@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDBD38E125
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 17:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C2A83BED7D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 17:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773942615; cv=none; b=pAS/FjyC18WTeRvo+MflnxsxxT0tZKFJsCj8PdpKZSbd3CbDRpoSlg9SrJ+HE1jguabpvhAiKImRf+7wEKuB/b3zWX+pTMD27KP9lWmoiomBjWKQaAFO/B/SbmcCd41EbBEEwqurN9JuOlY/WxIZUjZERFb3owhjDnJ94fXQbFg=
+	t=1773942616; cv=none; b=Lb16cuP0Urf6DEul5GXQGpFq2K09CICdDcI+WH+8OgnQMLryHG1whYOl31CkE9YTd556x9m8TIcn/FEDjajnzqH6TTHgXaEIpSi2dQkwFH5L7b3NpNBnXuDAsCwQU+cVthA+ZusAvoxUuKq/yvljdHxMF84+suTveLYtY6aAFI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773942615; c=relaxed/simple;
-	bh=YgV5gpYHpAx+2JHoo61/3GNsTkLFzkiBel0g35Xv5aY=;
+	s=arc-20240116; t=1773942616; c=relaxed/simple;
+	bh=aCP0pQ1woTYRuVokCj7I1yooybrQJkyC/VJckVnn3hQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TKaYFTXRGpd7iP143MVlBHEK5srx1EW5GaopCADuRPVRoHABAhEkPsAc/vKaBYfcyv/fWSsSzA29OQtKorjFa0wySjGyuu9ODXcfMkfW9Il78ZdpR649/dp52qdMc5w296ycFrhQIWL7UwldtmC+UeZC/qMGW7wWP0+CTKTWgYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GvPThXcX; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=rah7yW7eZBZ2VbRqliTf5KGF4ZY147p/dZxhRV1+A4jFjrpTPuzUwdiE7aSp8GMxU98TfnuZKFcQ4zpAB3yYVWPiovM0IQoLClc4ixpa6jE02or737s7o0mSwc06aF2o0L/0uxiiasH78b3zpr13cc62j72GGwuqY8LMp1sWT5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qKseOxXp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GvPThXcX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA0F7C19424;
-	Thu, 19 Mar 2026 17:50:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qKseOxXp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20B4EC19424;
+	Thu, 19 Mar 2026 17:50:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773942614;
-	bh=YgV5gpYHpAx+2JHoo61/3GNsTkLFzkiBel0g35Xv5aY=;
+	s=k20201202; t=1773942616;
+	bh=aCP0pQ1woTYRuVokCj7I1yooybrQJkyC/VJckVnn3hQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GvPThXcXSBpdm4HCAd0nGVWUElGBYjgxAWfCb/9hO1D7IUgvfV+1SZodqS5JQBuLm
-	 4wymT8hDp1KLeAUzMPRHdn1f+k11LKXC091qePhihhM926618DIiaz8Kqw6gFWHG54
-	 UQt4g5S6/CiRPp3Rnh//IkA0UVPnJZWjn59QlDTd6fZi12/n6MbhT+2zUMH33yYi1P
-	 5iwrH7qvLWEtRKIDuYOBa6yK1ddMrMN122jEtrjC3jFoYGJZDoWo4uzIHci/BqAzSC
-	 TpZ8DTfBfEfxabkRWlA1rhX4FI5pNw9Dya55GTxp0PywajBLzn4GY8rbTIPIYLYTS2
-	 uVlUectu13Rjw==
+	b=qKseOxXpEM8GEsSIA4ADV2IZEmu7JWm5cVczpg40PIqsfULuXGJKnt7GW2EW3bZtP
+	 kOsKGq8TDMekNkUzwW66KiWFXtuENXGghAD+szW+xlfljc3yadBFFY5iUuEtcen/Xo
+	 pQU1L8xtTSOsq+2cTSbDYc84Lk3jTilM6oY8GREPvHLGhDmBFdhuUpfXfrbYLoOiSo
+	 OyIzAnw7vXXRqhSm97briaWnuGNbrSvhBCj5awnYdr1i/Dbjw980UntgZ2J5lSllIq
+	 X31j/NokHa2X0+n7TtiX0SWAAJz33BdXNbgbeTXyBEKkQAEeuuhz+HpIwKZTZ0iCz6
+	 TQ9TS3RSryYuw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9EF239302E2;
-	Thu, 19 Mar 2026 17:50:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FE3B39302E2;
+	Thu, 19 Mar 2026 17:50:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,36 +37,36 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/1] adapter: Fix "Failed to set default system
- config"
- startup warning
+Subject: Re: [PATCH BlueZ v2 0/1] shared/shell: Fix SIGSEGV on invalid input
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177394260554.1735656.1849132373572262335.git-patchwork-notify@kernel.org>
-Date: Thu, 19 Mar 2026 17:50:05 +0000
-References: <20260319105457.1381098-1-hadess@hadess.net>
-In-Reply-To: <20260319105457.1381098-1-hadess@hadess.net>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org, ssorensen@roku.com
+ <177394260678.1735656.12146727451745372530.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Mar 2026 17:50:06 +0000
+References: <20260319141435.83060-1-wouter@xesxen.nl>
+In-Reply-To: <20260319141435.83060-1-wouter@xesxen.nl>
+To: Wouter <wouter@xesxen.nl>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 19 Mar 2026 11:52:05 +0100 you wrote:
-> I wonder if the original report swapped one warning for another, or if
-> the problem didn't happen for the majority of folks due to command
-> processing in hardware specific drivers/firmware.
+On Thu, 19 Mar 2026 15:14:34 +0100 you wrote:
+> I have updated the patch according to feedback received earlier today.
+> The valgrind input has been attached as a commit message, and checks are
+> now applied further down the callstack rather than at the source.
 > 
-> Regression test added to the meson tree:
-> https://github.com/hadess/bluez/blob/wip/hadess/add-meson-ell-wrap/unit/integration-test.py#L215
+> --
+> 
+> In `bluetoothctl` when entering a space followed by a tab the CLI
+> crashes with a segfault. This patch fixes the user input handling.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,1/1] adapter: Fix "Failed to set default system config" startup warning
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b9a72fef5cd5
+  - [BlueZ,v2,1/1] shared/shell: Fix SIGSEGV on invalid input
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1436eab1d0e5
 
 You are awesome, thank you!
 -- 
