@@ -1,180 +1,210 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E51F399356
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 05:42:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE4839DBC5
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 05:56:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773898968; cv=none; b=R66w4G9ReXxKltDrtyl600QS1Y67MuvD+9dbguDqO61jeP82y39+exwRmLJPz6T5CQ6HO1WWzOvHbUX76gyM0wr2yFT7TOnZdJTuupQsnaC2Z+7uDJo+eLByrUhsoWDjTNpKOq/Nrg2zkp+OR6/bISpmjygLHXemydSwWYlabXk=
+	t=1773899782; cv=none; b=htNn34UrYi3jBFXeHsniiZPRkAtsKbNt2P5QcxWAV/slN0GwFJT4qNkxf6LXUXZuXf+HU7WD3qrxDmMKNNGvFukra4hLTSJ5TRgjrux1y56uH8qcLEcXn/8AYa29LT5fgj6RtuM6lSv19tSEHDcsLK1A6/vQsppG8ms5LvAjz2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773898968; c=relaxed/simple;
-	bh=exRLnuHCQSsOrtJ71v/zE9ncFjdeTRRVRFrKK/OOVw0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NVgeuSISWMwPIpW6GmHhbZVd/ApJEAsuomD8JrFoitjTi3CksuNIIihYMaW2T7lnhC/VWMQpzmlGR0Q5iQbVArx4Noi5QdnQfaV1nEoVcZleas77yZgYwRhWPtn9l/ongWjz+Jg0Y38ISGcRI3FVBPqaO5txq7TGGxqIMm3K6mM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=B7xhtH+X; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=E8Ob6+oy; arc=none smtp.client-ip=205.220.180.131
+	s=arc-20240116; t=1773899782; c=relaxed/simple;
+	bh=8ZiUi24fqFUdPu4QU34GDgepeC6HnaXmOxRZ/hB7GnY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GA31XtiLZ6CCd959S8/doFbLc/8Un8dZ9qVIklBVMefrQkaXQURZ/b8lJdE/kTlv2FZmKNQtsm/JgvhZRjIVQzVlu3WXqL3mEs9aSFeudKv7OicKclKObPYAeIaLEo6pVyCCUAe2VclHEheO8qRpZdV9AQ5Z4YKyZk3Vc49jh8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=P2KCUt9+; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Czp+MJFz; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="B7xhtH+X";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="E8Ob6+oy"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62J5XsYn1802719
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 05:42:45 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="P2KCUt9+";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Czp+MJFz"
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62J5XQTk2347861
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 05:56:20 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	r6IJ94K1mctnGXhKKrgdpugngvotzrGmL7GIzeq9Cqc=; b=B7xhtH+XyW27VEbe
-	DDarm+24B/8/90sxSA6hRPVc4hCmG385Aa1oJjMwK6hTpBva8vvuDXB7re5Qgulz
-	l3C0E8KsX+h0rAKuvolDy+AyxTH9STcXZIOz7Edyk7Rwjs0JVaTC/HVszP9j3679
-	aOIUKJrHsuvX3QUXDfEzoKZEJnOn9REKe9xUue6LtyHNdzSvnt8VojCWQl/xi//l
-	pF0woFQEBu/oHzYEc/xX9FcFIlgzkmtCXyLWuCFKSSWbaCmZTiDchjZN2hYkiAa3
-	SjVwSJlQC6OhyVwN9LKNA0s/OGBKbiBbF9HVQxZEZaepfejqEn17+iNFtLSPm1S/
-	FzCOiA==
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cyscb3re1-1
+	tDkC/xeR/SGMrqyVDxbSwFz+SYbQs1f95eXg5vYl4CQ=; b=P2KCUt9+iuiCPzY0
+	8GD9yGDozQOvPOZugZX0KlZQmhXzvvoP0xCp5QTSuO+PnJ8NmUTpEbYlX1iJKJJo
+	/k5Ieg7ga4PayK7fHuRiaF6XR8ao5jG62z+tHSGqicntiyTAEsBovvkwVbeDX6En
+	9ni2jsQa3G2PfQnjIP2chTYYmCVv42JNCXThSqBnIGHmqwSKsGv3soCLhAfEhtzx
+	al2UHcJNhBWuv1Q6qruC8hN/kyjx+wHLZ3QbwL30S2MHsHsc8E6IaHHrnOlPYbhh
+	kgxmM0YY+MgelIna5/t0mu2mCnn+YqC9UDs1xu2Gqh7mdc23HQG1zwpgCTrVQBXf
+	qGSkDA==
+Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4d0957rbyt-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 05:42:45 +0000 (GMT)
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-5091327215dso43201061cf.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 22:42:45 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 05:56:20 +0000 (GMT)
+Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-2c0d15416b3so11684841eec.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2026 22:56:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1773898965; x=1774503765; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=r6IJ94K1mctnGXhKKrgdpugngvotzrGmL7GIzeq9Cqc=;
-        b=E8Ob6+oykgNKqDUNaP4xMd/hTR0d10cKWqpTy8qxKJI3r8kUBqu7mLjyNdX6FWXGjw
-         jOcwLEOpvVnD4t7tKZuvueelvwy77Epj7ygTBcSaafK+tV9cJEQajNGd/xnT9SYs1p0b
-         tMhWfi63NYcLZGTuk+zylU8V/xVHZqMRAu3/qMoGVwjz132g8Yk/xroE3ttH/xOHt+mm
-         WaANpDjlm15dJYjQRTtgET1Nws2aewuRtfo8y7QjiYFdw1BIHwgjt6QKyiyKm/XlBDLF
-         rd7be3G+U4YCtO9RPbJ3rnjBGuT3AiFVNsLorE63U5zC9VEaNLfVvns1LcsAcq01QxEZ
-         /xXA==
+        d=oss.qualcomm.com; s=google; t=1773899779; x=1774504579; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tDkC/xeR/SGMrqyVDxbSwFz+SYbQs1f95eXg5vYl4CQ=;
+        b=Czp+MJFzSxFeJuwMiEV6QpHeA+d46cZXKv/aQ5U/FFls+C+EOywoU1w03Ds9LSswJO
+         RUjxb+bJfBUVfFZg/GvAJwAbkTJGbEW+dhw2NrEgoHYGJ+8MGqoGn3DVDIqOynrdgrdD
+         vyCOEX8UXnNNbEjaXBFfL4lLTcHI7AYy4fjtaerW1Ip+A+zXynMLiFUo2G3tqtMacyB/
+         RisuwBF0tRY1/Ch5JTgPh30/sQ4g7plakjAExWKXXc3cDzRfVcDKKoZc8BABXE41jHkv
+         CAEfrFDCwZz4BfcRTpBaXBvi0OXrG6B0IKAYnsW2FgfwpnV/Wfyj6ScEJ4AUwfSBmIIR
+         KGxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773898965; x=1774503765;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r6IJ94K1mctnGXhKKrgdpugngvotzrGmL7GIzeq9Cqc=;
-        b=gtZi1gUeArv4at3Hz7BRPTvx2ZER61EMeVRbyK3Stsy7PQD9Ow5sHGzz20EpQlKOTO
-         wpGHN/gNc8ugfoSEWBBgxbHQC5Kx0bMiMZpnaktNkbZjDn0uQffVzqEYpXm820niAAdP
-         gY2YfQcAkwqdjqNGuxE3Pi+xSLLV77XKodEXb9vs//jNuG4Ix6XlSigVWMsu0b9O+d58
-         NPvQCbAunFCVZS84jGNcD+3IroUgkQWWQO9jzNsV8nAwz7SOYt5kkji7m60emxUdHBgV
-         y6QHHIq9zJ4x+G7s9fc9XRlXRrqPsHYl8JmUOxaYvwvCjRnPgA+CduQd9kKMW+u6AODk
-         1+BA==
-X-Forwarded-Encrypted: i=1; AJvYcCXCzYNLGf5/DYTZT1oYOi36y+6jX7RXouQzL6ptQcyHr30rRQ/EpViu71uvA27SGpVSdW4ZB3FIykW/mCnivKk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGSPk4TynN4c+1jKc2I/HW/R5Fvp2uroXv0IHyLdyT8F8rrfd1
-	hoCdThn5LXvFx29MkZC6XW7ALBXk3L8kQVquUCr9zPVva2nYjH1fgLqwAKsCAg0Gj8g+axe481k
-	a4wTXnpA5A5Zt+fxGsAVoeKWL6GdvlVFF8HQEJ9irgL0AV+9ezQPtMPcVHkNmXK9EbqX3kG4=
-X-Gm-Gg: ATEYQzzYn9izvr7xTcXjQrZO6krFK6pCyQuQGS/ACFJ+bHcVdtum38s3K5T7McP43fe
-	jXmZdGFoglcA//zTk+vZYi+T+d/hdi6PpEM4HwLyaevYveNia879ItLV0F1VkWZedtYb3l24xNn
-	p5HSmo3YWiUCC2htSLOOLdoNZYtiSrhhkB+6qfrzKAev8XGcUiu0gW7Y1KP580AvsFmTHfblR7/
-	BMU8wAsU+7VYUQh+eAuSBTMgPDAwksPrO4Qk1/a6GvllC+E2mc8yv/I4uLwh4/y9IRaaBBIl2UQ
-	SwhZpU1T9KVP6N8sxxo4lUDeZkkZmAeQ7otZ9VQeeLksdvvWQlQn/eG+8mMSsl1EOC3TOU84+mb
-	mQdNoP3bzYnSD8Bdwql8sqiOzYVe2Rm+CnDcRE1b+LTq5x/ZZmHojQD79cRjQvVEB1SYnBkGHKa
-	DDy+w/l7mecxW+hixqm97c7Nqra+7E2HXilBY=
-X-Received: by 2002:ac8:5a0d:0:b0:509:379b:d48 with SMTP id d75a77b69052e-50b14746739mr78317051cf.9.1773898964697;
-        Wed, 18 Mar 2026 22:42:44 -0700 (PDT)
-X-Received: by 2002:ac8:5a0d:0:b0:509:379b:d48 with SMTP id d75a77b69052e-50b14746739mr78316801cf.9.1773898964288;
-        Wed, 18 Mar 2026 22:42:44 -0700 (PDT)
-Received: from umbar.lan (2001-14ba-a073-af00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a073:af00:264b:feff:fe8b:be8a])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a279c7b7a8sm1003914e87.80.2026.03.18.22.42.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 22:42:42 -0700 (PDT)
-Date: Thu, 19 Mar 2026 07:42:39 +0200
-From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-Cc: Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
-        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
-        jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com
-Subject: Re: [PATCH v1] Bluetooth: hci_qca: disable power control for WCN7850
- when bt_en is not defined
-Message-ID: <whqo7o6fu6mytf3hpdrrirptx3fpprnp25as3dnam6n4fo7tjq@dolksuaq4irz>
-References: <20260319031040.4096297-1-shuai.zhang@oss.qualcomm.com>
- <mcjloavd6jhinb2wgfwihsdtbay5n7zv52tn63kzrabcqwyp26@mh5aet76kl7t>
- <1603a5b0-8edd-4c31-b2d1-344ee7df10ac@oss.qualcomm.com>
+        d=1e100.net; s=20251104; t=1773899779; x=1774504579;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tDkC/xeR/SGMrqyVDxbSwFz+SYbQs1f95eXg5vYl4CQ=;
+        b=ki4ncUZTT/FVFTZ3M7X09ui/WTka8hER5eTA3bDKEKuedhBkrBHswkza9irscCkTaS
+         fyt1tL8me6ciszmWFqNsjcWFQkOM02svoweiWswAHwknFYgoKO2DtFFcyKBRpKRqLljt
+         8vphwT3oovN9mL0fbBwA4TSLK/QlC0QX20ujrTiEpNRGywV39srRJzyFE73MSzb7ghl8
+         97mx6Y4g7b9JtGB4VJBs5epd8d8P/aJbVKqP8h1H1SgNDcsoowr73pdSmHZZJKgPAPvD
+         8YK5pfTnHQj5p5nKISzHxP1hJqCK7aglR/bDEnNhYDUgjEeQgXeImk+TEogF3YnsPw7w
+         cJdA==
+X-Forwarded-Encrypted: i=1; AJvYcCWQLvsJXwyZ5FDwxmJOdZ/1UDhRlA9PzTISk+fHSHV2vQED1aXVknKVORAqTho5eErAQjVHYef5yPWv0YUQsFA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLQceUKJfAb56t44A1pXRw6as2WUG89mx5PdoKJ/hWhQ8Dnpji
+	ZdAjB+AEjjQC0NkuYLck2zkxhE7zBZlE7jpNU4a34ZDlzUo0PsY4ZPY5z+9944XyyNmZMy02AVE
+	fvByPFM8r76LCgIuAaWYa2ngMreQLPuUfIC1tKr8ijFANHpXnyWlifm9FMAW2Uowv2m8WDt4=
+X-Gm-Gg: ATEYQzx+1446kfEiOv72S85z8Wkw6E7lQOcNB0XekOU1SWZhcqLJC3e1Cac4srQfiQg
+	un1iMGtk9TJBZwHsiI65q4cOEqm5NnGTTImOEctW1CmwY0MXsPmer/NoXdo7nQzl9DV5k21sBo2
+	RofQ+wwuxX1G1lB6lmFhGUMBFXkpZUpgPO6sEthlUEsFuwTrtjMQY75WCt4IFpkEjwRmNGeaZxB
+	dLm+L9OPfo8d+tKseY/87OzhF+Bb6bnq4fi0GrJKNTm0lqhNqVE6Kte68x0X7vWWOrVejPJX2aq
+	F0hs2GDdz4wXPE2Y3SqrVuopigjetgH/PxGRJkpjXlMevKV+yqFvrxxxmLc1X4V3U4eCh5PjrvX
+	umQxSsJuT0vHwU+lsoszHUsGenBxQ4C3S8IScO6xavdLf+2bGgm88h4Y2jjrJ5oB2ZHe8vINHOB
+	E=
+X-Received: by 2002:a05:7300:7f9f:b0:2bd:b961:7e8b with SMTP id 5a478bee46e88-2c0e50e9b2dmr2972221eec.24.1773899779382;
+        Wed, 18 Mar 2026 22:56:19 -0700 (PDT)
+X-Received: by 2002:a05:7300:7f9f:b0:2bd:b961:7e8b with SMTP id 5a478bee46e88-2c0e50e9b2dmr2972208eec.24.1773899778813;
+        Wed, 18 Mar 2026 22:56:18 -0700 (PDT)
+Received: from [10.110.94.9] (i-global254.qualcomm.com. [199.106.103.254])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c0e53b5235sm6901248eec.8.2026.03.18.22.56.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Mar 2026 22:56:18 -0700 (PDT)
+Message-ID: <6b5e6d2d-68cb-42da-82f3-43b2fd6fb943@oss.qualcomm.com>
+Date: Thu, 19 Mar 2026 13:56:15 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 0/2] Fix SSR unable to wake up bug
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+        Shuai Zhang <quic_shuaz@quicinc.com>, linux-arm-msm@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+References: <20251107033924.3707495-1-quic_shuaz@quicinc.com>
+ <CAMRc=Mce4KU_zWzbmM=gNzHi4XOGQWdA_MTPBRt15GfnSX5Crg@mail.gmail.com>
+ <212ec89d-0acd-4759-a793-3f25a5fbe778@oss.qualcomm.com>
+ <CAMRc=MdoUvcMrMga6nNYt8d-o8P-r3M_xY_JHznP3ffmZv8vkQ@mail.gmail.com>
+ <96472b7c-9288-4f81-9673-d91376189a18@oss.qualcomm.com>
+ <CABBYNZ+5ry0FWFSgOskw60jja9mE6WG5AwOi2pKxrkzqMn9bkQ@mail.gmail.com>
+Content-Language: en-US
+From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+In-Reply-To: <CABBYNZ+5ry0FWFSgOskw60jja9mE6WG5AwOi2pKxrkzqMn9bkQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1603a5b0-8edd-4c31-b2d1-344ee7df10ac@oss.qualcomm.com>
-X-Proofpoint-ORIG-GUID: eLfmPw3D2hdN2I-26fqMP0ByG1CWEU-Z
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE5MDA0MiBTYWx0ZWRfX49MsKq78cJj1
- f6MWEGlMrdHXvU7Ru78z2JG6k+LLfPpss6c1JcwZI4NKejjjQ7nFMY9RQ6dgp68dwnmayXGpu1l
- r/d/mWuXRbbkS6K24vj+dCmA/3QQ2+v+2IndTJWe8BNTth8qEea+VUwR6JlbK9hPSeLJovqgR3m
- /mnrIzQ7eN0Cag0V177uuqcDdKK4TpiPxdlp/HCQMsPEhyQ7fz2ElWsKNQu6LQW3FHucHI9nGAl
- rvANAS0srLbzP/xiXvl3qJenzajTnZ+PwK1TQbp27oNu84ncI9+karwIL05hcFo/UHK/nKSV5EG
- UkxQQh3qypeVWlkgTazbJupdgzwCpChfMCtBCWY/143co0F4q0PTVbiK2u2eLnnObHJuvfZpxG0
- mWWmCsnTMvqwdsFxXSf/wHoFn9SHiRPY668OOgp6hWePPDWyqQQ1DkAblp5YrTy8P2zcSH8Uj0B
- XbeOB2+4/v88o6ABOlw==
-X-Proofpoint-GUID: eLfmPw3D2hdN2I-26fqMP0ByG1CWEU-Z
-X-Authority-Analysis: v=2.4 cv=PtCergM3 c=1 sm=1 tr=0 ts=69bb8cd5 cx=c_pps
- a=JbAStetqSzwMeJznSMzCyw==:117 a=xqWC_Br6kY4A:10 a=8nJEP1OIZ-IA:10
- a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22 a=EUspDBNiAAAA:8
- a=M9_Ot2h7v_1VYoE6DvQA:9 a=3ZKOabzyN94A:10 a=wPNLvfGTeEIA:10
- a=uxP6HrT_eTzRwkO_Te1X:22
+X-Proofpoint-ORIG-GUID: Riw_32bxlHeB9lxcwPWEiIGAryfX_8Tg
+X-Proofpoint-GUID: Riw_32bxlHeB9lxcwPWEiIGAryfX_8Tg
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE5MDA0NCBTYWx0ZWRfX/MmIIbNAKpyv
+ O5EcFIMaNAb0wl+Or2/pha7sOIBh3iArvO/5aETlII061RfMf6826mN6Fb2KVY7rbTh1rjGF+OT
+ usxAoxDFMgsQMN8s1PrNjvUxmJzHwwRxSfHlK1QOnl4uTim2Dm+LUqhXlfkiinBuLR6oW2yC50z
+ 5UYY4tcmF6lNVVwL3y3EYcpG8vX+IGyQK1gmqul5PBd9IsAgIhfeI2b7QTjtPWMn6PwA1+JnSap
+ 2ZbKA+CT8AnfgiGS7HZAyePQnXh9ZIniwOlzk2W6CDjbvHI60GBT5+ZUon+2jua524Xvym5pHb3
+ Oj/UZI16fwlnm1XAL6Rdwwy01pBVUb4p7Y77lVPSku0prkyLhP8lTlcDsXqhROCtjLpfFNCngEr
+ dcDNXnGc+1KESc6P918kS5GFjaf8fKyl9sW+BOpeJnRNlNcfVgGfx47HAmnvoJpWHJkdF26pJMh
+ gfao7xgfXixzeMgyWsA==
+X-Authority-Analysis: v=2.4 cv=RZedyltv c=1 sm=1 tr=0 ts=69bb9004 cx=c_pps
+ a=PfFC4Oe2JQzmKTvty2cRDw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22
+ a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8 a=EUspDBNiAAAA:8 a=KKAkSRfTAAAA:8
+ a=2-u-yepbH7nZdbuG-UkA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=6Ab_bkdmUrQuMsNx7PHu:22 a=TjNXssC_j7lpFel5tvFf:22 a=cvBusfyB2V15izCimMoJ:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-03-19_01,2026-03-17_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 clxscore=1015 priorityscore=1501 bulkscore=0 lowpriorityscore=0
- malwarescore=0 spamscore=0 adultscore=0 suspectscore=0 impostorscore=0
+ bulkscore=0 priorityscore=1501 impostorscore=0 suspectscore=0 adultscore=0
+ spamscore=0 malwarescore=0 clxscore=1015 lowpriorityscore=0 phishscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603190042
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603190044
 
-On Thu, Mar 19, 2026 at 01:21:58PM +0800, Shuai Zhang wrote:
-> Hi� Dmitry
-> 
-> On 3/19/2026 11:51 AM, Dmitry Baryshkov wrote:
-> > On Thu, Mar 19, 2026 at 11:10:40AM +0800, Shuai Zhang wrote:
-> > > For platforms where the bt_en GPIO is not defined, software-based power
-> > > control should be disabled when power is managed by hardware.
-> > What does it mean for this chip, managing the power in hardware?
-> 
-> bt_en is pulled high by hardware,
+Hi  Luiz
 
-In which cases is it applicable?
+On 1/16/2026 10:42 PM, Luiz Augusto von Dentz wrote:
+> Hi Shuai,
+>
+> On Fri, Jan 16, 2026 at 4:48 AM Shuai Zhang
+> <shuai.zhang@oss.qualcomm.com> wrote:
+>> Hi Luiz, Marcel
+>>
+>> On 1/16/2026 5:20 PM, Bartosz Golaszewski wrote:
+>>> On Fri, Jan 16, 2026 at 9:37 AM Shuai Zhang
+>>> <shuai.zhang@oss.qualcomm.com> wrote:
+>>>> Hi Bartosz
+>>>>
+>>>> On 11/7/2025 11:37 PM, Bartosz Golaszewski wrote:
+>>>>> On Fri, 7 Nov 2025 04:39:22 +0100, Shuai Zhang <quic_shuaz@quicinc.com> said:
+>>>>>> This patch series fixes delayed hw_error handling during SSR.
+>>>>>>
+>>>>>> Patch 1 adds a wakeup to ensure hw_error is processed promptly after coredump collection.
+>>>>>> Patch 2 corrects the timeout unit from jiffies to ms.
+>>>>>>
+>>>>>> Changes v3:
+>>>>>> - patch2 add Fixes tag
+>>>>>> - Link to v2
+>>>>>>      https://lore.kernel.org/all/20251106140103.1406081-1-quic_shuaz@quicinc.com/
+>>>>>>
+>>>>>> Changes v2:
+>>>>>> - Split timeout conversion into a separate patch.
+>>>>>> - Clarified commit messages and added test case description.
+>>>>>> - Link to v1
+>>>>>>      https://lore.kernel.org/all/20251104112601.2670019-1-quic_shuaz@quicinc.com/
+>>>>>>
+>>>>>> Shuai Zhang (2):
+>>>>>>      Bluetooth: qca: Fix delayed hw_error handling due to missing wakeup
+>>>>>>        during SSR
+>>>>>>      Bluetooth: hci_qca: Convert timeout from jiffies to ms
+>>>>>>
+>>>>>>     drivers/bluetooth/hci_qca.c | 6 +++---
+>>>>>>     1 file changed, 3 insertions(+), 3 deletions(-)
+>>>>>>
+>>>>>> --
+>>>>> Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>>     Just a gentle ping. This patch series has been Acked but I haven’t
+>>>> seen it picked up by linux-next.
+>>>>
+>>>> Do you need anything else from me?
+>>> I don't pick up bluetooth patches, Luiz or Marcel do.
+>>>
+>>> Thanks,
+>>> Bartosz
+>> Could you please help clarify this?
+> There were no Fixes: or Cc: Stable in your changes to indicate they
+> need to be applied to the currently RC and stable trees, in which case
+> it will only be merged to next-next at a later stage.
+>
+> If that is not correct then lets us know if that needs either a Fixes
+> or stable tag so I can send a pull request immediately.
 
-> or described in the device tree as a
-> regular always-on GPIO.
 
-Why?
+So far, I haven’t seen this change merged into linux-next or any other 
+branch, although it has already been Acked-by.
 
-> 
-> 
-> > > Add QCA_WCN7850 to the existing condition so that power_ctrl_enabled is
-> > > cleared when bt_en is absent, aligning its behavior with WCN6750 and
-> > > WCN6855.
-> > > 
-> > > Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-> > > ---
-> > >   drivers/bluetooth/hci_qca.c | 3 ++-
-> > >   1 file changed, 2 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> > > index c17a462aef55..4512ff7cd0c0 100644
-> > > --- a/drivers/bluetooth/hci_qca.c
-> > > +++ b/drivers/bluetooth/hci_qca.c
-> > > @@ -2484,7 +2484,8 @@ static int qca_serdev_probe(struct serdev_device *serdev)
-> > >   		if (!qcadev->bt_en &&
-> > >   		    (data->soc_type == QCA_WCN6750 ||
-> > > -		     data->soc_type == QCA_WCN6855))
-> > > +		     data->soc_type == QCA_WCN6855 ||
-> > > +		     data->soc_type == QCA_WCN7850))
-> > >   			power_ctrl_enabled = false;
-> > >   		qcadev->sw_ctrl = devm_gpiod_get_optional(&serdev->dev, "swctrl",
-> > > -- 
-> > > 2.34.1
-> > > 
+I’m wondering whether I might be missing some information, or if there 
+is any additional action needed from my side.
 
--- 
-With best wishes
-Dmitry
+Please let me know.
+
+[1] Patch history: 
+https://lore.kernel.org/all/20251107033924.3707495-1-quic_shuaz@quicinc.com/
+
+
+>> Thanks，
+>>
+>> Shuai
+>>
+>
