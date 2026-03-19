@@ -1,133 +1,78 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B387039DBD1
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 15:02:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65293363C56
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 15:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773932572; cv=none; b=guyPnCniR4jB0jEKrSSWYKgCHNlE2kTm320fpvE9WDwcntU95y8pjWa7YRT81k9eZfRYxe+IFeuiaJDQbLE08/BnSZUU8g6JYiE93Vb//snw8vpQdMvfiuHxgTpet+0dtjNLUKs3c69rikrBGhXQD08mk/IS/yicGeg4PFDf/gM=
+	t=1773932810; cv=none; b=WtX2v1wS6FhXhdaQASIGlC7y6ulazYp8EWeByIuphnAiJZgZn0EZRWfL7mhrs/7u4jfNOhxsHmIGXIXIPNUrtNXF1WCkF36VG+ZBDM7u84pdtLHPk/AcS9kbc5n312gc/6nolM/NTQ9o9Y2BzzhH2DNQXsF4KTu6hZ+XMHbNqYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773932572; c=relaxed/simple;
-	bh=FCoDEpPkxguvfbAHewT9lOX57pIyTamAOfDcZIhhjwU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ZhQRg4yuXOZLQmUGq1JsZHlY4T15FqJ4w7rAWnSE1U575ohZTYpSmRHaCm17f1PcVoKxHgV6V89JbOy/glJMs8Tv0C+FYSt4P7wNMSJFLO6ISz9g1//i5GQ+e7pSDOELBZG/rmmLFWLdTnj9XrRmep5ErrRGitPt2Qq2vHQOgew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W92S53ik; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1773932810; c=relaxed/simple;
+	bh=PQ/FGeYv1/7sOCo5lTmwGp7UvJZA8mi2wH7Kk0PdEZY=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=YlG/Wx2HZYPmIGlRgZ6ng70FMdbqGO9mrmMKabsam29jQ+xyHgPzwni25FZ5HVjjIwIDF2Ua0gP/g8zI7VI0BFJXb6G1sJQMcLi2nKyb8GgyR1W35Td2r74ekx53xdPA1HD54d1P67OMrsey8cfLu4d6SR9dOMpCWdEqfBknoRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=VVNcU2J7; arc=none smtp.client-ip=192.30.252.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W92S53ik"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-509134ab2d2so8471051cf.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 08:02:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773932569; x=1774537369; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=xBxzQa/uSM4Hxf5ktNu3qerpNbskTAEfvP+YHQ68cqU=;
-        b=W92S53ik3wmBch5jvzZw0c6tnj947KMeRcO+dXjDgGZJdoEOV4W8SoSWqfYqYvhknR
-         ztNqzi7ZLdLRtX0JFSqP8LjSIv6J/+VhMuZvy4xCOzu9QHJPjBEQcuyRiUot4m2ikAFg
-         02uv5iJC2+JHIOvgGHu/07HPAxTjN6mFk9P0QQ0izCv4I+IJwbPpkIV9nWBk4Us4XDUy
-         VTrFFT7n5jO8eUX4YhoW2J2XNRuvUOb4oGmvy8GxnxKqbmQDd/qF6QgUwZKOhp620Ajf
-         8Zf648kFfRDgOzDxC2eWU+6mn2/kXGbZ4M27e0T0HMRcGetSG4quA8M55c8tcjHnx5eh
-         HXQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773932569; x=1774537369;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xBxzQa/uSM4Hxf5ktNu3qerpNbskTAEfvP+YHQ68cqU=;
-        b=in7TKBnY8Z9pD5tmregFabKMcM+i/MWbvSzTv2aKmUYv3eoZ2cWOlegWBI6g1yUA+7
-         LGLKfdhu6ohiKhwE30ro9t0bHQawe8W1hxcRbIFUfrTiIyDiP/NKbKs3m+dWtmu6KWLv
-         YWC+qi5ZxxbKqGGHkdoTAsMlGuPWeP058ekXmd0WKiR5ZPMyHQCHbgxf4F99CY8S4f7L
-         iTqKRZ0WTvRtVjJx7uauVEqoh7AS0oGee3eIjaodmN1rUT6e6qz7AD2+gRON4ruYdKGE
-         ldz9P+D3y+GKkaGt+ZRtC37cqBkYnId+p/rAxd0TgsXwzXPVf0UiHDnvWL18Wtfhm7oK
-         tNRg==
-X-Gm-Message-State: AOJu0Yycw6T2FOHMHN7QAuZvB4HKGA5ULvubruW23RfV3FS9zfJqTx8v
-	j51Cmwpo5gFcz4DLtHcw7knHIBDPC16zRXOvROZoVAx6odT45TQzjts5PpoZhw==
-X-Gm-Gg: ATEYQzxdUbrTdkj+Ee7D2nOBrgeMi1+HM4SpXdRWbX9BLNa1B8gLp32RHxVT7FEa7i6
-	Xp8t+D8RwHyBa1FdFuxvJpr+qmYzq55dNpj4jO1M+gWWgEKBAjkAj49oCLN5VCJa2rm0MzAWNb3
-	ndNw0UFAXNtpE7wocVPXWFqqkx9Y+PV8KhztHNrggP92XGaB86KlLjq1EhjuWOLB4vA4o6ieK+8
-	wDiQ5+933wOkJTCPG9/BtXZByUyTNcdfXyyCfzg/l6/+uCcfeX7hZnqpq9KaXWuuc+vF8+E7YVg
-	AhztHR3MBsjoecmEuQIzI6Gcb2pz3jMX0QOA8hHZVXu7xb13UBi6FkGTT8hc8J/lO7pUflrFtp4
-	xLuFmWNJN8xGssYgGll8iobn2ioh0ylu+XS79+QfBxALoFTWD5AEerGu9lqfvOm3nku2lo0GLQa
-	aJtQeRRAjArZo73brICyEOSZMbZ5iE88w=
-X-Received: by 2002:ac8:5709:0:b0:50b:33be:c1f3 with SMTP id d75a77b69052e-50b33becad3mr15955651cf.10.1773932567687;
-        Thu, 19 Mar 2026 08:02:47 -0700 (PDT)
-Received: from [172.17.0.2] ([135.232.177.161])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50b134ad813sm49071111cf.8.2026.03.19.08.02.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Mar 2026 08:02:46 -0700 (PDT)
-Message-ID: <69bc1016.c80a0220.12d4e4.aec6@mx.google.com>
-Date: Thu, 19 Mar 2026 08:02:46 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1884170234803529863=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="VVNcU2J7"
+Received: from github.com (hubbernetes-node-4750e8f.ash1-iad.github.net [10.56.84.25])
+	by smtp.github.com (Postfix) with ESMTPA id 69A88121113
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 08:06:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1773932808;
+	bh=RpnlckpnulsLhgizJggo876ggakS9e87q02b4wVmpFA=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=VVNcU2J7B3+axFIESHUPBZb5cZ4FUL27rRJSZTRdnmtEbCGLO4aXpzD62EgIXMzBJ
+	 oHFCiEGytk0h8v4qUcmXAA05ieaMI7/iWPrtsEWEkr6pH9Yrv9hOL41UuzMoLKpzwE
+	 GJLuMb+vAij8++2NHRBVmk1Qz8237shr9WENSPeg=
+Date: Thu, 19 Mar 2026 08:06:48 -0700
+From: Wouter <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1069318/000000-183f1a@github.com>
+Subject: [bluez/bluez] 183f1a: shared/shell: Fix SIGSEGV on invalid input
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: RE: shared/shell: Fix crash on bluetoothctl command completion
-In-Reply-To: <20260319132720.1517783-2-hadess@hadess.net>
-References: <20260319132720.1517783-2-hadess@hadess.net>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============1884170234803529863==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/1069318
+  Home:   https://github.com/bluez/bluez
+  Commit: 183f1ac1578b41868c56b5527139f27a2d04a2a0
+      https://github.com/bluez/bluez/commit/183f1ac1578b41868c56b5527139f27a2d04a2a0
+  Author: Wouter <wouter@xesxen.nl>
+  Date:   2026-03-19 (Thu, 19 Mar 2026)
 
-Dear submitter,
+  Changed paths:
+    M src/shared/shell.c
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1069297
+  Log Message:
+  -----------
+  shared/shell: Fix SIGSEGV on invalid input
 
----Test result---
+This fixes a crash when handling "<space><tab>"
 
-Test Summary:
-CheckPatch                    PENDING   0.41 seconds
-GitLint                       PENDING   0.41 seconds
-BuildEll                      PASS      21.01 seconds
-BluezMake                     PASS      651.40 seconds
-MakeCheck                     PASS      19.20 seconds
-MakeDistcheck                 PASS      249.49 seconds
-CheckValgrind                 PASS      297.12 seconds
-CheckSmatch                   WARNING   359.34 seconds
-bluezmakeextell               PASS      185.96 seconds
-IncrementalBuild              PENDING   0.42 seconds
-ScanBuild                     PASS      1010.58 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+==3760495== Invalid read of size 1
+==3760495==    at 0x4902187: strcmp (vg_replace_strmem.c:941)
+==3760495==    by 0x4067408: menu_completion (shell.c:1126)
+==3760495==    by 0x40675DE: shell_completion (shell.c:1177)
+==3760495==    by 0x4B267AB: gen_completion_matches (complete.c:1282)
+==3760495==    by 0x4B2F8C1: rl_complete_internal (complete.c:2104)
+==3760495==    by 0x4B26B52: _rl_dispatch_subseq (readline.c:941)
+==3760495==    by 0x4B27B71: readline_internal_char (readline.c:690)
+==3760495==    by 0x4B48695: rl_callback_read_char (callback.c:275)
+==3760495==    by 0x40655F2: bt_shell_input_line (shell.c:309)
+==3760495==    by 0x406577E: input_read (shell.c:343)
+==3760495==    by 0x4068CB4: watch_callback (io-glib.c:173)
+==3760495==    by 0x49C1F4C: g_main_dispatch (gmain.c:3565)
+==3760495==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
 
 
 
-https://github.com/bluez/bluez/pull/1974/checks
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1884170234803529863==--
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
