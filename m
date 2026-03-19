@@ -1,95 +1,78 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6D1374733
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 09:33:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238C1364E9E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 09:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773912813; cv=none; b=bOO3KZh0XqYUhxdtYwrSPPDURZVO99hOAT2eVSkIh2ko7kHKugNLWp1bFbcAa9hba2CYKB5mrs+MZ91FWpc9Dp2EWXm/Es8UdUX1/ta1FH5cZQ3+56cIVetjyl35boXTolxsUszOjxy54BWeJgqNhJJmKXT7QCl7nGp/y26YgNE=
+	t=1773912930; cv=none; b=DQxNnBousTW7NtZiKy39i8HSs8bPuTlgEmQh2pPv6I3lZHlrjlSTW1jsakQQiIklYCiDNVAnnVmw3lLckYvHuicLZZX+nd3NVLDUtnAWGawniFwzrpMU5KMvFhTkruyTf8D/tMnFUQNEfc8mYee0KqwXTCbAgaUsNeVuMRzGXCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773912813; c=relaxed/simple;
-	bh=3RDVZYhRcz8vBTRDCPncQTpOYVliYvqxmCzYiUzuAHg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=teyK2AX9iev/4lxc0E+LZYhyQ2e/IEliwLwG+UkjMYpqYXBemc1zwUCScG2HDtLGWqQEBpg6/mDS8iPNPQ9M51giqnM8Qp+DHzE5arRzLraqzHwNQ9Wt2sAOwD/Zlsh5nvGJLKagjHPgCVtYWtvedHxZWhUjXPe36xKQc9zPBk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ed1VMAlK; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1773912930; c=relaxed/simple;
+	bh=g1LWNtK2afsolgGOeq9xwfIE/uPBToXU24tUFiliqEY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=F/A60pNWyNdvlFsvwkOVtlQJaRP7PM76Jz02b35C8QhXByYOUDMDhTIYEZcLdX+0wpkpQ1Vth9aHOG3hB1RRoxVLPvxn7sx3EstIVWhntpA4DdkzXpCTPms7SbhPghTXA8vdbSHx2tGKw1r3zUF04Q6GVD18FKCa1NTa051vR50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fBq50bJe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ed1VMAlK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=1x
-	VBUkXcikCeULZEydVmRymAIEJ4UXQ8/gnfYOxP6QE=; b=ed1VMAlKGRpkKWjmHk
-	xaEUh0C3pm3gxXOw9M2epUnhUYldBUxA+w7fK0QHVnDj0cgZND/vCR78aUKCi0mp
-	mChu7uHEdw50+9h1odj4A1tPyyfa4IXjG4bgoHdgIXoaFZ8nYNen0DOMAUR0U+/B
-	ZcVYEL6jDu9IMf3OvJFhfIf5Y=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wCnq6edwrtpCWKwAA--.11698S2;
-	Thu, 19 Mar 2026 17:32:15 +0800 (CST)
-From: zhangchen200426@163.com
-To: luiz.von.dentz@intel.com,
-	frederic.danis@collabora.com,
-	pav@iki.fi,
-	pmenzel@molgen.mpg.de,
-	ceggers@arri.de,
-	research@johannes-moeller.dev,
-	b23@ee.vjti.ac.in,
-	surban@surban.net
-Cc: linux-bluetooth@vger.kernel.org,
-	Zhang Chen <zhangchen01@kylinos.cn>
-Subject: [PATCH] Bluetooth: L2CAP: Fix send LE flow credits in ACL link
-Date: Thu, 19 Mar 2026 17:32:11 +0800
-Message-Id: <20260319093211.2239158-1-zhangchen200426@163.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fBq50bJe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E813EC2BCB5
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 09:35:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773912929;
+	bh=g1LWNtK2afsolgGOeq9xwfIE/uPBToXU24tUFiliqEY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=fBq50bJer10MVsg4hF03FYSa4cfVWRFeOuhSdcPenQpmfKVw8HF0EysCf4clNm1CN
+	 8213qZMkWISXl3/UNIYXMOgazuo3NVRYPVDGfyKQWPS/W8KTjoUPAm6uPOj5PRBgwG
+	 qOMvfTdHgXIFfvUUxjM2HTg3bzdekTrHo6/LlajRNI1ejroTZ92rE+jia9TcVi/73v
+	 CUMYBB4gPIliJPq2O2O7qXZuo0UwGFPuA8Vk2bsTEi0GyM1HhI0gWUNe4qJz4Mg25R
+	 CvXS2xiTVdXZkRRQ7NHJQS9Dzj51dFWSRAc8ZMkFNhnTSAg7j/T+UgGLy8kqxvBt/o
+	 x32b4LxflyEOQ==
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5a279ce9475so1527610e87.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2026 02:35:29 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVQWkgvG/BrMsPO8OkE1ooNVSd83+vMg9jbagZnoILhwb4Ta4HAIcxnMpiwmDrdq7wG8kgeX1MSqJd25W1P79k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuMIfwEqiFsJYq8vUvuSoZh9XnJzjrdyAJflFTP3drPhiFr+AX
+	MgC5xdaX+vY3RNo9aDg2C/uD5CO6FR380an7hNlDNZz7tW5DQlCTLAmnpsCwTvNHd9pvVtDJf6B
+	11zoC2hslZoQKfnnNLyFt1eXpwZUnv+ZQ/0Qhub6Jvw==
+X-Received: by 2002:a05:6512:79a:b0:5a1:425b:c7c9 with SMTP id
+ 2adb3069b0e04-5a27de293cemr556765e87.20.1773912928532; Thu, 19 Mar 2026
+ 02:35:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wCnq6edwrtpCWKwAA--.11698S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7ZryrWFy7Kw4UJrWkCw4UArb_yoW8Gr48pr
-	WDGFn3Ca48Xrs0v3WkGw1xWa1UJr92gF1Y9rWjg398A3s3Jw48Gw4jka4jk3Wq9rWvqFWa
-	yF1rtwnxKa4Du3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07ULXoxUUUUU=
-X-CM-SenderInfo: x2kd0whfkh0jaqqujli6rwjhhfrp/xtbC6B8hvWm7wp9rLAAA3j
+References: <20260319075125.76539-1-shuai.zhang@oss.qualcomm.com>
+In-Reply-To: <20260319075125.76539-1-shuai.zhang@oss.qualcomm.com>
+From: Bartosz Golaszewski <brgl@kernel.org>
+Date: Thu, 19 Mar 2026 10:35:16 +0100
+X-Gmail-Original-Message-ID: <CAMRc=MdRGdR=FyQHWC7yfAgpAFxiK6QGjEQXVr7mavWLOPS14g@mail.gmail.com>
+X-Gm-Features: AaiRm51W5vgNLXZhG86rE-1b9a2hDSmG2E6LDcCJVpoZZZP4XJEsSJ03tuKE5hY
+Message-ID: <CAMRc=MdRGdR=FyQHWC7yfAgpAFxiK6QGjEQXVr7mavWLOPS14g@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: hci_qca: disable power control for WCN7850
+ when bt_en is not defined
+To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com, 
+	quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com, 
+	jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Zhang Chen <zhangchen01@kylinos.cn>
+On Thu, Mar 19, 2026 at 8:51=E2=80=AFAM Shuai Zhang
+<shuai.zhang@oss.qualcomm.com> wrote:
+>
+> On platforms using an M.2 slot with both UART and USB support, bt_en is
+> pulled high by hardware. In this case, software-based power control
+> should be disabled. The current platforms are Lemans-EVK and Monaco-EVK.
+>
+> Add QCA_WCN7850 to the existing condition so that power_ctrl_enabled is
+> cleared when bt_en is not software-controlled (or absent), aligning its
+> behavior with WCN6750 and WCN6855
+>
+> Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+> ---
 
-When the L2CAP channel mode is L2CAP_MODE_ERTM/L2CAP_MODE_STREAMING,
-l2cap_publish_rx_avail will be called and le flow credits will be sent in
-l2cap_chan_rx_avail, even though the link type is ACL.
+What are the changes in v2?
 
-The logs in question as follows:
-> ACL Data RX: Handle 129 flags 0x02 dlen 12
-      L2CAP: Unknown (0x16) ident 4 len 4
-        40 00 ed 05
-< ACL Data TX: Handle 129 flags 0x00 dlen 10
-      L2CAP: Command Reject (0x01) ident 4 len 2
-        Reason: Command not understood (0x0000)
-
-Bluetooth: Unknown BR/EDR signaling command 0x16
-Bluetooth: Wrong link type (-22)
-
-Fixes: ce60b9231b66 ("Bluetooth: compute LE flow credits based on recvbuf space")
-Cc: linux-bluetooth@vger.kernel.org
-Signed-off-by: Zhang Chen <zhangchen01@kylinos.cn>
----
- net/bluetooth/l2cap_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ead51dc0f3f1..d444ec5be88f 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6633,7 +6633,7 @@ void l2cap_chan_rx_avail(struct l2cap_chan *chan, ssize_t rx_avail)
- 
- 	chan->rx_avail = rx_avail;
- 
--	if (chan->state == BT_CONNECTED)
-+	if (chan->state == BT_CONNECTED && chan->conn->hcon->type == LE_LINK)
- 		l2cap_chan_le_send_credits(chan);
- }
- 
--- 
-2.25.1
-
+Bartosz
