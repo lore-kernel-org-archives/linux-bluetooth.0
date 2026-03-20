@@ -1,202 +1,173 @@
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A4229DB86
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 18:02:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6027313E31
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 18:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774029771; cv=pass; b=AKeJpW2bBbRLwl/L4poI1fG4mOGdWey6QepgNA/haj+ZbvsV7rPhdLGw+9RGZDXxCr2+0gmopvrn5p2mUiZieHJFBpSf5UtekeD96bprV0pIH301+OoTqv3tKiHtGdhJACtakSpcu0G3lYZprnlDFt8dMmnUIOrsDkwcIVNq7qw=
+	t=1774029971; cv=pass; b=QwmsfQ32ON2NM5k6jGS19rk5fvHx1qyaHayB+FbT8JK9JCftDhtzH+tQICWRgK40y8OHpHoRXncaXy3kDL0vrjRZKBAwI4c9Yhn0JHgcciQHeCfdJZ6EoBbVZPswqbnGONxaCjZF3yNmGly5P85htOJQ31M0ivOjlt+NexMUwgw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774029771; c=relaxed/simple;
-	bh=wN6kpZeaNONl9B4mFN236xU8f+pgFkGY773WjFaxrS0=;
+	s=arc-20240116; t=1774029971; c=relaxed/simple;
+	bh=w5NtZAmYyTtSTtyPoh/JD/7V8iyrvlWclVVZ1N62wqI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CqLZXofoOEU5gcXeRZFMXSV6Okl0H460VxGNtwX6gzz7NTdD8fyYBs6+sz+D41gciEImpt5dKO1SQkNDkJ3ek4B/C5O9PAphWfabS4fLrGs/4xz1D6k00QPgJhuBtUW/rhxSJej7EvdaIotdsTxRvb/VqNTEMszUS5kumzCDWQo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iAjakDrV; arc=pass smtp.client-ip=74.125.224.51
+	 To:Cc:Content-Type; b=F1b6+TYNfawJUHDtb5vYDUpjneQhQzggh29/e/pCK6eC2Fu+oEodQ+619CJ1doGEy2hnQMp7gtMx/4yBlHkIqfOLBgRQppWtYmXa8xNjAMpIdSBftPKG58ZnLDsS6fJLba6783zelwYj+qvabt19y0m2jcEbNclSVJmjCTNO8NU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ClajEQbl; arc=pass smtp.client-ip=74.125.224.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iAjakDrV"
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-64ca423ad53so2532414d50.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 11:02:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774029768; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ClajEQbl"
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-64ad79df972so1027157d50.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 11:06:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774029969; cv=none;
         d=google.com; s=arc-20240605;
-        b=VQmOaKaSrodcqB5o8+tNKXh1nAKZzBK6RyM+4wBFRSjUsEAQh0QarYQUqQofR4kBIO
-         SCULe52OJVdMoTON8ry1BRqsJrG8l805O7sZsSiIZwl64MorG1k7edC8yLUIshOcduHO
-         5NaI5XuzzMJ3YU0t/zH2GXyxgEXxXRA0GgMlFm/L44X2S82Fd2cGvIB0D54PnNs209En
-         L4oAIHLymBUjS1/0ANWTaqv5CtYS2yWm0c/RpfBg48nFc9nJsjQxCUuz+VA0F7bi4lKd
-         V7z/7M7kVrU5xQoA8bagX1UGrDdmeB7ZoTUWqPmRQT0JSkjzcdkRwrtVTHFryFJL0i6X
-         V4yg==
+        b=B1Odumt87iFJUUcaUFYrSCabY7eQEwVqC/F6S2qjzen3DLNKK5hrQhokdb29k/Zg7H
+         cns1aWJXUs3Km+Yljk6d70VoQJHqQRygQ7G3er/BfOEYDpu1O05Xg+YEn1zQf1Es9Ua0
+         dzr6YCsrh0dHlIGzl0NyOb8cbIrhphEGqkHbLzsdBpYWyeda18tuE/ELLkQMy+iJjDQY
+         JwcNH7+I7krsmfc2CEe0DnFF1VXOkmSRofZTaIOWpNj/nOMltuSJwbnoC9ndVQk8G0Cb
+         SlSj0pVY2vYi9hbqEpcUP2sSua0ZCPgIcx5LcRSMhi7JWUKoqBr0vNaKTyzBFgT0SGAT
+         PDFw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=cA6FO5PK5MXNem7BCc+OhGtaRpwVisqbTVMiqZHzls4=;
-        fh=lV9tb2ZvkTBrlnFL+I/ZZaJGaDkL6kLF0sYCFoGPB18=;
-        b=JrNpEOEj/jm4f/2Zj20uOl/opQz9u84RxZ7CxJl9ICOSkoBBsDoJBG8/BaCI7eU/s4
-         CgoHxEiEePuv3E0iO8LD50CcV+CB6b0n2ioXe/Q72KKCZCaYDH7L+R7bnY/qGnGWNQMI
-         Gl+XoRREdCVfsy0V58ipOUQZs25yYps6Yox314y4rXnCiF38lNR498hn5Ze0KMOCuVbm
-         NesqlkaM/bfCFYzBBI9jUHQ8r4KX+XeWKTilYMWZeFmfYBjzRd04D7U8P9UzqLHLyzgN
-         CkbBJMVlTytmHjiEgitvcyyDVnWj6zMdv8QedwgLihQZqjWPCPGveaXEVYJR30VPzguJ
-         xSUA==;
+        bh=VH3ptaGI6uFGJTGGxQrr1dbuHGISnI3c66r4T4ExgYA=;
+        fh=G7FL00PQJsOt3PYdjxvECRp+csodTO/dzt1YPk0wLec=;
+        b=e0kvYTzumX5hclIM+diyEO7/fdavZL8ASJgX2UUEMQ1hbgiw5pTN5lFkcyThgDFY/9
+         SEseTFpyrfW9muiU9PsvV0De4DzsEd2X72GIQHOGIcNh718aLH6dfwTLUKs7ZlUjcbI6
+         Oe4hNl4pcbD3Wp+cEQUgi0+B+zNo0Gp6huxht4AiwpNAsQHDATizdqbzY5WIu9i8o/DJ
+         ZRoRSBfUVVKXnPP1zhWhgobUbrquAmCrDR2PQfqiFMToIOZ4vVCv+friE6RbPrWhkYSv
+         cFo5lGLPIjxb/+p7SdTHaR/u5gQTsAV0UD2iyNis29kNUjpqATgYnWplvfcJHWvt7MCI
+         YmOg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774029768; x=1774634568; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1774029969; x=1774634769; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cA6FO5PK5MXNem7BCc+OhGtaRpwVisqbTVMiqZHzls4=;
-        b=iAjakDrV2JnOdSKmzB/JTsv0Lskd7+OGsZMlcbFAOyGpswwXoPuchIgp90W5+W7QCP
-         hkzYtDpKR5NEb1l7vPx3rXWEXCWiY2SCRlrIpZDp1u4zNBeDs3veV3uHah5qdYEBysAw
-         DwUazMAuTd0laNFypAARYC6E/X563galHQuwJnOuBgfkS9YAuFH/8Dk4JiYjfqGH38Ri
-         rMwowIoCDMq5WOAVOSTKKAWvLlMfYI/OaVsyan7sOl9Gb/drRMe6896mHRqkDrVSnBkX
-         ED7UtqI357Koen7IoPAG+Rj6g3DdnTKkIicb92Hcwwqj0MlRnUFdBaxE6HoLVIPXuOKb
-         fkEg==
+        bh=VH3ptaGI6uFGJTGGxQrr1dbuHGISnI3c66r4T4ExgYA=;
+        b=ClajEQbl5FheZ0Oo5nGvaOckZl+FuSOXjCE2yy3UAULod0DNgCryaKX/C4li9wRPj4
+         CUltFgNrL7ebd6LbjZhUR6pmlefuSyHxutmdR9CfFicektySdCnmMr/vnxEmlx1AH92I
+         LTnnNd8gJD2C1KXPyDQJ7q55929Taoq8oM7jXQPQbajf529QiNXny38KsYSfulLLZYc1
+         CFWJjuL/WG4M0E9IoTvjR19t+zug1Y1WRE6pBdipOXRin2Qw4hrpWjdABuu3M41MKYLa
+         lVtG1zXyHFDsBio8Qq77/loRcCcWTuLWCL4y7AfgsL3jbCL2GileoOc3cDydLyYvBvQQ
+         K28w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774029768; x=1774634568;
+        d=1e100.net; s=20251104; t=1774029969; x=1774634769;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=cA6FO5PK5MXNem7BCc+OhGtaRpwVisqbTVMiqZHzls4=;
-        b=ob8hdXTo1+hJ1sgnv4ynZJBx7rzR+oPgHXw7cHJp1Pyvewnxhvd8yP3S/mdHRRECl2
-         ahcuBICF2fE2ik/U/IuQ6LW+JJKkOa4QeP7vQ3/JsUqehjJ8i39MBAcZJfADN3MKUGHZ
-         GQbJj3YOYH+xaSqdcJkL0aR33lQyLi8Oim64ilJZmTbQdbwUySaSIf2Sr+iQYOWpIeU9
-         FRUqqHdLRW5XraxKm2HG+Ja//P845aQmLFZj4loiL5FlI9PCBR1ime4Sj/oEnY7PTTjx
-         Iyu9kMRVlNdGZNq2TZ9+oIfx1sWn1dQG81dT7CokYSFoAGCUrsZrVq5ueb9TZ6F+vNZ+
-         ui1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXzHAUb85ZstzV6SMhhh73ni1U4bq76gV/1Vs8ci122Ie9YZUskM+E8EyQgael/ViRMF4b3klg8Rmka9nPSqAw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYVeC/QzKu+jnrCeKz8mGGN7Np7BXfk4Bu56j2PIr9NgQhV0TJ
-	l8EYC8TKDe2E6hkLySewotMJSh65Of/rZ5ZoZ7Z7nnLXl8w2bLXIRQSfVNf0duYId1ghKuY6sU0
-	P+lsbrpcKctTtjqYtSH6di5Faigwi9rA=
-X-Gm-Gg: ATEYQzwx5C8zKDVRCHEnGG3ib2gNzJ44PZ1a2PUFL5A5jfaBn2F49nOVGJByEFaLZ1R
-	rIOrGTlCcB0cPz7yOz27mIfD2FuyociYu9i/ULOJ93weEjIzGh7UVXV8RStU9Sx/7YJMY3jlrxi
-	+gHSF5mMZmAI5a66twwEIn43CGwHfQ8x6mVeWZ6J0g0j8aHvA3Z1TKi4soLlPTEYMRmnDUrXH2j
-	ZAoZOq5TCqmxt5d65tFZjSyT3WiWrYW4p4PMLIUYXfF6En0HOeGxaqJuBW6gr8Amu745ISsbJaN
-	VZzUT2jPnYW9n7+ZnUjdfKoVMX9I7Lg7SoQs4kXEkgL+iaEFOpQO4AkLz+BxwaogIOEWEhMg1bv
-	Bp0ho
-X-Received: by 2002:a05:690e:4292:10b0:649:e6de:8f3f with SMTP id
- 956f58d0204a3-64eaa6de62emr3219341d50.32.1774029767001; Fri, 20 Mar 2026
- 11:02:47 -0700 (PDT)
+        bh=VH3ptaGI6uFGJTGGxQrr1dbuHGISnI3c66r4T4ExgYA=;
+        b=hJ0D2rff2Jrp3HMkfp/ZTVJC1RZZGorid7F4NoLI0RpBNXyJMZZAUX4xZw9WXltrjt
+         U4kr5ylDuQ2eVmalwEeBuzhgBn2XjA3T6aaHn5A99/ww/lKE00H82HFKSFYkUhKi/4Vg
+         zW92nTMH4d0gqIyUQt9cwt3gNszlUNyjwoinMBqKKb5Hj3JsZe3HJlK5A/meNYMotV4y
+         na1W3U5r/eS6AsnMK+9eb27Z7QmO6/PMqQrOQ9hh1zdqYlCLOGMCbZcF7jilLfD6Von3
+         Y1NTlFOryJ9eageFrQiklyB57UcRIyBynnsbGbSUOjEYil0QDT6aLLlJJaZ+KAmHPbVk
+         ImsA==
+X-Forwarded-Encrypted: i=1; AJvYcCVeXMA/Da+csGq7uukFyLthfsdesVB+M7z3o7off9rAYxGRhSsR7/lDd63xSegTbHAalEJ88UmNN0GUKIC0xjQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPcsHJ0VoivN2ZTDSdlCKXtl/1QE3u8E/2w6iqqjU1WgXVdb8I
+	st+dc4wpfUfxDUeBfbvXIMxdHGdx4UnTtpzitfc56ShSmdB101P8DcOFo73Cpkgi1NbNiRst2EU
+	UU0hFCZc21h/knaua5H4LTDjzPB/uS6I=
+X-Gm-Gg: ATEYQzwbqV9HgEXaZe3AnWXB5jk9ViiJHgJFM45V8TezivdgsGfar9qSOjv7FYvJW1V
+	otgzz64nZq/4jU9ipHpv9BwnweaT/Q9khRbj5O5E1XJ1iGXQLCDuh2QsZZlBOZitqhY0dSHA2kc
+	lZTJLm18VDQBvrhtO2YJ/VYX7F3zrIEIwq/sl4etdWaPjxpijAUE1w+z0DkL0q7XYvpWYkByWa1
+	2UeR/p7OT7ximS4RCHo9cPVMASj82n8xYRXwb96471f3l4Nr0KtlwZL6Dt0TV9IyMBuMLt1WJfY
+	/hVyxKj2wDb2RYpshz7IZq7NJ10LfHaUqksualQSFLirKIwHnghAsWHFOWrr0WSkXmO+bo9qUBG
+	e1JTZ
+X-Received: by 2002:a05:690e:2406:b0:649:c36a:a9bb with SMTP id
+ 956f58d0204a3-64eaa7dd497mr3111845d50.61.1774029968854; Fri, 20 Mar 2026
+ 11:06:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260319190455.135302-1-luiz.dentz@gmail.com> <177396481128.1855248.1024090053580545012.git-patchwork-notify@kernel.org>
- <6411a735-d187-4848-b199-a0e2c2e0e52c@leemhuis.info>
-In-Reply-To: <6411a735-d187-4848-b199-a0e2c2e0e52c@leemhuis.info>
+References: <20260320151958.851-1-sarveshwar.bajaj@nxp.com> <20260320151958.851-2-sarveshwar.bajaj@nxp.com>
+In-Reply-To: <20260320151958.851-2-sarveshwar.bajaj@nxp.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 20 Mar 2026 14:02:34 -0400
-X-Gm-Features: AaiRm53NYqewKQi3pNJ2dEJTs9aDibGtDwtQHrJUYixyc7-oeqpSDV2VIuxCqs4
-Message-ID: <CABBYNZJfLf6PzKUkGjiCvqEm3h0+3SUcxY5RNbUHv6LBdPT_zQ@mail.gmail.com>
-Subject: Re: bluetooth regression fix likely to miss -rc5 (was: Re: [GIT PULL]
- bluetooth 2026-03-19)
-To: Thorsten Leemhuis <regressions@leemhuis.info>
-Cc: kuba@kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, 
-	linux-bluetooth@vger.kernel.org, davem@davemloft.net, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Date: Fri, 20 Mar 2026 14:05:57 -0400
+X-Gm-Features: AaiRm52Ok3B9z39WSAnIIsunfKvWBdOh0JLcRxkiskLb8gFRF8AIVXBOJh24Q8I
+Message-ID: <CABBYNZJyr3-J1pVj_kGWLjjPn1_tYNhkYY9wEoahY-8s2kdWVw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 1/1] test: Fix pbap-client to work with system
+ bus obexd
+To: Sarveshwar Bajaj <sarveshwar.bajaj@nxp.com>
+Cc: luiz.von.dentz@intel.com, linux-bluetooth@vger.kernel.org, 
+	vinit.mehta@nxp.com, devyani.godbole@nxp.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Thorsten,
+Hi Sarveshwar,
 
-On Fri, Mar 20, 2026 at 12:47=E2=80=AFPM Thorsten Leemhuis
-<regressions@leemhuis.info> wrote:
+On Fri, Mar 20, 2026 at 11:37=E2=80=AFAM Sarveshwar Bajaj
+<sarveshwar.bajaj@nxp.com> wrote:
 >
-> On 3/20/26 01:00, patchwork-bot+netdevbpf@kernel.org wrote:
-> > This pull request was applied to netdev/net.git (main)
-> > by Jakub Kicinski <kuba@kernel.org>:
-> >
-> > On Thu, 19 Mar 2026 15:04:55 -0400 you wrote:
-> >> The following changes since commit 7ab4a7c5d969642782b8a5b608da0dd02aa=
-9f229:
-> >>
-> >>   MPTCP: fix lock class name family in pm_nl_create_listen_socket (202=
-6-03-19 09:37:48 -0700)
-> >>
-> >> are available in the Git repository at:
-> >>
-> >>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.gi=
-t tags/for-net-2026-03-19
-> >>
-> >> [...]
-> >
-> > Here is the summary with links:
-> >   - [GIT,PULL] bluetooth 2026-03-19
-> >     https://git.kernel.org/netdev/net/c/57ce3b2e9cda
+> commit 765356e80262 ("obexd: Unregister profiles when the user is
+> inactive") added support for running obexd on the system bus with
+> --system-bus flag. However, test/pbap-client was not updated to
+> match this change.
 >
-> [preface: sorry for being a pest again and making life of maintainers
-> harder with mails like this; but I think Linus (CCed) wants me to bring
-> up situations like this; Linus, if I'm wrong, please do not hesitate to
-> tell me]
+> As a result, pbap-client fails when obexd runs on the system bus and
+> prints a NoReply error due to connecting over the session bus instead
+> of the system bus.
 >
-> The quoted bluetooth pull to net afaics came a tiny bit too late for
-> this week's net PR to mainline. I assume there won't be another this
-> week, as that would be unusual from a look at the history (and well, if
-> I'm wrong I'm happy!). That is kind of unfortunate, as those bluetooth
-> changes contained a fix[1] for a regression that at least three people
-> reported (and I know of at least one other person that was affected)[2].
-> A regression that is known for nearly a month now and thus already took
-> way longer than the "fix within a week, preferably before the next rc."
-> rule of thumb Linus recently mentioned[3].
+> Fix by switching dbus.SessionBus() to dbus.SystemBus() and replacing
+> deprecated GObject.MainLoop with GLib.MainLoop and removing the legacy
+> GObject import fallback.
+>
+> Tested with obexd running with --system-bus and with a paired Bluetooth
+> device.
+> ---
+>  test/pbap-client | 12 ++++--------
+>  1 file changed, 4 insertions(+), 8 deletions(-)
+>
+> diff --git a/test/pbap-client b/test/pbap-client
+> index 6dada4a11..4ff301059 100755
+> --- a/test/pbap-client
+> +++ b/test/pbap-client
+> @@ -8,10 +8,7 @@ import sys
+>  import dbus
+>  import dbus.service
+>  import dbus.mainloop.glib
+> -try:
+> -  from gi.repository import GObject
+> -except ImportError:
+> -  import gobject as GObject
+> +from gi.repository import GLib
+>
+>  BUS_NAME=3D'org.bluez.obex'
+>  PATH =3D '/org/bluez/obex'
+> @@ -31,7 +28,7 @@ class PbapClient:
+>                 self.transfers =3D 0
+>                 self.props =3D dict()
+>                 self.flush_func =3D None
+> -               bus =3D dbus.SessionBus()
+> +               bus =3D dbus.SystemBus()
 
-Afaik, it was tagged as regression on March 1st afaik, according to
-[2]; traces were only provided on March 15th, so yeah it was fixed
-within a week once the necessary traces were supplied.
+Are these tests supposed to work only over system bus though? Perhaps
+we should attempt to detect it somehow, or actually deprecate
+pbap-client since obexctl can problably do the same thing with a
+script or something.
 
-> We had a similar situation last week already with the netfilter PR to
-> net[4], which came on a Friday -- and missed last week's net PR to
-> mainline, so those netfilter changes were only mainlined yesterday. Due
-> to this a revert[5] that fixes a regression multiple people reported[6]
-> missed -rc4 and will only be in -rc5.
+>                 obj =3D bus.get_object(BUS_NAME, session_path)
+>                 self.session =3D dbus.Interface(obj, SESSION_INTERFACE)
+>                 self.pbap =3D dbus.Interface(obj, PHONEBOOK_ACCESS_INTERF=
+ACE)
+> @@ -114,9 +111,8 @@ class PbapClient:
+>  if  __name__ =3D=3D '__main__':
 >
-> These two examples make me wonder if we might want to optimize something
-> here. Have a second net PR to mainline in some weeks? Or should the net
-> PR to mainline maybe be sent later during the week whenever possible
-> (say on a Friday)? That would have avoided the problem. And yes, I know,
-> Linus at some point due to last-minute problems asked to send net
-> mainline PRs mid-week. But he iirc (not totally sure, hence correct me
-> if I'm wrong) recently mentioned that things have improved. That's why
-> I'm wondering if we should forget about the mid-week thing again and
-> shift things a little.
-
-Bluetooth regressions are normally device-specific, though. In this
-case, the regression was introduced to pass a new Bluetooth
-Qualification test, so we would have to weigh what is more important:
-compliance or interoperability? Which would probably be a split
-decision, though we always tried to balance that, since both are
-important. However, I can't remove a valid compliance fix just because
-a user (later more appeared which raized the severity) said his device
-stopped working.
-
-> Ciao, Thorsten
+>         dbus.mainloop.glib.DBusGMainLoop(set_as_default=3DTrue)
+> -
+> -       bus =3D dbus.SessionBus()
+> -       mainloop =3D GObject.MainLoop()
+> +       bus =3D dbus.SystemBus()
+> +       mainloop =3D GLib.MainLoop()
 >
-> P.S. Once again I wonder if we should have a dedicated tree to collect
-> and quickly mainline regression fixes subsystem maintainers ACKed -- but
-> at the same time I think strongly that it's a totally stupid idea, as
-> bypassing subsystem has many downsides (like bypassing subsystem
-> specific CIs, the need for backmerges [or duplicated commits] and things
-> like that).
+>         client =3D dbus.Interface(bus.get_object(BUS_NAME, PATH),
+>                                                         CLIENT_INTERFACE)
+> --
+> 2.34.1
 >
-> [1]
-> https://lore.kernel.org/all/20260319152247.13225-1-luiz.dentz@gmail.com/
-> -- in next as 761fb8ec8778f0
-> [2]
-> https://lore.kernel.org/all/20260301233619.1807980-1-joanbrugueram@gmail.=
-com/
-> and links to bugzilla in that thread
-> [3]
-> https://lore.kernel.org/all/CAHk-%3Dwi86AosXs66-yi54%2BmpQjPu0upxB8ZAfG%2=
-BLsMyJmcuMSA@mail.gmail.com/
-> [4] https://lore.kernel.org/all/20260313150614.21177-1-fw@strlen.de/
-> [5] https://lore.kernel.org/all/20260313150614.21177-5-fw@strlen.de/
-> [6] https://bugzilla.kernel.org/show_bug.cgi?id=3D221152,
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D221158 , and
-> https://lore.kernel.org/all/143e1a402ad78dd7076516a6ceb637f378310b16.came=
-l@sapience.com/
-> (some of those are with stable kernels, where the culprit was backported
-> and reverted earlier already due to the regression)
-
+>
 
 
 --=20
