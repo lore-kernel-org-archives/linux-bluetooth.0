@@ -1,67 +1,68 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767FB3806A2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 11:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654DB351C0A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 11:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774004491; cv=none; b=giYoXZVrI3cHlk1yY2gWPscFzXgn8b0TiAohnLPRNSFmkWj17kRyoHPjJDIzHaD4OblHSn6m+gpmDHjdrUfYQiKPhPphx2v16TDK39jL7PcnNW6bYAV+7QPpX8mkd2X2X338d1tyYL0JbmPVL6LTChgh9/XxnOT4M5eyitwuf3k=
+	t=1774005795; cv=none; b=oSbZFs4QcHZYLW1L48sR9HAXIbRTfOCIK9MOZAmnMcj9yMSqOj521wbB7rKy6wWcL4qIRrCiGSN5G0PyCEaP3NvXfKkXxeDFtZDxYKzxODB1srRbkOTbISp6rRLcgx2HY+M24OInDFcuiT9lPi7O6+U7ROV6eti0qwR249A/J3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774004491; c=relaxed/simple;
-	bh=7+DB3+vjlDhpyqptJ6jWB91ZjW4fJtENspxOZ3cozdI=;
+	s=arc-20240116; t=1774005795; c=relaxed/simple;
+	bh=8BJGx9RZqrIh+eWxG09ALsa9KNbijfSt/c8dfN8TKb4=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=jYJwOuIGTof2Dxss4DjRqQQV2lKuCvXRnF9LaAWLyzc/7R8h9zt3XTALivTkfGS9G6Ehjl0Eac+0EcStjKub6MPcyON74t3BfJE55B1kRktvWVlzSFcPabLNHeYWHcXDUkdQuqIJph31ytfErieg6Qf2LICUzEy70Ps3scEkm68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PbNRDBbC; arc=none smtp.client-ip=209.85.216.48
+	 Content-Disposition; b=fOQaJasOjpDk7OBWgY4CN+da1rA0diiJHIkye2HzOgAVlynEPs6PTA96yAIs++9u0tdC0XITzoCsVZyAgJuuLMKKogjiTaRC9C6b0CxrbeecQSDa57/iwfbhsblFLtwIwPPq1XT/gw2RGjFamJOVsi8aUgWqVTPeQdfN4iLMhgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EPmxBbv4; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PbNRDBbC"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-35bb9070644so336958a91.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 04:01:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EPmxBbv4"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2b0603ee486so13428235ad.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 04:23:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774004490; x=1774609290; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1774005794; x=1774610594; darn=vger.kernel.org;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=FqQFOGzxjE5ZecTOXH8xi+uFz9L0OUi6AUwtTPl/2Ug=;
-        b=PbNRDBbCk2n/ORUK122R+yUphIesP5enlYyeAUqqxblFzXu6rAoOamInB00WaZWDDe
-         WKI/5TUse/+SDPV8r3fscUulJkZ0L4vEF2hb9M+NlHhLmLIinI7T4ZITDjvDqXL6Vctf
-         iGSm9RPrH/HRV/vGuDPgojE7LzZi53xqu/Z+8wwJIzlpMiFjsQ0lVDdjaysgVd7YB7sH
-         m7qaNNvhf3H0Uc89sOKUV6uGmvgNqS98C9qVdBSI25jPng7CL2zsYgRb6poeP10+UADw
-         RiCffjwJDAZL1dBsGvb/9knWwlyBV67akS9xOmua2CtQrsqrGJO17zj0D7fPq6tb2CMC
-         +lZA==
+        bh=L8VyJQBxzCjE2+Xkx+mvyR8wSXjPDl2xQEGG8EMwFck=;
+        b=EPmxBbv4ayHe1cw4Zunb8ES+elBWoirW3hELt5Apg77efJXBN6+4pxiVYzwMkuy9h7
+         MIj4nLc/Kfkq8OzJjE2+8Ho4ZdJprSn1Phzr2ebNhpaD+YLjL9GeGNK5Mq3eJfwXgZGF
+         VrOlMgak0rS08GRvEcfJPTsMIWefp/DkSSUVqLGZgTZ5SVI38xBEwIwZwojsFE+923TG
+         6+VhvNAD9Vr1Lz3sJWWYsPZJ9+1bnDA7Iq4iyVdfecxuKUiSXVZUDot8D92266KHVI5J
+         TpoFgWSgEuV04Q2GMId1VroWDuSzAnVgxtEzvcMWZ+yPn7748yilvwdk/3K0/bT6G/lN
+         d49A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774004490; x=1774609290;
+        d=1e100.net; s=20251104; t=1774005794; x=1774610594;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FqQFOGzxjE5ZecTOXH8xi+uFz9L0OUi6AUwtTPl/2Ug=;
-        b=QtlbkimRmfoI2so8ltJc0iSVW2bw+uzTBSXQlr3PcxBvjeKRgpLZcmHawOD9/+Use9
-         QA3YabU3FzXC4auF9WKWIOawdxnmSsRWks9QGUQdw8DsW1JUjUZ7A0h7aPgTmdiUYuu3
-         FbsAzxKGo1cibieK7bsfgSTAWCzL2hRE3QCyQ/ayRHcqzqvuUSrxzkWYkkWx1Bb3tIEq
-         10BE8yp37tT+BExUPnv78OvQJyqg6oGd9qC5SL1DQuHgfeWbX4A06evAguBIzHgqM9z3
-         CPL/gYb4bToDM8GgfWRgnDHh0Wiw1gz6Cgw2Ow1y2l4AQRfEou+nK69YN8I6qhewijbZ
-         f6Dw==
-X-Gm-Message-State: AOJu0YzWw7HSCkeI1hqgcMxz//WQTZhtraqor/mNpQxbWk003a1Go04g
-	9eDEylUcOymVilLdZvx+MnVZOtXrJcHOUa3jeZq94fnNVNbpderWqCfs
-X-Gm-Gg: ATEYQzzAULhBy0U+c42bDR36kcMxVJiB36hh6xvLCRp9O41pi8NBfBwWdows9UA3VSM
-	vHMQNI+o4/G3U0CBI3qJ/Rkk71mrUQ7gtQiDuq1NSkBiL7ffIkux0f2Vrip8A6Pr7kAmnKyzJC7
-	OwDgqu1cabr2FQ6MVO7hU+c8xNbmKu3VrkQBUjK3sK5zayu2kKNxr/S/6tHkheAIxj/LOYEg/Mh
-	ax5ikK8yZruDm/pBmgouQFhVfLnbBQ/4H1vnFSPnGvmfEriQyVVJIjwkWTCVXeqy7GETxtL9dxI
-	a5DgTEa9+4J5S5MgyIzV0tVKys4HmmeLn86DVIQqL2Nh66J+zMcB3C1ZqAhJWhWOO34G5oMZ7zH
-	PrZIitzjdzG7SuuCpSatv430nfMmbnaJR8T6Mm0QQ1Xsdla8J+6rdfi9JIrOk1HN8ouHZeDaVlk
-	E11ME8or7xYtHJsYD2xMpEYh8y5Ldeu1ukXiQrRpU6yg==
-X-Received: by 2002:a17:903:acb:b0:2ae:c5ae:cdfa with SMTP id d9443c01a7336-2b0827a7726mr21272915ad.28.1774004489682;
-        Fri, 20 Mar 2026 04:01:29 -0700 (PDT)
+        bh=L8VyJQBxzCjE2+Xkx+mvyR8wSXjPDl2xQEGG8EMwFck=;
+        b=hdLJCJs1g3qNDmtkOc0DPmqy0hXjmv1xACCR/01/wfY2OIFytrT1VciLVCQz+oGrsh
+         hX+iMVeCxg17KxTbw5cgILYt9pyT0DMmVi+1IBr0NInVM3JbYPUZCsO3D8JxxSKQ4WtA
+         JfoPqR70blAKmNmqooRGZLetZ5eTSN7rGwv81LcABeRtV2J8Ya/UcecZj/ghwAWhdPi5
+         sgPcHKudKwN2WXeUto9HPoYnqMGvGqZ8k4Q9yNL15Fx4vtYq4FLiCf7GHLi8W9ZdbUVF
+         E7r6+L/S5bN9kj11cQsumWoLE0pDkAFieh7dR1n1x57qpCPTl8opLxOdSYwaU9ngBHmZ
+         FDsQ==
+X-Gm-Message-State: AOJu0YygcjG/ukiSHyYhz4aTdix4yohCi9lyKag44v830qwaMDhb320m
+	GpysI3UT/MVqbm6hVORWY1nvnxVwgwY+RqVkfR4BJCNaKQtjRzkwY25tD4BnxA==
+X-Gm-Gg: ATEYQzxGGU/xTz/QqWn7W5Qz3P8t7jvBgw47NFw2mcYjf7s17G0DvHtUF7ppjsF5Us5
+	9Ph8QCinHyqt++ZZach5V0u2fyofhjgAiF/7ohITv9NJkgueRGHrjhfbjGSjIEQbG3B0h3wV2Bj
+	nudPSMOUStp5+WM5qJDL1+qdCMK5so5Z4hvOlNgzLDE+VT5sgS45IPg4lJFrqBd/1FiYeFLRTZ4
+	HCzm9azUtBm4wdNYesUN0dTooetDf5N1rIZSGCfqv1N1NDDRdomAwkoa3fANufhTyPxzFNd74FM
+	4BnOnkwODf/vmPufxNUqbRAH5oa9mWlhDayQ+jOdJPHGDn26LBTIo/gRwKP5Y+RF3atVjHqr9/E
+	qqkumx92/uTIsn+QfH+CIyC48yyS4gT5qD3eiSC8mPW7EHbtkjojTU65STlKz9/2lB5PWBsX18L
+	fM4c1C09JY0eNuXJoAH0e3Is6/tT8yt3igtvVJ8cG0MQ==
+X-Received: by 2002:a17:902:e846:b0:2b0:624f:8edc with SMTP id d9443c01a7336-2b0826cb353mr22729915ad.12.1774005793694;
+        Fri, 20 Mar 2026 04:23:13 -0700 (PDT)
 Received: from v4bel ([58.123.110.97])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b08354bcf0sm19970575ad.33.2026.03.20.04.01.27
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b0836a3299sm20863635ad.76.2026.03.20.04.23.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Mar 2026 04:01:29 -0700 (PDT)
-Date: Fri, 20 Mar 2026 20:01:26 +0900
+        Fri, 20 Mar 2026 04:23:13 -0700 (PDT)
+Date: Fri, 20 Mar 2026 20:23:10 +0900
 From: Hyunwoo Kim <imv4bel@gmail.com>
 To: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
 Cc: linux-bluetooth@vger.kernel.org, imv4bel@gmail.com
-Subject: [PATCH v2] Bluetooth: L2CAP: Fix deadlock in l2cap_conn_del()
-Message-ID: <ab0pBlGrvw_SHFwB@v4bel>
+Subject: [PATCH v2] Bluetooth: L2CAP: Fix ERTM re-init and zero pdu_len
+ infinite loop
+Message-ID: <ab0uHv8K_Jri2J6K@v4bel>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,60 +72,76 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-l2cap_conn_del() calls cancel_delayed_work_sync() for both info_timer
-and id_addr_timer while holding conn->lock. However, the work functions
-l2cap_info_timeout() and l2cap_conn_update_id_addr() both acquire
-conn->lock, creating a potential AB-BA deadlock if the work is already
-executing when l2cap_conn_del() takes the lock.
+l2cap_config_req() processes CONFIG_REQ for channels in BT_CONNECTED
+state to support L2CAP reconfiguration (e.g. MTU changes). However,
+since both CONF_INPUT_DONE and CONF_OUTPUT_DONE are already set from
+the initial configuration, the reconfiguration path falls through to
+l2cap_ertm_init(), which re-initializes tx_q, srej_q, srej_list, and
+retrans_list without freeing the previous allocations and sets
+chan->sdu to NULL without freeing the existing skb. This leaks all
+previously allocated ERTM resources.
 
-Move the work cancellations before acquiring conn->lock and use
-disable_delayed_work_sync() to additionally prevent the works from
-being rearmed after cancellation, consistent with the pattern used in
-hci_conn_del().
+Additionally, l2cap_parse_conf_req() does not validate the minimum
+value of remote_mps derived from the RFC max_pdu_size option. A zero
+value propagates to l2cap_segment_sdu() where pdu_len becomes zero,
+causing the while loop to never terminate since len is never
+decremented, exhausting all available memory.
 
-Fixes: ab4eedb790ca ("Bluetooth: L2CAP: Fix corrupted list in hci_chan_del")
+Fix the double-init by skipping l2cap_ertm_init() and
+l2cap_chan_ready() when the channel is already in BT_CONNECTED state,
+while still allowing the reconfiguration parameters to be updated
+through l2cap_parse_conf_req(). Also add a pdu_len zero check in
+l2cap_segment_sdu() as a safeguard.
+
+Fixes: 96298f640104 ("Bluetooth: L2CAP: handle l2cap config request during open state")
 Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
 ---
 Changes in v2:
-- Replace cancel_delayed_work_sync() with disable_delayed_work_sync()
-- v1: https://lore.kernel.org/all/abwTQVhyDv0_x26G@v4bel/
+- Keep BT_CONNECTED in allowed states for l2cap_config_req()
+- Skip l2cap_ertm_init() and l2cap_chan_ready() when already connected
+- v1: https://lore.kernel.org/all/abwTCkavRurEcEGO@v4bel/
 ---
- net/bluetooth/l2cap_core.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ net/bluetooth/l2cap_core.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 5deb6c4f1e41..b279620ed209 100644
+index 5deb6c4f1e41..b80667c263ef 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1748,6 +1748,9 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+@@ -2377,6 +2377,9 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
+ 	/* Remote device may have requested smaller PDUs */
+ 	pdu_len = min_t(size_t, pdu_len, chan->remote_mps);
  
- 	BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
- 
-+	disable_delayed_work_sync(&conn->info_timer);
-+	disable_delayed_work_sync(&conn->id_addr_timer);
++	if (!pdu_len)
++		return -EINVAL;
 +
- 	mutex_lock(&conn->lock);
+ 	if (len <= pdu_len) {
+ 		sar = L2CAP_SAR_UNSEGMENTED;
+ 		sdu_len = 0;
+@@ -4312,14 +4315,16 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
+ 	if (test_bit(CONF_INPUT_DONE, &chan->conf_state)) {
+ 		set_default_fcs(chan);
  
- 	kfree_skb(conn->rx_skb);
-@@ -1763,8 +1766,6 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+-		if (chan->mode == L2CAP_MODE_ERTM ||
+-		    chan->mode == L2CAP_MODE_STREAMING)
+-			err = l2cap_ertm_init(chan);
++		if (chan->state != BT_CONNECTED) {
++			if (chan->mode == L2CAP_MODE_ERTM ||
++			    chan->mode == L2CAP_MODE_STREAMING)
++				err = l2cap_ertm_init(chan);
  
- 	ida_destroy(&conn->tx_ida);
+-		if (err < 0)
+-			l2cap_send_disconn_req(chan, -err);
+-		else
+-			l2cap_chan_ready(chan);
++			if (err < 0)
++				l2cap_send_disconn_req(chan, -err);
++			else
++				l2cap_chan_ready(chan);
++		}
  
--	cancel_delayed_work_sync(&conn->id_addr_timer);
--
- 	l2cap_unregister_all_users(conn);
- 
- 	/* Force the connection to be immediately dropped */
-@@ -1783,9 +1784,6 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 		l2cap_chan_put(chan);
+ 		goto unlock;
  	}
- 
--	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
--		cancel_delayed_work_sync(&conn->info_timer);
--
- 	hci_chan_del(conn->hchan);
- 	conn->hchan = NULL;
- 
 -- 
 2.43.0
 
