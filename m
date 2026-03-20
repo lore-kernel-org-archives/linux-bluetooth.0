@@ -1,174 +1,122 @@
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6027313E31
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 18:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774029971; cv=pass; b=QwmsfQ32ON2NM5k6jGS19rk5fvHx1qyaHayB+FbT8JK9JCftDhtzH+tQICWRgK40y8OHpHoRXncaXy3kDL0vrjRZKBAwI4c9Yhn0JHgcciQHeCfdJZ6EoBbVZPswqbnGONxaCjZF3yNmGly5P85htOJQ31M0ivOjlt+NexMUwgw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774029971; c=relaxed/simple;
-	bh=w5NtZAmYyTtSTtyPoh/JD/7V8iyrvlWclVVZ1N62wqI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F1b6+TYNfawJUHDtb5vYDUpjneQhQzggh29/e/pCK6eC2Fu+oEodQ+619CJ1doGEy2hnQMp7gtMx/4yBlHkIqfOLBgRQppWtYmXa8xNjAMpIdSBftPKG58ZnLDsS6fJLba6783zelwYj+qvabt19y0m2jcEbNclSVJmjCTNO8NU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ClajEQbl; arc=pass smtp.client-ip=74.125.224.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88DE73DE43C;
+	Fri, 20 Mar 2026 18:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.98
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774031189; cv=none; b=tsxCyfbcxrvIPNzJ2oawSoBqpezsiLkL32wW4nSWEjHupAj0OmLUwlOCvZ9D+AA7BuXd2BmVg7Gtqemy0LWt59hhWs/U5r5jRYmDWIPXfsdIIreNaKF0sM4n+c8gHE/oe+pLXE+NA2BoWdX+9aPOckkrS9hEierJs/WW7VBkS3E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774031189; c=relaxed/simple;
+	bh=o5ItQIhCeMX6Yk+7eJ4ESB+JTMW+68A9aocn8H3JSaQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cj0RtqmHMO/qQKsTBJ/v/Bo7lG5EGQuqb4/0MfUzVvHqR36uAZ6/lm32aN0tAeRsCoC3k4OLXWFcgtlCPJUJ2rejNM4MQUGcGbYlQypvUVMgAW+/Rlv6pzypwMkMGNkCqYby/oRW98qoKyb/8SMEEa81KAyMYrVNOvk55EXGpgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=KSgBB4xj; arc=none smtp.client-ip=188.68.63.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ClajEQbl"
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-64ad79df972so1027157d50.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 11:06:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774029969; cv=none;
-        d=google.com; s=arc-20240605;
-        b=B1Odumt87iFJUUcaUFYrSCabY7eQEwVqC/F6S2qjzen3DLNKK5hrQhokdb29k/Zg7H
-         cns1aWJXUs3Km+Yljk6d70VoQJHqQRygQ7G3er/BfOEYDpu1O05Xg+YEn1zQf1Es9Ua0
-         dzr6YCsrh0dHlIGzl0NyOb8cbIrhphEGqkHbLzsdBpYWyeda18tuE/ELLkQMy+iJjDQY
-         JwcNH7+I7krsmfc2CEe0DnFF1VXOkmSRofZTaIOWpNj/nOMltuSJwbnoC9ndVQk8G0Cb
-         SlSj0pVY2vYi9hbqEpcUP2sSua0ZCPgIcx5LcRSMhi7JWUKoqBr0vNaKTyzBFgT0SGAT
-         PDFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=VH3ptaGI6uFGJTGGxQrr1dbuHGISnI3c66r4T4ExgYA=;
-        fh=G7FL00PQJsOt3PYdjxvECRp+csodTO/dzt1YPk0wLec=;
-        b=e0kvYTzumX5hclIM+diyEO7/fdavZL8ASJgX2UUEMQ1hbgiw5pTN5lFkcyThgDFY/9
-         SEseTFpyrfW9muiU9PsvV0De4DzsEd2X72GIQHOGIcNh718aLH6dfwTLUKs7ZlUjcbI6
-         Oe4hNl4pcbD3Wp+cEQUgi0+B+zNo0Gp6huxht4AiwpNAsQHDATizdqbzY5WIu9i8o/DJ
-         ZRoRSBfUVVKXnPP1zhWhgobUbrquAmCrDR2PQfqiFMToIOZ4vVCv+friE6RbPrWhkYSv
-         cFo5lGLPIjxb/+p7SdTHaR/u5gQTsAV0UD2iyNis29kNUjpqATgYnWplvfcJHWvt7MCI
-         YmOg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774029969; x=1774634769; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VH3ptaGI6uFGJTGGxQrr1dbuHGISnI3c66r4T4ExgYA=;
-        b=ClajEQbl5FheZ0Oo5nGvaOckZl+FuSOXjCE2yy3UAULod0DNgCryaKX/C4li9wRPj4
-         CUltFgNrL7ebd6LbjZhUR6pmlefuSyHxutmdR9CfFicektySdCnmMr/vnxEmlx1AH92I
-         LTnnNd8gJD2C1KXPyDQJ7q55929Taoq8oM7jXQPQbajf529QiNXny38KsYSfulLLZYc1
-         CFWJjuL/WG4M0E9IoTvjR19t+zug1Y1WRE6pBdipOXRin2Qw4hrpWjdABuu3M41MKYLa
-         lVtG1zXyHFDsBio8Qq77/loRcCcWTuLWCL4y7AfgsL3jbCL2GileoOc3cDydLyYvBvQQ
-         K28w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774029969; x=1774634769;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=VH3ptaGI6uFGJTGGxQrr1dbuHGISnI3c66r4T4ExgYA=;
-        b=hJ0D2rff2Jrp3HMkfp/ZTVJC1RZZGorid7F4NoLI0RpBNXyJMZZAUX4xZw9WXltrjt
-         U4kr5ylDuQ2eVmalwEeBuzhgBn2XjA3T6aaHn5A99/ww/lKE00H82HFKSFYkUhKi/4Vg
-         zW92nTMH4d0gqIyUQt9cwt3gNszlUNyjwoinMBqKKb5Hj3JsZe3HJlK5A/meNYMotV4y
-         na1W3U5r/eS6AsnMK+9eb27Z7QmO6/PMqQrOQ9hh1zdqYlCLOGMCbZcF7jilLfD6Von3
-         Y1NTlFOryJ9eageFrQiklyB57UcRIyBynnsbGbSUOjEYil0QDT6aLLlJJaZ+KAmHPbVk
-         ImsA==
-X-Forwarded-Encrypted: i=1; AJvYcCVeXMA/Da+csGq7uukFyLthfsdesVB+M7z3o7off9rAYxGRhSsR7/lDd63xSegTbHAalEJ88UmNN0GUKIC0xjQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPcsHJ0VoivN2ZTDSdlCKXtl/1QE3u8E/2w6iqqjU1WgXVdb8I
-	st+dc4wpfUfxDUeBfbvXIMxdHGdx4UnTtpzitfc56ShSmdB101P8DcOFo73Cpkgi1NbNiRst2EU
-	UU0hFCZc21h/knaua5H4LTDjzPB/uS6I=
-X-Gm-Gg: ATEYQzwbqV9HgEXaZe3AnWXB5jk9ViiJHgJFM45V8TezivdgsGfar9qSOjv7FYvJW1V
-	otgzz64nZq/4jU9ipHpv9BwnweaT/Q9khRbj5O5E1XJ1iGXQLCDuh2QsZZlBOZitqhY0dSHA2kc
-	lZTJLm18VDQBvrhtO2YJ/VYX7F3zrIEIwq/sl4etdWaPjxpijAUE1w+z0DkL0q7XYvpWYkByWa1
-	2UeR/p7OT7ximS4RCHo9cPVMASj82n8xYRXwb96471f3l4Nr0KtlwZL6Dt0TV9IyMBuMLt1WJfY
-	/hVyxKj2wDb2RYpshz7IZq7NJ10LfHaUqksualQSFLirKIwHnghAsWHFOWrr0WSkXmO+bo9qUBG
-	e1JTZ
-X-Received: by 2002:a05:690e:2406:b0:649:c36a:a9bb with SMTP id
- 956f58d0204a3-64eaa7dd497mr3111845d50.61.1774029968854; Fri, 20 Mar 2026
- 11:06:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="KSgBB4xj"
+Received: from mors-relay-2501.netcup.net (localhost [127.0.0.1])
+	by mors-relay-2501.netcup.net (Postfix) with ESMTPS id 4fcrcB5MD3z68YL;
+	Fri, 20 Mar 2026 19:26:18 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1774031178;
+	bh=o5ItQIhCeMX6Yk+7eJ4ESB+JTMW+68A9aocn8H3JSaQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=KSgBB4xjI45yHwv14LfECFzElIA1YiwlBSeOMp53jNJSLBfnOXfuKk0SAWwe+uGSo
+	 /BDedZP5vaSlddB4CLbkVt2bA7opfc/xKZPtrtGFVFzbhJ4P1Kz4K5T/2jN011kQPU
+	 4sQQ5V+fm9DrlKrBbaWVOYI1+1eWRd7d84puCw/MURMaMLJd3C/IYCTESfVHJyN0/V
+	 PGZay0dvgqEaW4CZhYIzF9515taUI4/wtSQU2JH+JNU/KYgk0Dr1XK0oaA51b9xw5J
+	 K92QeTgaM69mgbUbbJl7TFxMykEWTvW11AK1+2TdqtNN9BMEBLjDk5I8vH7D0OM4xo
+	 4Y/TvVQxn7g/w==
+Received: from policy01-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-2501.netcup.net (Postfix) with ESMTPS id 4fcrcB4dYYz4xS8;
+	Fri, 20 Mar 2026 19:26:18 +0100 (CET)
+X-Virus-Scanned: Debian amavisd-new at policy01-mors.netcup.net
+X-Spam-Flag: NO
+X-Spam-Score: -2.898
+X-Spam-Level: 
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy01-mors.netcup.net (Postfix) with ESMTPS id 4fcrc96SLXz8sbl;
+	Fri, 20 Mar 2026 19:26:17 +0100 (CET)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 35E52635BD;
+	Fri, 20 Mar 2026 19:26:16 +0100 (CET)
+Authentication-Results: mxe9fb;
+        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <e2b7f273-905f-40b0-95bf-ac6f9beb888b@leemhuis.info>
+Date: Fri, 20 Mar 2026 19:26:12 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260320151958.851-1-sarveshwar.bajaj@nxp.com> <20260320151958.851-2-sarveshwar.bajaj@nxp.com>
-In-Reply-To: <20260320151958.851-2-sarveshwar.bajaj@nxp.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 20 Mar 2026 14:05:57 -0400
-X-Gm-Features: AaiRm52Ok3B9z39WSAnIIsunfKvWBdOh0JLcRxkiskLb8gFRF8AIVXBOJh24Q8I
-Message-ID: <CABBYNZJyr3-J1pVj_kGWLjjPn1_tYNhkYY9wEoahY-8s2kdWVw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 1/1] test: Fix pbap-client to work with system
- bus obexd
-To: Sarveshwar Bajaj <sarveshwar.bajaj@nxp.com>
-Cc: luiz.von.dentz@intel.com, linux-bluetooth@vger.kernel.org, 
-	vinit.mehta@nxp.com, devyani.godbole@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: bluetooth regression fix likely to miss -rc5
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: kuba@kernel.org, Linus Torvalds <torvalds@linux-foundation.org>,
+ linux-bluetooth@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20260319190455.135302-1-luiz.dentz@gmail.com>
+ <177396481128.1855248.1024090053580545012.git-patchwork-notify@kernel.org>
+ <6411a735-d187-4848-b199-a0e2c2e0e52c@leemhuis.info>
+ <CABBYNZJfLf6PzKUkGjiCvqEm3h0+3SUcxY5RNbUHv6LBdPT_zQ@mail.gmail.com>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Content-Language: de-DE, en-US
+In-Reply-To: 
+ <CABBYNZJfLf6PzKUkGjiCvqEm3h0+3SUcxY5RNbUHv6LBdPT_zQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-PPP-Message-ID: <177403117699.3567880.6442946421288956324@mxe9fb.netcup.net>
+X-Rspamd-Server: rspamd-worker-8404
+X-Rspamd-Queue-Id: 35E52635BD
+X-NC-CID: IOLwiIw8DiIfpdvW7TEHhfxmZo2gVPkkujN5xX25ZardnN99F40=
 
-Hi Sarveshwar,
+On 3/20/26 19:02, Luiz Augusto von Dentz wrote:
+> On Fri, Mar 20, 2026 at 12:47 PM Thorsten Leemhuis
+> <regressions@leemhuis.info> wrote:
+>> On 3/20/26 01:00, patchwork-bot+netdevbpf@kernel.org wrote:
+>
+>> The quoted bluetooth pull to net afaics came a tiny bit too late for
+>> this week's net PR to mainline. I assume there won't be another this
+>> week, as that would be unusual from a look at the history (and well, if
+>> I'm wrong I'm happy!). That is kind of unfortunate, as those bluetooth
+>> changes contained a fix[1] for a regression that at least three people
+>> reported (and I know of at least one other person that was affected)[2].
+>> A regression that is known for nearly a month now and thus already took
+>> way longer than the "fix within a week, preferably before the next rc."
+>> rule of thumb Linus recently mentioned[3].
+> 
+> Afaik, it was tagged as regression on March 1st afaik, according to
+> [2];
 
-On Fri, Mar 20, 2026 at 11:37=E2=80=AFAM Sarveshwar Bajaj
-<sarveshwar.bajaj@nxp.com> wrote:
->
-> commit 765356e80262 ("obexd: Unregister profiles when the user is
-> inactive") added support for running obexd on the system bus with
-> --system-bus flag. However, test/pbap-client was not updated to
-> match this change.
->
-> As a result, pbap-client fails when obexd runs on the system bus and
-> prints a NoReply error due to connecting over the session bus instead
-> of the system bus.
->
-> Fix by switching dbus.SessionBus() to dbus.SystemBus() and replacing
-> deprecated GObject.MainLoop with GLib.MainLoop and removing the legacy
-> GObject import fallback.
->
-> Tested with obexd running with --system-bus and with a paired Bluetooth
-> device.
-> ---
->  test/pbap-client | 12 ++++--------
->  1 file changed, 4 insertions(+), 8 deletions(-)
->
-> diff --git a/test/pbap-client b/test/pbap-client
-> index 6dada4a11..4ff301059 100755
-> --- a/test/pbap-client
-> +++ b/test/pbap-client
-> @@ -8,10 +8,7 @@ import sys
->  import dbus
->  import dbus.service
->  import dbus.mainloop.glib
-> -try:
-> -  from gi.repository import GObject
-> -except ImportError:
-> -  import gobject as GObject
-> +from gi.repository import GLib
->
->  BUS_NAME=3D'org.bluez.obex'
->  PATH =3D '/org/bluez/obex'
-> @@ -31,7 +28,7 @@ class PbapClient:
->                 self.transfers =3D 0
->                 self.props =3D dict()
->                 self.flush_func =3D None
-> -               bus =3D dbus.SessionBus()
-> +               bus =3D dbus.SystemBus()
+Well, the first report was 2026-02-22
+https://bugzilla.kernel.org/show_bug.cgi?id=221120
 
-Are these tests supposed to work only over system bus though? Perhaps
-we should attempt to detect it somehow, or actually deprecate
-pbap-client since obexctl can problably do the same thing with a
-script or something.
+I don't blame you for missing that, as it took some time to reach you
+due to the know deficits of our bugzilla setup (and looking back I could
+and should have forwarded it faster once I had noticed it) -- which is
+another reason to change something there, but that is a different topic
+(see the recent discussion on the ksummit list).
 
->                 obj =3D bus.get_object(BUS_NAME, session_path)
->                 self.session =3D dbus.Interface(obj, SESSION_INTERFACE)
->                 self.pbap =3D dbus.Interface(obj, PHONEBOOK_ACCESS_INTERF=
-ACE)
-> @@ -114,9 +111,8 @@ class PbapClient:
->  if  __name__ =3D=3D '__main__':
->
->         dbus.mainloop.glib.DBusGMainLoop(set_as_default=3DTrue)
-> -
-> -       bus =3D dbus.SessionBus()
-> -       mainloop =3D GObject.MainLoop()
-> +       bus =3D dbus.SystemBus()
-> +       mainloop =3D GLib.MainLoop()
->
->         client =3D dbus.Interface(bus.get_object(BUS_NAME, PATH),
->                                                         CLIENT_INTERFACE)
-> --
-> 2.34.1
->
->
+> traces were only provided on March 15th, so yeah it was fixed
+> within a week once the necessary traces were supplied.
 
+Sure, and I can fully understand that you need traces to fix this and
+that not reverting the culprit helps motivating someone to provide them.
+But OTOH from Linus statement in [3] it sounds like he would have
+preferred to see this fixed faster through a revert.
 
---=20
-Luiz Augusto von Dentz
+I guess it's not too much of the problem that it took a bit longer from
+the report to a fix. But thx to your efforts (many thx for that) we now
+have a fix, so I'd say: let's mainline it quickly to (a) get it tested
+and (b) prevent more people from running into this, as then they might
+bisect for nothing.
+
+Ciao, Thorsten
