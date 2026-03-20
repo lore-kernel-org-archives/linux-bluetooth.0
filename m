@@ -1,112 +1,467 @@
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B9D3D8107
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 21:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99867371D1D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 21:31:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774041598; cv=none; b=g1mJhG345r1+gmsLS2wCV5mUfFB4trVms+dX+wiY1RJaRjf9O3L62bwCf6hhccuw5XTfaYCp8VHeD1bfSfvwFbkF7pyOIpX4WNkv6giP0IeqA6nSi8n8WOpWYDsi9MFBJ/EMMaCxKr+ryO7cJXoJKDin+VxGkzs4RZ9ZjYNl31M=
+	t=1774042300; cv=none; b=SGao+NiNDhxWhL46LVFhx0hqVkC9cFsVRtpMYYpCVPinpaMGqel3XGwuY9nQsEAs/blRRUt3OBW+qMqPkmxHb4u6DJYtCxJFhkxYCe9Co0n3hZQQEvyA+1rwTKowmlPyIplUwatvbNHI6ygE/CSoRMcSQ2+vr5IuQNflTnyyi1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774041598; c=relaxed/simple;
-	bh=HZRLHEwGWpwaQuLLrSh40uPRxk7ylCvGq0hs14KucR0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lOQijLuJq7JDQaHV0+pOAkQnj5xbkmf246HLY4wgVMKe7dX69BwrdD6Gu5tU2tBD9tJsz9aM6rPVPTdHkAfdlE+nnkfiVWOhOe86dSBsU+GDtqKmyd+JGu8Ljdhi1lAtwjSUK/m4+dTolBf+HP98wy2H9ccqfGEy4mkRT6VP1eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=eMDEouhS; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1774042300; c=relaxed/simple;
+	bh=LmjKq3gKMCvyQ3p7ifAGm6FjKcAothujq9xlk5lvLe0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=UiXKxeoeVZfkQhFt5Ew4mSaa87qq4KL5mCC29eoLUSPAoHOenheaXSXHE1MioUM7qFjLAc5gmiXvLgIp+KAMGu2KnnZHIaeCPysrHNVHV8FgznNAoI+EFyP/wE/JmcW3LNQGILnMCgvlAY19ZO1GIWKPCy+7oS+iwK/ov/dUvvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=github.com; spf=none smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=J0myTQ9E; arc=none smtp.client-ip=192.30.252.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="eMDEouhS"
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b982b0889d8so204172566b.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 14:19:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1774041594; x=1774646394; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XCE3Sb6hrBAlOh+2FMHN/3IZlK3Hh6o5UrXz2dr3r8U=;
-        b=eMDEouhSzs9exaBlbpACFyebZTFs3/a1JRwqnl6O8PH1E+uMaOwhH22MSGCtmsOYQk
-         IO03GOrQF82Eaa3WvbITXsHMrGcgQH27vphf7MLbcsYWdZgx+nLEQP9pFmJ7QpoRw7pq
-         NRyz4LOlLewWTz2p4/3MoTXbwJgnVbLW5cX04=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774041594; x=1774646394;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XCE3Sb6hrBAlOh+2FMHN/3IZlK3Hh6o5UrXz2dr3r8U=;
-        b=EvjC7ZPYHJiXUV/rA4q1MRfEObX1oaOakpqgHCoSp079B9a1OHsRnSwZmuwakwjUDC
-         ynPeo59ss4uG2j2W1nFSeEj/BQkMkFqBMGD+ij/sGMKmzVILfquU1qEIEPouesQrt3z0
-         OtTVs/nk0S3viJmv6NbpXh8cbRmjn9GPhhpQDGaNJq8mZtHAe9qOy8Vcn7cUgyoLBcyu
-         8NJY2dqB1i+6FNqJCEy2L1YtlsFLrN7HmZi4JDKP3eVJqFgtDGcPfzJ6BV8J10uAr9OM
-         4LpCPA93Xxgz3csFFN6PvljyNQEmK1oILMS0EtrE+H9VrJLlIbU41ENsmIb60wYYYspW
-         wTuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWk8syBuiRoL8h0klsRggtnB28necaq76VpZGcf0sFW/MkilSORUVog2KFah/+L23qP/pBA176PUP0ie9jq8Ew=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfN1alndQ2zfE8jKDyxxtDme+zp9MPjTD6yrWVQD4qKBo2mKk7
-	7wMRZ9PQZCqp2LikbNK0LTsKdkfz/qpeAoowTPuuRhzdCMmdA2nQOMsH+PCf96lsbL8Pn4s19ws
-	LGm1sWhM=
-X-Gm-Gg: ATEYQzwKiRuZdGlELfvRYufugX+ZQgEg7VPmRN2LsRP5SFJVR0KnaBM5tPvnKU1Q7o9
-	0dsEF0C5M1Y/d9yrH+b/0kE8LaJgg24uIAOfFNXAIu+xR4lnFrVRg8UhMCyWfUCKsautIJng0yd
-	lmvnN0sfZOfV9MhJUrgWpH+RnzNDWT9FKSyLwxLh3OyiHCT4c2QxqlQBU1JLOVA6vlpq+cAIKfA
-	NtcR20YETM9ner2QlJfCBZ+NiBL+mk5fA/xfUc85Fc0mDbAR57+y0CNQDqX9NZ7sViDqJW4YW4+
-	X15Bqeu3IbYo8Jj88qXvf+VxonqanxhbCUVsWJDzvblGVbmwV7tDUa3J5VzreuBN63RNhD2tFIF
-	Iac3pENO8+1XE7hhxJZ84BVoobAPWFv0f+9au9JxM78DhwRthnjXcv9gMR+8VyV8aMr93P2sJfp
-	G22jSUrVkt09pPIZ3tnjFvN/AvkKL+/alz0Km7/j/ujv0wN2Uvd6lGrmXoBzmXfmQQIl6Ml7Hl
-X-Received: by 2002:a17:907:3e8c:b0:b98:33c5:1bb9 with SMTP id a640c23a62f3a-b9833c56776mr303971366b.35.1774041594561;
-        Fri, 20 Mar 2026 14:19:54 -0700 (PDT)
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com. [209.85.208.45])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b983398c140sm195792466b.63.2026.03.20.14.19.53
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Mar 2026 14:19:54 -0700 (PDT)
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-661d20c9787so3756504a12.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 14:19:53 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWQ5K4HoJzPEkQh+N2W8HjDs5RZuEP6Zv36oTF9mlPe6t2Cr4z0PC5ybIRFF2kF4pgZA1JP6bgLKiPW3tnL7A8=@vger.kernel.org
-X-Received: by 2002:a05:6402:3786:b0:668:8c50:284c with SMTP id
- 4fb4d7f45d1cf-668c911da49mr3212716a12.11.1774041593499; Fri, 20 Mar 2026
- 14:19:53 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="J0myTQ9E"
+Received: from github.com (hubbernetes-node-ac03292.ash1-iad.github.net [10.56.200.76])
+	by smtp.github.com (Postfix) with ESMTPA id C13BF2E11F4
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 14:31:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1774042296;
+	bh=oDPcIp5WOfp9P4CRgD6Xo2n4OrXP5Xbo+RxS15LRHKc=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=J0myTQ9ESYJQF0/KepFx09gxeyAEa5lK6qeR8+Z83zKs6GJ6ZbteeVIi6tEMzIfQq
+	 hVXcFk9nhz3eQLNYuvjae0zciC/uoaWRh0SpvhHLn/waFr6uqRMGsKXCC+qslip6Dt
+	 tF816FnyRUaTRESnU7E8t5lFdk/ZatxVZlKVBkJg=
+Date: Fri, 20 Mar 2026 14:31:36 -0700
+From: Pauli Virtanen <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1070106/000000-e9e0d0@github.com>
+Subject: [bluez/bluez] cab77c: emulator: btvirt: check pkt lengths, don't get
+ stu...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260319190455.135302-1-luiz.dentz@gmail.com> <177396481128.1855248.1024090053580545012.git-patchwork-notify@kernel.org>
- <6411a735-d187-4848-b199-a0e2c2e0e52c@leemhuis.info> <CABBYNZJfLf6PzKUkGjiCvqEm3h0+3SUcxY5RNbUHv6LBdPT_zQ@mail.gmail.com>
- <CAHk-=wh8dnp1qT_CHG-Zz9H2=G1Q=0rF5SYv+YsEaPnVhznxWA@mail.gmail.com>
-In-Reply-To: <CAHk-=wh8dnp1qT_CHG-Zz9H2=G1Q=0rF5SYv+YsEaPnVhznxWA@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 20 Mar 2026 14:19:37 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgryF_COh9xzhGaJ-FAm471pn5uvqt-Z94+3ENPVu4w-Q@mail.gmail.com>
-X-Gm-Features: AaiRm52w5UPxNX4mH_HiyvwPIsVpHwHmqg_LpHJqM3MhIn7krj-l7qPCQ22Gurs
-Message-ID: <CAHk-=wgryF_COh9xzhGaJ-FAm471pn5uvqt-Z94+3ENPVu4w-Q@mail.gmail.com>
-Subject: Re: bluetooth regression fix likely to miss -rc5 (was: Re: [GIT PULL]
- bluetooth 2026-03-19)
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Thorsten Leemhuis <regressions@leemhuis.info>, kuba@kernel.org, 
-	linux-bluetooth@vger.kernel.org, davem@davemloft.net, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Fri, 20 Mar 2026 at 14:03, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> That hardware may admittedly often not be great, and we may all wish
-> that it didn't exist, but hey, that's the thing about reality: it's
-> often messy.
+  Branch: refs/heads/1070106
+  Home:   https://github.com/bluez/bluez
+  Commit: cab77c96790b54fe29148207fa572ed54070d95b
+      https://github.com/bluez/bluez/commit/cab77c96790b54fe29148207fa572ed54070d95b
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
 
-Of course, the thing about "reality is often messy" is that then you
-end up with the truly conflicting situations where there are other
-complications: security issues can sometimes mean that you *really*
-can't just revert a regression fix, because while paper standards and
-artificial tests are relatively worthless (compared to a user
-regression report), a severe security problem obviously isn't...
+  Changed paths:
+    M emulator/server.c
 
-Also, if the regression reports then come in late, people may have
-started relying on the new behavior, and reverting things then causes
-its own set of regressions.
+  Log Message:
+  -----------
+  emulator: btvirt: check pkt lengths, don't get stuck on malformed
 
-But when you get a regression report quickly during the early -rc
-period, that tends to mean that it's either a really bad fix, or it's
-just a very common piece of bad hardware (or a shared bug across many
-different hw implementations - which obviously is often then due to
-some common chip or firmware implementation or whatever)
+Don't try to parse packet before whole header is received.
 
-               Linus
+If received data has unknown packet type, reset buffer so that we don't
+get stuck.
+
+
+  Commit: c17542792f75d8c82b348dbb31b7b085071d6f9a
+      https://github.com/bluez/bluez/commit/c17542792f75d8c82b348dbb31b7b085071d6f9a
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M emulator/main.c
+
+  Log Message:
+  -----------
+  emulator: btvirt: allow specifying where server unix sockets are made
+
+Make --server to take optional path name where to create the various
+server sockets.
+
+
+  Commit: d51acda928781c9eb1e9950b32957d1d4911aff1
+      https://github.com/bluez/bluez/commit/d51acda928781c9eb1e9950b32957d1d4911aff1
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M emulator/server.c
+
+  Log Message:
+  -----------
+  emulator: btvirt: support SCO data packets
+
+Support also SCO data packets in btvirt.
+
+
+  Commit: 3fa888728bf9862af8dccf14db21f2191c107752
+      https://github.com/bluez/bluez/commit/3fa888728bf9862af8dccf14db21f2191c107752
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M emulator/btdev.c
+
+  Log Message:
+  -----------
+  emulator: btdev: clear more state on Reset
+
+On controller Reset command, initialize most fields in struct btdev to
+zero, similarly to the state just after btdev_create().
+
+This excludes some fields like command bitmasks, which hciemu may have
+adjusted.
+
+To make this easier, add struct_group() macro similar to what kernel
+uses.
+
+
+  Commit: 100b77c3da7a01ac86c62f3aa9913f0870ee0f9e
+      https://github.com/bluez/bluez/commit/100b77c3da7a01ac86c62f3aa9913f0870ee0f9e
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  test-runner: enable path argument for --unix
+
+Allow specifying the path for the controller socket to be used.
+
+
+  Commit: f52e4dbfa35b9a6a2663966cb376d2beda717a09
+      https://github.com/bluez/bluez/commit/f52e4dbfa35b9a6a2663966cb376d2beda717a09
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  test-runner: Add -o/--option option
+
+Allow passing arbitrary arguments to QEMU.
+
+
+  Commit: e23f319b65cc12957b74c6a900f871ae03a82207
+      https://github.com/bluez/bluez/commit/e23f319b65cc12957b74c6a900f871ae03a82207
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  test-runner: allow source tree root for -k
+
+Allow passing source tree root for -k option, look up kernel below it.
+
+
+  Commit: 04b7e47f41b21b1e8bfe47a8af38290f59720598
+      https://github.com/bluez/bluez/commit/04b7e47f41b21b1e8bfe47a8af38290f59720598
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M doc/ci.config
+    M doc/test-runner.rst
+    M doc/tester.config
+
+  Log Message:
+  -----------
+  doc: enable CONFIG_VIRTIO_CONSOLE in tester config
+
+Enable kernel option that allows using -device virtserialport in qemu.
+This is easier to make work reliably than pci-serial channel.
+
+
+  Commit: 379b2c8842062dabb1b56889067efe208e36d544
+      https://github.com/bluez/bluez/commit/379b2c8842062dabb1b56889067efe208e36d544
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M Makefile.tools
+    M configure.ac
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  test-runner: use virtio-serial for implementing -u device forwarding
+
+Using pci-serial to forward eg. btvirt sockets is unreliable, as qemu or
+kernel seems to be sometimes dropping part of the sent data or insert
+spurious \0 bytes, leading to sporadic errors like:
+
+    kernel: Bluetooth: hci0: command 0x0c52 tx timeout
+    kernel: Bluetooth: hci0: Opcode 0x0c52 failed: -110
+    btvirt: packet error, unknown type: 0
+
+This appears to occur most often when host system is under load, e.g.
+due to multiple test-runners running at the same time.  The problem is
+not specific to btvirt, but seems to be in the qemu serial device layer
+vs. kernel interaction.
+
+Change test-runner to use virtserialport to forward the btvirt
+connection inside the VM, as virtio-serial doesn't appear to have these
+problems.
+
+Since it's not a TTY device, we have to do vport <-> tty-with-hci-ldisc
+forwarding of the data in test-runner, so this becomes a bit more
+involved.
+
+
+  Commit: f5cb225dc2cfe45e9a107bbdb616429348243b57
+      https://github.com/bluez/bluez/commit/f5cb225dc2cfe45e9a107bbdb616429348243b57
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M doc/ci.config
+    M doc/test-runner.rst
+    M doc/tester.config
+
+  Log Message:
+  -----------
+  doc: enable KVM paravirtualization & clock support in tester kernel config
+
+Enable KVM guest and PTP options in tester kernel config.
+
+This allows synchronizing tester VM guest with host clock, needed for
+testers that want to compare timestamps outside the VM guest.
+
+
+  Commit: dd4baa332293f0b1265d1f84e86b28e508eabfa8
+      https://github.com/bluez/bluez/commit/dd4baa332293f0b1265d1f84e86b28e508eabfa8
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    A doc/test-functional.rst
+
+  Log Message:
+  -----------
+  doc: add functional/integration testing documentation
+
+Add documentation for functional/integration test suite.
+
+
+  Commit: 34f356ce91efd3046944a31e6ed3c0bd39d966d2
+      https://github.com/bluez/bluez/commit/34f356ce91efd3046944a31e6ed3c0bd39d966d2
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M doc/test-functional.rst
+    A test/functional/__init__.py
+    A test/functional/requirements.txt
+    A test/functional/test_bluetoothctl_vm.py
+    A test/functional/test_btmgmt_vm.py
+    A test/pytest.ini
+    A test/pytest_bluez/__init__.py
+    A test/pytest_bluez/env.py
+    A test/pytest_bluez/host_plugins.py
+    A test/pytest_bluez/plugin.py
+    A test/pytest_bluez/rpc.py
+    A test/pytest_bluez/runner.py
+    A test/pytest_bluez/tests/__init__.py
+    A test/pytest_bluez/tests/test_rpc.py
+    A test/pytest_bluez/tests/test_utils.py
+    A test/pytest_bluez/utils.py
+    A test/test-functional
+    A test/test-functional-attach
+
+  Log Message:
+  -----------
+  test: add functional/integration testing framework
+
+Add framework for writing tests simulating "real" environments where
+BlueZ and other parts of the stack run on different virtual machine
+hosts that communicate with each other.
+
+Implementation is factored into test/pytest_bluez/ support plugin that's
+in principle reusable for other projects, and test/functional/ actual
+test files.
+
+Implements:
+
+- RPC communication with tester instances running each of the VM hosts,
+  so that tests can be written on the parent host which coordinates the
+  execution.
+
+- Extensible way to add stateful test-specific code inside the VM
+  instances
+
+- Logging control: output from different processes running inside the VM
+  are separated and can be filtered.
+
+- Test runner framework with Pytest, factored into a pytest plugin
+
+- Grouping tests to minimize VM reboots
+
+- Redirecting USB controllers to use for testing
+
+There is no requirement that the tests spawn VM instances. The test
+runner finds any tests in test/**/test_*.py
+
+
+  Commit: 4327c438f03dcf986c21ca6abdf5e67a28846eac
+      https://github.com/bluez/bluez/commit/4327c438f03dcf986c21ca6abdf5e67a28846eac
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    A test/functional/test_pipewire.py
+    M test/pytest.ini
+
+  Log Message:
+  -----------
+  test: functional: add Pipewire-using audio streaming tests
+
+Add tests for Pipewire hosts connecting A2DP, BAP, and HFP to each other
+and stream audio:
+
+test/functional/test_pipewire.py::test_pipewire_a2dp
+test/functional/test_pipewire.py::test_pipewire_bap_bcast
+test/functional/test_pipewire.py::test_pipewire_bap_ucast
+test/functional/test_pipewire.py::test_pipewire_hfp
+
+The A2DP test would have catched the regression fixed by 066a164a524 and
+the BAP test that fixed by 6b0a08776a.
+
+
+  Commit: c4beee5121af16a3204a78745465d0cb6a0392b5
+      https://github.com/bluez/bluez/commit/c4beee5121af16a3204a78745465d0cb6a0392b5
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M doc/test-functional.rst
+    M test/pytest_bluez/__init__.py
+    A test/pytest_bluez/btmon.py
+    M test/pytest_bluez/plugin.py
+
+  Log Message:
+  -----------
+  test: functional: add --btmon option to start btmon
+
+After test finishes, any btmon dumps created are copied to current
+working directory.
+
+
+  Commit: 07667bac0f13e5a04e7fe60f5eb7cdf83628789d
+      https://github.com/bluez/bluez/commit/07667bac0f13e5a04e7fe60f5eb7cdf83628789d
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M Makefile.am
+    M configure.ac
+
+  Log Message:
+  -----------
+  build: add functional testing target
+
+This adds check-functional: target that runs the functional test suite.
+
+Also add a --enable-functional-testing=<kernel-image> argument for
+configure that can be used to include it in the check: make target,
+possibly with a predefined kernel image.
+
+
+  Commit: 81be006c93a9bd660718e059eef25729c0b2c7dc
+      https://github.com/bluez/bluez/commit/81be006c93a9bd660718e059eef25729c0b2c7dc
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M doc/test-functional.rst
+    A test/functional/test_tests.py
+
+  Log Message:
+  -----------
+  test: functional: impose Python code formatting
+
+Check Python code formatting of the functional test suite.
+
+
+  Commit: 7bc9883e78e1c3b2efd97e192a3a5977438d976e
+      https://github.com/bluez/bluez/commit/7bc9883e78e1c3b2efd97e192a3a5977438d976e
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M doc/test-functional.rst
+    M test/pytest.ini
+    A test/pytest_bluez/build_kernel.py
+    M test/pytest_bluez/plugin.py
+
+  Log Message:
+  -----------
+  test: functional: add option for building kernel image first
+
+Add convenience option test/test-functional --kernel-build to build a
+kernel image first.
+
+
+  Commit: 0e54374f133fc1196fa3db98c34ec172a84f0a5e
+      https://github.com/bluez/bluez/commit/0e54374f133fc1196fa3db98c34ec172a84f0a5e
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M doc/test-functional.rst
+    A test/functional/test_agent.py
+    M test/pytest_bluez/__init__.py
+    A test/pytest_bluez/agent.py
+
+  Log Message:
+  -----------
+  test: functional: add custom Agent1 implementation for testing
+
+Enable more precise testing of the Agent1 interface, and allow doing
+operations like pairing without bluetoothctl.
+
+
+  Commit: 6c9274e74ef2e7ca80829907d2b93e28f2583255
+      https://github.com/bluez/bluez/commit/6c9274e74ef2e7ca80829907d2b93e28f2583255
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    M test/pytest_bluez/env.py
+
+  Log Message:
+  -----------
+  test: functional: warn on kernel warning/bug messages
+
+Emit warnings if there is a WARNING/BUG message from kernel.
+
+
+  Commit: e9e0d0152bd9753d3cbcd1072fc5983c2358f1ca
+      https://github.com/bluez/bluez/commit/e9e0d0152bd9753d3cbcd1072fc5983c2358f1ca
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-03-20 (Fri, 20 Mar 2026)
+
+  Changed paths:
+    A test/functional/test_obex.py
+    M test/pytest_bluez/host_plugins.py
+
+  Log Message:
+  -----------
+  test: functional: add basic obex file transfer tests
+
+Add tests
+
+test/functional/test_obex.py::test_obex_ftp_get
+test/functional/test_obex.py::test_obex_ftp_list
+test/functional/test_obex.py::test_obexctl_list
+
+
+Compare: https://github.com/bluez/bluez/compare/cab77c96790b%5E...e9e0d0152bd9
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
