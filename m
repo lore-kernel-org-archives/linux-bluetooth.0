@@ -1,258 +1,137 @@
-Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013036.outbound.protection.outlook.com [52.101.72.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E8D3BBA16
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 14:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5593B9DAB
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 15:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.36
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774015209; cv=pass; b=RKNIcPQoVb2iKsq7q6rno3W/mvB9sopzOSgaC0+PBQJ4pZFMV0W/9RHH1H8KaRC0KwVtPYGN5/pd9VqDac0jckkP1bPePC0YsAMsMciJCt0H+kU59ZupDzI3vfWmrAIsLqNNzDwrJe5M1Q2KQsT3urdGKfmYiWPVAdqYpZJ0kEU=
+	t=1774020027; cv=fail; b=MHSU6D5KK1nNJdLb1J5h7EL48qNaaWoVpvc9Mv5hW9Ba7Y6QfYzV/IodAq5Xb+lWl7Y/RwsruthZbXEnXbzvV0xLPt9b9KuukZDBB+cKh7mWyinvqOPxaEtNl4iVrs/BWHLjP+NVNC/7DOMoQog4UhjzpGz0iZvvoZ2gNpQhZ1w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774015209; c=relaxed/simple;
-	bh=SXKYz3VDv8TKDUnwL3YYc25AC4oGQyXpui046etb3ps=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jfhDAX98E10eunKMleqBz2v0EjTMwW/xAEmHukKJwtj1AvLpIGjmYo8xNUXsnaF+ohUMp9LmIXw3LLg5e+pxoJNgFpMzwy1ELT/hGB1AtoxQHRW9rr9iSw4nVVm8M0hlFK9MkWpJjDHsfRzaPjcL65QDFBoZ43nmwr1Ajod+JTg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WJBNDT5g; arc=pass smtp.client-ip=74.125.224.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1774020027; c=relaxed/simple;
+	bh=6a8kySiVsih19ilNUDXkR2H96XCcSeH+hAaEPB6zy38=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=TNlzcRPrvvwrkthqSvx21+8VSOs97H1ebFZ5PGytHftPZBarYgugNj1DU8Lse7Z+JaSaoFIR4XgDx52NR1DSKSBBlMbDsEsq8HqlfA8y0EbkHTo55/C6BopxYDI1v7KYAJk6oaQuLJj0Q9q5647uw1aQwfbcb0rjN3FJNlst87M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=EU1445K6; arc=fail smtp.client-ip=52.101.72.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WJBNDT5g"
-Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-64c9a6d7f81so579665d50.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 07:00:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774015201; cv=none;
-        d=google.com; s=arc-20240605;
-        b=VRSMOldfBfztlky2P/wGDf/v+aFlLkar95kilsTudg4/90nH4iqH1VLvIn5L0wPba4
-         ivl94cGaWpt2u8nMM9b/aMdtQiQA1CWvTzIf3ZAH3U6EsLLZ6r2adUJeNmSr5uKQ8CpS
-         Qxfb23e7Qgcu9SiwMzPYiJQb7t+gzjBT5/zjaHTUvs7bf5AmpQ31trrreWeo+P31RbOF
-         z/TGAKK4VmPbQKiMSzItp1Xzms+dIFDt7DjdAgqw2hJ4V62uPTVK58ldVjPq+sE9CIx/
-         5MgX1HQLhDi1p/5Zivv7tGReTWzk9Q58kh+yTFAHRdDvoR9VHh7IdDPsYx3Z5cCVOPV0
-         ZGCQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=KQ9jLGOSl8+l27j5Vz4ediKGfPfCRBzhCYelPhQqizo=;
-        fh=tU9MxSekwlnkVe/kwsuL5HsnmCLxauicOHjxRvS138U=;
-        b=hT0tIzajv9/bTu7ltM87PSGPgMgvfw6RnBR5eZtvE7DNCyUmjPGu1RJlodFZ3HjDB4
-         tABHGVLitrQ6eTH7LqANzwId9iGyqQ0IFQ7A50u35CWUXxQFD9aqQHG4T2h4eoh0waE9
-         bq64ZV2/uz5MR9GQ69BJtAVJbR/JkXoCRexih8PuTyA5OE9ETtcFF6flLEjxfNG8KvB5
-         DncI694FkjLgJfgSA+m8UbhalO16DXHhXneOvviNaOQ+JwtErT3OSCCPJbLNho+nXlpn
-         9igNQaY+dhKE7iBTyiq6xBX9KBmst9xNG18izMvvDrhzponKN1I+9EpHog5O86usUXOr
-         +IKA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774015201; x=1774620001; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KQ9jLGOSl8+l27j5Vz4ediKGfPfCRBzhCYelPhQqizo=;
-        b=WJBNDT5gOAdzuz6Q38u2y2/qWB2B4qhVz1zBz3hjVhdKxqFv5Cp8E0DnyBS139azVp
-         YB7Bb0W1PI1IHuO6OSowrwTetA5dblttBvQVGL7PkC2UnjVJLNuqxjwR7XF9hLf+PNKv
-         1ErxuUi1EjQvfOsx2S78JXApuFMvFZgtYQokXM08wtEMxhLPuK9Hbqkd/nqGLJ2mhl1l
-         2+AXVk8jMklAIz9vaPzJ3Y06S110Pl3p9aRnXGXm+PsXRRPgQnnK/GE/jLj6rNDVRHtq
-         px1SWOtBB6+Rifh55YjcgT5/7gvuC2ZHRu/p96FKsIvO8jpqYW9JNknVN0j1icmD8W9/
-         cBBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774015201; x=1774620001;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KQ9jLGOSl8+l27j5Vz4ediKGfPfCRBzhCYelPhQqizo=;
-        b=gle8s7kvKFAC0UQ4fpdFjNaOBebBElNWdrvtkTvKhU/gu/A+pbvV/zpKGml7EeYVae
-         ufO7RDOa9dry7nfV0/vhieS0RxOu9eZaPaiX3QMvJaosDPqrhzRZGH3rdKU1Uk21t+kg
-         3ownze36YeFJB+IgGWrRuJ1MpZwF0PNK1wJ1Df3NBjNf4xL6IV2a9TafrHJc9CpHlUJf
-         4b4l4ZhlY82t48mABiaQaKBwIOoJzJEcRTpdjYO3Lm4QL3bUs7iPr0Rcyfuok+pC6aCt
-         WXFSAzzNX92V4p0MX0qhmKT0vU8++puvNukhR0BfSuAKmwxekap/PALJSVIOS1ohbqYu
-         8x7w==
-X-Forwarded-Encrypted: i=1; AJvYcCV1eaDEGdiWBWPPYvrc/VTPzIcrQvhQ8AFUv2x1TLkHn7Te/KptLG4sKZkf38ZNrNV3BOJHGQnrNw6WqDPlOHY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzClLuGWra6EsRgQCr3iWB8cyOn0jSiloM/Vk7kkm3dKsP2iYxk
-	9rk1wsO3oVJFvPdO3YOaZAo9DVITqJiIFrddoObJpzeOfRnr1KBWBFXMm2JicNidi0AhECTrkRC
-	Ck4Tv6flEVMDyJzBhupCSTQVxrgtCuAn2+WP9
-X-Gm-Gg: ATEYQzwZkNjC19u+j400cCW/j8rL5Iqas/uuUgbMQxE8+ErAbd02c9haBCIg3JxeO4N
-	uFaIK5P0+n0+vyFNGDLnIs7N8rxeSg7W+j5HG9tqykO7RGDro5LkdgH5DWT2A9zdwowynmmS/mQ
-	2XLxEQqxe39Em1bZbtGYSVB7iXKRoYIaSmzlnjwp/8h0i369Lp/5xVQ52R59gBXdMr9oddskEZ4
-	4lGhehwR5JU301QQ1lMV5/oXrzrY384b4PHg5suLWMrXXz86BxX+SikrUf18N11CcRovWTVZ75+
-	QQcibI59s+fYqJn4BM8qu8YYVhnvQdOZMjJz3lF7SJg/ZCykPsNzH9PyZzUI5a7QK/VB6A==
-X-Received: by 2002:a53:b455:0:b0:64a:edf2:e769 with SMTP id
- 956f58d0204a3-64eaa6b89e5mr2389426d50.10.1774015201249; Fri, 20 Mar 2026
- 07:00:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="EU1445K6"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=h2NuHfWP/R1X0R3rv0H+d4gzB39UzZOj5147pIUh+WaoY6dBz/r70pcvVfHKBqiLWjXEnh9jb4kJ4gwkUahVMVPnm2n+1ovG8zK8Sib8DNJSOezZQDw+9/jekvzuN2uMUcdGxY3FYEAZsyD4JR4IsncvfOpu492LyfMs0uIwp794Gi86Kbu8/XYYaFx5hjUX7eoeeml/HY5dhquPcUB4lIVZ4AUCd+aU/6hWsWRSAke3WiT5AbXUA/4YhEOHXYyswtXMV3E1XLZfSFyjtb2NL8pZha79PSGqX+pw/CRc2+n8wNDuazyOTv57w1EFGpXMziCNTff9/FJ9v3g9FFKByQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=v8Yn86VPOi66EJ6XrnXBb0od+zUKNm/4gQ4KtfFKufY=;
+ b=n1Y+w4i3J5x6KnTcNpywWsyi7VfX9A9NuQWHs67nbdcwbeGkEPC+tmoqQuPZ/2nXcBGkMgmj33H+Rp1X3peFUJKy3zEslrGvbZx1IDspchNWsKIVWtFd6zP+ra083gC8S9ls+1exDSD4+CjnP7kHRBYfGQORSP+IXSFDOuKl8jOQEzjbnnkLz4lRvbdfyv/JZgXd8yMjBzpTa1zHVx8HbxFUadx6Q4UJhT8OJ50buXgjyOqS2/Irug3ZPYLgsU9w3gI0PQ+syoRaOX4SgsVEzpP5XYYbZwN0s/lkhS6LwTkO4FI6m7ouJa+6jSYbNBJLnC+Cwnbk9GMjhuNVwnEtww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=v8Yn86VPOi66EJ6XrnXBb0od+zUKNm/4gQ4KtfFKufY=;
+ b=EU1445K6X8WS4pwv9mKxMagsR00BtlmbRUINOdbgqreyl3DTv2Id6V0TPAQk2mjSyHPiiyEkMAF6k6cXB+dqflzv7C5UyW8HJUGpuHLpiix2r0P8N06g1nnRw3eyecmwuYEfmlF4rkx6waD0jH/pQyXE86z6P+94hdHUFVrG6qkAt75Xdez+2M/xMQ027NsaLPw/IdqOWEGFW+SNglp1gDPRH8FqfM3oyzjy84PKY7cR1HYh+yOba8OX3hRbBjGy3hDQELS6AKwwqmNoQ+6wgAiGdXdunwt8SIvB5v7JiAk77TL55cHfpmcmDdAXzKccrB0JNYnRcBun17LiL78s1w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from GV2PR04MB12191.eurprd04.prod.outlook.com
+ (2603:10a6:150:33a::15) by DU0PR04MB9324.eurprd04.prod.outlook.com
+ (2603:10a6:10:357::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.19; Fri, 20 Mar
+ 2026 15:20:21 +0000
+Received: from GV2PR04MB12191.eurprd04.prod.outlook.com
+ ([fe80::c8ab:7d35:91ea:38b8]) by GV2PR04MB12191.eurprd04.prod.outlook.com
+ ([fe80::c8ab:7d35:91ea:38b8%5]) with mapi id 15.20.9723.022; Fri, 20 Mar 2026
+ 15:20:10 +0000
+From: Sarveshwar Bajaj <sarveshwar.bajaj@nxp.com>
+To: luiz.von.dentz@intel.com,
+	linux-bluetooth@vger.kernel.org
+Cc: vinit.mehta@nxp.com,
+	devyani.godbole@nxp.com
+Subject: [PATCH BlueZ v1 0/1] test: Fix pbap-client to work with system bus obexd
+Date: Fri, 20 Mar 2026 20:49:57 +0530
+Message-ID: <20260320151958.851-1-sarveshwar.bajaj@nxp.com>
+X-Mailer: git-send-email 2.49.0.windows.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: PN4PR01CA0071.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:26c::16) To GV2PR04MB12191.eurprd04.prod.outlook.com
+ (2603:10a6:150:33a::15)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ab0yX61gGSlEaMEF@v4bel>
-In-Reply-To: <ab0yX61gGSlEaMEF@v4bel>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 20 Mar 2026 09:59:50 -0400
-X-Gm-Features: AaiRm51fzlYomGVBhl1hNn19OxuDsw9d_flO-noJj0Qt9B3TO9YEvZwsZBipF4U
-Message-ID: <CABBYNZL0t9dvLcoxdAXCb37EdTU3+iEkpicSSz=w0iBJi5=P=w@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: L2CAP: Fix use-after-free in l2cap_chan_timeout
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, 
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: GV2PR04MB12191:EE_|DU0PR04MB9324:EE_
+X-MS-Office365-Filtering-Correlation-Id: 791d41d7-04f6-46d5-9084-08de86942d21
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|10070799003|366016|1800799024|376014|52116014|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	HHtW7orJmb+fKpcEAcbjhKe3IjYojLG1YKkF0tJTV9znH75ChLEoK10bZHKygTrz8LHHat9c3X3n68eg6/3NlQect2bKKMb472qdwS1BggMIPow4RI/hZJ0wTG3e9Iuq79MYKDT/ghhxe+9WGsjskTGrYlAz2c7qIrt13npbAr1op3vwvm2CjKdsZasSWIghfYSvMQB6DjhseqLwdYJq+Tseo8WpKvhXUoT1YlOlEygIuySUy11IJLvpe2Une3eYcOx7UCHm6ugA4RmKFLF/AaQeNxJyX1JtOj5+KERUfLMUgvzER6Xv8XSsf/4ZQr/MMgIESnqi5KkQJyVfYD95Drz7m6paYc4WwUI3XPhKmFT7UrJFeokGKmNAdfJ3AVkzR+9btr4b/N48GW82MkVor/Qs6mPKYXCY3wMkkVCgsNLdTdLnrq84XJiOZuICeVGY/hkToRmjg17qGLpwuSgIlF31BhOm/WPmkKKd/T3ymVhphLMTU620WBdg/7uMRX7DuI2wRStUY4dNA3yNMKHYv6vIxQ0ZOjdmIF06BsMCQqM2z2QsIZBvw39qdF73XHCD7GGngI1/JRGzooUyW2jKEJv4BBZ5G2i85O+K2fzSsUQ6wUKKH4KJyH07Ny04d0pf27DzG0c3DeCijAUk642xVbKAvNDZUykI1O54C3Xm7UYDoyi0lLF57srxXQqJwg7xRPH/+y8u18UOfUWbh1iY6NrLRJT9KOt49GCHajE2U54=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV2PR04MB12191.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(10070799003)(366016)(1800799024)(376014)(52116014)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?gvW0jLWpTqdiNgCGaxQX03vuaqIzfhQUct3KzT/Kgl8UUIct13EN6a9yBbED?=
+ =?us-ascii?Q?/dQecMTVPHmzWd645uOSh8Z234lBOhSQyrtjEUdOfToy4zuxylycHUgN3J+R?=
+ =?us-ascii?Q?fEW53XGRSd1UeYizs5P7GI3ZRwIu25V7lNrMbnDLr9HFupXyr3lKSTY5+q92?=
+ =?us-ascii?Q?eJwAS98mP6gyOCGVC1nVQVDbEYlcX4ygVDb3o4ND7OMnjBU7GqHRsMgv8Yvl?=
+ =?us-ascii?Q?TZO9KZShf82xEUUDkIXBlj6YruIenWjo34iTjgQmFd8oV1pAbNWuJy3j/Pfd?=
+ =?us-ascii?Q?JTfhF4gmQHone8HqGcRDvECDfudQwtexJS/KP9K6ejak5wNkuPyekEu7gpkU?=
+ =?us-ascii?Q?CchBp0yjBMJIJWKjcarQ9FZMxyEbIpQ/50OT7BgA0VwNSj/TrIcudJEvWu8n?=
+ =?us-ascii?Q?Aa1TinxFEgQYVZUO62G3stAC+w1MsGRcNr5Qd+/+qIOo/qGMqMQFJD2o+2X1?=
+ =?us-ascii?Q?O4v3ILUeIRAnJJCNL+IeoZilALGTD9HGjOB0U1WGEq+uT1coQRyJiE8WQkiv?=
+ =?us-ascii?Q?GBuZS/+PV2NiJXPdHq9NIf+HvH/KjrY3FYDga66dnZqgCYVBTbO9U5lgfwJv?=
+ =?us-ascii?Q?ztp8hHRbEmQS2uxoqswxjrwaWolL8llk8stdANBqwijCXNirnewJ1iMGy1l2?=
+ =?us-ascii?Q?5npP9kJ9Al20H1A82WblgRWdX+dInXWrfAhrFedayAPWcbSAFnjzxp4X7q8h?=
+ =?us-ascii?Q?TUEP3GyTvl6M/KuzhoP1WK9udDSR1+/ECinbhmVcwGeQgUpCLUzJEYaJckhp?=
+ =?us-ascii?Q?PHMQlGnkDs6CMyNYKBFXGauKXkITQR6BtWYl3Pfc87AeBx6zHNN//jUK/fbI?=
+ =?us-ascii?Q?uXxT40FD2iXv0LLFDFTfeSXSo83yVYHIB7YFhPLII/qRxjlDFRMM6blJmIrc?=
+ =?us-ascii?Q?FUuI2ut2GD39zzLSn4WeBchd5m2WnNW/HR2S9+nhEinJDYhJK8h8Fp4dBKwz?=
+ =?us-ascii?Q?uBA0COpUA1y4tBiLc7MFtyBRPKHM90bkUWKacV0faQDh8EBKT8QiUbNjohbY?=
+ =?us-ascii?Q?er7l9kOLaf1O1X4eIwYTkx1G6PL1p0iOUbisZWImPVfDEsilCvw5vdEepzG5?=
+ =?us-ascii?Q?EIxJLAov2jHgcJLskZE7W4JBo/sZd0zabIiZdhIzhmWf7YnvvqBebKlqsWMG?=
+ =?us-ascii?Q?kr7zKCTlJmGgFDN1Zau156uvfHPpQACuGqE4o/HWYun7XFm23Xlugj8WaJug?=
+ =?us-ascii?Q?aPSBYRkltPJann2SX8gNHOaIwp+5Pm5cvXT2jwiUtM91CHh063bFlYm+hrmB?=
+ =?us-ascii?Q?xRZglzUk8McusYTqg71qSxNJE9vhpOpCm4cs/ZYIGEguOC0W+DIU0V9LbUCX?=
+ =?us-ascii?Q?EYdFq1U+DLIC3duiyMb2vZgrMXGD+qm0z+cj7+3R6ogHDoZNadmTfoWSHBc6?=
+ =?us-ascii?Q?0Vnfl/+6ZZ9lXd1KbJS2SJtyl1e6GNndydQ0BvJGXYtd+n2w2fS6luDkMUgb?=
+ =?us-ascii?Q?em8XJ6QczAybZTY4b+7qFyWOVWqign2h1Y3ngzFEiKzxPNmFNsP93375w6EU?=
+ =?us-ascii?Q?yw8YGWowHy9eWkRsD8KnMh56ZwaJ7MpVEHj8yX5YKUwZgux2vlfj8xyB86sO?=
+ =?us-ascii?Q?pAVbzbIBz1TUwlBcH2E6HdFZLpOqbQOlkgCE71iZbYCCwzlcl4CgNVZD3k2s?=
+ =?us-ascii?Q?xPihYeB0GJ5YmTuUGeNFphpTUaBCRkYD61rIg/Xdq3mvVjSZTLertC6WRgDL?=
+ =?us-ascii?Q?4G7O+YsEKfT3ThuKqUK422/ZN8i6EV7Aq5DD9YhC4ATaHYKaVE0ZSbmpyksk?=
+ =?us-ascii?Q?QyAZ0dDvq+3PGqzK25fxJSXDQFvCJ3VeVvtJ19v8zFEr092mbw/141G7rOmt?=
+X-MS-Exchange-AntiSpam-MessageData-1: UGpOdadVFKvgzXskwlN8gXPPxhIFgu6sZaI=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 791d41d7-04f6-46d5-9084-08de86942d21
+X-MS-Exchange-CrossTenant-AuthSource: GV2PR04MB12191.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2026 15:20:10.6532
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: a0zIcOi1EaK7Gn9v42vpUuY7lm6DO3a8jYzjIK7qnpHomv/Pp3uqYYMXdYY1PAcnlTEK5LoVy8yx3c/EJek9pj4aed4HaKT+oq0wcMNPjeI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR04MB9324
 
-Hi Hyunwoo,
+This series updates bluez test utilities to support systems where
+obexd runs on the system bus via the --system-bus option. The existing
+pbap-client script used the session bus, causing D-Bus NoReply failures
+when creating PBAP sessions. 
+This patch switches to dbus.SystemBus(), updates the main loop to 
+GLib.MainLoop, and removes deprecated GObject fallback code. These 
+changes restore PBAP functionality when using system-bus obexd. 
 
-On Fri, Mar 20, 2026 at 7:41=E2=80=AFAM Hyunwoo Kim <imv4bel@gmail.com> wro=
-te:
->
-> l2cap_chan_timeout() reads chan->conn without holding any lock and
-> without taking a reference on the connection. If l2cap_conn_del()
-> frees the connection concurrently, mutex_lock(&conn->lock) operates
-> on freed memory. Additionally, the existing NULL check early return
-> leaks the channel reference held by the timer.
->
-> Fix the root cause by disabling channel timers when the channel is
-> being destroyed. Use disable_delayed_work() in l2cap_chan_del() to
-> prevent timers from being rearmed, and disable_delayed_work_sync()
-> in l2cap_conn_del() to ensure running timer work has completed
-> before the connection is freed.
->
-> The sync cannot be done directly inside l2cap_chan_del() because it
-> would deadlock in three independent ways: (1) l2cap_chan_timeout()
-> can call l2cap_chan_close() -> l2cap_chan_del(), so syncing chan_timer
-> would wait for itself; (2) callers hold conn->lock while
-> l2cap_chan_timeout() acquires it; (3) callers hold chan->lock while
-> the ERTM timer functions acquire it. Therefore, the sync is
-> performed in l2cap_conn_del() after releasing conn->lock.
->
-> Also fix the reference leak on the !conn early return path in
-> l2cap_chan_timeout().
->
-> Fixes: 3df91ea20e74 ("Bluetooth: Revert to mutexes from RCU list")
-> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-> ---
-> Changes in v2:
-> - Moved the fix from l2cap_chan_timeout() to l2cap_chan_del()/l2cap_conn_=
-del() to address the root cause instead of adding locking in the callback
-> - Used disable_delayed_work()/disable_delayed_work_sync() to prevent time=
-r rearming and ensure completion, as suggested by Luiz
-> - Applied the fix to all four channel timers (chan_timer, retrans_timer, =
-monitor_timer, ack_timer)
-> - Removed l2cap_conn_get()/l2cap_conn_put() and the lock reordering that =
-caused a circular locking dependency in v1
-> - v1: https://lore.kernel.org/all/abwSxg_C6n8Avid3@v4bel/
-> ---
->  net/bluetooth/l2cap_core.c | 30 ++++++++++++++++++++++++++++--
->  1 file changed, 28 insertions(+), 2 deletions(-)
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 5deb6c4f1e41..c08478e4512b 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -411,8 +411,10 @@ static void l2cap_chan_timeout(struct work_struct *w=
-ork)
->
->         BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
->
-> -       if (!conn)
-> +       if (!conn) {
-> +               l2cap_chan_put(chan);
->                 return;
-> +       }
->
->         mutex_lock(&conn->lock);
->         /* __set_chan_timer() calls l2cap_chan_hold(chan) while schedulin=
-g
-> @@ -649,6 +651,11 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err=
-)
->         struct l2cap_conn *conn =3D chan->conn;
->
->         __clear_chan_timer(chan);
-> +       /* Prevent the timer from being rearmed since the channel is abou=
-t
-> +        * to be destroyed. Running timer work will be synced by
-> +        * l2cap_conn_del() after releasing conn->lock.
-> +        */
-> +       disable_delayed_work(&chan->chan_timer);
+Validated on i.MX8MP with a Samsung S25 Ultra.
 
-Hmm, so we can't use the _sync version because it could be pending on
-conn->lock while this could be called from l2cap_conn_del? I wonder if
-we should clarify the comment or if we actually need to mark the
-l2cap_chan as deleted/disconnected or something, perhaps via state,
-also we may want to return something like -EINPROGRESS if a timer
-could not be disabled which would indicate to the likes of
-l2cap_conn_del that it need a cleanup.
+Sarveshwar Bajaj (1):
+  test: Fix pbap-client to work with system bus obexd
 
->         BT_DBG("chan %p, conn %p, err %d, state %s", chan, conn, err,
->                state_to_string(chan->state));
-> @@ -688,6 +695,10 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err=
-)
->                 __clear_retrans_timer(chan);
->                 __clear_monitor_timer(chan);
->                 __clear_ack_timer(chan);
-> +               /* Prevent the ERTM timers from being rearmed. */
-> +               disable_delayed_work(&chan->retrans_timer);
-> +               disable_delayed_work(&chan->monitor_timer);
-> +               disable_delayed_work(&chan->ack_timer);
+ test/pbap-client | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
+-- 
+2.34.1
 
-l2cap_clear_timer drops the reference if the timer was cancelled, so I
-think we will need to check the return of disable as well, or create a
-function like l2cap_disable_timer, that said Id return something to
-indicate that l2cap_chan_del didn't cleanup everything.
-
->                 skb_queue_purge(&chan->srej_q);
->
-> @@ -1742,6 +1753,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, i=
-nt err)
->  {
->         struct l2cap_conn *conn =3D hcon->l2cap_data;
->         struct l2cap_chan *chan, *l;
-> +       LIST_HEAD(del_list);
->
->         if (!conn)
->                 return;
-> @@ -1780,7 +1792,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, i=
-nt err)
->                 chan->ops->close(chan);
->
->                 l2cap_chan_unlock(chan);
-> -               l2cap_chan_put(chan);
-
-Let's populate the del_list only with channels that actually had a
-pending timer.
-
-> +               list_add_tail(&chan->list, &del_list);
->         }
->
->         if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
-> @@ -1791,6 +1803,20 @@ static void l2cap_conn_del(struct hci_conn *hcon, =
-int err)
->
->         hcon->l2cap_data =3D NULL;
->         mutex_unlock(&conn->lock);
-> +
-> +       /* Disable and sync-wait for any running channel timer work witho=
-ut
-> +        * holding conn->lock to avoid AB-BA deadlock with
-> +        * l2cap_chan_timeout() which acquires conn->lock.
-> +        */
-> +       list_for_each_entry_safe(chan, l, &del_list, list) {
-> +               disable_delayed_work_sync(&chan->chan_timer);
-> +               disable_delayed_work_sync(&chan->retrans_timer);
-> +               disable_delayed_work_sync(&chan->monitor_timer);
-> +               disable_delayed_work_sync(&chan->ack_timer);
-> +               list_del(&chan->list);
-> +               l2cap_chan_put(chan);
-> +       }
-
-It might be better to place the disable sync-wait on
-l2cap_chan_destroy then since l2cap_chan_del is not garanteed to do
-it, which means l2cap_chan_put is not safe to be called with
-conn->lock, but I guess it was never really safe since if we destroy
-the chan while a timer is pending/running it would cause an UAF
-
->         l2cap_conn_put(conn);
->  }
->
-> --
-> 2.43.0
->
-
-
---=20
-Luiz Augusto von Dentz
