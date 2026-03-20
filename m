@@ -1,77 +1,64 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81437368272
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 21:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E91D369990
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 21:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774041083; cv=pass; b=kDyIGIp6LHnZWvIbBSIBitin06phDCPholBA9I3ibYV5TwDY5ZolPkW1SMFxCN5p/hCxl7twQaDTpA333P69UQLKG9MbqULAOmlOXlMiKn0lHItdxBvvHPK8WpcAR/45LV6QSWTwiU1wiPIxX6scjUDmBvaYHVJ60M7UPVcHzh0=
+	t=1774041083; cv=pass; b=tNkcSAmwvrDpDppTPodR4xqWpobJEqhE8vWTV9a0CyOxzsP58HXQtU++7DlmWQnj5r0SDCI1rcXQDm6xeRNl0xT0B5LUebEVw3jWjedamvJNdL+6t2LvH69MA9xChtGxjULd8LyLDRkMvG88dQkR3zTu99LQ9gt8GWo5MxwY4wM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1774041083; c=relaxed/simple;
-	bh=aR/ueAvQua14H1IXXgXpHaZMCQlQBWI6CocPVQYDn6A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gcKzeqKBV+jeBTOdgKZFVMe4x70lY5VTgB7Xgm5Ovyw9/Oluut7Q5SRQvh7PLYobSC0lpOqb8dY0JPJwDIn4PAqqA6OYKVMbKxZ6gpKv4feZwn+ys1bWvoWNcIbqGfi1Xb39PX9h73JT6kzqtQ5LHc4w6vlz9+3gnjiMHCkJEhE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=FQoghHZ4; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=j8GIElCG; arc=pass smtp.client-ip=185.185.170.37
+	bh=MSPEiBaxcXIV+m+Fjw00oq324ltQIWWTaHq4gqpIv1c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=FoMfMUYCrO9Jw4QP0wmXC6rQVlt2Uxuus0t77PVnBtbasPGH7aMh4tmFRBJPrcK6e0EG1sIoaezTAndfmu1rgugl7TJWQnQpL0JI6Kvq3u2nLArnfs0Ns5MZXIhrU8lDuvG5Lo+jXr0gLC3BgkrE4qstV7U+claRD4iVadcPX7Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=Rd/aBBSR; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="FQoghHZ4";
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="j8GIElCG"
-Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPS id 4fcwGY005Rz49Q5R
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 23:11:16 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1774041077;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=yHO/qeLRbVy4L3fOC+OGWpazQ1LwO3gFLwW096ywwyA=;
-	b=FQoghHZ4j6xKyzZzgpOCLog4nsWqxjL38mHrnBZLg3aqqD2rejrhIVWKrGS4WjhptvABoH
-	VtrC5tJ7BAEMxfr/YRXNn/Il3YD0lC+Ynz0O8AZAsfK24Yd4z2gY+84s2E/DCsPEvRael/
-	jsbJad6ntGe2LAcxd2NJNgWzQR8kNHelbBCxp6YMFdbEBZe+ehkVw2LB+HqT3ejEjvmyeS
-	sRN6l+hy+/FlBoroMzEsp569t9ix6ZVJA5+JYxxy7CypD4K7c/L4c8r3mjbINx42sIIH+K
-	49dmSLFMs70KRFq4Cjjzn4RxTXGLw+9yRU5PUBtq+Ox0Sm9WpLP6huqu2B2kJw==
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="Rd/aBBSR"
 Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:3::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4fcwGM3mnPzyRl;
-	Fri, 20 Mar 2026 23:11:07 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4fcwGb09T7zyd7;
+	Fri, 20 Mar 2026 23:11:18 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1774041068;
+	t=1774041079;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=yHO/qeLRbVy4L3fOC+OGWpazQ1LwO3gFLwW096ywwyA=;
-	b=j8GIElCGi8D6LYqaiLfb4oRXBiwIz7CT7No1dO52hhzo8Zbk/6BMjGFf8ZpmdyqaULH9Pn
-	kTnGzg9iIvRb1Q5PiNrCtR5fsjw3h6mdEt3d9IZsSwa5aHMbZ7lp610hXZlF4kgoU0WhtL
-	vWeaN4gCAYct1/ou1f+M90+CINg3lVU=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1774041068;
-	b=YxiJAp2v5jZuVyXbeoNgH4R+3/tR4kHrpZ2c56OyVy/sI9bpNoAmarSK888qv4fG/XUkJE
-	b8wGHBi99j0h7hp6atogrxaY4G/bnm8ncIBjnRgffa6kDWaOYt1AS5zzYG829aNcuxnMEg
-	KS4m+Mn7y+oYHdqFFkwMAXnmg/JzqYo=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8JQh8TZUdyu35jAcViZLcAQGTFzRJuyWaZCJtw6jcVw=;
+	b=Rd/aBBSRXtV8yi+nAMuoY0nEHjOLb2svGSqiXSRnuGobWSkIZe9aGFUPcza/y+86RHNxh1
+	wEmicorGAOBKPT+Q7vXjceCySG0Vvu3EfXV2TrWph0n5gKcFZc7+9qTDLP8OunP4erqeAX
+	izOXynuP4SpQVAH+lvR0vmL83i2w6x0=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1774041079;
+	b=eoSOST+iSAqqd5xw91t8YA6+3M8k866FRlGhoyj8UJwNVpkrBgdk41hUdhO73iHKAOiyco
+	GMOIxtbPwuGEKrDTiByBjouj9BphhmNDzi16+IiZDzvDEepvd6TvyYh78r2+BFb8HGcHqn
+	Glg6daa88dWi3xz2F4PYPjKCuzbrU88=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1774041068;
+	s=meesny; t=1774041079;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=yHO/qeLRbVy4L3fOC+OGWpazQ1LwO3gFLwW096ywwyA=;
-	b=U+otzcGCYfrecLp6pMZOXZdxW4lc9BG/nGc9pPdE03DlYRCiGV1+BwZa66gdWZYSyLpq58
-	QCvrYhAi/ZgLOZUlm0FZRlA0RD7LPto5YAUqZ5t4TXAzR76t/jp+o+78pc79XWsWrwNGMY
-	ptmBD10OPglty0JJVw07Yhd7+fQRAdc=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8JQh8TZUdyu35jAcViZLcAQGTFzRJuyWaZCJtw6jcVw=;
+	b=p9wGxKcOKlsDh7tgIH1hPnmQCmxjjJP9Rr07zNlH5jEHDqTv+qr4C9IEUMfCteMu9NMM+A
+	/QeprpAUTMDzsbQjjjLZd+SeadNyzK6tScPgsiOgapsNyQsol84jZygnugbCw4Ouf19XJX
+	TtmWH2rgiWKeYf1Lzkt7tJoqco/UZcQ=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2 00/20] Functional/integration testing
-Date: Fri, 20 Mar 2026 23:10:44 +0200
-Message-ID: <cover.1774041047.git.pav@iki.fi>
+Subject: [PATCH BlueZ v2 11/20] doc: add functional/integration testing documentation
+Date: Fri, 20 Mar 2026 23:10:55 +0200
+Message-ID: <b65c3b8b33a1ebc9bd558819ce8c893cd43223db.1774041047.git.pav@iki.fi>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <cover.1774041047.git.pav@iki.fi>
+References: <cover.1774041047.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -80,401 +67,787 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add framework for writing tests simulating "real" environments where
-BlueZ and other parts of the stack run on different virtual machine
-hosts that communicate with each other.
-
-*** v2 ***
-
-https://github.com/pv/bluez/compare/func-test-v1-r..func-test-v2
-
-* move unit/func_test -> test/functional & test/pytest_bluez
-
-  The pytest_bluez plugin is in principle reusable for other projects,
-  so we can eg. have more complete Pipewire integration tests that can
-  live in Pipewire repository.
-
-* openpty() is in -lutil on some platforms, detect this in autoconf
-
-* more emulator adjustments:
-
-  - fix SCO data packet support in btvirt
-  - more complete Reset command
-
-* improve logging: get timestamps from kernel, and reorder logs
-  to timestamp order, so that lines from different hosts, btmon,
-  and parent tester appear in right order regardless of whether
-  VM console / btmon is lagging
-
-  - this requires accurate clock sync in the VM, so enable KVM PTP in
-    config and run chronyd inside the VMs
-  - use virtio port instead of qemu console to export logs, since the
-    console has fixed baud rate and is too slow
-
-* add --btmon & export btsnoop dumps from VM hosts
-
-* fix compatibility with older Python versions
-
-* add parametrized_host_config()
-
-* split Pipewire test to A2DP/BAP/HFP and really stream audio.
-  These catch the 5.86 regression fixed in 066a164a524e498 and
-  the 5.84 one in 6b0a08776a
-
-* add support for tests that reuse tester environment, so they can run
-  faster without needing Bluetoothd teardown/setup in between
-
-* add HostPlugin.presetup (mainly for test skipping)
-
-* deal with RPC virtio port buffer possibly containing unflushed
-  commands from previous failed test
-
-* add some Agent1 interface tests
-
-* add basic Obex file transfer tests
-
-* add support for logging in to a running test instance (for gdb etc)
-
-* export any core dumps out from test environ
-
-Some bells & whistles:
-
-* add --kernel-build for kernel image build
-
-* test suite Python code formatting checks
-
-***
-
-Implements:
-
-- RPC communication with tester instances running each of the VM hosts.
-  Tests run on parent host, which instructs VM hosts what to do.
-
-- Extensible way to add stateful test-specific code inside the VM
-  instances
-
-- Logging control: output from different processes running inside the VM
-  are separated and can be filtered.
-
-- Test runner framework with Pytest (more convenient than Python/unittest)
-
-- Automatic grouping of tests to minimize VM reboots
-
-- Redirecting USB controllers to use for testing in addition to btvirt
-
-- Fairly straightforward, ~1600 sloc for the framework
-
-There is no requirement that the tests spawn VM instances, the test
-runner can be used for any tests written in Python.
-
-See doc/test-functional.rst for various examples.
-
-Also test/functional/test_bluetoothctl_vm.py has some simple cases, and
-test/functional/test_pipewire.py for a more complicated setup
-
-    host0(qemu): Pipewire <-> BlueZ <-> kernel
-    <-> btvirt
-    host1(qemu): kernel <-> BlueZ <-> Pipewire
-
-The framework allows easily passing any data and code between the parent
-and VM hosts, so writing tests is straightforward.
-
-***
-
-Some examples:
-
-$ test/test-functional --list -q
-
-test/functional/lib/tests/test_rpc.py::test_basic
-test/functional/test_bluetoothctl_vm.py::test_bluetoothctl_pair[hosts0-vm2]
-test/functional/test_bluetoothctl_vm.py::test_bluetoothctl_script_show[hosts1-vm1]
-test/functional/test_btmgmt_vm.py::test_btmgmt_info[hosts2-vm1]
-test/functional/test_pipewire.py::test_pipewire[hosts3-vm2]
-
-$ test/test-functional -v --no-header
-======================================= test session starts ========================================
-collected 5 items
-
-test/functional/lib/tests/test_rpc.py::test_basic PASSED                                      [ 20%]
-test/functional/test_bluetoothctl_vm.py::test_bluetoothctl_script_show[hosts1-vm1] SKIPPED    [ 40%]
-test/functional/test_btmgmt_vm.py::test_btmgmt_info[hosts2-vm1] SKIPPED (No kernel image)     [ 60%]
-test/functional/test_bluetoothctl_vm.py::test_bluetoothctl_pair[hosts0-vm2] SKIPPED (No k...) [ 80%]
-test/functional/test_pipewire.py::test_pipewire[hosts3-vm2] SKIPPED (No kernel image)         [100%]
-
-=================================== 1 passed, 4 skipped in 0.19s ===================================
-
-$ test/test-functional --kernel=../linux
-============================= test session starts ==============================
-platform linux -- Python 3.14.3, pytest-8.3.5, pluggy-1.6.0
-rootdir: /home/pauli/prj/external/bluez/unit
-configfile: pytest.ini
-plugins: cov-5.0.0, forked-1.6.0, rerunfailures-15.0, timeout-2.4.0, xdist-3.7.0, hypothesis-6.123.0, flaky-3.8.1, anyio-4.12.1
-collected 5 items
-
-test/functional/lib/tests/test_rpc.py .                                   [ 20%]
-test/functional/test_bluetoothctl_vm.py .                                 [ 40%]
-test/functional/test_btmgmt_vm.py .                                       [ 60%]
-test/functional/test_bluetoothctl_vm.py .                                 [ 80%]
-test/functional/test_pipewire.py .                                        [100%]
-
-============================== 5 passed in 41.92s ==============================
-
-$ test/test-functional --kernel=../linux -k test_btmgmt
-============================= test session starts ==============================
-platform linux -- Python 3.14.3, pytest-8.3.5, pluggy-1.6.0
-rootdir: /home/pauli/prj/external/bluez/unit
-configfile: pytest.ini
-plugins: cov-5.0.0, forked-1.6.0, rerunfailures-15.0, timeout-2.4.0, xdist-3.7.0, hypothesis-6.123.0, flaky-3.8.1, anyio-4.12.1
-collected 5 items / 4 deselected / 1 selected
-
-test/functional/test_btmgmt_vm.py .                                       [100%]
-
-======================= 1 passed, 4 deselected in 9.15s ========================
-
-$ grep btmgmt test-functional.log
-13:15:42 INFO   rpc.host.0.0        :  client: call_plugin ('call', '__call__', <function run at 0x7f27b81ce140>, ['/home/pauli/prj/external/bluez/build/tools/btmgmt', '--index', '0', 'info']) {'stdout': -1, 'stdin': -3, 'encoding': 'utf-8'}
-13:15:42 INFO   host.0.0.rpc        :  server: call_plugin ('call', '__call__', <function run at 0x7fd5e35a1010>, ['/home/pauli/prj/external/bluez/build/tools/btmgmt', '--index', '0', 'info']) {'stdout': -1, 'stdin': -3, 'encoding': 'utf-8'}
-13:15:42 INFO   host.0.0.run        :      $ /home/pauli/prj/external/bluez/build/tools/btmgmt --index 0 info
-
-$ test/test-functional --kernel=../linux -k test_btmgmt --log-cli-level=0
-============================= test session starts ==============================
-platform linux -- Python 3.14.3, pytest-8.3.5, pluggy-1.6.0
-rootdir: /home/pauli/prj/external/bluez/unit
-configfile: pytest.ini
-plugins: cov-5.0.0, forked-1.6.0, rerunfailures-15.0, timeout-2.4.0, xdist-3.7.0, hypothesis-6.123.0, flaky-3.8.1, anyio-4.12.1
-collected 5 items / 4 deselected / 1 selected
-
-test/functional/test_btmgmt_vm.py::test_btmgmt_info[hosts2-vm1]
--------------------------------- live log setup --------------------------------
-13:00:31 INFO   func_test.lib.env   :  Starting btvirt: /usr/bin/stdbuf -o L -e L /home/pauli/prj/external/bluez/build/emulator/btvirt --server=/tmp/bluez-func-test-8t6ychy8
-13:00:31 OUT    btvirt              :  Bluetooth emulator ver 5.86
-13:00:31 INFO   func_test.lib.env   :  Starting host: /home/pauli/prj/external/bluez/build/tools/test-runner --kernel=../linux/arch/x86/boot/bzImage -u/tmp/bluez-func-test-8t6ychy8/bt-server-bredrle -o -chardev -o socket,id=ser0,path=/tmp/bluez-func-test-8t6ychy8/bluez-func-test-rpc-0,server=on,wait=off -o -device -o virtio-serial -o -device -o virtserialport,chardev=ser0,name=bluez-func-test-rpc -H -- /usr/bin/python3 -P /home/pauli/prj/external/bluez/test/functional/lib/runner.py /dev/ttyS2
-13:00:31 OUT    btvirt              :  Request for /tmp/bluez-func-test-8t6ychy8/bt-server-bredrle
-13:00:32 OUT    host.0.0            :  early console in extract_kernel
-13:00:32 OUT    host.0.0            :  input_data: 0x000000000425c2c4
-...
-13:00:39 INFO   rpc.host.0.0        :  client: call_plugin ('call', '__call__', <function run at 0x7f7547472140>, ['/home/pauli/prj/external/bluez/build/tools/btmgmt', '--index', '0', 'info']) {'stdout': -1, 'stdin': -3, 'encoding': 'utf-8'}
-13:00:39 DEBUG  host.0.0.rpc        :  server: done
-13:00:39 INFO   host.0.0.rpc        :  server: call_plugin ('call', '__call__', <function run at 0x7f77dcc81010>, ['/home/pauli/prj/external/bluez/build/tools/btmgmt', '--index', '0', 'info']) {'stdout': -1, 'stdin': -3, 'encoding': 'utf-8'}
-13:00:39 INFO   host.0.0.run        :      $ /home/pauli/prj/external/bluez/build/tools/btmgmt --index 0 info
-13:00:40 OUT    host.0.0.run.out    :  hci0:	Primary controller
-13:00:40 OUT    host.0.0.run.out    :  	addr 00:AA:01:00:00:42 version 11 manufacturer 1521 class 0x000000
-13:00:40 OUT    host.0.0.run.out    :  	supported settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr le advertising secure-conn debug-keys privacy static-addr phy-configuration cis-central cis-peripheral iso-broadcaster sync-receiver ll-privacy past-sender past-receiver
-13:00:40 OUT    host.0.0.run.out    :  	current settings: br/edr
-13:00:40 OUT    host.0.0.run.out    :  	name
-13:00:40 OUT    host.0.0.run.out    :  	short name
-13:00:40 INFO   host.0.0.run        :  (return code 0)
-13:00:40 DEBUG  rpc.host.0.0        :  client-reply
-PASSED                                                                   [100%]
-13:00:40 OUT    host.0.0            :  qemu-system-x86_64: terminating on signal 15 from pid 149047 (python3)
-======================= 1 passed, 4 deselected in 8.84s ========================
-
-$ test/test-functional --kernel=../linux -k test_bluetoothctl_pair --log-cli-level=0 --log-filter=*.bluetoothctl,rpc.* --force-usb
-============================= test session starts ==============================
-platform linux -- Python 3.14.3, pytest-8.3.5, pluggy-1.6.0
-rootdir: /home/pauli/prj/external/bluez/unit
-configfile: pytest.ini
-plugins: cov-5.0.0, forked-1.6.0, rerunfailures-15.0, timeout-2.4.0, xdist-3.7.0, hypothesis-6.123.0, flaky-3.8.1, anyio-4.12.1
-collected 5 items / 4 deselected / 1 selected
-
-test/functional/test_bluetoothctl_vm.py::test_bluetoothctl_pair[hosts0-vm2]
--------------------------------- live log setup --------------------------------
-13:03:20 INFO   rpc.host.0.0        :  client: start_load (<func_test.lib.host_plugins.Bdaddr object at 0x7f268712d160>,) {}
-13:03:20 INFO   rpc.host.0.0        :  client: start_load (<func_test.lib.host_plugins.Call object at 0x7f268712d2b0>,) {}
-13:03:20 INFO   rpc.host.0.0        :  client: start_load (<func_test.lib.host_plugins.DbusSystem object at 0x7f2687aa30e0>,) {}
-13:03:20 INFO   rpc.host.0.0        :  client: start_load (<func_test.lib.host_plugins.Bluetoothd object at 0x7f2687aa3230>,) {}
-13:03:20 INFO   rpc.host.0.0        :  client: start_load (<func_test.lib.host_plugins.Bluetoothctl object at 0x7f268712d010>,) {}
-13:03:20 INFO   rpc.host.0.1        :  client: start_load (<func_test.lib.host_plugins.Bdaddr object at 0x7f26871542d0>,) {}
-13:03:20 INFO   rpc.host.0.1        :  client: start_load (<func_test.lib.host_plugins.Call object at 0x7f2687154410>,) {}
-13:03:20 INFO   rpc.host.0.1        :  client: start_load (<func_test.lib.host_plugins.DbusSystem object at 0x7f2687aa30e0>,) {}
-13:03:20 INFO   rpc.host.0.1        :  client: start_load (<func_test.lib.host_plugins.Bluetoothd object at 0x7f2687aa3230>,) {}
-13:03:20 INFO   rpc.host.0.1        :  client: start_load (<func_test.lib.host_plugins.Bluetoothctl object at 0x7f2687154190>,) {}
-13:03:20 INFO   rpc.host.0.0        :  client: wait_load () {}
-13:03:21 DEBUG  rpc.host.0.0        :  client-reply
-13:03:21 INFO   rpc.host.0.1        :  client: wait_load () {}
-13:03:21 DEBUG  rpc.host.0.1        :  client-reply
--------------------------------- live log call ---------------------------------
-13:03:21 INFO   rpc.host.0.0        :  client: call_plugin ('bluetoothctl', 'send', 'show\n') {}
-13:03:21 DEBUG  rpc.host.0.0        :  client-reply
-13:03:21 INFO   rpc.host.0.0        :  client: call_plugin ('bluetoothctl', 'expect', 'Powered: yes') {}
-...
-13:03:23 INFO   rpc.host.0.0        :  client: call_plugin ('bluetoothctl', 'send', 'pair 70:1a:b8:73:99:bb\n') {}
-13:03:23 OUT    host.0.0.bluetoothctl:  pair 70:1a:b8:73:99:bb
-13:03:23 DEBUG  rpc.host.0.0        :  client-reply
-13:03:23 INFO   rpc.host.0.0        :  client: call_plugin ('bluetoothctl', 'expect', 'Confirm passkey (\\d+).*:') {}
-13:03:23 OUT    host.0.0.bluetoothctl:  [bluetoothctl]> pair 70:1a:b8:73:99:bb
-13:03:23 OUT    host.0.0.bluetoothctl:  Attempting to pair with 70:1A:B8:73:99:BB
-13:03:23 OUT    host.0.0.bluetoothctl:  [bluetoothctl]> hci0 device_flags_changed: 70:1A:B8:73:99:BB (BR/EDR)
-13:03:23 OUT    host.0.0.bluetoothctl:  [bluetoothctl]>      supp: 0x00000007  curr: 0x00000000
-13:03:23 OUT    host.0.0.bluetoothctl:  [bluetoothctl]> hci0 type 7 discovering off
-13:03:25 OUT    host.0.0.bluetoothctl:  [bluetoothctl]> hci0 70:1A:B8:73:99:BB type BR/EDR connected eir_len 12
-13:03:25 OUT    host.0.0.bluetoothctl:  [bluetoothctl]> [BlueZ 5.86]> [CHG] Device 70:1A:B8:73:99:BB Connected: yes
-13:03:25 OUT    host.0.0.bluetoothctl:  [BlueZ 5.86]> Request confirmation
-13:03:25 DEBUG  rpc.host.0.0        :  client-reply
-13:03:25 INFO   rpc.host.0.1        :  client: call_plugin ('bluetoothctl', 'expect', 'Confirm passkey 237345') {}
-13:03:25 OUT    host.0.1.bluetoothctl:  [bluetoothctl]> hci0 84:5C:F3:77:31:19 type BR/EDR connected eir_len 12
-13:03:25 OUT    host.0.1.bluetoothctl:  [bluetoothctl]> [NEW] Device 84:5C:F3:77:31:19 BlueZ 5.86
-13:03:25 DEBUG  rpc.host.0.1        :  client-reply
-13:03:25 INFO   rpc.host.0.0        :  client: call_plugin ('bluetoothctl', 'send', 'yes\n') {}
-13:03:25 OUT    host.0.1.bluetoothctl:  [bluetoothctl]> [BlueZ 5.86]> Request confirmation
-13:03:25 OUT    host.0.0.bluetoothctl:  [BlueZ 5.86]> [agent] Confirm passkey 237345 (yes/no): yes
-13:03:25 DEBUG  rpc.host.0.0        :  client-reply
-13:03:25 INFO   rpc.host.0.1        :  client: call_plugin ('bluetoothctl', 'send', 'yes\n') {}
-13:03:25 OUT    host.0.1.bluetoothctl:  [BlueZ 5.86]> [agent] Confirm passkey 237345 (yes/no): yes
-13:03:25 DEBUG  rpc.host.0.1        :  client-reply
-13:03:25 INFO   rpc.host.0.0        :  client: call_plugin ('bluetoothctl', 'expect', 'Pairing successful') {}
-13:03:25 OUT    host.0.0.bluetoothctl:  yes
-13:03:25 OUT    host.0.0.bluetoothctl:  [BlueZ 5.86]> hci0 new_link_key 70:1A:B8:73:99:BB type 0x08 pin_len 0 store_hint 1
-13:03:25 OUT    host.0.0.bluetoothctl:  [BlueZ 5.86]> [CHG] Device 70:1A:B8:73:99:BB Bonded: yes
-13:03:26 OUT    host.0.0.bluetoothctl:  [BlueZ 5.86]> [CHG] Device 70:1A:B8:73:99:BB AddressType: public
-13:03:26 OUT    host.0.0.bluetoothctl:  [BlueZ 5.86]> [CHG] Device 70:1A:B8:73:99:BB UUIDs: 0000110c-0000-1000-8000-00805f9b34fb
-13:03:26 OUT    host.0.0.bluetoothctl:  [BlueZ 5.86]> [CHG] Device 70:1A:B8:73:99:BB UUIDs: 0000110e-0000-1000-8000-00805f9b34fb
-13:03:26 DEBUG  rpc.host.0.0        :  client-reply
-PASSED                                                                   [100%]
------------------------------- live log teardown -------------------------------
-13:03:26 OUT    host.0.0.bluetoothctl:  [BlueZ 5.86]> [CHG] Device 70:1A:B8:98:FF:qemu-system-x86_64: terminating on signal 15 from pid 149357 (python3)
-
-======================= 1 passed, 4 deselected in 13.22s =======================
-
-$ test/test-functional -k test_btmgmt --kernel=../linux --trace
-============================= test session starts ==============================
-platform linux -- Python 3.14.3, pytest-8.3.5, pluggy-1.6.0
-rootdir: /home/pauli/prj/external/bluez/unit
-configfile: pytest.ini
-plugins: cov-5.0.0, forked-1.6.0, rerunfailures-15.0, timeout-2.4.0, xdist-3.7.0, hypothesis-6.123.0, flaky-3.8.1, anyio-4.12.1
-collected 5 items / 4 deselected / 1 selected
-
-test/functional/test_btmgmt_vm.py
->>>>>>>>>>>>>>>>>>>> PDB runcall (IO-capturing turned off) >>>>>>>>>>>>>>>>>>>>>
-> /home/pauli/prj/external/bluez/test/functional/test_btmgmt_vm.py(19)test_btmgmt_info()
--> (host,) = hosts
-(Pdb) n
-> /home/pauli/prj/external/bluez/test/functional/test_btmgmt_vm.py(21)test_btmgmt_info()
--> result = host.call(
-(Pdb) p host.bdaddr
-'00:aa:01:00:00:42'
-(Pdb) n
-> /home/pauli/prj/external/bluez/test/functional/test_btmgmt_vm.py(22)test_btmgmt_info()
--> run,
-(Pdb) n
-> /home/pauli/prj/external/bluez/test/functional/test_btmgmt_vm.py(23)test_btmgmt_info()
--> [btmgmt, "--index", "0", "info"],
-(Pdb) n
-> /home/pauli/prj/external/bluez/test/functional/test_btmgmt_vm.py(24)test_btmgmt_info()
--> stdout=subprocess.PIPE,
-(Pdb) n
-> /home/pauli/prj/external/bluez/test/functional/test_btmgmt_vm.py(25)test_btmgmt_info()
--> stdin=subprocess.DEVNULL,
-(Pdb) n
-> /home/pauli/prj/external/bluez/test/functional/test_btmgmt_vm.py(26)test_btmgmt_info()
--> encoding="utf-8",
-(Pdb) n
-> /home/pauli/prj/external/bluez/test/functional/test_btmgmt_vm.py(21)test_btmgmt_info()
--> result = host.call(
-(Pdb) n
-> /home/pauli/prj/external/bluez/test/functional/test_btmgmt_vm.py(28)test_btmgmt_info()
--> assert result.returncode == 0
-(Pdb) p result
-CompletedProcess(args=['/home/pauli/prj/external/bluez/build/tools/btmgmt', '--index', '0', 'info'], returncode=0, stdout='hci0:\tPrimary controller\n\taddr 00:AA:01:00:00:42 version 11 manufacturer 1521 class 0x000000\n\tsupported settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr le advertising secure-conn debug-keys privacy static-addr phy-configuration cis-central cis-peripheral iso-broadcaster sync-receiver ll-privacy past-sender past-receiver \n\tcurrent settings: br/edr \n\tname \n\tshort name \n')
-(Pdb) print(result.stdout)
-hci0:	Primary controller
-	addr 00:AA:01:00:00:42 version 11 manufacturer 1521 class 0x000000
-	supported settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr le advertising secure-conn debug-keys privacy static-addr phy-configuration cis-central cis-peripheral iso-broadcaster sync-receiver ll-privacy past-sender past-receiver
-	current settings: br/edr
-	name
-	short name
-(Pdb) q
-
-!!!!!!!!!!!!!!!!!!! _pytest.outcomes.Exit: Quitting debugger !!!!!!!!!!!!!!!!!!!
-======================= 4 deselected in 75.91s (0:01:15) =======================
-
-***
-
-Pauli Virtanen (20):
-  emulator: btvirt: check pkt lengths, don't get stuck on malformed
-  emulator: btvirt: allow specifying where server unix sockets are made
-  emulator: btvirt: support SCO data packets
-  emulator: btdev: clear more state on Reset
-  test-runner: enable path argument for --unix
-  test-runner: Add -o/--option option
-  test-runner: allow source tree root for -k
-  doc: enable CONFIG_VIRTIO_CONSOLE in tester config
-  test-runner: use virtio-serial for implementing -u device forwarding
-  doc: enable KVM paravirtualization & clock support in tester kernel
-    config
-  doc: add functional/integration testing documentation
-  test: add functional/integration testing framework
-  test: functional: add Pipewire-using audio streaming tests
-  test: functional: add --btmon option to start btmon
-  build: add functional testing target
-  test: functional: impose Python code formatting
-  test: functional: add option for building kernel image first
-  test: functional: add custom Agent1 implementation for testing
-  test: functional: warn on kernel warning/bug messages
-  test: functional: add basic obex file transfer tests
-
- Makefile.am                             |   9 +
- Makefile.tools                          |   2 +
- configure.ac                            |  30 +
- doc/ci.config                           |   9 +
- doc/test-functional.rst                 | 938 ++++++++++++++++++++++++
- doc/test-runner.rst                     |  17 +
- doc/tester.config                       |   9 +
- emulator/btdev.c                        | 117 +--
- emulator/main.c                         |  37 +-
- emulator/server.c                       |  21 +
- test/functional/__init__.py             |   2 +
- test/functional/requirements.txt        |   4 +
- test/functional/test_agent.py           |  46 ++
- test/functional/test_bluetoothctl_vm.py | 152 ++++
- test/functional/test_btmgmt_vm.py       |  30 +
- test/functional/test_obex.py            | 285 +++++++
- test/functional/test_pipewire.py        | 536 ++++++++++++++
- test/functional/test_tests.py           |  23 +
- test/pytest.ini                         |  18 +
- test/pytest_bluez/__init__.py           |  12 +
- test/pytest_bluez/agent.py              | 371 ++++++++++
- test/pytest_bluez/btmon.py              | 116 +++
- test/pytest_bluez/build_kernel.py       |  43 ++
- test/pytest_bluez/env.py                | 773 +++++++++++++++++++
- test/pytest_bluez/host_plugins.py       | 541 ++++++++++++++
- test/pytest_bluez/plugin.py             | 625 ++++++++++++++++
- test/pytest_bluez/rpc.py                | 387 ++++++++++
- test/pytest_bluez/runner.py             |  20 +
- test/pytest_bluez/tests/__init__.py     |   2 +
- test/pytest_bluez/tests/test_rpc.py     |  59 ++
- test/pytest_bluez/tests/test_utils.py   |  16 +
- test/pytest_bluez/utils.py              | 706 ++++++++++++++++++
- test/test-functional                    |   7 +
- test/test-functional-attach             |  52 ++
- tools/test-runner.c                     | 376 +++++++---
- 35 files changed, 6239 insertions(+), 152 deletions(-)
+Add documentation for functional/integration test suite.
+---
+ doc/test-functional.rst | 769 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 769 insertions(+)
  create mode 100644 doc/test-functional.rst
- create mode 100644 test/functional/__init__.py
- create mode 100644 test/functional/requirements.txt
- create mode 100644 test/functional/test_agent.py
- create mode 100644 test/functional/test_bluetoothctl_vm.py
- create mode 100644 test/functional/test_btmgmt_vm.py
- create mode 100644 test/functional/test_obex.py
- create mode 100644 test/functional/test_pipewire.py
- create mode 100644 test/functional/test_tests.py
- create mode 100644 test/pytest.ini
- create mode 100644 test/pytest_bluez/__init__.py
- create mode 100644 test/pytest_bluez/agent.py
- create mode 100644 test/pytest_bluez/btmon.py
- create mode 100644 test/pytest_bluez/build_kernel.py
- create mode 100644 test/pytest_bluez/env.py
- create mode 100644 test/pytest_bluez/host_plugins.py
- create mode 100644 test/pytest_bluez/plugin.py
- create mode 100644 test/pytest_bluez/rpc.py
- create mode 100644 test/pytest_bluez/runner.py
- create mode 100644 test/pytest_bluez/tests/__init__.py
- create mode 100644 test/pytest_bluez/tests/test_rpc.py
- create mode 100644 test/pytest_bluez/tests/test_utils.py
- create mode 100644 test/pytest_bluez/utils.py
- create mode 100755 test/test-functional
- create mode 100755 test/test-functional-attach
 
+diff --git a/doc/test-functional.rst b/doc/test-functional.rst
+new file mode 100644
+index 000000000..bb3d1ae46
+--- /dev/null
++++ b/doc/test-functional.rst
+@@ -0,0 +1,769 @@
++===============
++test-functional
++===============
++
++**test-functional** [*OPTIONS*]
++
++DESCRIPTION
++===========
++
++**test-functional(1)** is used for functional testing of BlueZ and
++kernel using multiple virtual machine environments, connected by real
++or virtual controllers.
++
++OPTIONS
++=======
++
++The `test-functional` script simply runs `Pytest
++<https://pytest.org>`__ which can take the following options:
++https://docs.pytest.org/en/stable/reference/reference.html#command-line-flags
++
++The following additional options apply:
++
++:--kernel=<image>: Kernel image (or built Linux source tree root) to
++	use.  See **test-runner(1)** and `tester.config` for required
++	kernel config.
++
++	If not provided, value from `FUNCTIONAL_TESTING_KERNEL`
++	environment variable is used. If none, no image is used.
++
++:--usb=hci0,hci1: USB controllers to use in tests that require use of
++	real controllers.
++
++	If not provided, value from `FUNCTIONAL_TESTING_CONTROLLERS`
++	environment variable is used. If none, all USB controllers
++	with suitable permissions are considered.
++
++:--force-usb: Force tests to use USB controllers instead of `btvirt`.
++
++:--vm-timeout=<seconds>: Specify timeout for communication with VM hosts.
++
++:--log-filter=[+-]<pattern>,[+-]<pattern>,...: Allow/deny lists
++	for filtering logging output. The pattern is a shell glob matching
++	to the logger names.
++
++:--build-dir=<path>: Path to build directory where to search for BlueZ
++        executables.
++
++:--list: Output brief lists of existing tests.
++
++Tests that require kernel image or USB controllers are skipped if none
++are available. Normally, tests use `btvirt`.
++
++VM instances share a directory ``/run/shared`` with host machine,
++located on host usually in ``/tmp/bluez-func-test-*/shared-*``.  Core
++dumps etc. are copied out from it before test instance is shut down.
++
++
++REQUIREMENTS
++============
++
++General
++-------
++
++The following are needed:
++
++- QEmu (x86_64)
++- ``dbus-daemon`` available
++
++Recommended:
++
++- KVM-enabled x86_64 host system
++- Preferably built BlueZ source tree
++- ``chronyd`` available
++- ``util-linux`` tools available
++- ``agetty`` available
++
++Python
++------
++
++The following Python packages are required:
++
++.. code-block::
++
++   pytest
++   pexpect
++   dbus-python
++
++To install them via pip::
++
++	python3 -m pip install -r test/functional/requirements.txt
++
++On Fedora / RHEL::
++
++	sudo dnf install python3-pytest python3-pexpect python3-dbus
++
++
++Kernel
++------
++
++The **test-functional(1)** tool requires a kernel image with similar
++config as **test-runner(1)**.  Simplest setup is
++
++.. code-block::
++
++	cp ../bluez/doc/tester.config .config
++	make olddefconfig
++	make -j8
++
++To get log timestamps right, the kernel should have the following
++configuration enabled:
++
++.. code-block::
++
++	CONFIG_HYPERVISOR_GUEST=y
++	CONFIG_PARAVIRT=y
++	CONFIG_KVM_GUEST=y
++
++	CONFIG_PTP_1588_CLOCK=y
++	CONFIG_PTP_1588_CLOCK_KVM=y
++	CONFIG_PTP_1588_CLOCK_VMCLOCK=y
++
++USB
++---
++
++Some tests may require a hardware controller instead of the virtual `btvirt` one.
++
++
++EXAMPLES
++========
++
++Run all tests
++-------------
++
++.. code-block::
++
++	$ test/test-functional --kernel=/pathto/bzImage
++
++	$ export FUNCTIONAL_TESTING_KERNEL=/pathto/bzImage
++	$ test/test-functional
++
++Show output during run
++----------------------
++
++.. code-block::
++
++	$ test/test-functional --log-cli-level=0
++
++Show only specific loggers:
++
++.. code-block::
++
++	$ test/test-functional --log-cli-level=0 --log-filter=rpc,host
++
++	$ test/test-functional --log-cli-level=0 --log-filter=*.bluetoothctl
++
++Filter out loggers:
++
++.. code-block::
++
++	$ test/test-functional --log-cli-level=0 --log-filter=-host
++
++	$ test/test-functional --log-cli-level=0 --log-filter=host,-host.*.1
++
++Run selected tests
++------------------
++
++.. code-block::
++
++	$ test/test-functional test/functional/test_cli_simple.py::test_bluetoothctl_script_show
++
++	$ test/test-functional -k test_bluetoothctl_script_show
++
++	$ test/test-functional -k 'test_btmgmt or test_bluetoothctl'
++
++Don't run tests with a given marker:
++
++.. code-block::
++
++	$ test/test-functional -m "not pipewire"
++
++Don't run known-failing tests:
++
++.. code-block::
++
++	$ test/test-functional -m "not xfail"
++
++Note that otherwise known-failing tests would be run, but with
++failures suppressed.
++
++Run previously failed and stop on failure
++-----------------------------------------
++
++.. code-block::
++
++	$ test/test-functional -x --ff
++
++List all tests
++--------------
++
++.. code-block::
++
++	$ test/test-functional --list
++
++Show errors from know-failing test
++----------------------------------
++
++.. code-block::
++
++	$ test/test-functional --runxfail -k test_btmgmt_info
++
++Redirect USB devices
++--------------------
++
++.. code-block::
++
++	$ test/test-functional --usb=hci0,hci1
++
++	$ export FUNCTIONAL_TESTING_CONTROLLERS=hci0,hci1
++	$ test/test-functional -vv
++
++This does not require running as root. Changing device permissions is
++sufficient. In verbose mode (``-vv``) some instructions are printed.
++
++Run all tests using the USB controllers:
++
++.. code-block::
++
++	$ test/test-functional --usb=hci0,hci1 --force-usb
++
++Run tests in parallel
++---------------------
++
++pytest-xdist is required for parallel execution. To run:
++
++.. code-block::
++
++	$ test/test-functional -n auto
++
++To reduce VM setup/teardowns:
++
++.. code-block::
++
++	$ test/test-functional -n auto --dist loadgroup
++
++Logging in to a test VM instance
++--------------------------------
++
++While test is running:
++
++.. code-block::
++
++	$ test/test-functional-attach
++
++For this to be useful, usually, you need to pause the test
++e.g. by running with ``--trace`` option.
++
++To do it manually, when starting the tester will log a line like::
++
++	TTY: socat /tmp/bluez-func-test-q658swgi/bluez-func-test-tty-0 STDIO,rawer
++
++with the location of the socket where the serial is connected to.
++
++WRITING TESTS
++=============
++
++The functional tests are written in files (test modules) names
++`test/functional/test_*.py`.  They are written using standard Pytest
++style.  See https://docs.pytest.org/en/stable/getting-started.html
++
++Example: Virtual machines
++-------------------------
++
++.. code-block:: python
++
++   from pytest_bluez import host_config, Bluetoothd, Bluetoothctl
++
++   @host_config(
++       [Bluetoothd(), Bluetoothctl()],
++       [Bluetoothd(), Bluetoothctl()],
++   )
++   def test_bluetoothctl_pair(hosts):
++       host0, host1 = hosts
++
++       host0.bluetoothctl.send("scan on\n")
++       host0.bluetoothctl.expect(f"Controller {host0.bdaddr.upper()} Discovering: yes")
++
++       host1.bluetoothctl.send("pairable on\n")
++       host1.bluetoothctl.expect("Changing pairable on succeeded")
++       host1.bluetoothctl.send("discoverable on\n")
++       host1.bluetoothctl.expect(f"Controller {host1.bdaddr.upper()} Discoverable: yes")
++
++       host0.bluetoothctl.expect(f"Device {host1.bdaddr.upper()}")
++       host0.bluetoothctl.send(f"pair {host1.bdaddr}\n")
++
++       idx, m = host0.bluetoothctl.expect(r"Confirm passkey (\d+).*:")
++       key = m[0].decode("utf-8")
++
++       host1.bluetoothctl.expect(f"Confirm passkey {key}")
++
++       host0.bluetoothctl.send("yes\n")
++       host1.bluetoothctl.send("yes\n")
++
++       host0.bluetoothctl.expect("Pairing successful")
++
++The test declares a VM setup with two Qemu instances, where both hosts
++run bluetoothd and start a bluetoothctl process.  The Qemu instances
++have `btvirt` virtual BT controllers and can see each other.
++
++The test itself runs on the parent host.
++
++The `host0/1.bluetoothctl.*` commands invoke RPC calls to one of the
++the two VM instances. In this case, they are controlling the
++`bluetoothctl` process using `pexpect` library to deal with its
++command line.
++
++When the test body finishes executing, the test passes. Or, it fails
++if any ``assert`` statement fails or an error is raised. For example,
++above ``RemoteError`` due to bluetoothctl not proceeding as expected
++in pairing is possible.
++
++The host configuration (bluetoothd + bluetoothctl above) is torn down
++between test (SIGTERM/SIGKILL sent etc.).
++
++By default the VM instance itself continues running, and may be used
++for other tests that share the same VM setup.
++
++Generally, the framework automatically orders the tests so that the VM
++setup does not need to be restarted unless needed.
++
++
++Example host plugin
++-------------------
++
++The `host.bluetoothctl` implementation used above is as follows:
++
++.. code-block:: python
++
++   from pytest_bluez import HostPlugin, Bluetoothd
++
++   class Bluetoothctl(Pexpect):
++       # Declare unique plugin name
++       name = "bluetoothctl"
++
++       # Declare plugin dependencies to be loaded first
++       depends = [Bluetoothd()]
++
++       # These run on parent host side:
++
++       def __init__(self, subdir, name):
++           self.exe = utils.find_exe(subdir, name)
++
++       def presetup(self):
++           pass
++
++       # These run on VM side at setup/teardown:
++
++       def setup(self, impl):
++           self.log = logging.getLogger(self.name)
++           self.log_stream = utils.LogStream(self.name)
++           self.ctl = pexpect.spawn(self.exe, logfile=self.log_stream.stream)
++
++       def teardown(self):
++           self.ctl.terminate()
++
++       # These define custom RPC methods that can be called
++
++       def expect(self, *a, **kw):
++           ret = self.ctl.expect(*a, **kw)
++           self.log.debug("match found")
++           return ret, self.ctl.match.groups()
++
++       def send(self, *a, **kw):
++           return self.ctl.send(*a, **kw)
++
++
++
++Host plugins are for injecting code to run on the VM side test hosts.
++The host plugins have scope of one test.  The VM side test framework
++sends SIGTERM and SIGKILL to all processes in the test process group
++to reset the state between each test.
++
++The plugins are declared by inheriting from `HostPlugin`. Their
++`__init__()` is supposed to only store declarative configuration on
++`self` and runs on parent side early in the test discovery phase.  The
++`presetup` runs on parent side in test setup phase, before VM
++environment is started. The plugin can for example do
++`pytest.skip(reason="something")` to skip the test.
++
++The `setup()` and `teardown()` methods run on VM-side at host
++environment start and end.  All other methods can be invoked via RPC
++by the parent tester, and any values returned by them are passed via
++RPC back to the parent.
++
++To load a plugin to a VM host, pass it to `host_config()` in the
++declaration of a given test.
++
++Test fixtures
++=============
++
++The following test fixtures are used to deal with spawning VM hosts:
++
++hosts
++-----
++
++.. code-block::
++
++    Session-scope fixture that expands to a list of VM host proxies
++    (`HostProxy`), with configuration as specified in `host_config`. The
++    VM instances used may be reused by other tests.  The userspace test
++    runner is torn down between tests.
++
++    Example:
++
++        def test_something(hosts):
++            host0 = hosts[0]
++            host1 = hosts[1]
++
++hosts_once
++----------
++
++.. code-block::
++
++   def test_something(hosts_once):
++       host0 = hosts_once[0]
++       host1 = hosts_once[1]
++
++Function-scope fixture. Same as `hosts`, but spawn separate VM
++instances for this test only.
++
++Others
++------
++
++The following fixtures are defined, but mainly for use as dependencies
++to `hosts`: `kernel` (selected kernel image), `usb_indices` (selected
++USB controllers), `host_setup` (current host plugin configurations),
++`vm_setup` (VM host configuration), `vm` (VM instances without
++userspace setup), `vm_once` (same but with function scope).
++
++Utilities
++=========
++
++In addition to standard Pytest features, the following items are
++available in the `pytest_bluez` module.
++
++host_config
++-----------
++
++.. code-block::
++
++    @host_config(*host_setup, hw=False, reuse=False)
++
++    Declare host configuration.
++
++    Args:
++        *host_setup: each argument is a list of plugins to be loaded on a host.
++            The number of arguments specifies the number of hosts.
++        hw (bool): whether to require hardware BT controller
++        reuse (bool): whether to define a setup where the test host processes
++            are not required to be torn down between tests. This is only useful
++            for tests that do not perturb e.g. bluetoothd state too much.
++
++    Returns:
++        callable: decorator setting pytest attributes
++
++    Example:
++
++        @host_config([Bluetoothd()], [Bluetoothd()])
++        def test_something(hosts):
++            host0, host1 = hosts
++
++    Example:
++
++        # Allow not restarting Bluetoothd between tests sharing this configuration
++        base_config = host_config([Bluetoothd()], reuse=True)
++
++        @base_config
++        def test_one(hosts):
++            host0, = hosts
++
++        @base_config
++        def test_two(hosts):
++            # Note: uses same Bluetoothd() instance as above
++            host0, = hosts
++
++parametrized_host_config
++------------------------
++
++.. code-block::
++
++    Declare parametrized host configurations.
++
++    See https://docs.pytest.org/en/stable/how-to/parametrize.html for the
++    concept.
++
++    Args:
++        param_host_setups (list): list of host setups
++        hw (bool): whether to require hardware BT controller
++        reuse (bool): whether to define a setup where the test host processes
++            are not required to be torn down between tests. This is only useful
++            for tests that do not perturb e.g. bluetoothd state too much.
++
++    Returns:
++        callable: decorator setting pytest attributes
++
++HostProxy
++---------
++
++.. code-block::
++
++   class HostProxy:
++       """
++       Parent-side proxy for VM host: load plugins, RPC calls to plugins
++       """
++
++       def load(self, plugin: HostPlugin):
++           """
++           Load given plugin to the VM host synchronously.
++           """
++
++       def start_load(self, plugin: HostPlugin):
++           """
++           Initiate loading the given plugin to the VM host.  Use
++           `wait_load` to wait for completion and make loaded plugins
++           usable.
++
++           """
++
++       def wait_load(self):
++           """
++           Wait for plugin loads to complete, and make plugins available.
++           """
++
++       def close(self)
++           """
++           Shutdown this VM host tester instance.
++           """
++
++       def __getattr__(self, name):
++           """
++   	Get a proxy attribute for one of the loaded plugins
++   	"""
++
++Parent host-side representation of one VM host with loadable plugins.
++
++Plugins are usually loaded based on `host_setup`, but can also be
++loaded during the test itself.
++
++Loaded plugins appear as attributes on the host proxy.
++
++find_exe
++--------
++
++.. code-block::
++
++   from pytest_bluez import find_exe
++   bluetoothctl = find_exe("client", "bluetoothctl")
++
++Find absolute path to the given executable, either within BlueZ build
++directory or on host.
++
++
++mainloop_invoke
++-------------
++
++.. code-block::
++
++    Blocking invoke of `func` in GLib main loop.
++
++    Note:
++
++        GLib main loop is only available for VM host plugins, not in tester.
++
++    Example:
++
++        value = mainloop_invoke(lambda: 123)
++        assert value == 123
++
++    Warning:
++        dbus-python **MUST** be used only from the GLib main loop,
++        as the library has concurrency bugs. All functions using it
++        **MUST** either run from GLib main loop eg. via mainloop_wrap
++
++mainloop_wrap
++-------------
++
++.. code-block::
++
++    Wrap function to run in GLib main loop thread
++
++    Note:
++
++        GLib main loop is only available for VM host plugins, not in tester.
++
++    Example:
++
++        @mainloop_wrap
++        def func():
++            bus = dbus.SystemBus()
++
++mainloop_wrap
++-------------
++
++.. code-block::
++
++    Wrap function to assert it runs from GLib main loop
++
++    Note:
++
++        GLib main loop is only available for VM host plugins, not in tester.
++
++    Example:
++
++        @mainloop_assert
++        def func():
++            bus = dbus.SystemBus()
++
++LogStream
++---------
++
++.. code-block::
++
++   from pytest_bluez import LogStream
++
++   log_stream = LogStream("bluetoothctl")
++   subprocess.run(["bluetoothctl", "show"], stdout=log_stream.stream)
++
++Utility to redirect a stream to logging with accurate kernel-provided
++timestamps.
++
++RemoteError
++-----------
++
++.. code-block::
++
++   from pytest_bluez import RemoteError
++
++   try:
++       host.call(foo)
++   except RemoteError as exc:
++       print(exc.traceback)
++       original_exception = exc.exc
++
++Exception raised on the VM side, passed through RPC. Properties:
++`traceback` is a traceback string and `exc` is the original exception
++instance raised on the remote side.
++
++Host plugins
++============
++
++The following host plugins are available:
++
++HostPlugin
++----------
++
++Base class for host plugins. See also example above.
++
++.. code-block::
++
++   class HostPlugin:
++       """
++       Plugin to insert code to VM host side.
++
++       Attributes:
++           name (str): unique name for the plugin
++           depends (tuple[HostPlugin]): plugins to be loaded before this one
++           value (object): object to appear as HostProxy attribute on parent side.
++               If None, the plugin is represented by a proxy object that does RPC
++               calls. Otherwise, must be a serializable value.
++
++       """
++
++       name = None
++       depends = ()
++       value = None
++
++       def __init__(self):
++           """
++           Configure plugin (runs on parent host side).  This is
++           called at test discovery time, so should mainly store static
++           data.
++
++           """
++           pass
++
++       def presetup(self):
++           """
++           Parent host-side setup, before VM environment is started.  May
++           use pytest.skip() to skip tests in case plugin cannot be set up.
++
++           """
++           pass
++
++       def setup(self, impl):
++           """
++           VM-side setup
++
++           Args:
++               impl (Implementation): plugin host object
++           """
++           pass
++
++       def teardown(self):
++           """VM-side teardown"""
++           pass
++
++Bdaddr
++------
++
++Host plugin providing ``host.bdaddr``.
++Loaded by default.
++
++Bluetoothctl
++------------
++
++.. code-block::
++
++   class Bluetoothctl(HostPlugin)
++       def expect(self, *a, **kw)
++       def send(self, *a, **kw)
++
++Host plugin for starting and controlling `bluetoothctl` with pexpect.
++
++Bluetoothd
++----------
++
++Host plugin starting Bluetoothd.
++
++Call
++----
++
++.. code-block::
++
++   class Call(HostPlugin):
++       def __call__(self, func, *args, **kwargs)
++
++Host plugin providing ``host.call(func, *args, **kw)`` which invokes
++the given function on VM host side.  Loaded by default.
++
++DbusSession
++-----------
++
++Host plugin providing session DBus, at address
++`impl["dbus-session"].address`.
++
++DbusSystem
++----------
++
++Host plugin providing system DBus, at address
++`impl["dbus-system"].address`.
++
++Pexpect
++-------
++
++.. code-block::
++
++   class Pexpect(HostPlugin)
++       def spawn(self, cmd)
++           """Returns: spawn_id"""
++       def close(self, spawn_id)
++       def expect(self, spawn_id, *a, **kw)
++       def send(self, spawn_id, *a, **kw)
++
++Host plugin for starting and controlling processes with pexpect.
++
++Rcvbuf
++------
++
++Host plugin setting pipe buffer size defaults.
++Loaded by default.
 -- 
 2.53.0
 
