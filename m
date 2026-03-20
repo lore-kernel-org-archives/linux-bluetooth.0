@@ -1,164 +1,258 @@
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38D62139C9
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 13:05:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774011934; cv=none; b=YkrqFtOXEQhzwbimr6OVkMfxA5Rpi5VDtQVaBPqo6aUx114SlzhhxJtVZoDznCBBr7VTCPc0TTfHvVsK0stXpFBOkCnXNZ/0BbroPdhXyF/zXPYB7kAm38K5sPCLRq0TCjRO1WymA7dJGN96vk+FBYrvA8Iqac+sbqBWcGNhFew=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774011934; c=relaxed/simple;
-	bh=oWN0DeEHwjKY53MVphG9HxAq/qtdgmCIUK7bFOOvdPw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Ev68O33XRRt8gMWtK6RVx3qTSGoQoiXQxtxYGUpdcz9nxxGFnCWF4bYylq820O1euKNp7H1vexDJnMcOu3iAe9ht1tSBOmUZeknhz6vxIcjiyCd/0nqKMnFy/RoaK3aZ8MpGxr/SNpdQ4xXHXa0/CDY6FlTl4FvUS1zzHREcydY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TCxQzs3j; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E8D3BBA16
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 14:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774015209; cv=pass; b=RKNIcPQoVb2iKsq7q6rno3W/mvB9sopzOSgaC0+PBQJ4pZFMV0W/9RHH1H8KaRC0KwVtPYGN5/pd9VqDac0jckkP1bPePC0YsAMsMciJCt0H+kU59ZupDzI3vfWmrAIsLqNNzDwrJe5M1Q2KQsT3urdGKfmYiWPVAdqYpZJ0kEU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774015209; c=relaxed/simple;
+	bh=SXKYz3VDv8TKDUnwL3YYc25AC4oGQyXpui046etb3ps=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jfhDAX98E10eunKMleqBz2v0EjTMwW/xAEmHukKJwtj1AvLpIGjmYo8xNUXsnaF+ohUMp9LmIXw3LLg5e+pxoJNgFpMzwy1ELT/hGB1AtoxQHRW9rr9iSw4nVVm8M0hlFK9MkWpJjDHsfRzaPjcL65QDFBoZ43nmwr1Ajod+JTg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WJBNDT5g; arc=pass smtp.client-ip=74.125.224.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TCxQzs3j"
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-46702742c99so1178256b6e.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 06:05:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WJBNDT5g"
+Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-64c9a6d7f81so579665d50.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 07:00:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774015201; cv=none;
+        d=google.com; s=arc-20240605;
+        b=VRSMOldfBfztlky2P/wGDf/v+aFlLkar95kilsTudg4/90nH4iqH1VLvIn5L0wPba4
+         ivl94cGaWpt2u8nMM9b/aMdtQiQA1CWvTzIf3ZAH3U6EsLLZ6r2adUJeNmSr5uKQ8CpS
+         Qxfb23e7Qgcu9SiwMzPYiJQb7t+gzjBT5/zjaHTUvs7bf5AmpQ31trrreWeo+P31RbOF
+         z/TGAKK4VmPbQKiMSzItp1Xzms+dIFDt7DjdAgqw2hJ4V62uPTVK58ldVjPq+sE9CIx/
+         5MgX1HQLhDi1p/5Zivv7tGReTWzk9Q58kh+yTFAHRdDvoR9VHh7IdDPsYx3Z5cCVOPV0
+         ZGCQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=KQ9jLGOSl8+l27j5Vz4ediKGfPfCRBzhCYelPhQqizo=;
+        fh=tU9MxSekwlnkVe/kwsuL5HsnmCLxauicOHjxRvS138U=;
+        b=hT0tIzajv9/bTu7ltM87PSGPgMgvfw6RnBR5eZtvE7DNCyUmjPGu1RJlodFZ3HjDB4
+         tABHGVLitrQ6eTH7LqANzwId9iGyqQ0IFQ7A50u35CWUXxQFD9aqQHG4T2h4eoh0waE9
+         bq64ZV2/uz5MR9GQ69BJtAVJbR/JkXoCRexih8PuTyA5OE9ETtcFF6flLEjxfNG8KvB5
+         DncI694FkjLgJfgSA+m8UbhalO16DXHhXneOvviNaOQ+JwtErT3OSCCPJbLNho+nXlpn
+         9igNQaY+dhKE7iBTyiq6xBX9KBmst9xNG18izMvvDrhzponKN1I+9EpHog5O86usUXOr
+         +IKA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774011932; x=1774616732; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=k59PnuE69D6I7bGuf78sHrtV+zC7RHx+bySInqIJh9A=;
-        b=TCxQzs3j9/0lkeZQKQ+h5DawXOOXIWR2AYnBRnmqZlkn93W3tUFw/LnzNfKfucto4A
-         SNKRAxgbFi4KnQUmRdeblvKIK7cr4Tg1K0gIyBFLrBthyoJvvmLZEqj+GyRbHrPsOXJJ
-         WFWj5hsyaYm6Ok4UMqakkzpJseq93XLiiN5+1qEOIMXyYGKmkQwJBWhOLOukwFvC47kD
-         ppY+RWgEPlrITW/OoWAsnQvZVf7CaONPKcSsGb0iPYvm0ldXp0oHBd17yZQlOYU+qXPX
-         ydVux2cUIO68CnERR/YogJhkAe1NjE1swg57876oYqNFHhXGg/N4DZUKrwgSo98SoQAr
-         iLOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774011932; x=1774616732;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1774015201; x=1774620001; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k59PnuE69D6I7bGuf78sHrtV+zC7RHx+bySInqIJh9A=;
-        b=SiXknQXzyzw18wlpqP229+K3Fk73JhWyPXAhsxf9rib2nazIp7jnvzFtQO3gjeiHjy
-         KqfCONrUEi5hRgpKT9wJVizl94Q3nrukdi5WYHvt/kKCAPwhzrPenr6N/8WcE9cdP/52
-         lBgJsl4e8fQQ5sP3JvQKobhB11KfvACJRilpvosl+eIj1ufeFTcVrIQG6vmpTnd3Aq9n
-         xXRdhtbN67Wdh0Y/x3dT1To6PQQ/9sXxe7fbFeQ99bHjlfv4oFSCNIs9e2YPgZFBfDPg
-         jeselMxZ4gfsrpzU4OvyzApbCofm3gvaUbfCplu+MA2dsp3or94zGlHO8V7SBC4pQEhf
-         vriA==
-X-Gm-Message-State: AOJu0YyCeFqK3NoQIqLHEz6lvZx1a0+WNbV9GCaF1gh9M0zkFqkdDfnT
-	m4H5YZU0c6QwPW2D/jNC7i1jw+dyrM5sPUoLBTiBaZSzE4Oo6GTEnAObNVNfuo/Z
-X-Gm-Gg: ATEYQzxA5Ajhj7CXBoS+25m5CZFzMFd2bPkYOV9R7ezSyoqKbKQa+2v/QUtYlFvw3rH
-	LaXsvHk+G3n732KZSVpYSWGXN9DRopSkYJk93nz5TgygCZ0WpUo9Ex9JXCyR+I+laPTBVaBCDGU
-	GKwNHNO/uh+aBnHOkNUTds4Pm3fdRDkB9vhrIwX2VsWTijRNTWOd01+0cruRxdqBN2IsAKNeZSI
-	2Y8MhZNthpH/uoy7TO/bOK97OWuXlnMtjbfsje/jnpIv5MmFaxBef2zWsWWbMuBVze2wvmwwkYC
-	wfMJ+4JTJpBAqi4nJjPkI0cXbjy4i8xiTa74TGFoABY/sF1zLGQrJrEu3si5HbNHVwH/kaNQlOU
-	rif8ssqjBcH1HyKS0RQdl3C/DaceIIBzZImQWpU4Oxi9m+C0a++Zyva9BIMdNwALkovYxaR2ty8
-	6gK1Q4DqedlBWu6D+ZeKhXFGELPaxf
-X-Received: by 2002:a05:6808:1396:b0:450:d471:dce5 with SMTP id 5614622812f47-467e5d24081mr1655597b6e.6.1774011932261;
-        Fri, 20 Mar 2026 06:05:32 -0700 (PDT)
-Received: from [172.17.0.2] ([20.109.87.116])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50b36cb2e29sm22334971cf.1.2026.03.20.06.05.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Mar 2026 06:05:31 -0700 (PDT)
-Message-ID: <69bd461b.c80a0220.301447.ea66@mx.google.com>
-Date: Fri, 20 Mar 2026 06:05:31 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3802544907313238616=="
+        bh=KQ9jLGOSl8+l27j5Vz4ediKGfPfCRBzhCYelPhQqizo=;
+        b=WJBNDT5gOAdzuz6Q38u2y2/qWB2B4qhVz1zBz3hjVhdKxqFv5Cp8E0DnyBS139azVp
+         YB7Bb0W1PI1IHuO6OSowrwTetA5dblttBvQVGL7PkC2UnjVJLNuqxjwR7XF9hLf+PNKv
+         1ErxuUi1EjQvfOsx2S78JXApuFMvFZgtYQokXM08wtEMxhLPuK9Hbqkd/nqGLJ2mhl1l
+         2+AXVk8jMklAIz9vaPzJ3Y06S110Pl3p9aRnXGXm+PsXRRPgQnnK/GE/jLj6rNDVRHtq
+         px1SWOtBB6+Rifh55YjcgT5/7gvuC2ZHRu/p96FKsIvO8jpqYW9JNknVN0j1icmD8W9/
+         cBBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774015201; x=1774620001;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=KQ9jLGOSl8+l27j5Vz4ediKGfPfCRBzhCYelPhQqizo=;
+        b=gle8s7kvKFAC0UQ4fpdFjNaOBebBElNWdrvtkTvKhU/gu/A+pbvV/zpKGml7EeYVae
+         ufO7RDOa9dry7nfV0/vhieS0RxOu9eZaPaiX3QMvJaosDPqrhzRZGH3rdKU1Uk21t+kg
+         3ownze36YeFJB+IgGWrRuJ1MpZwF0PNK1wJ1Df3NBjNf4xL6IV2a9TafrHJc9CpHlUJf
+         4b4l4ZhlY82t48mABiaQaKBwIOoJzJEcRTpdjYO3Lm4QL3bUs7iPr0Rcyfuok+pC6aCt
+         WXFSAzzNX92V4p0MX0qhmKT0vU8++puvNukhR0BfSuAKmwxekap/PALJSVIOS1ohbqYu
+         8x7w==
+X-Forwarded-Encrypted: i=1; AJvYcCV1eaDEGdiWBWPPYvrc/VTPzIcrQvhQ8AFUv2x1TLkHn7Te/KptLG4sKZkf38ZNrNV3BOJHGQnrNw6WqDPlOHY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzClLuGWra6EsRgQCr3iWB8cyOn0jSiloM/Vk7kkm3dKsP2iYxk
+	9rk1wsO3oVJFvPdO3YOaZAo9DVITqJiIFrddoObJpzeOfRnr1KBWBFXMm2JicNidi0AhECTrkRC
+	Ck4Tv6flEVMDyJzBhupCSTQVxrgtCuAn2+WP9
+X-Gm-Gg: ATEYQzwZkNjC19u+j400cCW/j8rL5Iqas/uuUgbMQxE8+ErAbd02c9haBCIg3JxeO4N
+	uFaIK5P0+n0+vyFNGDLnIs7N8rxeSg7W+j5HG9tqykO7RGDro5LkdgH5DWT2A9zdwowynmmS/mQ
+	2XLxEQqxe39Em1bZbtGYSVB7iXKRoYIaSmzlnjwp/8h0i369Lp/5xVQ52R59gBXdMr9oddskEZ4
+	4lGhehwR5JU301QQ1lMV5/oXrzrY384b4PHg5suLWMrXXz86BxX+SikrUf18N11CcRovWTVZ75+
+	QQcibI59s+fYqJn4BM8qu8YYVhnvQdOZMjJz3lF7SJg/ZCykPsNzH9PyZzUI5a7QK/VB6A==
+X-Received: by 2002:a53:b455:0:b0:64a:edf2:e769 with SMTP id
+ 956f58d0204a3-64eaa6b89e5mr2389426d50.10.1774015201249; Fri, 20 Mar 2026
+ 07:00:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, jonathan.rissanen@axis.com
-Subject: RE: Bluetooth: hci_h4: Fix race during initialization
-In-Reply-To: <20260320-hci-init-fix-v1-1-e1960a41baf2@axis.com>
-References: <20260320-hci-init-fix-v1-1-e1960a41baf2@axis.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <ab0yX61gGSlEaMEF@v4bel>
+In-Reply-To: <ab0yX61gGSlEaMEF@v4bel>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 20 Mar 2026 09:59:50 -0400
+X-Gm-Features: AaiRm51fzlYomGVBhl1hNn19OxuDsw9d_flO-noJj0Qt9B3TO9YEvZwsZBipF4U
+Message-ID: <CABBYNZL0t9dvLcoxdAXCb37EdTU3+iEkpicSSz=w0iBJi5=P=w@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: L2CAP: Fix use-after-free in l2cap_chan_timeout
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, 
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============3802544907313238616==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Hyunwoo,
 
-This is automated email and please do not reply to this email!
+On Fri, Mar 20, 2026 at 7:41=E2=80=AFAM Hyunwoo Kim <imv4bel@gmail.com> wro=
+te:
+>
+> l2cap_chan_timeout() reads chan->conn without holding any lock and
+> without taking a reference on the connection. If l2cap_conn_del()
+> frees the connection concurrently, mutex_lock(&conn->lock) operates
+> on freed memory. Additionally, the existing NULL check early return
+> leaks the channel reference held by the timer.
+>
+> Fix the root cause by disabling channel timers when the channel is
+> being destroyed. Use disable_delayed_work() in l2cap_chan_del() to
+> prevent timers from being rearmed, and disable_delayed_work_sync()
+> in l2cap_conn_del() to ensure running timer work has completed
+> before the connection is freed.
+>
+> The sync cannot be done directly inside l2cap_chan_del() because it
+> would deadlock in three independent ways: (1) l2cap_chan_timeout()
+> can call l2cap_chan_close() -> l2cap_chan_del(), so syncing chan_timer
+> would wait for itself; (2) callers hold conn->lock while
+> l2cap_chan_timeout() acquires it; (3) callers hold chan->lock while
+> the ERTM timer functions acquire it. Therefore, the sync is
+> performed in l2cap_conn_del() after releasing conn->lock.
+>
+> Also fix the reference leak on the !conn early return path in
+> l2cap_chan_timeout().
+>
+> Fixes: 3df91ea20e74 ("Bluetooth: Revert to mutexes from RCU list")
+> Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+> ---
+> Changes in v2:
+> - Moved the fix from l2cap_chan_timeout() to l2cap_chan_del()/l2cap_conn_=
+del() to address the root cause instead of adding locking in the callback
+> - Used disable_delayed_work()/disable_delayed_work_sync() to prevent time=
+r rearming and ensure completion, as suggested by Luiz
+> - Applied the fix to all four channel timers (chan_timer, retrans_timer, =
+monitor_timer, ack_timer)
+> - Removed l2cap_conn_get()/l2cap_conn_put() and the lock reordering that =
+caused a circular locking dependency in v1
+> - v1: https://lore.kernel.org/all/abwSxg_C6n8Avid3@v4bel/
+> ---
+>  net/bluetooth/l2cap_core.c | 30 ++++++++++++++++++++++++++++--
+>  1 file changed, 28 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 5deb6c4f1e41..c08478e4512b 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -411,8 +411,10 @@ static void l2cap_chan_timeout(struct work_struct *w=
+ork)
+>
+>         BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
+>
+> -       if (!conn)
+> +       if (!conn) {
+> +               l2cap_chan_put(chan);
+>                 return;
+> +       }
+>
+>         mutex_lock(&conn->lock);
+>         /* __set_chan_timer() calls l2cap_chan_hold(chan) while schedulin=
+g
+> @@ -649,6 +651,11 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err=
+)
+>         struct l2cap_conn *conn =3D chan->conn;
+>
+>         __clear_chan_timer(chan);
+> +       /* Prevent the timer from being rearmed since the channel is abou=
+t
+> +        * to be destroyed. Running timer work will be synced by
+> +        * l2cap_conn_del() after releasing conn->lock.
+> +        */
+> +       disable_delayed_work(&chan->chan_timer);
 
-Dear submitter,
+Hmm, so we can't use the _sync version because it could be pending on
+conn->lock while this could be called from l2cap_conn_del? I wonder if
+we should clarify the comment or if we actually need to mark the
+l2cap_chan as deleted/disconnected or something, perhaps via state,
+also we may want to return something like -EINPROGRESS if a timer
+could not be disabled which would indicate to the likes of
+l2cap_conn_del that it need a cleanup.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1069873
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.28 seconds
-GitLint                       PENDING   0.22 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      26.60 seconds
-CheckAllWarning               PASS      29.28 seconds
-CheckSparse                   PASS      27.58 seconds
-BuildKernel32                 PASS      25.94 seconds
-TestRunnerSetup               PASS      569.53 seconds
-TestRunner_l2cap-tester       PASS      28.30 seconds
-TestRunner_iso-tester         FAIL      36.61 seconds
-TestRunner_bnep-tester        PASS      6.29 seconds
-TestRunner_mgmt-tester        FAIL      115.04 seconds
-TestRunner_rfcomm-tester      PASS      9.29 seconds
-TestRunner_sco-tester         FAIL      14.40 seconds
-TestRunner_ioctl-tester       PASS      10.10 seconds
-TestRunner_mesh-tester        FAIL      12.55 seconds
-TestRunner_smp-tester         PASS      8.65 seconds
-TestRunner_userchan-tester    PASS      8.98 seconds
-IncrementalBuild              PENDING   0.67 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-BUG: KASAN: slab-use-after-free in le_read_features_complete+0x7e/0x2b0
-Total: 141, Passed: 141 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.108 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.740 seconds
-Mesh - Send cancel - 2                               Timed out    1.996 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+>         BT_DBG("chan %p, conn %p, err %d, state %s", chan, conn, err,
+>                state_to_string(chan->state));
+> @@ -688,6 +695,10 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err=
+)
+>                 __clear_retrans_timer(chan);
+>                 __clear_monitor_timer(chan);
+>                 __clear_ack_timer(chan);
+> +               /* Prevent the ERTM timers from being rearmed. */
+> +               disable_delayed_work(&chan->retrans_timer);
+> +               disable_delayed_work(&chan->monitor_timer);
+> +               disable_delayed_work(&chan->ack_timer);
 
 
+l2cap_clear_timer drops the reference if the timer was cancelled, so I
+think we will need to check the return of disable as well, or create a
+function like l2cap_disable_timer, that said Id return something to
+indicate that l2cap_chan_del didn't cleanup everything.
 
----
-Regards,
-Linux Bluetooth
+>                 skb_queue_purge(&chan->srej_q);
+>
+> @@ -1742,6 +1753,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, i=
+nt err)
+>  {
+>         struct l2cap_conn *conn =3D hcon->l2cap_data;
+>         struct l2cap_chan *chan, *l;
+> +       LIST_HEAD(del_list);
+>
+>         if (!conn)
+>                 return;
+> @@ -1780,7 +1792,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, i=
+nt err)
+>                 chan->ops->close(chan);
+>
+>                 l2cap_chan_unlock(chan);
+> -               l2cap_chan_put(chan);
+
+Let's populate the del_list only with channels that actually had a
+pending timer.
+
+> +               list_add_tail(&chan->list, &del_list);
+>         }
+>
+>         if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+> @@ -1791,6 +1803,20 @@ static void l2cap_conn_del(struct hci_conn *hcon, =
+int err)
+>
+>         hcon->l2cap_data =3D NULL;
+>         mutex_unlock(&conn->lock);
+> +
+> +       /* Disable and sync-wait for any running channel timer work witho=
+ut
+> +        * holding conn->lock to avoid AB-BA deadlock with
+> +        * l2cap_chan_timeout() which acquires conn->lock.
+> +        */
+> +       list_for_each_entry_safe(chan, l, &del_list, list) {
+> +               disable_delayed_work_sync(&chan->chan_timer);
+> +               disable_delayed_work_sync(&chan->retrans_timer);
+> +               disable_delayed_work_sync(&chan->monitor_timer);
+> +               disable_delayed_work_sync(&chan->ack_timer);
+> +               list_del(&chan->list);
+> +               l2cap_chan_put(chan);
+> +       }
+
+It might be better to place the disable sync-wait on
+l2cap_chan_destroy then since l2cap_chan_del is not garanteed to do
+it, which means l2cap_chan_put is not safe to be called with
+conn->lock, but I guess it was never really safe since if we destroy
+the chan while a timer is pending/running it would cause an UAF
+
+>         l2cap_conn_put(conn);
+>  }
+>
+> --
+> 2.43.0
+>
 
 
---===============3802544907313238616==--
+--=20
+Luiz Augusto von Dentz
