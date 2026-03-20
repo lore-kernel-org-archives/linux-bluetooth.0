@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9285B368972
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 21:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CEE369201
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 21:11:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774041082; cv=pass; b=UKvKaJfusK7k1lQyaKKbbcEhqQvF0Qp11WOOxYd1xUy/UTO9Onvi1Be/6JyKFVSZQstOeoMnMQiU8olaC5fgl9qLU/KAGWQ/UTnxUv3EEOqxkve+OEd/GrJPb0Attn8D7RzCm+XTsiLw307dtZNcJEYGq6ZydxUM/xKBcg6fmqQ=
+	t=1774041082; cv=pass; b=KiPtwQLbSKkI/tH0cR2Vg1OUSXXWzM16btIVKc8SrmkFQdkQXEZ4khH4fSW5o2ni7vdLFVu6yYxg+kp4zLa/ccKIVouFu+QvHyb28yJ53caWC6qmN3iridvpoc50WOtjXGiDVy+aUnq/KRrjQ0S8JSQR0TsLWYYTjGigo+yMk/E=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1774041082; c=relaxed/simple;
-	bh=KhaSn9U5TGNyM+Rr8VCAz2p32L0L3SC5h66L6yHEF+c=;
+	bh=oZdY4I3l6Eft1UrkvARddHl6Q3vrsowIJNSfH7U7N9M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ATsfWxIy/7QFoFbD5CtCGxtVEcwSzFTYz5lnNw7ExLKhwjmtdkZUT8O8Tt3isA3WsW84x1JSipCJuTKNMmleJksdB2Pyd4kIT5/T0SF6X5Fq/iML0pG3spoZ/UL0RxP7ZZLaeB29HhNM1fB7OmcuVnmmlCJ27zmHy6RD2OJXZRQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=QUWB0Sph; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=pcAB17/PXb7nl7xISsnIGuMKMgxh46hPzRYjhAgQojTZVDPUmmBkGtaA2/Dxw+quunUaRPTLQHB64pWG/rywnO5qe6vyyQyzvty0xExhXhbCOPXGPa4jgxHK32BEBVo1UseAvvzjBnTu8ET/fya5rclYPSzAJy7W97LXxSll0xo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=eqALyB5d; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="QUWB0Sph"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="eqALyB5d"
 Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:3::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4fcwGV52sLz104n;
-	Fri, 20 Mar 2026 23:11:14 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4fcwGY5NMbz1054;
+	Fri, 20 Mar 2026 23:11:17 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1774041075;
+	t=1774041078;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=o7PZwaLAn4Iw/yOWnWFmExpfeiYQBFi5jccS8/IX2Qk=;
-	b=QUWB0SphcgdgEU9DmlplrIt/euXfpK/B/Cx1uwSQbUH0QxiY7Ln9ghidR8+Hn9BNe3oGD8
-	L9W6m5k8Hm9iCM2MqHe9bRuKdMtdVog3lrR2gmQ5GjaxfR4Zn8FAfTN4QLn7sge+E9GsL3
-	L+Y3ehjyP2sCac5KOdwtRwhinn3uEGw=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1774041075;
-	b=UgnHi210mqClkzwXxuW6Lm9G1KDZ/xrwad9OSmV74MPwlwTYj8UnYk1C7IQAnnauLa1O9J
-	f+x00RLpp9Ac8g+z/BP18Ee1SrDXplOoPl/B5Mu5P1WlbUyHsfe1z9PCTdudHGiP+LUlc3
-	fR78Ij/HvwTnNo7HgpH0Q9Sbup4ML0I=
+	bh=OwoyNtcIj0iD6Cp9EXbxWYAiDu3cF2W2Gv8+zFdwr9o=;
+	b=eqALyB5dPKSws78dWc5A+Ug9VKA1COiWcpo0HkeZ+VaGrBBd4rP7pvyg97lZeF8PA0U5Kv
+	rgu0mjh8xKk8kQnyfxI/cLpt0sZFe/aqc+1t4j2XcQ1Xa81C46nihV1xtMrMiLJED5UsLf
+	p5/9PJJdchcoHEsJI8Vb30iI5+nygnw=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1774041078;
+	b=NMHsvhLe0fUSCsdZ7LVjtv+WL9yDXfMpDXb6RUtakF/Cb+LYgbEB3xgwzWdlCsElAexccJ
+	yevJv6oUod0k8nqFK3sYv/UGaIOW/hZXDI63s7nty4x5C1FkrAcx38lm1IOQ0ibMAtzI8O
+	k+wZOLd80+qDZlhx+BGnd3WWWcuRL54=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1774041075;
+	s=meesny; t=1774041078;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=o7PZwaLAn4Iw/yOWnWFmExpfeiYQBFi5jccS8/IX2Qk=;
-	b=uhxrS+mC4wsckEoCklZjLGYoOpz6BjMNi2Hn6/RCUbhPR8PParKP+t06w4a3WEYwiL3l1q
-	gg2ARvxkqAElIyziDtY+xhDxsip2/bGqgfEEUyknUggkb0CqhLoyo5tNsndvlHwM9N1Q7r
-	HNUzMjYj7GGOmI7jPv4rfOlJrvyfJ9E=
+	bh=OwoyNtcIj0iD6Cp9EXbxWYAiDu3cF2W2Gv8+zFdwr9o=;
+	b=lCZ0E8ACuQ0ePipfKAwxvU5IVJJYIJA4/xE1utUKtTpRJdErLOYNdIzFLHNqmU3wPNIUhL
+	Fv9WNOlWc74fGEo+bLbjSCXoPSz7OiteDaKc1vPk96X1mrDy9qSP3DRsQ9o6KDZq1SmpcS
+	kJDyyn25MThNPJHSh9vlO2ANbu8Ak64=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2 07/20] test-runner: allow source tree root for -k
-Date: Fri, 20 Mar 2026 23:10:51 +0200
-Message-ID: <0320656cafa97329c7f48b9d36b311d2c8b391be.1774041047.git.pav@iki.fi>
+Subject: [PATCH BlueZ v2 10/20] doc: enable KVM paravirtualization & clock support in tester kernel config
+Date: Fri, 20 Mar 2026 23:10:54 +0200
+Message-ID: <9d6e9c36914e02c0793999df293e5575741cd1fd.1774041047.git.pav@iki.fi>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1774041047.git.pav@iki.fi>
 References: <cover.1774041047.git.pav@iki.fi>
@@ -67,91 +67,80 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow passing source tree root for -k option, look up kernel below it.
----
- tools/test-runner.c | 42 ++++++++++++++++++++++++++++--------------
- 1 file changed, 28 insertions(+), 14 deletions(-)
+Enable KVM guest and PTP options in tester kernel config.
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 3de3a9d74..b3e0b0cfe 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -93,18 +93,31 @@ static const char *kernel_table[] = {
- 	NULL
- };
+This allows synchronizing tester VM guest with host clock, needed for
+testers that want to compare timestamps outside the VM guest.
+---
+ doc/ci.config       |  8 ++++++++
+ doc/test-runner.rst | 16 ++++++++++++++++
+ doc/tester.config   |  8 ++++++++
+ 3 files changed, 32 insertions(+)
+
+diff --git a/doc/ci.config b/doc/ci.config
+index a48c1af9d..bb3cb221f 100644
+--- a/doc/ci.config
++++ b/doc/ci.config
+@@ -8,6 +8,14 @@ CONFIG_VIRTIO=y
+ CONFIG_VIRTIO_PCI=y
+ CONFIG_VIRTIO_CONSOLE=y
  
--static const char *find_kernel(void)
-+static bool find_kernel(const char *root, char path[PATH_MAX])
- {
-+	struct stat st;
- 	int i;
- 
--	for (i = 0; kernel_table[i]; i++) {
--		struct stat st;
--
--		if (!stat(kernel_table[i], &st))
--			return kernel_table[i];
-+	if (root) {
-+		snprintf(path, PATH_MAX, "%s", root);
-+		if (stat(path, &st))
-+			return false;
-+		if (!(st.st_mode & S_IFDIR))
-+			return true;
- 	}
- 
--	return NULL;
-+	for (i = 0; kernel_table[i]; i++) {
-+		if (root)
-+			snprintf(path, PATH_MAX, "%s/%s", root,
-+						kernel_table[i]);
-+		else
-+			snprintf(path, PATH_MAX, "%s",
-+						kernel_table[i]);
-+		if (!stat(path, &st))
-+			return true;
-+	}
++CONFIG_HYPERVISOR_GUEST=y
++CONFIG_PARAVIRT=y
++CONFIG_KVM_GUEST=y
 +
-+	return false;
- }
- 
- static const struct {
-@@ -1209,7 +1222,7 @@ static void usage(void)
- 		"\t-U, --usb <qemu_args>  Provide USB device\n"
- 		"\t-q, --qemu <path>      QEMU binary\n"
- 		"\t-H, --qemu-host-cpu    Use host CPU (requires KVM support)\n"
--		"\t-k, --kernel <image>   Kernel image (bzImage)\n"
-+		"\t-k, --kernel <image>   Kernel bzImage or source tree path\n"
- 		"\t-o, --option <opt>     Additional argument passed to QEMU\n"
- 		"\t-h, --help             Show help options\n");
- }
-@@ -1236,6 +1249,8 @@ static const struct option main_options[] = {
- 
- int main(int argc, char *argv[])
- {
-+	char kernel_path[PATH_MAX];
++CONFIG_PTP_1588_CLOCK=y
++CONFIG_PTP_1588_CLOCK_KVM=y
++CONFIG_PTP_1588_CLOCK_VMCLOCK=y
 +
- 	if (getpid() == 1 && getppid() == 0) {
- 		prepare_sandbox();
- 		run_tests();
-@@ -1335,14 +1350,13 @@ int main(int argc, char *argv[])
- 		}
- 	}
+ CONFIG_NET=y
+ CONFIG_INET=y
  
--	if (!kernel_image) {
--		kernel_image = find_kernel();
--		if (!kernel_image) {
--			fprintf(stderr, "No default kernel image found\n");
--			return EXIT_FAILURE;
--		}
-+	if (!find_kernel(kernel_image, kernel_path)) {
-+		fprintf(stderr, "No kernel image found\n");
-+		return EXIT_FAILURE;
- 	}
+diff --git a/doc/test-runner.rst b/doc/test-runner.rst
+index d030787a4..60f18683c 100644
+--- a/doc/test-runner.rst
++++ b/doc/test-runner.rst
+@@ -122,6 +122,22 @@ options may be useful:
+ 	CONFIG_DEBUG_MUTEXES=y
+ 	CONFIG_KASAN=y
  
-+	kernel_image = kernel_path;
++Other
++-----
 +
- 	printf("Using QEMU binary %s\n", qemu_binary);
- 	printf("Using kernel image %s\n", kernel_image);
++For tests requiring accurate time inside the VM, possible with KVM:
++
++.. code-block::
++
++	CONFIG_HYPERVISOR_GUEST=y
++	CONFIG_PARAVIRT=y
++	CONFIG_KVM_GUEST=y
++
++	CONFIG_PTP_1588_CLOCK=y
++	CONFIG_PTP_1588_CLOCK_KVM=y
++	CONFIG_PTP_1588_CLOCK_VMCLOCK=y
++
++
+ EXAMPLES
+ ========
+ 
+diff --git a/doc/tester.config b/doc/tester.config
+index 015e7cc1a..0cf5e2723 100644
+--- a/doc/tester.config
++++ b/doc/tester.config
+@@ -3,6 +3,14 @@ CONFIG_VIRTIO=y
+ CONFIG_VIRTIO_PCI=y
+ CONFIG_VIRTIO_CONSOLE=y
+ 
++CONFIG_HYPERVISOR_GUEST=y
++CONFIG_PARAVIRT=y
++CONFIG_KVM_GUEST=y
++
++CONFIG_PTP_1588_CLOCK=y
++CONFIG_PTP_1588_CLOCK_KVM=y
++CONFIG_PTP_1588_CLOCK_VMCLOCK=y
++
+ CONFIG_NET=y
+ CONFIG_INET=y
  
 -- 
 2.53.0
