@@ -1,161 +1,146 @@
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4610431D362
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 20:04:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774037075; cv=pass; b=SGUuh150gSXLXsjUGkqqOfL/1O/z5Rzjl5OzqSUuSvqOHrXoPHGz7biZFUDAuEisa0dLnwKwy35BFQ5/FPhrE9ysHKMZmBVkENruIAfxnu5WL7GoEgB4aqwLS9wDWUerno1hVnfmI4XrBzxZYla4SUDCRLnXrWXI6AmxMABuf6k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774037075; c=relaxed/simple;
-	bh=PCCAH75FdWSWdrziLvg+ikPpjrrIxNO/KKCAb4zPY68=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F412D9ECB
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 21:03:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774040631; cv=none; b=UL5KV+F0ejOxaG29v19+pnqjELa+9gxdNZlRB72fgWH1yjPjIsPAZUWDQe07x2xyGAXIuBuLL8tHz1YjPiQ+z6vwcr1ONKXt7FXZx8zkXf75NT227jfQDbkNmvmaeRK7lbDdZhmErl4TcLZpFt3rIiuzoRzD/ujXxyg8jACS4mo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774040631; c=relaxed/simple;
+	bh=gz4z96j/kUq36nMix7l3YS85cXEqJghag0WF37XT8DY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L3p/de990d/DfVxCL19id6rxyiI/hGTM59ii8TTON7HYfQHUXz1Ni4WIOjYljb4Wd0pOBK0mRzhu18DY8+/Mf7bytIXyBU4SPM2DCPl9IHBvorb0O1XDTvgMdScm+Nu/mOjozfAMQw81k26p23QvIatZk0PIoS7MAUSpx32gmtM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hx1X9gSo; arc=pass smtp.client-ip=74.125.224.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=m6wh+B/JkP/Cf/vQyvItop30FD1csJVr9NF36DZBRnmVqwAHTCwODu5n5MoKclBPMYFTbcChyGq9W3v8K291yzJigmft5w+d9Ek9POqtBnMC2LEBzpP6C1rfBBEU0E8VGw6haOFg/RHLVAJiZFxd70ckXDg5dVlwt6YDglxATkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=SrHTcttn; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hx1X9gSo"
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-64e9f79cae8so1917487d50.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 13:04:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774037073; cv=none;
-        d=google.com; s=arc-20240605;
-        b=IiYlpVKDj+f6+93fD/Zd2niJkCmsa4riv4RjGEYPQG7LK1PqDC7BFjecHVFqgc3k0m
-         H/xvSEPCSnoxMMn9bEL/Qwhqd1h1+rjSdLfAeZXWdVI9pxWEwpH14FyJH2u2hW7uhOKI
-         nBLAz4B0pQMhpiz/qifYNLMmMC5FVdGJT16uf4VQ9O899nOpqAS71+iHxxXsBWJ0e9dN
-         3mNu8GBlrfCtYoVQAXiiOHRVMbmXuePWxmiK1MEJ0YGDS8FRM4u8j+w+UweOgNEoZ8Uf
-         lugCiEWygEW4SjPwOAz/aDrWsCWOJ+LJJA8I2kNmkFO97rckFUj1cSFLSeJ8flmD9FPp
-         585Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=jb/kPLHB9x86b/yNYeShN9qCBRpafUNvwYt90JlqOUg=;
-        fh=52uJ954Babu58Oy0KI3vTLJepWMKp3PIUtj65lBTnQ0=;
-        b=DdIOrtFW2xIY83WsCvzSZP9HJQxgh6C7xKcqb9DpZ8zEwQQMQVStkl+HDbISBS/NBn
-         4itUDLWFRRyCeptALPBwI05iV+uY5AGEDuml5on5wMdDSs/Jda3dAa7SnaaHS3Sstvis
-         aM2UlhSqnpC32buBiOSrqJm1JOKfpzqimbm3OITpPqekRL3kLiRZf0mnO796QV6kfJ6c
-         xg+fj/B8xHfAlvDYDL0jyp7hgz5INV+cNv0oTOXv6K5I06Ql1/2QVEuow40k2gI3j+sD
-         oshIYv8hTyrHRyWGcriu8KoEM1jgoz0TzisJZ6BuonpvKQ6jdYL01G9J/O8NMkmQ2yv+
-         pKaw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="SrHTcttn"
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b97ed4ad579so183416766b.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 14:03:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774037073; x=1774641873; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jb/kPLHB9x86b/yNYeShN9qCBRpafUNvwYt90JlqOUg=;
-        b=Hx1X9gSofkRh4ClPKLnhwS/H2EZWFMiPQ6+88uHKSfawpxV9EykAPLmGpjdtjpXVK8
-         y47U3kd52FLlpohCbSA8ckFf2hu+yp0wSnYDX8b4UBdgnvtSDm5d8l0JyUWPJMQKFpw+
-         ny9TVGtrebCPsXhZcRDhhTJPGojvs8IeE/2PH9hsiMiW2HVL/tS3QB2c7LA939zITHQz
-         /Shs03/RHb0d+UCowgvvPNn/nuPHDHdbOrvc9WUNERgkLJL1KvbxxoGhsEJ83oLI1MzN
-         5+ncvzdfRjx74ixQuiF3ky3vfrIWi60oiaxmRfRTMa4Z9PXz3UkNyqbQauOpqHL+tDDa
-         IiMQ==
+        d=linux-foundation.org; s=google; t=1774040628; x=1774645428; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=RfykHQROXEayv7l3WCeAk4a6XCvf0bpEMNKpRypCktg=;
+        b=SrHTcttnrQfQ/Fg5GcNWEUnh6/4mOwP/uX9vDfrCn/EoOJIBWAwWZwH6jxLxEJl6QE
+         yFuiPy+FGbCbdQ/0zQ9NN9jLsOAwULJ+c1uBzIoSH23xvewplzjFOj/p97kWR2xndGg3
+         wVydzvaLdr8M7jirAMenis50bDqSNEqQ7tfww=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774037073; x=1774641873;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=jb/kPLHB9x86b/yNYeShN9qCBRpafUNvwYt90JlqOUg=;
-        b=Q4q2tgruPiFgmf75uuufHQoxgsRNt/MUDFGR6xZDvgSaQ/Jbt3L0HqEkKpf3KyhCd1
-         uziNtPeoyevYIs+6l7+JBbVhQfOPE0PsPynT71HdnYs4+JtaAaWP5ZHpkU/YxlzrtQlH
-         /MSclCxMdECpcyj4bP/dgjG9YMdSmVtvfGLaJ8OWDQUG4MrSHPrOd44zRDanco+LeCGE
-         BYyPdOgnE7eUMBcNYaLjnclQCx/v78fKgrVU76LcYMHqRP2EZEJ2VTvOlosScnTxALSh
-         g2JulAdFsgH0DM7MH29l1nckItRDFOqgIfxhBcJiN6VoLC+8nzDTiQqn9ZfMr4frBzHV
-         wglw==
-X-Forwarded-Encrypted: i=1; AJvYcCWy3Pypx7Zwp0yOKpPaCzGk5NVfIviI/lk2hpGiVgL0CZVVwFx8RwreE/NPDrVxGLei1fkRsEkH0AWbhw/bZ9s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJDxhRLsFJRBq+3ARaHbot18EjASdmDrxYdRrQjkmSvWSMR4b8
-	G1oyMobKWnCW9W+75jQkJCyKXl6JZfn3bPo98m+1fslLB1rhFoITvVccn2YKQMLRS0N/SJhjBLn
-	XPQz52uZT6zrVH2mRwkmxfTyh4Kw1Vrr9dU+B
-X-Gm-Gg: ATEYQzwLI56uqpsoPJqnjrf3TsTgJ25dzLYnYjzOsU4MHhTM5dGx2ips1hh1sOyC6KB
-	ExrgmGxwRV7aYwig29Jm46RPu2tYh10wBsS4NIp2Hh9mtMahvOZKJjhanP1RU4Fc8dJKAh0S9Gd
-	+hNYi/NxJ+1xBzusXl3sbYplMRLnMFAgwUgzMaLWtuXcrI7WdjSWspxlQYNNiCkvsTqOK4fCkdn
-	GaOh9Hu5U4VK5j2tE9a7vyywm0qd6fqGQgtZdzf3COB3zTAC7aFlxwPYKEZ1B5aKwjcU9GgX6kR
-	Tbbd6TOPES8t6Mn6Kbl8RTanGN9iDCy1P5kxUjbTqqjNoxIVcSuH1LNDa7Ltlq2HWVJhF59ooie
-	drA==
-X-Received: by 2002:a05:690e:1181:b0:64e:a853:624d with SMTP id
- 956f58d0204a3-64eaa6b5ab4mr4412534d50.19.1774037073096; Fri, 20 Mar 2026
- 13:04:33 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1774040628; x=1774645428;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RfykHQROXEayv7l3WCeAk4a6XCvf0bpEMNKpRypCktg=;
+        b=c7ukMNOEaFV5gel75fdkBjJ1ymzJIoYBfgeqRICI8zz4RV1IiprAb+uT4SWuCQfyS4
+         FfMhPj5qUFQo11pZ6E02cNVhfkoFPLs+nd4YTTU1x/80A6cMfdB5tTZf7/qUb0T4Cpnh
+         Rm8C8xH1hQl+9ywNbl3dNB2rnjXhKI0dRr6qvLI1Gi1cWNoCvAd1Aw7W6+Y83o1j4XEX
+         eodW47yZqbwyzZn59shfyqtwXrvtnyWjeuWgjGwIdJD04kUlFuDdixBvheejtqcM8sFs
+         q42SGUB5YBsSWlkwuRifn67hSzKmlgDNUyDCZATtMdvcYuXxZQAD6D9ML59ovMDgcYfe
+         WCuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUQ1iQ9x3yvBEoYfHHDQjH+RefsrPCtr1fIoFl0nNK9f2W6Fhnti+4rsIAarFyDX+a1mQQD6qMj2GOtCdTWoV8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxn7c3oJqy+pBfjdSKOQ/3ERvSJHAgHAC0uNDtJDnXY9TTOkJZv
+	4O14WjJKDNosZD2dYpCRPu5vfAMHAQUb5gsDxW5jsWaKqChDpD3/FUZetoYqNUtWDJpZ8UQAmAh
+	ipdJ8Cdg=
+X-Gm-Gg: ATEYQzzsjqwGksoXmWJqcZfl+1Lhle9FvJA154/ZyWbaS5NPnb0sg6nMFS30URh1UBS
+	0B2cfc5YseccarfxrBtjvLZjwP4+KSsPNHszJ4ToC4cP6IY41BXFA6/mdypskquZW6pgvS3b171
+	bR0VjbpzuLuuzTK8kIVZNPk9DgcBRdx+Apm7kBcmlN8vlbInkZTRI73hScdur1Z5UPv2g1Lz3cR
+	9yL3OHjNLnanpOjlwwunuXiIv4eQJr0ELJ2EkfwUl3hul7jV/q+/ttHCHoG4D33nOAhv8nKD0GU
+	v7WuM+e6ANILR34Z0/trOl0uuhEFOO2Bt4TwcKZ6OyncgC6lZjaQut3im4wHJPWk5QCeHhUFpAV
+	Ggkt6Qie8HEM7ktPMY2aDu5yhonvpnsr+Wz1VIrVtIvJRVykSCDd3Xw/OOauI0CHb5Iltx/J/50
+	TZfStS6ZGIDZXl+GvFbPEhv1R8vfPigubO96Txo7J68rj0Li5XnzJSNThA9fVJBApUWdZT4vrUQ
+	ODBLO45gLI=
+X-Received: by 2002:a17:906:94a:b0:b96:ef3a:4709 with SMTP id a640c23a62f3a-b982f362b8amr282331666b.34.1774040627651;
+        Fri, 20 Mar 2026 14:03:47 -0700 (PDT)
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com. [209.85.208.44])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b98335de1e3sm190891166b.39.2026.03.20.14.03.46
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Mar 2026 14:03:46 -0700 (PDT)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-668abc98923so1896032a12.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 14:03:46 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCX1D/Ryt9Z+XynmV9tnxUWKYunRdZkomaw5uQwkj1ROvpXnMrWstPpSEEi1aMYVxlh3NS1LgLWW9B+clL6Zoh0=@vger.kernel.org
+X-Received: by 2002:a05:6402:278c:b0:666:725b:b660 with SMTP id
+ 4fb4d7f45d1cf-668ca31fe2cmr3173661a12.30.1774040626571; Fri, 20 Mar 2026
+ 14:03:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260320-hci-init-fix-v1-1-e1960a41baf2@axis.com>
-In-Reply-To: <20260320-hci-init-fix-v1-1-e1960a41baf2@axis.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 20 Mar 2026 16:04:22 -0400
-X-Gm-Features: AaiRm53UZPGPRPktL8VVpCVP17SaE0uTYP18r98nsnTSAuOOA1PFBX9O9w7teBQ
-Message-ID: <CABBYNZKkK-SU51kjexh0uKx0N9m-63dZf0vnGA3c5LsSkmFPOg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_h4: Fix race during initialization
-To: Jonathan Rissanen <jonathan.rissanen@axis.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel@axis.com
+References: <20260319190455.135302-1-luiz.dentz@gmail.com> <177396481128.1855248.1024090053580545012.git-patchwork-notify@kernel.org>
+ <6411a735-d187-4848-b199-a0e2c2e0e52c@leemhuis.info> <CABBYNZJfLf6PzKUkGjiCvqEm3h0+3SUcxY5RNbUHv6LBdPT_zQ@mail.gmail.com>
+In-Reply-To: <CABBYNZJfLf6PzKUkGjiCvqEm3h0+3SUcxY5RNbUHv6LBdPT_zQ@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 20 Mar 2026 14:03:30 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wh8dnp1qT_CHG-Zz9H2=G1Q=0rF5SYv+YsEaPnVhznxWA@mail.gmail.com>
+X-Gm-Features: AaiRm50M8NUw_PkbhBRYCMaCqWtNi1uA19DPteegykkyQpXcCTwtsupjkqHhJK0
+Message-ID: <CAHk-=wh8dnp1qT_CHG-Zz9H2=G1Q=0rF5SYv+YsEaPnVhznxWA@mail.gmail.com>
+Subject: Re: bluetooth regression fix likely to miss -rc5 (was: Re: [GIT PULL]
+ bluetooth 2026-03-19)
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Thorsten Leemhuis <regressions@leemhuis.info>, kuba@kernel.org, 
+	linux-bluetooth@vger.kernel.org, davem@davemloft.net, netdev@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Jonathan,
+On Fri, 20 Mar 2026 at 11:02, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Bluetooth regressions are normally device-specific, though. In this
+> case, the regression was introduced to pass a new Bluetooth
+> Qualification test, so we would have to weigh what is more important:
+> compliance or interoperability?
 
-On Fri, Mar 20, 2026 at 8:10=E2=80=AFAM Jonathan Rissanen
-<jonathan.rissanen@axis.com> wrote:
->
-> Commit 5df5dafc171b ("Bluetooth: hci_uart: Fix another race during
-> initialization") fixed a race for hci commands sent during initialization=
-.
-> However, there is still a race that happens if an hci event from one of
-> these commands is received before HCI_UART_REGISTERED has been set at
-> the end of hci_uart_register_dev(). The event will be ignored which
-> causes the command to fail with a timeout in the log:
->
-> "Bluetooth: hci0: command 0x1003 tx timeout"
->
-> This is because the hci event receive path (hci_uart_tty_receive ->
-> h4_recv) requires HCI_UART_REGISTERED to be set in h4_recv(), while the
-> hci command transmit path (hci_uart_send_frame -> h4_enqueue) only
-> requires HCI_UART_PROTO_INIT to be set in hci_uart_send_frame().
->
-> The check for HCI_UART_REGISTERED was originally added in commit
-> c2578202919a ("Bluetooth: Fix H4 crash from incoming UART packets")
-> to fix a crash caused by hu->hdev being null dereferenced. That can no
-> longer happen: once HCI_UART_PROTO_INIT is set in hci_uart_register_dev()
-> all pointers (hu, hu->priv and hu->hdev) are valid, and
-> hci_uart_tty_receive() already calls h4_recv() on HCI_UART_PROTO_INIT
-> or HCI_UART_PROTO_READY.
->
-> Remove the check for HCI_UART_REGISTERED in h4_recv() to fix the race
-> condition.
->
-> Signed-off-by: Jonathan Rissanen <jonathan.rissanen@axis.com>
-> ---
->  drivers/bluetooth/hci_h4.c | 3 ---
->  1 file changed, 3 deletions(-)
->
-> diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
-> index ec017df8572c..1e9e2cad9ddf 100644
-> --- a/drivers/bluetooth/hci_h4.c
-> +++ b/drivers/bluetooth/hci_h4.c
-> @@ -109,9 +109,6 @@ static int h4_recv(struct hci_uart *hu, const void *d=
-ata, int count)
->  {
->         struct h4_struct *h4 =3D hu->priv;
->
-> -       if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
-> -               return -EUNATCH;
-> -
->         h4->rx_skb =3D h4_recv_buf(hu, h4->rx_skb, data, count,
->                                  h4_recv_pkts, ARRAY_SIZE(h4_recv_pkts));
->         if (IS_ERR(h4->rx_skb)) {
->
-> ---
+What?
 
-There is some interesting comments on:
+That's nonsensical.
 
-https://sashiko.dev/#/patchset/20260320-hci-init-fix-v1-1-e1960a41baf2%40ax=
-is.com
+Compliance with some paper standard or artificial test is *COMPLETELY*
+irrelevant in the face of an actual user experience regression.
 
-It seems the issues pointed out there are unrelated to this change,
-but I guess it is worth double checking just in case.
+Because when reality and theory collide, theory goes out the window.
 
---=20
-Luiz Augusto von Dentz
+There's no "weighing what is more important". None. Users are a
+million times more important than specs or tests.
+
+And yes, the world is full of hardware that is not actually compliant
+with various standards that it's _supposed_ to be compliant with.
+
+That hardware may admittedly often not be great, and we may all wish
+that it didn't exist, but hey, that's the thing about reality: it's
+often messy.
+
+And sometimes it's the standard that is wrong.
+
+> I can't remove a valid compliance fix just because
+> a user (later more appeared which raized the severity) said his device
+> stopped working.
+
+Of course you can.
+
+The test or the standard may be entirely invalid. Not unheard of.
+
+But even more common is that the "fix" that made the test work may
+simply be wrong.
+
+Because that "fix some case, break something else" is in a fairly
+common pattern.  And that just makes the fix invalid and buggy.
+
+And we have a hard rule on regressions exactly BECAUSE of that
+situation: having a "fix one thing, break another" is what the
+suspend/resume code had for years and years.
+
+The constant "one step forward, two steps back" dance was what made us
+have that hard rule about regressions, because it's better to have a
+stable base with known problems - that you can perhaps document - than
+have a base where the problems just shift around like quicksand and
+users are understandably nervous about upgrading their system, because
+they never know if the end result works or not.
+
+So the whole "it's a fix so we can't remove it" is simple not a valid
+argument. It's absolutely wrong. Because a fix that causes regressions
+is BY DEFINITION not a fix at all.
+
+                Linus
