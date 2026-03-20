@@ -1,460 +1,112 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4934A368972
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 21:12:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774041141; cv=pass; b=q0lNyzSSmqll82RWxwEen3cbWGPjrJcmd/f6wKkzgRq77ixpHRU1lDj2yMgcjWV3Yfpw09F1o1FASAT1gmXYkhjObfTgXg8d32tOTgxb511ufkg8LIg6sXBiM/KOzqoGuRfhk7NDgyFTwj0ySOBHS0QX9zdN2xqUkDSYHClIFsg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774041141; c=relaxed/simple;
-	bh=Fa+3O/kCXpK7End/Epo7MsQGWB0qDK7/uwfEgpx6yT4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NWaehBUK57x4YcjAsyjjJypLDQsabH+WT46SbxqJ3iooHpQPk8X83HPxI29Fc9Va9WmTSkey/yo897UFOsGzD7C3ljEb+4O/cWrIfTALa7Ar8XkTfoeTaKdbxOcQQ454ef0pcNiZ8fm1uW0eV7Vkl48FgGJrGR2Je3noXxmFTPo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=qXoRSNks; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B9D3D8107
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 21:19:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774041598; cv=none; b=g1mJhG345r1+gmsLS2wCV5mUfFB4trVms+dX+wiY1RJaRjf9O3L62bwCf6hhccuw5XTfaYCp8VHeD1bfSfvwFbkF7pyOIpX4WNkv6giP0IeqA6nSi8n8WOpWYDsi9MFBJ/EMMaCxKr+ryO7cJXoJKDin+VxGkzs4RZ9ZjYNl31M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774041598; c=relaxed/simple;
+	bh=HZRLHEwGWpwaQuLLrSh40uPRxk7ylCvGq0hs14KucR0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lOQijLuJq7JDQaHV0+pOAkQnj5xbkmf246HLY4wgVMKe7dX69BwrdD6Gu5tU2tBD9tJsz9aM6rPVPTdHkAfdlE+nnkfiVWOhOe86dSBsU+GDtqKmyd+JGu8Ljdhi1lAtwjSUK/m4+dTolBf+HP98wy2H9ccqfGEy4mkRT6VP1eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=eMDEouhS; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="qXoRSNks"
-Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:3::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4fcwHk1hpDzyTn;
-	Fri, 20 Mar 2026 23:12:18 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1774041138;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gIN07/3Wg3sI1kQ8GMuj508n59GUm9mPA4ku+G4g2ak=;
-	b=qXoRSNksyZUr1cQ7XkdnM6Rl1PWNTapWY27QfiJYWX+gns/w9j+KQZ85xePnwuC3Yba89V
-	LVhbbXXal/0Oi2jU5YExiXPbVJj9QdMILIyVaMhiDxxz4UULin/m5ECXkpNO1iUufxmS8T
-	LQ90j3KHpkBWXDMhoPfo8jhdBRYti8c=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1774041138;
-	b=GkHMcl7CTeAFqpm6byfNYsg2mJX42LZ5s50EoPNa6nVZjWhK0LsNSooiSdbR7reqHo3Yj3
-	3oDvIzsxqXqh/Yp0oU4/HzUtHDjt7l37i40WDaCufNAB8fCvMp2PVyttSOpt23qdaJg2qK
-	rAudPIQdXHbIFZY8AtxD8y5gfkZfZfQ=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1774041138;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gIN07/3Wg3sI1kQ8GMuj508n59GUm9mPA4ku+G4g2ak=;
-	b=Ny0dN9ObeiX9sqG+Q+fPj2Z3bCKQ7kll9JpK++CxjwFOYcoaFJ1d0bH9G5EOd1SJlaJFrX
-	xkrztTWaMFXW8pZg8+mAlA6Jct7VHF7aMI9uMSoKiMD8KU6toLXFkDk7RSY8F3lKY6lprE
-	zrLf2OcvRs5BfHXc1aGiSCkfa+HjLic=
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2 20/20] test: functional: add basic obex file transfer tests
-Date: Fri, 20 Mar 2026 23:12:07 +0200
-Message-ID: <52acd3144d379e5e5a80d666ecb1238f68ec2610.1774041047.git.pav@iki.fi>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <cover.1774041047.git.pav@iki.fi>
-References: <cover.1774041047.git.pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="eMDEouhS"
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b982b0889d8so204172566b.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 14:19:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1774041594; x=1774646394; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=XCE3Sb6hrBAlOh+2FMHN/3IZlK3Hh6o5UrXz2dr3r8U=;
+        b=eMDEouhSzs9exaBlbpACFyebZTFs3/a1JRwqnl6O8PH1E+uMaOwhH22MSGCtmsOYQk
+         IO03GOrQF82Eaa3WvbITXsHMrGcgQH27vphf7MLbcsYWdZgx+nLEQP9pFmJ7QpoRw7pq
+         NRyz4LOlLewWTz2p4/3MoTXbwJgnVbLW5cX04=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774041594; x=1774646394;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XCE3Sb6hrBAlOh+2FMHN/3IZlK3Hh6o5UrXz2dr3r8U=;
+        b=EvjC7ZPYHJiXUV/rA4q1MRfEObX1oaOakpqgHCoSp079B9a1OHsRnSwZmuwakwjUDC
+         ynPeo59ss4uG2j2W1nFSeEj/BQkMkFqBMGD+ij/sGMKmzVILfquU1qEIEPouesQrt3z0
+         OtTVs/nk0S3viJmv6NbpXh8cbRmjn9GPhhpQDGaNJq8mZtHAe9qOy8Vcn7cUgyoLBcyu
+         8NJY2dqB1i+6FNqJCEy2L1YtlsFLrN7HmZi4JDKP3eVJqFgtDGcPfzJ6BV8J10uAr9OM
+         4LpCPA93Xxgz3csFFN6PvljyNQEmK1oILMS0EtrE+H9VrJLlIbU41ENsmIb60wYYYspW
+         wTuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWk8syBuiRoL8h0klsRggtnB28necaq76VpZGcf0sFW/MkilSORUVog2KFah/+L23qP/pBA176PUP0ie9jq8Ew=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfN1alndQ2zfE8jKDyxxtDme+zp9MPjTD6yrWVQD4qKBo2mKk7
+	7wMRZ9PQZCqp2LikbNK0LTsKdkfz/qpeAoowTPuuRhzdCMmdA2nQOMsH+PCf96lsbL8Pn4s19ws
+	LGm1sWhM=
+X-Gm-Gg: ATEYQzwKiRuZdGlELfvRYufugX+ZQgEg7VPmRN2LsRP5SFJVR0KnaBM5tPvnKU1Q7o9
+	0dsEF0C5M1Y/d9yrH+b/0kE8LaJgg24uIAOfFNXAIu+xR4lnFrVRg8UhMCyWfUCKsautIJng0yd
+	lmvnN0sfZOfV9MhJUrgWpH+RnzNDWT9FKSyLwxLh3OyiHCT4c2QxqlQBU1JLOVA6vlpq+cAIKfA
+	NtcR20YETM9ner2QlJfCBZ+NiBL+mk5fA/xfUc85Fc0mDbAR57+y0CNQDqX9NZ7sViDqJW4YW4+
+	X15Bqeu3IbYo8Jj88qXvf+VxonqanxhbCUVsWJDzvblGVbmwV7tDUa3J5VzreuBN63RNhD2tFIF
+	Iac3pENO8+1XE7hhxJZ84BVoobAPWFv0f+9au9JxM78DhwRthnjXcv9gMR+8VyV8aMr93P2sJfp
+	G22jSUrVkt09pPIZ3tnjFvN/AvkKL+/alz0Km7/j/ujv0wN2Uvd6lGrmXoBzmXfmQQIl6Ml7Hl
+X-Received: by 2002:a17:907:3e8c:b0:b98:33c5:1bb9 with SMTP id a640c23a62f3a-b9833c56776mr303971366b.35.1774041594561;
+        Fri, 20 Mar 2026 14:19:54 -0700 (PDT)
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com. [209.85.208.45])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b983398c140sm195792466b.63.2026.03.20.14.19.53
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Mar 2026 14:19:54 -0700 (PDT)
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-661d20c9787so3756504a12.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2026 14:19:53 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWQ5K4HoJzPEkQh+N2W8HjDs5RZuEP6Zv36oTF9mlPe6t2Cr4z0PC5ybIRFF2kF4pgZA1JP6bgLKiPW3tnL7A8=@vger.kernel.org
+X-Received: by 2002:a05:6402:3786:b0:668:8c50:284c with SMTP id
+ 4fb4d7f45d1cf-668c911da49mr3212716a12.11.1774041593499; Fri, 20 Mar 2026
+ 14:19:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260319190455.135302-1-luiz.dentz@gmail.com> <177396481128.1855248.1024090053580545012.git-patchwork-notify@kernel.org>
+ <6411a735-d187-4848-b199-a0e2c2e0e52c@leemhuis.info> <CABBYNZJfLf6PzKUkGjiCvqEm3h0+3SUcxY5RNbUHv6LBdPT_zQ@mail.gmail.com>
+ <CAHk-=wh8dnp1qT_CHG-Zz9H2=G1Q=0rF5SYv+YsEaPnVhznxWA@mail.gmail.com>
+In-Reply-To: <CAHk-=wh8dnp1qT_CHG-Zz9H2=G1Q=0rF5SYv+YsEaPnVhznxWA@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 20 Mar 2026 14:19:37 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgryF_COh9xzhGaJ-FAm471pn5uvqt-Z94+3ENPVu4w-Q@mail.gmail.com>
+X-Gm-Features: AaiRm52w5UPxNX4mH_HiyvwPIsVpHwHmqg_LpHJqM3MhIn7krj-l7qPCQ22Gurs
+Message-ID: <CAHk-=wgryF_COh9xzhGaJ-FAm471pn5uvqt-Z94+3ENPVu4w-Q@mail.gmail.com>
+Subject: Re: bluetooth regression fix likely to miss -rc5 (was: Re: [GIT PULL]
+ bluetooth 2026-03-19)
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Thorsten Leemhuis <regressions@leemhuis.info>, kuba@kernel.org, 
+	linux-bluetooth@vger.kernel.org, davem@davemloft.net, netdev@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Add tests
+On Fri, 20 Mar 2026 at 14:03, Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> That hardware may admittedly often not be great, and we may all wish
+> that it didn't exist, but hey, that's the thing about reality: it's
+> often messy.
 
-test/functional/test_obex.py::test_obex_ftp_get
-test/functional/test_obex.py::test_obex_ftp_list
-test/functional/test_obex.py::test_obexctl_list
----
- test/functional/test_obex.py      | 285 ++++++++++++++++++++++++++++++
- test/pytest_bluez/host_plugins.py |  61 +++++++
- 2 files changed, 346 insertions(+)
- create mode 100644 test/functional/test_obex.py
+Of course, the thing about "reality is often messy" is that then you
+end up with the truly conflicting situations where there are other
+complications: security issues can sometimes mean that you *really*
+can't just revert a regression fix, because while paper standards and
+artificial tests are relatively worthless (compared to a user
+regression report), a severe security problem obviously isn't...
 
-diff --git a/test/functional/test_obex.py b/test/functional/test_obex.py
-new file mode 100644
-index 000000000..6b9275520
---- /dev/null
-+++ b/test/functional/test_obex.py
-@@ -0,0 +1,285 @@
-+# -*- coding: utf-8; mode: python; eval: (blacken-mode); -*-
-+# SPDX-License-Identifier: LGPL-2.1-or-later
-+"""
-+Tests for Obex
-+"""
-+import sys
-+import os
-+import re
-+import pytest
-+import subprocess
-+import tempfile
-+import time
-+import logging
-+import json
-+import dbus
-+import threading
-+from pathlib import Path
-+
-+import pytest
-+
-+from pytest_bluez import (
-+    HostPlugin,
-+    Agent,
-+    host_config,
-+    find_exe,
-+    Bluetoothd,
-+    Bluetoothctl,
-+    Obexd,
-+    LogStream,
-+    wait_until,
-+    mainloop_wrap,
-+    mainloop_assert,
-+    Event,
-+    EventPluginMixin,
-+    dbus_service_event_method,
-+    Pexpect,
-+    utils,
-+)
-+
-+pytestmark = [pytest.mark.vm]
-+
-+log = logging.getLogger(__name__)
-+
-+
-+BUS_NAME = "org.bluez.obex"
-+PATH = "/org/bluez/obex"
-+AGENT_MANAGER_INTERFACE = "org.bluez.obex.AgentManager1"
-+AGENT_INTERFACE = "org.bluez.obex.Agent1"
-+CLIENT_INTERFACE = "org.bluez.obex.Client1"
-+SESSION_INTERFACE = "org.bluez.obex.Session1"
-+FILE_TRANSFER_INTERFACE = "org.bluez.obex.FileTransfer1"
-+TRANSFER_INTERFACE = "org.bluez.obex.Transfer1"
-+
-+FTP_UUID = "00001106-0000-1000-8000-00805f9b34fb"
-+
-+
-+class ObexAgent(HostPlugin, EventPluginMixin):
-+    depends = [Bluetoothd()]
-+    name = "obex_agent"
-+
-+    def __init__(self, path="/obexagent"):
-+        self.path = path
-+
-+    @mainloop_wrap
-+    def setup(self, impl):
-+        EventPluginMixin.setup(self, impl)
-+
-+        self.bus = dbus.SessionBus()
-+        self.bus.set_exit_on_disconnect(False)
-+
-+        self.agent = ObexAgentObject(self.bus, self.path, self.events)
-+
-+        bluez = self.bus.get_object(BUS_NAME, PATH)
-+        self.manager = dbus.Interface(bluez, AGENT_MANAGER_INTERFACE)
-+        self.manager.RegisterAgent(self.path)
-+
-+        log.info("Obex agent registered")
-+
-+    def cleanup(self):
-+        path = Path("/run/obex")
-+        for f in path.iterdir():
-+            f.unlink()
-+
-+
-+def agent_method(*a, **kw):
-+    return dbus_service_event_method(AGENT_INTERFACE, *a, **kw)
-+
-+
-+class ObexAgentObject(dbus.service.Object):
-+    @mainloop_assert
-+    def __init__(self, bus, path, events):
-+        self.events = events
-+        super().__init__(bus, path)
-+
-+    AuthorizePush = agent_method("AuthorizePush", ("path",), "o", "s", sync=False)
-+    Cancel = agent_method("Cancel")
-+
-+
-+def write_obex_file(name, content):
-+    with open(f"/run/obex/{name}", "w") as f:
-+        f.write(content)
-+
-+
-+def read_file(name):
-+    with open(name, "r") as f:
-+        return f.read()
-+
-+
-+#
-+# Direct Obex Python client API tests
-+#
-+
-+
-+class ObexClient(HostPlugin, EventPluginMixin):
-+    name = "obex"
-+
-+    @mainloop_wrap
-+    def setup(self, impl):
-+        EventPluginMixin.setup(self, impl)
-+
-+        self.transferred = 0
-+        self.transfer_path = None
-+        self.transfer_size = 0
-+
-+        self.bus = dbus.SessionBus()
-+        self.log = logging.getLogger(self.name)
-+        self.client = dbus.Interface(
-+            self.bus.get_object(BUS_NAME, PATH), CLIENT_INTERFACE
-+        )
-+
-+        self.bus.add_signal_receiver(
-+            self.properties_changed,
-+            dbus_interface="org.freedesktop.DBus.Properties",
-+            signal_name="PropertiesChanged",
-+            path_keyword="path",
-+        )
-+
-+    @mainloop_wrap
-+    def connect(self, bdaddr):
-+        def reply(path):
-+            obj = self.bus.get_object(BUS_NAME, path)
-+            self.session = dbus.Interface(obj, SESSION_INTERFACE)
-+            self.ftp = dbus.Interface(obj, FILE_TRANSFER_INTERFACE)
-+
-+        self._object_method(
-+            self.client, "CreateSession", bdaddr, {"Target": "ftp"}, reply_handler=reply
-+        )
-+
-+    @mainloop_assert
-+    def properties_changed(self, interface, properties, invalidated, path):
-+        if path != self.transfer_path:
-+            return
-+
-+        if "Status" in properties and (
-+            properties["Status"] == "complete" or properties["Status"] == "error"
-+        ):
-+            self.events.put(
-+                Event(
-+                    f"{FILE_TRANSFER_INTERFACE}:{properties['Status']}",
-+                    properties=properties,
-+                )
-+            )
-+            self.log.debug(f"Transfer {properties['Status']}")
-+
-+        if "Transferred" not in properties:
-+            return
-+
-+        value = properties["Transferred"]
-+        speed = (value - self.transferred) / 1000
-+        self.log.debug(
-+            f"Transfer progress {value}/{self.transfer_size} at {speed} kBps"
-+        )
-+        self.transferred = value
-+
-+    @mainloop_wrap
-+    def ftp_list_folder(self):
-+        return self.ftp.ListFolder()
-+
-+    @mainloop_wrap
-+    def ftp_get_file(self, dst, src):
-+        path, properties = self.ftp.GetFile(dst, src)
-+        self.transfer_path = path
-+        self.transfer_size = properties["Size"]
-+        return properties["Filename"]
-+
-+
-+@pytest.fixture
-+def paired_hosts(hosts):
-+    from .test_agent import test_agent_pair_bredr
-+
-+    if hosts[0].agent.has_device(hosts[1].bdaddr):
-+        return hosts
-+
-+    test_agent_pair_bredr(hosts, True)
-+    return hosts
-+
-+
-+obex_host_config = host_config(
-+    [Agent(), Obexd(), ObexClient(), Pexpect()],
-+    [Agent(), Obexd(), ObexAgent()],
-+    reuse=True,
-+)
-+
-+
-+@pytest.fixture
-+def obex_hosts(paired_hosts):
-+    host0, host1 = paired_hosts
-+
-+    if hasattr(host0, "session"):
-+        return paired_hosts
-+
-+    host0.obex.connect(host1.bdaddr)
-+
-+    service = host1.agent.expect("org.bluez.Agent1.AuthorizeService")
-+    assert service.uuid == FTP_UUID
-+    host1.agent.reply()
-+
-+    host0.obex.expect("org.bluez.obex.Client1.CreateSession:reply")
-+
-+    yield paired_hosts
-+
-+    host1.obex_agent.cleanup()
-+
-+
-+@obex_host_config
-+def test_obex_ftp_list(obex_hosts):
-+    host0, host1 = obex_hosts
-+
-+    host1.call(write_obex_file, "test", "1234")
-+
-+    (item,) = host0.obex.ftp_list_folder()
-+    assert item["Type"] == "file"
-+    assert item["Name"] == "test"
-+    assert item["Size"] == 4
-+
-+
-+@obex_host_config
-+def test_obex_ftp_get(obex_hosts):
-+    host0, host1 = obex_hosts
-+
-+    host1.call(write_obex_file, "test", "1234")
-+
-+    filename = host0.obex.ftp_get_file("", "test")
-+    host0.obex.expect("org.bluez.obex.FileTransfer1:complete")
-+    assert host0.call(read_file, filename) == "1234"
-+
-+
-+#
-+# obexctl tests
-+#
-+
-+
-+@pytest.fixture
-+def obexctl(obex_hosts):
-+    host0, host1 = obex_hosts
-+
-+    exe = find_exe("tools", "obexctl")
-+    obexctl = host0.pexpect.spawn([exe])
-+
-+    host0.pexpect.expect(obexctl, "Client /org/bluez/obex")
-+
-+    host0.pexpect.send(obexctl, f"connect {host1.bdaddr} {FTP_UUID}\n")
-+
-+    service = host1.agent.expect("org.bluez.Agent1.AuthorizeService")
-+    assert service.uuid == FTP_UUID
-+    host1.agent.reply()
-+
-+    host0.pexpect.expect(obexctl, "Connection successful")
-+    host0.pexpect.send(obexctl, f"select /org/bluez/obex/client/session1\n")
-+
-+    yield obexctl
-+
-+    host0.pexpect.close(obexctl)
-+
-+
-+@obex_host_config
-+def test_obexctl_list(obex_hosts, obexctl):
-+    host0, host1 = obex_hosts
-+
-+    host1.call(write_obex_file, "test", "1234")
-+
-+    host0.pexpect.send(obexctl, f"ls\n")
-+    host0.pexpect.expect(obexctl, f"Type: file")
-+    host0.pexpect.expect(obexctl, f"Name: test")
-+    host0.pexpect.expect(obexctl, f"Size: 4")
-diff --git a/test/pytest_bluez/host_plugins.py b/test/pytest_bluez/host_plugins.py
-index 678afc764..dd8ffaed6 100644
---- a/test/pytest_bluez/host_plugins.py
-+++ b/test/pytest_bluez/host_plugins.py
-@@ -16,6 +16,7 @@ import signal
- import functools
- import threading
- import resource
-+import shutil
- from pathlib import Path
- 
- import pytest
-@@ -34,6 +35,7 @@ __all__ = [
-     "Call",
-     "DbusSession",
-     "DbusSystem",
-+    "Obexd",
-     "Pexpect",
-     "Rcvbuf",
- ]
-@@ -263,6 +265,65 @@ class Bluetoothd(env.HostPlugin):
-         self.log_stream.close()
- 
- 
-+class Obexd(env.HostPlugin):
-+    """
-+    Host plugin starting obexd.
-+    """
-+
-+    name = "obexd"
-+    depends = [Bluetoothd(), DbusSession()]
-+
-+    def __init__(self):
-+        self.uuids = ("00001133-0000-1000-8000-00805f9b34fb",)
-+
-+    def presetup(self, config):
-+        try:
-+            self.exe = utils.find_exe("obexd/src", "obexd")
-+        except FileNotFoundError as exc:
-+            pytest.skip(reason=f"Obexd: {exc!r}")
-+
-+    @utils.mainloop_wrap
-+    def setup(self, impl):
-+        self.log = logging.getLogger(self.name)
-+
-+        self.path = Path("/run/obex")
-+        self.path.mkdir()
-+
-+        cmd = [self.exe, "--nodetach", f"--root={self.path}", "-d", "*"]
-+        self.log.info("Start obexd: {}".format(utils.quoted(cmd)))
-+
-+        self.log_stream = utils.LogStream("obexd")
-+        self.job = subprocess.Popen(
-+            cmd,
-+            stdin=subprocess.DEVNULL,
-+            stdout=self.log_stream.stream,
-+            stderr=subprocess.STDOUT,
-+        )
-+
-+        # Wait for the service
-+        self.log.info("Wait for obexd...")
-+        bus = dbus.SystemBus()
-+        bus.set_exit_on_disconnect(False)
-+        adapter = dbus.Interface(
-+            bus.get_object("org.bluez", "/org/bluez/hci0"),
-+            "org.freedesktop.DBus.Properties",
-+        )
-+
-+        def cond():
-+            uuids = [str(uuid) for uuid in adapter.Get("org.bluez.Adapter1", "UUIDs")]
-+            return all(uuid in uuids for uuid in self.uuids)
-+
-+        utils.wait_until(cond)
-+
-+        self.log.info("Obexd ready")
-+
-+    def teardown(self):
-+        self.log.info("Stop obexd")
-+        self.job.terminate()
-+        self.log_stream.close()
-+        shutil.rmtree(self.path)
-+
-+
- class Pexpect(env.HostPlugin):
-     """
-     Host plugin for starting and controlling processes with pexpect.
--- 
-2.53.0
+Also, if the regression reports then come in late, people may have
+started relying on the new behavior, and reverting things then causes
+its own set of regressions.
 
+But when you get a regression report quickly during the early -rc
+period, that tends to mean that it's either a really bad fix, or it's
+just a very common piece of bad hardware (or a shared bug across many
+different hw implementations - which obviously is often then due to
+some common chip or firmware implementation or whatever)
+
+               Linus
