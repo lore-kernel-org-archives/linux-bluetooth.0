@@ -1,62 +1,78 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063B02FDC57;
-	Sat, 21 Mar 2026 00:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C6529ACC5
+	for <linux-bluetooth@vger.kernel.org>; Sat, 21 Mar 2026 10:39:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774054342; cv=none; b=Z/z3Mqt1zacsUGwgF/ajL66t6swE3jjRiAJWV2LQ0pyLIS8fKsmXLjbtymUTZayH+Ol4kvBXD7SWldXtpGnE8SePc86AeIe8Dxbx8/EbEobvjaDI2vebkMFE0DIZudbpkQ/u0SsGM23Slg8s24SVldUkmv1geQ6eN3NEvcxkDw4=
+	t=1774089565; cv=none; b=ADe1299GeIz4fx/vL4heqMA6BLY3ftGR+3nGvrkSxHlFA83yTkY4J29kXu3xsqhG2WcjPKejhg4/nSFoOdEKcsQSPGKgsLgGiuGYb7pX6Yu9fJtERVLJcZP/3ZOGU66w5jlDfm0aOlRjKdxcuQbI8Ema3ulCxgLq55odheuVnl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774054342; c=relaxed/simple;
-	bh=L7+PxV1aS7scozLyw7rk75/7lLkAfMoe2xMLsfwLF7Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EFP9CYzRMDpm7XRNmjFdRRFODhxbcgd6W1Omve6S8aznDCJ4aup6hUjcB+kb/doWvhCQ39IoWCBmtKt7N+wGZF3k4HiNurx1Z5h0R+5d4Nj2vnGYmsFPERcVs19Qx2fk2v/uytt5OckDxJpouI5aDBqQ2+lNK0CZ7IOtI0Ahpic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DRVgqBF7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774089565; c=relaxed/simple;
+	bh=JZoL2mB9ZeDRTKEWAAau2+XSqpW/dWmevRg5Xn60py0=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=UgVPQ/MoszVPbwC5N8+FNnWnCpx5i+22Lw3W7QV53AyFmedg9/AANI2Ft+Ff3rmtvPmmYrOTTDFUGRv+hhbPHDjh8ZVWGhZMtVCqMI5s4MHxLWwTC5RcNur+mGTpYhm2TTxQptnnylzwXDcFNaALrxb1Gf/iStwYiuvPL4L2t0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZxcuTxhm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DRVgqBF7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55ADEC2BC9E;
-	Sat, 21 Mar 2026 00:52:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZxcuTxhm"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 54D67C2BCB3
+	for <linux-bluetooth@vger.kernel.org>; Sat, 21 Mar 2026 10:39:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774054341;
-	bh=L7+PxV1aS7scozLyw7rk75/7lLkAfMoe2xMLsfwLF7Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DRVgqBF7Ts1yH62Yj8OKaWf42vxYb6mxAhLKMIyAjLqtYC8Jw3/6Y/K/HFSfKS1Vz
-	 RKe/tdJiotXUEQRitH21kMBsSqvKKaG77tR2B15D+Bh4w5xZaHaLuRkx8EdUdz/Wkw
-	 bHScJpy0ryjC8hjS9/iAQBhx9Q7B5+1A+VoG4zM3kQ5G8DS/2EnHKkWNdAYoVkhFm0
-	 tbuNCOZxeb2yzmwFnzW8niUOF/VCDmVhU62dDjM6Q/iGvCy783h0+16pW/n02Rq6/9
-	 IosWJrrDnR1dmfHAFOzdZyi/psI/Y1k7NjqrFKNIdreQPAnWS6pTAmMBIZeIYBU24O
-	 qcfW5Rt6nONMw==
-Date: Fri, 20 Mar 2026 17:52:20 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Thorsten Leemhuis <regressions@leemhuis.info>, Linus Torvalds
- <torvalds@linux-foundation.org>, linux-bluetooth@vger.kernel.org,
- davem@davemloft.net, netdev@vger.kernel.org, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: bluetooth regression fix likely to miss -rc5 (was: Re: [GIT
- PULL] bluetooth 2026-03-19)
-Message-ID: <20260320175220.47147285@kernel.org>
-In-Reply-To: <CABBYNZJfLf6PzKUkGjiCvqEm3h0+3SUcxY5RNbUHv6LBdPT_zQ@mail.gmail.com>
-References: <20260319190455.135302-1-luiz.dentz@gmail.com>
-	<177396481128.1855248.1024090053580545012.git-patchwork-notify@kernel.org>
-	<6411a735-d187-4848-b199-a0e2c2e0e52c@leemhuis.info>
-	<CABBYNZJfLf6PzKUkGjiCvqEm3h0+3SUcxY5RNbUHv6LBdPT_zQ@mail.gmail.com>
+	s=k20201202; t=1774089565;
+	bh=JZoL2mB9ZeDRTKEWAAau2+XSqpW/dWmevRg5Xn60py0=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=ZxcuTxhmkniiR+DThExqQkeAclvGRFoOezq+3reeCWSGZtTk2shXDaYD4GSYGZMUd
+	 HHWpE/d2QkJeod2+UlV0FgYcAtlG7kPkkuYY7ewxzQOYueiZKlQ0Ugf5df72K3adri
+	 CmgWWYuxS3qfECSFwBlrcihysXdfAq1Q54EWcPeY0N86KFoI+EWeawhfs+SpLZInDT
+	 Ko7AldEQK3vwQnczUt307iIm7HHDQI90PD/6rNW8OWAJbcEqxZ2wWEXeZhOSGVPL4Y
+	 CKEKSRURtNTAQ72drXMqQijj8w0EboX5E8kP3dFLlpxMUa5wVxlpf/gRkfBvlXk6Lh
+	 XKiwqzS5cdu8w==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 4E98BC41614; Sat, 21 Mar 2026 10:39:25 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 220061] [REGRESSION, BISECTED] Multiple Bluetooth devices
+ cannot be paired under Linux 6.14.4
+Date: Sat, 21 Mar 2026 10:39:24 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: PATCH_ALREADY_AVAILABLE
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-220061-62941-kNQxOM7U6O@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-220061-62941@https.bugzilla.kernel.org/>
+References: <bug-220061-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Fri, 20 Mar 2026 14:02:34 -0400 Luiz Augusto von Dentz wrote:
-> Afaik, it was tagged as regression on March 1st afaik, according to
-> [2]; traces were only provided on March 15th, so yeah it was fixed
-> within a week once the necessary traces were supplied.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220061
 
-Hi Luiz, I don't really care about the complaint, just wanted to check
-whether you know that we always send the PR on Thu (either AM or PM
-depending on which maintainer is handling it)? If you do then nothing
-to see here, we are all doing our best. But if it's not crystal clear
-I should probably ping all sub-trees to remind folks.
+Artem S. Tashkinov (aros@gmx.com) changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |PATCH_ALREADY_AVAILABLE
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
