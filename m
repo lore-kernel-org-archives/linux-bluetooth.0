@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8B22FA0C7
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Mar 2026 21:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7185A264617
+	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Mar 2026 21:31:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774215092; cv=pass; b=JuexN8kC0NI5RkDyJHKdK+uNq5CP9H/ocu7VucVl+cfmRls6zHeTNenZbzHKGVpBeyxNCNKYFqCFSijNwVH2gTbOLIDrCfivzsNzYSF0MU3TPXxPowSxsY5rDFIymV9nirl31jdQ12rTxlsx1K4qO02MNCMRBSa3R3xmBz+LC4I=
+	t=1774215093; cv=pass; b=N4OSk4Tc+qQDYnFB4TfMyS7mJ9qbj74fz4JC39j66cZTE7YO/zFM9/xkh4VpV8vC26gP9yCPN8Y2XJKwV7GGtJmDPhd+vYN04rEuJc/lBPwnUnuSWjVnDcnQbUYqHxrknXjJ2gfIfGPWaYSslxOzkssGFAZ9Njm2cixpRDHrX3w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774215092; c=relaxed/simple;
-	bh=6KSwbhUtHzcUQ9cKtshbvQ/8n8MBs/kaFeO04sV/VCM=;
+	s=arc-20240116; t=1774215093; c=relaxed/simple;
+	bh=O1m2Zy7+eSnFCH574htqdM6Zcolzv+dRG6U7yCa0VTg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jURHrFR4E/hvp+dVvTwpSfuVSwZIHrlDrdxJK/dL1aKGPwfygscxT0ElN3aDiW4UaXhR3vwPewd7IWJBhHCNqDID8vJWm5Ne0CJ9zgKe8MgCIVPP0hZT1NyMPmRhkFq0KtTgnR+32AiOZ7d3gxp05YSr9CEMpx+SVAZnEfEPxvE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=JDxAPeR5; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=YfseEpFNksJKo8vsp+w9iZj8zEJvVOJMzm0wEgR+O9LATBX5Y6/YW+43wRXB2pJr6IHqSYzC0XMdNmI/cIKmlJNsaVuUnmzrJ4/XdoQ11asea/pr3FlygheEMdT1Aj81EjlcwsfV0qzNW7w2Tf4TtZvuchfPDeqGX5bQQGLRUfg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=JWv3SQ1f; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="JDxAPeR5"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="JWv3SQ1f"
 Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:3::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4ff8cw1RCwzyvd;
-	Sun, 22 Mar 2026 23:31:28 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4ff8cx4WW7zyw8;
+	Sun, 22 Mar 2026 23:31:29 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1774215088;
+	t=1774215089;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=X+biOyeo4lNIZifwk4chwASHhVC8FUq0bVDbejKnY24=;
-	b=JDxAPeR5YPjyEVvfB/ypMfGUg61CgxQkgoFgk+lwYqkrc1/xhGyVKUnFi1KWNarTR/BlaN
-	Thu/1sgJoYgiCNxoNM2h07Ye2fukhLjGJXE8DCsLf1m2Wo68DhF72UoOX+8f2c2gLsKw2G
-	OFXIvnXY8PfaqwCFdibiSxNhvnjn8h4=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1774215088;
-	b=vHiKtGBrtGMq7aBaUNom0fQblQUFU30f1Fnu/7W7C/Uo5rMicAuCfjHgbjnWaSC+vNCwWH
-	I+1IVxjD51YFSorkeQ3uan12iLRhs8RmhkM+iGS6C4ofyEMoNTu0rjNyTvCjpO57X4m/38
-	IaA8QiFXufbjWh9AO607W42XbozDB7s=
+	bh=7wMPdByLd4a3LscOR+bk+kCWy1NPuBKERHao/nATgVc=;
+	b=JWv3SQ1f5p5tvsQz4jmZAEBk4zgafcb5sfw0QqgDkLPJkX/kqbYOoL3tlAsKZ182HlPCGk
+	5NhCm8NKohKimqgr4Fpsfo5ZYTvyL2kyAp4TYLqBYpfnUg9zF1sHevLVQ8uQEXhjRYpHfu
+	NRa9lBIUwKOfb+HKmyoGjCx/A5BR6V4=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1774215089;
+	b=wWdPv0uS5U0Y/viQeXLG9Hmll4N4zWZwKyyQsUUwSrtW1SAKeHa0JrcvccyruOpYiol6cZ
+	6ZCVO3ZNlHHEvqPHONj7hsSWQ1/9rPAlx1OjPwF7Ros6VZcR7DPTSuxp5DGau/PBJvqZtU
+	+il87QbB3mFLt5ikVr0hPf/aKr9sLeU=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1774215088;
+	s=meesny; t=1774215089;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=X+biOyeo4lNIZifwk4chwASHhVC8FUq0bVDbejKnY24=;
-	b=qXSur/qOutP5C3NVbOo0m4F2H3QZviB9nBw5KY7jMceEum2ADVjl/BG7rgcH6RLxLySIh/
-	+yBEB8dZlB4zgPw2EbbCTibzEM+appzyk6LUhgYSk+ESOiCWi3izyMtC1eB+1zyYrazj+u
-	7ojqoUvp/hpFzFJ2/AqlBLdVKg/Ox78=
+	bh=7wMPdByLd4a3LscOR+bk+kCWy1NPuBKERHao/nATgVc=;
+	b=NIUCE/P89ZdLVxPCXYNuRQQp1e0HJusiQss2PHEwVFF7DIFvwFHuuNcIKRyaMxdQbsSXlS
+	Uq+6i3OzMMOY2S90anqv4Bwy4DP6WmxJ9hi9p+CVBCh8Cmne1+BqXtoT6yA4wju6A2JuPP
+	uxM9TiW3dKZeGnaAAKOWC1LS95EtcX0=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v3 18/20] test: functional: add custom Agent1 implementation for testing
-Date: Sun, 22 Mar 2026 23:31:18 +0200
-Message-ID: <1e7399dca0eeebab7ddfb801f04cd9d2e9888043.1774214693.git.pav@iki.fi>
+Subject: [PATCH BlueZ v3 20/20] test: functional: add basic obex file transfer tests
+Date: Sun, 22 Mar 2026 23:31:20 +0200
+Message-ID: <d3dcfbffce8f72f4459455f9ed98d669ba912074.1774214693.git.pav@iki.fi>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1774214693.git.pav@iki.fi>
 References: <cover.1774214693.git.pav@iki.fi>
@@ -67,605 +67,394 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Enable more precise testing of the Agent1 interface, and allow doing
-operations like pairing without bluetoothctl.
----
- doc/test-functional.rst       | 137 +++++++++++++
- test/functional/test_agent.py |  46 +++++
- test/pytest_bluez/__init__.py |   1 +
- test/pytest_bluez/agent.py    | 371 ++++++++++++++++++++++++++++++++++
- 4 files changed, 555 insertions(+)
- create mode 100644 test/functional/test_agent.py
- create mode 100644 test/pytest_bluez/agent.py
+Add tests
 
-diff --git a/doc/test-functional.rst b/doc/test-functional.rst
-index a03d2e461..48352b96f 100644
---- a/doc/test-functional.rst
-+++ b/doc/test-functional.rst
-@@ -729,6 +729,143 @@ Base class for host plugins. See also example above.
-            """VM-side teardown"""
-            pass
- 
-+Agent
-+-----
-+
-+DBus org.bluez.Agent1 test implementation.
-+
-+.. code-block::
-+
-+    class Agent(env.HostPlugin):
-+        """
-+        Host plugin providing org.bluez.Agent1 test implementation.
-+
-+        Asynchronous events are handled via expect().
-+
-+        Example:
-+
-+            host.agent.device_method(host1.bdaddr, "Pair")
-+            event = host.agent.expect("org.bluez.Agent1.RequestConfirmation")
-+            assert event.passkey == 1234
-+            host.agent.reply()
-+        """
-+
-+        depends = [Bluetoothd()]
-+        name = "agent"
-+
-+        def __init__(self, capability="KeyboardDisplay", path="/agent"):
-+
-+        def has_device(self, address):
-+            """
-+            Return True if device with given address exists
-+            """
-+
-+        def device_method(self, address, method, *a, **kw):
-+            """
-+            Call given org.bluez.Device1 DBus method
-+
-+            Args:
-+                address (str): bdaddr of target device
-+                method (str): name of DBus method, without interface prefix
-+                *a, **kw: argument passed to the DBus method call
-+
-+            Events:
-+                AgentEvent(kind="org.bluez.Device1.{method}:reply")
-+            """
-+
-+        def adapter_method(self, method, *a, **kw):
-+            """
-+            Call given org.bluez.Adapter1 DBus method
-+
-+            Args:
-+                method (str): name of DBus method, without interface prefix
-+                *a, **kw: argument passed to the DBus method call
-+
-+            Events:
-+                AgentEvent(kind="org.bluez.Adapter1.{method}")
-+            """
-+
-+        def adapter_set(self, key, value):
-+            """
-+            Set given org.bluez.Adapter1 property
-+            """
-+
-+        def adapter_get(self, key):
-+            """
-+            Get given org.bluez.Adapter1 property
-+            """
-+
-+        def get_event(self, block=True):
-+            """
-+            Get most recent pending AgentEvent, blocking optional
-+            """
-+
-+        def expect(self, kinds):
-+            """
-+            Get most recent pending AgentEvent and assert its kind
-+
-+            Returns:
-+                event (AgentEvent)
-+            """
-+
-+        def reply(self, *value):
-+            """
-+            Provide DBus reply to the most recent pending AgentEvent
-+
-+            Arguments:
-+                *value: DBus reply return values
-+            """
-+
-+        def reply_error(self, err=None):
-+            """
-+            Provide DBus error reply to the most recent pending AgentEvent
-+
-+            Arguments:
-+                err (dbus.DBusException): DBus error. Default: org.bluez.Error.Rejected
-+            """
-+
-+.. code-block::
-+
-+    class Event:
-+        """
-+        Asynchronous event
-+
-+        Properties:
-+            kind (str): event kind
-+            info (dict): event properties (also available as attributes)
-+        """
-+
-+.. code-block::
-+
-+   class EventPluginMixin:
-+       """
-+       Simple expect() / reply() pattern for handing async events in
-+       host plugins.
-+       """
-+
-+.. code-block::
-+
-+   def dbus_service_event_method(
-+       interface, name, args=(), in_signature="", out_signature="", sync=True
-+   ):
-+       """
-+       dbus.service.method that pushes Event instances to self.events
-+
-+       Example:
-+
-+           class AgentObject(dbus.service.Object):
-+               @utils.mainloop_assert
-+               def __init__(self, bus, path, events):
-+                   self.events = events
-+                   super().__init__(bus, path)
-+
-+               AuthorizeService = dbus_service_event_method(
-+                   "org.bluez.Agent1",
-+                   "AuthorizeService", ("device", "uuid"), "os", sync=False
-+               )
-+
-+       """
-+
- Bdaddr
- ------
- 
-diff --git a/test/functional/test_agent.py b/test/functional/test_agent.py
+test/functional/test_obex.py::test_obex_ftp_get
+test/functional/test_obex.py::test_obex_ftp_list
+test/functional/test_obex.py::test_obexctl_list
+---
+ test/functional/test_obex.py      | 285 ++++++++++++++++++++++++++++++
+ test/pytest_bluez/host_plugins.py |  61 +++++++
+ 2 files changed, 346 insertions(+)
+ create mode 100644 test/functional/test_obex.py
+
+diff --git a/test/functional/test_obex.py b/test/functional/test_obex.py
 new file mode 100644
-index 000000000..c548469d6
+index 000000000..2f408efb4
 --- /dev/null
-+++ b/test/functional/test_agent.py
-@@ -0,0 +1,46 @@
++++ b/test/functional/test_obex.py
+@@ -0,0 +1,285 @@
 +# -*- coding: utf-8; mode: python; eval: (blacken-mode); -*-
-+# SPDX-License-Identifier: GPL-2.0-or-later
++# SPDX-License-Identifier: LGPL-2.1-or-later
 +"""
-+Tests for bluetoothctl using VM instances
++Tests for Obex
 +"""
 +import sys
++import os
 +import re
 +import pytest
 +import subprocess
 +import tempfile
-+
 +import time
 +import logging
++import json
++import dbus
++import threading
++from pathlib import Path
 +
++import pytest
 +
-+from pytest_bluez import host_config, Agent, wait_until
++from pytest_bluez import (
++    HostPlugin,
++    Agent,
++    host_config,
++    find_exe,
++    Bluetoothd,
++    Bluetoothctl,
++    Obexd,
++    LogStream,
++    wait_until,
++    mainloop_wrap,
++    mainloop_assert,
++    Event,
++    EventPluginMixin,
++    dbus_service_event_method,
++    Pexpect,
++    utils,
++)
 +
 +pytestmark = [pytest.mark.vm]
 +
-+
-+@host_config([Agent()], [Agent()])
-+@pytest.mark.parametrize("success", [True, False], ids=["accept", "reject"])
-+def test_agent_pair_bredr(hosts, success):
-+    host0, host1 = hosts
-+
-+    host0.agent.adapter_method("StartDiscovery")
-+    host0.agent.expect("org.bluez.Adapter1.StartDiscovery:reply")
-+
-+    host1.agent.adapter_set("Pairable", True)
-+    host1.agent.adapter_set("Discoverable", True)
-+
-+    wait_until(host0.agent.has_device, host1.bdaddr)
-+
-+    host0.agent.device_method(host1.bdaddr, "Pair")
-+
-+    confirm_0 = host0.agent.expect("org.bluez.Agent1.RequestConfirmation")
-+    confirm_1 = host1.agent.expect("org.bluez.Agent1.RequestConfirmation")
-+    assert confirm_0.passkey == confirm_1.passkey
-+    host0.agent.reply()
-+
-+    if success:
-+        host1.agent.reply()
-+        host0.agent.expect("org.bluez.Device1.Pair:reply")
-+    else:
-+        host1.agent.reply_error()
-+        host0.agent.expect("org.bluez.Device1.Pair:error")
-diff --git a/test/pytest_bluez/__init__.py b/test/pytest_bluez/__init__.py
-index 9e967d472..cb0629d45 100644
---- a/test/pytest_bluez/__init__.py
-+++ b/test/pytest_bluez/__init__.py
-@@ -7,5 +7,6 @@ from .env import *
- from .utils import *
- from .host_plugins import *
- from .btmon import *
-+from .agent import *
- 
- from .plugin import *
-diff --git a/test/pytest_bluez/agent.py b/test/pytest_bluez/agent.py
-new file mode 100644
-index 000000000..5a65d6bae
---- /dev/null
-+++ b/test/pytest_bluez/agent.py
-@@ -0,0 +1,371 @@
-+# -*- coding: utf-8; mode: python; eval: (blacken-mode); -*-
-+# SPDX-License-Identifier: LGPL-2.1-or-later
-+"""
-+VM host plugins
-+"""
-+import os
-+import sys
-+import subprocess
-+import collections
-+import logging
-+import tempfile
-+import time
-+import shutil
-+import queue
-+from pathlib import Path
-+
-+import dbus
-+import dbus.service
-+
-+from . import env, utils
-+from .host_plugins import Bluetoothd
-+
-+__all__ = ["Agent", "Event", "EventPluginMixin", "dbus_service_event_method"]
-+
-+BUS_NAME = "org.bluez"
-+AGENT_INTERFACE = "org.bluez.Agent1"
-+AGENT_MANAGER_INTERFACE = "org.bluez.AgentManager1"
-+ADAPTER_INTERFACE = "org.bluez.Adapter1"
-+DEVICE_INTERFACE = "org.bluez.Device1"
-+PROPS_INTERFACE = "org.freedesktop.DBus.Properties"
-+
-+log = logging.getLogger("agent")
++log = logging.getLogger(__name__)
 +
 +
-+class Rejected(dbus.DBusException):
-+    _dbus_error_name = "org.bluez.Error.Rejected"
++BUS_NAME = "org.bluez.obex"
++PATH = "/org/bluez/obex"
++AGENT_MANAGER_INTERFACE = "org.bluez.obex.AgentManager1"
++AGENT_INTERFACE = "org.bluez.obex.Agent1"
++CLIENT_INTERFACE = "org.bluez.obex.Client1"
++SESSION_INTERFACE = "org.bluez.obex.Session1"
++FILE_TRANSFER_INTERFACE = "org.bluez.obex.FileTransfer1"
++TRANSFER_INTERFACE = "org.bluez.obex.Transfer1"
++
++FTP_UUID = "00001106-0000-1000-8000-00805f9b34fb"
 +
 +
-+class Event:
-+    """
-+    Asynchronous event.
-+
-+    Properties:
-+        kind (str): event kind
-+        info (dict): event properties (also available as attributes)
-+    """
-+
-+    def __init__(
-+        self, kind, reply_cb=None, error_cb=None, reply_type=None, info=None, **kw
-+    ):
-+        if info is None:
-+            info = {}
-+        info.update(kw)
-+        self.reply_cb = reply_cb
-+        self.error_cb = error_cb
-+        self.kind = kind
-+        self.reply_type = reply_type
-+        self.info = info
-+
-+    def __getattr__(self, name):
-+        try:
-+            return self.__dict__["info"][name]
-+        except KeyError:
-+            raise AttributeError(name)
-+
-+    def __getstate__(self):
-+        return dict(self.__dict__, reply_cb=None, error_cb=None)
-+
-+
-+class EventPluginMixin:
-+    """
-+    Simple expect() / reply() pattern for handing async events in
-+    host plugins.
-+
-+    """
-+
-+    def setup(self, impl):
-+        self.events = queue.SimpleQueue()
-+        self.cur_event = None
-+
-+    def get_event(self, block=True):
-+        """
-+        Get most recent pending Event, blocking optional
-+        """
-+        if self.cur_event is not None:
-+            return self.cur_event
-+
-+        try:
-+            self.cur_event = self.events.get(block=block)
-+            return self.cur_event
-+        except queue.Empty:
-+            return None
-+
-+    def expect(self, kinds):
-+        """
-+        Get most recent pending Event and assert its kind
-+
-+        Returns:
-+            event (Event)
-+        """
-+        if isinstance(kinds, str):
-+            kinds = (kinds,)
-+        kinds = tuple(kinds)
-+
-+        event = self.get_event()
-+        if event.kind not in kinds:
-+            raise AssertionError(f"Got {event.kind=}, expected {kinds=}")
-+        if event.reply_cb is None:
-+            self.cur_event = None
-+
-+        log.info(f"match {event.kind=}")
-+        return event
-+
-+    @utils.mainloop_wrap
-+    def reply(self, *value):
-+        """
-+        Provide DBus reply to the most recent pending Event
-+
-+        Arguments:
-+            *value: DBus reply return values
-+        """
-+        if len(value) == 1 and isinstance(value[0], Exception):
-+            self.cur_event.error_cb(value[0])
-+        else:
-+            if self.cur_event.reply_type is not None:
-+                value = self.cur_event.reply_type(*value)
-+            self.cur_event.reply_cb(*value)
-+        self.cur_event = None
-+
-+    def reply_error(self, err=None):
-+        """
-+        Provide DBus error reply to the most recent pending Event
-+
-+        Arguments:
-+            err (dbus.DBusException): DBus error. Default: org.bluez.Error.Rejected
-+        """
-+        if err is None:
-+            err = Rejected()
-+        self.reply(err)
-+
-+    @utils.mainloop_assert
-+    def _object_method(self, obj, method, *a, **kw):
-+        iface = obj.dbus_interface
-+
-+        reply_handler = kw.pop("reply_handler", None)
-+        error_handler = kw.pop("error_handler", None)
-+
-+        def reply(*values):
-+            log.info(f"{iface}.{method} reply: {values!r}")
-+            if reply_handler is not None:
-+                reply_handler(*values)
-+            self.events.put(Event(f"{iface}.{method}:reply", values=values))
-+
-+        def error(err):
-+            log.info(f"{iface}.{method} error: {err!r}")
-+            if error_handler is not None:
-+                error_handler(err)
-+            self.events.put(Event(f"{iface}.{method}:error", error=err))
-+
-+        getattr(obj, method)(*a, **kw, reply_handler=reply, error_handler=error)
-+
-+
-+class Agent(env.HostPlugin, EventPluginMixin):
-+    """
-+    Host plugin providing org.bluez.Agent1 test implementation.
-+
-+    Asynchronous events are handled via expect().
-+
-+    Example:
-+
-+        host.agent.device_method(host1.bdaddr, "Pair")
-+        event = host.agent.expect("org.bluez.Agent1.RequestConfirmation")
-+        assert event.passkey == 1234
-+        host.agent.reply()
-+    """
-+
++class ObexAgent(HostPlugin, EventPluginMixin):
 +    depends = [Bluetoothd()]
-+    name = "agent"
++    name = "obex_agent"
 +
-+    def __init__(self, capability="KeyboardDisplay", path="/agent"):
-+        self.capability = capability
++    def __init__(self, path="/obexagent"):
 +        self.path = path
 +
-+    @utils.mainloop_wrap
++    @mainloop_wrap
 +    def setup(self, impl):
 +        EventPluginMixin.setup(self, impl)
 +
-+        self.bus = dbus.SystemBus(private=True)
++        self.bus = dbus.SessionBus()
 +        self.bus.set_exit_on_disconnect(False)
 +
-+        self.agent = AgentObject(self.bus, self.path, self.events)
++        self.agent = ObexAgentObject(self.bus, self.path, self.events)
 +
-+        bluez = self.bus.get_object(BUS_NAME, "/org/bluez")
++        bluez = self.bus.get_object(BUS_NAME, PATH)
 +        self.manager = dbus.Interface(bluez, AGENT_MANAGER_INTERFACE)
-+        self.manager.RegisterAgent(self.path, self.capability)
++        self.manager.RegisterAgent(self.path)
 +
-+        log.info("Agent registered")
++        log.info("Obex agent registered")
 +
-+        self.manager.RequestDefaultAgent(self.path)
-+
-+    @utils.mainloop_wrap
-+    def teardown(self):
-+        self.manager.UnregisterAgent(self.path)
-+        log.info("Agent unregistered")
-+
-+    @utils.mainloop_wrap
-+    def has_device(self, address):
-+        """
-+        Return True if device with given address exists
-+        """
-+        try:
-+            self._find_device(address)
-+            return True
-+        except ValueError:
-+            return False
-+
-+    @utils.mainloop_wrap
-+    def device_method(self, address, method, *a, **kw):
-+        """
-+        Call given org.bluez.Device1 DBus method
-+
-+        Args:
-+            address (str): bdaddr of target device
-+            method (str): name of DBus method, without interface prefix
-+            *a, **kw: argument passed to the DBus method call
-+
-+        Events:
-+            Event(kind="org.bluez.Device1.{method}:reply")
-+        """
-+        device = self._find_device(address)
-+        self._object_method(device, method, *a, **kw)
-+
-+    @utils.mainloop_wrap
-+    def adapter_method(self, method, *a, **kw):
-+        """
-+        Call given org.bluez.Adapter1 DBus method
-+
-+        Args:
-+            method (str): name of DBus method, without interface prefix
-+            *a, **kw: argument passed to the DBus method call
-+
-+        Events:
-+            Event(kind="org.bluez.Adapter1.{method}")
-+        """
-+        adapter = dbus.Interface(
-+            self.bus.get_object(BUS_NAME, "/org/bluez/hci0"), ADAPTER_INTERFACE
-+        )
-+        self._object_method(adapter, method, *a, **kw)
-+
-+    @utils.mainloop_wrap
-+    def adapter_set(self, key, value):
-+        """
-+        Set given org.bluez.Adapter1 property
-+        """
-+        adapter = dbus.Interface(
-+            self.bus.get_object(BUS_NAME, "/org/bluez/hci0"), PROPS_INTERFACE
-+        )
-+        adapter.Set(ADAPTER_INTERFACE, key, value)
-+
-+    @utils.mainloop_wrap
-+    def adapter_get(self, key):
-+        """
-+        Get given org.bluez.Adapter1 property
-+        """
-+        adapter = dbus.Interface(
-+            self.bus.get_object(BUS_NAME, "/org/bluez/hci0"), PROPS_INTERFACE
-+        )
-+        return adapter.Get(ADAPTER_INTERFACE, key)
-+
-+    @utils.mainloop_assert
-+    def _find_device(self, address):
-+        manager = dbus.Interface(
-+            self.bus.get_object(BUS_NAME, "/"), "org.freedesktop.DBus.ObjectManager"
-+        )
-+        objects = manager.GetManagedObjects()
-+
-+        for path, ifaces in objects.items():
-+            device = ifaces.get(DEVICE_INTERFACE)
-+            if device is None:
-+                continue
-+            if device["Address"].lower() == address.lower():
-+                return dbus.Interface(
-+                    self.bus.get_object(BUS_NAME, path), DEVICE_INTERFACE
-+                )
-+        else:
-+            raise ValueError("Device {address=} not found")
-+
-+
-+def dbus_service_event_method(
-+    interface, name, args=(), in_signature="", out_signature="", sync=True
-+):
-+    """
-+    dbus.service.method that pushes Event instances to self.events
-+
-+    Example:
-+
-+        class AgentObject(dbus.service.Object):
-+            @utils.mainloop_assert
-+            def __init__(self, bus, path, events):
-+                self.events = events
-+                super().__init__(bus, path)
-+
-+            AuthorizeService = dbus_service_event_method(
-+                "org.bluez.Agent1",
-+                "AuthorizeService", ("device", "uuid"), "os", sync=False
-+            )
-+
-+    """
-+
-+    reply_type = {"": "None", "s": "str", "u": "dbus.UInt32"}[out_signature]
-+
-+    if not sync:
-+        cb_args = ("_reply", "_error")
-+        kw = dict(
-+            in_signature=in_signature,
-+            out_signature=out_signature,
-+            async_callbacks=("_reply", "_error"),
-+        )
-+    else:
-+        cb_args = ()
-+        kw = dict(in_signature=in_signature, out_signature=out_signature)
-+        assert not out_signature
-+
-+    args_str = ", ".join(args)
-+    if args_str:
-+        args_str = ", " + args_str
-+
-+    cb_args_str = ", ".join(cb_args)
-+    if cb_args:
-+        cb_args_str = ", " + cb_args_str
-+
-+    args_dict = ", ".join(f"{k}={k}" for k in args)
-+
-+    method_str = f"""def {name}(self{args_str}{cb_args_str}):
-+        info = dict({args_dict})
-+        log.info(f"{interface}.{name} {{info}}")
-+        self.events.put(Event("{interface}.{name}"{cb_args_str}, reply_type={reply_type}, info=info))
-+    """
-+
-+    ns = dict(dbus=dbus, Event=Event, log=log)
-+    exec(method_str, ns)
-+    return dbus.service.method(interface, **kw)(utils.mainloop_assert(ns[name]))
++    def cleanup(self):
++        path = Path("/run/obex")
++        for f in path.iterdir():
++            f.unlink()
 +
 +
 +def agent_method(*a, **kw):
 +    return dbus_service_event_method(AGENT_INTERFACE, *a, **kw)
 +
 +
-+class AgentObject(dbus.service.Object):
-+    @utils.mainloop_assert
++class ObexAgentObject(dbus.service.Object):
++    @mainloop_assert
 +    def __init__(self, bus, path, events):
 +        self.events = events
 +        super().__init__(bus, path)
 +
-+    Release = agent_method("Release")
-+    AuthorizeService = agent_method(
-+        "AuthorizeService", ("device", "uuid"), "os", sync=False
-+    )
-+    RequestPinCode = agent_method("RequestPinCode", ("device",), "o", "s", sync=False)
-+    RequestPasskey = agent_method("RequestPasskey", ("device",), "o", "u", sync=False)
-+    RequestConfirmation = agent_method(
-+        "RequestConfirmation", ("device", "passkey"), "ou", sync=False
-+    )
-+    RequestAuthorization = agent_method(
-+        "RequestAuthorization", ("device",), "o", sync=False
-+    )
-+    DisplayPasskey = agent_method(
-+        "DisplayPasskey", ("device", "passkey", "entered"), "ouq"
-+    )
-+    DisplayPinCode = agent_method("DisplayPinCode", ("device", "pincode"), "os")
++    AuthorizePush = agent_method("AuthorizePush", ("path",), "o", "s", sync=False)
 +    Cancel = agent_method("Cancel")
++
++
++def write_obex_file(name, content):
++    with open(f"/run/obex/{name}", "w") as f:
++        f.write(content)
++
++
++def read_file(name):
++    with open(name, "r") as f:
++        return f.read()
++
++
++#
++# Direct Obex Python client API tests
++#
++
++
++class ObexClient(HostPlugin, EventPluginMixin):
++    name = "obex"
++
++    @mainloop_wrap
++    def setup(self, impl):
++        EventPluginMixin.setup(self, impl)
++
++        self.transferred = 0
++        self.transfer_path = None
++        self.transfer_size = 0
++
++        self.bus = dbus.SessionBus()
++        self.bus.set_exit_on_disconnect(False)
++        self.log = logging.getLogger(self.name)
++        self.client = dbus.Interface(
++            self.bus.get_object(BUS_NAME, PATH), CLIENT_INTERFACE
++        )
++
++        self.bus.add_signal_receiver(
++            self.properties_changed,
++            dbus_interface="org.freedesktop.DBus.Properties",
++            signal_name="PropertiesChanged",
++            path_keyword="path",
++        )
++
++    @mainloop_wrap
++    def connect(self, bdaddr):
++        def reply(path):
++            obj = self.bus.get_object(BUS_NAME, path)
++            self.session = dbus.Interface(obj, SESSION_INTERFACE)
++            self.ftp = dbus.Interface(obj, FILE_TRANSFER_INTERFACE)
++
++        self._object_method(
++            self.client, "CreateSession", bdaddr, {"Target": "ftp"}, reply_handler=reply
++        )
++
++    @mainloop_assert
++    def properties_changed(self, interface, properties, invalidated, path):
++        if path != self.transfer_path:
++            return
++
++        if "Status" in properties and (
++            properties["Status"] == "complete" or properties["Status"] == "error"
++        ):
++            self.events.put(
++                Event(
++                    f"{FILE_TRANSFER_INTERFACE}:{properties['Status']}",
++                    properties=properties,
++                )
++            )
++            self.log.debug(f"Transfer {properties['Status']}")
++
++        if "Transferred" not in properties:
++            return
++
++        value = properties["Transferred"]
++        speed = (value - self.transferred) / 1000
++        self.log.debug(
++            f"Transfer progress {value}/{self.transfer_size} at {speed} kBps"
++        )
++        self.transferred = value
++
++    @mainloop_wrap
++    def ftp_list_folder(self):
++        return self.ftp.ListFolder()
++
++    @mainloop_wrap
++    def ftp_get_file(self, dst, src):
++        path, properties = self.ftp.GetFile(dst, src)
++        self.transfer_path = path
++        self.transfer_size = properties["Size"]
++        return properties["Filename"]
++
++
++@pytest.fixture
++def paired_hosts(hosts):
++    from .test_agent import test_agent_pair_bredr
++
++    if hosts[0].agent.has_device(hosts[1].bdaddr):
++        return hosts
++
++    test_agent_pair_bredr(hosts, True)
++    return hosts
++
++
++obex_host_config = host_config(
++    [Agent(), Obexd(), ObexClient(), Pexpect()],
++    [Agent(), Obexd(), ObexAgent()],
++    reuse=True,
++)
++
++
++@pytest.fixture
++def obex_hosts(paired_hosts):
++    host0, host1 = paired_hosts
++
++    if hasattr(host0, "session"):
++        return paired_hosts
++
++    host0.obex.connect(host1.bdaddr)
++
++    service = host1.agent.expect("org.bluez.Agent1.AuthorizeService")
++    assert service.uuid == FTP_UUID
++    host1.agent.reply()
++
++    host0.obex.expect("org.bluez.obex.Client1.CreateSession:reply")
++
++    yield paired_hosts
++
++    host1.obex_agent.cleanup()
++
++
++@obex_host_config
++def test_obex_ftp_list(obex_hosts):
++    host0, host1 = obex_hosts
++
++    host1.call(write_obex_file, "test", "1234")
++
++    (item,) = host0.obex.ftp_list_folder()
++    assert item["Type"] == "file"
++    assert item["Name"] == "test"
++    assert item["Size"] == 4
++
++
++@obex_host_config
++def test_obex_ftp_get(obex_hosts):
++    host0, host1 = obex_hosts
++
++    host1.call(write_obex_file, "test", "1234")
++
++    filename = host0.obex.ftp_get_file("", "test")
++    host0.obex.expect("org.bluez.obex.FileTransfer1:complete")
++    assert host0.call(read_file, filename) == "1234"
++
++
++#
++# obexctl tests
++#
++
++
++@pytest.fixture
++def obexctl(obex_hosts):
++    host0, host1 = obex_hosts
++
++    exe = find_exe("tools", "obexctl")
++    obexctl = host0.pexpect.spawn([exe])
++
++    obexctl.expect("Client /org/bluez/obex")
++    obexctl.send(f"connect {host1.bdaddr} {FTP_UUID}\n")
++
++    service = host1.agent.expect("org.bluez.Agent1.AuthorizeService")
++    assert service.uuid == FTP_UUID
++    host1.agent.reply()
++
++    obexctl.expect("Connection successful")
++    obexctl.send(f"select /org/bluez/obex/client/session1\n")
++
++    yield obexctl
++
++    obexctl.close()
++
++
++@obex_host_config
++def test_obexctl_list(obex_hosts, obexctl):
++    host0, host1 = obex_hosts
++
++    host1.call(write_obex_file, "test", "1234")
++
++    obexctl.send(f"ls\n")
++    obexctl.expect(f"Type: file")
++    obexctl.expect(f"Name: test")
++    obexctl.expect(f"Size: 4")
+diff --git a/test/pytest_bluez/host_plugins.py b/test/pytest_bluez/host_plugins.py
+index 3b9cf7857..b7425590e 100644
+--- a/test/pytest_bluez/host_plugins.py
++++ b/test/pytest_bluez/host_plugins.py
+@@ -16,6 +16,7 @@ import signal
+ import functools
+ import threading
+ import resource
++import shutil
+ from pathlib import Path
+ 
+ import pytest
+@@ -34,6 +35,7 @@ __all__ = [
+     "Call",
+     "DbusSession",
+     "DbusSystem",
++    "Obexd",
+     "Pexpect",
+     "Rcvbuf",
+ ]
+@@ -316,6 +318,65 @@ class Bluetoothd(env.HostPlugin):
+         self.log_stream.close()
+ 
+ 
++class Obexd(env.HostPlugin):
++    """
++    Host plugin starting obexd.
++    """
++
++    name = "obexd"
++    depends = [Bluetoothd(), DbusSession()]
++
++    def __init__(self):
++        self.uuids = ("00001133-0000-1000-8000-00805f9b34fb",)
++
++    def presetup(self, config):
++        try:
++            self.exe = utils.find_exe("obexd/src", "obexd")
++        except FileNotFoundError as exc:
++            pytest.skip(reason=f"Obexd: {exc!r}")
++
++    @utils.mainloop_wrap
++    def setup(self, impl):
++        self.log = logging.getLogger(self.name)
++
++        self.path = Path("/run/obex")
++        self.path.mkdir()
++
++        cmd = [self.exe, "--nodetach", f"--root={self.path}", "-d", "*"]
++        self.log.info("Start obexd: {}".format(utils.quoted(cmd)))
++
++        self.log_stream = utils.LogStream("obexd")
++        self.job = subprocess.Popen(
++            cmd,
++            stdin=subprocess.DEVNULL,
++            stdout=self.log_stream.stream,
++            stderr=subprocess.STDOUT,
++        )
++
++        # Wait for the service
++        self.log.info("Wait for obexd...")
++        bus = dbus.SystemBus()
++        bus.set_exit_on_disconnect(False)
++        adapter = dbus.Interface(
++            bus.get_object("org.bluez", "/org/bluez/hci0"),
++            "org.freedesktop.DBus.Properties",
++        )
++
++        def cond():
++            uuids = [str(uuid) for uuid in adapter.Get("org.bluez.Adapter1", "UUIDs")]
++            return all(uuid in uuids for uuid in self.uuids)
++
++        utils.wait_until(cond)
++
++        self.log.info("Obexd ready")
++
++    def teardown(self):
++        self.log.info("Stop obexd")
++        self.job.terminate()
++        self.log_stream.close()
++        shutil.rmtree(self.path)
++
++
+ class Pexpect(env.HostPlugin):
+     """
+     Host plugin for starting and controlling processes with pexpect.
 -- 
 2.53.0
 
