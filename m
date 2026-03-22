@@ -1,133 +1,110 @@
-Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD38B2D6401
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Mar 2026 22:38:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9017C175A86;
+	Sun, 22 Mar 2026 23:37:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774219122; cv=none; b=mP4jZMrtN6pluYhjEygnKc/PI2M6WETOw4MVkJ++V4D8cbQ/bui9U3mv+nDYSt8laAfGtaNlhOTuz6H+Um4CdszQzw4+Et1Zz6tIN96JXKfX5ehyF4JUYIXmGJAkgLHMfUKS7ERe5mvnNyqU3gU2Jg3vAiDVbzyTfsgDwk18o1Q=
+	t=1774222634; cv=none; b=mUOayxGd1ZfBUVeEbG1smemsrP4ZxUuWqzIUjATYxYmVukwcIf7M6dqSNqOH4tPLnYya4w+qiiH5HWbM3t0PBbBcbFvmcPOC1SgBoWOEr4XJjeqxKzGBPpO0afuvePpU3nsAeRSjptqiXvYm4UOb1WPk4Fkp3IYtguyVDoSBMTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774219122; c=relaxed/simple;
-	bh=nrxGdF4waJ7A0QgcfXoDVuvc9uecGMMgh8aa/GZGYFU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=mQTkSkQPJqt+6tE7Qxm63017GqJ6FJ4rectWEIvdk/ix2ArKBwERfI8eHzp0pnwD5ISpF2wFwLSpuwJXBFoA5zSOyc2zzCX/1LuKVHoxDEClJs/e4whr8LHSOzAdDQoIH5wmEa0i8Y0MjOxK4EhbTHjgGl5Woq2lMFjOnrxFFxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=diRRJ3+U; arc=none smtp.client-ip=74.125.82.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1774222634; c=relaxed/simple;
+	bh=C+cpYEwtbl8C0q9C0mMalH+TLGhOE8srxZhSJuIwx+g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iaGyXhjXCr31IXVxEMo8f0u4qbwwuIAf23hP9TPvLT10MNX5r3Y/RBgJAvprp3/98dPFeLGPEDi3oi75/jbFbHrN7svRIlNkDovNnW1kMa9Q0+ZgbCuqbi9+9dmt6OoP3hQ3r6A8WGeL/XaXqN61HlZwJknAc5YO/UcBXN7lpGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d+7WSNmZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="diRRJ3+U"
-Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-12732165d1eso4574282c88.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Mar 2026 15:38:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1774219120; x=1774823920; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NXA1HRFAxM3kL5RxK2EDEsBx69JR7gSiXJRWzbAtGv8=;
-        b=diRRJ3+UVREbTKpAdK2Z3CtdY+CM9zi7GhbU4kiOX7Cfbc3WRMLkg8Tjp1K+TGy3cY
-         hRDwQ9g0OJdVc5PzN+5d2A3tB9XkjGvexQuMFTQArxJMjdgbsJOB+trRe0/hRxgnH9LS
-         RQz4u5Tvvze2C+mb1xx4c8S1NZhB86ZncDXYJ7TXAKcwo3Vv/R4jpBIv57J7AxTOTfws
-         H8zcCX05rF3dN1T5geR4UyV9zd2dHJfrvjQXRJhTQ6OeAczGiRTaUcAL3IvXbDNVS750
-         UYuB1ACey89TTc1jdB/7768ZeTy5oMJgtILWAVeZ8uSPpxvYRWUm26qxFR0JhBSLBVch
-         u9yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774219120; x=1774823920;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NXA1HRFAxM3kL5RxK2EDEsBx69JR7gSiXJRWzbAtGv8=;
-        b=nb1rax29zKMoO6CVQaXLkKGfWm22fK2ZgaiqXL6VsDxTRDpGF5nIoIBC2sJ8mLQYtz
-         8Ng7eF4Js17SzeILxLWq2Srw9OiSQXHU8jsiJAXNpIC1urpjmNkQ5mXtIJRj/IGkR16S
-         2QImQxCJX56ph8/6YDYo/NbPlVi477lAY77z2iq5IQL5QvgqCiDR1FiAsR/sMnb126ML
-         M8Pwu63GcvPrUBuEmGylXY2oHyqO44/vaK5LVdQGIZxSg5uZlduptfY/5ufA+yDXNWO8
-         VgF2ljkEFVUzbNsgqq6pqcZRap8Fyf2baiI14Wd57gKoFkYq+ofXmLeIWr6RTMGNbv9u
-         n9YQ==
-X-Gm-Message-State: AOJu0YwIpMq3PYCiuC97FGricXD6XoIOgKl1ol8Diwm3q+LTQ+c1e/oK
-	dGi7pPANA96MbT5JolzYEgje+RLcUutxkl1z2fACD1I6alv6DagG7GXNPhmoQQ==
-X-Gm-Gg: ATEYQzyl7RM5FeaYjlO5RBzZNsKVIyjoyUUNEVe0NXuGR761gNVJl/B1Hrkq9WQGCgy
-	W5tpW2zaQfy6b0ISJyluROZVkT+TrA0fewgFMda/eTH7xq/s3d1qSQz7I20mh/iFrnMj9yy4BY1
-	XlfW6CqQf9zY1vbcOaf71HrdWF9m7FdoAxHnUacVR59sJIVUmPi+lp7Sk7prd7H2vgjA8T3pkS8
-	Wx2u5b+k4YHj/Oex2gz9cQYq4Dci+jDVPGUd0l3IrTlqJxfj5MscfsIWm5ijqDNjHLkjNxT/wQK
-	KqsBEiY/xkDMzDBPiDChZUrt9kW9+FJMTIOA/OOdSIK/bDUEm35H3LYiLRcp9MDFzcJwruTFx0d
-	Z7/LgzCj03vI5tQAEjEr14TbnOl3DzyLn7oN4KzMUvO99Y6Ywx9xoF8oP2GEN2NivfoiOYjr0pb
-	ZWwDNRFqavZiGdcUl4lGvT24qEjcQiKh1YqjwbGQM=
-X-Received: by 2002:a05:7022:2385:b0:128:d2d1:8a5c with SMTP id a92af1059eb24-12a726a30famr4346805c88.19.1774219120302;
-        Sun, 22 Mar 2026 15:38:40 -0700 (PDT)
-Received: from [172.17.0.2] ([57.151.137.34])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12a736b929csm8176649c88.13.2026.03.22.15.38.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Mar 2026 15:38:39 -0700 (PDT)
-Message-ID: <69c06f6f.050a0220.123ecd.9e31@mx.google.com>
-Date: Sun, 22 Mar 2026 15:38:39 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0706161851646962100=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d+7WSNmZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E31D6C19424;
+	Sun, 22 Mar 2026 23:37:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774222634;
+	bh=C+cpYEwtbl8C0q9C0mMalH+TLGhOE8srxZhSJuIwx+g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d+7WSNmZj4S8oSiXYk5eP5KyTbdNiEYggcm6Uj+B/1sYgR/Ce4pTRNKUoSr1Gf26q
+	 A5k+Ilqbqq7SdtpY1NBZzaCqeQZInLxHSsLlO3hj7yq8dEwlhGRo74lYFri8GjW/PT
+	 rSD9CwyrDne9Wza2FNGZtS30s8K30TxX5FaiDedQeVP7C9sP4NfWf47cD849Xp+CvZ
+	 6SXhpdtgnrmxguPMgp9+RUUJDWQyfeF4bYe7iFpkUuC/zauJtzFqqbRBXCEPPcX2Ay
+	 I9Dj54Lg86HRUtj2hxAJajZR2EN/AacRIqEx7dnNHhO6miQ1JvJuyiBA3xdXxNgH0u
+	 9R/zGQG+rUdIQ==
+Date: Sun, 22 Mar 2026 18:37:13 -0500
+From: Rob Herring <robh@kernel.org>
+To: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Hans de Goede <hansg@kernel.org>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Mark Pearson <mpearson-lenovo@squebb.ca>,
+	"Derek J. Clark" <derekjohn.clark@gmail.com>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org,
+	Stephan Gerhold <stephan.gerhold@linaro.org>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	linux-acpi@vger.kernel.org
+Subject: Re: [PATCH v6 6/9] dt-bindings: connector: m2: Add M.2 1620 LGA
+ soldered down connector
+Message-ID: <20260322233713.GA98177-robh@kernel.org>
+References: <20260317-pci-m2-e-v6-0-9c898f108d3d@oss.qualcomm.com>
+ <20260317-pci-m2-e-v6-6-9c898f108d3d@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: Functional/integration testing
-In-Reply-To: <c2a503373330ebcfa8f8a20f8378cfda5d17634c.1774214693.git.pav@iki.fi>
-References: <c2a503373330ebcfa8f8a20f8378cfda5d17634c.1774214693.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260317-pci-m2-e-v6-6-9c898f108d3d@oss.qualcomm.com>
 
---===============0706161851646962100==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Mar 17, 2026 at 09:59:56AM +0530, Manivannan Sadhasivam wrote:
+> Lenovo Thinkpad T14s is found to have a soldered down version of M.2 1620
+> LGA connector. Though, there is no 1620 LGA form factor defined in the M.2
+> spec, it looks very similar to the M.2 Key E connector. So add the
+> "pcie-m2-1620-lga-connector" compatible with "pcie-m2-e-connector" fallback
+> to reuse the Key E binding.
 
-This is automated email and please do not reply to this email!
+What is LGA?
 
-Dear submitter,
+If not in the spec, is it really something generic?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1070560
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.39 seconds
-GitLint                       PENDING   0.35 seconds
-BuildEll                      PASS      21.16 seconds
-BluezMake                     PASS      648.87 seconds
-MakeCheck                     PASS      19.44 seconds
-MakeDistcheck                 PASS      252.06 seconds
-CheckValgrind                 PASS      295.83 seconds
-CheckSmatch                   WARNING   357.92 seconds
-bluezmakeextell               PASS      184.14 seconds
-IncrementalBuild              PENDING   0.29 seconds
-ScanBuild                     PASS      1015.16 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-emulator/btdev.c:480:29: warning: Variable length array is used.
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
-https://github.com/bluez/bluez/pull/1981/checks
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0706161851646962100==--
+> 
+> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> ---
+>  .../devicetree/bindings/connector/pcie-m2-e-connector.yaml       | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml b/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
+> index f7859aa9b634..d8cf9a9ec7d0 100644
+> --- a/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
+> +++ b/Documentation/devicetree/bindings/connector/pcie-m2-e-connector.yaml
+> @@ -17,7 +17,14 @@ description:
+>  
+>  properties:
+>    compatible:
+> -    const: pcie-m2-e-connector
+> +    oneOf:
+> +      - items:
+> +          - enum:
+> +              - pcie-m2-1620-lga-connector
+> +          - const: pcie-m2-e-connector
+> +      - items:
+> +          - enum:
+> +              - pcie-m2-e-connector
+>  
+>    vpcie3v3-supply:
+>      description: A phandle to the regulator for 3.3v supply.
+> 
+> -- 
+> 2.51.0
+> 
