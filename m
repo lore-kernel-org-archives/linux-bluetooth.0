@@ -1,27 +1,27 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641022FA0C7
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Mar 2026 21:30:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5AA366DA4
+	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Mar 2026 21:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774215021; cv=pass; b=L0Y8Q7BEm7WmEAox7D8vzlMnMkqZR4OoAkruh6itgAHhsXVSmFRuyqZ7xUbLNaLjXJfBDqMbq0QpjiywHWzF9GEWtsouNly+EVPugSNdWPcy1l4wBwLHOqcYdAUk+q5LtsqQrCOAKJdQ0LcauvKoCDtvGTUNwPlayg4IvoW+c14=
+	t=1774215021; cv=pass; b=nieJYeyda+ab/Hi62J5LoJuZ/9KYyKX+faSKijGTufd6S8rt48XNBmW7FWSwi5Pj1AUdG5d2NIl8fkAkqVuEVd17yi7UKDL8Kl7vEUSe6Fs4QamP+QbFqniCrX8fn84ZbsD7kjgcjsbOQfxtptGADz2XcBHpltsK5IwV3npjBXc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1774215021; c=relaxed/simple;
-	bh=19XJKeZfYj3+QoTHJaVwkXUPh+R0Bq1s2EKkwvvQ880=;
+	bh=xbatIIUi+j6RAGEosH6MmHAUt+koICZnJHDfybkfVhA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SOc7YNOiZcbP9AzGkqCC1juN3T6eJogy4v/2Ew7XQeD2HzQiVSBvSszSVVazBTkcfONQU3OFV6aEdYceHvXTG9uxzOuxghRybv9k8EVB+fCf3abSZGztykO0oEtzW8WZlbLtd6C4A9J8eNacD06hTaXAicoPsxoK0ZgnpNrBJso=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=eTHp/27t; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=h1g/uqRh9vjr0/TCdOjI3rbAanjulp4AjKSU65GQMjN5bjJH/dpqBiLEBqka0D4v33pAlQVi+ADERuwI7TmTJX2V0kqMj8dYfvi0RJRWKgIvbFZ8U4bS9SlLkozzvkwRLWOfnCSI+TDagOwaI8GxYm8pvNoxvNGMZPZsNuI0ATI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=rCAVmc93; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="eTHp/27t"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="rCAVmc93"
 Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:3::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4ff8bS1xnJzyc9;
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4ff8bS43Nhzyvd;
 	Sun, 22 Mar 2026 23:30:12 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
 	t=1774215012;
@@ -29,14 +29,14 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZYEg5XwN4AClHnpJNIWTBuEmtoxA1419CCyGBs/R1dI=;
-	b=eTHp/27tWBBB1hXge+V4dX39E4BKrZpU4iNRg53+1ZQShJqCsNFr+i5alUKXEh1wW9exNP
-	RkCHBphBBeRcY5qUXpYqJ2dCveknjWHBJXKtC1xiENQ1FuMTwoY6c1u5Y7FNxdrjKrJ7Rq
-	fAjjzD1HSlrMoPz4drHSLiLZ8p6kvrQ=
+	bh=1ONUfVrdU74xydIZxCoU0cVlHRotjMEzS3J5btiRC4I=;
+	b=rCAVmc938+uLLPTgw5ZvxymtcOEKv+sFtWlvo1zrLz+DsKsYYNVsvSI7QJSTxXzlXa0c5e
+	S5SeC41HSu8ppF1wwsMq6ho+EsN/gyzWlsqhXF5V6e/I80dQw3x2SayPqoNJXx4/0Ft1GU
+	qsdpXXdVYndNOGWa5Z7/f+P0ba4iNVw=
 ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1774215012;
-	b=jV7SU8eQywS3KlOQh7ID7OMwtl8pAH28JIOSyJMiDObyggzRXrUTUZbln7stffEKE0a4Qc
-	FOCny+67V0winlhd5GDmsD/JFOMmq6K8flFSWjhvFXz2ogEhjZipkWlNmBXIo8bRYNEPCp
-	tBc25gzl7b+vJWSA6WPFrByQntOER+o=
+	b=zBVNuS0fXZHBw/XOJSpwx0rnYp4M9kKDCJC1lIYLbQWhXNrvsMg04hsh999G6OZNI3ua6D
+	Bm1MymWv/g2oAQN4yizGUv/POQRO93op80vAg6hHiwxqW7EAOQ5TmvCRDcTTamGxb2SjZS
+	0sPGWCLCtccnremv7LcwUjNKNrmas8M=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -46,16 +46,16 @@ ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZYEg5XwN4AClHnpJNIWTBuEmtoxA1419CCyGBs/R1dI=;
-	b=IQPFxiWTShwn1myl0wQz3GJL2dbm+Cbt4kHOSpx/x/7N6mJYskShgg75kVf4kWbLHfFesJ
-	04qho/vT81w9BNr7Il6ljRn+x28nxbUpIflR6F6JFzMUcqXPOYx60bt3sB9fxYch8suZET
-	O30Bj/v/4sFPNynn25a17QQvsdxJ9e0=
+	bh=1ONUfVrdU74xydIZxCoU0cVlHRotjMEzS3J5btiRC4I=;
+	b=kBAZd14MIY99fwdI7R+uXdYl5JbvZGRatpTjDIvnCpghm/bWsfSkZPIuW1fTE13SvDj+BK
+	wLLBgX6gfO2rDh4xBMXqCzMcOZzg4RMREma6FeIQlZy/99OoA3hg3Bqrd7w+EUbogYr0ra
+	oH3Z/HLUVM8rjAZIKOIKRyV3PCv5OLo=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v3 01/20] emulator: btvirt: check pkt lengths, don't get stuck on malformed
-Date: Sun, 22 Mar 2026 23:29:50 +0200
-Message-ID: <c2a503373330ebcfa8f8a20f8378cfda5d17634c.1774214693.git.pav@iki.fi>
+Subject: [PATCH BlueZ v3 02/20] emulator: btvirt: allow specifying where server unix sockets are made
+Date: Sun, 22 Mar 2026 23:29:51 +0200
+Message-ID: <41d54c33641f8a6004b3cb9a616c746119e2b156.1774214693.git.pav@iki.fi>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1774214693.git.pav@iki.fi>
 References: <cover.1774214693.git.pav@iki.fi>
@@ -67,47 +67,114 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Don't try to parse packet before whole header is received.
-
-If received data has unknown packet type, reset buffer so that we don't
-get stuck.
+Make --server to take optional path name where to create the various
+server sockets.
 ---
- emulator/server.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ emulator/main.c | 37 ++++++++++++++++++++++++-------------
+ 1 file changed, 24 insertions(+), 13 deletions(-)
 
-diff --git a/emulator/server.c b/emulator/server.c
-index fa2bc07be..f14e14cd2 100644
---- a/emulator/server.c
-+++ b/emulator/server.c
-@@ -136,12 +136,20 @@ again:
- 				client->pkt_len = 0;
- 				break;
- 			case HCI_ACLDATA_PKT:
-+				if (count < HCI_ACL_HDR_SIZE + 1) {
-+					client->pkt_offset += len;
-+					return;
-+				}
- 				acl_hdr = (hci_acl_hdr*)(ptr + 1);
- 				client->pkt_expect = HCI_ACL_HDR_SIZE + acl_hdr->dlen + 1;
- 				client->pkt_data = malloc(client->pkt_expect);
- 				client->pkt_len = 0;
- 				break;
- 			case HCI_ISODATA_PKT:
-+				if (count < HCI_ISO_HDR_SIZE + 1) {
-+					client->pkt_offset += len;
-+					return;
-+				}
- 				iso_hdr = (hci_iso_hdr *)(ptr + 1);
- 				client->pkt_expect = HCI_ISO_HDR_SIZE +
- 							iso_hdr->dlen + 1;
-@@ -151,6 +159,7 @@ again:
- 			default:
- 				printf("packet error, unknown type: %d\n",
- 					client->pkt_type);
-+				client->pkt_offset = 0;
- 				return;
- 			}
+diff --git a/emulator/main.c b/emulator/main.c
+index 456fcd98e..09d6e9adb 100644
+--- a/emulator/main.c
++++ b/emulator/main.c
+@@ -18,6 +18,7 @@
+ #include <stdbool.h>
+ #include <getopt.h>
+ #include <sys/uio.h>
++#include <limits.h>
  
+ #include "src/shared/mainloop.h"
+ #include "src/shared/util.h"
+@@ -46,7 +47,7 @@ static void usage(void)
+ 	printf("options:\n"
+ 		"\t-d                    Enable debug\n"
+ 		"\t-S                    Create local serial port\n"
+-		"\t-s                    Create local server sockets\n"
++		"\t-s[path=/tmp]         Create local server sockets\n"
+ 		"\t-t[port=45550]        Create a TCP server\n"
+ 		"\t-l[num]               Number of local controllers\n"
+ 		"\t-L                    Create LE only controller\n"
+@@ -60,7 +61,7 @@ static void usage(void)
+ static const struct option main_options[] = {
+ 	{ "debug",   no_argument,       NULL, 'd' },
+ 	{ "serial",  no_argument,       NULL, 'S' },
+-	{ "server",  no_argument,       NULL, 's' },
++	{ "server",  optional_argument, NULL, 's' },
+ 	{ "tcp",     optional_argument, NULL, 't' },
+ 	{ "local",   optional_argument, NULL, 'l' },
+ 	{ "le",      no_argument,       NULL, 'L' },
+@@ -88,6 +89,7 @@ int main(int argc, char *argv[])
+ 	struct server *server5;
+ 	bool debug_enabled = false;
+ 	bool server_enabled = false;
++	const char *server_path = "/tmp";
+ 	uint16_t tcp_port = 0;
+ 	bool serial_enabled = false;
+ 	int letest_count = 0;
+@@ -100,7 +102,7 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "dSst::l::LBAU::T::vh",
++		opt = getopt_long(argc, argv, "dSs::t::l::LBAU::T::vh",
+ 						main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+@@ -114,6 +116,8 @@ int main(int argc, char *argv[])
+ 			break;
+ 		case 's':
+ 			server_enabled = true;
++			if (optarg)
++				server_path = optarg;
+ 			break;
+ 		case 't':
+ 			if (optarg)
+@@ -196,28 +200,35 @@ int main(int argc, char *argv[])
+ 	}
+ 
+ 	if (server_enabled) {
+-		server1 = server_open_unix(SERVER_TYPE_BREDRLE,
+-						"/tmp/bt-server-bredrle");
++		char path[PATH_MAX];
++
++		snprintf(path, sizeof(path), "%s/%s", server_path,
++							"bt-server-bredrle");
++		server1 = server_open_unix(SERVER_TYPE_BREDRLE, path);
+ 		if (!server1)
+ 			fprintf(stderr, "Failed to open BR/EDR/LE server\n");
+ 
+-		server2 = server_open_unix(SERVER_TYPE_BREDR,
+-						"/tmp/bt-server-bredr");
++		snprintf(path, sizeof(path), "%s/%s", server_path,
++							"bt-server-bredr");
++		server2 = server_open_unix(SERVER_TYPE_BREDR, path);
+ 		if (!server2)
+ 			fprintf(stderr, "Failed to open BR/EDR server\n");
+ 
+-		server3 = server_open_unix(SERVER_TYPE_AMP,
+-						"/tmp/bt-server-amp");
++		snprintf(path, sizeof(path), "%s/%s", server_path,
++							"bt-server-amp");
++		server3 = server_open_unix(SERVER_TYPE_AMP, path);
+ 		if (!server3)
+ 			fprintf(stderr, "Failed to open AMP server\n");
+ 
+-		server4 = server_open_unix(SERVER_TYPE_LE,
+-						"/tmp/bt-server-le");
++		snprintf(path, sizeof(path), "%s/%s", server_path,
++							"bt-server-le");
++		server4 = server_open_unix(SERVER_TYPE_LE, path);
+ 		if (!server4)
+ 			fprintf(stderr, "Failed to open LE server\n");
+ 
+-		server5 = server_open_unix(SERVER_TYPE_MONITOR,
+-						"/tmp/bt-server-mon");
++		snprintf(path, sizeof(path), "%s/%s", server_path,
++							"bt-server-mon");
++		server5 = server_open_unix(SERVER_TYPE_MONITOR, path);
+ 		if (!server5)
+ 			fprintf(stderr, "Failed to open monitor server\n");
+ 	}
 -- 
 2.53.0
 
