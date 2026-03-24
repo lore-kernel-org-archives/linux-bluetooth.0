@@ -1,30 +1,30 @@
 Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7F33D9DB0;
-	Tue, 24 Mar 2026 08:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67943D9DB1;
+	Tue, 24 Mar 2026 08:51:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774342307; cv=none; b=Rw86BsmqRrlXUTm+qi9HM03eO0Zb8Hwni28M/czYuJi0U4SJ7V/bHrOKfK79rRAYiPFkom65iTIClwCm1X3cyMqegUTg8f6PJfVc1c/Qfpg4Ul0n4PvcQrIfT8S3LEwp1vADt2yLZ0ESY2j5Ty+xVth62VW9nXeooz675eUdtMs=
+	t=1774342317; cv=none; b=NBBzNop7J/YZWtNa/VM22hNbUyI8yvIFOz5VXA46Fp2iaLlZK3s/AiHIpChLjwbDbSJFqfdWyQRWV8fA2GSCq1uvFZQbbMRd5ACqPKcCc6yxV+URRlg8Sj102bZ1CD9y4A45Zg+l+Aj3DRpc2azfb6aw21e7VtPEK49tLJxGFis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774342307; c=relaxed/simple;
-	bh=g6RKEge0GayQZJaveOGeMqx8x1x7iWGaa6lu3XLRlb4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PTUfuHqRbi287qzAj7iPc1wjCxmN70Jpks/k3/FzykcxXELl9GzttjPbfO8dUiOHWj3iN/ca1rsbLQU5Hes45XY1Go2uWr1MR7SRQJja8MemehoR6kgLKC0FwV1SN2DllpT5ETb27V/z1xmv1Avc1LtPTxgV5a/u4qsBaU23/RQ=
+	s=arc-20240116; t=1774342317; c=relaxed/simple;
+	bh=xrCHbguGFIFSrvZ1b6iD5csa232XNCnUvzh5Gb69Sgs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T4mZ0a9taELXWJkEyKCFE20RzM3TZz8qcOQtVHwuIkyNvYwJUHw4+sUG+KbaiUe8nCwX6cTcjKhLbPGZWJvk7ZTJx0v1wYr+pDFgo9yndGZyMWiDgxmp69xXivVFc4ekFASMDTb5pLbbJck57aqPJF873PU43wGnezkB52v5Hww=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
 Received: from localhost.localdomain (unknown [111.196.245.197])
-	by APP-01 (Coremail) with SMTP id qwCowADnj2ufUMJp96b8Cg--.2045S2;
-	Tue, 24 Mar 2026 16:51:43 +0800 (CST)
+	by APP-01 (Coremail) with SMTP id qwCowAC3XWmpUMJppqf8Cg--.7601S2;
+	Tue, 24 Mar 2026 16:51:53 +0800 (CST)
 From: Pengpeng Hou <pengpeng@iscas.ac.cn>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com
 Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	pengpeng@iscas.ac.cn
-Subject: [PATCH] Bluetooth: btintel_pcie: validate completion ring indices
-Date: Tue, 24 Mar 2026 16:51:43 +0800
-Message-ID: <20260324085143.74785-1-pengpeng@iscas.ac.cn>
+Subject: [PATCH] Bluetooth: btintel_pcie: fix TX queue off-by-one
+Date: Tue, 24 Mar 2026 16:51:52 +0800
+Message-ID: <20260324085152.74986-1-pengpeng@iscas.ac.cn>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -33,70 +33,52 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowADnj2ufUMJp96b8Cg--.2045S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJr1Dur43uw47AFy3Ar13Arb_yoW8WrW8pF
-	WqgFn0yF1kXF12vwsxAa1rXFW3Wrs3A347C34xZ3yrWFn8tryktay5tF9Fq3yq9rWrGrW3
-	ZFs8Wr9xCr1UWr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
-	AVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4U
-	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjfU0VbkUU
-	UUU
+X-CM-TRANSID:qwCowAC3XWmpUMJppqf8Cg--.7601S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrZr1DJw4xtw15XFyrZFy5Jwb_yoWkGFc_uw
+	15Cw1Uu3y5JF1fXw12k3yFvFyjkFyxWFyvvFsrXrW5A348urs7CFyqvrn0qan3Ww17Kr9x
+	Aw12qr1Syry8GjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb4xFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+	Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r12
+	6r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1l
+	IxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUIfO7UUU
+	UU=
 X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
 
-The MSI-X RX and TX completion handlers trust the shared ring indices
-read from data->ia.cr_tia[] and data->ia.cr_hia[] before using cr_tia as
-an index into the fixed urbd ring arrays. If the device reports a stale
-or malformed completion index, the driver can step past rxq->urbd1s[] or
-txq->urbd0s[] before it gets a chance to recover.
+btintel_pcie_send_sync() reads the next transmit slot from
+data->ia.tr_hia[] and uses it as an index into the fixed txq descriptor
+arrays. The current guard only rejects values strictly greater than
+txq->count, so an index equal to the queue depth still falls through and
+is used as the next transmit slot one element past the end.
 
-Validate both completion ring indices against the queue depth before
-walking the descriptor arrays.
+Reject indices at or above the queue depth before preparing the TX
+descriptor.
 
 Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
 ---
- drivers/bluetooth/btintel_pcie.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ drivers/bluetooth/btintel_pcie.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 37b744e35bc4..06c2b81f2b6e 100644
+index 37b744e35bc4..760cb3d1aa18 100644
 --- a/drivers/bluetooth/btintel_pcie.c
 +++ b/drivers/bluetooth/btintel_pcie.c
-@@ -1008,6 +1008,13 @@ static void btintel_pcie_msix_tx_handle(struct btintel_pcie_data *data)
+@@ -359,7 +359,7 @@ static int btintel_pcie_send_sync(struct btintel_pcie_data *data,
  
- 	txq = &data->txq;
+ 	tfd_index = data->ia.tr_hia[BTINTEL_PCIE_TXQ_NUM];
  
-+	if (cr_tia >= txq->count || cr_hia >= txq->count) {
-+		bt_dev_err(data->hdev,
-+			   "TXQ: invalid ring indices tia=%u hia=%u",
-+			   cr_tia, cr_hia);
-+		return;
-+	}
-+
- 	while (cr_tia != cr_hia) {
- 		data->tx_wait_done = true;
- 		wake_up(&data->tx_wait_q);
-@@ -1403,6 +1410,12 @@ static void btintel_pcie_msix_rx_handle(struct btintel_pcie_data *data)
+-	if (tfd_index > txq->count)
++	if (tfd_index >= txq->count)
+ 		return -ERANGE;
  
- 	rxq = &data->rxq;
- 
-+	if (cr_tia >= rxq->count || cr_hia >= rxq->count) {
-+		bt_dev_err(hdev, "RXQ: invalid ring indices tia=%u hia=%u",
-+			   cr_tia, cr_hia);
-+		return;
-+	}
-+
- 	/* The firmware sends multiple CD in a single MSI-X and it needs to
- 	 * process all received CDs in this interrupt.
- 	 */
+ 	/* Firmware raises alive interrupt on HCI_OP_RESET or
 -- 
 2.50.1 (Apple Git-155)
 
