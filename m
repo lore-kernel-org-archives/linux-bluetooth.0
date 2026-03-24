@@ -1,299 +1,417 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC482FFFB8
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Mar 2026 17:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46D92F693B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Mar 2026 19:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774374062; cv=none; b=CjT2Fjp5jz8NA2kxBQZEijEN/Ea8VTzsTGOyBgaL9Yj8acgAItVVTksdj0V/835cRtt4NVND3ccbJCXDmR1dTuyOHtvokYOkfFTTxrPP0i+BaVlNgABVariE8nlGRbV/6iWZmdW+yGA1p7c/LbWEraXvBbSs57GUrXh4MJcYFB8=
+	t=1774381795; cv=none; b=jcfOVEqzQNs7eRw/1GhAOkwFnw7jk1uIqFRt/D+ccydzkhnYYs5wPF62fXt8pwrra523ZTgPrZ/v31t0/0ZKIA12hKi3nH+4KYdiLooZYGHonfwLfC0qZj6btRPzXtgGQtYdnCKkMkfN9p2hxAsqvu2I1cyPWbpYBjoeb/eFPtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774374062; c=relaxed/simple;
-	bh=HDhChax9CMrUw+PkhKnWWgIf/6RwC+knOQZyACexLno=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=ZrYbZf1tn97qGZyzLltZupsnfwqdPj7gOMvFlVe/Nm/c9z6pAR2tE/Rj4uXBTKUI6jRFVBD5cUEpX5+6bWYpnsAbETLxeQypb7WGAtGxs46C17vFbdM34d4EiA4BTkplTzUO0SLUNJqWiU1Cv55EskRTp8/nYrl0FBi3ZVHxxLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VAt5LhtG; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1774381795; c=relaxed/simple;
+	bh=XDFDA9fVRvZrngHiBR8tWQxx+NTXCe8OV4v6kJPsthY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sd8rvSkJ8aQq76s6NSjKCBkh9084ymN8iX+NI31j5+IwjJ50CKXD5NTqIkUp+YmvqnTLszmTUPsO/mWRZaxJA5m4+OZgZJgfQw0yI2/3szMgTtnmTijkHMae5q/oOLsMtxjYVhnF5wKft8Xlhb57DqlJfRMYpLUE8p+2Po7Llhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HHdfVy0O; arc=none smtp.client-ip=209.85.221.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VAt5LhtG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774374061; x=1805910061;
-  h=date:from:to:cc:subject:message-id;
-  bh=HDhChax9CMrUw+PkhKnWWgIf/6RwC+knOQZyACexLno=;
-  b=VAt5LhtGmNvqRK5yhbrVwQwjrqw8etr1NoSyBrigaybrDfAoWHExrRv+
-   TuTycEL6oW2QVK4AhdbAzs1zqXCljgksH9V63DKTn/xSw14J1h320T7VT
-   SLFoifVZDUutK7xZsECRvKtX2STbuSIPhge1yWNkD7H44hG/EbI+TvkVo
-   TchOeAiJDLqDVIUOVixf0Vn88R1dMYd+XBuhfH+Psb51d2dHqYwNXMxLz
-   zz5bs5etGpWswOd2eaym8i6C6EYh0399V/Kgg/nx7iIGfIztjEkfpxZce
-   Mca9UTT/aFscRucUCfMu9WUeKHbAXtXxpGeh0PUnDNlsQ/Qm22B6eC5Mf
-   g==;
-X-CSE-ConnectionGUID: YgeXNjppSyKAGDt1b/KmCw==
-X-CSE-MsgGUID: jR7mVziQQByq6Ubp5fJr+A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="98021969"
-X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="98021969"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 10:41:01 -0700
-X-CSE-ConnectionGUID: plB6AHFaQSipld//7cQDDg==
-X-CSE-MsgGUID: sqjFJCrjTXmPK1Zrwth3wQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="224386821"
-Received: from lkp-server01.sh.intel.com (HELO 3905d212be1b) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 24 Mar 2026 10:40:59 -0700
-Received: from kbuild by 3905d212be1b with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w55kO-0000000054D-2M7o;
-	Tue, 24 Mar 2026 17:40:56 +0000
-Date: Wed, 25 Mar 2026 01:40:45 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- acf374fce194d131a220bdeea0fdbfb9d275dc77
-Message-ID: <202603250136.snB6ySsn-lkp@intel.com>
-User-Agent: s-nail v14.9.25
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HHdfVy0O"
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-56a9076813bso2622713e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Mar 2026 12:49:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774381793; x=1774986593; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=geXhid+ObUxdODvoUvcKqgdoFUIwOaeaDzThI9FvmSQ=;
+        b=HHdfVy0O4i2KucjZ8ZWDcjbDaAR1QMDCusKRes+llQLSgRypTbkOJ/3kfRfZkirk06
+         O9JvqTE2R5pRnHbW/bcNpY2m1NryaJLvhdi21CV7WSj42QzB6Wnn7MBzkSojklq1DXAr
+         pvca/dJ7ATEDDpdaKpGGiULJwfIMkll+n9gEyUb3m3RBpdp4xIU5j8Nkck4aXIP9B50c
+         UIDNAJJw0skUR5XAG7ugRD/JYPF/bGpvDTQnzEDcqoe0X293HS9ezUT943QVjp4zsrh3
+         +zo2bOcn5ZumcGu8Elv8J5laERXCXWB7jIMq2EmJPfpwJ5iLnn+rtP/mNCoChiu9bNGC
+         TJPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774381793; x=1774986593;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=geXhid+ObUxdODvoUvcKqgdoFUIwOaeaDzThI9FvmSQ=;
+        b=FEns/vgh/cUfbBkfI3/sDgMtvJsmLvagcfnl3u4/Z9ILyfvsfXJROuRj9W5sI1xIFy
+         QBRrSHfW3LDLTv0/a7p2y7AqmimC7SgSaL25ZoJhr1tfsU/xhWG7Uu10nmbTY9Fazssn
+         S5FWJsWiB6XGT1haOisk95d4fT0hOKuef4TW5SJTwVPjuOAijPRSWy4906ciXtRScIY2
+         W6/VIDFDaCU4EKMrQrvdv3t9/M+9hO7yUpgjPSAr3peIxllpuL+QqpijhmqjB4g3Qx1b
+         Usi1DkDchNnz1kAftSJI3AKED3WxM74/CEs9fLWSUUk1KtUBxeIHeGF/om76bfZN1c58
+         pWTg==
+X-Gm-Message-State: AOJu0Yz493nin3SVeYlrNWvu/arhwPzKdQ14eg02oOkgWqb0lsuYHDWm
+	q3A6g8eWJkYFS4QiDASc5ka0IK/4dD2LdNoWxYSu6dWBQ6Tyf6tUlXXrQP3WmfQx
+X-Gm-Gg: ATEYQzwctFRgRWSkZIAMNEl2tlnfTOe8jFWeY69MdaqamCfRDaLoFeigP7jFaaYyrWV
+	54HSNbPVT4RlBSLOoYwdKOfiaadGcgncwaiksnONOjdmDjEQ2Urti6xNa3P5dloZHkU/hsaBXzK
+	KSdG6FnWcCTxkI0PNETHbXJTQjKqEXXItPyU9p8PaHyNoYoyoPLKuF88Kvv7nFYlej19oCHTgRn
+	wtI6A53mDDB6PbTsDebb9I0PRq/1O4tuIT2ggYq77qETWuhw69SD0WiMyac5VzHPyOQMOAeuxcv
+	c3DTBgQSbzXv+Zmdu7uE7R2lMZS5ZoDi3HU9DtqWNzXJqQu/AUTefGMusZCmMTYjoTnlQsz15dJ
+	+NoiEvdb1qzc4IPqtXsc72UYJicfRTT0RtLjy5WBNMeXEPciTV78DQPJTrAJoig5mAE7+K4Frxh
+	BwdFE7ET7DzEWqa2fENMKgrNUgu+TcxJgm4xvwawNusnotOrYbBK4epfZQi1VthJCRJeapfPGDc
+	iX4GVfbZJyWfi7GiA==
+X-Received: by 2002:a05:6102:9d8:b0:5ff:d1c8:a85e with SMTP id ada2fe7eead31-6038753a6c0mr625223137.32.1774381792558;
+        Tue, 24 Mar 2026 12:49:52 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-95136de3e33sm13759671241.9.2026.03.24.12.49.51
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2026 12:49:52 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 1/9] doc/btmon: Split Advertising and Scanning into btmon-advertising.rst
+Date: Tue, 24 Mar 2026 15:49:37 -0400
+Message-ID: <20260324194946.109349-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: acf374fce194d131a220bdeea0fdbfb9d275dc77  Bluetooth: L2CAP: Fix ERTM re-init and zero pdu_len infinite loop
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-elapsed time: 1305m
+Move the ADVERTISING AND SCANNING section into a standalone file and
+replace it with an RST include directive. This allows the
+btsnoop-analyzer to load only the relevant documentation for
+advertising/scanning focus-area analysis instead of the full btmon.rst.
+---
+ doc/btmon-advertising.rst | 155 ++++++++++++++++++++++++++++++++++++++
+ doc/btmon.rst             | 155 +-------------------------------------
+ 2 files changed, 158 insertions(+), 152 deletions(-)
+ create mode 100644 doc/btmon-advertising.rst
 
-configs tested: 222
-configs skipped: 7
+diff --git a/doc/btmon-advertising.rst b/doc/btmon-advertising.rst
+new file mode 100644
+index 000000000000..dfa5dbb1da66
+--- /dev/null
++++ b/doc/btmon-advertising.rst
+@@ -0,0 +1,155 @@
++.. This file is included by btmon.rst.
++
++ADVERTISING AND SCANNING
++==========================
++
++btmon decodes advertising data structures automatically. Advertising
++and scan response data appears in HCI LE advertising report events
++and in advertising command parameters.
++
++Advertising Reports
++--------------------
++
++When the controller reports received advertisements::
++
++    > HCI Event: LE Meta Event (0x3e) plen 43              #120 [hci0] 0.500003
++          LE Extended Advertising Report (0x0d)
++            Event type: 0x0013
++              Props: 0x0013
++                Connectable
++                Scannable
++                Complete
++            Address type: Random (0x01)
++            Address: 00:11:22:33:44:55
++            Primary PHY: LE 1M
++            Secondary PHY: LE 2M
++            SID: 0x01
++            TX power: 0 dBm
++            RSSI: -55 dBm (0xc9)
++            Data length: 18
++
++The advertising data (AD) structures within the report are decoded
++as typed fields:
++
++**Common AD types btmon decodes**:
++
++.. list-table::
++   :header-rows: 1
++   :widths: 10 30 60
++
++   * - AD Type
++     - Name
++     - Example in btmon output
++   * - 0x01
++     - Flags
++     - ``Flags: 0x06`` with decoded bits (LE General Discoverable,
++       BR/EDR Not Supported)
++   * - 0x02/0x03
++     - Incomplete/Complete 16-bit UUIDs
++     - ``16-bit Service UUIDs (complete): 2 entries``
++       followed by UUID list
++   * - 0x06/0x07
++     - Incomplete/Complete 128-bit UUIDs
++     - ``128-bit Service UUIDs (complete): 1 entry``
++   * - 0x08/0x09
++     - Shortened/Complete Local Name
++     - ``Name (complete): MyDevice``
++   * - 0x0a
++     - TX Power Level
++     - ``TX power: 4 dBm``
++   * - 0x16
++     - Service Data (16-bit UUID)
++     - ``Service Data (UUID 0x184e): ...`` with protocol-specific
++       decoding
++   * - 0xff
++     - Manufacturer Specific Data
++     - ``Company: Apple, Inc. (76)`` followed by hex data
++
++**Typical advertising report**::
++
++    > HCI Event: LE Meta Event (0x3e) plen 38              #120 [hci0] 0.500003
++          LE Extended Advertising Report (0x0d)
++            Address: 00:11:22:33:44:55
++            RSSI: -62 dBm (0xc2)
++            Flags: 0x06
++              LE General Discoverable Mode
++              BR/EDR Not Supported
++            Name (complete): LE-Audio-Left
++            16-bit Service UUIDs (complete): 3 entries
++              Published Audio Capabilities (0x1850)
++              Audio Stream Control (0x184e)
++              Common Audio (0x1853)
++            Service Data (UUID 0x1852): 01a2b3
++            Appearance: Earbud (0x0941)
++
++Extended Advertising
++---------------------
++
++Modern controllers use extended advertising commands and events.
++The setup sequence in btmon::
++
++    < HCI Command: LE Set Extended Adv Parameters (0x08|0x0036) plen 25  #50 [hci0] 0.100003
++          Handle: 0x01
++          Properties: 0x0000
++          Min advertising interval: 160.000 msec (0x0100)
++          Max advertising interval: 160.000 msec (0x0100)
++          Channel map: 37, 38, 39 (0x07)
++          Own address type: Random (0x01)
++          Peer address type: Public (0x00)
++          PHY: LE 1M, LE 2M
++          SID: 0x01
++          TX power: 7 dBm
++
++    < HCI Command: LE Set Extended Adv Data (0x08|0x0037) plen 35  #52 [hci0] 0.101003
++          Handle: 0x01
++          Operation: Complete extended advertising data (0x01)
++          Fragment preference: No fragmentation (0x01)
++
++Periodic Advertising (LE Audio)
++--------------------------------
++
++LE Audio broadcast sources use periodic advertising to transmit
++BASE announcements containing codec configuration::
++
++    > HCI Event: LE Meta Event (0x3e) plen 80              #200 [hci0] 0.500003
++          LE Periodic Advertising Report (0x0f)
++            Sync handle: 0x0001
++            TX power: 0 dBm
++            RSSI: -45 dBm
++            CTE Type: No CTE (0xff)
++            Data status: Complete (0x00)
++            Data length: 60
++            Service Data: Basic Audio Announcement (0x1851)
++              Presentation Delay: 40000 us
++              Number of Subgroups: 1
++                Codec: LC3 (0x06)
++                  Sampling Frequency: 48000 Hz
++                  Frame Duration: 10 ms
++                  Frame Length: 120
++
++Automating Advertising Analysis
++---------------------------------
++
++**Find all advertising reports** (devices seen)::
++
++    grep -n "Advertising Report\|Address:.*RSSI:" output.txt
++
++**Extract device names**::
++
++    grep -n "Name (complete):\|Name (short):" output.txt
++
++**Find LE Audio devices** (by service UUIDs in advertising)::
++
++    grep -n "Audio Stream Control\|Published Audio Capabilities\|Common Audio\|Basic Audio Announcement\|Broadcast Audio" output.txt
++
++**Track advertising setup** (local device configuring advertising)::
++
++    grep -n "Set Extended Adv\|Set Advertising\|Set Scan Response\|Adv Enable" output.txt
++
++**Find periodic advertising** (broadcast audio)::
++
++    grep -n "Periodic Advertising\|PA Sync\|PA Report\|Basic Audio Announcement\|Broadcast.*Announcement" output.txt
++
++**Identify devices by appearance**::
++
++    grep -n "Appearance:" output.txt
+diff --git a/doc/btmon.rst b/doc/btmon.rst
+index 2299c13ca16c..657f33ff19f1 100644
+--- a/doc/btmon.rst
++++ b/doc/btmon.rst
+@@ -2402,159 +2402,10 @@ Errors often cascade across layers. Common patterns:
+ 4. L2CAP ``Connection refused - security block`` → triggers SMP
+    pairing
+ 
+-ADVERTISING AND SCANNING
+-==========================
++PROTOCOL FLOWS
++===============
+ 
+-btmon decodes advertising data structures automatically. Advertising
+-and scan response data appears in HCI LE advertising report events
+-and in advertising command parameters.
+-
+-Advertising Reports
+---------------------
+-
+-When the controller reports received advertisements::
+-
+-    > HCI Event: LE Meta Event (0x3e) plen 43              #120 [hci0] 0.500003
+-          LE Extended Advertising Report (0x0d)
+-            Event type: 0x0013
+-              Props: 0x0013
+-                Connectable
+-                Scannable
+-                Complete
+-            Address type: Random (0x01)
+-            Address: 00:11:22:33:44:55
+-            Primary PHY: LE 1M
+-            Secondary PHY: LE 2M
+-            SID: 0x01
+-            TX power: 0 dBm
+-            RSSI: -55 dBm (0xc9)
+-            Data length: 18
+-
+-The advertising data (AD) structures within the report are decoded
+-as typed fields:
+-
+-**Common AD types btmon decodes**:
+-
+-.. list-table::
+-   :header-rows: 1
+-   :widths: 10 30 60
+-
+-   * - AD Type
+-     - Name
+-     - Example in btmon output
+-   * - 0x01
+-     - Flags
+-     - ``Flags: 0x06`` with decoded bits (LE General Discoverable,
+-       BR/EDR Not Supported)
+-   * - 0x02/0x03
+-     - Incomplete/Complete 16-bit UUIDs
+-     - ``16-bit Service UUIDs (complete): 2 entries``
+-       followed by UUID list
+-   * - 0x06/0x07
+-     - Incomplete/Complete 128-bit UUIDs
+-     - ``128-bit Service UUIDs (complete): 1 entry``
+-   * - 0x08/0x09
+-     - Shortened/Complete Local Name
+-     - ``Name (complete): MyDevice``
+-   * - 0x0a
+-     - TX Power Level
+-     - ``TX power: 4 dBm``
+-   * - 0x16
+-     - Service Data (16-bit UUID)
+-     - ``Service Data (UUID 0x184e): ...`` with protocol-specific
+-       decoding
+-   * - 0xff
+-     - Manufacturer Specific Data
+-     - ``Company: Apple, Inc. (76)`` followed by hex data
+-
+-**Typical advertising report**::
+-
+-    > HCI Event: LE Meta Event (0x3e) plen 38              #120 [hci0] 0.500003
+-          LE Extended Advertising Report (0x0d)
+-            Address: 00:11:22:33:44:55
+-            RSSI: -62 dBm (0xc2)
+-            Flags: 0x06
+-              LE General Discoverable Mode
+-              BR/EDR Not Supported
+-            Name (complete): LE-Audio-Left
+-            16-bit Service UUIDs (complete): 3 entries
+-              Published Audio Capabilities (0x1850)
+-              Audio Stream Control (0x184e)
+-              Common Audio (0x1853)
+-            Service Data (UUID 0x1852): 01a2b3
+-            Appearance: Earbud (0x0941)
+-
+-Extended Advertising
+----------------------
+-
+-Modern controllers use extended advertising commands and events.
+-The setup sequence in btmon::
+-
+-    < HCI Command: LE Set Extended Adv Parameters (0x08|0x0036) plen 25  #50 [hci0] 0.100003
+-          Handle: 0x01
+-          Properties: 0x0000
+-          Min advertising interval: 160.000 msec (0x0100)
+-          Max advertising interval: 160.000 msec (0x0100)
+-          Channel map: 37, 38, 39 (0x07)
+-          Own address type: Random (0x01)
+-          Peer address type: Public (0x00)
+-          PHY: LE 1M, LE 2M
+-          SID: 0x01
+-          TX power: 7 dBm
+-
+-    < HCI Command: LE Set Extended Adv Data (0x08|0x0037) plen 35  #52 [hci0] 0.101003
+-          Handle: 0x01
+-          Operation: Complete extended advertising data (0x01)
+-          Fragment preference: No fragmentation (0x01)
+-
+-Periodic Advertising (LE Audio)
+---------------------------------
+-
+-LE Audio broadcast sources use periodic advertising to transmit
+-BASE announcements containing codec configuration::
+-
+-    > HCI Event: LE Meta Event (0x3e) plen 80              #200 [hci0] 0.500003
+-          LE Periodic Advertising Report (0x0f)
+-            Sync handle: 0x0001
+-            TX power: 0 dBm
+-            RSSI: -45 dBm
+-            CTE Type: No CTE (0xff)
+-            Data status: Complete (0x00)
+-            Data length: 60
+-            Service Data: Basic Audio Announcement (0x1851)
+-              Presentation Delay: 40000 us
+-              Number of Subgroups: 1
+-                Codec: LC3 (0x06)
+-                  Sampling Frequency: 48000 Hz
+-                  Frame Duration: 10 ms
+-                  Frame Length: 120
+-
+-Automating Advertising Analysis
+----------------------------------
+-
+-**Find all advertising reports** (devices seen)::
+-
+-    grep -n "Advertising Report\|Address:.*RSSI:" output.txt
+-
+-**Extract device names**::
+-
+-    grep -n "Name (complete):\|Name (short):" output.txt
+-
+-**Find LE Audio devices** (by service UUIDs in advertising)::
+-
+-    grep -n "Audio Stream Control\|Published Audio Capabilities\|Common Audio\|Basic Audio Announcement\|Broadcast Audio" output.txt
+-
+-**Track advertising setup** (local device configuring advertising)::
+-
+-    grep -n "Set Extended Adv\|Set Advertising\|Set Scan Response\|Adv Enable" output.txt
+-
+-**Find periodic advertising** (broadcast audio)::
+-
+-    grep -n "Periodic Advertising\|PA Sync\|PA Report\|Basic Audio Announcement\|Broadcast.*Announcement" output.txt
+-
+-**Identify devices by appearance**::
+-
+-    grep -n "Appearance:" output.txt
++.. include:: btmon-advertising.rst
+ 
+ EXAMPLES
+ ========
+-- 
+2.53.0
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-tested configs:
-alpha                             allnoconfig    gcc-15.2.0
-alpha                            allyesconfig    gcc-15.2.0
-alpha                               defconfig    gcc-15.2.0
-arc                              allmodconfig    clang-16
-arc                              allmodconfig    gcc-15.2.0
-arc                               allnoconfig    gcc-15.2.0
-arc                              allyesconfig    clang-23
-arc                                 defconfig    gcc-15.2.0
-arc                   randconfig-001-20260324    gcc-8.5.0
-arc                   randconfig-002-20260324    gcc-8.5.0
-arm                               allnoconfig    clang-23
-arm                               allnoconfig    gcc-15.2.0
-arm                              allyesconfig    clang-16
-arm                              allyesconfig    gcc-15.2.0
-arm                                 defconfig    gcc-15.2.0
-arm                   randconfig-001-20260324    gcc-8.5.0
-arm                   randconfig-002-20260324    gcc-8.5.0
-arm                   randconfig-003-20260324    gcc-8.5.0
-arm                   randconfig-004-20260324    gcc-8.5.0
-arm64                            allmodconfig    clang-23
-arm64                             allnoconfig    gcc-15.2.0
-arm64                               defconfig    gcc-15.2.0
-arm64                 randconfig-001-20260324    gcc-13.4.0
-arm64                 randconfig-002-20260324    gcc-13.4.0
-arm64                 randconfig-002-20260324    gcc-8.5.0
-arm64                 randconfig-003-20260324    clang-23
-arm64                 randconfig-003-20260324    gcc-13.4.0
-arm64                 randconfig-004-20260324    clang-23
-arm64                 randconfig-004-20260324    gcc-13.4.0
-csky                             allmodconfig    gcc-15.2.0
-csky                              allnoconfig    gcc-15.2.0
-csky                                defconfig    gcc-15.2.0
-csky                  randconfig-001-20260324    gcc-13.4.0
-csky                  randconfig-001-20260324    gcc-15.2.0
-csky                  randconfig-002-20260324    gcc-13.4.0
-csky                  randconfig-002-20260324    gcc-15.2.0
-hexagon                          allmodconfig    clang-17
-hexagon                          allmodconfig    gcc-15.2.0
-hexagon                           allnoconfig    clang-23
-hexagon                           allnoconfig    gcc-15.2.0
-hexagon                             defconfig    gcc-15.2.0
-hexagon               randconfig-001-20260324    clang-23
-hexagon               randconfig-001-20260324    gcc-11.5.0
-hexagon               randconfig-002-20260324    clang-23
-hexagon               randconfig-002-20260324    gcc-11.5.0
-i386                             allmodconfig    clang-20
-i386                             allmodconfig    gcc-14
-i386                              allnoconfig    gcc-14
-i386                              allnoconfig    gcc-15.2.0
-i386                             allyesconfig    clang-20
-i386                             allyesconfig    gcc-14
-i386        buildonly-randconfig-001-20260324    gcc-12
-i386        buildonly-randconfig-002-20260324    gcc-12
-i386        buildonly-randconfig-003-20260324    gcc-12
-i386        buildonly-randconfig-004-20260324    gcc-12
-i386        buildonly-randconfig-005-20260324    gcc-12
-i386        buildonly-randconfig-006-20260324    gcc-12
-i386                                defconfig    gcc-15.2.0
-i386                  randconfig-001-20260324    clang-20
-i386                  randconfig-001-20260324    gcc-14
-i386                  randconfig-002-20260324    clang-20
-i386                  randconfig-003-20260324    clang-20
-i386                  randconfig-004-20260324    clang-20
-i386                  randconfig-005-20260324    clang-20
-i386                  randconfig-006-20260324    clang-20
-i386                  randconfig-006-20260324    gcc-14
-i386                  randconfig-007-20260324    clang-20
-i386                  randconfig-007-20260324    gcc-14
-i386                  randconfig-011-20260324    gcc-13
-i386                  randconfig-012-20260324    gcc-13
-i386                  randconfig-013-20260324    gcc-13
-i386                  randconfig-014-20260324    gcc-13
-i386                  randconfig-015-20260324    gcc-13
-i386                  randconfig-016-20260324    gcc-13
-i386                  randconfig-017-20260324    gcc-13
-loongarch                        allmodconfig    clang-23
-loongarch                         allnoconfig    clang-23
-loongarch                         allnoconfig    gcc-15.2.0
-loongarch                           defconfig    clang-19
-loongarch             randconfig-001-20260324    gcc-11.5.0
-loongarch             randconfig-001-20260324    gcc-14.3.0
-loongarch             randconfig-002-20260324    clang-18
-loongarch             randconfig-002-20260324    gcc-11.5.0
-m68k                             allmodconfig    gcc-15.2.0
-m68k                              allnoconfig    gcc-15.2.0
-m68k                             allyesconfig    clang-16
-m68k                             allyesconfig    gcc-15.2.0
-m68k                                defconfig    clang-19
-m68k                        m5407c3_defconfig    gcc-15.2.0
-microblaze                        allnoconfig    gcc-15.2.0
-microblaze                       allyesconfig    gcc-15.2.0
-microblaze                          defconfig    clang-19
-mips                             allmodconfig    gcc-15.2.0
-mips                              allnoconfig    gcc-15.2.0
-mips                             allyesconfig    gcc-15.2.0
-mips                           mtx1_defconfig    clang-23
-nios2                            allmodconfig    clang-23
-nios2                            allmodconfig    gcc-11.5.0
-nios2                             allnoconfig    clang-23
-nios2                             allnoconfig    gcc-11.5.0
-nios2                               defconfig    clang-19
-nios2                 randconfig-001-20260324    gcc-11.5.0
-nios2                 randconfig-002-20260324    gcc-11.5.0
-openrisc                         allmodconfig    clang-23
-openrisc                         allmodconfig    gcc-15.2.0
-openrisc                          allnoconfig    clang-23
-openrisc                          allnoconfig    gcc-15.2.0
-openrisc                            defconfig    gcc-15.2.0
-parisc                           allmodconfig    gcc-15.2.0
-parisc                            allnoconfig    clang-23
-parisc                            allnoconfig    gcc-15.2.0
-parisc                           allyesconfig    clang-19
-parisc                           allyesconfig    gcc-15.2.0
-parisc                              defconfig    gcc-15.2.0
-parisc                randconfig-001-20260324    gcc-8.5.0
-parisc                randconfig-002-20260324    gcc-8.5.0
-parisc64                            defconfig    clang-19
-powerpc                          allmodconfig    gcc-15.2.0
-powerpc                           allnoconfig    clang-23
-powerpc                           allnoconfig    gcc-15.2.0
-powerpc               randconfig-001-20260324    gcc-8.5.0
-powerpc               randconfig-002-20260324    gcc-8.5.0
-powerpc                  storcenter_defconfig    gcc-15.2.0
-powerpc64             randconfig-001-20260324    gcc-8.5.0
-powerpc64             randconfig-002-20260324    gcc-8.5.0
-riscv                            allmodconfig    clang-23
-riscv                             allnoconfig    clang-23
-riscv                             allnoconfig    gcc-15.2.0
-riscv                            allyesconfig    clang-16
-riscv                               defconfig    gcc-15.2.0
-riscv                 randconfig-001-20260324    clang-23
-riscv                 randconfig-002-20260324    clang-23
-s390                             allmodconfig    clang-18
-s390                             allmodconfig    clang-19
-s390                              allnoconfig    clang-23
-s390                             allyesconfig    gcc-15.2.0
-s390                                defconfig    gcc-15.2.0
-s390                  randconfig-001-20260324    clang-23
-s390                  randconfig-002-20260324    clang-23
-sh                               allmodconfig    gcc-15.2.0
-sh                                allnoconfig    clang-23
-sh                                allnoconfig    gcc-15.2.0
-sh                               allyesconfig    clang-19
-sh                               allyesconfig    gcc-15.2.0
-sh                                  defconfig    gcc-14
-sh                                  defconfig    gcc-15.2.0
-sh                    randconfig-001-20260324    clang-23
-sh                    randconfig-002-20260324    clang-23
-sparc                             allnoconfig    clang-23
-sparc                             allnoconfig    gcc-15.2.0
-sparc                               defconfig    gcc-15.2.0
-sparc                 randconfig-001-20260324    gcc-14
-sparc                 randconfig-001-20260324    gcc-15.2.0
-sparc                 randconfig-002-20260324    gcc-14
-sparc                 randconfig-002-20260324    gcc-15.2.0
-sparc64                          allmodconfig    clang-23
-sparc64                             defconfig    clang-20
-sparc64                             defconfig    gcc-14
-sparc64               randconfig-001-20260324    clang-23
-sparc64               randconfig-001-20260324    gcc-14
-sparc64               randconfig-002-20260324    clang-20
-sparc64               randconfig-002-20260324    gcc-14
-um                               allmodconfig    clang-19
-um                                allnoconfig    clang-23
-um                               allyesconfig    gcc-14
-um                               allyesconfig    gcc-15.2.0
-um                                  defconfig    clang-23
-um                                  defconfig    gcc-14
-um                             i386_defconfig    gcc-14
-um                    randconfig-001-20260324    gcc-14
-um                    randconfig-002-20260324    clang-17
-um                    randconfig-002-20260324    gcc-14
-um                           x86_64_defconfig    clang-23
-um                           x86_64_defconfig    gcc-14
-x86_64                           allmodconfig    clang-20
-x86_64                            allnoconfig    clang-20
-x86_64                            allnoconfig    clang-23
-x86_64                           allyesconfig    clang-20
-x86_64      buildonly-randconfig-001-20260324    gcc-14
-x86_64      buildonly-randconfig-002-20260324    clang-20
-x86_64      buildonly-randconfig-002-20260324    gcc-14
-x86_64      buildonly-randconfig-003-20260324    clang-20
-x86_64      buildonly-randconfig-003-20260324    gcc-14
-x86_64      buildonly-randconfig-004-20260324    gcc-14
-x86_64      buildonly-randconfig-005-20260324    gcc-12
-x86_64      buildonly-randconfig-005-20260324    gcc-14
-x86_64      buildonly-randconfig-006-20260324    clang-20
-x86_64      buildonly-randconfig-006-20260324    gcc-14
-x86_64                              defconfig    gcc-14
-x86_64                                  kexec    clang-20
-x86_64                randconfig-001-20260324    clang-20
-x86_64                randconfig-002-20260324    clang-20
-x86_64                randconfig-003-20260324    clang-20
-x86_64                randconfig-004-20260324    clang-20
-x86_64                randconfig-005-20260324    clang-20
-x86_64                randconfig-006-20260324    clang-20
-x86_64                randconfig-011-20260324    gcc-14
-x86_64                randconfig-012-20260324    gcc-14
-x86_64                randconfig-013-20260324    gcc-14
-x86_64                randconfig-014-20260324    gcc-14
-x86_64                randconfig-015-20260324    gcc-14
-x86_64                randconfig-016-20260324    gcc-14
-x86_64                randconfig-071-20260324    gcc-12
-x86_64                randconfig-072-20260324    gcc-12
-x86_64                randconfig-073-20260324    gcc-12
-x86_64                randconfig-074-20260324    gcc-12
-x86_64                randconfig-075-20260324    gcc-12
-x86_64                randconfig-076-20260324    gcc-12
-x86_64                               rhel-9.4    clang-20
-x86_64                           rhel-9.4-bpf    gcc-14
-x86_64                          rhel-9.4-func    clang-20
-x86_64                    rhel-9.4-kselftests    clang-20
-x86_64                         rhel-9.4-kunit    gcc-14
-x86_64                           rhel-9.4-ltp    gcc-14
-x86_64                          rhel-9.4-rust    clang-20
-xtensa                            allnoconfig    clang-23
-xtensa                            allnoconfig    gcc-15.2.0
-xtensa                           allyesconfig    clang-23
-xtensa                randconfig-001-20260324    gcc-14
-xtensa                randconfig-001-20260324    gcc-8.5.0
-xtensa                randconfig-002-20260324    gcc-14
-xtensa                randconfig-002-20260324    gcc-14.3.0
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
