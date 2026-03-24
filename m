@@ -1,64 +1,45 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D9114F9FB;
-	Tue, 24 Mar 2026 02:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB21E386C35;
+	Tue, 24 Mar 2026 02:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774319430; cv=none; b=sFdsd45ktzacHkCJCvXlEiu1H9O4q0/7+sRup9yAT8u8i2zXAGgGfwY446+oHvJA7qER8XKp7OI1MZMFoSW1AkLkvOiuE7Xr2fVtSQbzpnyaOUqd0zbPw7z7K/UO3r110jcfFxR4xi8YkoI0LiExi/VW9+Wdw8ancLmmkKe3iTs=
+	t=1774319735; cv=none; b=CEgZJFCuWhUInSN5HxGejEy3GRTA8LZmjJSI67esXS2DobqhujuEClyPSqdpzYiqJSPD8jQArzwXwooAm4Kw1MsgzyJmZKD1KTn3J43H/itO9yEPmndcxT0znfohXV54MLTc/0rI/CRbT7sJ9acuTkcHbwhP13q4R4zUbUHMVN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774319430; c=relaxed/simple;
-	bh=IIYuxEPx3zyTAp/M4ZwjGghMDdGK+bSQSfVkIBTV7SE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nKCM4vgbLdgMsH00EWF7kO1QAFScfC0qpQqia4iwuQtmzGwPfQczOpHJeym9wzN7peOf498WTb84kybGxB5uFQyqVbSiOBaBvUZapu+UGU3FqCwBYZEsLHOPUfB2rkIcHBAoSSs02Elos+IpEHVy79mRhQGT4MaJZxvjqoViztk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=FisRoSoc; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1774319735; c=relaxed/simple;
+	bh=d6UOTi2oJTOJsf8nOARM+VEycJjKk6B2ZgEYG+R0ACE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i/ActY+CnekexRrvAZgvjrCyAXtBsppbqARLnW5eMVn+jT2ROkqbU450KD0++E33R6ddYEJSBu4ioLROgfXy/S95TgwUKV9QY5K//CPzrX/Fcosos29hzIfDspPsy+o13bmHx79rRGE6OnkmSeboTCaB0jAWO4KtkytCkLHaF4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=UUT0PtpM; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="FisRoSoc"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62NHqYkW3170681;
-	Tue, 24 Mar 2026 02:30:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=o+0LCs9dOQ4rMG2qFls3tT2O/bZZDDzcE4P
-	wntoxJB0=; b=FisRoSocWbfYAj+mvl5RSOCyxggTXeYQjyFeX2IdXmSNx8k7xnw
-	y++9TX3aJODpqf5ZlssrLv4dfJrL5By+k76N0bMc411dha/GQwX8EdXwZPuDzhFt
-	o6uT4ink1Fg8hRi7QLWn/mFhkThwgOJJ9wNsQDMPQ4tJ5rC45n25bzhRtQ87Ub2J
-	dqxfQJt25vHO0VBw/0jNANfy6Rk0N6zexG9VaocJ4QE6avgSTDMzbQfO8XAERY+l
-	/yfxENbWYv9alaswyVL/ICACRdh4Gd6pFy83mZ1uDoLOm4VM09Jz+Orp/SVkbGy4
-	SXqTlRO/+XrG/5daW8W7jQu2x6OjyAA3Ufw==
-Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4d35r22m8y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Mar 2026 02:30:22 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 62O2UJHF002515;
-	Tue, 24 Mar 2026 02:30:19 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 4d1mdm9hgg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Mar 2026 02:30:19 +0000
-Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 62O2UJ9A002509;
-	Tue, 24 Mar 2026 02:30:19 GMT
-Received: from shuaz-gv.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 62O2UI9U002507
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Mar 2026 02:30:19 +0000
-Received: by shuaz-gv.ap.qualcomm.com (Postfix, from userid 4467449)
-	id C18E35E8; Tue, 24 Mar 2026 10:30:17 +0800 (CST)
-From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-To: Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
-        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
-        jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com,
-        shuai.zhang@oss.qualcomm.com
-Subject: [PATCH v3] Bluetooth: hci_qca: disable power control for WCN7850 when bt_en is not defined
-Date: Tue, 24 Mar 2026 10:30:16 +0800
-Message-Id: <20260324023016.3889062-1-shuai.zhang@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="UUT0PtpM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=he
+	olnZZ/TAm2Z544mhYf3kljQ8hQo1beKRZUx0uD+PY=; b=UUT0PtpM+sAIwPxzv9
+	BhCf2G9vDubGuRoEHZUVQwfFYgUS3U6idS4rhRV15lTDmreGDAH1jTXkebRl55Kz
+	PRJ16MLIE1dGSW/T/SsyzF3BNs3nDFwsdO5/ALMWmsr0PPZLxcm9B1mEO4SliLkd
+	EfMJedZ4dupE96BQQVfcgTLMw=
+Received: from pek-lpg-core5.wrs.com (unknown [])
+	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wD31+4a+MFpBisSBA--.24406S2;
+	Tue, 24 Mar 2026 10:34:04 +0800 (CST)
+From: Robert Garcia <rob_garcia@163.com>
+To: stable@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Robert Garcia <rob_garcia@163.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 6.1.y] Bluetooth: eir: Fix possible crashes on eir_create_adv_data
+Date: Tue, 24 Mar 2026 10:34:02 +0800
+Message-Id: <20260324023402.2607704-1-rob_garcia@163.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -67,69 +48,100 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=VvUuwu2n c=1 sm=1 tr=0 ts=69c1f73e cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=3WHJM1ZQz_JShphwDgj5:22 a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8
- a=98nF6S5uk-b2QhZ6SZYA:9
-X-Proofpoint-GUID: oXlFQ0FRFJVdMSCHShRqkHgqpAFr7lp-
-X-Proofpoint-ORIG-GUID: oXlFQ0FRFJVdMSCHShRqkHgqpAFr7lp-
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzI0MDAxOSBTYWx0ZWRfXwPqdJzNd/Yvd
- bwlEitbPScFgMvMiWyFaxlupotktzkuiA5AD44cWpdYW2/rb13pnBDjhZnfaWAVeiJAmcIAM6h5
- 3ZojF4Jk1ybwaHqqHQKtr67GQvJ+2N7rQeO69I2KH3Fcqte766rwRDDpjG0HUaCTdm2Jj+mFz9P
- T92wqftwpKU0UtY+55dWzssZ44UItQNnlIN9b7oMNj7rqNBHTTMPWjbSeKOo25xnKlWw9HmbQ2+
- EN+NCAqr5ptrfLKCqbBeYarAS13MXaseC7TJ+L7nXDg/Tfk2/tHSUMX3m63YAW/1EXipQLnJAAQ
- NH5dTmzHBXdgxEgA4How/nqAKgKM1GKz8jYcLOn4ehmvBixw6iTY0YU33MnvOcyC9GqB4PnvxBd
- bSu6dhyHqL1W1GDngV+/E+nt2q/PghaKgDpOkxMGCXRTkpOq7uIlh7wJKEewJgVnTC7vBPEAtXo
- EWSnIV/K0KtrutWYIjQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-23_07,2026-03-23_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 malwarescore=0 spamscore=0 adultscore=0 lowpriorityscore=0
- impostorscore=0 bulkscore=0 clxscore=1015 priorityscore=1501 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603240019
+X-CM-TRANSID:_____wD31+4a+MFpBisSBA--.24406S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxWw18ur1rAF43XF45Jry7Wrg_yoW5uF4rpF
+	Z8KF15ZrZ7Jw1UJrsFyay8Aa13Jr4UWry29rWDZFySqrn0vrZ7t34IkFySqF1ayFWqkF47
+	Z3W0qrW5urWqkw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piwID7UUUUU=
+X-CM-SenderInfo: 5uresw5dufxti6rwjhhfrp/xtbC5RwQe2nB+BzAhAAA3a
 
-On platforms using an M.2 slot with both UART and USB support, bt_en is
-pulled high by hardware. In this case, software-based power control
-should be disabled. The current platforms are Lemans-EVK and Monaco-EVK.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add QCA_WCN7850 to the existing condition so that power_ctrl_enabled is
-cleared when bt_en is not software-controlled (or absent), aligning its
-behavior with WCN6750 and WCN6855
+[ Upstream commit 47c03902269aff377f959dc3fd94a9733aa31d6e ]
 
-Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+eir_create_adv_data may attempt to add EIR_FLAGS and EIR_TX_POWER
+without checking if that would fit.
+
+Link: https://github.com/bluez/bluez/issues/1117#issuecomment-2958244066
+Fixes: 01ce70b0a274 ("Bluetooth: eir: Move EIR/Adv Data functions to its own file")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+[ Use pdu.data instead of pdu->data in hci_set_ext_adv_data_sync()
+ to keep context consistency. ]
+Signed-off-by: Robert Garcia <rob_garcia@163.com>
 ---
-Changes for v3
-- Add change history.
-- Link to v2: https://lore.kernel.org/all/20260319075125.76539-1-shuai.zhang@oss.qualcomm.com/
+ net/bluetooth/eir.c      | 7 ++++---
+ net/bluetooth/eir.h      | 2 +-
+ net/bluetooth/hci_sync.c | 5 +++--
+ 3 files changed, 8 insertions(+), 6 deletions(-)
 
-Changes for v2
-- Expand the commit description to include the affected platforms.
-- Link to v1: https://lore.kernel.org/all/20260319031040.4096297-1-shuai.zhang@oss.qualcomm.com/
----
- drivers/bluetooth/hci_qca.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index c17a462aef55..4512ff7cd0c0 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -2484,7 +2484,8 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
+index 3e1713673ecc..3f72111ba651 100644
+--- a/net/bluetooth/eir.c
++++ b/net/bluetooth/eir.c
+@@ -242,7 +242,7 @@ u8 eir_create_per_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ 	return ad_len;
+ }
  
- 		if (!qcadev->bt_en &&
- 		    (data->soc_type == QCA_WCN6750 ||
--		     data->soc_type == QCA_WCN6855))
-+		     data->soc_type == QCA_WCN6855 ||
-+		     data->soc_type == QCA_WCN7850))
- 			power_ctrl_enabled = false;
+-u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
++u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr, u8 size)
+ {
+ 	struct adv_info *adv = NULL;
+ 	u8 ad_len = 0, flags = 0;
+@@ -286,7 +286,7 @@ u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ 		/* If flags would still be empty, then there is no need to
+ 		 * include the "Flags" AD field".
+ 		 */
+-		if (flags) {
++		if (flags && (ad_len + eir_precalc_len(1) <= size)) {
+ 			ptr[0] = 0x02;
+ 			ptr[1] = EIR_FLAGS;
+ 			ptr[2] = flags;
+@@ -316,7 +316,8 @@ u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ 		}
  
- 		qcadev->sw_ctrl = devm_gpiod_get_optional(&serdev->dev, "swctrl",
+ 		/* Provide Tx Power only if we can provide a valid value for it */
+-		if (adv_tx_power != HCI_TX_POWER_INVALID) {
++		if (adv_tx_power != HCI_TX_POWER_INVALID &&
++		    (ad_len + eir_precalc_len(1) <= size)) {
+ 			ptr[0] = 0x02;
+ 			ptr[1] = EIR_TX_POWER;
+ 			ptr[2] = (u8)adv_tx_power;
+diff --git a/net/bluetooth/eir.h b/net/bluetooth/eir.h
+index 0df19f2f4af9..4497f8fd5fef 100644
+--- a/net/bluetooth/eir.h
++++ b/net/bluetooth/eir.h
+@@ -9,7 +9,7 @@
+ 
+ void eir_create(struct hci_dev *hdev, u8 *data);
+ 
+-u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr);
++u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr, u8 size);
+ u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr);
+ u8 eir_create_per_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr);
+ 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 5ad09900f8ff..58003f2f6f36 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1248,7 +1248,8 @@ static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
+ 			return 0;
+ 	}
+ 
+-	len = eir_create_adv_data(hdev, instance, pdu.data);
++	len = eir_create_adv_data(hdev, instance, pdu.data,
++				  HCI_MAX_EXT_AD_LENGTH);
+ 
+ 	pdu.cp.length = len;
+ 	pdu.cp.handle = instance;
+@@ -1279,7 +1280,7 @@ static int hci_set_adv_data_sync(struct hci_dev *hdev, u8 instance)
+ 
+ 	memset(&cp, 0, sizeof(cp));
+ 
+-	len = eir_create_adv_data(hdev, instance, cp.data);
++	len = eir_create_adv_data(hdev, instance, cp.data, sizeof(cp.data));
+ 
+ 	/* There's nothing to do if the data hasn't changed */
+ 	if (hdev->adv_data_len == len &&
 -- 
 2.34.1
 
