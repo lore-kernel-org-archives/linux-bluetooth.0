@@ -1,73 +1,73 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2F1317143
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Mar 2026 21:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A71833B0AFE
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Mar 2026 22:01:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774386037; cv=pass; b=VaxsuQWxeSiYqcd3g9/P+MNrcv5uDvuP+b7vWtDEcOx2rZGq742jvENh3aTYsajo3atB8aINQEQD7GrIm5cQwl3NIzOnk5fgSrTW+5LBkudiuXdO1h33OoAsGPxyORI6212IHndAEBDvDiys0hg7zPL7juuXo1y8z5CD/Q6zoCE=
+	t=1774389702; cv=pass; b=mVweFhGRlSoWp9xLA1Z+vlr64EO5vXYHEtpZsfx7tO6t4jhdbcZsRgpb7E0p7hgWnj1rgtm+BM2MTaMbk8XQz5QWd0wtgH37hSM+kd3xXluI3CfD3gkIiZBq56eGXAPzhAZTSamt1nJ//mPCPhtSrODdLqqtIVXnflWVQlc8ZGo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774386037; c=relaxed/simple;
-	bh=jfw7kmK0RNNByqSOe1UR8fp7ajsy6tOe8ReQjIwIiWU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=F9+9AT4xknnrtVRHKRnT95D1dUt940evKVAxuF4MjWIJxng5YjkCQegYS8HRzW409m+PC1U/IQZ7RVnStXXS0k6a+SvI18RKHmk9YdcDgKIbftJ5SuAX2VfP8GATkGPa7f+zmKfsY1BxYm6Vb0e2t3u/Id6Qso/zBIRCK574Hv4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=VuoHg9Tw; arc=pass smtp.client-ip=185.185.170.37
+	s=arc-20240116; t=1774389702; c=relaxed/simple;
+	bh=o8lTw2ItO5L/qFbtcXcpqFdd/Z8bInRtvMGoRVJsu7E=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=AvuDdTHhMke8DGsg9BfdEQIXuYS+oP59nOETLsvjAFWt94YzE14UN5igHrAKPtUhkkhhglaO+QY6ZTDTAtYE264N6Uji5YrFMjb14TyeLSmIVZ8wDlRublo8qP3zFaP+r+RbsufHP1JjZTT1GeqM5WGREcrxKXVTGWWzCT/3z5M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=KrFxdKJn; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="VuoHg9Tw"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="KrFxdKJn"
 Received: from [192.168.1.195] (unknown [IPv6:2a02:6ea0:1508:6::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4fgMr54BVYz49Q5g;
-	Tue, 24 Mar 2026 23:00:21 +0200 (EET)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4fgPBn0hK9z49Q5g
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2026 00:01:36 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1774386022;
+	t=1774389697;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=478J/X0+DrvTZUtXeGoaRcFWXFNEXy3aQOa4DhG/LEM=;
-	b=VuoHg9TweMREfeMiG6Kz1wBIzx3ZXKYhkI0Cgqn4NHa8k4jwvVtQ0IZL8qpvPL31tRPvQW
-	bmt5I//1LNun89GQs1npVdcm8jRbiaqBxPhIoCtJ5KtDv3/7n7oEtP1kMUGYQAWW7vV+z/
-	2tfNuxRBXBro1EvtEWNQcNfvtX5HEHx+ESHEtaLExybECemsboaKmYxh8lSbSHSXimFwHa
-	0WQfSUWZTajHyzL1FuAOSa27XGQTBfmBzwcqonpkFP8HrsURax9/rrsUKgKkqfLNge6yVw
-	uqBtBS9cWl89SASoXXV9N9lq4BLxPAqwJitjyG6dAv/wHWOkUOnxdRzXOVfIoQ==
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1774386022;
-	b=Qv0/mDFH3AUgrTyFzv8PLaqGz2fOP5snG7MV4Ly4nnXRfcqZuZ+yD8ELuSaB68YAXkpGN1
-	63H3K0cdqySJBvpOeE4tTjxDMD0er0nKWtzoHHWkhQ1JpoglJeu9OpP49Yjb3QuPwbT5Am
-	Avbwj/Qn1l1Zy1+9pOoBoZM8Luab4OTWKHzBWAb2JDxC3nyr7Vzx5PgtBU80sgnhINF4BK
-	q/1oR5TXDInpvFeh3OW9X2jgOoyzPOvgazDTWSlQNl7RJqEsEJJij4Q73u6O6ka2J9EzXO
-	Rm0iS2S+xVZ68aTlZ50Zt+cDTL6SXJFCQ2Br9jbwzmou/AThYAxiSjhR+PkcGA==
+	bh=o8lTw2ItO5L/qFbtcXcpqFdd/Z8bInRtvMGoRVJsu7E=;
+	b=KrFxdKJnhgEPtJkzWlhhkHL9kN413eVviADI5r+IlOZNzRjuVrxVfeimicqvQ3hLu1NhCQ
+	hqIJIdpIJ12sUM+8qvN3uZT6PTDyqAftcw8pxLnHxvHR1Xl8eLRpN91N1ES2Kgb6sSxMkL
+	JOIpv46RucucDkOyqkehwakysuTGOdI5t8mQNuEtw2+d7uxQoi6hMhfzOHLrH/uP+aLNcC
+	D2A36/WJS6nOXWhkDqboSEs7lc0lLlhx+LpOb+uEj87uKf9sC0BzAjre3RPSgDXYbNJwPN
+	nY3At957vCL/z/opOMDlCakTJtKZnbGndAYZ5ACzBSRYaJaIP6hTEAWGd5Z93A==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1774389697;
+	b=ReJ/Ot6T3aJeAjEtXA9ar7fBDdmrZZUsuxblA4L7BwRCrsMyq2l6xOhmH4SOFpX5CekMB1
+	QyjM2I6qlhoaWJwqIGfOHmvxcC+srYOG9I2qh+AmTiudluL/K8iUpajfVq/yZXb7d/vFN7
+	/D9pkCQoayVMLXVJXfzikJdWld1ddErxTTzTX0YhmNYkRzb21Esi1vlxCHFlaUEDN8rdad
+	IqsxBCx6xDt/hBWnffyGtkTLgsQdR9IMUlvF/IKBQttkDEqQ+bcH0PJLmqevW7w/ZDdw2k
+	VaX+O/fI3XN4bKsoZkeWsFOjDsTaCKpNxS+rfx+HOXhlhksC1shyOsLKXSMVUA==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pauli.virtanen@iki.fi
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1774386022;
+	s=lahtoruutu; t=1774389697;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=478J/X0+DrvTZUtXeGoaRcFWXFNEXy3aQOa4DhG/LEM=;
-	b=CTCTXE5W4Fg7I1RfEALCuqq91XTGN7e268RXHeUOGXdlP2+eZwwAQuveY907/fhzFXCsMj
-	3Wk0Xw5Cz4LJuZjvnM+ZKRHiSUi4aXqSYyPV8eCuosCuZdd3DcbvdXoyJotYGI2JsgjsO1
-	F7xY+bDNzv1X7dXa9NRrzLpk7GEzwiGnMyYArW8AaC6lJHYVPdANaHH28V59jIa21IXwjM
-	0yQrWpMrtkHSJcbi8vRkA6fhJ6ZIPXkM+X86jkBsDyhQekFeD2Zbo7Q+9i+WLrcGIb+QAX
-	kh30+oRYwoIHPafZDidm6DFTwydYvy8ZnWw5Ov1G/lnw4QrBWBLBjglXM6NBIg==
-Message-ID: <c465caa2c8771fc233f832415b5d1d6e5f155fee.camel@iki.fi>
-Subject: Re: [PATCH BlueZ v3 09/20] test-runner: use virtio-serial for
- implementing -u device forwarding
-From: Pauli Virtanen <pauli.virtanen@iki.fi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 24 Mar 2026 23:00:16 +0200
-In-Reply-To: <CABBYNZK+y9Ar3m563pqFhaoU0TfHfOMhJtvyT_ZhamnA-K41dw@mail.gmail.com>
-References: <cover.1774214693.git.pav@iki.fi>
-	 <34a731c7f20b905dc4b60e66a8c31e5bf3284017.1774214693.git.pav@iki.fi>
-	 <CABBYNZK+y9Ar3m563pqFhaoU0TfHfOMhJtvyT_ZhamnA-K41dw@mail.gmail.com>
-Autocrypt: addr=pauli.virtanen@iki.fi; prefer-encrypt=mutual;
+	bh=o8lTw2ItO5L/qFbtcXcpqFdd/Z8bInRtvMGoRVJsu7E=;
+	b=aGDOEbZf4rvkp0LsxQ3MhQwfIxERDPN/LCUYFhlpcK1C92qYyOt/zJdjEn7vQsN0sWQNFJ
+	SIBkM/0+qqooXlM+YJnXpdhbjNUBbsoCNwUZdz7k8ER9DY0peBBd6x3wjlv5AhuBqrHMVO
+	oWgO1tpiPWPIhPvjMjI+ijiwtqr4rvy8HfQk4JQsD1T/ZPlYNsXqk2jHOwtcuass4ZHu0x
+	AkwYfHQadBrEfzTryPsk9rG2IU/afY4l9/gyfo3DNRuS2Zrw5LAZYq6vAyQvhDiYofHyYt
+	02IRkEI2x8q0Gh10W1LA0ApISMbV1UMs3wTVMh4Ise50TlVKgr3TSoByLiWlJw==
+Message-ID: <ba772bc3777d19c5db441c3bacaea2b78112cdda.camel@iki.fi>
+Subject: Re: [RFC PATCH 2/2] Bluetooth: produce HW TX timestamps for ISO
+ from LE Read ISO TX Sync
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Date: Wed, 25 Mar 2026 00:01:35 +0200
+In-Reply-To: <a44bc1d9fc69341e59df05f4988844f64a2bcdef.camel@iki.fi>
+References: <cover.1773245666.git.pav@iki.fi>
+		 <1a4411e9ac1d6b5daa53aac78ca495c2db1b18a4.1773245666.git.pav@iki.fi>
+		 <CABBYNZJ8wEaZi3cGB3Dogo5xtHV8brY76J7tRdNpLozaVn36LA@mail.gmail.com>
+	 <a44bc1d9fc69341e59df05f4988844f64a2bcdef.camel@iki.fi>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
  keydata=mQINBGX+qmEBEACt7O4iYRbX80B2OV+LbX06Mj1Wd67SVWwq2sAlI+6fK1YWbFu5jOWFy
  ShFCRGmwyzNvkVpK7cu/XOOhwt2URcy6DY3zhmd5gChz/t/NDHGBTezCh8rSO9DsIl1w9nNEbghUl
  cYmEvIhQjHH3vv2HCOKxSZES/6NXkskByXtkPVP8prHPNl1FHIO0JVVL7/psmWFP/eeB66eAcwIgd
@@ -110,534 +110,186 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-ti, 2026-03-24 kello 16:24 -0400, Luiz Augusto von Dentz kirjoitti:
-> Hi Pauli,
+ke, 2026-03-11 kello 23:19 +0200, Pauli Virtanen kirjoitti:
+> Hi Luiz,
+[clip]
+> > Interesting analysis. I thought the sequence number for NOCP must
+> > match the sequence number set by the host when sending the packet,
+> > and
+> > its sole purpose was to be able to fetch the hardware time. Did you
+> > observe something different? If the sequence number had to
+> > synchronize
+> > with a clock, the host would need to generate empty packets even when
+> > there is nothing to transmit. This would consume power and memory
+> > solely to keep the sequence number in sync with the clock. I don't
+> > actually understand why NOCP was even used with ISO if the intention
+> > was to use sequence numbers like above, at very least NOCP should
+> > have
+> > been updated to carry the hardware clock and other timing information
+> > directly rather than using another command that consumes even more
+> > system power and memory.
 >=20
-> On Sun, Mar 22, 2026 at 5:30=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote=
-:
-> >=20
-> > Using pci-serial to forward eg. btvirt sockets is unreliable, as qemu o=
-r
-> > kernel seems to be sometimes dropping part of the sent data or insert
-> > spurious \0 bytes, leading to sporadic errors like:
-> >=20
-> >     kernel: Bluetooth: hci0: command 0x0c52 tx timeout
-> >     kernel: Bluetooth: hci0: Opcode 0x0c52 failed: -110
-> >     btvirt: packet error, unknown type: 0
-> >=20
-> > This appears to occur most often when host system is under load, e.g.
-> > due to multiple test-runners running at the same time.  The problem is
-> > not specific to btvirt, but seems to be in the qemu serial device layer
-> > vs. kernel interaction.
-> >=20
-> > Change test-runner to use virtserialport to forward the btvirt
-> > connection inside the VM, as virtio-serial doesn't appear to have these
-> > problems.
-> >=20
-> > Since it's not a TTY device, we have to do vport <-> tty-with-hci-ldisc
-> > forwarding of the data in test-runner, so this becomes a bit more
-> > involved.
+> There's no relationship to NOCP specified in Core Spec, it's pretty
+> vague. However, I don't see any other way for host to get clock sync
+> for TX than via NOCP (at least for <1 packet accuracy).
 >=20
-> Lets try to sort this out first before we go into the functional
-> framework. Does the vport not working as tty perhaps require a kernel
-> driver or something to enable direct operation?
+> It would indeed make most sense that sequence number is what the host
+> sent in the ISO packet, but it is not specified. Core Specification
+> v6.2 Vol 6 Part G Sec 2 also says:
+>=20
+> """
+> SDUs sent to the upper layer by the ISOAL shall be given a sequence
+> number which is initialized to 0 when the CIS or BIS is created. SDUs
+> received by the ISOAL from the upper layer shall be given a sequence
+> number which is initialized to 0 when the CIS or BIS is created. The
+> upper layer may synchronize its sequence number with the sequence
+> number in the ISOAL once the Datapath is configured and the link is
+> established.
+> """
+>=20
+> so one gets the impression controller shall assign new sequence numbers
+> and use those, and host shall "synchronize" to it in some unspecified
+> way.
+>=20
+> I saw some related discussions by the Zephyr people, I think the
+> outcome was along the lines that the spec is so vague that these
+> features are unusable.
+>=20
+> Some clarifications would be useful here, as I don't get what was the
+> way the spec intends that these are used.
+>=20
+> ***
+>=20
+> IIRC, in the controllers I tested (Intel AX210, Realtek 8761CU) the
+> returned timestamp and sequence number are always zero, so they haven't
+> actually implemented the command. I'd have to check what Mediatek
+> MT7925 does, it was at least setting RX timestamps properly.
+>=20
+> In Zephyr IIRC controller-assigned sequence number is used, but I'd
+> have to double check this.
 
-Looks like qemu has different option for the virtio TTY device. We can
-replace this patch with the following -> v4
+Retest:
 
-I'll wait for other comments on the series before continuing.
+MT7925 firmware produces LE Read ISO TX Sync responses with sequence
+numbers from host ISO packets, but timestamp is always 0.
 
+RTL8176CU firmware also produces responses with sequence numbers from
+host ISO packets, but timestamp is always 0.
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index b3e0b0cfe..0e3bfb8b7 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -306,7 +306,7 @@ static void start_qemu(void)
-                                testargs);
-=20
-        argv =3D alloca(sizeof(qemu_argv) +
--                       (sizeof(char *) * (6 + (num_devs * 4))) +
-+                       (sizeof(char *) * (8 + (num_devs * 4))) +
-                        (sizeof(char *) * (usb_dev ? 4 : 0)) +
-                        (sizeof(char *) * num_extra_opts));
-        memcpy(argv, qemu_argv, sizeof(qemu_argv));
-@@ -330,14 +330,19 @@ static void start_qemu(void)
-        argv[pos++] =3D "-append";
-        argv[pos++] =3D (char *) cmdline;
-=20
-+       if (num_devs) {
-+               argv[pos++] =3D "-device";
-+               argv[pos++] =3D "virtio-serial";
-+       }
-+
-        for (i =3D 0; i < num_devs; i++) {
-                char *chrdev, *serdev;
-=20
-                chrdev =3D alloca(48 + strlen(device_path));
-                sprintf(chrdev, "socket,path=3D%s,id=3Dbt%d", device_path,
-i);
-=20
--               serdev =3D alloca(48);
--               sprintf(serdev, "pci-serial,chardev=3Dbt%d", i);
-+               serdev =3D alloca(64);
-+               sprintf(serdev, "virtconsole,chardev=3Dbt%d,name=3Dbt.%d",
-i, i);
-=20
-                argv[pos++] =3D "-chardev";
-                argv[pos++] =3D chrdev;
-@@ -910,7 +915,7 @@ static void run_command(char *cmdname, char *home)
-        }
-=20
-        if (num_devs) {
--               const char *node =3D "/dev/ttyS1";
-+               const char *node =3D "/dev/hvc0";
-                unsigned int basic_flags, extra_flags;
-=20
-                printf("Attaching BR/EDR controller to %s\n", node);
+Intel AX210 produces responses with both sequence number and timestamp
+0.
+
+Zephyr produces responses with controller's own sequence numbering,
+host ISO packet seqnum is only used for determining skipped packets.
+Provides timestamps.
 
 
->=20
-> > ---
-> >  Makefile.tools      |   2 +
-> >  configure.ac        |   9 ++
-> >  tools/test-runner.c | 300 +++++++++++++++++++++++++++++++++-----------
-> >  3 files changed, 241 insertions(+), 70 deletions(-)
+MT/RTL/Intel seem to have same interpretation although none of them
+actually implements the command.
+
+
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Userspace application t=
+hat handle these timestamps must
+> > > then be
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * prepared that the ISO t=
+imestamp is reported on the wrong
+> > > packet
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * depending on controller=
+. Actual packet TX must rely on
+> > > backpressure
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * (monitoring packet comp=
+letion via COMPLETION tstamp),
+> > > and the
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * timestamps are useful o=
+nly for aligning the playback of
+> > > multiple ISO
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * streams.
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+> > > +
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memset(&ssh, 0, sizeof(ssh));
+> > > +
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* SDU Reference =3D BIG/CIG Re=
+ference - Time_Offset */
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ssh.hwtstamp =3D us_to_ktime(__=
+le32_to_cpu(rp->timestamp) -
+> > > offset);
+> > > +
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* The value may be 0, but skb_=
+tstamp_tx() does not allow
+> > > reporting zero
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * HW timestamp. Offset by=
+ 1 ns as a workaround.
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ssh.hwtstamp +=3D 1;
+> > > +
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 skb_tstamp_tx(conn->tx_q.iso_la=
+st_tx, &ssh);
+> > > +
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kfree_skb(conn->tx_q.iso_last_t=
+x);
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conn->tx_q.iso_last_tx =3D NULL=
+;
+> > > +
+> > > +unlock:
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hci_dev_unlock(hdev);
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return rp->status;
+> > > +}
+> > > +
+> > > =C2=A0static u8 hci_cc_le_read_buffer_size_v2(struct hci_dev *hdev, v=
+oid
+> > > *data,
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 struct sk_buff *skb)
+> > > =C2=A0{
+> > > @@ -4224,6 +4299,8 @@ static const struct hci_cc {
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HCI_CC(HCI_OP_LE_READ_TRAN=
+SMIT_POWER,
+> > > hci_cc_le_read_transmit_power,
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 sizeof(struct hci_rp_le_read_transmit_power)),
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HCI_CC_STATUS(HCI_OP_LE_SE=
+T_PRIVACY_MODE,
+> > > hci_cc_le_set_privacy_mode),
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HCI_CC(HCI_OP_LE_READ_ISO_TX_SY=
+NC,
+> > > hci_cc_le_read_iso_tx_sync,
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 sizeof(struct hci_rp_le_read_iso_tx_sync)),
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HCI_CC(HCI_OP_LE_READ_BUFF=
+ER_SIZE_V2,
+> > > hci_cc_le_read_buffer_size_v2,
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 sizeof(struct hci_rp_le_read_buffer_size_v2)),
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HCI_CC_VL(HCI_OP_LE_SET_CI=
+G_PARAMS,
+> > > hci_cc_le_set_cig_params,
+> > > @@ -4509,7 +4586,7 @@ static void hci_num_comp_pkts_evt(struct
+> > > hci_dev *hdev, void *data,
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 }
+> > >=20
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < count; ++i)
+> > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hci_conn=
+_tx_dequeue(conn);
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hci_conn=
+_tx_dequeue(conn, (i =3D=3D count -
+> > > 1));
+> > >=20
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 switch (conn->type) {
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 case ACL_LINK:
+> > > --
+> > > 2.53.0
+> > >=20
+> > >=20
 > >=20
-> > diff --git a/Makefile.tools b/Makefile.tools
-> > index f6de2e685..6e30a535f 100644
-> > --- a/Makefile.tools
-> > +++ b/Makefile.tools
-> > @@ -321,6 +321,8 @@ tools_btgatt_server_SOURCES =3D tools/btgatt-server=
-.c src/uuid-helper.c
-> >  tools_btgatt_server_LDADD =3D src/libshared-mainloop.la \
-> >                                                 lib/libbluetooth-intern=
-al.la
-> >=20
-> > +tools_test_runner_LDADD =3D $(OPENPTY_LIBS)
-> > +
-> >  tools_rctest_LDADD =3D lib/libbluetooth-internal.la
-> >=20
-> >  tools_l2test_LDADD =3D lib/libbluetooth-internal.la
-> > diff --git a/configure.ac b/configure.ac
-> > index 52de7d665..3bc1f5c44 100644
-> > --- a/configure.ac
-> > +++ b/configure.ac
-> > @@ -251,6 +251,15 @@ AC_ARG_ENABLE(tools, AS_HELP_STRING([--disable-too=
-ls],
-> >                 [disable Bluetooth tools]), [enable_tools=3D${enableval=
-}])
-> >  AM_CONDITIONAL(TOOLS, test "${enable_tools}" !=3D "no")
-> >=20
-> > +openpty_libs=3D
-> > +if (test "${enable_tools}" !=3D "no"); then
-> > +       AC_CHECK_FUNCS([openpty], [openpty_libs=3D],
-> > +         [AC_CHECK_LIB([util], [openpty], [openpty_libs=3D-lutil],
-> > +           [AC_CHECK_LIB([bsd], [openpty], [openpty_libs=3D-lbsd],
-> > +                [AC_MSG_ERROR([openpty not found])])])])
-> > +fi
-> > +AC_SUBST(OPENPTY_LIBS, [${openpty_libs}])
-> > +
-> >  AC_ARG_ENABLE(monitor, AS_HELP_STRING([--disable-monitor],
-> >                 [disable Bluetooth monitor]), [enable_monitor=3D${enabl=
-eval}])
-> >  AM_CONDITIONAL(MONITOR, test "${enable_monitor}" !=3D "no")
-> > diff --git a/tools/test-runner.c b/tools/test-runner.c
-> > index b3e0b0cfe..576313b79 100644
-> > --- a/tools/test-runner.c
-> > +++ b/tools/test-runner.c
-> > @@ -24,6 +24,9 @@
-> >  #include <getopt.h>
-> >  #include <poll.h>
-> >  #include <limits.h>
-> > +#include <dirent.h>
-> > +#include <pty.h>
-> > +#include <stdint.h>
-> >  #include <sys/wait.h>
-> >  #include <sys/stat.h>
-> >  #include <sys/types.h>
-> > @@ -306,7 +309,7 @@ static void start_qemu(void)
-> >                                 testargs);
-> >=20
-> >         argv =3D alloca(sizeof(qemu_argv) +
-> > -                       (sizeof(char *) * (6 + (num_devs * 4))) +
-> > +                       (sizeof(char *) * (8 + (num_devs * 4))) +
-> >                         (sizeof(char *) * (usb_dev ? 4 : 0)) +
-> >                         (sizeof(char *) * num_extra_opts));
-> >         memcpy(argv, qemu_argv, sizeof(qemu_argv));
-> > @@ -330,14 +333,17 @@ static void start_qemu(void)
-> >         argv[pos++] =3D "-append";
-> >         argv[pos++] =3D (char *) cmdline;
-> >=20
-> > +       argv[pos++] =3D "-device";
-> > +       argv[pos++] =3D "virtio-serial";
-> > +
-> >         for (i =3D 0; i < num_devs; i++) {
-> >                 char *chrdev, *serdev;
-> >=20
-> >                 chrdev =3D alloca(48 + strlen(device_path));
-> >                 sprintf(chrdev, "socket,path=3D%s,id=3Dbt%d", device_pa=
-th, i);
-> >=20
-> > -               serdev =3D alloca(48);
-> > -               sprintf(serdev, "pci-serial,chardev=3Dbt%d", i);
-> > +               serdev =3D alloca(64);
-> > +               sprintf(serdev, "virtserialport,chardev=3Dbt%d,name=3Db=
-t.%d", i, i);
-> >=20
-> >                 argv[pos++] =3D "-chardev";
-> >                 argv[pos++] =3D chrdev;
-> > @@ -360,65 +366,12 @@ static void start_qemu(void)
-> >         execve(argv[0], argv, qemu_envp);
-> >  }
-> >=20
-> > -static int open_serial(const char *path)
-> > -{
-> > -       struct termios ti;
-> > -       int fd, saved_ldisc, ldisc =3D N_HCI;
-> > -
-> > -       fd =3D open(path, O_RDWR | O_NOCTTY);
-> > -       if (fd < 0) {
-> > -               perror("Failed to open serial port");
-> > -               return -1;
-> > -       }
-> > -
-> > -       if (tcflush(fd, TCIOFLUSH) < 0) {
-> > -               perror("Failed to flush serial port");
-> > -               close(fd);
-> > -               return -1;
-> > -       }
-> > -
-> > -       if (ioctl(fd, TIOCGETD, &saved_ldisc) < 0) {
-> > -               perror("Failed get serial line discipline");
-> > -               close(fd);
-> > -               return -1;
-> > -       }
-> > -
-> > -       /* Switch TTY to raw mode */
-> > -       memset(&ti, 0, sizeof(ti));
-> > -       cfmakeraw(&ti);
-> > -
-> > -       ti.c_cflag |=3D (B115200 | CLOCAL | CREAD);
-> > -
-> > -       /* Set flow control */
-> > -       ti.c_cflag |=3D CRTSCTS;
-> > -
-> > -       if (tcsetattr(fd, TCSANOW, &ti) < 0) {
-> > -               perror("Failed to set serial port settings");
-> > -               close(fd);
-> > -               return -1;
-> > -       }
-> > -
-> > -       if (ioctl(fd, TIOCSETD, &ldisc) < 0) {
-> > -               perror("Failed set serial line discipline");
-> > -               close(fd);
-> > -               return -1;
-> > -       }
-> > -
-> > -       printf("Switched line discipline from %d to %d\n", saved_ldisc,=
- ldisc);
-> > -
-> > -       return fd;
-> > -}
-> > -
-> > -static int attach_proto(const char *path, unsigned int proto,
-> > +static int attach_proto(int fd, unsigned int proto,
-> >                                         unsigned int mandatory_flags,
-> >                                         unsigned int optional_flags)
-> >  {
-> >         unsigned int flags =3D mandatory_flags | optional_flags;
-> > -       int fd, dev_id;
-> > -
-> > -       fd =3D open_serial(path);
-> > -       if (fd < 0)
-> > -               return -1;
-> > +       int dev_id;
-> >=20
-> >         if (ioctl(fd, HCIUARTSETFLAGS, flags) < 0) {
-> >                 if (errno =3D=3D EINVAL) {
-> > @@ -895,13 +848,222 @@ static int start_audio_server(pid_t pids[2])
-> >         return 0;
-> >  }
-> >=20
-> > +static bool find_attach_dev(char path[PATH_MAX])
-> > +{
-> > +       const char *vport_path =3D "/sys/class/virtio-ports";
-> > +       struct dirent *entry;
-> > +       DIR *dir;
-> > +
-> > +       dir =3D opendir(vport_path);
-> > +       if (!dir)
-> > +               return false;
-> > +
-> > +       while ((entry =3D readdir(dir)) !=3D NULL) {
-> > +               FILE *f;
-> > +               char buf[64];
-> > +               size_t size;
-> > +
-> > +               snprintf(path, PATH_MAX, "%s/%s/name", vport_path,
-> > +                                                               entry->=
-d_name);
-> > +               f =3D fopen(path, "r");
-> > +               if (!f)
-> > +                       continue;
-> > +
-> > +               size =3D fread(buf, 1, sizeof(buf) - 1, f);
-> > +               buf[size] =3D 0;
-> > +
-> > +               fclose(f);
-> > +
-> > +               if (strncmp(buf, "bt.", 3) =3D=3D 0) {
-> > +                       snprintf(path, PATH_MAX, "/dev/%s", entry->d_na=
-me);
-> > +                       closedir(dir);
-> > +                       return true;
-> > +               }
-> > +       }
-> > +
-> > +       closedir(dir);
-> > +       return false;
-> > +}
-> > +
-> > +static void copy_fd_bidi(int src, int dst)
-> > +{
-> > +       fd_set rfds, wfds;
-> > +       int fd[2] =3D { src, dst };
-> > +       uint8_t buf[2][4096];
-> > +       size_t size[2] =3D { 0, 0 };
-> > +       size_t pos[2] =3D { 0, 0 };
-> > +       int i, ret;
-> > +
-> > +       /* Simple copying of data src <-> dst to both directions */
-> > +
-> > +       for (i =3D 0; i < 2; ++i) {
-> > +               int flags =3D fcntl(fd[i], F_GETFL);
-> > +
-> > +               if (fcntl(fd[i], F_SETFL, flags | O_NONBLOCK) < 0) {
-> > +                       perror("fcntl");
-> > +                       goto error;
-> > +               }
-> > +       }
-> > +
-> > +       while (1) {
-> > +               FD_ZERO(&rfds);
-> > +               FD_ZERO(&wfds);
-> > +
-> > +               for (i =3D 0; i < 2; ++i) {
-> > +                       if (size[i])
-> > +                               FD_SET(fd[i], &wfds);
-> > +                       else
-> > +                               FD_SET(fd[1 - i], &rfds);
-> > +               }
-> > +
-> > +               ret =3D select(FD_SETSIZE, &rfds, &wfds, NULL, NULL);
-> > +               if (ret < 0) {
-> > +                       if (errno =3D=3D EINTR)
-> > +                               continue;
-> > +                       perror("select");
-> > +                       goto error;
-> > +               }
-> > +
-> > +               for (i =3D 0; i < 2; ++i) {
-> > +                       ssize_t s;
-> > +
-> > +                       if (!size[i] && FD_ISSET(fd[1 - i], &rfds)) {
-> > +                               s =3D read(fd[1 - i], buf[i], sizeof(bu=
-f[i]));
-> > +                               if (s >=3D 0) {
-> > +                                       size[i] =3D s;
-> > +                                       pos[i] =3D 0;
-> > +                               } else if (errno =3D=3D EINTR) {
-> > +                                       /* ok */
-> > +                               } else {
-> > +                                       perror("read");
-> > +                                       goto error;
-> > +                               }
-> > +
-> > +                       }
-> > +
-> > +                       if (size[i]) {
-> > +                               s =3D write(fd[i], buf[i] + pos[i], siz=
-e[i]);
-> > +                               if (s >=3D 0) {
-> > +                                       size[i] -=3D s;
-> > +                                       pos[i] +=3D s;
-> > +                               } else if (errno =3D=3D EINTR || errno =
-=3D=3D EAGAIN
-> > +                                               || errno =3D=3D EWOULDB=
-LOCK) {
-> > +                                       /* ok */
-> > +                               } else {
-> > +                                       perror("write");
-> > +                                       goto error;
-> > +                               }
-> > +                       }
-> > +               }
-> > +       }
->=20
-> It doesn't look that great if you ask me. I think this requires us to
-> copy significantly more data than before, likely resulting in worse
-> performance, which could be detrimental in resource-limited
-> environments like GitHub CI/CD.
->=20
-> > +       return;
-> > +
-> > +error:
-> > +       fprintf(stderr, "Bluetooth controller forward terminated with e=
-rror\n");
-> > +       exit(1);
-> > +}
-> > +
-> > +static int start_controller_forward(const char *path, pid_t *controlle=
-r_pid)
-> > +{
-> > +       struct termios ti;
-> > +       pid_t pid;
-> > +       int src =3D -1, dst =3D -1, fd =3D -1;
-> > +       int ret, saved_ldisc, ldisc =3D N_HCI;
-> > +
-> > +       /* virtio-serial ports cannot be used for HCI line disciple, so
-> > +        * openpty() serial device and forward data to/from it.
-> > +        */
-> > +
-> > +       src =3D open(path, O_RDWR);
-> > +       if (src < 0)
-> > +               goto error;
-> > +
-> > +       /* Raw mode TTY */
-> > +       memset(&ti, 0, sizeof(ti));
-> > +       cfmakeraw(&ti);
-> > +       ti.c_cflag |=3D B115200 | CLOCAL | CREAD;
-> > +
-> > +       /* With flow control */
-> > +       ti.c_cflag |=3D CRTSCTS;
-> > +
-> > +       ret =3D openpty(&dst, &fd, NULL, &ti, NULL);
-> > +       if (ret < 0)
-> > +               goto error;
-> > +
-> > +       if (ioctl(fd, TIOCGETD, &saved_ldisc) < 0) {
-> > +               perror("Failed get serial line discipline");
-> > +               goto error;
-> > +       }
-> > +
-> > +       if (ioctl(fd, TIOCSETD, &ldisc) < 0) {
-> > +               perror("Failed set serial line discipline");
-> > +               goto error;
-> > +       }
-> > +
-> > +       printf("Switched line discipline from %d to %d\n", saved_ldisc,=
- ldisc);
-> > +
-> > +       pid =3D fork();
-> > +       if (pid < 0) {
-> > +               perror("Failed to fork new process");
-> > +               goto error;
-> > +       } else if (pid =3D=3D 0) {
-> > +               close(fd);
-> > +               copy_fd_bidi(src, dst);
-> > +               exit(0);
-> > +       }
-> > +
-> > +       *controller_pid =3D pid;
-> > +
-> > +       close(src);
-> > +       close(dst);
-> > +       return fd;
-> > +
-> > +error:
-> > +       if (src >=3D 0)
-> > +               close(src);
-> > +       if (dst >=3D 0)
-> > +               close(dst);
-> > +       if (fd >=3D 0)
-> > +               close(fd);
-> > +       return -1;
-> > +}
-> > +
-> > +static int attach_controller(pid_t *controller_pid)
-> > +{
-> > +       unsigned int basic_flags, extra_flags;
-> > +       char path[PATH_MAX];
-> > +       int fd;
-> > +
-> > +       *controller_pid =3D -1;
-> > +
-> > +       if (!find_attach_dev(path)) {
-> > +               printf("Failed to find Bluetooth controller virtio\n");
-> > +               return -1;
-> > +       }
-> > +
-> > +       printf("Forwarding Bluetooth controller from %s\n", path);
-> > +
-> > +       fd =3D start_controller_forward(path, controller_pid);
-> > +       if (fd < 0) {
-> > +               printf("Failed to forward Bluetooth controller\n");
-> > +               return -1;
-> > +       }
-> > +
-> > +       basic_flags =3D (1 << HCI_UART_RESET_ON_INIT);
-> > +       extra_flags =3D (1 << HCI_UART_VND_DETECT);
-> > +
-> > +       printf("Attaching Bluetooth controller\n");
-> > +
-> > +       return attach_proto(fd, HCI_UART_H4, basic_flags, extra_flags);
-> > +}
-> > +
-> >  static void run_command(char *cmdname, char *home)
-> >  {
-> >         char *argv[9], *envp[3];
-> >         int pos =3D 0, idx =3D 0;
-> >         int serial_fd;
-> >         pid_t pid, dbus_pid, daemon_pid, monitor_pid, emulator_pid,
-> > -             dbus_session_pid, audio_pid[2];
-> > +               dbus_session_pid, audio_pid[2], controller_pid;
-> >         int i;
-> >=20
-> >         if (!home) {
-> > @@ -910,18 +1072,11 @@ static void run_command(char *cmdname, char *hom=
-e)
-> >         }
-> >=20
-> >         if (num_devs) {
-> > -               const char *node =3D "/dev/ttyS1";
-> > -               unsigned int basic_flags, extra_flags;
-> > -
-> > -               printf("Attaching BR/EDR controller to %s\n", node);
-> > -
-> > -               basic_flags =3D (1 << HCI_UART_RESET_ON_INIT);
-> > -               extra_flags =3D (1 << HCI_UART_VND_DETECT);
-> > -
-> > -               serial_fd =3D attach_proto(node, HCI_UART_H4, basic_fla=
-gs,
-> > -                                                               extra_f=
-lags);
-> > -       } else
-> > +               serial_fd =3D attach_controller(&controller_pid);
-> > +       } else {
-> >                 serial_fd =3D -1;
-> > +               controller_pid =3D -1;
-> > +       }
-> >=20
-> >         if (start_dbus) {
-> >                 create_dbus_system_conf();
-> > @@ -1063,6 +1218,11 @@ start_next:
-> >                         monitor_pid =3D -1;
-> >                 }
-> >=20
-> > +               if (corpse =3D=3D controller_pid) {
-> > +                       printf("Controller terminated\n");
-> > +                       controller_pid =3D -1;
-> > +               }
-> > +
-> >                 for (i =3D 0; i < 2; ++i) {
-> >                         if (corpse =3D=3D audio_pid[i]) {
-> >                                 printf("Audio server %d terminated\n", =
-i);
-> > --
-> > 2.53.0
-> >=20
-> >=20
->=20
 
 --=20
 Pauli Virtanen
