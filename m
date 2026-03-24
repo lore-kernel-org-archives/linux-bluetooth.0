@@ -1,98 +1,119 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AA4B366557;
-	Tue, 24 Mar 2026 03:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAFB41459FA;
+	Tue, 24 Mar 2026 03:46:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774323735; cv=none; b=gueujRYNUfFk3gItwyv+XB3sM3iyYPmNsfUMTwBkJJ5EjaQzoCZtVBUjJDdxY+jH3S4cFmixElB/g6LLi3/k1fe8B2oYSK95JVEAYazinqvCs9e2E4nl1/ZuFGb5SAEt5WYNWTeeKJuy0bdrwxHl+kPdielhTfWFMo6S+Nsurfk=
+	t=1774323966; cv=none; b=j+XEjl4YN0yM1R/8akV+GW7Qxp63WyXBIoydMplAuNgH/mSaQuuDhmbwLVYnOLZKu6/sp5sNKa5GF6eEuG/fdDgoFtFtlrwrXv0snOaTSTsp4jrUVcQyW8PcYT0jG0jitIVRk61yynB3Ber1mwAvUhozXHuj6TDl6cmYbgHiHYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774323735; c=relaxed/simple;
-	bh=qpWNh+tTYj8MbrdcqgUMlZVZZhUWaYgGrvrVHLiKCBU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GfE3WWioYEGgsUTwcOL0a+TO4kjREcOEQBtJ3JSXFIgf4MV7YCLhJ9JQOgOZRXv58uIsLyxboqvk0P7DaSDteE+KmyP9dJ2RfUXHwNxDCIs/h+aXwJNAFqTWVHpk2GeIBhQvJtOX4CkIqS3viEpfoKfnaoXGfCv1I4nkwaeYWGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R719frGO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774323966; c=relaxed/simple;
+	bh=Q3QJs+Y+iu4ToxJAYkvQKBefuiR+iwODa4P0n7YoXKs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kEsAfReacda5tWCsUaW8BPcYXQ6KDjp7koOcbFvaeqwKsJ7syq1u+xybRBKrsYFJZcqYQGOm3D1+KnmcqMhEcHK91lpMPgIoqUGfh+X2St52ncSvG/oRGIaPFco+1Z1t/y9yzcCIX+2Ph3Fiby+cuiJIERm6X6MV2mnZ8BjHIXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AXOcCt+5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R719frGO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71660C19424;
-	Tue, 24 Mar 2026 03:42:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AXOcCt+5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01F9CC19424;
+	Tue, 24 Mar 2026 03:46:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774323735;
-	bh=qpWNh+tTYj8MbrdcqgUMlZVZZhUWaYgGrvrVHLiKCBU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=R719frGOM/L0P7abqsQXEE2kqqXEtWJwQlWRwk1c6JSRqaOjfeYcyyOm4/lf51mLC
-	 Nv1kOwcRbCBtHThGpyOwpG0IlUfZa4kYuRSFZM1GeQjBXDL5gJJ60wgiln/9o3hAiv
-	 qGV2aOc5keMh/1LnL0lV0vPFRDnbgAhE4o0KX3+i3UQWBzuZqwy1qjRxXcULJC+P9Q
-	 /+HYAhJ4SFlqQ4BqcnW2S9x6r2MFkwLsFwM+hCAQmU4sLYkFfZzOV/Pq2IqtPM8KAf
-	 bjzY0XPVn/+ja3Em3n+8c0ghrb3PSd027BxIKGh6kcZZaqwS7RQiOoRti+dsrb2n8N
-	 mGiW3gQixOGhA==
+	s=k20201202; t=1774323966;
+	bh=Q3QJs+Y+iu4ToxJAYkvQKBefuiR+iwODa4P0n7YoXKs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AXOcCt+5Vpk2YX0np7goO+WF09MjHNjFgrTEqjowY74CzNyqNCrShKq+/gH4yGAYv
+	 hLavYxlDAt6dxF7qZLEsO65A7oCJDTOEOV7kkVC2LMoq0KYXuvLtV95C/Eurn8G9JL
+	 TITkl3N9ZPwWjw7KtJaQ0kia8D6FhNvnafnTpKyY8YXLvyJsQfWaiG/ewwZytllN6W
+	 ICpCjJI8DUD+7psYuPGkliogjF/m078YgPCEO/CpOTBOZ1n3cFDSStxuM45aHW+83X
+	 XKPpMmfy7MZZEpNxUePsG5k5fjaATBpxCCaNoFu9RSMDgYjvgJTSF+mN9+hpOFTHOa
+	 f1oEc6kLEPemA==
+Date: Mon, 23 Mar 2026 22:46:02 -0500
 From: Bjorn Andersson <andersson@kernel.org>
-To: Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Jeff Johnson <jjohnson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Vinod Koul <vkoul@kernel.org>,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Matthias Kaehlcke <mka@chromium.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	ath10k@lists.infradead.org,
-	linux-pm@vger.kernel.org,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Subject: Re: (subset) [PATCH v2 00/14] power: sequencing: extend WCN driver to support WCN399x device
-Date: Mon, 23 Mar 2026 22:42:01 -0500
-Message-ID: <177432372677.35532.960283784585134331.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260106-wcn3990-pwrctl-v2-0-0386204328be@oss.qualcomm.com>
-References: <20260106-wcn3990-pwrctl-v2-0-0386204328be@oss.qualcomm.com>
+To: Konrad Dybcio <konradybcio@kernel.org>
+Cc: Jeff Johnson <jeff.johnson@oss.qualcomm.com>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	Bartosz Golaszewski <brgl@kernel.org>, Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, Abel Vesa <abel.vesa@oss.qualcomm.com>, 
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Subject: Re: [PATCH v3 01/10] dt-bindings: net: bluetooth: qualcomm: Fix
+ WCN6855 regulator names
+Message-ID: <acIIwsJhNVOKPziT@baldur>
+References: <20260225-topic-wcn6855_pmu_dtbdings-v3-0-576ec5c4e631@oss.qualcomm.com>
+ <20260225-topic-wcn6855_pmu_dtbdings-v3-1-576ec5c4e631@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260225-topic-wcn6855_pmu_dtbdings-v3-1-576ec5c4e631@oss.qualcomm.com>
 
-
-On Tue, 06 Jan 2026 03:01:10 +0200, Dmitry Baryshkov wrote:
-> Qualcomm WCN3950, WCN3988 and WCN399x families of WiFi/BT chips preceed
-> the later WCN / QCA devices, but they still incorporate a very simple
-> PMU on die. It controls internal on-chip power networks, but, most
-> importantly, it also requires a certain start-up procedure (first bring
-> up VDD_IO, then bring up other voltages). In order to further unify code
-> supporting different families of QCA / WCN chips and in order to
-> maintain the required power up sequence, properly represent these chips
-> in DTs and modify drivers to use power sequencing for these chips.
+On Wed, Feb 25, 2026 at 01:23:21PM +0100, Konrad Dybcio wrote:
+> From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 > 
-> [...]
+> Commit 5f4f954bba12 ("dt-bindings: bluetooth: bring the HW description
+> closer to reality for wcn6855") changed the vddrfa1p7-supply to 1p8
+> for whatever reason.
+> 
+> The schematics footprint for this chip definitely says 7 on the input
+> leg and the driver still expects 1p7. Bring it back.
+> 
 
-Applied, thanks!
+@Marcel, can you merge this binding, or would you prefer that I do it
+together with the dts changes?
 
-[10/14] arm64: dts: qcom: qrb2210-rb1: describe WiFi/BT properly
-        commit: 2d0840e31c8a6ceebc701822889424bb1927d1a7
-[11/14] arm64: dts: qcom: qrb4210-rb2: describe WiFi/BT properly
-        commit: 1eea8321da0fa3b80eb19802ab830bf83d304519
-[12/14] arm64: dts: qcom: sda660-ifc6560: describe WiFi/BT properly
-        commit: 40a5da727ebc2a8d085feda501ab7bee4c5d9608
-[13/14] arm64: dts: qcom: sdm845-db845c: describe WiFi/BT properly
-        commit: 77648f3a7e9be4e7090bd326b2e4a4f9265b80f3
-[14/14] arm64: dts: qcom: sm8150-hdk: describe WiFi/BT properly
-        commit: d545fd1caf42a8f20531ba38c671f5bf10542720
+Regards,
+Bjorn
 
-Best regards,
--- 
-Bjorn Andersson <andersson@kernel.org>
+> Fixes: 5f4f954bba12 ("dt-bindings: bluetooth: bring the HW description closer to reality for wcn6855")
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+> Reviewed-by: Abel Vesa <abel.vesa@oss.qualcomm.com>
+> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> Acked-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+> Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+> ---
+>  .../devicetree/bindings/net/bluetooth/qcom,wcn6855-bt.yaml         | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6855-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6855-bt.yaml
+> index 45630067d3c8..0beda26ae8bb 100644
+> --- a/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6855-bt.yaml
+> +++ b/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6855-bt.yaml
+> @@ -50,9 +50,6 @@ properties:
+>      description: VDD_RFA_1P7 supply regulator handle
+>      deprecated: true
+>  
+> -  vddrfa1p8-supply:
+> -    description: VDD_RFA_1P8 supply regulator handle
+> -
+>    vddrfacmn-supply:
+>      description: VDD_RFA_CMN supply regulator handle
+>  
+> @@ -68,7 +65,7 @@ required:
+>    - vddbtcmx-supply
+>    - vddrfa0p8-supply
+>    - vddrfa1p2-supply
+> -  - vddrfa1p8-supply
+> +  - vddrfa1p7-supply
+>    - vddrfacmn-supply
+>    - vddwlcx-supply
+>    - vddwlmx-supply
+> @@ -91,7 +88,7 @@ examples:
+>              vddbtcmx-supply = <&vreg_pmu_btcmx_0p8>;
+>              vddrfa0p8-supply = <&vreg_pmu_rfa_0p8>;
+>              vddrfa1p2-supply = <&vreg_pmu_rfa_1p2>;
+> -            vddrfa1p8-supply = <&vreg_pmu_rfa_1p7>;
+> +            vddrfa1p7-supply = <&vreg_pmu_rfa_1p7>;
+>              vddrfacmn-supply = <&vreg_pmu_rfa_cmn_0p8>;
+>              vddwlcx-supply = <&vreg_pmu_wlcx_0p8>;
+>              vddwlmx-supply = <&vreg_pmu_wlmx_0p8>;
+> 
+> -- 
+> 2.53.0
+> 
