@@ -1,69 +1,69 @@
-Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6F032F749
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10CFE345741
 	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Mar 2026 19:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774381802; cv=none; b=bC4rULi6wWwAM0dlR/tltGNYwyzvdTtWZWD5Fgq2ERkJhHMjmgJmqREz/TcueMb8aHoVvbpXq1kyd0JYeC+yU96ONAjmFE//dC7z/FLuO8KMX4YXl+nqhCd+iSoMMcvfqPHZNHBFy0QT13bc1Sa3vQ4Md7g768sJ2JcU4UwuJGM=
+	t=1774381803; cv=none; b=lQ17KTgpTEJL08CiN8kaFm1eYXvBP58L115jLkutC3Oac2vgP17TBx425BUQdFzbczdgagAxN710ACfOfhEl3XD200fXb2BVhT0Lxd/IM+EqCkpTUsKrgSG67Mj7uySxrBx7e1M1M/wxKbea3HzuoPSsREmKQEmJez+qvrnPoVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774381802; c=relaxed/simple;
-	bh=zNyzUu7aq7pE/5wZY6tOZFKF5x4QYOJn9pqcK+6p5Lw=;
+	s=arc-20240116; t=1774381803; c=relaxed/simple;
+	bh=+5EkYofi7D9N7MqIQP/TbjXfTF4QsL6dTRo8LOii8No=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Tq4WfUgCPJ36Xmq9WucbfLMEH9zwWUX6VGcw6v0PxDAjGviQTxjB5LUjrK/f07u+ASy9rv7XY01JcUeq14bqO8DYxm1VFt9hxzEyafwg86NPOwlCM7BA3smSkvRKJIGzhAEbB2ihbgebzQWUXi/ErIFo5kWvHb4Ksh8GNn3+VO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PSmeV8X4; arc=none smtp.client-ip=209.85.222.48
+	 MIME-Version; b=Mq8ta3VJ0r2pf+h7rLDN7zQrKY0TPmQTQ1ALnEhFQSqtOob2YSG9Zs3Ci4g3872sBbcI5w0j637LOCaL0C1L+GQyA+hBk9OD+1EFwUDlSFje3JMfXkYHzeY2EkrdDo48BTvXtyJ70ag7zy2XHVPeSr3isoHHaB7R1wwsoeaeQGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cckoQOOh; arc=none smtp.client-ip=209.85.217.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PSmeV8X4"
-Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-94acb3d6cceso3001214241.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cckoQOOh"
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-602a0648aa3so1074271137.2
         for <linux-bluetooth@vger.kernel.org>; Tue, 24 Mar 2026 12:50:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774381799; x=1774986599; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1774381800; x=1774986600; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7CVUGm3s2DznmxJ65oW3x8svfKu0PtTvcEAidxZN5v8=;
-        b=PSmeV8X4d8T8Hmrat3RuxjBqqQkll4q5UA0BVZCZ9hQqNve1KGcNr860BWrj+evCc4
-         a4ePOAhzrNHCw9y0HGIWqaCYVrMXrudKPR1dFNZ04gYxI5sEx2yfE0EsL04/jbbsAMLZ
-         JNMnvpdPKLyWPG0gacJI7oyab4UB3Oo5y4T3JmBpY8Doaqbjf0Gp9KImG3ZZwgp5H5Il
-         +95EAJMpTmxfuOhrg3QF6EJ5wqp1UPalQpx3C7frFKIq4wq89qukj0Z/yRYbRczInyFg
-         heUXCChCtSXifuz31UHBmHwbKFjJplrtrKfJFLVnL9kq/thf/pmsqLVv0cNIjW4+uM7e
-         JwBw==
+        bh=Ea/12V1RJqaeVASHiDTkqQcsX9xouLaqL0/OFWGKevU=;
+        b=cckoQOOhlz16UJ64wFcHP4J32zolOcLiE1/TBRx302Info4614CZW8boHYFYFtbVGo
+         AyFEL9bQ3nsbON6tP9S/wze671aOOP7zDq/acVl6aT0is7PHu4ADBUHs0KP5Wrf60HM7
+         dYSIohiXDk4ZCg/ncW832kLoz3jc56mKrzF5KB/kBBRLDflIcjcOsOVhBnfL0U7p5NXW
+         /02vB/MaWKuZox0eAvBHZlsmaNYPD5BB0/or0XwpG97ERU6WaxJ4aqUFwb+t6vgSaQ45
+         u+tsmrjUqvlraaYhLJoNFzlDNAo6BhxqqYya8SUGJ3onNc3wrP2eilKu9SY/7wY/Phqg
+         XorQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774381799; x=1774986599;
+        d=1e100.net; s=20251104; t=1774381800; x=1774986600;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=7CVUGm3s2DznmxJ65oW3x8svfKu0PtTvcEAidxZN5v8=;
-        b=rOGN5N8lH+uPzxkGySHt7f93T0U7KG0eg/ZExLnEYDAujwKjOa9wY9H4wIwBYytlge
-         oGlBZIU2K4zorNNaaOQXeP1ebhqRgxqZ9rg/Lm+yvzGeBZaTqkU11WKzu3WB+VP4EDQs
-         SNLyGvMnFhIp7JE2WTNLHyBJIngfim8cUdlRNc0bgRtbgsr0CD1S3ZCNhlZO7ze1AyNj
-         5E57976XqbDqttV+JGYvP/1ltxLNZ80emeyT0UEg4ol277p7FGdWrUs33RBLpzlzhi5N
-         DKzDWukKlohO9FRfV//2StgofTP025Ch8wP3up49XVuB2AyOr3jOvXim6y3XTHJQOL9H
-         o8Mg==
-X-Gm-Message-State: AOJu0YxYgcfUzlctLmVGRfy4rCb/pgVFgPmSfT+Oe4J3lAhmf8ljIPvF
-	9Fc4+8aa3UYiVAB+W1ddm5jY0Uwl/lgdpV6kkkY3Z1272/dxpdWdAk0HVhFkQ+2t
-X-Gm-Gg: ATEYQzwWmZJYGfpXNYY89XQL4Vvi3iuZZISijjYcWJ90zuR6pBhfs7VhAODEp21v+wM
-	03X541i5BBRKS38B5QGsfl7srqKW1uyqFu9nbtwQaxS+z9XGboJv3Ouj1mPWSw6t8tAtQ6SgToN
-	dzkyRsxq1/LD8jHy8pQIvYGBZzzypAUk/neSXr3Q1OWMYVPbC+tQjcdRMJleZfxu0khoiqCUiHM
-	UFWwrOICR9EnYZJtcKrp7ho9tta8b49EVeZY2IoCsql03Jui5Y3bYzUfogVxRxQP0F7KcUiuBLs
-	mx1yzU0QcUOh7fPHV7kVp47aExnmiPSyKfktb1CxUPybQhtySbGIzji8Iygx2YA2UUkvDA+jtK7
-	TdjQfNjtpxIJlXlHKDlHm50XxlWDhvbCT1a6+o5182H9KFsAwSxvyOR8Vqso9nixkutJ6b1HjQz
-	uC1afrJsWSJEnqd3ejV/Phbyagr9F9GJ6ynYa+TMhil7NRICaGne1wKASzPOLIIOwJ+udvCuIDH
-	/bXpqMq7z2QRPQlP4MZuYo4zQP+
-X-Received: by 2002:a05:6102:3353:b0:602:a15d:f615 with SMTP id ada2fe7eead31-60387238126mr558738137.21.1774381798812;
-        Tue, 24 Mar 2026 12:49:58 -0700 (PDT)
+        bh=Ea/12V1RJqaeVASHiDTkqQcsX9xouLaqL0/OFWGKevU=;
+        b=rqkePMINAG4VACfIGP8/eCO4Z4YP/K+4VR+lLjJ44UIICz6TfsPWfes8u5pbT4pfWx
+         Zn5eWhbaQCOMLG+Q6db4yDVYHU68hdN5464noHYqECcJ1YkZrUepF88Dr2F1C6HgCWUa
+         WfqwXK/iNAKwZtOUtX6hkzyoiqTJ+BmoA+Frlb8Y3KeZzzWv6f+AGIPpaBFLKF3+dTMc
+         jhG86CKzMkVGQ6H6uXLFzW0sh8Y1UlurgFIh+2oChCmGhc9Pb3KmEu0V9wQGsWHmiAeg
+         /m3FuR2u87tvhLaSLhlaq36nEIzUnEx+bpbVK/EQlE89If66z/K9rWq9PykGv035vuKd
+         dNxg==
+X-Gm-Message-State: AOJu0Yywy4zdyPEfhVkdslJ7PPW4QFhIka8t7Tg6DLHN79zbueis+OG5
+	FbIi5T6EftFIR6vXh09wPo1aybtbdzuPSkL3wvZxRQ17KmuxACPn4lQA0r90S1a8
+X-Gm-Gg: ATEYQzykUDFtJiAj/ykp/vVz8zkG7NABx2GqNO5LVEMuA0U4JGAAb2lzs93JJD5Pcmq
+	Ubesjcr3TXn5bn8GTCLjtP/ufw0fp5F6EJ4Ie4E8sg0TU8AjW6pKx25jqU/C5kQJkwpUPWoAn44
+	xVg9tJMdcLRKNQBqT6ojCuYoeKbfXFMv3tnwG6bjWPrTCC4dYGUgO5aecZyGiBu5ZmdWYIBR3xe
+	3Zr6djvo6s/lXcKLPp1W9uQ7MwWMcGSkllKWk/p/CYrvystHWFy+gjI6MneswGdRucoAm/29xPO
+	odbI/Z+ehPBYIC1tZXka+3rTnz1rdxwgehAKVGtk9TgoMraeusroRaFitnpIODye9HD8lOpWsed
+	cve7j8cqRXafs93wPhwkEmjOxLSfPAkwxHRv896JD2GZmnoJWh1XsaC13Gvea5K5MDOdnktn39r
+	ItIwFChrWGAWMWlWz+erxSDaotPLJmX78c1f67MzTeMejF793nM27DPm28KggFp4iDMQBKRjDuZ
+	TkNAmegedqLGFePOA==
+X-Received: by 2002:a05:6102:3a0e:b0:5ff:c510:b7e8 with SMTP id ada2fe7eead31-60387228693mr633360137.14.1774381799581;
+        Tue, 24 Mar 2026 12:49:59 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-95136de3e33sm13759671241.9.2026.03.24.12.49.57
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-95136de3e33sm13759671241.9.2026.03.24.12.49.58
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Mar 2026 12:49:58 -0700 (PDT)
+        Tue, 24 Mar 2026 12:49:59 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 8/9] doc/btmon: Add A2DP/AVDTP protocol flow documentation
-Date: Tue, 24 Mar 2026 15:49:44 -0400
-Message-ID: <20260324194946.109349-8-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 9/9] doc/btmon: Add HFP protocol flow documentation
+Date: Tue, 24 Mar 2026 15:49:45 -0400
+Message-ID: <20260324194946.109349-9-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260324194946.109349-1-luiz.dentz@gmail.com>
 References: <20260324194946.109349-1-luiz.dentz@gmail.com>
@@ -77,481 +77,516 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add btmon-a2dp.rst documenting the A2DP protocol flow as seen in btmon
-output, wrapped by btmon-classic-audio.rst parent file. Coverage
-includes:
+Add btmon-hfp.rst documenting the HFP protocol flow as seen in btmon
+output. Coverage includes:
 
- - AVDTP signaling: Discover, Get Capabilities, Set Configuration,
-   Open, Start, Suspend, Close
- - Codec capability/configuration decoding for SBC, AAC, aptX, aptX HD,
-   aptX Low Latency, FastStream, LDAC, and Opus
- - AVDTP media transport channel setup
- - AVRCP control and browsing channel overview
- - Delay Reporting
+ - SDP service discovery for Handsfree/AG UUIDs
+ - RFCOMM channel setup over L2CAP PSM 3 (SABM/UA, Parameter
+   Negotiation, Modem Status Command)
+ - AT command exchange for SLC setup (noted as hex dump only -- btmon
+   does not parse AT commands within RFCOMM UIH data frames)
+ - Codec negotiation via AT+BAC/AT+BCS
+ - SCO/eSCO synchronous connection setup (voice setting, coding format)
+ - Codec summary tables (AT-level vs HCI-level codec IDs)
  - Automation-friendly grep patterns
 ---
- doc/btmon-a2dp.rst          | 418 ++++++++++++++++++++++++++++++++++++
- doc/btmon-classic-audio.rst |  12 ++
- doc/btmon.rst               |   2 +
- 3 files changed, 432 insertions(+)
- create mode 100644 doc/btmon-a2dp.rst
- create mode 100644 doc/btmon-classic-audio.rst
+ doc/btmon-classic-audio.rst |   2 +
+ doc/btmon-hfp.rst           | 476 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 478 insertions(+)
+ create mode 100644 doc/btmon-hfp.rst
 
-diff --git a/doc/btmon-a2dp.rst b/doc/btmon-a2dp.rst
+diff --git a/doc/btmon-classic-audio.rst b/doc/btmon-classic-audio.rst
+index 11943c3a54bf..3e7c5384be87 100644
+--- a/doc/btmon-classic-audio.rst
++++ b/doc/btmon-classic-audio.rst
+@@ -10,3 +10,5 @@ A2DP uses L2CAP-based AVDTP media channels while HFP uses SCO/eSCO
+ synchronous connections.
+ 
+ .. include:: btmon-a2dp.rst
++
++.. include:: btmon-hfp.rst
+diff --git a/doc/btmon-hfp.rst b/doc/btmon-hfp.rst
 new file mode 100644
-index 000000000000..516410e4e283
+index 000000000000..c81c0df3feb3
 --- /dev/null
-+++ b/doc/btmon-a2dp.rst
-@@ -0,0 +1,418 @@
++++ b/doc/btmon-hfp.rst
+@@ -0,0 +1,476 @@
 +.. This file is included by btmon-classic-audio.rst.
 +
-+A2DP: Advanced Audio Distribution
-+-----------------------------------
++HFP: Hands-Free Profile
++-------------------------
 +
-+A2DP uses AVDTP (Audio/Video Distribution Transport Protocol) over
-+L2CAP to negotiate codec parameters and stream high-quality audio.
-+btmon fully decodes AVDTP signaling, codec capabilities, and AVRCP
-+remote control messages.
++HFP carries voice audio over SCO/eSCO connections with call control
++over RFCOMM. btmon decodes RFCOMM framing and SCO/eSCO connection
++setup. AT commands (the HFP control protocol) appear as raw hex dumps
++within RFCOMM data frames -- btmon does not parse AT command syntax.
 +
-+AVDTP Signaling Channel
++SDP Discovery
++~~~~~~~~~~~~~~
++
++HFP uses SDP to discover the remote device's Hands-Free or Audio
++Gateway service record and its RFCOMM channel number::
++
++    < ACL Data TX: Handle 1 flags 0x00 dlen 25
++          Channel: 64 len 21 [PSM 1 mode Basic (0x00)] {chan 0}
++            SDP: Service Search Attribute Request (0x06) tid 1 len 16
++              Search pattern: [len 5]
++                Sequence (6) with 3 byte(s) [8 extra bits] len 5
++                  UUID (3) with 2 byte(s) [0 extra bits] len 3
++                    Handsfree Audio Gateway (0x111f)
++              Max record count: 65535
++              Attribute list: [len 5]
++                Sequence (6) with 3 byte(s) [8 extra bits] len 5
++                  Unsigned Integer (1) with 4 byte(s) [0 extra bits] len 5
++                    0x0000ffff
++              Continuation state: 0
++
++The response contains the service record with the RFCOMM channel::
++
++    > ACL Data RX: Handle 1 flags 0x02 dlen 89
++          Channel: 64 len 85 [PSM 1 mode Basic (0x00)] {chan 0}
++            SDP: Service Search Attribute Response (0x07) tid 1 len 80
++              Attribute bytes: 77
++                Attribute list: [len 75] {position 0}
++                  Attribute: Service Class ID List (0x0001) [len 2]
++                    Handsfree Audio Gateway (0x111f)
++                  Attribute: Protocol Descriptor List (0x0004) [len 2]
++                    L2CAP (0x0100)
++                    RFCOMM (0x0003)
++                      Channel: 1
++                  Attribute: Bluetooth Profile Descriptor List (0x0009) [len 2]
++                    Handsfree (0x111e)
++                      Version: 0x0108
++              Continuation state: 0
++
++Key fields to extract:
++
++- **Service Class** -- ``Handsfree (0x111e)`` for HF role,
++  ``Handsfree Audio Gateway (0x111f)`` for AG role
++- **RFCOMM Channel** -- The channel number under ``RFCOMM (0x0003)``
++  in the Protocol Descriptor List (e.g., channel 1)
++- **Profile Version** -- Under the Bluetooth Profile Descriptor List
++  (e.g., ``0x0108`` = HFP 1.8, ``0x0109`` = HFP 1.9)
++
++RFCOMM Connection Setup
 +~~~~~~~~~~~~~~~~~~~~~~~~
 +
-+A2DP begins with an L2CAP connection on PSM 25 (0x0019). The first
-+L2CAP connection on this PSM carries AVDTP signaling; a second
-+connection on the same PSM carries media transport data::
++RFCOMM runs over L2CAP PSM 3. The connection proceeds in stages:
++multiplexer session on DLCI 0, parameter negotiation, then the data
++channel on the target DLCI.
++
++**L2CAP connection for RFCOMM**::
 +
 +    < ACL Data TX: Handle 1 flags 0x00 dlen 12
-+          L2CAP: Connection Request (0x02) ident 1 len 4
-+            PSM: 25 (0x0019)
-+            Source CID: 64
++          L2CAP: Connection Request (0x02) ident 2 len 4
++            PSM: 3 (0x0003)
++            Source CID: 65
 +
 +    > ACL Data RX: Handle 1 flags 0x02 dlen 16
-+          L2CAP: Connection Response (0x03) ident 1 len 8
-+            Destination CID: 64
-+            Source CID: 64
++          L2CAP: Connection Response (0x03) ident 2 len 8
++            Destination CID: 65
++            Source CID: 65
 +            Result: Connection successful (0x0000)
 +            Status: No further information available (0x0000)
 +
-+After L2CAP configuration completes, AVDTP signaling begins on this
-+channel.
++**SABM/UA on DLCI 0** (multiplexer session)::
 +
-+Stream Endpoint Discovery
++    < ACL Data TX: Handle 1 flags 0x00 dlen 12
++          Channel: 65 len 4 [PSM 3 mode Basic (0x00)] {chan 1}
++            RFCOMM: Set Async Balance Mode (SABM) (0x2f)
++             Address: 0x03 cr 1 dlci 0x00
++             Control: 0x3f poll/final 1
++             Length: 0
++             FCS: 0x1c
++
++    > ACL Data RX: Handle 1 flags 0x02 dlen 12
++          Channel: 65 len 4 [PSM 3 mode Basic (0x00)] {chan 1}
++            RFCOMM: Unnumbered Ack (UA) (0x63)
++             Address: 0x03 cr 1 dlci 0x00
++             Control: 0x73 poll/final 1
++             Length: 0
++             FCS: 0xd7
++
++**Parameter Negotiation** (MCC on DLCI 0)::
++
++    Channel: 65 len 14 [PSM 3 mode Basic (0x00)] {chan 1}
++      RFCOMM: Unnumbered Info with Header Check (UIH) (0xef)
++       Address: 0x03 cr 1 dlci 0x00
++       Control: 0xef poll/final 0
++       Length: 10
++       FCS: 0x70
++       MCC Message type: DLC Parameter Negotiation CMD (0x20)
++         Length: 8
++         dlci 2 frame_type 0 credit_flow 15 pri 7
++         ack_timer 0 frame_size 127 max_retrans 0 credits 7
++
++The DLCI in the PN command identifies the target channel. For RFCOMM
++channel N, DLCI = N * 2 (or N * 2 + 1 depending on the initiator
++role).
++
++**SABM/UA on target DLCI** (data channel)::
++
++    Channel: 65 len 4 [PSM 3 mode Basic (0x00)] {chan 1}
++      RFCOMM: Set Async Balance Mode (SABM) (0x2f)
++       Address: 0x0b cr 1 dlci 0x02
++       Control: 0x3f poll/final 1
++       Length: 0
++       FCS: 0x59
++
++    Channel: 65 len 4 [PSM 3 mode Basic (0x00)] {chan 1}
++      RFCOMM: Unnumbered Ack (UA) (0x63)
++       Address: 0x0b cr 1 dlci 0x02
++       Control: 0x73 poll/final 1
++       Length: 0
++       FCS: 0x92
++
++**Modem Status Command** (signals readiness)::
++
++    Channel: 65 len 8 [PSM 3 mode Basic (0x00)] {chan 1}
++      RFCOMM: Unnumbered Info with Header Check (UIH) (0xef)
++       Address: 0x03 cr 1 dlci 0x00
++       Control: 0xef poll/final 0
++       Length: 4
++       FCS: 0x70
++       MCC Message type: Modem Status Command CMD (0x38)
++         Length: 2
++         dlci 2
++         fc 0 rtc 1 rtr 1 ic 0 dv 1
++
++AT Command Exchange (SLC Setup)
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++HFP uses AT commands over RFCOMM for call control and feature
++negotiation. btmon shows these as RFCOMM UIH frames with the AT
++command text visible in the hex dump.
++
++**AT command in RFCOMM UIH frame**::
++
++    Channel: 65 len 21 [PSM 3 mode Basic (0x00)] {chan 1}
++      RFCOMM: Unnumbered Info with Header Check (UIH) (0xef)
++       Address: 0x09 cr 0 dlci 0x02
++       Control: 0xff poll/final 1
++       Length: 14
++       FCS: 0x86
++       Credits: 1
++        41 54 2b 42 52 53 46 3d 32 30 35 35 0d         AT+BRSF=2055.
++
++The AT command text is readable in the ASCII column of the hex dump
++(right side). The Service Level Connection (SLC) setup sequence
++exchanges device features and capabilities:
++
++1. ``AT+BRSF=<features>`` / ``+BRSF:<features>`` -- Supported
++   features bitmask exchange
++2. ``AT+BAC=1,2`` -- Available codecs (if codec negotiation supported).
++   Codec IDs: 1 = CVSD, 2 = mSBC, 3 = LC3-SWB
++3. ``AT+CIND=?`` / ``+CIND:(...)`` -- Indicator mapping query
++4. ``AT+CIND?`` / ``+CIND:values`` -- Current indicator values
++5. ``AT+CMER=3,0,0,1`` -- Enable indicator status reporting
++6. ``AT+CHLD=?`` / ``+CHLD:(0,1,2,3,4)`` -- Three-way calling support
++
++Key HFP feature bits (from ``AT+BRSF``):
++
++.. list-table::
++   :header-rows: 1
++   :widths: 10 25 25
++
++   * - Bit
++     - HF Feature
++     - AG Feature
++   * - 0
++     - EC/NR
++     - Three-way calling
++   * - 1
++     - Three-way calling
++     - EC/NR
++   * - 2
++     - CLI presentation
++     - Voice recognition
++   * - 3
++     - Voice recognition
++     - In-band ring tone
++   * - 4
++     - Remote volume
++     - Voice tag
++   * - 5
++     - Enhanced call status
++     - Reject call
++   * - 6
++     - Enhanced call control
++     - Enhanced call status
++   * - 7
++     - Codec negotiation
++     - Enhanced call control
++   * - 8
++     - HF indicators
++     - Extended error codes
++   * - 9
++     - eSCO S4 (T2)
++     - Codec negotiation
++   * - 11
++     -
++     - eSCO S4 (T2)
++
++Codec Connection Setup
++~~~~~~~~~~~~~~~~~~~~~~~
++
++When both sides support codec negotiation (feature bit 7 on HF, bit 9
++on AG), the AG selects a codec before establishing the audio link.
++This appears as AT commands in RFCOMM UIH frames::
++
++    AG -> HF:  +BCS:2      (select mSBC)
++    HF -> AG:  AT+BCS=2    (confirm mSBC)
++    AG -> HF:  OK
++
++HFP codec IDs (used in ``AT+BAC`` and ``AT+BCS``):
++
++.. list-table::
++   :header-rows: 1
++   :widths: 10 20 30
++
++   * - ID
++     - Codec
++     - Description
++   * - 1
++     - CVSD
++     - Narrow band (8 kHz), mandatory
++   * - 2
++     - mSBC
++     - Wide band speech (16 kHz)
++   * - 3
++     - LC3-SWB
++     - Super wide band (32 kHz), HFP 1.9+
++
++These HFP-level codec IDs differ from HCI codec IDs.
++
++Voice Setting
++~~~~~~~~~~~~~~
++
++Before SCO/eSCO setup, the host configures the voice setting. For
++CVSD, the air coding format is CVSD; for mSBC or LC3-SWB, it must be
++set to Transparent Data::
++
++    < HCI Command: Write Voice Setting (0x0c|0x0026) plen 2
++          Setting: 0x0063
++            Input Coding: Linear
++            Input Data Format: 2's complement
++            Input Sample Size: 16-bit
++            # of bits padding at MSB: 0
++            Air Coding Format: Transparent Data
++
++For CVSD::
++
++    < HCI Command: Write Voice Setting (0x0c|0x0026) plen 2
++          Setting: 0x0060
++            Input Coding: Linear
++            Input Data Format: 2's complement
++            Input Sample Size: 16-bit
++            # of bits padding at MSB: 0
++            Air Coding Format: CVSD
++
++SCO/eSCO Connection Setup
 +~~~~~~~~~~~~~~~~~~~~~~~~~~
 +
-+The initiator discovers available Stream Endpoints (SEPs) on the
-+remote device::
++After codec negotiation, the host establishes a synchronous connection
++for voice audio.
 +
-+    < ACL Data TX: Handle 1 flags 0x00 dlen 6
-+          Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
-+            AVDTP: Discover (0x01) Command (0x00) type 0x00 label 0 nosp 0
++**Setup Synchronous Connection** (basic)::
 +
-+    > ACL Data RX: Handle 1 flags 0x02 dlen 10
-+          Channel: 64 len 6 [PSM 25 mode Basic (0x00)] {chan 0}
-+            AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 0 nosp 0
-+              ACP SEID: 1
-+                Media Type: Audio (0x00)
-+                SEP Type: SNK (0x01)
-+                In use: No
++    < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
++          Handle: 1
++          Transmit bandwidth: 8000
++          Receive bandwidth: 8000
++          Max latency: 13
++          Setting: 0x0063
++            Input Coding: Linear
++            Input Data Format: 2's complement
++            Input Sample Size: 16-bit
++            # of bits padding at MSB: 0
++            Air Coding Format: Transparent Data
++          Retransmission effort: Optimize for link quality (0x02)
++          Packet type: 0x0008
++            EV3 may be used
 +
-+Each SEP has a SEID (Stream Endpoint Identifier), media type, and
-+role (Source or Sink). ``In use: Yes`` means the endpoint is already
-+streaming.
++**Enhanced Setup Synchronous Connection** (codec-aware)::
 +
-+Codec Capability Discovery
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++    < HCI Command: Enhanced Setup Synchronous Connection (0x01|0x003d) plen 59
++          Handle: 1
++          Transmit bandwidth: 8000
++          Receive bandwidth: 8000
++          Transmit Coding Format:
++            Codec: mSBC (0x05)
++          Receive Coding Format:
++            Codec: mSBC (0x05)
++          Transmit Codec Frame Size: 60
++          Receive Codec Frame Size: 60
++          Input Coding Format:
++            Codec: mSBC (0x05)
++          Output Coding Format:
++            Codec: mSBC (0x05)
++          Input Coded Data Size: 16
++          Output Coded Data Size: 16
++          Input PCM Data Format: 2's complement
++          Output PCM Data Format: 2's complement
++          Input PCM Sample Payload MSB Position: 0
++          Output PCM Sample Payload MSB Position: 0
++          Input Data Path: HCI
++          Output Data Path: HCI
++          Input Transport Unit Size: 60
++          Output Transport Unit Size: 60
++          Max latency: 13
++          Packet type: 0x0008
++            EV3 may be used
++          Retransmission effort: Optimize for link quality (0x02)
 +
-+After discovering SEIDs, the initiator queries each endpoint's
-+capabilities::
++HCI codec IDs displayed by btmon:
 +
-+    < ACL Data TX: Handle 1 flags 0x00 dlen 7
-+          Channel: 64 len 3 [PSM 25 mode Basic (0x00)] {chan 0}
-+            AVDTP: Get All Capabilities (0x0c) Command (0x00) type 0x00 label 1 nosp 0
-+              ACP SEID: 1
++.. list-table::
++   :header-rows: 1
++   :widths: 10 20 30
 +
-+    > ACL Data RX: Handle 1 flags 0x02 dlen 30
-+          Channel: 64 len 26 [PSM 25 mode Basic (0x00)] {chan 0}
-+            AVDTP: Get All Capabilities (0x0c) Response Accept (0x02) type 0x00 label 1 nosp 0
-+              Service Category: Media Transport (0x01)
-+              Service Category: Media Codec (0x07)
-+                Media Type: Audio (0x00)
-+                Media Codec: SBC (0x00)
-+                  Frequency: 0xf0
-+                    16000
-+                    32000
-+                    44100
-+                    48000
-+                  Channel Mode: 0x0f
-+                    Mono
-+                    Dual Channel
-+                    Stereo
-+                    Joint Stereo
-+                  Block Length: 0xf0
-+                    4
-+                    8
-+                    12
-+                    16
-+                  Subbands: 0x0c
-+                    4
-+                    8
-+                  Allocation Method: 0x03
-+                    SNR
-+                    Loudness
-+                  Minimum Bitpool: 2
-+                  Maximum Bitpool: 53
-+              Service Category: Content Protection (0x04)
-+                Content Protection Type: SCMS-T (0x0002)
-+              Service Category: Delay Reporting (0x08)
++   * - ID
++     - btmon Name
++     - Used For
++   * - 0x02
++     - CVSD
++     - Narrow band voice
++   * - 0x03
++     - Transparent
++     - Transparent data mode
++   * - 0x04
++     - Linear PCM
++     - Uncompressed PCM input/output
++   * - 0x05
++     - mSBC
++     - Wide band speech
++   * - 0x06
++     - LC3
++     - Super wide band (LC3-SWB)
 +
-+Capability responses list all supported values as bitmasks. Key
-+service categories:
++**Synchronous Connection Complete** (result)::
 +
-+- **Media Transport** (0x01) -- Always present, indicates the endpoint
-+  supports a media transport channel
-+- **Media Codec** (0x07) -- Codec type and supported parameters
-+- **Content Protection** (0x04) -- Copy protection (SCMS-T or DTCP)
-+- **Delay Reporting** (0x08) -- Endpoint supports delay reporting
++    > HCI Event: Synchronous Connection Complete (0x2c) plen 17
++          Status: Success (0x00)
++          Handle: 257
++          Address: 11:22:33:44:55:66 (OUI 11-22-33)
++          Link type: eSCO (0x02)
++          Transmission interval: 0x0c
++          Retransmission window: 0x06
++          RX packet length: 60
++          TX packet length: 60
++          Air mode: Transparent (0x03)
 +
-+Supported Codecs
++Key fields:
++
++- **Link type** -- ``SCO (0x00)`` for legacy, ``eSCO (0x02)`` for
++  enhanced (used by mSBC and LC3-SWB)
++- **Air mode** -- ``CVSD (0x02)`` for narrow band,
++  ``Transparent (0x03)`` for mSBC or LC3-SWB
++- **RX/TX packet length** -- 60 bytes typical for mSBC T2 settings
++
++SCO Data Packets
 +~~~~~~~~~~~~~~~~~
 +
-+btmon decodes several A2DP codecs. Each has a different parameter
-+format.
-+
-+**SBC** (mandatory A2DP codec)::
-+
-+    Media Codec: SBC (0x00)
-+      Frequency: 44100 (0x20)
-+      Channel Mode: Joint Stereo (0x01)
-+      Block Length: 16 (0x10)
-+      Subbands: 8 (0x04)
-+      Allocation Method: Loudness (0x01)
-+      Minimum Bitpool: 2
-+      Maximum Bitpool: 53
-+
-+**AAC** (MPEG-2,4)::
-+
-+    Media Codec: MPEG-2,4 AAC (0x02)
-+      Object Type: MPEG-4 AAC LC (0x40)
-+      Frequency: 44100 (0x0100)
-+      Channels: 2 (0x04)
-+      Bitrate: 256000bps
-+      VBR: No
-+
-+**aptX** (Qualcomm, vendor-specific)::
-+
-+    Media Codec: Non-A2DP (0xff)
-+      Vendor ID: Qualcomm Technologies International, Ltd. (APT) (0x0000004f)
-+      Vendor Specific Codec ID: aptX (0x0001)
-+        Frequency: 44100 (0x20)
-+        Channel Mode: Stereo (0x02)
-+
-+**aptX HD** (Qualcomm, vendor-specific)::
-+
-+    Media Codec: Non-A2DP (0xff)
-+      Vendor ID: Qualcomm Technologies, Inc. (0x000000d7)
-+      Vendor Specific Codec ID: aptX HD (0x0024)
-+        Frequency: 44100 (0x20)
-+        Channel Mode: Stereo (0x02)
-+
-+**LDAC** (Sony, vendor-specific)::
-+
-+    Media Codec: Non-A2DP (0xff)
-+      Vendor ID: Sony Corporation (0x0000012d)
-+      Vendor Specific Codec ID: LDAC (0x00aa)
-+
-+Vendor codecs appear as ``Non-A2DP (0xff)`` with decoded Vendor ID
-+and Codec ID. Capability responses list all supported values as
-+bitmasks; configuration responses show the single selected value.
-+
-+Stream Configuration
-+~~~~~~~~~~~~~~~~~~~~~
-+
-+After selecting a codec and parameters, the initiator sends Set
-+Configuration::
-+
-+    < ACL Data TX: Handle 1 flags 0x00 dlen 20
-+          Channel: 64 len 16 [PSM 25 mode Basic (0x00)] {chan 0}
-+            AVDTP: Set Configuration (0x03) Command (0x00) type 0x00 label 2 nosp 0
-+              ACP SEID: 1
-+              INT SEID: 1
-+              Service Category: Media Transport (0x01)
-+              Service Category: Media Codec (0x07)
-+                Media Type: Audio (0x00)
-+                Media Codec: SBC (0x00)
-+                  Frequency: 44100 (0x20)
-+                  Channel Mode: Joint Stereo (0x01)
-+                  Block Length: 16 (0x10)
-+                  Subbands: 8 (0x04)
-+                  Allocation Method: Loudness (0x01)
-+                  Minimum Bitpool: 2
-+                  Maximum Bitpool: 53
-+
-+    > ACL Data RX: Handle 1 flags 0x02 dlen 6
-+          Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
-+            AVDTP: Set Configuration (0x03) Response Accept (0x02) type 0x00 label 2 nosp 0
-+
-+Configuration responses show single selected values instead of
-+bitmask lists. ``ACP SEID`` is the remote endpoint, ``INT SEID`` is
-+the local endpoint.
-+
-+If configuration is rejected::
-+
-+    > ACL Data RX: Handle 1 flags 0x02 dlen 8
-+          Channel: 64 len 4 [PSM 25 mode Basic (0x00)] {chan 0}
-+            AVDTP: Set Configuration (0x03) Response Reject (0x03) type 0x00 label 2 nosp 0
-+              Service Category: Media Codec (0x07)
-+              Error code: Unsupported Configuration (0x29)
-+
-+Common AVDTP error codes:
-+
-+.. list-table::
-+   :header-rows: 1
-+   :widths: 10 30 60
-+
-+   * - Code
-+     - Name
-+     - Meaning
-+   * - 0x01
-+     - Bad Header Format
-+     - Malformed AVDTP header
-+   * - 0x11
-+     - Bad ACP SEID
-+     - Unknown endpoint ID
-+   * - 0x12
-+     - SEP In Use
-+     - Endpoint already streaming
-+   * - 0x13
-+     - SEP Not In Use
-+     - Endpoint not configured
-+   * - 0x29
-+     - Unsupported Configuration
-+     - Requested parameters not supported
-+   * - 0x31
-+     - Bad State
-+     - Command not valid in current state
-+
-+Open and Start
-+~~~~~~~~~~~~~~~
-+
-+After configuration, the stream is opened and then started::
-+
-+    < ACL Data TX: Handle 1 flags 0x00 dlen 7
-+          Channel: 64 len 3 [PSM 25 mode Basic (0x00)] {chan 0}
-+            AVDTP: Open (0x06) Command (0x00) type 0x00 label 3 nosp 0
-+              ACP SEID: 1
-+
-+    > ACL Data RX: Handle 1 flags 0x02 dlen 6
-+          Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
-+            AVDTP: Open (0x06) Response Accept (0x02) type 0x00 label 3 nosp 0
-+
-+After Open succeeds, a **second L2CAP connection** on PSM 25 is
-+established for the media transport channel. Then Start begins
-+streaming::
-+
-+    < ACL Data TX: Handle 1 flags 0x00 dlen 7
-+          Channel: 64 len 3 [PSM 25 mode Basic (0x00)] {chan 0}
-+            AVDTP: Start (0x07) Command (0x00) type 0x00 label 4 nosp 0
-+              ACP SEID: 1
-+
-+    > ACL Data RX: Handle 1 flags 0x02 dlen 6
-+          Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
-+            AVDTP: Start (0x07) Response Accept (0x02) type 0x00 label 4 nosp 0
-+
-+Media Data
-+~~~~~~~~~~~
-+
-+After Start, encoded audio flows on the media transport channel
-+(second L2CAP connection on PSM 25). btmon does **not** decode media
-+packet contents by default -- media data is suppressed. Only the
-+L2CAP channel header is visible when the ``--show-a2dp-stream``
-+filter is enabled, with the payload shown as a raw hex dump.
-+
-+The AVDTP state machine visible in the trace:
-+
-+.. list-table::
-+   :header-rows: 1
-+   :widths: 20 30 50
-+
-+   * - State
-+     - Triggered By
-+     - Description
-+   * - Idle
-+     - Initial / Abort response
-+     - No stream configured
-+   * - Configured
-+     - Set Configuration accept
-+     - Codec and parameters selected
-+   * - Open
-+     - Open accept / Suspend accept
-+     - Transport channel ready, not streaming
-+   * - Streaming
-+     - Start accept
-+     - Audio data flowing
-+   * - Closing
-+     - Close command sent
-+     - Tearing down stream
-+   * - Aborting
-+     - Abort command sent
-+     - Forced teardown
-+
-+Suspend, Close, and Abort
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+**Suspend** pauses streaming without tearing down the transport::
-+
-+    AVDTP: Suspend (0x09) Command (0x00) type 0x00 label 5 nosp 0
-+      ACP SEID: 1
-+    AVDTP: Suspend (0x09) Response Accept (0x02) type 0x00 label 5 nosp 0
-+
-+**Close** tears down the stream (returns to Idle)::
-+
-+    AVDTP: Close (0x08) Command (0x00) type 0x00 label 6 nosp 0
-+      ACP SEID: 1
-+    AVDTP: Close (0x08) Response Accept (0x02) type 0x00 label 6 nosp 0
-+
-+**Abort** forces immediate teardown::
++After the synchronous connection is established, voice data flows as
++SCO/eSCO data packets::
 +
-+    AVDTP: Abort (0x0a) Command (0x00) type 0x00 label 7 nosp 0
-+      ACP SEID: 1
-+    AVDTP: Abort (0x0a) Response Accept (0x02) type 0x00 label 7 nosp 0
-+
-+Delay Reporting
-+~~~~~~~~~~~~~~~~
-+
-+When the sink supports delay reporting, it sends a Delay Report to
-+inform the source of its rendering delay::
-+
-+    AVDTP: Delay Report (0x0d) Command (0x00) type 0x00 label 8 nosp 0
-+      ACP SEID: 1
-+      Delay: 15.0ms
-+    AVDTP: Delay Report (0x0d) Response Accept (0x02) type 0x00 label 8 nosp 0
-+
-+AVRCP Remote Control
-+~~~~~~~~~~~~~~~~~~~~~
-+
-+AVRCP (Audio/Video Remote Control Profile) uses L2CAP PSM 23
-+(control) and PSM 27 (browsing). btmon decodes AVCTP framing and
-+AVRCP PDUs.
-+
-+**Volume control**::
-+
-+    < ACL Data TX: Handle 1 flags 0x00 dlen 17
-+          Channel: 66 len 13 [PSM 23 mode Basic (0x00)] {chan 2}
-+            AVCTP Control: Response: type 0x00 label 0 PID 0x110e
-+              AV/C: Accepted: address 0x48 opcode 0x00
-+                Subunit: Panel
-+                Opcode: Vendor Dependent
-+                Company ID: 0x001958
-+                  AVRCP: SetAbsoluteVolume pt Single len 0x0001
-+                    Volume: 50.39% (64/127)
-+
-+**Playback status**::
-+
-+    AVRCP: GetPlayStatus pt Single len 0x0009
-+      SongLength: 0x00038270 (230000 milliseconds)
-+      SongPosition: 0x00000000 (0 milliseconds)
-+      PlayStatus: 0x01 (PLAYING)
-+
-+**Track metadata** (GetElementAttributes response)::
-+
-+    AVRCP: GetElementAttributes pt Single len 0x0050
-+      AttributeCount: 0x02
-+      Attribute: 0x00000001 (Title)
-+      CharsetID: 0x006a (UTF-8)
-+      AttributeValueLength: 0x000c
-+      AttributeValue: My Song Name
-+      Attribute: 0x00000002 (Artist)
-+      CharsetID: 0x006a (UTF-8)
-+      AttributeValueLength: 0x000b
-+      AttributeValue: The Artist
-+
-+**Passthrough commands** (play, pause, skip)::
-+
-+    AVCTP Control: Command: type 0x00 label 1 PID 0x110e
-+      AV/C: Control: address 0x48 opcode 0x7c
-+        Subunit: Panel
-+        Opcode: Passthrough
-+        Operation: 0x44 (PLAY Pressed)
-+        Length: 0x00
-+
-+**Event notifications** (volume change, track change)::
-+
-+    AVRCP: RegisterNotification pt Single len 0x0005
-+      EventID: 0x0d (EVENT_VOLUME_CHANGED)
-+      Volume: 50.39% (64/127)
-+
-+Automating A2DP Analysis
-+~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+**Identify A2DP activity**::
-+
-+    grep -n "AVDTP:\|Media Codec:" output.txt
-+
-+**Track AVDTP state transitions**::
-+
-+    grep -n "AVDTP:.*Command\|AVDTP:.*Response" output.txt
-+
-+**Check codec negotiation** (what was selected)::
-+
-+    grep -n "Set Configuration\|Media Codec:" output.txt
-+
-+**Verify stream is flowing** -- look for Start accept followed by
-+media data::
-+
-+    grep -n "AVDTP: Start\|PSM 25.*chan 1" output.txt
-+
-+**Detect codec mismatch** -- look for Set Configuration reject::
-+
-+    grep -n "Response Reject\|Error code:" output.txt
-+
-+**Track AVRCP volume and playback**::
-+
-+    grep -n "SetAbsoluteVolume\|Volume:\|GetPlayStatus\|PlayStatus:" output.txt
-+
-+**Full A2DP diagnosis pattern**:
-+
-+1. Find L2CAP Connection Request for PSM 25 -- confirms AVDTP channel
-+   setup
-+2. Find Discover response -- shows available endpoints and whether any
-+   are already in use
-+3. Find Get All Capabilities response -- verify codec support overlap
-+4. Find Set Configuration -- verify agreed codec and parameters
-+5. Find Open and Start -- confirm stream setup succeeded
-+6. Find second L2CAP connection on PSM 25 -- media transport channel
-+7. On failure, check for Response Reject with error code
-+8. If audio cuts out, look for Suspend or Close, or check for ACL
-+   disconnection
-diff --git a/doc/btmon-classic-audio.rst b/doc/btmon-classic-audio.rst
-new file mode 100644
-index 000000000000..11943c3a54bf
---- /dev/null
-+++ b/doc/btmon-classic-audio.rst
-@@ -0,0 +1,12 @@
-+.. This file is included by btmon.rst.
-+
-+CLASSIC AUDIO PROTOCOL FLOW
-+=============================
-+
-+Classic Bluetooth audio uses two main profiles: A2DP for high-quality
-+stereo streaming and HFP for voice calls. Both run over BR/EDR ACL
-+connections and use different transport mechanisms for audio data --
-+A2DP uses L2CAP-based AVDTP media channels while HFP uses SCO/eSCO
-+synchronous connections.
-+
-+.. include:: btmon-a2dp.rst
-diff --git a/doc/btmon.rst b/doc/btmon.rst
-index 6ecadf3f260d..8a02edce8e6a 100644
---- a/doc/btmon.rst
-+++ b/doc/btmon.rst
-@@ -767,6 +767,8 @@ PROTOCOL FLOWS
- 
- .. include:: btmon-le-audio.rst
- 
-+.. include:: btmon-classic-audio.rst
-+
- .. include:: btmon-advertising.rst
- 
- EXAMPLES
++    > BR-ESCO: Handle 257 flags 0x00 dlen 60
++    < BR-ESCO: Handle 257 flags 0x00 dlen 60
++
++btmon labels packets based on the connection type established in
++Synchronous Connection Complete:
++
++- ``BR-SCO`` -- Legacy SCO connection
++- ``BR-ESCO`` -- Enhanced SCO connection (mSBC, LC3-SWB, or eSCO CVSD)
++
++SCO data payload is **not displayed by default**. It requires the
++``--show-sco-data`` filter to see the hex dump of voice data.
++
++Codec-Specific Connection Summary
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++**CVSD (narrow band)**:
++
++- HFP codec ID: 1
++- HCI codec: CVSD (0x02)
++- Voice setting: 0x0060 (Air Coding Format: CVSD)
++- Air mode: CVSD (0x02)
++- Link type: SCO or eSCO
++- Typical packet size: 48 bytes (HV3) or 60 bytes (EV3)
++
++**mSBC (wide band speech)**:
++
++- HFP codec ID: 2
++- HCI codec: mSBC (0x05)
++- Voice setting: 0x0063 (Air Coding Format: Transparent Data)
++- Air mode: Transparent (0x03)
++- Link type: eSCO
++- Typical packet size: 60 bytes (EV3, T2 settings)
++
++**LC3-SWB (super wide band)**:
++
++- HFP codec ID: 3
++- HCI codec: LC3 (0x06)
++- Voice setting: 0x0063 (Air Coding Format: Transparent Data)
++- Air mode: Transparent (0x03)
++- Link type: eSCO
++- Note: btmon displays ``LC3``, not ``LC3-SWB``
++
++Automating HFP Analysis
++~~~~~~~~~~~~~~~~~~~~~~~~~
++
++**Identify HFP activity** -- look for RFCOMM on PSM 3::
++
++    grep -n "PSM: 3\|RFCOMM:" output.txt
++
++**Read AT commands** -- search hex dump ASCII for AT command patterns::
++
++    grep -n "AT+B\|AT+C\|+BRSF\|+CIND\|+CHLD\|+BCS" output.txt
++
++**Check codec negotiation** -- look for BCS (Bluetooth Codec
++Selection)::
++
++    grep -n "+BCS\|AT+BAC\|AT+BCS" output.txt
++
++**Verify SCO/eSCO setup**::
++
++    grep -n "Setup Synchronous\|Enhanced Setup Synchronous\|Synchronous Connection Complete\|Write Voice Setting" output.txt
++
++**Check voice codec** -- confirm air mode and coding format::
++
++    grep -n "Air mode:\|Air Coding Format:\|Codec:" output.txt
++
++**Detect SCO failures** -- check Synchronous Connection Complete
++status::
++
++    grep -n "Synchronous Connection Complete" output.txt
++
++Then examine the next line for ``Status:``. Common failures:
++
++- ``Connection Rejected due to Limited Resources (0x0d)`` -- controller
++  cannot allocate bandwidth
++- ``SCO Offset Rejected (0x2b)`` -- timing parameters rejected
++- ``SCO Interval Rejected (0x2c)`` -- interval parameters rejected
++
++**Track call state** -- look for CIEV indicator updates::
++
++    grep -n "+CIEV\|AT+CHUP\|ATD\|ATA\|AT+CLCC\|RING" output.txt
++
++**Full HFP diagnosis pattern**:
++
++1. Find SDP query for UUID 0x111e/0x111f -- confirms HFP discovery
++2. Find L2CAP Connection Request for PSM 3 -- RFCOMM channel setup
++3. Find RFCOMM SABM/UA on DLCI 0 then target DLCI -- multiplexer and
++   data channel
++4. Find AT+BRSF in hex dumps -- feature exchange, check codec
++   negotiation bit
++5. Find AT+BAC in hex dumps -- available codecs reported
++6. Find +BCS/AT+BCS in hex dumps -- codec selected for audio
++7. Find Write Voice Setting -- verify air coding format matches codec
++8. Find Setup Synchronous Connection or Enhanced variant -- SCO setup
++9. Find Synchronous Connection Complete -- check Status, Link type,
++   Air mode
++10. Find BR-SCO or BR-ESCO packets -- voice data flowing
 -- 
 2.53.0
 
