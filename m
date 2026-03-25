@@ -1,69 +1,69 @@
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E80333986D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2026 18:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CFF02DC765
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2026 18:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774464867; cv=none; b=l1EfOEpTK6RekRpsY38bmJxAhdXSU+mGblrvoCrX6gPRBJ5uFrwBLfMTc9CA7IUdpEncfObBvsOTjqCK5P+XW/t5nigvaIF5XML4w1G+5YJd9JVlKP2WWU8yi55IjFMV8dJZwsEzvLxW++AgUVr7QA67xNS2/EYyMOeRh41ZRvc=
+	t=1774464869; cv=none; b=G8ji6URgwfrUk5Uluoj7vf0QE2G69fG2cK6d18dt1UKUOxj0vAjpDGV0msTGOIdveIYu8GIFKdGlhBIq39KWSv7T/0BRqXYJ+FWh7V/M8KnN5TDekG9lIEiX1OwR83u0aLlkejWhHSBg5bc0RPXH7U1EAM2oErzrNnLiNpkEWWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774464867; c=relaxed/simple;
-	bh=Y1K4Dj0vpOJlYOVfe/urQnWPo6jge1rPD3y7TOdo1k4=;
+	s=arc-20240116; t=1774464869; c=relaxed/simple;
+	bh=B05Q5Y8ebRVKixFggMVLM95QTL68cH7bS8ktIyja60E=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Bw5QndYutT+Sr5CRCeGfWLW96hPVud90ZTU1flVELWzp5uz/0wj+u1qfn0u4UYLEUAOMvJgARMj6n9LdUJ0hmAaB9ygU0kDeokn+gTXGnuQIJW6qPK9c45fTzqZoZIwyxElSOscH4f53nNozm0jxVSoskSyK8GrfRk4KOM2bYCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DDU015vm; arc=none smtp.client-ip=209.85.221.181
+	 MIME-Version; b=XbrfdnqROpqPaxT/1soKYzxx1pQrzeID+sPvQG7rLISxHkvKciTtb1yAuvfzs6A5ORy/z5x5XvCpnSo7AStlh/PxC4++30t23I2yG4MPWQNdsVwb0r7xH6hFDguwD1iDsn4O8TAaqLOJiiqB//htvYY/cS3ZGzzyE6w57MWyxSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gumKOOeJ; arc=none smtp.client-ip=209.85.221.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DDU015vm"
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-5675d609621so219978e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2026 11:54:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gumKOOeJ"
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-56cc67e01deso220702e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2026 11:54:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774464864; x=1775069664; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1774464866; x=1775069666; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=R4oEavAdkD+gYhOeFg7b0IR4YeK3Zzr0KsC+busvX0c=;
-        b=DDU015vmSsvGLRRmmFtjMYQ8Ar4qdhCZIgKqd6fZPiZq0yDSa0405e7eMZw+ZN/S5G
-         J+o2BKvtBDK2wzeNFOr90FCb9eHKDfdjs+Th7vU3tRGK1L3Fe7imhld+5WTG6yALI8Zo
-         17KaToHlbVAFlyQhIls1KZ4NUEHZQ3Uo7IOVRrfCqrXyUncafpr44mmvsaqcyuXhgDkD
-         fuGoQr/2ZtaRfXKCUk97PyJA1MnTfvTOoVfeqUVMr4Pqqkvq9A25SB77mtWHFV3DczHm
-         We1PKUfutuwDdd4jTneiuvlPT5fUDF05ufQVyvgehIyaohKf0zn/Doc/vpXwLdg+T5Po
-         jG8g==
+        bh=6fXurI/JQepyfJv/UBhbLGv3tp/jWZHdRKYVT5X3XoE=;
+        b=gumKOOeJUDG8MJ9xYBqplQLcGiRyTpLac4cF6KE4VP2h76JLt6PJH5wFQS0ATFH6t2
+         yLjWUlp5ibn9WABNegjIHAjwygu+GYIUWjJKxVNtQ9FexOrNHJdVapE1ZLwBhg/3RyJy
+         N0a2bSx2JrBzqsmp+EmUexwl7T+pyESGDeJfbzWjMfWYvy5Tlj/FDoE5YofJZ4lYSBNs
+         JDPpLGVeaP4HrGqDvOuTJQS0xjvALUKZ/ZL2I6qHK3kyZMwp71UoMsSSOUdMsXyQeWkz
+         lsaVD8zPX71/Kqmj7ldZCMdNNlMeZvUE2/RGz2X8/nBWUh3ZBu0IQTwa3p9VUFZCi9+F
+         IVXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774464864; x=1775069664;
+        d=1e100.net; s=20251104; t=1774464866; x=1775069666;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=R4oEavAdkD+gYhOeFg7b0IR4YeK3Zzr0KsC+busvX0c=;
-        b=TuYTm8qU937FNx3hwl0BFxxyahqlqQtHAmUoAosDc2ZflHYFZ3FPv837ZiBqPdsYoR
-         cKUihhNfm1KGJbM6inuvV8S1AzhS7ihVyzGNQw0se3V54mWekZXWZbI/L7BdHnqBEB2Z
-         mF9GzacsLSjSmTIt7bwyYzShKlSgu2XtZZHJ+q9/tFC+Jl9QHXeiDll5GqhsiUOUK2o8
-         vgaABUh3cpJ5QUPdOoqkP6jE4wv/T2DTaPv/aPvYW7xctFuk0MkVfCToF9M5jW75ccf2
-         NPaRS98fQlVAAIRb9kTDiepmEESxrmUM7mdMmgeyNAdfFr9QvYZgvEHzImmg1rb6SVU3
-         9vEQ==
-X-Gm-Message-State: AOJu0Yyvw3azkBGcuCuG+FyWuJdSrimnq7AgSS3rVO4zknUHf/q22MBH
-	sL/z7SB3nvBMX0hf9/tTEgvil0s2gNWUOeeIJvM7JSzjCt6qEfR53+EGkgzDkJL8
-X-Gm-Gg: ATEYQzy40Rq+Cm9AdDD7YeWQYqnrDYDQ350CFlZGVVRtJ7gUy0R/SbkbO/Z0KkbeT5R
-	5saOYFLeFGQAOSETyezFi5W2awa3lHsntiecxGbJUQi+Gj5NTwFnNFvVWhEXexKNuyEjZEY0zjn
-	v0xP4gS4PSXw8pVyyo6Pcql05xml/TCQ+7IuNRIuqjAf6KceGhtWT/OaXX91paQIfYS7civEnw6
-	IXcZG8p7CmLOHaqlbJ763y/K3G7enV1nkw8rvmVLrkQoibdhGJWX9+a20m7J6e6EY2DqJPtCq81
-	0uLqt7XW7RdByqh9Hi3lDQZmP+K4nzTgVaxLbNBAQaj5JVMy8J5ZuOXl+RDC5Zu1n4W0U4U4CLd
-	65j/jRAbJ7SlVw8qE7Uncb5XSoVV4jTfKXXoSx25eHUVGZ9Pt8lND42UVZs0P5lWVs0HUymt9Ma
-	R++Dwxb1PQTH27dHWCV5ziKbptCVfYCqgIduEmTCB4iAuV3LIU/17K+7yHAzA/R8W2OjaQUeIhf
-	5gyEhQgmk2vA9BR1w==
-X-Received: by 2002:a05:6122:1353:b0:56c:db9e:7d04 with SMTP id 71dfb90a1353d-56d220a4cc0mr2545378e0c.10.1774464864162;
-        Wed, 25 Mar 2026 11:54:24 -0700 (PDT)
+        bh=6fXurI/JQepyfJv/UBhbLGv3tp/jWZHdRKYVT5X3XoE=;
+        b=WdXMb6zyXcXxVidwJxIZmrax8DogIJmn3lQ3s7OZ7LtF6sevX6K+X4uIo8cTu+zE6K
+         kVQEuScpxahG9JdlzC6D5GUZopzYsBF+sTr9d+QtVYeZyEa9Dvdv+JuHXGB6yWggvrJP
+         qZTZuCSoaC58HSzvfRRvTJPk0nWSf1fqJKT14YZAhiHgKVO79trYbRI0D9BcVUt4KchW
+         x2brC8b9o9pIENYfa1K8GHMGw6nb2WNd93z069xYYFEW6QzsdYwDbrT4iMIkEcADnAds
+         YcC9hw9Q5N94QTd0I7Do3Y2sRvVnJYWu51xlRfEdRjK/4jw633fZu23qwTNWQHJ+Po37
+         afJg==
+X-Gm-Message-State: AOJu0YyP1vSJViNlXoutJQb5cFjEB+idR8yPlFzrMQFQlWphR5cXcIXO
+	YhCiGByQNCUI3e7AGDJYNtPbrVbmdMtCKCJazDFiaEBmnPQ9g/eik+v0wAikCjWS
+X-Gm-Gg: ATEYQzx/ejY8bA6LlHjQAxxE/FGMn1x8/0MekHIbwr+fx3gsxMxrqP16XdNXHCdCrX+
+	ZMvtO8RbCL6ojn5cL/2nzS5+HjOtnjKAM3RPYNPGkLQcvpQPjP91pBAKVLOL8Dg5AWZJyGEzB51
+	ZZPwQQF3tgIiZwod75zgb9YENSeDYJmEMmN/15N2auEa1yj/BVEpwlZcAKWyheO2WB1mWpcpy4d
+	9NV/PcLsLrOgqdLA8nANPJSfzwf+chypktV9JBvL6PqjC9LzUWdxqkf15mm7kVNEXF5kGxEt0GC
+	B5JnnAmGnY1dCSQP1fRUFkC/uKTn1oL9lhM9DUYdNdZcBf4NXb3NHkZUwEMqs7kOVifVLJ1R3Nr
+	BxUouRnMlaLt8cojMg7zrBQrwCUG0KVvMoYOIgVo7H4wvFfuTHyTRQYiwJeFitm92szQTt/ldir
+	AcKsNzNVdMsSnKFWrjQGqf464M2C57Fv7DmH4DR7ndJEKS6k8crT15yNiH1Q9toLG++quvKD5aj
+	WCd6j9bJf7Tc5Dxbg==
+X-Received: by 2002:a05:6122:340e:b0:56c:860b:c34e with SMTP id 71dfb90a1353d-56d21f67619mr2796621e0c.8.1774464865672;
+        Wed, 25 Mar 2026 11:54:25 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56d31d71947sm921438e0c.14.2026.03.25.11.54.23
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56d31d71947sm921438e0c.14.2026.03.25.11.54.24
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Mar 2026 11:54:23 -0700 (PDT)
+        Wed, 25 Mar 2026 11:54:25 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 7/9] doc/btmon: Add HCI initialization sequence documentation
-Date: Wed, 25 Mar 2026 14:54:03 -0400
-Message-ID: <20260325185406.568078-7-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 8/9] doc/btmon: Add A2DP/AVDTP protocol flow documentation
+Date: Wed, 25 Mar 2026 14:54:04 -0400
+Message-ID: <20260325185406.568078-8-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260325185406.568078-1-luiz.dentz@gmail.com>
 References: <20260325185406.568078-1-luiz.dentz@gmail.com>
@@ -73,418 +73,499 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Document the multi-stage HCI controller initialization performed by
-the kernel (net/bluetooth/hci_sync.c). The four stages cover reset
-and identity, capability discovery, event mask configuration, and
-final setup. This helps trace readers distinguish normal init traffic
-from application-level issues.
+Add btmon-a2dp.rst documenting the A2DP protocol flow as seen in btmon
+output, wrapped by btmon-classic-audio.rst parent file. Coverage
+includes:
+
+ - AVDTP signaling: Discover, Get Capabilities, Set Configuration,
+   Open, Start, Suspend, Close
+ - Codec capability/configuration decoding for SBC, AAC, aptX, aptX HD,
+   aptX Low Latency, FastStream, LDAC, and Opus
+ - AVDTP media transport channel setup
+ - AVRCP control and browsing channel overview
+ - Delay Reporting
+ - Automation-friendly grep patterns
 ---
- Makefile.am            |   2 +
- doc/btmon-hci-init.rst | 363 +++++++++++++++++++++++++++++++++++++++++
- doc/btmon.rst          |   2 +
- 3 files changed, 367 insertions(+)
- create mode 100644 doc/btmon-hci-init.rst
+ Makefile.am                 |   2 +
+ doc/btmon-a2dp.rst          | 418 ++++++++++++++++++++++++++++++++++++
+ doc/btmon-classic-audio.rst |  12 ++
+ doc/btmon.rst               |   2 +
+ 4 files changed, 434 insertions(+)
+ create mode 100644 doc/btmon-a2dp.rst
+ create mode 100644 doc/btmon-classic-audio.rst
 
 diff --git a/Makefile.am b/Makefile.am
-index a8473127cf66..e67a1f5c81e9 100644
+index e67a1f5c81e9..7bbb968f66f7 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -550,6 +550,8 @@ EXTRA_DIST += doc/btmon-gatt.rst
+@@ -552,6 +552,8 @@ EXTRA_DIST += doc/btmon-connections.rst
  
- EXTRA_DIST += doc/btmon-connections.rst
+ EXTRA_DIST += doc/btmon-hci-init.rst
  
-+EXTRA_DIST += doc/btmon-hci-init.rst
++EXTRA_DIST += doc/btmon-classic-audio.rst doc/btmon-a2dp.rst
 +
  EXTRA_DIST += tools/magic.btsnoop
  
  AM_CPPFLAGS += $(DBUS_CFLAGS) $(GLIB_CFLAGS) -I$(srcdir)/lib
-diff --git a/doc/btmon-hci-init.rst b/doc/btmon-hci-init.rst
+diff --git a/doc/btmon-a2dp.rst b/doc/btmon-a2dp.rst
 new file mode 100644
-index 000000000000..9890df7c38af
+index 000000000000..516410e4e283
 --- /dev/null
-+++ b/doc/btmon-hci-init.rst
-@@ -0,0 +1,363 @@
-+.. This file is included by btmon.rst.
++++ b/doc/btmon-a2dp.rst
+@@ -0,0 +1,418 @@
++.. This file is included by btmon-classic-audio.rst.
 +
-+HCI INITIALIZATION SEQUENCE
-+============================
++A2DP: Advanced Audio Distribution
++-----------------------------------
 +
-+Every btsnoop trace that captures controller startup begins with a
-+dense block of HCI commands and events. This is the kernel's
-+Bluetooth subsystem initializing the controller through a multi-stage
-+sequence defined in ``net/bluetooth/hci_sync.c``. Understanding this
-+sequence helps distinguish normal initialization traffic from
-+application-level issues.
++A2DP uses AVDTP (Audio/Video Distribution Transport Protocol) over
++L2CAP to negotiate codec parameters and stream high-quality audio.
++btmon fully decodes AVDTP signaling, codec capabilities, and AVRCP
++remote control messages.
 +
-+Overview
-+--------
++AVDTP Signaling Channel
++~~~~~~~~~~~~~~~~~~~~~~~~
 +
-+The kernel initializes a Bluetooth controller in four stages after
-+opening the HCI device. Each stage sends a batch of HCI commands and
-+waits for their completion before proceeding to the next. The full
-+call chain is::
++A2DP begins with an L2CAP connection on PSM 25 (0x0019). The first
++L2CAP connection on this PSM carries AVDTP signaling; a second
++connection on the same PSM carries media transport data::
 +
-+    hci_power_on_sync
-+      └─ hci_dev_open_sync
-+           └─ hci_dev_init_sync
-+                ├─ hci_dev_setup_sync     (driver setup + quirks)
-+                └─ hci_init_sync
-+                     ├─ Stage 1: Reset + identity
-+                     ├─ Stage 2: Capabilities + buffer sizes
-+                     ├─ Stage 3: Event masks + policy
-+                     └─ Stage 4: Final configuration
++    < ACL Data TX: Handle 1 flags 0x00 dlen 12
++          L2CAP: Connection Request (0x02) ident 1 len 4
++            PSM: 25 (0x0019)
++            Source CID: 64
 +
-+After all four stages complete, a post-init phase
-+(``hci_powered_update_sync``) configures runtime parameters like
-+SSP, advertising, and scan settings.
++    > ACL Data RX: Handle 1 flags 0x02 dlen 16
++          L2CAP: Connection Response (0x03) ident 1 len 8
++            Destination CID: 64
++            Source CID: 64
++            Result: Connection successful (0x0000)
++            Status: No further information available (0x0000)
 +
-+For unconfigured devices (e.g. controllers that need firmware or a
-+BD address programmed), only a minimal **Stage 0** runs to identify
-+the hardware.
++After L2CAP configuration completes, AVDTP signaling begins on this
++channel.
 +
-+Stage 0: Reset and Basic Identity (Unconfigured Only)
-+-----------------------------------------------------
++Stream Endpoint Discovery
++~~~~~~~~~~~~~~~~~~~~~~~~~~
 +
-+This stage runs only for unconfigured controllers that need setup
-+before full initialization.
++The initiator discovers available Stream Endpoints (SEPs) on the
++remote device::
 +
-+**Commands sent:**
++    < ACL Data TX: Handle 1 flags 0x00 dlen 6
++          Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
++            AVDTP: Discover (0x01) Command (0x00) type 0x00 label 0 nosp 0
++
++    > ACL Data RX: Handle 1 flags 0x02 dlen 10
++          Channel: 64 len 6 [PSM 25 mode Basic (0x00)] {chan 0}
++            AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 0 nosp 0
++              ACP SEID: 1
++                Media Type: Audio (0x00)
++                SEP Type: SNK (0x01)
++                In use: No
++
++Each SEP has a SEID (Stream Endpoint Identifier), media type, and
++role (Source or Sink). ``In use: Yes`` means the endpoint is already
++streaming.
++
++Codec Capability Discovery
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++After discovering SEIDs, the initiator queries each endpoint's
++capabilities::
++
++    < ACL Data TX: Handle 1 flags 0x00 dlen 7
++          Channel: 64 len 3 [PSM 25 mode Basic (0x00)] {chan 0}
++            AVDTP: Get All Capabilities (0x0c) Command (0x00) type 0x00 label 1 nosp 0
++              ACP SEID: 1
++
++    > ACL Data RX: Handle 1 flags 0x02 dlen 30
++          Channel: 64 len 26 [PSM 25 mode Basic (0x00)] {chan 0}
++            AVDTP: Get All Capabilities (0x0c) Response Accept (0x02) type 0x00 label 1 nosp 0
++              Service Category: Media Transport (0x01)
++              Service Category: Media Codec (0x07)
++                Media Type: Audio (0x00)
++                Media Codec: SBC (0x00)
++                  Frequency: 0xf0
++                    16000
++                    32000
++                    44100
++                    48000
++                  Channel Mode: 0x0f
++                    Mono
++                    Dual Channel
++                    Stereo
++                    Joint Stereo
++                  Block Length: 0xf0
++                    4
++                    8
++                    12
++                    16
++                  Subbands: 0x0c
++                    4
++                    8
++                  Allocation Method: 0x03
++                    SNR
++                    Loudness
++                  Minimum Bitpool: 2
++                  Maximum Bitpool: 53
++              Service Category: Content Protection (0x04)
++                Content Protection Type: SCMS-T (0x0002)
++              Service Category: Delay Reporting (0x08)
++
++Capability responses list all supported values as bitmasks. Key
++service categories:
++
++- **Media Transport** (0x01) -- Always present, indicates the endpoint
++  supports a media transport channel
++- **Media Codec** (0x07) -- Codec type and supported parameters
++- **Content Protection** (0x04) -- Copy protection (SCMS-T or DTCP)
++- **Delay Reporting** (0x08) -- Endpoint supports delay reporting
++
++Supported Codecs
++~~~~~~~~~~~~~~~~~
++
++btmon decodes several A2DP codecs. Each has a different parameter
++format.
++
++**SBC** (mandatory A2DP codec)::
++
++    Media Codec: SBC (0x00)
++      Frequency: 44100 (0x20)
++      Channel Mode: Joint Stereo (0x01)
++      Block Length: 16 (0x10)
++      Subbands: 8 (0x04)
++      Allocation Method: Loudness (0x01)
++      Minimum Bitpool: 2
++      Maximum Bitpool: 53
++
++**AAC** (MPEG-2,4)::
++
++    Media Codec: MPEG-2,4 AAC (0x02)
++      Object Type: MPEG-4 AAC LC (0x40)
++      Frequency: 44100 (0x0100)
++      Channels: 2 (0x04)
++      Bitrate: 256000bps
++      VBR: No
++
++**aptX** (Qualcomm, vendor-specific)::
++
++    Media Codec: Non-A2DP (0xff)
++      Vendor ID: Qualcomm Technologies International, Ltd. (APT) (0x0000004f)
++      Vendor Specific Codec ID: aptX (0x0001)
++        Frequency: 44100 (0x20)
++        Channel Mode: Stereo (0x02)
++
++**aptX HD** (Qualcomm, vendor-specific)::
++
++    Media Codec: Non-A2DP (0xff)
++      Vendor ID: Qualcomm Technologies, Inc. (0x000000d7)
++      Vendor Specific Codec ID: aptX HD (0x0024)
++        Frequency: 44100 (0x20)
++        Channel Mode: Stereo (0x02)
++
++**LDAC** (Sony, vendor-specific)::
++
++    Media Codec: Non-A2DP (0xff)
++      Vendor ID: Sony Corporation (0x0000012d)
++      Vendor Specific Codec ID: LDAC (0x00aa)
++
++Vendor codecs appear as ``Non-A2DP (0xff)`` with decoded Vendor ID
++and Codec ID. Capability responses list all supported values as
++bitmasks; configuration responses show the single selected value.
++
++Stream Configuration
++~~~~~~~~~~~~~~~~~~~~~
++
++After selecting a codec and parameters, the initiator sends Set
++Configuration::
++
++    < ACL Data TX: Handle 1 flags 0x00 dlen 20
++          Channel: 64 len 16 [PSM 25 mode Basic (0x00)] {chan 0}
++            AVDTP: Set Configuration (0x03) Command (0x00) type 0x00 label 2 nosp 0
++              ACP SEID: 1
++              INT SEID: 1
++              Service Category: Media Transport (0x01)
++              Service Category: Media Codec (0x07)
++                Media Type: Audio (0x00)
++                Media Codec: SBC (0x00)
++                  Frequency: 44100 (0x20)
++                  Channel Mode: Joint Stereo (0x01)
++                  Block Length: 16 (0x10)
++                  Subbands: 8 (0x04)
++                  Allocation Method: Loudness (0x01)
++                  Minimum Bitpool: 2
++                  Maximum Bitpool: 53
++
++    > ACL Data RX: Handle 1 flags 0x02 dlen 6
++          Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
++            AVDTP: Set Configuration (0x03) Response Accept (0x02) type 0x00 label 2 nosp 0
++
++Configuration responses show single selected values instead of
++bitmask lists. ``ACP SEID`` is the remote endpoint, ``INT SEID`` is
++the local endpoint.
++
++If configuration is rejected::
++
++    > ACL Data RX: Handle 1 flags 0x02 dlen 8
++          Channel: 64 len 4 [PSM 25 mode Basic (0x00)] {chan 0}
++            AVDTP: Set Configuration (0x03) Response Reject (0x03) type 0x00 label 2 nosp 0
++              Service Category: Media Codec (0x07)
++              Error code: Unsupported Configuration (0x29)
++
++Common AVDTP error codes:
 +
 +.. list-table::
 +   :header-rows: 1
-+   :widths: 40 60
++   :widths: 10 30 60
 +
-+   * - HCI Command
-+     - Purpose
-+   * - ``HCI_Reset``
-+     - Reset the controller (skipped if ``RESET_ON_CLOSE`` quirk)
-+   * - ``HCI_Read_Local_Version_Information``
-+     - Read hardware/firmware version
-+   * - ``HCI_Read_BD_ADDR``
-+     - Read the controller's Bluetooth address
++   * - Code
++     - Name
++     - Meaning
++   * - 0x01
++     - Bad Header Format
++     - Malformed AVDTP header
++   * - 0x11
++     - Bad ACP SEID
++     - Unknown endpoint ID
++   * - 0x12
++     - SEP In Use
++     - Endpoint already streaming
++   * - 0x13
++     - SEP Not In Use
++     - Endpoint not configured
++   * - 0x29
++     - Unsupported Configuration
++     - Requested parameters not supported
++   * - 0x31
++     - Bad State
++     - Command not valid in current state
 +
-+Stage 1: Reset and Read Local Features
-+---------------------------------------
-+
-+Resets the controller and reads core identity and capability
-+information.
-+
-+**Commands sent:**
-+
-+.. list-table::
-+   :header-rows: 1
-+   :widths: 40 60
-+
-+   * - HCI Command
-+     - Purpose
-+   * - ``HCI_Reset``
-+     - Reset the controller
-+   * - ``HCI_Read_Local_Supported_Features``
-+     - Read LMP feature bitmask (BR/EDR, LE, SSP, etc.)
-+   * - ``HCI_Read_Local_Version_Information``
-+     - Read HCI version, LMP version, manufacturer
-+   * - ``HCI_Read_BD_ADDR``
-+     - Read the public Bluetooth address
-+
-+Stage 2: Read Capabilities and Setup
-+-------------------------------------
-+
-+Reads detailed capabilities, enables core features, and reads buffer
-+sizes. This stage has three phases: common commands, BR/EDR-specific
-+commands, and LE-specific commands.
-+
-+Common Commands
++Open and Start
 +~~~~~~~~~~~~~~~
 +
++After configuration, the stream is opened and then started::
++
++    < ACL Data TX: Handle 1 flags 0x00 dlen 7
++          Channel: 64 len 3 [PSM 25 mode Basic (0x00)] {chan 0}
++            AVDTP: Open (0x06) Command (0x00) type 0x00 label 3 nosp 0
++              ACP SEID: 1
++
++    > ACL Data RX: Handle 1 flags 0x02 dlen 6
++          Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
++            AVDTP: Open (0x06) Response Accept (0x02) type 0x00 label 3 nosp 0
++
++After Open succeeds, a **second L2CAP connection** on PSM 25 is
++established for the media transport channel. Then Start begins
++streaming::
++
++    < ACL Data TX: Handle 1 flags 0x00 dlen 7
++          Channel: 64 len 3 [PSM 25 mode Basic (0x00)] {chan 0}
++            AVDTP: Start (0x07) Command (0x00) type 0x00 label 4 nosp 0
++              ACP SEID: 1
++
++    > ACL Data RX: Handle 1 flags 0x02 dlen 6
++          Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
++            AVDTP: Start (0x07) Response Accept (0x02) type 0x00 label 4 nosp 0
++
++Media Data
++~~~~~~~~~~~
++
++After Start, encoded audio flows on the media transport channel
++(second L2CAP connection on PSM 25). btmon does **not** decode media
++packet contents by default -- media data is suppressed. Only the
++L2CAP channel header is visible when the ``--show-a2dp-stream``
++filter is enabled, with the payload shown as a raw hex dump.
++
++The AVDTP state machine visible in the trace:
++
 +.. list-table::
 +   :header-rows: 1
-+   :widths: 40 60
++   :widths: 20 30 50
 +
-+   * - HCI Command
-+     - Purpose
-+   * - ``HCI_Read_Local_Supported_Commands``
-+     - Read the supported command bitmask (HCI 1.2+)
-+   * - ``HCI_Write_Simple_Pairing_Mode`` (enable)
-+     - Enable SSP if supported and configured
-+   * - ``HCI_Write_Extended_Inquiry_Response`` (clear)
-+     - Clear EIR data when SSP is disabled
-+   * - ``HCI_Write_Inquiry_Mode``
-+     - Set inquiry mode (RSSI or Extended, based on features)
-+   * - ``HCI_Read_Inquiry_Response_Transmit_Power_Level``
-+     - Read inquiry TX power if supported
-+   * - ``HCI_Read_Local_Extended_Features`` (page 1)
-+     - Read extended feature page 1 (SSP host, LE host, etc.)
-+   * - ``HCI_Write_Authentication_Enable``
-+     - Sync authentication state with ``LINK_SECURITY`` flag
++   * - State
++     - Triggered By
++     - Description
++   * - Idle
++     - Initial / Abort response
++     - No stream configured
++   * - Configured
++     - Set Configuration accept
++     - Codec and parameters selected
++   * - Open
++     - Open accept / Suspend accept
++     - Transport channel ready, not streaming
++   * - Streaming
++     - Start accept
++     - Audio data flowing
++   * - Closing
++     - Close command sent
++     - Tearing down stream
++   * - Aborting
++     - Abort command sent
++     - Forced teardown
 +
-+BR/EDR Commands (if BR/EDR capable)
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+.. list-table::
-+   :header-rows: 1
-+   :widths: 40 60
-+
-+   * - HCI Command
-+     - Purpose
-+   * - ``HCI_Read_Buffer_Size``
-+     - Read ACL/SCO buffer sizes and count
-+   * - ``HCI_Read_Class_of_Device``
-+     - Read current device class
-+   * - ``HCI_Read_Local_Name``
-+     - Read the stored local name
-+   * - ``HCI_Read_Voice_Setting``
-+     - Read SCO voice setting (if supported)
-+   * - ``HCI_Read_Number_of_Supported_IAC``
-+     - Read number of supported inquiry access codes
-+   * - ``HCI_Read_Current_IAC_LAP``
-+     - Read current IAC LAP values
-+   * - ``HCI_Set_Event_Filter`` (clear all)
-+     - Clear any stored event filters
-+   * - ``HCI_Write_Connection_Accept_Timeout``
-+     - Set connection accept timeout (~20 seconds)
-+   * - ``HCI_Write_Synchronous_Flow_Control_Enable``
-+     - Enable SCO flow control if supported
-+
-+LE Commands (if LE capable)
++Suspend, Close, and Abort
 +~~~~~~~~~~~~~~~~~~~~~~~~~~~
 +
-+.. list-table::
-+   :header-rows: 1
-+   :widths: 40 60
++**Suspend** pauses streaming without tearing down the transport::
 +
-+   * - HCI Command
-+     - Purpose
-+   * - ``LE_Read_Local_Supported_Features``
-+     - Read LE feature bitmask
-+   * - ``LE_Read_All_Local_Supported_Features``
-+     - Read extended LE features (if supported)
-+   * - ``LE_Read_Buffer_Size`` [v2] or [v1]
-+     - Read LE ACL (and ISO) buffer sizes; v2 used when ISO capable
-+   * - ``LE_Read_Supported_States``
-+     - Read the LE state combination table
++    AVDTP: Suspend (0x09) Command (0x00) type 0x00 label 5 nosp 0
++      ACP SEID: 1
++    AVDTP: Suspend (0x09) Response Accept (0x02) type 0x00 label 5 nosp 0
 +
-+Stage 3: Event Masks, Link Policy, and Features
-+------------------------------------------------
++**Close** tears down the stream (returns to Idle)::
 +
-+Configures which events the controller should report, sets link
-+policy, and reads extended feature pages. This is the longest stage.
++    AVDTP: Close (0x08) Command (0x00) type 0x00 label 6 nosp 0
++      ACP SEID: 1
++    AVDTP: Close (0x08) Response Accept (0x02) type 0x00 label 6 nosp 0
 +
-+Event Masks and Link Policy
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~
++**Abort** forces immediate teardown::
 +
-+.. list-table::
-+   :header-rows: 1
-+   :widths: 40 60
++    AVDTP: Abort (0x0a) Command (0x00) type 0x00 label 7 nosp 0
++      ACP SEID: 1
++    AVDTP: Abort (0x0a) Response Accept (0x02) type 0x00 label 7 nosp 0
 +
-+   * - HCI Command
-+     - Purpose
-+   * - ``HCI_Set_Event_Mask``
-+     - Configure the main event mask based on controller capabilities
-+   * - ``HCI_Read_Stored_Link_Key``
-+     - Read all stored link keys
-+   * - ``HCI_Write_Default_Link_Policy_Settings``
-+     - Enable role switch, hold, sniff, park based on LMP features
-+   * - ``HCI_Read_Page_Scan_Activity``
-+     - Read page scan interval and window
-+   * - ``HCI_Read_Default_Erroneous_Data_Reporting``
-+     - Read error data reporting state (for wideband speech)
-+   * - ``HCI_Read_Page_Scan_Type``
-+     - Read page scan type (standard or interlaced)
-+   * - ``HCI_Read_Local_Extended_Features`` (pages 2..N)
-+     - Read all remaining extended feature pages
++Delay Reporting
++~~~~~~~~~~~~~~~~
 +
-+**Event mask details:** For dual-mode controllers the kernel enables
-+events for inquiry results (RSSI and extended), SSP (IO capability,
-+user confirmation, passkey), synchronous connections, sniff
-+subrating, encryption refresh, link supervision, and LE meta-events.
-+For LE-only controllers a minimal mask covers only command
-+completion, hardware errors, disconnection, and encryption changes.
++When the sink supports delay reporting, it sends a Delay Report to
++inform the source of its rendering delay::
 +
-+LE Event Mask and Capabilities
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++    AVDTP: Delay Report (0x0d) Command (0x00) type 0x00 label 8 nosp 0
++      ACP SEID: 1
++      Delay: 15.0ms
++    AVDTP: Delay Report (0x0d) Response Accept (0x02) type 0x00 label 8 nosp 0
 +
-+.. list-table::
-+   :header-rows: 1
-+   :widths: 40 60
++AVRCP Remote Control
++~~~~~~~~~~~~~~~~~~~~~
 +
-+   * - HCI Command
-+     - Purpose
-+   * - ``LE_Set_Event_Mask``
-+     - Configure which LE sub-events are reported
-+   * - ``LE_Read_Advertising_Channel_Tx_Power``
-+     - Read advertising TX power (legacy advertising only)
-+   * - ``LE_Read_Transmit_Power``
-+     - Read min/max transmit power range
-+   * - ``LE_Read_Accept_List_Size``
-+     - Read filter accept list capacity
-+   * - ``LE_Clear_Accept_List``
-+     - Clear the filter accept list
-+   * - ``LE_Read_Resolving_List_Size``
-+     - Read resolving list capacity (LL Privacy)
-+   * - ``LE_Clear_Resolving_List``
-+     - Clear the resolving list
-+   * - ``LE_Set_Resolvable_Private_Address_Timeout``
-+     - Set RPA rotation timeout
-+   * - ``LE_Read_Maximum_Data_Length``
-+     - Read max TX/RX octets and time (Data Length Extension)
-+   * - ``LE_Read_Suggested_Default_Data_Length``
-+     - Read current default data length
-+   * - ``LE_Read_Number_of_Supported_Advertising_Sets``
-+     - Read extended advertising set capacity
-+   * - ``HCI_Write_LE_Host_Supported``
-+     - Notify controller of host LE support (dual-mode only)
-+   * - ``LE_Set_Host_Feature``
-+     - Enable CIS Central (bit 32) and/or Channel Sounding (bit 47)
++AVRCP (Audio/Video Remote Control Profile) uses L2CAP PSM 23
++(control) and PSM 27 (browsing). btmon decodes AVCTP framing and
++AVRCP PDUs.
 +
-+**LE event mask details:** The kernel enables LE sub-events based on
-+features: connection complete (enhanced if available), advertising
-+reports (extended if available), long term key request, connection
-+parameter request, data length change, PHY update, channel selection
-+algorithm, periodic advertising events, CIS established/request (if
-+CIS capable), BIG create/sync/info (if BIS capable), and channel
-+sounding events (if CS capable).
++**Volume control**::
 +
-+Stage 4: Final Configuration
-+-----------------------------
++    < ACL Data TX: Handle 1 flags 0x00 dlen 17
++          Channel: 66 len 13 [PSM 23 mode Basic (0x00)] {chan 2}
++            AVCTP Control: Response: type 0x00 label 0 PID 0x110e
++              AV/C: Accepted: address 0x48 opcode 0x00
++                Subunit: Panel
++                Opcode: Vendor Dependent
++                Company ID: 0x001958
++                  AVRCP: SetAbsoluteVolume pt Single len 0x0001
++                    Volume: 50.39% (64/127)
 +
-+Performs final setup: deletes stale keys, sets event mask page 2,
-+reads codec information, enables Secure Connections, and configures
-+LE data length and PHY defaults.
++**Playback status**::
 +
-+Keys, Codecs, and Secure Connections
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++    AVRCP: GetPlayStatus pt Single len 0x0009
++      SongLength: 0x00038270 (230000 milliseconds)
++      SongPosition: 0x00000000 (0 milliseconds)
++      PlayStatus: 0x01 (PLAYING)
 +
-+.. list-table::
-+   :header-rows: 1
-+   :widths: 40 60
++**Track metadata** (GetElementAttributes response)::
 +
-+   * - HCI Command
-+     - Purpose
-+   * - ``HCI_Delete_Stored_Link_Key`` (all)
-+     - Delete all stored link keys from controller
-+   * - ``HCI_Set_Event_Mask_Page_2``
-+     - Enable page 2 events (authenticated payload timeout, etc.)
-+   * - ``HCI_Read_Local_Supported_Codecs`` [v2] or [v1]
-+     - Read supported codec IDs; v2 includes transport type info
-+   * - ``HCI_Read_Local_Pairing_Options``
-+     - Read default pairing options (max encryption key size)
-+   * - ``HCI_Get_MWS_Transport_Layer_Configuration``
-+     - Read MWS coexistence config if supported
-+   * - ``HCI_Read_Synchronization_Train_Parameters``
-+     - Read sync train params (Connectionless Peripheral Broadcast)
-+   * - ``HCI_Write_Secure_Connections_Support`` (enable)
-+     - Enable Secure Connections if SSP active
-+   * - ``HCI_Write_Default_Erroneous_Data_Reporting``
-+     - Enable/disable based on wideband speech setting
++    AVRCP: GetElementAttributes pt Single len 0x0050
++      AttributeCount: 0x02
++      Attribute: 0x00000001 (Title)
++      CharsetID: 0x006a (UTF-8)
++      AttributeValueLength: 0x000c
++      AttributeValue: My Song Name
++      Attribute: 0x00000002 (Artist)
++      CharsetID: 0x006a (UTF-8)
++      AttributeValueLength: 0x000b
++      AttributeValue: The Artist
 +
-+LE Data Length and PHY Defaults
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++**Passthrough commands** (play, pause, skip)::
 +
-+.. list-table::
-+   :header-rows: 1
-+   :widths: 40 60
++    AVCTP Control: Command: type 0x00 label 1 PID 0x110e
++      AV/C: Control: address 0x48 opcode 0x7c
++        Subunit: Panel
++        Opcode: Passthrough
++        Operation: 0x44 (PLAY Pressed)
++        Length: 0x00
 +
-+   * - HCI Command
-+     - Purpose
-+   * - ``LE_Write_Suggested_Default_Data_Length``
-+     - Set default TX octets/time for new connections
-+   * - ``LE_Set_Default_PHY``
-+     - Set preferred PHY (1M always; 2M and Coded if supported)
++**Event notifications** (volume change, track change)::
 +
-+Post-Initialization
-+-------------------
++    AVRCP: RegisterNotification pt Single len 0x0005
++      EventID: 0x0d (EVENT_VOLUME_CHANGED)
++      Volume: 50.39% (64/127)
 +
-+After the four stages complete, ``hci_powered_update_sync`` runs to
-+apply runtime configuration:
++Automating A2DP Analysis
++~~~~~~~~~~~~~~~~~~~~~~~~~~
 +
-+.. list-table::
-+   :header-rows: 1
-+   :widths: 40 60
++**Identify A2DP activity**::
 +
-+   * - Action
-+     - Purpose
-+   * - ``HCI_Write_Simple_Pairing_Mode``
-+     - Re-enable SSP + Secure Connections if configured
-+   * - ``HCI_Write_LE_Host_Supported``
-+     - Sync LE host support state
-+   * - LE advertising setup
-+     - Configure advertising parameters and data
-+   * - ``HCI_Write_Authentication_Enable``
-+     - Sync authentication enable state
-+   * - Scan/class/name/EIR updates
-+     - Configure page scan, device class, local name, EIR data
-+   * - ``LE_Set_Random_Address``
-+     - Set static random address if no public address
++    grep -n "AVDTP:\|Media Codec:" output.txt
 +
-+Reading the Init Sequence in a Trace
-+-------------------------------------
++**Track AVDTP state transitions**::
 +
-+When examining a btsnoop trace, the initialization block is the
-+first thing after the controller is opened. A typical dual-mode
-+controller trace starts with::
++    grep -n "AVDTP:.*Command\|AVDTP:.*Response" output.txt
 +
-+    < HCI Command: Reset
-+    > HCI Event: Command Complete (Reset)
-+    < HCI Command: Read Local Supported Features
-+    > HCI Event: Command Complete (Read Local Supported Features)
-+    < HCI Command: Read Local Version Information
-+    > HCI Event: Command Complete (Read Local Version Information)
-+    < HCI Command: Read BD ADDR
-+    > HCI Event: Command Complete (Read BD ADDR)
-+    ... [Stage 2-4 commands follow]
++**Check codec negotiation** (what was selected)::
 +
-+**Key things to look for:**
++    grep -n "Set Configuration\|Media Codec:" output.txt
 +
-+- **Missing commands**: If expected commands are absent, the
-+  controller may not support the corresponding feature. For example,
-+  no ``LE_Read_Buffer_Size`` means the controller is BR/EDR only.
++**Verify stream is flowing** -- look for Start accept followed by
++media data::
 +
-+- **Command failures**: A ``Status`` other than ``0x00`` in a Command
-+  Complete event during init usually indicates a broken controller or
-+  unsupported feature. The kernel handles most gracefully, but
-+  persistent errors may prevent the adapter from functioning.
++    grep -n "AVDTP: Start\|PSM 25.*chan 1" output.txt
 +
-+- **Buffer sizes**: The values returned by ``Read_Buffer_Size`` and
-+  ``LE_Read_Buffer_Size`` determine how many in-flight packets the
-+  controller can hold. Small buffer counts can cause throughput
-+  issues.
++**Detect codec mismatch** -- look for Set Configuration reject::
 +
-+- **Feature bits**: The ``Read_Local_Supported_Features`` response
-+  reveals what the controller supports (LE, SSP, eSCO, etc.). Cross
-+  reference with the commands that follow — the kernel only sends
-+  commands for features the controller reports supporting.
++    grep -n "Response Reject\|Error code:" output.txt
 +
-+- **Event mask**: The ``Set_Event_Mask`` command shows exactly which
-+  events the host wants to receive. If an expected event never
-+  appears in the trace, check whether it was enabled in the mask.
++**Track AVRCP volume and playback**::
 +
-+- **LE-only controllers**: These skip all BR/EDR commands
-+  (``Read_Buffer_Size``, ``Read_Local_Name``, link policy, etc.) and
-+  use a minimal event mask. The trace will be noticeably shorter.
++    grep -n "SetAbsoluteVolume\|Volume:\|GetPlayStatus\|PlayStatus:" output.txt
 +
-+- **Vendor commands**: Some controllers (Intel, Broadcom, Qualcomm,
-+  Realtek, MediaTek) insert vendor-specific HCI commands between
-+  stages for firmware download, configuration, or patch application.
-+  These appear as opcode groups ``0x3F`` (vendor) and are
-+  driver-specific.
++**Full A2DP diagnosis pattern**:
++
++1. Find L2CAP Connection Request for PSM 25 -- confirms AVDTP channel
++   setup
++2. Find Discover response -- shows available endpoints and whether any
++   are already in use
++3. Find Get All Capabilities response -- verify codec support overlap
++4. Find Set Configuration -- verify agreed codec and parameters
++5. Find Open and Start -- confirm stream setup succeeded
++6. Find second L2CAP connection on PSM 25 -- media transport channel
++7. On failure, check for Response Reject with error code
++8. If audio cuts out, look for Suspend or Close, or check for ACL
++   disconnection
+diff --git a/doc/btmon-classic-audio.rst b/doc/btmon-classic-audio.rst
+new file mode 100644
+index 000000000000..11943c3a54bf
+--- /dev/null
++++ b/doc/btmon-classic-audio.rst
+@@ -0,0 +1,12 @@
++.. This file is included by btmon.rst.
++
++CLASSIC AUDIO PROTOCOL FLOW
++=============================
++
++Classic Bluetooth audio uses two main profiles: A2DP for high-quality
++stereo streaming and HFP for voice calls. Both run over BR/EDR ACL
++connections and use different transport mechanisms for audio data --
++A2DP uses L2CAP-based AVDTP media channels while HFP uses SCO/eSCO
++synchronous connections.
++
++.. include:: btmon-a2dp.rst
 diff --git a/doc/btmon.rst b/doc/btmon.rst
-index 9cf1464eae63..6ecadf3f260d 100644
+index 6ecadf3f260d..8a02edce8e6a 100644
 --- a/doc/btmon.rst
 +++ b/doc/btmon.rst
-@@ -755,6 +755,8 @@ Errors often cascade across layers. Common patterns:
- PROTOCOL FLOWS
- ===============
+@@ -767,6 +767,8 @@ PROTOCOL FLOWS
  
-+.. include:: btmon-hci-init.rst
+ .. include:: btmon-le-audio.rst
+ 
++.. include:: btmon-classic-audio.rst
 +
- .. include:: btmon-connections.rst
+ .. include:: btmon-advertising.rst
  
- .. include:: btmon-gatt.rst
+ EXAMPLES
 -- 
 2.53.0
 
