@@ -1,227 +1,228 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32F2234CFB3
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2026 19:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC1631F99F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2026 19:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774466114; cv=pass; b=XR4c6am6JR5tpuvzQV8JKsmUDeBIPu9oSHPkXv4LD4O2Qc7K66x0zF1UdtxESjiRK/PviC3+DCrB1+BaQhTShmIiaXHVjydEEDcXnHd3a5WKjl7S1oSODiI+RKpo3ajO5vjAcVak3eQbKb+/v6wBIw8EfkWViFFfD42dj8qZqXw=
+	t=1774466574; cv=pass; b=ENor/CqEgs9chdXFqLbxPXjBmTuplM+B9MZpgaFA0miFOMFPdYMpSmn4xiZ8+tJR4ua1LqnYZ3vgFvx91wGM0kxJCV8AXAJ/0Mx6YoL8bOdMlZQ8HUeVbA7RvBD4IUsWShCrA3yVki2wyrFhMPwSTL9Zl6qzKRzFrmwM6XHSVR0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774466114; c=relaxed/simple;
-	bh=17uL7JqHbOdiM2LCamOjd/sRNjP9sKh1QCAnUmr3srQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FJwJwmOWM+irKGQNaWH6KBKVBQGR5ToLleL6TBDFNON62n7efzBO9htHRK3ZZt0ICNiN6FOF52zYquCGKBRqDcXfOJ2v46thknocaj7YYqXwzHoOlw12Sf1KcK9Jd4u22mPGgWtQfkWUw0M9qfEmReT6iy/ce1LfOxp39YfZg98=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=KvYxG0ac; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	s=arc-20240116; t=1774466574; c=relaxed/simple;
+	bh=M23odA6iUh/3k9hZ+Ebrm2lXVOhcX4kDmUrO0yXCJPU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aHXc5FDbzlu1lfC+Dt9uhmMGbcPf96H7Inwg3bhhiTg9X6UujKSRGBsC3KpdEdvYdy5prIMyYCh4wIh7y62RtaKvKIqLDx3IIo3LU6WgkkLcCA1dguMKwQCAk32JyhYCDOX7lYPeP55cbzyB86oFytRoQ8mXfKnfRrR2m3XkTx8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YkBwYCiV; arc=pass smtp.client-ip=74.125.224.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="KvYxG0ac"
-Received: from [192.168.1.195] (unknown [IPv6:2a03:1b20:1:f410::a01d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4fgxSB4fsMz49Q53;
-	Wed, 25 Mar 2026 21:15:06 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1774466107;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=yPKFZksGAfP47am+szcwpVl/SftLS/BdJnxM9VS0F3I=;
-	b=KvYxG0ac6KzC4z4XXoprL1TwARAodzBcbDPx2qhTnofnQyPAGKosNh4+cilLHZiZuSfnBv
-	VqM+iAX0mS67he657Vdbgnac1WIUQcnU3FZPBR7MrgZBaIbELnoXchhXHMC+6UjwmLQHJF
-	aXwpPi+ph4bJvyvbTyQkgP5AOu6+A0HR7RYhmDu+A8NRe/2tTN4IIvAxw/Wz7kDm5xUNpj
-	H3h2aV+FvzJkMt1e6bpiF/4lp2kfCAD3vMO3U9TmvSFOX957oHS1vKbxDe3u5p1if9DP9w
-	vgv31AiC6eo2ZW/py2jQ5kk9yoECvV/ARVKoPYepbYSdNJqCtUSfw92p5OnnYw==
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1774466107;
-	b=SksPYvF0UxmFKBV2ZuUUzoPlCXDFvCZ7AGV01BTA3ilyoadykn1wzIQ6YaG4YEUJVY019L
-	xKTgmpGAFgOQ4+4qt9hwNsrnTxzb2mPoMnzkIAj5RjRNEailjAen7H/3XzGIgDoxlgMJ/m
-	sAOS3QDJXZ8xpSOhZhKG5C+X20Y8JD0GBVAy5aJTp2WNaTDG2tPNjrxH2XdtAKfqzB9X09
-	l6m2VcW5GOmjmTqi2J1s8zLz4IbNgkq2tmfj2KAZOnQDbC8uxubOAvwx9CsXdLiyeb/ptf
-	22vk8uvcaFj1mrm7MzBmjDDP2fZHMILsqJ4/DPKRD4kULXJr4Uw6qD6sPHoK8g==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pauli.virtanen@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1774466107;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=yPKFZksGAfP47am+szcwpVl/SftLS/BdJnxM9VS0F3I=;
-	b=YdbUInDuAkri8htp3Xi38S/AnFbgZzfAYAF3+45RJKEPMN98MdG47tb4Ud13IBhc4XtHR3
-	96L4hVPHNFmFcCWHYnO6KWkcYs7YuLUBWtUgUlNTBMVMAT7aT+gdE4HlMsyQnUP8U47Kg0
-	PVe4sX+YgDM1c4hIkMEyD8BIEf1P1QTDQb24ySK72SeRIc/1rOuLMxgVdNYVW1vuM+E6l9
-	sb15iANi7m43hXv6iNKAHjLTHmkbkGjgMJklQr4Ofz1uYVg+1J81X0u5so2Sdx50kvEQqb
-	hr4VbX448HKDmU9SMC5/DhGhknLep/6ktP81Qm7SbGfjabuJjFMW2Bzfd2MGtA==
-Message-ID: <96256cdd679395e70b8317db7655ec6dfc4c9386.camel@iki.fi>
-Subject: Re: [PATCH 3/3] Bluetooth: hci_sync: make hci_cmd_sync_run_once
- return -EEXIST if exists
-From: Pauli Virtanen <pauli.virtanen@iki.fi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 25 Mar 2026 21:15:05 +0200
-In-Reply-To: <CABBYNZ+aBV2C6NQ=Pv_1ZRhhnntcd46bkOS2gj1sj_X4PoUjjw@mail.gmail.com>
-References: 
-	<f7ccb4a4f9e462a6c1c1ddba8dd1cdcc9456944b.1774459946.git.pav@iki.fi>
-	 <1eec5447ed02666ef9463bbc96c25971ce9c0d1f.1774459946.git.pav@iki.fi>
-	 <CABBYNZ+aBV2C6NQ=Pv_1ZRhhnntcd46bkOS2gj1sj_X4PoUjjw@mail.gmail.com>
-Autocrypt: addr=pauli.virtanen@iki.fi; prefer-encrypt=mutual;
- keydata=mQINBGX+qmEBEACt7O4iYRbX80B2OV+LbX06Mj1Wd67SVWwq2sAlI+6fK1YWbFu5jOWFy
- ShFCRGmwyzNvkVpK7cu/XOOhwt2URcy6DY3zhmd5gChz/t/NDHGBTezCh8rSO9DsIl1w9nNEbghUl
- cYmEvIhQjHH3vv2HCOKxSZES/6NXkskByXtkPVP8prHPNl1FHIO0JVVL7/psmWFP/eeB66eAcwIgd
- aUeWsA9+/AwcjqJV2pa1kblWjfZZw4TxrBgCB72dC7FAYs94ebUmNg3dyv8PQq63EnC8TAUTyph+M
- cnQiCPz6chp7XHVQdeaxSfcCEsOJaHlS+CtdUHiGYxN4mewPm5JwM1C7PW6QBPIpx6XFvtvMfG+Ny
- +AZ/jZtXxHmrGEJ5sz5YfqucDV8bMcNgnbFzFWxvVklafpP80O/4VkEZ8Og09kvDBdB6MAhr71b3O
- n+dE0S83rEiJs4v64/CG8FQ8B9K2p9HE55Iu3AyovR6jKajAi/iMKR/x4KoSq9Jgj9ZI3g86voWxM
- 4735WC8h7vnhFSA8qKRhsbvlNlMplPjq0f9kVLg9cyNzRQBVrNcH6zGMhkMqbSvCTR5I1kY4SfU4f
- QqRF1Ai5f9Q9D8ExKb6fy7ct8aDUZ69Ms9N+XmqEL8C3+AAYod1XaXk9/hdTQ1Dhb51VPXAMWTICB
- dXi5z7be6KALQARAQABtCZQYXVsaSBWaXJ0YW5lbiA8cGF1bGkudmlydGFuZW5AaWtpLmZpPokCWg
- QTAQgARAIbAwUJEswDAAULCQgHAgIiAgYVCgkICwIEFgIDAQIeBwIXgBYhBGrOSfUCZNEJOswAnOS
- aCbhLOrBPBQJl/qsDAhkBAAoJEOSaCbhLOrBPB/oP/1j6A7hlzheRhqcj+6sk+OgZZ+5eX7mBomyr
- 76G+m/3RhPGlKbDxKTWtBZaIDKg2c0Q6yC1TegtxQ2EUD4kk7wKoHKj8dKbR29uS3OvURQR1guCo2
- /5kzQQVxQwhIoMdHJYF0aYNQgdA+ZJL09lDz+JC89xvup3spxbKYc9Iq6vxVLbVbjF9Uv/ncAC4Bs
- g1MQoMowhKsxwN5VlUdjqPZ6uGebZyC+gX6YWUHpPWcHQ1TxCD8TtqTbFU3Ltd3AYl7d8ygMNBEe3
- T7DV2GjBI06Xqdhydhz2G5bWPM0JSodNDE/m6MrmoKSEG0xTNkH2w3TWWD4o1snte9406az0YOwkk
- xDq9LxEVoeg6POceQG9UdcsKiiAJQXu/I0iUprkybRUkUj+3oTJQECcdfL1QtkuJBh+IParSF14/j
- Xojwnf7tE5rm7QvMWWSiSRewro1vaXjgGyhKNyJ+HCCgp5mw+ch7KaDHtg0fG48yJgKNpjkzGWfLQ
- BNXqtd8VYn1mCM3YM7qdtf9bsgjQqpvFiAh7jYGrhYr7geRjary1hTc8WwrxAxaxGvo4xZ1XYps3u
- ayy5dGHdiddk5KJ4iMTLSLH3Rucl19966COQeCwDvFMjkNZx5ExHshWCV5W7+xX/2nIkKUfwXRKfK
- dsVTL03FG0YvY/8A98EMbvlf4TnpyyaytBtQYXVsaSBWaXJ0YW5lbiA8cGF2QGlraS5maT6JAlcEE
- wEIAEEWIQRqzkn1AmTRCTrMAJzkmgm4SzqwTwUCZf6qYQIbAwUJEswDAAULCQgHAgIiAgYVCgkICw
- IEFgIDAQIeBwIXgAAKCRDkmgm4SzqwTxYZD/9hfC+CaihOESMcTKHoK9JLkO34YC0t8u3JAyetIz3
- Z9ek42FU8fpf58vbpKUIR6POdiANmKLjeBlT0D3mHW2ta90O1s711NlA1yaaoUw7s4RJb09W2Votb
- G02pDu2qhupD1GNpufArm3mOcYDJt0Rhh9DkTR2WQ9SzfnfzapjxmRQtMzkrH0GWX5OPv368IzfbJ
- S1fw79TXmRx/DqyHg+7/bvqeA3ZFCnuC/HQST72ncuQA9wFbrg3ZVOPAjqrjesEOFFL4RSaT0JasS
- XdcxCbAu9WNrHbtRZu2jo7n4UkQ7F133zKH4B0SD5IclLgK6Zc92gnHylGEPtOFpij/zCRdZw20VH
- xrPO4eI5Za4iRpnKhCbL85zHE0f8pDaBLD9L56UuTVdRvB6cKncL4T6JmTR6wbH+J+s4L3OLjsyx2
- LfEcVEh+xFsW87YQgVY7Mm1q+O94P2soUqjU3KslSxgbX5BghY2yDcDMNlfnZ3SdeRNbssgT28PAk
- 5q9AmX/5YyNbexOCyYKZ9TLcAJJ1QLrHGoZaAIaR72K/kmVxy0oqdtAkvCQw4j2DCQDR0lQXsH2bl
- WTSfNIdSZd4pMxXHFF5iQbh+uReDc8rISNOFMAZcIMd+9jRNCbyGcoFiLa52yNGOLo7Im+CIlmZEt
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YkBwYCiV"
+Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-64937edbc9eso251408d50.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2026 12:22:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774466572; cv=none;
+        d=google.com; s=arc-20240605;
+        b=kvugCv1KF3BerPqkBQnpDC7yi5fUlIsn2tPzfSKNdyciH6OZgC01MlGar35QucCXv5
+         Cd6FntLWaz9c2wkumA13sh7AYEjg7DHLOblbb3WHnUPmdQoJOys0G2ys0bdgwrpVxKjj
+         oqYvnZI0he5DAaKScKyE5by+IHumLY0wJqIFdaeBR+bpO5WvD4TrGL1uasG1iUxkKCUS
+         D1MFEhVcKSPVk6erOfqQ0vfnMZg8WfNiYMEY7ILJXGbKmVaFRTDLZcErXCJ/biyVA/W8
+         lhOSsJ5wGtPlzHd1lxbvVwNjMGp+Ortt2s7K5Ahl1fhRuikdoQZRMdEbdYYB8RTWcy8p
+         kmJw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=RCipcYHV41WSFUBdXxt5GlaKJxP2x0Xd6EISWGVu8LM=;
+        fh=kLfBEwCGkV+7Pgt3CaQ3c2c3YyO9mc6jW6GVYbhg9nk=;
+        b=YLbglf9UJIANBHXa1OJ811RyH117gCU0KRus/7mxM01XkGJRPrvFWuadwR0CpDUKYL
+         95pssLIZlB7IVLP+DHbOmkvVJuZRyCU+pcAWjB/H/g2cOHeG1hlYlCWCCjuaD1MEiSDw
+         Gs9VlmaJj/8IgYQN5gLm7wK/lQIvkyq2Yaq/Okeq8r4dCK1hgiyY0AMdFHXPRDgBgBpD
+         qIR3NcVHXXPt/fgYA7Gixe1atOQh6MK/t00/ysovYRqjAFe8u7h0hw8RWGGO8E3u+9uY
+         16Gr29jTf7WIIJUOl4Pu08/XPLTl5FySIgDvAFB3mdZY11AuVlTOMjig2Qybi97nVsZa
+         pHbA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774466572; x=1775071372; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RCipcYHV41WSFUBdXxt5GlaKJxP2x0Xd6EISWGVu8LM=;
+        b=YkBwYCiVmXOfhbSfjYauNJfZA1v+LHKrAAyzuRjyqYn5FzKx657hllb8M7PhoMvthC
+         TbN2RgOk92CWpDspXHrajpfRYI6hv8ljtjWXendZZOf8aJvg1ok6pYnnaCSz4Eimi6Yu
+         OWSD0RBP8ppEy0XrTkd1w6TYCo1KHFsqDeHJY1a5ZukEWEEVYt/W7a9EjUGIUUhfeYCx
+         BM+Ml3HZLzv0H5PJUKrhcT3vafcsbABzEKZzTWKPnMdveNx2SgPksJL4DZMLfp0sv0w9
+         DINmSO+qvwMWmEntOKr606VrWmNNRE4tC89wg33AB/es7UmFJKqeWyunIoy0a/zKuQI0
+         PJ8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774466572; x=1775071372;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=RCipcYHV41WSFUBdXxt5GlaKJxP2x0Xd6EISWGVu8LM=;
+        b=kybI0MHt6MZelB/Xu2VfOJWeJSC0kjHKIbcEdqZqIUUHEjIX+EWw2p0r2ui0hEKexr
+         Gi+a0KryOtlLfrzvWqE1p3njHmWKDDOlKLk6u6FN+6NKyyJRvpDaQLmxWZR/ZMnKcfpF
+         O5vz/pLfNHMpMkJyYzYhZ6Pcq7FT5cCmmA0/oeInsdrjF6CvepUOWDWAJXrUe/EGxbDg
+         kcO/0O2iqe6mdAM9bfuxnIsNE3dl7CHwHUI2cP54r2t36EaXEmo7gM2rmP2R1F/AR5iP
+         QGFqUoOr2uDWxTTvXhrS6w3lTE4/HhJWK9am611RYmVcOyIuJwP0E4o/xoF/EzLYT1CW
+         9x4g==
+X-Gm-Message-State: AOJu0YxZqR7iDgkN+xKwgUBscmTpCFFfEm+dSsgWfb5ASwe2bQcnjkUa
+	yoq37rhQjsO5pzmBUQBSUfNyKvGidzSHG9pvD3DvnoRk96BJ0YgGLL9PSTDWr+JTboWN0xAwc3q
+	Jcdb1jET+dhvTgFvnBGecMg7OoQcnJ+bccKRL
+X-Gm-Gg: ATEYQzyC7Nl+l5hZcGl4pxw5txgLs0Ja0NGC9sZPMchGlLK0IPoM51bq0cmhuVRwanH
+	A43QXxhJ9yHw7cVV9BJIXXtUPZAWv2JzIxBMTCxxDSzT1eeU/KvT0TZdm+5zfbXq4hRBFta+hFT
+	NkWAKuqtWjEStS3WwVys/Q0aaRPHzGZM5spU4G3TEG3Dr74fHT/QwQ8DiMI0E8Sv5okyAXu3PpS
+	yCub+3S69P8clZOJ1204hNuo4cZXofH48l9nh1a0cYUQs2bgqZUWJ0EJu7Acr/t4AG85RNVGhht
+	trU6oS0Kxl39fF4mohf2M2/G2D014pOzALmh0dfa/5Vp13kLu0zyNA8HwgcNvYu3xE0JMg==
+X-Received: by 2002:a05:690e:4090:b0:64e:abca:564a with SMTP id
+ 956f58d0204a3-64ee609cf72mr4657741d50.22.1774466571780; Wed, 25 Mar 2026
+ 12:22:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <f7ccb4a4f9e462a6c1c1ddba8dd1cdcc9456944b.1774459946.git.pav@iki.fi>
+ <1eec5447ed02666ef9463bbc96c25971ce9c0d1f.1774459946.git.pav@iki.fi>
+ <CABBYNZ+aBV2C6NQ=Pv_1ZRhhnntcd46bkOS2gj1sj_X4PoUjjw@mail.gmail.com> <96256cdd679395e70b8317db7655ec6dfc4c9386.camel@iki.fi>
+In-Reply-To: <96256cdd679395e70b8317db7655ec6dfc4c9386.camel@iki.fi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 25 Mar 2026 15:22:39 -0400
+X-Gm-Features: AaiRm52DhZRww8BG39lIBBl62Wg6SBnuAJzKP9pB-RlaS3h6iryOKGpR6TIP6Ps
+Message-ID: <CABBYNZ+exqVhSSkGgaMJk=FQsPorf_h5uSLQR8GAjbLshRzwtQ@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Bluetooth: hci_sync: make hci_cmd_sync_run_once
+ return -EEXIST if exists
+To: Pauli Virtanen <pauli.virtanen@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Pauli,
 
-ke, 2026-03-25 kello 14:43 -0400, Luiz Augusto von Dentz kirjoitti:
-> Hi Pauli,
->=20
-> On Wed, Mar 25, 2026 at 1:42=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote=
-:
-> >=20
-> > hci_cmd_sync_run_once() needs to indicate whether a queue item was
-> > added, so caller can know if callbacks are called, so it can avoid
-> > leaking resources.
-> >=20
-> > Change the function to return -EEXIST if queue item already exists.
-> >=20
-> > hci_cmd_sync_run() may run the work immediately. If so, make it behave
-> > as if item was queued successfully. Change it to call also destroy() an=
-d
-> > return 0.
-> >=20
-> > Modify all callsites vs. the changes.
-> >=20
-> > The only callsite is hci_abort_conn(), and this changes its return
-> > value. However, its return value is not used except as the return value
-> > for hci_disconnect(), and nothing uses the return value of
-> > hci_disconnect(). Hence there should be no behavior change anywhere.
-> >=20
-> > Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> > ---
-> >  net/bluetooth/hci_conn.c |  4 +++-
-> >  net/bluetooth/hci_sync.c | 13 ++++++++++---
-> >  2 files changed, 13 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > index e6393f17576b..8cc2cc58c3f8 100644
-> > --- a/net/bluetooth/hci_conn.c
-> > +++ b/net/bluetooth/hci_conn.c
-> > @@ -3077,6 +3077,7 @@ static int abort_conn_sync(struct hci_dev *hdev, =
-void *data)
-> >  int hci_abort_conn(struct hci_conn *conn, u8 reason)
-> >  {
-> >         struct hci_dev *hdev =3D conn->hdev;
-> > +       int err;
-> >=20
-> >         /* If abort_reason has already been set it means the connection=
- is
-> >          * already being aborted so don't attempt to overwrite it.
-> > @@ -3113,7 +3114,8 @@ int hci_abort_conn(struct hci_conn *conn, u8 reas=
-on)
-> >          * as a result to MGMT_OP_DISCONNECT/MGMT_OP_UNPAIR which does
-> >          * already queue its callback on cmd_sync_work.
-> >          */
-> > -       return hci_cmd_sync_run_once(hdev, abort_conn_sync, conn, NULL)=
-;
-> > +       err =3D hci_cmd_sync_run_once(hdev, abort_conn_sync, conn, NULL=
-);
-> > +       return (err =3D=3D -EEXIST) ? 0 : err;
-> >  }
-> >=20
-> >  void hci_setup_tx_timestamp(struct sk_buff *skb, size_t key_offset,
-> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> > index 0b28495197c2..47d902310b19 100644
-> > --- a/net/bluetooth/hci_sync.c
-> > +++ b/net/bluetooth/hci_sync.c
-> > @@ -801,8 +801,15 @@ int hci_cmd_sync_run(struct hci_dev *hdev, hci_cmd=
-_sync_work_func_t func,
-> >                 return -ENETDOWN;
-> >=20
-> >         /* If on cmd_sync_work then run immediately otherwise queue */
-> > -       if (current_work() =3D=3D &hdev->cmd_sync_work)
-> > -               return func(hdev, data);
-> > +       if (current_work() =3D=3D &hdev->cmd_sync_work) {
-> > +               int err;
-> > +
-> > +               err =3D func(hdev, data);
-> > +               if (destroy)
-> > +                       destroy(hdev, data, err);
->=20
-> It is probably worth splitting this change into its own commit so we
-> can add a Fixes: tag and backport it.
+On Wed, Mar 25, 2026 at 3:15=E2=80=AFPM Pauli Virtanen <pauli.virtanen@iki.=
+fi> wrote:
+>
+> Hi,
+>
+> ke, 2026-03-25 kello 14:43 -0400, Luiz Augusto von Dentz kirjoitti:
+> > Hi Pauli,
+> >
+> > On Wed, Mar 25, 2026 at 1:42=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wro=
+te:
+> > >
+> > > hci_cmd_sync_run_once() needs to indicate whether a queue item was
+> > > added, so caller can know if callbacks are called, so it can avoid
+> > > leaking resources.
+> > >
+> > > Change the function to return -EEXIST if queue item already exists.
+> > >
+> > > hci_cmd_sync_run() may run the work immediately. If so, make it behav=
+e
+> > > as if item was queued successfully. Change it to call also destroy() =
+and
+> > > return 0.
+> > >
+> > > Modify all callsites vs. the changes.
+> > >
+> > > The only callsite is hci_abort_conn(), and this changes its return
+> > > value. However, its return value is not used except as the return val=
+ue
+> > > for hci_disconnect(), and nothing uses the return value of
+> > > hci_disconnect(). Hence there should be no behavior change anywhere.
+> > >
+> > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> > > ---
+> > >  net/bluetooth/hci_conn.c |  4 +++-
+> > >  net/bluetooth/hci_sync.c | 13 ++++++++++---
+> > >  2 files changed, 13 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> > > index e6393f17576b..8cc2cc58c3f8 100644
+> > > --- a/net/bluetooth/hci_conn.c
+> > > +++ b/net/bluetooth/hci_conn.c
+> > > @@ -3077,6 +3077,7 @@ static int abort_conn_sync(struct hci_dev *hdev=
+, void *data)
+> > >  int hci_abort_conn(struct hci_conn *conn, u8 reason)
+> > >  {
+> > >         struct hci_dev *hdev =3D conn->hdev;
+> > > +       int err;
+> > >
+> > >         /* If abort_reason has already been set it means the connecti=
+on is
+> > >          * already being aborted so don't attempt to overwrite it.
+> > > @@ -3113,7 +3114,8 @@ int hci_abort_conn(struct hci_conn *conn, u8 re=
+ason)
+> > >          * as a result to MGMT_OP_DISCONNECT/MGMT_OP_UNPAIR which doe=
+s
+> > >          * already queue its callback on cmd_sync_work.
+> > >          */
+> > > -       return hci_cmd_sync_run_once(hdev, abort_conn_sync, conn, NUL=
+L);
+> > > +       err =3D hci_cmd_sync_run_once(hdev, abort_conn_sync, conn, NU=
+LL);
+> > > +       return (err =3D=3D -EEXIST) ? 0 : err;
+> > >  }
+> > >
+> > >  void hci_setup_tx_timestamp(struct sk_buff *skb, size_t key_offset,
+> > > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> > > index 0b28495197c2..47d902310b19 100644
+> > > --- a/net/bluetooth/hci_sync.c
+> > > +++ b/net/bluetooth/hci_sync.c
+> > > @@ -801,8 +801,15 @@ int hci_cmd_sync_run(struct hci_dev *hdev, hci_c=
+md_sync_work_func_t func,
+> > >                 return -ENETDOWN;
+> > >
+> > >         /* If on cmd_sync_work then run immediately otherwise queue *=
+/
+> > > -       if (current_work() =3D=3D &hdev->cmd_sync_work)
+> > > -               return func(hdev, data);
+> > > +       if (current_work() =3D=3D &hdev->cmd_sync_work) {
+> > > +               int err;
+> > > +
+> > > +               err =3D func(hdev, data);
+> > > +               if (destroy)
+> > > +                       destroy(hdev, data, err);
+> >
+> > It is probably worth splitting this change into its own commit so we
+> > can add a Fixes: tag and backport it.
+>
+> Ok.
+>
+> Btw, sashiko produced valid comments on pre-existing usage of
+> queue_once, maybe some of these should be hci_cmd_sync_queue or
+> queue_once needs custom comparison API
+>
+> https://sashiko.dev/#/patchset/f7ccb4a4f9e462a6c1c1ddba8dd1cdcc9456944b.1=
+774459946.git.pav%40iki.fi
 
-Ok.
+Yeah, the data might be useless to compare most of the time, well
+except if it is something like hci_conn for example.
 
-Btw, sashiko produced valid comments on pre-existing usage of
-queue_once, maybe some of these should be hci_cmd_sync_queue or
-queue_once needs custom comparison API
+> >
+> > > +               return 0;
+> > > +       }
+> > >
+> > >         return hci_cmd_sync_submit(hdev, func, data, destroy);
+> > >  }
+> > > @@ -818,7 +825,7 @@ int hci_cmd_sync_run_once(struct hci_dev *hdev, h=
+ci_cmd_sync_work_func_t func,
+> > >                           void *data, hci_cmd_sync_work_destroy_t des=
+troy)
+> > >  {
+> > >         if (hci_cmd_sync_lookup_entry(hdev, func, data, destroy))
+> > > -               return 0;
+> > > +               return -EEXIST;
+> > >
+> > >         return hci_cmd_sync_run(hdev, func, data, destroy);
+> > >  }
+> > > --
+> > > 2.53.0
+> > >
+> > >
+> >
+>
+> --
+> Pauli Virtanen
 
-https://sashiko.dev/#/patchset/f7ccb4a4f9e462a6c1c1ddba8dd1cdcc9456944b.177=
-4459946.git.pav%40iki.fi
 
->=20
-> > +               return 0;
-> > +       }
-> >=20
-> >         return hci_cmd_sync_submit(hdev, func, data, destroy);
-> >  }
-> > @@ -818,7 +825,7 @@ int hci_cmd_sync_run_once(struct hci_dev *hdev, hci=
-_cmd_sync_work_func_t func,
-> >                           void *data, hci_cmd_sync_work_destroy_t destr=
-oy)
-> >  {
-> >         if (hci_cmd_sync_lookup_entry(hdev, func, data, destroy))
-> > -               return 0;
-> > +               return -EEXIST;
-> >=20
-> >         return hci_cmd_sync_run(hdev, func, data, destroy);
-> >  }
-> > --
-> > 2.53.0
-> >=20
-> >=20
->=20
 
 --=20
-Pauli Virtanen
+Luiz Augusto von Dentz
