@@ -1,228 +1,242 @@
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC1631F99F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2026 19:22:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774466574; cv=pass; b=ENor/CqEgs9chdXFqLbxPXjBmTuplM+B9MZpgaFA0miFOMFPdYMpSmn4xiZ8+tJR4ua1LqnYZ3vgFvx91wGM0kxJCV8AXAJ/0Mx6YoL8bOdMlZQ8HUeVbA7RvBD4IUsWShCrA3yVki2wyrFhMPwSTL9Zl6qzKRzFrmwM6XHSVR0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774466574; c=relaxed/simple;
-	bh=M23odA6iUh/3k9hZ+Ebrm2lXVOhcX4kDmUrO0yXCJPU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aHXc5FDbzlu1lfC+Dt9uhmMGbcPf96H7Inwg3bhhiTg9X6UujKSRGBsC3KpdEdvYdy5prIMyYCh4wIh7y62RtaKvKIqLDx3IIo3LU6WgkkLcCA1dguMKwQCAk32JyhYCDOX7lYPeP55cbzyB86oFytRoQ8mXfKnfRrR2m3XkTx8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YkBwYCiV; arc=pass smtp.client-ip=74.125.224.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B556D350A33
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2026 19:28:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774466889; cv=none; b=bRz/63O8BjrWMPuzH8b4ZrCeSaGjmT0sqXp5zchoRLGZ+uP5YRtGPN5E52CHDnL/xNcI321uZKIxeErCG45//mdcjypQ2tOMBmCJiCEmskDREr+xFGF2siapIzfaH3levoPASXkvSkTPbXO9ZfCO620yh8imjdneWkIWXyTbF98=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774466889; c=relaxed/simple;
+	bh=01mWvkYjGbm5tHCLlAcQpmGO/FLIprz/mxOagKU3bGU=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=G4VbXkC+iPcCX1iq0JQ1PrKok5FGRQ/xMvbtv9ExNFMlkxdo0Fn3K2b4R41iyE491WeDicn1o7akLSJR0n640D1D27rtJHqLBBOIGUzmCE/EKWp4YpvBErLubGYPnDuZCNXcUOT43h/uOCVwD2656QBpo3o8xr484a++AHCw0Fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Uz7b46Ql; arc=none smtp.client-ip=192.30.252.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YkBwYCiV"
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-64937edbc9eso251408d50.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2026 12:22:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774466572; cv=none;
-        d=google.com; s=arc-20240605;
-        b=kvugCv1KF3BerPqkBQnpDC7yi5fUlIsn2tPzfSKNdyciH6OZgC01MlGar35QucCXv5
-         Cd6FntLWaz9c2wkumA13sh7AYEjg7DHLOblbb3WHnUPmdQoJOys0G2ys0bdgwrpVxKjj
-         oqYvnZI0he5DAaKScKyE5by+IHumLY0wJqIFdaeBR+bpO5WvD4TrGL1uasG1iUxkKCUS
-         D1MFEhVcKSPVk6erOfqQ0vfnMZg8WfNiYMEY7ILJXGbKmVaFRTDLZcErXCJ/biyVA/W8
-         lhOSsJ5wGtPlzHd1lxbvVwNjMGp+Ortt2s7K5Ahl1fhRuikdoQZRMdEbdYYB8RTWcy8p
-         kmJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=RCipcYHV41WSFUBdXxt5GlaKJxP2x0Xd6EISWGVu8LM=;
-        fh=kLfBEwCGkV+7Pgt3CaQ3c2c3YyO9mc6jW6GVYbhg9nk=;
-        b=YLbglf9UJIANBHXa1OJ811RyH117gCU0KRus/7mxM01XkGJRPrvFWuadwR0CpDUKYL
-         95pssLIZlB7IVLP+DHbOmkvVJuZRyCU+pcAWjB/H/g2cOHeG1hlYlCWCCjuaD1MEiSDw
-         Gs9VlmaJj/8IgYQN5gLm7wK/lQIvkyq2Yaq/Okeq8r4dCK1hgiyY0AMdFHXPRDgBgBpD
-         qIR3NcVHXXPt/fgYA7Gixe1atOQh6MK/t00/ysovYRqjAFe8u7h0hw8RWGGO8E3u+9uY
-         16Gr29jTf7WIIJUOl4Pu08/XPLTl5FySIgDvAFB3mdZY11AuVlTOMjig2Qybi97nVsZa
-         pHbA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774466572; x=1775071372; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RCipcYHV41WSFUBdXxt5GlaKJxP2x0Xd6EISWGVu8LM=;
-        b=YkBwYCiVmXOfhbSfjYauNJfZA1v+LHKrAAyzuRjyqYn5FzKx657hllb8M7PhoMvthC
-         TbN2RgOk92CWpDspXHrajpfRYI6hv8ljtjWXendZZOf8aJvg1ok6pYnnaCSz4Eimi6Yu
-         OWSD0RBP8ppEy0XrTkd1w6TYCo1KHFsqDeHJY1a5ZukEWEEVYt/W7a9EjUGIUUhfeYCx
-         BM+Ml3HZLzv0H5PJUKrhcT3vafcsbABzEKZzTWKPnMdveNx2SgPksJL4DZMLfp0sv0w9
-         DINmSO+qvwMWmEntOKr606VrWmNNRE4tC89wg33AB/es7UmFJKqeWyunIoy0a/zKuQI0
-         PJ8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774466572; x=1775071372;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=RCipcYHV41WSFUBdXxt5GlaKJxP2x0Xd6EISWGVu8LM=;
-        b=kybI0MHt6MZelB/Xu2VfOJWeJSC0kjHKIbcEdqZqIUUHEjIX+EWw2p0r2ui0hEKexr
-         Gi+a0KryOtlLfrzvWqE1p3njHmWKDDOlKLk6u6FN+6NKyyJRvpDaQLmxWZR/ZMnKcfpF
-         O5vz/pLfNHMpMkJyYzYhZ6Pcq7FT5cCmmA0/oeInsdrjF6CvepUOWDWAJXrUe/EGxbDg
-         kcO/0O2iqe6mdAM9bfuxnIsNE3dl7CHwHUI2cP54r2t36EaXEmo7gM2rmP2R1F/AR5iP
-         QGFqUoOr2uDWxTTvXhrS6w3lTE4/HhJWK9am611RYmVcOyIuJwP0E4o/xoF/EzLYT1CW
-         9x4g==
-X-Gm-Message-State: AOJu0YxZqR7iDgkN+xKwgUBscmTpCFFfEm+dSsgWfb5ASwe2bQcnjkUa
-	yoq37rhQjsO5pzmBUQBSUfNyKvGidzSHG9pvD3DvnoRk96BJ0YgGLL9PSTDWr+JTboWN0xAwc3q
-	Jcdb1jET+dhvTgFvnBGecMg7OoQcnJ+bccKRL
-X-Gm-Gg: ATEYQzyC7Nl+l5hZcGl4pxw5txgLs0Ja0NGC9sZPMchGlLK0IPoM51bq0cmhuVRwanH
-	A43QXxhJ9yHw7cVV9BJIXXtUPZAWv2JzIxBMTCxxDSzT1eeU/KvT0TZdm+5zfbXq4hRBFta+hFT
-	NkWAKuqtWjEStS3WwVys/Q0aaRPHzGZM5spU4G3TEG3Dr74fHT/QwQ8DiMI0E8Sv5okyAXu3PpS
-	yCub+3S69P8clZOJ1204hNuo4cZXofH48l9nh1a0cYUQs2bgqZUWJ0EJu7Acr/t4AG85RNVGhht
-	trU6oS0Kxl39fF4mohf2M2/G2D014pOzALmh0dfa/5Vp13kLu0zyNA8HwgcNvYu3xE0JMg==
-X-Received: by 2002:a05:690e:4090:b0:64e:abca:564a with SMTP id
- 956f58d0204a3-64ee609cf72mr4657741d50.22.1774466571780; Wed, 25 Mar 2026
- 12:22:51 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Uz7b46Ql"
+Received: from github.com (hubbernetes-node-9c81543.ac4-iad.github.net [10.52.166.22])
+	by smtp.github.com (Postfix) with ESMTPA id DD2FC21379
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2026 12:28:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1774466886;
+	bh=RAENEoq2dDu7lZnodtR57L2Xx8J7jBKJssydNFvPf0k=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Uz7b46QlNOnnhQci/wSug3Ci7tbQ9zvmhfVqKb+nA8HWcthPfLv2NL5Xxe+OQwMam
+	 aEVXAybDPsHbf5AA+i3Iw9YRTBuCeG87dAQy3vLx4gA6qz1Dene4Iw5acEB3eK2/Oc
+	 XyhkHzVDSHiIHPtPp5Fkplrx6vksoiSvQ5RMoxF4=
+Date: Wed, 25 Mar 2026 12:28:06 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1072496/000000-67b764@github.com>
+Subject: [bluez/bluez] 1282f8: doc/btmon: Split Advertising and Scanning into
+ btm...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <f7ccb4a4f9e462a6c1c1ddba8dd1cdcc9456944b.1774459946.git.pav@iki.fi>
- <1eec5447ed02666ef9463bbc96c25971ce9c0d1f.1774459946.git.pav@iki.fi>
- <CABBYNZ+aBV2C6NQ=Pv_1ZRhhnntcd46bkOS2gj1sj_X4PoUjjw@mail.gmail.com> <96256cdd679395e70b8317db7655ec6dfc4c9386.camel@iki.fi>
-In-Reply-To: <96256cdd679395e70b8317db7655ec6dfc4c9386.camel@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 25 Mar 2026 15:22:39 -0400
-X-Gm-Features: AaiRm52DhZRww8BG39lIBBl62Wg6SBnuAJzKP9pB-RlaS3h6iryOKGpR6TIP6Ps
-Message-ID: <CABBYNZ+exqVhSSkGgaMJk=FQsPorf_h5uSLQR8GAjbLshRzwtQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Bluetooth: hci_sync: make hci_cmd_sync_run_once
- return -EEXIST if exists
-To: Pauli Virtanen <pauli.virtanen@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Pauli,
+  Branch: refs/heads/1072496
+  Home:   https://github.com/bluez/bluez
+  Commit: 1282f8515a6b8055bd2cc7ba7cffb24e8c9596c4
+      https://github.com/bluez/bluez/commit/1282f8515a6b8055bd2cc7ba7cffb24e8c9596c4
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-25 (Wed, 25 Mar 2026)
 
-On Wed, Mar 25, 2026 at 3:15=E2=80=AFPM Pauli Virtanen <pauli.virtanen@iki.=
-fi> wrote:
->
-> Hi,
->
-> ke, 2026-03-25 kello 14:43 -0400, Luiz Augusto von Dentz kirjoitti:
-> > Hi Pauli,
-> >
-> > On Wed, Mar 25, 2026 at 1:42=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wro=
-te:
-> > >
-> > > hci_cmd_sync_run_once() needs to indicate whether a queue item was
-> > > added, so caller can know if callbacks are called, so it can avoid
-> > > leaking resources.
-> > >
-> > > Change the function to return -EEXIST if queue item already exists.
-> > >
-> > > hci_cmd_sync_run() may run the work immediately. If so, make it behav=
-e
-> > > as if item was queued successfully. Change it to call also destroy() =
-and
-> > > return 0.
-> > >
-> > > Modify all callsites vs. the changes.
-> > >
-> > > The only callsite is hci_abort_conn(), and this changes its return
-> > > value. However, its return value is not used except as the return val=
-ue
-> > > for hci_disconnect(), and nothing uses the return value of
-> > > hci_disconnect(). Hence there should be no behavior change anywhere.
-> > >
-> > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> > > ---
-> > >  net/bluetooth/hci_conn.c |  4 +++-
-> > >  net/bluetooth/hci_sync.c | 13 ++++++++++---
-> > >  2 files changed, 13 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > > index e6393f17576b..8cc2cc58c3f8 100644
-> > > --- a/net/bluetooth/hci_conn.c
-> > > +++ b/net/bluetooth/hci_conn.c
-> > > @@ -3077,6 +3077,7 @@ static int abort_conn_sync(struct hci_dev *hdev=
-, void *data)
-> > >  int hci_abort_conn(struct hci_conn *conn, u8 reason)
-> > >  {
-> > >         struct hci_dev *hdev =3D conn->hdev;
-> > > +       int err;
-> > >
-> > >         /* If abort_reason has already been set it means the connecti=
-on is
-> > >          * already being aborted so don't attempt to overwrite it.
-> > > @@ -3113,7 +3114,8 @@ int hci_abort_conn(struct hci_conn *conn, u8 re=
-ason)
-> > >          * as a result to MGMT_OP_DISCONNECT/MGMT_OP_UNPAIR which doe=
-s
-> > >          * already queue its callback on cmd_sync_work.
-> > >          */
-> > > -       return hci_cmd_sync_run_once(hdev, abort_conn_sync, conn, NUL=
-L);
-> > > +       err =3D hci_cmd_sync_run_once(hdev, abort_conn_sync, conn, NU=
-LL);
-> > > +       return (err =3D=3D -EEXIST) ? 0 : err;
-> > >  }
-> > >
-> > >  void hci_setup_tx_timestamp(struct sk_buff *skb, size_t key_offset,
-> > > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> > > index 0b28495197c2..47d902310b19 100644
-> > > --- a/net/bluetooth/hci_sync.c
-> > > +++ b/net/bluetooth/hci_sync.c
-> > > @@ -801,8 +801,15 @@ int hci_cmd_sync_run(struct hci_dev *hdev, hci_c=
-md_sync_work_func_t func,
-> > >                 return -ENETDOWN;
-> > >
-> > >         /* If on cmd_sync_work then run immediately otherwise queue *=
-/
-> > > -       if (current_work() =3D=3D &hdev->cmd_sync_work)
-> > > -               return func(hdev, data);
-> > > +       if (current_work() =3D=3D &hdev->cmd_sync_work) {
-> > > +               int err;
-> > > +
-> > > +               err =3D func(hdev, data);
-> > > +               if (destroy)
-> > > +                       destroy(hdev, data, err);
-> >
-> > It is probably worth splitting this change into its own commit so we
-> > can add a Fixes: tag and backport it.
->
-> Ok.
->
-> Btw, sashiko produced valid comments on pre-existing usage of
-> queue_once, maybe some of these should be hci_cmd_sync_queue or
-> queue_once needs custom comparison API
->
-> https://sashiko.dev/#/patchset/f7ccb4a4f9e462a6c1c1ddba8dd1cdcc9456944b.1=
-774459946.git.pav%40iki.fi
+  Changed paths:
+    M Makefile.am
+    A doc/btmon-advertising.rst
+    M doc/btmon.rst
 
-Yeah, the data might be useless to compare most of the time, well
-except if it is something like hci_conn for example.
+  Log Message:
+  -----------
+  doc/btmon: Split Advertising and Scanning into btmon-advertising.rst
 
-> >
-> > > +               return 0;
-> > > +       }
-> > >
-> > >         return hci_cmd_sync_submit(hdev, func, data, destroy);
-> > >  }
-> > > @@ -818,7 +825,7 @@ int hci_cmd_sync_run_once(struct hci_dev *hdev, h=
-ci_cmd_sync_work_func_t func,
-> > >                           void *data, hci_cmd_sync_work_destroy_t des=
-troy)
-> > >  {
-> > >         if (hci_cmd_sync_lookup_entry(hdev, func, data, destroy))
-> > > -               return 0;
-> > > +               return -EEXIST;
-> > >
-> > >         return hci_cmd_sync_run(hdev, func, data, destroy);
-> > >  }
-> > > --
-> > > 2.53.0
-> > >
-> > >
-> >
->
-> --
-> Pauli Virtanen
+Move the ADVERTISING AND SCANNING section into a standalone file and
+replace it with an RST include directive. This allows the
+btsnoop-analyzer to load only the relevant documentation for
+advertising/scanning focus-area analysis instead of the full btmon.rst.
 
 
+  Commit: 9a26d0d5a347019ecf70a3b3d3680bedda22d577
+      https://github.com/bluez/bluez/commit/9a26d0d5a347019ecf70a3b3d3680bedda22d577
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-25 (Wed, 25 Mar 2026)
 
---=20
-Luiz Augusto von Dentz
+  Changed paths:
+    M Makefile.am
+    A doc/btmon-le-audio.rst
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Split LE Audio Protocol Flow into btmon-le-audio.rst
+
+Move the LE AUDIO PROTOCOL FLOW section (including CIS unicast,
+BIS broadcast, and BIG sync flows) into a standalone file and
+replace it with an RST include directive. This is the largest
+split section (660 lines) and was being truncated away in
+context-limited analysis.
+
+
+  Commit: 3b54050bac68029b72d070a731f8427acd202970
+      https://github.com/bluez/bluez/commit/3b54050bac68029b72d070a731f8427acd202970
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-25 (Wed, 25 Mar 2026)
+
+  Changed paths:
+    M Makefile.am
+    A doc/btmon-l2cap.rst
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Split L2CAP Channel Tracking into btmon-l2cap.rst
+
+Move the L2CAP CHANNEL TRACKING section into a standalone file and
+replace it with an RST include directive.
+
+
+  Commit: c94a2ddc2f512580e76078ebef69895c95756550
+      https://github.com/bluez/bluez/commit/c94a2ddc2f512580e76078ebef69895c95756550
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-25 (Wed, 25 Mar 2026)
+
+  Changed paths:
+    M Makefile.am
+    A doc/btmon-smp.rst
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Split SMP Pairing Flow into btmon-smp.rst
+
+Move the SMP PAIRING FLOW section into a standalone file and replace
+it with an RST include directive.
+
+
+  Commit: 5b9bfd6be1307c21b3f24b9a86262baa4d877eaf
+      https://github.com/bluez/bluez/commit/5b9bfd6be1307c21b3f24b9a86262baa4d877eaf
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-25 (Wed, 25 Mar 2026)
+
+  Changed paths:
+    M Makefile.am
+    A doc/btmon-gatt.rst
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Split GATT Database Reconstruction into btmon-gatt.rst
+
+Move the RECONSTRUCTING A GATT DATABASE FROM SNOOP TRACES section
+into a standalone file and replace it with an RST include directive.
+
+
+  Commit: 2f0dd9bd9221498d4435cc256c7c1f8ce1d499b1
+      https://github.com/bluez/bluez/commit/2f0dd9bd9221498d4435cc256c7c1f8ce1d499b1
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-25 (Wed, 25 Mar 2026)
+
+  Changed paths:
+    M Makefile.am
+    A doc/btmon-connections.rst
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Split Connection Tracking into btmon-connections.rst
+
+Move the CONNECTION TRACKING and HCI ERROR AND DISCONNECT REASON CODES
+sections into a standalone file and replace them with an RST include
+directive.
+
+
+  Commit: 29a7e2047da34d5a5c67b0931a437f7ec82d62b6
+      https://github.com/bluez/bluez/commit/29a7e2047da34d5a5c67b0931a437f7ec82d62b6
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-25 (Wed, 25 Mar 2026)
+
+  Changed paths:
+    M Makefile.am
+    A doc/btmon-hci-init.rst
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Add HCI initialization sequence documentation
+
+Document the multi-stage HCI controller initialization performed by
+the kernel (net/bluetooth/hci_sync.c). The four stages cover reset
+and identity, capability discovery, event mask configuration, and
+final setup. This helps trace readers distinguish normal init traffic
+from application-level issues.
+
+
+  Commit: 52908e879b272b3c8dc078992c6f4db690540f30
+      https://github.com/bluez/bluez/commit/52908e879b272b3c8dc078992c6f4db690540f30
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-25 (Wed, 25 Mar 2026)
+
+  Changed paths:
+    M Makefile.am
+    A doc/btmon-a2dp.rst
+    A doc/btmon-classic-audio.rst
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Add A2DP/AVDTP protocol flow documentation
+
+Add btmon-a2dp.rst documenting the A2DP protocol flow as seen in btmon
+output, wrapped by btmon-classic-audio.rst parent file. Coverage
+includes:
+
+ - AVDTP signaling: Discover, Get Capabilities, Set Configuration,
+   Open, Start, Suspend, Close
+ - Codec capability/configuration decoding for SBC, AAC, aptX, aptX HD,
+   aptX Low Latency, FastStream, LDAC, and Opus
+ - AVDTP media transport channel setup
+ - AVRCP control and browsing channel overview
+ - Delay Reporting
+ - Automation-friendly grep patterns
+
+
+  Commit: 67b7649e004ee3e5b2226bb182cc8582b604cce5
+      https://github.com/bluez/bluez/commit/67b7649e004ee3e5b2226bb182cc8582b604cce5
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-03-25 (Wed, 25 Mar 2026)
+
+  Changed paths:
+    M Makefile.am
+    M doc/btmon-classic-audio.rst
+    A doc/btmon-hfp.rst
+
+  Log Message:
+  -----------
+  doc/btmon: Add HFP protocol flow documentation
+
+Add btmon-hfp.rst documenting the HFP protocol flow as seen in btmon
+output. Coverage includes:
+
+ - SDP service discovery for Handsfree/AG UUIDs
+ - RFCOMM channel setup over L2CAP PSM 3 (SABM/UA, Parameter
+   Negotiation, Modem Status Command)
+ - AT command exchange for SLC setup (noted as hex dump only -- btmon
+   does not parse AT commands within RFCOMM UIH data frames)
+ - Codec negotiation via AT+BAC/AT+BCS
+ - SCO/eSCO synchronous connection setup (voice setting, coding format)
+ - Codec summary tables (AT-level vs HCI-level codec IDs)
+ - Automation-friendly grep patterns
+
+
+Compare: https://github.com/bluez/bluez/compare/1282f8515a6b%5E...67b7649e004e
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
