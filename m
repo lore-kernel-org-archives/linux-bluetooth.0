@@ -1,173 +1,164 @@
-Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
+Received: from ixit.cz (ixit.cz [185.100.197.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3733A3800;
-	Wed, 25 Mar 2026 23:30:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B207E1C69D;
+	Thu, 26 Mar 2026 00:02:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.100.197.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774481438; cv=none; b=Kc8FGx7jyNrWKoNTNnAbkugByx+AUnCVN8tme0TYxKdN2Rk0DQl3CaVG0PyRrd0TYtbPvO7bUaWhMvYQHhDCYEwEP95GXDM9MLwIhtv9eAZ3iP758zYKzzH7VZxf/+TcUdCL5yuGy/HgZvB+3zRspEjGok6KHfVluidZ43QWv7k=
+	t=1774483340; cv=none; b=mLYoJoeINQxgkyh2h7ZNmfwbt3sSjE2DtjGFq9reNLWAUdAfnNX+dfSbeQyMkG6L8cGtKBhkWtmv3QADKCP4+O0kQJootpYoA5ObcpWkQKrrd5st2zFtPdFYGmClvr9VTFPgtkXE7Nw7C7dWxNEAS9RwxppguqM5WAsCQ054mNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774481438; c=relaxed/simple;
-	bh=lWryKhkw4iLj5N6UVE9I7cEeZDeTwxGqMUn3iSX25wU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc:
-	 In-Reply-To:References; b=eyy7ll021f362MVm+WOyM7eh8QVevebj9dINS4Gd0BGy+CXmhiPs+auSw2bD+iqkWkp3UBXavc4boI9CkqnZoZS5lhFPERavvaag4g0H28mACsfcYM4scImY7e3gwV+J0syu+8CdJ8R0B5f4/EaWT6fMNwZ8iL6mKDWlkclsSzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jetm.me; spf=pass smtp.mailfrom=jetm.me; dkim=pass (2048-bit key) header.d=jetm.me header.i=@jetm.me header.b=Gh4PRkMe; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=uNrbFs84; arc=none smtp.client-ip=202.12.124.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jetm.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jetm.me
+	s=arc-20240116; t=1774483340; c=relaxed/simple;
+	bh=cKkuUnANPH2hVC80X9v70NueCB7aA218RY+Nm1l3uc4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=udi4zu3rWYAXmjhs5YciFMZnI1zNDNuQPI+eFh77zN0qpRm9lbD0iB8prLR3IRfEnFXS5hqv4wEOOmyjwSev/70va6DLQht77WZCpUVwC/zXgepxwt6WIhxXjTjqpG2pXlsTObErzZx0OTzhNY2+c9ononOIwJbWgiujiTSwjsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=CasRDRPX; arc=none smtp.client-ip=185.100.197.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ixit.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jetm.me header.i=@jetm.me header.b="Gh4PRkMe";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="uNrbFs84"
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfout.stl.internal (Postfix) with ESMTP id C08561D00192;
-	Wed, 25 Mar 2026 19:30:35 -0400 (EDT)
-Received: from phl-imap-07 ([10.202.2.97])
-  by phl-compute-02.internal (MEProxy); Wed, 25 Mar 2026 19:30:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jetm.me; h=cc:cc
-	:content-transfer-encoding:content-type:content-type:date:date
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1774481435;
-	 x=1774567835; bh=XVHd+2ZauyHwNk7khM0QiFJuTBAS85ERsapbSIu9KaY=; b=
-	Gh4PRkMeRmGqB8vRh25A4vrK7xNGbJI8HQY19+K0MteiBUZOuXt6mjpRqaX81ABT
-	78TefQVaDlkqN4VODzfLjJN9SiULO7a7PU+sw3jm3nmPjS5gz+jj8sVYwzooezf/
-	IOF2JjavV7tmXt6ggj2LM8qYMT55Tu5zbueI6mZk5qcVGiuJxj2+MfeVjBPH9Q4t
-	6h8+H29RJ/Of930q3vSJov4H6C6bPiNnZoOmzS7oPNEnqCmxhH7uozTNOBnaIS++
-	pKwS6auWZUI5xjNCpR64hjLuAcpCpSb9CWNJ4EbKPLH9t6RxrlrsEdS3SBzf9sD8
-	4Gqbtv0OG9JKPRkHPvP3Xg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1774481435; x=
-	1774567835; bh=XVHd+2ZauyHwNk7khM0QiFJuTBAS85ERsapbSIu9KaY=; b=u
-	NrbFs845hb7H7qVUSDLSf5NDhyyr5eVlhQOs4WI5I3UyaoRuuC1BNo9Q81cqNakZ
-	yweAAe3LAdbFd1CDa7rAGpnNGpsPwoCuS/xH7pAQF2OKtJfSo8dwhonL1EJaIDL1
-	Q5Uwag4A0bfo9KsHx57xL6S9CubOYan/cqXwCFF0ft/vayaOLUFQiEBtdyam8GM2
-	2i7vedE0d5RdS1iVbg1kz0GRmL1h8d/sDnexC8ijPj+QeYyebC08dDlqu6myHC9i
-	L/9UYJehf3ckTHXQgWYf8Upjod1UjDR9CK24pbymwx4qiOdEEr3R7oxdWc6eJF1i
-	PongdWTSFSll3PCXYF7Sw==
-X-ME-Sender: <xms:G3DEabqdCnBvjRaPeeimrnb2KkMDBI-UsEdbRdrKWGf5dGOp7L1ksA>
-    <xme:G3DEaQcYQc01ugEC7EdjWrQUiz1kQ3rUqKrzm3cS70-gZvDZCBnZMhnnAybjRaBd0
-    ho5PF-wN5m7rLr0LOpIsl98z7tNjAVv9QldP2oPaLqf1_n6dOGn>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefvdehjeelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepoffhfffugggtgffkvfevofgjfhesthejredtredtjeenucfhrhhomheplfgrvhhi
-    vghrucfvihgruceofhhlohhsshesjhgvthhmrdhmvgeqnecuggftrfgrthhtvghrnheptd
-    efvdefkedutdejfffhheehfffgfedthfeuieeiteetgedttdfhveefledvkeejnecuffho
-    mhgrihhnpehkvghrnhgvlhdrohhrghdpghhithhhuhgsrdgtohhmnecuvehluhhsthgvrh
-    fuihiivgepieenucfrrghrrghmpehmrghilhhfrhhomhepfhhlohhsshesjhgvthhmrdhm
-    vgdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprhgtphhtthhope
-    grnhhgvghlohhgihhorggttghhihhnohdruggvlhhrvghgnhhosegtohhllhgrsghorhgr
-    rdgtohhmpdhrtghpthhtoheplhhusghnihhnrdhivhgrnhesghhmrghilhdrtghomhdprh
-    gtphhtthhopehluhhiiidruggvnhhtiiesghhmrghilhdrtghomhdprhgtphhtthhopehm
-    rghtthhhihgrshdrsghgghesghhmrghilhdrtghomhdprhgtphhtthhopehmrghrtggvlh
-    eshhholhhtmhgrnhhnrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqkhgvrhhn
-    vghlsehlihhsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheplhhinhhugi
-    dqmhgvughirghtvghksehlihhsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthht
-    ohepjhhnvghtthhosehmihhnvghirhhordhiohdprhgtphhtthhopehlihhnuhigqdgslh
-    huvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:G3DEaT1IA4JbGCeaOpFiXnEbcQnS7p-xp4z1BktCK_0DR9GNsptc_g>
-    <xmx:G3DEaQUWAS-CI8dYeKdw4kgKgc5NToNz2kGD5B8auClR4gRpZEtNug>
-    <xmx:G3DEadMhKZcQL7yyzJhDSPEGjiexl2tvAuXmPbGN14frpcAk7syMUQ>
-    <xmx:G3DEab3LT3DxO-0EdC6b8KEUMdN4ws9S83ktk6UIKZv0Yma3cX0oIQ>
-    <xmx:G3DEaVHkR2ZafVQs33XygKrWtCxje1PVho5ZggLgl2ls2rBBOQujFCSz>
-Feedback-ID: i9dde48b3:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 7463B1EA006C; Wed, 25 Mar 2026 19:30:35 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-From: Javier Tia <floss@jetm.me>
-Date: Wed, 25 Mar 2026 17:30:25 -0600
-Subject: [PATCH v2 8/8] Bluetooth: btusb: Add MT7927 ID for ASUS X870E /
- ProArt X870E-Creator
+	dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b="CasRDRPX"
+Received: from [IPV6:2a02:f000:10bd:e301::1d7] (unknown [IPv6:2a02:f000:10bd:e301::1d7])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ixit.cz (Postfix) with ESMTPSA id 916155341243;
+	Thu, 26 Mar 2026 01:02:14 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
+	t=1774483334;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=R2Ewo+XzkBojo1ZNJfUV1ACLFD16IiiNHPZC2/wPH/E=;
+	b=CasRDRPXFnnKcJl3cBHPWyMk1NRbraOmFmlhca8LCnGq7hrHDO9IiOc01LzFm4tpZzIQgt
+	zXk+woMJ6pK6Q7ivxqmcl9pJOb4jdGaXt1SlQYgK907NveHcKKgs4SLL7c4yWTZfFmyZXH
+	uIWfG+TbF0vOLRuRAxGu5Fxv4S07660=
+Message-ID: <a75f80bc-d2fa-41f6-91aa-8252fbb415e6@ixit.cz>
+Date: Thu, 26 Mar 2026 01:02:13 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 7/8] arm64: dts: qcom: sdm845-db845c: describe WiFi/BT
+ properly
+To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Vinod Koul <vkoul@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, Liam Girdwood <lgirdwood@gmail.com>,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring
+ <robh@kernel.org>, linux-bluetooth@vger.kernel.org,
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+ Matthias Kaehlcke <mka@chromium.org>, linux-wireless@vger.kernel.org,
+ Jeff Johnson <jjohnson@kernel.org>, ath10k@lists.infradead.org,
+ linux-pm@vger.kernel.org, Bartosz Golaszewski <brgl@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
+ Krzysztof Kozlowski <krzk@kernel.org>,
+ Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+ Marcel Holtmann <marcel@holtmann.org>, Conor Dooley <conor+dt@kernel.org>,
+ Manivannan Sadhasivam <mani@kernel.org>
+References: <20260119-wcn3990-pwrctl-v3-0-948df19f5ec2@oss.qualcomm.com>
+ <20260119-wcn3990-pwrctl-v3-7-948df19f5ec2@oss.qualcomm.com>
+Content-Language: en-US
+From: David Heidelberg <david@ixit.cz>
+Autocrypt: addr=david@ixit.cz; keydata=
+ xsFNBF5v1x4BEADS3EddwsNsvVAI1XF8uQKbdYPY/GhjaSLziwVnbwv5BGwqB1tfXoHnccoA
+ 9kTgKAbiXG/CiZFhD6l4WCIskQDKzyQN3JhCUIxh16Xyw0lECI7iqoW9LmMoN1dNKcUmCO9g
+ lZxQaOl+1bY/7ttd7DapLh9rmBXJ2lKiMEaIpUwb/Nw0d7Enp4Jy2TpkhPywIpUn8CoJCv3/
+ 61qbvI9y5utB/UhfMAUXsaAgwEJyGPAqHlC0YZjaTwOu+YQUE3AFzhCbksq95CwDz4U4gdls
+ dmv9tkATfu2OmzERZQ6vJTehK0Pu4l5KmCAzYg42I9Dy4E6b17x6NncKbcByQFOXMtG0qVUk
+ F1yeeOQUHwu+8t3ZDMBUhCkRL/juuoqLmyDWKMc0hKNNeZ9BNXgB8fXkRLWEUfgDXsFyEkKp
+ NxUy5bDRlivf6XfExnikk5kj9l2gGlNQwqROti/46bfbmlmc/a2GM4k8ZyalHNEAdwtXYSpP
+ 8JJmlbQ7hNTLkc3HQLRsIocN5th/ur7pPMz1Beyp0gbE9GcOceqmdZQB80vJ01XDyCAihf6l
+ AMnzwpXZsjqIqH9r7T7tM6tVEVbPSwPt4eZYXSoJijEBC/43TBbmxDX+5+3txRaSCRQrG9dY
+ k3mMGM3xJLCps2KnaqMcgUnvb1KdTgEFUZQaItw7HyRd6RppewARAQABzSBEYXZpZCBIZWlk
+ ZWxiZXJnIDxkYXZpZEBpeGl0LmN6PsLBlAQTAQgAPgIbAwULCQgHAgYVCgkICwIEFgIDAQIe
+ AQIXgBYhBNd6Cc/u3Cu9U6cEdGACP8TTSSByBQJl+KksBQkPDaAOAAoJEGACP8TTSSBy6IAQ
+ AMqFqVi9LLxCEcUWBn82ssQGiVSDniKpFE/tp7lMXflwhjD5xoftoWOmMYkiWE86t5x5Fsp7
+ afALx7SEDz599F1K1bLnaga+budu55JEAYGudD2WwpLJ0kPzRhqBwGFIx8k6F+goZJzxPDsf
+ loAtXQE62UvEKa4KRRcZmF0GGoRsgA7vE7OnV8LMeocdD3eb2CuXLzauHAfdvqF50IfPH/sE
+ jbzROiAZU+WgrwU946aOzrN8jVU+Cy8XAccGAZxsmPBfhTY5f2VN1IqvfaRdkKKlmWVJWGw+
+ ycFpAEJKFRdfcc5PSjUJcALn5C+hxzL2hBpIZJdfdfStn+DWHXNgBeRDiZj1x6vvyaC43RAb
+ VXvRzOQfG4EaMVMIOvBjBA/FtIpb1gtXA42ewhvPnd5RVCqD9YYUxsVpJ9d+XsAy7uib3BsV
+ W2idAEsPtoqhVhq8bCUs/G4sC2DdyGZK8MRFDJqciJSUbqA+5z1ZCuE8UOPDpZKiW6H/OuOM
+ zDcjh0lOzr4p+/1TSg1PbUh7fQ+nbMuiT044sC1lLtJK0+Zyn0GwhR82oNM4fldNsaHRW42w
+ QGD35+eNo5Pvb3We5XRMlBdhFnj7Siggp4J8/PJ6MJvRyC+RIJPGtbdMB2/RxWunFLn87e5w
+ UgwR9jPMHAstuTR1yR23c4SIYoQ2fzkrRzuazsFNBF5v1x4BEADnlrbta2WL87BlEOotZUh0
+ zXANMrNV15WxexsirLetfqbs0AGCaTRNj+uWlTUDJRXOVIwzmF76Us3I2796+Od2ocNpLheZ
+ 7EIkq8budtLVd1c06qJ+GMraz51zfgSIazVInNMPk9T6fz0lembji5yEcNPNNBA4sHiFmXfo
+ IhepHFOBApjS0CiOPqowYxSTPe/DLcJ/LDwWpTi37doKPhBwlHev1BwVCbrLEIFjY0MLM0aT
+ jiBBlyLJaTqvE48gblonu2SGaNmGtkC3VoQUQFcVYDXtlL9CVbNo7BAt5gwPcNqEqkUL60Jh
+ FtvVSKyQh6gn7HHsyMtgltjZ3NKjv8S3yQd7zxvCn79tCKwoeNevsvoMq/bzlKxc9QiKaRPO
+ aDj3FtW7R/3XoKJBY8Hckyug6uc2qYWRpnuXc0as6S0wfek6gauExUttBKrtSbPPHiuTeNHt
+ NsT4+dyvaJtQKPBTbPHkXpTO8e1+YAg7kPj3aKFToE/dakIh8iqUHLNxywDAamRVn8Ha67WO
+ AEAA3iklJ49QQk2ZyS1RJ2Ul28ePFDZ3QSr9LoJiOBZv9XkbhXS164iRB7rBZk6ZRVgCz3V6
+ hhhjkipYvpJ/fpjXNsVL8jvel1mYNf0a46T4QQDQx4KQj0zXJbC2fFikAtu1AULktF4iEXEI
+ rSjFoqhd4euZ+QARAQABwsF8BBgBCAAmAhsMFiEE13oJz+7cK71TpwR0YAI/xNNJIHIFAmX4
+ qVAFCQ8NoDIACgkQYAI/xNNJIHKN4A/+Ine2Ii7JiuGITjJkcV6pgKlfwYdEs4eFD1pTRb/K
+ 5dprUz3QSLP41u9OJQ23HnESMvn31UENk9ffebNoW7WxZ/8cTQY0JY/cgTTrlNXtyAlGbR3/
+ 3Q/VBJptf04Er7I6TaKAmqWzdVeKTw33LljpkHp02vrbOdylb4JQG/SginLV9purGAFptYRO
+ 8JNa2J4FAQtQTrfOUjulOWMxy7XRkqK3QqLcPW79/CFn7q1yxamPkpoXUJq9/fVjlhk7P+da
+ NYQpe4WQQnktBY29SkFnvfIAwqIVU8ix5Oz8rghuCcAdR7lEJ7hCX9bR0EE05FOXdZy5FWL9
+ GHvFa/Opkq3DPmFl/0nt4HJqq1Nwrr+WR6d0414oo1n2hPEllge/6iD3ZYwptTvOFKEw/v0A
+ yqOoYSiKX9F7Ko7QO+VnYeVDsDDevKic2T/4GDpcSVd9ipiKxCQvUAzKUH7RUpqDTa+rYurm
+ zRKcgRumz2Tc1ouHj6qINlzEe3a5ldctIn/dvR1l2Ko7GBTG+VGp9U5NOAEkGpxHG9yg6eeY
+ fFYnMme51H/HKiyUlFiE3yd5LSmv8Dhbf+vsI4x6BOOOq4Iyop/Exavj1owGxW0hpdUGcCl1
+ ovlwVPO/6l/XLAmSGwdnGqok5eGZQzSst0tj9RC9O0dXO1TZocOsf0tJ8dR2egX4kxM=
+In-Reply-To: <20260119-wcn3990-pwrctl-v3-7-948df19f5ec2@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260325-mt7927-bt-support-v2-8-b892a3252880@jetm.me>
-To: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- Jose Tiburcio Ribeiro Netto <jnetto@mineiro.io>,
- Ivan Lubnin <lubnin.ivan@gmail.com>
-X-Mailer: b4 0.15.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2450; i=floss@jetm.me;
- h=from:subject:message-id; bh=lWryKhkw4iLj5N6UVE9I7cEeZDeTwxGqMUn3iSX25wU=;
- b=owEB7QES/pANAwAKAbXuwwuoZ3cfAcsmYgBpxHAKtflmLkRqGjxW+McWt6zvAtmhrwiIy9u9O
- VlvN0XKw+iJAbMEAAEKAB0WIQSbE7ILzw7eI0VKk8m17sMLqGd3HwUCacRwCgAKCRC17sMLqGd3
- H/dhC/0RkKcvlwts+4nHpJSslpidynecXn+0J/dyn8euUvdxWGfaSBNW/9UbTLnyDxqsuQU26xo
- 2531Yct8j4031UfwHPxElsZhTfe7zTPoMvX+pxpz+fQFr6pkReByg6zUyyZE0iaFetAVBMNT4M1
- G7iNxhGDj3hEqia8HbbwiOjG2J6bvHqU868MbivFwrFuQ/+flhKoMVlV1TGkZGS/eEqefvlqtTI
- oP33pysPxO/vc+7cZvE0LcaUlQZFzKq6TVfEGVQJKOhgVH3Cq5sgr0EMorw+FvlxGUFVjWXDxui
- lyW1/i1pefIk5Vg1dqa1D7PxEQmiwgqqdRDe74EYeUB+Tyonxwq1GwKb+TIl+2eGwxDHId1M069
- vZNpUXLJaig++Mwm3CHtj8iadePMIrYz+cNi97/+oLzHyYbds5+SH5JYYKZMiLzN5dbGAPQGf9P
- FzvxI0ithXFYJbCITeAp28pzoK77WOLhgEz38vIbrtOQsKWy14ashSTHp/ALHX89QalwM=
-X-Developer-Key: i=floss@jetm.me; a=openpgp;
- fpr=9B13B20BCF0EDE23454A93C9B5EEC30BA867771F
-In-Reply-To: <20260325-mt7927-bt-support-v2-0-b892a3252880@jetm.me>
-References: <20260325-mt7927-bt-support-v2-0-b892a3252880@jetm.me>
 
-Add USB device ID 13d3:3588 (IMC Networks/Azurewave) for the MediaTek
-MT7927 (Filogic 380) Bluetooth interface found on the ASUS ROG STRIX
-X870E-E GAMING WIFI and ASUS ProArt X870E-Creator WiFi motherboards.
+On 19/01/2026 18:08, Dmitry Baryshkov wrote:
 
-Note: boards with this USB ID report only one ISO alternate setting
-(alt 0), causing a non-fatal "setting interface failed (22)" during
-setup. Bluetooth still functions but initialization takes ~19 seconds
-instead of ~2.6 seconds.
+[...]
 
-The information in /sys/kernel/debug/usb/devices about the Bluetooth
-device is listed as the below.
+> +	wcn3990-pmu {
+> +		compatible = "qcom,wcn3990-pmu";
+> +
+> +		pinctrl-0 = <&sw_ctrl_default>;
+> +		pinctrl-names = "default";
+> +
+> +		vddio-supply = <&vreg_s4a_1p8>;
+> +		vddxo-supply = <&vreg_l7a_1p8>;
+> +		vddrf-supply = <&vreg_l17a_1p3>;
+> +		vddch0-supply = <&vreg_l25a_3p3>;
+> +		vddch1-supply = <&vreg_l23a_3p3>;
+> +
+> +		swctrl-gpios = <&pm8998_gpios 3 GPIO_ACTIVE_HIGH>;
 
-T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  5 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3588 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+Do you know if the GPIO is common for whole sdm845, or it's only recommended as 
+reference design, or nothing?
 
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=221096
-Link: https://github.com/openwrt/mt76/issues/927
-Signed-off-by: Javier Tia <floss@jetm.me>
-Tested-by: Jose Tiburcio Ribeiro Netto <jnetto@mineiro.io>
-Tested-by: Ivan Lubnin <lubnin.ivan@gmail.com>
----
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+I did test defaulting to GPIO 3 on Pixel 3 and WiFi works as before, but since 
+previous downstream kernel didn't touched GPIO 3 at all, I'm worried about 
+toggling unrelated GPIO.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 55a000540439..45ef0d008bce 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -761,6 +761,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0489, 0xe116), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x13d3, 0x3588), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0489, 0xe14e), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0489, 0xe14f), .driver_info = BTUSB_MEDIATEK |
+Thanks!
+David
+
+> +
+> +		regulators {
+> +			vreg_pmu_io: ldo0 {
+> +				regulator-name = "vreg_pmu_io";
+> +			};
+> +
+> +			vreg_pmu_xo: ldo1 {
+> +				regulator-name = "vreg_pmu_xo";
+> +			};
+> +
+> +			vreg_pmu_rf: ldo2 {
+> +				regulator-name = "vreg_pmu_rf";
+> +			};
+> +
+> +			vreg_pmu_ch0: ldo3 {
+> +				regulator-name = "vreg_pmu_ch0";
+> +			};
+> +
+> +			vreg_pmu_ch1: ldo4 {
+> +				regulator-name = "vreg_pmu_ch1";
+> +			};
 
 -- 
-2.53.0
-
+David Heidelberg
