@@ -1,164 +1,164 @@
-Received: from ixit.cz (ixit.cz [185.100.197.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B207E1C69D;
-	Thu, 26 Mar 2026 00:02:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.100.197.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDC01DFD96
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2026 00:19:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774483340; cv=none; b=mLYoJoeINQxgkyh2h7ZNmfwbt3sSjE2DtjGFq9reNLWAUdAfnNX+dfSbeQyMkG6L8cGtKBhkWtmv3QADKCP4+O0kQJootpYoA5ObcpWkQKrrd5st2zFtPdFYGmClvr9VTFPgtkXE7Nw7C7dWxNEAS9RwxppguqM5WAsCQ054mNk=
+	t=1774484380; cv=none; b=p0ZlsVmyD1Qxp2VWzO3Ljg7g5ZUUVI5Z6Y8ZTMCTei77vmWt4oSTfcn1PKpqPLze+49/ox3NzBGHtUE9YTVlQk2pK4Qq1DtnK0Sxm7kvW6G33LEX2KsPT2h7ZXB2MN7vHleKT2C5A33YlY9jADcsUZV/gSHOS+ubQppZQgaDqNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774483340; c=relaxed/simple;
-	bh=cKkuUnANPH2hVC80X9v70NueCB7aA218RY+Nm1l3uc4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=udi4zu3rWYAXmjhs5YciFMZnI1zNDNuQPI+eFh77zN0qpRm9lbD0iB8prLR3IRfEnFXS5hqv4wEOOmyjwSev/70va6DLQht77WZCpUVwC/zXgepxwt6WIhxXjTjqpG2pXlsTObErzZx0OTzhNY2+c9ononOIwJbWgiujiTSwjsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=CasRDRPX; arc=none smtp.client-ip=185.100.197.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ixit.cz
+	s=arc-20240116; t=1774484380; c=relaxed/simple;
+	bh=hmV5NJxkI+sXhJY572Iiroo6P0iGs40ESMZAX71smG4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=W400HYrOa82rtyymNigb3b6eMsregrWQPMz2cKECmaY6vERyjmEjuH2xYgZ9T8fFCercNNBRqXnU26Wv99YNvvOhS7OuPPYPN9DRO0dyE2kIGTkzfJZrUM7rnReyam9HzGg7KFiQq2NgE0mN0rItExqILfdhI5anUJc6p34GqTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nay8OWrL; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b="CasRDRPX"
-Received: from [IPV6:2a02:f000:10bd:e301::1d7] (unknown [IPv6:2a02:f000:10bd:e301::1d7])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ixit.cz (Postfix) with ESMTPSA id 916155341243;
-	Thu, 26 Mar 2026 01:02:14 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
-	t=1774483334;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=R2Ewo+XzkBojo1ZNJfUV1ACLFD16IiiNHPZC2/wPH/E=;
-	b=CasRDRPXFnnKcJl3cBHPWyMk1NRbraOmFmlhca8LCnGq7hrHDO9IiOc01LzFm4tpZzIQgt
-	zXk+woMJ6pK6Q7ivxqmcl9pJOb4jdGaXt1SlQYgK907NveHcKKgs4SLL7c4yWTZfFmyZXH
-	uIWfG+TbF0vOLRuRAxGu5Fxv4S07660=
-Message-ID: <a75f80bc-d2fa-41f6-91aa-8252fbb415e6@ixit.cz>
-Date: Thu, 26 Mar 2026 01:02:13 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nay8OWrL"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-50b2ebca625so3193811cf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2026 17:19:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774484377; x=1775089177; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=q6xc7UxzMxCp+L8D5OCdfdGn47XlXMsJvhhg0VkF8Pc=;
+        b=Nay8OWrL/SL3vUUPb61k/nmxg18XZjYFpVLvWK6k64WTBDnuobeERpb9AgQLXje1rW
+         SjmnEEdI8lOkI3Fa6ylkG5kPhZYXBThfPtwmCiJmGrfAhy7H18cXH+XyM4CmThhOXi3X
+         yMZ6ByYyTtmhbgdgTSY1a87E34mDS3rLZyj1yczooc9tC5xotFRDJfcerssFvvmyZZMU
+         FB9PSGS9Lr0pbdcuM5O61Jkkt95ekJaHjckFakfP4ff80R4uX4upBZCp/l4ve043sNqE
+         G6GscTdkO/fSYzSkHmeANzM/L30bWPeBpDVhBgWkOOYTfQtSsRdlZ9JoBS34pb47CEpQ
+         9/Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774484377; x=1775089177;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q6xc7UxzMxCp+L8D5OCdfdGn47XlXMsJvhhg0VkF8Pc=;
+        b=AR75nnaLKPS00IZqJslfAv00xTbtnwuWCLwZyNsjpc+m0dgug13MMlsTtcWy5GJ0DE
+         wKDHgbFT3AakWl58OdYV7x5goo9XmiekUM0EJ4ulMIYgnbFI/5SXlHn2bUk7Rm5wmcEF
+         MvfK/eBcBkzL2oOPFBE6/UzqKwCT1afL9bhtILdGgrb9y7CWzrIgIDjmFjuzUZjxRIVu
+         DRSmtdlTEepeyo6HI3hCBgZy3HviBP3TN+eCBq6q5mdjzWgCc3YourWzLXsyJVmcEopM
+         Gc/l0jLGeSEj+1Ht7xy0ePjpE/QIOA5zOzm5iswlDboXeOQ0SUhEO4tPLXwZSofz7fR0
+         oYEQ==
+X-Gm-Message-State: AOJu0Yw/owwSLU30pahHsPqgVeTMtIrHwIOBSDSvhgxFUPdBuHbA0sER
+	EVhy95rHR7NFT3c7QDoDgjbyt0YcIoX/vSgSggb3f1wYRfvjbtiF4DurLtdk4A==
+X-Gm-Gg: ATEYQzwNoGh+7TOcFLF0sReboEzlyxTc9GATJ251VLvX4CMgtbQx1VTI9KWtl9FBovz
+	rzMyq8upk39Lg94/g6meuXjGVhKbRViZNMzOg+993krdZ3y0eI6qLSuzI/SLSPppZ42CRh15ZFb
+	SfUzAhqhGUeOqx5Xr2ijNLA+rNKowdeU3/IdnGygHdROfJs702HhS0lRPkgg+jT2bUIvXzVZKRI
+	69ubZWyp7g2MX6hffZgXiAsJc2gUh8/IsDFjAZ8GzWOHOD2agpwEaTpMQVPhqY0TmV0HXdYjYfP
+	BMqZ3U3OJUvsF3jaeuuppvhI9YQ2yg3YGhQnunB9Zl9Knt0D/d4dplhCEUafS2PI5wrVEAP5Tsp
+	OBW2fK/MpReUH/Fb5naL5/Wrf1E2mqy1LVNP/o9a/Qu6Y3vUD3U0OGpjlsxUO34cJSDCrthNoag
+	/T0RlkNYyKkqE0YU3H1GIzQ4lNo+MTx70=
+X-Received: by 2002:a05:622a:5913:b0:509:2135:ed59 with SMTP id d75a77b69052e-50b808e24bbmr71305831cf.36.1774484377343;
+        Wed, 25 Mar 2026 17:19:37 -0700 (PDT)
+Received: from [172.17.0.2] ([172.171.254.149])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50b9234e1dbsm10601641cf.18.2026.03.25.17.19.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Mar 2026 17:19:37 -0700 (PDT)
+Message-ID: <69c47b99.050a0220.397eef.4d2c@mx.google.com>
+Date: Wed, 25 Mar 2026 17:19:37 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8689224001804463429=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 7/8] arm64: dts: qcom: sdm845-db845c: describe WiFi/BT
- properly
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>, Vinod Koul <vkoul@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, Liam Girdwood <lgirdwood@gmail.com>,
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring
- <robh@kernel.org>, linux-bluetooth@vger.kernel.org,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Matthias Kaehlcke <mka@chromium.org>, linux-wireless@vger.kernel.org,
- Jeff Johnson <jjohnson@kernel.org>, ath10k@lists.infradead.org,
- linux-pm@vger.kernel.org, Bartosz Golaszewski <brgl@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
- Krzysztof Kozlowski <krzk@kernel.org>,
- Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
- Marcel Holtmann <marcel@holtmann.org>, Conor Dooley <conor+dt@kernel.org>,
- Manivannan Sadhasivam <mani@kernel.org>
-References: <20260119-wcn3990-pwrctl-v3-0-948df19f5ec2@oss.qualcomm.com>
- <20260119-wcn3990-pwrctl-v3-7-948df19f5ec2@oss.qualcomm.com>
-Content-Language: en-US
-From: David Heidelberg <david@ixit.cz>
-Autocrypt: addr=david@ixit.cz; keydata=
- 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
-In-Reply-To: <20260119-wcn3990-pwrctl-v3-7-948df19f5ec2@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, floss@jetm.me
+Subject: RE: Bluetooth: Add MediaTek MT7927 (MT6639) support
+In-Reply-To: <20260325-mt7927-bt-support-v2-1-b892a3252880@jetm.me>
+References: <20260325-mt7927-bt-support-v2-1-b892a3252880@jetm.me>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============8689224001804463429==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-On 19/01/2026 18:08, Dmitry Baryshkov wrote:
+This is automated email and please do not reply to this email!
 
-[...]
+Dear submitter,
 
-> +	wcn3990-pmu {
-> +		compatible = "qcom,wcn3990-pmu";
-> +
-> +		pinctrl-0 = <&sw_ctrl_default>;
-> +		pinctrl-names = "default";
-> +
-> +		vddio-supply = <&vreg_s4a_1p8>;
-> +		vddxo-supply = <&vreg_l7a_1p8>;
-> +		vddrf-supply = <&vreg_l17a_1p3>;
-> +		vddch0-supply = <&vreg_l25a_3p3>;
-> +		vddch1-supply = <&vreg_l23a_3p3>;
-> +
-> +		swctrl-gpios = <&pm8998_gpios 3 GPIO_ACTIVE_HIGH>;
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1072604
 
-Do you know if the GPIO is common for whole sdm845, or it's only recommended as 
-reference design, or nothing?
+---Test result---
 
-I did test defaulting to GPIO 3 on Pixel 3 and WiFi works as before, but since 
-previous downstream kernel didn't touched GPIO 3 at all, I'm worried about 
-toggling unrelated GPIO.
+Test Summary:
+CheckPatch                    PENDING   0.37 seconds
+GitLint                       PENDING   0.24 seconds
+SubjectPrefix                 PASS      0.94 seconds
+BuildKernel                   PASS      26.23 seconds
+CheckAllWarning               PASS      28.82 seconds
+CheckSparse                   PASS      28.82 seconds
+BuildKernel32                 PASS      25.62 seconds
+TestRunnerSetup               PASS      566.89 seconds
+TestRunner_l2cap-tester       PASS      27.97 seconds
+TestRunner_iso-tester         FAIL      31.99 seconds
+TestRunner_bnep-tester        PASS      6.26 seconds
+TestRunner_mgmt-tester        FAIL      117.55 seconds
+TestRunner_rfcomm-tester      PASS      9.47 seconds
+TestRunner_sco-tester         FAIL      14.20 seconds
+TestRunner_ioctl-tester       PASS      10.32 seconds
+TestRunner_mesh-tester        FAIL      11.41 seconds
+TestRunner_smp-tester         PASS      8.53 seconds
+TestRunner_userchan-tester    PASS      6.65 seconds
+IncrementalBuild              PENDING   0.52 seconds
 
-Thanks!
-David
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-> +
-> +		regulators {
-> +			vreg_pmu_io: ldo0 {
-> +				regulator-name = "vreg_pmu_io";
-> +			};
-> +
-> +			vreg_pmu_xo: ldo1 {
-> +				regulator-name = "vreg_pmu_xo";
-> +			};
-> +
-> +			vreg_pmu_rf: ldo2 {
-> +				regulator-name = "vreg_pmu_rf";
-> +			};
-> +
-> +			vreg_pmu_ch0: ldo3 {
-> +				regulator-name = "vreg_pmu_ch0";
-> +			};
-> +
-> +			vreg_pmu_ch1: ldo4 {
-> +				regulator-name = "vreg_pmu_ch1";
-> +			};
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
--- 
-David Heidelberg
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+BUG: KASAN: slab-use-after-free in le_read_features_complete+0x7e/0x2b0
+Total: 141, Passed: 141 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.108 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.858 seconds
+Mesh - Send cancel - 2                               Timed out    1.995 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8689224001804463429==--
