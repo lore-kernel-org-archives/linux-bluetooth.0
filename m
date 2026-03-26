@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CF03B530F;
-	Thu, 26 Mar 2026 21:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B553FBEBF;
+	Thu, 26 Mar 2026 21:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774561218; cv=none; b=Fhm+VDaOHdoknw9JA8jmpSsw0Y63bU/j8/9a0JltpPd847POPb9FR0yaS8rquDOtuQ9NYg+Ux9elxSQzJ9B38gYtYeVQtK8W9q2p+XDdBX6vpZFsrAZOkPlCDRvjdCy/LcLifoQ+M69W1SZn8xgaE+oVT9yASurkMvbgj0Ybskw=
+	t=1774561220; cv=none; b=F+Z8Equ9FKTFv9Rf81krT9YT/0V3xpC6zFaqXsvk/IwRTOEfjxIWoGL3lZ02kFqtlm8Yy0gAyV84JznD3IUa8Ip3QkIXqxP1ux9LFYxJmm7NbjWXUzTYgjYQ0VT6WPQyhMvjXitNZONLbiA74rO6RkHzQHdczIY7WXH4Av/AeqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774561218; c=relaxed/simple;
-	bh=+lEnbrU6mIz2GRGSbVMp6wug2LlsBdWBUt3tA3pl+rg=;
+	s=arc-20240116; t=1774561220; c=relaxed/simple;
+	bh=CbxAd6TYhT3hwZAmaE1vDTQPpzcjprgHBELD1oBFdv4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cKH6FxgIkNf3EV5ksKsk86v8HMyAv4nehR0PjpY0pywvXvUggH6bSSdY20/2SI3Rojr+NCtC1xRVFGhSrlOabYKCY1sBv9lILHYxKVThsQw5hZ3iQlSn5H9m8emaanJ6RlGkHqw8BNM8M78Y0FtdRboHVoRAX+WzOD1BQj+41ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RHqGPH7m; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=XBcINFG/GdsEAXC48klFXzi+cnGaIN1PzeNUH6X41M9PM5JB1R1271tdusBhAAnTOgAfn3BZPFA4JAuTIRaqT4EStyIe0lLDUQiQkUjor4PG3xbt7Xcrbjril4HMp6vg6Bg+0xQXEVOD7Tj7SCMRrvVcaZJoCggkGupHJr2cCy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B4UskdpQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RHqGPH7m"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17DB8C116C6;
-	Thu, 26 Mar 2026 21:40:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B4UskdpQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52577C116C6;
+	Thu, 26 Mar 2026 21:40:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774561218;
-	bh=+lEnbrU6mIz2GRGSbVMp6wug2LlsBdWBUt3tA3pl+rg=;
+	s=k20201202; t=1774561219;
+	bh=CbxAd6TYhT3hwZAmaE1vDTQPpzcjprgHBELD1oBFdv4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RHqGPH7mGqzMw52tFfM2daSMzDInDy1SqsmcTKke3OHP8rWVoRfP4L2orIyvT3MO4
-	 sWlSa/jAuxGiSGLpKeSenB/VC2DLLEi+xXCfk/G56i2Rw/hZWac/BUBIZnC5gAUwvS
-	 h1cYmcMCLvdnd3XTrvuqiq8yXCUBiEUWy9iBy8XapJZPO6xqnf+RmgN2MlywBkR0lR
-	 I0qEKpaAqIjMA7tyG5+Q5Zx22/sD405cMiQkotFvWEkDclbhPSAXkj0SspB+dTIvGk
-	 VIIjla9F0KnD2XfypXlnhhG5KQCHk9Auap1X8wQtHl2O8JcIhNmEsO5zRrfrovHzOj
-	 1zsjT9KipHYyQ==
+	b=B4UskdpQE+CSZrk0Vdun72MYWjYMt8FUrooe5WnJGRc75z5SjeAJNmx3VyVvelQbX
+	 4C5SQJc3Qnq9kutjnMQWGMxwDBErR0hPi8GNriChR8oDeu7kKoUahNlLEDTTJHzGqB
+	 G6nwpMf10bt+e7NZEGbkZnNLw3CfKKLVAbQjx1z5yPoCw2PO7ZrxFhRW4GpmRbK1rp
+	 7oM3Nd8f96uN0MP7QWzFRa+7TBIgVSzKQ8OjnzP287XUI0H9t0uEH9QmM3rxBSexC6
+	 aRMk2IYHfP93tvLSq7KttbNgzi2yaOIcD+yIGnRN4yddO9s+JXD2MHWp2L6Z3vhLfG
+	 bmYqAjVVrykBw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9EFC39F280C;
-	Thu, 26 Mar 2026 21:40:05 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02D0F39F280C;
+	Thu, 26 Mar 2026 21:40:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,38 +37,46 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: SCO: fix race conditions in
- sco_sock_connect()
+Subject: Re: [PATCH v6] Bluetooth: hci_event: move wake reason storage into
+ validated event handlers
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177456120454.3188441.6495487267009938914.git-patchwork-notify@kernel.org>
-Date: Thu, 26 Mar 2026 21:40:04 +0000
-References: <20260326151645.27909-1-zzzccc427@gmail.com>
-In-Reply-To: <20260326151645.27909-1-zzzccc427@gmail.com>
-To: Cen Zhang <zzzccc427@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- baijiaju1990@gmail.com
+ <177456120578.3188441.11832842708918344410.git-patchwork-notify@kernel.org>
+Date: Thu, 26 Mar 2026 21:40:05 +0000
+References: <09ff4368485242cdb6bc707082fccc4d.security@1.0.0.127.in-addr.arpa>
+In-Reply-To: 
+ <09ff4368485242cdb6bc707082fccc4d.security@1.0.0.127.in-addr.arpa>
+To: Oleh Konko <security@1seal.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ luiz.dentz@gmail.com, gregkh@linuxfoundation.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 26 Mar 2026 23:16:45 +0800 you wrote:
-> sco_sock_connect() checks sk_state and sk_type without holding
-> the socket lock. Two concurrent connect() syscalls on the same
-> socket can both pass the check and enter sco_connect(), leading
-> to use-after-free.
+On Thu, 26 Mar 2026 17:31:24 +0000 you wrote:
+> hci_store_wake_reason() is called from hci_event_packet() immediately
+> after stripping the HCI event header but before hci_event_func()
+> enforces the per-event minimum payload length from hci_ev_table.
+> This means a short HCI event frame can reach bacpy() before any bounds
+> check runs.
 > 
-> The buggy scenario involves three participants and was confirmed
-> with additional logging instrumentation:
+> Rather than duplicating skb parsing and per-event length checks inside
+> hci_store_wake_reason(), move wake-address storage into the individual
+> event handlers after their existing event-length validation has
+> succeeded. Convert hci_store_wake_reason() into a small helper that only
+> stores an already-validated bdaddr while the caller holds hci_dev_lock().
+> Use the same helper after hci_event_func() with a NULL address to
+> preserve the existing unexpected-wake fallback semantics when no
+> validated event handler records a wake address.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] Bluetooth: SCO: fix race conditions in sco_sock_connect()
-    https://git.kernel.org/bluetooth/bluetooth-next/c/401702ac8a51
+  - [v6] Bluetooth: hci_event: move wake reason storage into validated event handlers
+    https://git.kernel.org/bluetooth/bluetooth-next/c/3e7e7f4bdbe5
 
 You are awesome, thank you!
 -- 
