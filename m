@@ -1,81 +1,67 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561083976BB;
-	Thu, 26 Mar 2026 18:30:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AA21B4156
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2026 18:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774549819; cv=none; b=iG0oQIisM2ZoBt/0cF0bJwIMq95N2XS+hoqNKqjyUiUGU9+D8qzBWEEsMq0EMynQ9JBq/HTKSqS5h9V4OToXkInkckwDZsAYRP9inyUJGa6URUhwwpgXm/xnRvUGVjjxhRcDRdmVU3VC2EVPG556WeHYYh2wswIutFhnmftGcYQ=
+	t=1774550487; cv=none; b=RiOvZCRjsykCa7Qrw3SQyi3EwWfNuZJoEs/j8sxwZM4ytIOe04fEwsl8KxLnoNvbK+s6trC731fAFpYq8PyzD0dh1414OMYNvtCe4kOGuaakXOvpHLc64rD3aZEHW1g//IEcuFFd4bLWK194qivKEwKN1VY8cROe5evYaVnASug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774549819; c=relaxed/simple;
-	bh=g+6QI5FgvaeuM24QYnQTHVdSlngrRlyb/ApyZyu2YaU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nAGQilwNWtMiuh9jcnVez7SloW92ZnnKlagVxPtJ0GPwS6GJogYBl8KDKIy45M0pHruch6IMXnZxmzuIKQsjMQJx6U+GGMAllRSoSyGNmwLLMh0o8yrDWt9U1W92j7zAEQCuqboksoe9L6KNA2VpfgYP0G2sn4dPBAOuaEYkpYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l6LD93N9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774550487; c=relaxed/simple;
+	bh=T+kl69zpIJpbbPZZUZFGkz+xRGsgI7eEtEiFwS0yVKg=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=kRHXZ/KryhhzXcJzebgN7VjGXN18MqJl2fRqxIKB8GkGOv3kEa4k1evDzBW1K2kaCdCF/qjVBVG3fIfyBEi/Wk5dFhym6GaWL0caF4RazofO4g/zzOrplmS6QF90oaWYNC4xn2yydyXSffHXmz8+KJ+GgAyYxwmHosWcGkfW4MQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=VzWR/qyG; arc=none smtp.client-ip=192.30.252.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l6LD93N9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0667AC116C6;
-	Thu, 26 Mar 2026 18:30:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774549819;
-	bh=g+6QI5FgvaeuM24QYnQTHVdSlngrRlyb/ApyZyu2YaU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=l6LD93N9ByGwdr4ENFu/4LyHFlgU95giiD9WppWO6D3IeVrhZeEqEKgexg6BoTtZi
-	 J13Ega2d151VjX3FSCOQulfta95Ng9SWYynrByKZTsrXJYtLws/AJz1JZQk7K/Kd/0
-	 hwTnrNpwVHtHn8BY504Ylvag5W+c0+hTRnN2uEfPGDRRf0EKILgUHHrP3ejQjgVjiR
-	 PhKR5RNPk9g7tDCPKmT40/ErO+PIXC+9/RlnjJoJ0iGuoSLcD6lxXQjLQP2whDWTGz
-	 3ZTckQMe1PKzeey88cIxcI+M9EhTq3QtAnN5+RmuMDJCT/xvowr3JHduwx+mYAIgFI
-	 MgV1BUhM8ENGg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9FCD39F2038;
-	Thu, 26 Mar 2026 18:30:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="VzWR/qyG"
+Received: from github.com (hubbernetes-node-ca0a085.ac4-iad.github.net [10.52.154.31])
+	by smtp.github.com (Postfix) with ESMTPA id 8C197202C3
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2026 11:41:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1774550485;
+	bh=IVt2nrsaCYLL0oDJTdDvlIv26obBBQrhyVjRI318NbM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=VzWR/qyGSkZdAOFfm24BUaYMQXiGBHjZrqHn9Ftu7ah5rLqMeI9r2XYFgdLoQ2HLi
+	 l5XRQXyEEktK4bvvu0TuwnQn45siehDK4rgCIXWOi5YCny7CiPF0JP4ttS3NlmSuqn
+	 CM+t1/HIhMDgXd+56fNQ54ElD2172X+4A71wWsaQ=
+Date: Thu, 26 Mar 2026 11:41:25 -0700
+From: hadess <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/097196-0d4bb4@github.com>
+Subject: [bluez/bluez] 0d4bb4: mesh-gatt: Fix JSON files missing from dist
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] Bluetooth: hci_qca: disable power control for WCN7850
- when
- bt_en is not defined
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <177454980529.3124616.11598462892322603776.git-patchwork-notify@kernel.org>
-Date: Thu, 26 Mar 2026 18:30:05 +0000
-References: <20260324023016.3889062-1-shuai.zhang@oss.qualcomm.com>
-In-Reply-To: <20260324023016.3889062-1-shuai.zhang@oss.qualcomm.com>
-To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-Cc: brgl@kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
- quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
- jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 0d4bb44219522a42a8a7daf94225c0d6ed9237b1
+      https://github.com/bluez/bluez/commit/0d4bb44219522a42a8a7daf94225c0d6ed9237b1
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-03-26 (Thu, 26 Mar 2026)
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M Makefile.tools
 
-On Tue, 24 Mar 2026 10:30:16 +0800 you wrote:
-> On platforms using an M.2 slot with both UART and USB support, bt_en is
-> pulled high by hardware. In this case, software-based power control
-> should be disabled. The current platforms are Lemans-EVK and Monaco-EVK.
-> 
-> Add QCA_WCN7850 to the existing condition so that power_ctrl_enabled is
-> cleared when bt_en is not software-controlled (or absent), aligning its
-> behavior with WCN6750 and WCN6855
-> 
-> [...]
+  Log Message:
+  -----------
+  mesh-gatt: Fix JSON files missing from dist
 
-Here is the summary with links:
-  - [v3] Bluetooth: hci_qca: disable power control for WCN7850 when bt_en is not defined
-    https://git.kernel.org/bluetooth/bluetooth-next/c/a94b3460712c
+Moving EXTRA_DIST into a conditional means that if the dist isn't made
+with the deprecated tools enabled, then files will be missing from the
+distribution.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Fixes: 1f6553edd8a5 ("build: Deprecate meshctl tool")
 
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
