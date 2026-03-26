@@ -1,46 +1,45 @@
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010053.outbound.protection.outlook.com [52.101.69.53])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011037.outbound.protection.outlook.com [52.101.65.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2628387357;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D303C943B;
 	Thu, 26 Mar 2026 09:59:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.53
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774519170; cv=fail; b=bIbwybAx1VVJQipgdq+uZ2ctGy14XIPVnLVPCeRo3IbpA60Pfh+KuJ07rn+X4ZKksa+Wrw4irzbdfYCirtEOZfzrfeNvoP3lF8DwQIjl7XUsHM0bwaKk3lHBgFpZA682rM7L6P5we86dij3QX6xxwlz5FcbqdRa6PekZwfefBD4=
+	t=1774519171; cv=fail; b=XDDyIYGFbtS4k3shLoDQ9A3U5f6cBXR2Wjznj6sZiYzHPUEcJ4JlrIbAQYMHj3wnb/fDu2RQJagPvZX/IRRqJbhkCBf557RFOZOoI17x73XBeamUieYy1l4brREn+XjhmGzvsOI/c0B/A6aHYywiWkq2FhY06hM+chBRmrNhWfE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774519170; c=relaxed/simple;
-	bh=aOjShqR+dhTKowbBEQCni7qrAypUUHojiYO97zPuAK4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=m0PAgXSNQhGc8dUe7cFzSk1WqBvHseT4LnElq/zTcNEyctOV3iFANY7VyCLtQ97YtF2VVezotEzeBqiGLQD1B3VV4Un/HSngro/0/TUhBnjpUmkx9y/5PS5JDyzo+CIqk1QSAqLIn96UT5+KnMFz+Azu5DNR8WVvTMM+zHHY5Oc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=CNXUsdx4; arc=fail smtp.client-ip=52.101.69.53
+	s=arc-20240116; t=1774519171; c=relaxed/simple;
+	bh=Aq6Q9YQslYahhM7IfEgXsDMdg04FiB1n+dPA1V30/ss=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=QPuVnzyRadYskZ3QAQn6b0yMjhRwzed18/afqE2v/8Z/9S3uD2TC7PjhCFwfTKtst0X4r4ZY9wrGigdqbZzagW29No7EnXyrOxyD9mcglapwCoJFm6JoTp3M5SlRcZR5p1ToNdMIxeZxvcIvIm0nXFWIKHG6NT7p6SRc7gdHt5U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=LSiZJweK; arc=fail smtp.client-ip=52.101.65.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axis.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="CNXUsdx4"
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="LSiZJweK"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=L2hW88hTDuG3JOA7dSEZFd4QEOkiNMFz1ZOj8Bqn1swp9FjYgvaey70QyFMdhnotEV6DaVIkmrTLSH9+ErYm/sdNFwJWpW8Xn88hXLSV+Nih/ZJ5/E21wUkAE2cY4efxNzjTg4THOeU3Vd4YS1g8Uw4wIEtqBT5hS6GTzWqXcbXgoyBIxWMkS57gNvwLhGH9K9/ORbJu+cAfO8ZOWi7LEVdGyDjsHlh3JQWcSg9HBtGSIC5/hcM6CSatEE2+mR25beeqs/NN6JGxJ0bTMN1B+FPio9fBUbnZMMfGB4u9okoDq3/+lMs0OgZziACpVfAbhfUv/WMZ27FrfpQOqtmOng==
+ b=RFZE+PDKH98BRAgZ5oQd2CU5BgD2zBI6BGayHx6Awzd06fDvGaB+jWpfGbwyuQ/y2aDJXbW78uclxSJWAr/mcwjz/EHQugWBmuGTUAi42oBL/+T5Lkg7ng9ijmD2KQla51tbij64KicSe4ErnTyCn2iDTz68uWwVwsmyMyotamYWh2hF09ojnZECKg4TET6AJzs3YBKvu8GAzYPxvaGddGcy+FT0MD9SHJQKn49J1PJcvM8NlvxdVwdnHAx1guMYpZtZoLJ6/mLjLgQ1RKJw3T2k6eujvpC7chh1JNzo3ww9y6CmAOi9bBzLIUXJLrsDyC6nAmJ+5uH525NCQR0iLw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HV33FTFSDx2C2jfk3VfjB2dSC0HMWNouUAjuRNgTK/A=;
- b=qZKAttHSuVCtVkUHerGDCAcDN+kQg1NNWs4bZJ8h4BgM9zbGjd4iXx4por4STYJaG7IrgVPdumUo6CQJjkcgcrRbnTWKZ1HSrxK+OHobz4WUYbdMi+ymcgmoOMreCUjDWMxUE50nG0dmSNdGc8dbpUtQK55AiXuHh7u/ykYjskUEtmVPzjuyfpwY1k+BcuPC6Rv/HtZrsh7k+/o7phXmVmlgK6VyMt9USTkRbYu1wWijQQpj/5jyQTttVoA24N+uameKYYswtAKv3ITGixjNSpMDYfhar2bWBLO7Rpg4x5M8Bic6BB9B/7m3JgHVr/SZF/VZZcMz3loaJjU2Ba2jPQ==
+ bh=FCLrMDFkc21eKW3l5sJm97FfiDIZt189ThG8F88rp58=;
+ b=wYxObWgLpw+RotWs0TXACOF93OLy31wsNfteE57MOPjQPcmhWh/A5k35uJQW4+sOcwFeoYfpwjbAsmVbMI5SLHu4Vqhyvq7EJgMoz58HDbb1PD/igOjFWgorQ7sXi916vwgLRDVB8ZbevTmwB7lv9SpNpWRCPgKyaAh+hxpT7LDzNL63EM6z88Nuj+RfEJVfXsf7MwrFvEu9ZuZ0vXdyerCjc+TAB9Jq59EePl5/VEb1IT0SHRVuQTGHS8rVxNgN/BDcfnffLH2sV9l9fawqRlthkA5Q9d22SvqKT6jY2DyEXDBuBaAmrxTcP9lnWp692PS+VWekh7bMCylV72Expw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  195.60.68.100) smtp.rcpttodomain=gmail.com smtp.mailfrom=axis.com; dmarc=pass
  (p=none sp=none pct=100) action=none header.from=axis.com; dkim=none (message
  not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HV33FTFSDx2C2jfk3VfjB2dSC0HMWNouUAjuRNgTK/A=;
- b=CNXUsdx4AvPK9Iq2NMhuLC9/4vIt2okaJPk2rIpdyhy+9QVEvA2HNRh1iNGLSLpWXuchoD2LgM9Kkkg6cqnKQGEz6BSHUljIiG6RbUzUG5XY7uLWqTxYJW8WScauBq5mm266RyRvGLysO/YunsndPxM+ExZzfnGhsuPb0UpQz6M=
-Received: from DU7PR01CA0035.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:50e::16) by GVXPR02MB11602.eurprd02.prod.outlook.com
- (2603:10a6:150:326::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.31; Thu, 26 Mar
- 2026 09:59:22 +0000
+ bh=FCLrMDFkc21eKW3l5sJm97FfiDIZt189ThG8F88rp58=;
+ b=LSiZJweKFSyYArl34JlbGsmGp4RzfnoyBOS68PLTySFVnEAoJ1nuHfeOSFyh3wGdlURrRXy8oaMNmz1F0xyFTzQ0yUmgFpao7s0JchPUeAuoNHz6iqAX5/zHUlzFBjEqG0tvPdAIqZSFgdvb1dm7jtF+XqbBgE0KR2wF4tH3+04=
+Received: from DU7PR01CA0027.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:50e::14) by AS8PR02MB8615.eurprd02.prod.outlook.com
+ (2603:10a6:20b:54d::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.20; Thu, 26 Mar
+ 2026 09:59:23 +0000
 Received: from DU6PEPF0000952A.eurprd02.prod.outlook.com
- (2603:10a6:10:50e:cafe::bc) by DU7PR01CA0035.outlook.office365.com
- (2603:10a6:10:50e::16) with Microsoft SMTP Server (version=TLS1_3,
+ (2603:10a6:10:50e:cafe::5a) by DU7PR01CA0027.outlook.office365.com
+ (2603:10a6:10:50e::14) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.32 via Frontend Transport; Thu,
- 26 Mar 2026 09:59:23 +0000
+ 26 Mar 2026 09:59:18 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 195.60.68.100)
  smtp.mailfrom=axis.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=axis.com;
@@ -50,22 +49,28 @@ Received-SPF: Pass (protection.outlook.com: domain of axis.com designates
 Received: from mail.axis.com (195.60.68.100) by
  DU6PEPF0000952A.mail.protection.outlook.com (10.167.8.11) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9745.21 via Frontend Transport; Thu, 26 Mar 2026 09:59:22 +0000
-Received: from se-mail11w.axis.com (10.20.40.11) by se-mail11w.axis.com
+ 15.20.9745.21 via Frontend Transport; Thu, 26 Mar 2026 09:59:23 +0000
+Received: from se-mail01w.axis.com (10.20.40.7) by se-mail11w.axis.com
  (10.20.40.11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.39; Thu, 26 Mar
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.39; Thu, 26 Mar
  2026 10:59:21 +0100
-Received: from se-intmail01x.se.axis.com (10.4.0.28) by se-mail11w.axis.com
+Received: from se-mail11w.axis.com (10.20.40.11) by se-mail01w.axis.com
+ (10.20.40.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.61; Thu, 26 Mar
+ 2026 10:59:21 +0100
+Received: from se-intmail02x.se.axis.com (10.4.0.28) by se-mail11w.axis.com
  (10.20.40.11) with Microsoft SMTP Server id 15.2.1748.39 via Frontend
  Transport; Thu, 26 Mar 2026 10:59:21 +0100
 Received: from pc56869-2347.se.axis.com (pc56869-2347.se.axis.com [10.94.2.37])
-	by se-intmail01x.se.axis.com (Postfix) with ESMTP id 8236D480E;
+	by se-intmail02x.se.axis.com (Postfix) with ESMTP id 8DE6E2CB2;
 	Thu, 26 Mar 2026 10:59:21 +0100 (CET)
 Received: by pc56869-2347.se.axis.com (Postfix, from userid 18630)
-	id 8CF7D602BC93; Thu, 26 Mar 2026 10:59:21 +0100 (CET)
+	id 8A36B602F25C; Thu, 26 Mar 2026 10:59:21 +0100 (CET)
 From: Jonathan Rissanen <jonathan.rissanen@axis.com>
-Date: Thu, 26 Mar 2026 10:59:09 +0100
-Subject: [PATCH v2 2/2] Bluetooth: hci_h4: Fix race during initialization
+Subject: [PATCH v2 0/2] Bluetooth: fix race during h4 bluetooth
+ initialization
+Date: Thu, 26 Mar 2026 10:59:07 +0100
+Message-ID: <20260326-hci-init-fix-v2-0-a974211d0224@axis.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -74,9 +79,10 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20260326-hci-init-fix-v2-2-a974211d0224@axis.com>
-References: <20260326-hci-init-fix-v2-0-a974211d0224@axis.com>
-In-Reply-To: <20260326-hci-init-fix-v2-0-a974211d0224@axis.com>
+X-B4-Tracking: v=1; b=H4sIAGsDxWkC/1XMQQ7CIBCF4as0s3bMDK1oXXkP0wUilVlIDTSkp
+ uHuYuPG5f+S962QXBSX4NysEF2WJFOooXYNWG/Cw6Hca4MipamlFr0VlCAzjrJgrw9HVidDTB3
+ Uyyu6Om/cdajtJc1TfG965u/6gxT9Q5mR0XGvyXR8M6O6mEXS3k5PGEopH2kI+emnAAAA
+X-Change-ID: 20260303-hci-init-fix-9657128a0104
 To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
 	<luiz.dentz@gmail.com>
 CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
@@ -84,76 +90,62 @@ CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 X-Mailer: b4 0.14.3
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU6PEPF0000952A:EE_|GVXPR02MB11602:EE_
-X-MS-Office365-Filtering-Correlation-Id: 06ade78f-6efe-48ab-3ab2-08de8b1e5ae1
+X-MS-TrafficTypeDiagnostic: DU6PEPF0000952A:EE_|AS8PR02MB8615:EE_
+X-MS-Office365-Filtering-Correlation-Id: b1ecbb20-e2f1-4f41-bc87-08de8b1e5b66
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700016|56012099003|22082099003|18002099003;
+	BCL:0;ARA:13230040|82310400026|376014|36860700016|1800799024|18002099003|56012099003|13003099007;
 X-Microsoft-Antispam-Message-Info:
-	aZffABHRAqtJAbV/y6IZ6/VGAYOgt+YwTR919uuNXyztsWQJ+ttoJHA4sUEbpGdX4feb6srADGIxWmbbNS0nn42hv83WaKVz529LlMLzr35Bp3KWKgWxxAePs/STCt1UnZDNrkSp+i4glCW6XiJFe5OwWS5+1Ep6M5LcVx+gLPcR/pTmClY4xkSudEmGxi7SkXRJh+hmfbNnUfTFnNlKFt6n4LuaRUnHBHO6mTZEiyQ74GqEruqiSr60BrTQ5Fzi59YNgHHdlcnaAs2Rqg7yJyCUmBVJskvmGYrCKC2IA+2W9ayAuww+3E/utDYzd3nFJg5F4HYRc+kHuBNUinhrxpxZ7/eWYy3IA8PxPlJ4iAByCbcAQDLG6Ysn0Y2iJvn6c7t2XKEOg0t/tQVb8R0F58CAZ5nbtvUfAmEVn8xkPVG66Ca9CrH03kySB4ImkGjubOyLCd7YwbU1gmkC3gNJwN/KjCoVckbPsHwQY7QLF4nQ+hGakdrwmKdePRawG4boakgVNZjQLiITDJtebA7Ccw/A/BftOBGNODyuY51ThCt2bHGFxhZJR0oRufqCNMmWasuc6biJsdNPEgNt0GrlDAeCB+Jzyb9UWWW/GuNWTz35nJvmYUxHPAxHdYZ4mXsORkXFYDnJVlDuvW/WtErIuFpz+ioeWL95/Iho6BQmCR3rqY78SnermML4FY6fq3bGfABk5svNpUV2VieQHrgnRPoRK9t4hmnEpoONOCjx53O1n2z0HtTcf+WneAvYAATTm11T0nlqEacnTEOvrC6S1w==
+	hCafs4WmQN8zW5q7gfBiM1KUpO6R/+OZ8+qXJ0Ud9kKotIp6ke0INzfPu8SORA35jcBp/Ubu1+LgaMWNFADHtfK/XgcnZONcpL6cFI/i+Jq67gejE14m6/rL6sPVgI1JabID8M6eF2SHLloKcPh+F3JH8rniTezPNAGfpWU6e8wEr2QN/oc0EMRQN4YBREzjaNtEL7QV03vWlyziQO5EIM0pnLn+8HPXPgE1nz62PtC52ID0YA4nYtDW8gJOEHz1OVjdLjH4e8N3oJtmub31tWTndmAxh1wVM6kbVLPlfJoS9qcNw19MfVo/XPQWMo+t9WduQPlrK5iJc7ovJir2CKd1HrtPn9tuNVSmTN0kp/sNBrGaqtbnNCnISmRGcvW1TqtJxIcjkRDtlmn7Q1cH/TjfhmtvRSXaAlA33iRKx+B9ZD/23LvQgMRgcPxyY6hLb16tD16WlWiZV++mS9CO0yhsUL1DiHS2ve1rEo7J1AwDv33/9vJ54D/X6EjONCtUmL7JEkBX27j7a7FwnfjWnSgGNnRJljsm+699IiLqU7pbVRDoZrDKEm8/Ps/FWFrOie/o/TSSHLiIHUYjIvl6SeHiLGiGF9xF+WDG56V4i3h3xzjjRuOWlgu9kGx1yFLUOUivqNOnUyNLGK2Ilz/pE7CkFTQohqL/i3sEvDiLXK1cJefGZSMFBGtl3DjfwEjj6LcYMJS7moKo2W4PusvbVZbTLA/o5/KAX06IZC5mpGQfN7MRnc93uTMHZKQzC2iHIRwlUj0aNhEP4lfaB70bfA==
 X-Forefront-Antispam-Report:
-	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700016)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700016)(1800799024)(18002099003)(56012099003)(13003099007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	Rt3rT9+Hb8xZT0g20TEvemHm140yGJZ/OFY1raZhj1PUJuETZOTwrUtD3Lj0fAFS75KptkCebHjynBVLjidFgnFe9W8B3s4eUH5Re5qu2xPi/6BhGcAlO9lqcGWAJTciuMzYA/0raEvVLy1VJFu6ELxRTidAAQPvR1Yg3SdavLMzR5wCjKEYSeTd/yus2Fuo3gOs54PzekQpjFHG8pELWoxbVX26LpUuXk044P8Mj9Ou1ftztCEANnFl48efNB50h616Hq9wnjLp4uCcc4f3mNHYLgdXW2XFewnqLeNiu9Ju8+2k/btDmpyg0G3wnBcymw5UBagfxJYYkBTlWVbS3TkLJglWTB3xM5CRuzlAqji0uBszGAAbt8B66qV/A2VwyvNjkAPlFxXqlnMf+iYDmxcMo/wWKn5y0fPZR6yVMV7YWsyBtRI1jED3j26ubMlV
+	TbUt4TfMbNDZ2+dIs5oga1nPx5cUMY0TznzXDvpWtYUVO/LvryQSF+5hOCMYhJ0kX+MHaVwEjRfzUgIYdYGQa+y9aLvN/gPsOtF1ilMCg1HNaunuvj93k9wtcDnmZ/R7VBR5ylrqyd54SmxLCRnfu1ZemmLtmQtSWifw6qThgLERJ90Unmytzh6KNBh2II+DO6Igd6zefmNIoxw4ETTwhyUaPjC5oeM4yH9e+FLEst0ItKP1d3MoDCct05W8jxdKRnGTV85uhl3XKy3NhfgvPxvdDAX4dk60LPfYpa5qk5HCNeTgnY0yXif/dRDzDRIajJ4iq0gzBC3m1nmVS4jRW1bhxDa5EfNNnPULugNoE/z/qL/uqzYKlG2venxgdgiIBMhOfExjBmAcaNd80ni0I7URFYJtItFpWv1/S5QjC/NQE70wz4qnPqPr2z1Qd/Jn
 X-OriginatorOrg: axis.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2026 09:59:22.2679
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2026 09:59:23.1426
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 06ade78f-6efe-48ab-3ab2-08de8b1e5ae1
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1ecbb20-e2f1-4f41-bc87-08de8b1e5b66
 X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	DU6PEPF0000952A.eurprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR02MB11602
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR02MB8615
 
-Commit 5df5dafc171b ("Bluetooth: hci_uart: Fix another race during
-initialization") fixed a race for hci commands sent during initialization.
-However, there is still a race that happens if an hci event from one of
-these commands is received before HCI_UART_REGISTERED has been set at
-the end of hci_uart_register_dev(). The event will be ignored which
-causes the command to fail with a timeout in the log:
+Hi,
 
-"Bluetooth: hci0: command 0x1003 tx timeout"
+This series fixes a race condition that causes hci events to sometimes
+be ignored during h4 initialization.
 
-This is because the hci event receive path (hci_uart_tty_receive ->
-h4_recv) requires HCI_UART_REGISTERED to be set in h4_recv(), while the
-hci command transmit path (hci_uart_send_frame -> h4_enqueue) only
-requires HCI_UART_PROTO_INIT to be set in hci_uart_send_frame().
+The first patch clears the HCI_UART_PROTO_INIT bit if device
+registration fails. This is needed to prevent the second patch from
+introducing a possible null pointer dereference.
 
-The check for HCI_UART_REGISTERED was originally added in commit
-c2578202919a ("Bluetooth: Fix H4 crash from incoming UART packets")
-to fix a crash caused by hu->hdev being null dereferenced. That can no
-longer happen: once HCI_UART_PROTO_INIT is set in hci_uart_register_dev()
-all pointers (hu, hu->priv and hu->hdev) are valid, and
-hci_uart_tty_receive() already calls h4_recv() on HCI_UART_PROTO_INIT
-or HCI_UART_PROTO_READY.
-
-Remove the check for HCI_UART_REGISTERED in h4_recv() to fix the race
-condition.
+The second patch contains the fix for the race condition.
 
 Signed-off-by: Jonathan Rissanen <jonathan.rissanen@axis.com>
 ---
- drivers/bluetooth/hci_h4.c | 3 ---
- 1 file changed, 3 deletions(-)
+Changes in v2:
+- Added a patch before the fix that prevents possible null pointer dereference
+  from being introduced.
+- Link to v1: https://lore.kernel.org/r/20260320-hci-init-fix-v1-1-e1960a41baf2@axis.com
 
-diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
-index ec017df8572c..1e9e2cad9ddf 100644
---- a/drivers/bluetooth/hci_h4.c
-+++ b/drivers/bluetooth/hci_h4.c
-@@ -109,9 +109,6 @@ static int h4_recv(struct hci_uart *hu, const void *data, int count)
- {
- 	struct h4_struct *h4 = hu->priv;
- 
--	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
--		return -EUNATCH;
--
- 	h4->rx_skb = h4_recv_buf(hu, h4->rx_skb, data, count,
- 				 h4_recv_pkts, ARRAY_SIZE(h4_recv_pkts));
- 	if (IS_ERR(h4->rx_skb)) {
+---
+Jonathan Rissanen (2):
+      Bluetooth: hci_ldisc: Clear HCI_UART_PROTO_INIT on error
+      Bluetooth: hci_h4: Fix race during initialization
 
+ drivers/bluetooth/hci_h4.c    | 3 ---
+ drivers/bluetooth/hci_ldisc.c | 3 +++
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+---
+base-commit: 05f7e89ab9731565d8a62e3b5d1ec206485eeb0b
+change-id: 20260303-hci-init-fix-9657128a0104
+
+Best regards,
 -- 
-2.39.5
+Jonathan Rissanen <jonathan.rissanen@axis.com>
 
