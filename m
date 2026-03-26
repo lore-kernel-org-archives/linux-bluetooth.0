@@ -1,124 +1,182 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B04F374E62
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2026 08:54:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69478386C3D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2026 09:01:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774515287; cv=none; b=ApqxP8TF6vdN0pN45+YMjGuXbJTF0MoNXyOtJD0YQ7R1alGvyH5sZy5AEJduxVyP3Ee8yFaeDuocc06CscK81hwn9jti93se+HetUoKsauxBPEeoIq9wDMAKBGBYlbypB49T2UYlmxIu6L2BPOG+wrUofsJulJk/PfZLANIg5z0=
+	t=1774515712; cv=none; b=mqaOQ6UZ6dKrT/iguaggVq6czQCxO24l/198gzAdcrnaZ2S40bCYGK6iFpuAOrF4pcIHLjTJumm/dnWjZXljl0krBk0+J+RIWpeRFf5nmUjozOKaEgkWK05KHdHKq0inQNbz0x8KHBa2BOqOIPNnY1atzx/xENieXjjaLpyprjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774515287; c=relaxed/simple;
-	bh=pVOvWW6/8RbPMOuNt3in1cuWQXC6AAst+EwzEiwLSEg=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KfCQoXS68Jb87C/NWKAhi/SoEJ0qxDXp8jZUBYt4Kee1IqP0tbJvRzgfTyJuxgOglfihAfZgE18V+IpqHgxQqc4Ebzisoei1uVvSKTnR5eDcqVFgHBv4XfdOLY7YSKQ1zymLs4CqHSoabXy4smN6LDDIoOgGOOpRJVNtNDIfy5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YagK5OW/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774515712; c=relaxed/simple;
+	bh=8BV78OzUJnjd8dgqkKXNuE5mAG2V/G6kGOC05Qcr1Lc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jqsoFiTCyBF0ZfBfDOsHB4W4SPn7OKPP5UI5mliVYqKdp1MhWWGHNN3qREWj/ep1+uWd6wDusvPWqBSEiM5ddgYLDZQvg7gNa5Zi15S95pivF+zDS/F8F97XOJIUS63X5lRddFPepVX3OgoTGHC/V53MAehdzdi0wg8IL4FDwec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=erTIgXXz; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=D55W2imv; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YagK5OW/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06D89C2BCFA
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2026 08:54:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774515287;
-	bh=pVOvWW6/8RbPMOuNt3in1cuWQXC6AAst+EwzEiwLSEg=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
-	b=YagK5OW/gMZ3YzCSyab/3HWPBs0Ini4PAPkopXeyQ6SM5R3LEUSxFGSUktMajiVqy
-	 KqJY++sfDH8Ih/RVLcVSy7OGEa+sQjgjwbr8vDLKTASbXu4hxdX17K4oMxqGm68HwJ
-	 wl/sBYugxwWjcgtfyABw66CY9Khm/SovttreMTNMHQK24dF2FeaSRZ6vAQuuC+3I91
-	 XMOJYcOovODpqO4lnd1Ld++hzTYLOl0q0z7K86YUJLD1U1MeOiTlvlgpjX9TX2yiX9
-	 tzJ5FHU6B4kwzyZ+5vS3KT7H2e0DV5AWcS4IMWwk3ve30ZlOKGSToBD8ZzcbSKs7dU
-	 BGlbQ6ZeqCNIg==
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-59e4989dacdso912991e87.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2026 01:54:46 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVDTg5e+BXf6vGrVlVaWb6ZEe3aqUs+blZvG18x4LJB7G9JIebTUppg5suGqMSA3UMwT2/T3DWaGKFzOlGrnAA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx18MM5AxElelK0RPPVYM8NuEMSnj4ybPO9xsu5efLH/XlVbrFD
-	ZjDPY20parhdMZ7SNvVIPIT6RXu7EpsVnriORnXcEE/RV4zKMWie3I980AJanxa0s8upeYvBrla
-	xyDI6Hkrv7XTclomX7ZK4XN/Ezpcd7C0qHQ58MZcewg==
-X-Received: by 2002:ac2:46f4:0:b0:5a2:a024:e6c2 with SMTP id
- 2adb3069b0e04-5a2a024e734mr805672e87.44.1774515285384; Thu, 26 Mar 2026
- 01:54:45 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 26 Mar 2026 01:54:44 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 26 Mar 2026 01:54:44 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260326-pci-m2-e-v7-0-43324a7866e6@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="erTIgXXz";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="D55W2imv"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62Q7cqOS2887637
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2026 09:01:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	JVD833rXl679fejlc5rkodKNHNn4ydrIaFRAgsku4LM=; b=erTIgXXzaly5BC9y
+	iUvSXFvd0hEhB1bD66c2CJbhVqLfIku9bGEzTdlpAWhuSkGSP7Bb7fdVK63c4/XC
+	j3HGu3XZVdUATcIwh8rAdBn3yfc4VRS//mjUoEF7X2g71yoz4dCqkScXID/aE/8v
+	P21na+psMCvAC/V85KS3ROjfPNz9n2jh09SOcm4ajvPJ7eCIBLCo5oFst/uecmsD
+	0CGA0uRMPb7Pwkj91Eyfl+JCCqLX3+VAs3LyPynvRFfPxW+F/Fe7eUCGnlN8hPjV
+	6rNHNH5I4xl8+mr+uqy8oMp+82RoHKs0sLoZl431ka2Zht897JNGk54+RTgr5cmn
+	SwLlDg==
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com [209.85.219.72])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4d50kg89bc-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2026 09:01:50 +0000 (GMT)
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-89a01982dc5so3008156d6.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2026 02:01:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1774515709; x=1775120509; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JVD833rXl679fejlc5rkodKNHNn4ydrIaFRAgsku4LM=;
+        b=D55W2imvO98ItVNdPPH91QCHhxRkuzqhU2QPsF0YTDaKRZAy3Q/6E5MRRkTSvD0+vZ
+         pVViOyVl9T6YxJSCqxBYjha/enU8fA5e8Mhwwpn+qvBLlvRM41I1H/A0ph4nOmLJgVcl
+         BiCg4tq6RkLjRf64mA+i1OGpqtQx3UfrcbkxZE21lPhYT1BruDwBE7svRT+lSXKgoUgm
+         UBCYjHaxpugzeUwrNCL0reKr+iGG7CdrXs3jg1XjJkjw9mrWlV30jJ8vpDB+QBw2EwUV
+         5El2Le/sYySXDgrm74RpWoX25BZV7UEDD1GaGw7L+JWmnLLkBmuTkxTgUIk2opJTSCAa
+         I7Mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774515709; x=1775120509;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JVD833rXl679fejlc5rkodKNHNn4ydrIaFRAgsku4LM=;
+        b=D9OKtvwsBX5TGp0XJDzEuTuCs8kTkgfodNUtMYpDxLLaoaRP2JvxUz3NK29HsnaY61
+         jp//FICnoFElOSW0dm7I4r9UfRXhX1+Xq02ut0QSteLxBiax3kYpXkyo2yhUqgmTslYM
+         hazzCgbaTFyUa3cpkrPmUy4clXZmg3iiT/st8NhRPANWLeNSYmCwYpRyL97fZTpiMbyu
+         1gMdLLvMkvbsDVKHjSYCBQYvqeyR8oxK8JlADNPpGftMv34kjIK3lwdhly5NXXs4Tuk1
+         bakCP9NxyNLHY42LCm47k0DAX9im5qOcSZup6XRsPHylnU1NUWvjtOwQZxRL8lCNOWBR
+         q0dA==
+X-Forwarded-Encrypted: i=1; AJvYcCXgTvb37MQk5fCPF6JAxcNW6EClbsCPsEX+rrPdWD3kAYQJ0R0U66T2PcgWWvP3365t1iIMWgMt4fUuHPXH09s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAG6nyPgR0g5YcimhmZVpTsIxFXQ1KXtmSQn5OAuifqI9dngRA
+	obfXEiuyGWQzLdV3VF6DcDuVNayCNpSImQGR2j/YeZrCX/w/bHPQrTypVQOiUW0sA1uX+uGOfQA
+	XLcLtG8CeAj+l+6XxC7sH+HSvauKkMrRpK/zzJ6pfr9xGSSwi+oM0ReEBXFNOlEa/WyVrwxw=
+X-Gm-Gg: ATEYQzwuyuXUDLoAnzLgZS/FBKOert9udebdo8MJGlxa/39sW50KiDcGGi8Kt3hFDOc
+	RaPfxnS1ie+90zCWInUabfQJoZ6/vF3R1i7rw/BLuy+dzrcU1EIrk8eQO+26vWh5md20Qx4n4VL
+	SSA7xw71pegDms/uK7AbVmGqM9K13ZyS8OYL6fRmIf1ZC63ZY6VpWV2A5UDFbDtZqg2XfZBZJj7
+	DqJvJHpfFSB5HwYKsHlFAdOMyWDZod0Pb5Uo93/N0jyRd1YyioY6CUzbGCnBtjVARkp8TiwbZA/
+	46UtpSgNgFaTCJUSKD9qrNpBpecogbQ37aVhU4+47+oQ+KDeUxplkAt8hjLxbX9DOvzanBlShXy
+	/0BNFVRmS+GGhKROIZhmXf7/NOmbvnQlN48GAr8MwLQoOPeXiQW+EFCHlyw0lOsjtN3eHtiunBN
+	HA1NU=
+X-Received: by 2002:a05:6214:c67:b0:89a:6263:feae with SMTP id 6a1803df08f44-89cc496bdd8mr71021116d6.2.1774515709537;
+        Thu, 26 Mar 2026 02:01:49 -0700 (PDT)
+X-Received: by 2002:a05:6214:c67:b0:89a:6263:feae with SMTP id 6a1803df08f44-89cc496bdd8mr71020086d6.2.1774515708327;
+        Thu, 26 Mar 2026 02:01:48 -0700 (PDT)
+Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9b203ef95csm87469966b.52.2026.03.26.02.01.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Mar 2026 02:01:47 -0700 (PDT)
+Message-ID: <b43c3e0e-33e1-4ddd-8415-2c11f6ecf9c0@oss.qualcomm.com>
+Date: Thu, 26 Mar 2026 10:01:43 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260326-pci-m2-e-v7-0-43324a7866e6@oss.qualcomm.com>
-Date: Thu, 26 Mar 2026 01:54:44 -0700
-X-Gmail-Original-Message-ID: <CAMRc=MeFPpO77ew4pbPjqo0E3fjos_B=t1AgooB7xrF5CWPeJA@mail.gmail.com>
-X-Gm-Features: AQROBzCb320XuFwbgeojakGVPIHtnFnx1cQ_VrqUrXaxSXRJoOgSnNC2mrU3j3w
-Message-ID: <CAMRc=MeFPpO77ew4pbPjqo0E3fjos_B=t1AgooB7xrF5CWPeJA@mail.gmail.com>
-Subject: Re: [PATCH v7 0/8] Add support for handling PCIe M.2 Key E connectors
- in devicetree
-To: manivannan.sadhasivam@oss.qualcomm.com
-Cc: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>, 
-	linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
-	linux-pci@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-pm@vger.kernel.org, Stephan Gerhold <stephan.gerhold@linaro.org>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, linux-acpi@vger.kernel.org, 
-	Hans de Goede <johannes.goede@oss.qualcomm.com>, 
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Hans de Goede <hansg@kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 7/8] arm64: dts: qcom: sdm845-db845c: describe WiFi/BT
+ properly
+To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+        David Heidelberg <david@ixit.cz>
+Cc: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+        linux-arm-msm@vger.kernel.org, Liam Girdwood <lgirdwood@gmail.com>,
+        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Rob Herring
+ <robh@kernel.org>, linux-bluetooth@vger.kernel.org,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Matthias Kaehlcke <mka@chromium.org>, linux-wireless@vger.kernel.org,
+        Jeff Johnson <jjohnson@kernel.org>, ath10k@lists.infradead.org,
+        linux-pm@vger.kernel.org, Bartosz Golaszewski <brgl@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Mark Brown <broonie@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>,
+        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Manivannan Sadhasivam <mani@kernel.org>
+References: <20260119-wcn3990-pwrctl-v3-0-948df19f5ec2@oss.qualcomm.com>
+ <20260119-wcn3990-pwrctl-v3-7-948df19f5ec2@oss.qualcomm.com>
+ <a75f80bc-d2fa-41f6-91aa-8252fbb415e6@ixit.cz>
+ <CAO9ioeVLy_Uzn7L9MyET5wg8CMR132+Dda5JzjdAB=6vz2NEMg@mail.gmail.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <CAO9ioeVLy_Uzn7L9MyET5wg8CMR132+Dda5JzjdAB=6vz2NEMg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Authority-Analysis: v=2.4 cv=SMZPlevH c=1 sm=1 tr=0 ts=69c4f5fe cx=c_pps
+ a=7E5Bxpl4vBhpaufnMqZlrw==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22
+ a=Mao_WS8moKRl95PynMsA:9 a=QEXdDO2ut3YA:10 a=pJ04lnu7RYOZP9TFuWaZ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzI2MDA2NSBTYWx0ZWRfXxuNuV8znrnjR
+ pARw83xMwGT7+Gh0pjnmYXPmxbxn0XLQxM1iBuoBQdCRd+wr+jYMbyapwdLfvk8/oZOHeW587vd
+ gcn2vgQDowCaAwd0UMBaI3/fy56JoWX8JgxJpVJHSr35KiApue7b05AtCMT/1pRghDN8/On+quD
+ VgQN279QreUxY/VuA33ZQ4SbAV42yisEspn1Or0j2Hwg1vEq9C/Fsm9H7qqbrWYQIvmi23M827K
+ 9ebwovHVlnsUjQEPGnUOgTOI56N5uO9xMzSXCxtMptWMtQOW5bF1A6XSLkRI+DvLvFQxCxH/t7l
+ nZ3w+rIGO1g5ho5ZV4H6SeDsUhJqR4PplAMLoSFP78TLsvxEb1Y/oHBM47wD142DKYf6TdZGqY4
+ tDD1n1SFxnL/156tPlEM61GTcwqrPMn4kF5mNbERANSC5xbzAgUdRKYro3CgI+zUiJY4SoHfpBj
+ uss7j/23GIwTJqoGzOQ==
+X-Proofpoint-GUID: owmhs9B5gXCVGb7Coc_4mPpTJGpgERYO
+X-Proofpoint-ORIG-GUID: owmhs9B5gXCVGb7Coc_4mPpTJGpgERYO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-26_02,2026-03-24_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 lowpriorityscore=0 suspectscore=0 bulkscore=0
+ impostorscore=0 spamscore=0 clxscore=1015 adultscore=0 phishscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2603050001
+ definitions=main-2603260065
 
-On Thu, 26 Mar 2026 09:06:28 +0100, Manivannan Sadhasivam via B4 Relay
-<devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> said:
-> Hi,
->
-> This series is the continuation of the series [1] that added the initial support
-> for the PCIe M.2 connectors. This series extends it by adding support for Key E
-> connectors. These connectors are used to connect the Wireless Connectivity
-> devices such as WiFi, BT, NFC and GNSS devices to the host machine over
-> interfaces such as PCIe/SDIO, USB/UART and NFC. This series adds support for
-> connectors that expose PCIe interface for WiFi and UART interface for BT. Other
-> interfaces are left for future improvements.
->
-> Serdev device support for BT
-> ============================
->
-> Adding support for the PCIe interface was mostly straightforward and a lot
-> similar to the previous Key M connector. But adding UART interface has proved to
-> be tricky. This is mostly because of the fact UART is a non-discoverable bus,
-> unlike PCIe which is discoverable. So this series relied on the PCI notifier to
-> create the serdev device for UART/BT. This means the PCIe interface will be
-> brought up first and after the PCIe device enumeration, the serdev device will
-> be created by the pwrseq driver. This logic is necessary since the connector
-> driver and DT node don't describe the device, but just the connector. So to make
-> the connector interface Plug and Play, the connector driver uses the PCIe device
-> ID to identify the card and creates the serdev device. This logic could be
-> extended in the future to support more M.2 cards. Even if the M.2 card uses SDIO
-> interface for connecting WLAN, a SDIO notifier could be added to create the
-> serdev device.
->
-> Testing
-> =======
->
-> This series, together with the devicetree changes [2] was tested on the
-> Qualcomm X1e based Lenovo Thinkpad T14s Laptop which has the WCN7850 WLAN/BT
-> 1620 LGA card connected over PCIe and UART.
->
-> Merge Strategy
-> ==============
->
-> Due to the API dependency, both the serdev and pwrseq patches need to go through
-> a single tree, maybe through pwrseq tree. So the serdev patches need Ack from
-> Greg. But Bluetooth patch can be merged separately.
+On 3/26/26 2:59 AM, Dmitry Baryshkov wrote:
+> On Thu, 26 Mar 2026 at 02:02, David Heidelberg <david@ixit.cz> wrote:
+>>
+>> On 19/01/2026 18:08, Dmitry Baryshkov wrote:
+>>
+>> [...]
+>>
+>>> +     wcn3990-pmu {
+>>> +             compatible = "qcom,wcn3990-pmu";
+>>> +
+>>> +             pinctrl-0 = <&sw_ctrl_default>;
+>>> +             pinctrl-names = "default";
+>>> +
+>>> +             vddio-supply = <&vreg_s4a_1p8>;
+>>> +             vddxo-supply = <&vreg_l7a_1p8>;
+>>> +             vddrf-supply = <&vreg_l17a_1p3>;
+>>> +             vddch0-supply = <&vreg_l25a_3p3>;
+>>> +             vddch1-supply = <&vreg_l23a_3p3>;
+>>> +
+>>> +             swctrl-gpios = <&pm8998_gpios 3 GPIO_ACTIVE_HIGH>;
+>>
+>> Do you know if the GPIO is common for whole sdm845, or it's only recommended as
+>> reference design, or nothing?
+>>
+>> I did test defaulting to GPIO 3 on Pixel 3 and WiFi works as before, but since
+>> previous downstream kernel didn't touched GPIO 3 at all, I'm worried about
+>> toggling unrelated GPIO.
+> 
+> It is an input-only GPIO, but nevertheless, if you are not sure, just skip it.
 
-I think Rob Herring is the man in charge here. The power sequencing parts look
-good to me now so with an Ack on the serdev changes I can queue them for v7.1.
-I can also put it on an immutable branch if needed.
+I think you should be able to observe its state and deduce based on that
 
-Bart
+On a sidenote, 99.5% of reference design choices seem to hold true on at
+least 90% of devices
+
+Konrad
