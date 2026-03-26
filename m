@@ -1,151 +1,221 @@
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713A5175A80
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2026 22:06:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179D013D51E;
+	Thu, 26 Mar 2026 22:13:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774562805; cv=none; b=XbjdJXLCDnFdhMxSlGwFmZoGOuC6+pbMbW2uqFy2s6Tarx0TE24Vu/MMmFRyqmJdZ8Uvpzrg/hsEjcOphofkAokPgv7TPOmYg4AQLkLo4vE0DE+LIYkYbTCCR7rg4zwJNaaXroHRZORlUANx92lQAbzmISekgQaWHhhRsD79Scs=
+	t=1774563189; cv=none; b=i/wVIgLSRgl5utkWXhK7n8JkEHCl2K0Dw2RlVFGOJoO2ZgriRU6vki7VuDVd82tk1XG/YYVwKkAWgqPXzU3OR9vEYisbgRcY0p/76srrJXLUZbO3Gij61z2s0+Fc9PHXeKcNe+dRwqMv9V05hv8niFGK6xURyKO7CV7BpQ+c2oY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774562805; c=relaxed/simple;
-	bh=++USdPL+pKrL/uXpRvVE6kdH8DsXg0VWGKl/Ymz5xcc=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rr3m6Siby+eq2WvqljWXI7nqRVyWg+upoBwIflBamKJN4bh7CIbE1xmhunf9kN1ggf/ftGSQYgT+fWPqOBZ/gd9awc32EoSIhUiIxWUAFVDsia/E2DI88Tg9jVAeEqWix8tQAE77Q7beyHyl53KAZEMbaA6zZRGKeeSESLUKdVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SmOMoTVS; arc=none smtp.client-ip=209.85.221.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1774563189; c=relaxed/simple;
+	bh=OpgBAjKnDiir2AF1xHFd8B3qoKOvAbft3PxkCn8MgxY=;
+	h=From:Subject:Date:In-Reply-To:References:Message-Id:MIME-Version:
+	 Content-Type:To:Cc; b=n0CCXyDdmPaz9IP+7kODSvOwzjXEJUGBRK5eKODr/kPFyNcF3yKpMMM2Spwi4wgoIiF8NiBZhVatuGlDYfyIju5l9NzuN4cIFKz5C4/VavWJdcdkgZF53gtDWnXb7pv1Y3uA/23vl0tiNbagDTSc9QjTxEdkVWgB3m/jcSyo1OE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jetm.me; spf=pass smtp.mailfrom=jetm.me; dkim=pass (2048-bit key) header.d=jetm.me header.i=@jetm.me header.b=pGhSj7oY; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=vRv5M+/1; arc=none smtp.client-ip=103.168.172.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jetm.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jetm.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SmOMoTVS"
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-56a9a7e762bso1577016e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2026 15:06:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774562803; x=1775167603; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=eDtitMS5FS4rBSSfPBCX9ivE7V7wG9L9M2z4VxSF26c=;
-        b=SmOMoTVS/ec08PtHsYjEfRTNFpANKaxtCNO0MaPwlCZouIZwP6rtrLI78JVojgyAsG
-         GzQdRgV+6ivUmovnw5KPIib3hdQBQVVnQRterPyaEXuAEYKkqOV6cVJXws4aAziMpG+K
-         7MC2BwnjmAsV1uJVey2O6IA/+MYaJ+gTQpDbWL+NZKwmao2bF91ME26rIKIGOj4R6gGA
-         6krU74bSfQHy2kp1Q9phSFbynmGRZcnOXy8yVzfZj7E/W7yTOKiGO7reoZvVSsz29iK6
-         ud9B9l2+/WVw7RAUviO3rairC0+Vap+HwmSPnFm6PjASL3BnofqmDfNmautbR+h1gauE
-         gM6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774562803; x=1775167603;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eDtitMS5FS4rBSSfPBCX9ivE7V7wG9L9M2z4VxSF26c=;
-        b=UIWsD3rlrhumJh6EW8GxCTz4bbV1/0vWO3hamw/WoQTPCYDuqCal3agTBP/iTp6Ooz
-         1E8lqJPt1AR3tLyfVvPy8Z5955LJuMx8kRpZgsxms0Uem3uoLYekSw6fQucdqH5Y+y7t
-         O3sEfzMGTydtoVpwbNog6uBlavaNh3bmhHt6Wb5xPfw8YjC2RQWProJk963f3Aeu1HtZ
-         cA2S/X5rWTs+ijdKQU2eipG2C6vR+yag4htDv7K/wxAGPPOmZhDSQqMknprBQoyxxRAT
-         W5O0GjzXLS/4gPYpCJqXY94axBgKrmXA6c6P8tO/tVXdu03lWRkXKKlbuGedvP9AUwOV
-         xRJg==
-X-Gm-Message-State: AOJu0YwLZ0rEx/V9N6bncQtQTOtphduwcaygn7TUYvRKAi1dl2b1R3Qo
-	rv4INEdX21FtBqOr3gbs01/YDEVmUpNi0+l7BRoi59kfY38ACWJySQledRgRN6rO
-X-Gm-Gg: ATEYQzyiPnnL4QlvFVa9n/lnWKQOAX33aPyc/DvA8frnmEitOZGc/gjGHGn2s7aVXsm
-	Xu/wAo9DG/X4ezmBfQqiYTqe/RbnP5T+bvll66WJB/U3oreCaI8TYIc+bexVx57XAkjzK5T2A3d
-	r7tNVXiH0HWLk75Mcuq0V0iajUspPgAMOSe4mJZJXbNz6kTlChn81m5XwoGaUXqRel9Teb10gZK
-	FpS5p7nnkQwu1QQrnJSB1IkzG4TQfrIp/+Gmq3AxIzpKu07V8hosrluLU+FNBGfjCJbM6pE/itA
-	s6w9lHAEJ64lnCgdh55XRG9LgeQM19oAYEtVMuumYviuCDrnNakUjl1bv4uSjc+Aiblzh2t/03W
-	0HIaFejHRT2f9sJRue8WCn6TFqb9gnvD052SconmjUkuT5sAUUf5xatzCZ02Eg+7t1sdA70Kjrm
-	TF2xCRqYXcyrOmyf4F08RlHuxpR7HPNQwd9hOSh5iMeRpgO8qAPUfz9Th1VSQPcFsnnUHwEKKsN
-	uCAYVhwAwvwUIJJkLGUpFM6N30Y
-X-Received: by 2002:a05:6122:4201:b0:56a:fc35:966b with SMTP id 71dfb90a1353d-56d4a4cb511mr72459e0c.2.1774562803162;
-        Thu, 26 Mar 2026 15:06:43 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56d31c3097fsm6356071e0c.7.2026.03.26.15.06.42
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2026 15:06:42 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] doc: Document bidirectional (Source+Sink) ASE flow in LE Audio
-Date: Thu, 26 Mar 2026 18:06:32 -0400
-Message-ID: <20260326220634.923877-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=jetm.me header.i=@jetm.me header.b="pGhSj7oY";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="vRv5M+/1"
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.phl.internal (Postfix) with ESMTP id 414AFEC021A;
+	Thu, 26 Mar 2026 18:13:07 -0400 (EDT)
+Received: from phl-imap-07 ([10.202.2.97])
+  by phl-compute-02.internal (MEProxy); Thu, 26 Mar 2026 18:13:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jetm.me; h=cc:cc
+	:content-transfer-encoding:content-type:content-type:date:date
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1774563187;
+	 x=1774649587; bh=qX+reOEVuZDx8UfWmUlNl/QyI4m0a7yMtNo+lm1iM6U=; b=
+	pGhSj7oYfDFtC4yTawBr4o9yATU1gmVXGZDEoex2dGMae3zk8OTK7Pg0uuYF7sN8
+	n+smmn4tl4iewvK9BJp+OISMH52Mb6c8hkcmgzexRqsJS1r8ept8LZD8KsK2gLQL
+	CZCudHIFd5D/lfYMWbo3KqZ+AbQ7J346KVBgzB+cYkv0Dhvy2KNtlAwdTAT0yMvu
+	yLsUNdwlpPIj9cbsVgEqngD+HTu0inJbVY6sFNstpwSpdeglQpSCARm9Oocsosqd
+	xUXZsR8wM9hFY4GReGRAMS9tZMiAoQXGcWdr/ozEkKLOMGsmhoeDfzWvfVH1xu3t
+	b91/TJhVTq3BhWqwensVvA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1774563187; x=
+	1774649587; bh=qX+reOEVuZDx8UfWmUlNl/QyI4m0a7yMtNo+lm1iM6U=; b=v
+	Rv5M+/1U59VLnqKLWgzYz7vd+Gnw82id1jVvm4sLkfdlUXtJvc3l8JuAXTDUvNo4
+	L3WceGQenSSYuOQMuy8H0agE2QymM1vpkYnyDgi6BQtA2iW/++ZdBPmrzKzVaBsm
+	yKPKkPNrCJAUqNVtZUQno4+vOeIOCfFtTK41wRJaQB5k9gIckGSRKt2/zU6zTQvD
+	6SkckaKj7kLCpq2+tIvaYaa3GVMpMwWRYa8QISzdwaVr4lo+R49cE2Qh3ALT21eh
+	HwazupJQvY0bMAGhU0Jg9gCkb+KwVNsA2he7DMEWvDHI+7SduAxYSXWfqyOMFetw
+	qc9i11/g07AjwZ8aIpOPQ==
+X-ME-Sender: <xms:ca_FaaHL4KrciFh0Osd_lsHQNU57zijnWZ1D8wkaHWZXYtw4mRcYOw>
+    <xme:ca_FaWItpOo9rW0InPMCUn_1iyrQpMpEnvLeFbIfbXCMdm9WsoABLyy_ZllLE3lYm
+    WbiG63T_fwRgqmX3Ao_rBV-_AksU5jCNmF5IpUJ8Jubvluv3HQ1qtU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefvdekheehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepoffhufffjghfkfggtgfgvfevofesthejredtredtjeenucfhrhhomheplfgrvhhi
+    vghrucfvihgruceofhhlohhsshesjhgvthhmrdhmvgeqnecuggftrfgrthhtvghrnhepud
+    ejheduhfehfeehfeeuueefiefggfdtueduheetveekjefhfeefheejiedtjeevnecuffho
+    mhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpehflhhoshhssehjvghtmhdrmhgvpdhnsggprhgtphhtthho
+    peduiedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnghgvlhhoghhiohgrtg
+    gthhhinhhordguvghlrhgvghhnohestgholhhlrggsohhrrgdrtghomhdprhgtphhtthho
+    peefudelfeeifedusehgmhgrihhlrdgtohhmpdhrtghpthhtoheptghhrghpuhhishgurg
+    hrihhogeesghhmrghilhdrtghomhdprhgtphhtthhopehluhgsnhhinhdrihhvrghnsehg
+    mhgrihhlrdgtohhmpdhrtghpthhtoheplhhuihiirdguvghnthiisehgmhgrihhlrdgtoh
+    hmpdhrtghpthhtohepmhgrthhthhhirghsrdgsghhgsehgmhgrihhlrdgtohhmpdhrtghp
+    thhtohepmhgvlhhinhhkohdvtddtfeesghhmrghilhdrtghomhdprhgtphhtthhopehnih
+    htihhnrdhrvgguugihkeeksehgmhgrihhlrdgtohhmpdhrtghpthhtohepgigvlhhnrghg
+    rgesghhmrghilhdrtghomh
+X-ME-Proxy: <xmx:ca_FaSKgoS2wIHgiy66KlO8z_UHZ2r_g49qltqzHAeba29OTYTPjJw>
+    <xmx:cq_FaTgGbpAWfLANYCWmXmSJVmV_5KvhPpmDhw4Vc2vTR5tppz3InQ>
+    <xmx:cq_FabMzDnSFnc5QuBOouf4sfVmqv7_m4gMUyQvQ7tKqps_URLeF2A>
+    <xmx:cq_FaW5Tu0vCJVtndaA6Xme_78L0iA7GtStfVVI-58SJpUupLHT1rQ>
+    <xmx:c6_FaWouPJDNzLnqZS2OGx9d94liJnOckF1sAb9XNzwji8zA3p6u-Rt6>
+Feedback-ID: i9dde48b3:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id D23A71EA006B; Thu, 26 Mar 2026 18:13:05 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+From: Javier Tia <floss@jetm.me>
+Subject: [PATCH v3 0/8] Bluetooth: Add MediaTek MT7927 (MT6639) support
+Date: Thu, 26 Mar 2026 16:13:03 -0600
+In-Reply-To: <177272816248.352280.12453518046823439297@jetm.me>
+References: <177272816248.352280.12453518046823439297@jetm.me>
+Message-Id: <20260326-mt7927-bt-support-v3-0-fa7ebd424323@jetm.me>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyjHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDYwNT3dwSc0sjc92kEt3i0oKC/KISXTNTC8tEU4NkSzPDNCWgvoKi1LT
+ MCrCZ0bG1tQCSofBsYwAAAA==
+X-Change-ID: 20260305-mt7927-bt-support-6589a50c961f
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+ Ryan Gilbert <xelnaga@gmail.com>, 
+ Jose Tiburcio Ribeiro Netto <jnetto@mineiro.io>, 
+ Llewellyn Curran <melinko2003@gmail.com>, 
+ Chapuis Dario <chapuisdario4@gmail.com>, Evgeny Kapusta <3193631@gmail.com>, 
+ Nitin Gurram <nitin.reddy88@gmail.com>, 
+ Thibaut FRANCOIS <tibo@humeurlibre.fr>, Ivan Lubnin <lubnin.ivan@gmail.com>
+X-Mailer: b4 0.15.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4754; i=floss@jetm.me;
+ h=from:subject:message-id; bh=OpgBAjKnDiir2AF1xHFd8B3qoKOvAbft3PxkCn8MgxY=;
+ b=owEB7QES/pANAwAKAbXuwwuoZ3cfAcsmYgBpxa9v6PKNfz3YcaZt0nUslqXRsBppv56R6OBGt
+ dSpUoVePpaJAbMEAAEKAB0WIQSbE7ILzw7eI0VKk8m17sMLqGd3HwUCacWvbwAKCRC17sMLqGd3
+ HxYzDACaoVolEfsF6bbF0o5E1HgLf3XRo6eb4/TNYcpdczqzpDrDcAcdWjFAleqT4ykM/6iRfjQ
+ mvgYGQ74DFxTSElYtvkwYNtLM+6GDgSidC6jeA6wyfraSyDCCQRpNNuW1iCUwybTUXonix42l2I
+ gkna77O3GjhwhGe0x+BJEWT0BfO2tM+sqZwUxaoL6KvghNrfqtuXdM0ND/2MnbO5gIvHU2Q4rcX
+ lokLaoE+CGymEuxVmb4bCiOx3Vic2oXEByApThj+CErvHUO/KTSt8H8ULSCj1NsALcBTF4/Ku2K
+ klvHF0xQAR+tpQMFzRbBdlLd5PU0IXFpUVN1968/pdR4Ne3/nTxKBt3WkPHqcg1GCF+g83d1oFN
+ /lANyDn3vxffV6hztg2oXh1n6p5/BfayKovkXr5NqeeyXxr5JOYJWVoLFYGT/MoJZn+BEHVPjnf
+ e10o2xCMfU7FR/AaxpQfn1cCq93EwUrcc7K816nn8/p+vgAWM8dmtIPLTNhpQnTEjfRmg=
+X-Developer-Key: i=floss@jetm.me; a=openpgp;
+ fpr=9B13B20BCF0EDE23454A93C9B5EEC30BA867771F
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+This series adds Bluetooth support for the MediaTek MT7927 (Filogic 380)
+combo WiFi 7 + BT 5.4 module. The BT subsystem uses hardware variant
+0x6639 and connects via USB.
 
-Add a subsection under ASCS explaining that multiple ASEs with
-different directions (Source + Sink) on the same connection is the
-standard bidirectional/conversational configuration.  Document the
-direction indicators (Receiver Start Ready for Source ASEs only),
-a typical setup sequence, and a note that this is normal behavior.
+The MT7927 is shipping in motherboards and PCIe add-in cards from ASUS,
+Gigabyte, Lenovo, MSI, and TP-Link since mid-2024. Without these patches,
+users see "Unsupported hardware variant (00006639)" or the BT subsystem
+hangs during firmware download.
 
-This provides LLM context so automated trace analysis does not
-misinterpret bidirectional streams as an error.
+The series consists of eight patches:
+
+  [1/8] Bluetooth: btmtk: Add MT6639 (MT7927) Bluetooth support
+  [2/8] Bluetooth: btmtk: fix ISO interface setup for single alt setting
+  [3/8] Bluetooth: btusb: Add MT7927 ID for ASUS ROG Crosshair X870E Hero
+  [4/8] Bluetooth: btusb: Add MT7927 ID for Lenovo Legion Pro 7 16ARX9
+  [5/8] Bluetooth: btusb: Add MT7927 ID for Gigabyte Z790 AORUS MASTER X
+  [6/8] Bluetooth: btusb: Add MT7927 ID for MSI X870E Ace Max
+  [7/8] Bluetooth: btusb: Add MT7927 ID for TP-Link Archer TBE550E
+  [8/8] Bluetooth: btusb: Add MT7927 ID for ASUS X870E / ProArt X870E-Creator
+
+Three driver changes are needed for MT6639 (patch 1):
+
+1. CHIPID workaround: On some boards the BT USB MMIO register reads
+   0x0000 for dev_id. Force dev_id to 0x6639 only when the USB VID/PID
+   matches a known MT6639 device, avoiding misdetection if a future
+   chip also reads zero. This follows the WiFi-side pattern.
+
+2. Firmware naming: MT6639 uses firmware version prefix "2_1" instead of
+   "1_1" used by MT7925 and other variants. The firmware path is
+   mediatek/mt7927/BT_RAM_CODE_MT6639_2_1_hdr.bin, using the mt7927
+   directory to match the WiFi firmware convention. The filename will
+   likely change to use MT7927 once MediaTek submits a dedicated
+   Linux firmware binary.
+
+3. Section filtering: The firmware binary contains 9 sections, but only
+   sections with (dlmodecrctype & 0xff) == 0x01 are Bluetooth-related.
+   Sending WiFi/other sections causes an irreversible BT subsystem hang.
+
+Patch 2 fixes the ISO interface setup for devices that expose only a
+single alternate setting (alt 0) on the ISO endpoint. Without this fix,
+btmtk_usb_claim_iso_intf() fails with EINVAL, causing ~20 second
+initialization delays on 13d3:3588 devices.
+
+Tested on:
+- ASUS ROG Crosshair X870E Hero (USB 0489:e13a)
+- ASUS ROG STRIX X870E-E (USB 13d3:3588)
+- ASUS ROG STRIX B850-E GAMING WIFI (USB 0489:e13a)
+- Gigabyte Z790 AORUS MASTER X (USB 0489:e10f)
+- Lenovo Legion Pro 7 16ARX9 (USB 0489:e0fa)
+- MSI MEG X870E ACE MAX (USB 0489:e110)
+- TP-Link Archer TBE550E PCIe (USB 0489:e116)
+
+The firmware blob is being submitted separately to linux-firmware via
+GitLab MR !946. The firmware path has been updated to mediatek/mt7927/
+per maintainer feedback.
+
+Changes in v3 (suggested by Sean Wang):
+- Scoped CHIPID workaround to a static VID/PID table of known MT6639
+  USB devices instead of mapping all zero-CHIPID cases to 0x6639
+- Changed firmware path from mediatek/mt6639/ to mediatek/mt7927/ to
+  match the WiFi firmware convention and avoid confusion
+- Added MODULE_FIRMWARE(FIRMWARE_MT7927) for initramfs firmware discovery
+- Added Tested-by for 0489:e110 (Nitin Gurram)
+
+Changes in v2:
+- Split USB device IDs into per-device commits as requested (Luiz)
+- Added 0489:e110 (MSI X870E Ace Max, new hardware report)
+- Added ISO interface fix for single alt setting (13d3:3588 devices)
+- Added Tested-by trailers for all USB IDs
+- Added USB descriptor output to all per-device commits
+- Removed BTMTK_FIRMWARE_LOADED skip logic (Sean Wang)
+
+Link to v2: https://lore.kernel.org/linux-bluetooth/20260325-mt7927-bt-support-v2-0-b892a3252880@jetm.me/T/#t
+Link to v1: https://lore.kernel.org/linux-bluetooth/177272816248.352280.12453518046823439297@jetm.me/
+
+Signed-off-by: Javier Tia <floss@jetm.me>
 ---
- doc/btmon-le-audio.rst | 49 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+Javier Tia (8):
+      Bluetooth: btmtk: Add MT6639 (MT7927) Bluetooth support
+      Bluetooth: btmtk: fix ISO interface setup for single alt setting
+      Bluetooth: btusb: Add MT7927 ID for ASUS ROG Crosshair X870E Hero
+      Bluetooth: btusb: Add MT7927 ID for Lenovo Legion Pro 7 16ARX9
+      Bluetooth: btusb: Add MT7927 ID for Gigabyte Z790 AORUS MASTER X
+      Bluetooth: btusb: Add MT7927 ID for MSI X870E Ace Max
+      Bluetooth: btusb: Add MT7927 ID for TP-Link Archer TBE550E
+      Bluetooth: btusb: Add MT7927 ID for ASUS X870E / ProArt X870E-Creator
 
-diff --git a/doc/btmon-le-audio.rst b/doc/btmon-le-audio.rst
-index db909ac38e47..50ee11879bb2 100644
---- a/doc/btmon-le-audio.rst
-+++ b/doc/btmon-le-audio.rst
-@@ -141,6 +141,55 @@ ASE Control Point commands:
-      - Release
-      - Tear down ASE (any → Releasing → Idle)
- 
-+Bidirectional Streams (Source + Sink)
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+A device may expose multiple ASEs with different directions. In the
-+conversational (telephony) use case, the remote device typically has at
-+least one **Sink** ASE (receives audio, e.g., speaker) and one
-+**Source** ASE (sends audio, e.g., microphone). Both ASEs share the
-+same CIG and often the same CIS, using the bidirectional capability of
-+Connected Isochronous Streams.
-+
-+**Direction indicators in btmon traces:**
-+
-+- The ``Receiver Start Ready`` command is only sent for **Source**
-+  ASEs (ASEs that send audio toward the local device). The server
-+  issues this command to indicate it is ready to transmit.
-+- The ``Receiver Stop Ready`` command likewise applies to Source ASEs.
-+- **Sink** ASEs transition directly from Enabling to Streaming
-+  without ``Receiver Start Ready``.
-+
-+**Typical bidirectional setup sequence** (two ASEs on one CIS)::
-+
-+    Config Codec  ASE ID=1 (Sink)    → Codec Configured
-+    Config Codec  ASE ID=3 (Source)  → Codec Configured
-+    Config QoS    ASE ID=1           → QoS Configured (CIG=X, CIS=Y)
-+    Config QoS    ASE ID=3           → QoS Configured (CIG=X, CIS=Y)
-+    Enable        ASE ID=1           → Enabling → Streaming (immediate)
-+    Enable        ASE ID=3           → Enabling
-+    CIS Established (Success)
-+    Setup ISO Data Path  Input  (Host→Controller, for Sink)
-+    Setup ISO Data Path  Output (Controller→Host, for Source)
-+    Receiver Start Ready ASE ID=3   → Streaming
-+
-+Both ASEs may reach Streaming at different times. The Sink ASE can
-+start receiving audio as soon as CIS is established, while the Source
-+ASE waits for the ``Receiver Start Ready`` handshake.
-+
-+.. note::
-+
-+   **This is normal behavior.** Seeing one Source ASE and one Sink
-+   ASE on the same connection is the standard bidirectional
-+   (conversational) configuration. It is **not** an error or
-+   misconfiguration. Both directions sharing a single CIS is
-+   efficient and expected.
-+
-+**Multiple ASEs per direction** are also valid. For example, a stereo
-+headset may expose two Sink ASEs (left and right channels) and one
-+Source ASE (mono microphone), each with its own GATT handle for ASE
-+state notifications.
-+
- CIS Setup and Teardown
- ------------------------
- 
--- 
-2.53.0
+ drivers/bluetooth/btmtk.c | 56 ++++++++++++++++++++++++++++++++++++++++++++---
+ drivers/bluetooth/btmtk.h |  1 +
+ drivers/bluetooth/btusb.c | 12 ++++++++++
+ 3 files changed, 66 insertions(+), 3 deletions(-)
+---
+base-commit: 50003ce2085a7f7dacf2426065d1a69c84b5b963
+change-id: 20260305-mt7927-bt-support-6589a50c961f
+
+Best regards,
+--  
+Javier Tia <floss@jetm.me>
 
