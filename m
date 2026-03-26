@@ -1,344 +1,279 @@
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11021130.outbound.protection.outlook.com [52.101.70.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B9F342177
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2026 17:16:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897AC4266B5;
+	Thu, 26 Mar 2026 17:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.130
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774545418; cv=pass; b=jDkYgT08PIvUceVi7O2FWKVqUMpAR1q8ENGhB+FRRKUqbFIK4wNWWPY9EE8bWz7b5SCOPUWbkcU9gtUilEDueG4hD5hv1aZBnYi2+A2/Y3GHFhYmi10CwnHFqVfZ6TVLiNlMT5LDUaRRnMGPtqtQeqDdFu0P3Y0GtYliqL8HIgM=
+	t=1774546292; cv=fail; b=It3ftWurmGFexTzc0yPoVoAlITDs/JNoka8tvja3yRziQjxe/Zvn04nHfdiGnOIz/+J7p6EikF+4vIN2NyS79xXAgFFg8gbh423m3tTqOU5VGtED86FZqGSuXRBn9RCtV/5my3m4nqEEtWRXZPEcWoqEPFkLrHLJCmjl1b2K9RI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774545418; c=relaxed/simple;
-	bh=XpGGKH0+jHnbkTx4XXcFRGePkyMxcMWfvg1wX52P9i4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i3jYAZUXlMq425vV7ietz2lrFRsmp3KvS7nmbha1NIAwwgVbzzjewWVXPk+2xWGBrndnMD7ncJv+7Q7F9kC0xY4bXZHdAYI0EBqsA3t7u5blOu9gwn4xwKgLkVuTOS2M/GHQggWZjzjJI/vOvNNKhXHnoFaQ6pp4/gBHmFDWbp4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JogsVsu7; arc=pass smtp.client-ip=74.125.224.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1774546292; c=relaxed/simple;
+	bh=bHjouV73JetLUH92DnLgUlkGCJJPQBuxvhP4fJ5P4h4=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=op6Y3rUQxrBx7TUXKKGSysWZWGo8lZ5qG0LDa80EEjAsinHAjE2l7DXlJy+yz3Rvilv9eIKPokkOymyul5ioHryb210XF/l2xEV2m5GnAsvQjAMrz9WWUsMtipic+2Xt3SKBGBUNCg07gR2o54GrXSx8PH0gRd3o8uwv56XsSRI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1seal.org; spf=pass smtp.mailfrom=1seal.org; dkim=pass (2048-bit key) header.d=1seal.org header.i=@1seal.org header.b=dP3hhc5w; arc=fail smtp.client-ip=52.101.70.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1seal.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1seal.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JogsVsu7"
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-64edf260b49so1576434d50.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2026 10:16:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774545415; cv=none;
-        d=google.com; s=arc-20240605;
-        b=LUAZRYHOdz03pxeIdA3zVFvSy4fyfXWjyB1adDQlIDT8WITJrQLELKzm4JlG+lburI
-         NjgfYJ4xNlv6mwAieG4ECJcLmUrJZ0T4aiS+jq+OPlIjFSpyZRDPA+7xsS3yLSSTTKQl
-         7drMdCycSJJrYQ9LhGzuWAt61bJeDXIFnWhzL522GPrW/Rk3KXim0b86xiSKb/RDGsvy
-         AZishaDZEWx9J2e/0GwYMTwlFCjNUUUYsAXQFAuJ5GiHkZqZVG97xoNbPPeksYo6te6M
-         EG6bXCstp+O97a034eGRmCN5Y8lp7NGMlvFtSn/n6j8q6VQiZ+kDqB9S8dkkoZ67wTM/
-         kuEQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=/out/Pg+eC1Z2v3A8N9eV3ek0NeKXkekWp4rHbti2gk=;
-        fh=0gNuo3HbqiW99Xlq627bxqC6UuzxHZi2Fi7U0nP15cI=;
-        b=iR9UAhIamMF1k8V41GdoGzyo0a20m8B6BwxUj0MaMdLZ7ZQw9G0WW4ZEyTHOCENisU
-         cW71GKL3/PVEKNRowEVBMaJvbiDa/2Wj1pF6TYMpqMwQuZ96pcloc3k8bNLxFxl54+pi
-         b2xCj9b7EnZaBMO8cZz6lAgnqFTR3Fdnw97MqTNf6oYls0ZZ08T5H1ErV7Picr2M9cLJ
-         5toVGyfjpcJZMKcKU4sqRCv+TBXq575BcEJAf+P2sKpiSzNyK6tQ/yT+nOjvkcQZV7Wl
-         OgcQ1zMoYUgHgG66RRA+q1UPsAgsmBoNkSSDYd3Qh4Da37GRhGKPuckfAPUtEqwqfM2H
-         54iw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774545415; x=1775150215; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/out/Pg+eC1Z2v3A8N9eV3ek0NeKXkekWp4rHbti2gk=;
-        b=JogsVsu7i8eoTAcPkMYZxq8iRuU9W5GExeU4BeqUdF3cFYYhnmmpLsZ8qjDk/oeQRy
-         xQgdOWpWRTH8I1GtLqsFqlCU8IRbTi/PLYm1xli9c5RBWeOmkEUhwfCaF3ZlxRS74m8K
-         S03o2p9J7HGzWmB2J+WNIcsPaip5Kmi+SkTfHrJkwrq2dlqKzKyGvsoqRsUdXMX3mJhr
-         LIDA5hJy3hppoPFuN6HBKUGOPwvrbpPVAw4zMzAg6S3tY0NXk4+bjVrn1Bgyc2Ciwc/t
-         4wyvkK7GMv8FA1xHlBhjKKuufSeW/HPtjU63qIjDOD3tcsT4UqtmqVsf2tPp8R9HaeRv
-         uJTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774545415; x=1775150215;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/out/Pg+eC1Z2v3A8N9eV3ek0NeKXkekWp4rHbti2gk=;
-        b=kvX/4YnLFTvgZQhLl3PXPwImakpiA4aDm2VO+QYmdKiPmwV0VfuGfqU7d8iRW1s9KA
-         luSfl9SRnznGUMDUtOKJJg3jz2fKglMuMamzsUuXII9+oNffC0FfFBITknCNlH7gmqZe
-         iMKAGsnIrAqRpHb+r9zgbi4fIm2AG4r70/SJJRx5LV3yBET14MJpctQ3+KDN0397sr0Z
-         goJ7dJLhQiMiemqXxALBQPFrRkTlNMtfRuZymYpW70qZ3UP5bfVLHnLW8XFVjGhe2lGE
-         idRveJXikrYAgCIbbKUNnblnzIqrkAer8hu/QTzWH9/V0laJuXNBvGTODlu4RtQOqlyr
-         w/NA==
-X-Gm-Message-State: AOJu0Yyq6MUDlPSd0b6cN8jWFZrRUq7DfpOkvVUfyTjb4+BCUblie5aU
-	3O9IHd2J44SRGRBNJXGALp5XVtWfQBNndUbm3F3DTbJbQX1W/3U48uguqiEVEyPAVLkY8iTKwmS
-	gCOxsU6gyLQ8ynG9nxaSmWEw7/HzBBD9GBo3BGm0=
-X-Gm-Gg: ATEYQzyNvzCVZAECWYPpJo+p3Tq8FXtgBGC1X6e1yTaGlfT7E8P3ihApYwG/c2qWGSZ
-	s88RYummxPBpwzQq9qaX+Di2MAR0Hpz3ZxkFg7THud9OvzX2V2XBZOTnpeRfeh17uhBbOnZfTzs
-	dwqpVgtV0V1fifeSWYgudBDzfKrefMEY/QZzBVwvtiM0KxL8J2wZ0dP8pTn4enu+hCcKvzhRgsF
-	Mtgl7cxe5JkKetpKOEYnXJqi1tdmivPepl802kLQgAbrQOmC3IWZ9xyl2iFR1aGyoeKb84JOB9c
-	GWstW3MMu49I8RQo0yxNV1kABkicMV5ur3CyDp3Ux9Ph245Se1q6xYCs8qjFiDXfHs1IcZjgdZp
-	/52v+
-X-Received: by 2002:a05:690e:b8c:b0:64f:b8af:3595 with SMTP id
- 956f58d0204a3-64fee1d9a44mr1868046d50.17.1774545414483; Thu, 26 Mar 2026
- 10:16:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=1seal.org header.i=@1seal.org header.b="dP3hhc5w"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=paC48HUGEXnKMnD+W25rOfqlM4H3TVAq07js6iBKiNP4YcKsZ81C/ONSI2G6yGDLc73VTboCHd6/4C3c1HIMkdO9lXS1iZzgDD6V+TZYF8EH7zomrvpbO3st3zfLfQ9/l6aUCoRLIUxtoyuwlmb0AyuGoeVbIOiodmZQwoBk9v1MTVI3Q5eVesmyzHqUjGCe6BuxhdUAKxSvEaycIEND8A7gO1CvnjPhwvJlPTeFC6n2nrWJALkFtm4KGv1ycgYxZmvkZ5FtTitAYsSs0hwaO2vM5BpWJFEndZ8HXPko6fii0QU0vEonzMEp6EG08m64ByZKbHy1AaTpnM9p4cnsuw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bHjouV73JetLUH92DnLgUlkGCJJPQBuxvhP4fJ5P4h4=;
+ b=gql6CQMSQxRCrkvonNjuVZnEZZNcNyFr783NLVbwkZ4qgRL1afZGHkXxcIPBaPOUqdxJ2xqP98XvnlcJ+n7z/LP8ozWKh2DRWd0LxTr/nVqA+iN4nr7QoSUXlGZVjsKwDChpx4b5z+uZLdieBTw68NeB1JNzF84PtUDn5nlpgFYfzixoyrcrGjv9wgm7Yx2Lrw2F9IMTRr3DT/mKyD5x/5WhuL8AEcqnCzXoWdB/DQ1WfyFc+o+2ROAwEqrIpsqn13GEU7Q7b4O0eRaR68AvpYI/a/PAysjI2RWRDBbnX2xhF/Zas9+2RXICxpr9JGO0hxr4RpN/xl9hHiE/HoY/pg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=1seal.org; dmarc=pass action=none header.from=1seal.org;
+ dkim=pass header.d=1seal.org; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1seal.org;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bHjouV73JetLUH92DnLgUlkGCJJPQBuxvhP4fJ5P4h4=;
+ b=dP3hhc5wo5FCZ+A+w/jAZ56xx0zBOFiX4baK4xOeDYQIc2xJ0B8+/9nNUv2JkNhR8bRpsLkGEyzUCpmXnTBLxgoGl5UAJanqomrnzuj6RkNIriWDPyZkjKysnf0t+en84D75hkl7HYw4lLOmibY7U3OcAK4/O5+drLexqUP2bSgYlDkIQZLjhfsy5SwBfps6Dfnoe0ENUigsWIwo9X8gjo9gskoa0hDrKmM7j2cVK/W1EE3iv+qWS8b0etPzBt1v4ffK0CivvvORCXvYYL732N+JWDSfc8+kIBQHshhS3lipj6R4KTuZzjYwEI0pWDugyXR3CFDUcCpAVc/ppUDn4g==
+Received: from DBBPR04MB7673.eurprd04.prod.outlook.com (2603:10a6:10:202::5)
+ by DUZPR04MB9846.eurprd04.prod.outlook.com (2603:10a6:10:4db::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.20; Thu, 26 Mar
+ 2026 17:31:25 +0000
+Received: from DBBPR04MB7673.eurprd04.prod.outlook.com
+ ([fe80::cf39:9ba0:2b9c:419]) by DBBPR04MB7673.eurprd04.prod.outlook.com
+ ([fe80::cf39:9ba0:2b9c:419%3]) with mapi id 15.20.9745.023; Thu, 26 Mar 2026
+ 17:31:24 +0000
+From: Oleh Konko <security@1seal.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "marcel@holtmann.org" <marcel@holtmann.org>, "luiz.dentz@gmail.com"
+	<luiz.dentz@gmail.com>, "gregkh@linuxfoundation.org"
+	<gregkh@linuxfoundation.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+Subject: [PATCH v6] Bluetooth: hci_event: move wake reason storage into
+ validated event handlers
+Thread-Topic: [PATCH v6] Bluetooth: hci_event: move wake reason storage into
+ validated event handlers
+Thread-Index: AQHcvUZe1IFDuNvgEUSZcjFrIyW0zw==
+Date: Thu, 26 Mar 2026 17:31:24 +0000
+Message-ID: <09ff4368485242cdb6bc707082fccc4d.security@1.0.0.127.in-addr.arpa>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=1seal.org;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DBBPR04MB7673:EE_|DUZPR04MB9846:EE_
+x-ms-office365-filtering-correlation-id: ae07d74e-e08c-46ab-62d5-08de8b5d8138
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|376014|366016|38070700021|18002099003|7055299006|56012099003;
+x-microsoft-antispam-message-info:
+ up8UN0RZsh/xkqPyhH5yvUM6nAnRiWHMZfqYY7XgBsoOpvpd4dHJTiTxb6P0PoAUkwvVvgnDcSFYxZhzW0kOD4r5JlPbTVGDtEru8pwN2XqEVvu1o1eU05rIyPgHf27l7keX+lOuy38DGsODvDhO/LxoI8do7ggs7DS4sQ6FLpujhMudFGPLDgfqKvTH4G75fUvQu9+VN2FufQzE39Z4OLAqQKGG134at2YtToJiu/8DlbMnmb0P9sJHl9kNaHG63J2ZyL2bVAYcoqkS9t/gZN3G0jpGLN6p3g4mAa4sUa8lX1QRnwP0od1+7K+QGRpC47sJC/0h0EOr8QfVBZCldp0jbHfn4WTOeR0bYSm+xWtfhIqtQsjDsw40MTR7HH8ejXzIY6ZhrTbxUY5eeV6gPG1BNaHdIrBm+f+dzKpCa8LYx3s2NyOL5eceqdIjWGdMSK6r4yQQ/cnyJbMBB/OKG+0DaJubm65Ew+XjyhDMH8pCJqkhwiyST4HgvmfNOlU26hwc2tNXI40QzqjDxIXfwVhSuwtmdsT4soPojUelvGfEat0Qn7/HfbpdP1adLUoTEaZgqxNglfAWN8l9jCVtYHpdV3HSrLIYXXtMxtPlY5sfIEvTXgoM9FlZW5/kTxaW4UQP+piZZj5TLmc3REZ3MjauZ18qL8FSwXpmISvRB6ux/GedDMNJxgV4anWeRMLH3MOCOCK05nSPEAMEOfLwLV7u19j8o1tugWySxYAskNoQmIssO9S/OoNaK8LrUaeYLQhp4crC38Ros/D3pfaZhj+Zan3MfFZMRPG3Y1gudiyMmTZlSaQwoaux/JiXsgbL
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7673.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700021)(18002099003)(7055299006)(56012099003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?N1RvOGJFY0dXZnJodk5HQ1UyclRKa1lZNVd4R2lBR3M2UDZzT3NyMGJEYVRE?=
+ =?utf-8?B?czFZYUt5N0JQTnZMWTAzWDhTWjZkK1g4WUhYNnZxbXNTRkNmeWhScWlFUnlG?=
+ =?utf-8?B?OGFqazlPVktKYUtEcDFVVEk2QjRxVEswOG83RmFkL0plWFVOMHZuVWN5RGtV?=
+ =?utf-8?B?TjF4TkFMSWx0ejB2RjBxWHFxdExLdW5Wb09kdFBxa0F4bjlZMVY0dll2elB1?=
+ =?utf-8?B?N0VKUUREVGI4cnV4eXFSN24xYmVtZVFQVTFybjh4ZjE0RTVMcXhZeEVzalV2?=
+ =?utf-8?B?STdwcmRXd3Nkb1dneWduNGNHWmdPRnduK1VoK29qTXZ4MUZNMWhSWTVQSHlD?=
+ =?utf-8?B?L29zTjdJMnlvSTFEL0hRclpVTENSQ3c4TFlKN09HT2k1dzBvUTNmK0x0Vzcv?=
+ =?utf-8?B?TW9EOXdjbHlsY3NETDFFK01UeEkrT1lWNGg4RU54dWcyZEI4T1ljaGJENFBy?=
+ =?utf-8?B?YVdTRzY4aE5TNHpIV1Q2WTE0U0hiSkh2WDA5N3lJWTFXckZsMmpEUVFlTFZi?=
+ =?utf-8?B?L2FTTU00Qi96K0FFYk9KdmlxZGJsUmR1ZlRUNUJ5cjgzbWdsbDhSbUhMNVc5?=
+ =?utf-8?B?QXhTWThjZVc0TDJMNGdVYldCRHZ3cGZjMlF4Z3h5enMxYXZQYVV3YTZ1c05k?=
+ =?utf-8?B?UjRYV2tGWHoySmFiaVlZY0I5YW5ZckluWFBOK3Y0QXNGQ2VBMGpSbjFqQXp5?=
+ =?utf-8?B?MHZvOVFWcVBtMldHWEpxL3RZM3kwVWhzOFRHUkVtUU5oSndrZGxPZ0xmRXFS?=
+ =?utf-8?B?c3EySHBUdFh0OGhKN0l1eThnRnFSYmFuSnEzRWZNUnNxTEEreUhGbnhMMDlh?=
+ =?utf-8?B?UytmdnFEY3BwTk5JMm9od0Jhb0NjeVY3T2tFYk44S0dZUXNwWkJJWGNUTkdW?=
+ =?utf-8?B?eXhxblZsbm1UcExVRXFUVjNoZEZVR2RxRFRvRFRML2ozcFBSZlk0Mk9EZFky?=
+ =?utf-8?B?Ti9hSUc4WXJocFJFTmdFWStvMmZ2dFc2YlB2emd2cU92b1hIcFZFR0hhbExr?=
+ =?utf-8?B?dEF5b1hGSW5FdXM3MGtiTnlRMFVBQ0lzY2J3RDBTY2E4T3VnSzFtL1ZjTENr?=
+ =?utf-8?B?Z1hJTExXZ3E1bW0yQ1NPRTQ5cWk2WEx6TXlNRXNIRUJIL2E4NVZxRCtWWm5t?=
+ =?utf-8?B?SlMvWmFUbUtPaG1mQmZjVmlOZUpiQ1pTZjVtcDlWbTdyR3hlMlEvL1BvMGlW?=
+ =?utf-8?B?YVpEbFEzN1FtSFQ2MjR4dEV4OG1wenZiWklTZ1pHdWk3cnVpb3ptMU9tM1l3?=
+ =?utf-8?B?UTJnbnFLeklSb2ErTDVwRENmckVsWW9FMURPb3hmbXFFbFFNYmFRNCtxbmJE?=
+ =?utf-8?B?WmNIZ25JM2daVFlib1NRTk9Fc3ZNNzhYaEdKZFFDQUh0Zkg3dHJReXZHYzFX?=
+ =?utf-8?B?OU9hd0l6RnltcU1DaytQWURCRUdseGxaNEJpVmpwOXdUalZ3SnRCb0V4OGpX?=
+ =?utf-8?B?aFk2RkVnTDdWNmw4MlZLSjFCZmF4dFFMMy9waXB4aitCL1cvRjJ6REcvci95?=
+ =?utf-8?B?ekZ3WUdlODQ4Q3JkNzUxV1BqcjkyWXN0OG15dmFQdUJMZzV6KzF2VmF4dGNW?=
+ =?utf-8?B?anp1UW02alZtTys5NUpDR0FZTktRTzNZTGM2ZHpXTEFVSzBHaXVLSGlTZWs0?=
+ =?utf-8?B?MjRZaHhOMEJ2OHg5QUdyZ25qSXFzUEtoeDM4VDRLMkpQc2VGQTdaZVFBWkRm?=
+ =?utf-8?B?STBkYlFRb0hZVkM5Y2s1N2tXVkdkeEM5ZlE4Z2pUT0tEZ1hzdFhxaXhqU3BN?=
+ =?utf-8?B?TmhoUmRWMWFSb3Z5NGZYQ2F4c0V2TUpqb2o4bDhDV0N1QlNkbnNXNmpSaXkw?=
+ =?utf-8?B?MmVjc01sMUxZcmRCUmZoUUFVNHJlcm1pM1BrWUp1SnNhRTd3Q1dvWXZhbTVR?=
+ =?utf-8?B?cEdJWkVpdSsvVVZva00zYTVyOWNRK0dZVEg3b0pzY1oyY3NZbDlEUjdZK1JM?=
+ =?utf-8?B?YUg2QWl4c2FjYnAzOUo4ZG1NcS80QjRwT21sVmwxbWMvTStZNC9vQWRVeENN?=
+ =?utf-8?B?RGFEY214WXZnZnZmdjFFU3Z2QzlDK2w3eUFLd2szRU4wWDJ1NTkydms4QWFa?=
+ =?utf-8?B?OEZRQm56OEFpWksrbGlyWnE4emdJN1FmSG03OGJwazY2KzZaWlVUY3QzZEJj?=
+ =?utf-8?B?bHgyT3JHNGNXYlNXYXRyUDlDU3RpVjBXU2xGWDl4MjNRd1c0cW9uR3FlcEFa?=
+ =?utf-8?B?WlN4Z3VSSE5hTUtIdXFiOXNtclMwU0lGQitxYUk5TlFTYXdpeERxa2JPSS90?=
+ =?utf-8?B?S1BOSXZtb0wzVHF4ck9DeXhVekM2Y2hWc0dOMlJVd3lzNlIyZkhMTGRMTlZV?=
+ =?utf-8?Q?1ka6l1pUR1+R61nPgn?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <52D41E071E84B248B1D191DE2341E682@eurprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <798ca355ce0144488610929e6c13e383.security@1.0.0.127.in-addr.arpa>
-In-Reply-To: <798ca355ce0144488610929e6c13e383.security@1.0.0.127.in-addr.arpa>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 26 Mar 2026 13:16:43 -0400
-X-Gm-Features: AQROBzDkB_gnah06z1tnOE9musoqsKMA1N7J6IXrdXzfGTUIESodA9_4JmsUdpI
-Message-ID: <CABBYNZLzVwa=Jq2GFJ96G0JCFEQjyY6yAEfrHsuwBXGmfEiyaw@mail.gmail.com>
-Subject: Re: [PATCH v5] Bluetooth: hci_event: move wake reason storage into
- validated event handlers
-To: Oleh Konko <security@1seal.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
-	"marcel@holtmann.org" <marcel@holtmann.org>, 
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: 1seal.org
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7673.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ae07d74e-e08c-46ab-62d5-08de8b5d8138
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Mar 2026 17:31:24.8816
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: e701d992-0f02-433e-a019-4256abe96ea1
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ywH+Vswa0UJTnkkFW37vOY0IyvCzcS2iWEZoSH9xLv7nrmk1mx/842duBic6rkGdtcZBG10lqWRulwuBDDtmfg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DUZPR04MB9846
 
-Hi Oleh,
-
-On Thu, Mar 26, 2026 at 11:06=E2=80=AFAM Oleh Konko <security@1seal.org> wr=
-ote:
->
-> hci_store_wake_reason() is called from hci_event_packet() immediately
-> after stripping the HCI event header but before hci_event_func()
-> enforces the per-event minimum payload length from hci_ev_table.
-> This means a short HCI event frame can reach bacpy() before any bounds
-> check runs.
->
-> Rather than duplicating skb parsing and per-event length checks inside
-> hci_store_wake_reason(), move wake-address storage into the individual
-> event handlers after their existing event-length validation has
-> succeeded. Convert hci_store_wake_reason() into a small helper that only
-> stores an already-validated bdaddr while the caller holds hci_dev_lock().
-> Use the same helper after hci_event_func() with a NULL address to
-> preserve the existing unexpected-wake fallback semantics when no
-> validated event handler records a wake address.
->
-> Annotate the helper with __must_hold(&hdev->lock) and add
-> lockdep_assert_held(&hdev->lock) so future call paths keep the lock
-> contract explicit.
->
-> Call the helper from hci_conn_request_evt(), hci_conn_complete_evt(),
-> hci_le_adv_report_evt(), hci_le_ext_adv_report_evt(), and
-> hci_le_direct_adv_report_evt().
->
-> Fixes: 2f20216c1d6f ("Bluetooth: Emit controller suspend and resume event=
-s")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Oleh Konko <security@1seal.org>
-> ---
-> v5:
-> - add __must_hold(&hdev->lock) and lockdep_assert_held(&hdev->lock)
->
->  net/bluetooth/hci_event.c | 90 ++++++++++++++-------------------------
->  1 file changed, 31 insertions(+), 59 deletions(-)
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 286529d2e554..cb27037eeef5 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -80,6 +80,10 @@ static void *hci_le_ev_skb_pull(struct hci_dev *hdev, =
-struct sk_buff *skb,
->         return data;
->  }
->
-> +static void hci_store_wake_reason(struct hci_dev *hdev,
-> +                                 const bdaddr_t *bdaddr, u8 addr_type)
-> +       __must_hold(&hdev->lock);
-> +
->  static u8 hci_cc_inquiry_cancel(struct hci_dev *hdev, void *data,
->                                 struct sk_buff *skb)
->  {
-> @@ -3111,6 +3115,7 @@ static void hci_conn_complete_evt(struct hci_dev *h=
-dev, void *data,
->         bt_dev_dbg(hdev, "status 0x%2.2x", status);
->
->         hci_dev_lock(hdev);
-> +       hci_store_wake_reason(hdev, &ev->bdaddr, BDADDR_BREDR);
->
->         /* Check for existing connection:
->          *
-> @@ -3274,6 +3279,10 @@ static void hci_conn_request_evt(struct hci_dev *h=
-dev, void *data,
->
->         bt_dev_dbg(hdev, "bdaddr %pMR type 0x%x", &ev->bdaddr, ev->link_t=
-ype);
->
-> +       hci_dev_lock(hdev);
-> +       hci_store_wake_reason(hdev, &ev->bdaddr, BDADDR_BREDR);
-> +       hci_dev_unlock(hdev);
-> +
->         /* Reject incoming connection from device with same BD ADDR again=
-st
->          * CVE-2020-26555
->          */
-> @@ -6403,6 +6412,8 @@ static void hci_le_adv_report_evt(struct hci_dev *h=
-dev, void *data,
->                                         info->length + 1))
->                         break;
->
-> +               hci_store_wake_reason(hdev, &info->bdaddr, info->bdaddr_t=
-ype);
-> +
->                 if (info->length <=3D max_adv_len(hdev)) {
->                         rssi =3D info->data[info->length];
->                         process_adv_report(hdev, info->type, &info->bdadd=
-r,
-> @@ -6491,6 +6502,8 @@ static void hci_le_ext_adv_report_evt(struct hci_de=
-v *hdev, void *data,
->                                         info->length))
->                         break;
->
-> +               hci_store_wake_reason(hdev, &info->bdaddr, info->bdaddr_t=
-ype);
-> +
->                 evt_type =3D __le16_to_cpu(info->type) & LE_EXT_ADV_EVT_T=
-YPE_MASK;
->                 legacy_evt_type =3D ext_evt_type_to_legacy(hdev, evt_type=
-);
->
-> @@ -6834,6 +6847,8 @@ static void hci_le_direct_adv_report_evt(struct hci=
-_dev *hdev, void *data,
->         for (i =3D 0; i < ev->num; i++) {
->                 struct hci_ev_le_direct_adv_info *info =3D &ev->info[i];
->
-> +               hci_store_wake_reason(hdev, &info->bdaddr, info->bdaddr_t=
-ype);
-> +
->                 process_adv_report(hdev, info->type, &info->bdaddr,
->                                    info->bdaddr_type, &info->direct_addr,
->                                    info->direct_addr_type, HCI_ADV_PHY_1M=
-, 0,
-> @@ -7517,73 +7532,29 @@ static bool hci_get_cmd_complete(struct hci_dev *=
-hdev, u16 opcode,
->         return true;
->  }
->
-> -static void hci_store_wake_reason(struct hci_dev *hdev, u8 event,
-> -                                 struct sk_buff *skb)
-> +static void hci_store_wake_reason(struct hci_dev *hdev,
-> +                                 const bdaddr_t *bdaddr, u8 addr_type)
-> +       __must_hold(&hdev->lock)
->  {
-> -       struct hci_ev_le_advertising_info *adv;
-> -       struct hci_ev_le_direct_adv_info *direct_adv;
-> -       struct hci_ev_le_ext_adv_info *ext_adv;
-> -       const struct hci_ev_conn_complete *conn_complete =3D (void *)skb-=
->data;
-> -       const struct hci_ev_conn_request *conn_request =3D (void *)skb->d=
-ata;
-> -
-> -       hci_dev_lock(hdev);
-> +       lockdep_assert_held(&hdev->lock);
->
->         /* If we are currently suspended and this is the first BT event s=
-een,
->          * save the wake reason associated with the event.
->          */
->         if (!hdev->suspended || hdev->wake_reason)
-> -               goto unlock;
-> +               return;
-> +
-> +       if (!bdaddr) {
-> +               hdev->wake_reason =3D MGMT_WAKE_REASON_UNEXPECTED;
-> +               return;
-> +       }
->
->         /* Default to remote wake. Values for wake_reason are documented =
-in the
->          * Bluez mgmt api docs.
->          */
->         hdev->wake_reason =3D MGMT_WAKE_REASON_REMOTE_WAKE;
-> -
-> -       /* Once configured for remote wakeup, we should only wake up for
-> -        * reconnections. It's useful to see which device is waking us up=
- so
-> -        * keep track of the bdaddr of the connection event that woke us =
-up.
-> -        */
-> -       if (event =3D=3D HCI_EV_CONN_REQUEST) {
-> -               bacpy(&hdev->wake_addr, &conn_request->bdaddr);
-> -               hdev->wake_addr_type =3D BDADDR_BREDR;
-> -       } else if (event =3D=3D HCI_EV_CONN_COMPLETE) {
-> -               bacpy(&hdev->wake_addr, &conn_complete->bdaddr);
-> -               hdev->wake_addr_type =3D BDADDR_BREDR;
-> -       } else if (event =3D=3D HCI_EV_LE_META) {
-> -               struct hci_ev_le_meta *le_ev =3D (void *)skb->data;
-> -               u8 subevent =3D le_ev->subevent;
-> -               u8 *ptr =3D &skb->data[sizeof(*le_ev)];
-> -               u8 num_reports =3D *ptr;
-> -
-> -               if ((subevent =3D=3D HCI_EV_LE_ADVERTISING_REPORT ||
-> -                    subevent =3D=3D HCI_EV_LE_DIRECT_ADV_REPORT ||
-> -                    subevent =3D=3D HCI_EV_LE_EXT_ADV_REPORT) &&
-> -                   num_reports) {
-> -                       adv =3D (void *)(ptr + 1);
-> -                       direct_adv =3D (void *)(ptr + 1);
-> -                       ext_adv =3D (void *)(ptr + 1);
-> -
-> -                       switch (subevent) {
-> -                       case HCI_EV_LE_ADVERTISING_REPORT:
-> -                               bacpy(&hdev->wake_addr, &adv->bdaddr);
-> -                               hdev->wake_addr_type =3D adv->bdaddr_type=
-;
-> -                               break;
-> -                       case HCI_EV_LE_DIRECT_ADV_REPORT:
-> -                               bacpy(&hdev->wake_addr, &direct_adv->bdad=
-dr);
-> -                               hdev->wake_addr_type =3D direct_adv->bdad=
-dr_type;
-> -                               break;
-> -                       case HCI_EV_LE_EXT_ADV_REPORT:
-> -                               bacpy(&hdev->wake_addr, &ext_adv->bdaddr)=
-;
-> -                               hdev->wake_addr_type =3D ext_adv->bdaddr_=
-type;
-> -                               break;
-> -                       }
-> -               }
-> -       } else {
-> -               hdev->wake_reason =3D MGMT_WAKE_REASON_UNEXPECTED;
-> -       }
-> -
-> -unlock:
-> -       hci_dev_unlock(hdev);
-> +       bacpy(&hdev->wake_addr, bdaddr);
-> +       hdev->wake_addr_type =3D addr_type;
->  }
->
->  #define HCI_EV_VL(_op, _func, _min_len, _max_len) \
-> @@ -7830,14 +7801,15 @@ void hci_event_packet(struct hci_dev *hdev, struc=
-t sk_buff *skb)
->
->         skb_pull(skb, HCI_EVENT_HDR_SIZE);
->
-> -       /* Store wake reason if we're suspended */
-> -       hci_store_wake_reason(hdev, event, skb);
-> -
->         bt_dev_dbg(hdev, "event 0x%2.2x", event);
->
->         hci_event_func(hdev, event, skb, &opcode, &status, &req_complete,
->                        &req_complete_skb);
->
-> +       hci_dev_lock(hdev);
-> +       hci_store_wake_reason(hdev, NULL, 0);
-> +       hci_dev_unlock(hdev);
-> +
->         if (req_complete) {
->                 req_complete(hdev, status, opcode);
->         } else if (req_complete_skb) {
-> --
-> 2.50.0
-
-https://sashiko.dev/#/patchset/f0d72bf42b33441991665b23e293c879.security%40=
-1.0.0.127.in-addr.arpa
-
-Seems valid to me, so we probably need to call hci_store_wake_reason
-in more event handlers.
-
---=20
-Luiz Augusto von Dentz
+aGNpX3N0b3JlX3dha2VfcmVhc29uKCkgaXMgY2FsbGVkIGZyb20gaGNpX2V2ZW50X3BhY2tldCgp
+IGltbWVkaWF0ZWx5CmFmdGVyIHN0cmlwcGluZyB0aGUgSENJIGV2ZW50IGhlYWRlciBidXQgYmVm
+b3JlIGhjaV9ldmVudF9mdW5jKCkKZW5mb3JjZXMgdGhlIHBlci1ldmVudCBtaW5pbXVtIHBheWxv
+YWQgbGVuZ3RoIGZyb20gaGNpX2V2X3RhYmxlLgpUaGlzIG1lYW5zIGEgc2hvcnQgSENJIGV2ZW50
+IGZyYW1lIGNhbiByZWFjaCBiYWNweSgpIGJlZm9yZSBhbnkgYm91bmRzCmNoZWNrIHJ1bnMuCgpS
+YXRoZXIgdGhhbiBkdXBsaWNhdGluZyBza2IgcGFyc2luZyBhbmQgcGVyLWV2ZW50IGxlbmd0aCBj
+aGVja3MgaW5zaWRlCmhjaV9zdG9yZV93YWtlX3JlYXNvbigpLCBtb3ZlIHdha2UtYWRkcmVzcyBz
+dG9yYWdlIGludG8gdGhlIGluZGl2aWR1YWwKZXZlbnQgaGFuZGxlcnMgYWZ0ZXIgdGhlaXIgZXhp
+c3RpbmcgZXZlbnQtbGVuZ3RoIHZhbGlkYXRpb24gaGFzCnN1Y2NlZWRlZC4gQ29udmVydCBoY2lf
+c3RvcmVfd2FrZV9yZWFzb24oKSBpbnRvIGEgc21hbGwgaGVscGVyIHRoYXQgb25seQpzdG9yZXMg
+YW4gYWxyZWFkeS12YWxpZGF0ZWQgYmRhZGRyIHdoaWxlIHRoZSBjYWxsZXIgaG9sZHMgaGNpX2Rl
+dl9sb2NrKCkuClVzZSB0aGUgc2FtZSBoZWxwZXIgYWZ0ZXIgaGNpX2V2ZW50X2Z1bmMoKSB3aXRo
+IGEgTlVMTCBhZGRyZXNzIHRvCnByZXNlcnZlIHRoZSBleGlzdGluZyB1bmV4cGVjdGVkLXdha2Ug
+ZmFsbGJhY2sgc2VtYW50aWNzIHdoZW4gbm8KdmFsaWRhdGVkIGV2ZW50IGhhbmRsZXIgcmVjb3Jk
+cyBhIHdha2UgYWRkcmVzcy4KCkFubm90YXRlIHRoZSBoZWxwZXIgd2l0aCBfX211c3RfaG9sZCgm
+aGRldi0+bG9jaykgYW5kIGFkZApsb2NrZGVwX2Fzc2VydF9oZWxkKCZoZGV2LT5sb2NrKSBzbyBm
+dXR1cmUgY2FsbCBwYXRocyBrZWVwIHRoZSBsb2NrCmNvbnRyYWN0IGV4cGxpY2l0LgoKQ2FsbCB0
+aGUgaGVscGVyIGZyb20gaGNpX2Nvbm5fcmVxdWVzdF9ldnQoKSwgaGNpX2Nvbm5fY29tcGxldGVf
+ZXZ0KCksCmhjaV9zeW5jX2Nvbm5fY29tcGxldGVfZXZ0KCksIGxlX2Nvbm5fY29tcGxldGVfZXZ0
+KCksCmhjaV9sZV9hZHZfcmVwb3J0X2V2dCgpLCBoY2lfbGVfZXh0X2Fkdl9yZXBvcnRfZXZ0KCks
+CmhjaV9sZV9kaXJlY3RfYWR2X3JlcG9ydF9ldnQoKSwgaGNpX2xlX3BhX3N5bmNfZXN0YWJsaXNo
+ZWRfZXZ0KCksIGFuZApoY2lfbGVfcGFzdF9yZWNlaXZlZF9ldnQoKS4KCkZpeGVzOiAyZjIwMjE2
+YzFkNmYgKCJCbHVldG9vdGg6IEVtaXQgY29udHJvbGxlciBzdXNwZW5kIGFuZCByZXN1bWUgZXZl
+bnRzIikKQ2M6IHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmcKU2lnbmVkLW9mZi1ieTogT2xlaCBLb25r
+byA8c2VjdXJpdHlAMXNlYWwub3JnPgotLS0KIG5ldC9ibHVldG9vdGgvaGNpX2V2ZW50LmMgfCA5
+NCArKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KIDEgZmlsZSBjaGFuZ2Vk
+LCAzNSBpbnNlcnRpb25zKCspLCA1OSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9uZXQvYmx1
+ZXRvb3RoL2hjaV9ldmVudC5jIGIvbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYwppbmRleCAyODY1
+MjlkMmU1NTQuLjgxZDJmOWEzZWVjOSAxMDA2NDQKLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfZXZl
+bnQuYworKysgYi9uZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jCkBAIC04MCw2ICs4MCwxMCBAQCBz
+dGF0aWMgdm9pZCAqaGNpX2xlX2V2X3NrYl9wdWxsKHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBzdHJ1
+Y3Qgc2tfYnVmZiAqc2tiLAogCXJldHVybiBkYXRhOwogfQogCitzdGF0aWMgdm9pZCBoY2lfc3Rv
+cmVfd2FrZV9yZWFzb24oc3RydWN0IGhjaV9kZXYgKmhkZXYsCisJCQkJICBjb25zdCBiZGFkZHJf
+dCAqYmRhZGRyLCB1OCBhZGRyX3R5cGUpCisJX19tdXN0X2hvbGQoJmhkZXYtPmxvY2spOworCiBz
+dGF0aWMgdTggaGNpX2NjX2lucXVpcnlfY2FuY2VsKHN0cnVjdCBoY2lfZGV2ICpoZGV2LCB2b2lk
+ICpkYXRhLAogCQkJCXN0cnVjdCBza19idWZmICpza2IpCiB7CkBAIC0zMTExLDYgKzMxMTUsNyBA
+QCBzdGF0aWMgdm9pZCBoY2lfY29ubl9jb21wbGV0ZV9ldnQoc3RydWN0IGhjaV9kZXYgKmhkZXYs
+IHZvaWQgKmRhdGEsCiAJYnRfZGV2X2RiZyhoZGV2LCAic3RhdHVzIDB4JTIuMngiLCBzdGF0dXMp
+OwogCiAJaGNpX2Rldl9sb2NrKGhkZXYpOworCWhjaV9zdG9yZV93YWtlX3JlYXNvbihoZGV2LCAm
+ZXYtPmJkYWRkciwgQkRBRERSX0JSRURSKTsKIAogCS8qIENoZWNrIGZvciBleGlzdGluZyBjb25u
+ZWN0aW9uOgogCSAqCkBAIC0zMjc0LDYgKzMyNzksMTAgQEAgc3RhdGljIHZvaWQgaGNpX2Nvbm5f
+cmVxdWVzdF9ldnQoc3RydWN0IGhjaV9kZXYgKmhkZXYsIHZvaWQgKmRhdGEsCiAKIAlidF9kZXZf
+ZGJnKGhkZXYsICJiZGFkZHIgJXBNUiB0eXBlIDB4JXgiLCAmZXYtPmJkYWRkciwgZXYtPmxpbmtf
+dHlwZSk7CiAKKwloY2lfZGV2X2xvY2soaGRldik7CisJaGNpX3N0b3JlX3dha2VfcmVhc29uKGhk
+ZXYsICZldi0+YmRhZGRyLCBCREFERFJfQlJFRFIpOworCWhjaV9kZXZfdW5sb2NrKGhkZXYpOwor
+CiAJLyogUmVqZWN0IGluY29taW5nIGNvbm5lY3Rpb24gZnJvbSBkZXZpY2Ugd2l0aCBzYW1lIEJE
+IEFERFIgYWdhaW5zdAogCSAqIENWRS0yMDIwLTI2NTU1CiAJICovCkBAIC01MDIxLDYgKzUwMzAs
+NyBAQCBzdGF0aWMgdm9pZCBoY2lfc3luY19jb25uX2NvbXBsZXRlX2V2dChzdHJ1Y3QgaGNpX2Rl
+diAqaGRldiwgdm9pZCAqZGF0YSwKIAlidF9kZXZfZGJnKGhkZXYsICJzdGF0dXMgMHglMi4yeCIs
+IHN0YXR1cyk7CiAKIAloY2lfZGV2X2xvY2soaGRldik7CisJaGNpX3N0b3JlX3dha2VfcmVhc29u
+KGhkZXYsICZldi0+YmRhZGRyLCBCREFERFJfQlJFRFIpOwogCiAJY29ubiA9IGhjaV9jb25uX2hh
+c2hfbG9va3VwX2JhKGhkZXYsIGV2LT5saW5rX3R5cGUsICZldi0+YmRhZGRyKTsKIAlpZiAoIWNv
+bm4pIHsKQEAgLTU3MTMsNiArNTcyMyw3IEBAIHN0YXRpYyB2b2lkIGxlX2Nvbm5fY29tcGxldGVf
+ZXZ0KHN0cnVjdCBoY2lfZGV2ICpoZGV2LCB1OCBzdGF0dXMsCiAJaW50IGVycjsKIAogCWhjaV9k
+ZXZfbG9jayhoZGV2KTsKKwloY2lfc3RvcmVfd2FrZV9yZWFzb24oaGRldiwgYmRhZGRyLCBiZGFk
+ZHJfdHlwZSk7CiAKIAkvKiBBbGwgY29udHJvbGxlcnMgaW1wbGljaXRseSBzdG9wIGFkdmVydGlz
+aW5nIGluIHRoZSBldmVudCBvZiBhCiAJICogY29ubmVjdGlvbiwgc28gZW5zdXJlIHRoYXQgdGhl
+IHN0YXRlIGJpdCBpcyBjbGVhcmVkLgpAQCAtNjAwNSw2ICs2MDE2LDcgQEAgc3RhdGljIHZvaWQg
+aGNpX2xlX3Bhc3RfcmVjZWl2ZWRfZXZ0KHN0cnVjdCBoY2lfZGV2ICpoZGV2LCB2b2lkICpkYXRh
+LAogCWJ0X2Rldl9kYmcoaGRldiwgInN0YXR1cyAweCUyLjJ4IiwgZXYtPnN0YXR1cyk7CiAKIAlo
+Y2lfZGV2X2xvY2soaGRldik7CisJaGNpX3N0b3JlX3dha2VfcmVhc29uKGhkZXYsICZldi0+YmRh
+ZGRyLCBldi0+YmRhZGRyX3R5cGUpOwogCiAJaGNpX2Rldl9jbGVhcl9mbGFnKGhkZXYsIEhDSV9Q
+QV9TWU5DKTsKIApAQCAtNjQwMyw2ICs2NDE1LDggQEAgc3RhdGljIHZvaWQgaGNpX2xlX2Fkdl9y
+ZXBvcnRfZXZ0KHN0cnVjdCBoY2lfZGV2ICpoZGV2LCB2b2lkICpkYXRhLAogCQkJCQlpbmZvLT5s
+ZW5ndGggKyAxKSkKIAkJCWJyZWFrOwogCisJCWhjaV9zdG9yZV93YWtlX3JlYXNvbihoZGV2LCAm
+aW5mby0+YmRhZGRyLCBpbmZvLT5iZGFkZHJfdHlwZSk7CisKIAkJaWYgKGluZm8tPmxlbmd0aCA8
+PSBtYXhfYWR2X2xlbihoZGV2KSkgewogCQkJcnNzaSA9IGluZm8tPmRhdGFbaW5mby0+bGVuZ3Ro
+XTsKIAkJCXByb2Nlc3NfYWR2X3JlcG9ydChoZGV2LCBpbmZvLT50eXBlLCAmaW5mby0+YmRhZGRy
+LApAQCAtNjQ5MSw2ICs2NTA1LDggQEAgc3RhdGljIHZvaWQgaGNpX2xlX2V4dF9hZHZfcmVwb3J0
+X2V2dChzdHJ1Y3QgaGNpX2RldiAqaGRldiwgdm9pZCAqZGF0YSwKIAkJCQkJaW5mby0+bGVuZ3Ro
+KSkKIAkJCWJyZWFrOwogCisJCWhjaV9zdG9yZV93YWtlX3JlYXNvbihoZGV2LCAmaW5mby0+YmRh
+ZGRyLCBpbmZvLT5iZGFkZHJfdHlwZSk7CisKIAkJZXZ0X3R5cGUgPSBfX2xlMTZfdG9fY3B1KGlu
+Zm8tPnR5cGUpICYgTEVfRVhUX0FEVl9FVlRfVFlQRV9NQVNLOwogCQlsZWdhY3lfZXZ0X3R5cGUg
+PSBleHRfZXZ0X3R5cGVfdG9fbGVnYWN5KGhkZXYsIGV2dF90eXBlKTsKIApAQCAtNjUzNiw2ICs2
+NTUyLDcgQEAgc3RhdGljIHZvaWQgaGNpX2xlX3BhX3N5bmNfZXN0YWJsaXNoZWRfZXZ0KHN0cnVj
+dCBoY2lfZGV2ICpoZGV2LCB2b2lkICpkYXRhLAogCWJ0X2Rldl9kYmcoaGRldiwgInN0YXR1cyAw
+eCUyLjJ4IiwgZXYtPnN0YXR1cyk7CiAKIAloY2lfZGV2X2xvY2soaGRldik7CisJaGNpX3N0b3Jl
+X3dha2VfcmVhc29uKGhkZXYsICZldi0+YmRhZGRyLCBldi0+YmRhZGRyX3R5cGUpOwogCiAJaGNp
+X2Rldl9jbGVhcl9mbGFnKGhkZXYsIEhDSV9QQV9TWU5DKTsKIApAQCAtNjgzNCw2ICs2ODUxLDgg
+QEAgc3RhdGljIHZvaWQgaGNpX2xlX2RpcmVjdF9hZHZfcmVwb3J0X2V2dChzdHJ1Y3QgaGNpX2Rl
+diAqaGRldiwgdm9pZCAqZGF0YSwKIAlmb3IgKGkgPSAwOyBpIDwgZXYtPm51bTsgaSsrKSB7CiAJ
+CXN0cnVjdCBoY2lfZXZfbGVfZGlyZWN0X2Fkdl9pbmZvICppbmZvID0gJmV2LT5pbmZvW2ldOwog
+CisJCWhjaV9zdG9yZV93YWtlX3JlYXNvbihoZGV2LCAmaW5mby0+YmRhZGRyLCBpbmZvLT5iZGFk
+ZHJfdHlwZSk7CisKIAkJcHJvY2Vzc19hZHZfcmVwb3J0KGhkZXYsIGluZm8tPnR5cGUsICZpbmZv
+LT5iZGFkZHIsCiAJCQkJICAgaW5mby0+YmRhZGRyX3R5cGUsICZpbmZvLT5kaXJlY3RfYWRkciwK
+IAkJCQkgICBpbmZvLT5kaXJlY3RfYWRkcl90eXBlLCBIQ0lfQURWX1BIWV8xTSwgMCwKQEAgLTc1
+MTcsNzMgKzc1MzYsMjkgQEAgc3RhdGljIGJvb2wgaGNpX2dldF9jbWRfY29tcGxldGUoc3RydWN0
+IGhjaV9kZXYgKmhkZXYsIHUxNiBvcGNvZGUsCiAJcmV0dXJuIHRydWU7CiB9CiAKLXN0YXRpYyB2
+b2lkIGhjaV9zdG9yZV93YWtlX3JlYXNvbihzdHJ1Y3QgaGNpX2RldiAqaGRldiwgdTggZXZlbnQs
+Ci0JCQkJICBzdHJ1Y3Qgc2tfYnVmZiAqc2tiKQorc3RhdGljIHZvaWQgaGNpX3N0b3JlX3dha2Vf
+cmVhc29uKHN0cnVjdCBoY2lfZGV2ICpoZGV2LAorCQkJCSAgY29uc3QgYmRhZGRyX3QgKmJkYWRk
+ciwgdTggYWRkcl90eXBlKQorCV9fbXVzdF9ob2xkKCZoZGV2LT5sb2NrKQogewotCXN0cnVjdCBo
+Y2lfZXZfbGVfYWR2ZXJ0aXNpbmdfaW5mbyAqYWR2OwotCXN0cnVjdCBoY2lfZXZfbGVfZGlyZWN0
+X2Fkdl9pbmZvICpkaXJlY3RfYWR2OwotCXN0cnVjdCBoY2lfZXZfbGVfZXh0X2Fkdl9pbmZvICpl
+eHRfYWR2OwotCWNvbnN0IHN0cnVjdCBoY2lfZXZfY29ubl9jb21wbGV0ZSAqY29ubl9jb21wbGV0
+ZSA9ICh2b2lkICopc2tiLT5kYXRhOwotCWNvbnN0IHN0cnVjdCBoY2lfZXZfY29ubl9yZXF1ZXN0
+ICpjb25uX3JlcXVlc3QgPSAodm9pZCAqKXNrYi0+ZGF0YTsKLQotCWhjaV9kZXZfbG9jayhoZGV2
+KTsKKwlsb2NrZGVwX2Fzc2VydF9oZWxkKCZoZGV2LT5sb2NrKTsKIAogCS8qIElmIHdlIGFyZSBj
+dXJyZW50bHkgc3VzcGVuZGVkIGFuZCB0aGlzIGlzIHRoZSBmaXJzdCBCVCBldmVudCBzZWVuLAog
+CSAqIHNhdmUgdGhlIHdha2UgcmVhc29uIGFzc29jaWF0ZWQgd2l0aCB0aGUgZXZlbnQuCiAJICov
+CiAJaWYgKCFoZGV2LT5zdXNwZW5kZWQgfHwgaGRldi0+d2FrZV9yZWFzb24pCi0JCWdvdG8gdW5s
+b2NrOworCQlyZXR1cm47CisKKwlpZiAoIWJkYWRkcikgeworCQloZGV2LT53YWtlX3JlYXNvbiA9
+IE1HTVRfV0FLRV9SRUFTT05fVU5FWFBFQ1RFRDsKKwkJcmV0dXJuOworCX0KIAogCS8qIERlZmF1
+bHQgdG8gcmVtb3RlIHdha2UuIFZhbHVlcyBmb3Igd2FrZV9yZWFzb24gYXJlIGRvY3VtZW50ZWQg
+aW4gdGhlCiAJICogQmx1ZXogbWdtdCBhcGkgZG9jcy4KIAkgKi8KIAloZGV2LT53YWtlX3JlYXNv
+biA9IE1HTVRfV0FLRV9SRUFTT05fUkVNT1RFX1dBS0U7Ci0KLQkvKiBPbmNlIGNvbmZpZ3VyZWQg
+Zm9yIHJlbW90ZSB3YWtldXAsIHdlIHNob3VsZCBvbmx5IHdha2UgdXAgZm9yCi0JICogcmVjb25u
+ZWN0aW9ucy4gSXQncyB1c2VmdWwgdG8gc2VlIHdoaWNoIGRldmljZSBpcyB3YWtpbmcgdXMgdXAg
+c28KLQkgKiBrZWVwIHRyYWNrIG9mIHRoZSBiZGFkZHIgb2YgdGhlIGNvbm5lY3Rpb24gZXZlbnQg
+dGhhdCB3b2tlIHVzIHVwLgotCSAqLwotCWlmIChldmVudCA9PSBIQ0lfRVZfQ09OTl9SRVFVRVNU
+KSB7Ci0JCWJhY3B5KCZoZGV2LT53YWtlX2FkZHIsICZjb25uX3JlcXVlc3QtPmJkYWRkcik7Ci0J
+CWhkZXYtPndha2VfYWRkcl90eXBlID0gQkRBRERSX0JSRURSOwotCX0gZWxzZSBpZiAoZXZlbnQg
+PT0gSENJX0VWX0NPTk5fQ09NUExFVEUpIHsKLQkJYmFjcHkoJmhkZXYtPndha2VfYWRkciwgJmNv
+bm5fY29tcGxldGUtPmJkYWRkcik7Ci0JCWhkZXYtPndha2VfYWRkcl90eXBlID0gQkRBRERSX0JS
+RURSOwotCX0gZWxzZSBpZiAoZXZlbnQgPT0gSENJX0VWX0xFX01FVEEpIHsKLQkJc3RydWN0IGhj
+aV9ldl9sZV9tZXRhICpsZV9ldiA9ICh2b2lkICopc2tiLT5kYXRhOwotCQl1OCBzdWJldmVudCA9
+IGxlX2V2LT5zdWJldmVudDsKLQkJdTggKnB0ciA9ICZza2ItPmRhdGFbc2l6ZW9mKCpsZV9ldild
+OwotCQl1OCBudW1fcmVwb3J0cyA9ICpwdHI7Ci0KLQkJaWYgKChzdWJldmVudCA9PSBIQ0lfRVZf
+TEVfQURWRVJUSVNJTkdfUkVQT1JUIHx8Ci0JCSAgICAgc3ViZXZlbnQgPT0gSENJX0VWX0xFX0RJ
+UkVDVF9BRFZfUkVQT1JUIHx8Ci0JCSAgICAgc3ViZXZlbnQgPT0gSENJX0VWX0xFX0VYVF9BRFZf
+UkVQT1JUKSAmJgotCQkgICAgbnVtX3JlcG9ydHMpIHsKLQkJCWFkdiA9ICh2b2lkICopKHB0ciAr
+IDEpOwotCQkJZGlyZWN0X2FkdiA9ICh2b2lkICopKHB0ciArIDEpOwotCQkJZXh0X2FkdiA9ICh2
+b2lkICopKHB0ciArIDEpOwotCi0JCQlzd2l0Y2ggKHN1YmV2ZW50KSB7Ci0JCQljYXNlIEhDSV9F
+Vl9MRV9BRFZFUlRJU0lOR19SRVBPUlQ6Ci0JCQkJYmFjcHkoJmhkZXYtPndha2VfYWRkciwgJmFk
+di0+YmRhZGRyKTsKLQkJCQloZGV2LT53YWtlX2FkZHJfdHlwZSA9IGFkdi0+YmRhZGRyX3R5cGU7
+Ci0JCQkJYnJlYWs7Ci0JCQljYXNlIEhDSV9FVl9MRV9ESVJFQ1RfQURWX1JFUE9SVDoKLQkJCQli
+YWNweSgmaGRldi0+d2FrZV9hZGRyLCAmZGlyZWN0X2Fkdi0+YmRhZGRyKTsKLQkJCQloZGV2LT53
+YWtlX2FkZHJfdHlwZSA9IGRpcmVjdF9hZHYtPmJkYWRkcl90eXBlOwotCQkJCWJyZWFrOwotCQkJ
+Y2FzZSBIQ0lfRVZfTEVfRVhUX0FEVl9SRVBPUlQ6Ci0JCQkJYmFjcHkoJmhkZXYtPndha2VfYWRk
+ciwgJmV4dF9hZHYtPmJkYWRkcik7Ci0JCQkJaGRldi0+d2FrZV9hZGRyX3R5cGUgPSBleHRfYWR2
+LT5iZGFkZHJfdHlwZTsKLQkJCQlicmVhazsKLQkJCX0KLQkJfQotCX0gZWxzZSB7Ci0JCWhkZXYt
+Pndha2VfcmVhc29uID0gTUdNVF9XQUtFX1JFQVNPTl9VTkVYUEVDVEVEOwotCX0KLQotdW5sb2Nr
+OgotCWhjaV9kZXZfdW5sb2NrKGhkZXYpOworCWJhY3B5KCZoZGV2LT53YWtlX2FkZHIsIGJkYWRk
+cik7CisJaGRldi0+d2FrZV9hZGRyX3R5cGUgPSBhZGRyX3R5cGU7CiB9CiAKICNkZWZpbmUgSENJ
+X0VWX1ZMKF9vcCwgX2Z1bmMsIF9taW5fbGVuLCBfbWF4X2xlbikgXApAQCAtNzgzMCwxNCArNzgw
+NSwxNSBAQCB2b2lkIGhjaV9ldmVudF9wYWNrZXQoc3RydWN0IGhjaV9kZXYgKmhkZXYsIHN0cnVj
+dCBza19idWZmICpza2IpCiAKIAlza2JfcHVsbChza2IsIEhDSV9FVkVOVF9IRFJfU0laRSk7CiAK
+LQkvKiBTdG9yZSB3YWtlIHJlYXNvbiBpZiB3ZSdyZSBzdXNwZW5kZWQgKi8KLQloY2lfc3RvcmVf
+d2FrZV9yZWFzb24oaGRldiwgZXZlbnQsIHNrYik7Ci0KIAlidF9kZXZfZGJnKGhkZXYsICJldmVu
+dCAweCUyLjJ4IiwgZXZlbnQpOwogCiAJaGNpX2V2ZW50X2Z1bmMoaGRldiwgZXZlbnQsIHNrYiwg
+Jm9wY29kZSwgJnN0YXR1cywgJnJlcV9jb21wbGV0ZSwKIAkJICAgICAgICZyZXFfY29tcGxldGVf
+c2tiKTsKIAorCWhjaV9kZXZfbG9jayhoZGV2KTsKKwloY2lfc3RvcmVfd2FrZV9yZWFzb24oaGRl
+diwgTlVMTCwgMCk7CisJaGNpX2Rldl91bmxvY2soaGRldik7CisKIAlpZiAocmVxX2NvbXBsZXRl
+KSB7CiAJCXJlcV9jb21wbGV0ZShoZGV2LCBzdGF0dXMsIG9wY29kZSk7CiAJfSBlbHNlIGlmIChy
+ZXFfY29tcGxldGVfc2tiKSB7Ci0tIAoyLjUwLjAKCg==
