@@ -1,160 +1,164 @@
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010018.outbound.protection.outlook.com [52.101.69.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C030342514;
-	Fri, 27 Mar 2026 10:47:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774608465; cv=fail; b=qYNrHkjBEF8gRorWzMaTLoVYizH1sOo6TQI29t0M7pv+WNT4KnVrX1w3nTFbDhrtszxcQn4pnNa0H93HxSCZGyerrVUgjlTCx19Aw5SG/VMHvdW/6lBsK9UpECY+CRZzRSM7GRzKAX5lOGJeiPZBjTU3dwy4RFXOKNFZOokafHI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774608465; c=relaxed/simple;
-	bh=zkp0NZbjcqNthis0qEje2Ard7Ttp2SnZ3DdNlBpPHww=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=FzCU/456vL5jpZw6Ai5q6KAR8AfqcpQbVfALLOsKL7CA2THkK/iR9tLeJVJmKeMXMcAtCn8ZOFlAdDpxdlLjZZMUvwWsDaNO2EyqrOdZr5XZASNBFD16r22FSIKgl9eBZ5R9oR8jTn5PWA+nS9HoJ2kixQcvjDtMFtEWK5lM/uQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=HOzCYH+z; arc=fail smtp.client-ip=52.101.69.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axis.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C80837BE64
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Mar 2026 11:32:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774611168; cv=none; b=Q+ju/0WQmVo/y60dtkUzvh2lTRWhXHS8+Wl8S1iL5dMlUfOfWJNXIanv5bplW+HOa1rAAonpyadH2ZvspDB7dqnKzAbDs6qYFSc/dCIYE7grEFzdGOMxXeZAbv+MCU4k0UCgefWwXk0Mbhz0A/znr6VP1aLGt6swUVGWlvdT0zU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774611168; c=relaxed/simple;
+	bh=TDAiSiJazToZHYNr6Dh0DeIoBUlqtiGdDjSOQFitbU4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=q94CP4Hr37PbcOG8b1pdIgK5SBY28kb42+ngj0AHDtAvOnUEJH6QZr/r1J8VLNoogKNJ0BAp+5oehfDGf+MJI6MzRjyRCFXVK81jV5/0DRz2E56kaB+FAxL5DDIZ6BE7XbezErKEbci8/r83Z2EnwDX3JZIRGXvjzbYAak+EdPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W3Lf+ckt; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="HOzCYH+z"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FgfAlLJE8T1PoH2o0BdNUqHUN++a7jQoumipb/FtZQw4KgZcbaXbxxB7uvYbsu5XXYlnWcqwEf0q0G+6REIo++D/amTOot8i2Jt9lC3thJxzktNlqTSI0qcwiFqMTID+itLfYyu29aQ0nIiv1uI4LIgNH3TTO0VkJJ5R0LNP+Y7+nUpHnOJcbujY/Nx2FjVlrcA/VnKGlsTNmjh7csp8V86HVBPgyl58j5GTGOp2y4oFWZ1s1ZX3GQOt6pNzY2BoQexZ8cGVyhNK+NF9soYR2GWXgKXLoJ3ReYbu7BwXn/IiZy3PQYwsCbVh3VDocrth6mMp3dqA0iLe+TJ1/7+t2w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OtcpnrONRdHbg//S68FfzhzUWtWVTCGD1UvXJApCNxk=;
- b=FMYVoaqbh05Tv92NSAuGA0T7aSzmd8QX+k0yrqIgcYOz+yY56yUC42RYCMKXPLf3tqoMb+s2VJ7+Dy/qXGfe0zIJXHXYiUEkpH0vjQ4j2cM7w0/HPYUj8c0daAEnAKXaBrcL1Yellh8zOVTet+iLwFw8436qv4+7emYjNeZ5ottkw4VrIbLWAo0X/NEiXPHu/Gv+Ur0yDbUFFoLIhswMkzFZTMPyzMMfBc4yQH8WLPUg/bWFmTkF72tUl/acfWU8S3cnFZnR2XegU9O2Wikh+M9pjE9sOrXY2rNp5rKDNFoinRzO9aXZbcEYv0nCt2TfghICDKf491SgUxJ9mTEG0Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 195.60.68.100) smtp.rcpttodomain=gmail.com smtp.mailfrom=axis.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=axis.com; dkim=none (message
- not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OtcpnrONRdHbg//S68FfzhzUWtWVTCGD1UvXJApCNxk=;
- b=HOzCYH+z0pHXWt7VMGNvFttkcgDXxoxZYj3IIWz6Q1y8SRm0w3+WlkjZogI4ixiuBFI5HE9dn85UmG9F4wDk3gV7iF4UPDXoH5PwKiEPbPkbo4S3qraoJ4IDrEN+Y93xGxSWqAMjvQHDbclm4A1No4zmubXV7mMWmaz4T87FtZY=
-Received: from DU2PR04CA0010.eurprd04.prod.outlook.com (2603:10a6:10:3b::15)
- by PAXPR02MB7813.eurprd02.prod.outlook.com (2603:10a6:102:225::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.20; Fri, 27 Mar
- 2026 10:47:38 +0000
-Received: from DB1PEPF000509F9.eurprd02.prod.outlook.com
- (2603:10a6:10:3b:cafe::58) by DU2PR04CA0010.outlook.office365.com
- (2603:10a6:10:3b::15) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9745.22 via Frontend Transport; Fri,
- 27 Mar 2026 10:47:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 195.60.68.100)
- smtp.mailfrom=axis.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=axis.com;
-Received-SPF: Pass (protection.outlook.com: domain of axis.com designates
- 195.60.68.100 as permitted sender) receiver=protection.outlook.com;
- client-ip=195.60.68.100; helo=mail.axis.com; pr=C
-Received: from mail.axis.com (195.60.68.100) by
- DB1PEPF000509F9.mail.protection.outlook.com (10.167.242.155) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9745.21 via Frontend Transport; Fri, 27 Mar 2026 10:47:37 +0000
-Received: from se-mail11w.axis.com (10.20.40.11) by se-mail10w.axis.com
- (10.20.40.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.39; Fri, 27 Mar
- 2026 11:47:34 +0100
-Received: from se-intmail02x.se.axis.com (10.4.0.28) by se-mail11w.axis.com
- (10.20.40.11) with Microsoft SMTP Server id 15.2.1748.39 via Frontend
- Transport; Fri, 27 Mar 2026 11:47:34 +0100
-Received: from pc56869-2347.se.axis.com (pc56869-2347.se.axis.com [10.94.2.37])
-	by se-intmail02x.se.axis.com (Postfix) with ESMTP id E23F08EE;
-	Fri, 27 Mar 2026 11:47:34 +0100 (CET)
-Received: by pc56869-2347.se.axis.com (Postfix, from userid 18630)
-	id DF63B6022493; Fri, 27 Mar 2026 11:47:34 +0100 (CET)
-From: Jonathan Rissanen <jonathan.rissanen@axis.com>
-Date: Fri, 27 Mar 2026 11:47:21 +0100
-Subject: [PATCH v3 2/2] Bluetooth: hci_h4: Fix race during initialization
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W3Lf+ckt"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-8cfc1aced74so337954385a.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Mar 2026 04:32:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774611164; x=1775215964; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=G3l2T+hQeL9yWXzzQUIlDsq3vjyfM7fDAelidd9GUEA=;
+        b=W3Lf+cktJSUmKay403V97OBrxdpU2HhX0l+WCb0aJUg/0lQFi1SM8D876viw4vDB1I
+         DKzh3MCWe679Xfg2pqv5IDWsTEEAIfupOUA4w4IfHh/Bf0vBy25FdEfpstOzpqAV+1n1
+         KeQ6S97FVw6cEKJP92vwOnICElix3T+g87Gz4/dml6Rom66bpSpVMOyUa/ppQx1usC6e
+         3gufVSnwW2NhqlBuySGAYd3nabBWrNkQTd9QSEU+dt4v1j715NncqE2xzyJSVY9fCJwk
+         NJexjV74IdfAQcEGF/8GuqA5VrjF4R+hkfPgMZsWc/TRcXt5ZA2h+8wEl5FZSsvav5m9
+         hQJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774611164; x=1775215964;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G3l2T+hQeL9yWXzzQUIlDsq3vjyfM7fDAelidd9GUEA=;
+        b=fjea4281QU2Z4eLIOQ80RlvamuQ6a531jCT5E+eWyCNRISlMb2vj/uNoSGfcdAm1xv
+         MQXTvbhm56Ykqy6pvZ8VrDNRf+lfDgqxb4EThmB2iRQctG5lQe7pjlLkzZ6V1S6xe1Vu
+         V9X5PEhc9G7EiBNRKDkBttIiLvO7GP/HM2w0MhfeqJ/Bk2nuBc5RfeQ5YnP2hwiM5+kF
+         VclG3RiDb1HeCRhZ2TbCHC5Tn/kgOOpEdqVS/CqeR7T/O9myHJqa5Yc0SZScZI+eTeuQ
+         43LOO4SQISKmffvvAmS7QdCwdN03eOAMUtxnh9KAe7+MpLddrvPiNM/He2/IyhAtQSiW
+         O/Jg==
+X-Gm-Message-State: AOJu0YwCwNB02lYQVZUMZcDknvmfCT8f0WnJIx92z4OHdLnCtIWaDGv8
+	dEVvZ+prCiBpXojpuvOJGhKNODavF7GEdghtfvP/mKz0tl3S/t0DgYUGouw9Pg==
+X-Gm-Gg: ATEYQzy33+EncazKn74dr11GUVdmIQJzqU8EMZibvu8eUF93+Wll6nqYZDLYWRIME1r
+	GBB2B/VuXf8CccGCsDvgrxqj0nyReVoYrww/DEYoC0ljbIGS/vtd9bwuay4kOlq2yUooxv125C0
+	gT0I3YdBiC540GAeFW+VWtVoWr97zAS3WWY43dDVrwsx94n33Kby+i9/w76lUBUYoXDlkOrfePR
+	4JeqbCZmr+bWjY+d7N5ov+zIO/ejQ964oAgsWh79juP+rsh5MnRCkXxZT1/KMQzXl9aICJfXoJQ
+	8RthPdCVeXlj/u61x6uhIkrWsHR8fORsoo3qIrDKklnN8uJzbLaRycF5wwGkgeN9tqY8sjPQ8dZ
+	1amMSrrxD0E7vG4PQNlFzZBTe7asAslkocY2RbMvdkliOwLQ1yVQFH7+/UkBl66hzr418iXdZ5M
+	+q/sNH+kHA5IJRQR7VNemZlsPtWD7W
+X-Received: by 2002:a05:620a:17a4:b0:8ca:105a:298f with SMTP id af79cd13be357-8d01c7fc3b5mr255088885a.68.1774611163778;
+        Fri, 27 Mar 2026 04:32:43 -0700 (PDT)
+Received: from [172.17.0.2] ([20.81.159.34])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8d00e3d5b7dsm453118185a.18.2026.03.27.04.32.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Mar 2026 04:32:43 -0700 (PDT)
+Message-ID: <69c66adb.050a0220.1310d0.6d83@mx.google.com>
+Date: Fri, 27 Mar 2026 04:32:43 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1672797038768284456=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, jonathan.rissanen@axis.com
+Subject: RE: Bluetooth: fix race during h4 bluetooth initialization
+In-Reply-To: <20260327-hci-init-fix-v3-1-1b54bad4ef0f@axis.com>
+References: <20260327-hci-init-fix-v3-1-1b54bad4ef0f@axis.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============1672797038768284456==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-ID: <20260327-hci-init-fix-v3-2-1b54bad4ef0f@axis.com>
-References: <20260327-hci-init-fix-v3-0-1b54bad4ef0f@axis.com>
-In-Reply-To: <20260327-hci-init-fix-v3-0-1b54bad4ef0f@axis.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	Jonathan Rissanen <jonathan.rissanen@axis.com>, <kernel@axis.com>
-X-Mailer: b4 0.14.3
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB1PEPF000509F9:EE_|PAXPR02MB7813:EE_
-X-MS-Office365-Filtering-Correlation-Id: 41242f26-b36f-4e8c-050e-08de8bee433b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|82310400026|36860700016|18002099003|56012099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	FcTAQIkNMTtdvk62GkNIHcGq79oylVPMWo432coQ5Tknufx00k1DZ7Cj0NMZToyvJd26xUFr5ixKgB8G3nLOOL4c0niCWoPxwxcjVXc4kDMjFdrjH8BwnJJ6CNIk9VEvWguHY0x0FCyOk0GSfM1jpwTx2h4zm6c2pyrnhj7E8Sk7JqHPDbLwInV4tkDRQ/wTLsZeq+QVC1fSw0ErTEHFAHx4IaxofEqBpcUpieb4bGma8BYA5X9yetNEb+gTqtO1Sz+41w6TCfjAbkHanJcv7Zms1LnFW8YaPZHi2h3OKAxte9lDzX0p9V4LBKtQxtb/YhN6dOPCR40+q9kbRchzo0E/VWez7FgDrFGHFDxj+hYGabdHKPKTcItrkPWd9JClt7Wjb8spOAhePoSpbSJoyV0NdTjJgm2+3A+LvpQPQlgkBGqfxD0Ng+z7xceK/MzDf8nWZ20PbJgLzKP1hdxyFTVs7WKTlPABAoeTdOjuE1oHeXhDUEGjrBcRzkItqDiHDkSiMlW7r3Mq5R4naVriFhQtOUk7joG/2Lr/gMm4CWrxJTlp7pfrULcV6oJ89m7XUwA/t5BfVjeUcY77yTz0nDLOunFKnHTgviDEfwntsHsrA9xzGD02wo10V97uMrBE5P8L4eZHzKVbmFMzOXx5wGbTBRX7Ep9OfcG8w5qEXHe1thb86ZG46VcJznFfz43Ig6S1vSuEy0IAMAJApXuaD2M/VTM7x4A3zcHzLiTBrpClkJw0VXmc984AScYe6KnWL9GBFS/ckN4NJEXk+33Arw==
-X-Forefront-Antispam-Report:
-	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(82310400026)(36860700016)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	dD6udnA7Csj1u7dyFWluGn5sPiP5UyVpMfNHuP2CWESYKsrHW0ClD3rlY6QYgfML9XGxNZM09LgVwe96P9GvoD2w5csi8FGH0Kh9/Y2iaubu+vfhbxUvPPotd+3iwIzHLI1Sb91bEI6IO5EtPUMHanYOVS+xZdazUOOYpkpsAd3yxOjmfaBxyMYAbqH+Umcjdv667Yb/0QJgWGubdPzIceZzsz9pcx5YTnNM0J4mnkUQ0gB2tgni77P0YG4ufDHHOt8ddMqm6FeJMYLztp7Wf4N8uVawgfhHFifZMHGYsIPADWdJheuqpOnSkYYtUPx0P6/hP5LwJegv+/u+GAOI3h4+hiEQqI9nTnMiqG0CQTvfiIY+eLDC7+zgGJVE4306SgLAq0Jmwg60KTVLg2g7s+iBunMZVntQePn6CNSMrTgKUrEuqWFusQAFS5Yth91w
-X-OriginatorOrg: axis.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Mar 2026 10:47:37.8979
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 41242f26-b36f-4e8c-050e-08de8bee433b
-X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF000509F9.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR02MB7813
 
-Commit 5df5dafc171b ("Bluetooth: hci_uart: Fix another race during
-initialization") fixed a race for hci commands sent during initialization.
-However, there is still a race that happens if an hci event from one of
-these commands is received before HCI_UART_REGISTERED has been set at
-the end of hci_uart_register_dev(). The event will be ignored which
-causes the command to fail with a timeout in the log:
+This is automated email and please do not reply to this email!
 
-"Bluetooth: hci0: command 0x1003 tx timeout"
+Dear submitter,
 
-This is because the hci event receive path (hci_uart_tty_receive ->
-h4_recv) requires HCI_UART_REGISTERED to be set in h4_recv(), while the
-hci command transmit path (hci_uart_send_frame -> h4_enqueue) only
-requires HCI_UART_PROTO_INIT to be set in hci_uart_send_frame().
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1073500
 
-The check for HCI_UART_REGISTERED was originally added in commit
-c2578202919a ("Bluetooth: Fix H4 crash from incoming UART packets")
-to fix a crash caused by hu->hdev being null dereferenced. That can no
-longer happen: once HCI_UART_PROTO_INIT is set in hci_uart_register_dev()
-all pointers (hu, hu->priv and hu->hdev) are valid, and
-hci_uart_tty_receive() already calls h4_recv() on HCI_UART_PROTO_INIT
-or HCI_UART_PROTO_READY.
+---Test result---
 
-Remove the check for HCI_UART_REGISTERED in h4_recv() to fix the race
-condition.
+Test Summary:
+CheckPatch                    PENDING   0.39 seconds
+GitLint                       PENDING   0.23 seconds
+SubjectPrefix                 PASS      0.23 seconds
+BuildKernel                   PASS      25.13 seconds
+CheckAllWarning               PASS      30.16 seconds
+CheckSparse                   PASS      26.52 seconds
+BuildKernel32                 PASS      24.27 seconds
+TestRunnerSetup               PASS      519.71 seconds
+TestRunner_l2cap-tester       PASS      27.44 seconds
+TestRunner_iso-tester         FAIL      33.49 seconds
+TestRunner_bnep-tester        PASS      6.40 seconds
+TestRunner_mgmt-tester        FAIL      110.54 seconds
+TestRunner_rfcomm-tester      PASS      9.24 seconds
+TestRunner_sco-tester         FAIL      14.16 seconds
+TestRunner_ioctl-tester       PASS      10.00 seconds
+TestRunner_mesh-tester        FAIL      11.47 seconds
+TestRunner_smp-tester         PASS      8.54 seconds
+TestRunner_userchan-tester    PASS      6.61 seconds
+IncrementalBuild              PENDING   1.04 seconds
 
-Fixes: 5df5dafc171b ("Bluetooth: hci_uart: Fix another race during initialization")
-Signed-off-by: Jonathan Rissanen <jonathan.rissanen@axis.com>
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+BUG: KASAN: slab-use-after-free in le_read_features_complete+0x7e/0x2b0
+Total: 141, Passed: 141 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.102 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.927 seconds
+Mesh - Send cancel - 2                               Timed out    1.996 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/hci_h4.c | 3 ---
- 1 file changed, 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
-index ec017df8572c..1e9e2cad9ddf 100644
---- a/drivers/bluetooth/hci_h4.c
-+++ b/drivers/bluetooth/hci_h4.c
-@@ -109,9 +109,6 @@ static int h4_recv(struct hci_uart *hu, const void *data, int count)
- {
- 	struct h4_struct *h4 = hu->priv;
- 
--	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
--		return -EUNATCH;
--
- 	h4->rx_skb = h4_recv_buf(hu, h4->rx_skb, data, count,
- 				 h4_recv_pkts, ARRAY_SIZE(h4_recv_pkts));
- 	if (IS_ERR(h4->rx_skb)) {
 
--- 
-2.39.5
-
+--===============1672797038768284456==--
