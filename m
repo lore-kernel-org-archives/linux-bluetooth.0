@@ -1,128 +1,104 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2FCE378813
-	for <linux-bluetooth@vger.kernel.org>; Sun, 29 Mar 2026 13:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774791258; cv=none; b=QU+gNbTN3vwljLwBiSgk1cDCCYKspLlUdZ2LoSa7mNXusTqjRxhCGo5uQQWj/cHtbBqMsdldcaVQAvKTv5yk6SlypFCDRgneLpNJPjzOIMY3thcjHWqSMaPttPNMXB747ytsvs9wk6vAa1l/WOtFR0dWBhFHnLzT4TFD55K/cn8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774791258; c=relaxed/simple;
-	bh=AfKe+Ehi5LRfLXpC7YQXSm58/KaiclsCNdK9TD5mCok=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=JjQh7JUUThbLTzNXSRPO2CWvMk/9ReqRUQbxNllgeRyEwTPQGDt8kE7Bs/GZ3vUfFTpLu4OMFGPrgQTC1SUMZbsxQ7vuJFsDT9zaci98899gj/4HvKH9kOWwjZV+u1YpXKM8R9AWRdOxxOMQ7a6csebNm3DaBDySVIaV9EL1ZIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R5qK+RJq; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D832FD7D3
+	for <linux-bluetooth@vger.kernel.org>; Sun, 29 Mar 2026 13:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774791792; cv=pass; b=ltQ3Qv/Q9w85fd5//1QqyUTl2kUeHW5O4VOmIZ5Q6QFeRy2//Pn9eXO/SZPaJaSmooO1fAJg/YAS1y1lgJMNBCj9aSkCEzbcxLTCZpVWs3BUw2YEb5KTTmIpzy2h9o3mky9UqhrTq1yIAm3DoI5XNG6+ZVy28/iamimjowmJVTo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774791792; c=relaxed/simple;
+	bh=7RnhzQXIDmaxtiexQte8hKVzTthM1n0Yj57COwSg7jE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=TECWYrVkKfCO4MbcZtaP2ld1Ht+wgFPDWyEt/e6nqoSZJxG5aEAOoSWkbDTaVWERcTZ2LHOSThHa5ypBuPuEWgguqMxAv1V3IAEH80E8IOGXphHvBgxcGyunPq4P5T1cwaRg7Y81E5BzpfCKZJ8e+ROb51wVXZDQGRKMTTUNdbY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=H7G41g/b; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R5qK+RJq"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8cd7284782dso223163785a.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 29 Mar 2026 06:34:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774791256; x=1775396056; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rg04liEey79kZk+owEofQg1QwGCoISp7eLK3niEX/Xg=;
-        b=R5qK+RJqVHM5YWd+rlToMdUvpRwwn5AycVSjhyEX1/XOTFdLGodfwpqnH/CwhRiJ66
-         8fIRpu2tjDCRol1SPI4PYSl10JRMD3/av7Z+m8M7GT+fV+BTA7/blp1SFZUW4QY/isN4
-         4Byj1wWcfIB+M+y4zZEoCbgshzQxd4XQQv0HhOXenDHLaibkqP4ym8C87RdBjWLljUOO
-         mmPPLQ8vpQDUbEFFT0omwbMPZ0bxyzwXqk+k8z+1Pj+dzf2pYTeZvBdZeserV+hFb3N/
-         KZJfNzuSSX5p9/M2fHLRPsOazDtquztm9yeZ8N9VACvU8e+aMZBzo6gnFmVg4RHtoFES
-         UT6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774791256; x=1775396056;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Rg04liEey79kZk+owEofQg1QwGCoISp7eLK3niEX/Xg=;
-        b=UQtOHMLqrbaX7tBwOqt9uH/dAF8i/4pIxiVMnoIsvbpKrqLFlmmFnb9e9hxYRzypdu
-         Nu5tJI7FH5yc0+B9UoFwcJY+8CzYR8v9x53VI+iDFnEfzidr80MiDizJrxexJMSryvxL
-         T6XffyMzj5AZ01LGz5B0BlI3fxGmIR3jQctKChgZDO+L9lOCDcQngGxc7ws1FBPl790J
-         9fl5OD2tuZbBP8NI7jH7dcrzcuxv+jNa+ezG0/ByrVCmEmqL3mwj9ZBH1I4w8Mwy4AHa
-         45fIaiDwQ1UDEXwckKarwSkD96QyH6fB93qa+JIMNYEQIzGCNjQ59zNgZqdTJx86buld
-         WQVQ==
-X-Gm-Message-State: AOJu0YzpBvz0YeJ78h7HVB/KoFmEG/gO669i8e7BejzUBh/f0pgB5EGm
-	lVjH4m08/fwPSDrGJ874Cg1GOKEPhxlpAE06fbhgQSM2zh4Ko1TUQ1qhLuxlpQ==
-X-Gm-Gg: ATEYQzy7TDgYyG4Qpw9iGegKn9t/6fU/2qh0XpE0Ss+nMQ+0AOZLXQ3UyWGS/3Ta4Tp
-	o+xCHSinJG7M0XOpDG3WB0JCR1N3jiNLBroViHZ7dggWl4EMaMYqz16NqvdkDF78bz1DKucbt2C
-	rfeo9sz6BIcRlfOum0FdWtErUpOnFBHujNaOQKfc1o4L3HJmakEA1FTMGgUqUILyESlHbdU2jtK
-	AlQA2YsczL4sSn2EVbZfcoWUOqXYDIHEpTvxut1eRj8gLgitl5QCp70paZmAUv/5hKGLVzDZcPD
-	mrECvtmyEAPTSO6fuw6pp2n1nYgLllozfPK5S/mA4QXZ6/uxwHSuNElnbUqAIv7ihjXsziKTmpr
-	P8V/Yd5mbYHhc6jLajMYd1KJSdbEywrBSPXsh1KslXVQ6a3Fal6N6iVbbSDIwlvu6huufcUGj0Y
-	KGs5JfQ3Dobqmx/WYdhsrA8WNcZsQhhA==
-X-Received: by 2002:a05:620a:710b:b0:8cf:c877:ed1d with SMTP id af79cd13be357-8d01c84422bmr1207305085a.69.1774791255563;
-        Sun, 29 Mar 2026 06:34:15 -0700 (PDT)
-Received: from [172.17.0.2] ([68.154.116.64])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8d02803f694sm382018485a.29.2026.03.29.06.34.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Mar 2026 06:34:15 -0700 (PDT)
-Message-ID: <69c92a57.e90a0220.178c5f.b609@mx.google.com>
-Date: Sun, 29 Mar 2026 06:34:15 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8688326274319060562=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="H7G41g/b"
+Received: from monolith.lan (unknown [IPv6:2a02:6ea0:1508:6::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4fkFvK32mHzyZ3;
+	Sun, 29 Mar 2026 16:43:09 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1774791789;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oqNvQfPIEMtbUNjQ7t3IB6tyvfcfsMI1x7yMKNA9euc=;
+	b=H7G41g/bwBAw4ZRBpOk/dyVUSJHztBcQciVCOQQs+IG8/APsxP4Rjl3QAkohKNO1RBECWd
+	QrNwUiUoLzhqGFIpLk/ffVK6vEJmFpsc1Pvv+Kk6k43OLROTCNuZAy21oEgrwi4vVL5epj
+	JCvtTFIOcl5TPl1WGx7xnpNA8lrKVtc=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1774791789;
+	b=FZy6zOarmThtmbHP/q4lzm4Ss3r/j3gIEE8VCEGtPH9Wl/z0umyXXgxYJQoCWifedCammv
+	FN6jfeFwS2B5kXvq0bLXvzpy55tdgI3XxrIju6YOs5I668T4te5Ab0vpT5tWJ4sWHbEZr2
+	wK+hh2GQPMbzeEiKk8ZgyYEDw9cZnuU=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1774791789;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oqNvQfPIEMtbUNjQ7t3IB6tyvfcfsMI1x7yMKNA9euc=;
+	b=DvBML/qcqZDW465d779gcOYisxltts8q+bUew3Tg0O2t1a1bWGc8GqWskxwkbUWIoOJIAN
+	aqcf5ovQVz34toL5okdC8j/FlspcbgmOsb3Wr1m0yeqgSQFtY2BS/NQjLvkv/rSAczCWVy
+	pAU1uEx6vNLUdDf2xOxrr/2BYpj/+nY=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH] Bluetooth: hci_sync: fix refcounting in le_read_features_complete
+Date: Sun, 29 Mar 2026 16:43:00 +0300
+Message-ID: <4677ae5da08686a59e6d7d9f12cf19f3ff2b0e31.1774787570.git.pav@iki.fi>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <089f435fb4668921bb416a3d60fa0f232456e054.1774791296.git.pav@iki.fi>
+References: <089f435fb4668921bb416a3d60fa0f232456e054.1774791296.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ] iso-tester: fix missing clear of io_id in callbacks
-In-Reply-To: <9d365c7dcabe381552d97a347aefd5a038716434.1774786982.git.pav@iki.fi>
-References: <9d365c7dcabe381552d97a347aefd5a038716434.1774786982.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8688326274319060562==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+hci_conn refcount acquired in hci_le_read_remote_features() must be
+unconditionally released in the destructor, or it leaks.  The destructor
+is always called if hci_cmd_sync_queue_once() returned with success.
 
-This is automated email and please do not reply to this email!
+Fix the destructor le_read_features_complete() to always release the
+refcount.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1074168
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.30 seconds
-GitLint                       PENDING   0.28 seconds
-BuildEll                      PASS      20.10 seconds
-BluezMake                     PASS      629.26 seconds
-MakeCheck                     PASS      18.79 seconds
-MakeDistcheck                 PASS      244.71 seconds
-CheckValgrind                 PASS      289.19 seconds
-CheckSmatch                   PASS      344.77 seconds
-bluezmakeextell               PASS      180.22 seconds
-IncrementalBuild              PENDING   0.25 seconds
-ScanBuild                     PASS      1003.77 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
-https://github.com/bluez/bluez/pull/1993/checks
-
+Fixes: 60562bebb651 ("Bluetooth: hci_sync: Fix UAF in le_read_features_complete")
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
-Regards,
-Linux Bluetooth
 
+Notes:
+    This probably should be fixup in bluetooth-next/master if it wasn't
+    pulled yet
 
---===============8688326274319060562==--
+ net/bluetooth/hci_sync.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 91d0252ae661..92f87761468b 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -7390,9 +7390,6 @@ static void le_read_features_complete(struct hci_dev *hdev, void *data, int err)
+ 
+ 	bt_dev_dbg(hdev, "err %d", err);
+ 
+-	if (err == -ECANCELED)
+-		return;
+-
+ 	hci_conn_put(conn);
+ }
+ 
+-- 
+2.53.0
+
