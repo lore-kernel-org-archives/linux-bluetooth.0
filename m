@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D832FD7D3
-	for <linux-bluetooth@vger.kernel.org>; Sun, 29 Mar 2026 13:43:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7D3309EE2
+	for <linux-bluetooth@vger.kernel.org>; Sun, 29 Mar 2026 13:43:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774791792; cv=pass; b=ltQ3Qv/Q9w85fd5//1QqyUTl2kUeHW5O4VOmIZ5Q6QFeRy2//Pn9eXO/SZPaJaSmooO1fAJg/YAS1y1lgJMNBCj9aSkCEzbcxLTCZpVWs3BUw2YEb5KTTmIpzy2h9o3mky9UqhrTq1yIAm3DoI5XNG6+ZVy28/iamimjowmJVTo=
+	t=1774791793; cv=pass; b=NPucYjuKe/i83BSC36wcFPjUfOUKIc8VrA0VQ/dOr9tVFTqXxU7hxGmgGFEMA4ScBuV/tFozo0wJBseykB3lqpXo207ss4CGYXGPr7baF6pdjIzRzZguNfQDZkq1km1IVlnIYjOaWDXwz2o/XSssQnBi9QXETnIOlUJ5k0BPVf0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774791792; c=relaxed/simple;
-	bh=7RnhzQXIDmaxtiexQte8hKVzTthM1n0Yj57COwSg7jE=;
+	s=arc-20240116; t=1774791793; c=relaxed/simple;
+	bh=LUN0TB1y+EUPkR+t8vcFvE8PiHtrfcFIcacIQzZ9wN0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TECWYrVkKfCO4MbcZtaP2ld1Ht+wgFPDWyEt/e6nqoSZJxG5aEAOoSWkbDTaVWERcTZ2LHOSThHa5ypBuPuEWgguqMxAv1V3IAEH80E8IOGXphHvBgxcGyunPq4P5T1cwaRg7Y81E5BzpfCKZJ8e+ROb51wVXZDQGRKMTTUNdbY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=H7G41g/b; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=VIK9VdVYlw4hZ2aPNtEMSdxHXXI0mxYZZrccJ0STnv5SgnxdNh8DAiiy0I3xjCRhJrIJ1MtsjIxbieb0/kwQni3ezuxM5mjoIIshOT6XzcU7dtWboaFa8ALl34N353SWZklh2aOkuFpnJgSaxxyjJUcD3RA99ksAgCVSfJRURd4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=OpdnrRwA; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="H7G41g/b"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="OpdnrRwA"
 Received: from monolith.lan (unknown [IPv6:2a02:6ea0:1508:6::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4fkFvK32mHzyZ3;
-	Sun, 29 Mar 2026 16:43:09 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4fkFvL0vwtzyTs;
+	Sun, 29 Mar 2026 16:43:10 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1774791789;
+	t=1774791790;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=oqNvQfPIEMtbUNjQ7t3IB6tyvfcfsMI1x7yMKNA9euc=;
-	b=H7G41g/bwBAw4ZRBpOk/dyVUSJHztBcQciVCOQQs+IG8/APsxP4Rjl3QAkohKNO1RBECWd
-	QrNwUiUoLzhqGFIpLk/ffVK6vEJmFpsc1Pvv+Kk6k43OLROTCNuZAy21oEgrwi4vVL5epj
-	JCvtTFIOcl5TPl1WGx7xnpNA8lrKVtc=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1774791789;
-	b=FZy6zOarmThtmbHP/q4lzm4Ss3r/j3gIEE8VCEGtPH9Wl/z0umyXXgxYJQoCWifedCammv
-	FN6jfeFwS2B5kXvq0bLXvzpy55tdgI3XxrIju6YOs5I668T4te5Ab0vpT5tWJ4sWHbEZr2
-	wK+hh2GQPMbzeEiKk8ZgyYEDw9cZnuU=
+	bh=qbndaXZt+GV5THQ8Mj3nYnkMnYXEWuejd7pGOjCJcFI=;
+	b=OpdnrRwA3SeX07BiGQwccoYywOAcE4GJQAzuR7+INv8SAOIsb2xYjENveLgIPsF7ZU9ohm
+	HmAQMobR/xwPX0Rh9z+pwva+WknwM8n42NhDHvyyLuMBGKM2VlFMuwSwKlqr2bqUUQwRCZ
+	xnMwjEWA0LJbIZk0yhjJyaEqzppxnXM=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1774791790;
+	b=GAmYYG1bfZoHyIfl6+QUbDerSsN1E0oMptWmToAJ3YfxSdvVl3sRQGB5fxbUpM7z4Twazi
+	nyyFLaTyHdh4FLML02UzM3lJtmyxmJ3pSKSCLsi0zqDQC5yFqpwpWtW3FJu1QJo/kDPe2a
+	Hh2C6zMTEXnRlywBY2zocFR5IuOW+IE=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1774791789;
+	s=meesny; t=1774791790;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=oqNvQfPIEMtbUNjQ7t3IB6tyvfcfsMI1x7yMKNA9euc=;
-	b=DvBML/qcqZDW465d779gcOYisxltts8q+bUew3Tg0O2t1a1bWGc8GqWskxwkbUWIoOJIAN
-	aqcf5ovQVz34toL5okdC8j/FlspcbgmOsb3Wr1m0yeqgSQFtY2BS/NQjLvkv/rSAczCWVy
-	pAU1uEx6vNLUdDf2xOxrr/2BYpj/+nY=
+	bh=qbndaXZt+GV5THQ8Mj3nYnkMnYXEWuejd7pGOjCJcFI=;
+	b=KqiHJTCqjtym0OOMIdOjSQn4p+fH6ci7F235DfLzeGXZ5UP8bbU4QvN8q1rUyNlaI+SdJJ
+	SEzQUnUfmllRxb1ikFOJyBh/PVT4EkB9EqRgr1+M/soJNofZP9Vujm9ykBLD8Fa3wiGIMy
+	OUK6853Ho9Y64sqs7Xk50FJObx931PU=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH] Bluetooth: hci_sync: fix refcounting in le_read_features_complete
-Date: Sun, 29 Mar 2026 16:43:00 +0300
-Message-ID: <4677ae5da08686a59e6d7d9f12cf19f3ff2b0e31.1774787570.git.pav@iki.fi>
+Subject: [PATCH v3] Bluetooth: hci_conn: fix potential UAF in set_cig_params_sync
+Date: Sun, 29 Mar 2026 16:43:01 +0300
+Message-ID: <5d61842fafed29f489f472bc6cb324e41f568083.1774787573.git.pav@iki.fi>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <089f435fb4668921bb416a3d60fa0f232456e054.1774791296.git.pav@iki.fi>
 References: <089f435fb4668921bb416a3d60fa0f232456e054.1774791296.git.pav@iki.fi>
@@ -67,37 +67,53 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-hci_conn refcount acquired in hci_le_read_remote_features() must be
-unconditionally released in the destructor, or it leaks.  The destructor
-is always called if hci_cmd_sync_queue_once() returned with success.
+hci_conn lookup and field access must be covered by hdev lock in
+set_cig_params_sync, otherwise it's possible it is freed concurrently.
 
-Fix the destructor le_read_features_complete() to always release the
-refcount.
+Take hdev lock to prevent hci_conn from being deleted or modified
+concurrently.  Just RCU lock is not suitable here, as we also want to
+avoid "tearing" in the configuration.
 
-Fixes: 60562bebb651 ("Bluetooth: hci_sync: Fix UAF in le_read_features_complete")
+Fixes: a091289218202 ("Bluetooth: hci_conn: Fix hci_le_set_cig_params")
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
 
 Notes:
-    This probably should be fixup in bluetooth-next/master if it wasn't
-    pulled yet
+    v3:
+    - no code changes, clearer commit message
+    v2:
+    - no change
 
- net/bluetooth/hci_sync.c | 3 ---
- 1 file changed, 3 deletions(-)
+ net/bluetooth/hci_conn.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 91d0252ae661..92f87761468b 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -7390,9 +7390,6 @@ static void le_read_features_complete(struct hci_dev *hdev, void *data, int err)
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 8cc2cc58c3f8..3a0592599086 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1843,9 +1843,13 @@ static int set_cig_params_sync(struct hci_dev *hdev, void *data)
+ 	u8 aux_num_cis = 0;
+ 	u8 cis_id;
  
- 	bt_dev_dbg(hdev, "err %d", err);
++	hci_dev_lock(hdev);
++
+ 	conn = hci_conn_hash_lookup_cig(hdev, cig_id);
+-	if (!conn)
++	if (!conn) {
++		hci_dev_unlock(hdev);
+ 		return 0;
++	}
  
--	if (err == -ECANCELED)
--		return;
--
- 	hci_conn_put(conn);
- }
+ 	qos = &conn->iso_qos;
+ 	pdu->cig_id = cig_id;
+@@ -1884,6 +1888,8 @@ static int set_cig_params_sync(struct hci_dev *hdev, void *data)
+ 	}
+ 	pdu->num_cis = aux_num_cis;
+ 
++	hci_dev_unlock(hdev);
++
+ 	if (!pdu->num_cis)
+ 		return 0;
  
 -- 
 2.53.0
