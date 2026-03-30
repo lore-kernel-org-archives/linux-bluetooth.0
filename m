@@ -1,63 +1,67 @@
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF31228468E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 14:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C711F2E62C6
+	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 14:33:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774881059; cv=none; b=gih3fiy+qdJk8cVIbHzF+rKP9ae3rt+J2QbjGinqZK0d55cVNZdi59TyQ/X1B3u3EA2+/nFjWc++ZyOedojprxXjKl7U2YC5IVsrC7pr9FZKz7EDvzN5eSTxUfhnWCKNxZZKX1yNKLMdfCZJeFUXXeLrj8eI1ILh6a9udCVSdek=
+	t=1774881237; cv=none; b=EADL2AKNkqMfeJxn8ThAFLZtNHQhqga9O13yOWVWSapsnbEAx1+vPk1bAraKu8cri2ONpWvPiRDDbNLf8bCZysCmNL5o6bh00Bey84Or9koU+4zSOpkHz/8SY60iGLIMaDiFwDIyF/2PKu7ECmKuJXg9DD1olakr3qWhhFFsufc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774881059; c=relaxed/simple;
-	bh=TDnoHUeTmp/TjrTdqiKdWbIGgtIRakvdhmzo7viGBGM=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YdB/cOOA+rsAg+zrwPU8Sdd2rKleXLEAwOQdsSV4as9rrUsBYbmBxmXY75/AnLLVwmfRS/XfkXgQ/006fYWzVnOVVgfBiXoC8vlSCVgwfXzZCJfxlsFkUWk7ZvyP62skQwJlFnRBvHXjP/8Fbnx5DGFh1t878kakXQvMoPf1gOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
+	s=arc-20240116; t=1774881237; c=relaxed/simple;
+	bh=1EZadMils4DQyzFsbMFwWkR5pY+3pv0uNYeeazVyAv4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=BsqbMRu2/2tP3g8X9NYK7ou/lR21PdN9HD+5AftPbpZrBPIuOeWD8ux1zyorcSgaD0cEYxCfZtRu3goVMiWCaWu/QWh6YSFDc7B2B0eHC5l9dnrz9FiSrFDirxQ8NA9QzG1zGiBhuCVTXBcznAiU+tgRXhe2S+4+j5b9Tj+gCJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6019D3EC2B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 14:30:55 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B478E3EC23;
+	Mon, 30 Mar 2026 14:33:53 +0000 (UTC)
+Message-ID: <7bd00a7f42a0d3aaf9d3d0f3a0bb1d9877fc351c.camel@hadess.net>
+Subject: Re: [PATCH BlueZ v3 02/20] emulator: btvirt: allow specifying where
+ server unix sockets are made
 From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] emulator: Remove compile-time header only glib dep
-Date: Mon, 30 Mar 2026 16:30:37 +0200
-Message-ID: <20260330143046.3497403-2-hadess@hadess.net>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260330143046.3497403-1-hadess@hadess.net>
-References: <20260330143046.3497403-1-hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
+Date: Mon, 30 Mar 2026 16:33:52 +0200
+In-Reply-To: <CABBYNZKt7POxvoJw7k0J2YvH4rpx4rfhrJ8+D9XgQwBFxKASuQ@mail.gmail.com>
+References: <cover.1774214693.git.pav@iki.fi>
+	 <41d54c33641f8a6004b3cb9a616c746119e2b156.1774214693.git.pav@iki.fi>
+	 <ed949f2550f79a4bef19bd482bf8b069ad5b7e0c.camel@hadess.net>
+	 <CABBYNZKt7POxvoJw7k0J2YvH4rpx4rfhrJ8+D9XgQwBFxKASuQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: dmFkZTFsF92b/unuq6pG0IVvhM6MBqnJA4n+t99dWaNjPNT8PH0w3mG76J5qL9YCALZgebTS6E4JFKXtlBoXm2vABgt5OdzTkK1/BMKL42gX26aeOWIWZASBZ4j6xPybCj90OeatbD5AJyaf3S0mnydSOJ6KjkTbcJbUYnpGMHRLWbLvXq2f7kXMUN+wq5GUOfpd5tonk86qLF9fYVEU9haKbjWSD4j7XmpVjVIcNdF4PQq5RvOUxATWyVFQ7zU4e47puoRlOwa3YJSmohZztKnzQiMtZD5Nn6GnZqSFV7CyxsTECy+vW04GKv27ezpftQbNgdDRxeyF1vQphShw3bop1GAktNgoCktTSOdtaUNMmSrJjab1hF5ePQWIfuCPB9X0BhJ22etfx4aU6cw4hzBui4jA7zDIeAbq120JXF20XgJ9t2i7iqdM4FZ8x87FpwO5jFyRdtnyBSzq9qFK4/416aKDeJexE9KJxA8gqfiUxbmJPwcOz0Al8s379pPgMTKjKvdlgZnfwpp9NcWqH5VhEsP4w3NO//yO1hP8oCNKc6luLK3noNhr9COe79tuKkauCbU+UzoAMjxR9QJepuXW01ErXZ3AZ8yyGz3p1tDWIqKHXVT/4CsYm/8y5lJBBfYQh+/rDybGakedhe7YzmPdX4ZVIblkzCc5eR24cd1GRO4r9Q
 X-GND-State: clean
-X-GND-Score: 0
+X-GND-Score: -100
+X-GND-Cause: dmFkZTGYTRiwFMT9R34a9iFtiT2bwTe0jc6lOm9pHNvZhSUAL6xJiVhZM7Qj4CujPynu5jcgcgkGcwa9yWvOJbhRnQvOGBvXynVNX2aONbabX9beWSrnHp5XAgKzm6dNpl1sGGe2aerMFJ0RPiU0ymoiSICeRf5m5j8045bfbeL93Grt6q0jGmhHJR9KSpW0rNtutw4aMFViQZnkxavSDUBle5eUqUH8eL47gN6ysQuzU527l5/TRp6k1W+sEgin2AvoB8sgjM8PozcXiYEP1nxx1tmw98usXKMOvNomBLpPuq48OZt8uSpcBQm43eYBrWmjZxmAk3cLvqq1n1rFlShRSDHiBIfHmeLmL87j0FPrn4iT83VydvREtweH44mimmJh47KwCbeOABBDhGhsmlcuvMcp0eW9PXdloisrExlGY8Df7IiCg5Rdd6RXJe3ZY3Upd6PTTgNS4ciTOSf33owDI3GuIbycvWjpkXRjQ+hwaW7dIPS1mYAXo2iN38qk8T/Pi0JG5TZg39zeNqA8z7gM5K2nDAu6L2tXOSM0WtXVOVup29d7eIxxPwCrg9pHYMq39YoGKcQDnaJ0LSLvW8yVG3NIP4y6SVVVA2Je5I5+wheHk3GBAWRBcH8iZs7XOUdfVJEg7Mg5+hZhmiGGxGPz7PmY1tnplEtFpG0gly8t1Gklkw
 
-btvirt relied on a glib header macro to use MIN/MAX, but didn't link
-against it, meaning that it was dependent on other programs in the
-project using glib to compile correctly.
+On Mon, 2026-03-30 at 10:01 -0400, Luiz Augusto von Dentz wrote:
+> > If we were allowed to use new glib calls, this hand-rolled code
+> > should
+> > probably use like g_build_filename():
+> > https://docs.gtk.org/glib/func.build_filename.html
+> > and g_auto:
+> > https://docs.gtk.org/glib/auto-cleanup.html
+> > to simplify the code.
+>=20
+> Don't really want to drag new dependecies.
 
-Remove the include and use our own implementation instead.
----
- emulator/btdev.c | 2 --
- 1 file changed, 2 deletions(-)
+btvirt depended on glib's headers. I've sent a patch to remove that
+use.
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index d3a9c6735ff1..3a295b679f34 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -25,8 +25,6 @@
- #include <fcntl.h>
- #include <unistd.h>
- 
--#include <glib.h>
--
- #include "bluetooth/bluetooth.h"
- #include "bluetooth/hci.h"
- 
--- 
-2.53.0
+>=20
+> > Luiz, could we have have an update to maintainer-guidelines.rst to
+> > reflect the current guidelines for using or adding glib calls to
+> > the
+> > code?
 
+Do you want me to send a patch to the maintainer-guidelines to explain
+that glib usage is fine as long as the binary already links to it? (or
+needs a robust mainloop, as we've seen recently with btmgmt?)
