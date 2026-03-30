@@ -1,160 +1,85 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC79B386C22
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 22:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A7F3AC0C3
+	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 22:15:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774908620; cv=none; b=SCZi2knV5InXruyrwNDdtTAGE4Y9ELpWCMAJp/ZTXnAGrlGeF24EUZXvOOTKfKa8tCeb5hqYoWWNgS2wL3rTd9WPnqBA6z26UCdoWk9nyU4Zy8C4H4SHIKXXC4QZDaURZm4AscPxxPpi9W3Lb1w0Trx10aTmq0wQPCJZn89ibog=
+	t=1774908923; cv=none; b=ac0hJxLLdS1r5nIswSZjFOjegJT+2jsnHOP9pMQHXYa3gYRFKZwpe6aXS9GuyY02gZ//SFsJq9113oLSADsbhQPFMo6kOiLBm//QkoHKimw8C052FtXwi1FR/TSdNl6/U0wWOKlgz1oo+g9lFBWO9OKSnuxfyb9W9bqzzuuBrQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774908620; c=relaxed/simple;
-	bh=FDBfk2gTLu1bF0rsxtRP8sgWzUpvU/oWz/qYiDUySTE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hEzMPuEhr/SYBFUJIzNhw02cQpIcMmlePxx1eZFtz4zOERJpyoG4iMkv298iA1Isq0WxRo/RbfB/AK2VXQ2+v7Z7c+pKNW2Yv2u85CHyYc6lykhr1yKaXoLcaEph2Qx5w9HtRDrBfM/EKXkAyHBZ3vCyVjzgsnEQM7TrRRcWxKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dMN/ajqG; arc=none smtp.client-ip=209.85.222.174
+	s=arc-20240116; t=1774908923; c=relaxed/simple;
+	bh=pX2WKX3zToh3vvAGp3fpKMyHP0+PbOINuhyqYDLke84=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Cc:Subject:
+	 In-Reply-To:References; b=kvHzytEkhoqt1ssyltJluNEoJm+jT4u1lrqgGwLqy4NbQ25viVWAH44RHoT6ZAjslG+rM9LNs7aTkGI5cWPH0wPw+MFwS1ZtI8XeAudk7EabB3yreOXPtXQpi+Eb/Z9XtHvsapeMvDpKfXjlhx2zGwUsgiv+OPQHWmGz03h/b4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EpJfmaQ7; arc=none smtp.client-ip=209.85.160.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dMN/ajqG"
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-8cd78a4ce8dso704648885a.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 15:10:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EpJfmaQ7"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-50b35f3e489so58766771cf.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 15:15:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774908617; x=1775513417; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PvvCrpWMzIENV2FZlq4KX5Fhj0gALiIkbUI42JoqXcU=;
-        b=dMN/ajqGZgDB0BeeTodBZ3BYWpk0wyvyv5Bms5HCIIhrJGl9Lt622sRaTO0UwgBu2X
-         x8XtnbqCnehgFY+hOxzbBHdx9UJETg/ocYpvKZwFC98D4fsSSeotzKqgB4v9Xaki3tmP
-         BUqHweologJtWuWwl6B9y/9iWNiY8H1qtuZFI/Dsw5EPfS3L6yS5rFWgkUkaoQjomGYk
-         WiftKPRIxxT5d+tMzv9CBBTcJ5HQHPnElIpLGlGMOtD+phaI6SjZ0CNT7l5AijGGIsw6
-         AhJg3EUX66IWybd4dAKOI/7rSfEqCWygk2hbgmj+veshKiwzOtGn7vwlrVw9h8r/nZ+I
-         B7Sw==
+        d=gmail.com; s=20251104; t=1774908921; x=1775513721; darn=vger.kernel.org;
+        h=references:in-reply-to:subject:cc:to:from:content-transfer-encoding
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pX2WKX3zToh3vvAGp3fpKMyHP0+PbOINuhyqYDLke84=;
+        b=EpJfmaQ7x6LAgCSEhddsbzlSWSu8QsDY1iRnWhnelAsKJBUtWyRPVVYjsRgklx69vy
+         gdSqX05dXQlMo1ti4e89/l1LwS8SMy4tkwUx0oWDLO7EZG3Dcu/54bMQ/rSbyN7Ymw2i
+         M0oA06gssUXcwiuFY+9Sy9OaGy1zV95v6gh2nv3MQdx6MODM6DOCeyS3KuGdpXzArm2+
+         xLLVdzGGsFbGRQ83P+oVmzeOyz7bSvnbLyeGgKBvUOnhNAii753rsoDuBVqq+lJdtNnx
+         D4awjVCfqngRgFolb57LkV4pnFGcDwd/2zWl7301CPrZAGCcHK4eHSdHI5PoVavITEnn
+         LXgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774908617; x=1775513417;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=PvvCrpWMzIENV2FZlq4KX5Fhj0gALiIkbUI42JoqXcU=;
-        b=Jyeq8MD9dCPYKw19SYRsr1qpVfAbGl0S6vx4fZSnWg0kv4Tb2GBWhaP4hcHZBJ4xi/
-         cT4VKf5zqRG3VjK0p+mejZ83x2U3zBG5f891mAhQCeSRGZBLR4koXLJjgQtyNrEN/EHv
-         QRwA1nfHc/YROT7DuH9DnuL5JYcDgdLeEneDENI0s0232UckjGigvJOvzvRdBUiJxukT
-         +cOkz8d7DBGecs0lJmN9Nkxr0oGNQSqQvh9QUvPlT7R2Q27xhWh485gNOpGDPxzaiU6K
-         WXbqrAGNnjqsxRjRMyblC5oGN1Y/IPDOzb8osCm5RidW/tb3bL1gIjCn/y2reaJxuWL5
-         mnVg==
-X-Gm-Message-State: AOJu0YwR2vnn1bQegovAh4452ocVQnfN8ZwsV24v8Ec79+Tc9i0CeNuS
-	00cyCKx6RHE7/NF4MOaoiG8jy2GGgd9c/8ImRIdSwOxBFhj0BKg0ygKUJ4ULiGQv
-X-Gm-Gg: ATEYQzyOAjvdLcJuXnRv6CTqEIFbrhYy2/aCIzHK/SuqSTu070/41+4JFs/S/8V16PM
-	PGI5qAYW3HGddCfnQ/LcBTfTF2atu4x+VhYChdKFNlhPE5jemedurywRIUZe4F9mjR6tyT9gdHa
-	3sxcgCfA3iwQyZ95PevHKUDdhVrp+AYDuS5ZfPVCS03GWRIMTqfkwL1jLNj9P6+zey3q86p7P1V
-	yxsoKJs4mUVjqgtNyswwA2t/0cXrsE/K3v3ToTXm4mfuPUqLzYNpp40dXRx6trUKrK4XJ7pUQz/
-	zEu9k8RwbKLZqquKfcLCZgcv1RGrf53eoe/+Gc9pe9WF5iQVj/8SKjLrEARMc7diSp2GSaD2VyV
-	7VunLj7QiTbl8kJN3gYyTqnFs/CF9A3U5Ug+tdOnbaLIJOhlUylSR8YITydt22hKGkQtflZFo7v
-	OQmVwPMnT9ubmG1aff0xD7bLes6er0QCzsitw/07P0tTY1H1XF+DfF/+Y9HyBC9c0a0Ijmrx/kk
-	RkEa6XOLzrUBl1rWYDBeA==
-X-Received: by 2002:a05:620a:4547:b0:8c6:a8a6:e164 with SMTP id af79cd13be357-8d01c796d8emr1904826285a.45.1774908617261;
-        Mon, 30 Mar 2026 15:10:17 -0700 (PDT)
-Received: from mango-teamkim.. ([129.170.197.108])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8d028095f1csm819343585a.47.2026.03.30.15.10.16
+        d=1e100.net; s=20251104; t=1774908921; x=1775513721;
+        h=references:in-reply-to:subject:cc:to:from:content-transfer-encoding
+         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pX2WKX3zToh3vvAGp3fpKMyHP0+PbOINuhyqYDLke84=;
+        b=d6HF7ldHMSnIMGWUrjZPXl+9o19MDD4/woqLUyZ3vtyVh6Tt6pxZgrtXdaXYuAuh5Y
+         gbMM/YwB84lV0cmqZBWkbAcXojOoE0VKqRL7jAc0INbTUtifHxunjCDIo1oECOW2bjSb
+         atOy+7AY71QWhH9NHY4Up6ypLeXpPl0PIWP0uBM7qeWxUYoN6kHDVIPzLzzU6Mz0aCwz
+         ZF8N/pdNnpoatGvC1WPRLEx1lBeUAdsp3wL9+hQ2vBjDLmxpIpOglO+itgl9ATDSQaeb
+         jqDiHObi8cdDN8Fh06mJSxfqzGH9anEJl7ATG+oFtkkBEE/Yhhu8lKNOEHdCoqOx6eGl
+         qG/Q==
+X-Gm-Message-State: AOJu0YxW2WzCRnaZcueAo4a7LIx8rJ7fPQhxz2NaUbsVTtVuZygvD+jo
+	YYKNFF5tvolPo8tmwatE200zd9SHVRa1IPwBDbx7ob8E1+EXcvJzsRwd
+X-Gm-Gg: ATEYQzz8clTN6vvS2Xqz89KATpbu4ZUAULr0M9YOWH90v8z7F8QGkGiE/R4dXN9bry0
+	skow0DL34+Kd/GLV//Cdfe33c85RPExQqR1SekkiYqfGIDL5WFtgZP1O20aN5IWbLlGgQcUvJfF
+	WN3V+rR/iB3Ctx+xLibhTtqTrfJOBWXxWo2drrQtwwpravE9wgciHWoF+ehoOCSTsWcLQi0fleh
+	suzGaDgrth/4vY2wVNeGktdT94raSWgpu4d2ukYduN0gqEfPiQuypqIqSq5lLormL7sds67uDlA
+	iJXd+VUy5/Q1RF9TLZ8v+J01oWLNaczOFcxmK20fWmvCiTKF5XuL2y5zCy7U79gWYNOqTBx5B/H
+	y653YF5ZpXFV+z14nAWRk4LqmdUO/fMWurNTuY4tkq4RC6YnCXoWb4XEYUxMwi5tLRCOExE7L8C
+	L2LWQVwD+386FK7KbUGgeDwbrLEHRH/2vK6GJbMgqzsh6c0xIbN1qt2Sed4oBh6QdCwfCx/BsF0
+	zD1NKHr3CMrhGJxPHMPTmHBiH5Hlyjs
+X-Received: by 2002:a05:622a:514d:b0:509:3fc5:a840 with SMTP id d75a77b69052e-50d2c62eb15mr17601591cf.10.1774908920743;
+        Mon, 30 Mar 2026 15:15:20 -0700 (PDT)
+Received: from localhost6.localdomain6 ([129.170.197.108])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50bb3df388dsm92762281cf.6.2026.03.30.15.15.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 15:10:16 -0700 (PDT)
-From: Nathan Rebello <nathan.c.rebello@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	stable@vger.kernel.org,
-	kyungtae.kim@dartmouth.edu,
-	Nathan Rebello <nathan.c.rebello@gmail.com>
-Subject: [PATCH v3] Bluetooth: ISO: fix NULL deref in iso_recv() ISO_END handling
-Date: Mon, 30 Mar 2026 18:10:15 -0400
-Message-ID: <20260330221015.322337-1-nathan.c.rebello@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260328035813.296410-1-nathan.c.rebello@gmail.com>
-References: <20260328035813.296410-1-nathan.c.rebello@gmail.com>
+        Mon, 30 Mar 2026 15:15:19 -0700 (PDT)
+Message-ID: <69caf5f7.050a0220.3c2ca3.53f7@mx.google.com>
+Date: Mon, 30 Mar 2026 15:15:19 -0700 (PDT)
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+From: Nathan Rebello <nathan.c.rebello@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, xiaoguai0992@gmail.com, kyungtae.kim@dartmouth.edu
+Subject: Re: [PATCH] Bluetooth: ISO: validate ISO_END fragments
+In-Reply-To: <CABBYNZLu31g8KnERbrOSDav90OaYOoSXjcS4ALBi8RmiXMaVig@mail.gmail.com>
+References: <20260328200938.140528-1-xiaoguai0992@gmail.com> <CABBYNZLu31g8KnERbrOSDav90OaYOoSXjcS4ALBi8RmiXMaVig@mail.gmail.com>
 
-The ISO_CONT case in iso_recv() properly checks for unexpected
-continuation frames and oversized fragments before accessing
-conn->rx_skb. The ISO_END case lacks both checks.
+Hi Luiz,
 
-When an ISO_END packet arrives without a preceding ISO_START:
-  - conn->rx_skb is NULL (never allocated)
-  - skb_put(conn->rx_skb, ...) dereferences NULL -> kernel crash
+Thanks for the feedback. I've sent a v3 addressing this -- checking
+!conn->rx_skb instead of !conn->rx_len:
 
-When an ISO_END fragment length does not exactly match the
-remaining expected length:
-  - the reassembly is malformed and must be rejected
+https://lore.kernel.org/linux-bluetooth/20260330221015.322337-1-nathan.c.rebello@gmail.com/
 
-KASAN confirmed the NULL-deref on kernel 7.0.0-rc5 via VHCI:
-
-  general protection fault, probably for non-canonical address 0xdffffc0000000018
-  KASAN: null-ptr-deref in range [0x00000000000000c0-0x00000000000000c7]
-  CPU: 0 UID: 0 PID: 72 Comm: kworker/u9:0 Not tainted 7.0.0-rc5
-  Workqueue: hci0 hci_rx_work
-  RIP: 0010:skb_put+0x27/0x1a0
-  Call Trace:
-   <TASK>
-   iso_recv+0x5e0/0xee0
-   hci_rx_work+0x226/0x730
-   process_one_work+0x633/0x1060
-   worker_thread+0x45b/0xd10
-   kthread+0x2c6/0x3b0
-   ret_from_fork+0x38d/0x5c0
-   </TASK>
-  Kernel panic - not syncing: Fatal exception
-
-Fix by adding validation to the ISO_END case: reject end frames
-when no rx_skb reassembly buffer exists, and reject end fragments
-whose length does not exactly complete the expected reassembly.
-
-Fixes: ccf74f2390d6 ("Bluetooth: Add ISO Socket")
-Cc: stable@vger.kernel.org
-Signed-off-by: Nathan Rebello <nathan.c.rebello@gmail.com>
----
-Changes in v3:
-  - Check !conn->rx_skb instead of !conn->rx_len to correctly
-    handle the case where an ISO_CONT fragment completes rx_len
-    but a valid zero-length ISO_END still follows.
-
-Changes in v2:
-  - Tighten end fragment check from (skb->len > conn->rx_len) to
-    (skb->len != conn->rx_len): the end fragment must exactly
-    complete the reassembly.
-
- net/bluetooth/iso.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index be145e273..7c57b1d22 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -2587,6 +2587,20 @@ int iso_recv(struct hci_dev *hdev, u16 handle, struct sk_buff *skb, u16 flags)
- 		break;
- 
- 	case ISO_END:
-+		if (!conn->rx_skb) {
-+			BT_ERR("Unexpected end frame (len %d)", skb->len);
-+			goto drop;
-+		}
-+
-+		if (skb->len != conn->rx_len) {
-+			BT_ERR("End fragment length mismatch (len %d, expected %d)",
-+			       skb->len, conn->rx_len);
-+			kfree_skb(conn->rx_skb);
-+			conn->rx_skb = NULL;
-+			conn->rx_len = 0;
-+			goto drop;
-+		}
-+
- 		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
- 					  skb->len);
- 		conn->rx_len -= skb->len;
--- 
-2.43.0
-
+Nathan Rebello
