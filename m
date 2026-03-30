@@ -1,162 +1,239 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 070953B5851
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 10:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94E32DF136
+	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 12:30:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774865766; cv=none; b=EQ7Vkz/lfzR0fSh4d1qXluJT2JaM37u5PsGz6QX9dBm5Fdeqj7ygwOAtlToxQVnsD3ATHRTCrFO60KXgKHyjiw3ooaE+rwh6IPdKvdmsNEntYov5QsSXVcQksKyFhS3AmcVJxvErdpSKnFRoBqkYvh6en4T6F3ckPzLdIbY6m3o=
+	t=1774873856; cv=none; b=D3N8xrPECNT08BXv1SXESVeYbm+E0NZRvKcNiUeiGNa54j6Ej2cHm6a6zYw5BK1/wPiQz9N6vSz7jc4aO9ay8X5Evvu7zndjdod1iuz1preP6qKPz2vD1sEN8Q+UzV/jH0ikAiIWTusrGcDqHVbwnhykFIzMMsc4Q4UAnCZVbpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774865766; c=relaxed/simple;
-	bh=s6Rs78s7QHBIbnQquYSseTkdkvUx3NGX1MkYm5hbNwY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=gfRPnaehYmUj1g8W+xZ6sHPst29P900JOVk17s+i9M9Q9TXeHHBHC0AuJ/zmzpbkBQmOqjGn9XQ0HeASjOT1LfpFrr1uhmcAOtvMBzRt0Rsugb9lpoGn27Qn/ec6BTWjRwbe6TPSLxtUOWxFOsdm81LUi1oVm43UQzNU+IEll0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=elrWvIoH; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="elrWvIoH"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-899a5db525cso35162366d6.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 03:16:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774865764; x=1775470564; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=d5Ip9M9I7ZaUs0wFBQHgwpjrmCyZChCOA0gQFVE6ge8=;
-        b=elrWvIoHv/wby1t0Yec1UBw+QfX6g60tJMKDmtm1yT+1xAGcvxOio3TT1RCcTjEYgu
-         KuBE+Juh4wcI5yrG3k3I9SjMqkwJU3vQW0j1bCCkN/y+7/b1eK3K3G5XADRGsKhdQRPd
-         ZXNtIy9ibgP7W8LOFNeXZPan/ShWZuANNJ1LSXQ2z39n2QkPZ4fnYjJvVnSCUFAgcOic
-         kvMCNkO6pT+8jCvXFYY08zRLvW+aAP/rqiepOMH7/XBKExMBZNJZvVHr0thPdmSQ0m33
-         KcTO2w4kBEPM4AprRYCxVnCGnphD7tVou0xAETs/4Ga2mRFUIoIRv8OBLIG792qT7m/j
-         vxpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774865764; x=1775470564;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d5Ip9M9I7ZaUs0wFBQHgwpjrmCyZChCOA0gQFVE6ge8=;
-        b=Bc0FivudUaEW5hScyk8F5ON1/9WbQgcITjrWFc8/Uta63AtCd2IbokQruU1IMX+K9U
-         VkdlMubJrGbQKpewRECmufZiv8PffZrGkEmYw9ExaQRYAsAG+zOjZriVlLxDumbqI0Ss
-         nOsLHyGewH3jHsPgetqEPS9C20LqG9pNwkNt3nk3FVOGXFkKEi+R/5l6Q9U8knU96pgv
-         m51qCx7Kw7JeMw0DUafIPM15tv0/nEuazJHlQcspYSTbH9UFtQwNR39SvcvUbiQOA3K/
-         Z4Hn4xXTAdrAqNXLan4v/y70VZOOz41BzXxiUwaGOukmsqA5OkEj97P1lqH4S8oznI5P
-         IvrQ==
-X-Gm-Message-State: AOJu0Yz9xLfFnmd5x9olWNG0Ci29SB8224IgimJAGzKnE2Hr6WGgLp/0
-	Q107GoIjjkxkC3dqGyJXHEHYdJLbQe5acjWdjUNIAaRZOG+UxrDxSfU4YyljMA==
-X-Gm-Gg: ATEYQzyri/CpSQeMOCWgjRuF/RasNqFlnAbq2pvgyMpUCo/bxm5VghcdNLGW/SrBnpN
-	hYJzep2kfJy10tHPCEMjtDMzRqa2V7ofKG8EYGzebqYPGgnrHSxl5WR3xvgDG/HbbvQ1RAnTGFm
-	d5m/eDjU/vnWYC554dN4kEtPbABQw3vusgRmrKKuNjk8D6/ge/J/jgdaURG5GruMLb6XHSNKGuy
-	FfiaDq+B66R4J+tVdY2SSYV3ANCHszrnxB6NsJxyR1XsYCvzu94SZFxARGH3TFxAGVthuLXIKQT
-	EWv6SdgvjuBIE53ZMHTe61xs44ODUI5WcjZYR2HEbfpBp9lPKCm/gYL0baU2zQPM2aoldCjXEFr
-	HS20JcuNOveM+GTB/KV6UE530//84gXQsXwfyPUG/N+IG8ShU2OXB0Ov90lRuCBpG83qoWQS6R+
-	wXM6tM0RyQa3IXmUALvvv/KmV7Y1C+
-X-Received: by 2002:a0c:f08c:0:b0:89f:2fa:a9b6 with SMTP id 6a1803df08f44-89f02fab135mr94812676d6.37.1774865763692;
-        Mon, 30 Mar 2026 03:16:03 -0700 (PDT)
-Received: from [172.17.0.2] ([20.161.28.96])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89ed03333c7sm58260266d6.47.2026.03.30.03.16.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 03:16:03 -0700 (PDT)
-Message-ID: <69ca4d63.d40a0220.138193.4eee@mx.google.com>
-Date: Mon, 30 Mar 2026 03:16:03 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3143537221408914808=="
+	s=arc-20240116; t=1774873856; c=relaxed/simple;
+	bh=A65XVjnfWCEicbXhgYWn9CKClmElL9qgiQPojauceH4=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=sSDbsGfWA15rfDaIu1HpabjYG9i8Bj5I+5bdDTefsyl/rk/KO2dWHK/Y57m3GImecQM7iMqVo/XopkKQIBZlGiiJw5o/etzx8EMmoStkJiyeZaa5Qh27zhQ51A25MF6iVDLxPGLo6txvJYn4U9nXt6JHTTGgoTv5ya2pg3pcdVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 79CC23EC1B;
+	Mon, 30 Mar 2026 12:30:46 +0000 (UTC)
+Message-ID: <ed949f2550f79a4bef19bd482bf8b069ad5b7e0c.camel@hadess.net>
+Subject: Re: [PATCH BlueZ v3 02/20] emulator: btvirt: allow specifying where
+ server unix sockets are made
+From: Bastien Nocera <hadess@hadess.net>
+To: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
+Date: Mon, 30 Mar 2026 14:30:46 +0200
+In-Reply-To: <41d54c33641f8a6004b3cb9a616c746119e2b156.1774214693.git.pav@iki.fi>
+References: <cover.1774214693.git.pav@iki.fi>
+	 <41d54c33641f8a6004b3cb9a616c746119e2b156.1774214693.git.pav@iki.fi>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, johan@kernel.org
-Subject: RE: Bluetooth: refactor endpoint lookup
-In-Reply-To: <20260330094134.1622788-2-johan@kernel.org>
-References: <20260330094134.1622788-2-johan@kernel.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-GND-Sasl: hadess@hadess.net
+X-GND-Cause: dmFkZTGZNaDYCvYHnLyGBTGayvcz2UjV9HrRbZgzOilq6nyL4nq2T67sdhGU4NkoMJTckWctzGawWvqA8CCiQhzEJy29StKferBPHOgur5AVK+h2xzfBuMUk6EzDAfDi4CoGuof0LsoTwWSA1tJiUDKRwyVQD8eOjK6LFMSj9BGqCT8IMGO6+zsbV9fDDuGj1g62siJvnoru4AeAXT44x/+k6S+OYEFuqBvBfVfqCzIkoOvcaucTdVMQC1MjJo65/o+xXcVN1tRyrXtlqFIMARM6fmh0PqdTGwlOID9MNz/ebo9vKIaGDybPdnAxrjNk0UPkH2k28NJABWWkLYTaVf2eUDj8sgFRzqcym8JDhCqNH3ha8/oB17T89qSpkxuje+DvtF5mBoIdT7JA0bdgyeyOjN9Y2AGes6SXr32ibaUK8Je0LUT0JWhwF8baTYQrTMyOddSRULh7XB4y2oC5gUPD4Xx3yvDORATdnoVGup4yhHRCqkVZS5igQ+/fxZo43fWJmAn6NsvACs+jXMcN5Pr7Bbovv3kKffyDeGCoRmU3eHL39ANS4yZ9CzYSgI/Fz2fb+5vFTFsIzbZPMSMVSw/yAiJG/NQtsgKVMpuwmcRc7Hq7MjRGaKcybGc+gdMh7n7aPG7NiIgbvSfUXHOGSg9gWGE1rFkS9hH5xbdwWAGb1htfpg
+X-GND-State: clean
+X-GND-Score: -100
 
---===============3143537221408914808==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Sun, 2026-03-22 at 23:29 +0200, Pauli Virtanen wrote:
+> Make --server to take optional path name where to create the various
+> server sockets.
+> ---
+> =C2=A0emulator/main.c | 37 ++++++++++++++++++++++++-------------
+> =C2=A01 file changed, 24 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/emulator/main.c b/emulator/main.c
+> index 456fcd98e..09d6e9adb 100644
+> --- a/emulator/main.c
+> +++ b/emulator/main.c
+> @@ -18,6 +18,7 @@
+> =C2=A0#include <stdbool.h>
+> =C2=A0#include <getopt.h>
+> =C2=A0#include <sys/uio.h>
+> +#include <limits.h>
+> =C2=A0
+> =C2=A0#include "src/shared/mainloop.h"
+> =C2=A0#include "src/shared/util.h"
+> @@ -46,7 +47,7 @@ static void usage(void)
+> =C2=A0	printf("options:\n"
+> =C2=A0		"\t-d=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Enable debug\n"
+> =C2=A0		"\t-S=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Create local serial =
+port\n"
+> -		"\t-s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Create local server
+> sockets\n"
+> +		"\t-s[path=3D/tmp]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Cre=
+ate local server
+> sockets\n"
+> =C2=A0		"\t-t[port=3D45550]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Cre=
+ate a TCP server\n"
+> =C2=A0		"\t-l[num]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Number of local
+> controllers\n"
+> =C2=A0		"\t-L=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Create LE only
+> controller\n"
+> @@ -60,7 +61,7 @@ static void usage(void)
+> =C2=A0static const struct option main_options[] =3D {
+> =C2=A0	{ "debug",=C2=A0=C2=A0 no_argument,=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 NULL, 'd' },
+> =C2=A0	{ "serial",=C2=A0 no_argument,=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ NULL, 'S' },
+> -	{ "server",=C2=A0 no_argument,=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NULL=
+, 's' },
+> +	{ "server",=C2=A0 optional_argument, NULL, 's' },
+> =C2=A0	{ "tcp",=C2=A0=C2=A0=C2=A0=C2=A0 optional_argument, NULL, 't' },
+> =C2=A0	{ "local",=C2=A0=C2=A0 optional_argument, NULL, 'l' },
+> =C2=A0	{ "le",=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 no_argument,=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 NULL, 'L' },
+> @@ -88,6 +89,7 @@ int main(int argc, char *argv[])
+> =C2=A0	struct server *server5;
+> =C2=A0	bool debug_enabled =3D false;
+> =C2=A0	bool server_enabled =3D false;
+> +	const char *server_path =3D "/tmp";
+> =C2=A0	uint16_t tcp_port =3D 0;
+> =C2=A0	bool serial_enabled =3D false;
+> =C2=A0	int letest_count =3D 0;
+> @@ -100,7 +102,7 @@ int main(int argc, char *argv[])
+> =C2=A0	for (;;) {
+> =C2=A0		int opt;
+> =C2=A0
+> -		opt =3D getopt_long(argc, argv,
+> "dSst::l::LBAU::T::vh",
+> +		opt =3D getopt_long(argc, argv,
+> "dSs::t::l::LBAU::T::vh",
+> =C2=A0						main_options, NULL);
+> =C2=A0		if (opt < 0)
+> =C2=A0			break;
+> @@ -114,6 +116,8 @@ int main(int argc, char *argv[])
+> =C2=A0			break;
+> =C2=A0		case 's':
+> =C2=A0			server_enabled =3D true;
+> +			if (optarg)
+> +				server_path =3D optarg;
+> =C2=A0			break;
+> =C2=A0		case 't':
+> =C2=A0			if (optarg)
+> @@ -196,28 +200,35 @@ int main(int argc, char *argv[])
+> =C2=A0	}
+> =C2=A0
+> =C2=A0	if (server_enabled) {
+> -		server1 =3D server_open_unix(SERVER_TYPE_BREDRLE,
+> -						"/tmp/bt-server-
+> bredrle");
+> +		char path[PATH_MAX];
+> +
+> +		snprintf(path, sizeof(path), "%s/%s", server_path,
+> +							"bt-server-
+> bredrle");
+> +		server1 =3D server_open_unix(SERVER_TYPE_BREDRLE,
+> path);
 
-This is automated email and please do not reply to this email!
+If we were allowed to use new glib calls, this hand-rolled code should
+probably use like g_build_filename():
+https://docs.gtk.org/glib/func.build_filename.html
+and g_auto:
+https://docs.gtk.org/glib/auto-cleanup.html
+to simplify the code.
 
-Dear submitter,
+Luiz, could we have have an update to maintainer-guidelines.rst to
+reflect the current guidelines for using or adding glib calls to the
+code?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1074462
+Pauli, do you think we could have helpers for this sort of path
+manipulation in src/shared? Not saying it needs to be to the level of
+complexity of the g_build_filename() implementation, but snprintf()...:
+https://github.com/GNOME/glib/blob/main/glib/gfileutils.c#L1926
 
----Test result---
+Luiz, another question, could we start using __attribute__(cleanup())
+in bluez?
 
-Test Summary:
-CheckPatch                    PENDING   0.34 seconds
-GitLint                       PENDING   0.40 seconds
-SubjectPrefix                 PASS      0.22 seconds
-BuildKernel                   PASS      26.62 seconds
-CheckAllWarning               PASS      29.36 seconds
-CheckSparse                   PASS      28.29 seconds
-BuildKernel32                 PASS      25.82 seconds
-TestRunnerSetup               PASS      568.19 seconds
-TestRunner_l2cap-tester       PASS      28.30 seconds
-TestRunner_iso-tester         PASS      38.29 seconds
-TestRunner_bnep-tester        PASS      6.37 seconds
-TestRunner_mgmt-tester        FAIL      112.29 seconds
-TestRunner_rfcomm-tester      PASS      9.41 seconds
-TestRunner_sco-tester         FAIL      14.48 seconds
-TestRunner_ioctl-tester       PASS      10.29 seconds
-TestRunner_mesh-tester        FAIL      12.47 seconds
-TestRunner_smp-tester         PASS      8.68 seconds
-TestRunner_userchan-tester    PASS      6.72 seconds
-IncrementalBuild              PENDING   0.93 seconds
+Consider the following example, adapted from systemd:
+#include <stddef.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+static inline void freep(void *p) {
+        free(*(void**) p);=20
+}
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+#define _cleanup_(f) __attribute__((cleanup(f)))
+#define _cleanup_free_ _cleanup_(freep)
 
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 485 (98.2%), Failed: 5, Not Run: 4
+int main(int argc, char **argv)
+{
+        _cleanup_free_ char *foo =3D NULL;
 
-Failed Test Cases
-Adv. connectable & connected (central) - Success     Failed       0.136 seconds
-Adv. non-connectable & connected (central) - Success Failed       0.134 seconds
-Ext Adv. connectable & connected (central)           Failed       0.172 seconds
-Ext Adv. non-connectable & connected (central)       Failed       0.179 seconds
-Read Exp Feature - Success                           Failed       0.105 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+        foo =3D strdup("my string");
 
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.683 seconds
-Mesh - Send cancel - 2                               Timed out    1.992 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+        printf ("%s\n", foo);
 
+        return 0;
+}
 
+Is that something we could use? Happy to send a patchset to implement
+the basics of it, and cleanup a few places where that would make the
+code more readable.
 
----
-Regards,
-Linux Bluetooth
+As the systemd coding style says in
+https://systemd.io/CODING_STYLE/#memory-allocation
 
+"Make use of _cleanup_free_ and friends. It makes your code much nicer
+to read (and shorter)!"
 
---===============3143537221408914808==--
+> =C2=A0		if (!server1)
+> =C2=A0			fprintf(stderr, "Failed to open BR/EDR/LE
+> server\n");
+> =C2=A0
+> -		server2 =3D server_open_unix(SERVER_TYPE_BREDR,
+> -						"/tmp/bt-server-
+> bredr");
+> +		snprintf(path, sizeof(path), "%s/%s", server_path,
+> +							"bt-server-
+> bredr");
+> +		server2 =3D server_open_unix(SERVER_TYPE_BREDR, path);
+> =C2=A0		if (!server2)
+> =C2=A0			fprintf(stderr, "Failed to open BR/EDR
+> server\n");
+> =C2=A0
+> -		server3 =3D server_open_unix(SERVER_TYPE_AMP,
+> -						"/tmp/bt-server-
+> amp");
+> +		snprintf(path, sizeof(path), "%s/%s", server_path,
+> +							"bt-server-
+> amp");
+> +		server3 =3D server_open_unix(SERVER_TYPE_AMP, path);
+> =C2=A0		if (!server3)
+> =C2=A0			fprintf(stderr, "Failed to open AMP
+> server\n");
+> =C2=A0
+> -		server4 =3D server_open_unix(SERVER_TYPE_LE,
+> -						"/tmp/bt-server-
+> le");
+> +		snprintf(path, sizeof(path), "%s/%s", server_path,
+> +							"bt-server-
+> le");
+> +		server4 =3D server_open_unix(SERVER_TYPE_LE, path);
+> =C2=A0		if (!server4)
+> =C2=A0			fprintf(stderr, "Failed to open LE
+> server\n");
+> =C2=A0
+> -		server5 =3D server_open_unix(SERVER_TYPE_MONITOR,
+> -						"/tmp/bt-server-
+> mon");
+> +		snprintf(path, sizeof(path), "%s/%s", server_path,
+> +							"bt-server-
+> mon");
+> +		server5 =3D server_open_unix(SERVER_TYPE_MONITOR,
+> path);
+> =C2=A0		if (!server5)
+> =C2=A0			fprintf(stderr, "Failed to open monitor
+> server\n");
+> =C2=A0	}
