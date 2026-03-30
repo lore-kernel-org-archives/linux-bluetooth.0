@@ -1,301 +1,159 @@
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35D919DF6A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 14:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774879284; cv=pass; b=OXF6idaNqlqZotdLYIIcMsoyjQsGhmXwpYLV/olCCJx3/trPboTGmja8kV1/cI51scGsbmb9dso27MOV8KO6Q67lDs90kvwFCBvst0eoxeiSpmSkRhj8OHTzC3fjIn9ewfrdMkEE6mH5m21Qo8CtyR/Oj8coXi5UpZhjrBewYJs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774879284; c=relaxed/simple;
-	bh=+TNcqLcie3cVOvYAn+4dZc4Hn1CAe7Vhi3nlyh3iLmU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=U+WeTbhVq+FssDl8FUQ/QO/FMqY76M0QsZP/sdCP5vJ68dHihibsNidBhHWKFmOf3Guep50uPqjAYuQPtPCMOylMWpT0qFNGNK6NySM74MGFNNf2CeKguuq0qjblMWBz//7XKxiFacGtK5EPkLTz3DtX/ZKRpqL6vXUTEOSTCgo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dU+BXKSY; arc=pass smtp.client-ip=74.125.224.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3133C3D4138
+	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 14:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774879467; cv=none; b=t6eVxetmv+OKSzASTuHFLJO1SEPoa2HB2egU4SefZJXJt4kpfd43fEiWNtL91rZEgzypHiRUxEcqix5FPI8tOZEcmBGIB+EWxR/Ny/nT8OWA/q6Y855uO76oZBIU/QwzjYmGr5yVWsO450uwqvmg0R0lT5v/ZO/8FrqxKeKN/Ys=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774879467; c=relaxed/simple;
+	bh=L0gl5ZvGzXWpu5CM/BlfL3VlES43T/wr0UNKCn7zalw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gdy+TOBtQbB00kXUJVfbW+g663agcqWhX+OlxFENcOyo6/QHqiio485dbbi45mgJFLko30n6UXICGAk7qHw4qEWTO6bPxqJQoHqGS6NJ+sjzPls1V4Lm8JeSU/RSpGzwCuekDmBAGclBHhrRB0Y9sieeyQz/qsBQ92rAXjTHzL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZTI8viNu; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dU+BXKSY"
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-650158138d9so2206149d50.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 07:01:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774879282; cv=none;
-        d=google.com; s=arc-20240605;
-        b=hm6CynFLKcIMZ6H/mnbqZWagDZEgYY3Gdddbwuq6F8sKedV8wjiWxITWqUWPFAX0b6
-         GgRRWxWqpQ4y3uDoiHubfu4qj60H/k6BV76BLNTNy9Dx9t+FSMAKgrnr7+uodVVR8tWK
-         zdefN37M/mGObtZ4195LrXxJKr46oHHcKjw21cg+cAv/AYwSG7z0su/KPwFFcnqRLkYv
-         Ic+A9qEF/Q/ZEUauORFSxEHHqgmHLGbT+yP1BkY2/rvxwpeSEXdcfM/R5fbP/zCQp/4p
-         CUFWTWGggLUeJiuEBpsLoT7wG4RfNWP0GlR6duLfMKp+xRN1/Lw6fu73XSC89PBo5wi5
-         QdKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=iz/oZf7U+ic/PgCGX2KicGxC3pM9cMVW8/mHCowexu8=;
-        fh=17q+SCcltX/E//iUrbAEWKpALk8TdeHyyZPZFPD1Y88=;
-        b=aEGFgdKQJozLwCytyMK3dzswrQMkUrrH+oQlUh0gIjIqEo3fFpvs5npeZp2f8JqZ1E
-         ub8mP8FxBJ8Z9fmmU0PcG3GB2pQTaUZIAkdBXWYaD5xYCvAvtR/aIeL106jSOs28CVH2
-         XL5IoH3cJyHBIQoy0Eqxbzjaic69ZnZ0e1pMDQrT+YZvnrOrxn0HnRmsfJNlHY2kNWHT
-         spc/hjSoBpqhZZCS1Smo6pV4oZBhQuPGP0pppqOfuoh6+gNliohW8R490Ka/L9gu0Bg1
-         3cMFvnaK6mIjvAvzDIyauLBufaJfqc1HV9hG5iE3FiLgA122bTxEgNri0KVGgqOQoP35
-         iBqw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZTI8viNu"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4853a485721so6484155e9.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 07:04:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774879282; x=1775484082; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iz/oZf7U+ic/PgCGX2KicGxC3pM9cMVW8/mHCowexu8=;
-        b=dU+BXKSYJ18MWrTZOxd6XfktZrJZ8SjfreB5dBNkhAlsuJj91TpkawZOA3rWzgvKfr
-         iwFiC1coaJcqyQFlhssOtyHYiSMl2Ytdbpw/91++w6l0y3XCDMuMxmhCnbFDhEwYyiKU
-         iiAeG6tchyFhZSDsJP7zptBgBbO87e0T1HALOlAwNx1rvRRLqDinp+qTdXONTVbdpWBT
-         TELXOw5cX0DsbtPPrGO+F+y2VA7Dhc3DOxbtnOrAI5b3xWjP2keAcWshmGEuEvK84VbA
-         mL0d4ej9I4gtWSyKnNmrYlwz0lt4XToL4SBjj0E11MXM5tFIg+95k2IgU2KAPCJdQCr8
-         2y/g==
+        d=gmail.com; s=20251104; t=1774879464; x=1775484264; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GDmJDYaQn1v0SJ7Zi6FTasnNARSB0I+h5h5AqOO5/W0=;
+        b=ZTI8viNuGfdq3Xli1FuOKsqDPUUeiTDqwELcxgU1/I0lRGrRo4q7L/GDH4KiPPsdQ6
+         1ae3IBpYoQWFFiN8JDVMeAzO+24pG8KlaQ3EQnCrQBiIMT+QFZpHk/CaeCyQK64gFnxF
+         OBDR8uEQiVWpKYDIzo3ssbL+iZqwAfpXA5ysYita+YbJZtwQaXboHBSA/V8riUmZfCIy
+         mL1a9d56Q8G9IXSuDSdqI+5CpjfJyvKyheQIRUwvuavyeTRJaIrEDweHmC0GXW2A0/c+
+         uOEWLunlMc36v5Chbtx6mxLHAVsDAmy1PFpkpD7xIs4rYX68Xz9nSPBrK+/SQ87m/wvV
+         RXmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774879282; x=1775484082;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=iz/oZf7U+ic/PgCGX2KicGxC3pM9cMVW8/mHCowexu8=;
-        b=C1iGichvj3n1XNjQjdAefFXva7qegApDyG8I4q0f/ntAx6csgoFITg9k5FpyaFwEkK
-         mysgYEPsvrGkenpzhEKT+Q6nHS6XRT1/GzWa8ERnvJtMW94UULkUAs3YdfN+XQoCoGji
-         gkAT6XrJ2zsXrAMs4l9CRyW36yOAxV9quCoxpnv4QYEUa2WJ0+HcpYWBxMaQ5UzW/kBG
-         idvNYbtWbx2C1klTeiUVHGtSBXhtzMfpzrHUn3LS8598efTgM9cu81kRi1Ryz69wm01P
-         8BO2hvdpM7XrbIbuH7VrvwzMVf14jEa9EQEqH+410xIHBdO87nWgkPKgl9MkSRxBTlt4
-         8mjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUhi/oZwVWszaNgVRwgcUaJFGSiyh3COLnfDRkH3dLB1sUmoOMRubUjmln9QKjbTS+Id5qSj/cDC1azzAY7HNU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyzh5FP4QJpmtC2oKmjYJpXlt005X2SUH42cMe9n1T+09gJHnT8
-	OML94mdUsYzpAL9bg7CGUJKsM07hPElRSe8sR9crgilRcMOcztl0TQb5KPVGlkqPu+eqxhZxnYa
-	cv/4wMRC4xpUb4G307FbecAla1eZUZ5U=
-X-Gm-Gg: ATEYQzz+oM1MZKYF6y8K235qtRs054AZg6JG9eTUmHnMcgccO6p6zGVUcC+vUIQ2jFM
-	VIIH7Fdf2kI93Dq/dCHNUJ32VD2b2p3kg/iqd03bM93l+U5Gp+kWvMxdTY5MZ9xiXoUdpYTKASJ
-	cww1nPhABh2LEQ9iwFVob7ODLNz1EnBjQBB930c6gUbZECJGDh6RWmuZa3gwVpLbTuXOih9TXMm
-	XfMmtJ0kBkhKXl3xlXAI5+khUwElGLPOsR6dVHnMXXgT9xmH2NQHyBag+vs/GlKz9PQH0Fp960A
-	zlq7yTfW1kkB8vwGAhiOHK7tO5UetR1v8fX55fyOt9JLv9MXLgc7YEQxYLGdiRxkJX2i6g==
-X-Received: by 2002:a05:690e:11ce:b0:64e:a4f6:1de0 with SMTP id
- 956f58d0204a3-64ff722f89amr12004075d50.35.1774879279964; Mon, 30 Mar 2026
- 07:01:19 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1774879464; x=1775484264;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GDmJDYaQn1v0SJ7Zi6FTasnNARSB0I+h5h5AqOO5/W0=;
+        b=np9KxWz9ECzYG24JAdKz0FrctL2Ahp4S0TyhgakmNoKUBY33zejqUkFaLcCi1kcDYO
+         DzO8zeje5bHhQAcEe8P/g5bjxXbfwcm97Ipzp+9vrmrQ11P88eKxaBlQAUu5N04EkRQO
+         sotGHvOPSk5ax6BCsE6yCdp4Y5DoGRWgyD1/ltsnCGmPx+0pcsWhZ3FLVJzK1NdZ20mS
+         7Boj5FyVa7e4Ee8qJkB1uZjBNNdxpQrYKBPikZh6pJS7/m6u2niNkiLMfn+xBJbL+jRN
+         Ui9o5DI8qfmi/9RTd5P9rQFaywwd8Z2jgHYpdfQfCx/lEsTQKKpp9A4aQgr/LZwOfALg
+         vHag==
+X-Gm-Message-State: AOJu0YxrMjCumhSLPah0VA2eI8CURBTzDQ3V9w/t9SIbQblVN/1aDc/s
+	8i77qk7yGCCHlfFOtxF+LEbOVEhbjOs0n/8eSm5/9ThsL4Pot+xYNZPgeO0T+Ki19Kk=
+X-Gm-Gg: ATEYQzz1itsOVNpVFWsQv0JZZtJTzpq2O9YAhd6c9t6slljTLZKWTank9WII8WBql/K
+	YD5nvyhwb0iO6fT7k83PvxhFv6bDWK/EnicBaw3maf9Lzi9ZNDkCAvblyxNoZdXwOgYxyukiwXp
+	GnWxrMlg2AGdEmiU34iHE6S+CRmzYiiqh/FG7PUpBDeWDlN54G+v6qTPo6sPbkylyuOZ0xDMARl
+	jSng2K2z5e8Yr37k6FqepUIr5lnpmXFy2tCSO6T23PsCg+wZE4p1b1WXMNsMiCxkBpPl8GRG1lL
+	gehx/ncVGDZAW/NUIHI+mHn0MaNjVu/6OvLFunaEEq0/9n/5gmCl4eP+k7gedNrsenEdWyy+C4v
+	KuczK7d0Q6GqTIYMnEvlpQF2IofTPhemHQOplvdjysOm0gtIyrRI35jn01MeaeN/h70dkaGpqLB
+	bmF0EImi17P3ouJZCsW5bd48Qyk8zp/Dfd+ZB8IXAw6CZikFI9+AXf8uncekzeqrQXVTsVyiIwR
+	F/x/B0F6PlRHw3fgrrnBMv6on/K
+X-Received: by 2002:a05:600c:c178:b0:487:1fbb:5a1c with SMTP id 5b1f17b1804b1-48727ef5629mr113171685e9.2.1774879464062;
+        Mon, 30 Mar 2026 07:04:24 -0700 (PDT)
+Received: from localhost ([2a01:cb1d:4ec:6700:174f:90cc:2ec3:a84b])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48722c6b495sm541568475e9.2.2026.03.30.07.04.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Mar 2026 07:04:23 -0700 (PDT)
+From: Aaron Esau <aaron1esau@gmail.com>
+X-Google-Original-From: Aaron Esau <git@aaronesau.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	linux-kernel@vger.kernel.org,
+	Aaron Esau <aaron1esau@gmail.com>
+Subject: [PATCH 1/3] Bluetooth: hci_conn: fix UAF in create_big_sync and create_big_complete
+Date: Mon, 30 Mar 2026 16:03:47 +0200
+Message-ID: <20260330140347.906689-2-git@aaronesau.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1774214693.git.pav@iki.fi> <41d54c33641f8a6004b3cb9a616c746119e2b156.1774214693.git.pav@iki.fi>
- <ed949f2550f79a4bef19bd482bf8b069ad5b7e0c.camel@hadess.net>
-In-Reply-To: <ed949f2550f79a4bef19bd482bf8b069ad5b7e0c.camel@hadess.net>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 30 Mar 2026 10:01:07 -0400
-X-Gm-Features: AQROBzCfXytCneF5VKEQihMzPOzQFhw1UPBaIBK6LMGI5XxGYsELBgOFswvJkHA
-Message-ID: <CABBYNZKt7POxvoJw7k0J2YvH4rpx4rfhrJ8+D9XgQwBFxKASuQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 02/20] emulator: btvirt: allow specifying where
- server unix sockets are made
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Bastien,
+From: Aaron Esau <aaron1esau@gmail.com>
 
-On Mon, Mar 30, 2026 at 8:36=E2=80=AFAM Bastien Nocera <hadess@hadess.net> =
-wrote:
->
-> On Sun, 2026-03-22 at 23:29 +0200, Pauli Virtanen wrote:
-> > Make --server to take optional path name where to create the various
-> > server sockets.
-> > ---
-> >  emulator/main.c | 37 ++++++++++++++++++++++++-------------
-> >  1 file changed, 24 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/emulator/main.c b/emulator/main.c
-> > index 456fcd98e..09d6e9adb 100644
-> > --- a/emulator/main.c
-> > +++ b/emulator/main.c
-> > @@ -18,6 +18,7 @@
-> >  #include <stdbool.h>
-> >  #include <getopt.h>
-> >  #include <sys/uio.h>
-> > +#include <limits.h>
-> >
-> >  #include "src/shared/mainloop.h"
-> >  #include "src/shared/util.h"
-> > @@ -46,7 +47,7 @@ static void usage(void)
-> >       printf("options:\n"
-> >               "\t-d                    Enable debug\n"
-> >               "\t-S                    Create local serial port\n"
-> > -             "\t-s                    Create local server
-> > sockets\n"
-> > +             "\t-s[path=3D/tmp]         Create local server
-> > sockets\n"
-> >               "\t-t[port=3D45550]        Create a TCP server\n"
-> >               "\t-l[num]               Number of local
-> > controllers\n"
-> >               "\t-L                    Create LE only
-> > controller\n"
-> > @@ -60,7 +61,7 @@ static void usage(void)
-> >  static const struct option main_options[] =3D {
-> >       { "debug",   no_argument,       NULL, 'd' },
-> >       { "serial",  no_argument,       NULL, 'S' },
-> > -     { "server",  no_argument,       NULL, 's' },
-> > +     { "server",  optional_argument, NULL, 's' },
-> >       { "tcp",     optional_argument, NULL, 't' },
-> >       { "local",   optional_argument, NULL, 'l' },
-> >       { "le",      no_argument,       NULL, 'L' },
-> > @@ -88,6 +89,7 @@ int main(int argc, char *argv[])
-> >       struct server *server5;
-> >       bool debug_enabled =3D false;
-> >       bool server_enabled =3D false;
-> > +     const char *server_path =3D "/tmp";
-> >       uint16_t tcp_port =3D 0;
-> >       bool serial_enabled =3D false;
-> >       int letest_count =3D 0;
-> > @@ -100,7 +102,7 @@ int main(int argc, char *argv[])
-> >       for (;;) {
-> >               int opt;
-> >
-> > -             opt =3D getopt_long(argc, argv,
-> > "dSst::l::LBAU::T::vh",
-> > +             opt =3D getopt_long(argc, argv,
-> > "dSs::t::l::LBAU::T::vh",
-> >                                               main_options, NULL);
-> >               if (opt < 0)
-> >                       break;
-> > @@ -114,6 +116,8 @@ int main(int argc, char *argv[])
-> >                       break;
-> >               case 's':
-> >                       server_enabled =3D true;
-> > +                     if (optarg)
-> > +                             server_path =3D optarg;
-> >                       break;
-> >               case 't':
-> >                       if (optarg)
-> > @@ -196,28 +200,35 @@ int main(int argc, char *argv[])
-> >       }
-> >
-> >       if (server_enabled) {
-> > -             server1 =3D server_open_unix(SERVER_TYPE_BREDRLE,
-> > -                                             "/tmp/bt-server-
-> > bredrle");
-> > +             char path[PATH_MAX];
-> > +
-> > +             snprintf(path, sizeof(path), "%s/%s", server_path,
-> > +                                                     "bt-server-
-> > bredrle");
-> > +             server1 =3D server_open_unix(SERVER_TYPE_BREDRLE,
-> > path);
->
-> If we were allowed to use new glib calls, this hand-rolled code should
-> probably use like g_build_filename():
-> https://docs.gtk.org/glib/func.build_filename.html
-> and g_auto:
-> https://docs.gtk.org/glib/auto-cleanup.html
-> to simplify the code.
+hci_connect_bis() queues create_big_sync with a raw conn pointer.
+create_big_sync blocks in __hci_cmd_sync_sk while a concurrent
+hci_conn_del on hdev->workqueue frees conn. On timeout, freed memory
+is dereferenced. The dequeue path also double-frees: hci_conn_del
+invokes create_big_complete via hci_cmd_sync_dequeue, which calls
+hci_conn_del again.
 
-Don't really want to drag new dependecies.
+Take hci_conn_get before queueing, add hci_conn_valid checks, handle
+-ECANCELED, drop with hci_conn_put in create_big_complete. Follows
+the create_le_conn_complete pattern.
 
-> Luiz, could we have have an update to maintainer-guidelines.rst to
-> reflect the current guidelines for using or adding glib calls to the
-> code?
->
-> Pauli, do you think we could have helpers for this sort of path
-> manipulation in src/shared? Not saying it needs to be to the level of
-> complexity of the g_build_filename() implementation, but snprintf()...:
-> https://github.com/GNOME/glib/blob/main/glib/gfileutils.c#L1926
+Fixes: eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS connections")
+Signed-off-by: Aaron Esau <aaron1esau@gmail.com>
+---
+ net/bluetooth/hci_conn.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
-Perhaps something like a util_filename or something simpler.
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index dc08585..59f5451 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -2119,11 +2119,16 @@ static void hci_iso_qos_setup(struct hci_dev *hdev, struct hci_conn *conn,
+ static int create_big_sync(struct hci_dev *hdev, void *data)
+ {
+ 	struct hci_conn *conn = data;
+-	struct bt_iso_qos *qos = &conn->iso_qos;
++	struct bt_iso_qos *qos;
+ 	u16 interval, sync_interval = 0;
+ 	u32 flags = 0;
+ 	int err;
+ 
++	if (!hci_conn_valid(hdev, conn))
++		return -ECANCELED;
++
++	qos = &conn->iso_qos;
++
+ 	if (qos->bcast.out.phy == 0x02)
+ 		flags |= MGMT_ADV_FLAG_SEC_2M;
+ 
+@@ -2198,11 +2203,24 @@ static void create_big_complete(struct hci_dev *hdev, void *data, int err)
+ 
+ 	bt_dev_dbg(hdev, "conn %p", conn);
+ 
++	if (err == -ECANCELED)
++		goto done;
++
++	hci_dev_lock(hdev);
++
++	if (!hci_conn_valid(hdev, conn))
++		goto unlock;
++
+ 	if (err) {
+ 		bt_dev_err(hdev, "Unable to create BIG: %d", err);
+ 		hci_connect_cfm(conn, err);
+ 		hci_conn_del(conn);
+ 	}
++
++unlock:
++	hci_dev_unlock(hdev);
++done:
++	hci_conn_put(conn);
+ }
+ 
+ struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
+@@ -2331,9 +2349,11 @@ struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
+ 				 BT_BOUND, &data);
+ 
+ 	/* Queue start periodic advertising and create BIG */
++	hci_conn_get(conn);
+ 	err = hci_cmd_sync_queue(hdev, create_big_sync, conn,
+ 				 create_big_complete);
+ 	if (err < 0) {
++		hci_conn_put(conn);
+ 		hci_conn_drop(conn);
+ 		return ERR_PTR(err);
+ 	}
+-- 
+2.52.0
 
-> Luiz, another question, could we start using __attribute__(cleanup())
-> in bluez?
->
-> Consider the following example, adapted from systemd:
-> #include <stddef.h>
-> #include <string.h>
-> #include <stdio.h>
-> #include <stdlib.h>
->
-> static inline void freep(void *p) {
->         free(*(void**) p);
-> }
->
-> #define _cleanup_(f) __attribute__((cleanup(f)))
-> #define _cleanup_free_ _cleanup_(freep)
->
-> int main(int argc, char **argv)
-> {
->         _cleanup_free_ char *foo =3D NULL;
->
->         foo =3D strdup("my string");
->
->         printf ("%s\n", foo);
->
->         return 0;
-> }
->
-> Is that something we could use? Happy to send a patchset to implement
-> the basics of it, and cleanup a few places where that would make the
-> code more readable.
->
-> As the systemd coding style says in
-> https://systemd.io/CODING_STYLE/#memory-allocation
-
-Yes, that's probably a good idea. I need to check what the kernel is
-doing in this regard as well since I recall they were introducing some
-support for auto freeing stuff.
-
-> "Make use of _cleanup_free_ and friends. It makes your code much nicer
-> to read (and shorter)!"
->
-> >               if (!server1)
-> >                       fprintf(stderr, "Failed to open BR/EDR/LE
-> > server\n");
-> >
-> > -             server2 =3D server_open_unix(SERVER_TYPE_BREDR,
-> > -                                             "/tmp/bt-server-
-> > bredr");
-> > +             snprintf(path, sizeof(path), "%s/%s", server_path,
-> > +                                                     "bt-server-
-> > bredr");
-> > +             server2 =3D server_open_unix(SERVER_TYPE_BREDR, path);
-> >               if (!server2)
-> >                       fprintf(stderr, "Failed to open BR/EDR
-> > server\n");
-> >
-> > -             server3 =3D server_open_unix(SERVER_TYPE_AMP,
-> > -                                             "/tmp/bt-server-
-> > amp");
-> > +             snprintf(path, sizeof(path), "%s/%s", server_path,
-> > +                                                     "bt-server-
-> > amp");
-> > +             server3 =3D server_open_unix(SERVER_TYPE_AMP, path);
-> >               if (!server3)
-> >                       fprintf(stderr, "Failed to open AMP
-> > server\n");
-> >
-> > -             server4 =3D server_open_unix(SERVER_TYPE_LE,
-> > -                                             "/tmp/bt-server-
-> > le");
-> > +             snprintf(path, sizeof(path), "%s/%s", server_path,
-> > +                                                     "bt-server-
-> > le");
-> > +             server4 =3D server_open_unix(SERVER_TYPE_LE, path);
-> >               if (!server4)
-> >                       fprintf(stderr, "Failed to open LE
-> > server\n");
-> >
-> > -             server5 =3D server_open_unix(SERVER_TYPE_MONITOR,
-> > -                                             "/tmp/bt-server-
-> > mon");
-> > +             snprintf(path, sizeof(path), "%s/%s", server_path,
-> > +                                                     "bt-server-
-> > mon");
-> > +             server5 =3D server_open_unix(SERVER_TYPE_MONITOR,
-> > path);
-> >               if (!server5)
-> >                       fprintf(stderr, "Failed to open monitor
-> > server\n");
-> >       }
->
-
-
---=20
-Luiz Augusto von Dentz
