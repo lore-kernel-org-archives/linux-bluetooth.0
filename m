@@ -1,54 +1,54 @@
 Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A9639EF2B;
-	Mon, 30 Mar 2026 20:39:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9336539A7F6;
+	Mon, 30 Mar 2026 20:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774903181; cv=none; b=QQNdkujLjkbRwZw8cuaO7JCmIOgSoL+PJ4o2QWW6MuvrCDvvsQsUFBUE2piouBMCtbaXz2GbeHXjs+GVYbAk09sMrbBRQJljtx+KOPwgGCdV4iKS94+GhbVhpG24TtqxaaRoOuoZt+dsLdKwxd2U3R3A7/alpRyYMNVNkJBUoa0=
+	t=1774903183; cv=none; b=dutt4/vDGQNY62jkviB6evBuVwtc/6GLIgR2PBhQtbUcBXIOFwOTFTueP0QzSu73FaNEHG6puG24fiJr+VBYq42KmLPjeTszoMcoJWwHBS2JQqKPBR32P9i2b9eJPX81XDDNVeRK3NwmoppKyoyBlUS344oO4+cRZci4v8Y9zKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774903181; c=relaxed/simple;
-	bh=em1RqiSQd0riysmowuL1VUyKfo405wv/OJvCy5th3/Q=;
+	s=arc-20240116; t=1774903183; c=relaxed/simple;
+	bh=0X9iYzgDtL2noTXAFbHuUBjE+Gu6Hwn5WtC2t2VD+ZU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc:
-	 In-Reply-To:References; b=XgS9YYBDeGTKy8EffHQgXjgdOQbm5RoaeV8+EceJCUaY3yirterABMg77hojV5lUa4OO0mZe5VbG5iSQoZ5jWtq8qpTNSCiUIfbV5hD4h0aX7D3b2QjyuymU04uE/aS9x1M05qlcmyWP9S8CAq/IPyBl35HWVhUPfKcnaQHntSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jetm.me; spf=pass smtp.mailfrom=jetm.me; dkim=pass (2048-bit key) header.d=jetm.me header.i=@jetm.me header.b=LTUDoagH; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=T+aukxX9; arc=none smtp.client-ip=103.168.172.150
+	 In-Reply-To:References; b=cW+ElYKnZCQVPmj3W21qVd5f8skdV0npfiTeXXdjMZ9Rhh2BEDvU5n2rT8v+n73cBbHeIY476hohGfxnG/qsx+CIJZCrgskWxm33IOo85txbI/uPahWQFYEZPcBzxZ8x0AxnKA80Lg05m7QOXJxQHHAk8HkXOXE1kSlZqTYyuw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jetm.me; spf=pass smtp.mailfrom=jetm.me; dkim=pass (2048-bit key) header.d=jetm.me header.i=@jetm.me header.b=S0UmgY9z; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=djUF2ntX; arc=none smtp.client-ip=103.168.172.150
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jetm.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jetm.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jetm.me header.i=@jetm.me header.b="LTUDoagH";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="T+aukxX9"
+	dkim=pass (2048-bit key) header.d=jetm.me header.i=@jetm.me header.b="S0UmgY9z";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="djUF2ntX"
 Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfout.phl.internal (Postfix) with ESMTP id A41EAEC026F;
-	Mon, 30 Mar 2026 16:39:34 -0400 (EDT)
+	by mailfout.phl.internal (Postfix) with ESMTP id DAEE0EC0266;
+	Mon, 30 Mar 2026 16:39:37 -0400 (EDT)
 Received: from phl-imap-07 ([10.202.2.97])
-  by phl-compute-02.internal (MEProxy); Mon, 30 Mar 2026 16:39:34 -0400
+  by phl-compute-02.internal (MEProxy); Mon, 30 Mar 2026 16:39:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jetm.me; h=cc:cc
 	:content-transfer-encoding:content-type:content-type:date:date
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1774903174;
-	 x=1774989574; bh=yOxP62o7cM1WT3zP9+AmG5fhiGJNqhZB89OLn2KAGlw=; b=
-	LTUDoagH6VkIJIpADs7Jla/zgC+W5TN8vhTU2XFDCV8Hs6IPWz+tMR2nereYD+Yc
-	xJ5gqy2ygF3U5FuIcTa1ToDDMKbx/Nh6xLi7rhVm8SWmEaIRqW1Nd0jBE4v9mnxe
-	SmjnJE7LL7zgwYBf+nYFLae8MttC5VBuHRxid2PFkp3S9RY0iA+mb4xjrocnhKuD
-	GruVuowimV40NlcxtiN8R4FwnUHFSMo6Gzt5yUFGsRUEB8qyAjXLn1ocDaeoX9zJ
-	eR1ZFMU+l0NgS99iJxth58E137U5i98IdTbTGauhE1oO39IXhD4ruJ8OjxL9juHd
-	wdmSTedrdMYpf6Y8oLc5SQ==
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1774903177;
+	 x=1774989577; bh=OKYvgQ1t1lSRkNHRJOJY5btuo/K6VYFBYLipl68nHhQ=; b=
+	S0UmgY9zxhxAgZdTyfvI268WvCUqEgvT5wfhpGIEk8g6fM6rWNWOn1O/ivwpg8Yp
+	P02pvjQi3qYnfC/aa1gmRbC7xom91nqGFQ9xDhheMwNuX+Soe6dxeDLPfza6Uxo+
+	GFa2Zb4GUtAgZNxvLQYpWAOWDV2Zdi6ichH9ZCwia+hMHptQZxxK8rWSzBW+8o5w
+	tU9aOF8kD3qy7RmT6ddfgyJpaCh1Lfa/1hWw0V9FqvrvSZZAY0MQEjY0OKA4xIkf
+	kn+x48IkiwbqWGHpBHvjkMdOUJMA5S9e403gjhkK4A8YDkqiAORQxfBBS7qeneZ9
+	ukxSucwMXRUVbZ+K4usWsw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1774903174; x=
-	1774989574; bh=yOxP62o7cM1WT3zP9+AmG5fhiGJNqhZB89OLn2KAGlw=; b=T
-	+aukxX9qy6Abviq/fECn3aBFx8c/j29XaL/YD/sJagO3l49D3aE392u4XNg0Y7rd
-	wdal7GQAcU5EaClKVeeau8Q2DVgvKdba9Vn1rIVB11W69k1q4M/H8lL/1Iz/YYOp
-	dT5DKz7T7D4UysE1/8uWeBAayDw4JazPjXmVZcc6bFd/KW6TGFT6LplF6LWjDmgD
-	n5kIjpa5N5mJfEGT6BzN571Ue3PMF1eyALuzTvPvXhaEg8bL5uSZwnm5hbzk9Qas
-	as/Nxpyrjz5WXG9ZAeWIT20q+60J7YNMSVl0pzpRv4UFDQCNMBEvqT0qX5qIlMDn
-	mOIi2Xw5VqIAc4Nwlyesg==
-X-ME-Sender: <xms:ht_KaYjiq4HbyAOZvgZE0pdEg3Dd49UjaNNZ9-FtR8d2GyqVGRjSQg>
-    <xme:ht_Kab13pER7VLPLTU7oSc0WfgORqGtqL7RYh_JsR0oU_ToAXay1gX698Erjxj4-n
-    wtBwkRHOnBse_VvQwxiyd139GuBFoQ5oX7D1cYiHdo_1l6ntOnGR2TE>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1774903177; x=
+	1774989577; bh=OKYvgQ1t1lSRkNHRJOJY5btuo/K6VYFBYLipl68nHhQ=; b=d
+	jUF2ntXCYPkyUUfpgJSZClSyaoX0AiH3AgUiFdzcsboQ756FT34BnPA+MWMo+mD/
+	i2Z/38xEVD15xlIy7uGeQjWQfJ3P9QacLVJdPzDGxYq+5NTMXS4EzBkgvTmP0LxI
+	xrZTydu5BB5y5q3i2S12OPc1YQFNaRAJ9eyH/VRm0rB6cI7UTSy0DZLjZc6hg5li
+	qsWmvPXVpLlgRkL1wf8lZG+rUUZ1cT7Exi9gokghF2ftS4MaMZgLPYwQ/qG1Fdtd
+	2mlZNrbT87V3rHm7Wm+dCaVpR3wrCPuZ6RjsBnXXdjh1LF1+9WN6PiaBCOsf/BSE
+	3FTktHc1KOtGilmsmA2mw==
+X-ME-Sender: <xms:id_KaYShDuxeilWmys9R7TvYmMM4MHEdpR6Da0UteZarpVP73Z6ysg>
+    <xme:id_KaQkxluBJqB-6OidQj3e7VSmEsCT5LNgLHyQjpUsfxj9BR5hj6KJ8ruRuK4b4J
+    N2b6bYDTNicsFxZ732OXKh6YmA3PgT9LXOL61ewwOCtcWTRE_g5v8p4>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeffeelleeiucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
@@ -56,30 +56,30 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeffeelleeiucetufdote
     vghrucfvihgruceofhhlohhsshesjhgvthhmrdhmvgeqnecuggftrfgrthhtvghrnheptd
     efvdefkedutdejfffhheehfffgfedthfeuieeiteetgedttdfhveefledvkeejnecuffho
     mhgrihhnpehkvghrnhgvlhdrohhrghdpghhithhhuhgsrdgtohhmnecuvehluhhsthgvrh
-    fuihiivgepudenucfrrghrrghmpehmrghilhhfrhhomhepfhhlohhsshesjhgvthhmrdhm
-    vgdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprhgtphhtthhope
-    grnhhgvghlohhgihhorggttghhihhnohdruggvlhhrvghgnhhosegtohhllhgrsghorhgr
-    rdgtohhmpdhrtghpthhtohepfeduleefieefudesghhmrghilhdrtghomhdprhgtphhtth
-    hopegthhgrphhuihhsuggrrhhiohegsehgmhgrihhlrdgtohhmpdhrtghpthhtoheplhhu
-    ihiirdguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthhtohepmhgrthhthhhirghsrd
-    gsghhgsehgmhgrihhlrdgtohhmpdhrtghpthhtohepmhgrrhgtvghlsehhohhlthhmrghn
-    nhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhkvghrnhgvlheslhhishhtsh
-    drihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehlihhnuhigqdhmvgguihgrthgv
-    kheslhhishhtshdrihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehlihhnuhigqd
-    gslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:ht_KaZsk6LIhXjFAGkbaUl1ZKcKnVct3xghf8LJ7f5CG6LLGBihACQ>
-    <xmx:ht_KaQteF0kq7QPNlALMtbyLHHpbqMje0JEgNXNXLHtqKFAWd0ovWg>
-    <xmx:ht_KaWEw41DwjMi68XZI8YxjtGY3TDou9FcnUvj3wn3tpaAlrQcnZg>
-    <xmx:ht_KaTOSgzzvEGAFkTDcYnfnqNsYpt3NTEqQWJy1IPBNh4XjKW-2Kg>
-    <xmx:ht_KadhgBVqKHOO6dOnG3pvqwtmVHJSbUI-SCQsyU_nKlPPTX6VPkn47>
+    fuihiivgepheenucfrrghrrghmpehmrghilhhfrhhomhepfhhlohhsshesjhgvthhmrdhm
+    vgdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprg
+    hnghgvlhhoghhiohgrtggthhhinhhordguvghlrhgvghhnohestgholhhlrggsohhrrgdr
+    tghomhdprhgtphhtthhopehluhhiiidruggvnhhtiiesghhmrghilhdrtghomhdprhgtph
+    htthhopehmrghtthhhihgrshdrsghgghesghhmrghilhdrtghomhdprhgtphhtthhopehm
+    rghrtggvlheshhholhhtmhgrnhhnrdhorhhgpdhrtghpthhtohepthhisghosehhuhhmvg
+    hurhhlihgsrhgvrdhfrhdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhkvghrnhgvlhes
+    lhhishhtshdrihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehlihhnuhigqdhmvg
+    guihgrthgvkheslhhishhtshdrihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehl
+    ihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpth
+    htoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:id_KaeU3g7iJpiWyVi95jJhfnQZJ_io454LpLrM4eWtTmBQme098iA>
+    <xmx:id_KaX9iUO3EIXMZJ1EwEsSKeefIjW_6CkeqmLjbgV7HSZUSwYYQQA>
+    <xmx:id_KaZuBzgvmhyROrnWUALMuG6vdovsx07xJJuaJr8SW7inrUyzc4g>
+    <xmx:id_Kaf3ZAgiMiWjID-LV_cHxmC67Y4zPIJx5kIU_gu2R3Oe2-AKgXw>
+    <xmx:id_KaYDGOgKKlDkYodeOM0_omZPNz8ogNS0qfxjwyVGK7UZAlA7fjSPC>
 Feedback-ID: i9dde48b3:Fastmail
 Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 7E4531EA006B; Mon, 30 Mar 2026 16:39:34 -0400 (EDT)
+	id B54DB1EA006B; Mon, 30 Mar 2026 16:39:37 -0400 (EDT)
 X-Mailer: MessagingEngine.com Webmail Interface
 From: Javier Tia <floss@jetm.me>
-Date: Mon, 30 Mar 2026 14:39:27 -0600
-Subject: [PATCH v4 5/8] Bluetooth: btusb: Add MT7927 ID for Gigabyte Z790
- AORUS MASTER X
+Date: Mon, 30 Mar 2026 14:39:29 -0600
+Subject: [PATCH v4 7/8] Bluetooth: btusb: Add MT7927 ID for TP-Link Archer
+ TBE550E
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -88,41 +88,41 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260330-mt7927-bt-support-v4-5-cecc025e7062@jetm.me>
+Message-Id: <20260330-mt7927-bt-support-v4-7-cecc025e7062@jetm.me>
 To: Marcel Holtmann <marcel@holtmann.org>,
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
  Matthias Brugger <matthias.bgg@gmail.com>,
  AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- Chapuis Dario <chapuisdario4@gmail.com>, Evgeny Kapusta <3193631@gmail.com>
+ Thibaut FRANCOIS <tibo@humeurlibre.fr>
 X-Mailer: b4 0.15.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2229; i=floss@jetm.me;
- h=from:subject:message-id; bh=em1RqiSQd0riysmowuL1VUyKfo405wv/OJvCy5th3/Q=;
- b=owEB7QES/pANAwAKAbXuwwuoZ3cfAcsmYgBpyt97MKgIx4cXnY3eqzf8uMUUC446fCf8n1tcF
- 2pAPhYzX/uJAbMEAAEKAB0WIQSbE7ILzw7eI0VKk8m17sMLqGd3HwUCacrfewAKCRC17sMLqGd3
- H+4WC/9kZvO0/+QQloBtSzCPc/4zjIp1506hnohXVFYAXe9NV3ri0hD/7IRuG6zbyG3G8xdkxAE
- IH9KyyVsUpMzXuFmh+/w99XxqfHpSdbyNOYRru+PIqiY0gh9SnLKzb8/J8v1G00xsnM47e/O3tG
- X3Hb6I1n4jBSB9WXpDu7k6lvxleEThQA5Hv+/euQsF4TEdMNvpOzqxlc7qapH695JSlzdrGCuOU
- XlEV/ta4vMyE/7UFlQ6d0jDIyuQ89PiQtYlyps6Axonzlo2Q24yN5Isgo823w4uK+BJBD89zZVW
- NKfr8dvDZONRVvoi2/GeP0as0GWbD1KAND1vDH+lkcxNbrtPyyeSqgbmFut1R6hKb5HH9uT6X5c
- ZN4YmbbkshBn1z8zvNyelHQfTWqlRZE23IsE6L1KF/l80yFgy7UrZNlDb3BCcC1CwiyNLG6T3pN
- 4XQq3Zlpqjh0X5tn9f1VF6gctjgWV/wP7iMZzm9X+TjGmMSbN9a2oWoONH89pONUUIhAA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2176; i=floss@jetm.me;
+ h=from:subject:message-id; bh=0X9iYzgDtL2noTXAFbHuUBjE+Gu6Hwn5WtC2t2VD+ZU=;
+ b=owEB7QES/pANAwAKAbXuwwuoZ3cfAcsmYgBpyt97LY/SZ5rcg3G9k7qesMrweJaMUpx2LZVGh
+ jHNrZUjVgiJAbMEAAEKAB0WIQSbE7ILzw7eI0VKk8m17sMLqGd3HwUCacrfewAKCRC17sMLqGd3
+ H8osDACISz3fln6X5a5+tcmN3bLyDlP19FlfSZCrCBWxWbaf+SfY04x8nKkxBLtTx6R/F/A8W6K
+ u0OBLE0BIQC6uwwVZiWluh9NunaYuzA+XeBO/yUPv9fTz1yPJKK4bfBMfW5Gx9ZQzedKJTeScUU
+ cIZAu9sxbkL1RjkKWZ31BjSUvqTopwvmckkwRNf6/ceTf0dQnCgitzysRvW62ZuukeRBlwcOPYO
+ JMmpx/HEL8cBehsj/1PFOmfXwYOgxnt3EjwdMWELjg7izEFx04A+y796jZZwBv/OAxUzXEl5RbU
+ 72p7CJy3pdpaPV6tzHMGN2xexn6UecuoTfbOGzrLLxMUJ2r1FUOAMf5XrQmWAE8EaAFjD0qmUzC
+ EjkR4ofNIqqTGq1igaey1tL9LdXaGWQcb6mkAUlKocnSmYHoYdnFsGaTbKPRWgRg0DmlFJao/TO
+ GzWdnlM3905iqRgwXasusyvTobQN6gCFokcGSiesP3/JoHeTXMLh9FqV7aeQMVykB+zV4=
 X-Developer-Key: i=floss@jetm.me; a=openpgp;
  fpr=9B13B20BCF0EDE23454A93C9B5EEC30BA867771F
 In-Reply-To: <20260330-mt7927-bt-support-v4-0-cecc025e7062@jetm.me>
 References: <20260330-mt7927-bt-support-v4-0-cecc025e7062@jetm.me>
 
-Add USB device ID 0489:e10f (Foxconn/Hon Hai) for the MediaTek MT7927
-(Filogic 380) Bluetooth interface found on the Gigabyte Z790 AORUS
-MASTER X motherboard.
+Add USB device ID 0489:e116 (Foxconn/Hon Hai) for the MediaTek MT7927
+(Filogic 380) Bluetooth interface found on the TP-Link Archer TBE550E
+PCIe adapter.
 
 The information in /sys/kernel/debug/usb/devices about the Bluetooth
 device is listed as the below.
 
 T:  Bus=01 Lev=01 Prnt=01 Port=05 Cnt=04 Dev#=  5 Spd=480  MxCh= 0
 D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e10f Rev= 1.00
+P:  Vendor=0489 ProdID=e116 Rev= 1.00
 S:  Manufacturer=MediaTek Inc.
 S:  Product=Wireless_Device
 S:  SerialNumber=000000000
@@ -144,21 +144,20 @@ E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
 Link: https://bugzilla.kernel.org/show_bug.cgi?id=221096
 Link: https://github.com/openwrt/mt76/issues/927
 Signed-off-by: Javier Tia <floss@jetm.me>
-Tested-by: Chapuis Dario <chapuisdario4@gmail.com>
-Tested-by: Evgeny Kapusta <3193631@gmail.com>
+Tested-by: Thibaut FRANCOIS <tibo@humeurlibre.fr>
 ---
  drivers/bluetooth/btusb.c | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2c9ca3d6016b..d60798331bb3 100644
+index 96882e9b831c..55a000540439 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -755,6 +755,8 @@ static const struct usb_device_id quirks_table[] = {
+@@ -759,6 +759,8 @@ static const struct usb_device_id quirks_table[] = {
  						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0489, 0xe0fa), .driver_info = BTUSB_MEDIATEK |
+ 	{ USB_DEVICE(0x0489, 0xe110), .driver_info = BTUSB_MEDIATEK |
  						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x0489, 0xe10f), .driver_info = BTUSB_MEDIATEK |
++	{ USB_DEVICE(0x0489, 0xe116), .driver_info = BTUSB_MEDIATEK |
 +						     BTUSB_WIDEBAND_SPEECH },
  	{ USB_DEVICE(0x0489, 0xe14e), .driver_info = BTUSB_MEDIATEK |
  						     BTUSB_WIDEBAND_SPEECH },
