@@ -1,207 +1,169 @@
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54BA39A05F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 19:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 502FA39A7EA
+	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 19:51:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774899386; cv=pass; b=DOb+z0sRjyOWEMt80Iw8bn10/SIWQlHJUPePotY/okEWR/sXyAVryP67Pl69NgdZeFL2U0MmdYkr7xurR6nZEKafP1OVYIO57kmpWWOiOPZPWDhNB3KVGWm+skTu6iqjrNDBPTFbnoYlMgIw0Bbr+nkXhS48P+X3LAVZ+GF2nyU=
+	t=1774900281; cv=pass; b=Uc7fTNjVlp2zc7eK9WM1ZjXpTVVMHkeCnKAO+S2++QdnDEHzhliMKcSLeMPvyzzXtltKdVog4vOW8E98ZzTXU+xwA7hPMvMJwh2PiPzOjliSicQcPXi4qJaxqL/5qBX6vWx8i93Wwl2YX9JFIK+piNb6L+iXgE1b/fax8U7uU3I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774899386; c=relaxed/simple;
-	bh=VOHBkXEEGvtOi4xRbgU9eEYEdZ33wTfbvFZ5aI4/z9w=;
+	s=arc-20240116; t=1774900281; c=relaxed/simple;
+	bh=XFJO2FiqDjQ+65cMKQQnolCljbLx8VyXTGABvPVGFgA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R2VPkQomKGkE8vmbOCTjidqs3fzJNiHR3sxqXjeY3uxnAg/vGtPaSi/9REU+YqxncZoh8cVz5v6LKvO1E43iYc/XXN00itFWO8mMs9y+6LBQaVvgtIire/1aFTSJbDEv9Axrilf+4S3l6TgWvJ0lceqFeaooYuMlFPgM4ImzJrg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AzhH783F; arc=pass smtp.client-ip=74.125.224.41
+	 To:Cc:Content-Type; b=RWHQsijnpI1sKPBBuqUvxGdWFLD49a1XN/vKdOmt5/6CCsFLs99gd+Lj0K337l3Ml4uybTohOoTyVNfBghIYX6ym7CvZDv8Kd6BXR5R1O9pe+YM4nEWaxtUVgFnLCQDpldOzCEIFVIPvO2+KO4xxVG2a6Ae9hx+f2z6O7kpfKYU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a7EKWLRB; arc=pass smtp.client-ip=74.125.224.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AzhH783F"
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-650158138d9so3145691d50.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 12:36:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774899384; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a7EKWLRB"
+Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-650182d19e0so2695343d50.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 12:51:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774900278; cv=none;
         d=google.com; s=arc-20240605;
-        b=RODAQf9IFk6ywTE0UMEGVVH8QSyjF3MbA/S4l/EgM+7gmkTa0Ytfq49//ylYpPCuV5
-         o6oQPA3FSSpSEANDnkUF7kilqnOmUnAVxWG2b/NC3ueqLjOcPediRC+/CdRvjWN1+B9c
-         YCwJfDVmsxJRrmCKRGEV7hk8Owg5NMaSHS2PD8eUczK33KG40fd+tbGlFH3oqQUQtKUO
-         TdA62W+VeUzWSA9mIXUMJithJcOuDfaw34/Uuhr984j7yIepqzw2VYQayHilVinUy8rc
-         GlCLSzALCMLUaEW0dG1xlyX3EhGpLij68cbwVPSALzbbOdsO3t4oGyo5KtP2TcsieyeR
-         WXWA==
+        b=QANZV/axEo2zeuXgx7lYLDevnoGMKVrkrUN2FwQa2HUkThS9pc2m2nwSce2zjf9vE5
+         D6Ya7NpKI7hSA1xDPuM04B/bGDh8mJgJuFJK0diZL7VSX3FSgT5SVFC3fNrG6vn4zrC6
+         TuhowjQoMpZtHaI+sQXX5UHnTa2pUPdsO1a9sPHc0ktK2WG1QB/hwm6MSt/poZgMcM6K
+         /yZS0Ur1DBJOb78AH4cP+YQ3rbQyntguiPm2uewy/3vBr392g7q/7Z9jyafhPmDgb1NK
+         TJyS/+q7tGr0n0ax/MQtjDBl9Z8pxXnz/EX1zTs6ABLQcCdAb7/vZMtTSfw3SmocGfws
+         C1EA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=oTZDZepOrmawTD9Ecu+6VDSjmONCioqOkSOXBIra8+c=;
-        fh=B0NTLRl6xlnNQz3qr9HQPFnrzX7nYNILTKF+Ji2LD7k=;
-        b=PsHliMWD4TYXQSRebXemrUbEIWuST18qwFniqIep3O+AhV3QkB5uWx6LNf0ZAv+dC1
-         zQBhpMv3UPD8uJPHYjHQqzDXaviCPMEzx1ZxVdGWSAFjJMhN6kbFM/c+RbPELXUdEe9c
-         L0mBknmOh6MJ3Tl2xZLYD8GA/6rJQMUFCPZwmXEvI0jdTVJNTktLN0pGIb60UPTJrxkw
-         QauJxvE2hZzn0g2qg6DvtcKu0qsNEjkw53ESKxGtXD2hG2dDNH/2KTi+QwlkmP4IO2E5
-         tQe6mrXFgkxXjbDKVtnk6jpWL88/ydJKk15BI/Z2lnvHspUkdZYSmuXWf8ApAo5+kth4
-         /lIA==;
+        bh=XfKNvyS7K49qe0UCAo+yyDfQl89msPOaI9UN+hDNaDA=;
+        fh=LQfOhVP3dW09eNCOvmq0FqCwKcz2BUyF25XiqUPTamw=;
+        b=MUXqCohgrCZ9dkji92g2nOsoedUn5r+TK+Tw7M2SOsLT9lZ+WCqpGM6dWdBJ2I5kwR
+         6SM1vkDrEt5TMgb1iFlrYUFortg0w1nOCjcSe/a38X85U2Kr0EIpku1YSpdiUsydRC8T
+         cQ3Nr3oBm9STLdwY+a0S/Le9jiIjaD/9cAjMuVTXsmxHTN0E1HrCVmSmjM1PhhuutoRb
+         j+kPPXUVcb/5RYAnrUXfkEKoQQGW7Cn5CkmRrevyqXmLgP0p85ylWYefUtIYtoQsPuH+
+         qQ5vyGRZLCl48MYXnRr+5lN57UJeE6ZZJTNgeqmIBzBNLlOD7Xun69eatpPby7WcoWV6
+         FIGQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774899384; x=1775504184; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1774900278; x=1775505078; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oTZDZepOrmawTD9Ecu+6VDSjmONCioqOkSOXBIra8+c=;
-        b=AzhH783FiMUhaTsVVKD6HA7rJzTwE1a5drYT+/oFWdWdVOKiMhLj8cHclPCE23r6Yd
-         HFMGSx520P7PZNg6tUSRygISiyZYXPXGk3/TVSiKC5TlwdLCfRLEqJIuskCI8XSPp8x5
-         6yv1ZFdzr/mbNKurW5fwsqaXnU+EofFAxfrjAIIIqto1Cm9Ps1wD5ofNpXM+2qlrczG5
-         ObjdtulGQgn/DGlhkKNN2HnRe+g78ZlVf6w8c/EdEC6OF7ghLCbYKI0C8LewzD++CiRC
-         yGQQyY6BzTLsgccEe+m6DS+VsyQHTQuMrmsiaF/0FYvLVZJa3nGFUuwBYfC8VLzXd/BZ
-         qDMA==
+        bh=XfKNvyS7K49qe0UCAo+yyDfQl89msPOaI9UN+hDNaDA=;
+        b=a7EKWLRBIAw3fGpKr+Y6KyKnN7LUnrkwd+9qSnFeNMIXvuGb2dFxPGmzk9RT0lcECx
+         TjN42CWu6LjwAD6hlpsS4ZrOvDGQZghIZtWilo317SrMB40fdcR4lxvBLbuwwpW5nH6N
+         IJ3y+GY74HWXg4NNCsI7PTg4cD3WVYy73MHtdVHLFoR/3TiIQbbYnpH1HDg4ZOIxQ21d
+         L90QzudmnOUuLbwgaXzmvt5muVvSEDT/+Myjs/0HH3oaKQCDtxAFjH7EEygdeEOW7NI9
+         BtWKjimARjDKYPVvPVYdpZ9noDNyZYhkK3tNhU0B6jEYEeXfUWu+3uhDxnbDAmqtIns6
+         65dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774899384; x=1775504184;
+        d=1e100.net; s=20251104; t=1774900278; x=1775505078;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=oTZDZepOrmawTD9Ecu+6VDSjmONCioqOkSOXBIra8+c=;
-        b=J8KA0sSmNueOBI7iU5OHLIPxql7ExTNAvib4UZ6iF/JKxA+XTbArC/2NnIs1zhtv+Z
-         18MBqsYGqFjnVmeavV3N1wNiO+34IDIe3x5UyhFXgehF1QmoyeXGCQ0eMZTsz4aIaEZM
-         AsjszzjXOZIwbsCQN81hglnkkegBdNTwHQSLYhrxLyDMWM5bbEIZGQglEL1rWZWhPuUb
-         RcuI3huJr4Sr7mgPC/MUsekZJaWmCxtdCvpF8LuOigiDTKzfmbe7qNcEzCFLGoEzPTV6
-         zMLxIBw948PKj6zdXRp4ZlL1VSaRYtQdaBwgRqVH/8VW34X7/fMHu/8thlTcf7EL+Iv8
-         9RDg==
-X-Gm-Message-State: AOJu0Yxij/llAjDElPo/FD4RO8OjozGROLS4jPKrAXLJbQO3yTNur0JE
-	jETFjBdvX0aIvB0Bxl2/WmGf96IbmmllwYz7uLNA5FkuDM30zpyWtM2nnZYgEw22yzvzurYECY+
-	e7fotUGMmdpYtWMi4fGFP49S2qdaBu6I=
-X-Gm-Gg: ATEYQzxl1jAXwu1n+KpSA2H9I3iDDMKJKdSc9vNBgfMChzwt3xBgFDkWObuJlaKm9eP
-	vHKXVOktz8Kq9jHxpRcyMHe21OVJf/W2H3oKT8Wc4zQ4jKo/WPwQPoU8PH4biDEsSHzxvn1hHGQ
-	kzgJelP/wSo9XWhxYdcMVe07tg5ayC4Y0eeA06DLarOKAJAiIPyusiD9GaFnvD8Va67uKr9FNPK
-	SjetIVVGvHxOKIh//IgZ3twapi+mzz/jIsU2F1lN+wHwnb9ffotE2DFagJVfrNJQ2d6oDeTgq5D
-	sgKZetvp8j1xflwxefYqk8JWL4NCp85l/YzZVbHwjLwKXw4c/UhykBaXm7NtpEju1hc=
-X-Received: by 2002:a53:ac94:0:b0:650:16ed:c1a9 with SMTP id
- 956f58d0204a3-65016edc4a3mr6510387d50.4.1774899383675; Mon, 30 Mar 2026
- 12:36:23 -0700 (PDT)
+        bh=XfKNvyS7K49qe0UCAo+yyDfQl89msPOaI9UN+hDNaDA=;
+        b=Gh7B7RHaZGH6SkOxijzcXKXA9edq30TIQNG62nB6myFjVxOTT1/6mV4728J0El79UO
+         Sn9MmbaOCMBx7j41KOx6ICp50iSN6ec6lojQUZAtPVwP7WsEzBrixVnbwhoQWvMCMyis
+         O24LuynqU8ZRd5xbR53BJcatJpNKx5XjaoVn7Mu+KBJDUVcjecG0YIusuHDPaxH11XDE
+         yuxXlYs0krc5jTPl438UJrHoUVrItzN2om/oZ0jK5MA+uamxtkLBXY/RRZjBlaBslJrd
+         nUA6ob7J8/gaFEcbIx1SI5D/cfnczOhffqbsBrPdKXMGPCq5JLkL5T7iCaOEL6J/PFra
+         wwPg==
+X-Forwarded-Encrypted: i=1; AJvYcCVy79DYNb3i2pm3xvQ7H4j8qXu7i+Z3qQm4mg7iSv3GZsuZ9gtqg/5K8c6OhntI6iicDyldbYwN7SnFsegjgPU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6fVFrr1WYhAwj2NB5aJd1swN3BmqaqUL0kDkFuxDBgd44KTWd
+	xHa0Mss1DDdnRy60sRmiI5sZny9QiOkzD/RCGrIcwzuxiFT+HTn+YOHWG6A+p6hLBL6qPILoLwL
+	21ztcaK0tfBbSA+4YJmYDLRgf80CHVIM=
+X-Gm-Gg: ATEYQzxSAH2WHRyxoNqxmjn6fM02IIdRffdERwO+/b9RJ3Sw8cnACIvqpXuZ4j9YYci
+	U3B+gq8FwcdwPBN6fdchc8XcuKO7xBwJB4Iu+9UNYQN2QDUX0wtLH1kAusHgNhtasUdYVc77fdf
+	ZC0o7nankIrPJxoapC2lSTWKvdpFTB4o/1U3H6+ZtW9MzC23BaCnTuHXf8nQrKs+9VNArkvO/ci
+	4HVURGrrRFQi2UEAHCyhrbwsrYAp90wBvbOfFB7emetUDjti/DHSogQ1CxdoNZQcpLurubp9z5J
+	9MDFIJCcH+rREIcig8SEI5IZ2aTkFaJ9Fpeu0k7xJ25H0ZHvjY4ACw2MSLeS7tAcHbA=
+X-Received: by 2002:a05:690e:1c08:b0:64c:a894:f723 with SMTP id
+ 956f58d0204a3-64ff7027e97mr14084881d50.0.1774900276530; Mon, 30 Mar 2026
+ 12:51:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <bt-smp-v3-b13a5d5f53ed4efaba74be7539453366@1seal.org> <78570f37f1da48f38336480ba61e29d9.security@1seal.org>
-In-Reply-To: <78570f37f1da48f38336480ba61e29d9.security@1seal.org>
+References: <CAKvcANPiqdO_Re3+06DWhb7uyKP+gCODJpo35sq5-x62gYJUPw@mail.gmail.com>
+ <20260328200938.140528-1-xiaoguai0992@gmail.com>
+In-Reply-To: <20260328200938.140528-1-xiaoguai0992@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 30 Mar 2026 15:36:11 -0400
-X-Gm-Features: AQROBzCmI9v4TonJPlPzchW4zfNfL9X9_SIEczU3FjRqG1Kt8sM7Xo9n2U9Ko8g
-Message-ID: <CABBYNZKHUosCj5+byy-XJ2spYhKP6p62ai5zoHehG=x5b441SA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] Bluetooth: SMP: honor local HIGH security when
- selecting legacy pairing method
-To: Oleh Konko <security@1seal.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
-	"marcel@holtmann.org" <marcel@holtmann.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Date: Mon, 30 Mar 2026 15:51:04 -0400
+X-Gm-Features: AQROBzA6KBl4EzkRU6poaG_SGJBRNepQU1Vk92F_42K5UY1gfxCQ9I_0GrAfF_I
+Message-ID: <CABBYNZ+8UW62Qot6=ev2Mf-Kc6JgJYtxh0B3OdV2zXJx=N0m1Q@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: ISO: validate ISO_END fragments
+To: Kangzheng Gu <xiaoguai0992@gmail.com>
+Cc: gregkh@linuxfoundation.org, marcel@holtmann.org, luiz.von.dentz@intel.com, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Oleh,
+Hi Kangzheng,
 
-On Mon, Mar 30, 2026 at 11:33=E2=80=AFAM Oleh Konko <security@1seal.org> wr=
-ote:
+On Sat, Mar 28, 2026 at 4:09=E2=80=AFPM Kangzheng Gu <xiaoguai0992@gmail.co=
+m> wrote:
 >
-> tk_request() currently forces JUST_CFM whenever the remote auth_req
-> omits SMP_AUTH_MITM. That ignores the local pending_sec_level, even
-> though the responder may still require BT_SECURITY_HIGH.
+> A malformed ISO_END fragment can trigger a NULL pointer dereference
+> due to missing validation before processing. An oversized end fragment
+> should also be rejected.
 >
-> The pairing-request path already rejects JUST_WORKS/JUST_CFM when
-> pending_sec_level >=3D BT_SECURITY_HIGH, so letting tk_request() ignore t=
-he
-> local MITM requirement can make method selection inconsistent with the
-> policy the stack already enforces.
+> Add the same validation for ISO_END as for ISO_CONT, and reset the
+> in-progress reassembly state when malformed input is detected.
 >
-> Only select JUST_CFM when the remote does not request MITM and the local
-> side does not require HIGH security. Otherwise, derive the method from
-> the IO capability table.
->
-> Fixes: 2b64d153a0cc ("Bluetooth: Add MITM mechanism to LE-SMP")
+> Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
 > Cc: stable@vger.kernel.org
-> Suggested-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> Signed-off-by: Oleh Konko <security@1seal.org>
+> Signed-off-by: Kangzheng Gu <xiaoguai0992@gmail.com>
 > ---
->  net/bluetooth/smp.c | 13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
+>  net/bluetooth/iso.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
 >
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index e67bf7b34ea..a9fb9b513d6 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -863,13 +863,14 @@ static int tk_request(struct l2cap_conn *conn, u8 r=
-emote_oob, u8 auth,
->         bt_dev_dbg(hcon->hdev, "auth:%u lcl:%u rem:%u", auth, local_io,
->                    remote_io);
+> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> index be145e2736b7..8707f3c4b103 100644
+> --- a/net/bluetooth/iso.c
+> +++ b/net/bluetooth/iso.c
+> @@ -2587,6 +2587,27 @@ int iso_recv(struct hci_dev *hdev, u16 handle, str=
+uct sk_buff *skb, u16 flags)
+>                 break;
 >
-> -       /* If neither side wants MITM, either "just" confirm an incoming
-> -        * request or use just-works for outgoing ones. The JUST_CFM
-> -        * will be converted to JUST_WORKS if necessary later in this
-> -        * function. If either side has MITM look up the method from the
-> -        * table.
-> +       /* If the remote doesn't request MITM and the local side doesn't
-> +        * require HIGH security, either "just" confirm an incoming reque=
-st
-> +        * or use just-works for outgoing ones. The JUST_CFM will be
-> +        * converted to JUST_WORKS if necessary later in this function.
-> +        * Otherwise, look up the method from the table.
->          */
-> -       if (!(auth & SMP_AUTH_MITM))
-> +       if (!(auth & SMP_AUTH_MITM) &&
-> +           hcon->pending_sec_level < BT_SECURITY_HIGH)
->                 smp->method =3D JUST_CFM;
->         else
->                 smp->method =3D get_auth_method(smp, local_io, remote_io)=
-;
+>         case ISO_END:
+> +               BT_DBG("End: frag len %d (expecting %d)", skb->len,
+> +                      conn->rx_len);
+> +
+> +               if (!conn->rx_len) {
+> +                       BT_ERR("Unexpected end frame (len %d)",
+> +                              skb->len);
+> +                       kfree_skb(conn->rx_skb);
+> +                       conn->rx_skb =3D NULL;
+> +                       conn->rx_len =3D 0;
+> +                       goto drop;
+> +               }
+
+I suspect this was not quite right:
+
+https://sashiko.dev/#/patchset/20260328200938.140528-1-xiaoguai0992%40gmail=
+.com
+
+Have you actually validated this changes against any hardware?
+
+> +               if (skb->len > conn->rx_len) {
+> +                       BT_ERR("Fragment is too long (len %d, expected %d=
+)",
+> +                              skb->len, conn->rx_len);
+> +                       kfree_skb(conn->rx_skb);
+> +                       conn->rx_skb =3D NULL;
+> +                       conn->rx_len =3D 0;
+> +                       goto drop;
+> +               }
+
+Hmm, this is the end fragment so anything other than skb->len =3D=3D
+conn->rx_len is unexpected.
+
+>                 skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb-=
+>len),
+>                                           skb->len);
+>                 conn->rx_len -=3D skb->len;
 > --
-> 2.50.0
+> 2.50.1
+>
 
-https://sashiko.dev/#/patchset/bt-smp-v3-b13a5d5f53ed4efaba74be7539453366%4=
-01seal.org
-
-Seem valid, perhaps we will need to do something like the following to
-force the SMP_AUTH_MITM bit in the response:
-
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 485e3468bd26..9841acc9d074 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -1809,6 +1809,19 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn
-*conn, struct sk_buff *skb)
-                return 0;
-        }
-
-+       /* If we need MITM check that it can be achieved */
-+       if (conn->hcon->pending_sec_level >=3D BT_SECURITY_HIGH) {
-+               u8 method;
-+
-+               method =3D get_auth_method(smp, conn->hcon->io_capability,
-+                                        req->io_capability);
-+               if (method =3D=3D JUST_WORKS || method =3D=3D JUST_CFM)
-+                       return SMP_AUTH_REQUIREMENTS;
-+
-+               /* Force MITM bit if not set by initiator */
-+               auth |=3D SMP_AUTH_MITM;
-+       }
-+
-        build_pairing_cmd(conn, req, &rsp, auth);
-
-        if (rsp.auth_req & SMP_AUTH_SC) {
-@@ -1826,16 +1839,6 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn
-*conn, struct sk_buff *skb)
-        if (sec_level > conn->hcon->pending_sec_level)
-                conn->hcon->pending_sec_level =3D sec_level;
-
--       /* If we need MITM check that it can be achieved */
--       if (conn->hcon->pending_sec_level >=3D BT_SECURITY_HIGH) {
--               u8 method;
--
--               method =3D get_auth_method(smp, conn->hcon->io_capability,
--                                        req->io_capability);
--               if (method =3D=3D JUST_WORKS || method =3D=3D JUST_CFM)
--                       return SMP_AUTH_REQUIREMENTS;
--       }
--
-        key_size =3D min(req->max_key_size, rsp.max_key_size);
-        if (check_enc_key_size(conn, key_size))
-                return SMP_ENC_KEY_SIZE;
 
 --=20
 Luiz Augusto von Dentz
