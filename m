@@ -1,239 +1,429 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845B133ADB1
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 02:11:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B9737D121;
+	Mon, 30 Mar 2026 06:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774836666; cv=none; b=EuvXCAuj3nNTBUVWsDmdjIl6s9pAf7r+sfoINVq2+FzxlnmrAzloeCCzhn99B4Iqwmx2oSTTAfmMB6xlS8c7fKF0gkgEllWfmLsh43l2nZRskhjVE+xwmA8HVTGlBeWHZxPzbFN0Wr9z/QZi6+32U+jak2geTmK0zxZosFImdSo=
+	t=1774852779; cv=none; b=C/q6r/XuEGShAKNaRpTTkkgFv9xwieh2GhVEFfXoLmsMZubptWb2W90+MbnaTFQ5Dxuj2EyC+TcmnX8casCRJBLeWAnfYra64B2uYLB4I1Y53eHNIct+ULdmf68+K+rHncD2cK8/ScZNfXI6kTOTfLZo0oQck5Tc/Qzd8ejOB1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774836666; c=relaxed/simple;
-	bh=FbloVJ6ZYAwb202X2oY4C5QbMUVhVHukJiZul5rQuEY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XEOM/ODfbu1td+NJDaGiklOwNSHO0zzRHSCM1TUN1jotMRks36y8ebNLTVBjaZkDn6Pt8cpMgo9btT5Bd2q2WbGTuyT65Is7X3jl3GMjJ2fgLh+ZPL/v+H2gm1/7VDUAD24mbDgWRgSFFA6wbpnUaI0lna8bccoyzu2T4iPkfPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=aeVAa28b; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=XMM1tQDN; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1774852779; c=relaxed/simple;
+	bh=tmYiyZorA0z4TjfSrT93Sw2Vmxyiubwxlrt4sweRxmw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l6oWnrn5SUSvvENkTEWvJMjIbyaiCJmZnAFcdkiTQrTpCwhuBjEzEr0JTp6WmlaaAVsbZyYpawsf8eoJl12KU9vaQOa0lPEa/TnMqrNSXVCo1X77lFQSbSrg/SoKhzj8wwnfhnn8COfcRSimC1eqImQm4jgzt4qXf+6t+oAu/HQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Rhcsv21U; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="aeVAa28b";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="XMM1tQDN"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62TCS498103746
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 02:11:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	gAJ++qiIe/HkmvU48xI1bbnnG+ouTJL7+deDhZkHf8Y=; b=aeVAa28bEpF2QGSe
-	cgM+YN5fN6taUqQo3NvOWILmzn6RuH/zk6kDh4oCWSBjbF/HkVgs21VRkyYxCZ7S
-	1D+C1Lhw6/GeJBAZbSxaMZmw+Sae6u6Ll0agjoVP7k0k72tD5ezzrbgJAR9Azs0S
-	8cSddbPavJGgiaF4sVm2sBiHX/XViuanWvgF2TabGg1tEOu+EiAHzz5IJOmAKoV3
-	EnC7IOZBlZ0OJhmIImfGPMAuwg8T8XtXmTUiA2SNFW5LIloWaUfAQty7bNdD60Rb
-	m1gJ7JjHi3h41kesjunCvbMx/DPLT1e2+U0/gej+BfyaPCRtu76K3J0692xO2JNG
-	2ZljPA==
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4d677141qr-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 02:11:04 +0000 (GMT)
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-35d98c6ab60so1338283a91.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 29 Mar 2026 19:11:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1774836664; x=1775441464; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gAJ++qiIe/HkmvU48xI1bbnnG+ouTJL7+deDhZkHf8Y=;
-        b=XMM1tQDNsKc8SfG8SqSRJ2zK/vXXqKwl/33NBYimEBzYKadP/mMqiWon/NplAzfaDA
-         Fm4MPzUfHaLUhkTRrrA9UXCqQ8N0m6PNy8iCb7FNqIJ0vdJWW5IR66g3M3ps3kApWLYW
-         8oljPjy4+INXBkym28HoLrni163GWeKw79MMh4XwknES7lSWPDhMDtAIgC6XrcVyaO3U
-         Eu995XunsKbPfFFKmoKj2468yz/wyg5o0r3irFUrc9wEC4UUPn5NifNaaoZ/S6hn9S0F
-         jiy5PhQ5PcpUYGuT1/ng4iW7VTcMlFBUg4/3p1RgqjAN0pkNBi1VEuZs2b8P4DP40Hng
-         Cd2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774836664; x=1775441464;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gAJ++qiIe/HkmvU48xI1bbnnG+ouTJL7+deDhZkHf8Y=;
-        b=Mvcg1usC+7mBNrmxaeDxJHFPuZDO8lwBFiGsTYqVtLkCXgfKcdqVaC2silbopy/YqV
-         KI/vHCFMJtlnFKuy/0GCEHeqiXuq80PUyM8yagZ5hLRCHqWXvbly3lb4mNiWD9PsxZYh
-         O8x53bUVXI2lZ7iyiufxz1Xb7a6PBxB+dgjy1/vo3/cS8+rk4fyqcMNazQa3P7ysz3bb
-         Vy6dAlp6V5rCclXMzuZcX31r3GTi9owWcSpXl1Er22h/YnY7d4VbzTMBRBcjAN0omEP2
-         hQgC6oCGtoSQ63Gotzf2ot0WGCJ1Bpekr9pEEsl0qJNR76aIifMbY7Lh8G6JX4Q3AgK3
-         G4Cg==
-X-Forwarded-Encrypted: i=1; AJvYcCWE6d6FdQuzDpeiarOcbv27J5uqum3UzV/lqIckMEkdi7L3ZQ6LSrFdx48a8goVEs7aLwBruL2kJOSec1kecFE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywu/W3L+tvzAySL2o5Yph/ozJPydas3t0YtxHms1RmBHRKKcEpC
-	yHRI1VNrjfN3VmmjdyY1EsH21Rc423T4wDjDXwFnswZ5smHvrlOUhCiYk2PRVDI4u0ik7lVjttj
-	AD/+BSxrJ/evCDaD8JtsC/3I6fjCclbqpE9p7xpAj7zdYtuGuQ6JRG4ExJpUw9mC3nTs2aa4=
-X-Gm-Gg: ATEYQzzfOVZuFvMkVOku02D61ycjfntYFsEGWIpsN6iNk1CHPppLhwcTu+8tnoO850O
-	9ByKw6UQeQ/dHTnmK2yjGUzhXaV1LU13QGk28GHVrlgMKPbNegSSAMQQNgx9U21a/JfrrWnOR8f
-	zRJ5qVMJ3r1x9L0gtpABi8/bFHzcZqM49FZD5NgIE94LNg62f+8fumz9vMkUhMH8gafp8yErx5X
-	bXb8JLRvy2RgNRGbJaKa2/zhziiFWF/Ap4axTmkM2IGIBXbzsjKQiOBrFYFGQ07W5/noEXT+Hvx
-	PQIQZM9q/w2vs2la4OAQAFWU4YIBhTCh7gLF1iar/6CPhIPy5oAaaHOnQ5prgPT2LT8FqI3LFOv
-	lQnJ1Dmaitb4EhqacYayHoxvH4vkmSEvBVihufkwbmDVZgL7aDyI/Wl7N0psa7pnVUpmKbpGx4s
-	Od
-X-Received: by 2002:a17:90b:3d81:b0:35b:952c:43ab with SMTP id 98e67ed59e1d1-35c30bb5f2amr7681725a91.4.1774836663846;
-        Sun, 29 Mar 2026 19:11:03 -0700 (PDT)
-X-Received: by 2002:a17:90b:3d81:b0:35b:952c:43ab with SMTP id 98e67ed59e1d1-35c30bb5f2amr7681693a91.4.1774836663333;
-        Sun, 29 Mar 2026 19:11:03 -0700 (PDT)
-Received: from [10.110.2.194] (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35d9509cf33sm5321474a91.13.2026.03.29.19.10.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 29 Mar 2026 19:11:02 -0700 (PDT)
-Message-ID: <e2bcaf8d-6caa-4f32-bf69-776dbd2b2b96@oss.qualcomm.com>
-Date: Mon, 30 Mar 2026 10:10:58 +0800
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Rhcsv21U"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774852777; x=1806388777;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=tmYiyZorA0z4TjfSrT93Sw2Vmxyiubwxlrt4sweRxmw=;
+  b=Rhcsv21UbiYMjBJsLwrvAIm+OM8yIcX37UqOjQUyIXhApQDwcrBpZxj3
+   0kSN3QgmngJOzSCYBZspUPdjJ59PEnWaaLhV5os75WlSybt9sy9xvXfVU
+   CsRbzaxHO4z8EHxvzuBj3Yw9DOYooBiLxdacA9J6yZt0ydIE7MQPTZ8Dx
+   3uc2M5IA1DegQvNjU0a74HWkO8AzzIoWP61NxV7eaAUn71EuSEcRE9c48
+   ndaR/Ds2HluK/LvKseYN7E6CoAKGn/AVT9n/LW5fYMu3HwDo8xpUSRT3/
+   ZfAaeCwwbbGtJ1iQBBTMUf/cJYFczq9rwIxGWWpJea6V0eaJS1Ot5RqWv
+   Q==;
+X-CSE-ConnectionGUID: huXMy3gpRKWFmkYVTM5x8A==
+X-CSE-MsgGUID: n8V19QxaSCuZGcAHQU7KvQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11743"; a="79700630"
+X-IronPort-AV: E=Sophos;i="6.23,149,1770624000"; 
+   d="scan'208";a="79700630"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2026 23:39:30 -0700
+X-CSE-ConnectionGUID: tAKsGNzHRwmgAAMe9qbaWg==
+X-CSE-MsgGUID: zmsKSNbKRtOa7FlX6Xlgkg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,149,1770624000"; 
+   d="scan'208";a="222646418"
+Received: from weba0957.iind.intel.com (HELO WEBA0932.iind.intel.com) ([10.224.186.34])
+  by fmviesa007.fm.intel.com with ESMTP; 29 Mar 2026 23:39:23 -0700
+From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-pci@vger.kernel.org,
+	bhelgaas@google.com,
+	ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Subject: [PATCH v1] Bluetooth: btintel_pcie:Support Product level reset.
+Date: Mon, 30 Mar 2026 12:08:41 +0530
+Message-ID: <20260330063842.1121545-1-chandrashekar.devegowda@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] Bluetooth: qca: Fix delayed hw_error handling due to
- missing wakeup during SSR
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>, linux-arm-msm@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com,
-        wei.deng@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
-        mengshi.wu@oss.qualcomm.com, Shuai Zhang <quic_shuaz@quicinc.com>,
-        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-References: <20260327083258.1398450-1-shuai.zhang@oss.qualcomm.com>
- <CABBYNZKwxh1R=EcBpqNpsO=pyJ7Z47qgYUQtrpG9QSC6sK3SpA@mail.gmail.com>
-Content-Language: en-US
-From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-In-Reply-To: <CABBYNZKwxh1R=EcBpqNpsO=pyJ7Z47qgYUQtrpG9QSC6sK3SpA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: bep5ZRpznObsSQKMyYQcxzWHhtulBXWM
-X-Authority-Analysis: v=2.4 cv=efYwvrEH c=1 sm=1 tr=0 ts=69c9dbb8 cx=c_pps
- a=vVfyC5vLCtgYJKYeQD43oA==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22
- a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8 a=c92rfblmAAAA:8 a=EUspDBNiAAAA:8
- a=KKAkSRfTAAAA:8 a=nMkBCxXBiB_ylkh7ArAA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=rl5im9kqc5Lf4LNbBjHf:22 a=TjNXssC_j7lpFel5tvFf:22 a=GvGzcOZaWPEFPQC_NcjD:22
- a=cvBusfyB2V15izCimMoJ:22
-X-Proofpoint-ORIG-GUID: bep5ZRpznObsSQKMyYQcxzWHhtulBXWM
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzMwMDAxNCBTYWx0ZWRfX0KIyt+IQYD5t
- qbc4KKQ/LIJNisZs9ppisYE2TlipJv9UC7cNdBjikpkX6bMMfLkQ8Y/oxJtnXPXrqfgVTKvBm+O
- 4249bl8kkR9KJkJH0AFY6ut1J6Udt/D9o45Qxl6JIP+HUBDDnoy5GWhyuf03RJ0eDB3Xp17hN/g
- HaSQiK5kuHQN3VZsvYXCrvJUAyRpW6LRdy2hmPsJ+Sg89z9xtAvtOLVoqadIpqOxx7YHzJCsnkI
- mLvK/hSDPMUBcOKSP/joLgC4qzBHH4idGDxBLYQ6qWU0C88QKdSheOTg/BFZRwbiROuE+jppp+C
- LWDjRNZPXZFUbg1bX6++bAyl+Mnn76euXST3uo+yXm26SqZh6GyrDmc8pImm8SDoLSSF0R6f5EC
- NWElkNX3X6oEW7YIcl/xnqdGvYe7x8tMDKAuR0qaZRfe/c3EMAUZxY59jChqj4TIJ/Y19eef8M5
- Hz39UNL2wkFwWO1CvUQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-29_05,2026-03-28_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 malwarescore=0 adultscore=0 clxscore=1015 spamscore=0
- priorityscore=1501 impostorscore=0 lowpriorityscore=0 phishscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2603050001
- definitions=main-2603300014
 
-Hi Luiz
+When driver encounters a TOP exception, ACPI methods will be called
+for Product level reset since Wifi and BT share the same TOP, BT driver
+will first reprobe the wifi driver and then reprobe BT.
 
-Thanks for the suggestion.
+Tested by:
+1) Simulating TOP exception: sudo hcitool cmd 3f 4d 0A 00
+And verified that the device went through PLDR by checking the ACPI
+debug logs.
+2) Toggle of sysfs attribute for BT reset for FLR i.e
+echo 1 > /sys/class/bluetooth/hci0/reset
 
-On 3/28/2026 1:51 AM, Luiz Augusto von Dentz wrote:
-> Hi Shuai,
->
-> On Fri, Mar 27, 2026 at 4:33 AM Shuai Zhang
-> <shuai.zhang@oss.qualcomm.com> wrote:
->> From: Shuai Zhang <quic_shuaz@quicinc.com>
->>
->> When Bluetooth controller encounters a coredump, it triggers
->> the Subsystem Restart (SSR) mechanism. The controller first
->> reports the coredump data, and once the data upload is complete,
->> it sends a hw_error event. The host relies on this event to
->> proceed with subsequent recovery actions.
->>
->> If the host has not finished processing the coredump data
->> when the hw_error event is received,
->> it sets a timer to wait until either the data processing is complete
->> or the timeout expires before handling the event.
->>
->> The current implementation lacks a wakeup trigger. As a result,
->> even if the coredump data has already been processed, the host
->> continues to wait until the timer expires, causing unnecessary
->> delays in handling the hw_error event.
->>
->> To fix this issue, adds a `wake_up_bit()` call after the host finishes
->> processing the coredump data. This ensures that the waiting thread is
->> promptly notified and can proceed to handle the hw_error event without
->> waiting for the timeout.
->>
->> Test case:
->> - Trigger controller coredump using the command: `hcitool cmd 0x3f 0c 26`.
->> - Use `btmon` to capture HCI logs.
->> - Observe the time interval between receiving the hw_error event
->> and the execution of the power-off sequence in the HCI log.
->>
->> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
->> Link: https://lore.kernel.org/stable/20251107033924.3707495-2-quic_shuaz%40quicinc.com
->> Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->> ---
->> Changes v4:
->> - add Acked-by signoff
->> - Link to v3
->>    https://lore.kernel.org/all/20251107033924.3707495-1-quic_shuaz@quicinc.com/
->>
->> Changes v3:
->> - add Fixes tag
->> - Link to v2
->>    https://lore.kernel.org/all/20251106140103.1406081-1-quic_shuaz@quicinc.com/
->>
->> Changes v2:
->> - Split timeout conversion into a separate patch.
->> - Clarified commit messages and added test case description.
->> - Link to v1
->>    https://lore.kernel.org/all/20251104112601.2670019-1-quic_shuaz@quicinc.com/
->> ---
->>   drivers/bluetooth/hci_qca.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index c17a462ae..228a754a9 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -1108,7 +1108,7 @@ static void qca_controller_memdump(struct work_struct *work)
->>                                  qca->qca_memdump = NULL;
->>                                  qca->memdump_state = QCA_MEMDUMP_COLLECTED;
->>                                  cancel_delayed_work(&qca->ctrl_memdump_timeout);
->> -                               clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
->> +                               clear_and_wake_up_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
->>                                  clear_bit(QCA_IBS_DISABLED, &qca->flags);
->>                                  mutex_unlock(&qca->hci_memdump_lock);
->>                                  return;
->> @@ -1186,7 +1186,7 @@ static void qca_controller_memdump(struct work_struct *work)
->>                          kfree(qca->qca_memdump);
->>                          qca->qca_memdump = NULL;
->>                          qca->memdump_state = QCA_MEMDUMP_COLLECTED;
->> -                       clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
->> +                       clear_and_wake_up_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
->>                  }
->>
->>                  mutex_unlock(&qca->hci_memdump_lock);
->> --
->> 2.34.1
-> https://sashiko.dev/#/patchset/20260327083258.1398450-1-shuai.zhang%40oss.qualcomm.com
->
-> Not saying the feedback is actually valid, but if there are other part
-> of the code still using clear_bit(QCA_MEMDUMP_COLLECTION then perhaps
-> they should be updated as well?
+Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+---
+ drivers/bluetooth/btintel.c      |   6 +-
+ drivers/bluetooth/btintel.h      |   7 ++
+ drivers/bluetooth/btintel_pcie.c | 163 +++++++++++++++++++++++++++++--
+ drivers/bluetooth/btintel_pcie.h |   6 ++
+ 4 files changed, 171 insertions(+), 11 deletions(-)
 
-
-Only these two locations incorrectly use clear_bit instead of 
-clear_and_wake_up_bit.
-
-  All other uses of QCA_MEMDUMP_COLLECTION only involve set_bit and 
-test_bit.
-
-
-Thanks,
-
-Shuai
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index dcaaa4ca02b9..4426327ebc61 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -67,9 +67,10 @@ static struct {
+ 	u32        fw_build_num;
+ } coredump_info;
+ 
+-static const guid_t btintel_guid_dsm =
++const guid_t btintel_guid_dsm =
+ 	GUID_INIT(0xaa10f4e0, 0x81ac, 0x4233,
+ 		  0xab, 0xf6, 0x3b, 0x2a, 0xc5, 0x0e, 0x28, 0xd9);
++EXPORT_SYMBOL_GPL(btintel_guid_dsm);
+ 
+ int btintel_check_bdaddr(struct hci_dev *hdev)
+ {
+@@ -2624,7 +2625,7 @@ static void btintel_set_ppag(struct hci_dev *hdev, struct intel_version_tlv *ver
+ 	kfree_skb(skb);
+ }
+ 
+-static int btintel_acpi_reset_method(struct hci_dev *hdev)
++int btintel_acpi_reset_method(struct hci_dev *hdev)
+ {
+ 	int ret = 0;
+ 	acpi_status status;
+@@ -2663,6 +2664,7 @@ static int btintel_acpi_reset_method(struct hci_dev *hdev)
+ 	kfree(buffer.pointer);
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(btintel_acpi_reset_method);
+ 
+ static void btintel_set_dsm_reset_method(struct hci_dev *hdev,
+ 					 struct intel_version_tlv *ver_tlv)
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 0e9ca99aaaae..70d812ad36a2 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -79,6 +79,8 @@ struct intel_tlv {
+ #define BTINTEL_HWID_SCP2	0x20	/* Scorpius Peak2 - Nova Lake */
+ #define BTINTEL_HWID_BZRIW	0x22	/* BlazarIW - Wildcat Lake */
+ 
++extern const guid_t btintel_guid_dsm;
++
+ struct intel_version_tlv {
+ 	u32	cnvi_top;
+ 	u32	cnvr_top;
+@@ -289,6 +291,7 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ int btintel_shutdown_combined(struct hci_dev *hdev);
+ void btintel_hw_error(struct hci_dev *hdev, u8 code);
+ void btintel_print_fseq_info(struct hci_dev *hdev);
++int btintel_acpi_reset_method(struct hci_dev *hdev);
+ #else
+ 
+ static inline int btintel_check_bdaddr(struct hci_dev *hdev)
+@@ -422,4 +425,8 @@ static inline void btintel_hw_error(struct hci_dev *hdev, u8 code)
+ static inline void btintel_print_fseq_info(struct hci_dev *hdev)
+ {
+ }
++static inline int btintel_acpi_reset_method(struct hci_dev *hdev)
++{
++	return -ENODEV;
++}
+ #endif
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 05f82bc3f0d7..abac1ae5df8f 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -15,6 +15,7 @@
+ #include <linux/wait.h>
+ #include <linux/delay.h>
+ #include <linux/interrupt.h>
++#include <linux/acpi.h>
+ 
+ #include <linux/unaligned.h>
+ #include <linux/devcoredump.h>
+@@ -100,6 +101,22 @@ enum {
+ 	BTINTEL_PCIE_D3
+ };
+ 
++enum {
++	BTINTEL_PCIE_DSM_SET_RESET_TIMING = 1,
++	BTINTEL_PCIE_DSM_GET_RESET_TIMING = 2,
++	BTINTEL_PCIE_DSM_BT_PLDR_CONFIG = 3,
++	BTINTEL_PCIE_DSM_GET_RESET_TYPE = 4,
++	BTINTEL_PCIE_DSM_DYNAMIC_PLDR = 5,
++	BTINTEL_PCIE_DSM_GET_RESET_METHOD = 6,
++	BTINTEL_PCIE_DSM_SET_PLDR_DELAY = 7,
++};
++
++enum btintel_dsm_internal_product_reset_mode {
++	BTINTEL_PCIE_DSM_PLDR_MODE_EN_PROD_RESET	= BIT(0),
++	BTINTEL_PCIE_DSM_PLDR_MODE_EN_WIFI_FLR		= BIT(1),
++	BTINTEL_PCIE_DSM_PLDR_MODE_EN_BT_OFF_ON		= BIT(2),
++};
++
+ /* Structure for dbgc fragment buffer
+  * @buf_addr_lsb: LSB of the buffer's physical address
+  * @buf_addr_msb: MSB of the buffer's physical address
+@@ -126,6 +143,11 @@ struct btintel_pcie_dbgc_ctxt {
+ 	struct btintel_pcie_dbgc_ctxt_buf bufs[BTINTEL_PCIE_DBGC_BUFFER_COUNT];
+ };
+ 
++/* structure for reset and recovery
++ * @pdev: The pci_dev for controller
++ * @work: work struct for reset
++ * @reset type: Reset can be FLR or PLDR
++ */
+ struct btintel_pcie_removal {
+ 	struct pci_dev *pdev;
+ 	struct work_struct work;
+@@ -2254,6 +2276,112 @@ static void btintel_pcie_inc_recovery_count(struct pci_dev *pdev,
+ }
+ 
+ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data);
++static void btintel_pcie_reset(struct hci_dev *hdev);
++
++static int btintel_pcie_acpi_reset_method(struct btintel_pcie_data *data)
++{
++	union acpi_object *obj, argv4;
++	acpi_handle handle;
++	int ret;
++	struct pldr_mode {
++		u16	cmd_type;
++		u16	cmd_payload;
++	} __packed;
++
++	/* set 1 for _PRR mode
++	 * Product Reset (PLDR Abort flow)
++	 */
++	static const struct pldr_mode mode = {
++		.cmd_type = 1,
++		.cmd_payload = BTINTEL_PCIE_DSM_PLDR_MODE_EN_PROD_RESET |
++			       BTINTEL_PCIE_DSM_PLDR_MODE_EN_WIFI_FLR,
++	};
++	struct hci_dev *hdev = data->hdev;
++
++	handle = ACPI_HANDLE(GET_HCIDEV_DEV(data->hdev));
++	if (!handle) {
++		bt_dev_dbg(data->hdev, "No support for bluetooth device in ACPI firmware");
++		return -EACCES;
++	}
++
++	if (!acpi_has_method(handle, "_PRR")) {
++		bt_dev_dbg(data->hdev, "No support for _PRR ACPI method, falling back to FLR");
++		btintel_pcie_reset(data->hdev);
++		return -ENODEV;
++	}
++
++	argv4.buffer.type = ACPI_TYPE_BUFFER;
++	argv4.buffer.length = sizeof(mode);
++	argv4.buffer.pointer = (void *)&mode;
++
++	obj = acpi_evaluate_dsm(handle, &btintel_guid_dsm, 0,
++				BTINTEL_PCIE_DSM_DYNAMIC_PLDR, &argv4);
++	if (!obj) {
++		bt_dev_err(data->hdev, "Failed to call dsm to set reset method");
++		return -EIO;
++	}
++	ACPI_FREE(obj);
++
++	pci_dev_lock(data->pdev);
++	pci_save_state(data->pdev);
++	ret = btintel_acpi_reset_method(hdev);
++	if (ret)
++		bt_dev_err(data->hdev, "ACPI _PRR reset failed (%d),PLDR incomplete",
++			   ret);
++	pci_restore_state(data->pdev);
++	pci_dev_unlock(data->pdev);
++	return ret;
++}
++
++static void btintel_pcie_perform_pldr(struct btintel_pcie_removal *removal)
++{
++	struct pci_dev *pdev = removal->pdev;
++	struct pci_dev *wifi = NULL;
++	struct pci_bus *bus;
++	struct btintel_pcie_data *data;
++	/* on integrated we have to look up by ID (same bus) */
++	static const struct pci_device_id wifi_device_ids[] = {
++	#define WIFI_DEV(_id) { PCI_DEVICE(PCI_VENDOR_ID_INTEL, _id) }
++		WIFI_DEV(0xA840), /* LNL */
++		WIFI_DEV(0xE440), /* PTL-P */
++		WIFI_DEV(0xE340), /* PTL-H */
++		WIFI_DEV(0xD340), /* NVL-H */
++		WIFI_DEV(0x6E70), /* NVL-S */
++		WIFI_DEV(0x4D40), /* WCL */
++		WIFI_DEV(0xD240), /* RZL-H */
++		WIFI_DEV(0x6C40), /* RZL-M */
++		{}
++	};
++	struct pci_dev *tmp = NULL;
++
++	data = pci_get_drvdata(pdev);
++
++	bus = pdev->bus;
++	if (!bus)
++		return;
++
++	/* If ACPI reset fell back to FLR or failed, skip reprobe to avoid
++	 * racing with the FLR work already scheduled.
++	 */
++	if (btintel_pcie_acpi_reset_method(data))
++		return;
++
++	list_for_each_entry(tmp, &bus->devices, bus_list) {
++		if (pci_match_id(wifi_device_ids, tmp)) {
++			wifi = pci_dev_get(tmp);
++			break;
++		}
++	}
++
++	if (wifi) {
++		if (device_reprobe(&wifi->dev))
++			BT_ERR("WiFi reprobe failed for BDF:%s", pci_name(wifi));
++		pci_dev_put(wifi);
++	}
++
++	if (device_reprobe(&pdev->dev))
++		BT_ERR("BT reprobe failed for BDF:%s", pci_name(pdev));
++}
+ 
+ static void btintel_pcie_removal_work(struct work_struct *wk)
+ {
+@@ -2266,9 +2394,13 @@ static void btintel_pcie_removal_work(struct work_struct *wk)
+ 	pci_lock_rescan_remove();
+ 
+ 	if (!pdev->bus)
+-		goto error;
++		goto out;
+ 
+ 	data = pci_get_drvdata(pdev);
++	if (!data) {
++		BT_WARN("PCI driver data is NULL, aborting removal work");
++		goto out;
++	}
+ 
+ 	btintel_pcie_disable_interrupts(data);
+ 	btintel_pcie_synchronize_irqs(data);
+@@ -2276,12 +2408,16 @@ static void btintel_pcie_removal_work(struct work_struct *wk)
+ 	flush_work(&data->rx_work);
+ 
+ 	bt_dev_dbg(data->hdev, "Release bluetooth interface");
++	if (data->reset_type == BTINTEL_PCIE_IOSF_PRR_PLDR) {
++		btintel_pcie_perform_pldr(removal);
++		goto out;
++	}
+ 	btintel_pcie_release_hdev(data);
+ 
+ 	err = pci_reset_function(pdev);
+ 	if (err) {
+ 		BT_ERR("Failed resetting the pcie device (%d)", err);
+-		goto error;
++		goto out;
+ 	}
+ 
+ 	btintel_pcie_enable_interrupts(data);
+@@ -2291,7 +2427,7 @@ static void btintel_pcie_removal_work(struct work_struct *wk)
+ 	if (err) {
+ 		BT_ERR("Failed to enable bluetooth hardware after reset (%d)",
+ 		       err);
+-		goto error;
++		goto out;
+ 	}
+ 
+ 	btintel_pcie_reset_ia(data);
+@@ -2301,9 +2437,9 @@ static void btintel_pcie_removal_work(struct work_struct *wk)
+ 	err = btintel_pcie_setup_hdev(data);
+ 	if (err) {
+ 		BT_ERR("Failed registering hdev (%d)", err);
+-		goto error;
++		goto out;
+ 	}
+-error:
++out:
+ 	pci_dev_put(pdev);
+ 	pci_unlock_rescan_remove();
+ 	kfree(removal);
+@@ -2339,15 +2475,19 @@ static void btintel_pcie_hw_error(struct hci_dev *hdev, u8 code)
+ 	struct pci_dev *pdev = dev_data->pdev;
+ 	time64_t retry_window;
+ 
+-	if (code == 0x13) {
+-		bt_dev_err(hdev, "Encountered top exception");
+-		return;
+-	}
++	btintel_pcie_dump_debug_registers(hdev);
+ 
+ 	data = btintel_pcie_get_recovery(pdev, &hdev->dev);
+ 	if (!data)
+ 		return;
+ 
++	if (code == 0x13)
++		dev_data->reset_type = BTINTEL_PCIE_IOSF_PRR_PLDR;
++	else
++		dev_data->reset_type = BTINTEL_PCIE_IOSF_PRR_FLR;
++
++	bt_dev_err(hdev, "Encountered exception err:0x%x triggering: %s", code,
++		   dev_data->reset_type == BTINTEL_PCIE_IOSF_PRR_PLDR ? "PLDR" : "FLR");
+ 	retry_window = ktime_get_boottime_seconds() - data->last_error;
+ 
+ 	if (retry_window < BTINTEL_PCIE_RESET_WINDOW_SECS &&
+@@ -2503,6 +2643,10 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
+ 
+ 	data->boot_stage_cache = 0x00;
+ 	data->img_resp_cache = 0x00;
++	/* FLR can be invoked by echoing to debugfs path, so explicitly
++	 * initialized
++	 */
++	data->reset_type = BTINTEL_PCIE_IOSF_PRR_FLR;
+ 
+ 	err = btintel_pcie_config_pcie(pdev, data);
+ 	if (err)
+@@ -2701,6 +2845,7 @@ static int btintel_pcie_resume(struct device *dev)
+ 	if (data->pm_sx_event == PM_EVENT_FREEZE ||
+ 	    data->pm_sx_event == PM_EVENT_HIBERNATE) {
+ 		set_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags);
++		data->reset_type = BTINTEL_PCIE_IOSF_PRR_FLR;
+ 		btintel_pcie_reset(data->hdev);
+ 		return 0;
+ 	}
+diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
+index e3d941ffef4a..856673fb2bd7 100644
+--- a/drivers/bluetooth/btintel_pcie.h
++++ b/drivers/bluetooth/btintel_pcie.h
+@@ -144,6 +144,11 @@ enum msix_mbox_int_causes {
+ 	BTINTEL_PCIE_CSR_MBOX_STATUS_MBOX4 = BIT(3), /* cause MBOX4 */
+ };
+ 
++enum btintel_pcie_reset_type {
++	BTINTEL_PCIE_IOSF_PRR_FLR = 0,
++	BTINTEL_PCIE_IOSF_PRR_PLDR = 1,
++};
++
+ #define BTINTEL_PCIE_MSIX_NON_AUTO_CLEAR_CAUSE	BIT(7)
+ 
+ /* Minimum and Maximum number of MSI-X Vector
+@@ -514,6 +519,7 @@ struct btintel_pcie_data {
+ 	struct txq	txq;
+ 	struct rxq	rxq;
+ 	u32	alive_intr_ctxt;
++	enum btintel_pcie_reset_type	reset_type;
+ 	struct btintel_pcie_dbgc	dbgc;
+ 	struct btintel_pcie_dump_header dmp_hdr;
+ 	u8	pm_sx_event;
+-- 
+2.43.0
 
