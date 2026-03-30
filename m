@@ -1,158 +1,165 @@
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616B12F0C45
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 22:51:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1758C3ACA51;
+	Mon, 30 Mar 2026 23:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774911075; cv=none; b=REUSPM4cjNAghrSZNkpmUubRX56iAmjL6y84TNSTFm3aBg1Ltjv7ijlq2lNkuanBxxnamD5x9rY+wPmRqt4M5jl9PnKEsStEpHYPjPQzicWf9WCS+qe7llednf5PerQsaopPW+Hj26wR0rm2Ky4g98NC9+ka26YyW2OjyhjOuDU=
+	t=1774914062; cv=none; b=GzKnAIC5Ga1bBxVaPnv50xwzIN9wh5vJmpm3yitAHsJYTTlYOunIf1zASjxPyf4Ahb16RDlfOjgAWUWbK4b0dmUYJIoNUNulI9E/rpK49bNoQv0YQRor0GpLVyPweKFedpmNbI9nFkukr7r6aNuMecvGh0Lc/+45xmyHiip5zSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774911075; c=relaxed/simple;
-	bh=s7EhldC8NnNr/7zmSfihqZKUl12TLpTS8HosmxPwXVE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=aPmDVLz4dGQouTsNsn/Q9FwvnwKLIF7wtR8iScx6vNRNX0GIJtjZVROIaIxpOGGafhfFvcwfmAtPh6GvG08ytroiH/yghxNuguwB+o8874bo84krm+wo0NZX9nXcJmw1VcFaKoUKixmEJtYawxah2YV3ajMu3U+u1mmV/ovkzhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Oj3c/xxd; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1774914062; c=relaxed/simple;
+	bh=/7bWj8LSjbjOOQbncVOiQyndkujrzPgYDKjh3MdDTFo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jCzRkI/aJRRsgWpMBf4f1RZfrYhiBNYqW+/HOOmIpx7YGNJb7mN3g2BSqbpNZAYODfRsydCDJsyiQMtgs4DxMutMsCIYGuXEQvAd8JZCpUCsHVlDMPJytxDNVdB7HK60P86/Yhrl8uNDUQvoN50xFTZOLl/jCvwP8FgqpbHxtes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ch9jykEi; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oj3c/xxd"
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-8cfbfdabf3fso504477285a.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 15:51:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774911069; x=1775515869; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=YscM1drlyQWd/iGJ4nRXD+Xu8NZC2GOPeROzW197dZU=;
-        b=Oj3c/xxdi1U4vYcCxwGRy2tTc5qyPtTAlDqfycJOg9mIkDqDR3W0o2H5os1hYEbFkN
-         7U3pzZ2qYbCcE7uW+ssmlwojPItIuRqhmrky9BsOUqyNECF38V0v+lVRs1SgNd8jN4Mm
-         q3tJLF/Vno0BwrOjZA8F52Ckgtu/E4SgTOm9FBnK+1GQcjybJa3erltQemA9ZPQocKXX
-         gStkkhOqQ4HtgiMZCL0yEswMt5hqg4dgx0MpUfF2aTFmxSOKc2O80QMKnosl13V5OouV
-         UVZe3E1JVZBKEEj9gGJKz48KgD5TeI8fmJKO3XfkdgwK2LwALUJcuvoBztlZ2/w1bvk9
-         qApw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774911069; x=1775515869;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YscM1drlyQWd/iGJ4nRXD+Xu8NZC2GOPeROzW197dZU=;
-        b=jvBzIIDVxbRuivDxHdWVgRTnwjAzec4sRZlLL13W0WnqQzaY+vXP5qX0xW+wyDRZii
-         90g8+dnnMb8iqYPSqZVj8INwPx2zthJMjco3gT9Qtw7wG3RDS3KQNe3hlNPkd38jAkbE
-         5n+WzPM5UmqO6PPlD3Q9VWsRf1joAuhU2Q2wUP6uRs+axx4vepk709tqI0mG6uqTxtHr
-         XNYFTW2jYImTNS+EkstEMZrFS6UBeoijEgQU0rrB6T8iCWplTgtKV8vEoMd5sWScYXEm
-         WgLcu9qhuab0vgCTtHH7+C8zA9xcZ1noY+jDZz3jqNUsalgYuBoKXuP321ah0k1AE5r3
-         EUsA==
-X-Gm-Message-State: AOJu0YwoahKYBrbMXg+d5BJvrawIxtNQyUtgHi2F/05jqqSTz7G6gkP0
-	X347UXxcPad3/4RhHZ6W4ftXDxffsozD4DgxHdY//iAoV7HrFDvQ25OIM9R0oQ==
-X-Gm-Gg: ATEYQzx5FVqkCqIuG0nb8j5J/ykWz0J2w+6m0hjoxLXIvBCL3QIaGKx5wfScTJgV+4B
-	oGD7tKTILGR82OZLo+Rxw7epkJrR4FgI/AHZQO43sVnowbWvV3YdAI4F6kCQLSGgvnHmSbCsv5T
-	C0News48A71JOoBxyUvmNUBRbdlYBBwkMPdWlDyqkBzKNzp8wGFay1l1YNrGRK6GDjCAyvJLt/t
-	3AIr5+DiJcbTcrImBU+kHfyg0hj3XpjlLlwUu/Lt4nv7Zde084M+A6dIHrqvzz/jlbCLKt+FY+L
-	rENu17CL0ia2fn/imNTPFbaSIcyk5kqdNNILZik+Cz7RkU5N6t9Yk5/da87IJ7vdABUerFdu+0h
-	rEZeRIGpzma1z5e/pT/KmcyD6Dz68OEDXlPI1OlklZtgi0NduSqLEQWOV0925pc0billIHj5HiT
-	Py1maC7oNwklebO2KF/7RbF636GxTn6g==
-X-Received: by 2002:a05:620a:46a7:b0:8cd:96e5:f7be with SMTP id af79cd13be357-8d01c816da7mr1944387585a.69.1774911069218;
-        Mon, 30 Mar 2026 15:51:09 -0700 (PDT)
-Received: from [172.17.0.2] ([64.236.133.97])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8d028086d25sm706013285a.43.2026.03.30.15.51.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 15:51:08 -0700 (PDT)
-Message-ID: <69cafe5c.050a0220.282a5f.8e62@mx.google.com>
-Date: Mon, 30 Mar 2026 15:51:08 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7702440857685502159=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ch9jykEi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774914060; x=1806450060;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/7bWj8LSjbjOOQbncVOiQyndkujrzPgYDKjh3MdDTFo=;
+  b=Ch9jykEiqdnkVIT2Z0tYUk8w7udTv+CnMy8IKE/Jx0AN4aIld3KAI7C9
+   tF7O/hTgpJo1bFlUYgNXu288aRqdnt3LE1nQY2IEoXh3hpLQ4oNuj+Iqj
+   Ti1C9k0QMZmdm5duuSX+1yJCzUhcEn86TDlcP/MCIPppZOzh2xin2ugPs
+   c5RNvGyjxFoNaqTxW5zR8v4l8sGS3lRK99AINW5A9LgsUUn/2rGJs+L13
+   nphurOL7qji2Tr1DfICdH9EtUM5ar2/BBCzd0yNGkL+aO+088OlHRYL/A
+   bnG+WMC2uBNinfIuwW31gv9B0fQDQVfH4w5tYc6DRhnfBPQwxWHLCXvCy
+   Q==;
+X-CSE-ConnectionGUID: YHtgwdfuTCunG078VBU2VA==
+X-CSE-MsgGUID: ERiYoVgqQ46S4kf3zyT7Sw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11744"; a="93500739"
+X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
+   d="scan'208";a="93500739"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 16:41:00 -0700
+X-CSE-ConnectionGUID: CBFG7EfbQBiV8V1pOgxBPQ==
+X-CSE-MsgGUID: q4vw4/sZSIerHKFhAUZP2A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
+   d="scan'208";a="231000505"
+Received: from lkp-server01.sh.intel.com (HELO 283bf2e1b94a) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 30 Mar 2026 16:40:58 -0700
+Received: from kbuild by 283bf2e1b94a with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w7ME3-000000001s5-1yZH;
+	Mon, 30 Mar 2026 23:40:55 +0000
+Date: Tue, 31 Mar 2026 07:39:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, linux-pci@vger.kernel.org,
+	bhelgaas@google.com, ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Subject: Re: [PATCH v1] Bluetooth: btintel_pcie:Support Product level reset.
+Message-ID: <202603310744.5WIVh3e6-lkp@intel.com>
+References: <20260330063842.1121545-1-chandrashekar.devegowda@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, nathan.c.rebello@gmail.com
-Subject: RE: [v3] Bluetooth: ISO: fix NULL deref in iso_recv() ISO_END handling
-In-Reply-To: <20260330221015.322337-1-nathan.c.rebello@gmail.com>
-References: <20260330221015.322337-1-nathan.c.rebello@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260330063842.1121545-1-chandrashekar.devegowda@intel.com>
 
---===============7702440857685502159==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Chandrashekar,
 
-This is automated email and please do not reply to this email!
+kernel test robot noticed the following build errors:
 
-Dear submitter,
+[auto build test ERROR on bluetooth-next/master]
+[also build test ERROR on next-20260327]
+[cannot apply to bluetooth/master linus/master v7.0-rc6]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1074833
+url:    https://github.com/intel-lab-lkp/linux/commits/Chandrashekar-Devegowda/Bluetooth-btintel_pcie-Support-Product-level-reset/20260330-190125
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+patch link:    https://lore.kernel.org/r/20260330063842.1121545-1-chandrashekar.devegowda%40intel.com
+patch subject: [PATCH v1] Bluetooth: btintel_pcie:Support Product level reset.
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20260331/202603310744.5WIVh3e6-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260331/202603310744.5WIVh3e6-lkp@intel.com/reproduce)
 
----Test result---
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603310744.5WIVh3e6-lkp@intel.com/
 
-Test Summary:
-CheckPatch                    PENDING   0.32 seconds
-GitLint                       PENDING   0.25 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      25.95 seconds
-CheckAllWarning               PASS      29.27 seconds
-CheckSparse                   PASS      27.90 seconds
-BuildKernel32                 PASS      26.13 seconds
-TestRunnerSetup               PASS      568.66 seconds
-TestRunner_l2cap-tester       PASS      28.07 seconds
-TestRunner_iso-tester         PASS      34.21 seconds
-TestRunner_bnep-tester        PASS      6.51 seconds
-TestRunner_mgmt-tester        FAIL      114.56 seconds
-TestRunner_rfcomm-tester      PASS      9.62 seconds
-TestRunner_sco-tester         FAIL      14.35 seconds
-TestRunner_ioctl-tester       PASS      10.48 seconds
-TestRunner_mesh-tester        FAIL      11.71 seconds
-TestRunner_smp-tester         PASS      8.83 seconds
-TestRunner_userchan-tester    PASS      6.85 seconds
-IncrementalBuild              PENDING   0.61 seconds
+All errors (new ones prefixed by >>):
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.100 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.821 seconds
-Mesh - Send cancel - 2                               Timed out    1.996 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+   drivers/bluetooth/btintel_pcie.c: In function 'btintel_pcie_acpi_reset_method':
+>> drivers/bluetooth/btintel_pcie.c:2307:14: error: implicit declaration of function 'acpi_has_method'; did you mean 'acpi_has_watchdog'? [-Wimplicit-function-declaration]
+    2307 |         if (!acpi_has_method(handle, "_PRR")) {
+         |              ^~~~~~~~~~~~~~~
+         |              acpi_has_watchdog
 
 
+vim +2307 drivers/bluetooth/btintel_pcie.c
 
----
-Regards,
-Linux Bluetooth
+  2280	
+  2281	static int btintel_pcie_acpi_reset_method(struct btintel_pcie_data *data)
+  2282	{
+  2283		union acpi_object *obj, argv4;
+  2284		acpi_handle handle;
+  2285		int ret;
+  2286		struct pldr_mode {
+  2287			u16	cmd_type;
+  2288			u16	cmd_payload;
+  2289		} __packed;
+  2290	
+  2291		/* set 1 for _PRR mode
+  2292		 * Product Reset (PLDR Abort flow)
+  2293		 */
+  2294		static const struct pldr_mode mode = {
+  2295			.cmd_type = 1,
+  2296			.cmd_payload = BTINTEL_PCIE_DSM_PLDR_MODE_EN_PROD_RESET |
+  2297				       BTINTEL_PCIE_DSM_PLDR_MODE_EN_WIFI_FLR,
+  2298		};
+  2299		struct hci_dev *hdev = data->hdev;
+  2300	
+  2301		handle = ACPI_HANDLE(GET_HCIDEV_DEV(data->hdev));
+  2302		if (!handle) {
+  2303			bt_dev_dbg(data->hdev, "No support for bluetooth device in ACPI firmware");
+  2304			return -EACCES;
+  2305		}
+  2306	
+> 2307		if (!acpi_has_method(handle, "_PRR")) {
+  2308			bt_dev_dbg(data->hdev, "No support for _PRR ACPI method, falling back to FLR");
+  2309			btintel_pcie_reset(data->hdev);
+  2310			return -ENODEV;
+  2311		}
+  2312	
+  2313		argv4.buffer.type = ACPI_TYPE_BUFFER;
+  2314		argv4.buffer.length = sizeof(mode);
+  2315		argv4.buffer.pointer = (void *)&mode;
+  2316	
+  2317		obj = acpi_evaluate_dsm(handle, &btintel_guid_dsm, 0,
+  2318					BTINTEL_PCIE_DSM_DYNAMIC_PLDR, &argv4);
+  2319		if (!obj) {
+  2320			bt_dev_err(data->hdev, "Failed to call dsm to set reset method");
+  2321			return -EIO;
+  2322		}
+  2323		ACPI_FREE(obj);
+  2324	
+  2325		pci_dev_lock(data->pdev);
+  2326		pci_save_state(data->pdev);
+  2327		ret = btintel_acpi_reset_method(hdev);
+  2328		if (ret)
+  2329			bt_dev_err(data->hdev, "ACPI _PRR reset failed (%d),PLDR incomplete",
+  2330				   ret);
+  2331		pci_restore_state(data->pdev);
+  2332		pci_dev_unlock(data->pdev);
+  2333		return ret;
+  2334	}
+  2335	
 
-
---===============7702440857685502159==--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
