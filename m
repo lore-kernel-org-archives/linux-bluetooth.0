@@ -1,163 +1,85 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1683F31E832
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 08:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45BEE38551C;
+	Mon, 30 Mar 2026 09:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774859404; cv=none; b=Vf5P1nP1g/Mj06CbtUCDCBfLSAOnlX9M9rdOgnTqepS+7t4No6r05DiA8SfWAvzUF3/82A0WR4MMVaZIKXa+IKlODQ3s6ChGyIrOVG9Y8bAdZbCwYCTjprxEODUYWoyz752bI1WBOWIr28p4jBMJGx5T7+/Z61oi53Jvt1/cmmw=
+	t=1774863202; cv=none; b=D4p0/gf4ibGi1k4BQv0fBkKLL6e6B9URYt6cyeA5gffWpj75iQ7GLv9mgnppg3jo2IyPd6FOMaJ8M/2L8GiRZJQp6Um+dng7mJhDkP/eNnJV518tffLCIZQMyYi+DlSflvhLxPpL1NLr0M4hlqP+sGLl27Ap2EaelDTvAg8rKjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774859404; c=relaxed/simple;
-	bh=ZSUw2E6HIEj4khtwnP8RLnsqOI6Gv49W3jTye7LNHxg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=febGbr2THwQ0gIbT0mdLR//TMhmOiWeVF2+OM0YUk6cPNhB7jh5ztwrhEod8Xto2IAAhR6mQj82VmF84Rbceda/6gUfa7Unws3rTx/HtU9sP0iE1eG0iT7zo0ZGgsMupwtKm0cgNxyUppIkee8YTzff1hvpQaxk1OPO67Lrt2B4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P7P6zarO; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1774863202; c=relaxed/simple;
+	bh=/koXv/gRjWCD4wnT3R4wEMCqKnoLsgkzSsKyyfQH1N8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KOUQyVBHpkHuTjkAEHBqfdyEWylfHMTzzqWHGQfV6WpDV0tMk0b1+i6iAdm3mWSK7kKcLvguRWplqJvzwB33IkQn/AybPaTFuBrB9mBOG+1bKrMoCBkC625Grq4q/enMnjGXFF4OznK26hWiG0vYUmuEJ7Y5o+ekwDrmdQQbKFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C+Mpnmfl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P7P6zarO"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-50b69bf5638so46677081cf.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 01:30:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774859402; x=1775464202; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wMnDAdcbiBk1tATOCqFYBWYucZMEBDrp7PkASYTdl00=;
-        b=P7P6zarO2Sfu3bsSwrhS3Xcr3xlqx5a4WzpsM0dgxWiBBce4hLbT3BHsAc/jKd56DQ
-         MUg/4kYP29YvZvYtevPvBg4TF5kKQC49iQlBb1p/us+vvvGsklH3Z4uLnHlgfwRux8aW
-         mrQ7WoQuOqTHHXKHcAJApEs9ofSWJkQkL8WIp8YSPDXu04e53hK5eMFuEdXvS570mdAP
-         Edl7xUsmTsbnYVk7FQ6DPT/NdWJuqbY0hA00/q8emfZPlEFS4ICm9/zRcOq5vaHJpEeg
-         ctxR1yz39bX2P0HUnE4mL5sK1JGW8JhxrWnBhEaQid2GBM7/W7TuV0f4yHf4zsKhiS6q
-         A7SQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774859402; x=1775464202;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wMnDAdcbiBk1tATOCqFYBWYucZMEBDrp7PkASYTdl00=;
-        b=Ne08V4nXQWq14G7+5qgi7PMB/Ks9L56YEUzVocSzP7rVlD5sEwyE88Y6pTyJ03vz1G
-         NRUQz6e7OHbOCCEBNToh4vkA0OrP4MknGlE/oTYP7l9QCKw3npHw7grh14NBv7bLwZzs
-         Bh57N50G0PGqEMDvidonTQ2XxFk0ApkJH0XJOcYV5kR4mxD/Ys2+YzLds7T//c+KrwmO
-         K1ZTCSFH1LCbRcV5ECJBrYKtSAwJEqaEbrw9aOOY3Ak3CXE53VtbSQXdY8XJypqsIxDX
-         0trpgFOLxg/lyilyCp9Mglg8VvEHbgQA0syJiA13P31dsUraQjYUJyfmiN8y4wtGYl85
-         x85A==
-X-Gm-Message-State: AOJu0Yzyn+vzFeCZsPRFiCI3VoH+0cDmR2Es3ZiphjUdCYOVaPzloNqk
-	Mni4ZayZagoLI2/P6XA8hbdAioh6ieJmuaw2UiloMvcil/vG0kmyEe2TTUh7Jw==
-X-Gm-Gg: ATEYQzzmJgWE+GjRvLnI6G5TVGIiUENb7EWd49p/6kWeMFWvfZ31K3a+YwgYuBkH07w
-	msnOM/K4VwUx6Y9GqA+aiGdNNPRwhi718xzfecC/hIzPVvvYhjSZ/JJojXPwgugK/E724qsx+k5
-	qUQf0tgpOdpY1T/dWKZQJ8i+P5b70mzilNKgSDy2J9juMM9cIhPQxiJjS2gGSy9NDlxbmah415i
-	IjtygZBwh2Xb2JTeh4gH8xOK9iwvIxe/Zq5EJ0E3KXfyq7zn0UlCrnsxbquRVCOc40Tl7xFlcVj
-	PdkChgKzgolAwx1vVgOy5pRQwZi0y2u5Ah1ebGOu60Mhxq5/tsdR/GrIO+EOcRPwZrhAZsTH4uj
-	egcTxXcVtZlvyNU9PgNUIZh+39fSCv1lI1kC5SydAFhEPjIxBDqtt2Fy5BKtRnG6txGiRriqyrJ
-	KylQ22wh+rdDJ0MEKFaUDBk568kv7emQ==
-X-Received: by 2002:a05:622a:8:b0:509:2f5f:a178 with SMTP id d75a77b69052e-50ba3836481mr161771191cf.21.1774859401722;
-        Mon, 30 Mar 2026 01:30:01 -0700 (PDT)
-Received: from [172.17.0.2] ([20.55.223.210])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50bb2dd8d8esm59344221cf.14.2026.03.30.01.30.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 01:30:01 -0700 (PDT)
-Message-ID: <69ca3489.050a0220.1c1d3f.dbc4@mx.google.com>
-Date: Mon, 30 Mar 2026 01:30:01 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2471014707581400424=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C+Mpnmfl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06D7AC4CEF7;
+	Mon, 30 Mar 2026 09:33:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774863202;
+	bh=/koXv/gRjWCD4wnT3R4wEMCqKnoLsgkzSsKyyfQH1N8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=C+MpnmflUAexr9yUfnKfYhsdkTFpT072SNykzOyHzX/rmMSrAQR0X6bg5a07Furd2
+	 34hKMEYAyasvqt2jPuLhFDcz+Xhp9VJkx9FRXjNNObsjJtLHeoWtB2dt4gfmxZLK4w
+	 /UylOJ3eb39QAM7Srm2H29QbIDIUP1kIKl0xHRqLcYxwmNKOllPizEXZkXe7uGyr4P
+	 hAGY9nCq/39i5FQIl7raFwPthF2k/cvPsqY0Rcn+uGJrG0TGCuEoxJcQh8QKbJBIbo
+	 59mrjoM54KjrdbyjB4HlMcsmuILuULZzgZNGX7kqFNMZ5EMMHgePZ2oe/Q1iTMBWU+
+	 UbwHlrdGbBj/A==
+Received: from johan by xi.lan with local (Exim 4.98.2)
+	(envelope-from <johan@kernel.org>)
+	id 1w78zn-00000006nx1-2npq;
+	Mon, 30 Mar 2026 11:33:19 +0200
+From: Johan Hovold <johan@kernel.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Johan Hovold <johan@kernel.org>,
+	Rajat Jain <rajatja@google.com>
+Subject: [PATCH] Bluetooth: btusb: fix wakeup irq devres lifetime
+Date: Mon, 30 Mar 2026 11:33:11 +0200
+Message-ID: <20260330093311.1621965-1-johan@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chandrashekar.devegowda@intel.com
-Subject: RE: [v1] Bluetooth: btintel_pcie:Support Product level reset.
-In-Reply-To: <20260330063842.1121545-1-chandrashekar.devegowda@intel.com>
-References: <20260330063842.1121545-1-chandrashekar.devegowda@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============2471014707581400424==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The OOB wakeup irq is device managed but its lifetime is incorrectly
+tied to the child HCI device rather than the USB interface to which the
+driver is bound.
 
-This is automated email and please do not reply to this email!
+This should not cause any trouble currently as the interrupt is only
+enabled during suspend, but it is technically wrong as the reference
+counted HCI device could remain after the driver has been unbound.
 
-Dear submitter,
+Note that the data passed to the interrupt handler is not device managed
+and is typically freed before the interrupt during disconnect, but this
+is also safe as long as the interrupt is disabled.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1074376
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.31 seconds
-GitLint                       PENDING   0.29 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      25.97 seconds
-CheckAllWarning               PASS      29.12 seconds
-CheckSparse                   PASS      27.49 seconds
-BuildKernel32                 PASS      24.99 seconds
-TestRunnerSetup               PASS      565.01 seconds
-TestRunner_l2cap-tester       PASS      28.33 seconds
-TestRunner_iso-tester         PASS      40.82 seconds
-TestRunner_bnep-tester        PASS      6.28 seconds
-TestRunner_mgmt-tester        FAIL      111.50 seconds
-TestRunner_rfcomm-tester      PASS      9.43 seconds
-TestRunner_sco-tester         FAIL      14.10 seconds
-TestRunner_ioctl-tester       PASS      10.12 seconds
-TestRunner_mesh-tester        FAIL      11.44 seconds
-TestRunner_smp-tester         PASS      8.45 seconds
-TestRunner_userchan-tester    PASS      6.61 seconds
-IncrementalBuild              PENDING   0.47 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 484 (98.0%), Failed: 6, Not Run: 4
-
-Failed Test Cases
-Adv. connectable & connected (central) - Success     Failed       0.128 seconds
-Adv. non-connectable & connected (central) - Success Failed       0.120 seconds
-Ext Adv. connectable & connected (central)           Failed       0.168 seconds
-Ext Adv. non-connectable & connected (central)       Failed       0.168 seconds
-Read Exp Feature - Success                           Failed       0.100 seconds
-LL Privacy - Set Device Flag 1 (Device Privacy)      Failed       0.152 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.901 seconds
-Mesh - Send cancel - 2                               Timed out    1.996 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Fixes: fd913ef7ce61 ("Bluetooth: btusb: Add out-of-band wakeup support")
+Cc: Rajat Jain <rajatja@google.com>
+Signed-off-by: Johan Hovold <johan@kernel.org>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 5c535f3ab722..4c5344ce16c1 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3801,7 +3801,7 @@ static int btusb_config_oob_wake(struct hci_dev *hdev)
+ 	}
+ 
+ 	irq_set_status_flags(irq, IRQ_NOAUTOEN);
+-	ret = devm_request_irq(&hdev->dev, irq, btusb_oob_wake_handler,
++	ret = devm_request_irq(&data->intf->dev, irq, btusb_oob_wake_handler,
+ 			       0, "OOB Wake-on-BT", data);
+ 	if (ret) {
+ 		bt_dev_err(hdev, "%s: IRQ request failed", __func__);
+-- 
+2.52.0
 
---===============2471014707581400424==--
