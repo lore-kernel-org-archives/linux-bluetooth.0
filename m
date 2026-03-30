@@ -1,179 +1,157 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3FED2D060D;
-	Mon, 30 Mar 2026 21:01:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC62C393DC0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 21:27:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774904509; cv=none; b=Ob9eHvqNVeMscpCZuSvkZJLamcFsp9ryREwNoQRhipD930zGqT6GcVJd/zfhwT6JdXJ4R7WIH8yHr1ZL9tgWVBAYwQzGHwxwGXXCXlzAJnOdq7mWj35d6toHv67l8r8FkS+3c4Ss1jvbdSuYWMyPiuEoejVbIbxvgUgF4P7nFYI=
+	t=1774906064; cv=none; b=EILvrDEZy/gwaIufrHpevseh38pTq2KxARnJnznefqRwuzbbRpbt/dqOVeeuMwoM0Tb4CXOZZxD2wtL4OurNS8rFOMZyQzMshwn8sa2n2khi09+/DDBKG309XqwSOnIyOlhwywe8Fq9e2ygPAQxhRp+HDZ+vBUbpfVqc4YnG0R8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774904509; c=relaxed/simple;
-	bh=7Bf6s5P7obYbKfi0McPxjoy/5AMRI2Ir4XDW4hxa6Vs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rq4WbVqO7Dzi7O1WYZShQchOWLeyKvAEW8HG+t/XcP8CgjbrZpMJbew4ptfQYft61z9vMGUwXWDs32bqvbP2L7r2LN23hEvbux+fX7YepVBPlcpUbBs4bJQxQegx7TYxnY0wQ/gzAAJTJUv4EwcSWKK+bTEyF6jiYI/lkt6cjR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bnYpUs5i; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1774906064; c=relaxed/simple;
+	bh=RKgk+a2ITsqi9XukOOzHKnfiIEpr6iF2PY9x6eaZd4U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dBQNvTgm/mxSiesML14lbSKIVmzheQhq3yc4kQ9+KtGfI4VA/AJmSqPgxjQci0hjlhFIAj3JctsIHqQq76zTi6+YJj90+s0KHF5OnCjT08lPNcxguVcejQPKV4fzGhek8H6LPFptbOWA38p7TW0eDZQ9dM5yYDbYQH1jzJcKHRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RhHgJza+; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bnYpUs5i"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774904508; x=1806440508;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=7Bf6s5P7obYbKfi0McPxjoy/5AMRI2Ir4XDW4hxa6Vs=;
-  b=bnYpUs5ite5y6LOmC47rEspSzsfjd8RgK+f4JYwcOEJTJdRlPDH2UQyX
-   JqXRyswpt7DyYRn4cqMBlx6hxa+vTutPOFfsQY9+LZ05K1oc4F18mhbwW
-   8DlrepqpLgG6eSAW776zDfnmW+y9g+h35helS2U1kSUOaS44AgGwGXs5y
-   AsPgc+2fGC7AD1mya7KkexlNzcddIy+8ViA6Jt2RUOpvqoWs8w6Q/evzP
-   ZnLrpOkGVPO1/5trfbwPUxxACP4DhVhPnxbYc6mJG6D3/HzC0KGEPTUqt
-   8mdQnGRK5pyJ3WW6TmmovRaezd0JO4F4R23qjLVmL11HRD/EjwxbmBfPN
-   g==;
-X-CSE-ConnectionGUID: 5Yh9+Hu4QImMINSw716bVw==
-X-CSE-MsgGUID: 08ofLtjxROCg/nX9ritBSw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11744"; a="79808838"
-X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
-   d="scan'208";a="79808838"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 14:01:47 -0700
-X-CSE-ConnectionGUID: 7nPBUnMATt+Vbc3qwsQHbg==
-X-CSE-MsgGUID: PhNu3LhYSn+JH6lFCOg0zw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
-   d="scan'208";a="226038623"
-Received: from lkp-server01.sh.intel.com (HELO 283bf2e1b94a) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 30 Mar 2026 14:01:45 -0700
-Received: from kbuild by 283bf2e1b94a with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w7Jjy-000000001i1-0j2s;
-	Mon, 30 Mar 2026 21:01:42 +0000
-Date: Tue, 31 Mar 2026 05:01:23 +0800
-From: kernel test robot <lkp@intel.com>
-To: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linux-pci@vger.kernel.org, bhelgaas@google.com,
-	ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-Subject: Re: [PATCH v1] Bluetooth: btintel_pcie:Support Product level reset.
-Message-ID: <202603310419.PsZ2njdQ-lkp@intel.com>
-References: <20260330063842.1121545-1-chandrashekar.devegowda@intel.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RhHgJza+"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2b2589c26e3so9421855ad.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 14:27:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774906062; x=1775510862; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QgJhP5eB3Kjlb+gJEQE6up3YZMbKoV0ITM0rqeVdqjo=;
+        b=RhHgJza+k1NMSAMgtCFvVXTCQSxNCEri5bXe6UCeRs78eQyBnMRPyiwfm+EvDZwwR8
+         S+kmR7G2LMLN7N3ozhrsIYrnY5DvOAULmN65cflRFmtac5ApSu1gwhVvZSgXVE736Nsc
+         CAolI7UN81WbDIkfkFvIaw9tAh1+rTpRv2Os+/Gshm+ec9ODwqdRDPQ4F/JRSn2IZQhO
+         mgcFSbSHVRC+tr1xuLLUCwc9ca6stjvzKTDf1uymhfb/P4B5vV1tt5beXZTGFlPCvEoq
+         pP3pvlzH23TYZ27XuP6ldJNIozg+FGwmdlcmR2HvpXl5yl+iv+LNynWDdCCjZMSrxM2o
+         An6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774906062; x=1775510862;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=QgJhP5eB3Kjlb+gJEQE6up3YZMbKoV0ITM0rqeVdqjo=;
+        b=KheBdVRWH4v8wg60SqJvb3LvOgM4DoGFOBoR5M8HxNPnkVqbvuWtawAUQ5VXi2h7J7
+         mGsQpZiOot7ND83quCteNAvQMu1FHs3+cvxXTBySoGBRqRNxiUP+Zv4pG83RcPlPHgwq
+         Pg93SUIFDxUT0k2wC6T3/mDbPJTR3hMq6p/gzg+09bCWGoWwtVshl4SRCXA9H2x+FGFW
+         3Gk50VctRFqsJc39mWOZcN+7f1dGDAou1HT7mBDcOAVV4GdgW9egCXqfQq7Pl4Wk4qci
+         dfVTik0bk04zwFXbscakwhr6AuZYi93UA/2GPwyR3way5GClL5vLu6jx/8efwdesqU5G
+         6uOQ==
+X-Gm-Message-State: AOJu0YxTD6dDyIut5Yf+t3lt6Y2Ok1M1j/hsxWAXTf56f1zkVlTTiWFi
+	Eq2Q4MKf08p6bqCIqD0lHHa2hERFMzUYO0AzLGZV212R5wZXu6dHxq5KhnIPqnU7
+X-Gm-Gg: ATEYQzz1HamfkY3VzWUwGituXWKCx0U/2smXKbFLIWXPn8WZ0CqmkbN6EOOyKg1Hvnd
+	uNNKF1FKPmR7fFIRLWX4zZT/qDtdqtguh/KFJVcz6tmrzRMgx7RzFnrO2asmz1Ls3uBFn/YK0nS
+	f1oshPl+KozImrPoSE4P1Zzr8Hovx8KX4Bydel06AxX283Ir7AOiUoR6cib8LKzzGHx/QXJigtU
+	hyEC2KTlLwD4SeH5X9jP7kn+eIvmxYFDuqZWvHBoRIC9T9KzTvGg5Ej+m8u+F6rCt3H7fKhNW2A
+	2enedihZigZIRMhny9vkTDb5OPvZTs3y+WA3Fr4qqYSmdkYoxI5dFm8CDqMxjwYTAcBRj3ben5d
+	npwgcQfBg3miEja8MogM601DN1/OXpnDlBgAacl+OzRH94yg01oiY2gA0qoy+4mQGkFaG1yQ30b
+	5k/TIxeBjHc7YHCcC4oDYa15uTU6LJOcsPfv1nvvBLA90b5uMYwc6zUhnv1oDbec+sZg3rq3RHd
+	rgfbR/9LT9Lb4xHAvC0aw==
+X-Received: by 2002:a05:620a:1a22:b0:8cd:8635:c031 with SMTP id af79cd13be357-8d01c60d473mr1783105485a.20.1774905690987;
+        Mon, 30 Mar 2026 14:21:30 -0700 (PDT)
+Received: from mango-teamkim.. ([129.170.197.108])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8d027edb8d1sm672796685a.4.2026.03.30.14.21.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Mar 2026 14:21:30 -0700 (PDT)
+From: Nathan Rebello <nathan.c.rebello@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	stable@vger.kernel.org,
+	kyungtae.kim@dartmouth.edu,
+	Nathan Rebello <nathan.c.rebello@gmail.com>
+Subject: [PATCH v2] Bluetooth: ISO: fix NULL deref in iso_recv() ISO_END handling
+Date: Mon, 30 Mar 2026 17:21:29 -0400
+Message-ID: <20260330212129.319339-1-nathan.c.rebello@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260328035813.296410-1-nathan.c.rebello@gmail.com>
+References: <20260328035813.296410-1-nathan.c.rebello@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260330063842.1121545-1-chandrashekar.devegowda@intel.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Chandrashekar,
+The ISO_CONT case in iso_recv() properly checks for unexpected
+continuation frames (!conn->rx_len) and oversized fragments
+(skb->len > conn->rx_len) before accessing conn->rx_skb. The
+ISO_END case lacks both checks.
 
-kernel test robot noticed the following build errors:
+When an ISO_END packet arrives without a preceding ISO_START:
+  - conn->rx_skb is NULL (never allocated)
+  - skb_put(conn->rx_skb, ...) dereferences NULL -> kernel crash
 
-[auto build test ERROR on bluetooth-next/master]
-[also build test ERROR on next-20260327]
-[cannot apply to bluetooth/master linus/master v7.0-rc6]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+When an ISO_END fragment length does not exactly match the
+remaining expected length:
+  - the reassembly is malformed and must be rejected
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Chandrashekar-Devegowda/Bluetooth-btintel_pcie-Support-Product-level-reset/20260330-190125
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-patch link:    https://lore.kernel.org/r/20260330063842.1121545-1-chandrashekar.devegowda%40intel.com
-patch subject: [PATCH v1] Bluetooth: btintel_pcie:Support Product level reset.
-config: um-allmodconfig (https://download.01.org/0day-ci/archive/20260331/202603310419.PsZ2njdQ-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260331/202603310419.PsZ2njdQ-lkp@intel.com/reproduce)
+KASAN confirmed the NULL-deref on kernel 7.0.0-rc5 via VHCI:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603310419.PsZ2njdQ-lkp@intel.com/
+  general protection fault, probably for non-canonical address 0xdffffc0000000018
+  KASAN: null-ptr-deref in range [0x00000000000000c0-0x00000000000000c7]
+  CPU: 0 UID: 0 PID: 72 Comm: kworker/u9:0 Not tainted 7.0.0-rc5
+  Workqueue: hci0 hci_rx_work
+  RIP: 0010:skb_put+0x27/0x1a0
+  Call Trace:
+   <TASK>
+   iso_recv+0x5e0/0xee0
+   hci_rx_work+0x226/0x730
+   process_one_work+0x633/0x1060
+   worker_thread+0x45b/0xd10
+   kthread+0x2c6/0x3b0
+   ret_from_fork+0x38d/0x5c0
+   </TASK>
+  Kernel panic - not syncing: Fatal exception
 
-All errors (new ones prefixed by >>):
+Fix by adding validation to the ISO_END case: reject unexpected
+end frames when no reassembly is in progress, and reject end
+fragments whose length does not exactly complete the expected
+reassembly.
 
-   In file included from drivers/bluetooth/btintel_pcie.c:13:
-   In file included from include/linux/pci.h:38:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:24:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:12:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:1209:55: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-    1209 |         return (port > MMIO_UPPER_LIMIT) ? NULL : PCI_IOBASE + port;
-         |                                                   ~~~~~~~~~~ ^
->> drivers/bluetooth/btintel_pcie.c:2307:7: error: call to undeclared function 'acpi_has_method'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-    2307 |         if (!acpi_has_method(handle, "_PRR")) {
-         |              ^
-   drivers/bluetooth/btintel_pcie.c:2307:7: note: did you mean 'acpi_has_watchdog'?
-   include/linux/acpi.h:1494:20: note: 'acpi_has_watchdog' declared here
-    1494 | static inline bool acpi_has_watchdog(void) { return false; }
-         |                    ^
-   1 warning and 1 error generated.
+Fixes: ccf74f2390d6 ("Bluetooth: Add ISO Socket")
+Cc: stable@vger.kernel.org
+Signed-off-by: Nathan Rebello <nathan.c.rebello@gmail.com>
+---
+Changes in v2:
+  - Tighten end fragment check from (skb->len > conn->rx_len) to
+    (skb->len != conn->rx_len): the end fragment must exactly
+    complete the reassembly, not merely avoid overflow.
 
+ net/bluetooth/iso.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-vim +/acpi_has_method +2307 drivers/bluetooth/btintel_pcie.c
-
-  2280	
-  2281	static int btintel_pcie_acpi_reset_method(struct btintel_pcie_data *data)
-  2282	{
-  2283		union acpi_object *obj, argv4;
-  2284		acpi_handle handle;
-  2285		int ret;
-  2286		struct pldr_mode {
-  2287			u16	cmd_type;
-  2288			u16	cmd_payload;
-  2289		} __packed;
-  2290	
-  2291		/* set 1 for _PRR mode
-  2292		 * Product Reset (PLDR Abort flow)
-  2293		 */
-  2294		static const struct pldr_mode mode = {
-  2295			.cmd_type = 1,
-  2296			.cmd_payload = BTINTEL_PCIE_DSM_PLDR_MODE_EN_PROD_RESET |
-  2297				       BTINTEL_PCIE_DSM_PLDR_MODE_EN_WIFI_FLR,
-  2298		};
-  2299		struct hci_dev *hdev = data->hdev;
-  2300	
-  2301		handle = ACPI_HANDLE(GET_HCIDEV_DEV(data->hdev));
-  2302		if (!handle) {
-  2303			bt_dev_dbg(data->hdev, "No support for bluetooth device in ACPI firmware");
-  2304			return -EACCES;
-  2305		}
-  2306	
-> 2307		if (!acpi_has_method(handle, "_PRR")) {
-  2308			bt_dev_dbg(data->hdev, "No support for _PRR ACPI method, falling back to FLR");
-  2309			btintel_pcie_reset(data->hdev);
-  2310			return -ENODEV;
-  2311		}
-  2312	
-  2313		argv4.buffer.type = ACPI_TYPE_BUFFER;
-  2314		argv4.buffer.length = sizeof(mode);
-  2315		argv4.buffer.pointer = (void *)&mode;
-  2316	
-  2317		obj = acpi_evaluate_dsm(handle, &btintel_guid_dsm, 0,
-  2318					BTINTEL_PCIE_DSM_DYNAMIC_PLDR, &argv4);
-  2319		if (!obj) {
-  2320			bt_dev_err(data->hdev, "Failed to call dsm to set reset method");
-  2321			return -EIO;
-  2322		}
-  2323		ACPI_FREE(obj);
-  2324	
-  2325		pci_dev_lock(data->pdev);
-  2326		pci_save_state(data->pdev);
-  2327		ret = btintel_acpi_reset_method(hdev);
-  2328		if (ret)
-  2329			bt_dev_err(data->hdev, "ACPI _PRR reset failed (%d),PLDR incomplete",
-  2330				   ret);
-  2331		pci_restore_state(data->pdev);
-  2332		pci_dev_unlock(data->pdev);
-  2333		return ret;
-  2334	}
-  2335	
-
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index be145e273..ee87341a1 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -2587,6 +2587,20 @@ int iso_recv(struct hci_dev *hdev, u16 handle, struct sk_buff *skb, u16 flags)
+ 		break;
+ 
+ 	case ISO_END:
++		if (!conn->rx_len) {
++			BT_ERR("Unexpected end frame (len %d)", skb->len);
++			goto drop;
++		}
++
++		if (skb->len != conn->rx_len) {
++			BT_ERR("End fragment length mismatch (len %d, expected %d)",
++			       skb->len, conn->rx_len);
++			kfree_skb(conn->rx_skb);
++			conn->rx_skb = NULL;
++			conn->rx_len = 0;
++			goto drop;
++		}
++
+ 		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
+ 					  skb->len);
+ 		conn->rx_len -= skb->len;
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
+
