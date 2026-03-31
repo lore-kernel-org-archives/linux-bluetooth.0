@@ -1,121 +1,166 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152DE44CF4A;
-	Tue, 31 Mar 2026 18:14:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16187376BE4
+	for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 18:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774980873; cv=none; b=cs7234QqzfdwjoAMjirM2Cjk7/G+cZ15TtUmkVSW41XNFPqz9P/QRlBT3T2BGONayO51vy+OW2juQY9V21gU2hY7qh/MqxPld/VV9VTIe2M2kQLrTB/9al+mfhTst8pka11YP3/WJKicVgqmtNH2ju7QcpvnwJMEr7TJ0l1u7ZI=
+	t=1774982090; cv=none; b=YpIg6/WFqx4wTir7HnhwNBSHXPPk4yMfwCzgBG6U5ZqTtGe7966JFKQLddgjff1/t4FdbxT9VBHePqFNI1ilMkoXXeI0TBN6TplcULicfaMuUU2M7zyRYt8zMdBNsHAJBcH/Oyi5nLL0APSLdsYFyy2eu3yW9ye0GIataCo2OQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774980873; c=relaxed/simple;
-	bh=rFLs6K0p6BMUuvOeR/nvOXIG5PrTQaLSMkfBIS5MkGM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NfOJB0e1yoUZUlS4jVWPC64+w8AfeUgFJ3N3HxQqF/1HZW+k56dhjAP4VCyyOlMln5MkHT6MCFW1qQQgzk66/TUbDYYsB4UO6PVOXQqV31SWJc1gLDkLF/fsjd4vvJKoz1/ZeBC/KgtrTZob001bJ7GoCY3ELuO/ZirDYxokEqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.229] (p5b13a713.dip0.t-ipconnect.de [91.19.167.19])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 957A74C2C37D47;
-	Tue, 31 Mar 2026 20:13:52 +0200 (CEST)
-Message-ID: <11effdbc-4eff-4430-a22f-3320f84859fb@molgen.mpg.de>
-Date: Tue, 31 Mar 2026 20:13:46 +0200
+	s=arc-20240116; t=1774982090; c=relaxed/simple;
+	bh=tYTsbM8gSBXh967M354ggusanv1jXdeCaOgrpC2/Ubs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=D21ClRvYFgWAi+WKbDPfvmDPkcbnuV7Cwn0OaXGqyxd7m+l2sxjaEZZamvIZ+/puwA3bqk7PaCCuGMrE0o2lFhyhzxmv29tx1QAo/g93oVYkN0jOP1wIVrzDdMzeX6+4bZ/h3wbs40FRAlj6wKdjyk86HI3nRxeVWMeMuvhA2Oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l5TTZ3yQ; arc=none smtp.client-ip=209.85.210.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l5TTZ3yQ"
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7d744d9acbeso2484138a34.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 11:34:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774982088; x=1775586888; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=brYcq9OETEyrATVhVWTeO9yDnoxRwM5n5KfjsWFYaZk=;
+        b=l5TTZ3yQYLenazCyrc3fw1KmB9zpSq/KElGX/z7PUktvjBMFDPxcEDe1rCJJqqSsns
+         Di1VY5JV3rdAyffmLuQ/JhPmWQ0u9/1PZIJnfm2vud1WEP+2+KbvKXafeJX2FEPG3gG+
+         iqLVB/Tz91Rud8oKehr2kWRheVd2adHHDUIcslXDmI//4JueXdqf3bFf4n24VeuqIfD+
+         lXk8UTm3Y1K52DO+FwiqJDu51Nd44fRMa6UJYuU6Y5bqnq555Yk7ytrXVMlaeXScZhuJ
+         NVKtT0x/zwfxlVpD03SrJ2S3jYi7wghjvh4SvVtPw+RK8RAPyqblUqQj6//cvhumUPHK
+         pzgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774982088; x=1775586888;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=brYcq9OETEyrATVhVWTeO9yDnoxRwM5n5KfjsWFYaZk=;
+        b=YY+eMTCb96xUQ7DmYbNF8ReG7wZnWFCO9WXJrWe8xc4pbvcgTGWwW2Uf86N9cbiUPn
+         dEK+KGNTwzTEqqsmhXLRfQmxXZakipc+u5LwD/m+rYcGJHv8kTI10awzLFkMJxZqpIXu
+         /N3I2Ww67Lm6cQlCg8vKbKjWM5gcIRDz9IjvFGKkFSLb2bYSigIkw/VAmj7Ea5J++Ni+
+         CDjofOZx5YbhaYwKuRxiCugHi4CF2DAw4YH6shnZi2+6Yy/pzdn4bYMxxIhsaLeCavya
+         QGDmDSJEJwBYqn7fs1Ma0+n9n6ddGwh6R8JsNvaqywJopkd7/HVEnFIcYMsRR1cQqkJK
+         B+bQ==
+X-Gm-Message-State: AOJu0YwyiirJrMsHotmiQEx6k/cEv+iXW3T1aKlttQ/DR3+l+6ja8q28
+	fdaR8FcOiZPqQ2Q3QLN+kDz02Nqim9LZ5ydooxnMwkP6O+p1WkoVs1WgS2nvwkGQ
+X-Gm-Gg: ATEYQzwf3nUxNp9jmmnPZybrNOhOHGzEzwqFqwCAGZbF/bTEyrAZI0TJdrj3qM+YFxK
+	0D3MoGIr+7u4faNBto2uzYLYptdLtbqFDxL28Fu50ABhs8gzRm6v0mbpyzdbzMwT0aqrtU1yNaW
+	bFU84/fsmphTvYUzmjGc0lkYSVGEkoSMwuj1oMDy0rJQytwfacSuFp9do1YalGXgIGj1T9go1Jj
+	Fu5/5F8pVdroRH313p8iOENzNbX5jKfrt6dTp53MU7OzRqqb8ThR4NeqpnkMLvLaBHWUSaz/SvI
+	3UOHV4fJbXBdwVNaje+9C15r2SqWBNkrn9G6k3kEgHsjo1nNVLTamTzanbVfYs7lyKWk3HkVSaw
+	x5d60nuhE5Rp5i7Vbdt6D4BlFHqGx9rGoM3PiOfTTOCopbK4sgN67znsmdE/x+J2++9E9FMVM97
+	KVP4uUqouzs1vyp31rpVOr3evwLI94dA==
+X-Received: by 2002:a05:6830:6d48:b0:7d7:fd7d:b035 with SMTP id 46e09a7af769-7db9946f8b8mr492922a34.32.1774982087779;
+        Tue, 31 Mar 2026 11:34:47 -0700 (PDT)
+Received: from [172.17.0.2] ([132.196.94.35])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7da3356d8c5sm3124097a34.14.2026.03.31.11.34.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Mar 2026 11:34:47 -0700 (PDT)
+Message-ID: <69cc13c7.050a0220.f09fa.2229@mx.google.com>
+Date: Tue, 31 Mar 2026 11:34:47 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8100353794453509640=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 8/8] Bluetooth: btusb: Add MT7927 ID for ASUS X870E /
- ProArt X870E-Creator
-To: Javier Tia <floss@jetm.me>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- Jose Tiburcio Ribeiro Netto <jnetto@mineiro.io>,
- Ivan Lubnin <lubnin.ivan@gmail.com>
-References: <20260331-mt7927-bt-support-v5-0-6f31b4342daa@jetm.me>
- <20260331-mt7927-bt-support-v5-8-6f31b4342daa@jetm.me>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260331-mt7927-bt-support-v5-8-6f31b4342daa@jetm.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, nercone@nercone.dev
+Subject: RE: [v2] Bluetooth: btusb: MediaTek MT7922: Add VID 0489 & PID e11d
+In-Reply-To: <20260331175301.6946-1-nercone@nercone.dev>
+References: <20260331175301.6946-1-nercone@nercone.dev>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============8100353794453509640==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-Dear Javier,
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1075353
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.36 seconds
+GitLint                       PENDING   0.31 seconds
+SubjectPrefix                 PASS      0.08 seconds
+BuildKernel                   PASS      26.35 seconds
+CheckAllWarning               PASS      28.74 seconds
+CheckSparse                   PASS      27.80 seconds
+BuildKernel32                 PASS      25.30 seconds
+TestRunnerSetup               PASS      567.92 seconds
+TestRunner_l2cap-tester       FAIL      28.00 seconds
+TestRunner_iso-tester         PASS      38.03 seconds
+TestRunner_bnep-tester        PASS      7.56 seconds
+TestRunner_mgmt-tester        FAIL      115.07 seconds
+TestRunner_rfcomm-tester      PASS      9.37 seconds
+TestRunner_sco-tester         FAIL      14.22 seconds
+TestRunner_ioctl-tester       PASS      10.35 seconds
+TestRunner_mesh-tester        FAIL      12.46 seconds
+TestRunner_smp-tester         PASS      8.62 seconds
+TestRunner_userchan-tester    PASS      6.65 seconds
+IncrementalBuild              PENDING   0.82 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_l2cap-tester - FAIL
+Desc: Run l2cap-tester with test-runner
+Output:
+Total: 96, Passed: 95 (99.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+L2CAP BR/EDR Server - Set PHY 3M                     Failed       0.117 seconds
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.112 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.693 seconds
+Mesh - Send cancel - 2                               Timed out    1.995 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Thank you for the patches and your persistence on improving them. I 
-noticed one more thing, just in this one:
 
-Am 31.03.26 um 19:09 schrieb Javier Tia:
-> Add USB device ID 13d3:3588 (IMC Networks/Azurewave) for the MediaTek
-> MT7927 (Filogic 380) Bluetooth interface found on the ASUS ROG STRIX
-> X870E-E GAMING WIFI and ASUS ProArt X870E-Creator WiFi motherboards.
-> 
-> Note: boards with this USB ID expose only one ISO alternate setting
-> (alt 0). Without the fix in patch 2/8 ("btmtk: fix ISO interface
-> setup for single alt setting"), this caused ~19 second initialization
-> delays. With the fix applied, initialization completes in ~2.6
-> seconds.
-> 
-> The information in /sys/kernel/debug/usb/devices about the Bluetooth
-> device is listed as the below.
-> 
-> T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  5 Spd=480  MxCh= 0
-> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=13d3 ProdID=3588 Rev= 1.00
-> S:  Manufacturer=MediaTek Inc.
-> S:  Product=Wireless_Device
-> S:  SerialNumber=000000000
-> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-> A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
-> 
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=221096
-> Link: https://github.com/openwrt/mt76/issues/927
-> Signed-off-by: Javier Tia <floss@jetm.me>
-> Tested-by: Jose Tiburcio Ribeiro Netto <jnetto@mineiro.io>
-> Tested-by: Ivan Lubnin <lubnin.ivan@gmail.com>
-> ---
->   drivers/bluetooth/btusb.c | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 55a000540439..45ef0d008bce 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -761,6 +761,8 @@ static const struct usb_device_id quirks_table[] = {
->   						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x0489, 0xe116), .driver_info = BTUSB_MEDIATEK |
->   						     BTUSB_WIDEBAND_SPEECH },
-> +	{ USB_DEVICE(0x13d3, 0x3588), .driver_info = BTUSB_MEDIATEK |
-> +						     BTUSB_WIDEBAND_SPEECH },
-
-This is not sorted. Is there a reason to place it here?
-
->   	{ USB_DEVICE(0x0489, 0xe14e), .driver_info = BTUSB_MEDIATEK |
->   						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x0489, 0xe14f), .driver_info = BTUSB_MEDIATEK |
-> 
+---
+Regards,
+Linux Bluetooth
 
 
-Kind regards,
-
-Paul
+--===============8100353794453509640==--
