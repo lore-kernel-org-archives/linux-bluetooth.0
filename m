@@ -1,148 +1,171 @@
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B0A3F787C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 14:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774965670; cv=pass; b=uWuiwJvzozP9GgdmYwIzc54WqWcfg1A9gXsFtT5MyS0YkSdX+3dn0b8s+4A/ltJcShnNlvv8u425xhR/7sLuwzVShndj9voH8Jt4BqhQ5QNUwni/BLAtazK6Gx0z2cZY6hVFkbug/Wo5pqgAip1fFvH1hrcMYZw1y3J1MAhn6NQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774965670; c=relaxed/simple;
-	bh=/EGeXi0tSLb53N6mJazS0D1a+VCbFBZRHCvJBfoqULg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BGsSclcTbusRYg3vK6AGE1A4cqpgE7qXYH6gtD8vRfhyJ84QGFH1Qvr/J8WIgYswvAi7zTxvpjzsmQerooUjzo7cPqgGJczwljcjrgqo1GEB8hKfbtnb80cgdV3691V9XmF2GTn+qjVup69lBuioJQghCzDED7ideBkiQhvjwxE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W502r166; arc=pass smtp.client-ip=74.125.224.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879853B388E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 14:13:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774966434; cv=none; b=Fb4vdGJth4/iHDCsf/YhKyxNlvwzvNRdMq27xKWTKK7/AOQW6/WJKqnv2RlXs39eJ75ois0UHkt9zJ1cLRgorJQjck0JiYIVT4Dz6xSkT6d5PbOQXSWU7eG+hl+Jit6fLJ7sr8uxJjnuVslxHRLh8gycKlhQnzhIpVrfiitT1S4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774966434; c=relaxed/simple;
+	bh=szt0w8DbKoVg8ulmw8/DZSgLzId9BVRNgZALH0Fp2+I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NgMzpKjpCgp2f5SruwpXUDeWn14wA3pZunFfzxBL/n7eJTd2VgPh2BMKWxgiQDXJu7jAnTeCfGNxiaPZD1XrBzJjUWOaAiu4YmoREbdl3nY8qHTvrtr+iXG6/v/L3c5NPBdoGq/QSc80VMrRi9uid2Mw10LgsXxhw9Erpkn+SD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F2Vk1FjD; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W502r166"
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-6501d242e2fso3924022d50.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 07:01:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774965666; cv=none;
-        d=google.com; s=arc-20240605;
-        b=S1pzxD4Ifw7yM2HkPOFOyk+m05uTY+6jZqUXX7c0+X70t/hCUOJH/hOdEF/QkE8wPQ
-         W2Gx2gjGVBXE3wvKghToQQPNS28hFy2lCoZ00XhFoXIVgBaqCf7yXXo6raLVf8UJLpq9
-         JYERyFeI5JDZjfcFjuv/sH+yuVxIuRP5z5Pzqw/cbB8jC4u6VTWGVnnsEUuCD4zhty87
-         OOat97p5vgeSaJYwj9q+/VSgA+UYCs0mz5jUFRcrp8R+//D4Xml4LmTBBSNgPSCJs5uM
-         HU71b/cjEqsYpUDllxpsOFNW+ApSfOx/M7dMWxQy9YNHHw1DOwUfdNdL0KY0p2Zpjh4z
-         4lQA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=fkBbNucK1sItaHRmkDI0IHgeNuWHC70roWoz9I8jxDc=;
-        fh=DBIRJP4DvnAE+M31BcQ50XI3CAn/idN52/MNTtsfw9E=;
-        b=kykCJUNzphtFCbPLS2mK7hf6bdILg3RVM6LyDNDS5UMSdCAD+7RCb3YYxzak1sOgsu
-         K4j6oWtNxQhbr5XTgaVPPsPksfD4MgB6WdHpJkqBmR05h10j9UDROUPsFgw9zUAeyxwW
-         yXP1uRbGOkMEl53kaRIbL919qHN3GxLUJJmvhvkt0PAcSsYb2Ftfef1lT7+2xvzRlllW
-         oWTbpC9nl0gXP3thmrUyX81jHdWOnLpg4ViAalBxT60PO6DPXFrHurAdxAhr9pTHnguk
-         BUxSfypCIG1/mTHCovkFSIuMMwMCYvK+kmLRbNiO5pHldqPY2mxr0tRbFauRTUKBiGvB
-         tu3g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F2Vk1FjD"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-82cd5c07f93so504416b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 07:13:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774965666; x=1775570466; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1774966433; x=1775571233; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fkBbNucK1sItaHRmkDI0IHgeNuWHC70roWoz9I8jxDc=;
-        b=W502r1663NGJGqPdWKo86ku3hmd0osm5WimzAXIMr+41+uwdARZdEHOhQN8GDX6vHq
-         eCh620aPZGl7H+sEHA39OIW7YsaHqjWs5phDwgqw17d9P+ExLs1JkoQ9MLeLMcBpkED4
-         z0Oip/rTgkRsdTYF9DPrqX9x3coM9dnQm886nt3Vf+edSyS+VutAz4cpssbI53pPzvgH
-         kaAu/D8otk2vyufXxkF2kJhCxVwkVK4T1HPIY7DarMrhGg6eRMuR/hmJmiDAM+1MPFaG
-         EV4QqConY6K/Jhi5/Kvok5aY4d+8XW5cQw7i4j1FnvtwbH3nS44JIUsfFghVJhuYQjY4
-         D/IA==
+        bh=gEznFt8iy4PfjJKzwmf2yqiGR9CX0VFuj03I+QP2lL4=;
+        b=F2Vk1FjDTzGMeJEBLL5KZvhExnhpcxoYDh7jRxljDbOoJQDCtRLux08bljbzY2LbWk
+         D64np2pqqgfEu6GSGXBjFWBXGgqeaUWAlsL1yOP8zsVTdgZ/Nf5rwR5BgBEyFqyorrff
+         Q4Q0KUrJntSqpjZhqVtBGoI+g/Y1uHyfTQ3rmpL7QLkewfQL8gvD2LZX8KaQ5VbQ8gh1
+         xnJRNhkLpx9M0Vdo/LIcUIjjO+ZoGvENH7uv6RGGTEcsljDFXBxeiPj6TXC/3ZRzv9oG
+         3pCLeSfqANiQCrzq6Yd5jxSpI/a5NeHaLpraCfI1qndQRvgN1sS0p5I4D/aj3XQs2rBC
+         pyEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774965666; x=1775570466;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1774966433; x=1775571233;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=fkBbNucK1sItaHRmkDI0IHgeNuWHC70roWoz9I8jxDc=;
-        b=WbwvMLpPo3aBhCpdvz8NxOl86Lisp3YL3hkHDbRM4g0N4FXo964oqUiHytay5EdoIm
-         686+Cex/6hm5qC/I8Ct7DxN27FHACCGua/YCfb/i+GFJYetWjYxbCtkTelG9X0DMbl0a
-         Y1VIhkn2Kq9EfMKS9SUVkEftUaNEsbaapa6bmYfsG/jOy0yk608U7kd4oII6E4enAzPk
-         2SKuNqeOQah6aldP6TWUlSvgXve1IAFxh1SIZ405iPyw0k0WxMvClPW3kmE/LffZY5uo
-         +TG2oqJdWHWf/pthn24hAdj+gnQajKNmgM3q3r9bts+PBuBXE/UXCUFEyXWQVaCxqdfi
-         +bUg==
-X-Gm-Message-State: AOJu0Yx3yQtfk1Rycr04KQLE8mH1dFaE8yNP8iKJk9ueP47gO/inf5tQ
-	g4y25gmNw72h8O4jSF9cXHOpHSiDPShMDcn8V1ZRzs3PDeso9onIjVvmyoO8Lw+xn2JMZhKbTsK
-	OV2ONy5css8AtxVly9L7ex60K8Tv9YsyNMYMX
-X-Gm-Gg: ATEYQzyyo4ewUcA/3ONEvmAocJ+MU5u8WGmFXNsGQR6sSG8SMZKWcH2j43SMyH/qW1F
-	7IO9CtXyYpWGZ+eM6s4IrwfmvyBFfzV+YGju+yaZbuadBDxfAgvyhW8KGjymzouwxgAKv78/SQn
-	m6oNErEEjju9Lc2MZitHzT3LGf96S6EbwRCOtVSVj2TyfL5H44Q23Ht1H0yxQDePE4lLvNb4s/e
-	sKQYD329CM6z0Jn7S8NmZVL3/Kp8JfFOlZYQhfZ8w5lGwFfZ72y/FkVj8Ny6LRhM3fwTbMZlyBt
-	Hta4IgEUsg6g4gN3shoULAa6O19ZY7UqtuM0p8+9ozgL2xX/mnnAyJ5JbeOaCo+fJsJ2iv5+nz/
-	rNmXQ
-X-Received: by 2002:a05:690e:14cf:b0:64e:e90c:5682 with SMTP id
- 956f58d0204a3-64ff742d9d1mr16176620d50.66.1774965666136; Tue, 31 Mar 2026
- 07:01:06 -0700 (PDT)
+        bh=gEznFt8iy4PfjJKzwmf2yqiGR9CX0VFuj03I+QP2lL4=;
+        b=o26R8mQr803Wo8N3NLSnN6U1/eFUWPQ/3LxUbrYkhXWZqGnMcmuS9FKnns92leHBQF
+         cYYtNZZefnemziKImMCG6Uc24wUKjFy69QFIfQ1tGIGSAZ9HrIanDGAH4kP2Nz/mPmQn
+         Xdk2WkzxeF4UVHAuhC6GloGliN4uTAKlIYZayw+OByeICPPp/vLQ0dTOm2n5zN0nRM/0
+         d8wiKhQ78dh6Cgb/p3n/97TJ4DzpXhXDOn8oYJeRD/tNYxC2XzAkPgfqS1SpYs6K0LdR
+         cjlhu7ia76holP7bbwL74gaKklSUPhD+zpyu4XZoUO013kLbchsOhom/lZWWZp/pjpw6
+         7OXw==
+X-Forwarded-Encrypted: i=1; AJvYcCUzkCi3Tq3QmBVEx7+dv8SKea3fy3ljzQt8MmnoEvMm2ABeiy0++ojCKym/mZ6FpuC2cspzwCdw1rmktCanzvk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyarFSycWUvNBcyWBkd2KdhMKrMfHHIaxRojC8wnNFDFG8YkQ/t
+	dDyqROn4AoKu41tNZ8CJhVOJiP/vxIVBlzmgN7xPnaG/45fWwZp4seGE
+X-Gm-Gg: ATEYQzwmP0TPD7QeI8Ik9cUS2fb/yuYr7qRMA7XV6SaK5hOk6YS+BJgE9jJwNr5CDL4
+	O8MVed+O7izA85eySu+CQuXbjUI6PIF8Xf6xLUKiUCvK5K7XKbMhhnYql2mV0yPcPocvNbWUtpc
+	Sd+pxIttSiQdwC15QzXHrwTEycnyTXL1qBAN3ZpyrZuJHeBkwkCzWHAs5mE8y6/pFpSba3ayjOH
+	r2PvGdzMev4Ss3pY3FfFn5XP8m6edo2ETqBqYwSXjekakMJbNcCrCz/Ydo3KnGmp/ApUhq04eMU
+	uIMFGYEGNIhrxk3SJZnEh2/i8XZZfkdh984ADoh+f6rxbxtuh1adJIBZtAkyurgNjYJFrzIyc77
+	cBlcxBT/QAlA2f2ADuR9HA7FHHzU+gDiukQO8SienrpfN/WCd0hH+Tpm1lGGjsiFc9WpiObuPMw
+	tG8T4Q
+X-Received: by 2002:a05:6a00:6ca2:b0:829:6f7d:3093 with SMTP id d2e1a72fcca58-82c960942d4mr15021120b3a.48.1774966432737;
+        Tue, 31 Mar 2026 07:13:52 -0700 (PDT)
+Received: from hkbin-u25 ([2406:280:1003:25b6::6da])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82ca847ff4dsm10630221b3a.23.2026.03.31.07.13.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Mar 2026 07:13:52 -0700 (PDT)
+From: hkbinbin <hkbinbinbin@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: gregkh@linuxfoundation.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	hkbinbin <hkbinbinbin@gmail.com>
+Subject: [PATCH v2] Bluetooth: hci_event: fix OOB read in hci_le_create_big_complete_evt
+Date: Tue, 31 Mar 2026 14:13:32 +0000
+Message-ID: <20260331141332.3243059-1-hkbinbinbin@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260331055032.1883139-1-hkbinbinbin@gmail.com>
+References: <20260331055032.1883139-1-hkbinbinbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260330143046.3497403-1-hadess@hadess.net>
-In-Reply-To: <20260330143046.3497403-1-hadess@hadess.net>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 31 Mar 2026 10:00:52 -0400
-X-Gm-Features: AQROBzCAdU4Z7WIfVJbCBXgRI2dMR4tls1lwWS8SQWyLKGMettIbI34e-ckpK04
-Message-ID: <CABBYNZ+mm1q0gKCajcv4AnuNn13j5DXKzWAmDvCRj1LuGTfRag@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] shared/util: Add MIN/MAX implementations
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Bastien,
+hci_le_create_big_complete_evt() iterates over BT_BOUND connections for
+a BIG handle using a while loop, accessing ev->bis_handle[i++] on each
+iteration.  However, there is no check that i stays within ev->num_bis
+before the array access.
 
-On Mon, Mar 30, 2026 at 10:42=E2=80=AFAM Bastien Nocera <hadess@hadess.net>=
- wrote:
->
-> And remove it from src/sdpd-request.c to avoid a redefinition warning
-> at compile-time.
-> ---
->  src/sdpd-request.c | 2 --
->  src/shared/util.h  | 6 ++++++
->  2 files changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/src/sdpd-request.c b/src/sdpd-request.c
-> index 1fc07e97bfe0..7c632c2aaf62 100644
-> --- a/src/sdpd-request.c
-> +++ b/src/sdpd-request.c
-> @@ -40,8 +40,6 @@ typedef struct {
->
->  #define SDP_CONT_STATE_SIZE (sizeof(uint8_t) + sizeof(sdp_cont_state_t))
->
-> -#define MIN(x, y) ((x) < (y)) ? (x): (y)
-> -
->  typedef struct sdp_cont_info sdp_cont_info_t;
->
->  struct sdp_cont_info {
-> diff --git a/src/shared/util.h b/src/shared/util.h
-> index c480351d6e9f..99a5aa2daf32 100644
-> --- a/src/shared/util.h
-> +++ b/src/shared/util.h
-> @@ -22,6 +22,12 @@
->  #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
->  #define BIT(n)  (1 << (n))
->
-> +#undef MIN
-> +#define MIN(a, b) ((a) > (b) ? (a) : (b))
-> +
-> +#undef MAX
-> +#define MAX(a, b) ((a) < (b) ? (a) : (b))
+When a controller sends a LE_Create_BIG_Complete event with fewer
+bis_handle entries than there are BT_BOUND connections for that BIG,
+or with num_bis=0, the loop reads beyond the valid bis_handle[] flex
+array into adjacent heap memory.  Since the out-of-bounds values
+typically exceed HCI_CONN_HANDLE_MAX (0x0EFF), hci_conn_set_handle()
+rejects them and the connection remains in BT_BOUND state.  The same
+connection is then found again by hci_conn_hash_lookup_big_state(),
+creating an infinite loop with hci_dev_lock held.
 
-This is causing many tests to fail with `make check`. It looks like
-the conditions are wrong, so MIN works as MAX and vice versa.
+Fix this by:
 
->  #if __BYTE_ORDER =3D=3D __LITTLE_ENDIAN
->  #define le16_to_cpu(val) (val)
->  #define le32_to_cpu(val) (val)
-> --
-> 2.53.0
->
->
+  - Breaking out of the loop when i reaches ev->num_bis and cleaning
+    up all remaining BT_BOUND connections, then terminating the BIG
+    since a mismatch between the host and controller state indicates
+    failure.
 
+  - Properly cleaning up the connection when hci_conn_set_handle()
+    fails, instead of calling continue which leaves it in BT_BOUND
+    state where it would be found again by the same lookup on the
+    next iteration.
 
---=20
-Luiz Augusto von Dentz
+Fixes: a0bfde167b50 ("Bluetooth: ISO: Add support for connecting multiple BISes")
+Cc: stable@vger.kernel.org
+Signed-off-by: hkbinbin <hkbinbinbin@gmail.com>
+---
+ net/bluetooth/hci_event.c | 26 ++++++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 286529d2e554..64b5b497c491 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -7085,9 +7085,15 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
+ 			continue;
+ 		}
+ 
++		if (i >= ev->num_bis)
++			break;
++
+ 		if (hci_conn_set_handle(conn,
+-					__le16_to_cpu(ev->bis_handle[i++])))
++					__le16_to_cpu(ev->bis_handle[i++]))) {
++			hci_connect_cfm(conn, HCI_ERROR_UNSPECIFIED);
++			hci_conn_del(conn);
+ 			continue;
++		}
+ 
+ 		conn->state = BT_CONNECTED;
+ 		set_bit(HCI_CONN_BIG_CREATED, &conn->flags);
+@@ -7096,7 +7102,22 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
+ 		hci_iso_setup_path(conn);
+ 	}
+ 
+-	if (!ev->status && !i)
++	if (conn) {
++		/* More bound connections than BIS handles reported by the
++		 * controller -- treat this as a failure for the entire BIG
++		 * and clean up any remaining BT_BOUND connections.
++		 */
++		do {
++			hci_connect_cfm(conn, HCI_ERROR_UNSPECIFIED);
++			hci_conn_del(conn);
++		} while ((conn = hci_conn_hash_lookup_big_state(hdev,
++							ev->handle,
++							BT_BOUND,
++							HCI_ROLE_MASTER)));
++
++		hci_cmd_sync_queue(hdev, hci_iso_term_big_sync,
++				   UINT_PTR(ev->handle), NULL);
++	} else if (!ev->status && !i) {
+ 		/* If no BISes have been connected for the BIG,
+ 		 * terminate. This is in case all bound connections
+ 		 * have been closed before the BIG creation
+@@ -7104,6 +7125,7 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
+ 		 */
+ 		hci_cmd_sync_queue(hdev, hci_iso_term_big_sync,
+ 				   UINT_PTR(ev->handle), NULL);
++	}
+ 
+ 	hci_dev_unlock(hdev);
+ }
+-- 
+2.51.0
+
