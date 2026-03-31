@@ -1,35 +1,30 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.nercone.dev (x162-43-93-16.static.xvps.ne.jp [162.43.93.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1C53FB7F6
-	for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 14:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656FD36BCC2;
+	Tue, 31 Mar 2026 14:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.43.93.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774967426; cv=none; b=EhcWWNmuebEi8ANd6wGBXdFFJjAGJcfOjaEFbXEwTFPIZxfJVbivuynPYgInZmagwX6kB3X78ccDZkvAmL8spk7mQB+tvxjr5ZAELjtqmxh4mwKB6jbjeF0YafbUdhPGekRG78wvTXGqq++o4JhqDLDMV6TR+cz7cSbr/ppnQA8=
+	t=1774968477; cv=none; b=EddAa43K8mGZtoXfuPusDg9zfsk4FPIcrynu6V8+cyj2VDrGUcplVWiBtv3wVb6OKbDQV1StSU6wMWJnZIYu8VAs4NqSZOCEGD4HOSz7GqHdZlbbQxfKZi1WUGbtgDeuU2hRCwbKoZEgaaw8gv4HgzvryFGioVopFk0t6XG7uuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774967426; c=relaxed/simple;
-	bh=uffDqo6wzxHl6riEfG3Jmly81N/VUXSDdw/2HpmnZAQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SYjYJPcEIZ1kxloEglEpFyoiPbeRF/gH2qH/MrJLLIQhOPmkN5zUMfTYMe15wodL8JG5rwdY13gqwOj1E2KFjkjxzBJH7adeoBLa5sd3s99nnDKmXH8sk63/eGpAK/PezhL2yndevXTokWvQmXOINNmtKDlZR5CJnNxswjS5OII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RzaPoJw3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774968477; c=relaxed/simple;
+	bh=x5KIR7w+pB/x01TpAfB85sh62UT/87XsbdL5QKXULyM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D98GGcu45g8TNGJdQT324GTyjgug/lsFKcKTMWDhVral50iVkxeLYDtNspfVd8Q04PrhjVlkFmV0KcUMAs2s19jsdtIljYEigBHD+NjbCU4YJ3hiGzZy9X9E0h3RL26s02KjBcce3Q422P9iytgIuBEgINtQePlJ9xL+ax06IJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nercone.dev; spf=fail smtp.mailfrom=nercone.dev; dkim=pass (2048-bit key) header.d=nercone.dev header.i=@nercone.dev header.b=jiww0uxd; arc=none smtp.client-ip=162.43.93.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nercone.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nercone.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RzaPoJw3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 337D1C19424;
-	Tue, 31 Mar 2026 14:30:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774967426;
-	bh=uffDqo6wzxHl6riEfG3Jmly81N/VUXSDdw/2HpmnZAQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RzaPoJw3Bxv+UANHEfA7JVSGIE4bTxizMW1xucFO3/EOQDwHcaKZ+o95AlVPUEVaO
-	 qwJ5+j+OppGOWIYIr2jZ7OIDhnj/IxXauv5+H6Ykuh66CakM9EdgrJNdv76FjQ/CYV
-	 OmnJD0UjEETcAXKNCy+NLEEW+er3Zrr5N/bd8JDaiZ8COobHoWuP7kba2gtmb+lmSv
-	 8glc0+9ZcZJJeIr4fNHO/0CR+VvQyigoi50Fe9fsngjTGpkrkpL/Bl04zsj5IvbW4z
-	 iQG4wo2b7ptzxuqcwGGkyNA0tSI+/C/cRpa9C+N1YC+kbLAqhFrIRnVoM6Cvud7rzW
-	 WhbZtIDfyefYA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02C373809A05;
-	Tue, 31 Mar 2026 14:30:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=nercone.dev header.i=@nercone.dev header.b="jiww0uxd"
+Authentication-Results: mail.nercone.dev;
+	auth=pass (plain)
+From: Kamiyama Chiaki <nercone@nercone.dev>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Kamiyama Chiaki <nercone@nercone.dev>
+Subject: [PATCH] Bluetooth: btusb: Add VID 0489 & PID e11d for MediaTek MT7922
+Date: Tue, 31 Mar 2026 23:45:32 +0900
+Message-ID: <20260331144532.10697-1-nercone@nercone.dev>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,43 +32,48 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: fix locking in hci_conn_request_evt() with
- HCI_PROTO_DEFER
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <177496740953.2731558.12495255644281555301.git-patchwork-notify@kernel.org>
-Date: Tue, 31 Mar 2026 14:30:09 +0000
-References: 
- <089f435fb4668921bb416a3d60fa0f232456e054.1774791296.git.pav@iki.fi>
-In-Reply-To: 
- <089f435fb4668921bb416a3d60fa0f232456e054.1774791296.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
+Received: from localhost (Unknown [127.0.0.1])
+	by mail.nercone.dev (Haraka) with ESMTPSA id AA3628E8-A808-48CF-A662-43DBB6F9F8BC.1
+	envelope-from <nercone@nercone.dev>
+	tls TLS_AES_256_GCM_SHA384 (authenticated bits=0);
+	Tue, 31 Mar 2026 23:46:40 +0900
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nercone.dev;
+ h=Content-Transfer-Encoding: MIME-Version: Message-ID: Date: Subject: Cc:
+ To: From; q=dns/txt; s=s20260328969; t=1774968401;
+ bh=zGEb1XkPD3XzjlNz4FMYOr2+KNIv02UJC6+k4GP9sRA=;
+ b=jiww0uxdoS/mvRWihHMN+TEULP/Pa4Zg5fYV57NysyfYfBWt4hoZF8df/C6nPYHQ6MFlE8luD
+ vLoT4+IJ7xprNsIhYNa8g7OZZ/sniRUlA2gVGbq0o2HhX2xNr0CIGWFIRCKeCPn0ancatNJOybQ
+ LPXvIUkulzxqLsy0Ec9EcxBQPrULOyskAo1eg6h/+WxufAOFu1qOPwZ4ctPFYch7ua+luegi0No
+ 00d7LEQvAyZ0K6Nzkqeh1JM0LYSL3oNzIVosD4Hs6dORv1MTlchrU/xs5mz219CjpUsOISJYrkH
+ hlfKeXMcHgTVBR0EueZuQaSob04tHepf/5WZakvtlKow==
 
-Hello:
+Add VID 0489 & PID e11d for MediaTek MT7922 USB Bluetooth chip.
+Found in Dynabook GA/ZY (W6GAZY5RCL).
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+The USB device information is as follows:
+  idVendor  = 0x0489 (Foxconn / Hon Hai)
+  idProduct = 0xe11d
+  Manufacturer: MediaTek Inc.
+  Product: Wireless_Device
 
-On Sun, 29 Mar 2026 16:42:59 +0300 you wrote:
-> When protocol sets HCI_PROTO_DEFER, hci_conn_request_evt() calls
-> hci_connect_cfm(conn) without hdev->lock. Generally hci_connect_cfm()
-> assumes it is held, and if conn is deleted concurrently -> UAF.
-> 
-> Only SCO and ISO set HCI_PROTO_DEFER and only for defer setup listen,
-> and HCI_EV_CONN_REQUEST is not generated for ISO.  In the non-deferred
-> listening socket code paths, hci_connect_cfm(conn) is called with
-> hdev->lock held.
-> 
-> [...]
+Signed-off-by: Kamiyama Chiaki <nercone@nercone.dev>
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Here is the summary with links:
-  - Bluetooth: fix locking in hci_conn_request_evt() with HCI_PROTO_DEFER
-    https://git.kernel.org/bluetooth/bluetooth-next/c/31798ffc35a9
-
-You are awesome, thank you!
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 5c535f3ab..dc7df146a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -697,6 +697,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe102), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe11d), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe152), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe153), .driver_info = BTUSB_MEDIATEK |
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.53.0
 
