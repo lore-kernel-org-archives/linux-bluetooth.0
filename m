@@ -1,98 +1,85 @@
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71B044B67E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 21:37:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7FEF4657F3
+	for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 22:00:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774993074; cv=none; b=UnokeQXoD0M0ygsfw5h3k8y2WypzW5RxwvKJK38XE1JvAJz4nskrJAy+gZ85JGYjx0KHyqVfq/lJEXnJJHszhLqmDvdgGdLKotw+TDuWly9IjO9cwcmYzG/D7zU65BF8NOW8ZTT+KbgZ3rM+gPTzoB0LXs9FY4S/mPFsS/WdfuA=
+	t=1774994403; cv=none; b=RYUCF3OFaNjStJI1b+354jQ4TA2Q4xFEzeDYmYJYErAaEkyhJzNWbNfEa5YEDGq0VtTSRx8COHKrDznDTGxJBTOpaVy3nyQoIi8kW6Ir8J92/lYB+TyggLe67nAK5pzFcBGyTFtQSMlcM8YAs6gNcemadvbXozZOI3ZtiJ4RWP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774993074; c=relaxed/simple;
-	bh=ggqwMYZjPQ++A2scxLufBuzGIJtpIIlCvJbxUG1jh+8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=oll6MoK37Ia/WuI29hwLRwQmTP1a4/icjATJVpc8itAKmTwsu8xEV3l8sewcrP6HpN8R6wiU4E9BXKipQbXYoTJvoASQa01REqmSy4UexlAwroDZNsHYHekk5YNj3dpRWXNXuX4jzOZlZ3EuZCOQzPi8lZ732+jGNcjUL9EYjG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 53B0B3EC64;
-	Tue, 31 Mar 2026 21:37:45 +0000 (UTC)
-Message-ID: <e6ce48e9a2d2b67ed069e91e7cc71f0ca8249a97.camel@hadess.net>
-Subject: Re: [PATCH BlueZ 1/2] shared/util: Add MIN/MAX implementations
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 31 Mar 2026 23:37:44 +0200
-In-Reply-To: <CABBYNZ+mm1q0gKCajcv4AnuNn13j5DXKzWAmDvCRj1LuGTfRag@mail.gmail.com>
-References: <20260330143046.3497403-1-hadess@hadess.net>
-	 <CABBYNZ+mm1q0gKCajcv4AnuNn13j5DXKzWAmDvCRj1LuGTfRag@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	s=arc-20240116; t=1774994403; c=relaxed/simple;
+	bh=1DNILWbgIQcXRnrZZ4Q8scWWi8pegVUE+8m+pvMC95Q=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=jvPdZaB1JOK2wGlK8kIfZ39sUJfCTQE3SsjOOO3scmAM447cL3lbzbnSJ0PZMYkjSsjv6Arj4foyXN2mDdA1LAmQECPRsx8CsDcIoRjimvU3eMn8wqI03RWU7avgDYaNZpfM5rBJZXBFPlGoaFS4untwf7EfSzuG/dPOf6gCppM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Rnr8s7xJ; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Rnr8s7xJ"
+Received: from github.com (hubbernetes-node-03dfe2c.ash1-iad.github.net [10.56.160.39])
+	by smtp.github.com (Postfix) with ESMTPA id 997C19203FB
+	for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 14:59:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1774994399;
+	bh=87onXsvQZSjlOu6auVtzKCPf5NNYfzRuvkcA2SgcKy8=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Rnr8s7xJsNAMI2+x6VPEaJ3nG4ZBMzEO5ZjP2rhcwiseqHRK5xadfeGdDV0TQGDYw
+	 2Ew7pqwttt5Bi5JGkIPEbdLrET6QjFzaJaeaHhvDhvDfgtf2ExU2Jjw7GCHdMt2GbP
+	 obHSXFo/S29RiZXkzAnzADJ2r9+YnD/ggycKfVVc=
+Date: Tue, 31 Mar 2026 14:59:59 -0700
+From: hadess <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1075447/000000-c446bf@github.com>
+Subject: [bluez/bluez] 0e74c4: shared/util: Add MIN/MAX implementations
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-Score: -100
-X-GND-Cause: dmFkZTFRKhX9Yy4Gxo1H98ow0NcmVZmWydiNBl7SqHRuaGIuvRRR0q3R96dHJww3mihAJTgcHMz4u1Xc5YkQ+4eNPq9jGK2Yr7QERboTvgrTY5vLBsj0QkYu+JHNSDY3z5Y7PgYbTuCCSw3cHbIpSPSIzWEsBi1B0n08ylY3rM9q0ahUUZ7eHs8MNqVkLnPo1rAHP33m0xtWLPnMv4Oc9q3XrKBfUzGEA20ONWhdrQzyo2AtmcV+WqZNklt9UJ12Nys/y0I+JHpsZc5wGmOtjnlMWhMCCO0yY/ndOBbKapZOrzVgLMEm8cDhd4olwxokkuRy+OeUQReXYZ0b19RPiEkkMIu/WQZG3ceKTuC7lf3lSli0ZAGxmTj9GDVvXF3G1WSeriSeDW+vp68EhnFEId1X+IsValaFELnGDH36Hxsk9K3ORaYkeZ/hNYa6gjBzTSYKdDPuJ5uHWMfg000I/05FOnj8yVAPAF/L0fQ8qvSE0YtQSEH88fP8Lfv7ybnRTt6akQt5GNmafw3WpttpJi7rc8GTqdxbvAST1LDiMTmpFT5PV359t1TBfuiJpq9S1S0kvE6ZmpyzTSmCHFk3dAIF91cXr2VQ7L84XKnNRXWWZ6M/Y8+JBYKEUoqcG7kJ8BAyMQUOKXxnjf0964agWqnwjeK/Z4Cd85l9wJHGDJisYGewuA
-X-GND-State: clean
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Tue, 2026-03-31 at 10:00 -0400, Luiz Augusto von Dentz wrote:
-> Hi Bastien,
->=20
-> On Mon, Mar 30, 2026 at 10:42=E2=80=AFAM Bastien Nocera <hadess@hadess.ne=
-t>
-> wrote:
-> >=20
-> > And remove it from src/sdpd-request.c to avoid a redefinition
-> > warning
-> > at compile-time.
-> > ---
-> > =C2=A0src/sdpd-request.c | 2 --
-> > =C2=A0src/shared/util.h=C2=A0 | 6 ++++++
-> > =C2=A02 files changed, 6 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/src/sdpd-request.c b/src/sdpd-request.c
-> > index 1fc07e97bfe0..7c632c2aaf62 100644
-> > --- a/src/sdpd-request.c
-> > +++ b/src/sdpd-request.c
-> > @@ -40,8 +40,6 @@ typedef struct {
-> >=20
-> > =C2=A0#define SDP_CONT_STATE_SIZE (sizeof(uint8_t) +
-> > sizeof(sdp_cont_state_t))
-> >=20
-> > -#define MIN(x, y) ((x) < (y)) ? (x): (y)
-> > -
-> > =C2=A0typedef struct sdp_cont_info sdp_cont_info_t;
-> >=20
-> > =C2=A0struct sdp_cont_info {
-> > diff --git a/src/shared/util.h b/src/shared/util.h
-> > index c480351d6e9f..99a5aa2daf32 100644
-> > --- a/src/shared/util.h
-> > +++ b/src/shared/util.h
-> > @@ -22,6 +22,12 @@
-> > =C2=A0#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
-> > =C2=A0#define BIT(n)=C2=A0 (1 << (n))
-> >=20
-> > +#undef MIN
-> > +#define MIN(a, b) ((a) > (b) ? (a) : (b))
-> > +
-> > +#undef MAX
-> > +#define MAX(a, b) ((a) < (b) ? (a) : (b))
->=20
-> This is causing many tests to fail with `make check`. It looks like
-> the conditions are wrong, so MIN works as MAX and vice versa.
+  Branch: refs/heads/1075447
+  Home:   https://github.com/bluez/bluez
+  Commit: 0e74c4e43ddb701b8db16504b8b5c0273baac1c4
+      https://github.com/bluez/bluez/commit/0e74c4e43ddb701b8db16504b8b5c0273baac1c4
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-03-31 (Tue, 31 Mar 2026)
 
-Whoops, fixed.
+  Changed paths:
+    M src/sdpd-request.c
+    M src/shared/util.h
 
->=20
-> > =C2=A0#if __BYTE_ORDER =3D=3D __LITTLE_ENDIAN
-> > =C2=A0#define le16_to_cpu(val) (val)
-> > =C2=A0#define le32_to_cpu(val) (val)
-> > --
-> > 2.53.0
-> >=20
-> >=20
->=20
+  Log Message:
+  -----------
+  shared/util: Add MIN/MAX implementations
+
+And remove it from src/sdpd-request.c to avoid a redefinition warning
+at compile-time.
+
+
+  Commit: c446bfe3cb10b8d2ce52661a715a3dfdaf576ebf
+      https://github.com/bluez/bluez/commit/c446bfe3cb10b8d2ce52661a715a3dfdaf576ebf
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-03-31 (Tue, 31 Mar 2026)
+
+  Changed paths:
+    M emulator/btdev.c
+
+  Log Message:
+  -----------
+  emulator: Remove compile-time header only glib dep
+
+btvirt relied on a glib header macro to use MIN/MAX, but didn't link
+against it, meaning that it was dependent on other programs in the
+project using glib to compile correctly.
+
+Remove the include and use our own implementation instead.
+
+
+Compare: https://github.com/bluez/bluez/compare/0e74c4e43ddb%5E...c446bfe3cb10
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
