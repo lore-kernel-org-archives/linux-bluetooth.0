@@ -1,131 +1,123 @@
-Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25DCD3009ED
-	for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 05:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7809534CFCF
+	for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 06:24:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774936242; cv=none; b=ZsT+bto2KMcuCq+mPG6Z8obFGji+fPvMrUrqfDRVsldmhyvJxFxCtnNy2LMHKIrwLPk/jAyI45nz5Vni8U4y1kvmPD3cLA374/c1KzC67M02qApEbxU51nQXFPMcb9575buCuT6HNahNbRjJ2ea2xis/BdXAKmrwOgn2KrkudRI=
+	t=1774938288; cv=none; b=MxnC3x96s//tydBRhqgDGi5WZMFPwm4U0MjFuRHGhHcLm4h+SWOhIvBAsVdeCvrv4Sa7yp8HgB55JcuKIZbmN1klWu8o/HIlbwawYUjS56fl9eNDW69RTkENwfeBURsqPrIXiOjBOH+iyhtOgvsDhvH/rCuiBiia190Jlv+Ttso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774936242; c=relaxed/simple;
-	bh=cVM85kBUixxEDF8geGvobDd+lyOPWvPL/3rV8qXg6Ng=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bTQg4vAYVw6FvIwtEq72jl6pYNP8SP53IeI1Ce+mQz/v8sm9dfVUfdj16wloxYve4acH0tHIMX8WBJh+ivFIzhKP4qCrCenbatLOZEgFcysCrayD2Z3ugZDNn3O0oJjGxL484kuoqMYVYzrvTFCoJigHmvMobjMvF3hD+PUL/FI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lPOqQ5LC; arc=none smtp.client-ip=74.125.82.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lPOqQ5LC"
-Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-1271257ae53so5252008c88.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 22:50:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774936240; x=1775541040; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4eJ1yAEb3cUbVO4oLsTAGit5fCasX3X7SEleR3AgWXs=;
-        b=lPOqQ5LCW1IGHvI1IQ+tQoASoZ+NcKBlDz64tchBQUkyEB6YwUgpEAWXDfn+mKgFsL
-         RAQidk4UGaaGJ7nFwxupipE7uFH0Sk793TrvWq2OzsSdNWYSOe0FMVifAgwRhrTMc1x8
-         VvSvF5hd/mZJ4YTqldZASKdf18clnmOWm5SNypjGPPhFZcYBKRai7qYY8u2MqCzoQNzH
-         GCI8Yt5947TyubXYtDTwNmoIRIDT1Ki4hJNbbOX9ra7YP0k1tq8+Jy6sf4WMboDOOsdc
-         WxTbrcMiLSY2Nla9Hf4577QWliOyWsLFsSzVgGJskBE+Og+et+/pdOphIRQqde8pvF4/
-         CHfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774936240; x=1775541040;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4eJ1yAEb3cUbVO4oLsTAGit5fCasX3X7SEleR3AgWXs=;
-        b=pGh+IA8QwAEd7+Hvl//G7iUrfZjj+wk15wy09JBeSVsM3rMzpLT2eOD439WhDdKkda
-         Qw4xjo7c5iNiGbTFHCsb5FGOrSn2ExJKukuY+l3+clDlqUH7AmEzoRuqj2ZBqfMNPe4v
-         xxCOHxo9JdO/OxR7amW6LPFcuw2JesWhuQL/EZhnj67xp2HiGMhaEMvdtysmFOvSPOeu
-         nCqkTXWt/hqK1o1gACcrAE9Zasf5CE2Rk4O1krsg6bnHo6+JbGytN3B3zDVzwqsQc/mL
-         D/mNTDpyNQSfk8l+NMgSp+0Kayrn8DUGbUYKgc7zevFysWmysv9c3jlpeUgT2F2VebX8
-         QwGw==
-X-Gm-Message-State: AOJu0YyRS2WTNr8LcbimISL3VhR2YO+yMhzp2cYaONuke6AXckEUaBJm
-	R8BPnmbNxxXcRWg0DmwfuTrLe4r1wd9GwR9t7JgAZn7yFF2nRuyHi28B
-X-Gm-Gg: ATEYQzzOnAis2utTjvpDtDmQ9tvQ8bRQoTxCqvjxvx77kwYwHAHs5PQxmlgH7LiilrU
-	DMBui20jMcIG5jT+QdNmbcoq1AcRuZjoiGmIV4Srvv0oE0ZzM7Fb8P+hkfXtj5g2hJ45NjXe4Y0
-	Nn8xZTwTIFxPd3q8ddzvvjBLLfMcKZO40J1Evo4MbWyQvp4py1o0g+xAeSAIEu34tfbdtRR0VIG
-	7zSKZaDVBnKqtZIXPClG0ruVLJb3hGzTTN/1vfvjKqRAxjJteSEr9l8lhEegJ1bYT3nyi6cQ/G3
-	SU+swX1AYDKrYonALMBOV9rMAg4mZaJb28wzwtPhuDtKljwTwu/8C3khW+ToLEOh1zOkS3eX+Ii
-	CMeA5hKj+7zGOkovrQQEnDUdfk+eRjHBFgKHjV0SL2iPMikF6E2fl6/W/rSyI0UUOKtn7D11SAJ
-	AuVJxrKsMaksDYBswUmwJQ5iW5IIggXsF8EK3FGEJXyjcspB6gV/fFifZyUKueAtEFSQ==
-X-Received: by 2002:a05:7022:62b:b0:127:380e:ff5a with SMTP id a92af1059eb24-12ab287e6c4mr6942873c88.17.1774936240096;
-        Mon, 30 Mar 2026 22:50:40 -0700 (PDT)
-Received: from localhost.localdomain (104.194.93.216.16clouds.com. [104.194.93.216])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12aba581027sm14497560c88.4.2026.03.30.22.50.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 22:50:39 -0700 (PDT)
-From: hkbinbin <hkbinbinbin@gmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	gregkh@linuxfoundation.org
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	hkbinbin <hkbinbinbin@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_event: fix OOB read and infinite loop in hci_le_create_big_complete_evt
-Date: Tue, 31 Mar 2026 05:50:32 +0000
-Message-ID: <20260331055032.1883139-1-hkbinbinbin@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1774938288; c=relaxed/simple;
+	bh=28kdi/rbzdGcHK6YLx4nQWxfR3Qrepjzmqu8EjYmfEk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=KQzVhqEnT+gLiiOwf0Z7gJUpqiIVrxGE8bsUU3w9DeLZsyZQjCt8P3M9m3nV6jHiqJXn3ILdnn45AvzCzNf2deyngDcncORs8Pnyjv+6xwg1sGqnsi9zwrkfCmZkN1zOv0DsWQ/cSKvwB3sW0sN/fa8weEIm9XrOZWnifXris8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.229] (p5b13a713.dip0.t-ipconnect.de [91.19.167.19])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 1DF7B4C4430F86;
+	Tue, 31 Mar 2026 08:24:35 +0200 (CEST)
+Message-ID: <e96776d6-ce8c-4626-984e-474f3606445d@molgen.mpg.de>
+Date: Tue, 31 Mar 2026 08:24:33 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Oops with 6.19.10: RIP: 0010:hci_sock_get_channel+0x5/0x20
+To: Gabor Gombas <gombasgg@gmail.com>
+References: <actZBr+wqcABY5mt@lan>
+Content-Language: en-US
+Cc: linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <actZBr+wqcABY5mt@lan>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-hci_le_create_big_complete_evt() iterates over BT_BOUND connections
-for a BIG handle using a while loop, accessing ev->bis_handle[i++]
-on each iteration.  However, there is no check that i < ev->num_bis
-before the array access.
+#regzbot ^introduced: v6.19.6..v6.19.10
 
-When a controller sends a LE_Create_BIG_Complete event with num_bis=0
-while BT_BOUND connections exist for that BIG handle, the loop reads
-beyond the valid bis_handle[] entries into adjacent heap memory.
-Since the out-of-bounds values typically exceed HCI_CONN_HANDLE_MAX
-(0x0EFF), hci_conn_set_handle() rejects them and the connection
-remains in BT_BOUND state.  The same connection is then found again
-by hci_conn_hash_lookup_big_state(), creating an infinite loop with
-hci_dev_lock held that blocks all Bluetooth operations:
+Dear Gabor,
 
-  Bluetooth: hci0: Invalid handle: 0x6b6b > 0x0eff
-  Bluetooth: hci0: Invalid handle: 0x6b6b > 0x0eff
-  ... (repeats ~177 times)
-  Bluetooth: hci0: Opcode 0x2040 failed: -110
-  Bluetooth: hci0: command 0x2040 tx timeout
 
-The value 0x6b6b is the KASAN slab free poison byte (0x6b),
-confirming reads of freed/uninitialized heap memory.
+Thank you for your report.
 
-Fix this by adding a bounds check on i against ev->num_bis before
-accessing the array.  Connections beyond the reported count are
-cleaned up with HCI_ERROR_UNSPECIFIED to prevent the infinite loop.
+Am 31.03.26 um 07:17 schrieb Gabor Gombas:
 
-Fixes: a0bfde167b50 ("Bluetooth: ISO: Add support for connecting multiple BISes")
-Cc: stable@vger.kernel.org
-Signed-off-by: hkbinbin <hkbinbinbin@gmail.com>
----
- net/bluetooth/hci_event.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+> I've upgraded to 6.19.10, and within an hour, I got the below Oops. The
+> line from bluetoothd is the only syslog entry close to the oops. 6.19.6
+> run fine on the same host since it was released.
+> 
+> Mar 30 22:00:43 host bluetoothd[807]: Path /org/bleak/65/140683142893552 removed along with Adv Monitor app :1.103
+> Mar 30 22:00:43 host kernel: Oops: general protection fault, probably for non-canonical address 0xf712f8c7a288279f: 0000 [#1] SMP PTI
+> Mar 30 22:00:43 host kernel: CPU: 1 UID: 0 PID: 807 Comm: bluetoothd Not tainted 6.19.10-gg #48 PREEMPT(lazy)
+> Mar 30 22:00:43 host kernel: Hardware name:  /D54250WYK, BIOS WYLPT10H.86A.0045.2017.0302.2108 03/02/2017
+> Mar 30 22:00:43 host kernel: RIP: 0010:hci_sock_get_channel+0x5/0x20
+> Mar 30 22:00:43 host kernel: Code: 0f a3 b7 78 03 00 00 0f 92 c0 c3 cc cc cc cc 66 0f 1f 44 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 <0f> b7 87 72 03 00 00 c3 cc cc cc cc 0f 1f 40 00 66 66 2e 0f 1f 84
+> Mar 30 22:00:43 host kernel: RSP: 0018:ffffbb74c11afa68 EFLAGS: 00010206
+> Mar 30 22:00:43 host kernel: RAX: 0000000000000000 RBX: ffff9c46c5ead600 RCX: 0000000000000002
+> Mar 30 22:00:43 host kernel: RDX: ffff9c46c97e1f80 RSI: 000000000000000d RDI: f712f8c7a288242d
+> Mar 30 22:00:43 host kernel: RBP: 0000000000000000 R08: ffffffff8296f7b0 R09: 0000000000000002
+> Mar 30 22:00:43 host kernel: R10: ffff9c46cb124000 R11: ffff9c4796f88400 R12: ffff9c46cb124b28
+> Mar 30 22:00:43 host kernel: R13: 0000000000000003 R14: 000000000000000d R15: ffff9c46cb124b08
+> Mar 30 22:00:43 host kernel: FS:  00007fec5ee85340(0000) GS:ffff9c4853a17000(0000) knlGS:0000000000000000
+> Mar 30 22:00:43 host kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> Mar 30 22:00:43 host kernel: CR2: 00007f959681a008 CR3: 0000000118f08001 CR4: 00000000001726f0
+> Mar 30 22:00:43 host kernel: Call Trace:
+> Mar 30 22:00:43 host kernel:  <TASK>
+> Mar 30 22:00:43 host kernel:  mgmt_pending_find+0x48/0xa0
+> Mar 30 22:00:43 host kernel:  remove_adv_monitor+0x3b/0x120
+> Mar 30 22:00:43 host kernel:  ? _raw_read_lock+0x13/0x40
+> Mar 30 22:00:43 host kernel:  hci_sock_sendmsg+0x656/0xb40
+> Mar 30 22:00:43 host kernel:  sock_write_iter+0x181/0x190
+> Mar 30 22:00:43 host kernel:  do_iter_readv_writev+0x139/0x230
+> Mar 30 22:00:43 host kernel:  vfs_writev+0x120/0x3a0
+> Mar 30 22:00:43 host kernel:  ? __seccomp_filter+0x34/0x5b0
+> Mar 30 22:00:43 host kernel:  ? _copy_to_iter+0x87/0x6b0
+> Mar 30 22:00:43 host kernel:  ? __seccomp_filter+0x34/0x5b0
+> Mar 30 22:00:43 host kernel:  ? do_writev+0xde/0x110
+> Mar 30 22:00:43 host kernel:  do_writev+0xde/0x110
+> Mar 30 22:00:43 host kernel:  do_syscall_64+0x6c/0xe90
+> Mar 30 22:00:43 host kernel:  ? syscall_exit_work+0x13e/0x1b0
+> Mar 30 22:00:43 host kernel:  ? do_syscall_64+0x8a/0xe90
+> Mar 30 22:00:43 host kernel:  ? do_syscall_64+0x8a/0xe90
+> Mar 30 22:00:43 host kernel:  ? switch_fpu_return+0x16/0xd0
+> Mar 30 22:00:43 host kernel:  ? do_syscall_64+0x29f/0xe90
+> Mar 30 22:00:43 host kernel:  ? handle_softirqs+0x13f/0x2a0
+> Mar 30 22:00:43 host kernel:  ? irqentry_exit+0x48/0x530
+> Mar 30 22:00:43 host kernel:  entry_SYSCALL_64_after_hwframe+0x71/0x79
+> Mar 30 22:00:43 host kernel: RIP: 0033:0x7fec5f333e92
+> Mar 30 22:00:43 host kernel: Code: 18 41 8b 93 08 03 00 00 59 5e 48 83 f8 fc 75 1a 83 e2 39 83 fa 08 75 12 e8 2b ff ff ff 0f 1f 00 49 89 ca 48 8b 44 24 20 0f 05 <48> 83 c4 18 c3 66 0f 1f 84 00 00 00 00 00 48 83 ec 10 ff 74 24 18
+> Mar 30 22:00:43 host kernel: RSP: 002b:00007ffc60d23590 EFLAGS: 00000202 ORIG_RAX: 0000000000000014
+> Mar 30 22:00:43 host kernel: RAX: ffffffffffffffda RBX: 00007ffc60d23610 RCX: 00007fec5f333e92
+> Mar 30 22:00:43 host kernel: RDX: 0000000000000001 RSI: 00007ffc60d23610 RDI: 0000000000000008
+> Mar 30 22:00:43 host kernel: RBP: 0000000000000008 R08: 0000000000000000 R09: 0000000000000000
+> Mar 30 22:00:43 host kernel: R10: 0000000000000000 R11: 0000000000000202 R12: 000055bcb1bf7e60
+> Mar 30 22:00:43 host kernel: R13: 000055bcb1bf9f90 R14: 000055bcb1c15520 R15: 0000000000000000
+> Mar 30 22:00:43 host kernel:  </TASK>
+> Mar 30 22:00:43 host kernel: Modules linked in: ip_set tun rfcomm 8021q algif_hash algif_skcipher af_alg bnep uinput kvm_intel iwlmvm mei_hdcp nls_cp437 kvm iwlwifi at24 vfat regmap_i2c fat irqbypass ir_rc6_decoder rc_rc6_mce n>
+> Mar 30 22:00:43 host kernel: ---[ end trace 0000000000000000 ]---
+> Mar 30 22:00:44 host kernel: RIP: 0010:hci_sock_get_channel+0x5/0x20
+> Mar 30 22:00:44 host kernel: Code: 0f a3 b7 78 03 00 00 0f 92 c0 c3 cc cc cc cc 66 0f 1f 44 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 <0f> b7 87 72 03 00 00 c3 cc cc cc cc 0f 1f 40 00 66 66 2e 0f 1f 84
+> Mar 30 22:00:44 host kernel: RSP: 0018:ffffbb74c11afa68 EFLAGS: 00010206
+> Mar 30 22:00:44 host kernel: RAX: 0000000000000000 RBX: ffff9c46c5ead600 RCX: 0000000000000002
+> Mar 30 22:00:44 host kernel: RDX: ffff9c46c97e1f80 RSI: 000000000000000d RDI: f712f8c7a288242d
+> Mar 30 22:00:44 host kernel: RBP: 0000000000000000 R08: ffffffff8296f7b0 R09: 0000000000000002
+> Mar 30 22:00:44 host kernel: R10: ffff9c46cb124000 R11: ffff9c4796f88400 R12: ffff9c46cb124b28
+> Mar 30 22:00:44 host kernel: R13: 0000000000000003 R14: 000000000000000d R15: ffff9c46cb124b08
+> Mar 30 22:00:44 host kernel: FS:  00007fec5ee85340(0000) GS:ffff9c4853a17000(0000) knlGS:0000000000000000
+> Mar 30 22:00:44 host kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> Mar 30 22:00:44 host kernel: CR2: 00007f959681a008 CR3: 0000000118f08001 CR4: 00000000001726f0
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 286529d2e554..ebd7ae75b133 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -7085,6 +7085,12 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
- 			continue;
- 		}
- 
-+		if (i >= ev->num_bis) {
-+			hci_connect_cfm(conn, HCI_ERROR_UNSPECIFIED);
-+			hci_conn_del(conn);
-+			continue;
-+		}
-+
- 		if (hci_conn_set_handle(conn,
- 					__le16_to_cpu(ev->bis_handle[i++])))
- 			continue;
--- 
-2.51.0
+Can you reproduce the issue? If yes, it’d be a great help, if you could 
+bisect the issue.
 
+
+Kind regards,
+
+Paul
