@@ -1,142 +1,121 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB052E413
-	for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 05:18:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48E2A28468E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 05:39:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774934284; cv=none; b=u8dQPWZzcSbtq3pP3jlDUt4JlDcAE66FQd5gcO3IeMwG8Rv8HSAWBm890+opPGqfdFbmcS5izIs81EtYJDfXd3YbKXHo7kv3VZNwhyhv8x2sgBNxoCC//324t2jiRnqcACNJCn90s6sMXGkLkElBZqJ7J0prgpWA7+QYc5oy0zY=
+	t=1774935566; cv=none; b=KiaQrd5gfUamA6BVvbRxm8WBtZxp2TYi8Oebjd1/zxqu0ku6lywxOCwagPN2QWdmYNvvvYl6N+H+53BlOHA/mSzkfygUOS+OfgheABoOiAV2lm/75zvEVLXPIC+KyifuwlRN7ql76liIRP1d7Pawq53vBnKkNauNUfzWA4x4weI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774934284; c=relaxed/simple;
-	bh=SJgEzo7Sati9WmZYIOmoAYQA3/wGDsZPh3DEL7XFTOE=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=FaqVUwetJkpdDujak9PIQsZm1ws1ohgBYWq8QbB/XHK7b42nHoBoEELShDa57UpvnqNsD5YgpWNkh7IUMCBtJ634Usf8dDhV6U53qwc0c8RaXcuWXfJqKzfiGtOLpSUbV/pt9nbujnoTke18g9stKBJazcp4GNxUCQV+RvjkmAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B/l59l73; arc=none smtp.client-ip=209.85.221.52
+	s=arc-20240116; t=1774935566; c=relaxed/simple;
+	bh=IRCcHxZE5vrRcel8klWBqk+hwn76HSWyQfvZSoxQlsw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iovHB34SKQjq/X0iQW4RKKQ2dIzASfF4LsEV2Adnr1KYmPK8J5Hz+ozG1yeMZQZSYHnOAPRBnhElHpLz5m5YTRJ1RFhQeBU9jJVVqKmTLZXRqYUH+nPfg4IF+GhVkZLi1IYQpeaCe2EJxwi2lVRYNAo8YJY1yga+4i3joH5zlJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cbKQHeIf; arc=none smtp.client-ip=74.125.82.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B/l59l73"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-439d8df7620so3664325f8f.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 22:18:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cbKQHeIf"
+Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2bdcf5970cdso3324843eec.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Mar 2026 22:39:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774934281; x=1775539081; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yhY6e4V3+/orkoCbvnEiC76W8rjIXcaivhpCwKre8Ng=;
-        b=B/l59l73jEir2zgwMPiJOdE1x7iXBOqIic+my4oarzcZ235PtX6XQD8JreXHCN2HTV
-         keot80yDB2TpROrg9XhzK0JMoU/yBZDJsgvxPtB3ezkIzS0EZja5cXNQDKoIkoGY14NT
-         n4w0eZUlbpwLwVVD8eeeUeaAb3AkBOSyFWYRb2uJSq9C1HnCD0pqVzjiNN2m08ODN2Wy
-         JitsvJADgQpRon4V/iFXGK26GjCdMUFliyRmcWMTAbEdWco3+rH2uB/FRSQEkYjmB5+9
-         GDuQ1/bMhEjc4UV0R1kGN2Rla6/k/VtfcGwSohRpP/P9nkizUSeuuC9N2iW1lB6oYx/7
-         Glhg==
+        d=gmail.com; s=20251104; t=1774935564; x=1775540364; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HV8dmt1HgzHPMJw/ZTQseF87igS3ZBKLE6u0ax+TN+8=;
+        b=cbKQHeIfgKXH/z9j7RkbpWtwjEEO4gAGFKUB8bLeDeanreLcqxAR8TLC4vpXzJOs2k
+         xkYRJfENbh8EsMxLH/AnfUOay1Y7ezbqdGRCczYEhQvPubQbj+wV2f5k8bP+7/oQfpG6
+         yoMNrPnsrVFb4zaE8HE+Slltg00y8NsZj5p6FZ5/7XTgfxWwneQdBqNgZIWoqywuXDJI
+         NrZ+g01fHn4co7m43/SBE7sNt3sF86QvRiJgmBFYntCsnPr0OWQLiVlAnOEA2P9odNEV
+         5hwAoRhlcZKpgvG2dA+m9NqWmlKDqkscMhfdVbxKtEyjbZDz6epE8zhfLjRSf6x0tIOj
+         KWYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774934281; x=1775539081;
-        h=content-disposition:mime-version:message-id:subject:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yhY6e4V3+/orkoCbvnEiC76W8rjIXcaivhpCwKre8Ng=;
-        b=RNZlHa21qckLnJ4SlLJ3afWwOzJElKQ9t+QvsB2kPibALOiv5++6Wp647HNEfjFVHs
-         IhQZe7c2d05adHRTXk5F3jwgXtWLujp9VZ2FOUuGft7GWikAzNMbfG0Os8HeHbSKdUWv
-         9pfEyhLjRXcNcoUTCmAGDf9WtB6Kr9ZMbtaIsSBjFyyQQTzkT1IVE5eNMaoD3oWyl4JM
-         +FlRJD0VRPWiivdkncTowz+5fI9esTeYAyBlDT77yRvUk4KXrvzIJWgHGV38Qa4zjQUr
-         ax2raZk4kzJ3F0KHoUeRAnf5XrzMNAsa6d34HoOn7EKkSAPs6T2L8cN0iTyN44Fqwg+F
-         Z6WA==
-X-Gm-Message-State: AOJu0YxUFfGIMwS/QiyYNSVchwuKb6BildCF1jo6qWkDQ7JFAE6050gm
-	k2Hh/ZldWDEwDiJG4ivtvxTKI8AT3uH9KIjkTXZ6R7yiJ4JIoBT1xDA/B1H37IPh
-X-Gm-Gg: ATEYQzxEWIE0ePM3ipEA2hJESoFzGciByQQLmvhWO0UM4MZE8qZwwGG+qrmSUS6Pf0a
-	mWisc4KMpWsp0IP5cf9j3rlPsi31gVPCKbK0j3Nhj/HtpdenypQ99ii9U5i96KccMs4Qapkc5sa
-	ukVP1kpiFRzzngjfbbG/VxzDkPkbr1CWCgm4MJ7YJFj2YAaxxiH3FHK9WwWxJ5MWehdhL4GsZCQ
-	+KwBQyG4yfgABH/K09uEcpYhT+EZ7iD+K+6jg5xJe4c6lzcsA5Wsk1EKEO4VGID53jg44RLZj3t
-	IjQ1lzEXK7Py7o6mn6LzOa7KDKjJ3zPHl55QJYBugcm+gH8jlDF/ms6kfaUauaALD/QpMvUzYT6
-	Ydr4eOMMKcFSJRHR7V1SoiXbQ5k7taJkjdJYdrKy/DNigqvIgHMFTzf4VbeoBXabJReM3oBoqn+
-	hUZwSqelDOEmX4cZl8ROseyCD291W9ycl9WlmIPdXLiHiBp8rJpzA9bbgfqy+5
-X-Received: by 2002:a05:6000:3101:b0:43c:f247:4792 with SMTP id ffacd0b85a97d-43cf2474972mr20060581f8f.12.1774934280426;
-        Mon, 30 Mar 2026 22:18:00 -0700 (PDT)
-Received: from raspi.lan (85-67-117-165.pool.digikabel.hu. [85.67.117.165])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43cf247079esm24022035f8f.25.2026.03.30.22.18.00
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20251104; t=1774935564; x=1775540364;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HV8dmt1HgzHPMJw/ZTQseF87igS3ZBKLE6u0ax+TN+8=;
+        b=ncb/PGIaXltMSQ9uJ/Q3F8mssQ83XUelufjU/MLEuoQtWkv0bjrvCXm7ESK3Zm+ZnH
+         lzNEiBN0Hv6NGOHRvjaRdlymUmwEUJKuQgj/S5vFGcJ+V2xhMNVyn8A4vVhI8OdnW/pA
+         zZV6RpiCYGj2r3iJiKL23yAVH54P0t6g0MzUofUiiu8dW9hStA7TosKMz65NgOX1cUfC
+         VDNDHOQ2ir/Qr5KBP2OHCmORUx/cHNNq6SCG64ykGW1U5qBm25siUxUqxYnoIkTvZ+Sb
+         h75XxiFH1otL/1dckb6jpfmEXdlegGMceRWQP7boOm4d80gvOyB99z9wglbV+AhORbVA
+         eSfg==
+X-Gm-Message-State: AOJu0YwAi09cUtpaeXCOJwRjJc+RktC9t9UlIqwffRdkHTjGfTVBP2pL
+	4PPeSHSEyxbeekoWfSZDIftFgsRPzofsK5kO3K9XT2MFPTAU4VgjQCK2
+X-Gm-Gg: ATEYQzxVtGUI67/xrgG0uIT+2E5TIaJ9WBoA3d369S0sZSzcW2X10E7j1Pcd3lIsUfj
+	cM+lOlKBMwGQ/IdijiL3sN8/+etSIxP5DUSXqND+PUYzaC0xZAhCuql/FTJJB3pVSHEQGMxMYFo
+	DrzyIWyGIyjWO1aDwmPcw15SobHU66IA7R5CN7c6nicdwcYWqW8y/ozO5Vw5SMohg1Oii9BOKSJ
+	vItKhiK1pzletkJxVuwvx6Mintjrdh/nEkztL5PYiAIDYR4jvg5aumCTwFYJx4s1jwFAXLYnSYJ
+	JGvwCHEOBbXsYS2BK6AIDa8/RIatMCorhwQKvR2Jh1T0BhKT0V5RiHaGMcdp02o4/YF+YPcnucr
+	2kz6l1Dq6iZ04qYTNkITVCGRl527QM0/DshBulgIEr/qe/ZGVV5gS33bGRcj8BRcUqppHUxdG6M
+	sfsPfSFBIbbxxnpvcSbJ3kalqCG7SS8KKiGBe+FlIt5w6ElClCM40imzjs0etRY1OaUA==
+X-Received: by 2002:a05:7300:bc08:b0:2a4:701a:b9ba with SMTP id 5a478bee46e88-2c7bc937c3cmr929977eec.14.1774935564304;
+        Mon, 30 Mar 2026 22:39:24 -0700 (PDT)
+Received: from localhost.localdomain (104.194.93.216.16clouds.com. [104.194.93.216])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c3c747e410sm9271157eec.25.2026.03.30.22.39.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 22:18:00 -0700 (PDT)
-Date: Tue, 31 Mar 2026 07:17:58 +0200
-From: Gabor Gombas <gombasgg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Oops with 6.19.10
-Message-ID: <actZBr+wqcABY5mt@lan>
+        Mon, 30 Mar 2026 22:39:24 -0700 (PDT)
+From: hkbinbin <hkbinbinbin@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	hkbinbin <hkbinbinbin@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_sync: fix stack buffer overflow in hci_le_big_create_sync
+Date: Tue, 31 Mar 2026 05:39:16 +0000
+Message-ID: <20260331053916.1856760-1-hkbinbinbin@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi,
+hci_le_big_create_sync() uses DEFINE_FLEX to allocate a
+struct hci_cp_le_big_create_sync on the stack with room for 0x11 (17)
+BIS entries.  However, conn->num_bis can hold up to HCI_MAX_ISO_BIS (31)
+entries — validated against ISO_MAX_NUM_BIS (0x1f) in the caller
+hci_conn_big_create_sync().  When conn->num_bis is between 18 and 31,
+the memcpy that copies conn->bis into cp->bis writes up to 14 bytes
+past the stack buffer, corrupting adjacent stack memory.
 
-I've upgraded to 6.19.10, and within an hour, I got the below Oops. The
-line from bluetoothd is the only syslog entry close to the oops. 6.19.6
-run fine on the same host since it was released.
+This is trivially reproducible: binding an ISO socket with
+bc_num_bis = ISO_MAX_NUM_BIS (31) and calling listen() will
+eventually trigger hci_le_big_create_sync() from the HCI command
+sync worker, causing a KASAN-detectable stack-out-of-bounds write:
 
-Mar 30 22:00:43 host bluetoothd[807]: Path /org/bleak/65/140683142893552 removed along with Adv Monitor app :1.103
-Mar 30 22:00:43 host kernel: Oops: general protection fault, probably for non-canonical address 0xf712f8c7a288279f: 0000 [#1] SMP PTI
-Mar 30 22:00:43 host kernel: CPU: 1 UID: 0 PID: 807 Comm: bluetoothd Not tainted 6.19.10-gg #48 PREEMPT(lazy) 
-Mar 30 22:00:43 host kernel: Hardware name:  /D54250WYK, BIOS WYLPT10H.86A.0045.2017.0302.2108 03/02/2017
-Mar 30 22:00:43 host kernel: RIP: 0010:hci_sock_get_channel+0x5/0x20
-Mar 30 22:00:43 host kernel: Code: 0f a3 b7 78 03 00 00 0f 92 c0 c3 cc cc cc cc 66 0f 1f 44 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 <0f> b7 87 72 03 00 00 c3 cc cc cc cc 0f 1f 40 00 66 66 2e 0f 1f 84
-Mar 30 22:00:43 host kernel: RSP: 0018:ffffbb74c11afa68 EFLAGS: 00010206
-Mar 30 22:00:43 host kernel: RAX: 0000000000000000 RBX: ffff9c46c5ead600 RCX: 0000000000000002
-Mar 30 22:00:43 host kernel: RDX: ffff9c46c97e1f80 RSI: 000000000000000d RDI: f712f8c7a288242d
-Mar 30 22:00:43 host kernel: RBP: 0000000000000000 R08: ffffffff8296f7b0 R09: 0000000000000002
-Mar 30 22:00:43 host kernel: R10: ffff9c46cb124000 R11: ffff9c4796f88400 R12: ffff9c46cb124b28
-Mar 30 22:00:43 host kernel: R13: 0000000000000003 R14: 000000000000000d R15: ffff9c46cb124b08
-Mar 30 22:00:43 host kernel: FS:  00007fec5ee85340(0000) GS:ffff9c4853a17000(0000) knlGS:0000000000000000
-Mar 30 22:00:43 host kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-Mar 30 22:00:43 host kernel: CR2: 00007f959681a008 CR3: 0000000118f08001 CR4: 00000000001726f0
-Mar 30 22:00:43 host kernel: Call Trace:
-Mar 30 22:00:43 host kernel:  <TASK>
-Mar 30 22:00:43 host kernel:  mgmt_pending_find+0x48/0xa0
-Mar 30 22:00:43 host kernel:  remove_adv_monitor+0x3b/0x120
-Mar 30 22:00:43 host kernel:  ? _raw_read_lock+0x13/0x40
-Mar 30 22:00:43 host kernel:  hci_sock_sendmsg+0x656/0xb40
-Mar 30 22:00:43 host kernel:  sock_write_iter+0x181/0x190
-Mar 30 22:00:43 host kernel:  do_iter_readv_writev+0x139/0x230
-Mar 30 22:00:43 host kernel:  vfs_writev+0x120/0x3a0
-Mar 30 22:00:43 host kernel:  ? __seccomp_filter+0x34/0x5b0
-Mar 30 22:00:43 host kernel:  ? _copy_to_iter+0x87/0x6b0
-Mar 30 22:00:43 host kernel:  ? __seccomp_filter+0x34/0x5b0
-Mar 30 22:00:43 host kernel:  ? do_writev+0xde/0x110
-Mar 30 22:00:43 host kernel:  do_writev+0xde/0x110
-Mar 30 22:00:43 host kernel:  do_syscall_64+0x6c/0xe90
-Mar 30 22:00:43 host kernel:  ? syscall_exit_work+0x13e/0x1b0
-Mar 30 22:00:43 host kernel:  ? do_syscall_64+0x8a/0xe90
-Mar 30 22:00:43 host kernel:  ? do_syscall_64+0x8a/0xe90
-Mar 30 22:00:43 host kernel:  ? switch_fpu_return+0x16/0xd0
-Mar 30 22:00:43 host kernel:  ? do_syscall_64+0x29f/0xe90
-Mar 30 22:00:43 host kernel:  ? handle_softirqs+0x13f/0x2a0
-Mar 30 22:00:43 host kernel:  ? irqentry_exit+0x48/0x530
-Mar 30 22:00:43 host kernel:  entry_SYSCALL_64_after_hwframe+0x71/0x79
-Mar 30 22:00:43 host kernel: RIP: 0033:0x7fec5f333e92
-Mar 30 22:00:43 host kernel: Code: 18 41 8b 93 08 03 00 00 59 5e 48 83 f8 fc 75 1a 83 e2 39 83 fa 08 75 12 e8 2b ff ff ff 0f 1f 00 49 89 ca 48 8b 44 24 20 0f 05 <48> 83 c4 18 c3 66 0f 1f 84 00 00 00 00 00 48 83 ec 10 ff 74 24 18
-Mar 30 22:00:43 host kernel: RSP: 002b:00007ffc60d23590 EFLAGS: 00000202 ORIG_RAX: 0000000000000014
-Mar 30 22:00:43 host kernel: RAX: ffffffffffffffda RBX: 00007ffc60d23610 RCX: 00007fec5f333e92
-Mar 30 22:00:43 host kernel: RDX: 0000000000000001 RSI: 00007ffc60d23610 RDI: 0000000000000008
-Mar 30 22:00:43 host kernel: RBP: 0000000000000008 R08: 0000000000000000 R09: 0000000000000000
-Mar 30 22:00:43 host kernel: R10: 0000000000000000 R11: 0000000000000202 R12: 000055bcb1bf7e60
-Mar 30 22:00:43 host kernel: R13: 000055bcb1bf9f90 R14: 000055bcb1c15520 R15: 0000000000000000
-Mar 30 22:00:43 host kernel:  </TASK>
-Mar 30 22:00:43 host kernel: Modules linked in: ip_set tun rfcomm 8021q algif_hash algif_skcipher af_alg bnep uinput kvm_intel iwlmvm mei_hdcp nls_cp437 kvm iwlwifi at24 vfat regmap_i2c fat irqbypass ir_rc6_decoder rc_rc6_mce n>
-Mar 30 22:00:43 host kernel: ---[ end trace 0000000000000000 ]---
-Mar 30 22:00:44 host kernel: RIP: 0010:hci_sock_get_channel+0x5/0x20
-Mar 30 22:00:44 host kernel: Code: 0f a3 b7 78 03 00 00 0f 92 c0 c3 cc cc cc cc 66 0f 1f 44 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 <0f> b7 87 72 03 00 00 c3 cc cc cc cc 0f 1f 40 00 66 66 2e 0f 1f 84
-Mar 30 22:00:44 host kernel: RSP: 0018:ffffbb74c11afa68 EFLAGS: 00010206
-Mar 30 22:00:44 host kernel: RAX: 0000000000000000 RBX: ffff9c46c5ead600 RCX: 0000000000000002
-Mar 30 22:00:44 host kernel: RDX: ffff9c46c97e1f80 RSI: 000000000000000d RDI: f712f8c7a288242d
-Mar 30 22:00:44 host kernel: RBP: 0000000000000000 R08: ffffffff8296f7b0 R09: 0000000000000002
-Mar 30 22:00:44 host kernel: R10: ffff9c46cb124000 R11: ffff9c4796f88400 R12: ffff9c46cb124b28
-Mar 30 22:00:44 host kernel: R13: 0000000000000003 R14: 000000000000000d R15: ffff9c46cb124b08
-Mar 30 22:00:44 host kernel: FS:  00007fec5ee85340(0000) GS:ffff9c4853a17000(0000) knlGS:0000000000000000
-Mar 30 22:00:44 host kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-Mar 30 22:00:44 host kernel: CR2: 00007f959681a008 CR3: 0000000118f08001 CR4: 00000000001726f0
+  BUG: KASAN: stack-out-of-bounds in hci_le_big_create_sync+0x256/0x3b0
+  Write of size 31 at addr ffffc90000487b48 by task kworker/u9:0/71
 
-Regards,
-Gabor
+Fix this by changing the DEFINE_FLEX count from the incorrect 0x11 to
+HCI_MAX_ISO_BIS, which matches the maximum number of BIS entries that
+conn->bis can actually carry.
+
+Fixes: 42ecf1947135 ("Bluetooth: ISO: Do not emit LE BIG Create Sync if previous is pending")
+Cc: stable@vger.kernel.org
+Signed-off-by: hkbinbin <hkbinbinbin@gmail.com>
+---
+ net/bluetooth/hci_sync.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 45d16639874a..b84587061ae0 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -7222,7 +7222,8 @@ static void create_big_complete(struct hci_dev *hdev, void *data, int err)
+ 
+ static int hci_le_big_create_sync(struct hci_dev *hdev, void *data)
+ {
+-	DEFINE_FLEX(struct hci_cp_le_big_create_sync, cp, bis, num_bis, 0x11);
++	DEFINE_FLEX(struct hci_cp_le_big_create_sync, cp, bis, num_bis,
++		    HCI_MAX_ISO_BIS);
+ 	struct hci_conn *conn = data;
+ 	struct bt_iso_qos *qos = &conn->iso_qos;
+ 	int err;
+-- 
+2.51.0
+
