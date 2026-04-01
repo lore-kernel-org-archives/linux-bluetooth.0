@@ -1,72 +1,99 @@
-Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FF5224D6
-	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Apr 2026 19:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9A3385529
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Apr 2026 20:45:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775073484; cv=none; b=fQ4y5H5t0Hm2PB0EZRheokW7zIjS51/ZyHRpzrwkOR62UjphBNz93P9BSdza3Pct4ejufCoipqeqrPj1yENNXwa883A68t1gS6etgeOBVWLYiDJeB6BemEpqZtMgtN4K0NJNA+munp/ogA53954U/QpdDRtuLmeetWV6ix84wwo=
+	t=1775076345; cv=none; b=r00AQ9XPQL/asKzuasn/ALlzVOGOGNMbmMf4gLjrnA71lNwxd1sIlgM0rrneuCpprD3ntv9FJ3m/xXLr2Oq1D3pHPMGfGlz+lcVU5pV0Q54U8eRSkUn7zDRXVeJyrytC2EjOl5QsBxngeAL0Z+G2Ds9SPiAYFk4JoUfJHA8/zz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775073484; c=relaxed/simple;
-	bh=7+Gebn64lelFvTN+Xf7CJU9m43+k/Bx+0Gm1S12kGRY=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=qCIyjerOCJ3AETo14DfgY6PtA9qUSCV+OVICztoaInS+OEPFC6raYB6a0tZCpyfGYiqTLKBQysWbyxtH9Rb3j8fB3eWzWhQcJJRbFV2HdeexM18HtN49H6h70dORYq5ThtZWo+HgHAgOyIx/teOIrpAjzQaj6GFP5eod5Bnw8ZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=EoS1QMUk; arc=none smtp.client-ip=192.30.252.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="EoS1QMUk"
-Received: from github.com (hubbernetes-node-b0c5c78.ac4-iad.github.net [10.52.223.29])
-	by smtp.github.com (Postfix) with ESMTPA id 6BDE5300C65
-	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Apr 2026 12:58:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1775073482;
-	bh=UBub+OV+th5dU61EEYe91bBY82/C1hU2igAdOy8MPTw=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=EoS1QMUkNZiv+uNXqEOHD2ygM4edzsqmgtH6HEIitVHbxf3agLDr25Qa+hJoQDW6f
-	 8ISiVKsJu0nQZ7DBCLq67+6Xbiwm7/ddjtqOB4Vt70QpjcF95eUjzk87rSpuPmZKsi
-	 mMHYDKHwHusJt5cl+CSq+xsvBRcgYRtl8dPpqU4A=
-Date: Wed, 01 Apr 2026 12:58:02 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
+	s=arc-20240116; t=1775076345; c=relaxed/simple;
+	bh=EbX9UO5hdUbUa1XPWME/t/GaH/opGbetADZufM0DWSI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=BgbD6a4d7kBs3cwGBL2hhki21/R34WgWNmtIHJmFuPNKqkmp2OEHIeWzNsaJzEWIg4kaf+ZRXD1/2RTTE6tro5lSWBsfyP9Oa5nYzVANcvuf9m1YDTlR29dJjubI+00S85ybH9KWkUhDZ7nVi5CMtYcDLhEM2uPyr4ccPYBVVZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9DDB820D56
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Apr 2026 20:45:35 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1076017/000000-17e787@github.com>
-Subject: [bluez/bluez] 17e787: doc/btmon: Add Channel Sounding protocol flow
- docu...
+Subject: [PATCH BlueZ 1/2] unit: Add unit test for new MIN/MAX macros
+Date: Wed,  1 Apr 2026 22:45:05 +0200
+Message-ID: <20260401204527.148077-1-hadess@hadess.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: hadess@hadess.net
+X-GND-State: clean
+X-GND-Score: 0
+X-GND-Cause: dmFkZTE7ssuRHBNTKJRevbw5qZ4XG6zSInVNWTNRPwAYRInNCOO+z4B0VwoZDeLJRt7y7q0CvGbWjdDdz2Q3VDpD+l5sCLeu2OvOJmNVzL0OrYU7w7zSwuc8gA+3E92kE3GeWr6sKGWKivAH5TNrY9ZCUy8laJyGW6zXJH8bhaJIotAsQzXHOXg8cKdC33RXMqWgpn5nNHx9jams1+p/iB/abXF6Q6BEETscdRmvSp16IvBk/7Xmstnz57M+Jw369FIlcPC/4s3YESYZhFR9hVT375jJLSB89W+BiBqfcssyZ5TjM5VCqY1uuyMupOIbl56wOQUuADCR4ckG3FjBAG2gY3tgtsMRQ1ZbSDZCtTIj5lvgTcNsSvtboCvFgdpKNvv8cgtUsZfE2jGUjnnKNhZ4aV1PVWwTj3aAjToErmD64Vivb8n5vtxrcKJ8UBmw9zhmIe9dYXQmLH3rWMM/zIe0pwTvPPcakKMTwBdnbfkio5RXDizc6IpDw5InJqMvWnCAM59/1exqIFmDM5Z/gNMdCD0BifYxghmpws71K1ixh+AiWiHRUVyIXUAiyB16YWJaqI1W55RGS/IEvEQJB5sfYf0jVoSm3q5xJ+VynssohB1UZY3DU5Rj1LVE2nakxwaJZczQLeijTolPCPr+4c+vI9ckHw9RP4DWhi5I9JICURer1g
 
-  Branch: refs/heads/1076017
-  Home:   https://github.com/bluez/bluez
-  Commit: 17e787538712cddfa378a4fe6a3eb6fa40c3cfd2
-      https://github.com/bluez/bluez/commit/17e787538712cddfa378a4fe6a3eb6fa40c3cfd2
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-04-01 (Wed, 01 Apr 2026)
+---
+ Makefile.am      |  4 ++++
+ unit/test-util.c | 34 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+)
+ create mode 100644 unit/test-util.c
 
-  Changed paths:
-    A doc/btmon-cs.rst
+diff --git a/Makefile.am b/Makefile.am
+index 2cfb884f1851..d9de71d587d8 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -696,6 +696,10 @@ unit_test_lib_SOURCES = unit/test-lib.c
+ unit_test_lib_LDADD = src/libshared-glib.la \
+ 				lib/libbluetooth-internal.la $(GLIB_LIBS)
+ 
++unit_tests += unit/test-util
++unit_test_util_LDADD = src/libshared-glib.la \
++				lib/libbluetooth-internal.la $(GLIB_LIBS)
++
+ unit_tests += unit/test-gatt
+ 
+ unit_test_gatt_SOURCES = unit/test-gatt.c
+diff --git a/unit/test-util.c b/unit/test-util.c
+new file mode 100644
+index 000000000000..8ab16cc083ba
+--- /dev/null
++++ b/unit/test-util.c
+@@ -0,0 +1,34 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2026  Bastien Nocera <hadess@hadess.net>
++ *
++ *
++ */
++
++#include <assert.h>
++
++#include "src/shared/util.h"
++#include "src/shared/tester.h"
++
++/* XXX glib.h must not be included, or it will clobber the
++ * MIN/MAX macros */
++
++static void test_min_max(const void *data)
++{
++	assert(MIN(3, 4) == 3);
++	assert(MAX(3, 4) == 4);
++	tester_test_passed();
++}
++
++int main(int argc, char *argv[])
++{
++	tester_init(&argc, &argv);
++
++	tester_add("/util/min_max", NULL, NULL,
++			test_min_max, NULL);
++
++	return tester_run();
++}
+-- 
+2.53.0
 
-  Log Message:
-  -----------
-  doc/btmon: Add Channel Sounding protocol flow documentation
-
-Add btmon-cs.rst documenting the complete CS protocol flow as seen
-in btmon traces.  Covers capability exchange, security enable,
-configuration, procedure parameters, enable/disable, subevent
-results with all four step modes (Mode 0-3), result status fields,
-FAE table exchange, channel classification, CS test mode, the
-typical setup sequence, and common issues.
-
-This provides LLM context so automated trace analysis can correctly
-interpret CS distance measurement sessions.
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
