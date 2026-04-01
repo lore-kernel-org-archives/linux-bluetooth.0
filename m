@@ -1,78 +1,67 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863BD40243C;
-	Wed,  1 Apr 2026 18:30:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72952620DE
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Apr 2026 19:00:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775068221; cv=none; b=OFfvImC5NLRBbLNBriLXDgqWbOazr3u7/65whvDotRcwPWtHeLAukOollVVZ0XPxBg32CI1/6X10vBMtAyZpmWLIXx0jkwq3N4EhmXEef2IbTC26IG3ULhy25yUO4nZn1/8PYJZlYNW4+nXm+MwLH8b85r++tCUK5kiroQitpPI=
+	t=1775070050; cv=none; b=AOCN0E/+VISlGOpl+BEh1lKL3m2HN2w8PEun9KngN0T2XaYTeEZvnqTrn2RXQi2Oh/lmG0tLx99tp/ItTSlN/qAlgotFqoI6sLOLhrDN9hhPJTn/sI8HbI368ewWLBDKxYmKqNa3EbeppZaNA/vkR3pS9M2IbZc0FuU74UFV/1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775068221; c=relaxed/simple;
-	bh=3n1VRJk7W1aVTtGMSinVRkfsNGhmE7mHhe3GVwXdwcQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZGmrG6aFEgEuhWuu1yvF/LSVBy/qQI3Yd9zTEIwdsrQdi1jpv2airGCUBDCcKRha88Oxcda2xflhzDNv7ZSyXUi2AUrjY/ujhutMsIW6ywbsYwyYeEqc4VzB8EfjXpP6Db2sab1A9CuPCT1uOnS/9gPzcBnfja6m0G02RV5zFX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VezQ2fxl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775070050; c=relaxed/simple;
+	bh=0TWUo1ovYbzC0VItGjPNLy1eTDKN8yUr6mr1WmxFCS0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=qacuKveDiwkB65/i6kEbJWvJGH8WIQXECsX9r4AV0UxlSEfpAPqPEaE3/2iJP8Vb7Tt7vPaOzMzPlDKMCZRP9OdmCKx0NE6Fqz64ihRAGLlBcx3p8vnLJH7l2FG/k80iRlrDvOcL7H4LRvPazs520kXFaqmpJSXT8WNFhARlPLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=BQNNko3o; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VezQ2fxl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69713C4CEF7;
-	Wed,  1 Apr 2026 18:30:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775068221;
-	bh=3n1VRJk7W1aVTtGMSinVRkfsNGhmE7mHhe3GVwXdwcQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VezQ2fxlHPyFZpNdOKRb5lqn0FON4/7IakPNbyeDaFiJdvRqYYrjxuCT1XjGauVxT
-	 FncpN2gQiKCRXFyvQNEEgXug1aXQ6mhut70Wm3QXXym7ZDkQBwiMBEMO/uR0CJimcb
-	 o+KHzLIhA7cEVUSYodymUVyUf4ycuIblWV+9Eg7x0RWRUx+CM6PMzR8yCetBWaaZg1
-	 fxymyXJDQteZCTSybwYEjvKWS2iSIlEaL/Lw4Qnr8JdXWUV/Z5BnDBKSjq6Qt2sS04
-	 e8T3PgCI65VJj2b+nzlMY1EI0tULnN4qKQps1/zYBcdH0CnjtxBZu/ml4zWC3n0nhP
-	 kYjfdtJRYLFPQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE813808203;
-	Wed,  1 Apr 2026 18:30:05 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="BQNNko3o"
+Received: from github.com (hubbernetes-node-a0eb99c.ac4-iad.github.net [10.52.161.35])
+	by smtp.github.com (Postfix) with ESMTPA id E32E4640977
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Apr 2026 12:00:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1775070047;
+	bh=yiM8VbnBLzscSKEhdQwtoX6KX46Kz1pC7tzfRa4dRak=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=BQNNko3oUmf/JBuRT9+g2kjnd7HyrkNNP2K2o/SF73jjoTIANADDfcP5LD06MxWh8
+	 +1FnjgKPAz5dTC2IhXVgXChorlnXdbJeBiyvUaBP+8Whgx8TmAjpv3hf9w0THxRNLn
+	 TNUq7zWcfaW1IjHexwJHTMmtnlm1qlQMYCZCCD8g=
+Date: Wed, 01 Apr 2026 12:00:47 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1075991/000000-15844b@github.com>
+Subject: [bluez/bluez] 15844b: doc: add btmon-mgmt.rst
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: MGMT: validate mesh send advertising
- payload
- length
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <177506820429.3813163.15864121769222548802.git-patchwork-notify@kernel.org>
-Date: Wed, 01 Apr 2026 18:30:04 +0000
-References: <20260401142532.332943-1-keenanat2000@gmail.com>
-In-Reply-To: <20260401142532.332943-1-keenanat2000@gmail.com>
-To: Keenan Dong <keenanat2000@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- luiz.dentz@gmail.com, linux-kernel@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/1075991
+  Home:   https://github.com/bluez/bluez
+  Commit: 15844bd657e26ac464586ffe6be0527a27f54160
+      https://github.com/bluez/bluez/commit/15844bd657e26ac464586ffe6be0527a27f54160
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-04-01 (Wed, 01 Apr 2026)
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M Makefile.am
+    A doc/btmon-mgmt.rst
+    M doc/btmon.rst
 
-On Wed,  1 Apr 2026 22:25:26 +0800 you wrote:
-> mesh_send() currently bounds MGMT_OP_MESH_SEND by total command
-> length, but it never verifies that the bytes supplied for the
-> flexible adv_data[] array actually match the embedded adv_data_len
-> field. MGMT_MESH_SEND_SIZE only covers the fixed header, so a
-> truncated command can still pass the existing 20..50 byte range
-> check and later drive the async mesh send path past the end of the
-> queued command buffer.
-> 
-> [...]
+  Log Message:
+  -----------
+  doc: add btmon-mgmt.rst
 
-Here is the summary with links:
-  - [v2] Bluetooth: MGMT: validate mesh send advertising payload length
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2c12536623ca
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Add a new btmon sub-document doc/btmon-mgmt.rst describing Management
+(MGMT) protocol flows as seen in btmon output; include it from
+doc/btmon.rst and list it in EXTRA_DIST in Makefile.am.
 
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
