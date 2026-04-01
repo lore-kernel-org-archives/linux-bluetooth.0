@@ -1,133 +1,95 @@
-Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
+Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com [209.85.160.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295CD1A682B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 22:47:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0CD837FF40
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Apr 2026 07:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774997247; cv=none; b=pUtRoFembdOXW0LaI3NHZsKfFTz1q0c/M4JLdQ1dLyx1C/jGyGXYUuJ38xBfG/+WoplBjWgF/K85M+RkThDq/gzIe8TctDJe1Ov7obzgkPXadc7fyodono8mjjlivRWTNH3B9Gv0guIydh+6LwKqGACz5hqBUTA2j3rjbOXIxB8=
+	t=1775029346; cv=none; b=hVXhTJk/0p4766DwZmDPGOpGwHXKehQ+vJvYIdrEhmG6tw45MejZ9FFxToC3kx9l3NbqWNZYLDGNoq6r5YFnTEtLQc65E7X+U8SoJs+aqyQ4VNOOFJd0vLZn+1WU6wqAd4Yiw5t9D+Mi+kOlEaIH2RtBCKyGD1/1iEBwAqjQMNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774997247; c=relaxed/simple;
-	bh=ldqiwtsx6KwhXpHboG6WytxUOhGQejNd5yzdkpuAb+Y=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=RcKvsQobKImNa/eTE4S+zsoVz2pSbIiW5f4aMvDH72rtyN2mx8P7wZOfiP6pOkT3FoVoNhkwXYG7NbGRZEZTrRCkPPhdPT55EQjkzoCPa8iTvkSf/+N5JECokVMV8fIuL3Fvnsf8lZYnWVBTbQFvklQdiRRbtnQPR1O/04mUC8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rYgw/z1y; arc=none smtp.client-ip=74.125.82.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rYgw/z1y"
-Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-2c56aa62931so3068506eec.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Mar 2026 15:47:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774997245; x=1775602045; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=GD9s5+i4dNfNtKo6jV1EZmRUPIvyH1H8QQwsjpO1GtU=;
-        b=rYgw/z1yHVyZ1y+Rau5R9723CP+5nmDhqV6Lq2ayISgsSKULrixgZcOdnfzihZMvBd
-         a3ToAn/OdU7PI/24AjUmMCa/Bv6qX6zrQ+sr06jLuaULALs0VQGMk5Ni1IM5wlcxQ4gp
-         oXX3lhAw9m0URc1Nme3b9aKQY71KaCHs3zI2TGS/xrULmsZiUPSoU5DKPdz/icCI7dLN
-         8pMT2cOkDA27UcRcuNT+mzfR5HUqSHu3VCZYCvZ7CloIS8yZeEM8NBm2b8ovWmRf/n5Q
-         FjRQ5pT+H5sWkQn7WSzSKKqngxlrHbMn5Lc5I8/QEt36q2+synYlg85u8VApt7VSLk2g
-         cQiQ==
+	s=arc-20240116; t=1775029346; c=relaxed/simple;
+	bh=uYAkN5OfpKmKah76zvJV3EVnhHOco4kTlTtyRslYQ3Y=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=enqTvzouHFS45dIGjK1dH5tUrxqIHJna4CJOIPUumuIIYbQE3M9ff+3Yt/ae+zZo8mYnN8796UFrhoZB5Z2Itdkp0LKlyJWvflCDpHjqqA/r7TT6+78KnmvDkvKU0V4OQSxw2La3owglQ/iSRIv5ymQNc/Jr9NDDOV84BGJNZ/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-4171fdb5a67so15050402fac.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Apr 2026 00:42:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774997245; x=1775602045;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GD9s5+i4dNfNtKo6jV1EZmRUPIvyH1H8QQwsjpO1GtU=;
-        b=EmSG3ZJ2XlASE1ZjOD6+jrL48XaFn6CqGWyViSqoTV6pWkvEFtJ+DZgFO891M0zNz1
-         /YGi8HNEziVrhEGMqIPQJRBBljlIlntA+TIAtlO4HUqI5Z00fRLbP0lgWFDebjnKY8LQ
-         AaKkHjrVJRwt4i1qCoGad7Ty2XgYVnZt/XOVnRaDDWUr1W3S7zy/w+/3WJx7IXGaY/Hc
-         GqODIgnn48RCGvNVzsf/O2nJxkNqlHXBpb6YCsidP7iiQsN8kMKX6Rm5NYoa6QjpaVSM
-         uKy4FjFjR3B3av5xqYsXGUM9hH2y6NWz5TIldze+7YcUHbm0RnuxpacgDEdPxDMvawyi
-         DmQw==
-X-Gm-Message-State: AOJu0Yxlf+Yvp9mPkxYEi0mIuvXn5fPoggGASAYC71YCoox4zAzQ2v3c
-	nzWC4JV/EeKruMIQYS4+cTfLZQjr6u8tgfEOTtDJ4O/3LrWk0P+EX2UCNKaTuQ==
-X-Gm-Gg: ATEYQzz7BNyQY0+qqs5+dl1i7y7XXAEbUe5mwB9SWU6oKgm03QSvDM+7SbSgF0RTalL
-	cEeMm/yeiAUltQyVaGU17ZPkNaeFp/+69FI3deErLT+kWM7tgCEaAGwg9qJ/SQ+I0w5JnqgacNJ
-	aevrGESlgUz2GJIuMARdNV7T4yS2rpntI9lmwaPJ0SA85yTGGmqBGzyLreZYGevsvBx4uhaKoHW
-	HjdMCMScNxD+BvxyC7IaYjy0C0GwO8syin+prznJdMu2N+DKZfhNUIxcspdlO6k2RB6WSKRLsmv
-	SoIOjn+qERKxOCfbvENd6ganyjCfp3bgkINMJpU62uy4DDAejbClbC39FOx0DqmjpOy7b1Ap+PT
-	E2aiy3tzoJ1+mD62hSQyriWRGXX7OjdcCchYlC80wr1NhPGWkacI86NnL68BoKXZJK2fGeprdUh
-	MddFOzpI7MeBrCh5E0tOeSiATmjXWQXli3
-X-Received: by 2002:a05:7300:2213:b0:2c8:6361:ab38 with SMTP id 5a478bee46e88-2c9313894f7mr820176eec.15.1774997244857;
-        Tue, 31 Mar 2026 15:47:24 -0700 (PDT)
-Received: from [172.17.0.2] ([172.182.225.169])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c886656fccsm2058587eec.11.2026.03.31.15.47.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2026 15:47:24 -0700 (PDT)
-Message-ID: <69cc4efc.050a0220.2dba59.6837@mx.google.com>
-Date: Tue, 31 Mar 2026 15:47:24 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2407571787260958711=="
+        d=1e100.net; s=20251104; t=1775029343; x=1775634143;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8cndwGR9l7kA1H6LQYvMU+aBOcFE9tQt/7nrNQaOAmU=;
+        b=drtaII3ow7Gwl4KlST8UIJEMklb4+J425tu5L46iocKPP9nqSyN7J7lyFUV4XfCLkL
+         GcFnIvnHO+WOcynmldvnbwet4JkTt64t/6W2+QgSn8zp4ytwtRsj+Kx6M54PPSM/2kQ+
+         LHBwJWfzxPQ0VShf/1HGuV8jGvQemhv4AUdrLlRrJ84Y+JFFbe6ZBdmJ2X7tS5t5cs1f
+         8ignleYtahylZrKEkZjCZRukWqj2SSpoh1cjkN/T6O6iqvJBwworUcGgcBXbNfXu4msY
+         N10to0xspnGYJ0ehylAqfMmQ9Iae2JVWsKpny3kf0g7N0pHBmn/Egfh/LhzNrMqdgTaL
+         nglw==
+X-Gm-Message-State: AOJu0YzzFdZR2pPa8Hqx8xoC+85XwV9KW2/QOATCsF3mW5il1feY38M8
+	lkoNHyrWK8w70D4ifE8fH1fb4AzOFE6VKdWJUtigCnVHCiEgMFxBNgHywGnjUR8c+PIY5oobTzB
+	p/8HigWbugjV/f12fswnwyF9WK0wlYjm5CNKgsFRs4LJNH+Z7XD/bCFcwWiA=
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: RE: shared/util: Add MIN/MAX implementations
-In-Reply-To: <20260331213731.3895736-2-hadess@hadess.net>
-References: <20260331213731.3895736-2-hadess@hadess.net>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-Received: by 2002:a05:6820:992:b0:67c:11cf:eb0e with SMTP id
+ 006d021491bc7-67fabbd3bd1mr1325705eaf.7.1775029343582; Wed, 01 Apr 2026
+ 00:42:23 -0700 (PDT)
+Date: Wed, 01 Apr 2026 00:42:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69cccc5f.050a0220.183828.003b.GAE@google.com>
+Subject: [syzbot] Monthly bluetooth report (Apr 2026)
+From: syzbot <syzbot+list17bec2e18045749d8ecd@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
---===============2407571787260958711==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello bluetooth maintainers/developers,
 
-This is automated email and please do not reply to this email!
+This is a 31-day syzbot report for the bluetooth subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bluetooth
 
-Dear submitter,
+During the period, 1 new issues were detected and 1 were fixed.
+In total, 32 issues are still open and 100 have already been fixed.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1075447
+Some of the still happening issues:
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.36 seconds
-GitLint                       PENDING   0.33 seconds
-BuildEll                      PASS      20.71 seconds
-BluezMake                     PASS      651.49 seconds
-MakeCheck                     PASS      18.40 seconds
-MakeDistcheck                 PASS      247.42 seconds
-CheckValgrind                 PASS      296.12 seconds
-CheckSmatch                   WARNING   357.45 seconds
-bluezmakeextell               PASS      184.81 seconds
-IncrementalBuild              PENDING   0.64 seconds
-ScanBuild                     PASS      1027.89 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-emulator/btdev.c:468:29: warning: Variable length array is used.
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
-https://github.com/bluez/bluez/pull/1996/checks
+Ref  Crashes Repro Title
+<1>  13597   Yes   WARNING in hci_conn_timeout (2)
+                   https://syzkaller.appspot.com/bug?extid=fc4b5b2477d4ca272907
+<2>  8418    Yes   WARNING in call_timer_fn
+                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
+<3>  4468    Yes   general protection fault in lock_sock_nested
+                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
+<4>  1400    No    KASAN: vmalloc-out-of-bounds Read in kcov_remote_start
+                   https://syzkaller.appspot.com/bug?extid=8a173e13208949931dc7
+<5>  1022    Yes   KASAN: slab-use-after-free Write in hci_conn_drop (3)
+                   https://syzkaller.appspot.com/bug?extid=3609b9b48e68e1fe47fd
+<6>  569     Yes   possible deadlock in l2cap_conn_del
+                   https://syzkaller.appspot.com/bug?extid=b71bb48c13bf3fed3692
+<7>  351     No    WARNING in l2cap_chan_del
+                   https://syzkaller.appspot.com/bug?extid=3272785b7a1fc9b510f6
+<8>  273     Yes   KASAN: wild-memory-access Read in l2cap_connect_cfm
+                   https://syzkaller.appspot.com/bug?extid=0e4ebcc970728e056324
+<9>  167     Yes   WARNING in hci_recv_frame
+                   https://syzkaller.appspot.com/bug?extid=3e07a461b836821ff70e
+<10> 147     Yes   KASAN: slab-use-after-free Read in l2cap_sock_new_connection_cb
+                   https://syzkaller.appspot.com/bug?extid=cdae834448ec8c3602fe
 
 ---
-Regards,
-Linux Bluetooth
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
---===============2407571787260958711==--
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
