@@ -1,197 +1,253 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D37A19EED3
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2026 02:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058ED1E47CC
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2026 06:46:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775096765; cv=none; b=QbaDTDE3duhATFlnVHFjvmEIyt08QHJtVYxIjLuqyL9gmlymHuSiK22sIz5mJosGQ484DAnnr6LapTXTcppDC5Z6ISTp4nwpeAv1O+cfBrh72kcYH8QItwJVKz32C6zHfbz4lPxeZkzwJ2BSwHyJyApEhw49WwqNOqMH6pt0ibY=
+	t=1775112412; cv=none; b=O31/KcVO4eLeGquYR2gzlejdVlTobnUk+qntYgqLb/15AIuJ67r/ApWdR4+XCFGKj/C4eI+YEBPRy+4a8T410sJCIb82arQkEboGVgl5g++SDkrDgPNvUytJm3Am6HXwSS/52Kyf1kvgrkDByRjlnVZ4mw4nxNOS/49oGScAQPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775096765; c=relaxed/simple;
-	bh=+hdin/cabmUnkeHYjAQY+h3l/3itYJtI+V7QeMIgFB4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=EnL6Qy3h+OHaDEQ0vSvwf1VAtI8S6pqsAUkolk0fBzubTxUYG/2GyRkiDBO6udqjoFZzGAzmOtJkzNqLUuZZAdbdOKmvz1kLNuL/W0ynavOMyt6dY7bTz4y5SgD2YcBqvI+Oe1s5Do4j0ZMYGcELvI15lL2wtgSJTvk7tmQEbdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=lKvz3NRj; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=SkgBFstD; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1775112412; c=relaxed/simple;
+	bh=gAVKWD6+LI3jINFccfSCDiEz5yLYnuoIxU1ZaPOSS8Y=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=LM7yr7t5PI3/5qTz2PQHruvjE7B8PAszHXi1JmyF/IJqt8hVdorZzojS+lmn8ENPN/Gsb9IyPvJElSjFsSpYXdsUMUezy9W9C2FyUC3YLckNDMt+IjOExv2+kvw/Cwtby+2njvs7A9MlGvzPKK0S2IFxCOk2j+efOZm4oZIMKUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Zg3P458r; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="lKvz3NRj";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="SkgBFstD"
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 631M4CPK2798898
-	for <linux-bluetooth@vger.kernel.org>; Thu, 2 Apr 2026 02:26:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	YoETeGfnx+ul1+cJim1t3718pgueffgoi0/3qr5B0f0=; b=lKvz3NRjg/wwN+ja
-	SnR04LOM5HUkSFyYAkyyiQhkVdNaU+j0X+wDeH/p4AzZhlkTi3tfBJ3X8IfRNuN6
-	MarWuJjXT5sBidS367kxwxNe7hP0i6JKJr9HSKEG0SHBvf0ZprmKfGgQJVGGkDqG
-	NCGJ3ly6HopmWx6s/ymMOHrXyFC/7HgSVJKp+BS4rv4ldHeDxWbS4lTeoC3KpM+P
-	uIZ+ldj4kcv5pgxCvccXqms8IYnP4mLPXHqlUT6y7+3f5A3Y7slufIIF/P72mEyK
-	3+g27DPqRP49FJ73PEcnfBjIyC9D+bWVY2p9DGZWVfsZcba5ICjlgnYqoy1kV/mn
-	hKnmhg==
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4d96hk1usq-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 02 Apr 2026 02:26:02 +0000 (GMT)
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2b249975139so9901505ad.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Apr 2026 19:26:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1775096761; x=1775701561; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=YoETeGfnx+ul1+cJim1t3718pgueffgoi0/3qr5B0f0=;
-        b=SkgBFstDEmAh/g/EMWfgYK3NHeYbTImbigC55ongYiNwVA/a3ubjRf6prYIAYqhRWm
-         ku1K0UF+64uuDs+xqW8O6GPjJ/2yvb8YzqVSyOfA8NQCXeF6QNsoDGYOVlFlLqmbYAWn
-         EQlYkRZMGUzYLoP7QL78EEaai19ZnJcaZDpXjd37NDvg4HPZbpbEl1H4qaDafq02BEFQ
-         ZeBWBqk6Gqxs+qkSHi+xkQmmHbeA5KmHcF52DzdalH38SMr0KI614lZ+2TEUryEh0NR7
-         7PCKhP1iC0Ot2IXWvWKAu+QL0D+O2usPVZGLrgODxc+jhA/p/isXsu1o8AXNo5uexGIb
-         KdBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775096761; x=1775701561;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YoETeGfnx+ul1+cJim1t3718pgueffgoi0/3qr5B0f0=;
-        b=cKtDfGAmD8yUWgzfYJfRySvbGp2vCRXmje1B++EMGgJJIJ1cIF3c5p82R3mXLtKtkU
-         cl5X6ONj4/NPobismhVKIbR+P60oJOQMYmNKlC/P88llElER924RkaqLLWDic8PPTmKm
-         VzzydV8c+t+D6yzk67LWpSXjg95F7p3BqiM2ADkEahSnri7ZsquSGCLtXYzBH7a8eeG/
-         goXspWJW1rlC4jCg46GIDbuxWmAHdZSkXkNCtc+Pue4phve69rfcXrBscd+VF+wWPDH/
-         /EYqHbehzavDsgtLqxPnkoD1ELwJ+8gu0QdCKRclHgH5bQkCz9W5R3N7fc0cbu+zqI2G
-         CEgw==
-X-Forwarded-Encrypted: i=1; AJvYcCVykl39nmcfQ4GuInA7xIyC0NyaLmEXBcc05L/MMOMW1CU66bk9dsxBvHzPx1k6nJro3SsSjHRxyvh1S56c25M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsmnbvasIN031ujPjY3k0ACfAW7yBuHJjy8l6T3TpD3TWi0xB4
-	yGf4wyIW5I6wthO0rmC+8qbhP5Ww67COkyoRf+HZ52ueZYICwv+bhdbUlRBamcZveGue8nAKh0v
-	7UBXL5XWBmx/vwfMC/T6yXpImnfDb7rInIKAllkPHB3pMOdNdd6uq4f3faseWgKCwv3TeP+I=
-X-Gm-Gg: ATEYQzxawo/jfgfH9higydVv9tCvp5fqMpHzOYJIjcJwPMxFaM8fGtjtDR5zYAMvzIR
-	mehjNjDnPMLPcJQ9Sbatj38hSgFGXDXgH9UWa8KhFul73Q7jkD0RQF7Oz03MQUYzPWJTc3LACfa
-	HYmFxKmUZ3xLVvtrNcDjfnQvQw6VYd+f68cYtPiQ8r6W5TCkKPEvFJzKwcdfLSaF2Njla/jTSr7
-	fzBX3gQNrRzvDSuM8s2r1ClGuDq40Gjz+m06uFsQ7+apkjGHeeg6L2WSBKa2fTv87JnB5HFnsd7
-	mZM7NdDcWMO3NC9vB+6qjkd4HXxk0MNcfEhsRFNABU2neCeMLEfIXeB5GSGIHIgW1wnARXdH/E+
-	6DLSaUJkNWCCAf8fBRD7asSBIS2s4IZ2mERsdh0wVLrh+XMau
-X-Received: by 2002:a17:903:458d:b0:2b0:5923:5194 with SMTP id d9443c01a7336-2b269d000a0mr51326595ad.27.1775096760981;
-        Wed, 01 Apr 2026 19:26:00 -0700 (PDT)
-X-Received: by 2002:a17:903:458d:b0:2b0:5923:5194 with SMTP id d9443c01a7336-2b269d000a0mr51326315ad.27.1775096760454;
-        Wed, 01 Apr 2026 19:26:00 -0700 (PDT)
-Received: from [10.239.97.158] ([114.94.8.21])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2749cbd85sm10116345ad.74.2026.04.01.19.25.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Apr 2026 19:25:59 -0700 (PDT)
-Message-ID: <e6753ccc-ed47-4543-8447-b616b8a42be4@oss.qualcomm.com>
-Date: Thu, 2 Apr 2026 10:25:53 +0800
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Zg3P458r"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1775112411; x=1806648411;
+  h=date:from:to:cc:subject:message-id;
+  bh=gAVKWD6+LI3jINFccfSCDiEz5yLYnuoIxU1ZaPOSS8Y=;
+  b=Zg3P458r8jWgUwfR2fMw7ymYpIieW5QqApP5Knh6LQIUGt4PO1Q9bo8g
+   4NSZG5XKEGt61pr72dsed9WYKcpyaUtjouyXt9NQ7r5wuoBoEiX/pgE1S
+   a8m7r6pgB1ki3aAYlNabTuzMtQUJruCWOmVJsHvI7kQIRpCFZr8pidn7j
+   uvOZNY/JiXicGQa/3vYlPI7eHSE6V+jnvi3ccONNXvd/srTiJaiL+4TSE
+   Py+gdk83Wl8jgQJSvsDRPRUeyOtfZ2P5BcsgPxAlKggupS0ryVknvlLEt
+   uxy1h6ZXmRRGmZSv+fzc3XAAj//x1X7JFABQSarZJ0XvWj3CsHBJTL1SQ
+   g==;
+X-CSE-ConnectionGUID: lsN4w0lkTiCTBdKGsJXQRA==
+X-CSE-MsgGUID: RgbNnvsgRxO2YD08GAXZJg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11746"; a="76130496"
+X-IronPort-AV: E=Sophos;i="6.23,155,1770624000"; 
+   d="scan'208";a="76130496"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2026 23:46:51 -0700
+X-CSE-ConnectionGUID: g91NbO3lTlC/EHU4ho2WmQ==
+X-CSE-MsgGUID: aHiIUmYHTbSTv4bd15Sgnw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,155,1770624000"; 
+   d="scan'208";a="231298413"
+Received: from lkp-server02.sh.intel.com (HELO cedfeeed6c12) ([10.239.97.151])
+  by orviesa004.jf.intel.com with ESMTP; 01 Apr 2026 23:46:50 -0700
+Received: from kbuild by cedfeeed6c12 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w8BpG-000000000BK-2nm5;
+	Thu, 02 Apr 2026 06:46:46 +0000
+Date: Thu, 02 Apr 2026 10:01:03 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS WITH WARNING
+ b65fdb465d5475e9ec1b70aa38b3fd79e237a089
+Message-ID: <202604021055.CPVbrLG4-lkp@intel.com>
+User-Agent: s-nail v14.9.25
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: btusb: Allow firmware re-download when
- version matches
-From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
-        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
-        jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com
-References: <20260108074353.1027877-1-shuai.zhang@oss.qualcomm.com>
- <zcn4iagkp4wtcg24obdhlv6pj6xyakcbezuzz6so3nvwneuybo@5bg3qjsuajqd>
- <4f0c351a-4268-4cbd-92dc-a5cc9845fb85@oss.qualcomm.com>
-Content-Language: en-US
-In-Reply-To: <4f0c351a-4268-4cbd-92dc-a5cc9845fb85@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDAyMDAyMSBTYWx0ZWRfX8h7fJSfvzau4
- v6Ow0Mzwtw7UyfoRam/aERJYW6SuFZ8BsJj1YywX/cWhwlVDy7DjUFFVzLq0D3YHtZ6wZDvHha8
- DpkaN4KVciXqbyyj1Sc0gNpm9QlRAevLEeK9cuNdtS+eV2ZamzSq/gL+LJ0geoGH73vZRZp4wnc
- J2E5wv2vWpvetFlJq3P6XjqzHl19WuRzNC/7eY18TEqzteaMIrWGLHhwURdzkRnyoyTasDJ3I2t
- 3FXhfMqYKzMzHYwShfQn6n8CB88Fr6P1kNTAvZK5nHBwdv58ZA2jLRJ9Rxmkmj42+3Vc8kGm0x+
- Lq3b7jTuPKHt4cV99jRs2bVOI/BMZlQFapSQcsjcgGoNeHXtIdktD1vqJ8aUUBm56kzcAHlY2tW
- ToQVML7k5ierb1hXM+jAN8SFhT7IzLT8twLlxtAPpk4x2XBFGDtIwcP0c0U2IsX7aT2QkF9IFUX
- Y9sWuntH+Gdl4ig5VyQ==
-X-Proofpoint-GUID: uL11np437RqJAUJ1Ws-hqKIO2tdgSgU5
-X-Proofpoint-ORIG-GUID: uL11np437RqJAUJ1Ws-hqKIO2tdgSgU5
-X-Authority-Analysis: v=2.4 cv=e9ULiKp/ c=1 sm=1 tr=0 ts=69cdd3ba cx=c_pps
- a=IZJwPbhc+fLeJZngyXXI0A==:117 a=Uz3yg00KUFJ2y2WijEJ4bw==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22
- a=EUspDBNiAAAA:8 a=F5nhctsNCyJB_H0xsZgA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=uG9DUKGECoFWVXl0Dc02:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-01_05,2026-04-01_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 priorityscore=1501 phishscore=0 bulkscore=0 malwarescore=0
- clxscore=1015 suspectscore=0 adultscore=0 spamscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2604020021
 
-Hi  Dmitry
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: b65fdb465d5475e9ec1b70aa38b3fd79e237a089  Bluetooth: btusb: Add MT7927 ID for ASUS X870E / ProArt X870E-Creator
 
-just checking if there are any updates on this patch.
-Please let me know if any further information is needed.
+Warning (recently discovered and may have been fixed):
 
-On 3/18/2026 10:32 AM, Shuai Zhang wrote:
-> Hi Dmitry
->
-> Thanks for the review.
->
-> On 3/14/2026 12:06 AM, Dmitry Baryshkov wrote:
->> On Thu, Jan 08, 2026 at 03:43:53PM +0800, Shuai Zhang wrote:
->>> Since USB can disconnect at any time, if it disconnects during
->>> the BT firmware download, the BT controller firmware version may still
->>> be updated even without completing the download.
->> Does it not have any check for not completing firmware update if the
->> download was not successful / complete?
->
-> Because of RAM limitations, the controller updates the firmware 
-> version during
->
-> the download process,even if the download does not complete.
->
-> Since btusb cannot power-cycle the controller, the only recovery after
->
-> an interrupted download is to retry the firmware download.
->
->>
->>> When USB reconnects, the BT host detects the same version as in the
->>> firmware file, which prevents the firmware from being downloaded again.
->>>
->>> Therefore, remove the equality check to ensure that after
->>> USB reconnection, the BT host can still download the firmware.
->>>
->>> Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
->>> ---
->>>   drivers/bluetooth/btusb.c | 5 ++++-
->>>   1 file changed, 4 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->>> index 646de80c7..991064a25 100644
->>> --- a/drivers/bluetooth/btusb.c
->>> +++ b/drivers/bluetooth/btusb.c
->>> @@ -3503,7 +3503,10 @@ static int 
->>> btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
->>>               "firmware rome 0x%x build 0x%x",
->>>               rver_rom, rver_patch, ver_rom, ver_patch);
->>>   -    if (rver_rom != ver_rom || rver_patch <= ver_patch) {
->>> +    /* Allow rampatch if version is greater than or equal to 
->>> firmware version.
->>> +     * Equal versions are acceptable for re-flashing or recovery 
->>> scenarios.
->>> +     */
->>> +    if (rver_rom != ver_rom || rver_patch < ver_patch) {
->>>           bt_dev_err(hdev, "rampatch file version did not match with 
->>> firmware");
->>>           err = -EINVAL;
->>>           goto done;
->>> -- 
->>> 2.34.1
->>>
-> Thanks,
-> Shuai
->
->
->
+    https://lore.kernel.org/oe-kbuild-all/202604012104.Gah2a7JG-lkp@intel.com
+    https://lore.kernel.org/oe-kbuild-all/202604012134.9zH5FiWa-lkp@intel.com
+
+    drivers/bluetooth/btmtk.c:35:3: warning: 'btmtk_mt6639_devs' defined but not used [-Wunused-const-variable=]
+    drivers/bluetooth/btmtk.c:35:3: warning: unused variable 'btmtk_mt6639_devs' [-Wunused-const-variable]
+
+Warning ids grouped by kconfigs:
+
+recent_errors
+|-- arm64-randconfig-001-20260401
+|   `-- drivers-bluetooth-btmtk.c:warning:unused-variable-btmtk_mt6639_devs
+|-- i386-randconfig-015-20260401
+|   `-- drivers-bluetooth-btmtk.c:warning:unused-variable-btmtk_mt6639_devs
+|-- i386-randconfig-017-20260401
+|   `-- drivers-bluetooth-btmtk.c:warning:btmtk_mt6639_devs-defined-but-not-used
+|-- powerpc64-randconfig-002-20260401
+|   `-- drivers-bluetooth-btmtk.c:warning:btmtk_mt6639_devs-defined-but-not-used
+|-- sparc64-randconfig-001-20260401
+|   `-- drivers-bluetooth-btmtk.c:warning:unused-variable-btmtk_mt6639_devs
+|-- x86_64-randconfig-005-20260401
+|   `-- drivers-bluetooth-btmtk.c:warning:unused-variable-btmtk_mt6639_devs
+|-- x86_64-randconfig-012-20260401
+|   `-- drivers-bluetooth-btmtk.c:warning:btmtk_mt6639_devs-defined-but-not-used
+|-- x86_64-randconfig-016-20260401
+|   `-- drivers-bluetooth-btmtk.c:warning:btmtk_mt6639_devs-defined-but-not-used
+`-- x86_64-randconfig-161-20260401
+    `-- drivers-bluetooth-btmtk.c:warning:btmtk_mt6639_devs-defined-but-not-used
+
+elapsed time: 1531m
+
+configs tested: 149
+configs skipped: 7
+
+tested configs:
+alpha                             allnoconfig    gcc-15.2.0
+alpha                            allyesconfig    gcc-15.2.0
+alpha                               defconfig    gcc-15.2.0
+arc                              allmodconfig    gcc-15.2.0
+arc                               allnoconfig    gcc-15.2.0
+arc                              allyesconfig    gcc-15.2.0
+arc                                 defconfig    gcc-15.2.0
+arc                   randconfig-001-20260401    gcc-8.5.0
+arc                   randconfig-002-20260401    gcc-11.5.0
+arm                               allnoconfig    clang-23
+arm                              allyesconfig    gcc-15.2.0
+arm                                 defconfig    clang-23
+arm                   randconfig-001-20260401    clang-23
+arm                   randconfig-002-20260401    clang-23
+arm                   randconfig-003-20260401    clang-23
+arm                   randconfig-004-20260401    gcc-12.5.0
+arm64                            allmodconfig    clang-19
+arm64                             allnoconfig    gcc-15.2.0
+arm64                               defconfig    gcc-15.2.0
+arm64                 randconfig-001-20260401    clang-18
+arm64                 randconfig-002-20260401    gcc-8.5.0
+arm64                 randconfig-003-20260401    gcc-8.5.0
+arm64                 randconfig-004-20260401    gcc-11.5.0
+csky                             allmodconfig    gcc-15.2.0
+csky                              allnoconfig    gcc-15.2.0
+csky                                defconfig    gcc-15.2.0
+csky                  randconfig-001-20260401    gcc-13.4.0
+csky                  randconfig-002-20260401    gcc-15.2.0
+hexagon                          allmodconfig    clang-17
+hexagon                           allnoconfig    clang-23
+hexagon                             defconfig    clang-23
+hexagon               randconfig-001-20260401    clang-23
+hexagon               randconfig-002-20260401    clang-17
+i386                             allmodconfig    gcc-14
+i386                              allnoconfig    gcc-14
+i386                             allyesconfig    gcc-14
+i386        buildonly-randconfig-001-20260401    gcc-14
+i386        buildonly-randconfig-002-20260401    clang-20
+i386        buildonly-randconfig-003-20260401    gcc-14
+i386        buildonly-randconfig-004-20260401    gcc-14
+i386        buildonly-randconfig-005-20260401    gcc-14
+i386        buildonly-randconfig-006-20260401    clang-20
+i386                                defconfig    clang-20
+i386                  randconfig-001-20260401    gcc-14
+i386                  randconfig-003-20260401    clang-20
+i386                  randconfig-004-20260401    gcc-12
+i386                  randconfig-005-20260401    gcc-14
+i386                  randconfig-006-20260401    gcc-14
+i386                  randconfig-007-20260401    gcc-14
+i386                  randconfig-011-20260401    clang-20
+i386                  randconfig-012-20260401    clang-20
+i386                  randconfig-013-20260401    clang-20
+i386                  randconfig-014-20260401    clang-20
+i386                  randconfig-015-20260401    clang-20
+i386                  randconfig-016-20260401    gcc-14
+i386                  randconfig-017-20260401    gcc-14
+loongarch                        allmodconfig    clang-19
+loongarch                         allnoconfig    clang-23
+loongarch                           defconfig    clang-19
+loongarch             randconfig-001-20260401    gcc-15.2.0
+loongarch             randconfig-002-20260401    clang-23
+m68k                             allmodconfig    gcc-15.2.0
+m68k                              allnoconfig    gcc-15.2.0
+m68k                             allyesconfig    gcc-15.2.0
+m68k                                defconfig    gcc-15.2.0
+microblaze                       alldefconfig    gcc-15.2.0
+microblaze                        allnoconfig    gcc-15.2.0
+microblaze                       allyesconfig    gcc-15.2.0
+microblaze                          defconfig    gcc-15.2.0
+mips                             allmodconfig    gcc-15.2.0
+mips                              allnoconfig    gcc-15.2.0
+mips                             allyesconfig    gcc-15.2.0
+nios2                            allmodconfig    gcc-11.5.0
+nios2                             allnoconfig    gcc-11.5.0
+nios2                               defconfig    gcc-11.5.0
+nios2                 randconfig-001-20260401    gcc-8.5.0
+nios2                 randconfig-002-20260401    gcc-9.5.0
+openrisc                         allmodconfig    gcc-15.2.0
+openrisc                          allnoconfig    gcc-15.2.0
+openrisc                            defconfig    gcc-15.2.0
+parisc                           allmodconfig    gcc-15.2.0
+parisc                            allnoconfig    gcc-15.2.0
+parisc                randconfig-001-20260401    gcc-8.5.0
+parisc                randconfig-002-20260401    gcc-8.5.0
+parisc64                            defconfig    gcc-15.2.0
+powerpc                          allmodconfig    gcc-15.2.0
+powerpc                           allnoconfig    gcc-15.2.0
+powerpc               randconfig-001-20260401    gcc-8.5.0
+powerpc64             randconfig-001-20260401    gcc-14.3.0
+powerpc64             randconfig-002-20260401    gcc-8.5.0
+riscv                            allmodconfig    clang-23
+riscv                             allnoconfig    gcc-15.2.0
+riscv                            allyesconfig    clang-16
+riscv                 randconfig-001-20260401    gcc-8.5.0
+riscv                 randconfig-002-20260401    gcc-11.5.0
+s390                              allnoconfig    clang-23
+s390                             allyesconfig    gcc-15.2.0
+s390                  randconfig-001-20260401    gcc-9.5.0
+s390                  randconfig-002-20260401    gcc-8.5.0
+sh                               allmodconfig    gcc-15.2.0
+sh                                allnoconfig    gcc-15.2.0
+sh                                  defconfig    gcc-15.2.0
+sh                    randconfig-001-20260401    gcc-10.5.0
+sh                    randconfig-002-20260401    gcc-15.2.0
+sparc                             allnoconfig    gcc-15.2.0
+sparc                 randconfig-001-20260401    gcc-8.5.0
+sparc                 randconfig-002-20260401    gcc-8.5.0
+sparc64                          allmodconfig    clang-23
+sparc64                             defconfig    clang-20
+sparc64               randconfig-001-20260401    clang-23
+sparc64               randconfig-002-20260401    clang-23
+um                                allnoconfig    clang-23
+um                               allyesconfig    gcc-14
+um                                  defconfig    clang-23
+um                             i386_defconfig    gcc-14
+um                    randconfig-001-20260401    clang-16
+um                    randconfig-002-20260401    gcc-14
+um                           x86_64_defconfig    clang-23
+x86_64                           allmodconfig    clang-20
+x86_64                            allnoconfig    clang-20
+x86_64                           allyesconfig    clang-20
+x86_64      buildonly-randconfig-001-20260401    gcc-14
+x86_64      buildonly-randconfig-002-20260401    gcc-14
+x86_64      buildonly-randconfig-003-20260401    gcc-12
+x86_64      buildonly-randconfig-004-20260401    gcc-12
+x86_64      buildonly-randconfig-005-20260401    clang-20
+x86_64      buildonly-randconfig-006-20260401    gcc-14
+x86_64                              defconfig    gcc-14
+x86_64                randconfig-001-20260401    gcc-14
+x86_64                randconfig-002-20260401    clang-20
+x86_64                randconfig-003-20260401    gcc-14
+x86_64                randconfig-004-20260401    gcc-14
+x86_64                randconfig-005-20260401    clang-20
+x86_64                randconfig-006-20260401    clang-20
+x86_64                randconfig-011-20260401    gcc-14
+x86_64                randconfig-012-20260401    gcc-14
+x86_64                randconfig-013-20260401    gcc-14
+x86_64                randconfig-014-20260401    clang-20
+x86_64                randconfig-015-20260401    clang-20
+x86_64                randconfig-016-20260401    gcc-14
+x86_64                randconfig-071-20260401    gcc-14
+x86_64                randconfig-072-20260401    clang-20
+x86_64                randconfig-073-20260401    gcc-14
+x86_64                randconfig-074-20260401    gcc-14
+x86_64                randconfig-075-20260401    clang-20
+x86_64                randconfig-076-20260401    gcc-14
+x86_64                          rhel-9.4-rust    clang-20
+xtensa                            allnoconfig    gcc-15.2.0
+xtensa                randconfig-001-20260401    gcc-9.5.0
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
