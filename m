@@ -1,139 +1,126 @@
-Received: from out-32.smtp.github.com (out-32.smtp.github.com [192.30.252.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA40175A8D
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2026 18:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BBE9371CF5
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2026 18:47:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775153215; cv=none; b=kqJ5Fcg2HzEcej8LSiNjeo6WbhovmdU2yHklQik6rHD7ykY8PsEW0lnGx3QoYpr0NTeSI08uv3eBJSwJ7Y0uiJ5j0ChKYXAvA/m+JHIVES0eD0di9Gz3EgpslvapH1d5hsI14UgN34ZOBUXsf531MvS1RNZngTcvWaJJ43SHKog=
+	t=1775155652; cv=none; b=uWfCvwZRdY+iJ0/LLMCpMeXtztu76jCNDdsuBBJT0pqDoeSmTHpVCndov+77LBTkjp6PEv4cNsgDXtTgb+SrMZX/1XDMn45HV7vAJmEcoOWpdwR8CuPxlb2L0Mae7dire0JqQy7UICskIMeQF3jbkABibWze+EFwm75jMLvsd/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775153215; c=relaxed/simple;
-	bh=qDIspGK2jBA74NYEomJufSN1FTeW70gLQ8L42JDm514=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ivfsk6gZ+GrA1r2WJmjhleWiZ0gEmrEg6D+zPSy5CNVU1eqV47xx+u7glcqm2uiMLkW7G3yW5JJw0cK7715oFhE2UFFghOvz4cOl+kdYJyGzqqTGcrvFcBbApnyh7kL33pljmSCrtQaYMSUDRGNJ5J7jucHXS3fqNPV3JaMuxxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=KZv+nm8s; arc=none smtp.client-ip=192.30.252.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1775155652; c=relaxed/simple;
+	bh=RwxN2MfipCgR418UuZSsP8mrLaJ4ASbiNxzJJ42mQLw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DPUatodszfaEwVcVOiaYFRtvaAB2Rcvif879VdxyUSRZf2danphgFUdaAlUbBioJTxPGLYVOAz/cEpj9Gj84utaDnUIRAqDectn0aSkcbttAzScw9Awo38kFKhr29UeVhPG7FJPKkkBJ/ctD/bdPDNNu03LF4vzLIAvAsAnYNiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lRyCmxc9; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="KZv+nm8s"
-Received: from github.com (hubbernetes-node-b0f768f.ac4-iad.github.net [10.52.154.36])
-	by smtp.github.com (Postfix) with ESMTPA id C7D1580096
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2026 11:06:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1775153213;
-	bh=sogY/lF62vb4G4K1JPyK8QjN+csJJagNOsDBbhTKfwM=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=KZv+nm8sTcdPk0xEizIYAQnCJ4nWys4EwjryMeVpkwbW5Tnr60L5xP5H6Hlufq5/q
-	 MP9eofutDZ4q9YKT22NkcKDeuVNvyp9v++eMQaxVOfeM1XD1Aed1K/MTiDD6/bs7sJ
-	 TDs6bPfSdFt1X2Zo6HnUatK78OyG3hJX0U8uDqFs=
-Date: Thu, 02 Apr 2026 11:06:53 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1076592/000000-c8d25d@github.com>
-Subject: [bluez/bluez] bb9298: doc/btmon: Add Channel Sounding protocol flow
- docu...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lRyCmxc9"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-48704db565eso12935835e9.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Apr 2026 11:47:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775155648; x=1775760448; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OODqbL4ANJzyaR6iRPGqbWeycFnxpu3cwsIO8Dd0p9M=;
+        b=lRyCmxc9wRlMWEtUP175D3F6l00Uh4XsnrdJuHJb79PK/lNoYn3QNz1bUo6L2tHStB
+         7J4/8ac93+oo1uVhlBtekQCt2pekNTIJRdWmb80qKlClduK1MyBGpDLlqPkppPNS+Keh
+         Rc2Vtf36rcg71x94irz/YsSo0NE9+CNBu1qhPjdDTIyPBVbfet5K05acyGUyHH4Td0Lz
+         HSyUqvexFnh/tww00KNp17IbSABegLdPyhw7MExCMRkUZd75NWNNmauAdptbqAjnxNlc
+         tTzUcjQIwZmDgN2TpP9rU4OOgq3QNECn0V1nK6qsoRNuMhN98ObrujrY0lGr4QYgNU0T
+         Ym7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775155648; x=1775760448;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OODqbL4ANJzyaR6iRPGqbWeycFnxpu3cwsIO8Dd0p9M=;
+        b=YW9WqH9MJbO/dWNFqejVYRom6HbagXgXiNOC0uyym87n15lJgXLBuTqSvqSlfnR+EV
+         4Ncv3+Ql0W6yXRaeH/sN8Q8vXlC0BT+ZiebwGeJ/v8dI5OUta9h4QG9yFo8Y2CdmHqMu
+         NaM/b28BRvKXgb21Donaq6jftgJmurxt6TK7IMUWqiXU+fEoQu0daxb5JIPE39Mbx7PB
+         /XY5xvO6fvjrNMCtpmF1dnR/qL49MmOkxVYvzt2Lqd/fe9lDdSQT3HnVDrK/KE8DB5rr
+         Lx6CAsySge2jFqSCsYi3HfWfJyZmkVAk3XQoIRktT8xBLgvtfycVlPPKCMgkyDZN+ySv
+         I7/A==
+X-Forwarded-Encrypted: i=1; AJvYcCXN3Lv3wqio5zvbCaqyk0huLdo+wOfGxFnC7BSaVtT1Wsse2C9mm/P+yuZRKP+B0uNrqL7b9Ka9qXRGTeDSfjo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWeu7Iavcy1l8saePq1juGcVH/z8P0dGs9DJgnHXOKHRPAZkL9
+	rtgvPGMZN7ifAZO/wVGbxkmI0IjjSc7r6oJb+vWnN4h53Ek8vaE666XH
+X-Gm-Gg: ATEYQzzz4BfSONERY3SnGjTIF90ZZDV+8MfpmcaAb2/j5nfpR02+YVIOph28Pp6qbWY
+	t/wvnLtufeltNSlnIkbnAy27GkEvpj9naJNCgdEOzm5oGG1gWJrFNMM0dRNltDcF4xZ4UrVD7id
+	6Y9ShIc1EKDqlRtgGzektfkz0HnYCY8m3keZvC8l+27gyU3Hhdo8UYsBDRIKECV5YN+votOMx1t
+	UkV5WSInV7eycbaoOc4Piiyh2sj9xp+qxuSqHVg7dpywxz9xwZen+28fBjvr56HOc1lS/E8pJvL
+	x5Q+01yKydYC8lFgCDO1uNH//PB99SjqaUl5xovSTi7c5H9bAjNy1sV4KBg0hEfstcmXagdCuil
+	TBvwdO6lbnheTXUqLP6hRz2A6niri2Y5FsNyIVhUu0BuufPN2SDkbjoYsNOcJvGDX8VO/1yXCRW
+	T9igj7eHdLW+/UOWT1Spk+ijizbSgLLwt22vritOU6DzUEzBd24q3Bs7jYUTkiVTAHWbbbL3+o1
+	G9+VyJEQQFK3FJOEtxawcqO6DzLFDhxJ3haqQ==
+X-Received: by 2002:a05:600c:8b03:b0:488:81b1:ae36 with SMTP id 5b1f17b1804b1-488997d3188mr1542835e9.23.1775155647914;
+        Thu, 02 Apr 2026 11:47:27 -0700 (PDT)
+Received: from Lord-Beerus.station (net-93-144-20-233.cust.vodafonedsl.it. [93.144.20.233])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488983db4fbsm2153705e9.13.2026.04.02.11.47.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Apr 2026 11:47:27 -0700 (PDT)
+From: Stefano Radaelli <stefano.radaelli21@gmail.com>
+X-Google-Original-From: Stefano Radaelli <stefano.r@variscite.com>
+To: linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Cc: pierluigi.p@variscite.com,
+	Stefano Radaelli <stefano.r@variscite.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH v2 0/1] Bluetooth: hci_ll: Enable BROKEN_ENHANCED_SETUP_SYNC_CONN for WL183x
+Date: Thu,  2 Apr 2026 20:47:02 +0200
+Message-ID: <cover.1771930508.git.stefano.r@variscite.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Message-ID: <20260402184702.5KeHjNNNy1I-vibLgyIMdMMdU6tMcc-O_Ij2_h9PEhs@z>
 
-  Branch: refs/heads/1076592
-  Home:   https://github.com/bluez/bluez
-  Commit: bb92984ff247b06450fc6e91b1f63d9134ae39a4
-      https://github.com/bluez/bluez/commit/bb92984ff247b06450fc6e91b1f63=
-d9134ae39a4
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-04-02 (Thu, 02 Apr 2026)
+While validating SCO audio on a platform using TI WL183x Bluetooth
+modules with the hci_ll driver, we observed failures when the
+HCI Enhanced Setup Synchronous Connection command was used.
 
-  Changed paths:
-    A doc/btmon-cs.rst
+Although the controller advertises support for the command, SCO setup
+fails in certain configurations (e.g. BT_VOICE_TRANSPARENT/mSBC).
+This matches the scenario described in commit 05abad857277
+("Bluetooth: HCI: Add HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk").
 
-  Log Message:
-  -----------
-  doc/btmon: Add Channel Sounding protocol flow documentation
+Initially, we considered setting the
+HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk unconditionally in
+hci_ll. However, this would affect all TI controllers handled by the
+driver, including configurations where the enhanced setup command
+works correctly.
 
-Add btmon-cs.rst documenting the complete CS protocol flow as seen
-in btmon traces.  Covers capability exchange, security enable,
-configuration, procedure parameters, enable/disable, subevent
-results with all four step modes (Mode 0-3), result status fields,
-FAE table exchange, channel classification, CS test mode, the
-typical setup sequence, and common issues.
+To avoid hardcoding the quirk globally, we first proposed a DT-based
+solution. Based on review feedback, the quirk is now enabled
+automatically for the affected devices by deducing it from the
+compatible string instead.
 
-This provides LLM context so automated trace analysis can correctly
-interpret CS distance measurement sessions.
+The issue has been observed on WL1831, WL1835 and WL1837 modules,
+therefore the quirk is enabled for:
+- "ti,wl1831-st"
+- "ti,wl1835-st"
+- "ti,wl1837-st"
 
+This keeps the change limited to the affected WL183x family and avoids
+impacting other TI controllers handled by hci_ll.
 
-  Commit: ac0383f3cd2d19860a8d4884a5a152de30bf2231
-      https://github.com/bluez/bluez/commit/ac0383f3cd2d19860a8d4884a5a15=
-2de30bf2231
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-04-02 (Thu, 02 Apr 2026)
+v1->v2:
+ - Remove DT property, used compatible instead
 
-  Changed paths:
-    M doc/btmon-cs.rst
+v1:
+Link: https://patchwork.kernel.org/project/bluetooth/patch/db4c7eab9d0c2f71eb61baff240957596f099401.1771847350.git.stefano.r@variscite.com/
 
-  Log Message:
-  -----------
-  doc/btmon: Add RAS/RAP protocol flow to Channel Sounding documentation
+Stefano Radaelli (1):
+  Bluetooth: hci_ll: Enable BROKEN_ENHANCED_SETUP_SYNC_CONN for WL183x
 
-Add the Ranging Service (RAS) and Ranging Profile (RAP) GATT-level
-protocol flow to btmon-cs.rst.  Covers all six RAS characteristics
-(Features, Real-time Ranging Data, On-demand Ranging Data, Control
-Point, Data Ready, Data Overwritten), the five Control Point opcodes
-(Get Ranging Data, ACK, Retrieve Lost Segments, Abort, Set Filter),
-the segmented ranging data format with Ranging Header and Subevent
-Header decoding, the typical on-demand and real-time data flows,
-and common issues.
+ drivers/bluetooth/hci_ll.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 
-  Commit: c8d25d070335e78579c0f95982b14e6829cea039
-      https://github.com/bluez/bluez/commit/c8d25d070335e78579c0f95982b14=
-e6829cea039
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-04-02 (Thu, 02 Apr 2026)
+base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
+-- 
+2.47.3
 
-  Changed paths:
-    M doc/btmon-cs.rst
-
-  Log Message:
-  -----------
-  doc/btmon: Add CS and RAS state machines and combined flow charts
-
-Add three state machine diagrams and four flow charts to btmon-cs.rst:
-
-- CS State Machine: IDLE =E2=86=92 CAPABILITIES EXCHANGED =E2=86=92 CONFI=
-GURED =E2=86=92
-  PARAMETERS SET =E2=86=92 PROCEDURE RUNNING =E2=86=92 CONFIGURED =E2=86=92=
- IDLE
-
-- RAS Data Transfer State Machine: IDLE =E2=86=92 DATA READY =E2=86=92
-  TRANSFERRING =E2=86=92 COMPLETE =E2=86=92 IDLE (with ABORTED and recove=
-ry paths)
-
-- Typical CS Setup Sequence: HCI command/event timeline with
-  state annotations showing the full capability exchange through
-  procedure enable/disable cycle
-
-- Combined HCI + GATT Flow: interleaved three-column chart
-  showing HCI CS operations alongside GATT RAS service discovery,
-  CCC setup, data ready notification, on-demand retrieval with
-  segmented transfers, and ACK
-
-- Real-time Streaming Flow: shows how HCI Subevent Results
-  trigger immediate GATT notifications on Real-time Ranging Data
-
-- Lost Segment Recovery Flow: demonstrates the Retrieve Lost
-  Segments mechanism with gap detection and retransmission
-
-
-Compare: https://github.com/bluez/bluez/compare/bb92984ff247%5E...c8d25d0=
-70335
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
