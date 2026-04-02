@@ -1,1594 +1,501 @@
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBA536308D
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2026 15:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3893F0744
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2026 16:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775145535; cv=pass; b=JAD6oz+/Pm4Mgm5BtN90iGTZ0eD/rlD+MJenNQHNicahnkwXYaDOVS911jjLkH652DN/Y9MNkLn7M6V7ogMmG9SG88nVcG1gvnrdZMwsXxcZCdePs3dt84eRo7glky2n6/DwF6tlG3/8OOeASbVBfjkJ6hysGCnCsVvtveOrPC4=
+	t=1775147028; cv=pass; b=YHL8vWGwZvMNyyK/0jdzUxiU4fMKCPdpa69ldwcFZsLQr/Mn+yTwJPhJugRdA6JEr3+jjKNnhSDsdGNDVdsAhZBsmdprHuqdtx4+EgD7jbEWIzVeoi9CoKmjZLUTEr2gBneBuDlECSAmtka0rwJJN3pJ5R3fXy9gEwEFhrQYbtY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775145535; c=relaxed/simple;
-	bh=Su4sLdvSJBT7ZeII9URKpP/rZipdxhVGhrTuAbSk0Zw=;
+	s=arc-20240116; t=1775147028; c=relaxed/simple;
+	bh=wmiyqCTpMem9gKzrbUnIMkXkr0/7KPQ7UtbKdQrleRU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u6kZD8IUX64erIWLdRDUKxeprgHqnEdYNI0OdLbW7nA2KxdZ46xgEMFE143XhOfiD3TXWRqIXku6K3FOHZeuV9EllmLXS2MvMbpFBJjZjzaxpUCfKsqYF9BGPRYOg7qzRfQg/hAkSzT6xFT9I0hGok1jO0bMoInG6F+YDd0LnBg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sUQi9mHV; arc=pass smtp.client-ip=74.125.224.48
+	 To:Cc:Content-Type; b=rjFK7VigkWUR++9CA7qkIPfoy+jfoQtLW9znaNHC1MN9r/0RC9CRAeRVaukYk5H20oN1joNYP5nRJFh9WZhT+NKztK08zwK+uBQTBUAQPnwC8o0gMxfjb2HnnVtFQaXzdAkZwMwGCjOUNv8SQRzxTzdLoNLlcsMtWuvBarFcaLM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OhQTOkXu; arc=pass smtp.client-ip=74.125.224.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sUQi9mHV"
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-650182d19e0so1240547d50.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Apr 2026 08:58:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775145529; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OhQTOkXu"
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-6500040f128so1025341d50.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Apr 2026 09:23:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775147023; cv=none;
         d=google.com; s=arc-20240605;
-        b=cXXCYp2e4UsNyxzWSNbQxDT4qjeuaWCekEmPGqtBovg2spB7Dyj12t6OLdSDsvc791
-         aDASpWlQk2Ki9WqFtaphRcY7wpEdTIC4fjQLzkzkn72tphTx6kOd+pkv2KvMnIUGc3OG
-         kM4tH8igNGHTAaTBJqp8V0z0qhhErR465gxCPwENWYnEWYk2oXA4knMPZEPY/VM44KIy
-         yLqcy46WW1v1LKFYBL5NVHrCzFIjqaZ/Lr3YKJZzbFg5rQ50d0889urSpG1kjBebOdMq
-         bJ0F9wS3POPlS6Qlezxcheb3CeY+u3Srg+bXz3fI2f9DggQAESAvRG7phMSe9kqhQ2dq
-         l7CA==
+        b=TtuaJhXQLpVBxEcTIdpslrskcTeHXLPPYvaqrjArp6wu7qlcSGT79vpkKgG7Om1FrM
+         VM/J1wLcDLwM18M7zqrySfgF7UdZjqqfHUB4Cz90xrkieChCHRXQ5YcTjUYbPn4Cie6m
+         yJW1nb9qF7+09cTfteuRYiGa+9hqojL6zXnGZiLZ94UbIqpUOjCEQGYuSD1zUBTmYkh1
+         WrNRQMPHbybrc6kABwFzBCWatNY+CBd5Ksb3/o5Icujrab2j2GnifYOtAXrATxluIw2M
+         kI+GxMHkj1mwWU3K1hxkvKippqR1PeoDH7fowwDVaG5lNR3PxUc6oUf2iT/zqPuAQ69u
+         7WxQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=x+AfFfXg1A7OpaCJpFgBn6YU2anppL75qL+/tR3jr/4=;
-        fh=8vmOwSm9QheBlSAtzpU2h+vPN6vqZAy+khabkFtSFIk=;
-        b=X4JJti+OvK2Kx/l4QFiXmewSU/LoHsi0W6eNWMSvkcu3a6wCiaRsaPhKYucyxh5POm
-         HFwQcmGSubgzJFyAhNdn9lvRgrlFDSb31+26JpnnqXl9WspWk0LuRdDMV3WX3mpF9KAV
-         A4UFQpv+wCSioM9N3PYcEJqqAHJpg6yLjKUjlrkyLk16fRAEEU88HQ1iQPMuzjHeKAHA
-         W/26D8mKZy1M2+80bPEIz+6G8Gv5P98CTMcrD2chUMWssCXbqMpO4xZTew9sVfZK+hFj
-         t3sNBNSZkMxc9Iez1SSmHo7clbG2M1GWSmt9qSS0q9Y4/33l7aXfgPvh/6KpvUEayyxV
-         fVzg==;
+        bh=idte2KKGh9htUrOU0IQdwWaLrFGjJA+QHTTsFtgSLkU=;
+        fh=DBIRJP4DvnAE+M31BcQ50XI3CAn/idN52/MNTtsfw9E=;
+        b=CQhkrTqy3QjlGbYA0c21BuOPmCxw/du+g8WaQbz9IFwqdNq73U8O/O5BZ5kMdq79ql
+         PyW4mdUGMGdeT8fHNZMUP6RuMQcn11g2lOf4T/HcZUDpxPQOuMO5FgWI7dsv1nCiS7ug
+         j3NV5OXMTGCnQolvSbnDNOo1BNAJt/zwOA4rif5JjyLF7FmtUv5E6qHmA+HFEvwxfCWW
+         ZtLhtEJJSm6IY2bB1h1aKFFDc0aWejYJIiP9p1g/uctSm/WounVGiT5ngB4rl+zaVn68
+         RRFJnbgImAkPmEXwfcHCOuq7dSIPysMjGDJuKUoJJ6xuAXP7XSSqu/QXurU4Hr4bDswR
+         c3hg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775145529; x=1775750329; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775147023; x=1775751823; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=x+AfFfXg1A7OpaCJpFgBn6YU2anppL75qL+/tR3jr/4=;
-        b=sUQi9mHVc+IYeV8dmRYXtN4YyDs8aFINYJ3xM6X+GfuqGXb0UBrnL89AltsRvRhLi2
-         2UblZeAOGR/OIHn3lE/gyV4DU6vDHuwgeWsXX9iUvvvU9N9uqkzawR+oyhXvXBdxzct4
-         uKhzRQwpiU3L4epujetWbdbzPA7z+aW2j1K08aTWNOGxMalDRt6nQ9vi8cZcn/4agtCS
-         op4TYRAqSO4oVdxBn3MjepMQdKA28ZikJdVK+oH2nwqvwI9olscc6BnjS/mJ2P9XaxgK
-         fiiPi6VN+ejqRPGZCxeGMaFCdkg5+SqIE35RTXAM7XAMa/N8FCbuNrqcVDKOfCDKcb/9
-         7TuQ==
+        bh=idte2KKGh9htUrOU0IQdwWaLrFGjJA+QHTTsFtgSLkU=;
+        b=OhQTOkXuauIDVqOr1egQnwX2URhZ00yEhdwNeFt8kOKfeTnXcwanuM/SaMh/odExCw
+         Tfz2FJ07w4io60DZH9ZvoIu1xe4rHn173jtY8b/KPtU4yOIy8huzhpo/7OYD22zKjgE4
+         ogG2i1G/jEDVsNyRq0da0q85Sd3g2yV+/fG6+8A+og5PKZ+ZqAR2tWlM0YCuLGrX63Sp
+         bF7mWKc0qfTdpR9sUhre3SbB11gxJh8cHft6eVSQWtUpsOVnieGUrXrFgek3NvLyka0G
+         uSNOCpL5BW0tERMMRIlsbZ8QHDSsc96EbpU4WNd5ycvYi0IWiX/uhjXIl12J0iWVxpWa
+         iGCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775145529; x=1775750329;
+        d=1e100.net; s=20251104; t=1775147023; x=1775751823;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=x+AfFfXg1A7OpaCJpFgBn6YU2anppL75qL+/tR3jr/4=;
-        b=dKJWfW90LMsz5kPZVjCFTAXBQjgp4mOYTMFVzGiqCIH0MxNaaiosER+E8FothG6Hvw
-         7OFy5rfsweMjws1sl5jiXPa116qZ0cNyGrle2beqk5fc58JIwwE9bfEu2pwHwezGnE78
-         8Z/0+YU6mMoW9JfKn12EmVyXNrp2nG+CVhTZqE5pEix7km4kWCsJmD80hHTZKaxNoS9M
-         faafPQl1skra4nMXuuBVdNsBHg9WZSh3nffVvi+8hIab3bZSpZh+55FNEaqkgcEjHgjS
-         zJ3tUneZ+m4m+BPZMNhVOeNGx0fPhmfV8BYx4QZ/duWI6VrtbQgS22ooXcL6ID7D0rIc
-         vh3w==
-X-Gm-Message-State: AOJu0YxcKJWOmsO9/sgFURl3+od4ESEW4yFiqBNsJ9GBt6nkFFWrj7/g
-	5OqIaE+Zcn9KXaOwOMQ7xI3wGMP+648v+esTlUaJWJJazuV1z3fM+8YNaZZk6lyGwgzAeVIseYa
-	QI4QJDTlznH+BaiH0x0QNEd/81Kw0IQo=
-X-Gm-Gg: AeBDieuW4dyO1HuQvQzfq9IaXL6sZ5M8VNpVLVEGaWjHJ6efWaEoVTUIwfRpRP6QsuU
-	hGunb0ST1ZYrHi2nLthwPtCltGOOo3KP1Zj3vaCyFrl0p9tM5/95ZXpn1+H4pP+hADYDzb/eO7O
-	6RFnjs7gC/voupKtyQnKUU9sol3wcqRHFcbtKgkUYlfkZF161G5LP90IPdvotI58kgnb8terpZO
-	HiNoRjFJW2qIkJAMOJJ+S+ZkV1J6s8XmEwd95H3STLtqubty9kE6TuaNAwvHdeBOOhfmshYhi1D
-	hpSVoCP8YalPq0lX0GVqkLdcbwH+efkagdbGJZf2W9x4Iccq592EPtpoLLydoEdv/m5adg==
-X-Received: by 2002:a53:ac9d:0:b0:650:aec:4e93 with SMTP id
- 956f58d0204a3-6502fdc12camr8076216d50.20.1775145528801; Thu, 02 Apr 2026
- 08:58:48 -0700 (PDT)
+        bh=idte2KKGh9htUrOU0IQdwWaLrFGjJA+QHTTsFtgSLkU=;
+        b=MO0W+cbzAhnivMEsKZ/T6kKIeo+lpBmr9jjPVaVZB3P4v5ehqZ6d+EQOVUlvX0C5t2
+         VR0ulp81nHcXheWz36GEOSdVgAs1w4nfMmYJiZ7+umLzuizT4nnNlZA0m9pQA6cVHjBO
+         kevoLCp8GtVXH+QS6Ku3685yqKk++WcH5a4EDih+xVShgzgNXxWViibmlcjAD2wkfLwt
+         jbWStR7fNSv6xI0M8P7ta4LPgyCNpQKsSziZHpH85TPma3Ncoz6W9Nx6WE1YfXXVPYTy
+         VsoRI7lNkXt0jhSEfY2UbtvOZo267I+JdjSqll1FMfGsrNMgqTMxgXqzwVDC+nKTUoyK
+         6lGw==
+X-Gm-Message-State: AOJu0YxhYeowLNk8bCXBbpXTXx7CEtsRX/YB8/FKQV1fJxRhMcX1ArTS
+	uR3mItdxhfsTnwkB+CdLXl2q8+EIVLxS9Gna21L3lqRpsVnu2oIyF1pHAbmqJtQBTGgEfPAfrLo
+	dgPIu9gXjxQ6Gj66IlaW60O6kFExH3udwhUr4ofs=
+X-Gm-Gg: AeBDievP39i7+SDqA1If91e+IaBbZL/cPRwJCMaGRFIQ7q0S8iM88RreJ3KvmaZobAL
+	/uYKmlwjAqQX7TNpzSlvkdFuQXYQqohyVm6WUHkPGO8us6ZPzoNOTjUPWil8SrAH2SJ4wqsokk5
+	C2WlptmX/cuGPf6jaOa51Qb4RMoDccba8IUopiaOXXWy5Shmgzxo7dDZ5b9188wY6ncPXSEP1HC
+	vfkDwgLGFlACpIMOVxQo82lkAMsyqETb3r7XG9DTQiiWvsZBmYTIhnfFgMu97Da27ex3Kp/+3V0
+	02tmAmG7FoO2AAL+AH1el3GTPOzh4DdEZff8CT4k5W5AdCpBHSu/6YEZ0IVNosq1u82Yw4k3sZz
+	1hw==
+X-Received: by 2002:a53:df4c:0:b0:650:18fc:f53e with SMTP id
+ 956f58d0204a3-6502fe5a150mr6572514d50.53.1775147023308; Thu, 02 Apr 2026
+ 09:23:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260402103900.310778-1-naga.akella@oss.qualcomm.com> <20260402103900.310778-4-naga.akella@oss.qualcomm.com>
-In-Reply-To: <20260402103900.310778-4-naga.akella@oss.qualcomm.com>
+References: <20260402154520.48939-1-hadess@hadess.net> <20260402154520.48939-2-hadess@hadess.net>
+In-Reply-To: <20260402154520.48939-2-hadess@hadess.net>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 2 Apr 2026 11:58:37 -0400
-X-Gm-Features: AQROBzDNj_OGlP9jB0Ug8gLi-mTxcUhFTb1bAWelevSTYGJN_KrexRhd7zOyfaM
-Message-ID: <CABBYNZJ9TrrHFfeBTW4=MxSserovskivHXbPwqRSo5kKmet7YA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 3/3] profiles: ranging: Add HCI LE Event Handling
- in Reflector role
-To: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com, 
-	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com, 
-	prathibha.madugonde@oss.qualcomm.com
+Date: Thu, 2 Apr 2026 12:23:31 -0400
+X-Gm-Features: AQROBzDC7lEuBudhCtaxyPoVcHU1vxOSEhWqbDcxIouOkwV4JFCAY4mFrqHzED8
+Message-ID: <CABBYNZK1qvGRpGqGXaYDGr5mmekcuEAYmdeKB9WzgXN6Rci38A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/3] shared: Remove glib dependency from src/shared/ad.c
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Naga,
+Hi Bastien,
 
-On Thu, Apr 2, 2026 at 6:39=E2=80=AFAM Naga Bhavani Akella
-<naga.akella@oss.qualcomm.com> wrote:
+On Thu, Apr 2, 2026 at 11:48=E2=80=AFAM Bastien Nocera <hadess@hadess.net> =
+wrote:
 >
-> Open RAW HCI Channel for CS Event Handling
-> Parse the following HCI LE CS Events in reflector role
-> and route the events to RAP Profile.
->  1. HCI_EVT_LE_CS_READ_RMT_SUPP_CAP_COMPLETE
->  2. HCI_EVT_LE_CS_CONFIG_COMPLETE
->  3. HCI_EVT_LE_CS_SECURITY_ENABLE_COMPLETE
->  4. HCI_EVT_LE_CS_PROCEDURE_ENABLE_COMPLETE
->  5. HCI_EVT_LE_CS_SUBEVENT_RESULT
->  6. HCI_EVT_LE_CS_SUBEVENT_RESULT_CONTINUE
-> Send HCI_OP_LE_CS_SET_DEFAULT_SETTINGS to the controller
-> with default settings selected by the user.
+> src/shared/ad.c includes src/eir.h, which uses glib, which means that
+> the non-glib shared library can't be used without linking to glib.
+>
+> Use our own linked list implementation to remove the glib use.
 > ---
->  Makefile.plugins           |    3 +-
->  profiles/ranging/rap.c     |   27 +
->  profiles/ranging/rap_hci.c | 1296 ++++++++++++++++++++++++++++++++++++
->  3 files changed, 1325 insertions(+), 1 deletion(-)
->  create mode 100644 profiles/ranging/rap_hci.c
+>  plugins/neard.c |  4 ++--
+>  src/adapter.c   |  9 +++++----
+>  src/device.c    | 22 +++++++++++-----------
+>  src/device.h    | 10 ++++++----
+>  src/eir.c       | 24 ++++++++++++------------
+>  src/eir.h       | 11 +++++------
+>  unit/test-eir.c |  5 ++---
+>  7 files changed, 43 insertions(+), 42 deletions(-)
 >
-> diff --git a/Makefile.plugins b/Makefile.plugins
-> index c9efadb45..ac667beda 100644
-> --- a/Makefile.plugins
-> +++ b/Makefile.plugins
-> @@ -89,7 +89,8 @@ builtin_modules +=3D battery
->  builtin_sources +=3D profiles/battery/battery.c
+> diff --git a/plugins/neard.c b/plugins/neard.c
+> index c84934025cd8..b2860403d50d 100644
+> --- a/plugins/neard.c
+> +++ b/plugins/neard.c
+> @@ -58,7 +58,7 @@ struct oob_params {
+>         bdaddr_t address;
+>         uint32_t class;
+>         char *name;
+> -       GSList *services;
+> +       slist_t *services;
+
+No need to come up with another list implementation, just use struct queue.
+
+>         uint8_t *hash;
+>         uint8_t *randomizer;
+>         uint8_t *pin;
+> @@ -68,7 +68,7 @@ struct oob_params {
 >
->  builtin_modules +=3D rap
-> -builtin_sources +=3D profiles/ranging/rap.c
-> +builtin_sources +=3D profiles/ranging/rap.c \
-> +               profiles/ranging/rap_hci.c
+>  static void free_oob_params(struct oob_params *params)
+>  {
+> -       g_slist_free_full(params->services, free);
+> +       slist_clear(params->services, free);
+>         g_free(params->name);
+>         g_free(params->hash);
+>         g_free(params->randomizer);
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 04568dae6e98..8eb0caa34223 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -43,6 +43,7 @@
+>  #include "textfile.h"
 >
->  if SIXAXIS
->  builtin_modules +=3D sixaxis
-> diff --git a/profiles/ranging/rap.c b/profiles/ranging/rap.c
-> index f03454c72..1b144b471 100644
-> --- a/profiles/ranging/rap.c
-> +++ b/profiles/ranging/rap.c
-> @@ -34,12 +34,17 @@
->  #include "src/shared/rap.h"
->  #include "attrib/att.h"
->  #include "src/log.h"
-> +#include "src/btd.h"
+>  #include "src/shared/util.h"
+> +#include "src/shared/list.h"
+>  #include "src/shared/queue.h"
+>  #include "src/shared/att.h"
+>  #include "src/shared/gatt-db.h"
+> @@ -7171,10 +7172,10 @@ static void confirm_name(struct btd_adapter *adap=
+ter, const bdaddr_t *bdaddr,
 >
-> +#define USE_BT_HCI_RAW_CHANNEL 1
->  struct rap_data {
->         struct btd_device *device;
->         struct btd_service *service;
->         struct bt_rap *rap;
->         unsigned int ready_id;
-> +#if USE_BT_HCI_RAW_CHANNEL
-> +       struct bt_hci *hci;
-> +#endif
+>  static void adapter_msd_notify(struct btd_adapter *adapter,
+>                                                         struct btd_device=
+ *dev,
+> -                                                       GSList *msd_list)
+> +                                                       slist_t *msd_list=
+)
+>  {
+>         GSList *cb_l, *cb_next;
+> -       GSList *msd_l, *msd_next;
+> +       slist_t *msd_l, *msd_next;
+>
+>         for (cb_l =3D adapter->msd_callbacks; cb_l !=3D NULL; cb_l =3D cb=
+_next) {
+>                 btd_msd_cb_t cb =3D cb_l->data;
+> @@ -7184,7 +7185,7 @@ static void adapter_msd_notify(struct btd_adapter *=
+adapter,
+>                 for (msd_l =3D msd_list; msd_l !=3D NULL; msd_l =3D msd_n=
+ext) {
+>                         const struct eir_msd *msd =3D msd_l->data;
+>
+> -                       msd_next =3D g_slist_next(msd_l);
+> +                       msd_next =3D msd_l->next;
+>
+>                         cb(adapter, dev, msd->company, msd->data,
+>                                                                 msd->data=
+_len);
+> @@ -7223,7 +7224,7 @@ static bool is_filter_match(GSList *discovery_filte=
+r, struct eir_data *eir_data,
+>                                 /* m->data contains string representation=
+ of
+>                                  * uuid.
+>                                  */
+> -                               if (g_slist_find_custom(eir_data->service=
+s,
+> +                               if (slist_find(eir_data->services,
+>                                                         m->data,
+>                                                         g_strcmp) !=3D NU=
+LL)
+>                                         got_match =3D true;
+> diff --git a/src/device.c b/src/device.c
+> index 0e8ca28d3809..2a3b23ef3013 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -2432,9 +2432,9 @@ unref:
+>         dev->connect =3D NULL;
+>  }
+>
+> -void device_add_eir_uuids(struct btd_device *dev, GSList *uuids)
+> +void device_add_eir_uuids(struct btd_device *dev, slist_t *uuids)
+>  {
+> -       GSList *l;
+> +       slist_t *l;
+>         GSList *added =3D NULL;
+>
+>         if (dev->bredr_state.svc_resolved || dev->le_state.svc_resolved)
+> @@ -2465,13 +2465,13 @@ static void add_manufacturer_data(void *data, voi=
+d *user_data)
+>                                         DEVICE_INTERFACE, "ManufacturerDa=
+ta");
+>  }
+>
+> -void device_set_manufacturer_data(struct btd_device *dev, GSList *list,
+> +void device_set_manufacturer_data(struct btd_device *dev, slist_t *list,
+>                                                                 bool dupl=
+icate)
+>  {
+>         if (duplicate)
+>                 bt_ad_clear_manufacturer_data(dev->ad);
+>
+> -       g_slist_foreach(list, add_manufacturer_data, dev);
+> +       slist_foreach(list, add_manufacturer_data, dev);
+>  }
+>
+>  static void add_service_data(void *data, void *user_data)
+> @@ -2479,7 +2479,7 @@ static void add_service_data(void *data, void *user=
+_data)
+>         struct eir_sd *sd =3D data;
+>         struct btd_device *dev =3D user_data;
+>         bt_uuid_t uuid;
+> -       GSList *l;
+> +       slist_t *l;
+>
+>         if (bt_string_to_uuid(&uuid, sd->uuid) < 0)
+>                 return;
+> @@ -2487,21 +2487,21 @@ static void add_service_data(void *data, void *us=
+er_data)
+>         if (!bt_ad_add_service_data(dev->ad, &uuid, sd->data, sd->data_le=
+n))
+>                 return;
+>
+> -       l =3D g_slist_append(NULL, sd->uuid);
+> +       l =3D slist_append(NULL, sd->uuid);
+>         device_add_eir_uuids(dev, l);
+> -       g_slist_free(l);
+> +       slist_free(l);
+>
+>         g_dbus_emit_property_changed(dbus_conn, dev->path,
+>                                         DEVICE_INTERFACE, "ServiceData");
+>  }
+>
+> -void device_set_service_data(struct btd_device *dev, GSList *list,
+> +void device_set_service_data(struct btd_device *dev, slist_t *list,
+>                                                         bool duplicate)
+>  {
+>         if (duplicate)
+>                 bt_ad_clear_service_data(dev->ad);
+>
+> -       g_slist_foreach(list, add_service_data, dev);
+> +       slist_foreach(list, add_service_data, dev);
+>  }
+>
+>  static void add_data(void *data, void *user_data)
+> @@ -2518,13 +2518,13 @@ static void add_data(void *data, void *user_data)
+>                                                 "AdvertisingData");
+>  }
+>
+> -void device_set_data(struct btd_device *dev, GSList *list,
+> +void device_set_data(struct btd_device *dev, slist_t *list,
+>                                                         bool duplicate)
+>  {
+>         if (duplicate)
+>                 bt_ad_clear_data(dev->ad);
+>
+> -       g_slist_foreach(list, add_data, dev);
+> +       slist_foreach(list, add_data, dev);
+>  }
+>
+>  static struct btd_service *find_connectable_service(struct btd_device *d=
+ev,
+> diff --git a/src/device.h b/src/device.h
+> index c7b8b2a16eb9..5ee1f2300223 100644
+> --- a/src/device.h
+> +++ b/src/device.h
+> @@ -9,6 +9,8 @@
+>   *
+>   */
+>
+> +#include "src/shared/list.h"
+> +
+>  #define DEVICE_INTERFACE       "org.bluez.Device1"
+>
+>  struct btd_device;
+> @@ -78,12 +80,12 @@ void btd_device_gatt_set_service_changed(struct btd_d=
+evice *device,
+>                                                 uint16_t start, uint16_t =
+end);
+>  bool device_attach_att(struct btd_device *dev, GIOChannel *io);
+>  void btd_device_add_uuid(struct btd_device *device, const char *uuid);
+> -void device_add_eir_uuids(struct btd_device *dev, GSList *uuids);
+> -void device_set_manufacturer_data(struct btd_device *dev, GSList *list,
+> +void device_add_eir_uuids(struct btd_device *dev, slist_t *uuids);
+> +void device_set_manufacturer_data(struct btd_device *dev, slist_t *list,
+>                                                         bool duplicate);
+> -void device_set_service_data(struct btd_device *dev, GSList *list,
+> +void device_set_service_data(struct btd_device *dev, slist_t *list,
+>                                                         bool duplicate);
+> -void device_set_data(struct btd_device *dev, GSList *list,
+> +void device_set_data(struct btd_device *dev, slist_t *list,
+>                                                         bool duplicate);
+>  void device_probe_profile(gpointer a, gpointer b);
+>  void device_remove_profile(gpointer a, gpointer b);
+> diff --git a/src/eir.c b/src/eir.c
+> index 68ed74fe6493..8efca6978b39 100644
+> --- a/src/eir.c
+> +++ b/src/eir.c
+> @@ -49,7 +49,7 @@ static void data_free(void *data)
+>
+>  void eir_data_free(struct eir_data *eir)
+>  {
+> -       g_slist_free_full(eir->services, free);
+> +       slist_clear(eir->services, free);
+>         eir->services =3D NULL;
+>         g_free(eir->name);
+>         eir->name =3D NULL;
+> @@ -57,11 +57,11 @@ void eir_data_free(struct eir_data *eir)
+>         eir->hash =3D NULL;
+>         free(eir->randomizer);
+>         eir->randomizer =3D NULL;
+> -       g_slist_free_full(eir->msd_list, g_free);
+> +       slist_clear(eir->msd_list, g_free);
+>         eir->msd_list =3D NULL;
+> -       g_slist_free_full(eir->sd_list, sd_free);
+> +       slist_clear(eir->sd_list, sd_free);
+>         eir->sd_list =3D NULL;
+> -       g_slist_free_full(eir->data_list, data_free);
+> +       slist_clear(eir->data_list, data_free);
+>         eir->data_list =3D NULL;
+>  }
+>
+> @@ -80,7 +80,7 @@ static void eir_parse_uuid16(struct eir_data *eir, cons=
+t void *data,
+>                 uuid_str =3D bt_uuid2string(&service);
+>                 if (!uuid_str)
+>                         continue;
+> -               eir->services =3D g_slist_append(eir->services, uuid_str)=
+;
+> +               eir->services =3D slist_append(eir->services, uuid_str);
+>         }
+>  }
+>
+> @@ -99,7 +99,7 @@ static void eir_parse_uuid32(struct eir_data *eir, cons=
+t void *data,
+>                 uuid_str =3D bt_uuid2string(&service);
+>                 if (!uuid_str)
+>                         continue;
+> -               eir->services =3D g_slist_append(eir->services, uuid_str)=
+;
+> +               eir->services =3D slist_append(eir->services, uuid_str);
+>         }
+>  }
+>
+> @@ -119,7 +119,7 @@ static void eir_parse_uuid128(struct eir_data *eir, c=
+onst uint8_t *data,
+>                 uuid_str =3D bt_uuid2string(&service);
+>                 if (!uuid_str)
+>                         continue;
+> -               eir->services =3D g_slist_append(eir->services, uuid_str)=
+;
+> +               eir->services =3D slist_append(eir->services, uuid_str);
+>                 uuid_ptr +=3D 16;
+>         }
+>  }
+> @@ -151,7 +151,7 @@ static void eir_parse_msd(struct eir_data *eir, const=
+ uint8_t *data,
+>         msd->data_len =3D len - 2;
+>         memcpy(&msd->data, data + 2, msd->data_len);
+>
+> -       eir->msd_list =3D g_slist_append(eir->msd_list, msd);
+> +       eir->msd_list =3D slist_append(eir->msd_list, msd);
+>  }
+>
+>  static void eir_parse_sd(struct eir_data *eir, uuid_t *service,
+> @@ -169,7 +169,7 @@ static void eir_parse_sd(struct eir_data *eir, uuid_t=
+ *service,
+>         sd->data_len =3D len;
+>         memcpy(&sd->data, data, sd->data_len);
+>
+> -       eir->sd_list =3D g_slist_append(eir->sd_list, sd);
+> +       eir->sd_list =3D slist_append(eir->sd_list, sd);
+>  }
+>
+>  static void eir_parse_uuid16_data(struct eir_data *eir, const uint8_t *d=
+ata,
+> @@ -226,7 +226,7 @@ static void eir_parse_data(struct eir_data *eir, uint=
+8_t type,
+>         ad->data =3D g_malloc(len);
+>         memcpy(ad->data, data, len);
+>
+> -       eir->data_list =3D g_slist_append(eir->data_list, ad);
+> +       eir->data_list =3D slist_append(eir->data_list, ad);
+>
+>         if (type =3D=3D EIR_CSIP_RSI)
+>                 eir->rsi =3D true;
+> @@ -605,12 +605,12 @@ static int match_sd_uuid(const void *data, const vo=
+id *user_data)
+>
+>  struct eir_sd *eir_get_service_data(struct eir_data *eir, const char *uu=
+id)
+>  {
+> -       GSList *l;
+> +       slist_t *l;
+>
+>         if (!eir || !uuid)
+>                 return NULL;
+>
+> -       l =3D g_slist_find_custom(eir->sd_list, uuid, match_sd_uuid);
+> +       l =3D slist_find(eir->sd_list, uuid, match_sd_uuid);
+>         if (!l)
+>                 return NULL;
+>
+> diff --git a/src/eir.h b/src/eir.h
+> index b9f7c3874eb3..7adaef7fb0e4 100644
+> --- a/src/eir.h
+> +++ b/src/eir.h
+> @@ -9,10 +9,9 @@
+>   *
+>   */
+>
+> -#include <glib.h>
+> -
+>  #include "bluetooth/sdp.h"
+>  #include "bluetooth/uuid.h"
+> +#include "src/shared/list.h"
+>
+>  #define EIR_FLAGS                   0x01  /* flags */
+>  #define EIR_UUID16_SOME             0x02  /* 16-bit UUID, more available=
+ */
+> @@ -73,7 +72,7 @@ struct eir_ad {
 >  };
 >
->  static struct queue *sessions;
-> @@ -95,6 +100,12 @@ static void rap_data_free(struct rap_data *data)
->         }
+>  struct eir_data {
+> -       GSList *services;
+> +       slist_t *services;
+>         unsigned int flags;
+>         char *name;
+>         uint32_t class;
+> @@ -88,9 +87,9 @@ struct eir_data {
+>         uint16_t did_product;
+>         uint16_t did_version;
+>         uint16_t did_source;
+> -       GSList *msd_list;
+> -       GSList *sd_list;
+> -       GSList *data_list;
+> +       slist_t *msd_list;
+> +       slist_t *sd_list;
+> +       slist_t *data_list;
+>  };
 >
->         bt_rap_ready_unregister(data->rap, data->ready_id);
-> +#if USE_BT_HCI_RAW_CHANNEL
-> +       if (data->hci) {
-> +               bt_rap_hci_sm_cleanup();
-> +               bt_hci_unref(data->hci);
-> +       }
-> +#endif
->         bt_rap_unref(data->rap);
->         free(data);
->  }
-> @@ -194,6 +205,22 @@ static int rap_probe(struct btd_service *service)
->                 free(data);
->                 return -EINVAL;
->         }
-> +#if USE_BT_HCI_RAW_CHANNEL
-> +       int16_t hci_index =3D btd_adapter_get_index(adapter);
-> +
-> +       data->hci =3D bt_hci_new_raw_device(hci_index);
-> +       if (bt_rap_attach_hci(data->rap, data->hci)) {
-> +               DBG("HCI raw channel initialized, hci%d", hci_index);
-> +               bt_rap_hci_set_le_bcs_options(
-> +                                       btd_opts.defaults.bcs.role,
-> +                                       btd_opts.defaults.bcs.cs_sync_ant=
-_sel,
-> +                                       btd_opts.defaults.bcs.max_tx_powe=
-r);
-> +       } else {
-> +               error("HCI raw channel not available (may be in use)");
-> +       }
-> +#else /* USE_BT_HCI_RAW_CHANNEL */
-> +       DBG("MGMT Events");
-> +#endif /* USE_BT_HCI_RAW_CHANNEL */
+>  void eir_data_free(struct eir_data *eir);
+> diff --git a/unit/test-eir.c b/unit/test-eir.c
+> index 55967e957c82..5024d43723a8 100644
+> --- a/unit/test-eir.c
+> +++ b/unit/test-eir.c
+> @@ -587,7 +587,7 @@ static void print_debug(const char *str, void *user_d=
+ata)
+>  static void test_ad(const struct test_data *test, struct eir_data *eir)
+>  {
+>         struct bt_ad *ad;
+> -       GSList *list;
+> +       slist_t *list;
 >
->         rap_data_add(data);
+>         ad =3D bt_ad_new_with_data(test->eir_size, test->eir_data);
+>         g_assert(ad);
+> @@ -636,7 +636,7 @@ static void test_parsing(gconstpointer data)
+>  {
+>         const struct test_data *test =3D data;
+>         struct eir_data eir;
+> -       GSList *list;
+> +       slist_t *list;
 >
-> diff --git a/profiles/ranging/rap_hci.c b/profiles/ranging/rap_hci.c
-> new file mode 100644
-> index 000000000..5d1aba8f2
-> --- /dev/null
-> +++ b/profiles/ranging/rap_hci.c
-> @@ -0,0 +1,1296 @@
-> +// SPDX-License-Identifier: LGPL-2.1-or-later
-> +/*
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-> + */
-> +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <stdbool.h>
-> +#include <stddef.h>
-> +#include <unistd.h>
-> +#include <string.h>
-> +#include <endian.h>
-> +
-> +#include "lib/bluetooth/bluetooth.h"
-> +#include "src/shared/util.h"
-> +#include "src/shared/rap.h"
-> +#include "src/shared/hci.h"
-> +#include "src/log.h"
-> +#include "monitor/bt.h"
-> +
-> +#ifndef MIN
-> +#define MIN(a, b) ((a) < (b) ? (a) : (b))
-> +#endif
-> +
-> +/*  CS State Definitions */
-> +enum cs_state_t {
-> +       CS_INIT,
-> +       CS_STOPPED,
-> +       CS_STARTED,
-> +       CS_WAIT_CONFIG_CMPLT,
-> +       CS_WAIT_SEC_CMPLT,
-> +       CS_WAIT_PROC_CMPLT,
-> +       CS_HOLD,
-> +       CS_UNSPECIFIED
-> +};
-> +
-> +const char *state_names[] =3D {
-> +       "CS_INIT",
-> +       "CS_STOPPED",
-> +       "CS_STARTED",
-> +       "CS_WAIT_CONFIG_CMPLT",
-> +       "CS_WAIT_SEC_CMPLT",
-> +       "CS_WAIT_PROC_CMPLT",
-> +       "CS_HOLD",
-> +       "CS_UNSPECIFIED"
-> +};
-> +
-> +/* Callback Function Type */
-> +typedef void (*cs_callback_t)(uint16_t length,
-> +                       const void *param, void *user_data);
-> +
-> +/* State Machine Context */
-> +struct cs_state_machine_t {
-> +       enum cs_state_t current_state;
-> +       enum cs_state_t old_state;
-> +       struct bt_hci *hci;
-> +       struct bt_rap *rap;
-> +       unsigned int event_id;
-> +       bool initiator;
-> +       bool procedure_active;
-> +};
-> +
-> +struct cs_callback_map_t {
-> +       enum cs_state_t state;
-> +       cs_callback_t callback;
-> +};
-> +
-> +struct cs_callback_map_t cs_callback_map[] =3D {
-> +       { CS_WAIT_CONFIG_CMPLT, bt_rap_hci_cs_config_complete_callback },
-> +       { CS_WAIT_SEC_CMPLT, bt_rap_hci_cs_sec_enable_complete_callback }=
-,
-> +       { CS_WAIT_PROC_CMPLT, bt_rap_hci_cs_procedure_enable_complete_cal=
-lback }
-> +};
-> +
-> +#define CS_CALLBACK_MAP_SIZE ARRAY_SIZE(cs_callback_map)
-> +
-> +struct bt_rap_hci_cs_options cs_opt;
-> +struct cs_state_machine_t *sm;
-> +
-> +/*  State Machine Functions */
-> +void cs_state_machine_init(struct cs_state_machine_t *sm, struct bt_rap =
-*rap,
-> +                               struct bt_hci *hci)
-> +{
-> +       if (!sm)
-> +               return;
-> +
-> +       memset(sm, 0, sizeof(struct cs_state_machine_t));
-> +       sm->current_state =3D CS_UNSPECIFIED;
-> +       sm->rap =3D rap;
-> +       sm->hci =3D hci;
-> +       sm->initiator =3D false;
-> +       sm->procedure_active =3D false;
-> +}
-> +
-> +void bt_rap_hci_sm_cleanup(void)
-> +{
-> +       if (!sm)
-> +               return;
-> +
-> +       if (sm->event_id)
-> +               bt_hci_unregister(sm->hci, sm->event_id);
-> +
-> +       sm->current_state =3D CS_UNSPECIFIED;
-> +       sm->rap =3D NULL;
-> +       sm->hci =3D NULL;
-> +       sm->procedure_active =3D false;
-> +
-> +       free(sm);
-> +}
-> +
-> +void bt_rap_hci_set_le_bcs_options(uint8_t role, uint8_t cs_sync_ant_sel=
-,
-> +                                       int8_t max_tx_power)
-> +{
-> +       cs_opt.role =3D role;
-> +       cs_opt.cs_sync_ant_sel =3D cs_sync_ant_sel;
-> +       cs_opt.max_tx_power =3D max_tx_power;
-> +}
-> +
-> +/* State Transition Logic */
-> +void cs_set_state(struct cs_state_machine_t *sm, enum cs_state_t new_sta=
-te)
-> +{
-> +       if (!sm)
-> +               return;
-> +
-> +       if (sm->current_state =3D=3D new_state)
-> +               return;
-> +
-> +       /* Validate state values before array access */
-> +       if (sm->current_state > CS_UNSPECIFIED || new_state > CS_UNSPECIF=
-IED) {
-> +               DBG("[ERROR] Invalid state transition attempted\n");
-> +               return;
-> +       }
-> +
-> +       DBG("[STATE] Transition: %s =E2=86=92 %s\n",
-> +               state_names[sm->current_state],
-> +               state_names[new_state]);
-> +
-> +       sm->old_state =3D sm->current_state;
-> +       sm->current_state =3D new_state;
-> +}
-> +
-> +enum cs_state_t cs_get_current_state(struct cs_state_machine_t *sm)
-> +{
-> +       return sm ? sm->current_state : CS_UNSPECIFIED;
-> +}
-> +
-> +bool cs_is_procedure_active(const struct cs_state_machine_t *sm)
-> +{
-> +       return sm ? sm->procedure_active : false;
-> +}
-> +
-> +/* HCI Event Callbacks */
-> +static void rap_def_settings_done_cb(const void *data, uint8_t size,
-> +                                       void *user_data)
-> +{
-> +       struct bt_hci_rsp_le_cs_set_def_settings *rp;
-> +       struct cs_state_machine_t *sm =3D (struct cs_state_machine_t *)us=
-er_data;
-> +
-> +       if (!sm || !data ||
-> +               size < sizeof(struct bt_hci_rsp_le_cs_set_def_settings))
-> +               return;
-> +
-> +       DBG("[EVENT] CS default Setting Complete (size=3D0x%02X)\n", size=
-);
-> +
-> +       rp =3D (struct bt_hci_rsp_le_cs_set_def_settings *)data;
-> +
-> +       if (cs_get_current_state(sm) !=3D CS_INIT) {
-> +               DBG("Event received in Wrong State!! Expected : CS_INIT")=
-;
-> +               return;
-> +       }
-> +
-> +       if (rp->status =3D=3D 0) {
-> +               /* Success - proceed to configuration */
-> +               cs_set_state(sm, CS_WAIT_CONFIG_CMPLT);
-> +
-> +               /* Reflector role */
-> +               DBG("Waiting for CS Config Completed event...\n");
-> +               /* TODO: Initiator role - Send CS Config complete cmd */
-> +       } else {
-> +               /* Error - transition to stopped */
-> +               DBG("[ERROR]CS Set default setting failed with status 0x%=
-02X\n",
-> +               rp->status);
-> +               cs_set_state(sm, CS_STOPPED);
-> +       }
-> +}
-> +
-> +void rap_send_hci_def_settings_command(struct cs_state_machine_t *sm,
-> +               struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete *ev)
-> +{
-> +       struct bt_hci_cmd_le_cs_set_def_settings cp;
-> +       unsigned int status;
-> +
-> +       memset(&cp, 0, sizeof(cp));
-> +
-> +       if (ev->handle)
-> +               cp.handle =3D ev->handle;
-> +       cp.role_enable =3D cs_opt.role;
-> +       cp.cs_sync_antenna_selection =3D cs_opt.cs_sync_ant_sel;
-> +       cp.max_tx_power =3D cs_opt.max_tx_power;
-> +
-> +       if (!sm || !sm->hci) {
-> +               DBG("[ERR] Set Def Settings: sm or hci is null");
-> +               return;
-> +       }
-> +
-> +       status =3D bt_hci_send(sm->hci, BT_HCI_CMD_LE_CS_SET_DEF_SETTINGS=
-,
-> +                               &cp, sizeof(cp), rap_def_settings_done_cb=
-,
-> +                               sm, NULL);
-> +
-> +       DBG("sending set default settings case, status : %d", status);
-> +       if (!status)
-> +               DBG("Failed to send default settings cmd");
-> +}
-> +
-> +static void rap_rd_rmt_supp_cap_cmplt_evt(const uint8_t *data, uint8_t s=
-ize,
-> +                                          void *user_data)
-> +{
-> +       struct cs_state_machine_t *sm =3D (struct cs_state_machine_t *)us=
-er_data;
-> +       struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete ev;
-> +       struct iovec iov;
-> +       uint8_t status;
-> +       uint16_t handle;
-> +
-> +       if (!sm || !data ||
-> +               size < sizeof(struct bt_hci_evt_le_cs_rd_rem_supp_cap_com=
-plete))
-> +               return;
-> +
-> +       /* Initialize iovec with the event data */
-> +       iov.iov_base =3D (void *)data;
-> +       iov.iov_len =3D size;
-> +
-> +       /* Parse all fields in order using iovec */
-> +       if (!util_iov_pull_u8(&iov, &status)) {
-> +               DBG("[ERROR] Failed to parse Status\n");
-> +               return;
-> +       }
-> +
-> +       if (!util_iov_pull_le16(&iov, &handle)) {
-> +               DBG("[ERROR] Failed to parse Connection_Handle\n");
-> +               return;
-> +       }
-
-Ok, so we got a connection handle; how will we map it back to the
-device/ATT connection? I guess that needs to be worked out first,
-perhaps with HCIGETCONNLIST so we can resolve the handle. That
-actually has some limitation since there is no bdaddr type we cannot
-resolve if it is a RPA for example. Since this is considered a
-temporary solution maybe that can be worked out. We might want to
-build helpers for ioctls into bt_hci e.g. bt_hci_get_conn_list, to
-make it simpler to submit commands.
-
-> +
-> +       ev.status =3D status;
-> +       ev.handle =3D handle;
-> +
-> +       DBG("[EVENT] Remote Capabilities Complete\n");
-> +       DBG("status=3D0x%02X, handle=3D0x%04X\n", ev.status, ev.handle);
-> +
-> +       if (ev.status =3D=3D 0) {
-> +               uint8_t u8_val;
-> +               uint16_t u16_val;
-> +
-> +               /* Parse remaining fields only if status is success */
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.num_config_supported =3D u8_val;
-> +
-> +               if (!util_iov_pull_le16(&iov, &u16_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.max_consecutive_procedures_supported =3D u16_val;
-> +
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.num_antennas_supported =3D u8_val;
-> +
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.max_antenna_paths_supported =3D u8_val;
-> +
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.roles_supported =3D u8_val;
-> +
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.modes_supported =3D u8_val;
-> +
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.rtt_capability =3D u8_val;
-> +
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.rtt_aa_only_n =3D u8_val;
-> +
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.rtt_sounding_n =3D u8_val;
-> +
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.rtt_random_payload_n =3D u8_val;
-> +
-> +               if (!util_iov_pull_le16(&iov, &u16_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.nadm_sounding_capability =3D u16_val;
-> +
-> +               if (!util_iov_pull_le16(&iov, &u16_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.nadm_random_capability =3D u16_val;
-> +
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.cs_sync_phys_supported =3D u8_val;
-> +
-> +               if (!util_iov_pull_le16(&iov, &u16_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.subfeatures_supported =3D u16_val;
-> +
-> +               if (!util_iov_pull_le16(&iov, &u16_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.t_ip1_times_supported =3D u16_val;
-> +
-> +               if (!util_iov_pull_le16(&iov, &u16_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.t_ip2_times_supported =3D u16_val;
-> +
-> +               if (!util_iov_pull_le16(&iov, &u16_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.t_fcs_times_supported =3D u16_val;
-> +
-> +               if (!util_iov_pull_le16(&iov, &u16_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.t_pm_times_supported =3D u16_val;
-> +
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +               ev.t_sw_time_supported =3D u8_val;
-> +
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-
-I would rather use a goto failed and handle these in a single place.
-
-> +                       return;
-> +               }
-> +
-> +               DBG("[EVENT] Remote Capabilities: num_config=3D%u, ",
-> +                       ev.num_config_supported);
-> +               DBG("max_consecutive_proc=3D%u, num_antennas=3D%u, ",
-> +                       ev.max_consecutive_procedures_supported,
-> +                       ev.num_antennas_supported);
-> +               DBG("max_antenna_paths=3D%u, roles=3D0x%02X, modes=3D0x%0=
-2X\n",
-> +                       ev.max_antenna_paths_supported,
-> +                       ev.roles_supported,
-> +                       ev.modes_supported);
-> +
-> +               rap_send_hci_def_settings_command(sm, &ev);
-> +               cs_set_state(sm, CS_INIT);
-> +       } else {
-> +               /* Error - transition to stopped */
-> +               DBG("[ERROR] Remote capabilities failed with status 0x%02=
-X\n",
-> +                       ev.status);
-> +               cs_set_state(sm, CS_STOPPED);
-> +       }
-> +}
-> +
-> +static void rap_cs_config_cmplt_evt(const uint8_t *data, uint8_t size,
-> +                                   void *user_data)
-> +{
-> +       struct cs_state_machine_t *sm =3D (struct cs_state_machine_t *)us=
-er_data;
-> +       struct rap_ev_cs_config_cmplt rap_ev;
-> +       struct iovec iov;
-> +       uint8_t status;
-> +       uint16_t handle;
-> +       uint8_t i;
-> +
-> +       if (!sm || !data ||
-> +               size < sizeof(struct bt_hci_evt_le_cs_config_complete))
-> +               return;
-> +
-> +       /* Initialize iovec with the event data */
-> +       iov.iov_base =3D (void *)data;
-> +       iov.iov_len =3D size;
-> +
-> +       DBG("[EVENT] Configuration Complete (size=3D0x%02X)\n", size);
-> +
-> +       /* State Check */
-> +       if (cs_get_current_state(sm) !=3D CS_WAIT_CONFIG_CMPLT) {
-> +               DBG("Event received in Wrong State!! ");
-> +               DBG("Expected : CS_WAIT_CONFIG_CMPLT");
-> +               return;
-> +       }
-> +
-> +       /* Parse all fields in order using iovec */
-> +       if (!util_iov_pull_u8(&iov, &status)) {
-> +               DBG("[ERROR] Failed to parse Status\n");
-> +               return;
-> +       }
-> +
-> +       if (!util_iov_pull_le16(&iov, &handle)) {
-> +               DBG("[ERROR] Failed to parse Connection_Handle\n");
-> +               return;
-> +       }
-> +
-> +       rap_ev.status =3D status;
-> +       rap_ev.conn_hdl =3D cpu_to_le16(handle);
-> +
-> +       if (rap_ev.status =3D=3D 0) {
-> +               /* Parse remaining fields only if status is success */
-> +               if (!util_iov_pull_u8(&iov, &rap_ev.config_id) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.action) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.main_mode_type) |=
-|
-> +                       !util_iov_pull_u8(&iov, &rap_ev.sub_mode_type) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.min_main_mode_ste=
-ps) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.max_main_mode_ste=
-ps) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.main_mode_rep) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.mode_0_steps) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.role) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.rtt_type) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.cs_sync_phy)) {
-> +                       DBG("[ERROR] Failed to parse config fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-
-If it is not a variable length you just pull the entire struct at once
-rather than doing it one by one.
-
-> +
-> +               /* Store rtt_type in global options */
-> +               cs_opt.rtt_type =3D rap_ev.rtt_type;
-> +
-> +               /* Parse Channel_Map (10 bytes) */
-> +               for (i =3D 0; i < 10; i++) {
-> +                       if (!util_iov_pull_u8(&iov, &rap_ev.channel_map[i=
-])) {
-> +                               DBG("[ERROR] Failed to parse Channel_Map[=
-%u]\n",
-> +                                       i);
-> +                               cs_set_state(sm, CS_STOPPED);
-> +                               return;
-> +                       }
-> +               }
-> +
-> +               /* Parse remaining fields */
-> +               if (!util_iov_pull_u8(&iov, &rap_ev.channel_map_rep) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.channel_sel_type)=
- ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.ch3c_shape) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.ch3c_jump) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.reserved) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.t_ip1_time) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.t_ip2_time) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.t_fcs_time) ||
-> +                       !util_iov_pull_u8(&iov, &rap_ev.t_pm_time)) {
-> +                       DBG("[ERROR] Failed to parse timing fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       return;
-> +               }
-> +
-> +               DBG("[EVENT] Config Complete: config_id=3D%u, action=3D%u=
-, ",
-> +                       rap_ev.config_id, rap_ev.action);
-> +               DBG("main_mode=3D%u, sub_mode=3D%u, role=3D%u, rtt_type=
-=3D%u\n",
-> +                       rap_ev.main_mode_type, rap_ev.sub_mode_type,
-> +                       rap_ev.role, rap_ev.rtt_type);
-> +
-> +               /* Success - proceed to Security enable complete */
-> +               cs_set_state(sm, CS_WAIT_SEC_CMPLT);
-> +
-> +               /* Reflector role */
-> +               DBG("Waiting for security enable event...\n");
-> +               /* TODO: Initiator role - Send CS Security enable cmd */
-> +       } else {
-> +               /* Error - transition to stopped */
-> +               DBG("[ERROR] Configuration failed with status 0x%02X\n",
-> +                       rap_ev.status);
-> +               cs_set_state(sm, CS_STOPPED);
-> +       }
-> +
-> +       /* Send Callback to RAP Profile */
-> +       for (size_t i =3D 0; i < CS_CALLBACK_MAP_SIZE; i++) {
-> +               if (cs_callback_map[i].state =3D=3D sm->old_state) {
-> +                       cs_callback_map[i].callback(size, &rap_ev, sm->ra=
-p);
-> +                       return;
-> +               }
-> +       }
-> +}
-> +
-> +static void rap_cs_sec_enable_cmplt_evt(const uint8_t *data, uint8_t siz=
-e,
-> +                                        void *user_data)
-> +{
-> +       struct cs_state_machine_t *sm =3D (struct cs_state_machine_t *)us=
-er_data;
-> +       struct rap_ev_cs_sec_enable_cmplt rap_ev;
-> +       struct iovec iov;
-> +       uint8_t status;
-> +       uint16_t handle;
-> +
-> +       if (!sm || !data ||
-> +               size < sizeof(struct bt_hci_evt_le_cs_sec_enable_complete=
-))
-> +               return;
-> +
-> +       /* Initialize iovec with the event data */
-> +       iov.iov_base =3D (void *)data;
-> +       iov.iov_len =3D size;
-> +
-> +       DBG("[EVENT] Security Enable Complete (size=3D0x%02X)\n", size);
-> +
-> +       /* State Check */
-> +       if (cs_get_current_state(sm) !=3D CS_WAIT_SEC_CMPLT) {
-> +               DBG("Event received in Wrong State!! ");
-> +               DBG("Expected : CS_WAIT_SEC_CMPLT");
-> +               return;
-> +       }
-> +
-> +       /* Parse all fields in order using iovec */
-> +       if (!util_iov_pull_u8(&iov, &status)) {
-> +               DBG("[ERROR] Failed to parse Status\n");
-> +               return;
-> +       }
-> +
-> +       if (!util_iov_pull_le16(&iov, &handle)) {
-> +               DBG("[ERROR] Failed to parse Connection_Handle\n");
-> +               return;
-> +       }
-> +
-> +       rap_ev.status =3D status;
-> +       rap_ev.conn_hdl =3D cpu_to_le16(handle);
-> +
-> +       DBG("[EVENT] Security Enable: status=3D0x%02X, handle=3D0x%04X\n"=
-,
-> +               rap_ev.status, handle);
-> +
-> +       if (rap_ev.status =3D=3D 0) {
-> +               /* Success - proceed to configuration */
-> +               cs_set_state(sm, CS_WAIT_PROC_CMPLT);
-> +
-> +               /* Reflector role */
-> +               DBG("Waiting for CS Proc complete event...\n");
-> +               /* TODO: Initiator - Send CS Proc Set Parameter and enabl=
-e */
-> +       } else {
-> +               /* Error - transition to stopped */
-> +               DBG("[ERROR] Security enable failed with status 0x%02X\n"=
-,
-> +                       rap_ev.status);
-> +               cs_set_state(sm, CS_STOPPED);
-> +       }
-> +
-> +       /* Send Callback to RAP Profile */
-> +       for (size_t i =3D 0; i < CS_CALLBACK_MAP_SIZE; i++) {
-> +               if (cs_callback_map[i].state =3D=3D sm->old_state) {
-> +                       cs_callback_map[i].callback(size, &rap_ev, sm->ra=
-p);
-> +                       return;
-> +               }
-> +       }
-> +}
-> +
-> +static void rap_cs_proc_enable_cmplt_evt(const uint8_t *data, uint8_t si=
-ze,
-> +                                         void *user_data)
-> +{
-> +       struct cs_state_machine_t *sm =3D (struct cs_state_machine_t *)us=
-er_data;
-> +       struct rap_ev_cs_proc_enable_cmplt rap_ev;
-> +       struct iovec iov;
-> +       uint8_t status;
-> +       uint16_t handle;
-> +       uint8_t i;
-> +
-> +       if (!sm || !data ||
-> +               size < sizeof(struct bt_hci_evt_le_cs_proc_enable_complet=
-e))
-> +               return;
-> +
-> +       /* Initialize iovec with the event data */
-> +       iov.iov_base =3D (void *)data;
-> +       iov.iov_len =3D size;
-> +
-> +       DBG("[EVENT] Procedure Enable Complete (size=3D0x%02X)\n", size);
-> +
-> +       /* State Check */
-> +       if (cs_get_current_state(sm) !=3D CS_WAIT_PROC_CMPLT) {
-> +               DBG("Event received in Wrong State!! ");
-> +               DBG("Expected : CS_WAIT_PROC_CMPLT");
-> +               return;
-> +       }
-> +
-> +       /* Parse all fields in order using iovec */
-> +       if (!util_iov_pull_u8(&iov, &status)) {
-> +               DBG("[ERROR] Failed to parse Status\n");
-> +               return;
-> +       }
-> +
-> +       if (!util_iov_pull_le16(&iov, &handle)) {
-> +               DBG("[ERROR] Failed to parse Connection_Handle\n");
-> +               return;
-> +       }
-> +
-> +       rap_ev.status =3D status;
-> +       rap_ev.conn_hdl =3D cpu_to_le16(handle);
-> +
-> +       if (rap_ev.status =3D=3D 0) {
-> +               uint8_t u8_val;
-> +               uint16_t u16_val;
-> +
-> +               /* Parse remaining fields only if status is success */
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse ");
-> +                       DBG("procedure enable fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       sm->procedure_active =3D false;
-> +                       return;
-> +               }
-> +               rap_ev.config_id =3D u8_val;
-> +
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse ");
-> +                       DBG("procedure enable fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       sm->procedure_active =3D false;
-> +                       return;
-> +               }
-> +               rap_ev.state =3D u8_val;
-> +
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse ");
-> +                       DBG("procedure enable fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       sm->procedure_active =3D false;
-> +                       return;
-> +               }
-> +               rap_ev.tone_ant_config_sel =3D u8_val;
-> +
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse ");
-> +                       DBG("procedure enable fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       sm->procedure_active =3D false;
-> +                       return;
-> +               }
-> +
-> +               rap_ev.sel_tx_pwr =3D u8_val;
-> +
-> +               /* Parse Subevent_Len (3 bytes) */
-> +               for (i =3D 0; i < 3; i++) {
-> +                       if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                               DBG("[ERROR]Failed to parse Subevent_Len[=
-%u]\n",
-> +                                       i);
-> +                               cs_set_state(sm, CS_STOPPED);
-> +                               sm->procedure_active =3D false;
-> +                               return;
-> +                       }
-> +                       rap_ev.sub_evt_len[i] =3D u8_val;
-> +               }
-> +
-> +               /* Parse remaining fields */
-> +               if (!util_iov_pull_u8(&iov, &u8_val)) {
-> +                       DBG("[ERROR] Failed to parse ");
-> +                       DBG("procedure timing fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       sm->procedure_active =3D false;
-> +                       return;
-> +               }
-> +               rap_ev.sub_evts_per_evt =3D u8_val;
-> +
-> +               if (!util_iov_pull_le16(&iov, &u16_val)) {
-> +                       DBG("[ERROR] Failed to parse ");
-> +                       DBG("procedure timing fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       sm->procedure_active =3D false;
-> +                       return;
-> +               }
-> +               rap_ev.sub_evt_intrvl =3D u16_val;
-> +
-> +               if (!util_iov_pull_le16(&iov, &u16_val)) {
-> +                       DBG("[ERROR] Failed to parse ");
-> +                       DBG("procedure timing fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       sm->procedure_active =3D false;
-> +                       return;
-> +               }
-> +               rap_ev.evt_intrvl =3D u16_val;
-> +
-> +               if (!util_iov_pull_le16(&iov, &u16_val)) {
-> +                       DBG("[ERROR] Failed to parse ");
-> +                       DBG("procedure timing fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       sm->procedure_active =3D false;
-> +                       return;
-> +               }
-> +               rap_ev.proc_intrvl =3D u16_val;
-> +
-> +               if (!util_iov_pull_le16(&iov, &u16_val)) {
-> +                       DBG("[ERROR] Failed to parse ");
-> +                       DBG("procedure timing fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       sm->procedure_active =3D false;
-> +                       return;
-> +               }
-> +               rap_ev.proc_counter =3D u16_val;
-> +
-> +               if (!util_iov_pull_le16(&iov, &u16_val)) {
-> +                       DBG("[ERROR] Failed to parse ");
-> +                       DBG("procedure timing fields\n");
-> +                       cs_set_state(sm, CS_STOPPED);
-> +                       sm->procedure_active =3D false;
-> +                       return;
-> +               }
-> +
-> +               DBG("[EVENT] Procedure Enable: config_id=3D%u, state=3D%u=
-, ",
-> +                       rap_ev.config_id, rap_ev.state);
-> +               DBG("sub_evts_per_evt=3D%u, evt_intrvl=3D%u, proc_intrvl=
-=3D%u\n",
-> +                       rap_ev.sub_evts_per_evt, rap_ev.evt_intrvl,
-> +                       rap_ev.proc_intrvl);
-> +
-> +               /* Success - procedure started */
-> +               cs_set_state(sm, CS_STARTED);
-> +               sm->procedure_active =3D true;
-> +       } else {
-> +               /* Error - transition to stopped */
-> +               DBG("[ERROR] Procedure enable failed with status 0x%02X\n=
-",
-> +                       rap_ev.status);
-> +               cs_set_state(sm, CS_STOPPED);
-> +               sm->procedure_active =3D false;
-> +       }
-> +
-> +       /* Send Callback to RAP Profile */
-> +       for (size_t i =3D 0; i < CS_CALLBACK_MAP_SIZE; i++) {
-> +               if (cs_callback_map[i].state =3D=3D sm->old_state) {
-> +                       cs_callback_map[i].callback(size, &rap_ev, sm->ra=
-p);
-> +                       return;
-> +               }
-> +       }
-> +}
-> +
-> +static void parse_i_q_sample(struct iovec *iov, int16_t *i_sample,
-> +                               int16_t *q_sample)
-> +{
-> +       uint8_t bytes[3];
-> +       uint32_t buffer;
-> +       uint32_t i12;
-> +       uint32_t q12;
-> +
-> +       /* Pull 3 bytes from iovec */
-> +       if (!util_iov_pull_u8(iov, &bytes[0]) ||
-> +               !util_iov_pull_u8(iov, &bytes[1]) ||
-> +               !util_iov_pull_u8(iov, &bytes[2])) {
-> +               *i_sample =3D 0;
-> +               *q_sample =3D 0;
-> +               return;
-> +       }
-> +
-> +       /* Reconstruct 24-bit buffer from 3 bytes */
-> +       buffer =3D (uint32_t)bytes[0] | ((uint32_t)bytes[1] << 8) |
-> +                               ((uint32_t)bytes[2] << 16);
-> +       i12 =3D  buffer        & 0x0FFFU;   /* bits 0..11 */
-> +       q12 =3D (buffer >> 12) & 0x0FFFU;   /* bits 12..23 */
-> +
-> +       /* Sign-extend 12-bit values to 16-bit */
-> +       *i_sample =3D (int16_t)((int32_t)(i12 << 20) >> 20);
-> +       *q_sample =3D (int16_t)((int32_t)(q12 << 20) >> 20);
-> +}
-> +
-> +/* Parse CS Mode 0 step data */
-> +static void parse_mode_zero_data(struct iovec *iov,
-> +                                struct cs_mode_zero_data *mode_data,
-> +                                uint8_t cs_role)
-> +{
-> +       uint32_t freq_offset;
-> +
-> +       if (iov->iov_len < 3) {
-> +               DBG("Mode 0: too short (<3)");
-> +               return;
-> +       }
-> +
-> +       util_iov_pull_u8(iov, &mode_data->packet_quality);
-> +       util_iov_pull_u8(iov, &mode_data->packet_rssi_dbm);
-> +       util_iov_pull_u8(iov, &mode_data->packet_ant);
-> +       DBG("CS Step mode 0");
-> +
-> +       if (cs_role =3D=3D CS_INITIATOR && iov->iov_len >=3D 4) {
-> +               util_iov_pull_le32(iov, &freq_offset);
-> +               mode_data->init_measured_freq_offset =3D freq_offset;
-> +       }
-> +}
-> +
-> +/* Parse CS Mode 1 step data */
-> +static void parse_mode_one_data(struct iovec *iov,
-> +                               struct cs_mode_one_data *mode_data,
-> +                               uint8_t cs_role, uint8_t cs_rtt_type)
-> +{
-> +       uint16_t time_val;
-> +
-> +       if (iov->iov_len < 4) {
-> +               DBG("Mode 1: too short (<4)");
-> +               return;
-> +       }
-> +
-> +       DBG("CS Step mode 1");
-> +       util_iov_pull_u8(iov, &mode_data->packet_quality);
-> +       util_iov_pull_u8(iov, &mode_data->packet_rssi_dbm);
-> +       util_iov_pull_u8(iov, &mode_data->packet_ant);
-> +       util_iov_pull_u8(iov, &mode_data->packet_nadm);
-> +
-> +       if (iov->iov_len >=3D 2) {
-> +               util_iov_pull_le16(iov, &time_val);
-> +               if (cs_role =3D=3D CS_REFLECTOR)
-> +                       mode_data->tod_toa_refl =3D time_val;
-> +               else
-> +                       mode_data->toa_tod_init =3D time_val;
-> +       }
-> +
-> +       if ((cs_rtt_type =3D=3D 0x01 || cs_rtt_type =3D=3D 0x02) &&
-> +               iov->iov_len >=3D 6) {
-> +               int16_t i_val, q_val;
-> +
-> +               parse_i_q_sample(iov, &i_val, &q_val);
-> +               mode_data->packet_pct1.i_sample =3D i_val;
-> +               mode_data->packet_pct1.q_sample =3D q_val;
-> +
-> +               parse_i_q_sample(iov, &i_val, &q_val);
-> +               mode_data->packet_pct2.i_sample =3D i_val;
-> +               mode_data->packet_pct2.q_sample =3D q_val;
-> +       }
-> +}
-> +
-> +/* Parse CS Mode 2 step data */
-> +static void parse_mode_two_data(struct iovec *iov,
-> +                               struct cs_mode_two_data *mode_data,
-> +                               uint8_t max_paths)
-> +{
-> +       uint8_t k;
-> +
-> +       if (iov->iov_len < 1) {
-> +               DBG("Mode 2: too short (<1)");
-> +               return;
-> +       }
-> +
-> +       util_iov_pull_u8(iov, &mode_data->ant_perm_index);
-> +       DBG("CS Step mode 2, max paths : %d", max_paths);
-> +
-> +       for (k =3D 0; k < max_paths; k++) {
-> +               int16_t i_val, q_val;
-> +
-> +               if (iov->iov_len < 4) {
-> +                       DBG("Mode 2: insufficient PCT for path %u (rem=3D=
-%zu)",
-> +                               k, iov->iov_len);
-> +                       break;
-> +               }
-> +               parse_i_q_sample(iov, &i_val, &q_val);
-> +               mode_data->tone_pct[k].i_sample =3D i_val;
-> +               mode_data->tone_pct[k].q_sample =3D q_val;
-> +
-> +               util_iov_pull_u8(iov, &mode_data->tone_quality_indicator[=
-k]);
-> +               DBG("tone_quality_indicator : %d",
-> +                       mode_data->tone_quality_indicator[k]);
-> +               DBG("[i, q] : %d, %d",
-> +                       mode_data->tone_pct[k].i_sample,
-> +                       mode_data->tone_pct[k].q_sample);
-> +       }
-> +}
-> +
-> +/* Parse CS Mode 3 step data */
-> +static void parse_mode_three_data(struct iovec *iov,
-> +                               struct cs_mode_three_data *mode_data,
-> +                               uint8_t cs_role, uint8_t cs_rtt_type,
-> +                               uint8_t max_paths)
-> +{
-> +       uint8_t k;
-> +       struct cs_mode_one_data *mode_one =3D &mode_data->mode_one_data;
-> +       struct cs_mode_two_data *mode_two =3D &mode_data->mode_two_data;
-> +
-> +       if (iov->iov_len < 4) {
-> +               DBG("Mode 3: mode1 too short (<4)");
-> +               return;
-> +       }
-> +
-> +       DBG("CS Step mode 3");
-> +
-> +       /* Parse Mode 1 portion */
-> +       parse_mode_one_data(iov, mode_one, cs_role, cs_rtt_type);
-> +
-> +       /* Parse Mode 2 portion */
-> +       if (iov->iov_len >=3D 1) {
-> +               util_iov_pull_u8(iov, &mode_two->ant_perm_index);
-> +               for (k =3D 0; k < max_paths; k++) {
-> +                       int16_t i_val, q_val;
-> +
-> +                       if (iov->iov_len < 4)
-> +                               break;
-> +                       parse_i_q_sample(iov, &i_val, &q_val);
-> +                       mode_two->tone_pct[k].i_sample =3D i_val;
-> +                       mode_two->tone_pct[k].q_sample =3D q_val;
-> +
-> +                       util_iov_pull_u8(iov,
-> +                                        &mode_two->tone_quality_indicato=
-r[k]);
-> +               }
-> +       }
-> +}
-> +
-> +/* Parse a single CS step */
-> +static void parse_cs_step(struct iovec *iov, struct cs_step_data *step,
-> +                       uint8_t cs_role, uint8_t cs_rtt_type,
-> +                       uint8_t max_paths)
-> +{
-> +       uint8_t mode;
-> +       uint8_t chnl;
-> +       uint8_t length;
-> +
-> +       /* Check if we have enough data for the 3-byte header */
-> +       if (iov->iov_len < 3) {
-> +               DBG("Truncated header for step");
-> +               return;
-> +       }
-> +
-> +       /* Read mode, channel, and length (3-byte header) */
-> +       if (!util_iov_pull_u8(iov, &mode) ||
-> +               !util_iov_pull_u8(iov, &chnl) ||
-> +               !util_iov_pull_u8(iov, &length)) {
-> +               DBG("Failed to read header for step");
-> +               return;
-> +       }
-> +
-> +       DBG("event->step_data_len : %d", length);
-> +
-> +       step->step_mode =3D mode;
-> +       step->step_chnl =3D chnl;
-> +       step->step_data_length =3D length;
-> +
-> +       DBG("Step: mode=3D%u chnl=3D%u data_len=3D%u", mode, chnl, length=
-);
-> +
-> +       if (iov->iov_len < length) {
-> +               DBG("Truncated payload for step (need %u, have %zu)",
-> +                       length, iov->iov_len);
-> +               return;
-> +       }
-> +
-> +       /* Parse step data based on mode */
-> +       switch (mode) {
-> +       case CS_MODE_ZERO:
-> +               parse_mode_zero_data(iov, &step->step_mode_data.mode_zero=
-_data,
-> +                                       cs_role);
-> +               break;
-> +       case CS_MODE_ONE:
-> +               parse_mode_one_data(iov, &step->step_mode_data.mode_one_d=
-ata,
-> +                                       cs_role, cs_rtt_type);
-> +               break;
-> +       case CS_MODE_TWO:
-> +               parse_mode_two_data(iov, &step->step_mode_data.mode_two_d=
-ata,
-> +                                       max_paths);
-> +               break;
-> +       case CS_MODE_THREE:
-> +               parse_mode_three_data(iov,
-> +                                       &step->step_mode_data.mode_three_=
-data,
-> +                                       cs_role, cs_rtt_type, max_paths);
-> +               break;
-> +       default:
-> +               DBG("Unknown step mode %d", mode);
-> +               /* Skip the entire step data */
-> +               util_iov_pull(iov, length);
-> +               break;
-> +       }
-> +}
-> +
-> +static void rap_cs_subevt_result_evt(const uint8_t *data, uint8_t size,
-> +                               void *user_data)
-> +{
-> +       struct cs_state_machine_t *sm =3D (struct cs_state_machine_t *)us=
-er_data;
-> +       struct rap_ev_cs_subevent_result *rap_ev;
-> +       struct iovec iov;
-> +       uint8_t cs_role;
-> +       uint8_t cs_rtt_type;
-> +       uint8_t max_paths;
-> +       uint8_t steps;
-> +       size_t send_len =3D 0;
-> +       uint16_t handle;
-> +       uint8_t config_id;
-> +       uint16_t start_acl_conn_evt_counter;
-> +       uint16_t proc_counter;
-> +       uint16_t freq_comp;
-> +       uint8_t ref_pwr_lvl;
-> +       uint8_t proc_done_status;
-> +       uint8_t subevt_done_status;
-> +       uint8_t abort_reason;
-> +       uint8_t num_ant_paths;
-> +       uint8_t num_steps_reported;
-> +       uint8_t i;
-> +
-> +       if (!sm || !data ||
-> +               size < sizeof(struct bt_hci_evt_le_cs_subevent_result))
-> +               return;
-> +
-> +       /* Initialize iovec with the event data */
-> +       iov.iov_base =3D (void *)data;
-> +       iov.iov_len =3D size;
-> +
-> +       /* Check if Procedure is active or not */
-> +       if (!sm->procedure_active) {
-> +               DBG("Received Subevent event when Procedure is inactive!"=
-);
-> +               return;
-> +       }
-> +
-> +       /* Parse header fields using iovec */
-> +       if (!util_iov_pull_le16(&iov, &handle)) {
-> +               DBG("[ERROR] Failed to parse Connection_Handle\n");
-> +               return;
-> +       }
-> +
-> +       if (!util_iov_pull_u8(&iov, &config_id) ||
-> +               !util_iov_pull_le16(&iov, &start_acl_conn_evt_counter) ||
-> +               !util_iov_pull_le16(&iov, &proc_counter) ||
-> +               !util_iov_pull_le16(&iov, &freq_comp) ||
-> +               !util_iov_pull_u8(&iov, &ref_pwr_lvl) ||
-> +               !util_iov_pull_u8(&iov, &proc_done_status) ||
-> +               !util_iov_pull_u8(&iov, &subevt_done_status) ||
-> +               !util_iov_pull_u8(&iov, &abort_reason) ||
-> +               !util_iov_pull_u8(&iov, &num_ant_paths) ||
-> +               !util_iov_pull_u8(&iov, &num_steps_reported)) {
-> +               DBG("[ERROR] Failed to parse subevent fields\n");
-> +               return;
-> +       }
-> +
-> +       cs_role =3D cs_opt.role;
-> +       cs_rtt_type =3D cs_opt.rtt_type;
-> +       max_paths =3D MIN((num_ant_paths + 1), CS_MAX_ANT_PATHS);
-> +       steps =3D MIN(num_steps_reported, CS_MAX_STEPS);
-> +       send_len =3D offsetof(struct rap_ev_cs_subevent_result, step_data=
-) +
-> +                                       steps * sizeof(struct cs_step_dat=
-a);
-> +       rap_ev =3D (struct rap_ev_cs_subevent_result *)malloc(send_len);
-> +       if (!rap_ev) {
-> +               DBG("[ERROR] Failed to allocate memory for subevent resul=
-t\n");
-> +               return;
-> +       }
-> +
-> +       DBG("[EVENT] Subevent Result (length=3D%u)\n", size);
-> +       rap_ev->conn_hdl                     =3D le16_to_cpu(handle);
-> +       rap_ev->config_id                    =3D config_id;
-> +       rap_ev->start_acl_conn_evt_counter   =3D start_acl_conn_evt_count=
-er;
-> +       rap_ev->proc_counter                 =3D proc_counter;
-> +       rap_ev->freq_comp                    =3D freq_comp;
-> +       rap_ev->ref_pwr_lvl                  =3D ref_pwr_lvl;
-> +       rap_ev->proc_done_status             =3D proc_done_status;
-> +       rap_ev->subevt_done_status           =3D subevt_done_status;
-> +       rap_ev->abort_reason                 =3D abort_reason;
-> +       rap_ev->num_ant_paths                =3D num_ant_paths;
-> +       rap_ev->num_steps_reported           =3D steps;
-> +
-> +       if (num_steps_reported > CS_MAX_STEPS) {
-> +               DBG("Too many steps reported: %u (max %u)",
-> +                       num_steps_reported, CS_MAX_STEPS);
-> +               goto send_event;
-> +       }
-> +
-> +       /* Early exit for error conditions */
-> +       if (rap_ev->subevt_done_status =3D=3D 0xF ||
-> +           rap_ev->proc_done_status =3D=3D 0xF) {
-> +               DBG("CS Procedure/Subevent aborted: ");
-> +               DBG("sub evt status =3D %d, proc status =3D %d, reason =
-=3D %d",
-> +                       rap_ev->subevt_done_status, rap_ev->proc_done_sta=
-tus,
-> +                       rap_ev->abort_reason);
-> +               goto send_event;
-> +       }
-> +
-> +       /* Parse interleaved step data from remaining iovec data */
-> +       for (i =3D 0; i < steps; i++)
-> +               parse_cs_step(&iov, &rap_ev->step_data[i], cs_role, cs_rt=
-t_type,
-> +                       max_paths);
-> +
-> +send_event:
-> +       DBG("CS subevent result processed: %zu bytes, ", send_len);
-> +       bt_rap_hci_cs_subevent_result_callback(send_len, rap_ev, sm->rap)=
-;
-> +       free(rap_ev);
-> +}
-> +
-> +static void rap_cs_subevt_result_cont_evt(const uint8_t *data, uint8_t s=
-ize,
-> +                                       void *user_data)
-> +{
-> +       struct cs_state_machine_t *sm =3D (struct cs_state_machine_t *)us=
-er_data;
-> +       struct rap_ev_cs_subevent_result_cont *rap_ev;
-> +       struct iovec iov;
-> +       uint8_t cs_role;
-> +       uint8_t cs_rtt_type;
-> +       uint8_t max_paths;
-> +       uint8_t steps;
-> +       size_t send_len =3D 0;
-> +       uint16_t handle;
-> +       uint8_t config_id;
-> +       uint8_t proc_done_status;
-> +       uint8_t subevt_done_status;
-> +       uint8_t abort_reason;
-> +       uint8_t num_ant_paths;
-> +       uint8_t num_steps_reported;
-> +       uint8_t i;
-> +
-> +       if (!sm || !data ||
-> +               size < sizeof(struct bt_hci_evt_le_cs_subevent_result_con=
-tinue))
-> +               return;
-> +
-> +       /* Initialize iovec with the event data */
-> +       iov.iov_base =3D (void *)data;
-> +       iov.iov_len =3D size;
-> +
-> +       /* Check if Procedure is active or not */
-> +       if (!sm->procedure_active) {
-> +               DBG("Received Subevent when CS Procedure is inactive!");
-> +               return;
-> +       }
-> +
-> +       /* Parse header fields using iovec */
-> +       if (!util_iov_pull_le16(&iov, &handle)) {
-> +               DBG("[ERROR] Failed to parse Connection_Handle\n");
-> +               return;
-> +       }
-> +
-> +       if (!util_iov_pull_u8(&iov, &config_id) ||
-> +               !util_iov_pull_u8(&iov, &proc_done_status) ||
-> +               !util_iov_pull_u8(&iov, &subevt_done_status) ||
-> +               !util_iov_pull_u8(&iov, &abort_reason) ||
-> +               !util_iov_pull_u8(&iov, &num_ant_paths) ||
-> +               !util_iov_pull_u8(&iov, &num_steps_reported)) {
-> +               DBG("[ERROR] Failed to parse subevent continue fields ");
-> +               return;
-> +       }
-> +
-> +       cs_role =3D cs_opt.role;
-> +       cs_rtt_type =3D cs_opt.rtt_type;
-> +       max_paths =3D MIN((num_ant_paths + 1), CS_MAX_ANT_PATHS);
-> +       steps =3D MIN(num_steps_reported, CS_MAX_STEPS);
-> +       send_len =3D offsetof(struct rap_ev_cs_subevent_result_cont, step=
-_data) +
-> +                                       steps * sizeof(struct cs_step_dat=
-a);
-> +       rap_ev =3D (struct rap_ev_cs_subevent_result_cont *)malloc(send_l=
-en);
-> +       if (!rap_ev) {
-> +               DBG("[ERROR] Failed to allocate memory for subevent resul=
-t\n");
-> +               return;
-> +       }
-> +
-> +       DBG("[EVENT] Subevent Result Cont (length=3D%u)\n", size);
-> +       rap_ev->conn_hdl                     =3D le16_to_cpu(handle);
-> +       rap_ev->config_id                    =3D config_id;
-> +       rap_ev->proc_done_status             =3D proc_done_status;
-> +       rap_ev->subevt_done_status           =3D subevt_done_status;
-> +       rap_ev->abort_reason                 =3D abort_reason;
-> +       rap_ev->num_ant_paths                =3D num_ant_paths;
-> +       rap_ev->num_steps_reported           =3D steps;
-> +
-> +       if (num_steps_reported > CS_MAX_STEPS) {
-> +               DBG("Too many steps reported: %u (max %u)",
-> +                       num_steps_reported, CS_MAX_STEPS);
-> +               goto send_event;
-> +       }
-> +
-> +       /* Early exit for error conditions */
-> +       if (rap_ev->subevt_done_status =3D=3D 0xF ||
-> +           rap_ev->proc_done_status =3D=3D 0xF) {
-> +               DBG("CS Procedure/Subevent aborted: ");
-> +               DBG("sub evt status =3D %d, proc status =3D %d, reason =
-=3D %d",
-> +                       rap_ev->subevt_done_status, rap_ev->proc_done_sta=
-tus,
-> +                       rap_ev->abort_reason);
-> +               goto send_event;
-> +       }
-> +
-> +       /* Parse interleaved step data from remaining iovec data */
-> +       for (i =3D 0; i < steps; i++)
-> +               parse_cs_step(&iov, &rap_ev->step_data[i], cs_role, cs_rt=
-t_type,
-> +                       max_paths);
-> +
-> +send_event:
-> +       DBG("CS subevent result cont processed: %zu bytes, ", send_len);
-> +       bt_rap_hci_cs_subevent_result_cont_callback(send_len, rap_ev, sm-=
->rap);
-> +       free(rap_ev);
-> +}
-> +
-> +/* HCI Event Registration */
-> +static void rap_handle_hci_events(const void *data, uint8_t size,
-> +                               void *user_data)
-> +{
-> +       struct iovec iov;
-> +       uint8_t subevent;
-> +
-> +       /* Initialize iovec with the event data */
-> +       iov.iov_base =3D (void *)data;
-> +       iov.iov_len =3D size;
-> +
-> +       /* Pull the subevent code */
-> +       if (!util_iov_pull_u8(&iov, &subevent))
-> +               return;
-> +
-> +       /* Now iov points to the payload, and iov_len is the payload leng=
-th */
-> +       switch (subevent) {
-> +       case BT_HCI_EVT_LE_CS_RD_REM_SUPP_CAP_COMPLETE:
-> +               rap_rd_rmt_supp_cap_cmplt_evt(iov.iov_base,
-> +                                       iov.iov_len, user_data);
-> +               break;
-> +       case BT_HCI_EVT_LE_CS_CONFIG_COMPLETE:
-> +               rap_cs_config_cmplt_evt(iov.iov_base,
-> +                                       iov.iov_len, user_data);
-> +               break;
-> +       case BT_HCI_EVT_LE_CS_SEC_ENABLE_COMPLETE:
-> +               rap_cs_sec_enable_cmplt_evt(iov.iov_base,
-> +                                       iov.iov_len, user_data);
-> +               break;
-> +       case BT_HCI_EVT_LE_CS_PROC_ENABLE_COMPLETE:
-> +               rap_cs_proc_enable_cmplt_evt(iov.iov_base,
-> +                                       iov.iov_len, user_data);
-> +               break;
-> +       case BT_HCI_EVT_LE_CS_SUBEVENT_RESULT:
-> +               rap_cs_subevt_result_evt(iov.iov_base,
-> +                                       iov.iov_len, user_data);
-> +               break;
-> +       case BT_HCI_EVT_LE_CS_SUBEVENT_RESULT_CONTINUE:
-> +               rap_cs_subevt_result_cont_evt(iov.iov_base,
-> +                                       iov.iov_len, user_data);
-> +               break;
-
-I'd probably recommend creating a subevent table with subevent op, min
-and max length and a callback. That table can then check if there is
-enough data and call the callback.
-
-> +       default:
-> +               break;
-> +       }
-> +}
-> +
-> +void bt_rap_hci_register_events(struct bt_rap *rap, struct bt_hci *hci)
-> +{
-> +       if (!rap || !hci)
-> +               return;
-> +
-> +       sm =3D new0(struct cs_state_machine_t, 1);
-> +       if (!sm) {
-> +               DBG("[ERROR] Failed to allocate state machine\n");
-> +               return;
-> +       }
-> +
-> +       cs_state_machine_init(sm, rap, hci);
-> +       sm->event_id =3D bt_hci_register(hci, BT_HCI_EVT_LE_META_EVENT,
-> +                                       rap_handle_hci_events, sm, NULL);
-> +
-> +       DBG("bt_hci_register done, event_id : %d", sm->event_id);
-> +
-> +       if (!sm->event_id) {
-> +               DBG("Error: Failed to register hci le meta events ");
-> +               DBG("event_id=3D0x%02X\n", sm->event_id);
-> +               free(sm);
-> +               return;
-> +       }
-> +}
-> +
-> +bool bt_rap_attach_hci(struct bt_rap *rap, struct bt_hci *hci)
-> +{
-> +       if (!rap)
-> +               return false;
-> +
-> +       if (!hci) {
-> +               DBG("Failed to create HCI RAW channel ");
-> +               bt_hci_unref(hci);
-> +               return false;
-> +       }
-> +
-> +       bt_rap_hci_register_events(rap, hci);
-> +
-> +       return true;
-> +}
+>         memset(&eir, 0, sizeof(eir));
+>
+> @@ -664,7 +664,6 @@ static void test_parsing(gconstpointer data)
+>         g_assert(eir.tx_power =3D=3D test->tx_power);
+>
+>         if (test->uuid) {
+> -               GSList *list;
+>                 int n =3D 0;
+>
+>                 for (list =3D eir.services; list; list =3D list->next, n+=
++) {
 > --
+> 2.53.0
+>
 >
 
 
