@@ -1,107 +1,85 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6B83921F8
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2026 10:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357862E1746
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2026 10:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775125388; cv=none; b=dED75DL+VPWc7DCZy6cTux5Hns5xs//kpiRnaaGVgPU/QetdtF4m+F796a0Iq5Fl/abItt3o0TdAwRsgeoQHf0tUgQrZ8jUi6aeGmjdwNcQnY2AKgFlwUj2U4n7KBLdCoP+vG+VSRMxSZgT/Mf5cCzbOQJBrGRyZ/JTzkb5bTz8=
+	t=1775125718; cv=none; b=HdTG86anryikR78otzN4PyTRA+TuP5TPl+JBOV7By8HZIZV7TaI/JIaind6YA9VA0SLVrR6FgZ6oWSnLYHI17UNr4aUK9KOQlv27brnqUJ+Yi7qMIwqN4K8ScBK9d9Fk4Ve8nbg1Dm6sxeJnGwE89Ti6cbb2tmDA5rDLAyab9gI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775125388; c=relaxed/simple;
-	bh=OpqgetGLI9elSjz1+T65ROJUAXPi20HI3b24Wr6039w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=fdkm3mH8mL8jxOTA1CANsWUOIcmq9iMvhyni2DaS89oFa5ndQiqR9HfQ76xl5wK2g+IH0WTrN8PWQlv5B8uxSFBH+i+/6xf/MV6ES1oNoCosxLLLO4WD1Fp0KqrHDCdAG3ZydU8bnVQfDQ1ur3HGOzo3+w0JB3n30HlbKTHDDaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 3CFF84C2C37D5A;
-	Thu, 02 Apr 2026 12:22:28 +0200 (CEST)
-Message-ID: <42befa05-71bd-4a5e-9f8f-269ad532a234@molgen.mpg.de>
-Date: Thu, 2 Apr 2026 12:22:27 +0200
+	s=arc-20240116; t=1775125718; c=relaxed/simple;
+	bh=0kUOP0A6Yt7feahXEqMGWokyNWShsQWoZCvdt2a7eE0=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=RbOD0bF17iwZqmSkAckGXKC1etQIA2tJbfdQls+D/w2qZx2EcaFhPmtmSgHSiucAx8hw402hBEOY7ahGV/YwBwfF31/zfANYxgHHZx0uOa03FxoD56JG6fkNnCbIXYp9cnRrh4AOp2CzSodxDLvdm2bvLWrqGwaWUqrO1wIzlYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=onrV458r; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="onrV458r"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BF368C2BCB0
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2026 10:28:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775125717;
+	bh=0kUOP0A6Yt7feahXEqMGWokyNWShsQWoZCvdt2a7eE0=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=onrV458rxxrj10SO19ZPlS/Y7nNknGldJTMfPI8K40RFdyai9gojsDf1tymPYKimq
+	 KLT+krn7WHJ4czx9Dc2KZcXiYdavc/8i0i5IomUOpQ6zIfHCK0nZMQJCudXKqgfcw3
+	 VygVEpTGBrmhXEPyfSQNV1Dy4uJCC29ZnwNxybDO3Udu4gxmRxR9eLMhNhmB5zJVAI
+	 nu8i+/bxdlMdS+5HGBJkbq4yQiHRbOtp2RVSTOxAmJtTkmly6cerhMQ8iD6l0zeRpd
+	 6+NiglZanJJsJQ8vXfhBVq2Hll35cxB0pcx8G+sRRjub0SN4mzelJTJbDWcLBlkzR+
+	 a4tGPHg/Thuug==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id B5E9AC53BBF; Thu,  2 Apr 2026 10:28:37 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221309] [REGRESSION] rtl8822cu: BLE disconnects with firmware
+ 0x0673_0EDC
+Date: Thu, 02 Apr 2026 10:28:37 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-221309-62941-JzPJV1VKnc@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221309-62941@https.bugzilla.kernel.org/>
+References: <bug-221309-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] rtl8822cu: BLE disconnects with firmware 0x0673_0EDC
-To: Hilda Wu <hildawu@realtek.com>
-References: <bug-221309-62941@https.bugzilla.kernel.org/>
-Content-Language: en-US
-Cc: linux-bluetooth@vger.kernel.org, linux-firmware@kernel.org,
- Josh Boyer <jwboyer@kernel.org>, regressions@lists.linux.dev
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <bug-221309-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-[To/Cc: +Hilda, linux-firmware@, Josh]
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221309
 
-Dear Hilda, dear Josh,
+--- Comment #1 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de)=
+ ---
+Thank you for your detailed report. As Hilda does not seem to have Linux Ke=
+rnel
+Bugzilla account, I replied to the Bugzilla notification on the [Bluetooth
+mailing list suggesting to revert the commit][1]. I wasn=E2=80=99t sure, if=
+ you would
+be ok with me putting your email address in Cc making it public. It would
+probably ease things up, if you would be in the loop.
 
+[1]:
+https://lore.kernel.org/linux-bluetooth/bug-221309-62941-wS09ufbMTD@https.b=
+ugzilla.kernel.org%2F/T/#u
 
-Hilda, unfortunately, you do not have a Linux Kernel Bugzilla account, 
-so I am replying here.
+--=20
+You may reply to this email to add a comment.
 
-Am 02.04.26 um 01:57 schrieb bugzilla-daemon@kernel.org:
-> https://bugzilla.kernel.org/show_bug.cgi?id=221309
-> 
->              Bug ID: 221309
->             Summary: rtl8822cu: BLE disconnects with firmware 0x0673_0EDC
->                      regression
->             Product: Drivers
->             Version: 2.5
->            Hardware: AMD
->                  OS: Linux
->              Status: NEW
->            Severity: normal
->            Priority: P3
->           Component: Bluetooth
->            Assignee: linux-bluetooth@vger.kernel.org
->            Reporter: i+kernel.org@schimpf.link
->          Regression: No
-> 
-> Created attachment 309794
->    --> https://bugzilla.kernel.org/attachment.cgi?id=309794&action=edit
-> stability log after downgrade
-> 
-> Overview
-> 
-> After updating linux-firmware-realtek to 20260221-1 (which includes commit fbf93476,
-> "update rtl8822c bt usb and uart firmware to 0x0673"), the RTL8822CU USB Bluetooth adapter
-> (0bda:b00c) begins dropping BLE connections every few minutes. Each disconnect
-> lasts several seconds before the device reconnects. The adapter itself never resets and
-> the USB device remains active throughout. Only the BLE link is lost.
-
-[… Linux 6.19.10-arch1-1 …]
-
-It looks like, the linux-firmware commit [1][2] caused a regression. 
-(Also linux-bluetooth@ wasn’t in Cc?) Could you please look into it? I 
-recommend to revert it for the time being and cut a new linux-firmware 
-release.
-
-
-Kind regards,
-
-Paul
-
-
-PS: Josh, do you have a pointer how to reach the commit from the merge 
-request?
-
-https://gitlab.com/kernel-firmware/linux-firmware/-/merge_requests/900 
-shows 
-https://gitlab.com/kernel-firmware/linux-firmware/-/commit/1f806c75e479fea9f222579deb6e69d285b614fc, 
-but I do not see a way to get to 
-https://gitlab.com/kernel-firmware/linux-firmware/-/commit/fbf93476.
-
-
-[1]: 
-https://lore.kernel.org/all/20260202115751.1056277-1-hildawu@realtek.com/
-[2]: https://gitlab.com/kernel-firmware/linux-firmware/-/commit/fbf93476
+You are receiving this mail because:
+You are the assignee for the bug.=
