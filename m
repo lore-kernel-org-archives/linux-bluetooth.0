@@ -1,221 +1,210 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+Received: from SY5PR01CU010.outbound.protection.outlook.com (mail-australiaeastazolkn19012067.outbound.protection.outlook.com [52.103.72.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE8A38C42B
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2026 07:56:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775116584; cv=none; b=aP0puteob9Sv6w6wwTPfCHESkjen38VDHZEJsFUGiLq8x2YFOXySvJYnLHwFwUInJipALAAfSshG6fi5Kvm+KsXMdbfTIz2ZELl5W+BYVOmApV9joN20C+3z+s44N/4ZzHEG+iLq8bJ9/uBImCHPihAxHHCmHp6nGfm9Q62ZA8g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775116584; c=relaxed/simple;
-	bh=acFIl4ni407JlLFAGdkmDAddl+nIfvX+ii2Nl8SzAao=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nRDo9mML1wHPp1fc8lNzVv8Tc0keNtPZkd33k3UeAtHFLNHV0ZBSQ5djjSwNbdnRH75b+7LaZ0R5XgUT/axhVBix20IKTK25A/5O5sBR7HM6Gn3yjcPwekW2/xw6CEMmHDu1FRhIMXr8To3PWZq/HWtxzFLiyBxRgOeQ1sWuXVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=jS01waBu; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF82365A00;
+	Thu,  2 Apr 2026 08:29:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.72.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775118584; cv=fail; b=gAxkcDcLfvYD8AsUUri+DLmIrY4np12ihF0sp1rebcRHuG6HAH6Ek2w3W/aBLAvwSjq7Kezu6ofmcgzvI/IoaUKyd4EL13r2tj7o8Lq45V8WZvah1vW+G1CIKsJmt/D4HI/Vn3AJ5UKEt8/UBwfETltTeO9MNFWiLoimhx1hMp0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775118584; c=relaxed/simple;
+	bh=K94OkDjeB6Pn0OKB64NtIlee90tLZIg19z6+AWDZfr4=;
+	h=From:Date:Subject:Content-Type:Message-ID:To:Cc:MIME-Version; b=kWiRvIJDHRhixplqthJWSmspaSbJn3t0rrsoJFMJ3HRyVmPaICzFlEZitv2ZGFJWy6/1BDHHVWJWXnLqKMi4cy18iAUfr+y8o1uDqAl6H1dNWorHTPdcUrH5h66yMr+ZmvOHSdtjo1/Qo5TcMYW66UbSB0Yi24y13l4nKGCnx40=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=I6Ital5G; arc=fail smtp.client-ip=52.103.72.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="jS01waBu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=e8
-	gb4xD/Gnf2SL5F/fg4KivZBoQ1XC2kHvWHucwznag=; b=jS01waBu2qYU7dhEJ+
-	Di9QtLizOEj1Baa2FuHXNHjMjUAeGFUo2odvcO1lBKaS2B/LzCUqUog2MyrDSbXQ
-	4XEH1JMqvnkcS6sADyH6Q/1N/Hx1Yhngi+PTrKZwnQ0E0ulOioYfxinWwq6vMkwz
-	sbN6JtJS0sIC2Y3zLY3mOY0r4=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wD3fwseIc5pOMOXCg--.33327S2;
-	Thu, 02 Apr 2026 15:56:15 +0800 (CST)
-From: zhangchen200426@163.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Zhang Chen <zhangchen01@kylinos.cn>
-Subject: [PATCH] [BlueZ,v1,1/1] avdtp: ignore Discover cmd when host sends before
-Date: Thu,  2 Apr 2026 15:56:10 +0800
-Message-Id: <20260402075610.1724091-1-zhangchen200426@163.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="I6Ital5G"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=L0d7W1aARjVb4jQKULSJwsQaAv/3TT5OmUZiJbsX19EQrQp05BVpIVEGIIdfHAyIH7TF+dUifxPSbU4qJLPDHVwef4Z14HB1wnnfDtN4t1t5+vJH8qNUnDdWi6/O+k16AdMmfoSm/yqD+cVYsvlLhgzf4Wq9GtC24ibZ9oLWnsvY/lRibnrFF1mUdqCRSU1bhjkhtH6fM0KkDRFt0l5+upCqPrtZb4+zkRZ9UkGLUYI7juEDFkJSijeOwQ3YsSqDqi34I6yqjoguHMm2U26emWMWkZzusmlrDsG7SQEv29nJm8TIIbGFzUpxTyCmWqs3VViLv/y9wsSBBGw7qzZi5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LAxiBxvnWBpVRIxL815D7vbgP5AnlVcI2p0D18/Zmyc=;
+ b=IYWF3I8jat+p1SOnggUrcIyN82sikJmf5EsjSrTUp8HLjcuRfz5ToU2zAFxsiTRfzKaSBXX0xeW7Fo583FN1wC2NbidI7mAXtLxGYpTF+ancc81di/RDi8RW9+nm1h/HoT1lEk56ZjCwsOvkl3lF/F3gBrlE7Q8ELCioIAn1aJ7vX0QKIAHJrLi0NFzsRul/1RPnevdeBHmhsWPgPeAFSgetYgia8WH+qIdiPJZFaMXoLO+8R9xlDFaei6ERY0SwUTtnWpwVMwbEH3hV/blxOiB4mfDTavRJOOUR3rYPIbSQQbDrfHcb3ZiqpKat7lE1eQqycb+i7e9F+iw01HCgsw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LAxiBxvnWBpVRIxL815D7vbgP5AnlVcI2p0D18/Zmyc=;
+ b=I6Ital5GhdCUJ4fQ6vk181NA2bojnuSztIHE/tUiKgcytPRbpRwvjyz915aJGCm8Lgatn0xX29HWC3yj1kb378wws+VE6hKquhX1kfdK+YcoPL0P625014x2NSryTGcZnUwPTCB3nZPvDGy55ctOQG8vjHBN+6twUgPZyJW8QXZzJZALNwD+FYnDSFHEBai8KhaKSAChtOeuQQhig/S1RGBHGkgRzm5Pq8EMv3R8HkpbXVSnZwFLMrpWgV2pzR9tYy1dihm5GIGfDOkItlGrna/TWf/0Vn5qxHBdUX0jt3Kb6vYPOfU3shfIOe5Gi0o2AvxO3wy7TFklfp4jW1ZZUQ==
+Received: from SYBPR01MB7881.ausprd01.prod.outlook.com (2603:10c6:10:1b0::5)
+ by SYBPR01MB8364.ausprd01.prod.outlook.com (2603:10c6:10:1a4::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.18; Thu, 2 Apr
+ 2026 08:29:37 +0000
+Received: from SYBPR01MB7881.ausprd01.prod.outlook.com
+ ([fe80::7cd2:d6e8:3fa0:5f0c]) by SYBPR01MB7881.ausprd01.prod.outlook.com
+ ([fe80::7cd2:d6e8:3fa0:5f0c%5]) with mapi id 15.20.9769.017; Thu, 2 Apr 2026
+ 08:29:37 +0000
+From: Junrui Luo <moonafterrain@outlook.com>
+Date: Thu, 02 Apr 2026 16:28:28 +0800
+Subject: [PATCH v2] Bluetooth: btintel_pcie: validate RX packet length
+ against buffer size
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID:
+ <SYBPR01MB78812A5517C2CED45F5BD315AF51A@SYBPR01MB7881.ausprd01.prod.outlook.com>
+X-B4-Tracking: v=1; b=H4sIAKsozmkC/x3KQQqAIBBA0avIrBN0iGS6SrSIGms2Fg5IIN49a
+ fn4v4JyFlaYTYXMRVTu1OEHA/u1pZOtHN2ADic3OrRRXlZLgThgYKLoob9P5j/0dYGCsLb2AVn
+ BlB9bAAAA
+X-Change-ID: 20260402-fixes-979e727e99f1
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Kiran K <kiran.k@intel.com>, 
+ Tedd Ho-Jeong An <tedd.an@intel.com>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Yuhao Jiang <danisjiang@gmail.com>, stable@vger.kernel.org, 
+ Paul Menzel <pmenzel@molgen.mpg.de>, Junrui Luo <moonafterrain@outlook.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1842;
+ i=moonafterrain@outlook.com; h=from:subject:message-id;
+ bh=K94OkDjeB6Pn0OKB64NtIlee90tLZIg19z6+AWDZfr4=;
+ b=owJ4nJvAy8zAJVb4wiKgu++DA+NptSSGzHMaq2P6KtljxLTDF0yYcOvCBCcXXkHznOBA5hCxS
+ 7KT/N1+l3aUsjCIcTHIiimyHC+49M3Cd4vuFp8tyTBzWJlAhjBwcQrARFweMTLM+iCbrNYzXVfP
+ euu/q1efO4pv7fvKIJmvHb7VZs8Fkzu6jAw/nv1qS7U7wFmnsag29c2sL2Wqca0n/x/zmdnOJ1F
+ Vc4sVAPTkSIY=
+X-Developer-Key: i=moonafterrain@outlook.com; a=openpgp;
+ fpr=C770D2F6384DB42DB44CB46371E838508B8EF040
+X-ClientProxiedBy: TY4P286CA0004.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:405:26d::12) To SYBPR01MB7881.ausprd01.prod.outlook.com
+ (2603:10c6:10:1b0::5)
+X-Microsoft-Original-Message-ID:
+ <20260402-fixes-v1-1-27ea5d9666dc@outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3fwseIc5pOMOXCg--.33327S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxuFWktw4xJrWkCw4DGF1kGrg_yoW7tr4UpF
-	yjqFs7WFyxXws3AFWxZrZ7uF4UXFZYqrZ5Xr13Z34Y9rs3uw18Jr9Yya4UK343Kr4rZw4j
-	va1UtF9Yqr95Cr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Um1v-UUUUU=
-X-CM-SenderInfo: x2kd0whfkh0jaqqujli6rwjhhfrp/xtbC5x9d+WnOIR9JJQAA3p
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SYBPR01MB7881:EE_|SYBPR01MB8364:EE_
+X-MS-Office365-Filtering-Correlation-Id: 17f839f8-b6c7-40c6-93ec-08de9091f907
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|15080799012|461199028|23021999003|19110799012|5062599005|6090799003|8060799015|5072599009|51005399006|22091999003|12121999013|24121999003|10035399007|440099028|4302099013|3412199025|26121999003|1602099012|40105399003|1710799026;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bHFJZ2VBTFdWS0czL096ZnY5RmZDNU1EaUo5b3BhRWRFZFdCR0pVRjkxcHEy?=
+ =?utf-8?B?RjNkVmZHckJWMnZqQXhWZTZ6SEJTRnRpTEdGNXJWWHRkUEJmeTFBb0hZRHNS?=
+ =?utf-8?B?WElCMFRKb1pYL0NIemZEVEVNL3lreEUyRGZvSkJjWkFXTWltS0NHcHI5V25z?=
+ =?utf-8?B?Z1o4Y2FnNTNRTjFGd2o4Z0FYbm9pMnIzZE5MRjZ2YzJFSnRoV2xUYWdnazBh?=
+ =?utf-8?B?dVdkNitBVVBhNWNiNzc1NFFtU2k1cGswZno2ZzJ4S25xZTVxMGNoZ2ZUb0o0?=
+ =?utf-8?B?SllyYlNHUTlKSHNFQmhaQzM1ekRTUVVUMHdMQWVWd1VvL3ZHS2VGTlVvTXhW?=
+ =?utf-8?B?YmZKOERJakEvSTFtTEZhdExnM2JzdFRia3BZUVJoUWw2WDd0aG5UNjF6eU1l?=
+ =?utf-8?B?aEZ3eVRTVlZOaFR5UW1pZEtUZmF2ZVh6bGRTZ1NHZXVoc3JaWEJEWTJyOEp2?=
+ =?utf-8?B?MUh6a0toaC9KVXBtWWRrRUFxN0xlM2NJU2xVZFc1SHFOdk81VEswREN6L0Fh?=
+ =?utf-8?B?cFlYMFEyU05XcVNFMGtPdFQrQVFCWGk1YmJ0NlI2UjEybzVod3JzNjRXekY1?=
+ =?utf-8?B?Uk9HWWVQZmRaZCtjVnQ5Tno1RFF4YUFwcVBOVXdORlpYN1FrSnVZUTI1dEtq?=
+ =?utf-8?B?c3MvNFRPREtCKzRwUGtiZ0FiTUdPaXJmRUdCbmt0Q012MXlaeU9sNU4rdXFh?=
+ =?utf-8?B?M3psaC9HSEtpbXRpaHN3NVB6NnFiUlErTHBjNC9FUTYzR2dacE5odzBmbzcz?=
+ =?utf-8?B?OEpVTmVzTHd2VCtnblc1Nmw1anlDb2dVTzVTelE4VzVWWndTWGFmTHQ1UGlZ?=
+ =?utf-8?B?OWdtREF2c3VuVDBsTjBjYWJzV3AwTDczZFRCQkZ5SFNxaGhKRm8zenRyS2pm?=
+ =?utf-8?B?VEhvdFNQeC9qOFhiS2RWcWdtVk93cGdLYnpqbDlDM3pQM3UwMkpqaXRsb0lR?=
+ =?utf-8?B?U0h5blpWdk5jUDdUSTlrMHY1TGJNaFQ0OHRRSVM0TllXMUJPeVpaOG5lTjht?=
+ =?utf-8?B?aVhGOEUwVmFHdHVqMy9seEZlQjNHdDFsN0hPSjRZZWpDeE9qMFNuTjlaTldn?=
+ =?utf-8?B?UTNWZjgvcGUrVWFUcFdJNmxrS2pBQW1KeDBtMlBZV0NNSzY4SkNOc0xMcURG?=
+ =?utf-8?B?WjNZcVZlWXdQeTV0dFp5bWN1MU11dytVYzZQTGswMG5IMzdaU2NiVWtINk5Z?=
+ =?utf-8?B?YVpjMEVHRnQ5ZERWUHlzMndqZ0lxdGJ1YTdpOFFtQnRHblE5R3cvcDdTZ0Nw?=
+ =?utf-8?B?Wm5Ub3JEdGVya0xBSVpkZVNpdkE5ZkhOSEplaFQ4N1ZIK0IyRUFFZFZnVGRD?=
+ =?utf-8?B?dkEwblBjNittSXZ0amo4akMwTzdvb1kycVRhMmtQN1MvU245SlhPd2VyeFRa?=
+ =?utf-8?B?UlpVNDZQV0tBK3E3ZXdTY25qMnZLby9rZkxkd25pZ1dlS3VjRndJWXlUclJH?=
+ =?utf-8?B?M2twNHpsYTNGdWxjakNPYSt4UzhSbE1Jb1RjeVpEVHl6bWdBRTRZQlBycFdS?=
+ =?utf-8?B?TXFkRVZRTWFTSldVUFVpME90SjBPTVJYMEprZFZ5Q0FWMkRSYkN3RjhZUy96?=
+ =?utf-8?B?NG92aHVQbW1EUDZMRU4yN3BlTGhXKzEwOUZTN2ZpR3hQUGFEOUw5U1hobVdm?=
+ =?utf-8?B?M05zRDFZWHNobFYycTZqZ3h5aUlqRUc0TU55enNyRHdwVUFtZlozVDNXdmhW?=
+ =?utf-8?Q?ZKMQ/NErL42jbmmJPGJa?=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VDVXdTZmNFdMcG42ajI4ZDljZFpMUy85ZXloUEMxYUluZTM1Q2JzNnIvdXhq?=
+ =?utf-8?B?TnRzUFE5OWR6SmFkalYvUEhyVjRiVkJvT016dmRwY1pqVGFXUHA0VThHUmp3?=
+ =?utf-8?B?UWZTeW9UTGtqTXVLYWJ3NDRSd2pZbmJZWWJ1SjhacFBrK2pSSG1QUVBQUUpX?=
+ =?utf-8?B?K3BDN25oRVo2b0NFRmlVK3RYWVNhY3hRYUIxR3I1YUxVVXJhZWU2OEhmNDEx?=
+ =?utf-8?B?L0lkUVVEeFhCaWUvaUgzTUFDWmlWUm5seVdmMWtTdXRuRytFTGJESzNvL2VM?=
+ =?utf-8?B?WGozUVZUT21ocWVORDV1eXVETzl3d1VjOU5sVlYvVjlFVzErTDRuQm9lSE9T?=
+ =?utf-8?B?OGI0K0ZESXIvM1hJN0V3TllFby8rQ2ZXdFFWSzVjMFhTMnFyNWpXcjl5N2li?=
+ =?utf-8?B?SkRlblRPcTVDcHk4S1F5SnVISGM3ZmFBQXd4L3p1blVkV0dCMnJSQWg3bGVh?=
+ =?utf-8?B?MUdDb09QaTN0QktPK014TDgyWTMyaU1ZZno2eHdWaVE5V0ZmVG11KzZyRzJj?=
+ =?utf-8?B?WVBnRHY4ZkNOZVZ6cUUyNXV5SUwxbTh4WVNEMml4cEFnZXRqai9lZHV2YjhK?=
+ =?utf-8?B?alI3Umd2Rzd6b2lRNXJTd21DS29qVEJNRzV1MkYva1BiQkswM3VGMzZ2WUxV?=
+ =?utf-8?B?VlVyM0RCOWtuajZjdFVTclp0Umxtc3ZCSkhENlhmNW1ZS2hBcFAzb05PS2FB?=
+ =?utf-8?B?TktkVXhFOTBOMngwa2g0cFMzRWpLWERqSFlETXJnRlpNR2dwcWtKTTFZSFlF?=
+ =?utf-8?B?VE4yclRTajFDbWNWenRFTTM2Zi9XY0tJUG85TUg1TUR6S0tDOWFuS0RUQ0Zj?=
+ =?utf-8?B?QlBKNmpiZW9yZS9zOGpEYU9GdWlDalFVR0lMV0lmSlRyTXJKNjJld0NBVkdV?=
+ =?utf-8?B?TCtNM1pib3NFRTEzQ2ZpUWxBSE9EKy9ONkx2cXJMWXJ6a2tkU3ZJRTZiZnRr?=
+ =?utf-8?B?OXNoNGYzalNoSlBtUERhRUtGRzZMT2YzR3BCakZlWkVHd09Jbi93dU5jOW9n?=
+ =?utf-8?B?UklSQUU4Rm1MVloycW5ZV3c1SlJpQkhuTkp4SGtHcWNKcSs0YktRYlBBVkc3?=
+ =?utf-8?B?Qy82V1FTTlphZjNtQzNIYTVodFp5Rm4vbWpRUHFXQVNmMnlwNno0TTJJaFBE?=
+ =?utf-8?B?M1gzOU9LZkExUTltenVveHZRT1JuYU1LVXNkb2x2ckZ2Wjg5NmpmbU9JTi9Q?=
+ =?utf-8?B?YzZKbUcwTFZIbUxPcW80M09Ib05SU2dRTmtOWEs2bTBIa2VHUStqZDFYN1ND?=
+ =?utf-8?B?K0x6a045TUZQRks3MlluVGhxSlRzVU5iT2lYb0dUcU1jTDZlMThtSHNJeGN4?=
+ =?utf-8?B?OHlsaEpYMUQwVm1tc1J5Lzk3RzJmUlI2Z09CWTVodXY1dzlMZkxtNC9EWEEx?=
+ =?utf-8?B?ekc2aWU0dmtndGJKWG1acmR3TW5CWiszeWFyM2dVTk9hNk5udTZQL1RRZkdl?=
+ =?utf-8?B?RkZRVXI3NEpkSFl0RmhjZTVaaWpEY3YvZVVlZUY3L0dyMUVubFFuK0NGMEdW?=
+ =?utf-8?B?bHpyRU1ldTlTWDdmdkgyQjRVbGoxREFuQXh6U3c4bkdQZWlTV202eFdLNDJj?=
+ =?utf-8?B?N2F2aitPU2hSTENoZHhpSzlmcW5HbFpwL01XU2VpeGROUmw4T1dFa2ZFVWla?=
+ =?utf-8?B?SENXRE4xczlmQ0dRTEpOa2EzUVRlNCtGMVBvM3lhVDY4WE5vV3lPS0xwakFG?=
+ =?utf-8?B?cC9KNUFLcG1qbnRobUVYTDVNWktvdTB0Wi9yRlhDU1M2Q0RpcVd4K3lQSWlB?=
+ =?utf-8?B?M254ZkkrTXFhVkdlekZndGdrMW0rcklpSXp2T2REd3dVdjFhaTBsNDNlcE5K?=
+ =?utf-8?B?cUs4VnVnK3lGcENnYmZWMjB3R2pEWU9UL1NIUUtRVVZTYk5vTnpCc0puMlpH?=
+ =?utf-8?B?RHd2SXptZ08rNFMrZHVBdXZtU0x1a0RGLzNGTTlpT0xnZEE9PQ==?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 17f839f8-b6c7-40c6-93ec-08de9091f907
+X-MS-Exchange-CrossTenant-AuthSource: SYBPR01MB7881.ausprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2026 08:29:36.9872
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SYBPR01MB8364
 
-From: Zhang Chen <zhangchen01@kylinos.cn>
+btintel_pcie_submit_rx_work() reads packet_len from an rfh_hdr in
+DMA-coherent memory and uses it as the length for skb_put_data() without
+upper bound validation. Since packet_len is a 16-bit field (0-65535) but
+each RX DMA buffer is only BTINTEL_PCIE_BUFFER_SIZE (4096) bytes, a
+malicious or malfunctioning firmware could set a large packet_len,
+causing an out-of-bounds read beyond the buffer into adjacent kernel
+heap memory.
 
-Theoretically, the party that initiates the connection should send the DISCOVER
-command. However, some devices, even though they are the connected party, still
-send the DISCOVER command. In such cases, there is a probability of connection
-failure.
+Add a check that packet_len does not exceed the available payload space
+alongside the existing zero-length check.
 
-Fails:
-
-< ACL Data TX: Handle 10 flags 0x00 dlen 6
-      Channel: 71 len 2 [PSM 25 mode Basic (0x00)] {chan 1}
-      AVDTP: Discover (0x01) Command (0x00) type 0x00 label 4 nosp 0
-> ACL Data RX: Handle 10 flags 0x02 dlen 8
-      Channel: 64 len 4 [PSM 25 mode Basic (0x00)] {chan 1}
-      AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 4 nosp 0
-        ACP SEID: 1
-          Media Type: Audio (0x00)
-          SEP Type: SRC (0x00)
-          In use: No
-< ACL Data TX: Handle 10 flags 0x00 dlen 18
-      Channel: 71 len 14 [PSM 25 mode Basic (0x00)] {chan 1}
-      AVDTP: Set Configuration (0x03) Command (0x00) type 0x00 label 5 nosp 0
-        ACP SEID: 1
-        INT SEID: 37
-        Service Category: Media Transport (0x01)
-        Service Category: Media Codec (0x07)
-          Media Type: Audio (0x00)
-          Media Codec: SBC (0x00)
-            Frequency: 44100 (0x20)
-            Channel Mode: Joint Stereo (0x01)
-            Block Length: 16 (0x10)
-            Subbands: 8 (0x04)
-            Allocation Method: Loudness (0x01)
-            Minimum Bitpool: 2
-            Maximum Bitpool: 53
-> ACL Data RX: Handle 10 flags 0x02 dlen 6
-      Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 1}
-      AVDTP: Set Configuration (0x03) Response Accept (0x02) type 0x00 label 5 >
-> ACL Data RX: Handle 10 flags 0x02 dlen 6
-      Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 1}
-      AVDTP: Discover (0x01) Command (0x00) type 0x00 label 0 nosp 0
-< ACL Data TX: Handle 10 flags 0x00 dlen 10
-      Channel: 71 len 6 [PSM 25 mode Basic (0x00)] {chan 1}
-      AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 0 nosp 0
-        ACP SEID: 25
-          Media Type: Audio (0x00)
-          SEP Type: SNK (0x01)
-          In use: No
-        ACP SEID: 38
-          Media Type: Audio (0x00)
-          SEP Type: SRC (0x00)
-          In use: No
-< ACL Data TX: Handle 10 flags 0x00 dlen 7
-      Channel: 71 len 3 [PSM 25 mode Basic (0x00)] {chan 1}
-      AVDTP: Open (0x06) Command (0x00) type 0x00 label 6 nosp 0
-        ACP SEID: 1
-> ACL Data RX: Handle 10 flags 0x02 dlen 6
-      Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 1}
-      AVDTP: Open (0x06) Response Accept (0x02) type 0x00 label 6 nosp 0
-< ACL Data TX: Handle 10 flags 0x00 dlen 12
-      L2CAP: Connection Request (0x02) ident 5 len 4
-        PSM: 25 (0x0019)
-        Source CID: 65
-> ACL Data RX: Handle 10 flags 0x02 dlen 12
-      L2CAP: Disconnection Request (0x06) ident 5 len 4
-        Destination CID: 64
-        Source CID: 71
-< ACL Data TX: Handle 10 flags 0x00 dlen 12
-      L2CAP: Disconnection Response (0x07) ident 5 len 4
-        Destination CID: 64
-        Source CID: 71
-> ACL Data RX: Handle 10 flags 0x02 dlen 16
-      L2CAP: Connection Response (0x03) ident 5 len 8
-        Destination CID: 127
-        Source CID: 65
-        Result: Connection refused - PSM not supported (0x0002)
-        Status: No further information available (0x0000)
-
-Works:
-
-< ACL Data TX: Handle 12 flags 0x00 dlen 6
-      Channel: 77 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
-      AVDTP: Discover (0x01) Command (0x00) type 0x00 label 11 nosp 0
-> ACL Data RX: Handle 12 flags 0x02 dlen 8
-      Channel: 64 len 4 [PSM 25 mode Basic (0x00)] {chan 0}
-      AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 11 nosp 0
-        ACP SEID: 1
-          Media Type: Audio (0x00)
-          SEP Type: SRC (0x00)
-          In use: No
-< ACL Data TX: Handle 12 flags 0x00 dlen 18
-      Channel: 77 len 14 [PSM 25 mode Basic (0x00)] {chan 0}
-      AVDTP: Set Configuration (0x03) Command (0x00) type 0x00 label 12 nosp 0
-        ACP SEID: 1
-        INT SEID: 13
-        Service Category: Media Transport (0x01)
-        Service Category: Media Codec (0x07)
-          Media Type: Audio (0x00)
-          Media Codec: SBC (0x00)
-            Frequency: 44100 (0x20)
-            Channel Mode: Joint Stereo (0x01)
-            Block Length: 16 (0x10)
-            Subbands: 8 (0x04)
-            Allocation Method: Loudness (0x01)
-            Minimum Bitpool: 2
-            Maximum Bitpool: 53
-> ACL Data RX: Handle 12 flags 0x02 dlen 6
-      Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
-      AVDTP: Set Configuration (0x03) Response Accept (0x02) type 0x00 label 12>
-> ACL Data RX: Handle 12 flags 0x02 dlen 6
-      Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
-      AVDTP: Discover (0x01) Command (0x00) type 0x00 label 0 nosp 0
-< ACL Data TX: Handle 12 flags 0x00 dlen 7
-      Channel: 77 len 3 [PSM 25 mode Basic (0x00)] {chan 0}
-      AVDTP: Open (0x06) Command (0x00) type 0x00 label 13 nosp 0
-        ACP SEID: 1
-> HCI Event: Number of Completed... (0x13) plen 5
-        Num handles: 1
-        Handle: 12
-        Count: 1
-> ACL Data RX: Handle 12 flags 0x02 dlen 6
-      Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
-      AVDTP: Open (0x06) Response Accept (0x02) type 0x00 label 13 nosp 0
-
-Signed-off-by: Zhang Chen <zhangchen01@kylinos.cn>
+Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
+Reported-by: Yuhao Jiang <danisjiang@gmail.com>
+Cc: stable@vger.kernel.org
+Cc: Paul Menzel <pmenzel@molgen.mpg.de>
+Signed-off-by: Junrui Luo <moonafterrain@outlook.com>
 ---
- profiles/audio/avdtp.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+Changes in v2:
+- Add bt_dev_warn() to log error suggested by Paul Menzel
+- Link to v1: https://lore.kernel.org/all/SYBPR01MB7881DD95CE054BC53AED4A21AF41A@SYBPR01MB7881.ausprd01.prod.outlook.com/
+---
+ drivers/bluetooth/btintel_pcie.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index d475a545e..243c828bf 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -413,6 +413,8 @@ struct avdtp {
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 37b744e35bc4..e60487e73749 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -1360,7 +1360,9 @@ static int btintel_pcie_submit_rx_work(struct btintel_pcie_data *data, u8 status
+ 	rfh_hdr = buf;
  
- 	/* Attempt stream setup instead of disconnecting */
- 	gboolean stream_setup;
-+
-+	gboolean discover_start;
- };
- 
- static GSList *state_callbacks = NULL;
-@@ -1418,6 +1420,11 @@ static gboolean avdtp_discover_cmd(struct avdtp *session, uint8_t transaction,
- 	struct seid_info *seps, *p;
- 	gboolean ret;
- 
-+	if (session->discover_start) {
-+		DBG("DISCOVER_CMD has been sent before.");
-+		return TRUE;
-+	}
-+
- 	sep_count = queue_length(session->lseps);
- 
- 	if (sep_count == 0) {
-@@ -2496,6 +2503,8 @@ struct avdtp *avdtp_new(GIOChannel *chan, struct btd_device *device,
- 	 * with respect to the disconnect timer */
- 	session->stream_setup = TRUE;
- 
-+	session->discover_start = FALSE;
-+
- 	session->dc_timeout = DISCONNECT_TIMEOUT;
- 
- 	avdtp_connect_cb(chan, NULL, session);
-@@ -3484,6 +3493,7 @@ int avdtp_discover(struct avdtp *session, avdtp_discover_cb_t cb,
- 	if (err == 0) {
- 		session->discover->cb = cb;
- 		session->discover->user_data = user_data;
-+		session->discover_start = TRUE;
- 	} else if (session->discover) {
- 		g_free(session->discover);
- 		session->discover = NULL;
+ 	len = rfh_hdr->packet_len;
+-	if (len <= 0) {
++	if (len <= 0 ||
++	    len > BTINTEL_PCIE_BUFFER_SIZE - sizeof(*rfh_hdr)) {
++		bt_dev_warn(data->hdev, "Invalid RX packet length: %d", len);
+ 		ret = -EINVAL;
+ 		goto resubmit;
+ 	}
+
+---
+base-commit: 7aaa8047eafd0bd628065b15757d9b48c5f9c07d
+change-id: 20260402-fixes-979e727e99f1
+
+Best regards,
 -- 
-2.25.1
+Junrui Luo <moonafterrain@outlook.com>
 
