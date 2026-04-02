@@ -1,146 +1,128 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725B41096F
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2026 18:47:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABCE9361DA8
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2026 18:53:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775155669; cv=none; b=bUCdExTJRnBUI1fkxneBelmRTrmt/P1zYhKctZ5tY13Yplgfj5htadME+L/tHA0gpuFftEVoNKuoAEEda0rKL8E1h0D9Vzs7jVbf4pNsfS0kfJz81ZXrWPhcg8Miz0TlbMZGZSmaFWn3s+lItrK4RUQNXc9ZvQVLvU8W2h33tck=
+	t=1775156023; cv=none; b=bvM6sTEdEoGytDV4mdaTsLyFjIbl6C4IaIctj3o5LRyg4iZa780GR6oA2Y1PuYUhclcKhCFQ4oavCtEuQ0fpxFDJDxbAl6iAYMVmZPm7wD9+L4ZOV0SnE4J83WYMhiYC4XjKp+TpPB2UKRumL7EiuF/ZwaL1EMi2YD57vahkICw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775155669; c=relaxed/simple;
-	bh=+NP8AtkPelglsgG9lKiUIkf3uGAVg5HfsX8OqOth+nE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RD0Wx5OCx3aZKL62YiDz5epcZk6t/AEfT12PNTBMTsBZLZBaBIDRXg9qt6K0L+C0GV43ai6s84ic5bTFoGTIwVOVJ2BAEwWw0o701ss8dVV0HUlyaclxQKJ8vzy93MX8QVcR5+u6/GPbK9IuLHvAWRZ1AEW53VoJ+rCvNCdR8T4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rx2qC9qb; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1775156023; c=relaxed/simple;
+	bh=6DSHuW+gs/1A2FmOqUILCYN9Sy+t19j2FifD7IyQ9Ng=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=YZUrRZ0h2VQwmd0Ap3ZLPl0caiYdBddvpWP72EQakLvWp6dfKTqlXlQE3Pjn1dqIncgjPrMAHfgMCx88Q1EG4Xir3NwH5b0Mz9wcOkXLgwxf8lWCngGse9Vq8tk1TqeApNIyPeEteuT5HoNGPCJqkCSY8Y2Yg3ukG6pF7lXGZvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FWuv7evG; arc=none smtp.client-ip=209.85.222.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rx2qC9qb"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4888244e9f9so11046145e9.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Apr 2026 11:47:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FWuv7evG"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-8cd8a189f44so119159485a.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Apr 2026 11:53:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775155667; x=1775760467; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d9Tn4lW/TMZkLp3AuUAwTlmXi/dcr0iOq7DY8TGFLb4=;
-        b=Rx2qC9qboG6sGUFfcv+DWdDHoDdz2tJnRoC6UiXktzkWUIP3ZGPjtk2qfdo2Ig4bff
-         Fufe1wOALogsvq9terOy0rjhHpEbfGRbDcChHxs5ghlHQpX0m/62rNQ3JkjJgYa/6ZQ1
-         HYxm1JSLFhLIQW5Jcw0m7xEPhJhAek1Shz/9FXcT5HiKGgvS9LH3hzwmlOy5RO/5JCNv
-         5/wBCKQrlJpsRYkxSV2KqsknXwc5aROm6HPihwNeu/uT9RB8ZR7BSceJcFgcN/LTN2eZ
-         y2erqEPN3rhl11p7yuZMyOkJvWMvlZE9oWVUdhti9r7KAD2rXw5i6BmSjGGJ5uB+BkR9
-         8pug==
+        d=gmail.com; s=20251104; t=1775156020; x=1775760820; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=+6KnPNFyQ+Ami5PrcBzt4NaOLrU1eHBWbXVA5ph0ghg=;
+        b=FWuv7evGxW1am89ub4OkrYirRgHQ0HTlHZhablRclJyEybAdbAafp+bdN5AmyfKXL8
+         tFhh0hlJaZgMnxcK9q/xwmEpMCm+DTavX/wLhI02Ff/hUcxt34MWGt3Qo1z7ROCM6kzw
+         OfP/zqkCwHYQSLdqfy/butsCfxPQ7vprAWaY9IdmBx8mowrytNozsGc6Unm+N0kN5bM8
+         wHh8r6gdZv5ahyCV/VBwoDFO8ctV0kYmShqc5AClkPOeLd0DjEhNOcZSArXr3Cjnp2Y2
+         0reVWRe2jK79Kq9zeWGJ9/heIslpbJlhIT8BFv8deDQQMWiAcb2E88hxBXjEhJpnFx86
+         jiaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775155667; x=1775760467;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=d9Tn4lW/TMZkLp3AuUAwTlmXi/dcr0iOq7DY8TGFLb4=;
-        b=RkT5xskWAfW51UCLEOV+cXGZOQGeRvfwxRIxqc6HOxy3QZAhO5wQ+U+3uRaWO5dSDA
-         jU9qoXoMe4eaI2JrfKRchApIa+dLa0jlv/NFlHVzzudnzopje4iaFuUV1UvBCvYhgiWe
-         iLq6ww5VLzxIAvsqatWbTWOcSlCKbNlqOs3ssDj27D3EI0YwRixn0M8IvDtFqBYEGcrP
-         aN288UHhXrJXQcOrN9FAid938dknScTdyzsNZu62mpnurACoAMxuHuorQm5vbIS1Y4gm
-         AxeVdzZ6kBg149OJVzBm08ZwKtTizw/4XJ1nxw31lPyxbafdfYpcAUZrl86er00Pt/RG
-         0T6A==
-X-Forwarded-Encrypted: i=1; AJvYcCXhxcuTZnfw4RQPwukf/P7EihtrgP5gZ0tmZVH0vL4REHNkYWYeDllC5YjxOib9ND76Xx+B38n0dY9t3LJtLrw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWpc2BbzPJ2RTqKSXQTkAmzrbhzs9fCzUQRgnvVZDLNIbe9IAM
-	3kxr0klSNzLdJIvk+SUSa7p1Aip/IC0GS9xIQGxMcEtZWzc2yB8ZyTWv
-X-Gm-Gg: ATEYQzw7KFoqTAwb9sypmM8qb2mxBdKtH3LqHpOqHH0wN9rVa0A6KFOskleqJDzZKw6
-	wdlnGylOkRKe+bHXQdObSCRpeqLsLlOCgucDJ925M8z4R8VGMao7iTW2Ka0jlRc+P6Uz/O9CAps
-	cKloAuaa556STBMZIpc326ZP2Qklda8ylCvz7IE/gEqckrJdRRi0PdhkUfeP3WxL8ZTdKBMfjG8
-	4IVlA/QYaD7bqrdB+CfVtEfwRLd8U2n3EkHVVX1Ptm0ImCTlt9KUwoKmkhfmALHDspCCC7+W3GC
-	JNzl2iZ2vlYVmuVRFhjTeRnVX+1dbIGZ9V5ST+GzKbp2n4799qXuHeJcGNYgpxc0ZQDlS5Q2RzT
-	MIXrW2NCmmEYapbytez5TegZUquT1muAm65v6KXcdUw23mF4YXP07EICYOYaB7qhgHoA2NuYfKL
-	R1xX6K9SRKJv/mFQP3hPY0kT24nDJVn4bTVGc5F3ICOd5m6qp1CVzKzfCAglxfpRjTX7xwszOhw
-	ZIertdoGfKWfr/iHmCD4c87H97rbwrgO1KzHw==
-X-Received: by 2002:a05:600c:8b06:b0:486:fdca:ea8d with SMTP id 5b1f17b1804b1-488997b7b3cmr1625495e9.25.1775155666638;
-        Thu, 02 Apr 2026 11:47:46 -0700 (PDT)
-Received: from Lord-Beerus.station (net-93-144-20-233.cust.vodafonedsl.it. [93.144.20.233])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488983db4fbsm2153705e9.13.2026.04.02.11.47.44
+        d=1e100.net; s=20251104; t=1775156020; x=1775760820;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+6KnPNFyQ+Ami5PrcBzt4NaOLrU1eHBWbXVA5ph0ghg=;
+        b=SlOB+DSr7QRY3bL0+GGNQq0Olv2PnGh9ZMuxb52J6Uzg3A7wdF2lrJbZYQGPqaRGWj
+         sG0zJXFxuDo7w/2HXRvIJee8+BNMkW7D8aQwMwpUc/uCfKUtIEsirqLZRjrJ2JNUmsoE
+         hmypMvQNdZ62+0c1shzOfpnvQZCBFmM7nOOGQ7M09vWhze7R5hsEmhT6R1pUc9SGQQdW
+         ztc5VIniK3MXr8PifA8D0TlyaLmAZ7twz3Dv4x6B3l9MVg+qtsEgFfKBJn3japcudjsm
+         AUETjtQzUHFbDkS7k98YDeCqNu88IcNyxcxETxILSmktiFPfhDmQwJNO/7G6MWyoW+U9
+         R7tA==
+X-Gm-Message-State: AOJu0YyD90bYmr2Lq/WnE3bul8xEhbkub47qOcyUtfIoooSySkXE9RH6
+	iWRDiNYyBkY5ojmf7vMhS3V54rPJ5s8VZC+num1lZsIaRWdiBiz6tLpdktrFRw==
+X-Gm-Gg: ATEYQzy83dTDZO1/WcYh0/K+QLPVQC15kPqGtvF/FFqtyGBCrioPelONbWMg9urXhtb
+	Rr0gTcO54rZCCE45PtiBJTH7uJGDWJbxmiUT9hYAF1bIfV3PZH18OmyZWg2kzinAwBOZC+7A299
+	zgpTN3aJrAzuLF0FtkYbpYvixE6RoY1gz1nHwcVQekr6txI2ZhWXHuCL+CSnnRvMAcbAgxo4n8s
+	y8EgJWo1TZ80U6oDoXDiGNh+4zzZP4KcZIjdr5oMk1JXj12na6GPE+gsT0YFqEYhnrYD8EIpDIL
+	4rMU+01Z8GFT6F+x5psXzBMziCrt/S5dqm/m2+kvwePrAoRs4BlJr5bo+E6Ak+PIt00pjhJpouS
+	XgsoL6uUmrW2jzr65EmPD1O1231KvAg8XJpHOpOTg1eiXLg8ymYzLv3fL4xr4MXM8InDgRb6DbI
+	/u/s4M6LBAIpdf6wdYINRXT600FeA/GvB4
+X-Received: by 2002:a05:620a:f03:b0:8cf:eb1c:57c4 with SMTP id af79cd13be357-8d41db4d3eemr61456585a.45.1775156020222;
+        Thu, 02 Apr 2026 11:53:40 -0700 (PDT)
+Received: from [172.17.0.2] ([172.203.212.192])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8d2a8648c17sm277931885a.33.2026.04.02.11.53.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2026 11:47:45 -0700 (PDT)
-From: Stefano Radaelli <stefano.radaelli21@gmail.com>
-X-Google-Original-From: Stefano Radaelli <stefano.r@variscite.com>
-To: linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Cc: pierluigi.p@variscite.com,
-	Stefano Radaelli <stefano.r@variscite.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH v2 1/1] Bluetooth: hci_ll: Enable BROKEN_ENHANCED_SETUP_SYNC_CONN for WL183x
-Date: Thu,  2 Apr 2026 20:47:03 +0200
-Message-ID: <36a2c4c75e557527d101897b649f9de8d2180fb6.1771930508.git.stefano.r@variscite.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <cover.1771930508.git.stefano.r@variscite.com>
-References: <cover.1771930508.git.stefano.r@variscite.com>
+        Thu, 02 Apr 2026 11:53:39 -0700 (PDT)
+Message-ID: <69cebb33.050a0220.9ee57.04fc@mx.google.com>
+Date: Thu, 02 Apr 2026 11:53:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7781375751446865317=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Message-ID: <20260402184703.oZ7dxFSSHiS67vmeMGdsoOIG_rMikE0fgSOtsOE0kJc@z>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [RFC,BlueZ,1/3] doc/btmon: Add Channel Sounding protocol flow documentation
+In-Reply-To: <20260402175624.2442647-1-luiz.dentz@gmail.com>
+References: <20260402175624.2442647-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Stefano Radaelli <stefano.r@variscite.com>
+--===============7781375751446865317==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-TI WL183x controllers advertise support for the HCI Enhanced Setup
-Synchronous Connection command, but SCO setup fails when the enhanced
-path is used. The only working configuration is to fall back to the
-legacy HCI Setup Synchronous Connection (0x0028).
+This is automated email and please do not reply to this email!
 
-This matches the scenario described in commit 05abad857277
-("Bluetooth: HCI: Add HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk").
+Dear submitter,
 
-Enable HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN automatically for
-devices compatible with:
-  - ti,wl1831-st
-  - ti,wl1835-st
-  - ti,wl1837-st
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1076592
 
-Signed-off-by: Stefano Radaelli <stefano.r@variscite.com>
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.30 seconds
+GitLint                       PENDING   0.31 seconds
+BuildEll                      PASS      20.15 seconds
+BluezMake                     PASS      660.36 seconds
+MakeCheck                     PASS      18.26 seconds
+MakeDistcheck                 PASS      244.89 seconds
+CheckValgrind                 PASS      291.88 seconds
+CheckSmatch                   PASS      349.42 seconds
+bluezmakeextell               PASS      181.27 seconds
+IncrementalBuild              PENDING   0.32 seconds
+ScanBuild                     PASS      1021.29 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+https://github.com/bluez/bluez/pull/2005/checks
+
 ---
-v1->v2:
- - 
+Regards,
+Linux Bluetooth
 
- drivers/bluetooth/hci_ll.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index 91acf24f1ef5..6f060eec3b81 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -68,6 +68,7 @@ struct ll_device {
- 	struct gpio_desc *enable_gpio;
- 	struct clk *ext_clk;
- 	bdaddr_t bdaddr;
-+	bool broken_enhanced_setup;
- };
- 
- struct ll_struct {
-@@ -656,6 +657,10 @@ static int ll_setup(struct hci_uart *hu)
- 			hci_set_quirk(hu->hdev, HCI_QUIRK_INVALID_BDADDR);
- 	}
- 
-+	if (lldev->broken_enhanced_setup)
-+		hci_set_quirk(hu->hdev,
-+			      HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN);
-+
- 	/* Operational speed if any */
- 	if (hu->oper_speed)
- 		speed = hu->oper_speed;
-@@ -710,6 +715,11 @@ static int hci_ti_probe(struct serdev_device *serdev)
- 	of_property_read_u32(serdev->dev.of_node, "max-speed", &max_speed);
- 	hci_uart_set_speeds(hu, 115200, max_speed);
- 
-+	if (of_device_is_compatible(serdev->dev.of_node, "ti,wl1831-st") ||
-+	    of_device_is_compatible(serdev->dev.of_node, "ti,wl1835-st") ||
-+	    of_device_is_compatible(serdev->dev.of_node, "ti,wl1837-st"))
-+		lldev->broken_enhanced_setup = true;
-+
- 	/* optional BD address from nvram */
- 	bdaddr_cell = nvmem_cell_get(&serdev->dev, "bd-address");
- 	if (IS_ERR(bdaddr_cell)) {
--- 
-2.47.3
-
+--===============7781375751446865317==--
