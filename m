@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15AF23DFC98;
-	Thu,  2 Apr 2026 15:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FDAE3E1CE0;
+	Thu,  2 Apr 2026 15:49:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775144989; cv=none; b=WBHD+kxJNYwkKp6L3OYULWmi3ndp3ajMAKwqvRIkCGbxaNNjUQRpTGTB8/oY+lF+BhzroIYycCEpv/PYOb8JcvniNyLWuUDKw54hJNqgsnrAJBiqqH7HGpYBFjHcKvTf9gNlNGEuOeIo5NZkj6o5PW4x1kFPUbRGuY8PTRw6ex8=
+	t=1775144989; cv=none; b=FmuumLC2Qb7GxseA0TrfENo+NWeSeWld0wQJGRKRpcoavqY90zvvzoSxVYDaD8CPcT9PBjFPA+nllK605cCZfUbVe6kqmq2P3teL04v2Gw+i0Dhd7lBn5DM4j0M9S8XTBInPOs0Ce+D6gZTtWagCupCRE+1kS7xpd6+b07KgRWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775144989; c=relaxed/simple;
-	bh=VL5LBw99FRqrEC5kFcGQ9UvBX6IvWRUeRbZCGJ/xtvM=;
+	bh=9dJNGOci2T1uYQXSXxoyli4dP9j6zsXiSaDLyLrKXXI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ENVA8gCSZTDJ+R1i7JIEJB5C91crmcaIp/xt00w/VxabPHnZy5vxCgTpdoSCXkv1C7kPFV8zQ7Ih3smODSeCzhaxg97pmQOMHIEV5Wq0cSpNy7JsXgAuK3YxVqsOih3hXwAs/A5Ku9HM1Xrn3/edMqrf1gtvKRSbcEgUXgAAMyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F41NZasR; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=NyOe4wTdmjQokg0R5e88qb3305oH9eD4sYThwLxlfffFO2bTTPF38COSkdv4HGudk6R+pK4eVzhBVDwHx1PrpqwHo7S7oLtLWcy2CkAeI1cBrOh/C1NnmSNLWlLS9+FOD9iXLp7oeQtHWNfy16xmkQQ9koDoVi62FCcQhGgrIY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ehE6p5O7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F41NZasR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1904C4AF0B;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ehE6p5O7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9B14C2BC9E;
 	Thu,  2 Apr 2026 15:49:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1775144988;
-	bh=VL5LBw99FRqrEC5kFcGQ9UvBX6IvWRUeRbZCGJ/xtvM=;
+	bh=9dJNGOci2T1uYQXSXxoyli4dP9j6zsXiSaDLyLrKXXI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=F41NZasRETl/Z6T1sqazPHpz2jx14eVbzBEBwndFzIWT/YVIp9HgrQnjIbvk9LHzI
-	 AMs1Qxm909CwowWYk5oc+wKbVsA7GtNuZkWIfD9/tuQhtMK773SoFQkQIj73IbFZxc
-	 uPc9R9BxEpmP4bDV0KO6jx0ftccvupHpdMgO8Gl/LAJNXFAbPWglTLHcGzfo9ay0D0
-	 BVDutsekGWO/HphfxneKks4mcZlR9bmrL7lFvtDk/c1TzjQQaW4GC/YkmJMs3F9KYU
-	 3QDAF96LIMHvjxo1oRH4YfVn90vwpmko72etSMQ+qH1zvyDHLh74xX4yQp7HPMMnJq
-	 j4IaxXa/vinfQ==
+	b=ehE6p5O78i2PNAhuC7ukdpSMMbHQPm4RW+Z2wAL3Odi+6TNv+j1FL7yyadybTbsMo
+	 8pNnSazlO/XiG7aeNdonOsDx3ix/e0VVaVIHExfrPiqU6A5gZefOKwdFOfA1lcBDaN
+	 9WNAuinWjt2j56D2WEgeLqgAFc3/FxcZ20y8VHLfBMWpMdonCfAXmVgbbRE61aXerj
+	 WmoRUhcPW2h6Gj0h+w88lFjf/6mPpgfjs+1+CSzvpaj9uel0m7bui4ECS5V//NlWZM
+	 L267eEKIzX31sorfj+KWC6WadtXrhJ6TfjvLMcD9jL8ElndCE/zuRzYN0uWpKjbSK+
+	 ZejbLV05vkYTA==
 Received: from johan by xi.lan with local (Exim 4.98.2)
 	(envelope-from <johan@kernel.org>)
-	id 1w8KIk-0000000ALvO-24qN;
+	id 1w8KIk-0000000ALvU-2CIh;
 	Thu, 02 Apr 2026 17:49:46 +0200
 From: Johan Hovold <johan@kernel.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -36,10 +36,10 @@ To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Johan Hovold <johan@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH v3 1/5] Bluetooth: btusb: fix use-after-free on registration failure
-Date: Thu,  2 Apr 2026 17:48:06 +0200
-Message-ID: <20260402154810.2467291-2-johan@kernel.org>
+	Rajat Jain <rajatja@google.com>
+Subject: [PATCH v3 4/5] Bluetooth: btusb: fix wakeup irq devres lifetime
+Date: Thu,  2 Apr 2026 17:48:09 +0200
+Message-ID: <20260402154810.2467291-5-johan@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260402154810.2467291-1-johan@kernel.org>
 References: <20260402154810.2467291-1-johan@kernel.org>
@@ -51,51 +51,90 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Make sure to release the sibling interfaces in case controller
-registration fails to avoid use-after-free and double-free when they are
-eventually disconnected.
+The OOB wakeup interrupt is device managed but its lifetime is
+incorrectly tied to the child HCI device rather than the USB interface
+to which the driver is bound.
 
-This issue was reported by Sashiko while reviewing a fix for a wakeup
-source leak in the btusb probe errors paths.
+This should not cause any trouble currently as the interrupt will be
+disabled when the HCI device is deregistered on disconnect (but this was
+not always the case, see [1]), and there should be no further references
+if probe fails before registering it. But it is still technically wrong
+as the reference counted HCI device could in theory remain after a probe
+failure.
 
-Link: https://sashiko.dev/#/patchset/20260402092704.2346710-1-johan%40kernel.org
-Fixes: 9bfa35fe422c ("[Bluetooth] Add SCO support to btusb driver")
-Fixes: 9d08f50401ac ("Bluetooth: btusb: Add support for Broadcom LM_DIAG interface")
-Cc: stable@vger.kernel.org	# 2.6.27
+Explicitly free the interrupt on disconnect so that it is guaranteed to
+be disabled before freeing the (non-managed) driver data (including if
+disconnected while suspended).
+
+[1] 699fb50d9903 ("drivers: base: Free devm resources when unregistering
+                   a device")
+
+Fixes: fd913ef7ce61 ("Bluetooth: btusb: Add out-of-band wakeup support")
+Cc: Rajat Jain <rajatja@google.com>
 Signed-off-by: Johan Hovold <johan@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btusb.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 21e85c212506..97de6e6e7dbc 100644
+index cb0d40a7af8f..04fed3d146ef 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -4372,7 +4372,7 @@ static int btusb_probe(struct usb_interface *intf,
+@@ -3784,8 +3784,7 @@ static int btusb_config_oob_wake(struct hci_dev *hdev)
+ 	}
  
- 	err = hci_register_dev(hdev);
- 	if (err < 0)
--		goto out_free_dev;
-+		goto err_release_siblings;
+ 	irq_set_status_flags(irq, IRQ_NOAUTOEN);
+-	ret = devm_request_irq(&hdev->dev, irq, btusb_oob_wake_handler,
+-			       0, "OOB Wake-on-BT", data);
++	ret = request_irq(irq, btusb_oob_wake_handler, 0, "OOB Wake-on-BT", data);
+ 	if (ret) {
+ 		bt_dev_err(hdev, "%s: IRQ request failed", __func__);
+ 		return ret;
+@@ -3794,12 +3793,18 @@ static int btusb_config_oob_wake(struct hci_dev *hdev)
+ 	ret = device_init_wakeup(dev, true);
+ 	if (ret) {
+ 		bt_dev_err(hdev, "%s: failed to init_wakeup", __func__);
+-		return ret;
++		goto err_free_irq;
+ 	}
  
- 	usb_set_intfdata(intf, data);
- 
-@@ -4381,6 +4381,15 @@ static int btusb_probe(struct usb_interface *intf,
- 
+ 	data->oob_wake_irq = irq;
+ 	bt_dev_info(hdev, "OOB Wake-on-BT configured at IRQ %u", irq);
++
  	return 0;
++
++err_free_irq:
++	free_irq(irq, data);
++
++	return ret;
+ }
+ #endif
  
-+err_release_siblings:
-+	if (data->diag) {
-+		usb_set_intfdata(data->diag, NULL);
-+		usb_driver_release_interface(&btusb_driver, data->diag);
-+	}
-+	if (data->isoc) {
-+		usb_set_intfdata(data->isoc, NULL);
-+		usb_driver_release_interface(&btusb_driver, data->isoc);
+@@ -4393,8 +4398,10 @@ static int btusb_probe(struct usb_interface *intf,
+ err_kill_tx_urbs:
+ 	usb_kill_anchored_urbs(&data->tx_anchor);
+ err_disable_wakeup:
+-	if (data->oob_wake_irq)
++	if (data->oob_wake_irq) {
+ 		device_init_wakeup(&data->udev->dev, false);
++		free_irq(data->oob_wake_irq, data);
 +	}
  out_free_dev:
  	if (data->reset_gpio)
  		gpiod_put(data->reset_gpio);
+@@ -4427,8 +4434,11 @@ static void btusb_disconnect(struct usb_interface *intf)
+ 
+ 	hci_unregister_dev(hdev);
+ 
+-	if (data->oob_wake_irq)
++	if (data->oob_wake_irq) {
+ 		device_init_wakeup(&data->udev->dev, false);
++		free_irq(data->oob_wake_irq, data);
++	}
++
+ 	if (data->reset_gpio)
+ 		gpiod_put(data->reset_gpio);
+ 
 -- 
 2.52.0
 
