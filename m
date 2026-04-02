@@ -1,158 +1,370 @@
-Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
+Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F04E3ED128
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2026 14:44:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775141072; cv=none; b=PC0TZMxdgvzQAsuLdC0myt1wTJjX4Lf8+nu+UfXOa3HyYHsZ9mJyVOueGCaqsTwKcPTgjIW89RchpoMyjWQnR0gLNJngLkCLJmzO9EfNaUmqagFdPGn5YqHJJ4ushc22HqL1lgb98qRDOfVJPjZ7V4L63cxHLnkeVXTemZymGss=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775141072; c=relaxed/simple;
-	bh=lRrsqFyx1+59tX6yc++hD4hvY8SJu6WB/6H8wr2RPQA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ce5J10GWizFElxSm4ardZRSbHtYsMW3jETA7LQuGy/JX6cBmr7cx4Re+BDRB2/MDnoxFUZ5fvv3ED3Jnn4Smgv5g3ZYuHg56+4Z6M0bC7kvQ9dThj2POtsjQSpYkP9wPia3gsFukPFkMcUr62V/h/GCUrRk8SSy4h1FG41f2NEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gVBef8bV; arc=none smtp.client-ip=74.125.82.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9659C2248AF
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Apr 2026 15:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775143720; cv=pass; b=AgbCKPZ1A9JhVPVmO9k9mzrAIlz7738uxzpPZX3Ivz9QKADodsdHAeeReZcGfzhV4ZUewmKoee4XcLVTwx1E/qI/GB6g6fY4ka8vsIryaDkLbJO7OhK2O+KJ1EpDcP7Q+fP9JSxVNZ6UGAyYCGF9AFf783fAAXb+iiFKwR5Gl2Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775143720; c=relaxed/simple;
+	bh=KjuoemJkq3RW5QdFs3Dmox81WUf1MW4cWn7aS9vZOJ4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dURUwZARfHjx116QCXpn3hilzGSqW5rVOQ3NU80G1e8tbgcKkPoGNb+ZVda+ohyNAijIjXcKPINeLf/nA6JyKqW5XUt76b3BwoyCkjPzPQdjpS84Y6+mSSjcn0B+JQF5mXZDMIOq3V8pFoDdNSxGAMLhoNZj+j9Yfi1OEle3mX0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gLQ9nhLF; arc=pass smtp.client-ip=74.125.224.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gVBef8bV"
-Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-2c5b3d8eab1so897078eec.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Apr 2026 07:44:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gLQ9nhLF"
+Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-65003f40a22so526504d50.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Apr 2026 08:28:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775143718; cv=none;
+        d=google.com; s=arc-20240605;
+        b=jqXiKN4YINf4G4bl87TnfVbcoKEk4GM6dTjHt0oIT1NynLWpxnHwyC2vChiDOvx1lQ
+         5G01cffCibrUo9rNl1RvYF6k800qGcfpQIKmGsdXEIQpbMi/W5k7C7hGTAC0S+OX1eUx
+         aBmhnkpgwbWeHpfsxv3EMzJvuDrTwrdFNMiBKJuqODis3gT+UvJi23TXvbdduiboizt1
+         HcCyJ+0qy7KS9qbZL5jDBgitkE3H0I7TyNZo/IWZrSZE0qBOZARrGnNRmQLXaAZ3Ki8q
+         PXkH/8+0DhMWXg9QMHPG08yl9OhoZUvD/CtXq1xbsbAglDspOlzdnKThbi28ApkY4ZgO
+         tBBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=UNKz4F/HfgvcAPmRHwI/m7peq1PWiWFvnrtLQ4w24lc=;
+        fh=8vmOwSm9QheBlSAtzpU2h+vPN6vqZAy+khabkFtSFIk=;
+        b=A0u7Qttb29VRcKcO23ZwNelGZHWJ6ehTikbolYfeO7j2SqrxbWZLbr4WTp1FpGHtdK
+         sK49vQzaGz+zoAfq3fdff64CujcPnc/53wdtlpbkjzVzdqN28pk89dp/edCcQyhgngfd
+         /GrNUjVUDD+YwpSValnHKTuBcjN8nj4tk28gKMKDnmer6JuHNxOAeaR7vYDxLXZRDga/
+         WlOL7ba5k9f74uzOIxcWXMbdX6qenIAFBDUYHnu8S3fDN9C9xYGrEHgxzol+GW9Zoajd
+         YVIbgAig6oVQNWl1KhgkzXEkTDD+muwtZMdWkpK5DgLKq0/nisLuwRWULck9MpHH7u/e
+         JFCA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775141069; x=1775745869; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=u0xvrbJn+d4lUIFJ2nTX3gLH7lCPyfKln+2uxnPXdvY=;
-        b=gVBef8bVAHGa73a6kLp/IRuopvJ9H9Ynmg6rLt5yFg8pnfvWoFhpaH23RiYsVVItVG
-         8v1c7wJj6Fn3aPVQXuu0w3xv8VcyVK4HFSYLubj4CUJZRDt8covTW8qp4uL3QtqZHPgc
-         jYhdV8c18VcAyCIyIwGDHA69qpTqmM1bAd28SxsC6CBrzcsk+ew+bAQEchRJSGxLCDkp
-         46Ji7CdjpsIUUkIiBK9lAUjjN0PLDGYM9bjR2UTxmClyPw7DOa5IgNsmAB1DoH4Sa4qk
-         364V0Rz7ioR3DhS+t4sIVY6+0EKQ8XGoAUDb4f0a/43vdQc+8lYoWsZvmu8ifn9O43sA
-         T2tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775141069; x=1775745869;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1775143718; x=1775748518; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=u0xvrbJn+d4lUIFJ2nTX3gLH7lCPyfKln+2uxnPXdvY=;
-        b=nu2X82sUyvx3UgRt+XbVG/6C+K8GsQ9qye+6BY2pVG8B7AsF41EqlCDrPpsbhFL+f+
-         jzcVLclDEc6lEVVhNSl4gWHRnlJVimGd1oOR4jhSaPnXHyPHn3ZlbtqX0x6DGKKK21FH
-         6mUSpzKWxf1PxpN1Fd4S2F4m8UcvL76qgJ0ZD7AVatPhIFVxyPMfZF2mxWfvFx1a+RLk
-         /YybHFENNwQGKjB8zQghJYkoxOHoxPdk2yaKWZe4g1VLDAGIPWJ7SFxyzkG0FFrbMvKC
-         qna5W1gkM0KPf1szXfepxxuN7AAySnUQ6cm6bNih2SCvrB9nfMh+vSe05LLsMeP0wmWt
-         Q87g==
-X-Gm-Message-State: AOJu0Yxcey9lrsJ9eqaHVM+JoPe2qM62KbyAFD8BRu7d9meW0MqSeo96
-	kfSg+4neT9X3I07buTLFEEf5lr8excWvry70C6vIzmVRc+OpcSbkslYjborrfA==
-X-Gm-Gg: AeBDiesj7crMPGwNc2jSR4ACXQ9niyouxrAoV8FGDHwFBtdeNfcZSLbjhCbAgUUyq2+
-	g91sb00+HN+8SvxhLLiJTVIAQcXfl8MBU/EKQ5l872ctXC75Oo9OnYCCEekDjvyO7p+sD9QEthZ
-	zRanvhUiI0+2r9zqhzfSVfr2XSeflVS498o5ki19yRAPy6Nh4JoXqjsEHWfSE1Ov0HvlIa95Gd7
-	8/imdbf10QEiTYLHnYsJw0WrqYReNU5FWIdrLBxybn3oGGyi3i5v7Qmi347i56P0GfVKP47D0X1
-	Wbu6fSQ0Fts/CzUwnmBi4l6dUsNCRkZHs0hoGyhXcbwsLQAbayxFKhL1V3Cu00e7MirxPEGmKcu
-	GzlFnYDSD+wIlmcoM6cI4m7M5ZpPPMus19zcCN+geepFmphTBMf+4g/EOvVLjK/UqjnGkCHhCSn
-	9ay+Gnpu3BzNChCTWCVUy9AbGR/ArF0w==
-X-Received: by 2002:a05:7300:c89:b0:2c7:ea98:d94 with SMTP id 5a478bee46e88-2c930798501mr4081758eec.2.1775141069175;
-        Thu, 02 Apr 2026 07:44:29 -0700 (PDT)
-Received: from [172.17.0.2] ([52.161.45.228])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ca7c3010e9sm3486911eec.14.2026.04.02.07.44.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2026 07:44:28 -0700 (PDT)
-Message-ID: <69ce80cc.050a0220.3b265.3041@mx.google.com>
-Date: Thu, 02 Apr 2026 07:44:28 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3132060715690233732=="
+        bh=UNKz4F/HfgvcAPmRHwI/m7peq1PWiWFvnrtLQ4w24lc=;
+        b=gLQ9nhLFZPacsycnCGnhA6DJTWXhWUWKwd7HRAYicW08V1nkSI1nVneMsYs4Dn2P+/
+         G03NL7fnQ18dTXphElDeMkhu7A9r/QZZ6kgazCiAl6QOGM/1IZ/5q6uvsTgMOjf2BNBs
+         gJPsQmV3WzfP2DVqrdsU7p4wSlv4X/jryljN+c5y64DxjKskNJb8UOnwKLTrtOBMFS7a
+         MGswpqigVBnZnBu5gpqfWloP4+NCj20bCC2gxTM+sbfRq0FTs8NrC23x0y00Zry+w3aZ
+         R2cG1aOPnLyMVjk1IggrWN7uSL3wQlZQkQ5owwHjHuq1oJlLARM2LJKFghHOmfgkXApz
+         swjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775143718; x=1775748518;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=UNKz4F/HfgvcAPmRHwI/m7peq1PWiWFvnrtLQ4w24lc=;
+        b=FTsCN32rK2/GJnh45qxPTkAam2boPgfhD5oejt853QlshFDJ07UGMRUldG5sOFFjv6
+         T8QPaAsH0aUXjgU6O38kMiv9eowP5VlI/TopEjbtx8j/cPtY93/A6bSox8XVk41V5TO3
+         nYR4Ywjx4UmUJ2fvTCiXXYc7MVhfKrYqChOzZlWHWcsGKAe0WXDniOfVD9HcPtgecp/W
+         PsziH8D+fi/qku1iEWk27zKepKbFfPDQgTEmtOxw29jip6It5qrrk7W4B1ZFkFKc0tKW
+         O678rftrjXYf4ljmU56cHHFzuN7I+RXEa+exBAllwA9HsyIfAAZe3s1G8UxgOGULTBK2
+         LfNw==
+X-Gm-Message-State: AOJu0YxZpncxCm4XDrVqMjhD22rMxOqq6PicCDj0HjPsNVPUo61TzqxP
+	giVzTd2v3nYs/QhYmXzeYVLap0ff/azUeTX/QzHInOj2x6aeJW7mvI1IA9A9op1pRd5a7unhQUf
+	7tKiYcJgHUHh26QZ0S1nHCT2482jhb/ApkztWYXs=
+X-Gm-Gg: AeBDies+F4uhwGroDaYHktEn483LcHrfG+7D1yNz/cZgqoImn0NtWdsIBVbs7S2btEt
+	tnkQcRL4KaBngzDwjQCdKszZaFDCVRbMS2aSGrIMpprel5IAfYH+h/OyUJh0/9nF1kbphtzJiMV
+	1fB6xj23wxd7oPDZNb6O/xdfpSI99ywZuWlmKigyUuAF3SY762DchSWEBXJp4mZ7TnNtqvMlH5G
+	9+hn8mDUZd05ARK+tTwOrrnioMe8TmCCQXBHNe9MMdxI8WAXgmhZXF5F6WchyajELyydTreFg4K
+	Wx4nTl3IICQRzaFF2EyAyJP4kAcsrZvbeHQV/mraB2J8fM9EXD1Yumg=
+X-Received: by 2002:a53:ac89:0:b0:64e:a2c4:a16a with SMTP id
+ 956f58d0204a3-6502fe83e84mr8338126d50.68.1775143717458; Thu, 02 Apr 2026
+ 08:28:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, arnd@kernel.org
-Subject: RE: Bluetooth: btmtk: hide unused btmtk_mt6639_devs[] array
-In-Reply-To: <20260402141119.2732591-1-arnd@kernel.org>
-References: <20260402141119.2732591-1-arnd@kernel.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20260402103900.310778-1-naga.akella@oss.qualcomm.com> <20260402103900.310778-2-naga.akella@oss.qualcomm.com>
+In-Reply-To: <20260402103900.310778-2-naga.akella@oss.qualcomm.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 2 Apr 2026 11:28:25 -0400
+X-Gm-Features: AQROBzDwWmIfl4bggCwE3oPkzvTQ65yCeNBdZfQ-8SLgP1d5oBy-B7afq1S5k_M
+Message-ID: <CABBYNZJUp4gQBX7UZ1qJHZa8SW+Yrr47e35oE1qnZajv26HPwg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 1/3] shared: rap: Introduce Channel Sounding HCI
+ raw interface support
+To: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com, 
+	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com, 
+	prathibha.madugonde@oss.qualcomm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============3132060715690233732==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Naga,
 
-This is automated email and please do not reply to this email!
+On Thu, Apr 2, 2026 at 6:39=E2=80=AFAM Naga Bhavani Akella
+<naga.akella@oss.qualcomm.com> wrote:
+>
+> Implement stub callbacks for Channel Sounding HCI events and add the
+> required protocol definitions for CS configuration, procedure control,
+> and subevent result parsing
+>
+> Add data structures to support Channel Sounding Processing
+> ---
+>  src/shared/rap.c |  46 +++++++++++++
+>  src/shared/rap.h | 168 +++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 214 insertions(+)
+>
+> diff --git a/src/shared/rap.c b/src/shared/rap.c
+> index 39ef3f278..a0ca6ca71 100644
+> --- a/src/shared/rap.c
+> +++ b/src/shared/rap.c
+> @@ -504,6 +504,52 @@ bool bt_rap_unregister(unsigned int id)
+>         return true;
+>  }
+>
+> +void bt_rap_hci_cs_subevent_result_cont_callback(uint16_t length,
+> +                                               const void *param,
+> +                                               void *user_data)
+> +{
+> +       struct bt_rap *rap =3D user_data;
+> +
+> +       DBG(rap, "Received CS subevent CONT: len=3D%d", length);
+> +}
+> +
+> +void bt_rap_hci_cs_subevent_result_callback(uint16_t length,
+> +                                       const void *param,
+> +                                       void *user_data)
+> +{
+> +       struct bt_rap *rap =3D user_data;
+> +
+> +       DBG(rap, "Received CS subevent: len=3D%d", length);
+> +}
+> +
+> +void bt_rap_hci_cs_procedure_enable_complete_callback(uint16_t length,
+> +                                               const void *param,
+> +                                               void *user_data)
+> +{
+> +       struct bt_rap *rap =3D user_data;
+> +
+> +       DBG(rap, "Received CS procedure enable complete subevent: len=3D%=
+d",
+> +           length);
+> +}
+> +
+> +void bt_rap_hci_cs_sec_enable_complete_callback(uint16_t length,
+> +                                                const void *param,
+> +                                                void *user_data)
+> +{
+> +       struct bt_rap *rap =3D user_data;
+> +
+> +       DBG(rap, "Received CS security enable subevent: len=3D%d", length=
+);
+> +}
+> +
+> +void bt_rap_hci_cs_config_complete_callback(uint16_t length,
+> +                                       const void *param,
+> +                                       void *user_data)
+> +{
+> +       struct bt_rap *rap =3D user_data;
+> +
+> +       DBG(rap, "Received CS config complete subevent: len=3D%d", length=
+);
+> +}
+> +
+>  struct bt_rap *bt_rap_new(struct gatt_db *ldb, struct gatt_db *rdb)
+>  {
+>         struct bt_rap *rap;
+> diff --git a/src/shared/rap.h b/src/shared/rap.h
+> index a1d1ff2ae..5bd45a65d 100644
+> --- a/src/shared/rap.h
+> +++ b/src/shared/rap.h
+> @@ -9,9 +9,154 @@
+>  #include <inttypes.h>
+>
+>  #include "src/shared/io.h"
+> +#include "lib/bluetooth/mgmt.h"
 
-Dear submitter,
+Do we still need the mgmt.h?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1076462
+> +#include "src/shared/hci.h"
+>
+>  struct bt_rap;
+>
+> +/* Channel Sounding Events */
+> +struct bt_rap_hci_cs_options {
+> +       uint8_t role;
+> +       uint8_t cs_sync_ant_sel;
+> +       int8_t max_tx_power;
+> +       int rtt_type;
+> +};
+> +
+> +#define CS_MODE_ZERO                           0x00
+> +#define CS_MODE_ONE                            0x01
+> +#define CS_MODE_TWO                            0x02
+> +#define CS_MODE_THREE                          0x03
+> +
+> +#define CS_REFLECTOR                   0x01
+> +#define CS_INITIATOR                   0x00
+> +
+> +#define CS_MAX_ANT_PATHS                       0x05
+> +#define CS_MAX_STEPS                   0xA0
+> +#define CS_MAX_STEP_DATA_LEN           0xFF
+> +
+> +struct rap_ev_cs_config_cmplt {
+> +       uint8_t status;
+> +       uint16_t conn_hdl;
+> +       uint8_t config_id;
+> +       uint8_t action;
+> +       uint8_t main_mode_type;
+> +       uint8_t sub_mode_type;
+> +       uint8_t min_main_mode_steps;
+> +       uint8_t max_main_mode_steps;
+> +       uint8_t main_mode_rep;
+> +       uint8_t mode_0_steps;
+> +       uint8_t role;
+> +       uint8_t rtt_type;
+> +       uint8_t cs_sync_phy;
+> +       uint8_t channel_map[10];
+> +       uint8_t channel_map_rep;
+> +       uint8_t channel_sel_type;
+> +       uint8_t ch3c_shape;
+> +       uint8_t ch3c_jump;
+> +       uint8_t reserved;
+> +       uint8_t t_ip1_time;
+> +       uint8_t t_ip2_time;
+> +       uint8_t t_fcs_time;
+> +       uint8_t t_pm_time;
+> +} __packed;
+> +
+> +struct rap_ev_cs_sec_enable_cmplt {
+> +       uint8_t status;
+> +       uint16_t conn_hdl;
+> +} __packed;
+> +
+> +struct rap_ev_cs_proc_enable_cmplt {
+> +       uint8_t status;
+> +       uint16_t conn_hdl;
+> +       uint8_t config_id;
+> +       uint8_t state;
+> +       uint8_t tone_ant_config_sel;
+> +       int8_t sel_tx_pwr;
+> +       uint8_t sub_evt_len[3];
+> +       uint8_t sub_evts_per_evt;
+> +       uint16_t sub_evt_intrvl;
+> +       uint16_t evt_intrvl;
+> +       uint16_t proc_intrvl;
+> +       uint16_t proc_counter;
+> +       uint16_t max_proc_len;
+> +} __packed;
+> +
+> +#define CS_MAX_STEPS                   0xA0
+> +
+> +struct pct_iq_sample {
+> +       int16_t i_sample;
+> +       int16_t q_sample;
+> +} __packed;
+> +
+> +struct cs_mode_zero_data {
+> +       uint8_t packet_quality;
+> +       uint8_t packet_rssi_dbm;
+> +       uint8_t packet_ant;
+> +       uint32_t init_measured_freq_offset;
+> +} __packed;
+> +
+> +struct cs_mode_one_data {
+> +       uint8_t packet_quality;
+> +       uint8_t packet_rssi_dbm;
+> +       uint8_t packet_ant;
+> +       uint8_t packet_nadm;
+> +       int16_t toa_tod_init;
+> +       int16_t tod_toa_refl;
+> +       struct pct_iq_sample packet_pct1;
+> +       struct pct_iq_sample packet_pct2;
+> +} __packed;
+> +
+> +struct cs_mode_two_data {
+> +       uint8_t ant_perm_index;
+> +       struct pct_iq_sample tone_pct[4];
+> +       uint8_t tone_quality_indicator[4];
+> +} __packed;
+> +
+> +struct cs_mode_three_data {
+> +       struct cs_mode_one_data mode_one_data;
+> +       struct cs_mode_two_data mode_two_data;
+> +} __packed;
+> +
+> +union cs_mode_data {
+> +       struct cs_mode_zero_data mode_zero_data;
+> +       struct cs_mode_one_data mode_one_data;
+> +       struct cs_mode_two_data mode_two_data;
+> +       struct cs_mode_three_data mode_three_data;
+> +};
+> +
+> +struct cs_step_data {
+> +       uint8_t step_mode;
+> +       uint8_t step_chnl;
+> +       uint8_t step_data_length;
+> +       union cs_mode_data step_mode_data;
+> +} __packed;
+> +
+> +struct rap_ev_cs_subevent_result {
+> +       uint16_t conn_hdl;
+> +       uint8_t config_id;
+> +       uint16_t start_acl_conn_evt_counter;
+> +       uint16_t proc_counter;
+> +       uint16_t freq_comp;
+> +       uint8_t ref_pwr_lvl;
+> +       uint8_t proc_done_status;
+> +       uint8_t subevt_done_status;
+> +       uint8_t abort_reason;
+> +       uint8_t num_ant_paths;
+> +       uint8_t num_steps_reported;
+> +       struct cs_step_data step_data[];
+> +} __packed;
+> +
+> +struct rap_ev_cs_subevent_result_cont {
+> +       uint16_t conn_hdl;
+> +       uint8_t config_id;
+> +       uint8_t proc_done_status;
+> +       uint8_t subevt_done_status;
+> +       uint8_t abort_reason;
+> +       uint8_t num_ant_paths;
+> +       uint8_t num_steps_reported;
+> +       struct cs_step_data step_data[];
+> +} __packed;
+> +
+>  typedef void (*bt_rap_debug_func_t)(const char *str, void *user_data);
+>  typedef void (*bt_rap_ready_func_t)(struct bt_rap *rap, void *user_data)=
+;
+>  typedef void (*bt_rap_destroy_func_t)(void *user_data);
+> @@ -43,3 +188,26 @@ bool bt_rap_ready_unregister(struct bt_rap *rap, unsi=
+gned int id);
+>  bool bt_rap_unregister(unsigned int id);
+>
+>  struct bt_rap *bt_rap_new(struct gatt_db *ldb, struct gatt_db *rdb);
+> +
+> +/* HCI Raw Channel Approach */
+> +void bt_rap_hci_cs_config_complete_callback(uint16_t length,
+> +                                            const void *param,
+> +                                            void *user_data);
+> +void bt_rap_hci_cs_sec_enable_complete_callback(uint16_t length,
+> +                                                const void *param,
+> +                                                void *user_data);
+> +void bt_rap_hci_cs_procedure_enable_complete_callback(uint16_t length,
+> +                                                     const void *param,
+> +                                                     void *user_data);
+> +void bt_rap_hci_cs_subevent_result_callback(uint16_t length,
+> +                                            const void *param,
+> +                                            void *user_data);
+> +void bt_rap_hci_cs_subevent_result_cont_callback(uint16_t length,
+> +                                                 const void *param,
+> +                                                 void *user_data);
+> +
+> +void bt_rap_hci_set_le_bcs_options(uint8_t role, uint8_t cs_sync_ant_sel=
+,
+> +                                  int8_t max_tx_power);
+> +
+> +bool bt_rap_attach_hci(struct bt_rap *rap, struct bt_hci *hci);
+> +void bt_rap_hci_sm_cleanup(void);
+> --
+>
 
----Test result---
 
-Test Summary:
-CheckPatch                    PENDING   0.57 seconds
-GitLint                       PENDING   0.35 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      27.67 seconds
-CheckAllWarning               PASS      30.45 seconds
-CheckSparse                   PASS      28.63 seconds
-BuildKernel32                 PASS      26.46 seconds
-TestRunnerSetup               PASS      579.52 seconds
-TestRunner_l2cap-tester       PASS      28.74 seconds
-TestRunner_iso-tester         PASS      44.79 seconds
-TestRunner_bnep-tester        PASS      6.58 seconds
-TestRunner_mgmt-tester        FAIL      115.26 seconds
-TestRunner_rfcomm-tester      PASS      9.48 seconds
-TestRunner_sco-tester         FAIL      14.42 seconds
-TestRunner_ioctl-tester       PASS      10.49 seconds
-TestRunner_mesh-tester        FAIL      12.56 seconds
-TestRunner_smp-tester         PASS      8.59 seconds
-TestRunner_userchan-tester    PASS      6.85 seconds
-IncrementalBuild              PENDING   0.93 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.110 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.714 seconds
-Mesh - Send cancel - 2                               Timed out    1.995 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3132060715690233732==--
+--=20
+Luiz Augusto von Dentz
