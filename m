@@ -1,488 +1,270 @@
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E98C2EAB82
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2026 08:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 697F9329C57
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2026 08:56:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775205700; cv=none; b=SM1Ce/iR1NWHmByyshf8zB7NgdkgstIrgPX8L//+mqYC3OoO/X03tHzAmwN+1mlfRxH2xuKdTmg5t0bSgb5Fshc0qNFHH7+ARHe7RX+Enx6cxnn1620i2x2l4699u2yVkzO6/pRgk4WCqEFYd2iM67QYE79Dd1lLXs581XSgFd8=
+	t=1775206599; cv=none; b=DeAJ3QAAvJjn4xPHNoatzfuTN2jYmanJG5/DTykxdooEFR2umtfvPBtEXsMLEb63gSyP5lba8stpbapflFuKI5aM5bNH2pRn874LghsZNzmU9dmub4qTcBT2gm0hChBdD2kpkSpxJRRksw+QLwZGBE6aNF+gM8mvZFROgMPPz1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775205700; c=relaxed/simple;
-	bh=CR0es/h5yKizDzENk7y68nue7Nnh0zHxt8Hwbn8jQ10=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PdPt0Vpubd1rYlnEvegx6O4riZM4DU0eKdxv2IYdo0IOwL0aaWxv+8UBgXgHbfKHoSUIlrIwqj0RmRJwwnHq4B7fjRKmW7UBTlYoHClu1bYqtJvYZs27UzrB6WvsY5VtM8w3T48cevKsACGN+LwiuqD4Bmw8j9MmYeIPodqEDrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 08E513EBC2
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2026 08:41:36 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
+	s=arc-20240116; t=1775206599; c=relaxed/simple;
+	bh=+N5KZaJxqmt0MCelTJwzlMXRZJltpO/IR6keB2uVoys=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Jmvy+HLDY/S7QhS3JSGiEHAiUQq233f8zBHwBGOxbdFKEjYGnaHZD1kdg2l2+oBgSnhUheLZrn1woGGF76T77Bm+UVMBetFRZJmvKnrjJuEvG2HoXBQVQgGfii0JzLp4VsMONnVztpjtMW4m3zbGmcQV9mCtjN+Pk7vEYNY8fWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=martinbts@gmx.net header.b=QpevXC+Q; arc=none smtp.client-ip=212.227.17.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=martinbts@gmx.net header.b="QpevXC+Q"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1775206594; x=1775811394; i=martinbts@gmx.net;
+	bh=focvSS0+DEpJo5zXv6DUeL5MQUKzKnkTezf8QdSUXVE=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
+	 References:MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=QpevXC+Q7KaLxvKabK2MB9FRrPBniU5FPjaAB350D+B8TFvQvr4CmEEk5mLND1J4
+	 iuaM5AjrbJiN9tTwLM/799uN1AEppC1EgH0M+IxoEiZDj4rHSyHaJPdcUhHustXAs
+	 YpvtLbFjIh0l9AG8drxveLRhSTcdmQq1CrfP9Mn6vrpgqLilflEZ1S0PJ6E+fSnuG
+	 WRlDXnSljMT9Y8QAwYhmUylLok4SAHNbh0NH1nbtaYn/lMKkVA5oYcgCPCLlwyXi4
+	 oDCr//unfxlc+h7uW1e8QzrC+/wu/z+iSOevwznQbtHa0yPIEuIfEyKQvFXRc8mFm
+	 smwq27E7idOKRhO3Aw==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from client.hidden.invalid by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1N5mKJ-1vRxNZ1hQB-0135zr; Fri, 03
+ Apr 2026 10:56:34 +0200
+From: Martin BTS <martinbts@gmx.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] shared: Remove glib dependency from src/shared/ad.c
-Date: Fri,  3 Apr 2026 10:40:55 +0200
-Message-ID: <20260403084128.348931-2-hadess@hadess.net>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260403084128.348931-1-hadess@hadess.net>
-References: <20260403084128.348931-1-hadess@hadess.net>
+Cc: hadess@hadess.net,
+	luiz.dentz@gmail.com,
+	vi@endrift.com,
+	Martin BTS <martinbts@gmx.net>
+Subject: [PATCH BlueZ v3 2/6] shared/gatt: Add timeout for secondary service discovery
+Date: Fri,  3 Apr 2026 10:55:49 +0200
+Message-ID: <20260403085555.23871-3-martinbts@gmx.net>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260403085555.23871-1-martinbts@gmx.net>
+References: <20260403085555.23871-1-martinbts@gmx.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: hadess@hadess.net
-X-GND-State: clean
-X-GND-Score: 0
-X-GND-Cause: dmFkZTF8wQdtWsTugDN7F0i8tNPfXw1dsz8/39mAsUvkFjzkGtsqDLKSGLBpXLWch1YuFvtIq378jm4dh5sh4S7Y6kMRAfOc+znNxo9cA41ZyKtRs0+pNez5Z623YM1nwXaHSuprObfH313wPDpmIUut4Qobt9bL0Z2R7W7TMASFjF3NKpqJ3ToF3R8DFL5KkqmMVgVyLmf1vznB7vyE6Xi/utU1nMpJomDs3LA78y/OyufD52xcbXVRtWIWA/kmCLjEOLktNXIm94TkDeaGtluyXYfvrDN6eZW9wGpeOeYmND6OfXxU4qczYir5eFYXuX58SZFfjt9/HNq5Vp0UVL+vrr4si8DRbFicrckMygPGmFpoyqcR42G3tX//FgUzI3qc9S9fvHlwfa6x4UKrEXqsY+ZvZXgcqWDQVxjlfcHbobGYjeFNzwR1giBHQr9/WzfsRGVqOsAMYzbyy6bl4KjPAkcZ9Tkt/IYQ/NKk1xRXpJmM8uhNTyVGNorG84Q1Iylq17iel0RdqkGCRenXAezRC9UwMnZ//UxD5mK1VZC2ua4OFGN9/FPffvbJSXm3kxBWCoAdC+6kR37TbruqxaohEvOGB7rbbz51KaCpz10yHNhUMKKwNNO54MUokDJthLlgbd8SMGNbo2T8xNB1xT/TBN3ROn/miV7tU3Cgvm7u2ikbyQ
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:PPeMc1K1i6GP+ke7IrfbKTujkYY1dHK1/5GexxSUimgSr02/zfV
+ ysWpTw4jguh8JA2mWPZhgYjr5v028f++bLEgTAGW6c99tgrqAcG6GqKwU1S/TBGnhasuegD
+ nMYibzHdARpfMyIhXjsEYe6sFRogeoauiWLedpkB5IImaCKAWJyntIlKfodBMqZYU5VKBrH
+ E2ChgJLfQrE9Q+iwNjUdA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:NnvJiYT2ZKY=;aLPOGCOXSxlF3gTcQKt09jNDulA
+ j/JgFO+BccIwEf4fC/+m/VNMZYEhiwdzNlCDmvp1E3GKzXpGoq8cdjwRvxzQCTUFdPChAwMZn
+ 5G/svHaeq7rOzjUTq1I1nSGcGo30oWTwbC7c4NX4anpG+995qsov+Cgc8rwhL5EmY1Tal7BNC
+ sA4mprctSnoDe6aISUy6ZpUxwz8+Vuls/FTvcYm1BE7V558USGhboRzSxGPj9LMNIB+4THgHg
+ QwestfsZAivH8gCAqJz5cJLEK60aVRCGYmtL+o5JiUFlOGAP9PyZM1tsWmDb9Rkl8i69vqFQT
+ s6eIo3T8fxVm8GrjtXRj7Y6YVqh8Sxj0giXxcAhFcj6aXEXN/nEwUDYKar8ojoMdxvSTb/eHH
+ VZVVRVKMgazJ7fZwpilXoNegMorvlQHa8LjCI0REqev9HKS26uy733khfv1JDxSWWdEEGxFR7
+ 4ViLZOTLb10L46GmWO/7tTwsFZw0YA2fjRJCRa3qHkc/SDJ+8SOaNauyUcTxM9kp2OEM6S6fN
+ hDWh8bty5S4MqqRLnFv2IBth2kf3LiwVBVqG8na6zsvaoCcDZiibkCPaTML4C+ucGfzC+nuJn
+ esk/rkiC56bVagNXzBPoz4KH4cHxCDdoS9jN6s4Lr6ZZ1uQDEtXGct8JjkAlIWODULQloAoru
+ APimcoealC/6/gl98nx3GDqpT7MIbM5RuJssr27zctNujdGUA9lNmva4LBSwGT0kxtwLghYXH
+ HPUCYEfOLDwyUvy29D+T8jXh1/e+HUICCDUTmEimISY8x6McYCAnwMlIUzQVOtAWZUAjOBgBt
+ 4lkW2QDkeon90ns07aUu6Uw7cRGzJ7RC1nwHPiMhdWlwj8fqy2GKcqBN4+XJDBzKS+FOYUR34
+ Ca+K+Nd97ErcyRWsplcfItiUIyh1JpAzHknDFQoFwjAz9jc0azH4jYHCRsUmnpVGOipzWtF/7
+ lYts19W0rmuU6lKjddzeaAx5c1wOGGCyazGz/zLzK2obJG8zz4D2jJOAAAYEsZzDGUQuOWcuv
+ ZNltHMv9fxERv2f2qN1XdzKawLYqjcSYUaNdSEZoE1LuT8eIJlx5Wh6xiYxNd9qFgWCqxrywv
+ +PVRXxtHDj23wCqI4+MrNLTAxzyl6hTzyhLWvT/T6wtHSD1KAKFppYJOWKTNurEJoi4SyVKlh
+ cDnGVpgYv7stdZ5GN98ntSimYVFndvgRfNHHYiUcMK1sAXS/RUMd6BDLeqoSXw8F0YNI+/jU3
+ beZTkVUG+iO3j92Bfif8YgjaOLQz2cJgjp2Zj3vxqrjzLBBa8nEvOrywotgeOT7l29VHK/r/i
+ AqUvdzHIKpVO3kfuhuEnuLLdKTrBAsrihgWvimyZyprvEYuOj3sHALsMY9sg/yFcJPWAVCCHC
+ FLtqpNt0cl3+hJUarAk/k02JDp9EMU9hFrAin5Ut6gOvhVy+Ba0hkFwF4ERFbjLiN6EqvczoI
+ rjFXGUKuH56GOPfD7CVsQUAC9YrYroqNEIBDA1ziIqZy8VzSZP9nNDbazyKd5zLuUUYRcxtVj
+ Q+QGAQAZ6WZA2orvzJuuFf8iFKMs0ygKWVSx/cpxeDA7Gua1lIhnqHiYf8DoAUyEP6Kxo2/ec
+ 4jBPhk/D9c1pZx/17L2u5I9yu3+xUjQozHfqSxmlG6PhR0w5wyRF5At4Nl28a+TageHFHqEvG
+ f0BG5tNuJ+pl0MwKDX/YH+bHVyV3lPjRZVN9DSMbfdGK6HpD1A892tnLXCgATp/RAC60UGsgP
+ YNNfX9PYGwUHKOMjCo8JpF3Z8uzTh7fNBKOfBSMJvDVGM7p9WPVQqfOWEWuxkfAaQAMRACf1K
+ /cX0LO5XzwiP1Sd29gvnc9+gBBygG3b79nhjzQlU/oQ7A1HvBH5XQU9U1aayRjtrqgMd+cNh5
+ 9EpNm0YjlRfb2jNd2hUgaYvbuPqQsIBYSoJmz7hrADrb4mTAEKxISQ71I6IfGwIXRkU3mplXr
+ LBdzReKthMt1Ul/TPa1vIEwFFFpSXjkONQXp4U4Ixktz3Xmp1NhsU/eZGbZ8oBuL3/HKRQ38L
+ PhicPzYsxSK76ieBK1Mk9kw59egluKqVaaf/p4t3wXHC9O0Xm8c19aCIcY5vmAPnCogrvtJaI
+ rqh006bbpokZFvGVrVi/Edeu6WIb9JatbvPgBjsPxksZMSaBRVlycz8R8qf1+Pkzov4n0WyWa
+ 2ulzzjmLUfBWGZeWCY/MmoeXXGEOmbxTTtnb4faPQpWeEPUBDi4D4Y1KfTlHUGeb4tkS2Z6KT
+ lwSOJXaec0w3faBCy/dss9fVYu+0FvgBCAeqnQ9JufAK09IBD7rhEK5iBdBZH3eT9D+Jq4D2l
+ /09UhmuC4rVNP9CLjXFkrK3O7cAMt8HPODZTfYP95lWBDXyCo7HE1Lu4qT6mCRPzENLXs4gaL
+ Bzrw82ZvsfnhC/1PZiNHfSbPr0HqLR7FwwaDUAr6h2cSEgaOeMUagsXLI7X9YR6OjvNh1slJ+
+ r8+ODZRk4vzbsOGtD69KIZXyvL1WYyqjlne5gh7fvHHaee7Avg7O6oTqCxUkpYAa97fvAz3/x
+ PU2nUuN3Rw/8mYBdFSIZCOG2BAAb/4hg9dfdn3pBHXrtaG0mCkag4HgNugJHKgvzgBVqlKYc/
+ 0Ccmewl58ZcK8EfjEQ/skgXE6lM0TTA5Hme2++T8sn6jix0JiOkM1SMDC0FtqyFSUlci1TBPn
+ s8uzGF5GFjNfgZk1AAfSfuRX0eTTVK9C+F4dBt5hOLqZqhBLbDHhf/RsWW4ZhYw5O4b1eqP2h
+ Z6ZlGGixifWR0tAbfuW0up/XtElBB1ZQSdbezeDGZtqpc30tmgVVqE2yc2T69ekbvH54IA/Na
+ UzV+72c15d8PLikgczf0wvAiBV+x2u9w0xfwwOooCPL3DE4DOrOCIBr7BuWKs1Q5RVkw9BRbD
+ 1fkk5Sc187ORdV7RiNK9jyHcjGsM2iZdbpZyMXnqyiJC4VoIg7Vzq5tlVNP/KTWA/rzwu5uaY
+ uVIH5GcKFT3mWqDPNN7XlnHCOW0N1G/ybcINPLuo6aFVfdBr879em2qHqlxWtz9FdFXA8MtwP
+ wRL0cFiMIcPeQRPqD8JMzYa4Lkt+wwsPGw8FzG/KedKhQZVpPGRk7N2XRNxDH7dy6Rk5+whG2
+ /5S6wT0Xf+hVILYdxPXMUK6Y0OJGZeSW971RRnZcRDBHrB3vxvfjPKWnX4Pi6afTpLbB+FdAm
+ wnSUnOO6Vq6UIJpsVi9QttRvFjAwLhBbJm2/GOzXnw6tWtjn4kDpaUv722iic9dT2CCH+dIyJ
+ vFFJfr97GHfqt2CsSjEe8zE7CaP9/xeVbpaiIZA1lhOlLdLIADM30yAEPstEDM7yl3DRRcdZy
+ eXnjzaObnWIjGp3lQDofP3s5Yg7+OAMrUskDkNw2Bb+x0dfNZg2lja4K8UKLWftAiKTCKZEly
+ QpG4/v8zWo+HQvZRNHFM/9WAE3PrhvlxEs3pDbUNe453xbQqjmBIErYVhjdJ9xU7rClN+46x6
+ qlkELx/c4Ea4YZngxmAD8Kyp7wX4tRNlKbc6wWv2RSyxERK2eabY9MpnkV3Uo89dBAq1MOrX3
+ jsiitn/Buk7SYPkMg/FpuWcuRX/8IiGhOgxE2b8Vy0pQqw4Rp3ZmZOrYcRghIvnV36e8jnxn9
+ +G8RY5XRd7tEYDRY3As1uI9oMigbiZpNZmxp8sM5l6NXxkigZqd4n9u69A7ybxDlJRC69agJ1
+ wGdGwy05j7aIDNZNgcLSA2VZpm/AVJh2bemCulYSGdR7RrpjNy7VJpi/SBOFAzJBHKpMZReey
+ Lo8OT/+ymP6Wp0bVSS6JclpxLwXY3DB9zYtEj/4z7VimUrkaJbnzVAC26enPqZ4ydhfyjkqDO
+ IIMV1Ov9v6FnN/vjnfcjbgDF43G8wHHWtykUhfHavvM9APM1UTXMGCexgh2Ppj8H7/OBkiryS
+ ityWCid26vzV2AT2P2Tg25Jz+fCQDG7RbM7exXuhqrEhbOmSUSnUCVzC2sSJ2tMtfXJYcXVs7
+ oVm0A2abCORNXzrZt088rcR/PgrJFcmsD6W2+hLeFGQ2LSxO1tFoKEJErxr1WgJjNZGZI+KxE
+ 2AjzkCwlmIKxPEyNu1MHLE/a3rAdg3Ujfb5rtaoz4Z8GjUA042xmvZbvJujPIJn4vktk2acv1
+ 9/CT8VHpKj3d6SgBPkS8gAJq2TKRIYVRWliE7XdHfSW6PJcZVWUrsMqzcwnUb3TeAOlnTrIOh
+ ngiu++SnU1ufdxbEMKKPAS55XP7WXl1vDxrespWm9IaKEG+tgaCp4kjuzFKFTMGfS52CSyu81
+ wlZAynRHiNkYT0/4I+tXfeWka4XOOmlmd7o9AgdW2HTZgu7IpdDCn7DzBu59WvCY//CRUzpWE
+ InxT2uFMtXYvoC1U5MeSXKOjsgo+XAaaqBdcHfOyWqHwmQYW60v1YgNGVHaRuiZ+hIXJeoJNR
+ T6+O2bjr2nPSbl9uZTMT7+QTxRbMWZzFy+x6PaWDyZ1am56JyzeUS0YhZTLshYU5AUIiwP2yK
+ 9CVnw7D3eBluoUbh9yhqsoAKTTqciiyhIUjdlG5cS894WbfejVCF3HE2CCpYc2xs6LiAQgV7Q
+ PZFJJNtdDbGvOWU+gvnpS3V7MCCkJXrfKYIgB6WRUeUM/6b+OZY0eqtTXp5l3jVdKVKBUZGxo
+ TEI4J3XmW1NVpQ60L1VYZI2VGSLKkPc7Ik/EA08xt0DpgweJPWoTbhzLJgPsppBPePUB9rS3P
+ ktxNVIAGvy9Vqa6mZCkNWabxMru1r03B07Yyv491w+Kth34g26AwxnzAAbqxPNIUGhztQ6vpt
+ QACNIzBGcLSSX6/2cy1bMO7d9iTkN/kaxkYdafDcE7MXIQ87s+CRFBD1eWFnSL6tlJaOwgSFK
+ tVrGfj8FZuee8JmGGA56s8FPTN4bdNNHemkmPdfGphtPu4G0mLnkQPrLtNg9XMUXx02PlCQdZ
+ ezt51EOnhfxIcDMjYShknK0COKF+1KzpelP9zzJyfe5Fole3kYNrb6MJIGQRj4uc4ykVWMpAc
+ Zl2cQHFD92UPFAarJxqRb/P3TWPPmmhfm8fDjOkisadVEExWnlv0r/bpMtp+BhGq4BBx4riSu
+ EBCNPEZDFZU8eMLqQ+tWZDugZV+ndqa+Uqu2D0HWTZlrbUMUQkEgU4UDa6S7HiejEHe0E6LJ6
+ N0KON2iHFUOlE+HIO8mxZWAF3vFDhP8xFl7wlz1QWvxDqhbwaqqkRHSWdNRvD0wh63oJYzbi7
+ fDWF0V6Y/utuOAylmsOW8SbR9Zpld/Si5axwzMbwdATwiVzjWdR+pP29X95mJqxFvlGI1qYv1
+ ulb+TzoeU1g7p0H1gJenAi8UHRSQpntvqW4ImfKc8jXuN2c2FNdaxQLXab3IpUHu10MEddVIi
+ yR8xywT5ydb
 
-src/shared/ad.c includes src/eir.h, which uses glib, which means that
-the non-glib shared library can't be used without linking to glib.
+Some BLE devices do not respond to secondary service discovery
+requests, causing the 30-second ATT timeout to fire and terminate the
+connection. Add a 2-second timeout at the GATT client level that
+cancels the pending ATT request and proceeds as if no secondary
+services were found. This prevents the ATT timeout from killing the
+connection while still giving well-behaved devices enough time to
+respond.
+=2D--
+ src/shared/gatt-client.c | 62 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 61 insertions(+), 1 deletion(-)
 
-Use our own queue implementation to remove the glib linked-list usage.
----
- plugins/neard.c |  4 ++--
- src/adapter.c   | 10 +++++-----
- src/device.c    | 29 +++++++++++++++--------------
- src/device.h    | 10 ++++++----
- src/eir.c       | 41 ++++++++++++++++++++++-------------------
- src/eir.h       | 11 +++++------
- unit/test-eir.c | 29 ++++++++++++++---------------
- 7 files changed, 69 insertions(+), 65 deletions(-)
-
-diff --git a/plugins/neard.c b/plugins/neard.c
-index c84934025cd8..edfc115373ef 100644
---- a/plugins/neard.c
-+++ b/plugins/neard.c
-@@ -58,7 +58,7 @@ struct oob_params {
- 	bdaddr_t address;
- 	uint32_t class;
- 	char *name;
--	GSList *services;
-+	struct queue *services;
- 	uint8_t *hash;
- 	uint8_t *randomizer;
- 	uint8_t *pin;
-@@ -68,7 +68,7 @@ struct oob_params {
- 
- static void free_oob_params(struct oob_params *params)
- {
--	g_slist_free_full(params->services, free);
-+	queue_destroy(params->services, free);
- 	g_free(params->name);
- 	g_free(params->hash);
- 	g_free(params->randomizer);
-diff --git a/src/adapter.c b/src/adapter.c
-index 04568dae6e98..aa5aca7d5fe3 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -7171,20 +7171,20 @@ static void confirm_name(struct btd_adapter *adapter, const bdaddr_t *bdaddr,
- 
- static void adapter_msd_notify(struct btd_adapter *adapter,
- 							struct btd_device *dev,
--							GSList *msd_list)
-+							struct queue *msd_list)
- {
- 	GSList *cb_l, *cb_next;
--	GSList *msd_l, *msd_next;
-+	struct queue_entry *msd_l, *msd_next;
- 
- 	for (cb_l = adapter->msd_callbacks; cb_l != NULL; cb_l = cb_next) {
- 		btd_msd_cb_t cb = cb_l->data;
- 
- 		cb_next = g_slist_next(cb_l);
- 
--		for (msd_l = msd_list; msd_l != NULL; msd_l = msd_next) {
-+		for (msd_l = queue_peek_head_entry(msd_list); msd_l != NULL; msd_l = msd_next) {
- 			const struct eir_msd *msd = msd_l->data;
- 
--			msd_next = g_slist_next(msd_l);
-+			msd_next = msd_l->next;
- 
- 			cb(adapter, dev, msd->company, msd->data,
- 								msd->data_len);
-@@ -7223,7 +7223,7 @@ static bool is_filter_match(GSList *discovery_filter, struct eir_data *eir_data,
- 				/* m->data contains string representation of
- 				 * uuid.
- 				 */
--				if (g_slist_find_custom(eir_data->services,
-+				if (queue_find(eir_data->services,
- 							m->data,
- 							g_strcmp) != NULL)
- 					got_match = true;
-diff --git a/src/device.c b/src/device.c
-index 0e8ca28d3809..f755851280c0 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2432,16 +2432,16 @@ unref:
- 	dev->connect = NULL;
- }
- 
--void device_add_eir_uuids(struct btd_device *dev, GSList *uuids)
-+void device_add_eir_uuids(struct btd_device *dev, struct queue *uuids)
- {
--	GSList *l;
-+	struct queue_entry *q;
- 	GSList *added = NULL;
- 
- 	if (dev->bredr_state.svc_resolved || dev->le_state.svc_resolved)
- 		return;
- 
--	for (l = uuids; l != NULL; l = l->next) {
--		const char *str = l->data;
-+	for (q = queue_peek_head_entry(uuids); q != NULL; q = q->next) {
-+		const char *str = q->data;
- 		if (g_slist_find_custom(dev->eir_uuids, str, bt_uuid_strcmp))
- 			continue;
- 		added = g_slist_append(added, (void *)str);
-@@ -2465,13 +2465,13 @@ static void add_manufacturer_data(void *data, void *user_data)
- 					DEVICE_INTERFACE, "ManufacturerData");
- }
- 
--void device_set_manufacturer_data(struct btd_device *dev, GSList *list,
-+void device_set_manufacturer_data(struct btd_device *dev, struct queue *queue,
- 								bool duplicate)
- {
- 	if (duplicate)
- 		bt_ad_clear_manufacturer_data(dev->ad);
- 
--	g_slist_foreach(list, add_manufacturer_data, dev);
-+	queue_foreach(queue, add_manufacturer_data, dev);
- }
- 
- static void add_service_data(void *data, void *user_data)
-@@ -2479,7 +2479,7 @@ static void add_service_data(void *data, void *user_data)
- 	struct eir_sd *sd = data;
- 	struct btd_device *dev = user_data;
- 	bt_uuid_t uuid;
--	GSList *l;
-+	struct queue *q;
- 
- 	if (bt_string_to_uuid(&uuid, sd->uuid) < 0)
- 		return;
-@@ -2487,21 +2487,22 @@ static void add_service_data(void *data, void *user_data)
- 	if (!bt_ad_add_service_data(dev->ad, &uuid, sd->data, sd->data_len))
- 		return;
- 
--	l = g_slist_append(NULL, sd->uuid);
--	device_add_eir_uuids(dev, l);
--	g_slist_free(l);
-+	q = queue_new();
-+	queue_push_tail(q, sd->uuid);
-+	device_add_eir_uuids(dev, q);
-+	queue_destroy(q, NULL);
- 
- 	g_dbus_emit_property_changed(dbus_conn, dev->path,
- 					DEVICE_INTERFACE, "ServiceData");
- }
- 
--void device_set_service_data(struct btd_device *dev, GSList *list,
-+void device_set_service_data(struct btd_device *dev, struct queue *queue,
- 							bool duplicate)
- {
- 	if (duplicate)
- 		bt_ad_clear_service_data(dev->ad);
- 
--	g_slist_foreach(list, add_service_data, dev);
-+	queue_foreach(queue, add_service_data, dev);
- }
- 
- static void add_data(void *data, void *user_data)
-@@ -2518,13 +2519,13 @@ static void add_data(void *data, void *user_data)
- 						"AdvertisingData");
- }
- 
--void device_set_data(struct btd_device *dev, GSList *list,
-+void device_set_data(struct btd_device *dev, struct queue *queue,
- 							bool duplicate)
- {
- 	if (duplicate)
- 		bt_ad_clear_data(dev->ad);
- 
--	g_slist_foreach(list, add_data, dev);
-+	queue_foreach(queue, add_data, dev);
- }
- 
- static struct btd_service *find_connectable_service(struct btd_device *dev,
-diff --git a/src/device.h b/src/device.h
-index c7b8b2a16eb9..b36f9af66dd2 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -9,6 +9,8 @@
-  *
-  */
- 
-+#include "src/shared/queue.h"
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index e1685809f..3e1c3e525 100644
+=2D-- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -20,6 +20,7 @@
+ #include "src/shared/queue.h"
+ #include "src/shared/gatt-db.h"
+ #include "src/shared/gatt-client.h"
++#include "src/shared/timeout.h"
+=20
+ #include <assert.h>
+ #include <limits.h>
+@@ -33,6 +34,8 @@
+ #define MIN(a, b) ((a) < (b) ? (a) : (b))
+ #endif
+=20
++#define SECONDARY_DISC_TIMEOUT	2000	/* 2 seconds in ms */
 +
- #define DEVICE_INTERFACE	"org.bluez.Device1"
- 
- struct btd_device;
-@@ -78,12 +80,12 @@ void btd_device_gatt_set_service_changed(struct btd_device *device,
- 						uint16_t start, uint16_t end);
- bool device_attach_att(struct btd_device *dev, GIOChannel *io);
- void btd_device_add_uuid(struct btd_device *device, const char *uuid);
--void device_add_eir_uuids(struct btd_device *dev, GSList *uuids);
--void device_set_manufacturer_data(struct btd_device *dev, GSList *list,
-+void device_add_eir_uuids(struct btd_device *dev, struct queue *uuids);
-+void device_set_manufacturer_data(struct btd_device *dev, struct queue *queue,
- 							bool duplicate);
--void device_set_service_data(struct btd_device *dev, GSList *list,
-+void device_set_service_data(struct btd_device *dev, struct queue *queue,
- 							bool duplicate);
--void device_set_data(struct btd_device *dev, GSList *list,
-+void device_set_data(struct btd_device *dev, struct queue *queue,
- 							bool duplicate);
- void device_probe_profile(gpointer a, gpointer b);
- void device_remove_profile(gpointer a, gpointer b);
-diff --git a/src/eir.c b/src/eir.c
-index 68ed74fe6493..89c15995a546 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -47,9 +47,18 @@ static void data_free(void *data)
- 	g_free(ad);
+ #define UUID_BYTES (BT_GATT_UUID_SIZE * sizeof(uint8_t))
+=20
+ #define GATT_SVC_UUID	0x1801
+@@ -114,6 +117,7 @@ struct bt_gatt_client {
+ 	unsigned int next_request_id;
+=20
+ 	struct bt_gatt_request *discovery_req;
++	unsigned int sec_disc_timeout_id;
+ 	unsigned int mtu_req_id;
+=20
+ 	/* Pending retry operation for DB out of sync handling */
+@@ -1231,6 +1235,42 @@ static bool discovery_parse_services(struct discove=
+ry_op *op, bool primary,
+ 	return true;
  }
- 
-+static struct queue *
-+queue_append(struct queue *q, void *data)
+=20
++struct sec_disc_timeout_data {
++	struct bt_gatt_client *client;
++	struct discovery_op *op;
++};
++
++static bool sec_disc_timeout_cb(void *user_data)
 +{
-+	if (!q)
-+		q = queue_new();
-+	queue_push_tail(q, data);
-+	return q;
++	struct sec_disc_timeout_data *data =3D user_data;
++	struct bt_gatt_client *client =3D data->client;
++	struct discovery_op *op =3D data->op;
++
++	DBG(client, "Secondary service discovery timed out, proceeding");
++
++	client->sec_disc_timeout_id =3D 0;
++
++	/* Cancel the pending ATT request before it hits the 30s ATT timeout */
++	if (client->discovery_req) {
++		bt_gatt_request_cancel(client->discovery_req);
++		bt_gatt_request_unref(client->discovery_req);
++		client->discovery_req =3D NULL;
++	}
++
++	/* Treat as success =E2=80=94 no secondary services found */
++	discovery_op_complete(op, true, 0);
++
++	return false;
 +}
 +
- void eir_data_free(struct eir_data *eir)
- {
--	g_slist_free_full(eir->services, free);
-+	queue_destroy(eir->services, g_free);
- 	eir->services = NULL;
- 	g_free(eir->name);
- 	eir->name = NULL;
-@@ -57,11 +66,11 @@ void eir_data_free(struct eir_data *eir)
- 	eir->hash = NULL;
- 	free(eir->randomizer);
- 	eir->randomizer = NULL;
--	g_slist_free_full(eir->msd_list, g_free);
-+	queue_destroy(eir->msd_list, g_free);
- 	eir->msd_list = NULL;
--	g_slist_free_full(eir->sd_list, sd_free);
-+	queue_destroy(eir->sd_list, sd_free);
- 	eir->sd_list = NULL;
--	g_slist_free_full(eir->data_list, data_free);
-+	queue_destroy(eir->data_list, data_free);
- 	eir->data_list = NULL;
- }
- 
-@@ -80,7 +89,7 @@ static void eir_parse_uuid16(struct eir_data *eir, const void *data,
- 		uuid_str = bt_uuid2string(&service);
- 		if (!uuid_str)
- 			continue;
--		eir->services = g_slist_append(eir->services, uuid_str);
-+		eir->services = queue_append(eir->services, uuid_str);
- 	}
- }
- 
-@@ -99,7 +108,7 @@ static void eir_parse_uuid32(struct eir_data *eir, const void *data,
- 		uuid_str = bt_uuid2string(&service);
- 		if (!uuid_str)
- 			continue;
--		eir->services = g_slist_append(eir->services, uuid_str);
-+		eir->services = queue_append(eir->services, uuid_str);
- 	}
- }
- 
-@@ -119,7 +128,7 @@ static void eir_parse_uuid128(struct eir_data *eir, const uint8_t *data,
- 		uuid_str = bt_uuid2string(&service);
- 		if (!uuid_str)
- 			continue;
--		eir->services = g_slist_append(eir->services, uuid_str);
-+		eir->services = queue_append(eir->services, uuid_str);
- 		uuid_ptr += 16;
- 	}
- }
-@@ -151,7 +160,7 @@ static void eir_parse_msd(struct eir_data *eir, const uint8_t *data,
- 	msd->data_len = len - 2;
- 	memcpy(&msd->data, data + 2, msd->data_len);
- 
--	eir->msd_list = g_slist_append(eir->msd_list, msd);
-+	eir->msd_list = queue_append(eir->msd_list, msd);
- }
- 
- static void eir_parse_sd(struct eir_data *eir, uuid_t *service,
-@@ -169,7 +178,7 @@ static void eir_parse_sd(struct eir_data *eir, uuid_t *service,
- 	sd->data_len = len;
- 	memcpy(&sd->data, data, sd->data_len);
- 
--	eir->sd_list = g_slist_append(eir->sd_list, sd);
-+	eir->sd_list = queue_append(eir->sd_list, sd);
- }
- 
- static void eir_parse_uuid16_data(struct eir_data *eir, const uint8_t *data,
-@@ -226,7 +235,7 @@ static void eir_parse_data(struct eir_data *eir, uint8_t type,
- 	ad->data = g_malloc(len);
- 	memcpy(ad->data, data, len);
- 
--	eir->data_list = g_slist_append(eir->data_list, ad);
-+	eir->data_list = queue_append(eir->data_list, ad);
- 
- 	if (type == EIR_CSIP_RSI)
- 		eir->rsi = true;
-@@ -595,24 +604,18 @@ int eir_create_oob(const bdaddr_t *addr, const char *name, uint32_t cod,
- 	return eir_total_len;
- }
- 
--static int match_sd_uuid(const void *data, const void *user_data)
-+static bool match_sd_uuid(const void *data, const void *user_data)
- {
- 	const struct eir_sd *sd = data;
- 	const char *uuid = user_data;
- 
--	return strcmp(sd->uuid, uuid);
-+	return strcmp(sd->uuid, uuid) == 0;
- }
- 
- struct eir_sd *eir_get_service_data(struct eir_data *eir, const char *uuid)
- {
--	GSList *l;
--
- 	if (!eir || !uuid)
- 		return NULL;
- 
--	l = g_slist_find_custom(eir->sd_list, uuid, match_sd_uuid);
--	if (!l)
--		return NULL;
--
--	return l->data;
-+	return queue_find(eir->sd_list, match_sd_uuid, uuid);
- }
-diff --git a/src/eir.h b/src/eir.h
-index b9f7c3874eb3..7d7125e756ce 100644
---- a/src/eir.h
-+++ b/src/eir.h
-@@ -9,10 +9,9 @@
-  *
-  */
- 
--#include <glib.h>
--
- #include "bluetooth/sdp.h"
- #include "bluetooth/uuid.h"
-+#include "src/shared/queue.h"
- 
- #define EIR_FLAGS                   0x01  /* flags */
- #define EIR_UUID16_SOME             0x02  /* 16-bit UUID, more available */
-@@ -73,7 +72,7 @@ struct eir_ad {
- };
- 
- struct eir_data {
--	GSList *services;
-+	struct queue *services;
- 	unsigned int flags;
- 	char *name;
- 	uint32_t class;
-@@ -88,9 +87,9 @@ struct eir_data {
- 	uint16_t did_product;
- 	uint16_t did_version;
- 	uint16_t did_source;
--	GSList *msd_list;
--	GSList *sd_list;
--	GSList *data_list;
-+	struct queue *msd_list;
-+	struct queue *sd_list;
-+	struct queue *data_list;
- };
- 
- void eir_data_free(struct eir_data *eir);
-diff --git a/unit/test-eir.c b/unit/test-eir.c
-index 55967e957c82..8d67b1973e6e 100644
---- a/unit/test-eir.c
-+++ b/unit/test-eir.c
-@@ -587,7 +587,7 @@ static void print_debug(const char *str, void *user_data)
- static void test_ad(const struct test_data *test, struct eir_data *eir)
- {
- 	struct bt_ad *ad;
--	GSList *list;
-+	struct queue_entry *q;
- 
- 	ad = bt_ad_new_with_data(test->eir_size, test->eir_data);
- 	g_assert(ad);
-@@ -607,8 +607,8 @@ static void test_ad(const struct test_data *test, struct eir_data *eir)
- 		}
- 	}
- 
--	for (list = eir->msd_list; list; list = list->next) {
--		struct eir_msd *msd = list->data;
-+	for (q = queue_peek_head_entry(eir->msd_list); q; q = q->next) {
-+		struct eir_msd *msd = q->data;
- 		struct bt_ad_manufacturer_data adm;
- 
- 		adm.manufacturer_id = msd->company;
-@@ -618,8 +618,8 @@ static void test_ad(const struct test_data *test, struct eir_data *eir)
- 		g_assert(bt_ad_has_manufacturer_data(ad, &adm));
- 	}
- 
--	for (list = eir->sd_list; list; list = list->next) {
--		struct eir_sd *sd = list->data;
-+	for (q = queue_peek_head_entry(eir->sd_list); q; q = q->next) {
-+		struct eir_sd *sd = q->data;
- 		struct bt_ad_service_data ads;
- 
- 		bt_string_to_uuid(&ads.uuid, sd->uuid);
-@@ -636,7 +636,7 @@ static void test_parsing(gconstpointer data)
- {
- 	const struct test_data *test = data;
- 	struct eir_data eir;
--	GSList *list;
-+	struct queue_entry *q;
- 
- 	memset(&eir, 0, sizeof(eir));
- 
-@@ -646,8 +646,8 @@ static void test_parsing(gconstpointer data)
- 	tester_debug("Name: %s", eir.name);
- 	tester_debug("TX power: %d", eir.tx_power);
- 
--	for (list = eir.services; list; list = list->next) {
--		char *uuid_str = list->data;
-+	for (q = queue_peek_head_entry(eir.services); q; q = q->next) {
-+		char *uuid_str = q->data;
- 
- 		tester_debug("UUID: %s", uuid_str);
- 	}
-@@ -664,11 +664,10 @@ static void test_parsing(gconstpointer data)
- 	g_assert(eir.tx_power == test->tx_power);
- 
- 	if (test->uuid) {
--		GSList *list;
- 		int n = 0;
- 
--		for (list = eir.services; list; list = list->next, n++) {
--			char *uuid_str = list->data;
-+		for (q = queue_peek_head_entry(eir.services); q; q = q->next, n++) {
-+			char *uuid_str = q->data;
- 			g_assert(test->uuid[n]);
- 			g_assert_cmpstr(test->uuid[n], ==, uuid_str);
- 		}
-@@ -676,16 +675,16 @@ static void test_parsing(gconstpointer data)
- 		g_assert(eir.services == NULL);
- 	}
- 
--	for (list = eir.msd_list; list; list = list->next) {
--		struct eir_msd *msd = list->data;
-+	for (q = queue_peek_head_entry(eir.msd_list); q; q = q->next) {
-+		struct eir_msd *msd = q->data;
- 
- 		tester_debug("Manufacturer ID: 0x%04x", msd->company);
- 		util_hexdump(' ', msd->data, msd->data_len, print_debug,
- 							"Manufacturer Data:");
- 	}
- 
--	for (list = eir.sd_list; list; list = list->next) {
--		struct eir_sd *sd = list->data;
-+	for (q = queue_peek_head_entry(eir.sd_list); q; q = q->next) {
-+		struct eir_sd *sd = q->data;
- 
- 		tester_debug("Service UUID: %s", sd->uuid);
- 		util_hexdump(' ', sd->data, sd->data_len, print_debug,
--- 
-2.53.0
++static void sec_disc_timeout_destroy(void *user_data)
++{
++	struct sec_disc_timeout_data *data =3D user_data;
++
++	discovery_op_unref(data->op);
++	free(data);
++}
++
+ static void discover_secondary_cb(bool success, uint8_t att_ecode,
+ 						struct bt_gatt_result *result,
+ 						void *user_data)
+@@ -1242,6 +1282,11 @@ static void discover_secondary_cb(bool success, uin=
+t8_t att_ecode,
+=20
+ 	discovery_req_clear(client);
+=20
++	if (client->sec_disc_timeout_id) {
++		timeout_remove(client->sec_disc_timeout_id);
++		client->sec_disc_timeout_id =3D 0;
++	}
++
+ 	if (!success) {
+ 		switch (att_ecode) {
+ 		case BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND:
+@@ -1354,8 +1399,18 @@ secondary:
+ 						discover_secondary_cb,
+ 						discovery_op_ref(op),
+ 						discovery_op_unref);
+-	if (client->discovery_req)
++	if (client->discovery_req) {
++		struct sec_disc_timeout_data *td;
++
++		td =3D new0(struct sec_disc_timeout_data, 1);
++		td->client =3D client;
++		td->op =3D discovery_op_ref(op);
++		client->sec_disc_timeout_id =3D timeout_add(
++						SECONDARY_DISC_TIMEOUT,
++						sec_disc_timeout_cb, td,
++						sec_disc_timeout_destroy);
+ 		return;
++	}
+=20
+ 	DBG(client, "Failed to start secondary service discovery");
+=20
+@@ -2822,6 +2877,11 @@ bool bt_gatt_client_cancel_all(struct bt_gatt_clien=
+t *client)
+=20
+ 	queue_remove_all(client->pending_requests, NULL, NULL, cancel_pending);
+=20
++	if (client->sec_disc_timeout_id) {
++		timeout_remove(client->sec_disc_timeout_id);
++		client->sec_disc_timeout_id =3D 0;
++	}
++
+ 	if (client->discovery_req) {
+ 		bt_gatt_request_cancel(client->discovery_req);
+ 		bt_gatt_request_unref(client->discovery_req);
+=2D-=20
+2.47.3
 
