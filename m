@@ -1,330 +1,101 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03BE36B05E
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2026 13:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16A3361DAB
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2026 14:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775224533; cv=none; b=Pq4zHf3IJr/wnx7VkDJopRPZetKV9uIRWIUEvtyMTAvIcG1wRFX3QiY8f2EuKXmIOnV+GaYJp22V7IYpvoSrIYCEG8NhYXSCOvI7Mz6gAbal+iI+kFYDgM2yZD4/iRqf1wj3kKcaC+H79f0u3t8cyM5wtvcpWN/Sehdm0uNNDwk=
+	t=1775224950; cv=none; b=QhYHAgGD0ofcaPbcFkZbU7yevEbXyTOTj6UPazHPfcLukY1jmmYNZlBiACxZy1izXkVe8wyRm902mtoFAlWALN/T21ARhA6FbB5GM6hAZNGxq5B5jULi5dHQm61HJV4O2oe/Pj6TKxO2ApNDn0k0StQ1NEP8sS8hlEfyAFm81+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775224533; c=relaxed/simple;
-	bh=akUQPIrMgPWRNFtOss4vuRIj1MAE0awNf856ZYFJhDg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=QMum6wkskJeej96qspOXjk4qVai/4lmA2NlXuwAGQgVq74GrPGsZfOv68V4zTOL2F4VJiXWlr1tDdQZ7O1UDcTkooBVrob/onfaczXDI9MUoOBgy2pYPyCnBDT498CUyB3H/ufASnCzO8rLh/C+f2z7vLGY/ULmsDEkvPB73H3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=1iJCghLn; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
+	s=arc-20240116; t=1775224950; c=relaxed/simple;
+	bh=C+JgOXvzCsEdD+gCbyRmAFqpR0gAisoegclAiXkE/so=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=bZf5MtHaMSEUh04HNgLMbAtpmya3pllhkc4eSY6kt2mejuQXOgfV9aA4mL6nBkQ6rkcEPAI6XFy3n+0b54YA2/sznUWk3+F1qucBQinHOl4TBetHMoji6HqZiTpB3sbwFJN1jSsTq8P0GdqcTI+STAeKHTQVs4UlpLHBooby5C0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EDkekRYw; arc=none smtp.client-ip=209.85.210.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="1iJCghLn"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b9c745e18a0so125324466b.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Apr 2026 06:55:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EDkekRYw"
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7dbb6c072f1so882876a34.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Apr 2026 07:02:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1775224522; x=1775829322; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EPHsiCpdUUXRFvwRdI2OtsPeWnYw906MZTDdwum5VRU=;
-        b=1iJCghLnvgfSUtBrShdDy/L79Y4llpI3oHKz2+th4NqH//TI3YsOLlElBFTCFSwQth
-         s2TttnLzyVCC6TT5Hqh0S3Q7w5CPh/XN94iAhtFlUExUFSEIhKsLbO4qZxCx6C5nQE0q
-         mYH4j3uW0hAoLlm/RAE91f0r9igUBigZ6Vqrlln4t9KiT0TsNpxOSxrJWqwpJlCtFDKf
-         RtbRRm3bQVdadj9CquFjAM//SK5tmu5HgRQ5E8pZoWo+WQKvdSfGYpYmmHumpTel/6Ip
-         2V6Z0ARw/Lm6cLIx72YKxhq0+CVyFeXaRhyWn2yk33YEzdE3v07YnrkbVenO4wpixqU/
-         bGDA==
+        d=gmail.com; s=20251104; t=1775224948; x=1775829748; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=C+JgOXvzCsEdD+gCbyRmAFqpR0gAisoegclAiXkE/so=;
+        b=EDkekRYwQO/D0gJAXa7U24MCTUP7jRTPwLdXbhwHVEgegUrcRgKEgQZwQebpUKpPeE
+         mwX/EHlqJCLB4+HO2lzYxEsIEK7540Bet921YsmWwGBfTbvtntFZDu1F305QXrzG3ssE
+         NOOWex4/tDIE7C1ClORbZdHcj6N9vaXbj42FWFlUzjKtK1Sivp75KS7swPkMeg1sKxxy
+         4BzsAXldd+bz54kBjSPN/p7ukXJ+JCShYaoxpoPA5A9ajeL/rP+bBMUmJCOPnOMqv3+R
+         3ZBZFES/8TdTjFESRVchRcQSScj2+Vc1WBmJmqDZ77ulQBH1skEImmql21QgjyZ2RO1h
+         KscQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775224522; x=1775829322;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=EPHsiCpdUUXRFvwRdI2OtsPeWnYw906MZTDdwum5VRU=;
-        b=M4i+jLHknNaB6yDAHE7shXK1XJ1w4DGtyRF6L/HAtDH35pdMhFnVRsdDA+gUyElO7G
-         IXOle4cBwB32P2tJfmtHzhqk/yNgmcPr0IWU8Ht/5Lmfr6c29xhvNUJayk5y8UEIIHnU
-         oQe7zcAYeDPAD4yTsCDxvdl88DTxkisEfN0y0IwO/T7jXxBCtcEtzEkri5Bi8pAR9FbH
-         +1tDPMlZ5ZAX/7OB/7fVrrRyUaj1wSWDqV3VjC+sww9rJizL8s4DSKTROxwJel3VQ7t/
-         aOfBQCiNNLWUvqJL9HJx7KIOjMpnqf0OtqgxdYEBrzHd7LewYj4d0aXw0te2xNVs7wcq
-         5TOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW1EkI7rLWbSvwJJlVwe4Gg2D5/6kwEKxRffby6QiI7qQWl6hwlLlU1YwJwZX2Wya2dit99Ryyh63ku5vd0N+E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxKMLvH+aCDwazWELZeLbB+bOUHJuanjY3cz6rAfwIP63pAyQy
-	LX0EawsIMOU+BONbZLfDQV8kOSGdLKlTbOJ2NML2XgrqAIphLDIlTKP5sp6VtS/CkNs=
-X-Gm-Gg: ATEYQzxcpiao0Or8n9U15v+zC58a0qAhEc9KX6ntgpeEjHAJok9GEx/7bd2DgEWrg4x
-	OxqjX2qRN1u49TZ/zTidoODoDNqOtDITGK+RnWN/5kIk38GymCnd80aSuimoUtc8icNeVfiAX4I
-	kRKZFVW9kHHm7rVFiTt/9U7Cl/oc8uAUgrF4VIjQBP9FhRUeoWlHixlaJbDhCfN/QXfPA42bKIh
-	YAMxlOwKAM12zf04emjxY1sQVzjUfMNjZoqvklM7TGnVJpyIGfZL4qOENiwvAq9XJ9NJbiN6xA6
-	x+E8J/TQ++b7OUEYZLBIj2T+++5chzBNeEEbq+5azIJ1lMWq6Pwel/vSmxUuoABYgRayolCnx/0
-	1AuhVt+3vVH+GYu5Di3c4Lq+40sShi+pgAGD9SvT54B/+4mK0Xo+3T23JbJRocAc9AQ9nuT7caT
-	QI8NuGS07Kw/EVKJUGOJxtE1ydk9NxpWNTYT+QovIBSPGHCia7KWiyMN8tj2sLk93sckLGVPGbI
-	0puhXFQ4bGBLhBn+/E9qinBpV6KSqxH+Px4Ew==
-X-Received: by 2002:a17:907:3d56:b0:b94:231f:26ca with SMTP id a640c23a62f3a-b9c46fedc37mr308190066b.20.1775224522291;
-        Fri, 03 Apr 2026 06:55:22 -0700 (PDT)
-Received: from otso.local (2001-1c00-3b89-c600-71a4-084f-6409-1447.cable.dynamic.v6.ziggo.nl. [2001:1c00:3b89:c600:71a4:84f:6409:1447])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9c3c972e28sm198057266b.1.2026.04.03.06.55.21
+        d=1e100.net; s=20251104; t=1775224948; x=1775829748;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C+JgOXvzCsEdD+gCbyRmAFqpR0gAisoegclAiXkE/so=;
+        b=q5Ch4B3iEuuaKhB1OVtjpL88rVLHIqhL5iMVjl7A6IgOA1TBirhLJFTrnMk9MFkRQh
+         Btx9Ik71Rx3SUNwNxlFOY2FSHOCa4ZjuBH3zAdJQKMOUpwOd8KJruUFjaEqvlQiCuMFg
+         ZrfgAtYop8ajwekhfXcbE8tGPswDFbRjzeWy0twUqovCDl/JykJoKLHffShLesjvAdYh
+         3tLEoFpCYMsi0L+bFgG7z5kyLsTar3prQdVM7JIItcoHP+X5HAy/8A9GYVsReSROGip9
+         UEkMCzFlQZjP7+uZe7zKbmm8jcuiBJ1AcCQG+hG35YrjQ0A+pddNBTeN17cpXVxZNQvy
+         vw8Q==
+X-Gm-Message-State: AOJu0YwrSAlpOd7WY/aMApg2se9nX29uG0FDNfKvSYYWsBczfPSMIjn3
+	TzAEEJj9yC3+j+ec2M+Jw5DKaze3c+YCOCT5asa3g4Qe2Bbt51v5W0tzIizyJQ==
+X-Gm-Gg: ATEYQzxjUp3x77onYZbmxYEFeO/SwgHcAG8YwV+FiMc0UV4ZNIlZrrv1i6ekDY8YVks
+	5Qaupuytuh3tkFDpE4ab3xTKKS1oNqO2HUYWsGcUY+gjVGp0fr99u0HwoVTaGhYztVRrZ1LSJN8
+	IogakBanRuw5NyjkxHj0HwGoLl4Ias2B9YTxF9KUtzjixtU+FjpKU6v7lyIE1J4CJDne+f2VXpP
+	4eBFHPe/zEyfLQRV3gp/QZJl6aAeQwUseosgYxBs84BLoLZ6H7j94Y74ViS1s4i7xk5oiiAhWP4
+	l96kcwaw61VgGJ0+2lktcpQcHcv8tJgv9a2Bdjw4gj+QxZMBOvY0PQPo5ysEgIBOCEA/BbBV1Y1
+	50zK1cSRfhxoUatcXL4ktDp9KjSBNcWXjhahOl7YsLsMCPzJCkjNbxoKjMPas/R4Vq/77zNJX/R
+	JD+AySex1WCu8NUWWQHv3Lf2whVGA=
+X-Received: by 2002:a05:6808:c2a2:b0:45c:8675:eef1 with SMTP id 5614622812f47-46ef57f16aamr1808252b6e.3.1775224947609;
+        Fri, 03 Apr 2026 07:02:27 -0700 (PDT)
+Received: from [172.17.0.2] ([20.98.18.68])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50d4b73ea66sm56349051cf.14.2026.04.03.07.02.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2026 06:55:21 -0700 (PDT)
-From: Luca Weiss <luca.weiss@fairphone.com>
-Date: Fri, 03 Apr 2026 15:52:52 +0200
-Subject: [PATCH v2 6/7] arm64: dts: qcom: milos-fairphone-fp6: Enable
- Bluetooth
+        Fri, 03 Apr 2026 07:02:27 -0700 (PDT)
+Message-ID: <69cfc873.c80a0220.276524.cb45@mx.google.com>
+Date: Fri, 03 Apr 2026 07:02:27 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5695093973139563146=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luca.weiss@fairphone.com
+Subject: RE: Enable Bluetooth and WiFi on Fairphone (Gen. 6)
+In-Reply-To: <20260403-milos-fp6-bt-wifi-v2-1-393322b27c5f@fairphone.com>
+References: <20260403-milos-fp6-bt-wifi-v2-1-393322b27c5f@fairphone.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5695093973139563146==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260403-milos-fp6-bt-wifi-v2-6-393322b27c5f@fairphone.com>
-References: <20260403-milos-fp6-bt-wifi-v2-0-393322b27c5f@fairphone.com>
-In-Reply-To: <20260403-milos-fp6-bt-wifi-v2-0-393322b27c5f@fairphone.com>
-To: Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Alexander Koskovich <AKoskovich@pm.me>, 
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
- Bartosz Golaszewski <brgl@kernel.org>, 
- Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
- Rocky Liao <quic_rjliao@quicinc.com>, 
- Johannes Berg <johannes@sipsolutions.net>, 
- Jeff Johnson <jjohnson@kernel.org>
-Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org, 
- linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
- linux-wireless@vger.kernel.org, ath11k@lists.infradead.org, 
- Luca Weiss <luca.weiss@fairphone.com>
-X-Mailer: b4 0.15.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1775224512; l=5650;
- i=luca.weiss@fairphone.com; s=20250611; h=from:subject:message-id;
- bh=akUQPIrMgPWRNFtOss4vuRIj1MAE0awNf856ZYFJhDg=;
- b=dyYdc5Ec1aiox9qFG4Riy10GAz315VOhkO2VRCASezMRP6RTMEzf6wuziUmcu2DsGn7c72cho
- P8++lG8qX9OCFoKmQAwkmfYwCfcltX0EMy6Baz9Am39oTehVbjctRh/
-X-Developer-Key: i=luca.weiss@fairphone.com; a=ed25519;
- pk=O1aw+AAust5lEmgrNJ1Bs7PTY0fEsJm+mdkjExA69q8=
 
-Add the nodes to describe the WCN6755 chip with its PMU and Bluetooth
-parts.
+This is an automated email and please do not reply to this email.
 
-Thanks to Alexander Koskovich for helping with the bringup, adding
-'clocks' to the PMU node to make Bluetooth work.
+Dear Submitter,
 
-Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: arch/arm64/boot/dts/qcom/milos.dtsi:2099
+error: arch/arm64/boot/dts/qcom/milos.dtsi: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts | 174 +++++++++++++++++++++++
- 1 file changed, 174 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts b/arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts
-index c1899db46e71..db72418b7195 100644
---- a/arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts
-+++ b/arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts
-@@ -24,6 +24,7 @@ / {
- 
- 	aliases {
- 		serial0 = &uart5;
-+		serial1 = &uart11;
- 	};
- 
- 	gpio-keys {
-@@ -225,6 +226,67 @@ trip1 {
- 			};
- 		};
- 	};
-+
-+	wcn6750-pmu {
-+		compatible = "qcom,wcn6755-pmu", "qcom,wcn6750-pmu";
-+
-+		vddaon-supply = <&vreg_s3b>;
-+		vddasd-supply = <&vreg_l7b>;
-+		vddpmu-supply = <&vreg_s3b>;
-+		vddrfa0p8-supply = <&vreg_s3b>;
-+		vddrfa1p2-supply = <&vreg_s2b>;
-+		vddrfa1p7-supply = <&vreg_s1b>;
-+		vddrfa2p2-supply = <&vreg_s1j>;
-+
-+		bt-enable-gpios = <&tlmm 53 GPIO_ACTIVE_HIGH>;
-+
-+		clocks = <&rpmhcc RPMH_RF_CLK1>;
-+
-+		pinctrl-0 = <&bluetooth_enable_default>;
-+		pinctrl-names = "default";
-+
-+		regulators {
-+			vreg_pmu_rfa_cmn: ldo0 {
-+				regulator-name = "vreg_pmu_rfa_cmn";
-+			};
-+
-+			vreg_pmu_aon_0p59: ldo1 {
-+				regulator-name = "vreg_pmu_aon_0p59";
-+			};
-+
-+			vreg_pmu_wlcx_0p8: ldo2 {
-+				regulator-name = "vreg_pmu_wlcx_0p8";
-+			};
-+
-+			vreg_pmu_wlmx_0p85: ldo3 {
-+				regulator-name = "vreg_pmu_wlmx_0p85";
-+			};
-+
-+			vreg_pmu_btcmx_0p85: ldo4 {
-+				regulator-name = "vreg_pmu_btcmx_0p85";
-+			};
-+
-+			vreg_pmu_rfa_0p8: ldo5 {
-+				regulator-name = "vreg_pmu_rfa_0p8";
-+			};
-+
-+			vreg_pmu_rfa_1p2: ldo6 {
-+				regulator-name = "vreg_pmu_rfa_1p2";
-+			};
-+
-+			vreg_pmu_rfa_1p7: ldo7 {
-+				regulator-name = "vreg_pmu_rfa_1p7";
-+			};
-+
-+			vreg_pmu_pcie_0p9: ldo8 {
-+				regulator-name = "vreg_pmu_pcie_0p9";
-+			};
-+
-+			vreg_pmu_pcie_1p8: ldo9 {
-+				regulator-name = "vreg_pmu_pcie_1p8";
-+			};
-+		};
-+	};
- };
- 
- &apps_rsc {
-@@ -752,6 +814,39 @@ &pon_resin {
- 	status = "okay";
- };
- 
-+&qup_uart11_cts {
-+	/*
-+	 * Configure a bias-bus-hold on CTS to lower power
-+	 * usage when Bluetooth is turned off. Bus hold will
-+	 * maintain a low power state regardless of whether
-+	 * the Bluetooth module drives the pin in either
-+	 * direction or leaves the pin fully unpowered.
-+	 */
-+	bias-bus-hold;
-+};
-+
-+&qup_uart11_rts {
-+	/* We'll drive RTS, so no pull */
-+	drive-strength = <2>;
-+	bias-disable;
-+};
-+
-+&qup_uart11_rx {
-+	/*
-+	 * Configure a pull-up on RX. This is needed to avoid
-+	 * garbage data when the TX pin of the Bluetooth module is
-+	 * in tri-state (module powered off or not driving the
-+	 * signal yet).
-+	 */
-+	bias-pull-up;
-+};
-+
-+&qup_uart11_tx {
-+	/* We'll drive TX, so no pull */
-+	drive-strength = <2>;
-+	bias-disable;
-+};
-+
- &qupv3_id_0 {
- 	status = "okay";
- };
-@@ -810,6 +905,59 @@ &tlmm {
- 			       <13 1>, /* NC */
- 			       <63 2>; /* WLAN UART */
- 
-+	qup_uart11_sleep_cts: qup-uart11-sleep-cts-state {
-+		pins = "gpio48";
-+		function = "gpio";
-+		/*
-+		 * Configure a bias-bus-hold on CTS to lower power
-+		 * usage when Bluetooth is turned off. Bus hold will
-+		 * maintain a low power state regardless of whether
-+		 * the Bluetooth module drives the pin in either
-+		 * direction or leaves the pin fully unpowered.
-+		 */
-+		bias-bus-hold;
-+	};
-+
-+	qup_uart11_sleep_rts: qup-uart11-sleep-rts-state {
-+		pins = "gpio49";
-+		function = "gpio";
-+		/*
-+		 * Configure pull-down on RTS. As RTS is active low
-+		 * signal, pull it low to indicate the BT SoC that it
-+		 * can wakeup the system anytime from suspend state by
-+		 * pulling RX low (by sending wakeup bytes).
-+		 */
-+		bias-pull-down;
-+	};
-+
-+	qup_uart11_sleep_tx: qup-uart11-sleep-tx-state {
-+		pins = "gpio50";
-+		function = "gpio";
-+		/*
-+		 * Configure pull-up on TX when it isn't actively driven
-+		 * to prevent BT SoC from receiving garbage during sleep.
-+		 */
-+		bias-pull-up;
-+	};
-+
-+	qup_uart11_sleep_rx: qup-uart11-sleep-rx-state {
-+		pins = "gpio51";
-+		function = "gpio";
-+		/*
-+		 * Configure a pull-up on RX. This is needed to avoid
-+		 * garbage data when the TX pin of the Bluetooth module
-+		 * is floating which may cause spurious wakeups.
-+		 */
-+		bias-pull-up;
-+	};
-+
-+	bluetooth_enable_default: bluetooth-enable-default-state {
-+		pins = "gpio53";
-+		function = "gpio";
-+		output-low;
-+		bias-disable;
-+	};
-+
- 	sdc2_card_det_n: sdc2-card-det-state {
- 		pins = "gpio65";
- 		function = "gpio";
-@@ -836,6 +984,32 @@ &uart5 {
- 	status = "okay";
- };
- 
-+&uart11 {
-+	/delete-property/ interrupts;
-+	interrupts-extended = <&intc GIC_SPI 586 IRQ_TYPE_LEVEL_HIGH 0>,
-+			      <&tlmm 51 IRQ_TYPE_EDGE_FALLING>;
-+
-+	pinctrl-1 =  <&qup_uart11_sleep_cts>,
-+		     <&qup_uart11_sleep_rts>,
-+		     <&qup_uart11_sleep_tx>,
-+		     <&qup_uart11_sleep_rx>;
-+	pinctrl-names = "default",
-+			"sleep";
-+
-+	status = "okay";
-+
-+	bluetooth {
-+		compatible = "qcom,wcn6755-bt", "qcom,wcn6750-bt";
-+
-+		vddrfacmn-supply = <&vreg_pmu_rfa_cmn>;
-+		vddaon-supply = <&vreg_pmu_aon_0p59>;
-+		vddbtcmx-supply = <&vreg_pmu_btcmx_0p85>;
-+		vddrfa0p8-supply = <&vreg_pmu_rfa_0p8>;
-+		vddrfa1p7-supply = <&vreg_pmu_rfa_1p7>;
-+		vddrfa1p2-supply = <&vreg_pmu_rfa_1p2>;
-+	};
-+};
-+
- &ufs_mem_hc {
- 	reset-gpios = <&tlmm 167 GPIO_ACTIVE_LOW>;
- 
 
--- 
-2.53.0
-
+--===============5695093973139563146==--
