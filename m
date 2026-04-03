@@ -1,128 +1,118 @@
-Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A77145FE0
-	for <linux-bluetooth@vger.kernel.org>; Sat,  4 Apr 2026 00:39:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4DA1FF7C8;
+	Sat,  4 Apr 2026 08:51:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775263177; cv=none; b=LIjj0ahEG8AG38oTSd9hGL+T+0sTVGadUbNHHMtp9kklsRW7ZIsK2sDP8RyEjhqSFzE60KQ7F7QDvhGpgp2U01hoC47sjg5nVGFahKABrqFmu7y7iLb62qI4GSUk9O6WHiszNWyeMZumSILb9hH4aIAoj70HHbhR4w59Erm0U10=
+	t=1775292690; cv=none; b=kw/AeHZhBdA4xqXjCj6XKjlxwvoUVTAMP3aca+JPOZIdenApOB7nIuibfY7HcAy0BNYrxe7/78R7JtASMaVKCRnxjfLAQBwPxA5bCYGLXkRkHC4M1NpakO2ES2uSr7Hm6AQzWY6OoPrnqoZOC6JTCPVczapO2iaH8fZv86EjVpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775263177; c=relaxed/simple;
-	bh=S+RspoFDT0rDLG3sUekFWjK0jOVrMlAF4JS1DHEk3sY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=YsaCvtKYY7BZCBAqQf7bMNmGB9+QlxgcMMTWBHMrBVkhFEQliU9HLK7DaemXgGSDJBIgGbbNsQdTAmPmVcg3xxNA8q6eoku/2mX1jVDOoMrFKjWvf64YBWPEdr3xlCTNP8N8fJiDhB8LxcSZMK/Z5KUGhYfP1ucdWFvS9bc4TDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A4yGf41T; arc=none smtp.client-ip=74.125.82.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A4yGf41T"
-Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-1273349c56bso2923874c88.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Apr 2026 17:39:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775263175; x=1775867975; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7Zfqby8kO8y2Ga0aSXsGAiVOdxtL5JkDb3Ml+Oqrd/I=;
-        b=A4yGf41TbxyXFfHnhR7C0/+okhiuD/ULcB/QBPYueZwHDTigLrHUfLB4Y9z84+b6B8
-         nGcfGb2GAdtqyebZL3trD0OSp3kRAvFsPwbqlzyKOEQ0QYS87RQSSnnd8dVH2lzsRKfl
-         tnDtEPtkK3ALWx9FY+KJGMiK1t1N6M9PUQM4xQ88xJKXV9EfiX+RbDCrpGyJcYqi7wgr
-         cXZebofraarmmR1aAXazAdmGtJYaPqqBj8Xx4mMFZutcfhnrsqS3hJn0fN66tdkZKujM
-         hEr9TVBRe46EiJ+lDNFGxKxD8iyQhUydihlM+cA1lR6zh82RQD8P5lBWWIbtWdKCFSif
-         aiNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775263175; x=1775867975;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7Zfqby8kO8y2Ga0aSXsGAiVOdxtL5JkDb3Ml+Oqrd/I=;
-        b=M372n0QSjcc0f10fkBvU2hiFSc7y9gGPlZnZmJxCki2qRbw3q0RZVrtpjBh9omgPIq
-         IscmGWGz81EnC88Zl5wDHC2EbXaGUSoveht5jZnvK3Qb8CIpMxo7Y/aCPNygnep1wH8R
-         q9VCYe+NG/CjGO5D/VzcJ0THZQNGAW+SpSZN7EIwyUaEzFbQS417MLgvzhXhwSKYrcA0
-         /zpzccXL5CNZeJobPQ2zNXeCppWlr8xzzeGL8THw1Lm+zzcQeag6AJnfN2Y23z1Pq/Rd
-         CkxXigNgBrJhkBWQUbBl3z1rU311+r+EfsWzWtND/8bKLNStPgtqLKYwbSHgvT8k4QNW
-         v/Yg==
-X-Gm-Message-State: AOJu0Yy1mshlI++WKKrpOD3BB7rozCwebC9ZXIRfO6oAdFFkfZi4C9lB
-	8DeR9ncCvzvFq+l7uWx00hbb6OaARovtLWC8TTcTDQio6W0TLW5DElmz2hLUNQ==
-X-Gm-Gg: AeBDiesxX611XZL8p1UWlIuc60OQMXvsIyRQuPxJ/hm5EhgKsffKKOS2lBbfqWLqTlQ
-	q7oORa5hN5QJ9aMjzsVkHZmY9A30Gkb+ru5mb5JrlbWd6Gpf6cpCpvBLc+Mct+M+qQMw4idCMj/
-	ozH0bTE+iX3uSaAhPZEL6iVkQVAfzmYSq6453DT+YjftLaWFacYo9gcZzomcb/Lp4why+B/cc8J
-	FmKv4MGnPwoeOAW1UYrYxAnPhSlLK2ONd46PuzYU5h8GX4uGVObhN6hwNanmS0cJ8Kh9FQipBwW
-	i8DNKKcDQHANT5/J+fQV4bGvb9RcMA+aZLdv/6YyUYioji94MJlnbssdoFN2LkMiTK8FWxElGQW
-	g2u8WD3g3K+noDXGVL20V7c1dmnmioXtveL3lGa34bOzk+glI49ZluDpDPTNQ1rDIN18v58JzmA
-	1k2pYUC7CAB5Mgsiiaf3p4fc7lRRpkoYYf
-X-Received: by 2002:a05:7022:6b85:b0:12b:f899:717f with SMTP id a92af1059eb24-12bfb6fb68bmr2355957c88.9.1775263175146;
-        Fri, 03 Apr 2026 17:39:35 -0700 (PDT)
-Received: from [172.17.0.2] ([172.182.195.226])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12bf90973b6sm5154336c88.9.2026.04.03.17.39.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2026 17:39:34 -0700 (PDT)
-Message-ID: <69d05dc6.050a0220.321466.1d18@mx.google.com>
-Date: Fri, 03 Apr 2026 17:39:34 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0978986744473462161=="
+	s=arc-20240116; t=1775292690; c=relaxed/simple;
+	bh=WRw1bxyb6uIlTxQSz9IZ4RDVQ6UJeNWe3qwUutsSzAM=;
+	h=From:Date:Message-ID:To:Cc:Subject; b=R80GVmwGpRCLdZb5kynyDQCO2771m3QjjKZGY05K3Eh4rhCC6YHA7+xPe5C2Kpntje7D9iatbfIBBiB76jvGn44arvOvDVzaFzCw5MuOl/9qAbwrqUlMpsJzYPzNqPC+G0tm3Dvq/Bsao0UQktUUbmu2cCVKMTJD1yrscnRWLEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from 0002-bnep.eml (unknown [111.196.245.197])
+	by APP-05 (Coremail) with SMTP id zQCowACHFwsG0dBp_7RzDA--.49444S2;
+	Sat, 04 Apr 2026 16:51:18 +0800 (CST)
+From: Pengpeng Hou <pengpeng@iscas.ac.cn>
+Date: Fri, 3 Apr 2026 16:56:12 +0800
+Message-ID: <20260404101002.2-bnep-pengpeng@iscas.ac.cn>
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, pengpeng@iscas.ac.cn
+Subject: [PATCH] Bluetooth: BNEP: validate control header bytes before reading
+ them
+X-CM-TRANSID:zQCowACHFwsG0dBp_7RzDA--.49444S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7CFyfCr47AF4DXF15uw1xXwb_yoW8Zw1kpF
+	W5uFs8Kr4kXr13AFWxta1rWa4Fvw1v9rnFkF4qvasIvr13tr1Sg34xGFy0qa12krZYqr47
+	GF10qF1UWwn8A3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvm14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK6x804I0_Grv_XF1l8cAvFVAK0II2c7
+	xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE
+	2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwV
+	C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIF
+	xwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJV
+	W8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF
+	1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6x
+	IIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvE
+	x4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnU
+	UI43ZEXa7VUbb_-PUUUUU==
+X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, harshsahuxlr9@gmail.com
-Subject: RE: [BlueZ] device: warn on BR/EDR connection key mismatch
-In-Reply-To: <20260403234246.31501-1-harshsahuxlr9@gmail.com>
-References: <20260403234246.31501-1-harshsahuxlr9@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============0978986744473462161==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+`bnep_rx_frame()` pulls the first byte from the skb and immediately reads
+the control type from the remaining data. Short control packets can leave
+no bytes in the skb at that point.
 
-This is automated email and please do not reply to this email!
+The later control-message pull logic also reads `skb->data + 1` before
+proving that the length byte or 16-bit filter length is actually present.
 
-Dear submitter,
+Validate the required control-header bytes before each dereference and
+drop malformed frames through the existing bad-frame path.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1077174
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.35 seconds
-GitLint                       PENDING   0.36 seconds
-BuildEll                      PASS      20.06 seconds
-BluezMake                     PASS      647.07 seconds
-MakeCheck                     PASS      18.75 seconds
-MakeDistcheck                 PASS      247.14 seconds
-CheckValgrind                 PASS      294.87 seconds
-CheckSmatch                   PASS      351.06 seconds
-bluezmakeextell               PASS      183.74 seconds
-IncrementalBuild              PENDING   0.35 seconds
-ScanBuild                     PASS      1017.39 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
-https://github.com/bluez/bluez/pull/2013/checks
-
+Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/bnep/core.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index d44987d4515c..0e7a7fb758c9 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -299,18 +299,27 @@ static int bnep_rx_frame(struct bnep_session *s, struct sk_buff *skb)
+ {
+ 	struct net_device *dev = s->dev;
+ 	struct sk_buff *nskb;
+-	u8 type, ctrl_type;
++	u8 type;
+ 
+ 	dev->stats.rx_bytes += skb->len;
+ 
++	if (!skb->len)
++		goto badframe;
++
+ 	type = *(u8 *) skb->data;
+ 	skb_pull(skb, 1);
+-	ctrl_type = *(u8 *)skb->data;
+ 
+ 	if ((type & BNEP_TYPE_MASK) >= sizeof(__bnep_rx_hlen))
+ 		goto badframe;
+ 
+ 	if ((type & BNEP_TYPE_MASK) == BNEP_CONTROL) {
++		u8 ctrl_type;
++
++		if (!skb->len)
++			goto badframe;
++
++		ctrl_type = *(u8 *)skb->data;
++
+ 		if (bnep_rx_control(s, skb->data, skb->len) < 0) {
+ 			dev->stats.tx_errors++;
+ 			kfree_skb(skb);
+@@ -326,12 +335,16 @@ static int bnep_rx_frame(struct bnep_session *s, struct sk_buff *skb)
+ 		switch (ctrl_type) {
+ 		case BNEP_SETUP_CONN_REQ:
+ 			/* Pull: ctrl type (1 b), len (1 b), data (len bytes) */
++			if (skb->len < 2)
++				goto badframe;
+ 			if (!skb_pull(skb, 2 + *(u8 *)(skb->data + 1) * 2))
+ 				goto badframe;
+ 			break;
+ 		case BNEP_FILTER_MULTI_ADDR_SET:
+ 		case BNEP_FILTER_NET_TYPE_SET:
+ 			/* Pull: ctrl type (1 b), len (2 b), data (len bytes) */
++			if (skb->len < 3)
++				goto badframe;
+ 			if (!skb_pull(skb, 3 + *(u16 *)(skb->data + 1) * 2))
+ 				goto badframe;
+ 			break;
+-- 
+2.50.1 (Apple Git-155)
 
---===============0978986744473462161==--
