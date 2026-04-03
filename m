@@ -1,26 +1,26 @@
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B553B234964
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51C537B011
 	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2026 08:41:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775205700; cv=none; b=ehhCpxzd4nAAE56MNV0mAWSz9FSdx94mSX7Yt0ryFKMHBMQClEj+U7E+R5A2im2WX7E/JZ/oL4IEsk1LMYgea0WPNrGRo0Vh5cU4UHEtDS4PRFiA5gTzkuIH78z42LtkOABgRoJbT1QLsXxLECiVJADNRYJDrgZ1gVtJZ1vppGI=
+	t=1775205700; cv=none; b=WzLRtHU6lbaQk6B1VdGVVDGnb4FR+r1oMJwwtDbGaEEeUDjVCrTM+8yuTEsS0DNiIcEXOFaVOKBBM3sjSWASHfr86cN4l8K6DwHzIrLAgyuaEJk1Uby4ZPH13EmQ5WJffbwsgiNT6keCHjyFEES341t8wttJ04MKLB7EimW8yz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775205700; c=relaxed/simple;
-	bh=nY3vUv5maUp+CVulFp7WWdOGuJBih3mhOSJiemSGdIA=;
+	bh=QX0FtBkED2+IcrAnAon2nRD+t8UTeVWRMl/ypTm0kbQ=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AGaw5TeNUNGVi2K+Cg5WGv/dgA26quygG/7CyCwDjtErGoml92hELYL1cbg28QQTC56tbbs5JlKV6vjbVKNL0105iIm33cNcTYK8u7+7Ua9ir2GQJg6jqMOazm+UfYDcC3QF/MwVJhrBcJEEHyGokbqob+UCQ+0MCMvEZ6otLhA=
+	 MIME-Version; b=i2t668gSai53Xry18rSlkpOFhy0h7LeeYeQy00WEOk394vdeGHpIQ3sp/5MiH3oFM7rpyo6oXLjG0avJ9+xmrCGtBQRHVR/2qDrQYIsHIVI/s1fZ5YRAZxAtPDrzhcSccM7/LMxnMeuTmRpChCjUeXvG5lcii6eUPS3+orYeiUA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 471333E97C
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 83E633E98F
 	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2026 08:41:37 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/4] shared/queue: Fix warning when compiling ad.c
-Date: Fri,  3 Apr 2026 10:40:56 +0200
-Message-ID: <20260403084128.348931-3-hadess@hadess.net>
+Subject: [PATCH BlueZ 4/4] shared: Remove unneeded glib includes
+Date: Fri,  3 Apr 2026 10:40:57 +0200
+Message-ID: <20260403084128.348931-4-hadess@hadess.net>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260403084128.348931-1-hadess@hadess.net>
 References: <20260403084128.348931-1-hadess@hadess.net>
@@ -34,28 +34,40 @@ Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 X-GND-State: clean
 X-GND-Score: 0
-X-GND-Cause: dmFkZTF8wQdtWsTugDN7F0i8tNPfXw1dsz8/39mAsUvkFjzkGtsqDLKSGLBpXLWch1YuFvtIq378jm4dh5sh4S7Y6kMRAfOc+znNxo9cA41ZyKtRs0+pNez5Z623YM1nwXaHSuprObfH313wPDpmIUut4Qobt9bL0Z2R7W7TMASFjF3NKpqJ3ToF3R8DFL5KkqmMVgVyLmf1vznB7vyE6Xi/utU1nMpJomDs3LA78y/OyufD52xcbXVRtWIWA/kmCLjEOLktNXIm94TkDeaGtluyXYfvrDN6eZW9wGpeOeYmND6OfXxU4qczYir5eFYXuX58SZFfjt9/HNq5Vp0UVL+vrr4sfCxNltkaQOjpON/zv2ML8YN9n6zUewlMatWlqGNEzS3UShyu4oNpU1uu7bQiW+8k8qAqMfirPaHS1eTsVrIoMSK2spBW0JSD+0L2kx1ODvkWVDyU1om6ZOMC82b5bq0Ayevvv8hrK5yPzGwIUscXSBRYZHUFvRnVYGwGXPsFRcxOgfuXs5J/s94AFBBtbpe2gy4lI4lJ2iisPP6WyBDGzFVueRfXwltcNr7uOQ6Y0mHb/Ztt8dIy2iBDnwIQO6G0bf0mEkcgq8y0/sJqTgU2Le2kXL0sEAW+KlNNAbuqOb3cYAwau7cvnwhTdl1pXg2Eb4lzLeEoyvWCept+53qP+Q
+X-GND-Cause: dmFkZTF8wQdtWsTugDN7F0i8tNPfXw1dsz8/39mAsUvkFjzkGtsqDLKSGLBpXLWch1YuFvtIq378jm4dh5sh4S7Y6kMRAfOc+znNxo9cA41ZyKtRs0+pNez5Z623YM1nwXaHSuprObfH313wPDpmIUut4Qobt9bL0Z2R7W7TMASFjF3NKpqJ3ToF3R8DFL5KkqmMVgVyLmf1vznB7vyE6Xi/utU1nMpJomDs3LA78y/OyufD52xcbXVRtWIWA/kmCLjEOLktNXIm94TkDeaGtluyXYfvrDN6eZW9wGpeOeYmND6OfXxU4qczYir5eFYXuX58SZFfjt9/HNq5Vp0UVL+vrr4sW0dttGoo9jfhalP13dFKkN+tMvzSxjB/gMiXdC35Ch65qEPq4euOJ+tcc2rCeIIPJ0EknKfo22sWdnZfRCH1dkaZmQyy96g24kIpYbWN+xf+iH2GCNxPgTxKy8FKummvI1HyDYhIshcNY9C1xiGvf/JL09wQ0p8au4OSgFQizrC93U6Iqe0TpFStSyeJly2M3tCT488VRuYa9QlGedd+HHKt9KtByzkVeHRfOQKUiwQi3Lj71YQz3UZJCj5cTHcI1F1o370OFVzN+vRpqq9l4iH693gNKxi8sGpz8Ui1/mVf0sQ8V6igEA7aM+oWZR/3dAYFMRKSbIgcSpLz7UtXEQ
 
-Both ad.c and eir.h include queue.h as both use the struct declared in
-this header. Quiet the warnings with a stanza that means it will be
-ignored second time around.
+glib was included, but no glib functions or data types were being used,
+so remove those includes.
 ---
- src/shared/queue.h | 2 ++
- 1 file changed, 2 insertions(+)
+ src/shared/csip.c | 2 --
+ src/shared/rap.c  | 1 -
+ 2 files changed, 3 deletions(-)
 
-diff --git a/src/shared/queue.h b/src/shared/queue.h
-index 5ea7ce4fd768..3a2dc407d91b 100644
---- a/src/shared/queue.h
-+++ b/src/shared/queue.h
-@@ -8,6 +8,8 @@
-  *
-  */
+diff --git a/src/shared/csip.c b/src/shared/csip.c
+index c5b77001a1aa..06b1606d9123 100644
+--- a/src/shared/csip.c
++++ b/src/shared/csip.c
+@@ -15,8 +15,6 @@
+ #include <unistd.h>
+ #include <errno.h>
  
-+#pragma once
-+
+-#include <glib.h>
+-
+ #include "bluetooth/bluetooth.h"
+ #include "bluetooth/uuid.h"
+ 
+diff --git a/src/shared/rap.c b/src/shared/rap.c
+index 39ef3f2783c4..ccf3e6f33793 100644
+--- a/src/shared/rap.c
++++ b/src/shared/rap.c
+@@ -12,7 +12,6 @@
  #include <stdbool.h>
+ #include <unistd.h>
+ #include <errno.h>
+-#include <glib.h>
  
- typedef void (*queue_destroy_func_t)(void *data);
+ #include "bluetooth/bluetooth.h"
+ #include "bluetooth/uuid.h"
 -- 
 2.53.0
 
