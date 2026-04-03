@@ -1,29 +1,32 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D992840DFBE
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2026 12:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F008296BCB
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2026 12:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775217851; cv=none; b=KINhk1RjjlkUty4ony+BUkfkmZ+yye25E99uBifziZDh446ZZYYrv9TduaRaL3YC8GHWykW8tk4wq2dG1LE4Kn++DH5ICe4wEI2e+lj+Ae0lhYiwULKb20McDwbdplM1F62Vpb2V/6XZ+Je8QRMKVr3lYOKK4O80ZmXtmQv3+Gw=
+	t=1775217854; cv=none; b=geEHoLN11QCdTXeZiTxBCFvPQSQmwus+W2toZcZJDJjMmwCgsHSyGdqRzd+9WpofKhmNjJNib4Hb8EpWpPi/NBEwDGWkVmC1jS3r7KlNH1+UqDixMk+IoLBATtgl9CZfmBES9zWX9r7gsTrZfk4ZU/v48FC1RsYpYcKiUJfYUZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775217851; c=relaxed/simple;
-	bh=rifaurehYUdICPJTK0fSNhnwGUeNSIsYZgmN2da2TwY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=smIqMZhwxauA47HnPrOHAjVeATKO696TN5xOmawjRzzHwncEwq07o74TA95ajvziAOehHp8fdEZhJjFNqPoue+kIZrlozoMyyTjHw/F4694l1+BwPBIkg8yJxGiE+P83ZA9YnxmvwGbGWGWAjH0xFCgUsd/nLpbeu1O4TSYCYU8=
+	s=arc-20240116; t=1775217854; c=relaxed/simple;
+	bh=fRSm776JpLMCZaAVvh9wYYZmKC46pU6+gPWSIzz0QPI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KW8mTF7n5H4EI85rdA0tdOzdTBUfw6nDxrZ7h48i40Bs0uelZOm9Aqbiju4cQavRzjL9CNKrok76xYSOEmh/A3TSgQiTC/0eYGvWm0omqAmG29msxUNYMBjJT5tRE+5RvKW1TmQk2Ex3Bs7eZMPtW3oK7Cz8oRAWQTrvsYJ+iIU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from sambura-Nitro-AN515-43.omp.ru (95.26.77.187) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 3 Apr
- 2026 15:03:50 +0300
+ 2026 15:03:56 +0300
 From: Kirill Samburskiy <k.samburskiy@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Kirill Samburskiy <k.samburskiy@omp.ru>
-Subject: [PATCH BlueZ v2 0/1] Fix unsolicited AVRCP RegisterNotification response
-Date: Fri, 3 Apr 2026 15:03:38 +0300
-Message-ID: <20260403120339.873320-1-k.samburskiy@omp.ru>
+Subject: [PATCH BlueZ v2 1/1] audio/avrcp: Track TG and CT events separately
+Date: Fri, 3 Apr 2026 15:03:39 +0300
+Message-ID: <20260403120339.873320-2-k.samburskiy@omp.ru>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260403120339.873320-1-k.samburskiy@omp.ru>
+References: <20260403120339.873320-1-k.samburskiy@omp.ru>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -74,20 +77,183 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Issue details: https://github.com/bluez/bluez/issues/1997
+Since we support both target and controller AVRCP roles, we need to
+track events for each role separately to avoid confusing events that we
+registered for notification from remote TG, and events that remote CT
+registered for notification from us. This change is only relevant if
+both sides support both CT and TG roles.
 
-This patch separates registered_events and transaction_events tracking for
-target and controller AVRCP roles.
-
-Changes:
-  v2: fix coding style
-
-Kirill Samburskiy (1):
-  audio/avrcp: Track TG and CT events separately
-
+Fixes: https://github.com/bluez/bluez/issues/1997
+---
  profiles/audio/avrcp.c | 51 +++++++++++++++++++++++++++---------------
  1 file changed, 33 insertions(+), 18 deletions(-)
 
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 326dfdab7e..9d0e0851ce 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -263,6 +263,8 @@ struct avrcp_data {
+ 	int features;
+ 	uint16_t obex_port;
+ 	GSList *players;
++	uint16_t registered_events;
++	uint8_t transaction_events[AVRCP_EVENT_LAST + 1];
+ };
+ 
+ struct avrcp {
+@@ -280,9 +282,7 @@ struct avrcp {
+ 	unsigned int browsing_id;
+ 	unsigned int browsing_timer;
+ 	uint16_t supported_events;
+-	uint16_t registered_events;
+ 	uint8_t transaction;
+-	uint8_t transaction_events[AVRCP_EVENT_LAST + 1];
+ 	struct pending_pdu *pending_pdu;
+ };
+ 
+@@ -850,13 +850,15 @@ done:
+ 
+ 	for (l = player->sessions; l; l = l->next) {
+ 		struct avrcp *session = l->data;
++		struct avrcp_data *target = session->target;
+ 		int err;
+ 
+-		if (!(session->registered_events & (1 << id)))
++		if (target == NULL ||
++				!(target->registered_events & (1 << id)))
+ 			continue;
+ 
+ 		err = avctp_send_vendordep(session->conn,
+-					session->transaction_events[id],
++					target->transaction_events[id],
+ 					code, AVC_SUBUNIT_PANEL,
+ 					buf, size + AVRCP_HEADER_LENGTH);
+ 
+@@ -864,7 +866,7 @@ done:
+ 			continue;
+ 
+ 		/* Unregister event as per AVRCP 1.3 spec, section 5.4.2 */
+-		session->registered_events ^= 1 << id;
++		target->registered_events ^= 1 << id;
+ 	}
+ 
+ 	return;
+@@ -1644,6 +1646,12 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+ 	if (!(session->supported_events & (1 << pdu->params[0])))
+ 		goto err;
+ 
++	if (session->target == NULL) {
++		pdu->params_len = cpu_to_be16(1);
++		pdu->params[0] = AVRCP_STATUS_INVALID_COMMAND;
++		return AVC_CTYPE_REJECTED;
++	}
++
+ 	switch (pdu->params[0]) {
+ 	case AVRCP_EVENT_STATUS_CHANGED:
+ 		len = 2;
+@@ -1686,8 +1694,8 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+ 	}
+ 
+ 	/* Register event and save the transaction used */
+-	session->registered_events |= (1 << pdu->params[0]);
+-	session->transaction_events[pdu->params[0]] = transaction;
++	session->target->registered_events |= (1 << pdu->params[0]);
++	session->target->transaction_events[pdu->params[0]] = transaction;
+ 
+ 	pdu->params_len = cpu_to_be16(len);
+ 
+@@ -3943,12 +3951,16 @@ static gboolean avrcp_handle_event(struct avctp *conn, uint8_t code,
+ 					void *user_data)
+ {
+ 	struct avrcp *session = user_data;
++	struct avrcp_data *controller = session->controller;
+ 	struct avrcp_header *pdu = (void *) operands;
+ 	uint8_t event;
+ 
+ 	if (!pdu)
+ 		return FALSE;
+ 
++	if (controller == NULL)
++		return FALSE;
++
+ 	if ((code != AVC_CTYPE_INTERIM && code != AVC_CTYPE_CHANGED)) {
+ 		if (pdu->params[0] == AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED &&
+ 				code == AVC_CTYPE_REJECTED) {
+@@ -3956,7 +3968,7 @@ static gboolean avrcp_handle_event(struct avctp *conn, uint8_t code,
+ 
+ 			/* Lookup event by transaction */
+ 			for (i = 0; i <= AVRCP_EVENT_LAST; i++) {
+-				if (session->transaction_events[i] ==
++				if (controller->transaction_events[i] ==
+ 								transaction) {
+ 					event = i;
+ 					goto changed;
+@@ -4008,14 +4020,14 @@ static gboolean avrcp_handle_event(struct avctp *conn, uint8_t code,
+ 		break;
+ 	}
+ 
+-	session->registered_events |= (1 << event);
+-	session->transaction_events[event] = transaction;
++	controller->registered_events |= (1 << event);
++	controller->transaction_events[event] = transaction;
+ 
+ 	return TRUE;
+ 
+ changed:
+-	session->registered_events ^= (1 << event);
+-	session->transaction_events[event] = 0;
++	controller->registered_events ^= (1 << event);
++	controller->transaction_events[event] = 0;
+ 	avrcp_register_notification(session, event);
+ 	return FALSE;
+ }
+@@ -4667,7 +4679,8 @@ static int avrcp_event(struct avrcp *session, uint8_t id, const void *data)
+ 	int err;
+ 
+ 	/* Verify that the event is registered */
+-	if (!(session->registered_events & (1 << id)))
++	if (session->target == NULL ||
++			!(session->target->registered_events & (1 << id)))
+ 		return -ENOENT;
+ 
+ 	memset(buf, 0, sizeof(buf));
+@@ -4692,21 +4705,22 @@ static int avrcp_event(struct avrcp *session, uint8_t id, const void *data)
+ 	pdu->params_len = cpu_to_be16(size);
+ 
+ 	err = avctp_send_vendordep(session->conn,
+-					session->transaction_events[id],
++					session->target->transaction_events[id],
+ 					code, AVC_SUBUNIT_PANEL,
+ 					buf, size + AVRCP_HEADER_LENGTH);
+ 	if (err < 0)
+ 		return err;
+ 
+ 	/* Unregister event as per AVRCP 1.3 spec, section 5.4.2 */
+-	session->registered_events ^= 1 << id;
++	session->target->registered_events ^= 1 << id;
+ 
+ 	return err;
+ }
+ 
+-static bool avrcp_event_registered(struct avrcp *session, uint8_t event)
++static bool avrcp_target_event_registered(struct avrcp *session, uint8_t event)
+ {
+-	return session->registered_events & (1 << event);
++	return session->target &&
++			session->target->registered_events & (1 << event);
+ }
+ 
+ int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify)
+@@ -4741,7 +4755,8 @@ int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify)
+ 		 * for it), allow the call to pass through if the remote
+ 		 * controller registered for a volume changed event.
+ 		 */
+-		if (!session->controller && !avrcp_event_registered(session,
++		if (!session->controller &&
++				!avrcp_target_event_registered(session,
+ 						AVRCP_EVENT_VOLUME_CHANGED))
+ 			return -ENOTSUP;
+ 	} else if (!avrcp_volume_supported(session->controller)) {
 -- 
 2.34.1
 
