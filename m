@@ -1,104 +1,109 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E733430F816;
-	Thu,  2 Apr 2026 20:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EBD02737EB
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2026 02:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775163391; cv=none; b=o8+GhFQK28nfZzhs9voFaXkCUVy/CBg1dcvcJX6kV2tdCs/I4L5StEspsGotGRTy5rDZtGn/gJQP4vB998tDlUVsUdFZClCmdg8VupmW63O0IocWS2Ez1yrrqq8NyhabtYdQSbgc/P7z9M+uepMSBpJ+Qx342MYNJSvAptID7Pw=
+	t=1775183720; cv=none; b=iskDuLviPSvdiNnsgZ9R/OP3j6pMtEE4IRhLn0dBEoFGFZ+x7pkiF+Bn9jfbG7vLu8qiH/LO6h86uMVLIzhYZE2rYAaz0g4+0HbdYm//zrvkkV+7EifZ1ZlDB7tgxOvOOn1pkR4vyXZvrqCsjVTWXmGm7rB0j2Bbxs3quHuLcog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775163391; c=relaxed/simple;
-	bh=1zotro0gKzhUhtGeNvJw9wplZhtNFy2WyCXqQf1WZNw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jRiIsXD5G+9A8bKXExGmoipR0yi6Jc9saKAlljxFBzB3La4uybO1YELUzvIKaP5lP7G8xUtLZHFtRN6rP+ygpFTwq8dfVUccVsZDKuKaiPCwc/onlW4cspCs5GjGvY5eAUo/ixMCT0XQzhUkqs0NRCwUy3hDZwQsLMt/EnNxwNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.229] (p5b13a32b.dip0.t-ipconnect.de [91.19.163.43])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 8FE4E4C2C37D60;
-	Thu, 02 Apr 2026 22:56:17 +0200 (CEST)
-Message-ID: <8697c336-3fff-470c-9a37-26a7f8f89189@molgen.mpg.de>
-Date: Thu, 2 Apr 2026 22:56:14 +0200
+	s=arc-20240116; t=1775183720; c=relaxed/simple;
+	bh=5BlhcsTDh6rMgSyWd7vPvs1GR0ITmrEksX9yVPM7pD8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=C1uiI33xU2cL5B9+Oa6h6ik9dp0fjTTrE3QtIsfMQLeEefbOTzDY27VcxFqvJegjtWqZ/1uOpZVslj2kEZ+jo6r95GarX2y/JRh861c0McwUPTb6Mk+U8I3TAHjuE8uHWbQhhp5X53sFFAJElJDlsuIaQNOcuRhshFx58tx8AeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ch/eEjl0; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ch/eEjl0"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-82cf636dac8so690317b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Apr 2026 19:35:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775183718; x=1775788518; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BL6izkFKiyu7pzRUtEH6dOuIFCaKg16fDgnoCHQq+J8=;
+        b=Ch/eEjl0Hm/wV2b3ZNF0ZDU8zSKmazY3+8jV8jFnWC2KuyrA+Cy8KQhYcY5vTLbiRs
+         i7ff92Gn3CnMuObfmAszmB1S2ag7aHYDfO7gcBvVMpIYR9ecwStXylTygsgZhFUJ8Qvw
+         mhOpjE73D/zpcpQVoF5gRUPv+2Oh0SvPgXcn8L+jUkMUNxwSAxFmmY7Uh1yheqjKmLGP
+         ekIEIX/+L8dATbMry+uxGyDZor6X+Dj9ekYZNDrUCBGk6phuDa98FL3HQwBU3i6hu9Kd
+         qwPBAq84lDhPleg5m3n/07FZ9BOCPP94t9UhYLVqrvBf0urGwOW3E+dZEfeo/OPlFIvQ
+         P/0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775183718; x=1775788518;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BL6izkFKiyu7pzRUtEH6dOuIFCaKg16fDgnoCHQq+J8=;
+        b=R/Sb52GWVTsiCgrU5kRYwDEyB+JsudhsqZCahXv5ZOGLtb0ynJXFSWEcwW/HzGR4F9
+         G1aCx1DMRfjFFDUMnwLTl6Jiqjn1VJieko7uJxstM9guUk61KBD7TQv6wVZLfrYtyxFJ
+         mK2L1ouPQC3knWpzmGFG9ERlQ1wkkN0UXRyzEeRo7BCeZ7ZpYJOVwrqD+wDJPdn4kMMj
+         QIkhpmvH12XxQ1pFAk/GRf1X8wIUsZcDDGwGDxfLlLqXnU0ixAEk5cj9ioefWBzyUgDP
+         DlP46ZA8TiDRegxI8MKVUl2MqY3UruHhhzVc+jkAuE02v4Po//F8RN/+M7UTelR4L48J
+         BpIA==
+X-Gm-Message-State: AOJu0YwzZuADGyuEkCm4RTYFyEmbW25Erobf/IRs4+EAsIQLbR0jADDQ
+	TdBDslASFc00YQgDiKaq8iMPbGwpsTKLT9aZIZNM0iyUXhWXMlWlsUiw0PS5DBdu8Ow=
+X-Gm-Gg: ATEYQzwicC/PisQWYXVR2xcU3VmTo0/6p1f3JNH7PcHCPiT84otfq1Kd1StYaeiH8EA
+	MnbIcqbO9vg4MfGWwS6F3WzL6DEuz0hgN+Fc1XJy+Bet24p1L5oEeQ9WpdQeCLkuhZRop1UarXp
+	d6GdVihf3MltiwDjRQ+65Eajffr/nRcVz+etFgFEuXimLNXgd1YuWamIGQKCaEl4tzWyjjZHk4y
+	nihln64ucWvDy03Pdln0mCuaUMaDLdwQbLgJy+WyST9BKhX+fI47g+IV4ftvuBgFKo8IwCyU0cA
+	rh4cR3cFWh+3wIqvFZEUGr8sMadzlSoNUo+mrPOEp2PVtJBOGeXw6eXAKLfjU7lAHFlfwQvc/Ac
+	CJpz2PvrdhfLNkMKQiMkDS70MreuC324wB/G4g8VmsjUMhjH7g/BqMmUOoIQjGCgMOtxYgLhNK3
+	lzuSkdHgaTLlPAa7i2/5zCSXxUmnDcUd5ptZjVzQr200e169Ho/WcuKoUz36I=
+X-Received: by 2002:a05:6a00:92a5:b0:82c:e1a0:3445 with SMTP id d2e1a72fcca58-82d0db72612mr1376030b3a.27.1775183718390;
+        Thu, 02 Apr 2026 19:35:18 -0700 (PDT)
+Received: from gmail.com (69-172-89-235.static.imsbiz.com. [69.172.89.235])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9b261b6sm5269657b3a.3.2026.04.02.19.35.16
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 02 Apr 2026 19:35:17 -0700 (PDT)
+From: Dudu Lu <phx0fer@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	Dudu Lu <phx0fer@gmail.com>
+Subject: [PATCH] Bluetooth: l2cap: Add missing chan lock in l2cap_ecred_reconf_rsp
+Date: Fri,  3 Apr 2026 10:35:13 +0800
+Message-Id: <20260403023513.25151-1-phx0fer@gmail.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-145)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/5] Bluetooth: btusb: fix use-after-free on
- registration failure
-To: Johan Hovold <johan@kernel.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20260402154810.2467291-1-johan@kernel.org>
- <20260402154810.2467291-2-johan@kernel.org>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260402154810.2467291-2-johan@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Dear Johan,
+l2cap_ecred_reconf_rsp() calls l2cap_chan_del() without first acquiring
+the channel lock or holding a reference on the channel. All other call
+sites of l2cap_chan_del() in l2cap_core.c (e.g., l2cap_disconnect_req,
+l2cap_ecred_conn_rsp) properly hold the channel lock and a reference.
 
+Without the lock, concurrent operations on the same channel can lead to
+list corruption or use-after-free. Fix by adding l2cap_chan_hold +
+l2cap_chan_lock before the deletion and the corresponding unlock + put
+after, matching the established pattern.
 
-Thank you for looking into and fixing the additional comments.
+Fixes: 15f02b910562 ("Bluetooth: L2CAP: Add L2CAP_ECRED_RECONF support")
+Signed-off-by: Dudu Lu <phx0fer@gmail.com>
+---
+ net/bluetooth/l2cap_core.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-Am 02.04.26 um 17:48 schrieb Johan Hovold:
-> Make sure to release the sibling interfaces in case controller
-> registration fails to avoid use-after-free and double-free when they are
-> eventually disconnected.
-> 
-> This issue was reported by Sashiko while reviewing a fix for a wakeup
-> source leak in the btusb probe errors paths.
-> 
-> Link: https://sashiko.dev/#/patchset/20260402092704.2346710-1-johan%40kernel.org
-> Fixes: 9bfa35fe422c ("[Bluetooth] Add SCO support to btusb driver")
-> Fixes: 9d08f50401ac ("Bluetooth: btusb: Add support for Broadcom LM_DIAG interface")
-> Cc: stable@vger.kernel.org	# 2.6.27
-> Signed-off-by: Johan Hovold <johan@kernel.org>
-> ---
->   drivers/bluetooth/btusb.c | 11 ++++++++++-
->   1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 21e85c212506..97de6e6e7dbc 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -4372,7 +4372,7 @@ static int btusb_probe(struct usb_interface *intf,
->   
->   	err = hci_register_dev(hdev);
->   	if (err < 0)
-> -		goto out_free_dev;
-> +		goto err_release_siblings;
->   
->   	usb_set_intfdata(intf, data);
->   
-> @@ -4381,6 +4381,15 @@ static int btusb_probe(struct usb_interface *intf,
->   
->   	return 0;
->   
-> +err_release_siblings:
-> +	if (data->diag) {
-> +		usb_set_intfdata(data->diag, NULL);
-> +		usb_driver_release_interface(&btusb_driver, data->diag);
-> +	}
-> +	if (data->isoc) {
-> +		usb_set_intfdata(data->isoc, NULL);
-> +		usb_driver_release_interface(&btusb_driver, data->isoc);
-> +	}
->   out_free_dev:
->   	if (data->reset_gpio)
->   		gpiod_put(data->reset_gpio);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index XXXXXXX..XXXXXXX 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5472,7 +5472,15 @@ static inline int l2cap_ecred_reconf_rsp(struct l2cap_conn *conn,
+ 		if (chan->ident != cmd->ident)
+ 			continue;
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+-		l2cap_chan_del(chan, ECONNRESET);
++		l2cap_chan_hold(chan);
++		l2cap_chan_lock(chan);
++
++		l2cap_chan_del(chan, ECONNRESET);
++
++		l2cap_chan_unlock(chan);
++		l2cap_chan_put(chan);
+ 	}
 
-
-Kind regards,
-
-Paul
+ 	return 0;
