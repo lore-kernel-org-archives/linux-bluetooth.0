@@ -1,37 +1,37 @@
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B79C38422B
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2026 08:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D3C37F8D5
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2026 08:56:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775206600; cv=none; b=SQW3UxmQAf3BsaPaxzFw4CHhrIky/sBCyEeY2MuJitT79PMfkxqHqrFNppP+Kl8PeDGD0geTHkRxLHgE40Mf0CjZNiNw6W4nSqHWyvUlj+3DsqMdE7qc0GrQNglQKZ7f0OfCE63myfMVNMDLP9GCLCeOl3EDqjEHQ+XUJe7f8bE=
+	t=1775206600; cv=none; b=uS5Jeh9sWZ5/7k8HASaoB0695+sppy3UrV0rigrHtJ+O2iRo3e4tliBMffamchTQ5ZNSjv8xtVrh4kvC9AuDgeQ7HPx0t4lzmvakUxdY6nFvPJ/SY54pmHFb6OOiIIihVA4Sl1jY5cAPsvOIUk4XmI+wPnrgR9DNG44ReifSdWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775206600; c=relaxed/simple;
-	bh=ikadPfVS+Hn6S28QMgt//vqakkYDZkjtZvDqVWlbETY=;
+	bh=8paMXxkJXvS4+T2V1S4zf6BBXDyItCoRuq1SbR2Ba48=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iOxSRlfFuOgKYSbXu+D4Mp7MVT6RFzr8t+swUorEfLcXnOWpCASfJRiOGvizkq/6K8AIi/K06qUa/vzEb1CJoLyMKg48yeJApOtQ0emjLWJ5v5ABynnvHeJP8Y1h6LJ9g/Ov7BtNuO/ROlXtu5YtPRj9+yFTLjLfKBgCUBgzRG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=martinbts@gmx.net header.b=tLzPzOkw; arc=none smtp.client-ip=212.227.17.22
+	 MIME-Version; b=dKIejEgYbhzwNK9npZlXvAzf71wvesSrhkTDW8xjbskAlPJTN6nlGC0EbpvsNIJtHL3kjNT/qPM6uDtTclu2OLwgrcH7TYhUTuxS/WM95FtWoNmUBh8gjGNr6g7jm3hEauio/29mbFf2l8YD/DXd3nOAHZBGqQseBDd5vgBf0lQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=martinbts@gmx.net header.b=fgIM0/O6; arc=none smtp.client-ip=212.227.17.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=martinbts@gmx.net header.b="tLzPzOkw"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=martinbts@gmx.net header.b="fgIM0/O6"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
 	s=s31663417; t=1775206594; x=1775811394; i=martinbts@gmx.net;
-	bh=egAuh6A6WUN1NdEPJi4WAWJCaTzYYB8SM6Lvatcvtbk=;
+	bh=H3T1tFntOpa/H3DizIEA62X+uU3NGe3Pt81zbIQ6UnE=;
 	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=tLzPzOkwexWw6ajbonjQ5anIoYFurgRDVtcdomSW6x9FrVA3OAmikR3dyV3siGO7
-	 7ISRtT6AJ2BxaG0Wi4z+bBo5HqwGfvsV+bqDjL8OBsZAgTaeifvj2PzMb8mHZ63r6
-	 akR4qKkJLbyf+uJqr2i6qNBiP9POR5hBEReHm1I/RT9iTRR0+BlhA7lIMQOAqNhQg
-	 pBV1qNM4e0I88ayAsV5MnmNlX4vwRAm4IdB4jfeT8RK1dqmvwyiaLZgfRE4/lric/
-	 oCdefHXGsOpna96CeqVU9LbhhkaCoiY2/dqF6aI/ykNRJTpd3DIac1omPvSvGLz+d
-	 wJMwn209HaWlmzkCKQ==
+	b=fgIM0/O6vekH0jqDKLAKLefcf10fDIxVprgiHGUs61aLKhzZg4cLdgAZcSHqaG0P
+	 rEAFs5QNmyMZXV9GP09cKWWmKYtvq/pcDCEVszfU3nTquJj4hW2GodTDtTX2tsoXr
+	 8AfB7Bdrrpm9rpChMNsSFbTojncmAq8Qv3SpNtaEwjVCFTScx6aCRMNIktPK3acN9
+	 MjUByZs/VYEMjZLUvhO9FmxUYSNCtnP9CDIuujZuSmD6ptmbn2oQXu8HI5KpN6vmB
+	 jYAj2z73tjc1O5A/6u4t0aHv3kWPQ4ALUPB4IniSg5S9/GFvERpaX03M18ALSnJDW
+	 8rajklQb+JOnFlhsLQ==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from client.hidden.invalid by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1Mof9F-1vk2EF2gH3-00m76r; Fri, 03
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1M6ll8-1w9AQm0lxO-002Zl4; Fri, 03
  Apr 2026 10:56:34 +0200
 From: Martin BTS <martinbts@gmx.net>
 To: linux-bluetooth@vger.kernel.org
@@ -39,9 +39,9 @@ Cc: hadess@hadess.net,
 	luiz.dentz@gmail.com,
 	vi@endrift.com,
 	Martin BTS <martinbts@gmx.net>
-Subject: [PATCH BlueZ v3 3/6] device: Rename set_alias to  btd_device_set_alias()
-Date: Fri,  3 Apr 2026 10:55:50 +0200
-Message-ID: <20260403085555.23871-4-martinbts@gmx.net>
+Subject: [PATCH BlueZ v3 1/6] shared/gatt: Add skip_secondary option for GATT client
+Date: Fri,  3 Apr 2026 10:55:48 +0200
+Message-ID: <20260403085555.23871-2-martinbts@gmx.net>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260403085555.23871-1-martinbts@gmx.net>
 References: <20260403085555.23871-1-martinbts@gmx.net>
@@ -52,164 +52,324 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:+tnEMrM1mQ70Z7Ga1Brfq+sTvpGiKDRZ5yh5blH0mzR6MgQ0Vez
- QSnr9OK2yGHImGpRwiGnpHcpbKGm3Oq8bvDmmf7lYVaQC4OpmYKa7bDlkWJ0h5LWeeRDXSx
- imd1mH2CsW67hjLwCt7doKKi6cAYE4u3N0PDZtiLYOYkdlCD87Qlo3pS5u3lQcs1q8m2BWs
- NLxVRAPx4nkLsXKRy5bHQ==
+X-Provags-ID: V03:K1:BNIr2BN6A2hOEHWXf8fCVi/xLxQD7Zbrms5tAFn0mXjZxtAhkW1
+ xFXZYzKCvJlhE1z91lwMK+gHanl2iafNycBp1cONyEOuQR9jyGjh6FQMYG6kfnC4Hw87ZpW
+ SQ1W/z2zzQlIMZ5qjzCCd22jsng+r6SUhAnYtxc6Ssx4w7CDmmqDBi17y2bgSpLiDImOqnA
+ eE/j1v00R39jirdzh2Dkw==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:HkUMd694PgE=;XxLKamdH4xnM67jHMRmyNV8JQ0r
- 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
- Olaqszfkc4L
+UI-OutboundReport: notjunk:1;M01:P0:XkHKKxDcpcE=;m5Ye1PwiUiUSgPwo/D0lKLoRxKQ
+ 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
 
-Renamed set_alias is exposed, so that plugins and others may set
-the device alias progammatically. This is usefule for devices whose
-Bluetooth name is generic (e.g. a bare BD addess, or literally
-"DeviceName") but whose identity is known to the plugin after
-protocol-level interrogation.
-
-The signature was changed. The first parameter,
-GDBusPendingPropertySet id was dropped and
-g_dbus_pending_property_success moved to dev_property_set_alias().
+Some BLE devices reject or ignore secondary service discovery requests,
+causing ATT timeouts that terminate the connection. Add a skip_secondary
+parameter to bt_gatt_client_new() that skips the secondary service
+discovery step during GATT client initialization. Add
+btd_device_set_skip_secondary() so device-specific plugins can enable
+this. All existing callers pass false (no behavior change).
 =2D--
- src/device.c | 15 +++++----------
- src/device.h |  1 +
- 2 files changed, 6 insertions(+), 10 deletions(-)
+ peripheral/gatt.c        | 3 ++-
+ src/device.c             | 9 ++++++++-
+ src/device.h             | 1 +
+ src/shared/gatt-client.c | 8 ++++++--
+ src/shared/gatt-client.h | 3 ++-
+ tools/btgatt-client.c    | 2 +-
+ unit/test-bap.c          | 2 +-
+ unit/test-gatt.c         | 2 +-
+ unit/test-gmap.c         | 2 +-
+ unit/test-mcp.c          | 2 +-
+ unit/test-micp.c         | 3 ++-
+ unit/test-tmap.c         | 2 +-
+ 12 files changed, 27 insertions(+), 12 deletions(-)
 
+diff --git a/peripheral/gatt.c b/peripheral/gatt.c
+index d1ddf0c97..2af67f24a 100644
+=2D-- a/peripheral/gatt.c
++++ b/peripheral/gatt.c
+@@ -121,7 +121,8 @@ static struct gatt_conn *gatt_conn_new(int fd)
+ 		return NULL;
+ 	}
+=20
+-	conn->client =3D bt_gatt_client_new(gatt_cache, conn->att, mtu, 0);
++	conn->client =3D bt_gatt_client_new(gatt_cache, conn->att, mtu, 0,
++								false);
+ 	if (!conn->gatt) {
+ 		fprintf(stderr, "Failed to create GATT client\n");
+ 		bt_gatt_server_unref(conn->gatt);
 diff --git a/src/device.c b/src/device.c
-index fbe137db7..0a88b82a2 100644
+index 3ea683667..fbe137db7 100644
 =2D-- a/src/device.c
 +++ b/src/device.c
-@@ -1063,17 +1063,12 @@ static gboolean dev_property_get_alias(const GDBus=
-PropertyTable *property,
- 	return TRUE;
- }
+@@ -213,6 +213,7 @@ struct btd_device {
+ 	bool		pending_paired;		/* "Paired" waiting for SDP */
+ 	bool		svc_refreshed;
+ 	bool		refresh_discovery;
++	bool		skip_secondary;
 =20
--static void set_alias(GDBusPendingPropertySet id, const char *alias,
--								void *data)
-+void btd_device_set_alias(struct btd_device *device, const char *alias)
- {
--	struct btd_device *device =3D data;
--
- 	/* No change */
- 	if ((device->alias =3D=3D NULL && g_str_equal(alias, "")) ||
--					g_strcmp0(device->alias, alias) =3D=3D 0) {
--		g_dbus_pending_property_success(id);
-+					g_strcmp0(device->alias, alias) =3D=3D 0)
+ 	/* Manage whether this device can wake the system from suspend.
+ 	 * - wake_support: Requires a profile that supports wake (i.e. HID)
+@@ -6302,7 +6303,8 @@ static void gatt_client_init(struct btd_device *devi=
+ce)
+ 	}
+=20
+ 	device->client =3D bt_gatt_client_new(device->db, device->att,
+-						device->att_mtu, features);
++						device->att_mtu, features,
++						device->skip_secondary);
+ 	if (!device->client) {
+ 		DBG("Failed to initialize");
  		return;
--	}
-=20
- 	g_free(device->alias);
- 	device->alias =3D g_str_equal(alias, "") ? NULL : g_strdup(alias);
-@@ -1082,8 +1077,6 @@ static void set_alias(GDBusPendingPropertySet id, co=
-nst char *alias,
-=20
- 	g_dbus_emit_property_changed(dbus_conn, device->path,
- 						DEVICE_INTERFACE, "Alias");
--
--	g_dbus_pending_property_success(id);
+@@ -8254,6 +8256,11 @@ void btd_device_set_conn_param(struct btd_device *d=
+evice, uint16_t min_interval,
+ 					timeout);
  }
 =20
- static void dev_property_set_alias(const GDBusPropertyTable *property,
-@@ -1101,7 +1094,9 @@ static void dev_property_set_alias(const GDBusProper=
-tyTable *property,
-=20
- 	dbus_message_iter_get_basic(value, &alias);
-=20
--	set_alias(id, alias, data);
-+	btd_device_set_alias(data, alias);
++void btd_device_set_skip_secondary(struct btd_device *device, bool skip)
++{
++	device->skip_secondary =3D skip;
++}
 +
-+	g_dbus_pending_property_success(id);
- }
-=20
- static gboolean dev_property_exists_class(const GDBusPropertyTable *prope=
-rty,
+ void btd_device_foreach_service_data(struct btd_device *dev, bt_ad_func_t=
+ func,
+ 							void *data)
+ {
 diff --git a/src/device.h b/src/device.h
-index fe988652d..8c56d416f 100644
+index c7b8b2a16..fe988652d 100644
 =2D-- a/src/device.h
 +++ b/src/device.h
-@@ -22,6 +22,7 @@ char *btd_device_get_storage_path(struct btd_device *dev=
-ice,
+@@ -231,6 +231,7 @@ void btd_device_foreach_ad(struct btd_device *dev, bt_=
+device_ad_func_t func,
+ void btd_device_set_conn_param(struct btd_device *device, uint16_t min_in=
+terval,
+ 					uint16_t max_interval, uint16_t latency,
+ 					uint16_t timeout);
++void btd_device_set_skip_secondary(struct btd_device *device, bool skip);
+ void btd_device_foreach_service_data(struct btd_device *dev,
+ 					bt_device_ad_func_t func,
+ 					void *data);
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index df1541b88..e1685809f 100644
+=2D-- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -93,6 +93,7 @@ struct bt_gatt_client {
+ 	struct queue *notify_chrcs;
+ 	int next_reg_id;
+ 	unsigned int disc_id, nfy_id, nfy_mult_id, ind_id;
++	bool skip_secondary;
 =20
+ 	/*
+ 	 * Handles of the GATT Service and the Service Changed characteristic
+@@ -1344,7 +1345,7 @@ secondary:
+ 	 * functionality of a device and is referenced from at least one
+ 	 * primary service on the device.
+ 	 */
+-	if (queue_isempty(op->pending_svcs))
++	if (queue_isempty(op->pending_svcs) || client->skip_secondary)
+ 		goto done;
 =20
- void btd_device_device_set_name(struct btd_device *device, const char *na=
-me);
-+void btd_device_set_alias(struct btd_device *device, const char *alias);
- void device_store_cached_name(struct btd_device *dev, const char *name);
- void device_get_name(struct btd_device *device, char *name, size_t len);
- bool device_name_known(struct btd_device *device);
+ 	/* Discover secondary services */
+@@ -2550,7 +2551,8 @@ fail:
+ struct bt_gatt_client *bt_gatt_client_new(struct gatt_db *db,
+ 							struct bt_att *att,
+ 							uint16_t mtu,
+-							uint8_t features)
++							uint8_t features,
++							bool skip_secondary)
+ {
+ 	struct bt_gatt_client *client;
+=20
+@@ -2561,6 +2563,8 @@ struct bt_gatt_client *bt_gatt_client_new(struct gat=
+t_db *db,
+ 	if (!client)
+ 		return NULL;
+=20
++	client->skip_secondary =3D skip_secondary;
++
+ 	if (!gatt_client_init(client, mtu)) {
+ 		bt_gatt_client_free(client);
+ 		return NULL;
+diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+index 63cf99500..d9655e6f0 100644
+=2D-- a/src/shared/gatt-client.h
++++ b/src/shared/gatt-client.h
+@@ -19,7 +19,8 @@ struct bt_gatt_client;
+ struct bt_gatt_client *bt_gatt_client_new(struct gatt_db *db,
+ 							struct bt_att *att,
+ 							uint16_t mtu,
+-							uint8_t features);
++							uint8_t features,
++							bool skip_secondary);
+ struct bt_gatt_client *bt_gatt_client_clone(struct bt_gatt_client *client=
+);
+=20
+ struct bt_gatt_client *bt_gatt_client_ref(struct bt_gatt_client *client);
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index 667b3d651..58999011a 100644
+=2D-- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -206,7 +206,7 @@ static struct client *client_create(int fd, uint16_t m=
+tu)
+ 		return NULL;
+ 	}
+=20
+-	cli->gatt =3D bt_gatt_client_new(cli->db, cli->att, mtu, 0);
++	cli->gatt =3D bt_gatt_client_new(cli->db, cli->att, mtu, 0, false);
+ 	if (!cli->gatt) {
+ 		fprintf(stderr, "Failed to create GATT client\n");
+ 		gatt_db_unref(cli->db);
+diff --git a/unit/test-bap.c b/unit/test-bap.c
+index 3a67e7016..221bbedfb 100644
+=2D-- a/unit/test-bap.c
++++ b/unit/test-bap.c
+@@ -582,7 +582,7 @@ static void test_setup(const void *user_data)
+ 	db =3D gatt_db_new();
+ 	g_assert(db);
+=20
+-	data->client =3D bt_gatt_client_new(db, att, 64, 0);
++	data->client =3D bt_gatt_client_new(db, att, 64, 0, false);
+ 	g_assert(data->client);
+=20
+ 	bt_gatt_client_set_debug(data->client, print_debug, "bt_gatt_client:",
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 535baafc6..8780cc4f5 100644
+=2D-- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -684,7 +684,7 @@ static struct context *create_context(uint16_t mtu, gc=
+onstpointer data)
+ 		g_assert(context->client_db);
+=20
+ 		context->client =3D bt_gatt_client_new(context->client_db,
+-							context->att, mtu, 0);
++						context->att, mtu, 0, false);
+ 		g_assert(context->client);
+=20
+ 		bt_gatt_client_set_debug(context->client, print_debug,
+diff --git a/unit/test-gmap.c b/unit/test-gmap.c
+index 8b37efd18..fbf1529a6 100644
+=2D-- a/unit/test-gmap.c
++++ b/unit/test-gmap.c
+@@ -323,7 +323,7 @@ static void test_setup(const void *user_data)
+ 	db =3D gatt_db_new();
+ 	g_assert(db);
+=20
+-	data->client =3D bt_gatt_client_new(db, att, 64, 0);
++	data->client =3D bt_gatt_client_new(db, att, 64, 0, false);
+ 	g_assert(data->client);
+=20
+ 	bt_gatt_client_set_debug(data->client, print_debug, "bt_gatt_client:",
+diff --git a/unit/test-mcp.c b/unit/test-mcp.c
+index 7d922bb83..3c5cdaad3 100644
+=2D-- a/unit/test-mcp.c
++++ b/unit/test-mcp.c
+@@ -509,7 +509,7 @@ static void test_setup(const void *user_data)
+ 	db =3D gatt_db_new();
+ 	g_assert(db);
+=20
+-	data->client =3D bt_gatt_client_new(db, att, 64, 0);
++	data->client =3D bt_gatt_client_new(db, att, 64, 0, false);
+ 	g_assert(data->client);
+=20
+ 	bt_gatt_client_set_debug(data->client, print_debug, "bt_gatt_client:",
+diff --git a/unit/test-micp.c b/unit/test-micp.c
+index ff17300d5..64a248a40 100644
+=2D-- a/unit/test-micp.c
++++ b/unit/test-micp.c
+@@ -500,7 +500,8 @@ static void test_setup(const void *user_data)
+ 	db =3D gatt_db_new();
+ 	g_assert(db);
+=20
+-	data->client =3D bt_gatt_client_new(db, att, MICP_GATT_CLIENT_MTU, 0);
++	data->client =3D bt_gatt_client_new(db, att, MICP_GATT_CLIENT_MTU, 0,
++								false);
+ 	g_assert(data->client);
+=20
+ 	bt_gatt_client_set_debug(data->client, print_debug, "bt_gatt_client:",
+diff --git a/unit/test-tmap.c b/unit/test-tmap.c
+index e75d62119..44465abf5 100644
+=2D-- a/unit/test-tmap.c
++++ b/unit/test-tmap.c
+@@ -288,7 +288,7 @@ static void test_setup(const void *user_data)
+ 	db =3D gatt_db_new();
+ 	g_assert(db);
+=20
+-	data->client =3D bt_gatt_client_new(db, att, 64, 0);
++	data->client =3D bt_gatt_client_new(db, att, 64, 0, false);
+ 	g_assert(data->client);
+=20
+ 	bt_gatt_client_set_debug(data->client, print_debug, "bt_gatt_client:",
 =2D-=20
 2.47.3
 
