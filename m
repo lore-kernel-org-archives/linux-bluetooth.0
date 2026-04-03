@@ -1,261 +1,273 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A9634D91F
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Apr 2026 06:42:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+Received: from zg8tmja5ljk3lje4mi4ymjia.icoremail.net (zg8tmja5ljk3lje4mi4ymjia.icoremail.net [209.97.182.222])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9D4D271464;
+	Fri,  3 Apr 2026 08:05:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.97.182.222
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775198553; cv=none; b=qDr1wo+8K9yuLigDUjQRIjPObWfquEAkeELlyjytPdlW/MiUSPE2YV3Aqkyu12XnSQc/87wfwi7MSPha+MAvI4BlW//M5MrhLzC5nYNo7HHhbASiBjrFtOJwgvX/pW24HYP/4aWW4AwrxAaKyqqh6TtFbUpcNkh4ZuCoXzlJVVk=
+	t=1775203561; cv=none; b=RB9EFWIWFe9oUD0hXOilgp56awjV761ZUFVgRFBs+Kf33KpX4zpu93WlerX7kIGZtSyTq/uYL8/lYJkDf1XMKGTZN2n669RfNATYyNcmtNAyzD9JEDTcjS9WpjpSqGPK5fafwKkzvs4CFxSidTLGPXhfbYDTpRC0/giqZ0UheT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775198553; c=relaxed/simple;
-	bh=ZlN3Xcv//PGWhMaUUn2DCfcAjgqqDQavSOxaihwnDD4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UTDPStIi4SiwDTZQ5cXZxsTYV+f+BzILXSgD0gwgg2OOJCZYPGNJAgeh2IaZyU50cqbrxwHVuXm7o2mDPl10amA0Cnt1uUM+Zre+4WiLHRIhwqgWT8ni9c/L67xcLtHOVj1RBWxXwwGTrgxYw11sh0zgJkF+dG0xqFVCsTWxYdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=oxqZpM++; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="oxqZpM++"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version:
-	Content-Type; bh=OKN7gDnzs2Kz4+KE1BtUeHkFkEQcEiFpWJ8XzlwW2hE=;
-	b=oxqZpM++opknYomT0iaEFm78NNv3c2CzNNIoBG9TZf35QSGYdcPlIE2qTuNmGH
-	4JYk7eQlFG9xMQYV1nHvcOWGXA8vkuJDrQaedajw5v6p22e7+yXNltg5mxO1RXvj
-	kLLsU7f/Futf461VkKL8J64p2EFLQmz0F7Byl+0gn95Nw=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wDXj6RIYc9pDiQbDA--.61841S2;
-	Fri, 03 Apr 2026 14:42:17 +0800 (CST)
-From: zhangchen200426@163.com
-To: luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	zhangchen01@kylinos.cn,
-	zhangchen200426@163.com
-Subject: Re: [PATCH] [BlueZ,v1,1/1] avdtp: ignore Discover cmd when host sends before
-Date: Fri,  3 Apr 2026 14:42:14 +0800
-Message-Id: <20260403064214.1992828-1-zhangchen200426@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CABBYNZKVUyrKqu55jvOx2oTAgGN0D=Ff=W0K9nq2pVVii38Ovw@mail.gmail.com>
-References: <CABBYNZKVUyrKqu55jvOx2oTAgGN0D=Ff=W0K9nq2pVVii38Ovw@mail.gmail.com>
+	s=arc-20240116; t=1775203561; c=relaxed/simple;
+	bh=lNuXDaVMVTtjFpWDyGbBoy37vpqtUnAvB5VrdlJcpDc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=IF+f5zcE9tTn9xajXax7QBON/pHL07lVyiS3GB8VGwONaL0lriBmGIRO6wz9fnSaAfjtcbl81WosRxr9iMdW+04bh0OjhjEsxTLKI6esVr/3ZeEAvmR/ToLFQrVUMhp62inMiJKIrYcXN6KU/YSn9bEXNNj24b0cod26i8z4rzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=209.97.182.222
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowAAnoADQdM9pq_SiAA--.912S2;
+	Fri, 03 Apr 2026 16:05:36 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	enjou1224z@gmail.com,
+	wangjiexun2025@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH v2 1/1] Bluetooth: serialize accept_q access
+Date: Fri,  3 Apr 2026 16:05:28 +0800
+Message-ID: <06a6b4549acba207847ce532dedbf1c95ab22d13.1774925231.git.wangjiexun2025@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1774454568.git.wangjiexun2025@gmail.com>
+References: <cover.1774454568.git.wangjiexun2025@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDXj6RIYc9pDiQbDA--.61841S2
-X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjfUUiSHUUUUU
-X-CM-SenderInfo: x2kd0whfkh0jaqqujli6rwjhhfrp/xtbC6Am4VWnPYUniYAAA3A
+X-CM-TRANSID:ygmowAAnoADQdM9pq_SiAA--.912S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3Jw47Cr43tryxCr48JF1UJrb_yoWxXryUpF
+	yUCas8GFWkJw45ur43taykurWayw1rWr43GayFvas5Ar9agFWrt3W2yayjvr1YyFZrCrsa
+	yF4jgwnxCr4UC3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
+	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
+	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
+	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
+	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
+	n4kS14v26r1q6r43MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
+	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQQGCWnOkPwEvQABs5
 
-On Thu, 2 Apr 2026 12:34:46 -0400, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->
-> Hi,
->
-> On Thu, Apr 2, 2026 at 3:58 AM <zhangchen200426@163.com> wrote:
-> >
-> > From: Zhang Chen <zhangchen01@kylinos.cn>
-> >
-> > Theoretically, the party that initiates the connection should send the DISCOVER
-> > command. However, some devices, even though they are the connected party, still
-> > send the DISCOVER command. In such cases, there is a probability of connection
-> > failure.
-> >
-> > Fails:
-> >
-> > < ACL Data TX: Handle 10 flags 0x00 dlen 6
-> >       Channel: 71 len 2 [PSM 25 mode Basic (0x00)] {chan 1}
-> >       AVDTP: Discover (0x01) Command (0x00) type 0x00 label 4 nosp 0
-> > > ACL Data RX: Handle 10 flags 0x02 dlen 8
-> >       Channel: 64 len 4 [PSM 25 mode Basic (0x00)] {chan 1}
-> >       AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 4 nosp 0
-> >         ACP SEID: 1
-> >           Media Type: Audio (0x00)
-> >           SEP Type: SRC (0x00)
-> >           In use: No
-> > < ACL Data TX: Handle 10 flags 0x00 dlen 18
-> >       Channel: 71 len 14 [PSM 25 mode Basic (0x00)] {chan 1}
-> >       AVDTP: Set Configuration (0x03) Command (0x00) type 0x00 label 5 nosp 0
-> >         ACP SEID: 1
-> >         INT SEID: 37
-> >         Service Category: Media Transport (0x01)
-> >         Service Category: Media Codec (0x07)
-> >           Media Type: Audio (0x00)
-> >           Media Codec: SBC (0x00)
-> >             Frequency: 44100 (0x20)
-> >             Channel Mode: Joint Stereo (0x01)
-> >             Block Length: 16 (0x10)
-> >             Subbands: 8 (0x04)
-> >             Allocation Method: Loudness (0x01)
-> >             Minimum Bitpool: 2
-> >             Maximum Bitpool: 53
-> > > ACL Data RX: Handle 10 flags 0x02 dlen 6
-> >       Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 1}
-> >       AVDTP: Set Configuration (0x03) Response Accept (0x02) type 0x00 label 5 >
-> > > ACL Data RX: Handle 10 flags 0x02 dlen 6
-> >       Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 1}
-> >       AVDTP: Discover (0x01) Command (0x00) type 0x00 label 0 nosp 0
-> > < ACL Data TX: Handle 10 flags 0x00 dlen 10
-> >       Channel: 71 len 6 [PSM 25 mode Basic (0x00)] {chan 1}
-> >       AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 0 nosp 0
-> >         ACP SEID: 25
-> >           Media Type: Audio (0x00)
-> >           SEP Type: SNK (0x01)
-> >           In use: No
-> >         ACP SEID: 38
-> >           Media Type: Audio (0x00)
-> >           SEP Type: SRC (0x00)
-> >           In use: No
-> > < ACL Data TX: Handle 10 flags 0x00 dlen 7
-> >       Channel: 71 len 3 [PSM 25 mode Basic (0x00)] {chan 1}
-> >       AVDTP: Open (0x06) Command (0x00) type 0x00 label 6 nosp 0
-> >         ACP SEID: 1
-> > > ACL Data RX: Handle 10 flags 0x02 dlen 6
-> >       Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 1}
-> >       AVDTP: Open (0x06) Response Accept (0x02) type 0x00 label 6 nosp 0
-> > < ACL Data TX: Handle 10 flags 0x00 dlen 12
-> >       L2CAP: Connection Request (0x02) ident 5 len 4
-> >         PSM: 25 (0x0019)
-> >         Source CID: 65
-> > > ACL Data RX: Handle 10 flags 0x02 dlen 12
-> >       L2CAP: Disconnection Request (0x06) ident 5 len 4
-> >         Destination CID: 64
-> >         Source CID: 71
-> > < ACL Data TX: Handle 10 flags 0x00 dlen 12
-> >       L2CAP: Disconnection Response (0x07) ident 5 len 4
-> >         Destination CID: 64
-> >         Source CID: 71
-> > > ACL Data RX: Handle 10 flags 0x02 dlen 16
-> >       L2CAP: Connection Response (0x03) ident 5 len 8
-> >         Destination CID: 127
-> >         Source CID: 65
-> >         Result: Connection refused - PSM not supported (0x0002)
-> >         Status: No further information available (0x0000)
->
-> You may consider throwing away the device you got, it is prefectly
-> valid to have a discovery both ways, AVDTP does allows either way to
-> setup a stream after all.
->
-Both sides do have the ability to setup a streams. The AVDTP profile
-has two roles, namely the initiator and the acceptor. The AVDTP
-specification stipulates that the establishment of a stream is initiated
-by the initiator, and the acceptor is the responding party. Therefore,
-in a single connection, AVDTP streams should only be established by the
-party that initiates the connection.
-> > Works:
-> >
-> > < ACL Data TX: Handle 12 flags 0x00 dlen 6
-> >       Channel: 77 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
-> >       AVDTP: Discover (0x01) Command (0x00) type 0x00 label 11 nosp 0
-> > > ACL Data RX: Handle 12 flags 0x02 dlen 8
-> >       Channel: 64 len 4 [PSM 25 mode Basic (0x00)] {chan 0}
-> >       AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 11 nosp 0
-> >         ACP SEID: 1
-> >           Media Type: Audio (0x00)
-> >           SEP Type: SRC (0x00)
-> >           In use: No
-> > < ACL Data TX: Handle 12 flags 0x00 dlen 18
-> >       Channel: 77 len 14 [PSM 25 mode Basic (0x00)] {chan 0}
-> >       AVDTP: Set Configuration (0x03) Command (0x00) type 0x00 label 12 nosp 0
-> >         ACP SEID: 1
-> >         INT SEID: 13
-> >         Service Category: Media Transport (0x01)
-> >         Service Category: Media Codec (0x07)
-> >           Media Type: Audio (0x00)
-> >           Media Codec: SBC (0x00)
-> >             Frequency: 44100 (0x20)
-> >             Channel Mode: Joint Stereo (0x01)
-> >             Block Length: 16 (0x10)
-> >             Subbands: 8 (0x04)
-> >             Allocation Method: Loudness (0x01)
-> >             Minimum Bitpool: 2
-> >             Maximum Bitpool: 53
-> > > ACL Data RX: Handle 12 flags 0x02 dlen 6
-> >       Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
-> >       AVDTP: Set Configuration (0x03) Response Accept (0x02) type 0x00 label 12>
-> > > ACL Data RX: Handle 12 flags 0x02 dlen 6
-> >       Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
-> >       AVDTP: Discover (0x01) Command (0x00) type 0x00 label 0 nosp 0
->
-> Yeah, and that just breaks the command sequence in the process, so
-> this is a pretty bad idea if you ask me.
->
-In this connection, the host acts as the initiator, so only the host needs
-to send the discover command. The slave only needs to respond, and it is
-unnecessary and unreasonable for the slave to send the discover command again.
-This modification is to ignore the discover command sent by the slave in this
-connection. If the slave acts as the initiator next time, this discover
-command will not be ignored.
-> > < ACL Data TX: Handle 12 flags 0x00 dlen 7
-> >       Channel: 77 len 3 [PSM 25 mode Basic (0x00)] {chan 0}
-> >       AVDTP: Open (0x06) Command (0x00) type 0x00 label 13 nosp 0
-> >         ACP SEID: 1
-> > > HCI Event: Number of Completed... (0x13) plen 5
-> >         Num handles: 1
-> >         Handle: 12
-> >         Count: 1
-> > > ACL Data RX: Handle 12 flags 0x02 dlen 6
-> >       Channel: 64 len 2 [PSM 25 mode Basic (0x00)] {chan 0}
-> >       AVDTP: Open (0x06) Response Accept (0x02) type 0x00 label 13 nosp 0
-> >
-> > Signed-off-by: Zhang Chen <zhangchen01@kylinos.cn>
-> > ---
-> >  profiles/audio/avdtp.c | 10 ++++++++++
-> >  1 file changed, 10 insertions(+)
-> >
-> > diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> > index d475a545e..243c828bf 100644
-> > --- a/profiles/audio/avdtp.c
-> > +++ b/profiles/audio/avdtp.c
-> > @@ -413,6 +413,8 @@ struct avdtp {
-> >
-> >         /* Attempt stream setup instead of disconnecting */
-> >         gboolean stream_setup;
-> > +
-> > +       gboolean discover_start;
-> >  };
-> >
-> >  static GSList *state_callbacks = NULL;
-> > @@ -1418,6 +1420,11 @@ static gboolean avdtp_discover_cmd(struct avdtp *session, uint8_t transaction,
-> >         struct seid_info *seps, *p;
-> >         gboolean ret;
-> >
-> > +       if (session->discover_start) {
-> > +               DBG("DISCOVER_CMD has been sent before.");
-> > +               return TRUE;
-> > +       }
-> > +
-> >         sep_count = queue_length(session->lseps);
-> >
-> >         if (sep_count == 0) {
-> > @@ -2496,6 +2503,8 @@ struct avdtp *avdtp_new(GIOChannel *chan, struct btd_device *device,
-> >          * with respect to the disconnect timer */
-> >         session->stream_setup = TRUE;
-> >
-> > +       session->discover_start = FALSE;
-> > +
-> >         session->dc_timeout = DISCONNECT_TIMEOUT;
-> >
-> >         avdtp_connect_cb(chan, NULL, session);
-> > @@ -3484,6 +3493,7 @@ int avdtp_discover(struct avdtp *session, avdtp_discover_cb_t cb,
-> >         if (err == 0) {
-> >                 session->discover->cb = cb;
-> >                 session->discover->user_data = user_data;
-> > +               session->discover_start = TRUE;
-> >         } else if (session->discover) {
-> >                 g_free(session->discover);
-> >                 session->discover = NULL;
-> > --
-> > 2.25.1
-> >
-> >
->
->
+From: Jiexun Wang <wangjiexun2025@gmail.com>
 
+bt_sock_poll() walks the accept queue without synchronization, while
+child teardown can unlink the same socket and drop its last reference.
 
+Protect accept_q with a dedicated lock for queue updates and polling.
+Also rework bt_accept_dequeue() to take temporary child references under
+the queue lock before dropping it and locking the child socket.
 
+Fixes: 1da177e4c3f41524e886b7f1b8a0c1fc7321cac2 ("Linux-2.6.12-rc2")
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Tested-by: Ren Wei <enjou1224z@gmail.com>
+Signed-off-by: Jiexun Wang <wangjiexun2025@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+---
+Changes in v2:
+- add Tested-by: Ren Wei <enjou1224z@gmail.com>
+- resend to the public Bluetooth/netdev lists
+
+ include/net/bluetooth/bluetooth.h |  1 +
+ net/bluetooth/af_bluetooth.c      | 85 +++++++++++++++++++++++--------
+ 2 files changed, 66 insertions(+), 20 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 69eed69f7f26..3faea66b1979 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -398,6 +398,7 @@ void baswap(bdaddr_t *dst, const bdaddr_t *src);
+ struct bt_sock {
+ 	struct sock sk;
+ 	struct list_head accept_q;
++	spinlock_t accept_q_lock; /* protects accept_q */
+ 	struct sock *parent;
+ 	unsigned long flags;
+ 	void (*skb_msg_name)(struct sk_buff *, void *, int *);
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 2b94e2077203..f44e1ecc83d8 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -154,6 +154,7 @@ struct sock *bt_sock_alloc(struct net *net, struct socket *sock,
+ 
+ 	sock_init_data(sock, sk);
+ 	INIT_LIST_HEAD(&bt_sk(sk)->accept_q);
++	spin_lock_init(&bt_sk(sk)->accept_q_lock);
+ 
+ 	sock_reset_flag(sk, SOCK_ZAPPED);
+ 
+@@ -214,6 +215,7 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
+ {
+ 	const struct cred *old_cred;
+ 	struct pid *old_pid;
++	struct bt_sock *par = bt_sk(parent);
+ 
+ 	BT_DBG("parent %p, sk %p", parent, sk);
+ 
+@@ -224,9 +226,12 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
+ 	else
+ 		lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
+ 
+-	list_add_tail(&bt_sk(sk)->accept_q, &bt_sk(parent)->accept_q);
+ 	bt_sk(sk)->parent = parent;
+ 
++	spin_lock_bh(&par->accept_q_lock);
++	list_add_tail(&bt_sk(sk)->accept_q, &par->accept_q);
++	spin_unlock_bh(&par->accept_q_lock);
++
+ 	/* Copy credentials from parent since for incoming connections the
+ 	 * socket is allocated by the kernel.
+ 	 */
+@@ -254,45 +259,73 @@ EXPORT_SYMBOL(bt_accept_enqueue);
+  */
+ void bt_accept_unlink(struct sock *sk)
+ {
++	struct sock *parent = bt_sk(sk)->parent;
++
+ 	BT_DBG("sk %p state %d", sk, sk->sk_state);
+ 
++	spin_lock_bh(&bt_sk(parent)->accept_q_lock);
+ 	list_del_init(&bt_sk(sk)->accept_q);
+-	sk_acceptq_removed(bt_sk(sk)->parent);
++	spin_unlock_bh(&bt_sk(parent)->accept_q_lock);
++
++	sk_acceptq_removed(parent);
+ 	bt_sk(sk)->parent = NULL;
+ 	sock_put(sk);
+ }
+ EXPORT_SYMBOL(bt_accept_unlink);
+ 
++static struct sock *bt_accept_get(struct sock *parent, struct sock *sk)
++{
++	struct bt_sock *bt = bt_sk(parent);
++	struct sock *next = NULL;
++
++	/* accept_q is modified from child teardown paths too, so take a
++	 * temporary reference before dropping the queue lock.
++	 */
++	spin_lock_bh(&bt->accept_q_lock);
++
++	if (sk) {
++		if (bt_sk(sk)->parent != parent)
++			goto out;
++
++		if (!list_is_last(&bt_sk(sk)->accept_q, &bt->accept_q)) {
++			next = &list_next_entry(bt_sk(sk), accept_q)->sk;
++			sock_hold(next);
++		}
++	} else if (!list_empty(&bt->accept_q)) {
++		next = &list_first_entry(&bt->accept_q,
++					 struct bt_sock, accept_q)->sk;
++		sock_hold(next);
++	}
++
++out:
++	spin_unlock_bh(&bt->accept_q_lock);
++	return next;
++}
++
+ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+ {
+-	struct bt_sock *s, *n;
+-	struct sock *sk;
++	struct sock *sk, *next;
+ 
+ 	BT_DBG("parent %p", parent);
+ 
+ restart:
+-	list_for_each_entry_safe(s, n, &bt_sk(parent)->accept_q, accept_q) {
+-		sk = (struct sock *)s;
+-
++	for (sk = bt_accept_get(parent, NULL); sk; sk = next) {
+ 		/* Prevent early freeing of sk due to unlink and sock_kill */
+-		sock_hold(sk);
+ 		lock_sock(sk);
+ 
+ 		/* Check sk has not already been unlinked via
+ 		 * bt_accept_unlink() due to serialisation caused by sk locking
+ 		 */
+-		if (!bt_sk(sk)->parent) {
++		if (bt_sk(sk)->parent != parent) {
+ 			BT_DBG("sk %p, already unlinked", sk);
+ 			release_sock(sk);
+ 			sock_put(sk);
+ 
+-			/* Restart the loop as sk is no longer in the list
+-			 * and also avoid a potential infinite loop because
+-			 * list_for_each_entry_safe() is not thread safe.
+-			 */
+ 			goto restart;
+ 		}
+ 
++		next = bt_accept_get(parent, sk);
++
+ 		/* sk is safely in the parent list so reduce reference count */
+ 		sock_put(sk);
+ 
+@@ -310,6 +343,8 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+ 				sock_graft(sk, newsock);
+ 
+ 			release_sock(sk);
++			if (next)
++				sock_put(next);
+ 			return sk;
+ 		}
+ 
+@@ -518,18 +553,28 @@ EXPORT_SYMBOL(bt_sock_stream_recvmsg);
+ 
+ static inline __poll_t bt_accept_poll(struct sock *parent)
+ {
+-	struct bt_sock *s, *n;
++	struct bt_sock *bt = bt_sk(parent);
++	struct bt_sock *s;
+ 	struct sock *sk;
++	__poll_t mask = 0;
++
++	spin_lock_bh(&bt->accept_q_lock);
++	list_for_each_entry(s, &bt->accept_q, accept_q) {
++		int state;
+ 
+-	list_for_each_entry_safe(s, n, &bt_sk(parent)->accept_q, accept_q) {
+ 		sk = (struct sock *)s;
+-		if (sk->sk_state == BT_CONNECTED ||
+-		    (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags) &&
+-		     sk->sk_state == BT_CONNECT2))
+-			return EPOLLIN | EPOLLRDNORM;
++		state = READ_ONCE(sk->sk_state);
++
++		if (state == BT_CONNECTED ||
++		    (test_bit(BT_SK_DEFER_SETUP, &bt->flags) &&
++		     state == BT_CONNECT2)) {
++			mask = EPOLLIN | EPOLLRDNORM;
++			break;
++		}
+ 	}
++	spin_unlock_bh(&bt->accept_q_lock);
+ 
+-	return 0;
++	return mask;
+ }
+ 
+ __poll_t bt_sock_poll(struct file *file, struct socket *sock,
 -- 
-Regards,
-    Zhang Chen
+2.34.1
 
