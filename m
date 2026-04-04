@@ -1,72 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D31221F06;
-	Sat,  4 Apr 2026 11:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3667E30BF66
+	for <linux-bluetooth@vger.kernel.org>; Sat,  4 Apr 2026 12:30:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775300621; cv=none; b=MHoMaaSuZj5bUkHFN10kYLSwuK3LutYK52vehEwP7i8Jxt006+8gSWhRaENHu8HfiYEBNUKyNMPO8vT+TP2sMKCf3BxCasvTEvu62hsn30sDL68hGLGfq2jwC/fLCNvtwd5NbYhbYnCtIvWU/Q40hW6mOm4u4kbAlhEkSMc9uP0=
+	t=1775305852; cv=none; b=m7eupxKUjbBSwfI2fm7Z44/1jdpwUsqZsyzUarrsj6rD5kYAU4Q+lPxx+CA9DbEE0aWBeULhrA0duLHuTRNPGKWGFsFHMdw6/GqYB936pcaAg/J8QIJOZ+ufVhwLJ7gPtLj31W/R6VK+EwEwLwWZha7aildQArSEKZPkDBbdDNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775300621; c=relaxed/simple;
-	bh=6St2+FWQW6l2+yulRPhL9B9LaFWvnweTQb8aao65BJQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eDTM0a33DY/185BaI19yg9+xmZSFoIy9Xx0bxj5FLCPvaVw+2zPtcIu3kVpd95WcfxFFfXUbgd0Q4yEDUXdUG/gF+6z6PtpYHLur9vDBK7uQI0OOBVbqDoSuO8rt4031/zW+zBWFjpxnAsM/BceF0rrtUBGy+l0prD4PADbl7JQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LlNyJzEP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775305852; c=relaxed/simple;
+	bh=yBYqG8f/BNhSoefQs4Dp++NLQbYC5JQ8dk7Ttks9e5M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q+lqgXbnKKlBL4mNThnC0c5aQ9bFq55vW6Yn3RzqCZUpMDdZfHYExZkdD/TvSiFXoTmPMibrwT2czRxCtRtnpMNwPGSYyoGZ9e4t4TeJOlUxUHyoST7FgaYiMRlYCippvBCbiTtRqPqZpFHUBICV3DbsKlwjf4FkMwW1nA55PaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vgj66MTy; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LlNyJzEP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05B5BC19421;
-	Sat,  4 Apr 2026 11:03:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775300621;
-	bh=6St2+FWQW6l2+yulRPhL9B9LaFWvnweTQb8aao65BJQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LlNyJzEP1vCy3VsXqvb+qYWW7ZgAAcWmqH3alo3kX5XyniTbUiC/P0mDfU/ml39KV
-	 0bOSX5o1nV5jSsW3IXO9FT/REUxr+KXeBtDRpTjuZkw7/77HI04blC8qRB5T2S13nJ
-	 dDgveJhRGnQ/4gyG9p2PLkN0UUEON9oS/fh764MK3IL2wt6ehQsFhK6+IX7BABewy4
-	 3pEl+awEVmsfviM7h3WUMU1n5tz8UK+hZMbnkQnKRUjRciQ7LL9LdfathHb+BrLkM1
-	 eM467LdIvq2ZKSCC5xLOH3WalCvBVkE93O1MValbuQh+qOmgjYS315D+J1ICMy678L
-	 batJXhfwJvgzw==
-Date: Sat, 4 Apr 2026 13:03:39 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Luca Weiss <luca.weiss@fairphone.com>
-Cc: Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Alexander Koskovich <AKoskovich@pm.me>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Jeff Johnson <jjohnson@kernel.org>, 
-	~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org
-Subject: Re: [PATCH v2 3/7] dt-bindings: net: wireless: ath11k: Document
- WCN6755 WiFi
-Message-ID: <20260404-sceptical-benign-chachalaca-e13aa9@quoll>
-References: <20260403-milos-fp6-bt-wifi-v2-0-393322b27c5f@fairphone.com>
- <20260403-milos-fp6-bt-wifi-v2-3-393322b27c5f@fairphone.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vgj66MTy"
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b9b1df1a6b3so325639566b.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 04 Apr 2026 05:30:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775305848; x=1775910648; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lQJwHs7LLfBmb1/jGCD5Yd30WkGkaC/E9C+9sb1VIRE=;
+        b=Vgj66MTyEIDPCC0y7DGE+EiNoaSz5V9NkCuUmt230xfJAbFbRFp4ZM5vi/lpIbUQNr
+         /u1xJqNQEMXDzC46+M/vKwQH4NSFYwWzAZQetRxjyo2lkQHTWw9YV+8AqDPJIwy0n++F
+         +4T2R9bKblExYMDEqX+k9lmurs6M5fu7pEululG2gdkmf5+3yOmjQiYMYQqOs5EDUmK3
+         9SantYtRwbb5DkXqCdWjZol5bA0DyRaRzQ8OdVWWStofkIFeziyzvxoFvHLIgoPlkj0o
+         rtcLlJBmx2V/llCaNlsfb+oDWGR8oG83XK34NhT5/H0dbBcqziYjronia07CJL8ccH+O
+         4QUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775305848; x=1775910648;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lQJwHs7LLfBmb1/jGCD5Yd30WkGkaC/E9C+9sb1VIRE=;
+        b=gl9/VuBrcj2UrxCzRCHx6nbTMu6p0JnFQFcd40Cd9/sknzIPQIYXxqabCn/3ZPNvWd
+         X1GpfHzhdZ8B72yC9iYZcgAZb2v02XdwJScTdz7lW1W7eW7dheWI9Jx41qkzvE3rBkXa
+         kIwcYsvT6mHRFsZQLdwOo451b26SRiHbytAzj8h8/Mrw3iIQNOufQEfZgCxaIFq/wkiX
+         r67nK+lDGnzEvMzYKfUnb5tW2TM1KDG8BHsxLvIboqBjMo9B6O8pOxzoLwYixV30xDH+
+         4m6DPPbx+5IPjZDOBRpz48wS79ByymrTB8bMKxc4yVtGySNFA7sYDtGB8btpqdXUQzGq
+         apuw==
+X-Gm-Message-State: AOJu0YzsHfOnuHR/ofVeBn31eSeB3G0EwS82VXTY3UZp4HhbQdHwxUxo
+	0KRepfsa/OnkEvkpiXLnx6GULMZ8xoaksaXm/gACRyxLXyZsYajyyNBxJWFl
+X-Gm-Gg: AeBDievUBUDAkZuMtOxrCMdHP3FphmeyqMxsK1puVlsXohhYJv9rndhi2oYCuTv0pE7
+	8qgiD+i//8oK21Qh36XMMz/orkZeiSu7QulWdpqzu8MVUydAoycI5bpkWeVHY/xTYinjaXy1prG
+	FkoC0C3Gq5lTaxuG7BBwdIh2d2u9TH1whivU/CODb5AXORhSQ2zQwwJns4FFha501Hf0lfZ3/He
+	vUpjiwX+rHnlgFbnfsvivM0r1e0C7WmykNodTBrHsZYKts/iCAd0FH+sM6LfZj3yKPUwLeRwr2G
+	pFW3Pajkg4AEqBMkbgL7ktA/5GZ7lKCDeHNa9Hug8r9HT/FfagWwffWM+T2BPizrn5+EX2Zn9ml
+	Fp1Phjh9S0u5EomGsnqi/701ZYPX2oePKBtSKh8i4gtM0udPVBuIUimgNZSROeBmGJv9d6BTXJL
+	/+6QTcIvtk3wPtSuvy0VMITH0xo4I=
+X-Received: by 2002:a17:906:6a1e:b0:b97:feec:5e82 with SMTP id a640c23a62f3a-b9c67b83920mr340531266b.43.1775305847511;
+        Sat, 04 Apr 2026 05:30:47 -0700 (PDT)
+Received: from mczerski.lan ([2a02:a311:43ab:e720:8870:5268:2b23:e74b])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9c3d026466sm285940566b.55.2026.04.04.05.30.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 04 Apr 2026 05:30:47 -0700 (PDT)
+From: Marek Czerski <ma.czerski@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marek Czerski <ma.czerski@gmail.com>
+Subject: [PATCH BlueZ] sixaxis: DS4: use 0x12 cmd to get device bdaddr
+Date: Sat,  4 Apr 2026 14:30:42 +0200
+Message-ID: <20260404123042.3049158-1-ma.czerski@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260403-milos-fp6-bt-wifi-v2-3-393322b27c5f@fairphone.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 03, 2026 at 03:52:49PM +0200, Luca Weiss wrote:
-> Document the WCN6755 WiFi using a fallback to WCN6750 since the two
-> chips seem to be completely pin and software compatible. In fact the
-> original downstream kernel just pretends the WCN6755 is a WCN6750.
-> 
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> ---
->  .../devicetree/bindings/net/wireless/qcom,ath11k.yaml    | 16 +++++++++++-----
->  1 file changed, 11 insertions(+), 5 deletions(-)
+This change is required for Esperanza EGG109k ps controller clone.
+EGG109k looks like PS3 controller but presents itself to the system
+as PS4 controller. It does not respond to 0x81 command.
+Command 0x12 contains both the device mac address as well as
+configured host mac address, so it can be used to query
+both. Kernel driver also uses 0x12 command for that.
+---
+ plugins/sixaxis.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-
-Best regards,
-Krzysztof
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index 27bc09815..8e212ee71 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -111,12 +111,12 @@ static int sixaxis_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
+ 
+ static int ds4_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
+ {
+-	uint8_t buf[7];
++	uint8_t buf[16];
+ 	int ret;
+ 
+ 	memset(buf, 0, sizeof(buf));
+ 
+-	buf[0] = 0x81;
++	buf[0] = 0x12;
+ 
+ 	ret = ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
+ 	if (ret < 0) {
+-- 
+2.43.0
 
