@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8DE34752A
-	for <linux-bluetooth@vger.kernel.org>; Sun,  5 Apr 2026 12:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECC93064B5
+	for <linux-bluetooth@vger.kernel.org>; Sun,  5 Apr 2026 12:41:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775392886; cv=pass; b=OjYLkc/jSBQME1Qw3XXjQzKU5Ul42EhIaIyp/9zn7Zxh7HOPrt0Nr4KlK1wg7u8Wx/zxhxO+hoKiA6fEtT7kxvm9ENMG9ISmu4AheAM52b5eSzZx/ljnV2rVdRSY1QsNfsC6nHU3W1iEBsuVdDyxcKwK+VjspHYoen70LHLuM78=
+	t=1775392887; cv=pass; b=A1X1SxP5wbPFVzg0froDsiw0SR1xIQ/nnHm3wmHwtkx/BsiabMZtvJiYVPOm8BNi2qEp5sQAI3KIB4X1+vVNzPf6l/2QPpcwT3QkoPFB8HvrWvttvpFBDWfax17ovcACXXYo1oJN4LORTlPokdE796a6dFcblEj0U1m4c8zC9v8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775392886; c=relaxed/simple;
-	bh=t6JpcX9hvH/kiPaZfXNnPG+t+8U7dl70qvtdtuvLrf4=;
+	s=arc-20240116; t=1775392887; c=relaxed/simple;
+	bh=PQ+Fmv+GM8CVmZCsRZ5QIz1eo9T+MX5mlzXs12AYdd8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DjLHrvUvi2BacybPiFlD1mUI56cgYESfvNerlG78CArWPCtHHW80g3qA083fR2odFp9L04TjcxUl2WvaDSEm7XAyyy9Ox3GviON9vypREavRMZsYiK7IhUyWerlq5D9dUHAlKrhmnjMCAh1+A37rj/vhcHfPrLoVnb6bI0aKjW0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=P/JXrUQ8; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=XRyoVJjzZca4zdvAakHdGZfEGxhjTHnmY9k3Y0xVkoQQKORmhGEBgg13jKut5AnU1pg4p9YRN77vTl2f5aYiQzjE1m82FkIziIAcEZORqvux60ebzT4NjmJHqn9HVSsxRJCrRqg075uT5XS3fHg+Zi+fUlqxBPDboku2rhGx3Oc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=TFL9BL9z; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="P/JXrUQ8"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="TFL9BL9z"
 Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:3::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4fpXBk2NM6zyxJ;
-	Sun, 05 Apr 2026 15:41:18 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4fpXBq28RkzyxD;
+	Sun, 05 Apr 2026 15:41:23 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1775392878;
+	t=1775392883;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=a3T8dqS3YL1lMe8iLj91OTICICWJNtnWRy+JtHSO/es=;
-	b=P/JXrUQ8ork6A3gNPw+/W7YANXY5ypdpjzouh64DnhLF4k0HpHJ5AVg9lahdYCd80GlbZO
-	P4DEyQIbZtyOabGC/mPpU0NLwaq6oR12AuHltRBX3+aZIHb3kM/puw8hTG5zdpCdrDYH9N
-	FsWqi2eqSf+CX+jrQ4wfmKYymtYx9YE=
+	bh=8MaCMwgXIZrlppSsYG2079OSdAnkGOQ23ZJUWof0xaA=;
+	b=TFL9BL9z0IAGejdxtJ429SDP+ATNRS3bOC9+B64fjxeENHl3amiHT8ZfVUkPpQEeM0IEq8
+	QPmpevKW9c0cL/iAElb/I2fLem1UoGnNMqZ9d2/zzfwVsjS/2BUyhGDH1Zav9yakuRh+1J
+	bswh0cFRNmXzEWgznpZTPG0ZUjh+c34=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1775392878;
+	s=meesny; t=1775392883;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=a3T8dqS3YL1lMe8iLj91OTICICWJNtnWRy+JtHSO/es=;
-	b=U64Oi+SJW46JpatFLQNK+9TXDEHpvfqLOssLAqIpF0Fyy+ctVfUzznslaRQ52HaE07keqj
-	aZlsiJf+A4yd0m2d6HJVfUkeqDSXAF7x4tztCIntxUdEom8NXoRR6au7rFWg1hwtx0WNXI
-	ZbqExbeTftZH+AkOtxnkjavK/d9UNp0=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1775392878;
-	b=ab+PLL9I++gcm7qjaqirmqkKe5JMIMZjoXealImEOCnLeiJMY8/h1RAZlJjilr9IBKBz+E
-	mVSpGY5qO62GVHyjjzthaLLqaEe0v5ZWdOcKbgEClU5UPgD0xch3/306Zx7C8V6fsCtSXw
-	oNkj+F/mRA6Ed2UEyU20R6NS3BHixWU=
+	bh=8MaCMwgXIZrlppSsYG2079OSdAnkGOQ23ZJUWof0xaA=;
+	b=O99iwPG7aLahdopmDuZL2CqCv42znueSYEY70gqtKvzL7npMBkYpOzUC60u3dQ4Rovu68O
+	dzQs1dQTQCJNv6ig1ny4tS18gjY9ArOM0F3zI+aEqobPInNboksdVDTWb+3zAp92Oak5oY
+	e5QwamDXo4JxMV7Yzrx3ojRPCfrA9H4=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1775392883;
+	b=HcXTKtCjoCRytC0hgcx8HYQK/Se7EOynxg9L7gzFgLBDzVt03fouGVpUO4YymHYOcCFkT7
+	EWSUpY5QARfK7AzIjVWZMtu86IJ4ttbBm6N0KbxA50ko3YD0oW18labBRc/PdNGWFokZD0
+	IvSqnltFvBvrotGI7fCyLcYoRs2oqWc=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v4 14/20] test: functional: add --btmon option to start btmon
-Date: Sun,  5 Apr 2026 15:39:55 +0300
-Message-ID: <8deb41a034f1c5d047a030a00534ad409658233d.1775392680.git.pav@iki.fi>
+Subject: [PATCH BlueZ v4 15/20] build: add functional testing target
+Date: Sun,  5 Apr 2026 15:39:56 +0300
+Message-ID: <4f1eb2329419ea339808ef787b9c18712459e876.1775392680.git.pav@iki.fi>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1775392680.git.pav@iki.fi>
 References: <cover.1775392680.git.pav@iki.fi>
@@ -67,244 +67,69 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-After test finishes, any btmon dumps created are copied to current
-working directory.
----
- doc/test-functional.rst       |   9 +++
- test/pytest_bluez/__init__.py |   1 +
- test/pytest_bluez/btmon.py    | 116 ++++++++++++++++++++++++++++++++++
- test/pytest_bluez/plugin.py   |  33 +++++++---
- 4 files changed, 150 insertions(+), 9 deletions(-)
- create mode 100644 test/pytest_bluez/btmon.py
+This adds check-functional: target that runs the functional test suite.
 
-diff --git a/doc/test-functional.rst b/doc/test-functional.rst
-index f51401930..8c392ff73 100644
---- a/doc/test-functional.rst
-+++ b/doc/test-functional.rst
-@@ -34,6 +34,9 @@ The following additional options apply:
- 	environment variable is used. If none, all USB controllers
- 	with suitable permissions are considered.
+Also add a --enable-functional-testing=<kernel-image> argument for
+configure that can be used to include it in the check: make target,
+possibly with a predefined kernel image.
+---
+ Makefile.am  |  9 +++++++++
+ configure.ac | 22 ++++++++++++++++++++++
+ 2 files changed, 31 insertions(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index 8fdf8d7fe..c65c02370 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -806,6 +806,15 @@ endif
+ TESTS = $(unit_tests)
+ AM_TESTS_ENVIRONMENT = MALLOC_CHECK_=3 MALLOC_PERTURB_=69
  
-+:--btmon: Launch btmon on all hosts to log events, and dump traffic to
-+	test-functional-\*.btsnoop
++check-functional: all
++	$(srcdir)/test/test-functional -v --kernel="$(FUNCTIONAL_TESTING_KERNEL)" \
++		--bluez-build-dir="$(top_builddir)" --bluez-src-dir="$(srcdir)" \
++		$(srcdir)/test
 +
- :--force-usb: Force tests to use USB controllers instead of `btvirt`.
++if FUNCTIONAL_TESTING
++check: check-functional
++endif
++
+ if DBUS_RUN_SESSION
+ AM_TESTS_ENVIRONMENT += dbus-run-session --
+ endif
+diff --git a/configure.ac b/configure.ac
+index 52de7d665..254d90318 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -405,6 +405,28 @@ if (test "${enable_testing}" = "yes"); then
+ 		#include <linux/net_tstamp.h>]])
+ fi
  
- :--vm-timeout=<seconds>: Specify timeout for communication with VM hosts.
-@@ -726,6 +729,12 @@ Bluetoothd
- 
- Host plugin starting Bluetoothd.
- 
-+Btmon
-+-----
++AC_ARG_ENABLE(functional-testing, AS_HELP_STRING([--enable-functional-testing],
++			[enable functional testing tools]),
++			[enable_functional_testing=yes; functional_testing_kernel=${enableval}],
++                        [enable_functional_testing=no])
++AM_CONDITIONAL(FUNCTIONAL_TESTING, test "${enable_functional_testing}" = "yes")
++AC_ARG_VAR(FUNCTIONAL_TESTING_KERNEL, [vmlinux image to use for functional testing])
++FUNCTIONAL_TESTING_KERNEL=${functional_testing_kernel}
 +
-+Host plugin providing btmon running in the background.
-+Usually should be loaded via `--btmon`.
++if (test "${enable_functional_testing}" = "yes"); then
++  if (test "${enable_client}" = "no" || \
++      test "${enable_tools}" != "yes" || \
++      test "${enable_testing}" != "yes"); then
++    AC_MSG_ERROR([--enable-functional-testing requires --enable-client --enable-tools --enable-testing])
++  fi
++  AC_MSG_CHECKING([pytest and dependencies])
++  python3 -m pip install --dry-run --no-index -r "${srcdir}/test/functional/requirements.txt" >/dev/null
++  if (test "$?" != "0"); then
++    AC_MSG_ERROR([pytest or dependencies missing])
++  fi
++  AC_MSG_RESULT([ok])
++fi
 +
- Call
- ----
- 
-diff --git a/test/pytest_bluez/__init__.py b/test/pytest_bluez/__init__.py
-index cb4dca71c..9e967d472 100644
---- a/test/pytest_bluez/__init__.py
-+++ b/test/pytest_bluez/__init__.py
-@@ -6,5 +6,6 @@ from .rpc import RemoteError
- from .env import *
- from .utils import *
- from .host_plugins import *
-+from .btmon import *
- 
- from .plugin import *
-diff --git a/test/pytest_bluez/btmon.py b/test/pytest_bluez/btmon.py
-new file mode 100644
-index 000000000..6a03353dd
---- /dev/null
-+++ b/test/pytest_bluez/btmon.py
-@@ -0,0 +1,116 @@
-+# -*- coding: utf-8; mode: python; eval: (blacken-mode); -*-
-+# SPDX-License-Identifier: GPL-2.0-or-later
-+"""
-+VM host plugin for btmon
-+"""
-+import os
-+import re
-+import subprocess
-+import tempfile
-+import logging
-+import time
-+
-+from . import env, utils
-+
-+__all__ = [
-+    "Btmon",
-+]
-+
-+
-+class Btmon(env.HostPlugin):
-+    """
-+    Host plugin running btmon and forwarding output to logging. Parses
-+    timestamps output by btmon.
-+
-+    """
-+
-+    name = "btmon"
-+
-+    def __init__(self, args=None):
-+        self.args = None if args is None else list(args)
-+        self.end_time = None
-+
-+    def setup(self, impl):
-+        self.log = logging.getLogger(self.name)
-+
-+        subprocess.run(["mount"])
-+
-+        self.dumpfile = f"/run/shared/test-functional-{impl.instance_name}.btsnoop"
-+
-+        if self.args is None:
-+            self.args = [
-+                "-S",
-+                "-A",
-+                "-I",
-+                "--color=always",
-+                f"--columns=160",
-+                "-w",
-+                self.dumpfile,
-+            ]
-+
-+        exe = utils.find_exe("monitor", "btmon")
-+        self.log_stream = BtmonLogStream("btmon")
-+        cmd = [exe, "-T"] + self.args
-+        self.log_stream.log.info("Starting btmon: {}".format(utils.quoted(cmd)))
-+        self.job = subprocess.Popen(
-+            cmd,
-+            stdin=subprocess.DEVNULL,
-+            stdout=self.log_stream.stream,
-+            stderr=subprocess.STDOUT,
-+        )
-+
-+    def stop(self):
-+        if self.job.poll() is None:
-+            self.job.terminate()
-+
-+        if self.end_time is None:
-+            self.end_time = time.time_ns()
-+
-+    def teardown(self):
-+        self.stop()
-+
-+        self.log.info("Wait for btmon shutdown...")
-+        while self.job.poll() is None and self.log_stream._nsec < self.end_time:
-+            time.sleep(0.5)
-+
-+        self.log_stream.close()
-+
-+        self.job.kill()
-+        self.job.wait()
-+
-+        self.log.info("Teardown done.")
-+
-+
-+class BtmonLogStream(utils.LogStream):
-+    """
-+    Log streams that parses timestamps from btmon output
-+    """
-+
-+    def __init__(self, name):
-+        super().__init__(name)
-+        self._localtime_tail = time.localtime()[6:]
-+        self._time_pat = re.compile(
-+            rb"\s(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)\.(\d+)(?:$|\x1b)"
-+        )
-+
-+    def _get_time(self, line, anc):
-+        m = self._time_pat.search(line)
-+        if m:
-+            m = m.groups()
-+            ts = (
-+                int(m[0]),
-+                int(m[1]),
-+                int(m[2]),
-+                int(m[3]),
-+                int(m[4]),
-+                int(m[5]),
-+            ) + self._localtime_tail
-+            ts = time.mktime(ts) + int(m[6]) / 10 ** len(m[6])
-+            self._nsec = int(ts * 1e9)
-+
-+        if self._nsec is None:
-+            return super()._get_time(line, anc)
-+
-+        nsec = self._nsec
-+        self._nsec += 1
-+        return nsec
-diff --git a/test/pytest_bluez/plugin.py b/test/pytest_bluez/plugin.py
-index 36de4a812..9f7e2b369 100644
---- a/test/pytest_bluez/plugin.py
-+++ b/test/pytest_bluez/plugin.py
-@@ -11,6 +11,7 @@ from pathlib import Path
- import pytest
- 
- from . import utils, env
-+from .btmon import Btmon
- 
- 
- __all__ = [
-@@ -110,6 +111,11 @@ def pytest_addoption(parser):
-     parser.addini(
-         "vm_timeout", "Default timeout for communication with VM etc.", default="30"
-     )
-+    group.addoption(
-+        "--btmon",
-+        action="store_true",
-+        help="Launch btmon on all hosts to log events, and dump traffic to test-functional-*.btsnoop",
-+    )
- 
-     # host_plugins.Rcvbuf:
-     parser.addini(
-@@ -459,6 +465,9 @@ def _hosts_impl(request, vm, setup, name, reuse):
- 
-         h.set_instance_name(f"{name}.{idx}")
- 
-+        if request.session.config.option.btmon:
-+            plugins = (Btmon(),) + plugins
-+
-         for p in plugins:
-             h.start_load(p)
- 
-@@ -477,18 +486,24 @@ def _close_hosts(request, vm, name):
-     if name is None:
-         return
- 
--    success = True
-     try:
--        vm.close_hosts()
--    except:
--        success = False
--        warnings.warn(traceback.format_exc())
-+        if request.session.config.option.btmon and name is not None:
-+            for h in vm.hosts:
-+                if hasattr(h, "btmon"):
-+                    h.btmon._call_noreply("teardown")
-     finally:
--        _copy_host_files(vm)
-+        success = True
-+        try:
-+            vm.close_hosts()
-+        except:
-+            success = False
-+            warnings.warn(traceback.format_exc())
-+        finally:
-+            _copy_host_files(vm)
- 
--        # Stop VM if tester is not responding
--        if not success:
--            vm.stop()
-+            # Stop VM if tester is not responding
-+            if not success:
-+                vm.stop()
- 
- 
- def _copy_host_files(vm):
+ AC_ARG_ENABLE(experimental, AS_HELP_STRING([--enable-experimental],
+ 			[enable experimental tools]),
+ 					[enable_experimental=${enableval}])
 -- 
 2.53.0
 
