@@ -1,240 +1,465 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from out-36.smtp.github.com (out-36.smtp.github.com [192.30.252.135])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD7F61A285
-	for <linux-bluetooth@vger.kernel.org>; Sun,  5 Apr 2026 12:46:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775393168; cv=pass; b=CrA6XRj6J0XJ2R6NDnx2/8JLpKwn33cO8A1YhP/ytG3ejuXAcHKb0RwXQRg0vXEnxx66UHjABizKcH+VSBwoTB2GMqQoSikMLmvIA9SM19Ws6+bvnujVvpwDvR1waabfeKT4KA642mKX7ydAUroNvmtC6H7+VMoZ9snofnixHZg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775393168; c=relaxed/simple;
-	bh=a4oih04jlTUOj6HrlfYVdeeRbA5HVLZm7qwaDTqCJGU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=rhd5k5iOeBr2SC3sTvWxo3UQB6/0vnr3qYwG1f0k8AakenE5LjZPkGURYHnVWE1SuxThhjswDEiU+0iwtm/CNttRDaV4bOITlQl5Zbo1c/NW+CzF+Nm/zILSeFMIvlkgKjKesfU1Ngiav9Ot4ZxwSRqGHeOKNmanzlwQjL+hL7o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=U5r5uz9Q; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2DA23E32B
+	for <linux-bluetooth@vger.kernel.org>; Sun,  5 Apr 2026 13:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.135
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775396273; cv=none; b=ZkIdfn8YEXk32Xmcuvo0t0ykCQjOpHbirixIUxkk4RAyvg+N7ly5PIypWB6yHDYaZvsk1i9FxbiDmXbICULeiOaC3OPlypIS/K8KoDCPbkhDWZmBhdOZFwKkpeCUkVPcclDLtGYPr/Wjetw+wFvZEy69sFHVuPvSicQ4d55oVFk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775396273; c=relaxed/simple;
+	bh=q025ERarCZBaCkY0L4uYKGpnYwDRF6va+ESX+9lHrEQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=hNaVtEvf1fFA9mMG335nF0Qg+/m7LV03zWH4lHegDl7CNyntC6cDj2+Snl6dLqEzLU+KD00Tr36DIkFmdm7TJezlWEbIDOeoRKkUQGVzK/zr/mpM1r9F+Zhn3IrSni5MB0cdEaIHDDL+aLa77i7Np2A00ecN1VATnQiRNrHP/uY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=jCbuu1R7; arc=none smtp.client-ip=192.30.252.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="U5r5uz9Q"
-Received: from [192.168.1.195] (unknown [IPv6:2a03:1b20:d:f011:3::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4fpX6Z2r3jz49PvR;
-	Sun, 05 Apr 2026 15:37:42 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1775392662;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gPvgHHYKCMbfWOo+F/9+Pidcxmv8CoZ5dpcu19/NApI=;
-	b=U5r5uz9QuPtZoOlsepUQJsGBOt4nb8Brj9xuysOKRTEFt3FMxn76Avc0/+0ZthMjCGaNq1
-	yuoxNkBH/yEAsyGqPBIqHPHQpYl3V1hcyAtXMrQC+PozgZNakaR9PDahpFIPyMZLqIoP/t
-	giFv25TwjajmV41HMQW0mNjemWDkW4xfVV78X90rn8/Z4QbRedRTiSvqpQepLx+ei4xXSc
-	lX6sFByJBAALZETA5VsU95OrgkpCQAIVqKWG6MU0pQ9wq8cvorFQKGi/A056R280wwCT2t
-	IhLJ1stD9L2KZNqO4eVctqRFcjbNWvdLJfs1AL5vcJWId58eJ6UCYJwV8nJB9Q==
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1775392662;
-	b=tRCET54T0mu56/b3l91KUadfCqIcmh4qaLllaiHS4crAAveQaN3Z18vCj3P4ZSGmaYHC+N
-	2+RTtnNujxEHuK9fA3DXauZQXEhRWoCQ9Gk0VOf/HzhWmkLjez9HrqtcpAIZCsyHX3pumc
-	ck1owk4oluJgAsRvqudV3N3bLiq3c74exY9ETcDsoOhwRm+rVSy8QsO3CV+Wdjjr2Rg9Ps
-	YE/zp7FhIX/PBoaSqmejJAupiU70dGU5e+bnogRhddYNhi1J0pFSLKa1hiznP5SpFXwYQV
-	XvNT9PSlmoIfvkQL3tQqwMoWggoxkIv0HbxDNcrqQz3skVBIrQcrK+nggBt8gg==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1775392662;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gPvgHHYKCMbfWOo+F/9+Pidcxmv8CoZ5dpcu19/NApI=;
-	b=LRm4kNIDxSXOox8W8GXiVgP9oyPfTZQ8FiND9OoLZuK1kBYfwxtIf2FfSQvQ24VgBUFFHj
-	V8iS2ZmwQub1YPObaEJReEyEUf6T+Ksr6kX1r9vA5ppv9woDKd2gTOqDlbbtC3Xz1RiOSk
-	8RAl4WaRFqdVIrx2TxmcJB5mKdrYy4C/oknIP1zIg8lHVOP1iWJC6aFPSUAB7FU9oZlGAb
-	ekThPx2VqIXX24bhf2so0MZr9KUCYcvNiFUWhfbOuiZkY+ehi2kedK4Gndhv200JDUG0o5
-	OduqEiP4/tmsj9QQqjbHlC6r8XMieIE71vhjKV2nyYuuaRZPTVU8oSDDf5DNXg==
-Message-ID: <15bf885f56faa1bd5eed300f8e436428c98906ca.camel@iki.fi>
-Subject: Re: Integration testing for BlueZ
-From: Pauli Virtanen <pav@iki.fi>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Sun, 05 Apr 2026 15:37:41 +0300
-In-Reply-To: <600acd737462930466b32072e7d86c857ba35c93.camel@hadess.net>
-References: <20260218024605.70890-1-ronan@rjp.ie>
-		 <20260218024605.70890-3-ronan@rjp.ie>
-		 <CABBYNZJqjaDJmkEy0yvyqLXP6kFH-dVjnzcCVknAkpu39zspaA@mail.gmail.com>
-		 <defdb4fb77123ebe7abea7e8f225720e4e72e6c5@rjp.ie>
-		 <CABBYNZLgugMFofwxAV4qFFP=RCnXG22MbcTgdt88ydbkSEKO9Q@mail.gmail.com>
-		 <cc92dcae7bf3c7832643071df30eb5734097d2d1.camel@hadess.net>
-		 <c606541c5c1309b9d4be685962f429581eaa7ffb.camel@iki.fi>
-		 <177a2b4ff440d84853662e042082f6580e41aed4.camel@hadess.net>
-		 <628CF193-5AAC-49F4-A7D0-D4417EC6B4D2@iki.fi>
-	 <600acd737462930466b32072e7d86c857ba35c93.camel@hadess.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.0 (3.60.0-1.fc44) 
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="jCbuu1R7"
+Received: from github.com (hubbernetes-node-043e610.ac4-iad.github.net [10.52.13.60])
+	by smtp.github.com (Postfix) with ESMTPA id 6F097700CAC
+	for <linux-bluetooth@vger.kernel.org>; Sun,  5 Apr 2026 06:37:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1775396271;
+	bh=qx5+w30GWyJQvowJb8/IYFp/GbT8T5in1fYClHEwmSw=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=jCbuu1R73vNJdv+elj/+KA9NSZvrZ76Wq+VDLuOegBJLi5eDPZQKJqJkBAZiqSTGJ
+	 69xO0f/GzfXjt5F1XWbVIJGeuifHuS6gU0MJyvdwMixVKfGMFmiRbkRmV3rPdYNMGW
+	 KWR2OSHz4jqGt6UBCGxlyUqMegfYnu222SpgWL5k=
+Date: Sun, 05 Apr 2026 06:37:51 -0700
+From: Pauli Virtanen <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1077422/000000-9a7446@github.com>
+Subject: [bluez/bluez] 31d2b6: emulator: btvirt: check pkt lengths, don't get
+ stu...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-ma, 2026-03-30 kello 17:03 +0200, Bastien Nocera kirjoitti:
-> On Mon, 2026-03-30 at 12:59 +0000, Pauli Virtanen wrote:
-> > > Do you still have a copy of the above file somewhere? I wanted to
-> > > finish porting them into my own integration tests which I'm hoping
-> > > to
-> > > add to the regression/unit tests that are usually run for every
-> > > commit/MR.
-> >=20
-> > https://github.com/pv/bluez/blob/func-test-v3/test/functional/test_blue=
-toothctl_vm.py
-> >=20
-> > and test_btmgmt_vm.py
-> >=20
-> > Although these don't currently contain much, but could be extended.
-> >=20
-> > FWIW I'd maybe consider using pytest also for Python regression &
-> > unit tests, at least if you can make them run without root.
-> >=20
-> > There's interesting bluetoothd mock dbus library by the bluez-alsa
-> > developer, which looks like it could be useful for bluetoothctl/etc
-> > utility testing
-> >=20
-> > <https://github.com/Samsung/bluezoo>
->=20
-> I'm pretty familiar with python-dbusmock which includes a bluetoothd
-> mock server which can be used as non-root:
-> https://github.com/martinpitt/python-dbusmock
->=20
-> It's used extensively in the gnome-bluetooth test suite:
-> https://gitlab.gnome.org/GNOME/gnome-bluetooth/-/blob/master/tests/integr=
-ation-test.py?ref_type=3Dheads
-> along with its mock upower implementation.
->=20
-> bluezoo looks more like a complete replacement including some behaviour
-> when running certain commands. The python-dbusmock implementation is
-> voluntarily simpler.
->=20
-> The questions at the end of the day boils down to *what* we want to
-> test:
->=20
-> 1) Just like the gnome-bluetooth test suite, we could only care for our
-> own code, bluetoothd and upower are mocked, no specific hardware or
-> permissions is required.
->=20
-> This usually requires tweaking the mock implementation to better match
-> the behaviour of the real thing.
->=20
-> 2) As I've implemented in this integration test:
-> https://github.com/hadess/bluez/blob/wip/hadess/add-meson-ell-wrap/unit/i=
-ntegration-test.py
-> we test command-line tools against the real bluetoothd which we
-> compile, it requires either root (to run btvirt if needed, and run
-> bluetoothd), or a machine with a real/mocked hardware and bluetoothd
-> already running. Ideally, with root access, you're testing the
-> "integration" of the command-line tools and bluetoothd.
-> Do we want to run those against a mocked bluetoothd that could get out
-> of sync with reality?
->=20
-> This wouldn't allow us to test bluetoothd itself as I've done in one
-> test, but maybe that's good to allow us to run those tests in more
-> circumstances?
->
-> My goal was being able to run "meson test" on my local development
-> machine without worrying about a layer of possibly outdated mocking
-> code.
->=20
-> I'd be fine running those tests that could be against a mocked
-> bluetoothd, if that means more tests being run.
->=20
-> I'd expect both those first options to be run for every merge request
-> or patch set, possibly even for every commit if we run into errors.
->=20
-> 3) We have your variant of the test suite that does what 2) does but
-> with many more moving parts, and pretty high requirements in terms of
-> setup (and possibly resources). The only thing that's mocked is the
-> Bluetooth adapters, and not even for all tests.
->=20
-> In short, I think I might, before sending a patch out, re-focus the
-> basic tools tests to run against a mocked dbusmock bluez, so they
-> always run, whatever the environment.
->=20
-> Next, we can try to figure out whether some tests like the bluetoothd
-> startup warning one can be shared between the "run on every merge
-> request" (option 2) vs. "run once a week or once a day" heavier duty
-> tests (option 3).
+  Branch: refs/heads/1077422
+  Home:   https://github.com/bluez/bluez
+  Commit: 31d2b60f6456e2fbad407ae6630aa196fe9fcbe6
+      https://github.com/bluez/bluez/commit/31d2b60f6456e2fbad407ae6630aa196fe9fcbe6
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
 
-Yes, mocked tests make sense only for subset of tests, here I was
-thinking about the regression tests that check that "--help" works and
-"bluetoothctl" prints things correctly. Didn't remember dbusmock had
-stubs for some bluetoothd services.
+  Changed paths:
+    M emulator/server.c
 
-The VM-based tests have some advantages in that the environment is more
-reproducible, you are able to test against bluetooth-next kernel, and
-they are more convenient to run on dev workstation as they don't need
-root or interfere with system services.
+  Log Message:
+  -----------
+  emulator: btvirt: check pkt lengths, don't get stuck on malformed
 
-In principle several of the tests could run both on host kernel with
-btvirt,=C2=A0and with some extra work you could define a compatible test
-fixture that can reuse the exact same test code, or just write the
-tests in a way that the test core can be reused. Although the
-bluetoothd + kernel stack is written in a way that controllers are
-independent, the single-host test setup is not exactly the same as
-multiple hosts, so there's probably some value in end-to-end tests.
+Don't try to parse packet before whole header is received.
 
-Performance-wise there is some room for improving the VM test speed,
-eg. not compiling kernel with lock debugging etc. slow debug options
-on, and using virtiofs instead of 9p as it appears the emulated 9p disk
-access is somewhat slow. The VM boot time is already amortized by
-reusing the VM instances, and bluetoothd etc environment restarts can
-be avoided where possible, so you could write multiple tests like the -
--help one with VM adding mostly a fixed cost.
-
-The tests that pair devices first spend time on waiting on the btvirt
-page timeout which is adding many seconds per tests. So there is also a
-non-negligible part of test time that is not limited by VM execution
-speed.
+If received data has unknown packet type, reset buffer so that we don't
+get stuck.
 
 
-For any tests running outside VM, it's probably simplest to write them
-in such a way that the test core could be reused. E.g. the bluetoothctl
-completion crash for example like would be
+  Commit: 94ea75c544b1e3ba176b1a408274abe826e058e5
+      https://github.com/bluez/bluez/commit/94ea75c544b1e3ba176b1a408274abe826e058e5
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
 
-def check_bluetoothctl_completion_crash():
-    child =3D pexpect.spawn(bluetoothctl)
-    child._decoder =3D AsciiDecoder()
-    child.expect(r"\[bluetoothctl\]> ")
-    child.sendline(" \t")
-    child.expect(r"\[bluetoothctl\]> ")
+  Changed paths:
+    M emulator/main.c
 
-    time.sleep(0.5)
+  Log Message:
+  -----------
+  emulator: btvirt: allow specifying where server unix sockets are made
 
-    assert child.isalive()
+Make --server to take optional path name where to create the various
+server sockets.
 
-@bluetoothd_reuse_config
-def test_bluetoothctl_completion_crash(hosts):
-    (host,) =3D hosts
 
-    host.call(check_bluetoothctl_completion_crash)
+  Commit: c16cc13cc4ad4d61b09ecd8f215d1dee8096a1e5
+      https://github.com/bluez/bluez/commit/c16cc13cc4ad4d61b09ecd8f215d1dee8096a1e5
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
 
-This adds ~0.8 sec to the total test duration in VM (compared to ~0.7
-outside VM with system bluetoothd), as the test does not require
-bluetoothd or VM restart.
+  Changed paths:
+    M emulator/server.c
 
-I'd also write all tests properly as Python package that can be
-imported elsewhere as needed, and follow the pytest convention that
-tests are in files named `test_*.py`, so that they and any helper
-functions are more reusable. If you use pytest for them, you also don't
-need a runner script.
+  Log Message:
+  -----------
+  emulator: btvirt: support SCO data packets
 
-For deciding what to run on CI, probably real runtime numbers are what
-matters. If the VM tests are fast enough, I'd think it would be OK to
-run them for all patches, as is done with the kernel VM testers.
+Support also SCO data packets in btvirt.
 
---=20
-Pauli Virtanen
+
+  Commit: b123f742cdc6a4e692fcaf32ce71e1cae2adcf6d
+      https://github.com/bluez/bluez/commit/b123f742cdc6a4e692fcaf32ce71e1cae2adcf6d
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    M emulator/btdev.c
+
+  Log Message:
+  -----------
+  emulator: btdev: clear more state on Reset
+
+On controller Reset command, initialize most fields in struct btdev to
+zero, similarly to the state just after btdev_create().
+
+This excludes some fields like command bitmasks, which hciemu may have
+adjusted.
+
+To make this easier, add struct_group() macro similar to what kernel
+uses.
+
+
+  Commit: ab46826be681be50f5176e96b978f8434c2bbd2c
+      https://github.com/bluez/bluez/commit/ab46826be681be50f5176e96b978f8434c2bbd2c
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  test-runner: enable path argument for --unix
+
+Allow specifying the path for the controller socket to be used.
+
+
+  Commit: ca0f20a60d2d9872363cea218bfa9bbaed1146d0
+      https://github.com/bluez/bluez/commit/ca0f20a60d2d9872363cea218bfa9bbaed1146d0
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  test-runner: Add -o/--option option
+
+Allow passing arbitrary arguments to QEMU.
+
+
+  Commit: c7e5ddf890c639b5d8a0db4b67b789aa869281d4
+      https://github.com/bluez/bluez/commit/c7e5ddf890c639b5d8a0db4b67b789aa869281d4
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  test-runner: allow source tree root for -k
+
+Allow passing source tree root for -k option, look up kernel below it.
+
+
+  Commit: 10e406f945efafb0bb3f17b22d03dbbc65e3754b
+      https://github.com/bluez/bluez/commit/10e406f945efafb0bb3f17b22d03dbbc65e3754b
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    M doc/ci.config
+    M doc/test-runner.rst
+    M doc/tester.config
+
+  Log Message:
+  -----------
+  doc: enable CONFIG_VIRTIO_CONSOLE in tester config
+
+Enable kernel option that allows using -device virtserialport in qemu.
+This is easier to make work reliably than pci-serial channel.
+
+
+  Commit: 129d3482f8bf3f598b8614ddd2bc09cd830f42e1
+      https://github.com/bluez/bluez/commit/129d3482f8bf3f598b8614ddd2bc09cd830f42e1
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  test-runner: use virtio-serial for implementing -u device forwarding
+
+Using pci-serial to forward eg. btvirt sockets is unreliable, as qemu or
+kernel seems to be sometimes dropping part of the sent data or insert
+spurious \0 bytes, leading to sporadic errors like:
+
+    kernel: Bluetooth: hci0: command 0x0c52 tx timeout
+    kernel: Bluetooth: hci0: Opcode 0x0c52 failed: -110
+    btvirt: packet error, unknown type: 0
+
+This appears to occur most often when host system is under load, e.g.
+due to multiple test-runners running at the same time.  The problem is
+not specific to btvirt, but seems to be in the qemu serial device layer
+vs. kernel interaction.
+
+Change test-runner to use virtserialport to forward the btvirt
+connection inside the VM, as virtio-serial doesn't appear to have these
+problems.
+
+
+  Commit: 89f1a846295f8908a2bf086e63ce8ffe73217a63
+      https://github.com/bluez/bluez/commit/89f1a846295f8908a2bf086e63ce8ffe73217a63
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    M doc/ci.config
+    M doc/test-runner.rst
+    M doc/tester.config
+
+  Log Message:
+  -----------
+  doc: enable KVM paravirtualization & clock support in tester kernel config
+
+Enable KVM guest and PTP options in tester kernel config.
+
+This allows synchronizing tester VM guest with host clock, needed for
+testers that want to compare timestamps outside the VM guest.
+
+
+  Commit: 1dad213f0b8d16fe20f3b595c949a53ce73b3fea
+      https://github.com/bluez/bluez/commit/1dad213f0b8d16fe20f3b595c949a53ce73b3fea
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    A doc/test-functional.rst
+
+  Log Message:
+  -----------
+  doc: add functional/integration testing documentation
+
+Add documentation for functional/integration test suite.
+
+
+  Commit: 59aef27bd01b8827384fcadd8f1e8e4e2272d079
+      https://github.com/bluez/bluez/commit/59aef27bd01b8827384fcadd8f1e8e4e2272d079
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    M doc/test-functional.rst
+    A test/functional/__init__.py
+    A test/functional/requirements.txt
+    A test/functional/test_bluetoothctl_vm.py
+    A test/functional/test_btmgmt_vm.py
+    A test/pytest.ini
+    A test/pytest_bluez/__init__.py
+    A test/pytest_bluez/env.py
+    A test/pytest_bluez/host_plugins.py
+    A test/pytest_bluez/plugin.py
+    A test/pytest_bluez/rpc.py
+    A test/pytest_bluez/runner.py
+    A test/pytest_bluez/tests/__init__.py
+    A test/pytest_bluez/tests/test_rpc.py
+    A test/pytest_bluez/tests/test_utils.py
+    A test/pytest_bluez/utils.py
+    A test/test-functional
+    A test/test-functional-attach
+
+  Log Message:
+  -----------
+  test: add functional/integration testing framework
+
+Add framework for writing tests simulating "real" environments where
+BlueZ and other parts of the stack run on different virtual machine
+hosts that communicate with each other.
+
+Implementation is factored into test/pytest_bluez/ support plugin that's
+in principle reusable for other projects, and test/functional/ actual
+test files.
+
+Implements:
+
+- RPC communication with tester instances running each of the VM hosts,
+  so that tests can be written on the parent host which coordinates the
+  execution.
+
+- Extensible way to add stateful test-specific code inside the VM
+  instances
+
+- Logging control: output from different processes running inside the VM
+  are separated and can be filtered.
+
+- Test runner framework with Pytest, factored into a pytest plugin
+
+- Grouping tests to minimize VM reboots
+
+- Redirecting USB controllers to use for testing
+
+There is no requirement that the tests spawn VM instances. The test
+runner finds any tests in test/**/test_*.py
+
+
+  Commit: 4f0b558635628ca6662da60429fd750653a26cc2
+      https://github.com/bluez/bluez/commit/4f0b558635628ca6662da60429fd750653a26cc2
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    A test/functional/test_pipewire.py
+    M test/pytest.ini
+
+  Log Message:
+  -----------
+  test: functional: add Pipewire-using audio streaming tests
+
+Add tests for Pipewire hosts connecting A2DP, BAP, and HFP to each other
+and stream audio:
+
+test/functional/test_pipewire.py::test_pipewire_a2dp
+test/functional/test_pipewire.py::test_pipewire_bap_bcast
+test/functional/test_pipewire.py::test_pipewire_bap_ucast
+test/functional/test_pipewire.py::test_pipewire_hfp
+
+The A2DP test would have catched the regression fixed by 066a164a524 and
+the BAP test that fixed by 6b0a08776a.
+
+
+  Commit: 67579c12d81b455f53adb5313aed35c0aaacc513
+      https://github.com/bluez/bluez/commit/67579c12d81b455f53adb5313aed35c0aaacc513
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    M doc/test-functional.rst
+    M test/pytest_bluez/__init__.py
+    A test/pytest_bluez/btmon.py
+    M test/pytest_bluez/plugin.py
+
+  Log Message:
+  -----------
+  test: functional: add --btmon option to start btmon
+
+After test finishes, any btmon dumps created are copied to current
+working directory.
+
+
+  Commit: d11831eea875563767ac7b90f2d70d894c61a938
+      https://github.com/bluez/bluez/commit/d11831eea875563767ac7b90f2d70d894c61a938
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    M Makefile.am
+    M configure.ac
+
+  Log Message:
+  -----------
+  build: add functional testing target
+
+This adds check-functional: target that runs the functional test suite.
+
+Also add a --enable-functional-testing=<kernel-image> argument for
+configure that can be used to include it in the check: make target,
+possibly with a predefined kernel image.
+
+
+  Commit: d5f4a2be72ed0645a2ce95fcbe7411196bbe9e61
+      https://github.com/bluez/bluez/commit/d5f4a2be72ed0645a2ce95fcbe7411196bbe9e61
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    M doc/test-functional.rst
+    A test/functional/test_tests.py
+
+  Log Message:
+  -----------
+  test: functional: impose Python code formatting
+
+Check Python code formatting of the functional test suite.
+
+
+  Commit: dafbf1b8536f0cfc10ff84a76bc5d8fcc0a67545
+      https://github.com/bluez/bluez/commit/dafbf1b8536f0cfc10ff84a76bc5d8fcc0a67545
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    M doc/test-functional.rst
+    M test/pytest.ini
+    A test/pytest_bluez/build_kernel.py
+    M test/pytest_bluez/plugin.py
+
+  Log Message:
+  -----------
+  test: functional: add option for building kernel image first
+
+Add convenience option test/test-functional --kernel-build to build a
+kernel image first.
+
+The point in this is to make running tests simpler for contributors, so
+that they don't need to read instructions what options the kernel should
+be built with just for running these tests.
+
+
+  Commit: 7669690a0c522c5c7bb9be9e502c2092505fcf34
+      https://github.com/bluez/bluez/commit/7669690a0c522c5c7bb9be9e502c2092505fcf34
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    M doc/test-functional.rst
+    A test/functional/test_agent.py
+    M test/pytest_bluez/__init__.py
+    A test/pytest_bluez/agent.py
+
+  Log Message:
+  -----------
+  test: functional: add custom Agent1 implementation for testing
+
+Enable more precise testing of the Agent1 interface, and allow doing
+operations like pairing without bluetoothctl.
+
+
+  Commit: 43611c89a4c33f58167704d1c6a9edae59f65d70
+      https://github.com/bluez/bluez/commit/43611c89a4c33f58167704d1c6a9edae59f65d70
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    M test/pytest_bluez/env.py
+
+  Log Message:
+  -----------
+  test: functional: warn on kernel warning/bug messages
+
+Emit warnings if there is a WARNING/BUG message from kernel.
+
+
+  Commit: 9a7446499754caca432255a3c2516ca2e319a9c6
+      https://github.com/bluez/bluez/commit/9a7446499754caca432255a3c2516ca2e319a9c6
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-04-05 (Sun, 05 Apr 2026)
+
+  Changed paths:
+    A test/functional/test_obex.py
+    M test/pytest_bluez/host_plugins.py
+
+  Log Message:
+  -----------
+  test: functional: add basic obex file transfer tests
+
+Add tests for Obex DBus API and obexctl
+
+test/functional/test_obex.py::test_obex_ftp_get
+test/functional/test_obex.py::test_obex_ftp_list
+test/functional/test_obex.py::test_obexctl_list
+
+
+Compare: https://github.com/bluez/bluez/compare/31d2b60f6456%5E...9a7446499754
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
