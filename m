@@ -1,460 +1,240 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B752749ED
-	for <linux-bluetooth@vger.kernel.org>; Sun,  5 Apr 2026 12:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD7F61A285
+	for <linux-bluetooth@vger.kernel.org>; Sun,  5 Apr 2026 12:46:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775392962; cv=pass; b=FnZWrYG6GDMWj7siu1nO1v1PjfbljrWK1NsTsBgSl1mERa10TDX5WOZyYKpNPTRCd4Lt7pZ3ZWiA8cvm9W6DrHYRpo4lzvzPASAd1fMXhZ1MM1pgQQpRfBpKqD+/yi9LI+OSSz2I0+GAK2sHXhb7dO2gECtQmQNXvH43OMz1ULU=
+	t=1775393168; cv=pass; b=CrA6XRj6J0XJ2R6NDnx2/8JLpKwn33cO8A1YhP/ytG3ejuXAcHKb0RwXQRg0vXEnxx66UHjABizKcH+VSBwoTB2GMqQoSikMLmvIA9SM19Ws6+bvnujVvpwDvR1waabfeKT4KA642mKX7ydAUroNvmtC6H7+VMoZ9snofnixHZg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775392962; c=relaxed/simple;
-	bh=b1EYhw9AuaSmzOfSom8l1exfSGUj90U2UXTNTh6g3nI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=knX0RDz0NKUnugmi1GSy4d6jOaTi2pgUXXCahMKivn97aQ8eRqJ1tWRjVibXM2rW9gB7Fp40gwUTk5V9zy3iHIk2beWnJ7c60xNrwb2nmkWgpbcL1F0GShLsNxbe4nJAsTncHCaihAog9XpA2QOSxKZH1fw5s+ihKOSEajfZOi0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=qi32XE6V; arc=pass smtp.client-ip=195.140.195.201
+	s=arc-20240116; t=1775393168; c=relaxed/simple;
+	bh=a4oih04jlTUOj6HrlfYVdeeRbA5HVLZm7qwaDTqCJGU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=rhd5k5iOeBr2SC3sTvWxo3UQB6/0vnr3qYwG1f0k8AakenE5LjZPkGURYHnVWE1SuxThhjswDEiU+0iwtm/CNttRDaV4bOITlQl5Zbo1c/NW+CzF+Nm/zILSeFMIvlkgKjKesfU1Ngiav9Ot4ZxwSRqGHeOKNmanzlwQjL+hL7o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=U5r5uz9Q; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="qi32XE6V"
-Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:3::d001])
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="U5r5uz9Q"
+Received: from [192.168.1.195] (unknown [IPv6:2a03:1b20:d:f011:3::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4fpXDG2dMvzyQH;
-	Sun, 05 Apr 2026 15:42:38 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1775392958;
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4fpX6Z2r3jz49PvR;
+	Sun, 05 Apr 2026 15:37:42 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1775392662;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4paMCQiJZ48yjI4sstxF69NJV/yAJiVNpY8IZ2FWWAE=;
-	b=qi32XE6VwgWGujv2tX2hMNEMR66zJHr3ODq3JneBC3zk5nrkmJAbQFf+D09UPqZhki0hJG
-	Lf6U0m1jX/aWjbA8jnDi2dg6K8TrKCH//7oB2Xu4XRsMQRlaxMqzyXL9iKRPCa0/lU9fBY
-	INjoyTBuZ4Irl5JbE2lpQS/P6qJ3UXg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1775392958;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4paMCQiJZ48yjI4sstxF69NJV/yAJiVNpY8IZ2FWWAE=;
-	b=WVlbeaEGt8Ic0XTG6bMgZTQJL6IsPf5Sex4achNLx/hIQcha8BW+d2Hf8dPD3+3g8P7SxM
-	sh3uFCavsTHIuo4jWnZEbIjMw3n3EVBZbcIBzsITXwfINc+TY0AOl0zK0lZlKLeKZkYRyJ
-	RNozqPVsBeuQeGGEV3RmlEj8BRzJ4o4=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1775392958;
-	b=vP2q3h1zjTzUBZhXrtsQzTg9YFDNSg1SO6VMRUIwIUUKhNczMc+Z2X1/gIdKiAiVIh3vQc
-	m60P+jxx/RRJFiOg+IxNGgjtQLSv9xAs1p8ut2Rh167wsgecy78p13W/AhRCiCcolKVyXy
-	yT38GIdnQ+0mU7KQxxrxNXEr535N1+g=
+	bh=gPvgHHYKCMbfWOo+F/9+Pidcxmv8CoZ5dpcu19/NApI=;
+	b=U5r5uz9QuPtZoOlsepUQJsGBOt4nb8Brj9xuysOKRTEFt3FMxn76Avc0/+0ZthMjCGaNq1
+	yuoxNkBH/yEAsyGqPBIqHPHQpYl3V1hcyAtXMrQC+PozgZNakaR9PDahpFIPyMZLqIoP/t
+	giFv25TwjajmV41HMQW0mNjemWDkW4xfVV78X90rn8/Z4QbRedRTiSvqpQepLx+ei4xXSc
+	lX6sFByJBAALZETA5VsU95OrgkpCQAIVqKWG6MU0pQ9wq8cvorFQKGi/A056R280wwCT2t
+	IhLJ1stD9L2KZNqO4eVctqRFcjbNWvdLJfs1AL5vcJWId58eJ6UCYJwV8nJB9Q==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1775392662;
+	b=tRCET54T0mu56/b3l91KUadfCqIcmh4qaLllaiHS4crAAveQaN3Z18vCj3P4ZSGmaYHC+N
+	2+RTtnNujxEHuK9fA3DXauZQXEhRWoCQ9Gk0VOf/HzhWmkLjez9HrqtcpAIZCsyHX3pumc
+	ck1owk4oluJgAsRvqudV3N3bLiq3c74exY9ETcDsoOhwRm+rVSy8QsO3CV+Wdjjr2Rg9Ps
+	YE/zp7FhIX/PBoaSqmejJAupiU70dGU5e+bnogRhddYNhi1J0pFSLKa1hiznP5SpFXwYQV
+	XvNT9PSlmoIfvkQL3tQqwMoWggoxkIv0HbxDNcrqQz3skVBIrQcrK+nggBt8gg==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1775392662;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gPvgHHYKCMbfWOo+F/9+Pidcxmv8CoZ5dpcu19/NApI=;
+	b=LRm4kNIDxSXOox8W8GXiVgP9oyPfTZQ8FiND9OoLZuK1kBYfwxtIf2FfSQvQ24VgBUFFHj
+	V8iS2ZmwQub1YPObaEJReEyEUf6T+Ksr6kX1r9vA5ppv9woDKd2gTOqDlbbtC3Xz1RiOSk
+	8RAl4WaRFqdVIrx2TxmcJB5mKdrYy4C/oknIP1zIg8lHVOP1iWJC6aFPSUAB7FU9oZlGAb
+	ekThPx2VqIXX24bhf2so0MZr9KUCYcvNiFUWhfbOuiZkY+ehi2kedK4Gndhv200JDUG0o5
+	OduqEiP4/tmsj9QQqjbHlC6r8XMieIE71vhjKV2nyYuuaRZPTVU8oSDDf5DNXg==
+Message-ID: <15bf885f56faa1bd5eed300f8e436428c98906ca.camel@iki.fi>
+Subject: Re: Integration testing for BlueZ
 From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v4 20/20] test: functional: add basic obex file transfer tests
-Date: Sun,  5 Apr 2026 15:40:01 +0300
-Message-ID: <0ecf3433adede8d65afd21147f15210bd0b527af.1775392680.git.pav@iki.fi>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <cover.1775392680.git.pav@iki.fi>
-References: <cover.1775392680.git.pav@iki.fi>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Sun, 05 Apr 2026 15:37:41 +0300
+In-Reply-To: <600acd737462930466b32072e7d86c857ba35c93.camel@hadess.net>
+References: <20260218024605.70890-1-ronan@rjp.ie>
+		 <20260218024605.70890-3-ronan@rjp.ie>
+		 <CABBYNZJqjaDJmkEy0yvyqLXP6kFH-dVjnzcCVknAkpu39zspaA@mail.gmail.com>
+		 <defdb4fb77123ebe7abea7e8f225720e4e72e6c5@rjp.ie>
+		 <CABBYNZLgugMFofwxAV4qFFP=RCnXG22MbcTgdt88ydbkSEKO9Q@mail.gmail.com>
+		 <cc92dcae7bf3c7832643071df30eb5734097d2d1.camel@hadess.net>
+		 <c606541c5c1309b9d4be685962f429581eaa7ffb.camel@iki.fi>
+		 <177a2b4ff440d84853662e042082f6580e41aed4.camel@hadess.net>
+		 <628CF193-5AAC-49F4-A7D0-D4417EC6B4D2@iki.fi>
+	 <600acd737462930466b32072e7d86c857ba35c93.camel@hadess.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.0 (3.60.0-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Add tests for Obex DBus API and obexctl
+ma, 2026-03-30 kello 17:03 +0200, Bastien Nocera kirjoitti:
+> On Mon, 2026-03-30 at 12:59 +0000, Pauli Virtanen wrote:
+> > > Do you still have a copy of the above file somewhere? I wanted to
+> > > finish porting them into my own integration tests which I'm hoping
+> > > to
+> > > add to the regression/unit tests that are usually run for every
+> > > commit/MR.
+> >=20
+> > https://github.com/pv/bluez/blob/func-test-v3/test/functional/test_blue=
+toothctl_vm.py
+> >=20
+> > and test_btmgmt_vm.py
+> >=20
+> > Although these don't currently contain much, but could be extended.
+> >=20
+> > FWIW I'd maybe consider using pytest also for Python regression &
+> > unit tests, at least if you can make them run without root.
+> >=20
+> > There's interesting bluetoothd mock dbus library by the bluez-alsa
+> > developer, which looks like it could be useful for bluetoothctl/etc
+> > utility testing
+> >=20
+> > <https://github.com/Samsung/bluezoo>
+>=20
+> I'm pretty familiar with python-dbusmock which includes a bluetoothd
+> mock server which can be used as non-root:
+> https://github.com/martinpitt/python-dbusmock
+>=20
+> It's used extensively in the gnome-bluetooth test suite:
+> https://gitlab.gnome.org/GNOME/gnome-bluetooth/-/blob/master/tests/integr=
+ation-test.py?ref_type=3Dheads
+> along with its mock upower implementation.
+>=20
+> bluezoo looks more like a complete replacement including some behaviour
+> when running certain commands. The python-dbusmock implementation is
+> voluntarily simpler.
+>=20
+> The questions at the end of the day boils down to *what* we want to
+> test:
+>=20
+> 1) Just like the gnome-bluetooth test suite, we could only care for our
+> own code, bluetoothd and upower are mocked, no specific hardware or
+> permissions is required.
+>=20
+> This usually requires tweaking the mock implementation to better match
+> the behaviour of the real thing.
+>=20
+> 2) As I've implemented in this integration test:
+> https://github.com/hadess/bluez/blob/wip/hadess/add-meson-ell-wrap/unit/i=
+ntegration-test.py
+> we test command-line tools against the real bluetoothd which we
+> compile, it requires either root (to run btvirt if needed, and run
+> bluetoothd), or a machine with a real/mocked hardware and bluetoothd
+> already running. Ideally, with root access, you're testing the
+> "integration" of the command-line tools and bluetoothd.
+> Do we want to run those against a mocked bluetoothd that could get out
+> of sync with reality?
+>=20
+> This wouldn't allow us to test bluetoothd itself as I've done in one
+> test, but maybe that's good to allow us to run those tests in more
+> circumstances?
+>
+> My goal was being able to run "meson test" on my local development
+> machine without worrying about a layer of possibly outdated mocking
+> code.
+>=20
+> I'd be fine running those tests that could be against a mocked
+> bluetoothd, if that means more tests being run.
+>=20
+> I'd expect both those first options to be run for every merge request
+> or patch set, possibly even for every commit if we run into errors.
+>=20
+> 3) We have your variant of the test suite that does what 2) does but
+> with many more moving parts, and pretty high requirements in terms of
+> setup (and possibly resources). The only thing that's mocked is the
+> Bluetooth adapters, and not even for all tests.
+>=20
+> In short, I think I might, before sending a patch out, re-focus the
+> basic tools tests to run against a mocked dbusmock bluez, so they
+> always run, whatever the environment.
+>=20
+> Next, we can try to figure out whether some tests like the bluetoothd
+> startup warning one can be shared between the "run on every merge
+> request" (option 2) vs. "run once a week or once a day" heavier duty
+> tests (option 3).
 
-test/functional/test_obex.py::test_obex_ftp_get
-test/functional/test_obex.py::test_obex_ftp_list
-test/functional/test_obex.py::test_obexctl_list
----
- test/functional/test_obex.py      | 285 ++++++++++++++++++++++++++++++
- test/pytest_bluez/host_plugins.py |  61 +++++++
- 2 files changed, 346 insertions(+)
- create mode 100644 test/functional/test_obex.py
+Yes, mocked tests make sense only for subset of tests, here I was
+thinking about the regression tests that check that "--help" works and
+"bluetoothctl" prints things correctly. Didn't remember dbusmock had
+stubs for some bluetoothd services.
 
-diff --git a/test/functional/test_obex.py b/test/functional/test_obex.py
-new file mode 100644
-index 000000000..2f408efb4
---- /dev/null
-+++ b/test/functional/test_obex.py
-@@ -0,0 +1,285 @@
-+# -*- coding: utf-8; mode: python; eval: (blacken-mode); -*-
-+# SPDX-License-Identifier: LGPL-2.1-or-later
-+"""
-+Tests for Obex
-+"""
-+import sys
-+import os
-+import re
-+import pytest
-+import subprocess
-+import tempfile
-+import time
-+import logging
-+import json
-+import dbus
-+import threading
-+from pathlib import Path
-+
-+import pytest
-+
-+from pytest_bluez import (
-+    HostPlugin,
-+    Agent,
-+    host_config,
-+    find_exe,
-+    Bluetoothd,
-+    Bluetoothctl,
-+    Obexd,
-+    LogStream,
-+    wait_until,
-+    mainloop_wrap,
-+    mainloop_assert,
-+    Event,
-+    EventPluginMixin,
-+    dbus_service_event_method,
-+    Pexpect,
-+    utils,
-+)
-+
-+pytestmark = [pytest.mark.vm]
-+
-+log = logging.getLogger(__name__)
-+
-+
-+BUS_NAME = "org.bluez.obex"
-+PATH = "/org/bluez/obex"
-+AGENT_MANAGER_INTERFACE = "org.bluez.obex.AgentManager1"
-+AGENT_INTERFACE = "org.bluez.obex.Agent1"
-+CLIENT_INTERFACE = "org.bluez.obex.Client1"
-+SESSION_INTERFACE = "org.bluez.obex.Session1"
-+FILE_TRANSFER_INTERFACE = "org.bluez.obex.FileTransfer1"
-+TRANSFER_INTERFACE = "org.bluez.obex.Transfer1"
-+
-+FTP_UUID = "00001106-0000-1000-8000-00805f9b34fb"
-+
-+
-+class ObexAgent(HostPlugin, EventPluginMixin):
-+    depends = [Bluetoothd()]
-+    name = "obex_agent"
-+
-+    def __init__(self, path="/obexagent"):
-+        self.path = path
-+
-+    @mainloop_wrap
-+    def setup(self, impl):
-+        EventPluginMixin.setup(self, impl)
-+
-+        self.bus = dbus.SessionBus()
-+        self.bus.set_exit_on_disconnect(False)
-+
-+        self.agent = ObexAgentObject(self.bus, self.path, self.events)
-+
-+        bluez = self.bus.get_object(BUS_NAME, PATH)
-+        self.manager = dbus.Interface(bluez, AGENT_MANAGER_INTERFACE)
-+        self.manager.RegisterAgent(self.path)
-+
-+        log.info("Obex agent registered")
-+
-+    def cleanup(self):
-+        path = Path("/run/obex")
-+        for f in path.iterdir():
-+            f.unlink()
-+
-+
-+def agent_method(*a, **kw):
-+    return dbus_service_event_method(AGENT_INTERFACE, *a, **kw)
-+
-+
-+class ObexAgentObject(dbus.service.Object):
-+    @mainloop_assert
-+    def __init__(self, bus, path, events):
-+        self.events = events
-+        super().__init__(bus, path)
-+
-+    AuthorizePush = agent_method("AuthorizePush", ("path",), "o", "s", sync=False)
-+    Cancel = agent_method("Cancel")
-+
-+
-+def write_obex_file(name, content):
-+    with open(f"/run/obex/{name}", "w") as f:
-+        f.write(content)
-+
-+
-+def read_file(name):
-+    with open(name, "r") as f:
-+        return f.read()
-+
-+
-+#
-+# Direct Obex Python client API tests
-+#
-+
-+
-+class ObexClient(HostPlugin, EventPluginMixin):
-+    name = "obex"
-+
-+    @mainloop_wrap
-+    def setup(self, impl):
-+        EventPluginMixin.setup(self, impl)
-+
-+        self.transferred = 0
-+        self.transfer_path = None
-+        self.transfer_size = 0
-+
-+        self.bus = dbus.SessionBus()
-+        self.bus.set_exit_on_disconnect(False)
-+        self.log = logging.getLogger(self.name)
-+        self.client = dbus.Interface(
-+            self.bus.get_object(BUS_NAME, PATH), CLIENT_INTERFACE
-+        )
-+
-+        self.bus.add_signal_receiver(
-+            self.properties_changed,
-+            dbus_interface="org.freedesktop.DBus.Properties",
-+            signal_name="PropertiesChanged",
-+            path_keyword="path",
-+        )
-+
-+    @mainloop_wrap
-+    def connect(self, bdaddr):
-+        def reply(path):
-+            obj = self.bus.get_object(BUS_NAME, path)
-+            self.session = dbus.Interface(obj, SESSION_INTERFACE)
-+            self.ftp = dbus.Interface(obj, FILE_TRANSFER_INTERFACE)
-+
-+        self._object_method(
-+            self.client, "CreateSession", bdaddr, {"Target": "ftp"}, reply_handler=reply
-+        )
-+
-+    @mainloop_assert
-+    def properties_changed(self, interface, properties, invalidated, path):
-+        if path != self.transfer_path:
-+            return
-+
-+        if "Status" in properties and (
-+            properties["Status"] == "complete" or properties["Status"] == "error"
-+        ):
-+            self.events.put(
-+                Event(
-+                    f"{FILE_TRANSFER_INTERFACE}:{properties['Status']}",
-+                    properties=properties,
-+                )
-+            )
-+            self.log.debug(f"Transfer {properties['Status']}")
-+
-+        if "Transferred" not in properties:
-+            return
-+
-+        value = properties["Transferred"]
-+        speed = (value - self.transferred) / 1000
-+        self.log.debug(
-+            f"Transfer progress {value}/{self.transfer_size} at {speed} kBps"
-+        )
-+        self.transferred = value
-+
-+    @mainloop_wrap
-+    def ftp_list_folder(self):
-+        return self.ftp.ListFolder()
-+
-+    @mainloop_wrap
-+    def ftp_get_file(self, dst, src):
-+        path, properties = self.ftp.GetFile(dst, src)
-+        self.transfer_path = path
-+        self.transfer_size = properties["Size"]
-+        return properties["Filename"]
-+
-+
-+@pytest.fixture
-+def paired_hosts(hosts):
-+    from .test_agent import test_agent_pair_bredr
-+
-+    if hosts[0].agent.has_device(hosts[1].bdaddr):
-+        return hosts
-+
-+    test_agent_pair_bredr(hosts, True)
-+    return hosts
-+
-+
-+obex_host_config = host_config(
-+    [Agent(), Obexd(), ObexClient(), Pexpect()],
-+    [Agent(), Obexd(), ObexAgent()],
-+    reuse=True,
-+)
-+
-+
-+@pytest.fixture
-+def obex_hosts(paired_hosts):
-+    host0, host1 = paired_hosts
-+
-+    if hasattr(host0, "session"):
-+        return paired_hosts
-+
-+    host0.obex.connect(host1.bdaddr)
-+
-+    service = host1.agent.expect("org.bluez.Agent1.AuthorizeService")
-+    assert service.uuid == FTP_UUID
-+    host1.agent.reply()
-+
-+    host0.obex.expect("org.bluez.obex.Client1.CreateSession:reply")
-+
-+    yield paired_hosts
-+
-+    host1.obex_agent.cleanup()
-+
-+
-+@obex_host_config
-+def test_obex_ftp_list(obex_hosts):
-+    host0, host1 = obex_hosts
-+
-+    host1.call(write_obex_file, "test", "1234")
-+
-+    (item,) = host0.obex.ftp_list_folder()
-+    assert item["Type"] == "file"
-+    assert item["Name"] == "test"
-+    assert item["Size"] == 4
-+
-+
-+@obex_host_config
-+def test_obex_ftp_get(obex_hosts):
-+    host0, host1 = obex_hosts
-+
-+    host1.call(write_obex_file, "test", "1234")
-+
-+    filename = host0.obex.ftp_get_file("", "test")
-+    host0.obex.expect("org.bluez.obex.FileTransfer1:complete")
-+    assert host0.call(read_file, filename) == "1234"
-+
-+
-+#
-+# obexctl tests
-+#
-+
-+
-+@pytest.fixture
-+def obexctl(obex_hosts):
-+    host0, host1 = obex_hosts
-+
-+    exe = find_exe("tools", "obexctl")
-+    obexctl = host0.pexpect.spawn([exe])
-+
-+    obexctl.expect("Client /org/bluez/obex")
-+    obexctl.send(f"connect {host1.bdaddr} {FTP_UUID}\n")
-+
-+    service = host1.agent.expect("org.bluez.Agent1.AuthorizeService")
-+    assert service.uuid == FTP_UUID
-+    host1.agent.reply()
-+
-+    obexctl.expect("Connection successful")
-+    obexctl.send(f"select /org/bluez/obex/client/session1\n")
-+
-+    yield obexctl
-+
-+    obexctl.close()
-+
-+
-+@obex_host_config
-+def test_obexctl_list(obex_hosts, obexctl):
-+    host0, host1 = obex_hosts
-+
-+    host1.call(write_obex_file, "test", "1234")
-+
-+    obexctl.send(f"ls\n")
-+    obexctl.expect(f"Type: file")
-+    obexctl.expect(f"Name: test")
-+    obexctl.expect(f"Size: 4")
-diff --git a/test/pytest_bluez/host_plugins.py b/test/pytest_bluez/host_plugins.py
-index 3b9cf7857..b7425590e 100644
---- a/test/pytest_bluez/host_plugins.py
-+++ b/test/pytest_bluez/host_plugins.py
-@@ -16,6 +16,7 @@ import signal
- import functools
- import threading
- import resource
-+import shutil
- from pathlib import Path
- 
- import pytest
-@@ -34,6 +35,7 @@ __all__ = [
-     "Call",
-     "DbusSession",
-     "DbusSystem",
-+    "Obexd",
-     "Pexpect",
-     "Rcvbuf",
- ]
-@@ -316,6 +318,65 @@ class Bluetoothd(env.HostPlugin):
-         self.log_stream.close()
- 
- 
-+class Obexd(env.HostPlugin):
-+    """
-+    Host plugin starting obexd.
-+    """
-+
-+    name = "obexd"
-+    depends = [Bluetoothd(), DbusSession()]
-+
-+    def __init__(self):
-+        self.uuids = ("00001133-0000-1000-8000-00805f9b34fb",)
-+
-+    def presetup(self, config):
-+        try:
-+            self.exe = utils.find_exe("obexd/src", "obexd")
-+        except FileNotFoundError as exc:
-+            pytest.skip(reason=f"Obexd: {exc!r}")
-+
-+    @utils.mainloop_wrap
-+    def setup(self, impl):
-+        self.log = logging.getLogger(self.name)
-+
-+        self.path = Path("/run/obex")
-+        self.path.mkdir()
-+
-+        cmd = [self.exe, "--nodetach", f"--root={self.path}", "-d", "*"]
-+        self.log.info("Start obexd: {}".format(utils.quoted(cmd)))
-+
-+        self.log_stream = utils.LogStream("obexd")
-+        self.job = subprocess.Popen(
-+            cmd,
-+            stdin=subprocess.DEVNULL,
-+            stdout=self.log_stream.stream,
-+            stderr=subprocess.STDOUT,
-+        )
-+
-+        # Wait for the service
-+        self.log.info("Wait for obexd...")
-+        bus = dbus.SystemBus()
-+        bus.set_exit_on_disconnect(False)
-+        adapter = dbus.Interface(
-+            bus.get_object("org.bluez", "/org/bluez/hci0"),
-+            "org.freedesktop.DBus.Properties",
-+        )
-+
-+        def cond():
-+            uuids = [str(uuid) for uuid in adapter.Get("org.bluez.Adapter1", "UUIDs")]
-+            return all(uuid in uuids for uuid in self.uuids)
-+
-+        utils.wait_until(cond)
-+
-+        self.log.info("Obexd ready")
-+
-+    def teardown(self):
-+        self.log.info("Stop obexd")
-+        self.job.terminate()
-+        self.log_stream.close()
-+        shutil.rmtree(self.path)
-+
-+
- class Pexpect(env.HostPlugin):
-     """
-     Host plugin for starting and controlling processes with pexpect.
--- 
-2.53.0
+The VM-based tests have some advantages in that the environment is more
+reproducible, you are able to test against bluetooth-next kernel, and
+they are more convenient to run on dev workstation as they don't need
+root or interfere with system services.
 
+In principle several of the tests could run both on host kernel with
+btvirt,=C2=A0and with some extra work you could define a compatible test
+fixture that can reuse the exact same test code, or just write the
+tests in a way that the test core can be reused. Although the
+bluetoothd + kernel stack is written in a way that controllers are
+independent, the single-host test setup is not exactly the same as
+multiple hosts, so there's probably some value in end-to-end tests.
+
+Performance-wise there is some room for improving the VM test speed,
+eg. not compiling kernel with lock debugging etc. slow debug options
+on, and using virtiofs instead of 9p as it appears the emulated 9p disk
+access is somewhat slow. The VM boot time is already amortized by
+reusing the VM instances, and bluetoothd etc environment restarts can
+be avoided where possible, so you could write multiple tests like the -
+-help one with VM adding mostly a fixed cost.
+
+The tests that pair devices first spend time on waiting on the btvirt
+page timeout which is adding many seconds per tests. So there is also a
+non-negligible part of test time that is not limited by VM execution
+speed.
+
+
+For any tests running outside VM, it's probably simplest to write them
+in such a way that the test core could be reused. E.g. the bluetoothctl
+completion crash for example like would be
+
+def check_bluetoothctl_completion_crash():
+    child =3D pexpect.spawn(bluetoothctl)
+    child._decoder =3D AsciiDecoder()
+    child.expect(r"\[bluetoothctl\]> ")
+    child.sendline(" \t")
+    child.expect(r"\[bluetoothctl\]> ")
+
+    time.sleep(0.5)
+
+    assert child.isalive()
+
+@bluetoothd_reuse_config
+def test_bluetoothctl_completion_crash(hosts):
+    (host,) =3D hosts
+
+    host.call(check_bluetoothctl_completion_crash)
+
+This adds ~0.8 sec to the total test duration in VM (compared to ~0.7
+outside VM with system bluetoothd), as the test does not require
+bluetoothd or VM restart.
+
+I'd also write all tests properly as Python package that can be
+imported elsewhere as needed, and follow the pytest convention that
+tests are in files named `test_*.py`, so that they and any helper
+functions are more reusable. If you use pytest for them, you also don't
+need a runner script.
+
+For deciding what to run on CI, probably real runtime numbers are what
+matters. If the VM tests are fast enough, I'd think it would be OK to
+run them for all patches, as is done with the kernel VM testers.
+
+--=20
+Pauli Virtanen
