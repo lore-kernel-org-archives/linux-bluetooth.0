@@ -1,66 +1,78 @@
-Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3EF81F5EA
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Apr 2026 20:08:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A353033E3
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Apr 2026 20:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775506088; cv=none; b=peyj+/Stw34lYnyo7WfV9u47HOaPkImCtSFaTRRVwFGV/fQN38kJfeUQEh74oGHg/jHxfrYZEQpFlyzo6/FZRVxoaaR74nmIYrQLn1dOB36013CcORwKZd/Kjqri77DJotUeiYqsVz922p1kfgpT+IozG1yUBs+Hg2M/Cw/q6Q8=
+	t=1775508027; cv=none; b=ZL9sMajxWsgpcgORiVzZcw025D0BlaUvgW4Ju5MNUqhLdACIGr3wm2Tbv0bvaZaegTvj1Dr2XJtZ68egwXpd4lbXS6KqqcX5UyGMOe1tFNbTF4MRwgB/tnPkyOJil9fEKj3VfYrkkDZBfJCHGcKLmJF1mXcYdx14nRkZhBZ0jB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775506088; c=relaxed/simple;
-	bh=UZyZAX0mdGv/YWA2TUmj/zMXRBOrCop8CjoyHkWkUDI=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=AhfBDtF8vFh12CqtX3VQtiVrSmpSLeSpFy9ITdmmdr/x/yMj13/6WXqg39kdOxP7OvOnlghay87lAJuQkZTf7UjHmASqeKRgLdzjA9lO5HXZP+NZM2N1og8woxHzfhq5bJZwU7P/FK2GT+WsoXG3MJEbfgfywh1EIaQ+vDH936s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Fc/MD8j9; arc=none smtp.client-ip=192.30.252.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1775508027; c=relaxed/simple;
+	bh=sy1C9upncuhBQxXyTh+Rxtpwh4Dmu08rXywqClXyXnE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=m0RjvVrgEApHl143z7tgIAA2uDN9yVx7kktQpJjDPj2MiqbhvQfCKM5S7yPGBkzeYFFZCwewbwSuyQstUFwFrrSlFhP5OdS5B+xRt93ecz8773nArrNhIhreNcCgII6NI4+B6z5zuoT2ifF2mG5NqIhnymuXVOOxx4hCsLhKWVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PwpzYMMX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Fc/MD8j9"
-Received: from github.com (hubbernetes-node-6b8dd41.ac4-iad.github.net [10.52.184.45])
-	by smtp.github.com (Postfix) with ESMTPA id B899530107A
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Apr 2026 13:08:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1775506086;
-	bh=3z8u0Doc5OstB/qo7EJCKxMAETNoPt+VcjCfYVooQ3A=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Fc/MD8j9WFQb/n5z7FqHa6XM4nthlNAlHExSqySVtdrfuzAijteNPQdGMugnOw36m
-	 4wvlEJYcgj+25E6ezjQ1joNZREqQl5UUlt55vFyC2VEb6raP/O2QCGM5bhziniLcCv
-	 np8AmZIOUQB3jVT0i0sXJFiNci3InCcGyw3OHxxU=
-Date: Mon, 06 Apr 2026 13:08:06 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1077784/000000-7f24cd@github.com>
-Subject: [bluez/bluez] 7f24cd: monitor: Fix not loading local GATT DB from
- cache
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PwpzYMMX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADD8EC4CEF7;
+	Mon,  6 Apr 2026 20:40:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775508026;
+	bh=sy1C9upncuhBQxXyTh+Rxtpwh4Dmu08rXywqClXyXnE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PwpzYMMXS9Gr5L46w86KOpDB2MXe9c16ns3eNUT/gVTGDRThEXneCM1dCp/WFOd4h
+	 jOIyU5KDK7gCVDDCv7dAZSlOXbH9GOFaFoIfJe/kWjVujBSmNGFzTByx2pCGj92dAm
+	 BF6HyALoFXXdTdzgk7w85U7v5mPdKfyEqFQz4VkkP+zAS4qUhvEvLDtC40w4oJiT6r
+	 MkLGP3x+wYFTp25QscAVDX2s8eGTLMayde+u+ZXH18J8eaxOsqRV+N5LGExeG10XKG
+	 I4A0Mtq07TOuNk9lgoCX4RwsvEJGzKlDITdYE54N744K2zBEBNcNUv4LCFoLJWwtyC
+	 97zhBsxazXV2Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE9C3809A3C;
+	Mon,  6 Apr 2026 20:40:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: l2cap: Add missing chan lock in
+ l2cap_ecred_reconf_rsp
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <177550800529.3255428.11613093006473846876.git-patchwork-notify@kernel.org>
+Date: Mon, 06 Apr 2026 20:40:05 +0000
+References: <20260405154741.7051-1-phx0fer@gmail.com>
+In-Reply-To: <20260405154741.7051-1-phx0fer@gmail.com>
+To: Dudu Lu <phx0fer@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com
 
-  Branch: refs/heads/1077784
-  Home:   https://github.com/bluez/bluez
-  Commit: 7f24cd6b2732404ee774381882b918cbe7cb7db6
-      https://github.com/bluez/bluez/commit/7f24cd6b2732404ee774381882b918cbe7cb7db6
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-04-06 (Mon, 06 Apr 2026)
+Hello:
 
-  Changed paths:
-    M monitor/att.c
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  monitor: Fix not loading local GATT DB from cache
+On Sun,  5 Apr 2026 23:47:41 +0800 you wrote:
+> l2cap_ecred_reconf_rsp() calls l2cap_chan_del() without holding
+> l2cap_chan_lock(). Every other l2cap_chan_del() caller in the file
+> acquires the lock first. A remote BLE device can send a crafted
+> L2CAP ECRED reconfiguration response to corrupt the channel list
+> while another thread is iterating it.
+> 
+> Add l2cap_chan_hold() and l2cap_chan_lock() before l2cap_chan_del(),
+> and l2cap_chan_unlock() and l2cap_chan_put() after, matching the
+> pattern used in l2cap_ecred_conn_rsp() and l2cap_conn_del().
+> 
+> [...]
 
-The local GATT DB maybe discover in previous connection and therefore
-should be cached as well to be able to decode follow-up connections
-where the discovery may not be visible.
+Here is the summary with links:
+  - Bluetooth: l2cap: Add missing chan lock in l2cap_ecred_reconf_rsp
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ff4aaa2d1db8
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
