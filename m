@@ -1,74 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75C27081E;
-	Sun,  5 Apr 2026 22:28:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775428124; cv=none; b=EE35lUakk7fVAfNOkCLomVGNnrvXFzh9I0/9SC1rthqA1l61rFDb8hET3stNRveaDrHKqIZm7PNIsVsp+pGKvdaRbcRd44Ei3KHe1bEWvmD9iJzDp27SBE9SD2Id2uyl7xBXLf0pNOhlJNgd6y2p5R1eI3PDO7bzMwUeG2UZT7w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775428124; c=relaxed/simple;
-	bh=sbn7cSt43ByRtf5P3IZPaeZopVX1YvGYKd1MKlCCcAg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b6Niw5d0eJnbTT7vI1l5Bmc0P1ueb+wqYkS7N47Gi5LRlYGeq44Lv5VgI8vdBrOFkNBGz/ZCqK6Gn5D7VhxF/ToOFsIFkmADLT6Eg5NdlqGztJKDUqwXpbiSOmB4RizKU2Vr3uunl+m34fJID3ynd/ICd0cLQshnIPVuOQ/gP2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pSSRAZ6u; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C510E31196F
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Apr 2026 10:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775472922; cv=pass; b=XsULJvOlDnG8Cg6X0bH6NcxxVU9iArMwysNgFUeZoiZWVys8HK/cgBFm87QXfWnccj3hTU7/jrrIuHHC+tdAg0pZ+7cPz/pS49w/xx5vq1E1V71EVPvOljnBaLfjYOmYMS8l3uit86HQHUwDMw5gwb51Y+uer31jtLE5iHYMbvw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775472922; c=relaxed/simple;
+	bh=9M7RvlJo7+tGa8w/d7k3uKpS1bXT3jVkfGfjBZhL3jE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cAPACWISuaIfWMU92i5A46JuNkhpMhoc4yARfR8FRNp6/Bst4DbDAGLcKcvwZqV4+D5n22a8yLxcpLYsH2TjPIvwLuyk8/8VhcgYMYdB/NE/xowppKLIE0P76a+o2HuVxN+pYKSCYG9HQRvs7zoeHcxdbg59ZuF0IWU6XwiUQBA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=oBILFveI; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pSSRAZ6u"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66D3BC116C6;
-	Sun,  5 Apr 2026 22:28:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775428124;
-	bh=sbn7cSt43ByRtf5P3IZPaeZopVX1YvGYKd1MKlCCcAg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pSSRAZ6uFllVa4WTmvevDT1RFY0M6Uyk8CQaZjE8TmGJeocgkzazCFH7IhxytBtd5
-	 QE+LFHDEyuDgQDzYdwLBR0/ccFzoAQn/Va1m8DKTMyxlF8mZKbNqFpotCYLTdToIZ6
-	 h29e0CezOrumd3pcc6+1bagOyoDE7iG8uSf35Wn3HXjhLpAWj7eb3cewwzd+6bclnW
-	 a2zYWnYPwOEUPervov4yFvAKC89M4yr9tmJU1LrYC2OOSpYG14Khmmhtged+8hnClv
-	 H1g7F7sASIbxBbNnzcw8vMZr0bhCMB47jIPc62YAA8c+SbpE8MWPURDCcKNOG6dC8P
-	 PcdnWItiZxY2g==
-Message-ID: <b7520942-865a-450f-8b06-1b5cbc95c7c2@kernel.org>
-Date: Sun, 5 Apr 2026 15:28:42 -0700
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="oBILFveI"
+Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:3::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4fq5ny2BtwzyTm;
+	Mon, 06 Apr 2026 13:55:18 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1775472918;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=77C8Q0xGscW5pCWQw1SK/eAvloovRnjfi8GQhOY4LF0=;
+	b=oBILFveIDcZJOISOo6tsYImt76c5qVEgy/NgNP8ZULKzAGs9RCEx4ay2fG3qcGH123osdg
+	Mh1b5106IUnWxyyDXRg0TaLRrRoZfjGBElRqMEFx/QmLVxAP9p/nNDdeOIQq0Nm1YmaWJ8
+	lUcISEchS1Kbbd+2N4MRXccadkE1sws=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1775472918;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=77C8Q0xGscW5pCWQw1SK/eAvloovRnjfi8GQhOY4LF0=;
+	b=QXeVr4HCQIzxyiCisUJW+81B8ApYROHp8ypX30qg5q3ycrEW3BOpHKcsQ3YEJRxITVAPUx
+	tEOt30GPCbSgRI+BjzJXAuJqX7DImqJIT+xuCWgz721Y0ylhXD29x22omRrNgUNowbizL5
+	i3JiR4nh1UChNOTi2S/R6HbYAcAq0Qk=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1775472918;
+	b=fAa8wSMP59aabOP6/HSaIvFOI8WO3viUE2jG1fs8YVkRbWqidbHHtoo1nhnrKThFncUG2P
+	H3ob0UN7/GFnay6Rzwu/dxKhUq0FMH2+s87DriU939LRcJGifgXtHlAa7IyHLT+gNKeX3X
+	Iv/tEmrI90jM6XzxS3CGiwYfewi3Xac=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] build: never build test-runner with ASAN
+Date: Mon,  6 Apr 2026 13:55:15 +0300
+Message-ID: <968d832c1d78d26409ed751f2901ea5eb105541a.1775472833.git.pav@iki.fi>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/7] dt-bindings: net: wireless: ath11k: Document
- WCN6755 WiFi
-To: Luca Weiss <luca.weiss@fairphone.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Alexander Koskovich <AKoskovich@pm.me>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann
- <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Rocky Liao <quic_rjliao@quicinc.com>,
- Johannes Berg <johannes@sipsolutions.net>, Jeff Johnson <jjohnson@kernel.org>
-Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-wireless@vger.kernel.org, ath11k@lists.infradead.org
-References: <20260403-milos-fp6-bt-wifi-v2-0-393322b27c5f@fairphone.com>
- <20260403-milos-fp6-bt-wifi-v2-3-393322b27c5f@fairphone.com>
-From: Jeff Johnson <jjohnson@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20260403-milos-fp6-bt-wifi-v2-3-393322b27c5f@fairphone.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 4/3/2026 6:52 AM, Luca Weiss wrote:
-> Document the WCN6755 WiFi using a fallback to WCN6750 since the two
-> chips seem to be completely pin and software compatible. In fact the
-> original downstream kernel just pretends the WCN6755 is a WCN6750.
-> 
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+test-runner cannot run as pid 1 inside VM when built with ASAN enabled.
+Drop MISC_CFLAGS/LDFLAGS from its build; the additional flags they
+contain beyond ASAN enable are not important for test-runner build.
+---
+ Makefile.tools | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Bjorn, will you take this entire series through your tree?
-
-Acked-by: Jeff Johnson <jjohnson@kernel.org>
-
+diff --git a/Makefile.tools b/Makefile.tools
+index 4a51762c3..8e0eae04e 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -321,6 +321,9 @@ tools_btgatt_server_SOURCES = tools/btgatt-server.c src/uuid-helper.c
+ tools_btgatt_server_LDADD = src/libshared-mainloop.la \
+ 						lib/libbluetooth-internal.la
+ 
++tools_test_runner_CFLAGS = $(WARNING_CFLAGS)
++tools_test_runner_LDFLAGS =
++
+ tools_rctest_LDADD = lib/libbluetooth-internal.la
+ 
+ tools_l2test_LDADD = lib/libbluetooth-internal.la
+-- 
+2.53.0
 
