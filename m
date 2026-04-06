@@ -1,255 +1,128 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65BC4E56A
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Apr 2026 13:15:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775481332; cv=pass; b=XQ298CSYLQM6xF132sbcxLTySffjGEkntIaWKz9ry6ewmTUnhAK7wjdjoBWAiechkJoTVarNoSCvazzU/QScOQ/vhxDV+Pt1Tr8Z+NF2hpT7T/50AgO9vxHistn3Nx9gKdYy3AoKNs44SOfQ6BcoB643Ed35lda24p47UMrLDus=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775481332; c=relaxed/simple;
-	bh=tc6KZO5/UsdqniNtqdiNOqzm0GSZ3xstEquBTztX2Go=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PjY/rlNrguLmzahlRIIkiiplCBAzqqLoGCpgPI6w7zR1WoVjRlit1BfLGyhdwyBg5aRwHiYOJmDmCYR291oZd+31QPh9jDT+4TpoazR/ZXQRK0dmzK6VsTVDKMCG7LhJ0f2BCU90m/r81FtCPoJWfGjZmHI2rGLSqdYz2UI0NmQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=YqBJTmjW; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A77123ABB9
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Apr 2026 13:36:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775482579; cv=none; b=WjlD1Jlgq7IYLxO/f6RFUWa3pKwC1c5VDtouYQL9JVcFOpn3DwSLFB5z39jzCFO39m+l3u7LITeQeFURvjTwMRQ6P32X+vxg5LgFXwPnNJBq8b32XQ31qiBmH9CXbkhkXIibtU9BYpAtEn78w3pXetgmJRdMpH7R0Bv4oX5+M6Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775482579; c=relaxed/simple;
+	bh=adkD1Ses5nzmhShqZdSR6hpWvaO9y6lLxt6SLejv1Ws=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=f6L05tzngKB3Fw/PBf9cDfDLyeMUEsHl0nOYmN+i24r5Pn4oN1xbi426O510ftbgR/dbW6OgD35JnqixTBCM5j2emEEnFkUqnPVWtoFaTgwr8mQjmjJzgdWKzSKXWKbJN4ZdtyzchefFiMyc0oDmHICw14TC7JlSoz++nSQdRPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iPtMyxf8; arc=none smtp.client-ip=74.125.82.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="YqBJTmjW"
-Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:3::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4fq8vb2Vnyzyvg;
-	Mon, 06 Apr 2026 16:15:23 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1775481323;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+n/5O+IcNZmZEGimlxOHXJ8MVtB8VL+T2a458SbUG/g=;
-	b=YqBJTmjWtkSELPpIWxIz3UqXT42Fv6fgk4NOqTK9qBpubL1L+CHgIiwg3ErW7+u0P8dTv5
-	lvsub+UNu8wf1bUqTnMs1UKeTaSG3HsgnrjT9MkccxUGZHrpiACB42SKa15Lt/2HdYA6x1
-	R73Y4Kb8xIb5iBw1OReH5j1kmsq82Mw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1775481323;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+n/5O+IcNZmZEGimlxOHXJ8MVtB8VL+T2a458SbUG/g=;
-	b=nTao1jrSJ+VzKUuOBgx+k31FLz2oRjtEr4T1b+wRlMipjibg2H6lIthgp/e7lLn9C3FfyH
-	9YYAPdiXbpQDhafVQdZbxkVO+z41AuP2DPC9L6p79GMHeLEGQsDR21QunaA59Y93Va66Gv
-	Rm0koEZ08md2Oi45BusAmATIEdd3tdc=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1775481323;
-	b=cs7fXSROMC6Ckg8Qh8T67M6nvTm/aQpCDqiOWwNQ7DvTksE7KW2gm/QTtnQs+MxdstQ9U0
-	CVBLkQp2rnTkpVnZnYKyAfjNrHz0MndOr8EiwllCzCx1a+uh27vDdb/7AhgU8ZOnYGW5l7
-	3Tb/YRjLPcyTR9G0pm6mUJVPeAwTwz8=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2 2/2] shared/mcp: fix parsing of control point arguments
-Date: Mon,  6 Apr 2026 16:15:20 +0300
-Message-ID: <3cda5993d78d31ca136ff2c568b8c86baa380f32.1775481285.git.pav@iki.fi>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <020cbb8375aacc6d8d9edad9aca96a6cde131dfb.1775481285.git.pav@iki.fi>
-References: <020cbb8375aacc6d8d9edad9aca96a6cde131dfb.1775481285.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iPtMyxf8"
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-12713e56abdso1281448c88.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Apr 2026 06:36:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775482577; x=1776087377; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=t6pULyZfqvCUNGBdQ2HUyskM7F6goST+I5qpXSleUMA=;
+        b=iPtMyxf8U8NXz74wJ+rPEpSoPrDtk/UgAtv2lWRBbGcr0fF/5WsPmA3i2lA5wK4085
+         r8EGZkUd/MwsAQQUug0yVd7qP4nCUwwooUxkrOidT9QnOh87HX/KOvgr9CMcXanXZqO9
+         2vt1dFT7BHr02K60Ae0dZv7gxDUNL4bc6r11bF9ETDH5SIRWgm66+T6LNa1jD1PLP+jZ
+         /BQyQnabGWA9wojyUFr4aLT3UMlaaQ6riGY65FhUIDkaXSS6Z8ITvyvK0S4xyuiN4bZ1
+         pTkHN5jlnXZW1YaZAmdfAhZi+I93CY84LRDLDryojXoJR4lx72DG6VlQ8d6qD+ZnajvB
+         +c6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775482577; x=1776087377;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t6pULyZfqvCUNGBdQ2HUyskM7F6goST+I5qpXSleUMA=;
+        b=D3MYNLn08UKTMu6P7U914SyDJ6/kPip62cEN0utJaMo2z7NCQ41pwN1hx9ZSL9NGY0
+         lZtHg9Gc1wk4JRTLJFsUB5q46UGGWBmEtBpaFEN+1Vi8WvFs3ThB60OEdWbbjBBzAJjL
+         v7dae8ZzTM2+cPyCdPMhMmQAdjtO3hJ/K9UwdfyazA2/OYVrM5EUGEl+LBXtCsTxlYOq
+         GogoxGaLXFaUb90GF6KXq7o9+g1pL91Dr6jogCOHCm7lpCxSl2SFn8gSyFv/m9eFb0tv
+         ImBV2A71Sb3VzF6NGzHz9HPEMOBTcoBDdEsxVPndYySiZL4NT8QO55bRo7SPGzV43mI+
+         CkzQ==
+X-Gm-Message-State: AOJu0YyJPtuv5i1lArDnRSgi/DRoLfXTXxGp1e7yxmFHuYjkBXUpElYY
+	5b/kZbO/lax3sWmsx11GJfjktRGG5jmGIO+V7XjajGTdAxiVYGag3JaD9mW9lw==
+X-Gm-Gg: AeBDieu7vXcLLxv9xU4RDD7MP6PWOpEub7hB0JLZ2ln4JEjDCtLZKgA5ar3y7rjNN+Y
+	2fXxcNPRZ2jtNYuo0GPAYDJqYlkTINVbra7PIpDdi6PvxJOqOVUbIXpTxfJRN4m3xGcgJfK5Ye0
+	VFnoRLPcwnjARRvJRQZ+LiRBk5iZU/unQv65rp56nLz5PnsubfE9W1T9SEKetkefaZCRM9t9LJj
+	UF2btZYqxgjMl0HpQbEujxJo8Jltsy1eSHnoBv+QykEJOqQIex+qmdi8khF6JJWuiplciTs6djT
+	6+MLLSQd+7Qhtxu+VZ7v4bHuDdeahh3aFcwuMsrjsNl+6MfP8DJXICTQWcNr/JWJhWoh4vK4t8s
+	ta2oT5Zq15UmWY1GHp8bhlRNcaak8asstwovge/9iRc0Zlhz4zIW7tVsXMFMEmMUrBecnqQRmfX
+	IhLdvdxFlDOvZOJc7VPhs0oD3mozZWF5Xz
+X-Received: by 2002:a05:7022:221b:b0:12c:427:dacf with SMTP id a92af1059eb24-12c0427de30mr2848438c88.10.1775482576741;
+        Mon, 06 Apr 2026 06:36:16 -0700 (PDT)
+Received: from [172.17.0.2] ([172.184.213.227])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12c0ce7dfe8sm3590203c88.3.2026.04.06.06.36.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Apr 2026 06:36:16 -0700 (PDT)
+Message-ID: <69d3b6d0.050a0220.20cdc0.c511@mx.google.com>
+Date: Mon, 06 Apr 2026 06:36:16 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7580420922761628409=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ,1/2] shared/mcp: fix crash on destroy after ATT gone
+In-Reply-To: <020cbb8375aacc6d8d9edad9aca96a6cde131dfb.1775477981.git.pav@iki.fi>
+References: <020cbb8375aacc6d8d9edad9aca96a6cde131dfb.1775477981.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Fix parsing of control point argument lost in rebases.
+--===============7580420922761628409==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add tests for Move Relative command that need it:
+This is automated email and please do not reply to this email!
 
-MCS/SR/MCP/BV-12-C [Move Relative from Playing]
-MCS/SR/MCP/BV-13-C [Move Relative from Paused]
-MCS/SR/MCP/BV-14-C [Move Relative from Seeking]
-MCS/SR/MCP/BV-75-C [Move Relative from Inactive]
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1077651
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.44 seconds
+GitLint                       PENDING   0.44 seconds
+BuildEll                      PASS      20.32 seconds
+BluezMake                     PASS      647.48 seconds
+MakeCheck                     PASS      18.63 seconds
+MakeDistcheck                 PASS      243.38 seconds
+CheckValgrind                 PASS      292.86 seconds
+CheckSmatch                   PASS      345.96 seconds
+bluezmakeextell               PASS      180.59 seconds
+IncrementalBuild              PENDING   0.42 seconds
+ScanBuild                     PASS      1010.00 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+https://github.com/bluez/bluez/pull/2020/checks
+
 ---
+Regards,
+Linux Bluetooth
 
-Notes:
-    v2: fix test data for MCS/SR/MCP/BV-75-C [Move Relative from Inactive]
 
- src/shared/mcp.c |   5 +++
- unit/test-mcp.c  | 100 ++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 103 insertions(+), 2 deletions(-)
-
-diff --git a/src/shared/mcp.c b/src/shared/mcp.c
-index 0dd175c6d..a954869b0 100644
---- a/src/shared/mcp.c
-+++ b/src/shared/mcp.c
-@@ -343,6 +343,11 @@ static void write_media_cp(struct gatt_db_attribute *attrib,
- 		rsp.result = BT_MCS_RESULT_OP_NOT_SUPPORTED;
- 		goto respond;
- 	}
-+	if (cmd->int32_arg && !util_iov_pull_le32(&iov, (uint32_t *)&arg)) {
-+		ret = BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
-+		rsp.op = 0;
-+		goto respond;
-+	}
- 
- 	DBG_MCS(mcs, "Command %s", cmd->name);
- 
-diff --git a/unit/test-mcp.c b/unit/test-mcp.c
-index 7d922bb83..6331c6c99 100644
---- a/unit/test-mcp.c
-+++ b/unit/test-mcp.c
-@@ -1812,17 +1812,48 @@ static int32_t sr_mcp_track_position(void *user_data)
- {
- 	struct test_data *data = user_data;
- 
--	return 71 - data->id;
-+	return data->id;
- }
- 
- static bool sr_mcp_set_track_position(void *user_data, int32_t value)
- {
- 	struct test_data *data = user_data;
- 
--	data->id = 71 - value;
-+	data->id = value;
- 	return true;
- }
- 
-+static bool sr_mcp_move_relative(void *user_data, int32_t offset)
-+{
-+	struct test_data *data = user_data;
-+	int pos = data->id;
-+
-+	tester_debug("Move Relative %d (pos %d)", (int)offset, pos);
-+
-+	if (!data->step)
-+		FAIL_TEST();
-+	data->step--;
-+
-+	if (bt_mcs_get_media_state(data->mcs) == BT_MCS_STATE_INACTIVE)
-+		return false;
-+
-+	pos += offset;
-+	if (pos < 0)
-+		pos = 0;
-+	if (pos > 71)
-+		pos = 71;
-+
-+	data->id = pos;
-+
-+	bt_mcs_changed(data->mcs, MCS_TRACK_POSITION_CHRC_UUID);
-+	return true;
-+}
-+
-+static int32_t sr_mcp_track_duration(void *user_data)
-+{
-+	return 71;
-+}
-+
- const struct bt_mcs_callback sr_mcp_mcs = {
- 	.media_cp_op_supported = sr_mcp_media_cp_op_supported,
- 	.play = sr_mcp_op_success,
-@@ -1832,6 +1863,8 @@ const struct bt_mcs_callback sr_mcp_mcs = {
- 	.stop = sr_mcp_op_success_inactive,
- 	.track_position = sr_mcp_track_position,
- 	.set_track_position = sr_mcp_set_track_position,
-+	.track_duration = sr_mcp_track_duration,
-+	.move_relative = sr_mcp_move_relative,
- 	.debug = mcs_debug,
- };
- 
-@@ -1908,15 +1941,64 @@ MCS_SR_MCP_CFG(bv_11_c, BT_MCS_STATE_SEEKING);
- MCS_SR_MCP_CFG(bv_74_c, BT_MCS_STATE_INACTIVE);
- #define MCS_SR_MCP_BV_74_C SR_MCP_STOP_INACTIVE
- 
-+#define SR_MCP_MOVE_RELATIVE(initial) \
-+	NOTIFY_CHRC(STATE, initial), \
-+	READ_CHRC(TRACK_DUR, 0x47, 0x00, 0x00, 0x00), \
-+	WRITE_NORESP_CHRC(CP, BT_MCS_CMD_MOVE_RELATIVE, 0xaf, 0xff, 0xff, \
-+									0xff), \
-+	NOTIFY_CHRC(TRACK_POS, 0x00, 0x00, 0x00, 0x00), \
-+	NOTIFY_CHRC(CP, BT_MCS_CMD_MOVE_RELATIVE, 0x01), \
-+	WRITE_NORESP_CHRC(CP, BT_MCS_CMD_MOVE_RELATIVE, 0x17, 0x00, 0x00, \
-+									0x00), \
-+	NOTIFY_CHRC(TRACK_POS, 0x17, 0x00, 0x00, 0x00), \
-+	NOTIFY_CHRC(CP, BT_MCS_CMD_MOVE_RELATIVE, 0x01), \
-+	WRITE_NORESP_CHRC(CP, BT_MCS_CMD_MOVE_RELATIVE, 0x30, 0x00, 0x00, \
-+									0x00), \
-+	NOTIFY_CHRC(TRACK_POS, 0x47, 0x00, 0x00, 0x00), \
-+	NOTIFY_CHRC(CP, BT_MCS_CMD_MOVE_RELATIVE, 0x01)
-+
-+#define SR_MCP_MOVE_RELATIVE_INACTIVE \
-+	READ_CHRC(TRACK_DUR, 0x47, 0x00, 0x00, 0x00), \
-+	WRITE_NORESP_CHRC(CP, BT_MCS_CMD_MOVE_RELATIVE, 0xaf, 0xff, 0xff, \
-+									0xff), \
-+	NOTIFY_CHRC(CP, BT_MCS_CMD_MOVE_RELATIVE, 0x03)
-+
-+MCS_SR_MCP_CFG(bv_12_c, BT_MCS_STATE_PLAYING);
-+#define MCS_SR_MCP_BV_12_C SR_MCP_MOVE_RELATIVE(BT_MCS_STATE_PLAYING)
-+
-+MCS_SR_MCP_CFG(bv_13_c, BT_MCS_STATE_PAUSED);
-+#define MCS_SR_MCP_BV_13_C SR_MCP_MOVE_RELATIVE(BT_MCS_STATE_PAUSED)
-+
-+MCS_SR_MCP_CFG(bv_14_c, BT_MCS_STATE_SEEKING);
-+#define MCS_SR_MCP_BV_14_C SR_MCP_MOVE_RELATIVE(BT_MCS_STATE_SEEKING)
-+
-+MCS_SR_MCP_CFG(bv_75_c, BT_MCS_STATE_INACTIVE);
-+#define MCS_SR_MCP_BV_75_C SR_MCP_MOVE_RELATIVE_INACTIVE
-+
- static void test_sr_mcp(const void *user_data)
- {
- 	struct test_data *data = (void *)user_data;
- 
-+	data->id = 13;
-+
- 	bt_mcs_set_media_state(data->mcs, data->cfg->state);
- 	data->step++;
- 	test_server(data);
- }
- 
-+static void test_sr_mcp_move_relative(const void *user_data)
-+{
-+	struct test_data *data = (void *)user_data;
-+
-+	data->id = 13;
-+
-+	bt_mcs_set_media_state(data->mcs, data->cfg->state);
-+	data->step++;
-+	if (data->cfg->state != BT_MCS_STATE_INACTIVE)
-+		data->step += 2;
-+	test_server(data);
-+}
-+
- static void testgroup_sr_mcp(void)
- {
- 	/* Only the MCS tests. No point in GMCS as only svc uuid changes */
-@@ -1955,6 +2037,20 @@ static void testgroup_sr_mcp(void)
- 		test_setup_server, test_sr_mcp,
- 		&cfg_mcs_sr_mcp_bv_74_c, MCS_SR_MCP_BV_74_C);
- 
-+	/* MCS.TS Sec 4.4.4 Move Relative */
-+	define_test("MCS/SR/MCP/BV-12-C [Move Relative from Playing]",
-+		test_setup_server, test_sr_mcp_move_relative,
-+		&cfg_mcs_sr_mcp_bv_12_c, MCS_SR_MCP_BV_12_C);
-+	define_test("MCS/SR/MCP/BV-13-C [Move Relative from Paused]",
-+		test_setup_server, test_sr_mcp_move_relative,
-+		&cfg_mcs_sr_mcp_bv_13_c, MCS_SR_MCP_BV_13_C);
-+	define_test("MCS/SR/MCP/BV-14-C [Move Relative from Seeking]",
-+		test_setup_server, test_sr_mcp_move_relative,
-+		&cfg_mcs_sr_mcp_bv_14_c, MCS_SR_MCP_BV_14_C);
-+	define_test("MCS/SR/MCP/BV-75-C [Move Relative from Inactive]",
-+		test_setup_server, test_sr_mcp_move_relative,
-+		&cfg_mcs_sr_mcp_bv_75_c, MCS_SR_MCP_BV_75_C);
-+
- 	/* TODO: other state transition tests. They largely test the profile
- 	 * upper layer, so do not add much here.
- 	 */
--- 
-2.53.0
-
+--===============7580420922761628409==--
