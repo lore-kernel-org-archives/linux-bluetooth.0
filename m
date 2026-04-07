@@ -1,262 +1,158 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B9D3A3E9A
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Apr 2026 09:44:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0983C3A872C
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Apr 2026 10:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775555054; cv=none; b=DBbKs7XuONSGSVtn28OC1x+aCQDJl9hiX5DPCNDrP/BIjRrvHeR9/Evm6gyk0J+ep3YopOOC3wades8CAKWP0S50j4baCqu4A1kaPCjB+tUEW8T/C1lnjGoJ2y6PgKBafY924ztoQyACZbCjWxxKsXenVcHytuTrbXW/DlZssoY=
+	t=1775557517; cv=none; b=GIjNF6kTB9U2UpXoDxEgnUUtlktxMuN7v2dwxLkK35F1QeOKJMQMGoNa4v3pHaDVm8m6EPzg+7HcFl1gNDymQ9E9t5BlYpnRPlRPQsmyxRE5EQoXgTY7vuTT2xuETGs+LcNMSb9bIfj+1Gr1saG0s9JtEXSNnMak/f04HIS/tzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775555054; c=relaxed/simple;
-	bh=7ajx81PtA+zlVd/nnu+xE8CVIKNwtPyqirS9Q4GGBtA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C0lCwy+yfPdZ5VSFcqD5jqqCAJ7xnEwSkvMOl2YfeWG7w9eBQjkA4aghIQVAJgiuMe0FForK0J7uJsZQN7QECkmyFUkctXIP3g2mBY7e8pXhJVmxYAz9fzrzkzhq9uUNd/li40teR7hVW4ajJUsOjilp4hTOhpWBA8kNhYUvT9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cNGoJ5lm; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1775557517; c=relaxed/simple;
+	bh=2A6OQL8RezmS+kZvWWaZ9SsogD51Kkgult/n4C12Brk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=raDcCPp/1Q3Eebe4XWCbKiFY8RaBGE/blkWuMxWx3zkWmVuOh9B6Z4+k+iZViXECdI+lDsyrByUcU1ATXdt4869fK5VpTYawQ2nRjtx41Q1QeIRmHAB7/1zGHvC1QOc/uM5NyJLkybOBleCkPL0LGkvz2Km0v7VHuXQW1H1VsCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fuJCvW6o; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cNGoJ5lm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775555047; x=1807091047;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=7ajx81PtA+zlVd/nnu+xE8CVIKNwtPyqirS9Q4GGBtA=;
-  b=cNGoJ5lmb/pgojKtvJN/18UCIQUwcVItJNfqz5qydWcuBNRH/+F1cpFY
-   Wp/7TcCJHlV3rOsHYQ10OS7kPNA288/ommSHPcKB7cWUIQX8G1lqT94FU
-   y3aYst4j1PAzuu64lM7nVH2hKkAGLgugHZ4okKO0VD/PmRlmHwdGpbIcL
-   DQJjk6Jr77RZvymRaPlm5KaxuTsafPu4d+T7PGEaNKhszu50/1twsROVf
-   NIQaWESNJwhrPgCGvLbFkMNBweqtFIleBd0QxLkU1kXBVHOy+CxroL7RO
-   TwRn9UOE5dpFW6qHb8pGtmGFpWRzZDQzVPkHgIzju4phlLrdrbr/kyFWx
-   g==;
-X-CSE-ConnectionGUID: rEywMJBITxCQ9Zhz/ZyP+Q==
-X-CSE-MsgGUID: wtVuoKqcSCSF2d4UTotuSQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11751"; a="76478764"
-X-IronPort-AV: E=Sophos;i="6.23,165,1770624000"; 
-   d="scan'208";a="76478764"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2026 02:44:05 -0700
-X-CSE-ConnectionGUID: xmiZVJhaQgaFlxwl0oaGQQ==
-X-CSE-MsgGUID: D4kgoOuFQ3yW5cfAUgCGSQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,165,1770624000"; 
-   d="scan'208";a="229798755"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa004.fm.intel.com with ESMTP; 07 Apr 2026 02:44:04 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH RESEND v1] Bluetooth: btintel_pcie: Align shared DMA memory to 128 bytes
-Date: Tue,  7 Apr 2026 15:32:40 +0530
-Message-ID: <20260407100240.757910-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fuJCvW6o"
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8cbc593a67aso497972285a.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2026 03:25:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775557515; x=1776162315; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=L6YKizvzek4GavyjMqe7DxLAVe5MrWZPNYpQoLxyAhs=;
+        b=fuJCvW6oOdR1v62O0WA7BhqE5X7Wy0CpoT8dfIodh9J04MuRj6jzWlJSk7SIERxEVA
+         ku59R3dVyEW41o/buVMFm2c8JijoY8nviPZzntGxTNUcVSPFR8X42hbKQgblhyS4KeYS
+         fvKcxBlO4Bthz1Kp2vNCw8LcS9jWMyJU41pV/mR3ULPfXFrntp7IM9JwJFRsp5KGhVfH
+         tviOW/8j67cM1h16wD9qsfeQTufaKNPWssx4flPd/detNszCWXXRQa/Ln5gp/1jlTQ9y
+         XKF5l3s89nBrqm9w4MuMPBP9Be8/3DdYX7WdpiPgY7M71tdn9VIzke4u72v2OLGDKFJd
+         az9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775557515; x=1776162315;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L6YKizvzek4GavyjMqe7DxLAVe5MrWZPNYpQoLxyAhs=;
+        b=pdhrO1bzIf5Ko7ZpuE2/1pvxHsGGuyP6PRmnYM/QCAxRht9uuC1/MR7h7UI82mfLIM
+         N+o09P/36DyUuyAiXl/9kTDVE5KmhEFxBYjz3wL0lO+7LEtitwj58YGIz9uGQH6nCTko
+         LvUFgJUAtPrclaSNDnov7CNMxoXJEf1o8F1Mnwyy6QiEytxMO+MxPZVSUHh1Lpsn6eNi
+         rDYXSsnOTz1ru/TRtiM+0UrKH10KXAtcLAZXyBNs2b2XO7StOMhj9l/uKQV8TWQyK4cE
+         g/GwMfc/MaROxJp9WrkCP5AwxIB7Bv8caNYr1vfTQC+IkgXL2nz4jCyvFWUZN2UgACk/
+         HYTQ==
+X-Gm-Message-State: AOJu0Yxz9lbcnXCR9m7saSuqkOWkvt2PTngSzkbHsJXgtOPNimlGFR9q
+	gBNr+GxIu+6G2VGPX7Zw8cPRiFCELH5lj3dNeNrCqEbgPz/1/25VUyS/c7Ptmg==
+X-Gm-Gg: AeBDievZZp7a6EXeMeZZU/SZ3GCE0gyF61uIDJYpQ9auJKN1dytBYPyRvZtr5v3N0dQ
+	KaB3ZvVzhWCQ2B0mFDVYKOvXHSn2H3Lu03SW7BvtWjChDsRk/ihvou4hU/3CR+CzkpbtBIGESJM
+	Dt3E8uobKksI/rRRklBM68+TeG6G7rt+v5uYB05fpEdGusXzBEJQ3daRfbREF3nfeNsin+LTJ2v
+	TtYcnPRaKwUIRloMGVA3kqsIg0I+47blxwKIosGJsE2QCPPdG3mtnWYTVuRzrDH63UsbzCPFtue
+	jCGe7sJfhHKWGN7BV4oifmUBmXuGuxY/1GNvYSaIBggthAnro9dPLmqTJRShRhbMMFEHsabBSJv
+	SK3PuSxDsuBFp25Ds8/LSrKxPJr20NcX4NAT6zEyksbKw6mKJ0V0ri4JcWgGlZ/UncG3E1WEKq3
+	/xViDEJ5ZE5yhljbwaqYC+43ptT8y63M3NwynwNuRi
+X-Received: by 2002:a05:620a:4050:b0:8cd:8f94:258e with SMTP id af79cd13be357-8d41e537481mr2338731185a.59.1775557514658;
+        Tue, 07 Apr 2026 03:25:14 -0700 (PDT)
+Received: from [172.17.0.2] ([172.172.157.5])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8d2a5393a07sm1281259085a.4.2026.04.07.03.25.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Apr 2026 03:25:14 -0700 (PDT)
+Message-ID: <69d4db8a.050a0220.2d011d.8702@mx.google.com>
+Date: Tue, 07 Apr 2026 03:25:14 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8754485965283044147=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
+Subject: RE: [RESEND,v1] Bluetooth: btintel_pcie: Align shared DMA memory to 128 bytes
+In-Reply-To: <20260407100240.757910-1-kiran.k@intel.com>
+References: <20260407100240.757910-1-kiran.k@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Align each descriptor/index/context region to 128 bytes before
-calculating the total DMA pool size. This ensures the memory layout
-shared with firmware meets the 128-byte alignment requirement.
+--===============8754485965283044147==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The DMA pool alignment is also set to 128 bytes to match the firmware
-expectation for all shared structures.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1078050
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.33 seconds
+GitLint                       PENDING   0.30 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      26.33 seconds
+CheckAllWarning               PASS      28.72 seconds
+CheckSparse                   PASS      27.87 seconds
+BuildKernel32                 PASS      25.58 seconds
+TestRunnerSetup               PASS      569.48 seconds
+TestRunner_l2cap-tester       PASS      27.94 seconds
+TestRunner_iso-tester         PASS      35.81 seconds
+TestRunner_bnep-tester        PASS      6.38 seconds
+TestRunner_mgmt-tester        FAIL      115.46 seconds
+TestRunner_rfcomm-tester      PASS      9.43 seconds
+TestRunner_sco-tester         FAIL      14.24 seconds
+TestRunner_ioctl-tester       PASS      10.19 seconds
+TestRunner_mesh-tester        FAIL      11.53 seconds
+TestRunner_smp-tester         PASS      8.68 seconds
+TestRunner_userchan-tester    PASS      6.71 seconds
+IncrementalBuild              PENDING   0.58 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.111 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.809 seconds
+Mesh - Send cancel - 2                               Timed out    1.995 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/btintel_pcie.c | 94 ++++++++++++++++++--------------
- drivers/bluetooth/btintel_pcie.h |  3 -
- 2 files changed, 53 insertions(+), 44 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 05f82bc3f0d7..8fb3ebe98146 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -37,6 +37,8 @@
- 
- #define POLL_INTERVAL_US	10
- 
-+#define BTINTEL_PCIE_DMA_ALIGN_128B	128 /* 128 byte aligned */
-+
- /* Intel Bluetooth PCIe device id table */
- static const struct pci_device_id btintel_pcie_table[] = {
- 	/* BlazarI, Wildcat Lake */
-@@ -1751,27 +1753,6 @@ static int btintel_pcie_setup_rxq_bufs(struct btintel_pcie_data *data,
- 	return 0;
- }
- 
--static void btintel_pcie_setup_ia(struct btintel_pcie_data *data,
--				  dma_addr_t p_addr, void *v_addr,
--				  struct ia *ia)
--{
--	/* TR Head Index Array */
--	ia->tr_hia_p_addr = p_addr;
--	ia->tr_hia = v_addr;
--
--	/* TR Tail Index Array */
--	ia->tr_tia_p_addr = p_addr + sizeof(u16) * BTINTEL_PCIE_NUM_QUEUES;
--	ia->tr_tia = v_addr + sizeof(u16) * BTINTEL_PCIE_NUM_QUEUES;
--
--	/* CR Head index Array */
--	ia->cr_hia_p_addr = p_addr + (sizeof(u16) * BTINTEL_PCIE_NUM_QUEUES * 2);
--	ia->cr_hia = v_addr + (sizeof(u16) * BTINTEL_PCIE_NUM_QUEUES * 2);
--
--	/* CR Tail Index Array */
--	ia->cr_tia_p_addr = p_addr + (sizeof(u16) * BTINTEL_PCIE_NUM_QUEUES * 3);
--	ia->cr_tia = v_addr + (sizeof(u16) * BTINTEL_PCIE_NUM_QUEUES * 3);
--}
--
- static void btintel_pcie_free(struct btintel_pcie_data *data)
- {
- 	btintel_pcie_free_rxq_bufs(data, &data->rxq);
-@@ -1789,13 +1770,16 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
- 	size_t total;
- 	dma_addr_t p_addr;
- 	void *v_addr;
-+	size_t tfd_size, frbd_size, ctx_size, ci_size, urbd0_size, urbd1_size;
- 
- 	/* Allocate the chunk of DMA memory for descriptors, index array, and
- 	 * context information, instead of allocating individually.
- 	 * The DMA memory for data buffer is allocated while setting up the
- 	 * each queue.
- 	 *
--	 * Total size is sum of the following
-+	 * Total size is sum of the following and each of the individual sizes
-+	 * are aligned to 128 bytes before adding up.
-+	 *
- 	 *  + size of TFD * Number of descriptors in queue
- 	 *  + size of URBD0 * Number of descriptors in queue
- 	 *  + size of FRBD * Number of descriptors in queue
-@@ -1803,15 +1787,25 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
- 	 *  + size of index * Number of queues(2) * type of index array(4)
- 	 *  + size of context information
- 	 */
--	total = (sizeof(struct tfd) + sizeof(struct urbd0)) * BTINTEL_PCIE_TX_DESCS_COUNT;
--	total += (sizeof(struct frbd) + sizeof(struct urbd1)) * BTINTEL_PCIE_RX_DESCS_COUNT;
-+	tfd_size = ALIGN(sizeof(struct tfd) * BTINTEL_PCIE_TX_DESCS_COUNT,
-+			 BTINTEL_PCIE_DMA_ALIGN_128B);
-+	urbd0_size = ALIGN(sizeof(struct urbd0) * BTINTEL_PCIE_TX_DESCS_COUNT,
-+			   BTINTEL_PCIE_DMA_ALIGN_128B);
- 
--	/* Add the sum of size of index array and size of ci struct */
--	total += (sizeof(u16) * BTINTEL_PCIE_NUM_QUEUES * 4) + sizeof(struct ctx_info);
-+	frbd_size = ALIGN(sizeof(struct frbd) * BTINTEL_PCIE_RX_DESCS_COUNT,
-+			  BTINTEL_PCIE_DMA_ALIGN_128B);
-+	urbd1_size = ALIGN(sizeof(struct urbd1) * BTINTEL_PCIE_RX_DESCS_COUNT,
-+			   BTINTEL_PCIE_DMA_ALIGN_128B);
-+
-+	ci_size = ALIGN(sizeof(u16) * BTINTEL_PCIE_NUM_QUEUES,
-+			BTINTEL_PCIE_DMA_ALIGN_128B);
-+
-+	ctx_size = ALIGN(sizeof(struct ctx_info), BTINTEL_PCIE_DMA_ALIGN_128B);
-+
-+	total = tfd_size + urbd0_size + frbd_size + urbd1_size + ctx_size + ci_size * 4;
- 
--	/* Allocate DMA Pool */
- 	data->dma_pool = dma_pool_create(KBUILD_MODNAME, &data->pdev->dev,
--					 total, BTINTEL_PCIE_DMA_POOL_ALIGNMENT, 0);
-+					 total, BTINTEL_PCIE_DMA_ALIGN_128B, 0);
- 	if (!data->dma_pool) {
- 		err = -ENOMEM;
- 		goto exit_error;
-@@ -1836,29 +1830,29 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
- 	data->txq.tfds_p_addr = p_addr;
- 	data->txq.tfds = v_addr;
- 
--	p_addr += (sizeof(struct tfd) * BTINTEL_PCIE_TX_DESCS_COUNT);
--	v_addr += (sizeof(struct tfd) * BTINTEL_PCIE_TX_DESCS_COUNT);
-+	p_addr += tfd_size;
-+	v_addr += tfd_size;
- 
- 	/* Setup urbd0 */
- 	data->txq.urbd0s_p_addr = p_addr;
- 	data->txq.urbd0s = v_addr;
- 
--	p_addr += (sizeof(struct urbd0) * BTINTEL_PCIE_TX_DESCS_COUNT);
--	v_addr += (sizeof(struct urbd0) * BTINTEL_PCIE_TX_DESCS_COUNT);
-+	p_addr += urbd0_size;
-+	v_addr += urbd0_size;
- 
- 	/* Setup FRBD*/
- 	data->rxq.frbds_p_addr = p_addr;
- 	data->rxq.frbds = v_addr;
- 
--	p_addr += (sizeof(struct frbd) * BTINTEL_PCIE_RX_DESCS_COUNT);
--	v_addr += (sizeof(struct frbd) * BTINTEL_PCIE_RX_DESCS_COUNT);
-+	p_addr += frbd_size;
-+	v_addr += frbd_size;
- 
- 	/* Setup urbd1 */
- 	data->rxq.urbd1s_p_addr = p_addr;
- 	data->rxq.urbd1s = v_addr;
- 
--	p_addr += (sizeof(struct urbd1) * BTINTEL_PCIE_RX_DESCS_COUNT);
--	v_addr += (sizeof(struct urbd1) * BTINTEL_PCIE_RX_DESCS_COUNT);
-+	p_addr += urbd1_size;
-+	v_addr += urbd1_size;
- 
- 	/* Setup data buffers for txq */
- 	err = btintel_pcie_setup_txq_bufs(data, &data->txq);
-@@ -1870,8 +1864,29 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
- 	if (err)
- 		goto exit_error_txq;
- 
--	/* Setup Index Array */
--	btintel_pcie_setup_ia(data, p_addr, v_addr, &data->ia);
-+	/* TR Head Index Array */
-+	data->ia.tr_hia_p_addr = p_addr;
-+	data->ia.tr_hia = v_addr;
-+	p_addr += ci_size;
-+	v_addr += ci_size;
-+
-+	/* TR Tail Index Array */
-+	data->ia.tr_tia_p_addr = p_addr;
-+	data->ia.tr_tia = v_addr;
-+	p_addr += ci_size;
-+	v_addr += ci_size;
-+
-+	/* CR Head index Array */
-+	data->ia.cr_hia_p_addr = p_addr;
-+	data->ia.cr_hia = v_addr;
-+	p_addr += ci_size;
-+	v_addr += ci_size;
-+
-+	/* CR Tail Index Array */
-+	data->ia.cr_tia_p_addr = p_addr;
-+	data->ia.cr_tia = v_addr;
-+	p_addr += ci_size;
-+	v_addr += ci_size;
- 
- 	/* Setup data buffers for dbgc */
- 	err = btintel_pcie_setup_dbgc(data);
-@@ -1879,9 +1894,6 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
- 		goto exit_error_txq;
- 
- 	/* Setup Context Information */
--	p_addr += sizeof(u16) * BTINTEL_PCIE_NUM_QUEUES * 4;
--	v_addr += sizeof(u16) * BTINTEL_PCIE_NUM_QUEUES * 4;
--
- 	data->ci = v_addr;
- 	data->ci_p_addr = p_addr;
- 
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index e3d941ffef4a..3c7bb708362d 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -178,9 +178,6 @@ enum {
- /* The size of DMA buffer for TX and RX in bytes */
- #define BTINTEL_PCIE_BUFFER_SIZE	4096
- 
--/* DMA allocation alignment */
--#define BTINTEL_PCIE_DMA_POOL_ALIGNMENT	256
--
- #define BTINTEL_PCIE_TX_WAIT_TIMEOUT_MS		500
- 
- /* Doorbell vector for TFD */
--- 
-2.43.0
 
+--===============8754485965283044147==--
