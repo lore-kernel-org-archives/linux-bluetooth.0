@@ -1,158 +1,181 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC581397E83
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Apr 2026 16:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775578482; cv=none; b=FqbK2UeMgBCol0ss4mvreM4YQnaAOXKQJzC/MUjBFbAjc7ZEIlJy2wAYfDNOPWVYckKzESjeDYTAYseARLrkcSms+huLouFFO7ZS37kLOiDM28jxLfZt8TqJpfs4MmMq/gl1vxZ7T/wc9PxthnB/PE2qnzOHPxTaOBD1y0LFIsg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775578482; c=relaxed/simple;
-	bh=QbCPDKlH3cgapl6FlowH/IKKnIZ5VRya1KnLgEI6s8c=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=SsmO5FoEFmpuzCTS6WuMkAfhh2/Zz8F0yioJoYa9T9grKzYZD6t/tpM9CpDS+FuMru/vR766c80dQuCmLLnjlpk757v2xqZQm3iAf/MluuWIlLQCCWXXNB2ykRSkb2pWHqJFRRpy/7NGwCrMAUAsXG8TuWdCVB8Ye9qbTXsYiCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fdj5yT7q; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88B73CF03B
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Apr 2026 16:37:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775579877; cv=pass; b=pdBmg9c6IfesaZCOp4pLbOfQIFmHk5f9tIEPiG6lk32ks1aWsB6RJ/hEWD0BoS186flCIFbD3E2tI2Y+hb2n77lPmpJv+xiBkElgPJIPDiBu4a6HHJpDxQ5mHcnEik9R8+5NCI7MXPd5NH6bVeWhZgvOLUQ1FxkW7Kqdy8L0NK0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775579877; c=relaxed/simple;
+	bh=d0Rq280+b0RTGZSw4cdoUni8pVhGTByH3GfapUpA96I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FMvEuZBSU7/ZmUDzKgCMqRnl0t5nINKYdqNtcWhPgMz8F6Pk3NNvgq7pq2NMsLKLRo4nN34e+ZF95ZXZQT/vSgpc4/Hy+0f/KFSWYqWcnqd+Bxe7U8Cn9jzclH20UTegFOknmwxWlDmbHhgmaKUykNeRr4sL5FwlP11axJflBUE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LIlkgieI; arc=pass smtp.client-ip=74.125.224.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fdj5yT7q"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-8c70b5594f4so4703485a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2026 09:14:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LIlkgieI"
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-65032e9cf01so4992880d50.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2026 09:37:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775579875; cv=none;
+        d=google.com; s=arc-20240605;
+        b=CIGW/mI0yDVuXK42oXCJcEkjpAk5iELCeAOqbhdK9+kBGuIhdgqihnfv9pZcuRwk8p
+         7BX2IQBpTjv4b0vMMHfYlRXeMvU7wn4aNap1rpZxxvRHwYM8otOogrCmL6Joj0jbSduc
+         59WpRI5pbf8QJllK/a6jAQYMeaNpTzuWJZ3s4MtaMiqnf4NtpRfHGsKQ50X2F9Wc2Rpq
+         dZsWoCyOD5ddaVnMD11Lk06IvR0ok9xNcGMfm1YakkLkR/FeLJQQrUOsrEPBvGLaueBz
+         Mv4bdElr9oIfpJ4QavnP1lQ7ntEhP6NlcGsA7I6FA97BC0i0Tv7Vy6SEo8ro20sSUv84
+         4zNQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=5U67jFro8V8266yLasTS6qz5uFih81qyQ9daWFSEJ4U=;
+        fh=enJkaQy1p0wkCdIHP7t0N9wD83bUIsHWTcf6KiXoIfA=;
+        b=gUSo05t3ROTtUF9ebgA4pZfMacggQ2hCSOwlJrJvYhOf0ILW+8wJHToLbU6+GORh1J
+         redP3yxyWuCsF96n3FMJxf5YWnA9Nqt4xOzmijqeaWhUVkcn/y96N9zjUWRRBpWRnAuu
+         35eIvWWZ5OkkN0BF0I6MvAaCnVZvyV4jMxNrzHdUZ7EzVL9J/CUVdDQ9tjM88R6xhT0r
+         On+CaP3RkZe1FCmblwxRj6xczIo1Lgm3ehYAEAaXaJ4TZHtEsO1XSvkvhZuuSBdgpyBy
+         BfgeXQAmx0lZaK0d4rmAeb9+Md5orpF0F62h3gexjFzPbQzES42kHZ7O4Z9SxgqQIiUw
+         8A3Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775578479; x=1776183279; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=T/4zEaf7FCiOXnkHw+kYBxBwaPjzQWcog5B8cKl7YuM=;
-        b=Fdj5yT7qfj7Pk9bQCfkQ+4wQJCEnMAJRzCzgj7RPFrObdTUAdGJCa+2+F9NmaoSbFL
-         L8FbvBt6aA/8mLzwYnctFFWUkCn1OItHTPNjT4vYVDB1SCgG+GuPRkOvKNarCUCcb0F0
-         0U1tZ4AOdgM6yoGxHmXDyDZ5D2BoloZHTgjzHrHPhaS8M0PxN1k677fBNVgBlTJWGBpz
-         i1vhYNf7t1BYa+0h7yAz91v+v52qavANwvX3UgjO8DjzP1N0tGmuwke8tGti5FKN6seJ
-         CUfe2wv/mMaZhfWkqiZ8DqE67CzqkL7h9OYw7PwCO4V+txMj65QcRbgobx6Cgt94t8FI
-         rdLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775578479; x=1776183279;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1775579875; x=1776184675; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=T/4zEaf7FCiOXnkHw+kYBxBwaPjzQWcog5B8cKl7YuM=;
-        b=BW5i9M7gxiXmEsOyqhoPBPQ8Dp6x0AD+B+tkydUYP4BcHCrQhX5y6S4pqu4L73rfqp
-         WJPoqyCw1+PsZFTSDovCbZYtv9762DTKgdso34H1QckMIdRqOXNhLLX1PhY64lY90CBD
-         NT7c9312wF+9Xh5JEGI9oz913S4J+SE7vhcxRlbvqwVqSyhFuIQgmrTYzgpru7iCfC63
-         vnBXvKTsGM8qh9f1RNz6BCTrze7GK5ZvLM5ffB5M8vSF6UmMum90RCCEUeoCsiYYqRL2
-         zFhqEJ0fm4cy9AR9G+39DjV9e2RMW07XPKj90/FWqy+eAOYIJgWe4gIIxfo9vo/48FWi
-         9qpw==
-X-Gm-Message-State: AOJu0Ywf04gg2ILpGesj21rleJpkAPqFDwlu6CDVHYcko7AqinSsjNrq
-	UX1wjviKkCMOyRRcLJanajeDKJ4XaknlUwBxxLaUYJMPCZHKIl2BpPJePSzZ8A==
-X-Gm-Gg: AeBDievEPP3DN094J4z9A/VR+hu8qyf88bTBTgxSyJYdvtiKGe8MclqouIOO3/k3mrj
-	zW0Y1vgGSQ+jkr0o+iHrM2CiZFf/21+zSDc3t5uexO3rDzHJozmRpkr69Eg4HS0ZZYo2OnIOOEq
-	F1bCDLTrf4Ri4f2URUcymy6vE+7u2r7NjoYUdf4HoaxVIW6DCZy4upI+yu6piMDCmAjb225+bPi
-	UjgxVjKj07IiMTnu9S0Vukn1v/NqiwivCOfWCkLxmOvUi6+PkwBnjZbMtN1Iw1xgkBdKBQDYpT6
-	pSKepAXqu8zfqbgfApstVOgMWNik521SzEoY1oiPs/RWnxRGwpmOSO4ZibkLTuYt2uioXaLne1x
-	Ti82CCcn8VF1RhnCby8aRpXQzAuI7PRL0vdt/jgx8U8+sH7AHSx+lLj8RNMNuDf+WsIotRveCSa
-	RLnZPGVckwNBGIIcsUcysPn0WJ5UmD8pTHBUomDB27
-X-Received: by 2002:a05:620a:199d:b0:8cd:b024:114d with SMTP id af79cd13be357-8d3042cd918mr2323278085a.40.1775578479437;
-        Tue, 07 Apr 2026 09:14:39 -0700 (PDT)
-Received: from [172.17.0.2] ([40.116.73.185])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8a593330593sm167389636d6.3.2026.04.07.09.14.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Apr 2026 09:14:38 -0700 (PDT)
-Message-ID: <69d52d6e.d40a0220.6c5b6.1701@mx.google.com>
-Date: Tue, 07 Apr 2026 09:14:38 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5472314047731399165=="
+        bh=5U67jFro8V8266yLasTS6qz5uFih81qyQ9daWFSEJ4U=;
+        b=LIlkgieIn6vvcbwhyJV/JropWc0cMwIr3HaVfUQwDrKSb1Knsq4wh7qSGRcZzN9utd
+         AhgcXCvjb5fto6z4Nk8NmXU1jBFDu06CUNeoBrapYjmSu8A5Bkkgxgz6PPJdgz9YYQBx
+         Fi4Ey3XrlNTocSVcFTo37ajFvk9+DcSsh5un1K1rlzpdcVpXmEQ1jOpFjnCMXGq/anX9
+         s3+LUmhKbyeUovnwsknfR1X7JnfKxguOxGPV1J0y9WxSjA96n5sZPodDhR/YOgVcan2C
+         MOXEgga07kpwLzvW/G5/cXEvqLwJMtELVLwph+shuC/KOCyBvzJahu9N2u8TDkgkVP32
+         3Aiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775579875; x=1776184675;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=5U67jFro8V8266yLasTS6qz5uFih81qyQ9daWFSEJ4U=;
+        b=fV67XuutakBtZ5qgfGcg6ATASlWLb5CIYktEgGiColDIwtt6IAaebhxlrxhOQ4mR9y
+         sGh3Gxu6t98/N62SIH3KK4nRV4ZlziCAdQiI5LcbimjK+nHxfF4Cikutf+ZyDw2ohBRD
+         MJ49bRJF1GgtxgrmSdqTCx8DLHK+oMmJUQmDa2164hdAPWMlrgzzj9JsdKwBGTgtjvh8
+         oNj/lDstJe8XeJOS7hJPuzVywds6IApG3C0pHDnVob9P43baWRsx80SO0vcmEvEmK/Tu
+         J0c+U05eP6zCTeOaOm/MThqzvW6yY1bI+k5QIE9yeVUhJsrdb38Ee7CJcjXhc8gmyQn8
+         456A==
+X-Gm-Message-State: AOJu0YzAi12gZhPSgYyKfYLn3gCrBj6szkzYX56kSB+xb9ItT6UgSx5p
+	NiAga5u1Hd9Ho5IPYQUO+D+12m0DV1kwTI5y7kR5AUr5VylYd+Pt6yuObidqs+VWCyyCWtPdEB3
+	1hb48PhvDR7zlWcn0sQJ6oSa+/+Ty1tk=
+X-Gm-Gg: AeBDievfJ6paTVD/Rv0fVACFGvS4x0Y9AKpjAQ79z19b6Mi8dSWoMn7bxFcJYui/Otn
+	+ssemwcwhvTnZf/ARhsVo9sfjjivhotfT9yJtKTJJvEiQqNf95xnOhHBNNnIb4wwnfN3mZ7/qyQ
+	9aXrv9+KJjIFqgcXswfLCKvHIYNpUYbUqVVHOkIAMtlap/Uw7+P1J/+9ElBBsDwEHArM+VF51TP
+	FQSDwqia2W0Erta3hLvR6NWbK7/V6HqjIWnzvFPGD2gjqnBhRsgHc98sKfhU2b525t+sLbA/gq3
+	tc0ORILFBjE3IyrC11zN8H5dsipJ7JRRJ5UF6GekmjA+zc7WCxvFac/cwEhVREYCgeY=
+X-Received: by 2002:a05:690e:150f:b0:650:3831:575d with SMTP id
+ 956f58d0204a3-65048721dddmr17570519d50.23.1775579874737; Tue, 07 Apr 2026
+ 09:37:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, metze@samba.org
-Subject: RE: Bluetooth: SCO: check for codecs->num_codecs == 1 before assigning to sco_pi(sk)->codec
-In-Reply-To: <20260407151345.126999-1-metze@samba.org>
 References: <20260407151345.126999-1-metze@samba.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20260407151345.126999-1-metze@samba.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 7 Apr 2026 12:37:43 -0400
+X-Gm-Features: AQROBzD73nrr1Oxu0tCJqahifmsLGRPGRhe66Xns53ZbNWYi7rfE0izX5fyQ95s
+Message-ID: <CABBYNZ+H7qnZFSz=Tx-S2Rdet9a1vEbb_kGbzv_VjC1ZGS5t_Q@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: SCO: check for codecs->num_codecs == 1 before
+ assigning to sco_pi(sk)->codec
+To: Stefan Metzmacher <metze@samba.org>
+Cc: linux-bluetooth@vger.kernel.org, Michal Luczaj <mhal@rbox.co>, 
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	David Wei <dw@davidwei.uk>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============5472314047731399165==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Stefan,
 
-This is automated email and please do not reply to this email!
+On Tue, Apr 7, 2026 at 11:13=E2=80=AFAM Stefan Metzmacher <metze@samba.org>=
+ wrote:
+>
+> copy_struct_from_sockptr() fill 'buffer' in
+> sco_sock_setsockopt() with zeros, so there's no
+> real problem.
+>
+> But it actually looks strange to do this,
+> without checking all of codecs->codecs[0]
+> really comes from userspace:
+>
+>   sco_pi(sk)->codec =3D codecs->codecs[0];
+>
+> As only optlen < sizeof(struct bt_codecs) is checked
+> and codecs->num_codecs is not checked against !=3D 1,
+> but only <=3D 1, and the space for the additional struct bt_codec
+> is not checked.
+>
+> Note I don't understand bluetooth and I didn't do any runtime
+> tests with this! I just found it when debugging a problem
+> in copy_struct_from_sockptr().
+>
+> I just added this to check the size is as expected:
+>
+>   BUILD_BUG_ON(struct_size(codecs, codecs, 0) !=3D 1);
+>   BUILD_BUG_ON(struct_size(codecs, codecs, 1) !=3D 8);
+>
+> And made sure it still compiles using this:
+>
+>   make CF=3D-D__CHECK_ENDIAN__ W=3D1ce C=3D1 net/bluetooth/sco.o
+>
+> Fixes: 3e643e4efa1e ("Bluetooth: Improve setsockopt() handling of malform=
+ed user input")
+> Cc: Michal Luczaj <mhal@rbox.co>
+> Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: David Wei <dw@davidwei.uk>
+> Cc: linux-bluetooth@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+> ---
+>  net/bluetooth/sco.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index b84587811ef4..359eabf7dddb 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -1045,7 +1045,13 @@ static int sco_sock_setsockopt(struct socket *sock=
+, int level, int optname,
+>
+>                 codecs =3D (void *)buffer;
+>
+> -               if (codecs->num_codecs > 1) {
+> +               if (codecs->num_codecs !=3D 1) {
+> +                       hci_dev_put(hdev);
+> +                       err =3D -EINVAL;
+> +                       break;
+> +               }
+> +
+> +               if (optlen < struct_size(codecs, codecs, codecs->num_code=
+cs)) {
 
-Dear submitter,
+I guess this is odd because there was no need for this code to exist,
+BT_CODEC should have used struct bt_codec rather than struct bt_codecs
+since we can only set exactly one codec, that said I don't think we
+can change this now thus why we need to perform these checks, anyway
+back to your changes why don't we have both checks for num_codecs !=3D 1
+&& optlen < struct_size(codecs, codecs, codecs->num_codecs)) since the
+handling is the same?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1078240
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.38 seconds
-GitLint                       PENDING   0.29 seconds
-SubjectPrefix                 PASS      0.44 seconds
-BuildKernel                   PASS      24.36 seconds
-CheckAllWarning               PASS      26.63 seconds
-CheckSparse                   PASS      25.66 seconds
-BuildKernel32                 PASS      23.82 seconds
-TestRunnerSetup               PASS      514.18 seconds
-TestRunner_l2cap-tester       PASS      27.33 seconds
-TestRunner_iso-tester         PASS      38.62 seconds
-TestRunner_bnep-tester        PASS      6.27 seconds
-TestRunner_mgmt-tester        FAIL      111.68 seconds
-TestRunner_rfcomm-tester      PASS      9.25 seconds
-TestRunner_sco-tester         FAIL      14.31 seconds
-TestRunner_ioctl-tester       PASS      10.02 seconds
-TestRunner_mesh-tester        FAIL      11.61 seconds
-TestRunner_smp-tester         PASS      8.56 seconds
-TestRunner_userchan-tester    PASS      6.63 seconds
-IncrementalBuild              PENDING   0.53 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.104 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.969 seconds
-Mesh - Send cancel - 2                               Timed out    1.995 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+>                         hci_dev_put(hdev);
+>                         err =3D -EINVAL;
+>                         break;
+> --
+> 2.43.0
+>
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5472314047731399165==--
+--=20
+Luiz Augusto von Dentz
