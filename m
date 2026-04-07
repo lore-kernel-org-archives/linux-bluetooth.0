@@ -1,28 +1,38 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B783B775B;
-	Tue,  7 Apr 2026 16:44:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2489A3CEB8A;
+	Tue,  7 Apr 2026 16:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775580293; cv=none; b=hLKlP3DzPnPd9Vwg2FUWAzhXKI0PNsOcVpZ7zf9Q65F7S4kuI9LXiJ57g4FEQfLghoNDmJPuWz3caNqXb9bk07RIwO5K1HK/mF/xBkO+MGm53kbeQ0BzwrRFMKaS8EuSDOL2MadkWW2OfRTIyPxRFy7rvB9CTsFmI0TwwXgimMY=
+	t=1775580310; cv=none; b=MaIpm60gnd8TqsAv/k9glTqi6IaYQcZlEKszS8Vzij2T3Xa+f3ddpUj9WeNBdg+jitbrLGGSR1rAvzrQeWUxfds0bvTs7YQEQ7gwEMeEY+rlhgBfnXbw2jtSyWL/buGsxFr3bpB4cX3tSqHBCpCaEYkCovv9gGrFw8V9FkUMIuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775580293; c=relaxed/simple;
-	bh=h00MzRooAOsXbISBuNVcteDoihjKyHmNQ/zr0I6ZB+k=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=CK7fAsUBYtjAcsb3TDX+z/eIy1R8otMZHp77tqurpy4jbVkpFtiMJXRI4xrsg8ewZ5RTvOZHlAkI1kw4Fd11JzLWWPbHOlafZkfNvkMxI9Ml6SGYRG/ViviU1+sWq8OqlbuSEaY7bGknXFoSkXb3IrynIX88gi/YoNdIXXcY2eQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.229] (p5dc55707.dip0.t-ipconnect.de [93.197.87.7])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id DB1C04C2C37D55;
-	Tue, 07 Apr 2026 18:44:37 +0200 (CEST)
-Message-ID: <4d20d421-9a17-4447-88fb-ef867e468138@molgen.mpg.de>
-Date: Tue, 7 Apr 2026 18:44:36 +0200
+	s=arc-20240116; t=1775580310; c=relaxed/simple;
+	bh=aWghbwSPtJUS+vzgpjiyJYaAA2Zszu5+lPYolEbsot8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tY27m/AkU3QHPGvYgutAsKII0vrTOhLIBS1f55hhqaHsZNKcgh6t5KYQ8GhcKKD8aw6EOouYgw9BnnIGbbQyncBSHSPQvHbD6Ov+9K7KpFh4Mfis3F7xCHNB76uGU0/dP74m+yXhNgp2+HpAzkcML9YHywl/+Ceoi58IK9z3zUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=p/Gp48Oc; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="p/Gp48Oc"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=XCD3n1iAjjNwkCO48IJAl65aHao6G63FAPtFryIaWTQ=; b=p/Gp48Ocs2NoBqsP0RG9y+cOiy
+	aAb2jdLbogm3M4Rh2z0H7SHKJcV/lWdlj0o+1ih2JnjHfQ/yjrDq3J90T6JaVTvTKbeZ3b7F5B2eb
+	XEUTXwznVnnBdiC9Tlwg5gBnbYB+ou3PdCePe/hdqzD6YN5dAJlDm4p75Hk8MPIBXBDoKhcxWVln6
+	S2pKZbvQtlkR+Ihr52NEVkJexoNggezVOzPHEH2Qgm3PXz0en/lpm7HOXRwB4Yfo5VzYifr4hTCBU
+	08pJu4PiDx2+s5zVgxvx0qZbHGq+wu9/+1i8KolFQoc8szstx28pKmf21sApkEgEqx7MLPc6mj6b6
+	OnC8tWN79XwlnKD+EopxK+tNzl/ChS7N/jmmrFaRzuVIMNZiQy3JEfeStD1kkvDOwb+6BH5JEZ40q
+	l+qy6GNqujRMqrs7txF5C3S70/AsE7JJ+KyYBW0HNdE50fUIyWZLJ++2U6ku/s+5eSiT4tRnh+xVM
+	/HJWlifHCysW6vwa1g0cY2Fe;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wA9Y2-00000007YIM-0Gyj;
+	Tue, 07 Apr 2026 16:45:06 +0000
+Message-ID: <4e4c1f7f-9ae9-4043-9ebc-e061e24868c8@samba.org>
+Date: Tue, 7 Apr 2026 18:45:05 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -30,106 +40,96 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: Re: [PATCH] Bluetooth: BNEP: validate control header bytes before
- reading them
-To: Pengpeng Hou <pengpeng@iscas.ac.cn>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260404101002.2-bnep-pengpeng@iscas.ac.cn>
+Subject: Re: [PATCH] Bluetooth: SCO: check for codecs->num_codecs == 1 before
+ assigning to sco_pi(sk)->codec
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Michal Luczaj <mhal@rbox.co>,
+ Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+ Marcel Holtmann <marcel@holtmann.org>, David Wei <dw@davidwei.uk>,
+ linux-kernel@vger.kernel.org
+References: <20260407151345.126999-1-metze@samba.org>
+ <CABBYNZ+H7qnZFSz=Tx-S2Rdet9a1vEbb_kGbzv_VjC1ZGS5t_Q@mail.gmail.com>
 Content-Language: en-US
-In-Reply-To: <20260404101002.2-bnep-pengpeng@iscas.ac.cn>
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <CABBYNZ+H7qnZFSz=Tx-S2Rdet9a1vEbb_kGbzv_VjC1ZGS5t_Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Dear Pengpeng,
+Hi Luiz,
 
-
-Thank you for your patch. Just a note, that the date/time mismataches:
-
-     Received: from 0002-bnep.eml (unknown [111.196.245.197])
-     	by APP-05 (Coremail) with SMTP id zQCowACHFwsG0dBp_7RzDA--.49444S2;
-     	Sat, 04 Apr 2026 16:51:18 +0800 (CST)
-     From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-     Date: Fri, 3 Apr 2026 16:56:12 +0800
-
-Am 03.04.26 um 10:56 schrieb Pengpeng Hou:
-> `bnep_rx_frame()` pulls the first byte from the skb and immediately reads
-> the control type from the remaining data. Short control packets can leave
-> no bytes in the skb at that point.
+> On Tue, Apr 7, 2026 at 11:13 AM Stefan Metzmacher <metze@samba.org> wrote:
+>>
+>> copy_struct_from_sockptr() fill 'buffer' in
+>> sco_sock_setsockopt() with zeros, so there's no
+>> real problem.
+>>
+>> But it actually looks strange to do this,
+>> without checking all of codecs->codecs[0]
+>> really comes from userspace:
+>>
+>>    sco_pi(sk)->codec = codecs->codecs[0];
+>>
+>> As only optlen < sizeof(struct bt_codecs) is checked
+>> and codecs->num_codecs is not checked against != 1,
+>> but only <= 1, and the space for the additional struct bt_codec
+>> is not checked.
+>>
+>> Note I don't understand bluetooth and I didn't do any runtime
+>> tests with this! I just found it when debugging a problem
+>> in copy_struct_from_sockptr().
+>>
+>> I just added this to check the size is as expected:
+>>
+>>    BUILD_BUG_ON(struct_size(codecs, codecs, 0) != 1);
+>>    BUILD_BUG_ON(struct_size(codecs, codecs, 1) != 8);
+>>
+>> And made sure it still compiles using this:
+>>
+>>    make CF=-D__CHECK_ENDIAN__ W=1ce C=1 net/bluetooth/sco.o
+>>
+>> Fixes: 3e643e4efa1e ("Bluetooth: Improve setsockopt() handling of malformed user input")
+>> Cc: Michal Luczaj <mhal@rbox.co>
+>> Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+>> Cc: Marcel Holtmann <marcel@holtmann.org>
+>> Cc: David Wei <dw@davidwei.uk>
+>> Cc: linux-bluetooth@vger.kernel.org
+>> Cc: linux-kernel@vger.kernel.org
+>> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+>> ---
+>>   net/bluetooth/sco.c | 8 +++++++-
+>>   1 file changed, 7 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+>> index b84587811ef4..359eabf7dddb 100644
+>> --- a/net/bluetooth/sco.c
+>> +++ b/net/bluetooth/sco.c
+>> @@ -1045,7 +1045,13 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
+>>
+>>                  codecs = (void *)buffer;
+>>
+>> -               if (codecs->num_codecs > 1) {
+>> +               if (codecs->num_codecs != 1) {
+>> +                       hci_dev_put(hdev);
+>> +                       err = -EINVAL;
+>> +                       break;
+>> +               }
+>> +
+>> +               if (optlen < struct_size(codecs, codecs, codecs->num_codecs)) {
 > 
-> The later control-message pull logic also reads `skb->data + 1` before
-> proving that the length byte or 16-bit filter length is actually present.
-> 
-> Validate the required control-header bytes before each dereference and
-> drop malformed frames through the existing bad-frame path.
+> I guess this is odd because there was no need for this code to exist,
+> BT_CODEC should have used struct bt_codec rather than struct bt_codecs
+> since we can only set exactly one codec, that said I don't think we
+> can change this now thus why we need to perform these checks, anyway
+> back to your changes why don't we have both checks for num_codecs != 1
+> && optlen < struct_size(codecs, codecs, codecs->num_codecs)) since the
+> handling is the same?
 
-Do you have by chance a reproducer?
+Should I submit a v2 using this:
+if (codecs->num_codecs != 1 || optlen < struct_size(codecs, codecs, codecs->num_codecs))
 
-> Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
-> ---
->   net/bluetooth/bnep/core.c | 17 +++++++++++++++--
->   1 file changed, 15 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-> index d44987d4515c..0e7a7fb758c9 100644
-> --- a/net/bluetooth/bnep/core.c
-> +++ b/net/bluetooth/bnep/core.c
-> @@ -299,18 +299,27 @@ static int bnep_rx_frame(struct bnep_session *s, struct sk_buff *skb)
->   {
->   	struct net_device *dev = s->dev;
->   	struct sk_buff *nskb;
-> -	u8 type, ctrl_type;
-> +	u8 type;
->   
->   	dev->stats.rx_bytes += skb->len;
->   
-> +	if (!skb->len)
-> +		goto badframe;
-> +
->   	type = *(u8 *) skb->data;
->   	skb_pull(skb, 1);
-> -	ctrl_type = *(u8 *)skb->data;
->   
->   	if ((type & BNEP_TYPE_MASK) >= sizeof(__bnep_rx_hlen))
->   		goto badframe;
->   
->   	if ((type & BNEP_TYPE_MASK) == BNEP_CONTROL) {
-> +		u8 ctrl_type;
-> +
-> +		if (!skb->len)
-> +			goto badframe;
-> +
-> +		ctrl_type = *(u8 *)skb->data;
-> +
->   		if (bnep_rx_control(s, skb->data, skb->len) < 0) {
->   			dev->stats.tx_errors++;
->   			kfree_skb(skb);
-> @@ -326,12 +335,16 @@ static int bnep_rx_frame(struct bnep_session *s, struct sk_buff *skb)
->   		switch (ctrl_type) {
->   		case BNEP_SETUP_CONN_REQ:
->   			/* Pull: ctrl type (1 b), len (1 b), data (len bytes) */
-> +			if (skb->len < 2)
-> +				goto badframe;
+Or can you to take it from here?
+As I don't really care and the patch is not strictly needed.
 
-gemini/gemini-3.1-pro-preview commented on this hunk.
-
-https://sashiko.dev/#/patchset/20260404101002.2-bnep-pengpeng%40iscas.ac.cn
-
->   			if (!skb_pull(skb, 2 + *(u8 *)(skb->data + 1) * 2))
->   				goto badframe;
->   			break;
->   		case BNEP_FILTER_MULTI_ADDR_SET:
->   		case BNEP_FILTER_NET_TYPE_SET:
->   			/* Pull: ctrl type (1 b), len (2 b), data (len bytes) */
-> +			if (skb->len < 3)
-> +				goto badframe;
->   			if (!skb_pull(skb, 3 + *(u16 *)(skb->data + 1) * 2))
->   				goto badframe;
->   			break;
-
-
-Kind regards,
-
-Paul
+Thanks!
+metze
