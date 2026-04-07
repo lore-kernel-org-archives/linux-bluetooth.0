@@ -1,238 +1,166 @@
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3233A381E;
-	Tue,  7 Apr 2026 10:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=60.244.123.138
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775558100; cv=fail; b=qT2EkpNkFWxsAYzYOWb8edTEUFelDIiQINoDI/CahasKaBHuWwdqgNHD/jxUUcLAt02bSX06Nk58SGWt0nrh6yewd7Ia7nOrppWuIO31ZC03Cc9d62tc3MCgKq/JbJDXD/EWufgVPMReCxa/To1pIKjfu7bApbXuBwr9pFAatFU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775558100; c=relaxed/simple;
-	bh=7DupyA7gHASIwFoyuJKneL9IVQseNo1fJ7hhBh8QsoE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=DTC29hux+jmP6EbqfX6XN8U131r44OkywjCqEfOpLNkVihJRyCPk7t/Q3bV6xP0k10W7z9b81q3+fojf0+C5IWFIABztgKf4k0i4qlyMztTLyCWZ0JsMKHVVi4Dqbu2rSMLYcMZg/M3OUtNdxnxeLfbinFE+zNM7g8tmxWh/2Ck=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=t1Hp6YGc; dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b=DwF+rchM; arc=fail smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2E23A9637
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Apr 2026 10:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775558129; cv=none; b=k76qEGtv3jza1gOrDwhWGHx1cKXUtxX+4HCcumONjzpd7D74wPdmuhdD4AVO1/B8eQu5N5Hd/u2eKRDSygfTBoJi3FGWfEfzs5FZUxEY/pWF7y5foQ5r7Id9Me8Dqs9uvNHkM5WpsL5rLVq4q2GuEZ2oas71HAVJPJY+OQcTHro=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775558129; c=relaxed/simple;
+	bh=uQzVW1roPikBeMA/njTJC5FPstkUhtm91Dl5DlgDevk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=usTq9AIhQ6kOWsLmX+EsdvUeqMSOI/HHFaqhiZXtQAvzIebf6Cz7FeP28H9v07BLZZERlMmqkduvBCg1L5D+xfY3GaZkz16NBweV+Sk5oS+ttY3mTQlQJw3xHuFt4pA0ELyjfHAjdCKPCOO88ri+/iAvv8DJ8BheSUEYs2qt8CU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=nqSj7uT/; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Yv3n7wQ6; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="t1Hp6YGc";
-	dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b="DwF+rchM"
-X-UUID: 6612c3a4326d11f1ae70033691e9ac7d-20260407
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=MIME-Version:Content-Transfer-Encoding:Content-ID:Content-Type:In-Reply-To:References:Message-ID:Date:Subject:CC:To:From; bh=7DupyA7gHASIwFoyuJKneL9IVQseNo1fJ7hhBh8QsoE=;
-	b=t1Hp6YGcVBtp5Okx0Ue/WxqGaab8lIQED5SmICO0L+9z4bUR5OB6sNilmq9mP3pEWne2upXgClu3WfZPxQQU/ZwfFXeZUvbj92rsKqlM5QaJjAHmoLcfrH7CpXn5RkRqJMlCjg4WYX8L64piZhLG16tT/qj2XeBrQ1zzjkGviYw=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:4ff46914-fe00-497a-ab7e-6169e7593305,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:e7bac3a,CLOUDID:13a09424-cb5c-4236-a89a-9a7fb20c9bc4,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|110|111|836|865|888|
-	898,TC:-5,Content:0|15|50,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:ni
-	l,BEC:-1,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 6612c3a4326d11f1ae70033691e9ac7d-20260407
-Received: from mtkmbs14n2.mediatek.inc [(172.21.101.76)] by mailgw01.mediatek.com
-	(envelope-from <chris.lu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1198244942; Tue, 07 Apr 2026 18:34:47 +0800
-Received: from mtkmbs10n2.mediatek.inc (172.21.101.183) by
- mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 7 Apr 2026 18:34:45 +0800
-Received: from SG2PR04CU010.outbound.protection.outlook.com (172.21.101.237)
- by mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server id
- 15.2.2562.29 via Frontend Transport; Tue, 7 Apr 2026 18:34:45 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=eD4AXdhZPurCGyrjGceqqhfiPVD0Lh7tuRYWgLkRXgGY0ecdaK5VqKM1NAr3bnRH2WdCIxQ+TwnJiDV5zSm3l1EtM2mFJtoz54If2s9CPWGLPKrdIC9okAUiPu9VLoYKrmTRuvcQShNwFZkI/ZqyU2COLCUfHkHi7v2YPZSxHMOAScca/DWHVaKgUps7ZnpZBoKt1oD5V/ThS3fu6DQCuSgqlVPg/24wzdsq3VknHkvIUq3WWR85u7FHivcZO9eTN6Kzu6w2Rt/tA9OE76RkcygSvnJRYniEqZHYFnxBAxxKr6KpY0OjOu5PEZn54btqlaLj/O1t2HcObMfLMo014g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7DupyA7gHASIwFoyuJKneL9IVQseNo1fJ7hhBh8QsoE=;
- b=txPSavnIuoQsXBAEmrDC/RI32P+csTvfugcnl37INY5B098HSZdAXhOD+k8V+tGr9JxgHNNyloQ97YjRH0mHUI+7ntcJ3SjKkcg0UDqLOJRQefjmFAu42KUd/V9bG6jBYSDvNmknmP5XSsPkYzLDIvkaxbVwlaU7v0dLnduuwS4vu07hivmLO5XzWVG/IlQa1oBUSi0h2m2ZtTrvMHS1CM1XKkJcj85CWA4fyWXoY+i5nj3H7mA2rw+mS2b1cQbhKBjMAOJw9lzSPIJtu9GraaSKptNznCNETKOje/bg35T97c9nDiDKqLA5OqAbwOtwPNGzkWVYbUANyCcycscGeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mediatek.com; dmarc=pass action=none header.from=mediatek.com;
- dkim=pass header.d=mediatek.com; arc=none
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="nqSj7uT/";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Yv3n7wQ6"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6376pfHe4009589
+	for <linux-bluetooth@vger.kernel.org>; Tue, 7 Apr 2026 10:35:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=F9sQiOwHJX/Qk2LJeim2Fo1+N6N9qaSRbw1
+	KOvcX49o=; b=nqSj7uT/ZhL+zRkLq8TM2vzCMdj+p4j9zLFtYqprvfNH8zPUOxh
+	xUaUWj9O8rqIm4mlSwdC1fgW66gXhFCg9VSu+559x7JSoZK3AYxJb0n/+4U+P6UQ
+	O35N+hR2r/YvUxv4R7myU1oISvuXCnebgWp7s/79vgwWGZaDF+wKHU2+3ML3UCaf
+	ZRI/Ld+6MnkRpeTv3IuWH9MPJYL49xevyzR8M1yswOBraXLxIaC43O6jpZBntrKq
+	Eii2iDvQbEZ11RETOKfdEnro+7NyK8jvRP5Hruw0z0MpR9DVtc/L7QnherDp5bk2
+	eHnjOQAspIjIl72tNm+8KEyZNyGKCEmlgcg==
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dcmrkt96m-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2026 10:35:27 +0000 (GMT)
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-82ce0a9e125so2961576b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2026 03:35:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mediateko365.onmicrosoft.com; s=selector2-mediateko365-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7DupyA7gHASIwFoyuJKneL9IVQseNo1fJ7hhBh8QsoE=;
- b=DwF+rchMz+RqqC1e7hAfDZCPEOJyAug77qBzGGtNmzuL6acMTmueQWFcVDF5uK0nMq00tZGtb7dHoOfIWTKPLBP2lbByOZRk/iYchZoYBcG9TXJ4FpoputDpa5TqfO3mNFKDIzk8nLqS7rB+9axXE8y9Gp00sgUeb4hN1Ksxs6Q=
-Received: from TYZPR03MB5741.apcprd03.prod.outlook.com (2603:1096:400:72::8)
- by KL1PR03MB8257.apcprd03.prod.outlook.com (2603:1096:820:10d::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.16; Tue, 7 Apr
- 2026 10:34:41 +0000
-Received: from TYZPR03MB5741.apcprd03.prod.outlook.com
- ([fe80::fd68:2f22:b501:b771]) by TYZPR03MB5741.apcprd03.prod.outlook.com
- ([fe80::fd68:2f22:b501:b771%3]) with mapi id 15.20.9769.016; Tue, 7 Apr 2026
- 10:34:41 +0000
-From: =?utf-8?B?Q2hyaXMgTHUgKOmZuOeomuazkyk=?= <Chris.Lu@mediatek.com>
-To: "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>
-CC: =?utf-8?B?V2lsbC1DWSBMZWUgKOadjuaUv+epjik=?= <Will-CY.Lee@mediatek.com>,
-	=?utf-8?B?U3RldmUgTGVlICjmnY7oppboqqAp?= <steve.lee@mediatek.com>,
-	"luiz.dentz@gmail.com" <luiz.dentz@gmail.com>, "marcel@holtmann.org"
-	<marcel@holtmann.org>, =?utf-8?B?U1MgV3UgKOW3q+aGsuasoyk=?=
-	<ss.wu@mediatek.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "johan.hedberg@gmail.com"
-	<johan.hedberg@gmail.com>, Sean Wang <Sean.Wang@mediatek.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>
-Subject: Re: [PATCH v1] Bluetooth: btmtk: add event filter to filter specific
- event
-Thread-Topic: [PATCH v1] Bluetooth: btmtk: add event filter to filter specific
- event
-Thread-Index: AQHcxlp/fA5Xz39xKkiaG6DcZmCdsLXTL6OAgAA3ugA=
-Date: Tue, 7 Apr 2026 10:34:41 +0000
-Message-ID: <729d8adf633815a5b9fb446d640cba1dfe4f6299.camel@mediatek.com>
-References: <20260407064759.3036650-1-chris.lu@mediatek.com>
-	 <abdf652a-f7e1-4641-bfd9-c0cfc20cca6d@molgen.mpg.de>
-In-Reply-To: <abdf652a-f7e1-4641-bfd9-c0cfc20cca6d@molgen.mpg.de>
-Accept-Language: zh-TW, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=mediatek.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TYZPR03MB5741:EE_|KL1PR03MB8257:EE_
-x-ms-office365-filtering-correlation-id: 36ebcd03-5479-4aa5-3018-08de949146f2
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700021|18002099003|56012099003|22082099003;
-x-microsoft-antispam-message-info: wPFXuWziP0yQCzeFdDogRLF5ZBrEWQ/0356mwfYHzBhE3iNpvbDQxAy/jWLNC/IVIZC4oc9yv8ELD5+TTEI8JndiDFeOLwesHUlB92Fjat1w893WOT3Vr4nLY+AvVWGZ6niJLJ7nIo9pvaYuKCa88SS+s3ykCbETE/aJ0GLg+KJZHj5tZitJStgR7ifvNWgV0nkFzRk6cet6wapeVdHcsvRKf21M63AZnT76t1GeSkMJXRdq23NISY2uHXDO3sev4nYWON7DnNzqQDbhrrf1VYm0gaX0wK0HYmF7ZNx5sq1OWdbInhf+7lJzH4pdzUhya4zlaM6ZrTdPJuhXZfUh3o0ZcniLMrprjQ3rpryMyndEYynnMrQEnL7FCXCfLw6ZqIwAbCKBbGQMhqnJ7BLW/KnG0KmHxo++Yr4sdTTsMd7eO6Zsi1M9tirkOTqo4RQD+HcvYfeUp9JAMtipVJMriYxb9o4seVqxGkmicH2NLRh39NTUhgNG4IwqWV/VWyIfPXTxirgzV4Sujwaxo4DKMM7WjB8kNl+AaVuaKXqiuQnDnix0YicNjEXbB/WF2NQjzRO01OnMfxK6xPzpkl98swJEf2NzQRFPKNAbK2QGvYi7py7Wc8WuPiF/OyYdsM73YHXZPN0/Vdm0N7tIrGvZ/ndDg2uHohNlWeGOpnp5EplkJcsuEv6K2AypzdU73toH8Hyc+uHbLM3ZLRtn53v/qyqjtYQzcJpuiSPsFiNolDbN7lQF/4i+UwG7dtDhHhhp2cRaQ0uBljAHJmnkNLiN4n2zOCevvrhW8Ukr+myiV64=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYZPR03MB5741.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700021)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?cHFjMzgxdWdZNVFzWTRwNGZpZjEvQ3VYbEpBdUdNbUs4dWJvd2Jhb2t1TUVN?=
- =?utf-8?B?eDk4dWhzYmd4ZHZRUmNJSHA5VEVYazhNRFFwMFZaYWVHdVpDQW9QekdidWlq?=
- =?utf-8?B?NzVINmVGZmw1THVMQjI5L2lldGwwcW83ck93d3ZKRDZWczloVEZVQWdzbDY3?=
- =?utf-8?B?K0ZGUkR2Y0VyMCsvWFkwazZzTmNWcWVPcStuZ0lYdHNuZHQ1dlB0U21PQk9v?=
- =?utf-8?B?ZXJJQk9hNlJCRHgyblkwZ2RiZ3IzNjVlQTgwZm5jNS8xcEw5N3hIUTkwNXg0?=
- =?utf-8?B?Q25TNjRwOUJ1SGtmTGdQd1UxVnFFNERBWUdvUnpYQ0M1cXMyR0todEtXM0tR?=
- =?utf-8?B?YnFraU5vejd2MnhyVGxFcUI3RzNZc3pLUlRyMHpaUDZSZFFRZVNqa2pZall1?=
- =?utf-8?B?QnZROWFKbXZqT0x1RUJCVVlyZkd1bHZWS09Ub21SajVGWVBnbDRURldua1N5?=
- =?utf-8?B?UGZnb09kYkVCdUZXSVg2YStZSk5jOWRQbWhUZFpGb3FaVjF3OHFGbW5GeTRm?=
- =?utf-8?B?dmNjcmU3alNsMGNMNnJmb1hRZHFhTGV3czR1SWxmakg5V1lvblRJZEhHZklQ?=
- =?utf-8?B?dldFT1F5Q29iVGxwTnhmcTJSYWQ1VU5aSmlWUnQ3VVFQT042M3JQNGE0aXlN?=
- =?utf-8?B?UFpoL0FzWjVLQ0x4MURjSUtIVFlsWGNjdlpXS3RvcDdIbzAyclN4ekxFVmMz?=
- =?utf-8?B?RUFpcmZKL3JQeWFWRlc1Z2s0MXo3dXhnbzAwazdRZFBuclNiMktiSEh4QWhD?=
- =?utf-8?B?VCs1MHhoM2ZJcFgzM3BuT24xWEtXV1ZzVzg2a2dwOUp0TzJ2V2MyNC9oK3ZJ?=
- =?utf-8?B?cndwdFJXaW9wSDZrU3ZnK2pyNC9ScENLaXFpUStlTGJLZWllZTVvYVRIajVR?=
- =?utf-8?B?ZW9LMDc4MXZWQUM5ZXdRalhWclMyamYrZU5iUHZlSERlTzFHakRMMk00Tmds?=
- =?utf-8?B?OTI4MDZmcW5IeGRZOE5sR0RPamlpQTZjaDBxZ0dMWTN1K0lnaUFieUdqVEVR?=
- =?utf-8?B?SGs2TG5mTm03TkRtRDhYVlNVWHY4d1ZUalRYSVdhOEdCVkU0YmVvTEFLMlE3?=
- =?utf-8?B?YzJTVms1TWxLa2dKakJTcWozZWUwVlZNbTdSZTF2bmRxQWNOYlh3YTlFbHpH?=
- =?utf-8?B?bGN3QnlVc1R2MXNtMk1Wa0xJWlRWMGgxNkVJdmV5OW9PM3lvdWNnQkhxN3pj?=
- =?utf-8?B?c2FxWURYZkR4Q09MRlZJdHdKUnNMczJQdmVGOTZ0ZmgyZTBzSGg2NUlYZGdh?=
- =?utf-8?B?UWJLR2tjVHJkQ1pmb0V3Sy9SZFNMeEFINWp5ei9wcUdqa2M5aThHWW5LYktY?=
- =?utf-8?B?aXFsSmwzb2pNN1VrMUY5RExxOXNjOG1QeWkxMC9mVEhQK3diWHpWbUo5emRD?=
- =?utf-8?B?aG1lcDNlTnhjMXNhQTJNemtsMG45VkJkb1JjT1FDeWRaRk5LOWdqRzZXcDZ5?=
- =?utf-8?B?eXgyU05OWUJ2SFpwUEdJd0JQSFRzODVkM0grME12TmczT2lDaldhTGJrb01V?=
- =?utf-8?B?SUJMQkREN1lsR0ZMNFJyTTFZL01xVDE3V0g3YVB0cE1GbGRMMmV2MWNwMFZJ?=
- =?utf-8?B?R3VWUEJOak8rTlpIZnZJaHlLcXYrSU5aeGlYLzBKSnk3emdmejhMNExuV1VZ?=
- =?utf-8?B?TUliV0JCZURxYnRoUUJYUVc0VTF5TkQrZ2ltMGt0N2t6UlJDODhIYkFDWlpF?=
- =?utf-8?B?dWhDM2RFZXVJL3F4bWZrT2Q2dmFhT3hFdG5MbDNVY2swUVM5OG4xSU5iZGVW?=
- =?utf-8?B?SlNBV2ZLdWczTVVqVHUxc2hCQlhTbWowQVUvcEgzQVBIcDJoSi8xcFFaOVJ0?=
- =?utf-8?B?TEhFdnQxRnlNcGRxUE8rbktpdHZPM3hOc2kwYVgyQUdidk5YUWg2U2Nnakgr?=
- =?utf-8?B?QWVtU1FnM2kvVDBadDAwM0d1NFcrdHVNMUpobzFUaHk3aDBUTHpCSUpYU0VH?=
- =?utf-8?B?a2J1dGp0YzhWbnhzV3RJbFZUU1FsdEsrMHhUejFoeUFoaEhnWTVzMGRHSlJJ?=
- =?utf-8?B?OTY2VWIyenVqNkZEenAveEY4b0lUL0Y3YVlyRytNTi8zdnBSK2RUQ2Fjd3hU?=
- =?utf-8?B?bjdTRTdzR3d3Ry8rVGdCWFI0WjRzeGZPZ0JJQVpsVzExWGUxc2hjSmZySzZY?=
- =?utf-8?B?WmJnRWNGcEk0SlRMUmg5aEZkYU9BNWx0WXQ2SnRMNWRqQ2FQNC8rVXcwOC9r?=
- =?utf-8?B?S2lwV3psU25UVTlaSVZpNURzNHowNmN0TWozcGg2a3kwVG1HcnlHRlVBRVU1?=
- =?utf-8?B?Sjk0Zng0QWNnbXlGVGdwRHlla2Y2TUVCSVVXckREQUZwNFJMdjAvS1Q3OFBv?=
- =?utf-8?B?bWsvRjJ6NzZRWnhlS3o2WHlRU2Q4VEw4eEtBQ3M1bEJLdXNYS204UT09?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6FF5D02FB97AC246915223E793E538A8@apcprd03.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        d=oss.qualcomm.com; s=google; t=1775558126; x=1776162926; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=F9sQiOwHJX/Qk2LJeim2Fo1+N6N9qaSRbw1KOvcX49o=;
+        b=Yv3n7wQ6WzMH/56iz+uXqzaIK5N64qLH8j1PM9lEp/3Ra4O0DJ3XxP+nHoJBE8vlwi
+         oGyZ29OfT1ww3gzuSblUwod/OniJMXUoV69s5kRcmFaiyCYQlDia6iG+FsyFaittmGkD
+         fzLedeiUUxrCdFmeyRLO9noqYpLaB1PWcrYg3jMUAEiTQX5WWiBexvgfh3Jf3VcGSjVc
+         92YeIU33bRM3yqFM1lEFkA8BnsSxAkD8QCCCmLkndZkiCTlI8vBgwhmjzuMDh+gttb8o
+         S39NdLLmiVoELW9D3lEpaeuqUQp3en2OvlFzCC/Eq4CfELl7VB40uvgc01/fzVky2KwQ
+         nhog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775558126; x=1776162926;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F9sQiOwHJX/Qk2LJeim2Fo1+N6N9qaSRbw1KOvcX49o=;
+        b=VUI2CQwmLEn9vGMIPMQHzAVule8y3pXyYN1aPm0o5sZniLMuX2WBQntST1O4oiel5y
+         PBTWa7DusZALmLij7ko5Md/QWptGVl6EyVePTC92zizCB2WBA77HBEauG4BGoz+lG6DQ
+         rw7WqOWr+qDYMz5ed2g8l3WpOVqwCFjE78Cx/9b8iVhHLQExovG5XegIrSFG0KHiyVTz
+         hWIph+kLvDoSAHmflqAvugssgFY7s/A9der1qQCY7F4FAUMLRVVqGseQfTnD7/tG57iH
+         XBQYQ4fqoxf4fMHa6Bw0PZ2bmJtXnv43DTkdraYGaumSr7wdK5hPXS8jo30MImejTrOx
+         gH+g==
+X-Gm-Message-State: AOJu0Yy06GQMYiaWCRP+he15aYaZCY5XFIKqmPDNtazJira+MkyBxWZs
+	K/3d7psXrxCbssyBFMaAA6gBedatt6oolWRVFkkb4saWdNyEHb5ezfVlGzhTsOBB6Lcce/GH0na
+	n/8CjFO87Owwf8XuEHFdcjQy6z/n7CP2fFZkqfWzZfTFNRYLyZ0Pl8ulGxYACfFCNFag7H27B+6
+	mnxNQ=
+X-Gm-Gg: AeBDietTtb7oEVkgUChdlvNwPb0uCKdeR0m1D9CJ/87uSvBuFiQe9zRln3fZs82hBez
+	zUBn1E+thLd+Y44FAdC/xSAApdsTxKOusvIOQbHFRomljNEA2wA7be3Hn3FWIq4OROvXr3vCuCU
+	C2rwS3ZwmajZWS88W8eFxU2WqaCIgo257RE5G+7nmdzICGU/KYHYOIJbwpGtzQGBc4yLjSDe1AD
+	tKOCi5J4aTtlzn9wRv8kJvN9pjN9vKa1urjQTfRnPR4c/QR4zs5q2dE3PbUN3A5hcNoezs9P/Ay
+	Tiz4ZM+QjfrrxEB2q83I5kwk2jtT7zooScGXr5Y4TuOfm8mMVkpS9hONd/3FUnuOQ/axueWF3bA
+	EvWyNHEKkWT3qIOT4Br8quBcvNCOXQyj1xnCbFI+vKZsdhYwJH7I=
+X-Received: by 2002:a05:6a00:301f:b0:824:a1c9:8a30 with SMTP id d2e1a72fcca58-82d0da8f3f1mr16442511b3a.23.1775558125661;
+        Tue, 07 Apr 2026 03:35:25 -0700 (PDT)
+X-Received: by 2002:a05:6a00:301f:b0:824:a1c9:8a30 with SMTP id d2e1a72fcca58-82d0da8f3f1mr16442468b3a.23.1775558124976;
+        Tue, 07 Apr 2026 03:35:24 -0700 (PDT)
+Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9ca14b3sm19575136b3a.54.2026.04.07.03.35.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Apr 2026 03:35:24 -0700 (PDT)
+From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
+        quic_anubhavg@quicinc.com, prathibha.madugonde@oss.qualcomm.com,
+        Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v2 0/3] Bluetooth: Add initial Channel Sounding
+Date: Tue,  7 Apr 2026 16:05:13 +0530
+Message-Id: <20260407103516.2371804-1-naga.akella@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: Sy64fcsmxe4pSOb3t8Dla82z/cZmPu+BnFGXgwAIcqjoot6hhiBcDJKUyc2aN6/xgbXVQxkKdndoThZNfVloYoQoVGGGFOFP75WtVGwo8q5g3MXrAvq5kH9KyA0WPLS5x2Os/K13d39QaTiEPJ4sbms9a9AD7nMRjEXnd6MBdIvmvmdAkVPD/LmtSbE0EGGmWKQflNqm3vVEzmVeFg7sHGxA/wp+l2kGLbTMP3MJ+NlCqCuIN6+O8tZRVMYbK2clB2y6D789HwOTxHVie+nvR4Ex/KJ6epVl66KfsxGdJ6sNT+KE5whG7DMQo1bTskxARH5EfwH4TxRKiVSszbUdAA==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TYZPR03MB5741.apcprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 36ebcd03-5479-4aa5-3018-08de949146f2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Apr 2026 10:34:41.4382
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a7687ede-7a6b-4ef6-bace-642f677fbe31
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: B96lRnc/73uxDjldnDYqnOEfl5qXFWEmCKZVAwq/Gy0aGjJ7618K/oqab991QrZQT4BJNJfOQowT/dAzPGBFeA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1PR03MB8257
+Content-Transfer-Encoding: 8bit
+X-Authority-Analysis: v=2.4 cv=Rrz16imK c=1 sm=1 tr=0 ts=69d4ddef cx=c_pps
+ a=mDZGXZTwRPZaeRUbqKGCBw==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22 a=JxoTkb2ISLZPhhTfFPgA:9
+ a=zc0IvFSfCIW2DFIPzwfm:22
+X-Proofpoint-ORIG-GUID: TESfGQahFwidtbaNAAgQJpX28G76ZYbY
+X-Proofpoint-GUID: TESfGQahFwidtbaNAAgQJpX28G76ZYbY
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA3MDA5NyBTYWx0ZWRfXyCp/mOK+eFAE
+ 25ofDLINTeaia5tbuJpxkAhE6Vk/gWmAD1zDdia5X8kQEa59tokwp1a9syf+JEbBInWBXD695fn
+ /kEWDnu0+g/GEFq53rF2yGY+KkkzrsF0hWwm9dHrsG41hvBc8pfYzlOn/fxSlyqQYXzl5wMIjAi
+ 2g3rtM9mZk1ZXrftI9nyCM38ZfFU80041J4521djDymg0WII2iKVmQOyd8FM2FALw3b7fkZqGJ+
+ 1PQ3NVkof6+LuHas7mbAfaUtRo9FPd3tO8qL93VAD2wF7hACpabVggPUFv/x9x7c1Qi5Ly6CnT2
+ pc8buQCMqO0eYndtjU5PnGPspOVFumg7yy4SeODVxqbmBf5Gut0m9WwE5BJIQKNwKIcF1SX8l0N
+ Xow4bQSodIlm+Np61fy/BNJZQAwiSVreFVC7PiNcf+9HwMyxAV5TIK56DTFykmD+3Za3nXz17w+
+ tF++uW4CrL7aRwcnlgA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-07_02,2026-04-07_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
+ phishscore=0 bulkscore=0 suspectscore=0 adultscore=0 clxscore=1015
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2604010000
+ definitions=main-2604070097
 
-RGVhciBQYXVsLA0KDQoNCk9uIFR1ZSwgMjAyNi0wNC0wNyBhdCAwOToxNCArMDIwMCwgUGF1bCBN
-ZW56ZWwgd3JvdGU6DQo+IA0KPiBFeHRlcm5hbCBlbWFpbCA6IFBsZWFzZSBkbyBub3QgY2xpY2sg
-bGlua3Mgb3Igb3BlbiBhdHRhY2htZW50cyB1bnRpbA0KPiB5b3UgaGF2ZSB2ZXJpZmllZCB0aGUg
-c2VuZGVyIG9yIHRoZSBjb250ZW50Lg0KPiANCj4gDQo+IERlYXIgQ2hyaXMsDQo+IA0KPiANCj4g
-VGhhbmsgeW91IGZvciB0aGUgcGF0Y2guDQo+IA0KPiBBbSAwNy4wNC4yNiB1bSAwODo0NyBzY2hy
-aWViIENocmlzIEx1Og0KPiA+IER1ZSB0byBzb21lIEJsdWV0b290aCBob3N0cyBoYXZlIG1lY2hh
-bmlzbSB0byBkZXRlY3QgaW52YWxpZA0KPiA+IGV2ZW50cywNCj4gPiBjYXVzaW5nIGFibm9ybWFs
-IGJlaGF2aW9yLg0KPiANCj4gU29ycnksIHRoaXMgZGVzY3JpcHRpb24gaXMgbXVjaCB0b28gc2hv
-cnQgYW5kIGdlbmVyYWwuIFBsZWFzZQ0KPiBlbGFib3JhdGUsDQo+IGFuZCBkb2N1bWVudCBkZXRh
-aWxzLg0KPiANCj4gPiBBZGQgYSBldmVudCBmaWx0ZXIgdG8gcHJldmVudCBkZWJ1Z2dpbmcgZXZl
-bnRzIGZyb20gYmVpbmcgc2VudCB0bw0KPiA+IGhvc3QuDQo+IA0KPiBhKm4qDQo+IA0KPiBXaGF0
-IGFyZSBkZWJ1Z2dpbmcgZXZlbnRzLCBhbmQgaG93IGNhbiB0aGV5IGJlIGRldGVjdGVkPw0KDQpU
-aGFua3MgZm9yIHlvdXIgc3VnZ2VzdGlvbi4NCkknbGwgc3VibWl0IHYyIHRvIHJldmlzZSB0aGUg
-Y29tbWl0IG1lc3NhZ2UgdG8gYXZvaWQgdXNpbmcgdmFndWUNCmRlc2NyaXB0aW9ucy4NCg0KPiAN
-Cj4gPiBTaWduZWQtb2ZmLWJ5OiBDaHJpcyBMdSA8Y2hyaXMubHVAbWVkaWF0ZWsuY29tPg0KPiAN
-Cj4gU2hvdWxkIHRoZXJlIGJlIGEgRml4ZXM6IHRhZywgc28gaXQgZ2V0cyBiYWNrcG9ydGVkPw0K
-DQpObywgaXQncyBub3QgYW4gaXNzdWUgZGVyaXZlZCBmcm9tIHByZXZpb3VzIGRyaXZlciBjaGFu
-Z2VzLg0KPiANCj4gPiAtLS0NCj4gPiDCoCBkcml2ZXJzL2JsdWV0b290aC9idG10ay5jIHwgMjIg
-KysrKysrKysrKysrKysrKysrKysrKw0KPiA+IMKgIGRyaXZlcnMvYmx1ZXRvb3RoL2J0bXRrLmgg
-fMKgIDcgKysrKysrKw0KPiA+IMKgIGRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgfMKgIDIgKysN
-Cj4gPiDCoCAzIGZpbGVzIGNoYW5nZWQsIDMxIGluc2VydGlvbnMoKykNCj4gPiANCj4gPiBkaWZm
-IC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgvYnRtdGsuYyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0
-bXRrLmMNCj4gPiBpbmRleCA1NTUxNmI0NjAyZGIuLjMwMmQ2ZGRmOTA2MiAxMDA2NDQNCj4gPiAt
-LS0gYS9kcml2ZXJzL2JsdWV0b290aC9idG10ay5jDQo+ID4gKysrIGIvZHJpdmVycy9ibHVldG9v
-dGgvYnRtdGsuYw0KPiA+IEBAIC0xNTAzLDYgKzE1MDMsMjggQEAgaW50IGJ0bXRrX3VzYl9zaHV0
-ZG93bihzdHJ1Y3QgaGNpX2RldiAqaGRldikNCj4gPiDCoMKgwqDCoMKgIHJldHVybiAwOw0KPiA+
-IMKgIH0NCj4gPiDCoCBFWFBPUlRfU1lNQk9MX0dQTChidG10a191c2Jfc2h1dGRvd24pOw0KPiA+
-ICsNCj4gPiAraW50IGJ0bXRrX3JlY3ZfZXZlbnQoc3RydWN0IGhjaV9kZXYgKmhkZXYsIHN0cnVj
-dCBza19idWZmICpza2IpDQo+ID4gK3sNCj4gPiArwqDCoMKgwqAgc3RydWN0IGhjaV9ldmVudF9o
-ZHIgKmhkciA9ICh2b2lkICopc2tiLT5kYXRhOw0KPiA+ICsNCj4gPiArwqDCoMKgwqAgaWYgKGhk
-ci0+ZXZ0ID09IEhDSV9FVl9DTURfQ09NUExFVEUpIHsNCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIHN0cnVjdCBoY2lfZXZfY21kX2NvbXBsZXRlICplYzsNCj4gPiArwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIHUxNiBvcGNvZGU7DQo+ID4gKw0KPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgZWMgPSAodm9pZCAqKShza2ItPmRhdGEgKyBIQ0lfRVZFTlRfSERSX1NJWkUpOw0KPiA+
-ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgb3Bjb2RlID0gX19sZTE2X3RvX2NwdShlYy0+b3Bj
-b2RlKTsNCj4gPiArDQo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAvKiBGaWx0ZXIgdmVu
-ZG9yIG9wY29kZSAqLw0KPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKG9wY29kZSA9
-PSAweGZjNWQpIHsNCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCBrZnJlZV9za2Ioc2tiKTsNCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCByZXR1cm4gMDsNCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIH0NCj4gPiAr
-wqDCoMKgwqAgfQ0KPiA+ICsNCj4gPiArwqDCoMKgwqAgcmV0dXJuIGhjaV9yZWN2X2ZyYW1lKGhk
-ZXYsIHNrYik7DQo+ID4gK30NCj4gPiArRVhQT1JUX1NZTUJPTF9HUEwoYnRtdGtfcmVjdl9ldmVu
-dCk7DQo+ID4gwqAgI2VuZGlmDQo+ID4gDQo+ID4gwqAgTU9EVUxFX0FVVEhPUigiU2VhbiBXYW5n
-IDxzZWFuLndhbmdAbWVkaWF0ZWsuY29tPiIpOw0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2Js
-dWV0b290aC9idG10ay5oIGIvZHJpdmVycy9ibHVldG9vdGgvYnRtdGsuaA0KPiA+IGluZGV4IGFk
-YWYzODU2MjZlZS4uMDhiNzM5MjdjOGYzIDEwMDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvYmx1ZXRv
-b3RoL2J0bXRrLmgNCj4gPiArKysgYi9kcml2ZXJzL2JsdWV0b290aC9idG10ay5oDQo+ID4gQEAg
-LTIxOCw2ICsyMTgsOCBAQCBpbnQgYnRtdGtfdXNiX3N1c3BlbmQoc3RydWN0IGhjaV9kZXYgKmhk
-ZXYpOw0KPiA+IMKgIGludCBidG10a191c2Jfc2V0dXAoc3RydWN0IGhjaV9kZXYgKmhkZXYpOw0K
-PiA+IA0KPiA+IMKgIGludCBidG10a191c2Jfc2h1dGRvd24oc3RydWN0IGhjaV9kZXYgKmhkZXYp
-Ow0KPiA+ICsNCj4gPiAraW50IGJ0bXRrX3JlY3ZfZXZlbnQoc3RydWN0IGhjaV9kZXYgKmhkZXYs
-IHN0cnVjdCBza19idWZmICpza2IpOw0KPiA+IMKgICNlbHNlDQo+ID4gDQo+ID4gwqAgc3RhdGlj
-IGlubGluZSBpbnQgYnRtdGtfc2V0X2JkYWRkcihzdHJ1Y3QgaGNpX2RldiAqaGRldiwNCj4gPiBA
-QCAtMjk2LDQgKzI5OCw5IEBAIHN0YXRpYyBpbmxpbmUgaW50IGJ0bXRrX3VzYl9zaHV0ZG93bihz
-dHJ1Y3QNCj4gPiBoY2lfZGV2ICpoZGV2KQ0KPiA+IMKgIHsNCj4gPiDCoMKgwqDCoMKgIHJldHVy
-biAtRU9QTk9UU1VQUDsNCj4gPiDCoCB9DQo+ID4gKw0KPiA+ICtzdGF0aWMgaW5saW5lIGludCBi
-dG10a19yZWN2X2V2ZW50KHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBzdHJ1Y3QNCj4gPiBza19idWZm
-ICpza2IpDQo+ID4gK3sNCj4gPiArwqDCoMKgwqAgcmV0dXJuIC1FT1BOT1RTVVBQOw0KPiA+ICt9
-DQo+ID4gwqAgI2VuZGlmDQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNi
-LmMgYi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+ID4gaW5kZXggZjlkNTE1ZWU5MTI0Li5k
-YWY4YTM4N2U2NjAgMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0K
-PiA+ICsrKyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCj4gPiBAQCAtNDE1MCw2ICs0MTUw
-LDggQEAgc3RhdGljIGludCBidHVzYl9wcm9iZShzdHJ1Y3QgdXNiX2ludGVyZmFjZQ0KPiA+ICpp
-bnRmLA0KPiA+IMKgwqDCoMKgwqAgfSBlbHNlIGlmIChpZC0+ZHJpdmVyX2luZm8gJiBCVFVTQl9N
-RURJQVRFSykgew0KPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC8qIEFsbG9jYXRlIGV4
-dHJhIHNwYWNlIGZvciBNZWRpYXRlayBkZXZpY2UgKi8NCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCBwcml2X3NpemUgKz0gc2l6ZW9mKHN0cnVjdCBidG10a19kYXRhKTsNCj4gPiArDQo+
-ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBkYXRhLT5yZWN2X2V2ZW50ID0gYnRtdGtfcmVj
-dl9ldmVudDsNCj4gPiDCoMKgwqDCoMKgIH0NCj4gPiANCj4gPiDCoMKgwqDCoMKgIGRhdGEtPnJl
-Y3ZfYWNsID0gaGNpX3JlY3ZfZnJhbWU7DQo+IA0KPiANCj4gS2luZCByZWdhcmRzLA0KPiANCj4g
-UGF1bA0KDQpUaGFua3MsDQpDaHJpcyBMdQ0KDQo=
+This patch series introduces initial support for Bluetooth Channel Sounding
+(CS) using the raw HCI interface.
+This series lays the groundwork for CS support by adding commonly
+required protocol definitions, configuration parsing, and event handling
+for the reflector role.
+
+The changes include:
+
+  1) Introduction of raw HCI support structures and callbacks for Channel
+     Sounding procedures and events. This provides the foundational data
+     definitions and HCI subevent handling needed by higher-level profiles.
+
+  2) Addition of Channel Sounding configuration parsing from the BlueZ
+     configuration file.This patch also updates the systemd
+     service capability bounding set to include CAP_NET_RAW, which is
+     required for bluetoothd to receive and process LE Channel Sounding
+     events when running under a constrained systemd environment.
+
+  3) Implementation of HCI LE Channel Sounding event handling in the Ranging
+     profile for the reflector role. This includes opening a raw HCI channel,
+     parsing relevant CS LE events, routing them to the RAP profile
+
+Patch overview:
+ 1/3 shared: rap: introduce Channel Sounding HCI raw interface support
+ 2/3 bluetooth: add Channel Sounding config parsing support
+ 3/3 profiles: ranging: add HCI LE Channel Sounding event handling (reflector)
+
+
+Naga Bhavani Akella (3):
+  shared: rap: Introduce Channel Sounding HCI raw  interface support
+  bluetooth: Add Channel Sounding config parsing  support
+  profiles: ranging: Add HCI LE Event Handling in  Reflector role
+
+ Makefile.plugins           |    3 +-
+ profiles/ranging/rap.c     |   71 ++
+ profiles/ranging/rap_hci.c | 1288 ++++++++++++++++++++++++++++++++++++
+ src/bluetooth.service.in   |    2 +-
+ src/btd.h                  |    7 +
+ src/main.c                 |  129 ++++
+ src/main.conf              |   24 +
+ src/shared/hci.c           |   67 +-
+ src/shared/hci.h           |   12 +
+ src/shared/rap.c           |   46 ++
+ src/shared/rap.h           |  174 +++++
+ 11 files changed, 1805 insertions(+), 18 deletions(-)
+ create mode 100644 profiles/ranging/rap_hci.c
+
+-- 
