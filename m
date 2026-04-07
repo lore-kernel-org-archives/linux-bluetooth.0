@@ -1,16 +1,16 @@
 Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B871FF7C7;
-	Tue,  7 Apr 2026 07:38:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C52538F920;
+	Tue,  7 Apr 2026 07:45:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775547539; cv=none; b=IhiIfiPmRITFBiYU0nqHmFHxhh3U4EgQ/bvVAE0mt+NVpLpi19tdaMn2Xeewe4ieIvJrGUPFsUa6AziVYa1sYkOGJfNcL4cCO9Lryfeo7lQAV67JM2bCXLC2BjlyuFMD4+k50fw2I9VEPgzM7K13K57wRxEmhIhMo77l3IC73oo=
+	t=1775547921; cv=none; b=Cme2R+mQedvYCywex8E0FlwuRT6wu3BGJm4BvjZjNGaVi+fDz8EeH1hlWtehpwysjEeNQwUDj8VQNohhsLaUKSD/fhKeApwm7q5T3whYmyWaxpkgsBZ891BSbCvr+/ZPsL9mALAm5QhjmBrvslppmdPX5tUaYW6s2Yu4Iz4bJfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775547539; c=relaxed/simple;
-	bh=JUVfQu1ciF/IbtPK8QjFKuzK0SKjLq8UrrGu3FJ9xAA=;
+	s=arc-20240116; t=1775547921; c=relaxed/simple;
+	bh=fQ19V4ZIIrIiIxdTeRrKJYjdZV7dZt5wI1Z7p01cfhE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BuyuM7A52vr1Y9Ch4w+qpTjZUxVTq64iJaYfJ1fMAupji/X5x2sZC0UhS5T2h2U0v4eN9WTLDRlZcNoqY1ABfjH9aYX3myp/FpCKO/k0+fFheo1KLa1yx3JvEHiH10IjPYuizNajj2T8SKzsUGtmBgBrytHyPl7jBbrakKRk++w=
+	 In-Reply-To:Content-Type; b=GfczTdWf1KNg8gBqTDaFXiwYYGL98RE4/3UTyEpmwkV5t3RRpmc6WPYTtFFYYPoJZE/UvrUvkuNCxGSkePllp/gHhbMdXdZVDGcq2CyJlT4Z0pK9gnZ9r4yCW27JoU+EElFDfkQDij8Nidt0GjNj2m6owMuaX4cJWGgGYo+PdNw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
@@ -19,10 +19,10 @@ Received: from [141.14.13.172] (g427.RadioFreeInternet.molgen.mpg.de [141.14.13.
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 1852A4C2C37D7D;
-	Tue, 07 Apr 2026 09:38:40 +0200 (CEST)
-Message-ID: <e1aa637e-1139-4328-8ff7-e5c023dcb200@molgen.mpg.de>
-Date: Tue, 7 Apr 2026 09:38:36 +0200
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 669924C2C37D7D;
+	Tue, 07 Apr 2026 09:44:54 +0200 (CEST)
+Message-ID: <89536043-67bd-4399-9a69-6b865c2a1cd6@molgen.mpg.de>
+Date: Tue, 7 Apr 2026 09:44:51 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -30,7 +30,7 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND PATCH v1] Bluetooth: btusb: MT7922: Add VID/PID 0e8d/223c
+Subject: Re: [RESEND PATCH v1] Bluetooth: btusb: MT7925: Add VID/PID 0e8d/8c38
 To: Chris Lu <chris.lu@mediatek.com>
 Cc: Marcel Holtmann <marcel@holtmann.org>,
  Johan Hedberg <johan.hedberg@gmail.com>,
@@ -38,27 +38,27 @@ Cc: Marcel Holtmann <marcel@holtmann.org>,
  Will Lee <will-cy.Lee@mediatek.com>, SS Wu <ss.wu@mediatek.com>,
  Steve Lee <steve.lee@mediatek.com>, linux-bluetooth@vger.kernel.org,
  LKML <linux-kernel@vger.kernel.org>, linux-mediatek@lists.infradead.org
-References: <20260407065053.3037036-1-chris.lu@mediatek.com>
+References: <20260407065110.3037135-1-chris.lu@mediatek.com>
 Content-Language: en-US
 From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260407065053.3037036-1-chris.lu@mediatek.com>
+In-Reply-To: <20260407065110.3037135-1-chris.lu@mediatek.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 Dear Chris,
 
 
 Thank you for the patch.
 
-Am 07.04.26 um 08:50 schrieb Chris Lu:
-> Add VID 0e8d & PID 223c for MediaTek MT7922 USB Bluetooth chip.
+Am 07.04.26 um 08:51 schrieb Chris Lu:
+> Add VID 0e8d & PID 8c38 for MediaTek MT7925 USB Bluetooth chip.
 > 
 > The information in /sys/kernel/debug/usb/devices about the Bluetooth
 > device is listed as the below.
 > 
-> T:  Bus=07 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+> T:  Bus=06 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
 > D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0e8d ProdID=223c Rev= 1.00
+> P:  Vendor=0e8d ProdID=8c38 Rev= 1.00
 > S:  Manufacturer=MediaTek Inc.
 > S:  Product=Wireless_Device
 > S:  SerialNumber=000000000
@@ -102,20 +102,22 @@ Am 07.04.26 um 08:50 schrieb Chris Lu:
 >   1 file changed, 2 insertions(+)
 > 
 > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index a5e44887a5b5..5f264ac843f5 100644
+> index a5e44887a5b5..0bd6254a2f63 100644
 > --- a/drivers/bluetooth/btusb.c
 > +++ b/drivers/bluetooth/btusb.c
-> @@ -721,6 +721,8 @@ static const struct usb_device_id quirks_table[] = {
+> @@ -759,6 +759,8 @@ static const struct usb_device_id quirks_table[] = {
 >   						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x04ca, 0x38e4), .driver_info = BTUSB_MEDIATEK |
+>   	{ USB_DEVICE(0x0489, 0xe151), .driver_info = BTUSB_MEDIATEK |
 >   						     BTUSB_WIDEBAND_SPEECH },
-> +	{ USB_DEVICE(0x0e8d, 0x223c), .driver_info = BTUSB_MEDIATEK |
+> +	{ USB_DEVICE(0x0e8d, 0x8c38), .driver_info = BTUSB_MEDIATEK |
 > +						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x13d3, 0x3568), .driver_info = BTUSB_MEDIATEK |
+>   	{ USB_DEVICE(0x13d3, 0x3602), .driver_info = BTUSB_MEDIATEK |
 >   						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x13d3, 0x3584), .driver_info = BTUSB_MEDIATEK |
+>   	{ USB_DEVICE(0x13d3, 0x3603), .driver_info = BTUSB_MEDIATEK |
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Won’t that cause conflicts now with the patch *[RESEND PATCH v1] 
+Bluetooth: btusb: MT7922: Add VID/PID 0e8d/223c*, and shouldn’t it be 
+send as a series.
 
 
 Kind regards,
