@@ -1,443 +1,162 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6741F192E;
-	Tue,  7 Apr 2026 09:30:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553242FB0A3;
+	Tue,  7 Apr 2026 09:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775554222; cv=none; b=fOtHIbB/aKMudX2oiwVU728dRexbx5VgtIn6BoXbM1ilShQk2GG5xvlZTAcl2+4xYOINdAHJNtfNjjCFGYih8YJaIqSAbOS43D92tElB7iZeYMeMZxiJAZe+I3lNhNXxnCqNrZ1dKxjMqrbpo2PA17x9HcL10ZhEG9xRstXzn5g=
+	t=1775554231; cv=none; b=Zz4ylcOtYyGdmzyITN4JBwyilZ19xZ3VOqTc3OlQtSMR2CVDkQQNe23M6Xzeggj91VGnDSudrhLj99KTvcfhDMbdzvUPiqA4PfTw9jPwIRQrmsjE1cITRi3uEQYCiZ+mxQMB6kVpFWiy3V4OVF663up8OKIKgywERPPuWminGD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775554222; c=relaxed/simple;
-	bh=qsH2UKICGVyaL6ToSCRVv2k4Aumdx9Cw0tu2ZW+ohX0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Hq2KaDczvxGiTAbn65rjg86liZji5WbAxmZIM7RWrKF7M4snZ28JERZkn8qW0ZAAL7NsWxfNWn/U2M6F/dBlkR4HZuEDpDbs5abL/eAcKLhTi4/RGKqFhneEqvBzHEkRk8Zyt4n4DbHyiQC5DTI4cG2spZnhf3U2jMEHMvVnjBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VG9FskOZ; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1775554231; c=relaxed/simple;
+	bh=KNmYJVvuWQRSanL6eGyu95+6ELDLCJ32Q4PfWZ6Ttbs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=YIJszb5JnNahvG/QCHNvTELlhP6IZjvQ2l2596J/hIumoQM6E25VTpQwVkZvhm38UuOUOLae1LIlzDd6mlkPVi0apVVXFQAtDXvwCdAal8KWYEO5W4J4G9z7V5jNiIWNH4NopRTg6a1An7TZKyjn5x++y12tSldWEWYIBZqMtP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=GiW6jt/P; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VG9FskOZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775554220; x=1807090220;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=qsH2UKICGVyaL6ToSCRVv2k4Aumdx9Cw0tu2ZW+ohX0=;
-  b=VG9FskOZIlNi3rf7H1bVcLswjQrf5yEREZec2x0lRCyV5/qprfh4HaGt
-   qR2+tFIYd9CEamIH5vLNj9JCo8anbJm1C/cgpsH/7Zf28/ToNOfoWmk7o
-   9ydrDq3zq48cqi4qb7Agzuy/HTmZU+FqhavKFNjfjkRW25SvSZDQIpyN7
-   Zj4Kgz7TkGQN7LnkZU+MNc8s6dhioags57yCHcL5AMpSUzWhXWdvJhKvL
-   0sU7Tem+qGA5cBnTFQVB8R8RRs/aSRELLpGWEkz8EadGYdYregT3y7x+x
-   RGT+Rye5o7ceB93UW9AIDbQ1IHQBXHmVwZG44sUKQ9oYakP12LnaVhJDI
-   A==;
-X-CSE-ConnectionGUID: HT+YZUI/S3e3dfQDCWXOTA==
-X-CSE-MsgGUID: sILv88x4RC+VoxsD9ePhpA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11751"; a="101967001"
-X-IronPort-AV: E=Sophos;i="6.23,165,1770624000"; 
-   d="scan'208";a="101967001"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2026 02:30:20 -0700
-X-CSE-ConnectionGUID: EHykXMblQ/mZaoTDnwXANQ==
-X-CSE-MsgGUID: 3Pk5KUnORgut0vsVwFORuQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,165,1770624000"; 
-   d="scan'208";a="232157672"
-Received: from weba0957.iind.intel.com (HELO WEBA0932.iind.intel.com) ([10.224.186.34])
-  by orviesa003.jf.intel.com with ESMTP; 07 Apr 2026 02:30:17 -0700
-From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-pci@vger.kernel.org,
-	bhelgaas@google.com,
-	ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-Subject: [PATCH v2] Bluetooth: btintel_pcie: Support Product level reset
-Date: Tue,  7 Apr 2026 14:59:40 +0530
-Message-ID: <20260407092940.1272507-1-chandrashekar.devegowda@intel.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="GiW6jt/P"
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6379UGrS4800040, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1775554216; bh=P0icrpAvvbSKDJjrMzGueZRXZ3PKswx9ku8yEDwlMbI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=GiW6jt/PSNHwa5TBxSMH2X5wPsVzOcJbNj0rMtTaDZtDVCxhzbigIwRan2+gQ23Mu
+	 ASquwCNKP9ufHepRlA/GJXX46DGd7uLl1ddtlLl2vHnMQ7AlIY11PnCsyOpDw1rsnb
+	 F0dMJv0wpbc9IR+aYhF9esbs8YEs4S01mrxj9LYKQA69ZCPMUVPwVjwvzp3Rv92/RB
+	 bCejWxP+jKpm88TEXHL7TOzimks6IIQknGT+H6hfH8rb6vByItfWk/UlGYu0mzssu2
+	 QH6HeSxarNu5PJi1npRmNydjgzvY/X//0srv9EWTzVZjyfm06mKxEnPUamaFqvD99X
+	 0q3bFO6azbpWQ==
+Received: from mail.realtek.com (rtkexhmbs04.realtek.com.tw[10.21.1.54])
+	by rtits2.realtek.com.tw (8.15.2/3.26/5.94) with ESMTPS id 6379UGrS4800040
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 7 Apr 2026 17:30:16 +0800
+Received: from RTKEXHMBS05.realtek.com.tw (10.21.1.55) by
+ RTKEXHMBS04.realtek.com.tw (10.21.1.54) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Tue, 7 Apr 2026 17:30:16 +0800
+Received: from RTKEXHMBS05.realtek.com.tw ([fe80::5e14:1ddb:ee82:82d6]) by
+ RTKEXHMBS05.realtek.com.tw ([fe80::5e14:1ddb:ee82:82d6%4]) with mapi id
+ 15.02.1748.010; Tue, 7 Apr 2026 17:30:16 +0800
+From: Hilda Wu <hildawu@realtek.com>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-firmware@kernel.org" <linux-firmware@kernel.org>,
+        Josh Boyer
+	<jwboyer@kernel.org>,
+        "regressions@lists.linux.dev"
+	<regressions@lists.linux.dev>,
+        Max Chou <max.chou@realtek.com>
+Subject: RE: [REGRESSION] rtl8822cu: BLE disconnects with firmware 0x0673_0EDC
+Thread-Topic: [REGRESSION] rtl8822cu: BLE disconnects with firmware
+ 0x0673_0EDC
+Thread-Index: AQHcwoqzFNYEvNmd/kC3msji9hdVI7XLuFJQ
+Date: Tue, 7 Apr 2026 09:30:16 +0000
+Message-ID: <e9cf7e6a4f1c4aa9b668f875fcb7084c@realtek.com>
+References: <bug-221309-62941@https.bugzilla.kernel.org/>
+ <42befa05-71bd-4a5e-9f8f-269ad532a234@molgen.mpg.de>
+In-Reply-To: <42befa05-71bd-4a5e-9f8f-269ad532a234@molgen.mpg.de>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-When driver encounters a TOP exception, ACPI methods will be called
-for Product level reset since Wifi and BT share the same TOP. BT driver
-will first reprobe the wifi driver and then reprobe BT.
+Hi Paul,
 
-Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
----
+Thank you for notifying us and providing the detailed information.
+We have already reverted the commit. We will proceed with fixing this issue=
+ and provide an updated firmware once the fix is complete.
+Thank you again.
 
-Notes:
-    v2: Incorporated review comments.
-    
-    Tested by:
-    1) Simulating TOP exception: sudo hcitool cmd 3f 4d 0A 00
-       And verified that the device went through PLDR by checking the ACPI
-       debug logs.
-    2) Toggle of sysfs attribute for BT reset for FLR i.e
-       echo 1 > /sys/class/bluetooth/hci0/reset
+Regards,
+Hilda
 
- drivers/bluetooth/btintel.c      |   8 +-
- drivers/bluetooth/btintel.h      |   7 ++
- drivers/bluetooth/btintel_pcie.c | 164 +++++++++++++++++++++++++++++--
- drivers/bluetooth/btintel_pcie.h |   6 ++
- 4 files changed, 173 insertions(+), 12 deletions(-)
+-----Original Message-----
+From: Paul Menzel <pmenzel@molgen.mpg.de>=20
+Sent: Thursday, April 2, 2026 6:22 PM
+To: Hilda Wu <hildawu@realtek.com>
+Cc: linux-bluetooth@vger.kernel.org; linux-firmware@kernel.org; Josh Boyer =
+<jwboyer@kernel.org>; regressions@lists.linux.dev
+Subject: Re: [REGRESSION] rtl8822cu: BLE disconnects with firmware 0x0673_0=
+EDC
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index dcaaa4ca02b9..c068a1d5ce81 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -67,9 +67,10 @@ static struct {
- 	u32        fw_build_num;
- } coredump_info;
- 
--static const guid_t btintel_guid_dsm =
-+const guid_t btintel_guid_dsm =
- 	GUID_INIT(0xaa10f4e0, 0x81ac, 0x4233,
- 		  0xab, 0xf6, 0x3b, 0x2a, 0xc5, 0x0e, 0x28, 0xd9);
-+EXPORT_SYMBOL_GPL(btintel_guid_dsm);
- 
- int btintel_check_bdaddr(struct hci_dev *hdev)
- {
-@@ -2624,7 +2625,7 @@ static void btintel_set_ppag(struct hci_dev *hdev, struct intel_version_tlv *ver
- 	kfree_skb(skb);
- }
- 
--static int btintel_acpi_reset_method(struct hci_dev *hdev)
-+int btintel_acpi_reset_method(struct hci_dev *hdev)
- {
- 	int ret = 0;
- 	acpi_status status;
-@@ -2632,7 +2633,7 @@ static int btintel_acpi_reset_method(struct hci_dev *hdev)
- 	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER, NULL };
- 
- 	status = acpi_evaluate_object(ACPI_HANDLE(GET_HCIDEV_DEV(hdev)), "_PRR", NULL, &buffer);
--	if (ACPI_FAILURE(status)) {
-+	if (ACPI_FAILURE(status) || !buffer.pointer) {
- 		bt_dev_err(hdev, "Failed to run _PRR method");
- 		ret = -ENODEV;
- 		return ret;
-@@ -2663,6 +2664,7 @@ static int btintel_acpi_reset_method(struct hci_dev *hdev)
- 	kfree(buffer.pointer);
- 	return ret;
- }
-+EXPORT_SYMBOL_GPL(btintel_acpi_reset_method);
- 
- static void btintel_set_dsm_reset_method(struct hci_dev *hdev,
- 					 struct intel_version_tlv *ver_tlv)
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 0e9ca99aaaae..70d812ad36a2 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -79,6 +79,8 @@ struct intel_tlv {
- #define BTINTEL_HWID_SCP2	0x20	/* Scorpius Peak2 - Nova Lake */
- #define BTINTEL_HWID_BZRIW	0x22	/* BlazarIW - Wildcat Lake */
- 
-+extern const guid_t btintel_guid_dsm;
-+
- struct intel_version_tlv {
- 	u32	cnvi_top;
- 	u32	cnvr_top;
-@@ -289,6 +291,7 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
- int btintel_shutdown_combined(struct hci_dev *hdev);
- void btintel_hw_error(struct hci_dev *hdev, u8 code);
- void btintel_print_fseq_info(struct hci_dev *hdev);
-+int btintel_acpi_reset_method(struct hci_dev *hdev);
- #else
- 
- static inline int btintel_check_bdaddr(struct hci_dev *hdev)
-@@ -422,4 +425,8 @@ static inline void btintel_hw_error(struct hci_dev *hdev, u8 code)
- static inline void btintel_print_fseq_info(struct hci_dev *hdev)
- {
- }
-+static inline int btintel_acpi_reset_method(struct hci_dev *hdev)
-+{
-+	return -ENODEV;
-+}
- #endif
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 05f82bc3f0d7..d45341cc4db6 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -15,6 +15,7 @@
- #include <linux/wait.h>
- #include <linux/delay.h>
- #include <linux/interrupt.h>
-+#include <linux/acpi.h>
- 
- #include <linux/unaligned.h>
- #include <linux/devcoredump.h>
-@@ -100,6 +101,22 @@ enum {
- 	BTINTEL_PCIE_D3
- };
- 
-+enum {
-+	BTINTEL_PCIE_DSM_SET_RESET_TIMING = 1,
-+	BTINTEL_PCIE_DSM_GET_RESET_TIMING = 2,
-+	BTINTEL_PCIE_DSM_BT_PLDR_CONFIG = 3,
-+	BTINTEL_PCIE_DSM_GET_RESET_TYPE = 4,
-+	BTINTEL_PCIE_DSM_DYNAMIC_PLDR = 5,
-+	BTINTEL_PCIE_DSM_GET_RESET_METHOD = 6,
-+	BTINTEL_PCIE_DSM_SET_PLDR_DELAY = 7,
-+};
-+
-+enum btintel_dsm_internal_product_reset_mode {
-+	BTINTEL_PCIE_DSM_PLDR_MODE_EN_PROD_RESET	= BIT(0),
-+	BTINTEL_PCIE_DSM_PLDR_MODE_EN_WIFI_FLR		= BIT(1),
-+	BTINTEL_PCIE_DSM_PLDR_MODE_EN_BT_OFF_ON		= BIT(2),
-+};
-+
- /* Structure for dbgc fragment buffer
-  * @buf_addr_lsb: LSB of the buffer's physical address
-  * @buf_addr_msb: MSB of the buffer's physical address
-@@ -126,6 +143,11 @@ struct btintel_pcie_dbgc_ctxt {
- 	struct btintel_pcie_dbgc_ctxt_buf bufs[BTINTEL_PCIE_DBGC_BUFFER_COUNT];
- };
- 
-+/* structure for reset and recovery
-+ * @pdev: The pci_dev for controller
-+ * @work: work struct for reset
-+ * @reset type: Reset can be FLR or PLDR
-+ */
- struct btintel_pcie_removal {
- 	struct pci_dev *pdev;
- 	struct work_struct work;
-@@ -2254,6 +2276,113 @@ static void btintel_pcie_inc_recovery_count(struct pci_dev *pdev,
- }
- 
- static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data);
-+static void btintel_pcie_reset(struct hci_dev *hdev);
-+
-+static int btintel_pcie_acpi_reset_method(struct btintel_pcie_data *data)
-+{
-+	union acpi_object *obj, argv4;
-+	acpi_handle handle;
-+	int ret;
-+	struct pldr_mode {
-+		__le16	cmd_type;
-+		__le16	cmd_payload;
-+	} __packed;
-+
-+	/* set 1 for _PRR mode
-+	 * Product Reset (PLDR Abort flow)
-+	 */
-+	static const struct pldr_mode mode = {
-+		.cmd_type = 1,
-+		.cmd_payload = BTINTEL_PCIE_DSM_PLDR_MODE_EN_PROD_RESET |
-+			       BTINTEL_PCIE_DSM_PLDR_MODE_EN_WIFI_FLR,
-+	};
-+	struct hci_dev *hdev = data->hdev;
-+
-+	handle = ACPI_HANDLE(GET_HCIDEV_DEV(data->hdev));
-+	if (!handle) {
-+		bt_dev_err(data->hdev, "No support for bluetooth device in ACPI firmware");
-+		return -EACCES;
-+	}
-+
-+	if (!acpi_has_method(handle, "_PRR")) {
-+		bt_dev_err(data->hdev, "No support for _PRR ACPI method, cold boot");
-+		return -ENODEV;
-+	}
-+
-+	argv4.buffer.type = ACPI_TYPE_BUFFER;
-+	argv4.buffer.length = sizeof(mode);
-+	argv4.buffer.pointer = (void *)&mode;
-+
-+	obj = acpi_evaluate_dsm(handle, &btintel_guid_dsm, 0,
-+				BTINTEL_PCIE_DSM_DYNAMIC_PLDR, &argv4);
-+	if (!obj) {
-+		bt_dev_err(data->hdev, "Failed to call dsm to set reset method");
-+		return -EIO;
-+	}
-+	ACPI_FREE(obj);
-+
-+	pci_dev_lock(data->pdev);
-+	pci_save_state(data->pdev);
-+	ret = btintel_acpi_reset_method(hdev);
-+	if (ret)
-+		bt_dev_err(data->hdev, "ACPI _PRR reset failed (%d), PLDR incomplete",
-+			   ret);
-+	pci_restore_state(data->pdev);
-+	pci_dev_unlock(data->pdev);
-+	return ret;
-+}
-+
-+static void btintel_pcie_perform_pldr(struct btintel_pcie_removal *removal)
-+{
-+	struct pci_dev *pdev = removal->pdev;
-+	struct pci_dev *wifi = NULL;
-+	struct pci_bus *bus;
-+	struct btintel_pcie_data *data;
-+	int ret;
-+	/* on integrated we have to look up by ID (same bus) */
-+	static const struct pci_device_id wifi_device_ids[] = {
-+	#define WIFI_DEV(_id) { PCI_DEVICE(PCI_VENDOR_ID_INTEL, _id) }
-+		WIFI_DEV(0xA840), /* LNL */
-+		WIFI_DEV(0xE440), /* PTL-P */
-+		WIFI_DEV(0xE340), /* PTL-H */
-+		WIFI_DEV(0xD340), /* NVL-H */
-+		WIFI_DEV(0x6E70), /* NVL-S */
-+		WIFI_DEV(0x4D40), /* WCL */
-+		WIFI_DEV(0xD240), /* RZL-H */
-+		WIFI_DEV(0x6C40), /* RZL-M */
-+		{}
-+	};
-+	struct pci_dev *tmp = NULL;
-+
-+	data = pci_get_drvdata(pdev);
-+
-+	bus = pdev->bus;
-+	if (!bus)
-+		return;
-+
-+	list_for_each_entry(tmp, &bus->devices, bus_list) {
-+		if (pci_match_id(wifi_device_ids, tmp)) {
-+			wifi = pci_dev_get(tmp);
-+			break;
-+		}
-+	}
-+
-+	if (wifi)
-+		device_release_driver(&wifi->dev);
-+
-+	ret = btintel_pcie_acpi_reset_method(data);
-+
-+	if (wifi) {
-+		if (device_reprobe(&wifi->dev))
-+			BT_ERR("WiFi reprobe failed for BDF:%s", pci_name(wifi));
-+		pci_dev_put(wifi);
-+	}
-+
-+	if (!ret) {
-+		if (device_reprobe(&pdev->dev))
-+			BT_ERR("BT reprobe failed for BDF:%s", pci_name(pdev));
-+	}
-+}
- 
- static void btintel_pcie_removal_work(struct work_struct *wk)
- {
-@@ -2266,9 +2395,13 @@ static void btintel_pcie_removal_work(struct work_struct *wk)
- 	pci_lock_rescan_remove();
- 
- 	if (!pdev->bus)
--		goto error;
-+		goto out;
- 
- 	data = pci_get_drvdata(pdev);
-+	if (!data) {
-+		BT_WARN("PCI driver data is NULL, aborting removal work");
-+		goto out;
-+	}
- 
- 	btintel_pcie_disable_interrupts(data);
- 	btintel_pcie_synchronize_irqs(data);
-@@ -2276,12 +2409,16 @@ static void btintel_pcie_removal_work(struct work_struct *wk)
- 	flush_work(&data->rx_work);
- 
- 	bt_dev_dbg(data->hdev, "Release bluetooth interface");
-+	if (data->reset_type == BTINTEL_PCIE_IOSF_PRR_PLDR) {
-+		btintel_pcie_perform_pldr(removal);
-+		goto out;
-+	}
- 	btintel_pcie_release_hdev(data);
- 
- 	err = pci_reset_function(pdev);
- 	if (err) {
- 		BT_ERR("Failed resetting the pcie device (%d)", err);
--		goto error;
-+		goto out;
- 	}
- 
- 	btintel_pcie_enable_interrupts(data);
-@@ -2291,7 +2428,7 @@ static void btintel_pcie_removal_work(struct work_struct *wk)
- 	if (err) {
- 		BT_ERR("Failed to enable bluetooth hardware after reset (%d)",
- 		       err);
--		goto error;
-+		goto out;
- 	}
- 
- 	btintel_pcie_reset_ia(data);
-@@ -2301,9 +2438,9 @@ static void btintel_pcie_removal_work(struct work_struct *wk)
- 	err = btintel_pcie_setup_hdev(data);
- 	if (err) {
- 		BT_ERR("Failed registering hdev (%d)", err);
--		goto error;
-+		goto out;
- 	}
--error:
-+out:
- 	pci_dev_put(pdev);
- 	pci_unlock_rescan_remove();
- 	kfree(removal);
-@@ -2339,15 +2476,19 @@ static void btintel_pcie_hw_error(struct hci_dev *hdev, u8 code)
- 	struct pci_dev *pdev = dev_data->pdev;
- 	time64_t retry_window;
- 
--	if (code == 0x13) {
--		bt_dev_err(hdev, "Encountered top exception");
--		return;
--	}
-+	btintel_pcie_dump_debug_registers(hdev);
- 
- 	data = btintel_pcie_get_recovery(pdev, &hdev->dev);
- 	if (!data)
- 		return;
- 
-+	if (code == 0x13)
-+		dev_data->reset_type = BTINTEL_PCIE_IOSF_PRR_PLDR;
-+	else
-+		dev_data->reset_type = BTINTEL_PCIE_IOSF_PRR_FLR;
-+
-+	bt_dev_err(hdev, "Encountered exception err:0x%x triggering: %s", code,
-+		   dev_data->reset_type == BTINTEL_PCIE_IOSF_PRR_PLDR ? "PLDR" : "FLR");
- 	retry_window = ktime_get_boottime_seconds() - data->last_error;
- 
- 	if (retry_window < BTINTEL_PCIE_RESET_WINDOW_SECS &&
-@@ -2503,6 +2644,10 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 
- 	data->boot_stage_cache = 0x00;
- 	data->img_resp_cache = 0x00;
-+	/* FLR can be invoked by echoing to debugfs path, so explicitly
-+	 * initialized
-+	 */
-+	data->reset_type = BTINTEL_PCIE_IOSF_PRR_FLR;
- 
- 	err = btintel_pcie_config_pcie(pdev, data);
- 	if (err)
-@@ -2701,6 +2846,7 @@ static int btintel_pcie_resume(struct device *dev)
- 	if (data->pm_sx_event == PM_EVENT_FREEZE ||
- 	    data->pm_sx_event == PM_EVENT_HIBERNATE) {
- 		set_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags);
-+		data->reset_type = BTINTEL_PCIE_IOSF_PRR_FLR;
- 		btintel_pcie_reset(data->hdev);
- 		return 0;
- 	}
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index e3d941ffef4a..856673fb2bd7 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -144,6 +144,11 @@ enum msix_mbox_int_causes {
- 	BTINTEL_PCIE_CSR_MBOX_STATUS_MBOX4 = BIT(3), /* cause MBOX4 */
- };
- 
-+enum btintel_pcie_reset_type {
-+	BTINTEL_PCIE_IOSF_PRR_FLR = 0,
-+	BTINTEL_PCIE_IOSF_PRR_PLDR = 1,
-+};
-+
- #define BTINTEL_PCIE_MSIX_NON_AUTO_CLEAR_CAUSE	BIT(7)
- 
- /* Minimum and Maximum number of MSI-X Vector
-@@ -514,6 +519,7 @@ struct btintel_pcie_data {
- 	struct txq	txq;
- 	struct rxq	rxq;
- 	u32	alive_intr_ctxt;
-+	enum btintel_pcie_reset_type	reset_type;
- 	struct btintel_pcie_dbgc	dbgc;
- 	struct btintel_pcie_dump_header dmp_hdr;
- 	u8	pm_sx_event;
--- 
-2.43.0
 
+External mail : This email originated from outside the organization. Do not=
+ reply, click links, or open attachments unless you recognize the sender an=
+d know the content is safe.
+
+
+
+[To/Cc: +Hilda, linux-firmware@, Josh]
+
+Dear Hilda, dear Josh,
+
+
+Hilda, unfortunately, you do not have a Linux Kernel Bugzilla account, so I=
+ am replying here.
+
+Am 02.04.26 um 01:57 schrieb bugzilla-daemon@kernel.org:
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D221309
+>
+>              Bug ID: 221309
+>             Summary: rtl8822cu: BLE disconnects with firmware 0x0673_0EDC
+>                      regression
+>             Product: Drivers
+>             Version: 2.5
+>            Hardware: AMD
+>                  OS: Linux
+>              Status: NEW
+>            Severity: normal
+>            Priority: P3
+>           Component: Bluetooth
+>            Assignee: linux-bluetooth@vger.kernel.org
+>            Reporter: i+kernel.org@schimpf.link
+>          Regression: No
+>
+> Created attachment 309794
+>    -->=20
+> https://bugzilla.kernel.org/attachment.cgi?id=3D309794&action=3Dedit
+> stability log after downgrade
+>
+> Overview
+>
+> After updating linux-firmware-realtek to 20260221-1 (which includes=20
+> commit fbf93476, "update rtl8822c bt usb and uart firmware to=20
+> 0x0673"), the RTL8822CU USB Bluetooth adapter
+> (0bda:b00c) begins dropping BLE connections every few minutes. Each=20
+> disconnect lasts several seconds before the device reconnects. The=20
+> adapter itself never resets and the USB device remains active throughout.=
+ Only the BLE link is lost.
+
+[... Linux 6.19.10-arch1-1 ...]
+
+It looks like, the linux-firmware commit [1][2] caused a regression.
+(Also linux-bluetooth@ wasn't in Cc?) Could you please look into it? I reco=
+mmend to revert it for the time being and cut a new linux-firmware release.
+
+
+Kind regards,
+
+Paul
+
+
+PS: Josh, do you have a pointer how to reach the commit from the merge requ=
+est?
+
+https://gitlab.com/kernel-firmware/linux-firmware/-/merge_requests/900
+shows
+https://gitlab.com/kernel-firmware/linux-firmware/-/commit/1f806c75e479fea9=
+f222579deb6e69d285b614fc,
+but I do not see a way to get to
+https://gitlab.com/kernel-firmware/linux-firmware/-/commit/fbf93476.
+
+
+[1]:
+https://lore.kernel.org/all/20260202115751.1056277-1-hildawu@realtek.com/
+[2]: https://gitlab.com/kernel-firmware/linux-firmware/-/commit/fbf93476
