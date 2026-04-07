@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA83D370D6E;
-	Tue,  7 Apr 2026 16:03:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF3F23CFF73;
+	Tue,  7 Apr 2026 16:03:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775577826; cv=none; b=apW8F0q55B22N0hZcdpEyeueEtnadQ7IAxhpjKSasXirXwqZRhcCeN+aidyA1W/wcByUQv/CDmmQ4No+9W1P8W8H5i90nZGSfVJfh3gJYh0OqyjJtI6FA8Qda+yV6LHjKx1eFrYBzQ+m2bYG0h4qLzjrX9fI02H2HYqy9noqFoo=
+	t=1775577835; cv=none; b=ViDLwvahS6ZfYAqeBDQh2YcCi7C6WwSj78AvbvOTFQ+NRNH449Gb6Imkw7R6vJ79Bb3L2oKVTtTF9E9lpcYFn02Bj+HeeWCeRKYlhChJol3Q5JW5bJpUprdOu7cjpV1sc8Gp67ntvCKUXB9d7WvW7KZqgXeTJup5ExVYsBIIyKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775577826; c=relaxed/simple;
-	bh=4tzNatN0lLNbSZtg3kjtdU6xpsyEALCIiXGSM4tnjsw=;
+	s=arc-20240116; t=1775577835; c=relaxed/simple;
+	bh=4ekckLVHC6JNlQ4+cwG1UzpRHWBEe2fAGVVPOLGy4R4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=htr2q5rASAOWnsP/pS7FuOiV8BXeHcJBymsfkZvgh2l2Jx0icPu4ftD2L2ni/+If+8J20xYd7Ri+bOGdMHlKD8vT8e3vw0akqCMrg3/n7shAHHnwovu6V1Q/+CvZ3V0rkzMWJf0KjSe+/lkJtC+0kWCOVCSy9MOR1IO0krCEMLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=E8ECd56h; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=d6ajivksdyhx886ntCJV3Uyo13yP1+nhjDucr231qdEteqNf9WviC2fSPAaB8vcV6IJcflsFVcSVWOOpqS6UjuBnD7/hx5z71exJZ2QkPvAvwhZpOdI2lKPNFeVgyBwypERrZpcDCNRib7vsBdeRfmi6m+GL0pLpT2CNr8c1qRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=qSo4Red0; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="E8ECd56h"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="qSo4Red0"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=1sWKeUoiedloG4v+5cKbhOh9byM/6fDeRhbG1bWIQbw=; b=E8ECd56hN1iYhq+ulix96lYfec
-	BSSD9n27nLPltvOqe1wKsaj1T6uNDrDUATj6RviiugjU5Nno1VV1fJElrU9eUfJpb2Zx6MvnmyoEc
-	TUaMlYuOCih63EaAJ2DIG3droMK0b1ra/DVyL2uHRGB5OqWbL1sJ4LZ8sgx/C8vpiyCtUOoKobykU
-	J02WfiwlIIx7K5Bd30TLWS2c3DI+aO4LR2xtGKllZLeD5tikhcTh4oXIQuVGAHEVc+9+gyqxdcQMS
-	rSpNKdkES8O2A6tqQFetsrGkPH7yM+AjbrEGcxZxFX/VAjnSgnGinxBs5BKB68ryi35+JKqJPr6PO
-	rcP/MfA9lzfuitNwQrLujw9FKLXIB0XKMbkKSAQxhmkUcKES65ge65e8Ee6LlSamdqIWvHGruQ1YZ
-	i0fkH+5Q3saPwdqD3H1OXCVVIomY6f0CgRiKp4HnV8Dd+QLemW+dZy/FWJscn2/xLJh6KOgO+lDvt
-	5olATBcZFV49Qfr0Xw+j1Wwj;
+	bh=0UZ4nM5ntRTkbDrlVt7CXwcY4ov92h/7RcMa2AIanwA=; b=qSo4Red0hA9iIVZtglDgmQLDfC
+	l5JsDBXdO2/CzltDZtArJ4WwV7NzmC6BPplR8N9aSXQlWZ+Aoj8ssFPheD5Qgr9ADG+KzZtMmEwlk
+	Ayfztl85Vp5HGr5uPyA0FDSlj/nNw9cVlFDfs814fxOnU+NQ48WeVIZvZ2nZz7Oc1XkjGpy1Iw5sU
+	wMiDBznHnatewtVKvOTWD1EE978yng7itidLTymOVgVgh19p67I5SHWDLXGAZDCYuWA4pCKa7Jyhk
+	vQw/igIiANmjHC8oGi3RrpdJaeU9Bs1UXGVggt2BF9w+T2kL/yzJu3NsPpg85XPMOewyXNDOFzDUn
+	oGwU/nxRyLi2z0JzyNV1pXny7S+ulV0cDL2voK66VxjQoIhvISTE2hvuMWv55Pcge4VtK1y5gBXYp
+	zC0qYo3zeS+vCf6xGjawJo8Ty0j/tFUywUyEj4wSCtccFVxsp6/qoDzOWBVZ1pt/V1XDw9sLe5X2O
+	x0haqQ6CLkoU/ZdEOI1T7i6s;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1wA8tp-00000007XiV-1Sez;
-	Tue, 07 Apr 2026 16:03:33 +0000
+	id 1wA8tv-00000007Xj8-0Juu;
+	Tue, 07 Apr 2026 16:03:39 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-kernel@vger.kernel.org
 Cc: metze@samba.org,
@@ -58,9 +58,9 @@ Cc: metze@samba.org,
 	Kees Cook <keescook@chromium.org>,
 	netdev@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/5] uaccess: fix ignored_trailing logic in copy_struct_to_user()
-Date: Tue,  7 Apr 2026 18:03:13 +0200
-Message-ID: <71f69442410c1186ed8ce6d5b4b9d4a5a70edbad.1775576651.git.metze@samba.org>
+Subject: [PATCH 2/5] sockptr: fix usize check in copy_struct_from_sockptr() for user pointers
+Date: Tue,  7 Apr 2026 18:03:14 +0200
+Message-ID: <cfaedbc33ae9d36adaabf04fa79424f30ff1efdd.1775576651.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1775576651.git.metze@samba.org>
 References: <cover.1775576651.git.metze@samba.org>
@@ -72,17 +72,23 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently all callers pass ignored_trailing=NULL, but I have
-code that will make use of.
+copy_struct_from_user will never hit the check_zeroed_user() call
+and will never return -E2BIG if new userspace passed new bits in a
+larger structure than the current kernel structure.
 
-Now it actually behaves like documented:
+As far as I can there are no critical/related uapi changes in
 
-* If @usize < @ksize, then the kernel is trying to pass userspace a newer
-  struct than it supports. Thus we only copy the interoperable portions
-  (@usize) and ignore the rest (but @ignored_trailing is set to %true if
-  any of the trailing (@ksize - @usize) bytes are non-zero).
+- include/net/bluetooth/bluetooth.h and net/bluetooth/sco.c
+  after the use of copy_struct_from_sockptr in v6.13-rc3
+- include/uapi/linux/tcp.h and net/ipv4/tcp_ao.c
+  after the use of copy_struct_from_sockptr in v6.6-rc1
 
-Fixes: 424a55a4a908 ("uaccess: add copy_struct_to_user helper")
+So that new callers will get the correct behavior from the start.
+
+Fixes: 4954f17ddefc ("net/tcp: Introduce TCP_AO setsockopt()s")
+Fixes: ef84703a911f ("net/tcp: Add TCP-AO getsockopt()s")
+Fixes: faadfaba5e01 ("net/tcp: Add TCP_AO_REPAIR")
+Fixes: 3e643e4efa1e ("Bluetooth: Improve setsockopt() handling of malformed user input")
 Cc: Dmitry Safonov <0x7f454c46@gmail.com>
 Cc: Dmitry Safonov <dima@arista.com>
 Cc: Francesco Ruggeri <fruggeri@arista.com>
@@ -110,22 +116,22 @@ Cc: linux-bluetooth@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- include/linux/uaccess.h | 2 +-
+ include/linux/sockptr.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/uaccess.h b/include/linux/uaccess.h
-index 4fe63169d5a2..1234b5fa4761 100644
---- a/include/linux/uaccess.h
-+++ b/include/linux/uaccess.h
-@@ -505,7 +505,7 @@ copy_struct_to_user(void __user *dst, size_t usize, const void *src,
- 			return -EFAULT;
- 	}
- 	if (ignored_trailing)
--		*ignored_trailing = ksize < usize &&
-+		*ignored_trailing = usize < ksize &&
- 			memchr_inv(src + size, 0, rest) != NULL;
- 	/* Copy the interoperable parts of the struct. */
- 	if (copy_to_user(dst, src, size))
+diff --git a/include/linux/sockptr.h b/include/linux/sockptr.h
+index 3e6c8e9d67ae..ba88f4d78c1b 100644
+--- a/include/linux/sockptr.h
++++ b/include/linux/sockptr.h
+@@ -91,7 +91,7 @@ static inline int copy_struct_from_sockptr(void *dst, size_t ksize,
+ 	size_t rest = max(ksize, usize) - size;
+ 
+ 	if (!sockptr_is_kernel(src))
+-		return copy_struct_from_user(dst, ksize, src.user, size);
++		return copy_struct_from_user(dst, ksize, src.user, usize);
+ 
+ 	if (usize < ksize) {
+ 		memset(dst + size, 0, rest);
 -- 
 2.43.0
 
