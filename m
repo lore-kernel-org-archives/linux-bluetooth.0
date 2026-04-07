@@ -1,153 +1,326 @@
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC1F394498;
-	Tue,  7 Apr 2026 11:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F69639BFE7;
+	Tue,  7 Apr 2026 12:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775562543; cv=none; b=K4r+2YIFtm1Y2S6hGzZVDx6Xt4gsYFFjH0Gqmu0kSUKpAk75zIu0NRGMeIXabm7apFjv4mKiK5UcnaqOrJsmcZP2fReOzFt+lI+EucVqxiHsTP0/qXicRh7hL2qTPetTgM3vCdthxIf66Z2rpa6PwbhoP9aAR26YOchzoJH6oFc=
+	t=1775563772; cv=none; b=F1bYyQb61cJ/1veaki8W9naSFnRBoqDDUMoczCnLtpC9ZLfctbywptTyW98cAR+qbT9SlEBR8FSvtCldk9zEnlzEvnstwEZbWuzE0m7HSSSdhk1vF+RSMGCpzEO9p8lb3vlAKHL9/zoBKRlDGF59wFujC4bOFHZtU5Npm4UxPzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775562543; c=relaxed/simple;
-	bh=DpUKsZTfnFn9s2DT1DW+kpntTvd3djSz466pJ70p0K8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fUvYoLVh96xTAJAfc39Nm0bGpm6ewKxCBEPMtGPDM5K3RTreSUcJ+CtHSpiKvBQXYCKsGBhTdT6IX7wJKTc25OJxmOnmpQCQUoL3wRbKZB7Rlw8RsiAm9ahZQLhg6GVWBk+W2v0lR9DE82jUF/5DtCHO0VMW65pBv3WR2fQG2zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=mwmubiC1; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	s=arc-20240116; t=1775563772; c=relaxed/simple;
+	bh=MA/16xgPpr6e24Jp3Irwq/t17AycVTq4l79wFF2Amw4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=GBP3UmA/cvXEe2vZ7rSQadWdwxSnCL3nu7xsxZAOhXfhF3QRepZ2QRF7gHMpGdc4cw+Ba1bBM/rjtS5Z+Pk2zbK0MrsftOzcTKoxqTW97eEngrYoGVzPgvcSoSmIUyFLaGnVUt5fkDb4xj3hfNLvNZ37kJIxbfeLuNtJ/DgxOqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f+ZnMjH9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="mwmubiC1"
-X-UUID: c0d9ae06327711f19a16598d5ca7f8ec-20260407
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=yuHXpV2guMEqjCofGpLmsHbbxGl7ArDogqOj9FM3zls=;
-	b=mwmubiC111WxeomLM5gvjLXDSW+fSKQ7pt8coWUrIqBXTBq04nAN3WzCfDXfmH7Vtfkz4VkSm/MLtk6ZJTwy25auf+NiKGgI2n/jAxw9cgraGWkUlv0ZBIwd3fwUFG4CQ14muo5SqKycDrsjtYpQC/tWtBWUQzt4VfHDkIryX7M=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:55980c85-f31d-4d86-b6cc-6189c4a586f9,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:e7bac3a,CLOUDID:8b1f9524-cb5c-4236-a89a-9a7fb20c9bc4,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102|836|865|888|898,TC:-5,Content:0|
-	15|50,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0
-	,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: c0d9ae06327711f19a16598d5ca7f8ec-20260407
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw02.mediatek.com
-	(envelope-from <chris.lu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 894366779; Tue, 07 Apr 2026 19:48:54 +0800
-Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 7 Apr 2026 19:48:53 +0800
-Received: from mtksitap99.mediatek.inc (10.233.130.16) by
- mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.2562.29 via Frontend Transport; Tue, 7 Apr 2026 19:48:53 +0800
-From: Chris Lu <chris.lu@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
-	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>, linux-kernel
-	<linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH v2] Bluetooth: btmtk: add event filter to filter specific event
-Date: Tue, 7 Apr 2026 19:48:51 +0800
-Message-ID: <20260407114851.3087886-1-chris.lu@mediatek.com>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f+ZnMjH9"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EC931C116C6;
+	Tue,  7 Apr 2026 12:09:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775563772;
+	bh=MA/16xgPpr6e24Jp3Irwq/t17AycVTq4l79wFF2Amw4=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=f+ZnMjH9u95W+KecgH1M5djCLLZnJ2HGZ7KjMf3gVFzXfg4lq3jCo+mxR/E9egmnh
+	 kXHaO5RLfZs70qR1kR+ZFxDvck468UjNzYFmkXVbvcIDzf6b1nYV1LByIVsJPqZ1wA
+	 EMWm0IjAuL6xPC8bbCOa4WtknGR1GqgmdRkdK9YIqLxMS921b6lvGNUCSqQB8Owk0m
+	 0e1QTOckyMRkmXbedowUvPjEMDHRePabm4d0WGawZsN5H4MJ2emhZu3KlbGx9SI4jG
+	 tKLj9tu4uQonVasdEfh4FNoilbjgCiwzzvpjvdTz2w60DecGM+MQJR2wWT0I/w7ujF
+	 tDaRgL20q7bkg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D74E4FEEF29;
+	Tue,  7 Apr 2026 12:09:31 +0000 (UTC)
+From: Sasha Finkelstein via B4 Relay <devnull+fnkl.kernel.gmail.com@kernel.org>
+Date: Tue, 07 Apr 2026 14:09:14 +0200
+Subject: [PATCH] Bluetooth: Add Broadcom channel priority commands
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260407-brcm-prio-v1-1-f38b17376640@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDEwNz3aSi5FzdgqLMfN0kM2ODVLPkZGMLYxMloPqCotS0zAqwWdGxtbU
+ AfbxXPlsAAAA=
+X-Change-ID: 20260407-brcm-prio-b630e6cc3834
+To: Sven Peter <sven@kernel.org>, Janne Grunau <j@jannau.net>, 
+ Neal Gompa <neal@gompa.dev>, Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org, asahi@lists.linux.dev, 
+ linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+ netdev@vger.kernel.org, Sasha Finkelstein <fnkl.kernel@gmail.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1775563770; l=7872;
+ i=fnkl.kernel@gmail.com; s=20241124; h=from:subject:message-id;
+ bh=gg4x5lEmIqKFrASgP0xO22e+G2K7V8H9TMkHZhq7+QY=;
+ b=vbmIOo8yojBRUh3vdplseWSQTA6tBL5Ublusuh3CS9xPiTabxvXlO4ioFtSCo6ffq9mj/H1I+
+ flNVNUJaGSeBgHsyPMZP7NVDSsx61c3wUNqJn5Pu53GVlZW04KseeMm
+X-Developer-Key: i=fnkl.kernel@gmail.com; a=ed25519;
+ pk=aSkp1PdZ+eF4jpMO6oLvz/YfT5XkBUneWwyhQrOgmsU=
+X-Endpoint-Received: by B4 Relay for fnkl.kernel@gmail.com/20241124 with
+ auth_id=283
+X-Original-From: Sasha Finkelstein <fnkl.kernel@gmail.com>
+Reply-To: fnkl.kernel@gmail.com
 
-Add an event filter to filter event with specific opcode to prevent BT
-stack from receiving unexpected event.
+From: Sasha Finkelstein <fnkl.kernel@gmail.com>
 
-Event with opcode 0xfc5d is generated when MediaTek's Bluetooth enable
-firmware logs and is not expected to be sent to userspace.
+Certain Broadcom bluetooth chips (bcm4377/bcm4378/bcm438) need ACL
+streams carrying audio to be set as "high priority" using a vendor
+specific command to prevent 10-ish second-long dropouts whenever
+something does a device scan. This series adds an ioctl to control
+the priorities and hooks it up for the relevant chips.
 
-Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+Signed-off-by: Sasha Finkelstein <fnkl.kernel@gmail.com>
 ---
-v1 -> v2: update commit message
----
- drivers/bluetooth/btmtk.c | 22 ++++++++++++++++++++++
- drivers/bluetooth/btmtk.h |  7 +++++++
- drivers/bluetooth/btusb.c |  2 ++
- 3 files changed, 31 insertions(+)
+ MAINTAINERS                      |  2 ++
+ drivers/bluetooth/hci_bcm4377.c  |  2 ++
+ include/net/bluetooth/hci_core.h | 12 ++++++++++++
+ include/net/bluetooth/hci_sock.h |  7 +++++++
+ net/bluetooth/Kconfig            |  7 +++++++
+ net/bluetooth/Makefile           |  1 +
+ net/bluetooth/brcm.c             | 29 +++++++++++++++++++++++++++++
+ net/bluetooth/brcm.h             | 17 +++++++++++++++++
+ net/bluetooth/hci_conn.c         | 11 +++++++++++
+ net/bluetooth/hci_sock.c         |  4 ++++
+ 10 files changed, 92 insertions(+)
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 55516b4602db..302d6ddf9062 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -1503,6 +1503,28 @@ int btmtk_usb_shutdown(struct hci_dev *hdev)
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(btmtk_usb_shutdown);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index c3fe46d7c4bc..81be021367ec 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2562,6 +2562,8 @@ F:	include/dt-bindings/pinctrl/apple.h
+ F:	include/linux/mfd/macsmc.h
+ F:	include/linux/soc/apple/*
+ F:	include/uapi/drm/asahi_drm.h
++F:	net/bluetooth/brcm.c
++F:	net/bluetooth/brcm.h
+ 
+ ARM/ARTPEC MACHINE SUPPORT
+ M:	Jesper Nilsson <jesper.nilsson@axis.com>
+diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
+index 925d0a635945..5f79920c0306 100644
+--- a/drivers/bluetooth/hci_bcm4377.c
++++ b/drivers/bluetooth/hci_bcm4377.c
+@@ -2397,6 +2397,8 @@ static int bcm4377_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	if (bcm4377->hw->broken_le_ext_adv_report_phy)
+ 		hci_set_quirk(hdev, HCI_QUIRK_FIXUP_LE_EXT_ADV_REPORT_PHY);
+ 
++	hci_set_brcm_capable(hdev);
 +
-+int btmtk_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_event_hdr *hdr = (void *)skb->data;
-+
-+	if (hdr->evt == HCI_EV_CMD_COMPLETE) {
-+		struct hci_ev_cmd_complete *ec;
-+		u16 opcode;
-+
-+		ec = (void *)(skb->data + HCI_EVENT_HDR_SIZE);
-+		opcode = __le16_to_cpu(ec->opcode);
-+
-+		/* Filter vendor opcode */
-+		if (opcode == 0xfc5d) {
-+			kfree_skb(skb);
-+			return 0;
-+		}
-+	}
-+
-+	return hci_recv_frame(hdev, skb);
-+}
-+EXPORT_SYMBOL_GPL(btmtk_recv_event);
+ 	pci_set_drvdata(pdev, bcm4377);
+ 	hci_set_drvdata(hdev, bcm4377);
+ 	SET_HCIDEV_DEV(hdev, &pdev->dev);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a7bffb908c1e..ef3b5433203c 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -642,6 +642,10 @@ struct hci_dev {
+ 	bool			aosp_quality_report;
  #endif
  
- MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
-diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-index adaf385626ee..08b73927c8f3 100644
---- a/drivers/bluetooth/btmtk.h
-+++ b/drivers/bluetooth/btmtk.h
-@@ -218,6 +218,8 @@ int btmtk_usb_suspend(struct hci_dev *hdev);
- int btmtk_usb_setup(struct hci_dev *hdev);
- 
- int btmtk_usb_shutdown(struct hci_dev *hdev);
++#if IS_ENABLED(CONFIG_BT_BRCMEXT)
++	bool			brcm_capable;
++#endif
 +
-+int btmtk_recv_event(struct hci_dev *hdev, struct sk_buff *skb);
- #else
- 
- static inline int btmtk_set_bdaddr(struct hci_dev *hdev,
-@@ -296,4 +298,9 @@ static inline int btmtk_usb_shutdown(struct hci_dev *hdev)
- {
- 	return -EOPNOTSUPP;
+ 	int (*open)(struct hci_dev *hdev);
+ 	int (*close)(struct hci_dev *hdev);
+ 	int (*flush)(struct hci_dev *hdev);
+@@ -1791,6 +1795,13 @@ static inline void hci_set_aosp_capable(struct hci_dev *hdev)
+ #endif
  }
+ 
++static inline void hci_set_brcm_capable(struct hci_dev *hdev)
++{
++#if IS_ENABLED(CONFIG_BT_BRCMEXT)
++	hdev->brcm_capable = true;
++#endif
++}
 +
-+static inline int btmtk_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+ static inline void hci_devcd_setup(struct hci_dev *hdev)
+ {
+ #ifdef CONFIG_DEV_COREDUMP
+@@ -1812,6 +1823,7 @@ int hci_get_conn_list(void __user *arg);
+ int hci_get_conn_info(struct hci_dev *hdev, void __user *arg);
+ int hci_get_auth_info(struct hci_dev *hdev, void __user *arg);
+ int hci_inquiry(void __user *arg);
++int hci_set_acl_prio(struct hci_dev *hdev, void __user *arg);
+ 
+ struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *list,
+ 					   bdaddr_t *bdaddr, u8 type);
+diff --git a/include/net/bluetooth/hci_sock.h b/include/net/bluetooth/hci_sock.h
+index 13e8cd4414a1..95d156ac4cae 100644
+--- a/include/net/bluetooth/hci_sock.h
++++ b/include/net/bluetooth/hci_sock.h
+@@ -91,6 +91,8 @@ struct hci_ufilter {
+ 
+ #define HCIINQUIRY	_IOR('H', 240, int)
+ 
++#define HCISETACLPRIO	_IOW('H', 250, int)
++
+ /* Ioctl requests structures */
+ struct hci_dev_stats {
+ 	__u32 err_rx;
+@@ -171,6 +173,11 @@ struct hci_inquiry_req {
+ 	__u8  length;
+ 	__u8  num_rsp;
+ };
++
++struct hci_acl_prio_req {
++	__u16 handle;
++	__u8  high_prio;
++};
+ #define IREQ_CACHE_FLUSH 0x0001
+ 
+ #endif /* __HCI_SOCK_H */
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 6b2b65a66700..0f2a5fbcafc5 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -110,6 +110,13 @@ config BT_AOSPEXT
+ 	  This options enables support for the Android Open Source
+ 	  Project defined HCI vendor extensions.
+ 
++config BT_BRCMEXT
++	bool "Enable Broadcom extensions"
++	depends on BT
++	help
++	  This option enables support for the Broadcom defined HCI
++	  vendor extensions.
++
+ config BT_DEBUGFS
+ 	bool "Export Bluetooth internals in debugfs"
+ 	depends on BT && DEBUG_FS
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index a7eede7616d8..b4c9013a46ce 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -24,5 +24,6 @@ bluetooth-$(CONFIG_BT_LE) += iso.o
+ bluetooth-$(CONFIG_BT_LEDS) += leds.o
+ bluetooth-$(CONFIG_BT_MSFTEXT) += msft.o
+ bluetooth-$(CONFIG_BT_AOSPEXT) += aosp.o
++bluetooth-$(CONFIG_BT_BRCMEXT) += brcm.o
+ bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
+ bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
+diff --git a/net/bluetooth/brcm.c b/net/bluetooth/brcm.c
+new file mode 100644
+index 000000000000..d03d2af5dc7e
+--- /dev/null
++++ b/net/bluetooth/brcm.c
+@@ -0,0 +1,29 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2026 The Asahi Linux Contributors
++ */
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++
++#include "brcm.h"
++
++int brcm_set_high_priority(struct hci_dev *hdev, u16 handle, bool enable)
++{
++	struct sk_buff *skb;
++	u8 cmd[3];
++
++	if (!hdev->brcm_capable)
++		return -EOPNOTSUPP;
++
++	cmd[0] = handle;
++	cmd[1] = handle >> 8;
++	cmd[2] = !!enable;
++
++	skb = hci_cmd_sync(hdev, 0xfc57, sizeof(cmd), cmd, HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb))
++		return PTR_ERR(skb);
++
++	kfree_skb(skb);
++	return 0;
++}
+diff --git a/net/bluetooth/brcm.h b/net/bluetooth/brcm.h
+new file mode 100644
+index 000000000000..a501f2988a96
+--- /dev/null
++++ b/net/bluetooth/brcm.h
+@@ -0,0 +1,17 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2026 The Asahi Linux Contributors
++ */
++
++#if IS_ENABLED(CONFIG_BT_BRCMEXT)
++
++int brcm_set_high_priority(struct hci_dev *hdev, u16 handle, bool enable);
++
++#else
++
++static inline int brcm_set_high_priority(struct hci_dev *hdev, u16 handle, bool enable)
 +{
 +	return -EOPNOTSUPP;
 +}
- #endif
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f9d515ee9124..daf8a387e660 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4150,6 +4150,8 @@ static int btusb_probe(struct usb_interface *intf,
- 	} else if (id->driver_info & BTUSB_MEDIATEK) {
- 		/* Allocate extra space for Mediatek device */
- 		priv_size += sizeof(struct btmtk_data);
 +
-+		data->recv_event = btmtk_recv_event;
++#endif
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 11d3ad8d2551..b2c7414a9c5b 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -35,6 +35,7 @@
+ #include <net/bluetooth/iso.h>
+ #include <net/bluetooth/mgmt.h>
+ 
++#include "brcm.h"
+ #include "smp.h"
+ #include "eir.h"
+ 
+@@ -2775,6 +2776,16 @@ int hci_get_auth_info(struct hci_dev *hdev, void __user *arg)
+ 	return copy_to_user(arg, &req, sizeof(req)) ? -EFAULT : 0;
+ }
+ 
++int hci_set_acl_prio(struct hci_dev *hdev, void __user *arg)
++{
++	struct hci_acl_prio_req req;
++
++	if (copy_from_user(&req, arg, sizeof(req)))
++		return -EFAULT;
++
++	return brcm_set_high_priority(hdev, req.handle, req.high_prio);
++}
++
+ struct hci_chan *hci_chan_create(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 0290dea081f6..4be6aeeb6bad 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -1035,6 +1035,9 @@ static int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd,
+ 		if (!capable(CAP_NET_ADMIN))
+ 			return -EPERM;
+ 		return hci_sock_reject_list_del(hdev, (void __user *)arg);
++
++	case HCISETACLPRIO:
++		return hci_set_acl_prio(hdev, (void __user *)arg);
  	}
  
- 	data->recv_acl = hci_recv_frame;
+ 	return -ENOIOCTLCMD;
+@@ -1072,6 +1075,7 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
+ 	case HCIGETAUTHINFO:
+ 	case HCIBLOCKADDR:
+ 	case HCIUNBLOCKADDR:
++	case HCISETACLPRIO:
+ 		break;
+ 	default:
+ 		return -ENOIOCTLCMD;
+
+---
+base-commit: bfe62a454542cfad3379f6ef5680b125f41e20f4
+change-id: 20260407-brcm-prio-b630e6cc3834
+
+Best regards,
 -- 
-2.45.2
+Sasha Finkelstein <fnkl.kernel@gmail.com>
+
 
