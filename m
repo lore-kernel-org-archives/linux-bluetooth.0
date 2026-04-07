@@ -1,208 +1,116 @@
-Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1F84AEE2
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Apr 2026 14:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775573707; cv=pass; b=tWSzCAf2jMeO1K0icXFXpk2YVwzhKp9qQ2YcxUMEoNq1IUARLugRw4lshufJUTVJSm+YP6D0OGiivR7rtg6JyahLLUIJcfdKHgGHncVcCH1qypazisLKe3QMEc5V34plU2C+xQbxk3T25Cahf28X7Y+dWgKId5EKT0NZk181ICU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775573707; c=relaxed/simple;
-	bh=eVsxr0t9Fw2c0fWOeoXpNiaWDH7faElE7igJEVdU2jg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=emezLG6MCLj5+X7v28/MfbjCo/L4X3JiGHyTi9lQ+7yz9ykOhUHKDjGukPFMoZwngdosuKS6NcG+Z+Uwcy73a2XfK1YguqpxFnwayDHGZQgMJOr/U7+REabKEIu3HjlQ878201xYAPHpMiApuApSY2asZ2YiNUVFqXwJ6vcxdF8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=r0+i+o/z; arc=pass smtp.client-ip=74.125.224.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF113DBA0;
+	Tue,  7 Apr 2026 15:14:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775574842; cv=none; b=QdKEMoXXL2gmzfJxKP9iMhT/i7Y8Boc7ta3Qw7vz/X/kM10TzdgUTaWdn68kxm8H+yuoB6mmssElUvWfaqptlMvw+r9oo/uMWH4ydthTLt2kPGNv8vADRYTw9mDoY1Bc1KjwV9Vlh71NkzB/Ka1nyrGAgAHhq/FP5sQZ4x5YZsQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775574842; c=relaxed/simple;
+	bh=VC7jsNAs9QZh8ziLQ1KaaOM+a4C6+0jnsTlBljF2OTs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IzyDwIuRVpC2XTZmF96bgincFo166Kx4kzGVrANdorjh6h7QZou1v04llC2CmHRx7CdKSpmv6xYRlKWzf5+Q9R8RBzwKcKYAR72awP40xlkegZXG8iRW82hSHwWRxxw64ugyztn/rwHbwnZuIRqiRF0VqgZFj0TDCFe8RyaQvuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=3oXHwoeq; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r0+i+o/z"
-Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-64ef161129bso4174746d50.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2026 07:55:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775573705; cv=none;
-        d=google.com; s=arc-20240605;
-        b=hsb4BYHuVJmuUs9QKjja6EznZAUU0IrTeTg5QUH2PuBuUM3pVV7/WNXloVgaXbLwAi
-         NuVi+DeH91AoA0qKbZRhRLMje8nfP4P/J+tkEFtv+0qgBy27yc4gQX5fkp7w5i6g+v+T
-         vvhuHQl+C+f1ZHaoN3SFFJrn0dwY3U6gI1c8pcUn71GGmfZyciYHUe8JGf7y79k7ve/1
-         ysOnUfab7DS+u0jlgfP4+rA3wwrXpglI552EJTQRz1rt/GzMGMxrwcVRCPitreWBuNie
-         QCaCYuWBOTrBv4AHxQcjS49RmzWQOGAGYzdaoiKVBKfjOG0BErffLj+yI5qNLSGHk8qj
-         S7eg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=7O+zSSK3GIsBsnq81maqI5w/67B+NUUKHtZOyjDy8dE=;
-        fh=6EeECuHNuBLCqlaYjGRBxONu/+r2ru0fCrTPKK5dPvY=;
-        b=lcQ90DFfg3R9CKDmXVCuM8yYacPHdC1UO7XgrDDeRRokC6wVkULalqwqJ+vQUSl9QE
-         dYR1wK80EIYSz+KjSC09+JHPFdabvZOKCwy2BuSvVbzyJByYrPnICmbAegu2zW8d5sJy
-         NPabuupOaIWHkoj80Oy1bfs2O+9Urolr+kfSfZiBnlur4fVTKDkYu+nr0FBLQc+TXxKF
-         QDk1aUuZ7BSMw212q55jA7V2X4tk3WciPVR6mEtipxl2Ls5wJeB1FFMEEU51N2AXvSqc
-         H6a0WTlFLa/B4x/g68jfXWpt5NpQb31C4QKdbmciJXZDlYoOURTgkIPY+yFyIsZytzz0
-         Q4WQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775573705; x=1776178505; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7O+zSSK3GIsBsnq81maqI5w/67B+NUUKHtZOyjDy8dE=;
-        b=r0+i+o/zeWSLfN0XzAMGmKZWSVREhRuVusA3eDieXxAMStAN39S2mwVS0sHmY3jgXl
-         neRJklJbLx0HyhITCkzRedM5PvOHKggCvz9mtBW6E7ZgS2hFFzvfk+XU+1nHrNcS1iYR
-         CcORtD+C9ildMe1Ar6WzYo7A9+UYFhjZGAaMWs3mgBzY1wTDdZt5I+ZjkvP4vBpQCqry
-         uCg3MmapL0QLUWK3q5mLskxjOAfo+9pvmaO2n3iBupOoGbjqjb+UvotRdZmrsoizZAtC
-         3koYhaKtG/bAOzTGsDCCPoGFoWBB5TQWpiCVLA81m8gOQ4ImpCBgJPmUulrL5+Vw/1p/
-         4/EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775573705; x=1776178505;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7O+zSSK3GIsBsnq81maqI5w/67B+NUUKHtZOyjDy8dE=;
-        b=iyJlLSH72kaZZUxWvaKUcojGCIlYoX3RngZ8oOdzQtLR6XLhvdR5W8X9UNJ8GjS0K7
-         sOr2qMKvxrO3BOP+1h2L3sR+qytESV6ExUoskuhLrwUsWwhaaTtxZVXNAE7aIFPldOVf
-         432gad3XFqtVWyCIxUDnsqLVYcHyNe5T3zte4dQYZjkvpPKyPGuSJzjwYqa5VkDjccDL
-         BJkkMwW6rV1ToLRmMEeNLuBl2yHSBRbyoipepFjshcKM/Ic8qsjubeziI8QeWuAkyUz4
-         UrUN6MHle574WQtTFLHSd2xU11z3N7N/YOcfD4xca2VaYwGHudUGSuaNoVFmUSvtr9lx
-         X6ww==
-X-Forwarded-Encrypted: i=1; AJvYcCVNG3cm7526SJ2BM/hnpOZ51kLI4JfmwflPsrlQsgvGkDSAXurF4uvATnWV4gbl7WdCZQxD0mAy+V+M/T2ZDvc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/i3lMSSAZPRHOfua65izKaDs1MCrhzfaw7S7oMSS5fTYEa3S2
-	CBDboxTpFud1j6svNxigvdg8M5v1cmI9fbFZ+SqmJkJP1qLu+4JM4rdhCPYyr2Tn+Fm7hYLMbrH
-	PYKikpbLZd/vq6+g9fEP21j+O3eVv/PA=
-X-Gm-Gg: AeBDieuvway49P75rXoP6BVdNx1d96O/mJ0RvqLWVwmfo1deRj2MhBTTkyWGMHdek8Y
-	3R4BzfTv3NfNU5OhGPwq60GjoJDAYFjqGclIur2iGt8mBYjRC9HHsbHYqgIOuUYRp1iPO/CXgyn
-	0MuvVvjI3lv7b7/Hh/dnI7t1QMK7LOMiPXRqzSaGj/5I67RRCFiZ+UcC8d/bHQYtYXmOKg8fINa
-	W4TRRU11LicBQvy1H87UpA6kWOZUHODQZsX5NdugZcYI5tuemjlv/rRoluuqhGWX5skoY3HA0ka
-	jFf03g4E6Cg3yFx6ZiAVxnweAg9t/WFVIR1l2Zomt5YVxoHC6UcDOqx0PnB+dQAnNS552TuywVp
-	ZPw==
-X-Received: by 2002:a05:690e:1482:b0:650:7a8a:f89e with SMTP id
- 956f58d0204a3-6507a8afa29mr3439862d50.9.1775573705119; Tue, 07 Apr 2026
- 07:55:05 -0700 (PDT)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="3oXHwoeq"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=q3E9RpQIFAshZuQuM1y0ZwcAbjG07hubtATqv00A1AE=; b=3oXHwoeqqtD+j+iEuUVu+iTkkP
+	lNr/muZjxStgPMApjdBX+AXpwVypfE2IXRp1HlzPokufMgJ7CN2No/0R1mnxjMMTmGrcGLdnXK6Vg
+	xFm8t/h+IRRBkaHUXopI22V0YYtj6hO+yJOICXcibxarx827H9IY0VRRk5gad81TL17YiEt+FC1sr
+	oTJJ3k1FBdvD/AmdkHDERdfUa5yMA4khW81gyZ6DbjXi2NjcolXxsFQWJKXlrkrnj/eFR1rO503x8
+	/d6zdEgBKxaq96ldERM8/k+IJVN61AURXmmG27oZZ7G2Pnic+prWS5gKaxwj41EjU8iGxo1E/m3kN
+	vhIl4BwHkInORATH3AzS2MMBCeoXP1FiM0+xMliKe1P6KYIv2+zCz6My0jacp2e+USSstH8ifylU1
+	zaUHnduBtqmcrdcl8o1LjTLOYpcx7FMsxmaUEv7gXZzQvjscVd+LH8sJ2cOAUPXouKu/A647p+ql0
+	v7AOKR1HNklZJiXCwZoEK1aE;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wA87o-00000007X39-3dSB;
+	Tue, 07 Apr 2026 15:13:57 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: metze@samba.org,
+	Michal Luczaj <mhal@rbox.co>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	David Wei <dw@davidwei.uk>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: SCO: check for codecs->num_codecs == 1 before assigning to sco_pi(sk)->codec
+Date: Tue,  7 Apr 2026 17:13:45 +0200
+Message-ID: <20260407151345.126999-1-metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260407114851.3087886-1-chris.lu@mediatek.com>
-In-Reply-To: <20260407114851.3087886-1-chris.lu@mediatek.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 7 Apr 2026 10:54:53 -0400
-X-Gm-Features: AQROBzAHknm1LcaBHn6KcplFZfkI-H597cHtdCF_vlpcMyfjpqsUG1hHk8Yd4sw
-Message-ID: <CABBYNZ+xi_ktCMSeXP_aNTVLZzKoz+Ye4gFZFvF7eiMRZcULww@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: btmtk: add event filter to filter specific event
-To: Chris Lu <chris.lu@mediatek.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>, 
-	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>, 
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-mediatek <linux-mediatek@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Chris,
+copy_struct_from_sockptr() fill 'buffer' in
+sco_sock_setsockopt() with zeros, so there's no
+real problem.
 
-On Tue, Apr 7, 2026 at 7:48=E2=80=AFAM Chris Lu <chris.lu@mediatek.com> wro=
-te:
->
-> Add an event filter to filter event with specific opcode to prevent BT
-> stack from receiving unexpected event.
->
-> Event with opcode 0xfc5d is generated when MediaTek's Bluetooth enable
-> firmware logs and is not expected to be sent to userspace.
->
-> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
-> ---
-> v1 -> v2: update commit message
-> ---
->  drivers/bluetooth/btmtk.c | 22 ++++++++++++++++++++++
->  drivers/bluetooth/btmtk.h |  7 +++++++
->  drivers/bluetooth/btusb.c |  2 ++
->  3 files changed, 31 insertions(+)
->
-> diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-> index 55516b4602db..302d6ddf9062 100644
-> --- a/drivers/bluetooth/btmtk.c
-> +++ b/drivers/bluetooth/btmtk.c
-> @@ -1503,6 +1503,28 @@ int btmtk_usb_shutdown(struct hci_dev *hdev)
->         return 0;
->  }
->  EXPORT_SYMBOL_GPL(btmtk_usb_shutdown);
-> +
-> +int btmtk_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
-> +{
-> +       struct hci_event_hdr *hdr =3D (void *)skb->data;
-> +
-> +       if (hdr->evt =3D=3D HCI_EV_CMD_COMPLETE) {
-> +               struct hci_ev_cmd_complete *ec;
-> +               u16 opcode;
-> +
-> +               ec =3D (void *)(skb->data + HCI_EVENT_HDR_SIZE);
-> +               opcode =3D __le16_to_cpu(ec->opcode);
-> +
-> +               /* Filter vendor opcode */
-> +               if (opcode =3D=3D 0xfc5d) {
-> +                       kfree_skb(skb);
-> +                       return 0;
-> +               }
-> +       }
-> +
-> +       return hci_recv_frame(hdev, skb);
-> +}
-> +EXPORT_SYMBOL_GPL(btmtk_recv_event);
->  #endif
->
->  MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
-> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-> index adaf385626ee..08b73927c8f3 100644
-> --- a/drivers/bluetooth/btmtk.h
-> +++ b/drivers/bluetooth/btmtk.h
-> @@ -218,6 +218,8 @@ int btmtk_usb_suspend(struct hci_dev *hdev);
->  int btmtk_usb_setup(struct hci_dev *hdev);
->
->  int btmtk_usb_shutdown(struct hci_dev *hdev);
-> +
-> +int btmtk_recv_event(struct hci_dev *hdev, struct sk_buff *skb);
->  #else
->
->  static inline int btmtk_set_bdaddr(struct hci_dev *hdev,
-> @@ -296,4 +298,9 @@ static inline int btmtk_usb_shutdown(struct hci_dev *=
-hdev)
->  {
->         return -EOPNOTSUPP;
->  }
-> +
-> +static inline int btmtk_recv_event(struct hci_dev *hdev, struct sk_buff =
-*skb)
-> +{
-> +       return -EOPNOTSUPP;
-> +}
->  #endif
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index f9d515ee9124..daf8a387e660 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -4150,6 +4150,8 @@ static int btusb_probe(struct usb_interface *intf,
->         } else if (id->driver_info & BTUSB_MEDIATEK) {
->                 /* Allocate extra space for Mediatek device */
->                 priv_size +=3D sizeof(struct btmtk_data);
-> +
-> +               data->recv_event =3D btmtk_recv_event;
->         }
->
->         data->recv_acl =3D hci_recv_frame;
-> --
-> 2.45.2
+But it actually looks strange to do this,
+without checking all of codecs->codecs[0]
+really comes from userspace:
 
+  sco_pi(sk)->codec = codecs->codecs[0];
 
-https://sashiko.dev/#/patchset/20260407114851.3087886-1-chris.lu%40mediatek=
-.com
+As only optlen < sizeof(struct bt_codecs) is checked
+and codecs->num_codecs is not checked against != 1,
+but only <= 1, and the space for the additional struct bt_codec
+is not checked.
 
-Both issues seem valid to me. That said, I wonder if it wouldn't have
-been better to allow drivers to register with its own struct
-hci_ev/struct hci_cc tables, that way the driver can extend event
-parsing rather than intercepting it and performing custom parsing
-which can lead to bugs like the ones mentioned above.
+Note I don't understand bluetooth and I didn't do any runtime
+tests with this! I just found it when debugging a problem
+in copy_struct_from_sockptr().
 
+I just added this to check the size is as expected:
 
---=20
-Luiz Augusto von Dentz
+  BUILD_BUG_ON(struct_size(codecs, codecs, 0) != 1);
+  BUILD_BUG_ON(struct_size(codecs, codecs, 1) != 8);
+
+And made sure it still compiles using this:
+
+  make CF=-D__CHECK_ENDIAN__ W=1ce C=1 net/bluetooth/sco.o
+
+Fixes: 3e643e4efa1e ("Bluetooth: Improve setsockopt() handling of malformed user input")
+Cc: Michal Luczaj <mhal@rbox.co>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: David Wei <dw@davidwei.uk>
+Cc: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+---
+ net/bluetooth/sco.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index b84587811ef4..359eabf7dddb 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -1045,7 +1045,13 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
+ 
+ 		codecs = (void *)buffer;
+ 
+-		if (codecs->num_codecs > 1) {
++		if (codecs->num_codecs != 1) {
++			hci_dev_put(hdev);
++			err = -EINVAL;
++			break;
++		}
++
++		if (optlen < struct_size(codecs, codecs, codecs->num_codecs)) {
+ 			hci_dev_put(hdev);
+ 			err = -EINVAL;
+ 			break;
+-- 
+2.43.0
+
