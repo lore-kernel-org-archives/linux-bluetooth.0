@@ -1,95 +1,128 @@
-Received: from out-2.smtp.github.com (out-2.smtp.github.com [192.30.252.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586D522083
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Apr 2026 21:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0263C278156
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Apr 2026 22:19:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775597606; cv=none; b=Q1pQ7yJT8LC816+2oAXwhsIufLGG5p9uOUa3eYq1WbRrjTUwLl697nR2psDFy7wFgpkjCR9IGqDELqy+In/691rodw2Nk0Eiz6+cVwHah+aueMIyVYryk4BU55V06jyn5A33AZDjlci3DreWiO3Y1YocCqEuDPFglMfwIfjnaLs=
+	t=1775600390; cv=none; b=mRZ/uY5S8XCEn53K5WlqtBnrAYFfJSDBgzouCkw8Nl65TpKFo8jhaZ1iXp9LhUhMLUK29g9Zk6hbR0+Bmt4k+i2XV6M6ZemuOxpa6GZj01RW+yXArEn5zNPs2ryuN79KLfSjubCv9WzQ30dfOM+X7Mo7cnRKvwjciZcOBpcm9iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775597606; c=relaxed/simple;
-	bh=3USYTVV+CoW9g3pHF8dMlNDHfxyHb19EfjbED7lMrMw=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=rs6ZTJfa3x4n1wCejCIQrUT5X7D53I+tbOZM1TytyBkQCtOWeBi6nUdXFm4oqo4/gd4Cid8qvG0iqpgi/hPhAddgw467JnIbHURLFmnlLDg2XeSxdkXLUuEIbgfXiYkujge7D6mFMtJ/xcOclRGrLH76lymFNQ1mAsdP7Hqshlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ba9Xz0ng; arc=none smtp.client-ip=192.30.252.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1775600390; c=relaxed/simple;
+	bh=TozuIud1KJsR7G7rniOSDguUeI6lTC+3O5PzzCZ5hLo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=bFq9waZ/FDfn0ncKNdzJdgpU8vr7Nz4ITaw2R8PO7HjD1wIp4VGhR6xu39XEWa9nbNfYy1kE0bi1IvjF43UPHSap+6E4Wu/ezTKwMpfMmlX21vlmLJdhTwjFPAEN8XRKHmPIDLvujLqMxPt+ZOpBcY5Gk870WWKmANfHnAIObZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S7eyGv4S; arc=none smtp.client-ip=74.125.82.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ba9Xz0ng"
-Received: from github.com (hubbernetes-node-48454f9.va3-iad.github.net [10.48.85.29])
-	by smtp.github.com (Postfix) with ESMTPA id 5A53C2C1016
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Apr 2026 14:33:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1775597604;
-	bh=UKoC1EADd+kMqiKXPEhP6wjYsJ+W0sTUpWe4INYb1pw=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=ba9Xz0ng2Gq9S1SAptqs8U312jSw1l6iQYgs6lTC/9sCvTOzkWzYPrbMRD6497eWJ
-	 yruSeY4AMuyCqtgKHOfCDwez0HuW7plae5fZnaS9cDrfuekZ+JB6eOUQyb4B9NqV4M
-	 7il3ldiEpHjg9fxdzINdGUnpi1QExj3IhvwlwraU=
-Date: Tue, 07 Apr 2026 14:33:24 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1078371/000000-4013af@github.com>
-Subject: [bluez/bluez] a95380: device: Fix btd_device_connect_services not
- discov...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S7eyGv4S"
+Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-2ba895adfeaso6038971eec.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2026 15:19:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775600388; x=1776205188; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=jJYtjCBYXVsmFTQ+8KGDUwS1Cp0PWW6byM3fQmTHsp4=;
+        b=S7eyGv4SDtZiwHkrnpnhN77gTroOraLQG+GbQAw2Sgzdsuwy23bEtVgEJmy9aRA+t8
+         5M0VlOocW6y878jGU0wDlvKhWzQ+KollW8jMeW9GZALgE43u8o385kz3wScXZfogbp5g
+         ZZTsIJcBt5dsq7NUXe+Vkj5cbYT3RZH+xtCa35qWIZKZtoMAIRL+bcEw9tprEGvE5UIU
+         MFuH8PhfumrB1rE7AomaxKVCBzj57Lpb+HVatpXjyHdkH+PIwsC71HABjdXEZ3WN4QaX
+         dIo9BW/UCkmEagGgDuoo4VupB5GffkyGGmhtOvS2LYof6L/JE2l4RbaEgnNWzcGqD4z5
+         UczQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775600388; x=1776205188;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jJYtjCBYXVsmFTQ+8KGDUwS1Cp0PWW6byM3fQmTHsp4=;
+        b=ZZLCsCVsEmIHkiRRz0FPcY4ii1r9aIeJPm2LqnuykEfUE+RhPTVprf6YMLHHuf5tvT
+         33tnYYF0KHIZa875WeJ9yaN4BC8RnqlPllk/E5LcdyL8V7OEknCiQm28qY9BUSDEf6jK
+         90xShPfsXt7qxN0ELgf6W69SNQwprt2EFRiYM+3bjEJJb483QyYbIWhqqZz5VtN3Sg/a
+         klksLBg0VVkbDOA1dDkd2HvLjB3OelJAjJI7OIlPKr0i1m/9kfMrXRrCWrsBrZcYcHQh
+         YzRRWVxiorM+TrYOhW2Ub8QaZZyv8M7qVLIds8CfzXiFEns4DRadKS2bP7gNcldHpl17
+         9e8Q==
+X-Gm-Message-State: AOJu0YwPTaHxoUZj37GIRp7nZTHL0QBEO+1ySo/cCghXHSvRV5ELRi5z
+	mzN62B4d270hCUu4l4EqJv+V9RZQr8bdk4zUTuHHvldRBrjpeHbQd9GhHEhZlw==
+X-Gm-Gg: AeBDieuR0x9Xcy0f+czjw6LeNt2MjfYtP9xJgcdrkp6xLHVCBBjSK99Pbjv2qvBghuW
+	LfuqRcYhfT5kQy6XX8kuFPBQ2svjE1grrO0EowwYpOMzzeIuOGVBHOAS6W2RaKErdNKzDxLd2e6
+	APWk4e5Ix7lHcbNxS/030gI2ufbpruLCNLKR5Imcq7oomfMRPpw/Xy9Otv7gMFtY3fG8O6l5IoR
+	X+ClmdE3D8x29lJ3U/4WJ19Z9y81wKSdZwkv+Qdoneu35hJDfu6DsKamlA1CX0sJyF4PQ/ex+XK
+	7gIHKufQOhMR4D3KlKHP0c54tlGGBfV0jfsvXDbDtXgY7eL1Z6iNh+0pX57FaqNSsBoxAvElbV3
+	52SblKJPShDQixgaPNeXN1T/j91pOXapg+TuA5YBAtsYUwRKS/MADJSVCkupqMmLGZNKuPwThKq
+	edzsXA8DiUgzbawFUv3Cx0j5NXDHa6/PM=
+X-Received: by 2002:a05:7300:214d:b0:2c4:c4ef:48f7 with SMTP id 5a478bee46e88-2cbf9afd2e8mr10069162eec.11.1775600387663;
+        Tue, 07 Apr 2026 15:19:47 -0700 (PDT)
+Received: from [172.17.0.2] ([20.171.126.212])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2cee97ff4e8sm9955181eec.25.2026.04.07.15.19.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Apr 2026 15:19:47 -0700 (PDT)
+Message-ID: <69d58303.050a0220.e6bae.dc19@mx.google.com>
+Date: Tue, 07 Apr 2026 15:19:47 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6206466609750828110=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1,1/2] device: Fix btd_device_connect_services not discovering
+In-Reply-To: <20260407211229.61232-1-luiz.dentz@gmail.com>
+References: <20260407211229.61232-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============6206466609750828110==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1078371
-  Home:   https://github.com/bluez/bluez
-  Commit: a9538003a81014b7ddfb4f8effea72d67de69a13
-      https://github.com/bluez/bluez/commit/a9538003a81014b7ddfb4f8effea72d67de69a13
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-04-07 (Tue, 07 Apr 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M src/adapter.c
-    M src/device.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  device: Fix btd_device_connect_services not discovering
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1078371
 
-btd_device_connect_services would not attempt to discover in case the
-selected bearer is BR/EDR and once discover is complete then it shall
-proceed with connecting the services.
+---Test result---
 
+Test Summary:
+CheckPatch                    PENDING   0.35 seconds
+GitLint                       PENDING   0.48 seconds
+BuildEll                      PASS      20.04 seconds
+BluezMake                     PASS      633.51 seconds
+MakeCheck                     PASS      18.28 seconds
+MakeDistcheck                 PASS      242.67 seconds
+CheckValgrind                 PASS      291.12 seconds
+CheckSmatch                   PASS      345.76 seconds
+bluezmakeextell               PASS      180.75 seconds
+IncrementalBuild              PENDING   0.43 seconds
+ScanBuild                     PASS      1014.54 seconds
 
-  Commit: 4013afdfbe12a5ec353d5f7769e4caa1a9947b6c
-      https://github.com/bluez/bluez/commit/4013afdfbe12a5ec353d5f7769e4caa1a9947b6c
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-04-07 (Tue, 07 Apr 2026)
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-  Changed paths:
-    M client/main.c
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-  Log Message:
-  -----------
-  client: Prompt user to start scanning on connect command
-
-If connect command don't find the device object make it prompt the
-user to start scanning and set discovery filter pattern to given
-address and mark it to auto-connect:
-
-[bluetoothctl]> connect XX:XX:XX:XX:XX:XX
-Device XX:XX:XX:XX:XX:XX not available
-[XX:XX:XX:XX:XX:XX] Scan and connect (yes,no): y
-SetDiscoveryFilter success
-Discovery started
-[NEW] Device XX:XX:XX:XX:XX:XX
-[NEW] BREDR /org/bluez/hci0/dev_XX:XX:XX:XX:XX:XX
-[CHG] Device XX:XX:XX:XX:XX:XX Connected: yes
-[CHG] BREDR XX:XX:XX:XX:XX:XX Connected: yes
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Compare: https://github.com/bluez/bluez/compare/a9538003a810%5E...4013afdfbe12
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+https://github.com/bluez/bluez/pull/2023/checks
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6206466609750828110==--
