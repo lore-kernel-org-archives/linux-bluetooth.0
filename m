@@ -1,28 +1,28 @@
 Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506EE145B3F;
-	Tue,  7 Apr 2026 07:15:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B871FF7C7;
+	Tue,  7 Apr 2026 07:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775546117; cv=none; b=kDNYHmlzG5tp18p0KtxVXCYR1xivrW0m44pKchxanFODHhBLRLnaipz+z8yr6Ctkb0JuNlrJd3g+ENS3GpRB7g8yMMbe6K8MolDDxHHfXiqvtUrBg3Df2doSAjbarz4X9XSlk5dq50ZcDY7PmhzBTgCretxEpW167onD1cn1cXQ=
+	t=1775547539; cv=none; b=IhiIfiPmRITFBiYU0nqHmFHxhh3U4EgQ/bvVAE0mt+NVpLpi19tdaMn2Xeewe4ieIvJrGUPFsUa6AziVYa1sYkOGJfNcL4cCO9Lryfeo7lQAV67JM2bCXLC2BjlyuFMD4+k50fw2I9VEPgzM7K13K57wRxEmhIhMo77l3IC73oo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775546117; c=relaxed/simple;
-	bh=lF+ijmtXIsNwy3xPpOBGwdy/F4psjobzs+8c4hB7TW8=;
+	s=arc-20240116; t=1775547539; c=relaxed/simple;
+	bh=JUVfQu1ciF/IbtPK8QjFKuzK0SKjLq8UrrGu3FJ9xAA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lALXi6d7x0rk8NQunRvJPUbqjsjQXi0xGIiFor4iB9bSF+upMJfjIy3dxs++3EYPWKpdrxPhKo5ajkoG7E5/5nzdClc2D+PFAlyWciA08xp2oMof6I5NDBu1gTHD9VShAV6HBWJnITE6SKVavuFqqVWz8bUGPQyf7/4iqa0iWRA=
+	 In-Reply-To:Content-Type; b=BuyuM7A52vr1Y9Ch4w+qpTjZUxVTq64iJaYfJ1fMAupji/X5x2sZC0UhS5T2h2U0v4eN9WTLDRlZcNoqY1ABfjH9aYX3myp/FpCKO/k0+fFheo1KLa1yx3JvEHiH10IjPYuizNajj2T8SKzsUGtmBgBrytHyPl7jBbrakKRk++w=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.44.15] (unknown [185.238.219.34])
+Received: from [141.14.13.172] (g427.RadioFreeInternet.molgen.mpg.de [141.14.13.172])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 49A204C2C37D7A;
-	Tue, 07 Apr 2026 09:14:33 +0200 (CEST)
-Message-ID: <abdf652a-f7e1-4641-bfd9-c0cfc20cca6d@molgen.mpg.de>
-Date: Tue, 7 Apr 2026 09:14:29 +0200
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 1852A4C2C37D7D;
+	Tue, 07 Apr 2026 09:38:40 +0200 (CEST)
+Message-ID: <e1aa637e-1139-4328-8ff7-e5c023dcb200@molgen.mpg.de>
+Date: Tue, 7 Apr 2026 09:38:36 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -30,8 +30,7 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: btmtk: add event filter to filter specific
- event
+Subject: Re: [RESEND PATCH v1] Bluetooth: btusb: MT7922: Add VID/PID 0e8d/223c
 To: Chris Lu <chris.lu@mediatek.com>
 Cc: Marcel Holtmann <marcel@holtmann.org>,
  Johan Hedberg <johan.hedberg@gmail.com>,
@@ -39,10 +38,10 @@ Cc: Marcel Holtmann <marcel@holtmann.org>,
  Will Lee <will-cy.Lee@mediatek.com>, SS Wu <ss.wu@mediatek.com>,
  Steve Lee <steve.lee@mediatek.com>, linux-bluetooth@vger.kernel.org,
  LKML <linux-kernel@vger.kernel.org>, linux-mediatek@lists.infradead.org
-References: <20260407064759.3036650-1-chris.lu@mediatek.com>
+References: <20260407065053.3037036-1-chris.lu@mediatek.com>
 Content-Language: en-US
 From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260407064759.3036650-1-chris.lu@mediatek.com>
+In-Reply-To: <20260407065053.3037036-1-chris.lu@mediatek.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
@@ -51,98 +50,72 @@ Dear Chris,
 
 Thank you for the patch.
 
-Am 07.04.26 um 08:47 schrieb Chris Lu:
-> Due to some Bluetooth hosts have mechanism to detect invalid events,
-> causing abnormal behavior.
-
-Sorry, this description is much too short and general. Please elaborate, 
-and document details.
-
-> Add a event filter to prevent debugging events from being sent to host.
-
-a*n*
-
-What are debugging events, and how can they be detected?
-
-> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
-
-Should there be a Fixes: tag, so it gets backported?
-
-> ---
->   drivers/bluetooth/btmtk.c | 22 ++++++++++++++++++++++
->   drivers/bluetooth/btmtk.h |  7 +++++++
->   drivers/bluetooth/btusb.c |  2 ++
->   3 files changed, 31 insertions(+)
+Am 07.04.26 um 08:50 schrieb Chris Lu:
+> Add VID 0e8d & PID 223c for MediaTek MT7922 USB Bluetooth chip.
 > 
-> diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-> index 55516b4602db..302d6ddf9062 100644
-> --- a/drivers/bluetooth/btmtk.c
-> +++ b/drivers/bluetooth/btmtk.c
-> @@ -1503,6 +1503,28 @@ int btmtk_usb_shutdown(struct hci_dev *hdev)
->   	return 0;
->   }
->   EXPORT_SYMBOL_GPL(btmtk_usb_shutdown);
-> +
-> +int btmtk_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
-> +{
-> +	struct hci_event_hdr *hdr = (void *)skb->data;
-> +
-> +	if (hdr->evt == HCI_EV_CMD_COMPLETE) {
-> +		struct hci_ev_cmd_complete *ec;
-> +		u16 opcode;
-> +
-> +		ec = (void *)(skb->data + HCI_EVENT_HDR_SIZE);
-> +		opcode = __le16_to_cpu(ec->opcode);
-> +
-> +		/* Filter vendor opcode */
-> +		if (opcode == 0xfc5d) {
-> +			kfree_skb(skb);
-> +			return 0;
-> +		}
-> +	}
-> +
-> +	return hci_recv_frame(hdev, skb);
-> +}
-> +EXPORT_SYMBOL_GPL(btmtk_recv_event);
->   #endif
->   
->   MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
-> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-> index adaf385626ee..08b73927c8f3 100644
-> --- a/drivers/bluetooth/btmtk.h
-> +++ b/drivers/bluetooth/btmtk.h
-> @@ -218,6 +218,8 @@ int btmtk_usb_suspend(struct hci_dev *hdev);
->   int btmtk_usb_setup(struct hci_dev *hdev);
->   
->   int btmtk_usb_shutdown(struct hci_dev *hdev);
-> +
-> +int btmtk_recv_event(struct hci_dev *hdev, struct sk_buff *skb);
->   #else
->   
->   static inline int btmtk_set_bdaddr(struct hci_dev *hdev,
-> @@ -296,4 +298,9 @@ static inline int btmtk_usb_shutdown(struct hci_dev *hdev)
->   {
->   	return -EOPNOTSUPP;
->   }
-> +
-> +static inline int btmtk_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
->   #endif
+> The information in /sys/kernel/debug/usb/devices about the Bluetooth
+> device is listed as the below.
+> 
+> T:  Bus=07 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0e8d ProdID=223c Rev= 1.00
+> S:  Manufacturer=MediaTek Inc.
+> S:  Product=Wireless_Device
+> S:  SerialNumber=000000000
+> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+> A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> I:  If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+> I:* If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+> E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+> 
+> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+> ---
+>   drivers/bluetooth/btusb.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
 > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index f9d515ee9124..daf8a387e660 100644
+> index a5e44887a5b5..5f264ac843f5 100644
 > --- a/drivers/bluetooth/btusb.c
 > +++ b/drivers/bluetooth/btusb.c
-> @@ -4150,6 +4150,8 @@ static int btusb_probe(struct usb_interface *intf,
->   	} else if (id->driver_info & BTUSB_MEDIATEK) {
->   		/* Allocate extra space for Mediatek device */
->   		priv_size += sizeof(struct btmtk_data);
-> +
-> +		data->recv_event = btmtk_recv_event;
->   	}
->   
->   	data->recv_acl = hci_recv_frame;
+> @@ -721,6 +721,8 @@ static const struct usb_device_id quirks_table[] = {
+>   						     BTUSB_WIDEBAND_SPEECH },
+>   	{ USB_DEVICE(0x04ca, 0x38e4), .driver_info = BTUSB_MEDIATEK |
+>   						     BTUSB_WIDEBAND_SPEECH },
+> +	{ USB_DEVICE(0x0e8d, 0x223c), .driver_info = BTUSB_MEDIATEK |
+> +						     BTUSB_WIDEBAND_SPEECH },
+>   	{ USB_DEVICE(0x13d3, 0x3568), .driver_info = BTUSB_MEDIATEK |
+>   						     BTUSB_WIDEBAND_SPEECH },
+>   	{ USB_DEVICE(0x13d3, 0x3584), .driver_info = BTUSB_MEDIATEK |
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
 
 Kind regards,
