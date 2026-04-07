@@ -1,326 +1,158 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F69639BFE7;
-	Tue,  7 Apr 2026 12:09:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448C63B3C0C
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Apr 2026 12:30:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775563772; cv=none; b=F1bYyQb61cJ/1veaki8W9naSFnRBoqDDUMoczCnLtpC9ZLfctbywptTyW98cAR+qbT9SlEBR8FSvtCldk9zEnlzEvnstwEZbWuzE0m7HSSSdhk1vF+RSMGCpzEO9p8lb3vlAKHL9/zoBKRlDGF59wFujC4bOFHZtU5Npm4UxPzY=
+	t=1775565039; cv=none; b=H69K9CSLiQqsYLfzFH/IUW29vsL+iem85YsNNNyCfRU12g7yO6Xum+wEd/ZAKMeS/T2kH7Qran5o/gHERLgHewwrmNOrH58qaG/CNnmGVRXumQpB1SRpds5DqnJi0zZZXWc5nVW7nT/DkRNZ0219nNJb7RCX5nVaLc4WEE+tCS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775563772; c=relaxed/simple;
-	bh=MA/16xgPpr6e24Jp3Irwq/t17AycVTq4l79wFF2Amw4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=GBP3UmA/cvXEe2vZ7rSQadWdwxSnCL3nu7xsxZAOhXfhF3QRepZ2QRF7gHMpGdc4cw+Ba1bBM/rjtS5Z+Pk2zbK0MrsftOzcTKoxqTW97eEngrYoGVzPgvcSoSmIUyFLaGnVUt5fkDb4xj3hfNLvNZ37kJIxbfeLuNtJ/DgxOqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f+ZnMjH9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775565039; c=relaxed/simple;
+	bh=PfQVsweOVY8q0zVO/86wSNJt1czQShucDM/McOaa4Y4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=sOu+zELMR432BXN90QUGty0Prt/CybJZsZ+EE/NxWT2LEeXI8xwjRvAgSzV3XpKRP832ryD3RspsP3/rEx0La5eqeora6ANt37qzSCceS+EXs3dyqXl8UI2LS0pliV3b6VV8TsPLx3EdZyqziNQ6rHW+3K3Q5ZNxOAvR1RxwPPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MkmzZsIN; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f+ZnMjH9"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EC931C116C6;
-	Tue,  7 Apr 2026 12:09:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775563772;
-	bh=MA/16xgPpr6e24Jp3Irwq/t17AycVTq4l79wFF2Amw4=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=f+ZnMjH9u95W+KecgH1M5djCLLZnJ2HGZ7KjMf3gVFzXfg4lq3jCo+mxR/E9egmnh
-	 kXHaO5RLfZs70qR1kR+ZFxDvck468UjNzYFmkXVbvcIDzf6b1nYV1LByIVsJPqZ1wA
-	 EMWm0IjAuL6xPC8bbCOa4WtknGR1GqgmdRkdK9YIqLxMS921b6lvGNUCSqQB8Owk0m
-	 0e1QTOckyMRkmXbedowUvPjEMDHRePabm4d0WGawZsN5H4MJ2emhZu3KlbGx9SI4jG
-	 tKLj9tu4uQonVasdEfh4FNoilbjgCiwzzvpjvdTz2w60DecGM+MQJR2wWT0I/w7ujF
-	 tDaRgL20q7bkg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D74E4FEEF29;
-	Tue,  7 Apr 2026 12:09:31 +0000 (UTC)
-From: Sasha Finkelstein via B4 Relay <devnull+fnkl.kernel.gmail.com@kernel.org>
-Date: Tue, 07 Apr 2026 14:09:14 +0200
-Subject: [PATCH] Bluetooth: Add Broadcom channel priority commands
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MkmzZsIN"
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8cfdac74050so596668685a.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2026 05:30:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775565037; x=1776169837; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=LiF3T9JlLwXmlHcZgP3arwRoE29/KtsdxI8PiO++/cg=;
+        b=MkmzZsINCBJOyoHLnvnSSHUtMR0gRxsjTjaRq555hN7O2TD4HBut7FNrlaEsbFdI3g
+         9EkmtSKHe2sPt/Jw63Jk1ii0g77j1DwxRGuDm2msQ5UGwfOQB6Cd7U+1rQQGFwgscRQl
+         mdatiMfnZXYIHgT4YirisaCaqp+zeTpepwmE3yX/GRlOXFtMDlfXq5ojow11CfWRVAMq
+         8DeLbVqIn9nv0MlZ9mtw7R51yqRttaZ4z5jgb6nRTFf03lZ3RLe2jxclZqGCEMXdKY3J
+         GjjBuD5zp0VsuPEr2vQIJjHSKKb1SQmTondGOkCMeFbuYiPiljqpX9l4O/EEyKG/NiCL
+         fLjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775565037; x=1776169837;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LiF3T9JlLwXmlHcZgP3arwRoE29/KtsdxI8PiO++/cg=;
+        b=C+dZEUDBvt/4EZix/sIWPIe3Do9XDovdeAiDim+tUHQzoSW0WakuGeJq4M5IzqpQMW
+         l3lUl80UTKCYeNzq4D/HlQqPWsz7NZzoQ3KDK4AYg0hAafl2/HlR3T4j4irjOiHlDRkr
+         pCuJLHDxboT0N51wp/EN5ckSzTjg3oJz7qKsu7UbLuN2+wc7r2ORuD1lhMtGol1BU8Xj
+         4NDI2oHZ0NfzJ7dUY82ziKlQsNEnX7M0HBa2n96n3u57nn05+fgmqqNpbnEiMISJFJ/V
+         wmpCwipLga/43UqQ6/QmNgmRhoQbXbswJ61lEW/G2FtlwmKhbC4Bjcq2AYrhJbiRiokh
+         HnYQ==
+X-Gm-Message-State: AOJu0YxG3RTUq5ZD62IP+TXpLC6P6KyW6+9nWHYe6+PDslQfjpvfaZ/l
+	sNoVctH8Aamv4avFX5HIfLZ+1GVPaHifGzL6N9duLnb7O8stERQkMKjZvy40tw==
+X-Gm-Gg: AeBDieud5Bjv/SPYw5j8Vz2Eg7AOVH0g++II0lXePsVcqBKg2B3rrqFifzaApZ08+5y
+	1UW222uS+wBJObIoIrSI98/GiEK1tIO7zhRbonKyvml+ob9TWjTCvkloNVeTuOMQOZFwqZhERB8
+	44u+/7z+7yNjyQplgo482EbzxpJj1Bpn28zsCeVrc2AETzwkDJ9TrDN4cK4DjnMRy1HAwcEs3J7
+	O54GVQoQY1d5ZNm6oVL1OTaQfLGMgtLtyH9D+63MN0x6JQRSlRcJpDuFrUpeV2k5oouSwPjIGMd
+	PdaIwVex2PFQbEaZ2rKA4KGXbY/BwT7DwnepeWQnXVw5IlUk7LWG1X8nflvN743Vz0tlClHM3rh
+	qssj2I8ALvea3MTaEtSCdzgwGJHOVxMyF/Aly3kDOeRixcWLZCy84EW6JdELqcsI24yX2RB8uWr
+	K8i5ok1BplbdV+7qNWvD9GyzbCwwWskMVP3TFE0U092Q==
+X-Received: by 2002:a05:620a:2844:b0:8cb:4d18:bb53 with SMTP id af79cd13be357-8d41ec0dfe6mr2343433885a.64.1775565036506;
+        Tue, 07 Apr 2026 05:30:36 -0700 (PDT)
+Received: from [172.17.0.2] ([172.178.119.21])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8d2a5a6764esm1350206685a.13.2026.04.07.05.30.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Apr 2026 05:30:36 -0700 (PDT)
+Message-ID: <69d4f8ec.050a0220.c64e0.8f48@mx.google.com>
+Date: Tue, 07 Apr 2026 05:30:36 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8449304564358802206=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
+Subject: RE: [v2] Bluetooth: btmtk: add event filter to filter specific event
+In-Reply-To: <20260407114851.3087886-1-chris.lu@mediatek.com>
+References: <20260407114851.3087886-1-chris.lu@mediatek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============8449304564358802206==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260407-brcm-prio-v1-1-f38b17376640@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIzMDEwNz3aSi5FzdgqLMfN0kM2ODVLPkZGMLYxMloPqCotS0zAqwWdGxtbU
- AfbxXPlsAAAA=
-X-Change-ID: 20260407-brcm-prio-b630e6cc3834
-To: Sven Peter <sven@kernel.org>, Janne Grunau <j@jannau.net>, 
- Neal Gompa <neal@gompa.dev>, Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-kernel@vger.kernel.org, asahi@lists.linux.dev, 
- linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
- netdev@vger.kernel.org, Sasha Finkelstein <fnkl.kernel@gmail.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1775563770; l=7872;
- i=fnkl.kernel@gmail.com; s=20241124; h=from:subject:message-id;
- bh=gg4x5lEmIqKFrASgP0xO22e+G2K7V8H9TMkHZhq7+QY=;
- b=vbmIOo8yojBRUh3vdplseWSQTA6tBL5Ublusuh3CS9xPiTabxvXlO4ioFtSCo6ffq9mj/H1I+
- flNVNUJaGSeBgHsyPMZP7NVDSsx61c3wUNqJn5Pu53GVlZW04KseeMm
-X-Developer-Key: i=fnkl.kernel@gmail.com; a=ed25519;
- pk=aSkp1PdZ+eF4jpMO6oLvz/YfT5XkBUneWwyhQrOgmsU=
-X-Endpoint-Received: by B4 Relay for fnkl.kernel@gmail.com/20241124 with
- auth_id=283
-X-Original-From: Sasha Finkelstein <fnkl.kernel@gmail.com>
-Reply-To: fnkl.kernel@gmail.com
 
-From: Sasha Finkelstein <fnkl.kernel@gmail.com>
+This is automated email and please do not reply to this email!
 
-Certain Broadcom bluetooth chips (bcm4377/bcm4378/bcm438) need ACL
-streams carrying audio to be set as "high priority" using a vendor
-specific command to prevent 10-ish second-long dropouts whenever
-something does a device scan. This series adds an ioctl to control
-the priorities and hooks it up for the relevant chips.
+Dear submitter,
 
-Signed-off-by: Sasha Finkelstein <fnkl.kernel@gmail.com>
----
- MAINTAINERS                      |  2 ++
- drivers/bluetooth/hci_bcm4377.c  |  2 ++
- include/net/bluetooth/hci_core.h | 12 ++++++++++++
- include/net/bluetooth/hci_sock.h |  7 +++++++
- net/bluetooth/Kconfig            |  7 +++++++
- net/bluetooth/Makefile           |  1 +
- net/bluetooth/brcm.c             | 29 +++++++++++++++++++++++++++++
- net/bluetooth/brcm.h             | 17 +++++++++++++++++
- net/bluetooth/hci_conn.c         | 11 +++++++++++
- net/bluetooth/hci_sock.c         |  4 ++++
- 10 files changed, 92 insertions(+)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1078124
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c3fe46d7c4bc..81be021367ec 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2562,6 +2562,8 @@ F:	include/dt-bindings/pinctrl/apple.h
- F:	include/linux/mfd/macsmc.h
- F:	include/linux/soc/apple/*
- F:	include/uapi/drm/asahi_drm.h
-+F:	net/bluetooth/brcm.c
-+F:	net/bluetooth/brcm.h
- 
- ARM/ARTPEC MACHINE SUPPORT
- M:	Jesper Nilsson <jesper.nilsson@axis.com>
-diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
-index 925d0a635945..5f79920c0306 100644
---- a/drivers/bluetooth/hci_bcm4377.c
-+++ b/drivers/bluetooth/hci_bcm4377.c
-@@ -2397,6 +2397,8 @@ static int bcm4377_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	if (bcm4377->hw->broken_le_ext_adv_report_phy)
- 		hci_set_quirk(hdev, HCI_QUIRK_FIXUP_LE_EXT_ADV_REPORT_PHY);
- 
-+	hci_set_brcm_capable(hdev);
-+
- 	pci_set_drvdata(pdev, bcm4377);
- 	hci_set_drvdata(hdev, bcm4377);
- 	SET_HCIDEV_DEV(hdev, &pdev->dev);
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a7bffb908c1e..ef3b5433203c 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -642,6 +642,10 @@ struct hci_dev {
- 	bool			aosp_quality_report;
- #endif
- 
-+#if IS_ENABLED(CONFIG_BT_BRCMEXT)
-+	bool			brcm_capable;
-+#endif
-+
- 	int (*open)(struct hci_dev *hdev);
- 	int (*close)(struct hci_dev *hdev);
- 	int (*flush)(struct hci_dev *hdev);
-@@ -1791,6 +1795,13 @@ static inline void hci_set_aosp_capable(struct hci_dev *hdev)
- #endif
- }
- 
-+static inline void hci_set_brcm_capable(struct hci_dev *hdev)
-+{
-+#if IS_ENABLED(CONFIG_BT_BRCMEXT)
-+	hdev->brcm_capable = true;
-+#endif
-+}
-+
- static inline void hci_devcd_setup(struct hci_dev *hdev)
- {
- #ifdef CONFIG_DEV_COREDUMP
-@@ -1812,6 +1823,7 @@ int hci_get_conn_list(void __user *arg);
- int hci_get_conn_info(struct hci_dev *hdev, void __user *arg);
- int hci_get_auth_info(struct hci_dev *hdev, void __user *arg);
- int hci_inquiry(void __user *arg);
-+int hci_set_acl_prio(struct hci_dev *hdev, void __user *arg);
- 
- struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *list,
- 					   bdaddr_t *bdaddr, u8 type);
-diff --git a/include/net/bluetooth/hci_sock.h b/include/net/bluetooth/hci_sock.h
-index 13e8cd4414a1..95d156ac4cae 100644
---- a/include/net/bluetooth/hci_sock.h
-+++ b/include/net/bluetooth/hci_sock.h
-@@ -91,6 +91,8 @@ struct hci_ufilter {
- 
- #define HCIINQUIRY	_IOR('H', 240, int)
- 
-+#define HCISETACLPRIO	_IOW('H', 250, int)
-+
- /* Ioctl requests structures */
- struct hci_dev_stats {
- 	__u32 err_rx;
-@@ -171,6 +173,11 @@ struct hci_inquiry_req {
- 	__u8  length;
- 	__u8  num_rsp;
- };
-+
-+struct hci_acl_prio_req {
-+	__u16 handle;
-+	__u8  high_prio;
-+};
- #define IREQ_CACHE_FLUSH 0x0001
- 
- #endif /* __HCI_SOCK_H */
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index 6b2b65a66700..0f2a5fbcafc5 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -110,6 +110,13 @@ config BT_AOSPEXT
- 	  This options enables support for the Android Open Source
- 	  Project defined HCI vendor extensions.
- 
-+config BT_BRCMEXT
-+	bool "Enable Broadcom extensions"
-+	depends on BT
-+	help
-+	  This option enables support for the Broadcom defined HCI
-+	  vendor extensions.
-+
- config BT_DEBUGFS
- 	bool "Export Bluetooth internals in debugfs"
- 	depends on BT && DEBUG_FS
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index a7eede7616d8..b4c9013a46ce 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -24,5 +24,6 @@ bluetooth-$(CONFIG_BT_LE) += iso.o
- bluetooth-$(CONFIG_BT_LEDS) += leds.o
- bluetooth-$(CONFIG_BT_MSFTEXT) += msft.o
- bluetooth-$(CONFIG_BT_AOSPEXT) += aosp.o
-+bluetooth-$(CONFIG_BT_BRCMEXT) += brcm.o
- bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
- bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
-diff --git a/net/bluetooth/brcm.c b/net/bluetooth/brcm.c
-new file mode 100644
-index 000000000000..d03d2af5dc7e
---- /dev/null
-+++ b/net/bluetooth/brcm.c
-@@ -0,0 +1,29 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2026 The Asahi Linux Contributors
-+ */
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+
-+#include "brcm.h"
-+
-+int brcm_set_high_priority(struct hci_dev *hdev, u16 handle, bool enable)
-+{
-+	struct sk_buff *skb;
-+	u8 cmd[3];
-+
-+	if (!hdev->brcm_capable)
-+		return -EOPNOTSUPP;
-+
-+	cmd[0] = handle;
-+	cmd[1] = handle >> 8;
-+	cmd[2] = !!enable;
-+
-+	skb = hci_cmd_sync(hdev, 0xfc57, sizeof(cmd), cmd, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
-+
-+	kfree_skb(skb);
-+	return 0;
-+}
-diff --git a/net/bluetooth/brcm.h b/net/bluetooth/brcm.h
-new file mode 100644
-index 000000000000..a501f2988a96
---- /dev/null
-+++ b/net/bluetooth/brcm.h
-@@ -0,0 +1,17 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2026 The Asahi Linux Contributors
-+ */
-+
-+#if IS_ENABLED(CONFIG_BT_BRCMEXT)
-+
-+int brcm_set_high_priority(struct hci_dev *hdev, u16 handle, bool enable);
-+
-+#else
-+
-+static inline int brcm_set_high_priority(struct hci_dev *hdev, u16 handle, bool enable)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+#endif
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 11d3ad8d2551..b2c7414a9c5b 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -35,6 +35,7 @@
- #include <net/bluetooth/iso.h>
- #include <net/bluetooth/mgmt.h>
- 
-+#include "brcm.h"
- #include "smp.h"
- #include "eir.h"
- 
-@@ -2775,6 +2776,16 @@ int hci_get_auth_info(struct hci_dev *hdev, void __user *arg)
- 	return copy_to_user(arg, &req, sizeof(req)) ? -EFAULT : 0;
- }
- 
-+int hci_set_acl_prio(struct hci_dev *hdev, void __user *arg)
-+{
-+	struct hci_acl_prio_req req;
-+
-+	if (copy_from_user(&req, arg, sizeof(req)))
-+		return -EFAULT;
-+
-+	return brcm_set_high_priority(hdev, req.handle, req.high_prio);
-+}
-+
- struct hci_chan *hci_chan_create(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 0290dea081f6..4be6aeeb6bad 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -1035,6 +1035,9 @@ static int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd,
- 		if (!capable(CAP_NET_ADMIN))
- 			return -EPERM;
- 		return hci_sock_reject_list_del(hdev, (void __user *)arg);
-+
-+	case HCISETACLPRIO:
-+		return hci_set_acl_prio(hdev, (void __user *)arg);
- 	}
- 
- 	return -ENOIOCTLCMD;
-@@ -1072,6 +1075,7 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
- 	case HCIGETAUTHINFO:
- 	case HCIBLOCKADDR:
- 	case HCIUNBLOCKADDR:
-+	case HCISETACLPRIO:
- 		break;
- 	default:
- 		return -ENOIOCTLCMD;
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.37 seconds
+GitLint                       PENDING   0.27 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      26.90 seconds
+CheckAllWarning               PASS      29.05 seconds
+CheckSparse                   PASS      28.90 seconds
+BuildKernel32                 PASS      25.66 seconds
+TestRunnerSetup               PASS      573.77 seconds
+TestRunner_l2cap-tester       PASS      28.14 seconds
+TestRunner_iso-tester         PASS      44.53 seconds
+TestRunner_bnep-tester        PASS      6.49 seconds
+TestRunner_mgmt-tester        FAIL      116.25 seconds
+TestRunner_rfcomm-tester      PASS      9.49 seconds
+TestRunner_sco-tester         FAIL      14.51 seconds
+TestRunner_ioctl-tester       PASS      10.54 seconds
+TestRunner_mesh-tester        FAIL      12.59 seconds
+TestRunner_smp-tester         PASS      8.66 seconds
+TestRunner_userchan-tester    PASS      6.76 seconds
+IncrementalBuild              PENDING   1.00 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.106 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.619 seconds
+Mesh - Send cancel - 2                               Timed out    1.993 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
 
 ---
-base-commit: bfe62a454542cfad3379f6ef5680b125f41e20f4
-change-id: 20260407-brcm-prio-b630e6cc3834
-
-Best regards,
--- 
-Sasha Finkelstein <fnkl.kernel@gmail.com>
+Regards,
+Linux Bluetooth
 
 
+--===============8449304564358802206==--
