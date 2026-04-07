@@ -1,142 +1,158 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67FD3D649F;
-	Tue,  7 Apr 2026 16:03:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC581397E83
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Apr 2026 16:14:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775577847; cv=none; b=EGYDAU/M2hO6Z9xYHV76nObReZm/j2ha1HRY47mX2pbLoZfbRjhhOWBx01MbawmmMnDA3SOkMaS4vgG81fU8Pq24/fhQ+OE7CPYy1OVMkUaBKGDuVDh+9wgDoyBBSZGVsSdZtxkxl+ikqK/gnN/HycfYN+xQMYrBmO91fdXArXo=
+	t=1775578482; cv=none; b=FqbK2UeMgBCol0ss4mvreM4YQnaAOXKQJzC/MUjBFbAjc7ZEIlJy2wAYfDNOPWVYckKzESjeDYTAYseARLrkcSms+huLouFFO7ZS37kLOiDM28jxLfZt8TqJpfs4MmMq/gl1vxZ7T/wc9PxthnB/PE2qnzOHPxTaOBD1y0LFIsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775577847; c=relaxed/simple;
-	bh=TAHbJ8shCUysdP4d22ZFghQI2jeDo3bLaktPKkLvi3w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nTCBuMGuI7UzrgBriEaItGSM6MQPQ051SG/PGy3Tlrm/ee1Ol8XAYNhYsS8+k7CKfxYWPv88aI6TryITXxstC/3Ats0kof4LAvDfcCEHPib8ARmHlkLQUQZPmGjBFwkEAt4vYuwEdUOw7zeyDjgdA0Z7CLVUoiPYFYA9ULz8g2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=bh2U4TGB; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1775578482; c=relaxed/simple;
+	bh=QbCPDKlH3cgapl6FlowH/IKKnIZ5VRya1KnLgEI6s8c=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=SsmO5FoEFmpuzCTS6WuMkAfhh2/Zz8F0yioJoYa9T9grKzYZD6t/tpM9CpDS+FuMru/vR766c80dQuCmLLnjlpk757v2xqZQm3iAf/MluuWIlLQCCWXXNB2ykRSkb2pWHqJFRRpy/7NGwCrMAUAsXG8TuWdCVB8Ye9qbTXsYiCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fdj5yT7q; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="bh2U4TGB"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=vIAh/1ZMFfnKbOCb9A/NbitCMcGGjkXhI3WpqSRlpLI=; b=bh2U4TGB9VGY9vtQW4X15pPD7Q
-	5CjfNPNASTyFRx6XQjQqK+GSVYy66EPSINPXK0EovcAWjWAaGH2Uej/8dyqRJn4uloBr2wf40GGGk
-	6Pm/oEIml6zdFeUwm3ivA5WGeXSDOQec/gly5IlQzvKoeoVcUMpuX6JBrmHaQEjX29DCMPsSAFH2L
-	dgeJplxifyTCW7xVUk+dosT7gneAwH1xcXCDoEmWn5S8cZX3/DrY/+4pvSmLiIjjGaPPdtZtR8aaw
-	iP9CEC2RPHZz3KQ64pf+XmMgejT7UxqN1PDVhDlPpSvuCWuN5xu9R1YOWZ8vJHTV6JNr/feYTtInf
-	pyyFLqrQzSn17xuUhzSFxLrEIJMVfHA74JYd3zLDj22RK/edgGoQ6EPlGFn83PZ4j4AQUYFpwQsWF
-	WghxJGTlOb7/6XAurEngk2aQOriVo/6iJmJ5/d8Tz5pwdr+KuVXWvyGPjlCJ0Pbng5z7/stjrtyje
-	MPWJ6YI9AUGLYXmZFS5fQGDw;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wA8uC-00000007Xkj-1c22;
-	Tue, 07 Apr 2026 16:03:56 +0000
-From: Stefan Metzmacher <metze@samba.org>
-To: linux-kernel@vger.kernel.org
-Cc: metze@samba.org,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Dmitry Safonov <dima@arista.com>,
-	Francesco Ruggeri <fruggeri@arista.com>,
-	Salam Noureddine <noureddine@arista.com>,
-	David Ahern <dsahern@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Michal Luczaj <mhal@rbox.co>,
-	David Wei <dw@davidwei.uk>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Xin Long <lucien.xin@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Aleksa Sarai <cyphar@cyphar.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Kees Cook <keescook@chromium.org>,
-	netdev@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/5] sockptr: introduce copy_struct_to_sockptr()
-Date: Tue,  7 Apr 2026 18:03:17 +0200
-Message-ID: <c950ee1578cb93b4411c3731010def9c1cd82f0d.1775576651.git.metze@samba.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1775576651.git.metze@samba.org>
-References: <cover.1775576651.git.metze@samba.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fdj5yT7q"
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-8c70b5594f4so4703485a.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Apr 2026 09:14:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775578479; x=1776183279; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=T/4zEaf7FCiOXnkHw+kYBxBwaPjzQWcog5B8cKl7YuM=;
+        b=Fdj5yT7qfj7Pk9bQCfkQ+4wQJCEnMAJRzCzgj7RPFrObdTUAdGJCa+2+F9NmaoSbFL
+         L8FbvBt6aA/8mLzwYnctFFWUkCn1OItHTPNjT4vYVDB1SCgG+GuPRkOvKNarCUCcb0F0
+         0U1tZ4AOdgM6yoGxHmXDyDZ5D2BoloZHTgjzHrHPhaS8M0PxN1k677fBNVgBlTJWGBpz
+         i1vhYNf7t1BYa+0h7yAz91v+v52qavANwvX3UgjO8DjzP1N0tGmuwke8tGti5FKN6seJ
+         CUfe2wv/mMaZhfWkqiZ8DqE67CzqkL7h9OYw7PwCO4V+txMj65QcRbgobx6Cgt94t8FI
+         rdLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775578479; x=1776183279;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T/4zEaf7FCiOXnkHw+kYBxBwaPjzQWcog5B8cKl7YuM=;
+        b=BW5i9M7gxiXmEsOyqhoPBPQ8Dp6x0AD+B+tkydUYP4BcHCrQhX5y6S4pqu4L73rfqp
+         WJPoqyCw1+PsZFTSDovCbZYtv9762DTKgdso34H1QckMIdRqOXNhLLX1PhY64lY90CBD
+         NT7c9312wF+9Xh5JEGI9oz913S4J+SE7vhcxRlbvqwVqSyhFuIQgmrTYzgpru7iCfC63
+         vnBXvKTsGM8qh9f1RNz6BCTrze7GK5ZvLM5ffB5M8vSF6UmMum90RCCEUeoCsiYYqRL2
+         zFhqEJ0fm4cy9AR9G+39DjV9e2RMW07XPKj90/FWqy+eAOYIJgWe4gIIxfo9vo/48FWi
+         9qpw==
+X-Gm-Message-State: AOJu0Ywf04gg2ILpGesj21rleJpkAPqFDwlu6CDVHYcko7AqinSsjNrq
+	UX1wjviKkCMOyRRcLJanajeDKJ4XaknlUwBxxLaUYJMPCZHKIl2BpPJePSzZ8A==
+X-Gm-Gg: AeBDievEPP3DN094J4z9A/VR+hu8qyf88bTBTgxSyJYdvtiKGe8MclqouIOO3/k3mrj
+	zW0Y1vgGSQ+jkr0o+iHrM2CiZFf/21+zSDc3t5uexO3rDzHJozmRpkr69Eg4HS0ZZYo2OnIOOEq
+	F1bCDLTrf4Ri4f2URUcymy6vE+7u2r7NjoYUdf4HoaxVIW6DCZy4upI+yu6piMDCmAjb225+bPi
+	UjgxVjKj07IiMTnu9S0Vukn1v/NqiwivCOfWCkLxmOvUi6+PkwBnjZbMtN1Iw1xgkBdKBQDYpT6
+	pSKepAXqu8zfqbgfApstVOgMWNik521SzEoY1oiPs/RWnxRGwpmOSO4ZibkLTuYt2uioXaLne1x
+	Ti82CCcn8VF1RhnCby8aRpXQzAuI7PRL0vdt/jgx8U8+sH7AHSx+lLj8RNMNuDf+WsIotRveCSa
+	RLnZPGVckwNBGIIcsUcysPn0WJ5UmD8pTHBUomDB27
+X-Received: by 2002:a05:620a:199d:b0:8cd:b024:114d with SMTP id af79cd13be357-8d3042cd918mr2323278085a.40.1775578479437;
+        Tue, 07 Apr 2026 09:14:39 -0700 (PDT)
+Received: from [172.17.0.2] ([40.116.73.185])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8a593330593sm167389636d6.3.2026.04.07.09.14.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Apr 2026 09:14:38 -0700 (PDT)
+Message-ID: <69d52d6e.d40a0220.6c5b6.1701@mx.google.com>
+Date: Tue, 07 Apr 2026 09:14:38 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5472314047731399165=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, metze@samba.org
+Subject: RE: Bluetooth: SCO: check for codecs->num_codecs == 1 before assigning to sco_pi(sk)->codec
+In-Reply-To: <20260407151345.126999-1-metze@samba.org>
+References: <20260407151345.126999-1-metze@samba.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-We already have copy_struct_from_sockptr() as wrapper to
-copy_struct_from_user() or copy_struct_from_bounce_buffer(),
-so it's good to have copy_struct_to_sockptr()
-as well matching the behavior of copy_struct_to_user()
-or copy_struct_to_bounce_buffer().
+--===============5472314047731399165==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The world would be better without sockptr_t, but having
-copy_struct_to_sockptr() is better than open code it
-in various places.
+This is automated email and please do not reply to this email!
 
-I'll use this in my IPPROTO_SMBDIRECT work,
-but maybe it will also be useful for others...
-IPPROTO_QUIC will likely also use it.
+Dear submitter,
 
-Cc: Dmitry Safonov <0x7f454c46@gmail.com>
-Cc: Dmitry Safonov <dima@arista.com>
-Cc: Francesco Ruggeri <fruggeri@arista.com>
-Cc: Salam Noureddine <noureddine@arista.com>
-Cc: David Ahern <dsahern@kernel.org>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Michal Luczaj <mhal@rbox.co>
-Cc: David Wei <dw@davidwei.uk>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Xin Long <lucien.xin@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Willem de Bruijn <willemb@google.com>
-Cc: Neal Cardwell <ncardwell@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Aleksa Sarai <cyphar@cyphar.com>
-Cc: Christian Brauner <brauner@kernel.org>
-CC: Kees Cook <keescook@chromium.org>
-Cc: netdev@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1078240
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.38 seconds
+GitLint                       PENDING   0.29 seconds
+SubjectPrefix                 PASS      0.44 seconds
+BuildKernel                   PASS      24.36 seconds
+CheckAllWarning               PASS      26.63 seconds
+CheckSparse                   PASS      25.66 seconds
+BuildKernel32                 PASS      23.82 seconds
+TestRunnerSetup               PASS      514.18 seconds
+TestRunner_l2cap-tester       PASS      27.33 seconds
+TestRunner_iso-tester         PASS      38.62 seconds
+TestRunner_bnep-tester        PASS      6.27 seconds
+TestRunner_mgmt-tester        FAIL      111.68 seconds
+TestRunner_rfcomm-tester      PASS      9.25 seconds
+TestRunner_sco-tester         FAIL      14.31 seconds
+TestRunner_ioctl-tester       PASS      10.02 seconds
+TestRunner_mesh-tester        FAIL      11.61 seconds
+TestRunner_smp-tester         PASS      8.56 seconds
+TestRunner_userchan-tester    PASS      6.63 seconds
+IncrementalBuild              PENDING   0.53 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.104 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3782
+Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.969 seconds
+Mesh - Send cancel - 2                               Timed out    1.995 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- include/linux/sockptr.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/linux/sockptr.h b/include/linux/sockptr.h
-index 706a8526cf3c..9c2429c1a570 100644
---- a/include/linux/sockptr.h
-+++ b/include/linux/sockptr.h
-@@ -107,6 +107,16 @@ static inline int copy_to_sockptr(sockptr_t dst, const void *src, size_t size)
- 	return copy_to_sockptr_offset(dst, 0, src, size);
- }
- 
-+static inline int
-+copy_struct_to_sockptr(sockptr_t dst, size_t usize, const void *src,
-+		       size_t ksize, bool *ignored_trailing)
-+{
-+	if (!sockptr_is_kernel(dst))
-+		return copy_struct_to_user(dst.user, usize, src, ksize, ignored_trailing);
-+
-+	return copy_struct_to_bounce_buffer(dst.kernel, usize, src, ksize, ignored_trailing);
-+}
-+
- static inline void *memdup_sockptr_noprof(sockptr_t src, size_t len)
- {
- 	void *p = kmalloc_track_caller_noprof(len, GFP_USER | __GFP_NOWARN);
--- 
-2.43.0
 
+--===============5472314047731399165==--
