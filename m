@@ -1,68 +1,72 @@
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A84D37754C
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Apr 2026 20:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4371D37754E
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Apr 2026 20:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775679268; cv=none; b=dRU2CqL+QUQ3N9QrvDzRlaKUlgj/fvc4MKIWu6LzYeX5Is5uP6UmyaPph9HcVmKe6Vj7CLUd1XIvqBQyJMmxhtvAG2WQ+DeF5APUYRzLrpp4QtdGN8wrD/9UcXqCE4DEvuWqPNiMf7RBsNzD7Ux1cAt10CNO6z3P3kSCA9PBgIY=
+	t=1775679269; cv=none; b=Euq0cRmLe17cICDckLa0bK3cxPzyVN5jNkXTmNDpS0bwVb8sm6pmEVyTiGEq0LaGavDMGoySvvfERQu2y2ryNKk5dASJQG58o6450nCl8zbVmtF601QdivB2qHxUVQ4+V+cgMIQehmi0h+2isfhRZgWHKlwshh3fbA+E5I1vyIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775679268; c=relaxed/simple;
-	bh=cLueYuXPRXrEtmcsRJp5N8hbm8RBUvkyXmbTAgpTJ4M=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Q83YVcrnycd6neYnR7t9BYRMrV6OL9Lz1DOiVX/f/hX130jYvtIe684xWYQxtWcpfnMWpVcI4kTe2F0pZPsSlwx/l6XZScAEkUjCj4UA8K//TcUpqCLOKX/YxX4+utXYN5AM5vVQIBdcJeLgKBwcaoYcaAHOZwcSE4PbkYKmZ4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jFxsOyBg; arc=none smtp.client-ip=209.85.221.175
+	s=arc-20240116; t=1775679269; c=relaxed/simple;
+	bh=ZRSOc/LyLfrF8wS8wmDwfvdqiq5801vJOs/TeTG1/LM=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=d6p2xqiPhZQGSxdacqE9LJAKpurTragS2B9ld1qYIlnR8zXZFnJQVcJ+3CzxGBnCkM6IMzaZZL38UrS5G2HAFCbFwTQntXKTghFk4fytoeamMu97z9REy0/nJm47P/4SInyqofzaGPpfHFvwbdnmTD5T0ttI1KxQifc71I8z19M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZaUgK5mU; arc=none smtp.client-ip=209.85.222.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jFxsOyBg"
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-56db1b3626bso74492e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Apr 2026 13:14:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZaUgK5mU"
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-953acf7ae20so60014241.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Apr 2026 13:14:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775679266; x=1776284066; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AAAT29BiVvyrPoVuH3xD+9nhk6leM/U8wh7yovvVAAw=;
-        b=jFxsOyBgKGZvSxJFadmEFQM8hRcRMifZVqQ9p0VnPsl94z4bxSceB0Uk5SJO1GoTyS
-         y2GfStO7cvUIRRo14cpz2YS+lgAathEddwKSMLTFa3kAuh5QP/qHB6qlPnhvtNA8g+mL
-         qjI9B3dKM9k46JQLQ5FgI2SW2Esbg/d/YBaqFNq9O7ShdnDgrAIhNLvU3otdBD8jL1b+
-         18Rex8Y0+2PDIDxXp85Wiui3lsO7/MNKxOJpe+vpwr7k/Ms6gaHLygP5extnBNnFXtFz
-         l0fHMaaQUs2UDnri3QymwHsEnfNK/Pzbslv0ytStSsPOyhUcDYYMmWtXWmcVJTluioOQ
-         j8SA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775679266; x=1776284066;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20251104; t=1775679267; x=1776284067; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=AAAT29BiVvyrPoVuH3xD+9nhk6leM/U8wh7yovvVAAw=;
-        b=l+OAbWLDzz3/sVgnJgJeFK6F2IrV4Of7+bRkhQdwM7TMJY+aM0IHjHVYHALMeWayoY
-         yAsL8BRiEwL67IF4zeOkXNqhAn+q6aLmkC10FQETlm+SG8JucqFH97tK0VRsJBufoujA
-         Ow5ZNTGnJbV9rp5UX6ltoHK9dohHREsk3kEGWbhQO6tejuZNSMP1xZlOTa89PKW3Y8oI
-         0N/6dQxhvgG7YBswtQXqBiKpTvl547K49rata0PnITbnnlMx1BfZ3wWtNC/xYU9fNNTc
-         sYygMeLsWEAY5CPIyB/yn8cy9MHEMv1vSgFUFjsmjKf23bKTyM1m0CtswrYqgltQVlDr
-         aJLg==
-X-Gm-Message-State: AOJu0YyotxiDKn5V8OnuZAODEBWjvYQkgr8VrsokO3KsU5maCOzDA58B
-	BSdO8e3daB3bha8u6z/XHu8LgzaOlYGw5GmFf0iWptKyPTxzqzKy1zuF4gNqSzd3x5w=
-X-Gm-Gg: AeBDievn7+qhg24rkymNwz4Kx408VpRFZMYVWmGNDhplTfCHtxEok+869r7dEE4yJ08
-	uQX2rUfl/kJqrMiftfsjayjwLBpTJzxkOA5CsTa/R5Rn/8bcOiBIMhK29pm4/yu+fthAPAZYRo5
-	Y8CoJVErs16cM7L93hC5blL7rp/Mrnsf0KgjrJfQUTAFKrVKSUmYJZ5aVI1FxYdLX1ja8sse492
-	O0du9DK2OGh4vTYk/YJ1Caf2681BUJwmwckI1MFk3Ygbt8ah/lH/r6vcJn9r0IrrvCZ6thhNWGv
-	waF6MabpwZtj/7PF9ofzMaGFIsxDOOxKxxxcK0D4E9vvnT5DKa+07/p4veu9DfhNX/EK6UpbqF3
-	TlYFwFNM3Agk0d9N4caTo7tAzJ2si+aKca/Yl5Yn9T2xpMvkH8kBIpj4HAHcWauKgQtEqZ1/7n4
-	Sk/SE/4FrGXiFQG1VU6olQR+Vd7EugYKnlcBDZwsA58aI/CkLtd71UdvbeecPjL03UqyT7ZfJIY
-	St2J+C/ys489TZX5wxOUwxR8Qr+
-X-Received: by 2002:a05:6102:6443:b0:608:9f39:fe90 with SMTP id ada2fe7eead31-6089f3a122bmr122404137.24.1775679265851;
-        Wed, 08 Apr 2026 13:14:25 -0700 (PDT)
+        bh=+eNJI/AsewBmy3J6FAVfzCU9BTAoCsqOSano2s+reVY=;
+        b=ZaUgK5mUm9SbKMShejnmF6D277vfa4fRBmVJoiChnBgmzPOQzypF5sLedDyhHwpLDy
+         2T4ac3VLj2QSG80Tp6dtcvMrosTxiA3owWQhM92RamkabcJWDUkQt9Fr6+a6sxSg9Un0
+         PwUx8TRq0qW/GDZoR4JhB/j8AgM81wOFxahW36IQ3SnfC8kViuwXiYZKidqyMLXSceJD
+         QLpwdm0VCyGaIVD5aB/4Nys4K2YDMXkxCI9R1CKMrpQGcCbLyx+5h46/5tQtywvWwi9a
+         0Th4JKeQtGku9zRD+1WnVyI7nsP7DJFK9ubjm1Z/jlLIqpAVAgjO/HpfNrCvPdE56/Dx
+         hhOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775679267; x=1776284067;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+eNJI/AsewBmy3J6FAVfzCU9BTAoCsqOSano2s+reVY=;
+        b=ZbEtXLxPtutRmIqHz3YMG1zIZm+sHgrqg+yBfKAa9ZzXmx0YJxDRyKeVFL1IF3gW4o
+         OL7xdo+fzDXKJamz8hnA04pZE1n7JYfe78/jN8LDm4tr1cxY/m7Sd4IHmTTpbYtdfglg
+         ToAz1se1FauHj3Ve6xPWYElHVdGnj9gkHj+AfQoD+RyWRJXZB+FwHWpJnlHScutgTIRu
+         doZTfPCOqJKk9HOJ7fiD5Si/4qZW7zbVE122O8SCDClZdwXbYGet3WRiN08ovjzanOZ9
+         p8qN3J5IdQtivppcMEDXi2HRDPO2uWinDs247CAvmf+EgJ2mW6etDv3Pd6zT0lpXcdsC
+         EmCA==
+X-Gm-Message-State: AOJu0Yw6STvLdMYQISkJjK4fkTjmAU2BHmSgwZdyjtZndppzh5HOJ4dW
+	GrO559rYqQO2UHHuYyp986vS4Ynshwp4bov38eB6X7g845opMaBJy7YZtb++U7AhMGY=
+X-Gm-Gg: AeBDieuIYQt0Ow+7T19KuXeWxsSRx1UXbFLos3KxjD/xfhanNKZB58JJzgEkmLKmtAK
+	RZHhWkszE8g0tk1yJx8EG4wSyCHV7XGuUork6GlZHyg8xMNWw/+Vadq+KsjJ3F5ickCHLtxlGbx
+	fS/lYWh2K5hRlDbTscEPJENHKW16HatIuUHUUL30+4Udbiyn2nc1ZaBWZfiKOd80Hzzvvm4Lk29
+	u/qXdC2f2TrQlzkwNefJyIofl3AENqUOv5DP8n3VA0HKXZ+ALKlCVfeHc8jJ1QdRKKKcK+QvqCu
+	wPJZE4v+As/vvS/er53Rrq+b1X/9IW3scvOyR56RpgKl2kN7XGgWqYJE2WCF6V+yarLsRFdd1Ze
+	BstYIOJZFWO/a54fO6CBvkyTREEQkca4Y8st3CiBLjfvSYQ8+45BHyjpv6kHnZq3wsdZB6/wBNo
+	g4HLc7dHp3mq7HXNN8ZcKB8Wtac/lFR4zicJpRuecu3kEJpDcCxn93R3exoJFnuOfQHr64SeaSd
+	U6Lwl+2o4YX+ADDBg==
+X-Received: by 2002:a05:6102:6a8b:b0:604:df34:b769 with SMTP id ada2fe7eead31-6087004796amr403403137.14.1775679267039;
+        Wed, 08 Apr 2026 13:14:27 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-60583098fa7sm21071024137.10.2026.04.08.13.14.24
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-60583098fa7sm21071024137.10.2026.04.08.13.14.26
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Apr 2026 13:14:25 -0700 (PDT)
+        Wed, 08 Apr 2026 13:14:26 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/2] shared/gatt-server: Add bt_gatt_server_set_permissions
-Date: Wed,  8 Apr 2026 16:14:14 -0400
-Message-ID: <20260408201415.488511-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 2/2] main.conf: Add GATT.Security option
+Date: Wed,  8 Apr 2026 16:14:15 -0400
+Message-ID: <20260408201415.488511-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260408201415.488511-1-luiz.dentz@gmail.com>
+References: <20260408201415.488511-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,73 +77,172 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds bt_gatt_server_set_permissions which can be used to
-enabled/disable permission checking before operations which can be
-useful on testing only environment where encryption/pairing is not
-desirable/needed.
----
- src/shared/gatt-server.c | 13 +++++++++++++
- src/shared/gatt-server.h |  2 ++
- 2 files changed, 15 insertions(+)
+This adds GATT.Security option which by default is set to auto to
+detect if encryption/authentication is required on demand, but if
+Testing is set enables the user to enter a desirable security level.
 
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index 27ae7e79ed3d..6273899965c0 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -93,6 +93,7 @@ struct bt_gatt_server {
- 	struct bt_att *att;
- 	int ref_count;
- 	uint16_t mtu;
-+	bool perms;
+In case the security level is low it then proceeds to disable checking
+GATT attribute permissions for server operations.
+---
+ src/btd.h     |  1 +
+ src/device.c  | 16 +++++++++++++---
+ src/main.c    | 35 +++++++++++++++++++++++++++++++++++
+ src/main.conf |  8 ++++++++
+ 4 files changed, 57 insertions(+), 3 deletions(-)
+
+diff --git a/src/btd.h b/src/btd.h
+index 1b521706d05e..c84a600d109a 100644
+--- a/src/btd.h
++++ b/src/btd.h
+@@ -158,6 +158,7 @@ struct btd_opts {
+ 	uint8_t		gatt_channels;
+ 	bool		gatt_client;
+ 	enum bt_gatt_export_t gatt_export;
++	bool		gatt_seclevel;
+ 	enum mps_mode_t	mps;
  
- 	unsigned int mtu_id;
- 	unsigned int read_by_grp_type_id;
-@@ -414,6 +415,9 @@ static uint8_t check_permissions(struct bt_gatt_server *server,
- 	uint32_t perm;
- 	int security;
+ 	struct btd_avdtp_opts avdtp;
+diff --git a/src/device.c b/src/device.c
+index cfbde307bcc9..3f86e60bd666 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -6300,7 +6300,7 @@ static void gatt_client_init(struct btd_device *device)
+ 	if (btd_opts.gatt_channels > 1)
+ 		features |= BT_GATT_CHRC_CLI_FEAT_EATT;
  
-+	if (!server->perms)
-+		return 0;
+-	if (device->bonding) {
++	if (!btd_opts.gatt_seclevel && device->bonding) {
+ 		DBG("Elevating security level since bonding is in progress");
+ 		bt_att_set_security(device->att, BT_ATT_SECURITY_MEDIUM);
+ 	}
+@@ -6371,6 +6371,9 @@ static void gatt_server_init(struct btd_device *device,
+ 	if (device->ltk)
+ 		bt_att_set_enc_key_size(device->att, device->ltk->enc_size);
+ 
++	if (btd_opts.gatt_seclevel == BT_ATT_SECURITY_LOW)
++		bt_gatt_server_set_permissions(device->server, false);
 +
- 	perm = gatt_db_attribute_get_permissions(attr);
+ 	bt_gatt_server_set_debug(device->server, gatt_debug, NULL, NULL);
  
- 	if (perm && mask & BT_ATT_PERM_READ && !(perm & BT_ATT_PERM_READ))
-@@ -1652,6 +1656,7 @@ struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
- 	server->db = gatt_db_ref(db);
- 	server->att = bt_att_ref(att);
- 	server->mtu = MAX(mtu, BT_ATT_DEFAULT_LE_MTU);
-+	server->perms = true;
- 	server->max_prep_queue_len = DEFAULT_MAX_PREP_QUEUE_LEN;
- 	server->prep_queue = queue_new();
- 	server->min_enc_size = min_enc_size;
-@@ -1680,6 +1685,14 @@ struct bt_att *bt_gatt_server_get_att(struct bt_gatt_server *server)
- 	return server->att;
+ 	btd_gatt_database_server_connected(database, device->server);
+@@ -6442,7 +6445,8 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
+ 		return false;
+ 	}
+ 
+-	if (sec_level == BT_IO_SEC_LOW && dev->le_state.paired) {
++	if (!btd_opts.gatt_seclevel && sec_level == BT_IO_SEC_LOW &&
++					dev->le_state.paired) {
+ 		DBG("Elevating security level since LTK is available");
+ 
+ 		sec_level = BT_IO_SEC_MEDIUM;
+@@ -6482,6 +6486,10 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
+ 		bt_att_set_remote_key(dev->att, dev->remote_csrk->key,
+ 							remote_counter, dev);
+ 
++	/* Force security level if it has been set */
++	if (btd_opts.gatt_seclevel)
++		bt_att_set_security(dev->att, btd_opts.gatt_seclevel);
++
+ 	database = btd_adapter_get_database(dev->adapter);
+ 
+ 	dst = device_get_address(dev);
+@@ -6597,7 +6605,9 @@ int device_connect_le(struct btd_device *dev)
+ 	/* Set as initiator */
+ 	dev->le_state.initiator = true;
+ 
+-	if (dev->le_state.paired)
++	if (btd_opts.gatt_seclevel)
++		sec_level = btd_opts.gatt_seclevel;
++	else if (dev->le_state.paired)
+ 		sec_level = BT_IO_SEC_MEDIUM;
+ 	else
+ 		sec_level = BT_IO_SEC_LOW;
+diff --git a/src/main.c b/src/main.c
+index 59df0ad4ca3a..818f7c06ef66 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -152,6 +152,7 @@ static const char *gatt_options[] = {
+ 	"Channels",
+ 	"Client",
+ 	"ExportClaimedServices",
++	"Security",
+ 	NULL
+ };
+ 
+@@ -1112,6 +1113,38 @@ static void parse_gatt_export(GKeyFile *config)
+ 	g_free(str);
  }
  
-+void bt_gatt_server_set_permissions(struct bt_gatt_server *server, bool value)
++static uint8_t parse_gatt_seclevel_str(const char *str)
 +{
-+	if (!server)
-+		return;
++	if (!strcmp(str, "auto"))
++		return BT_ATT_SECURITY_AUTO;
++	else if (!strcmp(str, "low") || !strcmp(str, "1"))
++		return BT_ATT_SECURITY_LOW;
++	else if (!strcmp(str, "medium") || !strcmp(str, "2"))
++		return BT_ATT_SECURITY_MEDIUM;
++	else if (!strcmp(str, "high") || !strcmp(str, "3"))
++		return BT_ATT_SECURITY_HIGH;
++	else if (!strcmp(str, "fips") || !strcmp(str, "4"))
++		return BT_ATT_SECURITY_FIPS;
 +
-+	server->perms = value;
++	DBG("Invalid value for Security=%s", str);
++	return BT_ATT_SECURITY_AUTO;
 +}
 +
- struct bt_gatt_server *bt_gatt_server_ref(struct bt_gatt_server *server)
++static void parse_gatt_seclevel(GKeyFile *config)
++{
++	char *str = NULL;
++
++	if (!btd_opts.testing)
++		return;
++
++	parse_config_string(config, "GATT", "Security", &str);
++	if (!str)
++		return;
++
++	btd_opts.gatt_seclevel = parse_gatt_seclevel_str(str);
++	g_free(str);
++}
++
+ static void parse_gatt(GKeyFile *config)
  {
- 	if (!server)
-diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
-index de98a0d04747..ea49f2960d71 100644
---- a/src/shared/gatt-server.h
-+++ b/src/shared/gatt-server.h
-@@ -17,6 +17,8 @@ struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
- 					uint8_t min_enc_size);
- uint16_t bt_gatt_server_get_mtu(struct bt_gatt_server *server);
- struct bt_att *bt_gatt_server_get_att(struct bt_gatt_server *server);
-+void bt_gatt_server_set_permissions(struct bt_gatt_server *server,
-+					bool value);
+ 	parse_gatt_cache(config);
+@@ -1122,6 +1155,7 @@ static void parse_gatt(GKeyFile *config)
+ 				1, 6);
+ 	parse_config_bool(config, "GATT", "Client", &btd_opts.gatt_client);
+ 	parse_gatt_export(config);
++	parse_gatt_seclevel(config);
+ }
  
- struct bt_gatt_server *bt_gatt_server_ref(struct bt_gatt_server *server);
- void bt_gatt_server_unref(struct bt_gatt_server *server);
+ static void parse_csis_sirk(GKeyFile *config)
+@@ -1269,6 +1303,7 @@ static void init_defaults(void)
+ 	btd_opts.gatt_channels = 1;
+ 	btd_opts.gatt_client = true;
+ 	btd_opts.gatt_export = BT_GATT_EXPORT_READ_ONLY;
++	btd_opts.gatt_seclevel = BT_ATT_SECURITY_AUTO;
+ 
+ 	btd_opts.avdtp.session_mode = BT_IO_MODE_BASIC;
+ 	btd_opts.avdtp.stream_mode = BT_IO_MODE_BASIC;
+diff --git a/src/main.conf b/src/main.conf
+index fd1ace651da7..52eb3854addc 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -291,6 +291,14 @@ KernelExperimental = 6fbaf188-05e0-496a-9885-d6ddfdb4e03e
+ # Default: read-only
+ #ExportClaimedServices = read-only
+ 
++# Security level:
++# Sets security level of ATT channel, setting security anything other than
++# auto requires Testing to be set, setting to low disables GATT server
++# attribite permissions.
++# Possible values: auto, [low=1, medium=2, high=3, fips=4 (Testing = true)]
++# Default = auto
++# Security = auto
++
+ [CSIS]
+ # SIRK - Set Identification Resolution Key which is common for all the
+ # sets. They SIRK key is used to identify its sets. This can be any
 -- 
 2.53.0
 
