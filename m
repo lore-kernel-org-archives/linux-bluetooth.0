@@ -1,158 +1,145 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA64242D89
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Apr 2026 20:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0809E17A300
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Apr 2026 20:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775678873; cv=none; b=mIm16hgFbM/hFMBFkTU9tFzlo+x3h38tfFZtyVOuSx8UmeRt8RznIZ/rMxERFY7qLHZU30k6+ojdDS67CVH2VIzO8FIJhLWkApHmb1z2l/25DX9oTW+41vulZ/1J2KbTCs6djTR40fFSkWaE5lCxL3LuPjRSblk5fo9wtkTp3B8=
+	t=1775679210; cv=none; b=Jh2opqEhz1rJv4qeUsUntbs8PQJPw4As3TGizuBRTODlhnuv97zEr2ORT3Waw5VFi0gOS9FjVGdiquJOGxaI1e9TwDARU655jdAKyVnyyEQyIhlCjXOPB4iq/BzQNTp6MRhR37Lb9ReiNa4RmVp0P7xDi9W4R7OPteENDPf8ciE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775678873; c=relaxed/simple;
-	bh=ws6IViV6Em10kN23hW2VYEBPGBdGAMUVAm88wK6geL8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=W0MJuPzcjgwIAePCfj/4gI1peMJK0Aoa58l4wJDdY9+c3a3EVmUzcY2mU8HSUlcHk2/sBxBlqdgWcIlHZBIvggo0AENu+Z9JwBPNqlpTVHLs+eeHMHFn++7jDKxbh0ZQ2RNMFDODGE/62DRntoHIzgNUfYD9HIvQZGKbo1Qd1RM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dusqZcy7; arc=none smtp.client-ip=209.85.222.176
+	s=arc-20240116; t=1775679210; c=relaxed/simple;
+	bh=cLueYuXPRXrEtmcsRJp5N8hbm8RBUvkyXmbTAgpTJ4M=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=HAZ8yPZMyF+NWRj5oY1JeASYuSWrNUAdhHNXdwpTTp0KLpRVtce2fltlgKeXQEE4iXb0tTBwJEFOj7S//+JVo/ASQCVsw9aXY8HtM450IMSa7Y48zpBvCxNOC5bLDshX+pxWyIFcBPfuZyASTT+4HVUZ2EV7au8AuIlMf/FF9lE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T24i3yx+; arc=none smtp.client-ip=209.85.221.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dusqZcy7"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-8d65f4073bfso25743985a.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Apr 2026 13:07:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T24i3yx+"
+Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-56daad0fdbaso40550e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Apr 2026 13:13:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775678871; x=1776283671; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=E6wry2KEmj0AbP7h6F5zr66B7AVj92YmDUEYyd87vCU=;
-        b=dusqZcy7G4bTP8NVYLXJ1Tp4IVBONI1PHHyR0MBjkTmbmLV7l7Z8Z/9NoGB+dt0G9x
-         YvuQ+uEWEpkmFBouE8gSKB1cV45XUE4YAwT0gTw8wO0Yfhmc4/9scZd9EptuKx8GfPas
-         0GpiCUQ0+dfBMSNYbm2yqQ6rw5gOcVGswOuso3VShTs8eEAZi0VOt/koQeittqILwNdO
-         hPMu64lxsZ7RABt3EUeoliahj3yldv5vVEsVJPGtgQhi0DujYwvlVvfCvaHkqcBto3oi
-         hhNtTnPqW5VOH+RMIfCCJhexbgUAuVtI4IpneR336lAKk3qlmhllC3A13XnDe/XChOtC
-         3DLA==
+        d=gmail.com; s=20251104; t=1775679208; x=1776284008; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AAAT29BiVvyrPoVuH3xD+9nhk6leM/U8wh7yovvVAAw=;
+        b=T24i3yx+VuFW0TdaSe0p9DSfjUO7k4lbIIkwgdfn1/NIRXPFFgGBCQ0kwbR29PUT3H
+         fubnV8opcF6w8GszJQGpFsYa/VASx9Ap5nBdemKJMPN+L571pUyNgD5Oorb8AwKCrsMq
+         CrRM4GWRAl0rAuE/NzibjIb11KZA68EjerOnG/VFuOY2AU920jVvCXub6D2L4Cr6YQNE
+         f7NajTJpS/XzgbfATcye9uahe6E1vqEH54fqjoMbDJre+Ttp7pWRza6CRoAG3aaq7iM/
+         ZKkscyadmEevJrju/mGMTKbUgaU10Ct12CTuAGxwxj3MZ6Pmbl1+zK2f4yrNh4FTFenO
+         hSzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775678871; x=1776283671;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E6wry2KEmj0AbP7h6F5zr66B7AVj92YmDUEYyd87vCU=;
-        b=sWE/DWHNSBwgwGHTqWCD7k0QV1Ar1oCyGESEWeTK4mNDTJIy0qgMI5hVrBLl8bhxYv
-         rjZD7cDe7X3Lw1qZuLAnxKsH3NNoqkb02S+FyNSKPaZd0dsU84Mfoqmrnr06+Fi8gC/c
-         UMorXAdlIqJldIvj6tDyH7Gl1porMLi7miej9LFSgAeRrd9dcCDtniEaRvd38FjkKcFd
-         y3yGwkBUx+Tj1fy1Y+wnc0uorhHjlcrNSyKMpO5ChSL3hH2QfzV2PG56CKH6bZ/z5XxC
-         8WkFM1dwW5YcDhHXg5APMN3kboMXt6WNyXy2QFMll8Mof+df7zISJEZqOZ6veq+PYr4/
-         7d+A==
-X-Gm-Message-State: AOJu0YzJOyWDJ9l5N3xZWe0i+43ilyjZQ35b5ZlK71Go9EjkyGnuEXTn
-	OWDD6Cum5KSB7xWvU70BgxeoExoKGZH2l3biRZ2zQ3k+j2CFRdh1P9n8BpczgQ==
-X-Gm-Gg: AeBDietn9BEPbgUV0jIf7fmxhG6KeSTi9mAAjIeEQTLzlSEc26mmR0kehfmjvE+titQ
-	we85KtG57w0xs4WvxMrmE2oB+9lI6sTAztdYTRNtQyKqg8Y+9E0U0kWE99ou3IvMI8tRDdnC/2U
-	1iCx9L9zv0WK+O0XxvoMtMeDYBiCuRoeTzdcCtE2Dq4jyQwOTw/XJCvN+R+g1cB07JI0lSpG0kd
-	fbB7QLCZlZL+XbjvVrbGLdi9AWaftJ2nfWf2Qk5DolNjD6UE7nFs5jqXdn3KgdccB/GgB025L4n
-	9/nOcsfgV1jdGm48+AgThKJ5R4C7O8B0mSxNokMaPCC1w4xkUOkbUxoJWNP10Uyu8JY59F+s9A5
-	Ot6xghoPYhVYMG/or/cmmADPHfurl/b6cWKnwwdpoAY1sWyBWhniENhANcYFTVGKQM4Hl3dZK9U
-	3CtG/12ofNYJQZPm1+jmjYAU5MrnY/qYM=
-X-Received: by 2002:a05:620a:d85:b0:8cd:80f1:f473 with SMTP id af79cd13be357-8dc3bbefdd3mr175908585a.23.1775678871093;
-        Wed, 08 Apr 2026 13:07:51 -0700 (PDT)
-Received: from [172.17.0.2] ([135.232.224.82])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8d2a5488a28sm1617409385a.2.2026.04.08.13.07.49
+        d=1e100.net; s=20251104; t=1775679208; x=1776284008;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AAAT29BiVvyrPoVuH3xD+9nhk6leM/U8wh7yovvVAAw=;
+        b=r5kphfwA9U8OB+ZhtvZQP/1C4U8dYLJvZyM1kVrKC4/C5BMHlGen0gXQhFmuIOLlow
+         pzcKvlpSYC/OiMDfJHbhnyuhOb+5C4oJLoxB8zcVFpKvhLZQTFNiI9lM01JS4vvj8XBd
+         rxpoUUNzn3TapQWjv+c2p7xcg9xr8ShA3KSGr0iTvLbXpg/8COJyjBofaF2sbpCV9O7A
+         GLEA9dPkMG4yTza6iDGKJ5lBEQYsMZqlvFxxjs4UCi6LtlgjFAskshEwXP2MqA/Bcnpd
+         v+FGai135IlcD1hDfQrBrh90ercgGp+s9Y4LFm5H6SIOsNqsq/2OS+MrsFFjnJLVgaDJ
+         1/4Q==
+X-Gm-Message-State: AOJu0YydsqIWl7SVgIItRK+7RQOAjAgUz1ZaNtwLs+6DIBMDNXfkHvPS
+	RpL477NNj30CdmA5cPSq4CkAgn28L6pFMkEaSn2PrtKGg4z7eKkEVAyM7oHqyI0fFkw=
+X-Gm-Gg: AeBDiev/vKgddF2XfnbORR3srQVigWlDZYTQ2d+xEUF8UBzLl4SBHHNp0x36iEVxNAs
+	sPB/Ksb54WHpApnvFAbbedERd4tea8sNo9r2z8pJLwgFvYUTesUaIBgI5R+Tzt6PnCmSSNAfNUS
+	owMu1Gx7NjHfsLWCNfItjsDPFNmAyqw45RKo2c97ev0CMGY5fX4LmCAjlz0/uWRo3kSpKedK+bV
+	V5hv1r0YhUSk0XZYBUZelHl9YHQ2XjeUQLCpa9G9U0575f+G/RpUe60NT5S6DCDgmw4KbnXVWDF
+	KunJtrvbu0hQxWeuNsDq5QtpDrhIDv5HkXlxNI0H8+MHRl8c7KKAVbeq1LP1ZrgB/vD88Zy2czL
+	IoIVrCwKSUq2TLQ7cPTxhhkX9wyrh2Y60yhWLwseje0E8xV148GmCREKR+qsmZsMCwRmyctqylQ
+	7iM0ZMnTYqxB+C1+6iZbN2us9Uzkp0DvVhukblG/D57V7ZjV0cWS75eqmNTrD6z7KyqvnmXpjn2
+	R1c8YXXsegl2zPSfA==
+X-Received: by 2002:a05:6122:3b83:b0:56e:e68e:9fae with SMTP id 71dfb90a1353d-56ee68eb83bmr6500910e0c.10.1775679207805;
+        Wed, 08 Apr 2026 13:13:27 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56d9bd2106csm20823096e0c.18.2026.04.08.13.13.26
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Apr 2026 13:07:50 -0700 (PDT)
-Message-ID: <69d6b596.050a0220.1cdd01.9e29@mx.google.com>
-Date: Wed, 08 Apr 2026 13:07:50 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============9152503645349185262=="
+        Wed, 08 Apr 2026 13:13:27 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 1/2] shared/gatt-server: Add bt_gatt_server_set_permissions
+Date: Wed,  8 Apr 2026 16:13:17 -0400
+Message-ID: <20260408201318.483799-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, shuvampandey1@gmail.com
-Subject: RE: Bluetooth: hci_event: fix potential UAF in SSP passkey handlers
-In-Reply-To: <177567405034.77733.13793767420759611909@gmail.com>
-References: <177567405034.77733.13793767420759611909@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============9152503645349185262==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1078865
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.49 seconds
-GitLint                       PENDING   0.28 seconds
-SubjectPrefix                 PASS      0.26 seconds
-BuildKernel                   PASS      25.88 seconds
-CheckAllWarning               PASS      28.13 seconds
-CheckSparse                   PASS      27.57 seconds
-BuildKernel32                 PASS      24.83 seconds
-TestRunnerSetup               PASS      567.22 seconds
-TestRunner_l2cap-tester       PASS      27.70 seconds
-TestRunner_iso-tester         PASS      37.67 seconds
-TestRunner_bnep-tester        PASS      6.40 seconds
-TestRunner_mgmt-tester        FAIL      113.44 seconds
-TestRunner_rfcomm-tester      PASS      9.37 seconds
-TestRunner_sco-tester         FAIL      14.29 seconds
-TestRunner_ioctl-tester       PASS      10.35 seconds
-TestRunner_mesh-tester        FAIL      11.48 seconds
-TestRunner_smp-tester         PASS      8.62 seconds
-TestRunner_userchan-tester    PASS      6.77 seconds
-IncrementalBuild              PENDING   0.64 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.107 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.860 seconds
-Mesh - Send cancel - 2                               Timed out    1.992 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+This adds bt_gatt_server_set_permissions which can be used to
+enabled/disable permission checking before operations which can be
+useful on testing only environment where encryption/pairing is not
+desirable/needed.
 ---
-Regards,
-Linux Bluetooth
+ src/shared/gatt-server.c | 13 +++++++++++++
+ src/shared/gatt-server.h |  2 ++
+ 2 files changed, 15 insertions(+)
 
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index 27ae7e79ed3d..6273899965c0 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -93,6 +93,7 @@ struct bt_gatt_server {
+ 	struct bt_att *att;
+ 	int ref_count;
+ 	uint16_t mtu;
++	bool perms;
+ 
+ 	unsigned int mtu_id;
+ 	unsigned int read_by_grp_type_id;
+@@ -414,6 +415,9 @@ static uint8_t check_permissions(struct bt_gatt_server *server,
+ 	uint32_t perm;
+ 	int security;
+ 
++	if (!server->perms)
++		return 0;
++
+ 	perm = gatt_db_attribute_get_permissions(attr);
+ 
+ 	if (perm && mask & BT_ATT_PERM_READ && !(perm & BT_ATT_PERM_READ))
+@@ -1652,6 +1656,7 @@ struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
+ 	server->db = gatt_db_ref(db);
+ 	server->att = bt_att_ref(att);
+ 	server->mtu = MAX(mtu, BT_ATT_DEFAULT_LE_MTU);
++	server->perms = true;
+ 	server->max_prep_queue_len = DEFAULT_MAX_PREP_QUEUE_LEN;
+ 	server->prep_queue = queue_new();
+ 	server->min_enc_size = min_enc_size;
+@@ -1680,6 +1685,14 @@ struct bt_att *bt_gatt_server_get_att(struct bt_gatt_server *server)
+ 	return server->att;
+ }
+ 
++void bt_gatt_server_set_permissions(struct bt_gatt_server *server, bool value)
++{
++	if (!server)
++		return;
++
++	server->perms = value;
++}
++
+ struct bt_gatt_server *bt_gatt_server_ref(struct bt_gatt_server *server)
+ {
+ 	if (!server)
+diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
+index de98a0d04747..ea49f2960d71 100644
+--- a/src/shared/gatt-server.h
++++ b/src/shared/gatt-server.h
+@@ -17,6 +17,8 @@ struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
+ 					uint8_t min_enc_size);
+ uint16_t bt_gatt_server_get_mtu(struct bt_gatt_server *server);
+ struct bt_att *bt_gatt_server_get_att(struct bt_gatt_server *server);
++void bt_gatt_server_set_permissions(struct bt_gatt_server *server,
++					bool value);
+ 
+ struct bt_gatt_server *bt_gatt_server_ref(struct bt_gatt_server *server);
+ void bt_gatt_server_unref(struct bt_gatt_server *server);
+-- 
+2.53.0
 
---===============9152503645349185262==--
