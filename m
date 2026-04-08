@@ -1,175 +1,106 @@
-Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 346FC3B0ADF
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Apr 2026 14:47:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775659623; cv=pass; b=T9ixPkjAX9YLv5trK9WFX54zY2E4vbO8H2FBWvppihK3v0beq6pba/G/EzcoiXa2rXllaCeujwyApAdic5ZRq1xrS7i37oJRqhWiZBJ/41s1CuMnfW+iUlGNBpGOVgbhiRTVMmznjioQYOoF0MaebTmiLGT21mBEi/4Oe4eB+F8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775659623; c=relaxed/simple;
-	bh=d2eDSCr7naQzF1CgIQJUx21DmfDs2veOFQWh7Z8B1Bk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CN6dRGOHmTqJUEYCkjqdaNtYJqjVuMTFHR+aT9BGhxtSe+iVSJ/f4X2hb6CokeJvQnrau1FBf0au3cLwwqxVWxXeuFESQ09no1eiAlt2vF5xif69fb9+Kgm7OQo2fOLC13QMHfIv2cEinXRRnfQAQqDzKX/BekSb90yEM6SMLLU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jzFNIjpF; arc=pass smtp.client-ip=74.125.224.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99652F6920
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Apr 2026 15:56:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775663804; cv=none; b=kImm9Cjz5IeoHZ8tcwUGAUYitPq+3zeFzNf6hnOXG3pfyorXEnRA6kXhIZjm4nTPLZ0znPoHzpOk/YgxT+jb3J1Zx7bysEBMT4EHRCLNr4HMQIi2AYIzH1vX1xMQgLmvH6ZUOgqyk+RmhX9lkJ5gVlO1xEJNAWq2YiESL+yDnwU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775663804; c=relaxed/simple;
+	bh=i64MSDYyFzPyBbLpNKVNZhYZXEBSwKU3pR6fwhJeiDk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Zl8ATxP7cd0top0DnthEp2bzmuwLFNs04n9CX/LfWoBNmTkYPpMxFqc2q+S55HUryI8lpJ1iZn/x1ERubl/G+rywR9nFwOt/rYM0NKdJBpLyHRd44kgG59muxS/gfWVMOvroTLw108+38+2xr1lAG3bPQR6by3HBBUf6M6K2Yu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sRdTsrKE; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jzFNIjpF"
-Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-650221149e2so6386281d50.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Apr 2026 07:47:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775659621; cv=none;
-        d=google.com; s=arc-20240605;
-        b=P1e+cUPD+OCXV/mofgKU0JHwPd5wfcMl2luTdfP2JSX0BRvZwEuJAodLdNUW4QI7ZW
-         i0YR4PQUUZWS9t33D5v7j0gvKWFIf/IoIGhUB1AgwsyJ+gMUBs06sQpfx3ldGT6xw+TR
-         PC3iiUcKc3hhRmZf5yXQ1Oi6TQxbGIKf+gdlRbYnT1x7tsvh6wHssjJkK0xge/hkGzm0
-         mzizyvoBAp/V6yM4l9U0czObVuVemqWVh2Q+zLDa4y7DroLlRTJBCCufqsRejUbw4P/k
-         kh2TQr+z324sUMJ+lSSru4CFmBnhXunNah0izby/DfDeZzRRunFWNR6CK9Pp2YXdFeeV
-         k0tQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=La/Sai7sLpHaKzjoGXOuIVYmgmhPb8IqjxWA7Z7S5kY=;
-        fh=G32oQlbOH4RnnGTXvns9H0EHjQ8ZmAa3WRM1vrDh2dc=;
-        b=CV/DAh0VgAcP1GzMAqb/3cE6tM1rXJJozDMgEAo9NUD9mb+f9opVdDti7KC187TOTD
-         VYoodPa7WNP1dDvGGjdO9HciRxzcOfF82zNsp5/rGTBUy2AD5WpT04OANfuqSOYr82mh
-         3SKy9CTKvhUMvCkEcKKiwpNjfL04PmICLUJJCswEqt6N89YXjyRLnkkSEAfY2TQsSmr8
-         jq1OiKJTrXLuw7lXJ51qEHCkB4kk083wQJgEUaWgKSGI3nBJUB5Hzs439Rmq0g1AjYXn
-         ZeAkKhEtw6JOtVOqe2jzAj77YxLqu4JiEoEXuHKmeqxcXblhq0FjtKuoWjgNwcKt//ZJ
-         tYuA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sRdTsrKE"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-488b0046078so36275655e9.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Apr 2026 08:56:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775659621; x=1776264421; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=La/Sai7sLpHaKzjoGXOuIVYmgmhPb8IqjxWA7Z7S5kY=;
-        b=jzFNIjpFwLzOPkjZrqlGZFr/Yo8diW5zSAtbZBuqGPWXlyv+9YqYZvDJkquuqxHwu3
-         iHR5e1b0v16Xud3AM3RkqlaMWXB8mCSRQekuCUCCr305myOBFEj1/hMBdPJ5eVgQ+6Hg
-         gc+D747KU2VY1aKO/cIvxPs039qZ8bDoGMrzb5S74CV4eTyuvxhfSzok85/YLgEORT3O
-         oU87M4kyHT3JVjfHc0LT8uX/LeB3xqoQwaUFKB3Iy6AaEJgANIs1I6gT/9wnfYOpJvuA
-         w7mRzaDq/eCN4LqzgPgwghZOK3SPb0NCD+TEzpAGNk4eCS5QidpPqqSphPY+dKNVGi9L
-         r+MA==
+        d=gmail.com; s=20251104; t=1775663801; x=1776268601; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0bydB5v4DzzNRJHgkjndYYKtbbrYjfgIG1NUJBAofkc=;
+        b=sRdTsrKEWA4H9XkJoD6vBRuI6K7heHKLhdE4nKI6lSYaCxYPZJm4LUv4b6pPN3lcL0
+         RHv76aJQnchnHEAEYxKqjPil3wBMvcV/cjbkgclXqeAmVsOOyL2ZCJ/z0Oa8Jyikay4n
+         3q0U/V3rpghSkPK85Kg4g3+G8d+xf8H8aT+XS7Ba9fhnvdHtTc3nMqCCNcBdEJlefZQu
+         jhYhxAEslCI/EXGkMkdEkOFrLoX7JeODQIyTBPyEpBRoMJnZ+F8fTkLquncEU3h6WPgy
+         u+YKnGL/U1IEiqdK3a0aZja4vO29hctr/TuO06TG+JYN72GdBr+4hueWqo7UYS+omFDe
+         IRxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775659621; x=1776264421;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=La/Sai7sLpHaKzjoGXOuIVYmgmhPb8IqjxWA7Z7S5kY=;
-        b=XM3sNSXS2ToGt+NwpLO7Eq99xaMx3SZz3OOWJZfnwHAel9gzPJ+fa9KJyzZX0TMaQD
-         ysxe7AvqFfLQt2SGVKjMyCIChLa+uMjbW/HR3XNF+X+G8R72RvHcNoL6+7K8y6pKuJMg
-         87AgyasLT3PEhxd/pJFcliep1CzSeAI8AUKVNGYF8Bx46BSIZ9RgtYIKVMX638w4xPZC
-         C1uDt8n+iCUrLb93bhnMTbc9dIDxNssxUB53uTRpMLbEEE8izQ5rl0UDPOeGcmZUfqRZ
-         /lrsRx3o9xpxmjkkM5+iDPM3F5hDythisuJHe29INBDOedJVErsHe8zCLtBhUMEeFUE6
-         bmrA==
-X-Forwarded-Encrypted: i=1; AJvYcCXQwDsAoF5cmgozBrs2TucmL0jRsM4gpBQI3rKRpDgKVTRhSE+1+o8lgclBk2wa8NIIjHZo0dkY+TJkOpbOMS8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxQWiI/uNJ99Ow4ysOmLz2usL5HPwqYSrHYWQNa1hxyO4j/g4z
-	h5jeo52EBLLo/VQBvn5pzvSj+b9DutxyqKLMZvqeihE3jQMUjGtRt1HMTeu1KdtmpUZvKNRNwKL
-	Y+IDg3KUujxJ0EwNrwT/fklwWjWUVHeo=
-X-Gm-Gg: AeBDieten9IDkNcP4QYHx/muHvcoqUd3BZRcCnp+Msbbb8NaJyHooahFcwKgteP3fk8
-	NMUOPZ4avcnyiUCCfFfqYk4LVQAiICafipLOsU9sy/Tr5nFOV/J6N/+xVA3JcGyQsXKwJFsHvwV
-	heUbGiAK9pNKlbbNP39WTFFH4D0c3FBbDd59EClmA5Wi3pVmymXI60WzsVsIZd4Z3QZtAA30oVs
-	w3LHovNkOZUr33fI5eisX2+vqM0u/gwt4+76KzSfEmGX6MZQr+XjfjQKnQHUTa/naCTwOI8ojXS
-	Vk7N9qWUyIi7MtuLX4Ig1lRk1ggYdi+rgYyzCqxpGJtZQvMv7mgi2LvBavaXMJ0TUVM=
-X-Received: by 2002:a05:690e:1c1c:b0:650:5316:1729 with SMTP id
- 956f58d0204a3-65053162098mr16799018d50.35.1775659620944; Wed, 08 Apr 2026
- 07:47:00 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1775663801; x=1776268601;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0bydB5v4DzzNRJHgkjndYYKtbbrYjfgIG1NUJBAofkc=;
+        b=X6FKGnfQR+P1IM/CO2/PjtauOe9DDVZyQibeBb2Wz4wNtK5LOv+4PxmkofSscOj1uZ
+         Cp96Byh2Jd2jd8NZqPqtioVguXSOtOT2V6W/NNGTQgRSTBHxozy6LNmJxA7E9yZE4aME
+         fUg+RQN9Em9l2SPcrvjj0Xg/TdOxsOdNr7Q5AoYIRNcAQwwuwxvm9+0QYk80EeYUvct/
+         rTDzBqswJkyB1nol+q3p8eiBxDk9ZYwS+0UJ8/2upoqim0DGEy9ZwfDw/Tt65hbMysqg
+         B6QfzO+ouoZO82MXsAEdfxOTX7tdLA60xxXSAxNcGtJbLekAT084BzRJ1uTXtw5BwvDf
+         ihGA==
+X-Gm-Message-State: AOJu0YxG7GaZb5kR8sL0Bkw22D8/u7hHyGEARrU26NaMM8+5z4DL7ofX
+	w+UPmIpi02L1f5RPCDNL3FTrgAkTL7raSAzyNGnhJ+YxeV0Px/NkJv3E
+X-Gm-Gg: AeBDievxo4pzb5MrcTHm499CClwzwM49uLG3DFTN6XNg/hlvyPVDn/61QR/nGcmWJgS
+	oRQkQ7vCBJiI9AjvECqhC9GNmvFyf36glKQujnAmtmhx9wtNuB9N+aTt+64xU4FCl7WZRwxrDiO
+	gUZ4uGrCbvdKiv+n45o5ETATResdrPkm1HPqqOgOOJUndwWKPc7lGm6a8ZOem+U0q//DXwSqa6l
+	RyRkDgsRwwLMK67MYJsbcr19N+8/Ic6qMa7ZTPFaDQ3D6OWIaMv0MvdGeDkmGtna4nvyNvzpQWu
+	Sh/nNPnTpgAAhLRmYY3a5pP+Sv6S41JJW5KMUdwBJk8qcQsuwX/FrZWLuDY9b8K62GXIMNE8Hsw
+	kbTyv8tgWGAERVtlm7Q2faixx7y/lIoKCi1RAcso2h4h2FgtvNqw8RFkI34VVZ8wyCna8WyywGb
+	yK4NEeqx7sCTbC6CBCUPnGx/LIDbVhJdX2+Qehp+oYjIqU1ni6G2vwNsaLdtGpJOHTJsPsArBI6
+	9IshLhm3Z/h
+X-Received: by 2002:a05:600c:628e:b0:485:4bd1:4c64 with SMTP id 5b1f17b1804b1-488997d94e0mr288446605e9.31.1775663800844;
+        Wed, 08 Apr 2026 08:56:40 -0700 (PDT)
+Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488cd19ea83sm3372565e9.1.2026.04.08.08.56.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Apr 2026 08:56:40 -0700 (PDT)
+From: David Carlier <devnexen@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	David Carlier <devnexen@gmail.com>
+Subject: [PATCH] Bluetooth: hci_conn: validate connection before BIG creation
+Date: Wed,  8 Apr 2026 16:56:38 +0100
+Message-ID: <20260408155638.95927-1-devnexen@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260408083217.1915419-1-kaihsin.chung@synaptics.com> <16bbcee4-2908-4eec-a03f-b847353b8bda@molgen.mpg.de>
-In-Reply-To: <16bbcee4-2908-4eec-a03f-b847353b8bda@molgen.mpg.de>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 8 Apr 2026 10:46:50 -0400
-X-Gm-Features: AQROBzBB-qYjgxSkGN0tIanowip70J6u0fMGc3KSbuXAHKywQ29iarNXq-MwvRk
-Message-ID: <CABBYNZJ+m9Y4JjLoq8jgwU_3Q197BRZrq+GM35X3hxKsyFaf1A@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Add Synaptcis 4384 Chip Support
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Kaihsin Chung <kaihsin.chung@synaptics.corp-partner.google.com>, marcel@holtmann.org, 
-	luiz.von.dentz@intel.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Kaihsin Chung <kaihsin.chung@synaptics.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Add missing hci_conn_valid() check in create_big_sync() to prevent
+a potential use-after-free. The connection object passed via
+hci_cmd_sync_queue() could be freed before the async callback
+executes, leading to a dereference of stale memory.
 
-On Wed, Apr 8, 2026 at 4:47=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de> =
-wrote:
->
-> Dear Kaihsin,
->
->
-> Thank you for your patch.
->
-> Am 08.04.26 um 10:32 schrieb kaihsin:
->
-> Please add an elaborate commit message.
->
-> > Signed-off-by: kaihsin <kaihsin.chung@synaptics.com>
->
-> Please configure to use the full name:
->
->      git config --global user.name "Kaihsin Chung"
->      git commit --amend --author=3D"Kaihsin Chung
-> <kaihsin.chung@synaptics.com>" -s
->
-> Then please re-roll as v2 (`git format-patch -v2 =E2=80=A6`).
->
-> > ---
-> >   drivers/bluetooth/btbcm.c   | 2 ++
-> >   drivers/bluetooth/hci_bcm.c | 3 ++-
-> >   2 files changed, 4 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-> > index f9a7c790d7e2..21ef875d6aa7 100644
-> > --- a/drivers/bluetooth/btbcm.c
-> > +++ b/drivers/bluetooth/btbcm.c
-> > @@ -515,6 +515,8 @@ static const struct bcm_subver_table bcm_uart_subve=
-r_table[] =3D {
-> >       { 0x4106, "BCM4335A0"   },      /* 002.001.006 */
-> >       { 0x410c, "BCM43430B0"  },      /* 002.001.012 */
-> >       { 0x2119, "BCM4373A0"   },      /* 001.001.025 */
-> > +     { 0x2128, "BCM4384A0_AP6684P" },/* 001.001.040 */
-> > +     { 0x4119, "BCM4384B0_AP6684PL"},/* 002.001.025 */
-> >       { }
-> >   };
-> >
-> > diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> > index 874d23089b39..972685e83b8a 100644
-> > --- a/drivers/bluetooth/hci_bcm.c
-> > +++ b/drivers/bluetooth/hci_bcm.c
-> > @@ -1609,7 +1609,8 @@ static const struct of_device_id bcm_bluetooth_of=
-_match[] =3D {
-> >       { .compatible =3D "brcm,bcm4335a0" },
-> >       { .compatible =3D "cypress,cyw4373a0-bt", .data =3D &cyw4373a0_de=
-vice_data },
-> >       { .compatible =3D "infineon,cyw55572-bt", .data =3D &cyw55572_dev=
-ice_data },
-> > -     { },
-> > +     { .compatible =3D "brcm,bcm4384-bt" },
-> > +     { },
->
-> Any idea, why the empty element is shown as changed?
+All other async callbacks using the same pattern already validate
+the connection (e.g. hci_le_big_create_sync, hci_acl_create_conn_sync,
+hci_le_create_conn_sync, abort_conn_sync).
 
-Most likely identation changed like capture by sashiko:
+Signed-off-by: David Carlier <devnexen@gmail.com>
+---
+ net/bluetooth/hci_conn.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-https://sashiko.dev/#/patchset/20260408092128.1915973-1-kaihsin.chung%40syn=
-aptics.com
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 11d3ad8d2551..be522fae0058 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -2130,6 +2130,9 @@ static int create_big_sync(struct hci_dev *hdev, void *data)
+ 	u32 flags = 0;
+ 	int err;
+ 
++	if (!hci_conn_valid(hdev, conn))
++		return -ECANCELED;
++
+ 	if (qos->bcast.out.phys == BIT(1))
+ 		flags |= MGMT_ADV_FLAG_SEC_2M;
+ 
+-- 
+2.53.0
 
-> >   };
-> >   MODULE_DEVICE_TABLE(of, bcm_bluetooth_of_match);
-> >   #endif
->
->
-> Kind regards,
->
-> Paul
->
-
-
---=20
-Luiz Augusto von Dentz
