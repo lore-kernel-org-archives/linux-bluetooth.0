@@ -1,98 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A25B40DFAB
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Apr 2026 13:22:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775740926; cv=none; b=W/gQubyLgv7xTqnUlIODLjnUO38JLTk0gJxhTmM5oh7AIBU5lNfnJ68V1ICfxYpi22I5Bdta7J4NG6sdGcbQWWFZod7STF25iMH0tHtU5+JqX9K5d5UpEKlNCrXxSnKY9fq5OOLhx/5XyQXo1BJWCKbxEFibwlnPwuwJFervT8k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775740926; c=relaxed/simple;
-	bh=pyoavoBz/+SPMVJWJKEhk8rkYm5D3u/d1Uqy8RrpCTI=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l+2OzMRfA96fQECCBADi5BEM73xzB7XA4+SZOcpIAJ8pjcD/IqToolyVuPvqPwEV6n0ouCtLVZEfC1WvyDdgKX6SE33WNlI6ikOEaCRs4mfCywAuomTr5h4OPLCBwsHHiZDNzemVzTiQH3rkxdcAjm38CdFJgDkq0oVLkLmlfNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K8X4GOC0; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5AD03DD50F
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Apr 2026 15:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775747997; cv=pass; b=qLjlg5kMAi1pyJx/cWJtH5Mz4s1zBtmkR3rgEk39/JUXn5vqUW35WFqGy38HtBBPQ5n3O2Pf9UD7IRELf4vF88C0Gm48wixFilIdaKmaDA4a+04dTLK18H1Nvws4OxQnf0i4x6l2TI9UkFyxpwVMC5yGGKSDGDOKPje4dC2KfSA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775747997; c=relaxed/simple;
+	bh=WxVxUebbeL3BGl6sp1FAzNJgwszo6zFr1Z0dFZU2TQc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YkytBjIKpdzF2ejgCc3lVrwPQVZlFawAVlGitob60RQLO8aDDrjWy2e2wLe+RrnhP5tQU/NpNRSoO4oSuywu8qZ6Pcg1ruRGZd6ULMuuftUpa3FUoQKOcFi7iHKJ0qOwzeb91gFxnEcSYNkw9CkDfRB399xj9PiMBO2lJ6PBACg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EAT+6OEp; arc=pass smtp.client-ip=74.125.224.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K8X4GOC0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3D85C19424
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Apr 2026 13:22:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775740925;
-	bh=pyoavoBz/+SPMVJWJKEhk8rkYm5D3u/d1Uqy8RrpCTI=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
-	b=K8X4GOC057jm252IWdXBlJenWm6rg0BJ0YXoHF74eqZOxYv50YVSCQQr9bUpmOShn
-	 lHfGUUyeApGjmJYXvMv0dUaFEMTgps6G+Oj/IzJ/nTU5gt/eb5mLzLE1Ub3mLm1Kaz
-	 a//ba++Iz+kW5ICUYECQ7LedVM0EGgIspvqR8WWOz8RZoOc85EsqHMSrDpQFuTH5fB
-	 8hchKownE9Yv+LA0htfdDxFpFXSYTWYY9uvB6BYafwoT06AEAVvAt0K6Vfhup2fpU6
-	 PFpepeQM0osPr3xtK8VamrF3OKiQpLpo+LQ4PwLOefCQshT5Em1qb+afZAoJ+blcuX
-	 GZoDBPEI/x9dg==
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-38a01c80c34so6505641fa.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Apr 2026 06:22:05 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU3w8J8Flri55bsjx2cHq6yQwQe9g8wAyMlL5G2+wbdI75ew97Hs/ISdv4TzFHRKv5h9fvMylKSCpfr6M58gko=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIdAFSVz7ZyludbCYKAxepEw6B5P8hRYg/QEGJWzvq9f5m1sKZ
-	vYR0MM8vBWuLhFtRnas7cRuPkxGnI7QGS0n7UptHkivdIPuiOtSa4GRC2oze8/BN3+sMSjEwChT
-	BAichGQE7d0zmN2L3DnZK4785N6YO9dCKoCD+bYc5Rw==
-X-Received: by 2002:a05:6512:220e:b0:5a2:b903:3b43 with SMTP id
- 2adb3069b0e04-5a33754f95fmr7843308e87.7.1775740924544; Thu, 09 Apr 2026
- 06:22:04 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 9 Apr 2026 13:22:03 +0000
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 9 Apr 2026 13:22:03 +0000
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260409112233.3326467-1-shuai.zhang@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EAT+6OEp"
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-64fc6b21789so728427d50.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Apr 2026 08:19:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775747995; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Lbdt9db0N/+jmMvLfUlnXdFLKDt3GM+zGKTCq//zifYBoT2seLvzs8jQcRkOvyDi2L
+         mgemlYzKmDe9rYsFOuyBreiKXVVjTXPTq7tzGzXLkv6VDBIPKRhfluKn4mdqwT7ZkWxJ
+         vpCKLWRY4SyCopyf3j7tc8fXudKo/UbWrcVZt3YLB6XjeqULgVnXmF0Waq4otT6dNg+0
+         F4xU0Lb6ftYJOTpICZVv2QOL+bt+4E5/vz7/ZuEd9ILRj+qNxktHMnY+5x9/ahLpfh+8
+         65M8WgvDUymj0SBkum3z8emXwaOMTKik9uPo/3Locw1wa18JVnBszZh/6AauFGdCb09c
+         HCvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=fSe3huXWAFFZZ1NES5Jyko0bJR3+jewHlkBFn+VuI2c=;
+        fh=LJjZ95Y72qQs2fnjpGcJ2qjfcbeOh0SYnwbCAeVN9AA=;
+        b=C378BffyLUUBslxZF3pIKf8ng64/6A1SjSq76oumqidBu1LnOQ6xvaKZeceJLNoFVx
+         xoD1Z5Zi3cRWbtb6cE5uGc5k6jJ8TmV8eyrPVKTTycykjbVD4gU0CuujRPG0SpP7ExjA
+         0onuc8ivj7R4+PTaM6v5UKwyS+IlgmjVml39L69N2NhRY2Rt3OvI898WbVq2yKmxjBej
+         3Mp0VBwghcmnPfvt/4A8BGaAUX1EjjIulcx1pHR9ktYPs6q1BqS7o5ZzcB5g6ik1q5WD
+         3u5qzvuCjByC7hucE4L5Wpp5TByOa0oK7DiiWY95cAjm9fzN5+h24CDVGIASiQCL9+oe
+         3ojw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775747995; x=1776352795; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fSe3huXWAFFZZ1NES5Jyko0bJR3+jewHlkBFn+VuI2c=;
+        b=EAT+6OEp6d2KXwzDrgqfluqzd837HraDN3DiPRRa4aQ32OY78nBYXc89KbO7z9powC
+         h4OmArl/wX6il64xFIWTINc3Nb7/1AAFZy7LXCGXVDMcxHiQA/M9q/qOSKQynbHU8xo9
+         FdxS7B+/bFsOebC8BDkMMCUXqxvAeRpyKw3+amd6fz071Def5jjfnQkhz2ks76MtPrlu
+         mjLVHGcs87GDfW9wWUTI9jqhJJjKAhv4t9v5lwHUKuVOwELYiXt7zCdf+T30w6Ullhzu
+         cxgoVJC/6zM2Gabn5fGVa9L5Z+U68GdNGwziRUs5juPbP3cWq6kS2oC952Yfq+xhfph0
+         uwFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775747995; x=1776352795;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=fSe3huXWAFFZZ1NES5Jyko0bJR3+jewHlkBFn+VuI2c=;
+        b=kyyuB/BOzs+mVqGv49TsDopkn/61X3n2RgLhMbuaYVwWRWxj4vTVcRaOtdDvC9I3eh
+         82A2Hn4ya8JxH8G6gthL6MjFeX50oZQMw2VcGmz8KpSnpkGlYaT/c3Emmrlo3g8aAziX
+         pwptSByBf4MRutLNWY7+n8DDiklmQUQiumQNmskv8eXTWwz/8JHWejU9IT42XsiaIgtm
+         e49rFy1NuhorpQfHJoKLUBca/bP2dwp9UEaBY3OBfO3h1FSgkbPvjs7Vl4nO3J3+ADf1
+         SvDZ69+HF2jXMPHldOi9FWKRYdiBap/J8YnOdX+ySp50O4gUVlU9w98M0ijkKqwU28XA
+         pLWg==
+X-Forwarded-Encrypted: i=1; AJvYcCXA1BoxPUKkzY2T5HRsv0MM0xIcaJX6jiPZe3s/htBUYzY17dGeeBLceHdg447I+eG9XvvYwBykVeYlLSHc7GI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2DV13YDgWNLdgE/CdggN4BYAwWFvLp1IaqnzZqeO8vqLZ066s
+	w1PuRlI2xJ+/lYXVuK00/WNUp9R1nuKsXPdwutntgMp+SXDYlnZnWRXnmBrcGDo0oQnLLf5GMBX
+	XeNuysHFvasGKT0jlrCJynz9ydgSUSwk=
+X-Gm-Gg: AeBDiet0qy3/yapwUoKxwj3ytP+Tj2amcqmYmrY8Cz+ifWlt7K9GvAVC66YcHih50MJ
+	D3uok3A70ulad1Rbl01/rp41dqCchDegs4cwgRBzja2IeoixjSHTnyaNq9wqKiLyWVrUiVINGiV
+	qQ00x1ex0yREkX+P/Wc+GE0XQT1kX8W8HQWS8rpEz/qMQLzoG7purrBORW0g9zqQAbv/X6uHCD6
+	MYBpklZW/R2yijLSogPYOpfWhAuFonzeYdZLe5QxXCs8Cwavt+EBKM5kqzfqompApfcgTjCJrMJ
+	Agu39CSMhQ9//hnAMJNm0A3/EcJatDF6UBsnUZNn27nAhHulNUYnIh2amhBrsbaN8aA=
+X-Received: by 2002:a05:690e:1341:b0:650:370c:d909 with SMTP id
+ 956f58d0204a3-6504868fd4amr24052318d50.15.1775747994519; Thu, 09 Apr 2026
+ 08:19:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260409112233.3326467-1-shuai.zhang@oss.qualcomm.com>
-Date: Thu, 9 Apr 2026 13:22:03 +0000
-X-Gmail-Original-Message-ID: <CAMRc=Mff0jK5qHO9NwNaXjL+OGzK6zh1GH1d04SksB2zDnOAEw@mail.gmail.com>
-X-Gm-Features: AQROBzC2F2aW-rUr4nEnAQgpPDSxFmZpc921gbfptwLURkkESbjxv0MvJpZAuCs
-Message-ID: <CAMRc=Mff0jK5qHO9NwNaXjL+OGzK6zh1GH1d04SksB2zDnOAEw@mail.gmail.com>
-Subject: Re: [PATCH v5] Bluetooth: qca: Fix delayed hw_error handling due to
- missing wakeup during SSR
-To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com, 
-	quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com, 
-	jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com, 
-	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20260408155638.95927-1-devnexen@gmail.com>
+In-Reply-To: <20260408155638.95927-1-devnexen@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 9 Apr 2026 11:19:41 -0400
+X-Gm-Features: AQROBzBL8FUn8i2X1o7D0pqyptla6siZrv0FoNEDlwQg8icOzCLUu8ag_DQGPmw
+Message-ID: <CABBYNZLMMbjy5ZsravMc9pCCvxMKGPNPVsaOy76LdZTyFPkfhg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_conn: validate connection before BIG creation
+To: David Carlier <devnexen@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 9 Apr 2026 13:22:33 +0200, Shuai Zhang
-<shuai.zhang@oss.qualcomm.com> said:
-> When Bluetooth controller encounters a coredump, it triggers
-> the Subsystem Restart (SSR) mechanism. The controller first
-> reports the coredump data, and once the data upload is complete,
-> it sends a hw_error event. The host relies on this event to
-> proceed with subsequent recovery actions.
+Hi David,
+
+On Wed, Apr 8, 2026 at 11:56=E2=80=AFAM David Carlier <devnexen@gmail.com> =
+wrote:
 >
-> If the host has not finished processing the coredump data
-> when the hw_error event is received,
-> it sets a timer to wait until either the data processing is complete
-> or the timeout expires before handling the event.
+> Add missing hci_conn_valid() check in create_big_sync() to prevent
+> a potential use-after-free. The connection object passed via
+> hci_cmd_sync_queue() could be freed before the async callback
+> executes, leading to a dereference of stale memory.
 >
-> The current implementation lacks a wakeup trigger. As a result,
-> even if the coredump data has already been processed, the host
-> continues to wait until the timer expires, causing unnecessary
-> delays in handling the hw_error event.
+> All other async callbacks using the same pattern already validate
+> the connection (e.g. hci_le_big_create_sync, hci_acl_create_conn_sync,
+> hci_le_create_conn_sync, abort_conn_sync).
 >
-> To fix this issue, adds a `wake_up_bit()` call after the host finishes
-> processing the coredump data. This ensures that the waiting thread is
-> promptly notified and can proceed to handle the hw_error event without
-> waiting for the timeout.
->
-> Test case:
-> - Trigger controller coredump using the command: `hcitool cmd 0x3f 0c 26`.
-> - Use `btmon` to capture HCI logs.
-> - Observe the time interval between receiving the hw_error event
-> and the execution of the power-off sequence in the HCI log.
->
-> Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+> Signed-off-by: David Carlier <devnexen@gmail.com>
 > ---
+>  net/bluetooth/hci_conn.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 11d3ad8d2551..be522fae0058 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -2130,6 +2130,9 @@ static int create_big_sync(struct hci_dev *hdev, vo=
+id *data)
+>         u32 flags =3D 0;
+>         int err;
+>
+> +       if (!hci_conn_valid(hdev, conn))
+> +               return -ECANCELED;
+> +
+>         if (qos->bcast.out.phys =3D=3D BIT(1))
+>                 flags |=3D MGMT_ADV_FLAG_SEC_2M;
+>
+> --
+> 2.53.0
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+https://sashiko.dev/#/patchset/20260408155638.95927-1-devnexen%40gmail.com
+
+Seem valid, I guess we probably need to use hci_conn_get to make it
+safe to use hci_conn_valid and then on create_big_complete
+hci_conn_put.
+
+--=20
+Luiz Augusto von Dentz
