@@ -1,101 +1,167 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C67377EB2
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Apr 2026 08:02:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385B619E839;
+	Thu,  9 Apr 2026 08:47:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775721756; cv=none; b=Jr7p6/j2WiYgfg508xaFmJx0aAvLja13XpB5rp5K992E0O9BraR6STAFuL7pa86FoQ11Ya+51uP82jLT6Y1mUNj9RUoVs7x2gYd21sAY8Y+5//N4nsc8zJMYME/D5atKS6dUU8nYdnB41v1gx1xJnZVPEnTh+ZPdi/9EhHyInO8=
+	t=1775724456; cv=none; b=WEjpF0ETA4Ev7DoRMBh9V8DGrkBEDkETr1T8reSgx84SGuh4oxAeoeUmL/ARzsPnQivT3g2P5wjQGZtDa9mos2DVs8O54DMxhl9P+App3+FXKQy5F9elITm2PJV2Oq/4mOYqcDEXew28cd+eQauec3rCPemnY2HTUmSel0pDT0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775721756; c=relaxed/simple;
-	bh=/qW1/eKb03DNDlTAK6llcONT8EHvtPQbCM2FB2ECGk0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ea295H2iHlaoCIWdVvv6yL56y65cPNVQjVe2uc/gX2gl/qVuTyCRJRyrZwdm+heKjeJ4QW0Yy+luEtPpKltHPIAhu4S6/aiMn7+TkGZRk7bPweGi5grKvlROoeJynvxWlQe/bxgFP/5y7rQ1dTTmrSQhnZyTplYlXz0ijClka+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FKUCAhh+; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1775724456; c=relaxed/simple;
+	bh=uWfpcH/Aq8NLPtNxzg+ifTHzZUkluCT0p2AKfAgtp1g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rK3s9wgiK6NwEyOhfoag/kOdhmeqsovVqizVzHyfxd3cerQlPBGi7JGE9LwjMIVqtLscGYJunR/IyukbLNTm7ptGtHJOmcnV6kpLMTzaMdjohAX2O3it9RpyPCiRW672OO9onilAbdujle9QZgU5tiHUffsd3/QI2qbwwqKS2js=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=LP69PJVB; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FKUCAhh+"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-50d87c138e1so6913181cf.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Apr 2026 01:02:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775721754; x=1776326554; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/qW1/eKb03DNDlTAK6llcONT8EHvtPQbCM2FB2ECGk0=;
-        b=FKUCAhh+7Q03U+s7f6I7w3T3N85vBqel3McuA3bgYNm4H1k0hFGUETKTROd3AgZS8o
-         pxsUBLDkudw+8UznQe8GtQGavaL+qabFnhi+23KfOSOKdytMoOhrwuxhQ529o3COfGP/
-         cEJhJ6SxwYWzHn6xfzx+eNdPvt4d7oY/BqUXZIFIuatMEgC11unuDdIb2HpsTS1fs77j
-         youdGy4SJ3xV9BtMJZ6sc1JmXaS8MkwTaWFWi1dihrNvdedjK7Tkvrso7yDzi6A3WNrO
-         pLvkU8h1PpH+Wlk6T3MOZygMohGRu1IEFiaZdV83HKN5IHEf9K0eJ5lD6vP4ekf9wRPC
-         MrAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775721754; x=1776326554;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/qW1/eKb03DNDlTAK6llcONT8EHvtPQbCM2FB2ECGk0=;
-        b=TzMgHRsADM+iIvi7JkOtMw4dAey3nAAmpxs8J3Fa7AYFhMBPO36HpjQSjtjmaWLu89
-         J/Ogd2uwVo+lmCU1mtXmmQVonGGlr7KXH5XaYp70E8rK4Y0HPy6gTRzye4t+mDtInd8D
-         BUIxlcV66zyCVRaPBbNBI3v54F8A3KvI3cwyPdYAa+kacHdxif5zgIx52IdoFFsQa/bL
-         UAnnduAI8dWJDQ6k8b2OMFtWeVTAfRuV6bcA+rP5WQCVXLbTZq5FryWfMLcbK/hgHPHZ
-         lmCQ3grdhO9r2yeydj1ywy4Qn4wmiGvlXHcvhcZD0LWUSIbzwsMwDx95nZnZoiK520xX
-         nVuA==
-X-Gm-Message-State: AOJu0Yy8JMm9ovnyZlrvB3CTboyc9jyF8B123fzC9ak5vxRUMSHHaDQ+
-	ImL54rJHx5twyj+p/q7YmJHc4y2m52F26+/pltARq/9q6K6AIaaid2h5/V/6a/a2
-X-Gm-Gg: AeBDiesSEmXdtIZnT3Uy8B4IpgBbWNTfuSyUANbnOtOM3e8tQBqvCSB8wNw+MMmweAr
-	el5HhlJttzGNnROjG9+cKaXJmcTuwN2HijzVSey3Evb3TQpYSCUE/qnCRW2rAJ8UAs19jioapg4
-	9iJSHV3Sf4Hu2fdBzqPyTb+piSdLBAbOXwLF7dn1J8mvqE9aImTQ9bDf1tXvtztdRJehNR7WapK
-	BsCNyxGWuegIJFC92+liSZtWbjO8P7UGkczmdFtjzrfnHVUS0Mdh4P0kXjEGjhaT2ek4PcBuB3t
-	JNS3G4m4XIoDomzteBuhHC5tI1VeNJbvMqgpxbbvCydWHgeYrEcmkzrvWfJ7jT0dLA8VPbTJfJB
-	YOlRHKqlr9jL9POtSOLbD3JJXrEhgepweih1Qv4NprBSpSrJvD0iT+bm5+bofMhd4UElXIIMVYO
-	UGrszl6N3HA4HIIl99wUDvoLTxENBn54We/8ztwFNddA==
-X-Received: by 2002:ac8:5844:0:b0:50d:8b60:ff13 with SMTP id d75a77b69052e-50dc2174a6bmr36834721cf.14.1775721753754;
-        Thu, 09 Apr 2026 01:02:33 -0700 (PDT)
-Received: from [172.17.0.2] ([172.203.30.212])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8aa1c6d5856sm104097656d6.46.2026.04.09.01.02.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Apr 2026 01:02:33 -0700 (PDT)
-Message-ID: <69d75d19.050a0220.e2061.ca01@mx.google.com>
-Date: Thu, 09 Apr 2026 01:02:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1378322715800358470=="
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="LP69PJVB"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=fw4Fi2J7rWpChzRbVh6OVQ83bjYAyOleBcAdAZEagLQ=; b=LP69PJVBp2AAvvJhb+h7sgwMOA
+	jk5BLH+tq9NMURwyv0gBh5ZXq9bXgfx2E1pJwSAPFsAzXcrBZ2dvOQfwJyjb8gnSLKm116gEYAUz4
+	ggk0+72oTcH+RLJPWW3Lg0hd+2pryKTMClpXT7WqnpDUHpgMUbtLhdIQgbK55u7y66HHiKDCdknvE
+	aif4QA+dufYcnvZ/BYhJ3WhPTff9SJt7xNHt2IEq+YgZFtrQs6dXrV2/YtvKaYR4XOFAZCGy1SNE3
+	UIQ1KtimHodn9jQrwH9q/Xdp5IClUlit/vsClSmNzlEtmXZfNnVMOe0mIAPKAgujXA2ZKCLj8yore
+	ih5GrRpBzwvlVLcLhCIVlNU7Rzzb99VxuAoNC8GBvHSONdaVcn0983O0sHxFZNChzlaW/6gzhnkL9
+	/4SbDog1AHcsZbRhji/O4xG7wStB0Z7rEjQOkBhSNKCwgxiH5PgG1kTcNa8k5g9JOv1vSukA80UMl
+	itZM/m4V6TIf6P6qSK+pX1CR;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wAl2v-000000087mr-3yWE;
+	Thu, 09 Apr 2026 08:47:30 +0000
+Message-ID: <fb21f224-310e-4744-8216-62fd93f36955@samba.org>
+Date: Thu, 9 Apr 2026 10:47:29 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, jianqkang@sina.cn
-Subject: RE: [5.10.y] Bluetooth: SCO: Fix use-after-free in sco_recv_frame() due to missing sock_hold
-In-Reply-To: <20260409074429.740279-1-jianqkang@sina.cn>
-References: <20260409074429.740279-1-jianqkang@sina.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============1378322715800358470==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/5] uaccess: add copy_struct_{from,to}_bounce_buffer()
+ helpers
+To: David Laight <david.laight.linux@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>,
+ Dmitry Safonov <dima@arista.com>, Francesco Ruggeri <fruggeri@arista.com>,
+ Salam Noureddine <noureddine@arista.com>, David Ahern <dsahern@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Michal Luczaj <mhal@rbox.co>,
+ David Wei <dw@davidwei.uk>, Luiz Augusto von Dentz
+ <luiz.von.dentz@intel.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>, Xin Long <lucien.xin@gmail.com>,
+ Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
+ Neal Cardwell <ncardwell@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Aleksa Sarai <cyphar@cyphar.com>,
+ Christian Brauner <brauner@kernel.org>, Kees Cook <keescook@chromium.org>,
+ netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+References: <cover.1775576651.git.metze@samba.org>
+ <f29570914590c50b9b6f451eb3a38d0fe1d954df.1775576651.git.metze@samba.org>
+ <20260407192540.321f3879@pumpkin>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <20260407192540.321f3879@pumpkin>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-This is an automated email and please do not reply to this email.
+Hi David,
 
-Dear Submitter,
+> On Tue,  7 Apr 2026 18:03:15 +0200
+> Stefan Metzmacher <metze@samba.org> wrote:
+> 
+>> These are similar to copy_struct_{from,to}_user() but operate
+>> on kernel buffers instead of user buffers.
+>>
+>> They can be used when there is a temporary bounce buffer used,
+>> e.g. in msg_control or similar places.
+>>
+>> It allows us to have the same logic to handle old vs. current
+>> and current vs. new structures in the same compatible way.
+>>
+>> copy_struct_from_sockptr() will also be able to
+>> use copy_struct_from_bounce_buffer() for the kernel
+>> case as follow us patch.
+>>
+>> I'll use this in my IPPROTO_SMBDIRECT work,
+>> but maybe it will also be useful for others...
+>> IPPROTO_QUIC will likely also use it.
+>>
+>> Cc: Dmitry Safonov <0x7f454c46@gmail.com>
+>> Cc: Dmitry Safonov <dima@arista.com>
+>> Cc: Francesco Ruggeri <fruggeri@arista.com>
+>> Cc: Salam Noureddine <noureddine@arista.com>
+>> Cc: David Ahern <dsahern@kernel.org>
+>> Cc: David S. Miller <davem@davemloft.net>
+>> Cc: Michal Luczaj <mhal@rbox.co>
+>> Cc: David Wei <dw@davidwei.uk>
+>> Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+>> Cc: Marcel Holtmann <marcel@holtmann.org>
+>> Cc: Xin Long <lucien.xin@gmail.com>
+>> Cc: Eric Dumazet <edumazet@google.com>
+>> Cc: Kuniyuki Iwashima <kuniyu@google.com>
+>> Cc: Paolo Abeni <pabeni@redhat.com>
+>> Cc: Willem de Bruijn <willemb@google.com>
+>> Cc: Neal Cardwell <ncardwell@google.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: Simon Horman <horms@kernel.org>
+>> Cc: Aleksa Sarai <cyphar@cyphar.com>
+>> Cc: Christian Brauner <brauner@kernel.org>
+>> CC: Kees Cook <keescook@chromium.org>
+>> Cc: netdev@vger.kernel.org
+>> Cc: linux-bluetooth@vger.kernel.org
+>> Cc: linux-kernel@vger.kernel.org
+>> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+>> ---
+>>   include/linux/uaccess.h | 63 +++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 63 insertions(+)
+>>
+>> diff --git a/include/linux/uaccess.h b/include/linux/uaccess.h
+>> index 1234b5fa4761..a6cd4f48bb99 100644
+>> --- a/include/linux/uaccess.h
+>> +++ b/include/linux/uaccess.h
+>> @@ -513,6 +513,69 @@ copy_struct_to_user(void __user *dst, size_t usize, const void *src,
+>>   	return 0;
+>>   }
+>>   
+>> +static __always_inline void
+>> +__copy_struct_generic_bounce_buffer(void *dst, size_t dstsize,
+>> +				    const void *src, size_t srcsize,
+>> +				    bool *ignored_trailing)
+>> +{
+>> +	size_t size = min(dstsize, srcsize);
+>> +	size_t rest = max(dstsize, srcsize) - size;
+>> +
+>> +	/* Deal with trailing bytes. */
+>> +	if (dstsize > srcsize)
+>> +		memset(dst + size, 0, rest);
+>> +	if (ignored_trailing)
+>> +		*ignored_trailing = dstsize < srcsize &&
+>> +			memchr_inv(src + size, 0, rest) != NULL;
+>> +	/* Copy the interoperable parts of the struct. */
+>> +	memcpy(dst, src, size);
+>> +}
+> 
+> Return 'ignored_trailing' rather than pass by reference.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+I also thought about that but it makes
+the copy_struct_to_ case more complex.
 
------ Output -----
+I'm not sure but my guess would be that
+the compiler would have the chance to skip the
+ignore_trailing logic if (as all current callers do)
+NULL is passed.
 
-error: patch failed: net/bluetooth/sco.c:305
-error: net/bluetooth/sco.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
+> And this is probably too big to inline.
 
-Please resolve the issue and submit the patches again.
+In the next patch this replace open coded logic in
+copy_struct_from_sockptr. So as all of copy_struct_*
+consists of inline functions I thought it would be good to
+keep it that way.
 
+So unless there a real good reason to change it
+I'd like to keep it as is.
 
----
-Regards,
-Linux Bluetooth
-
-
---===============1378322715800358470==--
+Thanks!
+metze
