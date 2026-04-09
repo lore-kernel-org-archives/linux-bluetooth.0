@@ -1,38 +1,38 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385B619E839;
-	Thu,  9 Apr 2026 08:47:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1388E3A7F72;
+	Thu,  9 Apr 2026 09:01:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775724456; cv=none; b=WEjpF0ETA4Ev7DoRMBh9V8DGrkBEDkETr1T8reSgx84SGuh4oxAeoeUmL/ARzsPnQivT3g2P5wjQGZtDa9mos2DVs8O54DMxhl9P+App3+FXKQy5F9elITm2PJV2Oq/4mOYqcDEXew28cd+eQauec3rCPemnY2HTUmSel0pDT0o=
+	t=1775725277; cv=none; b=ZVUi1RNEdkDcTU45UuG12idW0C6KuqSEWnAWnXU26WpzRlpD/B4Rb1wsz0Ez1LAcb3tnrJER+GehDqEUSUnZCfqrAUXdsbIuTFE4LOpdQ360uG8imcBREmK5vEqft86Wicc5/7gCm+rit8j7/XWYTpq7yjJejZMi50sojv6Xjqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775724456; c=relaxed/simple;
-	bh=uWfpcH/Aq8NLPtNxzg+ifTHzZUkluCT0p2AKfAgtp1g=;
+	s=arc-20240116; t=1775725277; c=relaxed/simple;
+	bh=GI7M3Sq4u2nZGi2pWSuuGV178v6wWu1SuhoP1DtLSSA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rK3s9wgiK6NwEyOhfoag/kOdhmeqsovVqizVzHyfxd3cerQlPBGi7JGE9LwjMIVqtLscGYJunR/IyukbLNTm7ptGtHJOmcnV6kpLMTzaMdjohAX2O3it9RpyPCiRW672OO9onilAbdujle9QZgU5tiHUffsd3/QI2qbwwqKS2js=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=LP69PJVB; arc=none smtp.client-ip=144.76.82.148
+	 In-Reply-To:Content-Type; b=caFsmtd2WblG1jjPqw804/njOPx1gWo8vIs0MFAxOgJmUMAuC6eZdbiFO4KTq3etTiOPMW8UuMHDpAc06FOGLO9nuaaLO6UUQjqmD7LBdEoNFWoiTC254F9ERzQAWqqt2mNg9SL1l3U5KpeauKxZEff5Eo3znNN+v2XEHApGZGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=yiOWWhAc; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="LP69PJVB"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="yiOWWhAc"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=fw4Fi2J7rWpChzRbVh6OVQ83bjYAyOleBcAdAZEagLQ=; b=LP69PJVBp2AAvvJhb+h7sgwMOA
-	jk5BLH+tq9NMURwyv0gBh5ZXq9bXgfx2E1pJwSAPFsAzXcrBZ2dvOQfwJyjb8gnSLKm116gEYAUz4
-	ggk0+72oTcH+RLJPWW3Lg0hd+2pryKTMClpXT7WqnpDUHpgMUbtLhdIQgbK55u7y66HHiKDCdknvE
-	aif4QA+dufYcnvZ/BYhJ3WhPTff9SJt7xNHt2IEq+YgZFtrQs6dXrV2/YtvKaYR4XOFAZCGy1SNE3
-	UIQ1KtimHodn9jQrwH9q/Xdp5IClUlit/vsClSmNzlEtmXZfNnVMOe0mIAPKAgujXA2ZKCLj8yore
-	ih5GrRpBzwvlVLcLhCIVlNU7Rzzb99VxuAoNC8GBvHSONdaVcn0983O0sHxFZNChzlaW/6gzhnkL9
-	/4SbDog1AHcsZbRhji/O4xG7wStB0Z7rEjQOkBhSNKCwgxiH5PgG1kTcNa8k5g9JOv1vSukA80UMl
-	itZM/m4V6TIf6P6qSK+pX1CR;
+	bh=Q2AEP7CMJD8PoBhyfTpJUOpR3duCs+Bk2ok596z3dOw=; b=yiOWWhAcKfdZ6X/A88xEF22KOy
+	jV9RPL4+S9HfuMLL8gqYsNa2FYEFqV51StGKNF0WKydTVbJ9ityniBgKPkK1A4WhGtLLwDSMLyu70
+	r6IygtetsO42w2gwJNq4YOFWUKMVnRhueBo1rBZWf/agnzoSBZ7q/fA9rbeR7gsBszd+TbeFQcL/j
+	p4EnT1aGXpwnitL36ab8LaA4LB6Azyyzr2ifuq+uNcZ03LcUdxOpFm8flWfZtNlw9YO9X9SE0aXlJ
+	Yt1IjUJgBWoa3WSbKU2aAVdPS+WZeWV1ZluSm/TbSRROI7QncFE7Im6FHHyiRDrplvbrEg873m4xn
+	Bg0lOfRwcn5VVeB5wdzrFB57jHdgLuEJPakKaZTLI8O1Ovsup4B9jssQ+y+NgvrKlfjZgetgomYui
+	KQ6kpEb6TOqmgL5Fz5tUp++yBFo0YPPHeHDBQBTT0NbmsTKHOnphOofSMegRtTGM+SA8G4hpbmkl4
+	KBBpTlQ08iyJ7AFzBaysDb1x;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1wAl2v-000000087mr-3yWE;
-	Thu, 09 Apr 2026 08:47:30 +0000
-Message-ID: <fb21f224-310e-4744-8216-62fd93f36955@samba.org>
-Date: Thu, 9 Apr 2026 10:47:29 +0200
+	id 1wAlGD-000000087wW-1UGt;
+	Thu, 09 Apr 2026 09:01:13 +0000
+Message-ID: <5405849b-ad9e-4c64-9259-2071f4e36c8a@samba.org>
+Date: Thu, 9 Apr 2026 11:01:12 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -40,128 +40,80 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/5] uaccess: add copy_struct_{from,to}_bounce_buffer()
- helpers
-To: David Laight <david.laight.linux@gmail.com>
+Subject: Re: [PATCH 1/5] uaccess: fix ignored_trailing logic in
+ copy_struct_to_user()
+To: Aleksa Sarai <cyphar@cyphar.com>
 Cc: linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>,
- Dmitry Safonov <dima@arista.com>, Francesco Ruggeri <fruggeri@arista.com>,
- Salam Noureddine <noureddine@arista.com>, David Ahern <dsahern@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Michal Luczaj <mhal@rbox.co>,
- David Wei <dw@davidwei.uk>, Luiz Augusto von Dentz
- <luiz.von.dentz@intel.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Dmitry Safonov <dima@arista.com>, Salam Noureddine <noureddine@arista.com>,
+ David Ahern <dsahern@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+ Michal Luczaj <mhal@rbox.co>, David Wei <dw@davidwei.uk>,
+ Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
  Marcel Holtmann <marcel@holtmann.org>, Xin Long <lucien.xin@gmail.com>,
  Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
  Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
  Neal Cardwell <ncardwell@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Aleksa Sarai <cyphar@cyphar.com>,
- Christian Brauner <brauner@kernel.org>, Kees Cook <keescook@chromium.org>,
- netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+ Simon Horman <horms@kernel.org>, Christian Brauner <brauner@kernel.org>,
+ Kees Cook <keescook@chromium.org>, netdev@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org
 References: <cover.1775576651.git.metze@samba.org>
- <f29570914590c50b9b6f451eb3a38d0fe1d954df.1775576651.git.metze@samba.org>
- <20260407192540.321f3879@pumpkin>
+ <71f69442410c1186ed8ce6d5b4b9d4a5a70edbad.1775576651.git.metze@samba.org>
+ <2026-04-08-ditzy-organic-yowl-croc-yWsgIE@cyphar.com>
 Content-Language: en-US
 From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <20260407192540.321f3879@pumpkin>
+In-Reply-To: <2026-04-08-ditzy-organic-yowl-croc-yWsgIE@cyphar.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi David,
+Hi Aleksa,
 
-> On Tue,  7 Apr 2026 18:03:15 +0200
-> Stefan Metzmacher <metze@samba.org> wrote:
+> On 2026-04-07, Stefan Metzmacher <metze@samba.org> wrote:
+>> Currently all callers pass ignored_trailing=NULL, but I have
+>> code that will make use of.
+>>
+>> Now it actually behaves like documented:
+>>
+>> * If @usize < @ksize, then the kernel is trying to pass userspace a newer
+>>    struct than it supports. Thus we only copy the interoperable portions
+>>    (@usize) and ignore the rest (but @ignored_trailing is set to %true if
+>>    any of the trailing (@ksize - @usize) bytes are non-zero).
 > 
->> These are similar to copy_struct_{from,to}_user() but operate
->> on kernel buffers instead of user buffers.
->>
->> They can be used when there is a temporary bounce buffer used,
->> e.g. in msg_control or similar places.
->>
->> It allows us to have the same logic to handle old vs. current
->> and current vs. new structures in the same compatible way.
->>
->> copy_struct_from_sockptr() will also be able to
->> use copy_struct_from_bounce_buffer() for the kernel
->> case as follow us patch.
->>
->> I'll use this in my IPPROTO_SMBDIRECT work,
->> but maybe it will also be useful for others...
->> IPPROTO_QUIC will likely also use it.
->>
->> Cc: Dmitry Safonov <0x7f454c46@gmail.com>
->> Cc: Dmitry Safonov <dima@arista.com>
->> Cc: Francesco Ruggeri <fruggeri@arista.com>
->> Cc: Salam Noureddine <noureddine@arista.com>
->> Cc: David Ahern <dsahern@kernel.org>
->> Cc: David S. Miller <davem@davemloft.net>
->> Cc: Michal Luczaj <mhal@rbox.co>
->> Cc: David Wei <dw@davidwei.uk>
->> Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
->> Cc: Marcel Holtmann <marcel@holtmann.org>
->> Cc: Xin Long <lucien.xin@gmail.com>
->> Cc: Eric Dumazet <edumazet@google.com>
->> Cc: Kuniyuki Iwashima <kuniyu@google.com>
->> Cc: Paolo Abeni <pabeni@redhat.com>
->> Cc: Willem de Bruijn <willemb@google.com>
->> Cc: Neal Cardwell <ncardwell@google.com>
->> Cc: Jakub Kicinski <kuba@kernel.org>
->> Cc: Simon Horman <horms@kernel.org>
->> Cc: Aleksa Sarai <cyphar@cyphar.com>
->> Cc: Christian Brauner <brauner@kernel.org>
->> CC: Kees Cook <keescook@chromium.org>
->> Cc: netdev@vger.kernel.org
->> Cc: linux-bluetooth@vger.kernel.org
->> Cc: linux-kernel@vger.kernel.org
->> Signed-off-by: Stefan Metzmacher <metze@samba.org>
->> ---
->>   include/linux/uaccess.h | 63 +++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 63 insertions(+)
->>
->> diff --git a/include/linux/uaccess.h b/include/linux/uaccess.h
->> index 1234b5fa4761..a6cd4f48bb99 100644
->> --- a/include/linux/uaccess.h
->> +++ b/include/linux/uaccess.h
->> @@ -513,6 +513,69 @@ copy_struct_to_user(void __user *dst, size_t usize, const void *src,
->>   	return 0;
->>   }
->>   
->> +static __always_inline void
->> +__copy_struct_generic_bounce_buffer(void *dst, size_t dstsize,
->> +				    const void *src, size_t srcsize,
->> +				    bool *ignored_trailing)
->> +{
->> +	size_t size = min(dstsize, srcsize);
->> +	size_t rest = max(dstsize, srcsize) - size;
->> +
->> +	/* Deal with trailing bytes. */
->> +	if (dstsize > srcsize)
->> +		memset(dst + size, 0, rest);
->> +	if (ignored_trailing)
->> +		*ignored_trailing = dstsize < srcsize &&
->> +			memchr_inv(src + size, 0, rest) != NULL;
->> +	/* Copy the interoperable parts of the struct. */
->> +	memcpy(dst, src, size);
->> +}
+> Good catch, though I want to mention that the current API design for
+> copy_struct_to_user() is a bit of a compromise -- I was trying to think
+> of a way of making it generic but what information you need really
+> depends on your API.
 > 
-> Return 'ignored_trailing' rather than pass by reference.
+> For request-flag APIs (like statx) then you can just unset the bits in
+> the response mask for fields past usize and so it is a non-fatal error,
+> but it requires knowing which field offsets map to which flags.
+> 
+> My initial idea for ignored_trailing was for it to return the offset
+> memchr_inv() gives you -- but unfortunately, this doesn't help in the
+> more generic case where you have multiple non-zero bits that need to
+> unset multiple flags.
 
-I also thought about that but it makes
-the copy_struct_to_ case more complex.
+I guess the caller could use if (ignored_trailing) { ... }
+to check more complex stuff and then decide ignore or return an error.
 
-I'm not sure but my guess would be that
-the compiler would have the chance to skip the
-ignore_trailing logic if (as all current callers do)
-NULL is passed.
+> Out of interest, how did you plan on using it? It might be a good idea
+> to rethink this API before it starts getting used "in anger" in a way
+> that leaks to uAPIs we can't change.
 
-> And this is probably too big to inline.
+Currently I only use it with WARN_ON_ONCE(ignored_trailing);
+in order to catch internal errors. See
+https://git.samba.org/?p=metze/linux/wip.git;a=blob;f=fs/smb/common/smbdirect/smbdirect_proto.c;h=ce7c78eb6795041ba672da434ffb01db73269cb7;hb=37c61ef9758f3e113d4078220d8fc2aee366c955#l1625
+But I guess I will at least change it to
+if (WARN_ON_ONCE(ignored_trailing))
+     return...
 
-In the next patch this replace open coded logic in
-copy_struct_from_sockptr. So as all of copy_struct_*
-consists of inline functions I thought it would be good to
-keep it that way.
+And in general I thought it would be good practice to
+check that case in new code in order to avoid unexpected
+behavior.
 
-So unless there a real good reason to change it
-I'd like to keep it as is.
+> In any case, for this patch feel free to take my
+> 
+> Reviewed-by: Aleksa Sarai <aleksa@amutable.com>
 
 Thanks!
 metze
+
