@@ -1,119 +1,174 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1388E3A7F72;
-	Thu,  9 Apr 2026 09:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564D13C0623;
+	Thu,  9 Apr 2026 11:22:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775725277; cv=none; b=ZVUi1RNEdkDcTU45UuG12idW0C6KuqSEWnAWnXU26WpzRlpD/B4Rb1wsz0Ez1LAcb3tnrJER+GehDqEUSUnZCfqrAUXdsbIuTFE4LOpdQ360uG8imcBREmK5vEqft86Wicc5/7gCm+rit8j7/XWYTpq7yjJejZMi50sojv6Xjqw=
+	t=1775733778; cv=none; b=fsn9aNkPamlNawjSO5v58nlYe1ncAokvEXrpR6Ea4cJ7yagfFeFq5HrEZoZCHFov3i06XLRhjJTUQxJbf+Gcae/PulJdxB3F1EnJOXkdTTXjrYrYO8ZrMZ1vPI+sA6jvE5XmLsyAHZerUl8yQSYWVV7tQ0HQBqQXWgN+97jlcO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775725277; c=relaxed/simple;
-	bh=GI7M3Sq4u2nZGi2pWSuuGV178v6wWu1SuhoP1DtLSSA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=caFsmtd2WblG1jjPqw804/njOPx1gWo8vIs0MFAxOgJmUMAuC6eZdbiFO4KTq3etTiOPMW8UuMHDpAc06FOGLO9nuaaLO6UUQjqmD7LBdEoNFWoiTC254F9ERzQAWqqt2mNg9SL1l3U5KpeauKxZEff5Eo3znNN+v2XEHApGZGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=yiOWWhAc; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1775733778; c=relaxed/simple;
+	bh=ZvlZi5CbcmEV2go9cPuXnCEvtdxTh5fXCo77fhyumnQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=B6/4oiU4SlDDos7/wGPH9EPv1P6XcCoIQV+aKvZeB+LPyWCyLU3+YpmnLemyvtl2OMPmhwybGOvO1ajg0S7LkkwRSbrfm170xMUkc3LmDHaDAJfKmg5XHG4wrjC9AIXICePh/oRXPdM/EQ4izLk/go9V3eC5j2k3gjCaqzki87o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=n22FO75F; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="yiOWWhAc"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=Q2AEP7CMJD8PoBhyfTpJUOpR3duCs+Bk2ok596z3dOw=; b=yiOWWhAcKfdZ6X/A88xEF22KOy
-	jV9RPL4+S9HfuMLL8gqYsNa2FYEFqV51StGKNF0WKydTVbJ9ityniBgKPkK1A4WhGtLLwDSMLyu70
-	r6IygtetsO42w2gwJNq4YOFWUKMVnRhueBo1rBZWf/agnzoSBZ7q/fA9rbeR7gsBszd+TbeFQcL/j
-	p4EnT1aGXpwnitL36ab8LaA4LB6Azyyzr2ifuq+uNcZ03LcUdxOpFm8flWfZtNlw9YO9X9SE0aXlJ
-	Yt1IjUJgBWoa3WSbKU2aAVdPS+WZeWV1ZluSm/TbSRROI7QncFE7Im6FHHyiRDrplvbrEg873m4xn
-	Bg0lOfRwcn5VVeB5wdzrFB57jHdgLuEJPakKaZTLI8O1Ovsup4B9jssQ+y+NgvrKlfjZgetgomYui
-	KQ6kpEb6TOqmgL5Fz5tUp++yBFo0YPPHeHDBQBTT0NbmsTKHOnphOofSMegRtTGM+SA8G4hpbmkl4
-	KBBpTlQ08iyJ7AFzBaysDb1x;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wAlGD-000000087wW-1UGt;
-	Thu, 09 Apr 2026 09:01:13 +0000
-Message-ID: <5405849b-ad9e-4c64-9259-2071f4e36c8a@samba.org>
-Date: Thu, 9 Apr 2026 11:01:12 +0200
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="n22FO75F"
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6395OQjY254218;
+	Thu, 9 Apr 2026 11:22:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=AqYhFyIAhfp1LHLHWC/4w1Zv1bTldniczyh
+	en2AZVyk=; b=n22FO75FzU1iMDS+e4cTXxdmIFU/0SnzSSXdihDlLPr3fE6IEQT
+	BBOyZ3wNrtyvBcgaSWdjZxbHfvh3hVs21FOI9ln8nWHw0BKIXQhWr7h66l9b7II8
+	E4hO9FTvrx/DiM2leZJedRQejDjjGLH9n+hUOy9+wimlVLMEXf6DdZ/196hyl/46
+	RShYAVR7lyAAhHuDwb1Hrha5KJxZx+NQYfO8QWLJQH6wiic3HH/ybTP/UxZ9koSH
+	rt+0P1yR5aE2FKVoRdAwElIAVZD1Oy0hsiS83NcDjbi1c/y2C504FSwclNiO6w9l
+	Y/8JkaXzCl+BW2BvD/dr0Yd5aonvkMZicVg==
+Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ddt6ybrm2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Apr 2026 11:22:50 +0000 (GMT)
+Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA02.qualcomm.com (8.18.1.7/8.18.1.7) with ESMTP id 639BMm2Q014226;
+	Thu, 9 Apr 2026 11:22:48 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 4db3njwav0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Apr 2026 11:22:48 +0000 (GMT)
+Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 639BMmmk014220;
+	Thu, 9 Apr 2026 11:22:48 GMT
+Received: from shuaz-gv.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 639BMmpU014219
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Apr 2026 11:22:48 +0000 (GMT)
+Received: by shuaz-gv.ap.qualcomm.com (Postfix, from userid 4467449)
+	id 664D25EC; Thu,  9 Apr 2026 19:22:47 +0800 (CST)
+From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+To: Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
+        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
+        jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com,
+        shuai.zhang@oss.qualcomm.com
+Subject: [PATCH v5] Bluetooth: qca: Fix delayed hw_error handling due to missing wakeup during SSR
+Date: Thu,  9 Apr 2026 19:22:33 +0800
+Message-Id: <20260409112233.3326467-1-shuai.zhang@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] uaccess: fix ignored_trailing logic in
- copy_struct_to_user()
-To: Aleksa Sarai <cyphar@cyphar.com>
-Cc: linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>,
- Dmitry Safonov <dima@arista.com>, Salam Noureddine <noureddine@arista.com>,
- David Ahern <dsahern@kernel.org>, "David S . Miller" <davem@davemloft.net>,
- Michal Luczaj <mhal@rbox.co>, David Wei <dw@davidwei.uk>,
- Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>, Xin Long <lucien.xin@gmail.com>,
- Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
- Neal Cardwell <ncardwell@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Christian Brauner <brauner@kernel.org>,
- Kees Cook <keescook@chromium.org>, netdev@vger.kernel.org,
- linux-bluetooth@vger.kernel.org
-References: <cover.1775576651.git.metze@samba.org>
- <71f69442410c1186ed8ce6d5b4b9d4a5a70edbad.1775576651.git.metze@samba.org>
- <2026-04-08-ditzy-organic-yowl-croc-yWsgIE@cyphar.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <2026-04-08-ditzy-organic-yowl-croc-yWsgIE@cyphar.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-ORIG-GUID: b-yzOyLQwaO0LPtmqZEzyguG6kzwUAKc
+X-Proofpoint-GUID: b-yzOyLQwaO0LPtmqZEzyguG6kzwUAKc
+X-Authority-Analysis: v=2.4 cv=R9sz39RX c=1 sm=1 tr=0 ts=69d78c0a cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=Um2Pa8k9VHT-vaBCBUpS:22 a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=COk6AnOGAAAA:8
+ a=eIGlGOcC9ytwnVZZLkwA:9 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA5MDEwMiBTYWx0ZWRfXw7JtpsCQovmr
+ vXm8yrWoqvrvBpYer1mPIllSWC34k83mCjFu4p+4TZSv/huwyhoVdBVeJboad+cCABryK1J1262
+ mwJobFxu6J7P2VdrImIJJ25apOyiu8/t4brfbCIr87IW5i5geU9NP+giMuk5RIT9gWJUBKGKxiZ
+ 8Pj4b0LdNmGgM7k5D9yJFnoMhqDQzgFXE2g3z1D61kXsehG5xA3jqPCNZ6CZ9SXkQbkDxBJ7AAV
+ 3aq3GWXEr4ajDlsMyS9FveMkURFEfBkqVd7CLyueJkuQhVGWy8HYvYveimuUZt0ZmOGGQOQp6i+
+ vw4FdkP6Qe5PsO6c1sVDGgpYckmSXI1vG4C1OB0aDwT6zL9myDc1vOMkAaIrAlmOgmlcL+go/2a
+ SHQnYrDHsjANii0R0cTZcQfSF9LA6QOm/PPKQOtDZ9koxQe/XC7Zzzha5hgfmNfBXwemcJGrL6C
+ gPSWDi69oZkU1J7kQKg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-09_03,2026-04-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 clxscore=1015 impostorscore=0 lowpriorityscore=0 phishscore=0
+ spamscore=0 priorityscore=1501 suspectscore=0 adultscore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604010000 definitions=main-2604090102
 
-Hi Aleksa,
+When Bluetooth controller encounters a coredump, it triggers
+the Subsystem Restart (SSR) mechanism. The controller first
+reports the coredump data, and once the data upload is complete,
+it sends a hw_error event. The host relies on this event to
+proceed with subsequent recovery actions.
 
-> On 2026-04-07, Stefan Metzmacher <metze@samba.org> wrote:
->> Currently all callers pass ignored_trailing=NULL, but I have
->> code that will make use of.
->>
->> Now it actually behaves like documented:
->>
->> * If @usize < @ksize, then the kernel is trying to pass userspace a newer
->>    struct than it supports. Thus we only copy the interoperable portions
->>    (@usize) and ignore the rest (but @ignored_trailing is set to %true if
->>    any of the trailing (@ksize - @usize) bytes are non-zero).
-> 
-> Good catch, though I want to mention that the current API design for
-> copy_struct_to_user() is a bit of a compromise -- I was trying to think
-> of a way of making it generic but what information you need really
-> depends on your API.
-> 
-> For request-flag APIs (like statx) then you can just unset the bits in
-> the response mask for fields past usize and so it is a non-fatal error,
-> but it requires knowing which field offsets map to which flags.
-> 
-> My initial idea for ignored_trailing was for it to return the offset
-> memchr_inv() gives you -- but unfortunately, this doesn't help in the
-> more generic case where you have multiple non-zero bits that need to
-> unset multiple flags.
+If the host has not finished processing the coredump data
+when the hw_error event is received,
+it sets a timer to wait until either the data processing is complete
+or the timeout expires before handling the event.
 
-I guess the caller could use if (ignored_trailing) { ... }
-to check more complex stuff and then decide ignore or return an error.
+The current implementation lacks a wakeup trigger. As a result,
+even if the coredump data has already been processed, the host
+continues to wait until the timer expires, causing unnecessary
+delays in handling the hw_error event.
 
-> Out of interest, how did you plan on using it? It might be a good idea
-> to rethink this API before it starts getting used "in anger" in a way
-> that leaks to uAPIs we can't change.
+To fix this issue, adds a `wake_up_bit()` call after the host finishes
+processing the coredump data. This ensures that the waiting thread is
+promptly notified and can proceed to handle the hw_error event without
+waiting for the timeout.
 
-Currently I only use it with WARN_ON_ONCE(ignored_trailing);
-in order to catch internal errors. See
-https://git.samba.org/?p=metze/linux/wip.git;a=blob;f=fs/smb/common/smbdirect/smbdirect_proto.c;h=ce7c78eb6795041ba672da434ffb01db73269cb7;hb=37c61ef9758f3e113d4078220d8fc2aee366c955#l1625
-But I guess I will at least change it to
-if (WARN_ON_ONCE(ignored_trailing))
-     return...
+Test case:
+- Trigger controller coredump using the command: `hcitool cmd 0x3f 0c 26`.
+- Use `btmon` to capture HCI logs.
+- Observe the time interval between receiving the hw_error event
+and the execution of the power-off sequence in the HCI log.
 
-And in general I thought it would be good practice to
-check that case in new code in order to avoid unexpected
-behavior.
+Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+---
+Changes v5:
+- Replace clear_and_wake_up_bit with wake_up_bit
+- Link to v4
+  https://lore.kernel.org/all/20260327083258.1398450-1-shuai.zhang@oss.qualcomm.com/
 
-> In any case, for this patch feel free to take my
-> 
-> Reviewed-by: Aleksa Sarai <aleksa@amutable.com>
+Changes v4:
+- add Acked-by signoff
+- Link to v3
+  https://lore.kernel.org/all/20251107033924.3707495-1-quic_shuaz@quicinc.com/
 
-Thanks!
-metze
+Changes v3:
+- add Fixes tag
+- Link to v2
+  https://lore.kernel.org/all/20251106140103.1406081-1-quic_shuaz@quicinc.com/
+
+Changes v2:
+- Split timeout conversion into a separate patch.
+- Clarified commit messages and added test case description.
+- Link to v1
+  https://lore.kernel.org/all/20251104112601.2670019-1-quic_shuaz@quicinc.com/
+---
+ drivers/bluetooth/hci_qca.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index c17a462ae..9fffe665b 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1108,7 +1108,7 @@ static void qca_controller_memdump(struct work_struct *work)
+ 				qca->qca_memdump = NULL;
+ 				qca->memdump_state = QCA_MEMDUMP_COLLECTED;
+ 				cancel_delayed_work(&qca->ctrl_memdump_timeout);
+-				clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
++				wake_up_bit(&qca->flags, QCA_MEMDUMP_COLLECTION);
+ 				clear_bit(QCA_IBS_DISABLED, &qca->flags);
+ 				mutex_unlock(&qca->hci_memdump_lock);
+ 				return;
+@@ -1186,7 +1186,7 @@ static void qca_controller_memdump(struct work_struct *work)
+ 			kfree(qca->qca_memdump);
+ 			qca->qca_memdump = NULL;
+ 			qca->memdump_state = QCA_MEMDUMP_COLLECTED;
+-			clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
++			wake_up_bit(&qca->flags, QCA_MEMDUMP_COLLECTION);
+ 		}
+ 
+ 		mutex_unlock(&qca->hci_memdump_lock);
+-- 
+2.34.1
 
