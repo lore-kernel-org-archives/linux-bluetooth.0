@@ -1,118 +1,170 @@
-Received: from smtp134-33.sina.com.cn (smtp134-33.sina.com.cn [180.149.134.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A18CD379EE8
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Apr 2026 07:29:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.149.134.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC42537B01E
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Apr 2026 07:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775719746; cv=none; b=P4U0mwwK3ak8rVm/55nGNEzDDw2Jy3TkVmudiETG0uaF+XLBQp+rJCuYmQruqMeJmb4J3LXRSYsSdsteEe0lhu3zEzpkilAy5ibL/xlKn7VFI6Nqai5pl20oduTAwxmqbwHHFe6yQ219uE1c95lHg9eLdzq28APvZGBe4zkS/bI=
+	t=1775720542; cv=none; b=Yfgp5u1c9xgMPa+uffAV8AfoyJRhOmHqAfrNvhmfgcxM+EozegvNshmwEynpm5CqfuVzfe7xHeNDHtlM3FGzc1CiSHenf9Q1zk+NnrbctsjEPX1LcyU3qOhhPqNeO6FYu3fut9hLzlO9ymssKaaW+byrWmrQgW+c0BCYRIeGAtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775719746; c=relaxed/simple;
-	bh=IBKDApS8cl9ptSAnQtUs+GTa1DVVnMGBPGv+drTGiIU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=E+tQEmLpY5GjZbDFsB+uTtJB6EnIvpzyyL0HfnYYiBs33CUyvSaWmL/mp8l04oWcGcHhEeBlLJc5rMJTF8j9fdN92dzKm+ji4VHMEVurESC0FLZgw+tkJIidmjiZJlCafS3/X7xJDAlj8fPQqfg6ALfZx9j+YaSZBBPs6kkkQ6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.cn; spf=pass smtp.mailfrom=sina.cn; dkim=pass (1024-bit key) header.d=sina.cn header.i=@sina.cn header.b=cq/rNWf6; arc=none smtp.client-ip=180.149.134.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.cn
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.cn header.i=@sina.cn header.b="cq/rNWf6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.cn; s=201208; t=1775719740;
-	bh=B9Ky8dM7FipFI/IZO7wupdIYKTEbpR7DFPjKqs0Wqbs=;
-	h=From:Subject:Date:Message-Id;
-	b=cq/rNWf6iIYJ3FRuNyZckK2nUhMFz6WLb7MDIhj7uLnLFVGyCqbhYLaqqCFAHLj1M
-	 Ut8ScQkZ6RfK38iY4Nk7rmIwSzzNnYbnq0R53XB4HBdZ1S974TY9dLgjhXDrEFvSDY
-	 abl8043F9fzsKjQ1SBgyPcy5SPucxvFzWq41cNqg=
-X-SMAIL-HELO: NTT-kernel-dev
-Received: from unknown (HELO NTT-kernel-dev)([60.247.85.88])
-	by sina.cn (10.185.250.21) with ESMTP
-	id 69D754A500005FD3; Thu, 9 Apr 2026 15:26:34 +0800 (CST)
-X-Sender: jianqkang@sina.cn
-X-Auth-ID: jianqkang@sina.cn
-Authentication-Results: sina.cn;
-	 spf=none smtp.mailfrom=jianqkang@sina.cn;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=jianqkang@sina.cn
-X-SMAIL-MID: 6621113408540
-X-SMAIL-UIID: BA6D2CF94FC24441B027FD2B1276A3BE-20260409-152634-1
-From: Jianqiang kang <jianqkang@sina.cn>
-To: gregkh@linuxfoundation.org,
-	stable@vger.kernel.org,
-	imv4bel@gmail.com
-Cc: patches@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	luiz.von.dentz@intel.com
-Subject: [PATCH 5.15.y] Bluetooth: SCO: Fix use-after-free in sco_recv_frame() due to missing sock_hold
-Date: Thu,  9 Apr 2026 15:26:29 +0800
-Message-Id: <20260409072629.621981-1-jianqkang@sina.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1775720542; c=relaxed/simple;
+	bh=DP0MaN12chIdKtctde1hPZNgioqVVK73fqKxEgc9Ikk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Ycaf+3D8gtx1SYf/MO0Or4GVp49bQ1N0pV+RxUM+y+uwihaM9MIPZIRpiaq0gd5rzhwnoLhq82/6Zi3jUBr8DrM8Rki4nqREfwrSG5ftlx5KJjbTHDcU9ebLP8GU8xn/hP/LQ3BoK0GUgPGgDKD+pc8Ef8NzZDiArhXpGjR62sI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-67a1e063795so1128628eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Apr 2026 00:42:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775720540; x=1776325340;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gygayrJGgMwZqbWBI6JiR+DhqkU8Ra5y3i3FEQwb3Xk=;
+        b=SE/wcuH94Vy46PhxMFZepHQLuHWqgOy2Zv+u/Iq7wo5twpID/m0TjFdOUR+JNjtGZm
+         Ugta5FVw5o6X8eMOLh/YGIANH5JZMTnEpOqJKM6wt4EPmo66HRPn/shV0Sw81KIPS58Q
+         qDLnUIhXWuBEllMJ0GAaSjzJ+3fJNaVLPX8RuTKtkpJmVyOYxBm0bDjxsaG5upGeY/AH
+         7uteciwcqPLIp1R+FDc6UG1SX9Plq8ebajjqWkmUVesabWAjJ6CPIvuwimN5Wlbh6Lnh
+         c7NYil0BIggkujnd5gYdmqm8FHa4qjsLrLU00ekmlAXn8+jlewQzpiLTMP4moYb/0nlE
+         3uLw==
+X-Gm-Message-State: AOJu0YzmQsgHlBzyxMJu6qFa7MIt6KOvC9uW/PFlYa9zLRUYzz5M0vSb
+	QasgMzFoyT14RaYPsSc1lchyauQapg1RPEuyn0kc4huzaEFCmlzJXchBtzdTd8sdO/uHap/SgdV
+	KQrJ1VNj69GVWwMqJw57WpT9ps7gc8ffOU5eWPRLhakcI0uub7Pfbk0gqIsARnQ==
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a4a:c441:0:b0:682:1c53:89fc with SMTP id
+ 006d021491bc7-68a682b1503mr888315eaf.8.1775720540016; Thu, 09 Apr 2026
+ 00:42:20 -0700 (PDT)
+Date: Thu, 09 Apr 2026 00:42:19 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69d7585b.050a0220.3030df.0011.GAE@google.com>
+Subject: [syzbot] [bluetooth?] general protection fault in h4_recv
+From: syzbot <syzbot+ff30eeab8e07b37d524e@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Hyunwoo Kim <imv4bel@gmail.com>
+Hello,
 
-[ Upstream commit 598dbba9919c5e36c54fe1709b557d64120cb94b ]
+syzbot found the following issue on:
 
-sco_recv_frame() reads conn->sk under sco_conn_lock() but immediately
-releases the lock without holding a reference to the socket. A concurrent
-close() can free the socket between the lock release and the subsequent
-sk->sk_state access, resulting in a use-after-free.
+HEAD commit:    3aae9383f42f Merge tag 'input-for-v7.0-rc6' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17814e06580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5a3e5e8c17cc174e
+dashboard link: https://syzkaller.appspot.com/bug?extid=ff30eeab8e07b37d524e
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=108c0bd6580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11015d02580000
 
-Other functions in the same file (sco_sock_timeout(), sco_conn_del())
-correctly use sco_sock_hold() to safely hold a reference under the lock.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/46384525f287/disk-3aae9383.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/bcd9d5c20ab7/vmlinux-3aae9383.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e4353e5e60e2/bzImage-3aae9383.xz
 
-Fix by using sco_sock_hold() to take a reference before releasing the
-lock, and adding sock_put() on all exit paths.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ff30eeab8e07b37d524e@syzkaller.appspotmail.com
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Jianqiang kang <jianqkang@sina.cn>
+RBP: 00007ffeca659d70 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007fd7d4415fac R14: 00007fd7d4415fa0 R15: 00007fd7d4415fa0
+ </TASK>
+Bluetooth: Can't register HCI device
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN NOPTI
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 0 UID: 0 PID: 5964 Comm: syz.0.18 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/18/2026
+RIP: 0010:h4_recv+0x52/0x1c0 drivers/bluetooth/hci_h4.c:112
+Code: df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 3c 01 00 00 4c 8b a3 b8 01 00 00 48 b8 00 00 00 00 00 fc ff df 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 0f 85 31 01 00 00 49 8b 34 24 48 89 ea 41 b9 04 00 00
+RSP: 0018:ffffc900037afca8 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: ffff888033b48400 RCX: ffffffff887767b0
+RDX: 0000000000000000 RSI: ffffffff8877b6a8 RDI: ffff888033b485b8
+RBP: ffffc900037afd68 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000001 R14: ffff888033b484c0 R15: ffffffff8cc1b1c0
+FS:  000055556677d500(0000) GS:ffff888124339000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fd7d4072140 CR3: 00000000747cb000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ hci_uart_tty_receive+0x259/0x7e0 drivers/bluetooth/hci_ldisc.c:627
+ tiocsti drivers/tty/tty_io.c:2290 [inline]
+ tty_ioctl+0x909/0x1690 drivers/tty/tty_io.c:2706
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl fs/ioctl.c:583 [inline]
+ __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x106/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fd7d419c819
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffeca659d08 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007fd7d4415fa0 RCX: 00007fd7d419c819
+RDX: 0000200000000100 RSI: 0000000000005412 RDI: 0000000000000003
+RBP: 00007fd7d4232c91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fd7d4415fac R14: 00007fd7d4415fa0 R15: 00007fd7d4415fa0
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:h4_recv+0x52/0x1c0 drivers/bluetooth/hci_h4.c:112
+Code: df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 3c 01 00 00 4c 8b a3 b8 01 00 00 48 b8 00 00 00 00 00 fc ff df 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 0f 85 31 01 00 00 49 8b 34 24 48 89 ea 41 b9 04 00 00
+RSP: 0018:ffffc900037afca8 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: ffff888033b48400 RCX: ffffffff887767b0
+RDX: 0000000000000000 RSI: ffffffff8877b6a8 RDI: ffff888033b485b8
+RBP: ffffc900037afd68 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000001 R14: ffff888033b484c0 R15: ffffffff8cc1b1c0
+FS:  000055556677d500(0000) GS:ffff888124339000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fd7d4072140 CR3: 00000000747cb000 CR4: 00000000003526f0
+----------------
+Code disassembly (best guess):
+   0:	df 48 89             	fisttps -0x77(%rax)
+   3:	fa                   	cli
+   4:	48 c1 ea 03          	shr    $0x3,%rdx
+   8:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+   c:	0f 85 3c 01 00 00    	jne    0x14e
+  12:	4c 8b a3 b8 01 00 00 	mov    0x1b8(%rbx),%r12
+  19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  20:	fc ff df
+  23:	4c 89 e2             	mov    %r12,%rdx
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+  2e:	0f 85 31 01 00 00    	jne    0x165
+  34:	49 8b 34 24          	mov    (%r12),%rsi
+  38:	48 89 ea             	mov    %rbp,%rdx
+  3b:	41                   	rex.B
+  3c:	b9                   	.byte 0xb9
+  3d:	04 00                	add    $0x0,%al
+
+
 ---
- net/bluetooth/sco.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index d98648bcc1a8..d0ef74c45914 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -311,7 +311,7 @@ static void sco_recv_frame(struct sco_conn *conn, struct sk_buff *skb)
- 	struct sock *sk;
- 
- 	sco_conn_lock(conn);
--	sk = conn->sk;
-+	sk = sco_sock_hold(conn);
- 	sco_conn_unlock(conn);
- 
- 	if (!sk)
-@@ -320,11 +320,15 @@ static void sco_recv_frame(struct sco_conn *conn, struct sk_buff *skb)
- 	BT_DBG("sk %p len %u", sk, skb->len);
- 
- 	if (sk->sk_state != BT_CONNECTED)
--		goto drop;
-+		goto drop_put;
- 
--	if (!sock_queue_rcv_skb(sk, skb))
-+	if (!sock_queue_rcv_skb(sk, skb)) {
-+		sock_put(sk);
- 		return;
-+	}
- 
-+drop_put:
-+	sock_put(sk);
- drop:
- 	kfree_skb(skb);
- }
--- 
-2.34.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
