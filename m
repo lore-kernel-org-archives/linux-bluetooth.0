@@ -1,123 +1,128 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F8238BF72
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Apr 2026 10:42:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F773AE188
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Apr 2026 10:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775817767; cv=none; b=fCHJNfmOA2INWejBwP4OuWyrSHyNRMcCOGMzE315536mtuF+tJvRPrHdqtDRFI5yWrFrVGZrOUGUrtwZlA1r447v6XR+PlAOhE5jiJabAi9E+kCBTQcTTQ5SZscwzirWDChXNpA/k+EJK+aCGRh6Z6Cc/dvReD7Y7gtorP1qk/g=
+	t=1775818324; cv=none; b=VnPeGIx/1ezcAHLOgYcfG09ZIaC7kfe/kqXxd/ITh7rjLyVSC+uViY04kvUcdKFoA8EwYQ8DWG/An3YqpN/SVFfVdeN8ii50JleCSIpnPbCI84yGNFC38QeYoIikWx0ngE89SnKtPNGrIPTa0X59WeFQeGewYvejzgtxEeI922s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775817767; c=relaxed/simple;
-	bh=x3vbm8dzITfs2TJ7MgGNykoYMSBX/YyGWE+qZBJOPho=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K2QHEQyRD59RWjwMYXSQ1F8cn2v/mlGUoVRqRWpTsnfvgLe4Wjye0+TRvMcUytDMyKv8MoLMxzQu2Y/XtfDcc078y7QIYHKntHm/0TwJetdEihOjhRAwag0s7ttn7M0iwNrpTjITKdpuVK3HninAoNuiLqaG1d5up/EGLbcU9aE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=insXvcVY; arc=none smtp.client-ip=209.85.216.44
+	s=arc-20240116; t=1775818324; c=relaxed/simple;
+	bh=Cxz1qCPx/lC5bKi3NVA/dyPwOzDhLgr7HMSvC9rvTzU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=grpZi1FVWbl+wWv4MI/6hS3VPpcA7Hab5zbxmbpf5+u8usMz0OrCuNJ6sA68lDtB7KzHZFEm51VOQIiCTsdOih5jfwiQi9w6cPvh52W2aaBHMxZNPdPD4b1f6fgkz3ubu1fMYO7qmSpsoPZ2jib4DubUGmUx21Oi0Q04SWSYulw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QkEfbTCE; arc=none smtp.client-ip=209.85.222.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="insXvcVY"
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-35691a231a7so1360504a91.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Apr 2026 03:42:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QkEfbTCE"
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8cfd122d78fso260946785a.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Apr 2026 03:51:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775817765; x=1776422565; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HeexHBGM6m9iUjQldRYMFqUMdoXfHrQClpu5bKv1pA4=;
-        b=insXvcVYKRL6+QbkbRXxESj+dwhtPvJwU64C3bOpPf1dWTUWSZHKFMYZ6VPy54spnZ
-         +bq7lT1cDJxR/B0bxnfjpXK8UQbMlQ50OMNZ08XWJPicj7QY4rgEOUj0dR+zjnS//b51
-         wb4lAVHa7DYj+5v4To59Vw0dc6g1UvWzmIDk8IctoRly4ILcGITM45EobvNkAq73PlCT
-         oetZ0oDsabICoejbXlgTND1rWiy1am/NY9beYvMTl4LtIKvyA6oJ4ZV8RgAapQu5AWWO
-         BGW4wZYnTuZH+WNv/IwvHr9+PgHX2X3fYgS7lhWgkw0BXQq7SQYQ0gdbnODPQnEz082D
-         qplw==
+        d=gmail.com; s=20251104; t=1775818318; x=1776423118; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=5VL9tNQIKKCukXUFqKbMMOCYv1SbXr/GgcxXVB8c7Uk=;
+        b=QkEfbTCEZM7XExOL+Ewueir1mvEvxQbGqc5g86c455d46QouqYFspu2Zwz3aA7h8zb
+         mDXunpuSJpX7G725aSVJ4eWABnX0JjOSuJSQnc5eWg/H2Q8knc2da+aJ8/FYXPu1cGFf
+         9zy9o2QWafFmOSeyx3n0d9tlS7TLBPEgmL/HM1/rp9CWU9I+aFJeeewfxsxGnAgDiAkq
+         ou8Z8jPj2CsjetWx6GmJddWtfqVJ7wGXKIYNpBvaflXLaI08NzRwOGJlwWyCsX1dcjPk
+         0kkHAwB2JGh9km3Df7+au3t3mU2gLfdD4fdfuOfiTzLQrqAPatXaHfWDlLfiVuE7uQGF
+         o7aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775817765; x=1776422565;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1775818318; x=1776423118;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HeexHBGM6m9iUjQldRYMFqUMdoXfHrQClpu5bKv1pA4=;
-        b=JBIWXn+lZrhdLToMtSUZOebnlsC//dK4m8g+r9TS3RM05nf0hT4kf2C0G2B+fd9rKN
-         6gZaEISX/unByzu6405brG8p5VQQXmBbEpybt6OzAZMBQ2ytPSZDgl0e6DZ0Si2IGCKW
-         8ea5y1GV2MM5Vwn8icnMaXNpHitHmyrnrVHkbJchMSlNm2e0zErFJx60pizIh/bTHwju
-         is26GHhMJKR4eNxYMR/0L+0o8PvgfRjCHIPPE7FbElvgla7VbwxReaFIwvdD8SSvTS+v
-         5jww5kO8radj4FboUV1c3cWeFET8FRgRhsHkZA3awGoVTOx2i1UxVW+Lw3S7UnEgBVJR
-         lYGQ==
-X-Gm-Message-State: AOJu0YysucTn81xMdsNY5ztb+QlapSm+Eib2TKQl0E8cvLMhU8GSaSXi
-	uecmw/1Y09FzQsHlZzRjO0pVu4THlnxzLF/+tqD3X57tLgVvQuTn+n0cKBhYaA==
-X-Gm-Gg: AeBDieupPHlDdyc5hdRUdVjVaV1ZwRXTU4Dxz3C4D0D3j56BEgN0uhjTMKfNjemVrIn
-	2KiJ68A9OmoTVw2Kmhlgso30gwIztBobFFNXOVRysQfw5t7avZuYtqm5MMhymB780hD2iqMnpQG
-	WmydXLigL2rvloPJfrosBiqQX8E679G4BE9kKo6ciumx+2OE9JlkTgYfULvXsB1U/GRNoFv4IWL
-	JnY6N0Efrn5W7q7ER1s9taKUVK92rFONLn4h0CFmZoyCzfSy57mGRpv8o+R0qFBziCxwUBgch28
-	jE7VzgMDlVFG3vEw9N14BeUgZggXXc0nY90yD9dxrLJ2IIbnEJQreUK9yKH1T7yBqAfmY+S3t+c
-	o18V6qTBEWUG4GyO2x3lInQCxgjbbublOke+fbfOUQ/UvVp7RCCwrjfn7PNI7ZaFVTnRiwE2mF4
-	tQq/VgoxJQy2WIRH2igJAIx2nTkHrH3eXeuoRyVsxgsCwNFng=
-X-Received: by 2002:a17:90b:4c8e:b0:35b:9ab6:1d4a with SMTP id 98e67ed59e1d1-35e4280ebc7mr2927325a91.18.1775817764639;
-        Fri, 10 Apr 2026 03:42:44 -0700 (PDT)
-Received: from fedora ([61.74.238.173])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35e412233ddsm2904247a91.5.2026.04.10.03.42.42
+        bh=5VL9tNQIKKCukXUFqKbMMOCYv1SbXr/GgcxXVB8c7Uk=;
+        b=sHR/OJciyMQ4ZEF3YGOjPCAffhdsGiX9Nqhrt4oKf11O+26XvkWSObSBD65+5Ko6Qx
+         /BVtwBUxIBbxh6w2rwTwpcvlOFwkXDbCjYNeBzPpnYUpwFGWki4NqnnccBiKxTQmBV+w
+         4p+CqwZZoHCWG3dGr0xWZey2epDJzDODTPcLJXxClCHYbuclEW2GYtr7Lhw6iS7xUDyp
+         YdM6gqyif7xwAp58o6I9PcBjFxqBG972hWcNcrjt8P/DQkRk+rhATuqdTrHZRfCroP3U
+         atO+XKUSG8OSALxmy8tRkpAm5sPHfLeUhWwd+Jf+dmTKRWqqWKsbyUvfX1lUxOnezteB
+         DE5w==
+X-Gm-Message-State: AOJu0YxezylHGpaSjRGhbIDLUkgETn1dXHODJA6rH5kjDLcE1TcHuay6
+	m/S7dHmH3RMZ9RbTso0QjHhAfmLkD/GvL/pq7XZ6NrpnMgXC5SZYxL5Hb56+hYRf
+X-Gm-Gg: AeBDievJoWEYHQGKQWuoOOrFNFibJfuw2c2op0DyX7oUqhtippQ/OD7s1GEAZ/Orv8W
+	J2eURPjxGg6ToRNbqDM/6EXsxmqFEInJYM9uJ8mFo4Qct+4Hrv9WkWf4vk95pM0pp8b9I6lRYr3
+	m8zDwlFPfJpu0cKeFLOcbJCrB80AtVmbdrY2pMu+Gg4lk8w8zVYkXerYgJs+2bEqInERldmJFgM
+	mypApHcBhkOh5rcwrYW/4k7sUMUtD5CidusndjexqVSushhp6xjKXEs/i6ibJsOlvhWATJHTZzh
+	n4i58v/ieg0ozWnw7UWPNYwaUY03kDUQ9QsxiumyCphzACMX1JtlH/o9mfKCityIfPo5a03lV3j
+	oBwzaMGwwIgw2Cu9uoR7XiSXtTa+ockBNJJ1sW34LJlD1jTVyJjQwI49wEbBcxxDlsOVf09qJul
+	y7MLzP9imBiCOIkwPPixeSVmeied6I
+X-Received: by 2002:a05:6214:4807:b0:89c:da2b:4905 with SMTP id 6a1803df08f44-8ac86157c5emr39968536d6.8.1775818317756;
+        Fri, 10 Apr 2026 03:51:57 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.222.81])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ac84a3452fsm25019566d6.17.2026.04.10.03.51.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Apr 2026 03:42:44 -0700 (PDT)
-From: SeungJu Cheon <suunj1331@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	johan.hedberg@intel.com,
-	linux-kernel@vger.kernel.org,
-	me@brighamcampbell.com,
-	shuah@kernel.org,
-	linux-kernel-mentees@lists.linux.dev,
-	SeungJu Cheon <suunj1331@gmail.com>
-Subject: [PATCH] Bluetooth: hci_event: reject incoming conn request when MASTER conn exists
-Date: Fri, 10 Apr 2026 19:42:22 +0900
-Message-ID: <20260410104222.537901-1-suunj1331@gmail.com>
-X-Mailer: git-send-email 2.52.0
+        Fri, 10 Apr 2026 03:51:57 -0700 (PDT)
+Message-ID: <69d8d64d.050a0220.3a23ec.10b6@mx.google.com>
+Date: Fri, 10 Apr 2026 03:51:57 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6102886096991899115=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, 294305068@qq.com
+Subject: RE: [BlueZ] src/device: Add ConnectedUUIDs property
+In-Reply-To: <tencent_8CF6DCCE00806DF68DB0363D6A1E68340707@qq.com>
+References: <tencent_8CF6DCCE00806DF68DB0363D6A1E68340707@qq.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-hci_conn_request_evt() reuses an existing connection without checking
-its role. When the existing connection has the MASTER role (outgoing
-connection in progress), conn->state is incorrectly overwritten from
-BT_CONNECTED or BT_OPEN to BT_CONNECT, causing state machine corruption.
+--===============6102886096991899115==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This can lead to use-after-free or state confusion when the connection
-is later disconnected.
+This is automated email and please do not reply to this email!
 
-The issue was observed during VHCI testing:
+Dear submitter,
 
-  Thread 1: Local connect() -> conn created (role=MASTER, state=BT_OPEN)
-  Thread 2: Remote Connection Request received
-         -> hci_conn_hash_lookup_ba() finds existing MASTER conn
-         -> conn->state overwritten to BT_CONNECT (no role check!)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1079646
 
-Fix by rejecting incoming connection requests when a MASTER connection
-to the same address already exists.
+---Test result---
 
-Fixes: 70c464256310 ("Bluetooth: Refactor connection request handling")
-Signed-off-by: SeungJu Cheon <suunj1331@gmail.com>
+Test Summary:
+CheckPatch                    PENDING   0.33 seconds
+GitLint                       PENDING   0.34 seconds
+BuildEll                      PASS      20.02 seconds
+BluezMake                     PASS      633.80 seconds
+MakeCheck                     PASS      19.08 seconds
+MakeDistcheck                 PASS      243.43 seconds
+CheckValgrind                 PASS      290.97 seconds
+CheckSmatch                   PASS      344.92 seconds
+bluezmakeextell               PASS      179.46 seconds
+IncrementalBuild              PENDING   0.33 seconds
+ScanBuild                     PASS      996.34 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+https://github.com/bluez/bluez/pull/2028
+
 ---
- net/bluetooth/hci_event.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 286529d2e554..3d34cf2e5067 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3327,6 +3327,12 @@ static void hci_conn_request_evt(struct hci_dev *hdev, void *data,
- 			bt_dev_err(hdev, "connection err: %ld", PTR_ERR(conn));
- 			goto unlock;
- 		}
-+	} else if (conn->role == HCI_ROLE_MASTER) {
-+		/* Reject incoming request when outgoing connection to
-+		 * the same device is already in progress.
-+		 */
-+		hci_reject_conn(hdev, &ev->bdaddr);
-+		goto unlock;
- 	}
- 
- 	memcpy(conn->dev_class, ev->dev_class, 3);
--- 
-2.52.0
 
+--===============6102886096991899115==--
