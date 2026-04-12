@@ -1,97 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE8B2DC331;
-	Sun, 12 Apr 2026 16:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776010575; cv=none; b=OgUiw2/oSrlp7E/IpNTrvNF4CrfhBSLebSFlvSBi/L/aTQCyIlHO0wtX3A5lPkzTu61R8HSDxo/+b9wuav0p4a/pxlF/Pjcc4Kts/G4URml/bbZ94nsFGW6OwYCkiGoGNryp1LIK0taZq/InFvI72rTjs7z2hqfEd8X3l9cLLl8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776010575; c=relaxed/simple;
-	bh=i8+c3zrd0aQ70iWJjRyQOJIhJYSNkL7NpiN2ytAgdyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XmTr35Lz0jIhbEE3NEQWyV1l83C9eDcsflf3aBX/mR6Qr6htUxvKmqSSD0gFjo6Jm8A0+v+oYS1BTlA1LIJe45nVG0hmPE0pOhCCEBY5X3GxhLUZmRiN3MtoqvvOTnXnaqnI4Y8hldW0if+io/PQ6KzBvMUc33McPQCFq0HDUNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Snttv5c7; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F5B36213D
+	for <linux-bluetooth@vger.kernel.org>; Sun, 12 Apr 2026 18:47:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776019680; cv=pass; b=p17Ioviz4L7Zb6ondWj9+NSDn5D/4tTQjBai1fnNsd8Am9zTbrsxBxHD3NDCQ0071XQEe1x3uRKJqLgJYMMZlozItZ4aFFbqrDZRS1QY2KRY8SeJE4g6emfFNeJD9fQjjHVh/o8SkLhXYxfLH6okL7k2d4XlZH6Z4UYi58lSHd0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776019680; c=relaxed/simple;
+	bh=h15z0epoXSb2fnfgZWnBBasdb2hQbyX+lmBmBcCv3vY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XFgMG47M6YGAej2EeVw5id+esfxp3hFvAaePTuOGoSKhWKLLwf8uIkte0gxbDCnl9XLpYaBuDcA+2WeW8aEbdxFOaRHkJ5jbzmfC/gF3IKCB9RwpwU4wnVM+ao65VgyQ9Qh4mYhtVYyLJdH2kBYtlGUDK1uOdYpO8wE6mRAJFd8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=gB4Y4BCl; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Snttv5c7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D24FC19424;
-	Sun, 12 Apr 2026 16:16:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776010575;
-	bh=i8+c3zrd0aQ70iWJjRyQOJIhJYSNkL7NpiN2ytAgdyc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Snttv5c7ZYaIftvcONG5laIm6mjGFHPF6/0lkK8wot828xgp4NiATEHhEIp5F3lnF
-	 JdS8qJve4gHwmJqt2/TsTQobM+srDcyNFGlV/8dYSEXGKGJIKIUgtggo9YOtLXsJLV
-	 2d4DHir4STAWNdSkGlhcl55H/Upwk7CMnXLnkkbkpEpuiIBC81aZQbABPZ6TW2DED2
-	 UsUxHAXhCT95Xixhbiv9zJFiqwPbeX+ctxxBLl2UfJS5el70bPcOKOZbpRGgcQUknW
-	 aamRotzmgqrBWO4SFo/TFxpXOTXWrMTYtJj0FJ1SY0YQlNiTZmK5OYtJs8xTl+muyb
-	 MNFTMGw/0Lglg==
-Date: Sun, 12 Apr 2026 09:16:14 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [GIT PULL] bluetooth-next 2026-04-10
-Message-ID: <20260412091614.1786af4e@kernel.org>
-In-Reply-To: <20260410172206.150975-1-luiz.dentz@gmail.com>
-References: <20260410172206.150975-1-luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="gB4Y4BCl"
+Received: from monolith.lan (mobile-access-2e844b-114.dhcp.inet.fi [46.132.75.114])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4fv00P3KR5zyQn;
+	Sun, 12 Apr 2026 21:47:49 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1776019669;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=iISAEr/jdT9eahX9gMcxAOt2ntBAvLwrRUF7qdh1g1s=;
+	b=gB4Y4BClY1HWncJXz1Tn0LEbudS8MAqLn+J9YW0BLS8vpHT2hGQGkErFDXvZ9V3gV5/X0A
+	neSXDbnv+ZoNhBG0YjWiama93tRsVJ02/RifaovkekTLPAAnM1oYvsROQGZ/BFkDkHC+e+
+	Gx2S+oXB2oA82aU/UfeOW/Y8ZzNxX5s=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1776019669;
+	b=KXgc+GbdN62W++UsovA0wNykPlvd77542mMqNbAx8cAPLKsIM18Z5T8G+jAQoGFTQdjbks
+	89dKKxtLH1esvayKXd6rN+bCmjyEuvVKPMtggzIOmKZurpc0cjw8VDAulCvGQijS60eW3j
+	Z210NEkbMM3kr0n7XH5zI94pIBw6WK0=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1776019669;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=iISAEr/jdT9eahX9gMcxAOt2ntBAvLwrRUF7qdh1g1s=;
+	b=YvU+muhruKZIUMoQZaYiYgGcGEZgFd2jbeHe2XGVaNhR6XzN63ydrtzz+XWNUJHd6gulvw
+	yQ938kv3dNxcUZQvuwAirY2h45udWagkOZXO4w4T3pe4UjKqxGuSnxkuM0sRhV7tPaX6ND
+	NVff1ooUdjr2/Y2Fki07LmsqraESNFY=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH] Bluetooth: SCO: fix sleeping under spinlock in sco_conn_ready
+Date: Sun, 12 Apr 2026 21:47:42 +0300
+Message-ID: <9f333a79da3f0f552ca735d549ea3e8ae0784220.1776019593.git.pav@iki.fi>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Fri, 10 Apr 2026 13:22:06 -0400 Luiz Augusto von Dentz wrote:
-> bluetooth-next pull request for net-next:
-> 
-> core:
->  - hci_core: Rate limit the logging of invalid ISO handle
->  - hci_sync: make hci_cmd_sync_run_once return -EEXIST if exists
->  - hci_event: fix locking in hci_conn_request_evt() with HCI_PROTO_DEFER
->  - hci_event: fix potential UAF in SSP passkey handlers
->  - HCI: Avoid a couple -Wflex-array-member-not-at-end warnings
->  - L2CAP: CoC: Disconnect if received packet size exceeds MPS
->  - L2CAP: Add missing chan lock in l2cap_ecred_reconf_rsp
->  - L2CAP: Fix printing wrong information if SDU length exceeds MTU
->  - SCO: check for codecs->num_codecs == 1 before assigning to sco_pi(sk)->codec
-> 
-> drivers:
->  - btusb: MT7922: Add VID/PID 0489/e174
->  - btusb: Add Lite-On 04ca:3807 for MediaTek MT7921
->  - btusb: Add MT7927 IDs ASUS ROG Crosshair X870E Hero, Lenovo Legion Pro 7
-> 	  16ARX9, Gigabyte Z790 AORUS MASTER X, MSI X870E Ace Max, TP-Link
-> 	  Archer TBE550E, ASUS X870E / ProArt X870E-Creator.
->  - btusb: Add MT7902 IDs 13d3/3579, 13d3/3580, 13d3/3594, 13d3/3596, 0e8d/1ede
->  - btusb: MediaTek MT7922: Add VID 0489 & PID e11d
->  - btintel: Add support for Scorpious Peak2 support
->  - btintel: Add support for Scorpious Peak2F support
->  - btintel_pcie: Add device id of Scorpius Peak2, Nova Lake-PCD-H
->  - btintel_pcie: Add device id of Scorpious2, Nova Lake-PCD-S
->  - btmtk: Add reset mechanism if downloading firmware failed
->  - btmtk: Add MT6639 (MT7927) Bluetooth support
->  - btmtk: fix ISO interface setup for single alt setting
->  - btmtk: add MT7902 SDIO support
->  - Bluetooth: btmtk: add MT7902 MCU support
->  - btbcm: Add entry for BCM4343A2 UART Bluetooth
->  - qca: enable pwrseq support for wcn39xx devices
->  - hci_qca: Fix BT not getting powered-off on rmmod
->  - hci_qca: disable power control for WCN7850 when bt_en is not defined
->  - hci_qca: Fix missing wakeup during SSR memdump handling
->  - hci_ldisc: Clear HCI_UART_PROTO_INIT on error
->  - mmc: sdio: add MediaTek MT7902 SDIO device ID
->  - hci_ll: Enable BROKEN_ENHANCED_SETUP_SYNC_CONN for WL183x
+sco_conn_ready calls sleeping functions under conn->lock spinlock.
 
-Two fixes tags are messed up here:
+The critical section can be reduced: conn->hcon is modified only with
+hdev->lock held. It is guaranteed to be held in sco_conn_ready, so
+conn->lock is not needed to guard it.
 
-Commit: 802446198014 ("Bluetooth: btmtk: hide unused btmtk_mt6639_devs[] array")
-	Fixes tag: Fixes: 4cdd001ff03f ("Bluetooth: btmtk: Add MT6639 (MT7927) Bluetooth support")
-	Has these problem(s):
-		- Target SHA1 does not exist
+Move taking conn->lock after lock_sock(parent). This also follows the
+lock ordering lock_sock() > conn->lock elsewhere in the file.
 
-Commit: 28c9cc700e30 ("Bluetooth: L2CAP: Fix printing wrong information if SDU length exceeds MTU")
-	Fixes tag: Fixes: fa768fce4aae ("Bluetooth: LE L2CAP: Disconnect if received packet's SDU exceeds IMTU")
-	Has these problem(s):
-		- Target SHA1 does not exist
+Fixes: 27c24fda62b60 ("Bluetooth: switch to lock_sock in SCO")
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
+ net/bluetooth/sco.c | 20 +++++++++-----------
+ 1 file changed, 9 insertions(+), 11 deletions(-)
+
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 18826d4b9c0b..3a5479538e85 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -1377,26 +1377,24 @@ static void sco_conn_ready(struct sco_conn *conn)
+ 		sk->sk_state_change(sk);
+ 		release_sock(sk);
+ 	} else {
+-		sco_conn_lock(conn);
+-
+-		if (!conn->hcon) {
+-			sco_conn_unlock(conn);
++		if (!conn->hcon)
+ 			return;
+-		}
++
++		lockdep_assert_held(&conn->hcon->hdev->lock);
+ 
+ 		parent = sco_get_sock_listen(&conn->hcon->src);
+-		if (!parent) {
+-			sco_conn_unlock(conn);
++		if (!parent)
+ 			return;
+-		}
+ 
+ 		lock_sock(parent);
+ 
++		sco_conn_lock(conn);
++
+ 		sk = sco_sock_alloc(sock_net(parent), NULL,
+ 				    BTPROTO_SCO, GFP_ATOMIC, 0);
+ 		if (!sk) {
+-			release_sock(parent);
+ 			sco_conn_unlock(conn);
++			release_sock(parent);
+ 			return;
+ 		}
+ 
+@@ -1417,9 +1415,9 @@ static void sco_conn_ready(struct sco_conn *conn)
+ 		/* Wake up parent */
+ 		parent->sk_data_ready(parent);
+ 
+-		release_sock(parent);
+-
+ 		sco_conn_unlock(conn);
++
++		release_sock(parent);
+ 	}
+ }
+ 
+-- 
+2.53.0
+
