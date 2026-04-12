@@ -1,211 +1,156 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0152D97BB;
-	Sun, 12 Apr 2026 07:38:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD07E31E845;
+	Sun, 12 Apr 2026 09:33:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775979516; cv=none; b=R4cLPhqFWqEEKtvQc2+egQnRz/H/HTBOQe2AJ1tvjGzCFu0ST8RrB5IT8JjMnfqAhazGBHpq3ruSOT03mpL02DGOAsfePShaRB0X619233ys44qtljCxtXYMp9aQZ6oV9wZuqwxDLySoknikSyGS7XJmtvHDMjXvUhwrK2Gm5CQ=
+	t=1775986393; cv=none; b=CkTHlZiav/P1fpvs5E3in+GKExvE/l7CN7TB+nbnsBeyzsjiSmxhyFFnfMM0zuWlVewLu4/1BzigF9Ub0Asl171ng2uwj6kQlumHXD0cyHHsZPYO7+Hc1mPoEPVBEmeH3kNHxHkcDVBWXKZURJU+pKUgPJsiy2xAFfOtyjLcfKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775979516; c=relaxed/simple;
-	bh=klXkvAco3dCEhyPEk2nAJN7GzJnM1we71W3KS1Fsd1I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gosr/dhfSEOwyW+3z0VMNaj7A6svRAeDfzlfgqmtPs5/B0QRFadduxqY89tRqAZfdj1Iqt1JEta7WI71J2/lzPJn0VeIP8+afDJEN2BesxnwS3K4ZniCZ2cdNQdG/d9oTJc1vlKcObiPsXewh1hVKvUjclDobXrMkHPJEG6ILN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.229] (p5dc559e8.dip0.t-ipconnect.de [93.197.89.232])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E0A164C2C37F03;
-	Sun, 12 Apr 2026 09:37:59 +0200 (CEST)
-Message-ID: <e009a1a1-17df-4845-b72a-ca6442754472@molgen.mpg.de>
-Date: Sun, 12 Apr 2026 09:37:58 +0200
+	s=arc-20240116; t=1775986393; c=relaxed/simple;
+	bh=UxHLX5c71n1eUJs1wHZNommuSug90KCdOCb+bplWQ18=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NdJhyE6OSpau4WBkIqIYhq24OxayEOOJZTrpARsjVNldX8rLiHycwZskba6ro70PE3ETrV6jiCyZDnS+P1vt9hgAj+0/V9i9pE77EtfM5P047N/3CuYwwgSAHp8c8264r6TOGxDskAKDYT7/Qn6k225e9giW0Hwbwu6uadockRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=AIEtBjxo; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="AIEtBjxo"
+X-UUID: 5ef13b98364e11f1ae70033691e9ac7d-20260412
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=eswdepsRpw7C5ySDeJmU7CTcV9FFqFZQAQ3ydAH/FJg=;
+	b=AIEtBjxo7H8BY4cwD9fF2KTvV0Gj6uDHfHwGJsHBIRoz6WijwrU14WU7x5fy+KuIV3h05KKSUQjAO+XAc4NtjEfHXf+tbiX/pWitsAcf2takfKxqtHyVMEAl7CDRz8gqlFnT2y251a2QvnVyNDgd4S0dkVvnMBAX4VAPv91IvjE=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:34b8f43c-efc8-4f02-a09e-c2b2c8efa1db,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:e7bac3a,CLOUDID:c66d528f-6df4-4a3d-a7a4-fbdc42d669ce,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102|836|865|888|898,TC:-5,Content:0|
+	15|50,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0
+	,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 5ef13b98364e11f1ae70033691e9ac7d-20260412
+Received: from mtkmbs09n1.mediatek.inc [(172.21.101.35)] by mailgw01.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1143948933; Sun, 12 Apr 2026 17:02:45 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
+ MTKMBS09N1.mediatek.inc (172.21.101.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Sun, 12 Apr 2026 17:02:44 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.2562.29 via Frontend Transport; Sun, 12 Apr 2026 17:02:44 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
+	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH v3] Bluetooth: btmtk: add event filter to filter specific event
+Date: Sun, 12 Apr 2026 17:02:42 +0800
+Message-ID: <20260412090242.1129701-1-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: RFCOMM: validate skb length in MCC handlers
-To: SeungJu Cheon <suunj1331@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- luiz.dentz@gmail.com, kees@kernel.org, kuba@kernel.org,
- me@brighamcampbell.com, shuah@kernel.org,
- linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20260412045457.53100-1-suunj1331@gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260412045457.53100-1-suunj1331@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Dear SeungJu,
+Add an event filter to filter event with specific opcode to prevent BT
+stack from receiving unexpected event.
 
+Event with opcode 0xfc5d is generated when MediaTek's Bluetooth enable
+firmware logs and is not expected to be sent to userspace.
 
-Thank you for the patch.
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+---
+v1 -> v2 : update commit message
+v2 -> v3 : add boundary check in btmtk.c in btmtk_recv_event; keep using
+           hci_recv_frame if CONFIG_BT_MTK wasn't defined in btmtk.h
+---
+ drivers/bluetooth/btmtk.c | 23 +++++++++++++++++++++++
+ drivers/bluetooth/btmtk.h |  7 +++++++
+ drivers/bluetooth/btusb.c |  2 ++
+ 3 files changed, 32 insertions(+)
 
-Am 12.04.26 um 06:54 schrieb SeungJu Cheon:
-> rfcomm_recv_pn(), rfcomm_recv_rpn(), rfcomm_recv_rls(), and
-> rfcomm_recv_msc() cast skb->data to their respective structs
-> without first checking skb->len. A remote device can send a
-> short MCC frame, causing out-of-bounds reads from the skb buffer.
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index 55516b4602db..78e84ecbbb91 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -1503,6 +1503,29 @@ int btmtk_usb_shutdown(struct hci_dev *hdev)
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(btmtk_usb_shutdown);
++
++int btmtk_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct hci_event_hdr *hdr = (void *)skb->data;
++	struct hci_ev_cmd_complete *ec;
++
++	if (hdr->evt == HCI_EV_CMD_COMPLETE &&
++	    skb->len >= HCI_EVENT_HDR_SIZE + sizeof(*ec)) {
++		u16 opcode;
++
++		ec = (void *)(skb->data + HCI_EVENT_HDR_SIZE);
++		opcode = __le16_to_cpu(ec->opcode);
++
++		/* Filter vendor opcode */
++		if (opcode == 0xfc5d) {
++			kfree_skb(skb);
++			return 0;
++		}
++	}
++
++	return hci_recv_frame(hdev, skb);
++}
++EXPORT_SYMBOL_GPL(btmtk_recv_event);
+ #endif
+ 
+ MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
+diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+index adaf385626ee..c93652508f14 100644
+--- a/drivers/bluetooth/btmtk.h
++++ b/drivers/bluetooth/btmtk.h
+@@ -218,6 +218,8 @@ int btmtk_usb_suspend(struct hci_dev *hdev);
+ int btmtk_usb_setup(struct hci_dev *hdev);
+ 
+ int btmtk_usb_shutdown(struct hci_dev *hdev);
++
++int btmtk_recv_event(struct hci_dev *hdev, struct sk_buff *skb);
+ #else
+ 
+ static inline int btmtk_set_bdaddr(struct hci_dev *hdev,
+@@ -296,4 +298,9 @@ static inline int btmtk_usb_shutdown(struct hci_dev *hdev)
+ {
+ 	return -EOPNOTSUPP;
+ }
++
++static inline int btmtk_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	return hci_recv_frame(hdev, skb);
++}
+ #endif
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f9d515ee9124..daf8a387e660 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -4150,6 +4150,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 	} else if (id->driver_info & BTUSB_MEDIATEK) {
+ 		/* Allocate extra space for Mediatek device */
+ 		priv_size += sizeof(struct btmtk_data);
++
++		data->recv_event = btmtk_recv_event;
+ 	}
+ 
+ 	data->recv_acl = hci_recv_frame;
+-- 
+2.45.2
 
-Nice catch. Do you have a reproducer to create such a short MCC frame?
-
-> For rfcomm_recv_pn(), the uninitialized pn->mtu value is stored
-> in d->mtu via rfcomm_apply_pn(), then echoed back to the remote
-> device in the PN response, leaking kernel heap data.
-> 
-> This results in use of uninitialized memory, as reported by KMSAN.
-> 
-> Add explicit skb->len checks against the expected structure size
-> at the start of each handler before accessing the payload.
-> 
-> =====================================================
-> BUG: KMSAN: uninit-value in rfcomm_run+0x7eae/0xee90
->   rfcomm_run+0x7eae/0xee90
->   kthread+0x53f/0x600
->   ret_from_fork+0x20f/0x910
->   ret_from_fork_asm+0x1a/0x30
-> 
-> Uninit was created at:
->   kmem_cache_alloc_node_noprof+0x3cd/0x12d0
->   __alloc_skb+0x855/0x1190
->   vhci_write+0x125/0x960
->   vfs_write+0xbe1/0x15c0
->   ksys_write+0x1d9/0x470
->   __x64_sys_write+0x97/0xf0
->   x64_sys_call+0x2ff0/0x3ea0
->   do_syscall_64+0x134/0xf80
->   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> CPU: 0 UID: 0 PID: 3374 Comm: krfcommd Tainted: G        W           7.0.0-rc7
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
-> Kernel panic - not syncing: kmsan.panic set ...
-> =====================================================
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: SeungJu Cheon <suunj1331@gmail.com>
-> ---
->   net/bluetooth/rfcomm/core.c | 40 +++++++++++++++++++++++++++++--------
->   1 file changed, 32 insertions(+), 8 deletions(-)
-> 
-> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-> index 611a9a94151e..daeba71a1514 100644
-> --- a/net/bluetooth/rfcomm/core.c
-> +++ b/net/bluetooth/rfcomm/core.c
-> @@ -1431,9 +1431,15 @@ static int rfcomm_apply_pn(struct rfcomm_dlc *d, int cr, struct rfcomm_pn *pn)
->   
->   static int rfcomm_recv_pn(struct rfcomm_session *s, int cr, struct sk_buff *skb)
->   {
-> -	struct rfcomm_pn *pn = (void *) skb->data;
-> +	struct rfcomm_pn *pn;
->   	struct rfcomm_dlc *d;
-> -	u8 dlci = pn->dlci;
-> +	u8 dlci;
-> +
-> +	if (skb->len < sizeof(*pn))
-> +		return -EINVAL;
-> +
-> +	pn = (void *) skb->data;
-> +	dlci = pn->dlci;
-
-gemini/gemini-3.1-pro-preview comments [1]. No idea if it’s a valid comment:
-
-> Before these handlers are reached, rfcomm_recv_mcc() unconditionally casts
-> skb->data to struct rfcomm_mcc * and reads mcc->type and mcc->len. Does
-> this leave an out-of-bounds read unpatched if a remote device sends an MCC
-> frame with 0 or 1 bytes of payload?
-> Additionally, if rfcomm_recv_frame() unconditionally trims the FCS with
-> skb->len--; skb->tail--;, could a 0-byte payload cause skb->len to
-> underflow to UINT_MAX?
-> Since skb->len is unsigned, this new check (UINT_MAX < 8) would evaluate to
-> false, potentially bypassing this protection entirely.
->   
->   	BT_DBG("session %p state %ld dlci %d", s, s->state, dlci);
->   
-> @@ -1483,8 +1489,8 @@ static int rfcomm_recv_pn(struct rfcomm_session *s, int cr, struct sk_buff *skb)
->   
->   static int rfcomm_recv_rpn(struct rfcomm_session *s, int cr, int len, struct sk_buff *skb)
->   {
-> -	struct rfcomm_rpn *rpn = (void *) skb->data;
-> -	u8 dlci = __get_dlci(rpn->dlci);
-> +	struct rfcomm_rpn *rpn;
-> +	u8 dlci;
->   
->   	u8 bit_rate  = 0;
->   	u8 data_bits = 0;
-> @@ -1495,6 +1501,12 @@ static int rfcomm_recv_rpn(struct rfcomm_session *s, int cr, int len, struct sk_
->   	u8 xoff_char = 0;
->   	u16 rpn_mask = RFCOMM_RPN_PM_ALL;
->   
-> +	if (skb->len < sizeof(*rpn))
-> +		return -EINVAL;
-
-gemini/gemini-3.1-pro-preview comments [1]:
-
-> Does this unconditionally drop legitimate 1-byte Remote Port Negotiation
-> (RPN) requests?
-> Looking at the existing code further down in rfcomm_recv_rpn():
->     if (len == 1) {
->         /* This is a request, return default (according to ETSI TS 07.10) settings */
->         ...
-> Since sizeof(struct rfcomm_rpn) is 8 bytes, enforcing this minimum length
-> would reject valid 1-byte queries allowed by the ETSI TS 07.10 standard.
-
-
-> +
-> +	rpn = (void *) skb->data;
-> +	dlci = __get_dlci(rpn->dlci);
-> +
->   	BT_DBG("dlci %d cr %d len 0x%x bitr 0x%x line 0x%x flow 0x%x xonc 0x%x xoffc 0x%x pm 0x%x",
->   		dlci, cr, len, rpn->bit_rate, rpn->line_settings, rpn->flow_ctrl,
->   		rpn->xon_char, rpn->xoff_char, rpn->param_mask);
-> @@ -1589,8 +1601,14 @@ static int rfcomm_recv_rpn(struct rfcomm_session *s, int cr, int len, struct sk_
->   
->   static int rfcomm_recv_rls(struct rfcomm_session *s, int cr, struct sk_buff *skb)
->   {
-> -	struct rfcomm_rls *rls = (void *) skb->data;
-> -	u8 dlci = __get_dlci(rls->dlci);
-> +	struct rfcomm_rls *rls;
-> +	u8 dlci;
-> +
-> +	if (skb->len < sizeof(*rls))
-> +		return -EINVAL;
-> +
-> +	rls = (void *) skb->data;
-> +	dlci = __get_dlci(rls->dlci);
->   
->   	BT_DBG("dlci %d cr %d status 0x%x", dlci, cr, rls->status);
->   
-> @@ -1608,9 +1626,15 @@ static int rfcomm_recv_rls(struct rfcomm_session *s, int cr, struct sk_buff *skb
->   
->   static int rfcomm_recv_msc(struct rfcomm_session *s, int cr, struct sk_buff *skb)
->   {
-> -	struct rfcomm_msc *msc = (void *) skb->data;
-> +	struct rfcomm_msc *msc;
->   	struct rfcomm_dlc *d;
-> -	u8 dlci = __get_dlci(msc->dlci);
-> +	u8 dlci;
-> +
-> +	if (skb->len < sizeof(*msc))
-> +		return -EINVAL;
-> +
-> +	msc = (void *) skb->data;
-> +	dlci = __get_dlci(msc->dlci);
->   
->   	BT_DBG("dlci %d cr %d v24 0x%x", dlci, cr, msc->v24_sig);
->   
-
-
-Kind regards,
-
-Paul
-
-
-[1]: 
-https://sashiko.dev/#/patchset/20260412045457.53100-1-suunj1331%40gmail.com
