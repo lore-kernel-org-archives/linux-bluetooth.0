@@ -1,295 +1,211 @@
-Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3FB25DB12
-	for <linux-bluetooth@vger.kernel.org>; Sun, 12 Apr 2026 05:59:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0152D97BB;
+	Sun, 12 Apr 2026 07:38:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775973560; cv=none; b=SqGtObl2bALADj6+3PZHX+E3ebUg+RydPovGhDjD7AJS+1RxsfF16HNmNAvXBwgTlVLvdpj1z1BDrRzmgVx74L9aLRSLPfePKfG7Zh2CoAb8ixiCb2phvL/28c08IvThfD35NFgPEr62ZAx8ygWCCT+DxvG2iZRSDW6j6CXO9xU=
+	t=1775979516; cv=none; b=R4cLPhqFWqEEKtvQc2+egQnRz/H/HTBOQe2AJ1tvjGzCFu0ST8RrB5IT8JjMnfqAhazGBHpq3ruSOT03mpL02DGOAsfePShaRB0X619233ys44qtljCxtXYMp9aQZ6oV9wZuqwxDLySoknikSyGS7XJmtvHDMjXvUhwrK2Gm5CQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775973560; c=relaxed/simple;
-	bh=PuanQNwAGr/+0akYtaNRXq5VLi5T8Ep0f4EBKnia90A=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=klA8AMY3yS+IzIGky2WGhjkCwpZz8aZzIL3cprZ2KEw7nWrm9roh8mG3Cg8BjK6Jf8c9X68hLHVybErxk0xUt+QY/+KiDrYipyiGRs5RmSTjkFbzfRUetGWlpy95dOWVyEIT/7T21fzOe0BXmdtZFgsR9iZYpqCE7oSXCFiyJzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YGJdxTPC; arc=none smtp.client-ip=74.125.82.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YGJdxTPC"
-Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2c15849aa2cso4110765eec.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Apr 2026 22:59:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775973558; x=1776578358; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cUuUUya+bkPlQqCd8hfkuTvukIBeRE7PMbLVwIF3018=;
-        b=YGJdxTPC16g+u+Eaq06xxTxfqK1SGEOigwgzt3vR/aw9+c7qprJM7KVPZ/L8ACqDW8
-         eiEgSsehqxBt7lHL86Ziw7dNSgnPdO2D/ZtdoJZ50IdYer2WO53mreEfICNy8kaTMF2C
-         MXsk8cu6h2TXUzvRy357cWWXvXrV0yjnbZwvMJysXsUbrjybzEKmpSpSat3f0FvoloXr
-         f5Ko0k+4c2BoeYWpyl5XDPVoWuEN5Sd1iEbR6Y+S1o0PgzRPpHDvxfcmzhN+iXWli1rt
-         GJHkxR4aw0vof3ALQqQOkSV6oky5MwG2ch2JrUdtxCLyFGwEiU/VjPmjvRtiyTVBJUjp
-         HrAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775973558; x=1776578358;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cUuUUya+bkPlQqCd8hfkuTvukIBeRE7PMbLVwIF3018=;
-        b=DoWmflz0rKqPxm+C12moJP84/sTQ3q3Lt8m9OTuLoTSOqSK8QMq0y2XmMI/iXYyMOz
-         CAaLNN95TsszdYyRz6nrFfP11VGJiGN9VC7/JaxHcZ4JiGZRYXb2B7EGduCG9OxctUt4
-         26CmAuvPxZJJCqNqntmqHD3O0g8tjlWb2SoCnSSawX3C0REl/gSLLrkEhL+kcdKqq4FQ
-         37vcffT0gH0oKqS38sW6JfGwMRku5bW0EYWL3b98jBebw5YPbrVmuFK19eTUxxMQY2Yh
-         aT/EVsKYiLOY1V0MxJd4Yi216/9OzFYtTsHcWyXwGGKVeNMmb1qRere1unolXOF5qWtt
-         hnqQ==
-X-Gm-Message-State: AOJu0YyyPONkSwZNXrTTj4ErZiKBa48rE9Aq+2+xeS0jmpZqKDp+0ymR
-	cMaeYbKMi4/xnFCFbfBbPVX9IUkO8D/lCRI0od27ZjV3eS0UAmg/wlFArcwVgQ==
-X-Gm-Gg: AeBDiesbwN0b/I22ENXhmUH68YAPggg9sRDibzCwa+lYJ9zjw1pOrrKANypkIl8CAdB
-	hAXRMH8oirCMzxIFYYVwoYtgJ5U2nJdxVWdeklTll4Il/2WbQjLvKsqGzDFjImLD+NvFOxoLHTh
-	5wFzwhsQ2ae9lsPsf1jjYeUFUQKVGXsT7+yw/LwF0RDxcskrKy60AZtUECYyQGXbZlbPEj6xr36
-	liFr1YspfdT+KBrIOJozkZ9/4OcrVvSARQgUi+sUeZzwKPLFYkYjaMU3qJGcJ0XNQJq2q6S4gEG
-	7fwaO+7af1BO98lBj+l0nql4di9fiS0nYgV2AnKfagW8ss8+kl/SC6JdwpAzHcKFBBZrktC8wog
-	pAJ2iQ/g7juMs8gDmwDJe4uIGfd/Wq3tWUotJ8P84x/QeTvohp+ddCOleo5GhuXmztS/nTTF1X6
-	R5B4lm2QMjjOxyJPx+oCKGKOHkAjYDwto=
-X-Received: by 2002:a05:7301:2b05:b0:2c9:ee15:a0fc with SMTP id 5a478bee46e88-2d58907cf63mr4737190eec.31.1775973558162;
-        Sat, 11 Apr 2026 22:59:18 -0700 (PDT)
-Received: from [172.17.0.2] ([128.24.160.225])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d5621d5e43sm10999744eec.21.2026.04.11.22.59.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Apr 2026 22:59:17 -0700 (PDT)
-Message-ID: <69db34b5.050a0220.15b6ff.7491@mx.google.com>
-Date: Sat, 11 Apr 2026 22:59:17 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5501324359177133117=="
+	s=arc-20240116; t=1775979516; c=relaxed/simple;
+	bh=klXkvAco3dCEhyPEk2nAJN7GzJnM1we71W3KS1Fsd1I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Gosr/dhfSEOwyW+3z0VMNaj7A6svRAeDfzlfgqmtPs5/B0QRFadduxqY89tRqAZfdj1Iqt1JEta7WI71J2/lzPJn0VeIP8+afDJEN2BesxnwS3K4ZniCZ2cdNQdG/d9oTJc1vlKcObiPsXewh1hVKvUjclDobXrMkHPJEG6ILN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.229] (p5dc559e8.dip0.t-ipconnect.de [93.197.89.232])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E0A164C2C37F03;
+	Sun, 12 Apr 2026 09:37:59 +0200 (CEST)
+Message-ID: <e009a1a1-17df-4845-b72a-ca6442754472@molgen.mpg.de>
+Date: Sun, 12 Apr 2026 09:37:58 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, suunj1331@gmail.com
-Subject: RE: Bluetooth: RFCOMM: validate skb length in MCC handlers
-In-Reply-To: <20260412045457.53100-1-suunj1331@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: RFCOMM: validate skb length in MCC handlers
+To: SeungJu Cheon <suunj1331@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ luiz.dentz@gmail.com, kees@kernel.org, kuba@kernel.org,
+ me@brighamcampbell.com, shuah@kernel.org,
+ linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org
 References: <20260412045457.53100-1-suunj1331@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260412045457.53100-1-suunj1331@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============5501324359177133117==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1080259
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.52 seconds
-GitLint                       PENDING   0.27 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      24.64 seconds
-CheckAllWarning               PASS      27.00 seconds
-CheckSparse                   PASS      25.67 seconds
-BuildKernel32                 PASS      23.96 seconds
-TestRunnerSetup               PASS      530.19 seconds
-TestRunner_l2cap-tester       FAIL      28.87 seconds
-TestRunner_iso-tester         PASS      38.61 seconds
-TestRunner_bnep-tester        PASS      6.57 seconds
-TestRunner_mgmt-tester        FAIL      118.31 seconds
-TestRunner_rfcomm-tester      PASS      9.80 seconds
-TestRunner_sco-tester         FAIL      14.74 seconds
-TestRunner_ioctl-tester       PASS      10.65 seconds
-TestRunner_mesh-tester        FAIL      12.57 seconds
-TestRunner_smp-tester         PASS      8.90 seconds
-TestRunner_userchan-tester    PASS      7.02 seconds
-TestRunner_6lowpan-tester     FAIL      9.00 seconds
-IncrementalBuild              PENDING   0.32 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_l2cap-tester - FAIL
-Desc: Run l2cap-tester with test-runner
-Output:
-Total: 96, Passed: 95 (99.0%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-L2CAP BR/EDR Server - Set PHY 3M                     Failed       0.119 seconds
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.110 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-7.0.0-rc2-g5632c26a4923 #1 Not tainted
-------------------------------------------------------
-kworker/u5:2/117 is trying to acquire lock:
-ffff888001abe240 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}, at: sco_connect_cfm+0x358/0x8d0
-
-but task is already holding lock:
-ffff8880025fd220 (&conn->lock){+.+.}-{3:3}, at: sco_connect_cfm+0x22d/0x8d0
-
-which lock already depends on the new lock.
+Dear SeungJu,
 
 
-the existing dependency chain (in reverse order) is:
+Thank you for the patch.
 
--> #1 (&conn->lock){+.+.}-{3:3}:
-       lock_acquire+0xf7/0x2c0
-       _raw_spin_lock+0x2a/0x40
-       sco_sock_connect+0x4d7/0x1280
-       __sys_connect+0x1a3/0x260
-       __x64_sys_connect+0x6e/0xb0
-       do_syscall_64+0xa0/0x570
-       entry_SYSCALL_64_after_hwframe+0x74/0x7c
+Am 12.04.26 um 06:54 schrieb SeungJu Cheon:
+> rfcomm_recv_pn(), rfcomm_recv_rpn(), rfcomm_recv_rls(), and
+> rfcomm_recv_msc() cast skb->data to their respective structs
+> without first checking skb->len. A remote device can send a
+> short MCC frame, causing out-of-bounds reads from the skb buffer.
 
--> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}:
-       check_prev_add+0xe9/0xc70
-       __lock_acquire+0x1457/0x1df0
-       lock_acquire+0xf7/0x2c0
-       lock_sock_nested+0x36/0xd0
-       sco_connect_cfm+0x358/0x8d0
-       hci_sync_conn_complete_evt+0x3d3/0x8e0
-       hci_event_packet+0x74f/0xb10
-       hci_rx_work+0x398/0xd00
-       process_scheduled_works+0xb16/0x1ac0
-       worker_thread+0x4ff/0xba0
-       kthread+0x368/0x490
-       ret_from_fork+0x498/0x7e0
-       ret_from_fork_asm+0x19/0x30
+Nice catch. Do you have a reproducer to create such a short MCC frame?
 
-other info that might help us debug this:
+> For rfcomm_recv_pn(), the uninitialized pn->mtu value is stored
+> in d->mtu via rfcomm_apply_pn(), then echoed back to the remote
+> device in the PN response, leaking kernel heap data.
+> 
+> This results in use of uninitialized memory, as reported by KMSAN.
+> 
+> Add explicit skb->len checks against the expected structure size
+> at the start of each handler before accessing the payload.
+> 
+> =====================================================
+> BUG: KMSAN: uninit-value in rfcomm_run+0x7eae/0xee90
+>   rfcomm_run+0x7eae/0xee90
+>   kthread+0x53f/0x600
+>   ret_from_fork+0x20f/0x910
+>   ret_from_fork_asm+0x1a/0x30
+> 
+> Uninit was created at:
+>   kmem_cache_alloc_node_noprof+0x3cd/0x12d0
+>   __alloc_skb+0x855/0x1190
+>   vhci_write+0x125/0x960
+>   vfs_write+0xbe1/0x15c0
+>   ksys_write+0x1d9/0x470
+>   __x64_sys_write+0x97/0xf0
+>   x64_sys_call+0x2ff0/0x3ea0
+>   do_syscall_64+0x134/0xf80
+>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> CPU: 0 UID: 0 PID: 3374 Comm: krfcommd Tainted: G        W           7.0.0-rc7
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
+> Kernel panic - not syncing: kmsan.panic set ...
+> =====================================================
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: SeungJu Cheon <suunj1331@gmail.com>
+> ---
+>   net/bluetooth/rfcomm/core.c | 40 +++++++++++++++++++++++++++++--------
+>   1 file changed, 32 insertions(+), 8 deletions(-)
+> 
+> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> index 611a9a94151e..daeba71a1514 100644
+> --- a/net/bluetooth/rfcomm/core.c
+> +++ b/net/bluetooth/rfcomm/core.c
+> @@ -1431,9 +1431,15 @@ static int rfcomm_apply_pn(struct rfcomm_dlc *d, int cr, struct rfcomm_pn *pn)
+>   
+>   static int rfcomm_recv_pn(struct rfcomm_session *s, int cr, struct sk_buff *skb)
+>   {
+> -	struct rfcomm_pn *pn = (void *) skb->data;
+> +	struct rfcomm_pn *pn;
+>   	struct rfcomm_dlc *d;
+> -	u8 dlci = pn->dlci;
+> +	u8 dlci;
+> +
+> +	if (skb->len < sizeof(*pn))
+> +		return -EINVAL;
+> +
+> +	pn = (void *) skb->data;
+> +	dlci = pn->dlci;
 
-...
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 117, name: kworker/u5:2
-preempt_count: 1, expected: 0
-RCU nest depth: 0, expected: 0
-INFO: lockdep is turned off.
-CPU: 0 UID: 0 PID: 117 Comm: kworker/u5:2 Not tainted 7.0.0-rc2-g5632c26a4923 #1 PREEMPT(lazy) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.13.0-1ubuntu1.1 04/01/2014
-Workqueue: hci0 hci_rx_work
-Call Trace:
- <TASK>
- dump_stack_lvl+0x49/0x60
- __might_resched+0x2ea/0x500
- lock_sock_nested+0x47/0xd0
- ? sco_connect_cfm+0x358/0x8d0
- sco_connect_cfm+0x358/0x8d0
- ? hci_debugfs_create_conn+0x190/0x210
- ? __pfx_sco_connect_cfm+0x10/0x10
- hci_sync_conn_complete_evt+0x3d3/0x8e0
- hci_event_packet+0x74f/0xb10
- ? __pfx_hci_sync_conn_complete_evt+0x10/0x10
- ? __pfx_hci_event_packet+0x10/0x10
- ? mark_held_locks+0x49/0x80
- ? lockdep_hardirqs_on_prepare+0xd4/0x180
- ? _raw_spin_unlock_irqrestore+0x2c/0x50
- hci_rx_work+0x398/0xd00
- process_scheduled_works+0xb16/0x1ac0
- ? __pfx_process_scheduled_works+0x10/0x10
- ? lock_acquire+0xf7/0x2c0
- ? lock_is_held_type+0x9b/0x110
- ? __pfx_hci_rx_work+0x10/0x10
- worker_thread+0x4ff/0xba0
- ? _raw_spin_unlock_irqrestore+0x2c/0x50
- ? __pfx_worker_thread+0x10/0x10
- kthread+0x368/0x490
- ? _raw_spin_unlock_irq+0x23/0x40
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x498/0x7e0
- ? __pfx_ret_from_fork+0x10/0x10
- ? __switch_to+0x9e4/0xe50
- ? __switch_to_asm+0x32/0x60
-...
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+gemini/gemini-3.1-pro-preview comments [1]. No idea if it’s a valid comment:
 
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.538 seconds
-Mesh - Send cancel - 2                               Timed out    1.993 seconds
-##############################
-Test: TestRunner_6lowpan-tester - FAIL
-Desc: Run 6lowpan-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-7.0.0-rc2-g5632c26a4923 #1 Not tainted
-------------------------------------------------------
-kworker/0:1/11 is trying to acquire lock:
-ffff8880026f4940 ((wq_completion)hci0#2){+.+.}-{0:0}, at: touch_wq_lockdep_map+0x75/0x180
+> Before these handlers are reached, rfcomm_recv_mcc() unconditionally casts
+> skb->data to struct rfcomm_mcc * and reads mcc->type and mcc->len. Does
+> this leave an out-of-bounds read unpatched if a remote device sends an MCC
+> frame with 0 or 1 bytes of payload?
+> Additionally, if rfcomm_recv_frame() unconditionally trims the FCS with
+> skb->len--; skb->tail--;, could a 0-byte payload cause skb->len to
+> underflow to UINT_MAX?
+> Since skb->len is unsigned, this new check (UINT_MAX < 8) would evaluate to
+> false, potentially bypassing this protection entirely.
+>   
+>   	BT_DBG("session %p state %ld dlci %d", s, s->state, dlci);
+>   
+> @@ -1483,8 +1489,8 @@ static int rfcomm_recv_pn(struct rfcomm_session *s, int cr, struct sk_buff *skb)
+>   
+>   static int rfcomm_recv_rpn(struct rfcomm_session *s, int cr, int len, struct sk_buff *skb)
+>   {
+> -	struct rfcomm_rpn *rpn = (void *) skb->data;
+> -	u8 dlci = __get_dlci(rpn->dlci);
+> +	struct rfcomm_rpn *rpn;
+> +	u8 dlci;
+>   
+>   	u8 bit_rate  = 0;
+>   	u8 data_bits = 0;
+> @@ -1495,6 +1501,12 @@ static int rfcomm_recv_rpn(struct rfcomm_session *s, int cr, int len, struct sk_
+>   	u8 xoff_char = 0;
+>   	u16 rpn_mask = RFCOMM_RPN_PM_ALL;
+>   
+> +	if (skb->len < sizeof(*rpn))
+> +		return -EINVAL;
 
-but task is already holding lock:
-ffffffff86c4d720 (rtnl_mutex){+.+.}-{4:4}, at: lowpan_unregister_netdev+0xd/0x30
+gemini/gemini-3.1-pro-preview comments [1]:
 
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #4 (rtnl_mutex){+.+.}-{4:4}:
-       lock_acquire+0xf7/0x2c0
-       __mutex_lock+0x16b/0x1fc0
-       lowpan_register_netdev+0x11/0x30
-       chan_ready_cb+0x836/0xd00
-       l2cap_recv_frame+0x6a06/0x8920
-       l2cap_recv_acldata+0x790/0xdf0
-       hci_rx_work+0x500/0xd00
-       process_scheduled_works+0xb16/0x1ac0
-       worker_thread+0x4ff/0xba0
-       kthread+0x368/0x490
-       ret_from_fork+0x498/0x7e0
-       ret_from_fork_asm+0x19/0x30
-
--> #3 (&chan->lock#3/1){+.+.}-{4:4}:
-       lock_acquire+0xf7/0x2c0
-       __mutex_lock+0x16b/0x1fc0
-       l2cap_chan_connect+0x74e/0x1980
-       lowpan_control_write+0x523/0x660
-       full_proxy_write+0x10b/0x190
-       vfs_write+0x1c0/0xf60
-       ksys_write+0xf1/0x1d0
-       do_syscall_64+0xa0/0x570
-       entry_SYSCALL_64_after_hwframe+0x74/0x7c
-
--> #2 (&conn->lock){+.+.}-{4:4}:
-...
-Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+> Does this unconditionally drop legitimate 1-byte Remote Port Negotiation
+> (RPN) requests?
+> Looking at the existing code further down in rfcomm_recv_rpn():
+>     if (len == 1) {
+>         /* This is a request, return default (according to ETSI TS 07.10) settings */
+>         ...
+> Since sizeof(struct rfcomm_rpn) is 8 bytes, enforcing this minimum length
+> would reject valid 1-byte queries allowed by the ETSI TS 07.10 standard.
 
 
+> +
+> +	rpn = (void *) skb->data;
+> +	dlci = __get_dlci(rpn->dlci);
+> +
+>   	BT_DBG("dlci %d cr %d len 0x%x bitr 0x%x line 0x%x flow 0x%x xonc 0x%x xoffc 0x%x pm 0x%x",
+>   		dlci, cr, len, rpn->bit_rate, rpn->line_settings, rpn->flow_ctrl,
+>   		rpn->xon_char, rpn->xoff_char, rpn->param_mask);
+> @@ -1589,8 +1601,14 @@ static int rfcomm_recv_rpn(struct rfcomm_session *s, int cr, int len, struct sk_
+>   
+>   static int rfcomm_recv_rls(struct rfcomm_session *s, int cr, struct sk_buff *skb)
+>   {
+> -	struct rfcomm_rls *rls = (void *) skb->data;
+> -	u8 dlci = __get_dlci(rls->dlci);
+> +	struct rfcomm_rls *rls;
+> +	u8 dlci;
+> +
+> +	if (skb->len < sizeof(*rls))
+> +		return -EINVAL;
+> +
+> +	rls = (void *) skb->data;
+> +	dlci = __get_dlci(rls->dlci);
+>   
+>   	BT_DBG("dlci %d cr %d status 0x%x", dlci, cr, rls->status);
+>   
+> @@ -1608,9 +1626,15 @@ static int rfcomm_recv_rls(struct rfcomm_session *s, int cr, struct sk_buff *skb
+>   
+>   static int rfcomm_recv_msc(struct rfcomm_session *s, int cr, struct sk_buff *skb)
+>   {
+> -	struct rfcomm_msc *msc = (void *) skb->data;
+> +	struct rfcomm_msc *msc;
+>   	struct rfcomm_dlc *d;
+> -	u8 dlci = __get_dlci(msc->dlci);
+> +	u8 dlci;
+> +
+> +	if (skb->len < sizeof(*msc))
+> +		return -EINVAL;
+> +
+> +	msc = (void *) skb->data;
+> +	dlci = __get_dlci(msc->dlci);
+>   
+>   	BT_DBG("dlci %d cr %d v24 0x%x", dlci, cr, msc->v24_sig);
+>   
 
-https://github.com/bluez/bluetooth-next/pull/70
 
----
-Regards,
-Linux Bluetooth
+Kind regards,
+
+Paul
 
 
---===============5501324359177133117==--
+[1]: 
+https://sashiko.dev/#/patchset/20260412045457.53100-1-suunj1331%40gmail.com
