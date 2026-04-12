@@ -1,208 +1,892 @@
-Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95C335B632
-	for <linux-bluetooth@vger.kernel.org>; Sun, 12 Apr 2026 19:34:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776022454; cv=none; b=cEptooyhNrjRGnjI++f8c5LgxTGriHiI2vDACCXEpE3CD0x88Xai+VG8r+0pyTsBcfbuDGw+a8gU5lgY3eTuLTZHBpgTkn+BnOAQ+DuHNDN3rpkLms0SyV0neJDEIOJk7okh9IqutiEhGYZSNVbDkCvl4Z8xefAT/I/r8U+2EwI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776022454; c=relaxed/simple;
-	bh=K8tXk2HA0RDL/brIYcp9zB/m1HZ6I2VGWwX7CwdFLb4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=AgIznHma962QigPLzbUj0iohPPYs+ma58WpajHjGKvZbyBm05T2YY3k9qIbDLMj3/q3ocUZh8HJmDgEWRzrY8+HKfJmARss+OwpIyhi4dFkeRb90qD9J8gQZUQhYYbqBVTUA2ZjSldb67zRrw9kmrYMfsMFYstGxpHdhraEwP/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QDpPQ7Lg; arc=none smtp.client-ip=74.125.82.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7103226A08F
+	for <linux-bluetooth@vger.kernel.org>; Sun, 12 Apr 2026 20:19:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776025152; cv=pass; b=VbIBixVu5NhPrUI0EGy8zaznAcBUU3f0O5EJ2NI4PGzokfndJXU1ujnn3ySGN7WsmOuFradox5BXXwsdMOlThOgvVhM9uyByqzGufCpoRkS0MJTN/lZRGH8AQWUmiepZFnnkvLFsERexSQMk4T2usdpYuySNYapkhxyAbCbqmyY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776025152; c=relaxed/simple;
+	bh=hX1dgOxr/tgDAJm8GI/Xv5nwExE4feI5gwtwiLY3wiU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sSMt8HMLIahIRt/9DkvMUzySSIN6qouGFtJOsJODbBA8rDdqbowvlNp+MY2OIAN4hvUNSN/LwU8Vw8LBbd7TvH57Yn2Yct1eDTLfcseuZ3kNzwpg27ohdNn4aHtF81WV8yza50w7vNT7JahcsJrp0L8k/KIoRWJZr7lkXfF7/FY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=S/5KMNzA; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QDpPQ7Lg"
-Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2d8fa0fadfeso133462eec.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Apr 2026 12:34:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776022452; x=1776627252; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=6eAOHazhsAGr9mdXSWgJ/04acR0evkybVrIcfKCwd+k=;
-        b=QDpPQ7LglGp7OQktnjdrF8BWFER5zFmUso9aycpKyntlww0BbmZ3dXvBKET8uydZ3X
-         XNJLcTsxFhrNDYCuWVxrNH/GBnq8ryjaBxPpIkTt0vhrJ2Ba9lHAoiPAwibEcSQ5wATf
-         0B+X9QlDMWGMqeOhwK1LYPZP2nBrFkN1hRmuJYNb65+LHHjoMXAy6JjqyVsdyhemluGo
-         TWCaXx5HFZCTu3H9XEDQ1Iu6MENMKwfWt1Giy0JcWH7fzWiGyQqTLRi5J94t/OGu2u/w
-         CTqo0xkV+9GOvs8OdxP14OuzC0EM67VDl9jmHShBfk01SFRa/nD4DIg42ywfyPxP1+d0
-         paZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776022452; x=1776627252;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6eAOHazhsAGr9mdXSWgJ/04acR0evkybVrIcfKCwd+k=;
-        b=Dg47gMjjgsDPekJI+dN7qcHl6ZGETYiSs/1bcuah1sCoxVaxB1HaFdHzlrxX7wd9ip
-         vEIdhujhtNkWsxYOAKoQnAd/tjNNzEUXb8g9/8SOCWNP8YWF4Sdni/3iqyC5psWVc1Eh
-         U3596I7XtvJV4KbwFW0pJKN63hFBcbRNjSS7myFcz+oLl4BazoFRfjwrVuNY3dgJWRHS
-         fy2csYDmthADcGxbkhHm9Hd+hKdfO7uRVrnBTPubaPGRXrX7m/mRHxQQe3Gu7gN0Cijf
-         X4qt5YqUom03LGVVGf0Svm/N1kPiRKDZIBWsCOJNl9vbxejL4j9wOymVE1WjMyIQJw4m
-         AhDg==
-X-Gm-Message-State: AOJu0Yzu82rh+qgXWY1DFOtp7YcATe4LoVJVYpf4fpHgf7fO/bKv6kZM
-	oK8u2GiVTv6EMuKUwZWgsNWjxjoEjmXykZn3peDZ5wHoi1RVdcXnyRe4BRFaYg==
-X-Gm-Gg: AeBDievLbDdGIEYOuB18le8bYas9tPk/p91buvqPKIosvymVMuqVF2hJ/1cwskL1bjp
-	lLi91o/Q6SySzcbOkQwq9SlPJCmBXDmLBhYVUSbB3NZTfq5FLPl7qUEhEBeJBqJhuA9lGPex6Lz
-	HM64NBdLvkgNNbQHlYE6GstiabElnmQMl/+TfjYxA22Z1r//7IC9AmzOluw1nHVSQF0F4i7yWJG
-	rfvwtMr8+gPgFo7iin5B/Q4an87XgrT9xc84Zt6d8imRrh8pC3JUDNfT+6UrSZcswDydgmsvrFf
-	fhS42RC2OXGmalhhyhI2rPqGFl+dTiJ94jXVnIVLfMnVxxlZyIKTxje3AT1CJr+UDHoRax8z14X
-	GDfu1Slx11/YXkpMlLPmAuyM/S0FA+6e4xb1vR+NokIFcOlKYEGK5UgVVSnQKO/rzK3VjePcEEw
-	upAwf3uu4QmEJeV5CtetKMKXXOjfdgLA==
-X-Received: by 2002:a05:7301:718f:b0:2d8:4705:aa19 with SMTP id 5a478bee46e88-2d84705ae0cmr925020eec.5.1776022451619;
-        Sun, 12 Apr 2026 12:34:11 -0700 (PDT)
-Received: from [172.17.0.2] ([20.169.72.161])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d5621d5e43sm12997033eec.21.2026.04.12.12.34.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Apr 2026 12:34:11 -0700 (PDT)
-Message-ID: <69dbf3b3.050a0220.15b6ff.f45a@mx.google.com>
-Date: Sun, 12 Apr 2026 12:34:11 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8910220196371495662=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="S/5KMNzA"
+Received: from monolith.lan (mobile-access-2e844b-114.dhcp.inet.fi [46.132.75.114])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4fv21k24FYzyPt;
+	Sun, 12 Apr 2026 23:19:06 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1776025146;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=lT9qMpnjLDN4RMiLZ+oBZ011rodafJ80RTUT0UX9yE0=;
+	b=S/5KMNzAXl/tueY2TMlGowru1ptEdz4B7d0hmypkrUmVudW8gGhmxNNAenvFTlnPN8AL+U
+	EE8+JFUKufj/WBGRR/G5jcn/FBeUMOKBatm7DmM4e1epkcACUhHDvOZxxjXsb6/tHMZzVi
+	rhaaX+TgpbncDJ9tq6+NttMNVx6k8Jw=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1776025146;
+	b=UkJnFTJ/eoeyd/oPDRXubWmQXs2sRAzlt09K3hJMSAUZr0j+mRuwa49lIbQlEzS8QOz+Yb
+	bVa7m3hkKajYm04dTCZHdaDpnvQFiYTtOdj7OueK3HKzwNeET+Z9iroC24DxKTcmjWWZm5
+	sJIbQdJnbOjMTLvsy77dOLB4GXS8Htg=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1776025146;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=lT9qMpnjLDN4RMiLZ+oBZ011rodafJ80RTUT0UX9yE0=;
+	b=OynXZ/BRtrSxERf2+sarpP9LMar95omJvW8nE/EcZ0PhKusdw/e32YhxOLQEvbIYOCBVHW
+	XTJViTDsBLl1HzH0XgEmjlfQ7/K+eXPPB+3iYp1+OSIrpPYyHzSmU+Bjscqt/3JEVAvCCs
+	k5jWhK8TwglWckaS99oSsyzCI4DHAbA=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [RFC PATCH] Bluetooth: SCO: remove sco_conn and simplify locking scheme
+Date: Sun, 12 Apr 2026 23:18:59 +0300
+Message-ID: <5ac8c40b96052cb320c4ee1083d37818ac5d90cc.1776025103.git.pav@iki.fi>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: Bluetooth: SCO: fix sleeping under spinlock in sco_conn_ready
-In-Reply-To: <9f333a79da3f0f552ca735d549ea3e8ae0784220.1776019593.git.pav@iki.fi>
-References: <9f333a79da3f0f552ca735d549ea3e8ae0784220.1776019593.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8910220196371495662==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The sco_conn struct is not needed, as every SCO hci_conn is associated
+with at most one SCO socket at a time. It adds unnecessary complexity in
+lifetime and locking management, which has led to bugs.  E.g. access to
+hci_conn::sco_data currently has a race in sco_conn_hold_unless_zero vs.
+sco_conn_put->sco_conn_free in sco_chan_del.
 
-This is automated email and please do not reply to this email!
+Simplify by removing sco_conn and moving all fields to sco_pi.
+The sco_pi(sk)->hcon field is guarded by lock_sock(sk).
 
-Dear submitter,
+Add lock hci_conn::proto_lock for protocols to use.  Make
+hci_conn::sco_data guarded by RCU, and use that lock for updates.  The
+RCU usage relies on SOCK_RCU_FREE, which moves destruct to call_rcu, so
+it can be paired with refcount_inc_not_zero(&sk->sk_refcnt) as done in
+other net/ protocols.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1080410
+sk owns hci_conn_hold logical refcount when sco_pi(sk)->hcon != NULL.
 
----Test result---
+Enable Clang context analysis for sco.c, and add relevant __must_hold
+and lockdep markers.
 
-Test Summary:
-CheckPatch                    PENDING   0.50 seconds
-GitLint                       PENDING   0.30 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      23.67 seconds
-CheckAllWarning               PASS      26.30 seconds
-CheckSparse                   PASS      24.97 seconds
-BuildKernel32                 PASS      23.06 seconds
-TestRunnerSetup               PASS      517.43 seconds
-TestRunner_l2cap-tester       FAIL      27.72 seconds
-TestRunner_iso-tester         PASS      32.92 seconds
-TestRunner_bnep-tester        PASS      6.26 seconds
-TestRunner_mgmt-tester        FAIL      110.65 seconds
-TestRunner_rfcomm-tester      PASS      9.28 seconds
-TestRunner_sco-tester         PASS      14.05 seconds
-TestRunner_ioctl-tester       PASS      9.98 seconds
-TestRunner_mesh-tester        FAIL      11.46 seconds
-TestRunner_smp-tester         PASS      8.44 seconds
-TestRunner_userchan-tester    PASS      6.50 seconds
-TestRunner_6lowpan-tester     FAIL      8.83 seconds
-IncrementalBuild              PENDING   0.30 seconds
+This fixes: race on sco_data, calling sleeping functions under spinlock
+in sco_conn_ready, dubious sco_conn locking & sk refcounting in
+sco_conn_ready, missing locking in getsockopt / setsockopt.
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_l2cap-tester - FAIL
-Desc: Run l2cap-tester with test-runner
-Output:
-Total: 96, Passed: 95 (99.0%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-L2CAP BR/EDR Server - Set PHY 2M                     Failed       0.114 seconds
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.102 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.829 seconds
-Mesh - Send cancel - 2                               Timed out    2.004 seconds
-##############################
-Test: TestRunner_6lowpan-tester - FAIL
-Desc: Run 6lowpan-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-7.0.0-rc2-g48abf361eec2 #1 Not tainted
-------------------------------------------------------
-kworker/0:1/11 is trying to acquire lock:
-ffff888002767140 ((wq_completion)hci0#2){+.+.}-{0:0}, at: touch_wq_lockdep_map+0x75/0x180
-
-but task is already holding lock:
-ffffffff8844d720 (rtnl_mutex){+.+.}-{4:4}, at: lowpan_unregister_netdev+0xd/0x30
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #4 (rtnl_mutex){+.+.}-{4:4}:
-       lock_acquire+0xf7/0x2c0
-       __mutex_lock+0x16b/0x1fc0
-       lowpan_register_netdev+0x11/0x30
-       chan_ready_cb+0x836/0xd00
-       l2cap_recv_frame+0x6a06/0x8920
-       l2cap_recv_acldata+0x790/0xdf0
-       hci_rx_work+0x500/0xd00
-       process_scheduled_works+0xb16/0x1ac0
-       worker_thread+0x4ff/0xba0
-       kthread+0x368/0x490
-       ret_from_fork+0x498/0x7e0
-       ret_from_fork_asm+0x19/0x30
-
--> #3 (&chan->lock#3/1){+.+.}-{4:4}:
-       lock_acquire+0xf7/0x2c0
-       __mutex_lock+0x16b/0x1fc0
-       l2cap_chan_connect+0x74e/0x1980
-       lowpan_control_write+0x523/0x660
-       full_proxy_write+0x10b/0x190
-       vfs_write+0x1c0/0xf60
-       ksys_write+0xf1/0x1d0
-       do_syscall_64+0xa0/0x570
-       entry_SYSCALL_64_after_hwframe+0x74/0x7c
-
--> #2 (&conn->lock){+.+.}-{4:4}:
-...
-Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
-https://github.com/bluez/bluetooth-next/pull/72
-
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
-Regards,
-Linux Bluetooth
 
+Notes:
+    It's probably possible to get rid of the proto_lock, but this requires
+    some custom memory ordering reasoning, so probably best avoided.
 
---===============8910220196371495662==--
+ include/net/bluetooth/hci_core.h |   6 +-
+ net/bluetooth/Makefile           |   2 +
+ net/bluetooth/hci_conn.c         |   2 +
+ net/bluetooth/sco.c              | 458 +++++++++++++------------------
+ 4 files changed, 196 insertions(+), 272 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a7bffb908c1e..555c2ce2dd15 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -770,8 +770,12 @@ struct hci_conn {
+ 	struct dentry	*debugfs;
+ 
+ 	struct hci_dev	*hdev;
++
++	/* Spinlock to guard sco_data */
++	spinlock_t	proto_lock;
++
+ 	void		*l2cap_data;
+-	void		*sco_data;
++	void __rcu	*sco_data;
+ 	void		*iso_data;
+ 
+ 	struct list_head link_list;
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index a7eede7616d8..5fcc93fdd54e 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -26,3 +26,5 @@ bluetooth-$(CONFIG_BT_MSFTEXT) += msft.o
+ bluetooth-$(CONFIG_BT_AOSPEXT) += aosp.o
+ bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
+ bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
++
++CONTEXT_ANALYSIS_sco.o := y
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 3a0592599086..b8014f8bd844 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1057,6 +1057,8 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type,
+ 	INIT_DELAYED_WORK(&conn->idle_work, hci_conn_idle);
+ 	INIT_DELAYED_WORK(&conn->le_conn_timeout, le_conn_timeout);
+ 
++	spin_lock_init(&conn->proto_lock);
++
+ 	atomic_set(&conn->refcnt, 0);
+ 
+ 	hci_dev_hold(hdev);
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 18826d4b9c0b..259bb45b0d65 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -42,21 +42,6 @@ static struct bt_sock_list sco_sk_list = {
+ };
+ 
+ /* ---- SCO connections ---- */
+-struct sco_conn {
+-	struct hci_conn	*hcon;
+-
+-	spinlock_t	lock;
+-	struct sock	*sk;
+-
+-	struct delayed_work	timeout_work;
+-
+-	unsigned int    mtu;
+-	struct kref	ref;
+-};
+-
+-#define sco_conn_lock(c)	spin_lock(&c->lock)
+-#define sco_conn_unlock(c)	spin_unlock(&c->lock)
+-
+ static void sco_sock_close(struct sock *sk);
+ static void sco_sock_kill(struct sock *sk);
+ 
+@@ -69,97 +54,21 @@ struct sco_pinfo {
+ 	bdaddr_t	dst;
+ 	__u32		flags;
+ 	__u16		setting;
++	unsigned int    mtu;
+ 	struct bt_codec codec;
+-	struct sco_conn	*conn;
++	struct delayed_work timeout_work;
++	struct hci_conn *hcon;
+ };
+ 
+ /* ---- SCO timers ---- */
+ #define SCO_CONN_TIMEOUT	(HZ * 40)
+ #define SCO_DISCONN_TIMEOUT	(HZ * 2)
+ 
+-static void sco_conn_free(struct kref *ref)
+-{
+-	struct sco_conn *conn = container_of(ref, struct sco_conn, ref);
+-
+-	BT_DBG("conn %p", conn);
+-
+-	if (conn->sk)
+-		sco_pi(conn->sk)->conn = NULL;
+-
+-	if (conn->hcon) {
+-		conn->hcon->sco_data = NULL;
+-		hci_conn_drop(conn->hcon);
+-	}
+-
+-	/* Ensure no more work items will run since hci_conn has been dropped */
+-	disable_delayed_work_sync(&conn->timeout_work);
+-
+-	kfree(conn);
+-}
+-
+-static void sco_conn_put(struct sco_conn *conn)
+-{
+-	if (!conn)
+-		return;
+-
+-	BT_DBG("conn %p refcnt %d", conn, kref_read(&conn->ref));
+-
+-	kref_put(&conn->ref, sco_conn_free);
+-}
+-
+-static struct sco_conn *sco_conn_hold(struct sco_conn *conn)
+-{
+-	BT_DBG("conn %p refcnt %u", conn, kref_read(&conn->ref));
+-
+-	kref_get(&conn->ref);
+-	return conn;
+-}
+-
+-static struct sco_conn *sco_conn_hold_unless_zero(struct sco_conn *conn)
+-{
+-	if (!conn)
+-		return NULL;
+-
+-	BT_DBG("conn %p refcnt %u", conn, kref_read(&conn->ref));
+-
+-	if (!kref_get_unless_zero(&conn->ref))
+-		return NULL;
+-
+-	return conn;
+-}
+-
+-static struct sock *sco_sock_hold(struct sco_conn *conn)
+-{
+-	if (!conn || !bt_sock_linked(&sco_sk_list, conn->sk))
+-		return NULL;
+-
+-	sock_hold(conn->sk);
+-
+-	return conn->sk;
+-}
+-
+ static void sco_sock_timeout(struct work_struct *work)
+ {
+-	struct sco_conn *conn = container_of(work, struct sco_conn,
+-					     timeout_work.work);
+-	struct sock *sk;
+-
+-	conn = sco_conn_hold_unless_zero(conn);
+-	if (!conn)
+-		return;
+-
+-	sco_conn_lock(conn);
+-	if (!conn->hcon) {
+-		sco_conn_unlock(conn);
+-		sco_conn_put(conn);
+-		return;
+-	}
+-	sk = sco_sock_hold(conn);
+-	sco_conn_unlock(conn);
+-	sco_conn_put(conn);
+-
+-	if (!sk)
+-		return;
++	struct sco_pinfo *pi = container_of(work, struct sco_pinfo,
++					    timeout_work.work);
++	struct sock *sk = (struct sock *)pi;
+ 
+ 	BT_DBG("sock %p state %d", sk, sk->sk_state);
+ 
+@@ -167,82 +76,94 @@ static void sco_sock_timeout(struct work_struct *work)
+ 	sk->sk_err = ETIMEDOUT;
+ 	sk->sk_state_change(sk);
+ 	release_sock(sk);
+-	sock_put(sk);
+ }
+ 
+ static void sco_sock_set_timer(struct sock *sk, long timeout)
+ {
+-	if (!sco_pi(sk)->conn)
+-		return;
+-
+ 	BT_DBG("sock %p state %d timeout %ld", sk, sk->sk_state, timeout);
+-	cancel_delayed_work(&sco_pi(sk)->conn->timeout_work);
+-	schedule_delayed_work(&sco_pi(sk)->conn->timeout_work, timeout);
++	cancel_delayed_work(&sco_pi(sk)->timeout_work);
++	schedule_delayed_work(&sco_pi(sk)->timeout_work, timeout);
+ }
+ 
+ static void sco_sock_clear_timer(struct sock *sk)
+ {
+-	if (!sco_pi(sk)->conn)
+-		return;
+-
+ 	BT_DBG("sock %p state %d", sk, sk->sk_state);
+-	cancel_delayed_work(&sco_pi(sk)->conn->timeout_work);
++	cancel_delayed_work(&sco_pi(sk)->timeout_work);
+ }
+ 
+ /* ---- SCO connections ---- */
+-static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
++static struct sock *__sco_peek_sk(struct hci_conn *hcon)
++	__must_hold(&hcon->proto_lock)
+ {
+-	struct sco_conn *conn = hcon->sco_data;
+-
+-	conn = sco_conn_hold_unless_zero(conn);
+-	if (conn) {
+-		if (!conn->hcon) {
+-			sco_conn_lock(conn);
+-			conn->hcon = hcon;
+-			sco_conn_unlock(conn);
+-		}
+-		return conn;
+-	}
+-
+-	conn = kzalloc_obj(struct sco_conn);
+-	if (!conn)
+-		return NULL;
+-
+-	kref_init(&conn->ref);
+-	spin_lock_init(&conn->lock);
+-	INIT_DELAYED_WORK(&conn->timeout_work, sco_sock_timeout);
+-
+-	hcon->sco_data = conn;
+-	conn->hcon = hcon;
+-	conn->mtu = hcon->mtu;
+-
+-	if (hcon->mtu > 0)
+-		conn->mtu = hcon->mtu;
+-	else
+-		conn->mtu = 60;
+-
+-	BT_DBG("hcon %p conn %p", hcon, conn);
+-
+-	return conn;
++	return rcu_dereference_protected(hcon->sco_data,
++					 lockdep_is_held(&hcon->proto_lock));
++}
++
++static struct sock *__sco_get_sk(struct hci_conn *hcon)
++{
++	struct sock *sk;
++
++	sk = rcu_dereference(hcon->sco_data);
++
++	if (sk && !refcount_inc_not_zero(&sk->sk_refcnt))
++		sk = NULL;
++
++	return sk;
++}
++
++static struct sock *sco_get_sk(struct hci_conn *hcon)
++{
++	struct sock *sk;
++
++	rcu_read_lock();
++	sk = __sco_get_sk(hcon);
++	rcu_read_unlock();
++	if (!sk)
++		return NULL;
++
++	lock_sock(sk);
++
++	/* Deal with sk detached in the meantime */
++	if (sco_pi(sk)->hcon != hcon) {
++		release_sock(sk);
++		sock_put(sk);
++		return NULL;
++	}
++
++	return sk;
++}
++
++static struct hci_conn *sco_sk_hcon(struct sock *sk)
++{
++	lockdep_assert(lockdep_sock_is_held(sk));
++	return sco_pi(sk)->hcon;
++}
++
++static void sco_sk_detach(struct sock *sk)
++{
++	struct hci_conn *hcon = sco_sk_hcon(sk);
++
++	if (hcon) {
++		/* RCU update (see sco_chan_add) */
++		spin_lock(&hcon->proto_lock);
++
++		lockdep_assert(__sco_peek_sk(hcon) == sk);
++		rcu_assign_pointer(hcon->sco_data, NULL);
++		sco_pi(sk)->hcon = NULL;
++
++		spin_unlock(&hcon->proto_lock);
++
++		hci_conn_drop(hcon);
++	}
+ }
+ 
+-/* Delete channel.
+- * Must be called on the locked socket. */
+ static void sco_chan_del(struct sock *sk, int err)
+ {
+-	struct sco_conn *conn;
++	BT_DBG("sk %p, hcon %p, err %d", sk, sco_sk_hcon(sk), err);
+ 
+-	conn = sco_pi(sk)->conn;
+-	sco_pi(sk)->conn = NULL;
++	lockdep_assert(lockdep_sock_is_held(sk));
+ 
+-	BT_DBG("sk %p, conn %p, err %d", sk, conn, err);
+-
+-	if (conn) {
+-		sco_conn_lock(conn);
+-		conn->sk = NULL;
+-		sco_conn_unlock(conn);
+-		sco_conn_put(conn);
+-	}
++	sco_sk_detach(sk);
+ 
+ 	sk->sk_state = BT_CLOSED;
+ 	sk->sk_err   = err;
+@@ -252,64 +173,67 @@ static void sco_chan_del(struct sock *sk, int err)
+ }
+ 
+ static void sco_conn_del(struct hci_conn *hcon, int err)
++	__must_hold(&hcon->hdev->lock)
+ {
+-	struct sco_conn *conn = hcon->sco_data;
+-	struct sock *sk;
++	struct sock *sk = sco_get_sk(hcon);
+ 
+-	conn = sco_conn_hold_unless_zero(conn);
+-	if (!conn)
++	if (!sk)
+ 		return;
+ 
+-	BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
+-
+-	sco_conn_lock(conn);
+-	sk = sco_sock_hold(conn);
+-	sco_conn_unlock(conn);
+-	sco_conn_put(conn);
+-
+-	if (!sk) {
+-		sco_conn_put(conn);
+-		return;
+-	}
+-
+ 	/* Kill socket */
+-	lock_sock(sk);
+ 	sco_sock_clear_timer(sk);
+ 	sco_chan_del(sk, err);
+ 	release_sock(sk);
+ 	sock_put(sk);
+ }
+ 
+-static void __sco_chan_add(struct sco_conn *conn, struct sock *sk,
++static void __sco_chan_add(struct hci_conn *hcon, struct sock *sk,
+ 			   struct sock *parent)
++	__must_hold(&hcon->hdev->lock)
++	__must_hold(&hcon->proto_lock)
+ {
+-	BT_DBG("conn %p", conn);
++	BT_DBG("hcon %p sk %p mtu %d", hcon, sk, (int)hcon->mtu);
+ 
+-	sco_pi(sk)->conn = conn;
+-	conn->sk = sk;
++	/* If parent, sk is not yet visible to user tasks, so no sk lock needed.
++	 */
++	lockdep_assert(parent || lockdep_sock_is_held(sk));
++	lockdep_assert_held(&hcon->hdev->lock);
++	lockdep_assert_held(&hcon->proto_lock);
++
++	if (hcon->mtu > 0)
++		sco_pi(sk)->mtu = hcon->mtu;
++	else
++		sco_pi(sk)->mtu = 60;
++
++	sock_set_flag(sk, SOCK_RCU_FREE);
++
++	sco_pi(sk)->hcon = hci_conn_hold(hcon);
++	rcu_assign_pointer(hcon->sco_data, sk);
+ 
+ 	if (parent)
+ 		bt_accept_enqueue(parent, sk, true);
+ }
+ 
+-static int sco_chan_add(struct sco_conn *conn, struct sock *sk,
++static int sco_chan_add(struct hci_conn *hcon, struct sock *sk,
+ 			struct sock *parent)
++	__must_hold(&hcon->hdev->lock)
+ {
+ 	int err = 0;
+ 
+-	sco_conn_lock(conn);
+-	if (conn->sk || sco_pi(sk)->conn)
++	spin_lock(&hcon->proto_lock);
++
++	if (__sco_peek_sk(hcon) || sco_pi(sk)->hcon)
+ 		err = -EBUSY;
+ 	else
+-		__sco_chan_add(conn, sk, parent);
++		__sco_chan_add(hcon, sk, parent);
++
++	spin_unlock(&hcon->proto_lock);
+ 
+-	sco_conn_unlock(conn);
+ 	return err;
+ }
+ 
+ static int sco_connect(struct sock *sk)
+ {
+-	struct sco_conn *conn;
+ 	struct hci_conn *hcon;
+ 	struct hci_dev  *hdev;
+ 	int err, type;
+@@ -344,13 +268,6 @@ static int sco_connect(struct sock *sk)
+ 		goto unlock;
+ 	}
+ 
+-	conn = sco_conn_add(hcon);
+-	if (!conn) {
+-		hci_conn_drop(hcon);
+-		err = -ENOMEM;
+-		goto unlock;
+-	}
+-
+ 	lock_sock(sk);
+ 
+ 	/* Recheck state after reacquiring the socket lock, as another
+@@ -363,10 +280,12 @@ static int sco_connect(struct sock *sk)
+ 		goto unlock;
+ 	}
+ 
+-	err = sco_chan_add(conn, sk, NULL);
++	lockdep_assert_held(&hcon->hdev->lock);
++
++	err = sco_chan_add(hcon, sk, NULL);
++	hci_conn_drop(hcon);
+ 	if (err) {
+ 		release_sock(sk);
+-		hci_conn_drop(hcon);
+ 		goto unlock;
+ 	}
+ 
+@@ -392,44 +311,35 @@ static int sco_connect(struct sock *sk)
+ static int sco_send_frame(struct sock *sk, struct sk_buff *skb,
+ 			  const struct sockcm_cookie *sockc)
+ {
+-	struct sco_conn *conn = sco_pi(sk)->conn;
++	struct hci_conn *hcon = sco_sk_hcon(sk);
+ 	int len = skb->len;
+ 
+ 	/* Check outgoing MTU */
+-	if (len > conn->mtu)
++	if (len > sco_pi(sk)->mtu)
+ 		return -EINVAL;
++	if (!hcon)
++		return -ENOTCONN;
+ 
+ 	BT_DBG("sk %p len %d", sk, len);
+ 
+ 	hci_setup_tx_timestamp(skb, 1, sockc);
+-	hci_send_sco(conn->hcon, skb);
++	hci_send_sco(hcon, skb);
+ 
+ 	return len;
+ }
+ 
+-static void sco_recv_frame(struct sco_conn *conn, struct sk_buff *skb)
++static void sco_recv_frame(struct sock *sk, struct sk_buff *skb)
+ {
+-	struct sock *sk;
+-
+-	sco_conn_lock(conn);
+-	sk = sco_sock_hold(conn);
+-	sco_conn_unlock(conn);
+-
+-	if (!sk)
+-		goto drop;
+-
+ 	BT_DBG("sk %p len %u", sk, skb->len);
+ 
+-	if (sk->sk_state != BT_CONNECTED)
+-		goto drop_put;
++	/* NOTE: sk not locked */
+ 
+-	if (!sock_queue_rcv_skb(sk, skb)) {
+-		sock_put(sk);
++	if (READ_ONCE(sk->sk_state) != BT_CONNECTED)
++		goto drop;
++
++	if (!sock_queue_rcv_skb(sk, skb))
+ 		return;
+-	}
+ 
+-drop_put:
+-	sock_put(sk);
+ drop:
+ 	kfree_skb(skb);
+ }
+@@ -472,16 +382,20 @@ static struct sock *sco_get_sock_listen(bdaddr_t *src)
+ 			sk1 = sk;
+ 	}
+ 
++	sk = sk ? sk : sk1;
++	if (sk)
++		sock_hold(sk);
++
+ 	read_unlock(&sco_sk_list.lock);
+ 
+-	return sk ? sk : sk1;
++	return sk;
+ }
+ 
+ static void sco_sock_destruct(struct sock *sk)
+ {
+ 	BT_DBG("sk %p", sk);
+ 
+-	sco_conn_put(sco_pi(sk)->conn);
++	WARN_ON(sco_pi(sk)->hcon);
+ 
+ 	skb_queue_purge(&sk->sk_receive_queue);
+ 	skb_queue_purge(&sk->sk_write_queue);
+@@ -514,12 +428,11 @@ static void sco_sock_kill(struct sock *sk)
+ 
+ 	BT_DBG("sk %p state %d", sk, sk->sk_state);
+ 
+-	/* Sock is dead, so set conn->sk to NULL to avoid possible UAF */
+-	if (sco_pi(sk)->conn) {
+-		sco_conn_lock(sco_pi(sk)->conn);
+-		sco_pi(sk)->conn->sk = NULL;
+-		sco_conn_unlock(sco_pi(sk)->conn);
+-	}
++	disable_delayed_work_sync(&sco_pi(sk)->timeout_work);
++
++	lock_sock(sk);
++	sco_sk_detach(sk);
++	release_sock(sk);
+ 
+ 	/* Kill poor orphan */
+ 	bt_sock_unlink(&sco_sk_list, sk);
+@@ -595,6 +508,8 @@ static struct sock *sco_sock_alloc(struct net *net, struct socket *sock,
+ 	sco_pi(sk)->codec.vid = 0xffff;
+ 	sco_pi(sk)->codec.data_path = 0x00;
+ 
++	INIT_DELAYED_WORK(&sco_pi(sk)->timeout_work, sco_sock_timeout);
++
+ 	bt_sock_link(&sco_sk_list, sk);
+ 	return sk;
+ }
+@@ -905,7 +820,6 @@ static int sco_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 			    size_t len, int flags)
+ {
+ 	struct sock *sk = sock->sk;
+-	struct sco_pinfo *pi = sco_pi(sk);
+ 
+ 	if (unlikely(flags & MSG_ERRQUEUE))
+ 		return sock_recv_errqueue(sk, msg, len, SOL_BLUETOOTH,
+@@ -914,8 +828,9 @@ static int sco_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	lock_sock(sk);
+ 
+ 	if (sk->sk_state == BT_CONNECT2 &&
+-	    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
+-		sco_conn_defer_accept(pi->conn->hcon, pi->setting);
++	    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags) &&
++	    sco_sk_hcon(sk)) {
++		sco_conn_defer_accept(sco_sk_hcon(sk), sco_pi(sk)->setting);
+ 		sk->sk_state = BT_CONFIG;
+ 
+ 		release_sock(sk);
+@@ -1090,7 +1005,7 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname,
+ 			break;
+ 		}
+ 
+-		opts.mtu = sco_pi(sk)->conn->mtu;
++		opts.mtu = sco_pi(sk)->mtu;
+ 
+ 		BT_DBG("mtu %u", opts.mtu);
+ 
+@@ -1108,9 +1023,14 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname,
+ 			break;
+ 		}
+ 
++		if (!sco_sk_hcon(sk)) {
++			err = -ENOTCONN;
++			break;
++		}
++
+ 		memset(&cinfo, 0, sizeof(cinfo));
+-		cinfo.hci_handle = sco_pi(sk)->conn->hcon->handle;
+-		memcpy(cinfo.dev_class, sco_pi(sk)->conn->hcon->dev_class, 3);
++		cinfo.hci_handle = sco_sk_hcon(sk)->handle;
++		memcpy(cinfo.dev_class, sco_sk_hcon(sk)->dev_class, 3);
+ 
+ 		len = min(len, sizeof(cinfo));
+ 		if (copy_to_user(optval, (char *)&cinfo, len))
+@@ -1175,12 +1095,12 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+ 		break;
+ 
+ 	case BT_PHY:
+-		if (sk->sk_state != BT_CONNECTED) {
++		if (sk->sk_state != BT_CONNECTED || !sco_sk_hcon(sk)) {
+ 			err = -ENOTCONN;
+ 			break;
+ 		}
+ 
+-		phys = hci_conn_get_phy(sco_pi(sk)->conn->hcon);
++		phys = hci_conn_get_phy(sco_sk_hcon(sk));
+ 
+ 		if (put_user(phys, (u32 __user *) optval))
+ 			err = -EFAULT;
+@@ -1199,7 +1119,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
+ 
+-		if (put_user(sco_pi(sk)->conn->mtu, (u32 __user *)optval))
++		if (put_user(sco_pi(sk)->mtu, (u32 __user *)optval))
+ 			err = -EFAULT;
+ 		break;
+ 
+@@ -1363,51 +1283,46 @@ static int sco_sock_release(struct socket *sock)
+ 	return err;
+ }
+ 
+-static void sco_conn_ready(struct sco_conn *conn)
++static void sco_conn_ready(struct hci_conn *hcon)
+ {
+ 	struct sock *parent;
+-	struct sock *sk = conn->sk;
++	struct sock *sk;
+ 
+-	BT_DBG("conn %p", conn);
++	lockdep_assert_held(&hcon->hdev->lock);
++
++	sk = sco_get_sk(hcon);
++
++	BT_DBG("hcon %p sk %p", hcon, sk);
+ 
+ 	if (sk) {
+-		lock_sock(sk);
+ 		sco_sock_clear_timer(sk);
+ 		sk->sk_state = BT_CONNECTED;
+ 		sk->sk_state_change(sk);
+ 		release_sock(sk);
++		sock_put(sk);
+ 	} else {
+-		sco_conn_lock(conn);
+-
+-		if (!conn->hcon) {
+-			sco_conn_unlock(conn);
++		parent = sco_get_sock_listen(&hcon->src);
++		if (!parent)
+ 			return;
+-		}
+-
+-		parent = sco_get_sock_listen(&conn->hcon->src);
+-		if (!parent) {
+-			sco_conn_unlock(conn);
+-			return;
+-		}
+ 
+ 		lock_sock(parent);
+ 
++		spin_lock(&hcon->proto_lock);
++
++		if (parent->sk_state != BT_LISTEN || __sco_peek_sk(hcon))
++			goto release;
++
+ 		sk = sco_sock_alloc(sock_net(parent), NULL,
+ 				    BTPROTO_SCO, GFP_ATOMIC, 0);
+-		if (!sk) {
+-			release_sock(parent);
+-			sco_conn_unlock(conn);
+-			return;
+-		}
++		if (!sk)
++			goto release;
+ 
+ 		sco_sock_init(sk, parent);
+ 
+-		bacpy(&sco_pi(sk)->src, &conn->hcon->src);
+-		bacpy(&sco_pi(sk)->dst, &conn->hcon->dst);
++		bacpy(&sco_pi(sk)->src, &hcon->src);
++		bacpy(&sco_pi(sk)->dst, &hcon->dst);
+ 
+-		sco_conn_hold(conn);
+-		hci_conn_hold(conn->hcon);
+-		__sco_chan_add(conn, sk, parent);
++		__sco_chan_add(hcon, sk, parent);
+ 
+ 		if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags))
+ 			sk->sk_state = BT_CONNECT2;
+@@ -1417,9 +1332,10 @@ static void sco_conn_ready(struct sco_conn *conn)
+ 		/* Wake up parent */
+ 		parent->sk_data_ready(parent);
+ 
++release:
++		spin_unlock(&hcon->proto_lock);
+ 		release_sock(parent);
+-
+-		sco_conn_unlock(conn);
++		sock_put(parent);
+ 	}
+ }
+ 
+@@ -1452,26 +1368,26 @@ int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ }
+ 
+ static void sco_connect_cfm(struct hci_conn *hcon, __u8 status)
++	__must_hold(&hcon->hdev->lock)
+ {
++	lockdep_assert_held(&hcon->hdev->lock);
++
+ 	if (hcon->type != SCO_LINK && hcon->type != ESCO_LINK)
+ 		return;
+ 
+ 	BT_DBG("hcon %p bdaddr %pMR status %u", hcon, &hcon->dst, status);
+ 
+-	if (!status) {
+-		struct sco_conn *conn;
+-
+-		conn = sco_conn_add(hcon);
+-		if (conn) {
+-			sco_conn_ready(conn);
+-			sco_conn_put(conn);
+-		}
+-	} else
++	if (!status)
++		sco_conn_ready(hcon);
++	else
+ 		sco_conn_del(hcon, bt_to_errno(status));
+ }
+ 
+ static void sco_disconn_cfm(struct hci_conn *hcon, __u8 reason)
++	__must_hold(&hcon->hdev->lock)
+ {
++	lockdep_assert_held(&hcon->hdev->lock);
++
+ 	if (hcon->type != SCO_LINK && hcon->type != ESCO_LINK)
+ 		return;
+ 
+@@ -1483,35 +1399,35 @@ static void sco_disconn_cfm(struct hci_conn *hcon, __u8 reason)
+ int sco_recv_scodata(struct hci_dev *hdev, u16 handle, struct sk_buff *skb)
+ {
+ 	struct hci_conn *hcon;
+-	struct sco_conn *conn;
++	struct sock *sk;
+ 
+-	hci_dev_lock(hdev);
++	rcu_read_lock();
+ 
+ 	hcon = hci_conn_hash_lookup_handle(hdev, handle);
+ 	if (!hcon) {
+-		hci_dev_unlock(hdev);
++		rcu_read_unlock();
+ 		kfree_skb(skb);
+ 		return -ENOENT;
+ 	}
+ 
+-	conn = sco_conn_hold_unless_zero(hcon->sco_data);
++	sk = __sco_get_sk(hcon);
+ 	hcon = NULL;
+ 
+-	hci_dev_unlock(hdev);
++	rcu_read_unlock();
+ 
+-	if (!conn) {
++	if (!sk) {
+ 		kfree_skb(skb);
+ 		return -EINVAL;
+ 	}
+ 
+-	BT_DBG("conn %p len %u", conn, skb->len);
++	BT_DBG("sk %p len %u", sk, skb->len);
+ 
+ 	if (skb->len)
+-		sco_recv_frame(conn, skb);
++		sco_recv_frame(sk, skb);
+ 	else
+ 		kfree_skb(skb);
+ 
+-	sco_conn_put(conn);
++	sock_put(sk);
+ 	return 0;
+ }
+ 
+-- 
+2.53.0
+
