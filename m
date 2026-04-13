@@ -1,48 +1,76 @@
-Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E9893CAE6A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2026 19:54:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438B62EB0F;
+	Mon, 13 Apr 2026 20:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776110083; cv=none; b=rZ7NcfPiSsS120Tp/FIGcsjsDWT6ujHY1V0P2h/N+EX6lkeUS44qYX0N0wvq7J1sF2TzlwL/J9Sk4Z7i9HtTFcnq1h1sxCXRn93whhVDIAQwdE4m2tQqw53glgKN4yrMvPWUqJOHUNR2SlEC9IY1OVmFkNC9P/97oontD7isZXo=
+	t=1776110434; cv=none; b=aHCCJeFh8OZvx6gJPyRgKSWLWGi+2mrFtcmm5BXz7/R0Y4hIqeD2caLQfRxh2qVN7RUdBmEMlGNpPecnqM+FRHg0uT2DzqXbOvUaJq99vVFQVJxD7bat0cIxbuL5HR9t3JMsi542WPmw0Rsr3ES0HXr4VPJPTIUikcL7jdvDfJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776110083; c=relaxed/simple;
-	bh=ZIMOCK0ULPGsBhRu6HBM7wnivwc4Kp0Fs8IdMsglMqA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=H51FrMK8LJf9RifJ06CoZL+0CqABMrk6pAJw/2ZzSeJ1faFkvQnSFn4tdJSFeYWG3H7hXE0EezGaraFFgOmeMQPP0zlXFKAON39S/1pNpQF70jaJuy4Jiyu0Od8zHPvG6LZRRISYA5MVly2oTdq1F55q9KGyvYeAqze/5RIIkng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=TX2kZ+st; arc=none smtp.client-ip=192.30.252.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1776110434; c=relaxed/simple;
+	bh=WPx8CTRgamD7KatsZgjeYaW6fnE4s7vStM9CP8CV+IE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lJFJClL7FNhollKltm1lAeQvIcEyGjyS4kiLATHBKYO8divHf7mQQQhLXecqksZ1skLR6k6FHhGI797jWDjk9gC7uphc9HmgtyaPFEUl6O1+te2NPCtLOeadzqhw4Q/AV1DPI0hcy8EtBiVsEgYe3cj9UBDo1C8AfMDjRfvVb6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hof6imjH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="TX2kZ+st"
-Received: from github.com (hubbernetes-node-a526bec.ac4-iad.github.net [10.52.211.102])
-	by smtp.github.com (Postfix) with ESMTPA id 7E2C920C86
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2026 12:54:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1776110080;
-	bh=zMHpfiTa2ODtQZA6Z6lz/dc9U60oUJ4kVh+aJlBxYw8=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=TX2kZ+stiyLC3kI/4WOJ5fVp5CMCKT0dOGe3WCHJxOWJCwswGzkRHxdfkgTOUzwE/
-	 SSv5NRvVSHh/fuPepyCqJwHjN1ODsuP/THTtQKDH+S9Z09o1a19pnFlhR8S+sto3La
-	 /NcIVdDPrFERU1Eb8VdFebks74uQjl41b5fB7Mfc=
-Date: Mon, 13 Apr 2026 12:54:40 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1080317/f3626f-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hof6imjH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2270C2BCAF;
+	Mon, 13 Apr 2026 20:00:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776110433;
+	bh=WPx8CTRgamD7KatsZgjeYaW6fnE4s7vStM9CP8CV+IE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Hof6imjHnvBwPjHucz3TrKnjTBAx8ZbFshMolJb5w+YoIoG8O1b69GMHXPVvykak5
+	 lQCYx8VRW8gFfzgz5mjGgCHTiuJo7q+helem8yPp0h1rK6zf95KX6OkvW1zBk4h38n
+	 XQ2NUxsgxAJCnUVvPYA1IW6tKetA0M8UstIgYWMfgglOMTiEFx2e9oUH1FdaHaY1sv
+	 BMFH7CC6taEtbU05MSLrSb58LFbu0dNRU+MkGf7UUDOjQm4TI/XdMk1RatwMkKwDnA
+	 dIxcrnNp8YMev8nn/IikNYoIt8zxiOYkt2OkaDynoUqNMB4QW9UgWU7Ka52O5HXtjM
+	 o6bOYzdE/HFSA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE9B3809A09;
+	Mon, 13 Apr 2026 20:00:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3] Bluetooth: btintel_pcie: Support Product level reset
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <177611040529.523783.435139428854356535.git-patchwork-notify@kernel.org>
+Date: Mon, 13 Apr 2026 20:00:05 +0000
+References: <20260413042041.1318723-1-chandrashekar.devegowda@intel.com>
+In-Reply-To: <20260413042041.1318723-1-chandrashekar.devegowda@intel.com>
+To: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-pci@vger.kernel.org,
+ bhelgaas@google.com, ravishankar.srivatsa@intel.com,
+ chethan.tumkur.narayan@intel.com
 
-  Branch: refs/heads/1080317
-  Home:   https://github.com/bluez/bluez
+Hello:
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Mon, 13 Apr 2026 09:50:40 +0530 you wrote:
+> When driver encounters a TOP exception, ACPI methods will be called
+> for Product level reset since Wifi and BT share the same TOP. BT driver
+> will first reprobe the wifi driver and then reprobe BT.
+> 
+> Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+> ---
+> 
+> [...]
+
+Here is the summary with links:
+  - [v3] Bluetooth: btintel_pcie: Support Product level reset
+    https://git.kernel.org/bluetooth/bluetooth-next/c/912a499a7955
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
