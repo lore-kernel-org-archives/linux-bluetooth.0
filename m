@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AF0176FB1;
-	Mon, 13 Apr 2026 18:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BDE834B437
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2026 18:20:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776104434; cv=none; b=RwsTRliXBbQ+D3b3Dnt0gJ0EEtRwGM9ijyZJq2f5Xw96xH3vhzsWR10y6bL2NiBl8v41uBtHb8+sKVyn5hpnjwVaTWiKagpVvYlFy1eURFPviGzciB1Gf0TOJAg+gorpI7x52Blhx0mjef+eUhBCSW4RbhfMjmiHzOp1azMW0U4=
+	t=1776104435; cv=none; b=qVUgAPUHUDkCJE7OL9Ag1MIWOz8ckDxsr5lJGMjjShk+f8aPg8UdoC2zzxuewNN21Sad/HPdOHIIgnxG/JeAQUI2d4+mBdaKXtArV21auPkO50Wxlm/v42VNZjrylZJtojWi9wf9tLowjd492GxJ4yqVQp5yc4QmS4FBXHu/Rno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776104434; c=relaxed/simple;
-	bh=FR9o3TgbcNBoW0c3K7lYDfILx+dcA2kt9Vi76wMXoes=;
+	s=arc-20240116; t=1776104435; c=relaxed/simple;
+	bh=ZxYklCwx+f1U90VE5YDHYxgSHDg+9J2yt1l4nYR5sPE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lqZtQ3xR//Xn3gOE4z44wXrC/Kl7N/gpG9IX+0TudYt7MKlye7Y672k89+QSV8xJ6/OAGOtncvzEVbzoS/ojY97Yxdm3gL0UidTt4ZfZd5PIVsHrM68Q5A7L+bBy8lHZWjDdOVuVMqoI5l5xdm1CGNmiMvdyOxUiFvShP1l3US0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ug4h3S7L; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=d2E6VhBL0cokftj5v4sPR7hFEg+GGgnSQuylmLODNoVt152gEmRUPKuscXSuHFx/unmO8fp1uQgeCCuWOYJkAdWg+TGFYGZMiOFi9DmZMNv/qINAnTwa59X9fbl8ak6b3SJ9DMB29MhN4/4ijDi5U9U+nV1MsaChHXPMA5CX+gI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qQwm9hU6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ug4h3S7L"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20C56C2BCAF;
-	Mon, 13 Apr 2026 18:20:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qQwm9hU6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55DC6C2BCAF;
+	Mon, 13 Apr 2026 18:20:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776104434;
-	bh=FR9o3TgbcNBoW0c3K7lYDfILx+dcA2kt9Vi76wMXoes=;
+	s=k20201202; t=1776104435;
+	bh=ZxYklCwx+f1U90VE5YDHYxgSHDg+9J2yt1l4nYR5sPE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ug4h3S7L1AalR2sgVjeW5MAUz1YqUB6dU15OqfJmvseSG5RzWnzhI35CpEO7wG31O
-	 x55eyQpoZ8Y1SRnfxCCdKKWK7tDswctyb57gNVHpHdTXr1IWSf9ymJzIMselvmVpv5
-	 f12RWl1QfOvHXLEqBY/0fGUFElSefjYHBAOQKDBGxILDk1rHnSvbZv6cmjcoUAoY11
-	 I43WP6in/KNij+v+IXlCyC9pffKMTV3+SNIHAjrnVP44XJa3rdlho1StcXyOXNUIRn
-	 B/0/NkMGfesr535Ac61A94tJbstBbuwXhosdQKdayHcO5O5PpTvqa2vhZ3ZiNYSq0r
-	 lJSiejESf2vxw==
+	b=qQwm9hU6axOBF+OMumRHgRCHb6LPR7fNbRGshE/K6GHsIBwvdoJ6VNSizj+uaL9bJ
+	 dQiNVaXauYAxi21p+9U32RClAsouMU1olujzGxOWanY8sVTvPAzJ1pPBx57b6t8hbB
+	 FSMcrDOE3L7I3sZsc5sDd4rYsR2arOkpsYxsunWuP/S/YybIn2YP4FjHi+wfDlGCjE
+	 0eRXWB2Hz1FuyXDlo3cUpuJJSpqUd4RmrOEsS7v3mwZ4jb/3Tw8LaVkgeap/r6H0cV
+	 Ydq8zjaQL6tFhq9P6pJgVumNxXsluMI+MW/RzIl1IHW1IlLH33Yh+fRNvbfM7eyNVI
+	 MJYe82c+HNFPQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9E70380A954;
-	Mon, 13 Apr 2026 18:20:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02C6E380A954;
+	Mon, 13 Apr 2026 18:20:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,43 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4] Bluetooth: hci_conn: fix potential UAF in
- create_big_sync
+Subject: Re: [PATCH] Bluetooth: SCO: fix sleeping under spinlock in
+ sco_conn_ready
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177610440530.483249.14737236012912824643.git-patchwork-notify@kernel.org>
-Date: Mon, 13 Apr 2026 18:20:05 +0000
-References: <20260412202916.196282-1-devnexen@gmail.com>
-In-Reply-To: <20260412202916.196282-1-devnexen@gmail.com>
-To: David Carlier <devnexen@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, pav@iki.fi,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org, luiz.von.dentz@intel.com
+ <177610440679.483249.9458207457157169828.git-patchwork-notify@kernel.org>
+Date: Mon, 13 Apr 2026 18:20:06 +0000
+References: 
+ <9f333a79da3f0f552ca735d549ea3e8ae0784220.1776019593.git.pav@iki.fi>
+In-Reply-To: 
+ <9f333a79da3f0f552ca735d549ea3e8ae0784220.1776019593.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sun, 12 Apr 2026 21:29:16 +0100 you wrote:
-> Add hci_conn_valid() check in create_big_sync() to detect stale
-> connections before proceeding with BIG creation. Handle the
-> resulting -ECANCELED in create_big_complete() and re-validate the
-> connection under hci_dev_lock() before dereferencing, matching the
-> pattern used by create_le_conn_complete() and create_pa_complete().
+On Sun, 12 Apr 2026 21:47:42 +0300 you wrote:
+> sco_conn_ready calls sleeping functions under conn->lock spinlock.
 > 
-> Keep the hci_conn object alive across the async boundary by taking
-> a reference via hci_conn_get() when queueing create_big_sync(), and
-> dropping it in the completion callback. The refcount and the lock
-> are complementary: the refcount keeps the object allocated, while
-> hci_dev_lock() serializes hci_conn_hash_del()'s list_del_rcu() on
-> hdev->conn_hash, as required by hci_conn_del().
+> The critical section can be reduced: conn->hcon is modified only with
+> hdev->lock held. It is guaranteed to be held in sco_conn_ready, so
+> conn->lock is not needed to guard it.
+> 
+> Move taking conn->lock after lock_sock(parent). This also follows the
+> lock ordering lock_sock() > conn->lock elsewhere in the file.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v4] Bluetooth: hci_conn: fix potential UAF in create_big_sync
-    https://git.kernel.org/bluetooth/bluetooth-next/c/d55d107b6fa6
+  - Bluetooth: SCO: fix sleeping under spinlock in sco_conn_ready
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d87bd74aeb54
 
 You are awesome, thank you!
 -- 
