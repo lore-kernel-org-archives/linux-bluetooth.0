@@ -1,90 +1,90 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4652731E842
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2026 10:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8CE53370FF
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2026 10:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776076908; cv=none; b=H+CxpLAS5vEBFZxzugcFHCfOKGmBcox1EmaI/fPYbLg/qWGCKmWri4zF5tcwSXJ/ZCS7IUozFDkd3qW2LoQqynbCH1lGrulEVJmkzjQYGMhkwIUvpkQ+Txv+MUM19D72nNTj+WGT/lYJQ/FDoxCog3rEa2DoEGiW3cAEUcNAGBg=
+	t=1776076913; cv=none; b=uuxj5DJ+pBKQsU4usSMnvR9E1ZlUFcWVY5i2ah3zZ8qbPYe9opyOYgz3x5HxCJJpqhR0TWHhiGJUB7fJasqti8XD7bQSlRZiFkZ/qs1ldKaijczBbfMFgEyM95qgEqlvHDfR2EPBSUngUh53LKtzCPk6HdvZIcCxlDMInmJkJ7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776076908; c=relaxed/simple;
-	bh=WP1VkMqMpH/puSWetMPEnt1vMG1Tge21kzUyG/JlboU=;
+	s=arc-20240116; t=1776076913; c=relaxed/simple;
+	bh=Lrud2Z0tGGhl+VnCuJ1LlC8xsqXINEr+qSBF9ZE+7pY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pJ5u3iaPFYrw7xdLDgzNlXE3BUAoXcoSamCx0InfObQf90jYAHn7Lq2n7u93vtHSfhP3vBW7eKkyMKmUoP9tZXu0azQZuD5xmWXLVor6/zl/tUZYoDCdvdui9dvnERK3WY/KP42IL9SKLcYBykBQB/e+fr+fnhOeM66M8COLmH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=R138zRm0; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=ffGQ2Mca; arc=none smtp.client-ip=205.220.180.131
+	 MIME-Version; b=u/LoppiMicB3pCGa9xeKSPB/GcBpygRa401B+8o3WV1oj80luugOnlJs68LDsqFaX5fzXBPiEpNl/leBL/fqWUppePiwY4rL30oGdy9uJ6jYjXGeCV16VEDFcI/J2rvHPYDU3BsihoYRjyhNSqmteoGSctJ5B6rT6RPYr81xvdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=B8fZwhwC; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=XOMzQtep; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="R138zRm0";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="ffGQ2Mca"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63D7cwQp1367778
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2026 10:41:45 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="B8fZwhwC";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="XOMzQtep"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63D7aUUu2043988
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2026 10:41:50 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=jKxyjMK0Xd9
-	qo8oyWMGEK1Uts0osWzamS4e7KKGTG78=; b=R138zRm0kfJCpVFtVpVhmNuyVuT
-	JJPHLHKz57VUoZNMAMQZF/7q0pV4M261GkY+DBAftCSVNtsJF5okbDdW8K3B95a4
-	DiRzgeda3cD02v4Ia1Fuw+kuHT8b4AOxnBik2zhodRe00XUSTBKyveLiEIkhxpQh
-	Zyy3qkKPijdySqdReou0YPWRef5tbXuEG+IM9GB9Jh9Fnwg6HhogeO4oQ4g5w/DP
-	LCAH4flYlZYb754l0tbLgizPJr4oUEIjIyZzChDVypHgh+fGW5HAQ4edybFMelJR
-	0eHVfZhQAw35Wfx56IjmSbBPfFo0xlo52+eUixBHdC5TrJiU/rLtsOBYSJw==
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dfevtmyfd-1
+	:mime-version:references:subject:to; s=qcppdkim1; bh=dvvuScVK2b2
+	/eF2Gcyoy/wJNo8yVtoSIJIFXCZVtXyA=; b=B8fZwhwC4JYLAKFlrcpaemT7tzt
+	k3JEDcdURgqh5kg5geuifPBeEaWCP/8oPVf0UxqhxU4LOpS3jRmNc1bC/1VG2+qv
+	OVdYWN6HAwhbjahH3+NxaBnWRR6XULHKjHIMbyyUGlbKXj4ya+jGpS/Bch8BJGce
+	sDAKK8FFjRjMcuMte03LhEBKz1t8PQ14aHDJ/5m+4E2+862al2mAnFgX6brfKz83
+	EnwjujpGCXd2t8zeAvFvlRHZRRY2VQSggWG4cDmSYxkHFD5vgho21j/YZ13mVRpq
+	nvkJm85h2aw2tB6MI1eALQdv2bdJgNu2dWszn2l0p6JFW1eOyquO0ydLnzw==
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dff0jvv8t-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2026 10:41:45 +0000 (GMT)
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2b4654f9bb6so4758755ad.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2026 03:41:45 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2026 10:41:50 +0000 (GMT)
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2b2d83e7461so46121965ad.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2026 03:41:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1776076904; x=1776681704; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1776076909; x=1776681709; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jKxyjMK0Xd9qo8oyWMGEK1Uts0osWzamS4e7KKGTG78=;
-        b=ffGQ2McabOSQ6m/p2uw71Ab6/Cl7dptSz/VCexkWLhyI6+L4qwuw6tPmf+iC3y7nAY
-         7e1+duSIEEJ9GFyKy5xk2wziKtAzlfATSxQDPLQiBHbHvUWSRU0IRNaO+0M3vBt6ACd9
-         LJeXvnmS2yx3Qx+t1VpVMn5xozJ4Q2EftTEBMGWTEd4pZ7Pq1TjjasSfjx+tn8JXzo/B
-         gJVV+hrRTgYWyzK9QVxfBnC2QC6CWcoP7ejE9r+h9RmiyMoDQuQYYaLJUdnWriRvcKC9
-         gpbfX3nux/UKcHW3js2X4CkycPgkDw1QdTgKdVNoM13u4evJVlGhSkwZh/aHHigfgYEQ
-         +3pg==
+        bh=dvvuScVK2b2/eF2Gcyoy/wJNo8yVtoSIJIFXCZVtXyA=;
+        b=XOMzQtepYHXjB1jfjupifPbBkkKebxtdpbgG3eQBQcXttq9gH8V70/dRz0+XcoNKQk
+         VtDoLMVutBfSJb/cKEUSLOe7KIK6oTnlbChofEnOGwtmXbParsuzfdWfeGNBo6dNMX6m
+         wrU0rgT0gjopGKVD1p4C1aUxL3Y81Hl8hAUahUiWh6xRjPaXrfOj2gaTyZgMCsN6bnvE
+         u0k7M5hCeUjTUa6eL3WI09eumA8ARx9ZFIqQCcDoG0Uio6I4wSdEpKBMwL8PZumBFnHC
+         W3ztscX8PU8ejYUaK3N5ezpY9H79oSyfOxmC1F+NHuYAyvYyhZHfXZyQC2v80siqn/ax
+         n24Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776076904; x=1776681704;
+        d=1e100.net; s=20251104; t=1776076909; x=1776681709;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=jKxyjMK0Xd9qo8oyWMGEK1Uts0osWzamS4e7KKGTG78=;
-        b=llCOTMlINqRC9OUs0/R5OAnEAqq4r2Es2R/8OReXXBm6MtY3x5IWHW6JGZfjTPsB9B
-         IVy1UpLvSFft7VdnYGcK+kcHrJaXq+ooRLsB7ayR5c725NxdR5ZG532VvzRU/DkBNpSG
-         OY4RlGDQLSzVlIEBzBflk40UDHcgb8ZanEkfdBwWNYPRcOjrrWr4Q3fnYB7dQpbIFEnQ
-         URaFEU+WKFgGdvGnMN4gGWRtLUckHgliOuaWu2mFKSdSgrsnRYWKyqPb08Wni9xs27rr
-         /4ZRJJ8iqyv9aG+JDqfMzbu3b9539xFGZuiuM4OJdit6OPhIh8yC0vYSud+nJ8KhMAVN
-         LICA==
-X-Gm-Message-State: AOJu0YysQ5f/e8t3ecREWOAIkIEqZbG9XLoTRviXC20GZm9V20qXmwbX
-	GsJIvfQJymQuUMje5YyE8A1UfW+LbIcsnBgKSTrBQJIfO0X8Kr3ylXoG6k+DQQRinbz6f2a7XIW
-	oA3YlMjxKWA/jaSLrnzOUnV3rlht+4ZEHl/h1X2EMroHbtmlfs78xwOX4JR3Fa/rRYuvmRitGXh
-	yP9hI=
-X-Gm-Gg: AeBDieufFEFOogfqSLA3M76kTWxrE/O0qK+t2EDysihk3riex7AkzTRLJ5NTxhpqJ61
-	hTGB9D/NcahS1XrGR37ugGVsQVvdG7R8biiO9DyYDFhc/ReqYHvHKpjMk09usGadIcfgQYM0XQY
-	2VD7mpr5zHqwkkq//fLcONxmDbPnomNUaO+O5xejRew0E0XPMYsyccXKYiLpY8i2Yh15UIVaoCr
-	hSMu2i+uQo2H7ZguTKqZlfeNSBWCNS4B7i+SHbjtbF8VUwf8vXrVwWX6/DrhULgMJkYFrKEjQuo
-	r/e852tLQh/6vFeoS1ctAJ3ublqUyzvzWpgFf6D7pm+9J0QAbg05i46qFf1CPasxYPs6+rqid+2
-	g94lfgpxrTSOy4WfUeDeCRz4iQpeo1xQdVmBfj0ZxH0jdRUReSFc=
-X-Received: by 2002:a17:903:3890:b0:2b2:d09c:c07c with SMTP id d9443c01a7336-2b2d5a68ed9mr126335165ad.36.1776076903986;
-        Mon, 13 Apr 2026 03:41:43 -0700 (PDT)
-X-Received: by 2002:a17:903:3890:b0:2b2:d09c:c07c with SMTP id d9443c01a7336-2b2d5a68ed9mr126334955ad.36.1776076903480;
-        Mon, 13 Apr 2026 03:41:43 -0700 (PDT)
+        bh=dvvuScVK2b2/eF2Gcyoy/wJNo8yVtoSIJIFXCZVtXyA=;
+        b=Z+D2+zl5YtGO+C41ZR7l/0+xQyYhi16MzhgFsZBIvqGEjvd+nK+42hOt9//B8PFKs8
+         YdhvsBQeasz/FbKk5GOqM0Xs2XZPJkDadiLdKM5WmzuAk/h4H/NUe9GZNU02SGAIPl22
+         KKUoVoeL/M5wqjFCRGvVJ/nA2Li4iOS0V6+tw+mHENMuvAoMVD3t7d8Sz7XPIKtOudss
+         420iR4kM0wmxpT3zeiFybFV1NuxTcI68hf4x9B2iGLTYs8bojNtMNcC9atPMcPrUiSdA
+         JvNfc+Oz2DVanfBzAKVF8SGtaq17C0fq8/Q2frdRJtPsxwg4SfApS7Y1YGBH3EELBjg7
+         U0dA==
+X-Gm-Message-State: AOJu0YzWeR5HgCdnCAClch9ogf8Qbjtr040m8Ds7TFNloXnWUPWM3uwd
+	eQllf8e28KgPd5o9qFYPzzVXHSDTT9nJ5gyofu1w2CyIBhlNytONsWcn+Gz4PBGkb9OnSVyulQx
+	MuJ/HsQNFw+E5CORYRfelch/JFbH2bXx7mQiFG0J0TGerVmIH/pNVhEm/zEKQd9zl8NMvMTFoGx
+	HNLTc=
+X-Gm-Gg: AeBDieu3YMniYIXs5wzdfvALMD+oZB4XIPWfOQ2+592ddyTZ10HebGpzrjoGRasNq6J
+	kFSXAqyYoyjpWw+bsxmZqGi6er2B5cFtRdsrqkm7Vy/C6Qdf4NR68vIgsYC5rETAsB60gZX88Np
+	Y46+GctRVitHhUAFGwCe7OZcUZmFF4n+vXhjK3w5BfzxxI4XhGheBwHCJC0mRdrb5Ub17coRQKW
+	kP1xhOsmSqeXxNCY187tJVdd1IUpMeSHAyX6Qq52D2jYBAvv1OFLR7oGSwm3ZSPlz9cIQufkxmf
+	VOGs81Q42Pl1xT4auPsCsM9/7Vb6zx2sG93WBBK+fQagam4nvSnz4dHj9y3SFAa1ouh7yLFMtuJ
+	3VACFiMJM2Xn1OfedEKkTcGZyL6NuvpHDHJIw15qp5oqdRkkKnwU=
+X-Received: by 2002:a17:902:76c3:b0:2b0:52b7:e82 with SMTP id d9443c01a7336-2b2d59a49fbmr99442105ad.16.1776076908950;
+        Mon, 13 Apr 2026 03:41:48 -0700 (PDT)
+X-Received: by 2002:a17:902:76c3:b0:2b0:52b7:e82 with SMTP id d9443c01a7336-2b2d59a49fbmr99441815ad.16.1776076908452;
+        Mon, 13 Apr 2026 03:41:48 -0700 (PDT)
 Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2d4e0f909sm144495055ad.35.2026.04.13.03.41.40
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2d4e0f909sm144495055ad.35.2026.04.13.03.41.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Apr 2026 03:41:43 -0700 (PDT)
+        Mon, 13 Apr 2026 03:41:48 -0700 (PDT)
 From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
         quic_anubhavg@quicinc.com, prathibha.madugonde@oss.qualcomm.com,
         Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Subject: [PATCH BlueZ v4 1/3] shared: rap: Introduce Channel Sounding HCI raw  interface support
-Date: Mon, 13 Apr 2026 16:11:14 +0530
-Message-Id: <20260413104116.1605357-2-naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v4 2/3] bluetooth: Add Channel Sounding config parsing  support
+Date: Mon, 13 Apr 2026 16:11:15 +0530
+Message-Id: <20260413104116.1605357-3-naga.akella@oss.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260413104116.1605357-1-naga.akella@oss.qualcomm.com>
 References: <20260413104116.1605357-1-naga.akella@oss.qualcomm.com>
@@ -95,422 +95,288 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Authority-Analysis: v=2.4 cv=RYWgzVtv c=1 sm=1 tr=0 ts=69dcc869 cx=c_pps
- a=cmESyDAEBpBGqyK7t0alAg==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDEzMDEwMyBTYWx0ZWRfX+rBFm4AAnq1k
+ bNZ0884RTOzgnKit3QsW9I3OSBB5jaPR4orqOP5cUYAVtpjGdVm+y0RviOI/oAjqm/avTBYIeDc
+ M9MSyE/x2SgPH6/wAqipRAJ5v+uBZuNCUHoNJtVrAuCh0wjYUoI94OGlAcCPjSF+CZSS/KkuC3t
+ n4ipvDRWfpMwEo18SRqaDAF0UMF7cP7WBWAbfO1ACv7Tsk+MgXr8oztecmwlTRuT9MNGDkhtQbL
+ +tL8mtLODTU4ScsZxEhDCTPMSjPXuEpTUhFxPxFbfjRvs+sRt+SdDDElHl/P8/hO7HrZbFXnSMf
+ 3Cf+gKHUVnS70n3IEoBZQWuBAT+2sNERoN/rn9vf/0dNsSTbtxs4FX8vC9t8gk5Sp7hAjuq29Tc
+ cxkLO8WkDXOVd1mrt6i1CkXoFlu581Mtnub/AVoKqMP9dIrRhEoJ4cowJxcXr/R4JVn8YgM8Nze
+ 7FyQUAiO34KFxHLL/dA==
+X-Proofpoint-ORIG-GUID: 65pJMg1O1577tYZIMRaS6kgQsgUdFFEs
+X-Proofpoint-GUID: 65pJMg1O1577tYZIMRaS6kgQsgUdFFEs
+X-Authority-Analysis: v=2.4 cv=d/LFDxjE c=1 sm=1 tr=0 ts=69dcc86e cx=c_pps
+ a=MTSHoo12Qbhz2p7MsH1ifg==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
  a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22 a=QxWqq81_DWPgsp5-wqkA:9
- a=1OuFwYUASf3TG4hYMiVC:22
-X-Proofpoint-GUID: iUEe5RSZqu3ceJ6d527M34738dOeHoVl
-X-Proofpoint-ORIG-GUID: iUEe5RSZqu3ceJ6d527M34738dOeHoVl
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDEzMDEwMyBTYWx0ZWRfX6Q+yIBa2uThl
- b3ApXezclMXEuzPY72YmdnUz67f9MejPeADLwpJ5VhKA91MPsiIKWFWT/lvMIsbUlHQkPK766oj
- 4O3HNmRM8z8Gg82W3Znr8L9tGeDRso4BKIr8wqOisNPBFUAyA1WxIbNbTLTb+KFHf1zpW3W2y32
- OCMeZPVFAxghaqhnXYpH5pbrnnMU8IOs3NV19sJ+QNA8Bx5tJyhg8xwPHUfnhireYB3o9KB0t9o
- AEhVeZejUvXDdSpIp+P7Rl3fP8eX2KGTlkvq3eDHecxZOssO9ER7gXGY3bOTlIgzCKVoEpzuuZq
- N36mWhxsK8zbxFMQVa3/mA8RzfmliJ3Tr6ZDwFqXuj+AE6L5dcbB3/1Zi+XcCNcpG1Fby0gufqD
- 1bt6W9uilSfmOhfYOZ3wPyZEGLAmBkvtXcNMuOYMPJiU6AU+JAvY9rFRJ2tuaHGGhyv5i9WyjiM
- t2y5zuwJI4FT3HeIsdQ==
+ a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22 a=FW10I0WjtUwoV23t3qsA:9
+ a=GvdueXVYPmCkWapjIL-Q:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-04-13_03,2026-04-13_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 bulkscore=0 spamscore=0 impostorscore=0 phishscore=0
- clxscore=1015 suspectscore=0 priorityscore=1501 adultscore=0
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604010000
- definitions=main-2604130103
+ spamscore=0 impostorscore=0 malwarescore=0 phishscore=0 priorityscore=1501
+ bulkscore=0 suspectscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604010000 definitions=main-2604130103
 
-Implement stub callbacks for Channel Sounding HCI events and add the
-required protocol definitions for CS configuration, procedure control,
-and subevent result parsing
+Add support for parsing Channel Sounding (CS) configuration options
+from the configuration file.
 
-Add data structures to support Channel Sounding Processing
-Add helper function to get hci conn info list and integrate it with RAP
+Add CAP_NET_RAW to CapabilityBoundingSet in bluetooth.service.
+bluetoothd requires CAP_NET_RAW to receive and process HCI LE events
+when running under a constrained systemd capability bounding set
 ---
- src/shared/hci.c |  67 +++++++++++++-----
- src/shared/hci.h |  12 ++++
- src/shared/rap.c |  50 +++++++++++++-
- src/shared/rap.h | 174 +++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 285 insertions(+), 18 deletions(-)
+ src/bluetooth.service.in |   2 +-
+ src/btd.h                |   7 +++
+ src/main.c               | 129 +++++++++++++++++++++++++++++++++++++++
+ src/main.conf            |  24 ++++++++
+ 4 files changed, 161 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/hci.c b/src/shared/hci.c
-index 575254c09..50ba199e3 100644
---- a/src/shared/hci.c
-+++ b/src/shared/hci.c
-@@ -20,9 +20,11 @@
- #include <sys/un.h>
- #include <sys/types.h>
- #include <sys/stat.h>
-+#include <sys/ioctl.h>
- #include <fcntl.h>
- #include <errno.h>
+diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
+index 8ebe89bec..8dcbde236 100644
+--- a/src/bluetooth.service.in
++++ b/src/bluetooth.service.in
+@@ -10,7 +10,7 @@ ExecStart=@PKGLIBEXECDIR@/bluetoothd
+ NotifyAccess=main
+ #WatchdogSec=10
+ #Restart=on-failure
+-CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
++CapabilityBoundingSet=CAP_NET_RAW CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+ LimitNPROC=1
  
-+#include "lib/bluetooth/hci.h"
- #include "monitor/bt.h"
- #include "src/shared/mainloop.h"
- #include "src/shared/io.h"
-@@ -30,22 +32,6 @@
- #include "src/shared/queue.h"
- #include "src/shared/hci.h"
+ # Filesystem lockdown
+diff --git a/src/btd.h b/src/btd.h
+index c84a600d1..db2e81239 100644
+--- a/src/btd.h
++++ b/src/btd.h
+@@ -94,11 +94,18 @@ struct btd_le_defaults {
+ 	uint8_t		enable_advmon_interleave_scan;
+ };
  
--#define BTPROTO_HCI	1
--struct sockaddr_hci {
--	sa_family_t	hci_family;
--	unsigned short	hci_dev;
--	unsigned short  hci_channel;
--};
--#define HCI_CHANNEL_RAW		0
--#define HCI_CHANNEL_USER	1
--
--#define SOL_HCI		0
--#define HCI_FILTER	2
--struct hci_filter {
--	uint32_t type_mask;
--	uint32_t event_mask[2];
--	uint16_t opcode;
--};
- 
- struct bt_hci {
- 	int ref_count;
-@@ -673,3 +659,52 @@ bool bt_hci_unregister(struct bt_hci *hci, unsigned int id)
- 
- 	return true;
- }
-+
-+bool bt_hci_get_conn_info(struct bt_hci *hci, uint16_t handle,
-+				struct bt_hci_conn_info *info)
-+{
-+	struct hci_conn_list_req *cl;
-+	struct hci_conn_info *ci;
-+	int fd, i;
-+	bool found = false;
-+
-+	if (!hci || !info)
-+		return false;
-+
-+	fd = io_get_fd(hci->io);
-+	if (fd < 0)
-+		return false;
-+
-+	/* Allocate buffer for connection list request */
-+	cl = malloc(10 * sizeof(*ci) + sizeof(*cl));
-+	if (!cl)
-+		return false;
-+
-+	memset(cl, 0, 10 * sizeof(*ci) + sizeof(*cl));
-+	cl->dev_id = 0;  /* Will be filled by ioctl */
-+	cl->conn_num = 10;
-+
-+	/* Get connection list via ioctl */
-+	if (ioctl(fd, HCIGETCONNLIST, (void *) cl) < 0) {
-+		free(cl);
-+		return false;
-+	}
-+
-+	/* Search for the connection with matching handle */
-+	ci = cl->conn_info;
-+	for (i = 0; i < cl->conn_num; i++, ci++) {
-+		if (ci->handle == handle) {
-+			info->handle = ci->handle;
-+			memcpy(info->bdaddr, &ci->bdaddr, 6);
-+			info->type = ci->type;
-+			info->out = ci->out;
-+			info->state = ci->state;
-+			info->link_mode = ci->link_mode;
-+			found = true;
-+			break;
-+		}
-+	}
-+
-+	free(cl);
-+	return found;
-+}
-diff --git a/src/shared/hci.h b/src/shared/hci.h
-index 76ee72f54..742e24897 100644
---- a/src/shared/hci.h
-+++ b/src/shared/hci.h
-@@ -13,6 +13,15 @@
- 
- typedef void (*bt_hci_destroy_func_t)(void *user_data);
- 
-+struct bt_hci_conn_info {
-+	uint16_t handle;
-+	uint8_t  bdaddr[6];
-+	uint8_t  type;
-+	uint8_t  out;
-+	uint16_t state;
-+	uint32_t link_mode;
-+};
-+
- struct bt_hci;
- 
- struct bt_hci *bt_hci_new(int fd);
-@@ -41,3 +50,6 @@ unsigned int bt_hci_register(struct bt_hci *hci, uint8_t event,
- 				bt_hci_callback_func_t callback,
- 				void *user_data, bt_hci_destroy_func_t destroy);
- bool bt_hci_unregister(struct bt_hci *hci, unsigned int id);
-+
-+bool bt_hci_get_conn_info(struct bt_hci *hci, uint16_t handle,
-+				struct bt_hci_conn_info *info);
-diff --git a/src/shared/rap.c b/src/shared/rap.c
-index 39ef3f278..5745cda08 100644
---- a/src/shared/rap.c
-+++ b/src/shared/rap.c
-@@ -26,8 +26,8 @@
- #include "src/shared/gatt-client.h"
- #include "src/shared/rap.h"
- 
--#define DBG(_rap, fmt, arg...) \
--	rap_debug(_rap, "%s:%s() " fmt, __FILE__, __func__, ## arg)
-+#define DBG(_rap, fmt, ...) \
-+	rap_debug(_rap, "%s:%s() " fmt, __FILE__, __func__, ##__VA_ARGS__)
- 
- #define RAS_UUID16			0x185B
- 
-@@ -504,6 +504,52 @@ bool bt_rap_unregister(unsigned int id)
- 	return true;
- }
- 
-+void bt_rap_hci_cs_subevent_result_cont_callback(uint16_t length,
-+						const void *param,
-+						void *user_data)
-+{
-+	struct bt_rap *rap = user_data;
-+
-+	DBG(rap, "Received CS subevent CONT: len=%d", length);
-+}
-+
-+void bt_rap_hci_cs_subevent_result_callback(uint16_t length,
-+					const void *param,
-+					void *user_data)
-+{
-+	struct bt_rap *rap = user_data;
-+
-+	DBG(rap, "Received CS subevent: len=%d", length);
-+}
-+
-+void bt_rap_hci_cs_procedure_enable_complete_callback(uint16_t length,
-+						const void *param,
-+						void *user_data)
-+{
-+	struct bt_rap *rap = user_data;
-+
-+	DBG(rap, "Received CS procedure enable complete subevent: len=%d",
-+	    length);
-+}
-+
-+void bt_rap_hci_cs_sec_enable_complete_callback(uint16_t length,
-+						 const void *param,
-+						 void *user_data)
-+{
-+	struct bt_rap *rap = user_data;
-+
-+	DBG(rap, "Received CS security enable subevent: len=%d", length);
-+}
-+
-+void bt_rap_hci_cs_config_complete_callback(uint16_t length,
-+					const void *param,
-+					void *user_data)
-+{
-+	struct bt_rap *rap = user_data;
-+
-+	DBG(rap, "Received CS config complete subevent: len=%d", length);
-+}
-+
- struct bt_rap *bt_rap_new(struct gatt_db *ldb, struct gatt_db *rdb)
- {
- 	struct bt_rap *rap;
-diff --git a/src/shared/rap.h b/src/shared/rap.h
-index a1d1ff2ae..21de72af3 100644
---- a/src/shared/rap.h
-+++ b/src/shared/rap.h
-@@ -9,9 +9,154 @@
- #include <inttypes.h>
- 
- #include "src/shared/io.h"
-+#include "lib/bluetooth/mgmt.h"
-+#include "src/shared/hci.h"
- 
- struct bt_rap;
- 
-+/* Channel Sounding Events */
-+struct bt_rap_hci_cs_options {
++struct btd_le_bcs {
 +	uint8_t role;
 +	uint8_t cs_sync_ant_sel;
 +	int8_t max_tx_power;
-+	int rtt_type;
 +};
 +
-+#define CS_MODE_ZERO				0x00
-+#define CS_MODE_ONE				0x01
-+#define CS_MODE_TWO				0x02
-+#define CS_MODE_THREE				0x03
-+
-+#define CS_REFLECTOR			0x01
-+#define CS_INITIATOR			0x00
-+
-+#define CS_MAX_ANT_PATHS			0x05
-+#define CS_MAX_STEPS			0xA0
-+#define CS_MAX_STEP_DATA_LEN		0xFF
-+
-+struct rap_ev_cs_config_cmplt {
-+	uint8_t status;
-+	uint16_t conn_hdl;
-+	uint8_t config_id;
-+	uint8_t action;
-+	uint8_t main_mode_type;
-+	uint8_t sub_mode_type;
-+	uint8_t min_main_mode_steps;
-+	uint8_t max_main_mode_steps;
-+	uint8_t main_mode_rep;
-+	uint8_t mode_0_steps;
-+	uint8_t role;
-+	uint8_t rtt_type;
-+	uint8_t cs_sync_phy;
-+	uint8_t channel_map[10];
-+	uint8_t channel_map_rep;
-+	uint8_t channel_sel_type;
-+	uint8_t ch3c_shape;
-+	uint8_t ch3c_jump;
-+	uint8_t reserved;
-+	uint8_t t_ip1_time;
-+	uint8_t t_ip2_time;
-+	uint8_t t_fcs_time;
-+	uint8_t t_pm_time;
-+} __packed;
-+
-+struct rap_ev_cs_sec_enable_cmplt {
-+	uint8_t status;
-+	uint16_t conn_hdl;
-+} __packed;
-+
-+struct rap_ev_cs_proc_enable_cmplt {
-+	uint8_t status;
-+	uint16_t conn_hdl;
-+	uint8_t config_id;
-+	uint8_t state;
-+	uint8_t tone_ant_config_sel;
-+	int8_t sel_tx_pwr;
-+	uint8_t sub_evt_len[3];
-+	uint8_t sub_evts_per_evt;
-+	uint16_t sub_evt_intrvl;
-+	uint16_t evt_intrvl;
-+	uint16_t proc_intrvl;
-+	uint16_t proc_counter;
-+	uint16_t max_proc_len;
-+} __packed;
-+
-+#define CS_MAX_STEPS			0xA0
-+
-+struct pct_iq_sample {
-+	int16_t i_sample;
-+	int16_t q_sample;
-+} __packed;
-+
-+struct cs_mode_zero_data {
-+	uint8_t packet_quality;
-+	uint8_t packet_rssi_dbm;
-+	uint8_t packet_ant;
-+	uint32_t init_measured_freq_offset;
-+} __packed;
-+
-+struct cs_mode_one_data {
-+	uint8_t packet_quality;
-+	uint8_t packet_rssi_dbm;
-+	uint8_t packet_ant;
-+	uint8_t packet_nadm;
-+	int16_t toa_tod_init;
-+	int16_t tod_toa_refl;
-+	struct pct_iq_sample packet_pct1;
-+	struct pct_iq_sample packet_pct2;
-+} __packed;
-+
-+struct cs_mode_two_data {
-+	uint8_t ant_perm_index;
-+	struct pct_iq_sample tone_pct[4];
-+	uint8_t tone_quality_indicator[4];
-+} __packed;
-+
-+struct cs_mode_three_data {
-+	struct cs_mode_one_data mode_one_data;
-+	struct cs_mode_two_data mode_two_data;
-+} __packed;
-+
-+union cs_mode_data {
-+	struct cs_mode_zero_data mode_zero_data;
-+	struct cs_mode_one_data mode_one_data;
-+	struct cs_mode_two_data mode_two_data;
-+	struct cs_mode_three_data mode_three_data;
-+};
-+
-+struct cs_step_data {
-+	uint8_t step_mode;
-+	uint8_t step_chnl;
-+	uint8_t step_data_length;
-+	union cs_mode_data step_mode_data;
-+} __packed;
-+
-+struct rap_ev_cs_subevent_result {
-+	uint16_t conn_hdl;
-+	uint8_t config_id;
-+	uint16_t start_acl_conn_evt_counter;
-+	uint16_t proc_counter;
-+	uint16_t freq_comp;
-+	uint8_t ref_pwr_lvl;
-+	uint8_t proc_done_status;
-+	uint8_t subevt_done_status;
-+	uint8_t abort_reason;
-+	uint8_t num_ant_paths;
-+	uint8_t num_steps_reported;
-+	struct cs_step_data step_data[];
-+} __packed;
-+
-+struct rap_ev_cs_subevent_result_cont {
-+	uint16_t conn_hdl;
-+	uint8_t config_id;
-+	uint8_t proc_done_status;
-+	uint8_t subevt_done_status;
-+	uint8_t abort_reason;
-+	uint8_t num_ant_paths;
-+	uint8_t num_steps_reported;
-+	struct cs_step_data step_data[];
-+} __packed;
-+
- typedef void (*bt_rap_debug_func_t)(const char *str, void *user_data);
- typedef void (*bt_rap_ready_func_t)(struct bt_rap *rap, void *user_data);
- typedef void (*bt_rap_destroy_func_t)(void *user_data);
-@@ -43,3 +188,32 @@ bool bt_rap_ready_unregister(struct bt_rap *rap, unsigned int id);
- bool bt_rap_unregister(unsigned int id);
+ struct btd_defaults {
+ 	uint16_t	num_entries;
  
- struct bt_rap *bt_rap_new(struct gatt_db *ldb, struct gatt_db *rdb);
+ 	struct btd_br_defaults br;
+ 	struct btd_le_defaults le;
++	struct btd_le_bcs bcs;
+ };
+ 
+ struct btd_csis {
+diff --git a/src/main.c b/src/main.c
+index 818f7c06e..d3a2528e3 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -156,6 +156,13 @@ static const char *gatt_options[] = {
+ 	NULL
+ };
+ 
++static const char *bcs_options[] = {
++	"Role",
++	"CsSyncAntennaSel",
++	"MaxTxPower",
++	NULL
++};
 +
-+/* HCI Raw Channel Approach */
-+void bt_rap_hci_cs_config_complete_callback(uint16_t length,
-+					     const void *param,
-+					     void *user_data);
-+void bt_rap_hci_cs_sec_enable_complete_callback(uint16_t length,
-+						 const void *param,
-+						 void *user_data);
-+void bt_rap_hci_cs_procedure_enable_complete_callback(uint16_t length,
-+						      const void *param,
-+						      void *user_data);
-+void bt_rap_hci_cs_subevent_result_callback(uint16_t length,
-+					     const void *param,
-+					     void *user_data);
-+void bt_rap_hci_cs_subevent_result_cont_callback(uint16_t length,
-+						  const void *param,
-+						  void *user_data);
+ static const char *csip_options[] = {
+ 	"SIRK",
+ 	"Encryption",
+@@ -193,6 +200,7 @@ static const struct group_table {
+ 	{ "CSIS",	csip_options },
+ 	{ "AVDTP",	avdtp_options },
+ 	{ "AVRCP",	avrcp_options },
++	{ "ChannelSounding",	bcs_options },
+ 	{ "AdvMon",	advmon_options },
+ 	{ }
+ };
+@@ -492,6 +500,46 @@ static bool parse_config_int(GKeyFile *config, const char *group,
+ 	return true;
+ }
+ 
++static bool parse_config_signed_int(GKeyFile *config, const char *group,
++					const char *key, int8_t *val,
++					size_t min, size_t max)
++{
++	char *str = NULL;
++	char *endptr = NULL;
++	long tmp;
++	bool result = false;
 +
-+void bt_rap_hci_set_le_bcs_options(uint8_t role, uint8_t cs_sync_ant_sel,
-+				   int8_t max_tx_power);
++	str = g_key_file_get_string(config, group, key, NULL);
++	if (!str)
++		return false;
 +
-+bool bt_rap_attach_hci(struct bt_rap *rap, struct bt_hci *hci);
-+void bt_rap_detach_hci(struct bt_rap *rap);
-+void bt_rap_hci_sm_cleanup(void);
++	tmp = strtol(str, &endptr, 0);
++	if (!endptr || *endptr != '\0') {
++		warn("%s.%s = %s is not integer", group, key, str);
++		goto cleanup;
++	}
 +
-+/* Connection handle mapping functions */
-+bool bt_rap_set_conn_handle(struct bt_rap *rap, uint16_t handle,
-+				const uint8_t *bdaddr, uint8_t bdaddr_type);
-+void bt_rap_clear_conn_handle(struct bt_rap *rap, uint16_t handle);
++	if (tmp < (long)min) {
++		warn("%s.%s = %ld is out of range (< %zu)", group, key, tmp,
++			min);
++		goto cleanup;
++	}
++
++	if (tmp > (long)max) {
++		warn("%s.%s = %ld is out of range (> %zu)", group, key, tmp,
++									max);
++		goto cleanup;
++	}
++
++	if (val)
++		*val = (int8_t)tmp;
++	result = true;
++
++cleanup:
++	g_free(str);
++	return result;
++}
++
+ struct config_param {
+ 	const char * const val_name;
+ 	void * const val;
+@@ -1184,6 +1232,82 @@ static void parse_csis(GKeyFile *config)
+ 					0, UINT8_MAX);
+ }
+ 
++static bool parse_cs_role(GKeyFile *config, const char *group,
++					const char *key, uint8_t *val)
++{
++	GError *err = NULL;
++	char *str = NULL;
++	int numeric_val;
++
++	/* Try to read as string first */
++	str = g_key_file_get_string(config, group, key, &err);
++	if (err) {
++		if (err->code != G_KEY_FILE_ERROR_KEY_NOT_FOUND)
++			DBG("%s", err->message);
++		g_error_free(err);
++		return false;
++	}
++
++	DBG("%s.%s = %s", group, key, str);
++
++	/* Check if it's a string value */
++	if (!strcmp(str, "Initiator") || !strcmp(str, "initiator")) {
++		if (val)
++			*val = 1;
++		g_free(str);
++		return true;
++	} else if (!strcmp(str, "Reflector") || !strcmp(str, "reflector")) {
++		if (val)
++			*val = 2;
++		g_free(str);
++		return true;
++	} else if (!strcmp(str, "Both") || !strcmp(str, "both")) {
++		if (val)
++			*val = 3;
++		g_free(str);
++		return true;
++	}
++
++	/* Try to parse as numeric value */
++	char *endptr = NULL;
++
++	numeric_val = strtol(str, &endptr, 0);
++
++	if (!endptr || *endptr != '\0') {
++		error("%s.%s = %s is not a valid value. "
++			"Expected: 1/Initiator, 2/Reflector, or 3/Both",
++			group, key, str);
++		g_free(str);
++		return false;
++	}
++
++	if (numeric_val < 1 || numeric_val > 3) {
++		warn("%s.%s = %d is out of range. "
++			"Valid values: 1 (Initiator), 2 (Reflector), 3 (Both)",
++			group, key, numeric_val);
++		g_free(str);
++		return false;
++	}
++
++	if (val)
++		*val = numeric_val;
++
++	g_free(str);
++	return true;
++}
++
++static void parse_le_cs_config(GKeyFile *config)
++{
++	parse_cs_role(config, "ChannelSounding", "Role",
++			&btd_opts.defaults.bcs.role);
++	parse_config_u8(config, "ChannelSounding", "CsSyncAntennaSel",
++			&btd_opts.defaults.bcs.cs_sync_ant_sel,
++			0x01, 0xFF);
++	parse_config_signed_int(config, "ChannelSounding",
++			"MaxTxPower", &btd_opts.defaults.bcs.max_tx_power,
++			INT8_MIN, INT8_MAX);
++}
++
+ static void parse_avdtp_session_mode(GKeyFile *config)
+ {
+ 	char *str = NULL;
+@@ -1262,6 +1386,7 @@ static void parse_config(GKeyFile *config)
+ 	parse_csis(config);
+ 	parse_avdtp(config);
+ 	parse_avrcp(config);
++	parse_le_cs_config(config);
+ 	parse_advmon(config);
+ }
+ 
+@@ -1313,6 +1438,10 @@ static void init_defaults(void)
+ 
+ 	btd_opts.advmon.rssi_sampling_period = 0xFF;
+ 	btd_opts.csis.encrypt = true;
++
++	btd_opts.defaults.bcs.role = 0x03;
++	btd_opts.defaults.bcs.cs_sync_ant_sel = 0xFF;
++	btd_opts.defaults.bcs.max_tx_power = 0x14;
+ }
+ 
+ static void log_handler(const gchar *log_domain, GLogLevelFlags log_level,
+diff --git a/src/main.conf b/src/main.conf
+index d31dd1b8f..fc0138bbf 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -299,6 +299,30 @@
+ # Default = auto
+ # Security = auto
+ 
++[ChannelSounding]
++# Current role of the device
++# Possible values:
++#   1 or "Initiator" - CS Initiator role,
++#   Generally, CS Initiator acts as Client (Gatt role) and Central (Gap role)
++#   2 or "Reflector" - CS Reflector role,
++#   Generally, CS Reflector acts as Server (Gatt role) and Peripheral (Gap role)
++#   3 or "Both"      - Both Initiator and Reflector roles
++# Default: 3 (Both)
++#Role = 3
++
++# Antenna Identifier to be used
++# Possible values:
++# 0x01-0x04 (antenna identifier to be used),
++# 0xFE - Antennas to be used in repetetive order,
++# 0xFF - Host doen't have recommendation
++# Default: 0xFF (Host doesn't have recommendation)
++#CsSyncAntennaSel = 0xFF
++
++# Maximum Transmit power
++# Possible values: 0x7F-0x14 (-127dBm to 20dBm)
++# Default: 0x14 (Max Power possible)
++#MaxTxPower = 0x14
++
+ [CSIS]
+ # SIRK - Set Identification Resolution Key which is common for all the
+ # sets. They SIRK key is used to identify its sets. This can be any
 -- 
 
