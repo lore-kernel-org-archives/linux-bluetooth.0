@@ -1,77 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB9135E921
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 21:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B838F3845B1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 21:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776200439; cv=none; b=Bqpst0A7ojPrzn7rMnlJe3GGfECrUK5bgfv5DodtLLRifLrl1rhEfsHdTTwg+swuV7rq5BpBRFGFmO+fKfsStk5j+ghIl4NmrdkIaN2F5/MHvff5ggZuKWUG3O9dTuIeAYCi58Xdpc5tu/FDsPMkesOoW7loDgnUnsaInjXZ3Oo=
+	t=1776202151; cv=none; b=Gm0GKHm4ULN3R8/0QDAZdld9jxy20eTHJ6vkhSRehYd1Q3Xd2lOYe8pAScGh5yspDVE9th36rsBDxxzYFvUanN1SchaQi0QmQywVol8A8ZK9gaZsv16HqlgJ5ifsWeTBSXYt9CVs5916KViL466h9zEgmmI9/w2ffrWmBqZ0Ngs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776200439; c=relaxed/simple;
-	bh=sz40yqYG+6U4+z0HnK8bFhxFUftTvMhfpq4gUCVG2xs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Y+A0Kgo3s5sSODsuCmSTKB/Igi++UdEqFelXjfnhnRkstKKvxYjIXeYMUqZ8tbBG+s5GqblQ0G7LMbAC3KDEzctEP++0OKa3pkjjeKgJQhv664abCuUDhszCw0iTh1tTCaCeNYViL4AvFazM9YUZAp8M6DSX1D/03p7VIWB600k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LXhGh/UV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776202151; c=relaxed/simple;
+	bh=3G2bqG4qaQFpAA54pTNzkIsVshK/6r05ja1gSyVS3TY=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Tb4GGyzF21Omy/4OzZ+Ek9qWoPvAGO2fSlBvRDHfY05wYZMs66GybFiaaqdwLwTsIcPGX5aVzaB9N8m9StKTl8w08zfhVXzxoSlHsHuk41kKa3ixeFMGHXD1Sjnq92y5Y5dfa403L3sfUUACCIlGYvuvN9nq1oeh3Mknp7MZepQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=luhyyNVJ; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LXhGh/UV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 754BCC19425;
-	Tue, 14 Apr 2026 21:00:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776200439;
-	bh=sz40yqYG+6U4+z0HnK8bFhxFUftTvMhfpq4gUCVG2xs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LXhGh/UV3rI4ICrffKmY3+t2xHmFctrKCfI9L/r3GZfSYzLwWSgmMR8WgajqN5aos
-	 ykWr3TJ12wDdkIAqpwLjnK3gDdyn9FUixWGpzC5yDxi7DVmARokHKKQv1w7oQdn88K
-	 G9TIDsFeA/6eikFrzmic54sgjtNsHthprJlJ6iauxIpnE66QQFdApWXG9fTqM1lKEA
-	 5sd34a7I46B6Kijoq41pWDSZgT8w5egReLC+9975Qa/WZGNdk8Ifl3h1Z1Qp1Ul5uB
-	 uD45Kgpid4zTvvhewdEDzkk/jha5L00/jJH1M7b5cLH1rOPxOtjBubTskyU6stXuRG
-	 bt8Ajhc0Su54w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02C453809A0D;
-	Tue, 14 Apr 2026 21:00:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="luhyyNVJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1776202149;
+	bh=w62VXYSc4VVF7JQOqIzJyE6N48YNi6FAdxhuUWpVRZo=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=luhyyNVJxlE+ZxtjFZsDNl/xXufuVaNdL9mAnDy+nCcL/Q9Rg3mXx/QdsySAUzg0x
+	 5FngtwSz7XkmcII5WON+Vtd65ch2BRBEZWrY3PVEZ348UB9Ph3RTqXjn93HhgnTO//
+	 uK7wmsPSzWziW+SwUEwibIgEgqm213T6/90ZvAuo=
+Received: from github.com (hubbernetes-node-3e494ce.ac4-iad.github.net [10.52.210.53])
+	by smtp.github.com (Postfix) with ESMTPA id DFE62A10E1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 14:29:09 -0700 (PDT)
+Date: Tue, 14 Apr 2026 14:29:09 -0700
+From: apusaka <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/b3e1ac-510623@github.com>
+Subject: [bluez/bluez] babc56: monitor: define manufacturer company IDs
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH Bluez 1/2] monitor: define manufacturer company IDs
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <177620040979.1468596.8665372680347270723.git-patchwork-notify@kernel.org>
-Date: Tue, 14 Apr 2026 21:00:09 +0000
-References: <20260414111307.3725821-1-apusaka@google.com>
-In-Reply-To: <20260414111307.3725821-1-apusaka@google.com>
-To: Archie Pusaka <apusaka@google.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
- chromeos-bluetooth-upstreaming@chromium.org, apusaka@chromium.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: babc5699226b535b6f15549a6daaaf7fb45acdd1
+      https://github.com/bluez/bluez/commit/babc5699226b535b6f15549a6daaaf7fb45acdd1
+  Author: Archie Pusaka <apusaka@chromium.org>
+  Date:   2026-04-14 (Tue, 14 Apr 2026)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M monitor/packet.c
 
-On Tue, 14 Apr 2026 19:11:10 +0800 you wrote:
-> From: Archie Pusaka <apusaka@chromium.org>
-> 
-> Define company IDs to make it more readable.
-> Also remove an unnecessary if that could cause uninitialized variable
-> warning.
-> ---
-> 
-> [...]
+  Log Message:
+  -----------
+  monitor: define manufacturer company IDs
 
-Here is the summary with links:
-  - [Bluez,1/2] monitor: define manufacturer company IDs
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=babc5699226b
-  - [Bluez,2/2] monitor: Set msft_opcode on read_local_version_rsp
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=510623fb53b5
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Define company IDs to make it more readable.
+Also remove an unnecessary if that could cause uninitialized variable
+warning.
 
 
+  Commit: 510623fb53b53dce5a297c4a7878cad7546c2e47
+      https://github.com/bluez/bluez/commit/510623fb53b53dce5a297c4a7878cad7546c2e47
+  Author: Archie Pusaka <apusaka@chromium.org>
+  Date:   2026-04-14 (Tue, 14 Apr 2026)
+
+  Changed paths:
+    M monitor/packet.c
+
+  Log Message:
+  -----------
+  monitor: Set msft_opcode on read_local_version_rsp
+
+Aside from INDEX_INFO, we can also receive manufacturer company ID
+when receiving read_local_version_rsp, so we should also try setting
+the msft_opcode there.
+
+
+Compare: https://github.com/bluez/bluez/compare/b3e1acdf9cd0...510623fb53b5
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
