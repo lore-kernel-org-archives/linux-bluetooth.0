@@ -1,62 +1,65 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F7920DE3
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 11:13:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 902FF3D891E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 11:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776165215; cv=none; b=CrhYaJKB0MwXNla1TNXZ5DqRRxE4pmJnvbMwVu7EEIdxKmcpr48T1e4txQ+sPUHBFVHaRCvTRC4PV0KH0KdQC3s45smkAGm/2aVXDpKF2yELCf2fQ6nuv6ccfLt3epquIzenQVAFeZaWbFtZwe49/EwXZCFelfU5vQJRslyGFHE=
+	t=1776165228; cv=none; b=WStagtQsIByulnBfZ7TQPYee4mBF26YLtrOddNTCjQwvoqlhTdH/Yh8sKOw5i13F7RZsVJT7UxYnQjbTux5HbXc40hSzjwXHRk/kuDL8cxIByMxt/UX/HeoatYUYkMe2IIDhrqNQniep2g7y7x1r7u27QLux96TDF3l2bOSYA4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776165215; c=relaxed/simple;
-	bh=VYca3pua4u4WGCbodlQKKRH7yLTVRWcD0NswXtR3NFM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=QlqhLZ/GAe5AOma9sLOO8Qk6m6RR8CPYSZmdkewHXkouREdz0MV81RsjT1buDqPalN+mFPIhbx0j2uros7G5U+xEzkVkEdUw4oV66W/C+9Lx7l91jTeK106y3U+eMi3S1wO9PI9RhjtuxaTMdhDEUt9de5Mlg6TL1nALGTyuhuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wf0ApCTz; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1776165228; c=relaxed/simple;
+	bh=I4BcHWrG6j12lvpiXbiOa/BQ/RDFFAwVN0L7PWpiDAg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Qz855B2OZqIdFQxtJBJoSMnQFORGwI+iGaXhaWGKwF4B6L2SYrVW5zyzCa5urDcxqUOBM1RRTtoefn5oX0F2k0X2G383LPCXHbAvlZoS6flct/zLbxlOipoZPysEcUiPA3x4Zh5WEYRfQ9eZAGI05lHWMcflU/iVMm5COXKQjpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sqVQM6rw; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wf0ApCTz"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2b242b9359aso50328585ad.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 04:13:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sqVQM6rw"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a90510a6d1so44410485ad.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 04:13:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776165214; x=1776770014; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jYQgMhZcNRLWOdYKuAP9wzRUiz3Mx5fd01yZgXYYTBY=;
-        b=wf0ApCTzfSw+sYtDZ7jj3aZ2cpdF8R/sWkGmtfkSP1BlfwUX0J3gi7yieB1dOm0ST7
-         ExKa+K4pSovsXr+7jQ18Y8WBNi0OO7kZwDGqq8mGwHCcEpr/d1r4RIgxG+Pkv49wsJPT
-         WKbBmd/TT6V2IbHmHM/KDlfEaB4o9hEAgzjBa6F+LCCzJQs8ZgkCovppqVuSu8c0IMPs
-         zkRVWC3pu4z6Tpuzm7nq7HLWFw6AfIgvvSYAFq6K9dhUZt0RPkYeXroMsTcjGuyWEXop
-         h9EylIjvgStQ7vy+KHwPb29l8ybY8ICzJRv63UufDAGbZAiyhfzwc6DYqe6vzgZCds7r
-         Q+Lg==
+        d=google.com; s=20251104; t=1776165227; x=1776770027; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=k0cUCBSD1OUsPMML0fx+o7ycL4ZQM6SI/O1l5R7MhAw=;
+        b=sqVQM6rwi1wVMxFNWN07UBXUJNuyrtZzqTzKTR+/OXXuYTTMr4xeZDKdoe/Zg7SvEk
+         c4vEcUjnNB9jJd8Dr+LQjFw0Z26tBZEFAEXeeAtbhtYkKNuut8Ch5eH16C7IMM6GQghU
+         jmDbRGjfJH86Qj8cLg+oYjnlSt3Nf6WGxc6HkNqmQ6IEUQCmsyCYJDzLDU35OhD0N3fa
+         +NCkJFYJ012WyMNZD3VPpboU+7hDgvIQAsokA/thC26K4amI0TF+QUEhD9WsFzDLii1Z
+         h7mgzB7a0lMg7uASjZUEmUfYFv9V2CJerAcHU3QtzlthVIXpcSkfvG98yu5L0lA7Lgtc
+         Ijgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776165214; x=1776770014;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jYQgMhZcNRLWOdYKuAP9wzRUiz3Mx5fd01yZgXYYTBY=;
-        b=HJUDnlvZowfReBUJ4knrN77ZaVI/2IztnbhmxdsEOsQNR3g/nEWHtuCzEVYpLWZwqK
-         y//KAZP6hu/6SGR/lCyhR85j+NYZUHE01ATFvHQl2WRf6mDWTLYeiFdkFvAmcdVXDWxT
-         J2p89y2y8pJyEBPReOy4qrexLmBNRkgqgshR/DYBv7IxcZilRYPCRDCYcqG3z3pzk3UD
-         EdWQ1THU2a8/Gg5o0uyAIzLzEfmw4daYDouetcSjDk5cY8S45gUgU7qHnmtrBDCRHuLQ
-         OQOmVZUtNG/04iKX0dBnB1YcqZj6l8CvQjg+DFlCp8A0YGn52lN8Ox9s+wxI9KYfhNcR
-         r4Pw==
-X-Gm-Message-State: AOJu0YwFVnqYZlCn21ncOaxq7Os1m3ad/i11fAyDHKR1xDMa7LyXM806
-	ajOSYfuwzkkHIZHSQgfhCIzUIikg5Sbs9ayQ9XAv+2k+L2ae7GjDuhBomdy5PouHJrrW8ndzPis
-	8IYElf3S4HTKl6vaXembinSnxmJYwU0SxSLAXpKX7LMU/SKLaPsAdeUNvnqxeCQtwhcDBJkMI7K
-	/8OKZ6KL+DWgVjSgIUkUkZSsr4ddSZOnJHD3u595fr61tdMuMeMVTosQ==
-X-Received: from plbbj8.prod.google.com ([2002:a17:902:8508:b0:2b2:4d5c:3eec])
- (user=apusaka job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:289:b0:2b4:5e65:5d0e
- with SMTP id d9443c01a7336-2b45e655efamr82380295ad.10.1776165213123; Tue, 14
- Apr 2026 04:13:33 -0700 (PDT)
-Date: Tue, 14 Apr 2026 19:11:10 +0800
+        d=1e100.net; s=20251104; t=1776165227; x=1776770027;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=k0cUCBSD1OUsPMML0fx+o7ycL4ZQM6SI/O1l5R7MhAw=;
+        b=ZVUxR5bV8OIZ6x+RQckIa8ccJStzeTnC7anU1F00KM+BK/WEzDkkosgVME6OgjcNBQ
+         uMwSQN1YA3IPHm8QSCtIDpTCjEEbG+oZEGTwLKVHgl9ckpbfMDr3Ou4AvIAq7tO+lKxM
+         zsvrgngj+w5krNt/x65nZURMQL5n1ZzI2eOHlA60G+ur9ZGozVzWuqnyCTl+jRFWi176
+         SPKpfgviHGeRvjyEpIpuZGPGcuKRhQAzi5hy4BWflvl9Q2VH6cF2BDRtLwk+en0N9oBY
+         +XRomNj10EHTffJSG4cAFMXaDMIsXGMASzmfglXzmxBD+ElRMuWoKGsUNHdI0DjgCkA/
+         Se3A==
+X-Gm-Message-State: AOJu0YyTrzEiOw5mwqGi1az+/mEZL2rxCM6RZbngUfV/J65ZAOY+I6IH
+	xdj9RWhWC7zv4iLnkcGCI62buCD8PmRvvbFgjK1JLSboErMYfYfnxMGM95rx96NrFQ43rTei5ye
+	1As2ckU1+vOR0LzFBm8e/0GQ5wulUCXfXZUMtk0ePOsaRrZAXG6UCCm5RJv6uUL8nxwqoRLnlE2
+	8LVEIO52RsSQI1LqP97kyTp4vPRro9M0iZJs/RuLyz3MpPWQC83u2y1g==
+X-Received: from plsp7.prod.google.com ([2002:a17:902:bd07:b0:2b2:3dc8:b460])
+ (user=apusaka job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1aa6:b0:2b0:badc:c9cf
+ with SMTP id d9443c01a7336-2b2c72aba80mr189610015ad.13.1776165226351; Tue, 14
+ Apr 2026 04:13:46 -0700 (PDT)
+Date: Tue, 14 Apr 2026 19:11:11 +0800
+In-Reply-To: <20260414111307.3725821-1-apusaka@google.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260414111307.3725821-1-apusaka@google.com>
 X-Mailer: git-send-email 2.54.0.rc1.513.gad8abe7a5a-goog
-Message-ID: <20260414111307.3725821-1-apusaka@google.com>
-Subject: [PATCH Bluez 1/2] monitor: define manufacturer company IDs
+Message-ID: <20260414111307.3725821-2-apusaka@google.com>
+Subject: [PATCH Bluez 2/2] monitor: Set msft_opcode on read_local_version_rsp
 From: Archie Pusaka <apusaka@google.com>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -66,186 +69,107 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-Define company IDs to make it more readable.
-Also remove an unnecessary if that could cause uninitialized variable
-warning.
+Aside from INDEX_INFO, we can also receive manufacturer company ID
+when receiving read_local_version_rsp, so we should also try setting
+the msft_opcode there.
 ---
 
- monitor/packet.c | 51 +++++++++++++++++++++++++++---------------------
- 1 file changed, 29 insertions(+), 22 deletions(-)
+ monitor/packet.c | 68 +++++++++++++++++-------------------------------
+ 1 file changed, 24 insertions(+), 44 deletions(-)
 
 diff --git a/monitor/packet.c b/monitor/packet.c
-index ff28dfbd4..30cab1a2f 100644
+index 30cab1a2f..ff0b1cac2 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -100,14 +100,21 @@
+@@ -4359,6 +4359,24 @@ static int addr2str(const uint8_t *addr, char *str)
+ 			addr[5], addr[4], addr[3], addr[2], addr[1], addr[0]);
+ }
  
- #define COLOR_PHY_PACKET		COLOR_BLUE
- 
--#define UNKNOWN_MANUFACTURER 0xffff
-+#define COMPANY_ID_INTEL	0x0002
-+#define COMPANY_ID_BROADCOM	0x000F
-+#define COMPANY_ID_QUALCOMM	0x001D
-+#define COMPANY_ID_MEDIATEK	0x0046
-+#define COMPANY_ID_APPLE	0x004C
-+#define COMPANY_ID_REALTEK	0x005D
-+#define COMPANY_ID_LINUX	0x05F1
-+#define COMPANY_ID_UNKNOWN	0xFFFF
- 
- static time_t time_offset = ((time_t) -1);
- static int priority_level = BTSNOOP_PRIORITY_DEBUG;
- static unsigned long filter_mask = 0;
- static bool index_filter = false;
- static uint16_t index_current = 0;
--static uint16_t fallback_manufacturer = UNKNOWN_MANUFACTURER;
-+static uint16_t fallback_manufacturer = COMPANY_ID_UNKNOWN;
- 
- #define CTRL_RAW  0x0000
- #define CTRL_USER 0x0001
-@@ -3487,7 +3494,7 @@ static void print_manufacturer_data(const void *data, uint8_t data_len)
- 	packet_print_company("Company", company);
- 
- 	switch (company) {
--	case 76:
-+	case COMPANY_ID_APPLE:
- 	case 19456:
- 		print_manufacturer_apple(data + 2, data_len - 2);
- 		break;
-@@ -4446,7 +4453,7 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
++static int get_msft_opcode(uint16_t manufacturer) {
++	switch (manufacturer) {
++	case COMPANY_ID_INTEL:
++		return 0xFC1E;
++	case COMPANY_ID_QUALCOMM:
++		return 0xFD70;
++	case COMPANY_ID_MEDIATEK:
++		return 0xFD30;
++	case COMPANY_ID_REALTEK:
++		return 0xFCF0;
++	case COMPANY_ID_LINUX:
++		return 0xFC1E;
++	default:
++		return BT_HCI_CMD_NOP;
++	}
++
++}
++
+ void packet_monitor(struct timeval *tv, struct ucred *cred,
+ 					uint16_t index, uint16_t opcode,
+ 					const void *data, uint16_t size)
+@@ -4451,50 +4469,8 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
+ 		if (index < MAX_INDEX) {
+ 			memcpy(index_list[index].bdaddr, ii->bdaddr, 6);
  			index_list[index].manufacturer = manufacturer;
+-
+-			switch (manufacturer) {
+-			case COMPANY_ID_INTEL:
+-				/*
+-				 * Intel controllers that support the
+-				 * Microsoft vendor extension are using
+-				 * 0xFC1E for VsMsftOpCode.
+-				 */
+-				index_list[index].msft_opcode = 0xFC1E;
+-				break;
+-			case COMPANY_ID_QUALCOMM:
+-				/*
+-				 * Qualcomm controllers that support the
+-				 * Microsoft vendor extensions are using
+-				 * 0xFD70 for VsMsftOpCode.
+-				 */
+-				index_list[index].msft_opcode = 0xFD70;
+-				break;
+-			case COMPANY_ID_MEDIATEK:
+-				/*
+-				 * Mediatek controllers that support the
+-				 * Microsoft vendor extensions are using
+-				 * 0xFD30 for VsMsftOpCode.
+-				 */
+-				index_list[index].msft_opcode = 0xFD30;
+-				break;
+-			case COMPANY_ID_REALTEK:
+-				/*
+-				 * Realtek controllers that support the
+-				 * Microsoft vendor extensions are using
+-				 * 0xFCF0 for VsMsftOpCode.
+-				 */
+-				index_list[index].msft_opcode = 0xFCF0;
+-				break;
+-			case COMPANY_ID_LINUX:
+-				/*
+-				 * Emulator controllers use Linux Foundation as
+-				 * manufacturer and support the
+-				 * Microsoft vendor extensions using
+-				 * 0xFC1E for VsMsftOpCode.
+-				 */
+-				index_list[index].msft_opcode = 0xFC1E;
+-				break;
+-			}
++			index_list[index].msft_opcode =
++				get_msft_opcode(manufacturer);
+ 		}
  
- 			switch (manufacturer) {
--			case 2:
-+			case COMPANY_ID_INTEL:
- 				/*
- 				 * Intel controllers that support the
- 				 * Microsoft vendor extension are using
-@@ -4454,7 +4461,7 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
- 				 */
- 				index_list[index].msft_opcode = 0xFC1E;
- 				break;
--			case 29:
-+			case COMPANY_ID_QUALCOMM:
- 				/*
- 				 * Qualcomm controllers that support the
- 				 * Microsoft vendor extensions are using
-@@ -4462,7 +4469,7 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
- 				 */
- 				index_list[index].msft_opcode = 0xFD70;
- 				break;
--			case 70:
-+			case COMPANY_ID_MEDIATEK:
- 				/*
- 				 * Mediatek controllers that support the
- 				 * Microsoft vendor extensions are using
-@@ -4470,7 +4477,7 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
- 				 */
- 				index_list[index].msft_opcode = 0xFD30;
- 				break;
--			case 93:
-+			case COMPANY_ID_REALTEK:
- 				/*
- 				 * Realtek controllers that support the
- 				 * Microsoft vendor extensions are using
-@@ -4478,7 +4485,7 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
- 				 */
- 				index_list[index].msft_opcode = 0xFCF0;
- 				break;
--			case 1521:
-+			case COMPANY_ID_LINUX:
- 				/*
- 				 * Emulator controllers use Linux Foundation as
- 				 * manufacturer and support the
-@@ -6528,7 +6535,7 @@ static void read_local_version_rsp(uint16_t index, const void *data,
+ 		addr2str(ii->bdaddr, str);
+@@ -6530,6 +6506,10 @@ static void read_local_version_rsp(uint16_t index, const void *data,
+ 		}
+ 
+ 		index_list[index_current].manufacturer = manufacturer;
++		if (index_list[index_current].msft_opcode == BT_HCI_CMD_NOP) {
++			index_list[index_current].msft_opcode =
++				get_msft_opcode(manufacturer);
++		}
+ 	}
+ 
  	print_manufacturer(rsp->manufacturer);
- 
- 	switch (manufacturer) {
--	case 15:
-+	case COMPANY_ID_BROADCOM:
- 		print_manufacturer_broadcom(rsp->lmp_subver, rsp->hci_rev);
- 		break;
- 	}
-@@ -10900,11 +10907,11 @@ static const char *current_vendor_str(uint16_t ocf)
- 		return "Microsoft";
- 
- 	switch (manufacturer) {
--	case 2:
-+	case COMPANY_ID_INTEL:
- 		return "Intel";
--	case 15:
-+	case COMPANY_ID_BROADCOM:
- 		return "Broadcom";
--	case 93:
-+	case COMPANY_ID_REALTEK:
- 		return "Realtek";
- 	}
- 
-@@ -10928,9 +10935,9 @@ static const struct vendor_ocf *current_vendor_ocf(uint16_t ocf)
- 		return msft_vendor_ocf();
- 
- 	switch (manufacturer) {
--	case 2:
-+	case COMPANY_ID_INTEL:
- 		return intel_vendor_ocf(ocf);
--	case 15:
-+	case COMPANY_ID_BROADCOM:
- 		return broadcom_vendor_ocf(ocf);
- 	}
- 
-@@ -10952,9 +10959,9 @@ static const struct vendor_evt *current_vendor_evt(const void *data,
- 		manufacturer = fallback_manufacturer;
- 
- 	switch (manufacturer) {
--	case 2:
-+	case COMPANY_ID_INTEL:
- 		return intel_vendor_evt(data, consumed_size);
--	case 15:
-+	case COMPANY_ID_BROADCOM:
- 		return broadcom_vendor_evt(evt);
- 	}
- 
-@@ -10971,11 +10978,11 @@ static const char *current_vendor_evt_str(void)
- 		manufacturer = fallback_manufacturer;
- 
- 	switch (manufacturer) {
--	case 2:
-+	case COMPANY_ID_INTEL:
- 		return "Intel";
--	case 15:
-+	case COMPANY_ID_BROADCOM:
- 		return "Broadcom";
--	case 93:
-+	case COMPANY_ID_REALTEK:
- 		return "Realtek";
- 	}
- 
-@@ -11116,7 +11123,7 @@ static void remote_version_complete_evt(struct timeval *tv, uint16_t index,
- 	print_manufacturer(evt->manufacturer);
- 
- 	switch (le16_to_cpu(evt->manufacturer)) {
--	case 15:
-+	case COMPANY_ID_BROADCOM:
- 		print_manufacturer_broadcom(evt->lmp_subver, 0xffff);
- 		break;
- 	}
-@@ -13808,7 +13815,7 @@ void packet_vendor_diag(struct timeval *tv, uint16_t index,
- 					"Vendor Diagnostic", NULL, extra_str);
- 
- 	switch (manufacturer) {
--	case 15:
-+	case COMPANY_ID_BROADCOM:
- 		broadcom_lm_diag(data, size);
- 		break;
- 	default:
-@@ -16161,7 +16168,7 @@ static void mgmt_print_system_config_tlv(void *data, void *user_data)
- 			value = get_u8(entry->value);
- 		else if (entry->length == 2)
- 			value = get_le16(entry->value);
--		else if (entry->length == 4)
-+		else
- 			value = get_le32(entry->value);
- 		print_field("%s: %u", desc, value);
- 	} else {
 -- 
 2.54.0.rc1.513.gad8abe7a5a-goog
 
