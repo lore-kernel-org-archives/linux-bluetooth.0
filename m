@@ -1,105 +1,174 @@
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE4D2DF155
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 09:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776157236; cv=none; b=MnJ4gMVPHroGfe0noMYmIq3e+ZL/bsdbVVSAYZA11oJwdMUWo8YPCe3F54mmtCMvW42y5q8w2rsZyrxtWwx3xQZ/NoKE7bSL1XT9RgVeyhD795lQMmZScKVNixPkjedFTWIS0zj5cShTdAjvQVwpAtX2LJ4TJsreKSbG+7yadCs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776157236; c=relaxed/simple;
-	bh=7BzH4l41ivGVwJZyLUtzjEKcBbitAg70COzuLd4I7K4=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA4B3D47C7
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 10:29:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776162563; cv=pass; b=U7XmMnrBbrgS+HpxCiJ59jpHErnXSGI8lloJ+e6VaLlkkczu1DTwXykY2qC50FQFGCmUu12QBHmbGBCc9IjcD7zzO7lh8Nn9cje0XWKFHfRhpEagWc8Ja3IYWE6fAHqbK4xOkVz0Y/vP/qBhvSeirGQnwDRG3rJJIwmbJfFSeUA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776162563; c=relaxed/simple;
+	bh=Ido82lTsBObPiLyE+cnbnYTa5RnXovthshiMl4cqqxw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gjlP11dl3aPeS4Q8+zxnd3sD8nlCcpm77M6BVutpTLXifxyUZBL+ngseV3HQZU5d9uPUdpIfIRBxPXi0BKWWcVx2DTLaY32OVzSPIDIqG9bbuNf0vAEiib1XXqMKh+ak1YU9c3oljqax/eDglM0N+CCjWPPJxsiU9k1iyoTPU6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gompa.dev; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gompa.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-40ee9b945d5so3923448fac.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 02:00:34 -0700 (PDT)
+	 To:Cc:Content-Type; b=LfvLuXxA6dKwlJomwLcA2lCp7QAPxfTTXqh+SfnS633hD/eXqu0UgDrGh8dUNypmTn3Q6asDGg4YUMQU6HSEkoHol8hNhs5PwrFCEcBTlUgxEwP2JgLZQcX3RKS02Ib3max6THdPVf0mCblo/fRYq7Oms9LspO2XfD7gsSKACv4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=CAg1W+YC; arc=pass smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="CAg1W+YC"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-38e68e4389cso26890931fa.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 03:29:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776162554; cv=none;
+        d=google.com; s=arc-20240605;
+        b=fvp7HBdpHq1Uf6gCbezpcrBjxtVNSuUtaUJ7PNaTQNawba0kdEINgjccqgNxEAEFfg
+         RRbKCmIdNoj51AF4wvIlJAyNVX2RbaEdwCqXmoprP9bwukF9NWcD16B2oZJ37rVQGYQl
+         SVlBUbpkYZbN8HIQkvB4765BDiklcjxHOfBxc4Z7sh0HsnVNfdS+R/s9Cb36KcGARXFJ
+         cZ0GE+lndk0NshgjS7q4Ycu6ld2Rlb30ZxSxxc3pC/RPR7kNGLZlOfduasdI+ukTJSgg
+         nTo2F3k9qQgDi3T4E1JTqA2fuXqFuvqjNzX5LtLvuG+IV15SAvCCpsuHI/pXrjVjHUhK
+         pmzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=obCwu9OJRNTUN7BsZbzZ8PH73jQ+TTI+BXXfuHZowXE=;
+        fh=5KXW+V6qWbiDfg97tGVB6E0AB9yX+y+97tgB5T/k6Uk=;
+        b=MvE7rD/EaawaVdVQ4ZoBE3tsx34svVBoEz3G0Feqp1P0G2SG98yw8mmwXbXIPrPEln
+         mvzRT6xQHbPHdYNVHLw4m8tufwVChXbkcYxMBpaPm9LAdwZqecj3W/8M1b5vlkC5UPZo
+         H5YuSLDnN3q3rbGTVQR0hpBqGTIxJqrU8wzxushtifY+5mQ7b2g3dQuwdkCaeDgtBQq/
+         KXHXb35cJNU8IYd6tX1jJagP33vhWieClcd3Sd+4hxOC3izwVpm8BNHUGDa/sANVjDOm
+         xRYN0upr0b+TtXiF+nvPmFCCQHCHcAXcr69tgmC0tZK0LTROSG3qGpdevBHVOpR9WYJf
+         yGKA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1776162554; x=1776767354; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=obCwu9OJRNTUN7BsZbzZ8PH73jQ+TTI+BXXfuHZowXE=;
+        b=CAg1W+YCDWa+7hMyoFTX9wrJnea3anbAiHdxWmpDFPNhe7kCyRPxDRCs4+n9KcUSjl
+         w6nzvTJigwS7oM6UFv5A3HKxmii0VyJz1d3VSyhkRHh9KbLCHy+zvkfyRpySbb5xZhZu
+         JuL3QYV3wyDOI2wfxl8ehTcAnuZZDMlWKsh4c=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776157234; x=1776762034;
+        d=1e100.net; s=20251104; t=1776162554; x=1776767354;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=7BzH4l41ivGVwJZyLUtzjEKcBbitAg70COzuLd4I7K4=;
-        b=XVhpLbABS1DBygwmUeVb0WtY6Eq2hybmmspkHUXYaQVyVu3xFa9sDnazT8r9oNKM4O
-         tkq7PtUKSbc2QaXk5C0MwTsGQEIhaifbp/hbgib98zdp5K8kzrScCCtVgd5Bufwr9SFr
-         ifyuWJKoEMTgslNB0+IlYhB8qgywI12eQ9/cv4O0Pl3e52hI9NlwxwtzYvNaaye+BFUa
-         Wd8JA/7nzek3aRhElEQwYFYZnC0Ts9tIdHupF1cvHOb66G8YAZWWSShpowHzMlDHVl2w
-         LSsaYUVNWu+lj3/FCFMKoYq6TSsDwRIV1cQTX5Xl+S1bIy0eF5S/hmk0GK1CjhUi2Qpr
-         sNzQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+AcMZi+0UpCYOjKBAy4QL/HPWBvu017fZONLEsJrUG8pdgllsJgntCDCsXXBDi7lYNH/nEyDgCpT0QF6lfjbc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5/4ysBhAvEycqvj3WYhdxQD0SAGY8P7shqr83bKEqXpAihOlN
-	FSHGX63Ib2BOM5RhUsnNZ3Y7u2waJJUY8l+G9sqIp1VvtRETmnahFVOm3QwFKwYC
-X-Gm-Gg: AeBDievWwmx6Zf9MxoyFPr0r/faDjpPiXKrEKzFLmj+gSZs2DI1iMekBONG/MZRVbEN
-	KYkanfPxSdOvgrye4zPX42YrZWacnykvR9QaNniMweJQcCxtU/q0bLfwH65ueZmgw7dH0rOqcII
-	G/dBSdr5EX75wyOmjJmz2IaIYty4hliwIr4lAIdCScUW+Zqop0HpSn0NNUCOWH60Qzc+5SoCnGD
-	4Qkmjs0QrI0oks+2wohmo4S4ifsCkLvjO/kUTlz/EiUQsUQ8sMfkEKoFXmqz5saG5cm0WZUX0M+
-	LnpHp8nvn88AlVkPx8HgJqybnEHHbliaGMQzHBo/b/zyY4YDDh08L8/IlFBWevIb67LPHJI6z2V
-	GRsINtIkiy7xF4ZiGWv/rEi0+cJnGxwLcAiJEaj5GZu8IHVX5bJ+M9oHMXkOSdphd/ZinJ3ICZW
-	0ZZjCz7HjRTP5F6E83mFqH4zggSDQpZSCrhfCmIBZqSmlRTEZYNA1oQd78zHB3wnvmHpAl2dRn1
-	58f+XKZQztlVX/uB26A4L0Q5EhDxMSMXBNcO33O0FdNG+eWN9bDclZbXN01T0VN32xreWOQNg==
-X-Received: by 2002:a05:6870:8289:b0:3e7:fa5f:7269 with SMTP id 586e51a60fabf-423e0e6f00amr9085147fac.2.1776157233559;
-        Tue, 14 Apr 2026 02:00:33 -0700 (PDT)
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com. [209.85.210.45])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-423ddb80ccesm10338802fac.13.2026.04.14.02.00.32
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Apr 2026 02:00:32 -0700 (PDT)
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7dc3d28e2f3so2495940a34.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 02:00:32 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8zLKqoStQbAKV5brhkgjWkBYIAN8pw515f7Z0cmkLTavkQSrIwvM0+4V3XgsUVTFN/bKbix01i0+wwSjz4DXY=@vger.kernel.org
-X-Received: by 2002:a05:6830:6d44:b0:7db:df4e:f937 with SMTP id
- 46e09a7af769-7dc27ca49a6mr10107828a34.7.1776157232558; Tue, 14 Apr 2026
- 02:00:32 -0700 (PDT)
+        bh=obCwu9OJRNTUN7BsZbzZ8PH73jQ+TTI+BXXfuHZowXE=;
+        b=QSMh4TJPxXuB7cWC1HEHBXW7kYvOufGBZAkWR37ntNNe7IugXTwW7wEhjyQ0fh4LHv
+         wT+uKdY/72OPoAwDwFwOEoKhU8wTrA1/bDE2UWC+Mt2unXnCyoDWroQ2xlLHel3jeR2c
+         jW8jt2lcvTPh3DI75D6Wu3TN5haxeYJ55lIY777Wv/FTX42cv2TdxlAib3llCsMmzrQz
+         sNeQhJls1i0S1ypOxJyY6Murf/bNIfOXB1cCKfq9nv6rszxuc8izJykTMwoE7E3aqFm8
+         xeLoiGuKITYeUdvVPou8rFouzkHHBuO0B7la7E22r3cxUX5+fULRaENZHek0e/d3+3li
+         AUEA==
+X-Forwarded-Encrypted: i=1; AFNElJ98NC47Dd6/5QMxuq75Z81pCqc9DuRlrPDdB4zYMqhiz7AsGIwtrpSW2+J3Iym+WzkeAFOUqjgfwjOdJteyuFk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdjmtXfJnG/DBasywucOhGHdDP1fYLEb9aMTS+lTDAaT8ePYed
+	vOUtFz1g/DcitfYlsm3ViWRlkFzzPhgnoSnt64WDO+gdoWqRfujk7MiwFXYZRGjg++0DlVDgy85
+	YFV0Bqu+dOWojsJMg/tYAdNyzBShKl9/b1Snwjpoh
+X-Gm-Gg: AeBDievpyXbLpK8KhmslM+kEhyIMT4KK4sjcr/QWOf3pgan6HduSOq0zz4OotmkfEGP
+	Cd8fKaMbaWCwu3XYgyOeoLAsGrZsIHFIexp5b55jk7bJpfZ77CqpUiOx85NXyznS/hr9rvchLOh
+	KPZA0qFLVBhSJernaRUoMKqZ2wf90XW01Mm7UQ8Zmmt/p0JOZH+8QlcvqYG7rBwyDAz8LAIZhnS
+	33N+EZYWr/lmXaLkoOHwoXvbpiXKzvZ79cz7q8NyUsQHsVmvGejfYbomJrviqJnp4/KAvdgRbFt
+	42bPPkBubHFsbI5gKjiHaAo33Q61pH97pCr1R2ueAPA+6kxx
+X-Received: by 2002:a05:6512:68e:b0:5a2:ae27:c879 with SMTP id
+ 2adb3069b0e04-5a3efd7f0d8mr4850095e87.29.1776162554447; Tue, 14 Apr 2026
+ 03:29:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260407-brcm-prio-v2-1-3f745edf49af@gmail.com>
-In-Reply-To: <20260407-brcm-prio-v2-1-3f745edf49af@gmail.com>
-From: Neal Gompa <neal@gompa.dev>
-Date: Tue, 14 Apr 2026 04:59:54 -0400
-X-Gmail-Original-Message-ID: <CAEg-Je-dvJA4yLJxwiJVg2S585Dihg4c7FTyf0Gv8iwahU0ifg@mail.gmail.com>
-X-Gm-Features: AQROBzBGriz3oUw4obwCyMl6uueqnkEVGw3CzezDOXXcUajBdgbMcTOpUgPlHRE
-Message-ID: <CAEg-Je-dvJA4yLJxwiJVg2S585Dihg4c7FTyf0Gv8iwahU0ifg@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Add Broadcom channel priority commands
-To: fnkl.kernel@gmail.com
-Cc: Sven Peter <sven@kernel.org>, Janne Grunau <j@jannau.net>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, asahi@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
+References: <20260326-pci-m2-e-v7-0-43324a7866e6@oss.qualcomm.com>
+ <20260413075459.GA2626902@google.com> <fpcs4p62f35a5qyqwgm5ysa73stbysxcr62tkmmkrrcvsuf4t4@4ivukyqjey57>
+ <eeytuhqpgdz4do4tgtbmfntub2femtyq7bij7svhodpyjwaylx@j3gmvq2a2zqc>
+ <CAGXv+5E=tujhtZjwi6Qm7hk3Ks74UzTQHWq82NiTEw1+vYod5g@mail.gmail.com> <ad36pIu-0dutL7Nk@ashevche-desk.local>
+In-Reply-To: <ad36pIu-0dutL7Nk@ashevche-desk.local>
+From: Chen-Yu Tsai <wenst@chromium.org>
+Date: Tue, 14 Apr 2026 18:29:02 +0800
+X-Gm-Features: AQROBzDHB_HCwto4iaprIWgL7mrQWt62yIrtGAtxckKlX4EUkJwTT3ZqPu-YslU
+Message-ID: <CAGXv+5EGe59nJctLweEdZjb3MNmMvjuCHngGSfptzN985OiLdg@mail.gmail.com>
+Subject: Re: [PATCH v7 0/8] Add support for handling PCIe M.2 Key E connectors
+ in devicetree
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Manivannan Sadhasivam <mani@kernel.org>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, Rob Herring <robh@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Hans de Goede <hansg@kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Stephan Gerhold <stephan.gerhold@linaro.org>, 
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, linux-acpi@vger.kernel.org, 
+	Hans de Goede <johannes.goede@oss.qualcomm.com>, 
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 7, 2026 at 1:46=E2=80=AFPM Sasha Finkelstein via B4 Relay
-<devnull+fnkl.kernel.gmail.com@kernel.org> wrote:
+On Tue, Apr 14, 2026 at 4:28=E2=80=AFPM Andy Shevchenko
+<andriy.shevchenko@linux.intel.com> wrote:
 >
-> From: Sasha Finkelstein <fnkl.kernel@gmail.com>
+> On Tue, Apr 14, 2026 at 01:03:19PM +0800, Chen-Yu Tsai wrote:
+> > On Tue, Apr 14, 2026 at 12:08=E2=80=AFAM Manivannan Sadhasivam <mani@ke=
+rnel.org> wrote:
+> > > On Mon, Apr 13, 2026 at 07:33:12PM +0530, Manivannan Sadhasivam wrote=
+:
+> > > > On Mon, Apr 13, 2026 at 03:54:59PM +0800, Chen-Yu Tsai wrote:
+> > > > > On Thu, Mar 26, 2026 at 01:36:28PM +0530, Manivannan Sadhasivam w=
+rote:
 >
-> Certain Broadcom bluetooth chips (bcm4377/bcm4378/bcm438) need ACL
-> streams carrying audio to be set as "high priority" using a vendor
-> specific command to prevent 10-ish second-long dropouts whenever
-> something does a device scan. This patch sends the command when the
-> socket priority is set to TC_PRIO_INTERACTIVE, as BlueZ does for audio.
+> ...
 >
-> Signed-off-by: Sasha Finkelstein <fnkl.kernel@gmail.com>
-> ---
-> Changes in v2:
-> - new ioctl got nack-ed, so let's use sk_priority as the trigger
-> - Link to v1: https://lore.kernel.org/r/20260407-brcm-prio-v1-1-f38b17376=
-640@gmail.com
-> ---
+> > > > > - Given that this connector actually represents two devices, how =
+do I
+> > > > >   say I want the BT part to be a wakeup source, but not the WiFi =
+part?
+> > > > >   Does wakeup-source even work at this point?
+> > > >
+> > > > You can't use the DT property since the devices are not described i=
+n DT
+> > > > statically. But you can still use the per-device 'wakeup' sysfs kno=
+b to enable
+> > > > wakeup.
+> >
+> > I see. I think not being able to specify generic properties for the dev=
+ices
+> > on the connector is going to be a bit problematic.
+>
+> This is nature of the open-connectors, especially on the busses that are
+> hotpluggable, like PCIe. We never know what is connected there _ahead_.
 
-Thank you so much for this!
+I believe what you mean by "hotpluggable" is "user replaceable".
 
-Reviewed-by: Neal Gompa <neal@gompa.dev>
+> In other words you can't describe in DT something that may not exist.
+
+But this is actually doable with the PCIe slot representation. The
+properties are put in the device node for the slot. If no card is
+actually inserted in the slot, then no device is created, and the
+device node is left as not associated with anything.
+
+It's just that for this new M.2 E-key connector, there aren't separate
+nodes for each interface. And the system doesn't associate the device
+node with the device, because it's no longer a child node of the
+controller or hierarchy, but connected over the OF graph.
+
+Moving over to the E-key connector representation seems like one step
+forward and one step backward in descriptive ability. We gain proper
+power sequencing, but lose generic properties.
+
+The latter part is solvable, but we likely need child nodes under the
+connector for the different interfaces. Properties that make sense for
+one type might not make sense for another.
 
 
---=20
-=E7=9C=9F=E5=AE=9F=E3=81=AF=E3=81=84=E3=81=A4=E3=82=82=E4=B8=80=E3=81=A4=EF=
-=BC=81/ Always, there's only one truth!
+Thanks
+ChenYu
+
+P.S. We could also just add child device nodes under the controller to
+put the generic properties, but that's splitting the description into
+multiple parts. Let's not go there if at all possible.
