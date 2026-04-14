@@ -1,71 +1,67 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE229256C6D
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 18:44:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E9F1C01
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 19:05:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776192265; cv=none; b=t2HU3wMNpve08c9WziAUZM+Q0tbI/KxSdIQBhe8l4jtY0+QyCxO1cn2fnU8OefrF2uBng4meHryk4vWYQ8/IhCVlvS69YbBAxhHsDr1rSA2B/PZlcx73Ndal1XW/4am30QAgshvQyqtTbWza+gR7TejfIqmauozNJyeB5e55Rs8=
+	t=1776193511; cv=none; b=X3c78MLReMh/ueBdZbp3nEgTp95c79XZGboIjGeOtHOCT+hHu9uLvy/ZqAm1hU/j7hEXHs+GUEwidNmInDU0SzcC1ZmZY3x7UG5ZLQCG7t9EG/yArRNCIV+0k095uOcEzMjiCoWEztxJYGo0zewhbO07SsRzgIbLeNwZnxrCYPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776192265; c=relaxed/simple;
-	bh=TUuhefwC4aFl3YLHYKYGENQxDOTKPvM6Tps0ln9Nurg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ETGJXsrKR5RqhgRYpNcaHXQhAwJeSLNsbFzOxdGX131IyOIvsmQ4mGWXvA1YMJKoOf/PrbZ7EBY4OkpDZ+reQqVPFLwzb5O1x1tqOT469cE+86D0APVZ30QRH78OzktCRZMVcltxsVrZafnKyfUP6AsYjhmOwxTgCF/NBKqkVwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ItE2W8Qy; arc=none smtp.client-ip=209.85.167.47
+	s=arc-20240116; t=1776193511; c=relaxed/simple;
+	bh=bDioenjEItxFbX6IG6Unwb7xF8FE2+H/oIqlW3uBQGY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=PvSMEqrgQNav2fBR8timyTjrrHKatidTmvyq5Fi0y+lkXTrAobMI7iz5u3Q9f8Og/dzgsGbkZJGJM4SYerzVfaRzb3RGLNAFEfF/4vPQeRWKvcM6WCCs0pxXLkIDxcFAcZy5QlRrKkXARa+VyKFQfJiR64CoA2T1WjLF5q5M51s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=o57U1J96; arc=none smtp.client-ip=209.85.221.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ItE2W8Qy"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5a2967e5de4so7988133e87.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 11:44:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o57U1J96"
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-56d8d479149so2042438e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 12:05:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776192262; x=1776797062; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SDSbhtw80z17ovEPSRK2tau26R2taQWyMreMp5Xkpwg=;
-        b=ItE2W8QyZ1Rgt0IwxlxYp5sYLe1lGkUC6QvZJRhPdiVHaybsNWkFjxT8jipJgSdQld
-         uoU9sB6V6Of85TGIRaMkxWTZziWK89yOVba+ZpCGBaZRwz40LYLybrDbXd/zLZ/1q7vp
-         o3Ut3+4RjV049+S+CxqIizLYHzg6jt+u4ZZlbVhsE7szv7lh0+gpbyIP6LI+eWPC8iKb
-         jAiTO7BxNxDHwVZs6PKGI9B1V8q93w+5tv3yG8fIku1+wIOCFOpDFMiNfNt8kvLtrKPV
-         ohTxbwGW6s8TYYhttfHpjNYrsjVJ8xZaonWHnOAsxMvtp7bB7nQQ9fZ5ofKG0yf76TUS
-         B8XA==
+        d=gmail.com; s=20251104; t=1776193508; x=1776798308; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WcMZjp4BmNxvYubmFnzNdb/WRJMCiuI0z0hkQ+/23HE=;
+        b=o57U1J96w/w2um9BwlmNK0uD5vV3S/bZoeww+Y3dK7+eNKzc1KwfFKVoqE+t+siRqu
+         tKmGX0L36DceoMV9d+Z97MgCULtvXCuZJ6frstsck7jfsl5+7C3TVj8pwD+i3cUdHO8e
+         86rWllz77LePJLhYVfZksMgxbK/QcHf8KdfLr/c/+oLgXqS6lkjLO2C5vZp4YNiMnnLo
+         r9Vmg1u6clhy27ttUsFJpz2wZkmdlEpjlh1oAmcJziGF0BmSRFzwOeJhJzxQft2B3N8V
+         BRZog+7lLJFfVclTXS2lMI1yvGwOWCg2j6voVZ+yOQuCo92eSlz8FIPB93b+8+N6TUdy
+         p8Aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776192262; x=1776797062;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SDSbhtw80z17ovEPSRK2tau26R2taQWyMreMp5Xkpwg=;
-        b=FactfkNpo6gogBTOmHgJL6kI0ztZMZe1BbKozdAgVysY33JpWyUp5Kd1h+dzfG5bZJ
-         e5WSkL/Jsyd+kHRSpuwyiWlg61KjjPTxs5GjNbZSGs3CnhCOjq4Prc203pnFxAcRAd++
-         1v52drKLg74bBKp/fTzLjpuPTHvP0iiLLOahI/tocxnyk0IxGQc4X+45uIc+Mm7RnGjV
-         O4Fkf2izudp+7hk5fyYi/q9aHJTyZOyIcXPybTdfZYOL3Tc2ysNRe3Brxk4Du29CcSI1
-         e/UE5XjFKqAuSiA+9rPDRsPHIuVMVBMmxdEzwfORerq1WvyMbzOzJSOEXYkRbV/BHjom
-         TSfg==
-X-Forwarded-Encrypted: i=1; AFNElJ800MkKzS7WgqvrDAv4e3G2+E1BJZNvT0ZNQ9CP5Ow002iBzGwu+ezJKFIPlwwx/L4Asq7BnXsGW4X7QL5KZk0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzG7OUN4qzkuOcc8+R2AmdQwVL1BNKWZ4CIqGzsVjDyaHVzQuMH
-	xSDPNo+cKweGJrXRyBt379l0gCCkRC9r8lxzAkAjFCbzGc/Giro81T7p
-X-Gm-Gg: AeBDiesa/Vh6miZpeKGyJGL5SKiuqEt31y0F967q5kTtSnuU2sh1CyEN+9w648V2GLq
-	Z911AEhzlTuWeCOkea4TkpoCVvKIoomcWrNBuNE5i+hmAdj4RvIf84mm+0p9sONbBrG/ETc+TmX
-	KJWltxskfletyQeJcpZFheOoaUy2iCVBcVY/Af1c5N0i45NmUBzFORdDHr9lqF4azAsJxOnCO7D
-	NKwPxEHZvBiBRIqQDR13YfutleypOkofSI9goTlLOrLXzwD9ZB7PkGN0uN/Rfq4rBp4/A3TWCbb
-	afPYwyB+5jgt9z/Lut0+Wl8FNo9Lgvemr+j1CBJMm7DUblmLwLv6Uh+Y9ByXHfO4tPEjxoz8QAN
-	UYuCbKyet94uSK8fEDpRV/Uhs9bwnM+IBh9Ak4D+J4TtQA1RQQCMMpBRHmbcTTiG08GhQo+CHpd
-	tr7He3vaaRx9BPkCCm0QYpzegl9Sinqh/pOuG8gjVPeYpq
-X-Received: by 2002:a05:6512:b86:b0:5a3:ffe5:caec with SMTP id 2adb3069b0e04-5a3ffe5cbdcmr2436008e87.34.1776192261504;
-        Tue, 14 Apr 2026 11:44:21 -0700 (PDT)
-Received: from localhost ([188.234.148.119])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a3fe377e5dsm1436814e87.30.2026.04.14.11.44.19
+        d=1e100.net; s=20251104; t=1776193508; x=1776798308;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WcMZjp4BmNxvYubmFnzNdb/WRJMCiuI0z0hkQ+/23HE=;
+        b=cRxJjc7nT5P2yQNjrN1sR8QL70zUR3Sa51bt4m1rfOoxw5vqYjZ49NFY0RBlPxq5so
+         yNvb9wSAq5nkZ7MaDn2mMUGgXkX/LVk8cF6NRVxsG7+MvjfGNXjwirTre1a9d9VbU0Uj
+         9PCJzf1rhsOWXhpKbRjMO+r7+2RMbg41wuh4NYPDNbt9JGGa9ezW4Qtw2B+zJt5tbtpO
+         TuKGfdZ06+LbjXrD6lTGgrmZAAqLvrMn9SRgdXDW82xTkPIxpprWPAu2QmeC8gTyFH73
+         0HvUBlbNpQv0/LAaY6NVpVRdw3Ey3C/fQv0TqdyJ3+GXxREYgJnurqg7XQ4K4JcXav7X
+         g4Cw==
+X-Gm-Message-State: AOJu0YxehoH72ZOOFOuqwoluqUEKyefCn6An1om6025lhkZR29tbR6cS
+	3tfNGfkp+4N1Go+QGXbzk5ukFhbiIWYf78ajh8zeV0KIN8ev9aYC1SsMzuJAjipt
+X-Gm-Gg: AeBDietdgWxBo6vOMeEl8ijS3icrGVUYWxI5NMnQbTYCQkyhuKgsRQJJ80+Rm/HnLuz
+	7Z/HeeSKmsG+FInDzAZ4tUSBy07953X7Gf6N2VCLXyJS+o3+mUQnSpyH1tZAkhvl0ut9YbIOXAR
+	tNyDN9YWkOsfQ3TicNXUfGkiSBxOuIThU1QxyqU8RLdmcLLw29NQXZE8XV8W/dZkeKPyKjvTpwk
+	huLZFF7nnbH4EMka/D/mUNEmkANMG5Y82oYsd8WqfcxgMCwL95zS/Am3jgv8oc3LGdc9UMUULO9
+	SsxFR911376mL4b0JxBrqMft0tRc4K83Kujsnq76I/8OconeUAwjHzlkBUnbAIuvfPaEri3a7BF
+	jmb3NPv4RvM3LRFY1B9VX8HRhILgy+adByii5WakzJzWH2EOv7kEFALMEVfEFtxJDjK8VhWOk0J
+	PkLqRwn0AXnJ///TT25s7kd1twjXV9QF4nc0tsv1JT8TWFVb6zEPMJIJ5X1lbZ5PnO8l4Ss5nI3
+	k3MKnAHRvW9wN1/L/UWQtKjZsSu
+X-Received: by 2002:a05:6123:102:b0:566:357b:ef25 with SMTP id 71dfb90a1353d-56f3bd13359mr9559296e0c.15.1776193508498;
+        Tue, 14 Apr 2026 12:05:08 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56f861e1650sm270525e0c.12.2026.04.14.12.05.07
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2026 11:44:20 -0700 (PDT)
-From: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-To: luiz.dentz@gmail.com,
-	marcel@holtmann.org
-Cc: pmenzel@molgen.mpg.de,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-Subject: [PATCH v4] Bluetooth: l2cap: defer conn param update to avoid conn->lock/hdev->lock inversion
-Date: Tue, 14 Apr 2026 23:43:42 +0500
-Message-ID: <20260414184415.17114-1-mikhail.v.gavrilov@gmail.com>
+        Tue, 14 Apr 2026 12:05:08 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2] bass: Fix crashing on BT_BASS_MOD_SRC
+Date: Tue, 14 Apr 2026 15:04:59 -0400
+Message-ID: <20260414190459.161947-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -73,231 +69,72 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-When a BLE peripheral sends an L2CAP Connection Parameter Update Request
-the processing path is:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  process_pending_rx()          [takes conn->lock]
-    l2cap_le_sig_channel()
-      l2cap_conn_param_update_req()
-        hci_le_conn_update()    [takes hdev->lock]
+If assistant attempt o modify source the code would attempt to iterate
+over all valid range of BIS indexes which may lead to the following
+trace since the delegator maybe freed in the process:
 
-Meanwhile other code paths take the locks in the opposite order:
+ #0  queue_find (queue=<optimized out>, function=function@entry=0x58b8761109c0 <setup_match_bis>, match_data=match_data@entry=0x3) at src/shared/queue.c:230
+ #1  0x000058b8761127fb in bass_update_bis_sync (bcast_src=<optimized out>, dg=<optimized out>) at profiles/audio/bass.c:1824
+ #2  handle_mod_src_req (data=<optimized out>, params=<optimized out>, bcast_src=0x58b894661be0) at profiles/audio/bass.c:1862
+ #3  cp_handler (bcast_src=0x58b894661be0, op=<optimized out>, params=<optimized out>, user_data=<optimized out>) at profiles/audio/bass.c:1910
+ #4  0x000058b8761bc978 in bass_handle_mod_src_op (bass=<optimized out>, attrib=<optimized out>, opcode=<optimized out>, id=<optimized out>, iov=<optimized out>, att=<optimized out>)
+    at src/shared/bass.c:1069
 
-  l2cap_chan_connect()          [takes hdev->lock]
-    ...
-      mutex_lock(&conn->lock)
-
-  l2cap_conn_ready()            [hdev->lock via hci_cb_list_lock]
-    ...
-      mutex_lock(&conn->lock)
-
-This is a classic AB/BA deadlock which lockdep reports as a circular
-locking dependency when connecting a BLE MIDI keyboard (Carry-On FC-49).
-
-Fix this by making hci_le_conn_update() defer the HCI command through
-hci_cmd_sync_queue() so it no longer needs to take hdev->lock in the
-caller context.  The sync callback uses __hci_cmd_sync_status_sk() to
-wait for the HCI_EV_LE_CONN_UPDATE_COMPLETE event, then updates the
-stored connection parameters (hci_conn_params) and notifies userspace
-(mgmt_new_conn_param) only after the controller has confirmed the update.
-
-A reference on hci_conn is held via hci_conn_get()/hci_conn_put() for
-the lifetime of the queued work to prevent use-after-free, and
-hci_conn_valid() is checked before proceeding in case the connection was
-removed while the work was pending.
-
-Fixes: f044eb0524a0 ("Bluetooth: Store latency and supervision timeout in connection params")
-Signed-off-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+To fix the code will now just interate at existing setups checking if
+they match the BIS index then adding/removing the stream so it is no
+longer possible to free the delegator before all setups are processed.
 ---
+ profiles/audio/bass.c | 24 ++++++++----------------
+ 1 file changed, 8 insertions(+), 16 deletions(-)
 
-Changes in v4 (Luiz Augusto von Dentz, Sashiko/Gemini AI review):
-- Use hci_conn_get()/hci_conn_put() to hold a reference while work is queued
-- Use __hci_cmd_sync_status_sk() to wait for HCI_EV_LE_CONN_UPDATE_COMPLETE,
-  then do params update + mgmt notification in the sync callback — removes the
-  need for hci_event.c changes and hci_sent_cmd_data()
-- Use kzalloc_obj() per checkpatch recommendation
-- Fix checkpatch alignment issues
- 
-Changes in v3 (Luiz Augusto von Dentz):
-- Move hci_cmd_sync_queue into hci_le_conn_update itself instead of open-coding
-  the deferral in l2cap_core.c
-- Move conn_params update and mgmt_new_conn_param into
-  hci_le_conn_update_complete_evt, using hci_sent_cmd_data to retrieve
-  the originally requested parameters
- 
-Changes in v2 (Paul Menzel, Sashiko/Gemini AI review):
-- Allocate before sending ACCEPTED response to avoid state mismatch on OOM
-- Verify connection handle and address in sync callback against reuse race
-- Expand commit message with implementation details
-
- include/net/bluetooth/hci_core.h |  2 +-
- net/bluetooth/hci_conn.c         | 98 +++++++++++++++++++++++++-------
- net/bluetooth/l2cap_core.c       | 12 +---
- 3 files changed, 82 insertions(+), 30 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a7bffb908c1e..aa600fbf9a53 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -2495,7 +2495,7 @@ void mgmt_adv_monitor_device_lost(struct hci_dev *hdev, u16 handle,
- 				  bdaddr_t *bdaddr, u8 addr_type);
- 
- int hci_abort_conn(struct hci_conn *conn, u8 reason);
--u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
-+void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
- 		      u16 to_multiplier);
- void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
- 		      __u8 ltk[16], __u8 key_size);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 11d3ad8d2551..c9cc18fab1f2 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -480,40 +480,100 @@ bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
- 	return hci_setup_sync_conn(conn, handle);
- }
- 
--u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
--		      u16 to_multiplier)
-+struct le_conn_update_data {
-+	struct hci_conn *conn;
-+	u16	min;
-+	u16	max;
-+	u16	latency;
-+	u16	to_multiplier;
-+};
-+
-+static int le_conn_update_sync(struct hci_dev *hdev, void *data)
- {
--	struct hci_dev *hdev = conn->hdev;
-+	struct le_conn_update_data *d = data;
-+	struct hci_conn *conn = d->conn;
- 	struct hci_conn_params *params;
- 	struct hci_cp_le_conn_update cp;
-+	u8 store_hint;
-+	int err;
- 
-+	/* Verify connection is still alive. */
- 	hci_dev_lock(hdev);
--
--	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
--	if (params) {
--		params->conn_min_interval = min;
--		params->conn_max_interval = max;
--		params->conn_latency = latency;
--		params->supervision_timeout = to_multiplier;
-+	if (!hci_conn_valid(hdev, conn)) {
-+		hci_dev_unlock(hdev);
-+		return -ECANCELED;
- 	}
--
- 	hci_dev_unlock(hdev);
- 
- 	memset(&cp, 0, sizeof(cp));
- 	cp.handle		= cpu_to_le16(conn->handle);
--	cp.conn_interval_min	= cpu_to_le16(min);
--	cp.conn_interval_max	= cpu_to_le16(max);
--	cp.conn_latency		= cpu_to_le16(latency);
--	cp.supervision_timeout	= cpu_to_le16(to_multiplier);
-+	cp.conn_interval_min	= cpu_to_le16(d->min);
-+	cp.conn_interval_max	= cpu_to_le16(d->max);
-+	cp.conn_latency		= cpu_to_le16(d->latency);
-+	cp.supervision_timeout	= cpu_to_le16(d->to_multiplier);
- 	cp.min_ce_len		= cpu_to_le16(0x0000);
- 	cp.max_ce_len		= cpu_to_le16(0x0000);
- 
--	hci_send_cmd(hdev, HCI_OP_LE_CONN_UPDATE, sizeof(cp), &cp);
-+	err = __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_CONN_UPDATE,
-+				       sizeof(cp), &cp,
-+				       HCI_EV_LE_CONN_UPDATE_COMPLETE,
-+				       HCI_CMD_TIMEOUT, NULL);
-+	if (err)
-+		return err;
-+
-+	/* Update stored connection parameters after the controller has
-+	 * confirmed the update via the LE Connection Update Complete event.
-+	 */
-+	hci_dev_lock(hdev);
- 
--	if (params)
--		return 0x01;
-+	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
-+	if (params) {
-+		params->conn_min_interval = d->min;
-+		params->conn_max_interval = d->max;
-+		params->conn_latency = d->latency;
-+		params->supervision_timeout = d->to_multiplier;
-+		store_hint = 0x01;
-+	} else {
-+		store_hint = 0x00;
-+	}
- 
--	return 0x00;
-+	hci_dev_unlock(hdev);
-+
-+	mgmt_new_conn_param(hdev, &conn->dst, conn->dst_type, store_hint,
-+			    d->min, d->max, d->latency, d->to_multiplier);
-+
-+	return 0;
-+}
-+
-+static void le_conn_update_complete(struct hci_dev *hdev, void *data, int err)
-+{
-+	struct le_conn_update_data *d = data;
-+
-+	hci_conn_put(d->conn);
-+	kfree(d);
-+}
-+
-+void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
-+			u16 to_multiplier)
-+{
-+	struct le_conn_update_data *d;
-+
-+	d = kzalloc_obj(*d);
-+	if (!d)
-+		return;
-+
-+	hci_conn_get(conn);
-+	d->conn = conn;
-+	d->min = min;
-+	d->max = max;
-+	d->latency = latency;
-+	d->to_multiplier = to_multiplier;
-+
-+	if (hci_cmd_sync_queue(conn->hdev, le_conn_update_sync, d,
-+			       le_conn_update_complete) < 0) {
-+		hci_conn_put(conn);
-+		kfree(d);
-+	}
- }
- 
- void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 95c65fece39b..aac2db1d6fbb 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4706,16 +4706,8 @@ static inline int l2cap_conn_param_update_req(struct l2cap_conn *conn,
- 	l2cap_send_cmd(conn, cmd->ident, L2CAP_CONN_PARAM_UPDATE_RSP,
- 		       sizeof(rsp), &rsp);
- 
--	if (!err) {
--		u8 store_hint;
--
--		store_hint = hci_le_conn_update(hcon, min, max, latency,
--						to_multiplier);
--		mgmt_new_conn_param(hcon->hdev, &hcon->dst, hcon->dst_type,
--				    store_hint, min, max, latency,
--				    to_multiplier);
--
--	}
-+	if (!err)
-+		hci_le_conn_update(hcon, min, max, latency, to_multiplier);
- 
+diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
+index bf0db0555963..1fd7704a77a2 100644
+--- a/profiles/audio/bass.c
++++ b/profiles/audio/bass.c
+@@ -1854,32 +1854,24 @@ static int handle_set_bcode_req(struct bt_bcast_src *bcast_src,
  	return 0;
+ }
+ 
+-static bool setup_match_bis(const void *data, const void *match_data)
+-{
+-	const struct bass_setup *setup = data;
+-	const int bis =  PTR_TO_INT(match_data);
+-
+-	return setup->bis == bis;
+-}
+-
+ static void bass_update_bis_sync(struct bass_delegator *dg,
+ 				struct bt_bcast_src *bcast_src)
+ {
+-	for (int bis = 1; bis < ISO_MAX_NUM_BIS; bis++) {
+-		struct bass_setup *setup = queue_find(dg->setups,
+-				setup_match_bis, INT_TO_PTR(bis));
+-		uint8_t state;
++	const struct queue_entry *entry;
+ 
+-		if (!setup)
+-			continue;
++	/* Check if existing setups if BIS needs to be added/removed */
++	for (entry = queue_get_entries(dg->setups); entry;
++				entry = entry->next) {
++		struct bass_setup *setup = entry->data;
++		uint8_t state;
+ 
+ 		state = bt_bap_stream_get_state(setup->stream);
+ 
+-		if (!setup->stream && bt_bass_check_bis(bcast_src, bis))
++		if (!setup->stream && bt_bass_check_bis(bcast_src, setup->bis))
+ 			bass_add_bis(setup);
+ 		else if (setup->stream &&
+ 				state == BT_BAP_STREAM_STATE_STREAMING &&
+-				!bt_bass_check_bis(bcast_src, bis))
++				!bt_bass_check_bis(bcast_src, setup->bis))
+ 			bass_remove_bis(setup);
+ 	}
  }
 -- 
 2.53.0
