@@ -1,146 +1,429 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2C32FE575
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 12:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776169480; cv=none; b=MffQ8CNxLuBzIupUrknQUCWUUkn3byhD3Za8T/hfmMwiet91AUexlaBv96PP8wdNhzgiz8tO4BPgknX2BBJvF/jW2rHWVRVRza3AB/D+Xk6B/2sgBPZn8gEAaxwcaMD6Rx4qOdr1qiyDVGgmjDeIEdeAPg07Mn+xzqNBy3+sNNA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776169480; c=relaxed/simple;
-	bh=rqdPDIlNFmDugikYz74V9QNSdJgJZB3IMcVQKHBwhCY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=MBw9sYnlirPPI7K4BklXUaoppoOc4AJMFHY2cP2dMXWzf3Vo3XllLhlUopTOv9dszZs7mwnDDCd803xyHAdw7r1OAJKZGBBYZHNS2Qhu8VohNKut0VtNkVdD7LF0V3Co+v5A1TCASBEjlJFiet5HTmr+zHq4gJSOqNX2pwMHfi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lQ+XWxGD; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8BF3E7146
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 14:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776175218; cv=pass; b=TfmdsIizoxwEaSxiSu+nTHT0M6oXQLiCmPkA1Bv5CEelfiPuNkUG89ly3wc/WMpSOUpE8NhIwWPnB1Coqa1CgrQ6t+NvbeNNyg7MWZOOAH8gm+wijzFWtVEMRxJSMef6p5HwHdzZBFBETFDYIccua3TEw36H4tyI2C8TLemY484=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776175218; c=relaxed/simple;
+	bh=tRdcvGDu2KlZy2Aw8Uf9ZHNnXnblpja1kseer4xSQZw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nII1VdIN/kmltrsEfcLWjetisiRztQ2dCeC7iZlAAFRUprnF0CFGeDmJKV9kmJ56OQPdKCSEZEEbQ3tE4kafZTqd0MP7vCu704ifyNs6jo3CuEz724nh0ctfuPzphxaUsOS4sZ9E1t+E6uOxf5DmBOLDao5nEKuquuRPE7xNovQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B475bes6; arc=pass smtp.client-ip=209.85.167.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lQ+XWxGD"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-8e0a768331cso228736585a.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 05:24:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B475bes6"
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-47938ef848cso1117797b6e.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 07:00:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776175216; cv=none;
+        d=google.com; s=arc-20240605;
+        b=J7htlg7fUZBgnxDRxPBYrVGJIRWkoGDfyw6PrGyIVjG+S1k3MJzC5U/GeO7wxcV2/7
+         EdbrVLLDVX1SWMbB69kGfThgUtpcfUNcw4e0snF9noqxyi5blhHAtL47xQbiURynMtAW
+         AWFYEulXFMzTeokaMb6HcarHeqLgHFe7Rkl04xorJJjrbVV5JvTPHBQEzwWJl64gQGMK
+         MMROepSJOil1PthYsH+qsY3SeakAQE40F6p6/KNJ/LnB3DyNxDhXwv26ay0XmfaStvzt
+         5aLv2kZfM5s8chWStQ4QH9bFf7p/OFgLFP4YNKklF6k1fKWI9ATGl5/RrYCE7WQUpCTK
+         OMEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=49AG2x6pEGoNnPJicOOKoScg9J+gRSWBSIBGOGB3T+I=;
+        fh=70n+HX71JqvAkrxDEiKtivZFSUrSS8wwjdTp9Eos8Qs=;
+        b=D/SL9qaffeVAKWM8ejJulteNp5UREAFtWgEabgOTle9m34cHBPIWrYeLJlyJ5/xtOr
+         wgy34ycvEkN8iWftBGOavpOryQpGyiIsaxymfVFkKKrJqa5DzjJ6zrGhMzG2asrqCLuu
+         6t432dS4kuEDCu3Meqwo7dI7ne+bYq8zfA2uotmaU0YrXOOW0n7JMkTNj9NyfXdZST4A
+         CwqE8BdY8tu9ysU2jtw0mBxN2J2iKuxe9PDqOBI289m4y3sDQHE7pfWJdFrCgvhWidBq
+         XnghXvFh5tn7+xALjdZgpvdCM0lCVLcwvbEmZmLXxBFdo0cdPSWlzkzbuv/URhedRg2J
+         iY8Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776169478; x=1776774278; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tc3jd8tIg1j1Ipoo7t+MsOrKEngLEJeqG4K7HJACIgU=;
-        b=lQ+XWxGDDAda0wk9kjApOxqbviR+DTED+kMgTveMi1lT5tiL9mAy9Njt5pJ8azqxMa
-         s5RaKIzu+UjS/wWGtGfqmizV5/v3bCpEFcMub56mD7QmTnZFrTro4Ny3kudU/BIONnNb
-         g9aphK1MeIhwXAJw/zIuISIyFdEebXR4acizvWUrl5zwxwsM4ANiB9UFtK5Lzit3AKF9
-         3kLdABDXI8zL/XhyLwRiJ1wSydyIH+ceQm+3SbJOMj6YFp10u2M9Awewog88xrV8VyrP
-         wpbFvHKS5GP46xEBCUiQlFkdV6cnPpcObrfaEBmeHfRVnA7NW6luOSk0WdQelXGrwgA4
-         4Qaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776169478; x=1776774278;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1776175216; x=1776780016; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Tc3jd8tIg1j1Ipoo7t+MsOrKEngLEJeqG4K7HJACIgU=;
-        b=gH0BJsYQ0SSgqEdkNAF+QnJInlQJFIkT5zXVvrCgmLYWJ1ARLm6M9Njx7B1i9qeBjO
-         s0qIAzM+/ca7GQlpUikKDLszyzvKGa+Eb2JUQXAli/8U6mwKk6oIN55iLX1ZXDBaLxtJ
-         xhtDwYx5H4vqTmTWP1+th8gjzNC1EjFQ1Td/Npk/s/9wvqimumn6l2WyhfiXX1QTuGYx
-         1RYz1E5D4erdV68XtXdDhW5J8wN2YDdLS1hXpfG/UIJjXYAAR/q6ceSikVVGN4/OLGLv
-         T/0VyHnKfOncVZoUqJKRLf/QsWFEU2qj+w0U9t7Wpaf26gEOeVvGIE8JNpesQmewLB7Q
-         Jd0A==
-X-Gm-Message-State: AOJu0YxsbY+vYi5Vbg2jaK4/vD9X3KTormY6YLD+a00GEfjRTmQcuxpb
-	rH7rOb1RJaUcWbZw+RP/W+A1gnh39wXNLJZVz83BwPOOCTmDT4xA09owS9SMRQ==
-X-Gm-Gg: AeBDiesfyhDu+iFN+UDV/Z99hNgscIZnnLyHJxu50tPP1FKE0jp9zpYaiSwv/PhFWdP
-	6AInmSKPB7dPh/hOyO3lM0TLeMrIntIZkSfb3KJNnIqOuzXmAodQxbfedHzGHFWCwlDfUtdl030
-	U0E4QV1zPfDzAgfFg8nPnWVyszGfu6eGmeKj4xwi2gPBQKR3vzt8dEN6O8/ScHefSnK3LzsZ6fa
-	2CnbkZnL75iFBPLXzmRj4jC/BzAx9oNQ3cNkbwEwpmHvWE6QRbMLjqBTYDdPp8tq4kkR8EHqPH9
-	LvVah72327PbSf7QpQglXuuVsQy1R/dD8pZmEx6mtkfGKfAM6wzfzL9Dj3Qn2a22NiKURSsV88V
-	N2tV1LiuOT9yBkSzOOYBjNjM+5+KV7MhDoMsiAOVzlGJRnaxbCQh48/udDnHbP5Ikv+/e/2p6SY
-	lbgvgSrKg2nZrV/Gzd7dk+NizbB+AVo3Bwyima4QTw
-X-Received: by 2002:a05:620a:2848:b0:8cf:c4e1:9761 with SMTP id af79cd13be357-8ddd03a2c72mr2212555185a.20.1776169477560;
-        Tue, 14 Apr 2026 05:24:37 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.89.64])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8de6553c460sm1114975285a.43.2026.04.14.05.24.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2026 05:24:36 -0700 (PDT)
-Message-ID: <69de3204.050a0220.3567e6.9897@mx.google.com>
-Date: Tue, 14 Apr 2026 05:24:36 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============9199618175859754061=="
+        bh=49AG2x6pEGoNnPJicOOKoScg9J+gRSWBSIBGOGB3T+I=;
+        b=B475bes68b6SMIrHNJi6PezRqBeD4jfO81Ltcrehh0pXEFGKewZc23S06CtIvgorX9
+         0tiCIm4NBFic5QN3CFFhVfWNgQ6tBN093/UKwWvdEqp+vWxUYL9o7ie9Fpb3AydObg8e
+         4bfk3rEPh+SAsdh3RyUXsbv/kcK0zly2WGhv+0SpReZgIgYTVhxn9U5ynIu3X979OYOD
+         /5u+KaLlpOAX5X/12jaRzif2prI773RvjgajqXglUZrz4o6yxW2/Ebgve2JTqkWRAqb6
+         KbVo4S0Ywr0zpCycMvlq4unYrsRLK7JCGItY/BjgO81Cq6cOz6RM9/ruyYXTY4tHZ5tG
+         fK7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776175216; x=1776780016;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=49AG2x6pEGoNnPJicOOKoScg9J+gRSWBSIBGOGB3T+I=;
+        b=eaoDyj1HytvFC+h9kveOIhypCbhG4C3OftTOFqk0PB+9NbNZjZI3YeIIg2heKhOpJT
+         prwjM9ZVcHa2xcDERhs1ol23le/YT4QkZy3tSNgZCey0wYLKTQa96r8QDIWZHj1pGRj7
+         99weLJBAUW/N6gd0irCTZLwsZqL0Me0QtDCTf101DXmFC57RHlKkC5aEPXzJkV6ntsSr
+         tLV3gPhuXPtQ1JzhqnaRF8eE3ELFbQXfDvu/NEPYLYOUGZzgpJmJB7Cxb8XLJC+GFado
+         4TNfBBHwQSwH+5sGSfzFWIANDFMqBALptoXeNq5UAM/b3dz1u7nLqf9/FyyzwpG7wM4H
+         aOtw==
+X-Forwarded-Encrypted: i=1; AFNElJ/N9i8zUPhJrqI2OaYLjsS5TIJEcCssBV5kXJtiJX1dER+b5+n046g/+NZn0NelVCzYSRYotjeO10zsHIuDJXY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCIlw1c0+G9ydZ+XbAU+JjntUFVbcM49eNHLeiEZnTWu2K4m9N
+	02DxG3kp/22gaYWz6/Ul3UWi3wBvydc8yM6TsOnGVYwmKovLSx7Eudg/q1W0hKqgWMOiRsJlk4L
+	+5vXPPuM/+yiNLWs3lMHYyJfGFhdF6TzvWTlfM60=
+X-Gm-Gg: AeBDiet9fCvnbdvwVYlQqPNmyNRbnMvsNgL8ijCJPfCuyvBlRBcRcR0RvgNXq43UUVV
+	MjBVx1OJm1bsf5j8lxFE70ufjNZamuqYHH8tXBoGHn35E8dC16QmzUv7CyA6QHrnTzx4KTwZzwy
+	awEGWCscxRVcaBk+2rle1I59Zn6e0ten1FrJfHD3Rc9D+THjuX72MGnEIy/qYWXSyPQTbely2uV
+	NRWmnePjAldfimN2tlblh9cIH6CDTZ3lKZLeKj8EccXmaayFyrEKCfKfxptmDsVGfSg5zzl+Tpa
+	/iGqWKmdcqk318gABVbtMEY147ytB9iyxvVlxijczg12ucUmkVXDYJddT3IJ8j8fQ2GZ3PGhUXV
+	zMQKb
+X-Received: by 2002:a4a:ee08:0:b0:692:9c90:8e9a with SMTP id
+ 006d021491bc7-6929c9093admr97107eaf.45.1776175215502; Tue, 14 Apr 2026
+ 07:00:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, apusaka@google.com
-Subject: RE: [Bluez,1/2] monitor: define manufacturer company IDs
-In-Reply-To: <20260414111307.3725821-1-apusaka@google.com>
-References: <20260414111307.3725821-1-apusaka@google.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20260407-brcm-prio-v2-1-3f745edf49af@gmail.com>
+In-Reply-To: <20260407-brcm-prio-v2-1-3f745edf49af@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 14 Apr 2026 10:00:02 -0400
+X-Gm-Features: AQROBzDtNMc0E_keXTqptniCR183NjGNZBRqq-7Qjon6jglhw36fYEjsseB1EhQ
+Message-ID: <CABBYNZJAEqwfTuVqbFAnx97HBSjcwn3Hb+y+r4r2C=MMPxFoDg@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Add Broadcom channel priority commands
+To: fnkl.kernel@gmail.com
+Cc: Sven Peter <sven@kernel.org>, Janne Grunau <j@jannau.net>, Neal Gompa <neal@gompa.dev>, 
+	Marcel Holtmann <marcel@holtmann.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, asahi@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============9199618175859754061==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Sasha,
 
-This is automated email and please do not reply to this email!
+On Tue, Apr 7, 2026 at 1:46=E2=80=AFPM Sasha Finkelstein via B4 Relay
+<devnull+fnkl.kernel.gmail.com@kernel.org> wrote:
+>
+> From: Sasha Finkelstein <fnkl.kernel@gmail.com>
+>
+> Certain Broadcom bluetooth chips (bcm4377/bcm4378/bcm438) need ACL
+> streams carrying audio to be set as "high priority" using a vendor
+> specific command to prevent 10-ish second-long dropouts whenever
+> something does a device scan. This patch sends the command when the
+> socket priority is set to TC_PRIO_INTERACTIVE, as BlueZ does for audio.
+>
+> Signed-off-by: Sasha Finkelstein <fnkl.kernel@gmail.com>
+> ---
+> Changes in v2:
+> - new ioctl got nack-ed, so let's use sk_priority as the trigger
+> - Link to v1: https://lore.kernel.org/r/20260407-brcm-prio-v1-1-f38b17376=
+640@gmail.com
+> ---
+>  MAINTAINERS                       |  2 ++
+>  drivers/bluetooth/hci_bcm4377.c   |  2 ++
+>  include/net/bluetooth/bluetooth.h |  4 ++++
+>  include/net/bluetooth/hci_core.h  | 11 +++++++++++
+>  net/bluetooth/Kconfig             |  7 +++++++
+>  net/bluetooth/Makefile            |  1 +
+>  net/bluetooth/brcm.c              | 29 +++++++++++++++++++++++++++++
+>  net/bluetooth/brcm.h              | 17 +++++++++++++++++
+>  net/bluetooth/hci_conn.c          | 28 ++++++++++++++++++++++++++++
+>  net/bluetooth/l2cap_sock.c        | 13 +++++++++++++
+>  10 files changed, 114 insertions(+)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index c3fe46d7c4bc..81be021367ec 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2562,6 +2562,8 @@ F:        include/dt-bindings/pinctrl/apple.h
+>  F:     include/linux/mfd/macsmc.h
+>  F:     include/linux/soc/apple/*
+>  F:     include/uapi/drm/asahi_drm.h
+> +F:     net/bluetooth/brcm.c
+> +F:     net/bluetooth/brcm.h
+>
+>  ARM/ARTPEC MACHINE SUPPORT
+>  M:     Jesper Nilsson <jesper.nilsson@axis.com>
+> diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4=
+377.c
+> index 925d0a635945..5f79920c0306 100644
+> --- a/drivers/bluetooth/hci_bcm4377.c
+> +++ b/drivers/bluetooth/hci_bcm4377.c
+> @@ -2397,6 +2397,8 @@ static int bcm4377_probe(struct pci_dev *pdev, cons=
+t struct pci_device_id *id)
+>         if (bcm4377->hw->broken_le_ext_adv_report_phy)
+>                 hci_set_quirk(hdev, HCI_QUIRK_FIXUP_LE_EXT_ADV_REPORT_PHY=
+);
+>
+> +       hci_set_brcm_capable(hdev);
+> +
+>         pci_set_drvdata(pdev, bcm4377);
+>         hci_set_drvdata(hdev, bcm4377);
+>         SET_HCIDEV_DEV(hdev, &pdev->dev);
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bl=
+uetooth.h
+> index 69eed69f7f26..07a250673950 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -457,6 +457,7 @@ struct l2cap_ctrl {
+>  };
+>
+>  struct hci_dev;
+> +struct hci_conn;
+>
+>  typedef void (*hci_req_complete_t)(struct hci_dev *hdev, u8 status, u16 =
+opcode);
+>  typedef void (*hci_req_complete_skb_t)(struct hci_dev *hdev, u8 status,
+> @@ -469,6 +470,9 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 o=
+pcode, u8 status,
+>  int hci_ethtool_ts_info(unsigned int index, int sk_proto,
+>                         struct kernel_ethtool_ts_info *ts_info);
+>
+> +int hci_conn_setsockopt(struct hci_conn *conn, struct sock *sk, int leve=
+l,
+> +                       int optname, sockptr_t optval, unsigned int optle=
+n);
+> +
+>  #define HCI_REQ_START  BIT(0)
+>  #define HCI_REQ_SKB    BIT(1)
+>
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
+_core.h
+> index a7bffb908c1e..947e7c2b08dd 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -642,6 +642,10 @@ struct hci_dev {
+>         bool                    aosp_quality_report;
+>  #endif
+>
+> +#if IS_ENABLED(CONFIG_BT_BRCMEXT)
+> +       bool                    brcm_capable;
+> +#endif
+> +
+>         int (*open)(struct hci_dev *hdev);
+>         int (*close)(struct hci_dev *hdev);
+>         int (*flush)(struct hci_dev *hdev);
+> @@ -1791,6 +1795,13 @@ static inline void hci_set_aosp_capable(struct hci=
+_dev *hdev)
+>  #endif
+>  }
+>
+> +static inline void hci_set_brcm_capable(struct hci_dev *hdev)
+> +{
+> +#if IS_ENABLED(CONFIG_BT_BRCMEXT)
+> +       hdev->brcm_capable =3D true;
+> +#endif
+> +}
+> +
+>  static inline void hci_devcd_setup(struct hci_dev *hdev)
+>  {
+>  #ifdef CONFIG_DEV_COREDUMP
+> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+> index 6b2b65a66700..0f2a5fbcafc5 100644
+> --- a/net/bluetooth/Kconfig
+> +++ b/net/bluetooth/Kconfig
+> @@ -110,6 +110,13 @@ config BT_AOSPEXT
+>           This options enables support for the Android Open Source
+>           Project defined HCI vendor extensions.
+>
+> +config BT_BRCMEXT
+> +       bool "Enable Broadcom extensions"
+> +       depends on BT
+> +       help
+> +         This option enables support for the Broadcom defined HCI
+> +         vendor extensions.
+> +
+>  config BT_DEBUGFS
+>         bool "Export Bluetooth internals in debugfs"
+>         depends on BT && DEBUG_FS
+> diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+> index a7eede7616d8..b4c9013a46ce 100644
+> --- a/net/bluetooth/Makefile
+> +++ b/net/bluetooth/Makefile
+> @@ -24,5 +24,6 @@ bluetooth-$(CONFIG_BT_LE) +=3D iso.o
+>  bluetooth-$(CONFIG_BT_LEDS) +=3D leds.o
+>  bluetooth-$(CONFIG_BT_MSFTEXT) +=3D msft.o
+>  bluetooth-$(CONFIG_BT_AOSPEXT) +=3D aosp.o
+> +bluetooth-$(CONFIG_BT_BRCMEXT) +=3D brcm.o
+>  bluetooth-$(CONFIG_BT_DEBUGFS) +=3D hci_debugfs.o
+>  bluetooth-$(CONFIG_BT_SELFTEST) +=3D selftest.o
+> diff --git a/net/bluetooth/brcm.c b/net/bluetooth/brcm.c
+> new file mode 100644
+> index 000000000000..9aa0a265ab3d
+> --- /dev/null
+> +++ b/net/bluetooth/brcm.c
+> @@ -0,0 +1,29 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2026 The Asahi Linux Contributors
+> + */
+> +
+> +#include <net/bluetooth/bluetooth.h>
+> +#include <net/bluetooth/hci_core.h>
+> +
+> +#include "brcm.h"
+> +
+> +int brcm_set_high_priority(struct hci_dev *hdev, u16 handle, bool enable=
+)
+> +{
+> +       struct sk_buff *skb;
+> +       u8 cmd[3];
+> +
+> +       if (!hdev->brcm_capable)
+> +               return 0;
+> +
+> +       cmd[0] =3D handle;
+> +       cmd[1] =3D handle >> 8;
 
-Dear submitter,
+Adding a packed struct and then using something like cpu_to_le16 is
+probably preferable over above.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1081093
+> +       cmd[2] =3D !!enable;
+> +
+> +       skb =3D hci_cmd_sync(hdev, 0xfc57, sizeof(cmd), cmd, HCI_CMD_TIME=
+OUT);
+> +       if (IS_ERR(skb))
+> +               return PTR_ERR(skb);
+> +
+> +       kfree_skb(skb);
+> +       return 0;
+> +}
+> diff --git a/net/bluetooth/brcm.h b/net/bluetooth/brcm.h
+> new file mode 100644
+> index 000000000000..fdaee63bd1d2
+> --- /dev/null
+> +++ b/net/bluetooth/brcm.h
+> @@ -0,0 +1,17 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2026 The Asahi Linux Contributors
+> + */
+> +
+> +#if IS_ENABLED(CONFIG_BT_BRCMEXT)
+> +
+> +int brcm_set_high_priority(struct hci_dev *hdev, u16 handle, bool enable=
+);
+> +
+> +#else
+> +
+> +static inline int brcm_set_high_priority(struct hci_dev *hdev, u16 handl=
+e, bool enable)
+> +{
+> +       return 0;
+> +}
+> +
+> +#endif
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 11d3ad8d2551..096163840f62 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -35,6 +35,7 @@
+>  #include <net/bluetooth/iso.h>
+>  #include <net/bluetooth/mgmt.h>
+>
+> +#include "brcm.h"
+>  #include "smp.h"
+>  #include "eir.h"
+>
+> @@ -3070,6 +3071,33 @@ int hci_conn_set_phy(struct hci_conn *conn, u32 ph=
+ys)
+>         }
+>  }
+>
+> +int hci_conn_setsockopt(struct hci_conn *conn, struct sock *sk, int leve=
+l,
+> +                       int optname, sockptr_t optval, unsigned int optle=
+n)
+> +{
+> +       int val;
+> +       bool old_high, new_high, changed;
+> +
+> +       if (level !=3D SOL_SOCKET)
+> +               return 0;
+> +
+> +       if (optname !=3D SO_PRIORITY)
+> +               return 0;
+> +
+> +       if (optlen < sizeof(int))
+> +               return -EINVAL;
+> +
+> +       if (copy_from_sockptr(&val, optval, sizeof(val)))
+> +               return -EFAULT;
+> +
+> +       old_high =3D sk->sk_priority >=3D TC_PRIO_INTERACTIVE;
+> +       new_high =3D val >=3D TC_PRIO_INTERACTIVE;
+> +       changed =3D old_high !=3D new_high;
+> +       if (!changed)
+> +               return 0;
+> +
+> +       return brcm_set_high_priority(conn->hdev, conn->handle, new_high)=
+;
 
----Test result---
+The skb carries the priority (skb->priority), not sure why you need to
+capture the sk_priority instead, doing so ignores the load balance
+that hci_core performs to avoid starving connections.
 
-Test Summary:
-CheckPatch                    FAIL      1.22 seconds
-GitLint                       PASS      0.54 seconds
-BuildEll                      PASS      17.61 seconds
-BluezMake                     PASS      603.42 seconds
-MakeCheck                     PASS      18.55 seconds
-MakeDistcheck                 PASS      220.26 seconds
-CheckValgrind                 PASS      273.63 seconds
-CheckSmatch                   WARNING   305.22 seconds
-bluezmakeextell               PASS      166.13 seconds
-IncrementalBuild              FAIL      0.25 seconds
-ScanBuild                     PASS      902.35 seconds
+> +}
+> +
+>  static int abort_conn_sync(struct hci_dev *hdev, void *data)
+>  {
+>         struct hci_conn *conn =3D data;
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 71e8c1b45bce..d5eef87accc4 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -891,6 +891,16 @@ static int l2cap_sock_setsockopt(struct socket *sock=
+, int level, int optname,
+>
+>         BT_DBG("sk %p", sk);
+>
+> +       if (level =3D=3D SOL_SOCKET) {
+> +               conn =3D chan->conn;
+> +               if (conn)
+> +                       err =3D hci_conn_setsockopt(conn->hcon, sock->sk,=
+ level,
+> +                                                 optname, optval, optlen=
+);
+> +               if (err)
+> +                       return err;
+> +               return sock_setsockopt(sock, level, optname, optval, optl=
+en);
+> +       }
+> +
+>         if (level =3D=3D SOL_L2CAP)
+>                 return l2cap_sock_setsockopt_old(sock, optname, optval, o=
+ptlen);
+>
+> @@ -1931,6 +1941,9 @@ static struct sock *l2cap_sock_alloc(struct net *ne=
+t, struct socket *sock,
+>
+>         INIT_LIST_HEAD(&l2cap_pi(sk)->rx_busy);
+>
+> +       if (sock)
+> +               set_bit(SOCK_CUSTOM_SOCKOPT, &sock->flags);
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[Bluez,2/2] monitor: Set msft_opcode on read_local_version_rsp
-ERROR:OPEN_BRACE: open brace '{' following function definitions go on the next line
-#108: FILE: monitor/packet.c:4362:
-+static int get_msft_opcode(uint16_t manufacturer) {
+This is more complicated than it needs to be. I'd just add a new
+callback, `hdev->set_priority(handle, skb->priority)`, so the driver
+is called whenever it needs to elevate a connection's priority, that
+said there could be cases where a connection needs its priority set
+momentarily to transmit A2DP, followed by OBEX packets that are best
+effort. Therefore, `hci_conn` will probably need to track the priority
+so it can detect when it needs changing on a per skb basis.
 
-/github/workspace/src/patch/14524190.patch total: 1 errors, 0 warnings, 86 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14524190.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/packet.c:2000:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3866:52: warning: array of flexible structuresmonitor/bt.h:3854:40: warning: array of flexible structuresmonitor/packet.c:2000:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3866:52: warning: array of flexible structuresmonitor/bt.h:3854:40: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - FAIL
-Desc: Incremental build with the patches in the series
-Output:
-
-fatal: previous rebase directory .git/rebase-apply still exists but mbox given.
+>         chan =3D l2cap_chan_create();
+>         if (!chan) {
+>                 sk_free(sk);
+>
+> ---
+> base-commit: bfe62a454542cfad3379f6ef5680b125f41e20f4
+> change-id: 20260407-brcm-prio-b630e6cc3834
+>
+> Best regards,
+> --
+> Sasha Finkelstein <fnkl.kernel@gmail.com>
+>
+>
 
 
-https://github.com/bluez/bluez/pull/2031
-
----
-Regards,
-Linux Bluetooth
-
-
---===============9199618175859754061==--
+--=20
+Luiz Augusto von Dentz
