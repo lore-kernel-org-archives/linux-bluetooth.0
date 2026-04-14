@@ -1,35 +1,35 @@
-Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8421C313550
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 19:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCB61A01BE
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 19:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776196470; cv=none; b=s5TUI3qopRnSrZ3xzq7jZ0I54agbGwPafWg/HztmJAm8KaebmYJs7z1wsm+x3gb0Ifu8VRIBHjoBa5a825t8JQL3kXfSo7U3W46UP4QZwkeInXQUoPyGRfAkV+xtEfsyRp9nO9b4xYgdscHweVlhumbI3WM0QsP2qxX1atZDJ2A=
+	t=1776196470; cv=none; b=BXGy3+YJ2sVtaNoX3+S4Azo7f/LES/S6ZfTVicIkMNIl8+eeETyxYHg0CYpBpnc9GTOm90CVoQ5lzIkw/3fK2FqxFHOpHyJ+CoIuQcWWUMWrMihUwRc2OQ7d6XQytQbqkVOF7HYY+9hQs70HHlxJNUbPckQ+rXYrp2v/i8Pf8GI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1776196470; c=relaxed/simple;
-	bh=dw/5gSF8bubFaFU4ixzMuurlbbctbD/I7qTMSkDYFhc=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=WaGzoSkXbwvDBKQATjwk7pY1okk1ltSAPapw1c2kwaphmn20VT6ZHXLbFhyub7wH0IBwhagQPxN9SRLLiDd+zVLSPOdLnjqyonLyIvzXoJ/3SzVEbezlsi+C9zjW/Oo/jPEHyo27cai0c0YglA10oO5jmn64CR2TUYz64MrNr1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=NEK9nIcy; arc=none smtp.client-ip=192.30.252.210
+	bh=iW/1nQNiqOjqUGCAFVfQFPjUX+nfDLKn4wzZJPLKzWg=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=iforkch92VBLDmBTiAltzUD5sJgG55d0VGZPZZRdd+M8f1pMI2UkDRLEStp6kK0fFhPtJGXoLEepY9WsfLl21rIYtL17w4ZuGJV8ir7hwd7s0X0CcuzTIZXqLZJadNap9eWIVW80+hNubl4G7pn/gfHne0G4TGmhPrr8Y7cIfBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=G79gqL+v; arc=none smtp.client-ip=192.30.252.208
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="NEK9nIcy"
-Received: from github.com (hubbernetes-node-607a941.ash1-iad.github.net [10.56.128.71])
-	by smtp.github.com (Postfix) with ESMTPA id AA2F1C12C7
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 12:54:28 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="G79gqL+v"
+Received: from github.com (hubbernetes-node-a91df83.ash1-iad.github.net [10.56.150.22])
+	by smtp.github.com (Postfix) with ESMTPA id BE1F2140E25
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 12:54:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1776196468;
-	bh=QvOGWbFi6uRQAxAgqrWYxm7RHaLhTckRipWtW9wAAV4=;
+	s=pf2023; t=1776196466;
+	bh=OKB74hkDrgWYte9VNTTy/aYKJK9e45CnHwnV1ambgiY=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=NEK9nIcyLKn2jIrxQ37rNB6LBXbulu9gBNymMK4obTaA5K/gV66JUdXYbvHEkJc8C
-	 Kq1FqlXoLS8NdrysNQ+htMkxPqUxwPQbuvpHm1f/KLSJTTt/vsZCWNFU8JQQUo3ipI
-	 EfMGyraRHVeVSIeDWfhJlxCA0QQKUIWqCS1rS5z8=
-Date: Tue, 14 Apr 2026 12:54:28 -0700
+	b=G79gqL+vUDaazSBWU/1hjeLV12cDc02YC79rrG/ZkGLfUKu4qQjeCr54c/IuCtNpo
+	 EbJ3EkWGRuucku6THuezEj0mJyMXMKR1QyEi8Y/9j6NvBTcWC8uI0vNOZqRIagqAoo
+	 B35lmVD5v4Drve9BxwJuqVaTDE6RVKUhKuY9YRyQ=
+Date: Tue, 14 Apr 2026 12:54:26 -0700
 From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1081265/000000-25ba1c@github.com>
-Subject: [bluez/bluez] 25ba1c: bass: Fix crashing on BT_BASS_MOD_SRC
+Message-ID: <bluez/bluez/push/refs/heads/1081219/000000-64916d@github.com>
+Subject: [bluez/bluez] 64916d: bass: Fix crashing on BT_BASS_MOD_SRC
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,10 +42,10 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1081265
+  Branch: refs/heads/1081219
   Home:   https://github.com/bluez/bluez
-  Commit: 25ba1cc75a26b4d4c780c2c3423942a9766c0932
-      https://github.com/bluez/bluez/commit/25ba1cc75a26b4d4c780c2c3423942a9766c0932
+  Commit: 64916d787eb437b49954c0e87564d9e77ab3a060
+      https://github.com/bluez/bluez/commit/64916d787eb437b49954c0e87564d9e77ab3a060
   Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
   Date:   2026-04-14 (Tue, 14 Apr 2026)
 
