@@ -1,286 +1,203 @@
-Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF941E2858
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 04:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776139297; cv=none; b=JcxG0mrBPM1Op3h0s9ZIY2kHW0v8ZWWf4lUm79cK7t8loFh5ISpazvvvVAp4BT5BJKmA4Ep4ojYGDOcB6kFOpIAIiUXbmAb79DrD83iAmQdMJgdaeHREl443l5clY8HjTojXZWkyzTrpfcEWFkvm6vY8oL8z5dyMTmzLXKUfjIg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776139297; c=relaxed/simple;
-	bh=rQGtvm8/3iRrW1kFPtxbmFV2/xb4/oZY7q2vamUzit0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=tYMugGn62yZAuU4vxlHjhsdDYxWXBTA89atKGz7OzQYwy9Wx3iGNEYnCtuhABTAK4YFTATafjvcu7qcj0oxVghLPyAn3UFtOX/EDblD6wQfwxMqChGFo+YpECrJC94+5Xj8Df+jluyDRRKJb0XQEfBITEZ+nmJLa7hoFjuno/Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kbAJF6Dd; arc=none smtp.client-ip=74.125.82.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BCA12BEC2E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 05:03:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776143015; cv=pass; b=DGJgvRuqvYvzMw79JVfNt1azN4rDo7wVK1t/SANUTVfuXTlhXyNKsLAMoRE+Vso7qU1yelpU7PJuUua2NPZY9kSpwdPs6S/GWqiLNMS7chlgurVac6ikbojBgOWSt2MkAlMETcUIy13quufD69qe2O1Goz1wXX6x1oO2bIdtZio=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776143015; c=relaxed/simple;
+	bh=/ONKg0B1L6p4zm87A4DLLkuv8Uix/xcFzs6/+rsavpU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m6U5BYu0vn3wotd+iYFNuqz1c3vPxt/+aqQWl1vKOzOJ6CE3fT3s6qYK+97pqQ8In6DTi7pZFP9gnQgSKX5WbaMQG8W4cP7ksR2rOnIomET5ROow4wI65Vx4kS8M1EM2Nbb3FeusRbi2pxE3KV/C2vCYJOdHbLs7MOk55a7t2No=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=k9UhoHTv; arc=pass smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kbAJF6Dd"
-Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-2d64c756111so5458613eec.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2026 21:01:35 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="k9UhoHTv"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5a3d1561e38so3747556e87.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Apr 2026 22:03:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776143011; cv=none;
+        d=google.com; s=arc-20240605;
+        b=TCpBWcOs2UyFcW6aNiuB7iG9X3w4OqAwQj/HtAbgwS1CM3i8hhxr2iI0nwqfM9cxXm
+         sTxNSlCrtT89DvacQ/tQwktdQt1jGfuu8VmYBebGQCT+3EVivXkKq9QP3rVDUyMq498c
+         7ytGJip+997mFeT136VAH6sSvXL/zfPAG1RnEohHsxk0vURq4f5Qx/clwIWrhLgF4Nf0
+         J6vQj3o8L1MpljLqHrKoGA0Hy34wItJpE+C/ID0vF9SUsoF2tlTImGENJLHpPxWAABOZ
+         VOj7w8FfzDKlK4BDY+tUSEvYdYlbnEhGgqjoIMj8vTJYeipz7CRJvxQe/EcixncOSCrQ
+         oOyQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=r5Pf27EYmY3rBtqc75kC82+zV4ukf34OCg9xmpmqAus=;
+        fh=yygJdMx6cxdVq++8uoMuoPEk5LzmZ3CW8/hw4IznHCY=;
+        b=LuPRcJSW4CbGSF2WRbg4CpU26UpXdQ34grJq7UtdmAdjyA5cL2QVl4fbHJZiWRvZa+
+         qSy06LaRLQNSKxL7zltshv9MW7UDWyhjOw+FsFufFeFpXX4+2hS//ZoHSQb0qfddvKem
+         ksRqmaeQcvx39+zkPkREDD58SRx2Pr+virnWqOLYOeqf1VqQPnO2+dhouFCgnbdH9WbC
+         9T5JN0sBmEPYTDJx7TmYY+tO1YgNI1AFI9RYFzsaar0WLAqT9zxpv+JuXsuEbv50eb95
+         krETzHsdMpHmprlYFLVnkb5Nn8Cn9ikYQoxgfw7eA291L/f2x7NJJ06tKnqlckAFafYu
+         MEcg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776139294; x=1776744094; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=9hmkNmuO88BH/dlKnozjAmLm1Hive+CHuk9YUbeCjRk=;
-        b=kbAJF6Ddyy+akOr+4nLQ/ibakgYveco6FJHt99h/eQmprximKfwc95pWkL9j+0O9qI
-         963w9s1zaE83RKouetQheA4w6vtFwMu5jXe80VyaAHC3waq0YF0rZe98NKH9oM6F6bzq
-         LKRhOUpW4TlCh27HsNtP6Frv9b3ZdRdkuu2JTxtCDy6uNFJ4V5KR7AKnEdZloQ5eIDlL
-         srJr2QbZ3aShvkNF/BCrjwDZVLYrMpgUsroeT+FzBB6y5GfEHMKcm3wV1qA5Xoklj/DN
-         qOWgis8VO+PrSj5U/B1G/J6o2eEEV3wVFDwEKu9XZWVqAE5wMXFdsZWrlo20YY+QH04v
-         XN6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776139294; x=1776744094;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=chromium.org; s=google; t=1776143011; x=1776747811; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9hmkNmuO88BH/dlKnozjAmLm1Hive+CHuk9YUbeCjRk=;
-        b=AW/FJr0GIHm5DrkJpTQlxdjPIl3jHVkIi0MqU5+eKhdfVq7v9eLnBx6XbwDl6B7zlq
-         CHDfCsxGTU/V+/83W40Vfk00+sBhhVVlQwiS8/ix97JJZKnvALUi3TsDBYaFf/jS6ys3
-         1mBwioq90R//GwWxUv1cQkJYIG85CCd9WOGFAQ3hTVbylHypythbS3De93NFUb5P+GA8
-         yvdn9v7W6bu+u69c6adH4EyLxzxPFFkaRYLicC/fb6VjB3Bc8wuj6HOdctWfTbEPHovo
-         hOh+5PeLp0+nIoHANr6p6fkNJbBW40BMQtVca32eoV8vsP3gkoYclp9zVV+tmcOUIABO
-         4QGw==
-X-Gm-Message-State: AOJu0Yyo0hFR8uLU+hD2DW7tAtzN5JLTK6HECf5TPZ3ldAASdY/9U0B3
-	o/5Vawc0LR6xw9B31XhUn1XIsKLzWJbSrmJuCMCIYF6NnvhtMqxxSUbTesmBdw==
-X-Gm-Gg: AeBDietezLS1pOIQdMG6BiEbRQ8c63ODpE8euND2aC6bi3NM/+oIvXYX2ZNUwgfyy/F
-	AciqcnElC45sJnWQOIFJWq9oOSLB9e6z/AQyOVnzgJ1WjgONCEuV1JSQtBw6ymJI/BZUvf8Rug4
-	24TDa4No36iycVPL6u52uBjGdE5WeKcPAAemCwGWODyCOcz3yK4MMOphm/L1/VtFIRiqVMMakWh
-	83ZWzu/gO64owrNXusgDqaOTTmSBBSxa27xvoGa8zzqOpZop+Y/6WxhKB0wtiYVUdQlwKtLoJbY
-	XBDbwhtfduYccWKDy+hl8SnEq2bBe3Nop4MOHrbEjVtxSpBoLSf4HvTavZQpnUjuTRIQLceRMOx
-	395uKNeepy2JTE8Gf2eWWY7HGswFXnm97LEmcT7ueH8ev/HyMtIJjfeAugiTph1oImPLSa4xlU9
-	71wW167TAXUejderMVjGlZDYqxoHbb
-X-Received: by 2002:a05:7300:d08d:b0:2da:39e9:20fc with SMTP id 5a478bee46e88-2da39e96e53mr1927421eec.17.1776139294217;
-        Mon, 13 Apr 2026 21:01:34 -0700 (PDT)
-Received: from [172.17.0.2] ([52.161.82.98])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d561cd2a4esm24758771eec.16.2026.04.13.21.01.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Apr 2026 21:01:33 -0700 (PDT)
-Message-ID: <69ddbc1d.050a0220.1d3f67.fa16@mx.google.com>
-Date: Mon, 13 Apr 2026 21:01:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8265011586270387977=="
+        bh=r5Pf27EYmY3rBtqc75kC82+zV4ukf34OCg9xmpmqAus=;
+        b=k9UhoHTvwzyqW/zmjESMuicoMoBBYBtJZXWbq6QFAeMa4+SEzlP6xCid/jUtzhFNq3
+         xJyIyFiHJqJBGmq6f4Ky9U44OV4gO45TCYbUBhdVkQgRk0UOyIW4aLZGwJkQoWb01xih
+         L3eOsn1bPR/InfQYoUdHiO8laGxXIXZU4L1Tg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776143011; x=1776747811;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=r5Pf27EYmY3rBtqc75kC82+zV4ukf34OCg9xmpmqAus=;
+        b=dSDXjxuKR+s3aQJJFjGLF7uJR2WUiwnjDAKRTgNJML1y2JhV/ZmoPfbDi4zsenOX5n
+         IOwt8pHbfJYCqCCrdVpgKu/fKbVsx1/go9+WdgyXB08rZ5tzH9Vq/SV2H68SPE03yZ6l
+         XyoBGtPWnbiIduUQ1Per5za6gE49gDwPaaLVamf93xIIbIUom0rgP/kmW7k9V5peH0FL
+         AiGxq/eqjik53Jc0WgjDnUocfXtTWpFEuMJAa2l0YT9U9DNbdLiDupWTHoq7DflOzOst
+         ptdV5KNfkQ2a+FHUNdkK+YaozUxcQPbxelu9vMyXYOd6uunFgKPSJ1UX1xo5CXaCXpPh
+         noZA==
+X-Forwarded-Encrypted: i=1; AFNElJ9oMfGpnNXW2zglr6ky1F5/zQ6afqbpsHGNl6yMrcJ7nQvE3AGyAfZLMk159zQLUxWinzPkfjQzV/MHqjuha9g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnVX737SHDuWbDWZ1kspAzbQJmAIOZSSbinVct4viD+NerT1Gy
+	jgLMDtT2b0++Fy/7wsV5T1G0FHVaoHmiF0vzTjzYmZAhfeTqPlNILfxRMROwi5zVHt7gbLGSt85
+	uhGdO5qQy0j5gMoMcopCRDy9lp2suFelU5CvpLdWB
+X-Gm-Gg: AeBDiesZhnJSK21/zqyP5OFPqAZ3cV5iMkTJikt0ipx15cmcy8H2i2O7fava8BEsJvw
+	oTnZYPZd7uSl08SU140VcQWzXRdoivi2kp5+UOP9bcOVr83Soiv5JWq4/NqvBY5HFO4tH7Q9TbA
+	f9sgBamMTCCRpo5Gy/k97eynQYXuVLQ//0barMBv8iiUV9A0f4fcvojpxGnkcQuWtdb2nhCLVbT
+	MUCmDA+W4olmAaZWTVycKY3fp6ufsu9b5TLBZlEG38HFkbWvI+IwX+BW/Qs+dgPJ7GlwN632tBE
+	CqS8QegXS0wd3VustGNDHvyN+gbVZXE+AMx69vWhC/iqwhRT
+X-Received: by 2002:a05:6512:3d07:b0:5a2:bebd:45b5 with SMTP id
+ 2adb3069b0e04-5a3ef702ba7mr4942397e87.4.1776143011315; Mon, 13 Apr 2026
+ 22:03:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, suunj1331@gmail.com
-Subject: RE: [v2] Bluetooth: RFCOMM: validate skb length in MCC handlers
-In-Reply-To: <20260414010741.233892-1-suunj1331@gmail.com>
-References: <20260414010741.233892-1-suunj1331@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20260326-pci-m2-e-v7-0-43324a7866e6@oss.qualcomm.com>
+ <20260413075459.GA2626902@google.com> <fpcs4p62f35a5qyqwgm5ysa73stbysxcr62tkmmkrrcvsuf4t4@4ivukyqjey57>
+ <eeytuhqpgdz4do4tgtbmfntub2femtyq7bij7svhodpyjwaylx@j3gmvq2a2zqc>
+In-Reply-To: <eeytuhqpgdz4do4tgtbmfntub2femtyq7bij7svhodpyjwaylx@j3gmvq2a2zqc>
+From: Chen-Yu Tsai <wenst@chromium.org>
+Date: Tue, 14 Apr 2026 13:03:19 +0800
+X-Gm-Features: AQROBzBGpczfuo3hb4EM0V1LAlLdphdlu-SZQrzKHBW63mwHzThEUJagiFr7yFk
+Message-ID: <CAGXv+5E=tujhtZjwi6Qm7hk3Ks74UzTQHWq82NiTEw1+vYod5g@mail.gmail.com>
+Subject: Re: [PATCH v7 0/8] Add support for handling PCIe M.2 Key E connectors
+ in devicetree
+To: Manivannan Sadhasivam <mani@kernel.org>
+Cc: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, Rob Herring <robh@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Hans de Goede <hansg@kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+	Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Stephan Gerhold <stephan.gerhold@linaro.org>, 
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, linux-acpi@vger.kernel.org, 
+	Hans de Goede <johannes.goede@oss.qualcomm.com>, 
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============8265011586270387977==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Apr 14, 2026 at 12:08=E2=80=AFAM Manivannan Sadhasivam <mani@kernel=
+.org> wrote:
+>
+> [Resending as my previous reply got bounced]
+>
+> On Mon, Apr 13, 2026 at 07:33:12PM +0530, Manivannan Sadhasivam wrote:
+> > On Mon, Apr 13, 2026 at 03:54:59PM +0800, Chen-Yu Tsai wrote:
+> > > Hi,
+> > >
+> > > On Thu, Mar 26, 2026 at 01:36:28PM +0530, Manivannan Sadhasivam wrote=
+:
+> > > > Hi,
+> > > >
+> > > > This series is the continuation of the series [1] that added the in=
+itial support
+> > > > for the PCIe M.2 connectors. This series extends it by adding suppo=
+rt for Key E
+> > > > connectors. These connectors are used to connect the Wireless Conne=
+ctivity
+> > > > devices such as WiFi, BT, NFC and GNSS devices to the host machine =
+over
+> > > > interfaces such as PCIe/SDIO, USB/UART and NFC. This series adds su=
+pport for
+> > > > connectors that expose PCIe interface for WiFi and UART interface f=
+or BT. Other
+> > > > interfaces are left for future improvements.
+> > >
+> > > Thanks for working on this. I started playing with it now that it is =
+in
+> > > -next. The PCIe part works fine. I'm looking into how to fit the pwrs=
+eq
+> > >
+> > > A couple questions:
+> > >
+> > > - Given that this connector actually represents two devices, how do I
+> > >   say I want the BT part to be a wakeup source, but not the WiFi part=
+?
+> > >   Does wakeup-source even work at this point?
+> > >
+> >
+> > You can't use the DT property since the devices are not described in DT
+> > statically. But you can still use the per-device 'wakeup' sysfs knob to=
+ enable
+> > wakeup.
 
-This is automated email and please do not reply to this email!
+I see. I think not being able to specify generic properties for the devices
+on the connector is going to be a bit problematic. Another use case I have
+requires specifying a bounce buffer / SWIOTLB for the PCIe WiFi card. The
+PCIe controller does not have an IOMMU behind it.
 
-Dear submitter,
+> > > - Are there plans to do the SDIO part?
+> > >
+> >
+> > No, not at the moment. Feel free to take it up if you have the hardware=
+ and
+> > motivation :)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1080925
+Ack. I think I still need to figure out what the plan is after mmc-pwrseq
+is deprecated.
 
----Test result---
+> > > - The matching done in the M.2 connector driver for pwrseq_get() seem=
+s a
+> > >   bit naive. It simply checks if the remote device in the OF graph is
+> > >   the same as the requesting device.
+> > >
+> > >   I think this would run into issues with USB hubs. If I have a USB h=
+ub
+> > >   and two M.2 connectors, with both connectors connected to the same
+> > >   hub, pwrseq_get() is going to always return only one of the instanc=
+es.
+> > >   This is because the USB hub has one device node with multiple OF gr=
+aph
+> > >   ports.
+> > >
+> >
+> > Yeah, this is a known limitation. I'm trying to improve this part now a=
+nd have
+> > the WIP commits here: https://github.com/Mani-Sadhasivam/linux/tree/pwr=
+seq-bt-en-fixes
+> >
+> > Once the merge window closes, I'll submit these.
 
-Test Summary:
-CheckPatch                    PASS      0.50 seconds
-GitLint                       FAIL      0.24 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      26.89 seconds
-CheckAllWarning               PASS      29.76 seconds
-CheckSparse                   PASS      28.82 seconds
-BuildKernel32                 PASS      23.72 seconds
-TestRunnerSetup               PASS      547.38 seconds
-TestRunner_l2cap-tester       PASS      28.62 seconds
-TestRunner_iso-tester         PASS      40.16 seconds
-TestRunner_bnep-tester        PASS      6.47 seconds
-TestRunner_mgmt-tester        FAIL      115.76 seconds
-TestRunner_rfcomm-tester      PASS      10.05 seconds
-TestRunner_sco-tester         FAIL      14.78 seconds
-TestRunner_ioctl-tester       PASS      10.80 seconds
-TestRunner_mesh-tester        FAIL      12.18 seconds
-TestRunner_smp-tester         PASS      8.87 seconds
-TestRunner_userchan-tester    PASS      6.84 seconds
-TestRunner_6lowpan-tester     FAIL      8.69 seconds
-IncrementalBuild              FAIL      1.15 seconds
+I couldn't tell which commit would help with this.
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2] Bluetooth: RFCOMM: validate skb length in MCC handlers
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-22: B1 Line exceeds max length (82>80): "  - Add a length check in rfcomm_recv_mcc() before accessing the MCC header (Paul)"
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.112 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-7.0.0-rc2-gd702855ed9de #1 Not tainted
-------------------------------------------------------
-kworker/u5:2/117 is trying to acquire lock:
-ffff888001946240 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}, at: sco_connect_cfm+0x358/0x8d0
-
-but task is already holding lock:
-ffff888002141a20 (&conn->lock){+.+.}-{3:3}, at: sco_connect_cfm+0x22d/0x8d0
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #1 (&conn->lock){+.+.}-{3:3}:
-       lock_acquire+0xf7/0x2c0
-       _raw_spin_lock+0x2a/0x40
-       sco_sock_connect+0x4d7/0x1280
-       __sys_connect+0x1a3/0x260
-       __x64_sys_connect+0x6e/0xb0
-       do_syscall_64+0xa0/0x570
-       entry_SYSCALL_64_after_hwframe+0x74/0x7c
-
--> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}:
-       check_prev_add+0xe9/0xc70
-       __lock_acquire+0x1457/0x1df0
-       lock_acquire+0xf7/0x2c0
-       lock_sock_nested+0x36/0xd0
-       sco_connect_cfm+0x358/0x8d0
-       hci_sync_conn_complete_evt+0x3d3/0x8e0
-       hci_event_packet+0x74f/0xb10
-       hci_rx_work+0x398/0xd00
-       process_scheduled_works+0xb16/0x1ac0
-       worker_thread+0x4ff/0xba0
-       kthread+0x368/0x490
-       ret_from_fork+0x498/0x7e0
-       ret_from_fork_asm+0x19/0x30
-
-other info that might help us debug this:
-
-...
-BUG: sleeping function called from invalid context at net/core/sock.c:3782
-in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 117, name: kworker/u5:2
-preempt_count: 1, expected: 0
-RCU nest depth: 0, expected: 0
-INFO: lockdep is turned off.
-CPU: 0 UID: 0 PID: 117 Comm: kworker/u5:2 Not tainted 7.0.0-rc2-gd702855ed9de #1 PREEMPT(lazy) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.13.0-1ubuntu1.1 04/01/2014
-Workqueue: hci0 hci_rx_work
-Call Trace:
- <TASK>
- dump_stack_lvl+0x49/0x60
- __might_resched+0x2ea/0x500
- lock_sock_nested+0x47/0xd0
- ? sco_connect_cfm+0x358/0x8d0
- sco_connect_cfm+0x358/0x8d0
- ? hci_debugfs_create_conn+0x190/0x210
- ? __pfx_sco_connect_cfm+0x10/0x10
- hci_sync_conn_complete_evt+0x3d3/0x8e0
- hci_event_packet+0x74f/0xb10
- ? __pfx_hci_sync_conn_complete_evt+0x10/0x10
- ? __pfx_hci_event_packet+0x10/0x10
- ? mark_held_locks+0x49/0x80
- ? lockdep_hardirqs_on_prepare+0xd4/0x180
- ? _raw_spin_unlock_irqrestore+0x2c/0x50
- hci_rx_work+0x398/0xd00
- process_scheduled_works+0xb16/0x1ac0
- ? __pfx_process_scheduled_works+0x10/0x10
- ? lock_acquire+0xf7/0x2c0
- ? lock_is_held_type+0x9b/0x110
- ? __pfx_hci_rx_work+0x10/0x10
- worker_thread+0x4ff/0xba0
- ? _raw_spin_unlock_irqrestore+0x2c/0x50
- ? __pfx_worker_thread+0x10/0x10
- kthread+0x368/0x490
- ? _raw_spin_unlock_irq+0x23/0x40
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x498/0x7e0
- ? __pfx_ret_from_fork+0x10/0x10
- ? __switch_to+0x9e4/0xe50
- ? __switch_to_asm+0x32/0x60
-...
-Total: 30, Passed: 30 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.082 seconds
-Mesh - Send cancel - 2                               Timed out    1.986 seconds
-##############################
-Test: TestRunner_6lowpan-tester - FAIL
-Desc: Run 6lowpan-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-7.0.0-rc2-gd702855ed9de #1 Not tainted
-------------------------------------------------------
-kworker/0:1/11 is trying to acquire lock:
-ffff8880026e4940 ((wq_completion)hci0#2){+.+.}-{0:0}, at: touch_wq_lockdep_map+0x75/0x180
-
-but task is already holding lock:
-ffffffff9844d720 (rtnl_mutex){+.+.}-{4:4}, at: lowpan_unregister_netdev+0xd/0x30
-
-which lock already depends on the new lock.
+In my head I think we would need to extend pwrseq_get() to add something
+like an index parameter that the provider is free to interpret. The M.2
+connector driver could interpret it as the USB port number on the remote
+end.
 
 
-the existing dependency chain (in reverse order) is:
-
--> #4 (rtnl_mutex){+.+.}-{4:4}:
-       lock_acquire+0xf7/0x2c0
-       __mutex_lock+0x16b/0x1fc0
-       lowpan_register_netdev+0x11/0x30
-       chan_ready_cb+0x836/0xd00
-       l2cap_recv_frame+0x6a06/0x8920
-       l2cap_recv_acldata+0x790/0xdf0
-       hci_rx_work+0x500/0xd00
-       process_scheduled_works+0xb16/0x1ac0
-       worker_thread+0x4ff/0xba0
-       kthread+0x368/0x490
-       ret_from_fork+0x498/0x7e0
-       ret_from_fork_asm+0x19/0x30
-
--> #3 (&chan->lock#3/1){+.+.}-{4:4}:
-       lock_acquire+0xf7/0x2c0
-       __mutex_lock+0x16b/0x1fc0
-       l2cap_chan_connect+0x74e/0x1980
-       lowpan_control_write+0x523/0x660
-       full_proxy_write+0x10b/0x190
-       vfs_write+0x1c0/0xf60
-       ksys_write+0xf1/0x1d0
-       do_syscall_64+0xa0/0x570
-       entry_SYSCALL_64_after_hwframe+0x74/0x7c
-
--> #2 (&conn->lock){+.+.}-{4:4}:
-...
-Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: IncrementalBuild - FAIL
-Desc: Incremental build with the patches in the series
-Output:
-
-fatal: previous rebase directory .git/rebase-apply still exists but mbox given.
-
-
-https://github.com/bluez/bluetooth-next/pull/81
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8265011586270387977==--
+Thanks
+ChenYu
