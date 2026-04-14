@@ -1,35 +1,35 @@
-Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
+Received: from out-7.smtp.github.com (out-7.smtp.github.com [192.30.252.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35243EC2DE
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 15:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50FD3EC2F8
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 15:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776181508; cv=none; b=KpbJPah8612ms7vrxtLFTpDPITLYN8cxVvTv8inzKHmTGYfYCm0oZOwCkrL3x2otnvfWHkofSE7cuFTAwdgLJLhtIe1rIIKTq8LTom2MslBZbZrHzzlJKF+CyR+vIA7bWwED0Va3Ow5aMFPsacz3yqDFZvw/XLGWirGHhcoAl0Q=
+	t=1776181509; cv=none; b=ajrLirwKtOsQvRui8XbvbHXZmV8KuWPFtNbbZ6GOwLCzwq488BQyF3N7NGVZFulGH4bEwoRXFw7UOy5mDR56DS+r5ZrSOqlbW73t4L6kXquQ67tKZxGf2gGI1LENuzXo7NP++mKL4yiCy9yQuCPa8H6k93osPcNACbf3ZlvPw9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776181508; c=relaxed/simple;
-	bh=WFOBnb4BHmxnBr+yPgAh4VJqbh/NRKxxzvF8ZRJ13bQ=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Ei2jxtm6Vc+SIvfqLw9P2d44rltp14dJggKJFIOd/+7iM51PeBBJmcN3K0qruBq3qJaWcW0umK8iS4Uvj9ZlU9gMGZ5yuJM62VCVSzP8Df8jvVRBvr7Ox11iwbIqRwyRCiTCXg7Z60RNHlD8yNEtiKeu7iivZ8L35YFyouYxRXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=NyoEzmKP; arc=none smtp.client-ip=192.30.252.201
+	s=arc-20240116; t=1776181509; c=relaxed/simple;
+	bh=8h+I6ODz+le7mLDhqut7JxU+N2v7svP5nkBMcZW6B4E=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ne9keXIhZ8uV5mTttIZJLWSEMM7otXsOXVq2O9Bxh8x9Gjnug76G5GjIzpYV2xk98qKIcC+EEdyrGJb18+AlJjVObaz8wk9M4jnJKXdjV3YMweBbgbiLNUrK6AB2K/Vd2dpMj9auUlNoQE+vS8FVednch5aWErqTCtgWvyNNN4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=hQoP3ERy; arc=none smtp.client-ip=192.30.252.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="NyoEzmKP"
-Received: from github.com (hubbernetes-node-f993f06.va3-iad.github.net [10.48.154.48])
-	by smtp.github.com (Postfix) with ESMTPA id 337AFE027B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 08:45:06 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="hQoP3ERy"
+Received: from github.com (hubbernetes-node-d0e3317.va3-iad.github.net [10.48.14.31])
+	by smtp.github.com (Postfix) with ESMTPA id 0B162901062
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 08:45:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1776181506;
-	bh=S/MTHoCwdVrpBr7kwSA3+ZLNuGOOtZ98YvAY5if2Ixg=;
+	s=pf2023; t=1776181508;
+	bh=YEAeeoVza4r7xMnL1eufsJ+3UiBzvgpWq5BLoTl/4mM=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=NyoEzmKPwWX5ZGkRDtOgpdayRZZjSIEl2YkKAGNTla27brLKPAalUxa+lRL+/Zx/W
-	 oJsY49bZi8O6NxMwv25T7x5RzUXZq6/MYrH5Xk8JuSISe/XUob9lWUl5Lh4PYEar5Q
-	 c6X668sKK+bUHTZ4WheSEZgPB99iETm2H2kVQZmY=
-Date: Tue, 14 Apr 2026 08:45:06 -0700
+	b=hQoP3ERyqlt7cNHGbJ+elW4VLhoFX6C5FtFMoSM8IqgY/MwxBHClj+w21mVv2jY/G
+	 ecE+kPL7+xsy5mYN/uruQ8iVgchuzafWf3uk7LQq47CNF8PRRqaR5DMdJirlOhww1K
+	 +FZIuyePHvR4IBnlmuxoMX+vbYbDm1eWOtUSRDpo=
+Date: Tue, 14 Apr 2026 08:45:07 -0700
 From: Bhavani <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1081191/000000-1729f3@github.com>
-Subject: [bluez/bluez] 9736f3: shared: rap: Introduce Channel Sounding HCI raw
+Message-ID: <bluez/bluez/push/refs/heads/1081201/000000-7f151a@github.com>
+Subject: [bluez/bluez] d7cd4d: shared: rap: Introduce Channel Sounding HCI raw
  in...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -43,10 +43,10 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1081191
+  Branch: refs/heads/1081201
   Home:   https://github.com/bluez/bluez
-  Commit: 9736f3017b53172b929ee0a710eec6b8c23212f2
-      https://github.com/bluez/bluez/commit/9736f3017b53172b929ee0a710eec6b8c23212f2
+  Commit: d7cd4d5e6656ba7bbc60887e9b204b7cb650845b
+      https://github.com/bluez/bluez/commit/d7cd4d5e6656ba7bbc60887e9b204b7cb650845b
   Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
   Date:   2026-04-14 (Tue, 14 Apr 2026)
 
@@ -68,8 +68,8 @@ Add data structures to support Channel Sounding Processing
 Add helper function to get hci conn info list and integrate it with RAP
 
 
-  Commit: 1729f38c58dfdd3d54034aed674f885f17ef759f
-      https://github.com/bluez/bluez/commit/1729f38c58dfdd3d54034aed674f885f17ef759f
+  Commit: cd3d94660e57931fc87810e491055e8f8de62741
+      https://github.com/bluez/bluez/commit/cd3d94660e57931fc87810e491055e8f8de62741
   Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
   Date:   2026-04-14 (Tue, 14 Apr 2026)
 
@@ -91,6 +91,34 @@ bluetoothd requires CAP_NET_RAW to receive and process HCI LE events
 when running under a constrained systemd capability bounding set
 
 
-Compare: https://github.com/bluez/bluez/compare/9736f3017b53%5E...1729f38c58df
+  Commit: 7f151a21b42da27f6feb26bd5d8c2d4adef1f317
+      https://github.com/bluez/bluez/commit/7f151a21b42da27f6feb26bd5d8c2d4adef1f317
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-04-14 (Tue, 14 Apr 2026)
+
+  Changed paths:
+    M Makefile.plugins
+    M profiles/ranging/rap.c
+    A profiles/ranging/rap_hci.c
+
+  Log Message:
+  -----------
+  profiles: ranging: Add HCI LE Event Handling in Reflector role
+
+Open RAW HCI Channel for CS Event Handling
+Parse the following HCI LE CS Events in reflector role
+and route the events to RAP Profile.
+ 1. HCI_EVT_LE_CS_READ_RMT_SUPP_CAP_COMPLETE
+ 2. HCI_EVT_LE_CS_CONFIG_COMPLETE
+ 3. HCI_EVT_LE_CS_SECURITY_ENABLE_COMPLETE
+ 4. HCI_EVT_LE_CS_PROCEDURE_ENABLE_COMPLETE
+ 5. HCI_EVT_LE_CS_SUBEVENT_RESULT
+ 6. HCI_EVT_LE_CS_SUBEVENT_RESULT_CONTINUE
+Send HCI_OP_LE_CS_SET_DEFAULT_SETTINGS to the controller
+with default settings selected by the user.
+Map connection handle received to device connection
+
+
+Compare: https://github.com/bluez/bluez/compare/d7cd4d5e6656%5E...7f151a21b42d
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
