@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDCB213DDA4;
-	Tue, 14 Apr 2026 21:00:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA91377563;
+	Tue, 14 Apr 2026 21:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776200434; cv=none; b=V9XEcYuqvZptdy8/BwoAKyi9GpUPrVAaj3iCi5kWnHIJoNo7S3zvX9qOEqS9RzNHUUnX8DcWYSqI6BE5BSPpbaDpY1nFvSG9hi0JnPf3lW8QJRr/t0ql76YQwLrgWsF/ebpXSeXe1PTvqkMNr5O14bZ2Q1amkEyNBEMPDhpp/IM=
+	t=1776200436; cv=none; b=T1IbUq6QXNSNzcSfh9HeFXPlzNBcy4cBApQIQlr7RsTqfuGbU1brzZxoI7a9b0tgkyrEHNKzRdVxJHF2V34IEMQ7UHdpkPcC7IGLT6d5J1Vba7v8uEdkcXEtWvijb0ApzNGdx7uzazLNNMW6Ad5ajfG4gRVeBS04xb4kVbjIsbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776200434; c=relaxed/simple;
-	bh=qDVYh6WLv/dBWQA7VroryOtD7C4utadxXIolPhKn+fE=;
+	s=arc-20240116; t=1776200436; c=relaxed/simple;
+	bh=6g0P2jYp8BQllTknzWCy2u2MiitXnxdF1aRmQTkSYwY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KgvAhBHcIhNRp9ytWfPQP0InRMf9EV20kOr1TNHjE/KjfBhuSyGMWQJ7o6+j8pMbNcqz3M+ESJzyJNxrQlot0MHA2dQKBUtxLBf3HWbwmb6E12s3sPGXH4EnLyIrbXxXrMLrHgaYeoSbMudNPKDRanC2rrOOz5J4/qFCWboaQCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LTrr2JZs; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=CnAwxZpL/UF18FLjPa0UVorbV6q8ggnDD1GWw2OSdiWEZM3/uHyZBtf3h25cboUrQi4/O0TJHUWNQ78xKSC0TceG30F53U1+KwLwPjyqNCuEGgrVnWc33uLwnxJ5TR0ZsPp4l2zqXB/Xx1ty4X3shfS3tPcMX+RyThGTiw5PqBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hNzjAUC1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LTrr2JZs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC5DCC2BCB0;
-	Tue, 14 Apr 2026 21:00:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hNzjAUC1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3942CC19425;
+	Tue, 14 Apr 2026 21:00:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776200434;
-	bh=qDVYh6WLv/dBWQA7VroryOtD7C4utadxXIolPhKn+fE=;
+	s=k20201202; t=1776200436;
+	bh=6g0P2jYp8BQllTknzWCy2u2MiitXnxdF1aRmQTkSYwY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LTrr2JZsNKowtXuZP9tKfPuPBBGD3HG5iF43zRXzlrVL/yNWhmiEPjv5JWvtocIU6
-	 T8XpftcsAKovZxMzHPV9MlzXZR2ceRRdipEIXByuIU31Xc53kOcMg9eWrKaB8SElkS
-	 AKbjD/ZhqNbtJERUnd+k8f1EJzKtvhUpjhEZ5KI8v1Fm/q1rOh5kz4MtHMDWxi8Ned
-	 Tk0crGPlADLwfM4iY6EjVzfZimGjGpHjzEKRpugGtjgnstmFMVl8szI+wYlqR+gJo9
-	 57KJvDNAGplzHeESAkIh66uDyVudeYvF5HZyEqVhi+Vv1Opi+ircW01Jj+hs31HeYx
-	 YD9h6rbqRpuGA==
+	b=hNzjAUC1k9twayaWsqA1yGROCWWm1dKcZXT2rkzaPHiG/KmiqPwBiLPWMhZ4ThJFg
+	 QOTrA3IxSQv3QyQKOWkZ+fTkuJoNP0T56GeK3sldx4zXRqShTyIT9xQu6iuUkuTIdA
+	 u+jlORyw8N+QzxkJei+IiGQwCs0S0oEpxaVK4hdMvNzqUbQe5q5I+4gm7AD2DR93NS
+	 BBd3fdwNYiB+gLGcpp5O4g0s7KEb2g1XGjme8yFNKhMCdqWkRUhRjzJbAhmE/6HMoV
+	 le2XjC4f0/f2SMpQi5f/yKnz7eu/D1bEz8K1i58ZGsmAjCllr4iR/evUKL0fNjgefg
+	 mJRWJuBMJ8oKw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FC8B3809A0C;
-	Tue, 14 Apr 2026 21:00:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA2323809A0D;
+	Tue, 14 Apr 2026 21:00:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,13 +37,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [RESEND PATCH v1] Bluetooth: btusb: MT7922: Add VID/PID 0e8d/223c
+Subject: Re: [RESEND PATCH v1] Bluetooth: btusb: MT7925: Add VID/PID 0e8d/8c38
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177620040505.1468596.15480605558058158606.git-patchwork-notify@kernel.org>
-Date: Tue, 14 Apr 2026 21:00:05 +0000
-References: <20260407065053.3037036-1-chris.lu@mediatek.com>
-In-Reply-To: <20260407065053.3037036-1-chris.lu@mediatek.com>
+ <177620040629.1468596.9025066166850277075.git-patchwork-notify@kernel.org>
+Date: Tue, 14 Apr 2026 21:00:06 +0000
+References: <20260407065110.3037135-1-chris.lu@mediatek.com>
+In-Reply-To: <20260407065110.3037135-1-chris.lu@mediatek.com>
 To: Chris Lu <chris.lu@mediatek.com>
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
  sean.wang@mediatek.com, will-cy.Lee@mediatek.com, ss.wu@mediatek.com,
@@ -55,15 +55,15 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 7 Apr 2026 14:50:53 +0800 you wrote:
-> Add VID 0e8d & PID 223c for MediaTek MT7922 USB Bluetooth chip.
+On Tue, 7 Apr 2026 14:51:10 +0800 you wrote:
+> Add VID 0e8d & PID 8c38 for MediaTek MT7925 USB Bluetooth chip.
 > 
 > The information in /sys/kernel/debug/usb/devices about the Bluetooth
 > device is listed as the below.
 > 
-> T:  Bus=07 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+> T:  Bus=06 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
 > D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0e8d ProdID=223c Rev= 1.00
+> P:  Vendor=0e8d ProdID=8c38 Rev= 1.00
 > S:  Manufacturer=MediaTek Inc.
 > S:  Product=Wireless_Device
 > S:  SerialNumber=000000000
@@ -104,8 +104,8 @@ On Tue, 7 Apr 2026 14:50:53 +0800 you wrote:
 > [...]
 
 Here is the summary with links:
-  - [RESEND,v1] Bluetooth: btusb: MT7922: Add VID/PID 0e8d/223c
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8205cbb54538
+  - [RESEND,v1] Bluetooth: btusb: MT7925: Add VID/PID 0e8d/8c38
+    https://git.kernel.org/bluetooth/bluetooth-next/c/41388deeb990
 
 You are awesome, thank you!
 -- 
