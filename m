@@ -1,141 +1,67 @@
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E9F1C01
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 19:05:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF91308F3E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 19:13:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776193511; cv=none; b=X3c78MLReMh/ueBdZbp3nEgTp95c79XZGboIjGeOtHOCT+hHu9uLvy/ZqAm1hU/j7hEXHs+GUEwidNmInDU0SzcC1ZmZY3x7UG5ZLQCG7t9EG/yArRNCIV+0k095uOcEzMjiCoWEztxJYGo0zewhbO07SsRzgIbLeNwZnxrCYPk=
+	t=1776193985; cv=none; b=NebvB3/r9VTLDTMvHQP9hYTi5e7GQkULcinr5rZ6zQmuqrGhJigyFzgJwB+5dOEjMy7T5wZ3oIa8w0xqaDd+ldD/vhklJ7V8lFEeT/kWnz6eGTnl+DK9PL55zPcxwTJRel+PLRt1AXtIqtmaMw3uhvfSuKccLn5/tgTfdArIsN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776193511; c=relaxed/simple;
-	bh=bDioenjEItxFbX6IG6Unwb7xF8FE2+H/oIqlW3uBQGY=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=PvSMEqrgQNav2fBR8timyTjrrHKatidTmvyq5Fi0y+lkXTrAobMI7iz5u3Q9f8Og/dzgsGbkZJGJM4SYerzVfaRzb3RGLNAFEfF/4vPQeRWKvcM6WCCs0pxXLkIDxcFAcZy5QlRrKkXARa+VyKFQfJiR64CoA2T1WjLF5q5M51s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=o57U1J96; arc=none smtp.client-ip=209.85.221.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776193985; c=relaxed/simple;
+	bh=0cLLTx0QavASC4O4NViN2MFvCES3Vi/qzSv+4u/+PmE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=rAldpj+yUVFr4sHDqRTUdycbRkF9W6LsOe13RlHtodxMKlgAYbxxkU4VTLeZsr7rqrsPOP+Cbxe0pp08Zr3WAgKuYqBrP+SemveejVIgzPnsYrsdhmTU6fs1hgZFn7dLCZlvklLrueFxILKJi+k6EHS0BVTkI9SfsBjkR/ayBjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=cGWfSbSW; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o57U1J96"
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-56d8d479149so2042438e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 12:05:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776193508; x=1776798308; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WcMZjp4BmNxvYubmFnzNdb/WRJMCiuI0z0hkQ+/23HE=;
-        b=o57U1J96w/w2um9BwlmNK0uD5vV3S/bZoeww+Y3dK7+eNKzc1KwfFKVoqE+t+siRqu
-         tKmGX0L36DceoMV9d+Z97MgCULtvXCuZJ6frstsck7jfsl5+7C3TVj8pwD+i3cUdHO8e
-         86rWllz77LePJLhYVfZksMgxbK/QcHf8KdfLr/c/+oLgXqS6lkjLO2C5vZp4YNiMnnLo
-         r9Vmg1u6clhy27ttUsFJpz2wZkmdlEpjlh1oAmcJziGF0BmSRFzwOeJhJzxQft2B3N8V
-         BRZog+7lLJFfVclTXS2lMI1yvGwOWCg2j6voVZ+yOQuCo92eSlz8FIPB93b+8+N6TUdy
-         p8Aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776193508; x=1776798308;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WcMZjp4BmNxvYubmFnzNdb/WRJMCiuI0z0hkQ+/23HE=;
-        b=cRxJjc7nT5P2yQNjrN1sR8QL70zUR3Sa51bt4m1rfOoxw5vqYjZ49NFY0RBlPxq5so
-         yNvb9wSAq5nkZ7MaDn2mMUGgXkX/LVk8cF6NRVxsG7+MvjfGNXjwirTre1a9d9VbU0Uj
-         9PCJzf1rhsOWXhpKbRjMO+r7+2RMbg41wuh4NYPDNbt9JGGa9ezW4Qtw2B+zJt5tbtpO
-         TuKGfdZ06+LbjXrD6lTGgrmZAAqLvrMn9SRgdXDW82xTkPIxpprWPAu2QmeC8gTyFH73
-         0HvUBlbNpQv0/LAaY6NVpVRdw3Ey3C/fQv0TqdyJ3+GXxREYgJnurqg7XQ4K4JcXav7X
-         g4Cw==
-X-Gm-Message-State: AOJu0YxehoH72ZOOFOuqwoluqUEKyefCn6An1om6025lhkZR29tbR6cS
-	3tfNGfkp+4N1Go+QGXbzk5ukFhbiIWYf78ajh8zeV0KIN8ev9aYC1SsMzuJAjipt
-X-Gm-Gg: AeBDietdgWxBo6vOMeEl8ijS3icrGVUYWxI5NMnQbTYCQkyhuKgsRQJJ80+Rm/HnLuz
-	7Z/HeeSKmsG+FInDzAZ4tUSBy07953X7Gf6N2VCLXyJS+o3+mUQnSpyH1tZAkhvl0ut9YbIOXAR
-	tNyDN9YWkOsfQ3TicNXUfGkiSBxOuIThU1QxyqU8RLdmcLLw29NQXZE8XV8W/dZkeKPyKjvTpwk
-	huLZFF7nnbH4EMka/D/mUNEmkANMG5Y82oYsd8WqfcxgMCwL95zS/Am3jgv8oc3LGdc9UMUULO9
-	SsxFR911376mL4b0JxBrqMft0tRc4K83Kujsnq76I/8OconeUAwjHzlkBUnbAIuvfPaEri3a7BF
-	jmb3NPv4RvM3LRFY1B9VX8HRhILgy+adByii5WakzJzWH2EOv7kEFALMEVfEFtxJDjK8VhWOk0J
-	PkLqRwn0AXnJ///TT25s7kd1twjXV9QF4nc0tsv1JT8TWFVb6zEPMJIJ5X1lbZ5PnO8l4Ss5nI3
-	k3MKnAHRvW9wN1/L/UWQtKjZsSu
-X-Received: by 2002:a05:6123:102:b0:566:357b:ef25 with SMTP id 71dfb90a1353d-56f3bd13359mr9559296e0c.15.1776193508498;
-        Tue, 14 Apr 2026 12:05:08 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56f861e1650sm270525e0c.12.2026.04.14.12.05.07
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2026 12:05:08 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="cGWfSbSW"
+Received: from github.com (hubbernetes-node-37d7efd.ash1-iad.github.net [10.56.158.30])
+	by smtp.github.com (Postfix) with ESMTPA id AC30E141054
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 12:13:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1776193983;
+	bh=GpT0VQFend6PS4vSB1P03aMFO4HuhGpwJPU/6nBv0lE=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=cGWfSbSWATHzWY87hbq72IDTey5w768zZ0lmmG239OGjBxO4vgZKJAMp2dZ/DzOrq
+	 n43/WNqBQ0N/GBs4eBa3/2AKGKACvuit6ZUb0e3S+Tp8Bb0dut/M5nmWi9fOvw2Dnn
+	 Lb6aRdG4x3yg/M4fmy1duRVuFMqpVOdGSzbvmqSk=
+Date: Tue, 14 Apr 2026 12:13:03 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2] bass: Fix crashing on BT_BASS_MOD_SRC
-Date: Tue, 14 Apr 2026 15:04:59 -0400
-Message-ID: <20260414190459.161947-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.53.0
+Message-ID: <bluez/bluez/push/refs/heads/master/d6171b-b3e1ac@github.com>
+Subject: [bluez/bluez] b3e1ac: workflow/ci: Add checks:write permission and
+ expli...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: b3e1acdf9cd084c265fe64116af6f96f96c70d37
+      https://github.com/bluez/bluez/commit/b3e1acdf9cd084c265fe64116af6f96f96c70d37
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-04-14 (Tue, 14 Apr 2026)
 
-If assistant attempt o modify source the code would attempt to iterate
-over all valid range of BIS indexes which may lead to the following
-trace since the delegator maybe freed in the process:
+  Changed paths:
+    M .github/workflows/ci.yml
 
- #0  queue_find (queue=<optimized out>, function=function@entry=0x58b8761109c0 <setup_match_bis>, match_data=match_data@entry=0x3) at src/shared/queue.c:230
- #1  0x000058b8761127fb in bass_update_bis_sync (bcast_src=<optimized out>, dg=<optimized out>) at profiles/audio/bass.c:1824
- #2  handle_mod_src_req (data=<optimized out>, params=<optimized out>, bcast_src=0x58b894661be0) at profiles/audio/bass.c:1862
- #3  cp_handler (bcast_src=0x58b894661be0, op=<optimized out>, params=<optimized out>, user_data=<optimized out>) at profiles/audio/bass.c:1910
- #4  0x000058b8761bc978 in bass_handle_mod_src_op (bass=<optimized out>, attrib=<optimized out>, opcode=<optimized out>, id=<optimized out>, iov=<optimized out>, att=<optimized out>)
-    at src/shared/bass.c:1069
+  Log Message:
+  -----------
+  workflow/ci: Add checks:write permission and explicit reopened trigger
 
-To fix the code will now just interate at existing setups checking if
-they match the BIS index then adding/removing the stream so it is no
-longer possible to free the delegator before all setups are processed.
----
- profiles/audio/bass.c | 24 ++++++++----------------
- 1 file changed, 8 insertions(+), 16 deletions(-)
+The CI action now creates individual GitHub Check Runs per test, which
+requires 'checks: write' permission on the GITHUB_TOKEN. Also make the
+pull_request trigger types explicit to include 'reopened', allowing CI
+to be retriggered by closing and reopening a PR.
 
-diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
-index bf0db0555963..1fd7704a77a2 100644
---- a/profiles/audio/bass.c
-+++ b/profiles/audio/bass.c
-@@ -1854,32 +1854,24 @@ static int handle_set_bcode_req(struct bt_bcast_src *bcast_src,
- 	return 0;
- }
- 
--static bool setup_match_bis(const void *data, const void *match_data)
--{
--	const struct bass_setup *setup = data;
--	const int bis =  PTR_TO_INT(match_data);
--
--	return setup->bis == bis;
--}
--
- static void bass_update_bis_sync(struct bass_delegator *dg,
- 				struct bt_bcast_src *bcast_src)
- {
--	for (int bis = 1; bis < ISO_MAX_NUM_BIS; bis++) {
--		struct bass_setup *setup = queue_find(dg->setups,
--				setup_match_bis, INT_TO_PTR(bis));
--		uint8_t state;
-+	const struct queue_entry *entry;
- 
--		if (!setup)
--			continue;
-+	/* Check if existing setups if BIS needs to be added/removed */
-+	for (entry = queue_get_entries(dg->setups); entry;
-+				entry = entry->next) {
-+		struct bass_setup *setup = entry->data;
-+		uint8_t state;
- 
- 		state = bt_bap_stream_get_state(setup->stream);
- 
--		if (!setup->stream && bt_bass_check_bis(bcast_src, bis))
-+		if (!setup->stream && bt_bass_check_bis(bcast_src, setup->bis))
- 			bass_add_bis(setup);
- 		else if (setup->stream &&
- 				state == BT_BAP_STREAM_STATE_STREAMING &&
--				!bt_bass_check_bis(bcast_src, bis))
-+				!bt_bass_check_bis(bcast_src, setup->bis))
- 			bass_remove_bis(setup);
- 	}
- }
--- 
-2.53.0
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
