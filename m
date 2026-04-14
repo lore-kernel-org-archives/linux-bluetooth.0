@@ -1,166 +1,251 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4D43D75CF
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 10:52:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F7920DE3
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 11:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776163959; cv=none; b=YxIQ/4aUR7cyHlIGqzNyU9BGBkVWnQObYrNMBmqd2OC2aQeHpf+QAYcp/u4RYLvY0iLtn6s7qUYbqERV26xApYbTd7Z4D4JV0VDfkoSI8kjxot/KJTwWj4AahwyclQQ876TahTOxlVkv+ICxiQ3mW5DS79LaQd+YGldDM/+oZzE=
+	t=1776165215; cv=none; b=CrhYaJKB0MwXNla1TNXZ5DqRRxE4pmJnvbMwVu7EEIdxKmcpr48T1e4txQ+sPUHBFVHaRCvTRC4PV0KH0KdQC3s45smkAGm/2aVXDpKF2yELCf2fQ6nuv6ccfLt3epquIzenQVAFeZaWbFtZwe49/EwXZCFelfU5vQJRslyGFHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776163959; c=relaxed/simple;
-	bh=vIwtEOJpzeFsp2fL7W/rXbGqInl0kOdZsvhfJvRr68w=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=jelDzQSAv+5l3WvXP1vyIA3SeTM9ht86iI/DKuMX6JY0eM5YPfmjo5PZD/3G4aHFQzBCRWvBNXEjfVRGopOFu+W01mHPy3dC1on5BqPX8JQH7GZYmTSkEN1dXzUdywwDj21Gbrc5JGRvcXxA/rSZDF+T6hLh87H7TWJCtJcfcG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xn5JdGTq; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1776165215; c=relaxed/simple;
+	bh=VYca3pua4u4WGCbodlQKKRH7yLTVRWcD0NswXtR3NFM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=QlqhLZ/GAe5AOma9sLOO8Qk6m6RR8CPYSZmdkewHXkouREdz0MV81RsjT1buDqPalN+mFPIhbx0j2uros7G5U+xEzkVkEdUw4oV66W/C+9Lx7l91jTeK106y3U+eMi3S1wO9PI9RhjtuxaTMdhDEUt9de5Mlg6TL1nALGTyuhuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wf0ApCTz; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xn5JdGTq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776163957; x=1807699957;
-  h=date:from:to:cc:subject:message-id;
-  bh=vIwtEOJpzeFsp2fL7W/rXbGqInl0kOdZsvhfJvRr68w=;
-  b=Xn5JdGTqzdsbtDum2UaHIPIqsVxnpRkMM2Xmay3/aILLZnwX5EBgb5mv
-   nSgYDDrboWpTDvu1ljQbK47Bc6Mbb5Su8R5+gOLOrk6x7YVi6v0uZrIJX
-   HJsUn3TeVGUe5alTCB7cXCG1jniPBO393zADCb2M8k1w1FXle474xlRhd
-   mmaF/mRKUceuTGE/f1PX0HrQZKL/sDqPeKR/659DShI8v0wwDKWqR/T1I
-   FSjxLEDoEXAFQv1g8SwVEkfFpx0s7/tRiTj+gKVuBVRanUGy499dfkTu9
-   ueRspNhJKf7NNDeLtAV7C7r1gxq/UdhD+E1j9de5HYfGn9F7vrh0p+hZb
-   A==;
-X-CSE-ConnectionGUID: zlBNR0Q2TNqQJWOKG45FsQ==
-X-CSE-MsgGUID: XyxfPGhbSnC61MFGC5P7uA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11758"; a="76148841"
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="76148841"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 03:52:36 -0700
-X-CSE-ConnectionGUID: VZsipf0zRwCJhoXfWVWH9Q==
-X-CSE-MsgGUID: osqZS0D4RZq0eS4ltqB3cw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="234993863"
-Received: from lkp-server01.sh.intel.com (HELO 7b0b59b3a0d4) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 14 Apr 2026 03:52:35 -0700
-Received: from kbuild by 7b0b59b3a0d4 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wCbNh-000000001Mr-0NVe;
-	Tue, 14 Apr 2026 10:52:33 +0000
-Date: Tue, 14 Apr 2026 18:51:40 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 912a499a7955a2773a20f33e495a5ce24d7279f0
-Message-ID: <202604141833.HLXiKMrQ-lkp@intel.com>
-User-Agent: s-nail v14.9.25
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wf0ApCTz"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2b242b9359aso50328585ad.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 04:13:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776165214; x=1776770014; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jYQgMhZcNRLWOdYKuAP9wzRUiz3Mx5fd01yZgXYYTBY=;
+        b=wf0ApCTzfSw+sYtDZ7jj3aZ2cpdF8R/sWkGmtfkSP1BlfwUX0J3gi7yieB1dOm0ST7
+         ExKa+K4pSovsXr+7jQ18Y8WBNi0OO7kZwDGqq8mGwHCcEpr/d1r4RIgxG+Pkv49wsJPT
+         WKbBmd/TT6V2IbHmHM/KDlfEaB4o9hEAgzjBa6F+LCCzJQs8ZgkCovppqVuSu8c0IMPs
+         zkRVWC3pu4z6Tpuzm7nq7HLWFw6AfIgvvSYAFq6K9dhUZt0RPkYeXroMsTcjGuyWEXop
+         h9EylIjvgStQ7vy+KHwPb29l8ybY8ICzJRv63UufDAGbZAiyhfzwc6DYqe6vzgZCds7r
+         Q+Lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776165214; x=1776770014;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jYQgMhZcNRLWOdYKuAP9wzRUiz3Mx5fd01yZgXYYTBY=;
+        b=HJUDnlvZowfReBUJ4knrN77ZaVI/2IztnbhmxdsEOsQNR3g/nEWHtuCzEVYpLWZwqK
+         y//KAZP6hu/6SGR/lCyhR85j+NYZUHE01ATFvHQl2WRf6mDWTLYeiFdkFvAmcdVXDWxT
+         J2p89y2y8pJyEBPReOy4qrexLmBNRkgqgshR/DYBv7IxcZilRYPCRDCYcqG3z3pzk3UD
+         EdWQ1THU2a8/Gg5o0uyAIzLzEfmw4daYDouetcSjDk5cY8S45gUgU7qHnmtrBDCRHuLQ
+         OQOmVZUtNG/04iKX0dBnB1YcqZj6l8CvQjg+DFlCp8A0YGn52lN8Ox9s+wxI9KYfhNcR
+         r4Pw==
+X-Gm-Message-State: AOJu0YwFVnqYZlCn21ncOaxq7Os1m3ad/i11fAyDHKR1xDMa7LyXM806
+	ajOSYfuwzkkHIZHSQgfhCIzUIikg5Sbs9ayQ9XAv+2k+L2ae7GjDuhBomdy5PouHJrrW8ndzPis
+	8IYElf3S4HTKl6vaXembinSnxmJYwU0SxSLAXpKX7LMU/SKLaPsAdeUNvnqxeCQtwhcDBJkMI7K
+	/8OKZ6KL+DWgVjSgIUkUkZSsr4ddSZOnJHD3u595fr61tdMuMeMVTosQ==
+X-Received: from plbbj8.prod.google.com ([2002:a17:902:8508:b0:2b2:4d5c:3eec])
+ (user=apusaka job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:289:b0:2b4:5e65:5d0e
+ with SMTP id d9443c01a7336-2b45e655efamr82380295ad.10.1776165213123; Tue, 14
+ Apr 2026 04:13:33 -0700 (PDT)
+Date: Tue, 14 Apr 2026 19:11:10 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.rc1.513.gad8abe7a5a-goog
+Message-ID: <20260414111307.3725821-1-apusaka@google.com>
+Subject: [PATCH Bluez 1/2] monitor: define manufacturer company IDs
+From: Archie Pusaka <apusaka@google.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>, 
+	Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 912a499a7955a2773a20f33e495a5ce24d7279f0  Bluetooth: btintel_pcie: Support Product level reset
+From: Archie Pusaka <apusaka@chromium.org>
 
-elapsed time: 873m
+Define company IDs to make it more readable.
+Also remove an unnecessary if that could cause uninitialized variable
+warning.
+---
 
-configs tested: 89
-configs skipped: 1
+ monitor/packet.c | 51 +++++++++++++++++++++++++++---------------------
+ 1 file changed, 29 insertions(+), 22 deletions(-)
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+diff --git a/monitor/packet.c b/monitor/packet.c
+index ff28dfbd4..30cab1a2f 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -100,14 +100,21 @@
+ 
+ #define COLOR_PHY_PACKET		COLOR_BLUE
+ 
+-#define UNKNOWN_MANUFACTURER 0xffff
++#define COMPANY_ID_INTEL	0x0002
++#define COMPANY_ID_BROADCOM	0x000F
++#define COMPANY_ID_QUALCOMM	0x001D
++#define COMPANY_ID_MEDIATEK	0x0046
++#define COMPANY_ID_APPLE	0x004C
++#define COMPANY_ID_REALTEK	0x005D
++#define COMPANY_ID_LINUX	0x05F1
++#define COMPANY_ID_UNKNOWN	0xFFFF
+ 
+ static time_t time_offset = ((time_t) -1);
+ static int priority_level = BTSNOOP_PRIORITY_DEBUG;
+ static unsigned long filter_mask = 0;
+ static bool index_filter = false;
+ static uint16_t index_current = 0;
+-static uint16_t fallback_manufacturer = UNKNOWN_MANUFACTURER;
++static uint16_t fallback_manufacturer = COMPANY_ID_UNKNOWN;
+ 
+ #define CTRL_RAW  0x0000
+ #define CTRL_USER 0x0001
+@@ -3487,7 +3494,7 @@ static void print_manufacturer_data(const void *data, uint8_t data_len)
+ 	packet_print_company("Company", company);
+ 
+ 	switch (company) {
+-	case 76:
++	case COMPANY_ID_APPLE:
+ 	case 19456:
+ 		print_manufacturer_apple(data + 2, data_len - 2);
+ 		break;
+@@ -4446,7 +4453,7 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
+ 			index_list[index].manufacturer = manufacturer;
+ 
+ 			switch (manufacturer) {
+-			case 2:
++			case COMPANY_ID_INTEL:
+ 				/*
+ 				 * Intel controllers that support the
+ 				 * Microsoft vendor extension are using
+@@ -4454,7 +4461,7 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
+ 				 */
+ 				index_list[index].msft_opcode = 0xFC1E;
+ 				break;
+-			case 29:
++			case COMPANY_ID_QUALCOMM:
+ 				/*
+ 				 * Qualcomm controllers that support the
+ 				 * Microsoft vendor extensions are using
+@@ -4462,7 +4469,7 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
+ 				 */
+ 				index_list[index].msft_opcode = 0xFD70;
+ 				break;
+-			case 70:
++			case COMPANY_ID_MEDIATEK:
+ 				/*
+ 				 * Mediatek controllers that support the
+ 				 * Microsoft vendor extensions are using
+@@ -4470,7 +4477,7 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
+ 				 */
+ 				index_list[index].msft_opcode = 0xFD30;
+ 				break;
+-			case 93:
++			case COMPANY_ID_REALTEK:
+ 				/*
+ 				 * Realtek controllers that support the
+ 				 * Microsoft vendor extensions are using
+@@ -4478,7 +4485,7 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
+ 				 */
+ 				index_list[index].msft_opcode = 0xFCF0;
+ 				break;
+-			case 1521:
++			case COMPANY_ID_LINUX:
+ 				/*
+ 				 * Emulator controllers use Linux Foundation as
+ 				 * manufacturer and support the
+@@ -6528,7 +6535,7 @@ static void read_local_version_rsp(uint16_t index, const void *data,
+ 	print_manufacturer(rsp->manufacturer);
+ 
+ 	switch (manufacturer) {
+-	case 15:
++	case COMPANY_ID_BROADCOM:
+ 		print_manufacturer_broadcom(rsp->lmp_subver, rsp->hci_rev);
+ 		break;
+ 	}
+@@ -10900,11 +10907,11 @@ static const char *current_vendor_str(uint16_t ocf)
+ 		return "Microsoft";
+ 
+ 	switch (manufacturer) {
+-	case 2:
++	case COMPANY_ID_INTEL:
+ 		return "Intel";
+-	case 15:
++	case COMPANY_ID_BROADCOM:
+ 		return "Broadcom";
+-	case 93:
++	case COMPANY_ID_REALTEK:
+ 		return "Realtek";
+ 	}
+ 
+@@ -10928,9 +10935,9 @@ static const struct vendor_ocf *current_vendor_ocf(uint16_t ocf)
+ 		return msft_vendor_ocf();
+ 
+ 	switch (manufacturer) {
+-	case 2:
++	case COMPANY_ID_INTEL:
+ 		return intel_vendor_ocf(ocf);
+-	case 15:
++	case COMPANY_ID_BROADCOM:
+ 		return broadcom_vendor_ocf(ocf);
+ 	}
+ 
+@@ -10952,9 +10959,9 @@ static const struct vendor_evt *current_vendor_evt(const void *data,
+ 		manufacturer = fallback_manufacturer;
+ 
+ 	switch (manufacturer) {
+-	case 2:
++	case COMPANY_ID_INTEL:
+ 		return intel_vendor_evt(data, consumed_size);
+-	case 15:
++	case COMPANY_ID_BROADCOM:
+ 		return broadcom_vendor_evt(evt);
+ 	}
+ 
+@@ -10971,11 +10978,11 @@ static const char *current_vendor_evt_str(void)
+ 		manufacturer = fallback_manufacturer;
+ 
+ 	switch (manufacturer) {
+-	case 2:
++	case COMPANY_ID_INTEL:
+ 		return "Intel";
+-	case 15:
++	case COMPANY_ID_BROADCOM:
+ 		return "Broadcom";
+-	case 93:
++	case COMPANY_ID_REALTEK:
+ 		return "Realtek";
+ 	}
+ 
+@@ -11116,7 +11123,7 @@ static void remote_version_complete_evt(struct timeval *tv, uint16_t index,
+ 	print_manufacturer(evt->manufacturer);
+ 
+ 	switch (le16_to_cpu(evt->manufacturer)) {
+-	case 15:
++	case COMPANY_ID_BROADCOM:
+ 		print_manufacturer_broadcom(evt->lmp_subver, 0xffff);
+ 		break;
+ 	}
+@@ -13808,7 +13815,7 @@ void packet_vendor_diag(struct timeval *tv, uint16_t index,
+ 					"Vendor Diagnostic", NULL, extra_str);
+ 
+ 	switch (manufacturer) {
+-	case 15:
++	case COMPANY_ID_BROADCOM:
+ 		broadcom_lm_diag(data, size);
+ 		break;
+ 	default:
+@@ -16161,7 +16168,7 @@ static void mgmt_print_system_config_tlv(void *data, void *user_data)
+ 			value = get_u8(entry->value);
+ 		else if (entry->length == 2)
+ 			value = get_le16(entry->value);
+-		else if (entry->length == 4)
++		else
+ 			value = get_le32(entry->value);
+ 		print_field("%s: %u", desc, value);
+ 	} else {
+-- 
+2.54.0.rc1.513.gad8abe7a5a-goog
 
-tested configs:
-alpha                   allnoconfig    gcc-15.2.0
-alpha                  allyesconfig    gcc-15.2.0
-arc                    allmodconfig    gcc-15.2.0
-arc                     allnoconfig    gcc-15.2.0
-arc                    allyesconfig    gcc-15.2.0
-arm                     allnoconfig    clang-23
-arm                     allnoconfig    gcc-15.2.0
-arm                    allyesconfig    gcc-15.2.0
-arm         randconfig-002-20260414    gcc-15.2.0
-arm64                  allmodconfig    clang-19
-arm64                   allnoconfig    gcc-15.2.0
-csky                   allmodconfig    gcc-15.2.0
-csky                    allnoconfig    gcc-15.2.0
-hexagon                allmodconfig    clang-17
-hexagon                 allnoconfig    clang-23
-hexagon                 allnoconfig    gcc-15.2.0
-hexagon     randconfig-001-20260414    clang-23
-hexagon     randconfig-002-20260414    clang-16
-i386                   allmodconfig    gcc-14
-i386                    allnoconfig    gcc-14
-i386                    allnoconfig    gcc-15.2.0
-i386                   allyesconfig    gcc-14
-i386        randconfig-014-20260414    gcc-14
-loongarch              allmodconfig    clang-19
-loongarch               allnoconfig    clang-23
-loongarch               allnoconfig    gcc-15.2.0
-loongarch   randconfig-001-20260414    clang-18
-loongarch   randconfig-002-20260414    clang-23
-m68k                   allmodconfig    gcc-15.2.0
-m68k                    allnoconfig    gcc-15.2.0
-m68k                   allyesconfig    gcc-15.2.0
-microblaze              allnoconfig    gcc-15.2.0
-microblaze             allyesconfig    gcc-15.2.0
-mips                   allmodconfig    gcc-15.2.0
-mips                    allnoconfig    gcc-15.2.0
-mips                   allyesconfig    gcc-15.2.0
-nios2                  allmodconfig    gcc-11.5.0
-nios2                   allnoconfig    clang-23
-nios2                   allnoconfig    gcc-11.5.0
-nios2       randconfig-001-20260414    gcc-11.5.0
-nios2       randconfig-002-20260414    gcc-11.5.0
-openrisc               allmodconfig    gcc-15.2.0
-openrisc                allnoconfig    clang-23
-openrisc                allnoconfig    gcc-15.2.0
-openrisc                  defconfig    gcc-15.2.0
-parisc                 allmodconfig    gcc-15.2.0
-parisc                  allnoconfig    clang-23
-parisc                  allnoconfig    gcc-15.2.0
-parisc                 allyesconfig    gcc-15.2.0
-parisc                    defconfig    gcc-15.2.0
-powerpc                allmodconfig    gcc-15.2.0
-powerpc                 allnoconfig    clang-23
-powerpc                 allnoconfig    gcc-15.2.0
-riscv                  allmodconfig    clang-23
-riscv                   allnoconfig    clang-23
-riscv                   allnoconfig    gcc-15.2.0
-riscv                  allyesconfig    clang-16
-riscv       randconfig-001-20260414    clang-23
-riscv       randconfig-002-20260414    gcc-8.5.0
-s390                   allmodconfig    clang-18
-s390                    allnoconfig    clang-23
-s390                   allyesconfig    gcc-15.2.0
-s390        randconfig-001-20260414    clang-23
-s390        randconfig-002-20260414    clang-23
-sh                     allmodconfig    gcc-15.2.0
-sh                      allnoconfig    clang-23
-sh                      allnoconfig    gcc-15.2.0
-sh                     allyesconfig    gcc-15.2.0
-sh          randconfig-001-20260414    gcc-15.2.0
-sh          randconfig-002-20260414    gcc-15.2.0
-sparc                   allnoconfig    clang-23
-sparc                   allnoconfig    gcc-15.2.0
-sparc64                allmodconfig    clang-23
-um                     allmodconfig    clang-19
-um                      allnoconfig    clang-23
-um                     allyesconfig    gcc-14
-x86_64                 allmodconfig    clang-20
-x86_64                  allnoconfig    clang-20
-x86_64                  allnoconfig    clang-23
-x86_64                 allyesconfig    clang-20
-x86_64      randconfig-001-20260414    gcc-14
-x86_64      randconfig-003-20260414    gcc-14
-x86_64      randconfig-004-20260414    clang-20
-x86_64      randconfig-005-20260414    clang-20
-x86_64                rhel-9.4-rust    clang-20
-xtensa                  allnoconfig    clang-23
-xtensa                  allnoconfig    gcc-15.2.0
-xtensa                 allyesconfig    gcc-15.2.0
-xtensa        cadence_csp_defconfig    gcc-15.2.0
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
