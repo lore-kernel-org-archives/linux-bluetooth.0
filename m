@@ -1,127 +1,105 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4574F394797;
-	Tue, 14 Apr 2026 08:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE4D2DF155
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 09:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776155313; cv=none; b=G/Z5loJUJESfuxUTbwJLQYpytYgyiej3OEkFYEGKiXzElMaWTkwKJn30okYaTvjuRgBN/Q7rdpeWF/E47yPtw1YprlfNo+AYtnaG+S19Te+B1kquEbwjyAhd0TNqUwSUYgzW+EiYaMOnMMghFt/Hde2qPw46hfz09VkqK4QgBcM=
+	t=1776157236; cv=none; b=MnJ4gMVPHroGfe0noMYmIq3e+ZL/bsdbVVSAYZA11oJwdMUWo8YPCe3F54mmtCMvW42y5q8w2rsZyrxtWwx3xQZ/NoKE7bSL1XT9RgVeyhD795lQMmZScKVNixPkjedFTWIS0zj5cShTdAjvQVwpAtX2LJ4TJsreKSbG+7yadCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776155313; c=relaxed/simple;
-	bh=E8vQKyt9MpxoC9XzgyedL1hL744D9xnu3AxzYNuYnlk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gK7wQzdefrd/JnpAIqaPnjpkWj5rIpjMciOcTWIN5rAoixkwaAVC0q2MhXmRpmmg2Zy1s/9oGM47msC0aGkMSE+RHtwf6pkJaQd1g1mwBQTlzeLxW8ZSvNAu7LxiwnTwICqbQqQ3gVYv+FnwKUnicWKC2Ggkqjuly0h88urhEbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nrqrQBvv; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nrqrQBvv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776155311; x=1807691311;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=E8vQKyt9MpxoC9XzgyedL1hL744D9xnu3AxzYNuYnlk=;
-  b=nrqrQBvvTiXBx7uJRCIKr+aEfVCDIVpV7pbqWVDzXrJMc8ky3+iVLAkS
-   qEhhSVpI/KpE+TAPuD/Bea4SzphrKpJBgpHDY5LMkHEW4mT4SZ0wkdpmb
-   bJBzZEUb4KaRYYx6S9nmyCptWYjuOImXE9MEiXnfC/WX/5DbXqsV3Yzp8
-   jxvL2Y0mHVYzRDmS7eFl3tgBZ9Zs7e5jn4lcmIwl5jE5wPJ/YZ/hP3B0X
-   4HofToBWdlbuiDkKG/mdoUiFgKmfjcwfn/ujWTZcLezIaKKnS7cBhu3cG
-   8mFw46FyHoVgXHwHStOza2HcoDTGmLSAv1u1ODFSSwZ0ti5V3N3Oj8vFB
-   A==;
-X-CSE-ConnectionGUID: htvNGI4VRhWHr7IRHmz0vQ==
-X-CSE-MsgGUID: 2Iqbb7S3QpqjjhmNBDmj2Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11758"; a="87728045"
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="87728045"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 01:28:30 -0700
-X-CSE-ConnectionGUID: +bVRXWnVTl+UbC1B5PjMKw==
-X-CSE-MsgGUID: 6AC0PQEOQUaj+1BKtE2xJg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="230255689"
-Received: from pgcooper-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.106])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 01:28:23 -0700
-Date: Tue, 14 Apr 2026 11:28:20 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Chen-Yu Tsai <wenst@chromium.org>
-Cc: Manivannan Sadhasivam <mani@kernel.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
-	Rob Herring <robh@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Hans de Goede <hansg@kernel.org>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Mark Pearson <mpearson-lenovo@squebb.ca>,
-	"Derek J. Clark" <derekjohn.clark@gmail.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org,
-	Stephan Gerhold <stephan.gerhold@linaro.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-	linux-acpi@vger.kernel.org,
-	Hans de Goede <johannes.goede@oss.qualcomm.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Subject: Re: [PATCH v7 0/8] Add support for handling PCIe M.2 Key E
- connectors in devicetree
-Message-ID: <ad36pIu-0dutL7Nk@ashevche-desk.local>
-References: <20260326-pci-m2-e-v7-0-43324a7866e6@oss.qualcomm.com>
- <20260413075459.GA2626902@google.com>
- <fpcs4p62f35a5qyqwgm5ysa73stbysxcr62tkmmkrrcvsuf4t4@4ivukyqjey57>
- <eeytuhqpgdz4do4tgtbmfntub2femtyq7bij7svhodpyjwaylx@j3gmvq2a2zqc>
- <CAGXv+5E=tujhtZjwi6Qm7hk3Ks74UzTQHWq82NiTEw1+vYod5g@mail.gmail.com>
+	s=arc-20240116; t=1776157236; c=relaxed/simple;
+	bh=7BzH4l41ivGVwJZyLUtzjEKcBbitAg70COzuLd4I7K4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gjlP11dl3aPeS4Q8+zxnd3sD8nlCcpm77M6BVutpTLXifxyUZBL+ngseV3HQZU5d9uPUdpIfIRBxPXi0BKWWcVx2DTLaY32OVzSPIDIqG9bbuNf0vAEiib1XXqMKh+ak1YU9c3oljqax/eDglM0N+CCjWPPJxsiU9k1iyoTPU6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gompa.dev; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gompa.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-40ee9b945d5so3923448fac.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 02:00:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776157234; x=1776762034;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7BzH4l41ivGVwJZyLUtzjEKcBbitAg70COzuLd4I7K4=;
+        b=XVhpLbABS1DBygwmUeVb0WtY6Eq2hybmmspkHUXYaQVyVu3xFa9sDnazT8r9oNKM4O
+         tkq7PtUKSbc2QaXk5C0MwTsGQEIhaifbp/hbgib98zdp5K8kzrScCCtVgd5Bufwr9SFr
+         ifyuWJKoEMTgslNB0+IlYhB8qgywI12eQ9/cv4O0Pl3e52hI9NlwxwtzYvNaaye+BFUa
+         Wd8JA/7nzek3aRhElEQwYFYZnC0Ts9tIdHupF1cvHOb66G8YAZWWSShpowHzMlDHVl2w
+         LSsaYUVNWu+lj3/FCFMKoYq6TSsDwRIV1cQTX5Xl+S1bIy0eF5S/hmk0GK1CjhUi2Qpr
+         sNzQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+AcMZi+0UpCYOjKBAy4QL/HPWBvu017fZONLEsJrUG8pdgllsJgntCDCsXXBDi7lYNH/nEyDgCpT0QF6lfjbc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5/4ysBhAvEycqvj3WYhdxQD0SAGY8P7shqr83bKEqXpAihOlN
+	FSHGX63Ib2BOM5RhUsnNZ3Y7u2waJJUY8l+G9sqIp1VvtRETmnahFVOm3QwFKwYC
+X-Gm-Gg: AeBDievWwmx6Zf9MxoyFPr0r/faDjpPiXKrEKzFLmj+gSZs2DI1iMekBONG/MZRVbEN
+	KYkanfPxSdOvgrye4zPX42YrZWacnykvR9QaNniMweJQcCxtU/q0bLfwH65ueZmgw7dH0rOqcII
+	G/dBSdr5EX75wyOmjJmz2IaIYty4hliwIr4lAIdCScUW+Zqop0HpSn0NNUCOWH60Qzc+5SoCnGD
+	4Qkmjs0QrI0oks+2wohmo4S4ifsCkLvjO/kUTlz/EiUQsUQ8sMfkEKoFXmqz5saG5cm0WZUX0M+
+	LnpHp8nvn88AlVkPx8HgJqybnEHHbliaGMQzHBo/b/zyY4YDDh08L8/IlFBWevIb67LPHJI6z2V
+	GRsINtIkiy7xF4ZiGWv/rEi0+cJnGxwLcAiJEaj5GZu8IHVX5bJ+M9oHMXkOSdphd/ZinJ3ICZW
+	0ZZjCz7HjRTP5F6E83mFqH4zggSDQpZSCrhfCmIBZqSmlRTEZYNA1oQd78zHB3wnvmHpAl2dRn1
+	58f+XKZQztlVX/uB26A4L0Q5EhDxMSMXBNcO33O0FdNG+eWN9bDclZbXN01T0VN32xreWOQNg==
+X-Received: by 2002:a05:6870:8289:b0:3e7:fa5f:7269 with SMTP id 586e51a60fabf-423e0e6f00amr9085147fac.2.1776157233559;
+        Tue, 14 Apr 2026 02:00:33 -0700 (PDT)
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com. [209.85.210.45])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-423ddb80ccesm10338802fac.13.2026.04.14.02.00.32
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Apr 2026 02:00:32 -0700 (PDT)
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7dc3d28e2f3so2495940a34.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 02:00:32 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ8zLKqoStQbAKV5brhkgjWkBYIAN8pw515f7Z0cmkLTavkQSrIwvM0+4V3XgsUVTFN/bKbix01i0+wwSjz4DXY=@vger.kernel.org
+X-Received: by 2002:a05:6830:6d44:b0:7db:df4e:f937 with SMTP id
+ 46e09a7af769-7dc27ca49a6mr10107828a34.7.1776157232558; Tue, 14 Apr 2026
+ 02:00:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAGXv+5E=tujhtZjwi6Qm7hk3Ks74UzTQHWq82NiTEw1+vYod5g@mail.gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+References: <20260407-brcm-prio-v2-1-3f745edf49af@gmail.com>
+In-Reply-To: <20260407-brcm-prio-v2-1-3f745edf49af@gmail.com>
+From: Neal Gompa <neal@gompa.dev>
+Date: Tue, 14 Apr 2026 04:59:54 -0400
+X-Gmail-Original-Message-ID: <CAEg-Je-dvJA4yLJxwiJVg2S585Dihg4c7FTyf0Gv8iwahU0ifg@mail.gmail.com>
+X-Gm-Features: AQROBzBGriz3oUw4obwCyMl6uueqnkEVGw3CzezDOXXcUajBdgbMcTOpUgPlHRE
+Message-ID: <CAEg-Je-dvJA4yLJxwiJVg2S585Dihg4c7FTyf0Gv8iwahU0ifg@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Add Broadcom channel priority commands
+To: fnkl.kernel@gmail.com
+Cc: Sven Peter <sven@kernel.org>, Janne Grunau <j@jannau.net>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, asahi@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 14, 2026 at 01:03:19PM +0800, Chen-Yu Tsai wrote:
-> On Tue, Apr 14, 2026 at 12:08 AM Manivannan Sadhasivam <mani@kernel.org> wrote:
-> > On Mon, Apr 13, 2026 at 07:33:12PM +0530, Manivannan Sadhasivam wrote:
-> > > On Mon, Apr 13, 2026 at 03:54:59PM +0800, Chen-Yu Tsai wrote:
-> > > > On Thu, Mar 26, 2026 at 01:36:28PM +0530, Manivannan Sadhasivam wrote:
+On Tue, Apr 7, 2026 at 1:46=E2=80=AFPM Sasha Finkelstein via B4 Relay
+<devnull+fnkl.kernel.gmail.com@kernel.org> wrote:
+>
+> From: Sasha Finkelstein <fnkl.kernel@gmail.com>
+>
+> Certain Broadcom bluetooth chips (bcm4377/bcm4378/bcm438) need ACL
+> streams carrying audio to be set as "high priority" using a vendor
+> specific command to prevent 10-ish second-long dropouts whenever
+> something does a device scan. This patch sends the command when the
+> socket priority is set to TC_PRIO_INTERACTIVE, as BlueZ does for audio.
+>
+> Signed-off-by: Sasha Finkelstein <fnkl.kernel@gmail.com>
+> ---
+> Changes in v2:
+> - new ioctl got nack-ed, so let's use sk_priority as the trigger
+> - Link to v1: https://lore.kernel.org/r/20260407-brcm-prio-v1-1-f38b17376=
+640@gmail.com
+> ---
 
-...
+Thank you so much for this!
 
-> > > > - Given that this connector actually represents two devices, how do I
-> > > >   say I want the BT part to be a wakeup source, but not the WiFi part?
-> > > >   Does wakeup-source even work at this point?
-> > >
-> > > You can't use the DT property since the devices are not described in DT
-> > > statically. But you can still use the per-device 'wakeup' sysfs knob to enable
-> > > wakeup.
-> 
-> I see. I think not being able to specify generic properties for the devices
-> on the connector is going to be a bit problematic.
-
-This is nature of the open-connectors, especially on the busses that are
-hotpluggable, like PCIe. We never know what is connected there _ahead_.
-
-In other words you can't describe in DT something that may not exist.
-
-> requires specifying a bounce buffer / SWIOTLB for the PCIe WiFi card. The
-> PCIe controller does not have an IOMMU behind it.
-
--- 
-With Best Regards,
-Andy Shevchenko
+Reviewed-by: Neal Gompa <neal@gompa.dev>
 
 
+--=20
+=E7=9C=9F=E5=AE=9F=E3=81=AF=E3=81=84=E3=81=A4=E3=82=82=E4=B8=80=E3=81=A4=EF=
+=BC=81/ Always, there's only one truth!
