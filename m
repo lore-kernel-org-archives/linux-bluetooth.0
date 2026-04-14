@@ -1,76 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCCD731ED93
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 16:32:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1648F264619
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 16:43:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776184320; cv=none; b=diQx1fusN7JrPcak7YuwJ8TVdOCBkXD2pi+Pr0BXnAuQjSTallpCqWb6QlCcBmm+SeIRN8ceKWUgfWHr37AiajryCXO8INyXcQHGSexy57AhjxU9xJm1YadtXsvxexiTalPO/ayT6kBMCWXNv4jSU0DduxrR9i4vh0+6T7WIPbw=
+	t=1776184983; cv=none; b=Oy8me+YU+OLDhPmbY3B/fcNaOcJDoo82piOEYiSMHSjSSW8OVdt+cgfM2PMJyzXZLxZyYz+MgQJsLrxWmKEPnYDsSEmpMePdj8z3A7UnsTWXXotV24AY23F1guHVwIfcJsk22zgjqQgJ86BfyQ1cBm3NK4K0iG94gUCaJJ0PErY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776184320; c=relaxed/simple;
-	bh=NYEQKYKEO94+ppJ5k4D+CDFj6m63xnfDdZC4sM5EDx4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Er9qd/WWnD/yD7lEy3uyFn8QkQgU14SV59hdkwPase3mON5wtVOuxWGhw9r9H0eXZgYGezU857phrNOKZeLtnMf75aLYlLXVBpFyUEOCGtM9bPoTO6pCiAeVSPtRNjtDSgJxwDeQU7d877bFzgdki3ziQ7tJN9JuiRMVZJ3ZgJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kQ1LOSmz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776184983; c=relaxed/simple;
+	bh=BXTgxj1yx/dBxzcXm+ph2rNVaV72IHQjLn9u+NEIvP4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=E64VELFdrlWQRkZkjUiaf3DKQpSXNaJZcXKCaQyx4fk7yfjP/FamqS0yWwsw2UzPshr5I2gB3JD56w4Bv+jax+ifemOYpOaP66h9F5E7mp2lEo/t2gV7Eng2t2dIfChFSqENVt28r05bldga0OUwnKn+eJKyEizR7jdlWSJ0cmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=gc8KW3k+; arc=none smtp.client-ip=192.30.252.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kQ1LOSmz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58610C19425;
-	Tue, 14 Apr 2026 16:32:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776184320;
-	bh=NYEQKYKEO94+ppJ5k4D+CDFj6m63xnfDdZC4sM5EDx4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kQ1LOSmzDVetCMjTOl7mymwkF2JLHTrwYy3M82CtS3FTtS2J/L4EQCgBNtAa563a5
-	 gNn3xQ6MijprGj11JgAdrdmFNpzwOq6w/9Tmrik0z8e92kwgJkolY+v8wLGj0fW39R
-	 hWnuCUSVP9nFY5WDdHzaVLn1FVGQLkL1rHYSSufbV1hh829gXGo859AcwOYhi0jbDo
-	 ntQzKkAPjl19uoBPbLTKTLq2K1+qlnZqURdEI8sWyuIx2LT9iUy7MqvGVeG7pbux1V
-	 h0T5UTr7ObiQMEIqfNHNl1jjhqLPxv1xMcpq8vSi0W9qX7Ga462pw7gZtIDDnd85+n
-	 Pg765nuqQJRDQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9F4D3809A07;
-	Tue, 14 Apr 2026 16:31:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="gc8KW3k+"
+Received: from github.com (hubbernetes-node-1e77013.va3-iad.github.net [10.48.209.43])
+	by smtp.github.com (Postfix) with ESMTPA id 6352E9200F6
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Apr 2026 09:43:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1776184981;
+	bh=qdNlnwPK9RGFwSV+p5DJbDIy1zFlxLkx53LRwGzNIt4=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=gc8KW3k+Li+YR589DDZkcgexPNmYqaWxTZvS/fBjQykye/NnP7P+Ql1WOKYRxAu46
+	 5hG2RW1cIIiVYreXyo01znokFQWANYJ1KSmtXzenNWtnmW8v4/qvsraRjlhOGmPdQe
+	 1+edN4Iu6LN02aiv+IosaAoeaBIlimb6GaXXXa5Q=
+Date: Tue, 14 Apr 2026 09:43:01 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/1ab128-d6171b@github.com>
+Subject: [bluez/bluez] 5797a6: bass: Fix crashing on BT_BASS_MOD_SRC
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5] Bluetooth: hci_event: Fix OOB read and infinite loop
- in
- hci_le_create_big_complete_evt
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <177618429045.1367635.11222923610101186397.git-patchwork-notify@kernel.org>
-Date: Tue, 14 Apr 2026 16:31:30 +0000
-References: <20260414144641.1168084-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260414144641.1168084-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 5797a61809ae0a214389b12c99b614ddd522f38e
+      https://github.com/bluez/bluez/commit/5797a61809ae0a214389b12c99b614ddd522f38e
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-04-14 (Tue, 14 Apr 2026)
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M profiles/audio/bass.c
 
-On Tue, 14 Apr 2026 10:46:41 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> hci_le_create_big_complete_evt() iterates over BT_BOUND connections for
-> a BIG handle using a while loop, accessing ev->bis_handle[i++] on each
-> iteration.  However, there is no check that i stays within ev->num_bis
-> before the array access.
-> 
-> [...]
+  Log Message:
+  -----------
+  bass: Fix crashing on BT_BASS_MOD_SRC
 
-Here is the summary with links:
-  - [v5] Bluetooth: hci_event: Fix OOB read and infinite loop in hci_le_create_big_complete_evt
-    https://git.kernel.org/bluetooth/bluetooth-next/c/862fd776a9f3
+If assistant attempt o modify source the code would attempt to iterate
+over all valid range of BIS indexes which may lead to the following
+trace since the delegator maybe freed in the process:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+ #0  queue_find (queue=<optimized out>, function=function@entry=0x58b8761109c0 <setup_match_bis>, match_data=match_data@entry=0x3) at src/shared/queue.c:230
+ #1  0x000058b8761127fb in bass_update_bis_sync (bcast_src=<optimized out>, dg=<optimized out>) at profiles/audio/bass.c:1824
+ #2  handle_mod_src_req (data=<optimized out>, params=<optimized out>, bcast_src=0x58b894661be0) at profiles/audio/bass.c:1862
+ #3  cp_handler (bcast_src=0x58b894661be0, op=<optimized out>, params=<optimized out>, user_data=<optimized out>) at profiles/audio/bass.c:1910
+ #4  0x000058b8761bc978 in bass_handle_mod_src_op (bass=<optimized out>, attrib=<optimized out>, opcode=<optimized out>, id=<optimized out>, iov=<optimized out>, att=<optimized out>)
+    at src/shared/bass.c:1069
+
+To fix the code will now just interate at existing setups checking if
+they match the BIS index then adding/removing the stream so it is no
+longer possible to free the delegator before all setups are processed.
 
 
+  Commit: d6171b00a2ae342c2b8266b6ee3350133ec55f20
+      https://github.com/bluez/bluez/commit/d6171b00a2ae342c2b8266b6ee3350133ec55f20
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-04-14 (Tue, 14 Apr 2026)
+
+  Changed paths:
+    M .github/workflows/ci.yml
+
+  Log Message:
+  -----------
+  workflow/ci: Add checks:write permission and explicit reopened trigger
+
+The CI action now creates individual GitHub Check Runs per test, which
+requires 'checks: write' permission on the GITHUB_TOKEN. Also make the
+pull_request trigger types explicit to include 'reopened', allowing CI
+to be retriggered by closing and reopening a PR.
+
+
+Compare: https://github.com/bluez/bluez/compare/1ab128f6d749...d6171b00a2ae
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
