@@ -1,52 +1,52 @@
-Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
+Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE40313522
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 20:52:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166E731AA87
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 20:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776286344; cv=none; b=KajDQdyDGB2LzT8QMY9pE+OfW0DkI+MhGEUVPnbNYLTMha1oFpXYHUkMQQgdmexZnMNlDTtLHIPZszkQDwT4iK0d3cNPMBtvh913Gu+m09rlpXbAE8nbk0LAJy3xeTWRgT4tDqoq3RbVKCcGmVI0AhH4UeRy/U0xha0L7XEjE38=
+	t=1776286450; cv=none; b=lttiSaJvixsXXCIv7TWr0ByNlGclkJYlmyidE1Du7UhEJsX08R0i/+y9AsErhLLF0DQ2RbF8/YekavgwkGY5pKTu2AfXXARimQr+nvtTcttkIop1J4dYTTcrpWvHWdCY7r1y1vu3upcPRhbm6a7KswZ1SxqvkG5PZq2KmldmK8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776286344; c=relaxed/simple;
-	bh=/DbqZRe/i07gyWu0jzUubvMAQOJPPUKc54gs+8v5zdI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SuN1voPHFm3LpS4kk/+Kcuy1GSyPKeFefDF/55krCivtFJX8yKY9n0YDhpDruzE5s1UtI0FRH/GKV/7QBw6Jugldjl6ltqhUGF3yS8NRTdHGXGnTDr6vAhlpF79CEj2dti87AZLGmPeGYM3FU5mOQa/mlZ5NYa7vIXC5JUtIUFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=kPNRhcCx; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WIL2MhCx; arc=none smtp.client-ip=103.168.172.158
+	s=arc-20240116; t=1776286450; c=relaxed/simple;
+	bh=5LuKKDDYD18agFFUuW6IDj+eqiisvUfQDI0nXpezae4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VNoRBrvZxWGfBd5nOnJGOaMX0yIVi7USjTZHGcSKfafyJDFlUf0xJoS7WWs80DK2j5spsWx5y6RueLwsMqo8QemBAWm+vCslpIJOFNwggwLuzhFS0abQFOzuhIe2jUGsTrmaIbRwVAGG7UzZsbRFzOy9p5cQa/gVoTLp8BO7bDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=p4Mloaei; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lLlUB48i; arc=none smtp.client-ip=103.168.172.144
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="kPNRhcCx";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WIL2MhCx"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 5BF671400065;
-	Wed, 15 Apr 2026 16:52:22 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Wed, 15 Apr 2026 16:52:22 -0400
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="p4Mloaei";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lLlUB48i"
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfout.phl.internal (Postfix) with ESMTP id 5E44CEC00C6;
+	Wed, 15 Apr 2026 16:54:08 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Wed, 15 Apr 2026 16:54:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
 	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm1; t=1776286342; x=1776372742; bh=2Npa2p+K4w8WbwOC9de1D
-	yzkroLcD6J9wuu7wZi0HKI=; b=kPNRhcCxDrV8IneEs46RUnDRbIJeV7re5S5f4
-	VMZETknNt/JVyCjoq6aTLt5MJaW3VY7/VJ7XSfb0ZDxsMi0QQjL8FCZATQWSw2pO
-	Sd8qgBr0hal5x/T+QYZsiqwZpK0k7rIgrZ3JT9pgAQ47hSsbTxPJPEGl4O9R2t4D
-	+pcIJtdMfMw07mvppY4KtXGIItW6mTUAYqzX9J24sY3idQnVzQ1F7l+18CiFDERu
-	KvJJBrp6DBT5P/y1+Ur+bix/ny5nXO10J1KmmukDAiH1zbaqqNuilcWxx18b/quO
-	ns9JnOM5S5kglSEELX6f6rr43p2jkkc+PBAJnbDv3obm/zDlQ==
+	:to; s=fm1; t=1776286448; x=1776372848; bh=uXzKEhf3LHBF+X4lWGJH9
+	IhU3L1pkW+Z5HQ6+JPO96s=; b=p4MloaeizDhGPmww5oJDMiHeaCUiOkOlI3AjG
+	hb9ho4ZEDClf8X7aX7Gp14ctPvYxLZr/ls9VfgAzpfxuQuFQAKiQ7p9j7eLDK2od
+	6aZNCElxwMoBjY07BumSOULJkIZsT2huy6ve7xOXPsmy8bXrfYVkOmcIVTUg5Hmm
+	6wBAs1ZaFDyMWagOFcKoQuHR5z7R7PqQuY1oHD4LWwoa5zCN9VHVOdN/KjfYQUlS
+	JJR7qe4jMYt2vUxwkdZDL9zL/NBtJNH+PAYeVGt7m9TLtBuYx1d4QoeTSyHVUFY9
+	bRO+G+z/z+lYz+7tsarMS8GGLPNWkHxU8/pCqYO8AekYh8K6Q==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
 	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1776286342; x=1776372742; bh=2Npa2p+K4w8WbwOC9de1DyzkroLcD6J9wuu
-	7wZi0HKI=; b=WIL2MhCxeV9al6f1Dg7jO740LqeBboxqgVKfyQHp/FITKSK2KBZ
-	Dmw+fa7mAexTP7BTl8TJKpVf7jtvIGgaRr1SazGeieTCDy5BqURGXsPkOsf7+uJn
-	IokidE6HU+VpDcOp8aWpv2phkZQT66v4cOyXNBfTke3bu2WuiykWZU802TtcwO/Z
-	kQB1HV48fiBB16mEpFoiO549Ey9WjpcgDYeuybe8wJiqXLb61IQ6aGBS6FkImbqs
-	W7ft2+vDZYKNZ9MlL69wpl1PbdiV9MkRHUxQM+mcntmF8vMK0FlPlqb0Frvu1uSh
-	+KYhIDGyEbApU1bUG5VT57el53pASxDNSjA==
-X-ME-Sender: <xms:hvrfaaAO9tTxe01wqxyEFdlJM0n4kx95fV5-4IL211dXkwc_LUSLNw>
-    <xme:hvrfabi6llw0x96KXdA3lro9OYYGdLCFDM6oyWN82Peiag_Rjovkpvr0f52ZUmbW4
-    k0p04h_meDUw4NP8oD7Pkq_HO1QCmFsEVhoae1KvBwVrskFyYXLG_s>
-X-ME-Received: <xmr:hvrfaSneePf4r4KLmYT9OrfcJq_Ni6eVSMW1vNilUqoaxjSRcay6r1x0pAiqtaqY3842aP0>
+	1776286448; x=1776372848; bh=uXzKEhf3LHBF+X4lWGJH9IhU3L1pkW+Z5HQ
+	6+JPO96s=; b=lLlUB48i7PIzghdwF8xMQrpQxodF7vI4fT1ODpJ8v49trjiDxfA
+	wkzPDUucIZ86m24p0Vj4OniLjnFqjFyk+Ny3q8/BVivxeGmly4DRBAnSXgw4rdPr
+	1+pVbOmav0DQGiWBfrpXUohHn5R/oFSz28KjTWZrJD0O+Kf1atNv6TERV+LmggO/
+	9ZVNV3Nz63QM5q14jT/enRay4d43AHvyss1xYUv4B4P5I/e+4gE4rW9DCeF3TTXG
+	8jfP8ZOXtN9+JR0tZqxkl8IR3+c9Z91dv+A8ube9NrFlshw8CmO+H+CZJl1QqIbO
+	ZWfpFrcmoXS+Ggmi28q8VFic5vbBpd+cDRA==
+X-ME-Sender: <xms:8PrfaXguUcIkcq1abvGORNJihJu331vnGE3-bBT1ywSypioIbZ-Nxw>
+    <xme:8PrfabBZH_Zytp4MlFM89I7if8NkvrhTBOowAitif_s_c9RMimwVGQVCUnbo-A7UX
+    pRWiNAPJ7Znwrs3Qdq3orhgQEPDKrtQxcckLtf5B0YKGz3NCgxr7gU>
+X-ME-Received: <xmr:8PrfacFdF7KgKE1i9rUBpA71ZCd9xRB6JysXh5JjX9eUC3nJkpX5C-HJpL2yr4_Y1QitdTs>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdegheduudcutefuodetggdotefrod
     ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
     ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfghrlh
@@ -59,22 +59,22 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdegheduudcutefuodetgg
     hgpdhrtghpthhtoheplhhuihiirdguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthht
     oheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
     gtphhtthhopehoshhssehfohhurhguihhmrdighiii
-X-ME-Proxy: <xmx:hvrfaXp7-yq4j35lToM3qV5mdT-MTVnCIusDMleI1Wn8y301SUpO3Q>
-    <xmx:hvrfabFkvIs1_9pxdVVR3gvZFzL3U7nIwMKHVVgXRVvPpnsfP0lsHA>
-    <xmx:hvrfaTwzcGHam2E1IuP80SYaDdBOoxQ26kChKpw7EPEZD5ujXPodQQ>
-    <xmx:hvrfaQrMCBbux_eXHsWI7Iq-Jt0xyn4gMY_w41P0-HgbWvApVHpx2A>
-    <xmx:hvrfaWymQMGhsIRvpfneCase_UOoB6lifahlCL9H_ObcehfyQ4urAN7E>
+X-ME-Proxy: <xmx:8PrfaTJfOncjbGxjWH1GdeqTHBaz-vWrnoo6AhtArb01cp2bwNYqzQ>
+    <xmx:8PrfaQmqugD5bTALYeW_2dDmp8ZDUp94Qhq-jkfmPRHEc-b5xEj82Q>
+    <xmx:8PrfabTJIOFSJQoYvzmBcRN0gKQXcAnk_J-mrci1bdO0MhlyAXdLtw>
+    <xmx:8PrfaSKtCOKmPDJ5ECetZJ8gaRcahIvI-oZHg4c_ZVq2CjqpKB8OSQ>
+    <xmx:8PrfaWRSH-dPtYsw0KJ4SCbdo5-HBAqvXpf7PJkipqG20fINBm8HzJLS>
 Feedback-ID: if72e4b10:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 15 Apr 2026 16:52:21 -0400 (EDT)
+ 15 Apr 2026 16:54:07 -0400 (EDT)
 From: Siwei Zhang <oss@fourdim.xyz>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	Siwei Zhang <oss@fourdim.xyz>
-Subject: [PATCH v2 RESEND] Bluetooth: L2CAP: Fix null-ptr-deref in l2cap_sock_state_change_cb()
-Date: Wed, 15 Apr 2026 16:51:36 -0400
-Message-ID: <20260415205205.2366630-1-oss@fourdim.xyz>
+Subject: [PATCH v3] Bluetooth: L2CAP: Fix null-ptr-deref in l2cap_sock_get_sndtimeo_cb()
+Date: Wed, 15 Apr 2026 16:53:36 -0400
+Message-ID: <20260415205344.2368172-1-oss@fourdim.xyz>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -87,7 +87,7 @@ Content-Transfer-Encoding: 8bit
 Add the same NULL guard already present in
 l2cap_sock_resume_cb() and l2cap_sock_ready_cb().
 
-Fixes: 89bc500e41fc ("Bluetooth: Add state tracking to struct l2cap_chan")
+Fixes: 8d836d71e222 ("Bluetooth: Access sk_sndtimeo indirectly in l2cap_core.c")
 Cc: stable@kernel.org
 Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
 ---
@@ -95,19 +95,19 @@ Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
  1 file changed, 3 insertions(+)
 
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 71e8c1b45bce..fb3cb70a5a39 100644
+index 71e8c1b45bce..ac48148a7628 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -1657,6 +1657,9 @@ static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state,
+@@ -1758,6 +1758,9 @@ static long l2cap_sock_get_sndtimeo_cb(struct l2cap_chan *chan)
  {
  	struct sock *sk = chan->data;
  
 +	if (!sk)
-+		return;
++		return 0;
 +
- 	sk->sk_state = state;
+ 	return READ_ONCE(sk->sk_sndtimeo);
+ }
  
- 	if (err)
 -- 
 2.53.0
 
