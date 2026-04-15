@@ -1,118 +1,219 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3763262FC1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 09:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330A13115BC;
+	Wed, 15 Apr 2026 09:07:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776243663; cv=none; b=Xn3vxGzvrflUMJXONzdqisy0vb0aVP7LIsAq20WGMT0tj6COyY3rbNNmZUsUPgrtjly2J2zMVRlUZBhdO31tw2at7O5e6x/lFzgFhOjIUE9QI9Io4Bc/12mpw1zt8pG24NPeB31e0QZh5PPTzSgaCg/dKU6jFTzyakBHjgD2SIE=
+	t=1776244037; cv=none; b=na45M0+Ra8Z8FVGViqmhk5a3xZKSo7UrLMu7qyobdesKXKDdzMxVbsbRsMsE2T2fJsR3mgOvmyu7ozo5B4x4Zei6nF8td4dgg36zUi4wwzsdVVm1S1kTvw1bk557R4ivgv4uZbvYPd3FAnO4jL4A8yQ0nvQSurIqz3mmyoHty7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776243663; c=relaxed/simple;
-	bh=INZe0xn3sSmHiKD3eRTFrJxurngYNIVTv61fZhnU6rM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=fZliLdUiHZnDp1uscwJdF2lSX8Q+VprGSTHKW5lxUIplhNsy5HySMPeUw1bOpyDURO2Ju3RbnVZVWihi3QAlgO74bToDukSCZeQkRobBjE0NS6EVvhuixwB2mLE1jHx8+B4AOV3BPlfbPdrrAGX5kipyh9rJJH2MqQe/diRVujo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nJwHVjn/; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776244037; c=relaxed/simple;
+	bh=XHcFesqTcaOkSuOln4bQvIcKY4DyL9z2YyP7unLltzk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=krwbDui9KKDeJOFN2UJNpe6fVGZ5LacrvPk+7frVj52cgHqY5kJdoYOfk1ivzw4y/mMyD0PgSDH/yEDMPU/cc5fFcz8ItKVHMFRr84YoR+dTGOtb7p34EQYoXW2hixUPdkzroUka8RN4KZG/u+ug9ePJoJau2mj1abMfVbT8rko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n4GZKgUQ; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nJwHVjn/"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-8d428da4300so714707385a.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 02:01:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776243660; x=1776848460; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5jrK+V1C+kHYlUfpemnuUjDWjJoLpOV2bkMfQnuspBU=;
-        b=nJwHVjn/WVRkSnHbAd3BqwzL4Y6dFE9KsCkYqhkq1Nzt2YU8TOrAGKxQLJoo+5cmC3
-         DuYOd6B74DThQLa+BijvTnPeTo/imD/pvk6Nlq10kYDo9UmMzhJL9kZYjLPE/FT+Dz03
-         h90mREEFIOWN94LsNwfD+CSobNWBE85OCxIxbaYaUkNtxkIXiLytRV0GP5xvoCyRKLKE
-         85mQgdTXvT5NVsaNLrkkPpeyUn8aV7XtBFtSTieL7T7JlyZXQNXu7wb5ETbATlKq5a/4
-         KxkG4vPMeJG2dFAfwHzi2qhKxys3iL0Vy9sOQ7yJuk47MMkWnIcZH0NnbcIfVxpJQ4cN
-         R6KA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776243660; x=1776848460;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5jrK+V1C+kHYlUfpemnuUjDWjJoLpOV2bkMfQnuspBU=;
-        b=kg43/Nxy3DUZYWskHpOQrN6ZZoBADWHb0FPylsrZjnEuXW2JH7/ihxOlmCxQ/vKB9G
-         yEPUcy+j1CDSTO4bIpV+ZatjvuwupvwV29PaKk8SXPx0ijD/i85hkFIJoMd/2Y7F1LwQ
-         b37ENWr21dVToCNzKcqgDFMGGCx5ofRrHdgEy2p4ugl8hFQ3fvzVXhfSpMhkkbNbt3CQ
-         LMwgPiEFBFo/TNALFv4oog6Q/3yU+lmK3ygKj2RjcdLHqIDK+oSo1HzDgDt1kdu8jU+W
-         u3IhSHnRSTn6YZW7ydFYmcVkkAlk4JG6Dnv1F9nGAlixgRanrzwdiFsX5sg3xc5GeykK
-         9GMw==
-X-Gm-Message-State: AOJu0Yzc/oaXT5Xpf+lGNy+H0EjU2JSYtqHPfkYdE0GxGbNaBp6i8S2r
-	Bj5yaAhqVxN/4oWbQhrkkTppItSlc1y4R02XYcEmXXC46u1c5LuSa99PpZJUWw==
-X-Gm-Gg: AeBDieu9S/JNpKhkfEpPYik+87fSo4AfByado233bfFI0WvndMm7jc6lSgw/E5Ou+hL
-	jFyidhYdxo+qsUXYAAxgu/z9sZJTvn4qcZkk+3Yn/Vowq/NXVbDH/pMcod309o62tR8F/HJu8NC
-	Qw9ogfMdDnpvoAw97d/nt5MdbL5gh6/zfZJObU7v5t8M/TgUjl70mVazXWw/ykHmSdFwoAfbr4+
-	/Zko5GBNjbJAhWjPTJ/Z6/crPO1afEibSyAKIHYlcg+MTjMGuuqYOVECDSytHi+quN1501h6pMG
-	2C2W0xpEdOCcwPKgF2Y2QXTInv02Z+/NEUw9cmINHsJgWm93bP4VL+dKYpstDsLLmXmBkFT2NUS
-	8Z/kQVEqv3NxazwjfgoH3QMk87W9nKnXjIClinFCOXXJAcX5lpHVRW7RIWFkOrNoTkVzAWrzJGh
-	FuQX2GWMvaZ84a2s2yEhflnKlIjMMhiFTGKs4mlbPcIfQ=
-X-Received: by 2002:a05:620a:bc8:b0:8cf:ff82:6dc3 with SMTP id af79cd13be357-8ddcfea0c55mr3073805085a.51.1776243655960;
-        Wed, 15 Apr 2026 02:00:55 -0700 (PDT)
-Received: from [172.17.0.2] ([135.232.177.195])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8e4ef33b5a4sm72328485a.19.2026.04.15.02.00.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2026 02:00:55 -0700 (PDT)
-Message-ID: <69df53c7.050a0220.219a9f.7c69@mx.google.com>
-Date: Wed, 15 Apr 2026 02:00:55 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6514615599756233560=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n4GZKgUQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776244036; x=1807780036;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=XHcFesqTcaOkSuOln4bQvIcKY4DyL9z2YyP7unLltzk=;
+  b=n4GZKgUQqDMry7ukJAZ8CieW6miim0Ez8LYNOd0PJyViZDbqvY04EgjW
+   fk7opFqlHvihbIYouIYPNWEEQ5OknfFNSur54PNfS5tS3QVkh4gp3ZvIP
+   npdCa/oElsPXEOFskZrxR0pjNLBFgslor70ADJwq4i5dL6F0CXwwG9Ufg
+   nftBwHN/IV7CsWRycl95iT33rOcr+7nMtDHyymo+jjtXFXlMGZue0DAPa
+   gcF3A6X5HnAlqjp1fzCuxFUKR1pqPvl2I6NPXQLIA+EVOOPtR2Z8vMsUU
+   2kGy41FL7Bhg6oUmEZSh8snhRFBZRQ6pi5sR+z3sv9dYm4AHqyxk7ZP1q
+   g==;
+X-CSE-ConnectionGUID: xBnssV7sQJGFWH/O+01xTw==
+X-CSE-MsgGUID: 4v8MOZs4T0iqz/qDk9I0rw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11759"; a="88665396"
+X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
+   d="scan'208";a="88665396"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 02:07:15 -0700
+X-CSE-ConnectionGUID: dig/invKSJuZ7wLgGQHR4w==
+X-CSE-MsgGUID: XwsoHjG9TAOScEITg4Ykxw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
+   d="scan'208";a="260786988"
+Received: from rvuia-mobl.ger.corp.intel.com (HELO localhost) ([10.245.244.34])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 02:07:09 -0700
+Date: Wed, 15 Apr 2026 12:07:06 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Chen-Yu Tsai <wenst@chromium.org>
+Cc: Manivannan Sadhasivam <mani@kernel.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
+	Rob Herring <robh@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Hans de Goede <hansg@kernel.org>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Mark Pearson <mpearson-lenovo@squebb.ca>,
+	"Derek J. Clark" <derekjohn.clark@gmail.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org,
+	Stephan Gerhold <stephan.gerhold@linaro.org>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	linux-acpi@vger.kernel.org,
+	Hans de Goede <johannes.goede@oss.qualcomm.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>
+Subject: Re: [PATCH v7 0/8] Add support for handling PCIe M.2 Key E
+ connectors in devicetree
+Message-ID: <ad9VOqjTiLNM6keW@ashevche-desk.local>
+References: <20260326-pci-m2-e-v7-0-43324a7866e6@oss.qualcomm.com>
+ <20260413075459.GA2626902@google.com>
+ <fpcs4p62f35a5qyqwgm5ysa73stbysxcr62tkmmkrrcvsuf4t4@4ivukyqjey57>
+ <eeytuhqpgdz4do4tgtbmfntub2femtyq7bij7svhodpyjwaylx@j3gmvq2a2zqc>
+ <CAGXv+5E=tujhtZjwi6Qm7hk3Ks74UzTQHWq82NiTEw1+vYod5g@mail.gmail.com>
+ <ad36pIu-0dutL7Nk@ashevche-desk.local>
+ <CAGXv+5EGe59nJctLweEdZjb3MNmMvjuCHngGSfptzN985OiLdg@mail.gmail.com>
+ <ad4tJN27opdEooA7@ashevche-desk.local>
+ <CAGXv+5EPA29G-fsH=wWOD8AK6TZFezFhsE0NHPYj_Pt3nT+d_w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, apusaka@google.com
-Subject: RE: [BlueZ] monitor: Add decoding for Microsoft defined event
-In-Reply-To: <20260415073940.739683-1-apusaka@google.com>
-References: <20260415073940.739683-1-apusaka@google.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGXv+5EPA29G-fsH=wWOD8AK6TZFezFhsE0NHPYj_Pt3nT+d_w@mail.gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
---===============6514615599756233560==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Wed, Apr 15, 2026 at 04:31:24PM +0800, Chen-Yu Tsai wrote:
+> On Tue, Apr 14, 2026 at 8:03 PM Andy Shevchenko
+> <andriy.shevchenko@linux.intel.com> wrote:
+> > On Tue, Apr 14, 2026 at 06:29:02PM +0800, Chen-Yu Tsai wrote:
+> > > On Tue, Apr 14, 2026 at 4:28 PM Andy Shevchenko
+> > > <andriy.shevchenko@linux.intel.com> wrote:
+> > > > On Tue, Apr 14, 2026 at 01:03:19PM +0800, Chen-Yu Tsai wrote:
+> > > > > On Tue, Apr 14, 2026 at 12:08 AM Manivannan Sadhasivam <mani@kernel.org> wrote:
+> > > > > > On Mon, Apr 13, 2026 at 07:33:12PM +0530, Manivannan Sadhasivam wrote:
+> > > > > > > On Mon, Apr 13, 2026 at 03:54:59PM +0800, Chen-Yu Tsai wrote:
+> > > > > > > > On Thu, Mar 26, 2026 at 01:36:28PM +0530, Manivannan Sadhasivam wrote:
 
-This is automated email and please do not reply to this email!
+...
 
-Dear submitter,
+> > > > > > > > - Given that this connector actually represents two devices, how do I
+> > > > > > > >   say I want the BT part to be a wakeup source, but not the WiFi part?
+> > > > > > > >   Does wakeup-source even work at this point?
+> > > > > > >
+> > > > > > > You can't use the DT property since the devices are not described in DT
+> > > > > > > statically. But you can still use the per-device 'wakeup' sysfs knob to enable
+> > > > > > > wakeup.
+> > > > >
+> > > > > I see. I think not being able to specify generic properties for the devices
+> > > > > on the connector is going to be a bit problematic.
+> > > >
+> > > > This is nature of the open-connectors, especially on the busses that are
+> > > > hotpluggable, like PCIe. We never know what is connected there _ahead_.
+> > >
+> > > I believe what you mean by "hotpluggable" is "user replaceable".
+> >
+> > From the OS perspective it's the same. From platform perspective
+> > there is a difference, granted.
+> 
+> Yes. I just wanted to clarify.
+> 
+> > > > In other words you can't describe in DT something that may not exist.
+> > >
+> > > But this is actually doable with the PCIe slot representation. The
+> > > properties are put in the device node for the slot. If no card is
+> > > actually inserted in the slot, then no device is created, and the
+> > > device node is left as not associated with anything.
+> >
+> > But you need to list all devices in the world if you want to support this
+> 
+> Why would I need to? The PCIe slot representation just describes a
+> PCIe bridge. Granted this might not be entirely correct, but it's
+> what we currently have.
+> 
+> And even then, there are properties like memory-region or wakeup-source
+> that are generic and aren't tied to specific devices.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1081435
+Yes,  see below what I replied...
 
----Test result---
+> > somehow. Yes, probably many of them (or majority) will be enumerated as is,
 
-Test Summary:
-CheckPatch                    PASS      0.48 seconds
-GitLint                       PASS      0.29 seconds
-BuildEll                      PASS      20.08 seconds
-BluezMake                     PASS      641.53 seconds
-MakeCheck                     PASS      18.87 seconds
-MakeDistcheck                 PASS      241.59 seconds
-CheckValgrind                 PASS      287.58 seconds
-CheckSmatch                   WARNING   343.47 seconds
-bluezmakeextell               PASS      179.33 seconds
-IncrementalBuild              PASS      659.52 seconds
-ScanBuild                     PASS      999.51 seconds
+^^^ "the majority" will work without any assistance.
 
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/msft.c: note: in included file:monitor/msft.h:88:44: warning: array of flexible structuresmonitor/packet.c:2002:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3866:52: warning: array of flexible structuresmonitor/bt.h:3854:40: warning: array of flexible structures
+> > but some may need an assistance via (dynamic) properties or similar mechanisms.
+
+> Even if we wanted to add dynamic properties, there is currently no proper
+> device node to attach them to.
+
+Isn't that's node created dynamically as well and attached to the PCI bus?
+
+> > > It's just that for this new M.2 E-key connector, there aren't separate
+> > > nodes for each interface. And the system doesn't associate the device
+> > > node with the device, because it's no longer a child node of the
+> > > controller or hierarchy, but connected over the OF graph.
+> > >
+> > > Moving over to the E-key connector representation seems like one step
+> > > forward and one step backward in descriptive ability. We gain proper
+> > > power sequencing, but lose generic properties.
+> >
+> > The "key" is property of the connector. Hence if you have an idea what can be
+> > common for ALL "key":s, that's probably can be abstracted. Note, I'm not
+> > familiar with the connector framework in the Linux kernel, perhaps it's already
+> > that kind of abstraction.
+> 
+> I'm not arguing for a even more generic "M.2" connector. The "key" is
+> already described in the compatible. I'm saying we should have some way
+> of describing the individual interfaces (PCIe, SDIO, USB, UART, I2S, I2C)
+> on the connector so further nodes or properties can be attached to them,
+> either with overlays or dynamically within the kernel. Right now the
+> are only described as individual ports, but we can't actually tie a
+> device to a OF graph port.
+
+Shouldn't it be described as a DT subtree? Sorry, I am not familiar with DT
+enough to understand the issue you have.
+
+> But maybe I'm overthinking the representation part. AFAICT for Qualcomm's
+> UART-based BT bit part, Mani just had the driver create a device node
+> under the UART (by traversing the OF graph to find the UART). If that's
+> the desired way then the connector binding should mention it. And that
+> works for me. But I think it's messier and also we're missing an
+> opportunity to make the M.2 connector a standardized attachment point
+> for overlays.
+
+Okay, now it might get clearer to me, but still, I am not an expert.
+
+> Mani, could you also chime in a bit on what you envisioned?
+
++1, please elaborate to me as well.
+
+> (Added Luca from Bootlin to CC, as I think there are parallels to the
+>  "Hotplug of Non-discoverable Hardware" work)
+> 
+> > > The latter part is solvable, but we likely need child nodes under the
+> > > connector for the different interfaces. Properties that make sense for
+> > > one type might not make sense for another.
+> > >
+> > > P.S. We could also just add child device nodes under the controller to
+> > > put the generic properties, but that's splitting the description into
+> > > multiple parts. Let's not go there if at all possible.
+
+-- 
+With Best Regards,
+Andy Shevchenko
 
 
-https://github.com/bluez/bluez/pull/2038
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6514615599756233560==--
