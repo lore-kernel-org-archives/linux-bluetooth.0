@@ -1,239 +1,118 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC4AD3B6359
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 08:31:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776241900; cv=pass; b=gKUsx3hS/pzyl2Sp8I6GXJ3UBbAv6iWuLrbgAC4kkP0SKMHGlaqnMUTbLg0J/7+T/451R72tW2XLvKHCUvSCtV3eU382DJ2VBGAW6M1s0nHCwlqz5o2Xv294+Vw1U34W/1Kdzl5Mb7JNmWgf54Bq08dZmmbsCfyDZ5AQ749DGuM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776241900; c=relaxed/simple;
-	bh=2vto3FW353Zu82QYk26GNUwn95iDmVTER564VnZJYjA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WBU2NZti30hUj/mPwcV/6lYMzzZ7zHqI4Gf8Acebs7n/2EihGbjX6y8g8X+x7OdW+rgxhN5bwVhHrnoyvZOEyWG9TqkUlmNKU4ux4SRv/zSi7BOtRrkggZJ+QAZdZhehBiHGP7lyMDEtHx408wOTI7U5TKSWu3XfBlyvhzxs/cE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=K5UGAvvF; arc=pass smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3763262FC1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 09:01:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776243663; cv=none; b=Xn3vxGzvrflUMJXONzdqisy0vb0aVP7LIsAq20WGMT0tj6COyY3rbNNmZUsUPgrtjly2J2zMVRlUZBhdO31tw2at7O5e6x/lFzgFhOjIUE9QI9Io4Bc/12mpw1zt8pG24NPeB31e0QZh5PPTzSgaCg/dKU6jFTzyakBHjgD2SIE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776243663; c=relaxed/simple;
+	bh=INZe0xn3sSmHiKD3eRTFrJxurngYNIVTv61fZhnU6rM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=fZliLdUiHZnDp1uscwJdF2lSX8Q+VprGSTHKW5lxUIplhNsy5HySMPeUw1bOpyDURO2Ju3RbnVZVWihi3QAlgO74bToDukSCZeQkRobBjE0NS6EVvhuixwB2mLE1jHx8+B4AOV3BPlfbPdrrAGX5kipyh9rJJH2MqQe/diRVujo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nJwHVjn/; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="K5UGAvvF"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5a3d42263e4so5865869e87.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 01:31:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776241896; cv=none;
-        d=google.com; s=arc-20240605;
-        b=NOt0vozdTnZBjoDErZGfPyKV+3Xr7iXtrY7ahgHCuT/zde2AJ24EZjuVOm/bxgdDIo
-         sGPL/kyftmJI2aqIRK9eoPkqefdvY/OWJWXsFRLK6pZsLNr3Gitu/uCRV212zMydD4Ma
-         6ulcyGs7O150fs6w+FE5055Uyz7Gb4nuPB1wxs0pTye1aivtgOZxuPCmr5RsJEcgcp3P
-         ZD6LWAVmmzo/RkXLhL1GiwIzbGcVeIEOMkWf0FEcpWja1g8YFt4wDDzzYHtZhEfRxWhw
-         Wq30qM2eXU+j965OxYkzSUPxLAQgXpdgIMHlAipf45Wg2UhddYrUpnm+yRs5mLxujG7L
-         yocA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=75qqfi9qSpcNd5UITToYiihcYMMpTHFOID21ZWu5+AE=;
-        fh=fjUqWZJuEbXVFU37uK3A218qrE5C18hTIfa9glLYj84=;
-        b=Tk/pCru0T3VYdEhL8yuSF02IdiJuaD/R8U25bmqcGTl2fONLDXnKCedt7OeofN6At+
-         iI+23TbPnjZzctv0O9njAY/5gt/i8T7ZJsse6DLrjk/71/bWMkvT+VVxZKxvMhSjHojb
-         odK5oRWR1y4Jx0AAgEEUtVqDVhjafiK71n4RL9CSjfD8/pX8H7189IgKxa1eVkxsf61P
-         M54CeOXVuJHBTAOSbhLzhEjNcQ/AW3z6qic8mLdu+VOjvN+8/ZP19RDdjqQeCmqUrylY
-         HhcK3Ow/fnZpBR33R1p5qGw8kuXtelH+oKxchHetJXJAWVuBxHgyZZg4gHbfE1q5kcWA
-         07Yg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nJwHVjn/"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-8d428da4300so714707385a.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 02:01:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1776241896; x=1776846696; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=75qqfi9qSpcNd5UITToYiihcYMMpTHFOID21ZWu5+AE=;
-        b=K5UGAvvFYCw1lKIySpdxs+2VhQlu1DNfkQnTJo6uJshdmSwQBoqYPkYm885x67rk5A
-         Sj0gGABTH/LttyV0M6yVENkD0MxhWEPS0tm4ubGvXt0SFTGMEnMnxewpxBPr/X9Kr5Cd
-         qAZ5aXEbrM+4DvQYOBBKj/rlzLSiDmcR7mKsY=
+        d=gmail.com; s=20251104; t=1776243660; x=1776848460; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=5jrK+V1C+kHYlUfpemnuUjDWjJoLpOV2bkMfQnuspBU=;
+        b=nJwHVjn/WVRkSnHbAd3BqwzL4Y6dFE9KsCkYqhkq1Nzt2YU8TOrAGKxQLJoo+5cmC3
+         DuYOd6B74DThQLa+BijvTnPeTo/imD/pvk6Nlq10kYDo9UmMzhJL9kZYjLPE/FT+Dz03
+         h90mREEFIOWN94LsNwfD+CSobNWBE85OCxIxbaYaUkNtxkIXiLytRV0GP5xvoCyRKLKE
+         85mQgdTXvT5NVsaNLrkkPpeyUn8aV7XtBFtSTieL7T7JlyZXQNXu7wb5ETbATlKq5a/4
+         KxkG4vPMeJG2dFAfwHzi2qhKxys3iL0Vy9sOQ7yJuk47MMkWnIcZH0NnbcIfVxpJQ4cN
+         R6KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776241896; x=1776846696;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=75qqfi9qSpcNd5UITToYiihcYMMpTHFOID21ZWu5+AE=;
-        b=nxmpKH3rQbPxuUL1+BVAekjsxGyRLyvNPDhwg5yyij3MBk62gBS5O62otQkxdmro3s
-         WuvwQF8FP5rrOj0aPSeMcYjYiRijkOJhx908NzyN3MoYxOOhEVw8LzIdXUXdC2zIED6v
-         Ax3qntB33UI5HWOWo8ogNGmPCjaAgVd9Gylbehgt7hMGtdQd1kEbLkw6iubjuSfyZKST
-         rm+09dy7gaEFbO+9skBbB7dKkMvJ+5vYXX6Upb0D6jIv9ozreJ9shn8v3zFs3I9fUpSF
-         tESPzfq89lTdxgocKLxwKqhEj3M6Q4Xb1Jo9Ke0bN+L20ZZTFRyZylhS8Y8aEJ+Ew+qf
-         R/7Q==
-X-Forwarded-Encrypted: i=1; AFNElJ/QyA3R2M9RxZ4MVm1qyGM4xWlLX5u6Wi4PJip1E3dGOEETpz3ZM/FPOMdcGsJu1pnOEXCya/TZnGRURi84PEg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+yFfu1jKNk7j7VSTGn+p5G0EjZWVSSygTV2lyt4Ca9eeRSAuU
-	f6ShSoV4Upc6LRk33RGK3UtyobiwDGjnf7Haz7nMIjYHU0p068gkOGpBuuUPWb2DIL385TLUbWG
-	YXCWlieH2/wi+otV1P99aeKniKk9yGy7D5OEqxlq4
-X-Gm-Gg: AeBDieufVR5YNE8LLErX3R2T5507rCaX+4qhtwaIxrRsr+aPEj2GoueA4K4MG42L43b
-	CM0dmf+A+bx/h9xsQ0L5Gv46ObM9AcrkkbR5FZTRqjBbuwQc8Qt3jaKbGgIMiloWf/yyBKNnkva
-	U+4CxLO9HZ3OXIMKUQHwXNVtIu9mZF6TItDhzsX5qw+GEPOeZw5zg16JBCRUBRhKA8VJZCxzcEx
-	j5A7R09ros3XDTHYHErg3gbmoPEGirG3ktN/pGRqV3bDSzZWioGLzvr64zjCqc11WDvYRX8WKax
-	DA73DpDkhllvFdsH952dAwf3HDnErDyiYOMJgK7MHyu8xU91
-X-Received: by 2002:a05:6512:3e26:b0:5a2:a174:8958 with SMTP id
- 2adb3069b0e04-5a3efb4968emr7410769e87.35.1776241895968; Wed, 15 Apr 2026
- 01:31:35 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776243660; x=1776848460;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5jrK+V1C+kHYlUfpemnuUjDWjJoLpOV2bkMfQnuspBU=;
+        b=kg43/Nxy3DUZYWskHpOQrN6ZZoBADWHb0FPylsrZjnEuXW2JH7/ihxOlmCxQ/vKB9G
+         yEPUcy+j1CDSTO4bIpV+ZatjvuwupvwV29PaKk8SXPx0ijD/i85hkFIJoMd/2Y7F1LwQ
+         b37ENWr21dVToCNzKcqgDFMGGCx5ofRrHdgEy2p4ugl8hFQ3fvzVXhfSpMhkkbNbt3CQ
+         LMwgPiEFBFo/TNALFv4oog6Q/3yU+lmK3ygKj2RjcdLHqIDK+oSo1HzDgDt1kdu8jU+W
+         u3IhSHnRSTn6YZW7ydFYmcVkkAlk4JG6Dnv1F9nGAlixgRanrzwdiFsX5sg3xc5GeykK
+         9GMw==
+X-Gm-Message-State: AOJu0Yzc/oaXT5Xpf+lGNy+H0EjU2JSYtqHPfkYdE0GxGbNaBp6i8S2r
+	Bj5yaAhqVxN/4oWbQhrkkTppItSlc1y4R02XYcEmXXC46u1c5LuSa99PpZJUWw==
+X-Gm-Gg: AeBDieu9S/JNpKhkfEpPYik+87fSo4AfByado233bfFI0WvndMm7jc6lSgw/E5Ou+hL
+	jFyidhYdxo+qsUXYAAxgu/z9sZJTvn4qcZkk+3Yn/Vowq/NXVbDH/pMcod309o62tR8F/HJu8NC
+	Qw9ogfMdDnpvoAw97d/nt5MdbL5gh6/zfZJObU7v5t8M/TgUjl70mVazXWw/ykHmSdFwoAfbr4+
+	/Zko5GBNjbJAhWjPTJ/Z6/crPO1afEibSyAKIHYlcg+MTjMGuuqYOVECDSytHi+quN1501h6pMG
+	2C2W0xpEdOCcwPKgF2Y2QXTInv02Z+/NEUw9cmINHsJgWm93bP4VL+dKYpstDsLLmXmBkFT2NUS
+	8Z/kQVEqv3NxazwjfgoH3QMk87W9nKnXjIClinFCOXXJAcX5lpHVRW7RIWFkOrNoTkVzAWrzJGh
+	FuQX2GWMvaZ84a2s2yEhflnKlIjMMhiFTGKs4mlbPcIfQ=
+X-Received: by 2002:a05:620a:bc8:b0:8cf:ff82:6dc3 with SMTP id af79cd13be357-8ddcfea0c55mr3073805085a.51.1776243655960;
+        Wed, 15 Apr 2026 02:00:55 -0700 (PDT)
+Received: from [172.17.0.2] ([135.232.177.195])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8e4ef33b5a4sm72328485a.19.2026.04.15.02.00.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Apr 2026 02:00:55 -0700 (PDT)
+Message-ID: <69df53c7.050a0220.219a9f.7c69@mx.google.com>
+Date: Wed, 15 Apr 2026 02:00:55 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6514615599756233560=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260326-pci-m2-e-v7-0-43324a7866e6@oss.qualcomm.com>
- <20260413075459.GA2626902@google.com> <fpcs4p62f35a5qyqwgm5ysa73stbysxcr62tkmmkrrcvsuf4t4@4ivukyqjey57>
- <eeytuhqpgdz4do4tgtbmfntub2femtyq7bij7svhodpyjwaylx@j3gmvq2a2zqc>
- <CAGXv+5E=tujhtZjwi6Qm7hk3Ks74UzTQHWq82NiTEw1+vYod5g@mail.gmail.com>
- <ad36pIu-0dutL7Nk@ashevche-desk.local> <CAGXv+5EGe59nJctLweEdZjb3MNmMvjuCHngGSfptzN985OiLdg@mail.gmail.com>
- <ad4tJN27opdEooA7@ashevche-desk.local>
-In-Reply-To: <ad4tJN27opdEooA7@ashevche-desk.local>
-From: Chen-Yu Tsai <wenst@chromium.org>
-Date: Wed, 15 Apr 2026 16:31:24 +0800
-X-Gm-Features: AQROBzDzEraU5iaeBZSJUdxidhUdHObcnpB5nGLDAzHMGlTf0-gnuExg99lbWBI
-Message-ID: <CAGXv+5EPA29G-fsH=wWOD8AK6TZFezFhsE0NHPYj_Pt3nT+d_w@mail.gmail.com>
-Subject: Re: [PATCH v7 0/8] Add support for handling PCIe M.2 Key E connectors
- in devicetree
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	Manivannan Sadhasivam <mani@kernel.org>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, Rob Herring <robh@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Hans de Goede <hansg@kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Mark Pearson <mpearson-lenovo@squebb.ca>, "Derek J. Clark" <derekjohn.clark@gmail.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Bartosz Golaszewski <brgl@kernel.org>, linux-serial@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	platform-driver-x86@vger.kernel.org, linux-pci@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Stephan Gerhold <stephan.gerhold@linaro.org>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, linux-acpi@vger.kernel.org, 
-	Hans de Goede <johannes.goede@oss.qualcomm.com>, 
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
-	Luca Ceresoli <luca.ceresoli@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, apusaka@google.com
+Subject: RE: [BlueZ] monitor: Add decoding for Microsoft defined event
+In-Reply-To: <20260415073940.739683-1-apusaka@google.com>
+References: <20260415073940.739683-1-apusaka@google.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Tue, Apr 14, 2026 at 8:03=E2=80=AFPM Andy Shevchenko
-<andriy.shevchenko@linux.intel.com> wrote:
->
-> On Tue, Apr 14, 2026 at 06:29:02PM +0800, Chen-Yu Tsai wrote:
-> > On Tue, Apr 14, 2026 at 4:28=E2=80=AFPM Andy Shevchenko
-> > <andriy.shevchenko@linux.intel.com> wrote:
-> > > On Tue, Apr 14, 2026 at 01:03:19PM +0800, Chen-Yu Tsai wrote:
-> > > > On Tue, Apr 14, 2026 at 12:08=E2=80=AFAM Manivannan Sadhasivam <man=
-i@kernel.org> wrote:
-> > > > > On Mon, Apr 13, 2026 at 07:33:12PM +0530, Manivannan Sadhasivam w=
-rote:
-> > > > > > On Mon, Apr 13, 2026 at 03:54:59PM +0800, Chen-Yu Tsai wrote:
-> > > > > > > On Thu, Mar 26, 2026 at 01:36:28PM +0530, Manivannan Sadhasiv=
-am wrote:
->
-> ...
->
-> > > > > > > - Given that this connector actually represents two devices, =
-how do I
-> > > > > > >   say I want the BT part to be a wakeup source, but not the W=
-iFi part?
-> > > > > > >   Does wakeup-source even work at this point?
-> > > > > >
-> > > > > > You can't use the DT property since the devices are not describ=
-ed in DT
-> > > > > > statically. But you can still use the per-device 'wakeup' sysfs=
- knob to enable
-> > > > > > wakeup.
-> > > >
-> > > > I see. I think not being able to specify generic properties for the=
- devices
-> > > > on the connector is going to be a bit problematic.
-> > >
-> > > This is nature of the open-connectors, especially on the busses that =
-are
-> > > hotpluggable, like PCIe. We never know what is connected there _ahead=
-_.
-> >
-> > I believe what you mean by "hotpluggable" is "user replaceable".
->
-> From the OS perspective it's the same. From platform perspective
-> there is a difference, granted.
+--===============6514615599756233560==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Yes. I just wanted to clarify.
+This is automated email and please do not reply to this email!
 
-> > > In other words you can't describe in DT something that may not exist.
-> >
-> > But this is actually doable with the PCIe slot representation. The
-> > properties are put in the device node for the slot. If no card is
-> > actually inserted in the slot, then no device is created, and the
-> > device node is left as not associated with anything.
->
-> But you need to list all devices in the world if you want to support this
+Dear submitter,
 
-Why would I need to? The PCIe slot representation just describes a
-PCIe bridge. Granted this might not be entirely correct, but it's
-what we currently have.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1081435
 
-And even then, there are properties like memory-region or wakeup-source
-that are generic and aren't tied to specific devices.
+---Test result---
 
-> somehow. Yes, probably many of them (or majority) will be enumerated as i=
-s,
-> but some may need an assistance via (dynamic) properties or similar mecha=
-nisms.
+Test Summary:
+CheckPatch                    PASS      0.48 seconds
+GitLint                       PASS      0.29 seconds
+BuildEll                      PASS      20.08 seconds
+BluezMake                     PASS      641.53 seconds
+MakeCheck                     PASS      18.87 seconds
+MakeDistcheck                 PASS      241.59 seconds
+CheckValgrind                 PASS      287.58 seconds
+CheckSmatch                   WARNING   343.47 seconds
+bluezmakeextell               PASS      179.33 seconds
+IncrementalBuild              PASS      659.52 seconds
+ScanBuild                     PASS      999.51 seconds
 
-Even if we wanted to add dynamic properties, there is currently no proper
-device node to attach them to.
-
-> > It's just that for this new M.2 E-key connector, there aren't separate
-> > nodes for each interface. And the system doesn't associate the device
-> > node with the device, because it's no longer a child node of the
-> > controller or hierarchy, but connected over the OF graph.
-> >
-> > Moving over to the E-key connector representation seems like one step
-> > forward and one step backward in descriptive ability. We gain proper
-> > power sequencing, but lose generic properties.
->
-> The "key" is property of the connector. Hence if you have an idea what ca=
-n be
-> common for ALL "key":s, that's probably can be abstracted. Note, I'm not
-> familiar with the connector framework in the Linux kernel, perhaps it's a=
-lready
-> that kind of abstraction.
-
-I'm not arguing for a even more generic "M.2" connector. The "key" is
-already described in the compatible. I'm saying we should have some way
-of describing the individual interfaces (PCIe, SDIO, USB, UART, I2S, I2C)
-on the connector so further nodes or properties can be attached to them,
-either with overlays or dynamically within the kernel. Right now the
-are only described as individual ports, but we can't actually tie a
-device to a OF graph port.
-
-But maybe I'm overthinking the representation part. AFAICT for Qualcomm's
-UART-based BT bit part, Mani just had the driver create a device node
-under the UART (by traversing the OF graph to find the UART). If that's
-the desired way then the connector binding should mention it. And that
-works for me. But I think it's messier and also we're missing an
-opportunity to make the M.2 connector a standardized attachment point
-for overlays.
-
-Mani, could you also chime in a bit on what you envisioned?
-
-(Added Luca from Bootlin to CC, as I think there are parallels to the
- "Hotplug of Non-discoverable Hardware" work)
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/msft.c: note: in included file:monitor/msft.h:88:44: warning: array of flexible structuresmonitor/packet.c:2002:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3866:52: warning: array of flexible structuresmonitor/bt.h:3854:40: warning: array of flexible structures
 
 
-Thanks
-ChenYu
+https://github.com/bluez/bluez/pull/2038
+
+---
+Regards,
+Linux Bluetooth
 
 
-> > The latter part is solvable, but we likely need child nodes under the
-> > connector for the different interfaces. Properties that make sense for
-> > one type might not make sense for another.
-> >
-> > P.S. We could also just add child device nodes under the controller to
-> > put the generic properties, but that's splitting the description into
-> > multiple parts. Let's not go there if at all possible.
->
-> --
-> With Best Regards,
-> Andy Shevchenko
->
->
+--===============6514615599756233560==--
