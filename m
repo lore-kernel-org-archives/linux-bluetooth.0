@@ -1,142 +1,117 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F372E228D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 12:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776256270; cv=none; b=Yy58TP4S6DjzQ9GXHRobn1KoKbaUR+OORJHV3QSIb8mhDv/sQa61nMUefEZ1KB22MJj62axOCfLZ3UOW4kLJLJ9rXQQAmS+FnYmmj9RFei6B4n+9ZrbY01Tink08PyvBQB3+qYyaBk5KgpkcSyfkHa42AabYXFqf/7hJ/V9YXnQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776256270; c=relaxed/simple;
-	bh=IyAAieHWtEoLzO+C7M91IQXZviDRvSny8J0mcTR8Wo4=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=PGBWZmLqf54JMvwOkORzP64VVHEfJrdkmO+M3gi63rQt8uEadgxKCL7jRlI9v5VKDGCogiN6us8eVSyzp7lu4xJhDMrIPelKAdiDn4M4vIoRMBsM+5Qbjk3r9ns/0GV/XurIHNLkcnBbCEzzwvyiqgclBKqm6YxdvwIUy0D9MJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ayeCIQEB; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0266E20A5F3
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 12:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776256449; cv=pass; b=nW+Ifk35wy85GXhnwqfTMUpIWSVqgta/xdTtRpAPIObrAtUWKeLB8F7rPlicLSsp1AN2t+5lxw5lJROZ/jwP/Y0ZYJ0p7E9LlZd5c0yAundCmNAHgHOspDQLgWAClwILk+3B+fYdUw+QT4FxTzVHy5SlTStgNHYGjQoOU9tzDSc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776256449; c=relaxed/simple;
+	bh=+h8HlJDwvYNw5rua/v6Zk+eoY4fhxZ1OcFHecBDCW7U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GDCI2mTUdZsU72h+SlJ271ezCnwJILvuP1gqKnX02vx9FhjGenlEt3XaaN74W9No9EAGxiBY6QBgwYS0XkecUUnGQC6vm69Roj/VDVvoG7Ju4p5TLqHGXBUAx8G/gV5/aKpxwK1vehEfSbwwctQPDHlXlLhxf3ZH9SIvBy7+U9g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=coUeAToS; arc=pass smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ayeCIQEB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776256267; x=1807792267;
-  h=date:from:to:cc:subject:message-id;
-  bh=IyAAieHWtEoLzO+C7M91IQXZviDRvSny8J0mcTR8Wo4=;
-  b=ayeCIQEBYvEwXfuCjrniC7/pPKrzI8Cs7o5Cfyvi1ab/L6eVva+Sv91L
-   rpmeilhFIa/kENMzU3pw6SHWmUXg12nWVdy2v1i45N7E9H2wWj0sDIp57
-   slGDP6qhhyM91a8LjAR4RznU1hkjS8BHr7Fm5QuUj9XQFljLbhORYZrzk
-   feUCkoPKBbf8aEX5jXUUK3PtoRpByALfh1vDCOs82I3oPtqSvjYRq9DC7
-   PHs+2EzYXcsRH3WFWYn+PaLRIdjC/wLrAxDbx6rVN2/xfAPA3+XuMxtzR
-   pX3VaB9IRyvTKJzSse8VP1ag3EX6Y5JKD0CnkB1HWamDx/CuFNZChrdM6
-   Q==;
-X-CSE-ConnectionGUID: i7UEiLpPTrmKSlQOnaPGHA==
-X-CSE-MsgGUID: RSi1wxrCReyyaLUfTXEKNA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11759"; a="88680703"
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="88680703"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 05:31:06 -0700
-X-CSE-ConnectionGUID: Kv57QDBxR2e49R63uzwXtg==
-X-CSE-MsgGUID: hAgQk2f5QBGUPmpfIfnbJQ==
-X-ExtLoop1: 1
-Received: from lkp-server01.sh.intel.com (HELO 7f3b36e5d6a5) ([10.239.97.150])
-  by fmviesa003.fm.intel.com with ESMTP; 15 Apr 2026 05:31:04 -0700
-Received: from kbuild by 7f3b36e5d6a5 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wCzOY-000000000VF-2RxN;
-	Wed, 15 Apr 2026 12:31:02 +0000
-Date: Wed, 15 Apr 2026 20:30:26 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 41388deeb99016b772801aa19ca7a3023d53826e
-Message-ID: <202604152018.33luWo9H-lkp@intel.com>
-User-Agent: s-nail v14.9.25
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="coUeAToS"
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c76cce85bd9so2616399a12.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 05:34:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776256447; cv=none;
+        d=google.com; s=arc-20240605;
+        b=eVlYXsRhw0MnC+x+jx1ofIyi3D0B+T1h8dEhdKavjURn+r6Rmiv+4rhbR6ghP3lR2d
+         yPHJ08oKj1gfZnt0LR08Di4Ns2+mIOdvkBIOY9RYdXeuJuK9uQpXsNqlVqXWcd0MkbEm
+         ZpXysr46hVgA+27EshJC4Jfo02+wRnHi7foj1kNuNy514RkSdylnV/kYIadv8hppugUc
+         NO6Pj7hOHSyMAyxtnExDf8zFQ3RFav3ev+lDXMI/827YlXf2kyCc4hp+M8W/KVRV3k9k
+         kT7aiatDxnQRUCXbVCbzAXOTNiT++iUkujR1PxhUuHib8/fwrasgr7AULX3jZXP5JR5v
+         3Xqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=9v5h0WGA6GciBmySthgQ0LZ+Ql4Vyrp/FXGCtEgGi0I=;
+        fh=PU4cQ10YwkXXNH6ATnP0qcpwSpJTNNeMU3Bw4NVOpd8=;
+        b=GCCzRhgZ6gbC2WjPeTNnXIDQ8IL5odUw81HouQXaswKt4Xi7FmBd+HFrdzN/IR3dyc
+         DkigRg+deyfLqnhlqGyYpT33OA27a5Ehq3cOroEuS0ajlLenRuk0OSTx4MspcOsL8fAP
+         hFGLHsRHi7pK+wFPcHdmR4imD9gOE/3xkw+H4uhiGyagxjnYLkph9iVtiQA/mUcn+6kh
+         NX5Fx5lypGEXG/MynOKX9rJql7XyTxHM123ynU/71RCto8YqNc3pcJU+E3D1LbBTU3Rd
+         wSrfdrdBRTl2FJ/UUg+Sv1mOnbt5JTAdven/VsDIvN/+7H7tAF1kGExZn3C4A1C0oRLy
+         /lJA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776256447; x=1776861247; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9v5h0WGA6GciBmySthgQ0LZ+Ql4Vyrp/FXGCtEgGi0I=;
+        b=coUeAToScc18oshLGC0r4BNfr+qC+POiK+moOCSMnnLTMm2Kn6FCEJVPZBsctVvdEt
+         j22YgRLi98r9pGRpxNkhZTPziPIVbLiK7p52l9D/jde5zByL/bWO5gZixlsYEypEH9iZ
+         7QojMrYnMFJYKjw3rHFt5uZ3JijHGOpKDy0vxDGF6lq1jEVAFPiGJ/alcoXUj3B3u/aK
+         yfdr9iX8dEONtCv9U+Ub68K6nMoTLJnkWCkH44THSydRKMywhLXp9RyoA4SlEt1+1Tpn
+         588RupYVXT+wwBKeQPBraUpPeiYnOFTZha0km4630k2dRJIeXxUkRNwEmK8ku723W/wM
+         4KFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776256447; x=1776861247;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9v5h0WGA6GciBmySthgQ0LZ+Ql4Vyrp/FXGCtEgGi0I=;
+        b=Xz13H9AYR91MOUPXAw/GEpwR42q0HMHIEG2e8E/8ORXOsfloP84+Mlh6m99YCbd6KX
+         Mzn2eQtAwUkCstZAUaMTzTAUIsnDcjHOZI+lvYqKlPEySAUBU4NFhlz1KLWvFsLWX06t
+         sC31tt3o9MH12GMSgtqQEpK8oeGHKrC/ctNxqfUHgeHVZlcY9GNqaNry0z1FaTOXEWyp
+         0p7iLpgtWmrzUpy+1NZ40RLR2svjhuvUP99A7F83W9jEcT0Ib1MyRKUW+LzBiDIbhNFj
+         TWlS5DTvGZtBdAB44d5o79dqoOD4nDseRntQpTUxqtlAtwYgkM9fp1cshV7iqJzm4jV1
+         QGDA==
+X-Forwarded-Encrypted: i=1; AFNElJ/hrTSaD9Ct60kDyn2A2e0sBpPJH7+rrIM5878DbQX4ZIFWEbZuDCrCz6nboMvcFfRMrG7qjPgTBVCh2OWRFsA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyu/tHOxVVKk29NuRyg73q8i8sANS7h1RIqpzpfRdoe7Pa1nKFr
+	WlkQYb6DyK4rWRkUCb87rwmcfw3Wkz/4TqhX/9plZatJJRHFkteKgoc16Qv7O3EwrTagV2A7T5X
+	QHkqOWD4E+f+Zcq7uzsH8Akyu8WMPT/O4G4uV
+X-Gm-Gg: AeBDieuctv2IDWxByPVzV7s04IjwdyMS5QM7CWEXcp2HRi2u1hoGrSXG+6O+snZsNAU
+	M4ceVnyrSiPC5bib/C7A7TKSehhVnotT4bmJamQh+ee1n/kYXYDxQ6bfjPSYnpg1EOLcr96yIBN
+	UtQ5hIUw/j5JvADJNAi7iJGuzHsYHLtfLxYbRLKV5CJ7CPAGveM4H+nDxnapQhELE/hJ/Zl+eWz
+	dKvTPrNFegLVlO36QhXBSc9uIGglXbGzK3h6UbA9Ef1dW1+cASMQ8W5rqMHGHqbBT1J5d7ISNQ3
+	SVZw79AJDS7dVNqXVKAVZCjm/iyGBw==
+X-Received: by 2002:a17:903:ac6:b0:2b0:60db:7927 with SMTP id
+ d9443c01a7336-2b2d5a168bcmr221211305ad.28.1776256447117; Wed, 15 Apr 2026
+ 05:34:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20260407-brcm-prio-v2-1-3f745edf49af@gmail.com> <CABBYNZJAEqwfTuVqbFAnx97HBSjcwn3Hb+y+r4r2C=MMPxFoDg@mail.gmail.com>
+In-Reply-To: <CABBYNZJAEqwfTuVqbFAnx97HBSjcwn3Hb+y+r4r2C=MMPxFoDg@mail.gmail.com>
+From: Sasha Finkelstein <fnkl.kernel@gmail.com>
+Date: Wed, 15 Apr 2026 14:33:55 +0200
+X-Gm-Features: AQROBzCJwjrc1bDi-TXhcjD-wf65qYVngCDiW7f3UZYU9kWetoIg3teCKW6NkdA
+Message-ID: <CAMT+MTQ6orj5tpiGL9hz8m2TGiBjA-9D_0e1iLt=_dXBFHcOgg@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Add Broadcom channel priority commands
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Sven Peter <sven@kernel.org>, Janne Grunau <j@jannau.net>, Neal Gompa <neal@gompa.dev>, 
+	Marcel Holtmann <marcel@holtmann.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, asahi@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 41388deeb99016b772801aa19ca7a3023d53826e  Bluetooth: btusb: MT7925: Add VID/PID 0e8d/8c38
+On Tue, 14 Apr 2026 at 16:00, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> > +       if (sock)
+> > +               set_bit(SOCK_CUSTOM_SOCKOPT, &sock->flags);
+>
+> This is more complicated than it needs to be. I'd just add a new
+> callback, `hdev->set_priority(handle, skb->priority)`, so the driver
+> is called whenever it needs to elevate a connection's priority, that
+> said there could be cases where a connection needs its priority set
+> momentarily to transmit A2DP, followed by OBEX packets that are best
+> effort. Therefore, `hci_conn` will probably need to track the priority
+> so it can detect when it needs changing on a per skb basis.
 
-elapsed time: 907m
-
-configs tested: 67
-configs skipped: 1
-
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-tested configs:
-alpha                   allnoconfig    gcc-15.2.0
-alpha                  allyesconfig    gcc-15.2.0
-arc                    allmodconfig    gcc-15.2.0
-arc                     allnoconfig    gcc-15.2.0
-arc                    allyesconfig    gcc-15.2.0
-arc         randconfig-001-20260415    gcc-13.4.0
-arc         randconfig-002-20260415    gcc-15.2.0
-arm                     allnoconfig    clang-23
-arm                    allyesconfig    gcc-15.2.0
-arm64                  allmodconfig    clang-19
-arm64                   allnoconfig    gcc-15.2.0
-csky                   allmodconfig    gcc-15.2.0
-csky                    allnoconfig    gcc-15.2.0
-hexagon                allmodconfig    clang-17
-hexagon                 allnoconfig    clang-23
-i386                   allmodconfig    gcc-14
-i386                    allnoconfig    gcc-14
-i386                   allyesconfig    gcc-14
-loongarch              allmodconfig    clang-19
-loongarch               allnoconfig    clang-23
-m68k                   allmodconfig    gcc-15.2.0
-m68k                    allnoconfig    gcc-15.2.0
-m68k                   allyesconfig    gcc-15.2.0
-m68k                      defconfig    gcc-15.2.0
-microblaze              allnoconfig    gcc-15.2.0
-microblaze             allyesconfig    gcc-15.2.0
-microblaze                defconfig    gcc-15.2.0
-mips                   allmodconfig    gcc-15.2.0
-mips                    allnoconfig    gcc-15.2.0
-mips                   allyesconfig    gcc-15.2.0
-nios2                  allmodconfig    gcc-11.5.0
-nios2                   allnoconfig    gcc-11.5.0
-nios2                     defconfig    gcc-11.5.0
-openrisc               allmodconfig    gcc-15.2.0
-openrisc                allnoconfig    gcc-15.2.0
-parisc                 allmodconfig    gcc-15.2.0
-parisc                  allnoconfig    gcc-15.2.0
-parisc                 allyesconfig    gcc-15.2.0
-powerpc                allmodconfig    gcc-15.2.0
-powerpc                 allnoconfig    gcc-15.2.0
-riscv                  allmodconfig    clang-23
-riscv                   allnoconfig    gcc-15.2.0
-riscv                  allyesconfig    clang-16
-s390                   allmodconfig    clang-18
-s390                    allnoconfig    clang-23
-s390                   allyesconfig    gcc-15.2.0
-sh                     allmodconfig    gcc-15.2.0
-sh                      allnoconfig    gcc-15.2.0
-sh                     allyesconfig    gcc-15.2.0
-sh                        defconfig    gcc-15.2.0
-sh                polaris_defconfig    gcc-15.2.0
-sparc                   allnoconfig    gcc-15.2.0
-sparc64                allmodconfig    clang-23
-sparc64                   defconfig    clang-20
-um                     allmodconfig    clang-19
-um                      allnoconfig    clang-23
-um                     allyesconfig    gcc-14
-um                        defconfig    clang-23
-um                   i386_defconfig    gcc-14
-um                 x86_64_defconfig    clang-23
-x86_64                 allmodconfig    clang-20
-x86_64                  allnoconfig    clang-20
-x86_64                 allyesconfig    clang-20
-x86_64                    defconfig    gcc-14
-x86_64                rhel-9.4-rust    clang-20
-xtensa                  allnoconfig    gcc-15.2.0
-xtensa                 allyesconfig    gcc-15.2.0
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+I have tested per-skb priorities, and unfortunately, this does not work.
+If something tries to send a low-priority packet (for example - a volume
+adjustment), a priority drop causes the same kind of dropout that is
+caused by scans. It appears that the only way to make this hardware work
+is to set the entire hci connection as high priority for as long as it
+is being used to transmit audio.
