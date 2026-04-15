@@ -1,72 +1,81 @@
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82181EB5E3
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 18:22:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F207A24A078
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 20:49:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776277347; cv=none; b=b8LmwJiDrTGpCXtns5Yj/t8JJRMdb5pcUuI7sg35SPUWCe+l1kitKCtbPuJL9KHi1YjpbCS7ZyKdAPnHBhJxgo5otgL9/Ofl20ifr7u/ZiJSoEiotF18FwGB2M+FG565x3So+t04V1irJ/brmWsH5iXFCio4anG5fLH5zPerC9g=
+	t=1776286146; cv=none; b=jt9GCdy7wRwM2q7rKLYFFSzhetHrmTrtN9U1mod0Y6RhGlUtyIA/LH+3e4zZjaLN0Ga0pmCq2TCMDWt4P4FicfSi+NaG3hiVZ5LM7Iu2ns8hJuspPoaJEQxYn8NqcORg1ZAaSLAgkf2Lem2Vy/T4Y92qVWR9jtXekOqtyZPlqZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776277347; c=relaxed/simple;
-	bh=S+9HFrwLlmepBIC70p0gBR1t3tDX5gfp2DVSBvnx85Q=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=o9kfgTbXHLCUSaYP/tvgaVFOLTe/kdVRyIEeQmu159bTKBkP1ei+eawD/eEsI8J2cvyLAFeg6ByVmSgA+IYZ1sjvs9b6SJ6gWSfLL+YRI8xCS5kO+Rga+5ZUuXpyvRz2a1cyu76A7Ng1652/CW3/2pRxGEq0M9yHypzGTRnf430=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JzyvZXH0; arc=none smtp.client-ip=209.85.217.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776286146; c=relaxed/simple;
+	bh=U/IL/10Zyjh/ODAUq0O8i/nDReanLDf+z5x0kyp6l6U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p8NfjEs6fIswCtmsa+LgR6N56mzLVaQBr80eFsBVO/tYBUqsAt3/0PCgoyNTPi7RRzaMPqexaRtXp+eXBd5ryf40jOssKAh9lJO9Ub+WXpvjvg1eUreLe2pqF1CxWu1Vdzi/WuO54OuBYwlh4o4iw5aGdEtKhaXLUeyJ492/ebE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=HpL/oN3k; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=G2/kuD9+; arc=none smtp.client-ip=103.168.172.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JzyvZXH0"
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-6137374b106so314376137.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 11:22:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776277343; x=1776882143; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9VzBYTa0U450LJvpklHr5OCVSzdp6jaguTVgHi3b43I=;
-        b=JzyvZXH07UYY58duRHpiPhIEfyN/lGJFe3+J+as06ZnXFOvdv7XcXlYd8Mq/nFNWGP
-         yOi0UoxhNOk/hHcADh8ogqLbQCs6Mxj62Czl/cJqCjTuy+o/4ykfP1Z+KvU2GtbvVhWE
-         AW6f+95frTIEBDzNroWDnZmEuV2lj/ardtkdaAirt9sSHK6YbbGblp57WB2LQ30B41SO
-         SJL/MX/cSMA8GXCFt6if91cD06LAMyN+RKiBcT0oM0ZRQCCWYxk5P+eRp+VZj8ir48X5
-         mb5MAMJQqLN6j8lVrK1dpVfCgr/6zeK/UfOl9lqvllbQnHPn3nA6B6X4XD34MWs1fFj8
-         YNxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776277343; x=1776882143;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=9VzBYTa0U450LJvpklHr5OCVSzdp6jaguTVgHi3b43I=;
-        b=sMNWJRGI3L2+xGFjd6KgYG04DBxFYiaWReoDRDf7qFNsSoo70sp634flBS+nV+6Twq
-         4kTaWfTYUrJW33XevAnPeQXpAQQRV1v84UV8K9ZCLyR8s+sXGseNp19QEJJbqUozA8xa
-         mVK/fVJOvwWqr5jEdHUkUE9Ng1X6UwMuDGU3ydlpSkIt2omuCS5mNPY0z56bWsHT++59
-         55nCdE0Za2/RwUFOD8K5fJstzln6UAkpm4QTPnTYP/4Of7OyJcr4QPY5JZ57F+QffXBM
-         8dDpibuC1dM0fhCY743qDXTAwHVu9HhKjPJNVYMKf2tDu0n4tEvUKhutI33+C04Rf65b
-         iTcA==
-X-Gm-Message-State: AOJu0YzhVmtxEu4Kn+yeXB5uST8NfOKb80s4hltTxY5NBBsW+yp/m9NU
-	dslkMvoV4zbvsbZNgOoA4LMVusdQy8vcOooXnyE5+Y4HsdJQ5e67gyD7NDTN0lnMPls=
-X-Gm-Gg: AeBDiesWlq1sJ1D03WUFr+3qvdev89egmMu6gsrrrW4xfSGyRgtYHC45XATEl0or/vw
-	D9clQpssUrkrqG9ZIZR//blR/OxIEx8hUbv1wGbP6H4M44ElbbEvLuKoZHx5BLzGYXOvsrmIgRM
-	xjST6XXWZrBw+JekujHQ6MHxPZLpSVH02t/AHxw6xJwciTDULfjOOr47C+N4oA+4olcROhPlSXS
-	aYGmYjbQMZ59Uyn0WnUs89UEMo9BLIdEfkHl2gnWkGYxB26MCBMivVIum9tNu6CdePTiDd1yU53
-	wnYWpQwhJSExhsW5YgY/9+OFpvXtzKguOtnOC9HNWhzmMgqYPcZcNldEUFtIvwPded1QtfRsCNA
-	JZVcuF7hw7tFPW9giMGGN1C5jAAIjOW0ct3E/+cZQ1MeuQHgznlY4MbrNSVXqOjGoMBUXzPch76
-	Ut0ioM7psV0eHP4M3t5tGKe6RFYmD3kha25YsLt5GWcs+MlZcib43RtMfrXo6Rn8Q9ICAEXrM+p
-	6nl9SN/Dh2xF7tvc8UN5PYlM6Pz8Hz5WXCIma4=
-X-Received: by 2002:a05:6102:5045:b0:607:9b5f:1df9 with SMTP id ada2fe7eead31-60a0197f6f9mr11589831137.32.1776277343465;
-        Wed, 15 Apr 2026 11:22:23 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-612cf10e76csm1219063137.8.2026.04.15.11.22.22
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2026 11:22:23 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 3/3] github: Add btsnoop-analyzer slash command workflow
-Date: Wed, 15 Apr 2026 14:22:09 -0400
-Message-ID: <20260415182210.514686-3-luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="HpL/oN3k";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="G2/kuD9+"
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id CDE5014000BB;
+	Wed, 15 Apr 2026 16:49:03 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Wed, 15 Apr 2026 16:49:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm1; t=1776286143; x=1776372543; bh=XXYgQHFB5Ia1g/3uCv3zW
+	trmY2GLFjWR3ar3w9oK7mQ=; b=HpL/oN3kRVB7fBqjAWhFwI7ZJ+kdsefpmdTgY
+	VtPmcE0Q1hrTnuJCx3lSrXGC4jiW5vcRGZxuu1g4QzieOcggipOiGzbOOh6igj/x
+	1stHV6jxZ8mL9n4ZwIZ9+WinTUxQmNqpK53i/zqzXNjhlXU1J78MN7rm4af+GfPQ
+	KmU3rhCMpynN3vdVoskC2yQlXrFfD1NMucI9LtR38TSYW72Vgv8p04k8fcpD+YU9
+	BNc3F7aIBernJjSTDdoV25MmiZv1dBBEGd2R4Zu/HnwzpP3PIc0nIxNY7ICLJFE2
+	9lNjxlcNb5s42owcWgKGqbV3zoXu9bFe4gplSfCnv114Wusyw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1776286143; x=1776372543; bh=XXYgQHFB5Ia1g/3uCv3zWtrmY2GLFjWR3ar
+	3w9oK7mQ=; b=G2/kuD9+3CvZlVduvwDoc9e8KQNj7Zam8aAUV/dTWR25yOsENn2
+	cpUCfgQutuWE7lNHvRRWu9VBdY2R/7A3h6zncRY6JXMBczeu4lAyH7R4WUHup7N8
+	PENoXkpQE2uxAnclQukBoqlMXbCrKofB4k/WTln+KFsWqVn7g/6dWk7WnCXJunc6
+	f8+TGbHN7W9E0hGRBozl/BN8ipHVi8O0ioJD+xSyxKugfenTBcQLNnEbQyiphmUC
+	5LsrwMUf6kYDIT69Xz1h9uZfcyzdAk2jX1w+IGdN+AxaVFBbIZ88DHPh/slWPE84
+	hm3n3uC/Kd7wn2D3EIzFhPXiBKlg6h0S0YA==
+X-ME-Sender: <xms:v_nfafY-ElaxGHIBFyr4Jym4AQ9ddfjMgtz2G1hfix74cO6xYs6M0A>
+    <xme:v_nfaVaTTMzoK_9k_2rU86CgbfWWjJOg3nypKquEw5CfLvugSsjtE_LkElHdKf1Pi
+    nPNCpaMYpONYPH21LOFJ4gERCXbUthtmfL6cyWhFFm9M1unTIq5scem>
+X-ME-Received: <xmr:v_nfaW8NLJ7lHFZpQ4aDbuISj_zz-PZMz5B41eIMb4u2jyi1mSnnr0e_J3UJ6lCXWfbb5Kg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdeghedutdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfghrlh
+    cuvffnffculdefhedmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfh
+    rhhomhepufhifigvihcukghhrghnghcuoehoshhssehfohhurhguihhmrdighiiiqeenuc
+    ggtffrrghtthgvrhhnpeeghedujefhtdelveeugeduffejffffvdfgfeeigfeujefftedv
+    tedvuefgveffheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfh
+    hrohhmpehoshhssehfohhurhguihhmrdighiiipdhnsggprhgtphhtthhopeegpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehmrghrtggvlheshhholhhtmhgrnhhnrdhorh
+    hgpdhrtghpthhtoheplhhuihiirdguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthht
+    oheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopehoshhssehfohhurhguihhmrdighiii
+X-ME-Proxy: <xmx:v_nfaUiAR2qPSmtu6jM8EbOS7LaFBMEH2p09ztvshYm3uWCny9975g>
+    <xmx:v_nfaWeEU90EsAG0UD5YBRfbHY1d5RGN76QZQ6HVN-hSKGlQWuhKIw>
+    <xmx:v_nfabo3DvU23admFf3Yg9C8jIhVFFdF3KB-rlhwaxyXqrNiJkBOJw>
+    <xmx:v_nfabDpgVBwx8gqlS0UyL2LMHU1H0E-ZTvM0kUVVXi1xwGXpHP4og>
+    <xmx:v_nfafMUgd9l89XohaLG1BGd89jHwuQR3q3CnxE1Pp-J0aic02GnkhCX>
+Feedback-ID: if72e4b10:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 15 Apr 2026 16:49:03 -0400 (EDT)
+From: Siwei Zhang <oss@fourdim.xyz>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Siwei Zhang <oss@fourdim.xyz>
+Subject: [PATCH v2 RESEND] Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()
+Date: Wed, 15 Apr 2026 16:47:54 -0400
+Message-ID: <20260415204842.2363950-1-oss@fourdim.xyz>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260415182210.514686-1-luiz.dentz@gmail.com>
-References: <20260415182210.514686-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -75,34 +84,45 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+l2cap_sock_new_connection_cb() accesses l2cap_pi(sk)->chan after
+release_sock(parent). Once the parent lock is released, the child
+socket sk can be freed by another task.
 
-Add caller workflow for the btsnoop-analyzer reusable workflow,
-enabling trace analysis from any issue comment.
+Save the channel pointer into a local variable while the parent lock
+is still held to prevent this.
+
+Fixes: 8ffb929098a5 ("Bluetooth: Remove parent socket usage from l2cap_core.c")
+Cc: stable@kernel.org
+Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
 ---
- .github/workflows/btsnoop-analyze.yml | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
- create mode 100644 .github/workflows/btsnoop-analyze.yml
+ net/bluetooth/l2cap_sock.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/.github/workflows/btsnoop-analyze.yml b/.github/workflows/btsnoop-analyze.yml
-new file mode 100644
-index 000000000000..484288c0d9b6
---- /dev/null
-+++ b/.github/workflows/btsnoop-analyze.yml
-@@ -0,0 +1,13 @@
-+name: Analyze on mention
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 71e8c1b45bce..1625e4fc38d6 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1497,6 +1497,7 @@ static void l2cap_sock_cleanup_listen(struct sock *parent)
+ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+ {
+ 	struct sock *sk, *parent = chan->data;
++	struct l2cap_chan *child_chan;
+ 
+ 	lock_sock(parent);
+ 
+@@ -1520,9 +1521,11 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+ 
+ 	bt_accept_enqueue(parent, sk, false);
+ 
++	child_chan = l2cap_pi(sk)->chan;
 +
-+on:
-+  issue_comment:
-+    types: [created]
-+
-+jobs:
-+  analyze:
-+    if: >-
-+      github.event.issue.pull_request == null &&
-+      contains(github.event.comment.body, '/analyze')
-+    uses: Vudentz/btsnoop-analyzer/.github/workflows/analyze-on-mention.yml@master
-+    secrets: inherit
+ 	release_sock(parent);
+ 
+-	return l2cap_pi(sk)->chan;
++	return child_chan;
+ }
+ 
+ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
 -- 
 2.53.0
 
