@@ -1,69 +1,69 @@
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0853290DE
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 20:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586E138C429
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 20:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776286712; cv=none; b=ZBstA+7T/HsjGDpC5pTUM3AX9vXegCH2/ak8KAgtwU2Yl63EWNj0ql1HVTcvNSr3lzStl9ZE1uTR812wsY6XSjtllxs7MnCJURVw7mp7/La1dLvrIVir+qZVI19p2ZjOl77KQYy6j/niLCAkI0qmYQRIxucTWwMwP3U9iBIryOw=
+	t=1776286713; cv=none; b=RrGE2mKpJbfJK/xqxWFo85MgAlEZC9662FrnlnpNs/LYCgLb5HUogUooNSD4N1Ex5b8rkniUjOroRLxeq15I+2us/TxHzrm+4T+Mck2XololxibTn0HUAkfg7zLs0blfKzNtiHnibZ7s9mTNcD1PNcuK/2VYcLOCvpqIAGVmjtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776286712; c=relaxed/simple;
-	bh=570iHrifgu/Sgabn8s4uNI2Up5PuSqocV+O+Xbax+/8=;
+	s=arc-20240116; t=1776286713; c=relaxed/simple;
+	bh=hr1SyPtJ0ACh4vqxJXzKWQ0r9xOgDEJOnZCn57diDKk=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Vis/5oq1k9ssBLYpjkyEOyKSbR2khDoKh+N46TMCQWKyDOsEw0CTkhrsVDmPt4K2LHB4EAglQMS2PRQciXlLuHT3N7hy8OqH1KRpByZSFcI25P4AEIS6VjThoCDRXEKODzUacNu1WOUPhyrpld8LoH9M2oASL/qE4BMCMoYOOcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FJA7zDTJ; arc=none smtp.client-ip=209.85.221.169
+	 MIME-Version; b=Vdg2Wltm3t04jGLTQ1SJcdOHIe6K1ktzJjqUrqRU7dzuUzKweCSRqoTzt/uiIRRDfJ3FETZzz5oMd1pEJlEH6FN0GAvWtNkYOdOzUkDdjT+ockywkoNRi4u0vEliWcJ2Ke1m7Fh3Ey7q2auXVnFPU8r8TV3JMW1F9dkNj+4TXBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=tF/hQmpk; arc=none smtp.client-ip=209.85.221.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FJA7zDTJ"
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-56a9a7e762bso5511125e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 13:58:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tF/hQmpk"
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-56a857578a8so2866982e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 13:58:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776286710; x=1776891510; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776286711; x=1776891511; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IRzE/EMkiSJE59A04Zcqh2pdNrsCho4p1F8UNIzOWKY=;
-        b=FJA7zDTJ5Eq6BX4pMeD0UyGKi9qHoE9rZa85bqRiUXGQn5b2SgkRQ6TMfZ0kEnehm4
-         6LWsZNtilEZaqV5W28RC+nnATAeu7IUOuHUGM6YnGgg1UcTNb50K7RnZpNSvAVCkgGtd
-         bQu2feqDrWWiRLCSHROk8ow8IYV/ME03HJNA56uqH/jhrvOq70iFoSU37TuhByj/ThKR
-         a64ddDTOgBx0pxhWnjI1Yr77xocV5FrVCVLVmYX8JVSIoxD+i78/4403G7ykVUjopcSw
-         0nvRMJ1XQPMb1uNciqyiiB658Wzsz33LzmksBNCWk+c1hAbgYpkJ+SYmkTQTgNJWlBOQ
-         +z1g==
+        bh=he+j6+AAh2ivKJP2IMM7LeOVAU++e/q5qxYPHatOL54=;
+        b=tF/hQmpkbg/U2fWVl6wcGN3do1KrSRRYhz1cOxG2TEI3gS1U0Il6ymTco0xaonR6RN
+         sqtqB09Wa7ldb7PfDi0Gm4eAGj8/rxjII2XYdtLMPCyBwRNV40IYBfM7rWrRn+pG5o5i
+         BJEOEOhnkS3LuPrj9g5tM0y8BhMqi6s5Fd9ICT2n5JntIWWQRIEVsc9l0MRF1hl9w1yG
+         DKFhinwEJm3nuj4FabPVxdvIs2uCSUtNs2wXzFcnEKwWHRTtxx/m8EbGKjqMaKYm1iQy
+         74IsjZmCpwLisnE9P8kkD7zMHTeNKQU6xNPloUDv3j2BQ8jTMmBu2bJvZNk54MDANv1/
+         2gRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776286710; x=1776891510;
+        d=1e100.net; s=20251104; t=1776286711; x=1776891511;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=IRzE/EMkiSJE59A04Zcqh2pdNrsCho4p1F8UNIzOWKY=;
-        b=otFsMccWBRsre/5MYe7gwQ8eqJhCAX1Cn+KyHJSNcorcn7jYiSGtGlbODazXX22mVa
-         02meN62Djr5Z7ZNox3at6JBYg3y/brk/mqzsNu+778jXBzeOzv8AYJZFtaZse1dN7d+J
-         87RAj86QX2kO/juadSDk6Qdxy1Vs1ybsW125C2uFzjB5ueCZfUvKrReaAYHOCfv/IXjF
-         qfc2Ujd+k+lP/eKdaaF5vdjdyV1kVXVvE/MGjpT5d/XDqKoMpxHOTv/gJuCNE47lxZ0s
-         9QHn/bdEM//YdWUGTJe1CTozbT0gr012YTV5dsaTlFx9YkaHExQgHVgtDPcyyX9ywuIe
-         xgeA==
-X-Gm-Message-State: AOJu0YwLpYb2OKXVAJyXcYP6tCZxs4QvMybcpBU3Xlj4ZNttHg2QLrOs
-	7SR/TLDEkRvxsWXdQNZFcPEHHeZfJvVEuypT48iGnDtWKOlB6yqf529TiUpbzQH97Bw=
-X-Gm-Gg: AeBDievoTDfGHL0pkgeDSP72lMhNB5klmQNtPiGoB/zzkXfntpdkL3hGTcn0lUeWW+S
-	36S6t0gmR35beHW6kaizv1PCIUNFSOWO+JYfcMVjnCqPMAOkxIZ83mIXnEV2Pf6oE812qr356im
-	CBaFcXCp6Y3T+0wYiaeqTXQCP/ZuSiAAdwd8nwcuKKPcTyW5MPM7SbvlTox26kEFX063T983uRv
-	DR7rxEPQg6aRWCGyT4Ohcux1v2Ug8xa9oHOlgVAmy4Av6h6qe6rPYUW2awHsGFbARCA7ylx4/nI
-	hMvWoYuw/rtPfXGpqTHWDGd9QKNpswfmOl7grjepHpK4BHcunFir8shgABOMmiE1o2ET8FhigGo
-	NqS8EcXr+jYV+WnkMNjiRi1Ylsh6v68pL3d/hI9kyZ/thnZm75Rr16egOQln2iNOsg4dUdSfcio
-	rTbO4DspTYD3z12Mt3wC3MM3mdRan66s77zKao6EHFW0OPle0dmqXpyY+8iqAbzcnh2wpLEd5Pz
-	b36MNBFLKHSvKnuNRgjViw/Ohe1
-X-Received: by 2002:a05:6122:e44c:b0:56b:7023:1393 with SMTP id 71dfb90a1353d-56f3bce3ad3mr12158012e0c.11.1776286709823;
-        Wed, 15 Apr 2026 13:58:29 -0700 (PDT)
+        bh=he+j6+AAh2ivKJP2IMM7LeOVAU++e/q5qxYPHatOL54=;
+        b=oGthUAFS4Y4S29djV/lsR4k1D4wW4OrxkFiZAXnEfMogLtqbCPdZ3OOZPFEoNiYN1O
+         v9zu3w+QhGyKb52I9gNXXE99eDTr+snCZJf3PAXtPyaq87DE+zwJevF8uZvGgs4BrF40
+         dEAuVO0/GzjlEgrdudBPR2MNCQljejqHuRle+XSdkHXrFMSO4D0/ays9Kzi0EW2hfz/E
+         gLu967r9Dq0jv/dg2XEX5thAE0jqVbV6IeQVO7nMUMpBvZZLciDtF9yXHotA/ch2l1iy
+         4aSzNfDzWFPObXFEI9o4454XLx2n56YW/C2rgZrbv+D/guJMVHCty01EqF4L/qEIP+3O
+         U/uQ==
+X-Gm-Message-State: AOJu0Yx4y0XX97hZHIQOlqOqkAm1ul8iplPYz7QuQuz7RfcNtfiDl6/O
+	XNG0/w+itPhNjfbAEJwXmXVEpa30rxki/ArsanZAdckwfQxWiXp7aAvKtQrp1zdKRP8=
+X-Gm-Gg: AeBDievdFfX454k56I20sFJ5/e5X4SkzxS8W4/D8j4/YJ4VVek5b8rwAsmzFZM8Z6aJ
+	4YutbhTuFB2eoSZlGLEkhmr5M5EYvWvi6VVu6ofhi54MJOhW0P6K983AzJYUnHxjyJvsG9Bv4o4
+	OGp6YHWVqa15vj0h6TmxG8oRqMDAdjk+MLNt40bj+dFQppmr+uqWgUcvzropNws+XQbkypeuS1X
+	Ohreqw1HLyRCDxB2Z0V2DZo3kDgnv2vSwOIoSXl6sgFhiNyBdV19QTHOry8KA7n31mg0YRVIDjJ
+	boVG4hAcAvxXjnW0iAgPGV+M13R70DVbzh9odKnDRb1VEb+87M2B1hx793Mv+J1RaIdThvvByQe
+	SdJj5oSubjAvDaZQ0MPt0JEl9GxrOzEgr8nKaOHu+aLMNXl2nbs36pU5aN65ihLAuMyz9rKBs5W
+	qnYbXHW7keBfU/rAX6z1XXhUW6H5lmH9G561xJn6nQvFvfvt4ancm8qsRw+qUfqUspkHfS9L0rd
+	BnOfAamPNsu+ner1pAipu2l9PPNOEEOWQz92ZQ=
+X-Received: by 2002:a05:6122:1d4c:b0:56a:fff5:b4d6 with SMTP id 71dfb90a1353d-56f3bb66d4cmr11002310e0c.4.1776286711182;
+        Wed, 15 Apr 2026 13:58:31 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56f8a032227sm2059622e0c.18.2026.04.15.13.58.28
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56f8a032227sm2059622e0c.18.2026.04.15.13.58.30
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2026 13:58:29 -0700 (PDT)
+        Wed, 15 Apr 2026 13:58:30 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/3] monitor: Use wall-clock duration for throughput and add min/max speed
-Date: Wed, 15 Apr 2026 16:58:17 -0400
-Message-ID: <20260415205818.594024-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 3/3] doc: Add throughput estimation section to btmon-l2cap.rst
+Date: Wed, 15 Apr 2026 16:58:18 -0400
+Message-ID: <20260415205818.594024-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260415205818.594024-1-luiz.dentz@gmail.com>
 References: <20260415205818.594024-1-luiz.dentz@gmail.com>
@@ -77,176 +77,78 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The previous speed calculation used the sum of per-packet latencies as
-the denominator.  For TX, each latency measures the time from command
-submission to completion event -- when multiple packets are in-flight
-simultaneously these overlap, making the sum much larger than wall-clock
-time and deflating the reported speed.  For RX the inter-arrival sum
-roughly equals wall-clock time.  This asymmetry caused the same data
-stream to report vastly different speeds depending on direction.
-
-Fix by computing speed from wall-clock duration (last packet timestamp
-minus first packet timestamp), which gives consistent results regardless
-of direction.  Also add 1-second windowed throughput tracking to report
-min and max speed alongside the average.
+Document the throughput statistics reported by btmon analyze mode,
+including speed calculation methodology, channel details (PSM, mode,
+MTU, MPS), and caveats about inter-packet latency vs wall-clock time.
+Also document the windowed throughput approach used by btsnoop-analyzer.
 ---
- monitor/analyze.c | 92 ++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 84 insertions(+), 8 deletions(-)
+ doc/btmon-l2cap.rst | 56 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
-diff --git a/monitor/analyze.c b/monitor/analyze.c
-index 68e4910325e5..de9c23603a21 100644
---- a/monitor/analyze.c
-+++ b/monitor/analyze.c
-@@ -61,6 +61,14 @@ struct hci_stats {
- 	struct queue *plot;
- 	uint16_t min;
- 	uint16_t max;
-+	/* Wall-clock throughput tracking */
-+	struct timeval first_ts;
-+	struct timeval last_ts;
-+	/* Windowed throughput (1-second windows) */
-+	struct timeval window_start;
-+	size_t window_bytes;
-+	long long speed_min;	/* Kb/s, 0 = not set */
-+	long long speed_max;	/* Kb/s */
- };
- 
- struct hci_conn {
-@@ -141,6 +149,8 @@ static void plot_draw(struct queue *queue, const char *title)
- 
- static void print_stats(struct hci_stats *stats, const char *label)
- {
-+	long long duration_ms;
+diff --git a/doc/btmon-l2cap.rst b/doc/btmon-l2cap.rst
+index e8c52c5e6c5c..6543f31db95c 100644
+--- a/doc/btmon-l2cap.rst
++++ b/doc/btmon-l2cap.rst
+@@ -190,3 +190,59 @@ Automating L2CAP Analysis
+ channel, note the Source CID and Destination CID from the Connection
+ Request/Response pair. Then search for those CIDs in subsequent data
+ frames.
 +
- 	if (!stats->num)
- 		return;
- 
-@@ -152,9 +162,41 @@ static void print_stats(struct hci_stats *stats, const char *label)
- 	print_field("%s size: %u-%u octets (~%zd octets)", label,
- 			stats->min, stats->max, stats->bytes / stats->num);
- 
--	if (TV_MSEC(stats->latency.total))
--		print_field("%s speed: ~%lld Kb/s", label,
--			stats->bytes * 8 / TV_MSEC(stats->latency.total));
-+	/* Compute wall-clock speed from first/last packet timestamps */
-+	duration_ms = TV_MSEC(stats->last_ts) - TV_MSEC(stats->first_ts);
-+	if (duration_ms > 0) {
-+		long long avg_speed = stats->bytes * 8 / duration_ms;
++Throughput Estimation
++----------------------
 +
-+		/* Close the last window for min/max if it has data */
-+		if (stats->window_bytes > 0 && stats->num > 1) {
-+			struct timeval delta;
-+			long long last_win_ms;
++btmon's ``--analyze`` (``-a``) mode computes per-channel statistics
++including throughput.  For each L2CAP channel it reports:
 +
-+			timersub(&stats->last_ts, &stats->window_start,
-+								&delta);
-+			last_win_ms = TV_MSEC(delta);
-+			if (last_win_ms > 0) {
-+				long long speed;
++- **Speed**: Computed as ``bytes * 8 / latency_sum_ms`` where
++  ``latency_sum_ms`` is the sum of inter-packet deltas (not wall-clock
++  duration).  This means idle gaps are excluded, so the figure
++  represents the *active sending rate* rather than application-level
++  throughput.
 +
-+				speed = stats->window_bytes * 8 /
-+								last_win_ms;
-+				if (!stats->speed_min ||
-+						speed < stats->speed_min)
-+					stats->speed_min = speed;
-+				if (speed > stats->speed_max)
-+					stats->speed_max = speed;
-+			}
-+		}
++- **Min/Avg/Max latency**: Per-packet inter-arrival time range.
 +
-+		if (stats->speed_min && stats->speed_max)
-+			print_field("%s speed: ~%lld Kb/s "
-+				"(min ~%lld Kb/s max ~%lld Kb/s)",
-+				label, avg_speed,
-+				stats->speed_min, stats->speed_max);
-+		else
-+			print_field("%s speed: ~%lld Kb/s", label,
-+								avg_speed);
-+	}
- 
- 	plot_draw(stats->plot, label);
- }
-@@ -1066,7 +1108,8 @@ static void event_pkt(struct timeval *tv, uint16_t index,
- 	}
- }
- 
--static void stats_add(struct hci_stats *stats, uint16_t size)
-+static void stats_add(struct hci_stats *stats, struct timeval *tv,
-+							uint16_t size)
- {
- 	stats->num++;
- 	stats->bytes += size;
-@@ -1075,6 +1118,39 @@ static void stats_add(struct hci_stats *stats, uint16_t size)
- 		stats->min = size;
- 	if (!stats->max || size > stats->max)
- 		stats->max = size;
++Example output::
 +
-+	/* Wall-clock timestamp tracking */
-+	if (!timerisset(&stats->first_ts))
-+		stats->first_ts = *tv;
-+	stats->last_ts = *tv;
++    Found TX L2CAP channel with CID 64
++          PSM 128 (0x0080)
++          Mode: LE Credit
++          MTU: 672
++          MPS: 490
++          TX packets: 29120/29114
++          TX Latency: 1-79 msec (~29 msec)
++          TX size: 494-494 octets (~494 octets)
++          TX speed: ~571 Kb/s
 +
-+	/* Windowed throughput: 1-second windows */
-+	if (!timerisset(&stats->window_start)) {
-+		stats->window_start = *tv;
-+		stats->window_bytes = size;
-+	} else {
-+		struct timeval delta;
++**Channel details shown in analyze mode:**
 +
-+		timersub(tv, &stats->window_start, &delta);
-+		if (TV_MSEC(delta) >= 1000) {
-+			/* Close current window, compute speed */
-+			long long speed;
++- **Fixed channels** (CID <= 7) display their protocol name
++  (e.g., ``ATT``, ``L2CAP Signaling (LE)``).
++- **PSM** is shown in both decimal and hexadecimal.
++- **Mode** is decoded from Configure Request options (BR/EDR) or
++  LE signaling (``Basic``, ``ERTM``, ``LE Credit``,
++  ``Enhanced Credit``, etc.).
++- **MTU** and **MPS** are extracted from signaling exchanges.
 +
-+			speed = stats->window_bytes * 8 /
-+						TV_MSEC(delta);
++**Throughput caveats:**
 +
-+			if (!stats->speed_min || speed < stats->speed_min)
-+				stats->speed_min = speed;
-+			if (speed > stats->speed_max)
-+				stats->speed_max = speed;
++1. The speed value uses inter-packet latency sums as the denominator,
++   not wall-clock elapsed time.  If the sender pauses (e.g., waiting
++   for credits), the idle period is not counted, which inflates the
++   reported speed relative to overall throughput.
 +
-+			/* Start new window */
-+			stats->window_start = *tv;
-+			stats->window_bytes = size;
-+		} else {
-+			stats->window_bytes += size;
-+		}
-+	}
- }
- 
- static void conn_pkt_tx(struct hci_conn *conn, struct timeval *tv,
-@@ -1087,10 +1163,10 @@ static void conn_pkt_tx(struct hci_conn *conn, struct timeval *tv,
- 	last_tx->chan = chan;
- 	queue_push_tail(conn->tx_queue, last_tx);
- 
--	stats_add(&conn->tx, size);
-+	stats_add(&conn->tx, tv, size);
- 
- 	if (chan)
--		stats_add(&chan->tx, size);
-+		stats_add(&chan->tx, tv, size);
- }
- 
- static void conn_pkt_rx(struct hci_conn *conn, struct timeval *tv,
-@@ -1106,7 +1182,7 @@ static void conn_pkt_rx(struct hci_conn *conn, struct timeval *tv,
- 
- 	conn->last_rx = *tv;
- 
--	stats_add(&conn->rx, size);
-+	stats_add(&conn->rx, tv, size);
- 	conn->rx.num_comp++;
- 
- 	if (chan) {
-@@ -1118,7 +1194,7 @@ static void conn_pkt_rx(struct hci_conn *conn, struct timeval *tv,
- 
- 		chan->last_rx = *tv;
- 
--		stats_add(&chan->rx, size);
-+		stats_add(&chan->rx, tv, size);
- 		chan->rx.num_comp++;
- 	}
- }
++2. TX latency is measured from command submission to completion event.
++   RX latency is the inter-arrival time between consecutive packets.
++   These measure different things, so TX and RX speeds for the same
++   channel are not directly comparable.
++
++3. For windowed throughput (min/avg/max), btsnoop-analyzer uses
++   1-second sampling windows over wall-clock time, which provides
++   a more realistic view of application-level bandwidth variation.
++
++**Automated throughput extraction** from btmon analyze output::
++
++    btmon -a trace.btsnoop 2>/dev/null | grep -E "speed:|Mode:|MTU:|MPS:|PSM"
 -- 
 2.53.0
 
