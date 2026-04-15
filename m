@@ -1,80 +1,67 @@
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166E731AA87
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 20:54:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E5B38B14E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 20:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776286450; cv=none; b=lttiSaJvixsXXCIv7TWr0ByNlGclkJYlmyidE1Du7UhEJsX08R0i/+y9AsErhLLF0DQ2RbF8/YekavgwkGY5pKTu2AfXXARimQr+nvtTcttkIop1J4dYTTcrpWvHWdCY7r1y1vu3upcPRhbm6a7KswZ1SxqvkG5PZq2KmldmK8w=
+	t=1776286711; cv=none; b=h3qvXpkWOySxFcFTpb1hQr0uf4BWrDwrCosGL3EOn1Y/6kPk7A7nZy6MQqDdak7q0GXGqPPdHEj/UqNCk5VZy7eG95/pO6q+x6DNDxUlGNtiMR2kqq2a1C7CFM0HC230D2VcfryVeobrIObPw5U7mJuHtqW3goPvcZEPAmdnt9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776286450; c=relaxed/simple;
-	bh=5LuKKDDYD18agFFUuW6IDj+eqiisvUfQDI0nXpezae4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VNoRBrvZxWGfBd5nOnJGOaMX0yIVi7USjTZHGcSKfafyJDFlUf0xJoS7WWs80DK2j5spsWx5y6RueLwsMqo8QemBAWm+vCslpIJOFNwggwLuzhFS0abQFOzuhIe2jUGsTrmaIbRwVAGG7UzZsbRFzOy9p5cQa/gVoTLp8BO7bDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=p4Mloaei; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lLlUB48i; arc=none smtp.client-ip=103.168.172.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
+	s=arc-20240116; t=1776286711; c=relaxed/simple;
+	bh=tK8T0nPt0fr0zrxbVVuhDSzbpXJlmOWqPaP4U5fsYLY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=XZbvJ8CXAKf4eqNP30/CGNuKtOCQX/sv3/noi1oRqWA6xppyXcXyphrNittnBNBBCQkIk7Yl2i4eVvFmNZvJm8O0dQYTW56gE3tzzu3t8WR6sJBHyl/ZskthdjEoZeu2HTG8XpDc7eVcqanmNK2Ns83JaKmm29TRHKfybnQpg1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MVFoCaa/; arc=none smtp.client-ip=209.85.221.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="p4Mloaei";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lLlUB48i"
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfout.phl.internal (Postfix) with ESMTP id 5E44CEC00C6;
-	Wed, 15 Apr 2026 16:54:08 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Wed, 15 Apr 2026 16:54:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm1; t=1776286448; x=1776372848; bh=uXzKEhf3LHBF+X4lWGJH9
-	IhU3L1pkW+Z5HQ6+JPO96s=; b=p4MloaeizDhGPmww5oJDMiHeaCUiOkOlI3AjG
-	hb9ho4ZEDClf8X7aX7Gp14ctPvYxLZr/ls9VfgAzpfxuQuFQAKiQ7p9j7eLDK2od
-	6aZNCElxwMoBjY07BumSOULJkIZsT2huy6ve7xOXPsmy8bXrfYVkOmcIVTUg5Hmm
-	6wBAs1ZaFDyMWagOFcKoQuHR5z7R7PqQuY1oHD4LWwoa5zCN9VHVOdN/KjfYQUlS
-	JJR7qe4jMYt2vUxwkdZDL9zL/NBtJNH+PAYeVGt7m9TLtBuYx1d4QoeTSyHVUFY9
-	bRO+G+z/z+lYz+7tsarMS8GGLPNWkHxU8/pCqYO8AekYh8K6Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1776286448; x=1776372848; bh=uXzKEhf3LHBF+X4lWGJH9IhU3L1pkW+Z5HQ
-	6+JPO96s=; b=lLlUB48i7PIzghdwF8xMQrpQxodF7vI4fT1ODpJ8v49trjiDxfA
-	wkzPDUucIZ86m24p0Vj4OniLjnFqjFyk+Ny3q8/BVivxeGmly4DRBAnSXgw4rdPr
-	1+pVbOmav0DQGiWBfrpXUohHn5R/oFSz28KjTWZrJD0O+Kf1atNv6TERV+LmggO/
-	9ZVNV3Nz63QM5q14jT/enRay4d43AHvyss1xYUv4B4P5I/e+4gE4rW9DCeF3TTXG
-	8jfP8ZOXtN9+JR0tZqxkl8IR3+c9Z91dv+A8ube9NrFlshw8CmO+H+CZJl1QqIbO
-	ZWfpFrcmoXS+Ggmi28q8VFic5vbBpd+cDRA==
-X-ME-Sender: <xms:8PrfaXguUcIkcq1abvGORNJihJu331vnGE3-bBT1ywSypioIbZ-Nxw>
-    <xme:8PrfabBZH_Zytp4MlFM89I7if8NkvrhTBOowAitif_s_c9RMimwVGQVCUnbo-A7UX
-    pRWiNAPJ7Znwrs3Qdq3orhgQEPDKrtQxcckLtf5B0YKGz3NCgxr7gU>
-X-ME-Received: <xmr:8PrfacFdF7KgKE1i9rUBpA71ZCd9xRB6JysXh5JjX9eUC3nJkpX5C-HJpL2yr4_Y1QitdTs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdegheduudcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfghrlh
-    cuvffnffculdefhedmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfh
-    rhhomhepufhifigvihcukghhrghnghcuoehoshhssehfohhurhguihhmrdighiiiqeenuc
-    ggtffrrghtthgvrhhnpeeghedujefhtdelveeugeduffejffffvdfgfeeigfeujefftedv
-    tedvuefgveffheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfh
-    hrohhmpehoshhssehfohhurhguihhmrdighiiipdhnsggprhgtphhtthhopeegpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopehmrghrtggvlheshhholhhtmhgrnhhnrdhorh
-    hgpdhrtghpthhtoheplhhuihiirdguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthht
-    oheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
-    gtphhtthhopehoshhssehfohhurhguihhmrdighiii
-X-ME-Proxy: <xmx:8PrfaTJfOncjbGxjWH1GdeqTHBaz-vWrnoo6AhtArb01cp2bwNYqzQ>
-    <xmx:8PrfaQmqugD5bTALYeW_2dDmp8ZDUp94Qhq-jkfmPRHEc-b5xEj82Q>
-    <xmx:8PrfabTJIOFSJQoYvzmBcRN0gKQXcAnk_J-mrci1bdO0MhlyAXdLtw>
-    <xmx:8PrfaSKtCOKmPDJ5ECetZJ8gaRcahIvI-oZHg4c_ZVq2CjqpKB8OSQ>
-    <xmx:8PrfaWRSH-dPtYsw0KJ4SCbdo5-HBAqvXpf7PJkipqG20fINBm8HzJLS>
-Feedback-ID: if72e4b10:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 15 Apr 2026 16:54:07 -0400 (EDT)
-From: Siwei Zhang <oss@fourdim.xyz>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Siwei Zhang <oss@fourdim.xyz>
-Subject: [PATCH v3] Bluetooth: L2CAP: Fix null-ptr-deref in l2cap_sock_get_sndtimeo_cb()
-Date: Wed, 15 Apr 2026 16:53:36 -0400
-Message-ID: <20260415205344.2368172-1-oss@fourdim.xyz>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MVFoCaa/"
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-56a8e0ea02aso7195978e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 13:58:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776286708; x=1776891508; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KZhyBlSyM0CnSTG7TFhovSfhAGT0ujk272wKbjOg+OE=;
+        b=MVFoCaa/YRwyl1EefwUodLVwS01JiTiq7HFeaEEqVdxEIQNp4fJ7Guo1BI5NTfwim+
+         nz6q4xOtxAEEdKX/7ktqubnUl96AN6BmQApdCti684W2XS6DUSAsBKXF34jZpcvgQcUg
+         Svx95sqLs61EfLZVu8NbvVwbTY7bXMz3OcqceRcX26OEwRkWXZIPKLxB/rt1/hyVsE3L
+         eaYhwA4ntGomDnXKjZw2ARUuL+Z7nNhRTXWpOLRzFTLOn5XY8fFqn0g+oYfkzmxClgmM
+         hRyIKhKY4L0CHzGZV5aj2cuUfW7bmoAqsjaZxoJvJ5LE/UBMY+MiXfQ9+BE56fYecJvJ
+         KKdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776286708; x=1776891508;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KZhyBlSyM0CnSTG7TFhovSfhAGT0ujk272wKbjOg+OE=;
+        b=kTejfHvsHPVo3dD7h2yhzBFV5SFf2IE4iv0PMG9CFxnVvhBBCOJNu7eNAoshMgze6g
+         WvZk0kh34bJf3KlX6Vs+n9/RD+0XAqFL2Rg8vHZuAW4iZzUEVqyvsZ5o8K13iXxldodo
+         uxtooDp5UalVm/sCMZN86Cw9UQeWc53eZk9035tlhC+5npQ2WQ5CReO6mLmyD1RlvSLp
+         aQGM0SScy0Yw0+/WkBf9pQKcZKfFtTfTgg2zAGDkVWoCYhso4eSWYwCnpAfk6zAAVysI
+         tQzdrqlIHZfsNdWfCm3M7SXzXvaRZ5M3Rtb4t5Ke/N+zefH58QDFBEh4ROy7BMHI+mpX
+         fyqQ==
+X-Gm-Message-State: AOJu0YwtVc9yhVG0K2SbeB0MXTG436ApoTPq4q+1RkaA6Fu6pe/R5149
+	Cz5pCCJiAj4aDycclQTMQQO1k50FmeNKtajznStbkzrZY+iKhWNm6NAt4ZcxZ0OR/IY=
+X-Gm-Gg: AeBDiesA09gLeKRTNqMp3FzHY77vgRb8zDJJqmYCKaOt2vGfK0jDqPJY+8xoPROJiis
+	2vpd8PrU90Rf7YkBCo4XH+LHI60Ny/R2EGifuxxnBHs6sa2dbWJzg7mRNjEoLAAiUeM++RQk6IF
+	0PrYUgh+UELunuNCfDY/oNL0EevrBisT2Zb2E/F41q58dY2wITmLji21lITQ9Bhvd53JxPzg9P3
+	kSR4S5MxPCAklB3wggw9QKJsCMsslyUK2wk9m+OaeYDusHwTXJSulsSvkB61ycQVKp7qhZ6Yhm6
+	XhiBctPhonv1QzSaSAAZ5g8x4C24qT/Dxl8SMfdtzXYItNCcYSBahLTIweEZYayUZ0OwM2b1hXo
+	TvVy6d1CqnnLsIhWMNvr26qVEV4y2gB/7xrztQzHOXSA/Bu1qhmAQFtDuxwMkOAEgthDRBJtnzU
+	u4oxGq/jEq4xuOaCjpzDgz8OY70LZifwLsm4htjNUsnKaPgHVcQOBFTg/48yiGyq8KxWf0XojL6
+	tE0zhMWlVc/sxOvWt61b65h4uKp+qfHI04TlhQ=
+X-Received: by 2002:a05:6122:45a6:b0:56a:ef51:4cae with SMTP id 71dfb90a1353d-56f3bb8a321mr11782733e0c.4.1776286708160;
+        Wed, 15 Apr 2026 13:58:28 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56f8a032227sm2059622e0c.18.2026.04.15.13.58.27
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Apr 2026 13:58:27 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/3] monitor: Add L2CAP channel details to analyze output
+Date: Wed, 15 Apr 2026 16:58:16 -0400
+Message-ID: <20260415205818.594024-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -84,29 +71,284 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the same NULL guard already present in
-l2cap_sock_resume_cb() and l2cap_sock_ready_cb().
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Fixes: 8d836d71e222 ("Bluetooth: Access sk_sndtimeo indirectly in l2cap_core.c")
-Cc: stable@kernel.org
-Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
+Enhance btmon analyze mode to display richer per-channel information:
+
+- Add MTU, MPS, and mode fields to struct l2cap_chan
+- Parse Configure Request/Response options for BR/EDR channels to
+  extract MTU (option 0x01) and mode (option 0x04)
+- Add l2cap_le_sig() to parse LE signaling (CID 5) for LE Credit
+  Based Connection Request/Response and Enhanced Credit Connection
+  Request, extracting PSM, MTU, MPS, and mode
+- Display fixed channel names (ATT, L2CAP Signaling, SMP) for CID <= 7
+- Show PSM in both decimal and hex format
+- Print mode, MTU, and MPS for dynamic channels
 ---
- net/bluetooth/l2cap_sock.c | 3 +++
- 1 file changed, 3 insertions(+)
+ monitor/analyze.c | 221 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 219 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 71e8c1b45bce..ac48148a7628 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1758,6 +1758,9 @@ static long l2cap_sock_get_sndtimeo_cb(struct l2cap_chan *chan)
- {
- 	struct sock *sk = chan->data;
- 
-+	if (!sk)
-+		return 0;
-+
- 	return READ_ONCE(sk->sk_sndtimeo);
+diff --git a/monitor/analyze.c b/monitor/analyze.c
+index 819d621cd03d..68e4910325e5 100644
+--- a/monitor/analyze.c
++++ b/monitor/analyze.c
+@@ -94,6 +94,9 @@ struct plot {
+ struct l2cap_chan {
+ 	uint16_t cid;
+ 	uint16_t psm;
++	uint16_t mtu;
++	uint16_t mps;
++	uint8_t mode;
+ 	bool out;
+ 	struct timeval last_rx;
+ 	struct hci_stats rx;
+@@ -156,17 +159,76 @@ static void print_stats(struct hci_stats *stats, const char *label)
+ 	plot_draw(stats->plot, label);
  }
+ 
++static const char *fixed_channel_name(uint16_t cid)
++{
++	switch (cid) {
++	case 0x0001:
++		return "L2CAP Signaling (BR/EDR)";
++	case 0x0002:
++		return "Connectionless";
++	case 0x0003:
++		return "AMP Manager";
++	case 0x0004:
++		return "ATT";
++	case 0x0005:
++		return "L2CAP Signaling (LE)";
++	case 0x0006:
++		return "SMP (LE)";
++	case 0x0007:
++		return "SMP (BR/EDR)";
++	default:
++		return NULL;
++	}
++}
++
++static const char *l2cap_mode_name(uint8_t mode)
++{
++	switch (mode) {
++	case 0x00:
++		return "Basic";
++	case 0x01:
++		return "Retransmission";
++	case 0x02:
++		return "Flow Control";
++	case 0x03:
++		return "ERTM";
++	case 0x04:
++		return "Streaming";
++	case 0x80:
++		return "LE Credit";
++	case 0x81:
++		return "Enhanced Credit";
++	default:
++		return "Unknown";
++	}
++}
++
+ static void chan_destroy(void *data)
+ {
+ 	struct l2cap_chan *chan = data;
++	const char *fixed;
+ 
+ 	if (!chan->rx.num && !chan->tx.num)
+ 		goto done;
+ 
+-	printf("  Found %s L2CAP channel with CID %u\n",
++	fixed = fixed_channel_name(chan->cid);
++	if (fixed)
++		printf("  Found %s L2CAP channel with CID %u (%s)\n",
++					chan->out ? "TX" : "RX", chan->cid,
++					fixed);
++	else
++		printf("  Found %s L2CAP channel with CID %u\n",
+ 					chan->out ? "TX" : "RX", chan->cid);
++
+ 	if (chan->psm)
+-		print_field("PSM %u", chan->psm);
++		print_field("PSM %u (0x%04x)", chan->psm, chan->psm);
++	if (!fixed) {
++		print_field("Mode: %s", l2cap_mode_name(chan->mode));
++		if (chan->mtu)
++			print_field("MTU: %u", chan->mtu);
++		if (chan->mps)
++			print_field("MPS: %u", chan->mps);
++	}
+ 
+ 	print_stats(&chan->rx, "RX");
+ 	print_stats(&chan->tx, "TX");
+@@ -433,6 +495,159 @@ static void l2cap_sig(struct hci_conn *conn, bool out,
+ 				chan->psm = psm;
+ 		}
+ 		break;
++	case BT_L2CAP_PDU_CONFIG_REQ:
++	{
++		const struct bt_l2cap_pdu_config_req *pdu = data + 4;
++		const uint8_t *opts;
++		uint16_t opts_len;
++
++		dcid = le16_to_cpu(pdu->dcid);
++		/* Options start after the 4-byte config req header */
++		opts = data + 4 + sizeof(*pdu);
++		opts_len = size - 4 - sizeof(*pdu);
++
++		chan = chan_lookup(conn, dcid, !out);
++		if (!chan)
++			break;
++
++		while (opts_len >= 2) {
++			uint8_t type = opts[0];
++			uint8_t len = opts[1];
++
++			if (opts_len < (uint16_t)(2 + len))
++				break;
++
++			switch (type) {
++			case 0x01: /* MTU */
++				if (len >= 2)
++					chan->mtu = get_le16(opts + 2);
++				break;
++			case 0x04: /* Retransmission and Flow Control */
++				if (len >= 1)
++					chan->mode = opts[2];
++				break;
++			}
++
++			opts += 2 + len;
++			opts_len -= 2 + len;
++		}
++		break;
++	}
++	case BT_L2CAP_PDU_CONFIG_RSP:
++	{
++		const struct bt_l2cap_pdu_config_rsp *pdu = data + 4;
++		const uint8_t *opts;
++		uint16_t opts_len;
++
++		scid = le16_to_cpu(pdu->scid);
++		/* Options start after the 6-byte config rsp header */
++		opts = data + 4 + sizeof(*pdu);
++		opts_len = size - 4 - sizeof(*pdu);
++
++		chan = chan_lookup(conn, scid, out);
++		if (!chan)
++			break;
++
++		while (opts_len >= 2) {
++			uint8_t type = opts[0];
++			uint8_t len = opts[1];
++
++			if (opts_len < (uint16_t)(2 + len))
++				break;
++
++			switch (type) {
++			case 0x01: /* MTU */
++				if (len >= 2)
++					chan->mtu = get_le16(opts + 2);
++				break;
++			case 0x04: /* Retransmission and Flow Control */
++				if (len >= 1)
++					chan->mode = opts[2];
++				break;
++			}
++
++			opts += 2 + len;
++			opts_len -= 2 + len;
++		}
++		break;
++	}
++	}
++}
++
++static void l2cap_le_sig(struct hci_conn *conn, bool out,
++					const void *data, uint16_t size)
++{
++	const struct bt_l2cap_hdr_sig *hdr = data;
++	struct l2cap_chan *chan;
++	uint16_t psm, scid, dcid;
++
++	switch (hdr->code) {
++	case BT_L2CAP_PDU_LE_CONN_REQ:
++	{
++		const struct bt_l2cap_pdu_le_conn_req *pdu = data + 4;
++
++		psm = le16_to_cpu(pdu->psm);
++		scid = le16_to_cpu(pdu->scid);
++		chan = chan_lookup(conn, scid, out);
++		if (chan) {
++			chan->psm = psm;
++			chan->mtu = le16_to_cpu(pdu->mtu);
++			chan->mps = le16_to_cpu(pdu->mps);
++			chan->mode = 0x80; /* LE Credit */
++		}
++		break;
++	}
++	case BT_L2CAP_PDU_LE_CONN_RSP:
++	{
++		const struct bt_l2cap_pdu_le_conn_rsp *pdu = data + 4;
++
++		dcid = le16_to_cpu(pdu->dcid);
++
++		/* The response's dcid is the responder's CID.  Its MTU/MPS
++		 * belong to the responder, so set them on the channel for
++		 * that direction (out).  Also propagate PSM from the
++		 * requester's channel (!out) if available.
++		 */
++		chan = chan_lookup(conn, dcid, out);
++		if (chan) {
++			struct l2cap_chan *req_chan;
++
++			chan->mtu = le16_to_cpu(pdu->mtu);
++			chan->mps = le16_to_cpu(pdu->mps);
++			chan->mode = 0x80; /* LE Credit */
++
++			/* Propagate PSM from the request channel */
++			req_chan = queue_find(conn->chan_list,
++					chan_match_cid,
++					UINT_TO_PTR(dcid |
++						(!out ? 0x10000 : 0)));
++			if (req_chan && req_chan->psm)
++				chan->psm = req_chan->psm;
++		}
++		break;
++	}
++	case BT_L2CAP_PDU_ECRED_CONN_REQ:
++	{
++		const struct bt_l2cap_pdu_ecred_conn_req *pdu = data + 4;
++		uint16_t req_len = le16_to_cpu(hdr->len);
++		int num_cids;
++		int i;
++
++		psm = le16_to_cpu(pdu->psm);
++		num_cids = (req_len - sizeof(*pdu)) / sizeof(uint16_t);
++
++		for (i = 0; i < num_cids; i++) {
++			scid = le16_to_cpu(pdu->scid[i]);
++			chan = chan_lookup(conn, scid, out);
++			if (chan) {
++				chan->psm = psm;
++				chan->mtu = le16_to_cpu(pdu->mtu);
++				chan->mps = le16_to_cpu(pdu->mps);
++				chan->mode = 0x81; /* Enhanced Credit */
++			}
++		}
++		break;
++	}
+ 	}
+ }
+ 
+@@ -938,6 +1153,8 @@ static void acl_pkt(struct timeval *tv, uint16_t index, bool out,
+ 		chan = chan_lookup(conn, cid, out);
+ 		if (cid == 1)
+ 			l2cap_sig(conn, out, data + 4, size - 4);
++		else if (cid == 5)
++			l2cap_le_sig(conn, out, data + 4, size - 4);
+ 		break;
+ 	}
  
 -- 
 2.53.0
