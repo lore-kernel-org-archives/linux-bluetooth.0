@@ -1,125 +1,69 @@
-Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0EA366823
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 09:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46EF39EF12
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 10:03:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776333036; cv=none; b=TyUDo7HZdYvX9jyc40wo8+XgBVEY8AZpmLX7Z7TrxbD9uqFpItRwYsggh8hvpCW0Nx664hA6upkfyy5Wfew8O8G7lL9ProrJvxmF+lrB+qxF7JhQQIZ38G2JyWteKNKjdv7Q2b7Q7xBa8FNagAjXfw7sn6QXW1O9hxFszLlpsEY=
+	t=1776333816; cv=none; b=bkupk698JnHtdsW9WQN0QZ05epdhpikklhTHpyxfofRtnniY04EBRBCcv+ux0JPlQrvGtTGsLHRHwBk1oI3NMeBArriueXhjGfn/GDKXiSRKIbifLoU0iJhdJuUhjU0IIfZ0HwsyIKMt7jGT3gmMFkzwj/MSiToC1yczgQXJwuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776333036; c=relaxed/simple;
-	bh=7JuHdFFsOI+HVuNOw1i3NMDFmmDzVGpxoRjPjwiiGVM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=JAjkusDxl/l7CErt630PFj+ixIsQMDH/UP1X3Z97c0Myf+mefYf8V0YB7whyecwA6e+Rl6Uh/6XUtIRfV4fBAhA57p2s3dP4/UayLZs02egDXQHMZNJbjBiy6tm7WKJC1/rSP1sYNxAkh5rMpfJSFmCNYFj/G1pl98VRpbk5CBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cop9q8RE; arc=none smtp.client-ip=74.125.82.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cop9q8RE"
-Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-2de831d2b20so3303299eec.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 02:50:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776333034; x=1776937834; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=2Z5YoQiiifrYeAfNvaFlr1Rr/6O3SUTVnIBwctU9Khk=;
-        b=cop9q8REi+W4gXz1B9pL9CoSk90LUaJzIL7Pv+TYGMwuGON2/I9JTw6jaZJzkQB8Xh
-         3fkU626yatInxmQ5ha8qmk7mZW3xFd9WT0sLs2Dsnu9El5HHhTeW//wSxBwZTQjbHbX+
-         U3rIdqjgLcpIbE2O9DpxUQc8/UtRlVOdk3cp+GCpQtxPSKbxPsRObVTxmxpduYJHTI1H
-         bTV2FhL1v8S9xWB6Il+hi1g8dJJblOVKadBXkSOy/yFjC60I+DZ7DJ9Tgoo9yw+jhqvx
-         aNg0uuNEbAv9pwtCYLZF2tu+ysd70DynocKYkTyveY5NIZWnnYY/dTrRRL+m9+0gTjhm
-         2MSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776333034; x=1776937834;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2Z5YoQiiifrYeAfNvaFlr1Rr/6O3SUTVnIBwctU9Khk=;
-        b=BuaNS5gRdHi4FP+sgCC5DrQJURaVgN933UytMkDz4vaefDnVD9bwHUfGFk6qeeJ4j3
-         DKWQmcWUdO4E+YHIN9wkcIyhskc8ctZlpDZFFAd5AcOg/ZsRdgWMtAfezj36YoaGZb2f
-         DIMNjuE3nVtOLF1lSErwcPvV7Km1zQk1avjxnd/WjE40nmlbuxs/2GXtnVoMWlJ6fzq+
-         S/7kqJwHhSjirEuZk1M8J0Kii9aChyASx+psguJfSULElZqslv/irdwp7qOpAh12g6+8
-         ZbCanWL7Unn61X0H5Dbbl3vI+zY659W+aezaI7xQR+GXwXy53ddSlzF7rQjNfiQHN7XZ
-         V06A==
-X-Gm-Message-State: AOJu0YwcqCC0qkoyYHjRZ+sSvFXA8+4/heiUOjgPITcTcIn5krakyyCJ
-	lcddj3RsLUv4kdX0mBYZn6lGjvxuU2mq8NlKl9qznlJc62zgRnWg3euL8mCqqw==
-X-Gm-Gg: AeBDies43bm/B/0di7bwrlg5elhVxWF8utSevFmUmrar1apznDFYyfaaEngw+sXrDvp
-	cs6o0gyp4MLpXeTjvBHg6EwWlvKgIcp/yS8ppWvYGbDlNhqway4Zta5A4sCRUiGC1rIfzYXdq7Q
-	V4aVhF6qtT1rgdFQiW6jI1imPJSKT041pNawhH3VgKogo0FbOhcIhgLeUZM9y8rA/O0b/MQ2kri
-	yEZuesJgVOfsuYhnThErsT23L8HBvAjjqAr/6rsc/RxBMz34QTKkOazqt1KhKih/OYCLLQnA6d2
-	Yph2aJl/3V5unvrpAnTlDX5yv18MGrGVKjYuwDqLfT188MN/9ZH+IrmUwE7AA6mhdY/JLs/BAHo
-	diw7mzU9Hhnc4tZF1pU3OhzSoLf7LDdoK9pDzl5YHavLMq9KSqWCyjrTpHhQWm/75rw4XkhBWK/
-	dAaMe/dTiVpqte1oEZedTeBqhdwTRNCil4AJOoso8ijt0=
-X-Received: by 2002:a05:693c:2c8c:b0:2df:68dd:21d7 with SMTP id 5a478bee46e88-2df68dd2618mr1935421eec.27.1776333034026;
-        Thu, 16 Apr 2026 02:50:34 -0700 (PDT)
-Received: from [172.17.0.2] ([172.184.173.244])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2de8f65f9bcsm8083513eec.22.2026.04.16.02.50.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2026 02:50:33 -0700 (PDT)
-Message-ID: <69e0b0e9.050a0220.3d9965.1e2c@mx.google.com>
-Date: Thu, 16 Apr 2026 02:50:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0903915041613170358=="
+	s=arc-20240116; t=1776333816; c=relaxed/simple;
+	bh=B/j3kxFlOZ7pbXOMKR0IInpB+9lYbeababtWFm0pZWA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=WUygVdLr/RaGz9otjTilJFj2mPsdqzGkcfqbiJ+n/FSw/lvkLI6WvWPdGXD6Vehlq0FK6pBb665Z2g/A+SafMQVufyV98qQXYG+XJqk5RuLcH7CNa3INQk/N9lOAy+33JkWlyUEk4uBnZi7CYRJ/Y+lg5T+/4xiNl4q1UZpMgWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E8D703EC02
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 10:03:31 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2] doc: Add missing btmon-cs doc to btmon.rst
+Date: Thu, 16 Apr 2026 12:03:17 +0200
+Message-ID: <20260416100323.3848182-1-hadess@hadess.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: RE: [BlueZ] doc: Add missing btmon-cs doc to btmon.rst
-In-Reply-To: <20260416084750.3735103-1-hadess@hadess.net>
-References: <20260416084750.3735103-1-hadess@hadess.net>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============0903915041613170358==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1081931
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.24 seconds
-GitLint                       PASS      0.19 seconds
-BuildEll                      PASS      19.92 seconds
-BluezMake                     PASS      648.95 seconds
-MakeCheck                     PASS      18.27 seconds
-MakeDistcheck                 FAIL      56.74 seconds
-CheckValgrind                 PASS      291.92 seconds
-CheckSmatch                   PASS      344.48 seconds
-bluezmakeextell               PASS      180.81 seconds
-IncrementalBuild              PASS      643.03 seconds
-ScanBuild                     PASS      1012.54 seconds
-
-Details
-##############################
-Test: MakeDistcheck - FAIL
-Desc: Run Bluez Make Distcheck
-Output:
-
-../../doc/btmon.rst:770: (SEVERE/4) Problems with "include" directive path:
-InputError: [Errno 2] No such file or directory: '../../doc/btmon-cs.rst'.
-Exiting due to level-4 (SEVERE) system message.
-make[2]: *** [Makefile:12191: doc/btmon.1] Error 1
-make[2]: *** Waiting for unfinished jobs....
-make[1]: *** [Makefile:4156: all] Error 2
-make: *** [Makefile:10690: distcheck] Error 1
-
-
-https://github.com/bluez/bluez/pull/2044
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: hadess@hadess.net
+X-GND-Cause: dmFkZTGhjJ/R2rB92h/ExDMa1NfQUCI8Tdq57jGAZy/bfKCL4SHxSO5IfI9KwsNxgX2kyf7TeMIEeBQUsf9TzAY+xva0Y+sMu7UUsywpWTyOcU1pmt9jK7R9X1Xf2U2F0id4k0w2d0IlVin9+XG1U2I7JBLZpCWUvoLm00HgcoPO3b2uGr5OcnQOFwmjMjvR9XQr7fgc/hyfEn4tbK4ZmmKtAyfp+MZw6RyrRcMzbS+oN70cwzbpMevWDtrOYWl0We/jj1C6kw5jUiUs1SCvXly0SfovM4wHzIoi8rebOOlsl0A1uMQi2WWoAUzcLwKnlXn60w6RNlyzhUXgoasU4asX2KvrSyz8sbdpdj85y/DqhTQgeoWWeYSLg90++2mTUgBxqL3xKfet2L6dRZam7ysH2AVzhlBkZfK/1ZBeerXyzJg7KMZEMjB0vlji7LVOVVb6HbxrXsbAIPtiYHFQt+TtWnx+bkqU1If0YMXLuVT0E6gLx+eJhBqI39ReDACuvg1QvRJZLkONxgmLK9NcaBg/h4oflstZIubpegueBEezoTAPbwsrwsaO1h47zHHp+Dm1L+3V8SyHcLUQmywP2a4MU4idlTQ2FKbORIuhlzTFSJuy1WwZO1//QT5N7WJqGI2I5JmflQQweLPATNS7TGXdDRGQQGQXedmdB9yy+TEs2g/fww
+X-GND-State: clean
+X-GND-Score: 0
 
 ---
-Regards,
-Linux Bluetooth
+ Makefile.am   | 2 ++
+ doc/btmon.rst | 2 ++
+ 2 files changed, 4 insertions(+)
 
+diff --git a/Makefile.am b/Makefile.am
+index 1f0b52ded8fa..76c4ab5d4f4e 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -542,6 +542,8 @@ EXTRA_DIST += doc/btmon-advertising.rst
+ 
+ EXTRA_DIST += doc/btmon-le-audio.rst
+ 
++EXTRA_DIST += doc/btmon-cs.rst
++
+ EXTRA_DIST += doc/btmon-l2cap.rst
+ 
+ EXTRA_DIST += doc/btmon-smp.rst
+diff --git a/doc/btmon.rst b/doc/btmon.rst
+index cd08ed3d5424..f701454e598e 100644
+--- a/doc/btmon.rst
++++ b/doc/btmon.rst
+@@ -767,6 +767,8 @@ PROTOCOL FLOWS
+ 
+ .. include:: btmon-le-audio.rst
+ 
++.. include:: btmon-cs.rst
++
+ .. include:: btmon-classic-audio.rst
+ 
+ .. include:: btmon-advertising.rst
+-- 
+2.53.0
 
---===============0903915041613170358==--
