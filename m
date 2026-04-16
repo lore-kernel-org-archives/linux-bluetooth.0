@@ -1,48 +1,107 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BEBF346E56
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 05:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D331BD9C9;
+	Thu, 16 Apr 2026 06:04:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776318714; cv=none; b=j4wBs+3Sf/5AXm3h5BRb9gDG28SW5Hanf4c7/LGWa69nQqw5Kp3184smyXY1gkyMKqAuEwvDjvFyNLuOc1exaEw5PNSQ9H9t0a1p/pycfbusRZkzWBwaQHupHkCvX/y4Ye7eqfwk8zcYDfCSpGdJhEv3yOHF4FLQ0mTivkOT45U=
+	t=1776319476; cv=none; b=o549Dff91UdP/wlLpjxPbh/Abn/geS5hUXzqtDWUV+d+e2BDBmCLvdvpabphG6zA8sWMITFvRM/LlV7CWDM5Gj0Sblw37Zp9HKwgz87TPpAdgxdPRBQ3JKjQX3bVwpn0xSlPa+8CF1ugNAjA+ZgNct4gCI226QDgmAWUaI4b7Go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776318714; c=relaxed/simple;
-	bh=g0nbspvoijTJic5YNYHVCQttTS57N9jppGesZtKGCbA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=SyFFGWgtRXXdpeFq9r5Zuq18HMqBnUCxLPEc1+zG0Q6E5WJk8YAfeEQ3UZ+AiBriGMLCMYCYvAeRQp+ocv7Tt2VhhwexRV9Dr0lFUz2q1E5b5CDOL89UrYpuSXg7iLDKVb09B1RRJogLvu2zftS4EFjbiL3G8xCowwsEbujHa68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=RQjojkPR; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1776319476; c=relaxed/simple;
+	bh=yFapuNipVikkE2B6owuuk3dLGajTUEesaj3UiOKWjf8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e+cTTXp+85zu++YtFGTQq4CoSCU1l8ppp0WbRk2d0FaI3WUXgMGrx0gYAUu9Om1kVUJR6DuezKdbbyocvm+2Hl6wAp5SMjIJO+gCcEM1h2smWDnn+6VeMsCYKPuHf4lYZAeVOPScyQ6fbZqOWCPHzJ0vn11ENNRRNHu/to3slsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ReHTs9dS; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="RQjojkPR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1776318712;
-	bh=K4+tnq0bhSRgO5s8hneiDFNHQ6vlpCCLYDg+4OPYhKQ=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=RQjojkPR/XJNFniX9niiC/zmLcIVOWwXv8YsBPJqUNiAE84cCmMEzG88Jn7IuEWtF
-	 ScMhLdJ4P3KDEgqt7KCD+oQW8xKEKGYs/uIBcExySAlJ8AirJV12K5IVyJacdE5dDH
-	 C59hn8vFjRZkjF1jSeROBn/PVFToJicmscpVxStY=
-Received: from github.com (hubbernetes-node-a3b4a53.ash1-iad.github.net [10.56.212.97])
-	by smtp.github.com (Postfix) with ESMTPA id 3E9FB36102C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Apr 2026 22:51:52 -0700 (PDT)
-Date: Wed, 15 Apr 2026 22:51:52 -0700
-From: BluezTestBot <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ReHTs9dS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776319473; x=1807855473;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=yFapuNipVikkE2B6owuuk3dLGajTUEesaj3UiOKWjf8=;
+  b=ReHTs9dSrKRk0oLAMpd9O9Dfi9S3gLHC79ZP70XhB33C/pXabyIxam3h
+   iFEcvQwV4Ixz4KlM8/0jSQHE0+wWdGPiUUx+iEM5UKFKxbBGJu3QDrDgP
+   QopPGYoiCpM6/IJtiwbe+2VpGQIQBQdKPHgQZnmyxc9ChxvgAmPMWJHku
+   FoUcnTIjnUgvYyN3udd4fxXY9WtGDgworrZLfrL+STtc090UGf1Lr3PgK
+   gmJj9cyGbhze518687WWWKk2KJjF1KAcgdFTV8K/ueeKeNV7Sgig57a0w
+   Wodn+ChtIG9lQJQOxuQhsuGdkuCKWYunqFySf4fNTQ5i3grBDH6IxRiHB
+   w==;
+X-CSE-ConnectionGUID: REaZzMu5TFqCFP2fghQz4A==
+X-CSE-MsgGUID: 2MTpWcY1RiKKuVHfhnBS+Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11760"; a="99958245"
+X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
+   d="scan'208";a="99958245"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 23:04:32 -0700
+X-CSE-ConnectionGUID: 1R076qMiQ7a5aQer4qBSpA==
+X-CSE-MsgGUID: UWfQmIhRQFCkp/jTk43U2A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
+   d="scan'208";a="268621981"
+Received: from weba0957.iind.intel.com (HELO WEBA0932.iind.intel.com) ([10.224.186.34])
+  by orviesa001.jf.intel.com with ESMTP; 15 Apr 2026 23:04:31 -0700
+From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1081201/7f151a-000000@github.com>
-Subject: [bluez/bluez]
+Cc: linux-pci@vger.kernel.org,
+	bhelgaas@google.com,
+	ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH v1] Bluetooth: btintel_pcie: Fix build error when CONFIG_ACPI is disabled
+Date: Thu, 16 Apr 2026 11:33:51 +0530
+Message-ID: <20260416060352.1392139-1-chandrashekar.devegowda@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1081201
-  Home:   https://github.com/bluez/bluez
+btintel_pcie_acpi_reset_method() uses ACPI APIs such as
+acpi_evaluate_object() and acpi_has_method() which are not available
+when CONFIG_ACPI is disabled, causing build errors on architectures
+like ppc64le that lack ACPI support.
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Guard btintel_pcie_acpi_reset_method() with IS_ENABLED(CONFIG_ACPI)
+and provide a stub returning -ENODEV when ACPI is not enabled.
+
+Fixes: 912a499a7955 ("Bluetooth: btintel_pcie: Support Product level reset")
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+---
+ drivers/bluetooth/btintel_pcie.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 076beb45c410..4d136ff342b8 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -2280,6 +2280,7 @@ static void btintel_pcie_inc_recovery_count(struct pci_dev *pdev,
+ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data);
+ static void btintel_pcie_reset(struct hci_dev *hdev);
+ 
++#if IS_ENABLED(CONFIG_ACPI)
+ static int btintel_pcie_acpi_reset_method(struct btintel_pcie_data *data)
+ {
+ 	union acpi_object *obj, argv4;
+@@ -2333,6 +2334,12 @@ static int btintel_pcie_acpi_reset_method(struct btintel_pcie_data *data)
+ 	pci_dev_unlock(data->pdev);
+ 	return ret;
+ }
++#else
++static int btintel_pcie_acpi_reset_method(struct btintel_pcie_data *data)
++{
++	return -ENODEV;
++}
++#endif
+ 
+ static void btintel_pcie_perform_pldr(struct btintel_pcie_data *data)
+ {
+-- 
+2.43.0
+
