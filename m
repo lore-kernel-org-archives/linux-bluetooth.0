@@ -1,70 +1,133 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9CD122068D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 13:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A2434CDD
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 14:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776347437; cv=none; b=m+DE5aUt2s07aOSeyDcR+K6V2s+5WbxgaZ5Dnr5//psxagyY3icLmHhzyRZ0KXpw44xgZgo2clxpY+mP+/3ZfAW2n3DX5qErsyis7/5XYIawLOdnmO/MEEugPB0z/VUCWuGPXbABRGB3qgReqfR+BASYEni6lPrjU0E7x6puK2A=
+	t=1776348564; cv=none; b=EicdSgXh5WPrpZGA5o2rfkXLyXFXr4Lc7ROhRtlVZk0TF37McOYZhO67+06EIra9zHrNC8scYNOoukFjMKBitD9Lu25W184efpD9BMQ2FspdhwbN9plyOLOhCN5ksYJng5T2LRdVftcR2UUk/JmsiFI6Z/A8F+dpmTCWu1IB9Kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776347437; c=relaxed/simple;
-	bh=UpdOxINuEkwSuPfp6lT7WPCmloWPOg2r5BBZ9jPwurc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ayzNRGDgZy22JwACotG/9qs5yg5Iv7zA5G0YEjrdCtMhMzZQZ81qXWb7W3RfZsJcTEbQhmH46lR1GjkwKHsBLgRD/S1LOGUNgIL0pnBaOAorCzrHNRyQLGL6hGLct/+4rtq6V5p1Rab8jhqRZsh1v7hW6Y7REE72P61kQttcnw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iyQluhBL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776348564; c=relaxed/simple;
+	bh=en6bMy/3liEdnR6YqQMt8MPhE23I9RPYiWx6XqGgVhY=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=YOU+FezFR8lu46wt7LaeNoEM/VgdYsJH32I+roXO0aGy29AMjY/z8nFUl9uEstbGL6v/N0MXC5mianVPx1gzxgaCctmtK1WV+19BuIJ0wNMI1YnTyvo6B4xRE0PpvIu+j6eTiEV/UkYW39RpOp7D40L1R+yYqZxVO9bBigumN1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=iX6ToLp9; arc=none smtp.client-ip=192.30.252.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iyQluhBL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4D5EC2BCAF;
-	Thu, 16 Apr 2026 13:50:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776347437;
-	bh=UpdOxINuEkwSuPfp6lT7WPCmloWPOg2r5BBZ9jPwurc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iyQluhBLyWLqMxJQBeRvKfNnG5Q0c92yxDYlSkIqUFRvxPlozslFeOYUJysPWSq1G
-	 YUEnWeuDQgaMQIv6XpICyUedFqmcuD/si3XRGRUK6U8VzaPJXA8j4zBtUVb3+d5i+C
-	 6JqGSwdWj5TVeklGZ/ibi6y4uFPuXL8FpMYsTXkN+v89U8RZZ+XNTxVlyloGQCP6v1
-	 R0ny46OX5CMPJD6jpQaYVMfox+HBXuSAPEoLJXOKP9xQaKX2FtfzmY3gUfBp1ifqEn
-	 O/j9EfdydE6Q+CJsKBmCUKuMX63VmJ05ocox9TZLeHhklmpFRiXOUx6aqpC7/5Ksnp
-	 OVvz09jGnMTUg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE42380AA60;
-	Thu, 16 Apr 2026 13:50:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="iX6ToLp9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1776348562;
+	bh=ccFhBo3KOpXLOtzct9Q3F+gahvh0M/donRopSGCskKY=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=iX6ToLp9O6kWSExVGxHoI/cGKX9IoCys5YADkcBi41436cEmfg6c7q2f0QHm0Wt9I
+	 6XGn2agJMYwCexOCIjktU/eJptrYz6+3YAV+TmzJzyuENemSnFIRq878w4C7kjSQAL
+	 UXhUqESJ/miz3eC11wlU64ga++9pZpMl3ifsStKA=
+Received: from github.com (hubbernetes-node-1eaabaf.va3-iad.github.net [10.48.222.42])
+	by smtp.github.com (Postfix) with ESMTPA id 77192181136
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 07:09:22 -0700 (PDT)
+Date: Thu, 16 Apr 2026 07:09:22 -0700
+From: hadess <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/510623-590bed@github.com>
+Subject: [bluez/bluez] 6b4c21: monitor: Add L2CAP channel details to analyze
+ output
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2] doc: Add missing btmon-cs doc to btmon.rst
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <177634740604.2827737.7640411424955587978.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Apr 2026 13:50:06 +0000
-References: <20260416100323.3848182-1-hadess@hadess.net>
-In-Reply-To: <20260416100323.3848182-1-hadess@hadess.net>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 6b4c21721c80ef09da17656920777a4f1a9bf293
+      https://github.com/bluez/bluez/commit/6b4c21721c80ef09da17656920777a4f1a9bf293
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-04-15 (Wed, 15 Apr 2026)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M monitor/analyze.c
 
-On Thu, 16 Apr 2026 12:03:17 +0200 you wrote:
-> ---
->  Makefile.am   | 2 ++
->  doc/btmon.rst | 2 ++
->  2 files changed, 4 insertions(+)
+  Log Message:
+  -----------
+  monitor: Add L2CAP channel details to analyze output
 
-Here is the summary with links:
-  - [BlueZ,v2] doc: Add missing btmon-cs doc to btmon.rst
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=590bed15fbaf
+Enhance btmon analyze mode to display richer per-channel information:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+- Add MTU, MPS, and mode fields to struct l2cap_chan
+- Parse Configure Request/Response options for BR/EDR channels to
+  extract MTU (option 0x01) and mode (option 0x04)
+- Add l2cap_le_sig() to parse LE signaling (CID 5) for LE Credit
+  Based Connection Request/Response and Enhanced Credit Connection
+  Request, extracting PSM, MTU, MPS, and mode
+- Display fixed channel names (ATT, L2CAP Signaling, SMP) for CID <= 7
+- Show PSM in both decimal and hex format
+- Print mode, MTU, and MPS for dynamic channels
 
 
+  Commit: ebeceecd3ccb823d46427a975563987242eaa6f5
+      https://github.com/bluez/bluez/commit/ebeceecd3ccb823d46427a975563987242eaa6f5
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-04-15 (Wed, 15 Apr 2026)
+
+  Changed paths:
+    M monitor/analyze.c
+
+  Log Message:
+  -----------
+  monitor: Use wall-clock duration for throughput and add min/max speed
+
+The previous speed calculation used the sum of per-packet latencies as
+the denominator.  For TX, each latency measures the time from command
+submission to completion event -- when multiple packets are in-flight
+simultaneously these overlap, making the sum much larger than wall-clock
+time and deflating the reported speed.  For RX the inter-arrival sum
+roughly equals wall-clock time.  This asymmetry caused the same data
+stream to report vastly different speeds depending on direction.
+
+Fix by computing speed from wall-clock duration (last packet timestamp
+minus first packet timestamp), which gives consistent results regardless
+of direction.  Also add 1-second windowed throughput tracking to report
+min and max speed alongside the average.
+
+
+  Commit: f360d9e4428dde40de4ff6d33ef178752e13fc1a
+      https://github.com/bluez/bluez/commit/f360d9e4428dde40de4ff6d33ef178752e13fc1a
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-04-15 (Wed, 15 Apr 2026)
+
+  Changed paths:
+    M doc/btmon-l2cap.rst
+
+  Log Message:
+  -----------
+  doc: Add throughput estimation section to btmon-l2cap.rst
+
+Document the throughput statistics reported by btmon analyze mode,
+including speed calculation methodology, channel details (PSM, mode,
+MTU, MPS), and caveats about inter-packet latency vs wall-clock time.
+Also document the windowed throughput approach used by btsnoop-analyzer.
+
+
+  Commit: 590bed15fbaf7be93f5121fcdaf12992f234df13
+      https://github.com/bluez/bluez/commit/590bed15fbaf7be93f5121fcdaf12992f234df13
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-04-16 (Thu, 16 Apr 2026)
+
+  Changed paths:
+    M Makefile.am
+    M doc/btmon.rst
+
+  Log Message:
+  -----------
+  doc: Add missing btmon-cs doc to btmon.rst
+
+
+Compare: https://github.com/bluez/bluez/compare/510623fb53b5...590bed15fbaf
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
