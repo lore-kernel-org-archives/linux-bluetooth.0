@@ -1,42 +1,42 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF6534B1A7
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 18:49:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7371CBEB9
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 18:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776365365; cv=none; b=djkXjxT7iH1eYAa/PAJQs9FOFLWm4xIdz3llKGf7tGBho8TwtqYWM5ZJ2Q0m8p882u52nZJkkgcCE9W+9kaHuG3B9ABwpFrS83TiAzkdYs9IQ/KVZvorMAi1Z1IIxhPckbRkCggRRzCCuJ80m+rVP94qD/O0ftO64a2+UJAiisQ=
+	t=1776365377; cv=none; b=e6HMiFGFM29+mRO6YTL6tmdNwNVsM1VufLsxQb/BjIZhX5EpA+Mj2prlbN0vycQe2UscKaMRJvQqi37Uhd5htX96gUDgJPDyh9YjWU2ZIQ/tC5GJFqEFHIbAPBV3b5q/jtZekNUI1Gjl5JFmj4IoGP66wasDaEvZR725d8gL/Zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776365365; c=relaxed/simple;
-	bh=7X2Zeh57YaIfzfmkbzq37uikt3UxeSXarGKuISGM+8w=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GUh+JoWQk7T/uNubD8mcezJhoIWoXp3titUV83HYn0RGdtX+8Zdom7kVt2c9nEXDt3rkM2G+ZZEVbaAspMZulM3aUY6lScIUdT7foeD3rWQ+syX47JQTHQzLhu0uKjMcF0FPA5l0aSbAa3YTLeRE+0cv55b+4hgxOSyV8/3zGxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=D+Q7gkxZ; arc=none smtp.client-ip=148.251.105.195
+	s=arc-20240116; t=1776365377; c=relaxed/simple;
+	bh=gNdcHYqbavQDOkehAK1bD2l3fLBXfa7W62whKVBUR54=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=k5qv2qIROBk2xLelLTcQF04T6PUdA1e39dJVuQ7KDoGOqwpsSYoBFudfLMZGhbkL57qZeFz5fXj+EJPFxEpDOdh93QVOp65J5c0DqFvlk7FhunDGNK1dI5YBQNVwhpBHRmXEFNZnNOHut3pEQlsdue9wSDfvHuBD7bhDTnwbeXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=f78hPHtV; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="D+Q7gkxZ"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="f78hPHtV"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1776365360;
-	bh=7X2Zeh57YaIfzfmkbzq37uikt3UxeSXarGKuISGM+8w=;
+	s=mail; t=1776365374;
+	bh=gNdcHYqbavQDOkehAK1bD2l3fLBXfa7W62whKVBUR54=;
 	h=From:To:Subject:Date:From;
-	b=D+Q7gkxZOkD1rWx5n52kHV56GuzEOlk9ekV8Q7Nc84Il9s8NSEB4WfvLpKupq9ImI
-	 5r4wXCoRnLMVNS/JeAS8m/OVo4WNz1spp7FK3WD39xvrGZLy71hyPz1PPApHOB6Ywd
-	 zpebnTSpMCydIDiX3o32SljbNsN1GnZBtDOd2piAhv928iM/FVYGO3nrAHeCHHznht
-	 +1llobN4NDG1DB7YoAO4sTctBoCcGUo03FfMgBPibxb3/nwxCQC1THCAp2FTCJuczM
-	 JtCzVwgv4tjFgpybVgwCobquBRym9rXKJ49AV2KHwRhHPqv3nRfYjO15o+YeY3LKKi
-	 14IaPRcaatIxA==
+	b=f78hPHtVbucpij9IEqSVtkO853cCgMMs7uzAExbeUQkw16xVsqqc5KLn4EW7OWSoE
+	 NZpR3DeRPbGZM+pIlOZedG3rIMq3xI8enNk6dwz1bS53Hk+7JIc6PIisJNVJ5ZKyct
+	 E70dTVkUXUJlgN1swXJSDy8YqnzXvzN7P4V/FlESki+QNAFxS8UTk9eLdykiOq+yTY
+	 P4bJTvtjIBglTmrPsGbU9614xytAZDBU4YIUdCE3Dd8j8gwzcGoIInwwVAMrQ39Sc3
+	 UkgJAulXukM0HKQWq+68UDtt2dphYB5dq0xUCNy2r/9mJMag3tVPML0xRQpsaV9ZqG
+	 yPzm+HSbGgglg==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 798A517E1276
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 20:49:20 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id EA1CE17E1276
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 20:49:33 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] client/btpclient: Add BTP_OP_BAP_DISCOVER support
-Date: Thu, 16 Apr 2026 20:49:14 +0200
-Message-ID: <20260416184914.145135-1-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ] client/btpclient: Add GATT discovery supports
+Date: Thu, 16 Apr 2026 20:49:29 +0200
+Message-ID: <20260416184929.145224-1-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -47,240 +47,347 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-BAP/CL/CGGIT/SER/BV-01-C expects IUT to discover the services before
-continuation.
-
-This reduces connection time for the BAP tests.
+This implements the following BTP GATT services commands which are used
+by BTP BAP service:
+- BTP_OP_GATT_DISC_PRIM_UUID
+- BTP_OP_GATT_DISC_CHRC_UUID
+- BTP_OP_GATT_DISC_ALL_DESC
 ---
- Makefile.tools          |   1 +
- client/btpclient/bap.c  | 109 ++++++++++++++++++++++++++++++++++++++++
- client/btpclient/bap.h  |  13 +++++
- client/btpclient/core.c |  15 ++++++
- src/shared/btp.h        |  16 ++++++
- 5 files changed, 154 insertions(+)
- create mode 100644 client/btpclient/bap.c
- create mode 100644 client/btpclient/bap.h
+ client/btpclient/gatt.c | 226 ++++++++++++++++++++++++++++++++++++++++
+ src/shared/btp.h        |  62 +++++++++++
+ 2 files changed, 288 insertions(+)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 8e0eae04e..001d0129f 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -562,6 +562,7 @@ noinst_PROGRAMS += client/btpclient/btpclient client/btpclient/btpclientctl
- client_btpclient_btpclient_SOURCES = client/btpclient/btpclient.c \
- 				client/btpclient/btpclient.h \
- 				src/shared/btp.c src/shared/btp.h \
-+				client/btpclient/bap.c client/btpclient/bap.h \
- 				client/btpclient/core.c client/btpclient/core.h \
- 				client/btpclient/gap.c client/btpclient/gap.h \
- 				client/btpclient/gatt.c client/btpclient/gatt.h
-diff --git a/client/btpclient/bap.c b/client/btpclient/bap.c
-new file mode 100644
-index 000000000..d64828894
---- /dev/null
-+++ b/client/btpclient/bap.c
-@@ -0,0 +1,109 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2026  Collabora Ltd.
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdlib.h>
-+
-+#include <ell/ell.h>
-+
-+#include "bluetooth/bluetooth.h"
-+#include "bluetooth/uuid.h"
-+#include "src/shared/btp.h"
-+#include "btpclient.h"
-+#include "bap.h"
-+
-+static struct btp *btp;
-+static bool bap_service_registered;
-+
-+static void btp_bap_read_commands(uint8_t index, const void *param,
+diff --git a/client/btpclient/gatt.c b/client/btpclient/gatt.c
+index 4a28a7b27..9d847141c 100644
+--- a/client/btpclient/gatt.c
++++ b/client/btpclient/gatt.c
+@@ -53,6 +53,9 @@ static void btp_gatt_read_commands(uint8_t index, const void *param,
+ 	}
+ 
+ 	commands |= (1 << BTP_OP_GATT_READ_SUPPORTED_COMMANDS);
++	commands |= (1 << BTP_OP_GATT_DISC_PRIM_UUID);
++	commands |= (1 << BTP_OP_GATT_DISC_CHRC_UUID);
++	commands |= (1 << BTP_OP_GATT_DISC_ALL_DESC);
+ 	commands |= (1 << BTP_OP_GATT_READ);
+ 	commands |= (1 << BTP_OP_GATT_READ_UUID);
+ 	commands |= (1 << BTP_OP_GATT_WRITE_WITHOUT_RSP);
+@@ -78,6 +81,218 @@ static bool match_attribute_handle(const void *attr, const void *handle)
+ 	return attribute->handle == L_PTR_TO_UINT(handle);
+ }
+ 
++static void btp_gatt_discover_prim_uuid(uint8_t index, const void *param,
 +					uint16_t length, void *user_data)
 +{
-+	uint16_t commands = 0;
-+
-+	if (index != BTP_INDEX_NON_CONTROLLER) {
-+		btp_send_error(btp, BTP_BAP_SERVICE, index,
-+						BTP_ERROR_INVALID_INDEX);
-+		return;
-+	}
-+
-+	commands |= (1 << BTP_OP_BAP_READ_SUPPORTED_COMMANDS);
-+	commands |= (1 << BTP_OP_BAP_DISCOVER);
-+
-+	commands = L_CPU_TO_LE16(commands);
-+
-+	btp_send(btp, BTP_BAP_SERVICE, BTP_OP_BAP_READ_SUPPORTED_COMMANDS,
-+			BTP_INDEX_NON_CONTROLLER, sizeof(commands), &commands);
-+}
-+
-+static void btp_bap_discover(uint8_t index, const void *param, uint16_t length,
-+								void *user_data)
-+{
 +	struct btp_adapter *adapter = find_adapter_by_index(index);
-+	const struct btp_bap_discover_cp *cp = param;
++	struct btp_device *device;
++	const struct btp_gatt_disc_prim_uuid_cp *cp = param;
 +	uint8_t status = BTP_ERROR_FAIL;
-+	struct btp_device *dev;
-+	struct btp_bap_discovery_completed_ev ev;
 +	bool prop;
++	bt_uuid_t uuid;
++	struct gatt_attribute *service;
++	uint16_t first_handle, end_handle;
++	uint rp_length;
++	struct btp_gatt_disc_prim_rp *rp;
 +
 +	if (!adapter) {
 +		status = BTP_ERROR_INVALID_INDEX;
 +		goto failed;
 +	}
 +
-+	btp_send(btp, BTP_BAP_SERVICE, BTP_OP_BAP_DISCOVER, index, 0, NULL);
++	/* Adapter needs to be powered to be able to read Handle */
++	if (!l_dbus_proxy_get_property(adapter->proxy, "Powered", "b",
++					&prop) || !prop) {
++		goto failed;
++	}
 +
-+	dev = find_device_by_address(adapter, &cp->address, cp->address_type);
-+
-+	/* Services should have been resolved during connection */
-+	if (!l_dbus_proxy_get_property(dev->proxy, "ServicesResolved", "b",
-+					&prop) || !prop)
++	device = find_device_by_address(adapter, &cp->address,
++							cp->address_type);
++	if (!device)
 +		goto failed;
 +
-+	memcpy(&ev.address, &dev->address, sizeof(ev.address));
-+	ev.address_type = dev->address_type;
-+	ev.status = 0;
++	if (cp->uuid_length == 2)
++		bt_uuid16_create(&uuid, bt_get_le16(cp->uuid));
++	else if (cp->uuid_length == 4)
++		bt_uuid32_create(&uuid, bt_get_le32(cp->uuid));
++	else if (cp->uuid_length == 16) {
++		uint128_t uint128;
 +
-+	btp_send(btp, BTP_BAP_SERVICE, BTP_EV_BAP_DISCOVERY_COMPLETED,
-+			adapter->index, sizeof(ev), &ev);
++		btoh128((uint128_t *)cp->uuid, &uint128);
++		bt_uuid128_create(&uuid, uint128);
++	} else
++		goto failed;
 +
++	service = l_queue_find(device->services, match_attribute_uuid, &uuid);
++	if (!service)
++		goto failed;
++
++	/* TODO: Find last handle */
++	first_handle = end_handle = service->handle;
++
++	rp_length = sizeof(struct btp_gatt_disc_prim_rp) +
++					sizeof(struct btp_gatt_service) +
++					bt_uuid_len(&service->uuid);
++	rp = malloc(rp_length);
++	rp->services_count = 1;
++	rp->services[0].start_handle = first_handle;
++	rp->services[0].end_handle = end_handle;
++	rp->services[0].uuid_length = bt_uuid_len(&service->uuid);
++	bt_uuid_to_le(&service->uuid, rp->services[0].uuid);
++
++	btp_send(btp, BTP_GATT_SERVICE, BTP_OP_GATT_DISC_PRIM_UUID,
++					adapter->index, rp_length, rp);
++
++	free(rp);
 +	return;
 +
 +failed:
-+	btp_send_error(btp, BTP_BAP_SERVICE, index, status);
++	btp_send_error(btp, BTP_GATT_SERVICE, index, status);
 +}
 +
-+bool bap_register_service(struct btp *btp_, struct l_dbus *dbus_,
-+					struct l_dbus_client *client)
++static void btp_gatt_discover_charac_uuid(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
 +{
-+	btp = btp_;
++	struct btp_adapter *adapter = find_adapter_by_index(index);
++	struct btp_device *device;
++	const struct btp_gatt_disc_chrc_uuid_cp *cp = param;
++	uint8_t status = BTP_ERROR_FAIL;
++	bool prop;
++	bt_uuid_t uuid;
++	struct gatt_attribute *charac;
++	uint rp_length;
++	struct btp_gatt_disc_chrc_rp *rp = NULL;
 +
-+	btp_register(btp, BTP_BAP_SERVICE, BTP_OP_BAP_READ_SUPPORTED_COMMANDS,
-+					btp_bap_read_commands, NULL, NULL);
++	if (!adapter) {
++		status = BTP_ERROR_INVALID_INDEX;
++		goto failed;
++	}
 +
-+	btp_register(btp, BTP_BAP_SERVICE, BTP_OP_BAP_DISCOVER,
-+					btp_bap_discover, NULL, NULL);
++	/* Adapter needs to be powered to be able to read Handle */
++	if (!l_dbus_proxy_get_property(adapter->proxy, "Powered", "b",
++					&prop) || !prop) {
++		goto failed;
++	}
 +
-+	bap_service_registered = true;
++	device = find_device_by_address(adapter, &cp->address,
++							cp->address_type);
++	if (!device)
++		goto failed;
 +
-+	return true;
++	if (cp->uuid_length == 2)
++		bt_uuid16_create(&uuid, bt_get_le16(cp->uuid));
++	else if (cp->uuid_length == 4)
++		bt_uuid32_create(&uuid, bt_get_le32(cp->uuid));
++	else if (cp->uuid_length == 16) {
++		uint128_t uint128;
++
++		btoh128((uint128_t *)cp->uuid, &uint128);
++		bt_uuid128_create(&uuid, uint128);
++	} else
++		goto failed;
++
++	charac = l_queue_find(device->characteristics, match_attribute_uuid,
++									&uuid);
++	if (!charac)
++		goto failed;
++
++	rp_length = sizeof(struct btp_gatt_disc_chrc_rp) +
++				sizeof(struct btp_gatt_characteristic) +
++				bt_uuid_len(&charac->uuid);
++	rp = malloc(rp_length);
++	rp->characteristics_count = 1;
++
++	rp->characteristics[0].characteristic_handle = charac->handle;
++	rp->characteristics[0].value_handle = charac->handle + 1;
++	rp->characteristics[0].properties = 0;
++	rp->characteristics[0].uuid_length = bt_uuid_len(&charac->uuid);
++	bt_uuid_to_le(&charac->uuid, rp->characteristics[0].uuid);
++
++	btp_send(btp, BTP_GATT_SERVICE, BTP_OP_GATT_DISC_CHRC_UUID,
++					adapter->index, rp_length, rp);
++
++	free(rp);
++	return;
++
++failed:
++	free(rp);
++	btp_send_error(btp, BTP_GATT_SERVICE, index, status);
 +}
 +
-+void bap_unregister_service(struct btp *btp)
++static void btp_gatt_discover_all_desc(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
 +{
-+	btp_unregister_service(btp, BTP_BAP_SERVICE);
-+	bap_service_registered = false;
++	struct btp_adapter *adapter = find_adapter_by_index(index);
++	struct btp_device *device;
++	const struct btp_gatt_disc_all_desc_cp *cp = param;
++	uint8_t status = BTP_ERROR_FAIL;
++	bool prop;
++	const struct l_queue_entry *entry;
++	struct l_queue *list;
++	uint16_t count;
++	uint rp_length;
++	struct btp_gatt_disc_all_desc_rp *rp = NULL;
++	uint8_t *ptr;
++
++	if (!adapter) {
++		status = BTP_ERROR_INVALID_INDEX;
++		goto failed;
++	}
++
++	/* Adapter needs to be powered to be able to read Handle */
++	if (!l_dbus_proxy_get_property(adapter->proxy, "Powered", "b",
++					&prop) || !prop) {
++		goto failed;
++	}
++
++	device = find_device_by_address(adapter, &cp->address,
++							cp->address_type);
++	if (!device)
++		goto failed;
++
++	list = l_queue_new();
++	count = 0;
++	rp_length = sizeof(struct btp_gatt_disc_all_desc_rp);
++	for (entry = l_queue_get_entries(device->descriptors); entry;
++							entry = entry->next) {
++		struct gatt_attribute *attribute = entry->data;
++
++		if (attribute->handle < cp->start_handle ||
++					attribute->handle > cp->end_handle)
++			continue;
++
++		l_queue_push_tail(list, attribute);
++		count++;
++		rp_length += sizeof(struct btp_gatt_descriptor) +
++						bt_uuid_len(&attribute->uuid);
++	}
++
++	rp = malloc(rp_length);
++	rp->descriptors_count = count;
++	ptr = (uint8_t *)rp->descriptors;
++	for (entry = l_queue_get_entries(list); entry; entry = entry->next) {
++		struct gatt_attribute *attribute = entry->data;
++		struct btp_gatt_descriptor *descriptor;
++
++		descriptor = (struct btp_gatt_descriptor *)ptr;
++		descriptor->descriptor_handle = attribute->handle;
++		descriptor->uuid_length = bt_uuid_len(&attribute->uuid);
++		bt_uuid_to_le(&attribute->uuid, descriptor->uuid);
++		ptr += sizeof(struct btp_gatt_descriptor) +
++						bt_uuid_len(&attribute->uuid);
++	}
++
++	btp_send(btp, BTP_GATT_SERVICE, BTP_OP_GATT_DISC_ALL_DESC,
++					adapter->index, rp_length, rp);
++
++	free(rp);
++	return;
++
++failed:
++	free(rp);
++	btp_send_error(btp, BTP_GATT_SERVICE, index, status);
 +}
 +
-+bool bap_is_service_registered(void)
-+{
-+	return bap_service_registered;
-+}
-diff --git a/client/btpclient/bap.h b/client/btpclient/bap.h
-new file mode 100644
-index 000000000..2b7a218b5
---- /dev/null
-+++ b/client/btpclient/bap.h
-@@ -0,0 +1,13 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2026  Collabora Ltd.
-+ *
-+ */
-+
-+bool bap_register_service(struct btp *btp_, struct l_dbus *dbus_,
-+					struct l_dbus_client *client);
-+void bap_unregister_service(struct btp *btp);
-+bool bap_is_service_registered(void);
-diff --git a/client/btpclient/core.c b/client/btpclient/core.c
-index cfff131f1..772178670 100644
---- a/client/btpclient/core.c
-+++ b/client/btpclient/core.c
-@@ -13,6 +13,7 @@
- #include "bluetooth/uuid.h"
- #include "src/shared/btp.h"
- #include "btpclient.h"
-+#include "bap.h"
- #include "core.h"
- #include "gap.h"
- #include "gatt.h"
-@@ -89,6 +90,14 @@ static void btp_core_register(uint8_t index, const void *param,
- 		if (!gatt_register_service(btp, dbus, client))
- 			goto failed;
+ static void gatt_read_setup(struct l_dbus_message *message,
+ 							void *user_data)
+ {
+@@ -471,6 +686,17 @@ bool gatt_register_service(struct btp *btp_, struct l_dbus *dbus_,
+ 	btp_register(btp, BTP_GATT_SERVICE, BTP_OP_GATT_READ_SUPPORTED_COMMANDS,
+ 					btp_gatt_read_commands, NULL, NULL);
  
-+		break;
-+	case BTP_BAP_SERVICE:
-+		if (bap_is_service_registered())
-+			goto failed;
++	btp_register(btp, BTP_GATT_SERVICE, BTP_OP_GATT_DISC_PRIM_UUID,
++					btp_gatt_discover_prim_uuid, NULL,
++					NULL);
 +
-+		if (!bap_register_service(btp, dbus, client))
-+			goto failed;
++	btp_register(btp, BTP_GATT_SERVICE, BTP_OP_GATT_DISC_CHRC_UUID,
++					btp_gatt_discover_charac_uuid, NULL,
++					NULL);
 +
- 		break;
- 	case BTP_L2CAP_SERVICE:
- 	case BTP_MESH_NODE_SERVICE:
-@@ -132,6 +141,12 @@ static void btp_core_unregister(uint8_t index, const void *param,
++	btp_register(btp, BTP_GATT_SERVICE, BTP_OP_GATT_DISC_ALL_DESC,
++					btp_gatt_discover_all_desc, NULL, NULL);
++
+ 	btp_register(btp, BTP_GATT_SERVICE, BTP_OP_GATT_READ,
+ 					btp_gatt_read, NULL, NULL);
  
- 		gatt_unregister_service(btp);
- 		break;
-+	case BTP_BAP_SERVICE:
-+		if (!bap_is_service_registered())
-+			goto failed;
-+
-+		bap_unregister_service(btp);
-+		break;
- 	case BTP_L2CAP_SERVICE:
- 	case BTP_MESH_NODE_SERVICE:
- 	case BTP_CORE_SERVICE:
 diff --git a/src/shared/btp.h b/src/shared/btp.h
-index 8b5078f82..c23346f4e 100644
+index 8b5078f82..72b61784e 100644
 --- a/src/shared/btp.h
 +++ b/src/shared/btp.h
-@@ -26,6 +26,7 @@
- #define BTP_GATT_SERVICE	2
- #define BTP_L2CAP_SERVICE	3
- #define BTP_MESH_NODE_SERVICE	4
-+#define BTP_BAP_SERVICE		14
- 
- struct btp_hdr {
- 	uint8_t service;
-@@ -344,6 +345,21 @@ struct btp_gatt_write_rp {
- 	uint8_t att_response;
+@@ -285,6 +285,27 @@ struct btp_gap_identity_resolved_ev {
+ 	bdaddr_t identity_address;
  } __packed;
  
-+#define BTP_OP_BAP_READ_SUPPORTED_COMMANDS	0x01
-+
-+#define BTP_OP_BAP_DISCOVER			0x02
-+struct btp_bap_discover_cp {
-+	uint8_t address_type;
-+	bdaddr_t address;
++struct btp_gatt_service {
++	uint16_t start_handle;
++	uint16_t end_handle;
++	uint8_t uuid_length;
++	uint8_t uuid[];
 +} __packed;
 +
-+#define BTP_EV_BAP_DISCOVERY_COMPLETED		0x80
-+struct btp_bap_discovery_completed_ev {
-+	uint8_t address_type;
-+	bdaddr_t address;
-+	uint8_t status;
++struct btp_gatt_characteristic {
++	uint16_t characteristic_handle;
++	uint16_t value_handle;
++	uint8_t properties;
++	uint8_t uuid_length;
++	uint8_t uuid[];
 +} __packed;
 +
- struct btp;
++struct btp_gatt_descriptor {
++	uint16_t descriptor_handle;
++	uint8_t uuid_length;
++	uint8_t uuid[];
++} __packed;
++
+ struct btp_gatt_char_value {
+ 	uint16_t handle;
+ 	uint8_t data_len;
+@@ -293,6 +314,47 @@ struct btp_gatt_char_value {
  
- typedef void (*btp_destroy_func_t)(void *user_data);
+ #define BTP_OP_GATT_READ_SUPPORTED_COMMANDS	0x01
+ 
++#define BTP_OP_GATT_DISC_PRIM_UUID		0x0c
++struct btp_gatt_disc_prim_uuid_cp {
++	uint8_t address_type;
++	bdaddr_t address;
++	uint8_t uuid_length;
++	uint8_t uuid[];
++} __packed;
++
++struct btp_gatt_disc_prim_rp {
++	uint8_t services_count;
++	struct btp_gatt_service services[];
++} __packed;
++
++struct btp_gatt_disc_chrc_rp {
++	uint8_t characteristics_count;
++	struct btp_gatt_characteristic characteristics[];
++} __packed;
++
++#define BTP_OP_GATT_DISC_CHRC_UUID		0x0f
++struct btp_gatt_disc_chrc_uuid_cp {
++	uint8_t address_type;
++	bdaddr_t address;
++	uint16_t start_handle;
++	uint16_t end_handle;
++	uint8_t uuid_length;
++	uint8_t uuid[];
++} __packed;
++
++#define BTP_OP_GATT_DISC_ALL_DESC		0x10
++struct btp_gatt_disc_all_desc_cp {
++	uint8_t address_type;
++	bdaddr_t address;
++	uint16_t start_handle;
++	uint16_t end_handle;
++} __packed;
++
++struct btp_gatt_disc_all_desc_rp {
++	uint8_t descriptors_count;
++	struct btp_gatt_descriptor descriptors[];
++} __packed;
++
+ #define BTP_OP_GATT_READ			0x11
+ struct btp_gatt_read_cp {
+ 	uint8_t address_type;
 -- 
 2.43.0
 
