@@ -1,158 +1,168 @@
-Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
+Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C660F3AA1BD
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 15:39:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC393B9D81
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 15:41:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776353947; cv=pass; b=f8PoH4ZEgbz18gmLxGokTgWybPscXTyxkTds0H/tBjCh5pOM60BDnySv2f2M2zJnM1Y/X8VdqBbfEqeqaFceO7WTEK+vy1zii2aI8F1sOOFueneW9bjKyavHnlY3I/8x2ug4Toyjf2NbJ+iRh7De0IsK7NtqlJCQ5WM/4O8vFN4=
+	t=1776354111; cv=pass; b=ppvvdVcL4LRZlZPduCfBuvNyBfPMtJRS4YxSBGATpWpjzxW3I/g7/U3D8RWeIU3DvznLgR2oOpdOcjSNA8osxQIDC+04wLd/x0AJobQAtzDOjoj1LCQhXRVHQ6gJJbBvEu5agRFCOs3TB5K0lYwUzYLSc0qVGxUCS+8BkHThU0k=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776353947; c=relaxed/simple;
-	bh=ZyR0lqxkf1kyx7I42Zbnlve3v0pv3rdi3lt2378dXMk=;
+	s=arc-20240116; t=1776354111; c=relaxed/simple;
+	bh=zBGBrZMTwKJ68rCLDRs8azQlORU5x7myV+tVHdcijts=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gqIDB0sLde0dZMQU7WMbhRHnsUfPhCEP/2MelqsODC2ZXF0DC/lDuxxEqfOCZA6aKjl3JFDN8U+v3mffS4gMsV1MaUs2UQrMm1o+v1va8iU0tpiuypu68We/sF20zR/JMgED4f5+QhVonRMWVHazu41LDabMAlNTEUOyNAC6l+M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WRvJOGH6; arc=pass smtp.client-ip=74.125.224.44
+	 To:Cc:Content-Type; b=G+T/Gha3YKoMatUEtMbvbhVJMExGKQdJ1w1hyrHIytEE3+fAcoTgnG7cGy39EBPcXIYi8oE5QI2XXHqM8iVL9C0OS4lJ/PBXsWSjPj6G5BmxGWpDPeFjec1QxqHv1H8u6TlQVu+w68qrI47kce9vqrwl1GqDj7MCCRrtHwOH+Ok=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M5k8RptB; arc=pass smtp.client-ip=74.125.224.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WRvJOGH6"
-Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-6501d242e2fso7840092d50.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 08:39:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776353945; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M5k8RptB"
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-651b6a003f6so3299197d50.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 08:41:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776354107; cv=none;
         d=google.com; s=arc-20240605;
-        b=ixxG01ejfpXs0aKT4xBMe9rzde2G+qJRodRjGvFzwvZmZ7p0a2a9F0QPFwElmKO9e2
-         CXZ5ZwJ3Je9xgUkA8PiHeQqajpib/XnLdBIPBJz9lVdJO4SJ48zxBuN6KDa2BnFb2p6c
-         jB6gnuldqdSPJk50+uFyyWlQi4/u2zprlVJqoGznVhKr37cU/HpE9W8K+p7AUs7QIMIo
-         AACKot4EGQCd/vT7cx/1c4DC22Zxyzy0fX6nbUMP9iL3KW8+HMUTf4mrbfZRRSxv/Qdy
-         NlUpIS24QTEuGq4LlXWmUrNVSXJx39a4j6HiHD49yBBA3knAVnrkGHKUzCemoY3OOcNO
-         w4zA==
+        b=Ta8trcomUvKqygOFeXXqYmKQEaLDqyRyUYpukSetv84P44+5VtMRU3d5fAp68y29zJ
+         jSKYiDfPDD70Y9Aurm2IcrDb2M2UfQiT+5BwkLMJoINDTbz8e9t9AlJSUbH6A3cdoNWY
+         y1I3iFrXGARt9npzesGYFVee01rG9ba6r+ZW+tDa84LiuuZSIpZXWQy5LWDtI00i/tKS
+         y6N62HjDBwQJKuab62QGIHjGhNp84VBIwLa9/d9XC7/11f7JOfiL4b6dJo3nJbbfStQZ
+         WcCyoOnWzMnodu+oO7+Hgkkp+X6P7gQigPGyJ9v7zOKbXsldkoZ+LdmTk6lvzUj8G+rM
+         EChA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=xJAAji2KCYwAwJwLO+0iuEn2n6211EDndqAmwrM7tSE=;
-        fh=23bX5btpwSN9kAMUf2KTA8giB20uqrBfGQFeJrgCqUk=;
-        b=X4LtxuXhrquA1IRFQYRnUyThlnCBnRbkSpyJhjEZwtnWgYZDUNO5ME8q6K4x496dO0
-         9/6I7tEi2xbeKhzYlhAhL/Y5LJ++3qh7yCNpMSCCoMp5GIOSj7uXANY/Jmwd9DhfGcvm
-         frt0l11siK00jqFI7WZXjabIP9j6LFTwTMiXhPbKY1/4+BGUi3PR7uQgmD6ub9g4XzOW
-         33Mc9tJqPEd8kcNqCu8KYjYlFuaee4ZahuFHsauUhIvH75d15CyTsjlNCqUzvww/ZJxI
-         nV2ziZal36wh5CG2WKiWuY2KOB5papeE5EOc6H5y55N95GM4fRH18IV2MJROoeMC2fWp
-         wmQQ==;
+        bh=OCnOF4+nugCQPZVKQw/7phANXrJTt1mtYs1TJKi/ahA=;
+        fh=bzTQUmg2r59+m7DtlsxWNHmZPk1xQ/c/u5Wwh8s+gdc=;
+        b=AQ4PIsnlEhz7rcTOuaP8fy0g8sf9XUXOG2g0ZBie1cPWk9iiMticRpvcBUHDWVGIc8
+         EWZnPAh7bXsBo3q9s6ikYazi+BEtPG1Z2iygb5yTK/QsOzOSX/rWWOlAlId6/Wd25T82
+         NDAET4LPdU5AMR7iBaZChOxXD+9JVPOYYgRF6z1/GKOnKKCUXVoSwj72kMcodpSQ/ElS
+         0EpKA0+cPcbdWjit784ArJvSGCUAPDTJXbR+V63L1uwldYRVuZRXEABBJDfHLa3MIMix
+         WqOVGM/wa3cS/xwXY0xKTf6j27XBCNmeLekb2VmVUVmsyWlhejGoJR3VZPkEEzYDv4hF
+         ydUw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776353945; x=1776958745; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776354107; x=1776958907; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xJAAji2KCYwAwJwLO+0iuEn2n6211EDndqAmwrM7tSE=;
-        b=WRvJOGH64xw7k1gUZE2JULep1DBcxTRBNfc75Lht+5znzD8iJHpY/k9bDUJ8MTl0ED
-         MUL6gvv9bmOgBjFSbhrYlCtU2s0vbaVU0pwIdvQ5DPvA9BCdMzSlw6HMAFHxc/YY3J1h
-         mQgHP3rPZMj9Gmplv4Tk7EwyV24OvIRNDq80qEVp9Pvi/6jIhBTJiXWkDNBNcgYlsK20
-         gklJdZ9K+jDZ5CB0dVJtTUH/dQBL3pKs+9dmB7Mqvpxe/zcCv4x0geh7WKx+zz4OJVOM
-         pXOLu6vRC5UVKXSYgGkVQsIsxsO7q5yXrcaa2ADX/AIdtkxybBUCwjsejRBZYXOw1npa
-         jodA==
+        bh=OCnOF4+nugCQPZVKQw/7phANXrJTt1mtYs1TJKi/ahA=;
+        b=M5k8RptBKBQylc39mD81QB/Ke4Y2T/5tjiqNXhpXkt0/dgWorzOuzLv6/itt+uoQzw
+         npwfwrOHsUzOkhTqp8KCP6oYr7LFjXTrUNzZNPgl2RUKmcjcs+ZxiewM4tzY4U/4qgLz
+         4L0wcCgYfKman6YI7/ynhgitzbc4oGWksbSKKt9aVdXGxkn7vjFyBpUNV9/Q+EUSNy5m
+         XQ2qP8gWGH5Z85ixnlxrDaJc6VgC5zgOPMC1ybJwUBtiN2Ic2GMkJkyRW5XyMaR8YjPw
+         H0MgDNkBqNsOaVKRNVkSSa/dZVSCmYmJ+rraev6g3BKgVrU2UgiiXULh/IvQDGNxNFBC
+         7mNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776353945; x=1776958745;
+        d=1e100.net; s=20251104; t=1776354107; x=1776958907;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=xJAAji2KCYwAwJwLO+0iuEn2n6211EDndqAmwrM7tSE=;
-        b=oFXZXZ3ZBnhxWNA24ZoEY1279EYkIoUTdcx0/7a1ZY0Q6w/e9EQPUGelmSeZc/8FWG
-         nsrYMVa6dKjvfaWyUh6kYTt9xpA22PP1LYZRmPadTB4S8zV+TuXYIKeS1/Sg+xauc27D
-         Vaize+1u4YFqcJOSD2UxVhx/5WWtS5+6Ae2E6mlaCVlmc3gqrk7d+eTtYFmKJxNjk3So
-         nIj3MRX/uo5j0yv2tj/cCeWxC8Qqqv7T1aSwPpOcdSqMsDTCZsQPUWE+RThz/wq5InlF
-         E2iUraH5uJVoafw/xdvKJO5M2YKLsmUaRLXKjvSeupDNOKCIQ3HjwbPjkf5f9rht1bIs
-         3dHw==
-X-Forwarded-Encrypted: i=1; AFNElJ+WaGoySjnv0NnlWHsAyIqozO81w+kkbuv0DI+o0glpXb1Zec/MkKUHcpyFtVw4VCC7/kHjH3mtnFDmolNSyUs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4HvJ0LVgR4zKo879vGgJIiiM0OsxO8LMWFnSdgvgIBnWBIwDj
-	RsnyD0h9yQVKdVKBHwKk+tmIARVmtjiPGOWEFYrWzZAywm2S1CK/hueIunhLKa0Omb0omc/UEPQ
-	whz6HBe2nLagd9I54nQHvQ0l6xI8mxms=
-X-Gm-Gg: AeBDievgH3r2IoD6fXKMT1lZWd+xyAKD/EJ46GtuUhL/sEf39PKJs6v/z8dHc8TYkoL
-	ufGTDIT8yvara7ALinLKvWyxnTd9YvUQs12SV9rFMvGwsmqYMjIc5KRjxG8v7I2hFbjrz02EbOf
-	fd75mOHePdWZjCotrNiCZ2Zdrnkz3rABVkbGbBj+Zn+zQ+Lzbtr6tLaccsibq5Aku3ifGCHiugs
-	o6SamM8yrHO1CTmJqDe1p6utJwBkmteELOvEfWE2/Ues5BUCVw/onxeRCHUPNZjsV9+mLpfAXJH
-	o/lHc7ArXtELGk+GHrKvepBsylDdWnaDZTJ70BTJge8lCbnWa7rSDUQSU0p8bkCKRysPk8YxyLw
-	7/XiO
-X-Received: by 2002:a53:d018:0:b0:653:3d0:f2b2 with SMTP id
- 956f58d0204a3-65303d11d0cmr1347707d50.20.1776353944719; Thu, 16 Apr 2026
- 08:39:04 -0700 (PDT)
+        bh=OCnOF4+nugCQPZVKQw/7phANXrJTt1mtYs1TJKi/ahA=;
+        b=adisVHnOFwgYOQp6hbIgpBXkj1RU9pF14JysE9RodmloOjizFfRIeyhLtP/ovabjUa
+         dmwDaM/SIW08t07P+9ZCskgfLgvbuNLz8zUCebFQ1L6Oruxja/JRiqGI63BgU9/h9+pI
+         xAnVttyCGvqwhWxNy0Jb9C6MHj/N1FESM1OFGx6Rs4Lrprk35i7U0AtTR1t/zL1uYWzE
+         adXxOuoyYL/X+iPpPEbU7bFRkR1vcSoJMmwAyS2sUNTl7nnkuSVZpfouMSBa+3wfFgNu
+         u31k5dQjXHD+Kd+2Sz6NGeQLhTI/4lhkZOfzHjotVRvsRhF48B4ScPpYclqnw3jyUM70
+         Nddg==
+X-Gm-Message-State: AOJu0Yx6TF5iBFEtIpFQtXQYWw98tqDHN5jyU4laT3wdYpCF5yXkqNkx
+	dkVwv0Dw+TOFXCdHhmPvGVJNxKfdMGJCvxuspTJQfvtqckOML8GA2SQf1RoPq4AIZcETtNbSSpI
+	HZR5MaUDSudcPBn71n7CLDGl6ta70QQc=
+X-Gm-Gg: AeBDiet/qCP94kXTO35m9yYdELBLFi+rKkrtiON0GN2cfjq3HKNeTOLScqdHcaAPZZF
+	Gnr4mmE999k7VsniNof2b4DePKVuBd6DE7z5mwAwf5d71Qfi4lAZeaM0ZkXfPvEoevc7s7BfnFx
+	drEFEI8rP4w6F7CFlP0CdaCdILLPb8emzeeQ/X0oCpK8uFHTzqbvYnjz5mERsQZZEpx7sd6K8np
+	qI46Z7pQdoMGJJ/keXYM+VLahokEZiem4quZ9po/u5rcUkUSi0/Zz+eJTN6gVnSCBeKHCWkDqga
+	NcOoiD86lOX0Vxw0KNBLTbdI/7MH6kyGz9eYTp7sUFf+yidJTAmOka44Ed7/aEruL43s5kTC3BD
+	vDQMe
+X-Received: by 2002:a53:bc05:0:b0:650:814:8124 with SMTP id
+ 956f58d0204a3-65198a88374mr18632177d50.17.1776354107448; Thu, 16 Apr 2026
+ 08:41:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260416152803.54396-1-venkat88@linux.ibm.com>
-In-Reply-To: <20260416152803.54396-1-venkat88@linux.ibm.com>
+References: <20260416153524.1405955-1-chandrashekar.devegowda@intel.com>
+In-Reply-To: <20260416153524.1405955-1-chandrashekar.devegowda@intel.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 16 Apr 2026 11:38:53 -0400
-X-Gm-Features: AQROBzCH7mNsAX5YIem25l7xMp6ZbupifopJsJTNfvZAA5qQjFdCknQRQncW8w8
-Message-ID: <CABBYNZKAKr_d62HKi0qPXAUjvG3fq9eAVuSyb+LsXtc5RtGCjg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btintel_pcie: Add ACPI dependency
-To: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-Cc: marcel@holtmann.org, chandrashekar.devegowda@intel.com, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	rafael@kernel.org, christophe.leroy@csgroup.eu, maddy@linux.ibm.com, 
-	riteshh@linux.ibm.com, broonie@kernel.org
+Date: Thu, 16 Apr 2026 11:41:36 -0400
+X-Gm-Features: AQROBzBjZjfRaING-KzrTi6Vvj06l3R7e7yZ4kftBDRWWzyE4CVrpze4YP2lhJE
+Message-ID: <CABBYNZK7PghZH_hbeftOK0JptRv3-NOatWQ35kKSfYku_RB1cA@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: btintel_pcie: Fix build error when
+ CONFIG_ACPI is disabled
+To: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-pci@vger.kernel.org, 
+	bhelgaas@google.com, ravishankar.srivatsa@intel.com, 
+	chethan.tumkur.narayan@intel.com, kernel test robot <lkp@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Venkat,
+Hi Chandrashekar,
 
-On Thu, Apr 16, 2026 at 11:28=E2=80=AFAM Venkat Rao Bagalkote
-<venkat88@linux.ibm.com> wrote:
+On Thu, Apr 16, 2026 at 11:39=E2=80=AFAM Chandrashekar Devegowda
+<chandrashekar.devegowda@intel.com> wrote:
 >
-> The btintel_pcie driver uses ACPI functions (acpi_has_method,
-> ACPI_HANDLE, acpi_evaluate_dsm) in btintel_pcie_acpi_reset_method()
-> but can be built without CONFIG_ACPI, leading to build failures
-> discovered by IBM CI:
+> btintel_pcie_acpi_reset_method() uses ACPI APIs such as
+> acpi_evaluate_object() and acpi_has_method() which are not available
+> when CONFIG_ACPI is disabled, causing build errors on architectures
+> that lack ACPI support.
 >
-> drivers/bluetooth/btintel_pcie.c:2309:14: error: implicit declaration
-> of function 'acpi_has_method' [-Werror=3Dimplicit-function-declaration]
->  2309 |         if (!acpi_has_method(handle, "_PRR")) {
->       |              ^~~~~~~~~~~~~~~
+> Guard btintel_pcie_acpi_reset_method() and btintel_pcie_perform_pldr()
+> with IS_ENABLED(CONFIG_ACPI). Since PLDR relies entirely on ACPI reset
+> methods, skip the entire PLDR flow when ACPI is not enabled instead of
+> unnecessarily unbinding and reprobing WiFi with no actual reset.
 >
-> Add ACPI dependency to the Kconfig entry to prevent building this
-> driver when ACPI is disabled, since the driver requires ACPI
-> functionality for its reset method.
->
-> Reported-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-> Closes: https://lore.kernel.org/all/ad624e0d-cfd7-4521-ae33-c5c3287b4204@=
-linux.ibm.com/
 > Fixes: 912a499a7955 ("Bluetooth: btintel_pcie: Support Product level rese=
 t")
-> Suggested-by: Rafael J. Wysocki <rafael@kernel.org>
-> Signed-off-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com=
+>
 > ---
-> Hi Marcel and Luiz,
+> v1 -> v2:
+>   - Guard btintel_pcie_perform_pldr() along with
+>     btintel_pcie_acpi_reset_method() under IS_ENABLED(CONFIG_ACPI)
+>     instead of providing a separate stub for the ACPI method, since
+>     PLDR is meaningless without ACPI support (Paul).
+>   - Tested with CONFIG_ACPI=3Dy, CONFIG_ACPI disabled, and 0day CI
+>     alpha config.
 >
-> I'm submitting a fix for a build failure in the btintel_pcie driver when
-> CONFIG_ACPI is not set. Christophe Leroy helped identify that commit
-> 912a499a7955 introduced this issue.
+>  drivers/bluetooth/btintel_pcie.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 >
->  drivers/bluetooth/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel=
+_pcie.c
+> index 076beb45c410..07223965388a 100644
+> --- a/drivers/bluetooth/btintel_pcie.c
+> +++ b/drivers/bluetooth/btintel_pcie.c
+> @@ -2280,6 +2280,7 @@ static void btintel_pcie_inc_recovery_count(struct =
+pci_dev *pdev,
+>  static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data);
+>  static void btintel_pcie_reset(struct hci_dev *hdev);
 >
-> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> index c5d45cf91f88..fc1b37044a9b 100644
-> --- a/drivers/bluetooth/Kconfig
-> +++ b/drivers/bluetooth/Kconfig
-> @@ -502,7 +502,7 @@ config BT_NXPUART
+> +#if IS_ENABLED(CONFIG_ACPI)
+>  static int btintel_pcie_acpi_reset_method(struct btintel_pcie_data *data=
+)
+>  {
+>         union acpi_object *obj, argv4;
+> @@ -2389,6 +2390,12 @@ static void btintel_pcie_perform_pldr(struct btint=
+el_pcie_data *data)
+>                         BT_ERR("BT reprobe failed for BDF:%s", pci_name(p=
+dev));
+>         }
+>  }
+> +#else
+> +static void btintel_pcie_perform_pldr(struct btintel_pcie_data *data)
+> +{
+> +       bt_dev_warn(data->hdev, "PLDR not supported, ACPI is disabled");
+> +}
+> +#endif
 >
->  config BT_INTEL_PCIE
->         tristate "Intel HCI PCIe driver"
-> -       depends on PCI
-> +       depends on PCI && ACPI
-
-Good catch, I will fix it in place.
-
->         select BT_INTEL
->         select FW_LOADER
->         help
+>  static void btintel_pcie_reset_work(struct work_struct *wk)
+>  {
 > --
-> 2.45.2
->
+> 2.43.0
 
+Doesn't making btintel_pci depend only on ACPI resolve all of this? Or
+do we really need to support systems without ACPI?
 
 --=20
 Luiz Augusto von Dentz
