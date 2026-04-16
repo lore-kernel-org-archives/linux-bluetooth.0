@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D000022541C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 16:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70716324B1E;
+	Thu, 16 Apr 2026 16:20:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776355835; cv=none; b=XSA750n5M3zPKdOuv0b3SiJdZWLbrbRNI/Cb55SR95r/ChYPXoBSipyZKCVOYIwp+KSXuK+JpfwZJ9LbBuibJ14EoDGj2yMG9J9ZIKZKEiBL4rH2hkq3BzFtV+T0NV69G9FCxVvytDRekar4tvd9guJhzxqWmp2L6ZfZjNEIDXA=
+	t=1776356438; cv=none; b=ZA5EpuupnOS8Qt2MJcfLGdmVbU37z/DstEXikpKrXhhCqDTB4URBYwcqXcHDWsH+TISArNJbULVWl6OMPFc//0zmgbCLnwHqftzIx0HjfqOKYRtb6yyiZSUDlE2/LRBFja6sMdeowaiQa9Q2wCurcdiICjobWGvjlKo5cZM0OJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776355835; c=relaxed/simple;
-	bh=L0mfc0b1CzaWk/QHTKhkVOH5BiArkeroIBsZ9xdOQDk=;
+	s=arc-20240116; t=1776356438; c=relaxed/simple;
+	bh=i4QTJp6gfQ6MsI0r1QtFdih9ZbHFZKrzr7vv0eudWf0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uXHf/OFGGSlrEocWisimHHyA5NWyot/c86ix+IK3bIxGMvM/ru3qXPGX9hbgplJYoDi68XD3BDiby1ie07ZaUhhqV8MXBEp8hyECWfdHqCItTUOSeSBimzhOikyL7/Bj64S/L8o11KQ7+Ks8r1zL25WwaeyseZ7qLKnb788/gOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P4hxhQqX; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=hb3nNlekihYdeSr1wokWqSgy/5QMDPbW7O/g0mJlwfRKZj2rttFeYRJ6CahW9QJRxMTtkgt8BON6sxSxz8GSu3sePborSr1RHyAcU2qK1v5Ij0BWN1i6Kh6Fbe/lhkeac7CWuvBtvqpe6pOiDBVkTrWhibEfRHjPca7XHR1OgSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ee4GYH1O; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P4hxhQqX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CAECC2BCB4;
-	Thu, 16 Apr 2026 16:10:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ee4GYH1O"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09F5EC2BCAF;
+	Thu, 16 Apr 2026 16:20:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776355835;
-	bh=L0mfc0b1CzaWk/QHTKhkVOH5BiArkeroIBsZ9xdOQDk=;
+	s=k20201202; t=1776356438;
+	bh=i4QTJp6gfQ6MsI0r1QtFdih9ZbHFZKrzr7vv0eudWf0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=P4hxhQqX9sfW68tw8dZW6Avq41vWBGEhCjEcgSWl9oTK11Jn9rjIgNR9kbz4q5RKR
-	 N3q/KHeicps0DIKP4bPdH2LqEFVRx1yc1A6Le+gmq4BktfU/B/MuQKfMv43C8a8iT6
-	 2WLjf6lPIFzlNVVqWY30w8h2h9+9P0Icwck7XPpvEAV8NyvlYat8L+3Yv5CobtBXU4
-	 nSzh/x5io4Tw9S6fjb9XqDV6GjNwC0FO9qYt9RbHUT1TMDQZV9Lj+GR1RIKAk8a5T3
-	 PFVTAop9KbLSUdAv2gO9dwAIe7UZQFV1cPN6oYghLfFh3UKwq2++dDHymh4WwhGPiJ
-	 /9SnWnVbuh6kQ==
+	b=ee4GYH1OcRa7DsyCxEmZUvA84gGsjvS+gM93qvXBSXBNzKeyI5DZItZJaza6eMtkx
+	 1QzPknArtBWexvc17KVia73PeybCnuQY2FNvfXUEgocVhE4j11xa8PvGuUMelVlsiq
+	 aFOAyB6kPrdmvMMs6Pc+Po4d07L03DzN0WXI3hcBddXh+ywtYJUWH03AvyRNQM3wjN
+	 2pwcqW1v9Me6INg5ycjmpuBuFfnjFPgRfPmMHHrEmTFNNRmKMOnPJdEM7K2aO/jtzs
+	 twu8OjDojoTyEIgywS2fLCS0g5gcw8ip5oAET5UlaC/ttXEzWHkOADcgyyBFwHyC8M
+	 XUw6DML1ZN1Pw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FE1B380AA67;
-	Thu, 16 Apr 2026 16:10:05 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9EC4380AA67;
+	Thu, 16 Apr 2026 16:20:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,35 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] client/btpclient: Add GATT read and write value
- supports
+Subject: Re: [PATCH v4] Bluetooth: btmtk: add event filter to filter specific
+ event
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177635580405.3299139.6040204220940361931.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Apr 2026 16:10:04 +0000
-References: <20260403143631.545312-1-frederic.danis@collabora.com>
-In-Reply-To: <20260403143631.545312-1-frederic.danis@collabora.com>
-To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
-Cc: linux-bluetooth@vger.kernel.org
+ <177635640655.3303094.2277821963642028002.git-patchwork-notify@kernel.org>
+Date: Thu, 16 Apr 2026 16:20:06 +0000
+References: <20260416111607.3161032-1-chris.lu@mediatek.com>
+In-Reply-To: <20260416111607.3161032-1-chris.lu@mediatek.com>
+To: Chris Lu <chris.lu@mediatek.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ sean.wang@mediatek.com, will-cy.Lee@mediatek.com, ss.wu@mediatek.com,
+ steve.lee@mediatek.com, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org
 
 Hello:
 
-This patch was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri,  3 Apr 2026 16:36:31 +0200 you wrote:
-> This stores the characteristics proxy and handle so we can call
-> org.bluez.GattCharacteristic1 ReadValue and WriteValue methods with
-> the "handle provided by PTS - 1".
+On Thu, 16 Apr 2026 19:16:07 +0800 you wrote:
+> Add an event filter to filter event with specific opcode to prevent BT
+> stack from receiving unexpected event.
 > 
-> This will allow to pass BAP/CL/CGGIT/CHA/BV-02-C and
-> BAP/UCL/CGGIT/CHA/BV-03-C.
+> Event with opcode 0xfc5d is generated when MediaTek's Bluetooth enable
+> firmware logs and is not expected to be sent to userspace.
+> 
+> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ] client/btpclient: Add GATT read and write value supports
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=15080642a414
+  - [v4] Bluetooth: btmtk: add event filter to filter specific event
+    https://git.kernel.org/bluetooth/bluetooth-next/c/b57b0f27cb05
 
 You are awesome, thank you!
 -- 
