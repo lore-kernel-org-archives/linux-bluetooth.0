@@ -1,208 +1,286 @@
-Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B6431714F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 18:11:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF6534B1A7
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 18:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776363074; cv=none; b=jjtzHxnvZOJAdgzsM+PMwGvQF5btSKHjIfI9WPO78PlqDcLbYBSDesxCUpvyFJRxCsIuq3cQEYJa0Nbdb394nfR2sCmiAtqHnc5T7evqlIuWfYHn+B70tcZmhaCZQ+jnFrnFeNbnQveGTPB4boW/2lmQrlofLe3T66GKAgsOh2I=
+	t=1776365365; cv=none; b=djkXjxT7iH1eYAa/PAJQs9FOFLWm4xIdz3llKGf7tGBho8TwtqYWM5ZJ2Q0m8p882u52nZJkkgcCE9W+9kaHuG3B9ABwpFrS83TiAzkdYs9IQ/KVZvorMAi1Z1IIxhPckbRkCggRRzCCuJ80m+rVP94qD/O0ftO64a2+UJAiisQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776363074; c=relaxed/simple;
-	bh=UNH1TS3ZyXL9972Hbs9t199T4JpWtWHOnmloZRYYeDc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=P1MqZxkFC4G+rvpxgHJlLqTOptt0lsTBfVi9IvK3r5RfaHhv4zyKrCvtQF2laO+byuagpIWPA1rCY0W1rYeG9AU3n7vaGtbNy1T3mXQszpY1a3yjlLkLJcIaj3usQ1GDfoG+ZrClHUpKFoxIpX2Y4jZn6CgBEDUQCcIjvtx46Dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FSoBvMoP; arc=none smtp.client-ip=74.125.82.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776365365; c=relaxed/simple;
+	bh=7X2Zeh57YaIfzfmkbzq37uikt3UxeSXarGKuISGM+8w=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GUh+JoWQk7T/uNubD8mcezJhoIWoXp3titUV83HYn0RGdtX+8Zdom7kVt2c9nEXDt3rkM2G+ZZEVbaAspMZulM3aUY6lScIUdT7foeD3rWQ+syX47JQTHQzLhu0uKjMcF0FPA5l0aSbAa3YTLeRE+0cv55b+4hgxOSyV8/3zGxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=D+Q7gkxZ; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FSoBvMoP"
-Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-2d96243c91fso2049996eec.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 11:11:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776363072; x=1776967872; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=G537djRavLl9rKC90gdsy1EFKERlegvHjqa5+8ebn2s=;
-        b=FSoBvMoP7GoE5fk6n/kXPk9fhPqhaM4b8282KA18puBeKXzmxi7WtCvt31LFKrQVDn
-         uBg2+vSJF/FpZukHy6gV6b5i2TycHk9JU6Ay41CO7Wj0cDwsXQDxJScqC/YxeJtvHtQL
-         kAHFAt4RKy4htvtyX6yV6vuyUCQmPu4xz2RIheqoSTizdjqI+aAKPtcVDAVxj2u+alzc
-         cEmKoO9Xbj2OPVozfohGwet1C9HeT9SUe9kX8RKSD57jxqDohm/FIHiuwiMMl8VKBZtT
-         iDtXVy8KIWfMHsIKk9iCfWPxrOE+LovZy60BPLmpQfJ/MA/7uPh9ZbLA+9W/VrvwuSCo
-         lpAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776363072; x=1776967872;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G537djRavLl9rKC90gdsy1EFKERlegvHjqa5+8ebn2s=;
-        b=G4hWG3PrcEutzKjnP8Yx0xQYwaS+6IIGHhmkpb1k+MgTZ2ex0dWgJCiLATCVe1Mbi3
-         7oELS/+mvuzdnMcZt1elS4LZXMfAnBpN9aHKU26WlwyJqDYGhpMaVA2boHpJkRoJBn+Z
-         o4hJ5yedaLRMGmkeGXy83l+YNz/txu0oUt2cLPaSd5ifNCRvE/ALvflMVc1rDd1VNoVt
-         TUVh1rUefLTmmopkYWP7EoS1sxdgQkYlBj49mC2YMgd3pyvrExGhKebWtdeCN8WxZ8M7
-         cmwk68dpdFwbITwL7V9ucNVlaogNr58Qe6+vzplG8rAFucLnQiCDzdObBYHlwxu9I/1l
-         E1tQ==
-X-Gm-Message-State: AOJu0Yzj8itDvcFDq8gvQNP3bDQ+OlM2K7I/QPW/dMZEVmZZWs6QsHTF
-	ZCWJuzhDU6Cklfyu6ezab6X8eKzIPAP2TR6PvYYZUF1GmXv2hQ1+34atKPNu8w==
-X-Gm-Gg: AeBDiese3DCHbfXhLeuppGhVD13jqZVX6rpv4DbrydyqG7ag+9gqXdUpxtoWG41h244
-	YCnlR2MM6w0UoQyNVdminQBYloZHHHEfgfF/ywU06E07Jhwg8gY80GDLUvAk8YtUCIaI5Rmdoai
-	Lb1D7WIc6VNeXZD2AyRya6geX72a5uj6q5tps2y+r1oYAV7GigOaJBBgHHnHVJo6Wi79npwQRha
-	34Xq2PFBaFysPq0kiRL0/Bu9VSgUfI6QvAAb7bxkMzFC7bEzL+7POpFwFSpnUm/5nsKNE6tOaRj
-	/ShDSUIZG7ObRS0vCli2TaEPE/dEcBDglJawPqmZSdXkLDnlOkWq3eS81LbqKOat7hmItKco8YA
-	aTXwpLXy4l5z6r1M8Ny//VrX+/m/Uw8+dx1Bb6/w7QKvkqC89D17JYdUxiR9/j+hy1Vjmq1OKwy
-	MD7tYiFu06/aDjKctl8+PnM4AL4bnWKXX6i8iWdRK7tPWBfDj8fDA=
-X-Received: by 2002:a05:7300:a10b:b0:2d9:32c8:2b69 with SMTP id 5a478bee46e88-2e2e68cdef4mr155862eec.28.1776363072084;
-        Thu, 16 Apr 2026 11:11:12 -0700 (PDT)
-Received: from [172.17.0.2] ([52.250.210.72])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2de8eb84673sm8465193eec.19.2026.04.16.11.11.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2026 11:11:11 -0700 (PDT)
-Message-ID: <69e1263f.050a0220.1ce00b.e0f0@mx.google.com>
-Date: Thu, 16 Apr 2026 11:11:11 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7276367595190811572=="
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="D+Q7gkxZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1776365360;
+	bh=7X2Zeh57YaIfzfmkbzq37uikt3UxeSXarGKuISGM+8w=;
+	h=From:To:Subject:Date:From;
+	b=D+Q7gkxZOkD1rWx5n52kHV56GuzEOlk9ekV8Q7Nc84Il9s8NSEB4WfvLpKupq9ImI
+	 5r4wXCoRnLMVNS/JeAS8m/OVo4WNz1spp7FK3WD39xvrGZLy71hyPz1PPApHOB6Ywd
+	 zpebnTSpMCydIDiX3o32SljbNsN1GnZBtDOd2piAhv928iM/FVYGO3nrAHeCHHznht
+	 +1llobN4NDG1DB7YoAO4sTctBoCcGUo03FfMgBPibxb3/nwxCQC1THCAp2FTCJuczM
+	 JtCzVwgv4tjFgpybVgwCobquBRym9rXKJ49AV2KHwRhHPqv3nRfYjO15o+YeY3LKKi
+	 14IaPRcaatIxA==
+Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 798A517E1276
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 20:49:20 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] client/btpclient: Add BTP_OP_BAP_DISCOVER support
+Date: Thu, 16 Apr 2026 20:49:14 +0200
+Message-ID: <20260416184914.145135-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chandrashekar.devegowda@intel.com
-Subject: RE: [v2] Bluetooth: btintel_pcie: Fix build error when CONFIG_ACPI is disabled
-In-Reply-To: <20260416153524.1405955-1-chandrashekar.devegowda@intel.com>
-References: <20260416153524.1405955-1-chandrashekar.devegowda@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
---===============7276367595190811572==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+BAP/CL/CGGIT/SER/BV-01-C expects IUT to discover the services before
+continuation.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1082111
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.46 seconds
-GitLint                       PASS      0.19 seconds
-SubjectPrefix                 PASS      0.06 seconds
-BuildKernel                   PASS      21.40 seconds
-CheckAllWarning               PASS      23.48 seconds
-CheckSparse                   PASS      22.69 seconds
-BuildKernel32                 PASS      21.57 seconds
-TestRunnerSetup               PASS      420.32 seconds
-TestRunner_l2cap-tester       PASS      23.32 seconds
-TestRunner_iso-tester         PASS      34.58 seconds
-TestRunner_bnep-tester        PASS      5.01 seconds
-TestRunner_mgmt-tester        FAIL      96.59 seconds
-TestRunner_rfcomm-tester      PASS      7.48 seconds
-TestRunner_sco-tester         PASS      11.88 seconds
-TestRunner_ioctl-tester       PASS      8.47 seconds
-TestRunner_mesh-tester        FAIL      9.96 seconds
-TestRunner_smp-tester         PASS      6.96 seconds
-TestRunner_userchan-tester    PASS      5.33 seconds
-TestRunner_6lowpan-tester     FAIL      6.73 seconds
-IncrementalBuild              PASS      20.92 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v2] Bluetooth: btintel_pcie: Fix build error when CONFIG_ACPI is disabled
-WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
-#95: 
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-
-total: 0 errors, 1 warnings, 19 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14527116.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.076 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.143 seconds
-Mesh - Send cancel - 2                               Timed out    1.996 seconds
-##############################
-Test: TestRunner_6lowpan-tester - FAIL
-Desc: Run 6lowpan-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-7.0.0-rc7-gcac561d0a38b #1 Not tainted
-------------------------------------------------------
-kworker/0:1/11 is trying to acquire lock:
-ffff8880026d9940 ((wq_completion)hci0#2){+.+.}-{0:0}, at: touch_wq_lockdep_map+0x75/0x180
-
-but task is already holding lock:
-ffffffffbd44f960 (rtnl_mutex){+.+.}-{4:4}, at: lowpan_unregister_netdev+0xd/0x30
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #4 (rtnl_mutex){+.+.}-{4:4}:
-       lock_acquire+0xf7/0x2c0
-       __mutex_lock+0x16b/0x1fc0
-       lowpan_register_netdev+0x11/0x30
-       chan_ready_cb+0x836/0xd00
-       l2cap_recv_frame+0x61bb/0x88e0
-       l2cap_recv_acldata+0x790/0xdf0
-       hci_rx_work+0x500/0xd00
-       process_scheduled_works+0xba7/0x1a90
-       worker_thread+0x514/0xbb0
-       kthread+0x368/0x490
-       ret_from_fork+0x498/0x7e0
-       ret_from_fork_asm+0x19/0x30
-
--> #3 (&chan->lock#3/1){+.+.}-{4:4}:
-       lock_acquire+0xf7/0x2c0
-       __mutex_lock+0x16b/0x1fc0
-       l2cap_chan_connect+0x74e/0x1980
-       lowpan_control_write+0x523/0x660
-       full_proxy_write+0x10b/0x190
-       vfs_write+0x1c0/0xf60
-       ksys_write+0xf1/0x1d0
-       do_syscall_64+0xa0/0x570
-       entry_SYSCALL_64_after_hwframe+0x74/0x7c
-
--> #2 (&conn->lock){+.+.}-{4:4}:
-...
-Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
-
-
-https://github.com/bluez/bluetooth-next/pull/96
-
+This reduces connection time for the BAP tests.
 ---
-Regards,
-Linux Bluetooth
+ Makefile.tools          |   1 +
+ client/btpclient/bap.c  | 109 ++++++++++++++++++++++++++++++++++++++++
+ client/btpclient/bap.h  |  13 +++++
+ client/btpclient/core.c |  15 ++++++
+ src/shared/btp.h        |  16 ++++++
+ 5 files changed, 154 insertions(+)
+ create mode 100644 client/btpclient/bap.c
+ create mode 100644 client/btpclient/bap.h
 
+diff --git a/Makefile.tools b/Makefile.tools
+index 8e0eae04e..001d0129f 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -562,6 +562,7 @@ noinst_PROGRAMS += client/btpclient/btpclient client/btpclient/btpclientctl
+ client_btpclient_btpclient_SOURCES = client/btpclient/btpclient.c \
+ 				client/btpclient/btpclient.h \
+ 				src/shared/btp.c src/shared/btp.h \
++				client/btpclient/bap.c client/btpclient/bap.h \
+ 				client/btpclient/core.c client/btpclient/core.h \
+ 				client/btpclient/gap.c client/btpclient/gap.h \
+ 				client/btpclient/gatt.c client/btpclient/gatt.h
+diff --git a/client/btpclient/bap.c b/client/btpclient/bap.c
+new file mode 100644
+index 000000000..d64828894
+--- /dev/null
++++ b/client/btpclient/bap.c
+@@ -0,0 +1,109 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2026  Collabora Ltd.
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdlib.h>
++
++#include <ell/ell.h>
++
++#include "bluetooth/bluetooth.h"
++#include "bluetooth/uuid.h"
++#include "src/shared/btp.h"
++#include "btpclient.h"
++#include "bap.h"
++
++static struct btp *btp;
++static bool bap_service_registered;
++
++static void btp_bap_read_commands(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	uint16_t commands = 0;
++
++	if (index != BTP_INDEX_NON_CONTROLLER) {
++		btp_send_error(btp, BTP_BAP_SERVICE, index,
++						BTP_ERROR_INVALID_INDEX);
++		return;
++	}
++
++	commands |= (1 << BTP_OP_BAP_READ_SUPPORTED_COMMANDS);
++	commands |= (1 << BTP_OP_BAP_DISCOVER);
++
++	commands = L_CPU_TO_LE16(commands);
++
++	btp_send(btp, BTP_BAP_SERVICE, BTP_OP_BAP_READ_SUPPORTED_COMMANDS,
++			BTP_INDEX_NON_CONTROLLER, sizeof(commands), &commands);
++}
++
++static void btp_bap_discover(uint8_t index, const void *param, uint16_t length,
++								void *user_data)
++{
++	struct btp_adapter *adapter = find_adapter_by_index(index);
++	const struct btp_bap_discover_cp *cp = param;
++	uint8_t status = BTP_ERROR_FAIL;
++	struct btp_device *dev;
++	struct btp_bap_discovery_completed_ev ev;
++	bool prop;
++
++	if (!adapter) {
++		status = BTP_ERROR_INVALID_INDEX;
++		goto failed;
++	}
++
++	btp_send(btp, BTP_BAP_SERVICE, BTP_OP_BAP_DISCOVER, index, 0, NULL);
++
++	dev = find_device_by_address(adapter, &cp->address, cp->address_type);
++
++	/* Services should have been resolved during connection */
++	if (!l_dbus_proxy_get_property(dev->proxy, "ServicesResolved", "b",
++					&prop) || !prop)
++		goto failed;
++
++	memcpy(&ev.address, &dev->address, sizeof(ev.address));
++	ev.address_type = dev->address_type;
++	ev.status = 0;
++
++	btp_send(btp, BTP_BAP_SERVICE, BTP_EV_BAP_DISCOVERY_COMPLETED,
++			adapter->index, sizeof(ev), &ev);
++
++	return;
++
++failed:
++	btp_send_error(btp, BTP_BAP_SERVICE, index, status);
++}
++
++bool bap_register_service(struct btp *btp_, struct l_dbus *dbus_,
++					struct l_dbus_client *client)
++{
++	btp = btp_;
++
++	btp_register(btp, BTP_BAP_SERVICE, BTP_OP_BAP_READ_SUPPORTED_COMMANDS,
++					btp_bap_read_commands, NULL, NULL);
++
++	btp_register(btp, BTP_BAP_SERVICE, BTP_OP_BAP_DISCOVER,
++					btp_bap_discover, NULL, NULL);
++
++	bap_service_registered = true;
++
++	return true;
++}
++
++void bap_unregister_service(struct btp *btp)
++{
++	btp_unregister_service(btp, BTP_BAP_SERVICE);
++	bap_service_registered = false;
++}
++
++bool bap_is_service_registered(void)
++{
++	return bap_service_registered;
++}
+diff --git a/client/btpclient/bap.h b/client/btpclient/bap.h
+new file mode 100644
+index 000000000..2b7a218b5
+--- /dev/null
++++ b/client/btpclient/bap.h
+@@ -0,0 +1,13 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2026  Collabora Ltd.
++ *
++ */
++
++bool bap_register_service(struct btp *btp_, struct l_dbus *dbus_,
++					struct l_dbus_client *client);
++void bap_unregister_service(struct btp *btp);
++bool bap_is_service_registered(void);
+diff --git a/client/btpclient/core.c b/client/btpclient/core.c
+index cfff131f1..772178670 100644
+--- a/client/btpclient/core.c
++++ b/client/btpclient/core.c
+@@ -13,6 +13,7 @@
+ #include "bluetooth/uuid.h"
+ #include "src/shared/btp.h"
+ #include "btpclient.h"
++#include "bap.h"
+ #include "core.h"
+ #include "gap.h"
+ #include "gatt.h"
+@@ -89,6 +90,14 @@ static void btp_core_register(uint8_t index, const void *param,
+ 		if (!gatt_register_service(btp, dbus, client))
+ 			goto failed;
+ 
++		break;
++	case BTP_BAP_SERVICE:
++		if (bap_is_service_registered())
++			goto failed;
++
++		if (!bap_register_service(btp, dbus, client))
++			goto failed;
++
+ 		break;
+ 	case BTP_L2CAP_SERVICE:
+ 	case BTP_MESH_NODE_SERVICE:
+@@ -132,6 +141,12 @@ static void btp_core_unregister(uint8_t index, const void *param,
+ 
+ 		gatt_unregister_service(btp);
+ 		break;
++	case BTP_BAP_SERVICE:
++		if (!bap_is_service_registered())
++			goto failed;
++
++		bap_unregister_service(btp);
++		break;
+ 	case BTP_L2CAP_SERVICE:
+ 	case BTP_MESH_NODE_SERVICE:
+ 	case BTP_CORE_SERVICE:
+diff --git a/src/shared/btp.h b/src/shared/btp.h
+index 8b5078f82..c23346f4e 100644
+--- a/src/shared/btp.h
++++ b/src/shared/btp.h
+@@ -26,6 +26,7 @@
+ #define BTP_GATT_SERVICE	2
+ #define BTP_L2CAP_SERVICE	3
+ #define BTP_MESH_NODE_SERVICE	4
++#define BTP_BAP_SERVICE		14
+ 
+ struct btp_hdr {
+ 	uint8_t service;
+@@ -344,6 +345,21 @@ struct btp_gatt_write_rp {
+ 	uint8_t att_response;
+ } __packed;
+ 
++#define BTP_OP_BAP_READ_SUPPORTED_COMMANDS	0x01
++
++#define BTP_OP_BAP_DISCOVER			0x02
++struct btp_bap_discover_cp {
++	uint8_t address_type;
++	bdaddr_t address;
++} __packed;
++
++#define BTP_EV_BAP_DISCOVERY_COMPLETED		0x80
++struct btp_bap_discovery_completed_ev {
++	uint8_t address_type;
++	bdaddr_t address;
++	uint8_t status;
++} __packed;
++
+ struct btp;
+ 
+ typedef void (*btp_destroy_func_t)(void *user_data);
+-- 
+2.43.0
 
---===============7276367595190811572==--
