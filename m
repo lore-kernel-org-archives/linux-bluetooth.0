@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A8382866
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 15:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1824B82866
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 15:20:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776352837; cv=none; b=HcaTIA5qJeMGQf3HkARoVOyvPCVcphemKeibwi6lduSiqvEpNA94OgR6yswfhvo+zgTn0+Va0zQ9g/uyc1aQKZZ6d1sbPgFvlCHmcVzKbL3QXW8DaqOhWsRHKDT/El4ky3I/WamEs6uZrYV/Xb04sIteEgSy64HDhQgi68falFA=
+	t=1776352838; cv=none; b=FPXhaSNUEyQL073Vv9WoxoZ5OE/HpLgSE8HdzR/uaY8DbC68hnElF1fbwkfetUmI33QztWVYC+YJkoe9grxrELhmBxDb66SA0JuwJ4bZiebDhTNqd5J6aPkXza8IlJCL7MUB9ZGxgMbvSai1Fq2M81XGANlYKTJ9Bqna3bPOfes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776352837; c=relaxed/simple;
-	bh=0NK3j9Z6q9QdDzqOipoPvBxK5UKb7bB8i3uxCwlrmYQ=;
+	s=arc-20240116; t=1776352838; c=relaxed/simple;
+	bh=y3N6MtE4Zl0q6onwLCpY8jWB/a0QPE3mmX8W17FptzU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mzOH4gF+z1t0koBVEBiQjgQsiQ5a/T0ivaG7+QQ9OblDpPd6hk3lzKQb8ko6ef9D7N5GM/kkF/nCXgyyEQeLz9+1nH3dyrB0x5EZ/Aa0npA7XUz6Er0tzLbhpSs8RCf3u/X/2gWySA9bhquZwcmPyLNj97QQ28nOdEIck+6PUxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yz8TkDH1; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=VcNCI0Pq6UjkQTVu6SeKd8WY84sXX0SVNtZd1ZDj+oTzCku6bUezIMsH+KxmA4JW/6bGqzAckcbv5KytpSLvtc1Bo+JL5NRT1fGIraGQpxtyA2298UXZ1z1xiP68wGlxDtWKe4Flp37LHBzWtbnJCRhDcTuDet2cap714rC1Vrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M5VPtA0a; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yz8TkDH1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9FE1C2BCAF;
-	Thu, 16 Apr 2026 15:20:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M5VPtA0a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F36C0C2BCAF;
+	Thu, 16 Apr 2026 15:20:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776352836;
-	bh=0NK3j9Z6q9QdDzqOipoPvBxK5UKb7bB8i3uxCwlrmYQ=;
+	s=k20201202; t=1776352838;
+	bh=y3N6MtE4Zl0q6onwLCpY8jWB/a0QPE3mmX8W17FptzU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Yz8TkDH1Re5+LoZC7kdOsdq30vekgHupgfPNUyzWn6kTHp3aaWvSK9jtFCnW969tz
-	 Lwxx+ABAv5p5jeJ4YPPM6McLFHwxybl7tNGN3Te0RWqaly7GisZX/SJDZ49/giZp9z
-	 EzD5U5HiEMarPHfjuIqgLs2YXHaP6bmGCUfSImBzJp92MLL+WyzwhNSW5uvuenlze3
-	 yf5o56DCBBJ4ftMHuy3PAAnF6K3YmBhEnzmoRZutIPPxrVa8hHXYuWQAGJoABJ1taD
-	 C99Qadn+hPMQCtaHnZYMDDmu3dAUm01L/UPzqDXiNTvOySXnyvnYo9luIle++zzn7s
-	 I7bBQiNOcPbLQ==
+	b=M5VPtA0aav+PDDRjKXDlOt/pT1U1bUCKR8glDm3g37jgU3v8QTmnEjmcf/tFDiYR+
+	 +Uo/xhcPRWXpCH27JFgQjuJZQ6xBh6x2KS9WX2msm8fEo5RnExRzylV5f8kIzBmIwC
+	 49AHfl5uz2EIjDrkXNvYuYrICEW19XX0nTg5RZZC/BJRFdOcIEilvc9pHqlty5tVn0
+	 g5Dh7dNuJqkUu3t2FwCg+4Rqw9M4Xe/797Dl4T/Ud/PxntxyQ9f5ih77i0ugZ0MzYc
+	 k4UpxsFuuTPDX7a3ylT8EgSHuXiFO4biFStrBs5nZUcaIP1a+iuIw1BAE/NDfW5c7M
+	 xAtDVPqxDBW5A==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE23380AA63;
-	Thu, 16 Apr 2026 15:20:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9E5F380AA63;
+	Thu, 16 Apr 2026 15:20:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,14 +37,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 1/4] shared/queue: Add way to iterate over queue
- contents
+Subject: Re: [PATCH BlueZ v2 0/3] Remove glib dep from non-glib shared library
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177635280504.3275927.6819493200765450409.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Apr 2026 15:20:05 +0000
-References: <20260403084128.348931-1-hadess@hadess.net>
-In-Reply-To: <20260403084128.348931-1-hadess@hadess.net>
+ <177635280653.3275927.901198944484854482.git-patchwork-notify@kernel.org>
+Date: Thu, 16 Apr 2026 15:20:06 +0000
+References: <20260416141021.3970323-1-hadess@hadess.net>
+In-Reply-To: <20260416141021.3970323-1-hadess@hadess.net>
 To: Bastien Nocera <hadess@hadess.net>
 Cc: linux-bluetooth@vger.kernel.org
 
@@ -53,25 +52,23 @@ Hello:
 This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri,  3 Apr 2026 10:40:54 +0200 you wrote:
-> There were no accessors that would give us an iteratable structure,
-> leaving us with just *_foreach() constructs that are cumbersome.
+On Thu, 16 Apr 2026 16:08:39 +0200 you wrote:
+> Changes since v1:
+> - remove queue_peek_head_entry() patch, we already had similar API
 > 
-> Add a way to get the first entry in the queue.
-> ---
->  src/shared/queue.c |  8 ++++++++
->  src/shared/queue.h |  1 +
->  unit/test-queue.c  | 20 ++++++++++++++++++++
->  3 files changed, 29 insertions(+)
+> Bastien Nocera (3):
+>   shared: Remove glib dependency from src/shared/ad.c
+>   shared/queue: Fix warning when compiling ad.c
+>   shared: Remove unneeded glib includes
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ,1/4] shared/queue: Add way to iterate over queue contents
+  - [BlueZ,v2,1/3] shared: Remove glib dependency from src/shared/ad.c
     (no matching commit)
-  - [BlueZ,2/4] shared: Remove glib dependency from src/shared/ad.c
-    (no matching commit)
-  - [BlueZ,3/4] shared/queue: Fix warning when compiling ad.c
+  - [BlueZ,v2,2/3] shared/queue: Fix warning when compiling ad.c
     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6a6aaeba6aed
-  - [BlueZ,4/4] shared: Remove unneeded glib includes
+  - [BlueZ,v2,3/3] shared: Remove unneeded glib includes
     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=07a0b87e6b34
 
 You are awesome, thank you!
