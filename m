@@ -1,82 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705D532B99F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 17:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6222426A1A4
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 18:07:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776360637; cv=none; b=hwrVvdz0btTkw2Sk5IaGlcBjZX8X8oVSBr+pbrSycm7zm0WIIbDCHtdXN/xCmbMIMecJdMeWa56uJ1hHh7bAMXweWHpnrByPFnr7Jow6+sDt4fR0y3/kc5aHA+bhUC+YEmKcNyQhVaw6wnwqRjNh6eKqIotQmv5ctZT1a7Is5HY=
+	t=1776362862; cv=none; b=dOn2lAzvIA4zgu3L9xbAFK41q2PWFkbBZGMgGSHR9l9H8q71yJuaSo+psGXVAkVv2c9tNcCw02uR7EbI8WA/ryqULAH/7CcoibP0uqRrAciyJLg0c6I52KQmMv5VrTIK+OnFHf/OzEduzgmfo+/PRyemNAuS5I4VUSNkKIlsgVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776360637; c=relaxed/simple;
-	bh=Mc2oxyIKpd2+CMWStoqnHd7CX9PASkftf0qVGuN6LFk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lKhMSsxU1K5ugjTUOULZ9JKQC3TC72xcLsPpwslvTsGV2KOk0lNJgEDx97NnjIxG9Uw8AuBLKnTLXeCdNm06uMRWJIjEU1YcOPV1YGzo2K89CKg+i4QgQcnspD96wELN987BYYsN9KGgO5ZDfp5/6wPaI1dAaLCqcBu4srbNORo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOR+AN4K; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776362862; c=relaxed/simple;
+	bh=6eB2f8JN6NO3fxpvUQkFWC+lGBf3HLj0o/1YwC7IV3M=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=NTCUiOcjU2Fw3RjgIUiiZue9F62iogOl2dzigdg3HFOs6ziHNfo7hIsMZlfC5x/0vt+gVmnDsZHKj7gRiszL5MyK2Xftbz12DNCTRT5ytTPxJqSgIG4uUqN6GVL9JDFevtKnP4op3FAW6a3Ab+/qEOl25WD+0DLmp9wauuqGOWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=bAIVHilv; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOR+AN4K"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 177E2C2BCAF;
-	Thu, 16 Apr 2026 17:30:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776360637;
-	bh=Mc2oxyIKpd2+CMWStoqnHd7CX9PASkftf0qVGuN6LFk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fOR+AN4KMxN8xDddd2A3nqTKV1k+EvzafsEahyK0aA+JHnMnBOguVuI3tjseqG5E1
-	 5YKydCAvtByEgFA2+DvnqiG6052Kp2EaoL8IFGxL18z5P7Yb3oo4gTw9yTNkOsKxHn
-	 U6z7Rfq8OgJEn/qdTDCiIPOEcSyrc6jynHAQcDaWcUu1XoJ+gZf0+8hU3bY04DZWkP
-	 9KAmAkQRaDHBmLL5bDjouHMcY8xZO0WEC3Cb0S9H98P+/LHa8v9IEO+oOkypll3Wb+
-	 rFW8PqppmrwtWqv+s+tfcAogI2hzKgtE+i1qTG4p0PDviakqFtb+rQTNgRpI+uNzT2
-	 YBTKj6lh5RN1w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9E1C380AA67;
-	Thu, 16 Apr 2026 17:30:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="bAIVHilv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1776362859;
+	bh=DQoAP6zDxkoF6AWtTPkcKnjXHB+tKk9HsIG2iTUx/m4=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=bAIVHilvk3cgJgsAnqgkWh7oMfgyQkCkorCizUY7txkt8miO82U6XpWckAvB3u3jd
+	 0SvObWjt3JBQtAwLq8+439fHUNJZx5DnUJ+AT4UU4nhzlABB2Fj74EgQR2ZqMG1kTD
+	 IBNlqTUNbzMHwV6G7XJVAlcmbiChoJUSUfzovHe8=
+Received: from github.com (hubbernetes-node-498850a.va3-iad.github.net [10.48.15.69])
+	by smtp.github.com (Postfix) with ESMTPA id 95BA08010EF
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 11:07:39 -0700 (PDT)
+Date: Thu, 16 Apr 2026 11:07:39 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/150806-ce07e9@github.com>
+Subject: [bluez/bluez] b73ba1: github: Add YAML issue template and
+ btsnoop-analyz...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 1/3] github: Add YAML issue template and
- btsnoop-analyzer workflow
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <177636060555.3324412.4472228454911439331.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Apr 2026 17:30:05 +0000
-References: <20260415182210.514686-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260415182210.514686-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: b73ba12b0bd62211609e1f6c94af780950a628ee
+      https://github.com/bluez/bluez/commit/b73ba12b0bd62211609e1f6c94af780950a628ee
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-04-16 (Thu, 16 Apr 2026)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    R .github/ISSUE_TEMPLATE/issue.md
+    A .github/ISSUE_TEMPLATE/issue.yml
+    A .github/workflows/btsnoop-analyzer.yml
 
-On Wed, 15 Apr 2026 14:22:07 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Replace the markdown issue template with a structured YAML form that
-> includes fields for description, reproduction steps, btmon trace upload,
-> analysis focus area selection, and privacy consent checkboxes.
-> 
-> Add a btsnoop-analyzer workflow that automatically analyzes btsnoop
-> traces attached to new issues using Vudentz/btsnoop-analyzer action,
-> posting results as issue comments.
-> 
-> [...]
+  Log Message:
+  -----------
+  github: Add YAML issue template and btsnoop-analyzer workflow
 
-Here is the summary with links:
-  - [BlueZ,v1,1/3] github: Add YAML issue template and btsnoop-analyzer workflow
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b73ba12b0bd6
-  - [BlueZ,v1,2/3] github: Make result posting robust against action failures
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ec6940c1a284
-  - [BlueZ,v1,3/3] github: Add btsnoop-analyzer slash command workflow
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ce07e906e499
+Replace the markdown issue template with a structured YAML form that
+includes fields for description, reproduction steps, btmon trace upload,
+analysis focus area selection, and privacy consent checkboxes.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Add a btsnoop-analyzer workflow that automatically analyzes btsnoop
+traces attached to new issues using Vudentz/btsnoop-analyzer action,
+posting results as issue comments.
 
 
+  Commit: ec6940c1a28413d5b7f52be27216cd1997653ced
+      https://github.com/bluez/bluez/commit/ec6940c1a28413d5b7f52be27216cd1997653ced
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-04-16 (Thu, 16 Apr 2026)
+
+  Changed paths:
+    M .github/workflows/btsnoop-analyzer.yml
+
+  Log Message:
+  -----------
+  github: Make result posting robust against action failures
+
+Use always() conditions with file-existence checks so steps 1-4
+results are posted even if the btsnoop-analyzer action fails
+partway through. The error comment now only fires on actual action
+failure (e.g. btmon build error), not LLM errors which are handled
+gracefully by the analyzer.
+
+
+  Commit: ce07e906e49998c32d5a3d3245bc8b1245e3b368
+      https://github.com/bluez/bluez/commit/ce07e906e49998c32d5a3d3245bc8b1245e3b368
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-04-16 (Thu, 16 Apr 2026)
+
+  Changed paths:
+    A .github/workflows/btsnoop-analyze.yml
+
+  Log Message:
+  -----------
+  github: Add btsnoop-analyzer slash command workflow
+
+Add caller workflow for the btsnoop-analyzer reusable workflow,
+enabling trace analysis from any issue comment.
+
+
+Compare: https://github.com/bluez/bluez/compare/15080642a414...ce07e906e499
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
