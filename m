@@ -1,48 +1,82 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E421FECAB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 17:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705D532B99F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 17:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776358851; cv=none; b=nP9mLO0RLkXqCXikKBzRm/cp71j7CUvwtQACovhKUBpQeqoNqQJ0Wxo0uM7NhNzihQc4YRVORONBcGWwqZ9LQIgW8TywNWMGPaumSjRTJIzAq17xanOcqjZVbrX6u+v/eICEkAHZXq9Q1EoNt8lhCVI8GlynB+sY6TvUXHO3KSg=
+	t=1776360637; cv=none; b=hwrVvdz0btTkw2Sk5IaGlcBjZX8X8oVSBr+pbrSycm7zm0WIIbDCHtdXN/xCmbMIMecJdMeWa56uJ1hHh7bAMXweWHpnrByPFnr7Jow6+sDt4fR0y3/kc5aHA+bhUC+YEmKcNyQhVaw6wnwqRjNh6eKqIotQmv5ctZT1a7Is5HY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776358851; c=relaxed/simple;
-	bh=EH8cTpgPHFEBzC0m+YZaiGIfo/JsIUCnIKYyQd12x34=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=WRHiUFMEdGaF90EQmk8N4XFZ53XpnZs7+hFdghHnm5UZE8KuKMKPEz+s1xuPP6LTO8aMx2CetMJTjtjTx5Gqnifxqz18GN9c2KUciRt/F5FRqJpp0v6FUcnNVeD28Y3fqExJ+K5l6fRzZsqrKuVhJaLs8o2HJNvatOf6A4BB+6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Fidktx+M; arc=none smtp.client-ip=192.30.252.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1776360637; c=relaxed/simple;
+	bh=Mc2oxyIKpd2+CMWStoqnHd7CX9PASkftf0qVGuN6LFk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lKhMSsxU1K5ugjTUOULZ9JKQC3TC72xcLsPpwslvTsGV2KOk0lNJgEDx97NnjIxG9Uw8AuBLKnTLXeCdNm06uMRWJIjEU1YcOPV1YGzo2K89CKg+i4QgQcnspD96wELN987BYYsN9KGgO5ZDfp5/6wPaI1dAaLCqcBu4srbNORo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOR+AN4K; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Fidktx+M"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1776358850;
-	bh=okokdwwC9y+1xrkEsUPR8R0+dfcGMiVaU5SCJ0jNGSQ=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Fidktx+MRmHDyKeOZ2GenBOTJwyS9nebBc1D3FLJOHmMwGxTxaUrDTB5Gdwwcz4Eo
-	 p0w/UuX4Zp4O1mk7G0ycPk+lKANWGvS29L/Az1sGdNEV4uCgd8Gx+z0qPVLNgt81OE
-	 xRUv4Y//JHEvtsAUqbIhZkJggMsosyllNXXBfy4o=
-Received: from github.com (hubbernetes-node-b017e4a.ash1-iad.github.net [10.56.76.24])
-	by smtp.github.com (Postfix) with ESMTPA id E87F65611BC
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 10:00:49 -0700 (PDT)
-Date: Thu, 16 Apr 2026 10:00:49 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1077051/c5e55b-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOR+AN4K"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 177E2C2BCAF;
+	Thu, 16 Apr 2026 17:30:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776360637;
+	bh=Mc2oxyIKpd2+CMWStoqnHd7CX9PASkftf0qVGuN6LFk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fOR+AN4KMxN8xDddd2A3nqTKV1k+EvzafsEahyK0aA+JHnMnBOguVuI3tjseqG5E1
+	 5YKydCAvtByEgFA2+DvnqiG6052Kp2EaoL8IFGxL18z5P7Yb3oo4gTw9yTNkOsKxHn
+	 U6z7Rfq8OgJEn/qdTDCiIPOEcSyrc6jynHAQcDaWcUu1XoJ+gZf0+8hU3bY04DZWkP
+	 9KAmAkQRaDHBmLL5bDjouHMcY8xZO0WEC3Cb0S9H98P+/LHa8v9IEO+oOkypll3Wb+
+	 rFW8PqppmrwtWqv+s+tfcAogI2hzKgtE+i1qTG4p0PDviakqFtb+rQTNgRpI+uNzT2
+	 YBTKj6lh5RN1w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9E1C380AA67;
+	Thu, 16 Apr 2026 17:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1 1/3] github: Add YAML issue template and
+ btsnoop-analyzer workflow
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <177636060555.3324412.4472228454911439331.git-patchwork-notify@kernel.org>
+Date: Thu, 16 Apr 2026 17:30:05 +0000
+References: <20260415182210.514686-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260415182210.514686-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/1077051
-  Home:   https://github.com/bluez/bluez
+Hello:
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Wed, 15 Apr 2026 14:22:07 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> Replace the markdown issue template with a structured YAML form that
+> includes fields for description, reproduction steps, btmon trace upload,
+> analysis focus area selection, and privacy consent checkboxes.
+> 
+> Add a btsnoop-analyzer workflow that automatically analyzes btsnoop
+> traces attached to new issues using Vudentz/btsnoop-analyzer action,
+> posting results as issue comments.
+> 
+> [...]
+
+Here is the summary with links:
+  - [BlueZ,v1,1/3] github: Add YAML issue template and btsnoop-analyzer workflow
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b73ba12b0bd6
+  - [BlueZ,v1,2/3] github: Make result posting robust against action failures
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ec6940c1a284
+  - [BlueZ,v1,3/3] github: Add btsnoop-analyzer slash command workflow
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ce07e906e499
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
