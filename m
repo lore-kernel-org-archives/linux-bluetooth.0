@@ -1,133 +1,125 @@
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014F939657E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 09:04:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0EA366823
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 09:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776330300; cv=none; b=SeCoiLoM4y8aQCBdv8lxwTb2iVyNBR0Ekcih65VLQcJ+TcZ3H9mjC8r1SN9FTfkNIzEIoZJ6suo7wTpWWULfe60jCEE3nGy+xXgAlwPH0upRy3+/CJkiT7H4+vYjOGTADAJNPMgyuJ97KegalrHPWrApv5v9LiF5R4tRiCaMCNw=
+	t=1776333036; cv=none; b=TyUDo7HZdYvX9jyc40wo8+XgBVEY8AZpmLX7Z7TrxbD9uqFpItRwYsggh8hvpCW0Nx664hA6upkfyy5Wfew8O8G7lL9ProrJvxmF+lrB+qxF7JhQQIZ38G2JyWteKNKjdv7Q2b7Q7xBa8FNagAjXfw7sn6QXW1O9hxFszLlpsEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776330300; c=relaxed/simple;
-	bh=kSUsktBfjTgsb2N9gCeFeRDbhHbebFACgd8HpipZFMs=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Vfo+66PE1IyRYQNE3F3AnmF5ALnUsGE7DHkBOdRYQ5Al9T1crtoxxkc8Og0v4JvwJIV1xTQy+n4JRGev+RwkIi7IxVk2I7z05duMFZqwUOY2WkRR5ZFrbqD+AgHwGJ+msMpQ2G0dIcOaZ2wgOZo9j4S5LLqAY8Jx8eBa7v78ZYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 02FAD3EBAE
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 09:04:48 +0000 (UTC)
-Message-ID: <448e67eae35581ff8a1384622ba2c0567026ecc7.camel@hadess.net>
-Subject: Re: [PATCH BlueZ 1/4] shared/queue: Add way to iterate over queue
- contents
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Date: Thu, 16 Apr 2026 11:04:48 +0200
-In-Reply-To: <20260403084128.348931-1-hadess@hadess.net>
-References: <20260403084128.348931-1-hadess@hadess.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	s=arc-20240116; t=1776333036; c=relaxed/simple;
+	bh=7JuHdFFsOI+HVuNOw1i3NMDFmmDzVGpxoRjPjwiiGVM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=JAjkusDxl/l7CErt630PFj+ixIsQMDH/UP1X3Z97c0Myf+mefYf8V0YB7whyecwA6e+Rl6Uh/6XUtIRfV4fBAhA57p2s3dP4/UayLZs02egDXQHMZNJbjBiy6tm7WKJC1/rSP1sYNxAkh5rMpfJSFmCNYFj/G1pl98VRpbk5CBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cop9q8RE; arc=none smtp.client-ip=74.125.82.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cop9q8RE"
+Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-2de831d2b20so3303299eec.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Apr 2026 02:50:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776333034; x=1776937834; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Z5YoQiiifrYeAfNvaFlr1Rr/6O3SUTVnIBwctU9Khk=;
+        b=cop9q8REi+W4gXz1B9pL9CoSk90LUaJzIL7Pv+TYGMwuGON2/I9JTw6jaZJzkQB8Xh
+         3fkU626yatInxmQ5ha8qmk7mZW3xFd9WT0sLs2Dsnu9El5HHhTeW//wSxBwZTQjbHbX+
+         U3rIdqjgLcpIbE2O9DpxUQc8/UtRlVOdk3cp+GCpQtxPSKbxPsRObVTxmxpduYJHTI1H
+         bTV2FhL1v8S9xWB6Il+hi1g8dJJblOVKadBXkSOy/yFjC60I+DZ7DJ9Tgoo9yw+jhqvx
+         aNg0uuNEbAv9pwtCYLZF2tu+ysd70DynocKYkTyveY5NIZWnnYY/dTrRRL+m9+0gTjhm
+         2MSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776333034; x=1776937834;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2Z5YoQiiifrYeAfNvaFlr1Rr/6O3SUTVnIBwctU9Khk=;
+        b=BuaNS5gRdHi4FP+sgCC5DrQJURaVgN933UytMkDz4vaefDnVD9bwHUfGFk6qeeJ4j3
+         DKWQmcWUdO4E+YHIN9wkcIyhskc8ctZlpDZFFAd5AcOg/ZsRdgWMtAfezj36YoaGZb2f
+         DIMNjuE3nVtOLF1lSErwcPvV7Km1zQk1avjxnd/WjE40nmlbuxs/2GXtnVoMWlJ6fzq+
+         S/7kqJwHhSjirEuZk1M8J0Kii9aChyASx+psguJfSULElZqslv/irdwp7qOpAh12g6+8
+         ZbCanWL7Unn61X0H5Dbbl3vI+zY659W+aezaI7xQR+GXwXy53ddSlzF7rQjNfiQHN7XZ
+         V06A==
+X-Gm-Message-State: AOJu0YwcqCC0qkoyYHjRZ+sSvFXA8+4/heiUOjgPITcTcIn5krakyyCJ
+	lcddj3RsLUv4kdX0mBYZn6lGjvxuU2mq8NlKl9qznlJc62zgRnWg3euL8mCqqw==
+X-Gm-Gg: AeBDies43bm/B/0di7bwrlg5elhVxWF8utSevFmUmrar1apznDFYyfaaEngw+sXrDvp
+	cs6o0gyp4MLpXeTjvBHg6EwWlvKgIcp/yS8ppWvYGbDlNhqway4Zta5A4sCRUiGC1rIfzYXdq7Q
+	V4aVhF6qtT1rgdFQiW6jI1imPJSKT041pNawhH3VgKogo0FbOhcIhgLeUZM9y8rA/O0b/MQ2kri
+	yEZuesJgVOfsuYhnThErsT23L8HBvAjjqAr/6rsc/RxBMz34QTKkOazqt1KhKih/OYCLLQnA6d2
+	Yph2aJl/3V5unvrpAnTlDX5yv18MGrGVKjYuwDqLfT188MN/9ZH+IrmUwE7AA6mhdY/JLs/BAHo
+	diw7mzU9Hhnc4tZF1pU3OhzSoLf7LDdoK9pDzl5YHavLMq9KSqWCyjrTpHhQWm/75rw4XkhBWK/
+	dAaMe/dTiVpqte1oEZedTeBqhdwTRNCil4AJOoso8ijt0=
+X-Received: by 2002:a05:693c:2c8c:b0:2df:68dd:21d7 with SMTP id 5a478bee46e88-2df68dd2618mr1935421eec.27.1776333034026;
+        Thu, 16 Apr 2026 02:50:34 -0700 (PDT)
+Received: from [172.17.0.2] ([172.184.173.244])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2de8f65f9bcsm8083513eec.22.2026.04.16.02.50.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Apr 2026 02:50:33 -0700 (PDT)
+Message-ID: <69e0b0e9.050a0220.3d9965.1e2c@mx.google.com>
+Date: Thu, 16 Apr 2026 02:50:33 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0903915041613170358=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-Score: 0
-X-GND-Cause: dmFkZTFmmg2COw6jMPDdLrYjq/Rh8/RWDY1w1zESsc0i+THC5+L/iNtOrSZsWCirzmcIEuk4CFMBMVVGkVNq2VOp9r9yJdgRX/RdbgeVADlmYPlIMJk2AF0gj31L7lq180M/jUYSpPtUcf7FKQ6PyvgbrydTh7jxmQpMbak7KG5zZ+yN8ewOx6cgQZcoDA71QVcyGaa4eLcQNua/iasCOWn7JocjePjrWXv5Z8sqTbrFylUv8J2q+29+xcX7ctZXN2htufJmBD0ZJuhAfo7w1rlicHII3ErU77GdMsvBmQ5BwXK0oV3BjfsVFd8SBjaS6jzveOC+GdaNCVd9goPBr70D1pyeDXWlF6wfX4j/vx5qPnPyWeJDhCPAPXa+K3oOgBTt2eKc8EgcrTU5eIp0WtJHjDgLxQ4b1GlrflhxnQtO66FdaBDjpC9iVTHEnixRoaYl83FgW9r4r9R/q93N2a8A3L4i3JQQLosp27RSSa/53Jlbb2UEIe3fLF7szNp8P9rILI8xCsYnwB09+E6sI4Od6W3OJH6DTxopPzOyrHK3jOXDywCwlrDmNgHXSOqk548gUGzLYrQFnNk29ZWgBj+hg2DschILgKV9gtO+w0bEpCwYMzUX2YjTacTh43wWs4cZrOzRJH5N/EQo8bdVlQNXhDHAwZoHI8KwKJRkuzVeDtLM/A
-X-GND-State: clean
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
+Subject: RE: [BlueZ] doc: Add missing btmon-cs doc to btmon.rst
+In-Reply-To: <20260416084750.3735103-1-hadess@hadess.net>
+References: <20260416084750.3735103-1-hadess@hadess.net>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hey,
+--===============0903915041613170358==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Could I please get a review on this patchset?
+This is automated email and please do not reply to this email!
 
-Cheers
+Dear submitter,
 
-On Fri, 2026-04-03 at 10:40 +0200, Bastien Nocera wrote:
-> There were no accessors that would give us an iteratable structure,
-> leaving us with just *_foreach() constructs that are cumbersome.
->=20
-> Add a way to get the first entry in the queue.
-> ---
-> =C2=A0src/shared/queue.c |=C2=A0 8 ++++++++
-> =C2=A0src/shared/queue.h |=C2=A0 1 +
-> =C2=A0unit/test-queue.c=C2=A0 | 20 ++++++++++++++++++++
-> =C2=A03 files changed, 29 insertions(+)
->=20
-> diff --git a/src/shared/queue.c b/src/shared/queue.c
-> index 0b53b5b7976e..20fe2a913f58 100644
-> --- a/src/shared/queue.c
-> +++ b/src/shared/queue.c
-> @@ -179,6 +179,14 @@ void *queue_peek_head(struct queue *queue)
-> =C2=A0	return queue->head->data;
-> =C2=A0}
-> =C2=A0
-> +struct queue_entry *queue_peek_head_entry(struct queue *queue)
-> +{
-> +	if (!queue || !queue->head)
-> +		return NULL;
-> +
-> +	return queue->head;
-> +}
-> +
-> =C2=A0void *queue_peek_tail(struct queue *queue)
-> =C2=A0{
-> =C2=A0	if (!queue || !queue->tail)
-> diff --git a/src/shared/queue.h b/src/shared/queue.h
-> index 122f4eaa6c2f..5ea7ce4fd768 100644
-> --- a/src/shared/queue.h
-> +++ b/src/shared/queue.h
-> @@ -27,6 +27,7 @@ bool queue_push_head(struct queue *queue, void
-> *data);
-> =C2=A0bool queue_push_after(struct queue *queue, void *entry, void *data)=
-;
-> =C2=A0void *queue_pop_head(struct queue *queue);
-> =C2=A0void *queue_peek_head(struct queue *queue);
-> +struct queue_entry *queue_peek_head_entry(struct queue *queue);
-> =C2=A0void *queue_peek_tail(struct queue *queue);
-> =C2=A0
-> =C2=A0typedef void (*queue_foreach_func_t)(void *data, void *user_data);
-> diff --git a/unit/test-queue.c b/unit/test-queue.c
-> index 46018ef9cf1f..e47199497d41 100644
-> --- a/unit/test-queue.c
-> +++ b/unit/test-queue.c
-> @@ -246,6 +246,25 @@ static void test_remove_all(const void *data)
-> =C2=A0	tester_test_passed();
-> =C2=A0}
-> =C2=A0
-> +static void test_peek_head_entry(const void *data)
-> +{
-> +	struct queue *queue;
-> +	struct queue_entry *entry;
-> +
-> +	queue =3D queue_new();
-> +	g_assert(queue !=3D NULL);
-> +
-> +	g_assert(queue_push_tail(queue, INT_TO_PTR(10)));
-> +
-> +	entry =3D queue_peek_head_entry(queue);
-> +	g_assert(entry->data =3D=3D queue_peek_head(queue));
-> +	g_assert_cmpint(PTR_TO_INT(entry->data), =3D=3D,
-> PTR_TO_INT(queue_peek_head(queue)));
-> +	g_assert_cmpint(PTR_TO_INT(entry->data), =3D=3D, 10);
-> +
-> +	queue_destroy(queue, NULL);
-> +	tester_test_passed();
-> +}
-> +
-> =C2=A0int main(int argc, char *argv[])
-> =C2=A0{
-> =C2=A0	tester_init(&argc, &argv);
-> @@ -263,6 +282,7 @@ int main(int argc, char *argv[])
-> =C2=A0						test_destroy_remove,
-> NULL);
-> =C2=A0	tester_add("/queue/push_after",=C2=A0 NULL, NULL,
-> test_push_after, NULL);
-> =C2=A0	tester_add("/queue/remove_all",=C2=A0 NULL, NULL,
-> test_remove_all, NULL);
-> +	tester_add("/queue/peek_head_entry", NULL, NULL,
-> test_peek_head_entry, NULL);
-> =C2=A0
-> =C2=A0	return tester_run();
-> =C2=A0}
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1081931
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.24 seconds
+GitLint                       PASS      0.19 seconds
+BuildEll                      PASS      19.92 seconds
+BluezMake                     PASS      648.95 seconds
+MakeCheck                     PASS      18.27 seconds
+MakeDistcheck                 FAIL      56.74 seconds
+CheckValgrind                 PASS      291.92 seconds
+CheckSmatch                   PASS      344.48 seconds
+bluezmakeextell               PASS      180.81 seconds
+IncrementalBuild              PASS      643.03 seconds
+ScanBuild                     PASS      1012.54 seconds
+
+Details
+##############################
+Test: MakeDistcheck - FAIL
+Desc: Run Bluez Make Distcheck
+Output:
+
+../../doc/btmon.rst:770: (SEVERE/4) Problems with "include" directive path:
+InputError: [Errno 2] No such file or directory: '../../doc/btmon-cs.rst'.
+Exiting due to level-4 (SEVERE) system message.
+make[2]: *** [Makefile:12191: doc/btmon.1] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [Makefile:4156: all] Error 2
+make: *** [Makefile:10690: distcheck] Error 1
+
+
+https://github.com/bluez/bluez/pull/2044
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0903915041613170358==--
