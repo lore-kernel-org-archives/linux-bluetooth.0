@@ -1,126 +1,203 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DDFF3A4507
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 13:11:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776553264D0
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 13:56:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776431491; cv=none; b=QIh5+ZXmaGkbe2TImtXy7uzU8thggjtP4+Cx5gaJQg5vVO8yJjcO0fzGcf2tg87sqxjAsr+V1dtOS8eK8h+wGXasPE+kG0ZpJvbGwC+D6reCFUKoGZiLsYYsm1dnIEg6UEtVLf75DDwjWGEX+PXnwbM0wIEbDYDmQDAXPkCXupU=
+	t=1776434177; cv=none; b=Ay5oJr/KrRsJUnQaHzngIODE2Y71oOZT1gZjHGm8Pu+sgUFvOkY0hH1qtSgl/nIG3SRYF8owsjYubhXuu+Y6JurhsPcTm74LCOHE+JW1CGDG+Y1IopEAuoOwgKmdqCItl1Gp7OHJFDCSSNiF2G1xM8UJL8LJpAJ1ofY4I4P7qD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776431491; c=relaxed/simple;
-	bh=2l6+VruZCe2G92lMFTOG+EfNer+jq/4dC3nqnXbD9Bs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bgbB4lXl0NDvI3pJMiNngD9hfmQAaROD9Xia/zAKLxsQd2heTe3vfQKWUAUkEbcCO7PxUVUNDC531OEgzmLtElatPr+x+/6Zxb9aX0M/nkagvobz776uPFHzzlt5FTGpkynMiBg3aEZgL7IOmzIPgYrxfWFTfpaeV0OkLRLt+pU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b=q2TmRER5; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	s=arc-20240116; t=1776434177; c=relaxed/simple;
+	bh=H/QSyMqjRa6gXBy0/KFDZENXfCxDb66sAYrLodpl6KY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SPCwQsLGie6MKkM3GPXYHSI4YSrC7CRT5Fzu+ClvDb3ZfN4fDhaZUQR1/vmznLSPBdxHQ2Qaj1mDhbDNoFCWDPz4A0nDIp5pff45Ba9CsVRPy9K5+wp3YVAblNe+++T6AEG8JNda2mZncj1UUChlGecv9CCBy/Qu7tIIRAdjpys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=bFGOpoVb; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=da6tug1l; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b="q2TmRER5"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-488af96f6b2so9109085e9.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 06:11:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="bFGOpoVb";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="da6tug1l"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63HANNpk1326161
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 13:56:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=B46pdC8738Z8lVr5soEMzfOXQKiJ/sgwXHe
+	fjzH6ANY=; b=bFGOpoVb4nrZ24pQq4TeuQg7QaCfphn77zfnlOJDYXMJeDVVTCI
+	A4GSGrnvTZTKsHJM2UmoZGtnYdJ/iL4+mnSuI02MVBmdpg9JLLOAxuSBng1O9BXr
+	ZEqvs9BXUHMKvXt3TZFTM4Jr4lvGKZyxLXo4Gqu32JRbzkknjqoqq/fRrKf3D8xI
+	tyxt/HVXdlrEnSTdcaMF8cDx6ac27UnHBUExVrklLr9ed9PJCh3Uc6qxSv/9M3hf
+	1i2XbhceN55+aZejfQ7WEfz1tndtEwtVqKPNAj7p5MEvmzhAd01/cHj3yKFJupZi
+	ONQTZk56dD10OVh3wkClEdjAxx480HcNqNQ==
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com [209.85.215.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dkdgy203n-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 13:56:15 +0000 (GMT)
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-c76c6280732so922055a12.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 06:56:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20251104.gappssmtp.com; s=20251104; t=1776431489; x=1777036289; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KiTXMXyGgbry+1smTdjpHYLgWhcXFX/mZbw63wGDKJA=;
-        b=q2TmRER5keY5WW2wPfyZIUAAn9rMC5RCl3jgFM5/FFZzQTUpboDKSaokoh9xwLCZ1c
-         Yw3ER8xaLSf2aUr7rVjNZMXHFNaA6Mb2P1LHSIGWmUkaJWmOH5I/8V7gnmqm+sljyv0u
-         Q7U/Hs0ydITGwUq49QEi+fXnXTgZFgachTSrPyRc21rSAmWYu8i7X/O168XnJW+fDIn6
-         cVhsENzBNny27jVYf/l+uydYKOnIShDPI3ZEsOoIgZmrxVZqPUeuCZLs0FrVgPY9UoyG
-         b9RvXS9bieCYyZJaVDMh1BmW8wk1yIdVUgqkQmVZJw80McuhI6dHaLN/M9dtPl2njWVM
-         ZKVA==
+        d=oss.qualcomm.com; s=google; t=1776434175; x=1777038975; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=B46pdC8738Z8lVr5soEMzfOXQKiJ/sgwXHefjzH6ANY=;
+        b=da6tug1l0dZD2xlU94iMp7X68xoIyoQmNkLxsPA28glYconI7d8WHxwiwj/6hcauK5
+         ZYvCDod0glBVsN4NAfI41qcXCHjwpB4Tn5Ek/lNkXAJ+phSpIAwf2Pfj38jZv9Npxm1z
+         /aCuUK0/yd8xJKpl0GNysK2eZGbgUmXsifumDkDo/nEM2oBTyIEDfBcLvZr02s2leewa
+         Cbboc8zHo1gx3z6nYCgrZhAMIuC0i10Ko58rnt9auzAzZOAOw8tT7HsISAwmNSZy92tN
+         m+Fcve5DcsZhje3tT7tk94jxBqdgIhIe498OrszAF3fVKMLIHiF+XsQIQb6/FZPOF40D
+         KfKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776431489; x=1777036289;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KiTXMXyGgbry+1smTdjpHYLgWhcXFX/mZbw63wGDKJA=;
-        b=DIugwdHwb/xtWONun9rUbql9/R5FIWOCkL0DdLsZQ1lApq/tpcT+q9YH2SQfhHcNOY
-         bMyOYj2E0sitpxhrSKzNjVxAJSh/6dlUFCU6aRz8hFiGjnEonZCSoS2l5CRAXiP3/3m8
-         P6piqueomIhkjjWR7tsbYiNF7yMj/GovnHe4lLA7ZvPXzrhddKDnReh5aBN+7R8djhfc
-         ZdkOgimzHcmxyOjXOonpZNFqvyEaqfBbRE07uqYnXmb/xp8uSpJfW33s1C9GZbtDF/Qi
-         uhuCA/NrDgQ+QBE1oNHU3RQqn3aFE/BZShPJRbZ7Poxk6KPB5fFzcHL6rx+7YIvgdFY+
-         1lFw==
-X-Forwarded-Encrypted: i=1; AFNElJ8O/r5D7eUjo+Sk5DjJJ4WBzQv1OR3pD3ILetFm4LFOdCfaNDBPgk8XHWLL7jeRsBOJVMr3tkgumxhsM3E286k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yww/tbZSM1iDXO49ThTtajH7I+pktqEEZHxwpd+u8DV4+MVN2ze
-	j/ljy2M22nGX60meZiT/oMP+28waUNRoR42v0hk5e3heI5lyVzCAXfxeozPj2X0iiy8=
-X-Gm-Gg: AeBDieuZilgfy6y5p06DvnM4IUSvC0r8nNVU+s1QRrN2Uidzqwz0OssAInmcrHdqY5y
-	G0pt0cc68brgy/2+ozgXlzUOAJ5TeMLF4n23Cn30+7TmPeL5Sexk+g0Ls06rEQm/xfTYuH+JKek
-	enSIEd9M5kPcKwdrYKRyYNL/o1OPLaxyR+pISTrqygFLL/Ne2wBwtmMwFtRoLeh9y/vM7OcOyux
-	y3xUwL0k4p4LynziBhsjvdHybhQ15y2crCZCPL3n6ircLLmu7BDEZuxjNKvYmfvO052qrehQWMi
-	r8NDHBLV8PTclgLRC/DnI/aYpK3+rir9kbDp3jikN+iwhZOqu23gGEQ63nb5ckpGDBwLpoE26Z3
-	f8mhQcDaIhtOLnzv6Lyvn6OiDGRkJsn+OZ2z7oxD8vH3P9RWJ28gJi77U2gcDoq5cSpYxZCp7Yz
-	oijc5GWXnZnJrv/GWgpYFkCmqpr8mqkG3KMr4z3GyN4OW/DbIaabFJMC5CBae52XVQxRR8oq4nT
-	dRddMCqM1UA8nHc3AHLLvT3pPTebaRb/tg=
-X-Received: by 2002:a05:600c:6297:b0:486:d76c:fa57 with SMTP id 5b1f17b1804b1-488fb77155dmr40662045e9.17.1776431488705;
-        Fri, 17 Apr 2026 06:11:28 -0700 (PDT)
-Received: from localhost (p200300f65f20eb08db61cfc60d8aa232.dip0.t-ipconnect.de. [2003:f6:5f20:eb08:db61:cfc6:d8a:a232])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-488fc10019bsm47077255e9.4.2026.04.17.06.11.28
+        d=1e100.net; s=20251104; t=1776434175; x=1777038975;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B46pdC8738Z8lVr5soEMzfOXQKiJ/sgwXHefjzH6ANY=;
+        b=W52Y/FK7KLmenE5LCbiQyxZ8aR/sPc+4ZLi/pfafVsq67HM2NuN+BpwF0i5rEx4dw5
+         /epFXL9DnUcooLjEiRM/0m78jqcgCXtH1rrarFfbprlFFGXYcW6wzfr3vE/qB0oFTUHF
+         YnhaCo47IDdPh9imkZxTJdKbkralSvmWPPCkkADMfGC0/ysqMGS+5ZdtJrrN0z13iNNo
+         /9nL+RxwsUwY30jpHS1xH9isn2sb0pR7WongSJ9Xi82UyjzNN9iqtmKKdWw7Fym2IPkL
+         wJotFrJf0hsvvLo0l2zdhplYq979IgsjzI15DlzQ1D4sbSgAGxr0oz4i931mLCrQu3AG
+         e8fA==
+X-Gm-Message-State: AOJu0YyHtDPgJtifv3o25FA05MawbVsk5Nj46ryKKW2RFKEv8uthDRkf
+	BF+kQwoWo596CJiXacG/NGBWCrCSmwph+3gX5pXIVSyrUhcUu++nAOlZUTH70Lszt9wFn8kze6T
+	VXpp+VijB/sJ6vwCMSf3qODINtCuXzMx31FkhE6dXBeSmgXb0mQvv53DRZz5AxonQVOj2yrDYMD
+	8+bzI=
+X-Gm-Gg: AeBDievMmnDabm8Zx/sHvbg+s7/KPNOCj6WBeKENhIaTRax9JnOmDzLpFPzLQzMXhVG
+	R/epmC2BHI3UyvDwd5MnNHR/UPz8EaHp1EinlA7o6ZmbXlvOpojn9KFNofReNLWamqGHS3Dwx/P
+	jnq5lKDUzY6EdFgu67Rhi1zlnxppsEG936hPEsu8gimIjU7A3p/X/4nDIzhJWp9TiMlBuUsZEQg
+	4bqQ5S55NxP42sM0PeEHizOi7PCTGqtTdsKvhLmNjUJxRVrSZ/DhRmvC2NLx7jV+PwWlIQ6gxdw
+	M6vSD2gRrPPoUa5NSSsYNeL6ruyXP0t6q6CYtFqQvWCSztUTZgvvdkgnkYw+bCIY/9Lp84+W4DY
+	r1YevaQN3R//vAEt8dC5LQd4iEuSGO7fNvW3uYExw7/BbroJi244Yy+W4docIPA==
+X-Received: by 2002:a05:6a00:3e16:b0:82f:5571:1a8d with SMTP id d2e1a72fcca58-82f8c8308e0mr3071331b3a.2.1776434174929;
+        Fri, 17 Apr 2026 06:56:14 -0700 (PDT)
+X-Received: by 2002:a05:6a00:3e16:b0:82f:5571:1a8d with SMTP id d2e1a72fcca58-82f8c8308e0mr3071309b3a.2.1776434174428;
+        Fri, 17 Apr 2026 06:56:14 -0700 (PDT)
+Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f8e981c12sm2652375b3a.6.2026.04.17.06.56.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Apr 2026 06:11:28 -0700 (PDT)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: "Christian A. Ehrhardt" <christian.ehrhardt@codasip.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH v1 3/6] Bluetooth: btmtksdio: Make use of driver data pointer in sdio_device_id
-Date: Fri, 17 Apr 2026 15:10:49 +0200
-Message-ID:  <06f26b3e090ea52c7a2620759e91511570404ec4.1776429984.git.u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <cover.1776429984.git.u.kleine-koenig@baylibre.com>
-References: <cover.1776429984.git.u.kleine-koenig@baylibre.com>
+        Fri, 17 Apr 2026 06:56:14 -0700 (PDT)
+From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
+        quic_anubhavg@quicinc.com, prathibha.madugonde@oss.qualcomm.com,
+        Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v10 0/3] Add initial Channel Sounding support for
+Date: Fri, 17 Apr 2026 19:26:01 +0530
+Message-Id: <20260417135604.3044630-1-naga.akella@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1468; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=2l6+VruZCe2G92lMFTOG+EfNer+jq/4dC3nqnXbD9Bs=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBp4jFefmfBzsGZ3kLo9zeNLh94uuX0wHZ82YrGA IzIlV9GZuaJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCaeIxXgAKCRCPgPtYfRL+ TqVpCACTT3vbVLQ2hxvR192QyFytoivzueoZDb7jatdZDvJrGkXY/SJpKAnv9gc7tTavtwOYXhV L7rr9SxPzSvrm3zD+tvpqyfbLoKqfGvY3AVSSl8244v/FpXMDNxScKr3vYhEkizGEik/1XdcnB3 AW8x/CqjVCy9e75Lwpx8EInxLRJZEbAfqaiX0exiAd+fe+EndihAzVbnujmTdKL8ma/h+gLj0eB mG3HY/e/6niSjndyNC/AvCXSlLgv3xR9Eg2yeDtxVe1/blvgFVPWaTjeUsEueV8dDHxLhU+f7vs T09dLoBa8K/yteXcNJ/kWIajTt4k3fRJTctpa2WxJWDTRszg
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: HB51CzVzCS5QyoeneulNbulJdndWS9Nu
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDE3MDE0MCBTYWx0ZWRfX10J2tf4qVu+M
+ NyyWvjIJOF/b8BpSjY5ta+bJIYOWUJVHfJ4UCmX2hVisN2MQcMIkS8YGkkTU9ilu6QcXdu23W48
+ A7lyusVwzng81T6fRaxHAoFoq5KXryStx16kLutHarRxh2IP7eZUaXGFO326G4MmR64bk4VGYrO
+ OgDRO/kG7TMVB/XhicUNYIF+dSerbpPdGwBlNapIyIN7K0ep+xLDu4EwYKgISC8fvExRUZqopt7
+ W078JUIuz9rQi3t9UB1CnTv6L2ED/gyuzZWD2UUdUINycjFMzG1nIR4JSWY6aEzO/+gw4bMgUUT
+ MavWtj/Tk3Zrtu3zX310BCJLHE+17q3k6GezDXsGKSrtlegQfoTBykbTaTp+V6NsdItdbkpuW34
+ 0MsgL1szRfrSvTlM8kZbCxMBlNbrog7onZWDK3DpK+UrOxP6HzHzCBLDdHO+aQdstUk4GnfxYnD
+ RY/zCsIRz3tIis0SSxw==
+X-Authority-Analysis: v=2.4 cv=GN041ONK c=1 sm=1 tr=0 ts=69e23bff cx=c_pps
+ a=rz3CxIlbcmazkYymdCej/Q==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22 a=APRDg7Au6S8_GZJoVLUA:9
+ a=bFCP_H2QrGi7Okbo017w:22
+X-Proofpoint-GUID: HB51CzVzCS5QyoeneulNbulJdndWS9Nu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-17_01,2026-04-17_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 priorityscore=1501 spamscore=0 impostorscore=0 suspectscore=0
+ lowpriorityscore=0 malwarescore=0 adultscore=0 bulkscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604070000 definitions=main-2604170140
 
-Recently struct sdio_device_id gained a new member to store a pointer to
-driver data. Make use of that to get rid of a bunch of casts.
+This patch series introduces initial support for Bluetooth Channel
+Sounding (CS) using the raw HCI interface.
+This series lays the groundwork for CS support by adding commonly required
+protocol definitions, configuration parsing, and event handling for
+the reflector role.
 
-Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
----
- drivers/bluetooth/btmtksdio.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+The changes include:
 
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index e986e5af51ae..ee886dcada63 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -64,11 +64,11 @@ static const struct btmtksdio_data mt7921_data = {
- 
- static const struct sdio_device_id btmtksdio_table[] = {
- 	{SDIO_DEVICE(SDIO_VENDOR_ID_MEDIATEK, SDIO_DEVICE_ID_MEDIATEK_MT7663),
--	 .driver_data = (kernel_ulong_t)&mt7663_data },
-+	 .driver_data_ptr = &mt7663_data },
- 	{SDIO_DEVICE(SDIO_VENDOR_ID_MEDIATEK, SDIO_DEVICE_ID_MEDIATEK_MT7668),
--	 .driver_data = (kernel_ulong_t)&mt7668_data },
-+	 .driver_data_ptr = &mt7668_data },
- 	{SDIO_DEVICE(SDIO_VENDOR_ID_MEDIATEK, SDIO_DEVICE_ID_MEDIATEK_MT7961),
--	 .driver_data = (kernel_ulong_t)&mt7921_data },
-+	 .driver_data_ptr = &mt7921_data },
- 	{ }	/* Terminating entry */
- };
- MODULE_DEVICE_TABLE(sdio, btmtksdio_table);
-@@ -1352,7 +1352,7 @@ static int btmtksdio_probe(struct sdio_func *func,
- 	if (!bdev)
- 		return -ENOMEM;
- 
--	bdev->data = (void *)id->driver_data;
-+	bdev->data = id->driver_data_ptr;
- 	if (!bdev->data)
- 		return -ENODEV;
- 
+  1) Introduction of raw HCI support structures and callbacks for Channel
+     Sounding procedures and events. This provides the foundational data
+     definitions and HCI subevent handling needed by higher-level profiles
+
+  2) Addition of Channel Sounding configuration parsing from the BlueZ
+     configuration file.This patch also updates the systemd
+     service capability bounding set to include CAP_NET_RAW, which is
+     required for bluetoothd to receive and process LE Channel Sounding
+     events when running under a constrained systemd environment
+
+  3) Implementation of HCI LE Channel Sounding event handling in the
+     Ranging profile for the reflector role.
+     This includes opening a raw HCI channel,
+     parsing relevant CS LE events, routing them to the RAP profile
+
+Patch overview:
+ 1/3 shared: rap: introduce Channel Sounding HCI raw interface support
+ 2/3 main.conf: add Channel Sounding config parsing support
+ 3/3 profiles: ranging: add HCI LE Channel Sounding event handling
+
+Changes in v10:
+- src/main.c: fixed parse_config_signed_int to use
+`long` instead of `size_t` for signed ranges
+
+- src/shared/rap.h: Updated bt_rap_attach_hci signature to
+take CS options as parameters,
+added bt_rap_get/set_hci_sm functions
+
+- src/shared/rap.c: Added per-instance HCI state machine storage
+with getter/setter functions
+
+- profiles/ranging/rap.c: Updated to pass CS options directly to
+bt_rap_attach_hci,
+added NULL check for HCI device creation
+
+- profiles/ranging/rap_hci.c: Converted global state machine and
+cs_opt to per-instance,
+added role_enable field to preserve HCI command values
+separately from parsing values,
+fixed C99 for-loop declarations,
+made state_names and cs_callback_map static const,
+replaced malloc with malloc0,
+fixed off-by-one error in subevent length validation,
+removed dead bt_hci_unref call
+
+Changes in v9:
+- src/shared/hci.c: Remove unused functions bt_hci_get_index
+and bt_hci_get_fd
+- profiles/ranging/rap_hci.c: Remove unused function
+cs_is_procedure_active
+
+Changes in v8:
+- profiles/ranging/rap_hci.c: Add static for cs_state_machine_init,
+cs_set_state, cs_get_current_state,
+cs_is_procedure_active, rap_send_hci_def_settings_command
+
+
+Naga Bhavani Akella (3):
+  shared: rap: Introduce Channel Sounding HCI raw  interface support
+  main.conf: Add Channel Sounding config parsing  support
+  profiles: ranging: Add HCI LE Event Handling in  Reflector role
+
+ Makefile.plugins           |    3 +-
+ profiles/ranging/rap.c     |   51 ++
+ profiles/ranging/rap_hci.c | 1287 ++++++++++++++++++++++++++++++++++++
+ src/bluetooth.service.in   |    2 +-
+ src/btd.h                  |    7 +
+ src/main.c                 |  132 +++-
+ src/main.conf              |   24 +
+ src/shared/hci.c           |   62 +-
+ src/shared/hci.h           |    3 +
+ src/shared/rap.c           |   68 +-
+ src/shared/rap.h           |  176 +++++
+ 11 files changed, 1793 insertions(+), 22 deletions(-)
+ create mode 100644 profiles/ranging/rap_hci.c
+
 -- 
-2.47.3
 
