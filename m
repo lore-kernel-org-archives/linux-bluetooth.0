@@ -1,67 +1,67 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86BCE3B19B7
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 08:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4692A3B19DA
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 08:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776415771; cv=none; b=anUm3lpFGjGcAKZv3NUT97wN+639TwmiNGRo75kqVx3mJc2jgtlOc4S9hwWHuN2L1cstHzQMO0ghnxyX8PNzT3bldEaXkP4opYzrn/5Zu4S3ewI4CzU36s32g7XCQYFfC+20bwGhx1ecNFL+gILddKFLGy+W707YEVqjJ39EuwQ=
+	t=1776415773; cv=none; b=albzyd0uOjmiGhYoUwbZNPp7l4DgX5q2nCdl45sYfSdzwiHGPMp/SURfPEQmOpxeLWbDVkqHCRbp9t7+HwJqUDg06BnAvKoJB3VpLa0d2HXjQJtvJhhBy06BbixGdGmbBYL3ylT7M+9L963bmZ9FPV1/v88uDOaw24NhsoyAcBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776415771; c=relaxed/simple;
-	bh=ZBy3GKls6lvORCRcIhx9MoXA0W0PjiR9l38g8U7QhWA=;
+	s=arc-20240116; t=1776415773; c=relaxed/simple;
+	bh=945W8owtOl27lJ/2AANH8/X7UDPMlJNhyUS3IIuZI7c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZA7ZvBBO11RY7morwnvwbDNjXZFnil0zBNCSJsXCoWaa7RsbtEDhZWllzOyB/2mTdiFhuISz7Ciz22PGd3EiCOGE62PKE9fbJ+aS4EZJ23v3IJSaNEtvRqb58jhx1ZFsBZEIWbw7ibROwN5rVaVxlfsbCLsJr9rmuLpXELqZl0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=p0EN0pYK; arc=none smtp.client-ip=209.85.128.48
+	 MIME-Version; b=c5NzDjDCxbxQSoRkjEu1omykxHOZityK2CSM/daywxKIGm+GTE/l9rxNVdKmg4l5Z+2LFDVoh2am3OiEgnC8CGoEQ4Fr47e+jfThs/y4LfNTeWsNtSuAEtXg08eef5Vs4pF3sFVjxDNcMKAACYRLU8vQ7RxphxkzZTDT4VDsk3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=MTYqwLV1; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="p0EN0pYK"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-488af9fdaa7so2766745e9.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 01:49:28 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="MTYqwLV1"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-488a88aeec9so6435705e9.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 01:49:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1776415766; x=1777020566; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1776415768; x=1777020568; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2IsQ0eg72VDUv1UOmZE7Ho060WwfI6PRYtKhDA1sHjY=;
-        b=p0EN0pYKBfrVHsRSVLbDjEk1BT4D3WafwmeCIvqZPrduwgCLOtu19dUxscPOfXJUwe
-         e11N0+RjspZ6JhGEgY/tKqdQivnCRkbu9BbErECKrwCQCn1npA12fIAbpsO6vHORvg+W
-         /g5nFOmaV3blbT6rzTtCSUYl6EQHnpTu/nFpM=
+        bh=l1tE+Q87KUMVVBwKNVYd/5/CC/4XRNK/FMVwgztA76o=;
+        b=MTYqwLV1IuEjU6BGvOpgtCrF4a9peRMu/RJT2L5MyrW1ageBHWsmIulU7QQgQwvFxQ
+         QRZMjRAWXI3o8+3HFHLlqrfQNBKZ/ERpu/E7ka134HN5lwa0mZZdPVmjJ2Y7FEasJdjI
+         I8SU/XqF21ZoPVhdecCWdIhhd5nlJTFlmGE1c=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776415766; x=1777020566;
+        d=1e100.net; s=20251104; t=1776415768; x=1777020568;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=2IsQ0eg72VDUv1UOmZE7Ho060WwfI6PRYtKhDA1sHjY=;
-        b=EAJPmkt3W2pFLa7Yj7sYUvZICWK8Mk1PLii31W1eJDjPQZvY1KPNWjL2rtf+onmG/m
-         Lc23t0qzVayRfnFdDgf7l21w5KIbClOc0oX4uycnZvNVi4KwEyUw9XW5JLfq4k4cWmym
-         hP8zJlWtBdgSKPaxL/tccxQB4iXjUG4uG2klW5fI7FaFpGOMWcFmoBt5dUboQlEzf1r8
-         qXPlqmVhqTiIeAoJH8N1g8BRF0GPGu2UzBSUcgJ/Zlneqkc+oHApLrKbNdC6lgsBGi6n
-         LKImmoBtB3oph8DuXmIEOLuLJuDU/p+UpX6X/HfNWfoVR5Ne5ZnjdycaMfOUkGohPF7n
-         Oj7g==
-X-Gm-Message-State: AOJu0YzWwxzDifOO3A8yLhttYJpqzr1SDh2veCMdK3vT8jmr9H+k8pGW
-	4favvJTBsLff3nBlPqXzx/rmRup3sy5AsA3nGiZtZ0Fa6OEn5HQai6QMFPYOA/lywzQBYoeDq+Z
-	Fbr2sTA==
-X-Gm-Gg: AeBDieuukfiOFOqPIM5k1XMo/St+kCKQiZvYw6T/jVAKi+m5OPV+RQcIu9BWxSr2LT1
-	sueWg/BhDl3HIkPId+fNCQpn7JFgxMT63rXA8RxX1lmKSKRETuwAlloPf6CjbdOXGDc51BvMoS5
-	f6kbVAUszN+Vpm4LNwmysIxAWInBNMExOLAmz7Zk1nssTU58F64aVZ7dTLHgKiBSQUhjeZLVv7w
-	mcer12noVEy6kND2HXIl7ygP8Rcf6lxfmzLipAvRmo6vO0sGRiwiV9I5wMgVb2crSctpxefF+te
-	tpxO+nXCDZgzh0RCK+O+HIAXwdl9TJXA8A/mSDKmo3geRv3cREzwKaCcyePiMnOakTlRBAx1qpj
-	aCEQny6PmZxgL97G1V5nwyCPCq52P2uQCyntChNn4HXFYaeTzilPPoMJJLaA7qaYilGRSuij67s
-	t+2+9fLoLAfe0gGECr5D08RP2evJjyzZ4J3M2zsD4z8/TSY7gI7EhUkWdV7C3SMd7gdR8C5Rb6d
-	Io370NseP0/Xtzs
-X-Received: by 2002:a05:600c:5295:b0:486:fbd1:9dc0 with SMTP id 5b1f17b1804b1-488fb780463mr21270305e9.22.1776415766488;
-        Fri, 17 Apr 2026 01:49:26 -0700 (PDT)
+        bh=l1tE+Q87KUMVVBwKNVYd/5/CC/4XRNK/FMVwgztA76o=;
+        b=WB4HuIuX0RBRFwo+vCh1jD5E+E6dDXTQX9I/OH9i+Lz5YvCKHd1MUKyGXQQMcCytjX
+         nIn7ZGT3WnrJZdFyXHck9UeogeP9D+Vtg8Ila/+Y6ItiUbdomtBqNtcmVgHxbNspMr/Y
+         8cV8mUmCSLdx4Mjf6UFBbTAr5xTDvn7x6FvsbXGuNNKj5FGyl2M+cwOis8Wz9RAfYtva
+         cHeaMWMMuKW3TTOIdjmh8r3lxvmzj1LQ00m5h9tf9RRI0Udxvup2qplu8NduJAOylMOp
+         0b269n3cPJ1PSS9hnd0vWz0PsxOsq5TXDOeRtQ6MN3CggKlwsZ59RepmkrftsgtiABmd
+         xjYQ==
+X-Gm-Message-State: AOJu0YyNyn4DAEoUAjrBkHY78Xzc30wr+r2vBZJey/+GcYq3kmFYFGYa
+	3+hT8xsmNxvkfLIUWUmKeL9RjxeS+tZuD6ExcOJsRvuWI5TSMTj4fedlLdVKF0cs4aJuI7eGw7i
+	SPpQinw==
+X-Gm-Gg: AeBDies2a1bDnUyuZTQYsqLISpgcHxtpOWzCozlzWtBG/NhpHxqWDhgcTCCkhS7wVZF
+	tBx2RoOcBViFAUcnOFMQ+0T6yL0y9BGfZBgI0GDOe7a2hpn+fYKP7ViK9+ZAe+KmhNeAtTmbq2a
+	GEKv43X4Y/kveUoON2IzZbnevCaNAzlqDYGiXFAnziH0APrkvddzjFLZ01EmY1ykrN3uEfq2akU
+	LoISzW+7rxaMgHc9w6ZyG9FZRv+iNHLPo9bwmb3jQTAhUSEMX5MjxHLb030c1w7CrmsoZence7j
+	18WB3WdN51wtU9sHaBdfksSTDdB1scQzHlOHriYHCKYn3TnN7GUXOW8Do0D1nZ/KRRcpWhiLwUF
+	SAAIkAIf2Z9e55hWyfycwsJd0uG+HNXvJ40Lxbyz5ep3Kj/lCZmgsEcWbaN3mZBeL2oyqE1D+qR
+	lVyA3JIvNNGD9hjYnZY5SoOyTkcDMYKUC5Ez5S+MZga2LRN5rjQEtgbjsmQ71sllqu9x4Ue62FF
+	pIEH/4Bw5v86P3F
+X-Received: by 2002:a05:600c:8582:b0:485:4006:960c with SMTP id 5b1f17b1804b1-488fb7710e1mr18996485e9.16.1776415768404;
+        Fri, 17 Apr 2026 01:49:28 -0700 (PDT)
 Received: from great-eastern2.home (public-gprs181528.centertel.pl. [46.134.48.89])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc16f8c3sm26315095e9.2.2026.04.17.01.49.25
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc16f8c3sm26315095e9.2.2026.04.17.01.49.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Apr 2026 01:49:26 -0700 (PDT)
+        Fri, 17 Apr 2026 01:49:28 -0700 (PDT)
 From: Michal Dzik <michal.dzik@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michal Dzik <michal.dzik@streamunlimited.com>
-Subject: [PATCH BlueZ 1/4] transport: allow setting Metadata property on broadcast
-Date: Fri, 17 Apr 2026 10:48:07 +0200
-Message-ID: <20260417084809.3633687-3-michal.dzik@streamunlimited.com>
+Subject: [PATCH BlueZ 2/4] shared/bap: run callback after setting the broadcast metadata
+Date: Fri, 17 Apr 2026 10:48:08 +0200
+Message-ID: <20260417084809.3633687-4-michal.dzik@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260417084809.3633687-2-michal.dzik@streamunlimited.com>
 References: <20260417084809.3633687-2-michal.dzik@streamunlimited.com>
@@ -73,43 +73,25 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Also fixes a problem where 64-bit iov_len was incorrectly initialized with
-32-bit value in dbus_message_iter_get_fixed_array().
+Without this callback, dbus property setting will stall.
 ---
- profiles/audio/transport.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ src/shared/bap.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index d9feef768..81a63c365 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -1336,6 +1336,7 @@ static void set_metadata(const GDBusPropertyTable *property,
- 	struct bap_transport *bap = transport->data;
- 	DBusMessageIter array;
- 	struct iovec iov;
-+	int len;
- 	int ret;
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 8da626fe3..78ba22259 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -2526,6 +2526,9 @@ static unsigned int bap_bcast_metadata(struct bt_bap_stream *stream,
+ 	util_iov_free(stream->meta, 1);
+ 	stream->meta = util_iov_dup(data, 1);
  
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY) {
-@@ -1347,7 +1348,8 @@ static void set_metadata(const GDBusPropertyTable *property,
++	if (func)
++		func(stream, BT_ASCS_RSP_SUCCESS, 0x00, user_data);
++
+ 	return 1;
+ }
  
- 	dbus_message_iter_recurse(iter, &array);
- 	dbus_message_iter_get_fixed_array(&array, &iov.iov_base,
--					(int *)&iov.iov_len);
-+					&len);
-+	iov.iov_len = len;
- 
- 	ret = bt_bap_stream_metadata(bap->stream, &iov, bap_metadata_complete,
- 				     UINT_TO_PTR(id));
-@@ -1614,7 +1616,7 @@ static const GDBusPropertyTable transport_bap_bc_properties[] = {
- 	{ "QoS", "a{sv}", get_bcast_qos, set_bcast_qos, qos_bcast_exists },
- 	{ "Endpoint", "o", get_endpoint, NULL, endpoint_exists },
- 	{ "Location", "u", get_location },
--	{ "Metadata", "ay", get_metadata },
-+	{ "Metadata", "ay", get_metadata, set_metadata },
- 	{ "Links", "ao", get_links, set_links, NULL },
- 	{ }
- };
 -- 
 2.43.0
 
