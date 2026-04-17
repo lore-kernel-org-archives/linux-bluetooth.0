@@ -1,124 +1,110 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6DBE372B31
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 11:34:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93EF7282F25
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 12:08:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776425669; cv=none; b=i5sYCNWbAZXw/AC1nDJDoxDCYgLVEWS8CJ7A/GXdTY/GoA83DniP95vNueqNg0E5VTcNvDbrZiWdDfzskKfnsvZu1GFoZgRHxLn30XoqDIivSHlpZ3N30uRiXugHEa7oGkMVcr6ea3Bv5HjuSZhWITa1u+5CcJ27HV9gwFRRGT8=
+	t=1776427707; cv=none; b=mJL6QTNdwhe4IL4ZXFn/F6phLKeyBzCXBclChxjlbmKj0KNdhtuDoyu22jITu7kOx0Fl8e3/0tryWsofHx0W0kXAJzjcXQZBF76BVU1fj/opmF5TEdY0XR2vcgGitDHe0Nz5V932LcGXLkVHB/0wnU/zPA+UkALgYvmLqP0adUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776425669; c=relaxed/simple;
-	bh=dkmSxwretijcqpRvVzRxfmwXKw+41ZoXbOHSxXGwz6c=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=eTBwYGGhMXyOj+778p2bIh5MZ6/dJxdAijb+0co6QWP+SlKCc0/b0NRId6Lm+RijPpPnr7MD58SCvHTwlnuV2mKLiP4hdaL+WvO0X/0M+sLheK9hdM9hv7bnjkDiSpheHOebME6XI+xG8WaVMsK1UlGNyarVlWmyVf07ZFgP9e8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=GBurzB7J; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1776427707; c=relaxed/simple;
+	bh=sjkb/GCu3zbDAv2Z6YkKxJ6pKxwInroY3jywndOyFx4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=TKAzHbwZQrObnn6+XggiEXlvVN7Ya7JMtN9aj07nafSt/u24FMJsYOCoGKFJMV4H2vChl83hkiKQqpIPM6Coeqy/Ha3FSjynHdy2BEHFvSWgl7dGi1shqEzFLGKtFDGGCBNwexXzI6jHDnKenGXeGHQ6YoOcO+NElvt3arb6H0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FVL+daqC; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="GBurzB7J"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1776425666;
-	bh=YDogZoNhaq2uF1JPfgpwl0eKPli+ybUbqtFr1jUNYqE=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=GBurzB7JovDzt15y82ubnt6+cHur/jde8eMmm2uwMnJB40TeHu+rgj5cjvBOf/QF+
-	 c/MHjVa277L685ckcTB9w+9aayFhhG1rIuukftJnyWZrfe3CIZ3qb9V+BDK/gsp6BQ
-	 Aba4dey0gM7Nir+W2wUf5Kow1VW3GBLBx9AYqOe0=
-Received: from github.com (hubbernetes-node-9479665.va3-iad.github.net [10.48.173.14])
-	by smtp.github.com (Postfix) with ESMTPA id D7886501104
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 04:34:26 -0700 (PDT)
-Date: Fri, 17 Apr 2026 04:34:26 -0700
-From: mdzik-sue <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1082491/000000-b7162b@github.com>
-Subject: [bluez/bluez] 43c234: transport: allow setting Metadata property on
- broa...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FVL+daqC"
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8d68bcf50fdso69337985a.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 05:08:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776427705; x=1777032505; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=U0Ehf+746bSL8l0crYK+XaE0NH5EmCpRJ7LtItfPCfQ=;
+        b=FVL+daqCOQosC9ceLH74GfgQCNjmUsSX+BDl4XqbmXQSS6WfzExI2GEiW3T8svtDxs
+         gJp9qgqkSfXUiVBJElA1UjdqcB1aUSG/+9xw6w+IGCeSi29Mz1NaoVblEOme2zRwQKUu
+         H+MOMJUYaIR4MIUePgbs4iNBEQZJUbn1WkBJvfH/zowRHZ/lqwl2v4RZlMPvoJpuJGyu
+         e16W65PHo6C26m6Wz0LdUR/S4JD/tv6TyV6EKXN4rfKb6Oq4mTPae7JnDgsTVVY2SCwH
+         G83UsgHYrtjeXJQ9tq8Fo+aswp+t36hcp44AalvdYIC34RKgsfKyJLFyp0J6SkVFbyyJ
+         jTgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776427705; x=1777032505;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U0Ehf+746bSL8l0crYK+XaE0NH5EmCpRJ7LtItfPCfQ=;
+        b=q/++TFlSX0stE2gSdZG2kWYmjDp4DqVycBhjf+yxcg/Dh62MZPqKZ4YiYtNE2mgkbG
+         uNOZwZx7KZOewjNzHU4CJkixxh+EuSuINvVi1yJwvYuqzvHHRcGWNenFXuReh65X7bd4
+         SuWnbCgIPMtN622wQmTzy4u/jmI1Sy4hcsmdBHxJtSTuo4Nq85drqBlmN2KwmdXJ4cBW
+         PR/4UN38oYrDMx2frNaYivEQx4saxH8UaSqL7esNIDFioY72fWhaAV66oTZQjmtnvBnb
+         gcck8S9l2X6JDHjBSTIVYdcDo+tTrbjprAp9Ic893WXB15cNNeS6Ean4NXHiNp6f/wZF
+         68vg==
+X-Gm-Message-State: AOJu0YyavgMUH3JDLHjV+AwOzD4cW/uur9hhdJ7WMrrADWVnuEpFFwyV
+	jmuHq6kq20jIEjHimVw87CVnD6Od5lAxrhU3CACuSYyPf+arKm6tl1wc2m27pg==
+X-Gm-Gg: AeBDiev6notTWHXInPE+opysB17a9AIQYEQz9NmaWWhuR0Xwo2vG0tfvS12DBFjAi8N
+	5VvEP80ycwkGj7o83nVOxxq0pgeZv81KkSvA3Jn1CsU0zMs3uttlByYgz2cV+Nisxf4KxTe+Vym
+	EF9Fk5bNnC6iALN5DrhTyPMIsy197jRZurUhe0SBxG0g2wahIWJ/edF20IIA7X6tc+9lOCdfSMe
+	c+ZqgdTwWsXQu2sjIITaPC/sBikWu1ETWrzxwWxxrgbU58vxU7QlhtJoFBXRVIsVBt9IFHprEuA
+	4myfBn0FuFQLb+220/tgIdijKgr4KOyXAuwwCf45wiALiK9eAz4XSqkkJjCnB0wiKKFNtz+zBOn
+	X8aHoxqxZnBVRWHPBdoAJG6lzP2MKIkLcB74OtzARVx7XmFF/YBpQp8uUyR1Cm8X3RO/0zm0P59
+	5U8+5CZoiqWZo8DIunE01RvS20SeIJtKwNGCKIk5o=
+X-Received: by 2002:a05:620a:4013:b0:8c7:139a:bf48 with SMTP id af79cd13be357-8e79236e343mr331849085a.49.1776427705245;
+        Fri, 17 Apr 2026 05:08:25 -0700 (PDT)
+Received: from [172.17.0.2] ([48.214.54.99])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8e7d69ad49dsm113606085a.18.2026.04.17.05.08.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Apr 2026 05:08:24 -0700 (PDT)
+Message-ID: <69e222b8.050a0220.1e8036.90ac@mx.google.com>
+Date: Fri, 17 Apr 2026 05:08:24 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1980794307337320204=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, tristmd@gmail.com
+Subject: RE: [v3] Bluetooth: hci_bcm4377: validate firmware event length in completion ring
+In-Reply-To: <20260417104639.2608008-1-tristmd@gmail.com>
+References: <20260417104639.2608008-1-tristmd@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============1980794307337320204==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1082491
-  Home:   https://github.com/bluez/bluez
-  Commit: 43c23455f1f30d126504078c0d647702a78af402
-      https://github.com/bluez/bluez/commit/43c23455f1f30d126504078c0d647702a78af402
-  Author: Michal Dzik <michal.dzik@streamunlimited.com>
-  Date:   2026-04-17 (Fri, 17 Apr 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M profiles/audio/transport.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  transport: allow setting Metadata property on broadcast
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1082469
 
-Also fixes a problem where 64-bit iov_len was incorrectly initialized with
-32-bit value in dbus_message_iter_get_fixed_array().
+---Test result---
 
-
-  Commit: 2a503234334acab7ba5894f0c2320ced08df1dfb
-      https://github.com/bluez/bluez/commit/2a503234334acab7ba5894f0c2320ced08df1dfb
-  Author: Michal Dzik <michal.dzik@streamunlimited.com>
-  Date:   2026-04-17 (Fri, 17 Apr 2026)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: run callback after setting the broadcast metadata
-
-Without this callback, dbus property setting will stall.
+Test Summary:
+CheckPatch                    PASS      0.74 seconds
+GitLint                       PASS      0.34 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      27.35 seconds
+CheckAllWarning               PASS      29.94 seconds
+CheckSparse                   PASS      29.01 seconds
+BuildKernel32                 PASS      26.57 seconds
+TestRunnerSetup               PASS      588.93 seconds
+IncrementalBuild              PASS      26.60 seconds
 
 
-  Commit: d393df9970cd00104c4dee6d38a2f7b9217d60b9
-      https://github.com/bluez/bluez/commit/d393df9970cd00104c4dee6d38a2f7b9217d60b9
-  Author: Michal Dzik <michal.dzik@streamunlimited.com>
-  Date:   2026-04-17 (Fri, 17 Apr 2026)
 
-  Changed paths:
-    M profiles/audio/bap.c
+https://github.com/bluez/bluetooth-next/pull/99
 
-  Log Message:
-  -----------
-  audio/bap: fill BIG and BIS for receiver
-
-This is for some reason a missing feature.
-We receive QoS structure from the kernel via BT_ISO_QOS, but BIG and BIS
-are not set there. In fact it is even impossible to pass them that way,
-as it is only one structure per remote device. That's why we have to parse
-BASE data to extract BIS and set it to stream->qos. BIG is not present
-explicitly in BASE, but we can use subgroup index with success.
-
-As a result of this commit, MediaTransport1 object has now a valid BIG
-and BIS set in QoS property.
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: b7162b86c92159830569c451417866809d707b05
-      https://github.com/bluez/bluez/commit/b7162b86c92159830569c451417866809d707b05
-  Author: Michal Dzik <michal.dzik@streamunlimited.com>
-  Date:   2026-04-17 (Fri, 17 Apr 2026)
-
-  Changed paths:
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  audio: update QoS dbus property after it is set
-
-Dbus set and get on QoS property use different data:
-- get uses bap->qos
-- set uses bap->stream->qos
-This works, because bap->qos is a copy of bap->stream->qos. The only
-issue is when we set this property and then try to get it. We see old, not
-updated copy. Simply calling bap_update_bcast_qos() fixes the problem.
-
-
-Compare: https://github.com/bluez/bluez/compare/43c23455f1f3%5E...b7162b86c921
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============1980794307337320204==--
