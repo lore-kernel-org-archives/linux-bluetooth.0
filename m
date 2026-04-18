@@ -1,118 +1,142 @@
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578A126AA91
-	for <linux-bluetooth@vger.kernel.org>; Sat, 18 Apr 2026 15:47:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3422E8B83
+	for <linux-bluetooth@vger.kernel.org>; Sat, 18 Apr 2026 16:27:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776527251; cv=none; b=CKP2AVv/5jSHrlSSgmQqbcAocz16PZSsupxPld/JkzcwpLk6bGVGYLf3IN1c9cndppWiYAkAYg4ObgNIMv8eYOF7J8BWUGTpwqQxPZGRexQxMjmP0IR5xIE3omDjq/NXC5tbaR+riAljIxdCLZQlm3cGTgfO9FLnKN++NnezC54=
+	t=1776529623; cv=none; b=undo76HjTlmMrIUCi3Yldtd8YNGCCZ/lzacr9uGELxBlSMK5JrJlm2lH0xzL6wt/Ou8hkNpWYjKHdOhOUPvxRDP/DVDTTnz0qAn4any0XlgnO+xQjdq809eY22p5PjTkKkeThkZJpZlELFgtwMFhYGpaia7HRj1BD+zABv+WwRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776527251; c=relaxed/simple;
-	bh=fkooYA84iAHO33mmGDGCH9fOoVrUIc4coDHinK+5BZg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Bc1snEAZgstodvlaVJLYXrb6sOtQg3ghgS824ZXxgCz/VBhmvfxDJyoS8dbA+ubYH3MHpPzjM5SZhmEtAKUvgDKeLWF1CF9lmv/UjOiSjIayAyL0LPYEAVhdf8Pu1r/sOuLFge57wuDyN3sHplNeThK/M6nWqlRjSaTXaVwzMKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ksg0xoX9; arc=none smtp.client-ip=209.85.222.177
+	s=arc-20240116; t=1776529623; c=relaxed/simple;
+	bh=EMv713bu6rLltkrUGcU31lQfDklcCaytyNHzIYqIhss=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=khkjX744tyNOTsaYIDc28Rk56/0hoB/xZHey/Rnb6dsIn2xMX1YM+dxhiS2BzBRb2fnIjKzd6qkj87O9N7ZitA8qHI36gdX8ndal1acecx88cTiOcujkmGn/GuvSPEutPIDhi80MZQcROcx/Cy0/YcgwjnsVb+dGoMUciUv3XHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GGIkzRgj; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ksg0xoX9"
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8cfbbf35354so209907085a.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 18 Apr 2026 08:47:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GGIkzRgj"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-488a29e6110so14819735e9.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 18 Apr 2026 09:27:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776527249; x=1777132049; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=DouZFKokfxZ8thybrnXS12N+UJh0OkVrzhmkWepULeQ=;
-        b=Ksg0xoX9lvMNDFQ5q3nwue7PgfR/t4Ujo+6Ptwy8pPrBdVYq1hpvd/sHob8A11n3Dl
-         vJ0bIt13vG32URgDaRtgGy4TIGuGGUpC1i5tnYhVM4fzLbnW9R6Ntt1rycKQB5vAJOQL
-         7gpyqg3J/8A6pgLCTo9B6Bcev7Cy1SpW2QOqEDeG2hXKjCbHiuXvHVrT/xuprDEXJyy2
-         y/IDs+dzvpWtC3QFTj/+P8JD9pjaOEj9rNSuA5WDfBMggT57mFJir/7A4METf+5C8aiN
-         /7bpMV1B+TFStNsxhkasm+ugoeM7K0aK5UAxGRZNS4TWbV5j5tzu0txKI685WMxabYcE
-         EfQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776527249; x=1777132049;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1776529619; x=1777134419; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DouZFKokfxZ8thybrnXS12N+UJh0OkVrzhmkWepULeQ=;
-        b=CObclqhL44LzyWPTAt54syiztAIm28sCCTmRWEjr5mj+g+R63kr/zd6Nc5khju5/Tg
-         R2HIQFHSPF7I/3IafX/XV8f9nqVNkQz0G34QnFqIeEHvy06vloyyc45mkpzovM/engI4
-         UxRnhQeaI2/0pxhKFnLDTJuL1MD65JzXLkKLGP0tnlU1QWFUPDgF1ykNfmeuJPW83YX4
-         wJ7W1AIIc63zj51HSmHOb8pnVSeHhHure4o4SU2WcwlJoB4Ycfq2brKqiXUtr/bmq90a
-         Qz+9rCUnZJ8+2oOJKp0xHsps/Bilih+/s0QeNIWxKZeiGokYQ00olcB1Dfs35Z98jOef
-         AqhQ==
-X-Gm-Message-State: AOJu0Yzh6h4790RjV+LkDxpOMnGUOunv8lhpJx5NnVmDzL5X9TLnv+4x
-	XAUtCGp99A+G5QoVAqISQptPjMGKx6NpeXLeyd0fHnG+LkiE6cyUta89LmTrdQ==
-X-Gm-Gg: AeBDies8D3UJIGxGoMDa89QE0/XVeaBlJxa0IZYEURrQ4pkz5AWSjo+GcR4hmZTFYt9
-	2iWxwAuF6E3+HvTFM+FrgeorFPu4FHPaYUy41zcEdcVhanX5FNxNqEAhfYKaBFOqp/jepoQA3/A
-	LKuQOSRvKz3rNenZr4kkN31i+AEEmkS+JcUcbc8q+ooHZuzyV43pJJjx41lDXY3WwFvq+/HdewD
-	WydD6XzoNV1atO9NYj7DgG77zzjqdZexQZMRlG33be3vqeg0fXBATKS3x7sdkzs4FjiD9yM2duj
-	mkpLe4gHdtQCAz7Y4oLT5ZKenP3fOAbkLzYhfLZFEuU1kLVayUbkqUgnPbNMh6f8lIFRKNI3+tu
-	gf80z3KI8wquaM1njVuZvezUMslQnEUQfoCRVYpNTww05fpD7Pmvrl/jgiSAJZcw0UlyCKtBgq2
-	VHwRVdUWh5jmWnD31TF8xeCY9kzmlUg16j+WFQFy1r+A==
-X-Received: by 2002:a05:620a:7107:b0:8cf:dd63:fae7 with SMTP id af79cd13be357-8e7913c1ff2mr1088525085a.34.1776527249042;
-        Sat, 18 Apr 2026 08:47:29 -0700 (PDT)
-Received: from [172.17.0.2] ([172.214.45.201])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8e7d3204cc6sm369530785a.0.2026.04.18.08.47.28
+        bh=1z94owYXX9n4dFeOaZ1Wv7/kBQxfkHENluA/04AquBc=;
+        b=GGIkzRgjuD5JgHXr0MtS4YQAeHYLwajNVUu+xif6ybGMpga/rF217QZxcfTVf1yqP9
+         W8i3DBXbVGs6wMZ8EkNgZ1CYu7HMSZDWYWS0jmxOSE3/8gRgQSTMkKPcqbKclYBIqQ58
+         9oU7b6ksPqqFX2wEMLJ7NPUdI6qwL+ukfzmKJd/ds5dtK7hvSOIQUDhCNRGNluzgr0Af
+         jpStYnK/KY98ezz7XdLBvS8kNgCQrlsDMB39Kl6+Ba3GGVmyz9R8O9hgYFfginawQZDn
+         +RBrQCFTBQ63OI5MLkAaV141LfrfrIQEwiDqnyIiH9v0mKeGSv1BcflsBqkpdM25PSlv
+         wKVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776529619; x=1777134419;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1z94owYXX9n4dFeOaZ1Wv7/kBQxfkHENluA/04AquBc=;
+        b=AVZkSoBJYTNr/QoyfNhKzNwwft7zcyp3kOm4vUw5txIM4iw65VD7y84/vq809IUU23
+         spXE7pANjzFWdqOshW9d3o696sIK+WR093QMyYB8kiQYIbB3sDi/lUjBgqa7HVumjKMR
+         wIkScc1GZ7e/6+nPvEqnkA/e7l1e/zzzqNxq8Rw3GVNDTBwkxZf/ZmCAuAWI1Ka2d1ie
+         dmUmi55mCiFRAgMq76rheMstAThSYF9QanHaam7jdCNOovvh0JY4cICNzddH/o9JKE9U
+         1B+5q/g1DQa9sdqVaXovSx8kPfTFjD0bwQbiL+X2iOH+LRcRvh2qizBrmYU+23jngWf0
+         pGPA==
+X-Gm-Message-State: AOJu0Yzj9VmRzLIjWxHJPbWCXygbIAnjDGX7LPD09DPidH4JYKBlmV1v
+	BOzNpS9EiH/KwdjYueTnmo7psol60pKK8jbgbtyvHY5IVZ3fPip+6yaCg2b3WAEh
+X-Gm-Gg: AeBDievedjroJX10F7GQL3eLWkK9aG8U7lkzuhg+lOsjrg21BxsVyt935dG28C4qpOw
+	silwFHyRsZ58pXaYN3RX+mAGk2lg2G8IuyeD+YPVC5wJwqNtQ34hXla0Z3SF1zUY073fSE21fE0
+	1CMk1MPPTlnEtbCZQcbD43BDCxEzFtr8UtqZvJzQ+KXr6oCwHxm40RiTJl651iPf3GpRlbDk5MD
+	iZd71sR55HxB2RcVIU/ulHC7/ZqETjzu57XqkGP/xijewdrgb2m/S5CX4vdGLkZuHBop3Oak8/0
+	b1ETb7pfDXXvJR3F2hg3/lXWXjTBhrn4YoaiStyEqnZ7y1IjsLzoNA18ZUuPVUC5Q5ww6x2nRiJ
+	OSuWd1lPqSdKmoO2UybNBXQUNReovug/+Bl1BFkWXeqDfV2YCmdSFmPAfXmd687OCgr4mlx/Oyi
+	QHoXizmfiTvh3bJNdljkFp/21md1Il393OPrkzwjKPNvutKDWvTQ8lLnbxj3h3eptp5MlFV89z4
+	+042IY8iijy5GRv3KaNxLUUc4f7i+ec+1LvO0zNn9CyoKxY
+X-Received: by 2002:a05:600c:8582:b0:480:690e:f14a with SMTP id 5b1f17b1804b1-488fb77d3a2mr77087395e9.14.1776529619191;
+        Sat, 18 Apr 2026 09:26:59 -0700 (PDT)
+Received: from server ([5.14.142.56])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc16f93dsm214456115e9.3.2026.04.18.09.26.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Apr 2026 08:47:28 -0700 (PDT)
-Message-ID: <69e3a790.050a0220.382ba.7d0f@mx.google.com>
-Date: Sat, 18 Apr 2026 08:47:28 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7783463013003508815=="
+        Sat, 18 Apr 2026 09:26:58 -0700 (PDT)
+From: StefanCondorache <condorachest@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com,
+	StefanCondorache <condorachest@gmail.com>
+Subject: [PATCH 2/2] adapter: remove connected device from kernel accept list on connect
+Date: Sat, 18 Apr 2026 19:26:52 +0300
+Message-ID: <20260418162652.287637-2-condorachest@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260418162652.287637-1-condorachest@gmail.com>
+References: <20260418162652.287637-1-condorachest@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, condorachest@gmail.com
-Subject: RE: adapter: add DisableDiscoveryOnConnect option for combo chip coexistence
-In-Reply-To: <20260418141127.243863-1-condorachest@gmail.com>
-References: <20260418141127.243863-1-condorachest@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============7783463013003508815==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+When DisableDiscoveryOnConnect is enabled, remove the device from the
+kernel accept list once it has successfully connected. This prevents
+the kernel from continuing background LE scanning for a device that
+is already connected, eliminating antenna contention on combo chips
+with shared Wi-Fi/Bluetooth radios.
 
-This is automated email and please do not reply to this email!
+The device is re-added to the accept list upon disconnection to
+restore auto-reconnect capability.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1082799
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.50 seconds
-GitLint                       PASS      0.34 seconds
-BuildEll                      PASS      20.26 seconds
-BluezMake                     PASS      609.83 seconds
-MakeCheck                     PASS      19.27 seconds
-MakeDistcheck                 PASS      236.90 seconds
-CheckValgrind                 PASS      277.51 seconds
-CheckSmatch                   WARNING   322.18 seconds
-bluezmakeextell               PASS      166.35 seconds
-IncrementalBuild              PASS      595.91 seconds
-ScanBuild                     PASS      922.27 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/main.c: note: in included file (through src/device.h):
-
-
-https://github.com/bluez/bluez/pull/2054
-
+Signed-off-by: StefanCondorache <condorachest@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ src/adapter.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index 4a18adfe0..48f0f2cc4 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -9533,6 +9533,7 @@ static void disconnected_callback(uint16_t index, uint16_t length,
+ {
+ 	const struct mgmt_ev_device_disconnected *ev = param;
+ 	struct btd_adapter *adapter = user_data;
++	struct btd_device *device = NULL;
+ 	uint8_t reason;
+ 
+ 	if (length < sizeof(struct mgmt_addr_info)) {
+@@ -9546,7 +9547,18 @@ static void disconnected_callback(uint16_t index, uint16_t length,
+ 	else
+ 		reason = ev->reason;
+ 
++	if (btd_opts.disable_discovery_on_connect)
++		device = btd_adapter_find_device(adapter, &ev->addr.bdaddr,
++							ev->addr.type);
++
+ 	dev_disconnected(adapter, &ev->addr, reason);
++
++	/*
++	 * Re-add the device to the kernel accept list after disconnection
++	 * so it can auto-reconnect in the future.
++	 */
++	if (btd_opts.disable_discovery_on_connect && device)
++		adapter_auto_connect_add(adapter, device);
+ }
+ 
+ static void connected_callback(uint16_t index, uint16_t length,
+@@ -9593,6 +9605,15 @@ static void connected_callback(uint16_t index, uint16_t length,
+ 	adapter_add_connection(adapter, device, ev->addr.type,
+ 					le32_to_cpu(ev->flags));
+ 
++	/*
++	 * If DisableDiscoveryOnConnect is enabled, remove the device from
++	 * the kernel accept list once it has connected. This stops the kernel
++	 * from continuing to scan for a device that is already connected,
++	 * eliminating antenna contention on combo chips.
++	 */
++	if (btd_opts.disable_discovery_on_connect)
++		adapter_auto_connect_remove(adapter, device);
++
+ 	name_known = device_name_known(device);
+ 
+ 	if (eir_data.name && (eir_data.name_complete || !name_known)) {
+-- 
+2.53.0
 
---===============7783463013003508815==--
