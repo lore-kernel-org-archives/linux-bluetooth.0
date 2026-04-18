@@ -1,297 +1,165 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A60346E6C
-	for <linux-bluetooth@vger.kernel.org>; Sat, 18 Apr 2026 05:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE50B2561A7
+	for <linux-bluetooth@vger.kernel.org>; Sat, 18 Apr 2026 06:17:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776490476; cv=none; b=u8pJN8vlr/j0zrJVtL3SiZnA6kCY/vAnOoqkh+mCenVnLxuyUDDCcBSLgPnNE/bwBwN290SK0YwskuzKbESRhs6g/YGSJHrhhjktjJrURX7oPjjynitkRZ5xs/uF9pJp+8FxuaJxUzRYIx0meYgIA2Afk7lXwBk+Hq0IKvrIR0M=
+	t=1776493027; cv=none; b=C9anb+GY8yNy20W7RFKLID1p5iN3EFivIxMK5W9L39XAbYhueL8Vjf36cbqPYu5U9KJ2mDBBfFnsnmmL1mzaWxb5LPDII/a3xWpF/GJfCjlBnx8vv2oeXiK5+xM1wFd6Q+uT2PhCBVjmsidbJ+0gb+MaxueDjcR/e8xgnkydiHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776490476; c=relaxed/simple;
-	bh=ZnOAyes5CApyxa4LVMptpnmk61/+ReVizQGGbcTr3UM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BwgZ964BYqHQmQLudMHNba07XkMmUG7h0x++fcKSvvMW4au32+QhTd8DFEgCneQro8zWrG1fL0VLuITxsfKf2SrBgCyrxJ5Db7uZGkWjob9RILB2IJfHwe/HfImH6c5YoZtodd/yIGplnx5yOydgz3pScFAtlYb3iJmu7NusQ98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pqnlxoEZ; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1776493027; c=relaxed/simple;
+	bh=tsSIN1CqfLMSwiXQH7bgDqn/JnpXXAf4citne9q1Jz0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=GH57GxKOzVnNjzYe+R4O5322eursgn83L/Dv8xm0hJwF3uTcjQKcJR3q5/55c/6y5BmbBlYwAdWSad10/EnZIjhrTXspjZUhR2IXH9mVzsYNwOCimsg5qGRkNpNhbh56awaNGgZCR+o1uRBUilSDgdYTBgUuDIBX0PXlaC31xBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XgKQNYwq; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pqnlxoEZ"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2b4583f0a1aso7970145ad.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 22:34:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XgKQNYwq"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-506aa685d62so7449791cf.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 23:17:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776490474; x=1777095274; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=moJK8j1PeysA2HLtwd4ur3AEjzXIvTcplo5qR2WzdzM=;
-        b=pqnlxoEZJaI93YOA9MgOipcyRmPCLLH3Y05Mh8Hxwe6XQN/6xHeo3ltDgxU9G24KKZ
-         QXy47f2bfq9+k6gg4jqYakaUWjT1XZ9Hbs4IO+mTwTt4DCDkYB3pVRpgulG45kp5HgP6
-         tNPo0o3D5qSu8oZq5UJn6JlGpyfeAHzs0efB7uC9T2yz46KfvcRmoZ8w9CyAdshr92nb
-         Ql8rw//OxcEhGwrfC2SMc6S18rfpBf0qP6siDND5cf17x2SyxdeI28VNidnwZagr1Xia
-         SbDzd9qW0AtjL2fyY2svE62FSodhU9kRdoz8EcTIXwtIIsiP+UWoFSyxhNkkt+MofU6i
-         TpRQ==
+        d=gmail.com; s=20251104; t=1776493024; x=1777097824; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=vKjQTAqdDN+Yf+1PRW0yidG8PLpIpcLnTA4qsdUwhuo=;
+        b=XgKQNYwqqfybhxecdA9lNS4aTQQH7NzRT7PsEVOKxxZHmjN7i1NWLSnGM8We0NvQkO
+         n64O11HhZxO6DSdvt5QQWFaFiYqQsZ2MvqjJZaEsWcmIwwPAIOJ9l5p35lhx7TwlV49n
+         fG79q99lh6qdV/MMFSPkBS6m0HCD5xdyFSO+DNwoRUmQGC9YM5E8btvECkkWjxGOrVkF
+         07wS+WwFunl9K4xQ/LqM5DUDSsbDMgBXTIs0Zoej8WGFm8Fn2ORe9dY+RkyORlmRfWoi
+         NIQhltspPqYs0he+R7VcOQpHXja5zJb9MT40MsyVRqmsAWB7VhqOGLfBG7EQWP9DZlc9
+         Gnzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776490474; x=1777095274;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=moJK8j1PeysA2HLtwd4ur3AEjzXIvTcplo5qR2WzdzM=;
-        b=f3mEbJEf06QvVy2ve6MfTpYS2QApNsfS0Bjr4aSqHAS8l4uiWmpupyXPUfEBbnoCNp
-         ED0u5bIxT/Wzfa4WhytUMN8C3CZxtLMaS9YW2ETUMz0jjS0C7uYm0eEQX+FAPFHN/Eoo
-         AdNRTaIysGilpWUQHchMhk9c6O/3B3yz4yW4RsVcFEVUkJdkzwAHzZGGpqaFqUjdjrmr
-         H8S37oCFzam6JmG6VQUwK+tYapPTdObSPpeFGqMU2Bq0HzyZ+IAzh0z5o5V6SaAA9Cro
-         KIbEyI2sMLQSGxepPJazpNp6/uAbLXde2H7dTLwBArjpWLD4RsaVT4ygs2uzTz87uN5M
-         CdQw==
-X-Gm-Message-State: AOJu0Yy6W2CHwSMwx2mjyOZ1t05xTFT/XcBaAsn5aFFdIHlhcsudWeYt
-	OQCOtHIwu6Ttd9l/YPjopqz6gpqglVhRt1QG9j0LXFQHER94kzJTfB9y
-X-Gm-Gg: AeBDiess1LkrHRsiYwEC0oCag5pjttN2Xdxnfz65QYJcFNnJYxH0ctcYLZ4udMTpVTX
-	L++MKHpW9CBhUDXaZH+7C9uQoCxj/VgAK5SmutWg4diW2d0/Oa3JrLhjtg/Cc5KjJP9Tgr53j93
-	fhGHz6xPxsvCdUTYDU9qQCopbS/bxa1GTUzb2aPyGveEXzkVw3Q0i77bDon6uRQo6TwSE2NgK+O
-	4sYrGNcB+g3PY4Vw0Chf02avStfv3957JFVvkE0asLJII0mOo+iaEPDA5HHRfu2LumYqC8ydDoQ
-	yQDDZ/rENYC7J6+C18wXiE2o64mp/adxOImb+tTAsxBJBpnbrYw3U54nrz9QmOIDw6hf00AoAYE
-	tQQYeUx4hMBtNJtHWondgREBtWQczzyueAQWonWqi5JpcLG/HesUED/iGBBvrDFcT84t6We03Je
-	QvSXUVxgrtr4AGJmtVSvjjpnrRIVOGKMrmf2zwHRVFZOSV+OcXRLz+LATQ2g==
-X-Received: by 2002:a17:903:890:b0:2b0:5968:a6d5 with SMTP id d9443c01a7336-2b5f9ef3e8fmr41044065ad.18.1776490474181;
-        Fri, 17 Apr 2026 22:34:34 -0700 (PDT)
-Received: from fedora ([61.74.238.173])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b5fa9ff3bfsm46251885ad.7.2026.04.17.22.34.31
+        d=1e100.net; s=20251104; t=1776493024; x=1777097824;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vKjQTAqdDN+Yf+1PRW0yidG8PLpIpcLnTA4qsdUwhuo=;
+        b=qXESUJgQStVAUCAV2BFtKIlPzFEDyxY+RM/NZv01xhjWhstzyRPWx+C6ZUN6B0abrK
+         NoF96YmdbIhTC1ErayFIAKyconajnAoSeiuKWSUw8Dh9VLE1FWqJ4lPhrofpxr/GNVZt
+         NBaodooRDRByylMldXesgkE8c/X0QdWzMEdEqcLthhTJjcyk2dHsdtGbaWvFHVlLKZtv
+         F88QlRj9h6NYU3vVLft4krKtwfdS0VaIk/Wfjmh3+2djZdpbMaPw6Fcuz9oKSKsUyoVA
+         xQLMlxxJo9KowmnUhAX56Lcn41W2JQRpO3L6EpulQqSF9Ck8GqxA1oyhA18vD8UXRiyi
+         40pQ==
+X-Gm-Message-State: AOJu0YwGsaLAacjea5ZM4GeT2cCmc9Uf4jtwBwpsgHVWk7OCj4fnn6RV
+	8Tgt321InHEfGAbxtgJjOkPnJQao7doqO1EzuWYTVKTE/wjbqTaWyPZPE5UgBQ==
+X-Gm-Gg: AeBDieukzF2w7hMAg6e1Ysnjt3rHkTdRWCXeh+DJESm2tG1ryOuqA3p4OL4YGyNPQdJ
+	G56gV0lnhBFirpH5cHSeiHJ6l/oLBwqjdeK9JKYxAX0EZv6xArKiLAZ4x+yA4n2t4T+HohDK1ND
+	bZCor9crU6PtyVrU/G9wRi9om+KJ+jZz9GepDfpks3AVLfSwdgAgv1cD/DIjnWe3H/P9ttsZv+w
+	/7eamFT9zuwByaKw7rtTzyqvZ4gr+08F+7e0Zq0UMKXImfBw3JMu5YzVGW13JGfXZ7ytqJBPwap
+	ghpxQHUeqDpEMWC9wDRiLnH4sCSbWxl+FedjERQvXhXiiQI/olCqfg9CyKYYGdyc/YOTWCbeQa+
+	GZh/KpdPYcIHegTtDseIK2oEiQuR/Eogfev4tyjzi+btfb3/lVG32ksb6t8UqX0jfQt0WHQfMxt
+	gn1bAjM/Z6XWcVrkgPwm7jR6HCfl6SXHEtW3t9a3+B
+X-Received: by 2002:a05:622a:59cf:b0:50d:a8f5:1bf8 with SMTP id d75a77b69052e-50e36bd6471mr82902461cf.37.1776493024357;
+        Fri, 17 Apr 2026 23:17:04 -0700 (PDT)
+Received: from [172.17.0.2] ([130.131.71.17])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b031f65a27sm15360386d6.16.2026.04.17.23.17.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Apr 2026 22:34:33 -0700 (PDT)
-From: SeungJu Cheon <suunj1331@gmail.com>
-To: luiz.dentz@gmail.com,
-	marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	me@brighamcampbell.com,
-	skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linux.dev,
-	SeungJu Cheon <suunj1331@gmail.com>
-Subject: [PATCH 2/2] Bluetooth: ISO: Fix data-race on iso_pi(sk) in socket and HCI event paths
-Date: Sat, 18 Apr 2026 14:34:01 +0900
-Message-ID: <20260418053401.128483-3-suunj1331@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260418053401.128483-1-suunj1331@gmail.com>
-References: <20260418053401.128483-1-suunj1331@gmail.com>
+        Fri, 17 Apr 2026 23:17:04 -0700 (PDT)
+Message-ID: <69e321e0.d40a0220.2b89.18ee@mx.google.com>
+Date: Fri, 17 Apr 2026 23:17:04 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0185708600202387794=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, suunj1331@gmail.com
+Subject: RE: Bluetooth: ISO: Fix KCSAN data-races on iso_pi(sk)
+In-Reply-To: <20260418053401.128483-2-suunj1331@gmail.com>
+References: <20260418053401.128483-2-suunj1331@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Several iso_pi(sk) fields (qos, qos_user_set, bc_sid, base, base_len,
-sync_handle, bc_num_bis) are written under lock_sock in
-iso_sock_setsockopt() and iso_sock_bind(), but read and written under
-hci_dev_lock only in two other paths:
+--===============0185708600202387794==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  - iso_connect_bis() / iso_connect_cis(), invoked from connect(2),
-    read qos/base/bc_sid and reset qos to default_qos on the
-    qos_user_set validation failure -- all without lock_sock.
+This is automated email and please do not reply to this email!
 
-  - iso_connect_ind(), invoked from hci_rx_work, writes sync_handle,
-    bc_sid, qos.bcast.encryption, bc_num_bis, base and base_len on
-    PA_SYNC_ESTABLISHED / PAST_RECEIVED / BIG_INFO_ADV_REPORT /
-    PER_ADV_REPORT events. The BIG_INFO handler additionally passes
-    &iso_pi(sk)->qos together with sync_handle / bc_num_bis / bc_bis
-    to hci_conn_big_create_sync() while setsockopt may be mutating
-    them.
+Dear submitter,
 
-Acquire lock_sock around the affected accesses in both paths.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1082745
 
-The locking order hci_dev_lock -> lock_sock matches the existing
-iso_conn_big_sync() precedent, whose comment documents the same
-requirement for hci_conn_big_create_sync(). The HCI connect/bind
-helpers do not wait for command completion -- they enqueue work via
-hci_cmd_sync_queue{,_once}() / hci_le_create_cis_pending() and
-return -- so the added hold time is comparable to iso_conn_big_sync().
+---Test result---
 
-KCSAN report:
+Test Summary:
+CheckPatch                    FAIL      1.15 seconds
+GitLint                       FAIL      0.53 seconds
+SubjectPrefix                 PASS      0.21 seconds
+BuildKernel                   PASS      20.74 seconds
+CheckAllWarning               PASS      22.73 seconds
+CheckSparse                   PASS      22.00 seconds
+BuildKernel32                 PASS      20.52 seconds
+TestRunnerSetup               PASS      414.87 seconds
+TestRunner_iso-tester         PASS      26.97 seconds
+IncrementalBuild              PASS      22.15 seconds
 
-BUG: KCSAN: data-race in iso_connect_cis / iso_sock_setsockopt
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[1/2] Bluetooth: ISO: Fix data-race on dst in iso_sock_connect()
+WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#132: 
+race at unknown origin, with read to 0xffff8f96ea66dde3 of 1 bytes by task 549 on cpu 1:
 
-read to 0xffffa3ae8ce3cdc8 of 1 bytes by task 335 on cpu 0:
- iso_connect_cis+0x49f/0xa20
- iso_sock_connect+0x60e/0xb40
- __sys_connect_file+0xbd/0xe0
- __sys_connect+0xe0/0x110
- __x64_sys_connect+0x40/0x50
- x64_sys_call+0xcad/0x1c60
- do_syscall_64+0x133/0x590
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+total: 0 errors, 1 warnings, 0 checks, 19 lines checked
 
-write to 0xffffa3ae8ce3cdc8 of 60 bytes by task 334 on cpu 1:
- iso_sock_setsockopt+0x69a/0x930
- do_sock_setsockopt+0xc3/0x170
- __sys_setsockopt+0xd1/0x130
- __x64_sys_setsockopt+0x64/0x80
- x64_sys_call+0x1547/0x1c60
- do_syscall_64+0x133/0x590
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-Reported by Kernel Concurrency Sanitizer on:
+/github/workspace/src/patch/14529234.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[2/2] Bluetooth: ISO: Fix data-race on iso_pi(sk) in socket and HCI event paths
+WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#156: 
 CPU: 1 UID: 0 PID: 334 Comm: iso_setup_race Not tainted 7.0.0-10949-g8541d8f725c6 #44 PREEMPT(lazy)
 
-The iso_connect_ind() races were found by inspection.
+total: 0 errors, 1 warnings, 0 checks, 137 lines checked
 
-Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
-Signed-off-by: SeungJu Cheon <suunj1331@gmail.com>
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14529235.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[1/2] Bluetooth: ISO: Fix data-race on dst in iso_sock_connect()
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+29: B1 Line exceeds max length (88>80): "race at unknown origin, with read to 0xffff8f96ea66dde3 of 1 bytes by task 549 on cpu 1:"
+42: B1 Line exceeds max length (100>80): "CPU: 1 UID: 0 PID: 549 Comm: iso_race_combin Not tainted 7.0.0-08391-g1d51b370a0f8 #40 PREEMPT(lazy)"
+[2/2] Bluetooth: ISO: Fix data-race on iso_pi(sk) in socket and HCI event paths
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+53: B1 Line exceeds max length (99>80): "CPU: 1 UID: 0 PID: 334 Comm: iso_setup_race Not tainted 7.0.0-10949-g8541d8f725c6 #44 PREEMPT(lazy)"
+
+
+https://github.com/bluez/bluetooth-next/pull/102
+
 ---
- net/bluetooth/iso.c | 54 +++++++++++++++++++++++++--------------------
- 1 file changed, 30 insertions(+), 24 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 14963ba68597..3ba13769be3a 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -347,6 +347,7 @@ static int iso_connect_bis(struct sock *sk)
- 		return -EHOSTUNREACH;
- 
- 	hci_dev_lock(hdev);
-+	lock_sock(sk);
- 
- 	if (!bis_capable(hdev)) {
- 		err = -EOPNOTSUPP;
-@@ -399,13 +400,9 @@ static int iso_connect_bis(struct sock *sk)
- 		goto unlock;
- 	}
- 
--	lock_sock(sk);
--
- 	err = iso_chan_add(conn, sk, NULL);
--	if (err) {
--		release_sock(sk);
-+	if (err)
- 		goto unlock;
--	}
- 
- 	/* Update source addr of the socket */
- 	bacpy(&iso_pi(sk)->src, &hcon->src);
-@@ -421,9 +418,8 @@ static int iso_connect_bis(struct sock *sk)
- 		iso_sock_set_timer(sk, READ_ONCE(sk->sk_sndtimeo));
- 	}
- 
--	release_sock(sk);
--
- unlock:
-+	release_sock(sk);
- 	hci_dev_unlock(hdev);
- 	hci_dev_put(hdev);
- 	return err;
-@@ -444,6 +440,7 @@ static int iso_connect_cis(struct sock *sk)
- 		return -EHOSTUNREACH;
- 
- 	hci_dev_lock(hdev);
-+	lock_sock(sk);
- 
- 	if (!cis_central_capable(hdev)) {
- 		err = -EOPNOTSUPP;
-@@ -498,13 +495,9 @@ static int iso_connect_cis(struct sock *sk)
- 		goto unlock;
- 	}
- 
--	lock_sock(sk);
--
- 	err = iso_chan_add(conn, sk, NULL);
--	if (err) {
--		release_sock(sk);
-+	if (err)
- 		goto unlock;
--	}
- 
- 	/* Update source addr of the socket */
- 	bacpy(&iso_pi(sk)->src, &hcon->src);
-@@ -520,9 +513,8 @@ static int iso_connect_cis(struct sock *sk)
- 		iso_sock_set_timer(sk, READ_ONCE(sk->sk_sndtimeo));
- 	}
- 
--	release_sock(sk);
--
- unlock:
-+	release_sock(sk);
- 	hci_dev_unlock(hdev);
- 	hci_dev_put(hdev);
- 	return err;
-@@ -2259,8 +2251,10 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 		sk = iso_get_sock(hdev, &hdev->bdaddr, bdaddr, BT_LISTEN,
- 				  iso_match_sid, ev1);
- 		if (sk && !ev1->status) {
-+			lock_sock(sk);
- 			iso_pi(sk)->sync_handle = le16_to_cpu(ev1->handle);
- 			iso_pi(sk)->bc_sid = ev1->sid;
-+			release_sock(sk);
- 		}
- 
- 		goto done;
-@@ -2271,8 +2265,10 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 		sk = iso_get_sock(hdev, &hdev->bdaddr, bdaddr, BT_LISTEN,
- 				  iso_match_sid_past, ev1a);
- 		if (sk && !ev1a->status) {
-+			lock_sock(sk);
- 			iso_pi(sk)->sync_handle = le16_to_cpu(ev1a->sync_handle);
- 			iso_pi(sk)->bc_sid = ev1a->sid;
-+			release_sock(sk);
- 		}
- 
- 		goto done;
-@@ -2299,27 +2295,35 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 					  ev2);
- 
- 		if (sk) {
--			int err;
--			struct hci_conn	*hcon = iso_pi(sk)->conn->hcon;
-+			int err = 0;
-+			bool big_sync;
-+			struct hci_conn *hcon;
- 
-+			lock_sock(sk);
-+
-+			hcon = iso_pi(sk)->conn->hcon;
- 			iso_pi(sk)->qos.bcast.encryption = ev2->encryption;
- 
- 			if (ev2->num_bis < iso_pi(sk)->bc_num_bis)
- 				iso_pi(sk)->bc_num_bis = ev2->num_bis;
- 
--			if (!test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags) &&
--			    !test_and_set_bit(BT_SK_BIG_SYNC, &iso_pi(sk)->flags)) {
-+			big_sync = !test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags) &&
-+				   !test_and_set_bit(BT_SK_BIG_SYNC, &iso_pi(sk)->flags);
-+
-+			if (big_sync)
- 				err = hci_conn_big_create_sync(hdev, hcon,
- 							       &iso_pi(sk)->qos,
- 							       iso_pi(sk)->sync_handle,
- 							       iso_pi(sk)->bc_num_bis,
- 							       iso_pi(sk)->bc_bis);
--				if (err) {
--					bt_dev_err(hdev, "hci_le_big_create_sync: %d",
--						   err);
--					sock_put(sk);
--					sk = NULL;
--				}
-+
-+			release_sock(sk);
-+
-+			if (big_sync && err) {
-+				bt_dev_err(hdev, "hci_le_big_create_sync: %d",
-+					   err);
-+				sock_put(sk);
-+				sk = NULL;
- 			}
- 		}
- 
-@@ -2373,8 +2377,10 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 			if (!base || base_len > BASE_MAX_LENGTH)
- 				goto done;
- 
-+			lock_sock(sk);
- 			memcpy(iso_pi(sk)->base, base, base_len);
- 			iso_pi(sk)->base_len = base_len;
-+			release_sock(sk);
- 		} else {
- 			/* This is a PA data fragment. Keep pa_data_len set to 0
- 			 * until all data has been reassembled.
--- 
-2.52.0
 
+--===============0185708600202387794==--
