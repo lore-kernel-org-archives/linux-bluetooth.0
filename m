@@ -1,165 +1,421 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE50B2561A7
-	for <linux-bluetooth@vger.kernel.org>; Sat, 18 Apr 2026 06:17:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7885C1DA23
+	for <linux-bluetooth@vger.kernel.org>; Sat, 18 Apr 2026 13:27:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776493027; cv=none; b=C9anb+GY8yNy20W7RFKLID1p5iN3EFivIxMK5W9L39XAbYhueL8Vjf36cbqPYu5U9KJ2mDBBfFnsnmmL1mzaWxb5LPDII/a3xWpF/GJfCjlBnx8vv2oeXiK5+xM1wFd6Q+uT2PhCBVjmsidbJ+0gb+MaxueDjcR/e8xgnkydiHU=
+	t=1776518869; cv=none; b=Ul+EUXp/SjJ5+fBCYy/HS8CIvdjXkP/+ftuLXuY9bBlVOcWD8SNoG8eBnmglvbh6O7HiRuh1Yfl1+OvRh6/HgUG5OiLbjd9sWpo62vDHs0KqirAb2k7CW73KyidDfRIp+IMHJtnbHZ3vSr9XgRcZDHcbYIdl0Kmx7fOyloUKmwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776493027; c=relaxed/simple;
-	bh=tsSIN1CqfLMSwiXQH7bgDqn/JnpXXAf4citne9q1Jz0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=GH57GxKOzVnNjzYe+R4O5322eursgn83L/Dv8xm0hJwF3uTcjQKcJR3q5/55c/6y5BmbBlYwAdWSad10/EnZIjhrTXspjZUhR2IXH9mVzsYNwOCimsg5qGRkNpNhbh56awaNGgZCR+o1uRBUilSDgdYTBgUuDIBX0PXlaC31xBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XgKQNYwq; arc=none smtp.client-ip=209.85.160.171
+	s=arc-20240116; t=1776518869; c=relaxed/simple;
+	bh=pjrNB3XJRLM7lx/BQ4favoWovX8Mb0l8vNkhzUbTk7U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Njq1WaBvjVKx+pFS4jK5unGOoh0dDPp9HEk98gTTJCMNnvsfGjxHrI28Ejev1P8zxtfiyQnW+W5JS4Johc8SmiebyHYCOVeqGOKErSkc2Z6bYL+3d29nIJIdDh8D+WUiP0BOC/GogDLz6afWYpfHU5ASzZA1eAfKSj3LkcYzPfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cCXzvXJC; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XgKQNYwq"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-506aa685d62so7449791cf.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Apr 2026 23:17:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cCXzvXJC"
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-43d74086e5bso1422283f8f.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 18 Apr 2026 06:27:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776493024; x=1777097824; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=vKjQTAqdDN+Yf+1PRW0yidG8PLpIpcLnTA4qsdUwhuo=;
-        b=XgKQNYwqqfybhxecdA9lNS4aTQQH7NzRT7PsEVOKxxZHmjN7i1NWLSnGM8We0NvQkO
-         n64O11HhZxO6DSdvt5QQWFaFiYqQsZ2MvqjJZaEsWcmIwwPAIOJ9l5p35lhx7TwlV49n
-         fG79q99lh6qdV/MMFSPkBS6m0HCD5xdyFSO+DNwoRUmQGC9YM5E8btvECkkWjxGOrVkF
-         07wS+WwFunl9K4xQ/LqM5DUDSsbDMgBXTIs0Zoej8WGFm8Fn2ORe9dY+RkyORlmRfWoi
-         NIQhltspPqYs0he+R7VcOQpHXja5zJb9MT40MsyVRqmsAWB7VhqOGLfBG7EQWP9DZlc9
-         Gnzw==
+        d=gmail.com; s=20251104; t=1776518865; x=1777123665; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RrXL/i2ehCIeC/uq5baz1/hnSDHS5FoTDfA7Ofn+8Sw=;
+        b=cCXzvXJC5Bhcung2G1Is4kOPpZ7hy/aOw0BorDyQCIabEQD8ZtvePtGeJCPlCSZniP
+         E+IsltM/NrelDMezaN2rtOuDeKVAjI2K2byET5ApxcMNjLfawyghHAy47roaq43DDEz8
+         OtUJ7ldxBN1XweuhWyanOn4g8yCFCmovqXNh51rqqs4zXxzqNq/Qt8F4wt7dFro2gGvm
+         jqFNz+cLc8kUcgzbBI/XWwyafLNx4YvZAcc4vx75EV3JPIYO7CjYjV0oTQc7KCAquNrs
+         Z7zAZU0mgyIQWC6ztkSMAAolFuemiPeQSifMjVr3eu4vG/bzqKsqu+S4SDSzgR8K0FbY
+         gxJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776493024; x=1777097824;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1776518865; x=1777123665;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vKjQTAqdDN+Yf+1PRW0yidG8PLpIpcLnTA4qsdUwhuo=;
-        b=qXESUJgQStVAUCAV2BFtKIlPzFEDyxY+RM/NZv01xhjWhstzyRPWx+C6ZUN6B0abrK
-         NoF96YmdbIhTC1ErayFIAKyconajnAoSeiuKWSUw8Dh9VLE1FWqJ4lPhrofpxr/GNVZt
-         NBaodooRDRByylMldXesgkE8c/X0QdWzMEdEqcLthhTJjcyk2dHsdtGbaWvFHVlLKZtv
-         F88QlRj9h6NYU3vVLft4krKtwfdS0VaIk/Wfjmh3+2djZdpbMaPw6Fcuz9oKSKsUyoVA
-         xQLMlxxJo9KowmnUhAX56Lcn41W2JQRpO3L6EpulQqSF9Ck8GqxA1oyhA18vD8UXRiyi
-         40pQ==
-X-Gm-Message-State: AOJu0YwGsaLAacjea5ZM4GeT2cCmc9Uf4jtwBwpsgHVWk7OCj4fnn6RV
-	8Tgt321InHEfGAbxtgJjOkPnJQao7doqO1EzuWYTVKTE/wjbqTaWyPZPE5UgBQ==
-X-Gm-Gg: AeBDieukzF2w7hMAg6e1Ysnjt3rHkTdRWCXeh+DJESm2tG1ryOuqA3p4OL4YGyNPQdJ
-	G56gV0lnhBFirpH5cHSeiHJ6l/oLBwqjdeK9JKYxAX0EZv6xArKiLAZ4x+yA4n2t4T+HohDK1ND
-	bZCor9crU6PtyVrU/G9wRi9om+KJ+jZz9GepDfpks3AVLfSwdgAgv1cD/DIjnWe3H/P9ttsZv+w
-	/7eamFT9zuwByaKw7rtTzyqvZ4gr+08F+7e0Zq0UMKXImfBw3JMu5YzVGW13JGfXZ7ytqJBPwap
-	ghpxQHUeqDpEMWC9wDRiLnH4sCSbWxl+FedjERQvXhXiiQI/olCqfg9CyKYYGdyc/YOTWCbeQa+
-	GZh/KpdPYcIHegTtDseIK2oEiQuR/Eogfev4tyjzi+btfb3/lVG32ksb6t8UqX0jfQt0WHQfMxt
-	gn1bAjM/Z6XWcVrkgPwm7jR6HCfl6SXHEtW3t9a3+B
-X-Received: by 2002:a05:622a:59cf:b0:50d:a8f5:1bf8 with SMTP id d75a77b69052e-50e36bd6471mr82902461cf.37.1776493024357;
-        Fri, 17 Apr 2026 23:17:04 -0700 (PDT)
-Received: from [172.17.0.2] ([130.131.71.17])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b031f65a27sm15360386d6.16.2026.04.17.23.17.03
+        bh=RrXL/i2ehCIeC/uq5baz1/hnSDHS5FoTDfA7Ofn+8Sw=;
+        b=T52YG/1ev7Ic4D2+Rq3QDxTuurcK1/fOPTOzmjkHmX9mpRbWbB/PDFFvZfe6I9OPtm
+         VsgQ7I13QKGNMl4znS//kxsVD55ND6o16YUnxL17cxkRM1myleSoklDmLWKys1fimpEk
+         omuGjD67WbO9ocupBWfjarnUWlNIdqscm6oQIxc7MiYWzp548j8m+uSt80vhdOWBHPIW
+         FZMISYIknDbZoTbEYQ+yDNmlFuN+iWZVNS/c9LWT4ygqbocRgC9eLcS7yoPsvROLq2yR
+         3kZzQyg/FnHmXerkfW7Q7j0MNxIw5jQykWZ4JVwcB7Cmo2II9hYfjyqvUenXzN8JkbG0
+         kRjQ==
+X-Gm-Message-State: AOJu0YyvFVLwROl0Sp3mynjHhAMkJmCUt/kWXHEy5C1iXdRb0JKqtM9H
+	/9UkSwtHuiXo+J2iso/cQaex5e8mewRRBr+EWizDCQEapFOSrDZndFzgPF7GVjsy
+X-Gm-Gg: AeBDietjq+d/cQQ8uMIi4+Kx/oU5e3gYo+d2+EvSYfovcxL+wRrCJenleK6vqHs6NSk
+	GjfkO6J12ZFP0Rt/zuJT9xjRyHFpTbIwn+T1TtHIsVhhLMiO0YwU0W9nAPqC2RTBpdr8/+dC6gZ
+	7mfCDRGTF3DdY4jSOpXSmNP/Ls+R+nQiLBiRusADtmyNc2KZw9ACDgmX6RewYJl1RncXRr0rY5u
+	UQfdQm3hdbvA98o0/ijBsWahqvXiTVJRYHjM0YhopktG98vqVYr9BQfsmsAWOqcr8WgOxuV66dm
+	aLhkSAC8AogVVrJaJkICvGosYfFXiMTrrjEqVkuv8OFOWNU+wAJaffyN9vyK7Oird7Su5xBBTSr
+	eecXgbuG9zajhMJwfosag/x/3ocQd7X1/WLqIKQHQW6Vz+1f0SmaihJ26aBjs+B2LOlL/iB31Bj
+	BrbXm65eXYkshhA+4H9yf64HkVqCSGKcKjMUoIHP405dGVZ9eJa223hi9v2xT3TogdJCGbLzjlk
+	J3MVcg6Zp07sLcjZnVKspViGobDYFbwUJ0sCqkObwQhjYvWzvU=
+X-Received: by 2002:a05:6000:2890:b0:43d:77c6:be78 with SMTP id ffacd0b85a97d-43fe3e16c4dmr10703249f8f.39.1776518865164;
+        Sat, 18 Apr 2026 06:27:45 -0700 (PDT)
+Received: from server ([82.76.107.201])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4cc0f31sm12734336f8f.12.2026.04.18.06.27.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Apr 2026 23:17:04 -0700 (PDT)
-Message-ID: <69e321e0.d40a0220.2b89.18ee@mx.google.com>
-Date: Fri, 17 Apr 2026 23:17:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0185708600202387794=="
+        Sat, 18 Apr 2026 06:27:44 -0700 (PDT)
+From: StefanCondorache <condorachest@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com,
+	Bastien Nocera <hadess@hadess.net>,
+	StefanCondorache <condorachest@gmail.com>
+Subject: [PATCH] adapter: add DisableDiscoveryOnConnect option for combo chip coexistence
+Date: Sat, 18 Apr 2026 16:27:40 +0300
+Message-ID: <20260418132740.235614-1-condorachest@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, suunj1331@gmail.com
-Subject: RE: Bluetooth: ISO: Fix KCSAN data-races on iso_pi(sk)
-In-Reply-To: <20260418053401.128483-2-suunj1331@gmail.com>
-References: <20260418053401.128483-2-suunj1331@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============0185708600202387794==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Bastien Nocera <hadess@hadess.net>
 
-This is automated email and please do not reply to this email!
+On systems with combo chips (shared Wi-Fi/Bluetooth antenna), background
+LE scanning for auto-connect devices competes with active connections,
+causing audio stuttering and Wi-Fi packet loss due to antenna
+multiplexing via Packet Traffic Arbitration (PTA).
 
-Dear submitter,
+Add a DisableDiscoveryOnConnect boolean option to the [General] section
+of main.conf. When enabled and an active connection exists, the option
+suppresses adding devices to the kernel auto-connect list in
+adapter_auto_connect_add() on kernels supporting KERNEL_CONN_CONTROL,
+and gates trigger_passive_scanning() on older kernels.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1082745
+The option defaults to false to preserve existing behavior.
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.15 seconds
-GitLint                       FAIL      0.53 seconds
-SubjectPrefix                 PASS      0.21 seconds
-BuildKernel                   PASS      20.74 seconds
-CheckAllWarning               PASS      22.73 seconds
-CheckSparse                   PASS      22.00 seconds
-BuildKernel32                 PASS      20.52 seconds
-TestRunnerSetup               PASS      414.87 seconds
-TestRunner_iso-tester         PASS      26.97 seconds
-IncrementalBuild              PASS      22.15 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[1/2] Bluetooth: ISO: Fix data-race on dst in iso_sock_connect()
-WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
-#132: 
-race at unknown origin, with read to 0xffff8f96ea66dde3 of 1 bytes by task 549 on cpu 1:
-
-total: 0 errors, 1 warnings, 0 checks, 19 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14529234.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[2/2] Bluetooth: ISO: Fix data-race on iso_pi(sk) in socket and HCI event paths
-WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
-#156: 
-CPU: 1 UID: 0 PID: 334 Comm: iso_setup_race Not tainted 7.0.0-10949-g8541d8f725c6 #44 PREEMPT(lazy)
-
-total: 0 errors, 1 warnings, 0 checks, 137 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14529235.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[1/2] Bluetooth: ISO: Fix data-race on dst in iso_sock_connect()
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-29: B1 Line exceeds max length (88>80): "race at unknown origin, with read to 0xffff8f96ea66dde3 of 1 bytes by task 549 on cpu 1:"
-42: B1 Line exceeds max length (100>80): "CPU: 1 UID: 0 PID: 549 Comm: iso_race_combin Not tainted 7.0.0-08391-g1d51b370a0f8 #40 PREEMPT(lazy)"
-[2/2] Bluetooth: ISO: Fix data-race on iso_pi(sk) in socket and HCI event paths
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-53: B1 Line exceeds max length (99>80): "CPU: 1 UID: 0 PID: 334 Comm: iso_setup_race Not tainted 7.0.0-10949-g8541d8f725c6 #44 PREEMPT(lazy)"
-
-
-https://github.com/bluez/bluetooth-next/pull/102
-
+Signed-off-by: StefanCondorache <condorachest@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ client/mgmt.c             |  4 ----
+ mesh/prov-initiator.c     |  3 +--
+ src/adapter.c             | 24 ++++++++++++++++++++++++
+ src/btd.h                 |  2 ++
+ src/device.c              |  4 ----
+ src/gatt-database.c       |  4 ----
+ src/main.c                |  4 ++++
+ src/main.conf             |  6 ++++++
+ src/shared/gatt-client.c  |  8 --------
+ src/shared/gatt-helpers.c |  4 ----
+ src/shared/ringbuf.c      |  4 ----
+ src/shared/uhid.c         |  4 ----
+ src/shared/vcp.h          |  8 --------
+ tools/advtest.c           |  3 ---
+ tools/btgatt-server.c     |  4 ----
+ tools/hcitool.c           |  4 ----
+ tools/parser/rfcomm.h     |  2 --
+ 17 files changed, 37 insertions(+), 55 deletions(-)
 
+diff --git a/client/mgmt.c b/client/mgmt.c
+index 71fcd21ff..50558a313 100644
+--- a/client/mgmt.c
++++ b/client/mgmt.c
+@@ -67,10 +67,6 @@ static struct {
+ 
+ static int pending_index = 0;
+ 
+-#ifndef MIN
+-#define MIN(x, y) ((x) < (y) ? (x) : (y))
+-#endif
+-
+ static void mgmt_menu_pre_run(const struct bt_shell_menu *menu);
+ 
+ #define PROMPT_ON	COLOR_BLUE "[mgmt]" COLOR_OFF "> "
+diff --git a/mesh/prov-initiator.c b/mesh/prov-initiator.c
+index d46081c7a..29c0be713 100644
+--- a/mesh/prov-initiator.c
++++ b/mesh/prov-initiator.c
+@@ -18,6 +18,7 @@
+ 
+ #include "src/shared/ad.h"
+ #include "src/shared/ecc.h"
++#include "src/shared/util.h"
+ 
+ #include "mesh/mesh-defs.h"
+ #include "mesh/util.h"
+@@ -34,8 +35,6 @@
+ #include "mesh/agent.h"
+ #include "mesh/error.h"
+ 
+-#define MIN(x, y) ((x) < (y) ? (x) : (y))
+-
+ /* Quick size sanity check */
+ static const uint16_t expected_pdu_size[] = {
+ 	2,	/* PROV_INVITE */
+diff --git a/src/adapter.c b/src/adapter.c
+index 6df66b3e0..4a18adfe0 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1594,6 +1594,18 @@ static void trigger_passive_scanning(struct btd_adapter *adapter)
+ 	if (!adapter->connect_list)
+ 		return;
+ 
++	/*
++	 * If the user has enabled DisableDiscoveryOnConnect, suppress
++	 * passive scanning whenever there is at least one active connection.
++	 * This prevents antenna multiplexing conflicts on combo chips where
++	 * Wi-Fi and Bluetooth share the same 2.4 GHz radio, which causes
++	 * audio drops and Wi-Fi packet loss during background scans.
++	 */
++	if (btd_opts.disable_discovery_on_connect && adapter->connections) {
++		DBG("suppress passive scan: active connection present");
++		return;
++	}
++
+ 	adapter->passive_scan_timeout = timeout_add_seconds(CONN_SCAN_TIMEOUT,
+ 					passive_scanning_timeout, adapter,
+ 					NULL);
+@@ -5717,6 +5729,18 @@ void adapter_auto_connect_add(struct btd_adapter *adapter,
+ 		return;
+ 	}
+ 
++	/*
++	 * If DisableDiscoveryOnConnect is enabled, suppress adding devices
++	 * to the kernel auto-connect list while an active connection exists.
++	 * On combo chips (shared Wi-Fi/Bluetooth antenna), the kernel's
++	 * background scanning for auto-connect devices competes with active
++	 * connections, causing audio drops and Wi-Fi packet loss.
++	 */
++	if (btd_opts.disable_discovery_on_connect && adapter->connections) {
++		DBG("suppress kernel auto-connect: active connection present");
++		return;
++	}
++
+ 	bdaddr = device_get_address(device);
+ 	bdaddr_type = btd_device_get_bdaddr_type(device);
+ 
+diff --git a/src/btd.h b/src/btd.h
+index c84a600d1..07c4d85ba 100644
+--- a/src/btd.h
++++ b/src/btd.h
+@@ -144,6 +144,8 @@ struct btd_opts {
+ 	bool		experimental;
+ 	bool		testing;
+ 	bool		filter_discoverable;
++	bool		disable_discovery_on_connect;
++
+ 	struct queue	*kernel;
+ 
+ 	uint16_t	did_source;
+diff --git a/src/device.c b/src/device.c
+index 470340c2d..28515054c 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -72,10 +72,6 @@
+ #define DISCOVERY_TIMER		1
+ #define INVALID_FLAGS		0xff
+ 
+-#ifndef MIN
+-#define MIN(a, b) ((a) < (b) ? (a) : (b))
+-#endif
+-
+ #define RSSI_THRESHOLD		8
+ #define AUTH_FAILURES_THRESHOLD	3
+ 
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 39e6a2593..680a52952 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -54,10 +54,6 @@
+ #define UUID_GATT	0x1801
+ #define UUID_DIS	0x180a
+ 
+-#ifndef MIN
+-#define MIN(a, b) ((a) < (b) ? (a) : (b))
+-#endif
+-
+ struct gatt_record {
+ 	struct btd_gatt_database *database;
+ 	uint32_t handle;
+diff --git a/src/main.c b/src/main.c
+index 818f7c06e..d7ddf5643 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -92,6 +92,7 @@ static const char *supported_options[] = {
+ 	"KernelExperimental",
+ 	"RemoteNameRequestRetryDelay",
+ 	"FilterDiscoverable",
++	"DisableDiscoveryOnConnect",
+ 	NULL
+ };
+ 
+@@ -1072,6 +1073,8 @@ static void parse_general(GKeyFile *config)
+ 					0, UINT32_MAX);
+ 	parse_config_bool(config, "General", "FilterDiscoverable",
+ 						&btd_opts.filter_discoverable);
++	parse_config_bool(config, "General", "DisableDiscoveryOnConnect",
++					&btd_opts.disable_discovery_on_connect);
+ }
+ 
+ static void parse_gatt_cache(GKeyFile *config)
+@@ -1283,6 +1286,7 @@ static void init_defaults(void)
+ 	btd_opts.name_request_retry_delay = DEFAULT_NAME_REQUEST_RETRY_DELAY;
+ 	btd_opts.secure_conn = SC_ON;
+ 	btd_opts.filter_discoverable = true;
++	btd_opts.disable_discovery_on_connect = false;
+ 
+ 	btd_opts.defaults.num_entries = 0;
+ 	btd_opts.defaults.br.page_scan_type = 0xFFFF;
+diff --git a/src/main.conf b/src/main.conf
+index d31dd1b8f..22507c465 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -157,6 +157,12 @@
+ # some stacks) or when testing bad/unintended behavior.
+ #FilterDiscoverable = true
+ 
++# Disables background LE passive scanning when an active connection is
++# established. Recommended for combo chips (shared Wi-Fi/Bluetooth antenna)
++# to prevent audio stuttering and packet loss caused by antenna multiplexing.
++# Defaults to false.
++#DisableDiscoveryOnConnect = false
++
+ [BR]
+ # The following values are used to load default adapter parameters for BR/EDR.
+ # BlueZ loads the values into the kernel before the adapter is powered if the
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index df1541b88..a6abe8ac2 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -25,14 +25,6 @@
+ #include <limits.h>
+ #include <sys/uio.h>
+ 
+-#ifndef MAX
+-#define MAX(a, b) ((a) > (b) ? (a) : (b))
+-#endif
+-
+-#ifndef MIN
+-#define MIN(a, b) ((a) < (b) ? (a) : (b))
+-#endif
+-
+ #define UUID_BYTES (BT_GATT_UUID_SIZE * sizeof(uint8_t))
+ 
+ #define GATT_SVC_UUID	0x1801
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index 8dee34a9e..b3d5d8f1a 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -20,10 +20,6 @@
+ #include "src/shared/gatt-helpers.h"
+ #include "src/shared/util.h"
+ 
+-#ifndef MIN
+-#define MIN(a, b) ((a) < (b) ? (a) : (b))
+-#endif
+-
+ struct bt_gatt_result {
+ 	uint8_t opcode;
+ 	void *pdu;
+diff --git a/src/shared/ringbuf.c b/src/shared/ringbuf.c
+index 957d355f9..7460dd483 100644
+--- a/src/shared/ringbuf.c
++++ b/src/shared/ringbuf.c
+@@ -21,10 +21,6 @@
+ #include "src/shared/util.h"
+ #include "src/shared/ringbuf.h"
+ 
+-#ifndef MIN
+-#define MIN(x,y) ((x)<(y)?(x):(y))
+-#endif
+-
+ struct ringbuf {
+ 	void *buffer;
+ 	size_t size;
+diff --git a/src/shared/uhid.c b/src/shared/uhid.c
+index 207afa55e..919618a71 100644
+--- a/src/shared/uhid.c
++++ b/src/shared/uhid.c
+@@ -26,10 +26,6 @@
+ 
+ #define UHID_DEVICE_FILE "/dev/uhid"
+ 
+-#ifndef MIN
+-#define MIN(x, y) ((x) < (y) ? (x) : (y))
+-#endif
+-
+ struct uhid_replay {
+ 	bool active;
+ 	struct queue *out;
+diff --git a/src/shared/vcp.h b/src/shared/vcp.h
+index 89efaa09c..e031beafd 100644
+--- a/src/shared/vcp.h
++++ b/src/shared/vcp.h
+@@ -23,14 +23,6 @@
+ #define BT_VCP_UNMUTE			0x05
+ #define BT_VCP_MUTE			0x06
+ 
+-#ifndef MAX
+-#define MAX(a, b) ((a) > (b) ? (a) : (b))
+-#endif
+-
+-#ifndef MIN
+-#define MIN(a, b) ((a) < (b) ? (a) : (b))
+-#endif
+-
+ struct bt_vcp;
+ 
+ typedef void (*bt_vcp_destroy_func_t)(void *user_data);
+diff --git a/tools/advtest.c b/tools/advtest.c
+index 7e744dca8..a67a03c43 100644
+--- a/tools/advtest.c
++++ b/tools/advtest.c
+@@ -39,9 +39,6 @@
+ 			"\xe1\x23\x99\xc1\xca\x9a\xc3\x31"
+ #define SCAN_IRK	"\xfa\x73\x09\x11\x3f\x03\x37\x0f" \
+ 			"\xf4\xf9\x93\x1e\xf9\xa3\x63\xa6"
+-#ifndef MIN
+-#define MIN(x, y) ((x) < (y) ? (x) : (y))
+-#endif
+ 
+ static struct mgmt *mgmt;
+ static uint16_t index1 = MGMT_INDEX_NONE;
+diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
+index 449c34203..18e8b9542 100644
+--- a/tools/btgatt-server.c
++++ b/tools/btgatt-server.c
+@@ -48,10 +48,6 @@
+ 		print_prompt(); \
+ 	} while (0)
+ 
+-#ifndef MIN
+-#define MIN(a, b) ((a) < (b) ? (a) : (b))
+-#endif
+-
+ #define COLOR_OFF	"\x1B[0m"
+ #define COLOR_RED	"\x1B[0;91m"
+ #define COLOR_GREEN	"\x1B[0;92m"
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index 834f83e7a..1903d859b 100644
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -34,10 +34,6 @@
+ 
+ #include "src/oui.h"
+ 
+-#ifndef MIN
+-#define MIN(a, b) ((a) < (b) ? (a) : (b))
+-#endif
+-
+ /* Unofficial value, might still change */
+ #define LE_LINK		0x80
+ 
+diff --git a/tools/parser/rfcomm.h b/tools/parser/rfcomm.h
+index b1cb1741c..d1b093a90 100644
+--- a/tools/parser/rfcomm.h
++++ b/tools/parser/rfcomm.h
+@@ -33,8 +33,6 @@
+ /* Returns the P/F-bit */
+ #define GET_PF(ctr) (((ctr) >> 4) & 0x1)
+ 
+-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+-
+ /* Endian-swapping macros for structs */
+ #define swap_long_frame(x) ((x)->h.length.val = le16_to_cpu((x)->h.length.val))
+ #define swap_mcc_long_frame(x) (swap_long_frame(x))
+-- 
+2.53.0
 
---===============0185708600202387794==--
