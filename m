@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B73407570;
-	Mon, 20 Apr 2026 13:27:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF4E64657CC;
+	Mon, 20 Apr 2026 13:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691629; cv=none; b=sKqLP+y+QiKz94kBpn8Lek+2xgtZwyy/HPgnzAk2b+2Yp32/4t9cTxFKX21s7x+6J+brAvW3sGUuVJ1j/G9hT4p1ZkS9Mv57Z7S2jJYaobypIGtz0NWbKYmsVH1WCvuhayf/iPKKYMflXIrOi3MayB1jlEO7PO8tnHrNQ46lGh0=
+	t=1776691830; cv=none; b=f6zZrK+B2IkTyMcBSc9d2KryReIpI44Fa3+Xb8/1TccH13Mps43NiPcxNFPpzv9fdxlrCKy8gG0n3u8+NvF6OJj31C98DJS+gqOfFzaTFqH+t7+CqCiVCoMrXL9qlKo/92BWO1ic8Z9F+n+myLz9aIPZZ4WWXW+O2vS0kpFdmTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691629; c=relaxed/simple;
-	bh=nAbsIGgmyyONm4jQimPirD+2ZbQr3SdslsuxV5gUrLo=;
+	s=arc-20240116; t=1776691830; c=relaxed/simple;
+	bh=cmg9KuhF5WyD3sfoKBJfBIlEtsiosFUQoJ3tomSefTE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tY1YTPC7/smanZSI2UFIqHfPa5nnQ7c2CKiqBYnYkIoh82vLdQPZdDlzKbvD0IXumGl4ifiNV2FGN5we0Km5oP7n3exhceD/rzFjNNzh0SKByjheozFozNoOHkhNbvBiAFYWsRtqU7lXnqd03hyiSuAVy4HqqpBfoeLgJ04pnH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fYqQvM++; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=BRrwpR2nAa3VyscCbpXDHmVYUk6ahNrA8Wa+0TuwJ4raY2soSbBiWeLP6R7jCazW17v6eDVI2X5bx27y073HB7BHSCsOfCv5gu4bHPFHELMwlEJZc0g2Q2M2/2Prsj2NApm+Xp1iQ0l0url4K5zT0Zkq2Fyk83s9Zjr75IRwgtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rf2WiIA9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fYqQvM++"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7BDDC2BCB7;
-	Mon, 20 Apr 2026 13:27:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rf2WiIA9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8284FC2BCB4;
+	Mon, 20 Apr 2026 13:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691629;
-	bh=nAbsIGgmyyONm4jQimPirD+2ZbQr3SdslsuxV5gUrLo=;
+	s=k20201202; t=1776691830;
+	bh=cmg9KuhF5WyD3sfoKBJfBIlEtsiosFUQoJ3tomSefTE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fYqQvM++cNAGtoCP1+L0IjMeqM7bOYEww+LT1no7EV3REA6cD6gEx+RfxM6l1U+n2
-	 Jw7u/CIXrZqGswiA/unI2Zk3HigWrgMiV3fyeY1i3rEONytjIkvWTe5U3DEwGR1l7D
-	 2s8cI57T+MUNtMFZtg+YMTozXpAwfKGPnMTLPmMjoF/QkXvIj96mKOvUwBDS0fWBpf
-	 obW9hkeoIw2hnt/STgfirxZhFyICpTa+FbVQwDZrm8g4b6n7NaGEYjSFOUXTFDp3i1
-	 8MxNJXPuR/YEeX/eIZ6BlVrsx4eBhX/bZEGxSPCzifEUsbQKKrN8EZ/g8GALJE8V9q
-	 mjMQs2VcPqLvw==
+	b=Rf2WiIA9BuK7Xs8i6pU+0B1b3/QRAhVBMGxbrdM5ECCETqYtMSgrVItBHlhW9lNxO
+	 uOfGtQM0roSrJWLw28XfbJq3lxO4jGcdY5Y96xcnxKWAl+MuFJG27pqS+HPtj1VQfQ
+	 BHhaYYAn+oOJLfaPpfZkvj6QPIdoZbbDaMSaj3y63+GNHLaugQTJy4SUKHlTbTNNO+
+	 FjVNhTbssq3bznBFrlw3lNv15vC5I/QoC5EufE9h0e31fKDqigzFfzAV/+Umzm42j8
+	 MddNpRb37P4O1NVnH5U3yQwPFT3Spgw0Ehhbc5x2RAreF+AaIO39iaRgy5Ba7yJV1l
+	 JrJa8GRTc1Jbw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -34,15 +34,11 @@ Cc: Chris Lu <chris.lu@mediatek.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
 	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH AUTOSEL 7.0-6.1] Bluetooth: btmtk: improve mt79xx firmware setup retry flow
-Date: Mon, 20 Apr 2026 09:18:55 -0400
-Message-ID: <20260420132314.1023554-141-sashal@kernel.org>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH AUTOSEL 7.0-6.12] Bluetooth: btusb: MT7922: Add VID/PID 0489/e174
+Date: Mon, 20 Apr 2026 09:20:14 -0400
+Message-ID: <20260420132314.1023554-220-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -55,15 +51,57 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 7.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Chris Lu <chris.lu@mediatek.com>
 
-[ Upstream commit 54f1f020e9f4a087779cc4d96a7c86f47d0c6797 ]
+[ Upstream commit 1f2ac009d3e06380400618e777c858e582872efa ]
 
-If retries are exhausted, driver should not do futher operation.
-During mt79xx firmware download process, if the retry count reaches0,
-driver will return an -EIO error and release the firmware resources.
+Add VID 0489 & PID e174 for MediaTek MT7922 USB Bluetooth chip.
+
+The information in /sys/kernel/debug/usb/devices about the Bluetooth
+device is listed as the below.
+
+T:  Bus=06 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0489 ProdID=e174 Rev= 1.00
+S:  Manufacturer=MediaTek Inc.
+S:  Product=Wireless_Device
+S:  SerialNumber=000000000
+C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+I:* If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
 
 Signed-off-by: Chris Lu <chris.lu@mediatek.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
@@ -72,260 +110,288 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 
 LLM Generated explanations, may be completely bogus:
 
-Now I have all the information needed for a thorough analysis. Let me
-compile the full assessment.
+Good. The patch would insert the `0xe174` entry right after the `0xe170`
+entry (line 704-705), which is exactly the position shown in the diff.
+The context lines match perfectly. Now I have all the information needed
+for the analysis.
 
 ---
 
 ## PHASE 1: COMMIT MESSAGE FORENSICS
 
-**Step 1.1: Subject Line**
-Record: [bluetooth/btmtk] [improve] Fix retry exhaustion handling in
-mt79xx firmware setup - when retry count reaches 0, driver should return
-error instead of continuing.
+**Step 1.1: PARSE THE SUBJECT LINE**
+Record: [Bluetooth: btusb] [Add] [VID/PID 0489/e174 for MediaTek MT7922
+USB Bluetooth chip]
 
-**Step 1.2: Tags**
-- Signed-off-by: Chris Lu <chris.lu@mediatek.com> (author, regular
-  MediaTek Bluetooth contributor)
-- Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  (Bluetooth maintainer, committed the patch)
-- No Fixes: tag, no Reported-by, no Cc: stable - expected for manual
-  review candidates.
+**Step 1.2: PARSE ALL COMMIT MESSAGE TAGS**
+- Signed-off-by: Chris Lu <chris.lu@mediatek.com> — author, MediaTek
+  employee
+- Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com> —
+  Bluetooth subsystem maintainer
+- No Fixes: tag (expected for device ID additions)
+- No Reported-by: tag (not a bug fix, so expected)
+- No Cc: stable tag (expected — that's why we're reviewing)
 
-**Step 1.3: Commit Body**
-The body describes: "If retries are exhausted, driver should not do
-further operation. During mt79xx firmware download process, if the retry
-count reaches 0, driver will return an -EIO error and release the
-firmware resources." Clear description of a missing error check.
+Record: Author is from MediaTek (chip vendor). Merged by the Bluetooth
+subsystem maintainer.
 
-**Step 1.4: Hidden Bug Fix Detection**
-Despite the word "improve" in the subject, this IS a bug fix. The word
-"improve" masks a clear logic error: the retry loop can exhaust without
-any error return, causing the driver to silently proceed with firmware
-download on a device in an abnormal state.
+**Step 1.3: ANALYZE THE COMMIT BODY TEXT**
+The commit body provides the USB device descriptor dump from
+`/sys/kernel/debug/usb/devices`, confirming this is a real MediaTek
+MT7922 Bluetooth USB device (Vendor=0489, ProdID=e174,
+Manufacturer=MediaTek Inc., Product=Wireless_Device). The device runs at
+USB 2.0 High Speed (480 Mbps) and has 3 interfaces typical of a
+Bluetooth HCI device.
 
-## PHASE 2: DIFF ANALYSIS
+Record: No bug described — this is a device ID addition enabling
+hardware support. The device is verified to exist and be manufactured by
+MediaTek.
 
-**Step 2.1: Inventory**
-- 1 file changed: `drivers/bluetooth/btmtk.c`
-- +6 lines added (1 comment, 5 code lines)
-- Function modified: `btmtk_setup_firmware_79xx()`
-- Scope: single-file surgical fix
+**Step 1.4: DETECT HIDDEN BUG FIXES**
+Record: This is not a hidden bug fix. It is a straightforward device ID
+addition to enable Bluetooth on hardware with this specific VID/PID.
 
-**Step 2.2: Code Flow Change**
-The retry loop at line 171 (`while (retry > 0)`) handles
-`BTMTK_WMT_PATCH_PROGRESS` by decrementing `retry`. BEFORE: if retry
-hits 0, the loop exits normally and code falls through to `fw_ptr +=
-section_offset`, proceeding with firmware download. AFTER: a check for
-`retry == 0` returns `-EIO` and jumps to `err_release_fw`.
+## PHASE 2: DIFF ANALYSIS - LINE BY LINE
 
-**Step 2.3: Bug Mechanism**
-This is a **logic/correctness fix** - missing error check after retry
-exhaustion. The `while (retry > 0)` loop can exit via:
-1. `break` when status == `BTMTK_WMT_PATCH_UNDONE` (normal path -
-   proceed to download)
-2. `goto next_section` when status == `BTMTK_WMT_PATCH_DONE` (skip
-   section)
-3. `goto err_release_fw` on command error or unexpected status
-4. Loop exhaustion when retry reaches 0 (BUG: falls through to download
-   path)
+**Step 2.1: INVENTORY THE CHANGES**
+- Files changed: `drivers/bluetooth/btusb.c` only
+- Lines added: +2 (one `USB_DEVICE` table entry spanning 2 lines)
+- Lines removed: 0
+- Function modified: None — this adds to the static `quirks_table[]`
+  array
+- Scope: single-file, single-table-entry addition
 
-Case 4 is the bug - the code proceeds as if the device is ready when
-it's not.
+Record: [1 file, +2/-0 lines] [quirks_table[] static data only] [Trivial
+single-entry addition]
 
-**Step 2.4: Fix Quality**
-Obviously correct. The check `if (retry == 0)` can only be true if the
-loop exhausted, meaning the device never left `PATCH_PROGRESS` state.
-Returning `-EIO` and cleaning up is the correct behavior. No regression
-risk.
+**Step 2.2: UNDERSTAND THE CODE FLOW CHANGE**
+- BEFORE: Device with VID 0489 / PID e174 is not recognized by btusb
+  driver, so Bluetooth doesn't work on this hardware
+- AFTER: Device is matched by `usb_device_id` table with `BTUSB_MEDIATEK
+  | BTUSB_WIDEBAND_SPEECH` flags, enabling the existing MediaTek
+  Bluetooth support path
+
+Record: Purely a data table entry; no logic changes.
+
+**Step 2.3: IDENTIFY THE BUG MECHANISM**
+Category: (h) Hardware workaround / Device ID addition. Without this
+entry, the btusb driver doesn't bind to the device, and the user's
+Bluetooth hardware is completely non-functional.
+
+Record: [Device ID addition] [Enables existing MT7922 driver code for a
+new PID variant]
+
+**Step 2.4: ASSESS THE FIX QUALITY**
+- Obviously correct: Yes — identical pattern to dozens of other entries
+  in the same table
+- Minimal: Yes — 2 lines, data-only
+- Regression risk: Zero — only affects devices with this specific
+  VID/PID
+- No API changes, no logic changes, no locking changes
+
+Record: [Perfect quality — trivial table entry] [Zero regression risk]
 
 ## PHASE 3: GIT HISTORY INVESTIGATION
 
-**Step 3.1: Blame**
-The buggy code was introduced in commit `8c0d17b6b06c5b` "Bluetooth:
-mediatek: add BT_MTK module" by Sean Wang on 2021-10-19. This was the
-initial creation of the BT_MTK module.
+**Step 3.1: BLAME THE CHANGED LINES**
+The neighboring entry `0xe170` was added by Chris Lu (same author) in
+commit `5a6700a31c953` on 2025-10-15. The MT7922A device section has
+entries going back to 2023. The BTUSB_MEDIATEK driver support has been
+present since at least v6.10.
 
-**Step 3.2: No Fixes: tag** - expected.
+Record: MT7922 support exists in tree since v6.10. This is just another
+PID variant for the same chip family.
 
-**Step 3.3: File History**
-The function `btmtk_setup_firmware_79xx` has been stable since 2021 in
-the retry loop area. The surrounding code has only had one minor change
-(commit `995d948cf2e458` adding `err = -EIO` in the else branch).
+**Step 3.2: FOLLOW THE FIXES: TAG**
+No Fixes: tag — expected for a device ID addition.
 
-**Step 3.4: Author**
-Chris Lu is a regular MediaTek Bluetooth contributor with 28+ commits
-touching `drivers/bluetooth/`, including many device ID additions and
-critical fixes.
+**Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES**
+Recent btusb.c commits are heavily dominated by device ID additions
+(e0e2, e0e4, e0f1, e0f2, e0f5, e0f6, e102, e152, e153, e170, plus IDs
+from other vendors). This is a pattern of ongoing hardware enablement
+for the MT7922 family.
 
-**Step 3.5: Dependencies**
-This commit is patch 1/3 of a series, but it is **standalone**. Patches
-2/3 and 3/3 add additional improvements (status checking and reset
-mechanism) that build on this but are not required. The fix applies
-cleanly without dependencies.
+Record: Standalone commit. No prerequisites beyond existing MT7922
+support.
 
-## PHASE 4: MAILING LIST RESEARCH
+**Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS**
+Chris Lu at MediaTek is a regular contributor to the Bluetooth/btusb
+subsystem. He authored the e170 entry, the e135 (MT7920) entry, and a
+kernel crash fix for MediaTek ISO interfaces. He clearly works on
+Bluetooth at MediaTek.
 
-**Step 4.1: Original Discussion**
-Found via `b4 dig -c 54f1f020e9f4`: Submitted as `[PATCH v1 1/3]` on
-2026-02-03. The cover letter explains: "When the device unexpectedly
-restarts during previous firmware download process, it can cause mt79xx
-firmware status to be abnormal in the next attempt." Series applied to
-bluetooth-next by Luiz Augusto von Dentz on 2026-04-10.
+Record: Author is a domain expert from the chip vendor.
 
-**Step 4.2: Review**
-Only v1 was submitted (no revisions needed). The Bluetooth maintainer
-(Luiz Augusto von Dentz) applied the series directly, indicating
-confidence in the fix quality.
+**Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS**
+The only prerequisite is MT7922 support via BTUSB_MEDIATEK, which has
+been present since v6.10 (commit `8c0401b7308cb`). The entry `0xe170`
+(the sibling right before) exists in the current tree. The patch applies
+cleanly — the diff context matches the current file exactly.
 
-**Step 4.3: Bug Report**
-No specific bug report link. The cover letter describes a real-world
-scenario where the device unexpectedly restarts during firmware
-download.
+Record: No dependencies beyond base MT7922 support already in stable
+trees (v6.10+).
 
-**Step 4.4: Series Context**
-Part of 3-patch series, but this patch is standalone. Patches 2 and 3
-are independent improvements that enhance the error recovery further.
+## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
 
-**Step 4.5: Stable Discussion**
-No existing stable nomination or discussion found.
+**Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION**
+Found via web search: The patch was submitted as `[PATCH v1]` and then
+`[PATCH RESEND v1]` on the linux-mediatek mailing list in January 2026.
+The RESEND indicates initial posting may not have received attention.
+The mailing list archive at lists.infradead.org confirms the exact same
+diff.
+
+Record: [https://lists.infradead.org/pipermail/linux-
+mediatek/2026-January/103452.html] [v1 + RESEND v1] [No concerns or NAKs
+visible]
+
+**Step 4.2: CHECK WHO REVIEWED THE PATCH**
+Merged by Luiz Augusto von Dentz (Bluetooth subsystem maintainer at
+Intel), as indicated by his Signed-off-by.
+
+Record: Bluetooth subsystem maintainer merged this.
+
+**Step 4.3-4.5:** Not applicable — no bug report (this is hardware
+enablement), no series dependencies.
 
 ## PHASE 5: CODE SEMANTIC ANALYSIS
 
-**Step 5.1: Key Function**
-`btmtk_setup_firmware_79xx()` - firmware setup for MT79xx series.
+**Step 5.1-5.5:** The change is purely to the `quirks_table[]` static
+data array. No functions are modified. The USB_DEVICE macro expands to
+match criteria for the USB core's device matching infrastructure. When a
+device with VID=0x0489/PID=0xe174 is plugged in, the btusb driver will
+bind to it using the BTUSB_MEDIATEK code path. This code path is well-
+tested through dozens of other MT7922 variants.
 
-**Step 5.2: Callers**
-- `btmtk_usb_setup()` in `btmtk.c` line 1332 - USB path for MT7922,
-  MT7925, MT7961
-- `mt79xx_setup()` in `btmtksdio.c` line 873 - SDIO path
+Record: No function changes. Data-only addition to existing, well-tested
+USB device matching infrastructure.
 
-Both are called during device initialization/setup.
+## PHASE 6: CROSS-REFERENCING AND STABLE TREE ANALYSIS
 
-**Step 5.3-5.4: Reachability**
-Called during HCI device setup, triggered when a MT79xx Bluetooth device
-is initialized. This is a common code path for all MT792x Bluetooth
-device users.
+**Step 6.1: DOES THE BUGGY CODE EXIST IN STABLE TREES?**
+The MT7922 BTUSB_MEDIATEK support exists since v6.10. The
+`quirks_table[]` and the entire MT7922 code path exist in all current
+active stable trees from v6.10 onward. For older stable trees (v6.6,
+v6.1), the base MT7922 support may not be present, so the device ID
+alone wouldn't help there.
 
-## PHASE 6: STABLE TREE ANALYSIS
+Record: Applicable to stable trees v6.10+, v6.12+, and future LTS
+branches.
 
-**Step 6.1: Code exists in stable**
-The buggy code was introduced in October 2021 (commit `8c0d17b6b06c5b`).
-Tags show it's in p-6.1, p-6.6, and all newer stable trees. The bug
-affects ALL active stable trees.
+**Step 6.2: CHECK FOR BACKPORT COMPLICATIONS**
+The diff context matches the current tree perfectly. The entry goes
+right after 0xe170 and before 0x04ca entries. The patch will apply
+cleanly.
 
-**Step 6.2: Backport Complexity**
-The patch should apply cleanly - the retry loop code hasn't changed
-since the original 2021 commit.
+Record: Clean apply expected.
 
-## PHASE 7: SUBSYSTEM CONTEXT
+**Step 6.3: CHECK IF RELATED FIXES ARE ALREADY IN STABLE**
+No prior fix for this specific VID/PID exists.
 
-**Step 7.1: Subsystem**
-Bluetooth driver (drivers/bluetooth/) - IMPORTANT criticality.
-MT7921/MT7922/MT7925 are extremely popular WiFi/BT combo chips found in
-many laptops (Lenovo, ASUS, Dell, etc.).
+## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
+
+**Step 7.1:** Subsystem: Bluetooth (drivers/bluetooth/). Criticality:
+IMPORTANT — Bluetooth is essential on laptops and IoT devices.
+
+**Step 7.2:** btusb.c is very actively developed with frequent device ID
+additions. The MT7922 is a popular WiFi/Bluetooth combo chip used in
+many laptops.
 
 ## PHASE 8: IMPACT AND RISK ASSESSMENT
 
-**Step 8.1: Affected Users**
-Users of MediaTek MT7921, MT7922, MT7925 Bluetooth devices (very large
-population).
+**Step 8.1: WHO IS AFFECTED**
+Users with laptops/devices containing a MediaTek MT7922 Bluetooth chip
+with the specific VID/PID 0489:e174. Without this patch, Bluetooth is
+completely non-functional for these users.
 
-**Step 8.2: Trigger Conditions**
-Triggered when the device reports `BTMTK_WMT_PATCH_PROGRESS`
-continuously for 2+ seconds during firmware download. The cover letter
-describes this happening after an unexpected device restart during a
-previous firmware download attempt.
+**Step 8.2: TRIGGER CONDITIONS**
+Trigger: simply having this hardware. Every boot, every time.
 
-**Step 8.3: Failure Mode**
-Without fix: firmware download proceeds on a device in an abnormal
-state, potentially leading to device malfunction, failed bluetooth
-initialization, or undefined behavior. Severity: MEDIUM-HIGH.
+**Step 8.3: FAILURE MODE**
+Without the patch: Bluetooth hardware is completely non-functional
+(driver doesn't bind). With the patch: full Bluetooth functionality.
 
-**Step 8.4: Risk-Benefit Ratio**
-- BENEFIT: Prevents firmware download to a device in an abnormal state
-  for widely-used hardware
-- RISK: Extremely low - 5 lines, obviously correct, only affects an
-  already-failed case
-- Ratio: Strongly favorable
+**Step 8.4: RISK-BENEFIT RATIO**
+- BENEFIT: HIGH — enables Bluetooth for real hardware users
+- RISK: VERY LOW — 2-line data-only change, cannot affect any other
+  device
+- Ratio: Excellent — maximum benefit, minimum risk
 
 ## PHASE 9: FINAL SYNTHESIS
 
-**Evidence FOR backporting:**
-- Fixes a real logic error (missing error check after retry exhaustion)
-- Very small and surgical (5 lines of code)
-- Obviously correct
-- Affects widely-used hardware (MT792x family)
-- Standalone fix with no dependencies
-- Applied by subsystem maintainer without revisions needed
-- Buggy code exists in all active stable trees since 2021
-- Clean apply expected
+**Step 9.1: EVIDENCE COMPILATION**
+FOR backporting:
+- Classic device ID addition — an explicit exception category that is
+  always YES
+- Only 2 lines added, data-only (zero code changes)
+- Zero regression risk (only matches this specific VID/PID)
+- Author is from MediaTek (chip vendor), merged by subsystem maintainer
+- Real hardware that users have (USB device dump provided)
+- Identical pattern to dozens of existing entries
+- MT7922 driver support exists in stable trees (v6.10+)
 
-**Evidence AGAINST backporting:**
-- Not a crash/panic fix - the immediate impact is proceeding with
-  firmware download in an abnormal state
-- No specific user-reported bug linked
-- Commit message uses "improve" rather than "fix"
+AGAINST backporting:
+- None
 
-**Stable Rules Checklist:**
-1. Obviously correct and tested? YES - trivially verifiable, applied to
-   bluetooth-next
-2. Fixes a real bug? YES - missing error handling after retry exhaustion
-3. Important issue? MEDIUM-HIGH - prevents undefined device behavior
-   during firmware setup for popular hardware
-4. Small and contained? YES - 5 lines, one file, one function
-5. No new features? CORRECT - pure error handling fix
-6. Can apply to stable? YES - clean apply expected
+**Step 9.2: STABLE RULES CHECKLIST**
+1. Obviously correct? YES — trivial table entry
+2. Fixes a real bug? YES — enables hardware for real users
+3. Important issue? YES — without it, Bluetooth is completely broken on
+   this hardware
+4. Small and contained? YES — 2 lines
+5. No new features/APIs? CORRECT — no new features
+6. Can apply to stable? YES — clean apply
+
+**Step 9.3: EXCEPTION CATEGORY**
+This is a **Device ID addition to an existing driver** — one of the
+explicit exception categories that is automatically YES for stable.
 
 ## Verification
 
-- [Phase 1] Parsed tags: Signed-off-by from Chris Lu (author) and Luiz
-  Augusto von Dentz (maintainer/committer)
-- [Phase 2] Diff analysis: 5 lines added after retry loop in
-  `btmtk_setup_firmware_79xx()`, adds `retry == 0` check returning -EIO
-- [Phase 3] git blame: buggy code introduced in commit 8c0d17b6b06c5b
-  (2021-10-19, Sean Wang), present in all stable trees
-- [Phase 3] git tag --contains: confirmed present in p-6.1, p-6.6, and
-  all newer stable tags
-- [Phase 3] git log --author="Chris Lu": confirmed Chris Lu is a regular
-  MediaTek BT contributor with 28+ commits
-- [Phase 4] b4 dig -c 54f1f020e9f4: found original submission at
-  https://patch.msgid.link/20260203062510.848761-2-chris.lu@mediatek.com
-- [Phase 4] b4 dig -a: only v1, no revisions needed, applied directly by
-  maintainer
-- [Phase 4] Thread mbox: series was applied to bluetooth-next,
-  patchwork-bot confirmed
-- [Phase 4] Cover letter: describes real-world scenario (device restart
-  during firmware download)
-- [Phase 5] Grep callers: btmtk_usb_setup() (USB path) and
-  mt79xx_setup() (SDIO path) both call this function
-- [Phase 6] Code unchanged in retry loop since 2021 - clean apply
-  expected
-- [Phase 8] Failure mode: proceeds with firmware download on abnormal
-  device state, severity MEDIUM-HIGH
+- [Phase 1] Parsed tags: Signed-off-by from Chris Lu (MediaTek) and Luiz
+  Augusto von Dentz (Bluetooth maintainer)
+- [Phase 2] Diff analysis: +2 lines, single USB_DEVICE entry in
+  quirks_table[], data-only
+- [Phase 3] git blame: neighboring entry 0xe170 added by same author in
+  5a6700a31c953 (Oct 2025)
+- [Phase 3] MT7922 base support in commit 8c0401b7308cb, present since
+  v6.10
+- [Phase 3] git merge-base: confirmed MT7922 support in v6.10 and v6.12,
+  NOT in v6.6 or v6.1
+- [Phase 4] Web search: found mailing list post at lists.infradead.org
+  confirming RESEND v1 submission Jan 2026
+- [Phase 4] Mailing list archive: identical diff confirmed, no NAKs or
+  objections
+- [Phase 5] No functions modified — purely static data table change
+- [Phase 6] Patch applies cleanly — verified context lines match current
+  tree exactly (lines 704-706)
+- [Phase 6] BTUSB_MEDIATEK appears 70 times in btusb.c — well-tested
+  code path
+- [Phase 8] Risk: zero (only affects devices with VID=0x0489,
+  PID=0xe174)
+
+This is a textbook device ID addition to an existing, well-tested
+driver. It enables Bluetooth on real MediaTek MT7922 hardware for users
+who have this specific VID/PID variant. The change is 2 lines of data-
+only additions with zero regression risk.
 
 **YES**
 
- drivers/bluetooth/btmtk.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index fa7533578f85c..0ada5a12130dc 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -205,6 +205,12 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
- 				}
- 			}
- 
-+			/* If retry exhausted goto err_release_fw */
-+			if (retry == 0) {
-+				err = -EIO;
-+				goto err_release_fw;
-+			}
-+
- 			fw_ptr += section_offset;
- 			wmt_params.op = BTMTK_WMT_PATCH_DWNLD;
- 			wmt_params.status = NULL;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 5c535f3ab7228..aeba026bdb427 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -703,6 +703,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe170), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe174), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x3804), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x38e4), .driver_info = BTUSB_MEDIATEK |
 -- 
 2.53.0
 
