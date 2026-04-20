@@ -1,182 +1,192 @@
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45783C342B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2026 19:17:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC01F37B00C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2026 19:23:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776712656; cv=pass; b=YZyI+hAkiunJHO2gcVZ+bOx1cxsXsEYrzO+yv2uzncv7OBpGmvxWOJRULoSJKzfUPFpIkWdzDj0Lxchdv1EuA/By0d9ncdUl2ratbx28QrdUMEKqt3PBbYkBQB/mkbVe39yb0DgKMFxeVO/ZfOTfe/6U9ZoHXiYiYHd+UWor49c=
+	t=1776712999; cv=pass; b=dgiA1mBIgabxtCwHxLb3c5+coXbi9hPXjFRk4q56AI56wZ72J3Y/S1Ih4Ycx/zsomOhcXOGCzuHSPdHArs36V7NqhnSmnaPEUQNB4geMD1ebvtsHjClqL1CgXvG4FFVpD5861MxxnfQocSMlwNuwL1Rer7IOqXXwwBAQu1alqs8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776712656; c=relaxed/simple;
-	bh=e/y0Pfu4Dq1Q5qmvf4rLxAev2cdUMuF47zxeKhZGvt8=;
+	s=arc-20240116; t=1776712999; c=relaxed/simple;
+	bh=Urc4fTcbbk2a40JtrOyUlkKJdjhGu8/jYnZtRKrjbmw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t8sv3m1pl7DUFXVvUCW25G7YMUIWV0STRcUsvTY8RnAnsflxXghz2TElRnOT/5REKd8a64nUYUMIROXveFjaukApwhzk9twTrJP2t9b7z5qR0Rx9VX7ISL5frz6UYcj1rX+A5Si6clIt5m/04TXbIcindAbzK1/PFEwUhx+IHNo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bxVivFAV; arc=pass smtp.client-ip=74.125.224.48
+	 To:Cc:Content-Type; b=Cel0FNRH/OBJoVgmTaedlVqcj1ozaRHaBJ/OlPMtr4ojiumW1FEnSSLfwqOuBE53HZDGYTdnSGNuSMJ6ODhCyYNecLDB6/Ud1+o6A4d5BHKhtxENKZksfVw0fVv5K/OguWZpFIR/B5CyPxo1UYUYTYZwKRpL+tWAbQB4DLsumRE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B3VVBkaC; arc=pass smtp.client-ip=74.125.224.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bxVivFAV"
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-650789b22e3so3896907d50.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2026 12:17:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776712654; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B3VVBkaC"
+Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-6540fe6a8e1so2460405d50.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2026 12:23:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776712997; cv=none;
         d=google.com; s=arc-20240605;
-        b=Re8uhSoUPvZM9IRyjFBL3bE8OxMLmQj7e0CEbaSeR4dwlRRzRyVMggYeuFADmBxJ30
-         WCqxMTJJAu11D8+mjWu3LZhVwbAb3JIw7qjv67mvuuXyfkIWxSsJLaIr0K8mUQT9YmQz
-         V3qnVSovpJgrLkvxZ8/xb+v2bKHCKcLI3F+zmU6b4MuVtIMbkhZw53E63Fcqim5gFn1p
-         KGt+Bg53nwV4MuKdGWzkVUqEnqNzGiUWb1RAkaAu4zwcItpOL/mAdZoyMLDgAQI90x5Y
-         Ky37yHo4TazltFPuq+X9LYt//3FX6dpfdi+mXExiwtUaw1VbsDZBnyXEWaqOxyTtGk6L
-         A7qg==
+        b=Qp0D95pqnYg5Fcc2qv5pCUafSCusLmy1IS46vu0+j2ws+3VoyMN4a24UojTYA+WFyz
+         ExqWE0UU03KzOVPtgFIEOYUHGQCY8IiLE279Tc9SUccd5SEO82NSeTnAx6s5yMVHDApc
+         d2Bw6PbdIGmyg+6q8s2UDbBLsAox677BH7idLvjO5K607DEmBFrjIkVky/If9leNHLiU
+         gHT3c0WEPo+bkeRP/4m6pOEp9ZTRDFPJRkm+MDL9hhPsZ5VnAQ5QuUHI7F0KX7ZqdWDr
+         zwbqqK0y6uhGcUDe2vGB0fFsc6DmXhDkSqd1h2usdkowEYMGMxDiVOWXgN15Ro1insMo
+         8oxA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=LqId3eMMe5rDOg5MnTzpXj8ZIYTviI3UDAXasv1bsS0=;
-        fh=hKqOnwLCl8SgX35Wtfz0k7Z43vvjyngXfQ9y70kb/8Q=;
-        b=Eo+rYr3Qic7H7mcpojYtmLn42G3/v4g25Sm8JMLxif2ivxguQWV9gyaV1DbcC6zcVF
-         0K47tRnkTER/Ea8NYMOOLJ9PWch5h0r8r6cGriYloFxrh7i7ACeX+6oyaKLF8mGJ+RmV
-         ez76msT23IjoWtbIjXgylfywTV+icl2DibqtQ2IYmXrBARn0W7DT0hGnf2uOKvDMUBf/
-         wU3ZwnHkPLdss5fiS1p3M9k85pDuzY9n6hYZ/SeCvv6AgRtGnJKHFpvuTV94REL6J/Ak
-         f2ovgIeEwW2Zyx/tlrlJb/BJhthdlyFFgL6qer9FwFINCWkSrAFFCkJymPo68RqcaP9P
-         xhCQ==;
+        bh=lUIn3hEw6JYFkddfNv6BL46EZAbPO+C2iSOKicXTGNM=;
+        fh=HFsVcJgUypbhncHewZRlNIlVY3lPzJibifEyV190lyE=;
+        b=VgYMp3YPrRdjc8SEiAlSscjAgH5XSBIJ/+zsf0XABNsFdU+R7XNw7SNgCLnF7JSxfG
+         A+nqU4BN/gNp2lD3FI0MBvB0hn+9tyeR/srRwCFtfeJhIAhF4OegxSU1SyVz+7CJn8Nm
+         Zy765fS0Zr5a9GvLCekWLjyPk5mM4/YEPdNeJxp7qTAU2VQXnZbSWk3PLa0aRcM+BpXT
+         5bC9zK/dxf3ZsEzaTNQHqpkk5sAbvJw7HTfY+VAH/nhUEg16X8scnihRyD9+9cPINYNS
+         HadB6uBIsl+WMgEiSmiVKHznJ2IQaZc+PvVhjR6YpthL3rnfQaBi4ZD1IQx/wa46lugY
+         U1lg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776712654; x=1777317454; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776712997; x=1777317797; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LqId3eMMe5rDOg5MnTzpXj8ZIYTviI3UDAXasv1bsS0=;
-        b=bxVivFAVnVq3IZw7WMoc9EZ4j7+Tu7LRD4xSgq5a4WgVGFApHCYG1lz0ALCigOpICa
-         LTRmdtTR8s0BMyFbxrLG2DTe7BK2V+/zq10lP+9RRjyu0psSKK190AG4xYlm2Ay0Es+0
-         v7kt+5NwGDvPRch/rlWv7ZYcYSBH3+i9mW/WQpnFwQW5nX7HaMJfCh3yfro4LLgpPUwP
-         sHmD0uctoueWDNogP6i+AZtuWhLHsh78VM0iurdaT5EID7H+/nbnVYuTfLpvnf1iIY6l
-         CXug1L5JsDmvUlV8C5sUKMWGDDVtiY/w8rsj1s71ORPgnj0DMAEpWQWcPo+rA3yGjj/k
-         XzFw==
+        bh=lUIn3hEw6JYFkddfNv6BL46EZAbPO+C2iSOKicXTGNM=;
+        b=B3VVBkaCz0DSlWRysjem6+2RdUQ1uDcVpfWW9kubqOGtWORcANAPRm2cEpFdWmsk+x
+         INcPoxDnEkQ8L8+K0W+BKn5N16jIBq8goQHNh1FfJtEU6w2ewgO4487OSTvlcwfulW/W
+         KUxzwhMNrBvka9XiPINFr3NxJ/6X1j1JXQLFTjoMNcWvm1T+/EoH1iQbl9gBe2bpMWJM
+         6tzY+mdKpKVvhfBYXeMD6H0L+2in/EMyRWpdyUcaJE6+nx/EUQhYHOnTEb86dAVOedq5
+         wQd/q+yWw/KdH4JylXtP7EIFztCmikzOqGZG8zqGxqBqHlhmiJjvRsoeNiFFQV2lMd2s
+         Ph+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776712654; x=1777317454;
+        d=1e100.net; s=20251104; t=1776712997; x=1777317797;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=LqId3eMMe5rDOg5MnTzpXj8ZIYTviI3UDAXasv1bsS0=;
-        b=kvIdIzeG6Sb3dTHdF02wn39Gl/v2Bb9Mh9BTywnJPhEjJv4B6AchcyegcZvVRTIkY8
-         +NlIKd4mby+urjt8zj5DEc2VH0px0CHPBXAANlOlXoFfjeSwiqLHqZQzqBpdC4PlJEbl
-         sF3CwTW8n+tJ4EEeT0jOHrVVEqLHV0ssZZKlVg3rH5dRZPY4iqNTJMQ3AAryeAXISP1f
-         /+TRN05MiFs6/ZoLTDIVwbUDInujf3eXvfu/iSUsCT5Mvh+mIw/07vuuXO37q2T5Ju7p
-         0VkosrXZ48wKxx8IEVMwxZlYYBV4JnicoIjx7P5LGwo6GySjcAntroYkdr69kmatBNhl
-         NlKQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/kH/a1AeuCQ4n4Se9KEYH4PAl2wyNXWa0YzSuW/TYdn/Kt+DjaT8/Xc+17e0Oj8ld1OklTvJRNCRmXGqi2A+c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywl4CA7Qdird5OOBxsMw5yWCjAecDLs7k+PWeHWCLiAz/i52pXW
-	tlfGpphyd70BbiSxHCu4/2mJ2NPFW19Xa6EEAr/76rIepbR+g8Wob1Amn4cnVWlqsSTH6tZr7eB
-	rhYomxahOsgBBU1QlUeSDTgTh2x52McY=
-X-Gm-Gg: AeBDiesBmhHd8KkWb26YG1Lzh7P11JjZDCoCPKVLtwtEHZdealOEHy/Wajs6pG1RFBE
-	I8OMjISbot8wXe/Z3w5np413WqHwXbp+wr7h4aC+jwUzUNkehDPaSdYBQiKbjHXw8Vbmz3e8P8P
-	fCp/a7KeHF8mkNTqHs/FokNGsrbQwPSb8ag2cxi4cDKl5xOQ1Q0jL2dOtiG/hRMAmCLOkYD5kOx
-	ZzXaxUYihXLwGvrMsHPI0ybVJDRL78iMwG+7ibRcItDly8cBCa8TQwzQGfnCoL8w88Wlp8DTSKx
-	56AxiZL7lov30bKP8slrVffAHj+VC5ujXpztzrmZEYi0i5OvUMEw3tx2+th3Q9M32MNmlT5jCwK
-	Alg==
-X-Received: by 2002:a05:690e:4141:b0:650:2ff9:d656 with SMTP id
- 956f58d0204a3-653108b5176mr14907504d50.29.1776712653576; Mon, 20 Apr 2026
- 12:17:33 -0700 (PDT)
+        bh=lUIn3hEw6JYFkddfNv6BL46EZAbPO+C2iSOKicXTGNM=;
+        b=h+BpZ5PM2pt4hidhP7HIiwSUBmPwR/XDsujKL4T4kWZtB/SUhE0L0KeDO7hxUYYuhk
+         jFKxeWlYz95t9hwUXrzVRAnSAQTteMSw/Pay5Jw2Dxj4//pw2ZvAa7UZI9005Jn88uK4
+         uTHaWSlBUqJxtoyexl+dnfhZtA359HkRC9QtOIe8A4wotAm2po3GKPR5D/nDpnDJPpFY
+         37ok88FMAoAlQbqXbkH3mO0DArZSoqZOLx1NTfxQLfBWG56hxrtQI/cR93d+t6uOjVN+
+         PI9eseoVPjVUD9s4ZMGL+2S/FfkSXFTsURbhPnBM4fDHLIquDIoz+Ik7jcAjDJkEp50l
+         EUBg==
+X-Forwarded-Encrypted: i=1; AFNElJ+Wr+M17ff3RLT3Ds8KYGOd4ZYyhE+8XWGj94R9gja9GO6gRAi1F7Bv2q5NFFL9gaHvqaB1uJU/DIc8fnhy1dM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUnOOvsZVoPjty2rnlq2ruF6+3kRSIrjTHP+plKOEiggXSkZJt
+	RYhpBp0Aq+mCxs303ZpNay+HNm7f9RM3gIGhZohcqG53k/B5k5s/6u3M6zTWrKLuSjzBfeNvRgY
+	/YDQEH8gX+Iv+HGkjawu0tesua3e09cc=
+X-Gm-Gg: AeBDievEqZZ8jcoTvFFx9tgmFVt1SmlNXOdRPFll3qjVjZn1VlbTCElQ1SfA7WPCHjo
+	YJXDR6QdyZcOBebMS46T1986fHcez11fiaMpcDsq6wJUsy9fL3lIfTJOnZgULrYObtQdGvh5hQk
+	+cOl6f2Lz6bN46r0AzX5C9OpIzKPVTZmW+0XJd+yQUBmWVOZMyb2CiaAmvC8GMAqGsspeb1htpu
+	rZfEhuPy3XXEofjFZaQmAzKLhnrz3+2zbPnqvGKagW4Nqj3SDe24G6SFoDUrO1PTzXBG5fwvo30
+	sX8eKu7G07y1OdsOqCMfyoQ8r0Inq0NSixueDkE7xfe9yv+cU/grCfA1tZLWD4gnOgv7v5M7lNg
+	SKQ==
+X-Received: by 2002:a53:cf44:0:b0:651:b86f:3657 with SMTP id
+ 956f58d0204a3-65310a0bde6mr9520237d50.36.1776712996801; Mon, 20 Apr 2026
+ 12:23:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260418000138.1848813-1-michael.bommarito@gmail.com>
-In-Reply-To: <20260418000138.1848813-1-michael.bommarito@gmail.com>
+References: <20260418053401.128483-1-suunj1331@gmail.com> <20260418053401.128483-2-suunj1331@gmail.com>
+In-Reply-To: <20260418053401.128483-2-suunj1331@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 20 Apr 2026 15:17:20 -0400
-X-Gm-Features: AQROBzB7p2eqNslJGxxV9DmwoYgd1f6Ag_8dEyj71H75g_Ar-pjlqehIUD42okY
-Message-ID: <CABBYNZKP-Rwumw0c7FHEsL5e6XpFZCBA-O2avNujtYgRHeVZhA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: virtio_bt: clamp rx length before skb_put
-To: Michael Bommarito <michael.bommarito@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Soenke Huster <soenke.huster@eknoes.de>, 
-	"Michael S . Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev
+Date: Mon, 20 Apr 2026 15:23:04 -0400
+X-Gm-Features: AQROBzCElDRvhVtJbXCcMB4PIv35kNLuKPjgXleuneDJqn-BnYQgD22cYaV6t4o
+Message-ID: <CABBYNZLBoU3byfK_G+=sTkBx3wNwEh2X6_7dG4+4LFtrc3Skpw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: ISO: Fix data-race on dst in iso_sock_connect()
+To: SeungJu Cheon <suunj1331@gmail.com>
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, me@brighamcampbell.com, 
+	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,
+Hi SeungJu,
 
-On Fri, Apr 17, 2026 at 8:01=E2=80=AFPM Michael Bommarito
-<michael.bommarito@gmail.com> wrote:
+On Sat, Apr 18, 2026 at 1:34=E2=80=AFAM SeungJu Cheon <suunj1331@gmail.com>=
+ wrote:
 >
-> virtbt_rx_work() calls skb_put(skb, len) where len comes directly
-> from virtqueue_get_buf() with no validation against the skb we
-> posted.  The RX skb is allocated as alloc_skb(1000) in
-> virtbt_add_inbuf().  A malicious or buggy virtio-bt backend that
-> reports used.len larger than the skb's tailroom causes skb_put() to
-> call skb_over_panic() in net/core/skbuff.c, which triggers
-> BUG() and panics the guest.
+> iso_sock_connect() copies the destination address into
+> iso_pi(sk)->dst under lock_sock, then releases the lock and reads
+> it back with bacmp() to decide between the CIS and BIS connect
+> paths:
 >
-> Reproduced on a QEMU 9.0 whose virtio-bt backend reports
-> used.len =3D 4096 into a 1000-byte rx skb:
+>     lock_sock(sk);
+>     bacpy(&iso_pi(sk)->dst, &sa->iso_bdaddr);
+>     iso_pi(sk)->dst_type =3D sa->iso_bdaddr_type;
+>     release_sock(sk);
 >
->   skbuff: skb_over_panic: text:ffffffff83958e84 len:4096 put:4096
->       head:ffff88800c071000 data:ffff88800c071000 tail:0x1000
->       end:0x6c0 dev:<NULL>
->   ------------[ cut here ]------------
->   kernel BUG at net/core/skbuff.c:214!
->   Call Trace:
->    skb_panic+0x160/0x162
->    skb_put.cold+0x31/0x31
->    virtbt_rx_work+0x94/0x250
->    process_one_work+0x80d/0x1510
->    worker_thread+0x4af/0xd20
->    kthread+0x2cc/0x3a0
+>     if (bacmp(&iso_pi(sk)->dst, BDADDR_ANY))  // <- no lock held
 >
-> Reject any len that exceeds skb_tailroom().  Drop the skb on the
-> error path; virtbt_add_inbuf() reposts a fresh one for the next
-> iteration.  With the check in place the same harness runs without
-> BUG(); the driver logs "rx reply len %u exceeds skb tailroom %u"
-> and the device keeps running.
+> This read after release_sock() races with any concurrent write to
+> iso_pi(sk)->dst on the same socket.
 >
-> Same class of bug as commit c04db81cd028 ("net/9p: Fix buffer overflow in=
- USB transport layer"),
-> which hardened the USB 9p transport against unchecked device-reported len=
-gth.
+> Fix by performing the bacmp() inside the lock_sock critical section
+> and caching the result in a local variable.
 >
-> Fixes: 160fbcf3bfb9 ("Bluetooth: virtio_bt: Use skb_put to set length")
-> Cc: stable@vger.kernel.org
-> Cc: Soenke Huster <soenke.huster@eknoes.de>
-> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
-> Assisted-by: Claude:claude-opus-4-7
+> This patch addresses only the bacmp() race in iso_sock_connect();
+> other unprotected iso_pi(sk) accesses are fixed separately in the
+> next patch.
+>
+> KCSAN report:
+>
+> BUG: KCSAN: data-race in memcmp+0x39/0xb0
+>
+> race at unknown origin, with read to 0xffff8f96ea66dde3 of 1 bytes by tas=
+k 549 on cpu 1:
+>  memcmp+0x39/0xb0
+>  iso_sock_connect+0x275/0xb40
+>  __sys_connect_file+0xbd/0xe0
+>  __sys_connect+0xe0/0x110
+>  __x64_sys_connect+0x40/0x50
+>  x64_sys_call+0xcad/0x1c60
+>  do_syscall_64+0x133/0x590
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> value changed: 0x00 -> 0xee
+>
+> Reported by Kernel Concurrency Sanitizer on:
+> CPU: 1 UID: 0 PID: 549 Comm: iso_race_combin Not tainted 7.0.0-08391-g1d5=
+1b370a0f8 #40 PREEMPT(lazy)
+>
+> Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
+> Signed-off-by: SeungJu Cheon <suunj1331@gmail.com>
 > ---
->  drivers/bluetooth/virtio_bt.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
+>  net/bluetooth/iso.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 >
-> diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.=
-c
-> index 76d61af8a275..157e68b6e75f 100644
-> --- a/drivers/bluetooth/virtio_bt.c
-> +++ b/drivers/bluetooth/virtio_bt.c
-> @@ -227,8 +227,15 @@ static void virtbt_rx_work(struct work_struct *work)
->         if (!skb)
->                 return;
+> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> index be145e2736b7..14963ba68597 100644
+> --- a/net/bluetooth/iso.c
+> +++ b/net/bluetooth/iso.c
+> @@ -1169,6 +1169,7 @@ static int iso_sock_connect(struct socket *sock, st=
+ruct sockaddr_unsized *addr,
+>         struct sockaddr_iso *sa =3D (struct sockaddr_iso *)addr;
+>         struct sock *sk =3D sock->sk;
+>         int err;
+> +       bool bcast;
 >
-> -       skb_put(skb, len);
-> -       virtbt_rx_handle(vbt, skb);
-> +       if (len > skb_tailroom(skb)) {
-> +               bt_dev_err(vbt->hdev,
-> +                          "rx reply len %u exceeds skb tailroom %u\n",
-> +                          len, skb_tailroom(skb));
-> +               kfree_skb(skb);
-> +       } else {
-> +               skb_put(skb, len);
-> +               virtbt_rx_handle(vbt, skb);
-> +       }
+>         BT_DBG("sk %p", sk);
 >
->         if (virtbt_add_inbuf(vbt) < 0)
->                 return;
+> @@ -1191,9 +1192,11 @@ static int iso_sock_connect(struct socket *sock, s=
+truct sockaddr_unsized *addr,
+>         bacpy(&iso_pi(sk)->dst, &sa->iso_bdaddr);
+>         iso_pi(sk)->dst_type =3D sa->iso_bdaddr_type;
+>
+> +       bcast =3D !bacmp(&iso_pi(sk)->dst, BDADDR_ANY);
+> +
+>         release_sock(sk);
+>
+> -       if (bacmp(&iso_pi(sk)->dst, BDADDR_ANY))
+> +       if (!bcast)
+>                 err =3D iso_connect_cis(sk);
+>         else
+>                 err =3D iso_connect_bis(sk);
 > --
-> 2.53.0
+> 2.52.0
+>
 
-https://sashiko.dev/#/patchset/20260418000138.1848813-1-michael.bommarito%4=
-0gmail.com
+https://sashiko.dev/#/patchset/20260418053401.128483-1-suunj1331%40gmail.co=
+m
 
-All seem like valid comments to me, first one is odd to me thought,
-never would have though that skb_tailroom wouldn't be enough to check
-if using `skb_put` is safe.
+Seems valid, so we migth just use sa in the place of iso_pi(sk) to
+avoid using it without sk being locked. Other problems it may reveal
+need to be addressed in separate patches.
 
 --=20
 Luiz Augusto von Dentz
