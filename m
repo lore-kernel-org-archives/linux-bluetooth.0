@@ -1,192 +1,382 @@
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC01F37B00C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2026 19:23:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E512DB7BB
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2026 19:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.49
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776712999; cv=pass; b=dgiA1mBIgabxtCwHxLb3c5+coXbi9hPXjFRk4q56AI56wZ72J3Y/S1Ih4Ycx/zsomOhcXOGCzuHSPdHArs36V7NqhnSmnaPEUQNB4geMD1ebvtsHjClqL1CgXvG4FFVpD5861MxxnfQocSMlwNuwL1Rer7IOqXXwwBAQu1alqs8=
+	t=1776714757; cv=pass; b=beMkrZOfmmU+JXsiVmbL/v4fGI5jcIRI2V3xWlxyAc6tS9zWYgXmbwWEp0ccrFb9TXXz2U/d9ZEvvyuT0rseDGzlT/Xr+jw3AXgh6WZ+5XdFB3VF1XRzprfInADNu8LZRrAVJd7C89Iag0gGEbnjWp4okbCnWh9EQL17KD5JHGI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776712999; c=relaxed/simple;
-	bh=Urc4fTcbbk2a40JtrOyUlkKJdjhGu8/jYnZtRKrjbmw=;
+	s=arc-20240116; t=1776714757; c=relaxed/simple;
+	bh=t745zpafVSC9CipFtOd0sExqtTX1GWRzOT+qj7N9A3Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Cel0FNRH/OBJoVgmTaedlVqcj1ozaRHaBJ/OlPMtr4ojiumW1FEnSSLfwqOuBE53HZDGYTdnSGNuSMJ6ODhCyYNecLDB6/Ud1+o6A4d5BHKhtxENKZksfVw0fVv5K/OguWZpFIR/B5CyPxo1UYUYTYZwKRpL+tWAbQB4DLsumRE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B3VVBkaC; arc=pass smtp.client-ip=74.125.224.54
+	 To:Cc:Content-Type; b=N7yuhP+fTFxpnwFzfnAwm7xevPZWMon7pSgaIJBTG0CJ5cTOVjXNonnRfPcaeGdLUMyl2E0j/JrSlsrR/v4B/gd/ygDFz2ivVfkkoaDJXPqdztWt2kDQ25mj3ppM3/+E7lCowKOnyed13tMBVlqbdGK6mPgi3tDXJbG/YfUq3XY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EOEEHCds; arc=pass smtp.client-ip=74.125.224.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B3VVBkaC"
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-6540fe6a8e1so2460405d50.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2026 12:23:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776712997; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EOEEHCds"
+Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-651b4d09141so4585100d50.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2026 12:52:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776714754; cv=none;
         d=google.com; s=arc-20240605;
-        b=Qp0D95pqnYg5Fcc2qv5pCUafSCusLmy1IS46vu0+j2ws+3VoyMN4a24UojTYA+WFyz
-         ExqWE0UU03KzOVPtgFIEOYUHGQCY8IiLE279Tc9SUccd5SEO82NSeTnAx6s5yMVHDApc
-         d2Bw6PbdIGmyg+6q8s2UDbBLsAox677BH7idLvjO5K607DEmBFrjIkVky/If9leNHLiU
-         gHT3c0WEPo+bkeRP/4m6pOEp9ZTRDFPJRkm+MDL9hhPsZ5VnAQ5QuUHI7F0KX7ZqdWDr
-         zwbqqK0y6uhGcUDe2vGB0fFsc6DmXhDkSqd1h2usdkowEYMGMxDiVOWXgN15Ro1insMo
-         8oxA==
+        b=lH2uGobECTUlfL7AmyO0GZD08amWz9pHObsc76RCeNDRUInhxVXFyqw8G919vYWXDX
+         d3VRFOAGCjUY1N3OQJdhqtJqrOuy6nG8aFlmYRbmXTKiq2IHalY+0jX50PqDaTrWxh8X
+         AFuGTJpdSYm0DmPfMKAwrsD3GIc+pA+yGullQzgcEHOy1d+yC1pKbD8yPSANn0faOqgc
+         4jCBAG8RNBWgVOmW7fYV+nu6ab9T7I8dP/jle8P0ehbAb6Y/AclapmnbWPjPDPh99jpq
+         VjLIr5gRE08hTDLv8U9l6LG/GHxrXRANLnzeTn5FSTnMpHznR04gwDzLRJHzQmi8KK5N
+         JKFQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=lUIn3hEw6JYFkddfNv6BL46EZAbPO+C2iSOKicXTGNM=;
-        fh=HFsVcJgUypbhncHewZRlNIlVY3lPzJibifEyV190lyE=;
-        b=VgYMp3YPrRdjc8SEiAlSscjAgH5XSBIJ/+zsf0XABNsFdU+R7XNw7SNgCLnF7JSxfG
-         A+nqU4BN/gNp2lD3FI0MBvB0hn+9tyeR/srRwCFtfeJhIAhF4OegxSU1SyVz+7CJn8Nm
-         Zy765fS0Zr5a9GvLCekWLjyPk5mM4/YEPdNeJxp7qTAU2VQXnZbSWk3PLa0aRcM+BpXT
-         5bC9zK/dxf3ZsEzaTNQHqpkk5sAbvJw7HTfY+VAH/nhUEg16X8scnihRyD9+9cPINYNS
-         HadB6uBIsl+WMgEiSmiVKHznJ2IQaZc+PvVhjR6YpthL3rnfQaBi4ZD1IQx/wa46lugY
-         U1lg==;
+        bh=SB4b32EgzYazN8qQxkM4O8xX3/Wz78zFPsOUYMoZOBw=;
+        fh=ImHaVp9LKIGjD0tRyxgUyPXd5WNSYdKgZ1TGxuDzvzM=;
+        b=eciJGXse7D9W4atf+QCuiYm55gFSjj6qlXtvjXhI8uaHDofvUdVlPkiNwcBPiEPKZP
+         lSelWDzMv0CSLTuWw3oeVFakxW6icEohgM67Ps0k8W+vslJLq3//wFkC932Y3kdKRSMO
+         gVsE2lQeRfmfucDmSRR+7WOOjqVSzDTe07Sbtlvcd79TzUlmaTR1AME6Y7qKPB89XxKC
+         VBxq2FINbHvca0ZUu8zsyIBbiWteqM3JZTtGIUfd6/0CWM1VfZ5w9kMlzAXhXi/rqXhn
+         1Vzhu3erugPUJwvgmOg95j8zpD69eL09q3+bQlySs1QbWMncAufTJ3TFoKAflD00jksY
+         M3Hw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776712997; x=1777317797; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776714754; x=1777319554; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lUIn3hEw6JYFkddfNv6BL46EZAbPO+C2iSOKicXTGNM=;
-        b=B3VVBkaCz0DSlWRysjem6+2RdUQ1uDcVpfWW9kubqOGtWORcANAPRm2cEpFdWmsk+x
-         INcPoxDnEkQ8L8+K0W+BKn5N16jIBq8goQHNh1FfJtEU6w2ewgO4487OSTvlcwfulW/W
-         KUxzwhMNrBvka9XiPINFr3NxJ/6X1j1JXQLFTjoMNcWvm1T+/EoH1iQbl9gBe2bpMWJM
-         6tzY+mdKpKVvhfBYXeMD6H0L+2in/EMyRWpdyUcaJE6+nx/EUQhYHOnTEb86dAVOedq5
-         wQd/q+yWw/KdH4JylXtP7EIFztCmikzOqGZG8zqGxqBqHlhmiJjvRsoeNiFFQV2lMd2s
-         Ph+w==
+        bh=SB4b32EgzYazN8qQxkM4O8xX3/Wz78zFPsOUYMoZOBw=;
+        b=EOEEHCdsbG621Hai4I9S9xbomdd7HNq1beBeK9MHsEEjkV0qR7aALSSfiRuGW/XNSp
+         SzLzeTwkinS4KYJyHqDOSuvFXV0WsRWfrtc3c35rYYi3pVASk75giVry+LKdhjlVvw4F
+         96KqWD3V6QlkXZRwhNBDxO/icQ0Gkrzdkirm/LWlgEOO61RUHlqEujNFsTpeqoVeJD3E
+         zs4oOFrOTwv6tFiOHdsm/e0pPRBPSo96MTWz5uVI883SOUBn8n3L1tVyMp+Hxh24F6YL
+         Vhxv/BIDemgCs8BcnH2bmpoK7M7bHJt+3Cgu/r71aomNUj6njRENTyQDjM+kazFqMFmk
+         N+Nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776712997; x=1777317797;
+        d=1e100.net; s=20251104; t=1776714754; x=1777319554;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=lUIn3hEw6JYFkddfNv6BL46EZAbPO+C2iSOKicXTGNM=;
-        b=h+BpZ5PM2pt4hidhP7HIiwSUBmPwR/XDsujKL4T4kWZtB/SUhE0L0KeDO7hxUYYuhk
-         jFKxeWlYz95t9hwUXrzVRAnSAQTteMSw/Pay5Jw2Dxj4//pw2ZvAa7UZI9005Jn88uK4
-         uTHaWSlBUqJxtoyexl+dnfhZtA359HkRC9QtOIe8A4wotAm2po3GKPR5D/nDpnDJPpFY
-         37ok88FMAoAlQbqXbkH3mO0DArZSoqZOLx1NTfxQLfBWG56hxrtQI/cR93d+t6uOjVN+
-         PI9eseoVPjVUD9s4ZMGL+2S/FfkSXFTsURbhPnBM4fDHLIquDIoz+Ik7jcAjDJkEp50l
-         EUBg==
-X-Forwarded-Encrypted: i=1; AFNElJ+Wr+M17ff3RLT3Ds8KYGOd4ZYyhE+8XWGj94R9gja9GO6gRAi1F7Bv2q5NFFL9gaHvqaB1uJU/DIc8fnhy1dM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUnOOvsZVoPjty2rnlq2ruF6+3kRSIrjTHP+plKOEiggXSkZJt
-	RYhpBp0Aq+mCxs303ZpNay+HNm7f9RM3gIGhZohcqG53k/B5k5s/6u3M6zTWrKLuSjzBfeNvRgY
-	/YDQEH8gX+Iv+HGkjawu0tesua3e09cc=
-X-Gm-Gg: AeBDievEqZZ8jcoTvFFx9tgmFVt1SmlNXOdRPFll3qjVjZn1VlbTCElQ1SfA7WPCHjo
-	YJXDR6QdyZcOBebMS46T1986fHcez11fiaMpcDsq6wJUsy9fL3lIfTJOnZgULrYObtQdGvh5hQk
-	+cOl6f2Lz6bN46r0AzX5C9OpIzKPVTZmW+0XJd+yQUBmWVOZMyb2CiaAmvC8GMAqGsspeb1htpu
-	rZfEhuPy3XXEofjFZaQmAzKLhnrz3+2zbPnqvGKagW4Nqj3SDe24G6SFoDUrO1PTzXBG5fwvo30
-	sX8eKu7G07y1OdsOqCMfyoQ8r0Inq0NSixueDkE7xfe9yv+cU/grCfA1tZLWD4gnOgv7v5M7lNg
-	SKQ==
-X-Received: by 2002:a53:cf44:0:b0:651:b86f:3657 with SMTP id
- 956f58d0204a3-65310a0bde6mr9520237d50.36.1776712996801; Mon, 20 Apr 2026
- 12:23:16 -0700 (PDT)
+        bh=SB4b32EgzYazN8qQxkM4O8xX3/Wz78zFPsOUYMoZOBw=;
+        b=VsLh/tDd89kxxwWNLsUNSQS4n2JCkautgYpoxZgT9T5Y9/4KyKEBTQGcCJpZFultic
+         dDMj+4m+MCOIsrgqueCraRfQNgSHdpVkwJ6gzGFBZDXIILO+c2Jq/UXr+EPvtkcdJimr
+         mFrj/TYHU1u4OXKFpyWwBwvU+u9eIybV1/aQT6IOAHtRh4t7BD6tvT5BwVaiBJdcldka
+         hOeOy6nYX9qH5ZiRR600vxzCSkPgV/0q8Q1CriLWjriLFo1N/h8V6/Zjqk836EfQi0zY
+         MpbBLVxAPk+na7h9gAjbWSxp1fTA7RYphCX7Cns2gZBFkwWMpVwjPJcMJ/r+JzHozQE0
+         CoCg==
+X-Gm-Message-State: AOJu0YwTccbcEN/7kfSqt8Q/nq3AQILeD7Qa8zERmPhPegvPggtyfYMS
+	Zk9zWXlSYZfPhzqcSQyhEKO5KSTtSFCWsL7CEL/M1QAe6f+qd8rbUAeNeCZp07LqiyS0JCjL9nu
+	svR3BGH8/sjtdllUkGzwkV4eUtgkfXYMpS/+q
+X-Gm-Gg: AeBDieu6HA3zqiebg053EDzzrpOP0PR2RIhq5kFw+KWW1O6oVozYPpvTwQYii17PfC/
+	owSa4N6NmroEAxPiPbPzft8jVNZpRQNL05ppSVxYdG0cSF/QE0L8Ccd2dxk/uHdUd/OmJqaoXP6
+	9tdEaqNEo+TggWoyvGGAtwIsYEfPMHU5ofGJn0DUrX5Ahvh5mEBmn0G0/ydecjxSeWRgcID/meu
+	Rk1/9m7SVfSTMyX286O0UaZoet6OV0FX03WIiAAPoSD2gj9pnXvIrbzGQmjN+aV9oQthJbuCiYw
+	pN0wg3m8D8geFNI0lHywqIvqodvaDH+ZmlXpmEzI3993UHXem5xxWsDDh/AZ1WYDu7hSP5NqPlR
+	VSQ==
+X-Received: by 2002:a05:690e:4006:b0:652:f16e:345d with SMTP id
+ 956f58d0204a3-65311bc3dfamr10710518d50.30.1776714754551; Mon, 20 Apr 2026
+ 12:52:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260418053401.128483-1-suunj1331@gmail.com> <20260418053401.128483-2-suunj1331@gmail.com>
-In-Reply-To: <20260418053401.128483-2-suunj1331@gmail.com>
+References: <20260420161345.145089-1-frederic.danis@collabora.com>
+In-Reply-To: <20260420161345.145089-1-frederic.danis@collabora.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 20 Apr 2026 15:23:04 -0400
-X-Gm-Features: AQROBzCElDRvhVtJbXCcMB4PIv35kNLuKPjgXleuneDJqn-BnYQgD22cYaV6t4o
-Message-ID: <CABBYNZLBoU3byfK_G+=sTkBx3wNwEh2X6_7dG4+4LFtrc3Skpw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Bluetooth: ISO: Fix data-race on dst in iso_sock_connect()
-To: SeungJu Cheon <suunj1331@gmail.com>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, me@brighamcampbell.com, 
-	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev
+Date: Mon, 20 Apr 2026 15:52:22 -0400
+X-Gm-Features: AQROBzDA7VUdiw_8kYWnDONEMthmW8S-brzo7-9LAG2LwsxnOWip0G2Ommo_Ayw
+Message-ID: <CABBYNZJzhE5y_YC=vw3-V2HRznnoeSxKkVt+FcFcv4=GnONmSw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] audio: Add ability to force CIS transport Links property
+To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi SeungJu,
+Hi Fr=C3=A9d=C3=A9ric,
 
-On Sat, Apr 18, 2026 at 1:34=E2=80=AFAM SeungJu Cheon <suunj1331@gmail.com>=
- wrote:
+On Mon, Apr 20, 2026 at 1:27=E2=80=AFPM Fr=C3=A9d=C3=A9ric Danis
+<frederic.danis@collabora.com> wrote:
 >
-> iso_sock_connect() copies the destination address into
-> iso_pi(sk)->dst under lock_sock, then releases the lock and reads
-> it back with bacmp() to decide between the CIS and BIS connect
-> paths:
+> If bluetoothd is started in testing mode the Links property for CIS
+> is readwrite and can be used to force transport objects Links.
+> This can used to unlink transport objects by sending an empty array.
 >
->     lock_sock(sk);
->     bacpy(&iso_pi(sk)->dst, &sa->iso_bdaddr);
->     iso_pi(sk)->dst_type =3D sa->iso_bdaddr_type;
->     release_sock(sk);
+> For unlinked transport objects, each transports needs to be acquired
+> separately.
 >
->     if (bacmp(&iso_pi(sk)->dst, BDADDR_ANY))  // <- no lock held
->
-> This read after release_sock() races with any concurrent write to
-> iso_pi(sk)->dst on the same socket.
->
-> Fix by performing the bacmp() inside the lock_sock critical section
-> and caching the result in a local variable.
->
-> This patch addresses only the bacmp() race in iso_sock_connect();
-> other unprotected iso_pi(sk) accesses are fixed separately in the
-> next patch.
->
-> KCSAN report:
->
-> BUG: KCSAN: data-race in memcmp+0x39/0xb0
->
-> race at unknown origin, with read to 0xffff8f96ea66dde3 of 1 bytes by tas=
-k 549 on cpu 1:
->  memcmp+0x39/0xb0
->  iso_sock_connect+0x275/0xb40
->  __sys_connect_file+0xbd/0xe0
->  __sys_connect+0xe0/0x110
->  __x64_sys_connect+0x40/0x50
->  x64_sys_call+0xcad/0x1c60
->  do_syscall_64+0x133/0x590
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> value changed: 0x00 -> 0xee
->
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 1 UID: 0 PID: 549 Comm: iso_race_combin Not tainted 7.0.0-08391-g1d5=
-1b370a0f8 #40 PREEMPT(lazy)
->
-> Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
-> Signed-off-by: SeungJu Cheon <suunj1331@gmail.com>
+> This allows to pass PTS tests BAP/UCL/STR/BV-543-C and BV-546-C.
 > ---
->  net/bluetooth/iso.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  profiles/audio/bap.c       | 44 +++++++++++++++++++++++++++++
+>  profiles/audio/transport.c | 57 +++++++++++++++++++++++++++++++-------
+>  2 files changed, 91 insertions(+), 10 deletions(-)
 >
-> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> index be145e2736b7..14963ba68597 100644
-> --- a/net/bluetooth/iso.c
-> +++ b/net/bluetooth/iso.c
-> @@ -1169,6 +1169,7 @@ static int iso_sock_connect(struct socket *sock, st=
-ruct sockaddr_unsized *addr,
->         struct sockaddr_iso *sa =3D (struct sockaddr_iso *)addr;
->         struct sock *sk =3D sock->sk;
->         int err;
-> +       bool bcast;
+> diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+> index 375026440..8f1f75240 100644
+> --- a/profiles/audio/bap.c
+> +++ b/profiles/audio/bap.c
+> @@ -2651,13 +2651,57 @@ static void bap_connect_bcast_io_cb(GIOChannel *c=
+han, GError *err,
+>         iso_connect_bcast_cb(chan, err, setup->stream);
+>  }
 >
->         BT_DBG("sk %p", sk);
->
-> @@ -1191,9 +1192,11 @@ static int iso_sock_connect(struct socket *sock, s=
-truct sockaddr_unsized *addr,
->         bacpy(&iso_pi(sk)->dst, &sa->iso_bdaddr);
->         iso_pi(sk)->dst_type =3D sa->iso_bdaddr_type;
->
-> +       bcast =3D !bacmp(&iso_pi(sk)->dst, BDADDR_ANY);
+> +struct connect_io_data {
+> +       GIOChannel *chan;
+> +       GError *err;
+> +       uint8_t cig_id;
+> +};
 > +
->         release_sock(sk);
+> +static bool find_enabling_stream(const void *data, const void *match_dat=
+a)
+> +{
+> +       const struct bap_setup *setup =3D data;
+> +       const struct connect_io_data *d =3D match_data;
+> +       uint8_t state;
+> +
+> +       state =3D bt_bap_stream_get_state(setup->stream);
+> +       if (state =3D=3D BT_BAP_STREAM_STATE_ENABLING &&
+> +                       setup->qos.ucast.cig_id =3D=3D d->cig_id)
+> +               iso_connect_cb(d->chan, d->err, setup->stream);
+> +
+> +       return false;
+> +}
+> +
+> +static bool find_enabling_ep(const void *data, const void *match_data)
+> +{
+> +       const struct bap_ep *ep =3D data;
+> +
+> +       if (ep->setups)
+> +               queue_find(ep->setups, find_enabling_stream, match_data);
+> +
+> +       return false;
+> +}
+> +
+>  static void bap_connect_io_cb(GIOChannel *chan, GError *err, gpointer us=
+er_data)
+>  {
+>         struct bap_setup *setup =3D user_data;
+> +       struct connect_io_data data;
 >
-> -       if (bacmp(&iso_pi(sk)->dst, BDADDR_ANY))
-> +       if (!bcast)
->                 err =3D iso_connect_cis(sk);
->         else
->                 err =3D iso_connect_bis(sk);
+>         if (!setup->stream)
+>                 return;
+>
+> +       if (bt_bap_stream_get_state(setup->stream) !=3D
+> +                        BT_BAP_STREAM_STATE_ENABLING) {
+> +               /* The stream may have manually been unliked for tests an=
+d the
+> +                * connect event refers to another stream of the CIG.
+
+If this is happening it already means the setup shouldn't be waiting
+for a connect IO to begin with. Alternatively, the problem might be
+that it will connect regardless because the CIS is bidirectional;
+connecting one stream connects both. However, one stream might have
+the defer setup marked. Did you check that? And in that case we should
+consider it connected, or maybe we should not advance and send the
+start operation if it is still deferred.
+
+> +                */
+> +               data.chan =3D chan;
+> +               data.err =3D err;
+> +               data.cig_id =3D setup->qos.ucast.cig_id;
+> +               queue_find(setup->ep->data->snks, find_enabling_ep, &data=
+);
+> +               queue_find(setup->ep->data->srcs, find_enabling_ep, &data=
+);
+> +               return;
+> +       }
+> +
+>         iso_connect_cb(chan, err, setup->stream);
+>  }
+>
+> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+> index d9feef768..794c492af 100644
+> --- a/profiles/audio/transport.c
+> +++ b/profiles/audio/transport.c
+> @@ -37,6 +37,7 @@
+>  #include "src/shared/bap.h"
+>  #include "src/shared/bass.h"
+>  #include "src/shared/io.h"
+> +#include "src/btd.h"
+>
+>  #ifdef HAVE_A2DP
+>  #include "avdtp.h"
+> @@ -114,6 +115,7 @@ struct bap_transport {
+>  struct media_transport_ops {
+>         const char *uuid;
+>         const GDBusPropertyTable *properties;
+> +       const GDBusPropertyTable *test_properties;
+>         void (*set_owner)(struct media_transport *transport,
+>                                 struct media_owner *owner);
+>         void (*remove_owner)(struct media_transport *transport,
+> @@ -1417,6 +1419,9 @@ static struct media_transport *find_transport_by_pa=
+th(const char *path)
+>         return NULL;
+>  }
+>
+> +static void bap_update_links(const struct media_transport *transport);
+> +static void transport_unlink(void *data, void *user_data);
+> +
+>  static void set_links(const GDBusPropertyTable *property,
+>                                 DBusMessageIter *iter,
+>                                 GDBusPendingPropertySet id, void *user_da=
+ta)
+> @@ -1434,6 +1439,16 @@ static void set_links(const GDBusPropertyTable *pr=
+operty,
+>
+>         dbus_message_iter_recurse(iter, &array);
+>
+> +       if (dbus_message_iter_get_arg_type(&array) =3D=3D DBUS_TYPE_INVAL=
+ID) {
+> +               struct queue *links =3D bt_bap_stream_io_get_links(bap->s=
+tream);
+> +
+> +               /* Unlink stream from all its links */
+> +               queue_foreach(links, transport_unlink, bap->stream);
+> +
+> +               bt_bap_stream_io_unlink(bap->stream, NULL);
+> +               bap_update_links(transport);
+> +       }
+> +
+>         while (dbus_message_iter_get_arg_type(&array) =3D=3D
+>                                                 DBUS_TYPE_OBJECT_PATH) {
+>                 struct media_transport *link;
+> @@ -1484,6 +1499,21 @@ static const GDBusPropertyTable transport_bap_uc_p=
+roperties[] =3D {
+>         { }
+>  };
+>
+> +static const GDBusPropertyTable transport_bap_uc_test_properties[] =3D {
+> +       { "Device", "o", get_device },
+> +       { "UUID", "s", get_uuid },
+> +       { "Codec", "y", get_codec },
+> +       { "Configuration", "ay", get_configuration },
+> +       { "State", "s", get_state },
+> +       { "QoS", "a{sv}", get_ucast_qos, NULL, qos_ucast_exists },
+> +       { "Endpoint", "o", get_endpoint, NULL, endpoint_exists },
+> +       { "Location", "u", get_location },
+> +       { "Metadata", "ay", get_metadata, set_metadata },
+> +       { "Links", "ao", get_links, set_links, links_exists },
+> +       { "Volume", "q", get_volume, set_volume, volume_exists },
+> +       { }
+> +};
+> +
+>  static gboolean get_bcast_qos(const GDBusPropertyTable *property,
+>                                         DBusMessageIter *iter, void *data=
+)
+>  {
+> @@ -1879,8 +1909,6 @@ static void bap_resume_complete(struct media_transp=
+ort *transport)
+>         transport_set_state(transport, TRANSPORT_STATE_ACTIVE);
+>  }
+>
+> -static void bap_update_links(const struct media_transport *transport);
+> -
+>  static bool match_link_transport(const void *data, const void *user_data=
+)
+>  {
+>         const struct bt_bap_stream *stream =3D data;
+> @@ -2535,10 +2563,11 @@ static void *transport_asha_init(struct media_tra=
+nsport *transport, void *data)
+>  #define TRANSPORT_OPS(_uuid, _props, _set_owner, _remove_owner, _init, \
+>                       _resume, _suspend, _cancel, _set_state, _get_stream=
+, \
+>                       _get_volume, _set_volume, _set_delay, _update_links=
+, \
+> -                     _destroy) \
+> +                     _destroy, _test_props) \
+>  { \
+>         .uuid =3D _uuid, \
+>         .properties =3D _props, \
+> +       .test_properties =3D _test_props, \
+>         .set_owner =3D _set_owner, \
+>         .remove_owner =3D _remove_owner, \
+>         .init =3D _init, \
+> @@ -2560,26 +2589,28 @@ static void *transport_asha_init(struct media_tra=
+nsport *transport, void *data)
+>                         transport_a2dp_resume, transport_a2dp_suspend, \
+>                         transport_a2dp_cancel, NULL, \
+>                         transport_a2dp_get_stream, transport_a2dp_get_vol=
+ume, \
+> -                       _set_volume, _set_delay, NULL, _destroy)
+> +                       _set_volume, _set_delay, NULL, _destroy, NULL)
+>
+>  #define BAP_OPS(_uuid, _props, _set_owner, _remove_owner, _update_links,=
+ \
+> -               _set_state) \
+> +               _set_state, _test_props) \
+>         TRANSPORT_OPS(_uuid, _props, _set_owner, _remove_owner,\
+>                         transport_bap_init, \
+>                         transport_bap_resume, transport_bap_suspend, \
+>                         transport_bap_cancel, _set_state, \
+>                         transport_bap_get_stream, transport_bap_get_volum=
+e, \
+>                         transport_bap_set_volume, NULL, \
+> -                       _update_links, transport_bap_destroy)
+> +                       _update_links, transport_bap_destroy, _test_props=
+)
+>
+>  #define BAP_UC_OPS(_uuid) \
+>         BAP_OPS(_uuid, transport_bap_uc_properties, \
+>                         transport_bap_set_owner, transport_bap_remove_own=
+er, \
+> -                       transport_bap_update_links_uc, transport_bap_set_=
+state)
+> +                       transport_bap_update_links_uc, \
+> +                       transport_bap_set_state, \
+> +                       transport_bap_uc_test_properties)
+>
+>  #define BAP_BC_OPS(_uuid) \
+>         BAP_OPS(_uuid, transport_bap_bc_properties, NULL, NULL, \
+> -                       transport_bap_update_links_bc, NULL)
+> +                       transport_bap_update_links_bc, NULL, NULL)
+>
+>  #define ASHA_OPS(_uuid) \
+>         TRANSPORT_OPS(_uuid, transport_asha_properties, NULL, NULL, \
+> @@ -2587,7 +2618,7 @@ static void *transport_asha_init(struct media_trans=
+port *transport, void *data)
+>                         transport_asha_resume, transport_asha_suspend, \
+>                         transport_asha_cancel, NULL, NULL, \
+>                         transport_asha_get_volume, transport_asha_set_vol=
+ume, \
+> -                       NULL, NULL, NULL)
+> +                       NULL, NULL, NULL, NULL)
+>
+>  static const struct media_transport_ops transport_ops[] =3D {
+>  #ifdef HAVE_A2DP
+> @@ -2642,6 +2673,7 @@ struct media_transport *media_transport_create(stru=
+ct btd_device *device,
+>         struct media_transport *transport;
+>         const struct media_transport_ops *ops;
+>         int fd;
+> +       const GDBusPropertyTable *properties;
+>
+>         transport =3D g_new0(struct media_transport, 1);
+>         if (device)
+> @@ -2696,9 +2728,14 @@ struct media_transport *media_transport_create(str=
+uct btd_device *device,
+>                         goto fail;
+>         }
+>
+> +       if (btd_opts.testing && ops->test_properties)
+> +               properties =3D ops->test_properties;
+> +       else
+> +               properties =3D ops->properties;
+> +
+>         if (g_dbus_register_interface(btd_get_dbus_connection(),
+>                                 transport->path, MEDIA_TRANSPORT_INTERFAC=
+E,
+> -                               transport_methods, NULL, ops->properties,
+> +                               transport_methods, NULL, properties,
+>                                 transport, media_transport_free) =3D=3D F=
+ALSE) {
+>                 error("Could not register transport %s", transport->path)=
+;
+>                 goto fail;
 > --
-> 2.52.0
+> 2.43.0
+>
 >
 
-https://sashiko.dev/#/patchset/20260418053401.128483-1-suunj1331%40gmail.co=
-m
-
-Seems valid, so we migth just use sa in the place of iso_pi(sk) to
-avoid using it without sk being locked. Other problems it may reveal
-need to be addressed in separate patches.
 
 --=20
 Luiz Augusto von Dentz
