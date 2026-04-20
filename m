@@ -1,48 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456F83A5421;
-	Mon, 20 Apr 2026 13:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EC63CC9F4;
+	Mon, 20 Apr 2026 13:17:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691022; cv=none; b=LZjZ/XemkTmWL1wNH98dMhuUQuSvc5+YcRV2NRLgqwWpprx9QDLuIL8LgzH/so/6Ib1UplubnBUCDFtNHZT3ng5uKukk6L2tHhwfRijAGDJ83HrEyMgU15lEOV6cdDDh+tIFo87nLUmR8UTswgTjRYuSiYVZlana5HDVR8yHQjo=
+	t=1776691067; cv=none; b=nbHJizljjPMhTOcQY/mkrL/EwMmjt3VOKBhEL4M2USiglIZxcsziwG+czd98fLc5gUsmeS847DHc3kf7QN3heM1MjT0H8//gZNwuYd88eBB2z+2lIXgvapqvG3Hff9WaVTxKil8lj2VNGGHdvel/VV7oz+W9rw3qqDtaP9saYck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691022; c=relaxed/simple;
-	bh=o2BQ8tLO1WJSMZ5lUAftphaYlqLGzweqzJDt9RDrhPc=;
+	s=arc-20240116; t=1776691067; c=relaxed/simple;
+	bh=1BnUsJ9rtrA+zccP0lKv+OjEToMSdEhfzh6+sSmolwQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Mb1SYNtyCAnxj3CHNObbWLxw/fqqx/6Lvd68ZT0/OXpur6B+3FCxMNLvvbZjOGnTWMotDoH6r5XkStDrwPw3bfRIYHBVej0d5lEEhnMfwOUCNJOhyiOegbjiN8y+fib+iP6jUgjY0PCcQI14YuKuczzCNSXlnm+j0b+BJqrBHzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E9TuX5zn; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=SJ90cdXf6m5VTMBt62WYaqfQSFBP1MufPGASd+ZjRBuwR/ZxdXzTLLBbk50453pQhVvv3TnDXoSUCBfjT+JE8i8cXMihjbqHx5W1bwpuDBZIQ8IgiKBeCTIpuM2Hf+xGFK9+4jYWYQzovQZ6nLjNpjXqMElDRn6JmcgZp5mt0TE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KCcHaTcB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E9TuX5zn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C592BC2BCB4;
-	Mon, 20 Apr 2026 13:17:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KCcHaTcB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26673C2BCB9;
+	Mon, 20 Apr 2026 13:17:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691022;
-	bh=o2BQ8tLO1WJSMZ5lUAftphaYlqLGzweqzJDt9RDrhPc=;
+	s=k20201202; t=1776691067;
+	bh=1BnUsJ9rtrA+zccP0lKv+OjEToMSdEhfzh6+sSmolwQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=E9TuX5zndlpMP6skowVUy2QRHERihd6Ftu6tSFdCxMYGxGnEdREWUsJnR48cJi6GY
-	 gfGlNTmBZGS9BAh91ufyj7DuHA2r2h5BEQSB4v56ghUzge99Bnzc7LiMG8mD/M7hNy
-	 HbTizB8V71Y4xbDY4migjqIbzBVZqgnvEXeCzcOlKdyzZlYBEyA1N4muG5rPC6p982
-	 joAIjMzZpgiJA/dNt2OU4xhraWzs91TAGe1wy2+jORC1YiTsqoEeaeEaoD+VJVb7yM
-	 sgwUsnBkbRkatEUt8WQ+0eZmCx0/tXdqmACAwYseLzrIPRYmTLDWyub49XimQAfRF6
-	 Ylk6Co7VYG1qQ==
+	b=KCcHaTcBm1NVlUdKyDheb2LRPJAjpUhV1ASZr2DscPx8UIJJtQ5wU5Mixt1PBwIiF
+	 7rO6LSHtFHGX4ZBlOaIMLpLLL4PDdSoUCCoaZZJh2lZbw8ZpCMN05YwV+cy9Mq6ms2
+	 8vkwtpGnV6c73yNtFQ+o4B/b/Mch0A70J3YV57QBvSpT25M410/HM1UAF9OVyBN8bZ
+	 atAhljH9xRpTr01aRFAL6BCWSu5FZiLll8SBZR3jnxf+FPEt1Extvf7qmy7IsYVUB0
+	 Cvyix52NURo83NCFuTrH4yq9H9VYh1RZAhEHbEK48uN5BDhTS9svSE8iD+MtzkNgVe
+	 0kmUUUluAgedw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Shuai Zhang <shuai.zhang@oss.qualcomm.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
+Cc: Stefano Radaelli <stefano.r@variscite.com>,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
-	brgl@kernel.org,
 	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
-	linux-arm-msm@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 7.0-6.6] Bluetooth: hci_qca: Fix missing wakeup during SSR memdump handling
-Date: Mon, 20 Apr 2026 09:08:34 -0400
-Message-ID: <20260420131539.986432-48-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 7.0-6.19] Bluetooth: hci_ll: Enable BROKEN_ENHANCED_SETUP_SYNC_CONN for WL183x
+Date: Mon, 20 Apr 2026 09:09:00 -0400
+Message-ID: <20260420131539.986432-74-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420131539.986432-1-sashal@kernel.org>
 References: <20260420131539.986432-1-sashal@kernel.org>
@@ -58,268 +55,317 @@ X-stable-base: Linux 7.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+From: Stefano Radaelli <stefano.r@variscite.com>
 
-[ Upstream commit c347ca17d62a32c25564fee0ca3a2a7bc2d5fd6f ]
+[ Upstream commit 1c0bc11cd445ba8235ac8ec87d5999b6769ed8b9 ]
 
-When a Bluetooth controller encounters a coredump, it triggers the
-Subsystem Restart (SSR) mechanism. The controller first reports the
-coredump data and, once the upload is complete, sends a hw_error
-event. The host relies on this event to proceed with subsequent
-recovery actions.
+TI WL183x controllers advertise support for the HCI Enhanced Setup
+Synchronous Connection command, but SCO setup fails when the enhanced
+path is used. The only working configuration is to fall back to the
+legacy HCI Setup Synchronous Connection (0x0028).
 
-If the host has not finished processing the coredump data when the
-hw_error event is received, it waits until either the processing is
-complete or the 8-second timeout expires before handling the event.
+This matches the scenario described in commit 05abad857277
+("Bluetooth: HCI: Add HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk").
 
-The current implementation clears QCA_MEMDUMP_COLLECTION using
-clear_bit(), which does not wake up waiters sleeping in
-wait_on_bit_timeout(). As a result, the waiting thread may remain
-blocked until the timeout expires even if the coredump collection
-has already completed.
+Enable HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN automatically for
+devices compatible with:
+  - ti,wl1831-st
+  - ti,wl1835-st
+  - ti,wl1837-st
 
-Fix this by clearing QCA_MEMDUMP_COLLECTION with
-clear_and_wake_up_bit(), which also wakes up the waiting thread and
-allows the hw_error handling to proceed immediately.
-
-Test case:
-- Trigger a controller coredump using:
-    hcitool cmd 0x3f 0c 26
-- Tested on QCA6390.
-- Capture HCI logs using btmon.
-- Verify that the delay between receiving the hw_error event and
-  initiating the power-off sequence is reduced compared to the
-  timeout-based behavior.
-
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+Signed-off-by: Stefano Radaelli <stefano.r@variscite.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-Now I have all the information needed for a complete analysis. Let me
-compile it.
+Now let me compile the full analysis.
 
 ---
 
 ## PHASE 1: COMMIT MESSAGE FORENSICS
 
 ### Step 1.1: PARSE THE SUBJECT LINE
-- **Subsystem prefix:** Bluetooth: hci_qca
-- **Action verb:** "Fix" - explicitly a bug fix
-- **One-line summary:** Fix missing wakeup during SSR memdump handling -
-  `clear_bit()` doesn't wake up waiters sleeping in
-  `wait_on_bit_timeout()`.
+- **Subsystem prefix**: `Bluetooth: hci_ll:`
+- **Action verb**: "Enable" — enabling a quirk workaround for broken
+  hardware
+- **Summary**: Enable the BROKEN_ENHANCED_SETUP_SYNC_CONN quirk for TI
+  WL183x Bluetooth controllers because SCO setup fails when using the
+  enhanced path.
+
+Record: [Bluetooth: hci_ll] [Enable] [Hardware quirk for broken enhanced
+SCO setup on WL183x]
 
 ### Step 1.2: PARSE ALL COMMIT MESSAGE TAGS
-- **Reviewed-by:** Bartosz Golaszewski (Qualcomm contributor,
-  knowledgeable in this driver)
-- **Reviewed-by:** Paul Menzel (known active reviewer)
-- **Signed-off-by:** Shuai Zhang <shuai.zhang@oss.qualcomm.com> (author,
-  Qualcomm - QCA chipset vendor)
-- **Signed-off-by:** Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  (Bluetooth maintainer)
-- No Fixes: tag, no Reported-by, no syzbot. Absence of Fixes: is
-  expected.
+- **Signed-off-by: Stefano Radaelli** — patch author (Variscite
+  employee, embedded board vendor)
+- **Signed-off-by: Luiz Augusto von Dentz** — Bluetooth subsystem
+  maintainer who merged it
+- No Fixes: tag (expected for review candidates)
+- No Cc: stable (expected)
+- No Reported-by (author found the bug during hardware validation)
+- No Link: tags
+
+Record: Maintainer SOB from Luiz Augusto von Dentz. No syzbot, no
+explicit stable nomination.
 
 ### Step 1.3: ANALYZE THE COMMIT BODY TEXT
-- **Bug:** When Bluetooth controller encounters a coredump (SSR), it
-  sends memdump data then sends `hw_error` event. The host calls
-  `wait_on_bit_timeout()` on `QCA_MEMDUMP_COLLECTION` to wait for the
-  collection to complete. But the collection worker clears the bit with
-  `clear_bit()`, which does NOT wake up the waiter.
-- **Symptom:** The waiting thread blocks for the full 8-second timeout
-  (`MEMDUMP_TIMEOUT_MS = 8000`) even when collection finishes early.
-- **Root cause:** API misuse - `wait_on_bit_timeout()` documentation
-  explicitly requires wakeup via `wake_up_bit()` or
-  `clear_and_wake_up_bit()`.
-- **Test:** Tested on QCA6390 hardware using `hcitool` and btmon.
+The commit explains that TI WL183x controllers advertise support for HCI
+Enhanced Setup Synchronous Connection but SCO fails when the enhanced
+path is used. The only working configuration is to fall back to legacy
+HCI Setup Synchronous Connection (0x0028). This references commit
+05abad857277 which introduced the exact quirk for this scenario.
+
+Record: Bug = SCO audio setup fails on WL183x chips. Symptom = SCO
+connection failure. Root cause = controller claims enhanced setup
+support but it's broken.
 
 ### Step 1.4: DETECT HIDDEN BUG FIXES
-This is an explicitly stated bug fix, not disguised. The
-`wait_on_bit_timeout` API documentation (in `include/linux/wait_bit.h`)
-states: "The clearing of the bit must be signalled with wake_up_bit(),
-often as clear_and_wake_up_bit()." Using plain `clear_bit()` is an API
-violation.
+This is a **hardware quirk/workaround**, not a hidden fix. It's
+explicitly enabling an existing quirk for specific devices that are
+broken. This falls squarely into the "hardware quirk" exception category
+for stable.
+
+Record: This is a hardware workaround (quirk), a known exception
+category that IS appropriate for stable.
 
 ---
 
-## PHASE 2: DIFF ANALYSIS - LINE BY LINE
+## PHASE 2: DIFF ANALYSIS
 
 ### Step 2.1: INVENTORY THE CHANGES
-- **File:** `drivers/bluetooth/hci_qca.c` only
-- **Changes:** 2 lines changed (2 `clear_bit` → `clear_and_wake_up_bit`)
-- **Functions modified:** `qca_controller_memdump()` (2 locations)
-- **Scope:** Single-file, single-function surgical fix
+- **File**: `drivers/bluetooth/hci_ll.c`
+- **Lines added**: ~10 (1 struct field + 4 lines in probe + 3 lines in
+  setup)
+- **Functions modified**: `struct ll_device` (field addition),
+  `ll_setup()` (quirk setting), `hci_ti_probe()` (compatible detection)
+- **Scope**: Single-file, surgical change
+
+Record: 1 file, ~10 lines added, 3 locations modified. Small and
+contained.
 
 ### Step 2.2: UNDERSTAND THE CODE FLOW CHANGE
-**Hunk 1 (line 1108):** Error path when `hci_devcd_init()` fails:
-- Before: `clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags)` — clears bit
-  but no wakeup
-- After: `clear_and_wake_up_bit(QCA_MEMDUMP_COLLECTION, &qca->flags)` —
-  clears bit AND wakes waiting thread
+1. **struct ll_device**: adds `bool broken_enhanced_setup` field
+2. **hci_ti_probe()**: checks if device is compatible with
+   wl1831-st/wl1835-st/wl1837-st and sets the new bool
+3. **ll_setup()**: if `broken_enhanced_setup` is true, calls
+   `hci_set_quirk()` to set `HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN`
 
-**Hunk 2 (line 1186):** Normal completion path (last sequence received):
-- Before: same `clear_bit()` without wakeup
-- After: same `clear_and_wake_up_bit()` with wakeup
+Record: Probe detects WL183x compatible → stores flag → setup applies
+quirk during device initialization.
 
 ### Step 2.3: IDENTIFY THE BUG MECHANISM
-This is a **synchronization bug**: missing wakeup. The
-`qca_wait_for_dump_collection()` function calls `wait_on_bit_timeout()`
-which puts the thread to sleep waiting for the bit to be cleared AND a
-wakeup signal. Without the wakeup, the thread sleeps for the full
-8-second timeout.
+Category: **Hardware workaround** (h). The TI WL183x chips claim support
+for Enhanced Setup Synchronous Connection but it doesn't work. The quirk
+tells the Bluetooth stack to fall back to the legacy command.
+
+Record: Hardware quirk. Broken enhanced SCO command on WL183x. Fix = set
+existing quirk flag.
 
 ### Step 2.4: ASSESS THE FIX QUALITY
-- **Obviously correct:** Yes. The `wait_on_bit_timeout` documentation
-  explicitly states wakeup is required.
-- **Minimal:** Yes, 2 line changes.
-- **Regression risk:** Negligible. `clear_and_wake_up_bit()` does
-  exactly what `clear_bit()` does plus a wakeup. No new side effects.
+- Obviously correct — same pattern used by btusb.c for QCA and MTK
+  controllers
+- Minimal and surgical — only affects WL183x devices
+- Zero regression risk for non-WL183x devices (guarded by compatible
+  check)
+- Low regression risk for WL183x (just falls back to legacy SCO path
+  that works)
+
+Record: High quality, obviously correct, follows established pattern. No
+regression risk.
 
 ---
 
 ## PHASE 3: GIT HISTORY INVESTIGATION
 
 ### Step 3.1: BLAME THE CHANGED LINES
-- Line 1108 (`clear_bit`): Introduced by `06d3fdfcdf5cef` (Sai Teja
-  Aluvala, 2023-06-14) — v6.6-rc1
-- Line 1186 (`clear_bit`): Introduced by `7c2c3e63e1e97c` (Venkata
-  Lakshmi, 2020-02-14) — v5.7-rc1
-- `wait_on_bit_timeout` (line 1606): Introduced by `d841502c79e3fd`
-  (Balakrishna Godavarthi, 2020-01-02) — v5.6-rc1
+The areas being modified were introduced by:
+- `struct ll_device`: Rob Herring, 2017-04-13 (commit 371805522f8709) —
+  in tree since v4.13
+- `ll_setup()`: David Lechner, 2017-12-12 (commit 0e58d0cdb3eb6e) — in
+  tree since v4.16
+- `hci_ti_probe()`: Rob Herring, 2017-04-13 — in tree since v4.13
 
-So the bug at line 1186 has existed since v5.7, and the bug at line 1108
-since v6.6.
+Record: Code being modified is very old (v4.13-v4.16), present in all
+stable trees.
 
 ### Step 3.2: FOLLOW THE FIXES: TAG
-No Fixes: tag (expected).
+No Fixes: tag. The commit references 05abad857277 as context (the commit
+that added the quirk), not as a Fixes target.
 
-### Step 3.3: CHECK FILE HISTORY
-Recent changes to `hci_qca.c` are active (73 commits since v5.15). The
-file sees regular activity.
+Record: N/A — no Fixes tag, but the referenced quirk commit
+(05abad857277) exists since v5.19.
+
+### Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES
+Recent changes to hci_ll.c are mostly unrelated (firmware leak fix,
+alloc_obj conversion, hci_set_quirk API migration). No prerequisites
+needed.
+
+Record: Standalone change. No prerequisites beyond the existing quirk
+definition (v5.19+) and compatible strings (always existed).
 
 ### Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS
-Shuai Zhang is a Qualcomm contributor with multiple commits to the QCA
-Bluetooth stack. The fix was reviewed by the Bluetooth maintainer (Luiz
-Augusto von Dentz).
+Stefano Radaelli from Variscite is primarily an embedded/DTS contributor
+(imx8mp, imx93). This is their first Bluetooth subsystem commit. The
+patch was reviewed and merged by the Bluetooth maintainer (Luiz Augusto
+von Dentz).
+
+Record: Author is a hardware vendor contributor; patch was accepted by
+subsystem maintainer.
 
 ### Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS
-None. `clear_and_wake_up_bit()` has existed since v4.17. The fix is a
-drop-in replacement for `clear_bit()` at two locations.
+- `HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN` exists since v5.19 (commit
+  05abad857277)
+- `hci_set_quirk()` API exists since v6.16 (commit 6851a0c228fc04)
+- For stable trees v6.1-v6.15, the quirk must use
+  `set_bit(HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN,
+  &hu->hdev->quirks)` instead of `hci_set_quirk()`
+- v5.15 CANNOT receive this fix (quirk doesn't exist there)
+
+Record: Backportable to v6.1+ with minor API adjustment for trees before
+v6.16.
 
 ---
 
 ## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
 
-### Step 4.1-4.2: FIND THE ORIGINAL PATCH DISCUSSION
-Found at:
-https://yhbt.net/lore/lkml/177583080679.2077665.8641347877052929776.git-
-patchwork-notify@kernel.org/T/
+### Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION
+Found at patchew.org — this is v2 of a 2-version series. v1 used a DT
+property approach, and after review feedback from Krzysztof Kozlowski,
+v2 switched to detecting the compatible string. The patch went through
+proper review.
 
-The patch went through **7 revisions** (v1 through v7), indicating
-extensive review:
-- v5→v6: Changed from `wake_up_bit` to `clear_and_wake_up_bit` (the
-  proper API)
-- Applied to bluetooth-next by Luiz Augusto von Dentz (Bluetooth
-  maintainer)
-- Commit in bluetooth-next: `9f07d5d04826`
+Record: v1→v2 evolution. Reviewer suggested compatible-based detection
+instead of DT property. Final version is clean.
 
-### Step 4.3: BUG REPORT
-No external bug report — the author identified the issue through
-code/testing.
+### Step 4.2: CHECK WHO REVIEWED THE PATCH
+- Krzysztof Kozlowski reviewed v1 and suggested the approach used in v2
+- Luiz Augusto von Dentz (Bluetooth maintainer) merged the patch
+- David Lechner and Marcel Holtmann were CC'd
 
-### Step 4.4-4.5: RELATED PATCHES AND STABLE HISTORY
-This is a standalone single-patch fix. No series dependencies.
+Record: Proper review by DT and Bluetooth maintainers.
+
+### Step 4.3: SEARCH FOR THE BUG REPORT
+The author (Variscite) found this during platform validation. The linked
+bugzilla (215576) for the original quirk commit shows this is a known
+class of bugs across multiple BT controller vendors (QCA, MTK, and now
+TI WL183x).
+
+Record: Real hardware bug affecting real products.
+
+### Step 4.4: CHECK FOR RELATED PATCHES AND SERIES
+This is a standalone patch (v2 0/1 series). No dependencies on other
+patches.
+
+Record: Standalone, no series dependencies.
+
+### Step 4.5: CHECK STABLE MAILING LIST HISTORY
+No prior stable discussion found for this specific commit.
+
+Record: No prior stable discussion.
 
 ---
 
 ## PHASE 5: CODE SEMANTIC ANALYSIS
 
-### Step 5.1-5.4: KEY FUNCTIONS AND CALL CHAINS
-The affected path:
-1. Bluetooth controller crashes → sends memdump data → sends `hw_error`
-   event
-2. `qca_hw_error()` or `qca_reset()` → calls
-   `qca_wait_for_dump_collection()` → `wait_on_bit_timeout()` on
-   `QCA_MEMDUMP_COLLECTION`
-3. Concurrently, `qca_controller_memdump()` (workqueue) processes dump
-   packets
-4. On completion, `qca_controller_memdump()` clears
-   `QCA_MEMDUMP_COLLECTION` — but without waking up the waiter in step 2
-5. Result: waiter in step 2 sleeps for full 8 seconds even though
-   collection finished
+### Step 5.1-5.4: IDENTIFY KEY FUNCTIONS AND TRACE CALL CHAINS
+- `hci_ti_probe()` → called during device enumeration when DT compatible
+  matches
+- `ll_setup()` → called during HCI device setup (hci_uart_proto.setup)
+- `enhanced_sync_conn_capable()` → checked in `hci_conn.c` and `sco.c`
+  when setting up SCO connections
+- The quirk prevents `HCI_OP_ENHANCED_SETUP_SYNC_CONN` from being used,
+  falling back to `HCI_OP_SETUP_SYNC_CONN`
 
-Both `qca_hw_error()` and `qca_reset()` call
-`qca_wait_for_dump_collection()`, so both paths are affected.
+Record: The quirk controls a well-defined code path in SCO connection
+setup. Impact is limited to SCO/audio on affected devices.
 
-### Step 5.5: SIMILAR PATTERNS
-No other `clear_bit`/`wait_on_bit_timeout` mismatches found in this
-file.
+### Step 5.5: SEARCH FOR SIMILAR PATTERNS
+The exact same quirk is set for QCA (commit d44e1dbda36ff) and MTK
+(commit e11523e97f474) controllers in btusb.c. This is an established,
+well-tested pattern.
+
+Record: Identical pattern used for 2 other controller families.
 
 ---
 
 ## PHASE 6: CROSS-REFERENCING AND STABLE TREE ANALYSIS
 
 ### Step 6.1: DOES THE BUGGY CODE EXIST IN STABLE TREES?
-- The `clear_bit` at the completion path (line 1186) has been present
-  since v5.7, so it exists in stable trees 5.10.y, 5.15.y, 6.1.y, 6.6.y,
-  6.12.y.
-- The `clear_bit` at the error path (line 1108) was introduced in v6.6,
-  so only in 6.6.y, 6.12.y.
+- The hci_ll driver with WL183x compatibles exists in all stable trees
+  (v4.13+)
+- The quirk mechanism exists in v5.19+ (v6.1.y, v6.6.y, v6.12.y stable
+  trees)
+- The `hci_set_quirk()` API only exists in v6.16+; older trees use
+  `set_bit()`
 
-### Step 6.2: BACKPORT COMPLICATIONS
-The patch should apply cleanly or with minor context adjustments. The
-two lines being changed are simple API call replacements. Older trees
-may not have the first hunk (line 1108) since that code was added in
-v6.6.
+Record: The bug exists in v6.1+, v6.6+, v6.12+ stable trees. Fix is
+applicable with minor API adjustment.
 
-### Step 6.3: RELATED FIXES ALREADY IN STABLE
-No related fixes for this specific bug found.
+### Step 6.2: CHECK FOR BACKPORT COMPLICATIONS
+- For v6.16+ (v7.0 target): clean apply
+- For v6.1-v6.15: needs `set_bit()` instead of `hci_set_quirk()` —
+  trivial one-line change
+
+Record: Clean apply to v7.0. Minor adjustment for older stable trees.
+
+### Step 6.3: CHECK IF RELATED FIXES ARE ALREADY IN STABLE
+No other fix for WL183x SCO exists in any stable tree.
+
+Record: No related fixes in stable.
 
 ---
 
 ## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
 
-### Step 7.1: SUBSYSTEM CRITICALITY
-- **Subsystem:** drivers/bluetooth — Bluetooth driver for Qualcomm
-  chipsets
-- **Criticality:** IMPORTANT — QCA Bluetooth chipsets are widely used in
-  laptops, phones, and embedded systems
+### Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY
+- Subsystem: Bluetooth (drivers/bluetooth) — IMPORTANT
+- Affects users of TI WL183x Bluetooth modules on embedded platforms
+  (Variscite boards, etc.)
 
-### Step 7.2: SUBSYSTEM ACTIVITY
-Active subsystem with regular commits.
+Record: Bluetooth driver, IMPORTANT subsystem, embedded hardware
+audience.
+
+### Step 7.2: ASSESS SUBSYSTEM ACTIVITY
+The Bluetooth subsystem is actively maintained by Luiz Augusto von
+Dentz. The hci_ll driver sees moderate activity.
+
+Record: Active subsystem, moderate driver activity.
 
 ---
 
 ## PHASE 8: IMPACT AND RISK ASSESSMENT
 
-### Step 8.1: AFFECTED POPULATION
-Users of QCA Bluetooth chipsets (QCA6390 and similar) — a significant
-population in the Android and laptop ecosystem.
+### Step 8.1: DETERMINE WHO IS AFFECTED
+Users of TI WL1831/WL1835/WL1837 Bluetooth modules. These are common on
+embedded ARM platforms (iMX, TI AM series, etc.) particularly for IoT
+and automotive applications.
 
-### Step 8.2: TRIGGER CONDITIONS
-Triggered when the Bluetooth controller crashes and SSR begins. Not
-common in normal operation, but when it happens (coredump, hw error),
-the 8-second unnecessary delay is always present.
+Record: Driver-specific, but significant embedded user base.
 
-### Step 8.3: FAILURE MODE SEVERITY
-- **Failure mode:** Unnecessary 8-second delay during Bluetooth recovery
-  after controller crash
-- **Severity:** MEDIUM — Not a crash, not data corruption, not a
-  security issue. It's a latency bug during error recovery that affects
-  usability.
+### Step 8.2: DETERMINE THE TRIGGER CONDITIONS
+Trigger: Any attempt to use SCO/HFP audio over Bluetooth on affected
+WL183x hardware. This is a common use case (phone calls, headsets).
 
-### Step 8.4: RISK-BENEFIT RATIO
-- **Benefit:** Eliminates unnecessary 8-second delay during SSR
-  recovery. Correct API usage per documentation.
-- **Risk:** Very low — 2-line change, `clear_and_wake_up_bit` is a
-  strict superset of `clear_bit` (clear + wakeup). No new side effects.
-- **Ratio:** Very favorable — minimal risk for a real improvement in
-  error recovery behavior.
+Record: Common trigger (SCO audio setup), happens every time audio is
+used.
+
+### Step 8.3: DETERMINE THE FAILURE MODE SEVERITY
+Without this fix, SCO audio connections simply fail. Users cannot use
+Bluetooth audio functionality (HFP/HSP profiles). This is a **functional
+failure** — a complete feature doesn't work.
+
+Record: Functional failure — SCO audio doesn't work at all. Severity:
+HIGH (complete loss of Bluetooth audio functionality).
+
+### Step 8.4: CALCULATE RISK-BENEFIT RATIO
+- **BENEFIT**: HIGH — enables Bluetooth audio on WL183x hardware
+- **RISK**: VERY LOW — 10 lines of code, only affects WL183x devices,
+  uses a well-tested quirk mechanism already proven with QCA and MTK
+- **Ratio**: Very favorable for backporting
+
+Record: Benefit HIGH, Risk VERY LOW. Clear favorable ratio.
 
 ---
 
@@ -327,104 +373,119 @@ the 8-second unnecessary delay is always present.
 
 ### Step 9.1: COMPILE THE EVIDENCE
 
-**FOR backporting:**
-- Fixes a genuine API misuse bug (`clear_bit` instead of
-  `clear_and_wake_up_bit`)
-- 2-line surgical fix, trivially correct per API documentation
-- Extensively reviewed (7 revisions), 2 Reviewed-by tags
-- Applied by Bluetooth maintainer
-- Tested on real hardware (QCA6390)
-- Very low regression risk
-- Bug exists since v5.7 for one path and v6.6 for the other
-- `clear_and_wake_up_bit()` exists since v4.17, no dependency issues
+**Evidence FOR backporting:**
+- Fixes a real hardware bug: SCO audio completely fails on WL183x
+- Hardware quirk — a recognized exception category for stable
+- Small, surgical change (~10 lines, single file)
+- Uses an established pattern (same quirk for QCA and MTK controllers)
+- Reviewed and merged by Bluetooth subsystem maintainer
+- Zero regression risk for non-affected devices
+- The driver and compatible strings exist in all stable trees
+- The quirk definition exists in v6.1+
 
-**AGAINST backporting:**
-- The bug doesn't cause crashes, data corruption, or security issues
-- Only manifests during SSR (error recovery), not during normal
-  operation
-- It's a latency/usability improvement rather than a fix for a hard
-  failure
+**Evidence AGAINST backporting:**
+- No Fixes: tag or explicit stable nomination (but expected for review
+  candidates)
+- Author is not a regular BT subsystem contributor (but patch was
+  accepted by maintainer)
+- Needs trivial API adjustment for stable trees < v6.16 (set_bit vs
+  hci_set_quirk)
+
+**UNRESOLVED:**
+- None significant
 
 ### Step 9.2: STABLE RULES CHECKLIST
-1. **Obviously correct and tested?** YES — API documentation is
-   explicit, tested on hardware
-2. **Fixes a real bug?** YES — missing wakeup causing unnecessary
-   8-second delay
-3. **Important issue?** MEDIUM — recovery delay, not crash/corruption
-4. **Small and contained?** YES — 2 lines in 1 file
-5. **No new features or APIs?** YES — just corrects API usage
-6. **Can apply to stable trees?** YES — `clear_and_wake_up_bit` exists
-   since v4.17
+1. Obviously correct and tested? **YES** — tested on WL183x hardware,
+   follows existing pattern
+2. Fixes a real bug? **YES** — SCO audio fails completely
+3. Important issue? **YES** — complete loss of Bluetooth audio
+   functionality
+4. Small and contained? **YES** — ~10 lines, single file
+5. No new features or APIs? **YES** — just enables existing quirk for
+   additional devices
+6. Can apply to stable trees? **YES** — clean apply to 7.0, minor
+   adjustment for older trees
 
-### Step 9.3: EXCEPTION CATEGORIES
-Not applicable — this is a standard bug fix.
+### Step 9.3: CHECK FOR EXCEPTION CATEGORIES
+This falls into the **hardware quirk/workaround** exception category.
+Adding a quirk to an existing driver for broken hardware is explicitly
+listed as appropriate for stable.
 
 ### Step 9.4: DECISION
-The fix is tiny, obviously correct, well-reviewed, and addresses a real
-bug where `wait_on_bit_timeout()` is used with `clear_bit()` instead of
-`clear_and_wake_up_bit()`, causing an unnecessary 8-second blocking
-delay during Bluetooth error recovery. While the impact is "only" a
-latency issue during recovery (not a crash or data loss), the extremely
-low risk of the fix and the real user-visible improvement make this
-appropriate for stable.
+This is a textbook hardware quirk for stable. It's small, obviously
+correct, fixes a real functional failure (no Bluetooth audio on WL183x),
+follows an established pattern, and carries virtually no regression
+risk.
 
 ---
 
 ## Verification
 
-- [Phase 1] Parsed tags: Reviewed-by from Bartosz Golaszewski and Paul
-  Menzel; SOB from author and Bluetooth maintainer
-- [Phase 2] Diff analysis: 2 lines changed in
-  `qca_controller_memdump()`, replacing `clear_bit()` with
-  `clear_and_wake_up_bit()`
-- [Phase 3] git blame: Line 1108 introduced in `06d3fdfcdf5cef`
-  (v6.6-rc1); Line 1186 introduced in `7c2c3e63e1e97c` (v5.7-rc1);
-  `wait_on_bit_timeout` introduced in `d841502c79e3fd` (v5.6-rc1)
-- [Phase 3] git describe: `clear_and_wake_up_bit` introduced in
-  `8236b0ae31c83` (v4.17-rc4), present in all active stable trees
-- [Phase 4] lore thread found: patch went through v1→v7, applied to
-  bluetooth-next by maintainer as `9f07d5d04826`
-- [Phase 4] No NAKs or objections in the discussion thread
-- [Phase 5] Call chain: `qca_hw_error()`/`qca_reset()` →
-  `qca_wait_for_dump_collection()` → `wait_on_bit_timeout()` waits for
-  bit cleared by `qca_controller_memdump()` workqueue
-- [Phase 5] Verified `wait_on_bit_timeout()` documentation in
-  `include/linux/wait_bit.h` lines 118-120 explicitly requires
-  `clear_and_wake_up_bit()`
-- [Phase 6] Buggy code exists in stable trees 5.10+, 5.15+, 6.1+, 6.6+,
-  6.12+ (second hunk); 6.6+, 6.12+ (first hunk)
-- [Phase 6] `MEMDUMP_TIMEOUT_MS` is 8000 (8 seconds) — confirmed at line
-  54
-- [Phase 8] Failure mode: 8-second unnecessary delay during Bluetooth
-  SSR recovery, severity MEDIUM
+- [Phase 1] Parsed commit message: no Fixes: tag, no Reported-by,
+  maintainer SOB from Luiz von Dentz
+- [Phase 2] Diff analysis: ~10 lines added to 1 file, 3 locations
+  (struct, probe, setup). Adds bool flag and quirk setting
+- [Phase 3] git blame: code modified dates to v4.13-v4.16
+  (371805522f8709, 0e58d0cdb3eb6e), present in all stable trees
+- [Phase 3] git show 05abad857277d: confirmed original quirk commit
+  exists since v5.19
+- [Phase 3] git merge-base checks: quirk in v5.19+, hci_set_quirk API in
+  v6.16+ only
+- [Phase 3] Verified WL183x compatibles exist in v5.15, v6.1, v6.6,
+  v6.12
+- [Phase 4] Found original submission on patchew.org: v2 series, v1→v2
+  evolution per reviewer feedback
+- [Phase 4] Review discussion: Krzysztof Kozlowski suggested compatible-
+  based approach
+- [Phase 5] Verified identical quirk pattern used for QCA
+  (d44e1dbda36ff) and MTK (e11523e97f474) in btusb.c
+- [Phase 6] Verified quirk does NOT exist in v5.15 (cannot backport
+  there), EXISTS in v6.1+
+- [Phase 6] Verified hci_set_quirk() NOT in v6.12/v6.15; older trees
+  need set_bit() instead
+- [Phase 8] Failure mode: complete SCO audio failure on WL183x hardware.
+  Severity: HIGH
 
 **YES**
 
- drivers/bluetooth/hci_qca.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/bluetooth/hci_ll.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index edc907c4e870a..524e47392f919 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1105,7 +1105,7 @@ static void qca_controller_memdump(struct work_struct *work)
- 				qca->qca_memdump = NULL;
- 				qca->memdump_state = QCA_MEMDUMP_COLLECTED;
- 				cancel_delayed_work(&qca->ctrl_memdump_timeout);
--				clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
-+				clear_and_wake_up_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
- 				clear_bit(QCA_IBS_DISABLED, &qca->flags);
- 				mutex_unlock(&qca->hci_memdump_lock);
- 				return;
-@@ -1183,7 +1183,7 @@ static void qca_controller_memdump(struct work_struct *work)
- 			kfree(qca->qca_memdump);
- 			qca->qca_memdump = NULL;
- 			qca->memdump_state = QCA_MEMDUMP_COLLECTED;
--			clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
-+			clear_and_wake_up_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
- 		}
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index 91c96ad123422..ab744001dafc4 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -68,6 +68,7 @@ struct ll_device {
+ 	struct gpio_desc *enable_gpio;
+ 	struct clk *ext_clk;
+ 	bdaddr_t bdaddr;
++	bool broken_enhanced_setup;
+ };
  
- 		mutex_unlock(&qca->hci_memdump_lock);
+ struct ll_struct {
+@@ -658,6 +659,10 @@ static int ll_setup(struct hci_uart *hu)
+ 			hci_set_quirk(hu->hdev, HCI_QUIRK_INVALID_BDADDR);
+ 	}
+ 
++	if (lldev->broken_enhanced_setup)
++		hci_set_quirk(hu->hdev,
++			      HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN);
++
+ 	/* Operational speed if any */
+ 	if (hu->oper_speed)
+ 		speed = hu->oper_speed;
+@@ -712,6 +717,11 @@ static int hci_ti_probe(struct serdev_device *serdev)
+ 	of_property_read_u32(serdev->dev.of_node, "max-speed", &max_speed);
+ 	hci_uart_set_speeds(hu, 115200, max_speed);
+ 
++	if (of_device_is_compatible(serdev->dev.of_node, "ti,wl1831-st") ||
++	    of_device_is_compatible(serdev->dev.of_node, "ti,wl1835-st") ||
++	    of_device_is_compatible(serdev->dev.of_node, "ti,wl1837-st"))
++		lldev->broken_enhanced_setup = true;
++
+ 	/* optional BD address from nvram */
+ 	bdaddr_cell = nvmem_cell_get(&serdev->dev, "bd-address");
+ 	if (IS_ERR(bdaddr_cell)) {
 -- 
 2.53.0
 
