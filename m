@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB43C3D16E8;
-	Mon, 20 Apr 2026 13:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73EB23B3C12;
+	Mon, 20 Apr 2026 13:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691086; cv=none; b=U8W3u+6is5DZgj98Ze9rzqksZaJSGQ2Us8OXGKHIH7mhz9P8IlymlUTD4VAcmGHzBaEUNlVuZBQYhiQdbQ5Jdwhj2atQNbhgfLRzyrRfBaCNcvq8xXW6v5bhW16DKUn9J6obPkZNYHCYq7l53d+SdxtJhpt3J+CXSzdSY1Ivwew=
+	t=1776691406; cv=none; b=qV3VmV+4HkAxINJnlb1oZnBl7No0n5zze0ozK7euDZz0VzPbuRdUxD2ml+A1xvaeQkMGa0w3y9exYuYKuwlV6uYH3YWDfQqv1kl+91OnU5Be5FST6fAWtq1btE/kkbZJSqB9vHq+tD8q10jBs+CHdqeTA5s/ls1IGRUpKSetp/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691086; c=relaxed/simple;
+	s=arc-20240116; t=1776691406; c=relaxed/simple;
 	bh=E9cH7PuQ2b5BSKlFNo0n1LqxRO0ZWNDze2FOxEKZVDo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P6m62F8DbbiYUixObV/ftKNMTp8OKtr9XuN9DFhQP5F/55dHdgbYyKWOy8LXBp6AuewDp4M3wR3/QAIZMu/FlM+IhrQ8WZjeOOYQsVTbOHaAqfQhY2jrNJbmUBObC8YcVx1PxW3czUZEu0J50zvN20kDvhsMoTjA3f9a16zXya4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eLMiVTtQ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=NFsHyEVG0eHIl3bgG4sm7Kvhf3uB2P76/1EiT/qKR385H180Y2C/KDFRNtuRYxYzyP83FctmIF/mtStamHMAYwVUD2VFy83o4yERw86He7HeKqyEnQ0XzJ8tANrpiqw8F8KfF/YpH1w8OhTrCpq+ikx4y5cKlMI+AOal/g+qQik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P/1PwRKY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eLMiVTtQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FABDC2BCB6;
-	Mon, 20 Apr 2026 13:18:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P/1PwRKY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66C23C19425;
+	Mon, 20 Apr 2026 13:23:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691086;
+	s=k20201202; t=1776691406;
 	bh=E9cH7PuQ2b5BSKlFNo0n1LqxRO0ZWNDze2FOxEKZVDo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eLMiVTtQmJ11L/b0fSZshHTKo8HXHVMZTmA9zNQTsRay4MzrmFmyuMw8NzpnDl9ug
-	 2m2av9Q75PTrLSmsg5lXfpAqt6NIYKiF6QHPApJShfmaxXKkoZIge88HBkKDE5e/LZ
-	 eiYHpbDCZ0ZyluMeQfim0X4cYunTPyfGYpbOOaGxcfvNLbniFI/UZhoN7iObDC6ZoR
-	 CblrPPDPHhcGtDkxIpq42mYIhODDVvKP7oN3aNABwU7rkfOD+xp+MctPZ9wyX15HTo
-	 HXOakphyD582Bk3tx4rAuIqSnarmr15FyV6UjXr0iU9iOlO6CmFH9w7Tk/+Wy3su2r
-	 XP5p+kwP0VtFw==
+	b=P/1PwRKYhLhrnse7bJw/5N30tNRBt91xG5XTHS+VbX9DssUT14s5lVCmh2ajY7QYP
+	 hh/qJItPEZ/OHl3iXUxEl4rVqF4M4GY/LxAC0/oMZ3KuH+zNXKDYcPHS/OcuJ8IKk+
+	 WFDVLu6sD++Drvb0MjBxwknwnT+gHBKhZLCBu5P+6uGcdvlY1O2+fndNGunK/G+p6r
+	 VGDmRQ2whQVpzV9SObIODQrS2GK5DtkVDMLec9Oxf4s/fGYKtyoIkeE4Yvl1r6bHOU
+	 N7L/VTfnDb/ufUHQEukMoI8b3yH1P8im0/5jfXsuUozxZYldNVfYirV+wOL3Y4LFoE
+	 ieQu/HeoejPCw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -33,18 +33,15 @@ Cc: Cen Zhang <zzzccc427@gmail.com>,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
+	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Subject: [PATCH AUTOSEL 6.18] Bluetooth: hci_sync: annotate data-races around hdev->req_status
-Date: Mon, 20 Apr 2026 09:09:11 -0400
-Message-ID: <20260420131539.986432-85-sashal@kernel.org>
+Date: Mon, 20 Apr 2026 09:16:41 -0400
+Message-ID: <20260420132314.1023554-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260420131539.986432-1-sashal@kernel.org>
-References: <20260420131539.986432-1-sashal@kernel.org>
+In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
+References: <20260420132314.1023554-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
