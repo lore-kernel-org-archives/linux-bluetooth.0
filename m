@@ -1,142 +1,112 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6B33793D4
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2026 17:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0843803D4
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2026 17:44:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776705553; cv=none; b=iYgR1P7kG2t60WAtcJhzgXMYhoiQyRd0gVb2usgKkiEbFRYhj61IliUMPA4Oh2v3pk4ZTMxDztIjlqAbie0bQyYhg62dOosMeVqrK+8PFviBZL//38OnAeis9xgj+Jf71QvsBlT0ryEOUUCH27ZIUrw0XVrNnFHuR7m/8H+WuMI=
+	t=1776707096; cv=none; b=oCm/c10Btiak0HcjtAoFdlMyVXkRTTwByN8aZA+2+tmtQyZhoIxnMHjw+meAVin6D+mrlW0IgUcPXrCwhOiN/mEgft0p+2PjE9twTn/IvAvFPIMLu7myDB0lpS13fjEV9a4nWdZ6HizpTDnEikW+Zh1VS5nqO+ip6cGYU9hIDpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776705553; c=relaxed/simple;
-	bh=AozOIqrG/q+E2LQW8jJH9J10O3WOMvyHmgBIDzwMG/A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u5SIk0mI74rGOHoWEfqhTKzZQhZ38zEsXSf8axeV04G9/9h54B4/RB4HRbH9semFVVZcv1gfrG3FAAZScLXHCzcCwFHuPcgjtwMdpHIOHzK/XLdR3oXrC+1OOW+fnUAlsC9vfC2Ym7Pkf3zM7wdgmLfBrg9g4lDVHUXXwwJ/T8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BnvC64ns; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1776707096; c=relaxed/simple;
+	bh=EgzDvlXXk1qwia8WL2jXvTdiMGgDwI0+Is+hFjsOTws=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=BzuNde9dcjFKrL48DUJbI2xyTexpNbsv6Qbf1jcVz7h87ykus2VCM/Bt9QynYTUMQlOIYtcUBGI2YwFNIAsAV8Xk++Iuw2N3NZC4DhIZ/mHDP2RSberh9n8JetHTMXFB6h31vizUtg0vb2t1amgchopGKTQWU6xxHPLBwY4aeTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BvpHBf7W; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BnvC64ns"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776705551; x=1808241551;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=AozOIqrG/q+E2LQW8jJH9J10O3WOMvyHmgBIDzwMG/A=;
-  b=BnvC64nswYdfX0JzJboCst6NW6yDxGfDg035zh+jzc7LL5mn90lpmKgY
-   pMYGhHHnGTdxjlhg9EfaAPg40PWgI8mkVL8nwsYvGUNzDmLlyM9thn6cx
-   s/64+JoI8wLjR1FARfCii4+7K+2rVuE8NgquZmhWXY071zGg0X1Rf/6oX
-   CfywNLUm4PkhdSoyE2BZvNmmWoFSUgfwCYlL0lfkgAsx/knEEgMo188rK
-   sKWRGzzY7IKlBxtDeMXrWmaTaNH/zF/1OTy+DggR9UgfCjMzEJZJ05Gy+
-   te7pE3a+I+IPR8XH7XPBQT7KgOc2N8X0yefBwLSdThLktlUjXYbuCJNaZ
-   A==;
-X-CSE-ConnectionGUID: idmhEZPeS+aI6wO9bx4s1Q==
-X-CSE-MsgGUID: tIzpnb82SgGtVfGt36+vwQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11762"; a="81497154"
-X-IronPort-AV: E=Sophos;i="6.23,190,1770624000"; 
-   d="scan'208";a="81497154"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2026 10:19:10 -0700
-X-CSE-ConnectionGUID: 6Td+Q5WeS1ePajiwP2CAPw==
-X-CSE-MsgGUID: B4WhNlCTQJ+q/75K1wfGKg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,190,1770624000"; 
-   d="scan'208";a="236757218"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa005.fm.intel.com with ESMTP; 20 Apr 2026 10:19:08 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	aluvala.sai.teja@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v2] Bluetooth: btintel_pcie: treat boot stage bit 12 as warning
-Date: Mon, 20 Apr 2026 23:07:35 +0530
-Message-ID: <20260420173735.950706-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BvpHBf7W"
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-50fb1932b62so57161cf.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Apr 2026 10:44:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776707094; x=1777311894; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=P/ie+2TAznKyUYtSjSdqPG2smryVzIwnWeI4Z4azgbM=;
+        b=BvpHBf7WDMk+VaRrd1JTymEgv4BsIhHrIzP+jTqUDdVq+br+gV8oAyqhZc2oY9TqJL
+         XvokV3gWiG07bVfJYp97qXJdpI476vWO+lLNL8alz6jE/RE3d9J3HGRYQAcM6Awk0MSf
+         TRPbfJYPxvmX4wiyws4tqFvH+ate3uqe6+NKfOuvDhawlG0yHh888/aago5fBwxjqn0m
+         An5MOGbLAzTdA+jcTyUIo/Z/oftcmwfrp6t1spHZdaCxwnjQOuo6MQoL0RksOcdtQ7kk
+         R2kfIOtqMX5uOuk7bwBbQ6qtx862YEojvSO2qaW9Oq2jNN37s8BIvAwdm1zO1/NQ40Lg
+         6ldA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776707094; x=1777311894;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P/ie+2TAznKyUYtSjSdqPG2smryVzIwnWeI4Z4azgbM=;
+        b=guNRCxueHVdCF25kb3ukD5/YyT3ghV8TxKJ89nWeV5RZswoMVSASDzE14wlkBmAdLc
+         Dv1FSuTZy5dsiezeW08vb+p+SRduXl9hQ2SmljYKz79TMhNakOwz2kKV6P56WUwbI/ZV
+         rgS3lAChnUa/BtjMase+B2iqWEF+YczmvYs59pwz6NTXiILgw6ZasLqvs2BEtCzTjFC/
+         HHhqcG4XjS4VN8jtEi7g/RbjJzHZQRcjClsmFpcnPrser+lc5IVxgI5jznwxEHFtm35C
+         j/Vr3EM0UKr1ooUtdLvL+9zC6xont95jxhD3xMLbV/tAoIj5RQF2oG3epSDAPqSMZ0vQ
+         IpDg==
+X-Gm-Message-State: AOJu0Yx39weyvdXUtF2fXwIig7K+fREa2ADyJBlGCCTVIdbijQcJC2T3
+	jTvC8Oao3dopQVhLwb4bEfWbWEPl8HRCZPBrrIyvcnbHGdRuwT5f9bpK9nTIJvYY
+X-Gm-Gg: AeBDieul7ofsZPUEdS0hTexAHvVa07ym/0ozap+cklICiiewr0ETy2iDuEuDlb5L6v8
+	pXgXVAKevpjrGZXzUAKh0nbfPrUoN5et3i8BmgDo41cZfxALi2wRh7qZuy5AyM8VvgvzDljtMCW
+	IE98YD3h1t8kOKEgHKDzwbwwYFTZ/YoXkPX6n7UHZPRWoxiim50JlMY1mJ1HonZdskGJ03znynH
+	bx8CP9vw0yqFOVf2mYml9sRgu8Fizku6VX72tDyuGx5SHa9prK0C7VvEJUckAeJYiY4XFKpklsP
+	WMcJ3Jn/v6fy9GluyQB3z8RQGyuJCT4rwsUUWEnOu8bR7uhFgPlVkCiE6yIRUzuoQF5YVmn64FH
+	/XyuF/D1yD8Zm+q0Vntfyo/VjnjxVJ1dlXfgpQV70f0HyCjZEtDbxIds/QsxozlqERup8q/zq4K
+	OpHX7dnFTZbijWOAgcpg+wLBF8Lu+9tYH9hHC9lupHor0=
+X-Received: by 2002:a05:622a:138f:b0:50b:3fbe:a0de with SMTP id d75a77b69052e-50e36c16a48mr224956861cf.32.1776707094031;
+        Mon, 20 Apr 2026 10:44:54 -0700 (PDT)
+Received: from [172.17.0.2] ([172.174.157.136])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50e392c859asm104985841cf.1.2026.04.20.10.44.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Apr 2026 10:44:53 -0700 (PDT)
+Message-ID: <69e66615.c80a0220.2e6467.3285@mx.google.com>
+Date: Mon, 20 Apr 2026 10:44:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3658936324408184058=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ,1/3] audio: Add ability to force CIS transport Links property
+In-Reply-To: <20260420161345.145089-1-frederic.danis@collabora.com>
+References: <20260420161345.145089-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+--===============3658936324408184058==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-CSR boot stage register bit 12 is documented as a device warning,
-not a fatal error. Rename the bit definition accordingly and stop
-including it in btintel_pcie_in_error().
+This is automated email and please do not reply to this email!
 
-This keeps warning-only boot stage values from being classified as
-errors while preserving abort-handler state as the actual error
-condition.
+Dear submitter,
 
-Fixes: 190377500fde ("Bluetooth: btintel_pcie: Dump debug registers on error")
-Signed-off-by: Kiran K <kiran.k@intel.com>
-Signed-off-by: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1083418
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.69 seconds
+GitLint                       PASS      1.04 seconds
+BuildEll                      PASS      20.38 seconds
+BluezMake                     PASS      641.43 seconds
+MakeCheck                     PASS      18.94 seconds
+MakeDistcheck                 PASS      248.34 seconds
+CheckValgrind                 PASS      297.20 seconds
+CheckSmatch                   PASS      348.73 seconds
+bluezmakeextell               PASS      184.69 seconds
+IncrementalBuild              PASS      642.44 seconds
+ScanBuild                     PASS      1015.02 seconds
+
+
+
+https://github.com/bluez/bluez/pull/2058
+
 ---
-v2: - Add warning log in btintel_pcie_in_error() when bit 12 is set,
-      including the boot_stage register value for diagnostics
-    - Add warning log in btintel_pcie_dump_debug_registers() to cover
-      paths that update boot_stage_cache without going through
-      btintel_pcie_in_error() (gp1 handler, hw_error, TX timeout)
-    - Use consistent "(boot_stage: 0x%8.8x)" format across all
-      boot_stage log messages
+Regards,
+Linux Bluetooth
 
- drivers/bluetooth/btintel_pcie.c | 13 ++++++++++---
- drivers/bluetooth/btintel_pcie.h |  2 +-
- 2 files changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 076beb45c410..fda474406003 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -301,6 +301,9 @@ static inline void btintel_pcie_dump_debug_registers(struct hci_dev *hdev)
- 	skb_put_data(skb, buf, strlen(buf));
- 	data->boot_stage_cache = reg;
- 
-+	if (reg & BTINTEL_PCIE_CSR_BOOT_STAGE_DEVICE_WARNING)
-+		bt_dev_warn(hdev, "Controller device warning (boot_stage: 0x%8.8x)", reg);
-+
- 	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_IPC_STATUS_REG);
- 	snprintf(buf, sizeof(buf), "ipc status: 0x%8.8x", reg);
- 	skb_put_data(skb, buf, strlen(buf));
-@@ -892,8 +895,11 @@ static inline bool btintel_pcie_in_lockdown(struct btintel_pcie_data *data)
- 
- static inline bool btintel_pcie_in_error(struct btintel_pcie_data *data)
- {
--	return (data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_DEVICE_ERR) ||
--		(data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_ABORT_HANDLER);
-+	if (data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_DEVICE_WARNING)
-+		bt_dev_warn(data->hdev, "Controller device warning (boot_stage: 0x%8.8x)",
-+			    data->boot_stage_cache);
-+
-+	return	data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_ABORT_HANDLER;
- }
- 
- static void btintel_pcie_msix_gp1_handler(struct btintel_pcie_data *data)
-@@ -926,7 +932,8 @@ static void btintel_pcie_msix_gp0_handler(struct btintel_pcie_data *data)
- 		data->img_resp_cache = reg;
- 
- 	if (btintel_pcie_in_error(data)) {
--		bt_dev_err(data->hdev, "Controller in error state");
-+		bt_dev_err(data->hdev, "Controller in error state (boot_stage: 0x%8.8x)",
-+			   data->boot_stage_cache);
- 		btintel_pcie_dump_debug_registers(data->hdev);
- 		return;
- 	}
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index d5b6d5121548..2db85f71b2f8 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -48,7 +48,7 @@
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_OPFW		(BIT(2))
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_ROM_LOCKDOWN	(BIT(10))
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_IML_LOCKDOWN	(BIT(11))
--#define BTINTEL_PCIE_CSR_BOOT_STAGE_DEVICE_ERR		(BIT(12))
-+#define BTINTEL_PCIE_CSR_BOOT_STAGE_DEVICE_WARNING	(BIT(12))
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_ABORT_HANDLER	(BIT(13))
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_DEVICE_HALTED	(BIT(14))
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_MAC_ACCESS_ON	(BIT(16))
--- 
-2.53.0
-
+--===============3658936324408184058==--
