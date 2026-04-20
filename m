@@ -1,44 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07D53A2560;
-	Mon, 20 Apr 2026 13:31:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C30E648AE29;
+	Mon, 20 Apr 2026 13:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691876; cv=none; b=NeTOEJLQ6uF8fFYKu3ic6JzeFzKMl5NK9tLCyTDIgil/SB8LyQcV+SW/StDPOr6wUeYGVhi+2US/t6oaHw4iNhsi7cfqYftVyc8850OFHJ7Dk+mkT5cQ/+BldRWmq8Rbn/ATpRJHAyUxCKEm0kzF3FLUihhnhteU9dMsZTQSfYo=
+	t=1776691923; cv=none; b=cMnHFke9rIEjkmNYcxPpoQZSABikqL1ciuZsgOBtGXRWHvYmUwqf2ykD/QDOGDTGL3sJ3FH3rcnaubCNZbHDFE9hVZVTjzhdvSmxq643ZM6vCTq/vxINuJi2H0qnSOQwQYZXnAAb41KXVdepTBYrEXkOEXGGw+GgY3H4qdg9G2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691876; c=relaxed/simple;
-	bh=0AZBXFP3Gue6Qoq8KpSwhCHDauX03K+T/rigRISsjzM=;
+	s=arc-20240116; t=1776691923; c=relaxed/simple;
+	bh=sAeeCHmKP9SRQ2EKpCxXk/Hm5GZYYx7Fh4XT159vIY0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KuAPnvLPxAdZdLmja6zIH5kTzWdXsVynCsdYAv0WodykWGn3kLDIhC/tgSehJJH0zm16+Ss5mfOSr7p+d5HcZpefU+rJyPpz9QbK2sNrGHza+4/I8XamkGMH8bVb7iPVc/kVaRnVw3KcKY/p214HzYIB2N/ZG+ixSRS9q0thniY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NNzuMbb6; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=gr/0J3XjoP9Wz8K+k1zdrb3HyPP1cklAqBlvw3CGp32TQg3AqOEyaJHKfN16M7xLZUVp4/m5tDaSeKMf8TCWIxLBm6mF/Z63d69q4tTduO4U8JVjizdO7d0DTU9jfUVnFP3SytmTZ0sJPeQ7Keb5JkEIF1K14Fu6UaU13DfXpWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hPGEm8t8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NNzuMbb6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32841C2BCB9;
-	Mon, 20 Apr 2026 13:31:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hPGEm8t8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B87AC2BCB6;
+	Mon, 20 Apr 2026 13:32:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691876;
-	bh=0AZBXFP3Gue6Qoq8KpSwhCHDauX03K+T/rigRISsjzM=;
+	s=k20201202; t=1776691923;
+	bh=sAeeCHmKP9SRQ2EKpCxXk/Hm5GZYYx7Fh4XT159vIY0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NNzuMbb6rE47Plsi09+uFBqmFEPFkpzUiCHMMLngcrd0f4OFfCunlbLRe/RqdLVNs
-	 qKQn/DGZHWK5I2GOXdC4Pi0CAsLcqDaGJcag2p+YDwQ+bWW+1OheZdi/RH5HuatcM7
-	 oBJiXia+fh9ApAAa6y3OKUN9Sh02jnnp3WtCBgO1oiKI3lNYRAttgA2dpThoPJn9TU
-	 HYVe1ZFR+Or9tOYJITvV+u8+LEWgKwVr4bGKGSTI3FQWPEorOxu+5JZLli9d6Gx+SV
-	 V7YDSaIS0lKQdvZNgswjPj0Wt21/MXdf3sxdRI0r9uGXaWF1EmKJL8sorgeg+TfM6A
-	 hn9XaZaoLC5qA==
+	b=hPGEm8t8fgTB47dQSHDtvN3GltZRcpHBof/MOFBlFkZ/nM14bweSfyFKJK2ZpfphX
+	 91crwvPs3vFtoC58PrR4lwe5ZnG7+VogjQlRW7veo7sniOqz5hF44UWAhc67Q2NeCH
+	 bvJ8hmUIJZYXf8deTdVGiym7ynC9LoAIyT07xLlPpdBhufaBuKPeH3WWnYp6Tm9rJ6
+	 G68/SQLYx6Vd1W/nS9d0dDxGxnmjFhfDRo8jVNzPZVKPfU/oU/eJr5VKqDcNdGwBfu
+	 x4cgtyG2g5yD6v6zEuuPbzl7wPRHeP0DtwAW6MYDmptdhbrwgniQ76Oanasp7Cb5A0
+	 QIeKyMhfSTWMA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Christian Eggers <ceggers@arri.de>,
+Cc: Marek Vasut <marex@nabladev.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 7.0-5.10] Bluetooth: L2CAP: CoC: Disconnect if received packet size exceeds MPS
-Date: Mon, 20 Apr 2026 09:20:40 -0400
-Message-ID: <20260420132314.1023554-246-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 7.0-5.10] Bluetooth: btbcm: Add entry for BCM4343A2 UART Bluetooth
+Date: Mon, 20 Apr 2026 09:21:05 -0400
+Message-ID: <20260420132314.1023554-271-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -51,379 +52,254 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 7.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Christian Eggers <ceggers@arri.de>
+From: Marek Vasut <marex@nabladev.com>
 
-[ Upstream commit 728a3d128325bad286b1e4f191026e8de8d12a85 ]
+[ Upstream commit 04c217a7fc8f23a1c99b014cb6a89cf77ac7a012 ]
 
-Core 6.0, Vol 3, Part A, 3.4.3:
-"... If the payload size of any K-frame exceeds the receiver's MPS, the
-receiver shall disconnect the channel..."
+This patch adds the device ID for the BCM4343A2 module, found e.g.
+in the muRata 1YN WiFi+BT combined device. The required firmware
+file is named 'BCM4343A2.hcd'.
 
-This fixes L2CAP/LE/CFC/BV-27-C (running together with 'l2test -r -P
-0x0027 -V le_public -I 100').
-
-Signed-off-by: Christian Eggers <ceggers@arri.de>
+Signed-off-by: Marek Vasut <marex@nabladev.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Tested-by: Christian Eggers <ceggers@arri.de>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-Now I have all the information needed for a comprehensive analysis. Let
-me compile the findings.
+The analysis is clear. Let me write it up.
 
 ---
 
 ## PHASE 1: COMMIT MESSAGE FORENSICS
 
-### Step 1.1: Parse Subject Line
-- **Subsystem**: `Bluetooth: L2CAP: CoC` (Bluetooth L2CAP Connection-
-  oriented Channels)
-- **Action verb**: "Disconnect" - implies enforcing mandatory protocol
-  behavior (a fix for missing behavior)
-- **Summary**: Enforce Bluetooth spec-mandated channel disconnect when
-  received packet exceeds MPS (Maximum PDU Size)
+**Step 1.1: Subject Line**
+- Subsystem: `Bluetooth: btbcm:`
+- Action verb: "Add entry"
+- Summary: Adds a device ID for BCM4343A2 UART Bluetooth chip.
+Record: [Bluetooth/btbcm] [Add] [Device ID for BCM4343A2 UART module]
 
-Record: [Bluetooth: L2CAP: CoC] [Disconnect/fix] [Enforce mandatory MPS
-check and channel disconnect per BT Core 6.0 spec]
+**Step 1.2: Tags**
+- `Signed-off-by: Marek Vasut <marex@nabladev.com>` — author
+- `Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>` — reviewer
+- `Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>` —
+  Bluetooth subsystem maintainer
+- No Fixes: tag (expected — this is a device ID addition, not a bug fix
+  per se)
+- No Cc: stable tag (expected)
+Record: Reviewed by Paul Menzel, committed by Bluetooth maintainer Luiz
+von Dentz.
 
-### Step 1.2: Parse Tags
-- **Signed-off-by**: Christian Eggers (author), Luiz Augusto von Dentz
-  (Bluetooth subsystem maintainer, committer)
-- **Tested-by**: Christian Eggers (author tested the v2 version)
-- **No Fixes: tag** - Expected for AUTOSEL review
-- **No Cc: stable** - Expected for AUTOSEL review
-- **No Reported-by** - This was found through BT Qualification test
-  suite compliance testing
+**Step 1.3: Commit Body**
+The BCM4343A2 module is found in the muRata 1YN WiFi+BT combined device.
+The required firmware file is `BCM4343A2.hcd`. Without this entry, the
+driver cannot identify the chip variant and load the correct firmware.
+Record: [Without this ID, users with muRata 1YN hardware cannot use
+Bluetooth properly]
 
-Record: Author is Christian Eggers, a regular Bluetooth contributor.
-Committed by subsystem maintainer Luiz Augusto von Dentz. Tested by the
-author.
-
-### Step 1.3: Analyze Commit Body
-- References **Bluetooth Core 6.0, Vol 3, Part A, 3.4.3** specification
-  requirement
-- The spec mandates: "If the payload size of any K-frame exceeds the
-  receiver's MPS, the receiver shall disconnect the channel"
-- This fixes **L2CAP/LE/CFC/BV-27-C** Bluetooth test case (a PTS
-  qualification test)
-- Without this fix, the kernel violates the Bluetooth specification
-
-Record: Bug = missing mandatory MPS check per Bluetooth spec. Symptom =
-BT qualification test failure; potential protocol state confusion from
-oversized packets. Root cause = l2cap_ecred_data_rcv() never validated
-packet size against MPS.
-
-### Step 1.4: Detect Hidden Bug Fixes
-This IS a bug fix, not disguised at all. The commit enforces a mandatory
-spec requirement that was missing, preventing oversized packets from
-being processed.
-
-Record: Yes, this is a genuine spec compliance bug fix.
-
----
+**Step 1.4: Hidden Bug Fix?**
+Not a hidden bug fix — it's an explicit device ID addition to enable
+hardware support.
+Record: [Not a hidden fix — explicit hardware enablement via device ID]
 
 ## PHASE 2: DIFF ANALYSIS
 
-### Step 2.1: Inventory
-- **Files changed**: `net/bluetooth/l2cap_core.c` (1 file)
-- **Lines**: +7 added, 0 removed
-- **Function modified**: `l2cap_ecred_data_rcv()`
-- **Scope**: Single-file, single-function, surgical addition
+**Step 2.1: Inventory**
+- Files changed: 1 (`drivers/bluetooth/btbcm.c`)
+- Lines added: 1
+- Lines removed: 0
+- Function modified: none — change is in a static data table
+  (`bcm_uart_subver_table[]`)
+Record: [1 file, +1 line, data table only, zero code logic change]
 
-### Step 2.2: Code Flow Change
-The patch adds a new check between the existing IMTU check and the
-credit decrement:
+**Step 2.2: Code Flow**
+The `bcm_uart_subver_table[]` is iterated in `btbcm_setup()` (line 618)
+to match a `subver` value from the hardware against known chip names. If
+a match is found, `hw_name` is set, which is then used to construct the
+firmware filename (e.g., `brcm/BCM4343A2.hcd`). Without the entry, the
+chip gets a generic "BCM" name and firmware loading will likely fail.
+Record: [Before: BCM4343A2 not recognized → generic fallback. After:
+correct name and firmware path used]
 
-- **Before**: After validating `skb->len <= chan->imtu`, immediately
-  decrements rx_credits
-- **After**: After IMTU check, also validates `skb->len <= chan->mps`.
-  If exceeded, logs error, sends disconnect request, returns -ENOBUFS
+**Step 2.3: Bug Mechanism**
+Category: Hardware enablement / device ID addition. This is not fixing a
+code bug — it enables a previously unsupported hardware variant.
+Record: [Device ID addition — enables correct firmware loading for
+BCM4343A2]
 
-### Step 2.3: Bug Mechanism
-Category: **Logic/correctness fix** - missing validation per Bluetooth
-specification
+**Step 2.4: Fix Quality**
+Trivially correct — a single static data table entry following an
+established pattern used by dozens of other entries. Zero regression
+risk.
+Record: [Trivially correct, zero regression risk, follows established
+pattern]
 
-The ERTM path (`l2cap_data_rcv()` at line 6561) already checks MPS: `if
-(len > chan->mps)`. This check was missing from the LE/Enhanced Credit
-Based flow control path (`l2cap_ecred_data_rcv()`), which was added in
-v5.7.
+## PHASE 3: GIT HISTORY
 
-### Step 2.4: Fix Quality
-- **Obviously correct**: Yes - identical pattern to the MPS check in
-  `l2cap_data_rcv()` and the IMTU check immediately above
-- **Minimal/surgical**: Yes - +7 lines, single check block
-- **Regression risk**: Very low - this only rejects oversized packets
-  that the spec says must be rejected
-- **Red flags**: None
+**Step 3.1: Blame**
+The `bcm_uart_subver_table` was introduced in 2015 by Marcel Holtmann
+(commit `9a0bb57d2d08f1`) and has been populated with additional entries
+continuously ever since. The table and driver exist in all stable trees.
+Record: [Table exists since 2015, present in all stable trees]
 
-Record: Trivial, obviously correct spec compliance fix.
+**Step 3.2: Fixes Tag**
+No Fixes: tag — not applicable for device ID additions.
 
----
+**Step 3.3: Related Changes**
+Multiple identical-pattern commits exist: BCM4343A0 (`d456f678a074b`),
+BCM43430A1 (`feb16722b5d5f`), BCM43430B0 (`27f4d1f214ae4`), BCM4373A0
+(`0d37ddfc50d9a`). This commit is entirely standalone.
+Record: [Standalone, follows well-established pattern of prior device ID
+additions]
 
-## PHASE 3: GIT HISTORY INVESTIGATION
+**Step 3.4: Author**
+Marek Vasut is a well-known Linux kernel developer, primarily in
+embedded/ARM. This is a straightforward hardware enablement patch from a
+board vendor.
+Record: [Established kernel contributor]
 
-### Step 3.1: Blame
-- `l2cap_ecred_data_rcv()` was created in commit `15f02b91056253`
-  ("Bluetooth: L2CAP: Add initial code for Enhanced Credit Based Mode")
-  from v5.7-rc1
-- The original LE flow control code (`aac23bf63659`) dates from
-  v3.14-rc1 (2013)
-- The MPS check was never present in the ecred/LE flow control receive
-  path
+**Step 3.5: Dependencies**
+None. The change is a single table entry addition. The data structure
+and all surrounding code are unchanged.
+Record: [No dependencies, standalone patch]
 
-### Step 3.2: Fixes Tag
-No Fixes: tag present (expected for AUTOSEL). However, the sibling
-commits by the same author (e1d9a66889867, b6a2bf43aa376) reference
-`Fixes: aac23bf63659`, which is in v3.14+.
+## PHASE 4: MAILING LIST
 
-### Step 3.3: File History / Related Changes
-The commit is part of a **4-patch series** by Christian Eggers:
-1. [PATCH 1/4] `e1d9a66889867` - Disconnect if SDU exceeds IMTU
-   (**already in v7.0**)
-2. [PATCH 2/4] THIS COMMIT - Disconnect if packet exceeds MPS (reworked
-   as v2 by maintainer)
-3. [PATCH 3/4] `b6a2bf43aa376` - Disconnect if sum of payload sizes
-   exceed SDU (**already in v7.0**)
-4. [PATCH 4/4] `0e4d4dcc1a6e8` - SMP test fix (**already in v7.0**)
+**Step 4.1: Discussion**
+Found the original submission on patchew.org. Paul Menzel reviewed it,
+asking about firmware availability. Marek pointed to the muRata firmware
+repository. Paul gave `Reviewed-by`. No objections or NAKs.
+Record: [Clean review, no concerns raised, Reviewed-by given]
 
-Patches 1, 3, 4 are in the v7.0 tree. Patch 2 was reworked as a v2 by
-the maintainer and applied to bluetooth-next (commit cb75c9a0505b).
+**Step 4.2: Reviewers**
+The Bluetooth maintainer (Luiz von Dentz) committed the patch. Paul
+Menzel reviewed.
+Record: [Committed by subsystem maintainer]
 
-### Step 3.4: Author's Context
-Christian Eggers is a regular Bluetooth contributor with 8+ commits to
-the Bluetooth subsystem. The maintainer (Luiz von Dentz) reworked v1 to
-a simpler v2 (using `chan->mps` directly instead of a new `mps_orig_le`
-field), demonstrating active review.
-
-### Step 3.5: Dependencies
-- **Soft dependency**: Commit `e1d9a66889867` changes the context above
-  (reformats IMTU check and adds `l2cap_send_disconn_req`). Without it,
-  the patch needs minor context adjustment, but the code logic is
-  independent.
-- This is functionally standalone - the MPS check is new code that
-  doesn't depend on any other check.
-
-Record: The MPS check is functionally standalone. In older stable trees
-without e1d9a66889867, the context would differ slightly but the fix can
-be adapted.
-
----
-
-## PHASE 4: MAILING LIST RESEARCH
-
-### Step 4.1: Original Discussion
-- **v1** submitted as [PATCH 2/4] at
-  `20260225170728.30327-2-ceggers@arri.de`
-- v1 introduced a new `mps_orig_le` field (Luiz questioned this
-  approach)
-- **v2** submitted by Luiz Augusto von Dentz with simplified approach
-  using `chan->mps` directly
-- Applied to bluetooth-next on Feb 27, 2026
-
-### Step 4.2: Reviewers
-- Luiz Augusto von Dentz (Bluetooth subsystem maintainer) personally
-  reworked the patch
-- Christian Eggers provided Tested-by on v2
-- No NAKs or concerns raised
-
-### Step 4.3: No syzbot or user bug reports; found via BT qualification
-testing
-
-### Step 4.4: Series Context
-The other 3 patches in the series are already in v7.0. This is the only
-one remaining to be backported.
-
-### Step 4.5: No stable-specific discussion found.
-
----
+**Step 4.3-4.5:** No bug report (this is hardware enablement), no series
+context needed, no stable discussion found.
 
 ## PHASE 5: CODE SEMANTIC ANALYSIS
 
-### Step 5.1: Key Function
-- `l2cap_ecred_data_rcv()` - receives data for LE FlowCtl and Enhanced
-  Credit Based modes
+**Step 5.1-5.4:** The modified data is consumed by `btbcm_setup()` which
+iterates the table to match a subver ID from hardware. This function is
+called during Bluetooth device initialization — a standard, well-tested
+code path. Adding an entry to the lookup table does not change any code
+flow.
+Record: [Consumed by btbcm_setup(), standard init path, no code flow
+change]
 
-### Step 5.2: Callers
-Called from `l2cap_data_channel()` at line 6834 for both
-`L2CAP_MODE_LE_FLOWCTL` and `L2CAP_MODE_EXT_FLOWCTL` modes. This is the
-main L2CAP data receive path for all LE Connection-oriented Channels.
-
-### Step 5.3-5.4: Impact Surface
-This function is called on every incoming L2CAP packet for LE CoC
-connections. Any Bluetooth device using LE L2CAP (BLE) can trigger this
-code path.
-
-### Step 5.5: Similar Patterns
-The ERTM path in `l2cap_data_rcv()` (line 6561) already has `if (len >
-chan->mps)` with disconnect. The ecred path was missing this analogous
-check.
-
----
+**Step 5.5:** Many similar entries exist (20+ in UART table alone). This
+is an established pattern.
 
 ## PHASE 6: STABLE TREE ANALYSIS
 
-### Step 6.1: Buggy Code Existence
-- `l2cap_ecred_data_rcv()` exists since v5.7 (commit `15f02b91056253`)
-- The function exists in ALL active stable trees: v5.10, v5.15, v6.1,
-  v6.6, v6.12, v7.0
+**Step 6.1:** The `bcm_uart_subver_table` has existed since 2015. The
+file and table structure are present in all active stable trees.
+Record: [Present in all stable trees]
 
-### Step 6.2: Backport Complications
-- For stable trees that already have `e1d9a66889867` (IMTU disconnect
-  fix): clean apply
-- For trees without it: minor context adjustment needed (the IMTU check
-  looks slightly different)
+**Step 6.2:** The patch applies cleanly — it's a single line insertion
+into a data table. Even if surrounding entries differ slightly between
+trees, this adds a new entry after the BCM4356A2 line (`0x230f`), which
+has been in the table since 2017.
+Record: [Clean apply expected]
 
-### Step 6.3: No related MPS fix already in stable.
+**Step 6.3:** No related fix exists in stable for BCM4343A2.
 
----
+## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
 
-## PHASE 7: SUBSYSTEM CONTEXT
-
-### Step 7.1: Subsystem
-- **Bluetooth** (`net/bluetooth/`) - IMPORTANT subsystem
-- Used by all BLE-capable devices (billions of devices)
-
-### Step 7.2: Activity
-Very active - 30+ L2CAP changes in recent history with many security and
-correctness fixes.
-
----
+**Step 7.1:** Bluetooth driver — IMPORTANT subsystem. Bluetooth is
+widely used, and BCM chips are common in embedded/IoT platforms.
+Record: [Bluetooth/driver, IMPORTANT criticality]
 
 ## PHASE 8: IMPACT AND RISK ASSESSMENT
 
-### Step 8.1: Affected Users
-All users of Bluetooth Low Energy (BLE) with L2CAP Connection-oriented
-Channels. This includes IoT devices, audio devices, input peripherals,
-and more.
+**Step 8.1:** Users with muRata 1YN WiFi+BT hardware (BCM4343A2 chip)
+are affected.
+Record: [Driver-specific: users of BCM4343A2/muRata 1YN hardware]
 
-### Step 8.2: Trigger Conditions
-Any remote BLE device sending a K-frame with payload exceeding the
-receiver's MPS. This can be triggered by:
-- A misbehaving or malicious remote BLE device
-- Protocol violations from buggy firmware
+**Step 8.2:** Triggered on every boot/device init for users with this
+hardware.
+Record: [Triggered on device init — blocking for affected users]
 
-### Step 8.3: Failure Mode Severity
-Without the fix:
-- **Spec violation**: Oversized packets are processed instead of being
-  rejected (MEDIUM)
-- **Potential protocol state confusion**: Processing oversized data can
-  corrupt SDU reassembly (MEDIUM-HIGH)
-- **Security implication**: Remote device can send larger-than-expected
-  data that gets processed (MEDIUM)
-- Severity: **MEDIUM-HIGH**
+**Step 8.3:** Without this ID, the Bluetooth chip cannot be properly
+identified and firmware cannot be loaded — Bluetooth is non-functional
+for this hardware.
+Record: [Bluetooth non-functional for affected hardware, severity
+MEDIUM-HIGH]
 
-### Step 8.4: Risk-Benefit Ratio
-- **Benefit**: HIGH - enforces mandatory Bluetooth spec requirement,
-  fixes qualification test, prevents oversized packet processing
-- **Risk**: VERY LOW - +7 lines, identical pattern to existing checks,
-  only rejects already-invalid packets
-- **Ratio**: Strongly favorable for backport
-
----
+**Step 8.4:**
+- Benefit: HIGH — enables Bluetooth for specific hardware that otherwise
+  doesn't work
+- Risk: VERY LOW — 1 line data table addition, zero code change, follows
+  established pattern
+Record: [Excellent risk-benefit ratio]
 
 ## PHASE 9: FINAL SYNTHESIS
 
-### Step 9.1: Evidence Compilation
+**Step 9.1: Evidence FOR backporting:**
+- Classic device ID addition to existing driver (explicit exception
+  category)
+- 1-line change, trivially correct, zero code logic change
+- Follows established pattern (20+ prior similar entries)
+- Reviewed by Paul Menzel, committed by Bluetooth maintainer
+- Enables real hardware (muRata 1YN) for real users
+- Table exists in all stable trees since 2015
 
-**FOR backporting:**
-- Fixes missing mandatory Bluetooth Core Spec validation (spec
-  compliance bug)
-- +7 lines, single function, obviously correct surgical fix
-- Follows identical pattern to existing MPS check in ERTM path and IMTU
-  check in same function
-- Reviewed/reworked by Bluetooth subsystem maintainer
-- Tested by the original author
-- The companion patches (1/4, 3/4) are already merged, making this
-  independent
-- Prevents processing oversized packets from remote devices (security-
-  adjacent)
-- Code exists in all active stable trees (v5.7+)
+**Evidence AGAINST backporting:**
+- None identified.
 
-**AGAINST backporting:**
-- Not triggered by syzbot or user crash reports (found via qualification
-  testing)
-- No explicit Fixes: tag (expected for AUTOSEL)
-- Minor context adjustment may be needed for older trees without
-  e1d9a66889867
+**Step 9.2: Stable Rules Checklist:**
+1. Obviously correct and tested? YES — single static data entry
+2. Fixes a real bug? YES — enables broken-without-it hardware
+3. Important issue? YES for affected users (no Bluetooth at all)
+4. Small and contained? YES — 1 line
+5. No new features/APIs? YES — just a data table entry
+6. Applies to stable? YES — table unchanged across trees
 
-### Step 9.2: Stable Rules Checklist
-1. Obviously correct and tested? **YES** - tested by author, pattern-
-   matched to existing code
-2. Fixes a real bug? **YES** - missing mandatory spec validation
-3. Important issue? **YES** - protocol compliance, potential
-   security/state confusion
-4. Small and contained? **YES** - +7 lines in one function
-5. No new features/APIs? **YES** - only adds validation
-6. Can apply to stable? **YES** - clean apply to v7.0; minor adjustment
-   for older trees
-
-### Step 9.3: Exception Categories
-Not an exception category; this is a standard protocol compliance bug
-fix.
-
-### Step 9.4: Decision
-This is a small, obviously correct fix that enforces a mandatory
-Bluetooth specification requirement. It prevents oversized packets from
-being processed by the kernel, which is both a spec compliance issue and
-a security-adjacent concern. The fix is minimal (+7 lines), follows
-established patterns in the same codebase, was reviewed/reworked by the
-subsystem maintainer, and tested by the author.
-
----
+**Step 9.3: Exception Category:**
+This is a **Device ID addition to an existing driver** — an explicit
+exception category that is automatically YES for stable.
 
 ## Verification
 
-- [Phase 1] Parsed commit message: references BT Core 6.0, Vol 3, Part
-  A, 3.4.3; fixes L2CAP/LE/CFC/BV-27-C test
-- [Phase 2] Diff analysis: +7 lines in `l2cap_ecred_data_rcv()`, adds
-  MPS size validation with disconnect
-- [Phase 3] git blame: `l2cap_ecred_data_rcv()` created in
-  `15f02b91056253` (v5.7-rc1), MPS check never present
-- [Phase 3] git show: ERTM path at line 6561 already has `if (len >
-  chan->mps)` - ecred path missing this
-- [Phase 3] Related commits: siblings e1d9a66889867, b6a2bf43aa376
-  already in v7.0 with Fixes: aac23bf63659
-- [Phase 3] git merge-base: aac23bf63659 is in v3.14+; 15f02b91056253 is
-  in v5.7+; both in all active stable trees
-- [Phase 4] Mailing list: v1 reworked to v2 by maintainer Luiz von
-  Dentz; Christian Eggers confirmed v2 works (Tested-by)
-- [Phase 4] Applied to bluetooth-next on Feb 27, 2026 (patchwork-bot
-  confirmation)
-- [Phase 4] No NAKs or objections raised
-- [Phase 5] Callers: `l2cap_data_channel()` for L2CAP_MODE_LE_FLOWCTL
-  and L2CAP_MODE_EXT_FLOWCTL
-- [Phase 6] Code exists in all active stable trees (v5.10+, v6.1, v6.6,
-  v6.12)
-- [Phase 8] Impact: all BLE CoC users; trigger: remote device sends
-  packet > MPS; severity MEDIUM-HIGH
+- [Phase 1] Parsed tags: Reviewed-by Paul Menzel, SOB by Bluetooth
+  maintainer Luiz von Dentz
+- [Phase 2] Diff analysis: exactly 1 line added to static
+  `bcm_uart_subver_table[]` data table
+- [Phase 3] git blame: table introduced in 2015 (commit
+  `9a0bb57d2d08f1`), present in all stable trees
+- [Phase 3] git log for related entries: confirmed 5+ prior identical-
+  pattern device ID additions
+- [Phase 4] Patchew/lore: found original submission, clean review, no
+  objections
+- [Phase 5] Code tracing: table consumed by `btbcm_setup()` at line
+  615-622, standard init path
+- [Phase 6] Table structure unchanged since 2015, clean apply expected
+- [Phase 8] Without entry, BCM4343A2 Bluetooth is non-functional for
+  muRata 1YN users
 
 **YES**
 
- net/bluetooth/l2cap_core.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/bluetooth/btbcm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 95c65fece39bd..9916ae6abef04 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6705,6 +6705,13 @@ static int l2cap_ecred_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
- 		return -ENOBUFS;
- 	}
- 
-+	if (skb->len > chan->mps) {
-+		BT_ERR("Too big LE L2CAP MPS: len %u > %u", skb->len,
-+		       chan->mps);
-+		l2cap_send_disconn_req(chan, ECONNRESET);
-+		return -ENOBUFS;
-+	}
-+
- 	chan->rx_credits--;
- 	BT_DBG("chan %p: rx_credits %u -> %u",
- 	       chan, chan->rx_credits + 1, chan->rx_credits);
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index d33cc70eec662..975b73cd04e67 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -507,6 +507,7 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
+ 	{ 0x6119, "BCM4345C0"	},	/* 003.001.025 */
+ 	{ 0x6606, "BCM4345C5"	},	/* 003.006.006 */
+ 	{ 0x230f, "BCM4356A2"	},	/* 001.003.015 */
++	{ 0x2310, "BCM4343A2"	},	/* 001.003.016 */
+ 	{ 0x220e, "BCM20702A1"  },	/* 001.002.014 */
+ 	{ 0x420d, "BCM4349B1"	},	/* 002.002.013 */
+ 	{ 0x420e, "BCM4349B1"	},	/* 002.002.014 */
 -- 
 2.53.0
 
