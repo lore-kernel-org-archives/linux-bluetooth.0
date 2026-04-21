@@ -1,64 +1,64 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C13923D6682
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 13:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D113D6CDA
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 13:56:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776779810; cv=none; b=JDXYRPmhbhyhKDSeb44gN6ed8Yz8kh6RRQAtuugkmHJgRGakVqdkqwE4erynqcTz0/Mwi8ootB+2LUwTF4iGdMLn/QnEoasbLeIex7kw95TVM3KYddL+3KI6apBm/ByBOZoh9JnV1N6HuF7cP7rUWiQo8M1clE/nk3DwCxBbkf8=
+	t=1776779811; cv=none; b=PaNYU9pEP6vyfDpUDnTk0nYRMtk+QrOQEMTj/KGYhR1fAGt8FO7vWckXKFYR6NRGLbNeh3fSR1iRhEFuEObJLsp+/5h++CxoU16Mw8D9eJ2dRpOUxoE3rEiAx/yo6hyg8hMqE+sM+mlA8L54Iq6+Cq6PBJRdGwkEJiDPy1Q1u+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776779810; c=relaxed/simple;
-	bh=xRR4YXHdNTwyaJomNKqEyxWDMa347weKXyNstaeXji0=;
+	s=arc-20240116; t=1776779811; c=relaxed/simple;
+	bh=nYU4fnXvJnfceEaKFU1kKDN/vmUIeBcyup447IWCgFg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VhKYkEhwRNK+5EZnDvra71beO1KkayJcPb0zvG2X357DtAvREwqoIlz4aFHPaStxeWJ7tx8Kisq8Fe0YuOC4SUF8Q/IrbSDQCp8KD90VMf3C0bWcfSGYj75aJ8nfLzXFN3bkK+jerFYXRVgYHhJK8TMjObqr6ikDY1yHvZ5I2NY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dUqiSiTV; arc=none smtp.client-ip=209.85.222.172
+	 MIME-Version; b=DbTESc6UF5hUf5Cxq2hoDkYf/Nutcc7omVOAMDU/PDsFEK/3rD0QTeTTue9BzwaqwZf9Qhw7dTr1zXFI+XHwO+Q9CfoxxZHe//O9muJ3KZ4D54eZza+oS7RzJ7y2LOx6MO5Rqcd+tCkZ12kDyF99L8qiRjojc8KOv5hkIH2uI8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WHovYTnk; arc=none smtp.client-ip=209.85.222.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dUqiSiTV"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-8e895b9e7cbso404897185a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 06:56:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WHovYTnk"
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8ef0ba61d46so31186485a.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 06:56:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776779808; x=1777384608; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776779809; x=1777384609; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YpRWGV/9h2J0e2y4smv95jEfx6BRtkOqUuKuvF+USRA=;
-        b=dUqiSiTVJLFNcIZJS9f3M9GROVSh0fq3yXxyAktO+Bkrm48rhDyLlx3YC0YE310mYJ
-         pqG69K9VEpGhWylwLTvvOhZ0SchIhA1IV4o3obyKghiKwC4i4W8TqFKLVHaJT8p16aL0
-         Uyji6AMUf3kVPerUTCf2j435+M95U/XuppBSOV7bjDRyiBz7gDYfq4hzwu+AZxJXJqwH
-         dCD8BlWpBPC23iltp6BuEIlgfhoJxM3K7wBwM+N31/v45p76ys9YhXhqF6LHi52HWj/3
-         0c5MiloTaqtUtrxHx7luFfj16M4zDDGkG0CxzI7oBUmmZyZIHfX6PoQaUZCWsh2IgK+p
-         bDVA==
+        bh=7Rq/HLyYIOXuijt0EBIF+AOgprIQBVUvhx8WQw17WEI=;
+        b=WHovYTnkYVZmumgh7eRmBSiCT5Mz1bn0Ozk7hgB5V2vNWqzJKl1URmX1+Ii/vazqym
+         teUEXQ9fgIqyC4hUREvJdNCkNMz73wEEs2F92XRVJrIss+6E9Z/pw0t7guNJTdzU8luT
+         EhZkem+GNwsk55OzOeeUTUWX01QW4PRGqWde+jBS4BNZS0SQ7l+gIxd8VmOOVrazQxrB
+         +dV3zxWFdYp7Dj6+lvnioCeuOPpOHSj0Te7U/L0tTUi/xcLHqD2nNMyfXWZIcAv62Nr+
+         /YF9yGL167xsAsaTZw+4tCoA/bu2imgstHrC//WzZCDYmIcDNCpOOPsuqVdB1qV3Yqik
+         r8mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776779808; x=1777384608;
+        d=1e100.net; s=20251104; t=1776779809; x=1777384609;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=YpRWGV/9h2J0e2y4smv95jEfx6BRtkOqUuKuvF+USRA=;
-        b=WMRGQINoTsa11WVlbH/cOZQyDI5BSxflKVUqv00maLq/6xCmB10jKaH38AlA05+eVa
-         2/oo+e27oGbTEhRyqVb7oo0QyKfbAJyufhrTs/ZiO4mIJOtPiMf9DEzI/8VPr8vVpHCm
-         6NI2xUTV0fk2Q+86h1Dy1/5BdHJQs2TOg8hye5bLC+S6NCBSoqIQVdLWhPbvn9GZnsLr
-         vJtl3SlR9EnuieyO29SBVB7joKaG6TLvB1AMzK7JiB+7Ieyp4Iqx+snHDisz+UHzl/4P
-         4KkrpwuJZIxKp5oYqt/t984T41GdZY49R/M7uF9T4WFVsPxTdpeNhJRuPYTC9r1fxbDu
-         y6PA==
-X-Forwarded-Encrypted: i=1; AFNElJ/3dAszy4NZ3ug+464K2+JH75GhokA0ObuqA4s3X0FbcCR6GQ1WgDijhKDzU88IugwKemLhQkcStsCni1nb8Lw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPD9qHRRswqXXTU1WFGtPlAS2qlJYRYQqHMwIM6G7airGxo2Dt
-	5PRtGQkfIfbVhuonJ1hGRL4KzxTZvgc2GGwbm5hueLaF1qBkDbmBUXEm
-X-Gm-Gg: AeBDieu0BdH8oK4Z9v7OwMIzZpXp2fyZCRgVibiuSzvuSis/W6pWHLo5RnqGka6TQ5f
-	wBTsutEe5gPv1ncCKat4DGQTamOcOhMJ8xBErmHJQQO7PN2wMxdtXRJuxBL/9+J85UuIDnbSE7D
-	OaavyBQtdeLMfKsz0y4NLxnAZ9xBj+haLKxKgPJeBBYPNTLX7b3Z5tPMGtcN/vBWaSBMail9RP0
-	mni5zkb6to1pbOyK7Dq4cS3tOgqGIM9dpNiqpNzr/ALh3bxCaKcpkN3EIhyrVo/krs5NLRepiM/
-	7V7Yob/4P2akjJFdaHCWWcI9TrxGDrmHOAodATuqoKKYo5wy2xdT0O55cGo6T6y3KU3o95slY0x
-	BpR2DErAdeHKxK2Nmgv0Nd+wFsJlHlFhjz4vwzkZv+WTx40TBJoFG3uvWMZS5m5/VK8FYzKMpJV
-	7noxT5Fgufk4cpuIEMtHUcvc2wdJkN9skHreDPsbw0l+qvMbfVtRPEbn7MZbhaHJ3AeXVBFf9uH
-	9WdgIeZrNUoonSK11buzKDRX92DVygfsMGS2Om6Qw==
-X-Received: by 2002:a05:620a:6ccd:b0:8d0:ad0:c026 with SMTP id af79cd13be357-8e78fd1ee3dmr2532149385a.21.1776779807613;
-        Tue, 21 Apr 2026 06:56:47 -0700 (PDT)
+        bh=7Rq/HLyYIOXuijt0EBIF+AOgprIQBVUvhx8WQw17WEI=;
+        b=lcBuOrMf3zyHom5tYAKebXi51P9cWMkJ/FQI/2VKu5+F67GNbeVV8AT3lpCHe9lz89
+         +9F4dVbgMxtJZpHD4uciBf5ydYk/soDv0fIw5CNJdKeHuMXrUQF/cb7qugwxfSI6ds84
+         MT8ApO4pSoNInmBcK+FJTY8ClCbdAHXRPUhQ55Elql3tJcNAjy0CeK4hRLbMLbg+TZq0
+         ghPp/MN2+ScOxiQ2M8Vmmj/qM3saTqOKefp48qMvfV3Xjc0Z029BmOO309A1w85c5Iyb
+         rJJ84TMOsk3ZyLgxwvBDLeZBEzZQUJ60YvDHhEXIGEAWigNlC+yFPbLzFtfIjzurqSOC
+         4+Yg==
+X-Forwarded-Encrypted: i=1; AFNElJ+z4V0kGeWkxCUXfFbrPqJ618dvzOjcSXLB+aLgrKr3BoM0w4UC4+Ii/DCYQ2Pu1fK0pzOIkcrtaoWYVEaF7gg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWGgcpTBVsRK+8nGdchsaI+NH05Eyq9EvxN/xxBZQ/DDJ59r79
+	zGs84Muyrr91Wnb1UtuYeNbp7WCcUyNlEgPTplFkyZSZEfRHFbqPAmbC
+X-Gm-Gg: AeBDietjQOrZujNX9DsWoFIVmHCJXCnflhXh/cMzv+p9EBXgUeFfKRX9BQvhtzN9pnc
+	lf6ASKFI0/2WtBVI33LzF2rnSZY7Zpw68mMhJRlCwPOx81jC6toICh850WjjwEf7F7WU6Yxw/Ls
+	zi9fA+xrtqvUeFzjlz+3a8pKeRf7SnyQDZB8kZ8SPNVHFNwTogqdJqUl+uLg7h8kRPcxwuNAN7c
+	TZdrxj3TTCFu+ulEfck7fdFS0aQpW4kwzQN/oJms1rIcJcCNk6ZHi8sWtzKBvYt20foAYYI7AcS
+	MiK3pPC2YiUlh5uYl1sC3hcFxI/OVjRe+zLdXevqX8UrFa30tt83lMmIVJkbyZSNXSOxGjBgSwn
+	XVfybc8utMAdBZzk8Cli68S/VLUPOHjjyor1XxCIbCXuQAwrO7Ihv0WyL8iSThwsGaBG7lE7jVc
+	Pqu13XBrQtCt0eSmw3KtlHFgbvT0efb9QJs9s1wfRaUSaaFvIt3hizO8Q48I54088AVxLTum398
+	09nwXw/q2hVu3ItpJWowKqxNwV/lnw=
+X-Received: by 2002:a05:620a:4722:b0:8cf:db04:8a31 with SMTP id af79cd13be357-8e79295cffamr2554011385a.55.1776779808936;
+        Tue, 21 Apr 2026 06:56:48 -0700 (PDT)
 Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8e7d69ad48asm1033231385a.19.2026.04.21.06.56.46
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8e7d69ad48asm1033231385a.19.2026.04.21.06.56.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 06:56:46 -0700 (PDT)
+        Tue, 21 Apr 2026 06:56:48 -0700 (PDT)
 From: Michael Bommarito <michael.bommarito@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -67,9 +67,9 @@ Cc: Mat Martineau <martineau@kernel.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH v2 0/2] Bluetooth: L2CAP: fix zero txwin_size handling and repeated CONFIG_RSP re-init
-Date: Tue, 21 Apr 2026 09:56:37 -0400
-Message-ID: <20260421135639.3185653-1-michael.bommarito@gmail.com>
+Subject: [PATCH v2 1/2] Bluetooth: L2CAP: handle zero txwin_size in ERTM RFC option
+Date: Tue, 21 Apr 2026 09:56:38 -0400
+Message-ID: <20260421135639.3185653-2-michael.bommarito@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <CABBYNZ+f3pur4cSsanQ1kvv-yORp2E0qmVLt9si_+FnnJup4Ng@mail.gmail.com>
 References: <20260417221628.1674866-1-michael.bommarito@gmail.com> <CABBYNZ+f3pur4cSsanQ1kvv-yORp2E0qmVLt9si_+FnnJup4Ng@mail.gmail.com>
@@ -81,76 +81,124 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi Luiz,
+Peer-supplied ERTM RFC txwin_size = 0 can still propagate into the
+ERTM transmit-window state, and the same invalid value can be
+introduced locally through L2CAP_OPTIONS. In the request path that zero
+reaches l2cap_seq_list_init(..., 0); in the response path it can shrink
+ack_win to 0 and leave ERTM sequencing in a nonsensical state.
 
-Thanks for the review.
+Normalize zero tx window values back to L2CAP_DEFAULT_TX_WINDOW
+wherever they enter the ERTM state machine: local socket options,
+outgoing tx_win setup, incoming config requests, and config-response
+parsing. Also make l2cap_seq_list_free() clear its metadata after kfree
+so an init failure after freeing srej_list cannot be freed a second time
+during later channel teardown.
 
-v1 mixed the original zero-txwin fix with a defensive
-l2cap_seq_list_init(size == 0) error return. Re-checking that path
-made it clear the reroll should be split:
+Fixes: 3c588192b5e5 ("Bluetooth: Add the l2cap_seq_list structure for tracking frames")
+Cc: stable@vger.kernel.org
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+Assisted-by: Claude:claude-opus-4-7
+---
+Changes in v2:
+- drop the v1 `l2cap_seq_list_init(size == 0) -> -EINVAL` approach
+  and instead normalize zero tx window values at the socket /
+  request / response inputs
+- clamp the local `L2CAP_OPTIONS` txwin_size = 0 case back to
+  `L2CAP_DEFAULT_TX_WINDOW`
+- make `l2cap_seq_list_free()` clear its metadata after `kfree()` so
+  later teardown cannot trip over a previously freed list
+- split the repeated `CONFIG_RSP` ERTM re-init fix into patch 2
 
-  1. keep the original report focused on zero txwin_size, but fix it by
-     normalizing zero window values at the actual inputs to the ERTM
-     state machine and by making sequence-list teardown idempotent,
-     rather than by introducing a new init-time failure path
-
-  2. handle the separate repeated-CONFIG_RSP ERTM re-init bug in its
-     own patch, matching the BT_CONNECTED guard that commit 25f420a0d4cf
-     already added on the CONFIG_REQ side
-
-While auditing the Sashiko comments, I also checked the claimed
-CONF_EWS_RECV bypass. I did not carry that theory into v2: in this tree
-CONF_EWS_RECV is declared but never set, so the concrete zero-window
-paths are the plain RFC option, the local L2CAP_OPTIONS socket setting,
-and the CONFIG_RSP / conf_rfc_get negotiation state.
-
-To make sure the reroll covered all the zero-entry sites (and only the
-zero-entry sites), I enumerated every assignment to tx_win / ack_win /
-remote_tx_win / txwin_size in net/bluetooth/l2cap_core.c and confirmed
-patch 1 normalizes the four reachable input paths -- the local
-L2CAP_OPTIONS setsockopt, l2cap_txwin_setup() on the outgoing RFC, the
-L2CAP_MODE_ERTM branch of l2cap_parse_conf_req(), and the EWS / RFC
-branches of l2cap_parse_conf_rsp() and l2cap_conf_rfc_get(). The only
-other writers are the channel-create defaults in l2cap_chan_create()
-(hard-coded to L2CAP_DEFAULT_TX_WINDOW) and the outgoing rfc.txwin_size
-= 0 assignments in L2CAP_MODE_BASIC / L2CAP_MODE_STREAMING branches,
-where a zero is spec-correct and never feeds ack_win.
-
-l2cap_seq_list_free()'s callers are l2cap_chan_del() (channel teardown)
-and l2cap_ertm_init()'s error path; clearing the list metadata after
-kfree() is safe for both and is what makes the partially-initialized
-re-entry in the failure path no longer a double-free source.
-
-For patch 2, the BT_CONNECTED guard added to l2cap_config_rsp() mirrors
-the existing one in l2cap_config_req() (lines 4339..4348 in this tree)
-so both sides of the CONFIG exchange now refuse to re-enter
-l2cap_ertm_init() once the channel is already connected. I did not
-pin down a single introducing commit for the CONFIG_RSP side during
-this pass, so patch 2 keeps Cc: stable@ without a speculative Fixes:
-tag; happy to add one if you'd prefer a specific reference.
-
-Changes since v1
-----------------
-
-  - Split the reroll into two patches: the zero-txwin fix and the
-    separate repeated-CONFIG_RSP ERTM re-init fix.
-  - Dropped the v1 l2cap_seq_list_init(size == 0) -> -EINVAL defence and
-    instead normalize zero tx window values where they enter negotiated
-    ERTM state.
-  - Clamp the local L2CAP_OPTIONS txwin_size = 0 case back to
-    L2CAP_DEFAULT_TX_WINDOW.
-  - Normalize zero tx window values seen during CONFIG_RSP / RFC parsing
-    so ack_win does not collapse to 0.
-  - Make l2cap_seq_list_free() clear list metadata after kfree so later
-    teardown cannot trip over a previously freed list.
-
-Michael Bommarito (2):
-  Bluetooth: L2CAP: handle zero txwin_size in ERTM RFC option
-  Bluetooth: L2CAP: skip ERTM re-init on repeated CONFIG_RSP
-
- net/bluetooth/l2cap_core.c | 39 +++++++++++++++++++++++++++-----------
+ net/bluetooth/l2cap_core.c | 23 +++++++++++++++++++----
  net/bluetooth/l2cap_sock.c |  3 +++
- 2 files changed, 31 insertions(+), 11 deletions(-)
+ 2 files changed, 22 insertions(+), 4 deletions(-)
 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 95c65fece39b..7ffafd117817 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -345,6 +345,10 @@ static int l2cap_seq_list_init(struct l2cap_seq_list *seq_list, u16 size)
+ static inline void l2cap_seq_list_free(struct l2cap_seq_list *seq_list)
+ {
+ 	kfree(seq_list->list);
++	seq_list->list = NULL;
++	seq_list->mask = 0;
++	seq_list->head = L2CAP_SEQ_LIST_CLEAR;
++	seq_list->tail = L2CAP_SEQ_LIST_CLEAR;
+ }
+ 
+ static inline bool l2cap_seq_list_contains(struct l2cap_seq_list *seq_list,
+@@ -3234,8 +3238,15 @@ static void __l2cap_set_ertm_timeouts(struct l2cap_chan *chan,
+ 	rfc->monitor_timeout = cpu_to_le16(L2CAP_DEFAULT_MONITOR_TO);
+ }
+ 
++static inline u16 l2cap_txwin_default(u16 txwin)
++{
++	return txwin ? txwin : L2CAP_DEFAULT_TX_WINDOW;
++}
++
+ static inline void l2cap_txwin_setup(struct l2cap_chan *chan)
+ {
++	chan->tx_win = l2cap_txwin_default(chan->tx_win);
++
+ 	if (chan->tx_win > L2CAP_DEFAULT_TX_WINDOW &&
+ 	    __l2cap_ews_supported(chan->conn)) {
+ 		/* use extended control field */
+@@ -3593,6 +3604,8 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+ 			break;
+ 
+ 		case L2CAP_MODE_ERTM:
++			rfc.txwin_size = l2cap_txwin_default(rfc.txwin_size);
++
+ 			if (!test_bit(CONF_EWS_RECV, &chan->conf_state))
+ 				chan->remote_tx_win = rfc.txwin_size;
+ 			else
+@@ -3715,7 +3728,8 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
+ 		case L2CAP_CONF_EWS:
+ 			if (olen != 2)
+ 				break;
+-			chan->ack_win = min_t(u16, val, chan->ack_win);
++			chan->ack_win = min_t(u16, l2cap_txwin_default(val),
++					      chan->ack_win);
+ 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EWS, 2,
+ 					   chan->tx_win, endptr - ptr);
+ 			break;
+@@ -3756,7 +3770,7 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
+ 			chan->mps    = le16_to_cpu(rfc.max_pdu_size);
+ 			if (!test_bit(FLAG_EXT_CTRL, &chan->flags))
+ 				chan->ack_win = min_t(u16, chan->ack_win,
+-						      rfc.txwin_size);
++						      l2cap_txwin_default(rfc.txwin_size));
+ 
+ 			if (test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
+ 				chan->local_msdu = le16_to_cpu(efs.msdu);
+@@ -3970,10 +3984,11 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
+ 		chan->monitor_timeout = le16_to_cpu(rfc.monitor_timeout);
+ 		chan->mps = le16_to_cpu(rfc.max_pdu_size);
+ 		if (test_bit(FLAG_EXT_CTRL, &chan->flags))
+-			chan->ack_win = min_t(u16, chan->ack_win, txwin_ext);
++			chan->ack_win = min_t(u16, chan->ack_win,
++					      l2cap_txwin_default(txwin_ext));
+ 		else
+ 			chan->ack_win = min_t(u16, chan->ack_win,
+-					      rfc.txwin_size);
++					      l2cap_txwin_default(rfc.txwin_size));
+ 		break;
+ 	case L2CAP_MODE_STREAMING:
+ 		chan->mps    = le16_to_cpu(rfc.max_pdu_size);
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 71e8c1b45bce..3b53e967bf40 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -765,6 +765,9 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname,
+ 			break;
+ 		}
+ 
++		if (!opts.txwin_size)
++			opts.txwin_size = L2CAP_DEFAULT_TX_WINDOW;
++
+ 		if (!l2cap_valid_mtu(chan, opts.imtu)) {
+ 			err = -EINVAL;
+ 			break;
 -- 
 2.53.0
