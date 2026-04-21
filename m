@@ -1,203 +1,162 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA43B387590;
-	Tue, 21 Apr 2026 14:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F091AAE17
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 14:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776782256; cv=none; b=oaPO3pKFxAIX5GtFWt0lDkNeadSn0aFbOaox7MkIu/omt9s5aQ8s5t3z+KSbty+xY4tUXZZqbFcEl/mDtlWYdP9VW2DlTEr/twwFkPgY8MnhP3RHK1GkapKjc9xtzoZJRLqJhqfwOTkDLJiBNXBSNJY+3M1ykcEy8eSkPQ8DuEU=
+	t=1776783087; cv=none; b=jD+/o6o7WLHJkgLMy1XRFZZB2TV9qjouXBajFgIUAZcDTme0N94KlRJLIBl/DMAOCgoaCCDuvh34aeQRvE6YFxKLVrILVcFD6GEqSTsvAesfIszn/U4nleA4gv1u2MsM+/o/6gbr2vsca6bkMyDsPI2zDz+o17ONbFiMDsbYqCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776782256; c=relaxed/simple;
-	bh=Jc1r7WiTMzlzZpAR8gpYFiGbgq1zu4/YSPRVmKk3eB4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B3Xkq87jM7RjUq6xfzBJqBDepsbH/gjfkUZmNj87Hlscs4FmurIieKr/wGsdVYPY+XTV7eL+Qu4kgoBJRjKdWdoULTlyXGLkFhQJyW8ik58xlWBMTtiLGoY524yPgaMEdnOQYiqIuWjAe4axoaNiz3zdLJBXp/9KImdnJPqB7uA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BDK6A7pw; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1776783087; c=relaxed/simple;
+	bh=GubX2Uz/m+K11vGC3agRLB99bkoKkhLCYqXyfObCK/I=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=bdag3oe6ZEjvklRHM4rQZ+R6YUp16kVTkl7q9O+gjhZP5WfbnbJD6hUBGt8nYLiMHsIzjj62HYdrno0X2s6pOQ56ql1ugaVbUZZk3HLe+njbAHY3z77Qmb2AMjLwfs3rVsKE5U8oozTI5mISLzsZ3mLEqdjw2zqvLnW8tNAgW7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hkHKdYWn; arc=none smtp.client-ip=74.125.82.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BDK6A7pw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776782255; x=1808318255;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Jc1r7WiTMzlzZpAR8gpYFiGbgq1zu4/YSPRVmKk3eB4=;
-  b=BDK6A7pwuiviAjoLYy5gDzccGnafRw4R99hfgBP/DoCV/X05h3VfAek+
-   Ewx5GJ4HxWf8t+YEvQTPvkT00KnTafwndm7/SPjbA3X9B4OV5h+3/dYYA
-   Zqi4H3wWk9uOPNih+wwFXRrAB4dVPDFbmwN5cDxtKxredHGhXq0k2AQQy
-   Sli1Pj0oo/uKzq6kBGFwKLi9rOuF9KMLaHGG8QxOBaYXw+03Vn3d6yE0a
-   MVyCal2EymsgqZuuqKeHp4I/Z5zuGDce+xL5SGGucea4RFLBnjU9MwQMe
-   X/zOz6cLdt4FUgzcC7KTeMoMcZJR5jcO19bqm2j227BlhpSQoe/NpLjwB
-   Q==;
-X-CSE-ConnectionGUID: NUJwpAkTQJix4KQK172M/Q==
-X-CSE-MsgGUID: a9uplsiSStatYM5j0iAl3Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11763"; a="100373430"
-X-IronPort-AV: E=Sophos;i="6.23,191,1770624000"; 
-   d="scan'208";a="100373430"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2026 07:37:10 -0700
-X-CSE-ConnectionGUID: PYeFdFnCTU+49WDFjXKZ+g==
-X-CSE-MsgGUID: p2vpNJ3bTUCon9nd1F/utQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,191,1770624000"; 
-   d="scan'208";a="227725225"
-Received: from lkp-server01.sh.intel.com (HELO 7e48d0ff8e22) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 21 Apr 2026 07:37:07 -0700
-Received: from kbuild by 7e48d0ff8e22 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wFCDo-000000003dg-37uZ;
-	Tue, 21 Apr 2026 14:37:04 +0000
-Date: Tue, 21 Apr 2026 22:36:24 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tristan Madani <tristmd@gmail.com>, linux-bluetooth@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	luiz.dentz@gmail.com, marcel@holtmann.org, sven@svenpeter.dev,
-	marcan@marcan.st, asahi@lists.linux.dev, stable@vger.kernel.org
-Subject: Re: [PATCH v3] Bluetooth: hci_bcm4377: validate firmware event
- length in completion ring
-Message-ID: <202604212248.Sek1Tdfg-lkp@intel.com>
-References: <20260417104639.2608008-1-tristmd@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hkHKdYWn"
+Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-2c156c4a9efso5690574eec.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 07:51:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776783085; x=1777387885; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=my01i5etMgtfKVcUlFgzCldpEvH8MteehNfrQqA/JAw=;
+        b=hkHKdYWndNqEu2+9db78ix+WyP4V2RsKgPl5b8LSPSDQLq5ylCHMNpAP3lDcOV4HRx
+         Gt4s1wqIR5+yH3vCC6riDG7nXBUh5UbozsGeyQ5ByZNgsTKHUcuVHODgBkBNLC+q6mHC
+         ElB3oUYFSfxwZtVB5ZuiXAGXFSww0hiS6ShkBs2Wb8L5p23CtvgUrU0u/DGeshV/K8Rk
+         xpMdyzKToVpqjpNiH6ydcL+EL9406gSLhQNVBxgYFdVlTy/ThwxlS+R0YR8nxeYql2Qv
+         z9WR1jEv3CknyaOc5oUgBbUg6IHlaZqKjS75MIPl5T0g1KxXOJ/PCBVtJ6Q2slS9WPgm
+         4vMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776783085; x=1777387885;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=my01i5etMgtfKVcUlFgzCldpEvH8MteehNfrQqA/JAw=;
+        b=DcSvOE6OVLETTlsGRA2R9UfVu7btF8N3IiScR/1XfcwnRr0hx8p8CTCx8JAXvKXJeg
+         OdB9PNYbUnwbKrPoO1TAxOMHkzb9RuprGZaF4Me9/MNy3AKoamuk75eErA7eOr+n6BSs
+         BAaubQJoD0b/IOXT+yMXXQ2MjYgRrmlYap9m+qd+YLi+W2SJ/KQQP2/91l67Y0rSIsYI
+         JlARbREGMdwCJqC06OTgfffSQD1Sn8o95M5GNh2gtbG0b2ATKgKbb2KJImGlOEpqXbWq
+         c262uZCQswlXNtXP8bx70c8L1QCHZiwj/XtL88Sn2HDcT4DO0B3NjwhLfL5b0C8QquOU
+         8TZg==
+X-Gm-Message-State: AOJu0Yw/1w4K5i7g1IEiYv4DXXwCQgymBD6fCEkbu8Vor5CoW2S4UqTB
+	JlekVyk7ucgbSB3oyd4QIH6zdey0UpBT3g0RJN9tuzdg5xisGGWQfYQNaSdDqw==
+X-Gm-Gg: AeBDieu8tACWT+mZN+2i9C7+u3TzF9YCvUZ/U/e8+PtnoU0yUmweiPrCdXqJDUo22jg
+	J7K4UCUQdXb8ZOiSA/rUOMNrZgWGtAD7XHoMwlVyxIPWRrVFZVrBY1SgzbMWiRKSwnY6z7SUQlQ
+	KQBpR3CAttzjyr9CvRler77ZpH2bpCZ6yxnBZ3FYtbBRpyfunP1UM4Lk6NK2iqe2h+4QoBCmR3w
+	AqGO1cdeJSvmUcb/nFEOhtUP8ozgCYp2M52KLPF/K6N/lajDwlL23p8m/k4WKqrRZcMYK7Xvh5D
+	GucLvChIBPjdKL1A01naoTPNluE9rCZUpvXXmIyQAPezU+J8tQMeg0SSiL6BmhR+jxEVJqI9RtZ
+	ld0Q4ICS6uFl1GVGQmY9pBu8DQa8wxVsrr09lenKOUsM56Yd+KzwrF18OVaI6/TICkWcWN29T4s
+	LYgr3eccs5t/3KtKvId4sauiSsvLPjTTFJDP/9P3v/IA==
+X-Received: by 2002:a05:7022:220f:b0:127:5cd6:fa45 with SMTP id a92af1059eb24-12c73f72632mr9044401c88.14.1776783084680;
+        Tue, 21 Apr 2026 07:51:24 -0700 (PDT)
+Received: from [172.17.0.2] ([52.161.180.154])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12da8b8fbc4sm7308534c88.4.2026.04.21.07.51.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Apr 2026 07:51:24 -0700 (PDT)
+Message-ID: <69e78eec.050a0220.2fc4bc.3bbd@mx.google.com>
+Date: Tue, 21 Apr 2026 07:51:24 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7830589840555669866=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260417104639.2608008-1-tristmd@gmail.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, michael.bommarito@gmail.com
+Subject: RE: [v2,1/2] Bluetooth: L2CAP: handle zero txwin_size in ERTM RFC option
+In-Reply-To: <20260421135639.3185653-2-michael.bommarito@gmail.com>
+References: <20260421135639.3185653-2-michael.bommarito@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Tristan,
+--===============7830589840555669866==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-kernel test robot noticed the following build warnings:
+This is automated email and please do not reply to this email!
 
-[auto build test WARNING on bluetooth/master]
-[also build test WARNING on bluetooth-next/master linus/master v7.0 next-20260420]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Dear submitter,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Tristan-Madani/Bluetooth-hci_bcm4377-validate-firmware-event-length-in-completion-ring/20260420-161359
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-patch link:    https://lore.kernel.org/r/20260417104639.2608008-1-tristmd%40gmail.com
-patch subject: [PATCH v3] Bluetooth: hci_bcm4377: validate firmware event length in completion ring
-config: um-allmodconfig (https://download.01.org/0day-ci/archive/20260421/202604212248.Sek1Tdfg-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260421/202604212248.Sek1Tdfg-lkp@intel.com/reproduce)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1083882
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202604212248.Sek1Tdfg-lkp@intel.com/
+---Test result---
 
-All warnings (new ones prefixed by >>):
+Test Summary:
+CheckPatch                    FAIL      1.20 seconds
+GitLint                       PASS      0.45 seconds
+SubjectPrefix                 PASS      0.17 seconds
+BuildKernel                   PASS      20.51 seconds
+CheckAllWarning               PASS      21.04 seconds
+CheckSparse                   PASS      23.68 seconds
+BuildKernel32                 PASS      18.71 seconds
+TestRunnerSetup               PASS      403.79 seconds
+TestRunner_l2cap-tester       PASS      23.06 seconds
+IncrementalBuild              PASS      21.36 seconds
 
-   In file included from drivers/bluetooth/hci_bcm4377.c:11:
-   In file included from include/linux/dma-mapping.h:8:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:1209:55: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-    1209 |         return (port > MMIO_UPPER_LIMIT) ? NULL : PCI_IOBASE + port;
-         |                                                   ~~~~~~~~~~ ^
->> drivers/bluetooth/hci_bcm4377.c:761:15: warning: format specifies type 'size_t' (aka 'unsigned long') but the argument has type 'u16' (aka 'unsigned short') [-Wformat]
-     760 |                          "event data len %zu exceeds payload size %zu for ring %d\n",
-         |                                                                   ~~~
-         |                                                                   %hu
-     761 |                          data_len, ring->payload_size, ring->ring_id);
-         |                                    ^~~~~~~~~~~~~~~~~~
-   include/linux/dev_printk.h:156:70: note: expanded from macro 'dev_warn'
-     156 |         dev_printk_index_wrap(_dev_warn, KERN_WARNING, dev, dev_fmt(fmt), ##__VA_ARGS__)
-         |                                                                     ~~~     ^~~~~~~~~~~
-   include/linux/dev_printk.h:110:23: note: expanded from macro 'dev_printk_index_wrap'
-     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
-         |                              ~~~    ^~~~~~~~~~~
-   2 warnings generated.
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v2,1/2] Bluetooth: L2CAP: handle zero txwin_size in ERTM RFC option
+WARNING: Non-standard signature: Assisted-by:
+#125: 
+Assisted-by: Claude:claude-opus-4-7
+
+ERROR: Unrecognized email address: 'Claude:claude-opus-4-7'
+#125: 
+Assisted-by: Claude:claude-opus-4-7
+
+total: 1 errors, 1 warnings, 0 checks, 72 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14532642.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-vim +761 drivers/bluetooth/hci_bcm4377.c
+[v2,2/2] Bluetooth: L2CAP: skip ERTM re-init on repeated CONFIG_RSP
+WARNING: Non-standard signature: Assisted-by:
+#124: 
+Assisted-by: Claude:claude-opus-4-7
 
-   734	
-   735	static void bcm4377_handle_completion(struct bcm4377_data *bcm4377,
-   736					      struct bcm4377_completion_ring *ring,
-   737					      u16 pos)
-   738	{
-   739		struct bcm4377_completion_ring_entry *entry;
-   740		u16 msg_id, transfer_ring;
-   741		size_t entry_size, data_len;
-   742		void *data;
-   743	
-   744		if (pos >= ring->n_entries) {
-   745			dev_warn(&bcm4377->pdev->dev,
-   746				 "invalid offset %d for completion ring %d\n", pos,
-   747				 ring->ring_id);
-   748			return;
-   749		}
-   750	
-   751		entry_size = sizeof(*entry) + ring->payload_size;
-   752		entry = ring->ring + pos * entry_size;
-   753		data = ring->ring + pos * entry_size + sizeof(*entry);
-   754		data_len = le32_to_cpu(entry->len);
-   755		msg_id = le16_to_cpu(entry->msg_id);
-   756		transfer_ring = le16_to_cpu(entry->ring_id);
-   757	
-   758		if (data_len > ring->payload_size) {
-   759			dev_warn(&bcm4377->pdev->dev,
-   760				 "event data len %zu exceeds payload size %zu for ring %d\n",
- > 761				 data_len, ring->payload_size, ring->ring_id);
-   762			return;
-   763		}
-   764	
-   765		if ((ring->transfer_rings & BIT(transfer_ring)) == 0) {
-   766			dev_warn(
-   767				&bcm4377->pdev->dev,
-   768				"invalid entry at offset %d for transfer ring %d in completion ring %d\n",
-   769				pos, transfer_ring, ring->ring_id);
-   770			return;
-   771		}
-   772	
-   773		dev_dbg(&bcm4377->pdev->dev,
-   774			"entry in completion ring %d for transfer ring %d with msg_id %d\n",
-   775			ring->ring_id, transfer_ring, msg_id);
-   776	
-   777		switch (transfer_ring) {
-   778		case BCM4377_XFER_RING_CONTROL:
-   779			bcm4377_handle_ack(bcm4377, &bcm4377->control_h2d_ring, msg_id);
-   780			break;
-   781		case BCM4377_XFER_RING_HCI_H2D:
-   782			bcm4377_handle_ack(bcm4377, &bcm4377->hci_h2d_ring, msg_id);
-   783			break;
-   784		case BCM4377_XFER_RING_SCO_H2D:
-   785			bcm4377_handle_ack(bcm4377, &bcm4377->sco_h2d_ring, msg_id);
-   786			break;
-   787		case BCM4377_XFER_RING_ACL_H2D:
-   788			bcm4377_handle_ack(bcm4377, &bcm4377->acl_h2d_ring, msg_id);
-   789			break;
-   790	
-   791		case BCM4377_XFER_RING_HCI_D2H:
-   792			bcm4377_handle_event(bcm4377, &bcm4377->hci_d2h_ring, msg_id,
-   793					     entry->flags, HCI_EVENT_PKT, data,
-   794					     data_len);
-   795			break;
-   796		case BCM4377_XFER_RING_SCO_D2H:
-   797			bcm4377_handle_event(bcm4377, &bcm4377->sco_d2h_ring, msg_id,
-   798					     entry->flags, HCI_SCODATA_PKT, data,
-   799					     data_len);
-   800			break;
-   801		case BCM4377_XFER_RING_ACL_D2H:
-   802			bcm4377_handle_event(bcm4377, &bcm4377->acl_d2h_ring, msg_id,
-   803					     entry->flags, HCI_ACLDATA_PKT, data,
-   804					     data_len);
-   805			break;
-   806	
-   807		default:
-   808			dev_warn(
-   809				&bcm4377->pdev->dev,
-   810				"entry in completion ring %d for unknown transfer ring %d with msg_id %d\n",
-   811				ring->ring_id, transfer_ring, msg_id);
-   812		}
-   813	}
-   814	
+ERROR: Unrecognized email address: 'Claude:claude-opus-4-7'
+#124: 
+Assisted-by: Claude:claude-opus-4-7
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+WARNING: The commit message has 'stable@', perhaps it also needs a 'Fixes:' tag?
+
+total: 1 errors, 2 warnings, 0 checks, 23 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14532643.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+https://github.com/bluez/bluetooth-next/pull/111
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7830589840555669866==--
