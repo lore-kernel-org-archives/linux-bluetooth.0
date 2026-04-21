@@ -1,64 +1,64 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD1D26E71F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 17:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C5F37A481
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 17:09:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776791341; cv=none; b=szaazh4Salw22KfUkV/Fe2C1rX8Z1PSdUMuyhdgp9Vs1IKEf+wbb88Vzc6wRbRAT7sGIGzf3fdON7T7mrakippc2fVFzlw+DzqomCBOaxFHj0vay+jNskgsoBriHmckoXysbUfQkaevsFl7BRvvuIzZISMczGgunw/dSnxsGEug=
+	t=1776791343; cv=none; b=j+4Vb5gGMaGXGlMhQrKYXYB47SKFOIK7ZaeBG9W8D51rxASNBVm/b6NQ692/RneyWzn9XQNhNyJZyV5O8T0GwVHkeUr+v/d5CoSNrOjsgjYe+9qVO+nbx/Xfy6QzSci7wMOhHfOLN1nJx5JWQkPs5xlv/wEdE9Lj17ke4HuSKlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776791341; c=relaxed/simple;
-	bh=m44O0dwBKI30dD/BNVYtje8eoZK0yrU4cbkCCOY9GCM=;
+	s=arc-20240116; t=1776791343; c=relaxed/simple;
+	bh=od8k5xtV8e4Z8osMhk6ok0xld4V4tOQnYwSKkBmiVjQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s8yCQ9Jvan2TwhI3C7MMx8ptKGU03QVmqHG91wyJUOAek4nPlYCKCDT/IjqpvyxWKQol20YD4hfinnNDJxjpyiTXCO/9MK8DF+nQOOsLzOJyuwTb6YI+tWXg2NHw/puXFYG9JFBxsk3jEi3VF2kq9yRVx4+AZOJ5ZcrZk1I4Hfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LRs6iQI6; arc=none smtp.client-ip=209.85.160.179
+	 MIME-Version; b=dvbxLCb5rH9sklpvfOoM/+6hUsCfFIIcv+dFr8lnhMXIc+d+caK60ETXWoGfme7x+/QDqGq/SsC6mV2Ek0ELvHyemORokSl1vksDEgLd3rKV3GtBF+FVdDelS+k4/uaBKhaSB/TTsXW68kog2kvs1lST0e5H/covFIVCVdhCn50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W/n9NTRo; arc=none smtp.client-ip=209.85.160.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LRs6iQI6"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-50d87610513so51065911cf.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 10:08:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W/n9NTRo"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-506a6cf8242so32632301cf.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 10:09:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776791339; x=1777396139; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776791340; x=1777396140; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WFUP7oxtLw+TaklzOUYMTAsDjSFshdzQqWmKfd2xajk=;
-        b=LRs6iQI6yZWLHSyQtiV8bkZhBNfG7qNL7IzzvxR6IeC86lglESWkXSYbrag3z7jqQk
-         0RAcH0QJLDlryaHP39YyNQw3faHf5bB38DtkEzJn9ERLwm8UBFqOttbNkkkBNuF8EC5N
-         f3cXiFsu41vmYiLyL6vJ+G6tfryzfDuCsnrjjkkh+in4Be6dBjxDo+ymsBarhdX+V3/z
-         VZHaHrupZD9d2FNtn2DpnvxIeXcX6xD4NCvfZGQNNOEw6dYOPCkSAmIeE27ntIQ5YDnh
-         rS8B4apd1ZrjtrnjP9cZkgguMlHlepyOS0XTS3zy0qgoX2/u1PWqNTvXVc4pYqGSld1/
-         5aFg==
+        bh=wH0BlHlhoxLNNnKqBxOSLzwEDmUvu7SwzB/nxXf7+zI=;
+        b=W/n9NTRoiXVLa8Mde0//RZjs4bm4ZQf4bJU/6+AfVwf6i2bOzPKtV4r5Vgatslfy2/
+         60//YJY7/KNBD1nwWnXe/FjQvyOf+4ue+1ccls6PgVg40jkU3EhX1kvEYY0lez0QMIOP
+         dvbRE/M6nzVb5Y8rJ373v618dJE3xr0YoMcWNhQeH07cmB2eDRiL8b5xVQryurmYwK5F
+         7TLdwxtpRYVjvYEg7tqAyUOtJds/kYeM4j3O39CNyIlqDam5CZkxR8kaJI5wvmN4Q94o
+         lakEa3LOhzI5OE5Der/KEpdN76v2WP5EtJXKL3D/mKFRxC3b7czx987oFJ9+XrWK522z
+         hdjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776791339; x=1777396139;
+        d=1e100.net; s=20251104; t=1776791340; x=1777396140;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=WFUP7oxtLw+TaklzOUYMTAsDjSFshdzQqWmKfd2xajk=;
-        b=NAx558RnbbA8w1+MuTlcCZAyOonTwYU+LBmA4yWRfEtGeB77XHtSxXH8sBiqsm5jfB
-         +WrgdK5+/QRSW/OUIHMEHpQ5dnimbk7mWaNKq9O/fIHt2Z98B5UVANNtE4nAE1KtI/Te
-         IvLIXceyYz8DtTR3OT4gGilz55eL7WeH8VmDGp6akvvrn24s+rVzjXSQyjrGMb6vSbyi
-         GfQ7J3yBtDKy+YcY7LZjBpR/L0yalUHNc2hG/3E58rhTQIsV26uX8GespH8RGqLs18J1
-         claNybomofqsA8NFisgHNZydr3+ByPcaW08IuJawkhX4JGhCpm2BBHhLlnMP6HHrTKb1
-         bl6w==
-X-Forwarded-Encrypted: i=1; AFNElJ/wx+dU2nj+uHEAQ7zsH2jENz5gkBXxwlcoSGYXlDqzNPZ8ftrrlESGE33vI2Fwg+u+Hcoq2kmhqt40cuCrgA8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygnlY8BxaTOC3b3Lg7aNu6gR2iF7t+LG+n9pESBWQ6gnLtWgph
-	T2H4k/q+GUYkVzsd/ayCwujqXMv09CWeK4lr2idb/NPQDdaACuW+ZJhu
-X-Gm-Gg: AeBDieuOYecPN/FfJaMtxEiunXLcpgQNK1IWrHlAFfY4QNBqBHjHc/1/MCldEqQUVjY
-	zF8sUBNm9rqqZJ2vnbJ4Cmu/dQTxUz/K62wnXSS8KZvGZcIPpxhO7wb0oBSYNvvBqsSriJ7REYB
-	ng8wlak4+AaZhpNXqXNTSvffh4A6vcUM64quVpFB61wv89+8Y0UHCPgpjQHFLgutTH2GTRENBxl
-	L5MNDuqcpzFBAgp/3oQxRlPOEP5KwyhgzgJsNvMJyJ7Vay3mgjF65I9Yly3iBCo3fGhHd5sxw4D
-	sZlaPdy5YuB3KNxZqhranAGvme0wAAx6lifTXQLYM1HUuWE0oEjBURHtv0Yesan8/u6P2HfuIIg
-	fRmmCl9VJRDaHSVAWdwoTbnKGppxaEPiTp3Nia3JZ8Sah94BZRtqjqHXio8GcpOnieIv+ntYK1M
-	H6mRDL/a10FWnNtF3SvJFCl2L7NZtJBnPCKXVOTt285bO8jmTVqaJcAjbzOfhlK7tzBzk1fMelV
-	YkIxLsaRpUMr8Hz/5oiGXs4yjpZ15Q=
-X-Received: by 2002:ac8:5ace:0:b0:50f:ad91:8902 with SMTP id d75a77b69052e-50fad918c7amr93780241cf.37.1776791338948;
-        Tue, 21 Apr 2026 10:08:58 -0700 (PDT)
+        bh=wH0BlHlhoxLNNnKqBxOSLzwEDmUvu7SwzB/nxXf7+zI=;
+        b=MZReXX2Swvh/1KnydpcxhO3T8CT9KsrqUinB0ws0tTlKOwz3+djHSG24mrZSO7mZ+b
+         JYYS/cAZj366IiZIzWro3yHwEtEKIpfGywRSfV7u2aoXLjKmGTppm9tWmXq3Pfb/49Qy
+         LUD1qIbdw8PN7fPlr8uyDaSd21hH+VMAdCWogg6TZIYC+tV/Ln9C/F/XA/fI3rkxTAMk
+         IunVoR+EPc4CqXZklx7XeifkNyjp3hk+KsD7ISiRnz0DJcycuYCad4EzlnUS6MDXOQPd
+         EwUPUdoRdsuZHUUmozrFZzfzCfZXmiOlLFhyyjeu7kXe2aicdXuYi3ug8l3z0dxOOqsy
+         eBgg==
+X-Forwarded-Encrypted: i=1; AFNElJ/KiKhpEdH/3NXoZAOpoPZmoPDb4MLXVf84cG4gMq6aAeHvWXCxPjStMGAPFOqMo9A1fJr9aQkxMvk6aawBo94=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIhtBe0PcCoVxRpeTpGiLanMlLKqG2GAx4a/obxJs0up+K5lro
+	Rg7+sq2/X4Mp0IcyiuRlkCyZEXvPDopiXPUFtG+gbpRHBRBQqZHP4/J1
+X-Gm-Gg: AeBDieujTwpbxGbdF4Fu3nPQgW1YLE9WC5CyIT5w8V05LhhJeI4dqgUr+Bn3mLPOxu7
+	kA/iNTTQxkKkZcwpS/a644hdfnArV3vk19MY/3vnrvFOMvjFJF0PN/jWp9aTskzj3yIIlL4S2Fe
+	ANQsTpVyP/t9YvRzrvwp93oRvql6eNHLV5DNf35WxMHk3uZEobR1FVNIhybxKjJNkPDaPwYnM9v
+	pKH/lHvalvXARkRB2UPg1BXHsgWktgumVWVC+QY3C2EqpEbXK3kjy5JOXEGKKvFNdLH6PXI9AzI
+	CyBnpGSCmeNRJbZBGLyVMTng1mvARVv7cOKBS87NCozCSL5AigZvocXGVdCu+lIRoaUDiTgC4Wl
+	UkobmsRv3AImwK5oH9fsKGVHhY3xRiqymf460QZtlKmkyIBlmo2gtX9J0ZVZwGe3nK7GilwhuDg
+	nBS9xF6MVHLTxVTKoCIAV8oYXUkqxMvNeCcSBx/rO6fK6YM7LwZUwmz0FFh84d2lUBHiUMudh5O
+	5q3uWIHoD2Qkrkiw6p2AsDsM8vfP60=
+X-Received: by 2002:a05:622a:aa46:10b0:50e:423e:2882 with SMTP id d75a77b69052e-50e423e40b5mr173188071cf.51.1776791340368;
+        Tue, 21 Apr 2026 10:09:00 -0700 (PDT)
 Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50fb92db861sm13134471cf.5.2026.04.21.10.08.57
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50fb92db861sm13134471cf.5.2026.04.21.10.08.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 10:08:58 -0700 (PDT)
+        Tue, 21 Apr 2026 10:08:59 -0700 (PDT)
 From: Michael Bommarito <michael.bommarito@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -67,12 +67,13 @@ Cc: linux-kernel@vger.kernel.org,
 	Soenke Huster <soenke.huster@eknoes.de>,
 	"Michael S . Tsirkin" <mst@redhat.com>,
 	virtualization@lists.linux.dev
-Subject: [PATCH v3 0/2] Bluetooth: virtio_bt: harden rx against untrusted backend
-Date: Tue, 21 Apr 2026 13:08:43 -0400
-Message-ID: <20260421170845.3469513-1-michael.bommarito@gmail.com>
+Subject: [PATCH v3 1/2] Bluetooth: virtio_bt: clamp rx length before skb_put
+Date: Tue, 21 Apr 2026 13:08:44 -0400
+Message-ID: <20260421170845.3469513-2-michael.bommarito@gmail.com>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <CABBYNZKqx4ureNbRGEghGjGWcmMQSoiY4oUCECme_Vgn8RvYYw@mail.gmail.com>
+In-Reply-To: <20260421170845.3469513-1-michael.bommarito@gmail.com>
 References: <CABBYNZKqx4ureNbRGEghGjGWcmMQSoiY4oUCECme_Vgn8RvYYw@mail.gmail.com>
+ <20260421170845.3469513-1-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -81,65 +82,104 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Respin of the virtio_bt rx hardening patch, split per Luiz's
-request on the v2 thread:
+virtbt_rx_work() calls skb_put(skb, len) where len comes directly
+from virtqueue_get_buf() with no validation against the buffer we
+posted to the device. The RX skb is allocated in virtbt_add_inbuf()
+and exposed to virtio as exactly 1000 bytes via sg_init_one().
 
-  https://lore.kernel.org/linux-bluetooth/20260421151659.3326690-1-michael.bommarito@gmail.com/
+Checking len against skb_tailroom(skb) is not sufficient because
+alloc_skb() can leave more tailroom than the 1000 bytes actually
+handed to the device. A malicious or buggy backend can therefore
+report used.len between 1001 and skb_tailroom(skb), causing skb_put()
+to include uninitialized kernel heap bytes that were never written by
+the device.
 
-v2 bundled two independent hazards in one commit and the commit
-message got convoluted trying to explain them together. This v3
-keeps each hazard in its own patch so the rationale for each is
-self-contained.
+The same path also accepts len == 0, in which case skb_put(skb, 0)
+leaves the skb empty but virtbt_rx_handle() still reads the pkt_type
+byte from skb->data, consuming uninitialized memory.
 
-Patch 1/2 keeps the original v1/v2 concern: virtbt_rx_work() calls
-skb_put() with a used.len the device controls, with no validation
-against the 1000-byte buffer we actually exposed to virtio via
-sg_init_one(). Checking against skb_tailroom() is not enough
-because alloc_skb() can leave more tailroom than 1000 bytes due to
-slab padding. len == 0 is also accepted, which lets an empty skb
-reach virtbt_rx_handle() where the pkt_type byte is then read from
-uninitialized memory. 1/2 defines VIRTBT_RX_BUF_SIZE, reuses it in
-alloc_skb() and sg_init_one(), and gates virtbt_rx_work() on
-[1, VIRTBT_RX_BUF_SIZE] with bt_dev_err_ratelimited() on the drop
-path.
+Define VIRTBT_RX_BUF_SIZE once and reuse it in alloc_skb() and
+sg_init_one(), and gate virtbt_rx_work() on that same constant so
+the bound checked matches the buffer actually exposed to the device.
+Reject used.len == 0 in the same gate so an empty completion can
+no longer reach virtbt_rx_handle().
 
-Patch 2/2 closes a residual short-payload hazard found during v2
-pre-send review. After 1/2 restricts used.len to [1, 1000], a
-one-byte completion still reaches hci_recv_frame() with skb->len
-pulled to 0. If that byte was HCI_ACLDATA_PKT, the ACL-vs-ISO
-classification fast-path in hci_dev_classify_pkt_type()
-dereferences hci_acl_hdr(skb)->handle whenever the HCI device has
-an active CIS_LINK, BIS_LINK, or PA_LINK connection, reading two
-bytes of uninitialized RX-buffer data. The same hazard shape
-exists for every packet type because none of the switch cases in
-virtbt_rx_handle() checked skb->len against the per-type minimum
-HCI header. 2/2 requires skb->len to cover the fixed header size
-for the selected type (event 2, ACL 4, SCO 3, ISO 4) before
-calling hci_recv_frame(); drop ratelimited otherwise. Unknown
-pkt_type values still take the original kfree_skb() default path.
+Use bt_dev_err_ratelimited() because the length value comes from an
+untrusted backend that can otherwise flood the kernel log.
 
-Both patches carry the same Fixes: 160fbcf3bfb9 and Cc: stable@
-as the v2 commit, because both hazards have existed since the
-driver switched to skb_put() for used.len handling.
+Same class of bug as commit c04db81cd028 ("net/9p: Fix buffer
+overflow in USB transport layer"), which hardened the USB 9p
+transport against unchecked device-reported length.
 
-Fresh runtime repro of the original skb_over_panic on an unpatched
-tree and a clean reject log with 1/2 applied are attached in the
-evidence bundle referenced from the v2 thread; no runtime change
-between v2 and v3 beyond the split (the final tree after 1/2+2/2
-is byte-identical to the v2 commit).
+Fixes: 160fbcf3bfb9 ("Bluetooth: virtio_bt: Use skb_put to set length")
+Cc: stable@vger.kernel.org
+Cc: Soenke Huster <soenke.huster@eknoes.de>
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+Assisted-by: Claude:claude-opus-4-7
+---
+Changes in v3:
+- split off the per-pkt-type header-length check into its own
+  patch (2/2) per Luiz's request; this patch now only covers the
+  used.len vs buffer-size hazard and the len == 0 path
 
-Prior public versions of this patch on linux-bluetooth:
+Changes in v2:
+- validate used.len against VIRTBT_RX_BUF_SIZE (the 1000 bytes
+  actually exposed to the device via sg_init_one()) rather than
+  skb_tailroom(), which can exceed 1000 due to slab padding
+- reject used.len == 0 before virtbt_rx_handle() reads the
+  pkt_type byte, so zero-length completions can no longer pull an
+  empty skb into hci_recv_frame()
+- switch the error log to bt_dev_err_ratelimited() because the
+  length value comes from an untrusted backend that can otherwise
+  flood the kernel log
 
-  v1: <20260418000138.1848813-1-michael.bommarito@gmail.com>
-  v2: <20260421151659.3326690-1-michael.bommarito@gmail.com>
+ drivers/bluetooth/virtio_bt.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-Michael Bommarito (2):
-  Bluetooth: virtio_bt: clamp rx length before skb_put
-  Bluetooth: virtio_bt: validate rx pkt_type header length
-
- drivers/bluetooth/virtio_bt.c | 39 ++++++++++++++++++++++++++++-------
- 1 file changed, 32 insertions(+), 7 deletions(-)
-
+diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
+index 76d61af8a275..2c5c39356a1c 100644
+--- a/drivers/bluetooth/virtio_bt.c
++++ b/drivers/bluetooth/virtio_bt.c
+@@ -12,6 +12,7 @@
+ #include <net/bluetooth/hci_core.h>
+ 
+ #define VERSION "0.1"
++#define VIRTBT_RX_BUF_SIZE 1000
+ 
+ enum {
+ 	VIRTBT_VQ_TX,
+@@ -33,11 +34,11 @@ static int virtbt_add_inbuf(struct virtio_bluetooth *vbt)
+ 	struct sk_buff *skb;
+ 	int err;
+ 
+-	skb = alloc_skb(1000, GFP_KERNEL);
++	skb = alloc_skb(VIRTBT_RX_BUF_SIZE, GFP_KERNEL);
+ 	if (!skb)
+ 		return -ENOMEM;
+ 
+-	sg_init_one(sg, skb->data, 1000);
++	sg_init_one(sg, skb->data, VIRTBT_RX_BUF_SIZE);
+ 
+ 	err = virtqueue_add_inbuf(vq, sg, 1, skb, GFP_KERNEL);
+ 	if (err < 0) {
+@@ -227,8 +228,15 @@ static void virtbt_rx_work(struct work_struct *work)
+ 	if (!skb)
+ 		return;
+ 
+-	skb_put(skb, len);
+-	virtbt_rx_handle(vbt, skb);
++	if (!len || len > VIRTBT_RX_BUF_SIZE) {
++		bt_dev_err_ratelimited(vbt->hdev,
++				       "rx reply len %u outside [1, %u]\n",
++				       len, VIRTBT_RX_BUF_SIZE);
++		kfree_skb(skb);
++	} else {
++		skb_put(skb, len);
++		virtbt_rx_handle(vbt, skb);
++	}
+ 
+ 	if (virtbt_add_inbuf(vbt) < 0)
+ 		return;
 -- 
 2.53.0
 
