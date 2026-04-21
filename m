@@ -1,90 +1,91 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D9B1632DD
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 11:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A116C202C46
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 11:32:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776771126; cv=none; b=LIDpwBs5UeQRJ5dCw16tQGux3H5Y3i2AWs+BX2FmGR9/CvLazsd1tCDQesAwUJJfIKX5725Uqc4S/f9z68+Oo80EsridjgrmNSEkmX5XWsPuDfINGAlJ04qPwrMUeRdt8xbNdgR8hIDvBCRA2mL523LbSfagR9pa1LFihRUy3xs=
+	t=1776771133; cv=none; b=TNbFaYZq/QBsIEDVD9s5Kk5QTpac7+fnS794dUTz/FQLIlo0WYSvUuP2R+JYBmksp7KIrHUTEI0ekvKuyxmnnT9lG6s7gpQ/eb8glW6gGhwqeRnwAJ3PqUtd2Oo5b1IgB9Xc8EiiztrDm4B9HNw1iPO/u7sRsJQMGOPYOCT5FD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776771126; c=relaxed/simple;
-	bh=eErapPiGo3unNFhIkS5yHfwYmolwatwxMFotBdjXbqA=;
+	s=arc-20240116; t=1776771133; c=relaxed/simple;
+	bh=/a0+v9uB9goL6906HntSQS/lSYbepPJvMdHy7tXPyW0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tIoz2eSVC5a1B3YyYw6rIhewLnerI5Nj8cnPCR23esOCNZJJVjq9g7s565enAI0D5+/sRnd0ucueXDBjRW7iB5eFZDrFuYuuUhtqpK1J4HPdiX6U9+tLns0IFbs5udOI03HlI7dVgCAFMz/OxOxghZDE8XUxcFHnFCPetLnx2aM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=D/cz68JP; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=cVIC1/D2; arc=none smtp.client-ip=205.220.168.131
+	 MIME-Version:Content-Type; b=rLmLBpWvhidzoHuKUSc7Z2MccDdG5FmL3T/XT2MThd6/y0huMeQ6Jb7rBR2HLEdd98axwZSdO51I84QsnHoYcmKdP77NNJRzaPFibFP0vMm04IYwu0vIeBGn83sHtcuZGPbDlgeVyZn4h3liHw+bjOguSnABF4t9uhyrL2d/AE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=XeGRJpeL; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=f+MtiVb7; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="D/cz68JP";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="cVIC1/D2"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="XeGRJpeL";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="f+MtiVb7"
 Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63L6eP4x3574148
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 11:32:04 GMT
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63L6eTdd3574225
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 11:32:10 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=sYOV/mf6XU1
-	FzAg3X2G0pu7aCyh51IrHAs74XqzGews=; b=D/cz68JPPT2ujBMaqw3ghGd+Yyc
-	3kUClnuxDtVvP4oRL76RGYOdTPRO+iKzOj7kxGGpiYiydWpYmAG0AVdVEY5SZ7Rq
-	6Ck5TpbvLHKafvrnBJhDwHoJkfEJjfXlOi+6XDi0T2Nf+hJRJ2FQgOq8uij7DyMd
-	cLUKRY3r8jWs6HP5hQvlQbbU9siwAmdzWCiHcUBqoASxvVyI9uTHbbJIJLOKgHQm
-	mjYX6ShnfauoKq6W92Ds+YqjbyfaIdlrf3xoOuRk4I5I3IxEWRN7tMTReTkhklA3
-	Yqo8xZgl5b8v5g5LoCSizlC+pDeSGjRPj6cJpRGRPGjOJeotXuw6Hsq1Fqw==
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dp465h2dj-1
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	tzBpvgX73FhXFHfBDFB5IhFAJ8PjGyUlBvMEp0X53SE=; b=XeGRJpeLwg7DsPvv
+	cv341QGeJM5aeN6A1StwQJvD1J6NNl0sRrlKxGOkUJY0Uev1eCk8j6vnbr0OtDwL
+	itcBSDYZ4mSQoTNRNJ87DC9+JvARmX2XSxsfpXMA4tpuE+wETCA3ZnNXb6cn9tSJ
+	1SnMtVAhU+OnzWr+WK8/kJpY2ROZ04HuWmigqQ0RaE1X4S/T6+KerCpAB7N+2pVQ
+	FZNy5AzIDF+HfYmYYgZ8xdLu/ZuSukBzt7d0hLbPOusj8pCnieiWX/2sEdzrxBF8
+	jif4o/mEOjKxSlgp2E1ZDOBx2O0zSxuUmcL6RaT35pA8wGBcLJLh5i8ZuGn2Ewb3
+	YwIINw==
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dp465h2dr-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 11:32:04 +0000 (GMT)
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-35daf3d3030so4486734a91.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 04:32:04 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 11:32:09 +0000 (GMT)
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2b2ec17dc21so46759905ad.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 04:32:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1776771123; x=1777375923; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1776771129; x=1777375929; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sYOV/mf6XU1FzAg3X2G0pu7aCyh51IrHAs74XqzGews=;
-        b=cVIC1/D2uVjPMw8McqpVFnO9+hfR/an050IcHfOXZSkf7+CGR4Ad2qXS4sv+wd/Ees
-         7+bu0EBLJn1+Aqarn7etJyYjFydW5Y6ymaN8sgyYVOycIwb0T8geZp50N80cnCI1YJBz
-         Z7kgmWLMkGtvrdeTAEwsLfUgD7wMKexCE1dTs/I7e2A/YOTtiiTRrkGWlpEZuiUJTt/R
-         mwAeLXWcuZhXNKTJcDgjtpXCIoWKx6hdZAjKtwJF9rEH9p6+1ApSDyKLRYFvxAdJTI4r
-         J/RWicU0hGiy4ss0xzVUrmp7W88ihCBIRs/4j5jwjz+SSN3a9Lyp8A81dwocyvp2V8Qv
-         y2JA==
+        bh=tzBpvgX73FhXFHfBDFB5IhFAJ8PjGyUlBvMEp0X53SE=;
+        b=f+MtiVb7pk/qnmsIrLIKE3CLGQ/61Yl8l/MlwGETXpeJYSmk5rp1DWbWY8R4YPnVCj
+         n8Dz+xc2rIRk6jyEG200XUVFJtShMAk5XGg+2tX/1b3qClRmsfj8O2YygWN+SnXvqJop
+         +aBixLWxopUVQfcZKiYs+IAmfe4zjfYxqdSkS8+sxqknxrXiSNGErk8mURP3xeCX+tCz
+         YHFAjZ4iXRR/DpVJN8P1u/VOBWs9Yiw+8Zrj+UjuhydGkcvpyXI7EVGaT4+UOKRnArVO
+         zJ52JbnFUQhNLpEt45t2ceH9hXD2SyqxmDHbBAEqP5Tk7CVmxqNcaUk53rar1oca/Fr5
+         21pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776771123; x=1777375923;
+        d=1e100.net; s=20251104; t=1776771129; x=1777375929;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=sYOV/mf6XU1FzAg3X2G0pu7aCyh51IrHAs74XqzGews=;
-        b=d21gNqvfyxYH14TUk0QaPCIU3YeAhHcAQaBLV1U2E1OO2sLk2jtn8B7JplHTqi7ehh
-         p/wptWimm9FUV+ZIis5q4vhCrnJSSidXpgq3gqM7x6PkAZJm5G4BjAgsgN13+x9M+4QC
-         wtc4WrACn7F+kVb9vBYHARmBC50aHzMJTYiFKXEhc6+ayTk3jtmu7cICIHQFvO5R9Y4x
-         JmMGY80MOnB4wFrb79XYtCRq7dYIJra+ck/n9puRnSYa3T+vkRjCZgQDEfsS4fd3c9w5
-         sWnH6w8akZIxlysPqqR05X+4ZatY4XeVmuoI7beK1zZtcZ6S0a5+q2+qookDUquHWm2Z
-         GjGQ==
-X-Gm-Message-State: AOJu0YyH7l+L8xJiCXI+huo9OxPQlXVIhq/FImfUh/XuY8B2bECv0qNH
-	UfA0zcr/P1aKPJLWvR+8Qinu/yzDuy5DsgMfJCDLhGNUJP8+JgpoXcaB5ReKm27avQ0+2Gocyo+
-	1k/nnUP4FW1NWthj4Mbd31BgtvkySOjTNE4hxq10SntEM95z80GvF/3QTfAzAbjYkkZ8EQ2964C
-	A4BhU=
-X-Gm-Gg: AeBDievgxPnq1S1Ot7vFfaME7qZdRV9VZpjQPtYr+6uBQhtFtL0AACdrT76KqpLvJG+
-	Nm6OTWBaZORdYohDCvgbz15SA4yJKYat+Vq76OGqaWFN0ytgGfsMdPx3iLL3YN4qt6OYTtBw684
-	GnirZ7kbirGQTKlTx5k+Ayi8lDwBTIf4uCJGorqZWP3gm3GSgsn4vMXV9GS0zsCZ6jx2vo4tfGw
-	4EGQTkdaUEHdCi4voqMPtXi24pO+/1QSRd/hnPXx5wVYyjJCwj53HZqY3EDYndgtj9qLhNCWtk6
-	fK8ozao7idLzbSSoolh3XtVzige888Uf6IRhCh8yeWMQTm/iYjTKlXEhuXmADNB4PfRhrTYixA5
-	sWzkTLH6883heUJlaiGTqWMSW7renugavLEsZ2fpUpfS3W5eyBPgUiQJggrBJBA==
-X-Received: by 2002:a17:90b:270a:b0:35d:a8d9:3b4 with SMTP id 98e67ed59e1d1-361403c35b5mr17118899a91.4.1776771123347;
-        Tue, 21 Apr 2026 04:32:03 -0700 (PDT)
-X-Received: by 2002:a17:90b:270a:b0:35d:a8d9:3b4 with SMTP id 98e67ed59e1d1-361403c35b5mr17118868a91.4.1776771122737;
-        Tue, 21 Apr 2026 04:32:02 -0700 (PDT)
+        bh=tzBpvgX73FhXFHfBDFB5IhFAJ8PjGyUlBvMEp0X53SE=;
+        b=tWIsG5K/iQg7YT1ohbnWlVGAVVBxn30N2R9cFrSBhnA7YPfudQgmoqxjYMy/Fg/lKs
+         pgdm30u5xoLWENQCtlBmpoA5u9wdcY4TGukQZt3HttcaXInRLR3dPHpqYs7mEnOVCG1c
+         iSzjFhN15KLzNuJcOspulcRS7YTclHcOfN4nzwPEIuldLLZSUAQAzaAiNT6452vtd1ZL
+         2giw7qkAj3cl61jr0q6UWq2dfbzz3Yn2kqEA6BEiMd4pejFgG+nMMtSPXUOTWFvUnnCg
+         t7iz7QCPmOxWhBETSrbq2d4iP4lLDpDAJPmLV6PrXRSDtc7E2ThdoGLytT3pIG26CzYt
+         2w2w==
+X-Gm-Message-State: AOJu0Yx1G3beg8sYXOmw1mnuRAVwVksLG+shwnt9wEWBBvD/fslsD0rB
+	bfgo5wKpV2egVN802mdxB33JRXDtTXM7Y6498dHivUNxKjaFIGcvJ55SdO3U2BU+azqhi31bfyQ
+	tkIAYytnZgSbc7xBrPFPHybYk/jUAv1yDcyYiSNxbnlFJ5LKtX2vQfENM+fwVV48dqmCKxJNBkc
+	YSa+c=
+X-Gm-Gg: AeBDievU3AU11OYQ8/7A+UTCxv0OCCSExTqtYffa7Jr8iAMP46g7eiVNIAqXjsqnxU9
+	nkfv1QJ2R7v/TIrPNh0fslsULbMazLOKc6kI12YwN1G8TFkEbv0dAO26qGWbmFTck6wim1DylN7
+	wCK9RpM848mpwP3mGbKJ2YlFfzaOZN3n1suKtCDl2yNp1OcrQb80U5k8ml1MD3rLjp7JaMipnBP
+	8TXAFukmRAVGMWRja6Nw3KhO/OvZaHTUMU8seiYdvKL4cvLvmoyBW7ZQIZt9+hjfU7tfrny4Nv3
+	QjsGS365NC6KsZLYyvRAwv544Hl7YvaP0uBcLD+O1gI8vcwCVQAgfWCIUnPIq8oPlZbisQFr0p7
+	mx2uDxSvYmF5VQ61Iez7p/JTOTUoNx/9wBxytm1EU0SOcYOSm4ihPyO/5/nHxwg==
+X-Received: by 2002:a05:6a20:e210:b0:398:7855:3e33 with SMTP id adf61e73a8af0-3a08d951e7dmr19487203637.56.1776771127875;
+        Tue, 21 Apr 2026 04:32:07 -0700 (PDT)
+X-Received: by 2002:a05:6a20:e210:b0:398:7855:3e33 with SMTP id adf61e73a8af0-3a08d951e7dmr19487146637.56.1776771126889;
+        Tue, 21 Apr 2026 04:32:06 -0700 (PDT)
 Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c797703059fsm10334903a12.24.2026.04.21.04.32.00
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c797703059fsm10334903a12.24.2026.04.21.04.32.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 04:32:02 -0700 (PDT)
+        Tue, 21 Apr 2026 04:32:06 -0700 (PDT)
 From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
         quic_anubhavg@quicinc.com, prathibha.madugonde@oss.qualcomm.com,
         Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Subject: [PATCH BlueZ v11 2/3] main.conf: Add Channel Sounding config parsing  support
-Date: Tue, 21 Apr 2026 17:01:47 +0530
-Message-Id: <20260421113148.3809176-3-naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v11 3/3] profiles: ranging: Add HCI LE Event Handling in Reflector role
+Date: Tue, 21 Apr 2026 17:01:48 +0530
+Message-Id: <20260421113148.3809176-4-naga.akella@oss.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260421113148.3809176-1-naga.akella@oss.qualcomm.com>
 References: <20260421113148.3809176-1-naga.akella@oss.qualcomm.com>
@@ -94,22 +95,24 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDIxMDExMyBTYWx0ZWRfXxmSaeno3HrSM
- nd3oCF3YaKIiuueCcjJgZRa+PDRPdvBnm6VlpaCLnzV2NzotsOjgwLLwENcddsOeFDGgkcUp3AR
- MNzdjtRfip6BaQlP5d4ku7h1TVuE/P8qO7CbNPpLgnOPucFCvUzbzG4w//nmUQGQgMMGN2DvnAq
- u4uXGUKOGNg0Dyjn9NVPnX2iJUDKA0wJm+eEEHuDyNoIjHkDnMU6w79BMCPkFTdSFaw4Np/a4FY
- dAmuv8IObkhtz8FV/VrxzFA85or5I13+VNOK6tbBsaHb15vNvGkdVCQ02M4QWR5xnBajHZck6Am
- f8g9JgvazGdeixhNI33Rvw4L86fUW7q/j7hPSCyanQH0qHdRWeboA73PF0OS9qAxCiUwwilo64K
- 0cAjQ++9GBRgfSAXcJfXTETMT1UEK3dn3YAWacZE1c/J8b/VmZzf4jbIZEjb7/7xbOT646rK26K
- P1m2hF7rP0n0JF4sH4w==
-X-Proofpoint-ORIG-GUID: Q7B4VoOFmAL3ZacGq_w0wYgt1SXmKZXF
-X-Authority-Analysis: v=2.4 cv=YOSvDxGx c=1 sm=1 tr=0 ts=69e76034 cx=c_pps
- a=UNFcQwm+pnOIJct1K4W+Mw==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22 a=IZGhllgqU5eGhMH6-2IA:9
- a=uKXjsCUrEbL0IQVhDsJ9:22
-X-Proofpoint-GUID: Q7B4VoOFmAL3ZacGq_w0wYgt1SXmKZXF
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDIxMDExMyBTYWx0ZWRfXyJUzbAtP4VVE
+ mEUsG6LW1yIuRz9vXHN88RwD2HuOe/DU7PK1NVuWHWfHFumXnXO/A4EsEQLlcgdkNz/71TGMV/j
+ LpGfTGAeu3jAcjoJ5XWkIM5kcEfYoVcYYVfV5AF7+jYzIqMoApGF0lydOiAz0zgluzp4D4G/qdb
+ lIe5QmcbwaZA8niJ7qDprPvBzpUONSABlq0oXaLKu3Wa0llKFicA81ocTrUrgRWyu2EWnNWi13G
+ gtgzlrI0e7NjsPe3mDdkCzv+qzB2IrsSkd6vG+n6aTJ0liH9qylO+k/JW0KW2Ze42s08nxix8Ha
+ GPW7IB8bNSpWU+kUinMa1Zx8+6eoL37GxgWsswAdkys3Fhl8OaQHV71TaR7mptEdyUEdWXAGrlo
+ B/UzUCIBmUBmaDe4c8M0UKTJ71PqBkQQGDvxDpG9R2AB1/dTqQKVyosty5nhqQ6GqfdfesFzIj8
+ xufbzoURcLhJJTkfb5Q==
+X-Proofpoint-ORIG-GUID: y_yJClHbbYVrEviZZjbb-OkwN6zygN2_
+X-Authority-Analysis: v=2.4 cv=YOSvDxGx c=1 sm=1 tr=0 ts=69e76039 cx=c_pps
+ a=JL+w9abYAAE89/QcEU+0QA==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22
+ a=oOLhp57udTVTuucuDuwA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=324X-CrmTo6CU4MGRt3R:22
+X-Proofpoint-GUID: y_yJClHbbYVrEviZZjbb-OkwN6zygN2_
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-04-21_02,2026-04-20_02,2025-10-01_01
@@ -119,281 +122,1555 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2604070000 definitions=main-2604210113
 
-Add support for parsing Channel Sounding (CS) configuration options
-from the configuration file.
-
-Add CAP_NET_RAW to CapabilityBoundingSet in bluetooth.service.
-bluetoothd requires CAP_NET_RAW to receive and process HCI LE events
-when running under a constrained systemd capability bounding set
+Open RAW HCI Channel for CS Event Handling
+Parse the following HCI LE CS Events in reflector role
+and route the events to RAP Profile.
+ 1. HCI_EVT_LE_CS_READ_RMT_SUPP_CAP_COMPLETE
+ 2. HCI_EVT_LE_CS_CONFIG_COMPLETE
+ 3. HCI_EVT_LE_CS_SECURITY_ENABLE_COMPLETE
+ 4. HCI_EVT_LE_CS_PROCEDURE_ENABLE_COMPLETE
+ 5. HCI_EVT_LE_CS_SUBEVENT_RESULT
+ 6. HCI_EVT_LE_CS_SUBEVENT_RESULT_CONTINUE
+Send HCI_OP_LE_CS_SET_DEFAULT_SETTINGS to the controller
+with default settings selected by the user.
+Map connection handle received to device connection
 ---
- src/bluetooth.service.in |   2 +-
- src/btd.h                |   7 +++
- src/main.c               | 132 ++++++++++++++++++++++++++++++++++++++-
- src/main.conf            |  24 +++++++
- 4 files changed, 162 insertions(+), 3 deletions(-)
+ Makefile.plugins           |    3 +-
+ profiles/ranging/rap.c     |  190 +++++-
+ profiles/ranging/rap_hci.c | 1259 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 1450 insertions(+), 2 deletions(-)
+ create mode 100644 profiles/ranging/rap_hci.c
 
-diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
-index 8ebe89bec..8dcbde236 100644
---- a/src/bluetooth.service.in
-+++ b/src/bluetooth.service.in
-@@ -10,7 +10,7 @@ ExecStart=@PKGLIBEXECDIR@/bluetoothd
- NotifyAccess=main
- #WatchdogSec=10
- #Restart=on-failure
--CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
-+CapabilityBoundingSet=CAP_NET_RAW CAP_NET_ADMIN CAP_NET_BIND_SERVICE
- LimitNPROC=1
+diff --git a/Makefile.plugins b/Makefile.plugins
+index c9efadb45..ac667beda 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -89,7 +89,8 @@ builtin_modules += battery
+ builtin_sources += profiles/battery/battery.c
  
- # Filesystem lockdown
-diff --git a/src/btd.h b/src/btd.h
-index c84a600d1..db2e81239 100644
---- a/src/btd.h
-+++ b/src/btd.h
-@@ -94,11 +94,18 @@ struct btd_le_defaults {
- 	uint8_t		enable_advmon_interleave_scan;
+ builtin_modules += rap
+-builtin_sources += profiles/ranging/rap.c
++builtin_sources += profiles/ranging/rap.c \
++		profiles/ranging/rap_hci.c
+ 
+ if SIXAXIS
+ builtin_modules += sixaxis
+diff --git a/profiles/ranging/rap.c b/profiles/ranging/rap.c
+index f03454c72..df4f07811 100644
+--- a/profiles/ranging/rap.c
++++ b/profiles/ranging/rap.c
+@@ -17,6 +17,7 @@
+ #include "gdbus/gdbus.h"
+ 
+ #include "bluetooth/bluetooth.h"
++#include "bluetooth/l2cap.h"
+ #include "bluetooth/uuid.h"
+ 
+ #include "src/plugin.h"
+@@ -34,15 +35,131 @@
+ #include "src/shared/rap.h"
+ #include "attrib/att.h"
+ #include "src/log.h"
++#include "src/btd.h"
++
++struct rap_adapter_data {
++	struct btd_adapter *adapter;
++	struct bt_hci *hci;  /* Shared HCI raw channel */
++	int ref_count;  /* Number of devices using this adapter */
++};
+ 
+ struct rap_data {
+ 	struct btd_device *device;
+ 	struct btd_service *service;
+ 	struct bt_rap *rap;
+ 	unsigned int ready_id;
++	struct rap_adapter_data *adapter_data;  /* Shared adapter-level HCI */
++	void *hci_sm;  /* Per-device HCI state machine */
  };
  
-+struct btd_le_bcs {
-+	uint8_t role;
-+	uint8_t cs_sync_ant_sel;
-+	int8_t max_tx_power;
+ static struct queue *sessions;
++static struct queue *adapter_list;  /* List of rap_adapter_data */
++
++/* Adapter data management */
++static bool match_adapter(const void *data, const void *match_data)
++{
++	const struct rap_adapter_data *adapter_data = data;
++	const struct btd_adapter *adapter = match_data;
++
++	return adapter_data->adapter == adapter;
++}
++
++static struct rap_adapter_data *rap_adapter_data_find(
++		struct btd_adapter *adapter)
++{
++	if (!adapter_list)
++		return NULL;
++
++	return queue_find(adapter_list, match_adapter, adapter);
++}
++
++static struct rap_adapter_data *rap_adapter_data_new(
++		struct btd_adapter *adapter)
++{
++	struct rap_adapter_data *adapter_data;
++	int16_t hci_index;
++
++	hci_index = btd_adapter_get_index(adapter);
++	DBG("Creating new adapter_data for hci%d", hci_index);
++
++	adapter_data = new0(struct rap_adapter_data, 1);
++	if (!adapter_data) {
++		error("Failed to allocate adapter_data");
++		return NULL;
++	}
++
++	adapter_data->adapter = adapter;
++	adapter_data->ref_count = 0;
++
++	/* Create adapter list if needed */
++	if (!adapter_list) {
++		DBG("Creating new adapter_list");
++		adapter_list = queue_new();
++	}
++
++	/* Add to queue BEFORE creating HCI to prevent race condition */
++	queue_push_tail(adapter_list, adapter_data);
++	DBG("Added adapter_data to queue");
++
++	/* Create HCI raw channel for this adapter */
++	DBG("Opening HCI raw device for hci%d", hci_index);
++	adapter_data->hci = bt_hci_new_raw_device(hci_index);
++
++	if (!adapter_data->hci) {
++		error("Failed to create HCI raw device for hci%d", hci_index);
++		queue_remove(adapter_list, adapter_data);
++		free(adapter_data);
++		return NULL;
++	}
++
++	DBG("HCI raw channel created successfully for hci%d", hci_index);
++
++	return adapter_data;
++}
++
++static struct rap_adapter_data *rap_adapter_data_ref(
++		struct btd_adapter *adapter)
++{
++	struct rap_adapter_data *adapter_data;
++
++	adapter_data = rap_adapter_data_find(adapter);
++	if (!adapter_data) {
++		adapter_data = rap_adapter_data_new(adapter);
++		if (!adapter_data)
++			return NULL;
++	}
++
++	adapter_data->ref_count++;
++
++	return adapter_data;
++}
++
++static void rap_adapter_data_unref(struct rap_adapter_data *adapter_data)
++{
++	if (!adapter_data)
++		return;
++
++	adapter_data->ref_count--;
++
++	if (adapter_data->ref_count > 0)
++		return;
++
++	/* No more devices using this adapter, clean up */
++	DBG("Cleaning up adapter HCI channel");
++
++	if (adapter_data->hci) {
++		bt_hci_unref(adapter_data->hci);
++		adapter_data->hci = NULL;
++	}
++
++	queue_remove(adapter_list, adapter_data);
++	free(adapter_data);
++
++	if (queue_isempty(adapter_list)) {
++		queue_destroy(adapter_list, NULL);
++		adapter_list = NULL;
++	}
++}
+ 
+ static struct rap_data *rap_data_new(struct btd_device *device)
+ {
+@@ -95,6 +212,19 @@ static void rap_data_free(struct rap_data *data)
+ 	}
+ 
+ 	bt_rap_ready_unregister(data->rap, data->ready_id);
++
++	/* Detach per-device HCI state machine */
++	if (data->hci_sm) {
++		bt_rap_detach_hci(data->rap, data->hci_sm);
++		data->hci_sm = NULL;
++	}
++
++	/* Release reference to shared adapter HCI channel */
++	if (data->adapter_data) {
++		rap_adapter_data_unref(data->adapter_data);
++		data->adapter_data = NULL;
++	}
++
+ 	bt_rap_unref(data->rap);
+ 	free(data);
+ }
+@@ -177,7 +307,7 @@ static int rap_probe(struct btd_service *service)
+ 	ba2str(device_get_address(device), addr);
+ 	DBG("%s", addr);
+ 
+-	/*Ignore, if we probed for this device already */
++	/* Ignore, if we probed for this device already */
+ 	if (data) {
+ 		error("Profile probed twice for this device");
+ 		return -EINVAL;
+@@ -195,6 +325,35 @@ static int rap_probe(struct btd_service *service)
+ 		return -EINVAL;
+ 	}
+ 
++	/* Get or create shared adapter-level HCI channel */
++	data->adapter_data = rap_adapter_data_ref(adapter);
++	if (!data->adapter_data) {
++		error("Failed to get adapter HCI channel");
++		bt_rap_unref(data->rap);
++		free(data);
++		return -EINVAL;
++	}
++
++	DBG("Using shared HCI channel for adapter (ref_count=%d)",
++		data->adapter_data->ref_count);
++
++	/* Create per-device HCI state machine with valid rap instance */
++	DBG("Attaching per-device HCI state machine");
++	data->hci_sm = bt_rap_attach_hci(data->rap, data->adapter_data->hci,
++					btd_opts.defaults.bcs.role,
++					btd_opts.defaults.bcs.cs_sync_ant_sel,
++					btd_opts.defaults.bcs.max_tx_power);
++
++	if (!data->hci_sm) {
++		error("Failed to attach HCI state machine for device");
++		rap_adapter_data_unref(data->adapter_data);
++		bt_rap_unref(data->rap);
++		free(data);
++		return -EINVAL;
++	}
++
++	DBG("HCI state machine attached successfully for device");
++
+ 	rap_data_add(data);
+ 
+ 	data->ready_id = bt_rap_ready_register(data->rap, rap_ready, service,
+@@ -228,6 +387,10 @@ static int rap_accept(struct btd_service *service)
+ 	struct btd_device *device = btd_service_get_device(service);
+ 	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
+ 	struct rap_data *data = btd_service_get_user_data(service);
++	struct bt_att *att;
++	const bdaddr_t *bdaddr;
++	uint8_t bdaddr_type;
++	uint16_t handle;
+ 	char addr[18];
+ 
+ 	ba2str(device_get_address(device), addr);
+@@ -243,6 +406,31 @@ static int rap_accept(struct btd_service *service)
+ 		return -EINVAL;
+ 	}
+ 
++	/* Set up connection handle mapping for CS event routing */
++	att = bt_rap_get_att(data->rap);
++	bdaddr = device_get_address(device);
++	bdaddr_type = device_get_le_address_type(device);
++
++	if (att && data->adapter_data && data->adapter_data->hci &&
++	    data->hci_sm) {
++		/* Use bt_hci_get_conn_handle to find the connection handle
++		 * by bdaddr using HCIGETCONNLIST ioctl
++		 */
++		if (bt_hci_get_conn_handle(data->adapter_data->hci,
++					(const uint8_t *) bdaddr, &handle)) {
++			DBG("Found conn handle 0x%04X for %s", handle, addr);
++			DBG("Setting up handle mapping: handle=0x%04X",
++				handle);
++			bt_rap_set_conn_handle(data->hci_sm,
++						data->rap, handle,
++						(const uint8_t *) bdaddr,
++						bdaddr_type);
++		} else {
++			error("Failed to find connection handle for device %s",
++				addr);
++		}
++	}
++
+ 	btd_service_connecting_complete(service, 0);
+ 
+ 	return 0;
+diff --git a/profiles/ranging/rap_hci.c b/profiles/ranging/rap_hci.c
+new file mode 100644
+index 000000000..1aca4bbf8
+--- /dev/null
++++ b/profiles/ranging/rap_hci.c
+@@ -0,0 +1,1259 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <stdbool.h>
++#include <stddef.h>
++#include <unistd.h>
++#include <string.h>
++#include <endian.h>
++
++#include "lib/bluetooth/bluetooth.h"
++#include "src/shared/util.h"
++#include "src/shared/queue.h"
++#include "src/shared/rap.h"
++#include "src/log.h"
++#include "monitor/bt.h"
++
++#ifndef MIN
++#define MIN(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
++/* Macro to sign-extend an N-bit value to 16-bit signed integer */
++#define SIGN_EXTEND_TO_16(val, bits) \
++	((int16_t)(((val) ^ (1U << ((bits)-1))) - (1U << ((bits)-1))))
++
++/*  CS State Definitions */
++enum cs_state {
++	CS_STATE_INIT,
++	CS_STATE_STOPPED,
++	CS_STATE_STARTED,
++	CS_STATE_WAIT_CONFIG_CMPLT,
++	CS_STATE_WAIT_SEC_CMPLT,
++	CS_STATE_WAIT_PROC_CMPLT,
++	CS_STATE_HOLD,
++	CS_STATE_UNSPECIFIED
 +};
 +
- struct btd_defaults {
- 	uint16_t	num_entries;
- 
- 	struct btd_br_defaults br;
- 	struct btd_le_defaults le;
-+	struct btd_le_bcs bcs;
- };
- 
- struct btd_csis {
-diff --git a/src/main.c b/src/main.c
-index 818f7c06e..9a3d2da25 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -156,6 +156,13 @@ static const char *gatt_options[] = {
- 	NULL
- };
- 
-+static const char *const bcs_options[] = {
-+	"Role",
-+	"CsSyncAntennaSel",
-+	"MaxTxPower",
-+	NULL
++static const char * const state_names[] = {
++	"CS_STATE_INIT",
++	"CS_STATE_STOPPED",
++	"CS_STATE_STARTED",
++	"CS_STATE_WAIT_CONFIG_CMPLT",
++	"CS_STATE_WAIT_SEC_CMPLT",
++	"CS_STATE_WAIT_PROC_CMPLT",
++	"CS_STATE_HOLD",
++	"CS_STATE_UNSPECIFIED"
 +};
 +
- static const char *csip_options[] = {
- 	"SIRK",
- 	"Encryption",
-@@ -183,7 +190,7 @@ static const char *advmon_options[] = {
- 
- static const struct group_table {
- 	const char *name;
--	const char **options;
-+	const char * const *options;
- } valid_groups[] = {
- 	{ "General",	supported_options },
- 	{ "BR",		br_options },
-@@ -193,6 +200,7 @@ static const struct group_table {
- 	{ "CSIS",	csip_options },
- 	{ "AVDTP",	avdtp_options },
- 	{ "AVRCP",	avrcp_options },
-+	{ "ChannelSounding",	bcs_options },
- 	{ "AdvMon",	advmon_options },
- 	{ }
- };
-@@ -356,7 +364,7 @@ static enum jw_repairing_t parse_jw_repairing(const char *jw_repairing)
- 
- 
- static void check_options(GKeyFile *config, const char *group,
--						const char **options)
-+						const char * const *options)
- {
- 	char **keys;
- 	int i;
-@@ -492,6 +500,46 @@ static bool parse_config_int(GKeyFile *config, const char *group,
- 	return true;
- }
- 
-+static bool parse_config_signed_int(GKeyFile *config, const char *group,
-+					const char *key, int8_t *val,
-+					long min, long max)
++/* Callback Function Type */
++typedef void (*cs_callback_t)(uint16_t length,
++			const void *param, void *user_data);
++
++/* State Machine Context */
++struct cs_state_machine {
++	enum cs_state current_state;
++	enum cs_state old_state;
++	struct bt_hci *hci;
++	struct bt_rap *rap;
++	unsigned int event_id;
++	bool initiator;
++	bool procedure_active;
++	struct bt_rap_hci_cs_options cs_opt;  /* Per-instance CS options */
++	uint8_t role_enable;  /* Role value for HCI commands (1, 2, or 3) */
++	struct queue *conn_mappings;  /* Per-instance connection mappings */
++};
++
++/* Connection Handle Mapping */
++struct rap_conn_mapping {
++	uint16_t handle;
++	uint8_t bdaddr[6];
++	uint8_t bdaddr_type;
++	struct bt_att *att;
++	struct bt_rap *rap;
++};
++
++/* Connection Mapping Helper Functions */
++static void mapping_free(void *data)
 +{
-+	char *str = NULL;
-+	char *endptr = NULL;
-+	long tmp;
-+	bool result = false;
++	struct rap_conn_mapping *mapping = data;
 +
-+	str = g_key_file_get_string(config, group, key, NULL);
-+	if (!str)
-+		return false;
++	if (!mapping)
++		return;
 +
-+	tmp = strtol(str, &endptr, 0);
-+	if (!endptr || *endptr != '\0') {
-+		warn("%s.%s = %s is not integer", group, key, str);
-+		goto cleanup;
-+	}
-+
-+	if (tmp < min) {
-+		warn("%s.%s = %ld is out of range (< %ld)", group, key, tmp,
-+			min);
-+		goto cleanup;
-+	}
-+
-+	if (tmp > max) {
-+		warn("%s.%s = %ld is out of range (> %ld)", group, key, tmp,
-+									max);
-+		goto cleanup;
-+	}
-+
-+	if (val)
-+		*val = (int8_t) tmp;
-+	result = true;
-+
-+cleanup:
-+	g_free(str);
-+	return result;
++	free(mapping);
 +}
 +
- struct config_param {
- 	const char * const val_name;
- 	void * const val;
-@@ -1184,6 +1232,81 @@ static void parse_csis(GKeyFile *config)
- 					0, UINT8_MAX);
- }
- 
-+static bool parse_cs_role(GKeyFile *config, const char *group,
-+					const char *key, uint8_t *val)
++static bool match_mapping_handle(const void *a, const void *b)
 +{
-+	GError *err = NULL;
-+	char *str = NULL;
-+	char *endptr = NULL;
-+	int numeric_val;
++	const struct rap_conn_mapping *mapping = a;
++	uint16_t handle = PTR_TO_UINT(b);
 +
-+	/* Try to read as string first */
-+	str = g_key_file_get_string(config, group, key, &err);
-+	if (err) {
-+		if (err->code != G_KEY_FILE_ERROR_KEY_NOT_FOUND)
-+			DBG("%s", err->message);
-+		g_error_free(err);
++	return mapping->handle == handle;
++}
++
++static bool match_mapping_rap(const void *a, const void *b)
++{
++	const struct rap_conn_mapping *mapping = a;
++	const struct bt_rap *rap = b;
++
++	return mapping->rap == rap;
++}
++
++static struct rap_conn_mapping *find_mapping_by_handle(
++					struct cs_state_machine *sm,
++					uint16_t handle)
++{
++	if (!sm || !sm->conn_mappings)
++		return NULL;
++
++	return queue_find(sm->conn_mappings, match_mapping_handle,
++				UINT_TO_PTR(handle));
++}
++
++static bool add_conn_mapping(struct cs_state_machine *sm, uint16_t handle,
++				const uint8_t *bdaddr, uint8_t bdaddr_type,
++				struct bt_att *att, struct bt_rap *rap)
++{
++	struct rap_conn_mapping *mapping;
++
++	if (!sm)
 +		return false;
++
++	if (!sm->conn_mappings) {
++		sm->conn_mappings = queue_new();
++		if (!sm->conn_mappings)
++			return false;
 +	}
 +
-+	DBG("%s.%s = %s", group, key, str);
-+
-+	/* Check if it's a string value */
-+	if (!strcmp(str, "Initiator") || !strcmp(str, "initiator")) {
-+		if (val)
-+			*val = 1;
-+		g_free(str);
-+		return true;
-+	} else if (!strcmp(str, "Reflector") || !strcmp(str, "reflector")) {
-+		if (val)
-+			*val = 2;
-+		g_free(str);
-+		return true;
-+	} else if (!strcmp(str, "Both") || !strcmp(str, "both")) {
-+		if (val)
-+			*val = 3;
-+		g_free(str);
++	/* Check if mapping already exists */
++	mapping = find_mapping_by_handle(sm, handle);
++	if (mapping) {
++		/* Update existing mapping */
++		if (bdaddr)
++			memcpy(mapping->bdaddr, bdaddr, 6);
++		mapping->bdaddr_type = bdaddr_type;
++		mapping->att = att;
++		mapping->rap = rap;
 +		return true;
 +	}
 +
-+	/* Try to parse as numeric value */
-+	numeric_val = strtol(str, &endptr, 0);
-+
-+	if (!endptr || *endptr != '\0') {
-+		warn("%s.%s = %s is not a valid value. "
-+			"Expected: 1/Initiator, 2/Reflector, or 3/Both",
-+			group, key, str);
-+		g_free(str);
++	/* Create new mapping */
++	mapping = new0(struct rap_conn_mapping, 1);
++	if (!mapping)
 +		return false;
-+	}
 +
-+	if (numeric_val < 1 || numeric_val > 3) {
-+		warn("%s.%s = %d is out of range. "
-+			"Valid values: 1 (Initiator), 2 (Reflector), 3 (Both)",
-+			group, key, numeric_val);
-+		g_free(str);
-+		return false;
-+	}
++	mapping->handle = handle;
++	if (bdaddr)
++		memcpy(mapping->bdaddr, bdaddr, 6);
++	mapping->bdaddr_type = bdaddr_type;
++	mapping->att = att;
++	mapping->rap = rap;
 +
-+	if (val)
-+		*val = numeric_val;
-+
-+	g_free(str);
-+	return true;
++	return queue_push_tail(sm->conn_mappings, mapping);
 +}
 +
-+static void parse_le_cs_config(GKeyFile *config)
++static void remove_conn_mapping(struct cs_state_machine *sm, uint16_t handle)
 +{
-+	parse_cs_role(config, "ChannelSounding", "Role",
-+			&btd_opts.defaults.bcs.role);
-+	parse_config_u8(config, "ChannelSounding", "CsSyncAntennaSel",
-+			&btd_opts.defaults.bcs.cs_sync_ant_sel,
-+			0x01, 0xFF);
-+	parse_config_signed_int(config, "ChannelSounding",
-+			"MaxTxPower", &btd_opts.defaults.bcs.max_tx_power,
-+			INT8_MIN, INT8_MAX);
++	struct rap_conn_mapping *mapping;
++
++	if (!sm || !sm->conn_mappings)
++		return;
++
++	mapping = queue_remove_if(sm->conn_mappings, match_mapping_handle,
++					UINT_TO_PTR(handle));
++	if (mapping)
++		mapping_free(mapping);
 +}
 +
- static void parse_avdtp_session_mode(GKeyFile *config)
- {
- 	char *str = NULL;
-@@ -1262,6 +1385,7 @@ static void parse_config(GKeyFile *config)
- 	parse_csis(config);
- 	parse_avdtp(config);
- 	parse_avrcp(config);
-+	parse_le_cs_config(config);
- 	parse_advmon(config);
- }
- 
-@@ -1313,6 +1437,10 @@ static void init_defaults(void)
- 
- 	btd_opts.advmon.rssi_sampling_period = 0xFF;
- 	btd_opts.csis.encrypt = true;
++static void remove_rap_mappings(struct cs_state_machine *sm)
++{
++	if (!sm || !sm->conn_mappings)
++		return;
 +
-+	btd_opts.defaults.bcs.role = 0x03;
-+	btd_opts.defaults.bcs.cs_sync_ant_sel = 0xFF;
-+	btd_opts.defaults.bcs.max_tx_power = 0x14;
- }
- 
- static void log_handler(const gchar *log_domain, GLogLevelFlags log_level,
-diff --git a/src/main.conf b/src/main.conf
-index d31dd1b8f..5846ef92d 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -299,6 +299,30 @@
- # Default = auto
- # Security = auto
- 
-+[ChannelSounding]
-+# Current role of the device
-+# Possible values:
-+#   1 or "Initiator" - CS Initiator role,
-+#   Generally, CS Initiator acts as Client (Gatt role) and Central (Gap role)
-+#   2 or "Reflector" - CS Reflector role,
-+#   Generally, CS Reflector acts as Server (Gatt role) and Peripheral (Gap role)
-+#   3 or "Both"      - Both Initiator and Reflector roles
-+# Default: 3 (Both)
-+#Role = 3
++	queue_remove_all(sm->conn_mappings, match_mapping_rap, sm->rap,
++				mapping_free);
++}
 +
-+# Antenna Identifier to be used
-+# Possible values:
-+# 0x01-0x04 (antenna identifier to be used),
-+# 0xFE - Antennas to be used in repetitive order,
-+# 0xFF - Host doesn't have recommendation
-+# Default: 0xFF (Host doesn't have recommendation)
-+#CsSyncAntennaSel = 0xFF
++static struct bt_rap *resolve_handle_to_rap(struct cs_state_machine *sm,
++						uint16_t handle)
++{
++	struct rap_conn_mapping *mapping;
 +
-+# Maximum Transmit power
-+# Possible values: 0x81-0x14 (-127dBm to 20dBm)
-+# Default: 0x14 (Max Power possible)
-+#MaxTxPower = 0x14
++	if (!sm)
++		return NULL;
 +
- [CSIS]
- # SIRK - Set Identification Resolution Key which is common for all the
- # sets. They SIRK key is used to identify its sets. This can be any
++	/* Try to find in mapping cache */
++	mapping = find_mapping_by_handle(sm, handle);
++	if (mapping && mapping->rap) {
++		DBG("Found handle 0x%04X in mapping cache", handle);
++		return mapping->rap;
++	}
++
++	/* Profile layer should have called bt_rap_set_conn_handle() during
++	 * connection establishment. If we reach here, the mapping was not set.
++	 */
++	DBG("No mapping found for handle 0x%04X", handle);
++	DBG("Profile layer should call bt_rap_set_conn_handle() on connect");
++
++	return NULL;
++}
++
++/*  State Machine Functions */
++static void cs_state_machine_init(struct cs_state_machine *sm,
++				struct bt_rap *rap, struct bt_hci *hci,
++				uint8_t role, uint8_t cs_sync_ant_sel,
++				int8_t max_tx_power)
++{
++	if (!sm)
++		return;
++
++	sm->current_state = CS_STATE_UNSPECIFIED;
++	sm->rap = rap;
++	sm->hci = hci;
++	sm->initiator = false;
++	sm->procedure_active = false;
++
++	/* Store role_enable for HCI commands (1, 2, or 3 from config) */
++	sm->role_enable = role;
++
++	/* Initialize per-instance CS options
++	 * Note: cs_opt.role will be overwritten with actual role (0x00 or 0x01)
++	 * from config complete event, but role_enable preserves the HCI value
++	 */
++	sm->cs_opt.role = role;
++	sm->cs_opt.cs_sync_ant_sel = cs_sync_ant_sel;
++	sm->cs_opt.max_tx_power = max_tx_power;
++	sm->cs_opt.rtt_type = 0;  /* Will be set from config complete event */
++}
++
++/* State Transition Logic */
++static void cs_set_state(struct cs_state_machine *sm,
++		enum cs_state new_state)
++{
++	if (!sm)
++		return;
++
++	if (sm->current_state == new_state)
++		return;
++
++	/* Validate state values before array access */
++	if (sm->current_state > CS_STATE_UNSPECIFIED ||
++	    new_state > CS_STATE_UNSPECIFIED) {
++		error("Invalid state transition attempted");
++		return;
++	}
++
++	DBG("[STATE] Transition: %s → %s",
++		state_names[sm->current_state],
++		state_names[new_state]);
++
++	sm->old_state = sm->current_state;
++	sm->current_state = new_state;
++}
++
++static enum cs_state cs_get_current_state(struct cs_state_machine *sm)
++{
++	return sm ? sm->current_state : CS_STATE_UNSPECIFIED;
++}
++
++/* HCI Event Callbacks */
++static void rap_def_settings_done_cb(const void *data, uint8_t size,
++					void *user_data)
++{
++	struct bt_hci_rsp_le_cs_set_def_settings *rp;
++	struct cs_state_machine *sm = (struct cs_state_machine *) user_data;
++
++	if (!sm || !data ||
++		size < sizeof(struct bt_hci_rsp_le_cs_set_def_settings))
++		return;
++
++	DBG("size=0x%02X", size);
++
++	rp = (struct bt_hci_rsp_le_cs_set_def_settings *) data;
++
++	if (cs_get_current_state(sm) != CS_STATE_INIT) {
++		DBG("Event received in Wrong State!! Expected : CS_STATE_INIT");
++		return;
++	}
++
++	if (rp->status == 0) {
++		/* Success - proceed to configuration */
++		cs_set_state(sm, CS_STATE_WAIT_CONFIG_CMPLT);
++
++		/* Reflector role */
++		DBG("Waiting for CS Config Completed event...");
++		/* TODO: Initiator role - Send CS Config complete cmd */
++	} else {
++		/* Error - transition to stopped */
++		error("CS Set default setting failed with status 0x%02X",
++		rp->status);
++		cs_set_state(sm, CS_STATE_STOPPED);
++	}
++}
++
++static void rap_send_hci_def_settings_command(struct cs_state_machine *sm,
++		struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete *ev)
++{
++	struct bt_hci_cmd_le_cs_set_def_settings cp;
++	unsigned int status;
++
++	memset(&cp, 0, sizeof(cp));
++
++	if (!sm || !sm->hci) {
++		error("Set Def Settings: sm or hci is null");
++		return;
++	}
++
++	if (ev->handle)
++		cp.handle = ev->handle;
++
++	cp.role_enable = sm->role_enable;  /* Use preserved HCI command value */
++	cp.cs_sync_antenna_selection = sm->cs_opt.cs_sync_ant_sel;
++	cp.max_tx_power = sm->cs_opt.max_tx_power;
++
++	status = bt_hci_send(sm->hci, BT_HCI_CMD_LE_CS_SET_DEF_SETTINGS,
++				&cp, sizeof(cp), rap_def_settings_done_cb,
++				sm, NULL);
++
++	DBG("sending set default settings case, status : %d", status);
++
++	if (!status)
++		error("Failed to send default settings cmd");
++}
++
++static void rap_rd_rmt_supp_cap_cmplt_evt(const uint8_t *data, uint8_t size,
++					   void *user_data)
++{
++	struct cs_state_machine *sm = (struct cs_state_machine *) user_data;
++	const struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete *evt;
++	struct bt_rap *rap;
++	struct iovec iov;
++
++	if (!sm || !data ||
++		size < sizeof(struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete))
++		return;
++
++	/* Initialize iovec with the event data */
++	iov.iov_base = (void *) data;
++	iov.iov_len = size;
++
++	/* Pull the entire structure at once */
++	evt = util_iov_pull_mem(&iov, sizeof(*evt));
++
++	if (!evt) {
++		error("Failed to pull remote cap complete struct");
++		return;
++	}
++
++	DBG("status=0x%02X, handle=0x%04X", evt->status, evt->handle);
++
++	/* Check status */
++	if (evt->status != 0) {
++		error("Remote capabilities failed with status 0x%02X",
++			evt->status);
++		cs_set_state(sm, CS_STATE_STOPPED);
++		return;
++	}
++
++	/* Resolve handle to RAP instance */
++	rap = resolve_handle_to_rap(sm, evt->handle);
++
++	if (!rap) {
++		DBG("[WARN] Could not resolve handle 0x%04X to RAP instance",
++			evt->handle);
++		/* Continue with state machine RAP for now */
++		rap = sm->rap;
++	}
++
++	DBG("num_config=%u, ",
++		evt->num_config_supported);
++	DBG("max_consecutive_proc=%u, num_antennas=%u, ",
++		evt->max_consecutive_procedures_supported,
++		evt->num_antennas_supported);
++	DBG("max_antenna_paths=%u, roles=0x%02X, modes=0x%02X",
++		evt->max_antenna_paths_supported,
++		evt->roles_supported,
++		evt->modes_supported);
++
++	rap_send_hci_def_settings_command(sm,
++		(struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete *) evt);
++	cs_set_state(sm, CS_STATE_INIT);
++}
++
++static void rap_cs_config_cmplt_evt(const uint8_t *data, uint8_t size,
++				    void *user_data)
++{
++	struct cs_state_machine *sm = (struct cs_state_machine *) user_data;
++	const struct bt_hci_evt_le_cs_config_complete *evt;
++	struct rap_ev_cs_config_cmplt rap_ev;
++	struct iovec iov;
++
++	if (!sm || !data ||
++		size < sizeof(struct bt_hci_evt_le_cs_config_complete))
++		return;
++
++	/* Initialize iovec with the event data */
++	iov.iov_base = (void *) data;
++	iov.iov_len = size;
++
++	DBG("size=0x%02X", size);
++
++	/* State Check */
++	if (cs_get_current_state(sm) != CS_STATE_WAIT_CONFIG_CMPLT) {
++		DBG("Event received in Wrong State!! ");
++		DBG("Expected : CS_STATE_WAIT_CONFIG_CMPLT");
++		return;
++	}
++
++	/* Pull the entire structure at once */
++	evt = util_iov_pull_mem(&iov, sizeof(*evt));
++	if (!evt) {
++		error("Failed to pull config complete struct");
++		return;
++	}
++
++	DBG("status=0x%02X, handle=0x%04X", evt->status, evt->handle);
++
++	/* Check status */
++	if (evt->status != 0) {
++		error("Configuration failed with status 0x%02X",
++			evt->status);
++		cs_set_state(sm, CS_STATE_STOPPED);
++		return;
++	}
++
++	/* Copy fields to rap_ev structure */
++	rap_ev.status = evt->status;
++	rap_ev.conn_hdl = cpu_to_le16(evt->handle);
++	rap_ev.config_id = evt->config_id;
++	rap_ev.action = evt->action;
++	rap_ev.main_mode_type = evt->main_mode_type;
++	rap_ev.sub_mode_type = evt->sub_mode_type;
++	rap_ev.min_main_mode_steps = evt->min_main_mode_steps;
++	rap_ev.max_main_mode_steps = evt->max_main_mode_steps;
++	rap_ev.main_mode_rep = evt->main_mode_repetition;
++	rap_ev.mode_0_steps = evt->mode_0_steps;
++	rap_ev.role = evt->role;
++	rap_ev.rtt_type = evt->rtt_type;
++	rap_ev.cs_sync_phy = evt->cs_sync_phy;
++	memcpy(rap_ev.channel_map, evt->channel_map, 10);
++	rap_ev.channel_map_rep = evt->channel_map_repetition;
++	rap_ev.channel_sel_type = evt->channel_selection_type;
++	rap_ev.ch3c_shape = evt->ch3c_shape;
++	rap_ev.ch3c_jump = evt->ch3c_jump;
++	rap_ev.reserved = evt->reserved;
++	rap_ev.t_ip1_time = evt->t_ip1_time;
++	rap_ev.t_ip2_time = evt->t_ip2_time;
++	rap_ev.t_fcs_time = evt->t_fcs_time;
++	rap_ev.t_pm_time = evt->t_pm_time;
++
++	/* Store role and rtt_type from config complete event
++	 * Note: evt->role contains actual role
++	 * (CS_INITIATOR=0x00, CS_REFLECTOR=0x01)
++	 * which is different from the role_enable value sent in HCI command
++	 */
++	sm->cs_opt.role = rap_ev.role;
++	sm->cs_opt.rtt_type = rap_ev.rtt_type;
++
++	DBG("config_id=%u, action=%u, ",
++		rap_ev.config_id, rap_ev.action);
++	DBG("main_mode=%u, sub_mode=%u, role=%u, rtt_type=%u",
++		rap_ev.main_mode_type, rap_ev.sub_mode_type,
++		rap_ev.role, rap_ev.rtt_type);
++
++	/* Success - proceed to Security enable complete */
++	cs_set_state(sm, CS_STATE_WAIT_SEC_CMPLT);
++
++	/* Reflector role */
++	DBG("Waiting for security enable event...");
++	/* TODO: Initiator role - Send CS Security enable cmd */
++
++	/* Send callback to RAP Profile */
++	bt_rap_hci_cs_config_complete_callback(size, &rap_ev, sm->rap);
++}
++
++static void rap_cs_sec_enable_cmplt_evt(const uint8_t *data, uint8_t size,
++					 void *user_data)
++{
++	struct cs_state_machine *sm = (struct cs_state_machine *) user_data;
++	struct rap_ev_cs_sec_enable_cmplt rap_ev;
++	struct iovec iov;
++	uint8_t status;
++	uint16_t handle;
++
++	if (!sm || !data ||
++		size < sizeof(struct bt_hci_evt_le_cs_sec_enable_complete))
++		return;
++
++	/* Initialize iovec with the event data */
++	iov.iov_base = (void *) data;
++	iov.iov_len = size;
++
++	DBG("size=0x%02X", size);
++
++	/* State Check */
++	if (cs_get_current_state(sm) != CS_STATE_WAIT_SEC_CMPLT) {
++		DBG("Event received in Wrong State!! ");
++		DBG("Expected : CS_STATE_WAIT_SEC_CMPLT");
++		return;
++	}
++
++	/* Parse all fields in order using iovec */
++	if (!util_iov_pull_u8(&iov, &status)) {
++		error("Failed to parse Status");
++		return;
++	}
++
++	if (!util_iov_pull_le16(&iov, &handle)) {
++		error("Failed to parse Connection_Handle");
++		return;
++	}
++
++	rap_ev.status = status;
++	rap_ev.conn_hdl = cpu_to_le16(handle);
++
++	DBG("status=0x%02X, handle=0x%04X",
++		rap_ev.status, handle);
++
++	if (rap_ev.status == 0) {
++		/* Success - proceed to configuration */
++		cs_set_state(sm, CS_STATE_WAIT_PROC_CMPLT);
++
++		/* Reflector role */
++		DBG("Waiting for CS Proc complete event...");
++		/* TODO: Initiator - Send CS Proc Set Parameter and enable */
++	} else {
++		/* Error - transition to stopped */
++		error("Security enable failed with status 0x%02X",
++			rap_ev.status);
++		cs_set_state(sm, CS_STATE_STOPPED);
++	}
++
++	/* Send callback to RAP Profile */
++	bt_rap_hci_cs_sec_enable_complete_callback(size, &rap_ev, sm->rap);
++}
++
++static void rap_cs_proc_enable_cmplt_evt(const uint8_t *data, uint8_t size,
++					  void *user_data)
++{
++	struct cs_state_machine *sm = (struct cs_state_machine *) user_data;
++	const struct bt_hci_evt_le_cs_proc_enable_complete *evt;
++	struct rap_ev_cs_proc_enable_cmplt rap_ev;
++	struct iovec iov;
++
++	if (!sm || !data ||
++		size < sizeof(struct bt_hci_evt_le_cs_proc_enable_complete))
++		return;
++
++	/* Initialize iovec with the event data */
++	iov.iov_base = (void *) data;
++	iov.iov_len = size;
++
++	DBG("size=0x%02X", size);
++
++	/* State Check */
++	if (cs_get_current_state(sm) != CS_STATE_WAIT_PROC_CMPLT) {
++		DBG("Event received in Wrong State!! ");
++		DBG("Expected : CS_STATE_WAIT_PROC_CMPLT");
++		return;
++	}
++
++	/* Pull the entire structure at once */
++	evt = util_iov_pull_mem(&iov, sizeof(*evt));
++	if (!evt) {
++		error("Failed to pull proc enable complete struct");
++		return;
++	}
++
++	DBG("status=0x%02X, handle=0x%04X", evt->status, evt->handle);
++
++	/* Check status */
++	if (evt->status != 0) {
++		error("Procedure enable failed with status 0x%02X",
++			evt->status);
++		cs_set_state(sm, CS_STATE_STOPPED);
++		sm->procedure_active = false;
++		return;
++	}
++
++	/* Copy fields to rap_ev structure */
++	rap_ev.status = evt->status;
++	rap_ev.conn_hdl = cpu_to_le16(evt->handle);
++	rap_ev.config_id = evt->config_id;
++	rap_ev.state = evt->state;
++	rap_ev.tone_ant_config_sel = evt->tone_antenna_config_selection;
++	rap_ev.sel_tx_pwr = evt->selected_tx_power;
++	memcpy(rap_ev.sub_evt_len, evt->subevent_len, 3);
++	rap_ev.sub_evts_per_evt = evt->subevents_per_event;
++	rap_ev.sub_evt_intrvl = evt->subevent_interval;
++	rap_ev.evt_intrvl = evt->event_interval;
++	rap_ev.proc_intrvl = evt->procedure_interval;
++	rap_ev.proc_counter = evt->procedure_count;
++	rap_ev.max_proc_len = evt->max_procedure_len;
++
++	DBG("config_id=%u, state=%u, ",
++		rap_ev.config_id, rap_ev.state);
++	DBG("sub_evts_per_evt=%u, evt_intrvl=%u, proc_intrvl=%u",
++		rap_ev.sub_evts_per_evt, rap_ev.evt_intrvl,
++		rap_ev.proc_intrvl);
++
++	/* Success - procedure started */
++	cs_set_state(sm, CS_STATE_STARTED);
++	sm->procedure_active = true;
++
++	/* Send callback to RAP Profile */
++	bt_rap_hci_cs_procedure_enable_complete_callback(size,
++			&rap_ev, sm->rap);
++}
++
++static void parse_i_q_sample(struct iovec *iov, int16_t *i_sample,
++				int16_t *q_sample)
++{
++	uint32_t buffer;
++	uint32_t i12;
++	uint32_t q12;
++
++	/* Pull 24-bit little-endian value from iovec */
++	if (!util_iov_pull_le24(iov, &buffer)) {
++		*i_sample = 0;
++		*q_sample = 0;
++		return;
++	}
++
++	/* Extract 12-bit I and Q values from 24-bit buffer */
++	i12 =  buffer        & 0x0FFFU;   /* bits 0..11 */
++	q12 = (buffer >> 12) & 0x0FFFU;   /* bits 12..23 */
++
++	/* Sign-extend 12-bit values to 16-bit using macro */
++	*i_sample = SIGN_EXTEND_TO_16(i12, 12);
++	*q_sample = SIGN_EXTEND_TO_16(q12, 12);
++}
++
++/* Parse CS Mode 0 step data */
++static void parse_mode_zero_data(struct iovec *iov,
++				 struct cs_mode_zero_data *mode_data,
++				 uint8_t cs_role)
++{
++	uint32_t freq_offset;
++
++	if (iov->iov_len < 3) {
++		DBG("Mode 0: too short (<3)");
++		return;
++	}
++
++	util_iov_pull_u8(iov, &mode_data->packet_quality);
++	util_iov_pull_u8(iov, &mode_data->packet_rssi_dbm);
++	util_iov_pull_u8(iov, &mode_data->packet_ant);
++	DBG("CS Step mode 0");
++
++	if (cs_role == CS_INITIATOR && iov->iov_len >= 4) {
++		util_iov_pull_le32(iov, &freq_offset);
++		mode_data->init_measured_freq_offset = freq_offset;
++	}
++}
++
++/* Parse CS Mode 1 step data */
++static void parse_mode_one_data(struct iovec *iov,
++				struct cs_mode_one_data *mode_data,
++				uint8_t cs_role, uint8_t cs_rtt_type)
++{
++	uint16_t time_val;
++
++	if (iov->iov_len < 4) {
++		DBG("Mode 1: too short (<4)");
++		return;
++	}
++
++	DBG("CS Step mode 1");
++	util_iov_pull_u8(iov, &mode_data->packet_quality);
++	util_iov_pull_u8(iov, &mode_data->packet_rssi_dbm);
++	util_iov_pull_u8(iov, &mode_data->packet_ant);
++	util_iov_pull_u8(iov, &mode_data->packet_nadm);
++
++	if (iov->iov_len >= 2) {
++		util_iov_pull_le16(iov, &time_val);
++		if (cs_role == CS_REFLECTOR)
++			mode_data->tod_toa_refl = time_val;
++		else
++			mode_data->toa_tod_init = time_val;
++	}
++
++	if ((cs_rtt_type == 0x01 || cs_rtt_type == 0x02) &&
++		iov->iov_len >= 6) {
++		int16_t i_val, q_val;
++
++		parse_i_q_sample(iov, &i_val, &q_val);
++		mode_data->packet_pct1.i_sample = i_val;
++		mode_data->packet_pct1.q_sample = q_val;
++
++		parse_i_q_sample(iov, &i_val, &q_val);
++		mode_data->packet_pct2.i_sample = i_val;
++		mode_data->packet_pct2.q_sample = q_val;
++	}
++}
++
++/* Parse CS Mode 2 step data */
++static void parse_mode_two_data(struct iovec *iov,
++				struct cs_mode_two_data *mode_data,
++				uint8_t max_paths)
++{
++	uint8_t k;
++
++	if (iov->iov_len < 1) {
++		DBG("Mode 2: too short (<1)");
++		return;
++	}
++
++	util_iov_pull_u8(iov, &mode_data->ant_perm_index);
++	DBG("CS Step mode 2, max paths : %d", max_paths);
++
++	for (k = 0; k < max_paths; k++) {
++		int16_t i_val, q_val;
++
++		if (iov->iov_len < 4) {
++			DBG("Mode 2: insufficient PCT for path %u (rem=%zu)",
++				k, iov->iov_len);
++			break;
++		}
++		parse_i_q_sample(iov, &i_val, &q_val);
++		mode_data->tone_pct[k].i_sample = i_val;
++		mode_data->tone_pct[k].q_sample = q_val;
++
++		util_iov_pull_u8(iov, &mode_data->tone_quality_indicator[k]);
++		DBG("tone_quality_indicator : %d",
++			mode_data->tone_quality_indicator[k]);
++		DBG("[i, q] : %d, %d",
++			mode_data->tone_pct[k].i_sample,
++			mode_data->tone_pct[k].q_sample);
++	}
++}
++
++/* Parse CS Mode 3 step data */
++static void parse_mode_three_data(struct iovec *iov,
++				struct cs_mode_three_data *mode_data,
++				uint8_t cs_role, uint8_t cs_rtt_type,
++				uint8_t max_paths)
++{
++	uint8_t k;
++	struct cs_mode_one_data *mode_one = &mode_data->mode_one_data;
++	struct cs_mode_two_data *mode_two = &mode_data->mode_two_data;
++
++	if (iov->iov_len < 4) {
++		DBG("Mode 3: mode1 too short (<4)");
++		return;
++	}
++
++	DBG("CS Step mode 3");
++
++	/* Parse Mode 1 portion */
++	parse_mode_one_data(iov, mode_one, cs_role, cs_rtt_type);
++
++	/* Parse Mode 2 portion */
++	if (iov->iov_len >= 1) {
++		util_iov_pull_u8(iov, &mode_two->ant_perm_index);
++		for (k = 0; k < max_paths; k++) {
++			int16_t i_val, q_val;
++
++			if (iov->iov_len < 4)
++				break;
++			parse_i_q_sample(iov, &i_val, &q_val);
++			mode_two->tone_pct[k].i_sample = i_val;
++			mode_two->tone_pct[k].q_sample = q_val;
++
++			util_iov_pull_u8(iov,
++					 &mode_two->tone_quality_indicator[k]);
++		}
++	}
++}
++
++/* Parse a single CS step */
++static void parse_cs_step(struct iovec *iov, struct cs_step_data *step,
++			uint8_t cs_role, uint8_t cs_rtt_type,
++			uint8_t max_paths)
++{
++	uint8_t mode;
++	uint8_t chnl;
++	uint8_t length;
++
++	/* Check if we have enough data for the 3-byte header */
++	if (iov->iov_len < 3) {
++		DBG("Truncated header for step");
++		return;
++	}
++
++	/* Read mode, channel, and length (3-byte header) */
++	if (!util_iov_pull_u8(iov, &mode) ||
++		!util_iov_pull_u8(iov, &chnl) ||
++		!util_iov_pull_u8(iov, &length)) {
++		DBG("Failed to read header for step");
++		return;
++	}
++
++	DBG("event->step_data_len : %d", length);
++
++	step->step_mode = mode;
++	step->step_chnl = chnl;
++	step->step_data_length = length;
++
++	DBG("Step: mode=%u chnl=%u data_len=%u", mode, chnl, length);
++
++	if (iov->iov_len < length) {
++		DBG("Truncated payload for step (need %u, have %zu)",
++			length, iov->iov_len);
++		return;
++	}
++
++	/* Parse step data based on mode */
++	switch (mode) {
++	case CS_MODE_ZERO:
++		parse_mode_zero_data(iov, &step->step_mode_data.mode_zero_data,
++					cs_role);
++		break;
++	case CS_MODE_ONE:
++		parse_mode_one_data(iov, &step->step_mode_data.mode_one_data,
++					cs_role, cs_rtt_type);
++		break;
++	case CS_MODE_TWO:
++		parse_mode_two_data(iov, &step->step_mode_data.mode_two_data,
++					max_paths);
++		break;
++	case CS_MODE_THREE:
++		parse_mode_three_data(iov,
++					&step->step_mode_data.mode_three_data,
++					cs_role, cs_rtt_type, max_paths);
++		break;
++	default:
++		DBG("Unknown step mode %d", mode);
++		/* Skip the entire step data */
++		util_iov_pull(iov, length);
++		break;
++	}
++}
++
++static void rap_cs_subevt_result_evt(const uint8_t *data, uint8_t size,
++				void *user_data)
++{
++	struct cs_state_machine *sm = (struct cs_state_machine *) user_data;
++	struct rap_ev_cs_subevent_result *rap_ev;
++	struct iovec iov;
++	uint8_t cs_role;
++	uint8_t cs_rtt_type;
++	uint8_t max_paths;
++	uint8_t steps;
++	size_t send_len = 0;
++	uint16_t handle;
++	uint8_t config_id;
++	uint16_t start_acl_conn_evt_counter;
++	uint16_t proc_counter;
++	uint16_t freq_comp;
++	uint8_t ref_pwr_lvl;
++	uint8_t proc_done_status;
++	uint8_t subevt_done_status;
++	uint8_t abort_reason;
++	uint8_t num_ant_paths;
++	uint8_t num_steps_reported;
++	uint8_t i;
++
++	if (!sm || !data ||
++		size < sizeof(struct bt_hci_evt_le_cs_subevent_result))
++		return;
++
++	/* Initialize iovec with the event data */
++	iov.iov_base = (void *) data;
++	iov.iov_len = size;
++
++	/* Check if Procedure is active or not */
++	if (!sm->procedure_active) {
++		DBG("Received Subevent event when Procedure is inactive!");
++		return;
++	}
++
++	/* Parse header fields using iovec */
++	if (!util_iov_pull_le16(&iov, &handle)) {
++		error("Failed to parse Connection_Handle");
++		return;
++	}
++
++	if (!util_iov_pull_u8(&iov, &config_id) ||
++		!util_iov_pull_le16(&iov, &start_acl_conn_evt_counter) ||
++		!util_iov_pull_le16(&iov, &proc_counter) ||
++		!util_iov_pull_le16(&iov, &freq_comp) ||
++		!util_iov_pull_u8(&iov, &ref_pwr_lvl) ||
++		!util_iov_pull_u8(&iov, &proc_done_status) ||
++		!util_iov_pull_u8(&iov, &subevt_done_status) ||
++		!util_iov_pull_u8(&iov, &abort_reason) ||
++		!util_iov_pull_u8(&iov, &num_ant_paths) ||
++		!util_iov_pull_u8(&iov, &num_steps_reported)) {
++		error("Failed to parse subevent fields");
++		return;
++	}
++
++	cs_role = sm->cs_opt.role;
++	cs_rtt_type = sm->cs_opt.rtt_type;
++	max_paths = MIN((num_ant_paths + 1), CS_MAX_ANT_PATHS);
++	steps = MIN(num_steps_reported, CS_MAX_STEPS);
++	send_len = offsetof(struct rap_ev_cs_subevent_result, step_data) +
++					steps * sizeof(struct cs_step_data);
++	rap_ev = malloc0(send_len);
++	if (!rap_ev) {
++		error("Failed to allocate memory for subevent result\n");
++		return;
++	}
++
++	DBG("length=%u", size);
++	rap_ev->conn_hdl                     = le16_to_cpu(handle);
++	rap_ev->config_id                    = config_id;
++	rap_ev->start_acl_conn_evt_counter   = start_acl_conn_evt_counter;
++	rap_ev->proc_counter                 = proc_counter;
++	rap_ev->freq_comp                    = freq_comp;
++	rap_ev->ref_pwr_lvl                  = ref_pwr_lvl;
++	rap_ev->proc_done_status             = proc_done_status;
++	rap_ev->subevt_done_status           = subevt_done_status;
++	rap_ev->abort_reason                 = abort_reason;
++	rap_ev->num_ant_paths                = num_ant_paths;
++	rap_ev->num_steps_reported           = steps;
++
++	if (num_steps_reported > CS_MAX_STEPS) {
++		DBG("Too many steps reported: %u (max %u)",
++			num_steps_reported, CS_MAX_STEPS);
++		goto send_event;
++	}
++
++	/* Early exit for error conditions */
++	if (rap_ev->subevt_done_status == 0xF ||
++	    rap_ev->proc_done_status == 0xF) {
++		DBG("CS Procedure/Subevent aborted: ");
++		DBG("sub evt status = %d, proc status = %d, reason = %d",
++			rap_ev->subevt_done_status, rap_ev->proc_done_status,
++			rap_ev->abort_reason);
++		goto send_event;
++	}
++
++	/* Parse interleaved step data from remaining iovec data */
++	for (i = 0; i < steps; i++)
++		parse_cs_step(&iov, &rap_ev->step_data[i], cs_role, cs_rtt_type,
++			max_paths);
++
++send_event:
++	DBG("CS subevent result processed: %zu bytes, ", send_len);
++	bt_rap_hci_cs_subevent_result_callback(send_len, rap_ev, sm->rap);
++	free(rap_ev);
++}
++
++static void rap_cs_subevt_result_cont_evt(const uint8_t *data, uint8_t size,
++					void *user_data)
++{
++	struct cs_state_machine *sm = (struct cs_state_machine *) user_data;
++	struct rap_ev_cs_subevent_result_cont *rap_ev;
++	struct iovec iov;
++	uint8_t cs_role;
++	uint8_t cs_rtt_type;
++	uint8_t max_paths;
++	uint8_t steps;
++	size_t send_len = 0;
++	uint16_t handle;
++	uint8_t config_id;
++	uint8_t proc_done_status;
++	uint8_t subevt_done_status;
++	uint8_t abort_reason;
++	uint8_t num_ant_paths;
++	uint8_t num_steps_reported;
++	uint8_t i;
++
++	if (!sm || !data ||
++		size < sizeof(struct bt_hci_evt_le_cs_subevent_result_continue))
++		return;
++
++	/* Initialize iovec with the event data */
++	iov.iov_base = (void *) data;
++	iov.iov_len = size;
++
++	/* Check if Procedure is active or not */
++	if (!sm->procedure_active) {
++		error("Received Subevent when CS Procedure is inactive!");
++		return;
++	}
++
++	/* Parse header fields using iovec */
++	if (!util_iov_pull_le16(&iov, &handle)) {
++		error("Failed to parse Connection_Handle");
++		return;
++	}
++
++	if (!util_iov_pull_u8(&iov, &config_id) ||
++		!util_iov_pull_u8(&iov, &proc_done_status) ||
++		!util_iov_pull_u8(&iov, &subevt_done_status) ||
++		!util_iov_pull_u8(&iov, &abort_reason) ||
++		!util_iov_pull_u8(&iov, &num_ant_paths) ||
++		!util_iov_pull_u8(&iov, &num_steps_reported)) {
++		error("Failed to parse subevent continue fields ");
++		return;
++	}
++
++	cs_role = sm->cs_opt.role;
++	cs_rtt_type = sm->cs_opt.rtt_type;
++	max_paths = MIN((num_ant_paths + 1), CS_MAX_ANT_PATHS);
++	steps = MIN(num_steps_reported, CS_MAX_STEPS);
++	send_len = offsetof(struct rap_ev_cs_subevent_result_cont, step_data) +
++					steps * sizeof(struct cs_step_data);
++	rap_ev = malloc0(send_len);
++	if (!rap_ev) {
++		error("Failed to allocate memory for subevent result\n");
++		return;
++	}
++
++	DBG("length=%u", size);
++	rap_ev->conn_hdl                     = le16_to_cpu(handle);
++	rap_ev->config_id                    = config_id;
++	rap_ev->proc_done_status             = proc_done_status;
++	rap_ev->subevt_done_status           = subevt_done_status;
++	rap_ev->abort_reason                 = abort_reason;
++	rap_ev->num_ant_paths                = num_ant_paths;
++	rap_ev->num_steps_reported           = steps;
++
++	if (num_steps_reported > CS_MAX_STEPS) {
++		DBG("Too many steps reported: %u (max %u)",
++			num_steps_reported, CS_MAX_STEPS);
++		goto send_event;
++	}
++
++	/* Early exit for error conditions */
++	if (rap_ev->subevt_done_status == 0xF ||
++	    rap_ev->proc_done_status == 0xF) {
++		DBG("CS Procedure/Subevent aborted: ");
++		DBG("sub evt status = %d, proc status = %d, reason = %d",
++			rap_ev->subevt_done_status, rap_ev->proc_done_status,
++			rap_ev->abort_reason);
++		goto send_event;
++	}
++
++	/* Parse interleaved step data from remaining iovec data */
++	for (i = 0; i < steps; i++)
++		parse_cs_step(&iov, &rap_ev->step_data[i], cs_role, cs_rtt_type,
++			max_paths);
++
++send_event:
++	DBG("CS subevent result cont processed: %zu bytes, ", send_len);
++	bt_rap_hci_cs_subevent_result_cont_callback(send_len, rap_ev, sm->rap);
++	free(rap_ev);
++}
++
++/* Subevent handler function type */
++typedef void (*subevent_handler_t)(const uint8_t *data, uint8_t size,
++				   void *user_data);
++
++/* Subevent table entry */
++struct subevent_entry {
++	uint8_t opcode;
++	uint8_t min_len;
++	uint8_t max_len;
++	subevent_handler_t handler;
++	const char *name;
++};
++
++/* Macro to define HCI event entries
++ * Note: min_len excludes the subevent byte since it's stripped before dispatch
++ */
++#define HCI_EVT(_opcode, _struct, _handler, _name) \
++	{ \
++		.opcode = _opcode, \
++		.min_len = sizeof(_struct), \
++		.max_len = 0xFF, \
++		.handler = _handler, \
++		.name = _name \
++	}
++
++/* Subevent dispatch table */
++static const struct subevent_entry subevent_table[] = {
++	HCI_EVT(BT_HCI_EVT_LE_CS_RD_REM_SUPP_CAP_COMPLETE,
++		struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete,
++		rap_rd_rmt_supp_cap_cmplt_evt,
++		"CS Read Remote Supported Capabilities Complete"),
++	HCI_EVT(BT_HCI_EVT_LE_CS_CONFIG_COMPLETE,
++		struct bt_hci_evt_le_cs_config_complete,
++		rap_cs_config_cmplt_evt,
++		"CS Config Complete"),
++	HCI_EVT(BT_HCI_EVT_LE_CS_SEC_ENABLE_COMPLETE,
++		struct bt_hci_evt_le_cs_sec_enable_complete,
++		rap_cs_sec_enable_cmplt_evt,
++		"CS Security Enable Complete"),
++	HCI_EVT(BT_HCI_EVT_LE_CS_PROC_ENABLE_COMPLETE,
++		struct bt_hci_evt_le_cs_proc_enable_complete,
++		rap_cs_proc_enable_cmplt_evt,
++		"CS Procedure Enable Complete"),
++	HCI_EVT(BT_HCI_EVT_LE_CS_SUBEVENT_RESULT,
++		struct bt_hci_evt_le_cs_subevent_result,
++		rap_cs_subevt_result_evt,
++		"CS Subevent Result"),
++	HCI_EVT(BT_HCI_EVT_LE_CS_SUBEVENT_RESULT_CONTINUE,
++		struct bt_hci_evt_le_cs_subevent_result_continue,
++		rap_cs_subevt_result_cont_evt,
++		"CS Subevent Result Continue")
++};
++
++#undef HCI_EVT
++
++#define SUBEVENT_TABLE_SIZE ARRAY_SIZE(subevent_table)
++
++/* HCI Event Registration */
++static void rap_handle_hci_events(const void *data, uint8_t size,
++				void *user_data)
++{
++	struct iovec iov;
++	uint8_t subevent;
++	const struct subevent_entry *entry = NULL;
++	size_t i;
++
++	/* Initialize iovec with the event data */
++	iov.iov_base = (void *) data;
++	iov.iov_len = size;
++
++	/* Pull the subevent code */
++	if (!util_iov_pull_u8(&iov, &subevent)) {
++		DBG("Failed to parse subevent code");
++		return;
++	}
++
++	/* Find the subevent in the table */
++	for (i = 0; i < SUBEVENT_TABLE_SIZE; i++) {
++		if (subevent_table[i].opcode == subevent) {
++			entry = &subevent_table[i];
++			break;
++		}
++	}
++
++	/* Check if subevent is supported */
++	if (!entry) {
++		DBG("Unknown subevent: 0x%02X", subevent);
++		return;
++	}
++
++	/* Validate payload length */
++	if (iov.iov_len < entry->min_len) {
++		DBG("%s: payload too short (%zu < %u)",
++		    entry->name, iov.iov_len, entry->min_len);
++		return;
++	}
++
++	if (entry->max_len != 0xFF && iov.iov_len > entry->max_len) {
++		DBG("%s: payload too long (%zu > %u)",
++		    entry->name, iov.iov_len, entry->max_len);
++		return;
++	}
++
++	/* Call the handler */
++	DBG("Handling %s (opcode=0x%02X, len=%zu)",
++	    entry->name, subevent, iov.iov_len);
++
++	entry->handler(iov.iov_base, iov.iov_len, user_data);
++}
++
++void *bt_rap_attach_hci(struct bt_rap *rap, struct bt_hci *hci,
++			uint8_t role, uint8_t cs_sync_ant_sel,
++			int8_t max_tx_power)
++{
++	struct cs_state_machine *sm;
++
++	if (!rap || !hci) {
++		error("rap or hci null");
++		return NULL;
++	}
++
++	/* Allocate per-instance state machine */
++	sm = new0(struct cs_state_machine, 1);
++	if (!sm) {
++		error("Failed to allocate state machine");
++		return NULL;
++	}
++
++	/* Initialize state machine with provided CS options */
++	cs_state_machine_init(sm, rap, hci, role, cs_sync_ant_sel,
++				max_tx_power);
++
++	sm->event_id = bt_hci_register(hci, BT_HCI_EVT_LE_META_EVENT,
++					rap_handle_hci_events, sm, NULL);
++
++	DBG("bt_hci_register done, event_id : %d", sm->event_id);
++
++	if (!sm->event_id) {
++		error("Failed to register hci le meta events");
++		error("event_id=0x%02X", sm->event_id);
++		free(sm);
++		return NULL;
++	}
++
++	DBG("CS options: role=%u, cs_sync_ant_sel=%u, max_tx_power=%d",
++		role, cs_sync_ant_sel, max_tx_power);
++
++	return sm;
++}
++
++bool bt_rap_set_conn_handle(void *hci_sm, struct bt_rap *rap, uint16_t handle,
++				const uint8_t *bdaddr, uint8_t bdaddr_type)
++{
++	struct cs_state_machine *sm = hci_sm;
++	struct bt_att *att;
++
++	if (!sm || !rap)
++		return false;
++
++	att = bt_rap_get_att(rap);
++	if (!att)
++		return false;
++
++	DBG("Setting connection mapping: handle=0x%04X, ", handle);
++	if (bdaddr) {
++		DBG("bdaddr=%02x:%02x:%02x:%02x:%02x:%02x type=%u",
++			bdaddr[5], bdaddr[4], bdaddr[3],
++			bdaddr[2], bdaddr[1], bdaddr[0], bdaddr_type);
++	}
++
++	return add_conn_mapping(sm, handle, bdaddr, bdaddr_type, att, rap);
++}
++
++void bt_rap_clear_conn_handle(void *hci_sm, uint16_t handle)
++{
++	struct cs_state_machine *sm = hci_sm;
++
++	if (!sm)
++		return;
++
++	DBG("Clearing connection mapping: handle=0x%04X", handle);
++	remove_conn_mapping(sm, handle);
++}
++
++void bt_rap_detach_hci(struct bt_rap *rap, void *hci_sm)
++{
++	struct cs_state_machine *sm = hci_sm;
++
++	if (!rap)
++		return;
++
++	DBG("Detaching RAP from HCI, cleaning up mappings");
++
++	/* Cleanup the per-instance state machine */
++	if (sm) {
++		/* Unregister HCI events */
++		if (sm->event_id && sm->hci)
++			bt_hci_unregister(sm->hci, sm->event_id);
++
++		/* Clean up per-instance connection mappings */
++		remove_rap_mappings(sm);
++
++		/* Destroy the connection mappings queue */
++		queue_destroy(sm->conn_mappings, mapping_free);
++
++		/* Free the state machine */
++		free(sm);
++	}
++}
 -- 
 
