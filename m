@@ -1,159 +1,100 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729A0377023
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 18:27:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DD233F5BC
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 19:55:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776796036; cv=none; b=DZGtT5tr/iBc3VAm0pFGXx1FRMblqD5TY8ghoZiYpUUILhYcEXO2mHCVgcMr5vWzg/AJ78al/9exEW1eU/+nHIw9jbBeQUo1djmNFL7Q78weBqGf3R0tQFOV6iAAnWKJLD9cxUmCm4J77dJQE7pNojmCQOCe8x4pzCjvE78LyWk=
+	t=1776801356; cv=none; b=j2I0+shHq3GSTJ95eg3L2ZYRzgLgaSCZnzG+3QnTsfU17AKCQnNfOPQpkshazqanYBBVHA8E+5VPPPuA6J6OCbfyLtmoBGTxOAXNK2IeHMAOGIpfOu7XJiqyJ/xnLE8dXU2mjdxWLFEXtvIfxgY88LiuWEjOdovEpwMWktmjptU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776796036; c=relaxed/simple;
-	bh=HE2+eLkQOOvnI/jNxAARo5BMBl1vtTI7e66uwuLKxy0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=NUF2EGm+1zexPqqMc9TyhC97NrrVXo5aHk+useIQgKw6NtkVTnZOBI+nL27/gILaLtT7NV9kbS0Oqi8BYUQ9EMCqIbYspug2PnsDqx9tbP0jqQUv9Y1utJNJuEWLuy5WYZfk/s+zItK0oLQ5k2y6QcneXz5g5Df6k7PNxxPNtoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O4vFRHFJ; arc=none smtp.client-ip=209.85.160.182
+	s=arc-20240116; t=1776801356; c=relaxed/simple;
+	bh=l1URCGmFp928CJXJTW1h4ja9YqpDw/29ohR4yYUzrz0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=EYBvYplxiriu9iA3ozji4sx6D6JG1mS33StrX3xECNN7ApzGEiEPZcNPfueR/vmIdweZpLKUvIZu4uOFptgLXN0aNnE/hqbm//46K6QkRZWDWkjxQ1Z1k891ihKwZIj9DTkgC2AZcN1Vo6yyjprtfyNnGmhGIZsr2MLR9LYsXyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M5CLehk8; arc=none smtp.client-ip=209.85.221.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O4vFRHFJ"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-50e614fdb42so22185101cf.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 11:27:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M5CLehk8"
+Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-56a857578a8so1801402e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 12:55:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776796019; x=1777400819; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=xm0ea2YWu8Eci5IT46a5t6WC1syL6xScXEIx5Bk1I0U=;
-        b=O4vFRHFJMAXHu7TYfpI7E+8NU9dXL3fx1H2nJt5htgRp/+NYZPBYm262mxD1C2U5Li
-         hOWZeQIGzZEDovwGrYpxL/4p4WwM0O2sR/JI8pepc44HacSdlCx5ZZqgKw9yiHJosk4c
-         d326rTMSMpIFMJ4998gsCnL/ESbgZUhVIVr17JzUzLvxtqsDr2ey6WBLDo52Syx9otI2
-         0XhgprG9rF5Kc6uF6iZu/33kTsTWsNSqo7OJLTjQHIWYrOhcf1eJinW7GO73EIkDQptP
-         F0KhKF9e1ixlPruVr2SxHnGDYGN11IpGAhXDE/pP5Th4zuv1Nc3IK8CcO6oso7JDbe7Z
-         Z5xA==
+        d=gmail.com; s=20251104; t=1776801354; x=1777406154; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YuNjQMgmCEGuUpz9Hhs45f9RQqURpfIZkIYN4kFwZDc=;
+        b=M5CLehk8hmRx/nxoqtVGAOgMvmkhjqu/SlQ84qXlF6Uz1+wSrrK5c9ROrcnsneYNiA
+         ibvMOdX6lB5gQAi3HEWUk/YLhMWCBv0CMgV0ZCTXbq+KTIpLgI8NGgI906sP/D6vsM2B
+         rqJfBbqILQPrgSXu+JBgO7bZUbn9E69eGGq8lwPfY49om87AQiBAu/V168ee7MC4FDUA
+         00lYzusVskdX/kAvCgc/LUDr1pRK7S7l1Dq1MVzcso5ExweyalhxbwGIxlOez5p3hF2R
+         LLqNfDIxRUvkSVtCxuD051zW0Yga5SnDLF6FKO1Mv1K0zzCdFW8h7ol6f4myjUB0G4p7
+         JdYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776796019; x=1777400819;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xm0ea2YWu8Eci5IT46a5t6WC1syL6xScXEIx5Bk1I0U=;
-        b=D+ZCDin3p9K7Tp87/pjSgwgpa0Iko+fQm01VVDcIn5qS7LjohgJ5+eg8uunFaTGh8v
-         5XZDRzBm468QBbMCIzYtUN9ggqlCRiNDDy6Wc86Izbaj0yxRcWxnSI/F2KzBWgJjx1XB
-         jgSSTrbAKP6H1bQZ/pl5o8A6dIOK0ASJRAjBTilw1J7fPD3O7WqMOOYfmOaL55Wt3HCv
-         MhjRFgeLSxPButpChErAN2PlppNjvPP6B63mfMUF0OeFVTv0vY/RrfGUnEljM0sWVZuj
-         absOZ97C96pmXLjy4e3AH4kPnBJPg8jvOwCW/T/Ox5w4kPISlLs/P6M9vLn/xteZDIrX
-         N9vA==
-X-Gm-Message-State: AOJu0Yx37T9wFB5KNOjFnNhbZvqYpeCuSJ4Xfvut7HFpbHX2jne4qMd5
-	EVbjHIXlE4AWaoDOGaxGU8oNwalqpMrtEm6k+KQ3s3LZNMnl3xcUOUj5ic5lMA==
-X-Gm-Gg: AeBDietdI3frW0OS9SP9r57HiEm9Rll1m9PpnvoZGmy4KyGtTm/fnXJqSHmEmVDXLfq
-	IhSiQBGegNhLZIiG6HJxjmswHpZQ45/a4yr+gE8mP/i/Y/Cl8mlSUFoV8ph8HfnSdvCt9XwBx8e
-	zvnMiXhCW96kr0JeknGOwePLKocOqRi6+qV9O8/oX+i7DUsP5J/+fVf6T4D3cUQYezyzMpBPhLu
-	oFO19KRv04dlgOkJv4hiEiBgKOFFgA2pTDMLiGtVXm8wcsZxcCo3aSc89EVjLF8R2IAbA9FIrm3
-	i/ZbObrhTZaEv5WGDKJAJqQvW2P8daYg8S9LA1wROD8XgXjr2Zvhk2RaoUVJgge0oP8xVQ1b4Za
-	0lkxO4zPjzhKbsE9TfC+5JBQFDo0YvV5vqOVgaXdjnjT16DNcm2TYCYz+tW/hZvmVjjUx8wPgac
-	82yOy1J23DpaU+7bpBXB3/Vw/g0xhDvtKh4wweO84x
-X-Received: by 2002:a05:622a:2612:b0:50f:bc35:ac3 with SMTP id d75a77b69052e-50fbc350e78mr29579051cf.36.1776796018927;
-        Tue, 21 Apr 2026 11:26:58 -0700 (PDT)
-Received: from [172.17.0.2] ([4.236.159.149])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50e39487921sm111826151cf.24.2026.04.21.11.26.58
+        d=1e100.net; s=20251104; t=1776801354; x=1777406154;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YuNjQMgmCEGuUpz9Hhs45f9RQqURpfIZkIYN4kFwZDc=;
+        b=OFzjCieO0akJmCNRHpBLwTniHQWBbtamGHk3EjKbHCh+LL53JKjj2CsnCv3jOPT0cU
+         Cz2Rn0hXsh5XlCiPT7pQ4mliu7Qg9eWyzIxXuXBg9tr3mLlr2SO9iJ8190+CdyRM57YY
+         L2nW6rCsONncULgvSq5/3U4Iz2Yern2YCmVAyfJJ9pHVa6oKelYiCsOSfpoNH8wBzj7X
+         S1IrJ3UAO/LwTna+pzn5VKRKgHxZ00QabmIo4X+QEHeMxBy534IfnlQyWmxG/9HAsbBo
+         UPL7Vo0DtOr+5AyD5+tWzRF9FWOE9nS3fyaFAGOVsJA+gEwltiKqiddR4Fl0OYgfjBD7
+         vFRw==
+X-Gm-Message-State: AOJu0YxcPJGlA5yAf1LlTyuT9jEOAXQfDGssa4+0m/+Xfmtteo20I2qP
+	zjqkOpdia2UD5nU26avhF6sRbhVq2O+5EzxUkkYhGwSRnqG6xcSjkuY3tJgJ6bZvKG4=
+X-Gm-Gg: AeBDievX2u1guTdMmTPKim61Pd0a3MJEiX+VuBuXTNRTK5r5psdLz1cbSwa4agGWmk9
+	zSfyUqu71X6o6bAKoCYdPn2q+mt9xF48YFWCKVqcGmK1/KiCKvNwgA+VmsQyzE8OoqMkJw0KhOO
+	8Qqo/582BzthVdELZQqX2j6xxvUPzn20KeI2/S7mfDHy3HpzDm8GuCAzL7B3OSAs4+haAnfHnBe
+	JxZqY3SwDCqs4aPJM53gYVOfN30e9rmpBympS+S1s5JSRm1LsD8MZQqWd/vjPQ7Tg6D9v4okirO
+	diWCYHBK3HcqzAbN/QC9YX1z7XCp1baJu8gi3tGB7eV7DkMVAbiv/IUjvXDMISQS88+mIF8m2ud
+	MNkMJpmRSSUAU4TyrZs2/Dj6W/HlxeZGWD+mU48jm/zMadHD/8Hlxoh+kA8IuqqG03D0lBGyWNn
+	NJnJmJTOCQxfutwe2KLb9zssisOnrJXY0bOSIMGY2EdlDQuVo1R9iDTf36753NGx8dqJBiAtxjS
+	LaHrTCU6Q5/rbV7qgAF3+JlDuzf
+X-Received: by 2002:a05:6123:14b:b0:56a:f576:cfca with SMTP id 71dfb90a1353d-56fa57d82ccmr9453021e0c.2.1776801354219;
+        Tue, 21 Apr 2026 12:55:54 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56fa91bf120sm8962318e0c.3.2026.04.21.12.55.53
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 11:26:58 -0700 (PDT)
-Message-ID: <69e7c172.050a0220.1f731b.ea52@mx.google.com>
-Date: Tue, 21 Apr 2026 11:26:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1839337623380634176=="
+        Tue, 21 Apr 2026 12:55:53 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] Add permissions for btsnoop-analyzer workflow
+Date: Tue, 21 Apr 2026 15:55:44 -0400
+Message-ID: <20260421195544.1950548-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, michael.bommarito@gmail.com
-Subject: RE: Bluetooth: virtio_bt: harden rx against untrusted backend
-In-Reply-To: <20260421170845.3469513-2-michael.bommarito@gmail.com>
-References: <20260421170845.3469513-2-michael.bommarito@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============1839337623380634176==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1083952
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.47 seconds
-GitLint                       PASS      0.81 seconds
-SubjectPrefix                 PASS      0.25 seconds
-BuildKernel                   PASS      24.88 seconds
-CheckAllWarning               PASS      27.06 seconds
-CheckSparse                   PASS      25.95 seconds
-BuildKernel32                 PASS      24.12 seconds
-TestRunnerSetup               PASS      520.13 seconds
-IncrementalBuild              PASS      24.74 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v3,1/2] Bluetooth: virtio_bt: clamp rx length before skb_put
-WARNING: Non-standard signature: Assisted-by:
-#141: 
-Assisted-by: Claude:claude-opus-4-7
-
-ERROR: Unrecognized email address: 'Claude:claude-opus-4-7'
-#141: 
-Assisted-by: Claude:claude-opus-4-7
-
-total: 1 errors, 1 warnings, 37 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14532816.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[v3,2/2] Bluetooth: virtio_bt: validate rx pkt_type header length
-WARNING: Non-standard signature: Assisted-by:
-#140: 
-Assisted-by: Claude:claude-opus-4-7
-
-ERROR: Unrecognized email address: 'Claude:claude-opus-4-7'
-#140: 
-Assisted-by: Claude:claude-opus-4-7
-
-total: 1 errors, 1 warnings, 42 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14532817.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
-https://github.com/bluez/bluetooth-next/pull/113
-
+Grant issues:write, contents:read, and models:read so the reusable
+workflow can post comments and access the GitHub Models API.
 ---
-Regards,
-Linux Bluetooth
+ .github/workflows/btsnoop-analyze.yml | 5 +++++
+ 1 file changed, 5 insertions(+)
 
+diff --git a/.github/workflows/btsnoop-analyze.yml b/.github/workflows/btsnoop-analyze.yml
+index 484288c0d9b6..b910f3c0cb66 100644
+--- a/.github/workflows/btsnoop-analyze.yml
++++ b/.github/workflows/btsnoop-analyze.yml
+@@ -4,6 +4,11 @@ on:
+   issue_comment:
+     types: [created]
+ 
++permissions:
++  issues: write
++  contents: read
++  models: read
++
+ jobs:
+   analyze:
+     if: >-
+-- 
+2.53.0
 
---===============1839337623380634176==--
