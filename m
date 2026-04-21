@@ -1,169 +1,203 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4C33D88E3
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 14:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA43B387590;
+	Tue, 21 Apr 2026 14:37:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776781708; cv=none; b=k7tpIynR8JbzahQj2O3Ra1tmjOoO/VinIi9EdspmuSYqIci1+JaXmaPbOgfPRME3w60aP1EzKmMQgpXN5LISKKz0xZqHER2GDMOC69BiVI/8CBXvX4lzHvIoZh2OKIiEZWouNoIO6FV9efkOMEdMWbzsIHjz2AF0Xt9KyVuTX+E=
+	t=1776782256; cv=none; b=oaPO3pKFxAIX5GtFWt0lDkNeadSn0aFbOaox7MkIu/omt9s5aQ8s5t3z+KSbty+xY4tUXZZqbFcEl/mDtlWYdP9VW2DlTEr/twwFkPgY8MnhP3RHK1GkapKjc9xtzoZJRLqJhqfwOTkDLJiBNXBSNJY+3M1ykcEy8eSkPQ8DuEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776781708; c=relaxed/simple;
-	bh=8Al3yrm/3hSvEPA958SWnVaUgmCGPZw8rcFuTzB+JYE=;
+	s=arc-20240116; t=1776782256; c=relaxed/simple;
+	bh=Jc1r7WiTMzlzZpAR8gpYFiGbgq1zu4/YSPRVmKk3eB4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ISLuH0OjxPQMeBGjIgQuK6plrGlo4CGQKuziEjL2svPUJezArUy4DIEnknYt33s4/8ZFZghYGMPtncH1S4cfDVFU+gcFdZgGsAtuxyJZY76rq5vmytKewi1jyz3t5sdoVhNwy2Cg0L7ceZoPJdI/vdKHvAZkCvIQc062m7maFKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b=oBVIiZfB; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=B3Xkq87jM7RjUq6xfzBJqBDepsbH/gjfkUZmNj87Hlscs4FmurIieKr/wGsdVYPY+XTV7eL+Qu4kgoBJRjKdWdoULTlyXGLkFhQJyW8ik58xlWBMTtiLGoY524yPgaMEdnOQYiqIuWjAe4axoaNiz3zdLJBXp/9KImdnJPqB7uA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BDK6A7pw; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b="oBVIiZfB"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43d0deb7ad5so3517961f8f.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 07:28:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20251104.gappssmtp.com; s=20251104; t=1776781705; x=1777386505; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8Al3yrm/3hSvEPA958SWnVaUgmCGPZw8rcFuTzB+JYE=;
-        b=oBVIiZfBEcXZc5iULO3eapa8JPyWTctIIEypve1SXZdvi3j3pV7EpNbYAZg/H2dmW2
-         sYFC4FfjX3WXGmbiyTRvSnLjwPGNV7O9irYpHsWeWY6cOAurQ59fhNWOjz05zKMCmmj4
-         r8FBkOTWsxSajQTpa4COqK9VnAFdzWmGelwlXm5mBWC38gwAeqV6BHVUp1rcniR5Gcub
-         ArEhKTZFywzIU30Kto5c4IZOKNVkt6TS9kFKjBPVu7IYPwWJ4rN7kSka4ioiMcL58Bdm
-         tR/GOu30faYoHkD0U8vsjiLu6Tm1jQ1t1YOCIjXs8we09C/QUM571zEFe+J6s4WpWkKh
-         QSIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776781705; x=1777386505;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8Al3yrm/3hSvEPA958SWnVaUgmCGPZw8rcFuTzB+JYE=;
-        b=gOENAkBiBbNyoWcTsxYENAy8rBXA8yTtctBV2vrLJ5+LFfp5kPZagvIdlfdwG96wVr
-         8q57Td491iSJ3q09DW8uDxepFdgdUjyZA8T52o9nVf4ckbAl2aQam5sv8aBj5VE0L+Sd
-         Fa1yZAC68lLXfWaM74UmgMSSJgJ9yn1t29frPGpCfEPp50wZy6AE9R+qmQuwPNCFjbqZ
-         5uTgKn01wcd1OyPerstsFMCr/SDpDTBJYItio7ZWLOmfuFZ1kZ2BOlmV+qsbt4szt1Ch
-         aixTqT9wk+HA/YNW1zdD0FHkK8E9eiQs2mYlHvK3UWesVuvty09aK4eRak03qUOaWuxZ
-         4wSw==
-X-Forwarded-Encrypted: i=1; AFNElJ+QRowDDwjRRRLMi2dtu60kjISQx9ha9I7PJ1ugt1HDcioqPf45wyZ/lsJ/U0h24CKB8MqXgVlR+mW/TUnoOZQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbE6yHMzIZyt4CFDMpudQrXJqh9R3+AkcAE/J2Itp5wvuDGRXb
-	PujYDxF2z37AtDvYLb5hA6mf6AmFJtzYMJVzwJDmw4kEYEtp0+178wzjPoe76Y4mRi8=
-X-Gm-Gg: AeBDiethfXpH8QZEiObTbNDAQBlWwVkWjVN25Fl+P47KspG3e+3lf71XSB0TSjtXj+J
-	VF1iM9RyzpjJBtJ4SZRNHU8K0BiLBJTmypDjXpftN9BsjHVSaxCf5KZL3lRnEIoyS+bsX+Qjnvm
-	QsUQFbADWSOY632aQU6xxZVVqNuz0TI6oCOWtTL0seAQvlZtPr4uceKN/e3ZXZvF0ZnQhkWy3NM
-	x0jI0/GCFM5EHfdX+rU8V6QgIA2yjEzjTJx43UQbgvf/+cmXuWlMB5wU0SvXb0nqNjW9Sq/b8+D
-	FGcEybaavfPTHbQMS2Yu/D75QFwvTRsMHEzVJ1jH1Z6R2lsRfMv5xT7RcyNiv5P372aHf7WsLTd
-	6lyMwUlFTX8Ccz5BtNtTxdQhD6KqtdQ/NCdypL7gf8aD+D0a8+5/BVPmH0Jl3jX6O+r7KLCKdnC
-	7J/aLO9fvKoZeBRpq+AqF5mjtLDD/vudqtzJqJB6VHqG90Ck65YywBcu4ldDSRmBhhmEMJygwSJ
-	9rVwnstdLiVmgPmmIsGW5WKkQ==
-X-Received: by 2002:a05:6000:25c6:b0:43d:7a08:a5f8 with SMTP id ffacd0b85a97d-43fe3e0ae91mr28509500f8f.35.1776781704476;
-        Tue, 21 Apr 2026 07:28:24 -0700 (PDT)
-Received: from localhost (p200300f65f114e0838b25d7f2f2f49cd.dip0.t-ipconnect.de. [2003:f6:5f11:4e08:38b2:5d7f:2f2f:49cd])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-43fe4e3a18csm42923276f8f.20.2026.04.21.07.28.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 07:28:23 -0700 (PDT)
-Date: Tue, 21 Apr 2026 16:28:22 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
-To: Johannes Berg <johannes@sipsolutions.net>, 
-	Ulf Hansson <ulfh@kernel.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	"Christian A. Ehrhardt" <christian.ehrhardt@codasip.com>, linux-mmc@vger.kernel.org, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Wolfram Sang <wsa+renesas@sang-engineering.com>, 
-	linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
-	linux-bluetooth@vger.kernel.org, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, linux-mediatek@lists.infradead.org, 
-	Ping-Ke Shih <pkshih@realtek.com>, linux-wireless@vger.kernel.org, Felix Fietkau <nbd@nbd.name>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, 
-	Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, 
-	Brian Norris <briannorris@chromium.org>, Francesco Dolcini <francesco@dolcini.it>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: Re: [PATCH v1 1/6] sdio: Add syntactic sugar to store a pointer in
- sdio_driver_id
-Message-ID: <aeeFun4zdz360GCb@monoceros>
-References: <cover.1776429984.git.u.kleine-koenig@baylibre.com>
- <c830049dcfcd99f005e2ff6742aace9341c61f13.1776429984.git.u.kleine-koenig@baylibre.com>
- <aeaMkfk_1t98e7SU@monoceros>
- <CABBYNZJzbEmYzTk2m+Y8SoHVouTMA6Gje_55iJsQ6cYtDLftbQ@mail.gmail.com>
- <aecu1ixyHP2hQvgE@monoceros>
- <2d6e902083d693cdbb15fc62c6bf92db34fc734a.camel@sipsolutions.net>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BDK6A7pw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776782255; x=1808318255;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Jc1r7WiTMzlzZpAR8gpYFiGbgq1zu4/YSPRVmKk3eB4=;
+  b=BDK6A7pwuiviAjoLYy5gDzccGnafRw4R99hfgBP/DoCV/X05h3VfAek+
+   Ewx5GJ4HxWf8t+YEvQTPvkT00KnTafwndm7/SPjbA3X9B4OV5h+3/dYYA
+   Zqi4H3wWk9uOPNih+wwFXRrAB4dVPDFbmwN5cDxtKxredHGhXq0k2AQQy
+   Sli1Pj0oo/uKzq6kBGFwKLi9rOuF9KMLaHGG8QxOBaYXw+03Vn3d6yE0a
+   MVyCal2EymsgqZuuqKeHp4I/Z5zuGDce+xL5SGGucea4RFLBnjU9MwQMe
+   X/zOz6cLdt4FUgzcC7KTeMoMcZJR5jcO19bqm2j227BlhpSQoe/NpLjwB
+   Q==;
+X-CSE-ConnectionGUID: NUJwpAkTQJix4KQK172M/Q==
+X-CSE-MsgGUID: a9uplsiSStatYM5j0iAl3Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11763"; a="100373430"
+X-IronPort-AV: E=Sophos;i="6.23,191,1770624000"; 
+   d="scan'208";a="100373430"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2026 07:37:10 -0700
+X-CSE-ConnectionGUID: PYeFdFnCTU+49WDFjXKZ+g==
+X-CSE-MsgGUID: p2vpNJ3bTUCon9nd1F/utQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,191,1770624000"; 
+   d="scan'208";a="227725225"
+Received: from lkp-server01.sh.intel.com (HELO 7e48d0ff8e22) ([10.239.97.150])
+  by fmviesa010.fm.intel.com with ESMTP; 21 Apr 2026 07:37:07 -0700
+Received: from kbuild by 7e48d0ff8e22 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wFCDo-000000003dg-37uZ;
+	Tue, 21 Apr 2026 14:37:04 +0000
+Date: Tue, 21 Apr 2026 22:36:24 +0800
+From: kernel test robot <lkp@intel.com>
+To: Tristan Madani <tristmd@gmail.com>, linux-bluetooth@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	luiz.dentz@gmail.com, marcel@holtmann.org, sven@svenpeter.dev,
+	marcan@marcan.st, asahi@lists.linux.dev, stable@vger.kernel.org
+Subject: Re: [PATCH v3] Bluetooth: hci_bcm4377: validate firmware event
+ length in completion ring
+Message-ID: <202604212248.Sek1Tdfg-lkp@intel.com>
+References: <20260417104639.2608008-1-tristmd@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="wkasyawrdb76jdw2"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2d6e902083d693cdbb15fc62c6bf92db34fc734a.camel@sipsolutions.net>
+In-Reply-To: <20260417104639.2608008-1-tristmd@gmail.com>
+
+Hi Tristan,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on bluetooth/master]
+[also build test WARNING on bluetooth-next/master linus/master v7.0 next-20260420]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Tristan-Madani/Bluetooth-hci_bcm4377-validate-firmware-event-length-in-completion-ring/20260420-161359
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/20260417104639.2608008-1-tristmd%40gmail.com
+patch subject: [PATCH v3] Bluetooth: hci_bcm4377: validate firmware event length in completion ring
+config: um-allmodconfig (https://download.01.org/0day-ci/archive/20260421/202604212248.Sek1Tdfg-lkp@intel.com/config)
+compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260421/202604212248.Sek1Tdfg-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202604212248.Sek1Tdfg-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from drivers/bluetooth/hci_bcm4377.c:11:
+   In file included from include/linux/dma-mapping.h:8:
+   In file included from include/linux/scatterlist.h:9:
+   In file included from arch/um/include/asm/io.h:24:
+   include/asm-generic/io.h:1209:55: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+    1209 |         return (port > MMIO_UPPER_LIMIT) ? NULL : PCI_IOBASE + port;
+         |                                                   ~~~~~~~~~~ ^
+>> drivers/bluetooth/hci_bcm4377.c:761:15: warning: format specifies type 'size_t' (aka 'unsigned long') but the argument has type 'u16' (aka 'unsigned short') [-Wformat]
+     760 |                          "event data len %zu exceeds payload size %zu for ring %d\n",
+         |                                                                   ~~~
+         |                                                                   %hu
+     761 |                          data_len, ring->payload_size, ring->ring_id);
+         |                                    ^~~~~~~~~~~~~~~~~~
+   include/linux/dev_printk.h:156:70: note: expanded from macro 'dev_warn'
+     156 |         dev_printk_index_wrap(_dev_warn, KERN_WARNING, dev, dev_fmt(fmt), ##__VA_ARGS__)
+         |                                                                     ~~~     ^~~~~~~~~~~
+   include/linux/dev_printk.h:110:23: note: expanded from macro 'dev_printk_index_wrap'
+     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
+         |                              ~~~    ^~~~~~~~~~~
+   2 warnings generated.
 
 
---wkasyawrdb76jdw2
-Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v1 1/6] sdio: Add syntactic sugar to store a pointer in
- sdio_driver_id
-MIME-Version: 1.0
+vim +761 drivers/bluetooth/hci_bcm4377.c
 
-Hello Johannes,
+   734	
+   735	static void bcm4377_handle_completion(struct bcm4377_data *bcm4377,
+   736					      struct bcm4377_completion_ring *ring,
+   737					      u16 pos)
+   738	{
+   739		struct bcm4377_completion_ring_entry *entry;
+   740		u16 msg_id, transfer_ring;
+   741		size_t entry_size, data_len;
+   742		void *data;
+   743	
+   744		if (pos >= ring->n_entries) {
+   745			dev_warn(&bcm4377->pdev->dev,
+   746				 "invalid offset %d for completion ring %d\n", pos,
+   747				 ring->ring_id);
+   748			return;
+   749		}
+   750	
+   751		entry_size = sizeof(*entry) + ring->payload_size;
+   752		entry = ring->ring + pos * entry_size;
+   753		data = ring->ring + pos * entry_size + sizeof(*entry);
+   754		data_len = le32_to_cpu(entry->len);
+   755		msg_id = le16_to_cpu(entry->msg_id);
+   756		transfer_ring = le16_to_cpu(entry->ring_id);
+   757	
+   758		if (data_len > ring->payload_size) {
+   759			dev_warn(&bcm4377->pdev->dev,
+   760				 "event data len %zu exceeds payload size %zu for ring %d\n",
+ > 761				 data_len, ring->payload_size, ring->ring_id);
+   762			return;
+   763		}
+   764	
+   765		if ((ring->transfer_rings & BIT(transfer_ring)) == 0) {
+   766			dev_warn(
+   767				&bcm4377->pdev->dev,
+   768				"invalid entry at offset %d for transfer ring %d in completion ring %d\n",
+   769				pos, transfer_ring, ring->ring_id);
+   770			return;
+   771		}
+   772	
+   773		dev_dbg(&bcm4377->pdev->dev,
+   774			"entry in completion ring %d for transfer ring %d with msg_id %d\n",
+   775			ring->ring_id, transfer_ring, msg_id);
+   776	
+   777		switch (transfer_ring) {
+   778		case BCM4377_XFER_RING_CONTROL:
+   779			bcm4377_handle_ack(bcm4377, &bcm4377->control_h2d_ring, msg_id);
+   780			break;
+   781		case BCM4377_XFER_RING_HCI_H2D:
+   782			bcm4377_handle_ack(bcm4377, &bcm4377->hci_h2d_ring, msg_id);
+   783			break;
+   784		case BCM4377_XFER_RING_SCO_H2D:
+   785			bcm4377_handle_ack(bcm4377, &bcm4377->sco_h2d_ring, msg_id);
+   786			break;
+   787		case BCM4377_XFER_RING_ACL_H2D:
+   788			bcm4377_handle_ack(bcm4377, &bcm4377->acl_h2d_ring, msg_id);
+   789			break;
+   790	
+   791		case BCM4377_XFER_RING_HCI_D2H:
+   792			bcm4377_handle_event(bcm4377, &bcm4377->hci_d2h_ring, msg_id,
+   793					     entry->flags, HCI_EVENT_PKT, data,
+   794					     data_len);
+   795			break;
+   796		case BCM4377_XFER_RING_SCO_D2H:
+   797			bcm4377_handle_event(bcm4377, &bcm4377->sco_d2h_ring, msg_id,
+   798					     entry->flags, HCI_SCODATA_PKT, data,
+   799					     data_len);
+   800			break;
+   801		case BCM4377_XFER_RING_ACL_D2H:
+   802			bcm4377_handle_event(bcm4377, &bcm4377->acl_d2h_ring, msg_id,
+   803					     entry->flags, HCI_ACLDATA_PKT, data,
+   804					     data_len);
+   805			break;
+   806	
+   807		default:
+   808			dev_warn(
+   809				&bcm4377->pdev->dev,
+   810				"entry in completion ring %d for unknown transfer ring %d with msg_id %d\n",
+   811				ring->ring_id, transfer_ring, msg_id);
+   812		}
+   813	}
+   814	
 
-On Tue, Apr 21, 2026 at 10:59:04AM +0200, Johannes Berg wrote:
-> On Tue, 2026-04-21 at 10:12 +0200, Uwe Kleine-K=F6nig (The Capable Hub)
-> wrote:
-> > >=20
-> > > We only received 1-3 of the 6:
-> > >=20
-> > > https://patchwork.kernel.org/project/bluetooth/list/?series=3D1082520
-> > >=20
-> > > Or is this on purpose, and we should consider the set complete?
-> >=20
-> > The remaining patches are for wifi. My expectation was that they go in
-> > via wifi+netdev once the first patch is in their base. But of course I'm
-> > open for maintainer coordination to let the series go in in less steps
-> > than I expected. If that helps I can also create an immutable branch,
-> > but I have no urge here, so if only the first patch goes in during the
-> > next merge window, I won't have problems to keep track of the remaining
-> > bits.
->=20
-> It's probably better for everything all around, including the various
-> automations that test patch series, if you just flip a coin, send these
-> to either BT or WiFi, and then resend the others later :)
-
-The first patch of this series adapting sdio_device_id is technically
-mmc material. However to demonstrate the upside of this patch you also
-have to look at at least one of bluetooth and wifi. So even if I drop
-one of those there are still two subsystems involved. And then in my
-subjective view it doesn't matter much if I involve two or three
-subsystems. Regarding test automations I would assume that if the
-bluetooth bot sees patches #1-#4 of this series it can do something
-already (involving either testing the series only partially or finding
-all 6 patches on lore). And then this isn't worse than just sending the
-first four patches of the series and delaying wifi until later.
-
-But I agree that's a trade-off.
-
-Having said that, I'm happy if the first patch is merged and patches #2
-to #6 are discarded by the bluetooth and wifi people. I'll come back to
-them once the first patch is in a release.
-
-> All assuming we get an ACK from whoever is responsible for patch 1 to
-> merge it through some other tree :)
-
-To make this more explicit: That would be Ulf as MMC maintainer.
-
-Best regards
-Uwe
-
---wkasyawrdb76jdw2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmnniYQACgkQj4D7WH0S
-/k4HiwgApSzuIJ1URhsrlSvh9N8JDusJG3q51TwVELmNJHyiGiApzvIMI2hf1LpH
-E1+5egvSwoK33C+ReJRedPagWp0Ll3IFfj2s0y3HvwrI5a76Tdf4sHvj5NHPiRIH
-y9KHO4wXogmzK8jd1kjTZQfVblWyXiIkrLiylpMbymhBKeStWp7DRQSV/94dIdZe
-Ig/lLo4/6IjeuI3hqDpPqnRIscxMXd5YdujPggb4cJWAEy0Xeh0UelFMr/++spDD
-07BXWuy0sJyPh7Q0c6YyhUYR2JQTbfRGhdia/V1lPmvtICvopICdSWsFPvGyqVwX
-F0yDYOI9syIZGhmxoclUWCaZGbh0IA==
-=qXiL
------END PGP SIGNATURE-----
-
---wkasyawrdb76jdw2--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
