@@ -1,84 +1,112 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDA12D97B7;
-	Tue, 21 Apr 2026 17:12:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D264C6C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 17:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776791560; cv=none; b=c5IG0zpSod0LyXI4H7wLPTVvTTXtOg02J5oh9ZY1gVJrrqQqyGOBC9zdnJWm0Yz9jcVkL1oooEklYkhxhkvX69/hP6xlTU0tRkUMKQNV3SHLFFSjDvyH3wev8KAfoHe3umFrnxXtCf3fRRHpgfkJvZsP2IUXb5Fip0pDSR2hmEo=
+	t=1776793190; cv=none; b=VDcqFJhtThBDLK4MBzmsTbDaTasYl46Bk9ULd6xQxJsv3qpy2M71n/iEkFvkLo5Mv//BS8PCUOzip2hHHX41PlIpzeKk6o29DaxXTUY9ACp6C5MhBKDxPxG7uxdcbkO2avjdmJaG7hWyjlZH+fY9JV4ha+b21OpTUmgOXxaTdO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776791560; c=relaxed/simple;
-	bh=lDD4mFtiF/g0xmUz0hEvR2E8FUHSWbKgZE2MMcfcfCQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jusFATpY2xue46mricCIHZRSXzaT0mLpqkGaxF6AVrjEqdJXmyB3+6d/e+kkAaP0X+AIzz4otJhHq44CzSYQj19+3Z1l90sQTsq/3mrsIBd5zjy5uTD6+gV8VhVuWLA97i4YTbnP1UFBzZEsHqybfW9a79XEU2Cdl3iz7L/ax2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=JBvNcvHM; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1776793190; c=relaxed/simple;
+	bh=J3YaYDo1Y44on77sykR38Q8w/5TogE/aDdIIEEScWp4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=fVktqX2qqoOeR28+c4Og68JrNwirGY2BNxyOwENjSDJXpsJt8Vbkgvlgmr481IuXl1F7G662/V2f0o/Uw85exbotaOfo72XC/fbbHYBpvIibSh1mbHJ3qKNPnVMA73+bOMuvDKGO4JGzF9o1I1JH/AR74KdZNUnE1cmg09T5xzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sETH1ohg; arc=none smtp.client-ip=74.125.82.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JBvNcvHM"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=pa+7dmAkJk0TY/M9oJPj1j6Upqwk6hNaxUKb3SseGGs=; b=JBvNcvHMBmwOLL6H5J4RUJMLsD
-	c5btm4ojoUy/gCDRfEpaRsYdJjTzMmmkPK6Ojjk0K8Yk6ZsdhLIciZU4MVDnS6R4gUfGMzlfJYvXo
-	oFXuR496GLhQ4q/Qr5m3SByT/aQWdlk1Taud04KOiEZb6bBnqnXTJ1qxkIW56rBwewL5JRgK6RpZ9
-	1cOZiTjQUh6NYLGjjNo+HDM9smdO7MCGtNA9/96/O0NycPL0JXGOm1woabQBI0JUbDvU4pULmm739
-	2iIJ+CGvopGJxBvLXQT9qNwnsgPhhki1L+ZermLETx2qaxBmudliZIoBGG1I7wK2M/i5MK98plsEO
-	xSQBbeGw==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wFEeJ-00000008xF0-2Tza;
-	Tue, 21 Apr 2026 17:12:35 +0000
-Message-ID: <57045171-b306-4277-8f9e-77a96ce31423@infradead.org>
-Date: Tue, 21 Apr 2026 10:12:32 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sETH1ohg"
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-12c8cc7a77eso1630725c88.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 10:39:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776793188; x=1777397988; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=9CtK7kumyUC9OtcBFYfej3n4U6D7ZI8siessWUqziCc=;
+        b=sETH1ohgH9H9ghAjkiM92sp8fI91izjr9QxEzdMO1nputwAhagggvDjFBg2sDbfelM
+         CXEFu4Ea+PVb1j2C8gO7YBqPzQT6Wd53d9LMSELPFb1wdH1eFO7RsP7+t5rSYpWxXlBN
+         WpUFSuKGPDKX8RaK0h8ehKE0vqrL7RxCBgacQx63lS/eNIhD7DOctz4TFTifbxs2bcJf
+         5xz4jpHQkwQo62LZP+94OqAAM6Rkjz3W5EfR5RqMG4hG2vNiN4ua3lyYvQ9+0cXN3rlR
+         f1GogHhFnrZTZom31KTWA3guLw4qbC8BWIzmL288NLO3MQDoUqV8y+uXg0pbKw3vS5Ma
+         jiTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776793188; x=1777397988;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9CtK7kumyUC9OtcBFYfej3n4U6D7ZI8siessWUqziCc=;
+        b=AA8+EXzY+xsnJQWcYA5eZokH/a3F2wDeWzgBM/gOAGwsEjC+q+x6FBjDi/5ekLkatp
+         gqNPEHoc8e1KMbYDkO65DKMkr9DYRzNAQ99IMzq4A944O5+1dQy0tDrxJu39wPf482Np
+         Zwz/ut7VKSss8NGdj/SzMvCzyeOaIP61wky5KiBVzwSj5WHsoFEqqr2907z9cj/pPkXV
+         IZ0tCX14vAz+dBrgoNX8Cp2eG/CW7LFjAISjFkjVLKAC2khwC1GoUir1A7NuPmxJvlUf
+         PlLbdkufizWF0ekuKJqM/wcBKwOOSFXzyY6u4U4tjhWbGB6QMw85wvm9qFwXF+ky4bcd
+         2Dsw==
+X-Gm-Message-State: AOJu0Yw4GOYaxS+CixcEzMu0Yo47RQqG8L3hWE9DD2mBYodFcGbdsayK
+	ewstYeQmTPqNnbsASXtoNzlzHB+mjO7p6PN7lhJhqhZ0ml7BazFIKgesubDvSg==
+X-Gm-Gg: AeBDieuGBJcava757uELf+IqoxP4VvzZfJuF2e0KY8h9XN2sKvUDXAMJwMDqTZ0czNz
+	qfo/fLYPIhnCXkR68D1aiw4y2XUCLMa5+nFEMMKDTJSk7sXBgZcaRBKVblTF5/s4PzAdifoRPl4
+	gs//aa9BwoYrhrQFC/17ebB36Fyl/U1ZatJtc118uvquWjS4KXrShSWtBZwvM14lTRRSBJYWKyM
+	fI8cWQtogYtCQuWYmsuUn2ZNJ/AIN3I2rT8f14Q5NJqMq3p0BzbtjNXm7h1/6NsIW5Jh8bXZSRu
+	U9RNSHSHUxapdk76FlCAxJLJ5b2hHqpiyP/JIWO/ntIRWlxWC0j3Xf/IVyIq7p3AHCGtD7umStT
+	0kWcHcUspxgfSYgwKKpyJ93t3oTY9Jhwcsbqy7//sd+fULse5WGQn+djNrXOZw6LDsaYTA7bbuM
+	czAkg6mUifdLcSMvL219SuLoj6pTW08kx3EcaY0XvZoZo=
+X-Received: by 2002:a05:7022:423:b0:12d:b2ad:fded with SMTP id a92af1059eb24-12db2adff6cmr1671051c88.10.1776793188080;
+        Tue, 21 Apr 2026 10:39:48 -0700 (PDT)
+Received: from [172.17.0.2] ([172.184.210.242])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12c919266f6sm10235479c88.1.2026.04.21.10.39.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Apr 2026 10:39:47 -0700 (PDT)
+Message-ID: <69e7b663.050a0220.150fee.e1ae@mx.google.com>
+Date: Tue, 21 Apr 2026 10:39:47 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5340692345258249664=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-deletions] net: remove ISDN subsystem and Bluetooth
- CMTP
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
- skhan@linuxfoundation.org, marcel@holtmann.org, mchehab+huawei@kernel.org,
- jani.nikula@intel.com, gregkh@linuxfoundation.org, demarchi@kernel.org,
- justonli@chromium.org, ivecera@redhat.com, jonathan.cameron@huawei.com,
- kees@kernel.org, marco.crivellari@suse.com, ferr.lambarginio@gmail.com,
- nihaal@cse.iitm.ac.in, mingo@kernel.org, tglx@kernel.org,
- linmq006@gmail.com, linux-doc@vger.kernel.org,
- linux-bluetooth@vger.kernel.org
-References: <20260421022108.1299678-1-kuba@kernel.org>
- <CABBYNZ+yCH2hxbS32o6eDT7BDMLZd3YpjUZ=sfiw=z9XjMT6OQ@mail.gmail.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <CABBYNZ+yCH2hxbS32o6eDT7BDMLZd3YpjUZ=sfiw=z9XjMT6OQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] doc: Add AI coding assistants guidelines
+In-Reply-To: <20260421155141.1863559-1-luiz.dentz@gmail.com>
+References: <20260421155141.1863559-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5340692345258249664==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1083932
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.28 seconds
+GitLint                       PASS      0.21 seconds
+BuildEll                      PASS      20.06 seconds
+BluezMake                     PASS      638.04 seconds
+MakeCheck                     PASS      18.28 seconds
+MakeDistcheck                 PASS      243.02 seconds
+CheckValgrind                 PASS      290.91 seconds
+CheckSmatch                   PASS      346.63 seconds
+bluezmakeextell               PASS      181.86 seconds
+IncrementalBuild              PASS      644.64 seconds
+ScanBuild                     PASS      1003.11 seconds
 
 
 
-On 4/21/26 6:55 AM, Luiz Augusto von Dentz wrote:
-> Hi Jakub,
-> 
-> On Mon, Apr 20, 2026 at 10:21 PM Jakub Kicinski <kuba@kernel.org> wrote:
->>
->> Remove the ISDN (mISDN, CAPI) subsystem and Bluetooth CMTP protocol
->> from the kernel tree.
->>
->>
-> 
-> Acked-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+https://github.com/bluez/bluez/pull/2060
 
-Please don't send 1.7 MB emails for an Ack.
+---
+Regards,
+Linux Bluetooth
 
-See https://people.kernel.org/tglx/,
-especially "Trim replies".
 
--- 
-~Randy
-
+--===============5340692345258249664==--
