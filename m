@@ -1,100 +1,142 @@
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDACE3BD62F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 10:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C24D35AC18
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 10:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776768378; cv=none; b=sMRGsu2vW/OdLN0J23TY2othS52qaXAYNI7HTfHVJo3GCtbkCtknwCY9kKABSL44LhVr+m2n/eMEbUTMvAvu60G/FUlV1XX46UrVqq0gLceUiTJnF95nqHg3yL6Oh+ingYn3g1F4o4rtIEDO8sgs7Ks0svPn8vIY1GIcnyb3Sa8=
+	t=1776768507; cv=none; b=SZokdNQzGyFTiiWBy/UJ/MTuGIGzAYitSdZ6JALiXW6LKD0/plnepDTJGkPRtI3440SZcX0vizH7POq4ZlZx+cgUfBKDIlrIF3y7DKjJmMZFN7EbizK1QmgXt/rWrRrA6kSFXOxkiCP88wNi7xSfJYkfr2UgenzS5dk9NHFkjBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776768378; c=relaxed/simple;
-	bh=XdYmnW1ypo68Toku+pjd/F/A+2IIfr7kLLdFuYbLXlY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=miYwctbaVYejzl+4VVxwWX+IRVURIKIWgLZf0MFMpVFLKYopdxobsWX7PlpSC10jrnRt7rEFBM6Wychh6gldkbAAojjvG2ktiHbysfbB1qK8QEYqYR//W2UYiiKntrzR4cesuH49HOK+KKEsjp6JyBFYj7CBKtS5cOdSwtFSFqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=moxJ+HDT; arc=none smtp.client-ip=209.85.167.176
+	s=arc-20240116; t=1776768507; c=relaxed/simple;
+	bh=FgFyEEu7SzAMRI//XWO7zdbV++r3zoDQ/MgG+dqm/7c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EUrHqu6IwpzeuqJDouYCdflOHnsrbwqaaWm08tsOtuWj2ziOxWyyUCpna/aYR+aLj0joH9Lb3zJkiWEWN+lyPMPtnemVJfzmfFgCqlJwUhGTTPtax5tYPhpOpn4YsFclIpwxt1+K8Yu0ftoIFo4EddDt48danZn+nUFPbDHG2rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jGuhvpOZ; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="moxJ+HDT"
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-479e4835e26so694266b6e.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 03:46:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jGuhvpOZ"
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43d572f7437so2693352f8f.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 03:48:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776768375; x=1777373175; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XdYmnW1ypo68Toku+pjd/F/A+2IIfr7kLLdFuYbLXlY=;
-        b=moxJ+HDTrALEtYgFIXxcrTHe3gnVdPcjgOwpXU8sZyZLchhIQG7G8XfWLH6rfMPlTt
-         EyIV2glvSRutOYXaE0qLsd/zpZimcnzvhaPM4ZGGSB/ohdVI5ATFve+GkaRK+JyqRD0Y
-         VETEcgm5P4ZhkS9A5xANyn0u/j3YtlVEyPZk+l7Q9xUabX1ebQw6xPE+ICrDSnkWNeSV
-         ZtlkAYAVBerGr8Rj73VmhlITZWS4rU2ghdFRrcZi0jfwhAhCRbJhbWwNPazUBDci9rja
-         DstS39qMaBvhoI2/Af9W3bv2J5vpw26r6Y1Q3Zkm/3A11F5L3/2Z8KKL3y+A4jFRSKfT
-         V6Sg==
+        d=gmail.com; s=20251104; t=1776768504; x=1777373304; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=f+ooAKgHIuKcQdMInfKY/BCUWonIks5RSqvPScUktgk=;
+        b=jGuhvpOZ1+sHmiFZmO7UMXLvK1JqUfIrTPAIuSO4Jtb3DN1AFV1n6ge4Pyh1QZ6KlI
+         OwuJD7v40siKsyMtDDkgCYJIa7QixBUx1Mf8VY8hG8ldN2ao9AbelSfEJa492ZptAYnQ
+         zz37EFRrfgyTgLlJHGHVh9+6yzzYdtAROB38jLXie6ngehlXZ7OpFF88hWxGvZXT+uXg
+         2SUu4yYlQflRZa3zlIHwfVC3irEZhkdAhMGESWh51ZPaLcAUkAgu/sJB/uqZLQm6YzQr
+         e6ImOk42YOsywu88Vjk0fHLrN9xyoCxhNQ8kGj2HR7jmzvsu51US32sGAA5hoIhGUqdG
+         D2yA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776768375; x=1777373175;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1776768504; x=1777373304;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XdYmnW1ypo68Toku+pjd/F/A+2IIfr7kLLdFuYbLXlY=;
-        b=kYj2JYYpAA8GOM+55Ub7W0FSRUov/n5wrUhah6gbtFTzB86m8L9IIbAPGnSnq9ZK/n
-         NKgk3XV1DRUC/whrnu07jY+NzA7wqhlbZ/UBxqgrgEYFL37TukUd8jqbDxAonrPHgVoQ
-         X5Q1Zmi1/SmsJh8ZMIsN4gUFkBndCo5IuMNE0XpkwrVBsSCPw9S+82+CNcQU8bX87WRe
-         pic9Vu933GWLkn/w1ZwY4O8N7gfsyZs1jMWq9Pz2QEn0fZtSybm+83tmjd6G8thjDLhy
-         2kuW/GNapYm93KW2ONzfKlkKn7KNO2A/hoMjuWllfc6mCKlTiusqFibBMi2WHDdYGMLS
-         LWng==
-X-Gm-Message-State: AOJu0Ywd/49rqaYrHm6dLwvybhNq91KyKLQogIZGxgjM3IOcqjNHv5tI
-	8GPDRsnb3Y5tkwTYFT9V0YaIEulJM4iX9D/2rOjlcMdYcIHt2ogmh7IJmG0Ihg==
-X-Gm-Gg: AeBDiet+mFfufs3ajbNYDC0TH9t/omUeJm/pRfBVcWg/u5jZFaEiQozQBkppHn9ysl6
-	zic53HsWYP2vBbS6VMpgp2VqiBE5vfBv3KNpR7sn+hBafqNs3kIZ2TgYWmADKimgPFnZOauLTI2
-	EKyEFiaPCoF4nnS4E9iqliWZfbhzRpk/fOOfG0EBGfELTAqBzpckRn6Kfv8ucsEwaqC6wvuQs7h
-	MhbJJAy6g/+q8Fms8+A/MzvbxrffyED+hVPL1TezO0Z4y1rmk+1HwMHSa0ohUF4j0GrDNv6quci
-	ItnExdCx8XEevm+6Mhy5ClE6/lax64oJ1D6XEfG4/qPtMkHmJiNhvgOks2zR0gfKgwNDcUAuNhC
-	4AEDdaktXi/K+4vNZ6T3ST7NGubHEPkzWEyFDuCol2MSR6viLBKawLa7kmzfWscE2KDOzT7ed0+
-	+UCrzPcsledqPUOLbe+8n+iE/xojU4mze49apn5J0v
-X-Received: by 2002:a05:6808:8489:b0:479:e876:9882 with SMTP id 5614622812f47-479e876c84fmr1829068b6e.36.1776768375379;
-        Tue, 21 Apr 2026 03:46:15 -0700 (PDT)
-Received: from [172.17.0.2] ([52.176.19.195])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dc9751920asm11091416a34.9.2026.04.21.03.46.14
+        bh=f+ooAKgHIuKcQdMInfKY/BCUWonIks5RSqvPScUktgk=;
+        b=CDckGfWvuhSEBH+CJAypz0PbfKF0fEgOCjH9M3vLxqzKHvTE5fBY4Ay+yRznhfMttB
+         r7mZpV7iFAxf7/NMerbI6CtcDr9s8DPxaBD2tlajz0WR228kYhpVHXNWnxYscl/cY5v0
+         1yT1Gsx3CoDoTyPRAWRgrKOFcwZZrGRTAUf9sOL5ri2ozSeuc5T9x28emWLLzxqkqjDT
+         /Sl7RaeLedfwXw9dIoXguBHniCicBi0IOiWrYSc39cCJenwS3zZQ//a9ipTgFQdrRlLD
+         Iil7tVy5aALEglwAwzJhZarb+giI6P1Bvya34TBeeeMeVP/ZbC61pn7F1HeR8daCEQ0m
+         n38Q==
+X-Forwarded-Encrypted: i=1; AFNElJ9ECo62Faz15IzD7899WmPuq3YayJSubKhOxrVB1zYGK5tqX8eIUmBqQ6Gegc7imtqMJDEcO9TWNTohbiiYxYw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRKnUCM3DErk5wDhxKhNys5FzuCyzJ1213YXBNG8SUN7GPIw3N
+	CEyq/LtO00uMZVdr+HtUsSTES+QsKxWyT6cIlVV7gxNZ4WaOpeuYbHGoK3oy
+X-Gm-Gg: AeBDieu6l2iUoVkgJyvDtg881Sqiw4rlaDL2YVVfjGi+XnrQ0/HNKJmoOx0QCA6Ivdz
+	Bt0j6DdA5/TJJxf+ke/1pVSHAU+hEp4RERMPNgRpzWm8iEfndfBcKWB7UdoKUV/evlbVisnSUIx
+	tnEQCY31TQfvmSjvp+ulXQiCTemTyi6b1tXjo0GL0yQ0EY7eQgjB+zk2/v8mOQzNsnTmTUxw8kI
+	Zq+FN4FXwfBM+gySpKuaI2JUMz3siVVgZQho3uL1MzRDG2jBTQwjPs+k+oIU5X11OuweucNSiYG
+	+Psb+GLX3VBXlBQt8EkaAmFHv4r8bAypd1tT2Hn5H+NO5St6o7WeNH/6iS+neWOmnWXSNQKx2jp
+	Qmzo72/p9OVA4jTqtOnNQac6eet2JmW5NwHtvgLOf9duA+6cb7EqfF+Q+wNWtc8fN8EAfYhuRZw
+	5b0DR4yTxYeKDbfw==
+X-Received: by 2002:a05:600c:8207:b0:485:3193:6ddb with SMTP id 5b1f17b1804b1-488fb73cf74mr265162525e9.3.1776768504275;
+        Tue, 21 Apr 2026 03:48:24 -0700 (PDT)
+Received: from debian.. ([2001:41d0:303:db6b::])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc14a61asm332563105e9.15.2026.04.21.03.48.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 03:46:14 -0700 (PDT)
-Message-ID: <69e75576.050a0220.e8c8f.fad6@mx.google.com>
-Date: Tue, 21 Apr 2026 03:46:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4777524681491255317=="
+        Tue, 21 Apr 2026 03:48:23 -0700 (PDT)
+From: Tristan Madani <tristmd@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Chen <mark-yw.chen@mediatek.com>,
+	linux-mediatek@lists.infradead.org,
+	stable@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	Tristan Madani <tristan@talencesecurity.com>
+Subject: [PATCH v4] Bluetooth: btmtk: validate WMT event SKB length before struct access
+Date: Tue, 21 Apr 2026 10:48:22 +0000
+Message-ID: <20260421104822.2498025-1-tristmd@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, tristmd@gmail.com
-Subject: RE: [v4] Bluetooth: btmtk: validate WMT event SKB length before struct access
-In-Reply-To: <177676799168.2227510.2141901333230538239@gmail.com>
-References: <177676799168.2227510.2141901333230538239@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4777524681491255317==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Tristan Madani <tristan@talencesecurity.com>
 
-This is an automated email and please do not reply to this email.
+btmtk_usb_hci_wmt_sync() casts the WMT event response SKB data to
+struct btmtk_hci_wmt_evt (7 bytes) and struct btmtk_hci_wmt_evt_funcc
+(9 bytes) without first checking that the SKB contains enough data.
+A short firmware response causes out-of-bounds reads from SKB tailroom.
 
-Dear Submitter,
+Use skb_pull_data() to validate and advance past the base WMT event
+header. For the FUNC_CTRL case, pull the additional status field bytes
+before accessing them.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: corrupt patch at line 50
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Fixes: d019930b0049 ("Bluetooth: btmtk: move btusb_mtk_hci_wmt_sync to btmtk.c")
+Cc: stable@vger.kernel.org
+Signed-off-by: Tristan Madani <tristan@talencesecurity.com>
 ---
-Regards,
-Linux Bluetooth
+Changes in v4:
+  - Use skb_pull_data() instead of manual length checks, per
+    Luiz Augusto von Dentz.
 
+Changes in v3:
+  - CI all pass (CheckPatch, BuildKernel, CheckSparse, etc.).
 
---===============4777524681491255317==--
+ drivers/bluetooth/btmtk.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index 6fb6ca274..b1a96ebae 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -695,8 +695,13 @@ static int btmtk_usb_hci_wmt_sync(struct hci_dev *hdev,
+ 	if (data->evt_skb == NULL)
+ 		goto err_free_wc;
+ 
+-	/* Parse and handle the return WMT event */
+-	wmt_evt = (struct btmtk_hci_wmt_evt *)data->evt_skb->data;
++	wmt_evt = skb_pull_data(data->evt_skb, sizeof(*wmt_evt));
++	if (!wmt_evt) {
++		bt_dev_err(hdev, "WMT event too short (%u bytes)",
++			   data->evt_skb->len);
++		err = -EINVAL;
++		goto err_free_skb;
++	}
++
+ 	if (wmt_evt->whdr.op != hdr->op) {
+ 		bt_dev_err(hdev, "Wrong op received %d expected %d",
+ 			   wmt_evt->whdr.op, hdr->op);
+@@ -712,7 +717,13 @@ static int btmtk_usb_hci_wmt_sync(struct hci_dev *hdev,
+ 		status = BTMTK_WMT_PATCH_DONE;
+ 		break;
+ 	case BTMTK_WMT_FUNC_CTRL:
+-		wmt_evt_funcc = (struct btmtk_hci_wmt_evt_funcc *)wmt_evt;
++		if (!skb_pull_data(data->evt_skb,
++				   sizeof(wmt_evt_funcc->status))) {
++			err = -EINVAL;
++			goto err_free_skb;
++		}
++
++		wmt_evt_funcc = (struct btmtk_hci_wmt_evt_funcc *)wmt_evt;
+ 		if (be16_to_cpu(wmt_evt_funcc->status) == 0x404)
+ 			status = BTMTK_WMT_ON_DONE;
+ 		else if (be16_to_cpu(wmt_evt_funcc->status) == 0x420)
+-- 
+2.47.3
