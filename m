@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A8C32548B;
-	Tue, 21 Apr 2026 17:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43654C6C;
+	Tue, 21 Apr 2026 17:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776793244; cv=none; b=ZHLpInzm8eLZbqI2slKuCuPTiBvqVrKLxvKRKfmT8Tc1j/5H5qUeQGfK1zlfAMpxvwQ+fh4HjV7TTCGmTAiYh4d1uY6l8Uvr0ZecvNQHOL31S5boyxmQDiBCY5RS7lahQxL2i/fzJurDo4f9Ns/9v/bftW6KK6h6kqgcZoOEXxc=
+	t=1776793246; cv=none; b=Fj+/znjxTP8+7xZ/EIZ4H6jQfySu07ozn/4N1RxRJGvN+SlTSpzqJgokRDz3jxMVQbb7qByIz3E6ulLrpjIaL/6hQSOtrOwAZYFwRzRVAT5Jb4uzWqpA9bbBkb6p6eabGijSIEf1o2vlqlP78sEuNOBpfyssTZYgjcKynt6fQGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776793244; c=relaxed/simple;
-	bh=9fNB/J0Q/DfdEmhtekKZrAUhlEBm1e4+GeehOrO87RA=;
+	s=arc-20240116; t=1776793246; c=relaxed/simple;
+	bh=3qtqG7J9kMvND6hT2tLevpqBaufSPreCC7vVtd7TGlg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ksyEmDkrQE6hEmZD4tyJ5pHN58Hb3Iv4Mq86jM7oo5mn+ODTbZU0enYbJWWILQGMbevj4DlAQRM829HG3n8wkAu4/YkJdRnoE4rZY177dwFGj1XoGBhOST9TMeGWArq7bQNasC4Xqiia/hcbO2/zBbh91f9S3qdWgrxHxwhfuKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AzygYIIS; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=SC7FIGsmAodgIvp6svBgW6DR1LmcZMWtYCi3dM9EkuZJU179GbnTP+2Ecbi35uPZ/ry+i+9o+4bPNS5tj2ZObZbRDLQujqHluIDu+dOJuklHpBaAA2guJRmJ11dlLVofs6R+nVvFh4iWGF2ZJNczAzpC3IlHKKvZDXg/vy1juTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VhxL1IYC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AzygYIIS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EA17C2BCB0;
-	Tue, 21 Apr 2026 17:40:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VhxL1IYC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9297AC2BCB0;
+	Tue, 21 Apr 2026 17:40:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776793244;
-	bh=9fNB/J0Q/DfdEmhtekKZrAUhlEBm1e4+GeehOrO87RA=;
+	s=k20201202; t=1776793245;
+	bh=3qtqG7J9kMvND6hT2tLevpqBaufSPreCC7vVtd7TGlg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AzygYIIS8Nbn3H5iNbPSOEa2LWEOkd4Rxykv7RB52e81y8qX0XWMcSw1tnUPgWlGz
-	 A89c3kz1tvlvWBynl2+CJLXQJqLX9u1K4C7GlNBvUkQjOQHVhaDRaQg8UHKv9OaONk
-	 ZDBY7FME1CoNcvOCNq4fCSk/fc27uUD/wYrpKCflnG1pNbQdBIioEOVwTZhBvpXaEr
-	 iVtOU7n70zmpZKfFFwmX4FUL/SwOmjHo0UWuMpq0DoKpeXZJKR7hezQ3yf0i6MBPTW
-	 rKmuMNWO3LMBgZudGJAfFmI7F70rRuq7g2HYI4EltIZAWyDWvYhbuEODaZ1X38f9We
-	 qEca8hz/yQK9g==
+	b=VhxL1IYCmIWcVAQYGFy/JF+bOeqpZnwlE+fbfom/nseQPina6LMxFfSk45gl2usNV
+	 M0CKWtojfOB8zBHNz3A9nqFR1mFULxJ4QXclEQiYCUZCAWKNo//6dK0oZqzbxmztzb
+	 DQ5lx6tALgayrbDkJD2fbV2jaf3XDGMfjRed9nXNJYdkKmaM6dqoMa9lsPBPuKpzjK
+	 nLfmeZFWhrLp18PK9sHICvz+eDZVmNHo/noFUNtl/js/4BjQTcismPv+HcD99BBchk
+	 SUTpsNnm+sK4/vIushafbKdNtwgImXuq3A/oS1b7MUlDjzS+WnF/W1+SQh2rPN0Kvm
+	 EbGgko5dJLrog==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9DF539301B9;
-	Tue, 21 Apr 2026 17:40:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FC0B39301B9;
+	Tue, 21 Apr 2026 17:40:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,38 +37,40 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4] Bluetooth: btmtk: validate WMT event SKB length before
- struct access
+Subject: Re: [PATCH] Bluetooth: hci_uart: Fix NULL deref in recv callbacks
+ when
+ priv is uninitialized
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177679320754.2928707.14796411684619815619.git-patchwork-notify@kernel.org>
-Date: Tue, 21 Apr 2026 17:40:07 +0000
-References: <20260421111454.3403059-1-tristmd@gmail.com>
-In-Reply-To: <20260421111454.3403059-1-tristmd@gmail.com>
-To: Tristan Madani <tristmd@gmail.com>
-Cc: luiz.dentz@gmail.com, marcel@holtmann.org, sean.wang@mediatek.com,
- mark-yw.chen@mediatek.com, linux-mediatek@lists.infradead.org,
- stable@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- tristan@talencesecurity.com
+ <177679320879.2928707.16610281359734342622.git-patchwork-notify@kernel.org>
+Date: Tue, 21 Apr 2026 17:40:08 +0000
+References: <20260421135331.15425-1-aurelien@hackers.camp>
+In-Reply-To: <20260421135331.15425-1-aurelien@hackers.camp>
+To: Aurelien DESBRIERES <aurelien@hackers.camp>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ johan.hedberg@gmail.com, luiz.dentz@gmail.com, linux-kernel@vger.kernel.org,
+ syzbot+ff30eeab8e07b37d524e@syzkaller.appspotmail.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 21 Apr 2026 11:14:54 +0000 you wrote:
-> From: Tristan Madani <tristan@talencesecurity.com>
+On Tue, 21 Apr 2026 15:53:31 +0200 you wrote:
+> When a fault is injected during hci_uart line discipline setup, the
+> proto open() callback may fail leaving hu->priv as NULL. A subsequent
+> TIOCSTI ioctl can trigger the recv() callback before priv is
+> initialized, causing a NULL pointer dereference.
 > 
-> btmtk_usb_hci_wmt_sync() casts the WMT event response SKB data to
-> struct btmtk_hci_wmt_evt (7 bytes) and struct btmtk_hci_wmt_evt_funcc
-> (9 bytes) without first checking that the SKB contains enough data.
-> A short firmware response causes out-of-bounds reads from SKB tailroom.
+> Fix all four affected HCI UART protocol drivers by adding a NULL check
+> on hu->priv at the start of their recv() callbacks: h4, h5, ath and
+> bcsp.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v4] Bluetooth: btmtk: validate WMT event SKB length before struct access
-    https://git.kernel.org/bluetooth/bluetooth-next/c/006b9943b982
+  - Bluetooth: hci_uart: Fix NULL deref in recv callbacks when priv is uninitialized
+    https://git.kernel.org/bluetooth/bluetooth-next/c/259c0a6e10fb
 
 You are awesome, thank you!
 -- 
