@@ -1,264 +1,183 @@
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A807337A49C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 07:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8624A3845B4
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 08:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776756798; cv=none; b=KW6F/4EKpqDAtQQjKu2+pBwhb/IAsYQoBERUh98O5006PRnnXjQegrfnOBraG5OlRwxe+7hF77DIE99Qy3dAp19n7UNMFDgJoNQudgsoIO/wu/PJgIlzE0Hrlm6XskufZ7dF8hvf50cAi5Ez/Bvyll3AxtIRoHiYdxfzq3MaAns=
+	t=1776759167; cv=none; b=GJMugh9eejon/nJzvvOkOw/SusAN1TvVms4GXnHRCAWpwycZfS3gXoJTg8k1ezqFmLlOEiwePZl8LWzShr03bS9QZQdlMtc2d3W8GBPx8vRwMoCKAPnX3WvTVU2ZS5UNjdyfbcRWU8LVfH86YTNojJZR1Mu4brKbuxVFra2bvq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776756798; c=relaxed/simple;
-	bh=Pkx5Ks341xpMMNT9rTWoGstO0+9jKfn3n7TXoWiIw10=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=fO4HZ8SyLQ10WrorajIm7yTHjzJq9jqgEML+EWv1SN/DnP/DpaFpc630Fgvq4F9le/DbPN7bDHVMyYKYA0ZwDQvKc010GuNfxmL/XxgbTdZ9Qux4QqwJa2OpQayzQ5HeKhU8LIA6Xhi9e5/M9cORSYWL5+3HPizUZXAf9uXNJZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id EAD313ED43;
-	Tue, 21 Apr 2026 07:33:07 +0000 (UTC)
-Message-ID: <f57e142712d4bd5a02d99a278e6f2d5620c1ded9.camel@hadess.net>
-Subject: Re: [PATCH] Bluetooth: Add HCI_QUIRK_NO_SCAN_WHILE_CONNECTED for
- combo chips
-From: Bastien Nocera <hadess@hadess.net>
-To: =?UTF-8?Q?=C8=98tefan?= Condorache <condorachest@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 21 Apr 2026 09:33:07 +0200
-In-Reply-To: <CAGfCjSajE4hBroEUXa=LNw1Z=52b6oT7DsFBm_X_LVphpLoLBA@mail.gmail.com>
-References: <20260419072433.55976-1-condorachest@gmail.com>
-	 <8961a9ba3e4a48eaa33060114366573439bbf73f.camel@iki.fi>
-	 <c4593a49ef6ed7151eceebfd22d602a0d018e9f5.camel@hadess.net>
-	 <CAGfCjSajE4hBroEUXa=LNw1Z=52b6oT7DsFBm_X_LVphpLoLBA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	s=arc-20240116; t=1776759167; c=relaxed/simple;
+	bh=RXcEsPkaE3nBchm7YaHAcD5u2O6FyVBqda9tZxmDoL4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tzboqDN4WRpDCgj5AiPLxq2Ix6B1xjb3bkb9LeJrv9CxyF6+AyIpm2NTFq1ZZ9V/s45InNe1UHTl8NZgMi1E6F8XFJRbK3OEy+lPcqi1/HrtbVSvqIYW5rVgZoULGmuPLaaY+Iuik6vpb9fqpZqLKEbWZxTdQILZyyvntObee3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b=d2GffH6+; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20251104.gappssmtp.com header.i=@baylibre-com.20251104.gappssmtp.com header.b="d2GffH6+"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-48374014a77so50445225e9.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Apr 2026 01:12:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20251104.gappssmtp.com; s=20251104; t=1776759164; x=1777363964; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RXcEsPkaE3nBchm7YaHAcD5u2O6FyVBqda9tZxmDoL4=;
+        b=d2GffH6+aJqxEtb9FwtEW1zi7cAagx14LPltCUFLgNrA8etjDodpu8+02hSSgnd/lA
+         jjw+7matkAaJi9jJLhOpQrVx1B09ndqTXJGoupFQ5kUkeswkeoqRVQtG33pJNZo0nO4O
+         QLFcT1saJmG9W75QchuyXCaG1D2Rn6Iv4ETUfxbk+nCGF5GrBrOuQjUk/kuGHcHz2xzb
+         YkQSyrNvUik5BNaHut5d15sNpknbUqOAXiOfzpglxaPaH4nhl7hKU7EslliCBW+5jzUk
+         jFlO1LIxuowV9C4avtxwjeCtMrdjgBFG58F1YjuoIIq8RMtSgC+rOfq2ynutDfMD/SaN
+         lETQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776759164; x=1777363964;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RXcEsPkaE3nBchm7YaHAcD5u2O6FyVBqda9tZxmDoL4=;
+        b=kvml/XwAG4+eyNwd8q+3COTS2bB08Um3KnghU9QzD7kdioA9JFgzuMnWnjjwDlME3d
+         pzhjkRIgNxnPr/VfG2CDh2CqR0EK9vWoLb57KcZ0Mnrzw9I57EfrkNQ/0SeV0Ux+zMlT
+         reiTBFOm9/2IuVyaZFFHEscNGHhs+/zdAV8cYQ0caKatt5QI3w3dk5qS0Ie1TgKhpejv
+         aCAznUCQ3EWdyz6kb0CD2nF6L7aUbspcJXxeG/b+WHS/f4BreuSYbRsqrETWTky9fSR0
+         sO7PwobzZKk9eBkNsCi2/W8dc3C8axlx7LKy/hAyhAUowzuqnPBiZ1yfBvAkcfzKuOJm
+         bVAQ==
+X-Forwarded-Encrypted: i=1; AFNElJ99CJOvC13Q5bNebYcNihIQss8AafmEJA9KjKV2v7DCZfu2R5k62S+x1UC+Of5LIM6ksV3KBky7nqb173b2BhI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUhy9mkbOY18crXCFtFynCXdN/hmSNjGcAsftPsSGIesXgPPor
+	2DememIdb0V5WOfMFb6CSgsA0NDe7tI+s6EVvHnFLfD0oxAPKwGm6HTNajbgBwazbVI=
+X-Gm-Gg: AeBDiesbpUv5jO37XFQRK5u6Y+kri4hoD9aqwWRMisiyqOtbyym7juBGFtPBmlb9/kf
+	FFJ0taBcXOk2Fvq1UFg1GRIwIAAojPV02kJ4LRjRS2giiHa1EtGMVYXbdad8+wACkh8ElU29uE2
+	llmvGkVnXmFr3Gzzizpf8XRJIZrY1PKskJasWkIzOuVUht1xbTXc577/wY83AN2wIOKR4QYlCXV
+	e4Amjf5TXFGEc4ZjHYCFfM8fPcza4pGZUPaaYAKAy0iDKS07aTrWMaI0jySIOBI4ktdBWjf8gco
+	CvhyvUxehrfjIOTZmgJ+ryy3RCu+/ksl/6Hkp0c3O0J19nGZ73donZTdz4OJJmtI54ZJEjvrsJE
+	CR603Y/Oarc0/qHF88wLSzg+2r25dz5on2uCr7+120rVFdAXOJvRER0NYvLBug0LKSuXn2+gKxz
+	eexU9LMqQ92EBErOFz2p1pyoSI+aTHe3ZUpBiNBq8=
+X-Received: by 2002:a05:600d:1b:b0:483:8062:b43 with SMTP id 5b1f17b1804b1-488fb771438mr205335215e9.19.1776759163884;
+        Tue, 21 Apr 2026 01:12:43 -0700 (PDT)
+Received: from localhost ([2a02:8071:b783:6940:1d24:d58d:2b65:c291])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4891bb3d121sm239274565e9.14.2026.04.21.01.12.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Apr 2026 01:12:42 -0700 (PDT)
+Date: Tue, 21 Apr 2026 10:12:41 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Ulf Hansson <ulfh@kernel.org>, 
+	"Christian A. Ehrhardt" <christian.ehrhardt@codasip.com>, linux-mmc@vger.kernel.org, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Wolfram Sang <wsa+renesas@sang-engineering.com>, 
+	linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
+	linux-bluetooth@vger.kernel.org, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, linux-mediatek@lists.infradead.org, 
+	Ping-Ke Shih <pkshih@realtek.com>, linux-wireless@vger.kernel.org, Felix Fietkau <nbd@nbd.name>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, 
+	Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, 
+	Brian Norris <briannorris@chromium.org>, Francesco Dolcini <francesco@dolcini.it>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: Re: [PATCH v1 1/6] sdio: Add syntactic sugar to store a pointer in
+ sdio_driver_id
+Message-ID: <aecu1ixyHP2hQvgE@monoceros>
+References: <cover.1776429984.git.u.kleine-koenig@baylibre.com>
+ <c830049dcfcd99f005e2ff6742aace9341c61f13.1776429984.git.u.kleine-koenig@baylibre.com>
+ <aeaMkfk_1t98e7SU@monoceros>
+ <CABBYNZJzbEmYzTk2m+Y8SoHVouTMA6Gje_55iJsQ6cYtDLftbQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-Score: -100
-X-GND-Cause: dmFkZTEoog9EmaDpCj5JZVNhP+2lfk3XsnP38BDwZsm1X6+txnxIg8Wg1/Rk01gY5ApOJLV921kopj6tJsvXksLNxHP9nHWmmPoO0r/SjXVyjA+g6U0ApYXqy9+zfcG0RElmckmbWAfJ4dPtQnlCNunqByuyDdLgY/j8LeIIGC6026KPgi4+5Xi+NbIKKXVAJOnqJKE1nCOHzxWjWe0xll6msK+sEZG3ewkBptu5SjW3dyrXq5mQEKntpsqsbF51THFYKv8efe2p1anZpg6sjAi40vGraBxPg6SC1/Nemzh8tuXB2Hy20zAExUfUWzjPS23JDcEZZMsgN+e/F22NyVi3YiUsLe/u2KI+7FgfwhKVMLazLEFd9OvxMSAFNpQYk0Dt9VNr/xFAwfAuzhYJivnWhDxa0lJ6oDvfU1z7rhu12zo8OIKmen6WqCYtKJwni80J3tposAcjKZBbkgChoixt3Grkr4GwXrbMMHXo2x+44SLudgyNnrLmiJ7GepeQZaIsMVeisWHFSA8iirJUSHZaCSFKBNhuL0xdZoNlvjk5I+TD4hyZX812M87ZIfHq1974DcOK/F0R8n0gw5f3+0/5WQ8G57IAWhBT2VHWIhThHIzwPT+4iABvp1bR+tmpKZcb2nrW5IgfBR9l/eMTfUjqcO2611atEJs6sVF/THfBPTb8EQ
-X-GND-State: clean
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ou2vweurizbmr2mn"
+Content-Disposition: inline
+In-Reply-To: <CABBYNZJzbEmYzTk2m+Y8SoHVouTMA6Gje_55iJsQ6cYtDLftbQ@mail.gmail.com>
 
-Hello =C8=98tefan,
 
-The mailing-list needs to be put on CC. FWIW, this LLM-generated reply
-that doesn't verify anything and takes me at my word really isn't
-useful.
+--ou2vweurizbmr2mn
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 1/6] sdio: Add syntactic sugar to store a pointer in
+ sdio_driver_id
+MIME-Version: 1.0
 
-Cheers
+Hello Luiz,
 
-On Mon, 2026-04-20 at 19:07 +0300, =C8=98tefan Condorache wrote:
-> Hi Bastien,=C2=A0
+On Mon, Apr 20, 2026 at 04:46:56PM -0400, Luiz Augusto von Dentz wrote:
+> On Mon, Apr 20, 2026 at 4:31=E2=80=AFPM Uwe Kleine-K=C3=B6nig (The Capabl=
+e Hub)
+> <u.kleine-koenig@baylibre.com> wrote:
+> > On Fri, Apr 17, 2026 at 03:10:47PM +0200, Uwe Kleine-K=C3=B6nig (The Ca=
+pable Hub) wrote:
+> > > On all current Linux architectures sizeof(long) =3D=3D sizeof(void *)=
+ and
+> > > this is used a lot through the kernel. For example it enables the usu=
+al
+> > > practice to store pointers in sdio_driver_id's .driver_data member.
+> > >
+> > > This works fine, but involves casting and thus isn't type-safe.
+
+To be honest, with the involved void* this isn't really type-safe
+either, but at least the data keeps being a pointer which is really
+helpful on CHERI. FTR: The alternative would be to use uintptr_t instead
+of unsigned long, which also has proponents in the CHERI community and
+which is used in the current vendor patch stack.
+
+> > > Additionally with the CHERI architecture extension there are machines
+> > > with sizeof(void *) > sizeof(long) for with the traditional approach =
+of
+> > > storing a pointer in .driver_data doesn't work.
+> > >
+> > > By replacing the plain unsigned long .driver_data by an anonymous uni=
+on,
+> > > most of the casting can be dropped and it yields a working solution f=
+or
+> > > CHERI.
+> > >
+> > > All users of struct sdio_driver_id are initialized in a way that is
+> > > compatible with the new definition, so no adaptions are needed there.
+> >
+> > sashiko.dev found s/sdio_driver_id/sdio_device_id/ twice in the commit
+> > log and once in the short log. If you consider applying this patch
+> > please adapt the commit message accordingly.
 >=20
-> Thank you for the detailed feedback.=C2=A0
-> =C2=A0Regarding your questions:=C2=A0
-> You are correct that vendor Realtek drivers implement BT/Wi-Fi
-> coexistence.=C2=A0
-> The upstream driver lacks this. This quirk is intended as a stopgap
-> until proper=C2=A0
-> coexistence support is implemented upstream.=C2=A0
+> No problem I can fix them up once applying.
+
+Thanks! If a new revision should be needed, of course I'll fix that,
+too.
+
+> > Many thanks to those who created sashiko.dev!
+> >
+> > Best regards
+> > Uwe
 >=20
-> The quirk should be removed once the upstream driver gains
-> coexistence support=C2=A0
-> equivalent to the vendor driver. Testing was done by streaming audio
-> over Bluetooth=C2=A0
-> while running continuous Wi-Fi traffic (iperf3) and observing audio
-> dropouts.=C2=A0
-> With the quirk enabled the dropouts stop. I acknowledge this is not
-> an automated reproducible test, which is a weakness.
+> We only received 1-3 of the 6:
 >=20
-> On Mon, Apr 20, 2026 at 12:08=E2=80=AFPM Bastien Nocera <hadess@hadess.ne=
-t>
-> wrote:
-> > On Sun, 2026-04-19 at 13:35 +0300, Pauli Virtanen wrote:
-> > > Hi,
-> > >=20
-> > > su, 2026-04-19 kello 10:24 +0300, StefanCondorache kirjoitti:
-> > > > Realtek combo chips share a single antenna between Wi-Fi and
-> > > > Bluetooth.
-> > > > Background LE passive scanning while an active connection
-> > > > exists
-> > > > causes
-> > > > antenna multiplexing conflicts via Packet Traffic Arbitration
-> > > > (PTA),
-> > > > resulting in audio stuttering and Wi-Fi packet loss.
-> > > >=20
-> > > > Add HCI_QUIRK_NO_SCAN_WHILE_CONNECTED to suppress passive
-> > > > scanning
-> > > > in
-> > > > hci_update_passive_scan_sync() when active connections are
-> > > > present.
-> > > > Set this quirk for all Realtek devices in btrtl_set_quirks().
-> > >=20
-> > > Some general questions on this, which are not immediately
-> > > apparent
-> > > from
-> > > the commit message:
-> > >=20
-> > > How is it know which Realtek models have this bug?
-> > >=20
-> > > Which ones were tested?
-> > >=20
-> > > Is it better to set the quirk for all Realtek devices than do it
-> > > per
-> > > USB id / chipset for each known bad device?
-> >=20
-> > I worked on the rtl8723bs Wi-Fi driver in a previous life (so much
-> > so
-> > that I can spell out the model number on top of my head), and I
-> > remember it having code for BT/Wi-Fi coexistence.
-> >=20
-> > Is this only a problem with the lack of BT/Wi-Fi coexistence
-> > support in
-> > the upstream Linux drivers (eg. not in the Realtek vendor drivers)
-> >=20
-> > How do you actually test this in a reliable and reproducible way?
-> > How
-> > will we know to remove this quirk?
-> >=20
-> > > > Also add device ID 0x0bda:0xc829 to the btusb Realtek device
-> > > > table.
-> > >=20
-> > > Patches adding USB device ids usually have USB info from
-> > > /sys/kernel/debug/usb/devices in the commit message, see other
-> > > patches
-> > > add these. Probably should be separate patch?
-> > >=20
-> > > > Signed-off-by: StefanCondorache <condorachest@gmail.com>
-> > > > ---
-> > > > =C2=A0drivers/bluetooth/btrtl.c=C2=A0=C2=A0 |=C2=A0 6 ++++++
-> > > > =C2=A0drivers/bluetooth/btusb.c=C2=A0=C2=A0 |=C2=A0 2 ++
-> > > > =C2=A0include/net/bluetooth/hci.h | 11 +++++++++++
-> > > > =C2=A0net/bluetooth/hci_sync.c=C2=A0=C2=A0=C2=A0 |=C2=A0 7 +++++++
-> > > > =C2=A04 files changed, 26 insertions(+)
-> > > >=20
-> > > > diff --git a/drivers/bluetooth/btrtl.c
-> > > > b/drivers/bluetooth/btrtl.c
-> > > > index 62f9d4df3a4f..00dfba656970 100644
-> > > > --- a/drivers/bluetooth/btrtl.c
-> > > > +++ b/drivers/bluetooth/btrtl.c
-> > > > @@ -1299,6 +1299,12 @@
-> > > > EXPORT_SYMBOL_GPL(btrtl_download_firmware);
-> > > > =C2=A0
-> > > > =C2=A0void btrtl_set_quirks(struct hci_dev *hdev, struct
-> > > > btrtl_device_info *btrtl_dev)
-> > > > =C2=A0{
-> > > > +=C2=A0 =C2=A0/* Realtek combo chips share the antenna between Wi-F=
-i and
-> > > > +=C2=A0 =C2=A0 * Bluetooth. Suppress passive scanning while connect=
-ed to
-> > > > +=C2=A0 =C2=A0 * prevent coexistence issues.
-> > > > +=C2=A0 =C2=A0 */
-> > > > +=C2=A0 =C2=A0hci_set_quirk(hdev, HCI_QUIRK_NO_SCAN_WHILE_CONNECTED=
-);
-> > >=20
-> > > This sets the quirk for all Realtek chips.
-> > >=20
-> > > Realtek chips are also in stuff like Bluetooth USB dongles that
-> > > are
-> > > not
-> > > combo wifi ones. Can they be identified?
-> > >=20
-> > > > +
-> > > > =C2=A0=C2=A0 =C2=A0/* Enable controller to do both LE scan and BR/E=
-DR inquiry
-> > > > =C2=A0=C2=A0 =C2=A0 * simultaneously.
-> > > > =C2=A0=C2=A0 =C2=A0 */
-> > > > diff --git a/drivers/bluetooth/btusb.c
-> > > > b/drivers/bluetooth/btusb.c
-> > > > index 5f57953393be..87972f5fc567 100644
-> > > > --- a/drivers/bluetooth/btusb.c
-> > > > +++ b/drivers/bluetooth/btusb.c
-> > > > @@ -516,6 +516,8 @@ static const struct usb_device_id
-> > > > quirks_table[] =3D {
-> > > > =C2=A0=C2=A0 =C2=A0/* Realtek 8822CU Bluetooth devices */
-> > > > =C2=A0=C2=A0 =C2=A0{ USB_DEVICE(0x13d3, 0x3549), .driver_info =3D B=
-TUSB_REALTEK
-> > > > |
-> > > > =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
-> > > > BTUSB_WIDEBAND_SPEECH },
-> > > > +=C2=A0 =C2=A0{ USB_DEVICE(0x0bda, 0xc829), .driver_info =3D BTUSB_=
-REALTEK
-> > > > |
-> > > > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0
-> > > > BTUSB_WIDEBAND_SPEECH },
-> > > > =C2=A0
-> > > > =C2=A0=C2=A0 =C2=A0/* Realtek 8851BE Bluetooth devices */
-> > > > =C2=A0=C2=A0 =C2=A0{ USB_DEVICE(0x0bda, 0xb850), .driver_info =3D B=
-TUSB_REALTEK
-> > > > },
-> > > > diff --git a/include/net/bluetooth/hci.h
-> > > > b/include/net/bluetooth/hci.h
-> > > > index 572b1c620c5d..8466dc52aeca 100644
-> > > > --- a/include/net/bluetooth/hci.h
-> > > > +++ b/include/net/bluetooth/hci.h
-> > > > @@ -378,6 +378,17 @@ enum {
-> > > > =C2=A0=C2=A0 =C2=A0 */
-> > > > =C2=A0=C2=A0 =C2=A0HCI_QUIRK_BROKEN_READ_PAGE_SCAN_TYPE,
-> > > > =C2=A0
-> > > > +=C2=A0 =C2=A0/* When this quirk is set, the controller suppresses
-> > > > passive LE
-> > > > +=C2=A0 =C2=A0 * background scanning while an active connection exi=
-sts.
-> > > > +=C2=A0 =C2=A0 * This is required for combo chips with shared Wi-
-> > > > Fi/Bluetooth
-> > > > +=C2=A0 =C2=A0 * antennas to prevent coexistence issues causing aud=
-io
-> > > > drops
-> > > > +=C2=A0 =C2=A0 * and Wi-Fi packet loss.
-> > > > +=C2=A0 =C2=A0 *
-> > > > +=C2=A0 =C2=A0 * This quirk can be set before hci_register_dev is c=
-alled
-> > > > or
-> > > > +=C2=A0 =C2=A0 * during the hdev->setup vendor callback.
-> > > > +=C2=A0 =C2=A0 */
-> > > > +=C2=A0 =C2=A0HCI_QUIRK_NO_SCAN_WHILE_CONNECTED,
-> > > > +
-> > > > =C2=A0=C2=A0 =C2=A0__HCI_NUM_QUIRKS,
-> > > > =C2=A0};
-> > > > =C2=A0
-> > > > diff --git a/net/bluetooth/hci_sync.c
-> > > > b/net/bluetooth/hci_sync.c
-> > > > index fd3aacdea512..5e30e725efa2 100644
-> > > > --- a/net/bluetooth/hci_sync.c
-> > > > +++ b/net/bluetooth/hci_sync.c
-> > > > @@ -3194,6 +3194,13 @@ int hci_update_passive_scan_sync(struct
-> > > > hci_dev *hdev)
-> > > > =C2=A0=C2=A0 =C2=A0if (hdev->discovery.state !=3D DISCOVERY_STOPPED=
-)
-> > > > =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;
-> > > > =C2=A0
-> > > > +=C2=A0 =C2=A0/* If the controller requires no scanning while conne=
-cted,
-> > > > +=C2=A0 =C2=A0 * suppress passive scanning when an active connectio=
-n
-> > > > exists.
-> > > > +=C2=A0 =C2=A0 */
-> > > > +=C2=A0 =C2=A0if (hci_test_quirk(hdev,
-> > > > HCI_QUIRK_NO_SCAN_WHILE_CONNECTED) &&
-> > > > +=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0 !list_empty(&hdev->conn_hash.list)=
-)
-> > > > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;
-> > > > +
-> > >=20
-> > > Does this break initiating connections via hci_connect_le_scan()
-> > > if
-> > > another connection is active?
-> > >=20
-> > > Is it possible to make more than one LE connection
-> > > simultaneously?
-> > >=20
-> > > > =C2=A0=C2=A0 =C2=A0/* Reset RSSI and UUID filters when starting bac=
-kground
-> > > > scanning
-> > > > =C2=A0=C2=A0 =C2=A0 * since these filters are meant for service dis=
-covery
-> > > > only.
-> > > > =C2=A0=C2=A0 =C2=A0 *
+> https://patchwork.kernel.org/project/bluetooth/list/?series=3D1082520
+>=20
+> Or is this on purpose, and we should consider the set complete?
+
+The remaining patches are for wifi. My expectation was that they go in
+via wifi+netdev once the first patch is in their base. But of course I'm
+open for maintainer coordination to let the series go in in less steps
+than I expected. If that helps I can also create an immutable branch,
+but I have no urge here, so if only the first patch goes in during the
+next merge window, I won't have problems to keep track of the remaining
+bits.
+
+Best regards
+Uwe
+
+--ou2vweurizbmr2mn
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmnnMXcACgkQj4D7WH0S
+/k44bwgAnoMan1Imv3flaHCO3huDhjM34bPslVMZz9O3wxMMwFGStgpU3tDvAlFl
+FisTZf//q5YDKDMU8QV1lWvbQoFEpQzTG9y9T3kx535oPPgxlG2VOVssH/fhxPgC
+5WRR74C/5X9vCV6KRMHrD8GhGNsn2S9si+AjSVxGC6NWrVOrbIyK1lRHOACx6rFV
+eM3s+J44T3ZGK60m180+bEFUfCsmOqCLoOTOJ2dB4hxddm0VF0MLiuby8b4v8RvB
+/IPA8CqsKTVcj01EMr5853cJiCZjfq5CHdo2tTK9JScUUBXv0Azi7Rv3s3P0hV22
+e9swpLSspOKoPqq6qBNNDtr19tQDTg==
+=Mg7P
+-----END PGP SIGNATURE-----
+
+--ou2vweurizbmr2mn--
