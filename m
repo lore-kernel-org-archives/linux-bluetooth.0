@@ -1,74 +1,81 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB5940DFC3
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Apr 2026 08:44:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D20AEEC0;
+	Wed, 22 Apr 2026 10:55:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776847479; cv=none; b=sUcFwGRbj7C0d/m653qw8WlAOPol+67JF7BU4lONpRg2gvFUQAEkbO9w0i7+evS1f0dfC3hQhvgLYRvknedhKFSvyICV8+NStAHVT53JE6K69ffiJAVc44QxAD3+mNQxMSnXD4PYLRetsDFMIV4p3m2PjsU+Rw5vmiQXZDS4Qmk=
+	t=1776855327; cv=none; b=jpuA573BIWdVk72lDQl8P1S8XZCaIoYfoWvBHKg37Ssr3FMBnvhor/CSmHV//Z23VC6kTO4+zQzC3cIifHNJbutj/sbyumLGDQaQShEkr0Va+hvnoTG345okCJbPJ1YJsLfkTwpYHvK9HEQXnNtaujAsNo2jwriA+Q4QAJmfCGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776847479; c=relaxed/simple;
-	bh=/vtzwwa1f8LuGJRn6BFsmc9MQgxVBL3RUEwVIZTVECQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=GBuSHGaM3DB7mIM+Sg8n+o/faZcEhWmnyo8lxZGHgv8dPeuuFHAOdiw6K5xN9Mg6CtID54HNLblmNtGyPAJyeuo+V/x3uB9freD4YmtFPJtf0YraMdVgf6fmOEKi1vOGYl4y5yXLBuvhfGZ/AZiKGp/zEHifmUkHPIVupiDGbco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=coUcRCXZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776855327; c=relaxed/simple;
+	bh=Cv/dvtt9j+p8MbtSj7Sysg2FpL5y9fNb3weRLkynaWU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dBjME7YrnCM9kKmrxEzPG4cqCogfh8UjJat7dgF/YkZpxiMu3PXBeAEV5HrgnkrhNNqzo4UhzVyq5wf//Kb6uga33tctBgg4c7WphDZ9wgODJyDYCp1tVGiD1qtyICpiAPC/5sxdSbKQK4PSkAt2lJJ9FHPmnBh86P1sFb775tQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ArQE3mYU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="coUcRCXZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 07E28C2BCB8
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Apr 2026 08:44:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ArQE3mYU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAEDDC19425;
+	Wed, 22 Apr 2026 10:55:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776847479;
-	bh=/vtzwwa1f8LuGJRn6BFsmc9MQgxVBL3RUEwVIZTVECQ=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=coUcRCXZebqTki/E6J3/k5S1plMVVT/93eEk7HoYgfyd4nSsfDE7vLhlxXHwMV1zv
-	 3FC/5J7OnuM2ZDS0VVsE4gEm6lyXrP/l8zmiCFc9z+x2tmPUU0Hiez181uta0epGRv
-	 ER7XdA4tmBcWUeqjRc5Wmd1K6fioYBEca+aMublgx81OyjrHzwXRtRUj0z8Wbvt5jZ
-	 M+nFuEnbyloaasPAlJImCZMjfq3qIsszlNdEbaBYDJiiVx1XPKYW/DQnQWUdg81+r3
-	 vpXPI1zN+19PW44oiNj3W9bp9N5q+iWkTnPWB8vSuNEdoyTFRvFcShnCIg6wRjbQRC
-	 HlNfuCejD0C4w==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id F1675C53BBF; Wed, 22 Apr 2026 08:44:38 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221339] AX200 -19 errors on boot after firmware 20260313-1.1
-Date: Wed, 22 Apr 2026 08:44:38 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: kiran.k@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221339-62941-zBDUCutudD@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221339-62941@https.bugzilla.kernel.org/>
-References: <bug-221339-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1776855327;
+	bh=Cv/dvtt9j+p8MbtSj7Sysg2FpL5y9fNb3weRLkynaWU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ArQE3mYUDYrhzX+54sLB9RhfxEf5H81CS8mcbi8mUaELpUurEgvq9posUW1zfxq6u
+	 GX6wuyTtjA3YLevsf+u39UeeqLTY3Z0nJlD/VZOOapW+QFvCJttxJRHSmbDVL+plNg
+	 i2Ozp3hU7kcwCQR4y+eAgFN0veEmgAdsohrCK2fa3JPWa+hKy98tmpEPLfemuLS55b
+	 Nzzn4MX5/ehEIhigE2mtIobktFku2Bl5yBSTzYzHh44GLABvYxfFPgjjcjr4EpgB6a
+	 dC1GlMsWFvHbhiSyINSlWef96SBv64+oya2Aqy8R6UidGyiD2vfjRuPfYSlP2idFmv
+	 hE3qjQvZPG9sA==
+Date: Wed, 22 Apr 2026 11:55:16 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, corbet@lwn.net,
+	skhan@linuxfoundation.org, marcel@holtmann.org,
+	luiz.dentz@gmail.com, mchehab+huawei@kernel.org,
+	jani.nikula@intel.com, gregkh@linuxfoundation.org,
+	demarchi@kernel.org, rdunlap@infradead.org, justonli@chromium.org,
+	ivecera@redhat.com, jonathan.cameron@huawei.com, kees@kernel.org,
+	marco.crivellari@suse.com, ferr.lambarginio@gmail.com,
+	nihaal@cse.iitm.ac.in, mingo@kernel.org, tglx@kernel.org,
+	linmq006@gmail.com, linux-doc@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH net-deletions] net: remove ISDN subsystem and Bluetooth
+ CMTP
+Message-ID: <20260422105516.GN651125@horms.kernel.org>
+References: <20260421022108.1299678-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260421022108.1299678-1-kuba@kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221339
+On Mon, Apr 20, 2026 at 07:21:07PM -0700, Jakub Kicinski wrote:
+> Remove the ISDN (mISDN, CAPI) subsystem and Bluetooth CMTP protocol
+> from the kernel tree.
+> 
+> ISDN is a pretty old technology and it's unclear whether anyone still
+> uses it. I went over the last few years of git history and all the
+> commits are either tree-wide conversions or syzbot/static analyzer
+> fixes.
+> 
+> When we discussed removal in the past IIRC there were some concerns
+> about ISDN still being used in parts of Germany. Unfortunately, the
+> code base is quite old, none of the current maintainers are familiar
+> with it and AI tools will have a field day finding bugs here.
+> 
+> Delete this code and preserve it in an out-of-tree repository
+> for any remaining users:
+> https://github.com/linux-netdev/mod-orphan
+> 
+> UAPI constants AF_ISDN/PF_ISDN and the SELinux isdn_socket class
+> are preserved for ABI stability, but the rest of uAPI is removed.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
---- Comment #13 from Kiran (kiran.k@intel.com) ---
-Raised PR to revert the faulty commit.
-https://gitlab.com/kernel-firmware/linux-firmware/-/merge_requests/1011
+Reviewed-by: Simon Horman <horms@kernel.org>
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
