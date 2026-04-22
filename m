@@ -1,91 +1,121 @@
-Received: from cae.in-ulm.de (cae.in-ulm.de [217.10.14.231])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B320F3B27DB;
-	Wed, 22 Apr 2026 10:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.10.14.231
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB550376496;
+	Wed, 22 Apr 2026 11:25:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776855373; cv=none; b=jhGu9jLzbRce/fObtOlgiGbnuB36uYkTsPKBfQ+Jhtp6kmU5hIC0aibXsSwa5M5ZZkTTcLuhW3oVN4imVV0j29qR37GoeGQkwK/WEbJVIiMJivtqKi9kvcjnUGWr6rVKQTyVn37xTGQ8tkQdkVuUXCJTqIB7EZeE0P7c+hJbWeU=
+	t=1776857112; cv=none; b=NQ1W0D3B/6uPoYAsrSjbTWV1SCO28UpnM5cT3qjXSvt8oX7eT1zXvsoyVhN7z5tLKbTAsDxe5pgBlF8XNc18EhKl1CsXud0KBsoi6PHqEgi2riPLVN43cbCj+P7I5JPoYPrVCmraDVfs1Mppd4lE0/GUeG1OCyf6Ir1SNF9vPvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776855373; c=relaxed/simple;
-	bh=70XgvPBVx0u4wkOHVoFPRVXOawrkL92AcYrhC61+KsE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IxRyqVaVKx3tbfS30DnpzQY3IndS2O0oNvtY3Y3nr3S0noY3pIOiSwFjqgFqrIogn1tVPTN5z4IJpMp7FYo7gZVKlkx4LPqeg2Q/2EZ9J268h9cEEC09tcIsJPVJRTNpV+MIkqCQoHJcHEfdcM9ag23cd9bkx7DbYfdQXWiDnNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c--e.de; spf=pass smtp.mailfrom=c--e.de; arc=none smtp.client-ip=217.10.14.231
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c--e.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=c--e.de
-Received: by cae.in-ulm.de (Postfix, from userid 1000)
-	id 2E38D14012C; Wed, 22 Apr 2026 12:56:01 +0200 (CEST)
-Date: Wed, 22 Apr 2026 12:56:01 +0200
-From: "Christian A. Ehrhardt" <lk@c--e.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Uwe =?iso-8859-1?Q?Kleine-K=F6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Ulf Hansson <ulfh@kernel.org>,
-	"Christian A. Ehrhardt" <christian.ehrhardt@codasip.com>,
-	linux-mmc@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-mediatek@lists.infradead.org,
-	Ping-Ke Shih <pkshih@realtek.com>, linux-wireless@vger.kernel.org,
-	Felix Fietkau <nbd@nbd.name>, Lorenzo Bianconi <lorenzo@kernel.org>,
-	Ryder Lee <ryder.lee@mediatek.com>,
-	Shayne Chen <shayne.chen@mediatek.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Brian Norris <briannorris@chromium.org>,
-	Francesco Dolcini <francesco@dolcini.it>
-Subject: Re: [PATCH v1 1/6] sdio: Add syntactic sugar to store a pointer in
- sdio_driver_id
-Message-ID: <aeipQfCYKjl006uM@cae.in-ulm.de>
-References: <cover.1776429984.git.u.kleine-koenig@baylibre.com>
- <c830049dcfcd99f005e2ff6742aace9341c61f13.1776429984.git.u.kleine-koenig@baylibre.com>
- <aeaMkfk_1t98e7SU@monoceros>
- <CABBYNZJzbEmYzTk2m+Y8SoHVouTMA6Gje_55iJsQ6cYtDLftbQ@mail.gmail.com>
- <aecu1ixyHP2hQvgE@monoceros>
- <aehwG2Egt93-sPVB@ashevche-desk.local>
+	s=arc-20240116; t=1776857112; c=relaxed/simple;
+	bh=eBmp37Fh5ZTlSrodz8LYA7+9XM/VHH8EMneGh3WJBVA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Up3lFu3Kuw5slrnankvHwNXtdPjG9anUct2SmosKbLlmRMfFWsWc52n1UUokTy29PzmMiLxMTQUjl3HF+Au5zUZV++LOzK/zQR8fTXOBY/YUNtNKZctM7YXAF1I8rT1rVbOFQnrDIdp4FwfoCMwpIlgN0gZ+ZNFXCl+/QA3jIas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c8gGNfkD; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c8gGNfkD"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 971F7C2BCB8;
+	Wed, 22 Apr 2026 11:25:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776857112;
+	bh=eBmp37Fh5ZTlSrodz8LYA7+9XM/VHH8EMneGh3WJBVA=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=c8gGNfkDPhwuVFHuYlh7ySuag3bN2J3tGptEhSsinFDqvr3XJvL1IyhHtV8/rOdTo
+	 QnLE7IzRCG7CjZkARPE1/EflVemx1Mo0qGrnWBPsEl86vet8nUmQrlUN98wywV+4eM
+	 PShHqQuDvCUg21g5AkkTAcCEGUKh79iB0RpwUEP2uOM5uRFW0sSw+JfxzCMoDG8iVQ
+	 GF0y8nlr8dMmSIyOKn078vni/xIVw/UwZVUt+lj9a3+ORaBDPhsS+HmutFsE8BBg/r
+	 ujsJADzdFHtl8XiAnYekJhzxrziCZ6qN/u9qtRIV7jsKj0+boLzzi43FpDjMY6q38S
+	 /mm0h/Wq7yKdw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8596FF8FA87;
+	Wed, 22 Apr 2026 11:25:12 +0000 (UTC)
+From: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>
+Date: Wed, 22 Apr 2026 16:54:44 +0530
+Subject: [PATCH 03/12] power: sequencing: qcom-wcn: Add support for
+ 'is_fixed()' callback to 'bluetooth' target
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aehwG2Egt93-sPVB@ashevche-desk.local>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260422-pwrseq-m2-bt-v1-3-720d02545a64@oss.qualcomm.com>
+References: <20260422-pwrseq-m2-bt-v1-0-720d02545a64@oss.qualcomm.com>
+In-Reply-To: <20260422-pwrseq-m2-bt-v1-0-720d02545a64@oss.qualcomm.com>
+To: Bartosz Golaszewski <brgl@kernel.org>, 
+ Manivannan Sadhasivam <mani@kernel.org>, 
+ Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Shuai Zhang <quic_shuaz@quicinc.com>
+Cc: linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-pci@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+ linux-bluetooth@vger.kernel.org, Wei Deng <wei.deng@oss.qualcomm.com>, 
+ Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+ Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+X-Mailer: b4 0.15.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1665;
+ i=manivannan.sadhasivam@oss.qualcomm.com; h=from:subject:message-id;
+ bh=OSA0rk78WdDSmkcO/t8XlaqhuYDC5RIPI2ByJSjXDI8=;
+ b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBp6LAVY4ZUMxgx8tEOqbhjBW009KzxqC7sLg0vT
+ YkPI3/4rnmJATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCaeiwFQAKCRBVnxHm/pHO
+ 9XLTCACmBOZ/6vCM4GiNJ4EAGBbpjMZp+nMbfjxiLoBS84VUGeB8Hj8Xoy1cIX1iWY4oEe2c2/D
+ YkmNGMDuV4gDCUu4QClzMHbBZeBfAkOLRttaC2X+uY24y0qyyiBqW7zuZD+KyCY+/dtNooVG/8V
+ t/nqfqoVvJAW1FXZ6yXL0G6rxs3RCZZv61pGlJf4jr7OOoc4RvTMTLXfiBqSaKvXFiuKNN60/bJ
+ 2/ERYv1EOw0+oo3S8KroevAAVwhTmM6JePXZpuqJZEizu+GBsRnA3CZOLAwoKl3x6MFjSTxv6nT
+ NcYo1MoZvG8k7207e3Byz4wsXLkXTgGq68ShZY0sUYUDpVSb
+X-Developer-Key: i=manivannan.sadhasivam@oss.qualcomm.com; a=openpgp;
+ fpr=C668AEC3C3188E4C611465E7488550E901166008
+X-Endpoint-Received: by B4 Relay for
+ manivannan.sadhasivam@oss.qualcomm.com/default with auth_id=461
+X-Original-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Reply-To: manivannan.sadhasivam@oss.qualcomm.com
 
+From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 
-Hi,
+Add support for 'is_fixed()' callback to indicate the consumers whether
+this power sequencer target 'bluetooth' is fixed or controllable. This is
+decided based on the availability of the 'bt-enable' GPIO in DT.
 
-On Wed, Apr 22, 2026 at 09:52:11AM +0300, Andy Shevchenko wrote:
-> > To be honest, with the involved void* this isn't really type-safe
-> > either, but at least the data keeps being a pointer which is really
-> > helpful on CHERI. FTR: The alternative would be to use uintptr_t instead
-> > of unsigned long, which also has proponents in the CHERI community and
-> > which is used in the current vendor patch stack.
-> 
-> FWIW, Linus categorically told that it has to be no uintptr_t in the
-> Linux kernel.
+Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+---
+ drivers/power/sequencing/pwrseq-qcom-wcn.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-This is probably not the correct context to discuss this but
-I will point out that if/when CHERI support is added to the
-kernel we will need a way to distinguish between
-* A (fat) pointer converted to an integer type (in order to do
-  integer arithmetic on the address) that might be converted back
-  to a pointer in the future and
-* A plain address "extracted" from a fat pointer.
-Using `uintptr_t` for the former and `unsigned long` for the
-latter seems like a reasonable choice but there are certainly
-other options.
+diff --git a/drivers/power/sequencing/pwrseq-qcom-wcn.c b/drivers/power/sequencing/pwrseq-qcom-wcn.c
+index b55b4317e21b..50ac5973b8e7 100644
+--- a/drivers/power/sequencing/pwrseq-qcom-wcn.c
++++ b/drivers/power/sequencing/pwrseq-qcom-wcn.c
+@@ -254,10 +254,18 @@ static int pwrseq_qcom_wcn6855_xo_clk_deassert(struct pwrseq_device *pwrseq)
+ 	return pwrseq_qcom_wcn_pwup_delay(pwrseq);
+ }
+ 
++static bool pwrseq_qcom_wcn_bt_is_fixed(struct pwrseq_device *pwrseq)
++{
++	struct pwrseq_qcom_wcn_ctx *ctx = pwrseq_device_get_drvdata(pwrseq);
++
++	return !ctx->bt_gpio;
++}
++
+ static const struct pwrseq_target_data pwrseq_qcom_wcn_bt_target_data = {
+ 	.name = "bluetooth",
+ 	.unit = &pwrseq_qcom_wcn_bt_unit_data,
+ 	.post_enable = pwrseq_qcom_wcn_pwup_delay,
++	.is_fixed = pwrseq_qcom_wcn_bt_is_fixed,
+ };
+ 
+ static const struct pwrseq_target_data pwrseq_qcom_wcn_wlan_target_data = {
+@@ -281,6 +289,7 @@ static const struct pwrseq_target_data pwrseq_qcom_wcn6855_bt_target_data = {
+ 	.name = "bluetooth",
+ 	.unit = &pwrseq_qcom_wcn6855_bt_unit_data,
+ 	.post_enable = pwrseq_qcom_wcn6855_xo_clk_deassert,
++	.is_fixed = pwrseq_qcom_wcn_bt_is_fixed,
+ };
+ 
+ static const struct pwrseq_target_data pwrseq_qcom_wcn6855_wlan_target_data = {
 
-Sorting out the difference between the two is a very large
-part of the diff required to port Linux (or in fact any piece
-of low-level software) to a CHERI system.
-
-Best regards,
-Christian
+-- 
+2.51.0
 
 
