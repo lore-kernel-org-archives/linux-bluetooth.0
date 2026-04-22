@@ -1,48 +1,79 @@
-Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081D4273D77
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Apr 2026 16:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CCBD2D8385
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Apr 2026 17:20:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776876104; cv=none; b=GmN2RcClsG+EvNShkxN2if59CgqkLzxgDT9iLXnGzCRg258N0etkNxnxyqWxebOM+qMR8sztCUmz7oKqJeVhpHH9znLg3LIPFVZHl8shw/DcVJVXKcOMGaTWJ6tHqfUeGEzkYLcm8dz7jX0LAl8TjMPhHZg7CforviE5N4tR5z8=
+	t=1776878442; cv=none; b=c86ty/+0cmxD6U8i6k/GgjdVCxWb43WExARZhNnTKvgQUqmsqIK+OP4TvbtYuSI1jxwS5KE7yYqVHulEncPi6NqR04zV9l3JQgdHCTYTB/3Vn2vQUlhqT5U/Spu5O3dtSU7DsDH8GBIZ4Xk+AVPUsLeiwVeubdoNtx3N4vESaRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776876104; c=relaxed/simple;
-	bh=wYfyY62kqvdiqzI1RG4WJGeSIZqc/7R7SRR9Eri4CyM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=HsX6vox+m3QOiRRkQtUTqVE+WfT+5SvubRy0s0QZoAhBXIFgpPLxJlY2w0AN+mkw+k2v/pErSLwaWHaUXwbO9eqCzKLbp2KWUMxiR3UnJKZK4M8oxELKzT6R1co90hFqzhHPcfr2oqSeiU7WNktjcLEWQddkUn0vU2coU49y52A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=HxT+Nw+a; arc=none smtp.client-ip=192.30.252.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1776878442; c=relaxed/simple;
+	bh=/0Brot5J7/hMKNiDSKFnU0wOwnd1lYnc1hcGqL1Ppqw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QcVVGlxAM+273OFqUsIzbHN5lZL8acLirVAdKzs1PgllBA+zoS29+jyp2B76CgsFVqo+I2/KkQcc6Y9rfl187g1azNOg88Be9aglBRxlLRzQW9vA3m51kS9SM1+3vnMhFOgNnqWI9lLzkWS/kNTLhuVx6k+ONHmrrszcuV+vLwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dtSbTe8N; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="HxT+Nw+a"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1776876102;
-	bh=0Ud2Tr9KYv6vhYY8mst/nIvtIcxAFF9cko2tO6UTo2o=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=HxT+Nw+amD8qn1nV7itOxN92XVFYzAjoNvSeP2FuKmpIWROC8ErwJnmFBMnCxx8H1
-	 vq/iwNf0GWb9u+SMf/hQr+tHWNrvn+DrDLt+htifRMW3bGv+Rbg6d0y3tc75U9KhMm
-	 8GjSpBCP+PU8fsTQHH6ALBIN5J6x32jHwEf0WOnI=
-Received: from github.com (hubbernetes-node-2246883.ac4-iad.github.net [10.52.13.72])
-	by smtp.github.com (Postfix) with ESMTPA id 41C2A210A9
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Apr 2026 09:41:42 -0700 (PDT)
-Date: Wed, 22 Apr 2026 09:41:42 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1084033/fc03db-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dtSbTe8N"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5ACDC19425;
+	Wed, 22 Apr 2026 17:20:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776878441;
+	bh=/0Brot5J7/hMKNiDSKFnU0wOwnd1lYnc1hcGqL1Ppqw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=dtSbTe8NUvLUCtf+HudIzMNb4A4Mz/vFFZxYMAFyhPSmrOGY7UqUAT1QqWzuRpCB4
+	 GH4p84GQlTKwVpaJqRJGsK6k/aarLsvZTAwxzOPJK3RrpJN/7M4HW8cDPneDh3p0vN
+	 B1ECdWTJmH/uyWT+b4r0jRvpcEqkk20SMQxsYedopBo3Db3e3PPZOOM9w47wfDyWCs
+	 tLNd54UjckP4ZbGc0FBM1kZfGufUR+/SO4GT4HORntp32Oby/E/Wvt8/tUygNW+H+Y
+	 wTQepnF4iPwSBKUQwWEt/i4UVcjBUAN8dwHyNxnSrBJTQ3qpJ/cvLuFEK8QzqBnrxQ
+	 9R0t1knyuPSow==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CF123930235;
+	Wed, 22 Apr 2026 17:20:05 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] Bluetooth: 6lowpan: fix cyclic locking warning on
+ netdev
+ unregister
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <177687840430.3877699.8350209661251408341.git-patchwork-notify@kernel.org>
+Date: Wed, 22 Apr 2026 17:20:04 +0000
+References: 
+ <afc0037c7237e101b50b68d969cc4202bede5f92.1775931137.git.pav@iki.fi>
+In-Reply-To: 
+ <afc0037c7237e101b50b68d969cc4202bede5f92.1775931137.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/1084033
-  Home:   https://github.com/bluez/bluez
+Hello:
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Sat, 11 Apr 2026 21:15:09 +0300 you wrote:
+> 6lowpan.c has theoretically conflicting lock orderings, which lockdep
+> complains about:
+> 
+>     a) rtnl_lock > hdev->workqueue
+> 
+>     from 6lowpan.c:delete_netdev -> rtnl_lock -> device_del
+>     -> put_device(parent) -> hci_release_dev -> destroy_workqueue
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2] Bluetooth: 6lowpan: fix cyclic locking warning on netdev unregister
+    https://git.kernel.org/bluetooth/bluetooth-next/c/87151e363b7e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
