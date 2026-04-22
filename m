@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 392DC3D16F2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0597D3CFF77;
 	Wed, 22 Apr 2026 11:25:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776857113; cv=none; b=LZqpbhY9V455PjgOn2tohThIMkXcXTMTNC9K6fXEwuLAHXUGJgaUTR+YdLTvlgjNz7/BTtrEvmEjKbAUsx3/Ma8hjvc4DIThZtjXDvV4lIP+v3CR4q/wJoyzBf8ifu55U9GP/VSlSKtYaudN6gv1d6SSTt37aIeWVwVzkWlo9+Y=
+	t=1776857113; cv=none; b=X0cEQNtpKtktMEvzUqUgq57J6+iJOo0dsgQWorwhadrO0p6dYBjpgprRZ04cto9dHnisCq6chwh7P9Jgmj9qAxiYiuv/8mOQ7tNodoBy4NPhMku9e7F2a5+S30QT0HSykNRO6xXi+GdAdg5TPsZ68uFL+zl02DSoFgDcw4ox/iY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1776857113; c=relaxed/simple;
-	bh=aC3N0vFLQqJ9pWeBGkZU7n1kGC1cK0vsr+ydfhVVUxM=;
+	bh=wNTq8bfKOhZVwTEppK+NyCHIphFCJQ60hjAPS6sIl0o=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=HzftSp6E2BKtHJVc2ZCP/Z9WrprLPZwaBNqJ46UjY/BsGn4ikxCAYl8guwOBxV7XUgOSsVRO94SougoJJEuEr2cauzuYNFlRdhdL7Z+WdoFRCYEItsNOnsIpzhEcSlz7S7Y3YLyGsr+f402lWKQTG5ez4Efve/UHBqz20n1s+JA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oLu72SdG; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=sK4ewD1KMP7Qi0ODLbfNdd9aBuKv8IgNiaFhtV7EYaqClVdVD0VF/59jwZeqRPKrTytdFcA5cXh9CldSEfjlXfFc6uplllRADF+WgkrylU0TN0JaieikN7NC8lks6dyqDG2Z3Q67QpcW8KFLXYclkfDM9NA9i2JE6YuLphpKWQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hZ/KR+Ed; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oLu72SdG"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1DAE3C2BCB9;
-	Wed, 22 Apr 2026 11:25:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hZ/KR+Ed"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BC2CFC2BCFB;
+	Wed, 22 Apr 2026 11:25:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776857113;
-	bh=aC3N0vFLQqJ9pWeBGkZU7n1kGC1cK0vsr+ydfhVVUxM=;
+	s=k20201202; t=1776857112;
+	bh=wNTq8bfKOhZVwTEppK+NyCHIphFCJQ60hjAPS6sIl0o=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=oLu72SdGs8LDg14oaxCuiOnuBXWounJvSv9QHX1RPk/M6w1qw8LPx4kZQPzl0Glds
-	 62TnNJod6g9OpUjzLGzK5EX44bOQTdvjY+pggFyVQR37/R3pB5LPbuYEfGHSaX2vBF
-	 NCvj/ffWTdUcq4nu+dPbvQBq+F/bIvZ0ScwxO7ScK84CPSnWgq1uNZ7HHJKrKteWfk
-	 B6Y4DLTJXa2+u9lvDgb9rm+vQr5gMbq/GwI/HIeHuiS0KNL7XDYx3r47KPhR3rCWR1
-	 JYWdO60zI+ixcCFE7d7sC/sH9YwgmLQu1rAoGGwhH+kk8cQpnAn5aZm5QVyIhUh5jY
-	 lvyEO91fwsRrQ==
+	b=hZ/KR+EdTgCtvzftOXnka8ufdsQ8E0d3oClRZ/Fu1CJFxzKmrUiozfHvC1Vz0unWC
+	 Lwsae1hnpOxouAdT7+gnLgHyzM0piV2MTbvxWoL6ENaMsPfYpVp4LdtgDsfDbFqwnj
+	 Nxt/IrPHT2Xh4ELBiCa8AWfgHC/6JKw930ngulS8bIYPiH2+dRAtmn9ugZBt7n8myh
+	 5ijgyTlqAkqOEFZL8yYkxhF9jCc7dR6+7S00S8DWw7Vu8U9imJ2L+VSmY2QF0onzwZ
+	 /r0Q2L2TK6VtoukZVOeYXOQtvpx5cvytqLyy4xgA4oYtZE93fcyKF1oNkKFfrdVy2s
+	 BajDzqnA0JHjw==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15442F5A8DE;
-	Wed, 22 Apr 2026 11:25:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B291BF55811;
+	Wed, 22 Apr 2026 11:25:12 +0000 (UTC)
 From: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>
-Date: Wed, 22 Apr 2026 16:54:53 +0530
-Subject: [PATCH 12/12] Bluetooth: hci_qca: Fix the broken BT_EN GPIO
- detection for Qcom WCN devices
+Date: Wed, 22 Apr 2026 16:54:47 +0530
+Subject: [PATCH 06/12] power: sequencing: pcie-m2: Improve PCI device ID
+ check
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -41,7 +41,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260422-pwrseq-m2-bt-v1-12-720d02545a64@oss.qualcomm.com>
+Message-Id: <20260422-pwrseq-m2-bt-v1-6-720d02545a64@oss.qualcomm.com>
 References: <20260422-pwrseq-m2-bt-v1-0-720d02545a64@oss.qualcomm.com>
 In-Reply-To: <20260422-pwrseq-m2-bt-v1-0-720d02545a64@oss.qualcomm.com>
 To: Bartosz Golaszewski <brgl@kernel.org>, 
@@ -53,19 +53,18 @@ Cc: linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-pci@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
  linux-bluetooth@vger.kernel.org, Wei Deng <wei.deng@oss.qualcomm.com>, 
  Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
- Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, 
- stable+noautosel@kernel.org
+ Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 X-Mailer: b4 0.15.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2538;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1720;
  i=manivannan.sadhasivam@oss.qualcomm.com; h=from:subject:message-id;
- bh=MQK4uW+3KV6qGFqWC5yEYOtbmFTmhw+bW5cuFTU5wq0=;
- b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBp6LAWuB2qxpCLf/GFBYjifLzZ8B9XHNP/TnaUg
- 6BT6IqwDcqJATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCaeiwFgAKCRBVnxHm/pHO
- 9UrGCACcW+dlfQav+XDBsT8HgQvBy6YlJjwgniDIlcAYbGTDuMmfs1PqEWivUb4lfHSSOMkUUAp
- mB+c9oOr7b08WeHiuO6gEtLJx1hITwXtZuJsrWjr5/dMeWwH1uIhIrbQc0XobrppCNb1YtkqPy2
- d34tGCxvjcH+Bzhz1IaNm4kW/FVogCv4LDi3K6zN3yHVVTghJpX8K6ZbuGtl/WcxHoouM4+nRty
- /jzTiLzt2Ax8VKjr19NAR/tStQGbufxp3PK/g6FmNE75k/teM3lF+ujGx52i5s7Cjdd+8CtthCJ
- ffU2AI06ZtQBFJVIFeYP684R9qS+CZYFDcNr1H5dPzJwE7Kk
+ bh=9jfNJVU1vG/IbMKLhPiGnv2Pu5DaJsF1czYa74dvxC8=;
+ b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBp6LAVzU48uaYh+mvxiCOrWmi+W6DA8++Z7TQUW
+ F9ykItrraeJATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCaeiwFQAKCRBVnxHm/pHO
+ 9TMTB/4wjc06WrFlO67nknTrUbRTVk22SzZRLP0y7hGCxhH2bcDY6dP53eBF6VnVyrYlOky26w3
+ yDu/gudrLaly4zkvZJe4XB4R99+Z7MCtkznFzIhDIOWQoJoPtkonDP3Y6rTakg2Qul482SxWzCI
+ 4t3roP9/VioL73rX5GfPrf3jZcDoigkdUoShVh9GcQvdZexO9jbFFUjfktKoHZf3sRmyUYmHg3F
+ xtBhWGhJeSP+a1t8rTNSS+P/IY+jI8arIwGIvC1F800X13qyXmv4nQDy4nu45kA7vWaOJ4VOQIs
+ SPTfTcGs4LrHANnvsVd71jPZX8d+ATtyTDy6g8jiHOLb17M7
 X-Developer-Key: i=manivannan.sadhasivam@oss.qualcomm.com; a=openpgp;
  fpr=C668AEC3C3188E4C611465E7488550E901166008
 X-Endpoint-Received: by B4 Relay for
@@ -75,65 +74,51 @@ Reply-To: manivannan.sadhasivam@oss.qualcomm.com
 
 From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 
-Commit 'db0ff7e15923 ("driver: bluetooth: hci_qca:fix unable to load the BT
-driver")' tried to check the presence of the BT_EN GPIO in Qcom WCN devices
-to indicate the HCI layer whether this BT device can be power controlled or
-not.
+Instead of hardcoding the PCI device check, use pci_match_id() to check for
+the known IDs using the pwrseq_m2_pci_ids[] array.
 
-But it was broken for two reasons:
+This makes adding support for new devices easier.
 
-1. Assumes that when devm_pwrseq_get() API returns an error, BT_EN is not
-controllable. This is no way true as the API can fail for various reasons
-and also the pwrseq-qcom-wcn driver treats the BT_EN GPIO as optional. So
-even if the GPIO is not present, it will not fail the probe and this API
-will not fail.
-
-2. By skipping the error return, probe deferral is completely broken as the
-API may return -EPROBE_DEFER to indicate the caller that the pwrseq driver
-is not yet probed. Skipping the return value means, this driver is not
-going to depend on pwrseq driver probing again and it just assumes that
-the pwrseq is not available.
-
-So to fix these issues, fail the probe if devm_pwrseq_get() returns an
-error and if it succeeds, use the newly introduced pwrseq_is_fixed() API to
-check whether the power sequencer is fixed or not (i.e., whether the
-Bluetooth interface on the Qcom WCN device is controllable using BT_EN GPIO
-or not) and set the 'bt_en_available' flag accordingly.
-
-Cc: <stable+noautosel@kernel.org> # Depends on pwrseq change
-Fixes: db0ff7e15923 ("driver: bluetooth: hci_qca:fix unable to load the BT driver")
 Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 ---
- drivers/bluetooth/hci_qca.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+ drivers/power/sequencing/pwrseq-pcie-m2.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 27e52b08ec47..dd1d93cbb3d8 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -2470,16 +2470,13 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 			qcadev->bt_power->pwrseq = devm_pwrseq_get(&serdev->dev,
- 								   "bluetooth");
+diff --git a/drivers/power/sequencing/pwrseq-pcie-m2.c b/drivers/power/sequencing/pwrseq-pcie-m2.c
+index d4d246a30a97..bdc4391c87c9 100644
+--- a/drivers/power/sequencing/pwrseq-pcie-m2.c
++++ b/drivers/power/sequencing/pwrseq-pcie-m2.c
+@@ -351,6 +351,11 @@ static void pwrseq_pcie_m2_remove_serdev(struct pwrseq_pcie_m2_ctx *ctx,
+ 	mutex_unlock(&ctx->list_lock);
+ }
  
--			/*
--			 * Some modules have BT_EN enabled via a hardware pull-up,
--			 * meaning it is not defined in the DTS and is not controlled
--			 * through the power sequence. In such cases, fall through
--			 * to follow the legacy flow.
--			 */
- 			if (IS_ERR(qcadev->bt_power->pwrseq))
--				qcadev->bt_power->pwrseq = NULL;
--			else
--				break;
-+				return PTR_ERR(qcadev->bt_power->pwrseq);
++static const struct pci_device_id pwrseq_m2_pci_ids[] = {
++	{ PCI_DEVICE(PCI_VENDOR_ID_QCOM, 0x1107) },
++	{ } /* Sentinel */
++};
 +
-+			if (pwrseq_is_fixed(qcadev->bt_power->pwrseq))
-+				bt_en_available = false;
-+
-+			break;
+ static int pwrseq_pcie_m2_notify(struct notifier_block *nb, unsigned long action,
+ 			      void *data)
+ {
+@@ -370,16 +375,14 @@ static int pwrseq_pcie_m2_notify(struct notifier_block *nb, unsigned long action
+ 
+ 	switch (action) {
+ 	case BUS_NOTIFY_ADD_DEVICE:
+-		/* Create serdev device for WCN7850 */
+-		if (pdev->vendor == PCI_VENDOR_ID_QCOM && pdev->device == 0x1107) {
++		if (pci_match_id(pwrseq_m2_pci_ids, pdev)) {
+ 			ret = pwrseq_pcie_m2_create_serdev(ctx, pdev);
+ 			if (ret)
+ 				return notifier_from_errno(ret);
  		}
+ 		break;
+ 	case BUS_NOTIFY_REMOVED_DEVICE:
+-		/* Destroy serdev device for WCN7850 */
+-		if (pdev->vendor == PCI_VENDOR_ID_QCOM && pdev->device == 0x1107)
++		if (pci_match_id(pwrseq_m2_pci_ids, pdev))
+ 			pwrseq_pcie_m2_remove_serdev(ctx, pdev);
  
- 		qcadev->bt_power->dev = &serdev->dev;
+ 		break;
 
 -- 
 2.51.0
