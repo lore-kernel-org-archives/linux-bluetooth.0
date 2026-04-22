@@ -1,135 +1,125 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B145366DB5;
-	Wed, 22 Apr 2026 15:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14152373BFE
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Apr 2026 15:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776872916; cv=pass; b=C7pB8XeoSlsBpArdp6shAQwhcEJD6C/15cw2/GHw2kA9XR2DkmyFIbPW4wAYbm2i699t4Cs7P3Zhl99xJW55UGWuazMtkhHaQ+EO6C8QDVWrTbrVBgwhBY+KSW1aBZ2T6os2Pb8F4YWrc/FLWCUQbFkNbY+tutCnv0ZYlkIZo5A=
+	t=1776872974; cv=pass; b=qigVHRfcM31AD8DCOyBvQPbwvC62Gpk+d0B1Oc2xBbK3LtruFAB27bFweuUdVCLo3eys5TXcWI9SuRRVuGd0LhxP1bkuhJ9FsY6jteQFvwarnu8l6qoP9IWpBZBBersG8bHOjDps6e3ga1OlrVCWcq9D5UhB1Xf+O7kQKerF2ME=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776872916; c=relaxed/simple;
-	bh=qIjzBdXnKCzxdoN144KjXzG83a3Ym+fkkiWHn5O77OQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BekY0OWeLhzXbtkB3CWyqY2nUCJr62dB0Yumr6JJN4DR/8iIpyeLRIpLoAl9q9Bn9cgJ75mx6hbEo377Dctz/f7G2PwZ8xlkLra+6ZPu/m0xWahzUebdf6+zoEJJboBaQT44qegN0thTJXvsghk8HxhH9mTgnSuy4XXtV7tfJ6I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=SCnUeHW3; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	s=arc-20240116; t=1776872974; c=relaxed/simple;
+	bh=KnzZfTAlMqHbtdHn9fFlGW+0k2wIDpBQ/n+z3Vc85HY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z0qxFt7gSMoAZJ2HheVFLtaufBSH78QVplZY67L4x0ae4j0JoQIeaBRCJvjWwRHzAl3y9bUyn2FvViRTsdFFjDIUSif3jE5sLZtQtV0064zfFfM0LobApdYvUofF1Lz0L03EiDX8EOb6rwuTCXO5hqRlLN0dFrFiA87hFbYvtj4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MFtDC9OD; arc=pass smtp.client-ip=74.125.224.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="SCnUeHW3"
-Received: from [10.71.99.228] (unknown [185.65.133.73])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4g13Xs6bhvzyQm;
-	Wed, 22 Apr 2026 18:48:29 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1776872910;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=G6DEaEaZjJXJucBXhJKzjDt8uNV9l5tZ3qXgUv7LXrk=;
-	b=SCnUeHW3k4fSdIbVrcXMrikm9I2pswNdakiDOY3LWRG7mbts89BO6DuhiNy0er41KjCGPi
-	DR7ibJcleuTtxPuLvYZ7sbwiugYSmPL5mYu3lQpYLet1duuWJyg3MMNsyBySHl98y/IOVj
-	FJw6Hw2ZcWmrHLKUdIEvk4zAyjJLxyo=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1776872910;
-	b=GaP0+uiLamMT8OvnfnD7b1JMQ65BQXEKKt9mHR3B86XyRR/5rphu30OKLTJ05uWIUVsjmH
-	91zv3R62AXXXv2snB2BHt/cQZ+IujkDMWbJgOJRamum5lfKKMbditS6EkiP/Hpg5aqtoYk
-	ghLVEt5COFrC6/3ubn3PQ6EVRdcyfYs=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1776872910;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=G6DEaEaZjJXJucBXhJKzjDt8uNV9l5tZ3qXgUv7LXrk=;
-	b=HZOYm5auCjTtoB2jLmqRpdasQZllmAXwApiaRIjVpmqw8SAq/qfK/1YqtiXN6/IoYI6DgQ
-	AnUw5Dfk3BRJMjLc0k6bggzVyLBAyIRoevSB8Hk180Qj1dNKOcwwXHLADP0UJ3GFhaJc+w
-	w8IZIkqrGgEEGn2KLRHeERE3LlsybGU=
-Message-ID: <910465cac44a42a12c781b64f1d113940de73a06.camel@iki.fi>
-Subject: Re: [PATCH] Bluetooth: HIDP: guard session->conn in
- hidp_connection_del
-From: Pauli Virtanen <pav@iki.fi>
-To: Michael Bommarito <michael.bommarito@gmail.com>, Luiz Augusto von Dentz
-	 <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Date: Wed, 22 Apr 2026 18:48:11 +0300
-In-Reply-To: <CAJJ9bXxCMVzVASz64obn78Ob2CDKBZX3r4B5iE_=+hbnwXDirQ@mail.gmail.com>
-References: <20260306023155.554597-1-luiz.dentz@gmail.com>
-	 <20260422011437.176643-1-michael.bommarito@gmail.com>
-	 <CABBYNZJu6bGZadWc10g=ZJPHoDZ_RKDosCgasow3oRpQchYZvw@mail.gmail.com>
-	 <CAJJ9bXxCMVzVASz64obn78Ob2CDKBZX3r4B5iE_=+hbnwXDirQ@mail.gmail.com>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.0 (3.60.0-1.fc44) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MFtDC9OD"
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-6501d242e3fso5435031d50.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Apr 2026 08:49:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776872970; cv=none;
+        d=google.com; s=arc-20240605;
+        b=YO1WmZVaPZr5rgjMZ/0oiRFH+EasKrzYcDy5m7vsc5bKxFQoJB874WL4HaqhMKxztA
+         azR4oEtl4wm+GAPJT/5ovBwZhFrZbeq50VfJxP9X7JemaEJ11UHxWIdLBoFZLG+4q6iv
+         xMW9/oVpFP2wjIq7x7j0BgYYyMM3wHC9MuiyKSH88hIC0gt7dQYhPV/9lM+QLP4LjAVp
+         9zzS+1+H0WNbnAuBBWQ2vhT2Ae3X7HwuwAj4I3w1u9KUuvgoq/nuWSzYxUr4YSAfnkui
+         DavTiN+7OeenODccmMIteZlNuxHyj64jRZZ/zmBdaHvtIQYwRUeFdbpoXm23mPuyeTdF
+         5YHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=rufkI5LGRKmOvIFyELaq/2dGpVFdO11QVYlsd9/dtoM=;
+        fh=VGBhSixYSFnMiAftiWPyGVZlU5frZf9/FPlhYax0HHI=;
+        b=PyG/rfaNa50Zqm9OEENU8uFXRzBIkK0Y6XWnP3gCAYBuvNcKkMBBUZUbo8vybA+DA0
+         9NVENLnrEv9l/EUoQ3Ea7IZiwASVr7u/AGTwcqIa7n3mPwOXDrb2MK0DxF9ThIECvbkF
+         5Uxs8/gI7nxuVownfPo5UVJDNQliBsFlCp76NJWBWmavR9df+AqXHC18I0UKOt6n+mG+
+         xNJFUWmWTaqzBDb1XsRbxLVsVBPyy3hOI2JJHl42V6YV2IjI1aRHZy7lWRtTD7d1GODz
+         MJiN2ybYc3GwobH3WP0vc3Q3Hplf4QtDPIM6H9a0kaNwFetkeSyts+azHkIxXAtQdE4f
+         YbMw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776872970; x=1777477770; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rufkI5LGRKmOvIFyELaq/2dGpVFdO11QVYlsd9/dtoM=;
+        b=MFtDC9ODGNhmQq1AYhU/dQnbRLOsL+hZyKnTLgb0bNtm/EL2sGx689TDxgte9VnueO
+         Gk4/TgP8GIfL7cpeLshkfSfBDqx9qGJ9E8twRv/2T4Q80djhVVfRk0C8+ZmPpLoPycsn
+         yY3/TDRx5CinOHLEwOSRpd5mwOSCeNq4+5hYYt3fyBsrkx+w9TmgBkFT1hQPDVlM8dnW
+         hcffzB2UnNHic3Vxwu1YBkGU2v4hFbHGlbaAOz8/AeORNburyDoSRkdByUwB0S7sUb76
+         Li3qkDdNAaf8ApNhCQ9hh8GdrBzm6lMNk7dV0jCxTzarcCWPovdeue8HTE0v+OyTok3O
+         4qHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776872970; x=1777477770;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=rufkI5LGRKmOvIFyELaq/2dGpVFdO11QVYlsd9/dtoM=;
+        b=oNCefQHOnQTtkBFWbPgDWRPf6cXmXwfBTJy5pQf9lbPFdapF+TOVqrrQ+bNLcx+M2i
+         i8ewnonzqWx9cQg/fkYEowLZVhsSV86sMujLQliHqxx2lswpoy0+LMsyxeB9V5l1P3RO
+         ZYXZJQxJrWmc8MrP1KXHVYqTCoG6cyFF9TURmsGuqrLjSlCtHAIBrcqY+5/jB7MqY0Z0
+         LDd2qXXDfOqp+0erPnag4FNVu0JaqG9ubm0Xt7xn8PDj9MAdWRWUMJLPMK1j9RABXNL9
+         shdrv13fjObinJtMUj9JMgNRMDNYgtU2ZVuEFGZmq9GIz0B+38w9UGy524rgJJ49eH4C
+         0mMw==
+X-Forwarded-Encrypted: i=1; AFNElJ9Vi4xgJBw+abafDKlz7dP/e2YwDz0/12MsjkxfNaG27LKz8FJs1281TrcnFtjFLlYFImY+oAFAGQM/PlRNiZw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCS1eqHkzdVf1U238NPOp1NsDoJlOlR9oUeeCIkz2CWQIJUmPf
+	yO0mk7EhTjIajMptwcehw9lP3q/SKuvWPE2tsm4NWLPENPD/PEZb1lq3FzEW2ehQb8M9VphEMZo
+	vp0iPJcAULhvTPlpSkqXvGLbjeIkQJ9mh2d0Y
+X-Gm-Gg: AeBDies2lwqE+whOxWnpUXVw6Lt7erEYOcYzfWuTalOEclCdtWKCxktyFxMx24F5q2J
+	JkexjwAgKXaxKvZdiy2bSlwO2wm77jEB5BKFqY4oNhwgZPQTp4EGRRz6hbmxNiFeY1r9QhrECm2
+	tw2dk8LoO1KhuuN3EQxp+90Nw0vKmHKWJrAlV91+yQiX2LXf+qV5B4VDB4WiI5t9Z36Q8cSoQPr
+	+0b8y1jpKVaY3LtQ83JtOlSx8naKqJFYvAtMyWFOIN/5IFkmBzSAR72H8t3XyJGkXGg16MNI6rl
+	wa5B9vH/wWRr+fQWnE0LnjsNlixzUbIslKFkD3HdU0PLCE5DNEgJRTNIVK+7EmhsRpmSp6mr6dl
+	EM6Xn
+X-Received: by 2002:a53:b64b:0:b0:651:bcc4:c1 with SMTP id 956f58d0204a3-65310a4ba78mr14162786d50.48.1776872969769;
+ Wed, 22 Apr 2026 08:49:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260306023155.554597-1-luiz.dentz@gmail.com> <20260422011437.176643-1-michael.bommarito@gmail.com>
+ <CABBYNZJu6bGZadWc10g=ZJPHoDZ_RKDosCgasow3oRpQchYZvw@mail.gmail.com> <CAJJ9bXxCMVzVASz64obn78Ob2CDKBZX3r4B5iE_=+hbnwXDirQ@mail.gmail.com>
+In-Reply-To: <CAJJ9bXxCMVzVASz64obn78Ob2CDKBZX3r4B5iE_=+hbnwXDirQ@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 22 Apr 2026 11:49:18 -0400
+X-Gm-Features: AQROBzBCMI7I5dkCdqIe2vqDSl3e0S35tv6TT-Al8s0OzTANYBAL7yPUfB7-VTU
+Message-ID: <CABBYNZ+i7shh3NjOzmrsHTgS-O06KDwZFuixF9i8By3Ho3U4cQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: HIDP: guard session->conn in hidp_connection_del
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Michael,
 
-ke, 2026-04-22 kello 11:09 -0400, Michael Bommarito kirjoitti:
+On Wed, Apr 22, 2026 at 11:09=E2=80=AFAM Michael Bommarito
+<michael.bommarito@gmail.com> wrote:
+>
 > On Wed, Apr 22, 2026 at 10:55=E2=80=AFAM Luiz Augusto von Dentz
 > <luiz.dentz@gmail.com> wrote:
 > > We might need a lock in order to access the session->conn:
->=20
+>
 > This one is a little easier than the other txwin_size issue in terms
 > of blast radius.
->=20
+>
 > What pattern would you prefer here?
->=20
+>
 > Option 1, smaller but ordering questions: hold the semaphore across
 > check and use like this:
->=20
+>
 > down_read(&hidp_session_sem);
 > if (session->conn)
 >     l2cap_unregister_user(session->conn, &session->user);
 > up_read(&hidp_session_sem)
->=20
->=20
+>
+>
 > Option 2, more correct but more cycles: snapshot the conn and use outside
->=20
+>
 > down_read(&hidp_session_sem);
 > conn =3D session->conn;
 > if (conn)
@@ -140,9 +130,14 @@ ke, 2026-04-22 kello 11:09 -0400, Michael Bommarito kirjoitti:
 >     l2cap_conn_put(conn);
 > }
 
-I'm not sure now (would need to rethink it through), but one probably
-should check if dbf666e4fc9b is needed or whether 752a6c9596d alone
-would be enough to address the original issue.
+Neither seems completely correct, in my opinion. I guess we want to
+use option 2 but set the session->conn to NULL since it will call
+l2cap_unregister_user.
+
+> Thanks,
+> Mike Bommarito
+
+
 
 --=20
-Pauli Virtanen
+Luiz Augusto von Dentz
