@@ -1,139 +1,145 @@
-Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 045B2317164
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Apr 2026 14:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6493431F98A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Apr 2026 14:59:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776869922; cv=pass; b=QgMynMBr3hC1IAs7nh3VhIrmRn2yI14D/wSEvDMfDgQVZQYqYLnLKqe4JoIbV+TXCbM9yeDoDPQFuU+RCe/m/+jxM+EloEd81WI2E4oKEKXWIvRlQc2P+fj4uU5SzDCEqDOE9hs2CIVJ7kxoAL0ivLpeEDd5gQEXvb3xd+uY4UY=
+	t=1776869948; cv=pass; b=CDptVloYkW61mabgEjBr02pI/Sv3U+1A7clFXDZ4GcRZ7c+GaWPWpsW9YW0owIgbnzIGrvLjdtuHScHcuFwuX4P5oyyJxoFngujuKUDOIqI7BoYNWfn6RBtkVmiBR6jh6xY6fGG2bzFzE0S24aUxMMZcPbYawvwN3T9qimXKmrE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776869922; c=relaxed/simple;
-	bh=078rttVyJWbDLtpUTmpCNyeg3LrV+3Yx+Iqwf0wDCYE=;
+	s=arc-20240116; t=1776869948; c=relaxed/simple;
+	bh=beSS0uV84ciXe7hTLQM40nPX6ti9qcIm2YbQa4xRGuc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J8MbjxcDEo6kR1uV+B+R9A933jHB247RHRYdtQ/fF7aRHSwW4uM/Ry7MKkwded/kYT3I3n6iL7pLeOqulsDp9tZEV28s3gxj9FO5226PS2pqzp21zS16belwC9JB1LhXcuM98A9Xngk6oO7r/RC0DRSfhHUGaa5fbsIR1Qd93D4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VwkKD5Ki; arc=pass smtp.client-ip=74.125.224.44
+	 To:Cc:Content-Type; b=Fx1U+qawa4x5Qj+//0on/iN4hwvkU8mZEiISdLsUk6ZefGYOPWdDtcePuMXQO0Sv1ETEQxpRa1dNME91rFJPIgN1dk5V3HWoINsH94ajHdblDs/LtmE33TJBRlff3qFuABekWHI6Jxt30UJhbD+dIGuOPdxNlk8AqamhNS10FQ0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ShjOM9KN; arc=pass smtp.client-ip=209.85.161.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VwkKD5Ki"
-Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-651b0eb2564so5913937d50.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Apr 2026 07:58:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776869920; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ShjOM9KN"
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-6948da50eb5so1644502eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Apr 2026 07:59:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776869945; cv=none;
         d=google.com; s=arc-20240605;
-        b=ihV5kYsfBIwmghfjzNKXjwyL9fgcDC3av3rc9vJho5DTFiiO9+jKTr27Z+PluHlmMf
-         aD1UDqSlAofJxc9sJo9X3rXpE3/ZFWwN2HS7nJodSQZHE7mt2P4D48DlZq7uNUQwtF5E
-         omTJt0g1Hs6rHnH6uA4sSjYyr3GIgPE+OwCqdPcODeiSXp/Ih54oSjg67WApr7f2a4kI
-         fYWFhVnZWx3FsUv/Jba+5eYeikdCMc1k1+TTSii3C3CUsu8E1pN4qFB7cUnVKh7T8QY6
-         nacp/aKax/tP29sxfL4pffafKgW4GwJyL6itWKh/WIwXQDkC1k4gGPq2ExTydEE0+7w3
-         xblQ==
+        b=ZCmXk4rDY+WMqWBLU1XfW3vq6646cBZQdn38BL1c95GSPqeASG6eEHm5siBMF/hwny
+         wVdnu2t3mS7zjVznQszf1N6KaeDaRjGFzKb1YYoohkXjw0Dgkb1Fq6TIAUpaK4mbqiNu
+         Yayh7BBAPHgUiKoLtgQJGfzwkTiURaTdW4ZXNDo6pH940bbBc3PzZRbucAqIN6HQw+my
+         pGKErE/wUemdkYV/xWUjlLZgVmHITU7BiV00w7g40Kqf1bUvVy8/3//a0wnb5OOziND9
+         KYfKZvq/i7+L1NI+jawzytnk6qEpiM/ljcjKoSuo610s5tVNx6zHAav0jvb+BZyrj2ql
+         IWOQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=NqyJWtKrH9oShmW+WNLiSnqWcym7LdgzARbMIJVVAy8=;
-        fh=sqV2+Eu9IQn4YDymdzhPe7sMFEHg8ej50eXfMopfuKg=;
-        b=IJlKVfPmXERxeEIvAVMShwuECKG+y8ptk7dXnA1IRoHDj54YoEYINgvqRBxFuEj5f9
-         T6uJnkHFvNovI3ugF/hNYIumwQd4UgJWPcgqvf3hAznya80FA3AbyFtBGt02ttOkNqHp
-         74SzrYnXHBs+c902fePSNQZG2CdCLKWTEztm6ZKb4qXa7dtKyrYudiflCABExwx90a36
-         GssUs+PMWOjJcGgHa9jRwYFem0SHw6q/J48z5pxhVPSq66+mn15naX0iTFhsnOjvVBPa
-         76zvuQFoUkaBSSgMrEq+xfHs47E04JeSMgcdSve+ZSxGIQYAaHTEttjrIBWYWr0MM+pR
-         DVKQ==;
+        bh=oQt7JjZxjs4Oan3dKiOCcRshQPydYgKWyrff6Kx3d9I=;
+        fh=DBIRJP4DvnAE+M31BcQ50XI3CAn/idN52/MNTtsfw9E=;
+        b=WRpVzW5jEJLbzFI/EA77k8uednyvA2rpRFiIT+FRaMpLJGgaX5mJnQlthJIgOGU4Ik
+         O8THOcKtcUow8vx8ZK26ZLILXCwN62zcIYNXdBTCkCoK6HVUyQqME0affqwoKd5btUa7
+         9tFGmb+hpVtJk3k8m9gPno5D7aq5CcHiOpFTXjL4cFWHFmjDit4y2KEHVxMuy7OBNzPs
+         hxitkoPuYKWyupC3eiUS0JjMhOg6iuN7rjpMG/shNCMeBGEYyzohyNqwteQHd825UvgZ
+         hCVk8AzZFqEqyD7VU6UyRx0vz+KneJcvctRFInRNfKg7S3GRjaAEs29JjBpA/yF46xy8
+         m2YQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776869920; x=1777474720; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776869945; x=1777474745; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NqyJWtKrH9oShmW+WNLiSnqWcym7LdgzARbMIJVVAy8=;
-        b=VwkKD5Ki9NpKUqQa6sLkt8/vMeRNjrS7bhzhrz/sEzDEbygGRCvdV1oBCuK22YoFSW
-         2tTso3xLdzxj7b3bPIt2BYgujvXuBT9lZQFkrF+x+RUu+8Slnl0ktkzAOa7BxkISR8R9
-         jUAusZrbcVLDR5Y/7HMgQFFjPFN8HFzZf+7dK/bBPD76nhdUZ2blSoLDDeAiontsqhIz
-         8WTUWDbk68zA7EKqAF4xS524CZicbs5V1YyZLB2B5sYuvtdZv5P7M+Jos3fbg1OBBuLf
-         o9I5ZRK+Kx7Sz6zGxWY7U+Rz7wsJduBbZ515++zBCtZ5UKrqxB3+4W/VQViQdjVle+oe
-         pr6A==
+        bh=oQt7JjZxjs4Oan3dKiOCcRshQPydYgKWyrff6Kx3d9I=;
+        b=ShjOM9KNXIddFHP4reSbLgWY6RAKPCnt6P5K/LW0KkFW/bxpcfNd45WeT6wXW7/zoQ
+         X0bResi2FnaKHolUr/KoYt2UkocuPMqp+wsMHqbBPcrxqYH9o6OcMzm0L1x3jWTqziop
+         U5SY3hszmwK5coFRdNT/ivWHlM4Mbr1WvbHHLirRdtB5mzzOtg6AEbHNGmVZACLZtf8/
+         expBEfj29oS+e1wc1MObJ1IBdCtSRPuOuKql8w+JzMQ9BbJ1SC+yzMQujaH1JCPQ2mdk
+         G735XOvv/a5YlCZIpNfeRcfFFgU0hCzIRwJAW+WfBkIigIAaK+BvhF/unvWu7VO5GRjF
+         NOOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776869920; x=1777474720;
+        d=1e100.net; s=20251104; t=1776869945; x=1777474745;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=NqyJWtKrH9oShmW+WNLiSnqWcym7LdgzARbMIJVVAy8=;
-        b=rP2tJowuXUKvd1QkWCiZW+3qVi8UUj9+wul51NjZ8CmC6FBxEZ1YEi6W+Wx6gyDLFI
-         QGFHqsExmPu8rVC6yjuc2HbZm+6PA3omxW9lD6349Sw1G+OGbTkSkME+dFDZAd9QStby
-         B0MS6bsfKy9xGKL0jsxEl/IvlzAIq8Gi+ckenC3qwbXtcaTAgAybst3A7bdnPpOBsk7b
-         6nkB3H3GxvJhCkBpGZhZUk0N+MmRoxV/v3g4x93H7eParCk9aWqCHoKCAXfCLNM2Uahg
-         VVbP9HcqZ2aEScvmagw4aLfR3JKuQ8z72szyKkujOfHlUY85uvvh4+mTnFHUtGtVfVuF
-         KJMA==
-X-Forwarded-Encrypted: i=1; AFNElJ9or1+9AMTGFX/NpV9lYYenePvD2gd9ySQPRykZepiHJVxpHtTf1iVGB6COL11GpoaOuXNoH8MVHZkjiuKvZkc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1WtkzPlEAsNGadEHCJX5044M2Tn6d2jkoEOKg0ZrWY/axFmZG
-	ibxz1kRMsrDJiVQuwlF6zKXX6STDqadTM6UEDJLaAxzAjhwHhu3XKmuBE10YJXQHAxZAxEy8E/j
-	lu66lzUKzBM5GJ3qRHjnH7wLzHGupx98=
-X-Gm-Gg: AeBDietEKLQXDlwNqZFd3gqpqc1Zk/jvsSsyVY4EAA23VVnntzfGk7l6u+on9PnpQwN
-	t9y5Jp3vw1+LeSjyT9o7sm3nXVe8NiZh7pGmZZw3cyhiO8U4zgBa2eZ4LHQBkna+AP5fEKC7Fz1
-	0e2eYTpjEroRZTDrP86T6Ifvl05zk1AWPIliFDyu+LmE29M8hCPFbK7+byKpHSM6uxEnTWeX2t/
-	k62i10L0bEa9vtSEi8cLui2qLMVOeykD09vM0HmtzP5PtHxwXQS+FgfwtoTM+p+v+l0GKodBOAJ
-	3DuxyXZUzplLZ8DJumEVbCDjVV870du5hwPIuUZb1+yafFvIc/Ia4EDiPg==
-X-Received: by 2002:a05:690e:128c:b0:651:c5d5:1141 with SMTP id
- 956f58d0204a3-6531088e804mr21017595d50.28.1776869919985; Wed, 22 Apr 2026
- 07:58:39 -0700 (PDT)
+        bh=oQt7JjZxjs4Oan3dKiOCcRshQPydYgKWyrff6Kx3d9I=;
+        b=N/FlL5VASTVDX7GhFEsUl/FJyShLd7TrV6VfTpJu0GzP7oeB1Z1fFlYPFqv17yog+t
+         H35NfB8fhPejJT/23LIAzDKpls3tBlHOQA60M32mm+l7AOuveYRQQVRO2rGTsE44b9Lw
+         EUvDEV5E02TpY4JzYsCBpkHERGRk1hghPaqfK+nA/6YKCPPBh7pme3u0W5h8jE8eTsm3
+         zFF7bMbBISQM3GBXKzsZlI0IhUl50dnFgBxZN16hQE9YKljIPoJqEwaHgp774eQKtWad
+         u+j5Xo3cevKd1vpxK1pTnjqRK+VzsZ6mrVfO+GupiCi2cfMMbWyLfQKjhNQQLpY67ao2
+         cqPw==
+X-Gm-Message-State: AOJu0YzxmRUMOb5idYKKZ2unanJni6FqL8sitS+uk7dgYP62KfN/3S0f
+	umzdRBZVM5ASOOBvxJjaJZsn610pOZLZouWdfagkYEBTuOx24QRBT95E0wem04LtCiQjB/h/kce
+	NtAeCXzhaPhVs96X5DMQHoPzjNUfHwEfxvx9ZKpo=
+X-Gm-Gg: AeBDietXh41aiAJYglR0LPbQk2DpSQLoKz5xRqb/hVvTHRkjVNSKsCz5HkQRaQHyPhZ
+	FYwHieM7oYYQmgIHFvyUXz8xEYHcPMg+/qnYlpY7Ik7nF5BpaT5Oy9WjqMhi6odlQfQDh1VbHSc
+	nZgDIUBmaZ1cut/JNvIvOcu7HfLBunUrNzguX4wp6WVxdgpQ7l0kvxkYWKvJhoxnMjS7H3PeU8/
+	ZLSLJTYp5rQstVHsDG9kktXs14oBlxTJr7sPbfIoeC2WGbaKLr8hjO88IKanuNrcnE4EVxq4Co5
+	zOFtQ9TxfnUBuM2MTFk0kq1/bpGZDx4LddXoUwLH9LAuUsjNpfdirBYJskr++uo2Xn682hdIFVf
+	0fg==
+X-Received: by 2002:a05:6820:6602:b0:694:9cae:bf3a with SMTP id
+ 006d021491bc7-6949caed790mr2106432eaf.34.1776869945205; Wed, 22 Apr 2026
+ 07:59:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260417221628.1674866-1-michael.bommarito@gmail.com>
- <CABBYNZ+f3pur4cSsanQ1kvv-yORp2E0qmVLt9si_+FnnJup4Ng@mail.gmail.com>
- <20260421135639.3185653-2-michael.bommarito@gmail.com> <CABBYNZKS5Prm+BTkpdPgArgODTEDgHXLjecfux=3ZW0r2x=UXw@mail.gmail.com>
-In-Reply-To: <CABBYNZKS5Prm+BTkpdPgArgODTEDgHXLjecfux=3ZW0r2x=UXw@mail.gmail.com>
-From: Michael Bommarito <michael.bommarito@gmail.com>
-Date: Wed, 22 Apr 2026 10:58:28 -0400
-X-Gm-Features: AQROBzDekR93usvh9Pimj95cjSzQS5l71ZvY76cwJ2OQBfEIuaMxc8oI-vdcE1A
-Message-ID: <CAJJ9bXy8CVjC4xG0zBcxi9xtiep33-uRGSysL1Q3FiqCN7Rt0w@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] Bluetooth: L2CAP: handle zero txwin_size in ERTM
- RFC option
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Mat Martineau <martineau@kernel.org>, 
-	Hyunwoo Kim <imv4bel@gmail.com>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260421202253.1957689-1-luiz.dentz@gmail.com> <93591251ab13408ba014fff8b9bcfc171893e232.camel@hadess.net>
+In-Reply-To: <93591251ab13408ba014fff8b9bcfc171893e232.camel@hadess.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 22 Apr 2026 10:58:52 -0400
+X-Gm-Features: AQROBzClKj2RgonEVc8sbLLp8f_BqG0MpNebJ0VT3LF8QEBcYjQ3wj4O0lkuwLo
+Message-ID: <CABBYNZK_h5_tttq0pJzPF9GOwr-W=e2ssL4dADmiNQuxvzKtZQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1] input: Fix checking LE bonding on HIDP
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 22, 2026 at 10:44=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> This seems to be going sideways:
+Hi Bastien,
+
+On Wed, Apr 22, 2026 at 4:01=E2=80=AFAM Bastien Nocera <hadess@hadess.net> =
+wrote:
 >
-> https://sashiko.dev/#/patchset/CABBYNZ%2Bf3pur4cSsanQ1kvv-yORp2E0qmVLt9si=
-_%2BFnnJup4Ng%40mail.gmail.com
+> On Tue, 2026-04-21 at 16:22 -0400, Luiz Augusto von Dentz wrote:
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > HIDP is classic only, LE uses HOG, so there is no point in checking
+> > the
+> > bonding with the address type which in case the device supports
+> > dual-mode will map to LE random/public address.
+> >
+> > Fixes: https://github.com/bluez/bluez/issues/2034
+> > ---
+> >  profiles/input/device.c | 3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> >
+> > diff --git a/profiles/input/device.c b/profiles/input/device.c
+> > index 6bdc5ee3aaf3..0ee6988c4e90 100644
+> > --- a/profiles/input/device.c
+> > +++ b/profiles/input/device.c
+> > @@ -127,8 +127,7 @@ static int connection_disconnect(struct
+> > input_device *idev, uint32_t flags);
+> >
+> >  static bool input_device_bonded(struct input_device *idev)
+> >  {
+> > -     return device_is_bonded(idev->device,
+> > -                             btd_device_get_bdaddr_type(idev-
+> > >device));
+> > +     return device_is_bonded(idev->device, BDADDR_BREDR);
 >
-> Patch 2/2 seems totally broken.
+> Do we want to do the same in virtual_cable_unplug() in that same file?
 
-Yeah, not a great turn.  I am struggling to figure out where to move
-some of these parts and where to put the guards without touching too
-much.  As Sashiko pointed out, there are some preexisting bugs or spec
-questions that I don't feel like I should be touching unless we expand
-this to more of a cleanup + hardening patch set.
+Yep.
 
-If we break this down, there are now ~5 different issues in
-adjacent/connected spots:
+> Do we also want to apply this to hog_accept() with BDADDR_LE in
+> profiles/input/hog.c ?
 
-Ones I was trying to hit or introduced:
-1. Zero txwin_size in inbound CONFIG_REQ (ERTM RFC) - original bug.
-Need to balance normalization with spec.
-2. Repeated CONFIG_RSP re-running l2cap_ertm_init in BT_CONNECTED -
-original v2 2/2 target.  We need the guard somewhere safe under the
-state model.
-3. Zero txwin_size from userspace setsockopt - original v2 1/2 hunk in
-l2cap_sock.c.
+Not really. In the case of LE you really need to specify the address
+type since there are multiple options: random versus public.
 
-Pre-existing issues:
-3. STREAMING -> ERTM mode switch via late CONF_RSP - pre-existing.
-4. l2cap_sock_setsockopt_old locking - pre-existing.
+> >  }
+> >
+> >  static void input_device_free(struct input_device *idev)
 
-It feels like the safe solution is probably going to be at least +100
-or 200 by the time it's done and more than just a hardening patch.  I
-can take a spin at it, but I will probably be slower and more
-bug-prone than someone else.  No pride of ownership here.  Just let me
-know if you want to take the fix over or let me try again
 
-Thanks,
-MIke Bommarito
+
+--=20
+Luiz Augusto von Dentz
