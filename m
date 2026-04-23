@@ -1,90 +1,112 @@
-Received: from forward500b.mail.yandex.net (forward500b.mail.yandex.net [178.154.239.144])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF283B6BF7;
-	Thu, 23 Apr 2026 16:11:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE38376BD3
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 16:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776960714; cv=none; b=VSwZtjoHqeU4GsvDrF//4+npTeqgYs4w98ez9aP7plxIEbRuBngSgwuZnKZDkz7Ya0C95o+xJYCiM/xKSeytrwlWhb5bKubjEaIMMp3q+fy2qpZVTDIu7DkcBh5JbBxlvkSHsS5fjJKt+Uv5bWcMpoGSDyORJsY3UK1bEsK9E8k=
+	t=1776961446; cv=none; b=Fk/M2pBy7f8x4gWQHq+uPWOe2n+WjPEaJlScsx9zAaUPLnIBxwoT0eiEIzWTCz+0cnNv03Rc+fiAZdg+50LfZkYx0kBmxGBkcgyOhn5Lj9YATsufoMtOvXodFokWerrCrLrmQgA88hrpDd4jW2wX+OXCQablShBCacPYBKaZ57U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776960714; c=relaxed/simple;
-	bh=PK6PUnCOy2lc1tim4ncLk3UjrNeFoUn1JFGnzmLa3lE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TryFbVYHrAmU4GeF6BvXjUe5A87f3ug+v8nP52Zbteaw4QdutAAgbeOziT9cp8Vb1qLHR2RVA9dMcfU9nBIznsFYtyMSPNbE4JXQA2NyItEALntKHiOG5Yomv2OkbyhbjrwOgivcdn3aaFFlj+nM8BeOGBy37sRQ5mD+yXwlxqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=HAzfPSuC; arc=none smtp.client-ip=178.154.239.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+	s=arc-20240116; t=1776961446; c=relaxed/simple;
+	bh=U+KFmt95aVCklt9f5liT8xPIB/iXLBQ9X5Y2xAA1h0Y=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WhpykY+qXuKXe9laOv/kJQX4pHTSkmBLQ1rCnTInuuErA67IZk+G7khKR7zNTRSeFUIC5DlEvvs1Kwu89Sn7HdwewTg0aADwpRKhQ0EOvrd0sSwrBmQuhVOsKiAZRtMFyGyBHI/tsnJesXcDatCAoXGiUhSDkJdvRDL9eDYYksw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nS6W89vj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="HAzfPSuC"
-Received: from mail-nwsmtp-smtp-production-main-55.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-55.sas.yp-c.yandex.net [IPv6:2a02:6b8:c23:1791:0:640:6f9:0])
-	by forward500b.mail.yandex.net (Yandex) with ESMTPS id 993D9C07DE;
-	Thu, 23 Apr 2026 19:03:58 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-55.sas.yp-c.yandex.net (smtp) with ESMTPSA id u3XnlH0SWqM0-0YutV12z;
-	Thu, 23 Apr 2026 19:03:58 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1776960238; bh=YiIUy5NItGtSij5DW5uaHw7aLxvTZq/uCuSi8QxEm7Q=;
-	h=References:Date:In-Reply-To:Cc:To:From:Subject:Message-ID;
-	b=HAzfPSuCszd3LySe/vhp2y4OWw8krw7xWgAP850hAWS2oNPgjXmmCU6scY7SzjenB
-	 jqpf3J6QxtkzbveGJja9TTewgieCQTciPvJh4NVkLR4yAzh+5UG7M4S3i83UhXsCaV
-	 8+7KQEYRbWKDxeJPnDEtRjMYkA479O0LqmqNUUYc=
-Authentication-Results: mail-nwsmtp-smtp-production-main-55.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <65872064c2ab5fbf47a743f2dcd72182ea8296a7.camel@yandex.ru>
-Subject: Re: [RFC PATCH] net: skb: on zero-copy formatted output to skb
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski	 <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org
-Date: Thu, 23 Apr 2026 19:03:56 +0300
-In-Reply-To: <8ed4f473-9c7b-4f77-911c-85cfb2fba2a5@lunn.ch>
-References: <20260423073638.778334-1-dmantipov@yandex.ru>
-	 <8ed4f473-9c7b-4f77-911c-85cfb2fba2a5@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nS6W89vj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C908C2BCB5
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 16:24:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776961446;
+	bh=U+KFmt95aVCklt9f5liT8xPIB/iXLBQ9X5Y2xAA1h0Y=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
+	b=nS6W89vj0JqAP+zMKZnxP9lt6XnAIW+wpC2dm/vaVq/mMjJdNKZn4ttFFXdH/0+IL
+	 uq6I2vCb9GKfgA9QOx1nQAc3Bx/zxcWPOGW95zw+HAxpTEF+Yx3g4w+gwhxiErrM6R
+	 e2mnVXE04VBQWzcr21THDTTJRzx/e7aJL0VF1hipnEMCPZO42ADliQ21FQaZLkVpIx
+	 otyvBGs2myhIt3NuncqRZ6be8OhC8/OTFIyhA02tsBP+DZK3LwAfmESP0o6pzYR94T
+	 IfnFave+z7R8VYKilC+ZSi1djW0Uo+uafXCm2bvl3Kh5jYpr4Wwu7mzbbXwIryk55Y
+	 XC/K7bOvyhWjQ==
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-386b553c70eso56320491fa.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 09:24:06 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+jsKapI5D8rM5eOt2gADv4uhfILfdmc9xRDfXQxVbsRQwJXFQZiof4GkWkKAaipNVpYBkQ9qa5dKtRsuyzwPo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGm810VQOteBVimr1od008Z2jsQv+gHnEDoURajxrUbk53xdWv
+	1bXRvZte75E1qy0QR6CkGVY05rzXTm80WYVQHetNx5tdtmPOQk4nXDfmRfKyQy9nEGugDgnfJTb
+	jJcS9ogJ+Zahfnxd4LP379SkIdXt2MuSx3jSaR7W89g==
+X-Received: by 2002:a05:651c:23d2:20b0:38c:594e:ffd4 with SMTP id
+ 38308e7fff4ca-38ec7af20b4mr66586491fa.25.1776961445086; Thu, 23 Apr 2026
+ 09:24:05 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 23 Apr 2026 12:24:02 -0400
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 23 Apr 2026 12:24:02 -0400
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260422-pwrseq-m2-bt-v1-1-720d02545a64@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260422-pwrseq-m2-bt-v1-0-720d02545a64@oss.qualcomm.com> <20260422-pwrseq-m2-bt-v1-1-720d02545a64@oss.qualcomm.com>
+Date: Thu, 23 Apr 2026 12:24:02 -0400
+X-Gmail-Original-Message-ID: <CAMRc=MfCprFY4QCwEJzbBnROGJzrRE-sRAD89xDxsUsJVfqOiQ@mail.gmail.com>
+X-Gm-Features: AQROBzCFPeFFKBDUBTFbF_d8cAOg-aBLOztoD_JeOpJg9Ts6CIUwK_iUG3b0JI0
+Message-ID: <CAMRc=MfCprFY4QCwEJzbBnROGJzrRE-sRAD89xDxsUsJVfqOiQ@mail.gmail.com>
+Subject: Re: [PATCH 01/12] power: sequencing: Introduce an API to check
+ whether the pwrseq is fixed or controllable
+To: manivannan.sadhasivam@oss.qualcomm.com
+Cc: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>, 
+	linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-pci@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, Wei Deng <wei.deng@oss.qualcomm.com>, 
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, Bartosz Golaszewski <brgl@kernel.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Shuai Zhang <quic_shuaz@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 2026-04-23 at 14:40 +0200, Andrew Lunn wrote:
+On Wed, 22 Apr 2026 13:24:42 +0200, Manivannan Sadhasivam via B4 Relay
+<devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> said:
+> From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+>
+> Introduce an API pwrseq_is_fixed() so that the consumers can check whether
+> the given power sequencer is fixed or controllable. This will come handy
+> in situations where the consumers need to know whether the specific power
+> sequencer like 'Bluetooth' can be controllable using properties like BT_EN.
+>
+> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> ---
+>
 
->=20
-> A quick look in drivers/bluetooth suggests that none of them care
-> about truncation, at least they don't check the return code. Maybe it
-> would be better to truncate than return an error?
+I have several concerns about this new function: its name is very vague and
+doesn't really indicate its function (how is it "fixed" if you still control
+it?), it can be used to expose all kinds of things because of this lack of
+precision. I feel like it goes against the goal of pwrseq which is to abstract
+these things away from consumers.
 
-Hm... I'm not a fan of (silent?) truncation and assume that user who wants =
-to
-detect it should be able to do so. If a (bluetooth) driver, or a subsystem,
-or whatever else, doesn't care too much, it can wrap it with something like
+The problem we have here is for now a HW quirk affecting a single driver. I'm
+thinking that we can live with this driver just checking the relevant property
+of the provider device.
 
-#define bt_skb_printf(skb, fmt, ...)				\
-({								\
-	if (unlikely(skb_printf(skb, fmt, __VA_ARGS__) < 0)	\
-		bt_warn("output to skb@%p truncated\n", skb));	\
-})
+Many subsystems provide functions that allow accessing the struct device
+associated with the provider. Could we introduce something like:
 
-> I would also try to make the behaviour consistent with the normal
-> sprintf(), or snprintf(). You want to give users some idea what it is
-> doing based on its name. It is well known that snprintf() will
-> truncate, and does not return an error code. sprintf() will just
-> overwrite the end of the buffer and not return an error code etc.
->=20
-> However calling this skb_snprintf() would be odd, since you don't
-> actually pass size. But it hints at what it does.
->=20
-> So please add some kerneldoc describing what it actually does.
+struct device *pwrseq_to_device(struct pwrseq_desc);
 
-OK, some more neutral name like 'skb_fmt(...)' may be better indeed.
+that would return the address of struct device associated with the provider of
+the descriptor? It wouldn't even have to return a new reference as holding a
+descriptor already implies also holding a reference to the pwrseq device
+backing it.
 
-> Please also annotate the const char *fmt, so the compiler can do
-> format string checks, parameter counting etc.
+Then in the bluetooth driver you could do:
 
-Surely '__printf(2, 3)' should be used here.
+	struct pwrseq_desc *pwrseq = pwrseq_get(dev, "bluetooth");
+	struct device *dev = pwrseq_to_device(pwrseq);
 
-Dmitry
+	// Big fat comment stating why you do this
+	if (!device_property_present(dev, "enable-gpios")) {
+		// do whatever quirk is required
+	}
+
+Would that make sense?
+
+Bart
