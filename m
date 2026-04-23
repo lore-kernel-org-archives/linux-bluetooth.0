@@ -1,48 +1,76 @@
-Received: from out-31.smtp.github.com (out-31.smtp.github.com [192.30.252.130])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D619368275
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 09:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C912F3DEFF0
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 10:39:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776938186; cv=none; b=sW3uimk+6RRFITAR3mzyJYoUoypquIWYT2fIKv9wLApaDOK5cquzYmHIrUFwhpM0QraJSZKPkgH2vXcXu0G0c2b6LoHThJWpZRQWNoYFgy+4mscrMYVogCz98BnH+OLCZvhczqhgSEztXUFXfFRYCLhcOOyciuIUVWzsQIQH5sw=
+	t=1776940783; cv=none; b=ZRLHSeEhC+cxJBmdxOrqy+oCTcmeUHus2M/+zFhl0Z1JP2oqKzEdUhcSKtZYMSVfJ0rO6+l60oK64gs8K1aOEcTFPsQ5BDva86CC5AAK/OK0Y41oy8ovo2jyz1GcvgB33x0PgilaQ2o2XUmY4Og7ry+7yzu0Fp3r9ST8uY16NVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776938186; c=relaxed/simple;
-	bh=nlihN9q7ZTG22MizOdXvn9HLZ9eAif7T+COKup7YNVM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=J8vpPcx3eZ2XlX0gSre7gC79bxH30SumSEhHdFYMJrAUA8CHK4xYhxDFG170e3B6FljDShqAHRNhd4nFbLEjAg3ZR4qcwi8e2aiNa3Vn/JOCd8q5BggpBHPiOgqvahpbFq0e0AQlQijMbxn84g/4e35C6Ca/UzJy/p46FLJH7nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=C6rXYVRh; arc=none smtp.client-ip=192.30.252.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1776940783; c=relaxed/simple;
+	bh=kq7MfNLwuLXTiZiPVorUHmCI88HVr+aXr9qC7kQ/M9I=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Nse1VSjq4mXJ8Q7Klrx4gv14wfrw4SsziR0jqRqw8PdFaNvrjJaJHVWIiqLTouX1Sc3I3zeZ8IoJVh1OmFWUThi6YIgP+0x2XVGMF75jlTAzArN5aVPTT/qs7F1SbHO44usyfCHQR2kplbnVtHXQB5rw4Welzyevq1N4jWIgXEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=V/uM5l0a; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="C6rXYVRh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1776938184;
-	bh=oEB+bhJLKZAZUbROCAYmeinxIQ50iw2e/i/jVXuRrGI=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=C6rXYVRhyK+ETq2ROzM7of8xQUDydhgljv21ZOx8UWzLtiEDKSneQSZbO4CgtSOyD
-	 iStg38qIOOW+TPPBGZpVl9X9gdHob8EdmLRT7Jr8DMpWbpxigXbkqO339+SF04CZMB
-	 aVjMzJF8fuFvDm5YzQOIGS/+FyFdQOtW/bk9i5ww=
-Received: from github.com (hubbernetes-node-dcefcc5.ac4-iad.github.net [10.52.206.140])
-	by smtp.github.com (Postfix) with ESMTPA id 4739C3226A9
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 02:56:24 -0700 (PDT)
-Date: Thu, 23 Apr 2026 02:56:23 -0700
-From: BluezTestBot <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="V/uM5l0a"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1776940780;
+	bh=kq7MfNLwuLXTiZiPVorUHmCI88HVr+aXr9qC7kQ/M9I=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=V/uM5l0aSK1nKR98tex9f+x4Iw6RNeMrHrifLqrS+MOgFCSZaj0BnSVXurKw/fePT
+	 +rdI7+6idi795orx/uEat7NJTH1hM6H51I9zCVCCBnwwK0iVEa5Z93l2oeZMfFUgRi
+	 O0b7YhHTYEFAe2wUiJMruC/uv/ZjqP4biSz35CX3GOnV/QqHWolQCSnNtirkHPbyTf
+	 BS38Pdd1QqKDkEtKJsf06ZhVGn2QYABqHA0RvMJ0A7CpCt5BRrM9FWSszZDgz2+D2I
+	 0PeOZ1DOYRQLLU58V84VcpuyUrKin5CMQgYPfqhObESrkjQDVvlsBKZ844acHllVe/
+	 wQWorz8eM2b2w==
+Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 1D1EA17E1352
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 12:39:40 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1083418/2a5c70-000000@github.com>
-Subject: [bluez/bluez]
+Subject: [PATCH BlueZ v3 2/3] doc: Add documentation for readwrite CIS transport Links property
+Date: Thu, 23 Apr 2026 12:39:33 +0200
+Message-ID: <20260423103934.22799-2-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260423103934.22799-1-frederic.danis@collabora.com>
+References: <20260423103934.22799-1-frederic.danis@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1083418
-  Home:   https://github.com/bluez/bluez
+This is only supported when bluetoothd is started in testing mode.
+---
+ doc/org.bluez.MediaTransport.rst | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+diff --git a/doc/org.bluez.MediaTransport.rst b/doc/org.bluez.MediaTransport.rst
+index 81cf9e4da..fe69f948b 100644
+--- a/doc/org.bluez.MediaTransport.rst
++++ b/doc/org.bluez.MediaTransport.rst
+@@ -180,6 +180,11 @@ array{object} Links [readonly, optional, CIS only, experimental]
+ 
+ Linked transport objects which the transport is associated with.
+ 
++If D-Bus testing interfaces as been enabled this property is readwrite.
++
++This can be used to manually unlink transport objects by sending empty array.
++Then, each link needs be acquired separately.
++
+ array{object} Links [readwrite, BIS only, experimental]
+ ```````````````````````````````````````````````````````
+ 
+-- 
+2.43.0
+
