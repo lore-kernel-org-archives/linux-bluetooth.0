@@ -1,121 +1,76 @@
-Received: from forward206b.mail.yandex.net (forward206b.mail.yandex.net [178.154.239.151])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F5130C63A;
-	Thu, 23 Apr 2026 07:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A75B322B7D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 07:53:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776930231; cv=none; b=kEnJT2ziC5s7G42AlnsIV8vw9KUj+rHloqWFCUxR2FFsbssjGPezD8cjjGFEa6jxv8EmWbrqNyhXVG8cUPtPxWfZkPDLpIxpwLNa3X8c2rK9SLs3NVZ6/O5p4og7ye6P2TH3OJ4EzD1zne5srw0zChZIgFVHttF2XHkGhurYPAk=
+	t=1776930808; cv=none; b=BKzykiHQKF/+2EHGOGmAydvDT9rkrYuBtgaPViwlkwYGdJYENUratWjkIWMjYRq9+9UeqwenaW/4SYTEd1Rro3At/32VgirK6DUjQgt4jsZALeMA59w9TvgaVSUx9fJ4BHMridrO0XfN5C+Rlif5gk52eOdfbn24NQXxiachkWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776930231; c=relaxed/simple;
-	bh=P+vxiwOcKxAiKsT7+7OxCqfy8g+9CM/8eAsl7KYas3U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CtC9A6V+ykh4BNvtL9TG5EfQVlCX1HVzMBG3AJUlY6gjx8skHUC5jS368mHXfAVvO2YyaF9/eQuwcCA2hd1n9TJmnJ5vXO3yYQhg76JHKwK9ITHge24wWCgciz8HJB5zQSdtjrAKvY+8jYgTcG5nlXRtwH1tAff3AmO2bdVHlQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=TRx9zNhB; arc=none smtp.client-ip=178.154.239.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+	s=arc-20240116; t=1776930808; c=relaxed/simple;
+	bh=kq7MfNLwuLXTiZiPVorUHmCI88HVr+aXr9qC7kQ/M9I=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iKEq8hORvvBV1guJoU8WKMce869yYvr62GItVVkhjoG8v9gihKDBbs7bVJh7J+FxJQ95wzcLKTUpfLPVQHqqXHu374vWTj8PngFTrN31+2v5npOkFZocaJk5oQkBB3V3IxBghKYhPfzOYrXFCgHQOM92noMcx3ayUwgVJceB8/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=HmZRkcEc; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="TRx9zNhB"
-Received: from forward103b.mail.yandex.net (forward103b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d103])
-	by forward206b.mail.yandex.net (Yandex) with ESMTPS id 0032A8156B;
-	Thu, 23 Apr 2026 10:37:19 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-85.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-85.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:2a2c:0:640:49cf:0])
-	by forward103b.mail.yandex.net (Yandex) with ESMTPS id EB58EC00B2;
-	Thu, 23 Apr 2026 10:37:10 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-85.iva.yp-c.yandex.net (smtp) with ESMTPSA id 8bONsJ0R3qM0-eRRRhrMu;
-	Thu, 23 Apr 2026 10:37:10 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1776929830; bh=wRLZkxFG2PlbFAjzQxBRAMljhGrOcvfkXIl4TIN3Ymg=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=TRx9zNhBWGLCDmAKVOOq96F8N2Q0AbnwjFR1Bj6Pq91TULHcWn619p+tZzIWOygA9
-	 9n7qEUbZrpefIJ7Iz7RlruH6lr3hyf/RBuKXXcsanjsa3xL4EcbaxoDBupa1g+xRTe
-	 MiByypAX0uoAXGaJObFzJRvTQ1YHmssM/RjJLdW0=
-Authentication-Results: mail-nwsmtp-smtp-production-main-85.iva.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	Dmitry Antipov <dmantipov@yandex.ru>
-Subject: [RFC PATCH] net: skb: on zero-copy formatted output to skb
-Date: Thu, 23 Apr 2026 10:36:38 +0300
-Message-ID: <20260423073638.778334-1-dmantipov@yandex.ru>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="HmZRkcEc"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1776930800;
+	bh=kq7MfNLwuLXTiZiPVorUHmCI88HVr+aXr9qC7kQ/M9I=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=HmZRkcEcoQrIBg5OZ5TmAcCIZWPjRfQObElfCxHN1qWXrw82VBz4YjDXqO+mWNS5T
+	 +4LmXUcgK31AhwFGGCp8bFAs/6wdc9iyp8CQlNmg/EN79f9Af1TWxnmD7k0LDnYI82
+	 aX97hkeq7tIuR7hkRX+RXPOBONOxKqjyo9RRfd8LiIy0m5vqoIcAPbIj8qrIcadnmm
+	 NOjQoCmFMBoxJEzzVDwsHYV0bVDHnCBUQ9/IrX/CCJjU6n9tOjXYuUStjf/t5g2RdE
+	 MvOJRK+G1DnbEIwpup0eK9iN/qYgDUW6ouYf5X45b1TxSmrzMBGM6jy6lb7Vv+O4z/
+	 nhkz/4wwL/JYg==
+Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 2460617E13D6
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 09:53:20 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 2/3] doc: Add documentation for readwrite CIS transport Links property
+Date: Thu, 23 Apr 2026 09:53:08 +0200
+Message-ID: <20260423075309.493820-2-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260423075309.493820-1-frederic.danis@collabora.com>
+References: <20260423075309.493820-1-frederic.danis@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Some code, most notably the Bluetooth drivers, uses something like
-the following:
-
-char buf[80];
-snprintf(buf, sizeof(buf), "Driver: %s\n", driver_name);
-skb_put_data(skb, buf, strlen(buf));
-
-This looks suboptimal at least because:
-
-1) It yields in BUG() just in case the developer underestimates
-   the size of an skb being used;
-2) It requires extra data copy from an external buffer;
-3) It uses 'strlen()' redundantly because actual data length
-   is calculated by 'snprintf()' itself.
-
-So introduce 'skb_printf()' which aims to address all of these
-issues. As usual, thoughts and comments are highly appreciated.
-
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+This is only supported when bluetoothd is started in testing mode.
 ---
- include/linux/skbuff.h |  1 +
- net/core/skbuff.c      | 18 ++++++++++++++++++
- 2 files changed, 19 insertions(+)
+ doc/org.bluez.MediaTransport.rst | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 2bcf78a4de7b..fb4ef55a8f86 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -4292,6 +4292,7 @@ int skb_mpls_update_lse(struct sk_buff *skb, __be32 mpls_lse);
- int skb_mpls_dec_ttl(struct sk_buff *skb);
- struct sk_buff *pskb_extract(struct sk_buff *skb, int off, int to_copy,
- 			     gfp_t gfp);
-+int skb_printf(struct sk_buff *skb, const char *fmt, ...);
+diff --git a/doc/org.bluez.MediaTransport.rst b/doc/org.bluez.MediaTransport.rst
+index 81cf9e4da..fe69f948b 100644
+--- a/doc/org.bluez.MediaTransport.rst
++++ b/doc/org.bluez.MediaTransport.rst
+@@ -180,6 +180,11 @@ array{object} Links [readonly, optional, CIS only, experimental]
  
- static inline int memcpy_from_msg(void *data, struct msghdr *msg, int len)
- {
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 7dad68e3b518..051ab4f28c75 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -6992,6 +6992,24 @@ struct sk_buff *pskb_extract(struct sk_buff *skb, int off,
- }
- EXPORT_SYMBOL(pskb_extract);
+ Linked transport objects which the transport is associated with.
  
-+int skb_printf(struct sk_buff *skb, const char *fmt, ...)
-+{
-+	int len, size = skb_availroom(skb);
-+	va_list args;
++If D-Bus testing interfaces as been enabled this property is readwrite.
 +
-+	va_start(args, fmt);
-+	len = vsnprintf(skb_tail_pointer(skb), size, fmt, args);
-+	va_end(args);
++This can be used to manually unlink transport objects by sending empty array.
++Then, each link needs be acquired separately.
 +
-+	if (unlikely(len >= size))
-+		return -ENOSPC;
-+
-+	skb->tail += len;
-+	skb->len += len;
-+	return len;
-+}
-+EXPORT_SYMBOL(skb_printf);
-+
- /**
-  * skb_condense - try to get rid of fragments/frag_list if possible
-  * @skb: buffer
+ array{object} Links [readwrite, BIS only, experimental]
+ ```````````````````````````````````````````````````````
+ 
 -- 
-2.53.0
+2.43.0
 
