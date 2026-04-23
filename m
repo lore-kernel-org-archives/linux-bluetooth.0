@@ -1,112 +1,81 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE38376BD3
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 16:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA16632C937
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 16:40:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776961446; cv=none; b=Fk/M2pBy7f8x4gWQHq+uPWOe2n+WjPEaJlScsx9zAaUPLnIBxwoT0eiEIzWTCz+0cnNv03Rc+fiAZdg+50LfZkYx0kBmxGBkcgyOhn5Lj9YATsufoMtOvXodFokWerrCrLrmQgA88hrpDd4jW2wX+OXCQablShBCacPYBKaZ57U=
+	t=1776962444; cv=none; b=LW7/A+xAHgP6JlaGq4dlAZGM5Jwl9urOljKBrWSZeWaxTHBv8BQ0h0R1QHLoYihpuqy6+hrlAm15b1DGg9eDJ68ut1QFY+7Allo8cLd4UZeYjUQfA5i+IeVQsKSqOueWS2OeV0vwUs6+M4mM5sLEWBss5Ov80a1CJKKDZ/IFcm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776961446; c=relaxed/simple;
-	bh=U+KFmt95aVCklt9f5liT8xPIB/iXLBQ9X5Y2xAA1h0Y=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WhpykY+qXuKXe9laOv/kJQX4pHTSkmBLQ1rCnTInuuErA67IZk+G7khKR7zNTRSeFUIC5DlEvvs1Kwu89Sn7HdwewTg0aADwpRKhQ0EOvrd0sSwrBmQuhVOsKiAZRtMFyGyBHI/tsnJesXcDatCAoXGiUhSDkJdvRDL9eDYYksw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nS6W89vj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776962444; c=relaxed/simple;
+	bh=kDBUIeTFSsEkTg1FuFd8wRN6AA7HfTaWwWZuHISpyHk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rOYZ85mDkk56yOpWP8GKSpLL+Ern6LVW2eI/hMqhbYVq9tdMlecpuuHsoFc8iwTuAfLTJ1V5sllaiT5ySvIT/YRHLMme/8H7dCoyEjo+0F1P103LRNb+Jp891QuOMj4lM2wjK8Vag2G3ckm5H5TkUGxkC0jChc+ickGXKIzRlss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rliQLYLS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nS6W89vj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C908C2BCB5
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 16:24:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rliQLYLS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E6DAC2BCAF;
+	Thu, 23 Apr 2026 16:40:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776961446;
-	bh=U+KFmt95aVCklt9f5liT8xPIB/iXLBQ9X5Y2xAA1h0Y=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
-	b=nS6W89vj0JqAP+zMKZnxP9lt6XnAIW+wpC2dm/vaVq/mMjJdNKZn4ttFFXdH/0+IL
-	 uq6I2vCb9GKfgA9QOx1nQAc3Bx/zxcWPOGW95zw+HAxpTEF+Yx3g4w+gwhxiErrM6R
-	 e2mnVXE04VBQWzcr21THDTTJRzx/e7aJL0VF1hipnEMCPZO42ADliQ21FQaZLkVpIx
-	 otyvBGs2myhIt3NuncqRZ6be8OhC8/OTFIyhA02tsBP+DZK3LwAfmESP0o6pzYR94T
-	 IfnFave+z7R8VYKilC+ZSi1djW0Uo+uafXCm2bvl3Kh5jYpr4Wwu7mzbbXwIryk55Y
-	 XC/K7bOvyhWjQ==
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-386b553c70eso56320491fa.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 09:24:06 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ+jsKapI5D8rM5eOt2gADv4uhfILfdmc9xRDfXQxVbsRQwJXFQZiof4GkWkKAaipNVpYBkQ9qa5dKtRsuyzwPo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGm810VQOteBVimr1od008Z2jsQv+gHnEDoURajxrUbk53xdWv
-	1bXRvZte75E1qy0QR6CkGVY05rzXTm80WYVQHetNx5tdtmPOQk4nXDfmRfKyQy9nEGugDgnfJTb
-	jJcS9ogJ+Zahfnxd4LP379SkIdXt2MuSx3jSaR7W89g==
-X-Received: by 2002:a05:651c:23d2:20b0:38c:594e:ffd4 with SMTP id
- 38308e7fff4ca-38ec7af20b4mr66586491fa.25.1776961445086; Thu, 23 Apr 2026
- 09:24:05 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 23 Apr 2026 12:24:02 -0400
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 23 Apr 2026 12:24:02 -0400
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260422-pwrseq-m2-bt-v1-1-720d02545a64@oss.qualcomm.com>
+	s=k20201202; t=1776962444;
+	bh=kDBUIeTFSsEkTg1FuFd8wRN6AA7HfTaWwWZuHISpyHk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=rliQLYLSwy4A4oAZs9eDZOHiToJ5tad3a8uoWwUfwI8b0zueUffE3vJE1aiNoNMVN
+	 BCNeDg4HEnmEM2cVFyDcyMf05sqALQUEHAdaTTb8asoKXmuXQlNhT6Iy/3ZBaVUY+9
+	 q2qQFiZWjUhWdf4r63k3EKW3n8dzSWLdpf+JF1HzkjzSGd/RdxQGNR9TabkUEdjKSB
+	 tQEURMuuz1mklacs2+TsTJDWsOEOAr8Yrry2QalmxeILTGOyQ1mPXRZdFR48GWoTOX
+	 PuR43o6XjsdhOoLKdKAXeo8iarlfdedOq7cOF89m2bpHLcQkQTGqDwI9GetWd8bIhT
+	 2Nf9YKlDOfNBA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02F0938111CE;
+	Thu, 23 Apr 2026 16:40:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260422-pwrseq-m2-bt-v1-0-720d02545a64@oss.qualcomm.com> <20260422-pwrseq-m2-bt-v1-1-720d02545a64@oss.qualcomm.com>
-Date: Thu, 23 Apr 2026 12:24:02 -0400
-X-Gmail-Original-Message-ID: <CAMRc=MfCprFY4QCwEJzbBnROGJzrRE-sRAD89xDxsUsJVfqOiQ@mail.gmail.com>
-X-Gm-Features: AQROBzCFPeFFKBDUBTFbF_d8cAOg-aBLOztoD_JeOpJg9Ts6CIUwK_iUG3b0JI0
-Message-ID: <CAMRc=MfCprFY4QCwEJzbBnROGJzrRE-sRAD89xDxsUsJVfqOiQ@mail.gmail.com>
-Subject: Re: [PATCH 01/12] power: sequencing: Introduce an API to check
- whether the pwrseq is fixed or controllable
-To: manivannan.sadhasivam@oss.qualcomm.com
-Cc: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>, 
-	linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-pci@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, Wei Deng <wei.deng@oss.qualcomm.com>, 
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Shuai Zhang <quic_shuaz@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v11 0/3] Add initial Channel Sounding support for
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <177696240555.664628.12018499209882369582.git-patchwork-notify@kernel.org>
+Date: Thu, 23 Apr 2026 16:40:05 +0000
+References: <20260421113148.3809176-1-naga.akella@oss.qualcomm.com>
+In-Reply-To: <20260421113148.3809176-1-naga.akella@oss.qualcomm.com>
+To: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+ quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
+ quic_anubhavg@quicinc.com, prathibha.madugonde@oss.qualcomm.com
 
-On Wed, 22 Apr 2026 13:24:42 +0200, Manivannan Sadhasivam via B4 Relay
-<devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> said:
-> From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
->
-> Introduce an API pwrseq_is_fixed() so that the consumers can check whether
-> the given power sequencer is fixed or controllable. This will come handy
-> in situations where the consumers need to know whether the specific power
-> sequencer like 'Bluetooth' can be controllable using properties like BT_EN.
->
-> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> ---
->
+Hello:
 
-I have several concerns about this new function: its name is very vague and
-doesn't really indicate its function (how is it "fixed" if you still control
-it?), it can be used to expose all kinds of things because of this lack of
-precision. I feel like it goes against the goal of pwrseq which is to abstract
-these things away from consumers.
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-The problem we have here is for now a HW quirk affecting a single driver. I'm
-thinking that we can live with this driver just checking the relevant property
-of the provider device.
+On Tue, 21 Apr 2026 17:01:45 +0530 you wrote:
+> This patch series introduces initial support for Bluetooth Channel
+> Sounding (CS) using the raw HCI interface.
+> This series lays the groundwork for CS support by adding commonly required
+> protocol definitions, configuration parsing, and event handling for
+> the reflector role.
+> 
+> The changes include:
+> 
+> [...]
 
-Many subsystems provide functions that allow accessing the struct device
-associated with the provider. Could we introduce something like:
+Here is the summary with links:
+  - [BlueZ,v11,1/3] shared: rap: Introduce Channel Sounding HCI raw interface support
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d9da103fd1a2
+  - [BlueZ,v11,2/3] main.conf: Add Channel Sounding config parsing support
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=55262e1a2ccf
+  - [BlueZ,v11,3/3] profiles: ranging: Add HCI LE Event Handling in Reflector role
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=868b9e3745dc
 
-struct device *pwrseq_to_device(struct pwrseq_desc);
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-that would return the address of struct device associated with the provider of
-the descriptor? It wouldn't even have to return a new reference as holding a
-descriptor already implies also holding a reference to the pwrseq device
-backing it.
 
-Then in the bluetooth driver you could do:
-
-	struct pwrseq_desc *pwrseq = pwrseq_get(dev, "bluetooth");
-	struct device *dev = pwrseq_to_device(pwrseq);
-
-	// Big fat comment stating why you do this
-	if (!device_property_present(dev, "enable-gpios")) {
-		// do whatever quirk is required
-	}
-
-Would that make sense?
-
-Bart
