@@ -1,150 +1,287 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E2430F545
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 14:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776953249; cv=pass; b=Wqc8DbLrKiew4PMRCOa7BnUoS6yl/Ez8tQIzWfXvYFVhQJWuzI034MLiRJh5006docEPDcprtQpGMQGf68GoSgfw3FJ+UYQYC39SKMsjpvViE6QvwWzrhunj55dSlwtYh+xgOZZBTZEZnC75dcPCudK6f0mcSf/M+sFPcK0Z7fE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776953249; c=relaxed/simple;
-	bh=vdEgnQ7UYncJPIweIDG0txiZ1qkftEmzo9ZKETJ59o0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mRwfPKhsWXYfFiJ3zSZ/K0Q+TDaLAxKE8HPUWoDHNnwrXDprStjzeYNp+g33FfaATefyI7/lcTvaBWu+jYaS7zVFic7ft2XuEhlMYIDpIZ9atoLJPArY6AO6c4o3/ADq5D0C+8NB7YRdhXw/shmRAb8qbyjkDqoXnrgmXYbssyg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s/jVyTsG; arc=pass smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F2877F39
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 15:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776956704; cv=none; b=Nn+EaFIfgLAff9ZjgA/nsIXv8GeOWkYKJPjoWBvCnkdSrth4wIChORO6x5twcC4dmTUX5T4RyhdC5jqyA+r4DBE54bls4psraTyO5c4l1v54Ly7OORLN7wR1egxKsMGbGZmwHsHgMbb1jaamheWnBEyeRn3OCP6PKa3MfT8NOA0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776956704; c=relaxed/simple;
+	bh=RDCvIzR0C5V1KSLLcEoLbzrIGprQJwA3D2bXbAJbTtA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PWJVZmueiMb7JAFqsbaQpGffZe3Rnj0PGZ3sXzteed2CzhTPQtXpQa2y3ww3DNH9Hb/8tHpttDdEJsy1q1r5OVqOeuu5pI/MgL2XhWUnAEBkR24Gx+C8SxlRoA6IS/9rQwcKhQ3oxzwnLrURlDr9P6ESn3iS/pXuCYnogagMAx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ekjeQ6TF; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=DluYLAdR; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s/jVyTsG"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-8acb856a674so80285726d6.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 07:07:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776953247; cv=none;
-        d=google.com; s=arc-20240605;
-        b=QTed2E9OE8pDf+WX6xWLlE9FjiInNnXmQphEn5I4cC1ddYnGHs92I1j3lh9Pa7k2ZV
-         OZO0GCoCK5N1IxS5d/fQnWauf+ndSo2lRHRVMrk1LouixqJ46LYLfBGYqAWCKR4Xk10g
-         6kOPS9dCg1bCdowulZxHka+ajEF/S30x2L2BAl2tWW5Epf79VuRY7RWm8Cf4cBWj5tQG
-         GBTfqM8/lBLVJRv3j/jjT0xnPrC9t3/mbYB6LwToqrQGM/QNjiJKj9r9K73l3LR7KB6F
-         Jz8FYwDJd317NHD+C9S4Cc47FYQkiLZux60H33W43gecxKtlIPc3YnT1Zwl+ySGixDEw
-         t1xA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=YnWvO7yjwrQhs9Z8T4RkhOyGwxBUSEXUTTKsZ/p4eKo=;
-        fh=M5DeAsNZEqPjbPGv+A8ausvCO2XN0fCZSIjXzTQbuKc=;
-        b=P3gVogUvXC5s1u4bQP9b94CzFAeID3t0OTPVX/m2FXb3flXfdoY6nHKzp6pl0TUDMj
-         EgyLmA7igsR9YBSyZc2V0lvEl6z+hldpIKDf6DT8R8Z0ZjcmOBVz2HrSwJ1H4qpis3Z9
-         KJJM01AAmUzaQoL4Iu1qgDW8MUcQzsxDbfr/UF2bYC3Gu6Sz8V8DqHhS3YKF/YZh5Ilp
-         5GL3C4DkyCPX80RQLPrE/c2F8tVQyF0UVlJZj52S7SInOp6UcjNYZPzcs/MHXudNNr8U
-         wpLoqQclhNODLkRJxnsFUmOl3HaFru6Njze7TJUvWyraEqxz45vSCzQyFrCRejXhtFWa
-         Iwfw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ekjeQ6TF";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="DluYLAdR"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63N8uLnj987849
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 15:05:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=TWUxBXVIDSnMVWoVsXYsVs0E45IKnn9F0Cm
+	97sUnxpE=; b=ekjeQ6TFPXLs+gaouv6FK7h/yJh+kwwd3DSZsyj+7xKCaFQoTuF
+	59VlCYDNalTwfIbPEH12gJSEVLf0KsRUdWfM03kZ+biY6hkPPmHcI3vceLPCWDMS
+	TRN/dA6ACMkNzpQkHguYwNm+UZlplZTIKZwj58I7GomRjDd+E9DubzwAaqZ84Q/y
+	p4DxY5WZCNeDpIKezFKxDb8u+NLdxd+g78xhFb4DMmYjsuo6CEOOAEPzOm9kr62q
+	Cgwl0e6UL2oat8vLWiATYmkWUyp3RfXM64DrAlrgESDCW5Fi7IkiYSBHoDdWeV6Q
+	4IVyPj25vNCabMMAcM1Vh0PiLhxcRBGdnXA==
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dq16q4j2m-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 15:05:01 +0000 (GMT)
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c70ea91bfe1so3349513a12.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 08:05:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776953247; x=1777558047; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=YnWvO7yjwrQhs9Z8T4RkhOyGwxBUSEXUTTKsZ/p4eKo=;
-        b=s/jVyTsGiyxgRH6irkrvazOlJ8hh77TwqdWVTqJOHk2RZbYFY7lA+SMJiqQluWOsGW
-         Qhm5sYAM1+wsa2rtVMJpgR8T1CmU/vi4uOBwc+GEa52TceRDn3BBIdkxbehMpvh/fT6v
-         0DWm5GXz4PUxaV6T/o5Ne+sVqRrO4w3sYF/L4X/kiCltCTJG2/KxqqNc4DK8JDMm6xQh
-         JhP116cS8NGI3wkJBQf3YDB4HGdpLweTYgK4uQ9YQOrzX9ksUciNoux3TxJfEtsIGKHf
-         oZq0RhuCFWik05NjL0PNis2pMAMCYf0yIVwybcPtg9EPM6osIPCfHIKENbr2BfoNB8kC
-         YKzA==
+        d=oss.qualcomm.com; s=google; t=1776956701; x=1777561501; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TWUxBXVIDSnMVWoVsXYsVs0E45IKnn9F0Cm97sUnxpE=;
+        b=DluYLAdRrCcpTwJuNvAXpjd2GIAziGzCiGCxWWheDe750EbcuOiNwNJsNeRgOsEu2N
+         dGCeBve7SfPROqFGhdufiOr97wjjmcLx23mksw3qkKEOmCbOyo00LDms2UYzWi+6NBpO
+         YHUsMVCAxMWrdzud4B2WPDth9ST6u8RggoqznGPsV2aIqSxnJvmQkykIZdeHXxEtKrES
+         Tj0XaniMu+Ilc59dXy2vNfRAYhmItapBV3atackFvn6YwoD96jN1QzOvfEfzyBLJbxkj
+         Woi4CBfXlyDwhjunS/l65/CMzl+z6ehZUBbDT4FM/7zNTvl+VDrJ+RJHVx5noP08tYIb
+         BDgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776953247; x=1777558047;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1776956701; x=1777561501;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YnWvO7yjwrQhs9Z8T4RkhOyGwxBUSEXUTTKsZ/p4eKo=;
-        b=PwCuPATwgDsdIGqiP5NZRky2AckWEvTHYNE6BvVWOXAq4b5NvvgwXKIC6F5QwwSfti
-         UXsr3PukCIRM4vBEg+6sRr0xbJ3X1vp/2gov80LZJr3Fymyi6+6n+5lBYd8MttTnk1qm
-         ViJ8OuRLo6ZJ7+I2qcZjfVrANzB08MwQ3Ywj/+57IrI16/lbdCxqnf4QXfoIkNeVto2a
-         tU/XBz+1Bu1gb86IW8s+QCrmYgnc3mV1G1al4oiQ+tFl4yET3fzEXZE+rpY3+736VpM+
-         PKC4oCcnJG8uZZJm8TbNnz3QCYgFxuq4BGS53/WREkAONgzA6tXQkErm0AgVO/8q1VhF
-         WMZg==
-X-Forwarded-Encrypted: i=1; AFNElJ+fNoXbpE4Df1teLJXlQvzuoXilp0fAcZayU/roRt6FWo46yGzDSU7/oQqUGBvOAb6PNwsUF/yS0rtGVdv1dYE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKyvuxMtFG9oKUDtWrmUpjSiFIfQZ0bqH5aVLwITs2NPbCMtq1
-	a9Fv28mUxDeFdzDTllMu9SM26Rjos8gCzxw9eXzOhFNIVA2jymqvExz3q/RN/qmLfVxKIwb+Jcr
-	orAVHKeY39iUwxoc69cTlRUKXWE9Bb3g=
-X-Gm-Gg: AeBDietp2gzzblhz3i3dEYEEmWdmZlX6roYm6awTvRB39uNCgoCYBLFlBQr+32cA7gm
-	pQVuTaraUuAhK7lvSQKYwx1k3THb3xyVE11YUpg+nTwoKusEYr1ncLFfoLaffVexhaaUSvDUScJ
-	UkXVzhV4eoQk04SyZ4O95eGPIzOkFbt58h0wGsTNGv1dnE0ze7TLM9VfJ5lBEiwTotSlQwEsix2
-	h25Kd+SZlJTu9IzrkMJp9hKSee5QTWn7P3Bg1PBIjMMKfnCAeImPPGAXWgZCIPkMmXi1RjRKRXR
-	Rn/bccbruh2Z+w==
-X-Received: by 2002:a05:6214:5505:b0:89c:cb57:6227 with SMTP id
- 6a1803df08f44-8b028565f9fmr389605626d6.12.1776953247144; Thu, 23 Apr 2026
- 07:07:27 -0700 (PDT)
+        bh=TWUxBXVIDSnMVWoVsXYsVs0E45IKnn9F0Cm97sUnxpE=;
+        b=EGYL9VoMFI9TCOVPT10mMLv9VVxc/W9wDtQjt6YMprHenR06rL4kwnLM3BRJESUfJQ
+         l/cABZKstDNIzEt7HlVLv9VYNxIy08r8rK796ip7LJNXGaIhi7WKUS9QPT1IJDd3S6oM
+         TeE63jqzOKS0kDuZnr+mfBqo9aM2+WEG6LmPmMcbnKSZESFxfCKyD0t0N3LbWPrry7UZ
+         mwfU7bxRtDslf3cDkuTm43C8liMk69DoVAok1j/jN6ZVag7Lr91LZso+ouhC5B6G7RLZ
+         T5b32oq9dB4zuz4BbR4wqIZ6YRSfeItxjRV1oUAC0L9Nzz8cprcvhLupCWLbLttJJ6so
+         z+5Q==
+X-Gm-Message-State: AOJu0YyI5i10LEHqH4SFGqqxWoz+VXUAJhQs+hvZ7o16eKqu98/Xcbn2
+	awAh/bjdpOy4f0mJDQQinrXVfqT30PXkc6Si8JLc7TtBiQZvQPG/Ll4MzuI0My5AMRuWobVD1TU
+	8WXURSdFhaZo+TaBTkrKZiDFKZb4K7+SuASw5yhFfXebPUriaD9QFMQQBDadXu7kW1deX5OE7l+
+	CH2ws=
+X-Gm-Gg: AeBDiev3nG7xH6EapsS8aCWn4YgeSjsSqi4QA3a063Ffv8Z2CSMLBpbTfP01GssFQ/d
+	QuuTSFi8Ukvu2DQIy1D5nr0x8g9GzoglJ7Sm5THZmoZ64+BcCwZzJ9PR11n0QkjcFtPc+tvbXdo
+	9EO9CSxCG0xbr9RYwcawo8fHghY8lJM5Hh/cIb/ri74/rhyGCMQvO5Avdc/QLbxvtgNOvu5VhYD
+	nN1cmS2bGAHL6rNxLsW8AUSliLkrL1ifJmpAOWw7HlXvNAygOXiii1sluI5xi+n65Dup65n7/KL
+	vp13rPLkw+WSXprf39HVLe35W5pIvX374QhbQqO63xgU+Vkp4gXQGWkMJR/4DNOkdIkE5E5ELT1
+	6efNM8LUFvK94GUiLvtv9qmYnavRHZi1Py+5hGnSPTmJGNSp0RTGAqw==
+X-Received: by 2002:a05:6a20:7fa2:b0:398:9662:10ff with SMTP id adf61e73a8af0-3a08d687750mr32397562637.4.1776956700590;
+        Thu, 23 Apr 2026 08:05:00 -0700 (PDT)
+X-Received: by 2002:a05:6a20:7fa2:b0:398:9662:10ff with SMTP id adf61e73a8af0-3a08d687750mr32397457637.4.1776956699804;
+        Thu, 23 Apr 2026 08:04:59 -0700 (PDT)
+Received: from hu-prathm-hyd.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c79770587c1sm15847466a12.32.2026.04.23.08.04.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Apr 2026 08:04:58 -0700 (PDT)
+From: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
+X-Google-Original-From: Prathibha Madugonde <prathm@qti.qualcomm.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
+        quic_anubhavg@quicinc.com
+Subject: [PATCH BlueZ] src/shared: implement custom CCC callbacks for intercepting client notification subscriptions
+Date: Thu, 23 Apr 2026 20:34:54 +0530
+Message-Id: <20260423150454.1908352-1-prathm@qti.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260219171310.118170-1-aha310510@gmail.com> <2026042355-blighted-chewing-5e50@gregkh>
- <CAO9qdTE0NhB58hqK8_1=69bD7uG_vF-FfpQXGR8dqcuWV4H2Mw@mail.gmail.com> <2026042327-wackiness-purify-09c2@gregkh>
-In-Reply-To: <2026042327-wackiness-purify-09c2@gregkh>
-From: Jeongjun Park <aha310510@gmail.com>
-Date: Thu, 23 Apr 2026 23:07:14 +0900
-X-Gm-Features: AQROBzCIjy63kF1LW75_LGFH4-N7i7woPyvD8ToIg_JgdzxbdpkrD0vUqxkoZkY
-Message-ID: <CAO9qdTGQPoMdh6ds6LFWEDtPSnjWEM746mrpfaVfxi8LBtckwQ@mail.gmail.com>
-Subject: Re: [PATCH 5.10.y 00/15] timers: Provide timer_shutdown[_sync]()
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: stable@vger.kernel.org, tglx@linutronix.de, Julia.Lawall@inria.fr, 
-	akpm@linux-foundation.org, anna-maria@linutronix.de, arnd@arndb.de, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux@roeck-us.net, luiz.dentz@gmail.com, marcel@holtmann.org, maz@kernel.org, 
-	peterz@infradead.org, rostedt@goodmis.org, sboyd@kernel.org, 
-	viresh.kumar@linaro.org, zouyipeng@huawei.com, linux-staging@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Authority-Analysis: v=2.4 cv=KPNqylFo c=1 sm=1 tr=0 ts=69ea351d cx=c_pps
+ a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22 a=EUspDBNiAAAA:8
+ a=YFgapOvgPKZBqhaLY10A:9 a=x9snwWr2DeNwDh03kgHS:22
+X-Proofpoint-GUID: EGS15OzjcHmOxJ2s_0FKFkxeLznaOwnm
+X-Proofpoint-ORIG-GUID: EGS15OzjcHmOxJ2s_0FKFkxeLznaOwnm
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDIzMDE1MCBTYWx0ZWRfXzrWmug+2UN7W
+ jtHbgP0OKZVladX+4xdOzKasnm9sCXTlQNUfDuxkkYlChkfFlR6SSsRT8MYX9GTStZS2Pjh0KoD
+ 0PLeN/Ust6GBEV5rwXYTMRoyYd53bGcTe7151079k6BkoTudTOVx5YFBzQ4bSpEdH4ff3dDLXmt
+ Tm/30moEtGqRq+AGHQFZHJsPyP++Xw2e7gF2pT65PkVx8y9I2mCfvOZaorcxiGMlxEekPy9h6dV
+ M/0KFs/q84Qy8ak9iWdnV/cEfOOHgpjsJL4MHLDRmzc76nz/Z1O04Cy2eSahb/czrJs5hFgF1HQ
+ wG6xjvoAg9qfMwKOSq/hqlcwLc/LaKJ+iB9/argf7cQfrhQrkPyl8NVur5OdQ3hnSA+kTpH45c2
+ PMRggr1PpRsrjw4HXrVMSx4FMEeIgAMefv6mSDS9wRY3hhNrtnwawVUi3Ybm0f+78aupYid/kk9
+ bVuGJ8pVo+2bEVFVWWQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-23_03,2026-04-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 clxscore=1015 malwarescore=0 bulkscore=0
+ priorityscore=1501 suspectscore=0 spamscore=0 adultscore=0 phishscore=0
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
+ definitions=main-2604230150
 
-Greg KH <gregkh@linuxfoundation.org> wrote:
-> > >
-> > > Ugh, I got the following build error for this series:
-> > > ../drivers/misc/sgi-xp/xpc_partition.c: In function 'xpc_partition_disengaged':
-> > > ../drivers/misc/sgi-xp/xpc_partition.c:294:25: error: implicit declaration of function 'del_singleshot_timer_sync' [-Werror=implicit-function-declaration]
-> > >   294 |                         del_singleshot_timer_sync(&part->disengage_timer);
-> > >       |                         ^~~~~~~~~~~~~~~~~~~~~~~~~
-> > >
-> >
-> > Oh dear. This issue occurred because commit 997754f114ef ("misc/sgi-xp:
-> > Replace in_interrupt() usage") was merged into version 5.11-rc1 and was
-> > therefore not backported to 5.10.y.
-> >
-> > Since this is a simple fix that only requires adding this commit to this
-> > patch series, I will quickly write and send you the v2 patch.
-> >
-> > https://lore.kernel.org/all/20201119103151.ppo45mj53ulbxjx4@linutronix.de/
-> >
-> > >
-> > > Don't know what happened, but I'll go and drop them all now.
-> > >
-> > > Do you _REALLY_ need these in the 5.10.y kernel?  Who is going to use
-> > > them?
-> > >
-> >
-> > You might think it is unnecessary, but I have seen bug patches related to
-> > timer_shutdown[_sync]() being backported after I backported it, and I
-> > believe it is well worth backporting if this feature allows various
-> > bug-fixing patches to be backported smoothly.
->
-> So you don't have a specific issue you are hitting with this patch set
-> that you want to have it here for?  It can't be for android devices, as
-> this patch series will be reverted from that tree, just like it was for
-> the 5.15.y Android trees, so what systems require it?
->
+From: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
 
-I am not backporting because it is absolutely necessary for Android or a
-specific system.
+---
+ src/shared/gatt-db.c | 119 ++++++++++++++++++++++++++++++++++++++++++-
+ src/shared/gatt-db.h |   4 ++
+ 2 files changed, 122 insertions(+), 1 deletion(-)
 
-https://lore.kernel.org/all/20251007155808.438441-1-aha310510@gmail.com/T/#u
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index d0e149d6f..87cc61cf3 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -1214,6 +1214,112 @@ gatt_db_service_add_ccc(struct gatt_db_attribute *attrib, uint32_t permissions)
+ 	return ccc;
+ }
+ 
++static void ccc_custom_read(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, struct bt_att *att,
++					void *user_data)
++{
++	struct gatt_db *db = attrib->service->db;
++
++	db->ccc->read_func(attrib, id, offset, opcode, att, db->ccc->user_data);
++}
++
++static void custom_write_result(struct gatt_db_attribute *attr, int err,
++							void *user_data)
++{
++	int *result = user_data;
++
++	*result = err;
++}
++
++static void ccc_custom_write(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					const uint8_t *value, size_t len,
++					uint8_t opcode, struct bt_att *att,
++					void *user_data)
++{
++	struct gatt_db_ccc *data = user_data;
++	struct gatt_db *db = attrib->service->db;
++	struct pending_write *p;
++	int err = 0;
++
++	/* Create another pending write to handle results from custom write
++	 * function.
++	 */
++	p = new0(struct pending_write, 1);
++	p->attrib = attrib;
++	p->id = ++attrib->write_id;
++	p->func = custom_write_result;
++	p->user_data = &err;
++
++	queue_push_tail(attrib->pending_writes, p);
++
++	/* Call custom write function first */
++	data->write_func(attrib, p->id, offset, value, len, opcode, att,
++							data->user_data);
++
++	if (err) {
++		gatt_db_attribute_write_result(attrib, id, err);
++		return;
++	}
++
++	/* If custom write function did not return error proceed to call the
++	 * default CCC write function.
++	 */
++	db->ccc->write_func(attrib, id, offset, value, len, opcode, att,
++							db->ccc->user_data);
++}
++
++struct gatt_db_attribute *
++gatt_db_service_add_ccc_custom(struct gatt_db_attribute *attrib,
++				uint32_t permissions,
++				gatt_db_write_t write_func, void *user_data)
++{
++	struct gatt_db *db;
++	struct gatt_db_attribute *ccc;
++	struct gatt_db_attribute *value;
++	uint16_t handle = 0;
++	struct gatt_db_ccc *data;
++
++	if (!attrib || !permissions)
++		return NULL;
++
++	db = attrib->service->db;
++
++	if (!db->ccc)
++		return NULL;
++
++	/* Locate value handle */
++	gatt_db_service_foreach_char(attrib, find_ccc_value, &handle);
++
++	if (!handle)
++		return NULL;
++
++	value = gatt_db_get_attribute(db, handle);
++	if (!value || value->notify_func)
++		return NULL;
++
++	data = new0(struct gatt_db_ccc, 1);
++	data->write_func = write_func;
++	data->user_data = user_data;
++
++	ccc = service_insert_descriptor(attrib->service, 0, &ccc_uuid,
++					permissions,
++					ccc_custom_read,
++					ccc_custom_write,
++					data);
++	if (!ccc) {
++		free(data);
++		return NULL;
++	}
++
++	gatt_db_attribute_set_fixed_length(ccc, 2);
++	ccc->notify_func = db->ccc->notify_func;
++	value->notify_func = db->ccc->notify_func;
++
++	return ccc;
++}
++
+ void gatt_db_ccc_register(struct gatt_db *db, gatt_db_read_t read_func,
+ 				gatt_db_write_t write_func,
+ 				gatt_db_notify_t notify_func,
+@@ -2338,6 +2444,8 @@ bool gatt_db_attribute_notify(struct gatt_db_attribute *attrib,
+ 					struct bt_att *att)
+ {
+ 	struct gatt_db_attribute *ccc;
++	struct gatt_db *db;
++	void *notify_user_data;
+ 
+ 	if (!attrib || !attrib->notify_func)
+ 		return false;
+@@ -2350,7 +2458,16 @@ bool gatt_db_attribute_notify(struct gatt_db_attribute *attrib,
+ 	if (!ccc)
+ 		return false;
+ 
+-	attrib->notify_func(attrib, ccc, value, len, att, ccc->user_data);
++	/* For custom CCC descriptors, use the database user_data for
++	 * notify_func. For regular CCC descriptors, use the CCC's user_data.
++	 */
++	db = attrib->service->db;
++	if (ccc->write_func == ccc_custom_write && db && db->ccc)
++		notify_user_data = db->ccc->user_data;
++	else
++		notify_user_data = ccc->user_data;
++
++	attrib->notify_func(attrib, ccc, value, len, att, notify_user_data);
+ 
+ 	return true;
+ }
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index dc2daf7fc..da0600c01 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -112,6 +112,10 @@ gatt_db_service_insert_descriptor(struct gatt_db_attribute *attrib,
+ struct gatt_db_attribute *
+ gatt_db_service_add_ccc(struct gatt_db_attribute *attrib, uint32_t permissions);
+ 
++struct gatt_db_attribute *
++gatt_db_service_add_ccc_custom(struct gatt_db_attribute *attrib,
++				uint32_t permissions,
++				gatt_db_write_t write_func, void *user_data);
+ struct gatt_db_attribute *
+ gatt_db_insert_included(struct gatt_db *db, uint16_t handle,
+ 			struct gatt_db_attribute *include);
+-- 
+2.34.1
 
-I simply started this in the hope that the same problem will not recur, as
-I had to write a separate patch a few months ago when I backported a bug
-fix patch I had written because the feature was missing.
-
-> thanks,
->
-> greg k-h
-
-Regards,
-Jeongjun Park
