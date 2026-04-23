@@ -1,137 +1,108 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from out-42.smtp.github.com (out-42.smtp.github.com [192.30.252.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA286382293
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 10:40:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041BE3876D0
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 10:59:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776940854; cv=none; b=fQndPxBkT1lIJOagAPKSVU1PdkdFKOj2G6Nf7AXybtyUe52GItqg56o80juAWO/EJqHl89NKm3TTE0j1NGvjvBBtsfCOuJkRUOByBL3co5C7I3R9fu6etk008z7hjvI10V4dE4sZ4JeOsixUDIRYe9RIdrfcs9rH8vFttOxTXfc=
+	t=1776941973; cv=none; b=KbIn4ZlEnaaPP2IyUMjBcLqy7/zoPS7CLW2dOag53HqpA+SoWIXoolCto2KxKVeBHFC0xBNe5iUciClovRhYZV692Qbyp1Tt5RtJAFOqjg8bNVdbl8WZpu9SdudfPwA8y9klwCbUQAFX9oHaizX9UtLJNQ4aOaLgUM08LSm1ZXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776940854; c=relaxed/simple;
-	bh=RwMEiLtYhHxg/LJWtpQvTfnuxTibT+oocZzTZcuHP+Q=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=gDvLpXYBtMfHqkzGAc2gqgS0Y6B/IQDN8NAhJmKxvt871qkBvWPRmxpo/z3mRG9pHt9Wh4qpoMICqx9kf4qXj+qQi3BYovWDBHQXc5++YydPgH/N/s9qfUaaIwz18/RX98s8lTHiPRbdR53tT1Y/mZRsqfrjgMevEDOG3KOsk1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fc2b3nM2; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1776941973; c=relaxed/simple;
+	bh=qqjpg/cEVBcGwIqDLsPy9dHwcDjIVh6vwHIwyvTbjoA=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=cBL1QLY9CIBCpVLy7mqQ4qUc5vvPrmahDLYi0I9K881s1iaknnHlijLa/pOsUzKRCrapjsThgrPswhB88tyx9Fr6ENpwjqWkAHwO8Lf9ZaytPGRorulbxn9rVLQZedQ2kMz6pNqAsuv3V8CiPkO2C/M0ygyZviBaycOnSUHwRhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=MQxucFJt; arc=none smtp.client-ip=192.30.252.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fc2b3nM2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776940854; x=1808476854;
-  h=date:from:to:cc:subject:message-id;
-  bh=RwMEiLtYhHxg/LJWtpQvTfnuxTibT+oocZzTZcuHP+Q=;
-  b=fc2b3nM2K8iTQSFVNNnF6DmPN9mnLGaC13Igup6B/He3hjIhe90wBMuU
-   uKtSTxJ9pAH/5i3M492GorvOZchHhp91OCPqto/M2HZDTBtGubEWvVdYr
-   7L18M0orUjHHjHhVri9wUbz86e+yEP0goddJ4UgRRh8XgqZNz95KPFP7N
-   ZSHuLdG4sWeov6lm9dJvRYNnmi9icf2Dq47ijU3Qf8hI4iIUOqJteUtmH
-   LBumg9CcXXbopfgQyGsX6+xGPPBqP/jyBBxOp8o5QD7zqnD9zKLjQMbEI
-   xzjcw0uekhXd17Ymht1dEMnMIdJmTCmpSrJXJLAvpumZ/+iZtAqSgOnoX
-   A==;
-X-CSE-ConnectionGUID: rlcBMfvXTG+St9pe1brLMA==
-X-CSE-MsgGUID: fz+tAaMUR7i2kH1ersC2lw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11764"; a="81769326"
-X-IronPort-AV: E=Sophos;i="6.23,194,1770624000"; 
-   d="scan'208";a="81769326"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2026 03:40:53 -0700
-X-CSE-ConnectionGUID: 2yAW+9WYSUOZP3mKwbyc2A==
-X-CSE-MsgGUID: jXbY0Rq0Qd2ot5UxCR3hgA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,194,1770624000"; 
-   d="scan'208";a="234407029"
-Received: from lkp-server01.sh.intel.com (HELO aa799cca880d) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 23 Apr 2026 03:40:52 -0700
-Received: from kbuild by aa799cca880d with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wFrUH-000000002av-38fN;
-	Thu, 23 Apr 2026 10:40:49 +0000
-Date: Thu, 23 Apr 2026 18:40:43 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 87151e363b7ef4c8b7e4e79ad5e718e69899ccb0
-Message-ID: <202604231830.Y0NR9wOc-lkp@intel.com>
-User-Agent: s-nail v14.9.25
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="MQxucFJt"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1776941971;
+	bh=oxFzb58zGOf7JSf68ZhzkcJrg6vkt2saAhcu54k7JzA=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=MQxucFJt5BNcfGCriTGrXd8tLAswlrmJ8JOwAxIeIrtFGtx5gZ6DZVq/yngpWjBLJ
+	 swhUCp2iq1LM4G5Gt7NLOy2rlkL714wSI4A50Jhc2YtnpnlwhH0vJgfFAsyiI86OZd
+	 zrNwaVvzbsy3K+DtIs0sVKspdLyoOzS18sh8sQDY=
+Received: from github.com (hubbernetes-node-137be09.ash1-iad.github.net [10.56.208.33])
+	by smtp.github.com (Postfix) with ESMTPA id 4FDD4841141
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 03:59:31 -0700 (PDT)
+Date: Thu, 23 Apr 2026 03:59:31 -0700
+From: fdanis-oss <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1084652/000000-ed9b9a@github.com>
+Subject: [bluez/bluez] 5d9d39: audio: Add ability to force CIS transport Links
+ pr...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 87151e363b7ef4c8b7e4e79ad5e718e69899ccb0  Bluetooth: 6lowpan: fix cyclic locking warning on netdev unregister
+  Branch: refs/heads/1084652
+  Home:   https://github.com/bluez/bluez
+  Commit: 5d9d394b23b77074a7426dc86dc2738f0ac4a970
+      https://github.com/bluez/bluez/commit/5d9d394b23b77074a7426dc86dc27=
+38f0ac4a970
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-04-23 (Thu, 23 Apr 2026)
 
-elapsed time: 1024m
+  Changed paths:
+    M profiles/audio/bap.c
+    M profiles/audio/transport.c
 
-configs tested: 60
-configs skipped: 2
+  Log Message:
+  -----------
+  audio: Add ability to force CIS transport Links property
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+If bluetoothd is started in testing mode the Links property for CIS
+is readwrite and can be used to force transport objects Links.
+This can used to unlink transport objects by sending an empty array.
 
-tested configs:
-alpha                   allnoconfig    gcc-15.2.0
-alpha                  allyesconfig    gcc-15.2.0
-arc                    allmodconfig    gcc-15.2.0
-arc                     allnoconfig    gcc-15.2.0
-arc                    allyesconfig    gcc-15.2.0
-arm                     allnoconfig    clang-23
-arm                    allyesconfig    gcc-15.2.0
-arm64                  allmodconfig    clang-19
-arm64                   allnoconfig    gcc-15.2.0
-arm64       randconfig-001-20260423    gcc-11.5.0
-arm64       randconfig-002-20260423    clang-23
-arm64       randconfig-003-20260423    gcc-14.3.0
-arm64       randconfig-004-20260423    clang-16
-csky                   allmodconfig    gcc-15.2.0
-csky                    allnoconfig    gcc-15.2.0
-csky        randconfig-001-20260423    gcc-10.5.0
-csky        randconfig-002-20260423    gcc-15.2.0
-hexagon                allmodconfig    clang-17
-hexagon                 allnoconfig    clang-23
-hexagon     randconfig-001-20260423    clang-16
-i386                   allmodconfig    gcc-14
-i386                    allnoconfig    gcc-14
-i386                   allyesconfig    gcc-14
-loongarch              allmodconfig    clang-19
-loongarch               allnoconfig    clang-23
-m68k                   allmodconfig    gcc-15.2.0
-m68k                    allnoconfig    gcc-15.2.0
-m68k                   allyesconfig    gcc-15.2.0
-microblaze              allnoconfig    gcc-15.2.0
-microblaze             allyesconfig    gcc-15.2.0
-mips                   allmodconfig    gcc-15.2.0
-mips                    allnoconfig    gcc-15.2.0
-mips                   allyesconfig    gcc-15.2.0
-nios2                  allmodconfig    gcc-11.5.0
-nios2                   allnoconfig    gcc-11.5.0
-openrisc               allmodconfig    gcc-15.2.0
-openrisc                allnoconfig    gcc-15.2.0
-parisc                  allnoconfig    gcc-15.2.0
-parisc                 allyesconfig    gcc-15.2.0
-powerpc                allmodconfig    gcc-15.2.0
-powerpc                 allnoconfig    gcc-15.2.0
-riscv                  allmodconfig    clang-23
-riscv                   allnoconfig    gcc-15.2.0
-riscv                  allyesconfig    clang-16
-s390                   allmodconfig    clang-18
-s390                    allnoconfig    clang-23
-s390                   allyesconfig    gcc-15.2.0
-sh                     allmodconfig    gcc-15.2.0
-sh                      allnoconfig    gcc-15.2.0
-sh                     allyesconfig    gcc-15.2.0
-sparc                   allnoconfig    gcc-15.2.0
-sparc64                allmodconfig    clang-23
-um                     allmodconfig    clang-19
-um                      allnoconfig    clang-23
-um                     allyesconfig    gcc-14
-x86_64                 allmodconfig    clang-20
-x86_64                  allnoconfig    clang-20
-x86_64                 allyesconfig    clang-20
-x86_64                rhel-9.4-rust    clang-20
-xtensa                  allnoconfig    gcc-15.2.0
+For unlinked transport objects, each transports needs to be acquired
+separately.
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+This allows to pass PTS tests BAP/UCL/STR/BV-543-C and BV-546-C.
+
+
+  Commit: 5bb06b0f3ae0ede93d527685cfe02f35027a5b10
+      https://github.com/bluez/bluez/commit/5bb06b0f3ae0ede93d527685cfe02=
+f35027a5b10
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-04-23 (Thu, 23 Apr 2026)
+
+  Changed paths:
+    M doc/org.bluez.MediaTransport.rst
+
+  Log Message:
+  -----------
+  doc: Add documentation for readwrite CIS transport Links property
+
+This is only supported when bluetoothd is started in testing mode.
+
+
+  Commit: ed9b9a29eb03f91729ea5af221598fe257017d64
+      https://github.com/bluez/bluez/commit/ed9b9a29eb03f91729ea5af221598=
+fe257017d64
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-04-23 (Thu, 23 Apr 2026)
+
+  Changed paths:
+    M client/player.c
+
+  Log Message:
+  -----------
+  client/player: Add support to unlink transports
+
+This is used to pass PTS tests BAP/UCL/STR/BV-543-C and BV-546-C.
+
+
+Compare: https://github.com/bluez/bluez/compare/5d9d394b23b7%5E...ed9b9a2=
+9eb03
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
