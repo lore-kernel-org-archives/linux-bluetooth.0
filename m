@@ -1,118 +1,101 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8B03CE4BB
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2026 12:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF222FD69A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2026 12:51:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777034203; cv=none; b=Zdh5OlJuHjOjM1xfdERytiilF1JugxxnwnB7oQlF6DSPWSkbUcr7/GfLFqYOm0/DXYYaL+C2Lco7JHwOyHOgHRXF2Xb+IskMLr6vxLcKOSACQDeeEjsXl+Nn9em/CbP7pYSzN+rC//zuLeelrXYTyTzA19Zr4LZbEq0O3Q45smc=
+	t=1777035067; cv=none; b=uJYyA3lpi4TYpCNDkZtgw2b6GOnJMhoDoOlN3oBAFCgPcwvtEfBD8K+72ygJN1kRIiSCksfCqwytlO/PVBtftkit5neqpMokdQM8pz4MgqUvDHi/TO8C4/e+Hvggik/EC/dWPMW4igD4mOk5fjxS0HesXNlS3qqkr/KijRSUCjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777034203; c=relaxed/simple;
-	bh=pSJbCe4jYdBNPPVgdV2w0UW1VOxodJwfblWAfE9R3Eo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PTJK6oIZsKiaAasMfjwD4bBx1CKNMFX+bRIXuxZ9V5KWu+ceq/t17Bgxuyw+lzp2hjCcV7E1MogXowRcp1zZG//ZxZ1Ja9VCTAVm5qGm0EiIKw8Yg2x/tga12oCEeKBA5ibfIwt2EocMlZoWaAq4IGSIYoOXEJcgiXkkBZPsKHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 39AAF4C2C37F0A;
-	Fri, 24 Apr 2026 14:35:54 +0200 (CEST)
-Message-ID: <547cf29f-0780-437f-a1ef-da3412d7f2ee@molgen.mpg.de>
-Date: Fri, 24 Apr 2026 14:35:53 +0200
+	s=arc-20240116; t=1777035067; c=relaxed/simple;
+	bh=LGjeJhZUFtqYOlQdh2ZrjgfS4/3N7x1QLMQVuNcpb2M=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=SwtjQ7p3pyo7V5TfwkuH9WrtDacFgpcBRWl0wv0gWxFrK5LfXOGZqQZZ2Ecl3T6J3JNoI4Qw3MGOLj0MjFlWZLVRy4kso2PtAxlXET9+kBnLtNgkUAwUEhmxV63Lk2wOCTD5HaqtJK1slhIKKALL7RTPzD615AVyAPdfKxyxhtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZempP7/Q; arc=none smtp.client-ip=74.125.82.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZempP7/Q"
+Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-2d891442388so12721115eec.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2026 05:51:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777035065; x=1777639865; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=LGjeJhZUFtqYOlQdh2ZrjgfS4/3N7x1QLMQVuNcpb2M=;
+        b=ZempP7/QmmusDkFnoLfLMSrldbEXq4gNnDMUH+HeSE5FZ3V+rMFqhAJylstBP0i2h5
+         Mm1MtdwkUNFPFI5I8+U8Ankh2oGPCp1AZUDFNWh3y6Ikt8dKRFMJlyuMrVcSQSJuTkh1
+         8nwf0BZctsHte9aKV4M41LuQbTn7BX8ze3LAfNg6A3JKBhDvRO8k7msBqRNiFSv19z6b
+         Q67GaFU5RO+J+DJq4YW+P6lXTdmj8p26Ww+ZHPIIvr96r8DPKiVfN7jIpsf5UAqSxn5n
+         cWqsy0KI1kVmpPcUIksvyPU2ueE2naHNproH2Eotks1bqDtjWCRLD63WoghkapCghJl0
+         8/Sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777035065; x=1777639865;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LGjeJhZUFtqYOlQdh2ZrjgfS4/3N7x1QLMQVuNcpb2M=;
+        b=aHT9xwL9bl8RUsZYRjZy/qaNFmC+9OXSDPX8GFSsciFSGqyek6ZWh8+K0Y09uYlU0v
+         gXr7m7VnA2pB3dZd7xkWK7y50rFcOjYz7lrAVNE0A9qO+52gcSq3KD+oLwmS74edBhn4
+         uHp8aO61kZqT8cp7wCEgng/TBttsGEMD1lB4gjPd4FYvXkt5wre/4w/9vZBoWlmCVlSr
+         b7YfPbFwCe+EOKaPAkTxaNHHz0ugU/4shT2gMPjmq2bW0WE+Em99xsmPh1uJVgxrhvTG
+         7gZr/lLAl2Wvo+3h4/OdvetqlUr+q2UkttlM321jSQqVw/60xjubuDPlKqgLAvTGgPcs
+         HkYg==
+X-Gm-Message-State: AOJu0Yz5kULx15oz0kpo7qxQxpwmCeBqlg3zN3A9gak2NIGzVZ1gdJB8
+	UncHHcaP6F6eQAv7NUCAouCZy6pc6VP4V8zhOLMMBxzzyOKHE4wsCKZRLcEJrA==
+X-Gm-Gg: AeBDieuVFDuHvDoEESGfhwbvLOSxiLVNv+K0OorBHozpZhQHft9H+PH6uZfuSxhgc8N
+	+L7YCbzBNstLXdT5STRQqe1hC4V7ElomHRJwBRZC6/rxeo05sfxGKqiuf8A6ydTWQKKcJ76a/3N
+	4iCh4ezoY+5Fw81TDDbdSJQvtyTWPhadD+051I84b/LGt/UQ9W2ompUoJG7q1FSDS4Gg8Fpbr1O
+	ad63q6JhDrbvOG08Ty3B3cQQjjAmwGGORtyONzQpBZE6CHmb11GzQwKyp02JqbKqoBuWKuZEI7H
+	VurUs+WyxMnp6lN/xwhs4al38oS1f4RrNKyY5jEi1ibC77+9ylK8SyGELwZcvHre5okFTdezfp5
+	mpzFkmsYnsuALcv+H435Ye3WCb+7DrR0hfoC864gAsPHJ25zOGHhKhm/D9fGcZLDt4TVC08uhKm
+	6ab99xinluPkkWE6WGu/Y7gjQg0gaYR1Zs/LIL8kRFrg==
+X-Received: by 2002:a05:7301:1f17:b0:2ea:3370:6e51 with SMTP id 5a478bee46e88-2ea33706e74mr9108494eec.4.1777035064988;
+        Fri, 24 Apr 2026 05:51:04 -0700 (PDT)
+Received: from [172.17.0.2] ([128.24.161.179])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e53dcb487bsm32658073eec.31.2026.04.24.05.51.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Apr 2026 05:51:04 -0700 (PDT)
+Message-ID: <69eb6738.050a0220.94ee0.6670@mx.google.com>
+Date: Fri, 24 Apr 2026 05:51:04 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1584418294578333828=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btusb: Add Realtek RTL8922AE VID/PID 0bda/d923
-To: Chen Zhang <zhangchen200426@163.com>
-Cc: luiz.von.dentz@intel.com, chris.lu@mediatek.com, floss@jetm.me,
- sean.wang@mediatek.com, zijun.hu@oss.qualcomm.com, chharry@chromium.org,
- ceggers@arri.de, johan@kernel.org, linux-bluetooth@vger.kernel.org,
- Chen Zhang <zhangchen01@kylinos.cn>
-References: <20260424122522.402953-1-zhangchen200426@163.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zhangchen200426@163.com
+Subject: RE: Bluetooth: btusb: Add Realtek RTL8922AE VID/PID 0bda/d923
 In-Reply-To: <20260424122522.402953-1-zhangchen200426@163.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+References: <20260424122522.402953-1-zhangchen200426@163.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============1584418294578333828==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-[Removed bouncing en-wei.wu@canonical.com]
+This is an automated email and please do not reply to this email.
 
-Dear Chen,
+Dear Submitter,
 
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Thank you for the patch.
+----- Output -----
 
-Am 24.04.26 um 14:25 schrieb zhangchen200426@163.com:
-> From: Chen Zhang <zhangchen01@kylinos.cn>
-> 
-> Add the vendor/product ID (0x0bda, 0xd923) to usb_device_id table for
-> Realtek RTL8922AE.
-> 
-> The device info from /sys/kernel/debug/usb/devices as below.
-> 
-> T:  Bus=10 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-> D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0bda ProdID=d923 Rev= 0.00
-> S:  Manufacturer=Realtek
-> S:  Product=Bluetooth Radio
-> S:  SerialNumber=00E04C885A01
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> 
-> Signed-off-by: Chen Zhang <zhangchen01@kylinos.cn>
-> ---
->   drivers/bluetooth/btusb.c | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index d84faad07dd7..572091e601f9 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -603,6 +603,8 @@ static const struct usb_device_id quirks_table[] = {
->   						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x0bda, 0xd922), .driver_info = BTUSB_REALTEK |
->   						     BTUSB_WIDEBAND_SPEECH },
-> +	{ USB_DEVICE(0x0bda, 0xd923), .driver_info = BTUSB_REALTEK |
-> +						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x13d3, 0x3617), .driver_info = BTUSB_REALTEK |
->   						     BTUSB_WIDEBAND_SPEECH },
->   	{ USB_DEVICE(0x13d3, 0x3616), .driver_info = BTUSB_REALTEK |
+error: patch failed: drivers/bluetooth/btusb.c:603
+error: drivers/bluetooth/btusb.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Please resolve the issue and submit the patches again.
 
 
-Kind regards,
+---
+Regards,
+Linux Bluetooth
 
-Paul
+
+--===============1584418294578333828==--
