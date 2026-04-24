@@ -1,66 +1,112 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5646B2D9ECB
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2026 05:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD9979DA
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2026 06:22:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777008352; cv=none; b=L8jSEabxCsg6qcpitLgi7wJy7LChWDNOx/KUVa7A/SI3AfmR3QO2weAtzLROgoKlYC+BJLeqGB4/q4WN8PzqdgYNkPT+3vhG+whPQs99fnfcIqPHSw2rjlVxva24wC2d9yLOLlPj9BzsmzoTlj6cpcY6cUuKmKgyPf3Pf7qD5rk=
+	t=1777011756; cv=none; b=GyH7i2JYpNqdNnGIE/mX1pZfw8DBDNOrKu/zSc3MEuHGs03YBEZGMbH/1hfapm+qTFWaksdZVTksQsFsoOEZS5dM4RsY0A5wA8x2a8+ANIkyck0SswVEZlYoWhKsROrp32r4dta8Ed06TUox0AcWIXUJ+prh7o+sfVmIbi02fyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777008352; c=relaxed/simple;
-	bh=b6lbDpdND86Fxhj7Afqr3pBbs+nhkWIxuclsmQ+uGBc=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=OY8Jpiqe0KESHTD+eZlJZZAq00Cq7GEWFqK7KSF5iVrcL57hAulxeVuV3csbo/GWG3lvtK9UXRilmrvpP3SaqhdiSOFh5IB84v5zuWI3NMyqd6xwjbyCzxA++ZRkMNm9QHZk899gGh9tWqANmzPGgHeyJw3j9gAmGqHps8z2TmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=FfOfeMHX; arc=none smtp.client-ip=192.30.252.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1777011756; c=relaxed/simple;
+	bh=WR+x46J5/cJUpZEAHzCB6osaW1yPsLFxQUF6WY6fyvU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=GwCaX7XMTszlDOseI6RBuUT4xHl5+7fA4M22amg9pqW+BfKXiHOmqlQHIL/I0Z8K5i4CuTjhZFryZc+7PgI4J0M5AAvV7jGL9yMBECywTS9wPwGuLv64wslAoWQ8Rgb2bk4TpbYzMaXeEpX+Ch0/HiVZ7k9HRlr5AwSQwLxXWLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sdmLi5bp; arc=none smtp.client-ip=209.85.210.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="FfOfeMHX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1777008350;
-	bh=9nn4nefG5So6MkUyt9sFjiYjbjRr5i6XsaD4JS0u/+0=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=FfOfeMHXBAR1I8LJFg0XDzNvYEdRvaNnUch0uwE5cOiWXnN3AIKdmGFWC6K3Iy3Qk
-	 lJiaY2709nlIctJTzZLKbnjMYfuIa1VEb8rX766yHOBoh69/YSRdQtCS1apyhlJJqE
-	 xAiq9YUR0jKuCbc5kYtRlSg8t04tUgibUdn7W7Uo=
-Received: from github.com (hubbernetes-node-c237d22.ash1-iad.github.net [10.56.184.41])
-	by smtp.github.com (Postfix) with ESMTPA id 875A5521105
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 22:25:50 -0700 (PDT)
-Date: Thu, 23 Apr 2026 22:25:50 -0700
-From: prathibhamadugonde <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1085008/000000-f8f5c8@github.com>
-Subject: [bluez/bluez] f8f5c8: src/shared: add custom CCC callbacks
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sdmLi5bp"
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7de4a9cb8eeso1502841a34.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Apr 2026 23:22:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777011754; x=1777616554; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=lWKb7hcFuMRg3IEg2bQgNLYeUGHrGhIMTx+hUsQaygU=;
+        b=sdmLi5bpXZ0Xcxfcrmj8k4alXFQY/tn7y02oo5k/wEtAgJ/vl+isKvXt6tWQyIphUf
+         jYrS8OV5DwiO18EiQC2/5/7TbU0sdwpDqAPktjll2MiWiS0PPUYaa1YDDy+FNECPLX2Y
+         ZsP7dPLYGhj9tW2ArAUAioZWV24kL3gtU/eBXQt6fW9OKq36PkYsd5vRPEggX9UUWqAN
+         mGPILxlmeisNGkrEDQlRjhvfouDPWp1O361TxpJAugaMM2XDuIgAZNZ+ENlV3XKxDZ95
+         0rWq7bhSgoLSDCu2/+z08QuiAQmL32ezkFILFYirNE5qyDuakkjX0t87XS0O2PNjGhwW
+         8yfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777011754; x=1777616554;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lWKb7hcFuMRg3IEg2bQgNLYeUGHrGhIMTx+hUsQaygU=;
+        b=c4UcZbqyydhArCX78QBhTYK0dW+3+Pa8K7NyWsSl/o5wepNI/it4eDTEeS7+aUE9pc
+         Cqrh3nEBCyk+0Pe2GcX0y64oqlg+8BAT6u0rNJRpgjadT5Agrw0zcDsD43Lgc/H3ZdiT
+         irrXXiddg5ivb3Q4TwdwyL6wplJfFjlo/LXw/AuAW90Jxw+VfvAWw3wej563khyK96T5
+         YuwygKlX+bUj6LpPMIY0m4NOIrziXyyCgtc86i0oO+/x6kqTNsGq0Pq3UlBPqmMF/yfz
+         YLtCyW1o6Bn1kKa88EyHv6mUGpAabi6IphiD1POqgF4dVMidPeuhN69nQhGHggpOGr8j
+         A4Sg==
+X-Gm-Message-State: AOJu0YwQuZzw4rZ9Go2C26Z4/SdoRWCKq+qJ610FnmwW95XcbU/q15VP
+	wRyO7lUAHSnBtt9Ueji7l8r+VDIjwZx5dYBRQURslo5t6DLfdVMk/m/UI3b/nQ==
+X-Gm-Gg: AeBDieuCW5JjQgb8InOrr+ZLRORJJS4fk+2zDNnKmZ83rdea3m7QVEBkoMzb0yGUaYo
+	oE5ruDkCFfOQZvt880ikIFA09SncGvIiVe9pahSDvXGA+wRB67CkquC0nk5ZuGpIpK8AsycLtYk
+	bxOXMBnWtIqODBBBkyJO/t6YQ+v9Tc3WYoV/0WtkZ5mxkgq1zOCgzahStXCgvnEr6BWhFvETq87
+	YpHmK9CfLV+JGCXL93DI4FAYEMHEhGCl/jUYwReqBiPMlGLz1q/TVZsQ5hTqvqDE3aWvFftAqbm
+	y5YreC+8DzmV4SyZL0U9RzGVrjYw1Y7XpvzJ0NMW8lBHHjm8/j+Oc7Qq1tcvCjnTOQERkhg9n3L
+	d63yLug60NyF4Gee0dnY2aXuVy4uSNW4QdCgetS9rMSPFncGioLNqlwZfgWdX4w6i7b23dmEDh7
+	GbzcsxdyWkZf/JUsQAhafrx4Wd10NqSsNOCpJyiqE=
+X-Received: by 2002:a05:6830:82ae:b0:7dc:cbaa:d730 with SMTP id 46e09a7af769-7dccbaaf733mr12303196a34.8.1777011753779;
+        Thu, 23 Apr 2026 23:22:33 -0700 (PDT)
+Received: from [172.17.0.2] ([52.165.58.39])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dc975033acsm18113736a34.1.2026.04.23.23.22.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Apr 2026 23:22:33 -0700 (PDT)
+Message-ID: <69eb0c29.9d0a0220.3a68b0.ed31@mx.google.com>
+Date: Thu, 23 Apr 2026 23:22:33 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3954739432279879747=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, prathibha.madugonde@oss.qualcomm.com
+Subject: RE: [BlueZ,v2] src/shared: add custom CCC callbacks
+In-Reply-To: <20260424042830.2374708-1-prathm@qti.qualcomm.com>
+References: <20260424042830.2374708-1-prathm@qti.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============3954739432279879747==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1085008
-  Home:   https://github.com/bluez/bluez
-  Commit: f8f5c8829c8ee2b41d70f4fcdb71b44009b6afba
-      https://github.com/bluez/bluez/commit/f8f5c8829c8ee2b41d70f4fcdb71b44009b6afba
-  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-  Date:   2026-04-24 (Fri, 24 Apr 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M src/shared/gatt-db.c
-    M src/shared/gatt-db.h
+Dear submitter,
 
-  Log Message:
-  -----------
-  src/shared: add custom CCC callbacks
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1085008
 
-Introduce custom CCC callbacks to allow interception of
-client notification subscription changes. This enables
-stack-level handling of CCC writes.
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.48 seconds
+GitLint                       PASS      0.28 seconds
+BuildEll                      PASS      20.67 seconds
+BluezMake                     PASS      648.34 seconds
+MakeCheck                     PASS      1.02 seconds
+MakeDistcheck                 PASS      249.68 seconds
+CheckValgrind                 PASS      225.71 seconds
+CheckSmatch                   PASS      352.21 seconds
+bluezmakeextell               PASS      183.36 seconds
+IncrementalBuild              PASS      640.32 seconds
+ScanBuild                     PASS      1032.72 seconds
 
 
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+https://github.com/bluez/bluez/pull/2068
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3954739432279879747==--
