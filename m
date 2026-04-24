@@ -1,80 +1,80 @@
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE213C1416
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2026 14:41:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 740373D410E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2026 14:44:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777041697; cv=pass; b=LvJhAuiAB+jE3riW6ZzITEDzmQw42sHKQc3PIjUWHg0CE0DysqF4MSZQlrqMyiU0Ljl0XGIov0GVXFOXtjgihtMO2b3/1A8ON2Ga9woxKeao5yGrJ8CFcUQGcVKimDEYDyYC1d8VjKTA898nRTcRz8AoH5oDbFn/qgSfV9Es83E=
+	t=1777041853; cv=pass; b=errV9JVHtS2b67k+kGp8wyZr5sWwnDKDh5kqoMJNlB75COEVWykZ/+znIz/F9gFSBfU77jlhdjzyxuSws+CxP5Hq6+kNZaWp/eO3ADcfE3T7qjyTPtKh8mIXsp5srJMszGQbRyKbFN3zhrCPn+MynleiNCPQ+TuMrZnuT8yA1xM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777041697; c=relaxed/simple;
-	bh=Hb/N9BhEWECIKeGcYCUWL0bdNwC7njVo2YvdJSCdg74=;
+	s=arc-20240116; t=1777041853; c=relaxed/simple;
+	bh=8UyGr+7IDRCoxEfR7IF8+ZFaxLKzqi5IB/dKwh0Jw04=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ShujaK+ERBJFQGd+pK5rFmk/TexXaqRSHIMLl9meDZVb5neY5fJFAafWku7DSLArGhQ+lOA8NyDDEbR/SV2DWUoCIW+8do0TnGZrLxL+3fciI7C/RIPvDB/rgY5gc3cX0niv85IZO1nunuTUQaZdA67U67BjnDkTkMN0LmuReLU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cGseifmh; arc=pass smtp.client-ip=74.125.224.53
+	 To:Cc:Content-Type; b=iDAjJ+KjkvCfNj+yt3cQZQ75L0Mj0tAt6U87XvwjQJiVetLYu8MbpFAcKXpHYahtOD6TNuMF3mqGAqMuCf5CHCi8NAbvCR15FRrhleZnVCNn6Afh94TYyZ8Vj+uLDHmqgTuzm6pcL8oi1LDgasSh18CCpEw4O/RZy4GCiAKqtxM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LYVtSzLD; arc=pass smtp.client-ip=74.125.224.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cGseifmh"
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-64937edbc9eso7034656d50.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2026 07:41:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777041695; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LYVtSzLD"
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-64d5a7926cfso7932610d50.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2026 07:44:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777041851; cv=none;
         d=google.com; s=arc-20240605;
-        b=Fk3+Z5pnSD2BhFdvVQMUitpszVH9iGK65WVixE2iEEyPYypxABFCvuPypMK/AcAkG/
-         UZ9/JsBFn434PxH6RIt8WkNsDOz5mRiy7NWxrHysxFho5qYV3pqM2sL3qZHixlXOFaLL
-         riHAX9U5SWPNg3jK0km+ffTlDk+yu6HVGN+0x0KwvE1sUuqOfRilwUsyFP4cn+W/S5op
-         zkMAXFzS4TlAV0OOYSgexo9+X0e1ZxHt97v4Tm/6j4ZaDSWnR/lTLsUrtDABMm8eR58D
-         VEiHecfpjdmvs6iPx4MrUJnxwohjiKsJK0UnIu5fV43LRv7FQNdVgD3rZAjWIaGl/8oD
-         A5ww==
+        b=KGJBp6sjoazKw/FGyYCprll96zAISgond8d5p+PEqNFR7G4u+o/drfEWBXGoLjWaHr
+         27ob+IW7kEE/sLKYYywzp8ipKazart9Dl+oK4tqDYO05Ur1sCLzURA7SdWLHUW1jxU4+
+         4lw8L2YTYZy3EP62Hqn2ebHPE8dPfzfww3gJsk2sxwu+/70+OhZGuW3hVUJlhPZzypoo
+         eUn4lXcCs0LNo99G5E6QTPNAxME5T2fdL1JoJ6JwfYgGEcok5bf4yMAg3W7JMfwLdgIZ
+         1xSxuqrGG70+njnnfLUMGijVrqRKhlL5klhv8JmZyQS9aiZ8vnxnTtV20LHG/VKWLWh1
+         X1wA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=+mdrds+Jypjh2CkgH36BmFmMXpEe9MxlGtue5cGpFNw=;
+        bh=dLGeuJPVWr3+lJqklk/j4A0GqiySHErHU3CNareY6Q4=;
         fh=ZFlyP5+YKgJkmoBW5+QP1miOu0vNYasz89rr0yCZ/+4=;
-        b=NAqPhwf36Lg2/UFTJtQapkTw3HYmtvGx74DrStGuE87q7q3eeQJHvQsvR8S4rIOiAM
-         dfn0/MzjAc8W/12p8Iqb85JktEhH299rEfl9vTv5qc9q/Q15dzBsD9ToTHXyNH7Ax9ho
-         6Zhsa6ktuwCmRoYD1qxcp+F6jnaewn7TlkY4xooGO53dLjbhvwDwvGjXXSYBsO+k2/6s
-         ELljFzaN73rsA69WEQGtCvUEdQHoy5b8zEgBRkvadBkKNo0rMFR83JpdtyscSJ8mBPsN
-         0Xz1JLFEseuqeUQSCpVQAjS1hoa9QVauzC7JzHIqZLRbkPDbxIBTZoxFc+qcz51nM49S
-         wbig==;
+        b=ZBT0V1Jjm2hcvpufMLdH8vMsJdysvLRByywOBXPBzAkawKZnRAI2fg1ORixCwyFbNH
+         G9rvOG41KyebEmC5pewnX8LM8/ChLJ3vmQ0AN8VMCRty+gTNZNYyFET7njxU3dzTXXsy
+         NbzfkEsqcUVQDMeGs136S6oJ9TRxKR/9fTHDHjSfrk12ytfhelLEqTGxMGV4WPwi9hXt
+         dTi1vqt1eqB0OG4YFPiF19aB9btShQmtbU9cl54MiPN7bSThiCHdKYIWK03Vu5uqUAXn
+         KOOwjyyZAAIQHued2mHkARTFsvm2FqATmt24+N9eOzmuAhNhf3tlb6kQGMtYLk8TV4I1
+         YZmQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777041695; x=1777646495; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777041851; x=1777646651; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+mdrds+Jypjh2CkgH36BmFmMXpEe9MxlGtue5cGpFNw=;
-        b=cGseifmhGzl2vpi9EW0eNCcqLB36bcVfCzJ41kBXEHDtkh3tzqA2GQSJXNSe6Kd1Ma
-         Qj1paZSkeNFwZLlOcIsDEwUNxNIn7ijyrKJodEMA3NL2OgGq5Zjmwwbqg99Ofwxi9lJP
-         hzkuoq6nR46si6zaDJunu6FeDrxCTI3m2UTKI8hTrmf/vQXIRtiyKxHY7MmH1YzmD5Ff
-         zk8kwVMP9o+ukmRzH5gTqx1+Ik36o07lh88eZCvdksPwbmi78f0P9eb3GuvWfqjQfZWK
-         3MxxrqvekVF/SBmw5Ex0kqIhFYA1yrLAQJT2fr9PH/BT6T4OkwtrrV7jZJeMRKp5icWY
-         B8Gg==
+        bh=dLGeuJPVWr3+lJqklk/j4A0GqiySHErHU3CNareY6Q4=;
+        b=LYVtSzLDkeztT6wSl9NUow678JBNwNmMJuyBFohpd+AZO1My6WScUqnFq9XhOkP78N
+         eskmx7cl7zHe4CWl0Ko64QVT5bef9Zk2B0/njvRjuXrscEEIzlMOGRYj1wPdTGttVk6O
+         IYUd0AbsYb5UKRKGlpF/ECACXOVXspGcykmqSfcgTWKL2RvP7TOqVqvgkDgBf3otKtef
+         SHFQGa1Kx/EEnOWmAH4N1IhAzEAiD5tsNIEHWKvPk5cp2foKYpGG9fajvjOuKKiHfb1Z
+         GMg9xzeWv/vl9s0I4TqjCMOC8NCAB2oqLkq3oaTGnPxAaFUn1WZFR95mMioaCKExMWNk
+         Tuzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777041695; x=1777646495;
+        d=1e100.net; s=20251104; t=1777041851; x=1777646651;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=+mdrds+Jypjh2CkgH36BmFmMXpEe9MxlGtue5cGpFNw=;
-        b=AuLDjDPeh0qZAVhRth538x6ZnbanCdfLn3gzuVFelaGz2aY3oASX16/gyCB4zBaTi0
-         YqA/OWDkiYvSX9bowLPNq89OV79TYqCfJmfBK/nISFBGJOy/p/3uyyhAk/l1038po0MJ
-         dBdtAlbiE63va7V7+lfo2Gswi3fcVobSI9sKtDNZ4lZN0A3eFzM26+QHXATeiNrAfAAC
-         /pBAPDN9pMtUaotyJSTdR8kRjfdXpbCOnmXlyBzjP1xnhTfdw00trfqpU8rXe8eAYyRO
-         PlcXRwNtLD0NRskBekF1yVOgMn0uJE1gv3PxtJMLKdFYNlCx2ju6snMo2U1J7adgJQt1
-         qADA==
-X-Gm-Message-State: AOJu0YwaW+hKf3E2WtFtvvmdheGfmMwEjNQfZ5w5E1jqF2MYj6242dgj
-	tXV6jzEvmneOCwQG9tbq5qeL2mUh/omzGYsHNvEHnNfnuJOUUzUCN9xsHrlRw9qY0JN3LJnxTyM
-	JWNTPPkhYgGHjFBbx6yh7RBuaoOBL1Wc=
-X-Gm-Gg: AeBDievYxnybPR5fXSikC3Pal2U0cZ+57D38MrmHs7RXP+Difb4zy/K8JLulWIbbM7i
-	MI/vC9YoayieG7AkmoUrRbkGdbAti5ao/gOoxYt4RhucCTonsyckRtuD87HY85eI0isCKs8sz97
-	wihehN+SMGFC6o0ru+OT8T+3ZP0uGOkBPyP5btiWnw8wrSs3yuPeXpUO8h7vX7iOAVFL2GLvtBB
-	z0Enla4v48znu66hvdsYTUbnZQTKOfWcksIDmwga3KrYdaNYzqkoLy6NxJXsl319UYyBlchLgnO
-	elM06d5GjEwP8ccDXB5DkKf5pnIIfDjoNG8VcTMxcU/jS12vZecltivX1shjMisX3AJ6N2TIFSK
-	zQZTx
-X-Received: by 2002:a05:690e:1406:b0:650:6df:681 with SMTP id
- 956f58d0204a3-65310a0c16cmr30994332d50.32.1777041695063; Fri, 24 Apr 2026
- 07:41:35 -0700 (PDT)
+        bh=dLGeuJPVWr3+lJqklk/j4A0GqiySHErHU3CNareY6Q4=;
+        b=Co62E8MyxQDRNJ09L7Anvtryg+VRtrzg4qt9UNVl+JBO/hqrXDnExDkPZsNzETKHEZ
+         t/e9oCfMX4+6EZ11KOFmu5yE5naBkKX2vqOw+oM+J2wrvdDw53n5OKcWucDlOYgSktPF
+         yfpMfWxVA1G03gFQljmevtRFcSZbpndZtPNP9kFgvq8wurCBfs5hwgPk52n3PQgdzuYr
+         lrWUdLd2TcAmOFOrY7qQn3A6ufQ3KcvCfUDV5fOc/ANMi/XRwD47M+3/4GSLbuaUwVQ+
+         X2ze123Q6ceE89aH4coBSBVocz1jHsrN7igKdKEdc6/d9kLK9v0zCcGobCct4pJpn4P1
+         ayzA==
+X-Gm-Message-State: AOJu0YzRDqh8tgvXUdFyzdt/1sc4aiGlPfMCaoa1TDUrw8Uxhj5QtcQp
+	ESQ1xV9SjAgxNMoInHJzyKfvyLecRMBa8OtBGxDomc8gud59suTPkYM8AnTptDYWe3HVafjJ6Uj
+	7OCruNKtX5xH8kKVgxwWB/4VwBclCBI5+3sAUbaE=
+X-Gm-Gg: AeBDievP2lGLKY5lo6Uz2MW15yUedUJ1PZ9fYS+z5vugFW3xBRQrkTeV6lqiOOiWfSt
+	WWS93bsnbQyPu+OI/E17bWX8G273oTsG6/MMMSv9vbVigAS7SNbaT5tn4gplVOy2AxzGse0oKvp
+	qgSxCrG+jq6BsMyqGwjCzJk6OkLCzjNQoI5t1wDeaL3cbvtBpRSprfbTYcyA70/s2P4nUKMUdXp
+	J3rR2YJkoPseCY6AIquQuFrd+1uaSmGxhC98hliNGYfuJJ+wp8ZTmoe0QjZYweoH5ttufk7hnPT
+	0szvTveB90xctFeJzVoPFbjDggzyy6+5bPNm9uzvXXNpYFGIs6a0pGHERC8apJze46jvg+9e7MB
+	C25Eu
+X-Received: by 2002:a05:690e:23db:b0:651:c7b1:d1e2 with SMTP id
+ 956f58d0204a3-653109ae164mr20830634d50.37.1777041851312; Fri, 24 Apr 2026
+ 07:44:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -85,16 +85,16 @@ References: <20260317142645.6332-1-raghavendra.rao@collabora.com>
  <20260424141831.9172-1-raghavendra.rao@collabora.com> <20260424141831.9172-2-raghavendra.rao@collabora.com>
 In-Reply-To: <20260424141831.9172-2-raghavendra.rao@collabora.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 24 Apr 2026 10:41:23 -0400
-X-Gm-Features: AQROBzAc2iSsfAZx3TFjLzjkPUHTfJgOYEPoBy6qKzo48Z2anau55oFu5VCZx8o
-Message-ID: <CABBYNZJ6ROO7SJ16M_kbAYYyEQY8kMbbrOvB-VOQ2-aqjK1fQQ@mail.gmail.com>
+Date: Fri, 24 Apr 2026 10:44:00 -0400
+X-Gm-Features: AQROBzCucbTUmxLs69Lem8jceDI1hpAiHaLrOqaKEroUEjsiybMM1kUvdxc2L8I
+Message-ID: <CABBYNZKXGxv0kVVOYZW0AsnQ2Qgx0NhAJ99k3kmjDeGgMcZ84Q@mail.gmail.com>
 Subject: Re: [PATCH v2 1/2] client: add public-broadcast advertising command
 To: raghu447 <raghavendra.rao@collabora.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Raghu,
+Hi,
 
 On Fri, Apr 24, 2026 at 10:19=E2=80=AFAM raghu447 <raghavendra.rao@collabor=
 a.com> wrote:
@@ -126,7 +126,12 @@ a.com> wrote:
 >  #define AD_PATH "/org/bluez/advertising"
 >  #define AD_IFACE "org.bluez.LEAdvertisement1"
 > +#define AD_PUBLIC_BROADCAST_UUID "0x1856"
->
+
+Forgot to mention, we don't seem to have a decoder for 0x1856, would
+you like to create one so we can actually see what is being programmed
+on btmon? That will probably require extending the
+monitor/packet.c:service_data_decoders
+
 >  struct ad_data {
 >         uint8_t data[245];
 > @@ -1005,6 +1009,73 @@ static void ad_clear_data(int type)
@@ -185,9 +190,6 @@ a.com> wrote:
 > +        data.data[0] =3D 0x02;
 > +    else if (!strcasecmp(argv[1], "hq"))
 > +        data.data[0] =3D 0x04;
-
-Are these bits? If they are, let's use BIT(1) and BIT(2).
-
 > +    else {
 > +        bt_shell_printf("Invalid argument: accepted values are sq or hq\=
 n");
@@ -240,11 +242,6 @@ state)
 > +    "hq",
 > +    NULL
 > +};
-
-I wonder if we should have better names for these, Android seems to
-have a setting for compatibility, not sure exactly what it means in
-terms of adv settings though.
-
 > +
 > +static char *public_broadcast_generator(const char *text, int state)
 > +{
