@@ -1,35 +1,65 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07ED3E5EDC;
-	Fri, 24 Apr 2026 18:50:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777056649; cv=none; b=TdU+hdv6fnHtMml5bZW6t80xTdgZVVP0QnlPnw1ldQaOJGBTaRBxxNGAN4E0wSw0OeGqMi1KNpbkkTNf/wNGOT37rw8klD1qVLmnYjdv4ERSfpDKmvN6siLyogp2sjAAcjrn/zIp8xl7Sl0ePpM/duW/ii56TYkBjqwOWun1dYs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777056649; c=relaxed/simple;
-	bh=/HmWbBRzv2bdxtNoRQsM/QXBmP5tXQFB8Lthz0780gw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=c3m2NZiJSbrXfq4BSda94KUosS/ybeWGUAXOjtSeWTY2Bta2HPRVQkSK2sPRIywDo4Gi/PibVOafdUFtVEqMX0HTAA+VSfA77wRFzDLYG9Y8wfIxnDMWoOKQOUurYPl+gHfLpC/R/wlIsiO/j4ivdg0cStUU8UU1MseUsPNNT5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BBqd7Bo3; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656CC346E6D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2026 19:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777058706; cv=pass; b=ZT87CCpCJIUo+IMqkzeuL7rcRrkuzPvHarqd9GfVPmq9eENe8SyG5XAasdN2g1ImAbm/i2El4fY3QYwBSM2uLjahA/0zYQ7T+kFrfED5JhauqwIRGtbdTiD/Nny64NLGkit2rH0Se4pAfxEcKJ3pM0uqxJy0x9vvHlffnkp26FA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777058706; c=relaxed/simple;
+	bh=SImdqwnZssbxVMp6BHu/VceGUXhj4tDWMbAyhItzfWI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QYf6gUy9+S9Ecp0CXhoE5fqxSQ4volvW6iQL88ZAbY+sjhnAAKicbtrNX6+gXxPB/wrAFY5xbmEfmCP17vx2rdULvp8ABTZ/l08SSIfjG66+t6cOOCTYUo3fbSfPKC022sRPPDu992VCAQ5RnQkIN4ho4R0t0ZQyv5TdXntZOCA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=lYm9Sz8S; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BBqd7Bo3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60AF5C19425;
-	Fri, 24 Apr 2026 18:50:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777056648;
-	bh=/HmWbBRzv2bdxtNoRQsM/QXBmP5tXQFB8Lthz0780gw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BBqd7Bo3qIrTRr98/beIPG3OXkgCUBOikTCzcgF3chOaYa4keaqK8fKxvOMgE+0IU
-	 sItF1mD/+0XtBUAmBvnpVpnQEPc/t4helXhMF2861WyI53f+g4mnTbW20EpabOjKTY
-	 wi/qb2fQvMG5u4fifYhG7dcnpgCFGhDM2aytHXGHMt6Sj6K/XeJFci9EKVsHhPMJon
-	 8yX8upu7ngV3ZqXyMTXbjOk+JEdvj3onp5io7OVuLNQMzKYSEQsc+rYP6bXh3IikZ3
-	 KaCnUlVjSI2UBfmL6UhQcCZdqyyvH92/MOjJ8ekqpzKvf7Tng6D/MmnlvE101FpZHu
-	 0ja8anuexX/jA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02B9B38119C3;
-	Fri, 24 Apr 2026 18:50:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="lYm9Sz8S"
+Received: from monolith (unknown [193.138.7.192])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4g2NFl5mFPzyV6;
+	Fri, 24 Apr 2026 22:24:59 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1777058701;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=r5s4ITLzucb1NombRG39OYMqsz80PblAoilF2T+Vi8I=;
+	b=lYm9Sz8Su6evx9NdAj+NTRpFmH+VaKSbfnNYiWy4GiQ5Hq0VtDwqofaeRgDuf/CaL3EeId
+	KktWdt9Z0/Ma4m/q9mN/7Hn9Mfmr+AldJctIalDiGFSuaKn2NJHZ3+elK7nLQv2mpgjx15
+	plpWMgSS9NFXnF5fzK6Nzgfn5j6oKnc=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1777058701;
+	b=lVKRQcw71A0X2HmW6qGRuOXSvX42hQANcV+YaO/NEZgIQDEDKF8RSBwHaaSfskQ2C68kQm
+	2G+olXdqYAK5cNR7wLCbVtaApRKz7DQ8jlLUE2XGx5Zf9fcQrtbQP6JtiknC106r79jgHT
+	Na2R5PWieWtQ6AWyHqe/9fnI+n1z5e8=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1777058701;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=r5s4ITLzucb1NombRG39OYMqsz80PblAoilF2T+Vi8I=;
+	b=sNFrQ2sbGtdQ2cyjNtHKrjvkm+m2fpUXJwSc9VLf5WJMx/Mi354s3/MQ+SlzQU7kmGy1z/
+	E7kXDc7alHpSzgqeZDCuj45cJzgACS7GQ1OHOWNKciEGuEHyin9PRn5oJLOlVoxUIon8zd
+	I81LJwj81aGsyPCvbxRbk/RX3AHhsTE=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	tristan@talencesecurity.com,
+	linux-mediatek@lists.infradead.org,
+	sean.wang@mediatek.com,
+	mark-yw.chen@mediatek.com
+Subject: [PATCH] Bluetooth: btmtk: accept too short WMT FUNC_CTRL events
+Date: Fri, 24 Apr 2026 22:24:29 +0300
+Message-ID: <770d36b07311bf88210c187923f243fb9f126f04.1777058551.git.pav@iki.fi>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,42 +67,47 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: RFCOMM: pull credit byte with
- skb_pull_data()
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <177705660854.1662901.6374144616828981672.git-patchwork-notify@kernel.org>
-Date: Fri, 24 Apr 2026 18:50:08 +0000
-References: <20260424070102.1-rfcomm-v2-pengpeng@iscas.ac.cn>
-In-Reply-To: <20260424070102.1-rfcomm-v2-pengpeng@iscas.ac.cn>
-To: Pengpeng Hou <pengpeng@iscas.ac.cn>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, kees@kernel.org,
- kuba@kernel.org, mingo@kernel.org, hadess@hadess.net, tglx@linutronix.de,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
 
-Hello:
+MT7925 (USB ID 0e8d:e025) on fw version 20260106153314 sends WMT
+FUNC_CTRL events that are missing the status field.
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Prior to commit 006b9943b982 ("Bluetooth: btmtk: validate WMT event SKB
+length before struct access") the status was read from out-of-bounds of
+SKB data, which usually would result to success with
+BTMTK_WMT_ON_UNDONE, although I don't know the intent here.  The bounds
+check added in that commit returns with error instead, producing
+"Bluetooth: hci0: Failed to send wmt func ctrl (-22)" and makes the
+device unusable.
 
-On Thu, 23 Apr 2026 23:31:00 +0800 you wrote:
-> rfcomm_recv_data() treats the first payload byte as a credit field when
-> the UIH frame carries PF and credit-based flow control is enabled.
-> 
-> After the header has been stripped, the PF/CFC path consumes that byte
-> with a direct skb->data dereference followed by skb_pull(). A malformed
-> short frame can reach this path without a byte available.
-> 
-> [...]
+Fix the regression by interpreting too short packet as status
+BTMTK_WMT_ON_UNDONE, which makes the device work normally again.
 
-Here is the summary with links:
-  - [v2] Bluetooth: RFCOMM: pull credit byte with skb_pull_data()
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2940edce391d
+Fixes: 006b9943b982 ("Bluetooth: btmtk: validate WMT event SKB length before struct access")
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
 
-You are awesome, thank you!
+Notes:
+    AFAICS the commit is not yet pulled and is only in bluetooth-next, so
+    maybe this should be just fixup?
+
+ drivers/bluetooth/btmtk.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index ab34f1dd42bc..68a32d11e5ec 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -719,8 +719,8 @@ static int btmtk_usb_hci_wmt_sync(struct hci_dev *hdev,
+ 	case BTMTK_WMT_FUNC_CTRL:
+ 		if (!skb_pull_data(data->evt_skb,
+ 				   sizeof(wmt_evt_funcc->status))) {
+-			err = -EINVAL;
+-			goto err_free_skb;
++			status = BTMTK_WMT_ON_UNDONE;
++			break;
+ 		}
+ 
+ 		wmt_evt_funcc = (struct btmtk_hci_wmt_evt_funcc *)wmt_evt;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.53.0
 
