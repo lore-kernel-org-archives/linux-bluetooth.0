@@ -1,105 +1,118 @@
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.174])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD473BE624
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2026 11:38:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7679332F765
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Apr 2026 12:12:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777030701; cv=none; b=eYd1aMMfTgL3N+OpbV/qcCT2oAF+WAZQCxE28ZcR4lniZ2/NrguiA/5+wBYbjlnFDjHCLjeMHYKpqObyfksNIw32JipCO2RAhuIgiYzPAfTkesukuX4d9450+hPD34tVu1BjplDUrvm/feLz9z+9KO4Sic8D1jWSq8QAq8cvCWg=
+	t=1777032753; cv=none; b=HHJnzw7ZN8EDhdx5ae/+rGv/lUF6tN8ehfofNFJrLttFEv6OWobUacBuzpHRL/Gdt923ppNO5xtcA7P6bfESO3sbJXyPCijrxDqFI/dg0KfugUAVtu/2+wqJtos3HdTh9iliUIBmkosQbwrk+LSZXwvLgIO8zGB0KNNPT+vRdq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777030701; c=relaxed/simple;
-	bh=11wqATdJd9uiOqrvI9u0loUKqZlcaAn+H7K3JSsdgKY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AQ8Bk8yoC/Eh3DYrI9dGRiHKV6WG/3YbaaAK989YsuvnJ27iiI+dVIsHNSQ7F1+fdbeypuzWCIVR6mnjlMwhrrM/N9YJ8+oj2L+ntLj54t+d5nbud/6GgZY3B66M+t7/XPhCU2YixL/ArzIBn/mBD0cZpOUA/WRLUdVUX3qk680=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=Gg3fFDrc; arc=none smtp.client-ip=188.68.63.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1777032753; c=relaxed/simple;
+	bh=YtxPv4id1DY8fExzcnX3S/OqquVBq6Xmf/aWdBzpdXI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=g7jQivASCVsifNs4twazM3lcABVGuM41Af8NgJjefGAo5sRGt8SGqSwZZ9YwSx61kQo1MGL3boG29Lt8u4VTrwKO7YFtjFZMlVOPjTUGd55BzqqNwg+GlAI69ln4FGNurDbmVU7dBd0rCYl7vh+S7sSfo48godsfqNH6+I2Zyw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=f2MojG/A; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="Gg3fFDrc"
-Received: from mors-relay8204.netcup.net (localhost [127.0.0.1])
-	by mors-relay8204.netcup.net (Postfix) with ESMTPS id 4g29lG6dYPz8gGK;
-	Fri, 24 Apr 2026 11:31:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1777030282;
-	bh=11wqATdJd9uiOqrvI9u0loUKqZlcaAn+H7K3JSsdgKY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Gg3fFDrc9h1WJZib+4Augf9otyWKM4KCZEPkQ3eTnX3ZTLTJmXg4q9sB5y/pG77nL
-	 wlWYE2up6ZK1t7o76bRAKXCnVZhsLbX8Cn2oiNiB47AKuVgtAZPYiDoNUDbLH3hFTr
-	 tspVIqxj3rGsLLZifcgHc2Xz12nZGxljoKJroUqD09kvIn3HAlpMiEesBOumSHZMIq
-	 9fHuql0JDzhLhWGqBgdQDOWhTvhAnW0HHx2ZP+oWihllUx1hkC6akGKXx3FMcrHoAB
-	 z4ZohDp37xU2vKTqvxSSVvLoTc3cVyIn46yf/Pt9/a/IhNvN5ocsFxQXypQMin5RXV
-	 6THYmC0sIPskA==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay8204.netcup.net (Postfix) with ESMTPS id 4g29lG5vD8z8gFh;
-	Fri, 24 Apr 2026 11:31:22 +0000 (UTC)
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4g29lG2LpNz8sZh;
-	Fri, 24 Apr 2026 13:31:22 +0200 (CEST)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id B0BB3632CC;
-	Fri, 24 Apr 2026 13:31:17 +0200 (CEST)
-Authentication-Results: mxe9fb;
-        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <ff141080-e94a-4c58-8fe0-f1c309d3f579@leemhuis.info>
-Date: Fri, 24 Apr 2026 13:31:17 +0200
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="f2MojG/A"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=qd
+	MkW+H5p8KM8m408oFhTfvR9xqPIozPjKl9Fh634XI=; b=f2MojG/ArIdHcVhdEY
+	Wibq3jeGURu74pmctw+mTcIgctGSbSlBy4ImaQ3nNlQDQ6OveGcThei9M/aciuJx
+	2kkfsjUQh+7Qw5yeyBS7tmEW3uu7z67hiurDqHlq1q3c35dXK9v9PNrRqpF14Vqz
+	p5MlX3cEDciWil/jHXEdKG/Xs=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-0 (Coremail) with SMTP id _____wAHTPR7XetpGqKqBQ--.57233S2;
+	Fri, 24 Apr 2026 20:09:32 +0800 (CST)
+From: zhangchen200426@163.com
+To: luiz.von.dentz@intel.com,
+	chris.lu@mediatek.com,
+	pmenzel@molgen.mpg.de,
+	floss@jetm.me,
+	sean.wang@mediatek.com,
+	en-wei.wu@canonical.com,
+	Zijun.Hu@oss.qualcomm.com,
+	chharry@chromium.org,
+	ceggers@arri.de,
+	johan@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Chen Zhang <zhangchen01@kylinos.cn>
+Subject: [PATCH v2] Bluetooth: btusb: Add Realtek RTL8922AE VID/PID 0bda/d922
+Date: Fri, 24 Apr 2026 20:09:28 +0800
+Message-Id: <20260424120928.397758-1-zhangchen200426@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Oops with 6.19.10: RIP: 0010:hci_sock_get_channel+0x5/0x20
-To: Gabor Gombas <gombasgg@gmail.com>
-Cc: Paul Menzel <pmenzel@molgen.mpg.de>, linux-bluetooth@vger.kernel.org,
- regressions@lists.linux.dev
-References: <actZBr+wqcABY5mt@lan>
- <e96776d6-ce8c-4626-984e-474f3606445d@molgen.mpg.de>
- <b3a60d9e-b811-42d9-bf05-f400e1302a30@leemhuis.info> <acwk5Z6AwTwE4H7D@lan>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-In-Reply-To: <acwk5Z6AwTwE4H7D@lan>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-PPP-Message-ID: <177703027796.991585.11373475514707063773@mxe9fb.netcup.net>
-X-Rspamd-Server: rspamd-worker-8404
-X-Rspamd-Queue-Id: B0BB3632CC
-X-NC-CID: iEAja7G2/FoEdy85d3eUDy5UqwAh2mAZg3JDYHIvMNNWhe4SUH8=
+X-CM-TRANSID:_____wAHTPR7XetpGqKqBQ--.57233S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxJFWrJr4kGF4rWFy8ZF4Dtwb_yoW5Gry5pF
+	45J3Z8ZF1fKF15W3s0kF45AayrW34xW347K3W7tw1rXFZ3Aan7JF1UArWfXFs2yr4Sgwna
+	qFnrG3yrKr1xKrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UPxhJUUUUU=
+X-CM-SenderInfo: x2kd0whfkh0jaqqujli6rwjhhfrp/xtbCwB3LaGnrXX3f+wAA34
 
+From: Chen Zhang <zhangchen01@kylinos.cn>
 
+Add the vendor/product ID (0x0bda, 0xd922) to usb_device_id table for
+Realtek RTL8922AE.
 
-On 3/31/26 21:47, Gabor Gombas wrote:
-> On Tue, Mar 31, 2026 at 09:07:48AM +0200, Thorsten Leemhuis wrote:
->> On 3/31/26 08:24, Paul Menzel wrote:
->>> Am 31.03.26 um 07:17 schrieb Gabor Gombas:
->>>
->>> Can you reproduce the issue? If yes, it’d be a great help, if you could
->>> bisect the issue.
->>
->> For instructions see:
->> https://docs.kernel.org/admin-guide/verify-bugs-and-bisect-regressions.html
->> or https://docs.kernel.org/admin-guide/bug-bisect.html
->>
->> Checking if mainline is affected is also important (the first guide
->> handles that), as that determines how this needs to be handled.
-> 
-> Unfortunately it's unlikely that I would have time for a bisection
-> before the weekend. The bug can be reproduced, I've booted 6.19.10
-> again, and this time hit the oops after a few minutes. The oops is
-> slightly different, so likely it's some kind of memory corruption. The
-> box in question is running Home Assistant, so it is constantly scanning
-> for Bluetooth devices.
-> 
-> I have a 6.19.8 kernel which I've built some time ago but then never
-> used, I've booted it now, we'll see how it fares.
-FYI, 6.19.y is now EOL, so this won't be fixed. But if the problem
-persists with 7.0 or 7.1-rc1, a bisection is likely needed to resolve this.
+The device info from /sys/kernel/debug/usb/devices as below.
 
-Ciao, Thorsten
+T:  Bus=10 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0bda ProdID=d922 Rev= 0.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00E04C885A01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
 
-#regzbot resolve: inconclusive: 6.19.y is EOL now and it's unknown if
-7.0 is affected
+Signed-off-by: Chen Zhang <zhangchen01@kylinos.cn>
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index a0a7da498466..d84faad07dd7 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -601,6 +601,8 @@ static const struct usb_device_id quirks_table[] = {
+ 	/* Realtek 8922AE Bluetooth devices */
+ 	{ USB_DEVICE(0x0bda, 0x8922), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0bda, 0xd922), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3617), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3616), .driver_info = BTUSB_REALTEK |
+-- 
+2.25.1
+
