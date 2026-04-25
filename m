@@ -1,180 +1,119 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1458339D6D5
-	for <linux-bluetooth@vger.kernel.org>; Sat, 25 Apr 2026 12:56:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777121769; cv=pass; b=f4tJDUXIZpJKa6x1sxRiRHKQU19CCd4UrqUXkfB+o0e2y7BKLP6van9hSIuy1AGtfjUYIGqWWp8Mf6Y4dhuxLA54eRLnRluliKBHcwIlhJMDB05lP2R+Dg6r/c30zk1FJ10Yb2dPdX7dle2HSCKueu7Yz5plg7CCfk6BknM4IoQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777121769; c=relaxed/simple;
-	bh=J78BG+6Vr3/BREqH8LEBG5R47nqvMu2JRLpZ4lKyayU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fOPbjmuewBSsu455RLi8fQknnPszxEf1jL1aRmtu4OLyCGd+UUti4mO8Q8XRR6+zQzLPp439ZQo7uAturR/mYqXf83UaU5rZX46oVnAWbuYnbtEy04tn6QWSoBYULTFeV5X2mgp4R4F3fJAinlOsXPK3JjcJnZra1D4gqOTrCLs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=aKMtkm0E; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9ED833D6C1
+	for <linux-bluetooth@vger.kernel.org>; Sat, 25 Apr 2026 14:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777127016; cv=none; b=uxL3ZzJx0X6d18eV3CYFiVzeCWwqPr5wKNPuuybOPcb5kYUjXWY1I1EyQipe1C7mnz3/rkZwCbm/OuUbW/vbKL3ZPt4Fpv+qOdd502uEAevn+vEyxprxNDYdSIbZUQ9v4LVxSL8kvUj2GCPzzW8u+w7hy0gWmebhguquxwbDFYk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777127016; c=relaxed/simple;
+	bh=7DCNnDph+P2xor3T10awohAbFMhR8kafC44PE+q5GpE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=RvSMMrrLNrKZnzvpgmE+dHqgbgzSDk5fgI/GabMs1rDwQjOtBDkSfC3RKey3jBLEQfGIlb+Yrh1AWdMPo3Z8vg3rbVRe4+iUtlzYGLXnGo2eTDB7+klquFnu2tIdmJtIoH9Onbbnf5dw0W27klm6/MCvSao2MOqBuzS5sEg86J4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n6h2zO79; arc=none smtp.client-ip=74.125.82.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="aKMtkm0E"
-Received: from monolith (unknown [193.138.7.192])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4g2qZW6WSBzyQH;
-	Sat, 25 Apr 2026 15:56:03 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1777121764;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=SZuM00xQCJ9SQ2uX+LJVCZK3MPfrZawFfZ2Xb8E/2s4=;
-	b=aKMtkm0EaI52qzj7Tl97eYU70YCX3LuTbA5qnhu/EIXueIjFgswiPxU8QYIbElGW2/tniS
-	tsTuQaQxLYEuBSIat+ESy568ELmRXWbo57pnTwtsgBs+sFen04cYuC6V4PR1a/84YCwq8m
-	vZDvqLXCBp262QebZ89qhCzDs/fT6SY=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1777121764;
-	b=C8USSztDHHl4b0/mNjUxEpE0vabil+YQZ6KJlJ0m6LYUhrV2a72jMY+b1yqY+DdFxhNKVr
-	gopjokNI8PkyQmtCwHXjh6Lp1ZbQyuaj6XUgwhDoYxP9ZGA1IwXeP0hn3aZJmUTTsGi8JT
-	2SdrCCHRQklVfcI8ioonGSelisrG3fg=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1777121764;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=SZuM00xQCJ9SQ2uX+LJVCZK3MPfrZawFfZ2Xb8E/2s4=;
-	b=xc6OBqPcbyfZtUChCGiipyP5Niu1l3RHNRkCMiAB5D7sg5xJkI0AqyrML93EtdCZmIfzpA
-	PJP8zhGu/8fICDBrVqFTSTxF07i2/Ww8V4tALwJI5frK/wDO4XFpRKx7xXs5TH+S5uekAF
-	NP2TBfen40C2+7pIIBgn74SLlu4SzgM=
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-mediatek@lists.infradead.org,
-	chris.lu@mediatek.com
-Subject: [PATCH v2] Bluetooth: btmtk: don't generate bogus ISO packets from zero padding
-Date: Sat, 25 Apr 2026 15:55:31 +0300
-Message-ID: <621d8a2b651aba8e3c2197017ca94f06ec77b824.1777121590.git.pav@iki.fi>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n6h2zO79"
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-2c156c4a9efso12081791eec.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Apr 2026 07:23:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777127014; x=1777731814; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=tlt9urkRxZM8cvVxpJ9zXNjs9cHf/EFJxXt8bMpEhFA=;
+        b=n6h2zO79aRBWT2dwxfExaUa6eT3xN0AXflLnBZhlkViFP4pSK2Wgn107oL8IQMGoaO
+         ihqVVzR7WIQ8o1m0cDqkr/Z5X5edScCAg99DlAPYe0rvJHLBrAoPtzpYM3Ce+UEITGQs
+         E2KYQm1IacHvTIiJpbPvLuZP6tTtxq/EvuYrX8RWLfLqeqqs3QkqRFagog/Kn/rGK3KG
+         6GEw4Vea2DlVpgesPOBlPxRLISOjXn1/k5xzRMULnbBr/WvNpfz/V4CCheFtqj6rr/W1
+         D3Awly68pz2SR2RUW67OxfB3wWefOcn0LYuQMFQpKu8ehkX0i6bxRPlr4aCmWHW7EHun
+         10Kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777127014; x=1777731814;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tlt9urkRxZM8cvVxpJ9zXNjs9cHf/EFJxXt8bMpEhFA=;
+        b=FKN37rx08EJgg/0HZz9wRoBUe2+6BFlZMp6y5/Q0Eo7dYGCOyJ42DZ9jwRH/w0igB2
+         xTccWM0NAi41EZ28G+rS+nTjCcSgNUfDncSLzxzD6uqCvq8WmRFoOWpLUiL3+FGEyIlT
+         ciS+zkNDE2u0UTrVFTiYWLPIamADwhUy2KJdNPc1+CTnrrQJlhhcMmr6DukagFzHnkbq
+         DX1CxLlfd/fSmWFWjb6Wyb4gYXte9EksEmx8NzXyCDQaeWWvoU3KseDmCXuJ0IlNC6OA
+         LnC6tJnTeeQwJImA0t/SFhTKAKCVDP7ZQdr3HlE80gHFY51JBECP2aRMNawoUcYnRRO8
+         Pjjg==
+X-Gm-Message-State: AOJu0Yyw3CWHeTUuFXwwlVv0GRJEcJJMS41eHA3k6Jqz+7QhwAqpwKmp
+	dU/yySLg2pWcgdx/mcZWYLC3EogojeYm6ngcUcWMHzZwDlbPAskkxNNmbSDVNQ==
+X-Gm-Gg: AeBDieu+zVz0MBCMlWicPB7gaADTxveuiPh3qC18/ykP2v6FjBsk5KmprupqiU11XuZ
+	RD9OanV7JUhOL27C0qdUu0W37M1vL/lkfl3FghvBZWT8wS7ELRW6y6ghLVLrSaESp+eoGDxc8m4
+	mXdsNqrA6mfw2vWPEQMFE+2gNQVTxCzTJtppJvP+8AUJjlIudpZ/2OEeqoDIIvjtYFcTWKtTzP1
+	b1DeZYVVqgJnsMSAgP1yQjLM5Pbb6XTjwxkBQ6c48FoWcIxvU2s1qlTNTIU3BhWFqoBT/PrSyNO
+	4BMWb8UeOpaJqtQjwJNyYRYnuj+bWpOedHrpvs3eHzJzX6T8cb4KiMvBNF8Mca6oTxceMZWYg3s
+	v2pT/YaV1GfL8jnTyid1jJfwUm2KhwTOcnAilK9lulLK8EgXPXn0ToInLH6ZTu6ETsAAW38Fbng
+	JoFCSJkMFkVQGG4gNRfiIzGN1hD5gCSzY0OvoYUi4+
+X-Received: by 2002:a05:7300:b807:b0:2ea:d965:a4b9 with SMTP id 5a478bee46e88-2ead965a544mr3409971eec.7.1777127013625;
+        Sat, 25 Apr 2026 07:23:33 -0700 (PDT)
+Received: from [172.17.0.2] ([104.209.5.147])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e539fa3ce1sm34545508eec.4.2026.04.25.07.23.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 25 Apr 2026 07:23:33 -0700 (PDT)
+Message-ID: <69ecce65.050a0220.355219.7cd1@mx.google.com>
+Date: Sat, 25 Apr 2026 07:23:33 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2684199483573245099=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [v2] Bluetooth: btmtk: don't generate bogus ISO packets from zero padding
+In-Reply-To: <621d8a2b651aba8e3c2197017ca94f06ec77b824.1777121590.git.pav@iki.fi>
+References: <621d8a2b651aba8e3c2197017ca94f06ec77b824.1777121590.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-With MT7925, received URBs for ISO have urb->actual_length of
-MTK_ISO_THRESHOLD (264) and contain ISO packet data followed by zero
-padding.
+--===============2684199483573245099==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-btmtk driver ISO handling added in commit ceac1cb0259d ("Bluetooth:
-btusb: mediatek: add ISO data transmission functions") assumes the data
-contains only payload, and generates bogus packets to hci_core from the
-padding, resulting to printk errors "Bluetooth: hci0: ISO packet for
-unknown connection handle 0"
+This is automated email and please do not reply to this email!
 
-Add check in btmtk that a new packet is not started if we have only
-trailing zeros left in the URB. If so, skip them and emit an error once
-per hdev, since this doesn't seem to be the intended behavior. This
-reduces spam to user logs.
+Dear submitter,
 
-Limit this behavior to the 7925 model.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1085490
 
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.79 seconds
+GitLint                       FAIL      0.26 seconds
+SubjectPrefix                 PASS      0.06 seconds
+BuildKernel                   PASS      27.00 seconds
+CheckAllWarning               PASS      28.81 seconds
+CheckSparse                   PASS      27.85 seconds
+BuildKernel32                 PASS      25.95 seconds
+TestRunnerSetup               PASS      568.80 seconds
+IncrementalBuild              PASS      24.21 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2] Bluetooth: btmtk: don't generate bogus ISO packets from zero padding
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+26: B2 Line has trailing whitespace: "    "
+
+
+https://github.com/bluez/bluetooth-next/pull/124
+
 ---
+Regards,
+Linux Bluetooth
 
-Notes:
-    v2:
-    - limit this to the 7925 model, as that is the only one tested
-    
-    If there's confirmation from Mediatek the zero padding instead of short
-    USB read is intentional, the warning is not needed.
 
- drivers/bluetooth/btmtk.c | 35 +++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btmtk.h |  2 ++
- 2 files changed, 37 insertions(+)
-
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index ab34f1dd42bc..934daf004dd6 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -1088,11 +1088,34 @@ struct urb *alloc_mtk_intr_urb(struct hci_dev *hdev, struct sk_buff *skb,
- }
- EXPORT_SYMBOL_GPL(alloc_mtk_intr_urb);
- 
-+static bool check_isopkt(struct hci_dev *hdev, void *buffer, int count,
-+			 int pktsize)
-+{
-+	struct btmtk_data *btmtk_data = hci_get_priv(hdev);
-+
-+	/* With MT7925 we receive URBs that have size MTK_ISO_THRESHOLD, with
-+	 * trailing zero padding following the ISO packet data. This appears not
-+	 * intentional, so flag an error, and skip rest of the URB to not
-+	 * generate ISO packets from the padding.
-+	 */
-+	if (btmtk_data->isopkt_rx_pad && pktsize == MTK_ISO_THRESHOLD &&
-+	    count < pktsize && mem_is_zero(buffer, count)) {
-+		if (!btmtk_data->isopkt_padding_seen) {
-+			btmtk_data->isopkt_padding_seen = true;
-+			bt_dev_err(hdev, "Zero ISO data (only first reported)");
-+		}
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
- static int btmtk_recv_isopkt(struct hci_dev *hdev, void *buffer, int count)
- {
- 	struct btmtk_data *btmtk_data = hci_get_priv(hdev);
- 	struct sk_buff *skb;
- 	unsigned long flags;
-+	int pktsize = count;
- 	int err = 0;
- 
- 	spin_lock_irqsave(&btmtk_data->isorxlock, flags);
-@@ -1102,6 +1125,9 @@ static int btmtk_recv_isopkt(struct hci_dev *hdev, void *buffer, int count)
- 		int len;
- 
- 		if (!skb) {
-+			if (!check_isopkt(hdev, buffer, count, pktsize))
-+				break;
-+
- 			skb = bt_skb_alloc(HCI_MAX_ISO_SIZE, GFP_ATOMIC);
- 			if (!skb) {
- 				err = -ENOMEM;
-@@ -1250,6 +1276,15 @@ static int btmtk_usb_isointf_init(struct hci_dev *hdev)
- 
- 	spin_lock_init(&btmtk_data->isorxlock);
- 
-+	switch (btmtk_data->dev_id) {
-+	case 0x7925:
-+		btmtk_data->isopkt_rx_pad = true;
-+		break;
-+	default:
-+		btmtk_data->isopkt_rx_pad = false;
-+		break;
-+	}
-+
- 	__set_mtk_intr_interface(hdev);
- 
- 	err = btmtk_submit_intr_urb(hdev, GFP_KERNEL);
-diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-index c83c24897c95..bd97e37afd99 100644
---- a/drivers/bluetooth/btmtk.h
-+++ b/drivers/bluetooth/btmtk.h
-@@ -177,6 +177,8 @@ struct btmtk_data {
- 	struct usb_interface *isopkt_intf;
- 	struct usb_anchor isopkt_anchor;
- 	struct sk_buff *isopkt_skb;
-+	bool isopkt_rx_pad;
-+	bool isopkt_padding_seen;
- 
- 	/* spinlock for ISO data transmission */
- 	spinlock_t isorxlock;
--- 
-2.53.0
-
+--===============2684199483573245099==--
