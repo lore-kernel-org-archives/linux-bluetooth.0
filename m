@@ -1,119 +1,74 @@
-Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0.riseup.net (mx0.riseup.net [198.252.153.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9ED833D6C1
-	for <linux-bluetooth@vger.kernel.org>; Sat, 25 Apr 2026 14:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3443090D7;
+	Sat, 25 Apr 2026 16:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.252.153.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777127016; cv=none; b=uxL3ZzJx0X6d18eV3CYFiVzeCWwqPr5wKNPuuybOPcb5kYUjXWY1I1EyQipe1C7mnz3/rkZwCbm/OuUbW/vbKL3ZPt4Fpv+qOdd502uEAevn+vEyxprxNDYdSIbZUQ9v4LVxSL8kvUj2GCPzzW8u+w7hy0gWmebhguquxwbDFYk=
+	t=1777135132; cv=none; b=aB2Ze+IFqc6/zkeCszT8vbbjT9crscnswhmgTwdDJv0ZNDzVpzTDhTlfupjFy/MW9BnuNB/749dj2tFnv45rAbj572ZXtz6p0l7vnnrmecLpq2PA+Cjbe9IO3U/akYtG+s5iENnBHi0aVIKUMav+ypY9mDwx1AqujhJCS6HdHlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777127016; c=relaxed/simple;
-	bh=7DCNnDph+P2xor3T10awohAbFMhR8kafC44PE+q5GpE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=RvSMMrrLNrKZnzvpgmE+dHqgbgzSDk5fgI/GabMs1rDwQjOtBDkSfC3RKey3jBLEQfGIlb+Yrh1AWdMPo3Z8vg3rbVRe4+iUtlzYGLXnGo2eTDB7+klquFnu2tIdmJtIoH9Onbbnf5dw0W27klm6/MCvSao2MOqBuzS5sEg86J4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n6h2zO79; arc=none smtp.client-ip=74.125.82.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1777135132; c=relaxed/simple;
+	bh=bNkVIzw0ahvft8xV/mHBztEcIVbGle+vJcyZDYMBDAk=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=sZG1gz1tPlvSzn+TXJDNZfr4bAC1S5JcOttdq/JGSfNwRPAUlHJqq78t7LQjlazu/J7e3OpuVUUqdydrhgE53Z9y+4jUDFqwYfjcYpNf4WIc9jo8GOlkx8NEkZt0yXLYQK07KwXMt0ERnx9/LkYPmrLV4FHfM5o/pjxJj+an6pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riseup.net; spf=pass smtp.mailfrom=riseup.net; dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b=Y/JSqk5a; arc=none smtp.client-ip=198.252.153.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riseup.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riseup.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n6h2zO79"
-Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-2c156c4a9efso12081791eec.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Apr 2026 07:23:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777127014; x=1777731814; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tlt9urkRxZM8cvVxpJ9zXNjs9cHf/EFJxXt8bMpEhFA=;
-        b=n6h2zO79aRBWT2dwxfExaUa6eT3xN0AXflLnBZhlkViFP4pSK2Wgn107oL8IQMGoaO
-         ihqVVzR7WIQ8o1m0cDqkr/Z5X5edScCAg99DlAPYe0rvJHLBrAoPtzpYM3Ce+UEITGQs
-         E2KYQm1IacHvTIiJpbPvLuZP6tTtxq/EvuYrX8RWLfLqeqqs3QkqRFagog/Kn/rGK3KG
-         6GEw4Vea2DlVpgesPOBlPxRLISOjXn1/k5xzRMULnbBr/WvNpfz/V4CCheFtqj6rr/W1
-         D3Awly68pz2SR2RUW67OxfB3wWefOcn0LYuQMFQpKu8ehkX0i6bxRPlr4aCmWHW7EHun
-         10Kw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777127014; x=1777731814;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tlt9urkRxZM8cvVxpJ9zXNjs9cHf/EFJxXt8bMpEhFA=;
-        b=FKN37rx08EJgg/0HZz9wRoBUe2+6BFlZMp6y5/Q0Eo7dYGCOyJ42DZ9jwRH/w0igB2
-         xTccWM0NAi41EZ28G+rS+nTjCcSgNUfDncSLzxzD6uqCvq8WmRFoOWpLUiL3+FGEyIlT
-         ciS+zkNDE2u0UTrVFTiYWLPIamADwhUy2KJdNPc1+CTnrrQJlhhcMmr6DukagFzHnkbq
-         DX1CxLlfd/fSmWFWjb6Wyb4gYXte9EksEmx8NzXyCDQaeWWvoU3KseDmCXuJ0IlNC6OA
-         LnC6tJnTeeQwJImA0t/SFhTKAKCVDP7ZQdr3HlE80gHFY51JBECP2aRMNawoUcYnRRO8
-         Pjjg==
-X-Gm-Message-State: AOJu0Yyw3CWHeTUuFXwwlVv0GRJEcJJMS41eHA3k6Jqz+7QhwAqpwKmp
-	dU/yySLg2pWcgdx/mcZWYLC3EogojeYm6ngcUcWMHzZwDlbPAskkxNNmbSDVNQ==
-X-Gm-Gg: AeBDieu+zVz0MBCMlWicPB7gaADTxveuiPh3qC18/ykP2v6FjBsk5KmprupqiU11XuZ
-	RD9OanV7JUhOL27C0qdUu0W37M1vL/lkfl3FghvBZWT8wS7ELRW6y6ghLVLrSaESp+eoGDxc8m4
-	mXdsNqrA6mfw2vWPEQMFE+2gNQVTxCzTJtppJvP+8AUJjlIudpZ/2OEeqoDIIvjtYFcTWKtTzP1
-	b1DeZYVVqgJnsMSAgP1yQjLM5Pbb6XTjwxkBQ6c48FoWcIxvU2s1qlTNTIU3BhWFqoBT/PrSyNO
-	4BMWb8UeOpaJqtQjwJNyYRYnuj+bWpOedHrpvs3eHzJzX6T8cb4KiMvBNF8Mca6oTxceMZWYg3s
-	v2pT/YaV1GfL8jnTyid1jJfwUm2KhwTOcnAilK9lulLK8EgXPXn0ToInLH6ZTu6ETsAAW38Fbng
-	JoFCSJkMFkVQGG4gNRfiIzGN1hD5gCSzY0OvoYUi4+
-X-Received: by 2002:a05:7300:b807:b0:2ea:d965:a4b9 with SMTP id 5a478bee46e88-2ead965a544mr3409971eec.7.1777127013625;
-        Sat, 25 Apr 2026 07:23:33 -0700 (PDT)
-Received: from [172.17.0.2] ([104.209.5.147])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e539fa3ce1sm34545508eec.4.2026.04.25.07.23.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Apr 2026 07:23:33 -0700 (PDT)
-Message-ID: <69ecce65.050a0220.355219.7cd1@mx.google.com>
-Date: Sat, 25 Apr 2026 07:23:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2684199483573245099=="
+	dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b="Y/JSqk5a"
+Received: from fews01-sea.riseup.net (fews01-sea-pn.riseup.net [10.0.1.109])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx0.riseup.net (Postfix) with ESMTPS id 4g2wWS18Xkz9wPk;
+	Sat, 25 Apr 2026 16:38:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=riseup.net; s=squak;
+	t=1777135124; bh=c9tCVmxU8vBP8gDvmTjuMIdSheyhQt3yEBsIRxSOwPk=;
+	h=Date:From:To:Subject:From;
+	b=Y/JSqk5aaQXVLbFTtEFIG4e61D8F+DEpUv/wwncXBWQHwTp78J2EJfD+Jd6zk9thK
+	 9tBqcQX2zJsDi+xp4E2v/BvZXeXM3YRufO37aUoKZTEUx/RGMTAknF1CneHMAPS+KH
+	 k51vSA4e57Ex0AyiJYE7J0Xp6+b5KRJdwqXY2Ugg=
+X-Riseup-User-ID: E588A17BF2C5D3B27C07A2B696FD88909E371CD1D0410A947224EF397B039D34
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	 by fews01-sea.riseup.net (Postfix) with ESMTPSA id 4g2wWR0fvcz22Mw;
+	Sat, 25 Apr 2026 16:38:42 +0000 (UTC)
+Date: Sat, 25 Apr 2026 17:38:30 +0100
+From: Alonso Garrigues <agarrigues@riseup.net>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] drivers: bluetooth: fix uninitialized scalar variable
+Message-ID: <aezuBuQca26r4a7l@lal>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [v2] Bluetooth: btmtk: don't generate bogus ISO packets from zero padding
-In-Reply-To: <621d8a2b651aba8e3c2197017ca94f06ec77b824.1777121590.git.pav@iki.fi>
-References: <621d8a2b651aba8e3c2197017ca94f06ec77b824.1777121590.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
---===============2684199483573245099==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+There is a path where the variable is read uninitialized,
+in case RTL_PATCH_SECURITY_HEADER and !key_id
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1085490
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.79 seconds
-GitLint                       FAIL      0.26 seconds
-SubjectPrefix                 PASS      0.06 seconds
-BuildKernel                   PASS      27.00 seconds
-CheckAllWarning               PASS      28.81 seconds
-CheckSparse                   PASS      27.85 seconds
-BuildKernel32                 PASS      25.95 seconds
-TestRunnerSetup               PASS      568.80 seconds
-IncrementalBuild              PASS      24.21 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2] Bluetooth: btmtk: don't generate bogus ISO packets from zero padding
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-26: B2 Line has trailing whitespace: "    "
-
-
-https://github.com/bluez/bluetooth-next/pull/124
-
+Signed-off-by: Alonso Garrigues <agarrigues@riseup.net>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btrtl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 62f9d4df3a4f..aa0d5af26b5f 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -543,7 +543,7 @@ static int rtlbt_parse_firmware_v2(struct hci_dev *hdev,
+ 				   unsigned char **_buf)
+ {
+ 	struct rtl_epatch_header_v2 *hdr;
+-	int rc;
++	int rc = 0;
+ 	u8 key_id;
+ 	u32 num_sections;
+ 	struct rtl_section *section;
+-- 
+2.53.0
 
---===============2684199483573245099==--
