@@ -1,150 +1,227 @@
-Received: from mail-oo1-f80.google.com (mail-oo1-f80.google.com [209.85.161.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722D82F0680
-	for <linux-bluetooth@vger.kernel.org>; Sat, 25 Apr 2026 23:07:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D00B26738D;
+	Sun, 26 Apr 2026 19:10:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777158446; cv=none; b=TGuDBCM77ZwGeQGvhQSrPTMlfAcoaGF1rHfYEo/LfNdRDCMu+bTjdKflxl+CiQkEX8duqE63z3KEZFD7hLOmlC+Fh2zhM6aS9prAZlUIK+aZfwA9Vj74LskPfQCylnx3jPjF6UJL/8AVKndZgJ0wEIMOybY2gX/kM6FVCHncUM8=
+	t=1777230627; cv=none; b=UC5rQ5a6qyE7NvetpALVAaAxs+myRJ2+XBqIgT6XsninYsypz1qhC9mqHl7WoELqSLCzD4ZC/q4Dewnpt/QxSYr1fO7ING3wOBXw3BUa8hs6iHHKn995TMMEfQcrwWAg2CKPq+KkbXC3yQUN6FJ0xf7RjKqwtTlT0aLKmiIpTQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777158446; c=relaxed/simple;
-	bh=NihHdFvjEKHD1k1Qq10Pf5w4TrwxQWx5oHmrMylywko=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=obvkJ7KjIhsc/lKgTxUVB8RwWYfftuF9xuQwHY6yXAAFQmIAOz0UQKbQ6kadUbfpYg4Ebb8VISdlW3BM1M1qX2+E6H/isviUKbVY91bVZ+QFLB/JWoUQwtpj1RfS7PbZfUCH5aSb8lh2B8NyyDR2bapW8sjA+1bCK0cZ02c8FVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f80.google.com with SMTP id 006d021491bc7-6961bda4505so3295427eaf.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Apr 2026 16:07:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777158444; x=1777763244;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MtQkIP8h6UGR3WAAAFlNk4hi2ZVDq2Utyswte4x7nlY=;
-        b=Fzf/lox55/RImzJCXwEtqctnAUokaQu4Vj371dzFPn8tgmcBoeQHQecHh9C3f7Zm3K
-         63rWLBm+wdET/KQADJrOBwnGelHZjrTLJ0V5baCZQEIZVx4EAA98ugZ16H3xwi7GqbGr
-         Pm2hRRIu9uYu1OyJwqWyfuRhjtAbuOGp/CmN13Tm9grs3vrNpcuZ1XlaRPDgzaS1AoCY
-         PzPAvJ7AFlkIJKydPSbuO9t5mGKiBYDpc91bjH+BGSoQC3LoD7gO/+FpxfuNCsWBPFcG
-         m5ZxHBhMMDfTe6KrWJ+/QUlL4GXVbuKhlDMHGb56PMlUUi+nncdWXtlY7403ZplIJoVZ
-         aUSQ==
-X-Gm-Message-State: AOJu0Yyhcn0/warpASpq8XqWB5sta0QUcxtgLJyYEzt8BgCua7MYSxnf
-	ULLQu+THfDBUJIiZlvIIkC8pbD45ULzUETmuOe5LX2xfaATC/QG83G6+e7wSThwe6nqfVoDgaMh
-	rjpYFJBvwsWTIvxu7IsQPhy78GNRSPU1MMXaOcZLMUAzhbr4VLhNdBY5s/I3fcA==
+	s=arc-20240116; t=1777230627; c=relaxed/simple;
+	bh=yxs0t7cDOuQrH76nlGNiykltD0x1yots232V7QppWQU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cMwgEw/aRcvFK/uziBJI+bkOP/utolCDhGkFodaE769D+wGDX9dRVtzO5dgUGCDYsuv0xkVbDpDIQZQOK1oBGQBZIU1WB5KJutA0w7HTrZ1MBcThDoW9+n2/Hh+7up4B6cJK7se3YxqnKOCVwwiEu8pH0IF55OuPMYXm8ARnNZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kPPcEmAs; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kPPcEmAs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1777230625; x=1808766625;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=yxs0t7cDOuQrH76nlGNiykltD0x1yots232V7QppWQU=;
+  b=kPPcEmAsvrFkAyhtAUndgolHxY1G/SLlIgoK1W5C8oOF7Hizv8BSn8G2
+   rcFMMkZ33rN5SrQxvYdTgFY2VJ+6+8cPLg6n40aWTRXhVJdQ1mPR72qne
+   85QPo6p7hpMzfUtL140z1ZeY/H+7gFc4mg6Ef0sQA4k3bIDXhPWvA4SEC
+   NOGrzSVY0J2oQ8Jg4MzduKAzenozBcgHfIACE8TZzglIfLCvawhx/SHin
+   u9+V3vuMhdRVNMuIXQkvx/hwSihNERqlQ8kzzsQUnQsIoVKMDr44aVV5p
+   i2CXHDKlTegEgqFto7tjc+JyIejalono45UeO6ZTbx0GyEIrkuxWxtEkZ
+   Q==;
+X-CSE-ConnectionGUID: csr7BpWbSquJbafYqCaznQ==
+X-CSE-MsgGUID: dWSY9C3JTc28bt3q2XkeoA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11768"; a="77286636"
+X-IronPort-AV: E=Sophos;i="6.23,200,1770624000"; 
+   d="scan'208";a="77286636"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2026 12:10:24 -0700
+X-CSE-ConnectionGUID: 2s+JDn8mRcWyqVEkxXVfAQ==
+X-CSE-MsgGUID: 184bo4lnQ92bGqQwCASFRA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,200,1770624000"; 
+   d="scan'208";a="233330237"
+Received: from arjan-box.jf.intel.com ([10.88.27.153])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2026 12:10:24 -0700
+From: Arjan van de Ven <arjan@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	syzbot+00f5a866124dc44cce14@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [bluetooth?] WARNING in hci_send_cmd (4)
+Date: Sun, 26 Apr 2026 12:11:36 -0700
+Message-ID: <20260426191142.467942-1-arjan@linux.intel.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <69ed492c.050a0220.e51af.0005.GAE@google.com>
+References: <69ed492c.050a0220.e51af.0005.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:f023:b0:696:2cb1:a008 with SMTP id
- 006d021491bc7-6962cb1b44bmr3867723eaf.53.1777158444553; Sat, 25 Apr 2026
- 16:07:24 -0700 (PDT)
-Date: Sat, 25 Apr 2026 16:07:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69ed492c.050a0220.e51af.0005.GAE@google.com>
-Subject: [syzbot] [bluetooth?] WARNING in hci_send_cmd (4)
-From: syzbot <syzbot+00f5a866124dc44cce14@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    b4e07588e743 tracing: tell git to ignore the generated 'un..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1768ac36580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f17ac3d4b47ac43a
-dashboard link: https://syzkaller.appspot.com/bug?extid=00f5a866124dc44cce14
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-b4e07588.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a3832abcd2f7/vmlinux-b4e07588.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0b5d6e6e9cbd/bzImage-b4e07588.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+00f5a866124dc44cce14@syzkaller.appspotmail.com
-
-workqueue: cannot queue hci_cmd_work on wq hci0
-WARNING: kernel/workqueue.c:2298 at __queue_work+0xd1f/0xfc0 kernel/workqueue.c:2296, CPU#0: kworker/0:3/1378
-Modules linked in:
-CPU: 0 UID: 0 PID: 1378 Comm: kworker/0:3 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-Workqueue: events l2cap_info_timeout
-RIP: 0010:__queue_work+0xd4a/0xfc0 kernel/workqueue.c:2296
-Code: 83 c5 18 4c 89 e8 48 c1 e8 03 42 80 3c 20 00 74 08 4c 89 ef e8 17 4d a5 00 49 8b 75 00 49 81 c7 70 01 00 00 4c 89 f7 4c 89 fa <67> 48 0f b9 3a 48 83 c4 58 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc
-RSP: 0018:ffffc9000257f720 EFLAGS: 00010082
-RAX: 1ffff110081cc181 RBX: 0000000000000008 RCX: ffff888000260000
-RDX: ffff888040182170 RSI: ffffffff8aa9ccd0 RDI: ffffffff90368d70
-RBP: 0000000000000020 R08: ffff888040e60bf7 R09: 1ffff110081cc17e
-R10: dffffc0000000000 R11: ffffed10081cc17f R12: dffffc0000000000
-R13: ffff888040e60c08 R14: ffffffff90368d70 R15: ffff888040182170
-FS:  0000000000000000(0000) GS:ffff88808c80c000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000005dc0 CR3: 0000000012a31000 CR4: 0000000000352ef0
-Call Trace:
- <TASK>
- queue_work_on+0x106/0x1d0 kernel/workqueue.c:2432
- queue_work include/linux/workqueue.h:696 [inline]
- hci_send_cmd+0xb7/0x1a0 net/bluetooth/hci_core.c:3111
- hci_conn_auth net/bluetooth/hci_conn.c:2459 [inline]
- hci_conn_security+0x599/0xa80 net/bluetooth/hci_conn.c:2551
- l2cap_conn_start+0x3bc/0xf20 net/bluetooth/l2cap_core.c:1534
- l2cap_info_timeout+0x68/0xa0 net/bluetooth/l2cap_core.c:1685
- process_one_work kernel/workqueue.c:3302 [inline]
- process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3385
- worker_thread+0xa53/0xfc0 kernel/workqueue.c:3466
- kthread+0x388/0x470 kernel/kthread.c:436
- ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	83 c5 18             	add    $0x18,%ebp
-   3:	4c 89 e8             	mov    %r13,%rax
-   6:	48 c1 e8 03          	shr    $0x3,%rax
-   a:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1)
-   f:	74 08                	je     0x19
-  11:	4c 89 ef             	mov    %r13,%rdi
-  14:	e8 17 4d a5 00       	call   0xa54d30
-  19:	49 8b 75 00          	mov    0x0(%r13),%rsi
-  1d:	49 81 c7 70 01 00 00 	add    $0x170,%r15
-  24:	4c 89 f7             	mov    %r14,%rdi
-  27:	4c 89 fa             	mov    %r15,%rdx
-* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
-  2f:	48 83 c4 58          	add    $0x58,%rsp
-  33:	5b                   	pop    %rbx
-  34:	41 5c                	pop    %r12
-  36:	41 5d                	pop    %r13
-  38:	41 5e                	pop    %r14
-  3a:	41 5f                	pop    %r15
-  3c:	5d                   	pop    %rbp
-  3d:	c3                   	ret
-  3e:	cc                   	int3
-  3f:	cc                   	int3
+This email is created by automation to help kernel developers
+deal with a large volume of AI generated bug reports by decoding
+oopses into more actionable information.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Decoded Backtrace
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+1. __queue_work -- crash site (kernel/workqueue.c:2297)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+   2275  static void __queue_work(int cpu, struct workqueue_struct *wq,
+   2276                           struct work_struct *work)
+   2277  {
+   2278      struct pool_workqueue *pwq;
+   2279      struct worker_pool *last_pool, *pool;
+   2280      unsigned int work_flags;
+   2281      unsigned int req_cpu = cpu;
+   2289      lockdep_assert_irqs_disabled();
+   2291      /*
+   2292       * For a draining wq, only works from the same workqueue are
+   2293       * allowed. The __WQ_DESTROYING helps to spot the issue that
+   2294       * queues a new work item to a wq after destroy_workqueue(wq).
+   2295       */
+   2296      if (unlikely(wq->flags & (__WQ_DESTROYING | __WQ_DRAINING) &&
+-> 2297             WARN_ONCE(!is_chained_work(wq),
+   2298                             "workqueue: cannot queue %ps on wq %s\n",
+   2299                             work->func, wq->name))) {
+   2300          return;
+   2301      }
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+2. queue_work_on (kernel/workqueue.c:2432)
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+   2422  bool queue_work_on(int cpu, struct workqueue_struct *wq,
+   2423                     struct work_struct *work)
+   2424  {
+   2425      bool ret = false;
+   2426      unsigned long irq_flags;
+   2428      local_irq_save(irq_flags);
+   2430      if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(work)) &&
+   2431          !clear_pending_if_disabled(work)) {
+-> 2432          __queue_work(cpu, wq, work);
+   2433          ret = true;
+   2434      }
+   2436      local_irq_restore(irq_flags);
+   2437      return ret;
+   2438  }
 
-If you want to undo deduplication, reply with:
-#syz undup
+3. hci_send_cmd (net/bluetooth/hci_core.c:3111)
+
+   3092  int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
+   3093                   const void *param)
+   3094  {
+   3095      struct sk_buff *skb;
+   3097      BT_DBG("%s opcode 0x%4.4x plen %d", hdev->name, opcode, plen);
+   3099      skb = hci_cmd_sync_alloc(hdev, opcode, plen, param, NULL);
+   3100      if (!skb) {
+   3101          bt_dev_err(hdev, "no memory for command");
+   3102          return -ENOMEM;
+   3103      }
+   3105      /* Stand-alone HCI commands must be flagged as
+   3106       * single-command requests.
+   3107       */
+   3108      bt_cb(skb)->hci.req_flags |= HCI_REQ_START;
+   3110      skb_queue_tail(&hdev->cmd_q, skb);
+-> 3111      queue_work(hdev->workqueue, &hdev->cmd_work);    // hdev->workqueue is __WQ_DRAINING
+   3113      return 0;
+   3114  }
+
+   Inlined caller: hci_conn_auth (net/bluetooth/hci_conn.c:2459)
+
+   2438  static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level,
+   2439                           __u8 auth_type)
+   2440  {
+   2454      if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->flags)) {
+   2455          struct hci_cp_auth_requested cp;
+   2456          cp.handle = cpu_to_le16(conn->handle);
+-> 2459          hci_send_cmd(conn->hdev, HCI_OP_AUTH_REQUESTED,
+   2460                       sizeof(cp), &cp);
+   2461      }
+   2464      return 0;
+   2465  }
+
+4. hci_conn_security (net/bluetooth/hci_conn.c:2551)
+
+   2487  int hci_conn_security(struct hci_conn *conn, __u8 sec_level,
+   2488                        __u8 auth_type, bool initiator)
+   2489  {
+   2544  auth:
+   2548      if (initiator)
+   2549          set_bit(HCI_CONN_AUTH_INITIATOR, &conn->flags);
+-> 2551      if (!hci_conn_auth(conn, sec_level, auth_type))
+   2552          return 0;
+   2563  }
+
+5. l2cap_info_timeout (net/bluetooth/l2cap_core.c:1685)
+   -- running on the 'events' workqueue, NOT on hdev->workqueue
+
+   1675  static void l2cap_info_timeout(struct work_struct *work)
+   1676  {
+   1677      struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
+   1678                                             info_timer.work);
+   1680      conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+   1681      conn->info_ident = 0;
+   1683  
+   1684      mutex_lock(&conn->lock);
+-> 1685      l2cap_conn_start(conn);
+   1686      mutex_unlock(&conn->lock);
+   1687  }
+
+
+Tentative Analysis
+
+The WARNING fires in __queue_work() at kernel/workqueue.c:2297 when
+hci_send_cmd() attempts to queue hci_cmd_work onto hdev->workqueue
+after that workqueue has entered the draining or destroying state.
+
+The call chain is:
+  l2cap_info_timeout (events wq)
+    -> l2cap_conn_start
+    -> hci_conn_security
+    -> hci_conn_auth [inlined]
+    -> hci_send_cmd
+    -> queue_work(hdev->workqueue, &hdev->cmd_work)   // <-
+
+The race arises in hci_dev_close_sync() (net/bluetooth/hci_sync.c):
+
+  1. HCI_UP is cleared with test_and_clear_bit(HCI_UP, ...).
+  2. drain_workqueue(hdev->workqueue) is called -- sets __WQ_DRAINING.
+  3. hci_conn_hash_flush() -> l2cap_conn_del() ->
+     disable_delayed_work_sync(&conn->info_timer) -- cancels the timer.
+
+The l2cap_info_timeout callback runs on the 'events' workqueue, which
+is entirely separate from hdev->workqueue.  Draining hdev->workqueue
+has no effect on pending events workqueue items.  If the
+l2cap_info_timeout work item was already queued on the events
+workqueue before step 3 cancels it, the timeout fires in the window
+between steps 2 and 3, reaching hci_send_cmd with hdev->workqueue
+already in the __WQ_DRAINING state.
+
+hci_send_cmd() does not check HCI_UP before calling queue_work(),
+unlike hci_recv_frame() and the hci_dev_ioctl() handler, which both
+guard with test_bit(HCI_UP, &hdev->flags).
+
+
+Potential Solution
+
+Add the same HCI_UP guard to hci_send_cmd() that already exists in
+hci_recv_frame() and hci_dev_ioctl():
+
+    if (!test_bit(HCI_UP, &hdev->flags))
+        return -ENETDOWN;
+
+Place this check at the top of hci_send_cmd(), before the skb
+allocation.  Since HCI_UP is cleared before drain_workqueue() in
+hci_dev_close_sync(), this guard catches the race without introducing
+any resource leak, lock imbalance, or side effects on callers.
+
+
+More information
+
+Oops-Analysis: http://oops.fenrus.org/reports/lkml/69ed492c.050a0220.e51af.0005.GAE_google.com/
+Assisted-by: GitHub Copilot linux-kernel-oops-x86.
