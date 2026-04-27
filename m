@@ -1,86 +1,159 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651B139FCBF
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2026 19:12:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A201317163
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2026 19:22:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777317127; cv=none; b=QKTiUazx1Gcr+qVC5I49ImJYPjukxouDRu58m41kf2K5C1ePsdlby2nFfcAKisR/C/jmkGpnNXNf2XFt0ZbFujOe22Yrw4uOybJxIPsRyaVgYNg03dzvJu6iESE4GOwy8WcFMTHX3Ft25rc6jngNXinwiey9ZtlTK3kC57neeQY=
+	t=1777317766; cv=none; b=PVuyDr09QsFxohIFtot7nlMf6zXX6SsVoeZjUmul+Bi3fLhZvTxItmU2/CgDJNcmtTIT+2RLkMIiwwJ9tzr5vWu9+Q5orhUuzDA9fzVbiOCR2/TKync972sJAXV5gDbRWan8aEI0bsI2r4I6KaJNfkcpPluvkf8muaLUwoScGuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777317127; c=relaxed/simple;
-	bh=B8y0hfPFEMh+EDKtJNHsttxwc9y89zET3oI6fwGvkNg=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Q10rmQ6zTTL2ljvkliJUNQde/92SOjKBVyKdPhPjaiGH6EDYeH/ipfMDQ+FO/Zn6YtdNXY5SWoXyE41TGdYgLxioqawZdYBr5pXwCo9WMnxGJ6JAeJtSR5Zq4B3m0rVm6UgA9Df/h/j4fJ9qtIuddtSM9XI/DoaJ6RMwOfr5PsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EsQ+T6rk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777317766; c=relaxed/simple;
+	bh=mP41cputbgdleNzbrW1jo/9EhPTIveY/Oiqw2HcoJAo=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=CipGg6UCTgjpq6KERSwpGhJnXHYZZbNj2NAIyKohFh+XMCAkoL4nHpwPdDWWOqr0yLaqPY9AhW5EWL4wcOC9qCTYTDuKFP6TSUIakKZX+weRGGfzXeG09FWvp/bdkylNwP2Mw8yWk2241wYDf2bDSc4r2NpFjIYJCpKdu8FsGPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ylkzwdpn; arc=none smtp.client-ip=209.85.217.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EsQ+T6rk"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F3590C19425
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2026 19:12:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777317127;
-	bh=B8y0hfPFEMh+EDKtJNHsttxwc9y89zET3oI6fwGvkNg=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=EsQ+T6rkgo4jwqGWt6zDeYi5MjFBTCr7/O81bKnAWZKbutekr0uTrM7/XDPB6XfWa
-	 jUY7+RDrGK0x2Vf2NIfvTQ9UiUUIio0XZimgckfFCZyK0vXKRFKtbU5/NLStM1s2fN
-	 U7vY1IOG4NtA+qIpkFwrbhelXM+uEmgM/9bmmm36uslJgHATnBNh8HRZNOwTCPMPc8
-	 gqMYacVJB4R6Oyeoe/sJSPECBzrsz32KFglz9hB0u1YYRKB31ln2TBkfM8J8k3kG0b
-	 AL4KuLKfly+oTgTM6LFzNlbYI9EZItiuFgHW139SuRdkCrU9gUL6BGNK2MVprFDT3i
-	 Fifzc1WrRC9Aw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id E9FA4C41613; Mon, 27 Apr 2026 19:12:06 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ylkzwdpn"
+Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-610aadb2d9fso3454779137.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2026 12:22:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777317753; x=1777922553; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=r0sG+vei2+rpRRVJd/XdB5jvzRiZaI5qHao/HX3zuC8=;
+        b=Ylkzwdpn0qYSwJ1l+gzXAxqdXANcUKUB8WB3N+ju8pBwM/Fk/VENLOC+Uj31hC5toQ
+         oA4QvReLoNJKHR4eczGtyYzvADGQkIU6w4dkWrDmw5PJb42EoYLR7CTM0O83xFg38HeA
+         4xwp1H2WETgAjIApLVRrzjYbmkWiGHrgs24grza4S31jE4kvPdQVDtKmE+er4KOqnpor
+         EaF/3m3sCDvJoWZ6Kmddj0+RS9qIcARja1KpuqwLpKJT+dzhQ8pgoP2JFPuMfPEjEW6i
+         +tFyqLwOjajxkHUIwStyhYfqBQGS+FTzf8T4tlRfz64x6RRy7BepAGbGPTUMVLTmq9e+
+         8VVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777317753; x=1777922553;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=r0sG+vei2+rpRRVJd/XdB5jvzRiZaI5qHao/HX3zuC8=;
+        b=hvGyhKzSMZFx7olq1XkaByhR7w+EUghO/uQmauf5rpTkn0RQ4szPSvxS8zbYIUzw6b
+         TNJO37NXdUdourQiOuA954PFA5iIHEtG+vEbUpXVRti4PSAPYT7LuFh9z9OrIwRs6wid
+         zg48gJuYdtwsFdvokGFtDXLjMmYlJQG07G5f7zoNLWIg8r9452evfvZLe1F1U4PLJ94G
+         Kmdn8wbC42IJvxjo5PPC37iyQeLnBLC7y4SC37sMhYyr8j7IONZZSSlewCWu/Zjsl36a
+         PYaTAHH91hH/VGy/FLh9XyUcAswIIyWiIvNMIaz9mwzPFuNTmEvetg/3R8aHEZ/gzcDx
+         ysrQ==
+X-Gm-Message-State: AOJu0YyvkmY3ROSkre8XDkaj2dcQb1fFI5FpCCTyGcbpWcrt0I7fl7Bx
+	va4djTX3SV6OyFy3cmNuehilLx2/w0sM6qFRNlB6qvn/d1GPQWTIf03T
+X-Gm-Gg: AeBDieuq6pY3jQ26Fni2/Nc8dIqD8njBdwnKlU4we8gNa6ifTvKrwdRNdithazF3+/V
+	HpFUQVOqOARbOF/tH94+K5A9lwcv+zHe/0yVp2ZHSjMRcng97hgYPsNA1JR1OGPRkPTy8AvK7OZ
+	xNP8HbSRDTcCXrgTuv1FtmVRa65t5n10V4vF9qjmmJmFkQjpW+zHUuXTlGFwCmdO6bvcnDSw3wh
+	Q1HPqCvWYRc2uBZDMcADomUlPOvLUz8dWAYrUZPYlbWzv/Uie/a+pk+c6vmMYhjXgrAH7eop5Ro
+	yRXHVtbPkYq2YCQZHbVEtajSp10Ed7EePlo3eWKPZu0k7O6CQqNeHIjALzgsJ1gKEheJEgERaO5
+	TH+d1Li1mAUFfTgF4A4d3NPSu4jEPO0lpi6MRC2NTgKNSTBgyomldprK054XHB7jIxtpyJbiOwQ
+	uE15tkcVqhlC2VuGzmZdKWKyWbpUbFgpThbZwy37DruJKMSjVCCZNfmC2K9A==
+X-Received: by 2002:a05:6102:4411:b0:605:4cbd:91ad with SMTP id ada2fe7eead31-627d2a8128fmr479637137.6.1777317752892;
+        Mon, 27 Apr 2026 12:22:32 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-627f507aa75sm90423137.3.2026.04.27.12.22.32
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Apr 2026 12:22:32 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221426] Intel AX211 Bluetooth hci0 hardware error 0x0c with
- HID/HOG failures on 6.19.14-zen
-Date: Mon, 27 Apr 2026 19:12:06 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: cristi@ieee.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221426-62941-vYVd7V7Hxy@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221426-62941@https.bugzilla.kernel.org/>
-References: <bug-221426-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Subject: [PATCH BlueZ v1] monitor: Add decoding support for Public Broadcast Announcements
+Date: Mon, 27 Apr 2026 15:22:23 -0400
+Message-ID: <20260427192223.2875358-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221426
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
---- Comment #3 from Cristian Cocos (cristi@ieee.org) ---
-(In reply to Paul Menzel from comment #2)
-> Thank you for your report. Do you know if it=E2=80=99s a regression, that=
- means, did
-> it work with earlier Linux versions?
+This adds support for decoding Public Broadcast Announcements (PBP).
+---
+ monitor/packet.c | 48 ++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 44 insertions(+), 4 deletions(-)
 
-I do not recall this issue's happening with the previous Linux kernel
-(6.19.13), hence very likely no regression.
+diff --git a/monitor/packet.c b/monitor/packet.c
+index ff0b1cac2f5f..820191e0f7f5 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -3615,7 +3615,7 @@ static void print_ltv(const char *str, void *user_data)
+ 	print_field("%s: %s", label, str);
+ }
+ 
+-static void print_base_annoucement(const uint8_t *data, uint8_t data_len)
++static void print_base_announcement(const uint8_t *data, uint8_t data_len)
+ {
+ 	struct iovec iov;
+ 	struct bt_hci_le_pa_base_data *base_data;
+@@ -3714,7 +3714,7 @@ done:
+ 		print_hex_field("  Data", iov.iov_base, iov.iov_len);
+ }
+ 
+-static void print_broadcast_annoucement(const uint8_t *data, uint8_t data_len)
++static void print_broadcast_announcement(const uint8_t *data, uint8_t data_len)
+ {
+ 	uint32_t bid;
+ 
+@@ -3727,12 +3727,52 @@ static void print_broadcast_annoucement(const uint8_t *data, uint8_t data_len)
+ 	print_field("Broadcast ID: %u (0x%06x)", bid, bid);
+ }
+ 
++static const struct bitfield_data pbp_feat_table[] = {
++	{ 0, "Encryption"					},
++	{ 1, "Standard Quality"					},
++	{ 2, "High Quality"					},
++	{}
++};
++
++static void print_pbp_announcement(const uint8_t *data, uint8_t data_len)
++{
++	struct iovec iov, meta;
++	uint8_t feat;
++	uint8_t len;
++
++	iov.iov_base = (void *) data;
++	iov.iov_len = data_len;
++
++	if (util_iov_pull_u8(&iov, &feat)) {
++		print_text(COLOR_ERROR, "  invalid features");
++		return;
++	}
++
++	print_field("Features: 0x%02x", feat);
++	print_bitfield(4, feat, pbp_feat_table);
++
++	if (util_iov_pull_u8(&iov, &len)) {
++		print_text(COLOR_ERROR, "  invalid metadata length");
++		return;
++	}
++
++	if (!len)
++		return;
++
++	meta.iov_base = util_iov_pull_mem(&iov, len);
++	meta.iov_len = len;
++
++	bt_bap_debug_metadata(meta.iov_base, meta.iov_len, print_ltv,
++						"    Metadata");
++}
++
+ static const struct service_data_decoder {
+ 	uint16_t uuid;
+ 	void (*func)(const uint8_t *data, uint8_t data_len);
+ } service_data_decoders[] = {
+-	{ 0x1851, print_base_annoucement },
+-	{ 0x1852, print_broadcast_annoucement }
++	{ 0x1851, print_base_announcement },
++	{ 0x1852, print_broadcast_announcement },
++	{ 0x1856, print_pbp_announcement }
+ };
+ 
+ static void print_service_data(const uint8_t *data, uint8_t data_len)
+-- 
+2.53.0
 
-> What firmware is used?
-
-BlueZ 5.86, AX211 firmware 202-5.26
-
-C
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
