@@ -1,100 +1,101 @@
-Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB4934252B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2026 04:02:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC0137AA7A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2026 06:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777262568; cv=none; b=dcYnl1LcMgh6FXsBh6lmQ50ZStfTc3fEKK3ATqAgz9STx4jFIJZlsiMEW7rQh+zPAKmtLCafALwpw4/3o9DnURCDk+C7CZ6z72ttA2AsSFiX0r1gxzHSMkvhFzPbOeraL1YbbxJ8Ac/J1pPdZdGKmfL+Me/uyfyFJ5Kh0RIs88M=
+	t=1777272067; cv=none; b=Q32NreA9vuANt0p54HfjcO0nRzLjFuEN1IGQ+uEs9fqLbCgNQrg2CobwhpHs0FfiGUEOdGrdPVUtbViB1GgG/Y2oiJF/6j3LC1H1g4k66BUf18WbXqlb30Jwj+JMtF6mrKtg1f3MHgNQ+ahWyZpn54bGZGzM2GYvXDQ6U1BDVSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777262568; c=relaxed/simple;
-	bh=PhcSNJLZPNup8n1VQwty0LFegcyTBwA91eupOEiQ+kw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=PCc+PRhxBBb5fyEE1YivmtJ4DUMoldNY6hBc5KsEJMhxsrjkC016kqAXYMiT58hqoI8A84iWVrn8KlfUP1hh3Wku7ek+wtLab4ti6h7MlO4b22U34w79OUA/ag7mVCjNw+yWnMc7/jF6d/ZKr48STYo+Yhqj9Okc5Kz8Z+z2g0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EcEZtAPc; arc=none smtp.client-ip=74.125.82.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1777272067; c=relaxed/simple;
+	bh=3jB3tu4QXaAILMB1EOgvYu0Kv/z27R7XgBSS+45x1PA=;
+	h=Date:Subject:Message-ID:From:To:Cc:MIME-Version:Content-Type; b=PMMftwnCVwwrqLvamiciARBJ4N6NcpFkJHgX/MME9RJ+VCgqndf1N02frIKqb65nuWtHwAMLc5rS8DRzQQ1PqcFcgrwrq+azaKWGy/h0okm4ka4fDVm2Rw7KgJvTfQvJlSs+rrmndxTqLsbBWHe9a+5xsIxg03+CzfPAcYavFyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=AMRH09Pg; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EcEZtAPc"
-Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-2d8ffdc31d0so2860362eec.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Apr 2026 21:02:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777262566; x=1777867366; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=PhcSNJLZPNup8n1VQwty0LFegcyTBwA91eupOEiQ+kw=;
-        b=EcEZtAPcHNzDbBwt/nvkQfqNktGIQxXaZYbr0abrmmGnJzJf2eXk1p6pqDYe4wQ7a3
-         Si3x5bsQ7Jegas5Nh7f4eyw9L33gW1XeYNf+YVdZju60z0tJO1kJiO2DTa1AAAQl7ath
-         JCPZuBlQmMutQr2coMrCDQAtMcPl04LPHT1sqvieVcRL5QpUoA4YnxgRcmz3d2lLbLrH
-         Fr2Q4A1B/XQbnCxnx71i+P4EMdZrJJ6zbM+PYbk1Og7PejnYDd4iAsjoe53ctd+dbMdE
-         KUBQ3545c0T26a9QFpcvax9nLb2Nu+xVPo+8PHnypQ8+1Aqflh9i4WoS8vDQo4u7b4ZH
-         LqRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777262566; x=1777867366;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PhcSNJLZPNup8n1VQwty0LFegcyTBwA91eupOEiQ+kw=;
-        b=p/5kwUygP+Vlao4M7qRDQkJwJ/nm2gsHFf5+51jqMHl5N0myZTyffmllLlhwI7GkBH
-         rY+CYStc+XkBcNNdmbNHiJxYg10hD2jYoxW6lE8ViC7tuQ+t87u95uoQ3E3OHPUbKGhC
-         cZKgXgwoZRw1eP+at9OmmHgmgKoi6r2Ny+HhqDz3uTHJEhat5xVr6dan5BZVt+uaPkVS
-         sT/7LOY1yu9cFawE2wlFRjRwXdyuLVmX7VOcIYsecs7aOG9NqH6FRa9OE7pINjb6ruJc
-         EouYVUPiSKyl20IOoRKh1lbbw+OBvPIq2w1TxvIE4xnnsVZtSdCk7McL/gJmKJLxb9FT
-         narw==
-X-Gm-Message-State: AOJu0YyBDZk/3BeZZMQqbl096XlI33pVuJmTUla10FYWrwquwV8IDNIy
-	6wGHiOKW6HbvWr+n7bXifRV12jqSpBcjf1nmbKb591B4kr7GjDPU4/8Chny1zw==
-X-Gm-Gg: AeBDieuS4l/Is6/rqMy1NJINtAYF9Tpm1vQ4HrjQj3c6LsAUIW+ftU96SZS1Kv2UgF5
-	hv9PekNhmlKcp6p6VvHv+bxv4FMoQb/dG4NDmYAfdP3c+gc0CjZySc+HnYJ3rI3ERGJxaJ3ajIC
-	jjyURahsMT3RdvEBycVbnFpT2vLx3q5CzjE0FKH+d240ec4bsg3IG8823zC9h8Rz/tMWFc4Kd1l
-	i+z79D0+kcKfe8I0IKgH+SXkg1VxWGMH2fOtKTocGRnA4q3sgcOcvSYo0Nz7bwx2eUv4MNIztV/
-	t8uHgUZx7X+udqtlbCFdxHAMiNMjLs8fzkDmJZsQNJHC10+pAec7jadR9Z42BTVClIOnvRQbpKk
-	pmF9W/VhtMOwGuIlOxPhhlaBsduAtOSQ5Jj8iZy0HJxW7TS+kuiRrSEaRB97UFlQKXztmpdIwE8
-	RVIzxF8fzcoeT6lJX4FIurMbNmJ4+Tc/GB3cinhsL3
-X-Received: by 2002:a05:7301:1693:b0:2d2:129a:1682 with SMTP id 5a478bee46e88-2e4786460f9mr21801194eec.16.1777262566138;
-        Sun, 26 Apr 2026 21:02:46 -0700 (PDT)
-Received: from [172.17.0.2] ([52.161.60.226])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e53d2ce98csm40455416eec.20.2026.04.26.21.02.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Apr 2026 21:02:45 -0700 (PDT)
-Message-ID: <69eedfe5.050a0220.101ddb.0571@mx.google.com>
-Date: Sun, 26 Apr 2026 21:02:45 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5081241945146557832=="
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="AMRH09Pg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:Subject:Message-ID:From:To:MIME-Version:
+	Content-Type; bh=3jB3tu4QXaAILMB1EOgvYu0Kv/z27R7XgBSS+45x1PA=;
+	b=AMRH09Pg94P+92srYzgbkzG3Mn86tzmiN2BjoB3hXpXpWPmuLBF+ObSZ4Yya+2
+	c26xknhN0xywEjyNk6/xJ/1vmYMrCkV4BAvotfVPWpRXt1rCDtKSpqhhxhv0Yv4i
+	DeLJrAkK2NlGcx4ITmUPW6Nymegp9aOjabEzmDrNoVCu8=
+Received: from [IPv6:240e:45c:1410:527:18aa:bbc:ab6a:5208] (unknown [])
+	by gzsmtp5 (Coremail) with SMTP id QCgvCgA3QrD4BO9pld9pBg--.96S2;
+	Mon, 27 Apr 2026 14:40:58 +0800 (CST)
+Date: Mon, 27 Apr 2026 14:40:55 +0800
+Subject: About Kernel limitation HCI_MAX_FRAME_SIZE (1024 + 4)
+Message-ID: <lot3ns12vglamg8c0b87iaoe.1777272055182@email.vivo.com>
+From: yjg0107 <yjg0107@163.com>
+To: "luiz.dentz" <luiz.dentz@gmail.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, safa.karakus@secunnix.com
-Subject: RE: [SECURITY] Use-after-free in l2cap_sock_alloc_skb_cb (net/bluetooth)
-In-Reply-To: <DB4P250MB08058DC86977A3A6F25207CDEB362@DB4P250MB0805.EURP250.PROD.OUTLOOK.COM>
-References: <DB4P250MB08058DC86977A3A6F25207CDEB362@DB4P250MB0805.EURP250.PROD.OUTLOOK.COM>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary="--_com.android.email_5033273815367680"
+X-CM-TRANSID:QCgvCgA3QrD4BO9pld9pBg--.96S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrKr43ZF47JF1ftr4kWw13twb_yoWxtrbEkr
+	43G3yxXF4UtF48Z3WUKF13CF4ayrWfWF1xA3yqq3y7ZFZ8Ww47XF48XFn7u3WxGa1DJr1Y
+	ya1Dtr4qkrn3XjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRKXdbDUUUUU==
+X-CM-SenderInfo: x1mjiiiqx6il2tof0z/xtbC-xuV2WnvBPsUfwAA36
 
---===============5081241945146557832==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+----_com.android.email_5033273815367680
+Content-Type: multipart/alternative; boundary="--_com.android.email_5033273815453842"
 
-This is an automated email and please do not reply to this email.
+----_com.android.email_5033273815453842
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
 
-Dear Submitter,
+SGkgTHVpeiwKClF1ZXN0aW9uIGlzIHNhbWUgYXMgaHR0cHM6Ly9naXRodWIuY29tL2JsdWV6L2Js
+dWV6L2lzc3Vlcy8yMDczLgpBYm91dCBLZXJuZWwgbGltaXRhdGlvbiBIQ0lfTUFYX0ZSQU1FX1NJ
+WkUgKDEwMjQgKyA0KSwgeW91IHNhaWQgdGhhdCB0aGlzIHdpbGwgYmUgZml4ZWQgdG8gZW5hYmxl
+IHVzZXIgc3BhY2UgY2hhbmdlZCwgZnJvbSAjMjAxIChjb21tZW50KS4KVGhlIHBhdGNoIGNvbW1p
+dCBpcyB0b3J2YWxkcy9saW51eEAwOTU3MmZjLCByaWdodD8KCkhvd2V2ZXIsIHdoeSBIQ0lfQ0hB
+Tk5FTF9VU0VSIHR5cGUgY2FuIG5vdCBjaGFuZ2UgTVRVIHZhbHVlPyBHb29nbGUgYmx1ZXRvb3Ro
+IGFpZGwgdXNlcyBIQ0lfQ0hBTk5FTF9VU0VSIHR5cGUgZnJvbSBodHRwczovL2NzLmFuZHJvaWQu
+Y29tL2FuZHJvaWQvcGxhdGZvcm0vc3VwZXJwcm9qZWN0LysvYW5kcm9pZC1sYXRlc3QtcmVsZWFz
+ZTpoYXJkd2FyZS9pbnRlcmZhY2VzL2JsdWV0b290aC9haWRsL2RlZmF1bHQvbmV0X2JsdWV0b290
+aF9tZ210LmNwcCBsaW5lIDI4Mi4KCkNvdWxkIGtlcm5lbCByZW1vdmUgdGhlIGxpbWl0YXRpb24g
+dGhhdCBIQ0lfQ0hBTk5FTF9VU0VSIGNhbiBub3QgY2hhbmdlIE1UVT8KClRoYW5rcy4KQi5SLgpK
+aWdvbmcgWWluCgoKCuWPkeiHqnZpdm/nlLXlrZDpgq7ku7Y=
+----_com.android.email_5033273815453842
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: base64
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+PCFET0NUWVBFIGh0bWw+CjxodG1sPgogICAgPGhlYWQ+CiAgICAgICAgPG1ldGEgaHR0cC1lcXVp
+dj0iQ29udGVudC1UeXBlIiBjb250ZW50PSJ0ZXh0L2h0bWw7IGNoYXJzZXQ9VVRGLTgiPgogICAg
+ICAgIDwhLS08bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRo
+LCBpbml0aWFsLXNjYWxlPTEiIC8+LS0+CiAgICAgICAgPHRpdGxlPkFib3V0IEtlcm5lbCBsaW1p
+dGF0aW9uIEhDSV9NQVhfRlJBTUVfU0laRSAoMTAyNCArIDQpPC90aXRsZT4KICAgICAgICA8c3R5
+bGU+CiAgICAgICAgYXt0ZXh0LWRlY29yYXRpb246bm9uZX0KICAgICAgICA8L3N0eWxlPgogICAg
+PC9oZWFkPgogICAgPGJvZHk+CiAgICAgICAgPGRpdiBpZD0idml2b0NvbnRhaW5lciIgPgogICAg
+ICAgICAgICA8ZGl2IGlkPSJ2aXZvQm9keSI+PGRpdiBkaXI9Imx0ciI+SGkgTHVpeiw8L2Rpdj4K
+PGJyPgo8ZGl2IGRpcj0ibHRyIj5RdWVzdGlvbiBpcyBzYW1lIGFzIDxhIGhyZWY9aHR0cHM6Ly9n
+aXRodWIuY29tL2JsdWV6L2JsdWV6L2lzc3Vlcy8yMDczLj5odHRwczovL2dpdGh1Yi5jb20vYmx1
+ZXovYmx1ZXovaXNzdWVzLzIwNzMuPC9hPjwvZGl2Pgo8ZGl2IGRpcj0ibHRyIj5BYm91dCBLZXJu
+ZWwgbGltaXRhdGlvbiBIQ0lfTUFYX0ZSQU1FX1NJWkUgKDEwMjQgKyA0KSwgeW91IHNhaWQgdGhh
+dCB0aGlzIHdpbGwgYmUgZml4ZWQgdG8gZW5hYmxlIHVzZXIgc3BhY2UgY2hhbmdlZCwgZnJvbSAj
+MjAxIChjb21tZW50KS48L2Rpdj4KPGRpdiBkaXI9Imx0ciI+VGhlIHBhdGNoIGNvbW1pdCBpcyB0
+b3J2YWxkcy9saW51eEAwOTU3MmZjLCByaWdodD88L2Rpdj4KPGJyPgo8ZGl2IGRpcj0ibHRyIj5I
+b3dldmVyLCB3aHkgSENJX0NIQU5ORUxfVVNFUiB0eXBlIGNhbiBub3QgY2hhbmdlIE1UVSB2YWx1
+ZT8gR29vZ2xlIGJsdWV0b290aCBhaWRsIHVzZXMgSENJX0NIQU5ORUxfVVNFUiB0eXBlIGZyb20g
+PGEgaHJlZj1odHRwczovL2NzLmFuZHJvaWQuY29tL2FuZHJvaWQvcGxhdGZvcm0vc3VwZXJwcm9q
+ZWN0LysvYW5kcm9pZC1sYXRlc3QtcmVsZWFzZTpoYXJkd2FyZS9pbnRlcmZhY2VzL2JsdWV0b290
+aC9haWRsL2RlZmF1bHQvbmV0X2JsdWV0b290aF9tZ210LmNwcD5odHRwczovL2NzLmFuZHJvaWQu
+Y29tL2FuZHJvaWQvcGxhdGZvcm0vc3VwZXJwcm9qZWN0LysvYW5kcm9pZC1sYXRlc3QtcmVsZWFz
+ZTpoYXJkd2FyZS9pbnRlcmZhY2VzL2JsdWV0b290aC9haWRsL2RlZmF1bHQvbmV0X2JsdWV0b290
+aF9tZ210LmNwcDwvYT4gbGluZSAyODIuPC9kaXY+Cjxicj4KPGRpdiBkaXI9Imx0ciI+Q291bGQg
+a2VybmVsIHJlbW92ZSB0aGUgbGltaXRhdGlvbiB0aGF0IEhDSV9DSEFOTkVMX1VTRVIgY2FuIG5v
+dCBjaGFuZ2UgTVRVPzwvZGl2Pgo8YnI+CjxkaXYgZGlyPSJsdHIiPlRoYW5rcy48L2Rpdj4KPGRp
+diBkaXI9Imx0ciI+Qi5SLjwvZGl2Pgo8ZGl2IGRpcj0ibHRyIj5KaWdvbmcgWWluPC9kaXY+Cjxi
+cj4KPGJyPgo8YnI+CjxkaXYgZGlyPSJsdHIiPuWPkeiHqnZpdm/nlLXlrZDpgq7ku7Y8L2Rpdj4K
+PC9kaXY+CiAgICAgICAgICAgIDxkaXYgaWQ9InZpdm9TaWduIiBzdHlsZT0ibWFyZ2luLXRvcDog
+MWVtOyI+PC9kaXY+CiAgICAgICAgPC9kaXY+CiAgICA8L2JvZHk+CjwvaHRtbD4=
+----_com.android.email_5033273815453842--
+----_com.android.email_5033273815367680--
 
------ Output -----
-
-error: corrupt patch at line 21
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5081241945146557832==--
