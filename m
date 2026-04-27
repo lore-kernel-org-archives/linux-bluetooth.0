@@ -1,36 +1,36 @@
-Received: from out-43.smtp.github.com (out-43.smtp.github.com [192.30.252.142])
+Received: from out-31.smtp.github.com (out-31.smtp.github.com [192.30.252.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358BB3E6DD4
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2026 17:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199BA3E6DD2
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2026 17:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777312682; cv=none; b=Mjt9mkQMOB56GFMd/OR+psgOva4iu3y25Ax0HS4sRmmmVBqoL7SQbLakxawkr5YWBb5grN/TaEpoM0Fpzya2IZ32Ug+ZxLkHiE4UWdt7rDCZZHZOyam9CPEQsGZhvQGwikqFkHLeWu5rfb7f4GwRoq60nhohtV+pFPX+PGlPG9s=
+	t=1777312686; cv=none; b=PGcMeEzdWhIb5/9m++W5O9fDNHYo7/NKgjQlxpqi+WiEUYpDPlR+NxC3grLij+pQiNjPAXabKiORqEBDkRFv8X8WGr9SrKC1aqcFTXtiH9ihnqRDsQxhQv/oNaVfcG9g7Um+VB1TpsZQMvKNzD++plxI+AGBi8AUf+dN+7fHS3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777312682; c=relaxed/simple;
-	bh=EjTSj7NTo9ccGUTaxDFHdohGYInIUMtk+4uFhV01dVY=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ZxudmHawnXXqsgU8ILdYJfXSui3oC9egxyu867d4hWhxXG0PvOSBA4Rl4t/Ypy2EGURdWzJlQHBN4SXjH0vWbwE0udpuqRzY6zlARaQOc4DvHk8Uhft+uQCxzDZuFHySf8xPJfvaqoW6N3HvzAUH8TKiuSOLubeFyowqHe5NNOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=E0H6DqIV; arc=none smtp.client-ip=192.30.252.142
+	s=arc-20240116; t=1777312686; c=relaxed/simple;
+	bh=blQI/BKvfn62/zi2u4Wjuaf5jQ40Ej/ql+X6JgO0V8Y=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=hhOnmf3oHRD75hmWyKjFtY2fsSRK9jywoRyXnFUr5GquLRoplOtYw43E46zFC+O/l+KO4iWrEJ4P+X0xH4fO8OJTIdSTe1orxEGbOjQHG3xsWrzOK5BGQvzMrFR0Yb/A/RP8YE8EJw/bKkyf+RMukWhftK/xDrn5rrfJHHmu+7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=CTCKHPDw; arc=none smtp.client-ip=192.30.252.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="E0H6DqIV"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="CTCKHPDw"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1777312680;
-	bh=Z6SXPZP6neFfvcKAMrlDLjvAnhKliZsbtvTdwyirUwQ=;
+	s=pf2023; t=1777312684;
+	bh=E9WC3Uwi0Gbfq5xdx6ONVxWMDzlaA6Lyie4UaGIoP3s=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=E0H6DqIVtr//j3FSdMHtes73zjBKZ8bX37qwAD2t8ZhmmTKiKd3WMTMTktZpcY7un
-	 XnIMvprmXGH/ifTTy42tNAYwBRzkV/T8wvnQuFhJTAixr8nIB9c6CKTLQG6yds0SGR
-	 FF7TM23qv1ETijDqGY2YrrQ1ohJ7bDThWk175sqk=
-Received: from github.com (hubbernetes-node-2dc1abb.ash1-iad.github.net [10.56.178.34])
-	by smtp.github.com (Postfix) with ESMTPA id 46AF784119B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2026 10:58:00 -0700 (PDT)
-Date: Mon, 27 Apr 2026 10:58:00 -0700
-From: prathibhamadugonde <noreply@github.com>
+	b=CTCKHPDwliW39RgskaPmgXzH6LYsjXJ+ribjd8jlTvo6cT+BsfwD7TqYSOqGGCoxq
+	 oyvFrGD3eCOmCiyj1KrXjhaiAtrYOQIQEOB7Wvp7cxwgITHyjieK71dPsxGxlwhIIG
+	 W5t/FtUel1h0AB+UPOdiDZiCRIn1RV64J9u1DIg0=
+Received: from github.com (hubbernetes-node-d0a4592.ac4-iad.github.net [10.52.162.23])
+	by smtp.github.com (Postfix) with ESMTPA id 4D8AE321061
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2026 10:58:04 -0700 (PDT)
+Date: Mon, 27 Apr 2026 10:58:04 -0700
+From: fdanis-oss <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1086284/000000-318956@github.com>
-Subject: [bluez/bluez] 5858e2: src/shared: Add RAS packet formatting and
- notifica...
+Message-ID: <bluez/bluez/push/refs/heads/1086318/000000-9100a7@github.com>
+Subject: [bluez/bluez] c18634: audio: Add ability to desynchronized linked
+ transport
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -39,46 +39,74 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain;
  charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1086284
+  Branch: refs/heads/1086318
   Home:   https://github.com/bluez/bluez
-  Commit: 5858e22147395b6b6660c241fadd9c221292e086
-      https://github.com/bluez/bluez/commit/5858e22147395b6b6660c241fadd9c221292e086
-  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
+  Commit: c1863432872e715acaee7ddeb32e93d6a9149983
+      https://github.com/bluez/bluez/commit/c1863432872e715acaee7ddeb32e9=
+3d6a9149983
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
   Date:   2026-04-27 (Mon, 27 Apr 2026)
 
   Changed paths:
-    M src/shared/rap.c
-    M src/shared/rap.h
+    M profiles/audio/transport.c
 
   Log Message:
   -----------
-  src/shared: Add RAS packet formatting and notification support for CS reflector
+  audio: Add ability to desynchronized linked transport
 
-Implement complete RAS data pipeline:
- - Handle HCI CS subevent result/continuation events
- - Serialize ranging/subevent headers per spec
- - GATT notifications for real-time ranging data
+If bluetoothd is started in testing mode a new Desynchronized property
+is added, allowing to prevent automatic acquire of linked transport
+objects.
+
+When desynchronized, each transports needs to be acquired separately.
+
+This allows to pass PTS tests BAP/UCL/STR/BV-543-C and BV-546-C.
 
 
-  Commit: 3189561250284aade1a61715ddf85052531d3842
-      https://github.com/bluez/bluez/commit/3189561250284aade1a61715ddf85052531d3842
-  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
+  Commit: db2fc7fa960a711f3e6c4691c4f73858a44ef23a
+      https://github.com/bluez/bluez/commit/db2fc7fa960a711f3e6c4691c4f73=
+858a44ef23a
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
   Date:   2026-04-27 (Mon, 27 Apr 2026)
 
   Changed paths:
-    M profiles/ranging/rap_hci.c
+    M doc/org.bluez.MediaTransport.rst
 
   Log Message:
   -----------
-  profiles/ranging: Read cs_mode_one_data members as per spec
+  doc: Add documentation for CIS transport Desynchronized property
 
-Rearrage reading of cs_mode_one_data struct members as per spec.
+This is only supported when bluetoothd is started in testing mode.
+
+Assisted-by: GPT:GPT-5.3-Codex
 
 
-Compare: https://github.com/bluez/bluez/compare/5858e2214739%5E...318956125028
+  Commit: 9100a7fccc84fc1f9d0c7b49612900297d94e187
+      https://github.com/bluez/bluez/commit/9100a7fccc84fc1f9d0c7b4961290=
+0297d94e187
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-04-27 (Mon, 27 Apr 2026)
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+  Changed paths:
+    M client/player.c
+
+  Log Message:
+  -----------
+  client/player: Add support to desynchronize linked transports
+
+After linked transports has been desynchronized, they should be acquired
+separately and read handler should only be started for source local
+endpoint.
+
+This is used to pass PTS tests BAP/UCL/STR/BV-543-C and BV-546-C.
+
+
+Compare: https://github.com/bluez/bluez/compare/c1863432872e%5E...9100a7f=
+ccc84
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
