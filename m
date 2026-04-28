@@ -1,161 +1,320 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A673F0A8C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Apr 2026 14:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777387258; cv=none; b=rZrU8PM0dYJGE90+gfVQXNpKuNFHpbh4qcmSaF1dBUZS42IZVIDYsLGEjRrPlaMsKJI6a+C8yTsxEl4PkK+mQMwnLCJwaQR4u7NrhusMu0stAo9mBsTSTW9XDXlZEySPF2uDpUlIzZVxKl2riIzCYyAhQyD45r1IuVC5TwvUF/s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777387258; c=relaxed/simple;
-	bh=kSLplDjiJeC9hydDPWWSlAbQuzNkls6UZ9tZ5ODFMtI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Oh1Ys980kRna9DSQsIDb+qUEPaHh+zFK3JLEoe7KMs1rY+LmzJaTwd+NiwIcr10MIB0L9a/kJyzzdpNnJ/PcKDconMBSSgzpDcjkYHvZBafPZTfk3axfsa6Ol0iKW2RS72iQovU5lwUBITqgZOHgfpYg78vm9S7xKJdnoHJZY+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=f9D84SbR; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B203033CF
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Apr 2026 14:42:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777387355; cv=pass; b=rO8NSYB6H86gX3hi+ABJfWmE1C8I6nFRCMNKG4zNpmN8qa3Uq43fAqHPs+YMjvVXFepX2inxXQcMW0miacre73wsLKEINsFVHAZAXntE82PNot3yDbFmtpnL8Asr8tXNj9s8Pee536X8yRaQxpikoj+TALmbjt/rYGc7q6I4hPI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777387355; c=relaxed/simple;
+	bh=p1wqucepv6wgTUeKXWKODa2B4LwnLJ5ybEfwGe17PGM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L6+R/ktxXSJJ13+r7jbxf5yUlezExfR1BsS0nLdilJFAv2kLS31UmHiqNXHdtFZSN87k/cEncEClzClJb/Oh6Rt3tiLkgruMwxzjZylLnpOnF9Vd/LkaR8MWbZAECYJ9sle59RghXoXePTvHMCbNdxZT6iue2i6pCpZeKgRkNG4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b+zlRU+1; arc=pass smtp.client-ip=74.125.224.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="f9D84SbR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1777387254;
-	bh=kSLplDjiJeC9hydDPWWSlAbQuzNkls6UZ9tZ5ODFMtI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=f9D84SbRhx495ST3IBOQroPrx4Va1l3/2MYfl1xW3fVvB+ZJ+Q/SqUSpLa1XZqarL
-	 hZ746kxHlSqtOFzBd/1jZNDfN1YeL+MsP/To24FzXFgUrJjJENcWbyUMjUxtonwLW2
-	 TrtUbAbO9sAfL/75yJ5kE6mwzpPsrDPAMIF1dHSfRg/+wAf4Z25hApcdcQhXV9w2oH
-	 CMpmAuw1jfKQcrdDzpMTFeaHFxM6Xss1EK3PIc56WUywF4SCumvEGFOrL/wawdg4LJ
-	 zUvciMn22vRFP1QLDMpV/Fd+ussaHRsDHpQdIeJTXvN+sbES5uJgczo/7w+tZ3CgCI
-	 ey59aXhhhcMMQ==
-Received: from raghavendra-XPS-13-7390.. (unknown [100.64.1.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: raghavendra)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 4975517E0EB6;
-	Tue, 28 Apr 2026 16:40:53 +0200 (CEST)
-From: raghu447 <raghavendra.rao@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: raghavendra <raghavendra.rao@collabora.com>
-Subject: [PATCH BlueZ v3 2/2] client: make advertise.name use public broadcast name
-Date: Tue, 28 Apr 2026 20:10:08 +0530
-Message-ID: <20260428144008.7487-3-raghavendra.rao@collabora.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260428144008.7487-1-raghavendra.rao@collabora.com>
-References: <20260424141831.9172-3-raghavendra.rao@collabora.com>
- <20260428144008.7487-1-raghavendra.rao@collabora.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b+zlRU+1"
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-652f220595fso11641132d50.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Apr 2026 07:42:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777387346; cv=none;
+        d=google.com; s=arc-20240605;
+        b=jXwQwN2uXI7EFtvyAnuTKAbv82PJhKCbsmW4+Ca8vPrGaMqN0eP3Mpq+jGYd4zvuHV
+         7nR1dnKdKoXwQoTUVDdIfj1qDhQG+c2l6XlKL7MOHcgQOTPqFJyP58BGeL/BmX95CAth
+         7CqWa9WIQdlbos7BFXvwHbMfv8xwXxTQ7vkETAIG56V1lG9M7q6xG6Npqx5olVbpBX8U
+         1mqlayEqE0pgJcGVcVut6ak0GPAcIVpvR8mPb9TN45GeS753TWsvJKoIWiSew9xh5XJy
+         XyRvtp2BndwDTUHDfB0kVKau79nvu8H/YM2GSJiX+8ovxeRJXqyxY5l2NL4JoCqKgwBk
+         0gXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=p1wqucepv6wgTUeKXWKODa2B4LwnLJ5ybEfwGe17PGM=;
+        fh=2PSdDMOkPZoY5Pg+8FqsRSolwO7zgkokkzv2bf/ICOs=;
+        b=Z2b8CKR6qhkmhl5YDP3yQ3Au6cWlvted99mu9mQMVfqL+eI5+C2/lyqqwu+diq4E+2
+         QXzJlkWX00V/syyfM8/uc+1HQ6kdrB/x9lYB/p+yJqXVLy6FniKpnir3s7Ae4yrwuBhd
+         qYZciL9RrnPmvIsH2ALOk8UUCD87pvuMixo+McRZ0JkYIh45Q6mUgWz+Hz6f0hw5jj1+
+         UznOorJ1iSyBysx5zFEYQvrdzaURVmGwm8wYZHhwjuZjI5qOAEZCm/kRyyZ2uhGrIigM
+         LU5Ene6jX39D17sXPPcToISm/wtl0O5ZZPxBYpbfygFz0G0Qz+8o6OczAUjHmytG8Gn/
+         W1oA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777387346; x=1777992146; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p1wqucepv6wgTUeKXWKODa2B4LwnLJ5ybEfwGe17PGM=;
+        b=b+zlRU+1RNZmYRuju1+1T5tQ16n6/yOq5NJ2AmqcM1PhCSTZ5uEJUJVG9GBoRg77Y1
+         83mQfSxafomzQIm6WsZqTP+uFFkBzzEwYwDiYlpstohT0Emcw8sbAUAUWgXpAKush9+g
+         EjUfLzc2Sci628ceiEnwrPQWfj8S03Q1dh9WC/w8toJPonYSY1UARjw3JNTIbRpFGkvf
+         O/glUa/k4t3y8SICUtlmQBnoTEqoE880BXnXSMOcZBG8AkcJaaxErdZtypCnUgaWBaTO
+         w5BBj1oEI4SEb4d37wYjSzy6sJM1n+ytazYV20mv+yo3SnO1MyyIrAdP6hby1xxnkRNs
+         jEnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777387346; x=1777992146;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=p1wqucepv6wgTUeKXWKODa2B4LwnLJ5ybEfwGe17PGM=;
+        b=m4TOwfmaEyYM5JmTtamWkNZln3zp6S7QfetZ9XcM4i2Wni2sUKPVSGEL838VbqelAd
+         0Bk/S6tdEOfC7KpOsnEAK84nJaMGRF5Q1Zmj4uH9GLamP/dT0Zp6P8F8LHzouW939Jyz
+         N9nBe4aZr3LCrIn7mR73OJ2euV6nQ5FeXeDTvKrgiE+X+NINMNhz6bPpkauw4EQf3Kxq
+         nd8EflZmrX5k4vApc39upwJks1hG2gRkeDKiYB7P7Mqr38fagRUXvfe0ARi/xabxeEgL
+         mJkh2RlLdfscrX8TtB+mGzWCyuWh49G14zunimp1J9BN3Nd9SHVT4C0n6A5mjUAHZaF/
+         xfIg==
+X-Gm-Message-State: AOJu0YwDxJQNrBpQ4T6jfpoHqKFOGr0sZkp/tYDvnwwDcsDPJNTI9v9m
+	zjf/xstRMAn2G4DkrMYfjZ1iOVSZcW4zoIZQ3Wj/1BK2vHgXnQlOtazvd65eaTV5DtaToK50Llc
+	3f50EnAPUZri0aeuZJ0LFhRVDFQPQ/1Q=
+X-Gm-Gg: AeBDiesUSPdJjYBer+4z/exNES6jDZP55sM/4QwO4WHzU8cOcwuCRWTvrKZjaaiKo8X
+	S+nsg0BVVI86VPcx/vncoKVCg6qRa/BePOdQKgYlYUQUui8KP788K7E1tkd5m++35qys/zvKV6M
+	yjnaqwG8UKjtEuBTcSmUnCPv+v3yH66mYpHr5IN/2l9aqTaORJdJyGhqX9ek1gbgxslcqCNOd1q
+	DdAZzbPxC774uEe7fwqyxb5YqudZYsyzGpCi5PIUUvmCCCfSiwZD3NGxDcrFnTrKdFUZMDZnqaR
+	W77bbNkDheVXRKDbz5carE9LPV5KbQfb3XoPIQlArLHL2fqs+nUDRZe2sxG4JhymFyTQWD3PXb4
+	N2A==
+X-Received: by 2002:a05:690e:d0a:b0:64c:b81d:2cb7 with SMTP id
+ 956f58d0204a3-65beee3eccbmr2963908d50.39.1777387346049; Tue, 28 Apr 2026
+ 07:42:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260317142645.6332-1-raghavendra.rao@collabora.com>
+ <20260424141831.9172-1-raghavendra.rao@collabora.com> <20260424141831.9172-2-raghavendra.rao@collabora.com>
+ <CABBYNZKXGxv0kVVOYZW0AsnQ2Qgx0NhAJ99k3kmjDeGgMcZ84Q@mail.gmail.com> <19dd4843cc9.16a62f4c253537.8494966934612526917@collabora.com>
+In-Reply-To: <19dd4843cc9.16a62f4c253537.8494966934612526917@collabora.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 28 Apr 2026 10:42:14 -0400
+X-Gm-Features: AVHnY4LCO6nMzXTUaXsXcsWoDJFW6xBJeDeeGZ6BFvrnq-yxNkmQ9r29uKAC1mM
+Message-ID: <CABBYNZKTccPXbgbGH7urrhs23FN_aA5HLe-trZUg07wwpcVX5Q@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] client: add public-broadcast advertising command
+To: Raghavendra Rao <raghavendra.rao@collabora.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: raghavendra <raghavendra.rao@collabora.com>
+Hi Raghavendra,
 
----
- client/advertising.c | 74 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 74 insertions(+)
+On Tue, Apr 28, 2026 at 10:35=E2=80=AFAM Raghavendra Rao
+<raghavendra.rao@collabora.com> wrote:
+>
+> Hello Luiz,
+>
+> I agree that adding a decoder for UUID 0x1856 would be useful.
+> I would like to work on that and send it as a follow-up patch.
 
-diff --git a/client/advertising.c b/client/advertising.c
-index 8ffbb085b..98e3895c3 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -31,6 +31,7 @@
- #define AD_PATH "/org/bluez/advertising"
- #define AD_IFACE "org.bluez.LEAdvertisement1"
- #define AD_PUBLIC_BROADCAST_UUID "0x1856"
-+#define AD_TYPE_PUBLIC_BROADCAST_NAME 0x30
- #define AD_PUBLIC_BROADCAST_SQ BIT(1)
- #define AD_PUBLIC_BROADCAST_HQ BIT(2)
- 
-@@ -1016,6 +1017,62 @@ static bool ad_is_public_broadcast_uuid(const char *uuid)
- 	return uuid && !bt_uuid_strcmp(uuid, AD_PUBLIC_BROADCAST_UUID);
- }
- 
-+static bool ad_broadcast_in_use(void)
-+{
-+	return ad_is_public_broadcast_uuid(ad.service[AD_TYPE_AD].uuid);
-+}
-+
-+static bool ad_has_public_broadcast_name(void)
-+{
-+	return ad.data[AD_TYPE_AD].valid &&
-+		ad.data[AD_TYPE_AD].type == AD_TYPE_PUBLIC_BROADCAST_NAME &&
-+		ad.data[AD_TYPE_AD].data.len > 0;
-+}
-+
-+static void ad_print_public_broadcast_name(void)
-+{
-+	if (!ad_has_public_broadcast_name()) {
-+		bt_shell_printf("Public Broadcast Name not set\n");
-+		return;
-+	}
-+
-+	bt_shell_printf("Public Broadcast Name: %.*s\n",
-+			(int) ad.data[AD_TYPE_AD].data.len,
-+			(char *) ad.data[AD_TYPE_AD].data.data);
-+}
-+
-+static bool ad_set_public_broadcast_name(DBusConnection *conn,
-+						const char *name)
-+{
-+	struct ad_data data;
-+	size_t len;
-+
-+	if (!name || !strlen(name)) {
-+		bt_shell_printf("Public Broadcast Name cannot be empty\n");
-+		return false;
-+	}
-+
-+	len = strlen(name);
-+	if (len > sizeof(data.data)) {
-+		bt_shell_printf("Public Broadcast Name too long\n");
-+		return false;
-+	}
-+
-+	memset(&data, 0, sizeof(data));
-+	memcpy(data.data, name, len);
-+	data.len = len;
-+
-+	ad_clear_data(AD_TYPE_AD);
-+	ad.data[AD_TYPE_AD].valid = true;
-+	ad.data[AD_TYPE_AD].type = AD_TYPE_PUBLIC_BROADCAST_NAME;
-+	ad.data[AD_TYPE_AD].data = data;
-+
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
-+					prop_names.data[AD_TYPE_AD]);
-+
-+	return true;
-+}
-+
- static const char *ad_public_broadcast_state(void)
- {
- 	if (!ad_is_public_broadcast_uuid(ad.service[AD_TYPE_AD].uuid))
-@@ -1202,6 +1259,23 @@ void ad_advertise_name(DBusConnection *conn, bool value)
- 
- void ad_advertise_local_name(DBusConnection *conn, const char *name)
- {
-+	if (ad_broadcast_in_use()) {
-+		if (!name) {
-+			ad_print_public_broadcast_name();
-+			return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+		}
-+
-+		if (ad_has_public_broadcast_name() &&
-+		    ad.data[AD_TYPE_AD].data.len == strlen(name) &&
-+		    !memcmp(ad.data[AD_TYPE_AD].data.data, name, strlen(name)))
-+			return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+
-+		if (!ad_set_public_broadcast_name(conn, name))
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+	}
-+
- 	if (!name) {
- 		if (ad.local_name)
- 			bt_shell_printf("LocalName: %s\n", ad.local_name);
--- 
-2.43.0
+Too late, Ive already send a patch to address it:
 
+https://patchwork.kernel.org/project/bluetooth/patch/20260427192223.2875358=
+-1-luiz.dentz@gmail.com/
+
+>
+> Thanks & Regards,
+> Raghavendra
+>
+>
+>
+> From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> To: "raghu447"<raghavendra.rao@collabora.com>
+> Cc: <linux-bluetooth@vger.kernel.org>
+> Date: Fri, 24 Apr 2026 20:14:00 +0530
+> Subject: Re: [PATCH v2 1/2] client: add public-broadcast advertising comm=
+and
+>
+> Hi,
+>
+> On Fri, Apr 24, 2026 at 10:19=E2=80=AFAM raghu447 <raghavendra.rao@collab=
+ora.com> wrote:
+> >
+> > From: raghavendra <raghavendra.rao@collabora.com>
+> >
+> > ---
+> > client/advertising.c | 71 ++++++++++++++++++++++++++++++++++++++++++++
+> > client/advertising.h | 2 ++
+> > client/main.c | 19 ++++++++++++
+> > 3 files changed, 92 insertions(+)
+> >
+> > diff --git a/client/advertising.c b/client/advertising.c
+> > index f9df1b855..fc51f8193 100644
+> > --- a/client/advertising.c
+> > +++ b/client/advertising.c
+> > @@ -20,6 +20,9 @@
+> > #include <string.h>
+> > #include <errno.h>
+> >
+> > +#include "bluetooth/bluetooth.h"
+> > +#include "bluetooth/uuid.h"
+> > +
+> > #include "gdbus/gdbus.h"
+> > #include "src/shared/util.h"
+> > #include "src/shared/shell.h"
+> > @@ -27,6 +30,7 @@
+> >
+> > #define AD_PATH "/org/bluez/advertising"
+> > #define AD_IFACE "org.bluez.LEAdvertisement1"
+> > +#define AD_PUBLIC_BROADCAST_UUID "0x1856"
+>
+> Forgot to mention, we don't seem to have a decoder for 0x1856, would
+> you like to create one so we can actually see what is being programmed
+> on btmon? That will probably require extending the
+> monitor/packet.c:service_data_decoders
+>
+> > struct ad_data {
+> > uint8_t data[245];
+> > @@ -1005,6 +1009,73 @@ static void ad_clear_data(int type)
+> > memset(&ad.data[type], 0, sizeof(ad.data[type]));
+> > }
+> >
+> > +static bool ad_is_public_broadcast_uuid(const char *uuid)
+> > +{
+> > + return uuid && !bt_uuid_strcmp(uuid, AD_PUBLIC_BROADCAST_UUID);
+> > +}
+> > +
+> > +static const char *ad_public_broadcast_state(void)
+> > +{
+> > + if (!ad_is_public_broadcast_uuid(ad.service[AD_TYPE_AD].uuid))
+> > + return NULL;
+> > +
+> > + if (ad.service[AD_TYPE_AD].data.len !=3D 2)
+> > + return NULL;
+> > +
+> > + if (ad.service[AD_TYPE_AD].data.data[0] =3D=3D 0x02 &&
+> > + ad.service[AD_TYPE_AD].data.data[1] =3D=3D 0x00)
+> > + return "sq";
+> > +
+> > + if (ad.service[AD_TYPE_AD].data.data[0] =3D=3D 0x04 &&
+> > + ad.service[AD_TYPE_AD].data.data[1] =3D=3D 0x00)
+> > + return "hq";
+> > +
+> > + return NULL;
+> > +}
+> > +
+> > +void ad_advertise_public_broadcast(DBusConnection *conn, int argc, cha=
+r *argv[])
+> > +{
+> > + struct ad_data data =3D {
+> > + .data =3D { 0x00, 0x00 },
+> > + .len =3D 2,
+> > + };
+> > + const char *state;
+> > +
+> > + if (argc < 2) {
+> > + state =3D ad_public_broadcast_state();
+> > + if (state)
+> > + bt_shell_printf("Public Broadcast: %s\n", state);
+> > + else
+> > + bt_shell_printf("Public Broadcast not set\n");
+> > +
+> > + return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> > + }
+> > +
+> > + if (!strlen(argv[1])) {
+> > + bt_shell_printf("Public broadcast value cannot be empty\n");
+> > + return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> > + }
+> > +
+> > + if (!strcasecmp(argv[1], "sq"))
+> > + data.data[0] =3D 0x02;
+> > + else if (!strcasecmp(argv[1], "hq"))
+> > + data.data[0] =3D 0x04;
+> > + else {
+> > + bt_shell_printf("Invalid argument: accepted values are sq or hq\n");
+> > + return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> > + }
+> > +
+> > + ad_clear_service(AD_TYPE_AD);
+> > +
+> > + ad.service[AD_TYPE_AD].uuid =3D g_strdup(AD_PUBLIC_BROADCAST_UUID);
+> > + ad.service[AD_TYPE_AD].data =3D data;
+> > +
+> > + g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
+> > + prop_names.service[AD_TYPE_AD]);
+> > +
+> > + return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> > +}
+> > +
+> > void ad_advertise_data(DBusConnection *conn, int type, int argc, char *=
+argv[])
+> > {
+> > char *endptr =3D NULL;
+> > diff --git a/client/advertising.h b/client/advertising.h
+> > index 9d124c7af..98f1bc524 100644
+> > --- a/client/advertising.h
+> > +++ b/client/advertising.h
+> > @@ -34,6 +34,8 @@ void ad_advertise_local_appearance(DBusConnection *co=
+nn, long int *value);
+> > void ad_advertise_duration(DBusConnection *conn, long int *value);
+> > void ad_advertise_timeout(DBusConnection *conn, long int *value);
+> > void ad_advertise_data(DBusConnection *conn, int type, int argc, char *=
+argv[]);
+> > +void ad_advertise_public_broadcast(DBusConnection *conn, int argc,
+> > + char *argv[]);
+> > void ad_disable_data(DBusConnection *conn, int type);
+> > void ad_advertise_discoverable(DBusConnection *conn, dbus_bool_t *value=
+);
+> > void ad_advertise_discoverable_timeout(DBusConnection *conn, long int *=
+value);
+> > diff --git a/client/main.c b/client/main.c
+> > index 57fa13888..5fd21c80d 100644
+> > --- a/client/main.c
+> > +++ b/client/main.c
+> > @@ -2920,6 +2920,17 @@ static char *scan_generator(const char *text, in=
+t state)
+> > return argument_generator(text, state, scan_arguments);
+> > }
+> >
+> > +static const char *public_broadcast_arguments[] =3D {
+> > + "sq",
+> > + "hq",
+> > + NULL
+> > +};
+> > +
+> > +static char *public_broadcast_generator(const char *text, int state)
+> > +{
+> > + return argument_generator(text, state, public_broadcast_arguments);
+> > +}
+> > +
+> > static void cmd_advertise(int argc, char *argv[])
+> > {
+> > dbus_bool_t enable;
+> > @@ -2970,6 +2981,11 @@ static void cmd_advertise_data(int argc, char *a=
+rgv[])
+> > ad_advertise_data(dbus_conn, AD_TYPE_AD, argc, argv);
+> > }
+> >
+> > +static void cmd_advertise_public_broadcast(int argc, char *argv[])
+> > +{
+> > + ad_advertise_public_broadcast(dbus_conn, argc, argv);
+> > +}
+> > +
+> > static void cmd_advertise_sr_uuids(int argc, char *argv[])
+> > {
+> > ad_advertise_uuids(dbus_conn, AD_TYPE_SRD, argc, argv);
+> > @@ -3653,6 +3669,9 @@ static const struct bt_shell_menu advertise_menu =
+=3D {
+> > "Set/Get advertise manufacturer data" },
+> > { "data", "[type] [data=3Dxx xx ...]", cmd_advertise_data,
+> > "Set/Get advertise data" },
+> > + { "public-broadcast", "[sq/hq]", cmd_advertise_public_broadcast,
+> > + "Set/Get BLE Audio Public Broadcast Announcement",
+> > + public_broadcast_generator },
+> > { "sr-uuids", "[uuid1 uuid2 ...]", cmd_advertise_sr_uuids,
+> > "Set/Get scan response uuids" },
+> > { "sr-solicit", "[uuid1 uuid2 ...]", cmd_advertise_sr_solicit,
+> > --
+> > 2.53.0
+> >
+> >
+>
+>
+> --
+> Luiz Augusto von Dentz
+>
+>
+>
+
+
+--=20
+Luiz Augusto von Dentz
