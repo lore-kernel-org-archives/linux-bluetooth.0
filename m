@@ -1,311 +1,179 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F54332638
-	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Apr 2026 08:04:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1C73BBA1D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Apr 2026 09:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777363445; cv=none; b=Hzyi89/VFcs3HsYxP0pSvVPblBTXPyKWLhB0npbTK4iRJVXaD5kCmsH+T+GLBM8NRdxhTyTpwMtQz/62rDmeu8owr3i+E78Elj627RGpi2sh97LXd9E3dScgqwJ8moW/4ZhUlMWXJoZQ2WWGYssXm5IGpVXL9nxgz+R7LVXeOfA=
+	t=1777368724; cv=none; b=VObEbTgp5Vul+saLWvv3zlONAl0BGuw+mMml7be8/hXSqI0IMAtnaOyWT5+D2Ryx+TVRWEM+E9a203oL9KycrBcXtYl5EGH8ZlXrQh6jUDtbC4q/75pQbwNReG7gHAiMHz04GPRyMXmTrrEkfS+BCRo5XLKETE1I5Y1jYjYQ+LE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777363445; c=relaxed/simple;
-	bh=3eFIboFxXFRDnkpuHJySKtHqNHdzjwkSBCF8yF5dnis=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=agXFtvXpfWlkV9pBCVLiTz46fZxj8sYARUvTSZAQqLpfeICfIN/vGXnV8nNOnbZMzTXMnDuYLhPb2gbygOyzDF6+nSqoo4fXWuN+I1sHrH44ip66Ezpz0oMpwucoOnfX6DWh9Bf6KSTvbj46LUY5aWQ24QiXkaiiAMVTBuxLTio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=lsqfjM+Q; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1777368724; c=relaxed/simple;
+	bh=RTNGG1oBjylw5WInHSS/Bhmq34TlF2xruXPC1zPQYu8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OAmqB4aI7CLOj8rmIqhv0etZPsaHVrCQm9tRr2KgojE7LkGbroBf8fYOqA/iRHEhc920YVKHdcBZYoLTGdnyULfWJUHXi3aznOpxH8vVRiHMnRI2vEBPho6tlWXieOkOtXEeJh+9IRmwEOU2sFcAdGdZ32RfL1Fu0R37S8OAnu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=KGmRWLkp; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=YR9adaM1; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="lsqfjM+Q"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1777363436;
-	bh=3eFIboFxXFRDnkpuHJySKtHqNHdzjwkSBCF8yF5dnis=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=lsqfjM+QJ2wRl9eYcZfGWSipooCdfXywhxN108ACis1Tlqy+t9lLGdszMbAcxzdFM
-	 CLsLTNT8Dp+G8pzCuiPCGEceTIHmV4vS7c7QKvqK+N2F2cB4jLoSRM+SYT9p0eU+ge
-	 reqsYnCrf3Pblj3gWp5EIcOISMS1XAC0P9iegFFGFWROjHRIx8xoMVzoGGXxkYtD6x
-	 h7Z6GBj++T9V91hm0yfKzgke3qgbV83Hcfzffje93hrKjEzSbygm5qXfwZU8MzZkPf
-	 aPS3/Qmlqhs+enL5lJKA1RvTg1oH0cBVlCpvNjNbsNFglkDcHvPigqPDqXmzLdGUIl
-	 yckFaahuM4Qag==
-Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id E1AD417E131F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Apr 2026 10:03:55 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/3] audio: Add ability to desynchronized linked transport
-Date: Tue, 28 Apr 2026 10:03:12 +0200
-Message-ID: <20260428080314.180777-2-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260428080314.180777-1-frederic.danis@collabora.com>
-References: <20260428080314.180777-1-frederic.danis@collabora.com>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="KGmRWLkp";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="YR9adaM1"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63S5VaNO2383024
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Apr 2026 09:32:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	dCix2WwSQZTaFU6BabqTi+usW62DHqdG6ZVKuM7pkp4=; b=KGmRWLkpxgKDdl5U
+	azdoUMZIS15OpVD9UdTI2seB2A+pveRUqgyL5htkHzur4xDEkw5ZB1US99e7xBvp
+	8EpsPzFMtjLMQV9ZKB6Cn9rK9d7Ln7tKKYlu5SSei2Xm83P7ClcXCR2ghw42lP5M
+	0JNWMyboMFPA9HVv3SabqhOU4MZ5CPl2SezQeaGvNA1j4kzrNXExhJscifDEgEcX
+	BucXH1MTrT9eA6SzdgISXaZhxR4lxfVDHPmBuNw1tZDtHWLHWxEK79DOYF9RzfaK
+	XIDC8HDzHJM5b2sxwyEgOQcFF0422eXbf5N6WY+J7QjaLFBfdxe1pDdcxJL8dizG
+	SE3flg==
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com [209.85.219.71])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dt85xvbew-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Apr 2026 09:32:02 +0000 (GMT)
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-8a016b99579so39615366d6.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Apr 2026 02:32:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1777368719; x=1777973519; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dCix2WwSQZTaFU6BabqTi+usW62DHqdG6ZVKuM7pkp4=;
+        b=YR9adaM1mpGa5JilD6BI/H8bWRDHvD+QvLroolE29xQa7hvMovEjJ3QGpiWPTGjBWb
+         oBKYN/pw8U3lZnMbrqdwwog1lsheyehtEEBt9IdfKNtcw3Y4Dt6vRf5ZHtupvxjr4Ijr
+         dHsBq1k8PPJklouFFU1mxjsLptvThcvgc5JNlQMwhS0zgUH7kgZ/KYYNBqgpTIp3xLRk
+         8AC4H9YIZkYykCLh+g+qqFBZvCUP3aFEfEbPdvKKlKIo50/9NbDLUOVzITpF6L9oF0bV
+         83krT6GtMWOmJLBTNXCY3vbnbLf+aKzBJJq4HMX22bWpk01iQFMaJ4sAqsN6ihODuNDC
+         MFDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777368719; x=1777973519;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dCix2WwSQZTaFU6BabqTi+usW62DHqdG6ZVKuM7pkp4=;
+        b=p/4ZLkWadcLRRnK49PeP0ikE+tdqtCsT2lupgTjpDRsFIg0Ig3Logh32Yf8SM8osqA
+         WnUCB1DhB9DmoENtGyRwIo3xgfzCqLsphoPW2+WbmtoouHcu68CTR7uV/u1otv7kyxBA
+         fXUeTQOcSiJJ5LB0iR2VSBMNUVmN+TKzbQQz2qhPqTmhqy8V5ZArQPpnLyCwsb5c2SzO
+         w6b8/NfAW2nVxxwtZnPiiNRVdZeJIFb0gfIKkEjb1dJcsAzMIY9SnURgNZF8RwQYDouO
+         /kxYKZimYJF7jiIH2CUIu2pxImGDHywOaQjZE6qzjaXQGccx46AAHYZbORl9i7U9MT2Q
+         iCuQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9NfVT1gZMzHVWPuMt22iTsTwJPNcokPO6z6xMmpgaIdbktlBWx5fHZQpi88nQ7Mlmq9GPMx5Ql9gY8bLDAmDw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxpg7F3Kf4NJl8yv61LhXQ7DtLj/nJ9D8XePog5ovbQnhetDv3u
+	RgUzX/EtABlMPGBadiEF9Orx4gragdnYesPzZwK0DH0Xd8sVJDD+rN+e6oxeG0shscJ+Ln5YRM4
+	h+BDyMHnWJ/PoBhqOrLJgLciXMczCrI14AZCA7IHma7PeFlZm5bBGvHeaw1TC1KRTxW91y+s=
+X-Gm-Gg: AeBDiesvQG7MIQ3O0XrzdptLqXb/yGZDT3089bBpaMSHggspZ8eZW4e7BDOmL9dD6nF
+	G0xxUwJyxL+akf4OqPM7q0aFSIXRed9q82u3qsoiQ3n48NfNYae5GDeVUcwCGAsS6sBMnUHkbS3
+	6DHi0Rmqpg4SbSaHWoKaIcTdMdSZwbo4B0vgu5pOAh5JnLVnqBZizakhz6d0FZtaPoEAMC09uEP
+	Pl/pkbBvsy8VFbBJMT2nPETwEJXPsPUjLSec77dmiktrL5sPDlAsxCOkgcAnJnAmiYI6DrbnTfx
+	ZK0dxS+Ep+3rSajCTcN8xY5KEP6vFA8l40AUFLzymF3RzD/z1f5Q5h2uq9Y9jFrADyh23GvtWiP
+	ZoRPPnRq1geGhBVOSnouOYGK1JLCb5LnDxho7WmKx2Hy06C2FUyvJlWVda9bJSR3/MJFToFB2r1
+	xstRLaoFJyKFs1YQ==
+X-Received: by 2002:a05:6214:629:b0:89a:4741:2147 with SMTP id 6a1803df08f44-8b3e2a0dfa3mr28573756d6.8.1777368718954;
+        Tue, 28 Apr 2026 02:31:58 -0700 (PDT)
+X-Received: by 2002:a05:6214:629:b0:89a:4741:2147 with SMTP id 6a1803df08f44-8b3e2a0dfa3mr28573486d6.8.1777368718524;
+        Tue, 28 Apr 2026 02:31:58 -0700 (PDT)
+Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bb80c081c40sm74244866b.55.2026.04.28.02.31.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Apr 2026 02:31:57 -0700 (PDT)
+Message-ID: <828c59ee-c30e-4a47-9ff8-6fbbe05bbdde@oss.qualcomm.com>
+Date: Tue, 28 Apr 2026 11:31:54 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] arm64: dts: monac-arduino-monza: Add Bluetooth UART
+ node
+To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com,
+        wei.deng@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
+        mengshi.wu@oss.qualcomm.com,
+        Loic Poulain <loic.poulain@oss.qualcomm.com>
+References: <20260428025652.662502-1-shuai.zhang@oss.qualcomm.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20260428025652.662502-1-shuai.zhang@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Authority-Analysis: v=2.4 cv=Zs3d7d7G c=1 sm=1 tr=0 ts=69f07e92 cx=c_pps
+ a=UgVkIMxJMSkC9lv97toC5g==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22
+ a=EUspDBNiAAAA:8 a=U7gHpUSv1cUObH_NKCQA:9 a=QEXdDO2ut3YA:10
+ a=1HOtulTD9v-eNWfpl4qZ:22
+X-Proofpoint-ORIG-GUID: hjh7XZWjryEQ_ZBNnofo4c7Ij-3GC0oq
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI4MDA4MyBTYWx0ZWRfXyEf5vwK43z4y
+ eCrIxFpPgSAPQbyb/6t9Uik6t+ffvSGceA9wyIZV5l3t1I4nMPUtnLYwZIKJhaw6RtEj+oASZ1b
+ NGJESkJP0RXERBj9yIi7xaU7Pp89wvxeORbMruZYsZu7tpF01ZjpPzVFb2Qb0PEQInXvHmWBgKF
+ QD8a6C/BxdtA8XQnvOLCtZ9by6wFIDvOxvq+MkvjhEq409X5epVpA42RmXXCEQWEHX5fbaRpCFW
+ I47zJzF2Y2Szz17wJmRqeUakTBCgWZywi1O7E6ta2ACn9XZ6ts8LV6bGqobvVc9Ye8yGsd40fsd
+ y/Ac/iQym4meWYqb8yYKzasCH5Ir/JLMMjJba1klGD4MnMJJJSCJDbwET/Dk1OgJbrIV2yFTHpN
+ 0XDs+yhvmEmvx7DUJqBMvV/KpWdZovlDljviyFvRn3GJ73b9qSIYO1R9UV1SmVfS1UxWM/ITk/w
+ vN2biccGoHFs6lVo5CA==
+X-Proofpoint-GUID: hjh7XZWjryEQ_ZBNnofo4c7Ij-3GC0oq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-28_02,2026-04-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 lowpriorityscore=0 phishscore=0 bulkscore=0 malwarescore=0
+ impostorscore=0 adultscore=0 suspectscore=0 spamscore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604280083
 
-If bluetoothd is started in testing mode a new Desynchronized property
-is added, allowing to prevent automatic acquire of linked transport
-objects.
+On 4/28/26 4:56 AM, Shuai Zhang wrote:
+> enable bt on monac-arduino-monza
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
 
-When desynchronized, each transports needs to be acquired separately.
+This sign-off chain is invalid as-is - should this patch have
+"From: Loic"? Who is the author?
 
-This allows to pass PTS tests BAP/UCL/STR/BV-543-C and BV-546-C.
----
-v1->v2: renamed 'desynchronized' to 'desync'
+> ---
+>  arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts b/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
+> index ca14f0ea4..092ca0b59 100644
+> --- a/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
+> +++ b/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
+> @@ -21,6 +21,7 @@ aliases {
+>  		ethernet0 = &ethernet0;
+>  		i2c1 = &i2c1;
+>  		serial0 = &uart7;
+> +		serial1 = &uart10;
+>  	};
+>  
+>  	chosen {
+> @@ -454,6 +455,16 @@ &uart7 {
+>  	status = "okay";
+>  };
+>  
+> +&uart10 {
+> +	status = "okay";
+> +	bluetooth: bluetooth {
 
- profiles/audio/transport.c | 116 ++++++++++++++++++++++++++++++++-----
- 1 file changed, 103 insertions(+), 13 deletions(-)
+Please keep a \n above the subnode definition
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 5c2a2777e..39e49ea49 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -37,6 +37,7 @@
- #include "src/shared/bap.h"
- #include "src/shared/bass.h"
- #include "src/shared/io.h"
-+#include "src/btd.h"
- 
- #ifdef HAVE_A2DP
- #include "avdtp.h"
-@@ -109,11 +110,18 @@ struct bap_transport {
- 	guint			resume_id;
- 	struct iovec		*meta;
- 	guint			chan_id;
-+	bool			desync;
-+		/* desync variable is only writable when testing is enabled;
-+		 * otherwise, it defaults to false, meaning the Enable/Acquire
-+		 * operations synchronize input/output directions that share
-+		 * the same ISO socket CID/CIG.
-+		 */
- };
- 
- struct media_transport_ops {
- 	const char *uuid;
- 	const GDBusPropertyTable *properties;
-+	const GDBusPropertyTable *test_properties;
- 	void (*set_owner)(struct media_transport *transport,
- 				struct media_owner *owner);
- 	void (*remove_owner)(struct media_transport *transport,
-@@ -351,7 +359,7 @@ static void transport_bap_remove_owner(struct media_transport *transport,
- {
- 	struct bap_transport *bap = transport->data;
- 
--	if (bap && bap->linked)
-+	if (bap && bap->linked && !bap->desync)
- 		queue_foreach(bt_bap_stream_io_get_links(bap->stream),
- 				linked_transport_remove_owner, owner);
- }
-@@ -729,7 +737,7 @@ static void transport_bap_set_owner(struct media_transport *transport,
- {
- 	struct bap_transport *bap = transport->data;
- 
--	if (bap && bap->linked)
-+	if (bap && bap->linked && !bap->desync)
- 		queue_foreach(bt_bap_stream_io_get_links(bap->stream),
- 				linked_transport_set_owner, owner);
- }
-@@ -1463,6 +1471,59 @@ static void set_links(const GDBusPropertyTable *property,
- 	g_dbus_pending_property_success(id);
- }
- 
-+static gboolean get_desync(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &bap->desync);
-+
-+	return TRUE;
-+}
-+
-+static void transport_desynchronize(void *data, void *user_data)
-+{
-+	struct bt_bap_stream *link = data;
-+	bool desync = PTR_TO_UINT(user_data);
-+	struct media_transport *transport;
-+	struct bap_transport *bap;
-+
-+	transport = find_transport_by_bap_stream(link);
-+	bap = transport->data;
-+	bap->desync = desync;
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), transport->path,
-+						MEDIA_TRANSPORT_INTERFACE,
-+						"Desynchronized");
-+}
-+
-+static void set_desync(const GDBusPropertyTable *property,
-+			DBusMessageIter *iter, GDBusPendingPropertySet id,
-+			void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN) {
-+		g_dbus_pending_property_error(id,
-+				ERROR_INTERFACE ".InvalidArguments",
-+				"Expected BOOLEAN");
-+		return;
-+	}
-+
-+	dbus_message_iter_get_basic(iter, &bap->desync);
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), transport->path,
-+						MEDIA_TRANSPORT_INTERFACE,
-+						"Desynchronized");
-+
-+	/* Set desynchronized for all the links */
-+	queue_foreach(bt_bap_stream_io_get_links(bap->stream),
-+					transport_desynchronize,
-+					UINT_TO_PTR(bap->desync));
-+
-+	g_dbus_pending_property_success(id);
-+}
-+
- static gboolean qos_ucast_exists(const GDBusPropertyTable *property, void *data)
- {
- 	struct media_transport *transport = data;
-@@ -1486,6 +1547,22 @@ static const GDBusPropertyTable transport_bap_uc_properties[] = {
- 	{ }
- };
- 
-+static const GDBusPropertyTable transport_bap_uc_test_properties[] = {
-+	{ "Device", "o", get_device },
-+	{ "UUID", "s", get_uuid },
-+	{ "Codec", "y", get_codec },
-+	{ "Configuration", "ay", get_configuration },
-+	{ "State", "s", get_state },
-+	{ "QoS", "a{sv}", get_ucast_qos, NULL, qos_ucast_exists },
-+	{ "Endpoint", "o", get_endpoint, NULL, endpoint_exists },
-+	{ "Location", "u", get_location },
-+	{ "Metadata", "ay", get_metadata, set_metadata },
-+	{ "Links", "ao", get_links, NULL, links_exists },
-+	{ "Volume", "q", get_volume, set_volume, volume_exists },
-+	{ "Desynchronized", "b", get_desync, set_desync, links_exists},
-+	{ }
-+};
-+
- static gboolean get_bcast_qos(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
- {
-@@ -1920,6 +1997,9 @@ static void transport_bap_update_links_uc(
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(), transport->path,
- 						MEDIA_TRANSPORT_INTERFACE,
- 						"Links");
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), transport->path,
-+						MEDIA_TRANSPORT_INTERFACE,
-+						"Desynchronized");
- 
- 	DBG("stream %p linked %s", bap->stream, bap->linked ? "true" : "false");
- }
-@@ -2037,8 +2117,9 @@ static guint transport_bap_resume(struct media_transport *transport,
- 		return bap->resume_id;
- 	}
- 
--	id = bt_bap_stream_enable(bap->stream, bap->linked, NULL,
--					bap_enable_complete, owner);
-+	id = bt_bap_stream_enable(bap->stream,
-+				bap->desync ? false : bap->linked,
-+				NULL, bap_enable_complete, owner);
- 	if (!id)
- 		return 0;
- 
-@@ -2161,7 +2242,7 @@ static void transport_bap_set_state(struct media_transport *transport,
- {
- 	struct bap_transport *bap = transport->data;
- 
--	if (!bap->linked)
-+	if (!bap->linked || bap->desync)
- 		return;
- 
- 	/* Update links */
-@@ -2540,10 +2621,11 @@ static void *transport_asha_init(struct media_transport *transport, void *data)
- #define TRANSPORT_OPS(_uuid, _props, _set_owner, _remove_owner, _init, \
- 		      _resume, _suspend, _cancel, _set_state, _get_stream, \
- 		      _get_volume, _set_volume, _set_delay, _update_links, \
--		      _destroy) \
-+		      _destroy, _test_props) \
- { \
- 	.uuid = _uuid, \
- 	.properties = _props, \
-+	.test_properties = _test_props, \
- 	.set_owner = _set_owner, \
- 	.remove_owner = _remove_owner, \
- 	.init = _init, \
-@@ -2565,26 +2647,28 @@ static void *transport_asha_init(struct media_transport *transport, void *data)
- 			transport_a2dp_resume, transport_a2dp_suspend, \
- 			transport_a2dp_cancel, NULL, \
- 			transport_a2dp_get_stream, transport_a2dp_get_volume, \
--			_set_volume, _set_delay, NULL, _destroy)
-+			_set_volume, _set_delay, NULL, _destroy, NULL)
- 
- #define BAP_OPS(_uuid, _props, _set_owner, _remove_owner, _update_links, \
--		_set_state) \
-+		_set_state, _test_props) \
- 	TRANSPORT_OPS(_uuid, _props, _set_owner, _remove_owner,\
- 			transport_bap_init, \
- 			transport_bap_resume, transport_bap_suspend, \
- 			transport_bap_cancel, _set_state, \
- 			transport_bap_get_stream, transport_bap_get_volume, \
- 			transport_bap_set_volume, NULL, \
--			_update_links, transport_bap_destroy)
-+			_update_links, transport_bap_destroy, _test_props)
- 
- #define BAP_UC_OPS(_uuid) \
- 	BAP_OPS(_uuid, transport_bap_uc_properties, \
- 			transport_bap_set_owner, transport_bap_remove_owner, \
--			transport_bap_update_links_uc, transport_bap_set_state)
-+			transport_bap_update_links_uc, \
-+			transport_bap_set_state, \
-+			transport_bap_uc_test_properties)
- 
- #define BAP_BC_OPS(_uuid) \
- 	BAP_OPS(_uuid, transport_bap_bc_properties, NULL, NULL, \
--			transport_bap_update_links_bc, NULL)
-+			transport_bap_update_links_bc, NULL, NULL)
- 
- #define ASHA_OPS(_uuid) \
- 	TRANSPORT_OPS(_uuid, transport_asha_properties, NULL, NULL, \
-@@ -2592,7 +2676,7 @@ static void *transport_asha_init(struct media_transport *transport, void *data)
- 			transport_asha_resume, transport_asha_suspend, \
- 			transport_asha_cancel, NULL, NULL, \
- 			transport_asha_get_volume, transport_asha_set_volume, \
--			NULL, NULL, NULL)
-+			NULL, NULL, NULL, NULL)
- 
- static const struct media_transport_ops transport_ops[] = {
- #ifdef HAVE_A2DP
-@@ -2647,6 +2731,7 @@ struct media_transport *media_transport_create(struct btd_device *device,
- 	struct media_transport *transport;
- 	const struct media_transport_ops *ops;
- 	int fd;
-+	const GDBusPropertyTable *properties;
- 
- 	transport = g_new0(struct media_transport, 1);
- 	if (device)
-@@ -2701,9 +2786,14 @@ struct media_transport *media_transport_create(struct btd_device *device,
- 			goto fail;
- 	}
- 
-+	if (btd_opts.testing && ops->test_properties)
-+		properties = ops->test_properties;
-+	else
-+		properties = ops->properties;
-+
- 	if (g_dbus_register_interface(btd_get_dbus_connection(),
- 				transport->path, MEDIA_TRANSPORT_INTERFACE,
--				transport_methods, NULL, ops->properties,
-+				transport_methods, NULL, properties,
- 				transport, media_transport_free) == FALSE) {
- 		error("Could not register transport %s", transport->path);
- 		goto fail;
--- 
-2.43.0
+> +		compatible = "qcom,qca2066-bt";
+> +		max-speed = <3200000>;
+> +		enable-gpios = <&tlmm 55 GPIO_ACTIVE_HIGH>;
+> +		status = "okay";
 
+The node is enabled already, because nothing disabled it. Drop the
+status line.
+
+Konrad
