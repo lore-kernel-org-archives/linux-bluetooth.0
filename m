@@ -1,136 +1,112 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB803B0ADA;
-	Tue, 28 Apr 2026 02:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66517404E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Apr 2026 03:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777345035; cv=none; b=mHSh2H40uPExn9t8ZFu3w1yONUepnW/HijLcAkVdzmVeMfzWvk6zhJxZ5hNQnMFoSsyiBU7h79dk8Gtw6l/sBr2IAivfC1G/QNYhLCvHwLXn3gXjZOYPnrOz1nSlNVHf1t9BAueAS1yssRBMeVSxx37mYwfons7Vlwrdcos+aWM=
+	t=1777347388; cv=none; b=RjhgXlbiuzGVBhnZvDdlyNeyLj8naPo/H9OAsXRdVSry+f89amy4JtWgS5iLJChs+Wq8o14iA2yo1rm2P+GMeLvPt6/xX0+3cnTAlyzAe8Zq195kw9OMrymLbccAGXYgpuC7V026P6Ckf74f1OOZq0mvTKiwexXuNrVdKlJ3lmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777345035; c=relaxed/simple;
-	bh=L/EVvAaZFPWDgrJ9+dDGug4QLHaNfCife80FWWpnDzo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=B9IfKZzBOr29FpjlmHoLtc3m1I+GZufp1Lss0gjY8nE4kjxxW7eYUo0Gvgpl3KmeA6khg53hWhKHIkjg+Yzn4lSiL6bX4rW655m3kpt4Yei29npQLk6Ptz6geb5xhjMA7sVBq2cpcJekPE7VAg9ZMg29CYjZQ9DfttC8rjRCQL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=W5szFSbv; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1777347388; c=relaxed/simple;
+	bh=hffMiNtxuL6VekEt4srd3ApK4iTeYiZ0KVt6a5PzrWs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=AINoWJBCrPIL/qdQXXSr5Q+59a37QC33j2/Sa8b6/AoJBHhptYGO6le4EcdiL6afS5QpXyLSFBVSxvoGLYFqOr71yQFJpPxByIHgEZ3ClXX2ApWMLv/WFKE53GSvOolFOTHtsHqfUz4m03zKSbdEt5IRMEJFPC+odiTzvYSpYUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DVs28oaO; arc=none smtp.client-ip=74.125.82.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="W5szFSbv"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63S26XRA1237213;
-	Tue, 28 Apr 2026 02:57:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=FmbRpaGk24szdgYw2AKkXm+HdRNfMwnIYMt
-	Zk+/cBxw=; b=W5szFSbvMkvLD/TEh5gJqhck5aNKMWFxlklQF2ZckJucSp7YHPc
-	vPP2OfXKQD2ouV+qxEaHnQOB86nIl4q6/ngiHKykTVQ6EHxDkABwdJN5zzlDeJJI
-	JD2AIDcM4oxgplc4KCMDCJO0GLbYA4cJ850hp81YGVx+uavUmoRsjW7e289LFD9Y
-	LgL0VIZZy0Q0vi1YDCzbf9JTS5SpoLn7J+YuDoQyN2jZfA4NWC2I8QLwqz9qhxU6
-	6rWWL5ghe3BGxI/lC+f8XMptbbpfakDjEu31KYyF9KEGsozqvf0CjzOtUai6AXRw
-	yLwKZXKVii52FNOiL2Q0vIpET8KkKK8W20w==
-Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dt6n4k8cs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Apr 2026 02:57:05 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.7/8.18.1.7) with ESMTP id 63S2v2oC007223;
-	Tue, 28 Apr 2026 02:57:02 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 4ds66nm8r0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Apr 2026 02:57:02 +0000 (GMT)
-Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 63S2v2lu007208;
-	Tue, 28 Apr 2026 02:57:02 GMT
-Received: from shuaz-gv.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 63S2v1kQ007192
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Apr 2026 02:57:02 +0000 (GMT)
-Received: by shuaz-gv.ap.qualcomm.com (Postfix, from userid 4467449)
-	id 1666760A; Tue, 28 Apr 2026 10:57:01 +0800 (CST)
-From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-To: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com,
-        wei.deng@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
-        mengshi.wu@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com,
-        Loic Poulain <loic.poulain@oss.qualcomm.com>
-Subject: [PATCH v1] arm64: dts: monac-arduino-monza: Add Bluetooth UART node
-Date: Tue, 28 Apr 2026 10:56:52 +0800
-Message-Id: <20260428025652.662502-1-shuai.zhang@oss.qualcomm.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DVs28oaO"
+Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-2bdd40d3c61so10393066eec.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Apr 2026 20:36:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777347386; x=1777952186; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=43LV9J6bEw2RGZBg7V4iPai6xDj4LasyIFvII2le1EY=;
+        b=DVs28oaO7padaoghsQVxPb6+EIIbP2FfjIdRnVacxMNMWx4tQRyrxosY1cXxGjlX3H
+         Xkt0jPeM5gGxPV/UPn01HXthQ/p7XFsNjqjxF6GUAaHiPnWZG+JUxQjIRBXPbPh5ZMHm
+         RA/KJM2NkOptJjGjDTVU2TBvF4Q0103y6B6cbC8YsA17OHZ/8nWtxWATyaoSpZXlJCBA
+         vTwx85bjIL6tekfNaEb2HQOSM1VlZXMc7U6d5F3OFSs1kOiJLFvlqZxxkR5MmS6LVsn2
+         yNuvLVsmrgb58Wfkk3WaFk5EO3ZR8qUcQx8likTG4Wk/Z2QhMNRf/sPHXFn97PyJTJHU
+         6wuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777347386; x=1777952186;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=43LV9J6bEw2RGZBg7V4iPai6xDj4LasyIFvII2le1EY=;
+        b=gX1rz2SjVn+44eblaTZZQf2yHdWCM42tBsQ0U1Qh/yPgY1Sl1nR/wsTptx46NaAHud
+         8M0u8+I9v45Ctl7ZvbRL6BNT5yCo+4t6MJJq+MXlH1Nvns5VYGZYP1ocDCQXif7IsXa9
+         Wde5PM/bIoJYGaPmH5r32pqONVKp92/yqxGMrLMXZUJEQGfn2B0SuN9hdG9xM4jPHXRF
+         q0OEF4ACqTg4sz/SKpOPRoJOnnBBMftDKHQ8BooLfaHe4TQjBUhvUrECxB8DOwR3rcVp
+         sxuTDggi5MayYTmb7R3eFx4j8xo3aspz2Zp1bR8HMcXggPCkiEjF0gaAuqQApzjBy6/K
+         A/Hg==
+X-Gm-Message-State: AOJu0Yytf9JTZQ8nUX0FAqyrOTy2XJM23paKSiSfWt1ZEbUWmUFM4R9S
+	GZLz/N/EjiiF9elYjqkF9/5JEVUIQSU+hqRtMwMVTKdCcRAcozcTVArA9CjWQw==
+X-Gm-Gg: AeBDievjErnlfD0FFtOYD3LmicfPnIm0UaVBtnvbJH/o1YfFyj4Su2zuB8aT/jiBNbI
+	+fdXDFsUuRn3k98wivWfI2McAeVhR0budU8CMHNZNp2usp6uqOKas2WaVQdr5AVOX/DYsqK3tjz
+	OAE8d14LuYKqz10H/LAz29kNi86iukUBfmEA2ehKtZvQ0HyZpC5/8giCcecCVFXGxxSN9WeKtL3
+	ZI97JkpFUoeKfiKcjyeA5/PKeG+kFDqniUbQpFigRThDFY9n+ryuNj1BgbhIv8fICD31E7vdb1F
+	rODhbEElPTkFGfoNGKT51UexAlM/EfocwR2GF3/nR1Rk1zrIZRWY+SwJXff5uXN/AALvgcXU7OG
+	oIXUVyh6pfNphgoAOO8oe5Yq6MeV1ri62910pb7OXp3koSV1zPDQCuPmtFxioKFHKAa3FEqpm2A
+	aLlp01GG8y2cpVxjtJoXp4CTDkiispVhKyRlD9nhdiDibGTs2MqA==
+X-Received: by 2002:a05:7300:220f:b0:2df:3eb7:531d with SMTP id 5a478bee46e88-2ed0a0b077amr652370eec.19.1777347386414;
+        Mon, 27 Apr 2026 20:36:26 -0700 (PDT)
+Received: from [172.17.0.2] ([52.159.227.4])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ed0a103542sm1782928eec.21.2026.04.27.20.36.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Apr 2026 20:36:25 -0700 (PDT)
+Message-ID: <69f02b39.050a0220.28c5e4.745b@mx.google.com>
+Date: Mon, 27 Apr 2026 20:36:25 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0417062237690833518=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-ORIG-GUID: 6QecfAgn8rAnLWTl0MC2hR6HCbxND6l0
-X-Authority-Analysis: v=2.4 cv=Xba5Co55 c=1 sm=1 tr=0 ts=69f02201 cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=gowsoOTTUOVcmtlkKump:22 a=EUspDBNiAAAA:8 a=3PoVfMXRn9QdUPswB34A:9
-X-Proofpoint-GUID: 6QecfAgn8rAnLWTl0MC2hR6HCbxND6l0
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI4MDAyNSBTYWx0ZWRfX7dzLAE8Vga0x
- Zz7QdnvAPj0BBFyLGJYwYqwOEV/Tm9CzizT8cfRt950QJ4DSu3+FPGnnKOo3GzfTOhjf32hzaFk
- PTkf8Qxz5GirPLqmN0R/HBH7UISjVmT33t2USf2+vEAuTnMVTK8oD0/QYd/RPOduQfjsg7tBn0x
- 7RPMraaSFYrriGSHi9uH7NqEbql2GAU8pjhzgWGjkaLmk4F9d8hbBHJHOd1RRjkAFR7RLNRNk56
- 5hOXK+7Q7W2JximuOKGsQZwrOPaIBLNgsO9jz2fMzyVjlrNWM2eDJYE2BNPTZHMIXPk9KFGIeqr
- VHJ++4SNqPyv+WnJesLUG5idPb9QFXe99KVo+jSMzBHFGGElokwsPxuxpJXZ7PA60eYKU56O9dB
- Lp4K4osNTJ6eaKW7CO7RSgCxPP6X3BikRm3yF3lJAa8htAWYrOABKaFrJM7G2oXQzhYOJLIGkqc
- Feyu5llm/4Sph1GAh5A==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-27_04,2026-04-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 bulkscore=0 suspectscore=0 phishscore=0 adultscore=0
- impostorscore=0 lowpriorityscore=0 spamscore=0 clxscore=1015 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604280025
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, prathibha.madugonde@oss.qualcomm.com
+Subject: RE: Add RAS Packet format and Notification support
+In-Reply-To: <20260428023111.1640377-2-prathm@qti.qualcomm.com>
+References: <20260428023111.1640377-2-prathm@qti.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-enable bt on monac-arduino-monza
+--===============0417062237690833518==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1086507
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.85 seconds
+GitLint                       PASS      0.42 seconds
+BuildEll                      PASS      20.23 seconds
+BluezMake                     PASS      638.35 seconds
+MakeCheck                     PASS      0.99 seconds
+MakeDistcheck                 PASS      245.83 seconds
+CheckValgrind                 PASS      222.44 seconds
+CheckSmatch                   PASS      348.84 seconds
+bluezmakeextell               PASS      181.26 seconds
+IncrementalBuild              PASS      640.76 seconds
+ScanBuild                     PASS      1012.70 seconds
+
+
+
+https://github.com/bluez/bluez/pull/2079
+
 ---
- arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts b/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
-index ca14f0ea4..092ca0b59 100644
---- a/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
-+++ b/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
-@@ -21,6 +21,7 @@ aliases {
- 		ethernet0 = &ethernet0;
- 		i2c1 = &i2c1;
- 		serial0 = &uart7;
-+		serial1 = &uart10;
- 	};
- 
- 	chosen {
-@@ -454,6 +455,16 @@ &uart7 {
- 	status = "okay";
- };
- 
-+&uart10 {
-+	status = "okay";
-+	bluetooth: bluetooth {
-+		compatible = "qcom,qca2066-bt";
-+		max-speed = <3200000>;
-+		enable-gpios = <&tlmm 55 GPIO_ACTIVE_HIGH>;
-+		status = "okay";
-+	};
-+};
-+
- &usb_1 {
- 	status = "okay";
- };
--- 
-2.34.1
 
+--===============0417062237690833518==--
