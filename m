@@ -1,48 +1,90 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D603A544A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 08:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F6E26A0DD
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 08:53:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777451638; cv=none; b=un8Bk8lcforqLosyliZmWB8062hPBiiTL3jhaBfQk8FupFZOsBQl0bf6C1jkquXnQrkFMsfGTTGOLa4GfmLx0h8nxRKNi5p+pYNKZu/S0xXuG6JaXWahWbqiwkgU0Elet5+mTY6lsrz9KzlsxKx2exGcH9HQ4E2YMU+BNddLWNk=
+	t=1777452808; cv=none; b=mCLj+TmZtqKYf7bdTgi4mT4CwlPCpu5qkxafE2GD4oTiAFifXgV7askZ5HbRWFb42EVTgEVpgBKqOyq8Dt7ieJGVoX3LPlaNZkZC3QIoyU+X3gdL9qmB4WyhFQueA+Uksc+xJjJtlA6p8yRTuB4lfLGKzvFT0WRQVji1UBHvpug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777451638; c=relaxed/simple;
-	bh=afa3XV35Qcms/7LoXu2Zn57JsT0gG+BQggzF5IU4EEQ=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=EF8LKlPvZCdO0mWoN9wC5mSNb57NS8OzSVVgY33DlCuUfvD2q8ZFJ0eYUG7S69FgFHqcb+BDBMBcamE3Kesa4yx/0VsBU/L5CtwxCsK3RrOs1WiyZakUcld338yTc7r7nA0l4Ot/JMBzb4C4uJqhQwYTX9m5QvPdhPYFAvw89k8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=AD8xXeJn; arc=none smtp.client-ip=192.30.252.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1777452808; c=relaxed/simple;
+	bh=OJw0cqLkYrPfWmxwpz5gJ+Hg/xhQpokAFPoJSwnJrOs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k//H4dniKn9HclyDlh7S4lUtMOCbUjbYC41nt1ONt3HUKuWLP0zaGQeYzAezVU/kZyo/rdfFzGk3qllJTXZwINJgqKMRrHGWpjquBzBvDAWyuWnGWxrd9gixPjYbFgsr0VHKMlqYOvr2hV8mL4I4B+9jMnI2UHsIZgHRDgKHxyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y3UWQnzr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="AD8xXeJn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1777451636;
-	bh=iNDSbAAXQYfLz1L1LitY/i/Krsv770676EyE916pTiA=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=AD8xXeJnLHSJCDn7W5iydZinmYrX8nA6kW/2g03BmrknZKRKIqgN/c6oQk9mMT2re
-	 ScTrjqw44IWxFYYzbUkfgNdJrMiT7D1iYZHah6qiz0Fb+ii00+dPqtENlkHWeiOMWX
-	 4hTTboRw9G+iFKdi1sAeX+kMb6/0szlkVzJQ2EhY=
-Received: from github.com (hubbernetes-node-2163ac2.ash1-iad.github.net [10.56.181.34])
-	by smtp.github.com (Postfix) with ESMTPA id 9B581520C7F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 01:33:56 -0700 (PDT)
-Date: Wed, 29 Apr 2026 01:33:56 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1086916/1b866e-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y3UWQnzr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5695FC2BCF7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 08:53:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777452808;
+	bh=OJw0cqLkYrPfWmxwpz5gJ+Hg/xhQpokAFPoJSwnJrOs=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Y3UWQnzrugN9g7H9n39KSSumKtrAVIdasAppLHzAlH98NZkxwIQz2dEqFdm+0df1W
+	 nb+rlwCt7e+lTtWWFXouOLexr04e7b7VqoYMY+vrlNjtRYIQMy5/ihOgrMObbCxrUy
+	 vzs/cqUMvxmgr6U87O9FjjAwe3huAVPGxywkpcRpDyslgiwKHty6inVTVwN5MT1YoS
+	 slP/fC9hAONh4xPfd/JmQgv+0BiiJvf43VIUHyOXKpTf4Nd94qgRkCxESRMmu3v40h
+	 yKOBB/8fwhJvYz385/Y41mkLaA8qOpejbv3ED0KmtWvFIsAV0JtNNBsnZy2JWSLz5B
+	 64hwJtq4rBNzw==
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5a40502e63bso11088576e87.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 01:53:28 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+hyLxGnMn4S4SZQC4SlWmQLMPRP4IiYCTpdOhtyn9ICbfxmZJxMtuB8m/R+ehTD+wLrkobEpvmGM1RnATX1YI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNE8n9bKye4/ZAwi1FZtr3IQcJUiMhNRUr3XzAY+dY+pmQuKul
+	492seCM7g90iPglxHkEV3/6I2WkBcbZ7RuzIj/p9KjkeObL8URwMsKP5eP92slgOqj5FJLGn7qo
+	Rtm9KRZVkIRlCtDuZ7Z/tGzx7Po8b4ibk0lBRAXrUtQ==
+X-Received: by 2002:a05:6512:2256:b0:5a4:2cf:601e with SMTP id
+ 2adb3069b0e04-5a749cf3d3amr1183325e87.12.1777452806809; Wed, 29 Apr 2026
+ 01:53:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+References: <20260428-block-as-nvmem-v1-0-6ad23e75190a@oss.qualcomm.com> <20260428-block-as-nvmem-v1-7-6ad23e75190a@oss.qualcomm.com>
+In-Reply-To: <20260428-block-as-nvmem-v1-7-6ad23e75190a@oss.qualcomm.com>
+From: Bartosz Golaszewski <brgl@kernel.org>
+Date: Wed, 29 Apr 2026 10:53:13 +0200
+X-Gmail-Original-Message-ID: <CAMRc=Me9G9vd06a39vi_UrXCTkUtJQRogm2MqgnwLS_r3Thyzg@mail.gmail.com>
+X-Gm-Features: AVHnY4K2fPfnriRCC1GlEFUQD6V4mQElLKoEhFKcWJOmHGXZy_EUPGrUvrMD7WI
+Message-ID: <CAMRc=Me9G9vd06a39vi_UrXCTkUtJQRogm2MqgnwLS_r3Thyzg@mail.gmail.com>
+Subject: Re: [PATCH 7/9] Bluetooth: hci_sync: Add NVMEM-backed BD address retrieval
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
+	Jeff Johnson <jjohnson@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+	Rocky Liao <quic_rjliao@quicinc.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, daniel@makrotopia.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  Branch: refs/heads/1086916
-  Home:   https://github.com/bluez/bluez
+On Tue, Apr 28, 2026 at 4:23=E2=80=AFPM Loic Poulain
+<loic.poulain@oss.qualcomm.com> wrote:
+>
+> Some devices store the Bluetooth BD address in non-volatile
+> memory, which can be accessed through the NVMEM framework.
+> Similar to Ethernet or WiFi MAC addresses, add support for
+> reading the BD address from a 'local-bd-address' NVMEM cell.
+>
+> As with the device-tree provided BD address, add a quirk to
+> indicate whether a device or platform should attempt to read
+> the address from NVMEM when no valid in-chip address is present.
+> Also add a quirk to indicate if the address is stored in
+> big-endian byte order.
+>
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> ---
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Is there any reason why we can't extend the existing
+of_get_mac_address() with another property name and use it here? It
+already has support for mac addresses from nvmem.
+
+Bart
