@@ -1,100 +1,134 @@
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD7D3C8731;
-	Wed, 29 Apr 2026 13:16:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7D23FD134
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 13:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777468568; cv=none; b=AWAYuFTx3tf0l7htUbPKun2e5KXv+YsxaoZxAeEnVPDrAmYgIyy6M9v6GetEVnMjSOQz5N9tHwCr8FsW9V1U6T+J6q77C3mJKHaA6N33pQ83r/UD0nEsGxnC6qsVc+eCAocUcJ6disl78XqLmjt13TXMhm7xe7HlOSCivcJD7AA=
+	t=1777470065; cv=none; b=qPgvim2/Nwh0A0wtDjN0tP/BjFdC+hQvN/CiSpAE1KryzL0JR+B0qC2TFQ+GgQ/YwCbZWHalNrhrwKf2TC+5vnMo3g8UR0vDlMaaYMLjIkWoJiN8YuNmgFGZpsdazLGQw5MK4AeLnkDZ0aQUQyu2/vgqs0XGqf9q7TozB87j8UI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777468568; c=relaxed/simple;
-	bh=bQN4HvhkFbObokdtlU0dNRRj8LRd1IT4TuaGdxzdS1Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TBUQYLCZXW+iU73wefYmFO4j29hSU5WtBJKLojigwwo1vJSNExxPNKmOKq8GbVvLmpyJktezB9ahgNKujHMSOdHotzykhRy0q7c+YMs4CY63svFBCopysLeJmK+2NJWJp/6IKc+toZGGQc24bvOXC7VhCz0rITLhPDkUZ5PJ5ZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nyhjsUce; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+	s=arc-20240116; t=1777470065; c=relaxed/simple;
+	bh=VvWnO5p7rH9s4xOJKUSBq25CDGaY3gGzJmvgx71arec=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=PTKWQuddy8oKMuBzNG6QQQyfmYEM244fSZs9hpwwKoF4C2phHzmhW5uikzf/+zwx5ruqs6P6sfvwVD+TGxUoQFFefO3dQYsf+cwslRhxIe/s6cOchkoJdXIJA0JgXOkyM/q6hOmnxWDAZVxpyn+wrXgsSKRNIU634p7GphaUccA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ku0yW6Kt; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nyhjsUce"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=00CFuie/XpWwEcDph5j08NpwMgP7MNQHVTxW7dFgKvc=; b=ny
-	hjsUcehLWZHWmuH2QESULtjCVCzsB1GVU/3RY7G8eO0LlZxg2TwHfvVGmvv68h2hOgOqaMx5j3zMi
-	ZWKXOP8J7vwKYMWMmgN0+IHllH8GYfSvIlBNQPz8hcfTPChEK7Rq6H+eqMH7z5vy7LUOO6ooCm6Qn
-	PGTItSJjEk8NOks=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wI4lK-000XF0-0n; Wed, 29 Apr 2026 15:15:34 +0200
-Date: Wed, 29 Apr 2026 15:15:34 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: Loic Poulain <loic.poulain@oss.qualcomm.com>,
-	Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jeff Johnson <jjohnson@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Rocky Liao <quic_rjliao@quicinc.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, linux-mmc@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	daniel@makrotopia.org
-Subject: Re: [PATCH 7/9] Bluetooth: hci_sync: Add NVMEM-backed BD address
- retrieval
-Message-ID: <e0adaf64-10d7-4e28-8403-769e3070ec30@lunn.ch>
-References: <20260428-block-as-nvmem-v1-0-6ad23e75190a@oss.qualcomm.com>
- <20260428-block-as-nvmem-v1-7-6ad23e75190a@oss.qualcomm.com>
- <CAMRc=Me9G9vd06a39vi_UrXCTkUtJQRogm2MqgnwLS_r3Thyzg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ku0yW6Kt"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4891b4934ffso117235e9.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 06:41:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777470056; x=1778074856; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VcF+qL2+XHdM3kJjnpyvX7fweQN4QlGSj763XZNBxs8=;
+        b=Ku0yW6Kt0SFPd65H0i/by4t1wogt9u637UFJZJVZDPUt+OZCPzzHq7k8z0osF1NURO
+         3n63KsL0dfUbx4ebrdBvld07VUo0aIxW5yrz/SW+oM8yyg7nYLt5m4XtYlvus3zNAbh0
+         weXI2300ZUzm/yNbCrCPbf1V6QNfNR4piEvcmVrRGzlPQywa38ldCLoP0ntv8w+ntUyE
+         /gmwlkNB8zGsv+kg4Dj1q6zSN+zZi0yyX1a46oxGvCco++uMXIrNe2oEwyD7izDeOSR7
+         1WjruAmNP5ASHAlm6Ow7oJkzRmJW9gDDLopnSoN+OHYW75REP2O49WWNRrfjoNEzhAH9
+         bmjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777470056; x=1778074856;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VcF+qL2+XHdM3kJjnpyvX7fweQN4QlGSj763XZNBxs8=;
+        b=EFb9qXiWX78MnhkNa/o4/WLAC/I0DVT4j4cW9tR05Qt6Qr7E1L7n+KAgNOS4x/U7/A
+         p/EStR+rW942gKvNUk0u7lmp2MaZEao7bz4d+tvRaZlyxAx696ls9Mb4OInDJ/CVcKMV
+         XRnzMt3W+2HxYgub3PCGsMsYWFKrWp4nJQYTpgaErZQS1cGDPHp7R0vkrEow2UlJKNrZ
+         0s6mFpAkujl46ovhr6RdAG2URslr71fTfZ1ey8HUKsH7OUlh0DAlU90eU0UpgOLppxBG
+         wS+5n9ggzRAkcOah8Un0DTkMrWYZeywakm+J/qoFcidmcAO6MtId/IkzhZLUBNbnBDrT
+         Vuow==
+X-Forwarded-Encrypted: i=1; AFNElJ+QKkV4W6BqUH/ul2N6SEjuYBW+Hh6IVtyETOJOUUy08lAu/KyNnBcK73yN8+750/rOVXbgTIGSXJ7/VQ00Hb4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1mHxYQmCxHqWIHf2xyNFMEoxi1FGRO2Cf9FI4F51NJ+qy2kLS
+	5qG85dbIC2+PWmb+BVPHpZ/yOpdWYrx6yC/2BDYR5lRskb290pcdpfJJS4D0hft8Rw==
+X-Gm-Gg: AeBDiet6EjvVpmDOWeG3Wq3g1sQQhaNp/I9sIvOjwCD3FbI3UozP9cmgLMgtt9NU2Pb
+	ovqcvlGERhQAUmgs8nIwsfQ/BJ1UyvOqxEuN4u8TDdw0aC5PahKGbXYy41Im6/Q2wCPcsNTEc5S
+	jQuFVg/eXEFx0qkCk02N/gM03qKV9gi47xWKInTLCpb9DV8AfQ9BgviCRuQNPF7KQjT1mtTrqZz
+	JMBJLHG6B2shaskqKDIVMTCNZOD+OozRyWi9Cyuxjt6W2Q5sEyoy2WWScW1nA4ts+0IaSPI8tok
+	WqXvs9tHNcyi/GsoU6hfsFKr+/AdbEejDxcGLDVgQPVcu6CoeaioJ8Iz9Bf+mXOCvv42b9A6ffH
+	trSqWPjDGXQFZPTThh7wfMDotRjrxu3gqEZktf8DkQxpbqaU4+RSfk5qHn6cGw/TIfCcPYngBg/
+	dXMGYZWq2gwp7I46U8qyqN38CMXyh6hGsicwTw0IHxtcinqQzUTl5q4HWSqFFPz5l1yvrgjz/K
+X-Received: by 2002:a05:600d:486:20b0:48a:5aa3:ac1e with SMTP id 5b1f17b1804b1-48a7c85d6c9mr895825e9.3.1777470055419;
+        Wed, 29 Apr 2026 06:40:55 -0700 (PDT)
+Received: from localhost ([2a00:79e0:288a:8:4582:e630:2e06:ee0f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a7bc7a359sm90738615e9.10.2026.04.29.06.40.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Apr 2026 06:40:54 -0700 (PDT)
+From: Jann Horn <jannh@google.com>
+Date: Wed, 29 Apr 2026 15:40:46 +0200
+Subject: [PATCH] Bluetooth: hci_event: fix memset typo
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMRc=Me9G9vd06a39vi_UrXCTkUtJQRogm2MqgnwLS_r3Thyzg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260429-bluetooth-memset-fix-v1-1-73507b81a903@google.com>
+X-B4-Tracking: v=1; b=H4sIAF0K8mkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDEyNL3aSc0tSS/PySDN3c1Nzi1BLdtMwKXQPDFHOD5FSDxOQ0cyWg1oK
+ iVKAw2Njo2NpaAIxQvUFmAAAA
+X-Change-ID: 20260429-bluetooth-memset-fix-01d70ce0acf7
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Iulia Tanasescu <iulia.tanasescu@nxp.com>, 
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Jann Horn <jannh@google.com>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1777470050; l=1634;
+ i=jannh@google.com; s=20240730; h=from:subject:message-id;
+ bh=VvWnO5p7rH9s4xOJKUSBq25CDGaY3gGzJmvgx71arec=;
+ b=kpg9xvBqQqKhZrwIP20Wkr+gWJOJQG22s84+xfDG/LFYd2DoS8KLlesBYgrV82dN69EQek5Bi
+ g7cWU8f7daWDbfy22UarmMN3dlAdszshS0rSkcbyhFmWsDrTdj1Akbf
+X-Developer-Key: i=jannh@google.com; a=ed25519;
+ pk=AljNtGOzXeF6khBXDJVVvwSEkVDGnnZZYqfWhP1V+C8=
 
-On Wed, Apr 29, 2026 at 10:53:13AM +0200, Bartosz Golaszewski wrote:
-> On Tue, Apr 28, 2026 at 4:23 PM Loic Poulain
-> <loic.poulain@oss.qualcomm.com> wrote:
-> >
-> > Some devices store the Bluetooth BD address in non-volatile
-> > memory, which can be accessed through the NVMEM framework.
-> > Similar to Ethernet or WiFi MAC addresses, add support for
-> > reading the BD address from a 'local-bd-address' NVMEM cell.
-> >
-> > As with the device-tree provided BD address, add a quirk to
-> > indicate whether a device or platform should attempt to read
-> > the address from NVMEM when no valid in-chip address is present.
-> > Also add a quirk to indicate if the address is stored in
-> > big-endian byte order.
-> >
-> > Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> > ---
-> 
-> Is there any reason why we can't extend the existing
-> of_get_mac_address() with another property name and use it here? It
-> already has support for mac addresses from nvmem.
+hci_le_big_sync_established_evt() currently does:
 
-Does it even need to be a different property name? Is a bluetooth MAC
-address somehow different to an Ethernet MAC address? Isn't it just a
-EUI-48, independent of it being Ethernet, Bluetooth, wifi, fddi, token
-ring, homing pigeon?
+    conn->num_bis = 0;
+    memset(conn->bis, 0, sizeof(conn->num_bis));
 
-      Andrew
+sizeof(conn->num_bis) is wrong - it would make sense to either use
+conn->num_bis (before setting that to 0) or sizeof(conn->bis).
+Fix it by using sizeof(conn->bis), the least intrusive change.
+
+Luckily, nothing actually depends on this memset() working properly:
+Nothing seems to ever read from conn->bis beyond conn->num_bis, and when
+conn->num_bis is increased, the corresponding elements of conn->bis are
+initialized. So I think this line could also just be removed.
+
+This is a purely theoretical fix and should have no impact on actual
+behavior.
+
+Fixes: 42ecf1947135 ("Bluetooth: ISO: Do not emit LE BIG Create Sync if previous is pending")
+Signed-off-by: Jann Horn <jannh@google.com>
+---
+compile-tested only
+---
+ net/bluetooth/hci_event.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index b2ee6b6a0f56..ad3945e4fe2a 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -7168,7 +7168,7 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
+ 	clear_bit(HCI_CONN_CREATE_BIG_SYNC, &conn->flags);
+ 
+ 	conn->num_bis = 0;
+-	memset(conn->bis, 0, sizeof(conn->num_bis));
++	memset(conn->bis, 0, sizeof(conn->bis));
+ 
+ 	for (i = 0; i < ev->num_bis; i++) {
+ 		u16 handle = le16_to_cpu(ev->bis[i]);
+
+---
+base-commit: dca922e019dd758b4c1b4bec8f1d509efddeaab4
+change-id: 20260429-bluetooth-memset-fix-01d70ce0acf7
+
+--  
+Jann Horn <jannh@google.com>
+
