@@ -1,198 +1,205 @@
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CEAA402BBA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 16:15:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F1140FDA2
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 16:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=205.220.180.131
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777479310; cv=pass; b=rrOJkPQYxxrFSpwe5eLTQtquhkL222WChssrVvqo+PDAZht8kupToJKAYJuHhV5kvBvjQb3hL802Qj8TWDrCdqCtxzDaxxNCJl0pyt5N0UL8Tt9Hp0ofW7gTP02WZTNnFIC6pErZ8vNpsu2iPkN+xfSAzvaB5IuVNsg6JmzySLE=
+	t=1777479754; cv=pass; b=nAgaEpTQmWfnqm8j76yg4NF1rJMeDeAhvWhgR8MyyU6GJAFpzrUuASUq0bjoPmck08BbXgIAl1qXge9Iu66Dv9T+VIIWPjWerP9gbIe15eKLEg6axjlhpdlA+7JXgKVJDDMQQVHBASHxYkVbzLkD0NQuS5lPh1luGJHv5EWhMnU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777479310; c=relaxed/simple;
-	bh=UPLJnzuRXE0jM27gAHduCD71+a58v9ckdqbBE9VNhs4=;
+	s=arc-20240116; t=1777479754; c=relaxed/simple;
+	bh=zeHlRNAL/iq8k8oB+OXu5Y2acD+IRikshmtnJE9EZ2k=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W7aAa8900MqEvpM2RiuLZeJIZmvJjUsga/IYfn3pyVm1jX9+HNq/SneMikdEvvxq3MB4gHFBmeNT2VFdkNblN/JA9Yd5+D8L0aRl/pe8HCzBQVqlLeRWy0tg3gUbasrNKisxR4tsL9srqS15dTVBIW4aM9mV/1F0Mt131yASAl4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DmgGSNHP; arc=pass smtp.client-ip=74.125.224.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=qJ8y9UviCGyFnwBEgrrP8V9Xp4rrBPu5rbfUdKSzv0zX4wpqfqsP0FMg32Clv8AyvltQDVOfcmcgFfSN+qo4R+CTt9HnSJLLx7JB5V5LiTrjfcEKLDFrqHjWtznjoOnmdGrqMtYDgIyBEiypyWX80GVEjK3fUV/6BmuEQDxFh2M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=jzRi40++; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=GkK2GDLC; arc=pass smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DmgGSNHP"
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-651bf695701so11760247d50.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 09:15:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777479305; cv=none;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="jzRi40++";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="GkK2GDLC"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63TFU2c8963996
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 16:22:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	zeHlRNAL/iq8k8oB+OXu5Y2acD+IRikshmtnJE9EZ2k=; b=jzRi40++qm9IKV3W
+	DFhl2OnAx5ljK0yTl5sdGb4NA1HEADBLS++TGqlMn+WPdwX2/6sEnm3lmv9ZYp99
+	LlEcReCx/bYzwF9NLAtO7bcrJFlciMJRn4aPd4eD+Stm98eR/lZ9R/efJuSpDVl6
+	p4AC2qFIxVW4C9vjed4kHsoulcpLPjlt7B+SFd8FKtUQRBzBx/9/HZp7wa0xKWjF
+	8rM2KO4apJFk/+YVNR4yaMCdO560y5Z1GaPSB3DeLIl+du/7wdBMFdHNxChQbTN3
+	j6zhYqIDgiwDKkVDo/UJGD/sin4FGYQlmLRq69LZ29Ly82bOVP73uBopj5ec+ouI
+	5qGwVQ==
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4du2m4vahj-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 16:22:29 +0000 (GMT)
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-69644bda339so1736412eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 09:22:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777479749; cv=none;
         d=google.com; s=arc-20240605;
-        b=EXwqzr7bg3tSvjXDOfuWWXi9DnhGQ6N7z7o2ogLyg+/iMWNPv3ayp/zu1jQcRvxyon
-         XyNzF/hMkjXXDXcf8uw284VLwS3DurW1ZY3ByZSb7HF/N+z1tDOq5eWmfjCWtXG+2wCb
-         OQFc64+fkLyf7p/mO1YopG8lC7m9YSH4FP/bl1VjTO416V4WhWu4vorMPYN/wApVbgkh
-         LEVxVkqWfQi3NcIQBJPtn2zZvn5F56JO6d9QcjDm8ody2XfC9HPjqkB+N2kzGV3pMpUc
-         ss9iMNyN7DyXahyrlQi8CvBUCM6e8U3G31GNo7yAHDhINbzkLubSwyB6zJeVuyPgnRMe
-         iGgg==
+        b=CdeWyXfhx/vAmbF0Ox49QTaj5Gf05MJkHfsW1hadVcp+Q+vtjZnexswRRPt0mwcINj
+         Mt6BbTgAXDDxnAOJDRThW2lGzjA1H54OPdXTKmINNo6lKhsJ8mjNvKDpPAM70XeRbkfU
+         GbVde8tfCh0xwYF/xhJ4Fl0ITe0wGwBnIVIsV1OXiZTDV03TUP1p8je57Os70OlBIOIK
+         AuBc+MfqtaHwx7luYUrjTC2fvRKuD31HG3Y3P9kPYQQN4J7BHzM0I65/WgFs6If7Nspu
+         aN/06r8hGT8G8Hduj2eqTtHq6ChPJo+o2Hda+SI2lmMBUAqQb3YMmBPo2D3zd0nO3rYR
+         DObg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=5rUkZAOipt+mPbY1AIV2H0jbdpVyPhjj9wOoigCLOxI=;
-        fh=QL3zaYYtX5UWOh8pyx2wOf6ao2WMtmZhWIbbNy1Kb8U=;
-        b=QeNpGGiDLedZntSufxx4sR7+8jacwlMzF2ruhOVl0Xl6xjCh+3nXd+Wax6xgjEoVXd
-         E01LhIht2RID12f6/VQ004W36QCUCjhsDnJ/roeI4TlXKyUqqtQh8Q6CvQeunZK/gxPz
-         fhc7RKfCcU9SihRAa+EEdjJww98H8HfFbmpT1j7oAv+mmqlOT+d9qusJX/zgD9VDYdFk
-         qqR/9tGgOVgcfrw6iBQ5e8acrg6x8YKlSqTAZrP97umnB0vU1nubpp43JVKYUD52e9en
-         XYW2AMGNT6g4/7ypddwehXQB+8BKs/7he9OaGXxwFvLAKLWHJYlQ1SVxuLVMdXvNuv50
-         be9g==;
+        bh=zeHlRNAL/iq8k8oB+OXu5Y2acD+IRikshmtnJE9EZ2k=;
+        fh=bl8cxnx33MMRCzloGK28HjZbovJJ9vHEclLbFuUwf7I=;
+        b=lRr0tiWpyyXduKbtXSpQl36uMyup9OBXs+1hJAYeGrOaWWA25bn/LZ+4POu+4TqQMA
+         lPGahMvXu/a0QrxZzAzz2tZC/wdQQpf/orDnFEF1yXDkZKFYI+dx3A9k9KdWmJ1XiFR+
+         7PXHUZbW5rw6+Ivv3rxi2uagX0065BtGQ7zZ9DLOxSsamnXI3k7ayAK0pWU6cCs2oIXa
+         EvHUOxDasBOzygyki3Z8FkY99jmq9GKOQ96RNVgp7y80jwVbdQ4kz2mXqbrZXpzgbRTg
+         pu5C5e0xhOPXoDGr7+g+WXIH0BT33u3dm8WZiLJVpmDC+s5r9prDtCi2aZKV7shQ5hss
+         BIkQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777479305; x=1778084105; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1777479749; x=1778084549; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5rUkZAOipt+mPbY1AIV2H0jbdpVyPhjj9wOoigCLOxI=;
-        b=DmgGSNHPJQd8z9oeLhROIe3souBHmr82QlvKa8fZfnN34/t3sG1IetpDL2Sd05p/2a
-         seC6ydAaG6p2Ny/jRMOJFVb3V7T9vD/yR4B3Zl+t+wQT7VQruDc5F05b1efeEhb32j3z
-         xHZs3Luus1DpbA/hgDRKz//FbY3wXxSpyE71qYutyezixnRbi3Wscig7LaLT9a2q+oJT
-         0H60oOewU+J++B/iB0jIGNFrEifvH3oL/1Wm+AMxeO5c8z1L5M2EY8luYcQBCRJ0ZG8N
-         9aYslUm4oGpgCr0EJNyhF0hgCJG5mNnrMvolVJzscmQfNrq6kt5yEuDqoXmH92AjqAle
-         qysQ==
+        bh=zeHlRNAL/iq8k8oB+OXu5Y2acD+IRikshmtnJE9EZ2k=;
+        b=GkK2GDLCkQqfYx6JvKVq9FxU+hMrvsfGpUfPRavqDCLTUpLBKUdKe5rLsqys6FDmtP
+         hIOvvEfK9Q6faBvDu4cyfg+UhizleVr7xWuPGM+/O/Smc7rzLbfFpORp6rQ6R9u9TB42
+         YPliTBBJ/jTM060xEkWFeIHanPsz3QjsND1QRwNRc75XReEhwvQYDq/sOJ5sAZqqa09m
+         mGS5XsOIV6arpJMMcEf7lnuj1cFn5E1nVJlL9a//ZJIk7eITAA7hTvndy26W2QBSoky3
+         Dia8pdzWoCz5Ns+Xld2S5VTzXxMwdwCZB56H5G8oStRP0rifd4r3PNpyuomi6/FBTwRr
+         emew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777479305; x=1778084105;
+        d=1e100.net; s=20251104; t=1777479749; x=1778084549;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=5rUkZAOipt+mPbY1AIV2H0jbdpVyPhjj9wOoigCLOxI=;
-        b=hc+1Mg0LG8BLNutLaRD65uPTFJSIKM5pae9B6dB1drPpZzboHnsTKTPMs/bn9upgcZ
-         XN7pHjYcr4OSiTFmGrNy4NiCfewgv4Ius9CMENBBNzYu2ZsgKq/O/dBJ/qt9N+qUq0Ab
-         Gp6UhYFZMnskvEFLms4mFAj2GqAezuSdOVsAIBHMehaquHGdk03AEiiIvWyYhNQ8wDu/
-         KAuGtu4reOwL790NI7P5vp4zT4l1Oue3bKmoyfn+/njOVgaLLWzS1kCA1Y/IiRTAHfys
-         Og/kj2yM0a/x8z3fzxhwCSE4F9eWZxqjqrNtndIeSEou3KnRyRXKWfi8Rm9zCGWRcMwu
-         qP4Q==
-X-Forwarded-Encrypted: i=1; AFNElJ8cQ+J90ALR2EFdsfFVNfoNiNDV/CRgTPXdAVNUHg4dq9k2Nz224rdlxPdI446UvLkSCrnT+/GFdeCHbDjfrzc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/ztioyCwEc0/+A5fFY59aX46dW0HG+Oe3UcXrMyXGqzjDHy3O
-	JlYpZRgAFfJ1l+vT38KQ5G2JMT+MreTo97uUr/nZQbYIi+IatUiuYDPs4xPwEmDviych4zK/3ed
-	7lC2Km73zUbHJPVj9u7CumvuEMS3tM5xB0qDuu4NbIA==
-X-Gm-Gg: AeBDietMjtMSgyjThii7rInESRxoBskGMNn8L6bSceI2HZC3NgSPdgsHAFcrlMSQmMo
-	zisPPNh6hxLHICqweIxUvWj9aqcqjUIDC+rm/yaaNDI2tVTLagQP4/TnTncBVBQg8PzkYKqmgFc
-	0BsUn4JNfqnDxHL38dIBL+eL7l3lSuoseWdSGl1haDxRescvSPM9Yiob2xjdMR4sjzXis/xA+be
-	opdYZYDXvrtBO0GID0Cy4ChH3UAofG8ybsQ/vbvNMT1S7P3/4XLhierCzO0pXqqIVjfGrfgZoHv
-	695ZGgamjsfxS1r11KCTyqyZfTocEszaMzz9mTXStWO1xhP3a75dzmIEsGzNv2692J33ekyjGz/
-	BwWha
-X-Received: by 2002:a05:690e:4253:b0:651:c71d:8a4f with SMTP id
- 956f58d0204a3-65beee95f1bmr5622309d50.51.1777479305063; Wed, 29 Apr 2026
- 09:15:05 -0700 (PDT)
+        bh=zeHlRNAL/iq8k8oB+OXu5Y2acD+IRikshmtnJE9EZ2k=;
+        b=e9tfMm6rM44h3ZY7G7kxzRFhamdw7w+MBGyIGX/dl15DsUPD9kUC+RwTpi9TaGwr+n
+         RWxIka/kdAjkgBmqD0lCEZDK53/gNmhWFZBWQpJZkg+6cb6a4o9bMtKkWfZvCzV7ueYB
+         6ExaXJk4Oth1afZDfLpsqrY5hTPOHqsOLlj8WB4hE8YV/OtLSj0HhssgbrxPHDgqrqGb
+         Ce3FfJJ/iki8MrJBZCIpR1g6RpT0PfIBR9lAwgPQPneP1eEPiVrwmhDOSjYief/mN2Jn
+         /5tnR+r4KZnVtEAqL+ka3A6voySHtlgXP/11E8n5FGa8xHi5k2zYrH4L4O0Necyhmr7W
+         derw==
+X-Forwarded-Encrypted: i=1; AFNElJ8KevFUPMzsA/8beQs2mpIpsW3OQJF1pj46malWlGdtwsvMDwSSPDKxXEn5mdMxAwf1370G0o2TksTM5le57QM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxradIPELCOiIVvaCApqllhkHhyKmfpTEKvlYrqo/H9s8ggohoR
+	PDWzW8uCSZuVQLoArlk5pEWfvB0iksklClyeQ9zbwhFdWMPYvOZigUx3wxqclyFmW2ky6i0mg2i
+	+XSVbUrAlZ1C+bdENTHsHpScEH2lOUG0l4Pg/I5EM6d4vwuV+K72LYDFFDgi9CJtDAlGv5zjPmC
+	2RLp0yJnLHpgUQTD2y6XJJaUIm56JQL38DyNIEA7zgKFf/bA==
+X-Gm-Gg: AeBDietI2ZAhetKe9o0PzMBHrKmUvhBP3DS1kRGM8eri2+aOreFHohccg3SdscJCNar
+	YO+oxH+kb2Yz1duaF5c7xYlboRHfuM1tbqZ6e2xO95GjQfZqplPwKzmC1hGNrnRskl4caX26PSn
+	xqB7W33um9dI1SuxPD9fVVbXsA6Bdzw7vsZf1NGM9zUR2nHko2KeT1XQafdoPbFLGAPJvMzWFIk
+	SFtGk0qioLnLyWNsAwcwXkaQlBQuzfQJHt2I9eVfshMvLP4+g==
+X-Received: by 2002:a05:6820:1014:b0:696:6e28:8c19 with SMTP id 006d021491bc7-6966e288f89mr732612eaf.20.1777479748806;
+        Wed, 29 Apr 2026 09:22:28 -0700 (PDT)
+X-Received: by 2002:a05:6820:1014:b0:696:6e28:8c19 with SMTP id
+ 006d021491bc7-6966e288f89mr732600eaf.20.1777479748427; Wed, 29 Apr 2026
+ 09:22:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260429121207.1306526-1-shuai.zhang@oss.qualcomm.com> <CABBYNZLP+rBrjhdKJLE7N47Bg-g4-6E3vS3yZXvMKwYQ2rMcUA@mail.gmail.com>
-In-Reply-To: <CABBYNZLP+rBrjhdKJLE7N47Bg-g4-6E3vS3yZXvMKwYQ2rMcUA@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 29 Apr 2026 12:14:52 -0400
-X-Gm-Features: AVHnY4JV2GGTpDCEOLEPMF8tGxsFSpeGXdY9sYwkj4hNwRvxAWwRpBteg7c9K1E
-Message-ID: <CABBYNZKbVT2xXqedwoenuU0YroJO-3gyhJGSixt0zvodLez0qQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: btusb: Allow firmware re-download when
- version matches
-To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com, 
-	wei.deng@oss.qualcomm.com, jinwang.li@oss.qualcomm.com, 
-	mengshi.wu@oss.qualcomm.com
+References: <20260428-block-as-nvmem-v1-0-6ad23e75190a@oss.qualcomm.com>
+ <20260428-block-as-nvmem-v1-7-6ad23e75190a@oss.qualcomm.com>
+ <CAMRc=Me9G9vd06a39vi_UrXCTkUtJQRogm2MqgnwLS_r3Thyzg@mail.gmail.com> <e0adaf64-10d7-4e28-8403-769e3070ec30@lunn.ch>
+In-Reply-To: <e0adaf64-10d7-4e28-8403-769e3070ec30@lunn.ch>
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Wed, 29 Apr 2026 18:22:16 +0200
+X-Gm-Features: AVHnY4IKbhM_HKhU56A0ru1z2waWryyeh9i-sfRAmlk4QJVuWsNhvXilz3QVxic
+Message-ID: <CAFEp6-26sVj21JVECREORdq+UeFTB22MoqAm6Pd2fTosCQau9Q@mail.gmail.com>
+Subject: Re: [PATCH 7/9] Bluetooth: hci_sync: Add NVMEM-backed BD address retrieval
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Bartosz Golaszewski <brgl@kernel.org>, Ulf Hansson <ulfh@kernel.org>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jeff Johnson <jjohnson@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+        ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, daniel@makrotopia.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI5MDE2NSBTYWx0ZWRfX/AySfWi4xSCn
+ BHED1e0YcxLvSBwCG500Icu7xMWUX98cgXlLAU7tbInYBeLS/SafH6xkY4+D4y/UC756e9Y7Cjv
+ gmrUZfdRq18WhP8AFIGbiigAdRUzAg90QKFIVH63y5155XyOp0ODyHWwg4X2T/G3JK+VsdEwcNs
+ cB6UvFAbl+N93b94wsm+KZ108CVUhIJdyZAsHq2w31P/Pf5UMBV3Mgq97NQf0hvxWoQVeD3sf3b
+ kncPtWapH3BZklqZjoMRcfnoV5RVbKMeZBKvzvptwr/IrgnVyBKNIP0szXbSRs4com48/aSaEbO
+ lYXyAhZl8zxjK6lANoMZMI6FY1+YobrC6sJFdEcKnVHJd7ebMK6wDxinre+PEAKaU/2QKfT6g6F
+ mZeTQ4nPIRGxR46o+q4hIwZgvtRUH300uQuk0o3121d8k2Ll5UlwrwoXeAHElYqrIeaw+dAblzU
+ Biw9taK3DPGbhzxNFLg==
+X-Proofpoint-GUID: mUlkwvoh3zv1E_OZPPzwdXw1Sqjg0mXQ
+X-Authority-Analysis: v=2.4 cv=MuFiLWae c=1 sm=1 tr=0 ts=69f23045 cx=c_pps
+ a=lkkFf9KBb43tY3aOjL++dA==:117 a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=rJkE3RaqiGZ5pbrm-msn:22 a=EUspDBNiAAAA:8 a=J1Chn9sQg74BwZjCRdUA:9
+ a=QEXdDO2ut3YA:10 a=k4UEASGLJojhI9HsvVT1:22
+X-Proofpoint-ORIG-GUID: mUlkwvoh3zv1E_OZPPzwdXw1Sqjg0mXQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-29_01,2026-04-28_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 clxscore=1015 phishscore=0 impostorscore=0 adultscore=0
+ priorityscore=1501 malwarescore=0 suspectscore=0 lowpriorityscore=0
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
+ definitions=main-2604290165
 
-Hi Shuai,
+Hi Bartosz, Andrew,
 
-On Wed, Apr 29, 2026 at 11:17=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Wed, Apr 29, 2026 at 3:15=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> Hi Shuai,
+> On Wed, Apr 29, 2026 at 10:53:13AM +0200, Bartosz Golaszewski wrote:
+> > On Tue, Apr 28, 2026 at 4:23=E2=80=AFPM Loic Poulain
+> > <loic.poulain@oss.qualcomm.com> wrote:
+> > >
+> > > Some devices store the Bluetooth BD address in non-volatile
+> > > memory, which can be accessed through the NVMEM framework.
+> > > Similar to Ethernet or WiFi MAC addresses, add support for
+> > > reading the BD address from a 'local-bd-address' NVMEM cell.
+> > >
+> > > As with the device-tree provided BD address, add a quirk to
+> > > indicate whether a device or platform should attempt to read
+> > > the address from NVMEM when no valid in-chip address is present.
+> > > Also add a quirk to indicate if the address is stored in
+> > > big-endian byte order.
+> > >
+> > > Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> > > ---
+> >
+> > Is there any reason why we can't extend the existing
+> > of_get_mac_address() with another property name and use it here? It
+> > already has support for mac addresses from nvmem.
 >
-> On Wed, Apr 29, 2026 at 8:12=E2=80=AFAM Shuai Zhang
-> <shuai.zhang@oss.qualcomm.com> wrote:
-> >
-> > The Bluetooth host decides whether to download firmware by reading the
-> > controller firmware download completion flag and firmware version
-> > information.
-> >
-> > If a USB error occurs during the firmware download process (for example
-> > due to a USB disconnect), the download is aborted immediately. An
-> > incomplete firmware transfer does not cause the controller to set the
-> > download completion flag, but the firmware version information may be
-> > updated at an early stage of the download process.
->
-> Hold on, if the download has been aborted then the version should be
-> reverted, or rather just update once the firmware loading is complete,
-> so this indicates there is a bug somewhere that needs fixing, not
-> worked around.
->
-> > In this case, after USB reconnection, the host attempts to re-download
-> > the firmware because the download completion flag is not set. However,
-> > since the controller reports the same firmware version as the target
-> > firmware, the download is skipped. This ultimately results in the
-> > firmware not being properly updated on the controller.
-> >
-> > This change removes the restriction that skips firmware download when
-> > the versions are equal. It covers scenarios where the USB connection
-> > can be disconnected at any time and ensures that firmware download can
-> > be retriggered after USB reconnection, allowing the Bluetooth firmware
-> > to be correctly and completely updated.
-> >
-> > Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-> > ---
-> > Changes v2:
-> > - Update code comments and commit message to reflect the correct logic.
-> > - Align the commit title with upstream conventions.
-> > - Link v1
-> >   https://lore.kernel.org/all/20260108074353.1027877-1-shuai.zhang@oss.=
-qualcomm.com/
-> > ---
-> >  drivers/bluetooth/btusb.c | 8 +++++++-
-> >  1 file changed, 7 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 572091e60..70abbabea 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -3550,7 +3550,13 @@ static int btusb_setup_qca_load_rampatch(struct =
-hci_dev *hdev,
-> >                     "firmware rome 0x%x build 0x%x",
-> >                     rver_rom, rver_patch, ver_rom, ver_patch);
-> >
-> > -       if (rver_rom !=3D ver_rom || rver_patch <=3D ver_patch) {
-> > +       /* Allow rampatch when the patch version equals the firmware ve=
-rsion.
-> > +        * A firmware download may be aborted by a transient USB error =
-(e.g.
-> > +        * disconnect) after the controller updates version info but be=
-fore
-> > +        * completion.
-> > +        * Allowing equal versions enables re-flashing during recovery.
-> > +        */
-> > +       if (rver_rom !=3D ver_rom || rver_patch < ver_patch) {
->
-> As I said above, this sounds more like a workaround. That said, I
-> wonder why it would print an error if the version matches, it sounds
-> to be that if the version matches it should just skip and consider it
-> has been loaded already in case the actual problem is fixed by setting
-> the new version only when loading has been completed.
+> Does it even need to be a different property name? Is a bluetooth MAC
+> address somehow different to an Ethernet MAC address? Isn't it just a
+> EUI-48, independent of it being Ethernet, Bluetooth, wifi, fddi, token
+> ring, homing pigeon?
 
-Btw, the following also seem valid although not introduced by this change:
+In terms of naming, I followed the pattern of the existing DT
+properties: for Ethernet/WiFi there is mac-address property, and for
+Bluetooth a local-bd-address property. So it seems reasonable to reuse
+the same naming for the NVMEM labelling. Also One thing to keep in
+mind is that Bluetooth has historically handled addresses in
+little-endian format, while Ethernet MAC addresses are typically
+stored in big-endian format (as far as I know).
 
-https://sashiko.dev/#/patchset/20260429121207.1306526-1-shuai.zhang%40oss.q=
-ualcomm.com
+That said, a more generic EUI-48 identifier could also make sense if
+we want to go in that direction, with expected property/nvmem-cell
+name(s) as parameters?
 
-> >                 bt_dev_err(hdev, "rampatch file version did not match w=
-ith firmware");
-> >                 err =3D -EINVAL;
-> >                 goto done;
-> > --
-> > 2.34.1
-> >
->
->
-> --
-> Luiz Augusto von Dentz
-
-
-
---=20
-Luiz Augusto von Dentz
+Regards,
+Loic
