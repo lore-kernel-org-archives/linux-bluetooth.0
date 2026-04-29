@@ -1,84 +1,112 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E072740B6C7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 17:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150BF38CFF6
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 17:56:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777482003; cv=none; b=YhahN3oHfQzN2XISDiZKonTdsAvrcZtqzzhfwAzJwI6UehdFNFns8JU7Vd8SydYXOnzLyn4QoW7M+CKPK93q2PkpKQ/VYpDeukn7TWMXdPm0xr16zGQ1gTD0VJKnvCYBgojJfYzO6svqCDSdkTS1SKzFVYY9VVUYLVs5kVbLiKs=
+	t=1777485398; cv=none; b=F52arcHiYZ8VjHHLpbCRoiqFWXXhmRcPir5drQC4hGSYZ6axUdFKxjIdAq61LhfwI49AXi4kL8lnap+D1T62Hmq0zd0OOOKeVDPw4/LaUn954+hrmt2gktBnlZ2Y+y44y92ftelIxDbxXRGlHeJBYFFMfPOr2zdIEU0PQMl6uzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777482003; c=relaxed/simple;
-	bh=UTJXlURM+m9NGklDjG2+Gd5C9lY6a7KY856nxXan2gg=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=EER06RZzAlMOQOX9izNBXb2GNl7Y5sWHD/b2avVhdWUWBjcSclp1QwX4SbG9KfIG2xqziVH+xjiMmVGnX8tNAZo8TJU+DENIf/JzkxEe8qR4yKpS9NEMEUPwA2OqsviAzdQerHDIQCA2//OJFvyQcg6akbBB9Oup7jWq485e7L8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=N2l4DowF; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1777485398; c=relaxed/simple;
+	bh=Mw2J1h1YCl0TWPIWoHyLqRuPBoJ720Nu7ZDk5AalqMY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=C0zykXuWpudpcxni5Fr5omjf+6fc+nZ2gCH99oG8E2P8GsYzEX7THfB85WCkaOP5v44bhoY7iuZn4Qnopgyz4kykfI9dUrjUZj/6b6CEnoG7F1JbRQEmr5SQYRrsToN1iZLEDYM5OV9HB1U7Bg6L/9KDBJRPIO+UplZp3bCwqgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EFxyINAb; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="N2l4DowF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1777482000;
-	bh=CtRt0Px5m65v03bXjCGkPOai7CQbjBe5xV9ZmN8xwRI=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=N2l4DowFhmZ/NsWgFwfXiBkAwZuyNdkH0KH4VvImlmJ2lh+f1QJpvdAIVFJJyms3y
-	 FOQ/IA+Esidei1q4RXUwYoQLDDANj64c9TDqo3NiJmkH5UngM2hZyCsHtKrtTPW+a9
-	 p8Zf3+r6WlYT0V5MxS9PKPKOW0h7PqX5qdW2QM3M=
-Received: from github.com (hubbernetes-node-e0b359a.ash1-iad.github.net [10.56.184.35])
-	by smtp.github.com (Postfix) with ESMTPA id EE396360FE1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 10:00:00 -0700 (PDT)
-Date: Wed, 29 Apr 2026 10:00:00 -0700
-From: prathibhamadugonde <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1087593/000000-ef82bc@github.com>
-Subject: [bluez/bluez] 62ddd2: src/shared: Add RAS packet format and
- notification...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EFxyINAb"
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-8ee7ffd738dso111337285a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Apr 2026 10:56:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777485396; x=1778090196; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=rIwYB85fqSBGobME3eI3ZW3WztC9erXyopXAGZ9fBjk=;
+        b=EFxyINAbProOyeg+oYTP8zcd5/Q4puoQy+xwqMhj10WnLHY8TZSirtfLcGfcEJ0Jze
+         q6d04gTRbkKb/mMlJclkithA+azG22gdOULTu4ClDpQ8QawXXAJgwOuWWj3W1/vlrPVu
+         EgcqKO3Je+qVa+wUGAuE/PL8yb8Hil8wSeL5ixD9oq4sD3A+ErAa+xViyVmZmJsFDBaB
+         VuUkaYkMfPLjhP1qvb0HehR8hmQkyXod52ZmuzJxo32e53HFCOr055DuLbFTY7I0aE1h
+         CIvweLCc1YOJeuPRgSQOG6ZVhf5ZqX+ncljbEKgku4jbc6/+2AfM5vOzW0/KPtqUW+j/
+         Wz1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777485396; x=1778090196;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rIwYB85fqSBGobME3eI3ZW3WztC9erXyopXAGZ9fBjk=;
+        b=YddyPI/S9NDoOgByFG/Nz2Ag4JSCNKgO1WdzZ/t10ZPPgk9M48HJYdqHkXXakOusIU
+         8IBRz8vy/QNyXVkehVNXJSrHh+vzoNW7lUNCYR15I9/6my3aTvDwXYPNJUugxAD2W3Ud
+         OE3EwuQiqciHfUxx6q2WZKU5MA5PLSlWUWJXW1qtO9BIUU4SMDHae0dHPQpquHE0Lxls
+         L/McNa3SPXGE6qB2EnjNAGhZc1PWNKc1BYvDUAF9Kl5YYMHGXb+Yj+rmj2V7XpekvqCl
+         NTyTMLwWV9NARDbjeHVojacKuxYV3UvBcjrwhqjBcZ35z8zQU2PeEAPBeoZ9MxJdYoWm
+         k5TA==
+X-Gm-Message-State: AOJu0YwMNu2EXq1gio9mtKvWPXrGCl5j/G00IiNRFgI65bAQaM/rAsYZ
+	U93m9EWU5Dyufxf6WxsCC4AEl5PIEKm8ELZN2zx/AuXVGtkCQt5FtFvVDUuOXH2j
+X-Gm-Gg: AeBDiet6sYGf3sqg0Fh79+QylDaybjwtsatAtZnc0pE5Y5bvp/is6ZxQsPzMuJE/0Il
+	HEYfnePfxE7dnjuU2EI7ra8E5kv6xTsICLnAwAAXcnsviOgRk/TOiAsygszWpVnPBcLXic3vezM
+	RbBFyk8gSHTYCuOwoX3FnTnS8OToccALI4KkUGO2YdH+arWfgLV6Bm7CY+nyOne/I+MOWx/eB6K
+	SWLk46llzGga5WKOmM2dQpJ+zscSCo6E9SoDBdWvyM17htDx2HiUkRulSOtkZTF9nDyPX5TCrl3
+	XekldCkfIcwi26UwjakQ1m8CylBfSFahtRTd2RMOEM21eh14ewU86td3N4UTN4KWGmT9sA3hCR5
+	C+fCE/b9wvGo1kGwQCXTOpYBdCBHEclicfEOpKui6TzV2wDUMcoQQpiLohgwSR6NsVgIoROa3E+
+	v86q2mT0DJdnoSG94ict4OdIaXDHFKRA5yueKq9E2f
+X-Received: by 2002:ae9:f712:0:b0:8f1:9e59:21fa with SMTP id af79cd13be357-8f91ec69735mr389998985a.5.1777485395769;
+        Wed, 29 Apr 2026 10:56:35 -0700 (PDT)
+Received: from [172.17.0.2] ([20.83.158.131])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8f94014bd1csm237892685a.43.2026.04.29.10.56.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Apr 2026 10:56:35 -0700 (PDT)
+Message-ID: <69f24653.e90a0220.1b978e.1aa1@mx.google.com>
+Date: Wed, 29 Apr 2026 10:56:35 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0602386573059067894=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, prathibha.madugonde@oss.qualcomm.com
+Subject: RE: Add RAS Packet format and Notification support
+In-Reply-To: <20260429152942.2940978-2-prathm@qti.qualcomm.com>
+References: <20260429152942.2940978-2-prathm@qti.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============0602386573059067894==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1087593
-  Home:   https://github.com/bluez/bluez
-  Commit: 62ddd2ea0370831d471a189551380c197e076a6d
-      https://github.com/bluez/bluez/commit/62ddd2ea0370831d471a189551380c197e076a6d
-  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-  Date:   2026-04-29 (Wed, 29 Apr 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M src/shared/rap.c
-    M src/shared/rap.h
+Dear submitter,
 
-  Log Message:
-  -----------
-  src/shared: Add RAS packet format and notification support
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1087593
 
-Implement complete RAS data pipeline:
- - Handle HCI CS subevent result/continuation events
- - Serialize ranging/subevent headers per spec
- - GATT notifications for real-time ranging data
+---Test result---
 
-
-  Commit: ef82bc92632ac28d2a435938ddf07614db4518e9
-      https://github.com/bluez/bluez/commit/ef82bc92632ac28d2a435938ddf07614db4518e9
-  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-  Date:   2026-04-29 (Wed, 29 Apr 2026)
-
-  Changed paths:
-    M profiles/ranging/rap_hci.c
-
-  Log Message:
-  -----------
-  profiles/ranging: Read cs_mode_one_data members
-
-Rearrage reading of cs_mode_one_data struct members as per spec.
+Test Summary:
+CheckPatch                    PASS      2.88 seconds
+GitLint                       PASS      0.68 seconds
+BuildEll                      PASS      20.16 seconds
+BluezMake                     PASS      633.33 seconds
+MakeCheck                     PASS      1.04 seconds
+MakeDistcheck                 PASS      244.49 seconds
+CheckValgrind                 PASS      221.27 seconds
+CheckSmatch                   PASS      349.22 seconds
+bluezmakeextell               PASS      180.63 seconds
+IncrementalBuild              PASS      638.28 seconds
+ScanBuild                     PASS      1025.08 seconds
 
 
-Compare: https://github.com/bluez/bluez/compare/62ddd2ea0370%5E...ef82bc92632a
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+https://github.com/bluez/bluez/pull/2085
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0602386573059067894==--
