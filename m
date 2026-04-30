@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73296364038;
-	Thu, 30 Apr 2026 17:56:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29F2477E40
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 19:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777571790; cv=none; b=NswuVPDsGxTPMW4NETJrFQ4dGL+LY5x8SBfKvKkEkySxmUTXoE2PnlzuyphwinsfXjfn4mnfbPQgsPIfp1+achrP6kLioAVbw83u5POA9AqKrIJVlU0mg7pJmhIIaNx03wujYTfDHJTCQYKNhaMtvQtFqVhhBLjBAaC7UcLIjCU=
+	t=1777575650; cv=none; b=pkeJYgWgO0mgULBnx+xwqL/7wevaAISM8EJ29KsAdyG6QNe8ffS6tST8KEKXb/nlu+nvnhPkwELuRDsCUrnf0yZah5hHL8hHt4+5LmdKBkni+OVflxVuxCLytLgeJchug/TFqnZRrA/EXdHRiz4ODQb6mPhsuSPsHYAxE6cFzFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777571790; c=relaxed/simple;
-	bh=mu8CyJbzk6oFEHDvzyPeBWPQN5MDIdG5XefzZtnwwtI=;
+	s=arc-20240116; t=1777575650; c=relaxed/simple;
+	bh=brFsSzKwQtT6fbXTW4gvrYRxWKQFDy4Rx689kb+YkVc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=C10ST1hahSlEnjsbLqSpdDM22r6b+BiLgj3IENGdaiAo1M7rSgF45UBcohONA+7V71nS85DFYLs2ZJ9fXGpDiPvdNz4lYp2tfuuDQwXxYW0yxiQPL2YsizJzwMRXOONVvGlABkaY0hzmC8SVN6nQjGgdOoRISZucgnuAaAQ4ChA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q/Lc+e1P; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=izXIzZ5LEXtTTJQfXLqTT9O48a6kgi39pnIlnkOKugU+mKVkySuM/Yk/NG1nSHFiAaJMF05IVO2CoehCau+PyJv9Ab182AoysBP4nZFqitFUUmrP+nDzKbnsaspxJCzexrVJc5Vqr5Fl7ND1IBAEns9APBZuW+X+bMBIDbgHACM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lnRPUw6W; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q/Lc+e1P"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17FF5C2BCB8;
-	Thu, 30 Apr 2026 17:56:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lnRPUw6W"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D089C2BCB3;
+	Thu, 30 Apr 2026 19:00:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777571790;
-	bh=mu8CyJbzk6oFEHDvzyPeBWPQN5MDIdG5XefzZtnwwtI=;
+	s=k20201202; t=1777575650;
+	bh=brFsSzKwQtT6fbXTW4gvrYRxWKQFDy4Rx689kb+YkVc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=q/Lc+e1PmVXZR66JcLglsxedi/KjuBpOyEUd08Gi5sHbNS686f1oeLxhchgB4vpJK
-	 R/3hvG9b+7yYgC5YcqsFJzTU0E7WOkA1AAZnfRvvvztDVYmmlTWi1lRV75/Ck/m7o4
-	 nKrti6asvEsyoXDee8Rg039zQJzAUZCE65OB7N7eHV/192REFW78H2QmCwBHpFdgmM
-	 pDr09ssaZmlZMBLMPFdvENHIGT8STuv1A1tadA0krD+Fmehto9XlvH4Lj2bkftBZxO
-	 sZNACpRiPdodRgtM5YWeT5Fcvb0i6vySGcZCt0PzQa2h2xrECCj8i1vxqkaLsQ2e7L
-	 MijkzzGrJTIJA==
+	b=lnRPUw6WNokYDhyWNMIoPiuVnK6dcWZqXLzvtqLOfSskgM9HqIOI6HJWhOMRVSPUt
+	 +eI+zxWlWM16Pd1J7SLiXUaYYn3yDJwuPvnPeM2/Ojf1AOx2cpNLGQL3xnNQ3RzRXk
+	 tavvI0e6Y1HOSkda3QZWNioIn1iwLsUssQnFQhb7Q6/A0BQToF0MXWp21CyFQcKU53
+	 umYyEMbO56gpYarmqsOVL9TNcoZ7yjuRGOomL8ve15at8VlXxJ9dTZWFUhtY9KYJaT
+	 2H8RblxzamxSnyoZGZqw0YuFAOGiqURnzb4OiB+1OaC85WrtRdujv+dVT6aEzQn2K0
+	 Y3qInxUcjJhCg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9E54380AA62;
-	Thu, 30 Apr 2026 17:55:45 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02BD6380AA77;
+	Thu, 30 Apr 2026 19:00:06 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,44 +37,38 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-deletions] net: remove ISDN subsystem and Bluetooth
- CMTP
+Subject: Re: [PATCH v1] gatt-client: Fix use-after-free caused by reentrant
+ client
+ teardown
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177757174432.3109994.10971496392017658764.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Apr 2026 17:55:44 +0000
-References: <20260421022108.1299678-1-kuba@kernel.org>
-In-Reply-To: <20260421022108.1299678-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
- skhan@linuxfoundation.org, marcel@holtmann.org, luiz.dentz@gmail.com,
- mchehab+huawei@kernel.org, jani.nikula@intel.com, gregkh@linuxfoundation.org,
- demarchi@kernel.org, rdunlap@infradead.org, justonli@chromium.org,
- ivecera@redhat.com, jonathan.cameron@huawei.com, kees@kernel.org,
- marco.crivellari@suse.com, ferr.lambarginio@gmail.com, nihaal@cse.iitm.ac.in,
- mingo@kernel.org, tglx@kernel.org, linmq006@gmail.com,
- linux-doc@vger.kernel.org, linux-bluetooth@vger.kernel.org
+ <177757560462.3164688.3337516240351476652.git-patchwork-notify@kernel.org>
+Date: Thu, 30 Apr 2026 19:00:04 +0000
+References: <20260429114806.2337081-1-jinwang.li@oss.qualcomm.com>
+In-Reply-To: <20260429114806.2337081-1-jinwang.li@oss.qualcomm.com>
+To: Jinwang Li <jinwang.li@oss.qualcomm.com>
+Cc: linux-bluetooth@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
+ quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
+ shuai.zhang@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 20 Apr 2026 19:21:07 -0700 you wrote:
-> Remove the ISDN (mISDN, CAPI) subsystem and Bluetooth CMTP protocol
-> from the kernel tree.
+On Wed, 29 Apr 2026 19:48:06 +0800 you wrote:
+> btd_gatt_client_service_removed() can be called reentrantly via
+> bt_gatt_client_unref() after the services queue has already been freed,
+> resulting in a use-after-free.
 > 
-> ISDN is a pretty old technology and it's unclear whether anyone still
-> uses it. I went over the last few years of git history and all the
-> commits are either tree-wide conversions or syzbot/static analyzer
-> fixes.
+> Reset client->ready to false before destroying the services queue to
+> prevent reentrant calls from dereferencing freed memory.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-deletions] net: remove ISDN subsystem and Bluetooth CMTP
-    https://git.kernel.org/bluetooth/bluetooth-next/c/4f10f1dfb235
+  - [v1] gatt-client: Fix use-after-free caused by reentrant client teardown
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d01616f0c276
 
 You are awesome, thank you!
 -- 
