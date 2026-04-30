@@ -1,104 +1,207 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E970221721
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 15:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F86A43CEEE
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 15:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777562909; cv=none; b=FhrDMuJ1/+MMeZOPe1gh4LWb1JHyZ8KNBVHLjn3UrPj6D9/bdZFSU95JzWMlQGaoRZmpR2U8a8ntYL8/6/LT4ZzCj1c9ZbRRHiaVEpL0b4P3JkFubE13fS022gvoXwQ8oIrjgUABt4APduNAo2JHMy1vWczk6U1qwAKjtXndmV4=
+	t=1777564248; cv=none; b=OBCYrrRmoBairZjX787LTBCmUeqMG/564balptpjeiG8dkLXchI0+tRHbmnI80pVE1HNr5nFi/oHztc/PjCMLaDnZWJh3HjHqZXjJwY05JzeG4V2FYpRvbkQj1a1P1yS4ZtcMzwcXAzYLvDenoUWripKgQVtrto6rfwfEDmWeRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777562909; c=relaxed/simple;
-	bh=YAgoho6+6cjhlts890bLQ6R6aeMk+3uqB6ileo8FT9s=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Y8co9aM5EJTQ5kQ79vj272ObujCMmbx4bqQhlDv7z+YtB2JuAL3vgNTR6sQzyR0neopOUuhfiFHqdx1YHE1st+sbCy0idfJ31LJZzhl+py54b3JjfSkyzhGnF69IwGDdtSZci+SUlqsu3UeUGAc3dEVNw5CN3SpWrGaJDobZ9u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=EyV/bwD/; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1777564248; c=relaxed/simple;
+	bh=l9W2wL9n1BnbNB9e+Pd9HayxGawVzMrl1//pFSzsERs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=XvBYT7dwdDkHvRKYqXNLaRogPX4rQuQqwgAY5ouYTH5x2hp5yyJ3hD6vVUxAN9pxCBXk4FI/9rpV9sHEq6U5hCKWJNdzGS75tEbN8KgSWIuM80nXWmMFNmkoA4b1JaO1QdhJ44OIQ0TUg9aT/T747M5uFrxglSL6C92ZJaMJwKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P0EAv0Er; arc=none smtp.client-ip=209.85.221.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="EyV/bwD/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1777562907;
-	bh=BRpvdaEVOJY7Lw15lEsyZHIg9xcYIJxqsrM+so5oZps=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=EyV/bwD/IBVWKtug/Ebh3FeSM+6cZTBzX6s9l3WVaoptXMW70Bn4pBtYk+arlvdgQ
-	 FlQrnWx3kUPydr83hGm10FSXnsOs61PBDWEfod9fI8eTHj9OO920QEklia6r+/5s7l
-	 9X/gm4U/e2rp44ys2oLA3wVmQav0bPaU0LQRJnT0=
-Received: from github.com (hubbernetes-node-39ad0d2.va3-iad.github.net [10.48.125.30])
-	by smtp.github.com (Postfix) with ESMTPA id 40A19501118
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 08:28:27 -0700 (PDT)
-Date: Thu, 30 Apr 2026 08:28:27 -0700
-From: prathibhamadugonde <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P0EAv0Er"
+Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-56f3e6bbecdso396144e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 08:50:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777564246; x=1778169046; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qOCTQsLc7aZtkFgQC+bhYtKzA1I1EcWEyXZ/7l19w+U=;
+        b=P0EAv0ErkSxy4CHv/BSsQrVMGdrMJhWVB4QAzaXyAveu2hBn6mCA4ffdK5ycgguUVP
+         RiiUsoCWq46gsDA8NDIEDxZNQjK8sQxb3CIBEjKhg2OC5EHZlRtB7VoAEMdn/mLRTV0p
+         7tySDO8iIfdagFuVx3aUFFcNtqm9BaOtIYct6kL8EedaJelobNDo6IQH/16Q9juFWz3y
+         tkUOGE9ny6J8rBM6fn+Ra0A2T9mZGhCK+PuJPGyAQ7mEVRVoCKaOPEypl88Rm6gc+3Tw
+         2T886R0IQDC6WaFwLeJDNuV7ymJ45UE2nbeuAS1Flzx+ilHKxw5FWpLc7jYFM0/a2UED
+         CN3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777564246; x=1778169046;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qOCTQsLc7aZtkFgQC+bhYtKzA1I1EcWEyXZ/7l19w+U=;
+        b=UU3TQIgtTD8c5W4YZN9tJCZ7xKjO2xer2P2C4horcmKzwzSixDWLN90MtO6hkb6J+g
+         GHKizTaVONkr1aSny6y3bX5WEjrqN1IXFIqvyBXYUJG4Vl0mHQoUflRuEcrd7RPdKy1a
+         h4S4ICmAN4ZKRPsO42MHhfUrWKIQOiKGRf5DdaExpxukN81TKZ6xy5tZwX/2LYVFp2Me
+         wdd+WPBwyvDr16fHN1guFEw7IdHlLPgEvsbhtxmpv8QqCB2m97HDO1WlsMVyhubK2QLl
+         GUKo8HqIAMG2h1JKp08ic5qB4pAuRUeutY7f5HmMEdlzR9SdbnnIhP4AdeF26G7MXdkF
+         rcog==
+X-Gm-Message-State: AOJu0YxEwnJ+FIPubump6Jf9G8alkKHNhUnFrlfxsZtSxOXGPU+q6PKg
+	kHuF20c0ovlhPfeTijdUX0uLpn+tE/zMJvcjVVaP/y60M8m5NXY1/jityiVi2w==
+X-Gm-Gg: AeBDiet/2T5NTTuDGe3N0osWPAhoQUXbNxLsFQ7udxK7xJLphCyuv1Z6aKpF+WnSqNu
+	DzndlVPrZyV5bc8xM1r50hfEQR00fy3VLbH1Rp1Oef5lNQ/uKbsuOU/cdYrwGby4SOzxUB+chCu
+	o/SWwKHR1klt1SCTYdHNtoSbucgw1QDkXGjR7dE8Dd5UW+x1SqTHCkgmfIHGFfdMC6KE4EofdCs
+	z1Yq+ojHrjedx0lZGSUqipZl1EjF2Kh7gPYzOHGpA3In0z3ejwCW+DEjxqjWa9j7zFf1KBNGy01
+	oSLadzNzSrIGZraI62R619EdLurIIEJH0bZCZ7OrZ/V0pC4/GEJGVnqVQE9NiwmXKuLdyQgw44M
+	9qSPYn4G3X4A7sq+sXXaTKdhOPcQh5FS5vA8GEJ0BsnEOnGOn4iu4C2CmK+phEpRt3k3XYLHgrA
+	d0tZqw/vvS2bpcX20RcqHMFGwAm6OGppb547J2x3wa5nCCWgwWz9hq8EGQQi0FXZGvYkDbjFmdB
+	N3Ir/Ze9t0kYpKtq465UktSloU3
+X-Received: by 2002:a05:6122:4f8a:b0:56e:ded3:98eb with SMTP id 71dfb90a1353d-573c95d7b93mr1599452e0c.6.1777564245779;
+        Thu, 30 Apr 2026 08:50:45 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-573b6dfa5b4sm3199545e0c.16.2026.04.30.08.50.44
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Apr 2026 08:50:45 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/304bc5-303ea3@github.com>
-Subject: [bluez/bluez] a9b39d: src/shared: Add RAS packet format and
- notification...
+Subject: [RFC PATCH BlueZ 1/3] shared/hci: Add BPF filter for registered events
+Date: Thu, 30 Apr 2026 11:50:36 -0400
+Message-ID: <20260430155038.426968-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: a9b39d71597dd28f9339bee4548b537c6749d384
-      https://github.com/bluez/bluez/commit/a9b39d71597dd28f9339bee4548b537c6749d384
-  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-  Date:   2026-04-30 (Thu, 30 Apr 2026)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  Changed paths:
-    M src/shared/rap.c
-    M src/shared/rap.h
+Implement a BPF socket filter in bt_hci_register/bt_hci_unregister that
+uses setsockopt(SO_ATTACH_FILTER) to only accept HCI events that have
+been registered, plus BT_HCI_EVT_CMD_COMPLETE and BT_HCI_EVT_CMD_STATUS
+which are always needed for command response processing.
 
-  Log Message:
-  -----------
-  src/shared: Add RAS packet format and notification support
+The filter is rebuilt each time an event is registered or unregistered,
+and only applies to non-stream (raw socket) connections.
 
-Implement complete RAS data pipeline:
- - Handle HCI CS subevent result/continuation events
- - Serialize ranging/subevent headers per spec
- - GATT notifications for real-time ranging data
+Assisted-by: Claude:claude-opus-4.6
+---
+ src/shared/hci.c | 84 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 84 insertions(+)
 
+diff --git a/src/shared/hci.c b/src/shared/hci.c
+index 0faa6dea555d..5105b0b2f320 100644
+--- a/src/shared/hci.c
++++ b/src/shared/hci.c
+@@ -23,6 +23,7 @@
+ #include <sys/ioctl.h>
+ #include <fcntl.h>
+ #include <errno.h>
++#include <linux/filter.h>
+ 
+ #include "bluetooth/hci.h"
+ #include "monitor/bt.h"
+@@ -565,6 +566,85 @@ bool bt_hci_flush(struct bt_hci *hci)
+ 	return true;
+ }
+ 
++static void update_evt_filter(struct bt_hci *hci)
++{
++	const struct queue_entry *entry;
++	struct sock_filter *filters;
++	struct sock_fprog fprog;
++	unsigned int count, i;
++	int fd;
++
++	fd = io_get_fd(hci->io);
++	if (fd < 0)
++		return;
++
++	/* If stream-based (not a raw socket), no BPF filtering needed */
++	if (hci->is_stream)
++		return;
++
++	count = queue_length(hci->evt_list);
++
++	/* Build filter: load event code, check defaults + registered events.
++	 * Packet layout for HCI_CHANNEL_RAW: [H4 type (1 byte)][evt code (1)]
++	 * So event code is at offset 1.
++	 *
++	 * Filter structure:
++	 *   [0] Load byte at offset 1 (event code)
++	 *   [1] JEQ BT_HCI_EVT_CMD_COMPLETE -> accept
++	 *   [2] JEQ BT_HCI_EVT_CMD_STATUS -> accept
++	 *   [3..3+count-1] JEQ registered_event -> accept
++	 *   [3+count] reject
++	 *   [4+count] accept
++	 */
++	filters = malloc(sizeof(*filters) * (count + 5));
++	if (!filters)
++		return;
++
++	i = 0;
++
++	/* Load event code byte */
++	filters[i++] = (struct sock_filter)
++		BPF_STMT(BPF_LD + BPF_B + BPF_ABS, 1);
++
++	/* Check BT_HCI_EVT_CMD_COMPLETE (0x0e) */
++	filters[i++] = (struct sock_filter)
++		BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, BT_HCI_EVT_CMD_COMPLETE,
++			 count + 2, 0);
++
++	/* Check BT_HCI_EVT_CMD_STATUS (0x0f) */
++	filters[i++] = (struct sock_filter)
++		BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, BT_HCI_EVT_CMD_STATUS,
++			 count + 1, 0);
++
++	/* Check each registered event */
++	entry = queue_get_entries(hci->evt_list);
++	while (entry) {
++		const struct evt *evt = entry->data;
++		unsigned int jump = count - (i - 3);
++
++		filters[i] = (struct sock_filter)
++			BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, evt->event,
++				 jump, 0);
++		i++;
++		entry = entry->next;
++	}
++
++	/* Reject */
++	filters[i++] = (struct sock_filter)
++		BPF_STMT(BPF_RET | BPF_K, 0);
++
++	/* Accept */
++	filters[i++] = (struct sock_filter)
++		BPF_STMT(BPF_RET | BPF_K, 0x0fffffff);
++
++	fprog.len = i;
++	fprog.filter = filters;
++
++	setsockopt(fd, SOL_SOCKET, SO_ATTACH_FILTER, &fprog, sizeof(fprog));
++
++	free(filters);
++}
++
+ unsigned int bt_hci_register(struct bt_hci *hci, uint8_t event,
+ 				bt_hci_callback_func_t callback,
+ 				void *user_data, bt_hci_destroy_func_t destroy)
+@@ -591,6 +671,8 @@ unsigned int bt_hci_register(struct bt_hci *hci, uint8_t event,
+ 		return 0;
+ 	}
+ 
++	update_evt_filter(hci);
++
+ 	return evt->id;
+ }
+ 
+@@ -657,6 +739,8 @@ bool bt_hci_unregister(struct bt_hci *hci, unsigned int id)
+ 
+ 	evt_free(evt);
+ 
++	update_evt_filter(hci);
++
+ 	return true;
+ }
+ 
+-- 
+2.53.0
 
-  Commit: 5d4792dc2a2088e7355e19b5fa763159f2a8231d
-      https://github.com/bluez/bluez/commit/5d4792dc2a2088e7355e19b5fa763159f2a8231d
-  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-  Date:   2026-04-30 (Thu, 30 Apr 2026)
-
-  Changed paths:
-    M profiles/ranging/rap_hci.c
-
-  Log Message:
-  -----------
-  profiles/ranging: Read cs_mode_one_data members
-
-Rearrage reading of cs_mode_one_data struct members as per spec.
-
-
-  Commit: 303ea3c539b80778eaea68900c9ea9bb421a97c0
-      https://github.com/bluez/bluez/commit/303ea3c539b80778eaea68900c9ea9bb421a97c0
-  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-  Date:   2026-04-30 (Thu, 30 Apr 2026)
-
-  Changed paths:
-    M unit/test-rap.c
-
-  Log Message:
-  -----------
-  unit/test-rap: Add PTS tests for CS reflector
-
-Added below RAS - Real time Ranging PTS testcases:
-RAS/SR/RCO/BV-01-C [Characteristic Read - RAS Features]
-RAS/SR/RRD/BV-01-C [Real-time Ranging Data]
-RAS/SR/RRD/BV-03-C [Real-time Ranging Data notifications and indications]
-RAS/SR/RRD/BV-05-C [Real-Time Ranging Data disconnection]
-RAS/SR/SPE/BI-11-C [Client enables both Real-time and On-demand]
-
-
-Compare: https://github.com/bluez/bluez/compare/304bc5b78a3c...303ea3c539b8
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
