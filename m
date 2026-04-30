@@ -1,69 +1,69 @@
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF05944BCAE
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 15:50:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5427D43CEEE
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 15:50:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777564250; cv=none; b=mk5lS9I/7v0iTYOo0AefgDJfoyLPI/MK2U2k46bdh+UNnXdyYgh6dz6DOInwW4XzwI1A7LqunitbiyzAdD2vfiJssyjxPJSnZLdjyzt3uayyGgIpWStHrQREhQzuxLtNlkAcmJGYwAEeIVJyMFvgOPaTDb5QCJHiT2Mp5r8xc+k=
+	t=1777564250; cv=none; b=PfEZsHU+B2f1gs7HEtX2wiICHZ4Kx8IrXELoQe6LGxQJYlTBGd9aw2ir4kchNnsueZouU7K6pc4+BcTRvYjBtWWG8i+puuhv5sV8ILUeNmrSjs9C+TmGhLtXRzGF5thKBjp2COTIbFlPpJPYYP1jUdH4j4owpSqE0i1IbPhz2W0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1777564250; c=relaxed/simple;
-	bh=9RQBiT0dHIhd3gtPCnDRxLRsn7TLmsX0NVBdBShd+KY=;
+	bh=pn23PmPfkYa0pCIVyPR8g9x3sa5akLFS3vA9A64lpvQ=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Vhp0dX1l3QNYn2mPUGTRAVhgqWadcQmWAKApdPqaCl934F5iuR6ZbWSyDfCu2d2u+8g4bzxCCLHcXscHSogFCyEzIhjYaSROUsHaOBwwTqj4FH4KrkybMMCU4hmFiwfHfQmRWtj2AjFP4K3URnCcsHLnE5Ws4xEkdfaswnkdPCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bjCni5Gj; arc=none smtp.client-ip=209.85.221.178
+	 MIME-Version; b=ds3O8OrqirUcxpuo472ENazYNBEYHB/pUch8IR/8bXGpIlTqQHlT2avUJNJSSPrJo/2v5EOYYl2hXi3CULIt6enQPJBylJGvrWvxLXOJFH4rpZ5qZrRwv0vE0bSdQ+6XhtlmZu7c86TQTDvhz0p/JhsQ4YlK6jQwvI9WmqevDLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sUYqZOiB; arc=none smtp.client-ip=209.85.221.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bjCni5Gj"
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-56f75445470so660221e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 08:50:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sUYqZOiB"
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-5673804da95so404270e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 08:50:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777564247; x=1778169047; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777564248; x=1778169048; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=VSkwXm+65XpCMRBcqk/hBL7jJ6/rrC/YeMwkqhG4gXs=;
-        b=bjCni5GjN9AwbEdhMjXIiwBvOZA4yRiPSkpbDzpttk0eUjVJnHa+F352j1bFkVInj+
-         O1Y+r5kaCvnw9sBt37lyyTrh2JyxOXdAb7ZNdQ4H8u7v2UuS4xGprvdhs484fslyY0r1
-         BFHhRgaG3gYLKMgHxCOAtqQvjLFRmRlmXWenA7GHWrEF9OYjWL/DDflsIs095Z6UPlt8
-         a5iM8ebGhdbr7HqXTzVM6e1lucmS1dob0tLo1WMqNLz81CHJuyZprLYLrVibRnAqoD6n
-         8yqrfbk4oTaoZclJ4QTcvAJbUqjrLukt1icMNXQ/SHDpEbjYxJ/ySD24NnmobUnXh7zJ
-         eLkA==
+        bh=+WSdSqJUzsIcg5N9jmyjCj22kSF6CuYnwGRuFZc8osU=;
+        b=sUYqZOiBLGFnwrqddJsE3veS5UP6vaGL7vV/rMpLgjF0wqWglrTXKUDjnLLKiOU6MM
+         k7yP4XqePLAagHMW+aZ9OI/9X+cjBfqIDgHwJtfiX+QR1LYSjNiAaChbemyxOKSwTc1M
+         wosP4fM1Wu2sw0lgZMMkAinWO187AlCihxpEq5HmorKLGkz6d23C9o/xVVrQx8RTUOGO
+         xDPElIIx422CzHOz1o0h732S9RqE1SEfsbhHQbaQRk+oVJ4Cr4WL0acWHPRgYTFgpxkZ
+         J14sKpv77U9Z4xVDK74DG5HanzPiDniNZGia91YSof5KsexBi62hRAlQWtAyEuh2ifxB
+         tJew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777564247; x=1778169047;
+        d=1e100.net; s=20251104; t=1777564248; x=1778169048;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=VSkwXm+65XpCMRBcqk/hBL7jJ6/rrC/YeMwkqhG4gXs=;
-        b=EKcRUC8atp7qea8UYHgE11yInZQ0dCP/elakB8q1lQyFxybRbViRblSUNLk1R7BOQv
-         hFfuypYRlGZd6/vy0gwBt4m5qqhtvIjJ9amXi7Rk3+cFGW/HU2S0gk14zYRgk7OVvK+Q
-         waFIdXQ8cck/0IqtIEBBTSSQThR0CQViYdRaoDGkFOXr1kfg6W9yM+x7WSHqAC+4G5Aa
-         LPW2k3+L6Rk4OMH+sKj2fZx7rINxqRA4X6Bv61oYEFsluAaYP/O0/8igWbVmaihAQCfz
-         R4l4ETe8R8FHchmVSwa/hRoIphVq7vYvj4e6g9LqosTRy7fApGoubr0Sy8rknTLQ4WeH
-         zr1w==
-X-Gm-Message-State: AOJu0YxFv2NIZz+WI1el0mSF3Hwh0Lh5de9k573Q0GfO+bGJ63nnW0eh
-	FBfluHLmZbPv2k2f0WpSbRDpphSJSB/DPhalC22hHgUZWLD8cQT9l9tgkh/ip2q1
-X-Gm-Gg: AeBDiesnhjkBC5Y7Fb/I+0T9S5WRkBcS6GqRGkvZ/XhJCbUARZHA+nY19Yn03AzSzRg
-	2HG4b8vAPym4jsefTG5G5C6akF5wMwYWQRRXVoUe1OTZTIfB6bjoaI68zK5oXJ7rcvk3SnAlKyx
-	6gZq1WLxH7L5VG94Z1szRoUExN6TRS2RUu8Q+51t20OaJR0tSuXxKgH6cfPinABkGwB2I4O61JH
-	j+eXHhNZTxf253DQmVrj7fwmM4bR8zGa7Pk9oF3GLxkaOXSxA0/hC+vP/C64WocGFoei6ImZ8yH
-	RacXj+1rKykGMY80GzQvgcceuN9dcaOg+Lk1Tz2P7tfrHxybLMnD7zO6AuliXOuQyYGTe9tCMPS
-	+ze2ICsdg/v2x0V8Nafv77reRAJpTSYZpQMCydZANCRY12inRohPTacPjloL/Uo79rxGNbo+JQw
-	7A922Jc15JtOElvWGcelVAbwPxCGa7//KSlwsECSO3WIc1kdfX5JIuCa5lXM5w3q/CavwvSmO7J
-	fLkd9flp33Uu34PjrXvsrok97NZ
-X-Received: by 2002:a05:6122:660e:b0:56a:ef51:4cae with SMTP id 71dfb90a1353d-573c959946bmr1945855e0c.4.1777564247302;
+        bh=+WSdSqJUzsIcg5N9jmyjCj22kSF6CuYnwGRuFZc8osU=;
+        b=gPQqaLGcyI+CmKUHv7ShVNJce0J4jw28/K9q5LrlySE2XIDap8bOmcKuBWnQJAnp5B
+         K7i3WauyVfP9BumL1kNNY/RT+IWemMd8YgV0TNFr81MPB3g1JGFmlWaxSfo5WoQl2esZ
+         1ZA3plYSmfQJhaQ9GOFqHRkzCOCHguzgOqo0KgqmTCipJHeTyaC+taFhAgKn7ZZNmrlY
+         IAQvgMyXRsb2eOodfE0OcLAS+TP3vPs6zt3At4ZhKsZAduWBPfg1T50JwODkUplWFM6u
+         J5nTvxogGQ/Np0KVBEQp/U9p3uENIQxFkby+7k5cRBWhR5G4+uT0RLcu5PKlxUknFhM7
+         PrcA==
+X-Gm-Message-State: AOJu0YxlkM3C2LRDOWUuf0GwnUOxSUuXcp/rnsh79w9nnjfsQpbwUO+4
+	UWJ1QFH9NoBXZvM6rZqsWp3B4lb0XaQz/14Nscul3vSqG+nQZQFzjvwFXnPbXfSw
+X-Gm-Gg: AeBDievVFpGAuYhnqjFyIZOlYM+81OxybXHpljhY9DgtR8HAVTgoPCayhk2dlJSdW1U
+	HUO+85LfMxcnfjClQ9ORLlVKWZAwhPyr1+rGJuLvpzdYkL1d2DUQsGpKkrT74caQeLo6HYevb8s
+	LVZiC2SUbr7mjw0Y0QcorIABPfCgSJptbNeAncsC/ULg3sp0oTz7tfhzQfAzQ596R8SQmCUbsSh
+	zJX1/FufEyLHAOjpy5WIEtoq/3xWLhESdoaajRcfuLQ+Bh3RlQMc3g7lmkLGZAKe/m8St7KulDu
+	vKgVfbWCY/2yH+7qPP8hA/1gyaJy9DBQZ0xFG9P4cYHO0g/1cuPc7yL6Tg5lPU54LM0P7M2AlL/
+	VOUK+qyyBSVaIePRNyUARzPGTfgbXdEZqXgF/8uOVl7IAcEi58sKn9laXkTn83tDwhtioufp9+/
+	LOxMtlhAdhIX6QaDAIdsVdzhDKN2PTFZ8fLfK6dj1j9grL4bTzGLD331NFF8kh9X1jj1vNSIqA0
+	meHvYv02J3WbHojFg/4VgL02i79
+X-Received: by 2002:a05:6122:4889:b0:56f:6d11:b962 with SMTP id 71dfb90a1353d-573c957ed5emr1667151e0c.2.1777564247958;
         Thu, 30 Apr 2026 08:50:47 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-573b6dfa5b4sm3199545e0c.16.2026.04.30.08.50.46
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-573b6dfa5b4sm3199545e0c.16.2026.04.30.08.50.47
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2026 08:50:46 -0700 (PDT)
+        Thu, 30 Apr 2026 08:50:47 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC PATCH BlueZ 2/3] shared/hci: Add bt_hci_register_subevent for LE Meta events
-Date: Thu, 30 Apr 2026 11:50:37 -0400
-Message-ID: <20260430155038.426968-2-luiz.dentz@gmail.com>
+Subject: [RFC PATCH BlueZ 3/3] ranging/rap_hci: Use bt_hci_register_subevent for LE CS events
+Date: Thu, 30 Apr 2026 11:50:38 -0400
+Message-ID: <20260430155038.426968-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260430155038.426968-1-luiz.dentz@gmail.com>
 References: <20260430155038.426968-1-luiz.dentz@gmail.com>
@@ -77,355 +77,302 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add bt_hci_register_subevent/bt_hci_unregister_subevent API that allows
-registering for specific LE Meta Event subevents. The BPF filter is
-extended to accept BT_HCI_EVT_LE_META_EVENT packets and then check the
-subevent byte (offset 4) against registered subevents.
+Replace the single BT_HCI_EVT_LE_META_EVENT registration and subevent
+dispatch table with individual bt_hci_register_subevent calls for each
+CS subevent. This enables BPF filtering at the socket level for each
+specific subevent and removes the manual subevent dispatch logic.
 
-Since bt_hci_register_subevent is only used with BT_HCI_EVT_LE_META_EVENT,
-the event parameter is omitted. The subevent list reuses struct evt where
-evt->event stores the subevent code.
+Event IDs are stored in a struct queue for flexible management.
 
 Assisted-by: Claude:claude-opus-4.6
 ---
- src/shared/hci.c | 239 ++++++++++++++++++++++++++++++++++++++++-------
- src/shared/hci.h |   6 ++
- 2 files changed, 211 insertions(+), 34 deletions(-)
+ profiles/ranging/rap_hci.c | 193 ++++++++++++++-----------------------
+ 1 file changed, 71 insertions(+), 122 deletions(-)
 
-diff --git a/src/shared/hci.c b/src/shared/hci.c
-index 5105b0b2f320..24b2c813e888 100644
---- a/src/shared/hci.c
-+++ b/src/shared/hci.c
-@@ -45,6 +45,7 @@ struct bt_hci {
- 	struct queue *cmd_queue;
- 	struct queue *rsp_queue;
- 	struct queue *evt_list;
-+	struct queue *subevt_list;
- 	struct queue *data_queue;
- };
- 
-@@ -239,6 +240,21 @@ static void process_notify(void *data, void *user_data)
- 						hdr->plen, evt->user_data);
+diff --git a/profiles/ranging/rap_hci.c b/profiles/ranging/rap_hci.c
+index 08ddc077ce94..8e65e5ef87bd 100644
+--- a/profiles/ranging/rap_hci.c
++++ b/profiles/ranging/rap_hci.c
+@@ -61,7 +61,7 @@ struct cs_state_machine {
+ 	enum cs_state old_state;
+ 	struct bt_hci *hci;
+ 	struct bt_rap *rap;
+-	unsigned int event_id;
++	struct queue *event_ids;
+ 	bool initiator;
+ 	bool procedure_active;
+ 	struct bt_rap_hci_cs_options cs_opt;  /* Per-instance CS options */
+@@ -302,7 +302,7 @@ static void rap_send_hci_def_settings_command(struct cs_state_machine *sm,
+ 		error("Failed to send default settings cmd");
  }
  
-+struct subevt_data {
-+	uint8_t subevent;
-+	const void *data;
-+	uint8_t size;
-+};
-+
-+static void process_subevt_notify(void *data, void *user_data)
-+{
-+	struct subevt_data *sd = user_data;
-+	struct evt *evt = data;
-+
-+	if (evt->event == sd->subevent)
-+		evt->callback(sd->data, sd->size, evt->user_data);
-+}
-+
- static void process_event(struct bt_hci *hci, const void *data, size_t size)
+-static void rap_rd_rmt_supp_cap_cmplt_evt(const uint8_t *data, uint8_t size,
++static void rap_rd_rmt_supp_cap_cmplt_evt(const void *data, uint8_t size,
+ 					   void *user_data)
  {
- 	const struct bt_hci_evt_hdr *hdr = data;
-@@ -275,6 +291,16 @@ static void process_event(struct bt_hci *hci, const void *data, size_t size)
+ 	struct cs_state_machine *sm = user_data;
+@@ -348,7 +348,7 @@ static void rap_rd_rmt_supp_cap_cmplt_evt(const uint8_t *data, uint8_t size,
+ 	cs_set_state(sm, CS_STATE_INIT);
+ }
  
- 	default:
- 		queue_foreach(hci->evt_list, process_notify, (void *) hdr);
-+		if (hdr->evt == BT_HCI_EVT_LE_META_EVENT && size > 0) {
-+			const uint8_t *params = data;
-+			struct subevt_data sd;
-+
-+			sd.subevent = params[0];
-+			sd.data = data + 1;
-+			sd.size = size - 1;
-+			queue_foreach(hci->subevt_list,
-+					process_subevt_notify, &sd);
-+		}
- 		break;
+-static void rap_cs_config_cmplt_evt(const uint8_t *data, uint8_t size,
++static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
+ 				    void *user_data)
+ {
+ 	struct cs_state_machine *sm = user_data;
+@@ -439,7 +439,7 @@ static void rap_cs_config_cmplt_evt(const uint8_t *data, uint8_t size,
+ 	bt_rap_hci_cs_config_complete_callback(size, &rap_ev, sm->rap);
+ }
+ 
+-static void rap_cs_sec_enable_cmplt_evt(const uint8_t *data, uint8_t size,
++static void rap_cs_sec_enable_cmplt_evt(const void *data, uint8_t size,
+ 					 void *user_data)
+ {
+ 	struct cs_state_machine *sm = user_data;
+@@ -500,7 +500,7 @@ static void rap_cs_sec_enable_cmplt_evt(const uint8_t *data, uint8_t size,
+ 	bt_rap_hci_cs_sec_enable_complete_callback(size, &rap_ev, sm->rap);
+ }
+ 
+-static void rap_cs_proc_enable_cmplt_evt(const uint8_t *data, uint8_t size,
++static void rap_cs_proc_enable_cmplt_evt(const void *data, uint8_t size,
+ 					  void *user_data)
+ {
+ 	struct cs_state_machine *sm = user_data;
+@@ -800,7 +800,7 @@ static void parse_cs_step(struct iovec *iov, struct cs_step_data *step,
  	}
  }
-@@ -332,10 +358,12 @@ static struct bt_hci *create_hci(int fd)
- 	hci->cmd_queue = queue_new();
- 	hci->rsp_queue = queue_new();
- 	hci->evt_list = queue_new();
-+	hci->subevt_list = queue_new();
- 	hci->data_queue = queue_new();
  
- 	if (!io_set_read_handler(hci->io, io_read_callback, hci, NULL)) {
- 		queue_destroy(hci->evt_list, NULL);
-+		queue_destroy(hci->subevt_list, NULL);
- 		queue_destroy(hci->rsp_queue, NULL);
- 		queue_destroy(hci->cmd_queue, NULL);
- 		queue_destroy(hci->data_queue, NULL);
-@@ -458,6 +486,7 @@ void bt_hci_unref(struct bt_hci *hci)
- 		return;
- 
- 	queue_destroy(hci->evt_list, evt_free);
-+	queue_destroy(hci->subevt_list, evt_free);
- 	queue_destroy(hci->cmd_queue, cmd_free);
- 	queue_destroy(hci->rsp_queue, cmd_free);
- 	queue_destroy(hci->data_queue, data_free);
-@@ -571,7 +600,7 @@ static void update_evt_filter(struct bt_hci *hci)
- 	const struct queue_entry *entry;
- 	struct sock_filter *filters;
- 	struct sock_fprog fprog;
--	unsigned int count, i;
-+	unsigned int evt_count, subevt_count, count, i;
- 	int fd;
- 
- 	fd = io_get_fd(hci->io);
-@@ -582,21 +611,37 @@ static void update_evt_filter(struct bt_hci *hci)
- 	if (hci->is_stream)
- 		return;
- 
--	count = queue_length(hci->evt_list);
-+	evt_count = queue_length(hci->evt_list);
-+	subevt_count = queue_length(hci->subevt_list);
- 
--	/* Build filter: load event code, check defaults + registered events.
--	 * Packet layout for HCI_CHANNEL_RAW: [H4 type (1 byte)][evt code (1)]
--	 * So event code is at offset 1.
-+	/* Filter structure:
-+	 * Packet layout: [H4 type(1)][evt code(1)][plen(1)][params...]
-+	 * For LE Meta: params[0] is the subevent code (offset 4 from start)
- 	 *
--	 * Filter structure:
- 	 *   [0] Load byte at offset 1 (event code)
--	 *   [1] JEQ BT_HCI_EVT_CMD_COMPLETE -> accept
--	 *   [2] JEQ BT_HCI_EVT_CMD_STATUS -> accept
--	 *   [3..3+count-1] JEQ registered_event -> accept
--	 *   [3+count] reject
--	 *   [4+count] accept
-+	 *   [1] JEQ CMD_COMPLETE -> accept
-+	 *   [2] JEQ CMD_STATUS -> accept
-+	 *   [3] JEQ LE_META -> subevent_check (if subevts registered)
-+	 *   [4..4+evt_count-1] JEQ registered_event -> accept
-+	 *   [4+evt_count] reject
-+	 *   -- subevent section (if subevt_count > 0) --
-+	 *   [5+evt_count] Load byte at offset 4 (subevent code)
-+	 *   [6+evt_count..6+evt_count+subevt_count-1] JEQ subevent -> accept
-+	 *   [6+evt_count+subevt_count] reject
-+	 *   -- shared accept --
-+	 *   [last] accept
- 	 */
--	filters = malloc(sizeof(*filters) * (count + 5));
-+
-+	/* Without subevents: 3 (defaults) + evt_count + reject + accept = evt_count + 5
-+	 * With subevents: 4 (defaults+LE_META) + evt_count + reject +
-+	 *                 1 (load subevent) + subevt_count + reject + accept
-+	 */
-+	if (subevt_count)
-+		count = 4 + evt_count + 1 + 1 + subevt_count + 1 + 1;
-+	else
-+		count = 3 + evt_count + 1 + 1;
-+
-+	filters = malloc(sizeof(*filters) * count);
- 	if (!filters)
- 		return;
- 
-@@ -606,32 +651,106 @@ static void update_evt_filter(struct bt_hci *hci)
- 	filters[i++] = (struct sock_filter)
- 		BPF_STMT(BPF_LD + BPF_B + BPF_ABS, 1);
- 
--	/* Check BT_HCI_EVT_CMD_COMPLETE (0x0e) */
--	filters[i++] = (struct sock_filter)
--		BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, BT_HCI_EVT_CMD_COMPLETE,
--			 count + 2, 0);
--
--	/* Check BT_HCI_EVT_CMD_STATUS (0x0f) */
--	filters[i++] = (struct sock_filter)
--		BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, BT_HCI_EVT_CMD_STATUS,
--			 count + 1, 0);
--
--	/* Check each registered event */
--	entry = queue_get_entries(hci->evt_list);
--	while (entry) {
--		const struct evt *evt = entry->data;
--		unsigned int jump = count - (i - 3);
-+	if (subevt_count) {
-+		/* accept is at index: count - 1
-+		 * From instruction at index i, jump_true = (count-1) - (i+1)
-+		 */
- 
-+		/* Check BT_HCI_EVT_CMD_COMPLETE -> accept */
- 		filters[i] = (struct sock_filter)
--			BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, evt->event,
--				 jump, 0);
-+			BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
-+				 BT_HCI_EVT_CMD_COMPLETE,
-+				 count - 1 - (i + 1), 0);
- 		i++;
--		entry = entry->next;
--	}
- 
--	/* Reject */
--	filters[i++] = (struct sock_filter)
--		BPF_STMT(BPF_RET | BPF_K, 0);
-+		/* Check BT_HCI_EVT_CMD_STATUS -> accept */
-+		filters[i] = (struct sock_filter)
-+			BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
-+				 BT_HCI_EVT_CMD_STATUS,
-+				 count - 1 - (i + 1), 0);
-+		i++;
-+
-+		/* Check LE_META -> subevent section
-+		 * subevent section starts at: 4 + evt_count + 1
-+		 * (after the evt reject instruction)
-+		 */
-+		filters[i] = (struct sock_filter)
-+			BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
-+				 BT_HCI_EVT_LE_META_EVENT,
-+				 4 + evt_count + 1 - (i + 1), 0);
-+		i++;
-+
-+		/* Check each registered event -> accept */
-+		entry = queue_get_entries(hci->evt_list);
-+		while (entry) {
-+			const struct evt *evt = entry->data;
-+
-+			filters[i] = (struct sock_filter)
-+				BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
-+					 evt->event,
-+					 count - 1 - (i + 1), 0);
-+			i++;
-+			entry = entry->next;
-+		}
-+
-+		/* Reject (for non-matching events) */
-+		filters[i++] = (struct sock_filter)
-+			BPF_STMT(BPF_RET | BPF_K, 0);
-+
-+		/* Subevent section: load subevent byte at offset 4 */
-+		filters[i++] = (struct sock_filter)
-+			BPF_STMT(BPF_LD + BPF_B + BPF_ABS, 4);
-+
-+		/* Check each registered subevent -> accept */
-+		entry = queue_get_entries(hci->subevt_list);
-+		while (entry) {
-+			const struct evt *evt = entry->data;
-+
-+			filters[i] = (struct sock_filter)
-+				BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
-+					 evt->event,
-+					 count - 1 - (i + 1), 0);
-+			i++;
-+			entry = entry->next;
-+		}
-+
-+		/* Reject (for non-matching subevents) */
-+		filters[i++] = (struct sock_filter)
-+			BPF_STMT(BPF_RET | BPF_K, 0);
-+	} else {
-+		/* No subevents - simple filter */
-+
-+		/* Check BT_HCI_EVT_CMD_COMPLETE -> accept */
-+		filters[i] = (struct sock_filter)
-+			BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
-+				 BT_HCI_EVT_CMD_COMPLETE,
-+				 count - 1 - (i + 1), 0);
-+		i++;
-+
-+		/* Check BT_HCI_EVT_CMD_STATUS -> accept */
-+		filters[i] = (struct sock_filter)
-+			BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
-+				 BT_HCI_EVT_CMD_STATUS,
-+				 count - 1 - (i + 1), 0);
-+		i++;
-+
-+		/* Check each registered event -> accept */
-+		entry = queue_get_entries(hci->evt_list);
-+		while (entry) {
-+			const struct evt *evt = entry->data;
-+
-+			filters[i] = (struct sock_filter)
-+				BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
-+					 evt->event,
-+					 count - 1 - (i + 1), 0);
-+			i++;
-+			entry = entry->next;
-+		}
-+
-+		/* Reject */
-+		filters[i++] = (struct sock_filter)
-+			BPF_STMT(BPF_RET | BPF_K, 0);
-+	}
- 
- 	/* Accept */
- 	filters[i++] = (struct sock_filter)
-@@ -744,6 +863,58 @@ bool bt_hci_unregister(struct bt_hci *hci, unsigned int id)
- 	return true;
+-static void rap_cs_subevt_result_evt(const uint8_t *data, uint8_t size,
++static void rap_cs_subevt_result_evt(const void *data, uint8_t size,
+ 				void *user_data)
+ {
+ 	struct cs_state_machine *sm = (struct cs_state_machine *) user_data;
+@@ -910,7 +910,7 @@ send_event:
+ 	free(rap_ev);
  }
  
-+
-+unsigned int bt_hci_register_subevent(struct bt_hci *hci,
-+				uint8_t subevent,
-+				bt_hci_callback_func_t callback,
-+				void *user_data, bt_hci_destroy_func_t destroy)
-+{
-+	struct evt *evt;
-+
-+	if (!hci)
-+		return 0;
-+
-+	evt = new0(struct evt, 1);
-+	evt->event = subevent;
-+
-+	if (hci->next_evt_id < 1)
-+		hci->next_evt_id = 1;
-+
-+	evt->id = hci->next_evt_id++;
-+
-+	evt->callback = callback;
-+	evt->destroy = destroy;
-+	evt->user_data = user_data;
-+
-+	if (!queue_push_tail(hci->subevt_list, evt)) {
-+		free(evt);
-+		return 0;
-+	}
-+
-+	update_evt_filter(hci);
-+
-+	return evt->id;
-+}
-+
-+bool bt_hci_unregister_subevent(struct bt_hci *hci, unsigned int id)
-+{
-+	struct evt *evt;
-+
-+	if (!hci || !id)
-+		return false;
-+
-+	evt = queue_remove_if(hci->subevt_list, match_evt_id,
-+							UINT_TO_PTR(id));
-+	if (!evt)
-+		return false;
-+
-+	evt_free(evt);
-+
-+	update_evt_filter(hci);
-+
-+	return true;
-+}
-+
- bool bt_hci_get_conn_handle(struct bt_hci *hci, const uint8_t *bdaddr,
- 				uint16_t *handle)
+-static void rap_cs_subevt_result_cont_evt(const uint8_t *data, uint8_t size,
++static void rap_cs_subevt_result_cont_evt(const void *data, uint8_t size,
+ 					void *user_data)
  {
-diff --git a/src/shared/hci.h b/src/shared/hci.h
-index 800dc4946b97..5be48577f9db 100644
---- a/src/shared/hci.h
-+++ b/src/shared/hci.h
-@@ -42,5 +42,11 @@ unsigned int bt_hci_register(struct bt_hci *hci, uint8_t event,
- 				void *user_data, bt_hci_destroy_func_t destroy);
- bool bt_hci_unregister(struct bt_hci *hci, unsigned int id);
+ 	struct cs_state_machine *sm = (struct cs_state_machine *) user_data;
+@@ -1009,113 +1009,12 @@ send_event:
+ }
  
-+unsigned int bt_hci_register_subevent(struct bt_hci *hci,
-+				uint8_t subevent,
-+				bt_hci_callback_func_t callback,
-+				void *user_data, bt_hci_destroy_func_t destroy);
-+bool bt_hci_unregister_subevent(struct bt_hci *hci, unsigned int id);
+ /* Subevent handler function type */
+-typedef void (*subevent_handler_t)(const uint8_t *data, uint8_t size,
+-				   void *user_data);
+ 
+-/* Subevent table entry */
+-struct subevent_entry {
+-	uint8_t opcode;
+-	uint8_t min_len;
+-	uint8_t max_len;
+-	subevent_handler_t handler;
+-	const char *name;
+-};
+-
+-/* Macro to define HCI event entries
+- * Note: min_len excludes the subevent byte since it's stripped before dispatch
+- */
+-#define HCI_EVT(_opcode, _struct, _handler, _name) \
+-	{ \
+-		.opcode = _opcode, \
+-		.min_len = sizeof(_struct), \
+-		.max_len = 0xFF, \
+-		.handler = _handler, \
+-		.name = _name \
+-	}
+-
+-/* Subevent dispatch table */
+-static const struct subevent_entry subevent_table[] = {
+-	HCI_EVT(BT_HCI_EVT_LE_CS_RD_REM_SUPP_CAP_COMPLETE,
+-		struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete,
+-		rap_rd_rmt_supp_cap_cmplt_evt,
+-		"CS Read Remote Supported Capabilities Complete"),
+-	HCI_EVT(BT_HCI_EVT_LE_CS_CONFIG_COMPLETE,
+-		struct bt_hci_evt_le_cs_config_complete,
+-		rap_cs_config_cmplt_evt,
+-		"CS Config Complete"),
+-	HCI_EVT(BT_HCI_EVT_LE_CS_SEC_ENABLE_COMPLETE,
+-		struct bt_hci_evt_le_cs_sec_enable_complete,
+-		rap_cs_sec_enable_cmplt_evt,
+-		"CS Security Enable Complete"),
+-	HCI_EVT(BT_HCI_EVT_LE_CS_PROC_ENABLE_COMPLETE,
+-		struct bt_hci_evt_le_cs_proc_enable_complete,
+-		rap_cs_proc_enable_cmplt_evt,
+-		"CS Procedure Enable Complete"),
+-	HCI_EVT(BT_HCI_EVT_LE_CS_SUBEVENT_RESULT,
+-		struct bt_hci_evt_le_cs_subevent_result,
+-		rap_cs_subevt_result_evt,
+-		"CS Subevent Result"),
+-	HCI_EVT(BT_HCI_EVT_LE_CS_SUBEVENT_RESULT_CONTINUE,
+-		struct bt_hci_evt_le_cs_subevent_result_continue,
+-		rap_cs_subevt_result_cont_evt,
+-		"CS Subevent Result Continue")
+-};
+-
+-#undef HCI_EVT
+-
+-#define SUBEVENT_TABLE_SIZE ARRAY_SIZE(subevent_table)
+-
+-/* HCI Event Registration */
+-static void rap_handle_hci_events(const void *data, uint8_t size,
+-				void *user_data)
++static void unregister_event_id(void *data, void *user_data)
+ {
+-	struct iovec iov;
+-	uint8_t subevent;
+-	const struct subevent_entry *entry = NULL;
+-	size_t i;
++	struct bt_hci *hci = user_data;
+ 
+-	/* Initialize iovec with the event data */
+-	iov.iov_base = (void *) data;
+-	iov.iov_len = size;
+-
+-	/* Pull the subevent code */
+-	if (!util_iov_pull_u8(&iov, &subevent)) {
+-		DBG("Failed to parse subevent code");
+-		return;
+-	}
+-
+-	/* Find the subevent in the table */
+-	for (i = 0; i < SUBEVENT_TABLE_SIZE; i++) {
+-		if (subevent_table[i].opcode == subevent) {
+-			entry = &subevent_table[i];
+-			break;
+-		}
+-	}
+-
+-	/* Check if subevent is supported */
+-	if (!entry) {
+-		DBG("Unknown subevent: 0x%02X", subevent);
+-		return;
+-	}
+-
+-	/* Validate payload length */
+-	if (iov.iov_len < entry->min_len) {
+-		DBG("%s: payload too short (%zu < %u)",
+-		    entry->name, iov.iov_len, entry->min_len);
+-		return;
+-	}
+-
+-	if (entry->max_len != 0xFF && iov.iov_len > entry->max_len) {
+-		DBG("%s: payload too long (%zu > %u)",
+-		    entry->name, iov.iov_len, entry->max_len);
+-		return;
+-	}
+-
+-	/* Call the handler */
+-	DBG("Handling %s (opcode=0x%02X, len=%zu)",
+-	    entry->name, subevent, iov.iov_len);
+-
+-	entry->handler(iov.iov_base, iov.iov_len, user_data);
++	bt_hci_unregister_subevent(hci, PTR_TO_UINT(data));
+ }
+ 
+ void *bt_rap_attach_hci(struct bt_rap *rap, struct bt_hci *hci,
+@@ -1123,6 +1022,7 @@ void *bt_rap_attach_hci(struct bt_rap *rap, struct bt_hci *hci,
+ 			int8_t max_tx_power)
+ {
+ 	struct cs_state_machine *sm;
++	unsigned int id;
+ 
+ 	if (!rap || !hci) {
+ 		error("rap or hci null");
+@@ -1140,22 +1040,68 @@ void *bt_rap_attach_hci(struct bt_rap *rap, struct bt_hci *hci,
+ 	cs_state_machine_init(sm, rap, hci, role, cs_sync_ant_sel,
+ 				max_tx_power);
+ 
+-	sm->event_id = bt_hci_register(hci, BT_HCI_EVT_LE_META_EVENT,
+-					rap_handle_hci_events, sm, NULL);
++	sm->event_ids = queue_new();
+ 
+-	DBG("bt_hci_register done, event_id : %d", sm->event_id);
++	/* Register each LE Meta subevent individually */
++	id = bt_hci_register_subevent(hci,
++			BT_HCI_EVT_LE_CS_RD_REM_SUPP_CAP_COMPLETE,
++			rap_rd_rmt_supp_cap_cmplt_evt, sm, NULL);
++	if (!id)
++		goto fail;
+ 
+-	if (!sm->event_id) {
+-		error("Failed to register hci le meta events");
+-		error("event_id=0x%02X", sm->event_id);
+-		free(sm);
+-		return NULL;
+-	}
++	queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
 +
- bool bt_hci_get_conn_handle(struct bt_hci *hci, const uint8_t *bdaddr,
- 				uint16_t *handle);
++	id = bt_hci_register_subevent(hci,
++			BT_HCI_EVT_LE_CS_CONFIG_COMPLETE,
++			rap_cs_config_cmplt_evt, sm, NULL);
++	if (!id)
++		goto fail;
++
++	queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
++
++	id = bt_hci_register_subevent(hci,
++			BT_HCI_EVT_LE_CS_SEC_ENABLE_COMPLETE,
++			rap_cs_sec_enable_cmplt_evt, sm, NULL);
++	if (!id)
++		goto fail;
++
++	queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
++
++	id = bt_hci_register_subevent(hci,
++			BT_HCI_EVT_LE_CS_PROC_ENABLE_COMPLETE,
++			rap_cs_proc_enable_cmplt_evt, sm, NULL);
++	if (!id)
++		goto fail;
++
++	queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
++
++	id = bt_hci_register_subevent(hci,
++			BT_HCI_EVT_LE_CS_SUBEVENT_RESULT,
++			rap_cs_subevt_result_evt, sm, NULL);
++	if (!id)
++		goto fail;
++
++	queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
++
++	id = bt_hci_register_subevent(hci,
++			BT_HCI_EVT_LE_CS_SUBEVENT_RESULT_CONTINUE,
++			rap_cs_subevt_result_cont_evt, sm, NULL);
++	if (!id)
++		goto fail;
++
++	queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
+ 
+ 	DBG("CS options: role=%u, cs_sync_ant_sel=%u, max_tx_power=%d",
+ 		role, cs_sync_ant_sel, max_tx_power);
+ 
+ 	return sm;
++
++fail:
++	error("Failed to register hci le meta subevents");
++	queue_foreach(sm->event_ids, unregister_event_id, hci);
++	queue_destroy(sm->event_ids, NULL);
++	free(sm);
++	return NULL;
+ }
+ 
+ bool bt_rap_set_conn_handle(void *hci_sm, struct bt_rap *rap, uint16_t handle,
+@@ -1204,8 +1150,11 @@ void bt_rap_detach_hci(struct bt_rap *rap, void *hci_sm)
+ 	/* Cleanup the per-instance state machine */
+ 	if (sm) {
+ 		/* Unregister HCI events */
+-		if (sm->event_id && sm->hci)
+-			bt_hci_unregister(sm->hci, sm->event_id);
++		if (sm->hci)
++			queue_foreach(sm->event_ids, unregister_event_id,
++								sm->hci);
++
++		queue_destroy(sm->event_ids, NULL);
+ 
+ 		/* Clean up per-instance connection mappings */
+ 		remove_rap_mappings(sm);
 -- 
 2.53.0
 
