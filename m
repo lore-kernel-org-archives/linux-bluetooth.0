@@ -1,315 +1,120 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90DE1632DD
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 16:32:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777566768; cv=none; b=eHyc9Tp57YIpmpbWMfckTWRdgMF2FxuQeF9cqpg3lHY+gzHEKnWNdgk6/G3SqCGj2tIwclt8yqEbvxuJmlaGii67hrHxCTNBLdWd2ZVfg7O8tl67rkmEnXIAfB1VtI0RorF/kq0vUqvEkTrJ2Vo49QYIz8/fS11fUICokB+Jga4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777566768; c=relaxed/simple;
-	bh=Qr5a90ezAl1KJS9kkrOeZW1NCQSAciCm46MSAPQoagU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NtXSypp9kiDyqAXCBspg018bU/R6rHcMSpBdiuvyQQvBaAunOT8NWUrTjp1hDxOfqgB5+2QWPaQ2ZEc1WG3d0FsFm2U9V50qvieTudm+uD4q5ChVMgDNq9BvssiIp4isWlazk+5otVT/VYSpXGE9Ljxi4beEMLFmngHdM6/2h/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KHEPMIvI; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D2C331209
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 16:47:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777567671; cv=pass; b=CDKKlqB/a2Z8wx/d2mPwNUJGZkyEdCj+HaiNGtUYqcknr+rifD8G1gpBDGyoUqhmzxXTlE3d/K7HhUOpO1Q4iU+RpB7t6DKuqNDszycqcZ1N3RD0jyLWG7+Ft0AuI1Jz+wcdDfKBk17jDMEGoIQax1/Tou7A/NaQEjr0tYOYikM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777567671; c=relaxed/simple;
+	bh=s3Q1zrVX/VDLpIIL3aJ8TT2PIigww+xEiCWav7Oc06s=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=pZM+sAF7YPW+gwsKpkg7AWP7vW30x3hGkN7NXXX7BSY2zpCoNOVkD9KVUr6rZh2N2QJvxtwgAHeok/NBfcEiquskuKLZxC1WZgTIdHK8GKW9wnW5oHqwx1AoTh9w1yqDuecxb99jGT4OCsdTYYI0/1StvO4KYOWjOJfLaL+qE7M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Bz7WoQgz; arc=pass smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KHEPMIvI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777566765; x=1809102765;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Qr5a90ezAl1KJS9kkrOeZW1NCQSAciCm46MSAPQoagU=;
-  b=KHEPMIvItzf2M+sMEliVylEpVZOuWyacV2vjnUZZ1lKgIY1CZZ04OXe3
-   KPFyh2OIGQl1Z7jidU95l9paPqF0gf5MsY4PDp3AGnee++tvYYT2hbjjY
-   tNU6rpXl3nb4/9LQ5GfBmQel7gC9mIPLRmBrIMQMs6/Bl0e67OL1fMYAS
-   J6aFFM3pedARHOEq1tTpDGYrmCJjfaynNtbwljhwRHiUdRIkt9i1Xfg/A
-   v3i7c7Uge61hmkkzO99MdkkiGo5prz8UC3alPojRRl97PXAZMqctqtneb
-   uk3sG5+6/icY49BiiJ0SY7KfUTq05Zn8r1wx6MjpJ0Mf4O5hGuZbzDUsA
-   w==;
-X-CSE-ConnectionGUID: dbBJD7wTRLKwxwlOhpvRjg==
-X-CSE-MsgGUID: 6ZhXXnUYTr+to8TzNnwxdA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11772"; a="78394137"
-X-IronPort-AV: E=Sophos;i="6.23,208,1770624000"; 
-   d="scan'208";a="78394137"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2026 09:32:45 -0700
-X-CSE-ConnectionGUID: sL97Ag/CTUy78J5+f/NOog==
-X-CSE-MsgGUID: gwSWpfXcSS6xmHBPuDfmuw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,208,1770624000"; 
-   d="scan'208";a="228135795"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa009.fm.intel.com with ESMTP; 30 Apr 2026 09:32:43 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	ravindra@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1] bluetooth: btintel: Add Bluetooth SAR revision 2 support
-Date: Thu, 30 Apr 2026 22:21:23 +0530
-Message-ID: <20260430165123.1070214-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Bz7WoQgz"
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-67148a70f8aso117a12.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 09:47:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777567669; cv=none;
+        d=google.com; s=arc-20240605;
+        b=QFa9ychoXtGS+W7Y2HaVAlG1aB38RGev0U4oekNKBMR1l1Y1+6kYs5lh47vY9SCxuU
+         6ys1rag7ow9m0G3cwH3rinoV3MXVTGN/l8Mjdr7YSg/BS4gtKbtT1XGltA9gcxz/O12F
+         jGG49Q7/Ov34er/56WuxnEf6Uco3uz3yFkWV6FBwQ/DPm+72SRF8MAOCMXUkIddjYQCW
+         g/F/DgAgdT9f0qRjB48oSqj59WOfMg0xSnIT6XGHQKmOZ7pLnptmlhe+KsiFLkHAJiQ1
+         kU0STsHkBePIOU1FIc/0v9XxegZTux7qpbexukU/TvpShlmnRHCXqe0LVtXgORyefXTH
+         71KA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=35BOGIcH1p4dwQ5HuRv3TZ7eqiagtXX5VFCur+zr67U=;
+        fh=1ampE+hIyWOJbAn1KY/FHa8bZtpDD3aN0t4l+yyhSYM=;
+        b=hHnPethrrDWNvywMJTXpRcp1PEvSQMRVKw6sqFNkUSdpKgNnhthadnpgtnztFVg9t6
+         1VQfhj7DTUwPWPbDUpSMyHQiroLWxhTrWN1D80kvh0dn4i+Pns+YTdfYayAyskbqTvo0
+         duchQd/f1Y5V7I5Ve+ReYU9rdRJOKI60W1gVUhhajybeovDrkGhQu3M8dct4MXwdcpfB
+         FIalkgxGralxbCsLUl4yzLhvr1Y8+6WYB5+TI+lMNQ8uSovRr3Go0Mqj8sN8fJeoDKHs
+         dICnY4f5S2R09m7YOrq5n34aPhGtp2bHNhkUW26ULDao7pZreQ9nmcC7szas9eJUW17B
+         0N/A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777567669; x=1778172469; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=35BOGIcH1p4dwQ5HuRv3TZ7eqiagtXX5VFCur+zr67U=;
+        b=Bz7WoQgzDd+nfWMklgOLBjaChHrou7f8kejh2HF1GUTZZOqQnhfro6oRPb34+QcALk
+         Hi5kMoA/74+sDdm1OpY21gUhlE32cL7wN2fW4nP4H7S/SsIQAGFR17USFgib2oqy/+UI
+         1owckaM2LHZZ5n6Qf23z7yEIX0YtiXCAmw2VYt+1tG8z+7t7gib23vJ5jkPk1DnncdWy
+         cGn471zA2h0IW15horCWO3Gutq8yaURrim3D2AedDBMMGbJmWJnRABg8OpbxtSR7O5NH
+         XW1MKl7omJSoQqnFhzDZY3pSzCX4saKqXoqmh9152CXR3BipjVgI0iA8KKSEepTUdz7w
+         kp7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777567669; x=1778172469;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=35BOGIcH1p4dwQ5HuRv3TZ7eqiagtXX5VFCur+zr67U=;
+        b=YeGP0fKyQdqJZYhLWAVCROK5m8KPQMtz9oLSw7q5NGtMQgC5FRkVCFxwJPLsax6G4+
+         eXvaQNkIUa79zwWlerim23YPYtCzYdd2uNg6EgEAriPUEkb6gWUglSdD6re29g93Q3ny
+         qYvonUfGQAZLot8HyaZIhX1V4gB/wGmOR/+8vuI+ggSYMVTvYNhQZ6kpjb4M4+bsGd4w
+         gCizpx5LmtV+bavYeUB8S2SJNXwowyv6oEqlW5bf431pb9+wrFZ5OflzqWH5P25ytdMP
+         UQW96IcFUEJCuBmIhWVHfoKkifKWj+iZAY48Mh5MVN3sVLkNHrQgXMaXs7xyWkocExEa
+         haRg==
+X-Forwarded-Encrypted: i=1; AFNElJ8NFPjD7tzs+Vrm1v12WchY2cZ8ydDE/fyRsBO3NHjcEvPCddsCSki2DuGn6P1eUdn0eyJKNMkpB4YTwH6n+2I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yygmrt12Iev42LlK/chwfIYk+nIVGjAiW64ER0zlbmHFnXdMDmZ
+	Jc+a6KRtGby5dml5ExhMhQ37wFOZxGj0p7rqFnmMokYfKdhk/+xe6NOxF3aeOZg4lYPU3s9HfRA
+	ieA1TpzUGlxbVe9Nl8jz3A2/Y82p4f6JQHu7wGmlh
+X-Gm-Gg: AeBDiesfKSLB6Yas+jPckV1BFKNSUhLHL/rIUN5p/F0+P8FClL/RrNkTL29yH+qcPqp
+	0H7Zksfv9jvpL1t+7odE/yUYSpERiKr0RPbLp7oP5iVcCyXKDn7Az5SUjaV7qkaplHd632nK/sc
+	oyMvVBojt9HSlHr3o7wOj56HQEQkdJFAlzpKNXGB8Yy9o18VqsHRfz3xQvIHmRdT8qO+nySSuiH
+	rzxuSEHgRcjgN3yDoUDOPjlWF991Ig2WkSI8H7iwLTeNzE/av86dgSvnxAkjk8QdaYD7dpvZeSG
+	p7J9pFAfaeEdQDWV4Lc+Sl671gBPUsOXLYfktDrf7nc0tSZgy1ipk/EPBg==
+X-Received: by 2002:aa7:ca4c:0:b0:670:d5f0:2595 with SMTP id
+ 4fb4d7f45d1cf-67b8f250163mr2117a12.11.1777567668262; Thu, 30 Apr 2026
+ 09:47:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Jann Horn <jannh@google.com>
+Date: Thu, 30 Apr 2026 18:47:12 +0200
+X-Gm-Features: AVHnY4JtB2QrcIoj5b2LdRvNFl6PvvqV-cmLqetEfIthcxa1hOmyqbxeD9zj4A8
+Message-ID: <CAG48ez2=SSQfGUXTPs9jQw_2Tw0JdzRHcLDdCgC7wTGkK0GOTA@mail.gmail.com>
+Subject: [BUG?] bluetooth LE ISO sockets never get freed because of SOCK_DEAD confusion?
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org
+Cc: kernel list <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-BRDS revision 2 introduces per-chain (Chain A and Chain B) TX power
-limits across five sub-bands (2.4G, 5.2G, 5.8/5.9G, 6G-low, 6G-high),
-replacing the single-chain per-modulation model of revisions 0 and 1.
+I can't figure out how to release a bluetooth LE ISO socket such that
+it gets freed.
 
-- Add btintel_set_sar_rev2() which sends the full Rev2 DDC sequence:
-    0x019e  inc-power-mode enable flag        (1 byte)
-    0x0311  2.4 GHz sub-band limits           (2 bytes)
-    0x0312  5.2 GHz sub-band limits           (2 bytes)
-    0x0313  5.8/5.9 GHz sub-band limits       (2 bytes)
-    0x0314  5.8/5.9 GHz sub-band limits again (2 bytes, duplicate FW reg)
-    0x0315  6 GHz low sub-band limits         (2 bytes)
-    0x0316  6 GHz high sub-band limits        (2 bytes)
-  followed by the SAR-init-complete command (0xfe25).
+ISO sockets are placed on the iso_sk_list, which holds references to
+its entries. The only place in which an ISO socket can be removed from
+this list is iso_sock_kill(), which calls bt_sock_unlink(&iso_sk_list,
+sk).
 
-Signed-off-by: Ravindra <ravindra@intel.com>
-Signed-off-by: Kiran K <kiran.k@intel.com>
----
- drivers/bluetooth/btintel.c | 154 +++++++++++++++++++++++++++++++++++-
- drivers/bluetooth/btintel.h |  18 +++++
- 2 files changed, 171 insertions(+), 1 deletion(-)
+But iso_sock_kill() bails out immediately if either sk->sk_socket is
+still set, or SOCK_DEAD is set. This means that if anything other than
+iso_sock_kill() sets SOCK_DEAD, the socket can never be freed.
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 5e9cac090bd8..97d897623c94 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -51,6 +51,7 @@ enum {
- #define BTINTEL_BT_DOMAIN		0x12
- #define BTINTEL_SAR_LEGACY		0
- #define BTINTEL_SAR_INC_PWR		1
-+#define BTINTEL_SAR_REV2		2
- #define BTINTEL_SAR_INC_PWR_SUPPORTED	0
- 
- #define CMD_WRITE_BOOT_PARAMS	0xfc0e
-@@ -3104,6 +3105,111 @@ static int btintel_set_mutual_sar(struct hci_dev *hdev, struct btintel_sar_inc_p
- 	return 0;
- }
- 
-+/* btintel_send_sar_rev2_band - send DDC command for one Rev2 sub-band
-+ *
-+ * Each DDC 0x0311-0x0316 carries 2 bytes: [ChainA_value, ChainB_value].
-+ * cmd->len = 4  (2 id + 2 data)
-+ * HCI total  = 5 bytes (1 len + 4)
-+ */
-+static int btintel_send_sar_rev2_band(struct hci_dev *hdev,
-+				      struct btintel_cp_ddc_write *cmd,
-+				      u16 id, u8 chain_a, u8 chain_b)
-+{
-+	cmd->len = 4;
-+	cmd->id = cpu_to_le16(id);
-+	cmd->data[0] = chain_a;
-+	cmd->data[1] = chain_b;
-+	return btintel_send_sar_ddc(hdev, cmd, 5);
-+}
-+
-+static int btintel_set_sar_rev2(struct hci_dev *hdev,
-+				struct btintel_sar_rev2 *sar)
-+{
-+	struct btintel_cp_ddc_write *cmd;
-+	struct sk_buff *skb;
-+	u8 buffer[64];
-+	bool enable;
-+	int ret;
-+
-+	cmd = (void *)buffer;
-+
-+	/* DDC 0x019e: enable/disable increased power mode SAR (1 byte) */
-+	cmd->len = 3;
-+	cmd->id = cpu_to_le16(0x019e);
-+	cmd->data[0] = (sar->inc_power_mode == BTINTEL_SAR_INC_PWR_SUPPORTED) ?
-+			0x01 : 0x00;
-+	ret = btintel_send_sar_ddc(hdev, cmd, 4);
-+	if (ret)
-+		return ret;
-+
-+	/* DDC 0x0311-0x0316: per sub-band ChainA + ChainB limits */
-+	ret = btintel_send_sar_rev2_band(hdev, cmd, 0x0311,
-+					 sar->chain_a.subband_2g4,
-+					 sar->chain_b.subband_2g4);
-+	if (ret)
-+		return ret;
-+
-+	ret = btintel_send_sar_rev2_band(hdev, cmd, 0x0312,
-+					 sar->chain_a.subband_5g2,
-+					 sar->chain_b.subband_5g2);
-+	if (ret)
-+		return ret;
-+
-+	/* 0x0313 and 0x0314 both carry the 5G8/5G9 value */
-+	ret = btintel_send_sar_rev2_band(hdev, cmd, 0x0313,
-+					 sar->chain_a.subband_5g8_5g9,
-+					 sar->chain_b.subband_5g8_5g9);
-+	if (ret)
-+		return ret;
-+
-+	ret = btintel_send_sar_rev2_band(hdev, cmd, 0x0314,
-+					 sar->chain_a.subband_5g8_5g9,
-+					 sar->chain_b.subband_5g8_5g9);
-+	if (ret)
-+		return ret;
-+
-+	ret = btintel_send_sar_rev2_band(hdev, cmd, 0x0315,
-+					 sar->chain_a.subband_6g1,
-+					 sar->chain_b.subband_6g1);
-+	if (ret)
-+		return ret;
-+
-+	ret = btintel_send_sar_rev2_band(hdev, cmd, 0x0316,
-+					 sar->chain_a.subband_6g3,
-+					 sar->chain_b.subband_6g3);
-+	if (ret)
-+		return ret;
-+
-+	/* Notify firmware that SAR initialisation is complete */
-+	enable = true;
-+	skb = __hci_cmd_sync(hdev, 0xfe25, 1, &enable, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_warn(hdev, "Failed to send Intel SAR Rev2 Enable (%ld)",
-+			    PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+
-+	kfree_skb(skb);
-+	return 0;
-+}
-+
-+static int btintel_sar_rev2_send_to_device(struct hci_dev *hdev,
-+					   struct btintel_sar_rev2 *sar,
-+					   struct intel_version_tlv *ver)
-+{
-+	u16 cnvi = ver->cnvi_top & 0xfff;
-+	u16 cnvr = ver->cnvr_top & 0xfff;
-+
-+	if (cnvi < BTINTEL_CNVI_BLAZARI || cnvr != BTINTEL_CNVR_WHP2) {
-+		bt_dev_dbg(hdev, "BT SAR Rev2 not supported on this platform (cnvi=0x%x cnvr=0x%x)",
-+			   cnvi, cnvr);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	bt_dev_info(hdev, "Applying Bluetooth SAR Rev2");
-+	return btintel_set_sar_rev2(hdev, sar);
-+}
-+
- static int btintel_sar_send_to_device(struct hci_dev *hdev, struct btintel_sar_inc_pwr *sar,
- 				      struct intel_version_tlv *ver)
- {
-@@ -3130,6 +3236,7 @@ static int btintel_acpi_set_sar(struct hci_dev *hdev, struct intel_version_tlv *
- {
- 	union acpi_object *bt_pkg, *buffer = NULL;
- 	struct btintel_sar_inc_pwr sar;
-+	struct btintel_sar_rev2 sar_rev2;
- 	acpi_status status;
- 	u8 revision;
- 	int ret;
-@@ -3150,14 +3257,59 @@ static int btintel_acpi_set_sar(struct hci_dev *hdev, struct intel_version_tlv *
- 		goto error;
- 	}
- 
-+	if (buffer->package.elements[0].type != ACPI_TYPE_INTEGER) {
-+		bt_dev_warn(hdev, "BT_SAR: unexpected ACPI type for revision field");
-+		ret = -EINVAL;
-+		goto error;
-+	}
-+
- 	revision = buffer->package.elements[0].integer.value;
- 
--	if (revision > BTINTEL_SAR_INC_PWR) {
-+	if (revision > BTINTEL_SAR_REV2) {
- 		bt_dev_dbg(hdev, "BT_SAR: revision: 0x%2.2x not supported", revision);
- 		ret = -EOPNOTSUPP;
- 		goto error;
- 	}
- 
-+	if (revision == BTINTEL_SAR_REV2 && bt_pkg->package.count == 13) {
-+		memset(&sar_rev2, 0, sizeof(sar_rev2));
-+		sar_rev2.revision       = revision;
-+		sar_rev2.bt_sar_bios    = bt_pkg->package.elements[1].integer.value;
-+		sar_rev2.inc_power_mode = bt_pkg->package.elements[2].integer.value;
-+
-+		sar_rev2.chain_a.subband_2g4     = bt_pkg->package.elements[3].integer.value;
-+		sar_rev2.chain_a.subband_5g2     = bt_pkg->package.elements[4].integer.value;
-+		sar_rev2.chain_a.subband_5g8_5g9 = bt_pkg->package.elements[5].integer.value;
-+		sar_rev2.chain_a.subband_6g1     = bt_pkg->package.elements[6].integer.value;
-+		sar_rev2.chain_a.subband_6g3     = bt_pkg->package.elements[7].integer.value;
-+
-+		sar_rev2.chain_b.subband_2g4     = bt_pkg->package.elements[8].integer.value;
-+		sar_rev2.chain_b.subband_5g2     = bt_pkg->package.elements[9].integer.value;
-+		sar_rev2.chain_b.subband_5g8_5g9 = bt_pkg->package.elements[10].integer.value;
-+		sar_rev2.chain_b.subband_6g1     = bt_pkg->package.elements[11].integer.value;
-+		sar_rev2.chain_b.subband_6g3     = bt_pkg->package.elements[12].integer.value;
-+
-+		bt_dev_dbg(hdev, "BT SAR Rev2: revision=%u bt_sar_bios=%u inc_power_mode=%u",
-+			    sar_rev2.revision, sar_rev2.bt_sar_bios, sar_rev2.inc_power_mode);
-+		bt_dev_dbg(hdev, "BT SAR Rev2 Chain A: 2g4=%u 5g2=%u 5g8_5g9=%u 6g1=%u 6g3=%u",
-+			    sar_rev2.chain_a.subband_2g4, sar_rev2.chain_a.subband_5g2,
-+			    sar_rev2.chain_a.subband_5g8_5g9, sar_rev2.chain_a.subband_6g1,
-+			    sar_rev2.chain_a.subband_6g3);
-+		bt_dev_dbg(hdev, "BT SAR Rev2 Chain B: 2g4=%u 5g2=%u 5g8_5g9=%u 6g1=%u 6g3=%u",
-+			    sar_rev2.chain_b.subband_2g4, sar_rev2.chain_b.subband_5g2,
-+			    sar_rev2.chain_b.subband_5g8_5g9, sar_rev2.chain_b.subband_6g1,
-+			    sar_rev2.chain_b.subband_6g3);
-+
-+		if (sar_rev2.bt_sar_bios != 1) {
-+			bt_dev_info(hdev, "Bluetooth SAR Rev2 is not enabled");
-+			ret = -EOPNOTSUPP;
-+			goto error;
-+		}
-+
-+		ret = btintel_sar_rev2_send_to_device(hdev, &sar_rev2, ver);
-+		goto error;
-+	}
-+
- 	memset(&sar, 0, sizeof(sar));
- 
- 	if (revision == BTINTEL_SAR_LEGACY && bt_pkg->package.count == 8) {
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 70d812ad36a2..3b5a228ca3c0 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -64,6 +64,7 @@ struct intel_tlv {
- 
- /* CNVR */
- #define BTINTEL_CNVR_FMP2		0x910
-+#define BTINTEL_CNVR_WHP2		0xA10	/* Whale Peak2 - Panther Lake */
- 
- #define BTINTEL_IMG_BOOTLOADER		0x01	/* Bootloader image */
- #define BTINTEL_IMG_IML			0x02	/* Intermediate image */
-@@ -202,6 +203,23 @@ struct btintel_sar_inc_pwr {
- 	u8	le_lr;
- };
- 
-+/* Bluetooth SAR feature (BRDS), Revision 2 - per-chain sub-band power limits */
-+struct btintel_sar_band_limits {
-+	u8	subband_2g4;
-+	u8	subband_5g2;
-+	u8	subband_5g8_5g9;
-+	u8	subband_6g1;
-+	u8	subband_6g3;
-+};
-+
-+struct btintel_sar_rev2 {
-+	u8	revision;
-+	u32	bt_sar_bios;    /* 1: BIOS-managed SAR enabled */
-+	u32	inc_power_mode; /* 0: supported, 1: disabled */
-+	struct btintel_sar_band_limits chain_a;
-+	struct btintel_sar_band_limits chain_b;
-+};
-+
- #define INTEL_HW_PLATFORM(cnvx_bt)	((u8)(((cnvx_bt) & 0x0000ff00) >> 8))
- #define INTEL_HW_VARIANT(cnvx_bt)	((u8)(((cnvx_bt) & 0x003f0000) >> 16))
- #define INTEL_CNVX_TOP_TYPE(cnvx_top)	((cnvx_top) & 0x00000fff)
--- 
-2.53.0
+When I call close() on an ISO socket returned by accept(), the
+behavior I observe is:
 
+sock_close
+  __sock_release
+    iso_sock_release
+      iso_sock_close
+        iso_sock_kill
+          [bails out because sk->sk_socket is still non-NULL]
+      sock_orphan
+        sk_set_flag(sk, SOCK_DEAD)
+        sk_set_socket(sk, NULL)
+      iso_sock_kill
+        [bails out because SOCK_DEAD is now set]
+
+Am I missing something, or can ISO sockets (once they have been
+accepted) never be freed?
