@@ -1,84 +1,123 @@
-Received: from out-40.smtp.github.com (out-40.smtp.github.com [192.30.252.139])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49EA39F160
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 09:25:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4183A5E81;
+	Thu, 30 Apr 2026 09:44:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777541119; cv=none; b=Sr1rZh8X+gTBYLM/ZbSsKmWyh1WJMGl+it4vV6uyO/x4ErEbN/8b3sCJqFUXVwBqVAI1Q+P14Crwj6QSmDxHWqht7cWpZqQdbik8TPC8D6baMSZiiH4Pz1qkZxEnMaJ45917uGwl57HNPLN3p6qPL5FB5DKO59aoz5yQojXPLV4=
+	t=1777542241; cv=none; b=CQQJNRzQ9svU4Dvm5jbkyuZAFwrbzfsNVU/fSMzYc9oYukMcXb/lusnz5RcxDM6ymPK5EQtNQXNr5YltnJPN3rp0E/R6ZUmhHq185q8W3Nee5vzUYpVmN9I5EqIsXbVh0LbjmuhWXtapMdt8C7aTsXCuOoCoJXnsjIdE6umtmH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777541119; c=relaxed/simple;
-	bh=P7rmCP/K5oH+wtXgvgvAfPWnE6g7rD7JeHPZe6sMNUQ=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=LWPq5zLsHZXcmw8L/Hg4LyGon7OvXF541Dmvv6TmguN+uBwgAEWKtumycwJS0LmAuuXNIDYQH05k5qepfTjyJJmxsq0x0T2kodXBCLlXRu3+Y2J2akjT+lN4XT8GAtYg3YdFB49swxXA2zF7anSu8R4PnR5/N3MZDyXF0m57iBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=jY1RVtn7; arc=none smtp.client-ip=192.30.252.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1777542241; c=relaxed/simple;
+	bh=pjD4a8rJ5wy6WIWFMXc/dMRwPE2lWwOkl+wfhS2cIxg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A6jLjC0mAFIS8/tGx5TlxlOnPGlb7yNv15qXboiAs9kMiuBWR5Lm1gZ4ohD1mAh52Es+k8/ZknJ42TECzDMrEphGTOrC6okF6qmbCYfGTJcoNBMpHKjCKr6XPehmyAoPEi795qjCFxE/je4A57IAZycbXgTVbqLpTfSFZpXE5yE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bplODJU/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="jY1RVtn7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1777541117;
-	bh=NaB18qi76YtEesTz8RXRMx5OCvlRUTbwVj2IehED6N4=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=jY1RVtn7yUXu9JHEDK+Tg+exznNSoFsNGky1qeZ5FY8w0sggKv04+YTy1n7ubyKt/
-	 Hl1+06/Qud0yJXH7amTZudp+3Pxz7Ee7+7R9L/MaDoKUnsxXtQhd7fpSyXkks7FcQy
-	 CERq2DyJFUWywWZk1ZPZIcNIhvLOWCj+BNffPY90=
-Received: from github.com (hubbernetes-node-cc0fef9.ash1-iad.github.net [10.56.202.55])
-	by smtp.github.com (Postfix) with ESMTPA id 0F424921B1E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 02:25:17 -0700 (PDT)
-Date: Thu, 30 Apr 2026 02:25:17 -0700
-From: prathibhamadugonde <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1087948/000000-293b36@github.com>
-Subject: [bluez/bluez] 7e38e0: src/shared: Add RAS packet format and
- notification...
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bplODJU/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92F83C2BCB3;
+	Thu, 30 Apr 2026 09:44:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777542241;
+	bh=pjD4a8rJ5wy6WIWFMXc/dMRwPE2lWwOkl+wfhS2cIxg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bplODJU/7ooHDNPIO3jofxmXUudXii8FNNlM4cLlKsg2xa1rzkJtzGIaCQEE5PtlT
+	 k2X2s+mFd8BHQrw+yditg9/oAb2mOFnydZHwRjIeFD0D5um8JnTMBeGiyY0lIqzu8A
+	 1dkEpe7x9CySs76qPyfav4wXZJZ33CEYe0VOX2WxMb4kdeR5izyJ4N7QuOfKzD+DYH
+	 OdTB2zDSzpq/JKsvbnZADUyziLCEVZsv4jiGSpL+Rn0Cub486PPITbtdu63OuNPubA
+	 cOL0/bXqyVZSeTcBqQGrpC11wIezKJWt6LrGGRX7T3O57Xmkl/hs+yrorqRVZFkcrf
+	 jmBwyEe1LL1xQ==
+Date: Thu, 30 Apr 2026 11:43:58 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
+	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	daniel@makrotopia.org
+Subject: Re: [PATCH 2/9] arm64: dts: qcom: arduino-imola: Describe boot1
+ NVMEM layout
+Message-ID: <20260430-famous-meek-dinosaur-edacc6@quoll>
+References: <20260428-block-as-nvmem-v1-0-6ad23e75190a@oss.qualcomm.com>
+ <20260428-block-as-nvmem-v1-2-6ad23e75190a@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260428-block-as-nvmem-v1-2-6ad23e75190a@oss.qualcomm.com>
 
-  Branch: refs/heads/1087948
-  Home:   https://github.com/bluez/bluez
-  Commit: 7e38e07ffd061e1b3756bdce628e3b3360f1d551
-      https://github.com/bluez/bluez/commit/7e38e07ffd061e1b3756bdce628e3b3360f1d551
-  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-  Date:   2026-04-30 (Thu, 30 Apr 2026)
+On Tue, Apr 28, 2026 at 04:23:07PM +0200, Loic Poulain wrote:
+> On Arduino Uno-Q, the eMMC boot1 partition is factory provisioned
+> with device-specific information such as the WiFi MAC address
+> and the Bluetooth BD address. This partition can serve as an
+> alternative to additional non-volatile memory, such as a
+> dedicated EEPROM.
+> 
+> The eMMC boot partitions are typically good candidates, as they
+> are realively small, read-only by default (and can be enforced
+> as hardware read-only), and are not affected by board reflashing
+> procedures, which generally target the eMMC user or GP partitions.
+> 
+> Describe the corresponding nvmem-layout for the WiFi and
+> Bluetooth addresses.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> ---
+>  arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts | 24 ++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts b/arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts
+> index bf088fa9807f040f0c8f405f9111b01790b09377..dc85cf94f71cac8666cab30ccf37cc2d2f8fd941 100644
+> --- a/arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts
+> +++ b/arch/arm64/boot/dts/qcom/qrb2210-arduino-imola.dts
+> @@ -409,7 +409,31 @@ &sdhc_1 {
+>  	no-sdio;
+>  	no-sd;
+>  
+> +	#address-cells = <1>;
+> +	#size-cells = <0>;
+> +
+>  	status = "okay";
+> +
+> +	card@0 {
+> +		compatible = "mmc-card";
+> +		reg = <0>;
 
-  Changed paths:
-    M src/shared/rap.c
-    M src/shared/rap.h
+> +
+> +		partitions-boot1 {
+> +			nvmem-layout {
 
-  Log Message:
-  -----------
-  src/shared: Add RAS packet format and notification support
+This should not be a separate patch. You add the layout AND you use it.
 
-Implement complete RAS data pipeline:
- - Handle HCI CS subevent result/continuation events
- - Serialize ranging/subevent headers per spec
- - GATT notifications for real-time ranging data
-
-
-  Commit: 293b360d5847a08fe8386972d5e60e9a3e44265d
-      https://github.com/bluez/bluez/commit/293b360d5847a08fe8386972d5e60e9a3e44265d
-  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-  Date:   2026-04-30 (Thu, 30 Apr 2026)
-
-  Changed paths:
-    M profiles/ranging/rap_hci.c
-
-  Log Message:
-  -----------
-  profiles/ranging: Read cs_mode_one_data members
-
-Rearrage reading of cs_mode_one_data struct members as per spec.
-
-
-Compare: https://github.com/bluez/bluez/compare/7e38e07ffd06%5E...293b360d5847
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+> +				compatible = "fixed-layout";
+> +				#address-cells = <1>;
+> +				#size-cells = <1>;
+> +
+> +				wifi_mac_addr: mac-addr@4400 {
+> +					reg = <0x4400 0x6>;
+> +				};
+> +
+> +				bd_addr: bd-addr@5400 {
+> +					reg = <0x5400 0x6>;
+> +				};
+> +			};
+> +		};
+> +	};
+>  };
+>  
+>  &spi5 {
+> 
+> -- 
+> 2.34.1
+> 
