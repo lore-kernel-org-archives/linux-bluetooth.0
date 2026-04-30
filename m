@@ -1,91 +1,90 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4F36FC5
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 07:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39ADB35C185
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 07:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777534916; cv=none; b=M2uWypQmu0bybftaI0DwlOCgKzO9gHN4dRKTJbdZEIu6uPPGNgUQMkRViH1/cawN68s7Z0VONYf/q80JGeRkraLzH8/3W9mGnrnkJ+OsZZkMKpPHPk7hcBf+jiBgemOx+TfVNp5Wfv+i5hUm1Q2+/k3IN01HXQlbQN633T5qj4Y=
+	t=1777534917; cv=none; b=ZVzv+SKaSM7BHX/Mg96tKrt4weFMCPhD0JYwgCj/JFw9ewaYBS07dWvJ78xg+Jc4o7olk00TXQWOCHNLN23LdkM55giNuXJE9kz28M9NJBFz2liZNlhCsvC4jzDcsO6zFFh1xP4QU611g7r4VhQuipkpnVz5wnZUo/OMtJFFJRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777534916; c=relaxed/simple;
-	bh=E+1agnrWg2Yoo9WMfXl+iCilrww8TEwK5OD80W9aidQ=;
+	s=arc-20240116; t=1777534917; c=relaxed/simple;
+	bh=C2MupbCihLMMxdAqiULKdFQISREaqVY6L2PVda6Xn/s=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uDQWXkgO9+LTUNXgcHmf+CO1e7o4hNzKLA0GVJifYxbKRy9+ubyNFqSfk0g4LPTx3KxjZE4DjlSqIMxFiEGbPP+FRG8QqTexZjuVX5SkzYK3+v0XwzRav7Di0ALEdV05HaYUB6II9GXUevEo8JWTc4dy54Z09bPwzrE/Jn4WtGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ZwfQ7Xt/; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=g8NxzOE7; arc=none smtp.client-ip=205.220.180.131
+	 MIME-Version; b=ut8bIuotGzJauVKIm5ruj3peBL0TniVSr5DEyoSG4HiQOHH5Gfcko3ZZSoc5LoP4nKgIkU43WpZjNkYLO1IeGQd+IzGWopTf5H7QFu9p/yVg0XCbgwYZoK4L+grZ7I/aB0r8zEQioQpPTkRK2BnT5q/vPvtPuvMh9zlfr5AHVmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=d8EGQxpI; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=P5u9RIvE; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ZwfQ7Xt/";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="g8NxzOE7"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63U75Jop831278
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 07:41:53 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="d8EGQxpI";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="P5u9RIvE"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63U44iak2099753
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 07:41:55 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	mgBsO6fIWxvkJzNusvG54LcnCvmmiEoH8UjJqtS8wzQ=; b=ZwfQ7Xt/xG5F64HB
-	vcaIlNRMtDl2c8IYiwjcu7m/lH5DzIvdjngXmuqfMrq3kt0hng8wOzBkZAGHDLYG
-	69G1BpylLYB6eU7AZ9JKr/sljquGSl0OpntoSXt4GomWwJZHI8707rPtVcl566hm
-	ClVnGvKMe/mg52+Z0etsJKIeVxzDtBRwOj9ctH3nadjLGYbnE4ekIswsozSJIOw9
-	zkygnv6BiRUtgQgubd0OsMifBvpA6YczTA80wvOD0Atd1sjQrSCnWSDty83zQRoU
-	AbWuEajBHxX0HIKvoR/vPdrxL24QH0TKNfkXN2qN33WYGT46gg4OceoEnsXK2Ip5
-	Ra5UBg==
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dv2cq04a3-1
+	cc:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=qcppdkim1; bh=UrPYU8jpATx
+	6dYibgt5k/bs2swMIqC1AsufUhUTJ12E=; b=d8EGQxpI5JxJXsPdWSZBvng2Zep
+	PFSFDpIy3fXyUagFbHpXmz9GErz8Ejd/PH1gNU3R1yT27uCakQcADut47cXHPT0M
+	pDhheQuLPhXNW/YFB/NXSwxJIk0LN3gAWD2BMUBFxA9RhxdX+VYG/Vjva4VR8OXZ
+	RWl8vGzycCQ7Al2647LmOF1DfzJrFBDLXoePZWOJEMWTWEQOXNvJlA76uf8/LJhd
+	9MBN3sbeODPbimRYis0KdprCSQhy58qJlbtMxm1XQA+yXqS78EdS92bkJ/nHJ+bx
+	ZdLGYhmDO+yj02DhJuR82hrh8+SUb0Cctp5e2pXIT4xh3Hu4lvaRmEUQS7g==
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4duyr40p13-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 07:41:53 +0000 (GMT)
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-36472c6a7d8so1181802a91.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 00:41:53 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 07:41:55 +0000 (GMT)
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-3649e59f0ddso664003a91.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 00:41:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1777534912; x=1778139712; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1777534914; x=1778139714; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mgBsO6fIWxvkJzNusvG54LcnCvmmiEoH8UjJqtS8wzQ=;
-        b=g8NxzOE7ZYaxMJegrt+AdknoHFtV91cEdibGSWfMz1MZ/FlPfqpKHZffpplYr5g3XE
-         SadV7qDWP5TdAVVyFwDYKZSYn2kyKrQvpFb357xbJxxgxhTiZMTugICY5cm1acudjNLO
-         YYjDNRv3uJSCiesvO0gorSCW4r07OyEWEBqVgxppxwk+vIJoBwWbzEKPqi7Eg57gMg7Q
-         cHLWQnHsuMTCFkmuUcW0ILelPj0f4302xgUhM4YD8R9TswWJ5grtSeO/W91VtMR8jNKg
-         H2BrdW2NUYO5asdrdwxznjvERBFq2p6UAi5bycaezoOFwvq6st5rXhg0R9cB/TOvqrbd
-         bX1w==
+        bh=UrPYU8jpATx6dYibgt5k/bs2swMIqC1AsufUhUTJ12E=;
+        b=P5u9RIvExMJey1eH/xfh1JUfwJWQ1MAVYwAsF62ya0bGRzlyPBK/6DHE5mJnsG/3IB
+         yW8kes1LmYqNo+238N1ROLvXDpKT1PRCK9QLDmR8APkuhMbNbEVcAmzeiWWpVRJZOaIk
+         cDI/11WrIF8LGi1OxnGVEPHkVp+3XNieZ34FTSikkE/8NpZ091SfaCQw48Pfz5+EVrEq
+         Mb6b6BBII1nl0PdQQNzy9NjGYMg5U8/cYks3P6JCoSBpW3Pb8+T7oQFtpqkoUCQZDgta
+         mTFeXIyGzI5P9s6jXYCbbYoadN3tjoD0apUxDGuJP/ECcUt11ZAL/OTzqUOAIGUKP9/3
+         3GVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777534912; x=1778139712;
+        d=1e100.net; s=20251104; t=1777534914; x=1778139714;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=mgBsO6fIWxvkJzNusvG54LcnCvmmiEoH8UjJqtS8wzQ=;
-        b=kn/Q7HBgQZg5vBcZn5o+4SNsbNYuTLgUfzLV2mGY+o+WeN2UBNtPwnTY8QYc6rrsAO
-         7Kv9IE1q58JDYgiGx9VUx3xd3qlzn29o6/GV8KxOveGVz1Ob7QCqRS/EI3bTTigXMmUb
-         rg4QU8sTCwd/NvhJHSSffb7QKD3gqi/QnbP2da9OD5rvZajb53+vv4iy9SqMF08ivuIG
-         1I2zcUQ2HLOXGNTHjqTnZWFh2OD2B/Et0K0WBnh/h5lnEVaVyJIwvRXBnWL2qCCGW9Ba
-         KxZnUfkNIWt7+MKGTUBLYoOQw4CFzmJlE1SiURos81zvTD7hRPrwOZqxH37iMUOTl+Y8
-         v6bw==
-X-Gm-Message-State: AOJu0Yw6dBNUZ4JHsz4yTXaRJT4/6GSUfN4XwATcAeEcHD2GWXhQWEAf
-	m3s7oDCAe6rAcODggBkqPMfuF7Hcf5yUN5FdEiLbzp/fceV47OuKGeAsM960xk9dYThQ8+W1kcv
-	2l8J4Nw22H7bhuhY2/UGAlw4qJY49LQTJFVm6XiYonKRr0St6KEDe5kM0cYGeZwrvW8fmBICx8H
-	CxLl8=
-X-Gm-Gg: AeBDiesAJTRnsp/G4Dd9Ezjf+XcVVWodqbvcfWb3gtgbWB6fKFnF4PW2ahfgiEAdOfR
-	bD+ws+9xhdgETVA+b0mz3mN2eBzLeTTcjIq3RsJnk1uQG1ZSFelB5479Q7ceDy9XvqMoxJyvBOl
-	wX0V7KFiXdrJKVAPeVpwiIxfOmSnz9t1Nn7K2qLL+Xc+89Qzo9xhNFkGwGdYipY9k7yJvispqTT
-	RNSaAtqTW1orYQG5cwqqJZIWeVBqv/TPG4/Vcu8gFYqj5t0ondq972Zb/2dqmPUfKKVa6aFAHQ8
-	v94eMLLOUFj7q3wy8V3GAChMi8cxQJOubM/sCnf+SzbFei7teQiPUK7uTquJOkD/8p7h/qKt/2R
-	xY1frkU/xfe+0qNTetllwXVYL9I0cZwf5OjXCw5X66QzajOj0QNVRuQ==
-X-Received: by 2002:a17:90b:5890:b0:35e:5aa5:ae38 with SMTP id 98e67ed59e1d1-364c2f59166mr1905949a91.9.1777534911752;
-        Thu, 30 Apr 2026 00:41:51 -0700 (PDT)
-X-Received: by 2002:a17:90b:5890:b0:35e:5aa5:ae38 with SMTP id 98e67ed59e1d1-364c2f59166mr1905929a91.9.1777534911217;
-        Thu, 30 Apr 2026 00:41:51 -0700 (PDT)
+        bh=UrPYU8jpATx6dYibgt5k/bs2swMIqC1AsufUhUTJ12E=;
+        b=cdMaqZrmErOId5W6Ch1ff0sJhL5NWfRNw5X+2BdZChT7r65ziSn+n4fBtYBbBnx6lO
+         YOUL9FjGDnZmVUEwIXpSRy8b816y8rPS0lBkxExO0ESehvrr/A5MJVScpsM2qzJAtAI8
+         +cN8TaPN/N3qdvfJdLiVLq4R5ug9ntwodYfYGJxwVdU7TNhXS47nLBinmT5a9cdrJjUy
+         RE0T/6WHh3IYNYMPv9MLRe9kzA1Cbb+IvOphceVAD+Umq1KrJLLrve53a2pn2erSGiT3
+         NtmzKyFx7s5Q67cc/ITRVnfOC52IPqaKO5WJX9+GqtDbKUJb5O6W8u5Hb4d4tcFMZ99Q
+         IMmQ==
+X-Gm-Message-State: AOJu0YzuZ2eoYwZ39tkGL1hi+hO97gATlEPfSSv3kq6RaY8z+52pbF8i
+	yiCuuJIVKXOXKyrBc0AS0lhyzpiVL/OXMd2UZh3aYKcLjyMHEWjUsnwvlh6dR6S5W6Eb2RPn55W
+	Eo/Sh0tGD3xUQKiFH36/XCrYwv/wJSLMgT2ktfJVf0+YsViH0mE9imckuERBKWfyy3m+spS8nFh
+	SVKFk=
+X-Gm-Gg: AeBDievJHXilcEkn2ONIVKq5S/T+4/cnsWljHqxWthWikCVduXu0n2KpgopgpnSRBig
+	Nxw4LZPeBhse1I1YXwGASdDRvqzRO8qImvKkXYnAINsHaUse7E311C+ECwBeEky06Cdhsny9Abw
+	BVaS0nxaCLo8DOfuiVJYHJgjeaxVYsuN4vMq7pkA+a/smplnFUhOLgH2H0gXcu/3qI2pewkP8XE
+	8vN3oTSwIA0LainFjuQWymhmQx2HOcHRATvXyImeVduKvcevr/EumUhGT0LnGcdNGMDapzSkN18
+	vpMkbcJz9ooCSEeQLryzmjlPWEN9rk7M6P/ftz7VWN2GP0a17r8VprNsrgqiGw+8nE6KdOBkQOA
+	aqStxkvGwpFVBVJOjQEHsYAdHVkD1T5eNvgQzww19ODkaAeLeV1Jk1w==
+X-Received: by 2002:a17:90b:6cd:b0:35f:b313:84ca with SMTP id 98e67ed59e1d1-364c31a1cffmr1881230a91.27.1777534913983;
+        Thu, 30 Apr 2026 00:41:53 -0700 (PDT)
+X-Received: by 2002:a17:90b:6cd:b0:35f:b313:84ca with SMTP id 98e67ed59e1d1-364c31a1cffmr1881201a91.27.1777534913558;
+        Thu, 30 Apr 2026 00:41:53 -0700 (PDT)
 Received: from hu-prathm-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364bdf54419sm1881432a91.8.2026.04.30.00.41.49
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364bdf54419sm1881432a91.8.2026.04.30.00.41.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2026 00:41:50 -0700 (PDT)
+        Thu, 30 Apr 2026 00:41:53 -0700 (PDT)
 From: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
 X-Google-Original-From: Prathibha Madugonde <prathm@qti.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
         quic_anubhavg@quicinc.com
-Subject: [PATCH BlueZ v7 2/3] unit/test-rap: Add PTS tests for CS reflector
-Date: Thu, 30 Apr 2026 13:11:41 +0530
-Message-Id: <20260430074142.3599484-3-prathm@qti.qualcomm.com>
+Subject: [PATCH BlueZ v7 3/3] profiles/ranging: Read cs_mode_one_data members
+Date: Thu, 30 Apr 2026 13:11:42 +0530
+Message-Id: <20260430074142.3599484-4-prathm@qti.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260430074142.3599484-1-prathm@qti.qualcomm.com>
 References: <20260430074142.3599484-1-prathm@qti.qualcomm.com>
@@ -95,433 +94,77 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: U2JOYSClxfoEQyPsb8Yzk3Yy-U3B1qRX
-X-Authority-Analysis: v=2.4 cv=aYRRWxot c=1 sm=1 tr=0 ts=69f307c1 cx=c_pps
- a=UNFcQwm+pnOIJct1K4W+Mw==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22
- a=EUspDBNiAAAA:8 a=gBUVAHx2Mo5-yXFmoJgA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=uKXjsCUrEbL0IQVhDsJ9:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDMwMDA3MyBTYWx0ZWRfX6dhGHPwmDyyC
- oG8Qw4k5AZuBNWRwhEnlPMBuphTp8qSDOX4+6uFEUlPDn+W2dHhm2kCDexmxOmGDTtun0Hl/CAL
- 8YWRszy1dTKEinjENcc072z8qu6zubyWiKDH6bsBexXbV76zLyMuzEu9kI4o6d8wWnyiLlJ+wAj
- FdN+qKqqc+ZPVyHoNkHdSEtmuBT8Csuw8ohIe0GazqDJMrOHz10psSEKvHcl/PHz3FHSLQZGzah
- j6zh8a8wuzdlm1Q0tzKngXE2laZsh9k306ctwIGh4SehGr+7oyvpIBvNb9SY0CF/5RQ8eVFe6zP
- 4TrU7RSwsA9hAQbP4GolcU595UbbwSBsGfmM4FNWdMD8SyPypRDzUbPgqlzf8c5OzNy8H9JRaQ+
- /YgFOcHymkwf218sFodsx7vkfXOMViDbCdy77EYYU0u4/uggdESVDZTtkEImr6MrATJJYjMRlX2
- dKYtIxXk5BOss3lsufA==
-X-Proofpoint-ORIG-GUID: U2JOYSClxfoEQyPsb8Yzk3Yy-U3B1qRX
+X-Authority-Analysis: v=2.4 cv=bJcm5v+Z c=1 sm=1 tr=0 ts=69f307c3 cx=c_pps
+ a=vVfyC5vLCtgYJKYeQD43oA==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22 a=EUspDBNiAAAA:8
+ a=VE_zAK7Kjm7KZJZHiogA:9 a=rl5im9kqc5Lf4LNbBjHf:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDMwMDA3NCBTYWx0ZWRfX70OfST/2NH55
+ PxbhVJq2R2ag7ulhAiYnNdJe4VTDAZCukmyVoAFdu+JqmTpvmq/R6b4AEmVD5heEwZQC7xaRBod
+ KjH6sHOrciLyle7JK0uyzCuET6SlaK+WNK195k8nQHnoj6snYhDRiPRK5KlHcSS1w+NKH3n5aXP
+ AVHw6zlpSfJ9Nzx/YEyQVmnp3JFOT38I7m4Ji33DO+qQHGsPd055Jmgo/4FHViN1CDBgDejLdkj
+ k+pmw3ueGm3Aen8PKJkfk8P1QY26jUKD8pBJv4hEE5nGarn3AgpGGr4hnjsKw44YigD2sjnkIF8
+ n08Zug5Ml6yHXXc/jaClGiDjrIrHYTXuZba1XTRSRp1VU9Fe7F2pM9gvGBIS0jkfVpQUJL9K7XN
+ vLb5RjB2NsL6ugZVBR+3995nWoZBsDtLW8lL6Vhxcc10EatX0O5O6tZknlKJsafFlgYX+bNc2kQ
+ FDgva0Tvws9YAcINurg==
+X-Proofpoint-GUID: Dni08LlgnduvvWaQuGHvS9S_j7OQK4yG
+X-Proofpoint-ORIG-GUID: Dni08LlgnduvvWaQuGHvS9S_j7OQK4yG
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-04-30_02,2026-04-28_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 malwarescore=0 clxscore=1015 phishscore=0 spamscore=0
- priorityscore=1501 lowpriorityscore=0 suspectscore=0 impostorscore=0
- adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ spamscore=0 bulkscore=0 clxscore=1015 suspectscore=0 adultscore=0
+ lowpriorityscore=0 impostorscore=0 phishscore=0 malwarescore=0
+ priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
- definitions=main-2604300073
+ definitions=main-2604300074
 
 From: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
 
-Added below RAS - Real time Ranging PTS testcases:
-RAS/SR/RCO/BV-01-C [Characteristic Read - RAS Features]
-RAS/SR/RRD/BV-01-C [Real-time Ranging Data]
-RAS/SR/RRD/BV-03-C [Real-time Ranging Data notifications and indications]
-RAS/SR/RRD/BV-05-C [Real-Time Ranging Data disconnection]
-RAS/SR/SPE/BI-11-C [Client enables both Real-time and On-demand]
+Rearrage reading of cs_mode_one_data struct members as per spec.
 ---
- unit/test-rap.c | 325 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 322 insertions(+), 3 deletions(-)
+ profiles/ranging/rap_hci.c | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
 
-diff --git a/unit/test-rap.c b/unit/test-rap.c
-index 884cb1c96..4ca4a715e 100644
---- a/unit/test-rap.c
-+++ b/unit/test-rap.c
-@@ -37,6 +37,7 @@ struct test_data_ras {
- 	size_t iovcnt;
- 	struct iovec *iov;
- 	unsigned int ras_id;
-+	struct bt_rap *rap;  /* Store rap instance for CS injection */
- };
+diff --git a/profiles/ranging/rap_hci.c b/profiles/ranging/rap_hci.c
+index a3d2df608..08ddc077c 100644
+--- a/profiles/ranging/rap_hci.c
++++ b/profiles/ranging/rap_hci.c
+@@ -632,19 +632,22 @@ static void parse_mode_one_data(struct iovec *iov,
+ 	}
  
- struct test_data_rap {
-@@ -68,8 +69,8 @@ struct notify {
- 	do {							\
- 		const struct iovec iov[] = { args };		\
- 		static struct test_data_ras data;			\
--		data.iovcnt = ARRAY_SIZE(iov_data(args));	\
--		data.iov = util_iov_dup(iov, ARRAY_SIZE(iov_data(args))); \
-+		data.iovcnt = ARRAY_SIZE(iov);	\
-+		data.iov = util_iov_dup(iov, ARRAY_SIZE(iov)); \
- 		tester_add(name, &data, NULL, function,	\
- 				test_teardown_ras);			\
- 	} while (0)
-@@ -155,6 +156,94 @@ static void gatt_notify_cb(struct gatt_db_attribute *attrib,
- 		printf("%s: Failed to send notification\n", __func__);
- }
+ 	DBG("CS Step mode 1");
+-	util_iov_pull_u8(iov, &mode_data->packet_quality);
+-	util_iov_pull_u8(iov, &mode_data->packet_rssi_dbm);
+-	util_iov_pull_u8(iov, &mode_data->packet_ant);
+-	util_iov_pull_u8(iov, &mode_data->packet_nadm);
+-
+-	if (iov->iov_len >= 2) {
+-		util_iov_pull_le16(iov, &time_val);
+-		if (cs_role == CS_REFLECTOR)
+-			mode_data->tod_toa_refl = time_val;
+-		else
+-			mode_data->toa_tod_init = time_val;
++	/* Parse fixed fields in specification order */
++	if (!util_iov_pull_u8(iov, &mode_data->packet_quality) ||
++		!util_iov_pull_u8(iov, &mode_data->packet_nadm) ||
++		!util_iov_pull_u8(iov, &mode_data->packet_rssi_dbm) ||
++		!util_iov_pull_le16(iov, &time_val) ||
++		!util_iov_pull_u8(iov, &mode_data->packet_ant)) {
++		DBG("Mode 1: failed to parse basic fields");
++		memset(mode_data, 0, sizeof(*mode_data));
++		return;
+ 	}
  
-+static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
-+					unsigned int id, uint16_t offset,
-+					const uint8_t *value, size_t len,
-+					uint8_t opcode, struct bt_att *att,
-+					void *user_data)
-+{
-+	struct test_data_ras *data = user_data;
-+	struct ccc_state *ccc;
-+	uint16_t handle;
-+	uint16_t ccc_value;
-+	uint8_t ecode = 0;
++	if (cs_role == CS_REFLECTOR)
++		mode_data->tod_toa_refl = time_val;
++	else
++		mode_data->toa_tod_init = time_val;
 +
-+	handle = gatt_db_attribute_get_handle(attrib);
-+
-+	if (offset) {
-+		ecode = BT_ATT_ERROR_INVALID_OFFSET;
-+		goto done;
-+	}
-+
-+	if (len != 2) {
-+		ecode = BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
-+		goto done;
-+	}
-+
-+	ccc_value = get_le16(value);
-+
-+	ccc = get_ccc_state(data, handle);
-+	if (!ccc) {
-+		ecode = BT_ATT_ERROR_UNLIKELY;
-+		goto done;
-+	}
-+
-+	ccc->value = ccc_value;
-+
-+	/* Send write response first */
-+	gatt_db_attribute_write_result(attrib, id, 0);
-+
-+	/* If notifications/indications enabled on Real-time Ranging Data CCCD,
-+	 * inject fake HCI CS subevent data to trigger notifications
-+	 */
-+	if (handle == 0x0006 && ccc_value != 0x0000 && data->rap) {
-+		size_t event_size = sizeof(struct rap_ev_cs_subevent_result) +
-+				    sizeof(struct cs_step_data);
-+		struct rap_ev_cs_subevent_result *fake_event;
-+		struct cs_mode_zero_data *mode_zero;
-+
-+		if (tester_use_debug())
-+			tester_debug("Injecting fake CS data...");
-+
-+		fake_event = g_malloc0(event_size);
-+		if (!fake_event)
-+			return;  /* Already sent write response */
-+
-+		/* Fill in the header fields */
-+		fake_event->conn_hdl = 0x0001;
-+		fake_event->config_id = 0x01;
-+		fake_event->start_acl_conn_evt_counter = 0x0000;
-+		fake_event->proc_counter = 0x0001;
-+		fake_event->freq_comp = 0x0000;
-+		fake_event->ref_pwr_lvl = 0x00;
-+		fake_event->proc_done_status = 0x00;
-+		fake_event->subevt_done_status = 0x00;
-+		fake_event->abort_reason = 0x00;
-+		fake_event->num_ant_paths = 0x01;
-+		fake_event->num_steps_reported = 0x01;
-+
-+		fake_event->step_data[0].step_mode = CS_MODE_ZERO;
-+		fake_event->step_data[0].step_chnl = 0x00;
-+		/* Mode 0: 1+1+1+4 bytes */
-+		fake_event->step_data[0].step_data_length = 4;
-+mode_zero = &fake_event->step_data[0].step_mode_data.mode_zero_data;
-+		mode_zero->packet_quality = 0x01;
-+		mode_zero->packet_rssi_dbm = 0x02;
-+		mode_zero->packet_ant = 0x03;
-+		mode_zero->init_measured_freq_offset = 0x04;
-+
-+		/* Inject the fake event to trigger notification */
-+		bt_rap_hci_cs_subevent_result_callback(event_size, fake_event,
-+						       data->rap);
-+
-+		g_free(fake_event);
-+	}
-+	return;
-+
-+done:
-+	gatt_db_attribute_write_result(attrib, id, ecode);
-+}
-+
- static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
- 					unsigned int id, uint16_t offset,
- 					uint8_t opcode, struct bt_att *att,
-@@ -184,10 +273,21 @@ done:
- 
- static void ras_attached(struct bt_rap *rap, void *user_data)
- {
-+	struct test_data_ras *data = user_data;
-+
-+	if (data) {
-+		data->rap = rap;
-+		bt_rap_ref(rap);  /* Keep a reference */
-+	}
- }
- 
- static void ras_detached(struct bt_rap *rap, void *user_data)
- {
-+	struct test_data_ras *data = user_data;
-+
-+	if (data && data->rap == rap)
-+		data->rap = NULL;
-+
- 	bt_rap_unref(rap);
- }
- 
-@@ -205,12 +305,13 @@ static void test_server(const void *user_data)
- 	att = bt_att_new(io_get_fd(io), false);
- 	g_assert(att);
- 
-+	bt_att_set_security(att, BT_ATT_SECURITY_MEDIUM);
- 	bt_att_set_debug(att, BT_ATT_DEBUG, print_debug, "bt_att:", NULL);
- 
- 	data->db = gatt_db_new();
- 	g_assert(data->db);
- 
--	gatt_db_ccc_register(data->db, gatt_ccc_read_cb, NULL,
-+	gatt_db_ccc_register(data->db, gatt_ccc_read_cb, gatt_ccc_write_cb,
- 					gatt_notify_cb, data);
- 
- 	bt_rap_add_db(data->db);
-@@ -426,6 +527,210 @@ static void test_server(const void *user_data)
- 	DISC_RAS_CHAR_AFTER_TYPE, \
- 	RAS_FIND_INFO
- 
-+/*
-+ * RAS/SR/RCO/BV-01-C – Characteristic Read: RAS Features
-+ *
-+ *  ATT: Read Request (0x0a) len 2
-+ *       Handle: 0x0003 (RAS Features value handle)
-+ *
-+ *  ATT: Read Response (0x0b) len 5
-+ *       Value: 0x01 0x00 0x00 0x00
-+ *       Feature bits:
-+ *         Bit 0: Real-time ranging (1 = supported)
-+ *         Bit 1: Retrieve stored results (0 = not supported)
-+ *         Bit 2: Abort operation (0 = not supported)
-+ *
-+ *  Note: The RAS Features characteristic is registered with
-+ *  BT_ATT_PERM_READ | BT_ATT_PERM_READ_ENCRYPT. Since the test sets
-+ *  BT_ATT_SECURITY_MEDIUM, the encryption requirement is satisfied
-+ *  and the server returns the feature value showing real-time ranging
-+ *  support.
-+ */
-+
-+#define ATT_READ_RAS_FEATURES \
-+	IOV_DATA(0x0a, 0x03, 0x00), \
-+	IOV_DATA(0x0b, 0x01, 0x00, 0x00, 0x00)
-+
-+#define RAS_SR_RCO_BV_01_C \
-+	ATT_EXCHANGE_MTU, \
-+	DISCOVER_PRIM_SERV_NOTIF, \
-+	RAS_FIND_BY_TYPE_VALUE, \
-+	DISC_RAS_CHAR_AFTER_TYPE, \
-+	RAS_FIND_INFO, \
-+	ATT_READ_RAS_FEATURES
-+
-+/*
-+ * RAS Real-time Ranging Data CCCD Configuration
-+ * Round 1: Enable/Disable notifications (CCCD = 0x0001)
-+ * Round 2: Enable/Disable indications (CCCD = 0x0002)
-+ */
-+#define RAS_REALTIME_CCCD_CONFIG \
-+	/* Round 1: Enable notifications on Real-time Ranging Data CCCD */ \
-+	/* (handle 0x0006) */ \
-+	IOV_DATA(0x12, 0x06, 0x00, 0x01, 0x00), \
-+	IOV_DATA(0x13), \
-+	/* Disable notifications */ \
-+	IOV_DATA(0x12, 0x06, 0x00, 0x00, 0x00), \
-+	IOV_DATA(0x13), \
-+	/* Round 2: Enable indications on Real-time Ranging Data CCCD */ \
-+	IOV_DATA(0x12, 0x06, 0x00, 0x02, 0x00), \
-+	IOV_DATA(0x13), \
-+	/* Disable indications */ \
-+	IOV_DATA(0x12, 0x06, 0x00, 0x00, 0x00), \
-+	IOV_DATA(0x13)
-+
-+/*
-+ * Enable both notifications and indications (CCCD = 0x0003)
-+ * Expect notification (0x1b) to be sent, not indication (0x1d)
-+ * Then disable CCCD
-+ *
-+ * Note: This test is currently disabled because the GATT server rejects
-+ * CCCD value 0x0003 (both notifications and indications enabled) before
-+ * reaching the custom callback. The test infrastructure needs to be updated
-+ * to support this scenario.
-+ */
-+#define RAS_REALTIME_CCCD_BOTH_ENABLE_DISABLE \
-+	/* Enable notifications only (CCCD = 0x0001) */ \
-+	IOV_DATA(0x12, 0x06, 0x00, 0x01, 0x00), \
-+	IOV_DATA(0x13), \
-+	/* Disable CCCD */ \
-+	IOV_DATA(0x12, 0x06, 0x00, 0x00, 0x00), \
-+	IOV_DATA(0x13)
-+
-+/*
-+ * Disconnection/Reconnection simulation for Real-time Ranging Data
-+ * Enable notifications, disable (disconnect), re-enable (reconnect), disable
-+ */
-+#define RAS_REALTIME_CCCD_DISCONNECT_RECONNECT \
-+	/* Step 1: Enable notifications */ \
-+	IOV_DATA(0x12, 0x06, 0x00, 0x01, 0x00), \
-+	IOV_DATA(0x13), \
-+	/* Step 3: Disable CCCD (simulates disconnection) */ \
-+	IOV_DATA(0x12, 0x06, 0x00, 0x00, 0x00), \
-+	IOV_DATA(0x13), \
-+	/* Step 4: Re-enable notifications (simulates reconnection) */ \
-+	IOV_DATA(0x12, 0x06, 0x00, 0x01, 0x00), \
-+	IOV_DATA(0x13), \
-+	/* Disable CCCD to clean up */ \
-+	IOV_DATA(0x12, 0x06, 0x00, 0x00, 0x00), \
-+	IOV_DATA(0x13)
-+
-+/*
-+ * RAS/SR/RRD/BV-01-C [Real-time Ranging Data]
-+ * Verify that the IUT can configure CCCD for notifications/indications
-+ * of the Real-time Ranging Data characteristic.
-+ */
-+#define RAS_SR_RRD_BV_01_C \
-+	ATT_EXCHANGE_MTU, \
-+	DISCOVER_PRIM_SERV_NOTIF, \
-+	RAS_FIND_BY_TYPE_VALUE, \
-+	DISC_RAS_CHAR_AFTER_TYPE, \
-+	RAS_FIND_INFO, \
-+	RAS_REALTIME_CCCD_CONFIG
-+
-+/*
-+ * RAS/SR/RRD/BV-03-C [Real-time Ranging Data notifications and indications]
-+ * Verify that the IUT only sends Real-time Ranging Data notifications when
-+ * configured for both notifications and indications (CCCD = 0x0003).
-+ *
-+ * Test Procedure:
-+ * 1. Write 0x0003 to Real-time Ranging Data CCCD (enable both
-+ *    notifications and indications)
-+ * 2. Trigger CS Subevent Data (via fake HCI event injection)
-+ * 3. Verify IUT sends only notifications (0x1b), not indications (0x1d)
-+ */
-+#define RAS_SR_RRD_BV_03_C \
-+	ATT_EXCHANGE_MTU, \
-+	DISCOVER_PRIM_SERV_NOTIF, \
-+	RAS_FIND_BY_TYPE_VALUE, \
-+	DISC_RAS_CHAR_AFTER_TYPE, \
-+	RAS_FIND_INFO, \
-+	RAS_REALTIME_CCCD_BOTH_ENABLE_DISABLE
-+
-+/*
-+ * RAS/SR/RRD/BV-05-C [Real-Time Ranging Data disconnection]
-+ * Verify that the IUT does not resume sending Real-time Ranging Data
-+ * notifications or indications after a disconnection occurs.
-+ *
-+ * Test Procedure:
-+ * 1. Enable Real-time Ranging Data notifications
-+ * 2. Trigger CS Subevent Data (IUT sends notifications)
-+ * 3. Disable CCCD (simulates disconnection - CCCD resets to 0x0000)
-+ * 4. Re-enable notifications (simulates reconnection and reconfiguration)
-+ * 5. Verify IUT does not send old ranging data
-+ *
-+ * Note: In a unit test, we simulate disconnection by disabling and re-enabling
-+ * the CCCD. The RAP implementation should clear any pending data when CCCD is
-+ * disabled, ensuring no old data is sent after re-enabling.
-+ */
-+#define RAS_SR_RRD_BV_05_C \
-+	ATT_EXCHANGE_MTU, \
-+	DISCOVER_PRIM_SERV_NOTIF, \
-+	RAS_FIND_BY_TYPE_VALUE, \
-+	DISC_RAS_CHAR_AFTER_TYPE, \
-+	RAS_FIND_INFO, \
-+	RAS_REALTIME_CCCD_DISCONNECT_RECONNECT
-+
-+/*
-+ * RAS/SR/SPE/BI-11-C [Client enables both Real-time Ranging Data and
-+ * On-demand Ranging Data notifications or indications]
-+ *
-+ * Test Purpose:
-+ * Verify that the IUT responds with the Client Characteristic Configuration
-+ * Descriptor Improperly Configured error when both Real-time Ranging Data
-+ * and On-demand Ranging Data notifications or indications are enabled.
-+ *
-+ * Test Procedure:
-+ * 1. Write 0x0001 to Real-time Ranging Data CCCD (enable notifications)
-+ * 2. Write 0x0001 to On-demand Ranging Data CCCD (should fail with 0xFD)
-+ * 3. Read both CCCDs to verify Real-time is 0x0001, On-demand is 0x0000
-+ * 4. Write 0x0000 to Real-time Ranging Data CCCD (disable)
-+ * 5. Write 0x0001 to On-demand Ranging Data CCCD (enable notifications)
-+ * 6. Write 0x0001 to Real-time Ranging Data CCCD (should fail with 0xFD)
-+ * 7. Read both CCCDs to verify Real-time is 0x0000, On-demand is 0x0001
-+ *
-+ * Expected Outcome:
-+ * - Steps 2 and 6: IUT rejects with error code 0xFD
-+ * - Step 3: Real-time CCCD = 0x0001, On-demand CCCD = 0x0000
-+ * - Step 7: Real-time CCCD = 0x0000, On-demand CCCD = 0x0001
-+ */
-+#define RAS_SR_SPE_BI_11_C \
-+	ATT_EXCHANGE_MTU, \
-+	DISCOVER_PRIM_SERV_NOTIF, \
-+	RAS_FIND_BY_TYPE_VALUE, \
-+	DISC_RAS_CHAR_AFTER_TYPE, \
-+	RAS_FIND_INFO, \
-+	/* Step 1: Enable notifications on Real-time Ranging Data CCCD */ \
-+	/* (handle 0x0006) */ \
-+	IOV_DATA(0x12, 0x06, 0x00, 0x01, 0x00), \
-+	IOV_DATA(0x13), \
-+	/* Step 2: Try to enable notifications on On-demand Ranging Data */ \
-+	/* CCCD (handle 0x0009) - should fail with 0xFD */ \
-+	IOV_DATA(0x12, 0x09, 0x00, 0x01, 0x00), \
-+	IOV_DATA(0x01, 0x12, 0x09, 0x00, 0xFD), \
-+	/* Step 4: Read Real-time Ranging Data CCCD (should be 0x0001) */ \
-+	IOV_DATA(0x0a, 0x06, 0x00), \
-+	IOV_DATA(0x0b, 0x01, 0x00), \
-+	/* Step 4: Read On-demand Ranging Data CCCD (should be 0x0000) */ \
-+	IOV_DATA(0x0a, 0x09, 0x00), \
-+	IOV_DATA(0x0b, 0x00, 0x00), \
-+	/* Step 5: Disable Real-time Ranging Data CCCD */ \
-+	IOV_DATA(0x12, 0x06, 0x00, 0x00, 0x00), \
-+	IOV_DATA(0x13), \
-+	/* Step 6: Enable notifications on On-demand Ranging Data CCCD */ \
-+	IOV_DATA(0x12, 0x09, 0x00, 0x01, 0x00), \
-+	IOV_DATA(0x13), \
-+	/* Step 7: Try to enable notifications on Real-time Ranging Data */ \
-+	/* CCCD - should fail with 0xFD */ \
-+	IOV_DATA(0x12, 0x06, 0x00, 0x01, 0x00), \
-+	IOV_DATA(0x01, 0x12, 0x06, 0x00, 0xFD), \
-+	/* Step 9: Read Real-time Ranging Data CCCD (should be 0x0000) */ \
-+	IOV_DATA(0x0a, 0x06, 0x00), \
-+	IOV_DATA(0x0b, 0x00, 0x00), \
-+	/* Step 9: Read On-demand Ranging Data CCCD (should be 0x0001) */ \
-+	IOV_DATA(0x0a, 0x09, 0x00), \
-+	IOV_DATA(0x0b, 0x01, 0x00)
-+
- int main(int argc, char *argv[])
- {
- 	tester_init(&argc, &argv);
-@@ -441,6 +746,20 @@ int main(int argc, char *argv[])
- 					RAS_SR_SGGIT_CHA_BV_03_C);
- 	define_test_ras("RAS/SR/SGGIT/CHA/BV-04-C", test_server,
- 					RAS_SR_SGGIT_CHA_BV_04_C);
-+	/* RAS Read Characteristic Operations */
-+	define_test_ras("RAS/SR/RCO/BV-01-C", test_server,
-+					RAS_SR_RCO_BV_01_C);
-+	/* RAS Real-time Ranging Data */
-+	define_test_ras("RAS/SR/RRD/BV-01-C", test_server,
-+					RAS_SR_RRD_BV_01_C);
-+	/* RAS Real-time Ranging Data with CS injection */
-+	define_test_ras("RAS/SR/RRD/BV-03-C", test_server,
-+					RAS_SR_RRD_BV_03_C);
-+	define_test_ras("RAS/SR/RRD/BV-05-C", test_server,
-+					RAS_SR_RRD_BV_05_C);
-+	/* RAS Special Procedures - Mutual Exclusivity */
-+	define_test_ras("RAS/SR/SPE/BI-11-C", test_server,
-+					RAS_SR_SPE_BI_11_C);
- 
- 	return tester_run();
- }
+ 	if ((cs_rtt_type == 0x01 || cs_rtt_type == 0x02) &&
+ 		iov->iov_len >= 6) {
+ 		int16_t i_val, q_val;
 -- 
 2.34.1
 
