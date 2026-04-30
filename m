@@ -1,319 +1,116 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613222D7814
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 17:11:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0673337B87
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 17:15:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777569093; cv=none; b=Wd/2i1ebv3a9vr6z4z0kgYUwsHIj+U6JQXR5a7Jo/kswRFaGP9+BXWSOMB31lPjrviOsVRgq8NCnhFr8aLWG77a547LMurks7Cul7EaMeb8SAKM0n7ZLzQPu1/lERjkQJwnhFDzyn5OU6lk/8FhNOQwrwuLARp/6rYifevlsnW8=
+	t=1777569354; cv=none; b=LUga9MiQRVP/vVKY5SphnXYOAKZqKSUOJnPXacLMR/sahtgKB5IYNDoMMKz6e4GXwfLUo5ozl6btirCoaxsF4JkvzwikzKpqkYhP6AqFPz54Eu3TwiKw9QFMDvx3MEdtSORrwFEkv9SAQqIz342c6xTS8L7md3kGxUM1vi5MWpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777569093; c=relaxed/simple;
-	bh=m1wemSQjXDwVa653KcNxYFlj2mvgRqFXLtfE70IV+TQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BM60avuizsYPBMtbFn4sfYBaGXWA1I6bSiZRmmR2h0LZHkZZwPzsMY68BaW8Ylgd21CpBRNAOs/cUAjuthvbNywSNlYbnme9UIVlwinth0nT63Ed+0RJnj3HmNSXotMOzM5kh212xT5JwoP6vd3AeRpKssi0rlRq1EgoFSie2vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.60.234] (p4fee2cee.dip0.t-ipconnect.de [79.238.44.238])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E251E4C2C37F03;
-	Thu, 30 Apr 2026 19:11:14 +0200 (CEST)
-Message-ID: <4c66feb9-e596-4ba2-98d3-b2365484fe2f@molgen.mpg.de>
-Date: Thu, 30 Apr 2026 19:11:12 +0200
+	s=arc-20240116; t=1777569354; c=relaxed/simple;
+	bh=PDOs13ikocPr/k2LmhrXjS74pfsy2pJc6CpLY9Xh3mg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=tHv3MrMe7BtDxCI0OJmj47qPI7zhocs6xQUiXPLy8cLpr9zkHFyGZKv3IBghfFHgos+znFYNFSkaPxbVAW711l/FDQdrkfamE5/+hC+poiQIvLUaKWfJiQFegySofMlvORRRaHOqBzmf7PuPEUQeZJqKNmV7ZcslDWqrD0bl/sM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=r4eS/bnT; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r4eS/bnT"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-50fb1ad3734so19002641cf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 10:15:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777569351; x=1778174151; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=gdZbeeI9sxXsLk05Llz9VUmeQMwCaqmlde9eVqY3q1s=;
+        b=r4eS/bnTXS4TqZWeNBYsNt+QOXDJXErIcP/t/3Rz9qcDbzMJdSQQEL5nGREnc1izVC
+         h9G+iruH5wI9k3RVTFU032MbgOxNInrm5k+3q9lchFjpWHvLnoTwxX5zmzgThBFjcLMR
+         4qio3rZyAKA8v+Wj7AXZe4qaoAZyJTy8huvMWmEccmC2npbTEX7QYNzfG625J/MWxF3X
+         6eHmIb4NnZTzx57YPdTkeOiZWFsrbVFK/r+elmxG4rKHK3L0heUKfoDC3V/FCQ2pHrcf
+         4LZxmtI4QA3fIqA3x1QQLoBPid8hnHsZ1DWhyiwOyJFFG4XBJ3npppD3As7D7u8vK0px
+         ROGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777569351; x=1778174151;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gdZbeeI9sxXsLk05Llz9VUmeQMwCaqmlde9eVqY3q1s=;
+        b=op0ZTsCXvzjuIgb+HJvEmjHrx9jQdCqnjBldjMUp8cu+XccfH+ZitVulI6bttYp7SO
+         C60gMFeKBWkbB1WxOvDWgeZgsLa6mIaiqDcv4ygFsytND94tyjPd/e0TKlShqpnwpYke
+         +9R/aBj4UiY/eXvGYDAIfClZNjduSh3eiQI8BE3EwETVmC5WaMskYzotTJuJZ4OJQ+vD
+         4LmqCMYiDjLGGHCmrswHtAVPWY4VKIzELC9nNTm4D31pTRlmYcBZals3kn597K7MdOEL
+         KXm7IngAtRBqY3cwO3d2rk1mpnNr2XEuJkikYJNaqeIUt1A44idirtnhUNY4ehafQLIA
+         0HcA==
+X-Gm-Message-State: AOJu0Yxi69+fwinM0mMTCzC7Me218MtRDFxujJQdL4G/di2Wqlkhn7Eu
+	HkCxI9sUQ3BbUCSNYXz3KHUm3txRxJNZ7uCVYHUAmitF4Gdm7wClIvZGZSPrxQ==
+X-Gm-Gg: AeBDietI6CYBPVsiR6xOTFOK6UhNNpkL7G8bAL0nw6EQLenVrSxipeIxLvCm9bQZSDu
+	KuDgdRvqlUG1gnWFYM3oJBDUqNJW20igWkdAFxNNYhZA9wWQ9p1k2O4khdREO4GX1KKhklLcFAo
+	mhgpyT5CM3wj0iApHgXY+V0UOM8iXkR9YzgpB6ctcPehVgevbP0+m6v8OwjeSddEKRQJDR3m5JE
+	xiUXood0ZMCUh7doecBneEkqFYQHlWiOWGdBGDhTQVNwTWH2+r/VITnDkZVmKx/quSrJywdiSls
+	10sKBz1RGub9hPB47crq1tjtyxDaIpcKdM+Yf9AJ5rPOnDDYFsRf6XeS09ki+yMYw70EQgDBsM2
+	HEwD8iNGFLOSs84gIwlAx6BZWJGFJ2T/BGzzMXnBUMaCi1oLPpQ2I4aIJS1r9bDlr7KEN7yqcQl
+	psDT3nCS2VXGhhhMCgtG0HOOBL6i9EDCK3e4hK2wc=
+X-Received: by 2002:a05:622a:8310:b0:50f:6e68:d71a with SMTP id d75a77b69052e-5102d1f7603mr32836531cf.28.1777569351383;
+        Thu, 30 Apr 2026 10:15:51 -0700 (PDT)
+Received: from [172.17.0.2] ([40.79.245.17])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5103d310ee8sm119091cf.22.2026.04.30.10.15.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Apr 2026 10:15:50 -0700 (PDT)
+Message-ID: <69f38e46.c80a0220.307c02.2ab8@mx.google.com>
+Date: Thu, 30 Apr 2026 10:15:50 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0465216949808047933=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] bluetooth: btintel: Add Bluetooth SAR revision 2
- support
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chethan.tumkur.narayan@intel.com, ravindra@intel.com
-References: <20260430165123.1070214-1-kiran.k@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
+Subject: RE: [v1] bluetooth: btintel: Add Bluetooth SAR revision 2 support
 In-Reply-To: <20260430165123.1070214-1-kiran.k@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+References: <20260430165123.1070214-1-kiran.k@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============0465216949808047933==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-Dear Kiran,
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1088244
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.08 seconds
+GitLint                       PASS      0.33 seconds
+SubjectPrefix                 FAIL      0.13 seconds
+BuildKernel                   PASS      26.51 seconds
+CheckAllWarning               PASS      28.79 seconds
+CheckSparse                   PASS      27.30 seconds
+BuildKernel32                 PASS      25.28 seconds
+TestRunnerSetup               PASS      572.34 seconds
+IncrementalBuild              PASS      26.13 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
 
 
-Thank you for the patch.
+https://github.com/bluez/bluetooth-next/pull/136
 
-Am 30.04.26 um 18:51 schrieb Kiran K:
-> BRDS revision 2 introduces per-chain (Chain A and Chain B) TX power
-> limits across five sub-bands (2.4G, 5.2G, 5.8/5.9G, 6G-low, 6G-high),
-> replacing the single-chain per-modulation model of revisions 0 and 1.
-> 
-> - Add btintel_set_sar_rev2() which sends the full Rev2 DDC sequence:
->      0x019e  inc-power-mode enable flag        (1 byte)
->      0x0311  2.4 GHz sub-band limits           (2 bytes)
->      0x0312  5.2 GHz sub-band limits           (2 bytes)
->      0x0313  5.8/5.9 GHz sub-band limits       (2 bytes)
->      0x0314  5.8/5.9 GHz sub-band limits again (2 bytes, duplicate FW reg)
->      0x0315  6 GHz low sub-band limits         (2 bytes)
->      0x0316  6 GHz high sub-band limits        (2 bytes)
->    followed by the SAR-init-complete command (0xfe25).
-
-Please detail how to test it, and please also paste the new debug messages.
-
-> Signed-off-by: Ravindra <ravindra@intel.com>
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> ---
->   drivers/bluetooth/btintel.c | 154 +++++++++++++++++++++++++++++++++++-
->   drivers/bluetooth/btintel.h |  18 +++++
->   2 files changed, 171 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index 5e9cac090bd8..97d897623c94 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -51,6 +51,7 @@ enum {
->   #define BTINTEL_BT_DOMAIN		0x12
->   #define BTINTEL_SAR_LEGACY		0
->   #define BTINTEL_SAR_INC_PWR		1
-> +#define BTINTEL_SAR_REV2		2
->   #define BTINTEL_SAR_INC_PWR_SUPPORTED	0
->   
->   #define CMD_WRITE_BOOT_PARAMS	0xfc0e
-> @@ -3104,6 +3105,111 @@ static int btintel_set_mutual_sar(struct hci_dev *hdev, struct btintel_sar_inc_p
->   	return 0;
->   }
->   
-> +/* btintel_send_sar_rev2_band - send DDC command for one Rev2 sub-band
-> + *
-> + * Each DDC 0x0311-0x0316 carries 2 bytes: [ChainA_value, ChainB_value].
-> + * cmd->len = 4  (2 id + 2 data)
-> + * HCI total  = 5 bytes (1 len + 4)
-> + */
-> +static int btintel_send_sar_rev2_band(struct hci_dev *hdev,
-> +				      struct btintel_cp_ddc_write *cmd,
-> +				      u16 id, u8 chain_a, u8 chain_b)
-> +{
-> +	cmd->len = 4;
-> +	cmd->id = cpu_to_le16(id);
-> +	cmd->data[0] = chain_a;
-> +	cmd->data[1] = chain_b;
-> +	return btintel_send_sar_ddc(hdev, cmd, 5);
-> +}
-> +
-> +static int btintel_set_sar_rev2(struct hci_dev *hdev,
-> +				struct btintel_sar_rev2 *sar)
-> +{
-> +	struct btintel_cp_ddc_write *cmd;
-> +	struct sk_buff *skb;
-> +	u8 buffer[64];
-> +	bool enable;
-> +	int ret;
-> +
-> +	cmd = (void *)buffer;
-> +
-> +	/* DDC 0x019e: enable/disable increased power mode SAR (1 byte) */
-> +	cmd->len = 3;
-> +	cmd->id = cpu_to_le16(0x019e);
-> +	cmd->data[0] = (sar->inc_power_mode == BTINTEL_SAR_INC_PWR_SUPPORTED) ?
-> +			0x01 : 0x00;
-> +	ret = btintel_send_sar_ddc(hdev, cmd, 4);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* DDC 0x0311-0x0316: per sub-band ChainA + ChainB limits */
-> +	ret = btintel_send_sar_rev2_band(hdev, cmd, 0x0311,
-> +					 sar->chain_a.subband_2g4,
-> +					 sar->chain_b.subband_2g4);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = btintel_send_sar_rev2_band(hdev, cmd, 0x0312,
-> +					 sar->chain_a.subband_5g2,
-> +					 sar->chain_b.subband_5g2);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* 0x0313 and 0x0314 both carry the 5G8/5G9 value */
-> +	ret = btintel_send_sar_rev2_band(hdev, cmd, 0x0313,
-> +					 sar->chain_a.subband_5g8_5g9,
-> +					 sar->chain_b.subband_5g8_5g9);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = btintel_send_sar_rev2_band(hdev, cmd, 0x0314,
-> +					 sar->chain_a.subband_5g8_5g9,
-> +					 sar->chain_b.subband_5g8_5g9);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = btintel_send_sar_rev2_band(hdev, cmd, 0x0315,
-> +					 sar->chain_a.subband_6g1,
-> +					 sar->chain_b.subband_6g1);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = btintel_send_sar_rev2_band(hdev, cmd, 0x0316,
-> +					 sar->chain_a.subband_6g3,
-> +					 sar->chain_b.subband_6g3);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Notify firmware that SAR initialisation is complete */
-> +	enable = true;
-> +	skb = __hci_cmd_sync(hdev, 0xfe25, 1, &enable, HCI_CMD_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		bt_dev_warn(hdev, "Failed to send Intel SAR Rev2 Enable (%ld)",
-> +			    PTR_ERR(skb));
-> +		return PTR_ERR(skb);
-> +	}
-> +
-> +	kfree_skb(skb);
-> +	return 0;
-> +}
-> +
-> +static int btintel_sar_rev2_send_to_device(struct hci_dev *hdev,
-> +					   struct btintel_sar_rev2 *sar,
-> +					   struct intel_version_tlv *ver)
-> +{
-> +	u16 cnvi = ver->cnvi_top & 0xfff;
-> +	u16 cnvr = ver->cnvr_top & 0xfff;
-> +
-> +	if (cnvi < BTINTEL_CNVI_BLAZARI || cnvr != BTINTEL_CNVR_WHP2) {
-> +		bt_dev_dbg(hdev, "BT SAR Rev2 not supported on this platform (cnvi=0x%x cnvr=0x%x)",
-> +			   cnvi, cnvr);
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	bt_dev_info(hdev, "Applying Bluetooth SAR Rev2");
-> +	return btintel_set_sar_rev2(hdev, sar);
-> +}
-> +
->   static int btintel_sar_send_to_device(struct hci_dev *hdev, struct btintel_sar_inc_pwr *sar,
->   				      struct intel_version_tlv *ver)
->   {
-> @@ -3130,6 +3236,7 @@ static int btintel_acpi_set_sar(struct hci_dev *hdev, struct intel_version_tlv *
->   {
->   	union acpi_object *bt_pkg, *buffer = NULL;
->   	struct btintel_sar_inc_pwr sar;
-> +	struct btintel_sar_rev2 sar_rev2;
->   	acpi_status status;
->   	u8 revision;
->   	int ret;
-> @@ -3150,14 +3257,59 @@ static int btintel_acpi_set_sar(struct hci_dev *hdev, struct intel_version_tlv *
->   		goto error;
->   	}
->   
-> +	if (buffer->package.elements[0].type != ACPI_TYPE_INTEGER) {
-> +		bt_dev_warn(hdev, "BT_SAR: unexpected ACPI type for revision field");
-> +		ret = -EINVAL;
-> +		goto error;
-> +	}
-> +
->   	revision = buffer->package.elements[0].integer.value;
->   
-> -	if (revision > BTINTEL_SAR_INC_PWR) {
-> +	if (revision > BTINTEL_SAR_REV2) {
->   		bt_dev_dbg(hdev, "BT_SAR: revision: 0x%2.2x not supported", revision);
->   		ret = -EOPNOTSUPP;
->   		goto error;
->   	}
->   
-> +	if (revision == BTINTEL_SAR_REV2 && bt_pkg->package.count == 13) {
-> +		memset(&sar_rev2, 0, sizeof(sar_rev2));
-> +		sar_rev2.revision       = revision;
-> +		sar_rev2.bt_sar_bios    = bt_pkg->package.elements[1].integer.value;
-> +		sar_rev2.inc_power_mode = bt_pkg->package.elements[2].integer.value;
-> +
-> +		sar_rev2.chain_a.subband_2g4     = bt_pkg->package.elements[3].integer.value;
-> +		sar_rev2.chain_a.subband_5g2     = bt_pkg->package.elements[4].integer.value;
-> +		sar_rev2.chain_a.subband_5g8_5g9 = bt_pkg->package.elements[5].integer.value;
-> +		sar_rev2.chain_a.subband_6g1     = bt_pkg->package.elements[6].integer.value;
-> +		sar_rev2.chain_a.subband_6g3     = bt_pkg->package.elements[7].integer.value;
-> +
-> +		sar_rev2.chain_b.subband_2g4     = bt_pkg->package.elements[8].integer.value;
-> +		sar_rev2.chain_b.subband_5g2     = bt_pkg->package.elements[9].integer.value;
-> +		sar_rev2.chain_b.subband_5g8_5g9 = bt_pkg->package.elements[10].integer.value;
-> +		sar_rev2.chain_b.subband_6g1     = bt_pkg->package.elements[11].integer.value;
-> +		sar_rev2.chain_b.subband_6g3     = bt_pkg->package.elements[12].integer.value;
-
-gemini/gemini-3.1-pro-preview has a comment [1]:
-
-> Is it safe to assume elements 1 through 12 are all of type ACPI_TYPE_INTEGER
-> here?
-> I see an explicit type check was added just above for the revision field
-> at buffer->package.elements[0], but elements 1 through 12 in bt_pkg are
-> accessed without similar validation.
-> If the ACPI table provides a string or buffer for any of these elements, could
-> the kernel incorrectly read overlapping union fields (such as string lengths or
-> pointers) as integers and send corrupted sub-band limits to the firmware?
+---
+Regards,
+Linux Bluetooth
 
 
-> +
-> +		bt_dev_dbg(hdev, "BT SAR Rev2: revision=%u bt_sar_bios=%u inc_power_mode=%u",
-> +			    sar_rev2.revision, sar_rev2.bt_sar_bios, sar_rev2.inc_power_mode);
-> +		bt_dev_dbg(hdev, "BT SAR Rev2 Chain A: 2g4=%u 5g2=%u 5g8_5g9=%u 6g1=%u 6g3=%u",
-> +			    sar_rev2.chain_a.subband_2g4, sar_rev2.chain_a.subband_5g2,
-> +			    sar_rev2.chain_a.subband_5g8_5g9, sar_rev2.chain_a.subband_6g1,
-> +			    sar_rev2.chain_a.subband_6g3);
-> +		bt_dev_dbg(hdev, "BT SAR Rev2 Chain B: 2g4=%u 5g2=%u 5g8_5g9=%u 6g1=%u 6g3=%u",
-> +			    sar_rev2.chain_b.subband_2g4, sar_rev2.chain_b.subband_5g2,
-> +			    sar_rev2.chain_b.subband_5g8_5g9, sar_rev2.chain_b.subband_6g1,
-> +			    sar_rev2.chain_b.subband_6g3);
-> +
-> +		if (sar_rev2.bt_sar_bios != 1) {
-> +			bt_dev_info(hdev, "Bluetooth SAR Rev2 is not enabled");
-> +			ret = -EOPNOTSUPP;
-> +			goto error;
-> +		}
-> +
-> +		ret = btintel_sar_rev2_send_to_device(hdev, &sar_rev2, ver);
-> +		goto error;
-> +	}
-> +
->   	memset(&sar, 0, sizeof(sar));
->   
->   	if (revision == BTINTEL_SAR_LEGACY && bt_pkg->package.count == 8) {
-> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-> index 70d812ad36a2..3b5a228ca3c0 100644
-> --- a/drivers/bluetooth/btintel.h
-> +++ b/drivers/bluetooth/btintel.h
-> @@ -64,6 +64,7 @@ struct intel_tlv {
->   
->   /* CNVR */
->   #define BTINTEL_CNVR_FMP2		0x910
-> +#define BTINTEL_CNVR_WHP2		0xA10	/* Whale Peak2 - Panther Lake */
->   
->   #define BTINTEL_IMG_BOOTLOADER		0x01	/* Bootloader image */
->   #define BTINTEL_IMG_IML			0x02	/* Intermediate image */
-> @@ -202,6 +203,23 @@ struct btintel_sar_inc_pwr {
->   	u8	le_lr;
->   };
->   
-> +/* Bluetooth SAR feature (BRDS), Revision 2 - per-chain sub-band power limits */
-> +struct btintel_sar_band_limits {
-> +	u8	subband_2g4;
-> +	u8	subband_5g2;
-> +	u8	subband_5g8_5g9;
-> +	u8	subband_6g1;
-> +	u8	subband_6g3;
-> +};
-> +
-> +struct btintel_sar_rev2 {
-> +	u8	revision;
-> +	u32	bt_sar_bios;    /* 1: BIOS-managed SAR enabled */
-> +	u32	inc_power_mode; /* 0: supported, 1: disabled */
-> +	struct btintel_sar_band_limits chain_a;
-> +	struct btintel_sar_band_limits chain_b;
-> +};
-> +
->   #define INTEL_HW_PLATFORM(cnvx_bt)	((u8)(((cnvx_bt) & 0x0000ff00) >> 8))
->   #define INTEL_HW_VARIANT(cnvx_bt)	((u8)(((cnvx_bt) & 0x003f0000) >> 16))
->   #define INTEL_CNVX_TOP_TYPE(cnvx_top)	((cnvx_top) & 0x00000fff)
-
-
-[1]: 
-https://sashiko.dev/#/patchset/20260430165123.1070214-1-kiran.k%40intel.com
+--===============0465216949808047933==--
