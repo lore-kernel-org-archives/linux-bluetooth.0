@@ -1,64 +1,64 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E449A399350
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 20:18:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3F139FCD9
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 20:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777580326; cv=none; b=ftqtke0giVLz7f8Fhtp6Rb1Dm8Xz7tgEKePb7iRjleiw13xuxfQ60hgvP93NdgzpXJYdTXfnEO27QvzyLa8A6ZfLIcykAf0spqB+l9LKrWwJAoZlCAuaRd/vxRwmzdk0HXwJW45wiJCk0U8qVEwBQOL6C7BhQBBCubdBekvjdwg=
+	t=1777580385; cv=none; b=Of0iC8H1WsthV9sWOcEw86O7kKA1WyROMTB3gwY95vZDZK84APcXCahm9Db8I8Z4vjdXY7BD/WVmt/84ZVBQgM7wz+6QmhsAHNyuAvIxDIUbxEinWsRS4uLD0jRC5gt8ffl9I3dQU0gfhk78bWEvh56tXanEuyb4RPfCV1xnzVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777580326; c=relaxed/simple;
-	bh=hIKxWYyJu37FLsxYi9Sa3m+kkUrVDVruiLNzHbqlXk0=;
+	s=arc-20240116; t=1777580385; c=relaxed/simple;
+	bh=4Tdxdt6Glqz5VwQ53zJq0XwKBBK+L+3wyj+TMICMTeg=;
 	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=QtwHboKdupnfgBguoCsGOT/sNh4syBCkd2X75/o8ImcAqwR4LX3Gz7IwHA4TMWQORLAAEbvqhZG/SVKVJSF65pO3xWqzoLk/Om35vmlpR0NK4NlMtrO5EUw+cLdR3J7EBkzg1QCZ9tI8i1e2cSoIxS+o9YFJQynQ5w6eNTJ+1dY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qicEaF9t; arc=none smtp.client-ip=209.85.219.41
+	 In-Reply-To:References; b=R9TPyOjUM9uTXT0e1Lt5o8qLJsRPV7nFFb8au8Uqc67uUnUdSpK9Vf4kB1CpFwt+tVxJrMwx2uz31Kiw0oMiQvq2tBjzBhYNgN2Whby0mjbI/iheoaL4RMRbtDRdJjM8jGdGSy7zeVJ6LxS5t5ERA3VFDM2IhD4lhVZV96mZU7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m0wBJPH3; arc=none smtp.client-ip=74.125.82.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qicEaF9t"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-8acae26e564so15520546d6.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 13:18:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m0wBJPH3"
+Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-12de530cbf1so360422c88.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Apr 2026 13:19:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777580322; x=1778185122; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777580376; x=1778185176; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zZlWaNlI3piu+ugE2XLIMWKD3k+SUWB/LacDtKOhVxU=;
-        b=qicEaF9thDhDA3OzSTxvRBxZDVdJoi/r68Dw36/cuTMkF0SEj3tYuPtcsp8aynheR3
-         L/JtjDzS7RJ4LcCmkuQocW3ZOAnUDgqxmeOEYVSBJwdAaauW8IFCtQsyBpya8fbC5LMx
-         jHkXSonYEMfQ6gHgMFgjvlC7kVV3Tq9VYfgHsae1FUoMLjY+00kS9UUO39zmYRfW0t9G
-         YPe1eJBW/my8gb9YpPriwwcmdpJ9hD2owj8VhLGRCTLjI+/Vi6GfWfZuHkU+HxDzYE/M
-         5WTMw5MEYiD5y4EdjI2IyN2gzJtoQMOL/zBiHzjnEAUnVzPsABP9jhiHVODjLXx/frfc
-         aTeQ==
+        bh=ig/j46md4Y5IU4vT8AFXLBJGv+V7kOSOwc6MGOVqnwE=;
+        b=m0wBJPH3Brw3DStfxM5wLUVvbu3Y9YoJKTOJvUOwy+sxdi3GgfP4KD+g/feXt5Acgu
+         BTw+vEB8aAUlv8c63StupMCzkojCfO8lwWD9Fm9hxBRkH+SW1+aD3hcKZMuI6y+a5zYI
+         DPrCmieQ/veO+cRB8KJk3vGUStUM0Cv3tQMEz6p4vUSU1EiOi9DdHQ/18/DHOv6s7k1C
+         AfotZQW8iPn3ScWvTJ/NE794uCIXcBWuHOTjZD5vT/q6H9Jrb3R2FGcp/r6e3QNANyZD
+         VWuDcNfeBOLKXnwxblJwDNq+G96V1YxrGCv+Vh665W4YDgAJuL2ZvInDwWzVMKXQ9t2l
+         s65g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777580322; x=1778185122;
+        d=1e100.net; s=20251104; t=1777580376; x=1778185176;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zZlWaNlI3piu+ugE2XLIMWKD3k+SUWB/LacDtKOhVxU=;
-        b=IYyBhmevmt5MatOUV7lU7Un7I3nauvWv93/KBsM8zN9iaSFr/FTD1Bwiphms4NR49Q
-         1oz7OBPdeblhvsZ3dWeOQv03j8OEG8Co2saSCS85JzJJIeKve9erlHOS42f6ZFDACb5w
-         EXPfKDIBmwBJI1Qo95sPRX+CuU+/eLGW+GH4GfORQWULolwP3ucOTUBMDfEL3b7QHEV5
-         OH/gomvUriwH8MKjlLGLGQH/hJkEijxhK5r3OkI5kOv2JmoHqMoEtg2n3517MudtH7d5
-         n6LWyJd+jiSdymL2EVTmBSnrjwuZVIDGJfsZLTinu7ro9VZZIxlUY9p80a5CY98EKU0w
-         u4Xw==
-X-Gm-Message-State: AOJu0YzyQ52TN9eMt8LzpYzvIrlbjvPhnTJrV3PNNU2ltvaDWdfvokYK
-	D161ICZF/Zc+XubJjxGG/TuONYkl2Y8SCJ1XFH8mln2utKmoMPmwu8nCXb8w9Q==
-X-Gm-Gg: AeBDiesOhKTvoSMO7nQJP437DMSbiwkhQOyXD+PRwxJ3srqdVMNDnFEPOw9w67qA8zG
-	a+X95EpS6dsC43NFsUZDMgFxMirtL04E83Hqjmcjx4u9J7Df92N21ftXqcEXF4//UP3uUSVTI3e
-	pj2QcfNSOG4cb33SjH9KRcSTYDcr+1is8Zv1bQIbySX/aC4lbwTwfYV5z9XVJkp3jgG61DYUjJV
-	TlSWcguplxCHw2yNFVgsZUadUwBcmWcasRWW0CC6SgciX/6CpkBdPDNwbJFLEttrFdCYiBlIAu1
-	5smSiMJoM+itIest3KEcL3N3wGh1SNCSKU6C4kByHjSkE90EkWfHmDYrfOJwjNxK4IhY7U05cVq
-	MEiNL3nXGPTZSd0Y/23GZoKSXMvlBvnucKOUMNrc745iHXmahxq3gKsPDsSo1ngaAgnxkRtkmV9
-	YHK6PjzRy3P2zBKd3DzeSt0sTQuegu+/s4Ic0ayJg=
-X-Received: by 2002:ad4:594b:0:b0:8ac:ab3b:39f7 with SMTP id 6a1803df08f44-8b5448089c2mr236446d6.4.1777580321977;
-        Thu, 30 Apr 2026 13:18:41 -0700 (PDT)
-Received: from [172.17.0.2] ([40.116.93.57])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53ca982a1sm902416d6.38.2026.04.30.13.18.41
+        bh=ig/j46md4Y5IU4vT8AFXLBJGv+V7kOSOwc6MGOVqnwE=;
+        b=go/Kj5EA7Xk1GSCC2hJdfmMQ1gY6Q+ddgAJdJ6oOcgsyba1nY8xGfEd/6i53Ez4Yul
+         eitYvn5oKlY6R0pspsyFF4z144fIuOe1+XVi0GjQ1/iNCkcNLrJkBMdV4h3/tGRQvEJq
+         O2HTaFbVQuAk+3CAYoS4oZRxPyuRUpLJFErsNfaqW3R0gSUObVmw8xO7v/xjX5/w4wEj
+         fPiUQlf/l0K0NdBgojkiyL/P20DB2NoVlYOOUTe8wHrlcnrkQrsvO1O7XVuiXZjt3zAw
+         RtpH+1V6XuGtJGQ4T/Go24GIe4iQE9i/hRwa//5Krx5oE0DTgIC6IA8eHfFd9Zcyr8eE
+         84vw==
+X-Gm-Message-State: AOJu0Yw0MCFu9YyUkLAL9xpYLCm3gR1d3ygOEskJ8OBG4+aNwKut9zke
+	EHrCJhhqbOQwf5eyBJVCcJulSFBdIJgg7wD6F5r2Mwnfds5CCNJ+GpLjKvmAAg==
+X-Gm-Gg: AeBDieulDAVVtIwM1YiKJgRtRiP8AR42vNc6/WORi9DODUhhYBiPC0nAqCLL3hwVRxl
+	Cod9YSNcut2wfSfS6anxcaom+cVcITrselBB8sFdL/iW0YKOhg+Bx0tMtrMg3hrXXDUF3lUaSKa
+	Sa8YLqN1DDjNzJPfSKZDytuXea6C/iyT5ojYUfDnRYDgHAWXKcGDGJC0fiq078wOTGYIZebN/ju
+	1Gl2Y5GY/S9krVldmJQJ+8z2NvMtdB/D5PQm62UkFrLLoNMSQU8K3kmLJv5ueslWlHy+kRLQXS0
+	MozMlwAdi7H3a/HUp6d42JFuqAaF5IiP6plxUbjBlUE5Q84i6CO7gVasawkYrGEI9dKpBrjslUL
+	pC3AMp9+eLec8UxhA7ZT6FuT6W5XTYIoB8UJJo3GFv0fAvVxDZK3C/feM0sCTNmEIFbV0vl5xSg
+	lPKTY31J4fp/S/eQhNuS3uTMCXTJkW4NnZpK81Ib8=
+X-Received: by 2002:a05:7300:80d2:b0:2d8:1efe:51dc with SMTP id 5a478bee46e88-2ed3d2bf85fmr2373401eec.6.1777580376133;
+        Thu, 30 Apr 2026 13:19:36 -0700 (PDT)
+Received: from [172.17.0.2] ([68.220.59.51])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ee3b783a95sm1386428eec.22.2026.04.30.13.19.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2026 13:18:41 -0700 (PDT)
-Message-ID: <69f3b921.d40a0220.3c3ab4.46fe@mx.google.com>
-Date: Thu, 30 Apr 2026 13:18:41 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3097802335393112276=="
+        Thu, 30 Apr 2026 13:19:35 -0700 (PDT)
+Message-ID: <69f3b957.050a0220.37bec4.7633@mx.google.com>
+Date: Thu, 30 Apr 2026 13:19:35 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1685217348221661338=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -66,13 +66,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, manivannan.sadhasivam@oss.qualcomm.com
-Subject: RE: Fixes/improvements for the PCI M.2 power sequencing driver
-In-Reply-To: <20260422-pwrseq-m2-bt-v1-1-720d02545a64@oss.qualcomm.com>
-References: <20260422-pwrseq-m2-bt-v1-1-720d02545a64@oss.qualcomm.com>
+To: linux-bluetooth@vger.kernel.org, shuai.zhang@oss.qualcomm.com
+Subject: RE: [v2] arm64: dts: monaco-arduino-monza: Add Bluetooth UART node
+In-Reply-To: <20260429103537.1282497-1-shuai.zhang@oss.qualcomm.com>
+References: <20260429103537.1282497-1-shuai.zhang@oss.qualcomm.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============3097802335393112276==
+--===============1685217348221661338==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -83,76 +83,47 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1084240
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1087406
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      10.21 seconds
-GitLint                       FAIL      3.79 seconds
-SubjectPrefix                 FAIL      1.77 seconds
-BuildKernel                   PASS      25.35 seconds
-CheckAllWarning               PASS      28.26 seconds
-CheckSparse                   PASS      27.92 seconds
-BuildKernel32                 PASS      25.29 seconds
-TestRunnerSetup               PASS      522.56 seconds
-TestRunner_l2cap-tester       FAIL      6.63 seconds
-TestRunner_iso-tester         PASS      295.69 seconds
-TestRunner_bnep-tester        FAIL      6.52 seconds
-TestRunner_mgmt-tester        FAIL      8.69 seconds
-TestRunner_rfcomm-tester      PASS      28.93 seconds
-TestRunner_sco-tester         PASS      68.09 seconds
-TestRunner_ioctl-tester       FAIL      35.27 seconds
-TestRunner_mesh-tester        PASS      26.96 seconds
-TestRunner_smp-tester         PASS      6.58 seconds
-TestRunner_userchan-tester    FAIL      6.58 seconds
-TestRunner_6lowpan-tester     PASS      22.91 seconds
-IncrementalBuild              PASS      46.87 seconds
+CheckPatch                    PASS      0.61 seconds
+GitLint                       FAIL      0.20 seconds
+SubjectPrefix                 FAIL      0.07 seconds
+BuildKernel                   PASS      26.26 seconds
+CheckAllWarning               PASS      28.76 seconds
+CheckSparse                   PASS      27.28 seconds
+BuildKernel32                 PASS      25.34 seconds
+TestRunnerSetup               PASS      568.74 seconds
+TestRunner_l2cap-tester       FAIL      6.77 seconds
+TestRunner_iso-tester         PASS      295.76 seconds
+TestRunner_bnep-tester        FAIL      6.74 seconds
+TestRunner_mgmt-tester        FAIL      9.03 seconds
+TestRunner_rfcomm-tester      PASS      28.98 seconds
+TestRunner_sco-tester         PASS      68.04 seconds
+TestRunner_ioctl-tester       FAIL      37.50 seconds
+TestRunner_mesh-tester        PASS      27.03 seconds
+TestRunner_smp-tester         PASS      6.63 seconds
+TestRunner_userchan-tester    FAIL      6.70 seconds
+TestRunner_6lowpan-tester     PASS      22.95 seconds
+IncrementalBuild              PASS      24.54 seconds
 
 Details
 ##############################
 Test: GitLint - FAIL
 Desc: Run gitlint
 Output:
-[01/12] power: sequencing: Introduce an API to check whether the pwrseq is fixed or controllable
+[v2] arm64: dts: monaco-arduino-monza: Add Bluetooth UART node
 
 WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (96>80): "[01/12] power: sequencing: Introduce an API to check whether the pwrseq is fixed or controllable"
-[02/12] power: sequencing: pcie-m2: Add support for 'is_fixed()' callback to 'uart' target
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (90>80): "[02/12] power: sequencing: pcie-m2: Add support for 'is_fixed()' callback to 'uart' target"
-[03/12] power: sequencing: qcom-wcn: Add support for 'is_fixed()' callback to 'bluetooth' target
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (96>80): "[03/12] power: sequencing: qcom-wcn: Add support for 'is_fixed()' callback to 'bluetooth' target"
-[05/12] power: sequencing: pcie-m2: Allow creating serdev for multiple PCI devices
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (82>80): "[05/12] power: sequencing: pcie-m2: Allow creating serdev for multiple PCI devices"
-[07/12] power: sequencing: pcie-m2: Create serdev for PCI devices present before probe
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (86>80): "[07/12] power: sequencing: pcie-m2: Create serdev for PCI devices present before probe"
-[08/12] power: sequencing: pcie-m2: Create BT node based on the pci_device_id[] table
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (85>80): "[08/12] power: sequencing: pcie-m2: Create BT node based on the pci_device_id[] table"
-[12/12] Bluetooth: hci_qca: Fix the broken BT_EN GPIO detection for Qcom WCN devices
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (84>80): "[12/12] Bluetooth: hci_qca: Fix the broken BT_EN GPIO detection for Qcom WCN devices"
+41: B1 Line exceeds max length (164>80): "- Document that the QCA2066 Bluetooth chip is powered by a board-level, hardware-provided 3.3 V supply, and that the GPIO is used only to enable the Bluetooth chip."
+42: B1 Line exceeds max length (92>80): "- Add the required sleep clock to satisfy the qcom,qca2066-bt DT binding and run dtbs_check."
+46: B1 Line exceeds max length (83>80): "  https://lore.kernel.org/all/20260428025652.662502-1-shuai.zhang@oss.qualcomm.com/"
 ##############################
 Test: SubjectPrefix - FAIL
 Desc: Check subject contains "Bluetooth" prefix
 Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
 "Bluetooth: " prefix is not specified in the subject
 ##############################
 Test: TestRunner_l2cap-tester - FAIL
@@ -176,17 +147,17 @@ Output:
 Total: 28, Passed: 0 (0.0%), Failed: 11, Not Run: 17
 
 Failed Test Cases
-Device List                                          Timed out  -28.814 seconds
-Device Info                                          Timed out   -6.189 seconds
-Reset Stat                                           Timed out   -6.192 seconds
-Set Link Mode - ACCEPT                               Timed out   -6.195 seconds
-Set Pkt Type - DM                                    Timed out  -14.382 seconds
-Set Pkt Type - DH                                    Timed out  -14.387 seconds
-Set Pkt Type - HV                                    Timed out  -14.390 seconds
-Set Pkt Type - 2-DH                                  Timed out  -14.393 seconds
-Set Pkt Type - 2-DH                                  Timed out  -14.396 seconds
-Set Pkt Type - ALL                                   Timed out  -14.399 seconds
-Set ACL MTU - 1                                      Timed out  -14.401 seconds
+Device List                                          Timed out  -30.821 seconds
+Device Info                                          Timed out   -6.175 seconds
+Reset Stat                                           Timed out   -6.179 seconds
+Set Link Mode - ACCEPT                               Timed out   -6.182 seconds
+Set Pkt Type - DM                                    Timed out  -14.368 seconds
+Set Pkt Type - DH                                    Timed out  -14.371 seconds
+Set Pkt Type - HV                                    Timed out  -14.374 seconds
+Set Pkt Type - 2-DH                                  Timed out  -14.378 seconds
+Set Pkt Type - 2-DH                                  Timed out  -14.381 seconds
+Set Pkt Type - ALL                                   Timed out  -14.384 seconds
+Set ACL MTU - 1                                      Timed out  -14.387 seconds
 ##############################
 Test: TestRunner_userchan-tester - FAIL
 Desc: Run userchan-tester with test-runner
@@ -194,11 +165,11 @@ Output:
 No test result found
 
 
-https://github.com/bluez/bluetooth-next/pull/137
+https://github.com/bluez/bluetooth-next/pull/139
 
 ---
 Regards,
 Linux Bluetooth
 
 
---===============3097802335393112276==--
+--===============1685217348221661338==--
