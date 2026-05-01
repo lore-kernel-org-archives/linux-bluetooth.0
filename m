@@ -1,162 +1,122 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C3C3806C3
-	for <linux-bluetooth@vger.kernel.org>; Fri,  1 May 2026 09:20:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E8338DD3
+	for <linux-bluetooth@vger.kernel.org>; Fri,  1 May 2026 14:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777627253; cv=none; b=jGA/WYaMwfe2F4uSsbavLlGzRa/RBjVsPlASNOPp1hzzWnseME4uhWJLPTuM14Y2W78uTtPHXQL3n16d3EULMGX5Xso9SU5KQEZr+7doGrAKJldjLhfxTTQ5pHFHmO/XzGmlJ4xa3NzezfIlEDvp62hteqx6PfyrZDwtFbvAekY=
+	t=1777644260; cv=none; b=aJNGpxWhr1oADkVG1fYzuq/Y3tn3rMsEy2UWt/sE0wo6q4/6wyVknxw2P1uvrv18AJXeB4Q/LI5Xgbm04zNWw1S0FBYrFRwLcEuQwjp9VwKjtyaimuBiE1eh2RnploCAm2sKgKblj4avsPRRbZz+3z0EouLpUFerofVMc/qyIBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777627253; c=relaxed/simple;
-	bh=t3nxPYsn/+uIJrb9cvX2Su+SoURhZtwc/pGiLCniQoM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=h8k+aP2yarShGWc3o+UXLn04YcvAUtd7hQOd+1p51Ayh5kjF7hevmhcGYhmq0fy353xZmirrtevDhYJTig1d1ROu1KX7me4BUJ3wD45gngf0Z0cNFBSZh4KESUkkPUYZJKq7kPhbsKh57waAllDxGIgT15J1Ah/TBMpYIUhcjro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=4cducM1g; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
+	s=arc-20240116; t=1777644260; c=relaxed/simple;
+	bh=iWGOCBpsOyAsQ0OtFdyhBPiAZW1zYxlmwFBl5ScrUyU=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=SZCeGkuViSjpklugFJxiIoCYoM+gCWOvtQd15WhA2QDGA/ZCB+MSo4DWFHXw2LpXvR4xWSPuzX8jXWHhaGYJGyVSfg/72FUsxz7MZ0ciEUJTblg/X7dIoYmGH/DnmxGJiGrscqDyUY6dP3S+gfNHNdv0Kok1nr/MIDgDAjIvfSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=b1egKg43; arc=none smtp.client-ip=192.30.252.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="4cducM1g"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-44a786a9a35so322714f8f.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 01 May 2026 02:20:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1777627250; x=1778232050; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0bfYkGp++VX2XGf/8Df8kQnMjnWB1zask25dl4NteK4=;
-        b=4cducM1goAgbmhRjB7BIeqVv4bhmvt/VGodszsfyXX9V+Y/WIx7CWBq3zq/e2LHY6v
-         oyxMrxfTKFkxp3Df6OIh7TXYpy5bkqrY9bWuoRADiTOVWKfVLpOp2nlyWdVm/NilvQt/
-         JeeHmwJiATC3bAGy/cvOYDsBxvMDA520LZnu3JNVxn3a7SZeB3zWHrgJFTgno9dL5XSq
-         39dVjZ/mzBqa+w9vf2fSkgec+ROGW1wPzHu8COQdnu5tVXASYxMAdDQmucxVlXla+46w
-         sd9xPL+p5rgFxJJZ2GuaYJlW0o5AzoTqx6A5qHlSh2qgcx7eO4vPrZfJ+AD33bB/taul
-         ZG3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777627250; x=1778232050;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0bfYkGp++VX2XGf/8Df8kQnMjnWB1zask25dl4NteK4=;
-        b=mthJBlWiiLn8OJJHwN1YYtRPNe8hlHG+HeH6BQ8AYiMpBJNuKXOSkEpByzFLXBMkA+
-         /Vw88AbTS/H8zpZO+A/siXrp9aHR68DO14YBR/nNkOSszv3uBqZRX/WoLNR4bW0vx7vh
-         G/gA0c9zRyfA9QNt35qdwHy7q2zyn9zkFFR0cp4YijaUTTSjTc/F39M6ZaHIBrQQpsiE
-         lNiTgEvgGbh7fvvEsoZHyPaa0kjH6S6De7c0Uyp6sJ/pHoGSP2S6DBhdWTJhJTOx3rLs
-         +HKU3rfNErDrQBhXLCrG7gIVwMZzwuf/setbG7N0OQJlO2InMDspgZlPyT4GMauqojr0
-         M5dg==
-X-Forwarded-Encrypted: i=1; AFNElJ+Q9pWZ0PFw7X5NE1CzWwtg1c4TKgHkg17kYR6HVG+m6HHztHMqmsGOKRaVwmSwcrWxauU4PnbQdyg8CrSMnj0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeCqcXnBOnYnUsTw+D8qG3zhuw24ZBJkptPDeKLGyIgldXDtnO
-	QvuMrOHsqlibnFRUDCkkm9E+XzRspFxyxYCQ8HF8F6r1YL1lqqsPod7GbiyTUweV9ps=
-X-Gm-Gg: AeBDievDwwRcAAgV8CBsdiOJvIIisPyt2424EM0vLbJZMc/BLrMfIeBtr+ohxj3+Yry
-	yvGX8Pc/sSWeD2ec6XVaUeyMJVI9bk2RZxjt+AwvG/c63I/l6B8RKm885vYxjupm8UzFE06x13j
-	WrOkaRipNRNLbDJzHbvoES24U4qMH7exJSGqHuDi/vZaNixAtlZWgPNrNHhXigU21KQGDvdpJfG
-	ohTmk+wAV/i2ehI0tPTA/sBV4dPY7gbC5+FoUIA48pnhYDklN8Wpcqw4S0wy8zdzGbFaz2PqqYI
-	eSVdT5ZGrFlVd0eQWMK1B5YqXixAPxS/GIEaIN6zqOZ39Ppoed62SJPn3zBuV8dGsvx2Vxfsh3t
-	pngZ2do8LxSicvtcKD8zg+kJ9u1Hk0MfJkYX+0p3qraIUiD6XI1KEr9HcCo65Jw/CnKL8UqdKkO
-	qplqmlLqawfN9Tqj1cE2gpsPqZWE3z4DihIhhlYh4I7lUEQ7e3GUOYWDbDDOEP+LogARKgKOCi2
-	qsJzttIWg==
-X-Received: by 2002:a05:6000:240c:b0:43f:e43a:f4a6 with SMTP id ffacd0b85a97d-44a857c10e8mr3084632f8f.6.1777627250496;
-        Fri, 01 May 2026 02:20:50 -0700 (PDT)
-Received: from localhost (046124199213.public.t-mobile.at. [46.124.199.213])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-44a98b768fdsm3583191f8f.33.2026.05.01.02.20.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 May 2026 02:20:49 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="b1egKg43"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1777644258;
+	bh=9lgKS8gm/KjyRn6ZUGm7FwWNDxNAj3kt/o7bw/PZlvA=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=b1egKg433XhLc58B+wrJiKANXLTvmh891a+buqB+2i03GdVwR54LWHB9jwJM8FyR9
+	 FZSQGnk4Csla5Iq1Awq21eFha6npZDn7ZRF4ohHxZCmXd35o4cHCDIaLF9Amwn4IQ7
+	 CnuLtY9QhZnrLyxm+8JcVbuEoghKt4ypN+PX++5k=
+Received: from github.com (hubbernetes-node-70381f8.ash1-iad.github.net [10.56.226.81])
+	by smtp.github.com (Postfix) with ESMTPA id AF5AF181033
+	for <linux-bluetooth@vger.kernel.org>; Fri,  1 May 2026 07:04:18 -0700 (PDT)
+Date: Fri, 01 May 2026 07:04:18 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/d01616-31e4fb@github.com>
+Subject: [bluez/bluez] 2128e1: shared/util: Add decoding support for HIDS 1.1
+ UUIDs
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 01 May 2026 11:20:47 +0200
-Message-Id: <DI789NOBWJHK.1V3SFQLCFLS4P@fairphone.com>
-Cc: "Bjorn Andersson" <andersson@kernel.org>, "Konrad Dybcio"
- <konradybcio@kernel.org>, "Rob Herring" <robh@kernel.org>, "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
- "Alexander Koskovich" <AKoskovich@pm.me>, "Liam Girdwood"
- <lgirdwood@gmail.com>, "Mark Brown" <broonie@kernel.org>, "Bartosz
- Golaszewski" <brgl@kernel.org>, "Marcel Holtmann" <marcel@holtmann.org>,
- "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>, "Balakrishna Godavarthi"
- <quic_bgodavar@quicinc.com>, "Rocky Liao" <quic_rjliao@quicinc.com>,
- "Johannes Berg" <johannes@sipsolutions.net>, "Jeff Johnson"
- <jjohnson@kernel.org>, <~postmarketos/upstreaming@lists.sr.ht>,
- <phone-devel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-bluetooth@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
- <ath11k@lists.infradead.org>
-Subject: Re: [PATCH v2 7/7] arm64: dts: qcom: milos-fairphone-fp6: Enable
- WiFi
-From: "Luca Weiss" <luca.weiss@fairphone.com>
-To: "Konrad Dybcio" <konrad.dybcio@oss.qualcomm.com>, "Dmitry Baryshkov"
- <dmitry.baryshkov@oss.qualcomm.com>, "Luca Weiss"
- <luca.weiss@fairphone.com>, "Jeff Johnson" <jeff.johnson@oss.qualcomm.com>,
- "Baochen Qiang" <baochen.qiang@oss.qualcomm.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260403-milos-fp6-bt-wifi-v2-0-393322b27c5f@fairphone.com>
- <20260403-milos-fp6-bt-wifi-v2-7-393322b27c5f@fairphone.com>
- <4fbs4arx6sez6fffy75ctmzecfvitr6aocau3cczlr2ps2ptld@v7wpa2irsihl>
- <2514523f-a43f-4470-a69b-3d5175d10385@oss.qualcomm.com>
-In-Reply-To: <2514523f-a43f-4470-a69b-3d5175d10385@oss.qualcomm.com>
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Konrad,
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 2128e1c73ff0c0dffc4869b52a8664cac7560455
+      https://github.com/bluez/bluez/commit/2128e1c73ff0c0dffc4869b52a8664cac7560455
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-04-30 (Thu, 30 Apr 2026)
 
-On Tue Apr 7, 2026 at 3:16 PM CEST, Konrad Dybcio wrote:
-> On 4/3/26 9:35 PM, Dmitry Baryshkov wrote:
->> On Fri, Apr 03, 2026 at 03:52:53PM +0200, Luca Weiss wrote:
->>> Configure and enable the WiFi node, and add the required pinctrl to
->>> provide the sleep clock from the PMK8550 (PMK7635) to WCN6755.
->>>
->>> Thanks to Alexander Koskovich for helping with the bringup, adding
->>> the missing pinctrl to make the WPSS stop crashing.
->>>
->>> Link: https://lore.kernel.org/linux-arm-msm/DBF7OWAWQ94M.FSCP4DPF8ZJY@f=
-airphone.com/
->>> Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
->>> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
->>> ---
->>>  arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts | 19 ++++++++++++++++=
-++-
->>>  1 file changed, 18 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts b/arch/ar=
-m64/boot/dts/qcom/milos-fairphone-fp6.dts
->>> index db72418b7195..d8ac495ca7c8 100644
->>> --- a/arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts
->>> +++ b/arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts
->>> @@ -242,7 +242,7 @@ wcn6750-pmu {
->>> =20
->>>  		clocks =3D <&rpmhcc RPMH_RF_CLK1>;
->>> =20
->>> -		pinctrl-0 =3D <&bluetooth_enable_default>;
->>> +		pinctrl-0 =3D <&bluetooth_enable_default>, <&pmk8550_sleep_clk_defau=
-lt>;
->>>  		pinctrl-names =3D "default";
->>> =20
->>>  		regulators {
->>> @@ -766,6 +766,17 @@ &pmiv0104_eusb2_repeater {
->>>  	qcom,tune-usb2-preem =3D /bits/ 8 <0x6>;
->>>  };
->>> =20
->>> +&pmk8550_gpios {
->>> +	pmk8550_sleep_clk_default: sleep-clk-default-state {
->>> +		pins =3D "gpio5";
->>> +		function =3D "func1";
->>> +		input-disable;
->>> +		output-enable;
->>=20
->> Hmm, if it's a sleep_clk, should it not be handled via the power
->> sequencer?
->
-> If you mean that it may be needed to toggle it with specific timings,
-> possibly..  seems that WCN6855 has a "xo-clk" GPIO defined. I requested
-> access to some docs that I think should have the answer, hopefully should
-> get it soon.
+  Changed paths:
+    M src/shared/util.c
 
-Did you manage to get anything there yet?
+  Log Message:
+  -----------
+  shared/util: Add decoding support for HIDS 1.1 UUIDs
 
-Regards
-Luca
+This adds support for HIDS 1.1 SCI UUIDs:
 
-> Or maybe +Jeff/Baochen could answer faster?
->
-> Konrad
+HID SCI Mode(0x2c39)
+HID SCI Information(0x2c3a)
 
+
+  Commit: 31e4fb1498f47dfbf18b414acbbbeac26dcda366
+      https://github.com/bluez/bluez/commit/31e4fb1498f47dfbf18b414acbbbeac26dcda366
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-04-30 (Thu, 30 Apr 2026)
+
+  Changed paths:
+    M monitor/att.c
+    M src/main.conf
+
+  Log Message:
+  -----------
+  monitor: Add decoding support for HIDS 1.1 flags and attributes
+
+This adds support for HIDS 1.1 SCI flags and attributes:
+
+> LE-ACL: Handle 2048 flags 0x02 dlen 9
+      ATT: Read Response (0x0b) len 4
+        Handle: 0x0021 Type: HID Information (0x2a4a)
+        Value[4]:
+        11 01 00 0f                                      ....
+            bcdHID: 0x0111
+            bCountryCode: 0x00
+            Flags: 0x0f
+            RemoteWake (0x01)
+            NormallyConnectable (0x02)
+            SCI Supported (0x04)
+            SCI Low Power Mode Supported (0x08)
+< LE-ACL: Handle 2048 flags 0x00 dlen 7
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x003d Type: HID SCI Information (0x2c3a)
+> LE-ACL: Handle 2048 flags 0x02 dlen 19
+      ATT: Read Response (0x0b) len 14
+        Handle: 0x003d Type: HID SCI Information (0x2c3a)
+        Value[14]:
+        08 02 0a 00 14 00 0a 00 08 00 08 00 08 00        ..............
+            Minimum Supported Connection Interval: 1.000 ms (0x08)
+            Number of Supported Subgroups: 2
+              Minimum Connection Interval[0]: 1.250 ms (0x000a)
+              Maximum Connection Interval[0]: 2.500 ms (0x0014)
+              Connection Interval Stride[0]: 1.250 ms (0x000a)
+              Minimum Connection Interval[1]: 1.000 ms (0x0008)
+              Maximum Connection Interval[1]: 1.000 ms (0x0008)
+              Connection Interval Stride[1]: 1.000 ms (0x0008)
+< LE-ACL: Handle 2048 flags 0x00 dlen 7
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x003f Type: HID SCI Mode (0x2c39)
+> LE-ACL: Handle 2048 flags 0x02 dlen 6
+      ATT: Read Response (0x0b) len 1
+        Handle: 0x003f Type: HID SCI Mode (0x2c39)
+        Value[1]:
+        00                                               .
+            Mode: None (0x00)
+
+
+Compare: https://github.com/bluez/bluez/compare/d01616f0c276...31e4fb1498f4
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
