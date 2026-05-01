@@ -1,69 +1,69 @@
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
+Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142CB3BAD8D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C2D3B19AE
 	for <linux-bluetooth@vger.kernel.org>; Fri,  1 May 2026 14:39:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777646344; cv=none; b=DWVx/98+L9TtdZqKQQSk4NsUO5DTdwkjSJObLKSeV0UBlK2cG7v5W/oAVwzO1U1tXZVe/ZGrfAi7Z8xy7ijlzzlt5/QBpU9eqgTCBWpURNtBL0CJ1GCbgvYcMZmfJWmZwNIsuslMl/3xrvJ1qVPSrpdu1o2aiSSCF2DQjqc1t+A=
+	t=1777646344; cv=none; b=jlY7N2Am6r+9nxLHD5hXAERvYqzWQykj6UjdjGhFhe789VNDM/Zc+dxBVrb4VhVQAgTPlD/5ODcEdyRwhjAVUq4wyl+yqsjMEAzJ9gjOOnwXIlRZ2M/XU9NdjmMihCfRLTo1iRuE0/DIwi5n1ezzPcsVl1wEye6RNwlAf5aTO8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1777646344; c=relaxed/simple;
-	bh=D2Gp3Yqs1ck+PJdNwn7aZzQJLW8epMVRtfky+CCgdrc=;
+	bh=f/BiqhsigHLnR/e1CU5ZfPg9DX2KioqXvninFtnILf0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XoWWDQetYGK07WntxMJj7xuafd2X6J7WAZ2jEKUsKA3OMDbZehYCo43hWIEL+eYKZ4jm31PsPuhmct3R+n8SEM5R92WSAKohYPaoegr3oXBn9cFlJkrXAnnI4CUBSqQ85QlpxscFdmc9e6Rif34XQPAqqn0lGorVBdCYTl42oCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=o25TpO9h; arc=none smtp.client-ip=209.85.221.174
+	 MIME-Version; b=fZQxFSU/o4UI7wld2p1Zu/1R4qw4IiPETNB9QONCwwlA8XoHzEEWVUaJbM9jwPxZFkfyRw9EwoWIb+oDQvl3yJrwjTPAvxgOOWpKe4lYL64onZu9apidka6kBI19oFo7Z/ZowqqC2RXabMTwkcuG/d9m2syuRM2ne+q2UPE3+QI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=o4MmTrrB; arc=none smtp.client-ip=209.85.221.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o25TpO9h"
-Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-56a8e0ea02aso1805596e0c.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o4MmTrrB"
+Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-56d95bc93e3so1121020e0c.1
         for <linux-bluetooth@vger.kernel.org>; Fri, 01 May 2026 07:39:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777646340; x=1778251140; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777646339; x=1778251139; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=B90siZ5dqpzJN+32PN+mfbmhHNMVrLuF+e5HNWBGIsQ=;
-        b=o25TpO9hqgmPWPKWya4d5D3xjCHUZzl4vALvC4Pjm8nTesykrOKKBkWMHFFc578rN7
-         JArIh1bYfu7GWMPhbhFxAOPct4CD127tQKGb3kx9sAkro09jn6EvHc5EWzASINjcTG8c
-         ne3w2SwsaZxFpPTxeqjrlbBmn0/5zpABHeYmPOw0NIw2I7xPSJyQtr9PO1sl+UMeGatd
-         h2fYkk7nXWr+bFfj1d2LgfgTqc8sJJrnceqsic+fIJavEnWCHsHXwAIisfYF6yRzmx3P
-         tQqHxcU5oBjkveStreUZ+lTDTdXNs+co8KeUsmGOGD/SEBnwJKb4IAx1NPj8nbKI9nzH
-         9/wQ==
+        bh=J1UOI/qdLIHaKvWkmNAm9sACo31fjgp8gOmcDp4MRPE=;
+        b=o4MmTrrBhveMGHpKVSGp3Q6uV2pbFQedNpsyvrAWJun9bRU4Qpsd5GPAu8kHy+Gx11
+         BWbZf6OifFM9pjSVpoKNIuH61WusBa6smPB2ipUjSY8oWR28PKRRgldjCkH3m1GvHV+B
+         Xr9Fb2scxkSflko2BhxzUbv8PyA/Q3sz0XqV1LWULiwPraxarLLommFlHKCJcch4lnbc
+         UxnRAjyp0s+gfHmJCcPcG7iHPsC5v/m+FaSGv7YIHeJ3IVrMvVBbjuMbyQ0+ZV/pccAz
+         D4yZMmB5uEDYjxgTAy1P3JXoNd+3MM3lf7MPIKYVTADflL4BYBvYHxBUm8EnFW+8wMBt
+         67Nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777646340; x=1778251140;
+        d=1e100.net; s=20251104; t=1777646339; x=1778251139;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=B90siZ5dqpzJN+32PN+mfbmhHNMVrLuF+e5HNWBGIsQ=;
-        b=sX9LJW7xmFqVkyZ7bdPDm91hpdxm1HCdZBo85D4sHN5i9LEWfMOlgO5E548KfrbzXb
-         3stNvgZr2PLkX1AAy0Qu5dfrFVIMGpI8/t8BaxGK27EX3ugfFpSxtfcr4dSdtvxSyxpL
-         NajCAzAO1Xx+iQ7FgtaFk1uKIF9USEQA9b1xF1pXh+SsPB/uiaSaEH+8OL9jYy0E5hgP
-         zhaVTfXzJU1QmTzzZDz4UClq5B3hXXz9WjQgbgi6gmsBWa0AotqF8T54ySYv6cIzlwZO
-         kLeSI7uviHK+CAuAWtqpjRh/WHotgvIMQofC9+haVIzpzu/wmqRI7RXEvXivFNbiOGlq
-         mYjg==
-X-Gm-Message-State: AOJu0YxDRYd39Vc9mTCaRccCqa7lCQk60JW2JP6MUTtc1h+RNAh6W/Jb
-	jFF/RKOE7T23pGskY2mcthoxBanpbdaIDp9PGeBfM5otO4v7rNqhlk+SEFDynUde
-X-Gm-Gg: AeBDieu9WYtXrnVfHhKa3BOXVB//RnDTP3cfizeRc7TvbyfAdLA7w3YBTeFB8sEHqOS
-	Knnx96m7amAVwvcISc5W2p8wLpZueZwQOzSGcOAvXZAHDCBksqe59b4cYO12xWkQfLIlSdLjwgX
-	5yOfqXkufVdjsILMbYSjwb3Q0HV/Rljop0V2vOVY3q1OlM94Zajt2w9eqTwUm6zKV0koAelIG+M
-	oMpbkGVurbw4eYq5RzNOYa17qvzT3rFNwPW1ltm91Ap1Y9PCJokwvSqnGSri/d/zcQXuWiUSRrl
-	sDQ5vfVCCGi0G1jVme+sIbT4nCzgmAje6v9+NLkQg4x2l9eau62jgcLNIT8A4D7VuWtimcJ9Jwa
-	bsI8YdFfURAfDPgiYk3swg6d1FCak67KzwTBEBz3hReHQdyglgw3zE1zzV+9XpwOM8g1P9c6joE
-	CPIHCF+eNfGpCvAhYo0II1fO0hKs0rJs9sL0ctZN3xVger/tC+ByyyLMjM7ThcFT6HW2xKSv9pB
-	rCXWq4FT2f0Yk//B6BS1Wa8gh+R
-X-Received: by 2002:a05:6122:909:b0:56b:7ec9:f54 with SMTP id 71dfb90a1353d-573c96a855amr4154660e0c.9.1777646340565;
-        Fri, 01 May 2026 07:39:00 -0700 (PDT)
+        bh=J1UOI/qdLIHaKvWkmNAm9sACo31fjgp8gOmcDp4MRPE=;
+        b=Vo6dI2XLM6mlHBHZEp/VVyFNDXfXaaczrMYZaoQO1V10+W7mEa8WEAam+4cwSXM2mm
+         zAZ6DDY6cHKntdO+jBbMnF3gDTJjsualmLEMZsGeAkEJFA9poXAYNVrawEB6haqyeMMZ
+         WPjoh10gGp2XZ/+yAiZ4yNNy46YcOQHoOnb/98Ag1a+ILmb9vxWyUizbYOliwElPlj8F
+         iqv/QeeptBOPqRHmkP+EBabOMPdgkW+QKd21gOAS9znqbfYM8lPhzVxftcM88JjX2/hP
+         LwOXqC1mNKQFyFMexhW6bEnIvXUlOdA3zDQNsY3wSG5cdtJnVt4mreVoGInDHEzJSqZm
+         oPBA==
+X-Gm-Message-State: AOJu0YwgJ34M2hDs3sw2OxPYgi8GlYeetY6WYlvtiL2peR7f6x78fs6f
+	1S5bpJHNeHaiuL4tKs9vv0CNXUK/eBFoim8SYiyHBD/bGgXTxjk4ayn0MrdhWBSH
+X-Gm-Gg: AeBDieu5PeuYf2jfMnWEbo3c6M48tYeutx3ZpCTdk/+ws/Ar/ywoNCS84kOGBMljyXj
+	9FHr98sMZ+iSRfYyxcXCCxw5nPUvR0j9PLobwsWUn0CHzvxf0kkI1TaD2zFLQcF0Co6Wc6ShBiV
+	b8L6N/daielCws1/XNLx1rWY+ZZQQbcRPGjXdhDDb1NQiN9z4x9uTHEscYwXAl6MDblVby4g2aA
+	ZSm1KueWIUhbDHnneNnI/E0tNKv2yYXSoLDrvLHv5oadMdSHu3cYRTmzNkArap8nXmhyNdX6itf
+	BtSGLY//fskNBBOwydhGhvcAUEn8E+uTDFjcQw7+XHBGdQg43Mh3Ew7eaYXtJg5pfBk/uWHv8bX
+	GDduPg0m/Qd1rBhl3F83QOMF8xLsIVXMkET/rIEyq/RxdXP/3599R2o11WdkqLABExpfLujHiLV
+	S2O3ZpUA0UKu2mE0guaqtHWdzd0xQBb97TG8aQW1zff0gBDdxt7AsB5/PPoEEsLaMUNlQZbDpRW
+	Uas66hu7jxMrgYt3amqligNWEJd
+X-Received: by 2002:a05:6122:3c46:b0:56d:aa1f:e48a with SMTP id 71dfb90a1353d-573c96f74edmr3819257e0c.12.1777646339336;
+        Fri, 01 May 2026 07:38:59 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-574a6dc7dd4sm1531895e0c.14.2026.05.01.07.39.00
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-574a6dc7dd4sm1531895e0c.14.2026.05.01.07.38.58
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 May 2026 07:39:00 -0700 (PDT)
+        Fri, 01 May 2026 07:38:58 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 4/4] hci-tester: Use bt_hci_register_subevent for LE Meta events
-Date: Fri,  1 May 2026 10:38:47 -0400
-Message-ID: <20260501143847.724150-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/4] shared/hci: Add bt_hci_register_subevent for LE Meta events
+Date: Fri,  1 May 2026 10:38:45 -0400
+Message-ID: <20260501143847.724150-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260501143847.724150-1-luiz.dentz@gmail.com>
 References: <20260501143847.724150-1-luiz.dentz@gmail.com>
@@ -77,144 +77,356 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Convert all bt_hci_register(BT_HCI_EVT_LE_META_EVENT) calls to use
-bt_hci_register_subevent with the specific subevent code. Update
-callbacks to work with data that no longer contains the subevent byte
-prefix, since bt_hci_register_subevent strips it before dispatch.
+Add bt_hci_register_subevent/bt_hci_unregister_subevent API that allows
+registering for specific LE Meta Event subevents. The BPF filter is
+extended to accept BT_HCI_EVT_LE_META_EVENT packets and then check the
+subevent byte (offset 4) against registered subevents.
+
+Since bt_hci_register_subevent is only used with BT_HCI_EVT_LE_META_EVENT,
+the event parameter is omitted. The subevent list reuses struct evt where
+evt->event stores the subevent code.
 
 Assisted-by: Claude:claude-opus-4.6
 ---
- tools/hci-tester.c | 59 +++++++++++++---------------------------------
- 1 file changed, 17 insertions(+), 42 deletions(-)
+ src/shared/hci.c | 240 ++++++++++++++++++++++++++++++++++++++++-------
+ src/shared/hci.h |   6 ++
+ 2 files changed, 212 insertions(+), 34 deletions(-)
 
-diff --git a/tools/hci-tester.c b/tools/hci-tester.c
-index 79193220feec..b8446ee83ccf 100644
---- a/tools/hci-tester.c
-+++ b/tools/hci-tester.c
-@@ -407,17 +407,9 @@ static void test_le_rand(const void *test_data)
- static void test_le_read_local_pk_complete(const void *data, uint8_t size,
- 								void *user_data)
- {
--	const uint8_t *event = data;
--	const struct bt_hci_evt_le_read_local_pk256_complete *evt;
-+	const struct bt_hci_evt_le_read_local_pk256_complete *evt = data;
- 	struct le_keys *keys = user_data;
+diff --git a/src/shared/hci.c b/src/shared/hci.c
+index 5105b0b2f320..40326fc810e6 100644
+--- a/src/shared/hci.c
++++ b/src/shared/hci.c
+@@ -45,6 +45,7 @@ struct bt_hci {
+ 	struct queue *cmd_queue;
+ 	struct queue *rsp_queue;
+ 	struct queue *evt_list;
++	struct queue *subevt_list;
+ 	struct queue *data_queue;
+ };
  
--	if (*event != BT_HCI_EVT_LE_READ_LOCAL_PK256_COMPLETE) {
--		tester_warn("Failed Read Local PK256 command");
--		tester_test_failed();
--		return;
--	}
--
--	evt = (void *)(event + 1);
- 	if (evt->status) {
- 		tester_warn("HCI Read Local PK complete failed (0x%02x)",
- 								evt->status);
-@@ -450,7 +442,8 @@ static void test_le_read_local_pk(const void *test_data)
- 	struct bt_hci_cmd_set_event_mask sem;
- 	struct bt_hci_cmd_le_set_event_mask lsem;
- 
--	bt_hci_register(user->hci_ut, BT_HCI_EVT_LE_META_EVENT,
-+	bt_hci_register_subevent(user->hci_ut,
-+				BT_HCI_EVT_LE_READ_LOCAL_PK256_COMPLETE,
- 				test_le_read_local_pk_complete,
- 				(void *)test_data, NULL);
- 
-@@ -480,17 +473,9 @@ static void test_le_read_local_pk(const void *test_data)
- static void setup_le_read_local_pk_complete(const void *data, uint8_t size,
- 								void *user_data)
- {
--	const uint8_t *event = data;
--	const struct bt_hci_evt_le_read_local_pk256_complete *evt;
-+	const struct bt_hci_evt_le_read_local_pk256_complete *evt = data;
- 	struct le_keys *keys = user_data;
- 
--	if (*event != BT_HCI_EVT_LE_READ_LOCAL_PK256_COMPLETE) {
--		tester_warn("Failed Read Local PK256 command");
--		tester_setup_failed();
--		return;
--	}
--
--	evt = (void *)(event + 1);
- 	if (evt->status) {
- 		tester_warn("HCI Read Local PK complete failed (0x%02x)",
- 								evt->status);
-@@ -523,7 +508,8 @@ static void setup_le_generate_dhkey(const void *test_data)
- 	struct bt_hci_cmd_set_event_mask sem;
- 	struct bt_hci_cmd_le_set_event_mask lsem;
- 
--	bt_hci_register(user->hci_ut, BT_HCI_EVT_LE_META_EVENT,
-+	bt_hci_register_subevent(user->hci_ut,
-+				BT_HCI_EVT_LE_READ_LOCAL_PK256_COMPLETE,
- 				setup_le_read_local_pk_complete,
- 				(void *)test_data, NULL);
- 
-@@ -554,18 +540,10 @@ static void setup_le_generate_dhkey(const void *test_data)
- static void test_le_generate_dhkey_complete(const void *data, uint8_t size,
- 								void *user_data)
- {
--	const uint8_t *event = data;
--	const struct bt_hci_evt_le_generate_dhkey_complete *evt;
-+	const struct bt_hci_evt_le_generate_dhkey_complete *evt = data;
- 	struct le_keys *keys = user_data;
- 	uint8_t dhkey[32];
- 
--	if (*event != BT_HCI_EVT_LE_GENERATE_DHKEY_COMPLETE) {
--		tester_warn("Failed DHKey generation command");
--		tester_test_failed();
--		return;
--	}
--
--	evt = (void *)(event + 1);
- 	if (evt->status) {
- 		tester_warn("HCI Generate DHKey complete failed (0x%02x)",
- 								evt->status);
-@@ -613,10 +591,11 @@ static void test_le_generate_dhkey(const void *test_data)
- 
- 	ecc_make_key(cmd.remote_pk256, keys->remote_sk);
- 
--	/* Unregister handler for META event */
--	bt_hci_unregister(user->hci_ut, 1);
-+	/* Unregister handler for PK256 subevent */
-+	bt_hci_unregister_subevent(user->hci_ut, 1);
- 
--	bt_hci_register(user->hci_ut, BT_HCI_EVT_LE_META_EVENT,
-+	bt_hci_register_subevent(user->hci_ut,
-+				BT_HCI_EVT_LE_GENERATE_DHKEY_COMPLETE,
- 				test_le_generate_dhkey_complete, keys,
- 				NULL);
- 
-@@ -830,15 +809,10 @@ static void teardown_connection(const void *test_data)
- static void test_adv_report(const void *data, uint8_t size, void *user_data)
- {
- 	struct user_data *user = tester_get_data();
--	uint8_t subevent = *((uint8_t *) data);
--	const struct bt_hci_evt_le_adv_report *lar = data + 1;
-+	const struct bt_hci_evt_le_adv_report *lar = data;
- 
--	switch (subevent) {
--	case BT_HCI_EVT_LE_ADV_REPORT:
--		if (!memcmp(lar->addr, user->bdaddr_ut, 6))
--			tester_setup_complete();
--		break;
--	}
-+	if (!memcmp(lar->addr, user->bdaddr_ut, 6))
-+		tester_setup_complete();
+@@ -239,6 +240,21 @@ static void process_notify(void *data, void *user_data)
+ 						hdr->plen, evt->user_data);
  }
  
- static void setup_advertising_initiated(const void *test_data)
-@@ -850,8 +824,9 @@ static void setup_advertising_initiated(const void *test_data)
- 	struct bt_hci_cmd_le_set_adv_parameters lsap;
- 	struct bt_hci_cmd_le_set_adv_enable lsae;
++struct subevt_data {
++	uint8_t subevent;
++	const void *data;
++	uint8_t size;
++};
++
++static void process_subevt_notify(void *data, void *user_data)
++{
++	struct subevt_data *sd = user_data;
++	struct evt *evt = data;
++
++	if (evt->event == sd->subevent)
++		evt->callback(sd->data, sd->size, evt->user_data);
++}
++
+ static void process_event(struct bt_hci *hci, const void *data, size_t size)
+ {
+ 	const struct bt_hci_evt_hdr *hdr = data;
+@@ -275,6 +291,16 @@ static void process_event(struct bt_hci *hci, const void *data, size_t size)
  
--	bt_hci_register(user->hci_lt, BT_HCI_EVT_LE_META_EVENT,
--					test_adv_report, NULL, NULL);
-+	bt_hci_register_subevent(user->hci_lt,
-+				BT_HCI_EVT_LE_ADV_REPORT,
-+				test_adv_report, NULL, NULL);
+ 	default:
+ 		queue_foreach(hci->evt_list, process_notify, (void *) hdr);
++		if (hdr->evt == BT_HCI_EVT_LE_META_EVENT && size > 0) {
++			const uint8_t *params = data;
++			struct subevt_data sd;
++
++			sd.subevent = params[0];
++			sd.data = data + 1;
++			sd.size = size - 1;
++			queue_foreach(hci->subevt_list,
++					process_subevt_notify, &sd);
++		}
+ 		break;
+ 	}
+ }
+@@ -332,10 +358,12 @@ static struct bt_hci *create_hci(int fd)
+ 	hci->cmd_queue = queue_new();
+ 	hci->rsp_queue = queue_new();
+ 	hci->evt_list = queue_new();
++	hci->subevt_list = queue_new();
+ 	hci->data_queue = queue_new();
  
- 	memset(sem.mask, 0, 8);
- 	sem.mask[1] |= 0x20;	/* Command Complete */
+ 	if (!io_set_read_handler(hci->io, io_read_callback, hci, NULL)) {
+ 		queue_destroy(hci->evt_list, NULL);
++		queue_destroy(hci->subevt_list, NULL);
+ 		queue_destroy(hci->rsp_queue, NULL);
+ 		queue_destroy(hci->cmd_queue, NULL);
+ 		queue_destroy(hci->data_queue, NULL);
+@@ -458,6 +486,7 @@ void bt_hci_unref(struct bt_hci *hci)
+ 		return;
+ 
+ 	queue_destroy(hci->evt_list, evt_free);
++	queue_destroy(hci->subevt_list, evt_free);
+ 	queue_destroy(hci->cmd_queue, cmd_free);
+ 	queue_destroy(hci->rsp_queue, cmd_free);
+ 	queue_destroy(hci->data_queue, data_free);
+@@ -571,7 +600,7 @@ static void update_evt_filter(struct bt_hci *hci)
+ 	const struct queue_entry *entry;
+ 	struct sock_filter *filters;
+ 	struct sock_fprog fprog;
+-	unsigned int count, i;
++	unsigned int evt_count, subevt_count, count, i;
+ 	int fd;
+ 
+ 	fd = io_get_fd(hci->io);
+@@ -582,21 +611,38 @@ static void update_evt_filter(struct bt_hci *hci)
+ 	if (hci->is_stream)
+ 		return;
+ 
+-	count = queue_length(hci->evt_list);
++	evt_count = queue_length(hci->evt_list);
++	subevt_count = queue_length(hci->subevt_list);
+ 
+-	/* Build filter: load event code, check defaults + registered events.
+-	 * Packet layout for HCI_CHANNEL_RAW: [H4 type (1 byte)][evt code (1)]
+-	 * So event code is at offset 1.
++	/* Filter structure:
++	 * Packet layout: [H4 type(1)][evt code(1)][plen(1)][params...]
++	 * For LE Meta: params[0] is the subevent code (offset 3 from start)
+ 	 *
+-	 * Filter structure:
+ 	 *   [0] Load byte at offset 1 (event code)
+-	 *   [1] JEQ BT_HCI_EVT_CMD_COMPLETE -> accept
+-	 *   [2] JEQ BT_HCI_EVT_CMD_STATUS -> accept
+-	 *   [3..3+count-1] JEQ registered_event -> accept
+-	 *   [3+count] reject
+-	 *   [4+count] accept
++	 *   [1] JEQ CMD_COMPLETE -> accept
++	 *   [2] JEQ CMD_STATUS -> accept
++	 *   [3] JEQ LE_META -> subevent_check (if subevts registered)
++	 *   [4..4+evt_count-1] JEQ registered_event -> accept
++	 *   [4+evt_count] reject
++	 *   -- subevent section (if subevt_count > 0) --
++	 *   [5+evt_count] Load byte at offset 3 (subevent code)
++	 *   [6+evt_count..6+evt_count+subevt_count-1] JEQ subevent -> accept
++	 *   [6+evt_count+subevt_count] reject
++	 *   -- shared accept --
++	 *   [last] accept
+ 	 */
+-	filters = malloc(sizeof(*filters) * (count + 5));
++
++	/* Without subevents: 3 (defaults) + evt_count + reject + accept =
++	 *                    evt_count + 5
++	 * With subevents: 4 (defaults+LE_META) + evt_count + reject +
++	 *                 1 (load subevent) + subevt_count + reject + accept
++	 */
++	if (subevt_count)
++		count = 4 + evt_count + 1 + 1 + subevt_count + 1 + 1;
++	else
++		count = 3 + evt_count + 1 + 1;
++
++	filters = malloc(sizeof(*filters) * count);
+ 	if (!filters)
+ 		return;
+ 
+@@ -606,32 +652,106 @@ static void update_evt_filter(struct bt_hci *hci)
+ 	filters[i++] = (struct sock_filter)
+ 		BPF_STMT(BPF_LD + BPF_B + BPF_ABS, 1);
+ 
+-	/* Check BT_HCI_EVT_CMD_COMPLETE (0x0e) */
+-	filters[i++] = (struct sock_filter)
+-		BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, BT_HCI_EVT_CMD_COMPLETE,
+-			 count + 2, 0);
+-
+-	/* Check BT_HCI_EVT_CMD_STATUS (0x0f) */
+-	filters[i++] = (struct sock_filter)
+-		BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, BT_HCI_EVT_CMD_STATUS,
+-			 count + 1, 0);
+-
+-	/* Check each registered event */
+-	entry = queue_get_entries(hci->evt_list);
+-	while (entry) {
+-		const struct evt *evt = entry->data;
+-		unsigned int jump = count - (i - 3);
++	if (subevt_count) {
++		/* accept is at index: count - 1
++		 * From instruction at index i, jump_true = (count-1) - (i+1)
++		 */
+ 
++		/* Check BT_HCI_EVT_CMD_COMPLETE -> accept */
+ 		filters[i] = (struct sock_filter)
+-			BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, evt->event,
+-				 jump, 0);
++			BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
++				 BT_HCI_EVT_CMD_COMPLETE,
++				 count - 1 - (i + 1), 0);
+ 		i++;
+-		entry = entry->next;
+-	}
+ 
+-	/* Reject */
+-	filters[i++] = (struct sock_filter)
+-		BPF_STMT(BPF_RET | BPF_K, 0);
++		/* Check BT_HCI_EVT_CMD_STATUS -> accept */
++		filters[i] = (struct sock_filter)
++			BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
++				 BT_HCI_EVT_CMD_STATUS,
++				 count - 1 - (i + 1), 0);
++		i++;
++
++		/* Check LE_META -> subevent section
++		 * subevent section starts at: 4 + evt_count + 1
++		 * (after the evt reject instruction)
++		 */
++		filters[i] = (struct sock_filter)
++			BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
++				 BT_HCI_EVT_LE_META_EVENT,
++				 4 + evt_count + 1 - (i + 1), 0);
++		i++;
++
++		/* Check each registered event -> accept */
++		entry = queue_get_entries(hci->evt_list);
++		while (entry) {
++			const struct evt *evt = entry->data;
++
++			filters[i] = (struct sock_filter)
++				BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
++					 evt->event,
++					 count - 1 - (i + 1), 0);
++			i++;
++			entry = entry->next;
++		}
++
++		/* Reject (for non-matching events) */
++		filters[i++] = (struct sock_filter)
++			BPF_STMT(BPF_RET | BPF_K, 0);
++
++		/* Subevent section: load subevent byte at offset 3 */
++		filters[i++] = (struct sock_filter)
++			BPF_STMT(BPF_LD + BPF_B + BPF_ABS, 3);
++
++		/* Check each registered subevent -> accept */
++		entry = queue_get_entries(hci->subevt_list);
++		while (entry) {
++			const struct evt *evt = entry->data;
++
++			filters[i] = (struct sock_filter)
++				BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
++					 evt->event,
++					 count - 1 - (i + 1), 0);
++			i++;
++			entry = entry->next;
++		}
++
++		/* Reject (for non-matching subevents) */
++		filters[i++] = (struct sock_filter)
++			BPF_STMT(BPF_RET | BPF_K, 0);
++	} else {
++		/* No subevents - simple filter */
++
++		/* Check BT_HCI_EVT_CMD_COMPLETE -> accept */
++		filters[i] = (struct sock_filter)
++			BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
++				 BT_HCI_EVT_CMD_COMPLETE,
++				 count - 1 - (i + 1), 0);
++		i++;
++
++		/* Check BT_HCI_EVT_CMD_STATUS -> accept */
++		filters[i] = (struct sock_filter)
++			BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
++				 BT_HCI_EVT_CMD_STATUS,
++				 count - 1 - (i + 1), 0);
++		i++;
++
++		/* Check each registered event -> accept */
++		entry = queue_get_entries(hci->evt_list);
++		while (entry) {
++			const struct evt *evt = entry->data;
++
++			filters[i] = (struct sock_filter)
++				BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K,
++					 evt->event,
++					 count - 1 - (i + 1), 0);
++			i++;
++			entry = entry->next;
++		}
++
++		/* Reject */
++		filters[i++] = (struct sock_filter)
++			BPF_STMT(BPF_RET | BPF_K, 0);
++	}
+ 
+ 	/* Accept */
+ 	filters[i++] = (struct sock_filter)
+@@ -744,6 +864,58 @@ bool bt_hci_unregister(struct bt_hci *hci, unsigned int id)
+ 	return true;
+ }
+ 
++
++unsigned int bt_hci_register_subevent(struct bt_hci *hci,
++				uint8_t subevent,
++				bt_hci_callback_func_t callback,
++				void *user_data, bt_hci_destroy_func_t destroy)
++{
++	struct evt *evt;
++
++	if (!hci)
++		return 0;
++
++	evt = new0(struct evt, 1);
++	evt->event = subevent;
++
++	if (hci->next_evt_id < 1)
++		hci->next_evt_id = 1;
++
++	evt->id = hci->next_evt_id++;
++
++	evt->callback = callback;
++	evt->destroy = destroy;
++	evt->user_data = user_data;
++
++	if (!queue_push_tail(hci->subevt_list, evt)) {
++		free(evt);
++		return 0;
++	}
++
++	update_evt_filter(hci);
++
++	return evt->id;
++}
++
++bool bt_hci_unregister_subevent(struct bt_hci *hci, unsigned int id)
++{
++	struct evt *evt;
++
++	if (!hci || !id)
++		return false;
++
++	evt = queue_remove_if(hci->subevt_list, match_evt_id,
++							UINT_TO_PTR(id));
++	if (!evt)
++		return false;
++
++	evt_free(evt);
++
++	update_evt_filter(hci);
++
++	return true;
++}
++
+ bool bt_hci_get_conn_handle(struct bt_hci *hci, const uint8_t *bdaddr,
+ 				uint16_t *handle)
+ {
+diff --git a/src/shared/hci.h b/src/shared/hci.h
+index 800dc4946b97..5be48577f9db 100644
+--- a/src/shared/hci.h
++++ b/src/shared/hci.h
+@@ -42,5 +42,11 @@ unsigned int bt_hci_register(struct bt_hci *hci, uint8_t event,
+ 				void *user_data, bt_hci_destroy_func_t destroy);
+ bool bt_hci_unregister(struct bt_hci *hci, unsigned int id);
+ 
++unsigned int bt_hci_register_subevent(struct bt_hci *hci,
++				uint8_t subevent,
++				bt_hci_callback_func_t callback,
++				void *user_data, bt_hci_destroy_func_t destroy);
++bool bt_hci_unregister_subevent(struct bt_hci *hci, unsigned int id);
++
+ bool bt_hci_get_conn_handle(struct bt_hci *hci, const uint8_t *bdaddr,
+ 				uint16_t *handle);
 -- 
 2.53.0
 
