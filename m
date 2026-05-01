@@ -1,38 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B201314A6B
-	for <linux-bluetooth@vger.kernel.org>; Fri,  1 May 2026 22:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59E217A2E8
+	for <linux-bluetooth@vger.kernel.org>; Fri,  1 May 2026 23:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777675038; cv=none; b=Sj0cxEHIJua2P2f+3bDllYgiTh3+LtEo3MxasBixtVs97rDFuYxJcXnxMGjVaPRy7XiwtCG8tzLeqA9DFw94WPnBW97JdGeUoQq3LV6eIqcWitv4m8xqR/5lYjpd+7u/9mMv7nkGnoFV5y3S8g21SK0oLITEsEV3zTZv0lKXV7k=
+	t=1777678605; cv=none; b=q5F/Fc6IaK/GFhXQKymdb6emBVqPgp4pOd9JtBzezQunJNnoO1qJpELjn8joIcJVa9RtSVDMfT1BTbJB1Cn753QvVqqzkzw7njybvtref/gyPHf1YNm9xpqUyfGwpD/25n5WTh7yM1U2P66YV9cQQBlwGqnbC0MnOWywoO4Obdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777675038; c=relaxed/simple;
-	bh=0TPYHWLgKXDiZGfNntI1eu+VssfCrhcSIw71mw77xfQ=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=gdF4o0iZ70z+rpkWCtbeyoz5R50iLjVn57MBB9O+PANiirrgIf7ljybn/N1VbtZraa5qDfur9+dwzgpkyEYCb0mAIF4TWl2H0E+qHUX+YEfYWN846J72etWlTDDfn+2Ly4z5Pwgu+tiYhgHrnVIhczvpja3+Fw2wmTXxx4Hc6mI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uJYb6VcU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777678605; c=relaxed/simple;
+	bh=/o684xJnWztkDaEVKy60yUq8AIRvApuOigUCYT/GPUw=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Xec7MXyqOsyLsdGp6ox+r0DyL82yXBGuaZGHIG/7Ohh73eVIBohVoz++DKOSbIuPGJiV8+udOHY0X8yFhm6Ca2z9+zz+fTAkBEX+LgBv2QRij/zXipp9EQYS4GN0ApVd88wwkWi6Ut3UUh9OfF3HItjg47S/7BKZIBi4Yus6Xwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vJ7lRluK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uJYb6VcU"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D82FAC2BCB4
-	for <linux-bluetooth@vger.kernel.org>; Fri,  1 May 2026 22:37:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vJ7lRluK"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 60DE6C2BCB8
+	for <linux-bluetooth@vger.kernel.org>; Fri,  1 May 2026 23:36:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777675037;
-	bh=0TPYHWLgKXDiZGfNntI1eu+VssfCrhcSIw71mw77xfQ=;
-	h=From:To:Subject:Date:From;
-	b=uJYb6VcUCkgDeLPPE0H1jTh8NkqYNV86qMAZcfCWXaV1z69nseZJp5zklmZK2SbRj
-	 lfpjzRVbwOW636IB2PsKHAjMfB4iqcJCqfXnRGYKgRn3uRk5xi8Bhc7gad7JU+jYlw
-	 3vgHKzYGkd2GsWqZf6hDEHRQwHLKf9Dhkp10Q7rKGXCGcmTIA4R0gzPxgDlSsp4Do9
-	 wIhxV6gzVLld2ph/kPznd2wWf1eBR8iDUqJFPme1ODl4cU3pmbJ2r9TiJOs1iUbzXc
-	 YcWwN4crdCuZPPS3Eg1mnpmkugZTrrGpj+VWfOet1NKEInJn572NvfpXYiU0HrLsKh
-	 NhxXUTj1h1T7A==
+	s=k20201202; t=1777678605;
+	bh=/o684xJnWztkDaEVKy60yUq8AIRvApuOigUCYT/GPUw=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=vJ7lRluKhwo6FdeqZ1QBU/yp0QA8qfOty1Ptcg3ZvbV+mLjnkTRTZkXDgN6OPasA8
+	 2QnxuoIUxtx/CqmE2xnc6IEH0GR53gekjSWzSWLwUnoAzSg346zzVGsWXExE0cc5A0
+	 Hvgxq9v+Kouao/kgCInWov/Eh4HvXG0IXqTWwFpk7Si2i9XCo0HZZPxU78z1DVzUrN
+	 5j9n001sOb4FSXGlwwghm7s7i+0XYd8dJGbmUcEaNnDjAOmyrfoGVCwHiYhAn3ehEX
+	 wwFnMupiW7TRYEB2da03zg08ulwG8RMo2hr3o9NW6QJfM+jp9uON/LEe7y9SrSjV9N
+	 29VUH4OsrcZqg==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id C2A41C4160E; Fri,  1 May 2026 22:37:17 +0000 (UTC)
+	id 4D5F1C41612; Fri,  1 May 2026 23:36:45 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221449] New: Wireless gamepad stopped working through Bluetooth
-Date: Fri, 01 May 2026 22:37:17 +0000
+Subject: [Bug 221449] Wireless gamepad stopped working through Bluetooth
+Date: Fri, 01 May 2026 23:36:45 +0000
 X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
+X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
 X-Bugzilla-Product: Drivers
 X-Bugzilla-Component: Bluetooth
@@ -45,10 +46,10 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-221449-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-221449-62941-8dIzRbARGk@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221449-62941@https.bugzilla.kernel.org/>
+References: <bug-221449-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -62,57 +63,10 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D221449
 
-            Bug ID: 221449
-           Summary: Wireless gamepad stopped working through Bluetooth
-           Product: Drivers
-           Version: 2.5
-          Hardware: Intel
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: arvin.ignaci@gmail.com
-        Regression: No
-
-I'm running Fedora Silverblue 44 (Universal Blue image) with kernel version
-6.19.14. Some time in the last month or so, a Bluetooth gamepad I had stopp=
-ed
-working. It started with inputs being mapped incorrectly and certain inputs=
- not
-being recognized. Now, I don't get any input at all. The same gamepad used =
-to
-work just fine over Bluetooth and still works over USB.
-
-The gamepad is a GuliKit KK3 set to the "Android" pairing mode; It shows up=
- as
-an "Xbox Wireless Controller" in Linux. My Bluetooth controller appears to =
-be
-an Intel AX200 modem (according to lsusb). When I connect the gamepad via
-Bluetooth and try pressing some buttons or moving the sticks around, the dm=
-esg
-output is filled with these messages:
-
-> [ 2041.273972] hid_report_raw_event: 14 callbacks suppressed
-> [ 2041.273976] microsoft 0005:045E:02FD.000C: Event data for report 1 was=
- too
-> short (16 vs 15)
-> [ 2041.277912] microsoft 0005:045E:02FD.000C: Event data for report 1 was=
- too
-> short (16 vs 15)
-> [ 2041.280044] microsoft 0005:045E:02FD.000C: Event data for report 1 was=
- too
-> short (16 vs 15)
-> [ 2041.288927] microsoft 0005:045E:02FD.000C: Event data for report 1 was=
- too
-> short (16 vs 15)
-> [ 2041.300915] microsoft 0005:045E:02FD.000C: Event data for report 1 was=
- too
-> short (16 vs 15)
-> [ 2041.309919] microsoft 0005:045E:02FD.000C: Event data for report 1 was=
- too
-> short (16 vs 15)
+--- Comment #1 from Arvin Ignaci (arvin.ignaci@gmail.com) ---
+To clarify, the gamepad stopped working after a system update, which is why=
+ I
+suspected a kernel regression and posted this issue here.
 
 --=20
 You may reply to this email to add a comment.
