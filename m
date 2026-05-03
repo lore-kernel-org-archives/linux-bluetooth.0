@@ -1,102 +1,168 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-24421.protonmail.ch (mail-24421.protonmail.ch [109.224.244.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D7634C9A3
-	for <linux-bluetooth@vger.kernel.org>; Sun,  3 May 2026 19:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283E23845D8
+	for <linux-bluetooth@vger.kernel.org>; Sun,  3 May 2026 23:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777836185; cv=none; b=a0D9hYMiyDZ8teQZIGfWPervtecA8Xb29scwRFkMbfEVjWvYD8zEoAnVEQiokORTCGIM6kJPba/gJ4DXHFv7Afq8hjBlZ1eALgJhp/gWYrUJEuV02Bvvrg3WtDu19f8r7/BWAglLCy0PZ5Gbn/SVIEyERrsGWHA/ksv/QjNzhYs=
+	t=1777850708; cv=none; b=C7Ss0mEextjc2TPNwHkZjQ7MjTRBRdTi5Yf1cXGXtX6ed2cv8To298ICN2WeezMbcdX1g01gKTYMy2sihaSfZM97PxxhMXCGnmHChIMZWF1PNpvf5P6hzEGn8flcyKoNL+SoFkLhZ2saHWAepZZ3ILNIYuiW18TuhgAaK9nw1sY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777836185; c=relaxed/simple;
-	bh=AY5hoYnqhAWpsABOAbtb1aTyA7L8FjdplsClX3diQsE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BVQrUPfDU91w1rYQf5vfHsc8EMEC7hQ2DGrWjeydmpFLpNtnbUPBVNRarnEsROVDM8hmdAFJ3Sf6V1LZheEGZjxoB/E38IqTm2wvRD3/qsrQqIWUZWi9ifL6VXkZTjIJbsDikqGeLXDYigaRl3YtyygELLOhOr2vE3z6hGrwzI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AEP4tW+b; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777850708; c=relaxed/simple;
+	bh=rP1iz8EjbGtJVmUZ2x+1WkA3uF8VPP+pBgfiLE4ETiQ=;
+	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=nY7V8C8y2OueYMyUaGiQtOjtQ/KpvLfAsL7ZHOjF693C278B1IOGXTLvJ80sv1Fr/jsok80s+QzRa4W8ewQIXuRWXTYXb0L0aJ517ocvU48Eq2yGv5apMhXKluUb67SYM1kcGijNk2BlTtlzyh1GxYQydrb9YWPPQrv9LCgaMXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fluentlogic.org; spf=pass smtp.mailfrom=fluentlogic.org; dkim=pass (2048-bit key) header.d=fluentlogic.org header.i=@fluentlogic.org header.b=KiOroc3F; arc=none smtp.client-ip=109.224.244.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fluentlogic.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fluentlogic.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AEP4tW+b"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ED2C4C2BCB9
-	for <linux-bluetooth@vger.kernel.org>; Sun,  3 May 2026 19:23:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777836185;
-	bh=AY5hoYnqhAWpsABOAbtb1aTyA7L8FjdplsClX3diQsE=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=AEP4tW+bG7NaFMgp874d7tnZ0VjxjXvMzyFUw9dsW0b8fEOA6HTBqPgY+loBoNbCd
-	 3h64wQLB3a2qWHzhhsOfWAeMowRCew1NQPRLUKSrbsFrfFugfjMmk+zPZSVo/kgPpb
-	 CLexa8Mp1h1ja9nletvlv+bq5iUADwNPK4J7/iGrgcK6at1Qngz8rrXQ0eWuHEGBsq
-	 znilObCb2P7h2E/2dNup0dtlntetObUbZjvj45ESMnEIrc11KP+3dUyTKuDmoM8xSk
-	 jrrZ2eswO6p4mO+PuqypEz1uYX5KIX2R3QoV/BiEQvMbee/+OPE0CfkeRn5RQnG+Ot
-	 OtDUZiOEVWP0Q==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id D773CC4160E; Sun,  3 May 2026 19:23:04 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 220237] Bluetooth: MediaTek MT7925 (0e8d:7925) fails to load
- firmware with timeout (-110)
-Date: Sun, 03 May 2026 19:23:04 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: jens.nitschke@mailbox.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-220237-62941-DnC8nTj8bg@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220237-62941@https.bugzilla.kernel.org/>
-References: <bug-220237-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=fluentlogic.org header.i=@fluentlogic.org header.b="KiOroc3F"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fluentlogic.org;
+	s=protonmail; t=1777850700; x=1778109900;
+	bh=rP1iz8EjbGtJVmUZ2x+1WkA3uF8VPP+pBgfiLE4ETiQ=;
+	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=KiOroc3FGMViWdUWjpkG9fSO8zAzNuiUfI6468mcAQnGjDmkIL3EBFlQSEaxnuOdE
+	 Zkr/rpCS4vcotyZBTOMKiFkNJMzHW5Z1go3S6feaz6lWmqe63Ut6FRKJv9iX91a5jG
+	 043yaX36Qn6OFvrmyiv1r7f0trgoHUHST2qsecLY5J7roThBeOgQ52fpZ4XrFuYn4M
+	 c787AdiWB4gZ9O9zkyv+Q4keowdQpJ1dPvLtfoeU6xMkM2E2P1EJMahLYGERB86hBW
+	 KYenlAnqfIUzcMm5/Y2+GItkTLQxZ1I8klz3yTWisZ/CeIoaMYMrizUfKHwZ82+WZx
+	 6kl9J+YoaK3xw==
+Date: Sun, 03 May 2026 23:24:55 +0000
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: admin <admin@fluentlogic.org>
+Subject: [SECURITY] BlueZ sdp.c signed integer underflow in SDP sequence parsing (8.1 HIGH)
+Message-ID: <ygH6bncNsvf-0Hco92Ae11Lw8-jOfekFO6O3bUvFK8w0DTueny_rwJIF6ffZg2G_XCB4v8h8xRIcAL2b_KwaweNcGa231ZQDHCMpzyvR5i8=@fluentlogic.org>
+Feedback-ID: 121058281:user:proton
+X-Pm-Message-ID: c85b23c14917cfaa69dfc06ea291949cd8aba2b3
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220237
+To: linux-bluetooth@vger.kernel.org =C2=A0 =C2=A0 =C2=A0=C2=A0 Subject: [SE=
+CURITY] BlueZ sdp.c signed integer underflow in SDP sequence parsing (8.1 H=
+IGH) =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0
 
-jens.nitschke@mailbox.org changed:
+=C2=A0 linux-bluetooth, =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |jens.nitschke@mailbox.org
+=C2=A0 Reporting a residual signed integer underflow in BlueZ 5.86 HEAD tha=
+t =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0
+=C2=A0 was not fully addressed by commit 31e4fb1.
 
---- Comment #4 from jens.nitschke@mailbox.org ---
-Device: HP OmniBook X Flip 14-fk0178ng
-BIOS: F.10 (2025-10-22)
-OS: CachyOS (Arch-based)
-Kernel: 7.0.3-1-cachyos
-WiFi/BT chip: MediaTek MT7925 (PCIe ID: 14c3:7925, Subsystem: 8c38)
-I can confirm this issue on my device. The Bluetooth USB interface never
-enumerates successfully. WiFi works fine via mt7925e driver.
-Key symptoms from dmesg:
+=C2=A0 AFFECTED FILE: lib/bluetooth/sdp.c lines 1213, 1262, 1392
 
-usb 3-5: device descriptor read/64, error -110
-xhci_hcd 0000:65:00.0: Timeout while waiting for setup device command
-usb 3-5: device not accepting address, error -62
+=C2=A0 ROOT CAUSE: =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0
+=C2=A0 bt_get_be32() returns uint32_t. The result is stored into an int*
+=C2=A0 target, sign-extending values >0x7FFFFFFF to negative. High-level =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0
+=C2=A0 paths in extract_seq() and sdp_extract_pdu() have seqlen<0 guards, =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0
+=C2=A0 but the residual paths introduced or left unpatched in 5.86 HEAD
+=C2=A0 remain unprotected. An adjacent attacker sending a crafted SDP =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0
+=C2=A0 response with an oversized sequence length field triggers negative
+=C2=A0 seqlen, bypassing subsequent size checks and corrupting heap metadat=
+a. =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0
 
-The BT device never appears in lsusb or rfkill. No hci0 interface is create=
-d.
-Workarounds that had no effect:
+=C2=A0 ATTACK: =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0
+=C2=A0 Pre-pairing, no authentication required. Auto-triggered on Bluetooth
+=C2=A0 device discovery. Adjacent attacker sends malformed SDP PDU during
+=C2=A0 scan =E2=80=94 signed underflow =E2=80=94 heap corruption =E2=80=
+=94 potential RCE or DoS
+=C2=A0 in bluetoothd. =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0
 
-pcie_aspm=3Doff
-usbcore.autosuspend=3D-1
-xhci_hcd.quirks=3D0x80000
-Early loading of mt7925e via initramfs
-linux-firmware up to date, firmware files present in
-/lib/firmware/mediatek/mt7925/
+=C2=A0 CVSS 3.1: AV:A/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H =3D 8.1 HIGH =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0
+=C2=A0 CWE-191: Integer Underflow =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0
 
---=20
-You may reply to this email to add a comment.
+=C2=A0 REMEDIATION: =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0
+=C2=A0 Add seqlen<0 guards at lines 1213, 1262, 1392. Store bt_get_be32() =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0
+=C2=A0 result in uint32_t and validate against INT_MAX before signed cast. =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+=C2=A0 Also reported to security@bluez.org. =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0
+
+=C2=A0 Martin Brodeur =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 Ottawa Canada =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0=C2=A0
+=C2=A0 Independent security researcher
