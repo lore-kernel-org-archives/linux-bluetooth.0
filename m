@@ -1,134 +1,90 @@
-Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-106100.protonmail.ch (mail-106100.protonmail.ch [79.135.106.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B883EE1CB
-	for <linux-bluetooth@vger.kernel.org>; Mon,  4 May 2026 19:04:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9A843F54DB
+	for <linux-bluetooth@vger.kernel.org>; Mon,  4 May 2026 19:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777921502; cv=none; b=p4jlfzB174ovzZj7nD30ur29YX/MXPUh1cBxebIC/Kc/pkqTABSqz9wdR+tjhJcW14cVY8V7MdBXft8zktJ0U2m8/oTGWZy45jRMhOr1s3YHGOxHtDFcY8xYGLwFBLh31JrThC6J0q4Fjv8WaYkpf/O1TmUbSgP8VCCjnMR4uRk=
+	t=1777921835; cv=none; b=S3qjRw79nyJxWTBu9rXll3BN2brM++Uu6uyH4vt0eUXDrJuYvDFNkFR9BA4GuKpnVHpSjo9o98GkQdDdtAwcjfFBrreND7qkGV3a4vb0FwFa7ilRAe3KaGS2pSi1/YF6i432Awpx5cHQqOdGEx72Ct5NX5+QcRUwPJIJ2rnpAFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777921502; c=relaxed/simple;
-	bh=TkTETB8FcuH37Uk23eNwtrGHgZT+XB61FHNKHQI7Qww=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ADVMxBoa6mj/t+OmENAqj3K8Hd+g95a/3wwcxyXxcXLhp21AmizOrweK22e8qIG26AEqB9K+Pd7IxLi3aYTUd2/p/BylY4KgHlUdedlwuxKH1+8mWeQqKhR71bbJf2Y7inseRfjhiX1iDTsoFm1TpZz3093gX7u7SYygv6FpSPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-7df05fc49e5so1023568a34.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 May 2026 12:04:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777921497; x=1778526297;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+kg55pUc+YqgDvvLMINRJfFAwlkmL6dsD2oqNH5ePEw=;
-        b=CB7pEJAvQ6w9KW1ybgPFYABBI03iXK0vabMCLqRW0SL1MrgCvts8lGAh7jnc+CSe8C
-         2CM8BfCFNoHdsZeKC578wyXhos3ehfG5TEYbP3Q4cVK0j1EhXjHZh1dOOgjdqy3TY2b1
-         VgdZysDVZOm8tjPWfyXhVmTDM91bq+MzL6ett2TbYMFH9sjjAs8FliQAglWI/WFFVduh
-         ymloI2aED+T5G0R54fR4arzLCkM4GsWo9ycP21X/egH24uKehnFIf1OjpqMGwK+WUhGM
-         Bzp0NNQrVu0u3iI7X7qk/Wn6L2SKp6U7PWgvYHOyRwR9La9kMvytYrVYGVgjU/HNr36W
-         KtsA==
-X-Gm-Message-State: AOJu0YxncXFx8suCHXSRz4O0vckgwYRbU8ovCCuLMCvTveerSxmcszZ7
-	KFZ8ghcDN2nFO2r3hIp2xqp80Jq6g4Gi8/vcTdeE5H58VlxLTaKsD/st
-X-Gm-Gg: AeBDievNJEZ+zZUeNfUmrZZ4yUYzGE2Jfv8yv9hc9kQnOx9skEl5+vKvS7P147cIqBR
-	fgXqKUD+48/Z+1FakmFwB9qSZfIiIMqbjqEiOcuq60vWLf+1IxSMpSLbfe1Yi49MEDBGQMs/mql
-	izoYVyFe2TZBsDdXx4EmU2MVBCEeqcsohnROaeCxsPY5BD6sONnX7YVedYPyvs9++7JHW21Oh5i
-	YW5HV462qDNjtl2fwNWe1RuVwVb+MyRJhnvnmrwWgjl1Zn3tDGb/LnedAIAjwPJMXiC2J64T9gN
-	WzsVMrXU3tWRq6lFU3d+FGpgPGXxnfmYegJ6APrDrBsUDj1DttfYztf6rog9JG50Tzxw0bcxFp/
-	jLKFYp+pvERu6SSxz4dMkpCoOZeKKLJx92nF0mqXhmP4bCgRXkGgZkN4IyhiCgMwzXz11rpgiJd
-	NB8urybV8LAEvC8KxQuz2xBdfLOtQpGqwBXhEAa182ohsq/gSYzzlU8LdzSJrcFyZG62mA3qbYe
-	4hZPEkMiLao6+UmHA==
-X-Received: by 2002:a05:6830:63ca:b0:7dc:de0f:b640 with SMTP id 46e09a7af769-7dee12afa83mr6320108a34.6.1777921497138;
-        Mon, 04 May 2026 12:04:57 -0700 (PDT)
-Received: from sean-HP-EliteBook-830-G6.lan ([207.191.35.252])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7ded51a9612sm7524229a34.26.2026.05.04.12.04.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 12:04:56 -0700 (PDT)
-From: Sean Wang <sean.wang@kernel.org>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	Sean Wang <sean.wang@mediatek.com>,
-	Kirill Shubin <kirill.kz.902@gmail.com>
-Subject: [PATCH] Bluetooth: btusb: Add new VID/PID 0x0489/0xe156 for MT7902
-Date: Mon,  4 May 2026 14:03:53 -0500
-Message-ID: <20260504190353.9358-1-sean.wang@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1777921835; c=relaxed/simple;
+	bh=o8nU7hkaGKvsVT2u8xw/6fsy6H4KW4U0FVuzV4vAzHY=;
+	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=WBPBJRHKnbOPSS5nHOXVM1TtMs9LPaV0kY+/2Uu4X0Oa5t+mD8R/67xRPmgPaNM7TBAjLJ/wUANjC6/gY3EI6EfYWNio6ENSeZYd7+l2/dJFAOEYQ//GnOk+FqnAu27KGLq+y3NW5DGWX/yepfDQlzl1klYN1TJlL2jtqudTxRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fluentlogic.org; spf=pass smtp.mailfrom=fluentlogic.org; dkim=pass (2048-bit key) header.d=fluentlogic.org header.i=@fluentlogic.org header.b=GF09RoLe; arc=none smtp.client-ip=79.135.106.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fluentlogic.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fluentlogic.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fluentlogic.org header.i=@fluentlogic.org header.b="GF09RoLe"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fluentlogic.org;
+	s=protonmail; t=1777921827; x=1778181027;
+	bh=o8nU7hkaGKvsVT2u8xw/6fsy6H4KW4U0FVuzV4vAzHY=;
+	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=GF09RoLe63N9lsKeK3VDEP5lmVEVSH4T4UO5apNpaA4f00NQiW5dYHiEPS60IDQ3/
+	 Th6ced9jBGQWZz1lkkgB10n7yjQwz/ikiv6mBRgigkH+f4TZW7lZSJSTfTP2QXoP2b
+	 9aInucCs3lSlhvPJDKfVxYoTKf/HekDMzdHao7aK7o1zmTeEUTgWsAAllkekV3eTEX
+	 9LyqITLE1JXUa4u0mWjwU724Fa5NVlZybGTJzcnK6FUobwghUj/Yq0wfS7m7DHlby2
+	 8g/FAGpyrhjU+/Ns4zzJKQKw0/dteMsm5zbInQqF+Hfh0+/poClBRnEh/mDzO5LP/A
+	 QGCt0TsB8Lb4g==
+Date: Mon, 04 May 2026 19:10:18 +0000
+To: linux-bluetooth@vger.kernel.org
+From: Martin Brodeur <admin@fluentlogic.org>
+Subject: [PATCH v3] sdp: fix overflow in sdp_extract_seqtype()
+Message-ID: <6vsGD_2xyWDIrUZkN1idLdLKf9ChYJJOMyOm2FglmFna_5KyDCgLG6PIsHrMSN5YJv0hAN0APdkK0kZq_5k_qKP_wqILFVxMpmkhb58GyVU=@fluentlogic.org>
+Feedback-ID: 121058281:user:proton
+X-Pm-Message-ID: d25a0842ece8d54830f3b3c1706e9d4be2ebbe55
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Sean Wang <sean.wang@mediatek.com>
+>From 9eef1ada8e0ce68413c17223c673034365c641bd Mon Sep 17 00:00:00 2001
+From: Martin Brodeur <admin@fluentlogic.org>
+Date: Mon, 4 May 2026 13:34:09 -0400
+Subject: [PATCH] sdp: fix overflow in sdp_extract_seqtype()
 
-Add VID 0489 & PID e156 for MediaTek MT7902 USB Bluetooth chip.
+bt_get_be32() returns uint32_t. Assigning directly to the
+int *size parameter sign-extends values greater than INT_MAX
+to negative, bypassing sequence-length sanity checks in
+extract_seq() and sdp_extract_pdu() callers.
 
-The information in /sys/kernel/debug/usb/devices about the Bluetooth
-device is listed as the below.
+Store the result in a uint32_t first and return an error if
+the value exceeds INT_MAX. This closes the residual paths not
+covered by commit 31e4fb1498f4 ("monitor: Add decoding support
+for HIDS 1.1 flags and attributes").
 
-T:  Bus=01 Lev=01 Prnt=01 Port=09 Cnt=05 Dev#=  6 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e156 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-I:* If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
-
-Co-developed-by: Kirill Shubin <kirill.kz.902@gmail.com>
-Signed-off-by: Kirill Shubin <kirill.kz.902@gmail.com>
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+Reported-by: Martin Brodeur <admin@fluentlogic.org>
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+ lib/bluetooth/sdp.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 572091e601f9..f1a225fe94e4 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -676,6 +676,8 @@ static const struct usb_device_id quirks_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3606), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 	/* MediaTek MT7902 Bluetooth devices */
-+	{ USB_DEVICE(0x0489, 0xe156), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0e8d, 0x1ede), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3579), .driver_info = BTUSB_MEDIATEK |
--- 
-2.43.0
+diff --git a/lib/bluetooth/sdp.c b/lib/bluetooth/sdp.c
+index 7210ce0..3295fc0 100644
+--- a/lib/bluetooth/sdp.c
++++ b/lib/bluetooth/sdp.c
+@@ -1249,7 +1249,15 @@ int sdp_extract_seqtype(const uint8_t *buf, int bufs=
+ize, uint8_t *dtdp, int *siz
+ =09=09=09SDPERR("Unexpected end of packet");
+ =09=09=09return 0;
+ =09=09}
+-=09=09*size =3D bt_get_be32(buf);
++=09=09{
++=09=09=09uint32_t val32 =3D bt_get_be32(buf);
++
++=09=09=09if (val32 > INT_MAX) {
++=09=09=09=09SDPERR("Sequence length overflow");
++=09=09=09=09return 0;
++=09=09=09}
++=09=09=09*size =3D (int) val32;
++=09=09}
+ =09=09scanned +=3D sizeof(uint32_t);
+ =09=09break;
+ =09default:
+--=20
+2.39.5 (Apple Git-154)
+
 
