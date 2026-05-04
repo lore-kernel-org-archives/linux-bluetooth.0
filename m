@@ -1,145 +1,165 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07664222580;
-	Mon,  4 May 2026 06:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B1F029CB24
+	for <linux-bluetooth@vger.kernel.org>; Mon,  4 May 2026 07:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777875811; cv=none; b=jdXzyvwxHKVqAg1YvJKxw3e+gxJghVN1PNZKmbIW4DYBYzFY688bHMdXB3zpjR4rMUFDNoGRYV+fuvhxUyDWElmGs1Yxk9H0chOxSP3WTtL6vXnToyKOEhiYEUdVH4Bv5pCMAlpyuCWR/DcGKP8setDKgsM7FeHORKhUTnEVlrU=
+	t=1777879796; cv=none; b=ZGF3RIvb40F51vPLPlsnxFmWRA8DRP+vkAE/f8VO8StJYEuMt71YmGJTNulUKQvCj7bO+VtsXEtiDkUXzgW3cQLQA1d6q3GnSnUb7Zd3KMJ3OWef82URya+xGJqx6V0qIa6DxLRDEQSvUYGdHBuMTlhB4O5kfQZLecFP73vVk00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777875811; c=relaxed/simple;
-	bh=M2p2YLE/JJsLA8h4FleVrhqYQHUgfRz3l8jdG0jHFPo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=my5qTh2TH9weNllFkYB633ZdXpnR5F6TmWGcRid6y0x3zjHqICVTcOeUMtSsOdOpivsHL43H+EKW2OpFn1KZBCrTAe7lBey1KZwrqQoh9kSKbWuHkAObzQo/11Fpxj1/kPwbh+c4RXSrxa9b6MBfr9+Y8Zm+ufLZYbe2ywuODs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Nlt0j+1A; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777879796; c=relaxed/simple;
+	bh=7Xqu/wUm1QfOXctEIzRh75K+quHMqxzwGFGhOHhW46E=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=pLzsb4ZPp3bxuhFcrdmO1qhnPSnSp2z4vY5smmwvXKnITjLCZzuYWX6G1u4kujAHGNVC2b9d65Hg5mCZrSgbG3UJ93/GVhwxWyfx7OB+++H/eZ9kaSKOYVSiAPZWyZWCHa9cPrUS+O/GYkNOLbxcw7m7MpRJhGPVdAlmqjB0w6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WsPYDwXI; arc=none smtp.client-ip=209.85.210.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Nlt0j+1A"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F1A1C2BCB8;
-	Mon,  4 May 2026 06:23:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1777875810;
-	bh=M2p2YLE/JJsLA8h4FleVrhqYQHUgfRz3l8jdG0jHFPo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Nlt0j+1A/kerXp2iYBB9O67wKpDLmpEDYym+gaXNO1EVlIps8Dkv4VYERiKB5XWp3
-	 Gf/yoGZ1RJ/IUVO71KTm4D0RkZHSzVoMBcs9OlLnj8vhfCHABche98jBDiq1MBjkAh
-	 L8uvDXIOkHctOPKttkcVedUG1g+7F/l7YPZMQ2VE=
-Date: Mon, 4 May 2026 08:22:49 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Conor Kotwasinski <conorkotwasinski2024@u.northwestern.edu>
-Cc: "Rafael J . Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>, driver-core@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	syzbot+d1db96f72a452dc9cbd2@syzkaller.appspotmail.com,
-	syzbot+faeac5b54ba997a96278@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2] sysfs: return -ENOENT from move/rename when kobj->sd
- is NULL
-Message-ID: <2026050437-matter-concur-d533@gregkh>
-References: <20260416150600.2148935-1-conorkotwasinski2024@u.northwestern.edu>
- <20260504050736.17672-1-conorkotwasinski2024@u.northwestern.edu>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WsPYDwXI"
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7d4c12ff3d5so3862401a34.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 May 2026 00:29:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777879794; x=1778484594; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=QAjsO2yesbuznQNwUB+axaoDbi82kmw01D+TRlyNDjk=;
+        b=WsPYDwXIsU1B5m5WPeyVPHGo7ps7Io2HsBfedTfdkr5A9DvXyJE/bmjpUBLy+graj0
+         gRNR8a0JkAzpQ8fvtBhBM23tIpDRWjquej9srFYd6CEdmPH4/uuRvHvdwmgH64NL/xpq
+         9Yune0vXKCPWwEiGkqIrvwTj1mq0a7ZXMpfz+hJmOE0WIykIbSE1XKXcQq9i47OvmCE9
+         +d7O9HELDtPlMZ4dY77PmT+fZNUP6ZqUx880Cr2JIf3dLEZVpaTVFjfrrJDQOy+AQwfD
+         Kkvidor7uLL+d+yf3CC6+U5mQE+iwH/nAyMIHQvPMsfhO5JOqz25zbKxg74JUTKNGaAL
+         +3BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777879794; x=1778484594;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QAjsO2yesbuznQNwUB+axaoDbi82kmw01D+TRlyNDjk=;
+        b=lXP+kDfg/QsKc+0//K0CF6H/NZ79/pV4as1hlDr5ucExboowzkaoiLHeo3hu4RxU2a
+         MbzZhslcw6I1g4wcXfc5uK8zd1MhShOCpA8cWoNItDiTOBDx6jAUzCa3rFA/ig6y1ycx
+         aksKRbwEcBcRYOLl/2paJB55KaPVwh+cQn9Jytl2N6+qWFKA7wS5nftK5H2TNi5mEXwy
+         ioAnhMPM4NoUsuxL+VQuXm/5Psb+BlgpAOFG9NeHU8l4VxuMLX3KqdCS1on+N0qY7a7q
+         eislJnNmsdTJf3jop7vyLMXufEEOS+y6qDXbwbkcpHXPDtJFBkhPPoGnrhtp+drsJegW
+         vrvA==
+X-Gm-Message-State: AOJu0YxtG6z+7J/SqzIFOindim380+UGq4lQNT2TLV6fowerDgo9aLbP
+	BfdNgQgmahHZ6WN03Qv/qa5fMHtx1Z6lwEqF8jXevMfPlfrCpesFnvGACKHN9g==
+X-Gm-Gg: AeBDieuPCweWxMJpVCPPQAdHh6sPluPGRnoAZkfKL3976IcJdm2PGOdrAi3tNM4hSeX
+	vb02e7cZxT3gS1WQNS0UJx51AXuLfRhJaZZ2FFEUfuRDDoLWStsnbq8sStX4iE8oANNQYYfa/KX
+	Jng8TTSWhBrdfQ7ulEIkFE3kp++U/IEw8epQiJPCjkiAhEnlyJm4eeYZ3FEdbgCEhUBOsXR2OuZ
+	pWKrn2xAofEzpgxtXaFcLL/R3bnoONnAd/pol9qkMaJmb+B+ohIc99XA8eSNFaf3HVpk0PEbEVW
+	VhMW6hUvrwPjPAJZXgez/PEckwg0RbKDyBD3oWZ9B+pvoHa2bgx2pXKz8u8+VP9st5h/PVcm590
+	gvTplR0jjq0R5dISgmbq+/zH4RxmKbwnZRl0HG9Gu5P5MzVA4eZJGZHdyIie3am/+SLXMisVjvp
+	h5irbgMr4V+ukA03SxKiIUaXIiOOlFwqACEE1ntqttiR4wSqQ87wA=
+X-Received: by 2002:a05:6820:3104:b0:681:b070:3dc6 with SMTP id 006d021491bc7-696979cf6c3mr4356528eaf.10.1777879794085;
+        Mon, 04 May 2026 00:29:54 -0700 (PDT)
+Received: from [172.17.0.2] ([132.196.83.33])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43454cbbbd7sm9347310fac.10.2026.05.04.00.29.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 May 2026 00:29:53 -0700 (PDT)
+Message-ID: <69f84af1.050a0220.2ef67e.53fe@mx.google.com>
+Date: Mon, 04 May 2026 00:29:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0698462937048448091=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, conorkotwasinski2024@u.northwestern.edu
+Subject: RE: [v2] sysfs: return -ENOENT from move/rename when kobj->sd is NULL
 In-Reply-To: <20260504050736.17672-1-conorkotwasinski2024@u.northwestern.edu>
+References: <20260504050736.17672-1-conorkotwasinski2024@u.northwestern.edu>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Mon, May 04, 2026 at 01:07:36AM -0400, Conor Kotwasinski wrote:
-> sysfs_move_dir_ns() and sysfs_rename_dir_ns() pass kobj->sd to
-> kernfs_rename_ns() unconditionally. If sysfs_remove_dir() has already
-> cleared kobj->sd, the NULL flows through and kernfs_rename_ns()
-> dereferences it via rcu_access_pointer(kn->__parent), which KASAN
-> surfaces as a stack-segment fault on the shadow lookup:
-> 
->   Oops: stack segment: 0000 [#1] SMP KASAN PTI
->   RIP: 0010:kernfs_rename_ns+0x3a/0x7a0 fs/kernfs/dir.c:1752
->   Call Trace:
->    kobject_move+0x525/0x6e0 lib/kobject.c:569
->    device_move+0xe0/0x730 drivers/base/core.c:4606
->    hci_conn_del_sysfs+0xb8/0x1a0 net/bluetooth/hci_sysfs.c:75
->    hci_conn_cleanup net/bluetooth/hci_conn.c:173 [inline]
->    hci_conn_del+0xc36/0x1240 net/bluetooth/hci_conn.c:1234
->    hci_conn_hash_flush+0x191/0x260 net/bluetooth/hci_conn.c:2638
->    hci_dev_close_sync+0x821/0x1100 net/bluetooth/hci_sync.c:5327
->    hci_dev_do_close net/bluetooth/hci_core.c:501 [inline]
->    hci_unregister_dev+0x21a/0x5b0 net/bluetooth/hci_core.c:2715
-> 
-> syzbot has reported 35 hits with this signature across net, net-next
-> and linux-next between July 2025 and January 2026, via both vhci
-> release and HCIDEVRESET ioctl.
-> 
-> Return -ENOENT in that case, consistent with sysfs_create_dir_ns().
-> The underlying ordering problem in bluetooth -- device_move() called
-> after the target's sysfs has been torn down -- is a separate issue.
-> 
-> Reported-by: syzbot+d1db96f72a452dc9cbd2@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/687c6966.a70a0220.693ce.00a5.GAE@google.com/
-> Reported-by: syzbot+faeac5b54ba997a96278@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=faeac5b54ba997a96278
-> Fixes: 324a56e16e44 ("kernfs: s/sysfs_dirent/kernfs_node/ and rename its friends accordingly")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Conor Kotwasinski <conorkotwasinski2024@u.northwestern.edu>
-> ---
->  fs/sysfs/dir.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/fs/sysfs/dir.c b/fs/sysfs/dir.c
-> index ffdcd4153c58..6664fae288c9 100644
-> --- a/fs/sysfs/dir.c
-> +++ b/fs/sysfs/dir.c
-> @@ -108,6 +108,9 @@ int sysfs_rename_dir_ns(struct kobject *kobj, const char *new_name,
->  	struct kernfs_node *parent;
->  	int ret;
->  
-> +	if (!kobj->sd)
-> +		return -ENOENT;
-> +
->  	parent = kernfs_get_parent(kobj->sd);
->  	ret = kernfs_rename_ns(kobj->sd, parent, new_name, new_ns);
->  	kernfs_put(parent);
-> @@ -120,6 +123,9 @@ int sysfs_move_dir_ns(struct kobject *kobj, struct kobject *new_parent_kobj,
->  	struct kernfs_node *kn = kobj->sd;
->  	struct kernfs_node *new_parent;
->  
-> +	if (!kn)
-> +		return -ENOENT;
-> +
->  	new_parent = new_parent_kobj && new_parent_kobj->sd ?
->  		new_parent_kobj->sd : sysfs_root_kn;
->  
-> 
-> base-commit: 36f35b8df6972167102a1c3d4361e0afb6a84534
-> -- 
-> 2.50.1 (Apple Git-155)
-> 
-> 
+--===============0698462937048448091==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Hi,
+This is automated email and please do not reply to this email!
 
-This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-a patch that has triggered this response.  He used to manually respond
-to these common problems, but in order to save his sanity (he kept
-writing the same thing over and over, yet to different people), I was
-created.  Hopefully you will not take offence and will fix the problem
-in your patch and resubmit it so that it can be accepted into the Linux
-kernel tree.
+Dear submitter,
 
-You are receiving this message because of the following common error(s)
-as indicated below:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1089086
 
-- This looks like a new version of a previously submitted patch, but you
-  did not list below the --- line any changes from the previous version.
-  Please read the section entitled "The canonical patch format" in the
-  kernel file, Documentation/process/submitting-patches.rst for what
-  needs to be done here to properly describe this.
+---Test result---
 
-If you wish to discuss this problem further, or you have questions about
-how to resolve this issue, please feel free to respond to this email and
-Greg will reply once he has dug out from the pending patches received
-from other developers.
+Test Summary:
+CheckPatch                    PASS      0.66 seconds
+GitLint                       PASS      0.28 seconds
+SubjectPrefix                 FAIL      0.10 seconds
+BuildKernel                   PASS      26.76 seconds
+CheckAllWarning               PASS      28.73 seconds
+CheckSparse                   PASS      27.73 seconds
+BuildKernel32                 PASS      25.43 seconds
+TestRunnerSetup               PASS      525.64 seconds
+TestRunner_l2cap-tester       FAIL      6.55 seconds
+TestRunner_iso-tester         PASS      295.63 seconds
+TestRunner_bnep-tester        FAIL      6.40 seconds
+TestRunner_mgmt-tester        FAIL      8.76 seconds
+TestRunner_rfcomm-tester      PASS      28.75 seconds
+TestRunner_sco-tester         PASS      68.04 seconds
+TestRunner_ioctl-tester       FAIL      37.27 seconds
+TestRunner_mesh-tester        PASS      26.90 seconds
+TestRunner_smp-tester         PASS      6.41 seconds
+TestRunner_userchan-tester    FAIL      6.57 seconds
+TestRunner_6lowpan-tester     PASS      22.78 seconds
+IncrementalBuild              PASS      24.00 seconds
 
-thanks,
+Details
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: TestRunner_l2cap-tester - FAIL
+Desc: Run l2cap-tester with test-runner
+Output:
+No test result found
+##############################
+Test: TestRunner_bnep-tester - FAIL
+Desc: Run bnep-tester with test-runner
+Output:
+No test result found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+No test result found
+##############################
+Test: TestRunner_ioctl-tester - FAIL
+Desc: Run ioctl-tester with test-runner
+Output:
+Total: 28, Passed: 0 (0.0%), Failed: 11, Not Run: 17
 
-greg k-h's patch email bot
+Failed Test Cases
+Device List                                          Timed out  -30.851 seconds
+Device Info                                          Timed out   -6.202 seconds
+Reset Stat                                           Timed out   -6.205 seconds
+Set Link Mode - ACCEPT                               Timed out   -6.208 seconds
+Set Pkt Type - DM                                    Timed out  -14.396 seconds
+Set Pkt Type - DH                                    Timed out  -14.399 seconds
+Set Pkt Type - HV                                    Timed out  -14.403 seconds
+Set Pkt Type - 2-DH                                  Timed out  -14.406 seconds
+Set Pkt Type - 2-DH                                  Timed out  -14.409 seconds
+Set Pkt Type - ALL                                   Timed out  -14.412 seconds
+Set ACL MTU - 1                                      Timed out  -14.414 seconds
+##############################
+Test: TestRunner_userchan-tester - FAIL
+Desc: Run userchan-tester with test-runner
+Output:
+No test result found
+
+
+https://github.com/bluez/bluetooth-next/pull/142
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0698462937048448091==--
