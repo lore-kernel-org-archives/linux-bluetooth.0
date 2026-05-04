@@ -1,35 +1,35 @@
-Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42A83D9029
-	for <linux-bluetooth@vger.kernel.org>; Mon,  4 May 2026 17:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E1F3E4C8C
+	for <linux-bluetooth@vger.kernel.org>; Mon,  4 May 2026 17:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777917514; cv=none; b=Kh15kRvFK285wAM/4Py6XJ6mv21c6BkC3ggqKmqMLdl64oa0oSlsqlvVvgXYlHtc4LVCbVHCilsqz/pmwZWOcGkDDXn5wefeTfRihb8YKC4VEc1xZbnWB03+qJbd8qHrq3zkRVX4J1wLmzrp/rkNHMc9oYBimhjoGUKNz2Gz9O8=
+	t=1777917518; cv=none; b=mWWEpcl2aBPUUu4kFQ4qIQHBXDUHwvIQ6Mhov9gTwMkMkHtgDUq/anFQ2CdjKidwMW4ooJhgwReAcMiq2yaGsk5rX6+9qPVzJdHHISR2bXopkjpU+jYJeYZAy/37sDVuTwtX2JrTjpPiJ32GKx15+ei0d4sbABG71xem5KuBKHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777917514; c=relaxed/simple;
-	bh=jWWLPRklRW146gdZeme9qwAmBaiR90MslAd3Cb5Fcm8=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=i1M0rz4x2vEe4oJGIBhWjDzpvSQ2cbgLJ0XpzWI4ZGiwc5A4LZIn3vkFiRA0DPjDRtvnk3kST07vfQmn4JSsW4VcXyerJBJvtKOKaBCRGJcRwiT73e1a+uAua+8daM8IwER6K1RyHY3CyhDQQSbtmse1qkA+nrHxIKFM2nlJISw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=OcLbP9Db; arc=none smtp.client-ip=192.30.252.206
+	s=arc-20240116; t=1777917518; c=relaxed/simple;
+	bh=9fRbhQMRpDfZte7CkabUMW50rjmNhLJOBZeBvU+kuaM=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=nDlNveiphcTcf+OL7GvKCipDjN2HnPOEhWe4htjpVEQbBPxL66MhQLkAtoKBR4M3f1ldc9JLqR6OnLAF2vO1bLH4H6HBEvvZe1a97V6QU7QlcWW506MWgpKz/6Nc9YwcOpxr5dihIMan+OYDfppY+vN2x11HKJM/Avo1pocQ2+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=hH6JNU0y; arc=none smtp.client-ip=192.30.252.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="OcLbP9Db"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="hH6JNU0y"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1777917512;
-	bh=vkkTkVjKfTtUmJLtW87jzzgPWmOfVQt7Wc/4atZWT8Q=;
+	s=pf2023; t=1777917516;
+	bh=61oFI7MoT5CyXv8YIBrfSl93hbC1gZ4/0sQqCbHN4jQ=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=OcLbP9DbfMX5NDAMyV+UgBoQeTPeTG8+oaPykGRcYbh4eaZET0ADj/IJidBT2/Hyn
-	 zyuSqTjuChVdYNGK+zKb10lUxO3dmUdhNaPrYx0s5/Nxz8go0w2vrlIVE2Ub0d3Q2J
-	 MNGNmUfyNQzRp3PyP9nEYYZyLQbulZl7s2LTR6lM=
-Received: from github.com (hubbernetes-node-683deae.ac4-iad.github.net [10.52.202.124])
-	by smtp.github.com (Postfix) with ESMTPA id 0152A21084
-	for <linux-bluetooth@vger.kernel.org>; Mon,  4 May 2026 10:58:32 -0700 (PDT)
-Date: Mon, 04 May 2026 10:58:31 -0700
-From: "github-actions[bot]" <noreply@github.com>
+	b=hH6JNU0y1ajpVT7Q/zrniupaFY+hsO7VQNGjgiUq9ZO/BH5CeM6AI5r/OlLTDM7AC
+	 eqCo+XO3gxG5ykFfpe7t3OIyuWUFQWdiXbEVQrqrqgaGtGAx23/sWJ1r4at/oJq2Ol
+	 ENfAalITSGwX4SJuaJs5vTBOHYDOlSKpoQKDg7pk=
+Received: from github.com (hubbernetes-node-12627c4.va3-iad.github.net [10.48.222.13])
+	by smtp.github.com (Postfix) with ESMTPA id 38D87180C7E
+	for <linux-bluetooth@vger.kernel.org>; Mon,  4 May 2026 10:58:36 -0700 (PDT)
+Date: Mon, 04 May 2026 10:58:36 -0700
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1089431/000000-dd093e@github.com>
-Subject: [bluez/bluez] dd093e: sdp: fix overflow in sdp_extract_seqtype()
+Message-ID: <bluez/bluez/push/refs/heads/1089386/db9aa4-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,31 +42,7 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1089431
+  Branch: refs/heads/1089386
   Home:   https://github.com/bluez/bluez
-  Commit: dd093e5cd4678eddd38db79325fe7cfb83084a7b
-      https://github.com/bluez/bluez/commit/dd093e5cd4678eddd38db79325fe7cfb83084a7b
-  Author: Martin Brodeur <admin@fluentlogic.org>
-  Date:   2026-05-04 (Mon, 04 May 2026)
-
-  Changed paths:
-    M lib/bluetooth/sdp.c
-
-  Log Message:
-  -----------
-  sdp: fix overflow in sdp_extract_seqtype()
-
-bt_get_be32() returns uint32_t. Assigning directly to the
-int *size parameter sign-extends values greater than INT_MAX
-to negative, bypassing sequence-length sanity checks in
-extract_seq() and sdp_extract_pdu() callers.
-
-Store the result in a uint32_t first and return an error if
-the value exceeds INT_MAX. This closes the residual paths not
-covered by commit 31e4fb1498f4 ("monitor: Add decoding support for HIDS 1.1 flags and attributes").
-
-Reported-by: Martin Brodeur <admin@fluentlogic.org>
-
-
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
