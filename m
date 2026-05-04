@@ -1,275 +1,135 @@
-Received: from mail-4323.protonmail.ch (mail-4323.protonmail.ch [185.70.43.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3043149620
-	for <linux-bluetooth@vger.kernel.org>; Mon,  4 May 2026 17:12:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4969923EAAF
+	for <linux-bluetooth@vger.kernel.org>; Mon,  4 May 2026 17:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777914733; cv=none; b=daPkzrQcKZCuB9Gt3l/P26GbIPRASrX4l0a2oZZrM5ELna82EcWcENHXWfznCBP/ncK/RdY/hmdSHYFjZrFhAJNmrmCEtCcvO/LB57JLS0igUDHDbS1gtKABmq83LFsssb7v8U1YFvGL4R5L2e+g4R7QSMwB1iH6r4LFXOf3Jow=
+	t=1777915609; cv=none; b=lnBWyLOkDCcXhKQILGf2JF3/1hFjNF3XpIMXFgUICPZ+CQFoT73b9lMilAlGOkeFoFEu0PFFiibeq9g4dv/5VPCUNXqdvTdATKhJg8b8Jsphxy48K3UrTThSiRMCzbGfrCIKX7nqqG4rBBGLZX9aN1z1EVZ4fGc3tR9K0rXSNP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777914733; c=relaxed/simple;
-	bh=Lriy2/savmlitRwjQVAAHff6H1AoJ13Dlz+wcqYkdwQ=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FmsY2+IW/0182OYzNyw5/6N3UjxEuMXxNGqMFM5pa++Z6Ic54OMEm3zlR0YcBQN3cG8NskZe/TgQXtuSdCueuqFIRKBKv9YToN15m8+nJhuf11QxxYEHp00tcpaPvLLg90wzYsmT8sggpPu7axC+FpSR9Y84ZcOtZdA/GMG07R4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fluentlogic.org; spf=pass smtp.mailfrom=fluentlogic.org; dkim=pass (2048-bit key) header.d=fluentlogic.org header.i=@fluentlogic.org header.b=RlJsEQmX; arc=none smtp.client-ip=185.70.43.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fluentlogic.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fluentlogic.org
+	s=arc-20240116; t=1777915609; c=relaxed/simple;
+	bh=rCwxyLDHxq+kY4/ypnpM67QRNaOM4/alPzOSBQJJdZk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=fXtIjPFG5zSbi0TE7ZaNjlzJYO7nA2VhVCGTQ0NCCFQhqKMbJ5cExZS7ISDfU8l0iq4ufUlOotXBjORVnueIQY/A/qORILnPdmOEoYNxqJkegAXtQ7CU79EBi6vSGk5J3qSUkJDz+sTlJwyXOfNFuFRywon3JiMPWQpetPeoz48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dhWh+8Xg; arc=none smtp.client-ip=74.125.82.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fluentlogic.org header.i=@fluentlogic.org header.b="RlJsEQmX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fluentlogic.org;
-	s=protonmail; t=1777914727; x=1778173927;
-	bh=xRKcEQbutf2fMqCUa+/ZNP12+5TQVyIEJdmPXW2pr3E=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=RlJsEQmXqfLzXeHodkBwyq/zIzP+ao49a03NaRHCNJZ1vkiYo98R3x+CKG58gETpC
-	 FAjgZr5zp8lTv4pwPzRuctL+/C/hVYuWMJuwFEBRq7uPxqBsAtg1ZrjRVIKAIwzxCw
-	 9ckaalSHzc8WwlCz5+PSGiX0hT9fCMA89hsXW+EUlTf6QV+8TfGG65E6n4Y6Ez5Vad
-	 rMV0ONK/vTc2RFhPi+DMRsZ+NvEpSPrYGyuBf9mDmC9n3JphkSrjneBWh79Wn9MUs0
-	 rrhrlWlAQASS++pNPScu1cW3pf5TS1OmY4PF95SfFZnxEhzOlKmmNrje8irXw+kNsh
-	 1dSHEk+PcQXiQ==
-Date: Mon, 04 May 2026 17:12:04 +0000
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-From: admin <admin@fluentlogic.org>
-Cc: linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
-Subject: Re: [PATCH BlueZ v2] sdp: fix overflow in sdp_extract_seqtype()
-Message-ID: <Rv_xUQOJhZyTRklb1n0yF71KB-MkPlAP_82ZjQSJv12SJaBr5vbpfWcwI3PVtuwotxG27kKsVi92OzRN92zaEBytgiCqZoWASokdLaxzuRA=@fluentlogic.org>
-In-Reply-To: <CABBYNZLQVVrxpcVqU4abyE5sodh6wq=a_z4NbPp+XN04RYz2nA@mail.gmail.com>
-References: <20260504164649.31170-1-admin@fluentlogic.org> <CABBYNZLQVVrxpcVqU4abyE5sodh6wq=a_z4NbPp+XN04RYz2nA@mail.gmail.com>
-Feedback-ID: 121058281:user:proton
-X-Pm-Message-ID: 0888bdfa1ddcbdae8d730ed8413f7d7cbfc81fce
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dhWh+8Xg"
+Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-12c19d23b19so6223720c88.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 May 2026 10:26:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777915607; x=1778520407; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=fdFKrsHJp6Fzh3m2QiP7v2OVGgK9dvMjWtWRZcJvLw4=;
+        b=dhWh+8Xga/Yk8SItWz2R7sNB235z9qEjkQ2lYR084Dsb5PU016tl74xurUnSAMCt0t
+         cYn22QiBXRpKuAK79NZXlmfzlO1jYfklL/jGENugwyOabJqFRmuBY0qxcE4w3J3GBN+i
+         /ZLuPqemeQgEmcvG6gR6VvZtU7jKxdNoxjR9sfE3etHNPa1U9dJg6Ln/EyzLIJyVnFdE
+         fpqrkn2swk1WxI38P4wBzHRqtu2r2bPpahemXgaeZRm8Lu/bA7FXGg6vnVmUrR8iZ8+g
+         mcw07ISNHG4iibZ1nY84zVUjOHFlfB2CQmfBUBbKq7DoHk6iccxKY1NWr3CxcHM1VKnO
+         cWdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777915607; x=1778520407;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fdFKrsHJp6Fzh3m2QiP7v2OVGgK9dvMjWtWRZcJvLw4=;
+        b=WsBONJ/1vhnxaz15pA1zZoJBd+cDORvyKFyolwD6ti3ST63wya0mItju47KdOxT59r
+         tsbLIhC/LIHtylhTV1MSRyIKcck51WtD4yeaJPjV8nWefctgoYmCRxjUZSkSoegimhX+
+         54p06UwFbNe76cNoeU/bIJhg3VJfT2J1YjyCzj+LgyOH3Hl5fUvOwfLUGrPb4Bz7wOub
+         tjOF/A9vvNhFCS2CHmmk4esuubNUoXekmezWolYsm8bZJrKa7/lbK5euHGEdBpz0u5QD
+         XZfOWH4UyNG1Vm1qNLlu8eSKBMWB/06+1G7kkgwuAREwd4zy1rc81Hdt5UpUuKzvH/2I
+         C0Dw==
+X-Gm-Message-State: AOJu0YwSBjcEn/iSJ2E3ScXqNs43Gk7Qmlid47Si2R5b0agVfzgX/9+W
+	kjaAYpSJMooHBRU/5I/Rl6n1K1n2dVriBGwEHwzGiVpggUfezaPgqIVdjYutlQ==
+X-Gm-Gg: AeBDievvHdaUzDlnsdDMoweZwGDs04AeUqoqWpJQTS+pwLaM54Ahmp0NS5VteblMXcj
+	iazAHMC7ThD12utKPzWeY2FCbQneWHIIRD6zA6Dovz2KEeSETUz+mxEH1Mk0cLmqjpIY9Xpm+Ni
+	rI7FHRVvs2mHFvszKS741tLQOTWacCYD6iFa2nwHws5K3+LedVsz/5+Dhi4EzuD9tfjhs4d4h7E
+	AYl4Xd4PPfqXUOvAOjoGC+UP0FxrUPTBSeepoQ3lWuc9bQ7v6AxBrLeq+oSWBEKYk9/0gaO7MB1
+	xEvdpGjkvGbIoimyBxiY07iVmqhaDchxq/WvgFrlUSMitidISjRew9olpD5N2XNFJWQiUapvwrI
+	3pwV9laAi7guYYFp/P7Ry3wQor0bmZdRgfVGTmR/NBJepDO/xTMH2y+1pEsaUqwFNxFtvLv+iqW
+	67SIz2ETGx3M0BPjtLRKU447NgCOAoU1+HFPIyeTnshQ==
+X-Received: by 2002:a05:7022:6624:b0:12a:6b3c:de54 with SMTP id a92af1059eb24-12dfd82c2a1mr4895049c88.29.1777915607065;
+        Mon, 04 May 2026 10:26:47 -0700 (PDT)
+Received: from [172.17.0.2] ([20.171.125.136])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12df8431037sm16842603c88.12.2026.05.04.10.26.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 May 2026 10:26:46 -0700 (PDT)
+Message-ID: <69f8d6d6.050a0220.3955e8.f5f1@mx.google.com>
+Date: Mon, 04 May 2026 10:26:46 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7892121030898705424=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, admin@fluentlogic.org
+Subject: RE: [BlueZ] sdp: fix overflow in sdp_extract_seqtype()
+In-Reply-To: <20260504160118.26675-1-admin@fluentlogic.org>
+References: <20260504160118.26675-1-admin@fluentlogic.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Luiz,=20
-Sorry for the multiple submissions, couldn't figure out something on the em=
-ailing side of things.
+--===============7892121030898705424==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Here's what my setup sees that you also must change since this is a more in=
-vasive fix:
-                                                                           =
-                                                    =20
-v3 changes the parameter type to uint32_t * and updates all callers (sdp.c =
-=C3=973, sdp-client.c, sdpd-request.c, sdpd-service.c, obexd/client/bluetoo=
-th.c).=20
+This is automated email and please do not reply to this email!
 
-Here are the details as needed:
+Dear submitter,
 
-                                                                       =20
-                                                                           =
-                                                                     =20
-  bt_get_be32() returns uint32_t. Assigning the result directly            =
-                                                                     =20
-  to the int *size parameter sign-extends values greater than              =
-                                                                     =20
-  INT_MAX to negative, bypassing sequence-length sanity checks             =
-                                                                     =20
-  in extract_seq() and sdp_extract_pdu() callers.                          =
-                                                                     =20
-                                                                           =
-                                                                     =20
-  Change the type of the size parameter from int * to uint32_t *,          =
-                                                                     =20
-  which correctly reflects the wire encoding and eliminates the
-  need for an intermediate overflow check. Update all callers.             =
-                                                                     =20
-                                                                           =
-                                                                     =20
-  Reported-by: Martin Brodeur <admin@fluentlogic.org>                      =
-                                                                     =20
-  ---                                                                      =
-                                                                     =20
-   lib/bluetooth/sdp.c      | 11 +++++++----                               =
-                                                                     =20
-   lib/bluetooth/sdp_lib.h  |  2 +-        =20
-   obexd/client/bluetooth.c |  2 +-                                        =
-                                                                     =20
-   src/sdp-client.c         |  3 ++-
-   src/sdpd-request.c       |  3 ++-                                       =
-                                                                     =20
-   src/sdpd-service.c       |  2 +-        =20
-   6 files changed, 14 insertions(+), 9 deletions(-)                       =
-                                                                     =20
-                                                                           =
-                                                                     =20
-  diff --git a/lib/bluetooth/sdp.c b/lib/bluetooth/sdp.c
-  index 7210ce0..fd443a7 100644                                            =
-                                                                     =20
-  --- a/lib/bluetooth/sdp.c                                                =
-                                                                     =20
-  +++ b/lib/bluetooth/sdp.c
-  @@ -1210,7 +1210,7 @@ static sdp_data_t *extract_str(const void *p, int b=
-ufsize, int *len)                                                    =20
-    * Extract the sequence type and its length, and return offset into buf =
-                                                                     =20
-    * or 0 on failure.
-    */                                                                     =
-                                                                     =20
-  -int sdp_extract_seqtype(const uint8_t *buf, int bufsize, uint8_t *dtdp, =
-int *size)
-  +int sdp_extract_seqtype(const uint8_t *buf, int bufsize, uint8_t *dtdp, =
-uint32_t *size)                                                      =20
-   {                                                                       =
-                                                                     =20
-        uint8_t dtd;                                                       =
-                                                                     =20
-        int scanned =3D sizeof(uint8_t);                                   =
-                                                                       =20
-  @@ -1262,7 +1262,8 @@ int sdp_extract_seqtype(const uint8_t *buf, int buf=
-size, uint8_t *dtdp, int *siz
-   static sdp_data_t *extract_seq(const void *p, int bufsize, int *len,    =
-                                                                     =20
-                                                        sdp_record_t *rec) =
-                                                                     =20
-   {                                                                       =
-                                                                     =20
-  -     int seqlen, n =3D 0;                                               =
-                                                                       =20
-  +     uint32_t seqlen;                   =20
-  +     int n =3D 0;
-        sdp_data_t *curr, *prev;
-        sdp_data_t *d =3D bt_malloc0(sizeof(sdp_data_t));                  =
-                                                                       =20
-  =20
-  @@ -1391,7 +1392,8 @@ void sdp_print_service_attr(sdp_list_t *svcAttrList=
-)                                                                    =20
-                                           =20
-   sdp_record_t *sdp_extract_pdu(const uint8_t *buf, int bufsize, int *scan=
-ned)                                                                 =20
-   {                                       =20
-  -     int extracted =3D 0, seqlen =3D 0;
-  +     int extracted =3D 0;
-  +     uint32_t seqlen =3D 0;                                             =
-                                                                       =20
-        uint8_t dtd;
-        uint16_t attr;                                                     =
-                                                                     =20
-        sdp_record_t *rec =3D sdp_record_alloc();
-  @@ -4422,7 +4424,8 @@ int sdp_service_search_attr_req(sdp_session_t *sess=
-ion, const sdp_list_t *search                                        =20
-        int status =3D 0;
-        uint32_t reqsize =3D 0, _reqsize;                                  =
-                                                                       =20
-        uint32_t rspsize =3D 0;                                            =
-                                                                       =20
-  -     int seqlen =3D 0, attr_list_len =3D 0;
-  +     uint32_t seqlen =3D 0;                                             =
-                                                                       =20
-  +     int attr_list_len =3D 0;             =20
-        int rsp_count =3D 0, cstate_len =3D 0;                             =
-                                                                         =
-=20
-        unsigned int pdata_len;
-        uint8_t *pdata, *_pdata;                                           =
-                                                                     =20
-  diff --git a/lib/bluetooth/sdp_lib.h b/lib/bluetooth/sdp_lib.h
-  index 7a48ad5..96048e6 100644                                            =
-                                                                     =20
-  --- a/lib/bluetooth/sdp_lib.h
-  +++ b/lib/bluetooth/sdp_lib.h                                            =
-                                                                     =20
-  @@ -610,7 +610,7 @@ void sdp_append_to_buf(sdp_buf_t *dst, uint8_t *data,=
- uint32_t len);                                                      =20
-   int sdp_gen_pdu(sdp_buf_t *pdu, sdp_data_t *data);
-   int sdp_gen_record_pdu(const sdp_record_t *rec, sdp_buf_t *pdu);        =
-                                                                     =20
-                                           =20
-  -int sdp_extract_seqtype(const uint8_t *buf, int bufsize, uint8_t *dtdp, =
-int *size);                                                          =20
-  +int sdp_extract_seqtype(const uint8_t *buf, int bufsize, uint8_t *dtdp, =
-uint32_t *size);
-                                                                           =
-                                                                     =20
-   sdp_data_t *sdp_extract_attr(const uint8_t *pdata, int bufsize, int *ext=
-ractedLength, sdp_record_t *rec);                                    =20
-  =20
-  diff --git a/obexd/client/bluetooth.c b/obexd/client/bluetooth.c         =
-                                                                     =20
-  index 96c69d8..4f1da37 100644            =20
-  --- a/obexd/client/bluetooth.c                                           =
-                                                                     =20
-  +++ b/obexd/client/bluetooth.c           =20
-  @@ -135,7 +135,7 @@ static void search_callback(uint8_t type, uint16_t st=
-atus,
-   {                                                                       =
-                                                                     =20
-        struct bluetooth_session *session =3D user_data;
-        unsigned int scanned, bytesleft =3D size;                          =
-                                                                       =20
-  -     int seqlen =3D 0;                    =20
-  +     uint32_t seqlen =3D 0;                                             =
-                                                                       =20
-        uint8_t dataType;
-        uint16_t port =3D 0;                                               =
-                                                                       =20
-        GError *gerr =3D NULL;               =20
-  diff --git a/src/sdp-client.c b/src/sdp-client.c
-  index 4f35cf1..a3ac6de 100644                                            =
-                                                                     =20
-  --- a/src/sdp-client.c
-  +++ b/src/sdp-client.c                                                   =
-                                                                     =20
-  @@ -151,7 +151,8 @@ static void search_completed_cb(uint8_t type, uint16_=
-t status,
-   {                                                                       =
-                                                                     =20
-        struct search_context *ctxt =3D user_data;
-        sdp_list_t *recs =3D NULL;                                         =
-                                                                       =20
-  -     int scanned, seqlen =3D 0, bytesleft =3D size;
-  +     int scanned, bytesleft =3D size;                                   =
-                                                                       =20
-  +     uint32_t seqlen =3D 0;
-        uint8_t dataType;                                                  =
-                                                                     =20
-        int err =3D 0;                                                     =
-                                                                       =20
-  =20
-  diff --git a/src/sdpd-request.c b/src/sdpd-request.c                     =
-                                                                     =20
-  index c78bfdf..6ce5a81 100644            =20
-  --- a/src/sdpd-request.c
-  +++ b/src/sdpd-request.c                                                 =
-                                                                     =20
-  @@ -135,7 +135,8 @@ struct attrid {
-   static int extract_des(uint8_t *buf, int len, sdp_list_t **svcReqSeq, ui=
-nt8_t *pDataType, uint8_t expectedType)                              =20
-   {                                                                       =
-                                                                     =20
-        uint8_t seqType;
-  -     int scanned, data_size =3D 0;                                      =
-                                                                       =20
-  +     int scanned;                       =20
-  +     uint32_t data_size =3D 0;
-        short numberOfElements =3D 0;                                      =
-                                                                       =20
-        int seqlen =3D 0;
-        sdp_list_t *pSeq =3D NULL;                                         =
-                                                                       =20
-  diff --git a/src/sdpd-service.c b/src/sdpd-service.c
-  index 3f3b540..e0f5783 100644                                            =
-                                                                     =20
-  --- a/src/sdpd-service.c
-  +++ b/src/sdpd-service.c                                                 =
-                                                                     =20
-  @@ -703,7 +703,7 @@ static sdp_record_t *extract_pdu_server(bdaddr_t *dev=
-ice, uint8_t *p,
-   {
-        int extractStatus =3D -1, localExtractedLength =3D 0;
-        uint8_t dtd;
-  -     int seqlen =3D 0;                                                  =
-                                                                       =20
-  +     uint32_t seqlen =3D 0;
-        sdp_record_t *rec =3D NULL;                                        =
-                                                                       =20
-        uint16_t attrId, lookAheadAttrId;  =20
-        sdp_data_t *pAttr =3D NULL;                                        =
-                                                                       =20
-  --
-  2.39.5 (Apple Git-154)        
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1089386
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.34 seconds
+GitLint                       PASS      0.23 seconds
+BuildEll                      PASS      20.37 seconds
+BluezMake                     PASS      669.02 seconds
+MakeCheck                     PASS      0.90 seconds
+MakeDistcheck                 PASS      247.28 seconds
+CheckValgrind                 PASS      222.09 seconds
+CheckSmatch                   PASS      354.69 seconds
+bluezmakeextell               PASS      189.55 seconds
+IncrementalBuild              PASS      643.57 seconds
+ScanBuild                     PASS      1054.69 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ] sdp: fix overflow in sdp_extract_seqtype()
+ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit 31e4fb1498f4 ("monitor: Add decoding support for HIDS 1.1 flags and attributes")'
+#68: 
+covered by commit 31e4fb1.
+
+/github/workspace/src/patch/14553286.patch total: 1 errors, 0 warnings, 16 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14553286.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+https://github.com/bluez/bluez/pull/2092
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7892121030898705424==--
