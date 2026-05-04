@@ -1,110 +1,72 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5410C3E4C79
-	for <linux-bluetooth@vger.kernel.org>; Mon,  4 May 2026 17:43:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42A83D9029
+	for <linux-bluetooth@vger.kernel.org>; Mon,  4 May 2026 17:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777916625; cv=none; b=ks8sdqOfHU/uQQDDJJfEhnBjKFLmhZaWqSgG4hvrGycRKGHtjZOEf9yDeiH0WMeIK0p7aPf1Vr3RB8jevPtRP78u6COm4HKGTeTzNnKrMnijDrnfC+0bfPFal676YgLsb9u1Not1555dD8CEK50j6NDdRBgMH98ulghJ/lluBGo=
+	t=1777917514; cv=none; b=Kh15kRvFK285wAM/4Py6XJ6mv21c6BkC3ggqKmqMLdl64oa0oSlsqlvVvgXYlHtc4LVCbVHCilsqz/pmwZWOcGkDDXn5wefeTfRihb8YKC4VEc1xZbnWB03+qJbd8qHrq3zkRVX4J1wLmzrp/rkNHMc9oYBimhjoGUKNz2Gz9O8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777916625; c=relaxed/simple;
-	bh=e1NbAuoyHdirlNLYqikbOQUfIcds1UhtM1T9VNQKyyQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=tOnfYKZxa/RWGH63ohNZsaNNrHdnfDlRRxy33Qxj6/MSI6MBRuqCZY931YfFAX7bdGWIvXysLQbaeoSEFzxuoOlNrP1eq7Fxpv0bZZZQulU7FaVVUqlzbwDuEDLAVr4k4olaPB8fOXk7oCmB+C98sWRs1HckCZhstxP26jJajdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=arzDAFeD; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1777917514; c=relaxed/simple;
+	bh=jWWLPRklRW146gdZeme9qwAmBaiR90MslAd3Cb5Fcm8=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=i1M0rz4x2vEe4oJGIBhWjDzpvSQ2cbgLJ0XpzWI4ZGiwc5A4LZIn3vkFiRA0DPjDRtvnk3kST07vfQmn4JSsW4VcXyerJBJvtKOKaBCRGJcRwiT73e1a+uAua+8daM8IwER6K1RyHY3CyhDQQSbtmse1qkA+nrHxIKFM2nlJISw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=OcLbP9Db; arc=none smtp.client-ip=192.30.252.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="arzDAFeD"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-8b8e98fd885so11361846d6.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 May 2026 10:43:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777916623; x=1778521423; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=c9mLNFecM8jBquisIOmtIDMy+YMU9hgdsTRwjMHm2pE=;
-        b=arzDAFeDT1CqZYM174H1LYK49Opw5kf7ZI9EXxVniJWSZfYOpx6kccHxTebEMudevv
-         uYlU9/F4FZjvujilriMxj0FeHCJGRewLKv5L+slByxSSFjimFFL6cyx9W1XPVYgf4reH
-         0L6Y07iBuA+gGki+LcKKNbnREFHPqRMPnMwZcXU7cT+k6HrjK+ShHRAU2enaFhfx7jqY
-         LSxxthvWILN9B6A1lsl18lUuvAIT+tNnttq0RvfDOg9E9A4GuAZH2mNUHTaaWAbo8x0a
-         isPZD9PFRQmr9lyciLjsDxf2kI4mriIkauqS2uFDrxFvShDgH/jRZY4FMemnrQxG6/7W
-         FrEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777916623; x=1778521423;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c9mLNFecM8jBquisIOmtIDMy+YMU9hgdsTRwjMHm2pE=;
-        b=j8rg5tpmjphGmXjH5BL7sQqRzXEA1bOj8crtNyXWKbjsnMODlpDE1rckMXq3r96hyL
-         TanQh++f0/OF1acf1qD0WCY9NTpKn7VRFVbRherat0OUERo2KgAzsUO4wWtdFmqxBvYg
-         4J+C6bOtv3csQTX8SzGRpUuW/ugspogK1RfMZjeQypeeARG7vyRv3qMhPME6scUM+IQy
-         AHmyup4SgjsR2XBOQNsUNhy8PeNtPY9D1k52hmr8KXm5v2MpuUVjV55bDsgR5kHXJBgj
-         Jkyn72E9LlcQgjaMfBkcSGMDwqrH5u3DWe/K14zRhd9RljuO7lhSKiW7+u449L94IY9k
-         P1QQ==
-X-Gm-Message-State: AOJu0YyKC0EkLbPjbk9bFkfeIM51WIPHT7trMcq7Hup5HRrfc7NmW9Jb
-	z0PHGXpZkgFnv/kIEOSTPDQDeHqsyEmwpedepmAjw7b1D/SopCYFqXpwlT3vVg==
-X-Gm-Gg: AeBDietMYXmYWVeL+nQQoKfAjjJRbndAcV0BLDXPhedevcc9MysNCRtJvvq4giYNzu1
-	htytK8URl+6LnpyCk0HKeXRwPgdmzAgv3Wb+JUNU0kYsA8Mpt5y5OcaOtEudvMQBfIvDPDMVGRj
-	HXlvo0v9FVJsI/fQv6tvwMiaO9L99K7robN6Ll1i7MDKyIqrSeHOvWH8hTbqTvMhrsueLoJmsbD
-	dUZ4lAvsjTnfIATRsnVo+L/S38ErEfvDPnEo6Jazebb26NWeeZ8Qpd4j1gTV0f2EcKMwnpBWEd7
-	cN0D42bjwZwmwNrKExx7Op3urT1KuDE8sSE/AbC+oyXYwzHFP2e4de0bmj+eBxMHpvCPkU6KUj7
-	qyF3cOackFds4Y1+8QMmm8IDog/CTemZp3mcvlnyQx8tDzVTQAXrrImKUQp4JQBsc60qboDg/sQ
-	HfWTR6lyJ/iJtha2cmT2A/hAqMZTD3lib02tUEjwrgsg==
-X-Received: by 2002:ad4:5f4d:0:b0:89c:a2ad:33a0 with SMTP id 6a1803df08f44-8b6699c9253mr189299916d6.45.1777916622899;
-        Mon, 04 May 2026 10:43:42 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.131.25])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53ce7e73dsm124521576d6.42.2026.05.04.10.43.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 10:43:42 -0700 (PDT)
-Message-ID: <69f8dace.0c0a0220.264aed.0e6d@mx.google.com>
-Date: Mon, 04 May 2026 10:43:42 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8539246879249225676=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="OcLbP9Db"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1777917512;
+	bh=vkkTkVjKfTtUmJLtW87jzzgPWmOfVQt7Wc/4atZWT8Q=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=OcLbP9DbfMX5NDAMyV+UgBoQeTPeTG8+oaPykGRcYbh4eaZET0ADj/IJidBT2/Hyn
+	 zyuSqTjuChVdYNGK+zKb10lUxO3dmUdhNaPrYx0s5/Nxz8go0w2vrlIVE2Ub0d3Q2J
+	 MNGNmUfyNQzRp3PyP9nEYYZyLQbulZl7s2LTR6lM=
+Received: from github.com (hubbernetes-node-683deae.ac4-iad.github.net [10.52.202.124])
+	by smtp.github.com (Postfix) with ESMTPA id 0152A21084
+	for <linux-bluetooth@vger.kernel.org>; Mon,  4 May 2026 10:58:32 -0700 (PDT)
+Date: Mon, 04 May 2026 10:58:31 -0700
+From: "github-actions[bot]" <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1089431/000000-dd093e@github.com>
+Subject: [bluez/bluez] dd093e: sdp: fix overflow in sdp_extract_seqtype()
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, u.kleine-koenig@baylibre.com
-Subject: RE: Bluetooth: hci_bcm4377: Use named initializers for pci_device_id array
-In-Reply-To: <20260504160940.2168650-2-u.kleine-koenig@baylibre.com>
-References: <20260504160940.2168650-2-u.kleine-koenig@baylibre.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============8539246879249225676==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/1089431
+  Home:   https://github.com/bluez/bluez
+  Commit: dd093e5cd4678eddd38db79325fe7cfb83084a7b
+      https://github.com/bluez/bluez/commit/dd093e5cd4678eddd38db79325fe7cfb83084a7b
+  Author: Martin Brodeur <admin@fluentlogic.org>
+  Date:   2026-05-04 (Mon, 04 May 2026)
 
-Dear submitter,
+  Changed paths:
+    M lib/bluetooth/sdp.c
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1089397
+  Log Message:
+  -----------
+  sdp: fix overflow in sdp_extract_seqtype()
 
----Test result---
+bt_get_be32() returns uint32_t. Assigning directly to the
+int *size parameter sign-extends values greater than INT_MAX
+to negative, bypassing sequence-length sanity checks in
+extract_seq() and sdp_extract_pdu() callers.
 
-Test Summary:
-CheckPatch                    PASS      0.64 seconds
-GitLint                       PASS      0.28 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      24.13 seconds
-CheckAllWarning               PASS      26.35 seconds
-CheckSparse                   PASS      25.25 seconds
-BuildKernel32                 PASS      25.90 seconds
-TestRunnerSetup               PASS      514.33 seconds
-IncrementalBuild              PASS      22.82 seconds
+Store the result in a uint32_t first and return an error if
+the value exceeds INT_MAX. This closes the residual paths not
+covered by commit 31e4fb1498f4 ("monitor: Add decoding support for HIDS 1.1 flags and attributes").
 
-
-
-https://github.com/bluez/bluetooth-next/pull/144
-
----
-Regards,
-Linux Bluetooth
+Reported-by: Martin Brodeur <admin@fluentlogic.org>
 
 
---===============8539246879249225676==--
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
