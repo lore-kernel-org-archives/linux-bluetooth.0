@@ -1,26 +1,26 @@
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35CD72F290B
-	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 08:57:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E3C313534
+	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 08:57:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777971479; cv=none; b=ZNFEvUl84vmftwORFlzD4MViMuYrXMKiTlb9C/GIeM2ETaDGKMAfloNeX2RwZ3cSGoDJmid2tdE+W99DomgBmRgjeJ4ff9UobykBZ33XqinSTUaayuavexpvHLxCJpRhzTpdszVok5ZW6qtvXWmVE5kJ+tEWDf2ARyW8lX6rVfg=
+	t=1777971479; cv=none; b=KWah//7cM/3EXWlPkMQgZRX8iYdAc8H9ajhRtdrLZnIbLPYlEpfPgH3gdZXZNF1pbjcvBEj3yiLtlcdqaKZRhazG0PU4ql0lsCZwWncJSaGEmfPRD/v64skl2/uzxVLZ+RBF3hFmpwUsUjHgeONvqaG1hzDDzalTCbLWNLOcc2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1777971479; c=relaxed/simple;
-	bh=YtSt8e+2yEHLAGEVQIIObM2VNoxYt1OKrAhUsHAC74w=;
+	bh=hgCJjDmFJ46K0Wts4HcnPqsmiOiKg3DZuamhGfcCd7I=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LrjT8GNJXuUdA8t90ntbA3jHLTyOoTMPZCLrWqC4PY8FQIi8vw4OuAiP88zxoFnpH79Qn6V6xY9vIClKVN6VdscnPVXubzz5d+AYbWvIcUv2yrRgPV4myCdkKKWq/wbmpMOAJgd0zwNmOAaAAaAeW1N4nq+XSanZBDMX82rYWg8=
+	 MIME-Version; b=VG3Y6SDc3X8+ygzn0BOU82F9R2cDEKnHIlhF13tdWZv2smqiHm3afBsP88Xav3sBusDJazIGnagX6IlfM8J2LQ3gW1qgKInaIQ6GqxQAfbGAEIbaYv/K5wkrAAQG2SsmcW26JP9aDhB6Mx6dIf4WljQJ41ckb04HUJgGOQLRUY4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6835E3EBD2
-	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 08:57:51 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 91A9A3EBC9
+	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 08:57:50 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v10 07/16] emulator: Install the emulator if built
-Date: Tue,  5 May 2026 10:45:13 +0200
-Message-ID: <20260505085741.2497401-8-hadess@hadess.net>
+Subject: [BlueZ v10 03/16] build: Add support for building with libical 4.x
+Date: Tue,  5 May 2026 10:45:09 +0200
+Message-ID: <20260505085741.2497401-4-hadess@hadess.net>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260505085741.2497401-1-hadess@hadess.net>
 References: <20260505085741.2497401-1-hadess@hadess.net>
@@ -34,28 +34,46 @@ Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 X-GND-State: clean
 X-GND-Score: 0
-X-GND-Cause: dmFkZTF7m1kdtbVHsZr2LXd0j4SaLCDeEFbauGG+fBV8q/Lb0JtuMjsr5muOTSEAf7igQM0Bnw8BHYljvnxFnsAmHOLly4+52VorB9b4KAmDSVF4GGxfoa10KOzkkk0FZ/iH7EudoHjCU3lQOFMf08hNxPB0Om5CXgN/JaXrD8vR0QFR6vK+BgL2HzcSZsu+faoyhdo4a67AVWTy2kRkYaFGckVGbBf8TVfzXT8T3W71rhL99sA17fK9wNykeLee1lk/s3PuiKITlPDUhdt/XRmi48jSPOFu1u+d/gMtvWUS3SjNATRBgl/nHvW2jk6XZ5zgKwUZHQGjWGUUgyPiGRUQZieqS/Jtagce6KsibFJdExOsonbw8sOyJsFPhtGT7awaedtGdyw1bc+bHNBBLudu7pmVzjqsz7sfPrwQ3+epOAGqtVOr+VZnScRLlpgBRvzmyZEiH6RS1F2oIdk3VowWpqUNPywwIyTPvnACP1u1XI9ULLtsRG5NCmk7NfQTKlCKnjWIo+JZbCT/VNnLdGOzqyMRLsyp0jhM0CQlJRITUxYFHNpGmmQfkkBSydi/lxla791oQRh9gJ1QrmVCB5kiTn0OzeOTmuUXyzaRq3S6mDRGVlF4eeEcxxXM3SjeSt0jx1c7o4+uHZdLmkMa6Qj3qlEot2iYd7XQw4EsKCTJU59cQw
+X-GND-Cause: dmFkZTGjXtlQIlUmPF5ZXUGZM6qk1yZnk/OvLodKm+PT9xQmLbo4lWCvuRPK6rd/W7JZbm9ANaFy6YkNqzL8cuHsapuoAjh0kaOBWfgwxF48hbGU2dwc7LqzJ5rhrFlmx9Gt9Fpzi/66M0G6a19AC+1gogg93fCjR/LKliyISowTJiZh1AUsvMCOl96WSe7qaqXDb5h3CLP61k/MbQB1cly7ieREwWQQRFPIkRVf5/Pm7UkotjZqhnXiVaWObgisugPZd8mmXNNN5REKFj+sCcCQX5CEFvusQxloKS10WETh9uESxmEmETwXXRK/SYzv8XEsOQh2f2J78360yZZFT0U3Ik7aqDRxZsYBwjqctMh7sQXgjDUQ2KAaYcK3/ePVhQHH6K6Bi9cAiVMzhYACJOg4int5FgMT38Nf0ZzD82Z1BZ5RbQHrjVCHO4Ky2es57I5AgorcsOsOmeg7PPlMHve/XT9xDAj1A+udvjq4UtGRkacRXgT2btAgf4bF/A9yE+NAry8XbW0xXOkr0PljrRB7BOuu/CFKkQgfPbOJ+856TxEMtojKuBT8hO1VAj3Vzo2RZSy4JXWpQ+4FhqksbyacQREKEWo0eYhrAhIp8C91b8xh36KZudjz079N45+XNcQme05r7O955IbLvui8EZnTAfGr37L/2/N1V9ycExzBbt/Qug
 
-It's useful for testing.
+Some functions were moved to libicalvcal, use that library if we're
+building against libical 4.0 or newer.
+
+See https://github.com/bluez/bluez/issues/2090
 ---
- emulator/meson.build | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ meson.build       | 6 ++++++
+ obexd/meson.build | 1 +
+ 2 files changed, 7 insertions(+)
 
-diff --git a/emulator/meson.build b/emulator/meson.build
-index 40544567e4e4..5ed734c5d69d 100644
---- a/emulator/meson.build
-+++ b/emulator/meson.build
-@@ -17,7 +17,9 @@ if get_option('tests').allowed()
-       'smp.c',
-       'phy.c',
-       'le.c' ],
--    dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep ]
-+    dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep ],
-+    install: true,
-+    install_dir: pkglibexecdir
-   )
- 
-   executable('b1ee',
+diff --git a/meson.build b/meson.build
+index d3c43d79141f..15508a868636 100644
+--- a/meson.build
++++ b/meson.build
+@@ -134,6 +134,12 @@ cups_dep = dependency('cups', required: get_option('cups'))
+ jsonc_dep = dependency('json-c', version: '>= 0.13', required: get_option('mesh'))
+ alsa_dep = dependency('alsa', required: get_option('midi'))
+ ical_dep = dependency('libical', required: get_option('obex'))
++ical4_dep = dependency('libical', version: '>= 4.0', required: false)
++if ical_dep.found() and ical4_dep.found()
++  icalvcal_dep = dependency('libicalvcal', required: get_option('obex'))
++else
++  icalvcal_dep = dummy_dep
++endif
+ readline_dep = dependency('readline',
+   required: get_option('client').enabled() or
+     get_option('mesh').enabled())
+diff --git a/obexd/meson.build b/obexd/meson.build
+index baddafcd8873..2270a10cb423 100644
+--- a/obexd/meson.build
++++ b/obexd/meson.build
+@@ -100,6 +100,7 @@ executable('obexd',
+     libgdbus_internal_dep,
+     libshared_glib_dep,
+     ical_dep,
++    icalvcal_dep,
+     dbus_dep,
+     ebook_dep,
+     edataserver_dep,
 -- 
 2.54.0
 
