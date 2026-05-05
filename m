@@ -1,131 +1,87 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071C924A05D
-	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 07:25:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E17F3C1969
+	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 07:54:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777965945; cv=none; b=pnVgtUHgKJHvLLnSJZu9UCEBpsIjaGKUN2nTJI/LeriHAG4enl8pV37loqdrheUVi15l0dVX4Iv4pvmZWqnzE7IJyi7eEFeEqNl7DZjnxwJaSNR761vN75/ZPHMQYOQ0iu3PB4ehRfGx4Q+XrbHN5fl3rS2OddI+WozVqyF2W+A=
+	t=1777967645; cv=none; b=VIDvxG/tqO6zBS+96XdSkhRfYyNmUEA0+EGMQZkGP6vN1ziZoP4+tRH2OPBA3ONACyh0iUNo9JHg/HL4HE67kFWDFMBuAXC4Es2fsEnNaAfx69QL1Qu67+EifO4eGxTtf5vYUs0wGpQUNsFfp0QZ2gPJrVWCgfcTxr3Egkh7sz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777965945; c=relaxed/simple;
-	bh=i5Lkc+CfTOB6sVCDMMmytd48xWAQjMlbhbIYU4nobVE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rSYwsS2IDZIEUIrOcKHRU64O8Y3xRo81/HpAHd3Gwn22q6A9fRiwv+jet4JGj/6wOph2rmE300ROJTlVZgbUDPMjLQneKJQ2+7RpDdlzhjZaWzTrDZdKAa0+uAwySbbG7T8RDnvqmnwkTTNZirSTVmh4HN9rq/axfLIyljp+Il0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VAxH9rpS; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VAxH9rpS"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-36505450d0dso3299926a91.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 05 May 2026 00:25:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777965943; x=1778570743; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IsCgd4r/SEhF0XtPggJxVG8eYmhOHhrTRShufNC28F8=;
-        b=VAxH9rpSySKR102JcEvhouByS6BBV0/riiZR0s/in0J7HiRAe/98rH67r01JD0cANW
-         F8y+YLcjD8nt1iQyzW/tDLXnG5LFX3llZiDOTGhBU70e3lWsMG6WPOqQxxeL3haOq54x
-         mqlNf9k+bzglc2YKTJfhqSsHaCuKuPKTElDT4Dz3F20Is5+tF04clQ0TsV16PLs5CW8K
-         APJwHAo5cG0NNmXLKKdzAGesOuTDb70XZMLbytl+vcM1hSVGkmkqUHhqnkS+HdUxojz+
-         Ni3MTuvI1qcO6JaeSsKHl8QcuQGLu6VHq+sciqQYYVnIqV26F5L8kgOZFlTbJH63D8R+
-         BZjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777965943; x=1778570743;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IsCgd4r/SEhF0XtPggJxVG8eYmhOHhrTRShufNC28F8=;
-        b=ioFuLFipaPs4cRBE8ejwIKDBspDSIe0vNn03beVRz4Jovrwd908jw70ar6GF8ZKzRf
-         b448k+CxEvF2o2arJB/7V1mwTqj8kcgTZnST5l2G2qrOvF81BHwcYs0+gcKQA+AMxBhY
-         qH+h0g3hbfc5BybpQqzq7Tyz+vrypJ9FkEJrkEgqjihjjx6j19hcmwu3U/RY8HucV2Y3
-         ogFxu4vxi7gowa0opfpJmDweWRyuDI67u1RzAGFf1IiWug/t04MbiJTvrufEX7rfMnzN
-         dD9gaqdl6n4F7kAbiJP3JWfBvDoHafrtLuPv0VxP4U3mwXGjhBuWSAfnc0qH06VbqqGL
-         ZU3Q==
-X-Forwarded-Encrypted: i=1; AFNElJ+HgNT4tF02s0Zzbi20XHmw4LmEO0Ezc29nSWCdVuWpnykLxhb+l1WHjJ+E9YYo4hiUJVhPHN7T5eTgklCwxWs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwupURLzCnxddp5vX8Yigy36mnaLEZXNb9NqQrCeePlcX39Zhw3
-	aVo7/vYr8IPy5ZlQrViBkRXLgTgsEDPIrt5330xS0gCK9cgZfgeMNr8H
-X-Gm-Gg: AeBDieuiNrHjryunrD80ta96yJIeWrwUEu+qTj8BYqNnkrJvFokCBNk0pXkhe29XuFW
-	0+uGypGSSGVQGyo8VTZCuJyOWJQl9A3tccUL3acMekzIVtLt8tnNgfCzY28hShA0PGPkODnGnyH
-	vV3tBIk3AFLCxhJ/x/KTr/SLnvfp2ktimdmnohO5pVpPQEtAKDEN+5jh+h+5i0SY2vhPkeRlwMm
-	2M3JuVk3CaxSBesmgtGPGpM79vX4bh2Q9SOsTV0G9GOc/RJ2ZbWOwtn2+oxUBwFEnPtbVCBg8L4
-	HMayXH5gX0a3yWBGfKrMvAgMEmLysL0HuKNMecmcHMqOjsr6E6G69RL8tpWFBdMYSchPsFdDXff
-	SWFNNAJA2vqk0Bj55ZEO9acVAJuMlg55ycr4Z7knJnpxVo2lxxBb8R0mLiq7ElwrotMO8qIwWsR
-	QjDdI3Q3SWRXpRf6pbRzN3yCe/2UiwDjIW0IzHnZwlsByb81YhvbxGCBqFHM7Imxg=
-X-Received: by 2002:a17:90a:e7c1:b0:35f:b306:5d47 with SMTP id 98e67ed59e1d1-3650cd85defmr13039460a91.1.1777965943359;
-        Tue, 05 May 2026 00:25:43 -0700 (PDT)
-Received: from BM5220 (118-232-8-190.dynamic.kbronet.com.tw. [118.232.8.190])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-364ebefe7fesm13737453a91.5.2026.05.05.00.25.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 May 2026 00:25:43 -0700 (PDT)
-From: Zenm Chen <zenmchen@gmail.com>
-To: max.chou@realtek.com
-Cc: hildawu@realtek.com,
-	linux-bluetooth@vger.kernel.org,
-	pkshih@realtek.com,
-	zenmchen@gmail.com
-Subject: RE: bluetooth hci0: Direct firmware load for rtl_bt/rtl8761a_config.bin failed with error -2
-Date: Tue,  5 May 2026 15:25:33 +0800
-Message-ID: <20260505072538.9503-1-zenmchen@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <d6274785e3644bfbb0bf6a3c6a6bbff3@realtek.com>
-References: <d6274785e3644bfbb0bf6a3c6a6bbff3@realtek.com>
+	s=arc-20240116; t=1777967645; c=relaxed/simple;
+	bh=//WPB2VZafAYd2nUi06O50PH6n8N77CatXZJamYFyfk=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=o+aS6suNLP0khTSpKuv4isJ6fiqiBMgi/ccJStQNhdswMmRUuvdosIGjxkaxR2Q3W+uvygOhWg676dM3wtOab2HgFXUevLHmXaRHwCCaOFyQr0mmQy8THIqpkH6OLIU20v5hs3EEk/xHLoYCBnGbAbeNkqjI13ig3pHu35fMlk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id 5C3D758178D
+	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 07:30:14 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 19E823ED38
+	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 07:30:06 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: [BlueZ 2/2] mpris-proxy: Avoid session->obex dereference
+Date: Tue,  5 May 2026 09:29:25 +0200
+Message-ID: <20260505072958.2424004-2-hadess@hadess.net>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260505072958.2424004-1-hadess@hadess.net>
+References: <20260505072958.2424004-1-hadess@hadess.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: hadess@hadess.net
+X-GND-Score: 0
+X-GND-Cause: dmFkZTGSdaQg5yVn+hkXwAA8aeo5fKxDOKO2FffoR5JhiL+V9poPHTHofuBuT3pkUQQyhZ0ns9UonxcJJv8cQEDafca04EZOlpiXyrv4yqvhXM0yT908XsKDkEB7teJbFDEXzShCLNiqN/YOJcjrNbjD1qiyqmge1cQgIruHiMDu+9yQbUkccXwCQ87cyWsRV1Md/H235aX4DAg22ah/qSpVfwc7S8NBglofPRbxOku2mlWqZzSDSVMDPGmSMCVtpR4BsHX28kiyrZ1jP5R9s2Eg+4GFJQYNsKSpi18ETG9CcSMxkJxB2XtzSLMz06avYc9Er2GG4axR7DUAiHxcWRqsJ4v1mrL6j+Oe0ODEAxxHiO2GC7JLhW/OFQwDAWnUM/aElB+6yYx1u9KyWEhmYCnfHGsCdgXg82FhFOrmVeL9Igy77tHxgX/yPKKTkzODAQCDmquZxgLiGCnAfTn7e6R5MjaJ518jtl4YGf9aZPfCgUkMod9VLFoUrE2dql4JvywEQuJoI02yKQ1/R5f2Jv5wlgJwsrvpl2l1Ao8SjvWiA+hVCNJot9FRI+b53HUJIO0dqwupO2ojLanIZL8hMOLtRVXDI97Vy27hXvNccdJSLi+ocZdgrtYOWMzjNHWTYVxocmxGNFDf3F53/RxRks+i+KaW53maZLFe4NL66FtJ8MEl1A
+X-GND-State: clean
 
-Max Chou <max.chou@realtek.com> 於 2026年4月30日週四 上午10:22寫道：
->
-> Hi!
-> The config file rtl8761a_config is not mandatory. In ic_id_table[],
-> .config_needed is indeed set to false. Please rest assured regarding
-> this matter.
-> If you would like to fix the warning message, it would be good to
-> send a patch to add rtl8761a_config.bin containing only the header
-> to the linux-firmware repository.
->
-> BRs,
-> Max
->
+Protect against trying to access session->obex variable that might be
+null after failure to create the session object.
+---
+ tools/mpris-proxy.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-Hi Max,
+diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c
+index 360b8ab34469..8c9b01044fe2 100644
+--- a/tools/mpris-proxy.c
++++ b/tools/mpris-proxy.c
+@@ -1306,7 +1306,7 @@ static int parse_track_entry(DBusMessageIter *entry, const char *key,
+ 		const char *handle, *path;
+ 		char *filename, *uri;
+ 
+-		if (!player || !player->obex)
++		if (!player || !player->obex || !player->obex->obex)
+ 			return -EINVAL;
+ 
+ 		path = g_dbus_proxy_get_path(player->obex->obex);
+@@ -2614,9 +2614,13 @@ static void obex_get_image(struct player *player, const char *handle)
+ 	DBusMessage *msg;
+ 	DBusMessageIter iter, array;
+ 	struct obex_session *obex_session = player->obex;
+-	const char *path = g_dbus_proxy_get_path(obex_session->obex);
++	const char *path;
+ 	char *filename;
+ 
++	if (!player->obex)
++		return;
++
++	path = g_dbus_proxy_get_path(obex_session->obex);
+ 	player->filename = g_strconcat(g_get_tmp_dir(), "/",
+ 				path + strlen(BLUEZ_OBEX_CLIENT_PATH "/"),
+ 				"-", handle, NULL);
+@@ -2674,7 +2678,7 @@ static void device_property_changed(GDBusProxy *proxy, const char *name,
+ 			player->obex = NULL;
+ 	}
+ 
+-	g_dbus_proxy_unref(session->obex);
++	g_clear_pointer(&session->obex, g_dbus_proxy_unref);
+ 	g_dbus_proxy_unref(session->device);
+ 	obex_sessions = g_slist_remove(obex_sessions, session);
+ 	g_free(session);
+-- 
+2.54.0
 
-Thank you for the clarification! After adding an empty config file,
-Bluetooth is working as usual and the error message doesn't appear anymore.
-
-$ od -t x1 /lib/firmware/rtl_bt/rtl8761bu_config.bin 
-0000000 55 ab 23 87 00 00
-0000006
-
-$ ls /lib/firmware/rtl_bt/rtl8761{a,bu}_config.bin 
-lrwxrwxrwx 1 root root 20 Apr 30 22:24 /lib/firmware/rtl_bt/rtl8761a_config.bin -> rtl8761bu_config.bin
--rw-r--r-- 1 root root  6 Mar  5 01:40 /lib/firmware/rtl_bt/rtl8761bu_config.bin
-
-$ dmesg
-[  550.038863] Bluetooth: Core ver 2.22
-[  550.038897] NET: Registered PF_BLUETOOTH protocol family
-[  550.038899] Bluetooth: HCI device and connection manager initialized
-[  550.038904] Bluetooth: HCI socket layer initialized
-[  550.038906] Bluetooth: L2CAP socket layer initialized
-[  550.038910] Bluetooth: SCO socket layer initialized
-[  550.070541] usbcore: registered new interface driver btusb
-[  550.077485] Bluetooth: hci0: RTL: examining hci_ver=06 hci_rev=000a lmp_ver=06 lmp_subver=8761
-[  550.079510] Bluetooth: hci0: RTL: rom_version status=0 version=3
-[  550.081469] Bluetooth: hci0: RTL: btrtl_initialize: key id 0
-[  550.081475] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761a_fw.bin
-[  550.083538] Bluetooth: hci0: RTL: loading rtl_bt/rtl8761a_config.bin
-[  550.083853] Bluetooth: hci0: RTL: cfg_sz 6, total sz 22646
-[  550.167668] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[  550.167674] Bluetooth: BNEP filters: protocol multicast
-[  550.167679] Bluetooth: BNEP socket layer initialized
-[  550.659710] Bluetooth: hci0: RTL: fw version 0x0e3e4380
-[  550.800287] Bluetooth: MGMT ver 1.22
-[  550.819174] NET: Registered PF_ALG protocol family
-[  550.857408] Bluetooth: RFCOMM TTY layer initialized
-[  550.857422] Bluetooth: RFCOMM socket layer initialized
-[  550.857433] Bluetooth: RFCOMM ver 1.11
