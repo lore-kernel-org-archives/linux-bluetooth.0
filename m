@@ -1,26 +1,26 @@
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D40C3D6CA5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29F6D3D333D
 	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 08:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777971481; cv=none; b=VGM025YimWu1kbwrkDmWlD3teSgJvjuwEIXdhr+qlx+Zzsmg9W1atkWdKvVVQlTUjE1NJ76Tn2e9fS4ofTtMT9xL//JazZKLAT0HLtYTTm1VDxhXNLiyZGx840JtMJYBpgEQGVD6IrenEGRO9R4kND4alSVw9P42GCtpC13Wnp8=
+	t=1777971482; cv=none; b=ci8E6wRJlOj365qolq3YHdAFqHsDac3UoIlWEFu0EWUgKQnj9r5RUdTiBFAjL2+doo4KvbMojvLeHqScub0kQ6md7uTaXWnQ5yKHJrsMH7wfSP4GD3Xy10kH8yuNAEdwfJh9RR35ze5yDyJ4Xw00mIKeQU3IHFqx/TcVfpZnIJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777971481; c=relaxed/simple;
-	bh=aM9wgmhsghttld+g769Sk49sNBLjHrtS5YEn3ao56y0=;
+	s=arc-20240116; t=1777971482; c=relaxed/simple;
+	bh=KHCu8OatL2kNLnMHT3vJAvGOWngJDgvnGmiYF6I5nQA=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ByspnMVHCD6Xy2M3y2makVPAwmk8q5L4WEjlpLcQ9zPYIqfArq8z7vo8MKsfuEMEwNxI3DLS7LZias4tet9uraFELL43Hk6SH9uE2M4Sf2TkboBF4jixZDxPWGUGYiFEUPtal585276XzGaIitOysu9lw9i7u0jN713Sg7ZGZos=
+	 MIME-Version; b=h6S9bHb/7QSKIt5jvP7LmiQvtHKcp1jQaQQ6nQ/X+fyfZeAmAOH1qNVwgRKeRgtwwvToULtGOeoFUUniGRoO5Obfg4WFF/X/OveIzqWb3kAL/QLgCXIAHFJ1dzQp2hGRDcLfC5Wfe4D5fnJxW632Qmxb4LQpDDVCw7b8a40KQXw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 24AD63EBCA
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8CCCF3EBD8
 	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 08:57:52 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v10 10/16] unit: Make gobex-transfer tests run concurrently
-Date: Tue,  5 May 2026 10:45:16 +0200
-Message-ID: <20260505085741.2497401-11-hadess@hadess.net>
+Subject: [BlueZ v10 12/16] build: Only build gdbus library if there is a user
+Date: Tue,  5 May 2026 10:45:18 +0200
+Message-ID: <20260505085741.2497401-13-hadess@hadess.net>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260505085741.2497401-1-hadess@hadess.net>
 References: <20260505085741.2497401-1-hadess@hadess.net>
@@ -34,59 +34,27 @@ Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 X-GND-State: clean
 X-GND-Score: 0
-X-GND-Cause: dmFkZTF7m1kdtbVHsZr2LXd0j4SaLCDeEFbauGG+fBV8q/Lb0JtuMjsr5muOTSEAf7igQM0Bnw8BHYljvnxFnsAmHOLly4+52VorB9b4KAmDSVF4GGxfoa10KOzkkk0FZ/iH7EudoHjCU3lQOFMf08hNxPB0Om5CXgN/JaXrD8vR0QFR6vK+BgL2HzcSZsu+faoyhdo4a67AVWTy2kRkYaFGckVGbBf8TVfzXT8T3W71rhL99sA17fK9wNykeLee1lk/s3PuiKITlPDUhdt/XRmi48jSPOFu1u+d/gMtvWUS3SjNATRBgl/nHvW2jk6XZ5zgKwUZHQGjWGUUgyPiGRUQZieqHgwvoBVE5OVYUsVEjzINiptj15iShtAfbPubW4dlz6Aa1jZ2Hdt5ESLr2wPcpMrOH84G6uSc+kKc8TTnL2GspvcIbZ2PiQnRsUw85BxE2HOtPpmGpRpCBkChvEtrDcJCkbuYm7QlTybvhhBC46m7oovJTuzSljqyHVc7DHdo+YVaMGxJ0GcQroyiX39qnCLb0St4hZ4k4OyIahHaI8sZCgsHzGhlkRZQHbHFsD1EDCm3JVL1b4fPml1aCjiXwdcsOpklkBa7jc0P+EHl4X0tdaTqD/YR01jnV73lh8l9xcxWyWCVNP2vAwew//ltCoALcfykADhzku8/YeH/vlK/5g
+X-GND-Cause: dmFkZTF7m1kdtbVHsZr2LXd0j4SaLCDeEFbauGG+fBV8q/Lb0JtuMjsr5muOTSEAf7igQM0Bnw8BHYljvnxFnsAmHOLly4+52VorB9b4KAmDSVF4GGxfoa10KOzkkk0FZ/iH7EudoHjCU3lQOFMf08hNxPB0Om5CXgN/JaXrD8vR0QFR6vK+BgL2HzcSZsu+faoyhdo4a67AVWTy2kRkYaFGckVGbBf8TVfzXT8T3W71rhL99sA17fK9wNykeLee1lk/s3PuiKITlPDUhdt/XRmi48jSPOFu1u+d/gMtvWUS3SjNATRBgl/nHvW2jk6XZ5zgKwUZHQGjWGUUgyPiGRUQZieqhvS+eTyupB8yJbRasv+JD0iNUy/JgdF9TaSAoTJ0pZhEm/tgBwC3t8zrDxS8wuWdDEHNsg7YR9GkTv3uOrQbSe5hpM4/BdRsKcjjyfvOdNlecolxIF/PJi9VoMBz0DnFnTSRYWr/hy/ZFWTKuUq1lTIO0UvjtxOdzvS2yAoI2o1NzyaHzCOKQXw6qZfr90OgyoHyS/kMkgs82egZ4VfrDNFW9V+EoLienNZOJKjsvvuH0ePonPXVIP+THnjvLjjx+CablVsOn9q1ANRqzNq6BBlW7AdZVSQN0J5V3rqZayOGDoZn/KQo3ICYnVXy7ffYmHE6V5T6ab1zAdfqdPrymg
 
 ---
- unit/meson.build | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+ meson.build | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/unit/meson.build b/unit/meson.build
-index 1bd3b7a85992..92e1c6f66caa 100644
---- a/unit/meson.build
-+++ b/unit/meson.build
-@@ -71,15 +71,18 @@ tests3 = [
-   [ 'test-avctp.c', '../src/log.c', 'avctp.c' ],
-   [ 'test-util.c' ],
- ]
-+tests4 = []
+diff --git a/meson.build b/meson.build
+index d67abfe32430..e98e78d68e4c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -265,7 +265,9 @@ configure_file(
+ )
  
- if ical_dep.found()
-   tests3 += [
-     [ 'test-gobex.c', 'util.c', gobex_sources ],
-     [ 'test-gobex-packet.c', 'util.c', gobex_sources ],
-     [ 'test-gobex-header.c', 'util.c', gobex_sources ],
--    [ 'test-gobex-transfer.c', 'util.c', gobex_sources ],
-     [ 'test-gobex-apparam.c', 'util.c', gobex_sources ],
-   ]
-+  tests4 = [
-+    [ 'test-gobex-transfer.c', 'util.c', gobex_sources ],
-+  ]
- endif
- 
- foreach t: tests3
-@@ -93,6 +96,22 @@ foreach t: tests3
-   test(test_name, exe)
- endforeach
- 
-+foreach t: tests4
-+  test_name = t[0].substring(0, -2)
-+  exe = executable(test_name,
-+    sources: t,
-+    c_args: [ '-DSTORAGEDIR="@0"'.format(storagedir) ],
-+    include_directories: '../lib',
-+    dependencies: libshared_glib_dep
-+  )
-+
-+  r = run_command(sh, unittest_list, t, check: true)
-+  unit_tests = r.stdout().strip().split(' ')
-+  foreach ut: unit_tests
-+    test(ut, exe, args: [ '-p', ut ])
-+  endforeach
-+endforeach
-+
- exe = executable('test-gdbus-client',
-   sources: 'test-gdbus-client.c',
-   dependencies: [ libgdbus_internal_dep, libshared_glib_dep ]
+ subdir('lib')
+-subdir('gdbus')
++if not get_option('tools').disabled() or get_option('client').enabled() or get_option('obex').enabled() or not get_option('tests').disabled() or not get_option('daemon').disabled()
++  subdir('gdbus')
++endif
+ subdir('attrib')
+ subdir('btio')
+ subdir('plugins')
 -- 
 2.54.0
 
