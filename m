@@ -1,29 +1,32 @@
 Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C78480331
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B670E48032C
 	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 10:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777978598; cv=none; b=iIHrC1BX4DEEj58AJLvji0dA7ruaiTYqcfasmTaObI1Nm3potciTtzj3xnjNtCcUUCjDML81nzNK2TMETwzkT7x5imF++lf4JG/9wy29nGkzx+MvZpUbZbz5670pUk2yxjdL8oYL1uqJvsBKDfR3PLSHBPhk6h+QmNHfYhV7xHM=
+	t=1777978598; cv=none; b=i8DuXDwFnbP3U/k8A1iDNOAXt9owTOuq+20WQ9ifR5Bi0onVssyTPzKURxMR+Sflm8ma1UX8XLkTnlqynMPM5DZDt9QJEwqwtyn5ZOOjmctE92VvQNnIGlEawq5wVYMBLU53UH3uZ/z5euHfitR15WwczNDhOFtOXCv1r5LgUAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1777978598; c=relaxed/simple;
-	bh=nyFeiliL99DHLxexPYoTbbPmMwp197hX/UfV57bdTfU=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=FxZxJtlWFmDtxAJXRaGJKNbplues6jFZxhTI9P1DA+Z2+39j5dJA1N86FmwTF8QxWpZoBQULQe9gP5HyzdFsmP3PGa8DvS4RnljhnCM2jb2VXw6Oek8dqIF6Wf0X4Bb0Qcg/yMOZ1oLVumzX6fsVpUQ6t/isXlfheU7WQCeGXgw=
+	bh=1oy7d6kB6YrC71bjluy3gr2uXcNxQnP3qwJLpRRvnWg=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fXbYFQbV0/ETQGCoy9ywtKv2ZDMYOr5XdyQ6SI1fJvEwpAw9kSzmphWM5Pw/HeOc+FdCxFuuMUxny14JOgKd7f94TFRjKt7hAE9d/k/Sry19eXyhdYQhxZs3Oykqtzj1uYYTyrWsLfOs3lsYwp5HOqR/VdtcSvxcvwLiDrK0A30=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::224])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id 33A3C581908
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id 2FF91581906
 	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 10:49:03 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E9DB93E9B9
-	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 10:48:55 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 301D23EC39
+	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 10:48:56 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v2 1/2] mpris-proxy: Fix possible crash
-Date: Tue,  5 May 2026 12:48:17 +0200
-Message-ID: <20260505104847.2550550-1-hadess@hadess.net>
+Subject: [BlueZ v2 2/2] mpris-proxy: Avoid session->obex dereference
+Date: Tue,  5 May 2026 12:48:18 +0200
+Message-ID: <20260505104847.2550550-2-hadess@hadess.net>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260505104847.2550550-1-hadess@hadess.net>
+References: <20260505104847.2550550-1-hadess@hadess.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -34,51 +37,51 @@ Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 X-GND-State: clean
 X-GND-Score: 0
-X-GND-Cause: dmFkZTFScmmvYYLT2wxZJrB7DFvCj8XMDG/193moz9eAgDaqTHlKcdowobdckXM7K+QN89F0GgY79QYI+mki0dXVFVNyNCEcCowMcD328QnT1If/lc6TgE470d2YRkA0ngM8w84PdIctWI36yRxzR7pLqFuTay+hOIbQydOZJQhk6xScUFhjTv8YVeE0hI7/4FsxP1Va4IKyNM/3wVHDIaNh3mVKCiT7nlyhUXXrm7byNLx8P8uzggp6snFEqJDfz75aRcPJIM2NsUTWxC+MYy6urf2gqbjlF97vs7beRekAJNdzgfqHKiuLxs0DdeNNup0mkyhUM8wmoX9B0JrCQHpQ1BlRdzIZ1XYgl/YAsotubvIbD5crYyAIX0Oa/hOSJaAyFQisAleuOP+zAErOCXfjfynStrCIV7mxmfhF/wJ/jiHApku09fwzOO6UhRx2r0XHLeM0yUEqgQyCrdPUAw8Xeyr8fthCvJRNJbsghnj610ErKS6MXh97YOHoOfBHixK6/I/Tx0P+HiVY4+pfg6Oq8bLi/mXGGJ1rKFQTNteLUmopGOljauLfAUIAnFhducwKKMcsXDBVEg5U3CHDDN4zIqeL8rLZYHIub+m5xWSYZ0ZJ88DO+aIWWJYUUZEG68KF2dgu5kBXp8fou9KPNOq6w5YnPOHazMf0TJy044sOqsdO9A
+X-GND-Cause: dmFkZTESvVD/YaMWboFeuoLPOmNP9r036CCxDQBdyl8/CpGly0oVqGRnVjGuJHQE6gHbvlfohygZjZAxrS11qhGp5rKIPdcj59tYCHlph0UjknzV58AgZ+Wf9r2WjB91x/rvR77gaTqMRBF28USIaeUXRI41R9Ssw5wdNIUfNty0awgOOGjQm7eKxxcNq8/4j94/aKBOMoPyzR8SrySr8mdT9BP3tjEH1Xas28eQ4hE7Zyt5r7qXD6/YL43nGGY3Thx4qbdYONUPGreL6vXCMmVDla2WWu9OCoszShTvxv5kbrqC0L16wKvj/ZvZurXiB0EY77NHRyXPqCyBUVKhYYvsaDZxVGpDiR3l92gChvc6E5Gs8JCKVMdiPxFX169+VZfAlTX0QLKhBnYAjPtKBlfICsmq1zAD+TczeHaob1wq+CS4VeRXFYm0jwZUpOkKticik/d/6c2P1xkWEP7u1Y54mGoVeVjINvIeExj/qAx1VlQ5nhKCr1ZD3BvCE2+ZCOeIoXiqhHNpLLP+LvIcvUmiu6BrdSQaH/OCmXSKhIVhCWDD10saR+D5WjVvisAHnt7dbmHbMX8DpHDOkDrepvWJ1eOpXAmSYIjLQWtlm6kD3blkAauTJ12AgTaNZ2+ATp3HMQsQ2zjtaRPCAxx74Pnk08gS8Yqm3+VSh1x6Z2iBFYYuBA
 
-find_player_by_obex() doesn't check whether session->obex is a valid
-pointer before dereferecing it, but all code paths that assign it use
-create_obex_session() to assign it, a function that can fail.
-
-Check whether session->obex is null before dereferencing it.
-
- #0 find_player_by_obex at tools/mpris-proxy.c:2819
- #1 obex_property_changed at tools/mpris-proxy.c:2929
- #2 add_property at gdbus/client.c:373
- #3 update_properties at gdbus/client.c:399
- #5 properties_changed at gdbus/client.c:537
- #6 signal_filter at gdbus/watch.c:416
- #7 message_filter at gdbus/watch.c:566
- #10 message_dispatch at gdbus/mainloop.c:59
- #13 g_main_context_dispatch_unlocked at ../glib/gmain.c:4451
- #14 g_main_context_iterate_unlocked at ../glib/gmain.c:4516
-
-Closes: https://bugzilla.redhat.com/show_bug.cgi?id=2466640
+Protect against trying to access session->obex variable that might be
+null after failure to create the session object.
 ---
-Changes since v1:
-- Fix missing space before = sign
-
- tools/mpris-proxy.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ tools/mpris-proxy.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c
-index 1d7a421e9278..eb607347aa32 100644
+index eb607347aa32..b6fdf15da40b 100644
 --- a/tools/mpris-proxy.c
 +++ b/tools/mpris-proxy.c
-@@ -2816,8 +2816,12 @@ static struct player *find_player_by_obex(const char *path)
- 	for (l = players; l; l = l->next) {
- 		struct player *player = l->data;
- 		struct obex_session *session = player->obex;
--		const char *obex_path = g_dbus_proxy_get_path(session->obex);
-+		const char *obex_path = NULL;
+@@ -1306,7 +1306,7 @@ static int parse_track_entry(DBusMessageIter *entry, const char *key,
+ 		const char *handle, *path;
+ 		char *filename, *uri;
  
-+		if (session == NULL)
-+			continue;
+-		if (!player || !player->obex)
++		if (!player || !player->obex || !player->obex->obex)
+ 			return -EINVAL;
+ 
+ 		path = g_dbus_proxy_get_path(player->obex->obex);
+@@ -2614,9 +2614,13 @@ static void obex_get_image(struct player *player, const char *handle)
+ 	DBusMessage *msg;
+ 	DBusMessageIter iter, array;
+ 	struct obex_session *obex_session = player->obex;
+-	const char *path = g_dbus_proxy_get_path(obex_session->obex);
++	const char *path;
+ 	char *filename;
+ 
++	if (!player->obex)
++		return;
 +
-+		obex_path = g_dbus_proxy_get_path(session->obex);
- 		if (g_str_has_prefix(path, obex_path))
- 			return player;
++	path = g_dbus_proxy_get_path(obex_session->obex);
+ 	player->filename = g_strconcat(g_get_tmp_dir(), "/",
+ 				path + strlen(BLUEZ_OBEX_CLIENT_PATH "/"),
+ 				"-", handle, NULL);
+@@ -2674,7 +2678,7 @@ static void device_property_changed(GDBusProxy *proxy, const char *name,
+ 			player->obex = NULL;
  	}
+ 
+-	g_dbus_proxy_unref(session->obex);
++	g_clear_pointer(&session->obex, g_dbus_proxy_unref);
+ 	g_dbus_proxy_unref(session->device);
+ 	obex_sessions = g_slist_remove(obex_sessions, session);
+ 	g_free(session);
 -- 
 2.54.0
 
