@@ -1,26 +1,26 @@
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5523A1A3B
-	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 08:57:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25EE834EF1C
+	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 08:57:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777971480; cv=none; b=Js7llgFbimTYMEIwbFb8F8hASP1Xbhi72u5TzGQHyk+Q6rNVVJRYiX53faa6PtUEJYn0ZBnakU/+IiBAGFWj558VUkqPzXsJlVvu6y3wQOauyaS7zbCO3hmPQ0APgy3bFS4pHmeKr78RQmePakKHpDQeeuPzD4h+RQmx7rG1bVs=
+	t=1777971481; cv=none; b=SWw2DgltKE4dFjVdmN9WokCFgSAPNak98TQV4cQpflLL620pH3po2GykZiVmykqmYsEZy8j9KG5PoKW+McMaYIPzMdA8Q6buSVZBoNQPhuYOjp0aXfpMSqXzHYIGqlucpYEX6HdKVG09WTwOzjVJYiphxG7pr0PpN2wZHemEAuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777971480; c=relaxed/simple;
-	bh=zRymKxd+CCFv5VDTRyALcbPmQp7uX6rxuIUTs0k4IYo=;
+	s=arc-20240116; t=1777971481; c=relaxed/simple;
+	bh=gkmCQRtyBfkuyB8tRuez96MtD6SDGRLHCTetqPF3bPY=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KQkbuy80HQIxbyqYjdENt0UxhMYlHc3/52w7OxRAVrjaKeLcF8rChjN4mWhavOsVT3o1IgugHPws9/huuOeoi27Gm0NDQwG0KhmFKDVFzQWsSSaDvkV35kRo4dwKq6Ap8MCKSmMFmTd0CsjdvKPFr1j4nlyii1OOpxh9AUqKNwE=
+	 MIME-Version; b=N4rtqePkV7jhnMw48KYGbQ0l+C2tSkaWjsudJ0pN94OOuyIXiFbzoISrAXr1Wwrdw3BhowaQPVkPIH9SG0q4cAn4KGMMvGqGzTwjuGD+CA1Gk2p8H86DcV5MN/XY/C6ysu01uwNS4d/gPX264j75dg1o3a7/1zgHzVucb68i9MQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C0E4E3EBCC
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2C29D3EBC0
 	for <linux-bluetooth@vger.kernel.org>; Tue,  5 May 2026 08:57:50 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v10 04/16] build: Separate systemd and libsystemd dependencies
-Date: Tue,  5 May 2026 10:45:10 +0200
-Message-ID: <20260505085741.2497401-5-hadess@hadess.net>
+Subject: [BlueZ v10 02/16] build: Add meson build system
+Date: Tue,  5 May 2026 10:45:08 +0200
+Message-ID: <20260505085741.2497401-3-hadess@hadess.net>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260505085741.2497401-1-hadess@hadess.net>
 References: <20260505085741.2497401-1-hadess@hadess.net>
@@ -34,43 +34,1997 @@ Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 X-GND-State: clean
 X-GND-Score: 0
-X-GND-Cause: dmFkZTF7m1kdtbVHsZr2LXd0j4SaLCDeEFbauGG+fBV8q/Lb0JtuMjsr5muOTSEAf7igQM0Bnw8BHYljvnxFnsAmHOLly4+52VorB9b4KAmDSVF4GGxfoa10KOzkkk0FZ/iH7EudoHjCU3lQOFMf08hNxPB0Om5CXgN/JaXrD8vR0QFR6vK+BgL2HzcSZsu+faoyhdo4a67AVWTy2kRkYaFGckVGbBf8TVfzXT8T3W71rhL99sA17fK9wNykeLee1lk/s3PuiKITlPDUhdt/XRmi48jSPOFu1u+d/gMtvWUS3SjNATRBgl/nHvW2jk6XZ5zgKwUZHQGjWGUUgyPiGRUQZieqHDXzyPs03QKr8QhHT+FduumNjwitO3CPfJ+9Sxd48NgZ9AAeNvEdxe1m4mQUiNwXZyWZlA0tAxPTLRboM71KalaEg75bWSrp3K+kLYfGLYiLjaUNJZVUaGokL2GxjTacZvc4q9sA4hUhQVdYsmtniPBH16S9rCdbY6VpI4+RQbRHKdp2zuVqR4u3e5pZDZmIkjXjp6gAyZ6FYjA/jidcNfrdVxVxYInv/t8wER5I6kGDtO64nEjiJbbZ49j4hw0wZQUYWLFz9KMm3z3Gg98LMJbzlwwOqJTQby3eZuaaIDmdRgXV0grojbs7utqDJeS+OYi32PeRg9E3InjkPwEPIQ
+X-GND-Cause: dmFkZTFNuJg3vOC76mMBI2SxKj0l8dW+TRRW5Htk31NJfrLsYjGV4DSZXgu3YFLeky52T7+lpdd7lK1E/zCaQNeqmgJevdRR+Q6hrISg1/j2WfGONdOtahmEsFABgu4/67+XOzoJSEU/BmP9LocFFNL9lW1hbvtGFqd4IfdUZADT+V8KtWvJhxIA40Sj3hYSRQx8EaythUmaZvka3fyeOFi2JRoxdRmesKrlit8kHJuTV1xZrf3HpC+IAW+aBFd6FDUCoR2roQ7jxQfGQbo5HpCB1t/hIAhFMCF3+uDJDGDWFnSfGAfw7vTeClddBCcvSGyFwNCGms0/A28W51oKA0YJElTidrvkwVNKsMXFcIGNa/jQTM6UpZcrVH/O1rYv1XU3pKbZiWAh/Tyy39NZHv93yGiqd/p5DJ/pJs0LhoTaF3dxCJXVY3uuo4REA0E0xoUR60CABJvxbnq0DeU1lN/dmu3NdDLKMR6A1GXH9+ZL3V3zSuNjPcQ7aajOQBbCuniPbcTqayAbdXXZQKW1jEJ7mg9ZFynG8Q9hGANjMXjSDDDiY9ZKNYGNMCFr2ljruI5abLHenF0yJp0G2V/kBq/3RgWQcboeroL6CklEhqHdg9nQoC5YMieqWunySM5H8vpYoxBRnRSPMIzKd97qW02qoG+wwEMfTYzbjwnAZ/N9foKnxw
 
-One is to install systemd service files, the other to enable deeper
-logind integration into obexd.
+The options default were selected to try and match the existing
+autotools default as best as possible. Further commits will likely
+change those defaults, but at least it should be clear what defaults
+were changed from.
+
+However, a number of options were removed:
+
+--enable-pie is replaced by the meson base option "b_pie":
+https://mesonbuild.com/Builtin-options.html#base-options
+
+--enable-maintainer-mode is replaced by the "debug" build-types:
+https://mesonbuild.com/Builtin-options.html#core-options
+
+--enable-debug and --disable-optimization are replaced by the
+debug build type:
+https://mesonbuild.com/Builtin-options.html#details-for-buildtype
+
+Each of the sanitisers have their own b_sanitize option:
+- asan: b_sanitize=address
+- lsan: b_sanitize=leak
+- ubsan: b_sanitize=address,undefined
+https://mesonbuild.com/Builtin-options.html#base-options
+
+--enable-coverage is replaced by the b_coverage option:
+https://mesonbuild.com/Builtin-options.html#base-options
+
+--enable-valgrind can be replicated by running the test suite with:
+meson test --setup valgrind
 ---
- meson.build       | 3 ++-
- meson_options.txt | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ attrib/meson.build           |  17 ++
+ btio/meson.build             |   1 +
+ client/btpclient/meson.build |  20 +++
+ client/meson.build           |  33 ++++
+ completion/meson.build       |   3 +
+ doc/meson.build              | 172 ++++++++++++++++++++
+ emulator/meson.build         |  34 ++++
+ gdbus/meson.build            |  19 +++
+ gobex/meson.build            |   8 +
+ lib/meson.build              |  53 +++++++
+ mesh/meson.build             |  60 +++++++
+ meson.build                  | 299 +++++++++++++++++++++++++++++++++++
+ meson_options.txt            |  52 ++++++
+ monitor/meson.build          |  37 +++++
+ obexd/meson.build            | 121 ++++++++++++++
+ peripheral/meson.build       |  13 ++
+ plugins/meson.build          |  29 ++++
+ profiles/meson.build         | 168 ++++++++++++++++++++
+ src/meson.build              |  88 +++++++++++
+ src/shared/meson.build       |  85 ++++++++++
+ test/meson.build             |  37 +++++
+ tools/mesh/meson.build       |  16 ++
+ tools/meson.build            | 261 ++++++++++++++++++++++++++++++
+ tools/mpris-proxy.service.in |   2 +-
+ unit/meson.build             | 126 +++++++++++++++
+ 25 files changed, 1753 insertions(+), 1 deletion(-)
+ create mode 100644 attrib/meson.build
+ create mode 100644 btio/meson.build
+ create mode 100644 client/btpclient/meson.build
+ create mode 100644 client/meson.build
+ create mode 100644 completion/meson.build
+ create mode 100644 doc/meson.build
+ create mode 100644 emulator/meson.build
+ create mode 100644 gdbus/meson.build
+ create mode 100644 gobex/meson.build
+ create mode 100644 lib/meson.build
+ create mode 100644 mesh/meson.build
+ create mode 100644 meson.build
+ create mode 100644 meson_options.txt
+ create mode 100644 monitor/meson.build
+ create mode 100644 obexd/meson.build
+ create mode 100644 peripheral/meson.build
+ create mode 100644 plugins/meson.build
+ create mode 100644 profiles/meson.build
+ create mode 100644 src/meson.build
+ create mode 100644 src/shared/meson.build
+ create mode 100644 test/meson.build
+ create mode 100644 tools/mesh/meson.build
+ create mode 100644 tools/meson.build
+ create mode 100644 unit/meson.build
 
+diff --git a/attrib/meson.build b/attrib/meson.build
+new file mode 100644
+index 000000000000..0b7bc97933db
+--- /dev/null
++++ b/attrib/meson.build
+@@ -0,0 +1,17 @@
++attrib_sources = files(
++  'att.c',
++  'gatt.c',
++  'gattrib.c'
++)
++
++gatttool_sources = files(
++  'gatttool.c',
++  'att.c',
++  'gatt.c',
++  'gattrib.c',
++  'interactive.c',
++  'utils.c',
++  '../client/display.c',
++  '../btio/btio.c',
++  '../src/log.c'
++)
+diff --git a/btio/meson.build b/btio/meson.build
+new file mode 100644
+index 000000000000..46ae5691f1d8
+--- /dev/null
++++ b/btio/meson.build
+@@ -0,0 +1 @@
++btio_sources = files('btio.c')
+diff --git a/client/btpclient/meson.build b/client/btpclient/meson.build
+new file mode 100644
+index 000000000000..c2cab2734659
+--- /dev/null
++++ b/client/btpclient/meson.build
+@@ -0,0 +1,20 @@
++executable('btpclient',
++  sources: [
++    'btpclient.c',
++    'core.c',
++    'bap.c',
++    'gap.c',
++    'gatt.c',
++    '../../src/shared/btp.c' ],
++  include_directories: '..',
++  dependencies: [ libbluetooth_internal_dep, libshared_ell_dep ],
++)
++executable('btpclientctl',
++  sources: [ 'btpclientctl.c', '../../client/display.c' ],
++  dependencies: [
++    libshared_mainloop_dep,
++    libshared_glib_dep,
++    libbluetooth_internal_dep,
++    readline_dep
++  ]
++)
+diff --git a/client/meson.build b/client/meson.build
+new file mode 100644
+index 000000000000..a7642d13fd8b
+--- /dev/null
++++ b/client/meson.build
+@@ -0,0 +1,33 @@
++if get_option('client').enabled()
++  executable('bluetoothctl',
++    sources: [
++      'main.c',
++      'print.c',
++      'display.c',
++      'agent.c',
++      'advertising.c',
++      'adv_monitor.c',
++      'gatt.c',
++      'admin.c',
++      'player.c',
++      'mgmt.c',
++      'assistant.c',
++      'hci.c',
++      'telephony.c'
++      ],
++    dependencies: [
++      libbluetooth_internal_dep,
++      libgdbus_internal_dep,
++      libshared_glib_dep,
++      glib_dep,
++      udevlib_dep,
++      dbus_dep,
++      readline_dep
++      ],
++    install: true,
++  )
++endif
++
++if get_option('btpclient').allowed() and ell_dep.found()
++  subdir('btpclient')
++endif
+diff --git a/completion/meson.build b/completion/meson.build
+new file mode 100644
+index 000000000000..24b71518c67d
+--- /dev/null
++++ b/completion/meson.build
+@@ -0,0 +1,3 @@
++install_data('zsh/_bluetoothctl',
++  install_dir: zshcompletiondir
++)
+diff --git a/doc/meson.build b/doc/meson.build
+new file mode 100644
+index 000000000000..3d5ccd7d3034
+--- /dev/null
++++ b/doc/meson.build
+@@ -0,0 +1,172 @@
++man_pages = [
++  'hci.7',
++  'iso.7',
++  'mgmt.7',
++  'l2cap.7',
++  'rfcomm.7',
++  'sco.7',
++  'btsnoop.7',
++  'org.bluez.Adapter.5',
++  'org.bluez.Bearer.LE.5',
++  'org.bluez.Bearer.BREDR.5',
++  'org.bluez.Device.5',
++  'org.bluez.DeviceSet.5',
++  'org.bluez.AgentManager.5',
++  'org.bluez.Agent.5',
++  'org.bluez.ProfileManager.5',
++  'org.bluez.Profile.5',
++  'org.bluez.NetworkServer.5',
++  'org.bluez.Network.5',
++  'org.bluez.Input.5',
++  'org.bluez.BatteryProviderManager.5',
++  'org.bluez.BatteryProvider.5',
++  'org.bluez.Battery.5',
++  'org.bluez.AdminPolicySet.5',
++  'org.bluez.AdminPolicyStatus.5',
++  'org.bluez.Media.5',
++  'org.bluez.MediaControl.5',
++  'org.bluez.MediaPlayer.5',
++  'org.bluez.MediaFolder.5',
++  'org.bluez.MediaItem.5',
++  'org.bluez.MediaEndpoint.5',
++  'org.bluez.MediaTransport.5',
++  'org.bluez.MediaAssistant.5',
++  'org.bluez.GattManager.5',
++  'org.bluez.GattProfile.5',
++  'org.bluez.GattService.5',
++  'org.bluez.GattCharacteristic.5',
++  'org.bluez.GattDescriptor.5',
++  'org.bluez.LEAdvertisingManager.5',
++  'org.bluez.LEAdvertisement.5',
++  'org.bluez.AdvertisementMonitorManager.5',
++  'org.bluez.AdvertisementMonitor.5',
++  'org.bluez.Telephony.5',
++  'org.bluez.Call.5',
++]
++
++obex_man_pages = [
++  'org.bluez.obex.Client.5',
++  'org.bluez.obex.Session.5',
++  'org.bluez.obex.Transfer.5',
++  'org.bluez.obex.ObjectPush.5',
++  'org.bluez.obex.FileTransfer.5',
++  'org.bluez.obex.Synchronization.5',
++  'org.bluez.obex.PhonebookAccess.5',
++  'org.bluez.obex.MessageAccess.5',
++  'org.bluez.obex.Message.5',
++  'org.bluez.obex.AgentManager.5',
++  'org.bluez.obex.Agent.5',
++  'org.bluez.obex.Image.5',
++]
++
++if get_option('obex').enabled()
++  man_pages += obex_man_pages
++endif
++
++monitor_man_pages = [ 'btmon.1' ]
++
++if get_option('monitor').allowed()
++  man_pages += monitor_man_pages
++endif
++
++tools_man_pages = [
++  'rctest.1',
++  'l2ping.1',
++  'btattach.1',
++  'isotest.1',
++  'bdaddr.1',
++]
++
++noinst_tools_man_pages = [ 'btmgmt.1' ]
++
++if get_option('tools').allowed()
++  man_pages += tools_man_pages
++  man_pages += noinst_tools_man_pages
++endif
++
++deprecated_tools_man_pages = [
++  'hciattach.1',
++  'hciconfig.1',
++  'hcitool.1',
++  'rfcomm.1',
++  'sdptool.1',
++  'ciptool.1',
++]
++
++if get_option('deprecated').allowed()
++  man_pages += deprecated_tools_man_pages
++endif
++
++hid2hci_man_pages = [ 'hid2hci.1' ]
++
++if get_option('hid2hci').enabled()
++  man_pages += 'hid2hci.1'
++endif
++
++client_man_pages = [
++  'bluetoothctl.1',
++  'bluetoothctl-mgmt.1',
++  'bluetoothctl-monitor.1',
++  'bluetoothctl-admin.1',
++  'bluetoothctl-advertise.1',
++  'bluetoothctl-endpoint.1',
++  'bluetoothctl-gatt.1',
++  'bluetoothctl-player.1',
++  'bluetoothctl-scan.1',
++  'bluetoothctl-transport.1',
++  'bluetoothctl-assistant.1',
++  'bluetoothctl-hci.1',
++  'bluetoothctl-telephony.1'
++]
++
++if get_option('client').enabled()
++  man_pages += client_man_pages
++endif
++
++if rst2man.found()
++  foreach man_page: man_pages
++    man_page_name = man_page.substring(0, -2)
++    man_section = man_page.substring(-1)
++    if man_section.to_int() == 7
++      man_page_name = man_page_name + '-protocol'
++    endif
++    install = not noinst_tools_man_pages.contains(man_page)
++    custom_target(man_page,
++      input: man_page_name + '.rst',
++      output: man_page,
++      command: rst2man_command,
++      install: install,
++      install_dir: get_option('mandir') / 'man@0@'.format(man_section)
++    )
++  endforeach
++endif
++
++bluetoothd_rst = configure_file(
++  input: 'bluetoothd.rst.in',
++  output: 'bluetoothd.rst',
++  configuration: man_conf
++)
++if rst2man.found()
++  custom_target(
++    input: bluetoothd_rst,
++    output: 'bluetoothd.8',
++    command: rst2man_command,
++    install: true,
++    install_dir: get_option('mandir') / 'man8'
++  )
++endif
++
++bluetooth_meshd_rst = configure_file(
++  input: 'bluetooth-meshd.rst.in',
++  output: 'bluetooth-meshd.rst',
++  configuration: man_conf
++)
++if get_option('mesh').enabled() and rst2man.found()
++  custom_target(
++    input: bluetooth_meshd_rst,
++    output: 'bluetooth-meshd.8',
++    command: rst2man_command,
++    install: true,
++    install_dir: get_option('mandir') / 'man8'
++  )
++endif
+diff --git a/emulator/meson.build b/emulator/meson.build
+new file mode 100644
+index 000000000000..40544567e4e4
+--- /dev/null
++++ b/emulator/meson.build
+@@ -0,0 +1,34 @@
++emulator_sources = files(
++  'hciemu.c',
++  'vhci.c',
++  'btdev.c',
++  'bthost.c',
++  'smp.c',
++)
++
++if get_option('tests').allowed()
++  executable('btvirt',
++    sources: [ 'main.c',
++      'serial.c',
++      'server.c',
++      'vhci.c',
++      'btdev.c',
++      'bthost.c',
++      'smp.c',
++      'phy.c',
++      'le.c' ],
++    dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep ]
++  )
++
++  executable('b1ee',
++    sources: 'b1ee.c',
++    include_directories: '../lib',
++    dependencies: libshared_mainloop_dep
++  )
++
++  executable('hfp',
++    sources: 'hfp.c',
++    dependencies: libshared_mainloop_dep
++  )
++endif
++
+diff --git a/gdbus/meson.build b/gdbus/meson.build
+new file mode 100644
+index 000000000000..dc7f2887a60f
+--- /dev/null
++++ b/gdbus/meson.build
+@@ -0,0 +1,19 @@
++gdbus_sources = [
++  'gdbus.h',
++  'mainloop.c',
++  'watch.c',
++  'object.c',
++  'client.c',
++  'polkit.c'
++]
++
++libgdbus_internal = static_library('gdbus_internal',
++  sources: gdbus_sources,
++  dependencies: [ glib_dep, dbus_dep ],
++  install: false
++)
++
++libgdbus_internal_dep = declare_dependency(
++  dependencies: dbus_dep,
++  link_with: libgdbus_internal
++)
+diff --git a/gobex/meson.build b/gobex/meson.build
+new file mode 100644
+index 000000000000..0ff6238a7b8c
+--- /dev/null
++++ b/gobex/meson.build
+@@ -0,0 +1,8 @@
++gobex_sources = files(
++  'gobex.c',
++  'gobex-defs.c',
++  'gobex-packet.c',
++  'gobex-header.c',
++  'gobex-transfer.c',
++  'gobex-apparam.c'
++)
+diff --git a/lib/meson.build b/lib/meson.build
+new file mode 100644
+index 000000000000..e8d11f342bd8
+--- /dev/null
++++ b/lib/meson.build
+@@ -0,0 +1,53 @@
++lib_sources = [
++  'bluetooth/bluetooth.c',
++  'bluetooth/hci.c',
++  'bluetooth/sdp.c',
++]
++
++lib_extra_sources = [
++  'bluetooth/uuid.c'
++]
++
++lib_headers = [
++  'bluetooth/bluetooth.h',
++  'bluetooth/hci.h',
++  'bluetooth/hci_lib.h',
++  'bluetooth/sco.h',
++  'bluetooth/l2cap.h',
++  'bluetooth/sdp.h',
++  'bluetooth/sdp_lib.h',
++  'bluetooth/rfcomm.h',
++  'bluetooth/bnep.h',
++  'bluetooth/cmtp.h',
++  'bluetooth/hidp.h'
++  ]
++
++if get_option('library').allowed()
++  lib_bluetooth = shared_library('bluetooth',
++    sources: lib_headers + lib_sources,
++    version: '3.19.15',
++    install: true
++  )
++
++  install_headers(lib_headers,
++    subdir: 'bluetooth'
++  )
++
++  pkgconfig = import('pkgconfig')
++  pkgconfig.generate(
++    name: 'bluez',
++    description: 'Bluetooth protocol stack for Linux',
++    version: meson.project_version(),
++    libraries: lib_bluetooth,
++  )
++endif
++
++libbluetooth_internal = static_library('bluetooth_internal',
++  sources: lib_headers + lib_sources + lib_extra_sources,
++  install: false
++)
++
++libbluetooth_internal_dep = declare_dependency(
++  link_with: libbluetooth_internal,
++  include_directories: '.'
++)
+diff --git a/mesh/meson.build b/mesh/meson.build
+new file mode 100644
+index 000000000000..cb4c9012300d
+--- /dev/null
++++ b/mesh/meson.build
+@@ -0,0 +1,60 @@
++if get_option('datafiles').allowed()
++  install_data('bluetooth-mesh.conf',
++    install_dir: dbusdir)
++  install_data('mesh-main.conf',
++    install_dir: configdir)
++endif
++
++if systemd_dep.found()
++  configure_file(
++    input: 'bluetooth-mesh.service.in',
++    output: 'bluetooth-mesh.service',
++    install: true,
++    install_dir: systemdsystemunitdir,
++    configuration: service_conf
++  )
++  install_data('org.bluez.mesh.service',
++    install_dir: dbussystembusdir
++  )
++endif
++
++executable('bluetooth-meshd',
++  sources: [
++    builtin_h,
++    'main.c',
++    'mesh.c',
++    'net-keys.c',
++    'mesh-io.c',
++    'mesh-mgmt.c',
++    'mesh-io-unit.c',
++    'mesh-io-mgmt.c',
++    'mesh-io-generic.c',
++    'net.c',
++    'crypto.c',
++    'friend.c',
++    'appkey.c',
++    'node.c',
++    'model.c',
++    'cfgmod-server.c',
++    'remprv-server.c',
++    'mesh-config-json.c',
++    'util.c',
++    'dbus.c',
++    'agent.c',
++    'prov-acceptor.c',
++    'prov-initiator.c',
++    'manager.c',
++    'pb-adv.c',
++    'keyring.c',
++    'rpl.c',
++    'prvbeac-server.c'
++  ],
++  include_directories: '../lib',
++  dependencies: [ libshared_ell_dep, jsonc_dep ],
++  c_args: [
++    '-DCONFIGDIR="@0@"'.format(configdir),
++    '-DMESH_STORAGEDIR="@0@"'.format(meshstoragedir)
++  ],
++  install: true,
++  install_dir: pkglibexecdir
++)
 diff --git a/meson.build b/meson.build
-index 15508a868636..915dd32a37c6 100644
---- a/meson.build
+new file mode 100644
+index 000000000000..d3c43d79141f
+--- /dev/null
 +++ b/meson.build
-@@ -144,7 +144,8 @@ readline_dep = dependency('readline',
-   required: get_option('client').enabled() or
-     get_option('mesh').enabled())
- systemd_dep = dependency('systemd', required: get_option('systemd'))
--libsystemd_dep = dependency('libsystemd', required: get_option('systemd'))
-+libsystemd_dep = dependency('libsystemd',
-+  required: get_option('obex').enabled() and get_option('logind').enabled())
- 
- ell_args = {
-   'version': '>= 0.39',
+@@ -0,0 +1,299 @@
++# SPDX-License-Identifier: GPL-2.0-or-later
++project(
++  'bluez', 'c',
++  version: '5.86',
++  license: 'LGPL-2.1-or-later AND GPL-2.0-or-later',
++  meson_version: '>= 1.3.0'
++)
++
++datadir = get_option('datadir')
++storagedir = '/' / get_option('localstatedir') / 'lib/bluetooth'
++configdir = get_option('sysconfdir') / 'bluetooth'
++pkglibdir = get_option('libdir') / 'bluetooth'
++pkglibexecdir = get_option('libexecdir') / 'bluetooth'
++meshstoragedir = storagedir / 'mesh'
++
++fs = import('fs')
++service_conf = configuration_data()
++if not fs.is_absolute(pkglibexecdir)
++  pkglibexecdir = get_option('prefix') / pkglibexecdir
++endif
++service_conf.set('PKGLIBEXECDIR', pkglibexecdir)
++
++add_project_arguments('-DHAVE_CONFIG_H', language: 'c')
++config_h = configuration_data()
++
++cc = meson.get_compiler('c')
++
++required_funcs = [
++  'explicit_bzero',
++  'getrandom',
++  'rawmemchr',
++  'signalfd',
++]
++
++foreach func: required_funcs
++  cc.has_function(func, required: true)
++endforeach
++
++required_lib_funcs = [
++  [ 'clock_gettime', 'rt' ],
++  [ 'pthread_create', 'pthread' ],
++  [ 'dlopen', 'dl' ]
++]
++
++foreach func: required_lib_funcs
++  dep = cc.find_library(func[1], required: true)
++  cc.has_function(func[0], dependencies: dep, required: true)
++endforeach
++
++required_headers = [
++  'stdarg.h',
++  'stdio.h',
++  'string.h',
++  'linux/types.h',
++  'linux/if_alg.h',
++  'linux/uinput.h',
++  'linux/uhid.h',
++  'sys/random.h'
++]
++
++foreach header: required_headers
++  cc.has_header(header, required: true)
++endforeach
++
++# basename may be only available in libgen.h with the POSIX behavior,
++# not desired here
++config_h.set10('HAVE_DECL_BASENAME',
++  cc.has_function('basename', prefix: '#define _GNU_SOURCE 1\n#include <string.h>'))
++
++# To combine with -Wl,--gc-sections
++add_project_arguments([ '-ffunction-sections', '-fdata-sections' ] , language: 'c')
++
++# Maintainer mode
++if get_option('buildtype').contains('debug')
++  test_cflags = [
++    '-Wno-unused-parameter',
++    '-Wno-missing-field-initializers',
++    '-Wdeclaration-after-statement',
++    '-Wmissing-declarations',
++    '-Wredundant-decls',
++    '-Wcast-align',
++    '-Wswitch-enum',
++    '-Wformat',
++    '-Wformat-security',
++    '-Wstringop-overflow',
++  ]
++
++  if get_option('buildtype') == 'debugoptimized'
++    test_cflags += '-D_FORTIFY_SOURCE=3'
++  endif
++
++  common_flags = [
++    '-DG_DISABLE_DEPRECATED',
++    '-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_36',
++    '-DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_36'
++  ]
++
++  common_flags += cc.get_supported_arguments(test_cflags)
++
++  add_project_arguments(common_flags, language: 'c')
++
++  config_h.set('HAVE_VALGRIND_MEMCHECK_H',
++    cc.has_header('valgrind/memcheck.h', required: get_option('valgrind')))
++endif
++
++test_cflags = [
++  '-ffunction-sections',
++  '-fdata-sections'
++]
++
++add_project_arguments(cc.get_supported_arguments(test_cflags), language: 'c')
++add_project_arguments('-I' + meson.project_build_root(), language: 'c')
++add_project_arguments('-I' + meson.project_source_root(), language: 'c')
++add_project_link_arguments('-Wl,--gc-sections', language: 'c')
++
++dummy_dep = dependency('dummy', required: false)
++glib_dep = dependency('glib-2.0', version: '>= 2.36')
++dbus_dep = dependency('dbus-1', version:'>= 1.10')
++
++cc.check_header('elfutils/libdwfl.h', required: get_option('backtrace'))
++backtrace_dep = cc.find_library('dw', required: get_option('backtrace'))
++config_h.set('HAVE_BACKTRACE_SUPPORT', backtrace_dep.found())
++
++config_h.set10('HAVE_DECL_SOF_TIMESTAMPING_TX_COMPLETION',
++  cc.has_header_symbol('linux/net_tstamp.h', 'SOF_TIMESTAMPING_TX_COMPLETION'))
++config_h.set10('HAVE_DECL_SCM_TSTAMP_COMPLETION',
++  cc.has_header_symbol('linux/errqueue.h', 'SCM_TSTAMP_COMPLETION', prefix: '#include <time.h>'))
++
++udevlib_dep = dependency('libudev', required: get_option('udev'))
++udevlib_sixaxis_dep = dependency('libudev', required: get_option('sixaxis'))
++udevlib_hid2hci_dep = dependency('libudev', required: get_option('hid2hci'))
++
++cups_dep = dependency('cups', required: get_option('cups'))
++jsonc_dep = dependency('json-c', version: '>= 0.13', required: get_option('mesh'))
++alsa_dep = dependency('alsa', required: get_option('midi'))
++ical_dep = dependency('libical', required: get_option('obex'))
++readline_dep = dependency('readline',
++  required: get_option('client').enabled() or
++    get_option('mesh').enabled())
++systemd_dep = dependency('systemd', required: get_option('systemd'))
++libsystemd_dep = dependency('libsystemd', required: get_option('systemd'))
++
++ell_args = {
++  'version': '>= 0.39',
++  'fallback' : ['ell', 'libell_dep'],
++  'default_options': [
++    'default_library=static',
++    'tests=false',
++    'cert-tests=false'
++  ]
++}
++ell_dep = dependency('ell',
++  kwargs: ell_args,
++  required: get_option('btpclient')
++)
++ell_mesh_dep = dependency('ell',
++  kwargs: ell_args,
++  required: get_option('mesh')
++)
++
++rst2man = find_program('rst2man', 'rst2man.py', required: get_option('manpages'))
++if rst2man.found()
++  rst2man_command = [
++    rst2man,
++    '--strict',
++    '--no-raw',
++    '--no-generator',
++    '--no-datestamp',
++    '@INPUT@',
++    '@OUTPUT@'
++  ]
++endif
++
++man_conf = configuration_data()
++man_conf.set('CONFIGDIR', get_option('prefix') / configdir)
++man_conf.set('MESH_STORAGEDIR', get_option('prefix') / meshstoragedir)
++
++if get_option('phonebook') == 'ebook'
++  ebook_dep = dependency('libebook-1.2', '>= 3.3', required: true)
++  edataserver_dep = dependency('libedataserver-1.2', '>= 3.3', required: true)
++else
++  ebook_dep = dummy_dep
++  edataserver_dep = dummy_dep
++endif
++
++plugindir = get_option('libdir') / 'bluetooth/plugins'
++
++dbusconfdir = get_option('dbusconfdir')
++if dbusconfdir == ''
++  dbusconfdir = dbus_dep.get_variable('datadir')
++endif
++dbusdir = dbusconfdir / 'dbus-1/system.d'
++
++dbussystembusdir = get_option('dbussystembusdir')
++if dbussystembusdir == ''
++  dbussystembusdir = dbus_dep.get_variable('system_bus_services_dir')
++endif
++
++dbussessionbusdir = get_option('dbussessionbusdir')
++if dbussessionbusdir == ''
++  dbussessionbusdir = dbus_dep.get_variable('session_bus_services_dir')
++endif
++
++service_in = configuration_data()
++service_in.set_quoted('PKGLIBEXECDIR', get_option('prefix') / pkglibexecdir)
++
++if systemd_dep.found()
++  systemdsystemunitdir = get_option('systemdsystemunitdir')
++  if systemdsystemunitdir == ''
++    systemdsystemunitdir = systemd_dep.get_variable('systemdsystemunitdir')
++  endif
++  systemduserunitdir = get_option('systemduserunitdir')
++  if systemduserunitdir == ''
++    systemduserunitdir = systemd_dep.get_variable('systemduserunitdir')
++  endif
++endif
++
++zshcompletiondir = get_option('zsh-completion-dir')
++if zshcompletiondir == ''
++  zshcompletiondir = datadir / 'zsh/site-functions'
++endif
++
++zsh_completions = fs.is_dir(zshcompletiondir)
++
++udev_dep = dependency('udev', version:'>= 196', required: udevlib_hid2hci_dep.found())
++if udev_dep.found()
++  udevdir = get_option('udevdir')
++  if udevdir == ''
++    udevdir = udev_dep.get_variable('udevdir')
++  endif
++endif
++
++if cups_dep.found()
++  cups_serverbin = get_option('cups_serverbin')
++  if cups_serverbin == ''
++    cups_serverbin = cups_dep.get_variable('cups_serverbin')
++  endif
++endif
++
++external_plugins_link_args = ''
++if get_option('external-plugins').enabled()
++  external_plugins_link_args = [
++    '-Wl,--export-dynamic',
++    '-Wl,--version-script=' + meson.project_source_root() / 'src/bluetooth.ver'
++  ]
++endif
++
++config_h.set('HAVE_A2DP', get_option('a2dp').allowed())
++config_h.set('HAVE_AVRCP', get_option('avrcp').allowed())
++config_h.set('HAVE_ASHA', get_option('asha').allowed())
++config_h.set('HAVE_VCP', get_option('vcp').allowed())
++config_h.set10('EXTERNAL_PLUGINS', get_option('external-plugins').enabled())
++config_h.set_quoted('VERSION', meson.project_version())
++
++configure_file(
++  output: 'config.h',
++  configuration: config_h
++)
++
++subdir('lib')
++subdir('gdbus')
++subdir('attrib')
++subdir('btio')
++subdir('plugins')
++subdir('profiles')
++subdir('src')
++subdir('client')
++if get_option('monitor').allowed()
++  subdir('monitor')
++endif
++subdir('emulator')
++subdir('gobex')
++subdir('tools')
++subdir('peripheral')
++if get_option('obex').enabled()
++  subdir('obexd')
++endif
++if zsh_completions
++  subdir('completion')
++endif
++if get_option('mesh').enabled()
++  subdir('mesh')
++endif
++if rst2man.found()
++  subdir('doc')
++endif
++if get_option('tests').allowed()
++  subdir('test')
++  subdir('unit')
++endif
++
++# Fix permissions on install
++install = find_program('install')
++sh = find_program('sh')
++meson.add_install_script(sh, '-c', 'install -dm755 ${DESTDIR}/' + configdir)
++meson.add_install_script(sh, '-c', 'install -dm700 ${DESTDIR}/' + storagedir)
++if get_option('mesh').enabled()
++  meson.add_install_script(sh, '-c', 'install -dm700 ${DESTDIR}/' + meshstoragedir)
++endif
 diff --git a/meson_options.txt b/meson_options.txt
-index 4a0c726c2098..54cfdbb0d7c1 100644
---- a/meson_options.txt
+new file mode 100644
+index 000000000000..4a0c726c2098
+--- /dev/null
 +++ b/meson_options.txt
-@@ -6,7 +6,8 @@ option('tests', type: 'feature', value: 'auto', description: 'Enable testing too
- option('tools', type: 'feature', value: 'enabled', description: 'Enable Bluetooth tools')
- option('monitor', type: 'feature', value: 'enabled', description: 'Enable Bluetooth monitor')
- option('client', type: 'feature', value: 'enabled', description: 'Enable command line client')
--option('systemd', type: 'feature', value: 'enabled', description: 'Enable systemd integration')
-+option('systemd', type: 'feature', value: 'enabled', description: 'Install systemd service files')
-+option('logind', type: 'feature', value: 'enabled', description: 'Enable logind integration in obexd')
- option('udev', type: 'feature', value: 'enabled', description: 'Enable udev device support in tools')
- option('datafiles', type: 'feature', value: 'enabled', description: 'Install configuration and data files')
- option('manpages', type: 'feature', value: 'auto', description: 'Enable building of manual pages')
+@@ -0,0 +1,52 @@
++option('valgrind', type: 'feature', value: 'disabled', description: 'Enable valgrind memory checks')
++option('backtrace', type: 'feature', value: 'disabled', description: 'Enable backtrace support')
++option('library', type: 'feature', value: 'enabled', description: 'Install Bluetooth library')
++option('examples', type: 'feature', value: 'auto', description: 'Enable test/example scripts')
++option('tests', type: 'feature', value: 'auto', description: 'Enable testing tools')
++option('tools', type: 'feature', value: 'enabled', description: 'Enable Bluetooth tools')
++option('monitor', type: 'feature', value: 'enabled', description: 'Enable Bluetooth monitor')
++option('client', type: 'feature', value: 'enabled', description: 'Enable command line client')
++option('systemd', type: 'feature', value: 'enabled', description: 'Enable systemd integration')
++option('udev', type: 'feature', value: 'enabled', description: 'Enable udev device support in tools')
++option('datafiles', type: 'feature', value: 'enabled', description: 'Install configuration and data files')
++option('manpages', type: 'feature', value: 'auto', description: 'Enable building of manual pages')
++option('experimental', type: 'feature', value: 'disabled', description: 'Enable experimental tools')
++option('deprecated', type: 'feature', value: 'disabled', description: 'Enable deprecated tools')
++option('external-plugins', type: 'feature', value: 'enabled', description: 'Enable support for external plugins')
++
++option('dbusconfdir', type: 'string', value: '', description: 'D-Bus configuration directory')
++option('dbussystembusdir', type: 'string', value: '', description: 'D-Bus system bus services dir')
++option('dbussessionbusdir', type:'string', value: '', description: 'D-Bus session bus services dir')
++option('systemdsystemunitdir', type: 'string', value: '', description: 'path to systemd system unit directory')
++option('systemduserunitdir', type: 'string', value: '', description: 'systemd user unit dir')
++option('zsh-completion-dir', type:'string', value: '', description: 'Path to install zsh completions')
++option('udevdir', type: 'string', value: '', description: 'udev directory')
++option('cups_serverbin', type: 'string', value: '', description: 'CUPS directory')
++
++option('nfc', type: 'feature', value: 'disabled', description: 'Enable NFC pairing')
++option('a2dp', type: 'feature', value: 'auto', description: 'Enable A2DP profile')
++option('avrcp', type: 'feature', value: 'auto', description: 'Enable AVRCP profile')
++option('network', type: 'feature', value: 'auto', description: 'Enable network profiles')
++option('hid', type: 'feature', value: 'auto', description: 'Enable HID profile')
++option('hog', type: 'feature', value: 'auto', description: 'Enable HoG profile')
++option('bap', type: 'feature', value: 'auto', description: 'Enable BAP profile')
++option('bass', type: 'feature', value: 'auto', description: 'Enable BASS service')
++option('mcp', type: 'feature', value: 'auto', description: 'Enable MCP profile')
++option('ccp', type: 'feature', value: 'auto', description: 'Enable CCP profile')
++option('vcp', type: 'feature', value: 'auto', description: 'Enable VCP profile')
++option('micp', type: 'feature', value: 'auto', description: 'Enable MICP profile')
++option('csip', type: 'feature', value: 'auto', description: 'Enable CSIP profile')
++option('asha', type: 'feature', value: 'auto', description: 'Enable ASHA support')
++option('cups', type: 'feature', value: 'auto', description: 'Enable CUPS printer support')
++option('mesh', type: 'feature', value: 'auto', description: 'Enable Mesh profile support')
++option('midi', type: 'feature', value: 'auto', description: 'Enable MIDI support')
++option('obex', type: 'feature', value: 'auto', description: 'Enable OBEX profile support')
++option('tmap', type: 'feature', value: 'auto', description: 'Enable TMAP profile support')
++option('gmap', type: 'feature', value: 'auto', description: 'Enable GMAP profile support')
++option('hfp', type: 'feature', value: 'auto', description: 'Enable HFP profile support')
++option('btpclient', type: 'feature', value: 'auto', description: 'Enable BTP client')
++option('sixaxis', type: 'feature', value: 'auto', description: 'Enable sixaxis plugin')
++option('hid2hci', type: 'feature', value: 'auto', description: 'Enable hid2hci tool')
++option('logger', type: 'feature', value: 'disabled', description: 'Enable HCI logger service')
++option('admin', type: 'feature', value: 'auto', description: 'Enable admin policy plugin')
++option('phonebook', type: 'combo', choices: [ 'dummy', 'ebook' ], value: 'dummy', description: 'Obexd phonebook plugin')
+diff --git a/monitor/meson.build b/monitor/meson.build
+new file mode 100644
+index 000000000000..44197f2d3ba2
+--- /dev/null
++++ b/monitor/meson.build
+@@ -0,0 +1,37 @@
++executable('btmon',
++  sources: [
++    'main.c',
++    'display.c',
++    'hcidump.c',
++    'ellisys.c',
++    'control.c',
++    'packet.c',
++    'vendor.c',
++    'lmp.c',
++    'crc.c',
++    'll.c',
++    'l2cap.c',
++    'sdp.c',
++    'avctp.c',
++    'avdtp.c',
++    'a2dp.c',
++    'rfcomm.c',
++    'bnep.c',
++    'hwdb.c',
++    'keys.c',
++    'analyze.c',
++    'intel.c',
++    'broadcom.c',
++    'msft.c',
++    'jlink.c',
++    'att.c',
++    '../src/log.c',
++    '../src/textfile.c',
++    '../src/settings.c'
++  ],
++  c_args: [
++    '-DSTORAGEDIR="@0"'.format(storagedir)
++  ],
++  dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep, udevlib_dep, glib_dep ],
++  install: true
++)
+diff --git a/obexd/meson.build b/obexd/meson.build
+new file mode 100644
+index 000000000000..baddafcd8873
+--- /dev/null
++++ b/obexd/meson.build
+@@ -0,0 +1,121 @@
++if get_option('datafiles').allowed()
++  install_data('src/obex.conf',
++    install_dir: dbusconfdir / 'dbus-1/system.d'
++  )
++endif
++
++if systemd_dep.found()
++  configure_file(
++    input: 'src/obex.service.in',
++    output: 'obex.service',
++    install: true,
++    install_dir: systemduserunitdir,
++    configuration: service_conf
++  )
++  configure_file(
++    input: 'src/org.bluez.obex.service.in',
++    output: 'org.bluez.obex.service',
++    install: true,
++    install_dir: dbussessionbusdir,
++    configuration: service_conf
++  )
++  install_symlink('dbus-org.bluez.obex.service',
++    pointing_to: dbussessionbusdir / 'org.bluez.obex.service',
++    install_dir: systemduserunitdir
++  )
++endif
++
++obexd_builtin_modules = [
++  'filesystem',
++  'bluetooth',
++  'opp',
++  'ftp',
++  'irmc',
++  'pbap',
++  'mas',
++  'mns'
++]
++
++obexd_builtin_sources = [
++  'plugins/filesystem.c',
++  'plugins/bluetooth.c',
++  'plugins/opp.c',
++  'plugins/ftp.c',
++  'plugins/irmc.c',
++  'plugins/pbap.c',
++  'plugins/vcard.c',
++  'plugins/phonebook-@0@.c'.format(get_option('phonebook')),
++  'plugins/mas.c',
++  'plugins/messages-dummy.c',
++  'client/mns.c',
++]
++
++if get_option('experimental').allowed()
++  obexd_builtin_modules += 'pcsuite'
++  obexd_builtin_sources += 'plugins/pcsuite.c'
++endif
++
++obex_plugindir = get_option('libdir') / 'obex/plugins'
++
++obexd_genbuiltin = find_program('src/genbuiltin')
++obexd_builtin_h = custom_target('obexd-builtin.h',
++  output: 'builtin.h',
++  capture: true,
++  command: [ obexd_genbuiltin, obexd_builtin_modules ]
++)
++
++executable('obexd',
++  sources: [
++    btio_sources,
++    gobex_sources,
++    obexd_builtin_sources,
++    obexd_builtin_h,
++    'src/main.c',
++    'src/plugin.c',
++    'src/log.c',
++    'src/logind.c',
++    'src/manager.c',
++    'src/obex.c',
++    'src/mimetype.c',
++    'src/service.c',
++    'src/transport.c',
++    'src/server.c',
++    'client/manager.c',
++    'client/session.c',
++    'client/bluetooth.c',
++    'client/sync.c',
++    'client/pbap.c',
++    'client/ftp.c',
++    'client/opp.c',
++    'client/map.c',
++    'client/bip.c',
++    'client/bip-common.c',
++    'client/map-event.c',
++    'client/transfer.c',
++    'client/transport.c',
++    'client/driver.c'
++  ],
++  dependencies: [
++    libbluetooth_internal_dep,
++    libgdbus_internal_dep,
++    libshared_glib_dep,
++    ical_dep,
++    dbus_dep,
++    ebook_dep,
++    edataserver_dep,
++    glib_dep,
++    libsystemd_dep.found() ? libsystemd_dep : dummy_dep
++  ],
++  c_args: [
++    '-DOBEX_PLUGIN_BUILTIN',
++    '-DPLUGINDIR="@0@"'.format(obex_plugindir),
++    '-D_FILE_OFFSET_BITS=64',
++    '-DCONFIGDIR="@0@"'.format(configdir),
++    libsystemd_dep.found() ? '-DSYSTEMD' : ''
++  ],
++  link_args: external_plugins_link_args,
++  install: true,
++  install_dir: pkglibexecdir,
++)
++
++
+diff --git a/peripheral/meson.build b/peripheral/meson.build
+new file mode 100644
+index 000000000000..6a9fdb4cbc66
+--- /dev/null
++++ b/peripheral/meson.build
+@@ -0,0 +1,13 @@
++if get_option('tests').allowed()
++  executable('btsensor',
++    sources: [
++      'main.c',
++      'efivars.c',
++      'attach.c',
++      'log.c',
++      'gap.c',
++      'gatt.c',
++    ],
++    dependencies: [ libshared_mainloop_dep, libbluetooth_internal_dep ]
++  )
++endif
+diff --git a/plugins/meson.build b/plugins/meson.build
+new file mode 100644
+index 000000000000..d02fb8530af0
+--- /dev/null
++++ b/plugins/meson.build
+@@ -0,0 +1,29 @@
++builtin_modules = [
++  'hostname',
++  'autopair',
++  'policy',
++]
++
++builtin_sources = files(
++  'hostname.c',
++  'autopair.c',
++  'policy.c'
++)
++
++builtin_deps = []
++
++if get_option('admin').allowed()
++  builtin_modules += 'admin'
++  builtin_sources += files('admin.c')
++endif
++
++if get_option('nfc').allowed()
++  builtin_modules += 'neard'
++  builtin_sources += files('neard.c')
++endif
++
++if udevlib_sixaxis_dep.found()
++  builtin_modules += 'sixaxis'
++  builtin_sources += files('sixaxis.c')
++  builtin_deps += udevlib_sixaxis_dep
++endif
+diff --git a/profiles/meson.build b/profiles/meson.build
+new file mode 100644
+index 000000000000..64e2da2bcfea
+--- /dev/null
++++ b/profiles/meson.build
+@@ -0,0 +1,168 @@
++builtin_modules += [
++  'gap',
++  'scanparam',
++  'deviceinfo',
++  'battery',
++  'rap',
++]
++
++builtin_sources += files(
++  'audio/media.c',
++  'audio/transport.c',
++  'audio/player.c',
++  'audio/avrcp-player.c',
++  'gap/gas.c',
++  'scanparam/scan.c',
++  'deviceinfo/deviceinfo.c',
++  'battery/battery.c',
++  'ranging/rap.c',
++  'ranging/rap_hci.c',
++)
++
++if get_option('a2dp').allowed()
++  builtin_modules += 'a2dp'
++  builtin_sources += files(
++    'audio/source.c',
++    'audio/sink.c',
++    'audio/a2dp.c',
++    'audio/avdtp.c'
++  )
++endif
++
++if get_option('avrcp').allowed()
++  builtin_modules += 'avrcp'
++  builtin_sources += files(
++    'audio/control.c',
++    'audio/avctp.c',
++    'audio/avctp.c',
++    'audio/avrcp.c'
++  )
++endif
++
++if get_option('network').allowed()
++  builtin_modules += 'network'
++  builtin_sources += files(
++    'network/manager.c',
++    'network/bnep.c',
++    'network/server.c',
++    'network/connection.c'
++  )
++  install_data('network/network.conf',
++    install_dir: configdir
++  )
++endif
++
++if get_option('hid').allowed()
++  builtin_modules += 'input'
++  builtin_sources += files(
++    'input/manager.c',
++    'input/server.c',
++    'input/device.c'
++  )
++
++  install_data('input/input.conf',
++    install_dir: configdir
++  )
++endif
++
++if get_option('hog').allowed()
++  builtin_modules += 'hog'
++  builtin_sources += files(
++    'input/hog.c',
++    'input/hog-lib.c',
++    'deviceinfo/dis.c',
++    'battery/bas.c',
++    'scanparam/scpp.c',
++    'input/suspend-none.c'
++  )
++endif
++
++if alsa_dep.found()
++  builtin_modules += 'midi'
++  builtin_sources += files(
++    'midi/midi.c',
++    'midi/libmidi.c'
++  )
++  builtin_deps += alsa_dep
++endif
++
++if get_option('bap').allowed()
++  builtin_modules += 'bap'
++  builtin_sources += files('audio/bap.c')
++endif
++
++if get_option('bass').allowed()
++  builtin_modules += 'bass'
++  builtin_sources += files('audio/bass.c')
++endif
++
++if get_option('mcp').allowed()
++  builtin_modules += 'mcp'
++  builtin_sources += files('audio/mcp.c')
++endif
++
++if get_option('vcp').allowed()
++  builtin_modules += 'vcp'
++  builtin_sources += files('audio/vcp.c')
++endif
++
++if get_option('micp').allowed()
++  builtin_modules += 'micp'
++  builtin_sources += files('audio/micp.c')
++endif
++
++if get_option('ccp').allowed()
++  builtin_modules += 'ccp'
++  builtin_sources += files('audio/ccp.c')
++endif
++
++if get_option('csip').allowed()
++  builtin_modules += 'csip'
++  builtin_sources += files('audio/csip.c')
++endif
++
++if get_option('asha').allowed()
++  builtin_modules += 'asha'
++  builtin_sources += files('audio/asha.c')
++endif
++
++if get_option('tmap').allowed()
++  builtin_modules += 'tmap'
++  builtin_sources += files('audio/tmap.c')
++endif
++
++if get_option('gmap').allowed()
++  builtin_modules += 'gmap'
++  builtin_sources += files('audio/gmap.c')
++endif
++
++if get_option('hfp').allowed()
++  builtin_modules += 'hfp'
++  builtin_sources += files('audio/telephony.c', 'audio/hfp-hf.c')
++endif
++
++if get_option('tools').allowed()
++  executable('iapd',
++    sources: 'iap/main.c',
++    dependencies: [ libgdbus_internal_dep, glib_dep, dbus_dep ]
++  )
++endif
++
++if cups_dep.found()
++  executable('bluetooth',
++    sources: [
++      'cups/main.c',
++      'cups/sdp.c',
++      'cups/spp.c',
++      'cups/hcrp.c'
++    ],
++    dependencies: [
++      libbluetooth_internal_dep,
++      libgdbus_internal_dep,
++      glib_dep,
++      dbus_dep
++    ],
++    install: true,
++    install_dir: cups_serverbin / 'backend'
++  )
++endif
+diff --git a/src/meson.build b/src/meson.build
+new file mode 100644
+index 000000000000..65b7131c86b4
+--- /dev/null
++++ b/src/meson.build
+@@ -0,0 +1,88 @@
++subdir('shared')
++
++if get_option('datafiles').allowed()
++  install_data('bluetooth.conf',
++    install_dir: dbusconfdir / 'dbus-1/system.d'
++  )
++  install_data('main.conf',
++    install_dir: configdir
++  )
++endif
++
++if systemd_dep.found()
++  configure_file(
++    input: 'bluetooth.service.in',
++    output: 'bluetooth.service',
++    install: true,
++    install_dir: systemdsystemunitdir,
++    configuration: service_conf
++  )
++
++  install_data('org.bluez.service',
++    install_dir: dbussystembusdir
++  )
++endif
++
++genbuiltin = find_program('genbuiltin')
++builtin_h = custom_target('src-builtin.h',
++  output: 'builtin.h',
++  capture: true,
++  command: [ genbuiltin, builtin_modules ]
++)
++
++executable('bluetoothd',
++  sources: [ builtin_sources,
++    attrib_sources,
++    btio_sources,
++    builtin_h,
++    'main.c',
++    'log.c',
++    'backtrace.c',
++    'rfkill.c',
++    'sdpd-server.c',
++    'sdpd-request.c',
++    'sdpd-service.c',
++    'sdpd-database.c',
++    'gatt-database.c',
++    'sdp-xml.c',
++    'sdp-client.c',
++    'textfile.c',
++    'uuid-helper.c',
++    'plugin.c',
++    'storage.c',
++    'advertising.c',
++    'agent.c',
++    'bearer.c',
++    'error.c',
++    'adapter.c',
++    'profile.c',
++    'service.c',
++    'gatt-client.c',
++    'device.c',
++    'dbus-common.c',
++    'eir.c',
++    'adv_monitor.c',
++    'battery.c',
++    'settings.c',
++    'set.c' ],
++  dependencies: [
++    libbluetooth_internal_dep,
++    libgdbus_internal_dep,
++    libshared_glib_dep,
++    backtrace_dep,
++    glib_dep,
++    dbus_dep,
++    udevlib_dep,
++    builtin_deps
++  ],
++  override_options: [ 'b_lundef=false' ],
++  c_args: [
++    '-DBLUETOOTH_PLUGIN_BUILTIN',
++    '-DPLUGINDIR="@0@"'.format(plugindir),
++    '-DSTORAGEDIR="@0@"'.format(storagedir),
++    '-DCONFIGDIR="@0@"'.format(configdir)
++  ],
++  link_args: [ '-Wl,--gc-sections', external_plugins_link_args ],
++  install: true,
++  install_dir: pkglibexecdir
++)
+diff --git a/src/shared/meson.build b/src/shared/meson.build
+new file mode 100644
+index 000000000000..ae9a65e1b5c6
+--- /dev/null
++++ b/src/shared/meson.build
+@@ -0,0 +1,85 @@
++shared_sources = [
++  'queue.c',
++  'util.c',
++  'mgmt.c',
++  'crypto.c',
++  'ecc.c',
++  'ringbuf.c',
++  'hci.c',
++  'hci-crypto.c',
++  'hfp.c',
++  'uhid.c',
++  'pcap.c',
++  'btsnoop.c',
++  'ad.c',
++  'att.c',
++  'gatt-helpers.c',
++  'gatt-client.c',
++  'gatt-server.c',
++  'gatt-db.c',
++  'gap.c',
++  'log.c',
++  'bap.c',
++  'bap-debug.c',
++  'mcp.c',
++  'vcp.c',
++  'micp.c',
++  'csip.c',
++  'bass.c',
++  'ccp.c',
++  'asha.c',
++  'battery.c',
++  'uinput.c',
++  'tmap.c',
++  'gmap.c',
++  'rap.c',
++]
++
++if readline_dep.found()
++  shared_sources += [ 'shell.c' ]
++endif
++
++libshared_glib = static_library('libshared-glib',
++  sources: [ shared_sources,
++    'io-glib.c',
++    'timeout-glib.c',
++    'mainloop-glib.c',
++    'mainloop-notify.c',
++    'tester.c' ],
++  include_directories: '../../lib',
++  dependencies: glib_dep
++)
++
++libshared_glib_dep = declare_dependency(
++  link_with: libshared_glib,
++  dependencies: glib_dep
++)
++
++libshared_mainloop = static_library('libshared-mainloop',
++  sources: [ shared_sources,
++    'io-mainloop.c',
++    'timeout-mainloop.c',
++    'mainloop.c',
++    'mainloop-notify.c' ],
++  include_directories: '../../lib',
++  dependencies: glib_dep
++)
++
++libshared_mainloop_dep = declare_dependency(
++  link_with: libshared_mainloop
++)
++
++if ell_dep.found()
++  libshared_ell = static_library('libshared-ell',
++    sources: [ shared_sources,
++      'io-ell.c',
++      'timeout-ell.c',
++      'mainloop-ell.c' ],
++    include_directories: [ '../..', '../../lib' ],
++    dependencies: [ glib_dep, ell_dep ]
++  )
++  libshared_ell_dep = declare_dependency(
++    link_with: libshared_ell,
++    dependencies: ell_dep
++  )
++endif
+diff --git a/test/meson.build b/test/meson.build
+new file mode 100644
+index 000000000000..6f93cf8a36e0
+--- /dev/null
++++ b/test/meson.build
+@@ -0,0 +1,37 @@
++test_scripts = [
++  'bluezutils.py',
++  'dbusdef.py',
++  'monitor-bluetooth',
++  'list-devices',
++  'test-discovery',
++  'test-manager',
++  'test-adapter',
++  'test-device',
++  'simple-agent',
++  'simple-endpoint',
++  'test-network',
++  'test-profile',
++  'service-record.dtd',
++  'service-did.xml',
++  'service-spp.xml',
++  'service-opp.xml',
++  'service-ftp.xml',
++  'simple-player',
++  'test-nap',
++  'test-hfp',
++  'opp-client',
++  'ftp-client',
++  'pbap-client',
++  'map-client',
++  'example-advertisement',
++  'example-gatt-server',
++  'example-gatt-client',
++  'test-gatt-profile',
++  'test-mesh',
++  'agent.py'
++]
++
++install_data(
++  sources: test_scripts,
++  install_dir: pkglibdir / 'tests'
++)
+diff --git a/tools/mesh/meson.build b/tools/mesh/meson.build
+new file mode 100644
+index 000000000000..ae1fbca6f6b6
+--- /dev/null
++++ b/tools/mesh/meson.build
+@@ -0,0 +1,16 @@
++if get_option('tools').allowed() and readline_dep.found()
++  executable('mesh-cfgclient',
++    sources: [ '../mesh-cfgclient.c',
++      'cfgcli.c',
++      'keys.c',
++      'util.c',
++      'remote.c',
++      'agent.c',
++      'mesh-db.c',
++      '../../mesh/util.c',
++      '../../mesh/crypto.c',
++    ],
++    dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep, ell_dep, dbus_dep, jsonc_dep, readline_dep ],
++    install: true
++  )
++endif
+diff --git a/tools/meson.build b/tools/meson.build
+new file mode 100644
+index 000000000000..8fc0dc1d2fb5
+--- /dev/null
++++ b/tools/meson.build
+@@ -0,0 +1,261 @@
++if get_option('logger').allowed()
++  executable('btmon-logger',
++    [ 'btmon-logger.c' ],
++    dependencies: libshared_mainloop_dep,
++    include_directories: '../lib/',
++    install_dir: pkglibexecdir
++  )
++
++  if systemd_dep.found()
++    configure_file(
++      input: 'bluetooth-logger.service.in',
++      output: 'bluetooth-logger.service',
++      configuration: service_in,
++      install: true,
++      install_dir: systemdsystemunitdir
++    )
++  endif
++endif
++
++executable('3dsp',
++  sources: '3dsp.c',
++  dependencies: libshared_mainloop_dep
++)
++
++tester_tools = [
++  'mgmt',
++  'mesh',
++  'l2cap',
++  'rfcomm',
++  'bnep',
++  'smp',
++  'gap',
++  'sco',
++  'userchan',
++  'iso',
++  'ioctl',
++  'hci',
++  '6lowpan',
++]
++
++if get_option('tests').allowed()
++  foreach tool: tester_tools
++    executable(tool + '-tester',
++      sources: [ tool + '-tester.c', emulator_sources ],
++      dependencies: [ libbluetooth_internal_dep, libshared_glib_dep, libgdbus_internal_dep, glib_dep ]
++    )
++  endforeach
++endif
++
++if udevlib_hid2hci_dep.found()
++  executable('hid2hci',
++    sources: 'hid2hci.c',
++    dependencies: udevlib_hid2hci_dep,
++    install: true,
++    install_dir: udevdir
++  )
++  install_data('hid2hci.rules',
++    install_dir: udevdir / 'rules.d',
++    rename: '97-hid2hci.rules'
++  )
++endif
++
++tools_names = [
++  'avinfo',
++  'avtest',
++  'scotest',
++  'hwdb',
++  'hcieventmask',
++  'btinfo',
++  'btconfig',
++  'btsnoop',
++  'btproxy',
++  'cltest',
++  'oobtest',
++  'advtest',
++  'seq2bseq',
++  'nokfw',
++  'rtlfw',
++  'create-image',
++  'eddystone',
++  'ibeacon',
++]
++
++inst_tools_names = [
++  'rctest',
++  'l2test',
++  'l2ping',
++  'bluemoon',
++  'hex2hcd',
++  'mpris-proxy',
++  'btattach',
++  'isotest'
++]
++
++if get_option('tools').allowed()
++  foreach tool: tools_names
++    executable(tool,
++      sources: tool + '.c',
++      dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep ]
++    )
++  endforeach
++
++  foreach tool: inst_tools_names
++    executable(tool,
++      sources: tool + '.c',
++      dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep, libgdbus_internal_dep, dbus_dep, glib_dep ],
++      install: true
++    )
++  endforeach
++
++  if udevlib_dep.found()
++    executable('bdaddr',
++      sources: [ 'bdaddr.c', '../src/oui.c' ],
++      dependencies: [ libbluetooth_internal_dep, udevlib_dep ]
++    )
++  endif
++  executable('btiotest',
++    sources: [ 'btiotest.c', btio_sources ],
++    dependencies: [ libbluetooth_internal_dep, glib_dep ]
++  )
++  executable('bneptest',
++    sources: [ 'bneptest.c', btio_sources, '../src/log.c', '../profiles/network/bnep.c' ],
++    dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep, glib_dep ]
++  )
++  executable('btgatt-client',
++    sources: [ 'btgatt-client.c', '../src/uuid-helper.c' ],
++    dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep ]
++  )
++  executable('btgatt-server',
++    sources: [ 'btgatt-server.c', '../src/uuid-helper.c' ],
++    dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep ]
++  )
++  if udevlib_dep.found()
++    executable('gatt-service',
++      sources: 'gatt-service.c',
++      dependencies: [ libbluetooth_internal_dep, libshared_mainloop_dep, glib_dep, libgdbus_internal_dep, udevlib_dep ]
++    )
++  endif
++  executable('test-runner',
++    sources: 'test-runner.c',
++    dependencies: [ libbluetooth_internal_dep ]
++  )
++
++  if readline_dep.found()
++    executable('btmgmt',
++      sources: [ 'btmgmt.c', '../src/uuid-helper.c', '../client/display.c', '../client/mgmt.c' ],
++      dependencies: [ libbluetooth_internal_dep, libshared_glib_dep, readline_dep ]
++    )
++    executable('obex-client-tool',
++      sources: [ 'obex-client-tool.c', gobex_sources, btio_sources ],
++      dependencies: [ libbluetooth_internal_dep, libshared_glib_dep, readline_dep, glib_dep ]
++    )
++    executable('obex-server-tool',
++      sources: [ 'obex-server-tool.c', gobex_sources, btio_sources ],
++      dependencies: [ libbluetooth_internal_dep, libshared_glib_dep, glib_dep ]
++    )
++    executable('bluetooth-player',
++      sources: [ 'bluetooth-player.c', '../client/print.c', '../client/player.c' ],
++      dependencies: [ libbluetooth_internal_dep, libshared_glib_dep, libgdbus_internal_dep, readline_dep ]
++    )
++    executable('obexctl',
++      sources: [ 'obexctl.c' ],
++      dependencies: [ libbluetooth_internal_dep, libshared_glib_dep, libgdbus_internal_dep, readline_dep ]
++    )
++    if get_option('mesh').enabled()
++      executable('mesh-cfgtest',
++        sources: 'mesh-cfgtest.c',
++        dependencies: [ libbluetooth_internal_dep, dbus_dep, ell_dep ],
++        include_directories: '..',
++        install: true
++      )
++      if get_option('deprecated').allowed()
++        executable('meshctl',
++          sources: [
++            'meshctl.c',
++            'mesh/agent.c',
++            'mesh-gatt/node.c',
++            'mesh-gatt/gatt.c',
++            'mesh-gatt/crypto.c',
++            'mesh-gatt/net.c',
++            'mesh-gatt/prov.c',
++            'mesh-gatt/util.c',
++            'mesh-gatt/prov-db.c',
++            'mesh-gatt/config-client.c',
++            'mesh-gatt/config-server.c',
++            'mesh-gatt/onoff-model.c'
++            ],
++          dependencies: [
++            libgdbus_internal_dep,
++            libshared_glib_dep,
++            libbluetooth_internal_dep,
++            glib_dep,
++            dbus_dep,
++            jsonc_dep,
++            readline_dep
++            ],
++          install: true
++        )
++      endif
++    endif
++  endif
++
++  if get_option('deprecated').allowed()
++    executable('gatttool',
++      sources: gatttool_sources,
++      dependencies: [ libbluetooth_internal_dep, libshared_glib_dep, readline_dep ],
++    )
++    executable('hciattach',
++      sources: [
++        'hciattach.c',
++        'hciattach_st.c',
++        'hciattach_ti.c',
++        'hciattach_tialt.c',
++        'hciattach_ath3k.c',
++        'hciattach_qualcomm.c',
++        'hciattach_intel.c',
++        'hciattach_bcm43xx.c'
++      ],
++      dependencies: libbluetooth_internal_dep,
++      install: true
++    )
++    if udevlib_dep.found()
++      executable('hcitool',
++        sources: [ 'hcitool.c', '../src/oui.c' ],
++        dependencies: [ libbluetooth_internal_dep, udevlib_dep ],
++        install: true
++      )
++    endif
++    executable('sdptool',
++      sources: [ 'sdptool.c', '../src/sdp-xml.c' ],
++      dependencies: [ libbluetooth_internal_dep, glib_dep ],
++      install: true
++    )
++    deprecated_tools = [
++      'ciptool',
++      'hciconfig',
++      'rfcomm'
++    ]
++    foreach tool: deprecated_tools
++      executable(tool,
++        sources: tool + '.c',
++        dependencies: libbluetooth_internal_dep,
++        install: true
++      )
++    endforeach
++  endif
++
++  if systemd_dep.found()
++    configure_file(
++      input: 'mpris-proxy.service.in',
++      output: 'mpris-proxy.service',
++      configuration: service_in,
++      install: true,
++      install_dir: systemduserunitdir
++    )
++  endif
++endif
++
++if get_option('mesh').enabled()
++  subdir('mesh')
++endif
+diff --git a/tools/mpris-proxy.service.in b/tools/mpris-proxy.service.in
+index 6ae56c6720b9..a55f0254014a 100644
+--- a/tools/mpris-proxy.service.in
++++ b/tools/mpris-proxy.service.in
+@@ -8,7 +8,7 @@ ConditionUser=!@system
+ 
+ [Service]
+ Type=simple
+-ExecStart=@PKGBINDIR@/mpris-proxy
++ExecStart=@PKGLIBEXECDIR@/mpris-proxy
+ 
+ [Install]
+ WantedBy=default.target
+diff --git a/unit/meson.build b/unit/meson.build
+new file mode 100644
+index 000000000000..c8198574147d
+--- /dev/null
++++ b/unit/meson.build
+@@ -0,0 +1,126 @@
++
++tests1 = [
++  [ 'test-tester.c' ],
++  [ 'test-uuid.c' ],
++  [ 'test-eir.c', '../src/eir.c', '../src/uuid-helper.c' ],
++  [ 'test-sdp.c', '../src/sdpd-database.c', '../src/log.c', '../src/sdpd-service.c', '../src/sdpd-request.c' ],
++  [ 'test-avrcp.c', '../src/log.c', 'avctp.c', 'avrcp-lib.c' ],
++  [ 'test-lib.c' ],
++  [ 'test-gatt.c' ],
++  [ 'test-bap.c' ],
++  [ 'test-micp.c' ],
++  [ 'test-bass.c' ],
++  [ 'test-vcp.c' ],
++  [ 'test-battery.c' ],
++  [ 'test-tmap.c' ],
++  [ 'test-gmap.c' ],
++  [ 'test-rap.c' ],
++  [ 'test-mcp.c' ],
++  [ 'test-hog.c',
++    btio_sources,
++    '../profiles/input/hog-lib.c',
++    '../profiles/scanparam/scpp.c',
++    '../profiles/battery/bas.c',
++    '../profiles/deviceinfo/dis.c',
++    '../src/log.c',
++    '../attrib/att.c',
++    '../attrib/gatt.c',
++    '../attrib/gattrib.c'
++  ],
++]
++
++foreach t: tests1
++  test_name = t[0].substring(0, -2)
++  exe = executable(test_name,
++    sources: t,
++    dependencies: [ libshared_glib_dep, libbluetooth_internal_dep ],
++  )
++  test(test_name, exe)
++endforeach
++
++tests2 = [
++  [ 'test-textfile.c', '../src/textfile.c' ],
++  [ 'test-crc.c', '../monitor/crc.c' ],
++  [ 'test-crypto.c' ],
++  [ 'test-ecc.c' ],
++  [ 'test-ringbuf.c' ],
++  [ 'test-queue.c' ],
++  [ 'test-mgmt.c' ],
++  [ 'test-uhid.c' ],
++  [ 'test-hfp.c' ],
++  [ 'test-avdtp.c', '../src/log.c', 'avdtp.c' ],
++  [ 'test-avctp.c', '../src/log.c', 'avctp.c' ],
++  [ 'test-util.c' ],
++]
++
++if ical_dep.found()
++  tests2 += [
++    [ 'test-gobex.c', 'util.c', gobex_sources ],
++    [ 'test-gobex-packet.c', 'util.c', gobex_sources ],
++    [ 'test-gobex-header.c', 'util.c', gobex_sources ],
++    [ 'test-gobex-transfer.c', 'util.c', gobex_sources ],
++    [ 'test-gobex-apparam.c', 'util.c', gobex_sources ],
++  ]
++endif
++
++foreach t: tests2
++  test_name = t[0].substring(0, -2)
++  exe = executable(test_name,
++    sources: t,
++    c_args: [ '-DSTORAGEDIR="@0"'.format(storagedir) ],
++    include_directories: '../lib',
++    dependencies: libshared_glib_dep
++  )
++  test(test_name, exe)
++endforeach
++
++exe = executable('test-gdbus-client',
++  sources: 'test-gdbus-client.c',
++  dependencies: [ libgdbus_internal_dep, libshared_glib_dep ]
++)
++dbus_run_session = find_program('dbus-run-session')
++if dbus_run_session.found()
++  test('test-gdbus-client', dbus_run_session, args: [ '--', exe ])
++else
++  test('test-gdbus-client', exe)
++endif
++
++exe = executable('test-gattrib',
++  sources: [ 'test-gattrib.c', '../attrib/gattrib.c', btio_sources, '../src/log.c' ],
++  dependencies: [ libshared_glib_dep, libbluetooth_internal_dep ]
++)
++test('test-gattrib', exe)
++
++exe = executable('test-profile',
++  sources: [ 'test-profile.c', 'btd.c', '../src/profile.c' ],
++  dependencies: [ dbus_dep, libshared_glib_dep, libbluetooth_internal_dep ]
++)
++test('test-profile', exe)
++
++if alsa_dep.found()
++  exe = executable('test-midi',
++    sources: [ 'test-midi.c', '../profiles/midi/libmidi.c' ],
++    c_args: [ '-DMIDI_TEST' ],
++    dependencies: [ libshared_glib_dep, alsa_dep ]
++  )
++  test('test-midi', exe)
++endif
++
++if get_option('mesh').enabled()
++  exe = executable('test-mesh-crypto',
++    sources: [ 'test-mesh-crypto.c' ],
++    dependencies: [ ell_dep ]
++  )
++  test('test-mesh-crypto', exe)
++endif
++
++add_test_setup(
++  'valgrind',
++  exe_wrapper: [
++    'valgrind', '--quiet', '--leak-check=full', '--trace-children=yes',
++    '--suppressions=@0@'.format(meson.current_source_dir() / 'valgrind.supp'),
++    '--num-callers=30', '--show-reachable=no', '--error-exitcode=1',
++  ],
++  # default timeout in meson is 30s
++  timeout_multiplier: 4,
++)
 -- 
 2.54.0
 
