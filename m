@@ -1,69 +1,69 @@
-Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5D4332EB1
-	for <linux-bluetooth@vger.kernel.org>; Wed,  6 May 2026 19:42:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B726332EB1
+	for <linux-bluetooth@vger.kernel.org>; Wed,  6 May 2026 19:42:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778096525; cv=none; b=YEkNx6esto/B5HgdXpjudGrVhi3fBTir7ug+F5wC3uTxt/Ej/bJ9NGY8J1xe9a6+DfsidiwVgxqCg20t8L1sv3h7Rpe4z52u1Q6uCYRayGm/QmZlSJ4ocigexCIuwlavHTi43sXOPrNjMmI4TxlttJV3PURnhSk/4TDWwOXsq+s=
+	t=1778096527; cv=none; b=kfuL4NbRiXkN1erM/1l27dY36ueN296bRU2VPXrtaLMbw+fPeO2quG5CwJf483VvxM05sV7MXuWjXEg49g1XQt16m1sFDyKb/i0IYhvkWjJcs9oc3LPuPnnwvTrAwBqPIkGGVYlqXtm0T7iQkPkfj41hDvVZ2E7mKXuehnzbwIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778096525; c=relaxed/simple;
-	bh=YqBK64fK3KWHzXtE6DEZrZGTPZID2urMSciRmGddgO8=;
+	s=arc-20240116; t=1778096527; c=relaxed/simple;
+	bh=3SHdphOsndkT7QOOqKgaRwv9Vi8YEHNwi+H+NzYlTiM=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=L1yxmhkBONE7Gf9xdkn/OhTdsN9Gjb4wgAET5XzY+6yFSgB+CbbtpJS5WmaA0s5rlBRennVDfJ6DXDEMbVDWWOnTLAMS2jWN3kXTa5O893ihM0EnpDXBSRGnIoz9KfRs96n7Q31cqbPrknCqjHY++00FdaohskVXEgU7y4G2r5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pSgsCLtx; arc=none smtp.client-ip=209.85.222.41
+	 MIME-Version; b=fOqj8YOLG9R3oZb2vrXEGMFJ41IdJu99/gF/wKB9hfi+i/+kPf7vWp/BCXDS093yopVCnj1F7aaASR5Sf/kk8av4TgBdbZdW3loKatgrIStefsC51JoFzLcYvsqe1G9wBVT1L/e8Gt5eFJUMI2toZcT/rUjMW3ZnZ8kKITDXUTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UiKAON7j; arc=none smtp.client-ip=209.85.222.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pSgsCLtx"
-Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-95d0476492eso11606241.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 May 2026 12:42:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UiKAON7j"
+Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-95d18b33f93so38540241.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 May 2026 12:42:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778096523; x=1778701323; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778096525; x=1778701325; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=/KnxhcxJSw4uTbkshHAWOk8X5O9ty6vG50N0HMgubvE=;
-        b=pSgsCLtxdz/+GZ/kinwQIEAFIjCmWrnFkvvM9rs4O27LTZfPTtlVTZ52XFf+1jbHg4
-         tdcmVB8vyta9VnYpsA0IZ/uD+j+99MVumt5OX33kIEJFGdhirUwF6kHbLyzyEmFxyX1j
-         YT6ORiFVYgPzZKfoLgRPfmO5iuwfzoGjEHRZyhxnHtjy5ESO0ESaF+SfIqG3RTq1zuvr
-         dOdnDw7FDzQWHeZsztWPkpG85HmdS7+ECRz8nmPNkOcnKCRoOrGapk9yIIK7eLDvV+oG
-         Sp1Y1JV+u4JBeeHpE1oGJkCxqh6yzrJx9Z7VdB/RaWQ8h5jMH0xxTW/qvssUBGreYhoP
-         RJrA==
+        bh=IK3nrYiRSW48KKXuNEnb9Smw2nTqDWc82L6/xaQASFw=;
+        b=UiKAON7jbZknDXx69QSqRbuBCnkTP5YPh6IuN17X0JpMSfHXz71Ug5UTTcLHucYyKQ
+         5SGRjgVnOfkpM9C7H+uzUuJK4LBSdmr2PhhGxOGiEc/mPkAyFtY/rw2R1P/3VVZns/5b
+         hS8GpjrtuaI9pqJhXnEERC0+BksVy/fXlCG1aM4yaVwS8KI93gQ+JNyZczEC7u58Z2+5
+         wQCqfMSry5wp0D/0rhT8ToNzQ77aCBsfmzAe19FwuzPLhNn1XnQWF1BHpTcXwtw/+Nqg
+         ErqAIdhXW8dggntp/xj1CjxVfwKeRrWxfQ0n/4NaqDRXUp9aqpVRXJ2OiEDnrGzVEwn/
+         LBMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778096523; x=1778701323;
+        d=1e100.net; s=20251104; t=1778096525; x=1778701325;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=/KnxhcxJSw4uTbkshHAWOk8X5O9ty6vG50N0HMgubvE=;
-        b=ihumg1XPoVl5HWHfqKwiSQAcnFc1LOBTa3ClDva0VLF/jrDySdPTt48PLEWlKuHGVF
-         bpJvCPQuInaU4k3m4H+6CKHx4iyTV2JBxQ71Lltf2O2lvIMM2LKFgN9z8nXpgtL5afUz
-         aG6i4J9Bbnqg3OYu81NY1Vb4bEv5j0/L6ikZQKpZj6awQEFU33u1qYY8pr5+syviT2qZ
-         gC9LIUJDYwr+GKCtTROtWcSipy/9E5mVO/Xkr9W0KFv36pOyHnrb77ltGqRzwDakeOnS
-         OPEvJtPszKMWigjZFMo5g/6UHYWjDz3SeZEZndFuJk2l9aj30k64nVwcJtVm7w//mFm5
-         +1ow==
-X-Gm-Message-State: AOJu0Ywu/2nnga7SWeV5qUg8UNMV6ZN3olSVAjQunq+L2PSsjy2BIkYa
-	1iojtYet7MRHRDXUuFMZBjC2rdtSJ4+lGJ+X0qlv2FGVt1UALu9fAvFl8pSS4WOL
-X-Gm-Gg: AeBDiescb4RCfeJPscmVOVqDDQEyKXXYnWRZqX4XmC6025FcPyxz9TVnSXGFZtBUbiC
-	2sx996B5NqLQKW7DhAJ2bLoHbsPK4F9PVOX54pktp9IrNlWoM65fRQKfS0VcQ0I++KD9gKDkb8R
-	f8kPkElphpjH4Hz77NleiJI2HvL1nxKaLHEavUCmoJ7AW8WK2IQSO/X2/9iJq2kxR7uykdGT0A+
-	xFQzoliRSTtIWqLQHQhJK8w1F4UA3gVOGwjmFnekgRgCtPA3PTkFNBa/JwviqmDOeNVy3aWj1iW
-	nv4B7qah8y3l197xON27ucb8dQ42ai78Xzag4mv0ZXhiF5h2w6Wz+WWZR83GRPFYavNATH7rjUg
-	ZN9THefXtoTP86U+rHJKcmDSAw1KBt7eptsJLwQlSQfXbvTD494egXIiy9NB/HZktWPAhRgFeb9
-	mqmMFyWm/RE2CsaxAaqhrThYzOOJllzkDtm8EOf2TH1JqmgJKaLe9TVuXMc++NZ20U7xW2cS5dM
-	SN1nf7PmWhdI9ezIp4m+D0AwCKu
-X-Received: by 2002:a05:6102:d8c:b0:62f:406b:1baa with SMTP id ada2fe7eead31-630f8e218f9mr2245363137.0.1778096523033;
-        Wed, 06 May 2026 12:42:03 -0700 (PDT)
+        bh=IK3nrYiRSW48KKXuNEnb9Smw2nTqDWc82L6/xaQASFw=;
+        b=gYMHz6mPqtRpfusVgDjyrt/ZJEGZtPQ4zYEjYTvHHiQ28MRI27/9o6Up0Ynyv7+MDq
+         YbZklFBePdT4sE6xM0pxB5EKPAhgMZtel0dwlRNwALTE12wV7gEKu/3t4mUUgzklL3mG
+         Awip+OJuyQubeW2q1iihdv3EyuImmQEnyM1t3XH1A6Ye+WxtUpNhkXfknRMChYXb8imJ
+         z/3Uiy4PPHLt1hYH1vy4oos9erwl1vLND70QX8oL6FJmxmxoOkcJSx6vNbNh++/V8MaW
+         qGABNGZfom0cmsJaYA+rsK4ZIajcPDKoZJ7bG5Zgiv7uHu+nmcY9eAVYOeaDAiyTrMEq
+         XMmg==
+X-Gm-Message-State: AOJu0YwrhWLRN9HKHHxvYd+x/hph7AADaseOoLqMMBR6rS2+LXZJpRn7
+	JzyATYNG0a708mzOhLcocTf0KoU4mJa1AyHYWL/M8S/anRmO9EXhuaPOSgRKxr6Q
+X-Gm-Gg: AeBDietXGPBlLYJlVdmn5xgKDBVWmsl0roZGAmttIGHTuCMa5lXlaK39Os1emWS+bix
+	X26B9uI/sJGJ73F7y5urnycUHeYrB3JDCFXPvqzq1UWuYYxu2BYALXXovdXQsi3PUNxEY/aHgVX
+	VCMkKTg4XGOGasmlmKWAy2+0pOMyDJPUkmJpWaJn0+TexfrGt7OJLsyIOqjH1OfMsDt5GgxuiIZ
+	/doLUdVeo+8YgYt1bLPGKUmQTRKJsGyomOHRRtZFUk3HI18gL093rO+AM4ylpOYlnx1SvSAlTfM
+	GG+hP1YN8mT3Kd1kKVP8yTj8JST1eVy2rSa0ovX2cbYa34RVunkALZ3e5y19WPwo2hOHbZt4XbL
+	ZAVWlVYqnfO1BSNBNCQQ6jNnQZVKUcY36vTyL5XkQWDEEhnCGZGep+6qmuet5Aaex0XG33OEWPH
+	esYkSAB3XlyPJ4t2Jh5aWBqCZY3++EQ8zLRvCF+hLdKW11OOPlSY6psmYpWmZpdt+VAAwFySMtn
+	mAugiqvZ7uVosm/l9HLI512PrWPqUg78s5m7x0=
+X-Received: by 2002:a05:6102:2d09:b0:62b:5299:fced with SMTP id ada2fe7eead31-630f762d616mr1958949137.9.1778096524735;
+        Wed, 06 May 2026 12:42:04 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-62bfb14fbfasm9613805137.1.2026.05.06.12.42.02
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-62bfb14fbfasm9613805137.1.2026.05.06.12.42.03
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2026 12:42:02 -0700 (PDT)
+        Wed, 06 May 2026 12:42:04 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/3] emulator/hciemu: Add hciemu_new_debug/hciemu_new_num_debug
-Date: Wed,  6 May 2026 15:41:49 -0400
-Message-ID: <20260506194150.1701855-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 3/3] tools/tester: Retry with debug on hciemu_new failure
+Date: Wed,  6 May 2026 15:41:50 -0400
+Message-ID: <20260506194150.1701855-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260506194150.1701855-1-luiz.dentz@gmail.com>
 References: <20260506194150.1701855-1-luiz.dentz@gmail.com>
@@ -77,96 +77,178 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add new constructors that accept debug callback and user_data parameters,
-setting them up immediately after allocation so errors during early
-initialization (create_vhci, hciemu_client_new) are captured by the debug
-output.
+When hciemu_new fails, retry using hciemu_new_debug to capture early
+initialization errors before reporting the failure. This helps diagnose
+issues like vhci or client creation failures in CI.
 ---
- emulator/hciemu.c | 20 +++++++++++++++++++-
- emulator/hciemu.h | 11 +++++++++--
- 2 files changed, 28 insertions(+), 3 deletions(-)
+ tools/6lowpan-tester.c  | 3 +++
+ tools/bnep-tester.c     | 3 +++
+ tools/ioctl-tester.c    | 3 +++
+ tools/iso-tester.c      | 4 ++++
+ tools/l2cap-tester.c    | 3 +++
+ tools/mesh-tester.c     | 3 +++
+ tools/mgmt-tester.c     | 3 +++
+ tools/rfcomm-tester.c   | 3 +++
+ tools/sco-tester.c      | 3 +++
+ tools/smp-tester.c      | 3 +++
+ tools/userchan-tester.c | 3 +++
+ 11 files changed, 34 insertions(+)
 
-diff --git a/emulator/hciemu.c b/emulator/hciemu.c
-index 9534d82bac39..15d806a62aa6 100644
---- a/emulator/hciemu.c
-+++ b/emulator/hciemu.c
-@@ -396,7 +396,9 @@ static struct hciemu_client *hciemu_client_new(struct hciemu *hciemu,
- 	return client;
- }
+diff --git a/tools/6lowpan-tester.c b/tools/6lowpan-tester.c
+index 2b43719f153e..95fdf206fc0c 100644
+--- a/tools/6lowpan-tester.c
++++ b/tools/6lowpan-tester.c
+@@ -178,6 +178,9 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 					index_removed_callback, NULL, NULL);
  
--struct hciemu *hciemu_new_num(enum hciemu_type type, uint8_t num)
-+struct hciemu *hciemu_new_num_debug(enum hciemu_type type, uint8_t num,
-+			hciemu_debug_func_t callback, void *user_data,
-+			hciemu_destroy_func_t destroy)
- {
+ 	data->hciemu = hciemu_new(HCIEMU_TYPE_LE);
++	if (!data->hciemu)
++		data->hciemu = hciemu_new_debug(HCIEMU_TYPE_LE, print_debug,
++							"hciemu: ", NULL);
+ 	if (!data->hciemu) {
+ 		tester_warn("Failed to setup HCI emulation");
+ 		tester_pre_setup_failed();
+diff --git a/tools/bnep-tester.c b/tools/bnep-tester.c
+index 581f54c20829..1c53d024c0f8 100644
+--- a/tools/bnep-tester.c
++++ b/tools/bnep-tester.c
+@@ -159,6 +159,9 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 					index_removed_callback, NULL, NULL);
  
- 	struct hciemu *hciemu;
-@@ -409,6 +411,10 @@ struct hciemu *hciemu_new_num(enum hciemu_type type, uint8_t num)
- 	if (!hciemu)
- 		return NULL;
+ 	data->hciemu = hciemu_new(data->hciemu_type);
++	if (!data->hciemu)
++		data->hciemu = hciemu_new_debug(data->hciemu_type, print_debug,
++							"hciemu: ", NULL);
+ 	if (!data->hciemu) {
+ 		tester_warn("Failed to setup HCI emulation");
+ 		tester_pre_setup_failed();
+diff --git a/tools/ioctl-tester.c b/tools/ioctl-tester.c
+index 969fbd955b76..e957b0d01bfa 100644
+--- a/tools/ioctl-tester.c
++++ b/tools/ioctl-tester.c
+@@ -227,6 +227,9 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 					index_removed_callback, NULL, NULL);
  
-+	hciemu->debug_callback = callback;
-+	hciemu->debug_destroy = destroy;
-+	hciemu->debug_data = user_data;
-+
- 	switch (type) {
- 	case HCIEMU_TYPE_BREDRLE:
- 		hciemu->btdev_type = BTDEV_TYPE_BREDRLE;
-@@ -465,11 +471,23 @@ struct hciemu *hciemu_new_num(enum hciemu_type type, uint8_t num)
- 	return hciemu_ref(hciemu);
- }
+ 	data->hciemu = hciemu_new(data->hciemu_type);
++	if (!data->hciemu)
++		data->hciemu = hciemu_new_debug(data->hciemu_type, print_debug,
++							"hciemu: ", NULL);
+ 	if (!data->hciemu) {
+ 		tester_warn("Failed to setup HCI emulation");
+ 		tester_pre_setup_failed();
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index 8dfea0b417f0..767ee0c57c47 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
+@@ -634,6 +634,10 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 					index_removed_callback, NULL, NULL);
  
-+struct hciemu *hciemu_new_num(enum hciemu_type type, uint8_t num)
-+{
-+	return hciemu_new_num_debug(type, num, NULL, NULL, NULL);
-+}
-+
- struct hciemu *hciemu_new(enum hciemu_type type)
- {
- 	return hciemu_new_num(type, 1);
- }
+ 	data->hciemu = hciemu_new_num(HCIEMU_TYPE_BREDRLE52, data->client_num);
++	if (!data->hciemu)
++		data->hciemu = hciemu_new_num_debug(HCIEMU_TYPE_BREDRLE52,
++						data->client_num, hciemu_debug,
++						"hciemu: ", NULL);
+ 	if (!data->hciemu) {
+ 		tester_warn("Failed to setup HCI emulation");
+ 		tester_pre_setup_failed();
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index 5c013d4704e5..a8cac3902b32 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -214,6 +214,9 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 					index_removed_callback, NULL, NULL);
  
-+struct hciemu *hciemu_new_debug(enum hciemu_type type,
-+			hciemu_debug_func_t callback, void *user_data,
-+			hciemu_destroy_func_t destroy)
-+{
-+	return hciemu_new_num_debug(type, 1, callback, user_data, destroy);
-+}
-+
- struct hciemu *hciemu_ref(struct hciemu *hciemu)
- {
- 	if (!hciemu)
-diff --git a/emulator/hciemu.h b/emulator/hciemu.h
-index 1164be6510a3..e832d6350bb3 100644
---- a/emulator/hciemu.h
-+++ b/emulator/hciemu.h
-@@ -31,8 +31,17 @@ enum hciemu_hook_type {
- 	HCIEMU_HOOK_POST_EVT,
- };
+ 	data->hciemu = hciemu_new(data->hciemu_type);
++	if (!data->hciemu)
++		data->hciemu = hciemu_new_debug(data->hciemu_type, print_debug,
++							"hciemu: ", NULL);
+ 	if (!data->hciemu) {
+ 		tester_warn("Failed to setup HCI emulation");
+ 		tester_pre_setup_failed();
+diff --git a/tools/mesh-tester.c b/tools/mesh-tester.c
+index 27628b627957..4412bfdb727e 100644
+--- a/tools/mesh-tester.c
++++ b/tools/mesh-tester.c
+@@ -416,6 +416,9 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 			index_removed_callback, NULL, NULL);
  
-+typedef void (*hciemu_debug_func_t)(const char *str, void *user_data);
-+typedef void (*hciemu_destroy_func_t)(void *user_data);
-+
- struct hciemu *hciemu_new(enum hciemu_type type);
- struct hciemu *hciemu_new_num(enum hciemu_type type, uint8_t num);
-+struct hciemu *hciemu_new_debug(enum hciemu_type type,
-+			hciemu_debug_func_t callback, void *user_data,
-+			hciemu_destroy_func_t destroy);
-+struct hciemu *hciemu_new_num_debug(enum hciemu_type type, uint8_t num,
-+			hciemu_debug_func_t callback, void *user_data,
-+			hciemu_destroy_func_t destroy);
+ 	data->hciemu = hciemu_new(data->hciemu_type);
++	if (!data->hciemu)
++		data->hciemu = hciemu_new_debug(data->hciemu_type, print_debug,
++							"hciemu: ", NULL);
+ 	if (!data->hciemu) {
+ 		tester_warn("Failed to setup HCI emulation");
+ 		test_pre_setup_failed();
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 213fd996b032..4d28090271e9 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -428,6 +428,9 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 					index_removed_callback, NULL, NULL);
  
- struct hciemu *hciemu_ref(struct hciemu *hciemu);
- void hciemu_unref(struct hciemu *hciemu);
-@@ -43,8 +52,6 @@ const uint8_t *hciemu_client_bdaddr(struct hciemu_client *client);
- bool hciemu_set_client_bdaddr(struct hciemu_client *client,
- 				const uint8_t *bdaddr);
+ 	data->hciemu = hciemu_new(data->hciemu_type);
++	if (!data->hciemu)
++		data->hciemu = hciemu_new_debug(data->hciemu_type, print_debug,
++							"hciemu: ", NULL);
+ 	if (!data->hciemu) {
+ 		tester_warn("Failed to setup HCI emulation");
+ 		test_pre_setup_failed();
+diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
+index 06e9fbdd6143..b7f7d9ebd794 100644
+--- a/tools/rfcomm-tester.c
++++ b/tools/rfcomm-tester.c
+@@ -164,6 +164,9 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 					index_removed_callback, NULL, NULL);
  
--typedef void (*hciemu_debug_func_t)(const char *str, void *user_data);
--typedef void (*hciemu_destroy_func_t)(void *user_data);
- bool hciemu_set_debug(struct hciemu *hciemu, hciemu_debug_func_t callback,
- 			void *user_data, hciemu_destroy_func_t destroy);
+ 	data->hciemu = hciemu_new(data->hciemu_type);
++	if (!data->hciemu)
++		data->hciemu = hciemu_new_debug(data->hciemu_type, print_debug,
++							"hciemu: ", NULL);
+ 	if (!data->hciemu) {
+ 		tester_warn("Failed to setup HCI emulation");
+ 		tester_pre_setup_failed();
+diff --git a/tools/sco-tester.c b/tools/sco-tester.c
+index f09ba04aeaf7..a2185b8ef198 100644
+--- a/tools/sco-tester.c
++++ b/tools/sco-tester.c
+@@ -192,6 +192,9 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 					index_removed_callback, NULL, NULL);
  
+ 	data->hciemu = hciemu_new(HCIEMU_TYPE_BREDRLE);
++	if (!data->hciemu)
++		data->hciemu = hciemu_new_debug(HCIEMU_TYPE_BREDRLE, print_debug,
++							"hciemu: ", NULL);
+ 	if (!data->hciemu) {
+ 		tester_warn("Failed to setup HCI emulation");
+ 		tester_pre_setup_failed();
+diff --git a/tools/smp-tester.c b/tools/smp-tester.c
+index aaf149c0deb7..581f3a233704 100644
+--- a/tools/smp-tester.c
++++ b/tools/smp-tester.c
+@@ -182,6 +182,9 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 					index_removed_callback, NULL, NULL);
+ 
+ 	data->hciemu = hciemu_new(data->hciemu_type);
++	if (!data->hciemu)
++		data->hciemu = hciemu_new_debug(data->hciemu_type, print_debug,
++							"hciemu: ", NULL);
+ 	if (!data->hciemu) {
+ 		tester_warn("Failed to setup HCI emulation");
+ 		tester_pre_setup_failed();
+diff --git a/tools/userchan-tester.c b/tools/userchan-tester.c
+index a03f64d84c0b..9164fc33f5d9 100644
+--- a/tools/userchan-tester.c
++++ b/tools/userchan-tester.c
+@@ -153,6 +153,9 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 					index_added_callback, NULL, NULL);
+ 
+ 	data->hciemu = hciemu_new(data->hciemu_type);
++	if (!data->hciemu)
++		data->hciemu = hciemu_new_debug(data->hciemu_type, mgmt_debug,
++							"hciemu: ", NULL);
+ 	if (!data->hciemu) {
+ 		tester_warn("Failed to setup HCI emulation");
+ 		tester_pre_setup_failed();
 -- 
 2.53.0
 
