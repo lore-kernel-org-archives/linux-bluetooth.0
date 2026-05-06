@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5C2239085
-	for <linux-bluetooth@vger.kernel.org>; Wed,  6 May 2026 02:12:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08DE415E97
+	for <linux-bluetooth@vger.kernel.org>; Wed,  6 May 2026 04:27:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778033529; cv=none; b=skWqreRNesIM1pYD3kUUkuN0qp7V1zeIHUVbA89cWaOENtndetW0TS4O0amy0plB7E9NhuJugm/aOGn1nGEwAoWya9FeDBw5+lq8DgVcyW6meG4Kkxq/6qF7PUE76a+y9Ykw0D8Fm7WnLN7N/V+6gvbrxOjq0x7YacrcbEWLWkI=
+	t=1778041624; cv=none; b=o4zhNbex/8pxZYP4mCQtvtymIx1A2jUZ81rKIk2cAP3oxLL7Xu8ffw5x8aU1cxScPuj7Res16YgllwGWLI44/58V8n06nFPvaaIHXW4RE/Knl0rRg0pZeGXJl9H01d2MxUgwmFntdZPI4eNiSxcBHqCMEzRdr7wIooBU3C2pWG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778033529; c=relaxed/simple;
-	bh=SP0bPjt2pDDSf5rwRs5QRFDsl8qC1aT2Gj3UETJW3YI=;
+	s=arc-20240116; t=1778041624; c=relaxed/simple;
+	bh=fjgIpkFvEiQk9dqROYDLqIfY6mPltDvTcHCFcOG2y0k=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tL/vEBxRQPizurIqkM0ZxLMO8HC+7IkaXcYsldFxWsD5+O5rp1WNtFNti3iQbEpPemIXqAQFYRD40OZy0D/8lYCtb1/U5n1Qq0vuMx0dXDDvVkrcuhzOf72JFyvhB6gfc4ZR66/I30IVfJSjTuFgI0cQqpV/SYwS2vo9sYzZsdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=owJrV2ew; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=JDcHggVJRvVPtnCmntw3XvhchSsDjHQudLMeYgNFHnJ1UIbI+93UWeItFqTcnjF9zBFJGcq7fLEZpUugaf9AYNP2F6KBGXqh+HiRrHnh3bGBJ3g93c8aFwVh1wbKezrNC2pcxeMHHhPp9rZhHWAyb4RcxHAcufLBPQxN4ZQj4tQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CYHLDCMI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="owJrV2ew"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 02835C2BCB4
-	for <linux-bluetooth@vger.kernel.org>; Wed,  6 May 2026 02:12:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CYHLDCMI"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9D51EC2BCC7
+	for <linux-bluetooth@vger.kernel.org>; Wed,  6 May 2026 04:27:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778033529;
-	bh=SP0bPjt2pDDSf5rwRs5QRFDsl8qC1aT2Gj3UETJW3YI=;
+	s=k20201202; t=1778041623;
+	bh=fjgIpkFvEiQk9dqROYDLqIfY6mPltDvTcHCFcOG2y0k=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=owJrV2ewZAQ/9xkdBs00tfZcYOsRVVqd3ncTUCH9aLrItBkFGW7bmgaTelCT2wTk9
-	 21nlM+6U1jaBn71sDWS/Hgbg8adFz/JPjBvoho/nkIpdaWrRgAuxTwCfDNJOFePls0
-	 XzOMfthZxBPINKe7qtrHkhMdeRskIVa3OVlU4c693iV7PP7H15nkoPcC71J5J2x72z
-	 RdCALN+dwH78STebOKdfN1Tn43hzlD4aEvCGksI2oQV9dQ++z4WS6ZwKMTe7YdE/pB
-	 zFfCKoK9FCsmGpqPv9Aor2tHwEeptiAIdwfRToBswKHY/bDmvHFTt4GH6MS2qhJCN8
-	 WsHJs8TFJ+Kpw==
+	b=CYHLDCMIA8EDCIfGIOMBJiwIx6urYUjPFB/P+WDp5OevFtzfER2VbqSaAaTOXH3yv
+	 bH8hf1ShtT/IKp3l6+c4UdszvDOxIqMigfA58NPMm04kl/QdvembMukSEaeiZh8CUL
+	 AxXOLPifY0RtfBTFkop3ThgIJyW+Zy2rmJPi8BJ29w7GSMCQx8UoOdUoZg2szG2mGp
+	 28k5g/N3FiQ6o6k4ByuOO5jlu4pl7bUfJI7n1tzVPiLLQs3vO9g9JpItPinr98LhPG
+	 hTRQPJHva8IFDUG7dKkjrPy/az7V6MT3qPl0T5nZ95yslRo1vTMvzBX1spHhgdRAgL
+	 wyfSWE7HRQMjw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id E5052C4160E; Wed,  6 May 2026 02:12:08 +0000 (UTC)
+	id 8D361C41616; Wed,  6 May 2026 04:27:03 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 221449] Wireless gamepad stopped working through Bluetooth
-Date: Wed, 06 May 2026 02:12:08 +0000
+Date: Wed, 06 May 2026 04:27:03 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -40,14 +40,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: arvin.ignaci@gmail.com
+X-Bugzilla-Who: regressions@leemhuis.info
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221449-62941-WnKEgcw6wC@https.bugzilla.kernel.org/>
+Message-ID: <bug-221449-62941-1RGNLgS9rE@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-221449-62941@https.bugzilla.kernel.org/>
 References: <bug-221449-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -63,20 +63,10 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D221449
 
---- Comment #3 from Arvin Ignaci (arvin.ignaci@gmail.com) ---
-Wow, didn't realize the kernel moved that fast. I'm on the latest version of
-Fedora, which I thought was a pretty up-to-date distro, and 6.19 seems to be
-the only version available in the repos. Looks like I'll have to figure out=
- how
-to install from source on Silverblue...
-
-What's a good way to isolate the kernel as the issue? Install and reboot wi=
-th
-an older and newer version and test the behavior under each, or is there a
-better way?
-
-(Sorry if these are really basic questions; I haven't really done any kernel
-development before.)
+--- Comment #4 from The Linux kernel's regression tracker (Thorsten Leemhui=
+s) (regressions@leemhuis.info) ---
+Fedora is preparing switching to 7.0. For the latest kernels, try
+https://fedoraproject.org/wiki/Kernel_Vanilla_Repositories
 
 --=20
 You may reply to this email to add a comment.
