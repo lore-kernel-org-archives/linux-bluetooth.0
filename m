@@ -1,188 +1,297 @@
-Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD693128CC
-	for <linux-bluetooth@vger.kernel.org>; Wed,  6 May 2026 11:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.182
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C16D43CEE7;
+	Wed,  6 May 2026 11:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778066142; cv=none; b=OVT7PgUlbFiSzuOAJTOs3x6lU+ZysMK3lu3rDPmDPHqYs7i16nxTcQCdFk+gxbUovwgYSJ+i0MGnKyFt3dP9KHBXJXifvnt8insEnX1fW9R7dPt7CK4zRb2nx6BfgdqZdaPiE1fWmlbaLqnzuxnxqwLMGjAG1SsgeMmJSFsThcU=
+	t=1778067843; cv=none; b=aGuY8MCodOM2b2Gq6QJoJZr0mq1wUG0jSH9JLKA6OjsgPyAdkxHtbIk9Tx1mbm5loMhpiwjUWRPZQ9WANlbGVTapJQXfzXqPPerXV8nOceQ/ulcILrLPZHylKDphLDmavXuZ0VMkBtZoalRprMi4vXuG7hVOAJ5SihIiYJoslcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778066142; c=relaxed/simple;
-	bh=RxxNTNMcbTQarGLJ9i6TjmU3KtGiWDDm0aBuptTl0Jo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Fh3ISU3SO9EwpcsdtgEKblPAZS6SI6LhzuiRHcY3cEMRyGLYW6g6VLV5lmF/377OWRrH4f4RZVYp2BwGGzEXU3V6ht2/+rK/4JmxXkXkkl64IXqRCqKr4XAul10bz0tnW9mgsfqwYN9Uc4OScAD5FHCSWeWN3LlEZCuVXha3ZXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SzyDKKdN; arc=none smtp.client-ip=74.125.82.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SzyDKKdN"
-Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-2b4520f6b32so9742394eec.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 May 2026 04:15:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778066139; x=1778670939; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=kIMhmJVPRLuSaQZqFXCURZrIbp1U2sfqIn6jSFiQInE=;
-        b=SzyDKKdNXA5tL0GZk3FQqdfP9Hnt0LCve/AB6q7rUcmzpPuVyfA/muRs7WSTj5ntqO
-         9whXlm46ccMhqpGlRuPILtum1IKrRvt8AQvxc3Zf9oTu4oCRSBs3j4OAyGAL8rO9Awa+
-         TrhFCYWhsR6T+nn3f9dxiQ8RaDStfCs2RBw+mO3FL4dCPjo7OLjbtYeUhcnYr5CaWoJU
-         mE5vpkAItTkzKz8FDuuqYD7dh8GFodyvY4Rq7oBBg7KBi7NCy/46mP1teeXM3y2nHDbt
-         2BP5pC2Kc2v5TV6zoaH059kSuNve4/z2CQaq2AkNSDeJjS7D8jmeSWIXIkz6wFtR0mLP
-         lvkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778066139; x=1778670939;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kIMhmJVPRLuSaQZqFXCURZrIbp1U2sfqIn6jSFiQInE=;
-        b=p04WeZWIHc/oRmsvvD7XKwrSO4qzSlPAFiXzwTz0SMC3hhNwoJHUKY/K3mRms7Yejs
-         EA6tU3/C3lYmER5qQxWZVPhoKtTaYMADBEU+loAjlH+OUFqzmZkSOlLGjVvt52gY0Rk8
-         N2NEicXGyovSIG+W6OXj4KNr4CZ61FwWZMhKKvVtJvYtjLRwKoR+3PcULsAbCrWKUJ7x
-         1XW6bKiaxbD3QM7yMteRX4DdxeqsYW3vBwjIBTbQQxKNMXQsxsCRIa5o1d0YfL4RzLt4
-         TaToSe2U3aU7rADMPZ5H6jGkNBpfmk9y8bpB7EK2Oki1zPwg6IhKs84rwmP81WbfbYo+
-         GqYw==
-X-Gm-Message-State: AOJu0YzXvLM4CZ1jeMP8vs/5G8W4fbnifI68uyeGdIik0adShRJfRThy
-	gjmXm21ss5Iydbcx3cIAzhrBJ6A+uOtKN2KgUYEh0bdIs1NBv+UZas1Oh7JtTg==
-X-Gm-Gg: AeBDievI/n+g5kSZ0vDGplSUdw2raHSXj9z0cV/Uq3MiLfd97IvUbbOi4llLfmtEc7q
-	zIwvyhuEPC5wkk+q7RIYUZ4Zs53WNe1bKKH6B8x0KHxYeKWohBDtZJ5WUehPTCnhBIyDfiOnDB8
-	+uc/qHWREHBTiQxLtVufLEoZnSkJ8jaSGZVFD6sRnebXsmsjEQsO8aEngImFFCVmoH05WAHjArD
-	0owyj2wE2M4WvgHcYQaXv5+IT+SM4NB3k+YNNZiwIQ7J4Eq3LVTUUZ5CY6qE9bYLeiXNnU8nxhL
-	EhZ97ZJ0ZDsL53fjMcVnzTsT69IBwviXThMg4b3BmdPjfBC140P2H5BzxTrmhYMgOFUvlqQIGCH
-	cWWdvO5TxWvbbz0pA6dTiX/qMFPJSoTK0EVanqOQ1gPQkcv8mhOWhZBCcUrhbExusoRXXdqzKOq
-	ezMtUMhxLeA3+zisyJLYyY7rpfgMOQV0uSGD2TvIA/Ei/fG6XlhAI=
-X-Received: by 2002:a05:7300:a599:b0:2f5:3641:f114 with SMTP id 5a478bee46e88-2f55094d7a2mr1465039eec.28.1778066136680;
-        Wed, 06 May 2026 04:15:36 -0700 (PDT)
-Received: from [172.17.0.2] ([68.220.60.224])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f56cec58efsm2860045eec.2.2026.05.06.04.15.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2026 04:15:36 -0700 (PDT)
-Message-ID: <69fb22d8.050a0220.1d3108.0591@mx.google.com>
-Date: Wed, 06 May 2026 04:15:36 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============9066851663434428570=="
+	s=arc-20240116; t=1778067843; c=relaxed/simple;
+	bh=KKzJ9iEALP6XEtSFo3DPsuQ7YVgewsn/CxWeQv/NcyQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pf5cZ1NtzYYTxEy9pVNdN0eIGKeX/Sz0uFCCknso662AdgzGDeN9mtkcRXTxlC+t2Lhxm4WqioOS//a4V8M1v8d2v0x3cIgS92MazHhaPJQ/XKnLAx9NH2Sirx4zQ1zk3oIPoZf2p8M1gKbUDLFHeIVogXKji7q7ilgUy0Q52fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=206.189.21.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app2 (Coremail) with SMTP id zQmowAAHnIJrKftpUPlKAA--.420S2;
+	Wed, 06 May 2026 19:43:39 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	jannh@google.com,
+	yuantan098@gmail.com,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	bird@lzu.edu.cn,
+	wangjiexun2025@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH v4] Bluetooth: serialize accept_q access
+Date: Wed,  6 May 2026 19:43:30 +0800
+Message-ID: <20260506114338.2873496-1-n05ec@lzu.edu.cn>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: RE: Add helper for "cleanup" variable attribute
-In-Reply-To: <20260506091824.2920716-2-hadess@hadess.net>
-References: <20260506091824.2920716-2-hadess@hadess.net>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQmowAAHnIJrKftpUPlKAA--.420S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3Jw47CryUKFy5Ar1UCw4kJFb_yoW3GrWxpF
+	yUCFZ8GFWkJw4Uuw17tayDurWSyw4rWr43GayFvas5Ar9agF4Fqr12yayjvr1ayrZrCF4f
+	tF4jgwnxCr4UC3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBj1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
+	jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52
+	x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWU
+	GwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
+	8JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kK
+	e7AKxVWUtVW8ZwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8V
+	W8GwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
+	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7
+	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
+	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
+	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQsTCWn7AGQEHAAAs+
 
---===============9066851663434428570==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Jiexun Wang <wangjiexun2025@gmail.com>
 
-This is automated email and please do not reply to this email!
+bt_sock_poll() walks the accept queue without synchronization, while
+child teardown can unlink the same socket and drop its last reference.
+The unsynchronized accept queue walk has existed since the initial
+Bluetooth import.
 
-Dear submitter,
+Protect accept_q with a dedicated lock for queue updates and polling.
+Also rework bt_accept_dequeue() to take temporary child references under
+the queue lock before dropping it and locking the child socket.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1090349
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.57 seconds
-GitLint                       PASS      1.32 seconds
-BuildEll                      PASS      20.73 seconds
-BluezMake                     PASS      654.60 seconds
-MakeCheck                     PASS      19.06 seconds
-MakeDistcheck                 PASS      249.78 seconds
-CheckValgrind                 PASS      296.64 seconds
-CheckSmatch                   WARNING   355.15 seconds
-bluezmakeextell               PASS      184.37 seconds
-IncrementalBuild              PASS      1277.75 seconds
-ScanBuild                     PASS      1024.24 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,2/5] shared/util: Add helper for "cleanup" variable attribute
-ERROR:OPEN_BRACE: open brace '{' following function definitions go on the next line
-#74: FILE: src/shared/util.h:96:
-+static inline void freep(void *p) {
-
-ERROR:CODE_INDENT: code indent should use tabs where possible
-#75: FILE: src/shared/util.h:97:
-+        free(*(void**) p);$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#75: FILE: src/shared/util.h:97:
-+        free(*(void**) p);$
-
-ERROR:POINTER_LOCATION: "(foo**)" should be "(foo **)"
-#75: FILE: src/shared/util.h:97:
-+        free(*(void**) p);
-
-/github/workspace/src/patch/14557019.patch total: 3 errors, 1 warnings, 13 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-NOTE: Whitespace errors detected.
-      You may wish to use scripts/cleanpatch or scripts/cleanfile
-
-/github/workspace/src/patch/14557019.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,5/5] main: Use _cleanup_() to simplify GError-handling
-ERROR:OPEN_BRACE: open brace '{' following function definitions go on the next line
-#66: FILE: src/main.c:208:
-+static inline void free_error(void *err) {
-
-ERROR:CODE_INDENT: code indent should use tabs where possible
-#67: FILE: src/main.c:209:
-+        g_error_free(*(void**) err);$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#67: FILE: src/main.c:209:
-+        g_error_free(*(void**) err);$
-
-ERROR:POINTER_LOCATION: "(foo**)" should be "(foo **)"
-#67: FILE: src/main.c:209:
-+        g_error_free(*(void**) err);
-
-/github/workspace/src/patch/14557018.patch total: 3 errors, 1 warnings, 127 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-NOTE: Whitespace errors detected.
-      You may wish to use scripts/cleanpatch or scripts/cleanfile
-
-/github/workspace/src/patch/14557018.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/main.c: note: in included file (through src/device.h):src/shared/gatt-server.c:271:25: warning: Variable length array is used.src/shared/gatt-server.c:614:25: warning: Variable length array is used.src/shared/gatt-server.c:712:25: warning: Variable length array is used.src/shared/gatt-server.c:271:25: warning: Variable length array is used.src/shared/gatt-server.c:614:25: warning: Variable length array is used.src/shared/gatt-server.c:712:25: warning: Variable length array is used.src/shared/gatt-server.c:271:25: warning: Variable length array is used.src/shared/gatt-server.c:614:25: warning: Variable length array is used.src/shared/gatt-server.c:712:25: warning: Variable length array is used.src/main.c: note: in included file (through src/device.h):src/main.c: note: in included file (through src/device.h):
-
-
-https://github.com/bluez/bluez/pull/2101
-
+Fixes: 1da177e4c3f41524e886b7f1b8a0c1fc7321cac2 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Reported-by: Jann Horn <jannh@google.com>
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Signed-off-by: Jiexun Wang <wangjiexun2025@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 ---
-Regards,
-Linux Bluetooth
+Changes in v4:
+- no functional changes
+- clarify that the race dates back to the initial Bluetooth import
+- update trailers
+  I noticed Jann also proposed a fix at
+  https://patchwork.kernel.org/project/bluetooth/patch/20260504-bluetooth-accept-uaf-fix-v1-1-1ca63c0efadd@google.com/,
+  so we're adding his Reported-by tag here. Please let us know if this
+  isn't appropriate.
+- v3 Link: https://lore.kernel.org/all/20260404162324.2789862-1-n05ec@lzu.edu.cn/
 
+Changes in v3:
+- move sk_acceptq_added()/sk_acceptq_removed() inside accept_q_lock
+  critical sections to serialize sk_ack_backlog updates with accept_q
+  operations
+- v2 Link: https://lore.kernel.org/all/06a6b4549acba207847ce532dedbf1c95ab22d13.1774925231.git.wangjiexun2025@gmail.com/
 
---===============9066851663434428570==--
+Changes in v2:
+- add Tested-by: Ren Wei <enjou1224z@gmail.com>
+- resend to the public Bluetooth/netdev lists
+
+ include/net/bluetooth/bluetooth.h |  1 +
+ net/bluetooth/af_bluetooth.c      | 87 +++++++++++++++++++++++--------
+ 2 files changed, 66 insertions(+), 22 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 69eed69f7f26..3faea66b1979 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -398,6 +398,7 @@ void baswap(bdaddr_t *dst, const bdaddr_t *src);
+ struct bt_sock {
+ 	struct sock sk;
+ 	struct list_head accept_q;
++	spinlock_t accept_q_lock; /* protects accept_q */
+ 	struct sock *parent;
+ 	unsigned long flags;
+ 	void (*skb_msg_name)(struct sk_buff *, void *, int *);
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 2b94e2077203..fa14b9a915eb 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -154,6 +154,7 @@ struct sock *bt_sock_alloc(struct net *net, struct socket *sock,
+ 
+ 	sock_init_data(sock, sk);
+ 	INIT_LIST_HEAD(&bt_sk(sk)->accept_q);
++	spin_lock_init(&bt_sk(sk)->accept_q_lock);
+ 
+ 	sock_reset_flag(sk, SOCK_ZAPPED);
+ 
+@@ -214,6 +215,7 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
+ {
+ 	const struct cred *old_cred;
+ 	struct pid *old_pid;
++	struct bt_sock *par = bt_sk(parent);
+ 
+ 	BT_DBG("parent %p, sk %p", parent, sk);
+ 
+@@ -224,9 +226,13 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
+ 	else
+ 		lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
+ 
+-	list_add_tail(&bt_sk(sk)->accept_q, &bt_sk(parent)->accept_q);
+ 	bt_sk(sk)->parent = parent;
+ 
++	spin_lock_bh(&par->accept_q_lock);
++	list_add_tail(&bt_sk(sk)->accept_q, &par->accept_q);
++	sk_acceptq_added(parent);
++	spin_unlock_bh(&par->accept_q_lock);
++
+ 	/* Copy credentials from parent since for incoming connections the
+ 	 * socket is allocated by the kernel.
+ 	 */
+@@ -244,8 +250,6 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
+ 		bh_unlock_sock(sk);
+ 	else
+ 		release_sock(sk);
+-
+-	sk_acceptq_added(parent);
+ }
+ EXPORT_SYMBOL(bt_accept_enqueue);
+ 
+@@ -254,45 +258,72 @@ EXPORT_SYMBOL(bt_accept_enqueue);
+  */
+ void bt_accept_unlink(struct sock *sk)
+ {
++	struct sock *parent = bt_sk(sk)->parent;
++
+ 	BT_DBG("sk %p state %d", sk, sk->sk_state);
+ 
++	spin_lock_bh(&bt_sk(parent)->accept_q_lock);
+ 	list_del_init(&bt_sk(sk)->accept_q);
+-	sk_acceptq_removed(bt_sk(sk)->parent);
++	sk_acceptq_removed(parent);
++	spin_unlock_bh(&bt_sk(parent)->accept_q_lock);
+ 	bt_sk(sk)->parent = NULL;
+ 	sock_put(sk);
+ }
+ EXPORT_SYMBOL(bt_accept_unlink);
+ 
++static struct sock *bt_accept_get(struct sock *parent, struct sock *sk)
++{
++	struct bt_sock *bt = bt_sk(parent);
++	struct sock *next = NULL;
++
++	/* accept_q is modified from child teardown paths too, so take a
++	 * temporary reference before dropping the queue lock.
++	 */
++	spin_lock_bh(&bt->accept_q_lock);
++
++	if (sk) {
++		if (bt_sk(sk)->parent != parent)
++			goto out;
++
++		if (!list_is_last(&bt_sk(sk)->accept_q, &bt->accept_q)) {
++			next = &list_next_entry(bt_sk(sk), accept_q)->sk;
++			sock_hold(next);
++		}
++	} else if (!list_empty(&bt->accept_q)) {
++		next = &list_first_entry(&bt->accept_q,
++					 struct bt_sock, accept_q)->sk;
++		sock_hold(next);
++	}
++
++out:
++	spin_unlock_bh(&bt->accept_q_lock);
++	return next;
++}
++
+ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+ {
+-	struct bt_sock *s, *n;
+-	struct sock *sk;
++	struct sock *sk, *next;
+ 
+ 	BT_DBG("parent %p", parent);
+ 
+ restart:
+-	list_for_each_entry_safe(s, n, &bt_sk(parent)->accept_q, accept_q) {
+-		sk = (struct sock *)s;
+-
++	for (sk = bt_accept_get(parent, NULL); sk; sk = next) {
+ 		/* Prevent early freeing of sk due to unlink and sock_kill */
+-		sock_hold(sk);
+ 		lock_sock(sk);
+ 
+ 		/* Check sk has not already been unlinked via
+ 		 * bt_accept_unlink() due to serialisation caused by sk locking
+ 		 */
+-		if (!bt_sk(sk)->parent) {
++		if (bt_sk(sk)->parent != parent) {
+ 			BT_DBG("sk %p, already unlinked", sk);
+ 			release_sock(sk);
+ 			sock_put(sk);
+ 
+-			/* Restart the loop as sk is no longer in the list
+-			 * and also avoid a potential infinite loop because
+-			 * list_for_each_entry_safe() is not thread safe.
+-			 */
+ 			goto restart;
+ 		}
+ 
++		next = bt_accept_get(parent, sk);
++
+ 		/* sk is safely in the parent list so reduce reference count */
+ 		sock_put(sk);
+ 
+@@ -310,6 +341,8 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+ 				sock_graft(sk, newsock);
+ 
+ 			release_sock(sk);
++			if (next)
++				sock_put(next);
+ 			return sk;
+ 		}
+ 
+@@ -518,18 +551,28 @@ EXPORT_SYMBOL(bt_sock_stream_recvmsg);
+ 
+ static inline __poll_t bt_accept_poll(struct sock *parent)
+ {
+-	struct bt_sock *s, *n;
++	struct bt_sock *bt = bt_sk(parent);
++	struct bt_sock *s;
+ 	struct sock *sk;
++	__poll_t mask = 0;
++
++	spin_lock_bh(&bt->accept_q_lock);
++	list_for_each_entry(s, &bt->accept_q, accept_q) {
++		int state;
+ 
+-	list_for_each_entry_safe(s, n, &bt_sk(parent)->accept_q, accept_q) {
+ 		sk = (struct sock *)s;
+-		if (sk->sk_state == BT_CONNECTED ||
+-		    (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags) &&
+-		     sk->sk_state == BT_CONNECT2))
+-			return EPOLLIN | EPOLLRDNORM;
++		state = READ_ONCE(sk->sk_state);
++
++		if (state == BT_CONNECTED ||
++		    (test_bit(BT_SK_DEFER_SETUP, &bt->flags) &&
++		     state == BT_CONNECT2)) {
++			mask = EPOLLIN | EPOLLRDNORM;
++			break;
++		}
+ 	}
++	spin_unlock_bh(&bt->accept_q_lock);
+ 
+-	return 0;
++	return mask;
+ }
+ 
+ __poll_t bt_sock_poll(struct file *file, struct socket *sock,
+-- 
+2.34.1
+
