@@ -1,135 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA3EB241CB7
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 19:28:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2BA8200110
+	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 20:34:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778182119; cv=none; b=jQe1CDv2olqfsogh8m9DDHKst2f5E81dT6ORcxGfuDzvN3nZ1A4MkTUSYAS0AdA9HFlWBkp1ZesVC1UE1nW8uFYh3oVCltXtZNjgHOSOUx3P1vVku4paGZ7m7slBx086DPoCnic7mYDDRfAn3RutJ26+H88LJg9eCeR2zTv4Mt4=
+	t=1778186075; cv=none; b=YHWSUzZpa8UFhauPqfESxixa17Ik6wAF9GHn8Z0ZMp38RM9adg+J6MVtgDYcD/Bw8uoO7rKQHqU4X5aZCUpgns0b7jLBRnMzAapw2w2TN55O7rX5MFRdqPNQchpVEnghIqcl4Os1NVIq9qgTmN6nm2S9epGkzMPWS6b3FLL8lXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778182119; c=relaxed/simple;
-	bh=cB4Ct01ZFwvEQ9sSqfLnZhfRPMc1qWRtPSDSTtVjSh8=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=azsWRJ5+d+sRcNnPbuxUQElsZv94YJqAxx8bWq8noJFp9qv6tX5OUPmWgv3UNz47kh7u2kZ8BLGmu2iYmesvukCXj/7OmuCs9CLVKdeJt6dNOa8aO66fbJYhjFl0W31ZGUdBsHYrMGc5JTYzG4cN3C/JbtLjsm9Wl6e3MR4tWKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DzQMTi59; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778186075; c=relaxed/simple;
+	bh=FHKgbUS335BLJP0j9Kh9ePsKhQ8PcyBIv3BdoJ41K7w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l9TycUI+F16V6rBvn1XR0SE8bLatJSx1L+OU0fN7iTDsOsIUzmXUuNfstbe8+m1XY9fIB1MPXAVOyH/7DjFgPIoY7lT0IA+e/xfsiGhPX/cVsVMI5Dmy2MWHtoXqoIIyEfv5zE74pny7M42/RDjB9/QYrL4t7a9bUA6DMNkhEMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KP2lBXT4; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DzQMTi59"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 43288C2BCB2
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 19:28:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778182119;
-	bh=cB4Ct01ZFwvEQ9sSqfLnZhfRPMc1qWRtPSDSTtVjSh8=;
-	h=From:To:Subject:Date:From;
-	b=DzQMTi59qmCbxfOx6wvV2VYo8mWGDAgQYtUXCvzg+p1r7/uW8JUECQ3rda4AU7vQE
-	 chnpzTURlvHyMYTXMYArA+q/trn+hW4w3BkI0Yh9Oon3Fx5GAup8OVGCDlG0jSY5K2
-	 9/qGXSKhxc5++YDIZmtHEb4ETilaG3aRjVt8D9rb3aRSrro9+qXIC5z1u/y27NcTa3
-	 3BmiBVC0OyircdykDcYbKIFQbwcxAD7XLkEHpWb8W4WmyUJK8Uwz9ajft8sfFfUXfO
-	 wyAHMLEGc8EMlwElZBUgHInI5HPvIpHzmJmzbJwgzs8avAUYqnVQDw7PwAFpv/1k/w
-	 uO5kDcx71SiGQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 34411C41612; Thu,  7 May 2026 19:28:39 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221481] New: btintel_pcie: suspend fails with -EBUSY on Intel
- Lunar Lake (s2idle)
-Date: Thu, 07 May 2026 19:28:39 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: vladko@duck.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-221481-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KP2lBXT4"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-488ff90d6c7so11660715e9.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 May 2026 13:34:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778186072; x=1778790872; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UFF0Rirex427kO1ZXdEYtmclVMtl5FBu+WCptqJ5C9c=;
+        b=KP2lBXT4f5i2GOlwuzRfvoHTe8DS9iq+a1OUL54nBjg8d+ivxFtCBUo9QJKewj9qmh
+         dIyV9EGaQXn1VsE2JZm6JxFrJRoweMV8bOxKVbCj4SVsIemOEwk6A8oCdwhJNuNIHRNP
+         /2MZ2VppZTYlZE6v4oebHuy7SQ4NsZSIhd1qfySh6fQoygjZejeQR/AdYuXky636H8Hf
+         h63wxJjEyS54Drjt6666Ut5CJUlWMq5oFoZ4pyXTxdQZalFyaKoY73RcqbTvX1IfTS6e
+         1K5zowajVl1qOp6J+GqMzdn5UULXA8K0lScuwpcWRmaK7V1hX8QaSObCcz4WMZt1e7IE
+         NsoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778186072; x=1778790872;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UFF0Rirex427kO1ZXdEYtmclVMtl5FBu+WCptqJ5C9c=;
+        b=DXxNIRYmWV8svs3MMkhw6HLhW1Y4lEbLPXybZF982KJZr7HoY/Tj9Xm0PDEOy+NaNM
+         ev8D8kAx+t3sNbNbfOoMaQ4NFFf+pM3oUuC1JCu3xn6DZjcrBh8p2reNDIGoCnhzOBnN
+         3/fPQJyotqeDICiGnQXyrcYyFioGgjUU20rZQTDN19+ZFURwnJVEYEvL/2/W3+HOrSOh
+         Q6XHT6arGLtlve/tUK/LCxpnZQpDmJr+ztTdKft5V8H3oSd+ES9vbUbIDBxiD8uCKHM6
+         JdAvmsyb45flXVTqNA4Ltxk7md3tSt2WDGlhJcQcWXsHhvYYLp9OpDpqGWkeMXPiN4fx
+         MUZg==
+X-Forwarded-Encrypted: i=1; AFNElJ/fxAkg7YL6JSZ0GsZg1qUm+3zK1+eadHrilrMU9Xquc4y/GQQrUULRsqnCAuEW10DbXPjo+RxaO6epG862giI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5HmXcRZN1r4lhNseMe/8E5A38Z2M5/OsTF4CAPuUgSlLbIcRb
+	qsrIxBtfZQ3Eia82yC56ihoKitfLtZ3AnDGtkQYVd9luJM+B4rOtU8bDTMsp0j6gGEY=
+X-Gm-Gg: AeBDiesoZifoICsdG3WBx86hTPitL/CCtp5A3D96IBKJ+uMS57gqeoRm6z0gwyFmCDG
+	Xtj8ETK35oV3BqOQj/b1DqbXSePah4iLhypH+6ZUtSHx5ZLZJ8pBwt2W6ul3WQ26+HW5sk1adc6
+	tFPSFsWbIIMZBlz86GCztUjtYRrt5NDRsV1oatSc5OZLwlewLsftdBncB0AIFyDbKDg1R9vDMu3
+	lui98d09x2wHN3jitipLzv9SEm6GR6SNFcAiRILwcaXx9L/KSPsEvmjy+/6AcotWyD5n439Qk/Z
+	6zunX6IiWfUejtlu+mjnS8vlxAxkIAbfF0++i0+Y7xQnKb6kJhcnRqpNTqooMzMuRV4GEu+B1Ke
+	zZvMlFTZy5NwWvDAMHUtZv5Zv5fElThwLaWypLL/YYiWDrrlWK+X07uUVtRht1mxfO9Aem+DO0b
+	bf3oxsk0hneyeuekry4slM0wlKnTIyCVUTs4IMB5fJn5UKth05pgVs8TG5G5v1h4L52WC0p8jh7
+	nI=
+X-Received: by 2002:a05:600c:b8a:b0:48a:56de:d620 with SMTP id 5b1f17b1804b1-48e51f32ac3mr157177425e9.14.1778186071944;
+        Thu, 07 May 2026 13:34:31 -0700 (PDT)
+Received: from cdev ([2a02:8071:5a94:e220::97ec])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e539109b7sm137175725e9.15.2026.05.07.13.34.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 May 2026 13:34:31 -0700 (PDT)
+From: "Vladimir V. Kondratyev" <vladimirkondratyev2@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+	Kiran K <kiran.k@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Vladimir V. Kondratyev" <vladimirkondratyev2@gmail.com>
+Subject: [PATCH] Bluetooth: btintel_pcie: fix stale cache in set_dxstate fallback check
+Date: Thu,  7 May 2026 22:34:26 +0200
+Message-ID: <20260507203426.128975-1-vladimirkondratyev2@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221481
+btintel_pcie_set_dxstate() falls back to checking the controller state via
+btintel_pcie_in_d3/d0() when the alive interrupt is missed. However, these
+helpers read boot_stage_cache, which is only updated by the interrupt
+handler. As such, if the interrupt was missed, the cache is stale and the
+fallback check always fails, exhausting all retries and returning -EBUSY,
+causing suspend to abort.
 
-            Bug ID: 221481
-           Summary: btintel_pcie: suspend fails with -EBUSY on Intel Lunar
-                    Lake (s2idle)
-           Product: Drivers
-           Version: 2.5
-          Hardware: Intel
-                OS: Linux
-            Status: NEW
-          Severity: blocking
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: vladko@duck.com
-        Regression: No
+The fix involves re-reading the hardware register before the fallback state
+check, consistent with btintel_pcie_resume().
 
-Summary:
-btintel_pcie returns -16 (EBUSY) during suspend, causing the entire suspend
-operation to abort on Intel Lunar Lake hardware. The system immediately res=
-umes
-after every suspend attempt.
+Fixes: e57362f4911b ("Bluetooth: btintel_pcie: Add support for _suspend() / _resume()")
 
-Hardware:
-- CPU/Platform: Intel Lunar Lake
-- Bluetooth device: btintel_pcie at PCI 0000:00:14.7
-- iGPU: Intel Arc 140V (xe driver)
+Signed-off-by: Vladimir V. Kondratyev <vladimirkondratyev2@gmail.com>
+---
+ drivers/bluetooth/btintel_pcie.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-Software
-- Kernel: 6.19.13-arch1-1
-- Distribution: EndeavourOS (Arch-based)
-- Desktop: KDE Plasma (Wayland)
-- Sleep state: s2idle only (mem_sleep shows [s2idle], no S3/deep)
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index fda474406003..7fca8eea6e01 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -2778,9 +2778,13 @@ static int btintel_pcie_set_dxstate(struct btintel_pcie_data *data, u32 dxstate)
+ 					  BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0);
+ 
+ 		/* A hardware bug may cause the alive interrupt to be missed.
+-		 * Check if the controller reached the expected state and retry
+-		 * the operation only if it hasn't.
++		 * Refresh boot_stage_cache from hardware since it is only
++		 * updated by the interrupt handler, then check if the
++		 * controller reached the expected state and retry the
++		 * operation only if it hasn't.
+ 		 */
++		data->boot_stage_cache = btintel_pcie_rd_reg32(data,
++							       BTINTEL_PCIE_CSR_BOOT_STAGE_REG);
+ 		if (dxstate == BTINTEL_PCIE_STATE_D0) {
+ 			if (btintel_pcie_in_d0(data))
+ 				return 0;
+-- 
+2.54.0
 
-Reproduction
-1. Boot system with btintel_pcie loaded
-2. Run: systemctl suspend
-3. System immediately wakes up; suspend never enters sleep state
-
-Kernel log (relevant excerpt)
-  kernel: PM: suspend entry (s2idle)
-  kernel: btintel_pcie 0000:00:14.7: PM: pci_pm_suspend(): btintel_pcie_sus=
-pend
-[btintel_pcie] returns -16
-  kernel: btintel_pcie 0000:00:14.7: PM: dpm_run_callback(): pci_pm_suspend
-returns -16
-  kernel: btintel_pcie 0000:00:14.7: PM: failed to suspend async: error -16
-  kernel: PM: Some devices failed to suspend, or early wake event detected
-  kernel: PM: suspend exit
-  systemd-sleep: Failed to put system to sleep. System resumed again: Devic=
-e or
-resource busy
-
-Workaround
-Manually unloading the module before suspend allows sleep to succeed:
-modprobe -r btintel_pcie && systemctl suspend
-
-Expected behavior
-btintel_pcie should successfully suspend alongside the rest of the system
-during
-s2idle, or yield gracefully so the suspend proceeds without it.
-
-Notes
-/sys/power/mem_sleep reports [s2idle] only (no deep/S3), consistent with
-Lunar Lake's lack of S3 support. The issue is reproducible 100% of the time
-with the module loaded.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
