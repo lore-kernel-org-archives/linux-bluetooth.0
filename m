@@ -1,484 +1,185 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9D517993
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 16:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778170786; cv=none; b=pVkf9/7c9UYb+2gBV1E9Mv5XmmXs0Viqnzw00YR3SiJJvCK0wS2Lv3pOvQg03a8jm2dVCYeez/fL0IYvylHAsJyIFGnqM9OUFR1EreWZEZWGO566uS6IZoVNuOp0cNTdPlBIu6uwzHfN5h6zg7IQSUrHdzqccQahd7aYYoEFZ7A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778170786; c=relaxed/simple;
-	bh=ES1b7ou7s05Vs0Z/uTTmRsay80q+62UDtrpO4b2ffrA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=CLmuhisDcwghvHXibJn+RldkPt4gr6pxGgfvRYSn8mw+8moiFi6olhLFb5wAm9RaWntULNaejkIDD3BjcujZhIzzF7eVVs3bRlp+43Ca+PunDKT6hhiYATH92bcf4layJqKkfdB0edTJcjqGWBnieEEEBAqwWfnMtBxlrn4ZDMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NtmjihX9; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE4D3E7150
+	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 16:57:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778173032; cv=pass; b=DB3Q6kAUZ7B3zYmL5MFDbD5hmBG6mVp0pPhsK7e/muU6TPYSacDOr1OM8R1rqSlHUql2iRHXm5uET6KwXoO1DGzb73kKtc6rOC117amWraHiJSmiMJxQecdYuzs+hqzIpPilwvIjDGyFQGlce+DTRAom5rFrXrLD2nOtIgCMrFs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778173032; c=relaxed/simple;
+	bh=3pvbwqrSQCHstd3zjhq3FJd+DljYBCZEt5jPpFQpVnc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gLSC6L0k4Wco3pcq4uE81bNPI1XDacm+Lat0SYm1mztOkSS55rfHRlWH/F+/QDPKXwEHFGgyFDW/kKcxhuaUccZ3Gq2NvAITPrIUSW/OJIITxgr38aCmremTa5y0PBnUeGok6G69RoGVpHiHLQ5GZDxWDT1dUYwibb9sXWylCYg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nc0Qr46l; arc=pass smtp.client-ip=74.125.224.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NtmjihX9"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-8d933da14f0so109255085a.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 May 2026 09:19:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nc0Qr46l"
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-64e87a81639so1198642d50.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 May 2026 09:57:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778173030; cv=none;
+        d=google.com; s=arc-20240605;
+        b=WWRoK7kbHkhgSbZ5VE/dzamwp+gCoe5/WmvfD6CN1m7Rz/RWHsvVOHsvcYuVa1p5NM
+         dz0gDXWYA35GG2bzJzMQkn3SbIw964neuIDVhPD0KvlEePBoRd3gbIKg60cqmwJcqxXg
+         g+P8Thp4weG4WLXZlPNc8EUAKZVXabOCGMJEKgdFfeHOtkTc3U6VqffbaNgIPgkAxSYV
+         OJ2y+vZc7ltiHLHpxDT8bJkHq62r3cSSAhNV2NXdaVsFtVwy4wLw0UVf4H1zccmXmvLC
+         bMB0MDUdn+2ts/T+s4FUZ7Ok79/6LUF6S9TTSW6vrcXP79TeCynCuB6ZEVPNaQcn3whJ
+         CfhA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=bjfNv7qyKVTKgj/qV9Ej6P2+ef16A/kBd7RAVYDFD0s=;
+        fh=ImHaVp9LKIGjD0tRyxgUyPXd5WNSYdKgZ1TGxuDzvzM=;
+        b=lZM39gIZQhGKcjCHFvJdoKlBrpdJEP6fPFTlDAAMZALmt+JmL2F9KC1b1SNZ67krk9
+         S5g1C2Zqao26Sf6ZOSSi/veyAWxtZODBo4TPuKBgYAPhdQs2veQNSFtx1i23cKCGbZlw
+         Dq3B4MRfED37X8bspo182fgKC0h10LkxoG8KvKitI70x9ZVuunM0XBghvKG96kwYvtjI
+         Qf8ZKAMyI4FYpDdSFN/Xlp1WJqAKQYYMtxlbXDNILELXH9M+0Gt5c5l/vOXJyGx17q2F
+         M/Bl+CrUpJKBXK7qmuttmdL7rjbyLx5uCYEOdqKjlFmhd0VdDAPTa5hvqDzFc5fiN2mX
+         Ek6A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778170783; x=1778775583; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NoEuTeo9Jj24i8dxcMYMX+vLlm3Uv+YBPBcBc5Hi9DY=;
-        b=NtmjihX9EJONDet7OramgZMsA66d2QTVPXJjScWyF3hqX8SkoFPQ+y24vt0PFyglgE
-         g3a8taAYH5yjGA0YJ/gUYN/oyo1zh3XrkUmVZQg+DWYjoabhWU5j1DnFEFQDq9vUrhwB
-         Se8KhFHvs1vyTSKxcpHwx8WPnbrMKmrvthddZvollNFchbah8oWD/6jhsGI3ubBACvVV
-         0136XcfXnTB1pNSLFjrViCWuUZGHxOt4IH0DficBwPjrPAi9oa8XqOpx+lVXFYGK9rIf
-         Ifr9czam7FI7HxtCirhyeMB6fwFGIHTr7z4YTuYxSNZlD+mqP9ueD2jeuQrQaaYSNeZh
-         hCOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778170783; x=1778775583;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1778173030; x=1778777830; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NoEuTeo9Jj24i8dxcMYMX+vLlm3Uv+YBPBcBc5Hi9DY=;
-        b=SGXCyZkP3RkiDY20NdO97oUv1HS1QhXeQNKPd4K8Q/cZHW+4afMHm/TMDbKz86vcLu
-         T7KzGKtw+CqwSi6QR+hEjem7GehqIZNepywQbSazr0flUPSshf8MIO3kJTzhHwN8FMhw
-         jDArg8rVP5cr4IIQ8+kh+lr77cvqgdsbOgAVw1J8PcU1NEOm4hGP0ltzK4WwoyeoYnOW
-         SawWIX/A1X6Bkg0QVOMdJNDMAZNlpIqjn5DGXUIqxgEi7If2n8YqiGgMuhttriv7TdPu
-         fX0fIpfFU8/1OPklY1abdGtx5HOom2hU1Ahv4HGa+VElRPM6EZX7I4EWBrAVQCUP+ApA
-         I0qA==
-X-Gm-Message-State: AOJu0Yx8moJaRGOSuNWjINYTLdd/E/Y04b6eqq8ZkH/9eBtBgM+2Z30C
-	nQ9lT9vpMUxGXErRZZf1+2+k2C67oy+RPjz2eNr/dqgkn7zfuYv0KZALYTbmmQ==
-X-Gm-Gg: AeBDiev5/93D+2HfdAFT49KLsj+rn2QXgt+eMlH4a/7Kl5d/WO4Rijr7umThPGzxAgq
-	vGm4n5hsP6j9rD6fCdQF4shlbrQLJc4Xb0ch1J4VnosUXFywmbJ1YeOAb7OkCpWfD8wRiU2XakH
-	l4WbXM88P2aXnhtBWOBzHg1uNGcZDuLpqJmPpUpJRvoQ5InHPd01ipL/A2UclaQ18WVyHY0/xMw
-	iLZt/l0wQidmI02kaPlr0qv6i6ciO/6LdBmBeNwQgbkge4ckStveCnRt/12oOXSkqhEdEteLhOW
-	AZTyDvZ2k54aae9Vsdj+3TCJthWOnss7JkxfjnX7fHb6llcNJTgr/65OBWVE0dMQxh+VHb36Hc1
-	YuiRkIW+CKbnJHEoQc5i98FIdY2kceI0k6n0+GCHhPssCPVvODLhqVP/tgYJNPcXtb0nVDlVR+e
-	4uqTqiy+vUgl5bm/Z5tb7marrVTMoBEv+V
-X-Received: by 2002:a05:620a:2586:b0:8eb:605f:6ccf with SMTP id af79cd13be357-904d4b58d72mr1253203485a.17.1778170782565;
-        Thu, 07 May 2026 09:19:42 -0700 (PDT)
-Received: from [172.17.0.2] ([135.232.184.217])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8fc29a80784sm1969787485a.12.2026.05.07.09.19.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 09:19:42 -0700 (PDT)
-Message-ID: <69fcbb9e.050a0220.376a5e.6216@mx.google.com>
-Date: Thu, 07 May 2026 09:19:42 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3806542287699436031=="
+        bh=bjfNv7qyKVTKgj/qV9Ej6P2+ef16A/kBd7RAVYDFD0s=;
+        b=nc0Qr46lspsE+uU3gGePLj+vVeYdm204IJOTkqn9uLj+iFi5ss4RHbjK29J/UQPvm0
+         2kDpSfXnhptBhWIWgzY6rMdbb043flH8WoKFENiC8FVLk7l4jqusF2Rf/2pj2U+MZMV+
+         zynwo0BL600aWQlWnurpFwBNt6zH+YPgklZQ23sCtaJQz8mLbHAiNHYR3xogvsT4yY5P
+         7H3nMRma36QUzpKyVNmMlBA7aAVxmJ7K9AmeQCsjDd21N4HyIdftgLH0hFXN0g1uTmTU
+         fE2fPpEeGuvnn6ujPEaZmOtdsHDV8c0Ryl9LY0suHlWEcw4z4q2pUK1jc0ZsuKz+rzil
+         8Qvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778173030; x=1778777830;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=bjfNv7qyKVTKgj/qV9Ej6P2+ef16A/kBd7RAVYDFD0s=;
+        b=aux+lIKbulJJ8Z8+c+Gpdw/DmqUR9OaFv8x6KGV86irmniFL5VjCB1Ywaj5FJMy0Ec
+         i/YqVlXAZoUWPnTQJDdh5hJskRcjdqnrqm/35ph3jTD630IyuF6vxmgzZK4LbRE4EB8x
+         ahnPIPFhf/l21pSpapdXtgHeV7pUQLA0/9ct+ziiakEen0uYTm+RId3jBL1RwQTdxFhI
+         X4zxTsFD3/iXmpUmPiwXn8/ZVxJN1ZSxuYIA/V2j2tblMfpB6olEQsLsndVM6Ua9J/1o
+         X+G0oizsi9C+8pQ1FVGftYfw8Do3d9lLS24+EIZ6TnZZJAku6OKtqk6xr8Q3ClkjikXV
+         Y49Q==
+X-Gm-Message-State: AOJu0Ywy71j5tNNt4geXQVCAxx0W9TEHZKx7YXos5+xbQZtns4j1w7QQ
+	TI/4rdKLndXqCNTvoW+PVzuWoknuEjOQLa9LvXmJibqN3oA8UGAskB8C/Q6Biua5bWStqDHvHQY
+	zXml0HLpOrXIR3F624Vei9ejMXbm2tjQJrWh8
+X-Gm-Gg: Acq92OHBXjguulz6unNdf0k9EO6GEg7GFZgxHnar9437yMsO4lktwZko+9/FgmT06of
+	4QJ8NI89NjM1hBdZEObEbzpCs0rSKxNVG4N7g4nItt3dkr//W99KunE58QX1A27r7eRx+3Lb5G9
+	o7FWJVYrZGQBUmcLRmu4nJREF2JIrcow7haxR2t6cRwc7lGIrYCx///dIEphsfFS0iKxFyCy3zT
+	R/+71wPcd89ePy738uuEn4frHKJBZrxEk0HlYpESMS17RmhWDEXrVptc5bR0Y4pkR1vrMveQ2Do
+	xUm+jMNAWi6WYbYUt239imkG2Wp8yFKX994RLItwdx8jbshXujlOCuYMYmy2xorwsADdKg==
+X-Received: by 2002:a05:690e:4192:b0:65d:823f:3c97 with SMTP id
+ 956f58d0204a3-65d823f4295mr2808517d50.53.1778173029668; Thu, 07 May 2026
+ 09:57:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, loic.poulain@oss.qualcomm.com
-Subject: RE: Support for block device NVMEM providers
-In-Reply-To: <20260507-block-as-nvmem-v2-1-bf17edd5134e@oss.qualcomm.com>
-References: <20260507-block-as-nvmem-v2-1-bf17edd5134e@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20260507161633.437600-1-frederic.danis@collabora.com>
+In-Reply-To: <20260507161633.437600-1-frederic.danis@collabora.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 7 May 2026 12:56:58 -0400
+X-Gm-Features: AVHnY4IgqUmZZUDP_h5HWngScGH0BZWtdRDwg3CTisnwvaCkfeKSBA5x_-x_bnk
+Message-ID: <CABBYNZKVPuthzegSwFUDGrBaFP8FnGjmz-Z__5G3Pb1qXpwf8g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] client/btpclient: Add BTP_EV_GAP_SEC_LEVEL_CHANGED support
+To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============3806542287699436031==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Fr=C3=A9d=C3=A9ric,
 
-This is automated email and please do not reply to this email!
+On Thu, May 7, 2026 at 12:23=E2=80=AFPM Fr=C3=A9d=C3=A9ric Danis
+<frederic.danis@collabora.com> wrote:
+>
+> This allows reduces connection time for the BAP tests.
+> ---
+>  client/btpclient/gap.c | 22 ++++++++++++++++++++++
+>  src/shared/btp.h       | 11 +++++++++++
+>  2 files changed, 33 insertions(+)
+>
+> diff --git a/client/btpclient/gap.c b/client/btpclient/gap.c
+> index 68e029dcc..1a6c2c2f0 100644
+> --- a/client/btpclient/gap.c
+> +++ b/client/btpclient/gap.c
+> @@ -2538,6 +2538,21 @@ static void btp_gap_device_connection_ev(struct l_=
+dbus_proxy *proxy,
+>         }
+>  }
+>
+> +static void btp_security_changed_ev(struct l_dbus_proxy *proxy, bool pai=
+red)
+> +{
+> +       struct btp_device *dev =3D find_device_by_proxy(proxy);
+> +       struct btp_adapter *adapter =3D find_adapter_by_device(dev);
+> +       struct btp_gap_sec_level_changed_ev ev;
+> +
+> +       /* TODO: get real security level */
 
-Dear submitter,
+I guess it wouldn't hurt to expose the security level somehow, not the
+key itself just the level.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1091131
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      6.79 seconds
-GitLint                       FAIL      7.79 seconds
-SubjectPrefix                 FAIL      0.88 seconds
-BuildKernel                   PASS      26.57 seconds
-CheckAllWarning               PASS      29.41 seconds
-CheckSparse                   PASS      28.88 seconds
-BuildKernel32                 PASS      26.60 seconds
-TestRunnerSetup               PASS      578.47 seconds
-TestRunner_l2cap-tester       FAIL      18.90 seconds
-TestRunner_iso-tester         PASS      311.40 seconds
-TestRunner_bnep-tester        FAIL      18.63 seconds
-TestRunner_mgmt-tester        FAIL      23.51 seconds
-TestRunner_rfcomm-tester      PASS      41.48 seconds
-TestRunner_sco-tester         PASS      80.61 seconds
-TestRunner_ioctl-tester       FAIL      50.25 seconds
-TestRunner_mesh-tester        PASS      39.48 seconds
-TestRunner_smp-tester         PASS      18.56 seconds
-TestRunner_userchan-tester    FAIL      18.58 seconds
-TestRunner_6lowpan-tester     PASS      35.03 seconds
-IncrementalBuild              PASS      54.54 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v2,4/8] block: implement NVMEM provider
-WARNING: please write a help paragraph that fully describes the config symbol with at least 4 lines
-#207: FILE: block/Kconfig:212:
-+config BLK_NVMEM
-+	bool "Block device NVMEM provider"
-+	depends on OF
-+	depends on NVMEM
-+	help
-+	  Allow block devices (or partitions) to act as NVMEM providers,
-+	  typically used with eMMC to store MAC addresses or Wi-Fi
-+	  calibration data on embedded devices.
-+
-
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#229: 
-new file mode 100644
-
-total: 0 errors, 2 warnings, 244 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14559647.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2,8/8] arm64: dts: qcom: arduino-imola: Describe NVMEM layout for WiFi/BT addresses
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (85>80): "[v2,8/8] arm64: dts: qcom: arduino-imola: Describe NVMEM layout for WiFi/BT addresses"
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: TestRunner_l2cap-tester - FAIL
-Desc: Run l2cap-tester with test-runner
-Output:
-Crash detected:
-==34==    by 0x13350F: tester_run (tester.c:1085)
-==34==    by 0x1142AD: main (l2cap-tester.c:3295)
-==34==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
-==34== 
-==34== 
-==34== Process terminating with default action of signal 11 (SIGSEGV)
-==34==  Access not within mapped region at address 0x0
-==34==    at 0x483FF54: __strcmp_sse2 (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
-==34==    by 0x115C46: read_info_callback (l2cap-tester.c:156)
-==34==    by 0x12E860: request_complete (mgmt.c:320)
-==34==    by 0x12F2F5: can_read_data (mgmt.c:408)
-==34==    by 0x131D68: watch_callback (io-glib.c:173)
-==34==    by 0x48A304D: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A33FF: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A36F2: g_main_loop_run (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x133B18: mainloop_run (mainloop-glib.c:65)
-==34==    by 0x133F4F: mainloop_run_with_signal (mainloop-notify.c:196)
-==34==    by 0x13350F: tester_run (tester.c:1085)
-==34==    by 0x1142AD: main (l2cap-tester.c:3295)
-==34==  If you believe this happened as a result of a stack
-==34==  overflow in your program's main thread (unlikely but
-==34==  possible), you can try to increase the size of the
-==34==  main thread stack using the --main-stacksize= flag.
-==34==  The main thread stack size used in this run was 8388608.
-==34== 
-Valgrind errors:
-==34==    by 0x115C46: read_info_callback (l2cap-tester.c:156)
-==34==    by 0x12E860: request_complete (mgmt.c:320)
-==34==    by 0x12F2F5: can_read_data (mgmt.c:408)
-==34==    by 0x131D68: watch_callback (io-glib.c:173)
-==34==    by 0x48A304D: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A33FF: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A36F2: g_main_loop_run (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x133B18: mainloop_run (mainloop-glib.c:65)
-==34==    by 0x133F4F: mainloop_run_with_signal (mainloop-notify.c:196)
-==34==    by 0x13350F: tester_run (tester.c:1085)
-==34==    by 0x1142AD: main (l2cap-tester.c:3295)
-==34==  If you believe this happened as a result of a stack
-==34==  overflow in your program's main thread (unlikely but
-==34==  possible), you can try to increase the size of the
-==34==  main thread stack using the --main-stacksize= flag.
-==34==  The main thread stack size used in this run was 8388608.
-==34== 
-==34== HEAP SUMMARY:
-==34==     in use at exit: 66,009 bytes in 462 blocks
-==34==   total heap usage: 592 allocs, 130 frees, 79,004 bytes allocated
-==34== 
-==34== LEAK SUMMARY:
-==34==    definitely lost: 0 bytes in 0 blocks
-==34==    indirectly lost: 0 bytes in 0 blocks
-==34==      possibly lost: 0 bytes in 0 blocks
-==34==    still reachable: 66,009 bytes in 462 blocks
-==34==         suppressed: 0 bytes in 0 blocks
-==34== Rerun with --leak-check=full to see details of leaked memory
-==34== 
-==34== For lists of detected and suppressed errors, rerun with: -s
-==34== ERROR SUMMARY: 51 errors from 3 contexts (suppressed: 0 from 0)
-Crash detected:
-==34==         suppressed: 0 bytes in 0 blocks
-==34== Rerun with --leak-check=full to see details of leaked memory
-==34== 
-==34== For lists of detected and suppressed errors, rerun with: -s
-==34== ERROR SUMMARY: 51 errors from 3 contexts (suppressed: 0 from 0)
-Segmentation fault
-Process 33 exited with status 139
-reboot: Restarting system
-reboot: machine restart
-No test result found
-##############################
-Test: TestRunner_bnep-tester - FAIL
-Desc: Run bnep-tester with test-runner
-Output:
-Crash detected:
-==34==    by 0x12CC4F: tester_run (tester.c:1085)
-==34==    by 0x111CB3: main (bnep-tester.c:298)
-==34==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
-==34== 
-==34== 
-==34== Process terminating with default action of signal 11 (SIGSEGV)
-==34==  Access not within mapped region at address 0x0
-==34==    at 0x483FF54: __strcmp_sse2 (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
-==34==    by 0x112206: read_info_callback (bnep-tester.c:101)
-==34==    by 0x1281B0: request_complete (mgmt.c:320)
-==34==    by 0x128B65: can_read_data (mgmt.c:408)
-==34==    by 0x12B5D8: watch_callback (io-glib.c:173)
-==34==    by 0x48A304D: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A33FF: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A36F2: g_main_loop_run (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x12D258: mainloop_run (mainloop-glib.c:65)
-==34==    by 0x12D68F: mainloop_run_with_signal (mainloop-notify.c:196)
-==34==    by 0x12CC4F: tester_run (tester.c:1085)
-==34==    by 0x111CB3: main (bnep-tester.c:298)
-==34==  If you believe this happened as a result of a stack
-==34==  overflow in your program's main thread (unlikely but
-==34==  possible), you can try to increase the size of the
-==34==  main thread stack using the --main-stacksize= flag.
-==34==  The main thread stack size used in this run was 8388608.
-==34== 
-Valgrind errors:
-==34==    by 0x112206: read_info_callback (bnep-tester.c:101)
-==34==    by 0x1281B0: request_complete (mgmt.c:320)
-==34==    by 0x128B65: can_read_data (mgmt.c:408)
-==34==    by 0x12B5D8: watch_callback (io-glib.c:173)
-==34==    by 0x48A304D: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A33FF: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A36F2: g_main_loop_run (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x12D258: mainloop_run (mainloop-glib.c:65)
-==34==    by 0x12D68F: mainloop_run_with_signal (mainloop-notify.c:196)
-==34==    by 0x12CC4F: tester_run (tester.c:1085)
-==34==    by 0x111CB3: main (bnep-tester.c:298)
-==34==  If you believe this happened as a result of a stack
-==34==  overflow in your program's main thread (unlikely but
-==34==  possible), you can try to increase the size of the
-==34==  main thread stack using the --main-stacksize= flag.
-==34==  The main thread stack size used in this run was 8388608.
-==34== 
-==34== HEAP SUMMARY:
-==34==     in use at exit: 25,264 bytes in 82 blocks
-==34==   total heap usage: 212 allocs, 130 frees, 38,256 bytes allocated
-==34== 
-==34== LEAK SUMMARY:
-==34==    definitely lost: 0 bytes in 0 blocks
-==34==    indirectly lost: 0 bytes in 0 blocks
-==34==      possibly lost: 0 bytes in 0 blocks
-==34==    still reachable: 25,264 bytes in 82 blocks
-==34==         suppressed: 0 bytes in 0 blocks
-==34== Rerun with --leak-check=full to see details of leaked memory
-==34== 
-==34== For lists of detected and suppressed errors, rerun with: -s
-==34== ERROR SUMMARY: 51 errors from 3 contexts (suppressed: 0 from 0)
-Crash detected:
-==34==         suppressed: 0 bytes in 0 blocks
-==34== Rerun with --leak-check=full to see details of leaked memory
-==34== 
-==34== For lists of detected and suppressed errors, rerun with: -s
-==34== ERROR SUMMARY: 51 errors from 3 contexts (suppressed: 0 from 0)
-Segmentation fault
-Process 33 exited with status 139
-reboot: Restarting system
-reboot: machine restart
-No test result found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Crash detected:
-==34==    by 0x14F4FF: tester_run (tester.c:1085)
-==34==    by 0x12B999: main (mgmt-tester.c:15134)
-==34==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
-==34== 
-==34== 
-==34== Process terminating with default action of signal 11 (SIGSEGV)
-==34==  Access not within mapped region at address 0x0
-==34==    at 0x483FF54: __strcmp_sse2 (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
-==34==    by 0x12F8E8: read_info_callback (mgmt-tester.c:181)
-==34==    by 0x14A740: request_complete (mgmt.c:320)
-==34==    by 0x14B2F5: can_read_data (mgmt.c:408)
-==34==    by 0x14DD68: watch_callback (io-glib.c:173)
-==34==    by 0x48A304D: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A33FF: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A36F2: g_main_loop_run (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x14FB08: mainloop_run (mainloop-glib.c:65)
-==34==    by 0x14FF3F: mainloop_run_with_signal (mainloop-notify.c:196)
-==34==    by 0x14F4FF: tester_run (tester.c:1085)
-==34==    by 0x12B999: main (mgmt-tester.c:15134)
-==34==  If you believe this happened as a result of a stack
-==34==  overflow in your program's main thread (unlikely but
-==34==  possible), you can try to increase the size of the
-==34==  main thread stack using the --main-stacksize= flag.
-==34==  The main thread stack size used in this run was 8388608.
-==34== 
-Valgrind errors:
-==34==    by 0x12F8E8: read_info_callback (mgmt-tester.c:181)
-==34==    by 0x14A740: request_complete (mgmt.c:320)
-==34==    by 0x14B2F5: can_read_data (mgmt.c:408)
-==34==    by 0x14DD68: watch_callback (io-glib.c:173)
-==34==    by 0x48A304D: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A33FF: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A36F2: g_main_loop_run (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x14FB08: mainloop_run (mainloop-glib.c:65)
-==34==    by 0x14FF3F: mainloop_run_with_signal (mainloop-notify.c:196)
-==34==    by 0x14F4FF: tester_run (tester.c:1085)
-==34==    by 0x12B999: main (mgmt-tester.c:15134)
-==34==  If you believe this happened as a result of a stack
-==34==  overflow in your program's main thread (unlikely but
-==34==  possible), you can try to increase the size of the
-==34==  main thread stack using the --main-stacksize= flag.
-==34==  The main thread stack size used in this run was 8388608.
-==34== 
-==34== HEAP SUMMARY:
-==34==     in use at exit: 182,263 bytes in 2,112 blocks
-==34==   total heap usage: 2,389 allocs, 277 frees, 204,641 bytes allocated
-==34== 
-==34== LEAK SUMMARY:
-==34==    definitely lost: 0 bytes in 0 blocks
-==34==    indirectly lost: 0 bytes in 0 blocks
-==34==      possibly lost: 0 bytes in 0 blocks
-==34==    still reachable: 182,263 bytes in 2,112 blocks
-==34==         suppressed: 0 bytes in 0 blocks
-==34== Rerun with --leak-check=full to see details of leaked memory
-==34== 
-==34== For lists of detected and suppressed errors, rerun with: -s
-==34== ERROR SUMMARY: 51 errors from 3 contexts (suppressed: 0 from 0)
-Crash detected:
-==34==         suppressed: 0 bytes in 0 blocks
-==34== Rerun with --leak-check=full to see details of leaked memory
-==34== 
-==34== For lists of detected and suppressed errors, rerun with: -s
-==34== ERROR SUMMARY: 51 errors from 3 contexts (suppressed: 0 from 0)
-Segmentation fault
-Process 33 exited with status 139
-reboot: Restarting system
-reboot: machine restart
-No test result found
-##############################
-Test: TestRunner_ioctl-tester - FAIL
-Desc: Run ioctl-tester with test-runner
-Output:
-Total: 28, Passed: 0 (0.0%), Failed: 11, Not Run: 17
-
-Failed Test Cases
-Device List                                          Timed out  -31.790 seconds
-Device Info                                          Timed out   -6.931 seconds
-Reset Stat                                           Timed out   -6.938 seconds
-Set Link Mode - ACCEPT                               Timed out   -6.945 seconds
-Set Pkt Type - DM                                    Timed out  -15.213 seconds
-Set Pkt Type - DH                                    Timed out  -15.219 seconds
-Set Pkt Type - HV                                    Timed out  -15.225 seconds
-Set Pkt Type - 2-DH                                  Timed out  -15.234 seconds
-Set Pkt Type - 2-DH                                  Timed out  -15.241 seconds
-Set Pkt Type - ALL                                   Timed out  -15.247 seconds
-Set ACL MTU - 1                                      Timed out  -15.253 seconds
-##############################
-Test: TestRunner_userchan-tester - FAIL
-Desc: Run userchan-tester with test-runner
-Output:
-Crash detected:
-==34==    by 0x12D77F: tester_run (tester.c:1085)
-==34==    by 0x111DFB: main (userchan-tester.c:392)
-==34==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
-==34== 
-==34== 
-==34== Process terminating with default action of signal 11 (SIGSEGV)
-==34==  Access not within mapped region at address 0x0
-==34==    at 0x483FF54: __strcmp_sse2 (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
-==34==    by 0x11250B: read_info_callback (userchan-tester.c:88)
-==34==    by 0x128450: request_complete (mgmt.c:320)
-==34==    by 0x128E95: can_read_data (mgmt.c:408)
-==34==    by 0x12C108: watch_callback (io-glib.c:173)
-==34==    by 0x48A304D: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A33FF: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A36F2: g_main_loop_run (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x12DD88: mainloop_run (mainloop-glib.c:65)
-==34==    by 0x12E1BF: mainloop_run_with_signal (mainloop-notify.c:196)
-==34==    by 0x12D77F: tester_run (tester.c:1085)
-==34==    by 0x111DFB: main (userchan-tester.c:392)
-==34==  If you believe this happened as a result of a stack
-==34==  overflow in your program's main thread (unlikely but
-==34==  possible), you can try to increase the size of the
-==34==  main thread stack using the --main-stacksize= flag.
-==34==  The main thread stack size used in this run was 8388608.
-==34== 
-Valgrind errors:
-==34==    by 0x11250B: read_info_callback (userchan-tester.c:88)
-==34==    by 0x128450: request_complete (mgmt.c:320)
-==34==    by 0x128E95: can_read_data (mgmt.c:408)
-==34==    by 0x12C108: watch_callback (io-glib.c:173)
-==34==    by 0x48A304D: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A33FF: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x48A36F2: g_main_loop_run (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.6400.6)
-==34==    by 0x12DD88: mainloop_run (mainloop-glib.c:65)
-==34==    by 0x12E1BF: mainloop_run_with_signal (mainloop-notify.c:196)
-==34==    by 0x12D77F: tester_run (tester.c:1085)
-==34==    by 0x111DFB: main (userchan-tester.c:392)
-==34==  If you believe this happened as a result of a stack
-==34==  overflow in your program's main thread (unlikely but
-==34==  possible), you can try to increase the size of the
-==34==  main thread stack using the --main-stacksize= flag.
-==34==  The main thread stack size used in this run was 8388608.
-==34== 
-==34== HEAP SUMMARY:
-==34==     in use at exit: 26,001 bytes in 92 blocks
-==34==   total heap usage: 222 allocs, 130 frees, 38,997 bytes allocated
-==34== 
-==34== LEAK SUMMARY:
-==34==    definitely lost: 0 bytes in 0 blocks
-==34==    indirectly lost: 0 bytes in 0 blocks
-==34==      possibly lost: 0 bytes in 0 blocks
-==34==    still reachable: 26,001 bytes in 92 blocks
-==34==         suppressed: 0 bytes in 0 blocks
-==34== Rerun with --leak-check=full to see details of leaked memory
-==34== 
-==34== For lists of detected and suppressed errors, rerun with: -s
-==34== ERROR SUMMARY: 51 errors from 3 contexts (suppressed: 0 from 0)
-Crash detected:
-==34==         suppressed: 0 bytes in 0 blocks
-==34== Rerun with --leak-check=full to see details of leaked memory
-==34== 
-==34== For lists of detected and suppressed errors, rerun with: -s
-==34== ERROR SUMMARY: 51 errors from 3 contexts (suppressed: 0 from 0)
-Segmentation fault
-Process 33 exited with status 139
-reboot: Restarting system
-reboot: machine restart
-No test result found
+> +       memcpy(&ev.address, &dev->address, sizeof(ev.address));
+> +       ev.address_type =3D dev->address_type;
+> +       ev.sec_level =3D BTP_GAP_SEC_LEVEL_AUTH_ENC;
+> +
+> +       btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_SEC_LEVEL_CHANGED,
+> +                                       adapter->index, sizeof(ev), &ev);
+> +}
+> +
+>  static void btp_identity_resolved_ev(struct l_dbus_proxy *proxy)
+>  {
+>         struct btp_device *dev =3D find_device_by_proxy(proxy);
+> @@ -2709,6 +2724,13 @@ void gap_property_changed(struct l_dbus_proxy *pro=
+xy, const char *name,
+>                          */
+>                         if (!prop)
+>                                 btp_gap_device_connection_ev(proxy, prop)=
+;
+> +               } else if (!strcmp(name, "Paired")) {
+> +                       bool prop;
+> +
+> +                       if (!l_dbus_message_get_arguments(msg, "b", &prop=
+))
+> +                               return;
+> +
+> +                       btp_security_changed_ev(proxy, prop);
+>                 } else if (!strcmp(name, "AddressType")) {
+>                         /* Address property change came first along with =
+address
+>                          * type.
+> diff --git a/src/shared/btp.h b/src/shared/btp.h
+> index b99ad3a28..4d3c4ec6f 100644
+> --- a/src/shared/btp.h
+> +++ b/src/shared/btp.h
+> @@ -286,6 +286,17 @@ struct btp_gap_identity_resolved_ev {
+>         bdaddr_t identity_address;
+>  } __packed;
+>
+> +#define BTP_GAP_SEC_LEVEL_UNAUTH_ENC           0x01
+> +#define BTP_GAP_SEC_LEVEL_AUTH_ENC             0x02
+> +#define BTP_GAP_SEC_LEVEL_AUTH_SC              0x03
+> +
+> +#define BTP_EV_GAP_SEC_LEVEL_CHANGED           0x89
+> +struct btp_gap_sec_level_changed_ev {
+> +       uint8_t address_type;
+> +       bdaddr_t address;
+> +       uint8_t sec_level;
+> +} __packed;
+> +
+>  struct btp_gatt_service {
+>         uint16_t start_handle;
+>         uint16_t end_handle;
+> --
+> 2.43.0
+>
+>
 
 
-https://github.com/bluez/bluetooth-next/pull/152
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3806542287699436031==--
+--=20
+Luiz Augusto von Dentz
