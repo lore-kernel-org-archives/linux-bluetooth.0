@@ -1,87 +1,88 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C55244A725
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 15:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3427444D6BD
+	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 15:24:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778167491; cv=none; b=GRPhCqp2NlZ6FFR5cQFOrcg9guz7r80wGI6xBAR88XYidHxBWdclztIVoY3mKcB1iDc85/oANQvY5Sx2FUNmEhFhVinStq8ymuXIKX8tLARMtyeakZDqgMU98ePEvjWujF96IkM4SOTV1iOlM88K87HTgLsmCxnuSTlVhZBvA8M=
+	t=1778167494; cv=none; b=S4c82KwXplN+lKrrzF4rY1z7FahdaBAbojl04vh+OkBm+aBbCOH4o/8Z3hINuKOVaGv16EV1UNEqM2VHhUAVjdOFRJqTCqpLLGiwgOWJ7Yyf/OJNNG+jygHXVStAqFBM78IahEwz+5KEgcLOjxH2/jI5AxEniEn2huZippU8ajA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778167491; c=relaxed/simple;
-	bh=Yq9eZWlTIDpBT1jqRXA1YcQ7jewB4Li4nESrsfqdqxw=;
+	s=arc-20240116; t=1778167494; c=relaxed/simple;
+	bh=aWIeQEdmSLhgx88ywuNXkmaIu8+4RM4LnE64b4MEZHg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Aeba4KmNKjHOTeyIHJnhCpkTSTSAHzmth4WEJNO00GDfmw2zMwKNVGO2XguKiIabxIUYV9mmlIXKopXcH4ajjtSvBXNOXfD2wz63MjFdckDQd6qgLjpLtr2xBs76owE2BUyenqzC75bhDTPCTIxUPgJQX0qsdWobsNLtLCmvx/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=PHIaw8lj; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=UqyYzGxt; arc=none smtp.client-ip=205.220.168.131
+	 In-Reply-To:To:Cc; b=ILl4i1aiK1W4cWwqKbkeKg/M3bibQuYeWyQ40BB5a+j3SBFWyERtxnfudJkOI/zQGge3VzAL9Wd7HQB5J6rARQXrdWb2XUwYcsVFkbyLBIy2AKyWb0Ft20swAgNd52cBBGd9eULDdTOgxNYomPI6A5I17hRqCh2+7pZqNfcy3J8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=A2LhJinX; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=RrFaubmw; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="PHIaw8lj";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="UqyYzGxt"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 647BxaH62734203
-	for <linux-bluetooth@vger.kernel.org>; Thu, 7 May 2026 15:24:49 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="A2LhJinX";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="RrFaubmw"
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 647BUroZ682836
+	for <linux-bluetooth@vger.kernel.org>; Thu, 7 May 2026 15:24:51 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	z8YhFkwRRG7HQCuWlp0zuKi3fIa5ZkmTd/FI4268HU0=; b=PHIaw8ljGKMKOyXW
-	JOMO0FrKk7092/z3zBfZ51Z0eshaRXz/CQjQi3MqCNsDNbb1qyI6e1z8L6NOHnkr
-	a1T9wEdg+HlOXoTK3j8BvpPkfYpIYnQpUUdIHv3nEYEtQ6QuuHUsOFBNOYnw/w5k
-	G2dlYAXt7ffweosKr94E6p9uMOyUBDLi6BeLLgIrCIfN6eB3m4+vWiIyvLUwJqUL
-	IeNMZtKS/iDJbuF36Egxpn6xYoL4qBCCYwivxpddkuSgwv+10CSYj8MbKhHJIe0U
-	Vg0yh/yatuoRZzZWNG2qQ3C7Gm1F+6hc4NFRkzcjcFx6rUa0Rh0SVRfIm84CrLFu
-	IbJ5LA==
-Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com [209.85.217.70])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e0tbqrt3f-1
+	BmKkWNysoQOkzQVu0/HpO6GRxwgi9ndXDewfJyYIvjs=; b=A2LhJinXkxFI/S96
+	9vte8eeCRxFZ/E3ZYfrJQhuW21ihoIaeeqWVGUT9ZnEWt1g9Nqjg0us2pQSDCU8o
+	puKLgB8ksgjnhr+8qycY2wZEqtnKH/wo64eSLK/DgtapCF9gGyZr9Yhp3EEZqXFX
+	AOFJ0tp4dfPdwVx6xtbBZfSxwIRsO9nzFdFO2ewf9zbsaanbhqgC8AM9eWRPGm2n
+	4K4k+eogj+kc+t2F5nNkwR9xmaMXKzfNi2t0wdIAw6RVTViVO5T8DfxVaqIr9qWK
+	na8BUQmp9zy6TMKuJ1pgBd2WFa3Q0sgXHSdsRyFv8baE99MiF4vyAAK78VuqhYAN
+	Q5COHg==
+Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com [209.85.222.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e0mhat8a6-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 07 May 2026 15:24:48 +0000 (GMT)
-Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-62f5497f0b0so684936137.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 May 2026 08:24:48 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 07 May 2026 15:24:51 +0000 (GMT)
+Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-95cfcad1f82so469780241.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 May 2026 08:24:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1778167488; x=1778772288; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1778167491; x=1778772291; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=z8YhFkwRRG7HQCuWlp0zuKi3fIa5ZkmTd/FI4268HU0=;
-        b=UqyYzGxtw4RaQzs+Lh7p3NAX+TfIazBHUHl3Tt9PoIe22UEUWSag0zGZPWXj6nFdoa
-         US9Pn74G3mNcsuuFo+X/XgxXikIOYw7eFIBrj8S9FZfN+nS2vLJ6YvI4fHxY5uJlQVUp
-         crYdIPHBbNbwuzxZ1im8QrBxY/KxQg0B/eULb9Wh+WUNMUboYLovphyOOjUL9Zw3fI9r
-         vcvXH6fmR6WE094U3VU8efcdFEL3jwtRYslld5EKDupMG10t5Xvd7TP3Fyb4+9XJ8Fd2
-         GIdUdFy1918mpYnHZwwBLB/0/YJNh/IJD552BSffi8RHc4Swpis0f4CYLisf+w/SU+S8
-         SFUA==
+        bh=BmKkWNysoQOkzQVu0/HpO6GRxwgi9ndXDewfJyYIvjs=;
+        b=RrFaubmwROjA0/q3REU/Ya8LjAcSHqVNS8tqLWl2fn9aGRsh6kJltcPlu3d5TCO2SU
+         InSOo3lCgM6FWgR/KViqx2MvnzpPCfPWy+YNGS00xWhKLHad5jj+W8tZWn9JqTBRAnmx
+         C0qbyQ+0pFUBL6GFJ/Xzyp+Ajy39Q2rOSNzJeVCuAOgTOxxBKu5HEO7+rwVHahfmI1/0
+         A1YA3Z1yLAguddzwIVuvpPIE3FEjrGiP46pizFAPbM8mw5I7wUS58cESJF0gnR63kDzP
+         ivJUq+eRetKEIJC+Zeyq2+y52eMK5zhoJZaA04odHMwHB0XAmsHogpXnbEU1JrPo/eAg
+         H/Vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778167488; x=1778772288;
+        d=1e100.net; s=20251104; t=1778167491; x=1778772291;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=z8YhFkwRRG7HQCuWlp0zuKi3fIa5ZkmTd/FI4268HU0=;
-        b=jw7Eug4z9ZUYOoMPUv30ad+iCbff0qly0Fwg7rLt/dCs5vfz6rVLeFoBRdOWe6Dvma
-         2TzgiG3GrORgGYiTqKi5k9qn3kQe61dGzzm5Oqut8r1apn4AuK4wbYRDbp7ddpHI9zE6
-         chZBWkkEiPNfiYy+IxyACWrINKuilLlElYr4GjurXmj0o51NZmkoRwICyzK5tSVvv9NU
-         BZwYCgQexm3GxHa1OEMCF6YZHdXp76KFkr2OO1d9ZdYmwuFYZNySqnxzuMLtugiLiy+A
-         U1e/DBQFLpMPswCTgjuudHvJ7eqsuz/WdmvF40TUAqLY6m+AQrtCraRuwPlXZelY97y5
-         n+zQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9Zvht/87WuXAPCTE5HpYeBX/AXocJD6Pw3JWbRfoIRPohfBKFBMQu5MOECHSX6z29HX+IMGujMMwF0QmJ8RSg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgEFLF7iAdOCAJB5pBEaGav6A5dOFiDkE9LWbQOhQPrTrhHG5s
-	kjGaOmsRj8koaPm2gwUwq3wZnK/btojurFy3tv1l2hZ+1RB3X7KEfVHVBi8xjzpNyJbBCjMAtlQ
-	YxPyGBoIrSyevToGhpi0lxGAFgdC3gcETiagZw1wHT46uWck/Vp3O8iV+k7lH71HE0cCQZ7k=
-X-Gm-Gg: AeBDiev3ijsWeH7K8lZA419FqbHMGV3J50eWgzaOHyt2XQH2wRzcjCqI8dkkcRINfX+
-	LLkI8KmjnaW72gEE6LRk6ycy7xWcOSyylDKBpl0kOaHMkv+rUSt8GPg0zgiYd9dRjHX0l5oapNf
-	jdJGZbAF5nRcKNfeob/mG5LDe4dG8vyKwSDixmmzJMqIh+DLJXxGc+oODZfeREuhNy2jbDuBxXI
-	nlOgxua+P01ckrBSg+bzF4ln4d04Tu8m7kLIr3GBB8dY5rW273jgvkIutcWS54wG8MhM21qowuc
-	UmFg2+zgwdYX5Z/QNq3/9umaAhUiH1b/5/X1Gu5v7tql831g7bVAVhliviXxt5CuTnJqS54QPcK
-	5cT4wxpbIp0+mneN88ktGDx7LoYI0l1BKCqr3xhYmNQXq6s00g8P+J1FyMTXcVGJF7XXNRBo69S
-	Rh8u/CwXdX/bjorx+ns8E52ULExZk=
-X-Received: by 2002:a05:6102:1614:b0:62f:c97f:aec4 with SMTP id ada2fe7eead31-630f927f4fbmr3735554137.27.1778167487868;
-        Thu, 07 May 2026 08:24:47 -0700 (PDT)
-X-Received: by 2002:a05:6102:1614:b0:62f:c97f:aec4 with SMTP id ada2fe7eead31-630f927f4fbmr3735537137.27.1778167487442;
-        Thu, 07 May 2026 08:24:47 -0700 (PDT)
+        bh=BmKkWNysoQOkzQVu0/HpO6GRxwgi9ndXDewfJyYIvjs=;
+        b=GaBCzfckYbFxSnmOTIybs0WJG9Dkmgt1PLwMWwy17BUratGLOd2NuJpSypcqJGk411
+         Vmg0Mjg/ZulKFy8FMWnFTovixNdXDPNPtYxRVHqwAwB6/jaOIbPix+aY3cBmJ+88SO+q
+         d6vfQH6uSQ0nIZc0tLCclxP+LPvdVdKYWnKoHwms1iBQMUq6p95QdNEBGAN69DA8rS6o
+         2MKmArzBc8ciZ0a7uw5JG5rDv8r5XuI5kssh3zRtSVVRs6FYp3orULdr41GrFEFX/NaF
+         tUHTxHaQHDR1YCXLhN4YD5A3Z++gFJuKp3tZuLTjm9/hhAgrPjZugxnj3B3dlxhGINBW
+         RDBQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9+aqfLIfpqw66A3HWxmFEX7F6T2kE/pS2+J4utkQR2DVQCcgFenLXXCypO4ySGZWliuCXOeGf6UWfX/EboSvA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFv4pYKk6IxevpNdDpPfQk0glbxCUxb/Z2tvjeEqHEO18m/FpJ
+	KF6tRbcLQGn8rV1i1YWYFlr71iCvBcBnjtwpPoOf/+MrF9HQYBxxx4vqO3efdB5qssCDMwVFxf9
+	5I0bBzzXt8xegqLiz8VIFM5cwJKKy0pv1pSMbhLTc8wnDLEvNavTNTh9XoCjiUo9KzxlIYEo=
+X-Gm-Gg: AeBDietnF4Ig/IU2DrLhxFl6SLzNLNttWsbPZ/Il8gN24jDpS3IPt1hwCuYiAxyn9A0
+	iGo2zQ1MfzEHdu6MRC3abBXDSJzJXG6znQLlGIZheGe6JGxq1js0WoqgBYPtp6+W3L2Swa90qYm
+	H5AdUYTHNeq/plxvUrEDc39s9dlQ8WpvGv8qar27EzP+VNcPZ8xz07X+sAZdYsciQp7jQYfa6mK
+	vH6K2U7At8W/7w0R95+hjHWcAifC3PJ0owxU2A0+zpJKdx9+opoBG8NnO7Yon4RbV8PQjTb4GJn
+	N97gETc1XgUwVzuYlXQfvxO1hQKLy9b72tkURqAy+S1gg0egvZBpgQGXj4+RphDNIJjxbYUunMd
+	Tpg4lgAmLdQl1OI9NWAsCEcXN3tlKL2YciOZ81CMoJT/Av6s31aKx+mbDib8oE30QkDy3l+UhnC
+	/+h2gXFJkapKunb6hb+jCTxucuzQA=
+X-Received: by 2002:a05:6122:3a06:b0:56b:8e1c:582d with SMTP id 71dfb90a1353d-5755974b78emr4681447e0c.14.1778167490344;
+        Thu, 07 May 2026 08:24:50 -0700 (PDT)
+X-Received: by 2002:a05:6122:3a06:b0:56b:8e1c:582d with SMTP id 71dfb90a1353d-5755974b78emr4681359e0c.14.1778167489785;
+        Thu, 07 May 2026 08:24:49 -0700 (PDT)
 Received: from QCOM-eG0v1AUPpu.na.qualcomm.com ([2a01:e0a:830:450:b16a:3475:ec42:bcfa])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bca583dd7e4sm240966b.58.2026.05.07.08.24.45
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bca583dd7e4sm240966b.58.2026.05.07.08.24.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 08:24:46 -0700 (PDT)
+        Thu, 07 May 2026 08:24:49 -0700 (PDT)
 From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Thu, 07 May 2026 17:24:36 +0200
-Subject: [PATCH v2 1/8] dt-bindings: mmc: Document support for nvmem-layout
+Date: Thu, 07 May 2026 17:24:37 +0200
+Subject: [PATCH v2 2/8] dt-bindings: net: wireless: qcom,ath10k: Add NVMEM
+ MAC address cell
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -90,7 +91,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260507-block-as-nvmem-v2-1-bf17edd5134e@oss.qualcomm.com>
+Message-Id: <20260507-block-as-nvmem-v2-2-bf17edd5134e@oss.qualcomm.com>
 References: <20260507-block-as-nvmem-v2-0-bf17edd5134e@oss.qualcomm.com>
 In-Reply-To: <20260507-block-as-nvmem-v2-0-bf17edd5134e@oss.qualcomm.com>
 To: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
@@ -119,84 +120,60 @@ Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
         netdev@vger.kernel.org, daniel@makrotopia.org,
         Loic Poulain <loic.poulain@oss.qualcomm.com>
 X-Mailer: b4 0.14.2
-X-Proofpoint-ORIG-GUID: Hkc1YiUFBy6ltiEic35lyNJZes2aJoHF
-X-Authority-Analysis: v=2.4 cv=SJVykuvH c=1 sm=1 tr=0 ts=69fcaec0 cx=c_pps
- a=N1BjEkVkxJi3uNfLdpvX3g==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA3MDE1NCBTYWx0ZWRfX2T0jL6SA2yzL
+ 6QNOEFcyeUSm49Y97wcRc+CTSASPAnHyueYaCcP8DGpjLuSPE/q951Y8DXS/z+obCBtFBcPRTUp
+ hL6KcOvvRC2EkxvPzglEkkmUmAOAQQKu3wIcoskjVbxYJ8Hknz6kRPEfqfhjv3TUFFIasXoT3F0
+ heQfcVR0I8Y6TlexYVxma9/2H8NXQJaxcH7EPLZ63q3Ms2JrLQjC/ssBkCEEugxcEWKmCJFsFnA
+ CDobmMMff1Z3Z5XoT7uelOv0I2hVaiRcT2/UOO1cct7luqVsYeutgx6FKRz/DE03qy1ldyMbKc0
+ i3UXpe25/YK13nY4dJVqCO0jCsJqb4Zd1F775oNYODuUoEyiabm0Ruh+k4xVhJq7kUZlLEVgl9t
+ iPWkGFOQk2l1u9bogWLNk2En7V8spsWqpPrPnRy6i6yy48LBT7X/9Xmafyak0cYwsL4ylorDamH
+ P6Jcwr40mYvKhddeSlQ==
+X-Proofpoint-ORIG-GUID: LP1BQGNG12H84IPSLYMbVDvgjInSicp1
+X-Proofpoint-GUID: LP1BQGNG12H84IPSLYMbVDvgjInSicp1
+X-Authority-Analysis: v=2.4 cv=ReWgzVtv c=1 sm=1 tr=0 ts=69fcaec3 cx=c_pps
+ a=R6oCqFB+Yf/t2GF8e0/dFg==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
  a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22 a=EUspDBNiAAAA:8
- a=hFPe-bIbDLvfECHHD4sA:9 a=QEXdDO2ut3YA:10 a=crWF4MFLhNY0qMRaF8an:22
-X-Proofpoint-GUID: Hkc1YiUFBy6ltiEic35lyNJZes2aJoHF
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA3MDE1NCBTYWx0ZWRfXxrp0x+G5LNxV
- FUcfjUi1dGbiJVrhUFvBaaAkU2b1TomDE46WRGbnOR017mX+EX+atdt2csPMkg2TeWdlvuYQJPS
- H7MPcaRn/vCCyJGK/rLToDmth4cJtjLijTJQePtLsuuoy7NC0fOq4WVitUeCCLg0+oRqd7Tlriu
- cPIwCBP4nsLeyyi1EBkAhIH4kzN1ca9g8QfhYLtfCgcQHrmQEzzTq+ypyRC2Nk1jUePWZHzH83N
- Q3VsGWagXcsqNHK05iOUcweK+UE/foCxufgURvV7x2LZGwIQKDmjGbkQOHD1+7J1XXMnaIqRpgr
- CusQku51P89iji5SK/c3e8YfTvQOIOgykP/JG8+9ysJFS7kXefLj0nod0tjhTxGlZaR4NmuAA9M
- zmxQW9n8rXC3P4A0J6F8wXOO6xu/VC08X1XJmaxYpMIGY22Yg6fE41M12qJBXa0nzTIbTWBimYx
- DdKcS7tTA1WuZXBT8DA==
+ a=u7WPNUs3qKkmUXheDGA7:22 a=eoimf2acIAo5FJnRuUoq:22 a=EUspDBNiAAAA:8
+ a=yPTVd8cUMD2GasGf7IAA:9 a=QEXdDO2ut3YA:10 a=TD8TdBvy0hsOASGTdmB-:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-05-07_01,2026-05-06_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 priorityscore=1501 suspectscore=0 lowpriorityscore=0
- impostorscore=0 bulkscore=0 adultscore=0 malwarescore=0 spamscore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
+ clxscore=1015 priorityscore=1501 impostorscore=0 lowpriorityscore=0
+ spamscore=0 suspectscore=0 adultscore=0 phishscore=0 malwarescore=0
+ bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2604200000
  definitions=main-2605070154
 
-Add support for an nvmem-layout subnode under an eMMC hardware
-partition. This allows the partition to be exposed as an NVMEM
-provider and its internal layout to be described. For example,
-an eMMC boot partition can be used to store device-specific
-information such as a WiFi MAC address.
+Add support for an NVMEM cell provider with the standard "mac-address"
+cell name. This allows the ath10k device to retrieve its MAC address
+from non-volatile storage such as an EEPROM or an eMMC partition.
 
 Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
 ---
- .../devicetree/bindings/mmc/mmc-card.yaml          | 24 ++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/mmc/mmc-card.yaml b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
-index a61d6c96df759102f9c1fbfd548b026a77921cae..b21426a49cf1d9aae5b4e8e447b5be11b08c96bf 100644
---- a/Documentation/devicetree/bindings/mmc/mmc-card.yaml
-+++ b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
-@@ -40,6 +40,9 @@ patternProperties:
-         contains:
-           const: fixed-partitions
+diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
+index c21d66c7cd558ab792524be9afec8b79272d1c87..96e025cd1e3acacf3da270ed43955b0d6acdb7de 100644
+--- a/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
++++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
+@@ -92,6 +92,15 @@ properties:
  
-+      nvmem-layout:
-+        $ref: /schemas/nvmem/layouts/nvmem-layout.yaml
-+
- required:
-   - compatible
-   - reg
-@@ -86,6 +89,27 @@ examples:
-                     read-only;
-                 };
-             };
-+
-+            partitions-boot2 {
-+                nvmem-layout {
-+                    compatible = "fixed-layout";
-+
-+                    #address-cells = <1>;
-+                    #size-cells = <1>;
-+
-+                    mac-addr@4400 {
-+                        compatible = "mac-base";
-+                        reg = <0x4400 0x6>;
-+                        #nvmem-cell-cells = <1>;
-+                    };
-+
-+                    bd-addr@5400 {
-+                        compatible = "mac-base";
-+                        reg = <0x5400 0x6>;
-+                        #nvmem-cell-cells = <1>;
-+                    };
-+                };
-+            };
-         };
-     };
+   ieee80211-freq-limit: true
  
++  nvmem-cells:
++    maxItems: 1
++    description:
++      Nvmem data cell that contains a 6 byte MAC address with the most
++      significant byte first (big-endian).
++
++  nvmem-cell-names:
++    const: mac-address
++
+   qcom,calibration-data:
+     $ref: /schemas/types.yaml#/definitions/uint8-array
+     description:
 
 -- 
 2.34.1
