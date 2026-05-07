@@ -1,144 +1,107 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BAAA3CD8C9
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 09:55:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFD230F535;
+	Thu,  7 May 2026 11:55:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778147732; cv=none; b=VFK90LBWJF9ViH684bog/nKTCGBFrEyZ7s47dS43BEVKiefYeaNs1L72dCAYuRJBr8hsxs2Tu4YPVZfYLxYMuoRES2/0iLdTukdoZnfF8mmup8iHKgpwWpmX0VTvzaOUVERggz66/4E0swbz2GEAjTUIlUlpM6Y2IEpI8UpVh10=
+	t=1778154957; cv=none; b=PvImNycthW1KNYsBucryU3uJiSg1q6foUi8WlxPbi8RjcsPdkZoa4mcOvpvv2qhOI5ZSRzi1w0uUVNdtyofUNHVM+VolfippAHJYkJRO4f0b0NcRVrTN0+MyOp0BOPSpZ1Q0QxxdXYT4D9wOTQJ2KSNJZaL/o3e/QhLKICy6T50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778147732; c=relaxed/simple;
-	bh=pKDQVKIKsAfsrrFwmgVAcbT4/X9T/+heH3VD4Ok4M28=;
-	h=Date:Subject:Message-ID:From:To:Cc:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CkzmYO32urFKldwyQj71032mPSeZU0uGii3myL0bzPy0aCcjSR2jgZAJHZZ6SZEiAxLqD9UL+VK5SytuEyHj58OesAecqaUdovKgNdlFx3QmuXFIBLs2gbtkC9IILa/1lhzC6XhmQJ5yU9cO9ZyznQf3y+amGQmT4f+BghxP0ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=IVUaw6ZG; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1778154957; c=relaxed/simple;
+	bh=YDXczwc/IWPhalqlWlFpa2CJ/z0NSpD0assHYzKCyWA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kU1a93UWuxgqkWvs1j8j+uy8fxODYLTVmPhynVUJj3uSVRDRJjFzGCKNv2Kjrxq7GN6pLuax1iy7Zox3JonQFLzCO7H/QNHzoX6NbxPlvyomPRvCl7q01UYhM5TMk/poZzz5npusdxPIjUifsBBFhBX9RbazA/BN19GspS9RRAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WbWLF5YR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="IVUaw6ZG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:Subject:Message-ID:From:To:MIME-Version:
-	Content-Type; bh=pKDQVKIKsAfsrrFwmgVAcbT4/X9T/+heH3VD4Ok4M28=;
-	b=IVUaw6ZGJWYKkO2YVclTT3KX3FIehT/rjBIoK4/4sUs1GxkPQh6FqEeKD4H4vj
-	zEbuzsldyeqS+OmhIxQQeh8JCoM203BXoKQ6EX3WlV0vD6pYSEnkRgE5qaEGeyCu
-	d5ZXAglB3bCfD+G+oGtn7QUPI43M5vjKFkC7vaBGB7vTk=
-Received: from [IPv6:240e:45d:1470:4cad:18ad:1c3b:844a:c8d2] (unknown [])
-	by gzsmtp5 (Coremail) with SMTP id QCgvCgD3xrSJYfxpjxhlCw--.77S2;
-	Thu, 07 May 2026 17:55:23 +0800 (CST)
-Date: Thu, 07 May 2026 17:55:20 +0800
-Subject: =?UTF-8?Q?=E5=9B=9E=E5=A4=8D:_About_Kernel_limitation?=
- =?UTF-8?Q?_HCI=5FMAX=5FFRAME=5FSIZE_(1024_+_4)?=
-Message-ID: <2gf28eqgco7psijo593ebohv.1778147720576@email.vivo.com>
-From: yjg0107 <yjg0107@163.com>
-To: "luiz.dentz" <luiz.dentz@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <lot3ns12vglamg8c0b87iaoe.1777272055182@email.vivo.com>
-References: <lot3ns12vglamg8c0b87iaoe.1777272055182@email.vivo.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WbWLF5YR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDA99C2BCB8;
+	Thu,  7 May 2026 11:55:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778154957;
+	bh=YDXczwc/IWPhalqlWlFpa2CJ/z0NSpD0assHYzKCyWA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WbWLF5YR1dqs5ZCyWfRaA26iiUEiANJ8QdYaY9R/RFS5fSg8HgxxFA76o88d5MgCn
+	 QUVsqwwjxeojpmMH/g7xO6YOXzLLtKKWnl8QVaPXIFv6X7oPQghNuoXgbEjmpGH8QO
+	 zBnuuWQ1gjSPjf4aRsbbV1FcGHWI46BJfIDFhwbuFH6gO0cR7NMFw2yR7K2UMREant
+	 Fb0vTnzqTI+Ijz+O66M99I262BHAmzpSy/EGXgAg628s7nCEzj0vScLjraRnydaWH3
+	 Gk2qGSqcyqCcHdxZ+nYsxuNuNK6oLVsZPIkcAhwzDJgQwLEuAu4ESxaJRt2BvZ/gvF
+	 0NSVGP7KBOYMA==
+Date: Thu, 7 May 2026 17:25:44 +0530
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: manivannan.sadhasivam@oss.qualcomm.com, 
+	Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>, linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-pci@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	Wei Deng <wei.deng@oss.qualcomm.com>, Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Shuai Zhang <quic_shuaz@quicinc.com>
+Subject: Re: [PATCH 01/12] power: sequencing: Introduce an API to check
+ whether the pwrseq is fixed or controllable
+Message-ID: <77mdzohpwzvzivuipzt34hjetnuuxznqsyomncipdwo3ne374f@msayj6kdqwru>
+References: <20260422-pwrseq-m2-bt-v1-0-720d02545a64@oss.qualcomm.com>
+ <20260422-pwrseq-m2-bt-v1-1-720d02545a64@oss.qualcomm.com>
+ <CAMRc=MfCprFY4QCwEJzbBnROGJzrRE-sRAD89xDxsUsJVfqOiQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="--_com.android.email_1073209348300880"
-X-CM-TRANSID:QCgvCgD3xrSJYfxpjxhlCw--.77S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Zr45CFy8try8tF43ArWxXrb_yoW8Jw1xpa
-	13AFs5CryxJw1xC34DGw47CF93u3Z7u3y3CF95J3s5Ar1furWDu347GrW09FZ7CrZrtFW8
-	JFn2qrykKa15ZrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0JUcTm-UUUUU=
-X-CM-SenderInfo: x1mjiiiqx6il2tof0z/xtbC4wwVWWn8YYy1bQAA3D
-
-----_com.android.email_1073209348300880
-Content-Type: multipart/alternative; boundary="--_com.android.email_1073209348362422"
-
-----_com.android.email_1073209348362422
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: base64
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMRc=MfCprFY4QCwEJzbBnROGJzrRE-sRAD89xDxsUsJVfqOiQ@mail.gmail.com>
 
-SGkgVnVkZW50eiwKCkluIHRoZSBmdXR1cmUsIEJUIFNJRyB3aWxsIGludHJvZHVjZSB0aGUgSGln
-aCBEYXRhIFRocm91Z2hwdXQgKEhEVCksIHdoaWNoIG1heSByZXF1aXJlIHRyYW5zbWl0IGxhcmdl
-ciBkYXRhIHNpemUsIG5vdCBqdXN0IDEwMjQuClNvIHdoYXQncyB5b3VyIG9waW5pb25zPyBDb3Vs
-ZCBrZXJuZWwgcmVtb3ZlIHRoZSBsaW1pdGF0aW9uIHRoYXQgSENJX0NIQU5ORUxfVVNFUiBjYW4g
-bm90IGNoYW5nZSBNVFU/Ckxvb2tpbmcgZm9yd2FyZCB0byB5b3VyIHJlcGx5LCB0aGFuayB5b3Ug
-dmVyeSBtdWNoLgoKQi5SLgpKaWdvbmcgWWluKOaut+WQieWKnyktLS0tLS0tLS0tIOWbnuWkjeea
-hOWOn+mCruS7tiAtLS0tLS0tLS0tCuWPkeS7tuS6uu+8mnlqZzAxMDcgPHlqZzAxMDdAMTYzLmNv
-bT4K5pel5pyf77yaMjAyNuW5tDTmnIgyN+aXpSAxNDo0MArkuLvpopjvvJpBYm91dCBLZXJuZWwg
-bGltaXRhdGlvbiBIQ0lfTUFYX0ZSQU1FX1NJWkUgKDEwMjQgKyA0KQrmlLbku7bkurrvvJoibHVp
-ei5kZW50eiIgPGx1aXouZGVudHpAZ21haWwuY29tPgrmioTpgIHvvJpsaW51eC1ibHVldG9vdGgg
-PGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc+CgpBYm91dCBLZXJuZWwgbGltaXRhdGlv
-biBIQ0lfTUFYX0ZSQU1FX1NJWkUgKDEwMjQgKyA0KQpIaSBMdWl6LAoKUXVlc3Rpb24gaXMgc2Ft
-ZSBhcyBodHRwczovL2dpdGh1Yi5jb20vYmx1ZXovYmx1ZXovaXNzdWVzLzIwNzMuCkFib3V0IEtl
-cm5lbCBsaW1pdGF0aW9uIEhDSV9NQVhfRlJBTUVfU0laRSAoMTAyNCArIDQpLCB5b3Ugc2FpZCB0
-aGF0IHRoaXMgd2lsbCBiZSBmaXhlZCB0byBlbmFibGUgdXNlciBzcGFjZSBjaGFuZ2VkLCBmcm9t
-ICMyMDEgKGNvbW1lbnQpLgpUaGUgcGF0Y2ggY29tbWl0IGlzIHRvcnZhbGRzL2xpbnV4QDA5NTcy
-ZmMsIHJpZ2h0PwoKSG93ZXZlciwgd2h5IEhDSV9DSEFOTkVMX1VTRVIgdHlwZSBjYW4gbm90IGNo
-YW5nZSBNVFUgdmFsdWU/IEdvb2dsZSBibHVldG9vdGggYWlkbCB1c2VzIEhDSV9DSEFOTkVMX1VT
-RVIgdHlwZSBmcm9tIGh0dHBzOi8vY3MuYW5kcm9pZC5jb20vYW5kcm9pZC9wbGF0Zm9ybS9zdXBl
-cnByb2plY3QvKy9hbmRyb2lkLWxhdGVzdC1yZWxlYXNlOmhhcmR3YXJlL2ludGVyZmFjZXMvYmx1
-ZXRvb3RoL2FpZGwvZGVmYXVsdC9uZXRfYmx1ZXRvb3RoX21nbXQuY3BwIGxpbmUgMjgyLgoKQ291
-bGQga2VybmVsIHJlbW92ZSB0aGUgbGltaXRhdGlvbiB0aGF0IEhDSV9DSEFOTkVMX1VTRVIgY2Fu
-IG5vdCBjaGFuZ2UgTVRVPwoKVGhhbmtzLgpCLlIuCkppZ29uZyBZaW4KCgoK5Y+R6Ieqdml2b+eU
-teWtkOmCruS7tg==
-----_com.android.email_1073209348362422
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: base64
+On Thu, Apr 23, 2026 at 12:24:02PM -0400, Bartosz Golaszewski wrote:
+> On Wed, 22 Apr 2026 13:24:42 +0200, Manivannan Sadhasivam via B4 Relay
+> <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> said:
+> > From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> >
+> > Introduce an API pwrseq_is_fixed() so that the consumers can check whether
+> > the given power sequencer is fixed or controllable. This will come handy
+> > in situations where the consumers need to know whether the specific power
+> > sequencer like 'Bluetooth' can be controllable using properties like BT_EN.
+> >
+> > Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> > ---
+> >
+> 
+> I have several concerns about this new function: its name is very vague and
+> doesn't really indicate its function (how is it "fixed" if you still control
+> it?), it can be used to expose all kinds of things because of this lack of
+> precision. I feel like it goes against the goal of pwrseq which is to abstract
+> these things away from consumers.
+> 
+> The problem we have here is for now a HW quirk affecting a single driver. I'm
+> thinking that we can live with this driver just checking the relevant property
+> of the provider device.
+> 
+> Many subsystems provide functions that allow accessing the struct device
+> associated with the provider. Could we introduce something like:
+> 
+> struct device *pwrseq_to_device(struct pwrseq_desc);
+> 
+> that would return the address of struct device associated with the provider of
+> the descriptor? It wouldn't even have to return a new reference as holding a
+> descriptor already implies also holding a reference to the pwrseq device
+> backing it.
+> 
+> Then in the bluetooth driver you could do:
+> 
+> 	struct pwrseq_desc *pwrseq = pwrseq_get(dev, "bluetooth");
+> 	struct device *dev = pwrseq_to_device(pwrseq);
+> 
+> 	// Big fat comment stating why you do this
+> 	if (!device_property_present(dev, "enable-gpios")) {
+> 		// do whatever quirk is required
+> 	}
+> 
+> Would that make sense?
+> 
 
-PCFET0NUWVBFIGh0bWw+CjxodG1sPgogICAgPGhlYWQ+CiAgICAgICAgPG1ldGEgaHR0cC1lcXVp
-dj0iQ29udGVudC1UeXBlIiBjb250ZW50PSJ0ZXh0L2h0bWw7IGNoYXJzZXQ9VVRGLTgiPgogICAg
-ICAgIDwhLS08bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRo
-LCBpbml0aWFsLXNjYWxlPTEiIC8+LS0+CiAgICAgICAgPHRpdGxlPuWbnuWkjTogQWJvdXQgS2Vy
-bmVsIGxpbWl0YXRpb24gSENJX01BWF9GUkFNRV9TSVpFICgxMDI0ICsgNCk8L3RpdGxlPgogICAg
-ICAgIDxzdHlsZT4KICAgICAgICBhe3RleHQtZGVjb3JhdGlvbjpub25lfQogICAgICAgIDwvc3R5
-bGU+CiAgICA8L2hlYWQ+CiAgICA8Ym9keT4KICAgICAgICA8ZGl2IGlkPSJ2aXZvQ29udGFpbmVy
-IiA+CiAgICAgICAgICAgIDxkaXYgaWQ9InZpdm9Cb2R5Ij48ZGl2IGRpcj0ibHRyIj5IaSBWdWRl
-bnR6LDwvZGl2Pgo8YnI+CjxkaXYgZGlyPSJsdHIiPkluIHRoZSBmdXR1cmUsIEJUIFNJRyB3aWxs
-IGludHJvZHVjZSB0aGUgSGlnaCBEYXRhIFRocm91Z2hwdXQgKEhEVCksIHdoaWNoIG1heSByZXF1
-aXJlIHRyYW5zbWl0IGxhcmdlciBkYXRhIHNpemUsIG5vdCBqdXN0IDEwMjQuPC9kaXY+CjxkaXYg
-ZGlyPSJsdHIiPlNvIHdoYXQncyB5b3VyIG9waW5pb25zPyBDb3VsZCBrZXJuZWwgcmVtb3ZlIHRo
-ZSBsaW1pdGF0aW9uIHRoYXQgSENJX0NIQU5ORUxfVVNFUiBjYW4gbm90IGNoYW5nZSBNVFU/PC9k
-aXY+CjxkaXYgZGlyPSJsdHIiPkxvb2tpbmcgZm9yd2FyZCB0byB5b3VyIHJlcGx5LCB0aGFuayB5
-b3UgdmVyeSBtdWNoLjwvZGl2Pgo8YnI+CjxkaXYgZGlyPSJsdHIiPkIuUi48L2Rpdj4KPGRpdiBk
-aXI9Imx0ciI+Smlnb25nIFlpbijmrrflkInlip8pPC9kaXY+CjwvZGl2PgogICAgICAgICAgICA8
-ZGl2IGlkPSJ2aXZvU2lnbiIgc3R5bGU9Im1hcmdpbi10b3A6IDFlbTsiPjwvZGl2PgogICAgICAg
-IDwvZGl2PgogICAgPC9ib2R5Pgo8L2h0bWw+PGRpdiBjbGFzcz0icXVvdGUiPi0tLS0tLS0tLS0g
-5Zue5aSN55qE5Y6f6YKu5Lu2IC0tLS0tLS0tLS08YnI+5Y+R5Lu25Lq677yaeWpnMDEwNyAmbHQ7
-PGEgaHJlZj1tYWlsdG86eWpnMDEwN0AxNjMuY29tPnlqZzAxMDdAMTYzLmNvbTwvYT4mZ3Q7PGJy
-PuaXpeacn++8mjIwMjblubQ05pyIMjfml6UgMTQ6NDA8YnI+5Li76aKY77yaQWJvdXQgS2VybmVs
-IGxpbWl0YXRpb24gSENJX01BWF9GUkFNRV9TSVpFICgxMDI0ICsgNCk8YnI+5pS25Lu25Lq677ya
-JnF1b3Q7bHVpei5kZW50eiZxdW90OyAmbHQ7PGEgaHJlZj1tYWlsdG86bHVpei5kZW50ekBnbWFp
-bC5jb20+bHVpei5kZW50ekBnbWFpbC5jb208L2E+Jmd0Ozxicj7mioTpgIHvvJpsaW51eC1ibHVl
-dG9vdGggJmx0OzxhIGhyZWY9bWFpbHRvOmxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc+
-bGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZzwvYT4mZ3Q7PGJyPjxiciB0eXBlPSdhdHRy
-aWJ1dGlvbic+PCFET0NUWVBFIGh0bWw+CjxodG1sPgogICAgPGhlYWQ+CiAgICAgICAgPG1ldGEg
-aHR0cC1lcXVpdj0iQ29udGVudC1UeXBlIiBjb250ZW50PSJ0ZXh0L2h0bWw7IGNoYXJzZXQ9VVRG
-LTgiPgogICAgICAgIDwhLS08bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2
-aWNlLXdpZHRoLCBpbml0aWFsLXNjYWxlPTEiIC8+LS0+CiAgICAgICAgPHRpdGxlPkFib3V0IEtl
-cm5lbCBsaW1pdGF0aW9uIEhDSV9NQVhfRlJBTUVfU0laRSAoMTAyNCArIDQpPC90aXRsZT4KICAg
-ICAgICA8c3R5bGU+CiAgICAgICAgYXt0ZXh0LWRlY29yYXRpb246bm9uZX0KICAgICAgICA8L3N0
-eWxlPgogICAgPC9oZWFkPgogICAgPGJvZHk+CiAgICAgICAgPGRpdiBpZD0idml2b0NvbnRhaW5l
-ciIgPgogICAgICAgICAgICA8ZGl2IGlkPSJ2aXZvQm9keSI+PGRpdiBkaXI9Imx0ciI+SGkgTHVp
-eiw8L2Rpdj4KPGJyPgo8ZGl2IGRpcj0ibHRyIj5RdWVzdGlvbiBpcyBzYW1lIGFzIDxhIGhyZWY9
-aHR0cHM6Ly9naXRodWIuY29tL2JsdWV6L2JsdWV6L2lzc3Vlcy8yMDczLj5odHRwczovL2dpdGh1
-Yi5jb20vYmx1ZXovYmx1ZXovaXNzdWVzLzIwNzMuPC9hPjwvZGl2Pgo8ZGl2IGRpcj0ibHRyIj5B
-Ym91dCBLZXJuZWwgbGltaXRhdGlvbiBIQ0lfTUFYX0ZSQU1FX1NJWkUgKDEwMjQgKyA0KSwgeW91
-IHNhaWQgdGhhdCB0aGlzIHdpbGwgYmUgZml4ZWQgdG8gZW5hYmxlIHVzZXIgc3BhY2UgY2hhbmdl
-ZCwgZnJvbSAjMjAxIChjb21tZW50KS48L2Rpdj4KPGRpdiBkaXI9Imx0ciI+VGhlIHBhdGNoIGNv
-bW1pdCBpcyB0b3J2YWxkcy9saW51eEAwOTU3MmZjLCByaWdodD88L2Rpdj4KPGJyPgo8ZGl2IGRp
-cj0ibHRyIj5Ib3dldmVyLCB3aHkgSENJX0NIQU5ORUxfVVNFUiB0eXBlIGNhbiBub3QgY2hhbmdl
-IE1UVSB2YWx1ZT8gR29vZ2xlIGJsdWV0b290aCBhaWRsIHVzZXMgSENJX0NIQU5ORUxfVVNFUiB0
-eXBlIGZyb20gPGEgaHJlZj1odHRwczovL2NzLmFuZHJvaWQuY29tL2FuZHJvaWQvcGxhdGZvcm0v
-c3VwZXJwcm9qZWN0LysvYW5kcm9pZC1sYXRlc3QtcmVsZWFzZTpoYXJkd2FyZS9pbnRlcmZhY2Vz
-L2JsdWV0b290aC9haWRsL2RlZmF1bHQvbmV0X2JsdWV0b290aF9tZ210LmNwcD5odHRwczovL2Nz
-LmFuZHJvaWQuY29tL2FuZHJvaWQvcGxhdGZvcm0vc3VwZXJwcm9qZWN0LysvYW5kcm9pZC1sYXRl
-c3QtcmVsZWFzZTpoYXJkd2FyZS9pbnRlcmZhY2VzL2JsdWV0b290aC9haWRsL2RlZmF1bHQvbmV0
-X2JsdWV0b290aF9tZ210LmNwcDwvYT4gbGluZSAyODIuPC9kaXY+Cjxicj4KPGRpdiBkaXI9Imx0
-ciI+Q291bGQga2VybmVsIHJlbW92ZSB0aGUgbGltaXRhdGlvbiB0aGF0IEhDSV9DSEFOTkVMX1VT
-RVIgY2FuIG5vdCBjaGFuZ2UgTVRVPzwvZGl2Pgo8YnI+CjxkaXYgZGlyPSJsdHIiPlRoYW5rcy48
-L2Rpdj4KPGRpdiBkaXI9Imx0ciI+Qi5SLjwvZGl2Pgo8ZGl2IGRpcj0ibHRyIj5KaWdvbmcgWWlu
-PC9kaXY+Cjxicj4KPGJyPgo8YnI+CjxkaXYgZGlyPSJsdHIiPuWPkeiHqnZpdm/nlLXlrZDpgq7k
-u7Y8L2Rpdj4KPC9kaXY+CiAgICAgICAgICAgIDxkaXYgaWQ9InZpdm9TaWduIiBzdHlsZT0ibWFy
-Z2luLXRvcDogMWVtOyI+PC9kaXY+CiAgICAgICAgPC9kaXY+CiAgICA8L2JvZHk+CjwvaHRtbD48
-L2Jsb2NrcXVvdGU+PC9kaXY+
-----_com.android.email_1073209348362422--
-----_com.android.email_1073209348300880--
+Yeah, sounds good to me. I'll incorporate this in v2, thanks!
 
+- Mani
+
+-- 
+மணிவண்ணன் சதாசிவம்
