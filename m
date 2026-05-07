@@ -1,36 +1,36 @@
-Received: from out-31.smtp.github.com (out-31.smtp.github.com [192.30.252.130])
+Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C4C2D8399
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 18:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24DB64657F8
+	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 18:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778178303; cv=none; b=QY7Ukq5WimSH3v2rFizN7ruBJF757uSQSHsfoDC1RGJVBKqJG2jKuMZ6OYRH5j+vy7vf9m8le0+BpMk5egYCot49zgNCB5C61WblQrMHs2uB+foNVt9pIZtdAzDfi2OFqx0FBdhNNfWy9GH8eTxggXzMJ88aErQxtSD3OlUZ5QI=
+	t=1778178363; cv=none; b=FW7MrKYpSem4g8UbDVfiG4Zq4VJC0Hhp+7JSsJD5ltFISbMFmmT9q3qfVz1ODYSrP5vbp1FMu/GCWi0GQF65MUKH7jWFl2sC7s1zNTcOYTBtNncCXsf2klbiOZGDLYYtxP0FgGCvZ0J0fSld1Gr69Yc152Z8mX3UTLJ4JOsk04c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778178303; c=relaxed/simple;
-	bh=OwLZ9B9aHmF8+ACo+eIdLKiCgHbhcdHpI5oL0Qp+mrw=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=BvGWB9YZQuiVHeG4GUXbBzqhndcTvp5eX9+1RAe4b5bmXGVydv9BxFJfqr9dmYqZ7nZWjI103421qYKr6pMSpF0FwfCSKZc+lHFwtbBbt0RM+7Jh6ks4wNFiT+4uZOOPqXlncSm5JaOBrIgk5fZ4EQx3OnoUIhXoT5TIXFsdv9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=fZuxq3Zp; arc=none smtp.client-ip=192.30.252.130
+	s=arc-20240116; t=1778178363; c=relaxed/simple;
+	bh=WKDdHjC6drv8Angh6Ox459jkv36IRvUxn0rAM0GKmRA=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=SQN03MQR3JV37xR1KxHmwQ49wcwlfVt5yBjDTS35dAzAPT5L+WQArDtTms12MwzPtl/yuBjki1BpoRopauXIZxfPd6K0i7LGj7wBTwJh37yoV0KB01GmUbU2o9LlZLCHNkVrp4UJ7lCGFQKXlpd/ge7ZC0IgIrh1uxho+kYXdTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=CRvS7EHa; arc=none smtp.client-ip=192.30.252.209
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="fZuxq3Zp"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="CRvS7EHa"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1778178301;
-	bh=hep4VKPhw0qh7ir55DYhHl/11VplCUBtL2Q0ZmWjCNU=;
+	s=pf2023; t=1778178361;
+	bh=84HN34eMgzbegzNtAZri2Smhh6bSsnVC83HZnEk4N3E=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=fZuxq3ZpHsKBm7K1Ib/iEixOht2c+WMJxgGadaOeL69E6OvBuigPmi71uqN/Ua1Ff
-	 sNDyEKuDQ9bqjKOI8jaBu7Vj1hVHwQVPUnNQrgGISHRcSPkERZqJQIhw5CSgyPR/Ap
-	 fehjcb4zqjwgLVUSWaJBCxYz7FiZ8p7Xy3+gE8yM=
-Received: from github.com (hubbernetes-node-15446f7.ac4-iad.github.net [10.52.208.57])
-	by smtp.github.com (Postfix) with ESMTPA id DF77732117F
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 11:25:01 -0700 (PDT)
-Date: Thu, 07 May 2026 11:25:01 -0700
-From: qarnet <noreply@github.com>
+	b=CRvS7EHaxDezd4HJ7C8HCTBah7mFhOOJcA8LgSn2lEHDZT6T90w6MdqI/q/fo9suQ
+	 xF2dTrjuVqm14d2sOZJG2hdpkaLDdYc3QruGnMZuCYrzI+rP1UHQGx/Fq3aC3RVj2K
+	 hFKJLRP/Ngx1TqVNxzHCZZBe4dCnohXJRr0qB5RQ=
+Received: from github.com (hubbernetes-node-ed49da3.ash1-iad.github.net [10.56.200.47])
+	by smtp.github.com (Postfix) with ESMTPA id 3F409521059
+	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 11:26:01 -0700 (PDT)
+Date: Thu, 07 May 2026 11:26:01 -0700
+From: prathibhamadugonde <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/e3dec6-d45fd4@github.com>
-Subject: [bluez/bluez] d45fd4: bap: Fix typo in QoS D-Bus dictionary entry
- names
+Message-ID: <bluez/bluez/push/refs/heads/1091197/000000-27e1da@github.com>
+Subject: [bluez/bluez] 27e1da: monitor: Add parsing of CS step mode data in
+ RAS N...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,24 +43,19 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
+  Branch: refs/heads/1091197
   Home:   https://github.com/bluez/bluez
-  Commit: d45fd43a1cc3ba791858f11c144112c518a9ad84
-      https://github.com/bluez/bluez/commit/d45fd43a1cc3ba791858f11c144112c518a9ad84
-  Author: Thomas Kirschner <thomaskirschner85@yahoo.de>
+  Commit: 27e1daee95cfa9081887153b978ec5a512c45945
+      https://github.com/bluez/bluez/commit/27e1daee95cfa9081887153b978ec5a512c45945
+  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
   Date:   2026-05-07 (Thu, 07 May 2026)
 
   Changed paths:
-    M profiles/audio/bap.c
+    M monitor/att.c
 
   Log Message:
   -----------
-  bap: Fix typo in QoS D-Bus dictionary entry names
-
-MinimumDelay and PreferredMinimumDelay had wrong spelling, causing
-them to be exposed incorrectly over D-Bus. Any client relying on
-the correct spelling would fail to find these entries, breaking
-LE Audio QoS negotiation.
+  monitor: Add parsing of CS step mode data in RAS Notifications
 
 
 
