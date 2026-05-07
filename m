@@ -1,112 +1,75 @@
-Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9491015B998
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 00:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2180933064D
+	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 08:13:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778115530; cv=none; b=cAsZtdjHYrV1qzzV6zK4D+KSkE0Hd/Um/3zJQSNmTR4LysRl/4rbOt3sQnmDkpp0592GA4DTpNtWEl93yaHF9zxT8tBF+gmaIocG++KDuYjW9H09mD0xLQBUm+UCbTzF27Yb3/63gB/MORn5JQEjzeKIfDqrf9ARlyZr6ERNSA8=
+	t=1778141589; cv=none; b=Px+kwGE6oRFJAYzhwSviBFIOHFBXvfWpUemx9xqQZ8LdbFfff5ImSafBV8yQ5ZWPBgArmvX8iUYCq/0AT71MlmMq3wXCJXZlLvQUV8jH8etmC1Togu7N90sJ7t/YC1RaMfu7giNXPIiVK8EoR4jKNYLX+GcER6eM8avGc7LESKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778115530; c=relaxed/simple;
-	bh=QV4iqx5owyIJ5STcCgKyoKxSK/XvCEnHXUXJWRZqttU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=EgGuzfaIlNEEkT5Q7ozOuvHC0H74VFAv94zZgvuxtGQWKpwCI/lo/+CXNboDvEpEgbBVlOBj59XJcukhj5IpoBw+4hRLWDG3n+a0JJP+HjzBDfsmZU0sTZudjvzysj0xjqDYoW/c8KZl3Nf/o0U/K5u1ZbAWJHgafi0jYI4PcLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rfdm4gpV; arc=none smtp.client-ip=74.125.82.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rfdm4gpV"
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-2c156c4a9efso407571eec.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 May 2026 17:58:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778115528; x=1778720328; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=mfu4Bvz3R1a34N+AdgdHqXHGoSuiifRG53+SL2K8Pm0=;
-        b=Rfdm4gpV0xUUuizMiiqzaZbuAn0kE0L38iPWzNSfDYPPJipCijL0UQqNpLmtogeqMb
-         +6VoXSTEJpFsAxc8+oHE9e6JLp7aUoo2CBBH459RvuehS2ndHFv+oo1pzUSaCvUDPYqN
-         6RGDrDOru03+Cf6fa7lWLI7LFkiNAtw2ci3XctU854HRkBBIbbr6JLX3z9Z0iUOGErVW
-         qNi3fsbHI/IJV3FYVWbU8QoRHesla2IhF661/VhvlpgYmW5IKWjj52xOK+tJjuL0Gwp3
-         liYm46X49T8qIe6qYAJf2MBeBobZcRJqBywrO5FyF2tQZ9EwBQnGXfPM8/TpjCnSa/T3
-         Jp+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778115528; x=1778720328;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mfu4Bvz3R1a34N+AdgdHqXHGoSuiifRG53+SL2K8Pm0=;
-        b=C+aLZOjOKM5dVFqORExx0pyARIQQ4q+qP5w/Yeox8HsJuryVIw1vQwf8prsB409gCc
-         rpKLlW6WRYPnvgOT8ElKIOVHIQiJSYsg5iH2cX+Gu1TNMVBGNsSVbXWqD/XSRmWPqRl6
-         lFCpmt7HdRqry6yy+xb4ADLv7zpBgxS/o1j72qAl8QSGYhZLC8JoCf6q8oQShEqiGLaf
-         gVnLV94uhjikWU962AuNkx+caDgcm46ledZeww/gnWIMI8FIPbf+lt5nwBuA3raIu+d0
-         nssvrdDByGUv0CMr7APWac4PFZvNxKNS2gdQ/B15SZbmzC4ys9FG3J4DcONscddGrF9S
-         1V4w==
-X-Gm-Message-State: AOJu0Yx4dw/nB9yFKIBb5108ngjdMIgFxRyQWSQHxY+ClTaGz9uUsCAi
-	es+O1RHm6sIbGsEbUvXs6Z7+1bYslf4MJAzVJV84lSA+W2wUMtrir4C+AobLKA==
-X-Gm-Gg: AeBDieuSsKGesQsDTdNqhf1pt37/hWSfVydQQvAxrvv2mbPFNJNFJgDfsxgzafz//2M
-	V3KpmDB8bhJo3sx7ouzeMkpYL24pEuj6IAer4bRS8HWxxfBwASZGoHhOS7l7J+fK0Q3X2H5JWy0
-	5ejaO5TtZHjH2fqDhrv6XahZ8ZFGG7AG0lz1MxEuUs7/BBQf2Viujsr0kJx+FCA3CXrtdUZpxWB
-	9Fhqmv65rzfKwfJjhlYhAOogWkN32205e9VPhu0duxOEMvVjQ2wQLTg4g6YYHWpKVgINlnKAAGv
-	1B/hQVMLzTZBzdeSwxsiLmRQGp4PfjksGf39pvbNrgL4ivREss8A1QQnbNMMKs2cGTmaw+WwULG
-	pTwiQAleq8gvhUavoq0uEjgNGh2surWBYtuuAlQ/jwhVifb4roLrpV3CQLwWkzZzSqRnEq7W7wi
-	rPCj7mFqflB2YPPrvfdduddFY69BXHrCoE+xgd/pkfLvM=
-X-Received: by 2002:a05:7300:6ca8:b0:2e0:1f09:d924 with SMTP id 5a478bee46e88-2f54d696ab4mr3424938eec.5.1778115528263;
-        Wed, 06 May 2026 17:58:48 -0700 (PDT)
-Received: from [172.17.0.2] ([172.184.174.151])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f56f88f548sm6714288eec.18.2026.05.06.17.58.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2026 17:58:47 -0700 (PDT)
-Message-ID: <69fbe3c7.050a0220.595ef.0c78@mx.google.com>
-Date: Wed, 06 May 2026 17:58:47 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4599468339104057084=="
+	s=arc-20240116; t=1778141589; c=relaxed/simple;
+	bh=c6E8lUDUoWUunenEENLBXRDXAZKhC1URYEQ4EDfWpkk=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hsEJZFovpopUSC8dSeUyN9Am8sp93U5LlB7sIU9BJXsrx/ygvvMexWb6dA+osTmBiyQnyjQ9SX6Mf78Bwzwut74U8E4Qj4PU1C0vfOm2zWhh6WV5qS19Kyu0b96upED3hT5Vjq7AE+AwrEdg0z7f8Cv/DIDLp+Om3K7nerKgbzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 974943E9C6;
+	Thu,  7 May 2026 08:13:04 +0000 (UTC)
+Message-ID: <a506942c64fea3ff40abe16756de20ee4f426ee2.camel@hadess.net>
+Subject: Re: [PATCH BlueZ] bap: Fix typo in QoS D-Bus dictionary entry names
+From: Bastien Nocera <hadess@hadess.net>
+To: Thomas Kirschner <thomaskirschner85@yahoo.de>, 
+	linux-bluetooth@vger.kernel.org
+Date: Thu, 07 May 2026 10:13:04 +0200
+In-Reply-To: <20260506230051.27436-1-thomaskirschner85@yahoo.de>
+References: <20260506230051.27436-1-thomaskirschner85.ref@yahoo.de>
+	 <20260506230051.27436-1-thomaskirschner85@yahoo.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.1 (3.60.1-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, thomaskirschner85@yahoo.de
-Subject: RE: [BlueZ] bap: Fix typo in QoS D-Bus dictionary entry names
-In-Reply-To: <20260506230051.27436-1-thomaskirschner85@yahoo.de>
-References: <20260506230051.27436-1-thomaskirschner85@yahoo.de>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-GND-Sasl: hadess@hadess.net
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: dmFkZTEA4actgv/+BqguF4HbJo0xnpnlrCgZGQ8WBks6Sar1ecsg96nz1I35jHM9X3JFRqudJz67GQwy4WxAaAgseb0twQw0e7cJ3G4EO22C/2KJJkwHmAP6cqq+L8OyJ+gmaIxXRyz86Ogu20KW9k7vSQUXw6uWy9a3lse9TvKJhJ43/5Xb3qkkWqFlNZ/Jo4weT7e95NlJ4yzTDKQEQgLYJldsxQ/ZkXObvMDK9SAJ8nMn+tkJEcRKGWp+se5S0ZLZwJzRM0vssV3//AAkYoXTl0aA6uPIEhfeRmjjQKU42qQTyFfpvUMf4gp8nw0jqnNLGbnbsg0vyA5xyonEMvDLrfxLqLTZWWhrvvSvK7xeNzYtoalcZsnomsGOHWob8v12Tz/se2ji57xVH1RJHmXtEAJ+mE1ZDtTSuY/oTV52I4nLiWt1KN/eLpZMSGPR7EtfiONz2TbNckFZwxYC7owZfIIi6i6zp2Rrl7TAlb3nUWAc+Gxb7t1cZnWUCrs9qOOk8MGK6btxmkYHWdDfMJSMZc4suG12wOZpDvq+Sg0XmVRJrjlyiIHN2qUnhhuYlEfclpQhhNKx7Rlme8hVPpn58qgzyDVtGevu6fEvuIWy2fThFkwvIdh5pmEQMiewV82fO4C3pIr0T8kGWOyC/lYp5TotHDExl3ZODW9f9kyqe6P5Ow
 
---===============4599468339104057084==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+LGTM
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1090721
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.28 seconds
-GitLint                       PASS      0.20 seconds
-BuildEll                      PASS      19.93 seconds
-BluezMake                     PASS      664.48 seconds
-MakeCheck                     PASS      3.73 seconds
-MakeDistcheck                 PASS      242.46 seconds
-CheckValgrind                 PASS      224.20 seconds
-CheckSmatch                   PASS      345.16 seconds
-bluezmakeextell               PASS      180.63 seconds
-IncrementalBuild              PASS      652.49 seconds
-ScanBuild                     PASS      1008.10 seconds
-
-
-
-https://github.com/bluez/bluez/pull/2105
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4599468339104057084==--
+On Thu, 2026-05-07 at 01:00 +0200, Thomas Kirschner wrote:
+> MinimumDelay and PreferredMinimumDelay had wrong spelling, causing
+> them to be exposed incorrectly over D-Bus. Any client relying on
+> the correct spelling would fail to find these entries, breaking
+> LE Audio QoS negotiation.
+> ---
+> =C2=A0profiles/audio/bap.c | 4 ++--
+> =C2=A01 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+> index 5333267f7..b35542488 100644
+> --- a/profiles/audio/bap.c
+> +++ b/profiles/audio/bap.c
+> @@ -432,11 +432,11 @@ static gboolean get_qos(const
+> GDBusPropertyTable *property,
+> =C2=A0	dict_append_entry(&dict, "Retransmissions", DBUS_TYPE_BYTE,
+> &qos->rtn);
+> =C2=A0	dict_append_entry(&dict, "MaximumLatency", DBUS_TYPE_UINT16,
+> =C2=A0					&qos->latency);
+> -	dict_append_entry(&dict, "MimimumDelay", DBUS_TYPE_UINT32,
+> +	dict_append_entry(&dict, "MinimumDelay", DBUS_TYPE_UINT32,
+> =C2=A0					&qos->pd_min);
+> =C2=A0	dict_append_entry(&dict, "MaximumDelay", DBUS_TYPE_UINT32,
+> =C2=A0					&qos->pd_max);
+> -	dict_append_entry(&dict, "PreferredMimimumDelay",
+> DBUS_TYPE_UINT32,
+> +	dict_append_entry(&dict, "PreferredMinimumDelay",
+> DBUS_TYPE_UINT32,
+> =C2=A0					&qos->ppd_min);
+> =C2=A0	dict_append_entry(&dict, "PreferredMaximumDelay",
+> DBUS_TYPE_UINT32,
+> =C2=A0					&qos->ppd_max);
