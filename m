@@ -1,89 +1,68 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBBE34F49F
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 17:13:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5993EFD39
+	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 17:42:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778174032; cv=none; b=rfdVCG8fvBINvmGzlpxJ1Z5TJIxt2aHj+4EWgQWFNyx6V2KztYZLxYojT2ozfnxz655tM+esPyvzng8ySnPnhz058I0nMxuqftBavmwyOCaUMUH1sWcaeuRedMEsfTWqL2YTGyTVp99iPJzQaaYwRFP+SIA8AYyGrTwTxPUoB20=
+	t=1778175738; cv=none; b=ZAUwCzwOebm6rz9DAo0I5kTNAUiEe9JAhkLC1FmfHi3J1Q8Uujk/6oo790QIDKiipJ5+zZxugoU107kVwV/x8JltS/mlmPMWUCsZSgA4FvfjGsIhwug1wLPB5OjBJeqnUQQ5Ke2JcRs873bANZ9StrsfpPqA1kJGZIejzVrpHUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778174032; c=relaxed/simple;
-	bh=E40OdREOhQCxHFWzEtww1Sq2r3iCmHUm2jMagSIEQn8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tcb5U0fHrjnqjQWlJgnaW3VXDIg9Jhke2cTY+SDNP0lgJPez43uhRbfjO/q7OIbH9J8gQEzuu2DHkkCsYxZubixpJCnEsGHET2L1lF3CGJDoRrvE41ZjPnn0AYsMd+yg6SO8eEv2Dw2tMGXW0eZz0xAK1IlSdYovqq7vXoKgKN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=KZJf1ToE; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=PuwNoh2/; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1778175738; c=relaxed/simple;
+	bh=oU4MjfCF8Cd6juq9wkDxv1ZsE9XD+9yr8jCCupit7JU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=kF7cQGsC2IyORuuPMSUshzR6nJoun50N8LF59hHKMgioze9ui1nQiupsarRIrB2w09c13JpH3Bx9WbfKXE2TK4lHZx9WN3crkhUffJ7su+8ZyB71wjYzvVZPtwRnjl5inLc3w6gSND4sA+K2g3WZ3bqFXxtfw1V7xijLtCDrJuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pXNtNa3Z; arc=none smtp.client-ip=209.85.222.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="KZJf1ToE";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="PuwNoh2/"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 647F5h5w259747
-	for <linux-bluetooth@vger.kernel.org>; Thu, 7 May 2026 17:13:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=vWxlArjgwF81NUv9FAXIv01FwU1EYTIoABq
-	0GOkM3fo=; b=KZJf1ToE9N2YtmvpA/2mw2nmvxUAYvrZQ81BwSHGU37C7MebmTo
-	JYbW4QpdGY8BGgQdN3tYkcF/oZrYB1cvjg6ARjCUvfuqCCKoTf8o0lircvlijq8g
-	ePqnolMiwkP6JsyHOk7yWRE2nv9H4ucoTW8P+Uo1xlF+5uMwtsm2L6jxMWTG3Ui2
-	kpTGFZWxRTzkriC1CWnTaEveezb65oIgtPWrvW/t08O8tFQ7H3ugVutmGMcUkkEv
-	3agZgynEVwQ3maIYF7XHF/K1V2mr2vKYvchg5FIctyQxh9V11Amqc2DyRPyQpZLn
-	QXXPT05nT/dX+28z+jfrsZQA6ffLW7xqDmQ==
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e0hr8ubct-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 07 May 2026 17:13:48 +0000 (GMT)
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2b2eba42b8dso13151975ad.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 May 2026 10:13:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pXNtNa3Z"
+Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-94dcf70af41so329930241.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 May 2026 10:42:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1778174027; x=1778778827; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vWxlArjgwF81NUv9FAXIv01FwU1EYTIoABq0GOkM3fo=;
-        b=PuwNoh2/D6afvpza+P6HKd8yNHXsOu2RFiqTXAElfEB+WFUUa5NZmUamDx8BCUT8KV
-         ab1s+070GqDkUFQ0J09fG/gg2h8m2uDy7ZCio9Lh3KvqCTWfR7sfGYylIV44vd8vO8Ji
-         9//WxIYirJ8gTAOAbKQBgLfO2cramacv9hzlJbQa8FyGZoWBXrS7/zduztx/O9FVHM++
-         1A7/8iLHguKaVlevzBKVtRWIFix4+LP6Jrae246dOYAa4BDi7HZniFwv4oR9bTWQVd0l
-         n50DAwDZhK96D1GOYX1dhspq9Q1/rbLEHXWbUZ05iYt9Z9TAO3whisFH1Uo1MVUHyNtv
-         /6Tg==
+        d=gmail.com; s=20251104; t=1778175735; x=1778780535; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XQEgEma+RFtw1vDyzWrXmsfOnjcuC3OQYgfR1v3vUr4=;
+        b=pXNtNa3Zk+yZZEyyZfK8jpPn6aSVgVS/uhKgJfp9zEOba5TUHpGy1TRlt6kk84oAso
+         RBuATXUgbdIwu2JrVFuJsC1fMVvwG/TKZP/kOzj+1eD8GyAn0HviAFsY4/IqDcToOFrG
+         /4982jYDbkKetTlwDQ4J7xRVZyaMgben3DhubfLspppbG4qSU5DBir/pEqIDXY+s/5hf
+         7SG9vI97em/BRb95MYX8Ox3uMdbQ/6S6TCCeIC16SLzSR2VQkA9ghk9/41von9QrncUt
+         NRcgp805M9rHb93puosh/0wO1nyadCID62Wz+OHPzC5OoHbKbwEPsfTXvGKwyZ/YyLdf
+         mQKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778174027; x=1778778827;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vWxlArjgwF81NUv9FAXIv01FwU1EYTIoABq0GOkM3fo=;
-        b=ZZerYA+G6eDfkPhCyQ31kHXW9Evq3MFlE/A7YdkJ61XPdFktgKCPxDys4N/erJ7W62
-         41pBDLdwfiwDVZRFXI7I36z+zS/QmsPKSnGopxiZD4Q9ilU+BH15C2X29/e6GchcOR76
-         eh68oiRwiMp3EB2g9hdVf4foBpqHwXMjKeTrFAQRHb4SLEP6/7gyb821wq/oViG8TKtZ
-         0dTfQhz8lvrbk6mE45Z9ZoxjfJMfqKO+vnPRgoCcYb4dB85rm+YiveUNViXmz2wd1BAu
-         0MVCb6FDmVyuGcUtCcGm7ecKalLxNkC5SlGa1lqwGti1JO77axprp5sDGjxlqKouNFAH
-         jSig==
-X-Gm-Message-State: AOJu0YzxwH6/2UDqZSQb7u3dxHoFmaIBhWsH3kbcFO9WMwper37QWfCU
-	dERlg70hIpfvjj3bb9yTA1LOHi07GA7ltG3yX2SXQnGp120wYATDLKnamedqd0xnEwK71yfsswO
-	oWhQNtgyR7970YUeg36fSJM2vlIUk6j/eJ1w0RlqYpD/hZG/5HfleOk9WYNkoMNnXzGSS6bsMoT
-	KFslU=
-X-Gm-Gg: Acq92OGDYDufkWdH2/AecX0Fe1HdANP98VKo/uebdkvTBoZ0QXplSA2xVMKfydFAw7D
-	soIsXSEt2pTuM5oqHlq7VbsuBYrQHMp8vu2+8Mkv7UBlkbz8fRP7Faq2mxSXpT/8/XYqbUCXzSZ
-	ytY1m7k9fJAPcoHuXO2MWtFItkS3PSdICvCKSlEwC5Nt8ySCPKx5F0z0bi+SYTlWOsMVEOwtftE
-	OBu66evcv6zxO0C3mr57lL+HJCb52JGaRb7mabWSzMpOWTMRZ4kntDPAejbWwQJK7W5XJ02hme3
-	g1uRYmbERg8jsdL12+eTHedBmsYm75KUZwb14taaK3ZdSqIWobS7xgpWXw+7rEVIgyU6DahTDNO
-	TYgKt6IWrtS6VBxwkz/oONwS8wpWkAJky5ZGNNLIuRMo=
-X-Received: by 2002:a17:903:178b:b0:2ba:881f:6192 with SMTP id d9443c01a7336-2ba881f63c2mr85698715ad.22.1778174027143;
-        Thu, 07 May 2026 10:13:47 -0700 (PDT)
-X-Received: by 2002:a17:903:178b:b0:2ba:881f:6192 with SMTP id d9443c01a7336-2ba881f63c2mr85698285ad.22.1778174026541;
-        Thu, 07 May 2026 10:13:46 -0700 (PDT)
-Received: from hu-prathm-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bae78412bdsm2601335ad.42.2026.05.07.10.13.44
+        d=1e100.net; s=20251104; t=1778175735; x=1778780535;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XQEgEma+RFtw1vDyzWrXmsfOnjcuC3OQYgfR1v3vUr4=;
+        b=kgdgNVcFY1mQw0DW10zTsFvkd31vIDyEta4wOTfVwNuAY651kxnWx9Oia/j5p9CnU6
+         pddjpf/2xgawaC0XlTma+0S+juW1wLSD8gTLw8Rs/9AtZQkVOsx4C/5JnVHRKbZH2HO1
+         Stsz/Wpiwh0s7YOEex5JiF8SPvzOa2ezbzgLJVaCDO1OAwcQ0rFIMxI4UqaJEAo91YGq
+         aTzsZ2I2m7gV5xtdLyFVTCRHLLdmYtbzfnEdx0SV7PBS6GzHk/0+3vexjU5u5beO2Gbv
+         spAQRIB1MAHNDQ9ZXSogjjHV/Vy5wexvt+u1hgp394+3f4n2ohJdAgBWlTPJTjVedcrK
+         ApJA==
+X-Gm-Message-State: AOJu0YxIQw9zsu54BH9/RwUOjNGH4Yw4eXrrSK8IdSYQurJ86SyqKo41
+	vrCB/U9/58vMXtkJCTP4yhD8zwBvkpoGmvxAAN9a7ujzGZTWPyWVA+oK2jRn15Fk
+X-Gm-Gg: AeBDievMr/p9J3OQLErJDgQVNQfKqTfPV/mIdEsmHrVdR26XaLtjiLkyqOwq0y0JllO
+	9C9PC2Yy1ILRfCxQRRlHaKJR33HwOqhKzU5WleqtwIGIx5Ksdhp+MCYG60q9ci+j3pZFlLezAzy
+	GTmZvqcYWgAa50IPyw0jdtwjmRgSiowSy7vrbSE2K3Kd5ofpeHTobLh3bKX0tq285w9sT+IrULw
+	c/MiQw5jpujkk/ETbiAlTcicuqNwqtqvxCr/jBpFGIAIT+fuiHtFcgVhXTpf99sDHWEbWzo/jty
+	m6p9LhpF+WNqB3FY7T3st6P1xjwVjeqDCDGrXDUbEePzZlX2bqtXtnkAEcGyotNXUhFlNr8+abB
+	DZXWLvTipd20R3WbX1YnvZvi/Sb6bPWtYegB5gpv2L3a24ENCS1xn+lKEuBOKFJ3XPrXOpOYC5F
+	sThX5RfHdInIAUkuvnUV3MY0CskPMXBTU+m9TmTAHhWqrZVCbplOC5NpY/xj7ZsIXiBQmFvg2cH
+	DJ9/ZZtBV0+JTUvTY5YY/lHrzCW
+X-Received: by 2002:a05:6102:26ce:b0:62f:549d:ad1b with SMTP id ada2fe7eead31-630f8e9ad0amr5182114137.7.1778175734941;
+        Thu, 07 May 2026 10:42:14 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5754dc8b662sm5355317e0c.4.2026.05.07.10.42.14
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 10:13:46 -0700 (PDT)
-From: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-X-Google-Original-From: Prathibha Madugonde <prathm@qti.qualcomm.com>
+        Thu, 07 May 2026 10:42:14 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
-        quic_anubhavg@quicinc.com
-Subject: [PATCH BlueZ v1] monitor: Add parsing of CS step mode data in RAS Notifications
-Date: Thu,  7 May 2026 22:43:42 +0530
-Message-Id: <20260507171342.2971553-1-prathm@qti.qualcomm.com>
-X-Mailer: git-send-email 2.34.1
+Subject: [PATCH v4 1/2] Bluetooth: HCI: Add initial support for Short Connection Interval feature
+Date: Thu,  7 May 2026 13:42:04 -0400
+Message-ID: <20260507174205.209488-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -91,656 +70,398 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: JbuQGbC0jY7vBOIlBcG2D2gQdnhuohBU
-X-Authority-Analysis: v=2.4 cv=caHiaHDM c=1 sm=1 tr=0 ts=69fcc84c cx=c_pps
- a=IZJwPbhc+fLeJZngyXXI0A==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22 a=EUspDBNiAAAA:8
- a=RTxZpuEgJeujCBl3evkA:9 a=uG9DUKGECoFWVXl0Dc02:22
-X-Proofpoint-GUID: JbuQGbC0jY7vBOIlBcG2D2gQdnhuohBU
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA3MDE3MyBTYWx0ZWRfX+l6bxRF+9s9H
- jUXfZjBcCiBqp9VPv02FLazYIRZgakSP3qgjlovq/8xlMXa3nDPV8Osd2D/ZrQ+EPa0q1JhVl0O
- 237MvXVrGCiKzlhVTT3urKx8vdMo2gWzu1RICn0BkeMH1Fc4DVnTahE/ZeXNWqJqtDoxG22hFPL
- jgWbjGyFR9X69MbNiVDMzmxBVisEPM2mps9+5vVykIRpnv+NjDKW37ME5WluiT0cbH6SCc2KzQG
- 30nBe/gkgjQ+Edt3ju5y+UC395W05yTtfsr3EC8xZWLS1aRApFwjRdTc4mODAU+X8ZzFCzACmiB
- zCmmZshDiI22Xsk2o32QTnC2ocpGtgOH9DgJut7/7MiJnk+qVDeYp2LW9sPIHkhedqIDydEl8Aq
- 3ngDx1zU4Hy262vW9FmQ1M0lf0jBAoD/FD9zypgQ6h29kNsCGo5Ad2NRjecTKf8Un/5KJ//9wqm
- yPjB9GdLAiq3fOb+3yg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-07_02,2026-05-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 clxscore=1015 suspectscore=0 bulkscore=0 priorityscore=1501
- adultscore=0 lowpriorityscore=0 impostorscore=0 spamscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2605070173
 
-From: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This adds initial support for SCI related commands, command bits, event
+event mask bit and feature bits:
+
+Events:
+
+HCI_LE_Connection_Rate_Change(0x37)
+
+Commands:
+
+HCI_LE_Connection_Rate_Request(0x20a1)
+HCI_LE_Set_Default_Rate_Parameters(0x20a2)
+HCI_LE_Read_Minimum_Supported_Connection_Interval(0x20a3)
+
+Also update the init sequence to incorporte support for reading SCI
+groups and then setting the Default Rate
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- monitor/att.c | 512 +++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 491 insertions(+), 21 deletions(-)
+ include/net/bluetooth/hci.h      | 52 ++++++++++++++++++++
+ include/net/bluetooth/hci_core.h | 15 ++++++
+ net/bluetooth/hci_core.c         | 14 +++++-
+ net/bluetooth/hci_event.c        | 60 +++++++++++++++++++++++
+ net/bluetooth/hci_sync.c         | 83 +++++++++++++++++++++++++++++++-
+ 5 files changed, 222 insertions(+), 2 deletions(-)
 
-diff --git a/monitor/att.c b/monitor/att.c
-index 03d46634f..a979ab241 100644
---- a/monitor/att.c
-+++ b/monitor/att.c
-@@ -4120,16 +4120,18 @@ static void print_ras_segmentation_header(uint8_t header)
- 	print_field("    Segment Index: %u", segment_index);
- }
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 572b1c620c5d..848ec42de827 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -656,6 +656,7 @@ enum {
+ #define HCI_LE_LL_EXT_FEATURE		0x80
+ #define HCI_LE_CS			0x40
+ #define HCI_LE_CS_HOST			0x80
++#define HCI_LE_SCI			0x01
  
--static void print_ras_ranging_header(const struct l2cap_frame *frame)
-+static uint8_t print_ras_ranging_header(const struct l2cap_frame *frame)
- {
- 	uint16_t ranging_counter_config;
- 	uint8_t selected_tx_power;
- 	uint8_t antenna_paths_mask;
- 	uint8_t mask;
-+	uint8_t num_antenna_paths = 0;
-+	uint8_t i;
+ /* Connection modes */
+ #define HCI_CM_ACTIVE	0x0000
+@@ -2486,6 +2487,46 @@ struct hci_rp_le_cs_test {
  
- 	if (!l2cap_frame_get_le16((void *)frame, &ranging_counter_config)) {
- 		print_text(COLOR_ERROR, "    Ranging Header: invalid size");
--		return;
-+		return 0;
- 	}
+ #define HCI_OP_LE_CS_TEST_END			0x2096
  
- 	/* Lower 12 bits: Ranging Counter, Upper 4 bits: Configuration ID */
-@@ -4140,14 +4142,14 @@ static void print_ras_ranging_header(const struct l2cap_frame *frame)
++#define HCI_OP_LE_CONN_RATE			0x20a1
++struct hci_cp_le_conn_rate {
++	__le16   handle;
++	__le16   interval_min;
++	__le16   interval_max;
++	__le16   subrate_min;
++	__le16   subrate_max;
++	__le16   max_latency;
++	__le16   cont_num;
++	__le16   supv_timeout;
++	__le16   min_ce_len;
++	__le16   max_ce_len;
++} __packed;
++
++#define HCI_OP_LE_SET_DEF_RATE		0x20a2
++struct hci_cp_le_set_def_rate {
++	__le16   interval_min;
++	__le16   interval_max;
++	__le16   subrate_min;
++	__le16   subrate_max;
++	__le16   max_latency;
++	__le16   cont_num;
++	__le16   supv_timeout;
++	__le16   min_ce_len;
++	__le16   max_ce_len;
++} __packed;
++
++#define HCI_OP_LE_READ_CONN_INTERVAL	0x20a3
++struct hci_le_conn_interval_group {
++	__le16   min;
++	__le16   max;
++	__le16   stride;
++} __packed;
++
++struct hci_rp_le_read_conn_interval {
++	__u8    status;
++	__u8    num_grps;
++	struct hci_le_conn_interval_group grps[] __counted_by(num_grps);
++} __packed;
++
+ /* ---- HCI Events ---- */
+ struct hci_ev_status {
+ 	__u8    status;
+@@ -3300,6 +3341,17 @@ struct hci_evt_le_cs_test_end_complete {
+ 	__u8	status;
+ } __packed;
  
- 	if (!l2cap_frame_get_u8((void *)frame, &selected_tx_power)) {
- 		print_text(COLOR_ERROR, "    Selected TX Power: invalid size");
--		return;
-+		return 0;
- 	}
++#define HCI_EVT_LE_CONN_RATE_CHANGE			0x37
++struct hci_evt_le_conn_rate_change {
++	__u8	status;
++	__le16	handle;
++	__le16	interval;
++	__le16	subrate;
++	__le16	latency;
++	__le16	cont_number;
++	__le16	supv_timeout;
++} __packed;
++
+ #define HCI_EV_VENDOR			0xff
  
- 	print_field("    Selected TX Power: %d dBm", (int8_t)selected_tx_power);
+ /* Internal events generated by Bluetooth stack */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index aa600fbf9a53..61872403fe65 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -333,6 +333,14 @@ struct adv_monitor {
+ #define HCI_ADV_MONITOR_EXT_NONE		1
+ #define HCI_ADV_MONITOR_EXT_MSFT		2
  
- 	if (!l2cap_frame_get_u8((void *)frame, &antenna_paths_mask)) {
- 		print_text(COLOR_ERROR, "    Antenna Paths Mask: invalid size");
--		return;
-+		return 0;
- 	}
++
++struct sci_group {
++	struct list_head list;
++	__u16 min;
++	__u16 max;
++	__u16 stride;
++};
++
+ #define HCI_MAX_SHORT_NAME_LENGTH	10
  
- 	print_field("    Antenna Paths Mask: 0x%2.2x", antenna_paths_mask);
-@@ -4157,6 +4159,14 @@ static void print_ras_ranging_header(const struct l2cap_frame *frame)
+ #define HCI_CONN_HANDLE_MAX		0x0eff
+@@ -572,6 +580,7 @@ struct hci_dev {
+ 	struct list_head	pend_le_reports;
+ 	struct list_head	blocked_keys;
+ 	struct list_head	local_codecs;
++	struct list_head	sci_groups;
  
- 	if (mask)
- 		print_text(COLOR_WHITE_BG, "      RFU (0x%2.2x)", mask);
-+
-+	/* Count the number of set bits in antenna_paths_mask */
-+	for (i = 0; i < 4; i++) {
-+		if (antenna_paths_mask & (1 << i))
-+			num_antenna_paths++;
-+	}
-+
-+	return num_antenna_paths;
- }
+ 	struct hci_dev_stats	stat;
  
- static const char *ras_ranging_done_status_str(uint8_t status)
-@@ -4203,7 +4213,7 @@ static const char *ras_abort_reason_str(uint8_t reason)
- 	}
- }
+@@ -2082,6 +2091,12 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define mws_transport_config_capable(dev) (((dev)->commands[30] & 0x08) && \
+ 	(!hci_test_quirk((dev), HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG)))
  
--static void print_ras_subevent_header(const struct l2cap_frame *frame)
-+static uint8_t print_ras_subevent_header(const struct l2cap_frame *frame)
- {
- 	uint16_t start_acl_conn_event;
- 	uint16_t freq_compensation;
-@@ -4216,7 +4226,7 @@ static void print_ras_subevent_header(const struct l2cap_frame *frame)
- 	if (!l2cap_frame_get_le16((void *)frame, &start_acl_conn_event)) {
- 		print_text(COLOR_ERROR,
- 			"      Start ACL Connection Event: invalid size");
--		return;
-+		return 0;
- 	}
++/* Shorter Connection Intervals support */
++#define le_sci_capable(dev) \
++	((dev)->le_features[9] & HCI_LE_SCI)
++
++void hci_sci_groups_clear(struct hci_dev *hdev);
++
+ /* ----- HCI protocols ----- */
+ #define HCI_PROTO_DEFER             0x01
  
- 	print_field("      Start ACL Connection Event: %u",
-@@ -4225,7 +4235,7 @@ static void print_ras_subevent_header(const struct l2cap_frame *frame)
- 	if (!l2cap_frame_get_le16((void *)frame, &freq_compensation)) {
- 		print_text(COLOR_ERROR,
- 			"      Frequency Compensation: invalid size");
--		return;
-+		return 0;
- 	}
- 
- 	print_field("      Frequency Compensation: %d (0.01 ppm)",
-@@ -4233,7 +4243,7 @@ static void print_ras_subevent_header(const struct l2cap_frame *frame)
- 
- 	if (!l2cap_frame_get_u8((void *)frame, &status_byte1)) {
- 		print_text(COLOR_ERROR, "      Status: invalid size");
--		return;
-+		return 0;
- 	}
- 
- 	ranging_done_status = status_byte1 & 0x0F;
-@@ -4248,7 +4258,7 @@ static void print_ras_subevent_header(const struct l2cap_frame *frame)
- 
- 	if (!l2cap_frame_get_u8((void *)frame, &status_byte2)) {
- 		print_text(COLOR_ERROR, "      Abort Reasons: invalid size");
--		return;
-+		return 0;
- 	}
- 
- 	ranging_abort_reason = status_byte2 & 0x0F;
-@@ -4264,7 +4274,7 @@ static void print_ras_subevent_header(const struct l2cap_frame *frame)
- 	if (!l2cap_frame_get_u8((void *)frame, &ref_power_level)) {
- 		print_text(COLOR_ERROR,
- 			"      Reference Power Level: invalid size");
--		return;
-+		return 0;
- 	}
- 
- 	print_field("      Reference Power Level: %d dBm",
-@@ -4273,10 +4283,451 @@ static void print_ras_subevent_header(const struct l2cap_frame *frame)
- 	if (!l2cap_frame_get_u8((void *)frame, &num_steps_reported)) {
- 		print_text(COLOR_ERROR,
- 			"      Number of Steps Reported: invalid size");
--		return;
-+		return 0;
- 	}
- 
- 	print_field("      Number of Steps Reported: %u", num_steps_reported);
-+
-+	return num_steps_reported;
-+}
-+
-+static const char *packet_quality_str(uint8_t quality)
-+{
-+	switch (quality & 0x03) {
-+	case 0x00:
-+		return "CS Access Address check is successful, and all bits "
-+			"match the expected sequence";
-+	case 0x01:
-+		return "CS Access Address check is successful, but some bits "
-+			"do not match the expected sequence";
-+	case 0x02:
-+		return "CS Access Address check failed";
-+	default:
-+		return "Reserved";
-+	}
-+}
-+
-+static const char *tone_quality_str(uint8_t quality)
-+{
-+	switch (quality & 0x03) {
-+	case 0x00:
-+		return "Tone quality is high";
-+	case 0x01:
-+		return "Tone quality is medium";
-+	case 0x02:
-+		return "Tone quality is low";
-+	case 0x03:
-+		return "Tone quality indication is not available";
-+	default:
-+		return "Reserved";
-+	}
-+}
-+
-+static const char *tone_extension_str(uint8_t quality)
-+{
-+	switch ((quality >> 4) & 0x03) {
-+	case 0x00:
-+		return "Not tone extension slot";
-+	case 0x01:
-+		return "Tone extension slot; tone not expected to be present";
-+	case 0x02:
-+		return "Tone extension slot; tone expected to be present";
-+	default:
-+		return "Reserved";
-+	}
-+}
-+
-+static void print_step_mode_0(const struct l2cap_frame *frame, uint8_t len)
-+{
-+	uint8_t quality, rssi, antenna;
-+	uint16_t freq_offset;
-+
-+	if (len < 3) {
-+		print_hex_field("  Raw step data", frame->data, len);
-+		return;
-+	}
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &quality)) {
-+		print_text(COLOR_ERROR, "  Packet Quality: invalid size");
-+		return;
-+	}
-+
-+	print_field("  Packet Quality: 0x%02x", quality);
-+	print_field("    %s", packet_quality_str(quality));
-+	print_field("    Bit errors: %u", (quality >> 2) & 0x3F);
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &rssi)) {
-+		print_text(COLOR_ERROR, "  Packet RSSI: invalid size");
-+		return;
-+	}
-+
-+	print_field("  Packet RSSI: %d", (int8_t)rssi);
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &antenna)) {
-+		print_text(COLOR_ERROR, "  Packet Antenna: invalid size");
-+		return;
-+	}
-+
-+	print_field("  Packet Antenna: %u", antenna);
-+
-+	if (len == 5) {
-+		if (!l2cap_frame_get_le16((void *)frame, &freq_offset)) {
-+			print_text(COLOR_ERROR,
-+				"  Measured Freq Offset: invalid size");
-+			return;
-+		}
-+
-+		print_field("  Measured Freq Offset: %d (0.01 ppm)",
-+						(int16_t)freq_offset);
-+	}
-+}
-+
-+static void print_step_mode_1(const struct l2cap_frame *frame, uint8_t len)
-+{
-+	uint8_t quality, nadm, rssi, antenna;
-+	uint16_t toa_tod;
-+
-+	if (len < 6) {
-+		print_hex_field("  Raw step data", frame->data, len);
-+		return;
-+	}
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &quality)) {
-+		print_text(COLOR_ERROR, "  Packet Quality: invalid size");
-+		return;
-+	}
-+
-+	print_field("  Packet Quality: 0x%02x", quality);
-+	print_field("    %s", packet_quality_str(quality));
-+	print_field("    Bit errors: %u", (quality >> 2) & 0x3F);
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &nadm)) {
-+		print_text(COLOR_ERROR, "  Packet NADM: invalid size");
-+		return;
-+	}
-+
-+	if (nadm == 0xFF)
-+		print_field("  Packet NADM: Unknown NADM (0xff)");
-+	else
-+		print_field("  Packet NADM: %u", nadm);
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &rssi)) {
-+		print_text(COLOR_ERROR, "  Packet RSSI: invalid size");
-+		return;
-+	}
-+
-+	print_field("  Packet RSSI: %d", (int8_t)rssi);
-+
-+	if (!l2cap_frame_get_le16((void *)frame, &toa_tod)) {
-+		print_text(COLOR_ERROR, "  ToA_ToD: invalid size");
-+		return;
-+	}
-+
-+	print_field("  ToA_ToD: 0x%08x", toa_tod | 0xFFFF0000);
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &antenna)) {
-+		print_text(COLOR_ERROR, "  Packet Antenna: invalid size");
-+		return;
-+	}
-+
-+	print_field("  Packet Antenna: %u", antenna);
-+}
-+
-+static void print_step_mode_2(const struct l2cap_frame *frame, uint8_t len,
-+				uint8_t num_antenna_paths)
-+{
-+	uint8_t ant_perm_idx;
-+	uint8_t i;
-+	uint32_t pct;
-+	uint16_t i_sample, q_sample;
-+	uint8_t quality;
-+
-+	if (len < 1) {
-+		print_hex_field("  Raw step data", frame->data, len);
-+		return;
-+	}
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &ant_perm_idx)) {
-+		print_text(COLOR_ERROR, "  Antenna Permutation Index: "
-+							"invalid size");
-+		return;
-+	}
-+
-+	print_field("  Antenna Permutation Index: %u", ant_perm_idx);
-+
-+	/* Use the antenna paths count from ranging header */
-+	for (i = 0; i < (num_antenna_paths + 1); i++) {
-+		if (frame->size < 4) {
-+			print_text(COLOR_ERROR,
-+				"    Insufficient data for path %u",
-+				i);
-+			return;
-+		}
-+
-+		if (!l2cap_frame_get_le24((void *)frame, &pct)) {
-+			print_text(COLOR_ERROR, "    PCT: invalid size");
-+			return;
-+		}
-+
-+		/* Extract 12-bit I and Q samples from 24-bit PCT */
-+		i_sample = pct & 0x0FFF;
-+		q_sample = (pct >> 12) & 0x0FFF;
-+
-+		print_field("  Path %u", i);
-+		print_field("    PCT: 0x%06x", pct);
-+		print_field("      I: 0x%03x", i_sample);
-+		print_field("      Q: 0x%03x", q_sample);
-+
-+		if (!l2cap_frame_get_u8((void *)frame, &quality)) {
-+			print_text(COLOR_ERROR, "    Tone quality indicator: "
-+							"invalid size");
-+			return;
-+		}
-+
-+		print_field("    Tone quality indicator: 0x%02x", quality);
-+		print_field("      %s (0x%02x)", tone_quality_str(quality),
-+							quality & 0x03);
-+		print_field("      %s (0x%02x)", tone_extension_str(quality),
-+							(quality >> 4) & 0x03);
-+	}
-+}
-+
-+static void print_step_mode_3(const struct l2cap_frame *frame, uint8_t len,
-+				uint8_t num_antenna_paths)
-+{
-+	uint8_t quality, nadm, rssi, antenna;
-+	uint16_t toa_tod;
-+	uint8_t ant_perm_idx;
-+	uint8_t i;
-+	uint32_t pct;
-+	uint16_t i_sample, q_sample;
-+	uint8_t tone_quality;
-+
-+	/* Mode 3 = Mode 1 (6 bytes) + Mode 2 (variable) */
-+	if (len < 6) {
-+		print_hex_field("  Raw step data", frame->data, len);
-+		return;
-+	}
-+
-+	/* Parse Mode 1 data first */
-+	if (!l2cap_frame_get_u8((void *)frame, &quality)) {
-+		print_text(COLOR_ERROR, "  Packet Quality: invalid size");
-+		return;
-+	}
-+
-+	print_field("  Packet Quality: 0x%02x", quality);
-+	print_field("    %s", packet_quality_str(quality));
-+	print_field("    Bit errors: %u", (quality >> 2) & 0x3F);
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &nadm)) {
-+		print_text(COLOR_ERROR, "  Packet NADM: invalid size");
-+		return;
-+	}
-+
-+	if (nadm == 0xFF)
-+		print_field("  Packet NADM: Unknown NADM (0xff)");
-+	else
-+		print_field("  Packet NADM: %u", nadm);
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &rssi)) {
-+		print_text(COLOR_ERROR, "  Packet RSSI: invalid size");
-+		return;
-+	}
-+
-+	print_field("  Packet RSSI: %d", (int8_t)rssi);
-+
-+	if (!l2cap_frame_get_le16((void *)frame, &toa_tod)) {
-+		print_text(COLOR_ERROR, "  ToA_ToD: invalid size");
-+		return;
-+	}
-+
-+	print_field("  ToA_ToD: 0x%08x", toa_tod | 0xFFFF0000);
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &antenna)) {
-+		print_text(COLOR_ERROR, "  Packet Antenna: invalid size");
-+		return;
-+	}
-+
-+	print_field("  Packet Antenna: %u", antenna);
-+
-+	/* Now parse Mode 2 data */
-+	if (frame->size < 1)
-+		return;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &ant_perm_idx)) {
-+		print_text(COLOR_ERROR, "  Antenna Permutation Index: "
-+							"invalid size");
-+		return;
-+	}
-+
-+	print_field("  Antenna Permutation Index: %u", ant_perm_idx);
-+
-+	/* Use the antenna paths count from ranging header */
-+	for (i = 0; i < (num_antenna_paths + 1); i++) {
-+		if (frame->size < 4) {
-+			print_text(COLOR_ERROR,
-+				"    Insufficient data for path %u",
-+				i);
-+			return;
-+		}
-+
-+		if (!l2cap_frame_get_le24((void *)frame, &pct)) {
-+			print_text(COLOR_ERROR, "    PCT: invalid size");
-+			return;
-+		}
-+
-+		/* Extract 12-bit I and Q samples from 24-bit PCT */
-+		i_sample = pct & 0x0FFF;
-+		q_sample = (pct >> 12) & 0x0FFF;
-+
-+		print_field("  Path %u", i);
-+		print_field("    PCT: 0x%06x", pct);
-+		print_field("      I: 0x%03x", i_sample);
-+		print_field("      Q: 0x%03x", q_sample);
-+
-+		if (!l2cap_frame_get_u8((void *)frame, &tone_quality)) {
-+			print_text(COLOR_ERROR, "    Tone quality indicator: "
-+							"invalid size");
-+			return;
-+		}
-+
-+		print_field("    Tone quality indicator: 0x%02x",
-+							tone_quality);
-+		print_field("      %s (0x%02x)",
-+				tone_quality_str(tone_quality),
-+				tone_quality & 0x03);
-+		print_field("      %s (0x%02x)",
-+				tone_extension_str(tone_quality),
-+				(tone_quality >> 4) & 0x03);
-+	}
-+}
-+
-+static void  print_ranging_steps(const struct l2cap_frame *frame,
-+				uint8_t num_steps, uint8_t num_antenna_paths)
-+{
-+	uint8_t step_idx;
-+
-+	for (step_idx = 0; step_idx < num_steps && frame->size > 0;
-+								step_idx++) {
-+		uint8_t mode_byte;
-+		uint8_t mode_type;
-+		bool aborted;
-+		uint8_t step_data_len;
-+
-+		if (!l2cap_frame_get_u8((void *)frame, &mode_byte)) {
-+			print_text(COLOR_ERROR, "Step %u: Mode: invalid size",
-+								step_idx);
-+			return;
-+		}
-+
-+		mode_type = mode_byte & 0x03;
-+		aborted = (mode_byte & 0x80) != 0;
-+
-+		print_field("Step %u", step_idx);
-+		print_field("  Mode Type: %u", mode_type);
-+		print_field("  Aborted: %s", aborted ? "Yes" : "No");
-+
-+		/* If aborted, step data length is 0 */
-+		if (aborted)
-+			continue;
-+
-+		/* Determine step data length based on mode type
-+		 * Mode 0: Check if we have 5 bytes (initiator) or 3 bytes
-+		 * (reflector)
-+		 * Mode 1: Always 6 bytes
-+		 * Mode 2: 1 byte (ant_perm_idx) + num_antenna_paths * 4 bytes
-+		 * Mode 3: 6 bytes (Mode 1) + 1 byte (ant_perm_idx) +
-+		 * num_antenna_paths * 4 bytes
-+		 */
-+		switch (mode_type) {
-+		case 0:
-+			/* Mode 0: Default to 3 bytes (reflector)
-+			 * Only use 5 bytes if we're the last step AND have
-+			 * exactly 5 bytes remaining
-+			 */
-+			if (step_idx == num_steps - 1 && frame->size == 5) {
-+				/* Initiator - last step with exactly 5 bytes */
-+				step_data_len = 5;
-+			} else if (frame->size >= 3) {
-+				/* Reflector - default case */
-+				step_data_len = 3;
-+			} else {
-+				print_text(COLOR_ERROR,
-+					"  Insufficient data for Mode 0");
-+				return;
-+			}
-+			break;
-+		case 1:
-+			/* Mode 1: Always 6 bytes */
-+			if (frame->size < 6) {
-+				print_text(COLOR_ERROR,
-+					"  Insufficient data for Mode 1");
-+				return;
-+			}
-+			step_data_len = 6;
-+			break;
-+		case 2:
-+			/* Mode 2: 1 byte antenna + num_antenna_paths * 4
-+			 * bytes per path
-+			 */
-+			step_data_len = 1 + ((num_antenna_paths + 1) * 4);
-+			if (frame->size < step_data_len) {
-+				print_text(COLOR_ERROR,
-+					"  Insufficient data for Mode 2 (need %u)",
-+					step_data_len);
-+				return;
-+			}
-+			break;
-+		case 3:
-+			/* Mode 3: 6 bytes Mode 1 + 1 byte antenna +
-+			 * num_antenna_paths * 4 bytes
-+			 */
-+			step_data_len = 7 + ((num_antenna_paths + 1) * 4);
-+			if (frame->size < step_data_len) {
-+				print_text(COLOR_ERROR,
-+					"  Insufficient data for Mode 3 (need %u)",
-+					step_data_len);
-+				return;
-+			}
-+			break;
-+		default:
-+			print_text(COLOR_ERROR, "  Unknown mode type");
-+			return;
-+		}
-+
-+		if (step_data_len > frame->size) {
-+			print_text(COLOR_ERROR, "  Invalid step data length");
-+			return;
-+		}
-+
-+		if (step_data_len > 0) {
-+			struct l2cap_frame step_frame;
-+
-+			l2cap_frame_clone(&step_frame, frame);
-+			step_frame.size = step_data_len;
-+
-+			switch (mode_type) {
-+			case 0:
-+				print_step_mode_0(&step_frame, step_data_len);
-+				break;
-+			case 1:
-+				print_step_mode_1(&step_frame, step_data_len);
-+				break;
-+			case 2:
-+				print_step_mode_2(&step_frame, step_data_len,
-+						num_antenna_paths);
-+				break;
-+			case 3:
-+				print_step_mode_3(&step_frame, step_data_len,
-+						num_antenna_paths);
-+				break;
-+			}
-+
-+			if (!l2cap_frame_pull((void *)frame, frame,
-+							step_data_len))
-+				return;
-+		}
-+	}
- }
- 
- static void ras_ranging_data_read(const struct l2cap_frame *frame)
-@@ -4292,26 +4743,45 @@ static void ras_ranging_data_read(const struct l2cap_frame *frame)
- 	print_ras_segmentation_header(seg_header);
- 
- 	first_segment = seg_header & 0x01;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index c46c1236ebfa..04c5559ef029 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2543,8 +2543,9 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
+ 	INIT_LIST_HEAD(&hdev->adv_instances);
+ 	INIT_LIST_HEAD(&hdev->blocked_keys);
+ 	INIT_LIST_HEAD(&hdev->monitored_devices);
 -
- 	/* Only try to decode headers if this is the first segment */
--	if (first_segment && frame->size >= 6) {
-+	if (first_segment && frame->size >= 4) {
-+		uint8_t num_steps;
-+		uint8_t num_antenna_paths;
+ 	INIT_LIST_HEAD(&hdev->local_codecs);
++	INIT_LIST_HEAD(&hdev->sci_groups);
 +
- 		print_field("  Ranging Data Body:");
--		print_ras_ranging_header(frame);
-+		num_antenna_paths = print_ras_ranging_header(frame);
+ 	INIT_WORK(&hdev->rx_work, hci_rx_work);
+ 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
+ 	INIT_WORK(&hdev->tx_work, hci_tx_work);
+@@ -2740,6 +2741,16 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ }
+ EXPORT_SYMBOL(hci_unregister_dev);
  
- 		/* Try to decode subevent header if enough data remains */
--		if (frame->size >= 10) {
-+		if (frame->size >= 8) {
- 			print_field("    Subevent #0:");
--			print_ras_subevent_header(frame);
-+			num_steps = print_ras_subevent_header(frame);
++void hci_sci_groups_clear(struct hci_dev *hdev)
++{
++	struct sci_group *grp, *tmp;
 +
-+			/* Parse steps if we have num_steps and
-+			 * num_antenna_paths
-+			 */
-+			if (num_steps > 0 && num_antenna_paths > 0 &&
-+						frame->size > 0) {
-+				print_ranging_steps((void *)frame, num_steps,
-+						num_antenna_paths);
-+			}
- 		}
-+	} else if (!first_segment && frame->size > 0) {
-+		/* For continuation segments, we cannot reliably decode without
-+		 * full segment reassembly, as steps may be split across
-+		 * segments.
-+		 * Just show the raw data.
-+		 */
-+		print_field("  Continuation Segment (raw data - requires "
-+				"reassembly for proper decoding):");
-+		print_hex_field("    Segment Data", frame->data, frame->size);
++	list_for_each_entry_safe(grp, tmp, &hdev->sci_groups, list) {
++		list_del(&grp->list);
++		kfree(grp);
++	}
++}
++
+ /* Release HCI device */
+ void hci_release_dev(struct hci_dev *hdev)
+ {
+@@ -2766,6 +2777,7 @@ void hci_release_dev(struct hci_dev *hdev)
+ 	hci_discovery_filter_clear(hdev);
+ 	hci_blocked_keys_clear(hdev);
+ 	hci_codec_list_clear(&hdev->local_codecs);
++	hci_sci_groups_clear(hdev);
+ 	msft_release(hdev);
+ 	hci_dev_unlock(hdev);
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index eea2f810aafa..a73c5dad27cd 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3957,6 +3957,49 @@ static u8 hci_cc_le_read_all_local_features(struct hci_dev *hdev, void *data,
+ 	return rp->status;
+ }
+ 
++static u8 hci_cc_le_read_conn_interval(struct hci_dev *hdev, void *data,
++				       struct sk_buff *skb)
++{
++	struct hci_rp_le_read_conn_interval *rp = data;
++	__u8 i;
++
++	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
++
++	if (rp->status)
++		return rp->status;
++
++	hci_dev_lock(hdev);
++
++	/* Clear any existing SCI groups before adding new ones. */
++	hci_sci_groups_clear(hdev);
++
++	for (i = 0; i < rp->num_grps; i++) {
++		struct hci_le_conn_interval_group *grp;
++		struct sci_group *sgrp;
++
++		/* Pull HCI event data for the current group. */
++		grp = skb_pull_data(skb, sizeof(*grp));
++		if (!grp) {
++			bt_dev_err(hdev, "invalid data length for SCI group");
++			break;
++		}
++
++		sgrp = kzalloc(sizeof(*sgrp), GFP_KERNEL);
++		if (!sgrp)
++			break;
++
++		sgrp->min = __le16_to_cpu(grp->min);
++		sgrp->max = __le16_to_cpu(grp->max);
++		sgrp->stride = __le16_to_cpu(grp->stride);
++
++		list_add(&sgrp->list, &hdev->sci_groups);
++	}
++
++	hci_dev_unlock(hdev);
++
++	return rp->status;
++}
++
+ static void hci_cs_le_create_big(struct hci_dev *hdev, u8 status)
+ {
+ 	bt_dev_dbg(hdev, "status 0x%2.2x", status);
+@@ -4239,6 +4282,10 @@ static const struct hci_cc {
+ 	HCI_CC(HCI_OP_LE_READ_ALL_LOCAL_FEATURES,
+ 	       hci_cc_le_read_all_local_features,
+ 	       sizeof(struct hci_rp_le_read_all_local_features)),
++	HCI_CC_VL(HCI_OP_LE_READ_CONN_INTERVAL,
++		  hci_cc_le_read_conn_interval,
++		  sizeof(struct hci_rp_le_read_conn_interval),
++		  HCI_MAX_EVENT_SIZE),
+ };
+ 
+ static u8 hci_cc_func(struct hci_dev *hdev, const struct hci_cc *cc,
+@@ -7372,6 +7419,16 @@ static void hci_le_read_all_remote_features_evt(struct hci_dev *hdev,
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static void hci_le_conn_rate_change_evt(struct hci_dev *hdev, void *data,
++					struct sk_buff *skb)
++{
++	struct hci_evt_le_conn_rate_change *ev = data;
++
++	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
++
++	/* TODO: Store rate to be used for next connection? */
++}
++
+ #define HCI_LE_EV_VL(_op, _func, _min_len, _max_len) \
+ [_op] = { \
+ 	.func = _func, \
+@@ -7483,6 +7540,9 @@ static const struct hci_le_ev {
+ 		     sizeof(struct
+ 			    hci_evt_le_read_all_remote_features_complete),
+ 		     HCI_MAX_EVENT_SIZE),
++	/* [0x37 = HCI_EVT_LE_CONN_RATE_CHANGE] */
++	HCI_LE_EV(HCI_EVT_LE_CONN_RATE_CHANGE, hci_le_conn_rate_change_evt,
++		  sizeof(struct hci_evt_le_conn_rate_change)),
+ };
+ 
+ static void hci_le_meta_evt(struct hci_dev *hdev, void *data,
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index fd3aacdea512..3225bea38215 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -4449,6 +4449,10 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
+ 		events[6] |= 0x02;	/* LE CS Subevent Result Continue event */
+ 		events[6] |= 0x04;	/* LE CS Test End Complete event */
+ 	}
++
++	if (le_sci_capable(hdev))
++		events[6] |= 0x40;	/* LE Connection Rate Change */
++
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EVENT_MASK,
+ 				     sizeof(events), events, HCI_CMD_TIMEOUT);
+ }
+@@ -4611,9 +4615,16 @@ static int hci_le_set_host_features_sync(struct hci_dev *hdev)
+ 			return err;
  	}
  
--	if (frame->size > 0) {
--		print_hex_field("  Remaining Ranging Data Segment", frame->data,
--								frame->size);
--	}
-+	if (frame->size > 0 && first_segment)
-+		print_hex_field("  Remaining Ranging Data Segment",
-+						frame->data, frame->size);
+-	if (le_cs_capable(hdev))
++	if (le_cs_capable(hdev)) {
+ 		/* Channel Sounding (Host Support) */
+ 		err = hci_le_set_host_feature_sync(hdev, 47, 0x01);
++		if (err)
++			return err;
++	}
++
++	if (le_sci_capable(hdev))
++		/* Short Connection Interval (Host Support) */
++		err = hci_le_set_host_feature_sync(hdev, 73, 0x01);
  
- done:
--	if (frame->size)
-+	if (frame->size && first_segment)
- 		print_hex_field("  Remaining Data", frame->data, frame->size);
+ 	return err;
  }
+@@ -4896,11 +4907,81 @@ static int hci_le_set_default_phy_sync(struct hci_dev *hdev)
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+ }
+ 
++/* Read Connection Interval if command is supported and SCI feature bit is
++ * marked as supported.
++ */
++static int hci_le_read_conn_interval_sync(struct hci_dev *hdev)
++{
++	if (!(hdev->commands[48] & BIT(7)) || !le_sci_capable(hdev))
++		return 0;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_READ_CONN_INTERVAL,
++				     0, NULL, HCI_CMD_TIMEOUT);
++}
++
++/* Set Default Connection Rate Parameters if command is supported, SCI feature
++ * bit is marked as supported and at least one of the supported SCI groups
++ * exists.
++ */
++static int hci_le_set_def_rate_sync(struct hci_dev *hdev)
++{
++	struct hci_cp_le_set_def_rate cp;
++	struct sci_group *grp, *tmp;
++	__u16 min = 0, max = 0;
++
++	if (!(hdev->commands[48] & BIT(6)) || !le_sci_capable(hdev) ||
++	    list_empty(&hdev->sci_groups))
++		return 0;
++
++	memset(&cp, 0, sizeof(cp));
++
++	/* Iterate over the SCI groups and find the widest supported connection
++	 * interval range to maximize compatibility with peer devices.
++	 */
++	list_for_each_entry_safe(grp, tmp, &hdev->sci_groups, list) {
++		if (!min || grp->min < min)
++			min = grp->min;
++
++		if (!max || grp->max > max)
++			max = grp->max;
++	}
++
++	cp.interval_min = cpu_to_le16(min);
++	cp.interval_max = cpu_to_le16(max);
++
++	/* HOG 1.2 Table 7.4. Modes with recommended parameter values suggests
++	 * subrate 1-4 for all modes so use that as default.
++	 */
++	cp.subrate_min = cpu_to_le16(0x0001);
++	cp.subrate_max = cpu_to_le16(0x0004);
++
++	/* HIP 1.2 Table 7.5. Modes with recommended parameter values suggests
++	 * max latency of 0 for all modes expect low power.
++	 */
++	cp.max_latency = 0x0000;
++
++	/* HIP 1.2 Table 7.5. Modes with recommended parameter values suggests
++	 * continuation number 1 for full range.
++	 */
++	cp.cont_num = cpu_to_le16(0x0001);
++
++	cp.supv_timeout = hdev->le_supv_timeout;
++	cp.min_ce_len = cpu_to_le16(min);
++	cp.max_ce_len = cpu_to_le16(max);
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_DEF_RATE,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
+ static const struct hci_init_stage le_init4[] = {
+ 	/* HCI_OP_LE_WRITE_DEF_DATA_LEN */
+ 	HCI_INIT(hci_le_set_write_def_data_len_sync),
+ 	/* HCI_OP_LE_SET_DEFAULT_PHY */
+ 	HCI_INIT(hci_le_set_default_phy_sync),
++	/* HCI_OP_LE_READ_CONN_INTERVAL */
++	HCI_INIT(hci_le_read_conn_interval_sync),
++	/* HCI_OP_LE_SET_DEF_RATE */
++	HCI_INIT(hci_le_set_def_rate_sync),
+ 	{}
+ };
  
 -- 
-2.34.1
+2.53.0
 
