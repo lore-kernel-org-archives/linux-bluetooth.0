@@ -1,125 +1,206 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.13])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C273B4EBF;
-	Fri,  8 May 2026 11:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D881607A4
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 May 2026 12:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778241499; cv=none; b=ivM673IwLKSaHoqIJ231aHDdE5p5D7UOZqYX83rHNf5BU8Lqd+Suf8f666UXd20TXfyjzq1NqPGPMsyyZQaiO2xDvSdLlVvqw/dZRvFUtF72tk4TepOA08Nde7bo69GsF4+iHfo64P/qQZlhYS5fhf35oBBgMIr2t383Yt7e0Qw=
+	t=1778244610; cv=none; b=I/cdypGwkdxWdn3j4cm6mC35EYWnlAJh7nmJ0lIf8u71VJNYR0OejoCjed6mSAl969T0fhSZvoQwixosp4xDzKXcGJI1n6LCNQ053r0+r9PfZb+9rFnBiNFF6ScluehshcjhmRJIZTTGoflZ6lrxHDJ4z1CDdsU+tyhmw/TFGrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778241499; c=relaxed/simple;
-	bh=85dTceD0IWboELxihnqRVHzi7RDeZJAOaAXgcRQkFpc=;
-	h=Date:Message-ID:From:To:Cc:Subject:Content-Type; b=DRIngdVdkzb022BvKAq8ZM1hJezzC+iIDUXj51xfijgTI4D4aB2R9jrR5MEx5VSG8Nufzlba4TL5yL2N2I/NV4gaq0aSgSQLjzmMNU+/u1AR3K3Z85HUePRtdc9lr2zwWhQL/3OvWWC32uba/HDhYNdlpnCjwnmvYvCMxhpgBSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=desarrollaria.com; spf=pass smtp.mailfrom=desarrollaria.com; dkim=pass (2048-bit key) header.d=desarrollaria.com header.i=y2k@desarrollaria.com header.b=xhCGkGq4; arc=none smtp.client-ip=212.227.17.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=desarrollaria.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=desarrollaria.com
+	s=arc-20240116; t=1778244610; c=relaxed/simple;
+	bh=zw7g2Yy6gSTJR6AEXuh6Ij4LgD/Ye5RZbXDj40piSG0=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=jpyTiQ2nmeuYzkRy3yOe0zrhPozR/QqHAlxU1wV9Z58DrTYTsig7x84NFWdqungjPx2O31pCHajqhrpLihqJjviSxcu7rEkvfbcLRiSNghFvRdMnmqlRQNjnRBcXBCoTCf4Ev6jIqmOrR9VGH8pH06tgafZWqdA0rFs6HBrQenc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=AEc5OrVj; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=DascmWg+; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=desarrollaria.com header.i=y2k@desarrollaria.com header.b="xhCGkGq4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=desarrollaria.com;
-	s=s1-ionos; t=1778241495; x=1778846295; i=y2k@desarrollaria.com;
-	bh=igq5MOPxA7P+ODUeQe+UTATdqArvLfUvAFWoZXb7zwY=;
-	h=X-UI-Sender-Class:Date:Message-ID:From:To:Cc:Subject:
-	 Content-Type:cc:content-transfer-encoding:content-type:date:from:
-	 message-id:mime-version:reply-to:subject:to;
-	b=xhCGkGq4rpHs2N5PU7+WAb5wGVN/HZQ70ch+6qHiXU/IyTVBzjOj2O+dNLPaxcmN
-	 7tAF5vIOiJf0oFLBYp9MxIMKvIG0nSw2xF0ud/fYvugdA3skHTbwxF765uZ88uxCV
-	 2C1DyT7kYMSdG5OH4sEcOReRYQdDz47cM8cRkKSUXhHdN0LKKcIkGMBy7vO7zI29c
-	 k4/YkzNesucPX4MNQyHTqXkQenTcSivNAhpTUorGLx1+G+yXOCXUhnrIsk3kAZfC0
-	 HEp/wF+0TID8r/fA6aJYRzuMl2HdxiejewwvUvEwS2PSd6MJfjb6xDOBQYg3TLXp/
-	 nm34y33xoi7VVSjoBQ==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue108
- [212.227.17.181]) with ESMTPSA (Nemesis) id 1MQeDw-1vyiAT1XOA-00IkEY; Fri, 08
- May 2026 13:53:03 +0200
-Date: Fri, 08 May 2026 13:53:02 +0200
-Message-ID: <b02f7394c751e4313442cd156e00c38a.y2k@desarrollaria.com>
-From: y2k <y2k@desarrollaria.com>
-To: marcel@holtmann.org
-Cc: luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Bluetooth: RFCOMM: missing sock_hold() in rfcomm_get_sock_by_channel()
-Content-Type: text/plain; charset=UTF-8
-X-Provags-ID: V03:K1:UHmHS/4tfWMVSt9LZav6qcqnAepwIPZonEBXx3J4L8eOo0aNNwP
- PRBwFcW1xSzRBRn50fZFvfUHPB4Gq3miD1nMu9Fc+r8jvVcyZ+4C6FnrHRnkNsSw9+FnfXX
- 84W2hFzeKNSDNJxLp+CsVW5+LaJFoZvKz8b7cmkx4nUPpdWUadRxlODZ0+ZPIXeRJ/g8RGA
- sseN9/Sa+BQfjyWgudZpA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:PrQRY6Lw4Fs=;NhT+x+3VGomMujocvmgak5Ankaq
- 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
- FHGNcYOkaMGBLs62n0bwnEtYYHdZKiQ5
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="AEc5OrVj";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="DascmWg+"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 648BAGC32198887
+	for <linux-bluetooth@vger.kernel.org>; Fri, 8 May 2026 12:50:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	fgy0grFfJFOerAGbvrwoD3Um+wI6cGrkAGMGsBcSdPA=; b=AEc5OrVjL0wweDjV
+	LM81Ei88lJb9V/aW+wrlAueL0bNYeUkLPYe0l+CJNzj/JElm7BvQz0XzV9DFrmIP
+	GYDFojJHOv94qhRiJiTOT6yu4uI7y/fhkDg+aRCHSL2EW8IgnTZ/6QkVBntS1qoO
+	lRTL7yYuDUhFCp5c/aju0VnEDEIDPJPIg2XI6YMadvqW+ErAoaxhtYq0pRyULRCD
+	UzbSQFhNpMzl/Iy0nFpEG+rfwZbItzxywgVNAqH9uxxn0EIA7gEz0RNq3j27Kt1v
+	qY7o3xM1aDIbqYysgh2U4hq0EcLR+vNt3jM6UBDUXyvWFkBmPGwrTS8jwgGUCLCL
+	OoEH3w==
+Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e119skcmm-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 08 May 2026 12:50:06 +0000 (GMT)
+Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-2f21cb36bbbso213707eec.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 May 2026 05:50:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1778244606; x=1778849406; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=fgy0grFfJFOerAGbvrwoD3Um+wI6cGrkAGMGsBcSdPA=;
+        b=DascmWg+sWfm5gGWxN10T045Iqtf2yCDCB+jqOTryL63ZtsE9ZQ/hSNYyrbD/SUal7
+         BggJtYeHlYkHpLpO9zNBOEwxh2KFouFdkr4TtDDG/8mksNnwmixVftb0XYcoed8t/Vqa
+         wbGjT0JUmeHP3z28xTeA37gqCrCl7WAOaByAP1muhSYnXqz2TRa2zdvz9NJ+qHiV5YKJ
+         c9hrR3MLhZ9wBRBNIKT8uYOYYGRP98wBqcClZKQOojRfSr0FpgjKt1D5ifIjJJ5oaJNC
+         T6TPj4JLdJcqjkXw1JtePOPTy2kr3U05S5tBkwoaLUlvo2/3YXe3CbbjMITKTYAxHGgf
+         wEpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778244606; x=1778849406;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fgy0grFfJFOerAGbvrwoD3Um+wI6cGrkAGMGsBcSdPA=;
+        b=GKc1tE8qAoknGCb/qtfOh7gMKFkiIEzrdNi+4ao69LjQpU+fbI+1WZBO/ZtZBB028n
+         JTfCt59mzOp/8gg3LlH1kaR2bGGY0R7Ts88yc3Wfd1Zsf1e1008jM72tTVZqsLEZZ2gf
+         rwZzkU3uB5sn3T22n/0GpMRmnNB76cuixNSf6hLh/mXSFxfCXemAW/YldHDCEfWffDli
+         Nl793tET+36fBc2dvGpJ+AIgMkJjjIFLnr5T1rBSvpemjA10ViS+1Z48ba+KR+ebgKF8
+         FCTNHW8MJ5igVHWaQx9iaS4MbWO3UOBTyxGjnDjZUEW1JlrFehOEPU/4q+DwDGtkAsya
+         w4/Q==
+X-Forwarded-Encrypted: i=1; AFNElJ/dBv6rzq+w4QEvoM4m1bomsngXbRkfRCCNNPqOCNvEQusu/yKpQz850A7siwvr83sfZIVMJYc8Z2o1TOBXJoE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzejhzmBdsEpuu9H7yiNnk8e6NVsswFfxAIXnsss6xMDFTadmbE
+	8UOvBB3mQv0K73n2yF799Ng1GpsvzzNfcNFSMH7U3DjJe13BPQ6O8xivsKaEyDIdQF6Mc9lvLUb
+	owCBiR9OzacqYXjTcBZsBKOs+TWvR2geCJSPijbh9BiA01JZ6wlo4xGd10flLIvx2VV9MvS4=
+X-Gm-Gg: AeBDiesoaY8VxWQAoUo7HFEq3NYZspmvbZWdGh02PNV/UQCPFGaXE5wOwifr8YSJdPH
+	0w8balCfrNrWr6OIYPtnwuW9S3LHbD4ghvtmfE6Q4xYjoe+aQXYiFWeqH1pxq6qa1kveQ0eoafu
+	YqZhLGmyvvLAOClf3pxCL85QiHyXxraZeEa2C6OkMUCTG17oOcO3IxgfpLaDOIN7KJePlzkIb9O
+	ldo2eJE3bxmhTuqmmgN9wTXXGCcxR+Mgl6A6tpkHjkl4rgeuTontsEnQdDt+T7KuUUZwP3GtnC7
+	d14gTCDX7OcfyylsUBqlJYfP6eZsDse1entCCquhFODTYQJSqfestjQyOefRjRlwEU5+o2dPMFD
+	WO4yvIcnGCBd/8HclH2VGbG7aBNcz3Wr7nIfARQpnno0=
+X-Received: by 2002:a05:7022:68a9:b0:11b:ad6a:6e39 with SMTP id a92af1059eb24-1320b6fa279mr2355542c88.5.1778244605509;
+        Fri, 08 May 2026 05:50:05 -0700 (PDT)
+X-Received: by 2002:a05:7022:68a9:b0:11b:ad6a:6e39 with SMTP id a92af1059eb24-1320b6fa279mr2355521c88.5.1778244604928;
+        Fri, 08 May 2026 05:50:04 -0700 (PDT)
+Received: from [10.239.97.27] ([114.94.8.21])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-132781103e7sm2635918c88.1.2026.05.08.05.49.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 May 2026 05:50:04 -0700 (PDT)
+Message-ID: <b66ea442-2c02-4662-b5de-f5482736ef7e@oss.qualcomm.com>
+Date: Fri, 8 May 2026 20:49:36 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Wei Deng <wei.deng@oss.qualcomm.com>
+Subject: Re: [PATCH v2 0/9] Fixes/improvements for the PCI M.2 power
+ sequencing driver
+To: manivannan.sadhasivam@oss.qualcomm.com,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Shuai Zhang <quic_shuaz@quicinc.com>
+Cc: linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+References: <20260507-pwrseq-m2-bt-v2-0-1740bd478539@oss.qualcomm.com>
+Content-Language: en-US
+In-Reply-To: <20260507-pwrseq-m2-bt-v2-0-1740bd478539@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA4MDEzMiBTYWx0ZWRfX0XKjJQiVxJXf
+ 1T9gWFBjOma0eGxNDL3/UgfdjnKs47xpqLgMp9sqAGvpfIhc+BcScw0GACbif13hNSceJmFR6LM
+ bhS6q5Hw5u306V3cnbgHYMSYF0q0nSm3Yq15i1iQ4Dto4pbWlQwIx5F5uhJ+Xw6GW921K/b6aIL
+ U8QFw9lDbQWEPsxaaurb/IYDJE4Lm9AHM5dW2EMyTiwNtA2EY4MJ1SYwjV0gSAGC3qWr+S9vn8Z
+ BZEqVQeviWQ4sjSV45ZJXMe1LOwFr2LiJzM1rdt3RzUjE5qamfs2Rv7R27rrVHn8yUAEdv1hS7C
+ 9Cq35fDfoZ25lAyAzXarW8UseGil0ALI1z5iBo2x66EwhKnOIYaAuAExFTriC/7CO8R6xWKPVY6
+ Rz2wxOuFOegeO5JoKc4bUOO0CAfXskJ6thOlM1+tl+S/h/nx/aOW3YwBBqPE7CQRm7CYBPEokVN
+ pPzT7+w1t8UJuW9k7ig==
+X-Proofpoint-ORIG-GUID: 2yb7FuhNUaTITMbivIhJIwRwGznnGw0M
+X-Proofpoint-GUID: 2yb7FuhNUaTITMbivIhJIwRwGznnGw0M
+X-Authority-Analysis: v=2.4 cv=Dd4nbPtW c=1 sm=1 tr=0 ts=69fddbfe cx=c_pps
+ a=PfFC4Oe2JQzmKTvty2cRDw==:117 a=Uz3yg00KUFJ2y2WijEJ4bw==:17
+ a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22
+ a=NEAV23lmAAAA:8 a=bC-a23v3AAAA:8 a=EUspDBNiAAAA:8 a=qRrKk6tSi6DhAyMAVQEA:9
+ a=QEXdDO2ut3YA:10 a=6Ab_bkdmUrQuMsNx7PHu:22 a=FO4_E8m0qiDe52t0p3_H:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-07_02,2026-05-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 bulkscore=0 clxscore=1015 adultscore=0 lowpriorityscore=0
+ suspectscore=0 spamscore=0 impostorscore=0 phishscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2605080132
 
-Commit 4e37f6452d58 ("Bluetooth: SCO: hold sk properly in sco_conn_ready")
-fixed a UAF in SCO by adding sock_hold() before returning a socket pointer
-from sco_get_sock_listen(). The RFCOMM counterpart has the same problem.
+Hi Mani,
 
-rfcomm_get_sock_by_channel() returns a socket pointer without holding a
-reference. The caller rfcomm_connect_ind() then calls lock_sock() on the
-returned pointer:
+Tested with WCN685x on both M.2 card (pwrseq-pcie-m2) and direct attach
+(pwrseq-qcom-wcn). BT works correctly in both cases.
 
-  parent = rfcomm_get_sock_by_channel(BT_LISTEN, channel, &src);
-  if (!parent)
-      return 0;
-  lock_sock(parent);   /* UAF if parent was freed */
+Tested-by: Wei Deng <wei.deng@oss.qualcomm.com>
 
-rfcomm_get_sock_by_channel() holds read_lock(&rfcomm_sk_list.lock) during
-the search but releases it before returning. Between the return and the
-lock_sock() call, the socket can be closed and freed by another thread
-since rfcomm_sock_release() does not take rfcomm_lock().
+On 5/8/2026 12:06 AM, Manivannan Sadhasivam via B4 Relay wrote:
+> Hi,
+> 
+> This series has several key improvements and fixes to the M.2 power sequencing
+> driver and also the BT HCI_QCA driver. Notably, this series allows the M.2 power
+> sequencing driver to work with more M.2 cards, not just WCN7850. It also allows
+> the BT HCI_QCA driver to detect whether it can control BT_EN (or W_DISABLE2#)
+> signal on the connector and set the HCI_QUIRK_NON_PERSISTENT_SETUP quirk.
+> 
+> Testing
+> =======
+> 
+> This series was tested on Lenovo Thinkpad T14s together with the below DTS
+> patches:
+> https://github.com/Mani-Sadhasivam/linux/commit/29534d15307551b2355eb254601dec511169f0aa
+> https://github.com/Mani-Sadhasivam/linux/commit/f4eaacfe647674be200847092b43cdef2194fc55
+> 
+> Merge Strategy
+> ==============
+> 
+> Since the BT HCI_QCA changes depend on the pwrseq changes, it would be good to
+> merge the whole series through pwrseq tree or through an immutable branch.
+> 
+> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> ---
+> Changes in v2:
+> - Dropped the pwrseq_is_fixed() change in favor or exporting pwrseq device's dev
+>   pointer and using it to check for the presence of W_DISABLE2# property
+> - Dropped the BT_EN fix for the Qcom WCN devices since it will be handled
+>   separately
+> - Collected tags
+> - Link to v1: https://patch.msgid.link/20260422-pwrseq-m2-bt-v1-0-720d02545a64@oss.qualcomm.com
+> 
+> ---
+> Manivannan Sadhasivam (9):
+>       power: sequencing: pcie-m2: Fix inconsistent function prefixes
+>       power: sequencing: pcie-m2: Allow creating serdev for multiple PCI devices
+>       power: sequencing: pcie-m2: Improve PCI device ID check
+>       power: sequencing: pcie-m2: Create serdev for PCI devices present before probe
+>       power: sequencing: pcie-m2: Create BT node based on the pci_device_id[] table
+>       Bluetooth: hci_qca: Add M.2 Bluetooth device support using pwrseq
+>       Bluetooth: hci_qca: Rename 'power_ctrl_enabled' to 'bt_en_available'
+>       power: sequencing: Add an API to return the pwrseq device's 'dev' pointer
+>       Bluetooth: hci_qca: Set 'bt_en_available' based on W_DISABLE2# presence in M.2 connector
+> 
+>  drivers/bluetooth/hci_qca.c               |  28 +++-
+>  drivers/power/sequencing/core.c           |   9 ++
+>  drivers/power/sequencing/pwrseq-pcie-m2.c | 234 ++++++++++++++++++++++--------
+>  include/linux/pwrseq/consumer.h           |   7 +
+>  4 files changed, 217 insertions(+), 61 deletions(-)
+> ---
+> base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
+> change-id: 20260422-pwrseq-m2-bt-abdaa71094eb
+> 
+> Best regards,
+> --  
+> Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> 
+> 
 
-rfcomm_connect_ind() is called under rfcomm_lock() but the socket close
-path does not take rfcomm_lock(), so there is no mutual exclusion.
+-- 
+Best Regards,
+Wei Deng
 
-The race condition is:
-
-  Thread 1 (rfcomm_connect_ind)    Thread 2 (rfcomm_sock_release)
-  rfcomm_get_sock_by_channel()
-    returns parent (no sock_hold)
-                                    __rfcomm_sock_close()
-                                      SOCK_ZAPPED set
-                                    sock_orphan() -> sk_socket = NULL
-                                    rfcomm_sock_kill()
-                                      sock_put() -> refcount=0 -> FREE
-  lock_sock(parent)  <- UAF
-
-The fix should mirror 4e37f6452d58: add sock_hold() before returning
-the socket in rfcomm_get_sock_by_channel(), and sock_put() after
-lock_sock() in rfcomm_connect_ind().
-
-Fixes: b7ce436a5d79 ("Bluetooth: switch to lock_sock in RFCOMM")
-Reported-by: y2k <y2k@desarrollaria.com>
-
-Thanks,
-y2k
-y2k@desarrollaria.com
