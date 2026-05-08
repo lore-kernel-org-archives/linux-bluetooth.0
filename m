@@ -1,112 +1,115 @@
-Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7226137755C
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 May 2026 07:09:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88FEF35C1A6
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 May 2026 08:42:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778224194; cv=none; b=RnNBVHFXJGa9ID2H7BLkWaXiaAo4ZhMma1sF+JsuPAx+7yu+/AmHt4k9OxhrcPK3WQx5auFdddEk1OOq+3heAz9UNWQqMUvevWMkyB831D7fTAK2jSNa/Z2SCuZlYYrdmG+PCKPIoYEMNMSMhesW0RgLO8/jTcq1TSAwltQp7m4=
+	t=1778229739; cv=none; b=KK5XjfSuTAwPaxidSSvebg8ocfMLq+g+utnY61o2OigpR7RqG7pQA8Z9tD7vObdeeVNa6GUAC/8Wyxx4dlo9wis2ba6O3GviJxdEZeqbIJPUMdai3RnzuMi0vslkSByq1N5Uie2yl5cBhzDy5HWYxOOxWUgK/zFS5cedXNL2AJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778224194; c=relaxed/simple;
-	bh=l+yN5nMRtFUtosAediu/nb//BmITAol/CBGSs2MxYHU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=J4tDpeXj+PousxLkaMcLQjyWr4jAbFne+F4utoeFpPvUypEv3Ejn86nt+Ihk6BcSk+t/U/ormdyFv7sxDfSJNv15DLeKDibR3iKKBpJfbcS6bFtlPkCk3afgL3fhnjI1AHIP5TYqO7TrXwwcZulkzIajBJwYW/dz0EtWW0yGgwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pgphJpBQ; arc=none smtp.client-ip=74.125.82.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1778229739; c=relaxed/simple;
+	bh=u85YHATecIVRgKpfNOIDwDcORK6VX1SNuGbFdKLd7N0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DBML7srdO8LVwPGltSRULe9cdGxB+38gDCNNukdQxumrIEU3RYELDaSZPDBqBFYRJ4mXYlKWGzqajUnAAUYGJeJtAowTzrDZqkyAnala4202vG3jz4x4RqdoIVGB0E0zQEvF3Gfr7A5ce48l9MGL+JKgJ0lH9LmCgCPyTFPFpK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in; spf=pass smtp.mailfrom=cse.iitm.ac.in; dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.i=@cse-iitm-ac-in.20251104.gappssmtp.com header.b=ThCYLX92; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cse.iitm.ac.in
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pgphJpBQ"
-Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-2f33ae12f97so168448eec.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 May 2026 00:09:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.i=@cse-iitm-ac-in.20251104.gappssmtp.com header.b="ThCYLX92"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-82748257f5fso1793718b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 May 2026 01:42:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778224189; x=1778828989; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=mRVunwQGPGk/VN7QwXj74BmmP5dnFL6CncO80stg6dE=;
-        b=pgphJpBQmPNXQgmxLP55hsgAPc/md/xuh33jw29aNRfypciyF9OIAE91ckeIEexeJ+
-         rvrwSI9QCXZVdSQLDCak03Lf7xvZZunW4Rm3dYgJUT3QCwOb0Y+pR9mmpqF4LnEBKAwQ
-         EyeZgxHd5WvrfmtZCZ58BfG/9UOrlz0iOXlXzImV9Chq5zy1VYbnX0w0PeLIYmO/gFvE
-         asmB4Gg3s4PPNc18+yVLP7cdymzHoZ7J+tWleNx+J6moXadd+TXbO+BOENZNFpar4/Pf
-         vru63q7IQ8teFNT8r1d3a5sqGiLfcQfwmIWgiBCsFX5+Xg2Hl1dsojMqn+Vokqujhhfb
-         9dAw==
+        d=cse-iitm-ac-in.20251104.gappssmtp.com; s=20251104; t=1778229735; x=1778834535; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8Bh9Icwt5+0ETWdyXuUVRLGVBe+vK407pyrzUFu3GVs=;
+        b=ThCYLX92XMt27YshZ41vjuWcVcqOuYIBW/V48Yz7IIRlhUjvlRR3fWI40DK1eMCD1u
+         DbJJ9zTse9yexR9Z0gfIT+paRZnZ1fFYjnG9Rk0LrA/7yNm0EW5+XX9jroc9HOkjos3E
+         emJ5ih8WMmvXSxDsW9iTLF/D5InP7oGebb12r99KhhItatbIwxLMY4p+ZNG5JSpGv7HY
+         nrEmJrHBXt93JHcHlC+aXKxFq28abkea+3PG3fCoG/8RS38rkjBjFMeWEufLCPRXUl3x
+         cFwJjciNN+DJLQCEWZM9gx3+QaYpsJXNAXEdd0v1ZB3EPAisRVgP1NUVyKr1Q8iI70hz
+         9fCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778224189; x=1778828989;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1778229735; x=1778834535;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mRVunwQGPGk/VN7QwXj74BmmP5dnFL6CncO80stg6dE=;
-        b=A0A6y2mTYX7eMSJwddysth5OMMkgsEnszDLtobfcjjgUnlhjUgF/GL6xuMl7d3zXBV
-         nu9QVRj1JTU4IraUQ9BoOggiwYsVeTQW+dWX1XaaDC7uZEzEN5NSGllwZE5MS7kkIjkX
-         issWyCKXsdKuYn0+seYlfpQ+h+0v/qwERM+93yU63J8+n6/7i2DoY96Rl+/czlc1D8m8
-         ojsSxjxg9zl1t2AVRsdDwPWciZF4GQUR+ntHJcLHwL/pT+d7juwMEROt3nNGhwgmcbzp
-         RT45F/V+7LspWeSYTZEQyUWEEVTVmuyMAYGiFqJWfaWjUC5PKcoNUp+nCTW+apQ+USX6
-         U5ZQ==
-X-Gm-Message-State: AOJu0Yy7/YtQbiul4n3znEPvFNLhLwkhv3lxKM7duIiQ+soLETHav8Ud
-	pCIqFPqhfSrMe4R556fuzkHjGPAnQ4YJQtVgrPvHsyEMDItY+KcdW2b4+mrY8Q==
-X-Gm-Gg: Acq92OHqiGdBF9r0OjILA13EtvzOyn//3+TfxqWdO3AdMhvSwFY14b3o98uEd1St/qf
-	T1hkQaFORLaFVTzjQCUR5JiSa4oYYAOuYe0pGEpSgoqfxzmveYEGfJO9omesghonuc7Bs3hrzaL
-	OV0a45l8rzOwi31LUDLY28100iY1SlghZ4Gs1LcUMDoGG5WSDEVUm+BaqFBQlJNVlhoAAd7tqCM
-	0h5GQ/yLR/1C/H1V+U+1KP1uS9vZOMS5ebQVrU3zXKSSFkD68pmuoum7HutJflkWSW+NyPWJP7a
-	kYOnB5VLy8vYQw3MUeYVO8zFXdlhzL8aLyNefR6NWF6wgiRNhTSqf0MrSreVMrTDSyIrd3Dua59
-	kUuRBe1k5+tRYoasgyUAed0+x2tf+mukRT84tOfevJncY1msRR+uU1flkDWfghhbS0tjIHoOIic
-	RZ2BO9pMLVs9wFWE21UQ2e2lMw4riQsTgqSGAMfM3P
-X-Received: by 2002:a05:7300:3207:b0:2c5:60d0:701e with SMTP id 5a478bee46e88-2f85bb73083mr829586eec.3.1778224188988;
-        Fri, 08 May 2026 00:09:48 -0700 (PDT)
-Received: from [172.17.0.2] ([172.182.225.3])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f8862d3047sm1297343eec.10.2026.05.08.00.09.48
+        bh=8Bh9Icwt5+0ETWdyXuUVRLGVBe+vK407pyrzUFu3GVs=;
+        b=pby7SG4/Vfe1ZLVAoahnjlmW/dcRj6igHG/mVCxWk9LWCVm1BH9DmZyXf4ht2cjf8T
+         TP1tBh/9v1hJB606Xq3oOdh212whtxaStmQlD6q5Vv2w96KF034xnU7ZGHDqcDQ6Kz1u
+         +FPOtlCh/pyE45RbO/gJohlD/wfiubj47ReoTwLYIc51yFFa2FfkYnHD6Ub12Qit1LTc
+         2KmjYQ9Gne4kfqhvlzsiuJR/Et88sBsCb/FGRshAKYKqguo1OOe86LcuaKuFmP3w6eR7
+         F5bY+V/JEwKwpMbzGfY5IRBTJgwVcUrklX+Fk2MGzOA8hEWSBlbM9aLhUTqjruNa4k5o
+         wgOw==
+X-Forwarded-Encrypted: i=1; AFNElJ8vx1itXsWAK7i9MK4Do9/yQUMX1Yzp+5i1e/tC2ptyxPGMyDUVGmf4dBLdjeMZE/MFay0rKVGYTzF61duyFRc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKEWQPIT+q9Yv6bhsUFkG5VdkWF4nBJjglcFlMCR43teYLg6Rg
+	j2zZpylGYh9FUPjbURicM3Qq2O3AfNyq6lBi/IFWXxYJnYnyDs+rx9G+lry4FDnirfI=
+X-Gm-Gg: Acq92OH9QiE/Zfs/vtcfa6xp6KlDpMqkC/RCOjsZX85Hp/Prviv4Bm+/768e9mmvWh1
+	1zvojjB4yN/LGhtW2Lo3SqH3D5YtFDNluGJ76K8inr3XEi5vPETXDuhGPE3xiqHF85LToz0+efW
+	jpN82J0Uil7GsqzgUEAjrDyayIepbuvSHHe0qwxazBZwCCQP0FmT+ImneunhDMUSO7ycACQ+Lkm
+	tfrAO6uGao3PNB7HH96pV8VT45NQyN7kX7ga/IX0WJq6dOGQKkqCIOUs10rtT+pH+4qeILAD0qy
+	IRdcL0d0vqHEsCj8p4+sh1i3N59QO3xz+9mQcjWSO1mjLgIZgczWQ3rx2WjLS5Z053sbTmmr39s
+	9VHXnndVg5kqy273ZmQI+CUxmnwYzTPD5tnJSU5pWBhBF6mONTJwlCzSAgscVuBNxCmRnOm8vZM
+	IzxuI72Em9N0U6ZUv88Tfjzq6msDmugMnEYx55OhNlRlmnlSoBsUPnk9btvkOSS7+E69sJaNjqL
+	+gzSRvgRFP24bkATGhVag19BdPpSjl5Us/qEScuGZ/m+BO12prK09Ur7A==
+X-Received: by 2002:a05:6a00:3c92:b0:82f:47ec:944f with SMTP id d2e1a72fcca58-83bb7aba933mr5031440b3a.16.1778229734627;
+        Fri, 08 May 2026 01:42:14 -0700 (PDT)
+Received: from localhost.localdomain ([103.158.43.41])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-83967dbd995sm10518149b3a.43.2026.05.08.01.42.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 00:09:48 -0700 (PDT)
-Message-ID: <69fd8c3c.050a0220.2f853.c5d7@mx.google.com>
-Date: Fri, 08 May 2026 00:09:48 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7667693177782158273=="
+        Fri, 08 May 2026 01:42:14 -0700 (PDT)
+From: Abdun Nihaal <nihaal@cse.iitm.ac.in>
+To: marcel@holtmann.org
+Cc: Abdun Nihaal <nihaal@cse.iitm.ac.in>,
+	luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: virtio_bt: fix potential memory leak in virtbt_probe()
+Date: Fri,  8 May 2026 14:11:53 +0530
+Message-ID: <20260508084158.68765-1-nihaal@cse.iitm.ac.in>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, prathibha.madugonde@oss.qualcomm.com
-Subject: RE: [BlueZ,v3] monitor: Parsing of cs step mode data in RAS Notifications
-In-Reply-To: <20260508053819.3424918-1-prathm@qti.qualcomm.com>
-References: <20260508053819.3424918-1-prathm@qti.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============7667693177782158273==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The memory allocated for struct virtio_bluetooth is not freed on the
+error paths. Fix that by calling kfree() on the error paths.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1091417
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.66 seconds
-GitLint                       PASS      0.23 seconds
-BuildEll                      PASS      20.00 seconds
-BluezMake                     PASS      653.56 seconds
-MakeCheck                     PASS      0.88 seconds
-MakeDistcheck                 PASS      243.78 seconds
-CheckValgrind                 PASS      220.27 seconds
-CheckSmatch                   PASS      346.56 seconds
-bluezmakeextell               PASS      181.41 seconds
-IncrementalBuild              PASS      647.01 seconds
-ScanBuild                     PASS      1010.36 seconds
-
-
-
-https://github.com/bluez/bluez/pull/2109
-
+Fixes: afd2daa26c7a ("Bluetooth: Add support for virtio transport driver")
+Cc: stable@vger.kernel.org
+Signed-off-by: Abdun Nihaal <nihaal@cse.iitm.ac.in>
 ---
-Regards,
-Linux Bluetooth
+Compile tested only. Issue found using static analysis.
 
+ drivers/bluetooth/virtio_bt.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
---===============7667693177782158273==--
+diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
+index 140ab55c9fc5..b34dd5ddd631 100644
+--- a/drivers/bluetooth/virtio_bt.c
++++ b/drivers/bluetooth/virtio_bt.c
+@@ -311,7 +311,7 @@ static int virtbt_probe(struct virtio_device *vdev)
+ 
+ 	err = virtio_find_vqs(vdev, VIRTBT_NUM_VQS, vbt->vqs, vqs_info, NULL);
+ 	if (err)
+-		return err;
++		goto free_vbt;
+ 
+ 	hdev = hci_alloc_dev();
+ 	if (!hdev) {
+@@ -400,6 +400,8 @@ static int virtbt_probe(struct virtio_device *vdev)
+ 	hci_free_dev(hdev);
+ failed:
+ 	vdev->config->del_vqs(vdev);
++free_vbt:
++	kfree(vbt);
+ 	return err;
+ }
+ 
+-- 
+2.43.0
+
