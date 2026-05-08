@@ -1,137 +1,110 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F15940B6C7
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 May 2026 17:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3430DCA45
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 May 2026 18:47:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778261566; cv=none; b=hG3LTNppZSfpdFvKKYNVF0I+eRXgTFPBuJqCQrHtqXKinDc60bv+sLyRVEOKI0r54DeR2CnmOogAx5+gLi4k2bKeBzv7vr1C8oY+9KfidzFa3FCQjSp/S2IG8Cad+FcsCMs+U9nd3fERj1tBRAkAvIFUSgTfXtye8ixqZ7c3/zs=
+	t=1778266045; cv=none; b=N+yZ9Y6/cDSOxd8R/n/9P+jmh3v7AOUM86tb2KbcxwkFy92QQPDwzSWZtU7zYwJ4LXWs8aAYu1pQ8K9iJGF3Iek9xWV88ub1bGgGqA7ydhrSnc1rlhxcEWqM/5tOeZhID/h3wq5IwUF9OiSRyP2r5fvWu8wy/ebaaAFv3AsYL3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778261566; c=relaxed/simple;
-	bh=LplV3crLjJFyz1CKIX58/3G5oyVUNzkN7/tKutv6ISY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mYftVC2/zT/egQBgXHUhIdT8njT1NyTrQ13ZmKF3sNvyLLrVk7fkpuHwtNggH5xLYctaFEBGV3e0L9KjmC+Wy2HRAaMi73SDdEE5RoLj/dCUIRyZAbrO+E6f/uK1RuLTwgJwkOiJbqzCpepPWCthoVKD3Oi5HtfTB4JHKL7qy8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SagMxUA7; arc=none smtp.client-ip=209.85.208.176
+	s=arc-20240116; t=1778266045; c=relaxed/simple;
+	bh=MwWW0A/NUOMehA4fTMkXPaGSqNDLWA2y7KciIM5AA40=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=aNZcCIILsYXeSAGlKwW/LFdHmB2ORsvFJS0YgrUBMzq5IG50Z49HHLThGzu9F53Ir1VN4GQUfoacsaS9ZvwmPNB2NHxfxk+c/eN8ryjGzKvYlVaOsEq3XYGCy8m1DlepD3NyFpOsTeDB8h0Hkj3D5x0ywA7RbWWtIgNAyiMbDJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MFQKYSRJ; arc=none smtp.client-ip=209.85.219.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SagMxUA7"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-393ba0616aaso24491211fa.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 May 2026 10:32:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MFQKYSRJ"
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-8bb4e8a5240so23997366d6.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 May 2026 11:47:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778261561; x=1778866361; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JKiWj7c3WOUi3B7MNwmGjdVqB1Ve1n7R+SIRjPXohtk=;
-        b=SagMxUA7DK+tK3LCVK2O37xqlwyhcfZciQbXK6LT/efDfzuVN92NUthqKYR51g5am/
-         k6npWXBITfrRzZTwnqCwnIV8niBV5lO7SYXXD2Gw9PeWWrmpYtzy7ZCajReHLIhzyA5K
-         Fa6nQEnkUCXjpE5zf4sXHhBHGCgiROsnL2QKqESIHpTEDsOixoRlH62lhF4wcDXvK1kO
-         lmsyr+tMUTwQOp3FryKYClaLMMfQyDCQIeZuUcfdblYhqUJnIXq1XFdgIrpXmWmdLiwt
-         hESFk2okLYHoNJt90JfZKNoy/c4UQuP9C8OEmeMPCRiuKwT9EzIvLRmIP6CuMdtSqM5Q
-         j0tw==
+        d=gmail.com; s=20251104; t=1778266043; x=1778870843; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=wqyDvqqMNtS+m+09TRVclOb5AQzVAgliBfle109f1W8=;
+        b=MFQKYSRJJJyGE5C30AREi05tYITRIfcWOG5dpTUjzIok1rB3Lt8nPXhXycvRwuAWb1
+         nQRmiCQgom1up46S16E66J5vxJ4+mjYH77aiTqiLuoN2etdnnR1P13xO7MIHbUpFafS+
+         KHdue8dZqR9RNhJcKPWmDj/HE1BLov53KebEKty0/bwM7hh66/9sJsKSaGPDwwfJpZFz
+         p7Z+uPxNZ1sDMx5/2zrrxYMho3+uIj4PG6weYQMS3/llCcNrg3z5TAny3z/goaWdQRqC
+         LP7OchfE5A3ZX3OZfkxl+Sej/e8aJCxFyiNNJcu3Shx9+fh3q6YaU9d8krMbfEh4JAkC
+         r1dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778261561; x=1778866361;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1778266043; x=1778870843;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JKiWj7c3WOUi3B7MNwmGjdVqB1Ve1n7R+SIRjPXohtk=;
-        b=q3scNkvWe2H6uXTZSlokGkUI8HgFvE9yNeOzfeCoaS1Cb9zBzQUYtnhm5bAuvr2FQK
-         djnEqWe3oAtI9CHz6XCFzQuZswnj2dC8s3oxR0AFha1dwXo3gEnrlD8XYzDzBFhSRQsf
-         GLjD9yBXeOCNLvKpaU4rpUn9cFZAjBf2PTRoI+yjloYeNYE/PG8u2TgSX2mRYjGV2ffg
-         utWuJx/JcaqDCta99sYB7sOwwlXbVg+VV2OYhoEm1zs3UAxCfU9LoKtFrvV9g6kqVVmM
-         +cJlFqFuoa4/xRm4MNQ+mjPv9YDcpJGaTSjahWItZ+a4vIkk7jwKFUiQ2DSWmF3mHKxV
-         zqpQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9uKp9UKD/E+JMpK8Jp/HKLFQ4Mp7N3o0uWpUAPo1/yQc+yhqP0Y+7BbxXQpNWuntG4xgeB2KiARWMCxzYOLyI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlEvSDd82ceMMruD67AzHl3WP38tnOFqnFJhWJE3hQavaZnMGF
-	pXyb1f6CN0qBkS0+hUKXZXBveKj/PaEaNhw08nbAXxMbn2S6e8C/4TcC
-X-Gm-Gg: Acq92OFeL3MGV5m5oPsV0l+WPBUGiSZv7e3c5IVHtmH0RzBt6tl33shB46joIQBTUNh
-	UxtElpfo0J//96/uYEbGUYl3qaMsoJlekuHaStzehVBzTN8weudQgvXWeNwtUqvE9fIyLECvbx2
-	a1qSewjm1cgfNLETzXlryIdEIWUssXHaSi77+sOVD6G54/S1fRhdzaf/oAcJphZ3jnz0+vhNS0o
-	BByOag7HRRweXjn0GwMEcIyhCKTvZEJ132OGXtgOZujQLwEIqeMI57SZj8c4Am41zyVuL5nv7g4
-	4GiicWi1eFFH2aSNJEzNN0cev0lrB+Y7nIocT5O2Vd5rkwNI/uP2OzoTJB4SfJq8A29X2v6gYXw
-	5MMI1jzpFq1pHga64L3AaS5C+D9PHJzAbvWAZgXIJYt9N+GwKdSNv+4EiaObwiKdcwhrQRS1h3P
-	iUoybUAPWtEMVKFqdwh8Ih+IyN3pF1vOAmyiWkmdZLKCJ1
-X-Received: by 2002:a2e:98d0:0:b0:38e:90b9:ce98 with SMTP id 38308e7fff4ca-393c40cbb63mr38714761fa.6.1778261560643;
-        Fri, 08 May 2026 10:32:40 -0700 (PDT)
-Received: from localhost ([188.234.148.119])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-393f6144071sm6162291fa.32.2026.05.08.10.32.39
+        bh=wqyDvqqMNtS+m+09TRVclOb5AQzVAgliBfle109f1W8=;
+        b=FP+lRMj8dQ/RzYcINTY/yMFdwpQLwVD0lqNiQhz4votGayRJHSoAmfXRt7ZkRO3NIa
+         8rfybmksVKy/le8iDSiuK1dbONI0WzMDhpkxITgXpLsN4H+/l3CD0qH6Xc1PO/ALYPmk
+         fH3zZN2lFKyIdDtvMZCSjHoh7+T/zVmwWoIjPyQaQynrbJEr00oZzDbU8jcsp0Vf9LIy
+         wmtKVubB51zFDkyVVHFOx8XFBEV/7dwx3R9mmjnr1Q0YYImz+G4lTicwrCZ8qBbp/4+F
+         uCxQUgeOs5fXDOmOPNSl7WkQmRlNi6n3FLpBf0nScOL2epwgvuks0DuCXCEx4MmNxRqY
+         xJxA==
+X-Gm-Message-State: AOJu0Yx601tlkbB50M3pUxq0DTu7cFxosgfqqQDhnAOPHrmoFK8IU7i2
+	b2IQZAfuYdvQQ8A86zNvLWhnkMO737v8isGIq3fHVQHWyEVgJl8ZK2ZGeS3i5Q==
+X-Gm-Gg: Acq92OE4zD+P/4kK0sARfVvoaIrFAvGe+QwOIfOZbRO1mwqquCmeCD7azQzxjaZZwLP
+	l0gOajdEwVxZSah1WtSSZ9eaOVqocqgO1o8swbd6cxg3Whko9QA0Aq/ZbroRaurMprqdAAGVhYx
+	a+SnCld6/WYLt4auPlwxOrOcuWqukLpx2q29kRhlrD55+ScDL6UmAbRFOHhOLTu6NNkQarthhio
+	nF2cNvyCGHeSEZWLO82qBGUCV5+GQEEggU5KdyDGtxIJbzhq/p1juri5afXMyMuto0PjV7jixlJ
+	JTJHlYOHB8ojLV/ODGS2Wg3G5ceFd6zU9qD2xPkdRYK3DE2CqYhsOF7ieUDU0F5YqKHRCv1+0ie
+	l/pWVtX9FB/ortZ/JnRtLHm5Sa6M3qBcT6pXTYGygajB3Ph17EsnZ0MzOv+bgV13GR2TyTDopbm
+	FB+dYO3GX6XuLzZSvxd02kGK22qi081r/nHmbYKGYr
+X-Received: by 2002:a05:6214:dc7:b0:89f:2fa:a9bb with SMTP id 6a1803df08f44-8bf412ff394mr61847256d6.9.1778266042620;
+        Fri, 08 May 2026 11:47:22 -0700 (PDT)
+Received: from [172.17.0.2] ([20.161.30.241])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53d83114fsm238693876d6.48.2026.05.08.11.47.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 10:32:39 -0700 (PDT)
-From: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	Tristan Madani <tristan@talencesecurity.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-Subject: [PATCH] Bluetooth: btmtk: handle FUNC_CTRL events without status field
-Date: Fri,  8 May 2026 22:31:21 +0500
-Message-ID: <20260508173121.27526-1-mikhail.v.gavrilov@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        Fri, 08 May 2026 11:47:22 -0700 (PDT)
+Message-ID: <69fe2fba.0c0a0220.f328.44ec@mx.google.com>
+Date: Fri, 08 May 2026 11:47:22 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6970641213488498560=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, mikhail.v.gavrilov@gmail.com
+Subject: RE: Bluetooth: btmtk: handle FUNC_CTRL events without status field
+In-Reply-To: <20260508173121.27526-1-mikhail.v.gavrilov@gmail.com>
+References: <20260508173121.27526-1-mikhail.v.gavrilov@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-A WMT FUNC_CTRL response shorter than struct btmtk_hci_wmt_evt_funcc
-(9 bytes; WMT header plus a 2-byte big-endian status) makes
-btmtk_usb_hci_wmt_sync() fail with -EINVAL.  This regresses Bluetooth
-initialization on MediaTek MT7922 (e.g. USB id 0489:e0e2; reproduced
-with firmware 0x008a008a, build 20260224103448): the FUNC_CTRL response
-from the controller is 7 bytes long and the second skb_pull_data() in
-the FUNC_CTRL case returns NULL, aborting setup:
+--===============6970641213488498560==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20260224103448
-  Bluetooth: hci0: Failed to send wmt func ctrl (-22)
+This is automated email and please do not reply to this email!
 
-Reverting the offending commit on top of v7.1-rc2 restores Bluetooth
-on the affected hardware.
+Dear submitter,
 
-The pre-existing code dereferenced wmt_evt_funcc->status out of the
-SKB tailroom in this case -- the original out-of-bounds read that the
-offending commit correctly closes.  The byte pair read OOB almost
-never matched 0x404 (ON_DONE) or 0x420 (ON_PROGRESS), so the else
-branch ran and the caller observed BTMTK_WMT_ON_UNDONE.  That value
-lets btmtk_usb_setup() proceed: for func_query it means "not yet
-enabled, issue enable", and for the enable command it means "treat
-as not done", both of which keep setup advancing rather than aborting
-it.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1091757
 
-Preserve that effective behaviour explicitly: when the status field
-is absent, set status to BTMTK_WMT_ON_UNDONE instead of failing.
-The OOB read remains closed, since skb_pull_data() still validates
-the length before any further access.
+---Test result---
 
-Fixes: 634a4408c061 ("Bluetooth: btmtk: validate WMT event SKB length before struct access")
-Cc: stable@vger.kernel.org
-Cc: Tristan Madani <tristan@talencesecurity.com>
-Tested-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com> # MT7922 (0489:e0e2)
-Signed-off-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+Test Summary:
+CheckPatch                    PASS      0.77 seconds
+GitLint                       PASS      0.35 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      24.70 seconds
+CheckAllWarning               PASS      27.71 seconds
+CheckSparse                   PASS      26.44 seconds
+BuildKernel32                 PASS      24.94 seconds
+TestRunnerSetup               PASS      529.49 seconds
+IncrementalBuild              PASS      26.83 seconds
+
+
+
+https://github.com/bluez/bluetooth-next/pull/157
+
 ---
- drivers/bluetooth/btmtk.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index f70c1b0f8990..fb4875760164 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -719,8 +719,10 @@ static int btmtk_usb_hci_wmt_sync(struct hci_dev *hdev,
- 	case BTMTK_WMT_FUNC_CTRL:
- 		if (!skb_pull_data(data->evt_skb,
- 				   sizeof(wmt_evt_funcc->status))) {
--			err = -EINVAL;
--			goto err_free_skb;
-+			bt_dev_dbg(hdev,
-+				   "FUNC_CTRL event without status, assuming UNDONE");
-+			status = BTMTK_WMT_ON_UNDONE;
-+			break;
- 		}
- 
- 		wmt_evt_funcc = (struct btmtk_hci_wmt_evt_funcc *)wmt_evt;
--- 
-2.54.0
 
+--===============6970641213488498560==--
