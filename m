@@ -1,115 +1,110 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88FEF35C1A6
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 May 2026 08:42:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE35532AAD6
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 May 2026 10:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778229739; cv=none; b=KK5XjfSuTAwPaxidSSvebg8ocfMLq+g+utnY61o2OigpR7RqG7pQA8Z9tD7vObdeeVNa6GUAC/8Wyxx4dlo9wis2ba6O3GviJxdEZeqbIJPUMdai3RnzuMi0vslkSByq1N5Uie2yl5cBhzDy5HWYxOOxWUgK/zFS5cedXNL2AJ8=
+	t=1778235375; cv=none; b=KmjB/H1aO7zyKm7uRN1RuiPJF1Ov3beGYDQbePak+Jc1i0PacOKr+TPcfZE16qXGr4nLdJEW7M7fODNm1kg2BAQmEQLWDe9oX/TEiFsR0Sh4h01DoJkqTawwhmELop5mFNHvfCp8MwhR+kG6gck92y2PI8093rOdxpdou7GcfU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778229739; c=relaxed/simple;
-	bh=u85YHATecIVRgKpfNOIDwDcORK6VX1SNuGbFdKLd7N0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DBML7srdO8LVwPGltSRULe9cdGxB+38gDCNNukdQxumrIEU3RYELDaSZPDBqBFYRJ4mXYlKWGzqajUnAAUYGJeJtAowTzrDZqkyAnala4202vG3jz4x4RqdoIVGB0E0zQEvF3Gfr7A5ce48l9MGL+JKgJ0lH9LmCgCPyTFPFpK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in; spf=pass smtp.mailfrom=cse.iitm.ac.in; dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.i=@cse-iitm-ac-in.20251104.gappssmtp.com header.b=ThCYLX92; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cse.iitm.ac.in
+	s=arc-20240116; t=1778235375; c=relaxed/simple;
+	bh=tR6gPq/KWGu5/FLIxSrQAF06G8RpN6XnPuoyPBN/gpo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=EfeJV5bBaKTfxERqypNyi3wvYGgGg1qALCihvnmtS2HE08GU0nfhbuZoIVgZ1Qn2tgKRMFJvsCkxZZ9K38HvKp4R0FgEJjDIcasXC16po+ue5u8c4Vhv9vA+SrvFHFYeTL6dywCT5rI7ygAHCeF2Lip3Zw5Hb7AuPQJYs6uI4mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HyBxOEA7; arc=none smtp.client-ip=74.125.82.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.i=@cse-iitm-ac-in.20251104.gappssmtp.com header.b="ThCYLX92"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-82748257f5fso1793718b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 May 2026 01:42:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HyBxOEA7"
+Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-2f0ad52830cso2764512eec.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 May 2026 03:16:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cse-iitm-ac-in.20251104.gappssmtp.com; s=20251104; t=1778229735; x=1778834535; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8Bh9Icwt5+0ETWdyXuUVRLGVBe+vK407pyrzUFu3GVs=;
-        b=ThCYLX92XMt27YshZ41vjuWcVcqOuYIBW/V48Yz7IIRlhUjvlRR3fWI40DK1eMCD1u
-         DbJJ9zTse9yexR9Z0gfIT+paRZnZ1fFYjnG9Rk0LrA/7yNm0EW5+XX9jroc9HOkjos3E
-         emJ5ih8WMmvXSxDsW9iTLF/D5InP7oGebb12r99KhhItatbIwxLMY4p+ZNG5JSpGv7HY
-         nrEmJrHBXt93JHcHlC+aXKxFq28abkea+3PG3fCoG/8RS38rkjBjFMeWEufLCPRXUl3x
-         cFwJjciNN+DJLQCEWZM9gx3+QaYpsJXNAXEdd0v1ZB3EPAisRVgP1NUVyKr1Q8iI70hz
-         9fCQ==
+        d=gmail.com; s=20251104; t=1778235373; x=1778840173; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=RhYrD/qUlnmFbz6WLzAXwub0GqnME4rTJoiXfzFciys=;
+        b=HyBxOEA7ph0qcCHQqwDjF3A2GL6JuIl5ramWuT9AJMbtpRv+iZd/+SnquswQiQQzmZ
+         DezjnGfRBlstan7IrmNtfoWWS1uWJ/124/2t6MutXdfpZTxHiJKVh1gtqEtEzDnSjv2d
+         ovOSERHx512ywtdF762AfmRg2rV4wLEYw/oor4vvsDaulDkZiPPTW4fuMd8+zeeTxH5T
+         kn+r+Q2doqulMfEiwv9e4fZVhq48FZEsZMhrZhFZTdzBxJKSg6yzZtyv4GjvF4qk8oZf
+         1YYu3Sm4fbDi4E1AthERodiI8+y53KdnN4QdhlbuQLbmuNs7TWbk6oWIqPxnH3JRzqRj
+         ZNDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778229735; x=1778834535;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1778235373; x=1778840173;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8Bh9Icwt5+0ETWdyXuUVRLGVBe+vK407pyrzUFu3GVs=;
-        b=pby7SG4/Vfe1ZLVAoahnjlmW/dcRj6igHG/mVCxWk9LWCVm1BH9DmZyXf4ht2cjf8T
-         TP1tBh/9v1hJB606Xq3oOdh212whtxaStmQlD6q5Vv2w96KF034xnU7ZGHDqcDQ6Kz1u
-         +FPOtlCh/pyE45RbO/gJohlD/wfiubj47ReoTwLYIc51yFFa2FfkYnHD6Ub12Qit1LTc
-         2KmjYQ9Gne4kfqhvlzsiuJR/Et88sBsCb/FGRshAKYKqguo1OOe86LcuaKuFmP3w6eR7
-         F5bY+V/JEwKwpMbzGfY5IRBTJgwVcUrklX+Fk2MGzOA8hEWSBlbM9aLhUTqjruNa4k5o
-         wgOw==
-X-Forwarded-Encrypted: i=1; AFNElJ8vx1itXsWAK7i9MK4Do9/yQUMX1Yzp+5i1e/tC2ptyxPGMyDUVGmf4dBLdjeMZE/MFay0rKVGYTzF61duyFRc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKEWQPIT+q9Yv6bhsUFkG5VdkWF4nBJjglcFlMCR43teYLg6Rg
-	j2zZpylGYh9FUPjbURicM3Qq2O3AfNyq6lBi/IFWXxYJnYnyDs+rx9G+lry4FDnirfI=
-X-Gm-Gg: Acq92OH9QiE/Zfs/vtcfa6xp6KlDpMqkC/RCOjsZX85Hp/Prviv4Bm+/768e9mmvWh1
-	1zvojjB4yN/LGhtW2Lo3SqH3D5YtFDNluGJ76K8inr3XEi5vPETXDuhGPE3xiqHF85LToz0+efW
-	jpN82J0Uil7GsqzgUEAjrDyayIepbuvSHHe0qwxazBZwCCQP0FmT+ImneunhDMUSO7ycACQ+Lkm
-	tfrAO6uGao3PNB7HH96pV8VT45NQyN7kX7ga/IX0WJq6dOGQKkqCIOUs10rtT+pH+4qeILAD0qy
-	IRdcL0d0vqHEsCj8p4+sh1i3N59QO3xz+9mQcjWSO1mjLgIZgczWQ3rx2WjLS5Z053sbTmmr39s
-	9VHXnndVg5kqy273ZmQI+CUxmnwYzTPD5tnJSU5pWBhBF6mONTJwlCzSAgscVuBNxCmRnOm8vZM
-	IzxuI72Em9N0U6ZUv88Tfjzq6msDmugMnEYx55OhNlRlmnlSoBsUPnk9btvkOSS7+E69sJaNjqL
-	+gzSRvgRFP24bkATGhVag19BdPpSjl5Us/qEScuGZ/m+BO12prK09Ur7A==
-X-Received: by 2002:a05:6a00:3c92:b0:82f:47ec:944f with SMTP id d2e1a72fcca58-83bb7aba933mr5031440b3a.16.1778229734627;
-        Fri, 08 May 2026 01:42:14 -0700 (PDT)
-Received: from localhost.localdomain ([103.158.43.41])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-83967dbd995sm10518149b3a.43.2026.05.08.01.42.11
+        bh=RhYrD/qUlnmFbz6WLzAXwub0GqnME4rTJoiXfzFciys=;
+        b=MddmKvtb1ScRW2YWn7At7EF7hDcjncEMf0rg5xPlTNwq6CXW1EjEU8D2WaSCaV0wAB
+         bFmNdW0cQ88X5cHqvY2+5OauGioTRLInTJdXlhw5b+Bs/QF1AP/sV9UFegp4cHNHgp2E
+         QvhrVPGDmg9M9/VTCftiLkfq8CwpS910IiTEh9o9ePzOyxzCZBgIp7wuls9Qywu6iUwu
+         +RTF8fuhgdc68NuYPLDuGtSCYk2ZGEFyblXE0eQQpUInMi5icUNnD2iHD+3H/Giwzmwd
+         3U8RwKnn0glzMsG1zc4gGtzMZA8s4c9OI8Eaj+BtQXtYUawq/eflMbNYBi1//8b23XsW
+         4xKQ==
+X-Gm-Message-State: AOJu0YzTJ/QaJ1iMxdJfz5ipQPnh8seltsxyh1LOaf4ayXybIJ4SucSg
+	7ct84kK+EckxEr/2P0pjHlD/EuH6nNTnzwbBEoIE1Dr1B3ruG6unCcOMGTeBRQ==
+X-Gm-Gg: Acq92OHAY5lLi9bR+L/dwdsPcRs65uWW+zMzqD19hbDAcrRv4pNdaXkmqTCmUdqP35d
+	Ks15vu07JAcEJUwn19vsgyHsIotRJvEJRGolqC4kbzEj3tO28JzrXVd2QxxiVjFP2tgM21Qa5m5
+	4LrUBVB0+UH24GGFZOp9z/W5x92r0LGeXMj2dVlswQJH6C+5IGbTRm211pvXcxs4IVgAsZK414M
+	Tbzr/R4J9pgMdQdb5p/HK0gF0u4hkRLdgXRDe8InVwrS0n6vHnK33CQYA5kIS5J++m3Qd3Fd4S2
+	dIC9QU4Rg/US23CORSa+8dS83DIAGIN22vvJQRox0D0Kjcr8xwUALcFlM4u+T/zTAXrGg7bXgQf
+	9eQiiestkda8mZHu6UHNHwNEMVVGXtZG7b7MQRUv8lcgIrFOoAxNMal1/qDPmPgzvo9dGYgofY8
+	p0ZJp04bXHqTRXe2rq42ADyN8FLUC9XuU=
+X-Received: by 2002:a05:7300:434b:b0:2ea:b975:3db1 with SMTP id 5a478bee46e88-2f54ad77112mr6009479eec.23.1778235372364;
+        Fri, 08 May 2026 03:16:12 -0700 (PDT)
+Received: from [172.17.0.2] ([57.151.136.184])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f8884752ccsm1484127eec.17.2026.05.08.03.16.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 01:42:14 -0700 (PDT)
-From: Abdun Nihaal <nihaal@cse.iitm.ac.in>
-To: marcel@holtmann.org
-Cc: Abdun Nihaal <nihaal@cse.iitm.ac.in>,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: virtio_bt: fix potential memory leak in virtbt_probe()
-Date: Fri,  8 May 2026 14:11:53 +0530
-Message-ID: <20260508084158.68765-1-nihaal@cse.iitm.ac.in>
-X-Mailer: git-send-email 2.43.0
+        Fri, 08 May 2026 03:16:11 -0700 (PDT)
+Message-ID: <69fdb7eb.050a0220.22ece4.c2f2@mx.google.com>
+Date: Fri, 08 May 2026 03:16:11 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2461048002471212337=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, nihaal@cse.iitm.ac.in
+Subject: RE: Bluetooth: virtio_bt: fix potential memory leak in virtbt_probe()
+In-Reply-To: <20260508084158.68765-1-nihaal@cse.iitm.ac.in>
+References: <20260508084158.68765-1-nihaal@cse.iitm.ac.in>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The memory allocated for struct virtio_bluetooth is not freed on the
-error paths. Fix that by calling kfree() on the error paths.
+--===============2461048002471212337==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes: afd2daa26c7a ("Bluetooth: Add support for virtio transport driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Abdun Nihaal <nihaal@cse.iitm.ac.in>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1091511
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.64 seconds
+GitLint                       PASS      0.23 seconds
+SubjectPrefix                 PASS      0.08 seconds
+BuildKernel                   PASS      26.45 seconds
+CheckAllWarning               PASS      29.08 seconds
+CheckSparse                   PASS      27.49 seconds
+BuildKernel32                 PASS      25.44 seconds
+TestRunnerSetup               PASS      572.35 seconds
+IncrementalBuild              PASS      24.73 seconds
+
+
+
+https://github.com/bluez/bluetooth-next/pull/156
+
 ---
-Compile tested only. Issue found using static analysis.
+Regards,
+Linux Bluetooth
 
- drivers/bluetooth/virtio_bt.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
-index 140ab55c9fc5..b34dd5ddd631 100644
---- a/drivers/bluetooth/virtio_bt.c
-+++ b/drivers/bluetooth/virtio_bt.c
-@@ -311,7 +311,7 @@ static int virtbt_probe(struct virtio_device *vdev)
- 
- 	err = virtio_find_vqs(vdev, VIRTBT_NUM_VQS, vbt->vqs, vqs_info, NULL);
- 	if (err)
--		return err;
-+		goto free_vbt;
- 
- 	hdev = hci_alloc_dev();
- 	if (!hdev) {
-@@ -400,6 +400,8 @@ static int virtbt_probe(struct virtio_device *vdev)
- 	hci_free_dev(hdev);
- failed:
- 	vdev->config->del_vqs(vdev);
-+free_vbt:
-+	kfree(vbt);
- 	return err;
- }
- 
--- 
-2.43.0
-
+--===============2461048002471212337==--
