@@ -1,109 +1,112 @@
-Received: from out-5.smtp.github.com (out-5.smtp.github.com [192.30.252.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6529B37186E
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 May 2026 06:13:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7226137755C
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 May 2026 07:09:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778220812; cv=none; b=PoBg/ViieATmbU0AVKEC027ADNlYu3glpeJYbYSQK9FbkNiG3IRHlZrjIzHL0rvVexR20n5RPxcr+9cxqE3ucGHObPQEEkuL+bJPddN0L0WuaVuSXnWhIhPW1YP/98uTw8sf6xItpMvym61PQebUN+pxo12fWRnAwrfLw9YD47w=
+	t=1778224194; cv=none; b=RnNBVHFXJGa9ID2H7BLkWaXiaAo4ZhMma1sF+JsuPAx+7yu+/AmHt4k9OxhrcPK3WQx5auFdddEk1OOq+3heAz9UNWQqMUvevWMkyB831D7fTAK2jSNa/Z2SCuZlYYrdmG+PCKPIoYEMNMSMhesW0RgLO8/jTcq1TSAwltQp7m4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778220812; c=relaxed/simple;
-	bh=0wskw0Rm97L8yJAZp/SixpW1n8LM/iZJcEWNkYF2+D8=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=DSm1lRCD4+Bl9n8I7uv4CGyhUI92u1KGDqgBx+W5pCA0V99CmF1bNrTqfpmpr6cBaqoxnNSOz6CuKngYgPHi4obpKYeaMMS/AI7qwlhya9YRalonpfsa7pf1FwpwTNQI5qzmDSasUJoY6oAmfu3retBiVRxx9o71c1HLS6qEo0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=DKIDDLLK; arc=none smtp.client-ip=192.30.252.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1778224194; c=relaxed/simple;
+	bh=l+yN5nMRtFUtosAediu/nb//BmITAol/CBGSs2MxYHU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=J4tDpeXj+PousxLkaMcLQjyWr4jAbFne+F4utoeFpPvUypEv3Ejn86nt+Ihk6BcSk+t/U/ormdyFv7sxDfSJNv15DLeKDibR3iKKBpJfbcS6bFtlPkCk3afgL3fhnjI1AHIP5TYqO7TrXwwcZulkzIajBJwYW/dz0EtWW0yGgwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pgphJpBQ; arc=none smtp.client-ip=74.125.82.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="DKIDDLLK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1778220803;
-	bh=GvPh72+S02jTwauy/+qkbU/9ydRWQq6S0E8vE6Wz1bU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=DKIDDLLKIQUjVAElkrG2QrYa5YTeCwPQgA200ftNCDW6WguK1kYpejvtChCWT7C92
-	 CO2IJZQLJXjPi46g2Ws6uslK/5CTK0DdleBrZsOlJj20XQHJxJx/UfN6jpdUBQJpar
-	 3unlBriDJiqkQlgM1V89A+elWEpBl3vOVn3gay4s=
-Received: from github.com (hubbernetes-node-1af9998.va3-iad.github.net [10.48.201.68])
-	by smtp.github.com (Postfix) with ESMTPA id 61A10780345
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 May 2026 23:13:23 -0700 (PDT)
-Date: Thu, 07 May 2026 23:13:23 -0700
-From: prathibhamadugonde <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1091417/000000-b1528e@github.com>
-Subject: [bluez/bluez] b1528e: monitor: Parsing of cs step mode data in RAS
- Notif...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pgphJpBQ"
+Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-2f33ae12f97so168448eec.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 May 2026 00:09:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778224189; x=1778828989; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=mRVunwQGPGk/VN7QwXj74BmmP5dnFL6CncO80stg6dE=;
+        b=pgphJpBQmPNXQgmxLP55hsgAPc/md/xuh33jw29aNRfypciyF9OIAE91ckeIEexeJ+
+         rvrwSI9QCXZVdSQLDCak03Lf7xvZZunW4Rm3dYgJUT3QCwOb0Y+pR9mmpqF4LnEBKAwQ
+         EyeZgxHd5WvrfmtZCZ58BfG/9UOrlz0iOXlXzImV9Chq5zy1VYbnX0w0PeLIYmO/gFvE
+         asmB4Gg3s4PPNc18+yVLP7cdymzHoZ7J+tWleNx+J6moXadd+TXbO+BOENZNFpar4/Pf
+         vru63q7IQ8teFNT8r1d3a5sqGiLfcQfwmIWgiBCsFX5+Xg2Hl1dsojMqn+Vokqujhhfb
+         9dAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778224189; x=1778828989;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mRVunwQGPGk/VN7QwXj74BmmP5dnFL6CncO80stg6dE=;
+        b=A0A6y2mTYX7eMSJwddysth5OMMkgsEnszDLtobfcjjgUnlhjUgF/GL6xuMl7d3zXBV
+         nu9QVRj1JTU4IraUQ9BoOggiwYsVeTQW+dWX1XaaDC7uZEzEN5NSGllwZE5MS7kkIjkX
+         issWyCKXsdKuYn0+seYlfpQ+h+0v/qwERM+93yU63J8+n6/7i2DoY96Rl+/czlc1D8m8
+         ojsSxjxg9zl1t2AVRsdDwPWciZF4GQUR+ntHJcLHwL/pT+d7juwMEROt3nNGhwgmcbzp
+         RT45F/V+7LspWeSYTZEQyUWEEVTVmuyMAYGiFqJWfaWjUC5PKcoNUp+nCTW+apQ+USX6
+         U5ZQ==
+X-Gm-Message-State: AOJu0Yy7/YtQbiul4n3znEPvFNLhLwkhv3lxKM7duIiQ+soLETHav8Ud
+	pCIqFPqhfSrMe4R556fuzkHjGPAnQ4YJQtVgrPvHsyEMDItY+KcdW2b4+mrY8Q==
+X-Gm-Gg: Acq92OHqiGdBF9r0OjILA13EtvzOyn//3+TfxqWdO3AdMhvSwFY14b3o98uEd1St/qf
+	T1hkQaFORLaFVTzjQCUR5JiSa4oYYAOuYe0pGEpSgoqfxzmveYEGfJO9omesghonuc7Bs3hrzaL
+	OV0a45l8rzOwi31LUDLY28100iY1SlghZ4Gs1LcUMDoGG5WSDEVUm+BaqFBQlJNVlhoAAd7tqCM
+	0h5GQ/yLR/1C/H1V+U+1KP1uS9vZOMS5ebQVrU3zXKSSFkD68pmuoum7HutJflkWSW+NyPWJP7a
+	kYOnB5VLy8vYQw3MUeYVO8zFXdlhzL8aLyNefR6NWF6wgiRNhTSqf0MrSreVMrTDSyIrd3Dua59
+	kUuRBe1k5+tRYoasgyUAed0+x2tf+mukRT84tOfevJncY1msRR+uU1flkDWfghhbS0tjIHoOIic
+	RZ2BO9pMLVs9wFWE21UQ2e2lMw4riQsTgqSGAMfM3P
+X-Received: by 2002:a05:7300:3207:b0:2c5:60d0:701e with SMTP id 5a478bee46e88-2f85bb73083mr829586eec.3.1778224188988;
+        Fri, 08 May 2026 00:09:48 -0700 (PDT)
+Received: from [172.17.0.2] ([172.182.225.3])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f8862d3047sm1297343eec.10.2026.05.08.00.09.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 May 2026 00:09:48 -0700 (PDT)
+Message-ID: <69fd8c3c.050a0220.2f853.c5d7@mx.google.com>
+Date: Fri, 08 May 2026 00:09:48 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7667693177782158273=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, prathibha.madugonde@oss.qualcomm.com
+Subject: RE: [BlueZ,v3] monitor: Parsing of cs step mode data in RAS Notifications
+In-Reply-To: <20260508053819.3424918-1-prathm@qti.qualcomm.com>
+References: <20260508053819.3424918-1-prathm@qti.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============7667693177782158273==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1091417
-  Home:   https://github.com/bluez/bluez
-  Commit: b1528e37b53e3743947e22bdd4376bac225ba5b3
-      https://github.com/bluez/bluez/commit/b1528e37b53e3743947e22bdd4376bac225ba5b3
-  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-  Date:   2026-05-08 (Fri, 08 May 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M monitor/att.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  monitor: Parsing of cs step mode data in RAS Notifications
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1091417
 
-Sample Decoding Example:
-            Subevent #0:
-              Start ACL Connection Event: 406
-              Frequency Compensation: -16384 (0.01 ppm)
-              Ranging Done Status: Partial results, more to follow (0x1)
-              Subevent Done Status: All results complete (0x0)
-              Ranging Abort Reason: No abort (0x0)
-              Subevent Abort Reason: No abort (0x0)
-              Reference Power Level: -14 dBm
-              Number of Steps Reported: 58
-                Step 0
-                  Mode Type: 0
-                  Aborted: No
-                  Packet Quality: 0x00
-                    CS Access Address check is successful
-                    Bit errors: 0
-                  Packet RSSI: -52
-                  Packet Antenna: 1
-                Step 1
-                  Mode Type: 0
-                  Aborted: No
-                  Packet Quality: 0x00
-                    CS Access Address check is successful
-                    Bit errors: 0
-                  Packet RSSI: -48
-                  Packet Antenna: 1
-                Step 2
-                  Mode Type: 1
-                  Aborted: No
-                  Packet Quality: 0x00
-                    CS Access Address check is successful
-                    Bit errors: 0
-                  Packet NADM: Unknown NADM (0xff)
-                  Packet RSSI: -60
-                  ToA_ToD: 0xffffff45
-                  Packet Antenna: 1
-                Step 3
-                  Mode Type: 1
-                  Aborted: No
-                  Packet Quality: 0x00
-                    CS Access Address check is successful
-                    Bit errors: 0
-                  Packet NADM: Unknown NADM (0xff)
-                  Packet RSSI: -54
-                  ToA_ToD: 0xffffff53
-                  Packet Antenna: 1
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.66 seconds
+GitLint                       PASS      0.23 seconds
+BuildEll                      PASS      20.00 seconds
+BluezMake                     PASS      653.56 seconds
+MakeCheck                     PASS      0.88 seconds
+MakeDistcheck                 PASS      243.78 seconds
+CheckValgrind                 PASS      220.27 seconds
+CheckSmatch                   PASS      346.56 seconds
+bluezmakeextell               PASS      181.41 seconds
+IncrementalBuild              PASS      647.01 seconds
+ScanBuild                     PASS      1010.36 seconds
 
 
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+https://github.com/bluez/bluez/pull/2109
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7667693177782158273==--
