@@ -1,60 +1,60 @@
-Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
+Received: from mail-pj1-f65.google.com (mail-pj1-f65.google.com [209.85.216.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B683A7F6F
-	for <linux-bluetooth@vger.kernel.org>; Sat,  9 May 2026 17:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD2C3A7F6F
+	for <linux-bluetooth@vger.kernel.org>; Sat,  9 May 2026 17:38:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778348264; cv=none; b=QwQUpmzfCZeVIHbqwiV9FGF1BgKB7aWGwYXjD8nRcQuslI11+yWT3sqdnt2ZoLnb/T78meLjeg0IWxp/1aSexnahf5LKFvvHo7NviqUZR/UZ1MahzH+Z2NVgVOxsqy0Ma3Ad/oQGbPGoo1phx3uD65o+xsiJgDIAKG0LLAFLSew=
+	t=1778348291; cv=none; b=WBnxo3ZuSQbgYmCTzG0+1RNkY4viI06cLKKf9Bz5+Ee/wvcloyqV4J885rwukx/3IqM1d1v0Dgat49NhLVwFnjNDvvjDSqj9b5rLlKxxHrGqFF8kFUE7TuHUsD9mYDzXumfOqmo8d21Z0x65Ulkv8O2CFmPysNTAfjTDr+j0lRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778348264; c=relaxed/simple;
-	bh=I7t5q5hv4eMLevE6KOcpV5PBeoi1BPFTA3lfTL1x0R8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=u3RORJH370yDHuOEkRP3AHyF0PgkaStZpuJMeXqDincP0orhV+2XJd+quwPGZFJMBUYgkCTFTB3YWOo7HR9nws95WXUSskER4skxYm4M/Z/znj0tfdEAFVmE5w5ET8/dEYOfHga4oEEvXbzN/9LFrpBpQSol6x6zU7Mg/I3FHDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QOGlVw/y; arc=none smtp.client-ip=209.85.214.194
+	s=arc-20240116; t=1778348291; c=relaxed/simple;
+	bh=B199kt+BH+alaZQK1JxLDtZaR8d8bGngi+b9ijGkgNo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=f75TQgWW3EIB3WsteJtpe65rHemvHqkbMAYg0xZOeFAL3ttJVBuwRO2Lh8AJeRaY/HjO+EUMytolZGloSvw4VLd0FYV3BzbqQY2KU/yXDdfaB7yF7KUuuu2ZqWRP8vYvWXkI/tblu/26s33MN35gm5/6Wg2LROYk942lHPnp5tE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PTeY+Xc5; arc=none smtp.client-ip=209.85.216.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QOGlVw/y"
-Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-2ba4a1a0325so21607165ad.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 09 May 2026 10:37:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PTeY+Xc5"
+Received: by mail-pj1-f65.google.com with SMTP id 98e67ed59e1d1-366087480d8so2695389a91.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 09 May 2026 10:38:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778348262; x=1778953062; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778348289; x=1778953089; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mw3B+YxDKfj8tFV2xTgPlRdOE16ht898X2ckp1lDjzQ=;
-        b=QOGlVw/yH2Ga4v2Aa1v3BLqy8v9BAEFe2VMttCytfKEB9JhkB/wF8FwP3O1Fvb6rHs
-         wu59q+sjgClY0c4q7OVPLlODWLCdRFiILy5cUXs1KPGg9ldpxJCJAp1ksalzaWZpoDm8
-         hpboFW9cw3cR/kdc9NzEaja8fEIoITXET4MGq+AzAvt6fJ06RAy0JqGSi9zJTLbRoWM7
-         FnOOriJ0LB6AJ5AhIekIHO/HN6RF9lg2/DZdmDDaeN2pKArK/FAeuvxeDd0wZq8DO6kU
-         bhnNOukJ4x/9cjcKiDiwWgGVHaVlRV6HfVum9WH3VY1QtkdbPvjLkFAlQU2XbFW5jZfc
-         w8VQ==
+        bh=KwihATtMife8xxJX2EKXnY39i7hkWowsEJNlqJe2dzw=;
+        b=PTeY+Xc5tVYyNNQ4fHlZd4uHMRmlJIVtIMvo3rO30uI1coewupKeZ91eoaRZW4wHRR
+         FDVFLcaR2SJcMeCvdns6RHVYzPkt/KpSTBkNdR4pKYtEjtYfvN+9rt9u3ng64fiuSjUt
+         wJS5fl7zwgnhT95DgFpY3vwPkW74Kzi55w+AufXThqzz6bNolqsUmdli/8IEhQKUhO2H
+         uIXpX59FRgGXjtWHf5AGfgQzPGSR6pO7oGb/zn1kvqHV4DC2qhquwZyhD+nT1kGWMy3T
+         8OK9ubGRaAN8CTMUssc9HBYYYSDQq9BWI57MUyFmAouOF4sRGIPlnmXHqk7zc+7NPKOA
+         buRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778348262; x=1778953062;
+        d=1e100.net; s=20251104; t=1778348289; x=1778953089;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mw3B+YxDKfj8tFV2xTgPlRdOE16ht898X2ckp1lDjzQ=;
-        b=GCrxCGUcCv1QkJQO8wxW08FkRnrj/wGOkCQba7Y/YeOCLUwcjEWC9QaxygxcQ1ldV0
-         JTBNHJJ+xV54cXL8b85faEJmVPQ4w+i/BKdJcTc3xAEeu3kN/Aeg1Br1BZwMF30INR+W
-         N4S8sYVrPB/GfLhBn8TQh5eeIP/d8yNieFPwgE2DyiGDicAhZZQuaO9V+Obs3j3N7xd1
-         /WV5I2Qg9S9CVCX7KIIBS7TIUK1pVMsRSYv+TP1zc6M9nwQViiiMzEgMv2UZOcH+ALT9
-         XX2Kr/HvWJi+qL0AbxR3yPElQqgjmz14v8d5Y/BblQYBcJ3HODIzW3QDyzR5fvSTpIkx
-         XN1A==
-X-Gm-Message-State: AOJu0YxPsVKvKdY4QuGvVjDE2YyUv7thPHen2f6gMc9qGNZw+3FWLRL3
-	CImds3z677d+dDObZtNb2ZM/FxrVjSMFpS5g0wS6hH31CBV05HLaBrbW
-X-Gm-Gg: Acq92OFlU5t3UNJNCNFI4ki2x4kkqbI3zEanuS7QkfNhBaEM2UwJqCADMJ9gJHPce0o
-	Yntsn1nwXilF3uEn+jW7q45KaC1YYGYrsUwTUAG7YGiRAeBjEA0DCP+WCBRijTUL0bRrPeXPyqG
-	bDAktAViatQm+8o2KgoXRwsFI/sCrII9GkgJE31S7k+4D3fFe5G4qbJNdnBNgljRkhc5AOZKMnr
-	JWN2K1uhhYeW5C8oqxOaYbDRJrT5boYfW0JgevDDKU1+/lnsBZNJq+4/j918P3lzDCXUq/vf7Rx
-	5SaC7UgmI6OsLA/z6z2aMlvnK1XRTFGL3x8w3tbsrdscBv/SHvLnPpkYI+299UMmnmNBihMm8v9
-	4KoSY4hQKhv9wa+7hEu9pbcNb7Pt14WA61wdSrvTSPkeqNSORJcVyxEkho8srOtTW8p3wNHhoEm
-	i9ZecrJQAcOcJ32kOm1WJKVmfiQBEEK99r1oU0h76xcg==
-X-Received: by 2002:a17:903:1446:b0:2b7:aba0:ac10 with SMTP id d9443c01a7336-2bc7a99c150mr28136335ad.11.1778348261984;
-        Sat, 09 May 2026 10:37:41 -0700 (PDT)
+        bh=KwihATtMife8xxJX2EKXnY39i7hkWowsEJNlqJe2dzw=;
+        b=hKV7a/O+A9i5rDYkKkRaBNewuZqN2CMxDk3yMDi//suBHk+3vHr3kp70pwQ02WVy3P
+         FgQ9C/56KcNrBbmYizYfC1KUUt8nM4NyJXB4INUMZKkpYrfnXAUBQKr+zi+dMr/cwU4+
+         vFIJmvJWeK0B6XONhopqplrV5MjE2QRduipS2+9mVN4Mngs7r0bD9ML9ggKozivvKbFS
+         TwN5H0+6C5LQjEfgXC5Q7Brn9q87gewOqCBAaOwRyKJfMvnqtHtruZG+QYv53n0lE+n2
+         SIJ7IhmbHcUrOIRuYzh6LBLKZ2Enz7hHn0p/OFEM9KOf0BxRs8P4oyotxTgZ6i8mY3ie
+         2zUg==
+X-Gm-Message-State: AOJu0YwcuQt/EwiETQy6a2i11h5LDoUsk2NzWMrrEaxvcheOHXLIGQwO
+	QZtPCc3RUp2VYMh9C141/eznAd8qaD82BHmTKDxSBuG1j/xzWHbQDUzOjtkFuVW3K0ugfQ==
+X-Gm-Gg: Acq92OFSpsiQjAGHU6Jd6DUtsH6AJRpf+jg+Gd0498xE6rcsV+xQPAcEs3UjmsToyA3
+	waSrqzRtQPIMY3LyISB/GUm46o9xmeazkvhMBC2jHWu0xJ/GiCdSXcfENzrMohJk51DA7eEhbkM
+	96Cd3kytJz8LtXx7UOSg0GjxEhG51bW79dhd1i68s1alLG0/M8edVsGKzykx0ubLf2HHB9XT+xA
+	hmC8y2qCUe2VwbNb8YWS6a5hMMAbgLYDrlQLHbiUgQ7q5HXVRYBfr0G2Q4xGsgiI457oAleeT/F
+	yKaJyg87Ei+g/E51nIVIuv5MnFHg912YM06t4PhT2XKQqXMV2QLCGImYtB71j9BEmXeHgs2UkY6
+	mLXQ/Z/cvHvrRTnFTjHGUNt5I9wIMJzGYGGzlSdfbdCEClJfMp70naFHrWfcN1UQY1DAO6jeMxA
+	GdxIWeKrFW4H89Muk0HGuRono0VjK5CD05cdbkEastVQ==
+X-Received: by 2002:a17:90b:3846:b0:366:33a6:9926 with SMTP id 98e67ed59e1d1-36633a69cfamr10642386a91.18.1778348288447;
+        Sat, 09 May 2026 10:38:08 -0700 (PDT)
 Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1ec232esm58010745ad.81.2026.05.09.10.37.35
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-367d625f126sm3025004a91.3.2026.05.09.10.38.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 May 2026 10:37:41 -0700 (PDT)
+        Sat, 09 May 2026 10:38:08 -0700 (PDT)
 From: Zhang Cen <rollkingzzc@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -62,9 +62,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	zerocling0077@gmail.com,
 	Zhang Cen <rollkingzzc@gmail.com>
-Subject: [PATCH] Bluetooth: RFCOMM: hold listener socket in rfcomm_connect_ind()
-Date: Sun, 10 May 2026 01:37:27 +0800
-Message-Id: <20260509173727.412674-1-rollkingzzc@gmail.com>
+Subject: [PATCH] Bluetooth: 6lowpan: Defer peer channel release until RCU cleanup
+Date: Sun, 10 May 2026 01:37:45 +0800
+Message-Id: <20260509173745.413473-1-rollkingzzc@gmail.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -74,186 +74,309 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-rfcomm_get_sock_by_channel() returns a listener from rfcomm_sk_list
-after dropping rfcomm_sk_list.lock, but it does not hold a reference on
-that socket. rfcomm_connect_ind() then locks the listener, queues a
-child on it, and may still notify it after unlocking it.
+A 6LoWPAN peer stores the protocol-owned L2CAP channel reference in
+peer->chan. chan_close_cb() removes the peer from the RCU list, but it
+also drops that reference immediately. The peer object can still be seen
+by in-flight RCU readers, and some paths keep using peer->chan after the
+lookup has finished.
 
-rfcomm_connect_ind()              listener close
-1. Look up the parent on          1. close() enters
-   rfcomm_sk_list.                   rfcomm_sock_release().
-2. Drop rfcomm_sk_list.lock       2. rfcomm_sock_shutdown()
-   without pinning the listener.     starts tearing the listener down.
-3. Later call lock_sock(parent),  3. rfcomm_sock_kill() unlinks the
-   bt_accept_enqueue(parent, ...),   listener and drops its last
-   or the deferred-setup callback.   reference.
+That lets transmit and disconnect paths dereference, lock, or send
+through a channel whose last reference was released by the close path.
 
-Take a socket reference on the selected listener before leaving
-rfcomm_sk_list.lock, re-check that the parent is still in BT_LISTEN
-after locking it, cache the deferred-setup bit while the parent is
-locked, and drop the extra reference after the last parent use in
-rfcomm_connect_ind().
+Defer the peer-owned l2cap_chan_put() until the peer RCU callback so a
+peer that remains observable through RCU still carries a live channel
+reference. Then take temporary channel references in the unicast,
+multicast, and explicit disconnect paths before they keep using the
+channel after the lookup window closes.
+
+If the reader reaches step 3 after teardown reaches step 4, it can hit a
+freed l2cap_chan.
 
 The buggy scenario involves two paths, with each column showing the order within that path:
 
-  rfcomm_connect_ind():                  listener close:
-  1. Call                                1. close() enters
-     rfcomm_get_sock_by_channel(BT_LISTEN,       rfcomm_sock_release()
-     channel, &src)
-  2. Return the matched listener         2. rfcomm_sock_shutdown() runs
-     after                                  the BT_LISTEN close path and
-     read_unlock(&rfcomm_sk_list.lock)       rfcomm_sock_cleanup_listen(parent)
-     without sock_hold()                    sets parent->sk_state =
-                                            BT_CLOSED and SOCK_ZAPPED
-  3. Later call lock_sock(parent)        3. rfcomm_sock_release() calls
-     and bt_accept_enqueue(parent,          sock_orphan(parent) and
-     sk, true)                              rfcomm_sock_kill(parent)
-  4. After release_sock(parent),         4. rfcomm_sock_kill() unlinks
-     read bt_sk(parent)->flags and          the listener from
-     may call                               rfcomm_sk_list and sock_put()
-     parent->sk_state_change(parent)        can free it
+  L2CAP peer teardown:                   Concurrent peer reader:
+  1. l2cap_conn_del() or another         1. A reader such as
+     close path takes a temporary           __peer_lookup_conn(),
+     hold on the channel                    setup_header(),
+                                            send_mcast_pkt(), or
+                                            bt_6lowpan_disconnect()
+                                            traverses the peer list and
+                                            reads peer->chan
+  2. l2cap_chan_del() drops the          2. The reader keeps using the
+     connection-owned channel               raw channel pointer after the
+     reference before 6LoWPAN               lookup or after only RCU
+     close handling finishes                protection remains
+  3. chan_close_cb() removes the         3. It dereferences channel
+     matching lowpan_peer from the          fields or calls send or close
+     peer list                              operations through that
+                                            pointer
+  4. The original chan_close_cb()
+     also dropped the peer-owned
+     l2cap_chan reference, and the
+     close caller later released
+     its temporary hold
 
-The lookup path drops rfcomm_sk_list.lock without a private reference,
-so listener close can mark the socket closed, unlink it, and free it
-before rfcomm_connect_ind() reaches lock_sock(), bt_accept_enqueue(), or
-its deferred-setup callback.
+A peer reader can still observe the lowpan_peer while chan_close_cb()
+has already consumed the peer-owned channel reference and the close
+caller is releasing the last temporary hold, leaving peer->chan stale
+before the peer's RCU grace period ends.
 
-rfcomm_lock serializes RFCOMM core work but does not serialize userspace
-close against rfcomm_sock_release() or rfcomm_sock_kill().
-
-Sanitizer validation reported:
-BUG: KASAN: slab-use-after-free in lock_sock_nested()
-Read of size 1 at addr ffff88810da92250
-Call trace:
-  dump_stack_lvl() (?:?)
-  print_address_description() (mm/kasan/report.c:373)
-  lock_sock_nested() (net/core/sock.c:3780)
-  print_report() (?:?)
-  __virt_addr_valid() (?:?)
-  srso_alias_return_thunk() (arch/x86/include/asm/nospec-branch.h:375)
-  kasan_addr_to_slab() (mm/kasan/common.c:45)
-  kasan_report() (?:?)
-  __kasan_check_byte() (mm/kasan/common.c:571)
-  lock_acquire() (?:?)
-  rcu_is_watching() (?:?)
-  rfcomm_connect_ind() (net/bluetooth/rfcomm/sock.c:952)
-  rfcomm_recv_pn() (net/bluetooth/rfcomm/core.c:1432)
-  trace_clock_x86_tsc() (arch/x86/kernel/trace_clock.c:14)
-  __lock_acquire() (kernel/locking/lockdep.c:5077)
-  rfcomm_recv_mcc() (net/bluetooth/rfcomm/core.c:1645)
-  do_raw_spin_lock() (?:?)
-  mark_held_locks() (kernel/locking/lockdep.c:4308)
-  rfcomm_recv_frame() (net/bluetooth/rfcomm/core.c:1738)
-  rfcomm_process_rx() (net/bluetooth/rfcomm/core.c:1933)
-  rfcomm_run() (net/bluetooth/rfcomm/core.c:2114)
-  find_held_lock() (kernel/locking/lockdep.c:5340)
-  _raw_spin_unlock_irqrestore() (kernel/locking/spinlock.c:196)
-  lockdep_hardirqs_on() (?:?)
-  __kthread_parkme() (kernel/kthread.c:259)
-  kthread() (?:?)
-  _raw_spin_unlock_irq() (kernel/locking/spinlock.c:204)
-  ret_from_fork() (?:?)
-  __switch_to() (?:?)
-  ret_from_fork_asm() (?:?)
-  kasan_save_stack() (mm/kasan/common.c:52)
-  kasan_save_track() (mm/kasan/common.c:74)
-  __kasan_kmalloc() (?:?)
-  __kmalloc_noprof() (?:?)
-  sk_prot_alloc() (net/core/sock.c:2233)
-  sk_alloc() (?:?)
-  bt_sock_alloc() (?:?)
-  rfcomm_sock_alloc() (net/bluetooth/rfcomm/sock.c:271)
-  rfcomm_sock_create() (net/bluetooth/rfcomm/sock.c:305)
-  bt_sock_create() (net/bluetooth/af_bluetooth.c:116)
-  __sock_create() (?:?)
-  __sys_socket() (net/socket.c:1801)
-  __x64_sys_socket() (?:?)
-  do_syscall_64() (arch/x86/entry/syscall_64.c:87)
-  entry_SYSCALL_64_after_hwframe() (?:?)
-  kasan_save_free_info() (?:?)
-  __kasan_slab_free() (?:?)
-  kfree() (?:?)
-  __sk_destruct() (net/core/sock.c:2345)
-  sk_destruct() (net/core/sock.c:2402)
-  __sk_free() (net/core/sock.c:2417)
-  sk_free() (net/core/sock.c:2428)
-  rfcomm_sock_kill() (net/bluetooth/rfcomm/sock.c:192)
-  rfcomm_sock_release() (net/bluetooth/rfcomm/sock.c:912)
-  __sock_release() (net/socket.c:713)
+lowpan_peer objects stay RCU-visible after peer_del() removes them from
+the list.
 
 Signed-off-by: Zhang Cen <rollkingzzc@gmail.com>
 
 ---
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index be6639cd6f59..677c9cd22fb2 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -122,7 +122,7 @@ static struct sock *__rfcomm_get_listen_sock_by_addr(u8 channel, bdaddr_t *src)
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 2f03b780b40d..ea3ee6929101 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -95,13 +95,20 @@ static inline void peer_add(struct lowpan_btle_dev *dev,
+ 	atomic_inc(&dev->peer_count);
  }
  
- /* Find socket with channel and source bdaddr.
-- * Returns closest match.
-+ * Returns closest match with an extra reference held.
-  */
- static struct sock *rfcomm_get_sock_by_channel(int state, u8 channel, bdaddr_t *src)
- {
-@@ -136,15 +136,25 @@ static struct sock *rfcomm_get_sock_by_channel(int state, u8 channel, bdaddr_t *
- 
- 		if (rfcomm_pi(sk)->channel == channel) {
- 			/* Exact match. */
--			if (!bacmp(&rfcomm_pi(sk)->src, src))
-+			if (!bacmp(&rfcomm_pi(sk)->src, src)) {
-+				sock_hold(sk);
- 				break;
-+			}
- 
- 			/* Closest match */
--			if (!bacmp(&rfcomm_pi(sk)->src, BDADDR_ANY))
-+			if (!bacmp(&rfcomm_pi(sk)->src, BDADDR_ANY)) {
-+				if (sk1)
-+					sock_put(sk1);
++static void peer_free_rcu(struct rcu_head *rcu)
++{
++	struct lowpan_peer *peer = container_of(rcu, struct lowpan_peer, rcu);
 +
- 				sk1 = sk;
-+				sock_hold(sk1);
-+			}
++	l2cap_chan_put(peer->chan);
++	kfree(peer);
++	module_put(THIS_MODULE);
++}
++
+ static inline bool peer_del(struct lowpan_btle_dev *dev,
+ 			    struct lowpan_peer *peer)
+ {
+ 	list_del_rcu(&peer->list);
+-	kfree_rcu(peer, rcu);
+-
+-	module_put(THIS_MODULE);
++	call_rcu(&peer->rcu, peer_free_rcu);
+ 
+ 	if (atomic_dec_and_test(&dev->peer_count)) {
+ 		BT_DBG("last peer");
+@@ -137,9 +144,32 @@ __peer_lookup_conn(struct lowpan_btle_dev *dev, struct l2cap_conn *conn)
+ 	return NULL;
+ }
+ 
+-static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
+-						  struct in6_addr *daddr,
+-						  struct sk_buff *skb)
++static struct l2cap_chan *lookup_peer_chan(struct l2cap_conn *conn)
++{
++	struct lowpan_btle_dev *entry;
++	struct lowpan_peer *peer;
++	struct l2cap_chan *chan = NULL;
++
++	rcu_read_lock();
++
++	list_for_each_entry_rcu(entry, &bt_6lowpan_devices, list) {
++		peer = __peer_lookup_conn(entry, conn);
++		if (peer) {
++			chan = peer->chan;
++			l2cap_chan_hold(chan);
++			break;
++		}
++	}
++
++	rcu_read_unlock();
++
++	return chan;
++}
++
++static int peer_lookup_dst(struct lowpan_btle_dev *dev, struct in6_addr *daddr,
++			   struct sk_buff *skb, u8 *lladdr,
++			   bdaddr_t *peer_addr, u8 *peer_addr_type,
++			   struct l2cap_chan **chan)
+ {
+ 	struct rt6_info *rt = dst_rt6_info(skb_dst(skb));
+ 	int count = atomic_read(&dev->peer_count);
+@@ -175,13 +205,20 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
+ 	rcu_read_lock();
+ 
+ 	list_for_each_entry_rcu(peer, &dev->peers, list) {
++		struct l2cap_chan *pchan = peer->chan;
++
+ 		BT_DBG("dst addr %pMR dst type %u ip %pI6c",
+-		       &peer->chan->dst, peer->chan->dst_type,
++		       &pchan->dst, pchan->dst_type,
+ 		       &peer->peer_addr);
+ 
+ 		if (!ipv6_addr_cmp(&peer->peer_addr, nexthop)) {
++			memcpy(lladdr, peer->lladdr, ETH_ALEN);
++			*peer_addr = pchan->dst;
++			*peer_addr_type = pchan->dst_type;
++			l2cap_chan_hold(pchan);
++			*chan = pchan;
+ 			rcu_read_unlock();
+-			return peer;
++			return 0;
  		}
  	}
  
-+	if (sk && sk1)
-+		sock_put(sk1);
+@@ -190,9 +227,16 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
+ 	if (neigh) {
+ 		list_for_each_entry_rcu(peer, &dev->peers, list) {
+ 			if (!memcmp(neigh->ha, peer->lladdr, ETH_ALEN)) {
++				struct l2cap_chan *pchan = peer->chan;
 +
- 	read_unlock(&rfcomm_sk_list.lock);
++				memcpy(lladdr, peer->lladdr, ETH_ALEN);
++				*peer_addr = pchan->dst;
++				*peer_addr_type = pchan->dst_type;
++				l2cap_chan_hold(pchan);
++				*chan = pchan;
+ 				neigh_release(neigh);
+ 				rcu_read_unlock();
+-				return peer;
++				return 0;
+ 			}
+ 		}
+ 		neigh_release(neigh);
+@@ -200,7 +244,7 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
  
- 	return sk ? sk : sk1;
-@@ -934,6 +944,7 @@ int rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc *
+ 	rcu_read_unlock();
+ 
+-	return NULL;
++	return -ENOENT;
+ }
+ 
+ static struct lowpan_peer *lookup_peer(struct l2cap_conn *conn)
+@@ -379,7 +423,7 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
+ 	struct in6_addr ipv6_daddr;
+ 	struct ipv6hdr *hdr;
+ 	struct lowpan_btle_dev *dev;
+-	struct lowpan_peer *peer;
++	u8 peer_lladdr[ETH_ALEN];
+ 	u8 *daddr;
+ 	int err, status = 0;
+ 
+@@ -388,9 +432,9 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
+ 	dev = lowpan_btle_dev(netdev);
+ 
+ 	memcpy(&ipv6_daddr, &hdr->daddr, sizeof(ipv6_daddr));
++	lowpan_cb(skb)->chan = NULL;
+ 
+ 	if (ipv6_addr_is_multicast(&ipv6_daddr)) {
+-		lowpan_cb(skb)->chan = NULL;
+ 		daddr = NULL;
+ 	} else {
+ 		BT_DBG("dest IP %pI6c", &ipv6_daddr);
+@@ -400,16 +444,15 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
+ 		 * or user set route) so get peer according to
+ 		 * the destination address.
+ 		 */
+-		peer = peer_lookup_dst(dev, &ipv6_daddr, skb);
+-		if (!peer) {
++		err = peer_lookup_dst(dev, &ipv6_daddr, skb, peer_lladdr,
++				      peer_addr, peer_addr_type,
++				      &lowpan_cb(skb)->chan);
++		if (err) {
+ 			BT_DBG("no such peer");
+-			return -ENOENT;
++			return err;
+ 		}
+ 
+-		daddr = peer->lladdr;
+-		*peer_addr = peer->chan->dst;
+-		*peer_addr_type = peer->chan->dst_type;
+-		lowpan_cb(skb)->chan = peer->chan;
++		daddr = peer_lladdr;
+ 
+ 		status = 1;
+ 	}
+@@ -417,8 +460,13 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
+ 	lowpan_header_compress(skb, netdev, daddr, dev->netdev->dev_addr);
+ 
+ 	err = dev_hard_header(skb, netdev, ETH_P_IPV6, NULL, NULL, 0);
+-	if (err < 0)
++	if (err < 0) {
++		if (lowpan_cb(skb)->chan) {
++			l2cap_chan_put(lowpan_cb(skb)->chan);
++			lowpan_cb(skb)->chan = NULL;
++		}
+ 		return err;
++	}
+ 
+ 	return status;
+ }
+@@ -483,15 +531,23 @@ static int send_mcast_pkt(struct sk_buff *skb, struct net_device *netdev)
+ 		dev = lowpan_btle_dev(entry->netdev);
+ 
+ 		list_for_each_entry_rcu(pentry, &dev->peers, list) {
++			struct l2cap_chan *chan = pentry->chan;
+ 			int ret;
+ 
+ 			local_skb = skb_clone(skb, GFP_ATOMIC);
++			if (!local_skb) {
++				err = -ENOMEM;
++				continue;
++			}
++
++			l2cap_chan_hold(chan);
+ 
+ 			BT_DBG("xmit %s to %pMR type %u IP %pI6c chan %p",
+ 			       netdev->name,
+-			       &pentry->chan->dst, pentry->chan->dst_type,
+-			       &pentry->peer_addr, pentry->chan);
+-			ret = send_pkt(pentry->chan, local_skb, netdev);
++			       &chan->dst, chan->dst_type,
++			       &pentry->peer_addr, chan);
++			ret = send_pkt(chan, local_skb, netdev);
++			l2cap_chan_put(chan);
+ 			if (ret < 0)
+ 				err = ret;
+ 
+@@ -530,10 +586,14 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 
+ 	if (err) {
+ 		if (lowpan_cb(skb)->chan) {
++			struct l2cap_chan *chan = lowpan_cb(skb)->chan;
++
+ 			BT_DBG("xmit %s to %pMR type %u IP %pI6c chan %p",
+ 			       netdev->name, &addr, addr_type,
+-			       &lowpan_cb(skb)->addr, lowpan_cb(skb)->chan);
+-			err = send_pkt(lowpan_cb(skb)->chan, skb, netdev);
++			       &lowpan_cb(skb)->addr, chan);
++			err = send_pkt(chan, skb, netdev);
++			l2cap_chan_put(chan);
++			lowpan_cb(skb)->chan = NULL;
+ 		} else {
+ 			err = -ENOENT;
+ 		}
+@@ -802,8 +862,6 @@ static void chan_close_cb(struct l2cap_chan *chan)
+ 			       last ? "last " : "1 ", peer);
+ 			BT_DBG("chan %p orig refcnt %u", chan,
+ 			       kref_read(&chan->kref));
+-
+-			l2cap_chan_put(chan);
+ 			break;
+ 		}
+ 	}
+@@ -917,19 +975,20 @@ static int bt_6lowpan_connect(bdaddr_t *addr, u8 dst_type)
+ 
+ static int bt_6lowpan_disconnect(struct l2cap_conn *conn, u8 dst_type)
  {
- 	struct sock *sk, *parent;
- 	bdaddr_t src, dst;
-+	bool defer_setup = false;
- 	int result = 0;
+-	struct lowpan_peer *peer;
++	struct l2cap_chan *chan;
  
- 	BT_DBG("session %p channel %d", s, channel);
-@@ -947,6 +958,11 @@ int rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc *
+ 	BT_DBG("conn %p dst type %u", conn, dst_type);
  
- 	lock_sock(parent);
+-	peer = lookup_peer(conn);
+-	if (!peer)
++	chan = lookup_peer_chan(conn);
++	if (!chan)
+ 		return -ENOENT;
  
-+	if (parent->sk_state != BT_LISTEN)
-+		goto done;
-+
-+	defer_setup = test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags);
-+
- 	/* Check for backlog size */
- 	if (sk_acceptq_is_full(parent)) {
- 		BT_DBG("backlog full %d", parent->sk_ack_backlog);
-@@ -974,9 +990,11 @@ int rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc *
- done:
- 	release_sock(parent);
+-	BT_DBG("peer %p chan %p", peer, peer->chan);
++	BT_DBG("chan %p", chan);
  
--	if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags))
-+	if (defer_setup)
- 		parent->sk_state_change(parent);
+-	l2cap_chan_lock(peer->chan);
+-	l2cap_chan_close(peer->chan, ENOENT);
+-	l2cap_chan_unlock(peer->chan);
++	l2cap_chan_lock(chan);
++	l2cap_chan_close(chan, ENOENT);
++	l2cap_chan_unlock(chan);
++	l2cap_chan_put(chan);
  
-+	sock_put(parent);
-+
- 	return result;
+ 	return 0;
  }
