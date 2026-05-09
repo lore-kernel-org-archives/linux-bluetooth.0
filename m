@@ -1,69 +1,72 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A616C2FD
-	for <linux-bluetooth@vger.kernel.org>; Sat,  9 May 2026 00:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1DBC2FD
+	for <linux-bluetooth@vger.kernel.org>; Sat,  9 May 2026 00:23:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778286224; cv=none; b=nvmrKT07/y96+UHm3xmjimw+LEc6D9/L26nPV+Tp9W6ycSjuH70y0ksli0K1PpB7T7Q+USuVmcHr1KVwJ5wAuR6FxQIilmI5kJEgZtFRoo5+863UWwni2Oz+xv0vy5gTk4hZzR35o6Xv/x+NdAXBbW6aSPMocFdbhgJtb8g2Eh8=
+	t=1778286229; cv=none; b=amTLMdgg5aIfAJlFyzdsLIxo3tCuZqae843xjFXcMpzme7QzNdn3pjwuO1ntKQEuxSVya6pDcJsLw6FsY63JnjuWRWnH+62yBHhJp8GSUStgu7TRcA04HwNTOxXyZ5A9yqpGJEgmxCxL1GYRw8fE1zDutCnziYFXvLhDDGV1H34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778286224; c=relaxed/simple;
-	bh=4L9njLwPt+x0tmfyQ4Be5amfxyUivUCP/lPUSH9BiPE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HZe7K6aVNlV7sI6Fzb4FEwBIZ3X46+vRoDnM0agxZxPbW/YMVR93dU9DLN9vw/PcoVtyS1qwkYx4oQMBNS/RJdZ+wL3DZQ32SLNShk6PQ1A7If0UbEQohm4mhvAlWavuqMxKkcwh0YF15ZAR3mCKrUl1apx7eHFJ+h/mubfKDIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=prestonhunt.com; spf=pass smtp.mailfrom=prestonhunt.com; dkim=pass (2048-bit key) header.d=prestonhunt-com.20251104.gappssmtp.com header.i=@prestonhunt-com.20251104.gappssmtp.com header.b=p9sa6bvK; arc=none smtp.client-ip=209.85.210.175
+	s=arc-20240116; t=1778286229; c=relaxed/simple;
+	bh=VTr664UO1eiv11Xu8dY7Sr3IL3mlp99VRkGVQZO8mb8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WKI8TKMlH5GxlH/Nt56tHm5A90somlA3pvwzDYoPCkBpSdnGipNzPCnQzAgjK6A1fVN+oeOmgSlTvd+IwxlocHji1bVNs7mSKN+vz3Q/kWMXK873KP3OyvbdT+qhLqL0oJeNXq+HJYlWnEYoVx2rMV2+mJUUN97WUC6onYwvsBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=prestonhunt.com; spf=pass smtp.mailfrom=prestonhunt.com; dkim=pass (2048-bit key) header.d=prestonhunt-com.20251104.gappssmtp.com header.i=@prestonhunt-com.20251104.gappssmtp.com header.b=Oa8bjQBv; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=prestonhunt.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prestonhunt.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=prestonhunt-com.20251104.gappssmtp.com header.i=@prestonhunt-com.20251104.gappssmtp.com header.b="p9sa6bvK"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-83d31ac4017so581606b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 May 2026 17:23:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=prestonhunt-com.20251104.gappssmtp.com header.i=@prestonhunt-com.20251104.gappssmtp.com header.b="Oa8bjQBv"
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-c798fc1a28cso1087973a12.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 May 2026 17:23:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=prestonhunt-com.20251104.gappssmtp.com; s=20251104; t=1778286222; x=1778891022; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iStTXFvvTn1nIhG8KX3xrMWXt1lscjm0GW28X2wP9y0=;
-        b=p9sa6bvKLO7RsBEEwHnV0Bjy+KvQOj2Xko+Hl+4jimgGvnGG5ccnLdcI6u/4r64ZFn
-         6+z8BCNt8esTrS4ONyXg0KF9Xw7wJGqsOLGagRGjCxBxAG6Mw/aEBADXhr68RVPryviv
-         qMcLkeKlrbw5tWqRg8Fa6A4gUNKe2cmEyqYmYwHOZa8ci3M5v09EceoeQDnl25m3GrGf
-         SxtjofwG+nDO3f/Eg9WnmWsWZTh6iKPyWyA4M3er/uqYDWO0z3mYzbbFGpwGnQngsAvT
-         6fIx5xcqNZQTQ8SakDYvH4k0wThpkBPNw6UuMB1gC8rPcJm/JO/3SFeEv5PrKFyyM2Tm
-         92VA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778286222; x=1778891022;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=prestonhunt-com.20251104.gappssmtp.com; s=20251104; t=1778286227; x=1778891027; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iStTXFvvTn1nIhG8KX3xrMWXt1lscjm0GW28X2wP9y0=;
-        b=GRrzpfpkO7nuelzHYNx9snM5Za59xbbhFFGU4zRcwRWxG6JI+5VENIaYgf/EVoj7VN
-         31dGaCDsQtGNUXIGvzlrj07/L3Lo+8OWE9SEr7eIRKNp6Ov39ADPJhuDjbucRNH7GoEC
-         NpqS6fFhGz6KTwRP+YONIePV6aY3QKIsBervYuA2rXul+NU0+W96p1RGvTXU7ZR9H8pG
-         ZYzpm7QdAyAUHufGFzZzzShnvT9wJh0ruYkpNi30BXGws6EQqBRXy4zeO50J6DGzfLE4
-         BN3RZZZd/kySgE6gWezHE3spjfCFrbzQXFPMUWh+6yWIkQM8XI2LFJLLCzoHrqbsItRD
-         N8dw==
-X-Gm-Message-State: AOJu0YzeJTqxs2Bb51s1RaeADVuhLF6r/wJdCtNKVeWnq8dlx5p4xfEI
-	Tl8+LxhghEy7MxFig93KrdaKiuB36FvMHvoE7frVXGCoB5EQvh6BEDspSbThEfEuvWWLgmlCvzq
-	5GmTA
-X-Gm-Gg: Acq92OEk11GA89iCSgFW17kJ/xbk7WNmSQQKcs2vxBA4fzmoJgXcv5IJEsMG0broNkW
-	mAsWurNJuiYQOtybGDooE1jFY7CEHKJ+p4kRFsES2sC9YHMFjURoU/CcT8EWgROrpNakVubwNSE
-	5SdLg7ozv2HZihSbO+VUFF+eFiXJ4HjKq8Pr6ROaDQ4vyVxNb4B7r89L/fQelpxF2BgtX/2bO4T
-	zWlT3C84GRsz1nanO/+3quLx7TgfjqtBrU9Qd6zEobbQ+CfVWw5kMlGnuZCDJ33t6XbU1RQgKG+
-	3EVetldKWV6O5VHuX+6dz8Bzhwctzf7CNVfb8ndiIbat+l3Ge0UQB2RPM8+y9/kkzqqh6yzL2jX
-	QkBkV0B2HZDrKq5GcWnkdeNFGq9OaUP2xO/GXAczjKJvnTmiO4XoAep+igVOG68fWvUgB+fXnG8
-	zyqc9RnyQjai2jxJvxMBdnPGVmJHdActKSc6DaYfugMTzaHDLDB5tiDjZhgB0vuE5C4SVAUGF67
-	K3DZjM40w==
-X-Received: by 2002:a05:6a00:4193:b0:781:2291:1045 with SMTP id d2e1a72fcca58-83a5b2d34damr15144301b3a.8.1778286222368;
-        Fri, 08 May 2026 17:23:42 -0700 (PDT)
+        bh=iOP2kkAcnMvysTNMXFwr4SJqXsHpbsG1uFMZelAgw2k=;
+        b=Oa8bjQBvnCQdw9CU0jtsP7iov1F6De3nyK4K8qxzTaOASI+wMm/5c7bdhZCMfcsFHH
+         P4eGbcjRrS+TO3ajzVWxI6lkNZ5RqK4015OJ7rpeSqLB9ihjmalNnaAMhafkAMUHdJRo
+         4ImdenWHgCNIeVJg0NwjFYL/Zn8HPN9BSLVI8HZwYpfBWN0OBm4lhoM4JNqCOPsz9VI5
+         TOBf+cIKBlIUTb7Pen671ZVfu/r42KHCQ6/dj0jgczdoNU5M13B36kHUW+4RBGluHmCO
+         m2Vjo8/hQg5CkyCer5z2Hq4nOR7QkFWhp1Y92OkmN3KWr5obBaWWvmqy04yUF4AXStwO
+         60UA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778286227; x=1778891027;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=iOP2kkAcnMvysTNMXFwr4SJqXsHpbsG1uFMZelAgw2k=;
+        b=eGfuzyWAOH5jFxRZ6oiAiSYU7uAju+g9ye84HHWvEkcEVvbGPD9N2bbwZdVRTE55ov
+         h8NQ69g/hLee03zkYbdM8IuxagSE4QWTMbBx7b8u550FYkD9+JcP3qAxCEa/BkVLc8WK
+         wLp9UGOIPnV1hu3kFw4acfLDqeY8CIxdw9BU2MESjusSahxasybfdz8RR8WMunMjgRHP
+         PE9sPjsPuj7SUmRAnUO39biCKcjgWbnJjDC41PjPV4xPIixsV78LeGxxMDo+QjRgjnwW
+         WWkCVjNjOH+JJzxqgOQEonzMnfWilyiCbgaaqRgUij5+hZUKQu0d8bFd31a66M1kSvO8
+         O4yQ==
+X-Gm-Message-State: AOJu0YzL23Hgo6HGJhNOA1WKDIYtkti9r1TjaQ+CwOV74A9sfr2oEoom
+	nI+/xgbvT+tXIihug6SsH/iicFK7VHPeHpl0sPjGmON6/bx0s9hVl4uLctItsA0/7QitmMsh/4P
+	EPWXp
+X-Gm-Gg: AeBDietLIZRE7/fFOUsG0NIIMswhWobOf3JtYzTmDdDqLdPRYkFCLU6wkSls3A0NMXS
+	8VE0onD20tVXyrFhTPkilFLJ7sdi9j16dHqRgzMKxf5/CHsXG8Minj7elnmJNsiiwzvNqSGDXTs
+	dz2hd6Z3IZ1yykLKHi6JUrQs9uJN/4MTd3gDe7o4Zn9if54ZzexEY4mLTNddygnzUUOfJ0BztPi
+	utvV9JpHp5rMhJA01S/aohkUSdHtiFz2dbTwJhdJCG+HFnSaOKeGqvWG1Q8506y5aG1ewz0/yw4
+	3YZ2DRCDxcl1N08CuuTzVkVS5hubv77zm+yhnDIElbBGiNuAXQyxFdYAx1+WbIm05qG2+tE63mF
+	OZUQq/iqz6OiG2ggEAim58zGlUU74KEeNyHxH0z7Ey/MbOMa8QuwstfYJch+2ZLUfWAzNNofHfv
+	sJaoVCycVB5Agt+EoCrxUm5Ud0SplFU+vXENLjVg+w3TkSHRIz4mzUGQhA2mrP4KGLmuDH87s=
+X-Received: by 2002:a05:6a20:958f:b0:3a2:bd1d:d67d with SMTP id adf61e73a8af0-3aa5ab711b1mr16473929637.34.1778286227079;
+        Fri, 08 May 2026 17:23:47 -0700 (PDT)
 Received: from tars (97-115-124-22.ptld.qwest.net. [97.115.124.22])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83967dbdda0sm13765615b3a.44.2026.05.08.17.23.41
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83967dbdda0sm13765615b3a.44.2026.05.08.17.23.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 17:23:42 -0700 (PDT)
+        Fri, 08 May 2026 17:23:46 -0700 (PDT)
 From: Preston Hunt <me@prestonhunt.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Preston Hunt <me@prestonhunt.com>
-Subject: [PATCH BlueZ 0/1] btmon/TDS: decode org 0x02 as Wi-Fi Alliance
-Date: Fri,  8 May 2026 17:22:48 -0700
-Message-ID: <20260509002249.2771777-1-me@prestonhunt.com>
+Subject: [PATCH BlueZ 1/1] btmon: decode 0x02 as Wi-Fi Alliance
+Date: Fri,  8 May 2026 17:22:49 -0700
+Message-ID: <20260509002249.2771777-2-me@prestonhunt.com>
 X-Mailer: git-send-email 2.51.2
+In-Reply-To: <20260509002249.2771777-1-me@prestonhunt.com>
+References: <20260509002249.2771777-1-me@prestonhunt.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -72,15 +75,44 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Adding support to show Wi-Fi Alliance when decoding TDS frames in btmon.
-AFAIK, this code has been assigned to WFA.
-
-Preston Hunt (1):
-  btmon: decode 0x02 as Wi-Fi Alliance
-
+---
  monitor/packet.c | 16 ++++++++++++++--
  1 file changed, 14 insertions(+), 2 deletions(-)
 
+diff --git a/monitor/packet.c b/monitor/packet.c
+index a0bf7a709..9439a74c5 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -4009,6 +4009,18 @@ static void print_mesh_data(const uint8_t *data, uint8_t len)
+ 	packet_hexdump(data + 1, len - 1);
+ }
+ 
++static char *get_org_label(uint8_t org)
++{
++	switch (org) {
++	case 0x01:
++		return "Bluetooth SIG";
++	case 0x02:
++		return "Wi-Fi Alliance";
++	default:
++		return "RFU";
++	}
++}
++
+ static void print_transport_data(const uint8_t *data, uint8_t len)
+ {
+ 	print_field("Transport Discovery Data");
+@@ -4016,8 +4028,8 @@ static void print_transport_data(const uint8_t *data, uint8_t len)
+ 	if (len < 3)
+ 		return;
+ 
+-	print_field("  Organization: %s (0x%02x)",
+-			data[0] == 0x01 ? "Bluetooth SIG" : "RFU", data[0]);
++	print_field("  Organization: %s (0x%02x)", get_org_label(data[0]),
++			data[0]);
+ 	print_field("  Flags: 0x%2.2x", data[1]);
+ 	print_field("    Role: 0x%2.2x", data[1] & 0x03);
+ 
 -- 
 2.51.2
 
