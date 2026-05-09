@@ -1,118 +1,108 @@
-Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A252BE656
-	for <linux-bluetooth@vger.kernel.org>; Sat,  9 May 2026 02:14:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53C938C2AA;
+	Sat,  9 May 2026 08:32:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778292879; cv=none; b=qRHdSYLVQG3kjtqty+JZ5WNxOztS8asr3FgiFVbh0AWnFIru/zmzYCojCoAub5pMKTsIAe8rcXNH5YOnQbIHRkTuurm+nxc4XuM6Dv2PoWYzgoUMEzwKoMJi0Kp1Ed8v1XA+t4xcNEY2VZpwQjhv9YpTOKaGZppIkY8ZK6/y8D4=
+	t=1778315535; cv=none; b=RRUe7vjW82bdMcXdtudHKVWjNHAGAbue4hVQSWZWs2ZR+w3PoWbmPt4umw2b2MKr4WaJE1G5kdfxcBeAbS8YpMCRvZx2nymM12kNiFk0aiXV8fr4stxn8pThz1myszdT9r+VWYqBv+/ETGDuiWoue01grVHTH4brwGmTdOWKbio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778292879; c=relaxed/simple;
-	bh=BlXXPxODtBS8eeDnc8bmmeuTkFQF2C4EfGdZwsf1vMA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=jT8K+ivmNTBIQ3zNE0pKmkELQnzJs68zGS9O54TKdGmYJ4AIGqSyPVvt4M+YeylmnNkXUUjIY3WIENvzZxW01DnVpXZ9Z3gpwdEo+LTJOtdU52BupyQHIlGBRQ5ZJ6TVptavDC3VfPpqMgot4nwRb2CQ6vtluMwWrVSuQuF6O3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QyVhhR9N; arc=none smtp.client-ip=74.125.82.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1778315535; c=relaxed/simple;
+	bh=2cTZOBsaXJfrbAo4fOEuHNXivIBOdTy6k1+K9HbUPlo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=il5A4CBQjy2MdDyByf2ij0fsBPFKvywiyd/Tq/3EM53lkA9sL/ncLd5SmhY226te1fTq8xz0Olm6YqGDMl3dmB9Fnau1uWVaQAMQApQvAvK/fqJgqGMrE38tr/XRa1FPzehdO7IUsGlYjtms13rJxrwfIuKs20nqpC7+dIPbcyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=plr0aj/p; arc=none smtp.client-ip=54.207.22.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QyVhhR9N"
-Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-2c15849aa2cso3390367eec.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 May 2026 19:14:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778292876; x=1778897676; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=fn2M8IdrAMPfV8M8KwZvDkJBU7XsFASy4uleN2Zl6kU=;
-        b=QyVhhR9NVJNDdmCdCtC+kDmzqgNjQbbqkcAynW3gkyZ3sFhXkJC6nV4In7M+NKx9Iq
-         KTaQQbRUXmyT3EUwuuov0EZci+TGrM+heneNNy8qwUnTEb6jHJ7ERbF4A77f/Ebq2/A6
-         NWXCURPwuwIpVT9QaKuyORC9aqPBCBxrHXpqAGrsVm87xR/jS/Dc9oq6ykwmlPG3urg6
-         yGPaX8CG2wtmfnyQZPkH8RX+qtrMoAaWvvi/wmwqBdURqR249sEulir5Qvbret3OIYOH
-         VtBfo90yKF/vv0Ag8gC/TiyACKFTGfoal1ICLCjp5xAJGORh2ekX0McjvfcgJdn6t4F+
-         L+wA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778292876; x=1778897676;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fn2M8IdrAMPfV8M8KwZvDkJBU7XsFASy4uleN2Zl6kU=;
-        b=EBhx9Hwc+HcGd78cT4kqx0F70TU7e0IXtSCFDXplChVhcvtVzQ+0uX+6EYFxVJcGnV
-         +A6jn2gjHxXEF8bjpUtenqzLp+pip6TiEa+2J3JkWjr5Xu7r+S6XD/MdTA2IsdRgv6di
-         zdFTfMu1JZtJiqoFDdChedxzzLwvSmz2MGa//C6pgpvMBmUMhy0JDI65aLrMhKeast9M
-         P+bguoab0QDKLowcgaMr0rtKwl86v8MXBdLl9VEoFeHj3Okiqo0Q6sHMFIsWpBQpVs0O
-         4laYzpt4wijrjgg246I8uRXng2Ks7Y3rfaW8ZxaD2fpQjT88q1W6fmkKGpyCixvd5k9z
-         CLCQ==
-X-Gm-Message-State: AOJu0Yz65PMCeENpBzwTcq2zbKR2t08tLxa0YyMFF5fzb8kw91Qs5B8S
-	U0DpW3lNmymupVB843X+CIKUBkS5cxbJBinV9S6zRi8jzytKPkEcMSR8iA+eMQ==
-X-Gm-Gg: Acq92OEXxVGyQ4lT391mbnSB82sn2zzxBjx5RUsqKEJKAHg7BxAmJreUiyM+5SrFC/R
-	+oNnx0/3N5bRgANZVAigmo9BNBt01VM5VMY09FYgs9ZJs2lbwFLNBMUZlq2tJulC2htMADTOQg4
-	hvgqFuFa1aSXm3Gx7HVPqBWB7U1FoSdqtq+qQPg9PRUnk5xcwC4WSi6ti5e/hhs7bWvLWUVwo2T
-	wXcG1r87T2+wP5WuV1XUDvSGSsF2UUuFvdm8drFst2bTmGKGnjKIMD2xDUD7oas5aVXbEo9h+n1
-	lN5IooMLCthCXK0NOJQ+9gH6nx8g01TRTRmReyp38CLZM7YKa7WjtBTsmflp51dFxZhV4WI6exB
-	3aAKLclRmMqqLOnbCA+kCc1DxNfpaHBMOaVYSU9DC3yCb2g8nQ7FHynwqSClmdVnwnmbyrcVJ2B
-	SpgQ1UeOLeCbuD6Jdq1aN+q7uFMK+KXJRoDg23dwDqLf4=
-X-Received: by 2002:a05:7300:6d08:b0:2ce:25be:c8e8 with SMTP id 5a478bee46e88-2f549f7c307mr7538067eec.17.1778292875642;
-        Fri, 08 May 2026 19:14:35 -0700 (PDT)
-Received: from [172.17.0.2] ([172.215.209.185])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f8862d3047sm5443411eec.10.2026.05.08.19.14.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 19:14:35 -0700 (PDT)
-Message-ID: <69fe988b.050a0220.2f853.3ca7@mx.google.com>
-Date: Fri, 08 May 2026 19:14:35 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1716516543025464397=="
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="plr0aj/p"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1778315496;
+	bh=75MRJG5bCdCuYUUYQ1VLQaZYT1JvZx/IDclUGNtpMZM=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version;
+	b=plr0aj/p1zu85v5ZlOl1vb52P1xOplPgdpI8EJ5nojEv2iMW6Bzgjo2P1tcQbs3Vh
+	 7BhmebZ8mkm9Nbuu/dMG+X/gLXhdq1mq4XodqjH2alKwX7ijs5Wr4ufZEgXjXK6wYv
+	 Uyv6fuKCo8Zn7Y2bSLqcLNfHRp2bKH7lfYoqoTOw=
+X-QQ-mid: zesmtpip2t1778315490t0b0601e2
+X-QQ-Originating-IP: WKyQ1VWGg6tDwd4YJBZsrdbq0C5nmV/jkB75ohFGVyM=
+Received: from localhost.localdomain ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sat, 09 May 2026 16:31:28 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 6282689411101105919
+EX-QQ-RecipientCnt: 7
+From: wuyankun <wuyankun@uniontech.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	wuyankun <wuyankun@uniontech.com>,
+	syzbot+da2717d5c64bf7975268@syzkaller.appspotmail.com,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_uart: serialize close flush with write_work
+Date: Sat,  9 May 2026 16:31:24 +0800
+Message-Id: <20260509083124.291207-1-wuyankun@uniontech.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, me@prestonhunt.com
-Subject: RE: btmon/TDS: decode org 0x02 as Wi-Fi Alliance
-In-Reply-To: <20260509002249.2771777-2-me@prestonhunt.com>
-References: <20260509002249.2771777-2-me@prestonhunt.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz5b-1
+X-QQ-XMAILINFO: MNbA5mkmBXEJDSEEpAV1tdC3p2zB8TDfUMvVn8oBTumV44efhmTJehfb
+	pcBY4r0SqGJihy6I9Uhpj+XomKVeFoKyFLD2Eh/7j4LybwEDjQ0+NnBivgHdbe4vYv5W2Ca
+	MsV5H9HlSvgAwk76N1mw8S1K3wWz0vtfktddGYFQmLis4y0z26w9TsujQVYW9wA0k6LVxI8
+	UIF4717ZBqqeF5M9gZA6lOENoygOn7jDQM+I41DrUf+hMCOdKphAW+ukbyUfEVBOaaO04oQ
+	MELRjzTSa1vDUEANbpUYzW3LfvEweEy1g1kQnmYiY6AXX7xsyoO45X7u5y82Q2dcvx31XsZ
+	9E8YXIV671g+zZDCMg5ypsTrWVrIHFw4dw9icDayzywswMKYAXmYAkHTaTZ8W5jHMDth/Ac
+	iywhl3nCZN5aDhvcNQQcDOaYX23l/zwtotCDnzEVnfuyKWBZLTz7XjKvcpiKbODGUYkCWFf
+	UG8lkKygh3UqT2CLuPRQlS4jjBqA7ea5VnC+dfyGDF7H7LdElHCeoYoJg9NZPVPEs/eKbKZ
+	HjFEDTHToTDPwtiZ89C02HKchtxuHSMWbsMbApuHkP4RatZzxAxfFSWkyJ+FR/ebj1auvN6
+	eslRmX45PIngxq05FJ9OXMmSfxYzMHBUeSzNMc/Xp+GqTtLqhZM0/rs1CYiCmwiZHpqqO6P
+	5Py911BEtIiplV5dosqYfYDCjX9ZIsMNzAqzAm/bUUv/DH22vldCoM07py6cNZqtQLxFNZP
+	2bTU31P3s3fAqixa6yVHQLdyLmFGgiCE0WFy1NmuG2lzbogfe5km51RoxfM44WcrZLSiJ/H
+	MAPX26kHXiv8FQ2Z5Z48+LtkvMVMIzhHyNiZzxjmnF7V/bMMPq/SZFCN07kE4EGJDRT+8qY
+	0EMN9jnxwki8/63H6YtyADNKJSDIE4PxZy801ABAiwGLDO8HJ/AZ+zH26x8kz6MrzBXXsCJ
+	QHoA3CarK9uZBEsW1IsOtERg/gR+8T0VR2V4X18hyGmalZ0ws0G1d4oj0FM1/JmqE+UrOPN
+	+h9nc8n9wM9caEluHRMo4rbpFq7kU=
+X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
+X-QQ-RECHKSPAM: 0
 
---===============1716516543025464397==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+hci_uart_close() calls hci_uart_flush(), and flush may free hu->tx_skb.
+At the same time, hci_uart_write_work() can still be running and access
+the same skb (for example through skb_pull()), which leads to a
+use-after-free.
 
-This is automated email and please do not reply to this email!
+Fix this by canceling write_work before calling hci_uart_flush(), so the
+tx_skb lifetime is fully serialized against the TX worker.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1091848
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.34 seconds
-GitLint                       PASS      0.26 seconds
-BuildEll                      PASS      20.23 seconds
-BluezMake                     PASS      643.92 seconds
-MakeCheck                     PASS      0.89 seconds
-MakeDistcheck                 PASS      246.11 seconds
-CheckValgrind                 PASS      218.86 seconds
-CheckSmatch                   WARNING   346.88 seconds
-bluezmakeextell               PASS      181.91 seconds
-IncrementalBuild              PASS      639.76 seconds
-ScanBuild                     PASS      1013.45 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/packet.c:2000:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3909:52: warning: array of flexible structuresmonitor/bt.h:3897:40: warning: array of flexible structures
-
-
-https://github.com/bluez/bluez/pull/2113
-
+Reported-by: syzbot+da2717d5c64bf7975268@syzkaller.appspotmail.com
+Link: https://syzkaller.appspot.com/bug?extid=da2717d5c64bf7975268
+Cc: stable@vger.kernel.org
+Signed-off-by: wuyankun <wuyankun@uniontech.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/hci_ldisc.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 275ea865bc29..51cc9af0f7e8 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -263,8 +263,11 @@ static int hci_uart_open(struct hci_dev *hdev)
+ /* Close device */
+ static int hci_uart_close(struct hci_dev *hdev)
+ {
++	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	BT_DBG("hdev %p", hdev);
+ 
++	/* Ensure write_work is not touching tx_skb while flush frees it. */
++	cancel_work_sync(&hu->write_work);
+ 	hci_uart_flush(hdev);
+ 	hdev->flush = NULL;
+ 	return 0;
+-- 
+2.20.1
 
---===============1716516543025464397==--
