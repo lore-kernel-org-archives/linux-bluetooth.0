@@ -1,382 +1,144 @@
-Received: from mail-pj1-f65.google.com (mail-pj1-f65.google.com [209.85.216.65])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD2C3A7F6F
-	for <linux-bluetooth@vger.kernel.org>; Sat,  9 May 2026 17:38:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1FB71A9FA4
+	for <linux-bluetooth@vger.kernel.org>; Sat,  9 May 2026 18:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778348291; cv=none; b=WBnxo3ZuSQbgYmCTzG0+1RNkY4viI06cLKKf9Bz5+Ee/wvcloyqV4J885rwukx/3IqM1d1v0Dgat49NhLVwFnjNDvvjDSqj9b5rLlKxxHrGqFF8kFUE7TuHUsD9mYDzXumfOqmo8d21Z0x65Ulkv8O2CFmPysNTAfjTDr+j0lRQ=
+	t=1778351352; cv=none; b=V8z2ayONBYMunzJNPLYHf6gIWB6Lg92YrMvAvhRqoI0qato9TeoRI66P/RsYNQve8odQHW1W5EGXffuIMDAdUS8h69aL0wVOnGD+8eWWcEzR/ite5zdBlqDhf6lQa+m/rY0T8OGVMRw+jKql3dteooc0681nwbVYlrkxL33JN5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778348291; c=relaxed/simple;
-	bh=B199kt+BH+alaZQK1JxLDtZaR8d8bGngi+b9ijGkgNo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=f75TQgWW3EIB3WsteJtpe65rHemvHqkbMAYg0xZOeFAL3ttJVBuwRO2Lh8AJeRaY/HjO+EUMytolZGloSvw4VLd0FYV3BzbqQY2KU/yXDdfaB7yF7KUuuu2ZqWRP8vYvWXkI/tblu/26s33MN35gm5/6Wg2LROYk942lHPnp5tE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PTeY+Xc5; arc=none smtp.client-ip=209.85.216.65
+	s=arc-20240116; t=1778351352; c=relaxed/simple;
+	bh=NMVsv4LTBFgsbP0p5QRffJH93e7lt3M8H4Zy7XY9F/I=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=g8Zkq/ikIbE8fli8uI/dVwTYkLy7iklXgWytu9fzrj5F5jrhhzZfWfq3j/giE7AvJlwuAL7BVAkYZ5amtGhM1xf5EcxwsWIuk8poojOXAysqoNgJEwAgg6M5oIYJOoKVcpmF0MzSQWsfb/aif6YxO41R+Euec4M2DysFIx9y6K8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lglx9Zlv; arc=none smtp.client-ip=209.85.222.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PTeY+Xc5"
-Received: by mail-pj1-f65.google.com with SMTP id 98e67ed59e1d1-366087480d8so2695389a91.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 09 May 2026 10:38:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lglx9Zlv"
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-8ee9ec26edaso361634085a.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 09 May 2026 11:29:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778348289; x=1778953089; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KwihATtMife8xxJX2EKXnY39i7hkWowsEJNlqJe2dzw=;
-        b=PTeY+Xc5tVYyNNQ4fHlZd4uHMRmlJIVtIMvo3rO30uI1coewupKeZ91eoaRZW4wHRR
-         FDVFLcaR2SJcMeCvdns6RHVYzPkt/KpSTBkNdR4pKYtEjtYfvN+9rt9u3ng64fiuSjUt
-         wJS5fl7zwgnhT95DgFpY3vwPkW74Kzi55w+AufXThqzz6bNolqsUmdli/8IEhQKUhO2H
-         uIXpX59FRgGXjtWHf5AGfgQzPGSR6pO7oGb/zn1kvqHV4DC2qhquwZyhD+nT1kGWMy3T
-         8OK9ubGRaAN8CTMUssc9HBYYYSDQq9BWI57MUyFmAouOF4sRGIPlnmXHqk7zc+7NPKOA
-         buRw==
+        d=gmail.com; s=20251104; t=1778351350; x=1778956150; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=cVME8v05VY1AZucnCw2+gqxgjL1DY1Otzyv4nlsvGeo=;
+        b=Lglx9ZlvL/52epIhi0Hd8d6vbwofhRPSJTSdIf8BYd3KGYYRgorqdU2Hhv3fYUKtNt
+         j8oC1XAeUQSZMhW2xWhJxhkGIVv2jnel9b2Y+9NfygJIPSif5rFlGrkytyavyQhc+nC5
+         xITR9ncrp7BwPL7MMo0k9vNf2azzgyMrVGJYP/u53a6uT1r4a3s6gHij3S5IGL2m45B3
+         b+wpZDcgMP9wv/Kly4eEDa+pzygR5BP1uScJG+g3jA+iKTvrZ2HFFW6gdCK1A6xlgPTU
+         6acaIG4FUc2zXbvyRccSs+qTD1GMh73FWUOJXalah9LMRCjRqfES594Egm0XEZDKM1SE
+         JlSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778348289; x=1778953089;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1778351350; x=1778956150;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KwihATtMife8xxJX2EKXnY39i7hkWowsEJNlqJe2dzw=;
-        b=hKV7a/O+A9i5rDYkKkRaBNewuZqN2CMxDk3yMDi//suBHk+3vHr3kp70pwQ02WVy3P
-         FgQ9C/56KcNrBbmYizYfC1KUUt8nM4NyJXB4INUMZKkpYrfnXAUBQKr+zi+dMr/cwU4+
-         vFIJmvJWeK0B6XONhopqplrV5MjE2QRduipS2+9mVN4Mngs7r0bD9ML9ggKozivvKbFS
-         TwN5H0+6C5LQjEfgXC5Q7Brn9q87gewOqCBAaOwRyKJfMvnqtHtruZG+QYv53n0lE+n2
-         SIJ7IhmbHcUrOIRuYzh6LBLKZ2Enz7hHn0p/OFEM9KOf0BxRs8P4oyotxTgZ6i8mY3ie
-         2zUg==
-X-Gm-Message-State: AOJu0YwcuQt/EwiETQy6a2i11h5LDoUsk2NzWMrrEaxvcheOHXLIGQwO
-	QZtPCc3RUp2VYMh9C141/eznAd8qaD82BHmTKDxSBuG1j/xzWHbQDUzOjtkFuVW3K0ugfQ==
-X-Gm-Gg: Acq92OFSpsiQjAGHU6Jd6DUtsH6AJRpf+jg+Gd0498xE6rcsV+xQPAcEs3UjmsToyA3
-	waSrqzRtQPIMY3LyISB/GUm46o9xmeazkvhMBC2jHWu0xJ/GiCdSXcfENzrMohJk51DA7eEhbkM
-	96Cd3kytJz8LtXx7UOSg0GjxEhG51bW79dhd1i68s1alLG0/M8edVsGKzykx0ubLf2HHB9XT+xA
-	hmC8y2qCUe2VwbNb8YWS6a5hMMAbgLYDrlQLHbiUgQ7q5HXVRYBfr0G2Q4xGsgiI457oAleeT/F
-	yKaJyg87Ei+g/E51nIVIuv5MnFHg912YM06t4PhT2XKQqXMV2QLCGImYtB71j9BEmXeHgs2UkY6
-	mLXQ/Z/cvHvrRTnFTjHGUNt5I9wIMJzGYGGzlSdfbdCEClJfMp70naFHrWfcN1UQY1DAO6jeMxA
-	GdxIWeKrFW4H89Muk0HGuRono0VjK5CD05cdbkEastVQ==
-X-Received: by 2002:a17:90b:3846:b0:366:33a6:9926 with SMTP id 98e67ed59e1d1-36633a69cfamr10642386a91.18.1778348288447;
-        Sat, 09 May 2026 10:38:08 -0700 (PDT)
-Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-367d625f126sm3025004a91.3.2026.05.09.10.38.01
+        bh=cVME8v05VY1AZucnCw2+gqxgjL1DY1Otzyv4nlsvGeo=;
+        b=DsqMJA61Rp6EKUN3FMlKJ/BgENdI5KN0RceMdETEpJhjBDgk4bkv28+To1Wv6Gcu/N
+         sE1tyWl9ztgM9KzIQghPTmXs2MeUFJ//5YxfYR7orHEGJdOfsfwdFYpusDKV9gEFu7wA
+         AITKooQIsRCnq84c7MEyrSM58UTgIOhhrCYUc4mh5Nc/8D43rWvfYhxt3RQDcFz2B4ba
+         J0z5onqJs9eiLqmpI5yIBPdY0A/sli+jm8L/q58WSVVp5P2t9cufqM4bvYDAQlb9v1a4
+         IdqkjSvt+2vivXmeQzhtoTQSNa14x7lbsMLYx9/7B3bg5MFQj1pybecNsu4wrHYKOC3C
+         Gh8w==
+X-Gm-Message-State: AOJu0YyiiFa24tWxddZb8D5BXCCAguC7af70rOpzEc/S5FjX19+WNU/S
+	9jPbnTOTJ20Q43gkHihlC6xqaNR/liJMnJDSED1Xf2/z6BdLHnyqOSJlkgT75A==
+X-Gm-Gg: Acq92OEnmSixAu0o4hB9Gh3g8D7T+uduB+xRTDIdzWI6mIz9UcJ8nbgC1KucWIqVSjE
+	ai8Gdtzj/WyLIIN59o6LhNAsG7sb5WaKsTDHXxSevXflIDcNw+F65qKhd5IK7zbaREnnubx4YG6
+	/FyXADdhevzjC2f64kLHpP4eUS9n+AEr8FkHoqV0v7mPS7AAHeqlkRgpTNfit2z8Mg09VstVaEe
+	bD+1onRgpWRn5INqc17ELSlOhLXOzgjBI8FWZAV4wmrNj+ExaySDesHKlXpROHIu7Wpcs3A7ssJ
+	pHzBbOYlIKCzwN0esiGbleI96bEVpe2Gy7MIK2Wb28WFhjSErItNr36LnvWZw0cUggkxbCh+3xs
+	V3ALqdORAX90WuOaY4xemd7DJ7eEzTM1ZgAWwiEKtek12/nJ3EvHB9QUbM/cZV/A1BsdEA9DAv9
+	yyBI+Vil1oQhggLEdzr8tet+tzsne0I239kZxJJEsb
+X-Received: by 2002:a05:620a:4552:b0:8bb:ac44:bd3c with SMTP id af79cd13be357-904d6cd6819mr2584896985a.52.1778351349648;
+        Sat, 09 May 2026 11:29:09 -0700 (PDT)
+Received: from [172.17.0.2] ([20.231.101.36])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8fc2cd04ddesm2613335085a.43.2026.05.09.11.29.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 May 2026 10:38:08 -0700 (PDT)
-From: Zhang Cen <rollkingzzc@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zerocling0077@gmail.com,
-	Zhang Cen <rollkingzzc@gmail.com>
-Subject: [PATCH] Bluetooth: 6lowpan: Defer peer channel release until RCU cleanup
-Date: Sun, 10 May 2026 01:37:45 +0800
-Message-Id: <20260509173745.413473-1-rollkingzzc@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Sat, 09 May 2026 11:29:09 -0700 (PDT)
+Message-ID: <69ff7cf5.050a0220.141698.f23c@mx.google.com>
+Date: Sat, 09 May 2026 11:29:09 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7117387498647923233=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, rollkingzzc@gmail.com
+Subject: RE: Bluetooth: RFCOMM: hold listener socket in rfcomm_connect_ind()
+In-Reply-To: <20260509173727.412674-1-rollkingzzc@gmail.com>
+References: <20260509173727.412674-1-rollkingzzc@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-A 6LoWPAN peer stores the protocol-owned L2CAP channel reference in
-peer->chan. chan_close_cb() removes the peer from the RCU list, but it
-also drops that reference immediately. The peer object can still be seen
-by in-flight RCU readers, and some paths keep using peer->chan after the
-lookup has finished.
+--===============7117387498647923233==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-That lets transmit and disconnect paths dereference, lock, or send
-through a channel whose last reference was released by the close path.
+This is automated email and please do not reply to this email!
 
-Defer the peer-owned l2cap_chan_put() until the peer RCU callback so a
-peer that remains observable through RCU still carries a live channel
-reference. Then take temporary channel references in the unicast,
-multicast, and explicit disconnect paths before they keep using the
-channel after the lookup window closes.
+Dear submitter,
 
-If the reader reaches step 3 after teardown reaches step 4, it can hit a
-freed l2cap_chan.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1092078
 
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.77 seconds
+GitLint                       FAIL      0.34 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      24.98 seconds
+CheckAllWarning               PASS      27.45 seconds
+CheckSparse                   PASS      26.44 seconds
+BuildKernel32                 PASS      24.22 seconds
+TestRunnerSetup               PASS      518.00 seconds
+TestRunner_rfcomm-tester      PASS      63.49 seconds
+IncrementalBuild              PASS      23.77 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: RFCOMM: hold listener socket in rfcomm_connect_ind()
+WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#119: 
 The buggy scenario involves two paths, with each column showing the order within that path:
 
-  L2CAP peer teardown:                   Concurrent peer reader:
-  1. l2cap_conn_del() or another         1. A reader such as
-     close path takes a temporary           __peer_lookup_conn(),
-     hold on the channel                    setup_header(),
-                                            send_mcast_pkt(), or
-                                            bt_6lowpan_disconnect()
-                                            traverses the peer list and
-                                            reads peer->chan
-  2. l2cap_chan_del() drops the          2. The reader keeps using the
-     connection-owned channel               raw channel pointer after the
-     reference before 6LoWPAN               lookup or after only RCU
-     close handling finishes                protection remains
-  3. chan_close_cb() removes the         3. It dereferences channel
-     matching lowpan_peer from the          fields or calls send or close
-     peer list                              operations through that
-                                            pointer
-  4. The original chan_close_cb()
-     also dropped the peer-owned
-     l2cap_chan reference, and the
-     close caller later released
-     its temporary hold
+WARNING: The commit message has 'BUG: KASAN: ', perhaps it also needs a 'Fixes:' tag?
 
-A peer reader can still observe the lowpan_peer while chan_close_cb()
-has already consumed the peer-owned channel reference and the close
-caller is releasing the last temporary hold, leaving peer->chan stale
-before the peer's RCU grace period ends.
+total: 0 errors, 2 warnings, 0 checks, 65 lines checked
 
-lowpan_peer objects stay RCU-visible after peer_del() removes them from
-the list.
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-Signed-off-by: Zhang Cen <rollkingzzc@gmail.com>
+/github/workspace/src/patch/14563150.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: RFCOMM: hold listener socket in rfcomm_connect_ind()
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+23: B1 Line exceeds max length (91>80): "The buggy scenario involves two paths, with each column showing the order within that path:"
+
+
+https://github.com/bluez/bluetooth-next/pull/160
 
 ---
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 2f03b780b40d..ea3ee6929101 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -95,13 +95,20 @@ static inline void peer_add(struct lowpan_btle_dev *dev,
- 	atomic_inc(&dev->peer_count);
- }
- 
-+static void peer_free_rcu(struct rcu_head *rcu)
-+{
-+	struct lowpan_peer *peer = container_of(rcu, struct lowpan_peer, rcu);
-+
-+	l2cap_chan_put(peer->chan);
-+	kfree(peer);
-+	module_put(THIS_MODULE);
-+}
-+
- static inline bool peer_del(struct lowpan_btle_dev *dev,
- 			    struct lowpan_peer *peer)
- {
- 	list_del_rcu(&peer->list);
--	kfree_rcu(peer, rcu);
--
--	module_put(THIS_MODULE);
-+	call_rcu(&peer->rcu, peer_free_rcu);
- 
- 	if (atomic_dec_and_test(&dev->peer_count)) {
- 		BT_DBG("last peer");
-@@ -137,9 +144,32 @@ __peer_lookup_conn(struct lowpan_btle_dev *dev, struct l2cap_conn *conn)
- 	return NULL;
- }
- 
--static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
--						  struct in6_addr *daddr,
--						  struct sk_buff *skb)
-+static struct l2cap_chan *lookup_peer_chan(struct l2cap_conn *conn)
-+{
-+	struct lowpan_btle_dev *entry;
-+	struct lowpan_peer *peer;
-+	struct l2cap_chan *chan = NULL;
-+
-+	rcu_read_lock();
-+
-+	list_for_each_entry_rcu(entry, &bt_6lowpan_devices, list) {
-+		peer = __peer_lookup_conn(entry, conn);
-+		if (peer) {
-+			chan = peer->chan;
-+			l2cap_chan_hold(chan);
-+			break;
-+		}
-+	}
-+
-+	rcu_read_unlock();
-+
-+	return chan;
-+}
-+
-+static int peer_lookup_dst(struct lowpan_btle_dev *dev, struct in6_addr *daddr,
-+			   struct sk_buff *skb, u8 *lladdr,
-+			   bdaddr_t *peer_addr, u8 *peer_addr_type,
-+			   struct l2cap_chan **chan)
- {
- 	struct rt6_info *rt = dst_rt6_info(skb_dst(skb));
- 	int count = atomic_read(&dev->peer_count);
-@@ -175,13 +205,20 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
- 	rcu_read_lock();
- 
- 	list_for_each_entry_rcu(peer, &dev->peers, list) {
-+		struct l2cap_chan *pchan = peer->chan;
-+
- 		BT_DBG("dst addr %pMR dst type %u ip %pI6c",
--		       &peer->chan->dst, peer->chan->dst_type,
-+		       &pchan->dst, pchan->dst_type,
- 		       &peer->peer_addr);
- 
- 		if (!ipv6_addr_cmp(&peer->peer_addr, nexthop)) {
-+			memcpy(lladdr, peer->lladdr, ETH_ALEN);
-+			*peer_addr = pchan->dst;
-+			*peer_addr_type = pchan->dst_type;
-+			l2cap_chan_hold(pchan);
-+			*chan = pchan;
- 			rcu_read_unlock();
--			return peer;
-+			return 0;
- 		}
- 	}
- 
-@@ -190,9 +227,16 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
- 	if (neigh) {
- 		list_for_each_entry_rcu(peer, &dev->peers, list) {
- 			if (!memcmp(neigh->ha, peer->lladdr, ETH_ALEN)) {
-+				struct l2cap_chan *pchan = peer->chan;
-+
-+				memcpy(lladdr, peer->lladdr, ETH_ALEN);
-+				*peer_addr = pchan->dst;
-+				*peer_addr_type = pchan->dst_type;
-+				l2cap_chan_hold(pchan);
-+				*chan = pchan;
- 				neigh_release(neigh);
- 				rcu_read_unlock();
--				return peer;
-+				return 0;
- 			}
- 		}
- 		neigh_release(neigh);
-@@ -200,7 +244,7 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
- 
- 	rcu_read_unlock();
- 
--	return NULL;
-+	return -ENOENT;
- }
- 
- static struct lowpan_peer *lookup_peer(struct l2cap_conn *conn)
-@@ -379,7 +423,7 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
- 	struct in6_addr ipv6_daddr;
- 	struct ipv6hdr *hdr;
- 	struct lowpan_btle_dev *dev;
--	struct lowpan_peer *peer;
-+	u8 peer_lladdr[ETH_ALEN];
- 	u8 *daddr;
- 	int err, status = 0;
- 
-@@ -388,9 +432,9 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
- 	dev = lowpan_btle_dev(netdev);
- 
- 	memcpy(&ipv6_daddr, &hdr->daddr, sizeof(ipv6_daddr));
-+	lowpan_cb(skb)->chan = NULL;
- 
- 	if (ipv6_addr_is_multicast(&ipv6_daddr)) {
--		lowpan_cb(skb)->chan = NULL;
- 		daddr = NULL;
- 	} else {
- 		BT_DBG("dest IP %pI6c", &ipv6_daddr);
-@@ -400,16 +444,15 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
- 		 * or user set route) so get peer according to
- 		 * the destination address.
- 		 */
--		peer = peer_lookup_dst(dev, &ipv6_daddr, skb);
--		if (!peer) {
-+		err = peer_lookup_dst(dev, &ipv6_daddr, skb, peer_lladdr,
-+				      peer_addr, peer_addr_type,
-+				      &lowpan_cb(skb)->chan);
-+		if (err) {
- 			BT_DBG("no such peer");
--			return -ENOENT;
-+			return err;
- 		}
- 
--		daddr = peer->lladdr;
--		*peer_addr = peer->chan->dst;
--		*peer_addr_type = peer->chan->dst_type;
--		lowpan_cb(skb)->chan = peer->chan;
-+		daddr = peer_lladdr;
- 
- 		status = 1;
- 	}
-@@ -417,8 +460,13 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
- 	lowpan_header_compress(skb, netdev, daddr, dev->netdev->dev_addr);
- 
- 	err = dev_hard_header(skb, netdev, ETH_P_IPV6, NULL, NULL, 0);
--	if (err < 0)
-+	if (err < 0) {
-+		if (lowpan_cb(skb)->chan) {
-+			l2cap_chan_put(lowpan_cb(skb)->chan);
-+			lowpan_cb(skb)->chan = NULL;
-+		}
- 		return err;
-+	}
- 
- 	return status;
- }
-@@ -483,15 +531,23 @@ static int send_mcast_pkt(struct sk_buff *skb, struct net_device *netdev)
- 		dev = lowpan_btle_dev(entry->netdev);
- 
- 		list_for_each_entry_rcu(pentry, &dev->peers, list) {
-+			struct l2cap_chan *chan = pentry->chan;
- 			int ret;
- 
- 			local_skb = skb_clone(skb, GFP_ATOMIC);
-+			if (!local_skb) {
-+				err = -ENOMEM;
-+				continue;
-+			}
-+
-+			l2cap_chan_hold(chan);
- 
- 			BT_DBG("xmit %s to %pMR type %u IP %pI6c chan %p",
- 			       netdev->name,
--			       &pentry->chan->dst, pentry->chan->dst_type,
--			       &pentry->peer_addr, pentry->chan);
--			ret = send_pkt(pentry->chan, local_skb, netdev);
-+			       &chan->dst, chan->dst_type,
-+			       &pentry->peer_addr, chan);
-+			ret = send_pkt(chan, local_skb, netdev);
-+			l2cap_chan_put(chan);
- 			if (ret < 0)
- 				err = ret;
- 
-@@ -530,10 +586,14 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
- 
- 	if (err) {
- 		if (lowpan_cb(skb)->chan) {
-+			struct l2cap_chan *chan = lowpan_cb(skb)->chan;
-+
- 			BT_DBG("xmit %s to %pMR type %u IP %pI6c chan %p",
- 			       netdev->name, &addr, addr_type,
--			       &lowpan_cb(skb)->addr, lowpan_cb(skb)->chan);
--			err = send_pkt(lowpan_cb(skb)->chan, skb, netdev);
-+			       &lowpan_cb(skb)->addr, chan);
-+			err = send_pkt(chan, skb, netdev);
-+			l2cap_chan_put(chan);
-+			lowpan_cb(skb)->chan = NULL;
- 		} else {
- 			err = -ENOENT;
- 		}
-@@ -802,8 +862,6 @@ static void chan_close_cb(struct l2cap_chan *chan)
- 			       last ? "last " : "1 ", peer);
- 			BT_DBG("chan %p orig refcnt %u", chan,
- 			       kref_read(&chan->kref));
--
--			l2cap_chan_put(chan);
- 			break;
- 		}
- 	}
-@@ -917,19 +975,20 @@ static int bt_6lowpan_connect(bdaddr_t *addr, u8 dst_type)
- 
- static int bt_6lowpan_disconnect(struct l2cap_conn *conn, u8 dst_type)
- {
--	struct lowpan_peer *peer;
-+	struct l2cap_chan *chan;
- 
- 	BT_DBG("conn %p dst type %u", conn, dst_type);
- 
--	peer = lookup_peer(conn);
--	if (!peer)
-+	chan = lookup_peer_chan(conn);
-+	if (!chan)
- 		return -ENOENT;
- 
--	BT_DBG("peer %p chan %p", peer, peer->chan);
-+	BT_DBG("chan %p", chan);
- 
--	l2cap_chan_lock(peer->chan);
--	l2cap_chan_close(peer->chan, ENOENT);
--	l2cap_chan_unlock(peer->chan);
-+	l2cap_chan_lock(chan);
-+	l2cap_chan_close(chan, ENOENT);
-+	l2cap_chan_unlock(chan);
-+	l2cap_chan_put(chan);
- 
- 	return 0;
- }
+Regards,
+Linux Bluetooth
+
+
+--===============7117387498647923233==--
