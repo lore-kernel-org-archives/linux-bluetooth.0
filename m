@@ -1,220 +1,101 @@
-Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C0A28A72F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 13:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEA13ECBF3
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 13:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778506362; cv=none; b=F4Szag96FRVOtw6v5eoA5ybl58xlPdk6rBsUbiEAomnOhp7cLEl8ZttLH1DPkwYoNPxzY3sQavkTwVEWQQdeRwHNzPvrmPvRvCA8VXXu709wP8SdxEgI7Q8HeHinQKwOKbPSH9eu353me99+3UgxN6lG2TNfPsJ0IwK6AVDb1wY=
+	t=1778506526; cv=none; b=Kt23D9//kVzntgpYEzbRSSPU+hhYIJNKaieeUSSaQYXbc+Rq48rN2up3iemjSM/5rTGRVPNqrXJrDGDndIRwFlMu1BDpRezY8k8Q1W3MRLS+8XClmHzP+slTokEQcCm6Feh2qWp82hYtgkWTp65oEUCSHxtuPxNW3+KNNgGZX6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778506362; c=relaxed/simple;
-	bh=5teQI24YKKHEo+3eeWwpuEoaBsAY5iTnp+rCTTJ3njk=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ntDlh0sCyJg1RvO8oIX9sEVVgGFYAmZip8hExVjGNJHPoJcdwwyGxevxKjLRJgOXppnMC7nI6acEN+EFGalem6DBmuAJd7J/sitCM3z+pPKYVQCFA9sYtetQa4niv2XtS14faXNSIJ4lAv0Uc0yk24EPojaM+Sl7pUk8/2+ZaPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id 646B35813FC
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 13:21:48 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B1B3D3EC3F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 13:21:40 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v3 2/6] shared/util: Add helper for "cleanup" variable attribute
-Date: Mon, 11 May 2026 15:18:05 +0200
-Message-ID: <20260511132131.1283892-3-hadess@hadess.net>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260511132131.1283892-1-hadess@hadess.net>
-References: <20260511132131.1283892-1-hadess@hadess.net>
+	s=arc-20240116; t=1778506526; c=relaxed/simple;
+	bh=JuSAqdix6vqSKbwXax4/uaq1hVNOoI6nuTO4ZDVhHhQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=STI5ejMWF7gqoTLS9/LC/P0BRz8adNTW5nuQ7mDDUOULP68oO9emR3UpVZ5WFWvLUcmMBeO+WCo3/l5doz+5qyMsafuqQMfJBPxxTCpxM3OJwIi1OJkl0wRcLooc8G0uP/mMkwmicY3cZefxpaQxktkAm1gwvUDxnSR/Lgy9SFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JRIoij7z; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JRIoij7z"
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-514ae601e01so15252901cf.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 06:35:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778506524; x=1779111324; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=JuSAqdix6vqSKbwXax4/uaq1hVNOoI6nuTO4ZDVhHhQ=;
+        b=JRIoij7zwhnTdz0HY9huKvv1b+G9NfjueJuvUpWDd5v51YADVyhZe2FbJGe0jEGDk+
+         f/mowHiXDwWzYg4n4zEmJfHmKt8+837UGF9q6uvTF2lXra4G3xWRn34zaS4jbpiudHvB
+         Rrw0qS0wTtXrg4Ds2vqxjQ2wGMQqGSKIvy1d4MEz2Mn7NUqiVRnIKcsyQXGtXSOwDAtR
+         1CIc4Hc+AwPpzRQercmcKPpGx9ORmOEIt1e9BPE2xHrO8c2EvvIEbJzqqm6ERCjFan6K
+         Yyyp79ui27ZsvtoMoS1h0bqp62HRFFJ49g66RI1HoJCT3a7agGTBvtTlobF0379aSm5Q
+         bWZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778506524; x=1779111324;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JuSAqdix6vqSKbwXax4/uaq1hVNOoI6nuTO4ZDVhHhQ=;
+        b=qT1EwMzU+rC/8uf3scp91B8Xol87DUOwtcE8zhgjEFSsxNdMfaDRvfFC0HG1cwBYpI
+         dVCvdqjuHUd8N5sjp8/Hmsbd9eQiAF4D1cda046NRaTtEg0ibWJYO4CF3otMj6K6PVLI
+         ag6Tp215yFMymvXFq5uiuRh9ExczOmGJN5KB4ItNnOZqF2TL+GqZmjT0mfdDfuUqER83
+         1u6BLJLGHCmWW7rNmiB1+CkgvD6csDJpGtwFlRnQissD1EMyPfUtlGUsTUVLYCwxIA66
+         5GFBSBqC6s7O6uP9qxuwWStHEmPbme3jE2/9efyMhLa1BZaUa3ElgOnvo11IhBQWpYVs
+         WqBQ==
+X-Gm-Message-State: AOJu0YxAWVzDWSyo7Rc7b31pmtrRp1hW1UbWWimfRdVp70bj7snwn9vr
+	7kSpMc8u7F0JTZcoI7YK+SBd/SMK4D7u+rt+Z9zsdqbjEXlYnbFFqyaYYSUjKw==
+X-Gm-Gg: Acq92OFXvNq6lcA/D3jzKke5yqTqNrPzPdA9zgIysEmY9ktAXuHrSi6oyCMxB2Dhq9E
+	EOar46X4MUOUHedwEnE46qSg/2k6KNmReotJez13DjC2DmT5N4AwJ8utHGO4jfGf6uCLNXcMpv/
+	plLXdn5drcc5UBFrBagRi3SepQR6oSpZIE1mFmhVaqJaYGb5ZdQCBDF/lXqH574NKnR61hy3fcP
+	Ey+dQBxm6zkrY2q5uMUXNckOTxzNf0luvOkxetjZjs8pwgpJfPlHWFivVFkM1dVCqTZymx/tjKj
+	dXXdOtMhu9hB0SOq0viSVtMdU1B/vr9yE78UDRVpg+K45hXzTP9lBel4zbp4i6leFGeYtQWR1p5
+	Eu6p0V6xGBDUnrJwLQVgjDpaVPxEmFrixG0DKtxJgqugUZiT3M+DoibO+fb3XbcJKuI5JtdNKmL
+	oTh0gzUvdCMutZ3q1VyVIMiJuH/RBaUg==
+X-Received: by 2002:a05:622a:5d4:b0:50e:60d7:b272 with SMTP id d75a77b69052e-51461faa785mr319623321cf.41.1778506523528;
+        Mon, 11 May 2026 06:35:23 -0700 (PDT)
+Received: from [172.17.0.2] ([172.172.158.4])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-514a956cad9sm56492891cf.9.2026.05.11.06.35.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 May 2026 06:35:23 -0700 (PDT)
+Message-ID: <6a01db1b.c80a0220.b7bb0.2402@mx.google.com>
+Date: Mon, 11 May 2026 06:35:23 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3626141627821303405=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: dmFkZTFWrjC4rbw2kUE4leMiEZylQ3RfD7xFrNoK0D1EDp1tpCkqHNRBYsbMxsr/VD+ImALuLtVXOCMLrsVhd0jYsBD69lMyPgClXpEjwLZEHmpyoG0ldNTnmvbv0VOhysSOzPgrJGC0q9mmEw0Xu3knMQgXLhUvrRyoBJWFKbYcPDxTaDKNG090z1CPeqwwUFJ2jT6qgH9bdhuOz4EOyyQJIfdA46ip6gIkT9HzZMg6h16wYW6sUfrYuUaKJZ5l3Wf5lOB0W0lp/RgH2buTwKm/fEFoqZgTd+aKV8mVTkTOS7iIEsZf3+/ScffbSzp6dBoDW4Idkl2/RFs6ezqU0iWO0RkmEHR6nE1e0ytbxOswGKQ8+xEwPu6WB93Qh5V6+XsI/o0PRnHZKHRGuYF/XfEyKO/GrfTJYytKnWsA6F5b71hsrrR8fm+fNs2PryGK9OV+KokRHZpSfp4Dv50nBraQhoLOhesPTCbEK4vXGMZt2/vrp9uS2t/4dKjFYjrQVAZZ4g8NJPpD32Yek/nftqNTNXFgJD0orMlvzxEzE+L68ut3Y9/1H4hYpqDvcuQ4cDlLzJf9WOK+GGNGctI0w1VTwUcoA9Bgh3/5+hasNadwZlg/xK2T2jy6F5KHBA4umOw9Ot0lVfEAlP77DhZAaTMRPdhSlNAN/N3I9Bt+D4riVdyHaA
-X-GND-State: clean
-X-GND-Score: 0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
+Subject: RE: [BlueZ,v3,4/6] main: Use _cleanup_() to simplify configuration parsing
+In-Reply-To: <20260511132131.1283892-5-hadess@hadess.net>
+References: <20260511132131.1283892-5-hadess@hadess.net>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Use the widespread "cleanup" variable attribute:
-https://gcc.gnu.org/onlinedocs/gcc/Common-Attributes.html#index-cleanup
+--===============3626141627821303405==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-It is implemented by both GCC and clang on platforms where bluez is
-used, and can help reduce memory leaks, while improving readability.
+This is an automated email and please do not reply to this email.
 
-This implements:
-- generic cleanup (_cleanup_free_)
-- cleanup with specific free function (_cleanup_())
-- cleanup for specific types (_cleanup_type_(type))
-- cleanup for file descriptors
-- capturing a variable before it is freed (so it is only freed in error
-  paths for example, _steal_() and _steal_fd())
+Dear Submitter,
 
-This commit includes tests which should cover all those new helpers.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-See also:
-https://systemd.io/CODING_STYLE/#memory-allocation
-https://docs.gtk.org/glib/auto-cleanup.html
+----- Output -----
+
+error: patch failed: src/main.c:205
+error: src/main.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- src/shared/util.h | 40 +++++++++++++++++++++++++++++
- unit/test-util.c  | 65 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 105 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/shared/util.h b/src/shared/util.h
-index 67629dddfaa9..c8ce90c5f1b5 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -15,9 +15,11 @@
- #include <stdbool.h>
- #include <alloca.h>
- #include <byteswap.h>
-+#include <errno.h>
- #include <string.h>
- #include <sys/types.h>
- #include <sys/uio.h>
-+#include <unistd.h>
- 
- #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
- #define BIT(n)  (1 << (n))
-@@ -93,6 +95,44 @@ do {						\
- #define newa(t, n) ((t*) alloca(sizeof(t)*(n)))
- #define malloc0(n) (calloc(1, (n)))
- 
-+static inline void freep(void *p)
-+{
-+	free(*(void **) p);
-+}
-+
-+static inline void * _steal_(void *p)
-+{
-+	void **orig = (void **) p;
-+	void *ret = *orig;
-+	*orig = NULL;
-+	return ret;
-+}
-+
-+static inline int _steal_fd_(int *fdp)
-+{
-+	int fd = *fdp;
-+	*fdp = -1;
-+	return fd;
-+}
-+
-+static inline void closefd(int *fdp)
-+{
-+	int errno_save = errno;
-+	int fd = *fdp;
-+	*fdp = -1;
-+	if (fd < 0)
-+		return;
-+	close(fd);
-+	errno = errno_save;
-+}
-+
-+#define CLEANUP_FREEFUNC(type, func) static inline void cleanup_##type (type **_ptr) { (func) (*_ptr); }
-+
-+#define _cleanup_(f) __attribute__((cleanup(f)))
-+#define _cleanup_type_(type) __attribute__((cleanup(cleanup_##type)))
-+#define _cleanup_free_ _cleanup_(freep)
-+#define _cleanup_fd_ _cleanup_(closefd)
-+
- char *strdelimit(char *str, char *del, char c);
- int strsuffix(const char *str, const char *suffix);
- char *strstrip(char *str);
-diff --git a/unit/test-util.c b/unit/test-util.c
-index 443c4f70362c..1672b32eb39c 100644
---- a/unit/test-util.c
-+++ b/unit/test-util.c
-@@ -9,14 +9,73 @@
-  */
- 
- #include <assert.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
- 
- #include "src/shared/util.h"
- #include "src/shared/tester.h"
-+#include "bluetooth/bluetooth.h"
- 
- /* XXX glib.h must not be included, or it will clobber the
-  * MIN/MAX macros.
-  */
- 
-+static void test_cleanup_free(const void *data)
-+{
-+	_cleanup_free_ char *p1 = NULL;
-+	_cleanup_free_ char *p2 = NULL;
-+	_cleanup_free_ char *is_null = NULL;
-+
-+	p1 = malloc0(10);
-+	p2 = malloc0(15);
-+
-+	p1[0] = 1;
-+	p2[0] = 1;
-+
-+	{
-+		_cleanup_free_ uint8_t *data = NULL;
-+		_cleanup_free_ uint8_t *is_null_too = NULL;
-+
-+		data = malloc0(128);
-+		data[0] = 1;
-+
-+		assert(is_null_too == NULL);
-+	}
-+	{
-+		_cleanup_free_ uint8_t *data = NULL;
-+		data = malloc0(128 * 2);
-+		data[0] = 3;
-+	}
-+
-+	assert(is_null == NULL);
-+	tester_test_passed();
-+}
-+
-+CLEANUP_FREEFUNC(bdaddr_t, free);
-+
-+static void test_cleanup_type(const void *data)
-+{
-+#define ADDR "FF:FF:FF:FF:FF:FF"
-+	_cleanup_type_(bdaddr_t) bdaddr_t *address = NULL;
-+	char str[33];
-+
-+	address = strtoba(ADDR);
-+	assert(bacmp(address, BDADDR_ALL) == 0);
-+	printf("%d = ba2str(address, str)\n", ba2str(address, str));
-+	assert(ba2str(address, str) == 17);
-+	assert(strcmp(str, ADDR) == 0);
-+	tester_test_passed();
-+}
-+
-+static void test_cleanup_fd(const void *data)
-+{
-+	_cleanup_fd_ int fd = -1;
-+
-+	fd = open("/dev/null", O_RDONLY);
-+	assert(fd != 0);
-+	tester_test_passed();
-+}
-+
- static void test_min_max(const void *data)
- {
- 	assert(MIN(3, 4) == 3);
-@@ -30,6 +89,12 @@ int main(int argc, char *argv[])
- 
- 	tester_add("/util/min_max", NULL, NULL,
- 			test_min_max, NULL);
-+	tester_add("/util/cleanup_free", NULL, NULL,
-+			test_cleanup_free, NULL);
-+	tester_add("/util/cleanup_type", NULL, NULL,
-+			test_cleanup_type, NULL);
-+	tester_add("/util/cleanup_fd", NULL, NULL,
-+			test_cleanup_fd, NULL);
- 
- 	return tester_run();
- }
--- 
-2.54.0
 
+--===============3626141627821303405==--
