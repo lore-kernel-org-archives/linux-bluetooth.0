@@ -1,114 +1,350 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E552836A0
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 22:19:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7ACF4E378B;
+	Mon, 11 May 2026 22:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778537953; cv=none; b=cBt9jT0lkFdUqimmOJPFgPSlfDgQt28rsTXG++OdoE27XHF0FZ3YMfEl9B/y0eOUI62xstaayAnFhNpiT4AsUHDzOoFiPaQzKKqFbZ8gcMlBHQ/J14nWpRebVgeTUnCITIp6/ro5TZGQlWS7lf8fG4SlOda3E/RwbpAi9qahTbA=
+	t=1778537997; cv=none; b=F7hyqS4xgoGc35uKp86MnzMQEr7duJVthMyKLlkeAIHApjCHZPLoEorXVlbVZaVaFZsGFNK/tzt3ZZZo2Wdr9ar0/iOmu5ogz1eywa1DzpxqoaVKTzrzd3/hy9GpeuqGHReolpEPVdffQImsQtduboejxugFxMIxjLOKW4LtXKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778537953; c=relaxed/simple;
-	bh=wtjud2YtOQ2UE50nHquHvVJmMIfCTsaJMdHf6PrrDKY=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=PjVcyOb/bfFKy9x1EfT8nSDcqnUiL1sXP9W9XvcoHWkLdlvJlj13wjKTR2W7JXSO+8LJPPwiSv76krAjKNKXaQh7FscLuzqX90NSql/JPa8l6Tc8/znNNWlmiZ+AHFi5V25UQG5bdXmBC3lT+yPPsDcl/gYjNQMowB1OsM/JwVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=kWsc3GmY; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1778537997; c=relaxed/simple;
+	bh=9tCgCsqZ2HSZ/TsOoNVOU6D2wmSey9I88Ha5w3FI9Mk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=puA78v3MpZn1LqnHxidFSmt5cpggtn2kM7GvT4S/sk8eYpJx8ASXpjQYakCmaBTVK4phCditdDByTR01bxlaShw4Ubp6D6IF/NtPK7Twht821PG2S1xZagCbEHscTulbpbTPdGiuRF49RxqYqQfL4G8RYmWdFpPCk9/XX8Q5EE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u0FsmAbh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="kWsc3GmY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1778537951;
-	bh=OK2gAIWS2UlE29QjesifRFAvvLMRkLeIMIa7Xj+tZCA=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=kWsc3GmYpC1g26jbHY218vltjcmMw9N0f5loeBG7kohHc2zZsf8CtIyUYNFDe3mQ5
-	 D3aM7NzJBQ/TO+gGYDOJM7Gonb8yDJSU99xUlOuax6EkOtcRNFXnnt2oi5CpwLEJNg
-	 HWUdgUVuxLsUMAopZsQL9K8iDssLatZ5K61/4d1w=
-Received: from github.com (hubbernetes-node-5433c44.ash1-iad.github.net [10.56.179.14])
-	by smtp.github.com (Postfix) with ESMTPA id 41EB1360B6D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 15:19:11 -0700 (PDT)
-Date: Mon, 11 May 2026 15:19:11 -0700
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1093117/000000-2c6d6b@github.com>
-Subject: [bluez/bluez] 2c6d6b: adapter: add BCAA UUID also when seen device is
- no...
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u0FsmAbh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72BD8C2BCF5;
+	Mon, 11 May 2026 22:19:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778537997;
+	bh=9tCgCsqZ2HSZ/TsOoNVOU6D2wmSey9I88Ha5w3FI9Mk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=u0FsmAbhVPthG3ctJPI1QiR9odlre3f6ubom/raf4q3f8248bVbdxpHdXmiAWuoEh
+	 H7z/SgayXzHj9zqqTpD7YIs43H4sMqBtlhcb9qlQ3E8/V+ahMj3VuGdO/jyPVyQtcZ
+	 B6Ape4JtG6X5urDBsaTUqPEajBoxWiZ1/qEDdhBu8PwnYj+VHbv1RVVyfNZq1f1xwK
+	 56IBwKNvZ9UJjUvncvJ7obV/WS/X9PaxuoiMWRNVQNylazE5eRFKdR3KaAK26+UtlX
+	 VIIK+sdRwWbYB27fi4dE71rinWd7tXV5IqlKeVK7D3o6+CjyolhIBhnyuYr4cV16p7
+	 stW2jGuKKoTgA==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Aurelien DESBRIERES <aurelien@hackers.camp>,
+	syzbot+ff30eeab8e07b37d524e@syzkaller.appspotmail.com,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH AUTOSEL 7.0-6.18] Bluetooth: hci_uart: Fix NULL deref in recv callbacks when priv is uninitialized
+Date: Mon, 11 May 2026 18:19:16 -0400
+Message-ID: <20260511221931.2370053-17-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260511221931.2370053-1-sashal@kernel.org>
+References: <20260511221931.2370053-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 7.0.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1093117
-  Home:   https://github.com/bluez/bluez
-  Commit: 2c6d6baaf29b7b7cf6cc44e9d26a0239bfbd3e19
-      https://github.com/bluez/bluez/commit/2c6d6baaf29b7b7cf6cc44e9d26a0239bfbd3e19
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-05-11 (Mon, 11 May 2026)
+From: Aurelien DESBRIERES <aurelien@hackers.camp>
 
-  Changed paths:
-    M src/adapter.c
+[ Upstream commit 902fe40bce7059722f7ffa1c378e577675cf1918 ]
 
-  Log Message:
-  -----------
-  adapter: add BCAA UUID also when seen device is not discoverable
+When a fault is injected during hci_uart line discipline setup, the
+proto open() callback may fail leaving hu->priv as NULL. A subsequent
+TIOCSTI ioctl can trigger the recv() callback before priv is
+initialized, causing a NULL pointer dereference.
 
-BAP v1.0.2 Sec 6.4 specifies Broadcast discovery uses observation
-procedure (Core Vol 3 Part C Sec 9.1.2) which makes no reference to
-device discoverability state.
+Fix all four affected HCI UART protocol drivers by adding a NULL check
+on hu->priv at the start of their recv() callbacks: h4, h5, ath and
+bcsp.
 
-However, if remote device does:
+Reported-by: syzbot+ff30eeab8e07b37d524e@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=ff30eeab8e07b37d524e
+Signed-off-by: Aurelien DESBRIERES <aurelien@hackers.camp>
+Assisted-by: Claude:claude-sonnet-4-6
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
 
-1. Send Advertising Data for some other UUID with General Discoverable
-2. Send Advertising Data for BCAA UUID with no flags
+LLM Generated explanations, may be completely bogus:
 
-then adapter.c:btd_adapter_device_found() creates device in step 1. but
-in step 2. it ignores the BCAA UUID since the device exists but is not
-discoverable; the monitoring=true special case applies only for
-first-seen devices.  Consequently bap plugin fails to pick up the BCAA
-stream.
+## Phase 1: Commit Message Forensics
+Step 1.1 Record: Subsystem `Bluetooth: hci_uart`; action verb `Fix`;
+intent is to prevent NULL dereference in HCI UART protocol `recv()`
+callbacks when `hu->priv` is not initialized.
 
-This sequence was observed to be produced by BlueZ + btvirt.
+Step 1.2 Record: Tags found: `Reported-by:
+syzbot+ff30eeab8e07b37d524e@syzkaller.appspotmail.com`; `Closes:
+https://syzkaller.appspot.com/bug?extid=ff30eeab8e07b37d524e`; `Signed-
+off-by: Aurelien DESBRIERES`; `Assisted-by: Claude:claude-sonnet-4-6`;
+`Signed-off-by: Luiz Augusto von Dentz`. No `Fixes:` tag. Notable
+pattern: syzbot report with reproducer and KASAN NULL-deref crash.
 
-Fix by monitoring also previously existing but currently non-connectable
-devices with BCAA UUID.
+Step 1.3 Record: The commit describes a `hu->priv == NULL` path during
+HCI UART setup followed by received data via `TIOCSTI`, causing a NULL
+pointer dereference. The syzkaller report verifies a KASAN NULL-
+deref/general protection fault in `h4_recv`, with call chain `tty_ioctl
+-> tiocsti -> hci_uart_tty_receive -> h4_recv`.
 
-Link: https://gitlab.freedesktop.org/pipewire/pipewire/-/merge_requests/2812#note_3467783
-Log:
---------------------------
-@ MGMT Event: Device Found (0x0012) plen 17
-        LE Address: 00:AA:01:00:00:42 (Intel Corporation)
-        RSSI: invalid (0x7f)
-        Flags: 0x00000000
-        Data length: 3
-        Data[3]:
-        02 01 06                                         ...
-        Flags: 0x06
-          LE General Discoverable Mode
-          BR/EDR Not Supported
-...
-@ MGMT Event: Device Found (0x0012) plen 39
-        LE Address: 00:AA:01:00:00:42 (Intel Corporation)
-        RSSI: invalid (0x7f)
-        Flags: 0x00000004
-          Not Connectable
-        Data length: 25
-        Data[25]:
-        06 16 52 18 56 db 55 03 03 4e 18 0d 16 4e 18 00  ..R.V.U..N...N..
-        ff 0f 0f 00 04 03 01 01 00                       .........
-        Service Data: Broadcast Audio Announcement (0x1852)
-        Broadcast ID: 5626710 (0x55db56)
-        16-bit Service UUIDs (complete): 1 entry
-          Audio Stream Control (0x184e)
-        Service Data: Audio Stream Control (0x184e)
-          Data[10]:
-        00 ff 0f 0f 00 04 03 01 01 00
---------------------------
+Step 1.4 Record: This is not hidden cleanup; it is an explicit memory-
+safety crash fix. The added checks prevent dereferencing protocol-
+private state when setup/error handling leaves it absent.
 
+## Phase 2: Diff Analysis
+Step 2.1 Record: Four files changed, all in `drivers/bluetooth`:
+`hci_ath.c` `+3/-0`, `hci_bcsp.c` `+3/-0`, `hci_h4.c` `+3/-0`,
+`hci_h5.c` `+3/-0`; total `12` insertions. Modified functions:
+`ath_recv`, `bcsp_recv`, `h4_recv`, `h5_recv`. Scope: small multi-file
+surgical driver fix.
 
+Step 2.2 Record: Each hunk previously assigned `hu->priv` to a protocol-
+private pointer and then dereferenced it. After the patch, each callback
+returns `-ENODEV` if that pointer is NULL. The affected path is receive
+handling through the HCI UART line discipline, including data injected
+by `TIOCSTI`.
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Step 2.3 Record: Bug category is NULL pointer dereference / memory
+safety. Specific mechanism: `hci_uart_tty_receive()` calls
+`hu->proto->recv()`, and these callbacks dereference `hu->priv`; if
+setup/error handling leaves `hu->priv` NULL, the callback crashes. The
+fix adds direct NULL guards before first dereference.
+
+Step 2.4 Record: Fix quality is high: simple, local, obviously correct,
+no API/data structure changes. Regression risk is very low; it only
+changes an invalid crash path to `-ENODEV`.
+
+## Phase 3: Git History Investigation
+Step 3.1 Record: `git blame` on the vulnerable lines showed the current
+callback bodies come from long-standing Bluetooth UART code, with recent
+edits such as `b489556a856d` for `h4_recv_buf()` usage and
+`ca94b2b036c2` adding the BCSP registered guard. The vulnerable pattern
+exists in `v6.19.14` and `v7.0.5`.
+
+Step 3.2 Record: No `Fixes:` tag, so no tagged introducing commit to
+follow.
+
+Step 3.3 Record: Related recent commits include `0ffac654e95c` / stable
+backport `981b4fd2baf3` removing the `HCI_UART_REGISTERED` guard from
+`h4_recv`, and `0c3cd7a0b862` fixing a related HCI UART NULL deref in
+write work. Another related upstream commit, `68d39ea5e0ad`, clears
+`HCI_UART_PROTO_INIT` on register error but is present in `v7.1-rc*`,
+not in checked `v6.19.14`/`v7.0.5`.
+
+Step 3.4 Record: No prior Bluetooth commits by Aurelien DESBRIERES were
+found in this checkout. The patch was committed/applied by Bluetooth
+maintainer Luiz Augusto von Dentz.
+
+Step 3.5 Record: No functional prerequisite is required for this patch
+in affected trees; it applies cleanly to current `v7.0.5`. It is most
+relevant to trees with the `HCI_UART_PROTO_INIT` receive path and the
+recent H4 initialization-race changes, such as checked `v6.19.y` and
+`v7.0.y`.
+
+## Phase 4: Mailing List And External Research
+Step 4.1 Record: `b4 dig -c 902fe40bce70` found the original thread:
+`https://patch.msgid.link/20260421135331.15425-1-aurelien@hackers.camp`.
+`b4 dig -a` found only v1; the committed patch matches the submitted
+revision.
+
+Step 4.2 Record: `b4 dig -w` showed recipients included `linux-
+bluetooth`, Marcel Holtmann, Johan Hedberg, Luiz Dentz, `linux-kernel`,
+and syzbot. The patchwork bot reported it was applied to
+`bluetooth/bluetooth-next.git` by Luiz Augusto von Dentz.
+
+Step 4.3 Record: Syzkaller bug page verifies: “general protection fault
+in h4_recv”, KASAN NULL-ptr-deref, C and syz reproducers, and fix commit
+`902fe40bce70`.
+
+Step 4.4 Record: No multi-patch series was found; only v1 of this one-
+patch submission.
+
+Step 4.5 Record: Direct lore stable fetch was blocked by Anubis; web
+search found no stable-specific discussion. This does not affect the
+decision because the syzbot crash and code path are verified elsewhere.
+
+## Phase 5: Code Semantic Analysis
+Step 5.1 Record: Modified functions: `ath_recv`, `bcsp_recv`, `h4_recv`,
+`h5_recv`.
+
+Step 5.2 Record: Exact call path verified: protocol structs assign
+`.recv = h4_recv/ath_recv/bcsp_recv/h5_recv`; `hci_uart_tty_receive()`
+calls `hu->proto->recv(hu, data, count)`; `tiocsti()` calls the line
+discipline `receive_buf`.
+
+Step 5.3 Record: Key callees include `h4_recv_buf()`,
+`hci_recv_frame()`, `h5_reset_rx()`, `bcsp_unslip_one_byte()`, and skb
+cleanup helpers. The first unsafe operation in each changed function was
+a dereference of the private pointer.
+
+Step 5.4 Record: Reachability is verified from userspace ioctl in the
+syzkaller trace and reproducer: `openat("/dev/ptmx")`, `TIOCSETD` to
+`N_HCI`, `HCIUARTSETPROTO` with fault injection, then `TIOCSTI`.
+
+Step 5.5 Record: Similar HCI UART receive callbacks exist; some, like
+`qca_recv` and `ll_recv`, still have `HCI_UART_REGISTERED` guards before
+dereferencing private data. The candidate focuses on the four callbacks
+identified in the accepted patch.
+
+## Phase 6: Stable Tree Analysis
+Step 6.1 Record: Checked `v6.19.14` and `v7.0.5`: the four callbacks
+exist without the new NULL checks. These trees also have
+`hci_uart_tty_receive()` accepting `HCI_UART_PROTO_INIT`. Checked
+`v6.6`/`v6.12`: older receive gating differs, so the exact trigger is
+less clearly present there.
+
+Step 6.2 Record: `git apply --check` of the candidate diff succeeds on
+the current `v7.0.5` checkout. Expected backport difficulty for similar
+affected trees is clean or trivial.
+
+Step 6.3 Record: No equivalent recv-callback NULL guard was found in
+`v6.19.14` or `v7.0.5`. A related central cleanup exists upstream as
+`68d39ea5e0ad`, but not in those checked stable tags.
+
+## Phase 7: Subsystem Context
+Step 7.1 Record: Subsystem is Bluetooth HCI UART, a driver subsystem
+under `drivers/bluetooth`. Criticality: important for systems using
+UART-attached Bluetooth controllers; not universal core kernel code.
+
+Step 7.2 Record: Bluetooth UART code is actively changing in this range,
+with recent initialization-race and NULL-deref fixes in the same area.
+
+## Phase 8: Impact And Risk
+Step 8.1 Record: Affected users are systems with `N_HCI` / HCI UART
+Bluetooth line discipline enabled, especially with H4/H5/ATH/BCSP
+protocol paths.
+
+Step 8.2 Record: Trigger verified by syzkaller requires HCI UART line
+discipline setup, fault/error during protocol setup, then received data
+through `TIOCSTI`. The reproducer uses fault injection and ioctl access;
+unprivileged exploitability was not established.
+
+Step 8.3 Record: Failure mode is kernel oops/general protection fault
+from KASAN NULL dereference in `h4_recv`; severity HIGH to CRITICAL
+because it crashes the kernel.
+
+Step 8.4 Record: Benefit is high for affected stable trees because it
+prevents a reproducible kernel crash. Risk is very low: 12 added lines,
+no new feature, no locking changes, no API changes.
+
+## Phase 9: Final Synthesis
+Step 9.1 Record: Evidence for backporting: syzbot report with
+reproducer, KASAN NULL deref, syscall-triggered path, small surgical
+patch, accepted by Bluetooth maintainer, applies cleanly to checked
+stable tree. Evidence against: trigger appears tied to setup
+failure/fault injection and may not affect older stable trees with
+different HCI UART initialization flow. Unresolved: exact applicability
+to every older LTS branch was not fully verified.
+
+Step 9.2 Record: Stable rules checklist: obviously correct: yes; fixes
+real bug: yes, syzbot crash; important issue: yes, kernel oops; small
+and contained: yes, 12 insertions in four driver callbacks; no new
+features/APIs: yes; applies to stable: yes for checked `v7.0.5`, likely
+trivial for affected `v6.19.y`.
+
+Step 9.3 Record: No exception category needed; this is a direct crash
+fix, not a device ID/quirk/build/doc patch.
+
+Step 9.4 Record: Decision is to backport to affected stable trees,
+especially those containing the `HCI_UART_PROTO_INIT` receive path and
+recent HCI UART initialization fixes. The benefit/risk ratio is strongly
+favorable.
+
+## Verification
+- Phase 1: Parsed commit `902fe40bce7059722f7ffa1c378e577675cf1918` with
+  `git show`; verified syzbot and Closes tags.
+- Phase 2: Verified diff stat: four files, 12 insertions, only NULL
+  guards in recv callbacks.
+- Phase 3: Ran `git blame` on changed callback lines and inspected
+  related commits `0ffac654e95c`, `981b4fd2baf3`, `0c3cd7a0b862`, and
+  `68d39ea5e0ad`.
+- Phase 4: Ran `b4 dig -c`, `-a`, and `-w`; fetched mirror thread and
+  syzkaller bug/reproducer.
+- Phase 5: Verified call path with source reads and exact searches:
+  `tiocsti()` -> line discipline `receive_buf` ->
+  `hci_uart_tty_receive()` -> protocol `.recv`.
+- Phase 6: Checked `v6.19.14`, `v7.0.5`, `v6.12`, and `v6.6` snippets;
+  verified patch applies to current `v7.0.5` with `git apply --check`.
+- Phase 8: Verified failure mode from syzkaller crash log: KASAN NULL-
+  ptr-deref/general protection fault in `h4_recv`.
+- UNVERIFIED: Exact applicability to every active older stable/LTS
+  branch; older branches with different HCI UART gating may not need
+  this patch.
+
+**YES**
+
+ drivers/bluetooth/hci_ath.c  | 3 +++
+ drivers/bluetooth/hci_bcsp.c | 3 +++
+ drivers/bluetooth/hci_h4.c   | 3 +++
+ drivers/bluetooth/hci_h5.c   | 3 +++
+ 4 files changed, 12 insertions(+)
+
+diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
+index fa679ad0acdfa..8201fa7f61e84 100644
+--- a/drivers/bluetooth/hci_ath.c
++++ b/drivers/bluetooth/hci_ath.c
+@@ -191,6 +191,9 @@ static int ath_recv(struct hci_uart *hu, const void *data, int count)
+ {
+ 	struct ath_struct *ath = hu->priv;
+ 
++	if (!ath)
++		return -ENODEV;
++
+ 	ath->rx_skb = h4_recv_buf(hu, ath->rx_skb, data, count,
+ 				  ath_recv_pkts, ARRAY_SIZE(ath_recv_pkts));
+ 	if (IS_ERR(ath->rx_skb)) {
+diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+index b386f91d8b46d..db56eead27ceb 100644
+--- a/drivers/bluetooth/hci_bcsp.c
++++ b/drivers/bluetooth/hci_bcsp.c
+@@ -585,6 +585,9 @@ static int bcsp_recv(struct hci_uart *hu, const void *data, int count)
+ 	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
+ 		return -EUNATCH;
+ 
++	if (!bcsp)
++		return -ENODEV;
++
+ 	BT_DBG("hu %p count %d rx_state %d rx_count %ld",
+ 	       hu, count, bcsp->rx_state, bcsp->rx_count);
+ 
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index a889a66a326f7..7673727074985 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -109,6 +109,9 @@ static int h4_recv(struct hci_uart *hu, const void *data, int count)
+ {
+ 	struct h4_struct *h4 = hu->priv;
+ 
++	if (!h4)
++		return -ENODEV;
++
+ 	h4->rx_skb = h4_recv_buf(hu, h4->rx_skb, data, count,
+ 				 h4_recv_pkts, ARRAY_SIZE(h4_recv_pkts));
+ 	if (IS_ERR(h4->rx_skb)) {
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index cfdf75dc28475..d353837182125 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -587,6 +587,9 @@ static int h5_recv(struct hci_uart *hu, const void *data, int count)
+ 	struct h5 *h5 = hu->priv;
+ 	const unsigned char *ptr = data;
+ 
++	if (!h5)
++		return -ENODEV;
++
+ 	BT_DBG("%s pending %zu count %d", hu->hdev->name, h5->rx_pending,
+ 	       count);
+ 
+-- 
+2.53.0
+
