@@ -1,449 +1,197 @@
-Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B590844E040
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 17:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A722E62B7
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 17:27:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778520213; cv=none; b=Y+G+JGfQk1w2d0L+fvjAkLwFPXO8RDakwYdHflkqF0morkrpCvLjXxQrJB6RyZt/RLENbZZpSvnDEo8UmU/NbbvANXay0qO87qswzRCCn0XMxjSatZR/ZICaS4Wi9kvGVA4pm9DhGYRNzrlPud9WmfX+GQvwglkttzbOdESEzy8=
+	t=1778520481; cv=none; b=hHZm/SG783jz9Bre5sF+iVl6rKbTo7Mr4WptpLmon13gf9urs8tYfja04DN1IQcOLB4H2XlKpjvqw3eS0fNx1iMxxnlLDUI1YyYzc9HnJlmOn2upQhQJqU03qvFFCRuPVxwdybjK48VqhQrEaCupNgGxrX6V1+N3UvVBiDgVzlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778520213; c=relaxed/simple;
-	bh=WJHz5n5qO43gssAYd0RpXe5VUYFm9L7jP/Y3eZfA1OY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dkQtGFnN2qtfGux3w1Eo9kODQyhehuzq3h6XzRdqswUrmyIssJYRby5YWFHlI/mRVD/Ijskx37LCcn3x2EQgf9lxhuztnURPr5zbbRuT1Px1Fn26ZhXyVptzobWNEXp2XzF9BLrIeKPx3cIEzLg7NavksxKNak/W+iJBw8jZlBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RLv+NiJQ; arc=none smtp.client-ip=209.85.214.193
+	s=arc-20240116; t=1778520481; c=relaxed/simple;
+	bh=AJtTCIZl2BAQj1XMmguyycAaX4kazz4va9L+Q8ZDepk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=p4Z54CWUQhVyOD/Z8r+jbbUgeSgLSEG9MApsNUO9lQ9XWdFqinvg9NlCS28b2Iq1LX6ESNqH9/ayRbUSgtAAfrTQf0zdQG9eN6MFOqX7QU5NuZcStcLNcZvUCRU5OEYVYVGUCNDiIQK+qQBooTBmYbmoKMfSO9f379rxlGh3eOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rMeF3Nix; arc=none smtp.client-ip=209.85.160.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RLv+NiJQ"
-Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-2ba21d32776so30718565ad.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 10:23:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rMeF3Nix"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-5102582e237so34830101cf.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 10:27:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778520209; x=1779125009; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XwWVQu8XVyE46tCIzrpzjGbbrMxOv7xyn045m50uP+M=;
-        b=RLv+NiJQNVAg9+Y91TDEdQyn5+L5A3pA08TrV/69EM7y35/zwqHokEDwOOL19g+ZQf
-         hu1BPNeqjZ/jfpz8/EiOzr9rUBBrUNkP4fEcqogkQ66YIrjHch+y5Qip8Xy+eEHriQK6
-         AtVTPWFNkzO/a1mlxEU69Jl+ACj9Y1Iun78ikjh7ZN3UFGl41Za37+CS9/5hr7Lno6mR
-         yRB787YrAibUpDKmmU/9D+m1Ss6RhBjZrHiiig5ZUB47YM6WR+tAGLYNS6L/kdfW1I8g
-         OTQRODTyi3wKbTCCVamXprk2G5tbcXQg7J6+bBBLViU5PPsNGOb45+xju0ezBtwK08NW
-         c7cQ==
+        d=gmail.com; s=20251104; t=1778520478; x=1779125278; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=jZylSBAIj0euqAPCTBUCPVDh+wx81rNWKAc82s4xnHI=;
+        b=rMeF3NixjpDNgWuO///tMOeGRSLBnySHmauBdWikwNSROLrIcyV9YSo4kqP1dy0I2r
+         mI/7Pn5N1HR/vFDDOn/Tn+ib0BThyqswILTLZ4GKObSF9jThSc7ahj2mY/EWab82gWvG
+         pfWXWuDteoXL2kjy8xU+cXi2+60N7Mqfy2TBn7Ab2lCGRT+UZ8RN3BW/FGVBVGDTHndh
+         fiwgfSnLe6sWSAlgBNQRglwDkEZr6H8AnP9AY/sNb6B8Kc4MuQnWb+S99Xf0/4afKDpT
+         /zbIYIe0gPyvlSZFgLMwO1VF8ylj1Z3v5T7wMu+HMBTI342NhWhfK1/C7NJ/zaaP7tzM
+         rn3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778520209; x=1779125009;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1778520478; x=1779125278;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XwWVQu8XVyE46tCIzrpzjGbbrMxOv7xyn045m50uP+M=;
-        b=daYOdqQN2e48wuw6pYNKUCmqcI1pqd/es0BE7lfAkAm0UVtphkf62njuN5v8pw1fK5
-         x1sVO9ppphbgtBoKP1zYX19MxUcQRzNkG6NjlkC2B/wzxultIfu+pXCmpRc3/KaXeU/s
-         QYDWJESe3htEJKyyf6vzJFfjVPnRBsDrW9Pd8qP9SNQNomrZqeEk0gvbfUkKS5fLFJ93
-         3dhfAPwzpOaJrNQ2C5gzQj/qq93ZRKJIQjmnYNBHD7EiG/NCBurT1uHKD5ZZFlcTq8d2
-         6EZBT3nzBoPYPDN6btoqWuA5Wh/POWHSM6CKHj9EBripdEsUIBZG4Fw/NDdrHGIUjx8W
-         qLQA==
-X-Gm-Message-State: AOJu0YzeOnS9dM7O64DkW35+Hq2579QXeh8qPuDOpuziX+nrzJwGCdOi
-	D3xpS1hkEDBxwLVntaF3o6uJ5NOzqX2KRH7ziZVnGLF7hD6edwpnpX4/
-X-Gm-Gg: Acq92OHxhof1urugHqQAy3GcpJ2pgI3qQXbh9jhUCT8eFFsPm9/jy/rIqfb8GpYEAq5
-	vKHcw6zapHnyuIfZFGZ9Q5ZuJPP8IqglOctXYm60rsy9HtJbpY+atNoC2HzicpnOwHTO7GhnFFV
-	izRtJEh9fu4SyKehWJj0YHhRAfCiM4q1oALedxZs2aYLI0zS0lN6rKNSzO9nrf5r3PcBbuN9uBA
-	hKyh0+bIV+3/3G2jpNb8g/Gs+/c1ehIU+QCzH96AKsXL36wBB7UbdUDcKVOV9cNL51qWU6kIopm
-	QFSzx8vDzJ2yM75Ol4tmXzuGAU7GdCnh9DNms7gB3LzXCTURbu6gwX1weyRklNugs6rcP0yfSri
-	CduHdFZQfPwOQud9/J7u3FfH6cyWsXXfNyFqrSjtJ3YHWpDGO3EktHH47ttBzxzTtvpCH7ZWUF2
-	gJgMBsNCJRtQQZit9dzLERY9n0bJ03gRQ=
-X-Received: by 2002:a17:902:ef09:b0:2bc:b80f:6782 with SMTP id d9443c01a7336-2bcb80f6998mr64244835ad.11.1778520208822;
-        Mon, 11 May 2026 10:23:28 -0700 (PDT)
-Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1d3ff52sm110938825ad.26.2026.05.11.10.23.20
+        bh=jZylSBAIj0euqAPCTBUCPVDh+wx81rNWKAc82s4xnHI=;
+        b=Ue1QL9vwvf322ycG9BLwcv6f2ACHvp4ly66e2IdNPWjm3n36QEZkuPi3wbZ5NbKn4U
+         iwFGEYRPYmAv/m/YwpSC6tstg1I2nmi4ZIUf3EMmrt0t3N6OoLGMqXRTyHv97+6/avw3
+         i6UJ4/XQ3mQrEd3aKFyNrcAUomho94Rq73sswdqPUfb7Bi/DN/6QGq+cc9BxPNaFSQ7h
+         UR8FaraT7atYGk8SuOqQDLyX0BPUUV86qyS1kxBXXPFK7kTWrsBjbRnQds6ETrgeYzGO
+         YzLh9idmyMxKdQ9WJGcanoacgKcUAZtk7dU7Gj/YHfXTzKvvGMhsqpuaMARMCTk2l6EH
+         Unhw==
+X-Gm-Message-State: AOJu0YzLNZO8EOh3gw+cBpKNQLulv1hG270BS0BCOXYEQ5Z3hGFSX4dF
+	TakMqLBViAvgIYoDdgFKRYaOYSxBRqokMY49QQ9g7u0Ci6GzsKdo3YT7ndLo8A==
+X-Gm-Gg: Acq92OFihLvOL3A7Ld/nYc/hyMxw0NCwYtsKE+m/jSlNcP/yTnf87G1mrIjHW2TdgHS
+	MHbavm6t6W6K3eakp9oUA4NLrivXgSmz6AGdjR1wcbysyzsFIdZjArd+awiRwS1LzaL6ZZheH59
+	IBH5V0EWI7DTwG4RdWx67t4k1HBB3lE3A5oEeJdY9A9lRl0y+rOP3YjgCjX4DwRac9GQKg7lWW0
+	qdNcBGskIM3MrTC0xMFcoufO1vnjCi1AnAzUfMD9MMX/hY1FnygK29yxoM0iv2gJNeYvErGbe7U
+	RI2pyJxt69YlNncdwP6xG5zF+3sLIxw2ihNEjJUXWpWa+oQr0uXFmM0CVC8mggrUPd82ud7ZRbs
+	BUHerdblTv/VFnGmRAI9L6x0/10uooZO2suKvyyoLXovKPKq6OS/6jt8epyEFCjFqlDuTLouz8a
+	G6A9jyrnXeiDLxJk67OsSbTczJsi90hx0=
+X-Received: by 2002:a05:622a:4d46:b0:50f:9c32:509d with SMTP id d75a77b69052e-514621f7de2mr351336961cf.60.1778520478405;
+        Mon, 11 May 2026 10:27:58 -0700 (PDT)
+Received: from [172.17.0.2] ([64.236.141.194])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5148e7bf34asm100012051cf.14.2026.05.11.10.27.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 10:23:28 -0700 (PDT)
-From: Zhang Cen <rollkingzzc@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Hillf Danton <hdanton@sina.com>,
-	zerocling0077@gmail.com,
-	2045gemini@gmail.com
-Subject: [PATCH v3] Bluetooth: 6lowpan: Fix peer and channel lifetime during teardown
-Date: Tue, 12 May 2026 01:23:10 +0800
-Message-Id: <20260511172310.3723421-1-rollkingzzc@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Mon, 11 May 2026 10:27:58 -0700 (PDT)
+Message-ID: <6a02119e.050a0220.271c94.d4cc@mx.google.com>
+Date: Mon, 11 May 2026 10:27:58 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4959854932914016979=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
+Subject: RE: Add helper for "cleanup" variable attribute
+In-Reply-To: <20260511132131.1283892-2-hadess@hadess.net>
+References: <20260511132131.1283892-2-hadess@hadess.net>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-A 6LoWPAN peer keeps a protocol-owned L2CAP channel reference in
-peer->chan. chan_close_cb() removes the peer from the RCU list when the
-channel is closed, but the old code also dropped that channel reference
-before the peer object stopped being observable by in-flight RCU readers.
+--===============4959854932914016979==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The buggy scenario involves two paths, with each column showing the order
-within that path:
+This is automated email and please do not reply to this email!
 
-  close path:                            lookup/transmit path:
-  l2cap_conn_del() or another            setup_header(), send_mcast_pkt(),
-  close path holds a temporary           bt_6lowpan_disconnect(), or
-  channel reference                      chan_recv_cb() observes a peer
+Dear submitter,
 
-  l2cap_chan_del() drops the             the reader leaves the RCU read
-  connection-owned channel reference     side critical section, or keeps
-                                         using peer->chan inside it
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1092801
 
-  chan_close_cb() removes the peer       the reader reads channel fields,
-  from the peer list                     locks the channel, or sends
-                                         through peer->chan
+---Test result---
 
-  the old chan_close_cb() dropped
-  the peer-owned channel reference
+Test Summary:
+CheckPatch                    FAIL      2.71 seconds
+GitLint                       PASS      1.76 seconds
+BuildEll                      PASS      20.40 seconds
+BluezMake                     PASS      666.47 seconds
+MakeCheck                     PASS      18.72 seconds
+MakeDistcheck                 PASS      245.36 seconds
+CheckValgrind                 PASS      291.26 seconds
+CheckSmatch                   WARNING   351.83 seconds
+bluezmakeextell               PASS      186.73 seconds
+IncrementalBuild              PASS      1330.28 seconds
+ScanBuild                     PASS      1038.55 seconds
 
-  the close caller releases its
-  temporary channel reference
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v3,2/6] shared/util: Add helper for "cleanup" variable attribute
+ERROR:POINTER_LOCATION: "foo * bar" should be "foo *bar"
+#106: FILE: src/shared/util.h:103:
++static inline void * _steal_(void *p)
 
-If the close path consumes the peer-owned channel reference before a
-reader finishes with peer->chan, the reader can use a freed l2cap_chan.
-The lookup helpers that returned raw peer pointers after rcu_read_unlock()
-also let callers outlive the peer object's kfree_rcu() lifetime.
+WARNING:LONG_LINE: line length of 104 exceeds 80 columns
+#132: FILE: src/shared/util.h:129:
++#define CLEANUP_FREEFUNC(type, func) static inline void cleanup_##type (type **_ptr) { (func) (*_ptr); }
 
-Give lowpan_peer its own refcount and make RCU lookups acquire a peer
-reference before returning a peer to code that runs outside the read-side
-critical section. Keep the peer-owned L2CAP channel reference attached to
-the peer until the last peer reference is dropped.
+WARNING:SPACING: space prohibited between function name and open parenthesis '('
+#132: FILE: src/shared/util.h:129:
++#define CLEANUP_FREEFUNC(type, func) static inline void cleanup_##type (type **_ptr) { (func) (*_ptr); }
 
-The last peer put can happen from an RCU callback or from the network
-transmit path, so do not drop the final L2CAP channel reference directly
-from lowpan_peer_put(). Queue final peer destruction to a dedicated
-workqueue and release the channel and module references there. Store the
-peer, rather than a temporary channel reference, in the skb control block
-for unicast transmit, and put the peer after the send path is done.
-Multicast continues to use peer->chan only while it is inside the RCU
-read-side critical section.
+ERROR:SPACING: need consistent spacing around '*' (ctx:WxO)
+#132: FILE: src/shared/util.h:129:
++#define CLEANUP_FREEFUNC(type, func) static inline void cleanup_##type (type **_ptr) { (func) (*_ptr); }
+                                                                              ^
 
-Wait for queued RCU callbacks and peer-destroy work during module exit so
-asynchronous peer destruction cannot outlive the module text.
+WARNING:LINE_SPACING: Missing a blank line after declarations
+#184: FILE: unit/test-util.c:46:
++		_cleanup_free_ uint8_t *data = NULL;
++		data = malloc0(128 * 2);
 
-Signed-off-by: Zhang Cen <rollkingzzc@gmail.com>
+/github/workspace/src/patch/14565706.patch total: 2 errors, 3 warnings, 140 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14565706.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[BlueZ,v3,4/6] main: Use _cleanup_() to simplify configuration parsing
+ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
+#84: FILE: src/main.c:258:
++	_cleanup_type_(GError) GError *err = NULL;
+ 	                              ^
+
+ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
+#108: FILE: src/main.c:440:
++	_cleanup_type_(GError) GError *err = NULL;
+ 	                              ^
+
+ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
+#204: FILE: src/main.c:888:
++	_cleanup_type_(GError) GError *err = NULL;
+ 	                              ^
+
+ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
+#409: FILE: src/main.c:1207:
++	_cleanup_type_(GError) GError *err = NULL;
+ 	                              ^
+
+ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
+#501: FILE: src/main.c:1570:
++	_cleanup_type_(GError) GError *err = NULL;
+ 	                              ^
+
+/github/workspace/src/patch/14565665.patch total: 5 errors, 0 warnings, 413 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14565665.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/main.c: note: in included file (through src/device.h):src/shared/gatt-server.c:271:25: warning: Variable length array is used.src/shared/gatt-server.c:614:25: warning: Variable length array is used.src/shared/gatt-server.c:712:25: warning: Variable length array is used.src/shared/gatt-server.c:271:25: warning: Variable length array is used.src/shared/gatt-server.c:614:25: warning: Variable length array is used.src/shared/gatt-server.c:712:25: warning: Variable length array is used.src/shared/gatt-server.c:271:25: warning: Variable length array is used.src/shared/gatt-server.c:614:25: warning: Variable length array is used.src/shared/gatt-server.c:712:25: warning: Variable length array is used.src/main.c: note: in included file (through src/device.h):
+
+
+https://github.com/bluez/bluez/pull/2118
+
 ---
- net/bluetooth/6lowpan.c | 128 ++++++++++++++++++++++++++++++++--------
- 1 file changed, 104 insertions(+), 24 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 23a229ab6..7a1b0d7b0 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -9,6 +9,8 @@
- #include <linux/etherdevice.h>
- #include <linux/module.h>
- #include <linux/debugfs.h>
-+#include <linux/refcount.h>
-+#include <linux/workqueue.h>
- 
- #include <net/ipv6.h>
- #include <net/ip6_route.h>
-@@ -29,10 +31,12 @@ static struct dentry *lowpan_control_debugfs;
- 
- #define IFACE_NAME_TEMPLATE "bt%d"
- 
-+struct lowpan_peer;
-+
- struct skb_cb {
- 	struct in6_addr addr;
- 	struct in6_addr gw;
--	struct l2cap_chan *chan;
-+	struct lowpan_peer *peer;
- };
- #define lowpan_cb(skb) ((struct skb_cb *)((skb)->cb))
- 
-@@ -52,6 +56,7 @@ static bool enable_6lowpan;
-  */
- static struct l2cap_chan *listen_chan;
- static DEFINE_MUTEX(set_lock);
-+static struct workqueue_struct *lowpan_peer_wq;
- 
- enum {
- 	LOWPAN_PEER_CLOSING,
-@@ -61,6 +66,8 @@ enum {
- struct lowpan_peer {
- 	struct list_head list;
- 	struct rcu_head rcu;
-+	struct work_struct destroy_work;
-+	refcount_t refcnt;
- 	struct l2cap_chan *chan;
- 
- 	/* peer addresses in various formats */
-@@ -95,13 +102,39 @@ static inline void peer_add(struct lowpan_btle_dev *dev,
- 	atomic_inc(&dev->peer_count);
- }
- 
-+static inline bool lowpan_peer_get_unless_zero(struct lowpan_peer *peer)
-+{
-+	return refcount_inc_not_zero(&peer->refcnt);
-+}
-+
-+static void lowpan_peer_destroy(struct work_struct *work)
-+{
-+	struct lowpan_peer *peer = container_of(work, struct lowpan_peer,
-+						destroy_work);
-+
-+	l2cap_chan_put(peer->chan);
-+	kfree(peer);
-+	module_put(THIS_MODULE);
-+}
-+
-+static void lowpan_peer_put(struct lowpan_peer *peer)
-+{
-+	if (refcount_dec_and_test(&peer->refcnt))
-+		queue_work(lowpan_peer_wq, &peer->destroy_work);
-+}
-+
-+static void lowpan_peer_put_rcu(struct rcu_head *rcu)
-+{
-+	struct lowpan_peer *peer = container_of(rcu, struct lowpan_peer, rcu);
-+
-+	lowpan_peer_put(peer);
-+}
-+
- static inline bool peer_del(struct lowpan_btle_dev *dev,
- 			    struct lowpan_peer *peer)
- {
- 	list_del_rcu(&peer->list);
--	kfree_rcu(peer, rcu);
--
--	module_put(THIS_MODULE);
-+	call_rcu(&peer->rcu, lowpan_peer_put_rcu);
- 
- 	if (atomic_dec_and_test(&dev->peer_count)) {
- 		BT_DBG("last peer");
-@@ -179,7 +212,8 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
- 		       &peer->chan->dst, peer->chan->dst_type,
- 		       &peer->peer_addr);
- 
--		if (!ipv6_addr_cmp(&peer->peer_addr, nexthop)) {
-+		if (!ipv6_addr_cmp(&peer->peer_addr, nexthop) &&
-+		    lowpan_peer_get_unless_zero(peer)) {
- 			rcu_read_unlock();
- 			return peer;
- 		}
-@@ -189,7 +223,8 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
- 	neigh = __ipv6_neigh_lookup(dev->netdev, nexthop);
- 	if (neigh) {
- 		list_for_each_entry_rcu(peer, &dev->peers, list) {
--			if (!memcmp(neigh->ha, peer->lladdr, ETH_ALEN)) {
-+			if (!memcmp(neigh->ha, peer->lladdr, ETH_ALEN) &&
-+			    lowpan_peer_get_unless_zero(peer)) {
- 				neigh_release(neigh);
- 				rcu_read_unlock();
- 				return peer;
-@@ -212,8 +247,9 @@ static struct lowpan_peer *lookup_peer(struct l2cap_conn *conn)
- 
- 	list_for_each_entry_rcu(entry, &bt_6lowpan_devices, list) {
- 		peer = __peer_lookup_conn(entry, conn);
--		if (peer)
-+		if (peer && lowpan_peer_get_unless_zero(peer))
- 			break;
-+		peer = NULL;
- 	}
- 
- 	rcu_read_unlock();
-@@ -361,8 +397,10 @@ static int chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 		return -ENOENT;
- 
- 	dev = lookup_dev(chan->conn);
--	if (!dev || !dev->netdev)
-+	if (!dev || !dev->netdev) {
-+		lowpan_peer_put(peer);
- 		return -ENOENT;
-+	}
- 
- 	err = recv_pkt(skb, dev->netdev, peer);
- 	if (err) {
-@@ -370,6 +408,8 @@ static int chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 		err = -EAGAIN;
- 	}
- 
-+	lowpan_peer_put(peer);
-+
- 	return err;
- }
- 
-@@ -380,6 +420,8 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
- 	struct ipv6hdr *hdr;
- 	struct lowpan_btle_dev *dev;
- 	struct lowpan_peer *peer;
-+	struct l2cap_chan *chan;
-+	u8 peer_lladdr[ETH_ALEN];
- 	u8 *daddr;
- 	int err, status = 0;
- 
-@@ -388,9 +430,9 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
- 	dev = lowpan_btle_dev(netdev);
- 
- 	memcpy(&ipv6_daddr, &hdr->daddr, sizeof(ipv6_daddr));
-+	lowpan_cb(skb)->peer = NULL;
- 
- 	if (ipv6_addr_is_multicast(&ipv6_daddr)) {
--		lowpan_cb(skb)->chan = NULL;
- 		daddr = NULL;
- 	} else {
- 		BT_DBG("dest IP %pI6c", &ipv6_daddr);
-@@ -406,10 +448,13 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
- 			return -ENOENT;
- 		}
- 
--		daddr = peer->lladdr;
--		*peer_addr = peer->chan->dst;
--		*peer_addr_type = peer->chan->dst_type;
--		lowpan_cb(skb)->chan = peer->chan;
-+		chan = peer->chan;
-+		memcpy(peer_lladdr, peer->lladdr, ETH_ALEN);
-+		*peer_addr = chan->dst;
-+		*peer_addr_type = chan->dst_type;
-+		lowpan_cb(skb)->peer = peer;
-+
-+		daddr = peer_lladdr;
- 
- 		status = 1;
- 	}
-@@ -417,8 +462,13 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
- 	lowpan_header_compress(skb, netdev, daddr, dev->netdev->dev_addr);
- 
- 	err = dev_hard_header(skb, netdev, ETH_P_IPV6, NULL, NULL, 0);
--	if (err < 0)
-+	if (err < 0) {
-+		if (lowpan_cb(skb)->peer) {
-+			lowpan_peer_put(lowpan_cb(skb)->peer);
-+			lowpan_cb(skb)->peer = NULL;
-+		}
- 		return err;
-+	}
- 
- 	return status;
- }
-@@ -486,6 +536,10 @@ static int send_mcast_pkt(struct sk_buff *skb, struct net_device *netdev)
- 			int ret;
- 
- 			local_skb = skb_clone(skb, GFP_ATOMIC);
-+			if (!local_skb) {
-+				err = -ENOMEM;
-+				continue;
-+			}
- 
- 			BT_DBG("xmit %s to %pMR type %u IP %pI6c chan %p",
- 			       netdev->name,
-@@ -529,11 +583,17 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	}
- 
- 	if (err) {
--		if (lowpan_cb(skb)->chan) {
-+		struct lowpan_peer *peer = lowpan_cb(skb)->peer;
-+
-+		if (peer) {
-+			struct l2cap_chan *chan = peer->chan;
-+
- 			BT_DBG("xmit %s to %pMR type %u IP %pI6c chan %p",
- 			       netdev->name, &addr, addr_type,
--			       &lowpan_cb(skb)->addr, lowpan_cb(skb)->chan);
--			err = send_pkt(lowpan_cb(skb)->chan, skb, netdev);
-+			       &lowpan_cb(skb)->addr, chan);
-+			err = send_pkt(chan, skb, netdev);
-+			lowpan_peer_put(peer);
-+			lowpan_cb(skb)->peer = NULL;
- 		} else {
- 			err = -ENOENT;
- 		}
-@@ -649,6 +709,8 @@ static struct l2cap_chan *add_peer_chan(struct l2cap_chan *chan,
- 	if (!peer)
- 		return NULL;
- 
-+	INIT_WORK(&peer->destroy_work, lowpan_peer_destroy);
-+	refcount_set(&peer->refcnt, 1);
- 	peer->chan = chan;
- 
- 	baswap((void *)peer->lladdr, &chan->dst);
-@@ -822,8 +884,6 @@ static void chan_close_cb(struct l2cap_chan *chan)
- 			       last ? "last " : "1 ", peer);
- 			BT_DBG("chan %p orig refcnt %u", chan,
- 			       kref_read(&chan->kref));
--
--			l2cap_chan_put(chan);
- 			break;
- 		}
- 	}
-@@ -938,6 +998,7 @@ static int bt_6lowpan_connect(bdaddr_t *addr, u8 dst_type)
- static int bt_6lowpan_disconnect(struct l2cap_conn *conn, u8 dst_type)
- {
- 	struct lowpan_peer *peer;
-+	struct l2cap_chan *chan;
- 
- 	BT_DBG("conn %p dst type %u", conn, dst_type);
- 
-@@ -945,11 +1006,14 @@ static int bt_6lowpan_disconnect(struct l2cap_conn *conn, u8 dst_type)
- 	if (!peer)
- 		return -ENOENT;
- 
--	BT_DBG("peer %p chan %p", peer, peer->chan);
-+	chan = peer->chan;
-+
-+	BT_DBG("peer %p chan %p", peer, chan);
- 
--	l2cap_chan_lock(peer->chan);
--	l2cap_chan_close(peer->chan, ENOENT);
--	l2cap_chan_unlock(peer->chan);
-+	l2cap_chan_lock(chan);
-+	l2cap_chan_close(chan, ENOENT);
-+	l2cap_chan_unlock(chan);
-+	lowpan_peer_put(peer);
- 
- 	return 0;
- }
-@@ -1189,6 +1253,7 @@ static ssize_t lowpan_control_write(struct file *fp,
- 			peer = lookup_peer(conn);
- 			if (peer) {
- 				BT_DBG("6LoWPAN connection already exists");
-+				lowpan_peer_put(peer);
- 				return -EALREADY;
- 			}
- 
-@@ -1320,6 +1385,12 @@ static struct notifier_block bt_6lowpan_dev_notifier = {
- 
- static int __init bt_6lowpan_init(void)
- {
-+	int err;
-+
-+	lowpan_peer_wq = alloc_ordered_workqueue("bt_6lowpan_peer", 0);
-+	if (!lowpan_peer_wq)
-+		return -ENOMEM;
-+
- 	lowpan_enable_debugfs = debugfs_create_file_unsafe("6lowpan_enable",
- 							   0644, bt_debugfs,
- 							   NULL,
-@@ -1328,7 +1399,14 @@ static int __init bt_6lowpan_init(void)
- 						     bt_debugfs, NULL,
- 						     &lowpan_control_fops);
- 
--	return register_netdevice_notifier(&bt_6lowpan_dev_notifier);
-+	err = register_netdevice_notifier(&bt_6lowpan_dev_notifier);
-+	if (err) {
-+		debugfs_remove(lowpan_enable_debugfs);
-+		debugfs_remove(lowpan_control_debugfs);
-+		destroy_workqueue(lowpan_peer_wq);
-+	}
-+
-+	return err;
- }
- 
- static void __exit bt_6lowpan_exit(void)
-@@ -1346,6 +1424,8 @@ static void __exit bt_6lowpan_exit(void)
- 	disconnect_devices();
- 
- 	unregister_netdevice_notifier(&bt_6lowpan_dev_notifier);
-+	rcu_barrier();
-+	destroy_workqueue(lowpan_peer_wq);
- }
- 
- module_init(bt_6lowpan_init);
--- 
-2.43.0
 
+--===============4959854932914016979==--
