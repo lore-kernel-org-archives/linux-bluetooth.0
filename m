@@ -1,178 +1,257 @@
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0BE33FF8B8
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 14:47:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2653FF8BB
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 14:53:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778510826; cv=pass; b=ak5F6cg0bddcS6MeuwaJo5Sd+imetYB/0OHM1/U/b0TfkGqNog10Avo7eB+FWKypKtIFq7PawQ43ZlRh8jFcsQtilKR2wJdkGW0iJgfZyxz4DmYGwC/TvhobMNwI+S3h63L9UPIM53EY7PVp/YCIajMAvGFIumHFY9k5AhoQeK4=
+	t=1778511201; cv=pass; b=JOzOp4mhkItqg3Xgx1CcAC+GYKk8HutfqbUEz6LTC1b13/XiLeYqr4NU0T459vV5FCYLxE/O3gQSEj/ACdgfwY23RQpllt4kJnl7iYvPY4lNuopHrolpa8M5IC+BU7h7JKhREP4QG/mCu1xBEeK7OcmiKu0c711bgfGjR+CzfnA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778510826; c=relaxed/simple;
-	bh=soEsa3tUTOG6JdSr5huOrWqs/34j+Pwcq0cOOxiNc3c=;
+	s=arc-20240116; t=1778511201; c=relaxed/simple;
+	bh=q2TCtoSLf2PLJkmKD3x1+eVXl13mdaDYWUrpr08E9W4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jznE/z385Z12muer3Ba7gKwymHYC7PXDCuImJnrrYTlUWLryUHpk3lHaFE4tbcsTf8JQfBKcYOz7lfFW1jm1s1UCsqr0gqASIAXBdrEp3/hKU3w6PErVK7VXyr6jCq+8Ab+d7NVVRRcuxWiRwXoS8bXyd8+rC3yOH9r3cM5HWs8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GOGz5ffR; arc=pass smtp.client-ip=74.125.224.45
+	 To:Cc:Content-Type; b=YOGjQEFYiSYB4gXJiOwaSA4UDBC0yYPIUnXJ9C9z5B3ChcB0vnJolSo7jjYc4kUvtB/aWJjcyAxoqtllCttxncjIPRv0KSHeB1bMiMi7rEoHfi86rOh+PoGGI7VLV59xaY7PMEvm+RLZ2duae34n2m23GI3AmlPLHsbCQl5SqLU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hZ/ytBvo; arc=pass smtp.client-ip=74.125.224.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GOGz5ffR"
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-651bc83e74aso4509142d50.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 07:47:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778510824; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hZ/ytBvo"
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-65dd9b25829so267725d50.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 07:53:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778511199; cv=none;
         d=google.com; s=arc-20240605;
-        b=PH/IFzW4sEQwV7RHE6krPbb08GNN9VizTmNSS3kJ9/+AZaud8NMMarQqIphRE2Kfnq
-         crY9vAQF3ZFXjnd8Qiwvq0uzM0WiXMDOs/+r8PGMWX/2CK0d6hAO1olZz6/jq8Nv9toE
-         GMF33q2CCpSooT5A0b9uOQ0QUYYS9jcqJo/jPgkTm0FQuHIFo6Pw5uNaeHK7bRpJTRgS
-         HzxpkrZfDKqANY/nLom/hmQgc5VGjjML2ZiN7gfmgA9UO1H50px+SPWJ7GSyFayljUKq
-         VXSY8xSiLsG11r+fJ9QV1baep0ynE33azU+lH7flxCMD4+855lui3A159Klpob3RPnS7
-         rJwA==
+        b=ZxRnMNDyX6Ty+zGFF0sjZOCGrBKuvXcNYdn/uL765lLOyYz0L2K0Q04jjzKjq4WHUM
+         HHKL2tWUAScukCATaOa3HOfivGr6WNG/3KCDZjaBfAR537XnHvRtAxwATnIx6Jh+vdXa
+         HiMOpVtf7qbtsnPWexpVK7MyRERuN6CPSd+dD2VCM0GaaNPnZW9BeG1OuLXFZBNQWuNz
+         HTnne3esMRBIQr1Ipg03nl8qlgT0p8H9tmdjqz/K1RLb7+TvUxUjDgyTWoqoy3thmoPd
+         kKzyUzgTcQfcQ9EApvO+xWaS0w5C01wmpiYTkIy1BOVDjv2BLdWpWEflJ4ptIPZSUk35
+         8dmQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=913Z8wN5aRe7Y7ZvXwheQtw55PNzkBfnlIGObXm3NPA=;
-        fh=7jTDQpu2B7cbxqO/IE3DliLY68p99ZWgJKKVAIvyCQo=;
-        b=XSriChvuMr2HVY+iuawVFcXJMERPSWrf87IbixtXv2zbkqaTHo6weCXNbZib2lqBWN
-         YfA7u0dUoAKMM7is2YfYxN9hajWQh6seOX5dO6yn/XZuPDtyJ+pvUepdMGSA/UQ10wRE
-         fitkrK7z3GSQFgjVnetH27UajMoaE7ykHQbB0R5Qp+pS6WMuwuqhw43JKf9Ym9AUtgRh
-         kmS5JCJ7gTaWSPA0gzrDMmTXL1MVO2Pl27ULgm5ELnTuKfKOcEbgbY/gF4SxN+x4xcFO
-         cSqTguJXS9dpFQlIR77FCLtOYxoPm7/AAozVg9S5i1Yt64tiC0YG7gdqNZH5Q4SpESmt
-         l60g==;
+        bh=mH7N4j++r3IaudrlTt6rvym5myFHJfjExvIPYpFZaxQ=;
+        fh=oCcrFhmBLILf98b1g9mjYhwSxEG99kKZw0E6lWUI4JI=;
+        b=i+Dbc57F8x99b75ynB7Cd4fGezfzpwUTbzBiLbhc8eXHtWtAXaImrMwp4S+Rz5o3FV
+         r/P+tdFo3aFs0Lwt6S9mKhmdgY7KSDtuRoBggZGa9+79RDmQqnv5jLnrd4jNZ5MfzxF7
+         nltyQ06hCDDgwM2HOkiARZqBevmIpulZ9LLWwQD2avBp1IsSHurhZmZsGDU8HcP7Rzf2
+         +FFVpHkyTtuCRGCZAYvtnwKeZHr2qF0Ik3RStFrgDo5q3Jo3JRuDoCB7J3zHhurGipiD
+         L8TwaX72XTjEhD+yheWQKfyQYq2JIKjYR+UQfqFLdebKUDm4RhJHXew9PMijAqWcePYo
+         yfMQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778510824; x=1779115624; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778511199; x=1779115999; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=913Z8wN5aRe7Y7ZvXwheQtw55PNzkBfnlIGObXm3NPA=;
-        b=GOGz5ffRksLu5+u6q40zZRAy1kG2ou35uU/+Oxxw7aso1CDHixZsf8HQTVD7OK2+az
-         z2T9eEdaXkeeYF9+/vb3KdA4JaaYYF1R70mGOjSHKcsO9vLWLUCumwO3t6D/F/7GIbnf
-         l4pujbkbvIvD+6D5QM8XMZhs5u4xQ9XqoWfemoDJ6lIpYkfr/gQr2unshVHxjH4YXL/U
-         7wsTZ1q0x76IktylMozFoNNxNbfnoo6p+uoF/D6/vPajB4LQAeTjdIELeItyVPUIB1gw
-         WyAk43nwCy9zPKrBi/Qs7uYdIpxkQIUynMzcgERpT0KT3SIvz/sUJXQiQsGheXHIvdxV
-         hMyQ==
+        bh=mH7N4j++r3IaudrlTt6rvym5myFHJfjExvIPYpFZaxQ=;
+        b=hZ/ytBvo/pzqfEAa31ZkNcjZ0PTdYSDkFCCDo6o0tMj2aPedQ1lxUpS51MXkssVl2p
+         u8KgFkv1uFM8EILRW3IAM5acmBYygxsxmnQRboXps0XOFxxrprDO+GdgRshNuHbPwecW
+         azkDgakwyCre9jli/iI+CiquoLpdtpnjEXYl0VQOoFNVMAuIlSkQQd+GhnjYSnGDlwHd
+         A+KdG8lsSzuCy0waoXWtoGtjT0lhwTT5g5WDIGSGqhZHq+sBF3uc0kvaH5BcHwQ3w++l
+         0zPZjcd6aBnD4etsPNq1XRigdY4ctQyaM1f400JGl4tABLUd7sKkNltkNvv9fB9DMQol
+         1Jfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778510824; x=1779115624;
+        d=1e100.net; s=20251104; t=1778511199; x=1779115999;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=913Z8wN5aRe7Y7ZvXwheQtw55PNzkBfnlIGObXm3NPA=;
-        b=DKAgR0ToWqVhAG9LakeIi5UovOJrrLyRZMiD/iAY3N8C738FdX/4SN5VkR44Lm8HxH
-         sgu2QEpUszjmCoERjUvHOXGMnHQjmdYDRXIoGHKXmZU4tSBYDPsluzAhyBcAN5BaC65f
-         55Td9ioZIuXJt3jvKBtYkuTvnQRbysMQO4i6xpiFq6gwpkKG7E3xWF35Ks1lglf1xmsk
-         E769JxlX98DmIYijKM8XAYHo7kNUCMxGGY7z94yWlucnTaaRuW/AxSyYksEDJvGAhNuD
-         UglODoV3whqoqZ9q5SGk5+pTu0KOHoKuK+QYMDKV5b0PPz51hmbRfknowHTUOVZGOu1b
-         wXEg==
-X-Gm-Message-State: AOJu0YxzgnbSR8az8XhQh5aPGp549y/jli3zMC9W28zBfU4Oqnsb8Y/o
-	Je4hSnkwMPLSer88u+CePE27inYkAMYafogrKVAivMA41Gm+wMdT10+1HOYC5UWyelVYVIhPzQb
-	KQ7NJJWyrDE2SqLhwR43Rz45tzpPPWN0=
-X-Gm-Gg: Acq92OF6+IwIFNxU2smVYgXTv37hGtz7lNspXP5L6l0qAukRPtSuszRS6gAwHDB6ZN5
-	hNykNh1+MGE855SrkW9+9WzRntfOm+Ux3nFB5QSVtjGEXL6BKnssStnByZuYCVYbxEGnzMXe+AQ
-	8mQFJcO5/iOrIqjeFAiLFTRqOqk+ARyfeWQX2Iew95APCwgs9kmJT7VMhFkHMvmEdRTpSR+VAlY
-	60YMDMv2O5F79d9TLMRrubY+J3wYR3Ee2lIBDVOY8RXhbxrEXP9/2GN9QwiRYjHModb60R2J62v
-	28RxHrAb4/HR37BYBmd2Kbm9SCJERb0zNEmJuG7A3pm/pV1x2sqgYyoDd3yhRdpTRZ4=
-X-Received: by 2002:a53:ac8e:0:b0:652:541e:9681 with SMTP id
- 956f58d0204a3-65c79c67ea6mr25890686d50.3.1778510823622; Mon, 11 May 2026
- 07:47:03 -0700 (PDT)
+        bh=mH7N4j++r3IaudrlTt6rvym5myFHJfjExvIPYpFZaxQ=;
+        b=KLWUmVrjQtl9Y7p20hAV5E3/QKfTTYaUaRyBv2ducVwu1laVh5vdhLE6LgQOyuIfKX
+         tvzcWq/O2NXHnOBmHDsbX89QMCMYpX9SQmABzk1ckRP88vn7qhCXyKzGjj4jYV3Y0w71
+         lieKYEEahvGeih3VgFZJzppteIjDCyQzMwW00jcoMbDY+3HeKXgMCNIndCwZJE4b+cV+
+         cxXsH7mqtKxGQ9PFOO3mxRB+JzjQpZnPiO+vRe/l7qEdAkHDRY0X0flf5aWtBiTbcU57
+         DrrxpSGC49MEBRFoqYCJ6J2Ytzcr9lkIjCdllnyepsA5C0l35HruZ/a1aBJRY+6LHCDD
+         Wgow==
+X-Forwarded-Encrypted: i=1; AFNElJ/UxSTNkwKzZ1Rpi4Fli/GQEdD5YJNlnIf7qYE+G7j6y1H+5ZEoVdmJK/7OMcED5G+PmOj7xdDJK7REZueomZM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxc7NyvqxuaQmYKVfsB3OxAn5xB7e1s8qqwooS0a6L4uFPky/Lh
+	pYE1AeZ0JtNUacrxtNAbQMmCHEMoqMuMJhVxSPDRqItXxI8QPRMKwRgCsI3VA48jdDCR9cAz7H8
+	mC67DdBoJrhT97kX2jvhBF6uyy6dNN7k=
+X-Gm-Gg: Acq92OE+2JegiQrGRVcVTOTW7m6wnc7DH6I8a1TyCgUMFkwsjEF83K/XZ1LdgZafIxS
+	9nTH29Pgbu/f5fVudnqgaqMQ3tclEHRjC1gvulyEyC0Zy8bmP/6JglY4LZGhJwonvJCxenATV/L
+	B3QtXGBpPfHr6WBuHjSUXpL9PDxT0uw+JftEWPoKsZ3DNmbq+EmTA7/7AjpD6/rGVy4/d9g0gxZ
+	KUi+/IzscgGRYANZYQQijTLlQB9ugTl75MEO6ht0OMpjNQkpP856gR8xPy52ppvPy6oSZKy7MHm
+	30MeR5TmPJKBSDYGa94Po5QUVcxj3gEUECrMArVkcpnOO5+8Qe42pOg6XsLWXFILRfw=
+X-Received: by 2002:a05:690e:b4c:b0:656:ad2e:98b5 with SMTP id
+ 956f58d0204a3-65d94c4c72emr14661107d50.35.1778511198684; Mon, 11 May 2026
+ 07:53:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <770d36b07311bf88210c187923f243fb9f126f04.1777058551.git.pav@iki.fi>
- <CABBYNZ+jM+2BQ4Fek87OCKbyvuxjsyeCG0qpGRkAO4LA=pj4xw@mail.gmail.com> <d9fe37aa17175290bc406ccad8ed4cf533dfd8b8.camel@iki.fi>
-In-Reply-To: <d9fe37aa17175290bc406ccad8ed4cf533dfd8b8.camel@iki.fi>
+References: <cover.1778506829.git.michael.bommarito@gmail.com> <490e228dd02983fb1530fb114d4174148f810261.1778506829.git.michael.bommarito@gmail.com>
+In-Reply-To: <490e228dd02983fb1530fb114d4174148f810261.1778506829.git.michael.bommarito@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 11 May 2026 10:46:50 -0400
-X-Gm-Features: AVHnY4IGoPgw4d0fIvipGtsBveaPxZgL3RQu-HjG2UesWQH9AkBZVxdfXxjDoSs
-Message-ID: <CABBYNZ+FfhYtU2=J-V4pjKf_vKV=Y5LhVhxS_epKe-qaUUt8_g@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btmtk: accept too short WMT FUNC_CTRL events
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org, 
-	Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+Date: Mon, 11 May 2026 10:53:07 -0400
+X-Gm-Features: AVHnY4KdJ6uIUItlvWVm4hjtGOIr8Ds-NBKNTO6jvd9cqCVO4aKGk0OqFI1lRGw
+Message-ID: <CABBYNZL-f+AzFWdhvLcxdf0oCXbgr3AXqM1W2npOPZEv0gRA6w@mail.gmail.com>
+Subject: Re: [PATCH 1/4] Bluetooth: hci_sync: pin conn across hci_le_create_conn_sync
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Mat Martineau <martineau@kernel.org>, netdev@vger.kernel.org, 
+	stable@vger.kernel.org, Pauli Virtanen <pav@iki.fi>, Aaron Esau <git@aaronesau.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Pauli,
+Hi Michael,
 
-On Fri, May 8, 2026 at 3:09=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
+On Mon, May 11, 2026 at 10:34=E2=80=AFAM Michael Bommarito
+<michael.bommarito@gmail.com> wrote:
 >
-> Hi Luiz,
+> hci_le_create_conn_sync() runs from the cmd_sync workqueue with a
+> struct hci_conn pointer it interprets out of the work item's void
+> *data argument. The hci_conn_valid() check at function entry is a
+> TOCTOU: nothing prevents hci_disconn_complete_evt() (executing on
+> hdev->workqueue rx_work) from running between the
+> hci_conn_hash_lookup walk in hci_conn_valid() and the body's first
+> deref. hci_disconn_complete_evt() -> hci_conn_del() -> hci_conn_cleanup()
+> unregisters the device and drops the final kref, which kfrees the
+> hci_conn slot. The cmd_sync callback then writes through the freed
+> pointer (clear_bit on conn->flags, conn->state, the four
+> le_conn_*_interval fields).
 >
-> pe, 2026-04-24 kello 15:38 -0400, Luiz Augusto von Dentz kirjoitti:
-> > Hi Pauli, Tristan,
-> >
-> > On Fri, Apr 24, 2026 at 3:25=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wro=
-te:
-> > >
-> > > MT7925 (USB ID 0e8d:e025) on fw version 20260106153314 sends WMT
-> > > FUNC_CTRL events that are missing the status field.
-> > >
-> > > Prior to commit 006b9943b982 ("Bluetooth: btmtk: validate WMT event S=
-KB
-> > > length before struct access") the status was read from out-of-bounds =
-of
-> > > SKB data, which usually would result to success with
-> > > BTMTK_WMT_ON_UNDONE, although I don't know the intent here.  The boun=
-ds
-> > > check added in that commit returns with error instead, producing
-> > > "Bluetooth: hci0: Failed to send wmt func ctrl (-22)" and makes the
-> > > device unusable.
-> > >
-> > > Fix the regression by interpreting too short packet as status
-> > > BTMTK_WMT_ON_UNDONE, which makes the device work normally again.
-> > >
-> > > Fixes: 006b9943b982 ("Bluetooth: btmtk: validate WMT event SKB length=
- before struct access")
-> > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> > > ---
-> > >
-> > > Notes:
-> > >     AFAICS the commit is not yet pulled and is only in bluetooth-next=
-, so
-> > >     maybe this should be just fixup?
-> >
-> > Yeah, I'll most likely fix it in place and add your Signed-off-by.
+> A KASAN slab-use-after-free splat in cache kmalloc-8k confirms the
+> bug on linux-next tip commit bee6ea30c487 ("Add linux-next specific
+> files for 20260421") under UML+KASAN, matching the slab geometry of
+> the syzbot trace fixed in commit 035c25007c9e ("Bluetooth: hci_sync:
+> Fix UAF in le_read_features_complete").
 >
-> Looks like this got pulled to net without this fix, so it's broken now
+> Follow the reference-pinning pattern from commit 035c25007c9e
+> ("Bluetooth: hci_sync: Fix UAF in le_read_features_complete") and
+> commit 0beddb0c380b ("Bluetooth: hci_conn: fix potential UAF in
+> create_big_sync"): the queue site takes a reference via
+> hci_conn_get() so the slot is not freed between
+> hci_disconn_complete_evt() retiring the conn and the cmd_sync
+> callback / completion handler returning. The completion handler
+> drops the reference on every exit path, including the -ECANCELED
+> short-circuit.
+>
+> Introduce a static helper hci_cmd_sync_queue_conn_once() so the
+> get/put pair is not open-coded at every queue site. See the
+> helper's kerneldoc for the -EEXIST contract.
+>
+> The hci_conn_valid() check in the callback body is retained: a
+> logically-deleted-but-still-referenced conn has stale
+> hdev->conn_hash.list state, and continuing to drive a connection
+> attempt on it would be a logic bug even though the memory is safe.
+>
+> Pauli Virtanen posted a series-wide variant of this fix as
+> https://lore.kernel.org/linux-bluetooth/e18591f264c50e15917cb8b9e5f9798d9=
+880979d.1762100290.git.pav@iki.fi/
+> (PATCH v2 8/8, 2025-11-02). KASAN reproducer captured under
+> UML+KASAN (linux-next tip bee6ea30c487).
+>
+> Fixes: 881559af5f5c ("Bluetooth: hci_sync: Attempt to dequeue connection =
+attempt")
+> Cc: stable@vger.kernel.org
+> Assisted-by: Claude:claude-opus-4-7
+> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+> ---
+>  net/bluetooth/hci_sync.c | 41 ++++++++++++++++++++++++++++++++--------
+>  1 file changed, 34 insertions(+), 7 deletions(-)
+>
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index fd3aacdea512..b20e07474257 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -786,6 +786,31 @@ int hci_cmd_sync_queue_once(struct hci_dev *hdev, hc=
+i_cmd_sync_work_func_t func,
+>  }
+>  EXPORT_SYMBOL(hci_cmd_sync_queue_once);
+>
+> +/* Queue an HCI command entry once, pinning a hci_conn for the duration.
+> + *
+> + * On success, the cmd_sync queue owns one hci_conn_get() reference;
+> + * the supplied destroy callback must hci_conn_put() to balance.
+> + *
+> + * On any failure return (including -EEXIST, where
+> + * hci_cmd_sync_queue_once() neither invokes destroy nor consumes the
+> + * data pointer because an existing entry already owns the slot), the
+> + * helper releases the reference before returning, so callers do not
+> + * need to discriminate failure codes to keep the refcount balanced.
+> + */
+> +static int hci_cmd_sync_queue_conn_once(struct hci_dev *hdev,
 
-My bad, will try to expedite a PR to have it fixed asap.
+Id suggest we dropped the once at the end so just hci_cmd_sync_queue_conn.
 
-> >
-> > >  drivers/bluetooth/btmtk.c | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-> > > index ab34f1dd42bc..68a32d11e5ec 100644
-> > > --- a/drivers/bluetooth/btmtk.c
-> > > +++ b/drivers/bluetooth/btmtk.c
-> > > @@ -719,8 +719,8 @@ static int btmtk_usb_hci_wmt_sync(struct hci_dev =
-*hdev,
-> > >         case BTMTK_WMT_FUNC_CTRL:
-> > >                 if (!skb_pull_data(data->evt_skb,
-> > >                                    sizeof(wmt_evt_funcc->status))) {
-> > > -                       err =3D -EINVAL;
-> > > -                       goto err_free_skb;
-> > > +                       status =3D BTMTK_WMT_ON_UNDONE;
-> > > +                       break;
-> >
-> > This probably means the original change was never tested on real
-> > hardware. We likely need input from the MediaTek team on how to handle
-> > these events, as I don't think a public spec exists.
-> >
-> > >                 }
-> > >
-> > >                 wmt_evt_funcc =3D (struct btmtk_hci_wmt_evt_funcc *)w=
-mt_evt;
-> > > --
-> > > 2.53.0
-> > >
-> >
+> +                                       hci_cmd_sync_work_func_t func,
+> +                                       struct hci_conn *conn,
+> +                                       hci_cmd_sync_work_destroy_t destr=
+oy)
+> +{
+> +       int err;
+> +
+> +       err =3D hci_cmd_sync_queue_once(hdev, func, hci_conn_get(conn), d=
+estroy);
+> +       if (err)
+> +               hci_conn_put(conn);
+> +
+> +       return err;
+
+Then we incorporate return (err =3D=3D -EEXIST) ? 0 : err; logic above, so
+I don't think any caller should require queuing multiple procedures
+for the same conn.
+
+> +}
+> +
+>  /* Run HCI command:
+>   *
+>   * - hdev must be running
+> @@ -6982,36 +7007,38 @@ static void create_le_conn_complete(struct hci_de=
+v *hdev, void *data, int err)
+>         bt_dev_dbg(hdev, "err %d", err);
+>
+>         if (err =3D=3D -ECANCELED)
+> -               return;
+> +               goto done;
+>
+>         hci_dev_lock(hdev);
+>
+>         if (!hci_conn_valid(hdev, conn))
+> -               goto done;
+> +               goto unlock;
+>
+>         if (!err) {
+>                 hci_connect_le_scan_cleanup(conn, 0x00);
+> -               goto done;
+> +               goto unlock;
+>         }
+>
+>         /* Check if connection is still pending */
+>         if (conn !=3D hci_lookup_le_connect(hdev))
+> -               goto done;
+> +               goto unlock;
+>
+>         /* Flush to make sure we send create conn cancel command if neede=
+d */
+>         flush_delayed_work(&conn->le_conn_timeout);
+>         hci_conn_failed(conn, bt_status(err));
+>
+> -done:
+> +unlock:
+>         hci_dev_unlock(hdev);
+> +done:
+> +       hci_conn_put(conn);
+>  }
+>
+>  int hci_connect_le_sync(struct hci_dev *hdev, struct hci_conn *conn)
+>  {
+>         int err;
+>
+> -       err =3D hci_cmd_sync_queue_once(hdev, hci_le_create_conn_sync, co=
+nn,
+> -                                     create_le_conn_complete);
+> +       err =3D hci_cmd_sync_queue_conn_once(hdev, hci_le_create_conn_syn=
+c, conn,
+> +                                          create_le_conn_complete);
+>         return (err =3D=3D -EEXIST) ? 0 : err;
+>  }
 >
 > --
-> Pauli Virtanen
-
+> 2.53.0
+>
 
 
 --=20
