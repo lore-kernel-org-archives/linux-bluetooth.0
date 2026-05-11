@@ -1,98 +1,85 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53248377574
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 11:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA2E372663
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 11:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778499006; cv=none; b=pEhpNH4uk509er3BQmNJozh4gd1N9nHIoHIQyU2cEgG5Xa1AbJaabf0QHoKEaWPW6GMUp8vsLIDIaDBM3+CT4zABigRxdW9Pn3bytfIJBiazRphT5PC1MnUVETluf4R26sMPsBE4jNfY8BfYr1qeeMAhu/v68UorF3mzNA+JcLE=
+	t=1778499258; cv=none; b=UPubb/fsGsjgqE/XDxsxSq0QH88KNaJq0TpuY6KIipTH0ex8sIxe1hSpBrmzdTYRkrut3suMbmVLJvEAZ2nu5O3g+RW4KE7slscUKHL9NK7N7ukE8Qs0zaXGyb1xbC6UJp4XViBMizi4hkFeg4uOCXASknQ3sUqp37Uf+u742KI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778499006; c=relaxed/simple;
-	bh=IqeusD7M1GeDYISR0gEebUtKpnVGG12mdh36BE5ONCI=;
+	s=arc-20240116; t=1778499258; c=relaxed/simple;
+	bh=h1T+iTpfKYzeu/41wI2x47MVUVgmS5QYj1N27EmVJ2M=;
 	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GTTXtaGuVhPo5tox22S7oSOAfYG4lOGWv+xJ/zPfkF0uJ7dtZM01wZCnzgKFenUUeCaOOQiWBXgjlafSFhAigV+ulH4SeH+HBIT2Ip5BB1iB5EC5b3kVwzNGP9SSQDTrQNR8DyVD1lp2LH8wNR8902NqgwBI0tsqKvYsKOUt9So=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQCdmNsA; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=YOyS1wZBAz3pG45t/jtwe5cO3/s7QEcsqCGXDmE2Mo0AhUffHY2U96v2YEHGAVBLYOjWLDzgn6qn4qVaeg/iFEQgDkhsmlt7VY5HLWh+uBzE7JXimNPWyAAN0orrMMDulGoIs1gZ5mGH8N5QqkoZrXKqXiYUSP5JBpln4ecZuxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WHm5gWAV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQCdmNsA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 002C9C4AF0E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 11:30:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WHm5gWAV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FE33C2BCFB
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 11:34:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778499006;
-	bh=IqeusD7M1GeDYISR0gEebUtKpnVGG12mdh36BE5ONCI=;
+	s=k20201202; t=1778499258;
+	bh=h1T+iTpfKYzeu/41wI2x47MVUVgmS5QYj1N27EmVJ2M=;
 	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
-	b=UQCdmNsA2HNRZi618Ti6Qgj7Eu2mu+CjUBP6v8fQlfk0MiE639MxL8eWXPHwelqmg
-	 9s8fwULbVpjE1SEqsNZ+1yE4RTDr+DPLjtlChVqZoRyMcRrjgnHr0K95KzeidjVFwo
-	 w/faNuiTciWBxTuAz3FiBcOsfbXOa9oYRzb5QLzhlV8ek504pFwt6ksLN6OJCC/N2J
-	 CAq+9d9Zv2jkQFfX5RXz5/NCue3ECTlzZLKbdQ2PqxWLhsk5fKPSz+SBFR918eIGyN
-	 CjsRmLQ+Kwaipq2MHQ7oPADPMBGKHgSAhkHEimGMc+1kpphIuC4IkzsVT5zFB+2voP
-	 kjP61TSkHblcA==
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-3939d2bd739so36707831fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 04:30:05 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ+aqKX9nBn76W/T8Z6IVd3KF1tz84GTaHmM9DMVOn8ykFGdT/MHhWD9Mc9rXaGaI87YjL7wpLpQcTM512ahKdU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMLEMTWQt68t90qsxNH1e/dbOfNNsqt+1LoCRZuMiV3SgLEbCu
-	l8AgXK6w50EzZ+ry+NKJfm3w7+Y0EQjgF4KZ0s32AUG8oxN08sm6CnJmqF3qXC7D6e3WMBCk2LH
-	sLrjNpCvxLBsztTme1Hr2jLcifk0pnGpsyEWx6AZCmw==
-X-Received: by 2002:a05:651c:897:b0:394:5b8:485a with SMTP id
- 38308e7fff4ca-39405b84da4mr33981821fa.14.1778499004642; Mon, 11 May 2026
- 04:30:04 -0700 (PDT)
+	b=WHm5gWAVCpHW95+kfauTw8F8Mxkdne+4wgo/o8Z74m8hRsjiDQIxoIA9RGJ5AJcy4
+	 BAb6bDk4VDWqsqfyNHqdey4RFBmF3lOUgh0aTWCgZXlR9p27rPDSYEJbGfrz/kBmB8
+	 DIw/7sTyr7YpvgBUPAWqSvcjXzfuyu1j/58Mjc/mPf4lygRn1aXr/20HWuoCpIqTJo
+	 DtEYS89TB+9X2Q05EiWQNBUCF7fjvZokb/Ul0Lc06KCwWBVI1NIIlALl4fTl6ltO5K
+	 UR8g0AknRp9XI7LeEwPgtgAyGvwEI5bng7u9rOqkjgBsiFCnBIWj3O1NhEWySe6v4U
+	 +MhS1+erpriig==
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-3942e9977a5so3638711fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 04:34:18 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ9lzXt5jMT651JJMfbwMcEre47fHJ9K7++rsoSkJKi2JXVN1wfxAhhvT73BCV5E6P5biq6STr1vETNzYGULSew=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysVoF/fqz2/8QvWn43dNUSU8SIpoJreYVWgn2FDeVbatAD4myy
+	1AcgzMjgoOAwKNx943O47OU4hTK7x6YXmZncD1y7kpKIHcScBSRUFKJIDv9NYg95175qErD9slt
+	7elZnLjobdbNYiXA1edPg6q+UwksiiT5ucVSXWIbFmQ==
+X-Received: by 2002:a05:651c:881:b0:38a:2a56:9546 with SMTP id
+ 38308e7fff4ca-393db0ec0e7mr51883851fa.13.1778499256816; Mon, 11 May 2026
+ 04:34:16 -0700 (PDT)
 Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 11 May 2026 04:30:02 -0700
+ HTTPREST; Mon, 11 May 2026 04:34:14 -0700
 Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 11 May 2026 04:30:02 -0700
+ HTTPREST; Mon, 11 May 2026 04:34:14 -0700
 From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260507-block-as-nvmem-v2-8-bf17edd5134e@oss.qualcomm.com>
+In-Reply-To: <20260507-pwrseq-m2-bt-v2-8-1740bd478539@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260507-block-as-nvmem-v2-0-bf17edd5134e@oss.qualcomm.com> <20260507-block-as-nvmem-v2-8-bf17edd5134e@oss.qualcomm.com>
-Date: Mon, 11 May 2026 04:30:02 -0700
-X-Gmail-Original-Message-ID: <CAMRc=MfM7cTRA7fMG_ej2v1e=6aQDMz3t9TxvwXeJ0mR1VY2dw@mail.gmail.com>
-X-Gm-Features: AVHnY4J57m614VXHB1gG4Q2Qt_nwp6rzOp-nMalUaxmsHemzFoQ6bUJPlO5KxfQ
-Message-ID: <CAMRc=MfM7cTRA7fMG_ej2v1e=6aQDMz3t9TxvwXeJ0mR1VY2dw@mail.gmail.com>
-Subject: Re: [PATCH v2 8/8] arm64: dts: qcom: arduino-imola: Describe NVMEM
- layout for WiFi/BT addresses
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, daniel@makrotopia.org, 
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, Ulf Hansson <ulfh@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Saravana Kannan <saravanak@kernel.org>
+References: <20260507-pwrseq-m2-bt-v2-0-1740bd478539@oss.qualcomm.com> <20260507-pwrseq-m2-bt-v2-8-1740bd478539@oss.qualcomm.com>
+Date: Mon, 11 May 2026 04:34:14 -0700
+X-Gmail-Original-Message-ID: <CAMRc=Me=Vc7-fH60k37X=CmZF0p9pq1=LuPB8guYAG2bE5+nJA@mail.gmail.com>
+X-Gm-Features: AVHnY4KvDZonEFsAY3V4FXK5oGMr-0fSg8j1UEekWmAJz-f9zkiDXym_hc0bJAY
+Message-ID: <CAMRc=Me=Vc7-fH60k37X=CmZF0p9pq1=LuPB8guYAG2bE5+nJA@mail.gmail.com>
+Subject: Re: [PATCH v2 8/9] power: sequencing: Add an API to return the pwrseq
+ device's 'dev' pointer
+To: manivannan.sadhasivam@oss.qualcomm.com
+Cc: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>, 
+	linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-pci@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, Wei Deng <wei.deng@oss.qualcomm.com>, 
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, Bartosz Golaszewski <brgl@kernel.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Shuai Zhang <quic_shuaz@quicinc.com>
 Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 7 May 2026 17:24:43 +0200, Loic Poulain
-<loic.poulain@oss.qualcomm.com> said:
-> On Arduino Uno-Q, the eMMC boot1 partition is factory provisioned
-> with device-specific information such as the WiFi MAC address
-> and the Bluetooth BD address. This partition can serve as an
-> alternative to additional non-volatile memory, such as a
-> dedicated EEPROM.
+On Thu, 7 May 2026 18:06:16 +0200, Manivannan Sadhasivam via B4 Relay
+<devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> said:
+> From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 >
-> The eMMC boot partitions are typically good candidates, as they
-> are relatively small, read-only by default (and can be enforced
-> as hardware read-only), and are not affected by board reflashing
-> procedures, which generally target the eMMC user or GP partitions.
+> The consumer drivers can make use of the pwrseq device's 'dev' pointer to
+> query the pwrseq provider's DT node to check for existence of specific
+> properties.
 >
-> Describe the corresponding nvmem-layout for the WiFi and Bluetooth
-> addresses, and point the WiFi and Bluetooth nodes to the appropriate
-> NVMEM cells to retrieve them.
+> Hence, add an API to return the pwrseq device's 'dev' pointer to consumers.
 >
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+> Note that since pwrseq_get() would've increased the pwrseq refcount, there
+> is no need to increase the refcount in this API again.
+>
+> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 > ---
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Thanks, I like this approach much more.
+
+Bart
