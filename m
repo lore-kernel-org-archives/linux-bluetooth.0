@@ -1,90 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F1B3D8913
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 10:36:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E573D47DC;
+	Mon, 11 May 2026 10:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778495783; cv=none; b=SIPQ2/3AI5B8pOXuQRhdS/12bbiTL351FzlM0Y5RMw/Dm/tGw8CkjaR7q3yVPFIxlcR/uqBUiJj+oS1lJ+w95KQ1Al76FuqBaEQxEh2Ba56AjmJLPrg2R5ej8Z/aeyhzs3dGFQPzTA8qdEo5CKR4T70FdlbHeNPU8bdLAAtSf3I=
+	t=1778496124; cv=none; b=O7krW7J13sCXm7hd3YnZtSVZwamfjKtymvlooZFrle8SlqmOtw/YuYGgvTmpjq/wJfnxTiV3izQTkX9Af/qwsO4H3RuPI/9D6nw5LiWBA5Fl15Kkyvhbfjv63pPqNxacT3JyTTD9dErgh02rDUKp1BcRcz3E0c/BLffOGUOaY7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778495783; c=relaxed/simple;
-	bh=IENORfZd5dSYQkrNitKAXWYKfDtZSTBMvfDRDDw/UDU=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cBtIyWLSs9RlW+BWsia/KsKT9ZCNWR9PvJ1fXLfxGL4bric4XPxG0vJfYXK9WRu7r1sueH/jBHuOqmZpCNMIEwlONGhH71yAgea0rOARe7kjC4E4ielUMC02Rn7sGaOK+9/L7kuBuJEKSgsvtySF+ttLE9udATQmyRo5ImI2C68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l5apJdrA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778496124; c=relaxed/simple;
+	bh=h6zSdtN9jQgMR/YPfbG1OygHwk4VDPpboHdb0JfjOWE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=aYoCdXQQoQGn1K7RNDc5Bphm3OnIKGPYMWapYATdp3U3h1cUmhroE6dKf/I2ptAQxXaWGU3GpV8Dj/ORg4HsK35OV2UrkziGO06Cq48RXaO7tgK580iLgLxRyRN2rdyveS7vfO5zKrgg2fFHqlz73TftRyWoWtZD6j2SXCDzBx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=ebgfSf75; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l5apJdrA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35A86C2BCFF
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 10:36:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778495783;
-	bh=IENORfZd5dSYQkrNitKAXWYKfDtZSTBMvfDRDDw/UDU=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
-	b=l5apJdrA49uY4v/bTHhH4NFQ7CWM57f59dOtXdEGrLYwpCS1ywrulpD6I3CAgAf5R
-	 udIkFkcAMJPz9f9xbehDGPY+rrLy/tUipUUHf231IteL2U5+M+Fe7Tmjf6uyHKA5NS
-	 XfZrkhgED5mZ2SN3YroJZ+eEaYUPeP58CAu1uoDA5oAFZsA7KkOqtaIfhpNrCOBoXe
-	 HN0LJFu+si9U9t+aUEQ1u1Bq1qqgcBwQoPxit9XSEixu1xy/tobN8YKQHYHNR55Bz3
-	 wTGWB7OmdcOW3TgjMZjj6Nwpsa1jD7MisITRNr8vi0COY8+KQ4/7eZwoAoyl1GD1ej
-	 uEA8B59Lty7Nw==
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5a525aedb24so4085012e87.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 03:36:23 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8CoEmHo4XDdHGfBR/VVZm1meaSNddUWVHdBr71r4tCWGSl9uzaBnmP4WSh+/G7a/kRkQzHAm/Ho5csts/2cNU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6CwXcdkNX7bdTjMy3ciNkTh/xkL/5yYkxfxwJfDiVqQZYKgp5
-	VnTwawR/fZ+hBCH095/4hDfnIhKSAEvTPwoqtPWNIt9F7BCWO/BrohvcC5RkMvvHZo57CeIzVhR
-	bZpO3J2K9vcxugzzeoY5Q0YAmu0e4cxomunfxuAOWig==
-X-Received: by 2002:a05:6512:3e1c:b0:5a8:b966:7b1f with SMTP id
- 2adb3069b0e04-5a8b9667b9amr3508208e87.16.1778495781398; Mon, 11 May 2026
- 03:36:21 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 11 May 2026 03:36:18 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 11 May 2026 03:36:18 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260507-block-as-nvmem-v2-5-bf17edd5134e@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="ebgfSf75"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
+	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
+	From:Reply-To:Content-ID:Content-Description;
+	bh=1XedRuOdFDTkq6Iy8V1E9JuuU/kZM1EoPconoc3Ujuk=; b=ebgfSf75t+3LGt5JtkJLFQygEr
+	L5wj4gWS37lANmsYO0OChJ5WiVfKQ3/yCdTb5uUPX2/bym7Den7I8SxdNVyGB/jDxdyPLX59q9V9j
+	wrcCS47RI5S8s4CTL9zFfJnP6OhVJbU06lENAvFXBjrZygq5LcpqsC2mZXz08XdItN+rEkTlWw3N2
+	6yeqK7isue4IqWXAcdCqTbnZgyyPEQ2JcwN0SXTiuiypjmzrJofjEkhzSAFP9PUOUdfz/sPgVjbV0
+	P5Qc/hvOTNTqKZTS712+0QwlDjg3vY99Baq+DvR3NB27W1HSCUV4KA+IW/xxgQ11PZSfHulb93b7o
+	MQBSRxUg==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wMO5I-001XeG-1S;
+	Mon, 11 May 2026 10:42:00 +0000
+From: Breno Leitao <leitao@debian.org>
+Date: Mon, 11 May 2026 03:41:46 -0700
+Subject: [PATCH net-next 1/7] Bluetooth: hci_sock: write the full optval
+ for getsockopt
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260507-block-as-nvmem-v2-0-bf17edd5134e@oss.qualcomm.com> <20260507-block-as-nvmem-v2-5-bf17edd5134e@oss.qualcomm.com>
-Date: Mon, 11 May 2026 03:36:18 -0700
-X-Gmail-Original-Message-ID: <CAMRc=Mdi5DuwhewSpaPCJCWWkmw57pLPx3snSyV_gtBN1gWtMw@mail.gmail.com>
-X-Gm-Features: AVHnY4LRJOdRAiXXJAqk3x0LB0U9Hhhkl-SHYK7hw0ni4PNj3Dx_sfKHg57uYFk
-Message-ID: <CAMRc=Mdi5DuwhewSpaPCJCWWkmw57pLPx3snSyV_gtBN1gWtMw@mail.gmail.com>
-Subject: Re: [PATCH v2 5/8] net: of_net: Add of_get_nvmem_eui48() helper for
- EUI-48 lookup
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, daniel@makrotopia.org, Ulf Hansson <ulfh@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Saravana Kannan <saravanak@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260511-getsock_three-v1-1-1461fa8786ab@debian.org>
+References: <20260511-getsock_three-v1-0-1461fa8786ab@debian.org>
+In-Reply-To: <20260511-getsock_three-v1-0-1461fa8786ab@debian.org>
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ Breno Leitao <leitao@debian.org>, kernel-team@meta.com
+X-Mailer: b4 0.16-dev-d5d98
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1628; i=leitao@debian.org;
+ h=from:subject:message-id; bh=h6zSdtN9jQgMR/YPfbG1OygHwk4VDPpboHdb0JfjOWE=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqAbJvxpCu685LY0M+x+JGeNiNeOAEmTcLxOpM6
+ sUTKNcfLriJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCagGybwAKCRA1o5Of/Hh3
+ bdBED/9BQMslx5J3oS7A5NvTjE6ZYWguJWBxVtl5eXMXQgx+pnQxR54Z+7FLncjY5zaHdOnITnS
+ m1dP4wc3jmkIhRPkqkgX2DCpZIgi6TYXarTJX1kh9gaRyy51HHLWnzECgR0iYtPJsPJTE8Cvc9c
+ VFaic+w1TS0CSWzrCIUEr6avlOVs6/w2Aoqj5BhJLorhCZEC+JDfWaM8QIqDLwegqOJXGVKxctk
+ Pbxsb0Td7VPbZBwsWZKwEbeuChZ2hDyxaPRyZSgl7HG2EHihq04JFzi/tDqMGht2lTX9+Rbmvjy
+ 3+SZLwUZwi02gzVmLb3JHXVEiZacpRGYpQkg79UpvPL8E2EPHCzco/JUtZUraL8USYZGZqU7upN
+ WSIoc2Bpr30+8Vp/ZOw2+PHS1g1nu2YI0DeQgQo5fwuZ2nb6ydQ+XD6VF1uFXf7HEeFIIfUrOXf
+ v3EndpdHewsw8+krLTJUydrQ2qwU2WBNF8G0HbsPvgUgQ4SSl73AhL7OWRk8rd4qzhvurCMNsEQ
+ ZCCymxitGayugT4iMWah9JSFJTSa3BWkh778goeheFDHuBoDz9VQVKlEI4pyoZlwMi6OrTAFCJo
+ v8amTK0SDOoVhFufhpCDDu+sn6zCx4pt6sQ18gJAda+OaW+aG60MD2p/eaUuZ5C4C8/9mevhmu4
+ kF79nw+2DD5zFDQ==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Debian-User: leitao
 
-On Thu, 7 May 2026 17:24:40 +0200, Loic Poulain
-<loic.poulain@oss.qualcomm.com> said:
-> Factor out the common NVMEM EUI-48 retrieval logic from
-> of_get_mac_address_nvmem() into a new of_get_nvmem_eui48() helper that
-> accepts the NVMEM cell name as a parameter. This allows other subsystems
-> (e.g. Bluetooth) to reuse the same lookup-validate-copy pattern with a
-> different cell name, without duplicating code.
->
-> of_get_mac_address_nvmem() is updated to call of_get_nvmem_eui48() with
-> "mac-address", preserving its existing behavior.
->
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> ---
+In hci_sock_getsockopt_old(), HCI_DATA_DIR and HCI_TIME_STAMP both store
+their value into a local int and then call put_user(opt, optval). Because
+optval is the function parameter typed char __user *, put_user sizes the
+write from sizeof(*optval), so only the low byte of the int is copied to
+userspace.
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+The matching setsockopt path reads sizeof(int) via copy_safe_from_sockptr,
+so userspace passes a 4-byte buffer in both directions but previously got
+back only one initialized byte on the read side.
+
+Not sending this through 'net' tree given this bug is mostly invisble,
+given opt is 0/1, and the last byte is being properly copied.
+
+With this change, the upcoming translation to .getsockopt_iter becomes
+mechanical.
+
+FWIW: This behavior appeared in commit 1da177e4c3f4 ("Linux-2.6.12-rc2").
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ net/bluetooth/hci_sock.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 0290dea081f62..1823c06ba8940 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -2088,7 +2088,7 @@ static int hci_sock_getsockopt_old(struct socket *sock, int level, int optname,
+ 		else
+ 			opt = 0;
+ 
+-		if (put_user(opt, optval))
++		if (put_user(opt, (int __user *)optval))
+ 			err = -EFAULT;
+ 		break;
+ 
+@@ -2098,7 +2098,7 @@ static int hci_sock_getsockopt_old(struct socket *sock, int level, int optname,
+ 		else
+ 			opt = 0;
+ 
+-		if (put_user(opt, optval))
++		if (put_user(opt, (int __user *)optval))
+ 			err = -EFAULT;
+ 		break;
+ 
+
+-- 
+2.53.0-Meta
+
