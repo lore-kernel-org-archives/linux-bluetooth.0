@@ -1,143 +1,195 @@
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.61.103])
+Received: from out162-62-57-64.mail.qq.com (out162-62-57-64.mail.qq.com [162.62.57.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6F538D;
-	Mon, 11 May 2026 06:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.61.103
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522012BEC2C;
+	Mon, 11 May 2026 06:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778481018; cv=none; b=N9cLnC7AMk0xVYXXpg48ud7dYpyNUKEf9agx120oJrOowYaM6VxSs0emIL83ohfBx5dpGYDM75LkCIeoLMGUZ36KXGVU1BvJ3ptht2zfYWawgIGEAqIYB6/5u2758q/SmLNxGCdx39NbKqfsx4BoiotcvARl0EZB56vzPoov//E=
+	t=1778481262; cv=none; b=P1PxIA7MhznosYiXZMu/LxtVHgn0VvqC8ntbLCGC4fHS2bpzAwRPz3x3nZSFmtGQMPclxeXXKnAXer9GQAIdxVyyld9rKS/psqBwau/4hl4KUMb8KAzzBN6bWwfdAaa4y2JtHK0WmKmZgpUmYWimgU2ojNT6BqapzRho/taPBW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778481018; c=relaxed/simple;
-	bh=LKk49BYYahEX/ogTF3fB76enQeNUY+jlhggXzzuQoKQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=JlH7bjA4URMPc3MFX9mm4ODXGvpQcgcemyYRx4Fx9k7UafI17KufnyczWoxGreSxhciWjkJebpoWKGki0xczw/IxnmVVjV2ByzjUXMYdMOm5gZhyOe/iuRTlyfu7HTdIG0ra2OZ/Wzxy5GuFcFP7xRXBvw6fxci1w5yMSROV1Y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=l4dLhcjL; arc=none smtp.client-ip=188.68.61.103
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1778481262; c=relaxed/simple;
+	bh=odYTO9CzqRZ/MB/1W9FvnzdFiRY6G5Wu2JuRefiGKYQ=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=iVK/sosh6VOYa0wPAcC3O9popFAiTP4gJcK3AvhkCJ1wBvJD3HmZDat69c0XFx+oV+7gjn4EiTaTMdXJ0xrZgzzi2Gi3NCoeZCc+7sDA7F60XpSq0zMIRospbne3aFoneekmm/0g+aCkXBUwghQzJPR9ldqHE0fFNs3ih+u9D2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=GEfRqvDm; arc=none smtp.client-ip=162.62.57.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="l4dLhcjL"
-Received: from mors-relay-8403.netcup.net (localhost [127.0.0.1])
-	by mors-relay-8403.netcup.net (Postfix) with ESMTPS id 4gDVFq0K5lz86L2;
-	Mon, 11 May 2026 08:30:07 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1778481007;
-	bh=LKk49BYYahEX/ogTF3fB76enQeNUY+jlhggXzzuQoKQ=;
-	h=Date:Subject:To:References:From:Cc:In-Reply-To:From;
-	b=l4dLhcjLsUrRMeESiD8by5l8cbIpn5nZZ30jxNbCatV26LjjHvEYatv3kX91mk9jG
-	 E4l3HNDNmL6BcAf0wTZmFbm5sx1zjhSBYMhxvxZFgMxl32G0eMrdQSETbKmjTzED/T
-	 aeujt//+hJiId6NttkOW+oKGwPiXEU7NpBSFUMnW44AXodlpcKeDsAuq+BXhDu55e7
-	 LXajUdcx+oqGdzJHfkKUcY3QyCPc99dFBYTDSgmntS5Leh97rYmxRAEDMxBZInmtoH
-	 f1qic421jX0ZVuwI9WGGGrBLipnacGndKlWl/zYeKxPDgKthKiFdy/WrudU6THC8eN
-	 cUu8Sl7dkPbWQ==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-8403.netcup.net (Postfix) with ESMTPS id 4gDVFp6kb6z86GN;
-	Mon, 11 May 2026 08:30:06 +0200 (CEST)
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4gDVFp1vKvz8svf;
-	Mon, 11 May 2026 08:30:06 +0200 (CEST)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 9F3D061837;
-	Mon, 11 May 2026 08:30:05 +0200 (CEST)
-Authentication-Results: mxe9fb;
-        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <01ffb0cc-dcf6-4e60-adf3-fbb96e0666d0@leemhuis.info>
-Date: Mon, 11 May 2026 08:30:04 +0200
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="GEfRqvDm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1778481248; bh=vfGr/xAlGhPhpi/P77prhoa1++/Z64kxSalCOXbvdkg=;
+	h=From:To:Cc:Subject:Date;
+	b=GEfRqvDm5qsvFdyd0ILcEB/TCHbv2gkXvGyGcxWvG+fjvqHoo8Lq6Y+kkWdsprebN
+	 L6bds87uG4rt1bG85qEWP1BSIj4NgsAwW2fg1ZFSuQ9ygbY7celH9uKq63XBjrdadm
+	 pZjOypm9A2beD+BIDQXvrvbQdky9b9ntSDsNwRNU=
+Received: from NTT-kernel-dev ([60.247.85.88])
+	by newxmesmtplogicsvrsza73-0.qq.com (NewEsmtp) with SMTP
+	id 885872EF; Mon, 11 May 2026 14:34:05 +0800
+X-QQ-mid: xmsmtpt1778481245tdw4aubn2
+Message-ID: <tencent_CA96C7486F1CF8F0C72A2274E56AD1766708@qq.com>
+X-QQ-XMAILINFO: NwU6Bou9okj/7K0UsUOIqEkkX7LoAHgssLC4vzLHV88f2rEERYEgwZugsKgSue
+	 ckNx0IsdeYGRUFV4zLfySeZO87Wzuq7jv9i2d5v9JwMYmD4/KOHE6m01jSammBGT1spcss7v0ISe
+	 G2+6b4tRRBY6Jy4sMDvZ+bkHldZLXvO4tddx3NRPgFX9lPXxCkX49aul5R5t7ocrtmEWUDxwBcpm
+	 8tauVBRJLlkBw5ig7iuQItwKoIesqHl6grJhl7YwLsI0ehvAITsinYZ/sOSlQrI2kcV8CYVD5TvJ
+	 wI4fiyfBfmdgxWfBPfEh1wnP3tXMnccDPAPgYtwnZbvo2qi8+GNzs0llOCmN+tgOVIUPzxe1z9Mf
+	 YNBboknkIpy6u/dX62HkNDVQPQPAcmfDn7KZX1gkyhTHGD+eVwdqhtAGwXPjC3JBLQqWrZ2byR9Q
+	 3XK0CATKaTVNc8HNF9dQ3urTptNIyOTPrFcSe1A6XeQMG2m4r5BdjbameqbJnmYXH0g+mJu4urzY
+	 lRtroy7sXiecYhx/r64Tq5HyHrf5KaLr8Cxqvbxb+AWpS9xqhw4Obkc+elvMSriPNbZsRY6cHg88
+	 8nkqBVqDGpBDf7GIBK66aepNuRFmjPiTTxzEZtplsi+NcGyDQdwk1JMnUx0tdCzUA2cwKu+NOaAC
+	 Ul2CMuTaEhWOUiHolZbW0rlT5TVXzn6xHNXlxqdcg2pbNmjsjxWtMxcZFKRdi7BjNtEuHt1HMKJB
+	 k40Pc0F1W9vy+Pm4vC6nEK3P8+obiiiUWU4Ls7MP/OLpCmq6MyjmAM2WIx77iqF2gd6lwBTvqsRF
+	 ukr9k5rFlkJOvx+WTbgyD92jIl8vZNywEJzmrCSFl6zVcfoEp0K4E1xbrYY0QCCV7BVhUyTnelGa
+	 D4zaAgoVjlIy6+gB1ZuCsz6V5FePG9NYsyPAfKexyhZSkxnXYaH0vUSDtYzDYnW7sqBkD0Q8GqRn
+	 FDIj5X14wZ8WV4XbaoI5FevxDU7wz0AK1ThvIeXZf8dlyA1vivmdW67Cq0AJ8SiimJHBPWzxWWIg
+	 7neRFipA==
+X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
+From: Fang Wang <32840572@qq.com>
+To: gregkh@linuxfoundation.org,
+	stable@vger.kernel.org,
+	luiz.von.dentz@intel.com
+Cc: patches@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH 6.1.y 1/2] Bluetooth: hci_sync: Remove remaining dependencies of hci_request
+Date: Mon, 11 May 2026 14:34:05 +0800
+X-OQ-MSGID: <20260511063405.856013-1-32840572@qq.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Linux 7.1-rc3 regression (Bluetooth)
-To: markus.suvanto@gmail.com
-References: <f652d5d9841a9b7c100dd19ee97c86099f580724.camel@gmail.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-Cc: linux-kernel@vger.kernel.org,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- Linux kernel regressions list <regressions@lists.linux.dev>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Pauli Virtanen <pav@iki.fi>,
- Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-In-Reply-To: <f652d5d9841a9b7c100dd19ee97c86099f580724.camel@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-PPP-Message-ID: <177848100600.3495226.3526253921001327380@mxe9fb.netcup.net>
-X-NC-CID: u9b/F5+RGuLVrkiC2KntT5mHbEnDMX0DYPqupjqEls0GsAUhdqA=
+Content-Transfer-Encoding: 8bit
 
-On 5/11/26 07:17, markus.suvanto@gmail.com wrote:
-> Hello
-> 
-> I upgrade 7.1-rc2 to 7.1-rc3. After that bluetooth  didn't start
-> hci0: Failed to send wmt func ctrl (-22)
-> My fix was to revert commit 634a4408c0615c523cf7531790f4f14a422b9206
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Thx for your report. FWIW, there are two proposed fixed for this change
-floating around:
+[ Upstream commit f2d89775358606c7ab6b6b6c4a02fe1e8cd270b1 ]
 
-https://lore.kernel.org/all/20260508173121.27526-1-mikhail.v.gavrilov@gmail.com/
-https://lore.kernel.org/all/770d36b07311bf88210c187923f243fb9f126f04.1777058551.git.pav@iki.fi/
+This removes the dependencies of hci_req_init and hci_request_cancel_all
+from hci_sync.c.
 
-Given that this is the third revert within a short time-frame I wonder
-if we should fast-track a fix (once ready) to spare more users the pain
-of bisecting & reporting.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Fang Wang <32840572@qq.com>
+---
+ include/net/bluetooth/hci_sync.h | 17 +++++++++++++++++
+ net/bluetooth/hci_request.h      | 21 ---------------------
+ net/bluetooth/hci_sync.c         | 14 +++++++++++---
+ 3 files changed, 28 insertions(+), 24 deletions(-)
 
-Ciao, Thorsten
-
-> -Markus Suvanto
-> 
-> 
-> commit 994246ea1eed9029d648b28a9828359f5046173e (HEAD -> master)
-> Author: Markus Suvanto <markus.suvanto@movesole.com>
-> Date:   Mon May 11 07:29:47 2026 +0300
-> 
->     Revert "Bluetooth: btmtk: validate WMT event SKB length before struct access"
->     
->     This reverts commit 634a4408c0615c523cf7531790f4f14a422b9206.
-> 
-> commit 5d6919055dec134de3c40167a490f33c74c12581 (tag: v7.1-rc3, origin/master, origin/HEAD)
-> Author: Linus Torvalds <torvalds@linux-foundation.org>
-> Date:   Sun May 10 14:08:09 2026 -0700
-> 
->     Linux 7.1-rc3
-> 
-> 
-> Lenovo ThinkPad T14s Gen 1 (20UJ) AMD Ryzen 5 PRO 4650U 
-> 
-> Not working dmesg:
-> masu@t470 ~ % grep Bluetoot dmesg_7.1.0-rc3 
-> [    4.229749] Bluetooth: Core ver 2.22
-> [    4.232923] Bluetooth: HCI device and connection manager initialized
-> [    4.233081] Bluetooth: HCI socket layer initialized
-> [    4.233227] Bluetooth: L2CAP socket layer initialized
-> [    4.233236] Bluetooth: SCO socket layer initialized
-> [    4.413060] Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20251223091725
-> [    6.142372] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-> [    6.142384] Bluetooth: BNEP filters: protocol multicast
-> [    6.142393] Bluetooth: BNEP socket layer initialized
-> [    7.727087] Bluetooth: hci0: Failed to send wmt func ctrl (-22)
-> [    7.727140] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
-> 
-> 
-> Working dmesg:
-> masu@t470 ~ % grep Bluetoot dmesg_7.1.0-rc3-00001-g994246ea1eed  
-> [    4.296358] Bluetooth: Core ver 2.22
-> [    4.296385] Bluetooth: HCI device and connection manager initialized
-> [    4.296393] Bluetooth: HCI socket layer initialized
-> [    4.296399] Bluetooth: L2CAP socket layer initialized
-> [    4.296404] Bluetooth: SCO socket layer initialized
-> [    4.391514] Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20251223091725
-> [    6.087152] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-> [    6.087165] Bluetooth: BNEP filters: protocol multicast
-> [    6.087172] Bluetooth: BNEP socket layer initialized
-> [    7.591891] Bluetooth: hci0: Device setup in 3127955 usecs
-> [    7.591922] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
-> [    7.657339] Bluetooth: MGMT ver 1.23
-> [   25.883135] Bluetooth: RFCOMM TTY layer initialized
-> [   25.883150] Bluetooth: RFCOMM socket layer initialized
-> [   25.883154] Bluetooth: RFCOMM ver 1.11
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index a8b106d884d4..a68ddf5c0228 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -5,6 +5,23 @@
+  * Copyright (C) 2021 Intel Corporation
+  */
+ 
++#define HCI_REQ_DONE	  0
++#define HCI_REQ_PEND	  1
++#define HCI_REQ_CANCELED  2
++
++#define hci_req_sync_lock(hdev)   mutex_lock(&hdev->req_lock)
++#define hci_req_sync_unlock(hdev) mutex_unlock(&hdev->req_lock)
++
++struct hci_request {
++	struct hci_dev		*hdev;
++	struct sk_buff_head	cmd_q;
++
++	/* If something goes wrong when building the HCI request, the error
++	 * value is stored in this field.
++	 */
++	int			err;
++};
++
+ typedef int (*hci_cmd_sync_work_func_t)(struct hci_dev *hdev, void *data);
+ typedef void (*hci_cmd_sync_work_destroy_t)(struct hci_dev *hdev, void *data,
+ 					    int err);
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index 0be75cf0efed..b730da4a8b47 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -22,27 +22,6 @@
+ 
+ #include <asm/unaligned.h>
+ 
+-#define HCI_REQ_DONE	  0
+-#define HCI_REQ_PEND	  1
+-#define HCI_REQ_CANCELED  2
+-
+-#define hci_req_sync_lock(hdev)   mutex_lock(&hdev->req_lock)
+-#define hci_req_sync_unlock(hdev) mutex_unlock(&hdev->req_lock)
+-
+-#define HCI_REQ_DONE	  0
+-#define HCI_REQ_PEND	  1
+-#define HCI_REQ_CANCELED  2
+-
+-struct hci_request {
+-	struct hci_dev		*hdev;
+-	struct sk_buff_head	cmd_q;
+-
+-	/* If something goes wrong when building the HCI request, the error
+-	 * value is stored in this field.
+-	 */
+-	int			err;
+-};
+-
+ void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
+ void hci_req_purge(struct hci_request *req);
+ bool hci_req_status_pend(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index c6f9d07a4819..4d23455e90bb 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -11,7 +11,6 @@
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/mgmt.h>
+ 
+-#include "hci_request.h"
+ #include "hci_codec.h"
+ #include "hci_debugfs.h"
+ #include "smp.h"
+@@ -142,6 +141,13 @@ static int hci_cmd_sync_run(struct hci_request *req)
+ 	return 0;
+ }
+ 
++static void hci_request_init(struct hci_request *req, struct hci_dev *hdev)
++{
++	skb_queue_head_init(&req->cmd_q);
++	req->hdev = hdev;
++	req->err = 0;
++}
++
+ /* This function requires the caller holds hdev->req_lock. */
+ struct sk_buff *__hci_cmd_sync_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 				  const void *param, u8 event, u32 timeout,
+@@ -153,7 +159,7 @@ struct sk_buff *__hci_cmd_sync_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 
+ 	bt_dev_dbg(hdev, "Opcode 0x%4.4x", opcode);
+ 
+-	hci_req_init(&req, hdev);
++	hci_request_init(&req, hdev);
+ 
+ 	hci_cmd_sync_add(&req, opcode, plen, param, event, sk);
+ 
+@@ -5188,7 +5194,9 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+ 	cancel_delayed_work(&hdev->le_scan_disable);
+ 	cancel_delayed_work(&hdev->le_scan_restart);
+ 
+-	hci_request_cancel_all(hdev);
++	hci_cmd_sync_cancel_sync(hdev, ENODEV);
++
++	cancel_interleave_scan(hdev);
+ 
+ 	if (hdev->adv_instance_timeout) {
+ 		cancel_delayed_work_sync(&hdev->adv_instance_expire);
+-- 
+2.34.1
 
