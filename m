@@ -1,197 +1,140 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A722E62B7
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 17:27:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778520481; cv=none; b=hHZm/SG783jz9Bre5sF+iVl6rKbTo7Mr4WptpLmon13gf9urs8tYfja04DN1IQcOLB4H2XlKpjvqw3eS0fNx1iMxxnlLDUI1YyYzc9HnJlmOn2upQhQJqU03qvFFCRuPVxwdybjK48VqhQrEaCupNgGxrX6V1+N3UvVBiDgVzlc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778520481; c=relaxed/simple;
-	bh=AJtTCIZl2BAQj1XMmguyycAaX4kazz4va9L+Q8ZDepk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=p4Z54CWUQhVyOD/Z8r+jbbUgeSgLSEG9MApsNUO9lQ9XWdFqinvg9NlCS28b2Iq1LX6ESNqH9/ayRbUSgtAAfrTQf0zdQG9eN6MFOqX7QU5NuZcStcLNcZvUCRU5OEYVYVGUCNDiIQK+qQBooTBmYbmoKMfSO9f379rxlGh3eOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rMeF3Nix; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF67450904
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 17:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778520944; cv=pass; b=XRBHxOFBN9I6Pas/w4VDYOKfC7xUh1ctDv+BdlatVXZH9CYY11BlXxRwbWA9vc34eOyl7oayTv0mQpvOH5ahGIT1AgML3KokRxcbk3kT7PQEObFiaRxRzKrqj+nhL8zQnR6Fu7SkblY8NR1bKUEPI0bgtDUGmArPY6XnJ3Zey7Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778520944; c=relaxed/simple;
+	bh=PrHitHZsoYkpOMvbmxI3GoouXwZw7Mpx8RnnPHK+sF8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=exY8IG9+Y/5UfBVUcGV9zuua9qVcQ74b35an3F+nBIK9XATpu5Pg+7wqJJ4gR2q0Uh/NrW3L3Y+fiZjp7am1eCc8IHLKQzZOuv5ee9kGtYyZUpyZIrGFYQVWmqaWCivEyvsjtGgPHOOgdoOXdIciQA/XwLl3cFmgiTjFoFXd8/Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bc4Hyq64; arc=pass smtp.client-ip=74.125.224.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rMeF3Nix"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-5102582e237so34830101cf.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 10:27:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bc4Hyq64"
+Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-65c364b893aso4437196d50.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 10:35:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778520942; cv=none;
+        d=google.com; s=arc-20240605;
+        b=BjyZnUmQwHAzI2Q8vpfbERe2aY+gwMBMzNbgAB2aj4uWVBw9gMAU9NgkPkxiAQIPFh
+         0Lhdps9EQMsCPa/YkDPUtqG8LmIAWefdvtuciOk5ulTI6xAG16OIGP1fk4OqpPMQIYc1
+         3Y7qnjgX3XysPBpejNA6ZyKmXU+ZUDpgIAhhQNHC8NLJt3YeNnP4F11ueaaNnGhASCJi
+         ZI8FbwEqvAbu/YN0Kuqb6SU9HbDiMyTAPd/4E9WRjz/ljjYjpEUw0CdR5ERYcfranZUs
+         eoaedlMLvWdbeRMakfrpnahqF9x8dIEaE7Utax5MJH3pI6ai+rvErP/47Dy/8jr3qNzV
+         YVrQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=dlz/dzPv3rXYhFqA+0mmgm8FDTZKSNmwOlN+ACRup7M=;
+        fh=KVfISlVZd2xZgbfwvv2Xziebuy1KOvcrcayY3iKofj0=;
+        b=hDKm/ciqvZhcZ7U4xKRkyHKdgiN55uZaoErngydNeNS8VfBfKMsbbF5KSTX6YTZUbR
+         2JDkiDd+iWxt+iDAVQIySAz+/1xJs8QeIQWUBKiQCE7VEngYuNJwnYksP/SRKB7ksxJe
+         0TmQwv9craubTsaWSt3+wy3Ki/sV0IrjmDoNun3o0c+AER4dJfw5sUGcLlQiUBLSQkDc
+         yDlD3maA1ktvQlBdAKCOqN2iWBir0DmB9C3fjVcwTSnU/QFqcu2T6yIRqRQDA7adMvLr
+         +MpBOs4/NBxnQ9IU/y60JxrawUzlKxlisVjDvlBQ6XcV0/fO4HnXx3MdJ2LxHwUWwEu9
+         CLpw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778520478; x=1779125278; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jZylSBAIj0euqAPCTBUCPVDh+wx81rNWKAc82s4xnHI=;
-        b=rMeF3NixjpDNgWuO///tMOeGRSLBnySHmauBdWikwNSROLrIcyV9YSo4kqP1dy0I2r
-         mI/7Pn5N1HR/vFDDOn/Tn+ib0BThyqswILTLZ4GKObSF9jThSc7ahj2mY/EWab82gWvG
-         pfWXWuDteoXL2kjy8xU+cXi2+60N7Mqfy2TBn7Ab2lCGRT+UZ8RN3BW/FGVBVGDTHndh
-         fiwgfSnLe6sWSAlgBNQRglwDkEZr6H8AnP9AY/sNb6B8Kc4MuQnWb+S99Xf0/4afKDpT
-         /zbIYIe0gPyvlSZFgLMwO1VF8ylj1Z3v5T7wMu+HMBTI342NhWhfK1/C7NJ/zaaP7tzM
-         rn3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778520478; x=1779125278;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1778520942; x=1779125742; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jZylSBAIj0euqAPCTBUCPVDh+wx81rNWKAc82s4xnHI=;
-        b=Ue1QL9vwvf322ycG9BLwcv6f2ACHvp4ly66e2IdNPWjm3n36QEZkuPi3wbZ5NbKn4U
-         iwFGEYRPYmAv/m/YwpSC6tstg1I2nmi4ZIUf3EMmrt0t3N6OoLGMqXRTyHv97+6/avw3
-         i6UJ4/XQ3mQrEd3aKFyNrcAUomho94Rq73sswdqPUfb7Bi/DN/6QGq+cc9BxPNaFSQ7h
-         UR8FaraT7atYGk8SuOqQDLyX0BPUUV86qyS1kxBXXPFK7kTWrsBjbRnQds6ETrgeYzGO
-         YzLh9idmyMxKdQ9WJGcanoacgKcUAZtk7dU7Gj/YHfXTzKvvGMhsqpuaMARMCTk2l6EH
-         Unhw==
-X-Gm-Message-State: AOJu0YzLNZO8EOh3gw+cBpKNQLulv1hG270BS0BCOXYEQ5Z3hGFSX4dF
-	TakMqLBViAvgIYoDdgFKRYaOYSxBRqokMY49QQ9g7u0Ci6GzsKdo3YT7ndLo8A==
-X-Gm-Gg: Acq92OFihLvOL3A7Ld/nYc/hyMxw0NCwYtsKE+m/jSlNcP/yTnf87G1mrIjHW2TdgHS
-	MHbavm6t6W6K3eakp9oUA4NLrivXgSmz6AGdjR1wcbysyzsFIdZjArd+awiRwS1LzaL6ZZheH59
-	IBH5V0EWI7DTwG4RdWx67t4k1HBB3lE3A5oEeJdY9A9lRl0y+rOP3YjgCjX4DwRac9GQKg7lWW0
-	qdNcBGskIM3MrTC0xMFcoufO1vnjCi1AnAzUfMD9MMX/hY1FnygK29yxoM0iv2gJNeYvErGbe7U
-	RI2pyJxt69YlNncdwP6xG5zF+3sLIxw2ihNEjJUXWpWa+oQr0uXFmM0CVC8mggrUPd82ud7ZRbs
-	BUHerdblTv/VFnGmRAI9L6x0/10uooZO2suKvyyoLXovKPKq6OS/6jt8epyEFCjFqlDuTLouz8a
-	G6A9jyrnXeiDLxJk67OsSbTczJsi90hx0=
-X-Received: by 2002:a05:622a:4d46:b0:50f:9c32:509d with SMTP id d75a77b69052e-514621f7de2mr351336961cf.60.1778520478405;
-        Mon, 11 May 2026 10:27:58 -0700 (PDT)
-Received: from [172.17.0.2] ([64.236.141.194])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5148e7bf34asm100012051cf.14.2026.05.11.10.27.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 10:27:58 -0700 (PDT)
-Message-ID: <6a02119e.050a0220.271c94.d4cc@mx.google.com>
-Date: Mon, 11 May 2026 10:27:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4959854932914016979=="
+        bh=dlz/dzPv3rXYhFqA+0mmgm8FDTZKSNmwOlN+ACRup7M=;
+        b=bc4Hyq6422T08nEavjrv0nDDz85pVXB3eTqJKoNwnpdT8bP8Bcl4KiEc2T32rsGCnR
+         rQBiLxpofKw27UTTEer8HxQMuuFQTNtybfmTHLOUcjFC01b2futXIZnJkpAf/SxRAe5T
+         4IEBJR4+6A0JQ3lmblaixA6Xavv2Su0YfU2Rxoiszu/K1wy8M1QdSJGMbIRL5xLuddKT
+         olhNLsqOa2ZxCDocaVSA3GDhEbP3Axifd2YAiQnkt5xF2MReURk6aZ9vftmjn0Zt5k5k
+         WnR9mEMats8f+i9zBxTrDwuT/CA4g0+RXlEeN+f5nGBaitZynX1AK+/iRbTkWQEqi6Lk
+         hCTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778520942; x=1779125742;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=dlz/dzPv3rXYhFqA+0mmgm8FDTZKSNmwOlN+ACRup7M=;
+        b=SWuFRbbFqSiZyTqsFdsZ0kG/lW5u2ijjgQW4cISGKmA4n/zTxs4uyzq9COi5Td/a25
+         DaZNNfa6O3hjW3L+ONDKdVkuX5HHV9pZszhSWrnTQyry9qeSsnCk551P6z9SBnkelB30
+         TCz3J0F26VyNfI1U1CQ09uNFQJRKKIYgG/dVM2AHo6BTViu531BjP0MJuSbC+6a1nwGC
+         UDjzVHIYcExoieeC8WtN/nSv3IKZ7xs5W8ry6pkG9imNpVLu1yDJlN1krnjtT4JZRMAF
+         QFsQm9sn36wFKV21VMN8Pn1DeqndbLKlXG6yw9IfAObQVC4efGmZSoAH4bApxqzwJtMd
+         ubkQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9/cCqY3e5/HQsgDVhevdz/vDJrypcdUeTC7OsNx/HOUiYJ7dFt7vrif0vuY6+nHOv051NNUj58KfElF+hgpcc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCwctkYg/El4EjOEd+jkeDqVEtENOrmvhKkONCrub9uro2QlcN
+	ze6YWlxeIHJrl7CRBZ/lhARWSdhMEk4kLvWzoM980004GyzKEgw57JXJxyDIa/Wm3U9BoGGIQT4
+	6POXHz9zHlP2N9Vqx5ZW8980nsrSZB2g=
+X-Gm-Gg: Acq92OG+YPWCwfAYL5cNr+dCj0qr41HatsILIlc8yyfVauIk+mstNJGxuCzpXthYCg5
+	nFGsyxwLU8vjMbMKh795fQVLF8SOHR3WVUOFcTvNNn4fRUnx+dS3WPZF1HeJZjBhuaeUuwQwYA2
+	okGqRTvDmdAE3VJqTHtV9giZZ3KUJiny3buDBqLsQv9N5eB1tgrBqRMVuN7ISiKLv7QN5Ek++u9
+	pIoIDHhWhpZfOYifv38CGVOQdTnG55Gq3qzTPpmsiOGgnfxS+lOT5HrAl+Iz7iFhQVMkPRF7BUL
+	eowEmQRe4laEdtsbL+VKsx1yW5/Jz+7MZN0SH/upqWHBBcrsHwaePoPfCJR02sRy+OI0Ig==
+X-Received: by 2002:a05:690e:120d:b0:65d:8123:25e5 with SMTP id
+ 956f58d0204a3-65d94afdef1mr13964872d50.7.1778520942181; Mon, 11 May 2026
+ 10:35:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: RE: Add helper for "cleanup" variable attribute
-In-Reply-To: <20260511132131.1283892-2-hadess@hadess.net>
-References: <20260511132131.1283892-2-hadess@hadess.net>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <cover.1778506829.git.michael.bommarito@gmail.com>
+ <490e228dd02983fb1530fb114d4174148f810261.1778506829.git.michael.bommarito@gmail.com>
+ <CABBYNZL-f+AzFWdhvLcxdf0oCXbgr3AXqM1W2npOPZEv0gRA6w@mail.gmail.com> <CAJJ9bXxdm6LRW-5a4a1eDyZSQjNkJ4PNF+aERHkHe9EMQFX8oA@mail.gmail.com>
+In-Reply-To: <CAJJ9bXxdm6LRW-5a4a1eDyZSQjNkJ4PNF+aERHkHe9EMQFX8oA@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 11 May 2026 13:35:30 -0400
+X-Gm-Features: AVHnY4L-7jwHCz-ogOtNC6Z8VESGLPAPWW1nNwcsCVS7lrb7wnAJ7aIMYilRan0
+Message-ID: <CABBYNZ+nyk+hZ498373bLJ0dOkDbNqP0PyoH5MWsPerHhBSfLA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] Bluetooth: hci_sync: pin conn across hci_le_create_conn_sync
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Mat Martineau <martineau@kernel.org>, netdev@vger.kernel.org, 
+	stable@vger.kernel.org, Pauli Virtanen <pav@iki.fi>, Aaron Esau <git@aaronesau.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============4959854932914016979==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Michael,
 
-This is automated email and please do not reply to this email!
+On Mon, May 11, 2026 at 1:01=E2=80=AFPM Michael Bommarito
+<michael.bommarito@gmail.com> wrote:
+>
+> On Mon, May 11, 2026 at 10:53=E2=80=AFAM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> > Id suggest we dropped the once at the end so just hci_cmd_sync_queue_co=
+nn.
+> >
+> > > +                                       hci_cmd_sync_work_func_t func=
+,
+> > > +                                       struct hci_conn *conn,
+> > > +                                       hci_cmd_sync_work_destroy_t d=
+estroy)
+> > > +{
+> > > +       int err;
+> > > +
+> > > +       err =3D hci_cmd_sync_queue_once(hdev, func, hci_conn_get(conn=
+), destroy);
+> > > +       if (err)
+> > > +               hci_conn_put(conn);
+> > > +
+> > > +       return err;
+> >
+> > Then we incorporate return (err =3D=3D -EEXIST) ? 0 : err; logic above,=
+ so
+> > I don't think any caller should require queuing multiple procedures
+> > for the same conn.
+>
+> OK, good call.  I checked the other 10 callers for
+> hci_cmd_sync_queue_once and there isn't any variation today, so that
+> seems safe.
+>
+> Do you want me to wait another 24-48 for others to weigh in or ship v2 no=
+w?
 
-Dear submitter,
+Just create a v2, anyone with comments can add them there as well.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1092801
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      2.71 seconds
-GitLint                       PASS      1.76 seconds
-BuildEll                      PASS      20.40 seconds
-BluezMake                     PASS      666.47 seconds
-MakeCheck                     PASS      18.72 seconds
-MakeDistcheck                 PASS      245.36 seconds
-CheckValgrind                 PASS      291.26 seconds
-CheckSmatch                   WARNING   351.83 seconds
-bluezmakeextell               PASS      186.73 seconds
-IncrementalBuild              PASS      1330.28 seconds
-ScanBuild                     PASS      1038.55 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v3,2/6] shared/util: Add helper for "cleanup" variable attribute
-ERROR:POINTER_LOCATION: "foo * bar" should be "foo *bar"
-#106: FILE: src/shared/util.h:103:
-+static inline void * _steal_(void *p)
-
-WARNING:LONG_LINE: line length of 104 exceeds 80 columns
-#132: FILE: src/shared/util.h:129:
-+#define CLEANUP_FREEFUNC(type, func) static inline void cleanup_##type (type **_ptr) { (func) (*_ptr); }
-
-WARNING:SPACING: space prohibited between function name and open parenthesis '('
-#132: FILE: src/shared/util.h:129:
-+#define CLEANUP_FREEFUNC(type, func) static inline void cleanup_##type (type **_ptr) { (func) (*_ptr); }
-
-ERROR:SPACING: need consistent spacing around '*' (ctx:WxO)
-#132: FILE: src/shared/util.h:129:
-+#define CLEANUP_FREEFUNC(type, func) static inline void cleanup_##type (type **_ptr) { (func) (*_ptr); }
-                                                                              ^
-
-WARNING:LINE_SPACING: Missing a blank line after declarations
-#184: FILE: unit/test-util.c:46:
-+		_cleanup_free_ uint8_t *data = NULL;
-+		data = malloc0(128 * 2);
-
-/github/workspace/src/patch/14565706.patch total: 2 errors, 3 warnings, 140 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14565706.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v3,4/6] main: Use _cleanup_() to simplify configuration parsing
-ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
-#84: FILE: src/main.c:258:
-+	_cleanup_type_(GError) GError *err = NULL;
- 	                              ^
-
-ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
-#108: FILE: src/main.c:440:
-+	_cleanup_type_(GError) GError *err = NULL;
- 	                              ^
-
-ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
-#204: FILE: src/main.c:888:
-+	_cleanup_type_(GError) GError *err = NULL;
- 	                              ^
-
-ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
-#409: FILE: src/main.c:1207:
-+	_cleanup_type_(GError) GError *err = NULL;
- 	                              ^
-
-ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
-#501: FILE: src/main.c:1570:
-+	_cleanup_type_(GError) GError *err = NULL;
- 	                              ^
-
-/github/workspace/src/patch/14565665.patch total: 5 errors, 0 warnings, 413 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14565665.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/main.c: note: in included file (through src/device.h):src/shared/gatt-server.c:271:25: warning: Variable length array is used.src/shared/gatt-server.c:614:25: warning: Variable length array is used.src/shared/gatt-server.c:712:25: warning: Variable length array is used.src/shared/gatt-server.c:271:25: warning: Variable length array is used.src/shared/gatt-server.c:614:25: warning: Variable length array is used.src/shared/gatt-server.c:712:25: warning: Variable length array is used.src/shared/gatt-server.c:271:25: warning: Variable length array is used.src/shared/gatt-server.c:614:25: warning: Variable length array is used.src/shared/gatt-server.c:712:25: warning: Variable length array is used.src/main.c: note: in included file (through src/device.h):
-
-
-https://github.com/bluez/bluez/pull/2118
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4959854932914016979==--
+--=20
+Luiz Augusto von Dentz
