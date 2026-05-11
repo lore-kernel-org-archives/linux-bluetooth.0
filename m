@@ -1,122 +1,130 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5A6CA4E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 18:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473EE44E027
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 19:10:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778525384; cv=none; b=He151lqW5MyFioHy2n6TludDjaqUJYzZ5Ukhho3otII8N4D16miWI+M8mg8daiodcZY0W/64828whPkxJTmsPVi0PdiMWgI6kJ7MzhFl6tv0b/OYJ6jn9sHvvFJGZx706O1PsMfPcJSDHEo+0aMLtp6E0NylR3/975OFm+Mvm7M=
+	t=1778526659; cv=none; b=ckQszgYRj7utH58u+T9J1KYpUmj//mW/qjiYZestneZ7yP9aGLKbHktlNbv9CPfCM4tAY/+k8L9e4BWUupPxgiaxAv9eL/1qL9x9OXfyQ0FakyvquXL4Hr5cNP5JqVkrIklgOKhJuQNWelV6piBS5jR5Nq9VAueUGBQV4BLHENs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778525384; c=relaxed/simple;
-	bh=k2R+tt+w612Eq66ur9hQ2WtwYbxAO92nza9BDxJxhqA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=fcE+Pf3i/f7VQ/NFT68U9arhwCrNuD5hBiqrmpclFLTfR0zjITntkGrgAieLBR3RSEe1NGu4ncuL5O+91Tdb33TrBSh+UMg+dP9Otyhrkx/Hj3yIYqPiXe+dKFhBTraO7RA/lk7boO+KT/jyLTdOBBduk+7+Eeph0MrSOJlfPCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PE9qZdrd; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PE9qZdrd"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-900fa9f178dso505173685a.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 11:49:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778525382; x=1779130182; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zexb0Fpg7+5HVQ5wzdVMeSxz06YVVXn0kOYY/OebCvw=;
-        b=PE9qZdrdHhDHq0zfFx5n7yToExTmd5q4MLaALG2lyw2otXZOdPv/R/TjCuZvFAG2zU
-         kSHDXaGvy4OehlsyWotCZXF5wDtGXZ2Np1fdSg8A8NW6RZtRM6zCvdO79Y4cfDqKDkP4
-         6kYE3RPYtBCqCqN57U1Xlc+EbWxigmQ857eMjyh1A2kbMbhgDCrks8hMf4ooMBRzd1JL
-         CBGN3SqW9kFnYBMOukFzGb65TTra4lfsHCwsXvwVx6E2bdrbRX2ZuSa+iDjm3S9kWh2c
-         O8cREouvc4yuCb1J6+X9QLbpu0Y+ocF4YXagh/1gaWskEhkVBDymjvKLdlSuswuBAVdw
-         h7CA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778525382; x=1779130182;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Zexb0Fpg7+5HVQ5wzdVMeSxz06YVVXn0kOYY/OebCvw=;
-        b=f9hG+mABl8TjOvPvLT14gSKPH6DXhcR/JeBWedqG+a+rDaxKU8wbW+hid8+32kglgH
-         1sNvSNHwybhazGbKaDI9gL40Htk+2FUIsZK/e10Tawb+2ZvWn14xcOgLG/xgIsPxZzZW
-         +jIZL21/PmkljE/pbI8xsazdhRCHvmDSBv69fbDOLxPHcaz3IfmTReobGuiAH3zLWOGF
-         VBOXDMekvFO7S70vICsqkciRGL8M5ILRJMCCrQf2TwQkdVuhyR4Scqptw2T51KuYJEMd
-         Ivaipt2DvRizyjaBIbN09cO3GWUHr1LpuJLW2g4K0YNWh1l36fFY23AV0kyHUvIKhays
-         p+5g==
-X-Gm-Message-State: AOJu0Yys2UEhovMjNOD+e/XOZdEb8Lrvp1eGADC1oCMDTwJchSdbTrSY
-	SV7yCFPZyqDrjxxA2WNy9h8W5Z+27zj4KzZKEMVvWdzhFgkTTgETHxeDw1nxDg==
-X-Gm-Gg: Acq92OHSE097hxsAh0DgG/Iqc2OXOIR5j35u5Iw9yvpAcdhW3Qtge9/s/pt+F+J6z/Q
-	quXmX9JJ5KPCna1SSnDUVDAUDdm856dK9EbGtyjIFb2HVD/qbeSi/29kYdKbT/WVJJCMxK3tzu9
-	9+7j9wNGkzr0d7sEP71g7T7lDiWRpaXV8rxd6Wf0dLqm6RZjNvPJ6/MFAUhS8RFFhCEpxq35L7d
-	5PlIGDF+fVBaHRohHuq3FkT5j0AMWGuKC5WozOzBjkjg27p1W32omHhur7Q2enG4CjYsIoW3HgU
-	cMwH2JHvbZ9ibkz7mDet+bJ5pX+FFQeieHtYT6fQbEJzpPTDW3ruuIUk/EqPvszQSzf/gmpQelv
-	CALw8HT7DXCpTT280w0nQKuqq1pjrx79b+WSwk2ZX5bEYsPKREoBdMiCFRpoqjZWMHid8nBSx1p
-	xmUtg25MNszTR5/gdoZA3iAUlj9O1NIw==
-X-Received: by 2002:a05:620a:4084:b0:8eb:10d4:a471 with SMTP id af79cd13be357-9091092342bmr1554736885a.43.1778525381647;
-        Mon, 11 May 2026 11:49:41 -0700 (PDT)
-Received: from [172.17.0.2] ([20.97.196.167])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-907b977274csm1092406285a.6.2026.05.11.11.49.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 11:49:41 -0700 (PDT)
-Message-ID: <6a0224c5.050a0220.32432b.e35d@mx.google.com>
-Date: Mon, 11 May 2026 11:49:41 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4448234459826631502=="
+	s=arc-20240116; t=1778526659; c=relaxed/simple;
+	bh=TE7SRsvUGeCuYcTtgtODB8BKTPzWjEYyXd7Y3NBvNRQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U5UXICDIPe93UAVfwOQwMgyNhLOtrXrfuVOc8Fm7w0gaouDK2lWxxtizlnCTfZvU4OE+HK9z+P+CJzRx1QF0wEN/8EnebP7HHbx/2nrLKUO6QOHpOu6iqgLfYshL0GzAKir4YUs7bDVrrFqHlST7DIslgnRdy7pgbhXtK/17DvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.192] (unknown [95.90.247.101])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id CA9514C1511A17;
+	Mon, 11 May 2026 21:10:38 +0200 (CEST)
+Message-ID: <4c1fb760-55b5-4392-9c89-7c8a3ce5201c@molgen.mpg.de>
+Date: Mon, 11 May 2026 21:10:38 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, oss@fourdim.xyz
-Subject: RE: Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()
-In-Reply-To: <20260511170929.709823-2-oss@fourdim.xyz>
-References: <20260511170929.709823-2-oss@fourdim.xyz>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Simplify MAC access
+ request/release
+To: Kiran K <kiran.k@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+ chethan.tumkur.narayan@intel.com
+References: <20260511133932.1217624-1-kiran.k@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260511133932.1217624-1-kiran.k@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============4448234459826631502==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1092984
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.40 seconds
-GitLint                       FAIL      0.34 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      26.78 seconds
-CheckAllWarning               PASS      27.90 seconds
-CheckSparse                   PASS      26.85 seconds
-BuildKernel32                 PASS      24.71 seconds
-TestRunnerSetup               PASS      524.97 seconds
-TestRunner_l2cap-tester       PASS      376.41 seconds
-TestRunner_smp-tester         PASS      18.41 seconds
-TestRunner_6lowpan-tester     PASS      51.29 seconds
-IncrementalBuild              PASS      23.95 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[RESEND,v4,1/1] Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (86>80): "[RESEND,v4,1/1] Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()"
+Dear Kiran,
 
 
-https://github.com/bluez/bluetooth-next/pull/172
+Thank yuo for your patch.
 
----
-Regards,
-Linux Bluetooth
+Am 11.05.26 um 15:39 schrieb Kiran K:
+> Drop the STOP_MAC_ACCESS_DIS and XTAL_CLK_REQ bit manipulations from
+> btintel_pcie_get_mac_access() and btintel_pcie_release_mac_access().
+> These bits are no longer required to be toggled by the host driver for
+> MAC access on the supported parts; the controller manages them
+> internally.
+
+Does the “no longer” refer to some controller firmware update? Please 
+elaborate. (I personally prefer that as much as possible is done outside 
+the firmware.) Also, maybe be explicit, and mention, if having the code 
+has any practical downsides.
+
+> Also fix the idempotency check in btintel_pcie_get_mac_access(): only
+> assert MAC_ACCESS_REQ if it is not already set, instead of keying the
+> read-modify-write off the MAC_ACCESS_STS bit (which reflects grant,
+> not request, state).
+
+*Also* is a good indicator to make something a separate commit. Any 
+reason to not do it?
+
+> Remove the now-unused STOP_MAC_ACCESS_DIS and XTAL_CLK_REQ register
+> defines from btintel_pcie.h.
+> 
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+
+No Fixes: tag? At least the second issue sounds like something to backport.
+
+> ---
+>   drivers/bluetooth/btintel_pcie.c | 10 +---------
+>   drivers/bluetooth/btintel_pcie.h |  3 ---
+>   2 files changed, 1 insertion(+), 12 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+> index fda474406003..53a4ad80b871 100644
+> --- a/drivers/bluetooth/btintel_pcie.c
+> +++ b/drivers/bluetooth/btintel_pcie.c
+> @@ -594,9 +594,7 @@ static int btintel_pcie_get_mac_access(struct btintel_pcie_data *data)
+>   
+>   	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
+>   
+> -	reg |= BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS;
+> -	reg |= BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ;
+> -	if ((reg & BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_STS) == 0)
+> +	if (!(reg & BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ))
+>   		reg |= BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ;
+>   
+>   	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
+> @@ -622,12 +620,6 @@ static void btintel_pcie_release_mac_access(struct btintel_pcie_data *data)
+>   	if (reg & BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ)
+>   		reg &= ~BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ;
+>   
+> -	if (reg & BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS)
+> -		reg &= ~BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS;
+> -
+> -	if (reg & BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ)
+> -		reg &= ~BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ;
+> -
+>   	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
+>   }
+>   
+> diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
+> index 2db85f71b2f8..7fc8c46ed689 100644
+> --- a/drivers/bluetooth/btintel_pcie.h
+> +++ b/drivers/bluetooth/btintel_pcie.h
+> @@ -34,9 +34,6 @@
+>   #define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_STS	(BIT(20))
+>   
+>   #define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ	(BIT(21))
+> -/* Stop MAC Access disconnection request */
+> -#define BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS	(BIT(22))
+> -#define BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ		(BIT(23))
+>   
+>   #define BTINTEL_PCIE_CSR_FUNC_CTRL_BUS_MASTER_STS	(BIT(28))
+>   #define BTINTEL_PCIE_CSR_FUNC_CTRL_BUS_MASTER_DISCON	(BIT(29))
+
+The diff looks good.
 
 
---===============4448234459826631502==--
+Kind regards,
+
+Paul
