@@ -1,161 +1,179 @@
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77924377563
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 14:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0BE33FF8B8
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 14:47:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778510075; cv=pass; b=bDl3xc10/sp6LIgVRE6xmGlewV0XOmKVqGayKnwHpU5AMIOxtWTw5lXJoh621S34R0Mv5EaKcEEM2T3eyVAXzEaNpX5bXorMZWL53rKAkUdu26vEAtsvO6WgJ/C/0n/ApDrl1xBowPWdgNiyk7/scbDdK6GfT6OfvKLGDZdtPU0=
+	t=1778510826; cv=pass; b=ak5F6cg0bddcS6MeuwaJo5Sd+imetYB/0OHM1/U/b0TfkGqNog10Avo7eB+FWKypKtIFq7PawQ43ZlRh8jFcsQtilKR2wJdkGW0iJgfZyxz4DmYGwC/TvhobMNwI+S3h63L9UPIM53EY7PVp/YCIajMAvGFIumHFY9k5AhoQeK4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778510075; c=relaxed/simple;
-	bh=vD7AonEnJis4H4yYmplk1jKeBBiHyHkWqatkz2fEvwE=;
+	s=arc-20240116; t=1778510826; c=relaxed/simple;
+	bh=soEsa3tUTOG6JdSr5huOrWqs/34j+Pwcq0cOOxiNc3c=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nuGRjQDOhx84avVVjcAiqTn2A9BAPOXdfvenrlX8fDARrvJ+vBy3dRA41v7TtTN/Yan7ToPkly9bJxyKH2reLgTaIeIPfvmEt/Gp/gRSEm0r/fPqFc4q7+nl497aeUOkm9UB0u9OCC0Rv5EHJgV7FkOskM/b98ZieOe6UiCa1Kg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Q5acmmuw; arc=pass smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 To:Cc:Content-Type; b=jznE/z385Z12muer3Ba7gKwymHYC7PXDCuImJnrrYTlUWLryUHpk3lHaFE4tbcsTf8JQfBKcYOz7lfFW1jm1s1UCsqr0gqASIAXBdrEp3/hKU3w6PErVK7VXyr6jCq+8Ab+d7NVVRRcuxWiRwXoS8bXyd8+rC3yOH9r3cM5HWs8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GOGz5ffR; arc=pass smtp.client-ip=74.125.224.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q5acmmuw"
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-7bd8c55c885so42990517b3.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 07:34:31 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778510071; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GOGz5ffR"
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-651bc83e74aso4509142d50.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 07:47:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778510824; cv=none;
         d=google.com; s=arc-20240605;
-        b=M2x1lfdQQ8l4nYagBsxFYw3ZnkXCED7yr1BoiGA5nN1fBCsi6QzZhuWjLrSQP8zxL0
-         bX1pwGs1RSh3P0Pf9GDOvl9ew/L5ERVpX1juu6sjxXLXgOVsKbreLvpuzlLU9hAxxvcf
-         ww62jGBkTXIoMSkarAfIxyd7fFaz3twBhLXlzKsW+X8pu1/Mbyr91Y3trA7HhZxMN+R5
-         lrhL6Eux/2xha/yLxr9JylqWFsq91T1PgSb5QPWWULYAVdKZkbIcUagRBmLlc2RVb2Iq
-         HJN4bBKrj1pa08/6tWixY8Vxdq1vEvPSPDWhS61wg3qAYh5Nq7AwAp8CjfGphIV8IUmE
-         BqVQ==
+        b=PH/IFzW4sEQwV7RHE6krPbb08GNN9VizTmNSS3kJ9/+AZaud8NMMarQqIphRE2Kfnq
+         crY9vAQF3ZFXjnd8Qiwvq0uzM0WiXMDOs/+r8PGMWX/2CK0d6hAO1olZz6/jq8Nv9toE
+         GMF33q2CCpSooT5A0b9uOQ0QUYYS9jcqJo/jPgkTm0FQuHIFo6Pw5uNaeHK7bRpJTRgS
+         HzxpkrZfDKqANY/nLom/hmQgc5VGjjML2ZiN7gfmgA9UO1H50px+SPWJ7GSyFayljUKq
+         VXSY8xSiLsG11r+fJ9QV1baep0ynE33azU+lH7flxCMD4+855lui3A159Klpob3RPnS7
+         rJwA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=+v2ay7d5zaezO4LQdeMSaE6xJKDm17at2Vx/sGq20mw=;
-        fh=tlqWOVrmFmv9KXUqVEC/0xz/WZIxP5EozTranj+cRW0=;
-        b=IxKMY4YOiHsSMC80O9DTFI8SJHvD1ODsWeczyYjJrUrzs81IH2J1EYOJNZJD0FoUBp
-         gekUTR+fYbVwMktK4AX5VPYfce6jrHmIWDoQBA4FFRrCN41lgKTjXGxSWAHjJQZKbblW
-         /t86jlC9EkcenIODGsnEHTwlGOF0U6vRD100Rch3xWMJgPFJmLyXB30zhKOhZtAWVeMz
-         7WAdIf6W4ijP28jN1tBlW6mXg2e/o87OIei8l6HVSHL9kIdK/z4vrm+yJyivEQCACWvQ
-         GlheSPSazSTOeDdqYycBtyhN5V0rMPw2oH4JCmMCAHeptXbkG8mkchX5AgfaF6vVeI/K
-         ETIQ==;
+        bh=913Z8wN5aRe7Y7ZvXwheQtw55PNzkBfnlIGObXm3NPA=;
+        fh=7jTDQpu2B7cbxqO/IE3DliLY68p99ZWgJKKVAIvyCQo=;
+        b=XSriChvuMr2HVY+iuawVFcXJMERPSWrf87IbixtXv2zbkqaTHo6weCXNbZib2lqBWN
+         YfA7u0dUoAKMM7is2YfYxN9hajWQh6seOX5dO6yn/XZuPDtyJ+pvUepdMGSA/UQ10wRE
+         fitkrK7z3GSQFgjVnetH27UajMoaE7ykHQbB0R5Qp+pS6WMuwuqhw43JKf9Ym9AUtgRh
+         kmS5JCJ7gTaWSPA0gzrDMmTXL1MVO2Pl27ULgm5ELnTuKfKOcEbgbY/gF4SxN+x4xcFO
+         cSqTguJXS9dpFQlIR77FCLtOYxoPm7/AAozVg9S5i1Yt64tiC0YG7gdqNZH5Q4SpESmt
+         l60g==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1778510071; x=1779114871; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778510824; x=1779115624; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+v2ay7d5zaezO4LQdeMSaE6xJKDm17at2Vx/sGq20mw=;
-        b=Q5acmmuw9wc8edoPdpXTRIwB3HzpMyeIudW0Ur6smFGRtCXex9lcXNCJEHQ9eBisC2
-         OJJsjyxxJeZZLTIHkqIubFD4yul2mCa/jdspskTZwxE3mNC8jZF55CIljIjFjw+66PPX
-         ufBLOrpjF2XrNpVGeRVJbp0B4y77uheUB5MKkxLRKdocVLcNMtXXLaygFrzdEM1fetxo
-         MJlfxKGffvb52b+X4RGpE8lthQex+Ey0+MEkXvCYQ+jbh0iZd/LB2qZJeggAjsnxPfVe
-         0ebDK35wE6quPfMgapxEILmsQTJC90ebkQoQTC/7wq8aY2dccrymOJXQe9egPFlTuuZv
-         hUjw==
+        bh=913Z8wN5aRe7Y7ZvXwheQtw55PNzkBfnlIGObXm3NPA=;
+        b=GOGz5ffRksLu5+u6q40zZRAy1kG2ou35uU/+Oxxw7aso1CDHixZsf8HQTVD7OK2+az
+         z2T9eEdaXkeeYF9+/vb3KdA4JaaYYF1R70mGOjSHKcsO9vLWLUCumwO3t6D/F/7GIbnf
+         l4pujbkbvIvD+6D5QM8XMZhs5u4xQ9XqoWfemoDJ6lIpYkfr/gQr2unshVHxjH4YXL/U
+         7wsTZ1q0x76IktylMozFoNNxNbfnoo6p+uoF/D6/vPajB4LQAeTjdIELeItyVPUIB1gw
+         WyAk43nwCy9zPKrBi/Qs7uYdIpxkQIUynMzcgERpT0KT3SIvz/sUJXQiQsGheXHIvdxV
+         hMyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778510071; x=1779114871;
+        d=1e100.net; s=20251104; t=1778510824; x=1779115624;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=+v2ay7d5zaezO4LQdeMSaE6xJKDm17at2Vx/sGq20mw=;
-        b=psyqG9D6HSN7gIUgBd0cpc/sdQoWbY6uWjhBkBQYUCMkfw5Ib1LXBOkG0IV+iKacXZ
-         42Q/6fVL5VXSchJkf58n5j/twbsfFRNB/aEjTk0v3nu145+XNcYwPGl8W5TT1eQZBUfn
-         3s+1vP7rvOM66GYXMKn9OkH9FDsoIDTfU87b7rgztiI6fEs/XrCW7A7tUEpXCbRuy8M4
-         VtGKxnBQ/yQJfh/v9g7oB2T1aHKerlicAE+JXruvaz25zKr8uATP6pJSrgJsxR8ZwZ4p
-         0Och0cY0O4Z7KbEnA2h/54g7QVXs0qq+Gk8wdN7tH6MSrm3XZMdEdKCl1SH6Pmd7qAZP
-         N4vw==
-X-Forwarded-Encrypted: i=1; AFNElJ/hWu+PLpWRaNNHuQDhBWCZfdc07uOG63kot1so3Iuw2qePdbttXa9vmvNSOhMrklvLYzEO9F5ooQ2wjixRFbg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxd74S/srqf8cMidqd0o+WItuZB7+96pUbGbNwhhqwgtFo2cAiM
-	U8LPtT3Y1ADaMmGnYzXvr31MfcrJBmytoQKe5jQvnIYWpDu74k54tEMrvW4YPvKs77GGgYK7cZ+
-	R9EFrmMNa9Xz2XaYlkg3IJRFfknrg+/zuZUQhL+QbLQ==
-X-Gm-Gg: Acq92OERzDqWGy3O5xPFcKKb+RU+EWevVK1Mc4DoagPcFic4dAr3GojfCwIypkoVOvi
-	WPLn6Hi8JiOJDDwf88bZQ7pKBqvzojOsIOrKY3OoVyVquUORzjxtXCZLi+RulEAXSbejeSwdH4f
-	AiUbQkbPytAGejN+WSowGSznfehZYx0O9nKXcz0f99ZPGRK6Lop7kMxgW8MZAuy8kwGvV1Q06Fe
-	4Ii02CoaiG4AyqI0MPuZPCQSquytIQByTIZf3pkmFK337cLJW8njMIXbPfmE3hA5XEuZ0Bp4NKd
-	57iS0oz4jG+AR9C70TY=
-X-Received: by 2002:a05:690c:dd3:b0:7ba:d5fb:b543 with SMTP id
- 00721157ae682-7bdf5dcc7b4mr242694677b3.13.1778510070862; Mon, 11 May 2026
- 07:34:30 -0700 (PDT)
+        bh=913Z8wN5aRe7Y7ZvXwheQtw55PNzkBfnlIGObXm3NPA=;
+        b=DKAgR0ToWqVhAG9LakeIi5UovOJrrLyRZMiD/iAY3N8C738FdX/4SN5VkR44Lm8HxH
+         sgu2QEpUszjmCoERjUvHOXGMnHQjmdYDRXIoGHKXmZU4tSBYDPsluzAhyBcAN5BaC65f
+         55Td9ioZIuXJt3jvKBtYkuTvnQRbysMQO4i6xpiFq6gwpkKG7E3xWF35Ks1lglf1xmsk
+         E769JxlX98DmIYijKM8XAYHo7kNUCMxGGY7z94yWlucnTaaRuW/AxSyYksEDJvGAhNuD
+         UglODoV3whqoqZ9q5SGk5+pTu0KOHoKuK+QYMDKV5b0PPz51hmbRfknowHTUOVZGOu1b
+         wXEg==
+X-Gm-Message-State: AOJu0YxzgnbSR8az8XhQh5aPGp549y/jli3zMC9W28zBfU4Oqnsb8Y/o
+	Je4hSnkwMPLSer88u+CePE27inYkAMYafogrKVAivMA41Gm+wMdT10+1HOYC5UWyelVYVIhPzQb
+	KQ7NJJWyrDE2SqLhwR43Rz45tzpPPWN0=
+X-Gm-Gg: Acq92OF6+IwIFNxU2smVYgXTv37hGtz7lNspXP5L6l0qAukRPtSuszRS6gAwHDB6ZN5
+	hNykNh1+MGE855SrkW9+9WzRntfOm+Ux3nFB5QSVtjGEXL6BKnssStnByZuYCVYbxEGnzMXe+AQ
+	8mQFJcO5/iOrIqjeFAiLFTRqOqk+ARyfeWQX2Iew95APCwgs9kmJT7VMhFkHMvmEdRTpSR+VAlY
+	60YMDMv2O5F79d9TLMRrubY+J3wYR3Ee2lIBDVOY8RXhbxrEXP9/2GN9QwiRYjHModb60R2J62v
+	28RxHrAb4/HR37BYBmd2Kbm9SCJERb0zNEmJuG7A3pm/pV1x2sqgYyoDd3yhRdpTRZ4=
+X-Received: by 2002:a53:ac8e:0:b0:652:541e:9681 with SMTP id
+ 956f58d0204a3-65c79c67ea6mr25890686d50.3.1778510823622; Mon, 11 May 2026
+ 07:47:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1776429984.git.u.kleine-koenig@baylibre.com> <c830049dcfcd99f005e2ff6742aace9341c61f13.1776429984.git.u.kleine-koenig@baylibre.com>
-In-Reply-To: <c830049dcfcd99f005e2ff6742aace9341c61f13.1776429984.git.u.kleine-koenig@baylibre.com>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Mon, 11 May 2026 16:33:52 +0200
-X-Gm-Features: AVHnY4Lsmc0xOoSZAdNPsitAF34xmre0WH2Fz_Ejkt7Ep8UMQ1cwv9JaIHq62oo
-Message-ID: <CAPDyKFo6nvBCnOHXUSvedaT3Rnob+oF=nZoRoic_EkgFBTxzwg@mail.gmail.com>
-Subject: Re: [PATCH v1 1/6] sdio: Add syntactic sugar to store a pointer in sdio_driver_id
-To: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
-Cc: Ulf Hansson <ulfh@kernel.org>, 
-	"Christian A. Ehrhardt" <christian.ehrhardt@codasip.com>, linux-mmc@vger.kernel.org, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Wolfram Sang <wsa+renesas@sang-engineering.com>, linux-kernel@vger.kernel.org, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	linux-mediatek@lists.infradead.org, Ping-Ke Shih <pkshih@realtek.com>, 
-	linux-wireless@vger.kernel.org, Felix Fietkau <nbd@nbd.name>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, 
-	Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, 
-	Brian Norris <briannorris@chromium.org>, Francesco Dolcini <francesco@dolcini.it>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+References: <770d36b07311bf88210c187923f243fb9f126f04.1777058551.git.pav@iki.fi>
+ <CABBYNZ+jM+2BQ4Fek87OCKbyvuxjsyeCG0qpGRkAO4LA=pj4xw@mail.gmail.com> <d9fe37aa17175290bc406ccad8ed4cf533dfd8b8.camel@iki.fi>
+In-Reply-To: <d9fe37aa17175290bc406ccad8ed4cf533dfd8b8.camel@iki.fi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 11 May 2026 10:46:50 -0400
+X-Gm-Features: AVHnY4IGoPgw4d0fIvipGtsBveaPxZgL3RQu-HjG2UesWQH9AkBZVxdfXxjDoSs
+Message-ID: <CABBYNZ+FfhYtU2=J-V4pjKf_vKV=Y5LhVhxS_epKe-qaUUt8_g@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btmtk: accept too short WMT FUNC_CTRL events
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, 
+	Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 17 Apr 2026 at 15:11, Uwe Kleine-K=C3=B6nig (The Capable Hub)
-<u.kleine-koenig@baylibre.com> wrote:
->
-> On all current Linux architectures sizeof(long) =3D=3D sizeof(void *) and
-> this is used a lot through the kernel. For example it enables the usual
-> practice to store pointers in sdio_driver_id's .driver_data member.
->
-> This works fine, but involves casting and thus isn't type-safe.
-> Additionally with the CHERI architecture extension there are machines
-> with sizeof(void *) > sizeof(long) for with the traditional approach of
-> storing a pointer in .driver_data doesn't work.
->
-> By replacing the plain unsigned long .driver_data by an anonymous union,
-> most of the casting can be dropped and it yields a working solution for
-> CHERI.
->
-> All users of struct sdio_driver_id are initialized in a way that is
-> compatible with the new definition, so no adaptions are needed there.
->
-> Signed-off-by: Uwe Kleine-K=C3=B6nig (The Capable Hub) <u.kleine-koenig@b=
-aylibre.com>
+Hi Pauli,
 
-Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
-
-Feel free to take this via whatever tree makes best sense!
-
-Kind regards
-Uffe
-
-> ---
->  include/linux/mod_devicetable.h | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+On Fri, May 8, 2026 at 3:09=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
 >
-> diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_deviceta=
-ble.h
-> index 5b1725fe9707..0eb5d196f5b5 100644
-> --- a/include/linux/mod_devicetable.h
-> +++ b/include/linux/mod_devicetable.h
-> @@ -414,7 +414,10 @@ struct sdio_device_id {
->         __u8    class;                  /* Standard interface or SDIO_ANY=
-_ID */
->         __u16   vendor;                 /* Vendor or SDIO_ANY_ID */
->         __u16   device;                 /* Device ID or SDIO_ANY_ID */
-> -       kernel_ulong_t driver_data;     /* Data private to the driver */
-> +       union {                         /* Data private to the driver */
-> +               kernel_ulong_t driver_data;
-> +               const void *driver_data_ptr;
-> +       };
->  };
+> Hi Luiz,
 >
->  /* SSB core, see drivers/ssb/ */
+> pe, 2026-04-24 kello 15:38 -0400, Luiz Augusto von Dentz kirjoitti:
+> > Hi Pauli, Tristan,
+> >
+> > On Fri, Apr 24, 2026 at 3:25=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wro=
+te:
+> > >
+> > > MT7925 (USB ID 0e8d:e025) on fw version 20260106153314 sends WMT
+> > > FUNC_CTRL events that are missing the status field.
+> > >
+> > > Prior to commit 006b9943b982 ("Bluetooth: btmtk: validate WMT event S=
+KB
+> > > length before struct access") the status was read from out-of-bounds =
+of
+> > > SKB data, which usually would result to success with
+> > > BTMTK_WMT_ON_UNDONE, although I don't know the intent here.  The boun=
+ds
+> > > check added in that commit returns with error instead, producing
+> > > "Bluetooth: hci0: Failed to send wmt func ctrl (-22)" and makes the
+> > > device unusable.
+> > >
+> > > Fix the regression by interpreting too short packet as status
+> > > BTMTK_WMT_ON_UNDONE, which makes the device work normally again.
+> > >
+> > > Fixes: 006b9943b982 ("Bluetooth: btmtk: validate WMT event SKB length=
+ before struct access")
+> > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> > > ---
+> > >
+> > > Notes:
+> > >     AFAICS the commit is not yet pulled and is only in bluetooth-next=
+, so
+> > >     maybe this should be just fixup?
+> >
+> > Yeah, I'll most likely fix it in place and add your Signed-off-by.
+>
+> Looks like this got pulled to net without this fix, so it's broken now
+
+My bad, will try to expedite a PR to have it fixed asap.
+
+> >
+> > >  drivers/bluetooth/btmtk.c | 4 ++--
+> > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+> > > index ab34f1dd42bc..68a32d11e5ec 100644
+> > > --- a/drivers/bluetooth/btmtk.c
+> > > +++ b/drivers/bluetooth/btmtk.c
+> > > @@ -719,8 +719,8 @@ static int btmtk_usb_hci_wmt_sync(struct hci_dev =
+*hdev,
+> > >         case BTMTK_WMT_FUNC_CTRL:
+> > >                 if (!skb_pull_data(data->evt_skb,
+> > >                                    sizeof(wmt_evt_funcc->status))) {
+> > > -                       err =3D -EINVAL;
+> > > -                       goto err_free_skb;
+> > > +                       status =3D BTMTK_WMT_ON_UNDONE;
+> > > +                       break;
+> >
+> > This probably means the original change was never tested on real
+> > hardware. We likely need input from the MediaTek team on how to handle
+> > these events, as I don't think a public spec exists.
+> >
+> > >                 }
+> > >
+> > >                 wmt_evt_funcc =3D (struct btmtk_hci_wmt_evt_funcc *)w=
+mt_evt;
+> > > --
+> > > 2.53.0
+> > >
+> >
+>
 > --
-> 2.47.3
->
+> Pauli Virtanen
+
+
+
+--=20
+Luiz Augusto von Dentz
