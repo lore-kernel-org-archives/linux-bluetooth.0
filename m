@@ -1,113 +1,90 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067493BA253
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 08:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F1B3D8913
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 10:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778488336; cv=none; b=K6K6dIXYzWin/4F1BhcD32SEs5gvE9soRpKDJoehWcDorX6QdRaJaVdgI+ZhcDitSemeYQQXfKxcflgIuDsRB6fJWK0txyu+/Wxlnvgbe8YWwdue4vCvQMS2SgQ3tZ++nGLFTjcmUbE/pGKU/D75jdf8JwkthOSpw6C2lyvFgeM=
+	t=1778495783; cv=none; b=SIPQ2/3AI5B8pOXuQRhdS/12bbiTL351FzlM0Y5RMw/Dm/tGw8CkjaR7q3yVPFIxlcR/uqBUiJj+oS1lJ+w95KQ1Al76FuqBaEQxEh2Ba56AjmJLPrg2R5ej8Z/aeyhzs3dGFQPzTA8qdEo5CKR4T70FdlbHeNPU8bdLAAtSf3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778488336; c=relaxed/simple;
-	bh=gkCLn1rB41k1HBGmEr9BMtghvpgESwkksWN/1LCmCgw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=SzX0yDNA412KPmt6XGFDANtDoNqXnwz9CQ/2CpZaHmpH153SWnTmOf5z5wU1XHHaaPF5NSMwBbYWnDSNKs//wJNElLgONAFAUZ1OLeoC0ThNY9Vyh2w9xCO0FwpJkALOEEH9J4lu1+8d2eyW668pwXcaDS+FM6lDbs02c4Koucw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S/5nVDra; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1778495783; c=relaxed/simple;
+	bh=IENORfZd5dSYQkrNitKAXWYKfDtZSTBMvfDRDDw/UDU=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cBtIyWLSs9RlW+BWsia/KsKT9ZCNWR9PvJ1fXLfxGL4bric4XPxG0vJfYXK9WRu7r1sueH/jBHuOqmZpCNMIEwlONGhH71yAgea0rOARe7kjC4E4ielUMC02Rn7sGaOK+9/L7kuBuJEKSgsvtySF+ttLE9udATQmyRo5ImI2C68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l5apJdrA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S/5nVDra"
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-8d65f4073bfso568770285a.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 01:32:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778488328; x=1779093128; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=rfQoIgp9EqC8BsTWP/9AYA8IfWEQc7rXdxlWx/9WCWw=;
-        b=S/5nVDra/bunNZPpCpb2AhTDj8cCpFeG8iTIV3QDjxKg5Qati8Rj11jKxirb2EcIVs
-         MYfO0u8gUOoRqzQYaTHWUfgTC3lz9yV3n+gQv9ZeTOQkZoOW0Bf70+kJUDamxEO8hHCq
-         Z+JUm5lUqNanUtma1OdJu7IK8Qz0oT9N2xXISqvenxmf6QWODd9tMFhEuouEZN3MkrLx
-         3NPsWGS1jjukwETWBka0crY+UzWTEztqAmhb0mO2AmIkkzZ0Rc6iqLqsCrY2sAiOXwZc
-         fu0LdavaOgV2iWONADzkc+HEFgTy4AxnGV2zX7N8Q85xqjg++g/ZtBorVKBJCP8Ur0wQ
-         vxxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778488328; x=1779093128;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rfQoIgp9EqC8BsTWP/9AYA8IfWEQc7rXdxlWx/9WCWw=;
-        b=OQ8hxyRV3KGUcxkGaKCtT1TV+AMXITkeltjEKpB50YqZbbtgBmmn5Z5q28/uC7jqx9
-         hDr7VGq7KLWOZB3JHa+j6BI9GgJX7r8LxN1FKARdqV9f9n+2PrOqU1TX1GsOzbK+F47q
-         d7V16RzNtDWim0RhquRgzctFQZgqj4/L1TSiyp29NQeaDyvizR2U5Y+Uy7ZdlAYWs8ZZ
-         p4HtUFnNnmiuXHovjE2eIHhd/MmVuCNx+HGeTZX0wLkSITtz0u4A8uU38CmVu7v9mbPP
-         BEfq81f8GAoPNHZPYZdMAPb0Q9HuiFHAwIzGnpVZkrp0FdYapHPdqtNzqktKXVckl6ah
-         D9fA==
-X-Gm-Message-State: AOJu0YzB3Ny8sZSNXhfGCBVMKrqxzD1nzS4m8RdCcZiv27hS5lE6DJod
-	HiUwd2JM40M08v7SaZ876FaOm9y0krwQnn0q5UXc651JP9SVwJOtQ0rvv01ppw==
-X-Gm-Gg: Acq92OEy2Z73jOFwc753/qI26FXrg3rB5Gg4XGLOkcYuxqDjJfCcb+sftPdQ9y6I9Or
-	OlJjmPgw1iNf6VINTAbtgQqQnO/Lcrbp050h3ZOTem5q6Aao3PTHoQV85epvEwDTYeYiotsxsGV
-	TmUI1EgKA3/7Wra4PiODCb5X33EEd6khe7/imKAbaGzc7GyStiU5HBiETGmUgVtbIOp4Z78J1e0
-	xmbwd9PjOGvpYTSXGXBhNDPxyayoU1GxQEUVNriWMDYu7Cv0vV+qf+uZJviaIkPFHUa3fQoDRF2
-	bdQsBwBbNtND2YMUZvdWWY7DAKrHSa72HIdRS+DQRVJL0eWdRhyiKdrN3+V67aquk3ZBhJ/4A+w
-	iyYJpSsGmBIq+JOCCEBf52PLDG/lmuP8XoXlYJcF1RM2SFQ8ZEjo2tsDnO9Vb4AY8MxIQUcz+fQ
-	FiSUET4wq9U2F34IYjnzCiNLWSFgGE4g==
-X-Received: by 2002:a05:620a:2a16:b0:8eb:605f:6ce0 with SMTP id af79cd13be357-904d43924b2mr3389319085a.5.1778488327783;
-        Mon, 11 May 2026 01:32:07 -0700 (PDT)
-Received: from [172.17.0.2] ([20.109.92.214])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-907b966ee91sm1004628585a.10.2026.05.11.01.32.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 01:32:07 -0700 (PDT)
-Message-ID: <6a019407.050a0220.321be4.4b8a@mx.google.com>
-Date: Mon, 11 May 2026 01:32:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3406897249301157562=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l5apJdrA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35A86C2BCFF
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 10:36:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778495783;
+	bh=IENORfZd5dSYQkrNitKAXWYKfDtZSTBMvfDRDDw/UDU=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
+	b=l5apJdrA49uY4v/bTHhH4NFQ7CWM57f59dOtXdEGrLYwpCS1ywrulpD6I3CAgAf5R
+	 udIkFkcAMJPz9f9xbehDGPY+rrLy/tUipUUHf231IteL2U5+M+Fe7Tmjf6uyHKA5NS
+	 XfZrkhgED5mZ2SN3YroJZ+eEaYUPeP58CAu1uoDA5oAFZsA7KkOqtaIfhpNrCOBoXe
+	 HN0LJFu+si9U9t+aUEQ1u1Bq1qqgcBwQoPxit9XSEixu1xy/tobN8YKQHYHNR55Bz3
+	 wTGWB7OmdcOW3TgjMZjj6Nwpsa1jD7MisITRNr8vi0COY8+KQ4/7eZwoAoyl1GD1ej
+	 uEA8B59Lty7Nw==
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5a525aedb24so4085012e87.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 03:36:23 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ8CoEmHo4XDdHGfBR/VVZm1meaSNddUWVHdBr71r4tCWGSl9uzaBnmP4WSh+/G7a/kRkQzHAm/Ho5csts/2cNU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6CwXcdkNX7bdTjMy3ciNkTh/xkL/5yYkxfxwJfDiVqQZYKgp5
+	VnTwawR/fZ+hBCH095/4hDfnIhKSAEvTPwoqtPWNIt9F7BCWO/BrohvcC5RkMvvHZo57CeIzVhR
+	bZpO3J2K9vcxugzzeoY5Q0YAmu0e4cxomunfxuAOWig==
+X-Received: by 2002:a05:6512:3e1c:b0:5a8:b966:7b1f with SMTP id
+ 2adb3069b0e04-5a8b9667b9amr3508208e87.16.1778495781398; Mon, 11 May 2026
+ 03:36:21 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 11 May 2026 03:36:18 -0700
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 11 May 2026 03:36:18 -0700
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260507-block-as-nvmem-v2-5-bf17edd5134e@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, oss@fourdim.xyz
-Subject: RE: Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()
-In-Reply-To: <20260511045124.298319-2-oss@fourdim.xyz>
-References: <20260511045124.298319-2-oss@fourdim.xyz>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20260507-block-as-nvmem-v2-0-bf17edd5134e@oss.qualcomm.com> <20260507-block-as-nvmem-v2-5-bf17edd5134e@oss.qualcomm.com>
+Date: Mon, 11 May 2026 03:36:18 -0700
+X-Gmail-Original-Message-ID: <CAMRc=Mdi5DuwhewSpaPCJCWWkmw57pLPx3snSyV_gtBN1gWtMw@mail.gmail.com>
+X-Gm-Features: AVHnY4LRJOdRAiXXJAqk3x0LB0U9Hhhkl-SHYK7hw0ni4PNj3Dx_sfKHg57uYFk
+Message-ID: <CAMRc=Mdi5DuwhewSpaPCJCWWkmw57pLPx3snSyV_gtBN1gWtMw@mail.gmail.com>
+Subject: Re: [PATCH v2 5/8] net: of_net: Add of_get_nvmem_eui48() helper for
+ EUI-48 lookup
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, daniel@makrotopia.org, Ulf Hansson <ulfh@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
+	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Saravana Kannan <saravanak@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
---===============3406897249301157562==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, 7 May 2026 17:24:40 +0200, Loic Poulain
+<loic.poulain@oss.qualcomm.com> said:
+> Factor out the common NVMEM EUI-48 retrieval logic from
+> of_get_mac_address_nvmem() into a new of_get_nvmem_eui48() helper that
+> accepts the NVMEM cell name as a parameter. This allows other subsystems
+> (e.g. Bluetooth) to reuse the same lookup-validate-copy pattern with a
+> different cell name, without duplicating code.
+>
+> of_get_mac_address_nvmem() is updated to call of_get_nvmem_eui48() with
+> "mac-address", preserving its existing behavior.
+>
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> ---
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1092493
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.09 seconds
-GitLint                       PASS      0.32 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      25.70 seconds
-CheckAllWarning               PASS      28.70 seconds
-CheckSparse                   PASS      27.32 seconds
-BuildKernel32                 PASS      25.31 seconds
-TestRunnerSetup               PASS      561.40 seconds
-TestRunner_l2cap-tester       PASS      378.21 seconds
-TestRunner_smp-tester         PASS      18.06 seconds
-TestRunner_6lowpan-tester     PASS      51.06 seconds
-IncrementalBuild              PASS      24.97 seconds
-
-
-
-https://github.com/bluez/bluetooth-next/pull/163
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3406897249301157562==--
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
