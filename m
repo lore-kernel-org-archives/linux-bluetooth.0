@@ -1,106 +1,78 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9BFC2D979C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 08:36:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6EFD4963CC
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 08:37:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778575002; cv=none; b=bUb/UAnIenGrBjy/Ixctq6Q05N5Q4C/S8jJhrXuSdRKiyb1M3fXEJ3F4NQrmSRt8ieTnZnDYhOxrqnIC6o3qcVvYXYs6VTXgG48EIlncm0Oz1nMo+yis0U2k6/bDm0p3dhneUGnO7NDT3yyPgqlXtmaXq+As/r9xPfEd+Yhjl1U=
+	t=1778575080; cv=none; b=WDAIIbSqbmKQDukq6Qw7vGXses97s2LqxjhBgkYLEXlm3fH1/Pp6vkpS+2HrSi2Iiqjp1jz2TcFOybkUS6UILuTn/Ih3QmjEcEmfQFte1MtwOIS/EIBaLz2FQDsvVaeIXFyg7/cWrlDMpF39Vaa5RREc8+x0sDeVEpmrmD7o4Fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778575002; c=relaxed/simple;
-	bh=p3kwv5co9ONEp1UVBgBXf9lFd/SmGxi1aguj9bmrGJM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ef3D7MUCW2wAqAytPWxKnZeoGQmzN2Mm/y12CygtLiuZ3OuyzUG3BtshG4KNdLIgpvdBek5WblHsQwdhpaifxEXkN5+0Dg1yMg0qzxZFcRp267YTtqJlmMJTXIIvfAZZ1kL62YD8ZFIvS3vfxma3uQv8t5HdHKUUXArRKHflavM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.13.172] (g427.RadioFreeInternet.molgen.mpg.de [141.14.13.172])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	s=arc-20240116; t=1778575080; c=relaxed/simple;
+	bh=sy4ht4L0rTUf6RWlAI5TkElE3qVVD0wDz2hHv+qg+s0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TAgAJRIcGbMJdxFPnsE5u0g/+C2jemmYCPf1DZd5ol+YewO1KloYSwEIEE+ygvRemV1bgTovmM5VwmTzmZZdSU56+30rX0r4UcwRuV/opXZVGKBLyPgscFKDLyriE6Ynjew+zN+vkczvnvgud3bL6XJYEALUF14INAXAq4HZBUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=T+v7okhG; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="T+v7okhG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1778575076;
+	bh=sy4ht4L0rTUf6RWlAI5TkElE3qVVD0wDz2hHv+qg+s0=;
+	h=From:To:Subject:Date:From;
+	b=T+v7okhGXKEBc/c+I4mFCmsQ2msVaOYBIYBMmq3zTiwxZHaIVHy2SRLKIaXyHGOTZ
+	 +nSY8Iy6uoxonPNxRURroQc1RF43bD2msJ6LXX32kIpZuh2z686TTQxaQ6GTnm7KN/
+	 C6XoM3pMEmB2T8/8z//opQVmoPYErf9zZLvUzEDyEMGqt2PgoRpAYIOTOIXO3z3nuI
+	 CXL8o87K5iJNa3ZdBxcHreZUhopfed0gQMT6w7vdgnb/POv8S2tYemk5hL5u/BgSOR
+	 eVBFKIHVCa3UGUeWCfASHFSyf4Ojte8edeAAjlrMwZoMqEc9eDiN79kV2+qL7Ku2zk
+	 1r0C55rExPnBA==
+Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 33B244C2C37F0B;
-	Tue, 12 May 2026 10:36:15 +0200 (CEST)
-Message-ID: <03348484-1415-4061-928f-35388258560f@molgen.mpg.de>
-Date: Tue, 12 May 2026 10:36:09 +0200
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id C47BB17E12BF
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 10:37:56 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] pbap: Fix not checking Database Identifier length
+Date: Tue, 12 May 2026 10:37:50 +0200
+Message-ID: <20260512083750.178053-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] Bluetooth: btusb: Add support for Intel Lizard Peak 2
- (0x8087:0x0040)
-To: Ravindra <ravindra@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- kiran.k@intel.com, chethan.tumkur.narayan@intel.com
-References: <20260512082256.1214764-1-ravindra@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260512082256.1214764-1-ravindra@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Dear Ravindra,
+Database Identifier is supposed to be 16 bytes values.
 
+A paired Bluetooth device acting as a PBAP server can overflow the
+heap in obexd by up to 239 bytes into adjacent allocations by returning
+a DATABASEID_TAG application parameter with an oversized length.
+With both length and content fully attacker-controlled, this enables
+standard glibc heap exploitation primitives (tcache/fastbin poisoning)
+leading to remote code execution in the obexd process.
+---
+ obexd/client/pbap.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Thank you for your patch.
+diff --git a/obexd/client/pbap.c b/obexd/client/pbap.c
+index 0f575e61e..ce5e6cd5d 100644
+--- a/obexd/client/pbap.c
++++ b/obexd/client/pbap.c
+@@ -330,7 +330,8 @@ static void read_databaseid(struct pbap_data *pbap, GObexApparam *apparam)
+ 		data = value;
+ 	}
+ 
+-	if (memcmp(data, pbap->databaseid, len)) {
++	if (len == sizeof(pbap->databaseid) &&
++			memcmp(data, pbap->databaseid, len)) {
+ 		memcpy(pbap->databaseid, data, len);
+ 		g_dbus_emit_property_changed(conn,
+ 					obc_session_get_path(pbap->session),
+-- 
+2.43.0
 
-Am 12.05.26 um 10:22 schrieb Ravindra:
-> Device from /sys/kernel/debug/usb/devices:
-> 
-> T:  Bus=09 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-> D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=8087 ProdID=0040 Rev= 0.00
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> 
-> Signed-off-by: Ravindra <ravindra@intel.com>
-> ---
->   drivers/bluetooth/btusb.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 572091e601f9..3f012c2a014a 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -484,6 +484,7 @@ static const struct usb_device_id quirks_table[] = {
->   	{ USB_DEVICE(0x8087, 0x0037), .driver_info = BTUSB_INTEL_COMBINED },
->   	{ USB_DEVICE(0x8087, 0x0038), .driver_info = BTUSB_INTEL_COMBINED },
->   	{ USB_DEVICE(0x8087, 0x0039), .driver_info = BTUSB_INTEL_COMBINED },
-> +	{ USB_DEVICE(0x8087, 0x0040), .driver_info = BTUSB_INTEL_COMBINED }, /* Lizard Peak2 */
->   	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
->   	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL_COMBINED |
->   						     BTUSB_INTEL_NO_WBS_SUPPORT |
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
