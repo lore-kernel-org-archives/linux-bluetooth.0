@@ -1,118 +1,132 @@
-Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
+Received: from mail-yx1-f66.google.com (mail-yx1-f66.google.com [74.125.224.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8EA34EF05
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 23:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778540922; cv=none; b=uSw1klszwG6QDhbSTas6cIiGTaDUxp7xQ9QiXR+AkGdABdNxUnblScR4+aAYaqODjiRwIw5BNUVG6YXZdsOujcQJ7DaL2/qUpRhyIInlSgMOi0btYjNpyhnsQHf8Tah4eRQ/pN1JpiImlElphdPRfC4WGjfTnp8vULki8xXhZmo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778540922; c=relaxed/simple;
-	bh=09LPX9aedco0rLsE6v4FzPZ6m4j7yl0RWePqvLD8ia4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=CCl7tFiPLGHAJWLsZQEFJhsUeKvIiK1HJb+C3GZy6F+/z6mgMOkzERiEs7clmSJMbt8POWkvv7xzBy9PAW9HT0HWU5vuPEqQ/pLwozto893mZrOoYG/8fIqDkz7bQ5POdUL3N55nmnW+q4qfdKA6nUaneBffuZf80LjmW/i1/NQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IN3+8i37; arc=none smtp.client-ip=74.125.82.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9E41FD4
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 02:00:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778551239; cv=pass; b=o23IFKgvajtnkI6CqflzapG98RNBYb3LVK044O+iI2sAtcxJH6LZ7+KJq5V+ga/X5Wcd0NTjf3HGcGHdnAZpEAxdNgq5BsZMTGcovncL/Z7n7Q6eV1U2Vt/V/fLe7RVkMoQIA952SQQhCKxVwKE8mwHBj5vaEbDrubJribRDCJs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778551239; c=relaxed/simple;
+	bh=SpwwXacXJonEOu72OwiSzV2ErCVrduQLCkUL8LuSyyE=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=ZrEscFdPlzTvS0s2sAqQv0zA3trQ2BwVSWJi/13IOsGsHaVA3YfRFtm5Y9/E/DPXszSyF3EiDp2wFDvGyZzsxYqB7xgkp6xZGpz2fmuWHdJZQCMI9QhJN7lmgheTbjxGHl93dO/qMng7PpY8o7eDYu4eiGgxnAJEyA2T7EVbb6M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tyg2iqoA; arc=pass smtp.client-ip=74.125.224.66
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IN3+8i37"
-Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-132d1b2519eso2866559c88.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 16:08:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tyg2iqoA"
+Received: by mail-yx1-f66.google.com with SMTP id 956f58d0204a3-65dd1e59e08so126683d50.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 May 2026 19:00:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778551237; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Kt1yVbaD46sss7Qu0yIX0VfWiu6gE/5+tVJNNPiT7iG7XCZwla9jv/cqlJ/XzZN6zM
+         wpBDpktS1Z8gWtHBzDLCi05upDHUvQbjt7YFSjJ87JaBDZ1H8NgbVDMZvyUJ7XsGjQ4l
+         XlDgZ30FQPpoPbPxfSBfCva8lkg7CJHoQwIV2DGAoUo6NdILOVCEcBP6DtRRMDVSpQ07
+         KWRI5Qm25I4HqjdUdtXxeBOcWKKeZlJwcDk5wt4ZViJp4aD1BDZK2+/7n3RSoaoeHwld
+         19vfOK6FnxyRulX7VtFJvhDu78tAkfIWRE8WFoQMnG9qHp3aZm4Sm+tRl0N5M7wHGv7/
+         3Qbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=SpwwXacXJonEOu72OwiSzV2ErCVrduQLCkUL8LuSyyE=;
+        fh=4lGQI6056MBa4/oovMyIYaKLn+Wz/24RGvUivMmQP8E=;
+        b=f/ahGrLscxppsree5GjkD33NHjQMh7EAEWHi1JIOoOwmP9M130PO/whnZletnkB4+9
+         IQvK8yQh49ug0y+8pLpBb2ytTTbxwvgg7DPPaQaXB9XXWZ5OdBuYHbH+CcNlR4tUmNof
+         oXexNi61XFNibTn2M4fA6jhzK7j9jqosu0/mfTzQ4uWuYtr/vgnrgOG8eClfLwoFQqfF
+         kpS9wKr24iFG88OFfm+9A0uk+6YVLJPamdh1UZ8YcwPqPYUjPrMznyxwLYz95UOUs3Rp
+         m7uxICtXUcxU7FCxudLOTnt9kLQhxqAYIOeT2fwcpkaZSatJOKpzsRjxFPe6p9PoSylD
+         qxAg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778540920; x=1779145720; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=EGifGYiJLCH3Wv85diUOLCWRRjhVJlOi5/WXKFOAzsA=;
-        b=IN3+8i37h9UZy2/c3piyQ+Z2kxuXEFbdKvlMiNdx0OfRinWDDfZjBGLq375xtjM8kD
-         KmMxxxNmbo+RhuxmYD5Vnk4xxjBwAQKb9qsYIQ1zjvnsPmGBU8ECueAAU5nHC9AXEdCL
-         zmNXCsZqhTNHvpWRJd0RZhceMq49ZXiLKYKVf/nEndmuaFBcTwfdIjKpmI7MVOeX+jxX
-         lhCluv5GJpOMYcw9bzWjjtBl9RsB9KN1kWALd4e0ne0Y4dsjZLxyMmpF7L5i//EuZceF
-         FBU9DTREcsAihG9/S7BN/w8nyCIaz/jetMTpzcwiFO7Cd0Rw0gfbLWMZzovaVe0kc3Qt
-         WQqA==
+        d=gmail.com; s=20251104; t=1778551237; x=1779156037; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SpwwXacXJonEOu72OwiSzV2ErCVrduQLCkUL8LuSyyE=;
+        b=Tyg2iqoAvig7a8H4nPLKCgeMqH1ZvlGuPI8qddMfdK7bCGMlyREV8NnRKQHxRNwcqo
+         wT6CCyJmSeSuoFxLwefNXuYnILmQ/Hs2y5JjlFsJqlmNQTHcLBc8LMo2N/9Mpdafv1en
+         dd1JaeZWCNKx/9N1DvKRMIHTWwMbyezzxxCathLlwKvVeKw7Al5CiEAREZaRezG3b0U8
+         Ii635wfdu9NcsqDL/+wbh9B7sDSzJLAd+/ZxhyOWpMIm8EJJ3DHIBq8x+WDbpdRV4gTh
+         o3XFOLTTPg2LwK7gEUTqBgMZESZo4j23Dnsnwyp30L6rvQ9TOj2yxKtkPsVPZwR2/Ttg
+         G/Vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778540920; x=1779145720;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EGifGYiJLCH3Wv85diUOLCWRRjhVJlOi5/WXKFOAzsA=;
-        b=XRbYYhzjkIGVJdaSyXLZlXm8npgNC8DyDv5mjxMu2yBwI54xhBqmMPUxgzROW1hus3
-         7fjJ9miYKXeJfuxw3x0Qo8sASoqRFw74KpBiqdnBs8959N2/OrLZOPYLlI+RGSWx0+ki
-         J0vgCkHQ9AJ/wzDwd6p81U4TyRexnJ+GF2IqV7AVgViDpOS7UUE//3nBFFN2p4TyOxoh
-         LDDNFI55G40qA59/hFmqH0/DGB8/C7zP3O7u92AuFe0WqVCdGSP5WLxxZfGEFoh9xxqt
-         Ycdp0s2MYQcsswCQYDMzQLERzfkhnfZ0YvHoN19WHGzDZKv6cAZTai3LpHDJxRjBp0su
-         gc1w==
-X-Gm-Message-State: AOJu0YyZCBThF3Ti3kGZD8V13klv/Q6YPjSqr6KvwCTGzqACS+AEBcYi
-	b++LF9B++8gv50zJNQ9EsCsV1YrIk4i3VNDxuU0yFdZMWmnLQApBVVKAewt8xg==
-X-Gm-Gg: Acq92OGFmbQg+oiR0p28OHvJ5eLw6y6jCJ+Xsk2ZHuyZdrRDbNhVm1p3kbCLkyEwJWn
-	3FeUOyzsmWpU8uITxy0OpfpkyHcKZBL7vXORs/qsRKj3cjZlmdMn4bFEof+ggM7X6bB/KCtaCQh
-	/EBzgKjGa5uLHfRkBmgLLg39csRC0r1OIsEJftkp+fW6ICKUvYqh6RhbNVgeDAJJex0hi+a3VJm
-	GxZjdXQsej8m/oUkF4F8LNIXcK8l2jBHsxHG4B9E1SBszCPcUCsbXMQegCCetNQgeNeuaO272bM
-	NXo3c9Ch5Uj34ntb3VSoxRpK5RQewrbtl1e01oYNE6PeQANGF1elnZgU7PkHXI2stqMOuZKWIQ+
-	1qAat7ifpUpWjxP55e9r/HsNpRqoqH6iQN+RB9OxPGHMbDRHFgcje9pIOp9IMHkimAykTneOC+o
-	fUz6WqDCXutzaAc/2b9Odt4Q10MSLk0gT7
-X-Received: by 2002:a05:7300:6da5:b0:2ea:ed3e:13b7 with SMTP id 5a478bee46e88-2f54ad72068mr13171784eec.7.1778540919694;
-        Mon, 11 May 2026 16:08:39 -0700 (PDT)
-Received: from [172.17.0.2] ([172.184.134.210])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f88885b87dsm18716984eec.21.2026.05.11.16.08.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 16:08:39 -0700 (PDT)
-Message-ID: <6a026177.050a0220.3aafd3.3707@mx.google.com>
-Date: Mon, 11 May 2026 16:08:39 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3581741638847686843=="
+        d=1e100.net; s=20251104; t=1778551237; x=1779156037;
+        h=to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SpwwXacXJonEOu72OwiSzV2ErCVrduQLCkUL8LuSyyE=;
+        b=cwRttcervyHugpbhi+7fZg/hUhzplCczIusoYCMzjF8hTcuCjsOxQrm79Ltft0QGId
+         DUNxzIgaGX41sr4Yr9nSE6lLEBZTCKUIRH0eZmJuTbT7bba5qT499+4VqPHmWYuOB7w1
+         NWkOEOBqy0hxuzal0sfwBgC/g9yCLndnkrzOPUoV4fWKM6L12i6K5L5z6qSVxUqQWdWC
+         5rP5lWkR9MZzXcPe311dp0sYsjBciOUh94/LA6kaudbJHUD4bpPL1CSH+ivkRM/7u/wM
+         x4DDk79GHFlKmLSoWtMIqIEd99F6wlxrO8qTjEcI0cIBPP9MuzeX7/Ou7yyMJkK8zW7H
+         QZzw==
+X-Gm-Message-State: AOJu0YzNu+xbeMrxu/4W30R8wQQfeSkKkOAurIzbpN+cA11+Rp6jBZSD
+	vHBC4A5wMOwDPpBrQEoIrRZGvqnaAVBJ6Nx4qRfQ1R3XawoLlBXzsIG4MCuBX2aTaZB3gFrcPbN
+	tEmclwxpZ8J4X16sIbtwM9IR7lsVKtwBKQdk1NqeHn+ROz0C0cA==
+X-Gm-Gg: Acq92OG4Ahb1Dsk8zhx9K1gA+VbPp0bMkOBTxoKYKhWkqmmHoVFbA56SIwil1fmAZqd
+	P4EFGQWhhdmFmGAcWwRS7E2gIpLaMGD0QMkq5Pry8oVaGhqgN6KQ8OlWoQ8EkkwCDaHZ4/jY5Ll
+	WZhjOFHBI6jo/lo2JY1pvkvz2ZT9roc0G1/umfuXFntsMMGuIuFNM3ZyudanVL2WlDheA5NoAcU
+	OkVNiqPhp5a1PkuF0TWLr5I5g9QI2x/OsU6C1+p363K9br6qvJWqw1sBUFP+n5kfCWb
+X-Received: by 2002:a05:690e:4284:20b0:64e:c1fb:c2de with SMTP id
+ 956f58d0204a3-65c7b9efaa2mr12066883d50.6.1778551236775; Mon, 11 May 2026
+ 19:00:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ] adapter: add BCAA UUID also when seen device is not discoverable
-In-Reply-To: <a03d5b481c87d86d2bd2bdb376729ea6c4f992a9.1778535912.git.pav@iki.fi>
-References: <a03d5b481c87d86d2bd2bdb376729ea6c4f992a9.1778535912.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+From: Tomoka Kimura <tkimura.dev@gmail.com>
+Date: Tue, 12 May 2026 11:00:25 +0900
+X-Gm-Features: AVHnY4K3PsQUPWNY3okmRFY1qxqBtBV8282m0Ch3LXpsx3tolOe5Yo0iEqWKNrE
+Message-ID: <CALC1NsyNYQM0NMFmfqG6sg8fqoKhHUBoH7dcQCeQ0MXN3NkpFw@mail.gmail.com>
+Subject: Question: recommended way to detect re-pairing completion over D-Bus
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
---===============3581741638847686843==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+I'm developing an embedded device using BlueZ and need to update the
+UI when pairing has fully completed.
 
-Dear submitter,
+For initial pairing, I can use the `PropertiesChanged` signal for
+`org.bluez.Device1.Paired`, which works well.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1093117
+However, during re-pairing, if the remote device deletes its pairing
+information while my device keeps the existing bond, I cannot detect
+when the new pairing has actually completed. In this case, the
+`org.bluez.Device1` object already exists, and `Paired`/`Bonded` are
+already `true`, so no `PropertiesChanged` signal is emitted.
 
----Test result---
+Environment:
+- BlueZ 5.72
+- BR/EDR peripheral + BLE peripheral
+- Agent capability: NoInputNoOutput
+- `JustWorksRepairing=confirm`
 
-Test Summary:
-CheckPatch                    PASS      0.29 seconds
-GitLint                       FAIL      0.20 seconds
-BuildEll                      PASS      20.52 seconds
-BluezMake                     PASS      655.94 seconds
-CheckSmatch                   PASS      355.51 seconds
-bluezmakeextell               PASS      183.32 seconds
-IncrementalBuild              PASS      658.13 seconds
-ScanBuild                     PASS      1044.68 seconds
+What I observed:
+- `RequestAuthorization` is called before LTK storage completes, so it
+appears too early to treat as pairing completion
+- `Connected` also becomes true too early
+- `ServicesResolved` does not seem suitable because it is tied to
+service discovery rather than pairing/bond persistence, and its timing
+can vary depending on the device. In some cases it may be emitted
+noticeably after pairing has already completed
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ] adapter: add BCAA UUID also when seen device is not discoverable
+What I need is a reliable indication that pairing/bonding has fully
+completed and all keys have been stored, including during re-pairing.
 
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-23: B1 Line exceeds max length (89>80): "Link: https://gitlab.freedesktop.org/pipewire/pipewire/-/merge_requests/2812#note_3467783"
+My questions are:
 
+1. Is there an official D-Bus API/signal/property for detecting this
+completion point?
+2. If not, what is the recommended approach for applications that need
+to update UI at the correct timing?
 
-https://github.com/bluez/bluez/pull/2119
+I also checked the source up to 5.86 and it looks like
+`device_set_paired()` / `device_set_bonded()` still do not emit
+`PropertiesChanged` if both bearers are already paired/bonded.
 
----
-Regards,
-Linux Bluetooth
+Any guidance would be appreciated.
 
-
---===============3581741638847686843==--
+Best regards,
+Tomoka Kimura
