@@ -1,223 +1,120 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDEAD3AE182
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 20:54:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D6537CD53
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 21:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778619264; cv=none; b=YtANN9FZZH51TjmDIfj+2MpVIkPM8FJvWTHMl/t9A+el06s4qyRxByNy4L9bvAohP960bjbmhFXsznifL4MQJQEcoPTl1gTRZ6nMmQ01lvCas/gVIDb0GI7gH2iASooQ8e1ySsfTBQN8IfOL1mdS3BIJFqp+RB4PhHDoZ/huCjw=
+	t=1778621003; cv=none; b=NDJsZU4VGIfcWLsGqrolve6DtmCri50zrZKWpiddqWgD9SVbM45u3+gAzWWbq8x0SwYKWcrASrjHnFm9NsYA3Dfrcbygga+nil5A5cszZ/JVX/NjAksbT6pyXtqf4CZ8dSNWhL+QEwkSe0r4F0XOmmZ3kjx4EdsAW+7KHrM5aEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778619264; c=relaxed/simple;
-	bh=owqcCt0ChlKbbpJ7nfZJEmjqAnuMjSMrGU1B0sO7iuA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Jdqdo2uuSRUWc22djqCTwA7GJRuu3v3/D8a/Qd3zG1YbLnuvHmNKfLOl2ox5HIQZ2E7FIRRoBYs6UVQTJKWqw7rSk2MN/aTBz2OAipYKZ8natwja1eFQuJ/8Z1N/wPcvwuKOCdpZ7AriyhL4yRmnEJv/ofBhX5AkncXr/qcztSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=cQ1TUnMR; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1778621003; c=relaxed/simple;
+	bh=NNGKIz0NQOCCAjnN2uxGJ26WQpBDveGwFOAabhxRfNs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=dvIhXJw/UF0HPw0YoRHBfpgHlkFfMvMkY0UXhebodrdL79vAfUGWN4vcAaImWFJgfW4jQpMSDWQ9t6YPIh5pcwlmoTMOZSbtQsCXa7ieLprEZY/94WDTZ1kOADArgFS74QQ5kyj4V9jdfY0gHvAkevjrlYvkjrP42AefRzLdF2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HtvLZmKC; arc=none smtp.client-ip=74.125.82.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="cQ1TUnMR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1778619262;
-	bh=NIZlFdrkMMx7yPkSN35ROCZg+yOk/lwhSBY6Svo06S8=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=cQ1TUnMRxMMBBP7xlT+d9TdeFn+Ra46n5hFRu3R0IIBAbAv7VuWHMwsbYMkFDGeDJ
-	 fiOTw5FVu5KjbxMU23r2jhTE+AntrI+2kaa+av3pnoc4JnS8GReIybxozvpEGCjOTf
-	 O3ba+VR9IKri58yc1JOKElT/j2QdRvxZ8AyduiDc=
-Received: from github.com (hubbernetes-node-0e6f440.ash1-iad.github.net [10.56.207.15])
-	by smtp.github.com (Postfix) with ESMTPA id 29FC9360A57
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 13:54:22 -0700 (PDT)
-Date: Tue, 12 May 2026 13:54:22 -0700
-From: fdanis-oss <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/6ba04f-ee4a47@github.com>
-Subject: [bluez/bluez] 4ed84c: mesh: Remove unused but set variable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HtvLZmKC"
+Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-2bdcf5970cdso4374613eec.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 14:23:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778621001; x=1779225801; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=MYvg6PGntFkWxwojor+Adw0/39rDBv8fQvV/vtTwBpM=;
+        b=HtvLZmKCOzkAXKDwB9W3feL2sLdkKvUWIW9EfA405W9HDIn2YdiykT2Cz5gK643eoj
+         ZOBRvqAuR4OSV//sw5MFN2l2vWFNeIS+roDkp+4SDor2oqeqtMLeodZd+z6Wzc/70CiJ
+         muTvoD/qtFHcLRE37ijMJ3tv8noR7F/WyAyEaJaobrU7bux8MhA6Sk9vL8gqutt7lJzj
+         IeF2vhymrEKt3KG3qSkuMJYdtvDtAzL8XeL8LQYC9leIw1gH23br85a82Jrsovtt9qfB
+         hviKLOXm73dscgTIkkogLA7JdRXcRQCYfFij1lem+CPgp6+/bbdeCdKvxoz6+0o40jP0
+         LR+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778621001; x=1779225801;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MYvg6PGntFkWxwojor+Adw0/39rDBv8fQvV/vtTwBpM=;
+        b=RYbOp/I0lgjVORK2hn/ojGl7R77hETYu40skuNLCe8ukhjhuZUtEY4SpWrmxBO0RmL
+         7z1VUGrz6pNG6MOZ3X5e8QbBVMDYzHUB5EkHEtMnlj3Al7mARJM3sa4toiU1TsT+w/X4
+         cKxRqJFsmPe7leq5OIHN6ewRpO/h/GkxLnXY9nF0gdXwuHsdGn4SOkqma1MNxc/HftPG
+         UG6B7naxF92aSqhOZBZT+hzfGhnGhLsYNH1x/ChEtYvWl5vAImz3KFLloFSSmdfoWmPW
+         cDHa4WZt5Yi8UanfMlgkWjrzNCJd1Yqyk4KgTuc1ymqUq80/Hj8LG3AwZEaZ3yoy8HRN
+         btHw==
+X-Gm-Message-State: AOJu0YzKxo8z2nZXzSfshjasKCmzXDTT0sbjWc6l8D114XUsPScKsnkd
+	THKwgNVzOp/r5Fz8Eoq4zOG6fjCELQbVDdiDcSdbBMnHkpAC3Souy7wf9a/WFg==
+X-Gm-Gg: Acq92OE/oiAYovARgPpXurBlQW7rYfdZrsjMFPuvFskAlQCO8PDW9hLvKeeLUdggbMf
+	XKIAt+JxwAj0yCM0xGhy7fPoO2I0V7SNm8fsKn4nZNzwQ1QVu2ZWzB4y/JIXBUgTRG5Sc+8b3HW
+	e0AsPYVCirwMVoeOZijwtgVIjY2/MuvT4ovrBcSrZgv/wEvPc0/d5Gg35iPtGoT9Y/LnpoASOXY
+	0a8L+bNMKgSLebXgwDWfDei/t79dYsyiMhyQU7rf4MFNQqR5pLxaeILBTejuNAuqtrp9C2bugi5
+	s4KFSQcefuE3oZ9ntEnRdvXxSWJM+LgtEHtHmELE0I+BCepjPu7sKjGiNYh7SNebEa9M4x54czc
+	XLwWdkm3tfqvoZm7SGL9BTjQmLRt+RScL1G+207Pkqj2A24bfgFLUDjN4LMVxWNwCHJqX+4A7y3
+	Q83ZYTAPTp1qu7cGXvqEBt69GzIsg=
+X-Received: by 2002:a05:7300:3212:b0:2f3:b7b2:cbd3 with SMTP id 5a478bee46e88-301174808fbmr447000eec.5.1778621001363;
+        Tue, 12 May 2026 14:23:21 -0700 (PDT)
+Received: from [172.17.0.2] ([13.83.42.66])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f8859eafc2sm24610244eec.4.2026.05.12.14.23.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 May 2026 14:23:20 -0700 (PDT)
+Message-ID: <6a039a48.050a0220.11fbaa.7675@mx.google.com>
+Date: Tue, 12 May 2026 14:23:20 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3157746752124520596=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, jannh@google.com
+Subject: RE: Bluetooth: bnep: Fix UAF read of dev->name
+In-Reply-To: <20260512-bnep-add-uaf-v1-1-f62ff8f61d50@google.com>
+References: <20260512-bnep-add-uaf-v1-1-f62ff8f61d50@google.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 4ed84c4132f42c6e61934ce7f6bc29433c3e000f
-      https://github.com/bluez/bluez/commit/4ed84c4132f42c6e61934ce7f6bc2=
-9433c3e000f
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-05-12 (Tue, 12 May 2026)
+--===============3157746752124520596==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  Changed paths:
-    M mesh/net.c
+This is automated email and please do not reply to this email!
 
-  Log Message:
-  -----------
-  mesh: Remove unused but set variable
+Dear submitter,
 
-We played around with the bits, but didn't do anything with it.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1093767
 
-mesh/net.c: In function =E2=80=98ack_received=E2=80=99:
-mesh/net.c:1569:18: error: variable =E2=80=98ack_copy=E2=80=99 set but no=
-t used [-Werror=3Dunused-but-set-variable=3D]
- 1569 |         uint32_t ack_copy =3D ack_flag;
-      |                  ^~~~~~~~
+---Test result---
 
+Test Summary:
+CheckPatch                    PASS      0.54 seconds
+GitLint                       FAIL      0.21 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      26.75 seconds
+CheckAllWarning               PASS      29.78 seconds
+CheckSparse                   PASS      27.99 seconds
+BuildKernel32                 PASS      26.10 seconds
+TestRunnerSetup               PASS      579.08 seconds
+TestRunner_bnep-tester        PASS      19.09 seconds
+IncrementalBuild              PASS      24.48 seconds
 
-  Commit: a225faba50d1224b1191c84198fefa4f7053bb6c
-      https://github.com/bluez/bluez/commit/a225faba50d1224b1191c84198fef=
-a4f7053bb6c
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-05-12 (Tue, 12 May 2026)
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: bnep: Fix UAF read of dev->name
 
-  Changed paths:
-    M tools/mesh/mesh-db.c
-
-  Log Message:
-  -----------
-  mesh: Fix str{r,}chr usage
-
-Fix the code manipulating "const char *" return values from
-json_object_to_json_string_ext() to modify it for printing, we're
-not allowed to do that.
-
-tools/mesh/mesh-db.c: In function =E2=80=98mesh_db_finish_export=E2=80=99=
-:
-tools/mesh/mesh-db.c:2598:13: error: assignment discards =E2=80=98const=E2=
-=80=99 qualifier from pointer target type [-Werror=3Ddiscarded-qualifiers=
-]
- 2598 |         pos =3D strrchr(hdr, '}');
-      |             ^
-tools/mesh/mesh-db.c:2604:13: error: assignment discards =E2=80=98const=E2=
-=80=99 qualifier from pointer target type [-Werror=3Ddiscarded-qualifiers=
-]
- 2604 |         pos =3D strrchr(hdr, '"');
-      |             ^
-tools/mesh/mesh-db.c:2613:13: error: assignment discards =E2=80=98const=E2=
-=80=99 qualifier from pointer target type [-Werror=3Ddiscarded-qualifiers=
-]
- 2613 |         pos =3D strchr(str, '{');
-      |             ^
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+27: B2 Line has trailing whitespace: "--  "
 
 
-  Commit: 28c9f959bb3be8e311b34a6c08bd95045dabd7bf
-      https://github.com/bluez/bluez/commit/28c9f959bb3be8e311b34a6c08bd9=
-5045dabd7bf
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-05-12 (Tue, 12 May 2026)
+https://github.com/bluez/bluetooth-next/pull/179
 
-  Changed paths:
-    M mesh/util.c
-
-  Log Message:
-  -----------
-  mesh: Fix const qualifier dropping when using strchr()
-
-strchr() with a const string returns a const string, we don't change
-that string or "next", so make both const and get rid of the warning.
-
-mesh/util.c: In function =E2=80=98create_dir=E2=80=99:
-mesh/util.c:108:14: error: assignment discards =E2=80=98const=E2=80=99 qu=
-alifier from pointer target type [-Werror=3Ddiscarded-qualifiers]
-  108 |         prev =3D strchr(dir_name, '/');
-      |              ^
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: 31625e481b081efb2d654d401eca2abf1274d0ed
-      https://github.com/bluez/bluez/commit/31625e481b081efb2d654d401eca2=
-abf1274d0ed
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-05-12 (Tue, 12 May 2026)
-
-  Changed paths:
-    M src/adapter.c
-
-  Log Message:
-  -----------
-  adapter: add BCAA UUID also when seen device is not discoverable
-
-BAP v1.0.2 Sec 6.4 specifies Broadcast discovery uses observation
-procedure (Core Vol 3 Part C Sec 9.1.2) which makes no reference to
-device discoverability state.
-
-However, if remote device does:
-
-1. Send Advertising Data for some other UUID with General Discoverable
-2. Send Advertising Data for BCAA UUID with no flags
-
-then adapter.c:btd_adapter_device_found() creates device in step 1. but
-in step 2. it ignores the BCAA UUID since the device exists but is not
-discoverable; the monitoring=3Dtrue special case applies only for
-first-seen devices.  Consequently bap plugin fails to pick up the BCAA
-stream.
-
-This sequence was observed to be produced by BlueZ + btvirt.
-
-Fix by monitoring also previously existing but currently non-connectable
-devices with BCAA UUID.
-
-Link: https://gitlab.freedesktop.org/pipewire/pipewire/-/merge_requests/2=
-812#note_3467783
-Log:
---------------------------
-@ MGMT Event: Device Found (0x0012) plen 17
-        LE Address: 00:AA:01:00:00:42 (Intel Corporation)
-        RSSI: invalid (0x7f)
-        Flags: 0x00000000
-        Data length: 3
-        Data[3]:
-        02 01 06                                         ...
-        Flags: 0x06
-          LE General Discoverable Mode
-          BR/EDR Not Supported
-...
-@ MGMT Event: Device Found (0x0012) plen 39
-        LE Address: 00:AA:01:00:00:42 (Intel Corporation)
-        RSSI: invalid (0x7f)
-        Flags: 0x00000004
-          Not Connectable
-        Data length: 25
-        Data[25]:
-        06 16 52 18 56 db 55 03 03 4e 18 0d 16 4e 18 00  ..R.V.U..N...N..=
-
-        ff 0f 0f 00 04 03 01 01 00                       .........
-        Service Data: Broadcast Audio Announcement (0x1852)
-        Broadcast ID: 5626710 (0x55db56)
-        16-bit Service UUIDs (complete): 1 entry
-          Audio Stream Control (0x184e)
-        Service Data: Audio Stream Control (0x184e)
-          Data[10]:
-        00 ff 0f 0f 00 04 03 01 01 00
---------------------------
-
-
-  Commit: ee4a4775bc4f8348e2a860dc44bcdd7570279908
-      https://github.com/bluez/bluez/commit/ee4a4775bc4f8348e2a860dc44bcd=
-d7570279908
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-05-12 (Tue, 12 May 2026)
-
-  Changed paths:
-    M obexd/client/pbap.c
-
-  Log Message:
-  -----------
-  pbap: Fix not checking Database Identifier length
-
-Database Identifier is supposed to be 16 bytes values.
-
-A paired Bluetooth device acting as a PBAP server can overflow the
-heap in obexd by up to 239 bytes into adjacent allocations by returning
-a DATABASEID_TAG application parameter with an oversized length.
-With both length and content fully attacker-controlled, this enables
-standard glibc heap exploitation primitives (tcache/fastbin poisoning)
-leading to remote code execution in the obexd process.
-
-
-Compare: https://github.com/bluez/bluez/compare/6ba04fad369f...ee4a4775bc=
-4f
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+--===============3157746752124520596==--
