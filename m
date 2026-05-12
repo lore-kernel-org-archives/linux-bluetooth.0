@@ -1,106 +1,112 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15B53CE48F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 11:29:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD07C36C9E1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 12:26:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778585383; cv=none; b=cRAKaZegnxKTIvNZ5Z7kyAq1x1NXjgyyciqoPS8cI/9NrXYlAJwbI79A2pXeEkLfkeiFmZcnXmWKAFsjNtg1ILUysJMlLrNsQ2t01/TBnAK5MMl8zzmTtLzDOwIzkDQSTByTCCFbV3IYxDUE19665z1oY0NoUCjlkpYZfCp5jFA=
+	t=1778588823; cv=none; b=Y8egoYaib4bMyqlXL46nlCr46Yb6f2uymSObk86e4vX4/IaLbgPEh0DHByT+K9t3THMp+3zutYuGhz+3FW/rlYJwdm4j5iypFAfLCtvnOI2wNnfyp0p/JCWHnmStgWhAr2OgcL/1aQhtCU5/hm3EI5fGPNOzzjwgG+/ely1e2PI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778585383; c=relaxed/simple;
-	bh=92VUI+v4FAUApk6yUbX28pXNJA5xhT2pY/NywYejOas=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=gsmDWpnnG0oXdOF+Bg4cJilrJm7gu3ftjwcukRJT/Nr7LjqKuBLjdQGVX7AYgVd9ysE0fvRgPo2QTqmOFmdj8XRSHotSAna9mLeJl109CG3IhP/8yaW30st9MlfNkwI3NS6vbQYQgZMIyowLYS8pEWkj0vTCS0dTzRaC/HYccko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=RNGujEUJ; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1778588823; c=relaxed/simple;
+	bh=4VB3iBtddUxJzj31KYKpS6jWtU1zgOyKVla0ifc7F7w=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=OGr8g7ajMcyNhd7Jn8danbeFkjX1PQNKNCGrJwAMwKAqSQIV+PaQ9updHrFaBESnW0JrV9mlcQQiV3tr0uwznEalV55xEio/c4+Sv9Jvc40uvFier1g0G6Vl9tGBJrgKUjxutlV98XThKamyxELSnveoSsEl0PM9v4jvPvdTY+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J4EW1UCR; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="RNGujEUJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1778585381;
-	bh=5+TtMrCMLCZu0ya+Z2ATIvAq0J/P6bKsoRMM3ZXRPns=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=RNGujEUJ4IcZTPtxTcWi0JGw772jndsAK8FxZl2BEiD18mY1Y8KmFKMPBwJUbS8S9
-	 rd5rr/6+MHcl8GBqKe6+OMsib/OmuCsJzXfUSFW55Pci5KofZqoGc6vPGT2o8EHe3l
-	 2QKPjuRJ2CZCR83GvBjmWMoRwWM19cARFmVp4yiQ=
-Received: from github.com (hubbernetes-node-7a39a72.ac4-iad.github.net [10.52.210.21])
-	by smtp.github.com (Postfix) with ESMTPA id 149CA78110E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 04:29:41 -0700 (PDT)
-Date: Tue, 12 May 2026 04:29:41 -0700
-From: hadess <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1093445/000000-c915f8@github.com>
-Subject: [bluez/bluez] c915f8: media: Fix possible crash on exit/adapter
- removal
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J4EW1UCR"
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-515226c0cdbso2752091cf.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 05:26:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778588816; x=1779193616; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Npq64HUfkO1IXH6Wh0gwJ/HEw127b25morA3RkiXfoU=;
+        b=J4EW1UCRpzyCvn4MGvsHphDUI8s/NXmxr56cJKhL6qKRUd0zi7ShIF0IRZ2EjG4h77
+         HtdV0AuwjioCdvY79abAqsrgWa3b9cJLepRBLtYETTsIHB3wI16j8/yaCQ/3cbKhNTgF
+         GFQtXQNKNfYYv6NXth5D2dSx0gvv42hQYYgEA5gxf7gLMvNTIYoFVYx0qImzC6oKi0En
+         6bTM/jLMWTpDUdhCpuQlWQXGA9JJ/89RNvx5V9WL7JdB1begXfN3nu9zFwM3FTcbkOeL
+         aaVMUqAcFlaO7he7gH94WXEE4QmSInyfQLN/Uc+Nb0RyBiE15SzyZPbjOzCxrTb6qc7i
+         pnIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778588816; x=1779193616;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Npq64HUfkO1IXH6Wh0gwJ/HEw127b25morA3RkiXfoU=;
+        b=Kw71UsbEnshowKXf4yHnrqy6HnTmcKjjmLWCJizB5Msctzp4nXO7R1bqZDGaE6mRFc
+         BPr+06MoY3E+YY6jZoVnhvN04flJiy3rZZ2AWPP6F1pJrmNEKHvUV8Tj/bhhPAkya76X
+         U8ttAGaK+wjsD1nMOFXovOWpRY+q+RkNJ7XBqrPUPYcXV61oj+21o4idjQSjkIwwyLln
+         GIAwEHw2lg7KZmE8lZ6+B88Hkwf3SnjVQ1Gzs4UvMaH1wp3u7gFhhTElAKVHbiVs/QcD
+         YbEMl/EQhFnicIdcZRWPM8dOjhBHpttkAWj6x7YM7jE4Fow1YxslqNPr11Q3/H8FLsUc
+         k48g==
+X-Gm-Message-State: AOJu0Yw38A80Stt7AJNqLkJY7abVyfO/t0j94NFu9qkJEgHjjpWztepT
+	mymzNON0oIgohOgQBiwAwVy4CNCgBDyb/XFgACA7TF3PAZMMgzsCAYGAZzyjhA==
+X-Gm-Gg: Acq92OF3HhlpXqbMB00cp5COUZ1UIYChppdrwZdZ8oix9Bk34Jeml0nqNF9Jbuqklhk
+	cR+lHYSvzbTqTaCZZy/8744hMZTDzofGQuCZRjTvihV/XI7JtkL6D72XSAK1BBeHr3CciHntlmj
+	V1Dj5zbHmINLDm30pgte94FWyNf9/rofeeZ7VoaEgfTV37lz1BJebueL4jv5DsflvAPkytyZhKq
+	wyR+3x7/kswjBnHrGkoItIKD71BgTpUraV9L5Z+9hDZ1i0pWzRgZ1k99tPixYzPiGGYKIaO3CQ3
+	q/MSYToXMtRMsqfTaCMerTdSqBqJQPQAGLiLh18gmPpw0Kf0t5PuoL1E2KLMcIEc+nDynKzEEXL
+	zXKt+ArjzZ8NcqgsJGH9pSZAaSsjrTbbz80cWWeV6bFIkjg0tcw5S2FtdELlCd9TYp3eIChKs6E
+	AGf2u5odd0s7rU0lfttVNGT2MqkCsSRRA=
+X-Received: by 2002:ac8:578f:0:b0:510:2506:1ba9 with SMTP id d75a77b69052e-514d2222c77mr39093881cf.49.1778588816013;
+        Tue, 12 May 2026 05:26:56 -0700 (PDT)
+Received: from [172.17.0.2] ([64.236.134.231])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-514d6d463c4sm13404991cf.8.2026.05.12.05.26.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 May 2026 05:26:55 -0700 (PDT)
+Message-ID: <6a031c8f.050a0220.1cf1f9.b06e@mx.google.com>
+Date: Tue, 12 May 2026 05:26:55 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0384280997590100526=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
+Subject: RE: [RFC,BlueZ] media: Fix possible crash on exit/adapter removal
+In-Reply-To: <20260512101431.2017966-1-hadess@hadess.net>
+References: <20260512101431.2017966-1-hadess@hadess.net>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============0384280997590100526==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1093445
-  Home:   https://github.com/bluez/bluez
-  Commit: c915f8eb390fba5588ce1425025d4a4274a3fbed
-      https://github.com/bluez/bluez/commit/c915f8eb390fba5588ce1425025d4a4274a3fbed
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2026-05-12 (Tue, 12 May 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M profiles/audio/media.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  media: Fix possible crash on exit/adapter removal
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1093445
 
-Nothing protects media_endpoint_remove() from being called multiple
-times for the same structure. Before a g_free() call is made on
-endpoint->capabilities, there are NULL checks, and NULL setting,
-for every variable that might get modified, so a second call to the same
-function, even though it's still using-after-free, is only
-reading-after-free, and might crash at the first attempt at modifying
-that freed memory.
+---Test result---
 
-The reason why this function might be called multiple times is because
-in some circumstances, another signal might be received that the
-endpoint is getting removed while we're already in the process of
-removing that endpoint.
-
-For example, release_endpoint() (which should appear in between
-path_free() and media_endpoint_remove() in the below backtrace, as
-that's the function called at profiles/audio/media.c:3651), will send a
-D-Bus message which it then waits for the answer to, meaning that other
-D-Bus message could be received while we're waiting for the answer, and
-then destroying the endpoint.
-
- #11 media_endpoint_destroy at profiles/audio/media.c:231
- #12 media_endpoint_remove at profiles/audio/media.c:314
- #13 path_free at profiles/audio/media.c:3651
- #14 remove_interface at gdbus/object.c:742
- #15 g_dbus_unregister_interface at gdbus/object.c:1499
- #16 g_slist_foreach at ../glib/gslist.c:837
- #17 unload_drivers at src/adapter.c:5932
- #18 adapter_remove at src/adapter.c:7088
- #19 adapter_unregister at src/adapter.c:9504
- #20 index_removed at src/adapter.c:10693
- #21 queue_foreach at src/shared/queue.c:207
- #23 process_notify at src/shared/mgmt.c:349
- #24 can_read_data at src/shared/mgmt.c:409
- #25 watch_callback at src/shared/io-glib.c:173
- #27 g_main_context_dispatch_unlocked at ../glib/gmain.c:4451
- #28 g_main_context_iterate_unlocked at ../glib/gmain.c:4516
- #30 mainloop_run at src/shared/mainloop-glib.c:65
- #31 mainloop_run_with_signal at src/shared/mainloop-notify.c:196
-
-in profiles/audio/media.c:
- 231         g_free(endpoint->capabilities);
-
-See https://bugzilla.redhat.com/show_bug.cgi?id=2467980
+Test Summary:
+CheckPatch                    PASS      0.43 seconds
+GitLint                       PASS      0.29 seconds
+BuildEll                      PASS      20.29 seconds
+BluezMake                     PASS      657.53 seconds
+MakeCheck                     PASS      2.98 seconds
+MakeDistcheck                 PASS      246.45 seconds
+CheckValgrind                 PASS      226.08 seconds
+CheckSmatch                   PASS      350.07 seconds
+bluezmakeextell               PASS      181.48 seconds
+IncrementalBuild              PASS      664.24 seconds
+ScanBuild                     PASS      1027.26 seconds
 
 
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+https://github.com/bluez/bluez/pull/2122
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0384280997590100526==--
