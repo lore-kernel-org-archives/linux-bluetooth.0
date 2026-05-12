@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540763C0A1B;
-	Tue, 12 May 2026 17:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19EB5317162
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 19:21:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778608265; cv=none; b=Q1cnRCW+nzlHjLtqslC183sw8eKtZrwc+u7XgvIGv3yuiKc+a7GBDi6rvToymWg0WmOhC92GrnyV52QtWQhyrLZwr/27nPgozkWhSuFnRXoRnl/eWvThByPInJLm6edDuX9BBj0jfzk1Hi5gpbIYaeTwUqMnHbvXCHVDXAcbG3Q=
+	t=1778613663; cv=none; b=AiU1PE6pjtL5GJX6namSG3t0MYpqRW2k+UEzey9SIP3e8J3H3/7dOFwmNlMMEyajtZ3p+gPk7uRwgaid+5SbEBdFJ8EZ8q+ieolGgK0MmF9wFo1OyraWyfM5j5tdG4UNTmLEgiF2Ftv7urkCFJAV2S8z2BaWbxGynh3063DT8bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778608265; c=relaxed/simple;
-	bh=iRcqfMLnrkRQg9QzN1FEm5Xx9NahBc4jxGJJC/3wlFg=;
+	s=arc-20240116; t=1778613663; c=relaxed/simple;
+	bh=28hphx8IuY4LbdK5p6cM7TmkzpO2ULuEEAmOR2xtOEo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ssFuRc+1txodSljyVDIelngt/txwawGIjTqlZCjUnMhzyvPBTer1HuHytfhYoOE0uhwaq576ddXlGk2y7lEQwq77wqJARt5vBV1t5AP85h3UI78LGW/8RSmC/akSDt3NKJE1u5HtqJ9orZky2CMbs3p8TvvxBMk7HNaYroiredc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t+PcSxfQ; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=C49lWXtwz/CBdmeHILQmZrGs2d9vr/UHakSm5abJxODGjtyLJCwJv/Zl4C3fUhiJV4wK0J9TTUvvWHj1vaL9qc7xC+6h+A2Ph/aW1z7fBReDBDzqbniqry8zqVnduD/6lzO8ap4EiDODsgtgGiOuSkFUQ14/1fBbEeqXK/X5Fhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n2+Sm1I1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t+PcSxfQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36BE6C2BCB0;
-	Tue, 12 May 2026 17:51:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n2+Sm1I1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B408DC2BCB0;
+	Tue, 12 May 2026 19:21:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778608265;
-	bh=iRcqfMLnrkRQg9QzN1FEm5Xx9NahBc4jxGJJC/3wlFg=;
+	s=k20201202; t=1778613662;
+	bh=28hphx8IuY4LbdK5p6cM7TmkzpO2ULuEEAmOR2xtOEo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=t+PcSxfQ6SW5TJXPRZI7R9vFZRr4R8RLLg43/rr4L60rM6NJ+GFW49SfNlrwj6D49
-	 haG9oKxVAQMMKYGd0IiBONmRhkiVJqAhPyuM0/3acdPCJiKwfHEIu7PJ8VKvdBYAvv
-	 g01M9m3Aq5Iw/nYpywLUxP/nCxZ8Yig4/hHMs1TU4VX5C5thdqHCSaXFPwr/4IhMd7
-	 qcKxACe/+OnJq/D3XWns0FEE/m+CA/cqoCij4PU0TfVukRPviRiZyGuNMNnBrPT9W5
-	 37J4WNG551WbY7aVEUgvtOZhd1DsifVcheGbukLFVqCYR7kV9raAhIFVaSxoAFliIp
-	 r4mll/GHOa1RA==
+	b=n2+Sm1I1N8dB5QSm/EPCUpnVLW7/cZnGTO0DUt6LrT2thourcuUXluP7EIf55o8LY
+	 b9dms2S61nt8BJ5M9aJsT098hfcPhkUvFZrGnt1UcXgzKB7+wHOuEtKPPy3n/4Bp8O
+	 3lSRhN8UyGNMGdLKBmklAjT8iwMOIlbSDBW34vZZVfPRDOTLUr/jPZUqmYIuyP/BsM
+	 pUyemN66+aUHK5MhgOeTmgMRmV7RCpxKkJxT2m86TSTUbMQCeemXH7XaHYrY1mM6la
+	 ErmDzalumngS1zNTUZ0QiUYFBmFNkW1y6cuDIutpjlFfXNsCeptYRe4cR8z2L+/+1N
+	 8uemtCLcxWmxg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE123812FD7;
-	Tue, 12 May 2026 17:50:12 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02D8F3811A59;
+	Tue, 12 May 2026 19:20:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,56 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/6] Bluetooth: convert remaining bluetooth
- socket families to getsockopt_iter
+Subject: Re: [PATCH BlueZ] adapter: add BCAA UUID also when seen device is not
+ discoverable
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177860821104.3015105.542889541013880756.git-patchwork-notify@kernel.org>
-Date: Tue, 12 May 2026 17:50:11 +0000
-References: <20260512-getsock_three-v2-0-30b7b22ef14c@debian.org>
-In-Reply-To: <20260512-getsock_three-v2-0-30b7b22ef14c@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- shuah@kernel.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org
+ <177861360880.3045511.5201092313121444491.git-patchwork-notify@kernel.org>
+Date: Tue, 12 May 2026 19:20:08 +0000
+References: 
+ <a03d5b481c87d86d2bd2bdb376729ea6c4f992a9.1778535912.git.pav@iki.fi>
+In-Reply-To: 
+ <a03d5b481c87d86d2bd2bdb376729ea6c4f992a9.1778535912.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 12 May 2026 04:12:15 -0700 you wrote:
-> Continue the conversion to .getsockopt_iter for the Bluetooth socket
-> families: hci_sock, ISO, RFCOMM, SCO and L2CAP. The first patch is a
-> small precursor that fixes a long-standing 1-byte put_user write in
-> hci_sock_getsockopt_old() so the subsequent conversion stays mechanical.
+On Tue, 12 May 2026 00:54:47 +0300 you wrote:
+> BAP v1.0.2 Sec 6.4 specifies Broadcast discovery uses observation
+> procedure (Core Vol 3 Part C Sec 9.1.2) which makes no reference to
+> device discoverability state.
 > 
-> The riskiest change in this series is the SCO BT_CODEC conversion: it
-> is the only one that drops an open-coded ptr cursor in favour of
-> relying on iter_out advancing naturally on every copy_to_iter() call.
-> Every other socket option is a near-mechanical s/copy_to_user/
-> copy_to_iter/ rewrite, but BT_CODEC walks a variable-length list of
-> codecs + capabilities and previously tracked its own write offset by
-> hand. Getting the cursor semantics wrong here would silently truncate
-> or misalign user-visible codec data.
+> However, if remote device does:
+> 
+> 1. Send Advertising Data for some other UUID with General Discoverable
+> 2. Send Advertising Data for BCAA UUID with no flags
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/6] Bluetooth: hci_sock: write the full optval for getsockopt
-    https://git.kernel.org/bluetooth/bluetooth-next/c/375386737970
-  - [net-next,v2,2/6] Bluetooth: hci_sock: convert to getsockopt_iter
-    https://git.kernel.org/bluetooth/bluetooth-next/c/317bb006946a
-  - [net-next,v2,3/6] Bluetooth: ISO: convert to getsockopt_iter
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2b650bf299b6
-  - [net-next,v2,4/6] Bluetooth: RFCOMM: convert to getsockopt_iter
-    https://git.kernel.org/bluetooth/bluetooth-next/c/477cbdca7568
-  - [net-next,v2,5/6] Bluetooth: L2CAP: convert to getsockopt_iter
-    https://git.kernel.org/bluetooth/bluetooth-next/c/fcadc2780bf2
-  - [net-next,v2,6/6] Bluetooth: SCO: convert to getsockopt_iter
-    https://git.kernel.org/bluetooth/bluetooth-next/c/ff2e1268ee45
+  - [BlueZ] adapter: add BCAA UUID also when seen device is not discoverable
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ec223f0782ef
 
 You are awesome, thank you!
 -- 
