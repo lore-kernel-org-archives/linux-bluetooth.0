@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D863EDE52
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 19:21:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B4F63EDE5E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 19:21:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778613664; cv=none; b=ZgvCzijs1es0fYxQhDoH75WCREnTOd/nN3+Ba6GxkG8wqs+OK4YdTgqSai0TxGHYwhl9/2tlSHgRZSzzyMNjaN+pZ5oPRtXTkug5PgbMazmh6Ay2zCvkxc+AwB51dy395Zr2NXBLMp7bLHNE/ZL/BUFg84UNZWAnoAj04QUIsw8=
+	t=1778613666; cv=none; b=j2KcTVVpJtYGMEtXEF6/+zFWVAZMstHSZMc1/L6VrlQduCuYb2kcVD2wd/xsF0niLzzs9xrWS1z/0kpY0hWgQO0ArO4J+uhm2rd4jPlVGneD50wOrxWqRhrA3yq6VB+4LvnxEjeoVBpZPf0mU/bdnT7sfeLzpxEV8oD2qHCsx6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778613664; c=relaxed/simple;
-	bh=926aawpdoYBEci4otQq5f1hj1UXdu38Nf7A1psBHgHE=;
+	s=arc-20240116; t=1778613666; c=relaxed/simple;
+	bh=2xWlbyyFIMfltEBEByZ7xowpu/C9d20FUxITMtGHOxg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZIvBfdEiF3a41i1BqE3nPAP5LrWH89aW//XpV7aNBA90OlzygRrc/Y21YdZE1fftDBSG+Y5/NNcO8zU7roHB7eOMocL/So1q7cf/YIBE4Rdg7X2qpWaPvqdjzcg7cRzBLsE7gGYVcnofT98TQ5Uu8oRTLdDQ8jtjHBft6bBsuIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i8ob2yeo; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=aQN+fJYV/21nVdgkUsPfBQA5HNRMbKbR61PGM8Xw42gTNEElc1mioxTbIqcj4P1rzxg+fLgHb9hFZRJkz57V8jLxdLfc+1HnR28ChTPecckSoO8AEy6MSfvSrTJ6xUXVH6dW1H/03pNqDCkDFidW2IeCXUhgS2cSmnWQ0/4yL7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ANVCDzgN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i8ob2yeo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CC95C2BCB0;
-	Tue, 12 May 2026 19:21:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ANVCDzgN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF5AEC2BCB0;
+	Tue, 12 May 2026 19:21:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778613664;
-	bh=926aawpdoYBEci4otQq5f1hj1UXdu38Nf7A1psBHgHE=;
+	s=k20201202; t=1778613665;
+	bh=2xWlbyyFIMfltEBEByZ7xowpu/C9d20FUxITMtGHOxg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=i8ob2yeoYisChUlpFgcTEeNS277Ejwhnto11pueFJpr/3XnJwNhUJn1TLw0xjPbS/
-	 l0JXZWQDWREB4bxp6Pw4UE6Q32EQ+3kbxefkZBXbiLsb285cpcmAdxcVKU/xt6sjko
-	 VSmjiNJcsJNy5ZYlvICZJa6s+FhAEL2MypTlCKBRQAvqtRCA0kaVrrr/iICWqFf3ZZ
-	 ZqR/ZD83dtJDEn70ebk9cE5P9ele3IrKT0mFkM4joU75GxllPMROmo6OHnu84Hkkm8
-	 Pcej7pmqnLGac565JJSUOIKTRHEkD4w+LTF3/Ll0X0ZLDLvyw4eANMRsVJC25vXD8S
-	 nYbqFJYfcMzQQ==
+	b=ANVCDzgNUPTN8i8ugDxPziYKX/EKj2uSJK5KoM3+7TpQ1GvdWUnbBs4dKkZPeEGb0
+	 WvwHvGAPb1APSSa3klTbsNzlA/Qttuf7jVhwj4KyLVvNinnL3UyIluf0sPBUVx/fCH
+	 BO3v0wcCHrE9cpgDN/c9mKlRMuS3JPMtnoIH2jsxLvY77RjnyhK2YHOo2QcoHsgn/q
+	 qEbhAYiWFKOoofFe/yrVvT93qqbpAWSY+fdC/Ozpxp41/jEoC2LU9z9BFLJejNsxzx
+	 Bn2mMFOysRhqqkk8hbdL8+ybh4wOt8ae1//bnq7yM0DqFd2D64y1yLiC2O3vL2Fd+o
+	 E9UhlYq5yGtxw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CF013811A59;
-	Tue, 12 May 2026 19:20:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02BE53811A59;
+	Tue, 12 May 2026 19:20:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,13 +37,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [BlueZ 1/3] mesh: Remove unused but set variable
+Subject: Re: [BlueZ v3 0/6] Add helper for "cleanup" variable attribute
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177861361004.3045511.14583977326255540667.git-patchwork-notify@kernel.org>
-Date: Tue, 12 May 2026 19:20:10 +0000
-References: <20260511113511.1217887-1-hadess@hadess.net>
-In-Reply-To: <20260511113511.1217887-1-hadess@hadess.net>
+ <177861361154.3045511.1045324340041670862.git-patchwork-notify@kernel.org>
+Date: Tue, 12 May 2026 19:20:11 +0000
+References: <20260511132131.1283892-1-hadess@hadess.net>
+In-Reply-To: <20260511132131.1283892-1-hadess@hadess.net>
 To: Bastien Nocera <hadess@hadess.net>
 Cc: linux-bluetooth@vger.kernel.org
 
@@ -52,23 +52,31 @@ Hello:
 This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 11 May 2026 13:35:05 +0200 you wrote:
-> We played around with the bits, but didn't do anything with it.
+On Mon, 11 May 2026 15:18:03 +0200 you wrote:
+> As discussed in:
+> https://lore.kernel.org/linux-bluetooth/ed949f2550f79a4bef19bd482bf8b069ad5b7e0c.camel@hadess.net/
 > 
-> mesh/net.c: In function ‘ack_received’:
-> mesh/net.c:1569:18: error: variable ‘ack_copy’ set but not used [-Werror=unused-but-set-variable=]
->  1569 |         uint32_t ack_copy = ack_flag;
->       |                  ^~~~~~~~
+> Implement a cleanup helper.
+> 
+> The MIN/MAX fix is here because it touches the same hunk in src/main.c
+> as the other patches. Feel free to pick it up straight away while the
+> rest is discussed.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,1/3] mesh: Remove unused but set variable
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f95b524e5a1d
-  - [BlueZ,2/3] mesh: Fix str{r,}chr usage
+  - [BlueZ,v3,1/6] all: Remove more unneeded MIN/MAX macro definition
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ca2b39b0c08e
+  - [BlueZ,v3,2/6] shared/util: Add helper for "cleanup" variable attribute
     (no matching commit)
-  - [BlueZ,3/3] mesh: Fix const qualifier dropping when using strchr()
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7b2b51ac6f64
+  - [BlueZ,v3,3/6] doc: Recommend using _cleanup_ and friends
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9ba6c13df5fb
+  - [BlueZ,v3,4/6] main: Use _cleanup_() to simplify configuration parsing
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=140e3569295c
+  - [BlueZ,v3,5/6] client: Use _cleanup_fd_ to simplify urandom access
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e33f5027b898
+  - [BlueZ,v3,6/6] btattach: Use _cleanup_fd_ to simplify error paths
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=02aa9a8cfe6a
 
 You are awesome, thank you!
 -- 
