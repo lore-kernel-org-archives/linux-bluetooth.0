@@ -1,129 +1,199 @@
-Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AEEF3ACA43;
-	Wed, 13 May 2026 18:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7B43AA4F8
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2026 19:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778698596; cv=none; b=Ark+VjkcA8GaLgQfCs39x2vVijPZBZ2P+zZxi/ACC7uGqKD63pg40FDchP7wnaqnCbClWVxrrxFTF3ry6gqpth204rJJqa1asB/J2x5YAzsjUBnQcxX0TwBLcXqJFa29alaqj9fk6yBFYq8u7HYSi/geznWfpCBBfKx7zHdTX5g=
+	t=1778700938; cv=none; b=fI5flEX5QFODokw0AV0sAC5/WQeWsffFVj40Gudsgynz1bp1gs+JPvq6ep5HtrjMFoVrrcoXW9BTZLsvfeBVaLIzI1HQnwwIgg0nO366tLq+Wx6dCRGwxm3bjewp7NwLCruHKaxKCmi+qt6bgMeR/y4tDBo4KgO7YPZ4+Ycfwe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778698596; c=relaxed/simple;
-	bh=w6GLU1QWnWXVcH13iWcyIkNryJyiygPRfwYCrbG+NPw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=jXfYaXERvMHoe2vEG4o9QYO9dguy5XP3IhkW9sx+Gb92agKmZjK2Bv+T0NA9tS8WWDndkGagzzW5GlUOwqTp1aSiHEPXgV10YOcvKjV7QRVVOmj8rvV83KM/fJzRFpldnr772F201MlPDRulOKkH2I+pW2jEAcN2rHxIPDlEIBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=lW7pxsK8; arc=none smtp.client-ip=213.97.179.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+	s=arc-20240116; t=1778700938; c=relaxed/simple;
+	bh=vA6RpUdKopEs6oycVJjkV0lI8fBKY0jLi9rmCr31vFw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nsoR3yofWnSY7rPojA9Iw0MekXzhPAwgJaSEognawJVfiX+FRwKYFxOEJxTyMGFmUg1rDj6IXMLYFygUt8Nw+oun18sxvY1RelFa6doPyq7DKmem/qWyx26nVwL9wYY2Kzv10Gar3DkTOVnLOlPBPS7D8grkuhoysOs5tZY/VUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=starlabs.systems; spf=pass smtp.mailfrom=starlabs.systems; dkim=pass (2048-bit key) header.d=starlabs-systems.20251104.gappssmtp.com header.i=@starlabs-systems.20251104.gappssmtp.com header.b=h5Ik+tNl; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=starlabs.systems
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starlabs.systems
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="lW7pxsK8"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Subject:Date:From:Sender:Reply-To:Content-ID:Content-Description
-	:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=YWKyEvPS9YYJo6Vfcy/T7LXw6l87JIRxlNyOtO3cngQ=; b=lW7pxsK8QnUIbj19EHNjAZAZxs
-	FKX4R7GT3+Lkq68qfO39RmlriVGVD3dIZNXGvzc5QrjYMsLhdQGAANCKLo2xIUhnsv5vsdjL54zbL
-	6Ru/KRe/AVFSQNiwfOCiinOcvZF1kkwELKDl6tuZe2mC7acIHsSz8ag8h0emG3NFWV4dtAidlK7Vh
-	pRBh4P5+Y33SLprgXEh3WSzZpNSAyJkoq9/ciyarVcOTB+F1twhTLRlpTTzUEUPFU2gSCe72nhHZI
-	100ZSKvsuEskpFIzVjGD3eJGpMLZ3+jS893D4L79fNU3PEbStS/K/mNu/EzJT+M8KDwMNx8CcRlTH
-	J0/tpAEQ==;
-Received: from 177-136-93-131.vmaxnet.com.br ([177.136.93.131] helo=[192.168.1.54])
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1wNEko-00A6FQ-5f; Wed, 13 May 2026 20:56:22 +0200
-From: Heitor Alves de Siqueira <halves@igalia.com>
-Date: Wed, 13 May 2026 15:55:23 -0300
-Subject: [PATCH] Bluetooth: hci_core: Don't queue tx_work while draining
- workqueue
+	dkim=pass (2048-bit key) header.d=starlabs-systems.20251104.gappssmtp.com header.i=@starlabs-systems.20251104.gappssmtp.com header.b="h5Ik+tNl"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-488a88aeec9so80260245e9.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2026 12:35:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=starlabs-systems.20251104.gappssmtp.com; s=20251104; t=1778700934; x=1779305734; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JvAe1DPpB6I0psi9WiBtsI+tM6xWmLP/jLbbUynVL7k=;
+        b=h5Ik+tNlvjBHehG+DQNYaBnvU3vpqXhBjC4Wpw9MRbGtDoTnVgJEl4E9uKLpRyW2Q+
+         8mVbsUUcNgfb55jY6/T+ph8rPr8FjkHk1Gm+gc4khJf+IBn76EkrgNnP7DjkbiURdmca
+         xRugY7raiGBij9wljMPocW9kshmGjpV29JXa1d9LJvhslrZ3zVIdS1AI73q4Kkm6NcW+
+         +tx9T4+CaJRg/B6bYVz9NJSWVGi0Gx38+CFyJVhDj3VPxmAPsygUmF095jQaH3OENPdQ
+         oI0zsWvH+utiSqwOkUGjLXtdokBub2QodrZv1k2MvZN7hadl0Ehc1Cp0ZgiEQ4OHWT07
+         LoWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778700934; x=1779305734;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JvAe1DPpB6I0psi9WiBtsI+tM6xWmLP/jLbbUynVL7k=;
+        b=Qy2moOJsHVmoQZScQasBSDjSmNITjYKj5vuQtr5u5FQ4oQFBFbKtZxmcJ+WOaKN4ZT
+         0L60/NZDh0HTfHOlYPbjFnJCL+jc/3GHQ/8zfwcogj2qynx0o3FjcsrHS/vWib5kZk08
+         w2iuvh7gCQIkdzsl3zyb+159zd5z4IFbMRJYrcLLzJkwcuNYnjl1tVa+CJAnFbzbD0YZ
+         W72rSM6OO+wT5dl6YGNCtvZ7gw19Vdr8WU+Xab1wnAoMgWEy911U99zaodFeYzBLxJti
+         H4ib03HK3kLSYV+wQ4/wvnWM78sXUg2y2u+sXyMGPPHs9ZohEzNj5m3MhWZB/yY8KQ77
+         7LzA==
+X-Forwarded-Encrypted: i=1; AFNElJ/SyXhNUPNsqWYoSWpNtfQghuBvkn2+otVRrmGIk9u1mCjxvF6k1gNOhNrZK3Ojln0Atx5SWKvR4uc+/WaeasE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLlCjt4wb8XVYsog6P+zFe+6gwWxKWYGFr4xI0bQso9+l2r34k
+	KOWaPFChLOYcc26TubpFfG6VuNBMiXczSa7/Xj/hdi2h32CFCjOqKsA8tPFX8EZ+rQ==
+X-Gm-Gg: Acq92OGkymPKxIiLmFEH+OiegrZ+REdz7+Ks3Y383KX8z8T/7NOOnrU4wADERGTna5d
+	O5hMvUOZ+kDqyJvG1LuRv2xSlnUlAG6V4ctwVWus1bnG8lLb1q0cCboApKcI9I+wYms29jWoYkw
+	YAv/XXnBOq4gMaLYSx4mDFRD/ri/usFBW/TAgFMpPrqOI+LKiFP5iV8DVc36hDYtwMC3dPbBfNE
+	q1d1xVDG1FNtEz357bIsCsQGENRGKfTmFcKdR9IxmlnscvK4lSb0V7Axx9WXFJJu7vPmCDTSqy8
+	aAHJKuZefPltdaXH1IS98VhNnsGnY7yOLHVJnuPjOto1Tw8/386HOEfUsTaUReG2sXs5FqNAYRd
+	jkWLdB0AX2v5bF4MBako0nI/ntPIzN/KWZrpHQINWYMZJ4SkprSFRX31PYIOyRc7fls8GITW+En
+	L0wVbFfPyCymDMdqDYYCq6IKg356sAxjVdgmTfwN7/H1oBTbXtzg==
+X-Received: by 2002:a05:600c:8716:b0:48f:d5d7:df63 with SMTP id 5b1f17b1804b1-48fd5d7e0b1mr25261675e9.27.1778700933717;
+        Wed, 13 May 2026 12:35:33 -0700 (PDT)
+Received: from horizon ([217.155.46.38])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fd64d9f63sm10160775e9.12.2026.05.13.12.35.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 May 2026 12:35:33 -0700 (PDT)
+From: Sean Rhodes <sean@starlabs.systems>
+To: linux-kernel@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: [PATCH v2] Bluetooth: btusb: clear remote wake on idle Intel ACPI paths
+Date: Wed, 13 May 2026 20:35:31 +0100
+Message-ID: <19a2b7d308f5cdfa651fee727c1423833380ea1b.1778700929.git.sean@starlabs.systems>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260513-hci_send-v1-1-ae3eef758280@igalia.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIzMDU0Nj3YzkzPji1LwUXTMTAyNLg5RU88TkZCWg8oKi1LTMCrBR0bEQfnF
- pUlZqcglIv1JtLQBLU7D6bAAAAA==
-X-Change-ID: 20260513-hci_send-640290de7acc
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Gustavo Padovan <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel-dev@igalia.com, 
- syzbot+97721dd81f792e838ba0@syzkaller.appspotmail.com
-X-Mailer: b4 0.15.2
+Content-Transfer-Encoding: 8bit
 
-Syzbot reported a warning when L2CAP calls queue_work() on the hdev
-workqueue while it's being drained. This can happen during device reset or
-close paths for hci_send_acl(), hci_send_sco() and hci_send_iso().
+Commit 8020c41b39f5 ("usb: core: allow ACPI-managed hard-wired ports
+to power off") allows internal USB devices on ACPI-managed hard-wired
+ports to use the existing runtime power-off path. For Intel combined USB
+Bluetooth controllers, btusb still keeps runtime remote wake enabled for
+as long as the adapter is open, which prevents the USB PM core from
+dropping the last child reference and powering the port off while idle.
 
-The workqueue is drained in hci_dev_do_reset() and in hci_dev_close_sync():
-  - hci_dev_close_sync() clears the HCI_UP bit before draining
-  - hci_dev_do_reset() sets HCI_CMD_DRAIN_WORKQUEUE before draining
+Only keep runtime remote wake enabled while the controller is expected
+to signal activity on its own: established links, discovery, LE scan,
+LE advertising, or BR/EDR page/inquiry scan. When those are idle, clear
+needs_remote_wakeup so autosuspend can power-manage the port and a later
+host-initiated command can resume the device again.
 
-Add these checks before queuing tx_work, and free the SKB if it's not
-queued for transmission.
+Cache the BTUSB_INTEL_COMBINED match flag in btusb_data so the runtime
+wake decision can be made from the open and receive paths, where the
+usb_device_id used during probe is no longer available.
 
-Fixes: 3eff45eaf817 ("Bluetooth: convert tx_task to workqueue")
-Reported-by: syzbot+97721dd81f792e838ba0@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=97721dd81f792e838ba0
-Signed-off-by: Heitor Alves de Siqueira <halves@igalia.com>
+Signed-off-by: Sean Rhodes <sean@starlabs.systems>
 ---
- net/bluetooth/hci_core.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ drivers/bluetooth/btusb.c | 50 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 48 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index c46c1236ebfa..5d5f8ad7d1a8 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3278,6 +3278,12 @@ void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags)
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7f5fce93d984..8e30c968fd6a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -950,6 +950,7 @@ struct btusb_data {
+ 	unsigned long flags;
  
- 	BT_DBG("%s chan %p flags 0x%4.4x", hdev->name, chan, flags);
+ 	bool poll_sync;
++	bool intel_combined;
+ 	int intr_interval;
+ 	struct work_struct  work;
+ 	struct work_struct  waker;
+@@ -1007,6 +1008,9 @@ struct btusb_data {
+ 	struct qca_dump_info qca_dump;
+ };
  
-+	if (!test_bit(HCI_UP, &hdev->flags) ||
-+	    hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE)) {
-+		kfree_skb(skb);
-+		return;
-+	}
++static bool btusb_intel_idle_power_manageable(struct btusb_data *data);
++static bool btusb_needs_runtime_remote_wakeup(struct btusb_data *data);
 +
- 	hci_queue_acl(chan, &chan->data_q, skb, flags);
+ static void btusb_reset(struct hci_dev *hdev)
+ {
+ 	struct btusb_data *data;
+@@ -1218,12 +1222,19 @@ static inline void btusb_free_frags(struct btusb_data *data)
  
- 	queue_work(hdev->workqueue, &hdev->tx_work);
-@@ -3291,6 +3297,12 @@ void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb)
- 
- 	BT_DBG("%s len %d", hdev->name, skb->len);
- 
-+	if (!test_bit(HCI_UP, &hdev->flags) ||
-+	    hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE)) {
-+		kfree_skb(skb);
-+		return;
-+	}
+ static int btusb_recv_event(struct btusb_data *data, struct sk_buff *skb)
+ {
++	int err;
 +
- 	hdr.handle = cpu_to_le16(conn->handle);
- 	hdr.dlen   = skb->len;
+ 	if (data->intr_interval) {
+ 		/* Trigger dequeue immediately if an event is received */
+ 		schedule_delayed_work(&data->rx_work, 0);
+ 	}
  
-@@ -3374,6 +3386,12 @@ void hci_send_iso(struct hci_conn *conn, struct sk_buff *skb)
- 
- 	BT_DBG("%s len %d", hdev->name, skb->len);
- 
-+	if (!test_bit(HCI_UP, &hdev->flags) ||
-+	    hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE)) {
-+		kfree_skb(skb);
-+		return;
-+	}
+-	return data->recv_event(data->hdev, skb);
++	err = data->recv_event(data->hdev, skb);
++	if (!err)
++		data->intf->needs_remote_wakeup =
++			btusb_needs_runtime_remote_wakeup(data);
 +
- 	hci_queue_iso(conn, &conn->data_q, skb);
++	return err;
+ }
  
- 	queue_work(hdev->workqueue, &hdev->tx_work);
-
----
-base-commit: 1f63dd8ca0dc05a8272bb8155f643c691d29bb11
-change-id: 20260513-hci_send-640290de7acc
-
-Best regards,
---  
-Heitor Alves de Siqueira <halves@igalia.com>
-
+ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+@@ -1991,7 +2002,8 @@ static int btusb_open(struct hci_dev *hdev)
+ 			goto setup_fail;
+ 	}
+ 
+-	data->intf->needs_remote_wakeup = 1;
++	data->intf->needs_remote_wakeup =
++		btusb_needs_runtime_remote_wakeup(data);
+ 
+ 	if (test_and_set_bit(BTUSB_INTR_RUNNING, &data->flags))
+ 		goto done;
+@@ -2034,6 +2046,38 @@ static void btusb_stop_traffic(struct btusb_data *data)
+ 	usb_kill_anchored_urbs(&data->ctrl_anchor);
+ }
+ 
++static bool btusb_intel_idle_power_manageable(struct btusb_data *data)
++{
++	struct usb_device *udev = data->udev;
++
++	return data->intel_combined && udev->parent &&
++	       usb_acpi_power_manageable(udev->parent, udev->portnum - 1);
++}
++
++static bool btusb_needs_runtime_remote_wakeup(struct btusb_data *data)
++{
++	struct hci_dev *hdev = data->hdev;
++
++	if (!btusb_intel_idle_power_manageable(data))
++		return true;
++
++	if (hci_conn_count(hdev))
++		return true;
++
++	if (hdev->discovery.state == DISCOVERY_FINDING ||
++	    hdev->discovery.state == DISCOVERY_RESOLVING)
++		return true;
++
++	if (hci_dev_test_flag(hdev, HCI_LE_SCAN) ||
++	    hci_dev_test_flag(hdev, HCI_LE_ADV) ||
++	    hci_dev_test_flag(hdev, HCI_ADVERTISING) ||
++	    test_bit(HCI_PSCAN, &hdev->flags) ||
++	    test_bit(HCI_ISCAN, &hdev->flags))
++		return true;
++
++	return false;
++}
++
+ static int btusb_close(struct hci_dev *hdev)
+ {
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+@@ -4118,6 +4162,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 	data->recv_bulk = btusb_recv_bulk;
+ 
+ 	if (id->driver_info & BTUSB_INTEL_COMBINED) {
++		data->intel_combined = true;
++
+ 		/* Allocate extra space for Intel device */
+ 		priv_size += sizeof(struct btintel_data);
+ 
