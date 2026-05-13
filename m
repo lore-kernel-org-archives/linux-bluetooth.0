@@ -1,63 +1,101 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598D538E11A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2026 17:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C3D4A13A1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2026 17:31:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778693314; cv=none; b=CRESBG71FBhpkvwge6qhCS1TnnIaxpc50ONWkly5cIF3Jci5i0yYRQ3mwqHVFLU1lSmH8Lmdg0leMfWLWdOgbcN2OAQk8s+VS7xG1GCFyd22eATJhkVijnPBzPfscziBpGAwAuiuirWL4UQMIWzj1nYubphbaOmMMicpqip88bw=
+	t=1778693460; cv=none; b=RPT+n6W8sh46pon0DereMbTrVL29S+olcMSYbizy2UIQKovA40p/Xre4ryU2eNktx+0o+c2cPMmoadskdr9xeZpJgHDPIcXgqJidZIrXEWHVzotedt4Uu1AJJK4T6MpcFIwl5d530uKjywGqdJvMP21g/xfjEQ2e2LzhoctFZEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778693314; c=relaxed/simple;
-	bh=lDIWj0wctBRS1lhJkcxgpSonstTWnylFJZuyiRkGPAY=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=JPliQQRWghNkLEdmhZSWsC8KLgmZ7fIYz34XSeL6AMVv+YQzB15/yGhV9ftlsEgpZF6hiIjBdQAFIuKugw/E4cP4L1wLPPGlAwtrbuV7tW69asrOpQcdxNne9h49KT2I7WUZEkRFP9GF8PGvHHs2J6JvLst6YPmNgkNV1EENlQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=A8O2NSJq; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1778693460; c=relaxed/simple;
+	bh=OuwdTUIR0xm4xHjVd8jGTcI4r9judw6RN7SzrK2wMMw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=XQ9LcAEz2f6BgjfD/4DqGVGPO1dght1Jn6FiQwqdcQz/agpjhbFd/jOiDSEmGwhC67FhEzbrxgUYkHCbGPcQE2lxuCLzJmvcnAitTTtG7QW0Jo6/UDk0Pzf13ISv6xZTs1im6qjhvSQto466qOVoyJmtVYoq+2jRZsY/aW39dNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NC3RA/TT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="A8O2NSJq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1778693312;
-	bh=mU65xPn4a4o1sVf9TBT7sDxFbpFSHAoXiOAvXYl6E5U=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=A8O2NSJq221XuWADqTk0nH1lY3X/YrTb0ZKp2WVWuFeGXtfYg92rpZoQdLV9HiPzW
-	 bjVQ0N0uJxW5tYCNMdMtslgnmMrv+ln7hVqukyjCGXI/lrngrDPaBiMuDq/hlqbVmS
-	 R6O5HbXpLCvpMxPzb7tAL6nDJIhKWtwLzWHQhAek=
-Received: from github.com (hubbernetes-node-6f2f154.ac4-iad.github.net [10.52.141.43])
-	by smtp.github.com (Postfix) with ESMTPA id A2031781009
-	for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2026 10:28:32 -0700 (PDT)
-Date: Wed, 13 May 2026 10:28:32 -0700
-From: raghava447 <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1094333/000000-f91af1@github.com>
-Subject: [bluez/bluez] f91af1: shared/bap: set QoS state when CIS is lost
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NC3RA/TT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A285C19425;
+	Wed, 13 May 2026 17:31:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778693460;
+	bh=OuwdTUIR0xm4xHjVd8jGTcI4r9judw6RN7SzrK2wMMw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NC3RA/TTGDr7BSCjzjoPLBcNyaxuQJIWQTx7egYbnnKGuOCZR5g67y2qt/Nxhhw8d
+	 KRPWejKkvEezoqXTxEFfAjNG4bxVTBPWCI+j5n1rUwZUdvxdQ7SIMqydMqisahvPRM
+	 C3hZ4ddn7P3+sSY1pPjbt+IvytvIERwbwvPO0w4ucPOGq3c8DlHc8MpRuOehRfSosZ
+	 62vxaswbj+0urSQpDtqFe13p6oAM8Wxz7MXCMaOF9/8m6gNfDEbyHNWpoIS7Am00je
+	 t2KivpNIAFU/tri6IhpLnVfzMQPiEPuucA8HsMA6rn7dsN6P258+8dtbR+LLr1Mdih
+	 J/rbIHJCd8bwQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9DD3393023E;
+	Wed, 13 May 2026 17:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3] Bluetooth: btusb: Add support for Intel Lizard Peak 2
+ (0x8087:0x0040)
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <177869340530.3749256.5585432261077716049.git-patchwork-notify@kernel.org>
+Date: Wed, 13 May 2026 17:30:05 +0000
+References: <20260512083444.1214935-1-ravindra@intel.com>
+In-Reply-To: <20260512083444.1214935-1-ravindra@intel.com>
+To: Ravindra <ravindra@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+ kiran.k@intel.com, chethan.tumkur.narayan@intel.com
 
-  Branch: refs/heads/1094333
-  Home:   https://github.com/bluez/bluez
-  Commit: f91af1627fdca285e516f802c64a15b3e27b2c3f
-      https://github.com/bluez/bluez/commit/f91af1627fdca285e516f802c64a15b3e27b2c3f
-  Author: raghavendra <raghavendra.rao@collabora.com>
-  Date:   2026-05-13 (Wed, 13 May 2026)
+Hello:
 
-  Changed paths:
-    M src/shared/bap.c
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  shared/bap: set QoS state when CIS is lost
+On Tue, 12 May 2026 14:04:44 +0530 you wrote:
+> Device from /sys/kernel/debug/usb/devices:
+> 
+> T:  Bus=09 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+> D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=8087 ProdID=0040 Rev= 0.00
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> 
+> [...]
 
-This is used to pass PTS tests BAP/USR/SCC/BV-167-C and BAP/USR/SCC/BV-168-C.
+Here is the summary with links:
+  - [v3] Bluetooth: btusb: Add support for Intel Lizard Peak 2 (0x8087:0x0040)
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a9a4dd96b77c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
