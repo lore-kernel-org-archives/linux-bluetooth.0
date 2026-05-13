@@ -1,27 +1,27 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6B74CA279
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA7784CA287
 	for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2026 16:17:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778689070; cv=pass; b=hliEBWHJU/1NyH8hvRI+N0BH4dSxwABu84Z2YFuVJEzRMOHuadgi19EDMdQ2z/i5Zp4Aj2KxbMQ/EHMezv6pSqmv/d3aWZ3B684c6qa9elgwS/kPpGMIwUwwzhWuWuiLAZYyAEtXvb3mqA7pHghmN5CvBkF4YeVtsseBsp9JNVY=
+	t=1778689070; cv=pass; b=MBhGRgK0d0+dtr4S1K88rq5J2UQtQAGa5TAwFoPT9tQjARZoyNglA1LBJYEj0myqL1VyDrTnSPrqHZ5Deqq1m8347nMLotFdxM8p1Vm2jvs3SnCYIbLXY+FV99cJ478Q9W9kxVSntSic+07+Kg0LsLc6HSSONViiH9VNh/uPKfw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1778689070; c=relaxed/simple;
-	bh=ZZTsQfjbr70DmSnCepEJOmMgM5B6avHmBoVmg+3th+E=;
+	bh=r8vhe6TJzV2iFgZE4/ALec9B9lFn/qooMLcTLsffhV8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lbL/BD5/UqUR6ZSwJHtPBQi1ykMsag5RC2W3ZDEfc4qInviDnX4H2xqjOgmGS/V+FMhkSrLvLYAXZfBu/CZ9kUw2F77Py0pXb9ZveIMr8Zk4P3p1xjVsQXn4LlJf+ys9BQL6yCZaI1pb2rXd0qfD0CrHQJGDY0JS38/SRMiK+YU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=qKNOjJTr; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=Uwb1rQmz1/v3kY7+vq1js5M6ugTat6SY0ZlcgLOpBuiV3WSdLTmNQj2XZTwWvFE1kCXVj79B0TLRFean0vXCocyOuZltBvoMyXoRF/DeD32EKZVyKO57ufioo6jgKs02u9kPQamYWMUv1rt1G3D66lQ/3AFACgeUaRmubEqA8Xg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=huJYkDEl; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="qKNOjJTr"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="huJYkDEl"
 Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a02d])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gFzBq55ypzyZB;
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4gFzBq2l5Lz10Th;
 	Wed, 13 May 2026 19:17:39 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
 	t=1778689059;
@@ -29,14 +29,14 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0HqNlGy1bcubGN7AMATeQllUyvR56fuKIywKzhPJYQE=;
-	b=qKNOjJTr+Xay5XjCeOBcG13hp6A2AW8oilM40sMPHclBkDxJOVzzP9+K81NHgpI82woMM5
-	4EduV9+cuWLWePZ59Z7C7vIYWHpxA2MQdMQB60nU3vLLNca8hedbcvAzkRL2fhaDsE9jqC
-	IQ/KyS8TjpEsxZGkkFWZZXbwx8DHxeg=
+	bh=b0JMVZc6OPnkkDRh0OCQ8uUU3qN0ud7vnxHqHvfq7mo=;
+	b=huJYkDElDpW8ZoE3yQcW+9p0HldlT3qtgD9v1ylMBTILVrlcLurQXzZn9ItgTCYxe9TQdz
+	sQBWos6rAONvVABz3QJWOJEQakTiAwasmkRx34/bNgisKay62GUI/VBs/Ka8/lABGyAwaW
+	MTnyjITua1Jf4WMkJf2apn0q0tFSWrQ=
 ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1778689059;
-	b=GelYbB03AxIPLn80rYMK6KBaUmplFGopuYs7+0lM/7KoDh6YcuGObxL1SypCpgy3xhM351
-	5GutsdcgZYb2DewCl+llQKVRdHbhKRi9noPMXKyQdScuFSFotHovKVH9/rcCrJTpaslF0E
-	ngdZ3Zbn/HdPHIKYg7NKtHxBWJPjwf0=
+	b=O0sz29LvCuucqjIIWlPod2W+WsYE91MQA51xDbqff6e9G7gm+5vjhuH/j2et9Gb/XtF1TM
+	3TTiNrU4QdpU5QGdi/D09GGnPqIZupnyA19ACyIyE5ihqDM7Xj9mIYPApOWp5UJ2A8EJvr
+	Rn3C8zbEZKj43RDEh6QTc4GF0qFjqlo=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -46,16 +46,16 @@ ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0HqNlGy1bcubGN7AMATeQllUyvR56fuKIywKzhPJYQE=;
-	b=TuXceCTV7Uhn0XcRL2at3bA5Y2AzLcvPRarkaAocR2VhAAxpNLzMK4De28RQxwrA9Q5wla
-	c8ZXmfN66vBR1JXcwmvH8CoX5Q6d9FATLTj1O2PUlgEcbG2hgJrXzNjAxfREm2owQ33goA
-	He4G9sZ31QRbOsVJHUUqH8pmVB/Kpmg=
+	bh=b0JMVZc6OPnkkDRh0OCQ8uUU3qN0ud7vnxHqHvfq7mo=;
+	b=fAlsdbK5/E1MHNxfgEZTvd3qB/SPRPQHRRvvVekM/dnbn5tLxoCykxvkJv59MR6eC8uH+1
+	MNfYKhMyyITgOLMjN9gSwSxU2lx6m1nDGGrPxjXZ4TQcIUB62ifBI0ypACaeM2ntn8uDft
+	v5aJV+xOSXwWHQ7SBPSUvc6EaBSznVY=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v5 08/16] test-runner: use virtio-serial for implementing -u device forwarding
-Date: Wed, 13 May 2026 19:17:25 +0300
-Message-ID: <5d818c768189b6d0a8e5a4b90eb41cc7b9932624.1778688966.git.pav@iki.fi>
+Subject: [PATCH BlueZ v5 07/16] test-runner: allow source tree root for -k
+Date: Wed, 13 May 2026 19:17:24 +0300
+Message-ID: <391ce2cd9d3130d055e5d141fb6589ca7c6569f9.1778688966.git.pav@iki.fi>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <cover.1778688966.git.pav@iki.fi>
 References: <cover.1778688966.git.pav@iki.fi>
@@ -67,70 +67,92 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Using pci-serial to forward eg. btvirt sockets is unreliable, as qemu or
-kernel seems to be sometimes dropping part of the sent data or insert
-spurious \0 bytes, leading to sporadic errors like:
-
-    kernel: Bluetooth: hci0: command 0x0c52 tx timeout
-    kernel: Bluetooth: hci0: Opcode 0x0c52 failed: -110
-    btvirt: packet error, unknown type: 0
-
-This appears to occur most often when host system is under load, e.g.
-due to multiple test-runners running at the same time.  The problem is
-not specific to btvirt, but seems to be in the qemu serial device layer
-vs. kernel interaction.
-
-Change test-runner to use virtserialport to forward the btvirt
-connection inside the VM, as virtio-serial doesn't appear to have these
-problems.
+Allow passing source tree root for -k option, look up kernel below it.
 ---
- tools/test-runner.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ tools/test-runner.c | 42 ++++++++++++++++++++++++++++--------------
+ 1 file changed, 28 insertions(+), 14 deletions(-)
 
 diff --git a/tools/test-runner.c b/tools/test-runner.c
-index b3e0b0cfe..0e3bfb8b7 100644
+index 3de3a9d74..b3e0b0cfe 100644
 --- a/tools/test-runner.c
 +++ b/tools/test-runner.c
-@@ -306,7 +306,7 @@ static void start_qemu(void)
- 				testargs);
+@@ -93,18 +93,31 @@ static const char *kernel_table[] = {
+ 	NULL
+ };
  
- 	argv = alloca(sizeof(qemu_argv) +
--			(sizeof(char *) * (6 + (num_devs * 4))) +
-+			(sizeof(char *) * (8 + (num_devs * 4))) +
- 			(sizeof(char *) * (usb_dev ? 4 : 0)) +
- 			(sizeof(char *) * num_extra_opts));
- 	memcpy(argv, qemu_argv, sizeof(qemu_argv));
-@@ -330,14 +330,19 @@ static void start_qemu(void)
- 	argv[pos++] = "-append";
- 	argv[pos++] = (char *) cmdline;
+-static const char *find_kernel(void)
++static bool find_kernel(const char *root, char path[PATH_MAX])
+ {
++	struct stat st;
+ 	int i;
  
-+	if (num_devs) {
-+		argv[pos++] = "-device";
-+		argv[pos++] = "virtio-serial";
-+	}
-+
- 	for (i = 0; i < num_devs; i++) {
- 		char *chrdev, *serdev;
- 
- 		chrdev = alloca(48 + strlen(device_path));
- 		sprintf(chrdev, "socket,path=%s,id=bt%d", device_path, i);
- 
--		serdev = alloca(48);
--		sprintf(serdev, "pci-serial,chardev=bt%d", i);
-+		serdev = alloca(64);
-+		sprintf(serdev, "virtconsole,chardev=bt%d,name=bt.%d", i, i);
- 
- 		argv[pos++] = "-chardev";
- 		argv[pos++] = chrdev;
-@@ -910,7 +915,7 @@ static void run_command(char *cmdname, char *home)
+-	for (i = 0; kernel_table[i]; i++) {
+-		struct stat st;
+-
+-		if (!stat(kernel_table[i], &st))
+-			return kernel_table[i];
++	if (root) {
++		snprintf(path, PATH_MAX, "%s", root);
++		if (stat(path, &st))
++			return false;
++		if (!(st.st_mode & S_IFDIR))
++			return true;
  	}
  
- 	if (num_devs) {
--		const char *node = "/dev/ttyS1";
-+		const char *node = "/dev/hvc0";
- 		unsigned int basic_flags, extra_flags;
+-	return NULL;
++	for (i = 0; kernel_table[i]; i++) {
++		if (root)
++			snprintf(path, PATH_MAX, "%s/%s", root,
++						kernel_table[i]);
++		else
++			snprintf(path, PATH_MAX, "%s",
++						kernel_table[i]);
++		if (!stat(path, &st))
++			return true;
++	}
++
++	return false;
+ }
  
- 		printf("Attaching BR/EDR controller to %s\n", node);
+ static const struct {
+@@ -1209,7 +1222,7 @@ static void usage(void)
+ 		"\t-U, --usb <qemu_args>  Provide USB device\n"
+ 		"\t-q, --qemu <path>      QEMU binary\n"
+ 		"\t-H, --qemu-host-cpu    Use host CPU (requires KVM support)\n"
+-		"\t-k, --kernel <image>   Kernel image (bzImage)\n"
++		"\t-k, --kernel <image>   Kernel bzImage or source tree path\n"
+ 		"\t-o, --option <opt>     Additional argument passed to QEMU\n"
+ 		"\t-h, --help             Show help options\n");
+ }
+@@ -1236,6 +1249,8 @@ static const struct option main_options[] = {
+ 
+ int main(int argc, char *argv[])
+ {
++	char kernel_path[PATH_MAX];
++
+ 	if (getpid() == 1 && getppid() == 0) {
+ 		prepare_sandbox();
+ 		run_tests();
+@@ -1335,14 +1350,13 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
+ 
+-	if (!kernel_image) {
+-		kernel_image = find_kernel();
+-		if (!kernel_image) {
+-			fprintf(stderr, "No default kernel image found\n");
+-			return EXIT_FAILURE;
+-		}
++	if (!find_kernel(kernel_image, kernel_path)) {
++		fprintf(stderr, "No kernel image found\n");
++		return EXIT_FAILURE;
+ 	}
+ 
++	kernel_image = kernel_path;
++
+ 	printf("Using QEMU binary %s\n", qemu_binary);
+ 	printf("Using kernel image %s\n", kernel_image);
+ 
 -- 
 2.54.0
 
