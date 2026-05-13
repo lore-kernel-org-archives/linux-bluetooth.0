@@ -1,105 +1,173 @@
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35D77083C;
-	Wed, 13 May 2026 02:54:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
+Received: from mail-pf1-f193.google.com (mail-pf1-f193.google.com [209.85.210.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFAF0391E66
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2026 03:13:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778640896; cv=none; b=eyBnXafci3huLeg3ypkcS5cAufYdRnfjW2kNqHLksUauLhAk1c6w0PHAKVO1C7iwF2pRW2uBuyrKjcBTPXeIu+qfKVdNjZTyTFBtT6WCQGxdpmWVD4oVm+v9nYyhKshtati05Yo1KDAu+HNG0VLHeO21f2f4krJ7ViSv3ynaiBM=
+	t=1778641988; cv=none; b=NPecp+kC4O+/7IwFgPFfJXTqD4lYF9DpQsq1cNpDr5eZB8TH3G8A8eMf+WByUjST+T1xVMYHXjHRmqVOKreAk9uDThqs/AwgWtoW1W8HS3eVbiyNza5t1HqdNcrRBTvF/3w2LNNyQykHnKsQ/vEM8Kxf/h4YEGguwLJj2KJw+dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778640896; c=relaxed/simple;
-	bh=xBTToRtLbFsWRe/CjaOfqkgZRWur/hO+jRG3mmJeA0k=;
-	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=cpMxGPJDaMqjMmY97V9t2Wl3m9XttmfEZPDJYwRUJQxcUlqonnLdxWx0g2z71JgPBK6rn4WxiJ5s7s9GRhJFpHP+L7UgnoioxZen/mZomSbbGnva+rliZVQznodtyIORmqEQR9uQIYW+tyeoRpRvX9PNwKxCngeJGBylN2cwF7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn; spf=pass smtp.mailfrom=stu.xidian.edu.cn; dkim=fail (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b=zg1SAIQv reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
+	s=arc-20240116; t=1778641988; c=relaxed/simple;
+	bh=3jyMf4YQe7LloZwYO+qq/3QqYv5SZ/8ELYvdc7UTfKk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LVb/wPNrAhRlvq6bFXo0eENhZ1FgsAFyXAhm+43xqFSiWD5QZkkI+IFEf+qChKY7jK2mh+M2zHzPiUTJvg3NMhZJZjfoOcrJa8plgK65tF+JfmuSKNcZ8nEFS8L8IP+Y7rK7gk4I/QCI+lePCLe25a/pxWAzu5xiV0kXT3KZbsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WaP0Bksz; arc=none smtp.client-ip=209.85.210.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b="zg1SAIQv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WaP0Bksz"
+Received: by mail-pf1-f193.google.com with SMTP id d2e1a72fcca58-83945063f70so3357115b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 May 2026 20:13:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=stu.xidian.edu.cn; s=dkim; h=Received:Date:From:To:Cc:Subject:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID;
-	bh=pZFsEvJIfMgA5ozNv8+8p5qlEdoOXE/kvIsZHRyzL+E=; b=zg1SAIQvyw7Ky
-	Qlb1K4cJVBEeTGBP9N5Go4w7V9swm+lx9DJju5uVbP5F8tmYj6XrtdHc7bqRA+we
-	93TRzBtZd+t+v0yFNKKmCGLyHZFhvM0EKG12kbQQssOI4vucN74kyrD7tuZuy9U4
-	JFc+7TyoPsaUF2lUf7FQYHr9F0g4oU=
-Received: from 25181214217$stu.xidian.edu.cn ( [113.200.174.80] ) by
- ajax-webmail-hzbj-edu-front-4.icoremail.net (Coremail) ; Wed, 13 May 2026
- 10:54:41 +0800 (GMT+08:00)
-Date: Wed, 13 May 2026 10:54:41 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?546L5piO54Wc?= <25181214217@stu.xidian.edu.cn>
-To: "Marcel Holtmann" <marcel@holtmann.org>,
-	"Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-serial@vger.kernel.org
-Subject: BUG: General Protection Fault in h5_recv due to TTY line discipline
- race condition (TIOCSTI)
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.3-cmXT6 build
- 20250410(2f5ccd7f) Copyright (c) 2002-2026 www.mailtech.cn
- mispb-8dfce572-2f24-404d-b59d-0dd2e304114c-icoremail.cn
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+        d=gmail.com; s=20251104; t=1778641986; x=1779246786; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=g5PuE0GNhnbIqlYAFwEGtvGgzGg7kilah+ZL5RNKSSg=;
+        b=WaP0BkszWsxnHMZ3J2OV6M3//BFanwaYtlAT7bLmWpmqboQTFwsCypQaV71Lx2Qmjy
+         a8DMwHbmSfrT39b94mkJhK6eZT3mpsGO7oVAiXkKidMV/9nqvsBU5vltGh1V+rDVAmm2
+         fpBSYpEzeo6OGbrui2g670c/T16/XwuKlDXl75H6lhcP7/6XhVUirNTxMN7h0thZRuiL
+         00SZpnwu87DMuWwH+iz/1UEwtzUqOhSY/5Yhj5kJ/EyHoiRwUUE6qMoFBO6uV8KgcQgt
+         aPeT6B8L5SLjPBsUWw/xLMVQ+BvvmUucnaydVoN4RZZb+U+KKhyWuc1Zg5/FGfV2gSdZ
+         F87g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778641986; x=1779246786;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g5PuE0GNhnbIqlYAFwEGtvGgzGg7kilah+ZL5RNKSSg=;
+        b=MV3dAbXpW2Lav9uMRv6uNxR9dIflko1DMBtaAv9iqafPo5KejeiLEhuiC5TtTfsF8R
+         dC5X0MgQh/kR8J52DRitd/QTanVT5v+IxDmqERB/h6FWs4BAyxzcB5uo9m1N2Y8lfBtU
+         o/t4LO5ry+WWbYlgrS8Uy48oFgPPpmc7LcYZ+YNawwCI4jwMV0229RS/BCT+WEc/f8Kl
+         vqTmNM41PJEvLw/dOMFzkjRWtYzH2ofA8c0vmTiJ/SkPFhH46CnwaKW9JEz3SOfsRt9U
+         pGVTcSg9lZTgO7DlNWS3qtQh2lGMGa+wzjXg2FULxBI5L9Px6/7wP8vKSp2JBYuqAm7a
+         vebw==
+X-Gm-Message-State: AOJu0YwWQmC7F3SfrRNg1NaqFCQZCXPutl6+QVameQg0+aPLnCreaO8n
+	ZQjOHzFV2Lqj8DXFE4ACjmEQzIo3jhJInHFzOBPuIhVlzN+vZc2mjwce
+X-Gm-Gg: Acq92OFpcUFT6FuJbmM/YStdBDScXDnZZHSee0HnmKTSM1L/u1p6tw2/Mfhc3Br1465
+	KvPYbmfpJNVzhvkddmHSK5UXo2HglDoClW9m52pTh8LW9ZciQv3XSTDjXRnutjClIvLQrvCqZ2B
+	aFkEL+8Espsbo9oAOnkO27BsWwdOmcN0yJxZq86qPbhzpijsc2E0S6TythVOt1c3rvd3ybYdmrM
+	2F1bKrVrDRRWv1D090tF4oILgX5D060OQFAQIpt9WDzKIhZ9Ib22+xGfhRrHPA9TQnV4k+8nbI8
+	VnGYA7aNOjLlwNly6e0jVKVltKbujqVpIOzdym7a0fU5HbB4jaEOSY6Ezbo/IThCqlPGfRTGje4
+	i47jRSRwyJ9vdCrH36NRrG4I9Zl6tGdhbDuMmYn4jB2aZfHfX8aG6L3aOX9CBVDDbv6uPArOyiU
+	y/EkUcOjWNBA9TlkNOoS3JIkyJRnmYF5I=
+X-Received: by 2002:a05:6a00:1886:b0:829:b08f:7353 with SMTP id d2e1a72fcca58-83f02d2e731mr1461990b3a.7.1778641985850;
+        Tue, 12 May 2026 20:13:05 -0700 (PDT)
+Received: from localhost ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83965d35b3bsm23227883b3a.24.2026.05.12.20.12.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 May 2026 20:13:05 -0700 (PDT)
+From: Zhang Cen <rollkingzzc@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zerocling0077@gmail.com,
+	2045gemini@gmail.com,
+	Zhang Cen <rollkingzzc@gmail.com>
+Subject: [PATCH] Bluetooth: bnep: reject short frames before parsing
+Date: Wed, 13 May 2026 11:12:46 +0800
+Message-Id: <20260513031246.651762-1-rollkingzzc@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <6f2b8e36.f987.19e1f420686.Coremail.25181214217@stu.xidian.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:BrQMCkC2Xbnx5wNqw1wNAg--.53789W
-X-CM-SenderInfo: qsvrmiqsrujiux6v33wo0lvxldqovvfxof0/1tbiAQULEWoDRF0ja
-	QACsm
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWkCw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Transfer-Encoding: 8bit
 
-CkhpIGFsbCwKCldlIGhhdmUgZGlzY292ZXJlZCBhIHNldmVyZSBOVUxMIHBvaW50ZXIgZGVyZWZl
-cmVuY2UgYW5kIHN1YnNlcXVlbnQgR2VuZXJhbCBQcm90ZWN0aW9uIEZhdWx0IGluIGBoNV9yZWN2
-KClgIHdpdGhpbiBgZHJpdmVycy9ibHVldG9vdGgvaGNpX2g1LmNgLiBUaGlzIGNyYXNoIGlzIHRy
-aWdnZXJlZCBieSBhIHJhY2UgY29uZGl0aW9uIGJldHdlZW4gdGhlIGluaXRpYWxpemF0aW9uIG9m
-IHRoZSBIQ0kgVUFSVCBsaW5lIGRpc2NpcGxpbmUgYW5kIGNvbmN1cnJlbnQgZGF0YSBpbmplY3Rp
-b24gdmlhIHRoZSBgVElPQ1NUSWAgaW9jdGwuCgpUaGlzIGlzc3VlIHdhcyBmb3VuZCBkdXJpbmcg
-ZnV6emluZyB3aXRoIGEgY3VzdG9tIExMTS1hc3Npc3RlZCBkZXZpY2UgbW9kZWxpbmcgZnJhbWV3
-b3JrLgoKIyMjIENyYXNoIFRyYWNlIChLQVNBTikKCk9vcHM6IGdlbmVyYWwgcHJvdGVjdGlvbiBm
-YXVsdCwgcHJvYmFibHkgZm9yIG5vbi1jYW5vbmljYWwgYWRkcmVzcyAweGRmZmZmYzAwMDAwMDAw
-NWY6IDAwMDAgWyMxXSBTTVAgS0FTQU4gUFRJCktBU0FOOiBudWxsLXB0ci1kZXJlZiBpbiByYW5n
-ZSBbMHgwMDAwMDAwMDAwMDAwMmY4LTB4MDAwMDAwMDAwMDAwMDJmZl0KQ1BVOiAzIFVJRDogMCBQ
-SUQ6IDc1ODMzIENvbW06IHN5ei4wLjU2MDUgTm90IHRhaW50ZWQgNi4xOC4wICMxIFBSRUVNUFQo
-ZnVsbCkgClJJUDogMDAxMDpoNV9yZWN2KzB4ZmMvMHg4ZjAgZHJpdmVycy9ibHVldG9vdGgvaGNp
-X2g1LmM6NTcyCi4uLgpDYWxsIFRyYWNlOgogPFRBU0s+CiBoY2lfdWFydF90dHlfcmVjZWl2ZSsw
-eDI1Yi8weDgwMCBkcml2ZXJzL2JsdWV0b290aC9oY2lfbGRpc2MuYzo2MjcKIHRpb2NzdGkgZHJp
-dmVycy90dHkvdHR5X2lvLmM6MjI5MCBbaW5saW5lXQogdHR5X2lvY3RsKzB4NTAyLzB4MTY5MCBk
-cml2ZXJzL3R0eS90dHlfaW8uYzoyNzA2CiBfX3g2NF9zeXNfaW9jdGwrMHgxOGYvMHgyMTAgZnMv
-aW9jdGwuYzo1ODMKIGRvX3N5c2NhbGxfNjQrMHhjYi8weGZhMCBhcmNoL3g4Ni9lbnRyeS9zeXNj
-YWxsXzY0LmM6OTQKLi4uCgojIyMgVnVsbmVyYWJpbGl0eSBBbmFseXNpcwoKVGhlIGNyYXNoIG9j
-Y3VycyBkdWUgdG8gYW4gYXJjaGl0ZWN0dXJhbCByYWNlIHdpbmRvdyBkdXJpbmcgdGhlIGxpbmUg
-ZGlzY2lwbGluZSBzZXR1cDoKCjEuIFRocmVhZCBBIGV4ZWN1dGVzIGBpb2N0bChIQ0lVQVJUU0VU
-UFJPVE8pYCB0byBzZXQgdGhlIGxpbmUgZGlzY2lwbGluZSB0byBIQ0lfVUFSVF9INS4gVGhlIGtl
-cm5lbCBzZXRzIHRoZSBgSENJX1VBUlRfUFJPVE9fSU5JVGAgYml0IGluIGBodS0+ZmxhZ3NgIGFu
-ZCBwcm9jZWVkcyB0byBjYWxsIGBoY2lfdWFydF9yZWdpc3Rlcl9kZXYoKWAsIHdoaWNoIGV2ZW50
-dWFsbHkgaW52b2tlcyBgaDVfb3BlbigpYC4KMi4gQmVmb3JlIGBoNV9vcGVuKClgIGZpbmlzaGVz
-IGV4ZWN1dGluZyBhbmQgYWxsb2NhdGVzIG1lbW9yeSBmb3IgYGh1LT5wcml2YCAoaS5lLiwgYmVm
-b3JlIGBodS0+cHJpdiA9IGg1O2AgaXMgZXhlY3V0ZWQpLCBUaHJlYWQgQiBjb25jdXJyZW50bHkg
-ZXhlY3V0ZXMgYGlvY3RsKFRJT0NTVEkpYC4KMy4gVGhlIGBUSU9DU1RJYCBjb21tYW5kIGZvcmNl
-cyBkYXRhIGludG8gdGhlIFRUWSByZWNlaXZlIHBhdGgsIGNhbGxpbmcgYGhjaV91YXJ0X3R0eV9y
-ZWNlaXZlKClgLgo0LiBJbnNpZGUgYGhjaV91YXJ0X3R0eV9yZWNlaXZlKClgLCB0aGUgY29uZGl0
-aW9uIGAhdGVzdF9iaXQoSENJX1VBUlRfUFJPVE9fSU5JVCwgJmh1LT5mbGFncylgIGV2YWx1YXRl
-cyB0byBGQUxTRSAoYmVjYXVzZSBUaHJlYWQgQSBzZXQgaXQpLCBhbGxvd2luZyB0aGUgZXhlY3V0
-aW9uIHRvIHByb2NlZWQgd2l0aG91dCBkcm9wcGluZyB0aGUgZGF0YS4KNS4gVGhlIGV4ZWN1dGlv
-biBmbG93cyBpbnRvIGBodS0+cHJvdG8tPnJlY3YoKWAgLT4gYGg1X3JlY3YoKWAuCjYuIGBoNV9y
-ZWN2KClgIGJsaW5kbHkgZGVyZWZlcmVuY2VzIGBodS0+cHJpdmAgKHdoaWNoIGlzIHN0aWxsIE5V
-TEwpLCBsZWFkaW5nIHRvIHRoZSBHUEYgd2hlbiBhY2Nlc3NpbmcgYGg1LT5yeF9wZW5kaW5nYCBv
-biBsaW5lIDU3MjogYEJUX0RCRygiLi4uICV6dSAuLi4iLCAuLi4sIGg1LT5yeF9wZW5kaW5nLCAu
-Li4pO2AuCgojIyMgUHJvcG9zZWQgRml4IERpcmVjdGlvbgoKV2hpbGUgYWRkaW5nIGEgc2ltcGxl
-IGBpZiAoIWg1KSByZXR1cm4gMDtgIGF0IHRoZSBiZWdpbm5pbmcgb2YgYGg1X3JlY3YoKWAgcHJl
-dmVudHMgdGhlIGNyYXNoLCBpdCBzZWVtcyB0aGUgcm9vdCBjYXVzZSBsaWVzIGluIHRoZSBwZXJt
-aXNzaXZlbmVzcyBvZiB0aGUgYEhDSV9VQVJUX1BST1RPX0lOSVRgIHN0YXRlIGluIGBoY2lfdWFy
-dF90dHlfcmVjZWl2ZSgpYCwgb3IgdGhlIGxhY2sgb2YgcHJvcGVyIHN5bmNocm9uaXphdGlvbiBi
-ZXR3ZWVuIHRoZSBgb3BlbmAgY2FsbGJhY2sgYW5kIHRoZSBgcmVjdmAgcGF0aCBkdXJpbmcgaW5p
-dGlhbGl6YXRpb24uCgpTaW5jZSB3ZSBhcmUgbm90IGVudGlyZWx5IGZhbWlsaWFyIHdpdGggdGhl
-IHNwZWNpZmljIGhhbmRzaGFrZSByZXF1aXJlbWVudHMgb2YgdGhlIEg1IHByb3RvY29sIGR1cmlu
-ZyB0aGUgYFBST1RPX0lOSVRgIHBoYXNlLCB3ZSBhcmUgcmVwb3J0aW5nIHRoaXMgdnVsbmVyYWJp
-bGl0eSBoZXJlIHJhdGhlciB0aGFuIHN1Ym1pdHRpbmcgYSBwb3RlbnRpYWxseSBmbGF3ZWQgcGF0
-Y2guCgpQbGVhc2UgbGV0IHVzIGtub3cgaWYgeW91IG5lZWQgbW9yZSBpbmZvcm1hdGlvbiBvciB0
-aGUgZnVsbCByZXByb2R1Y2VyLgoKUmVwb3J0ZWQtYnk6IE1pbmd5dSBXYW5nIDwyNTE4MTIxNDIx
-N0BzdHUueGlkaWFuLmVkdS5jbj4KCkJlc3QgcmVnYXJkcywKTWluZ3l1IFdhbmc=
+An L2CAP peer can deliver an empty BNEP payload or a payload that contains
+only the outer type byte. bnep_rx_frame() currently dereferences the type
+byte and, for control traffic, the control opcode before it proves that
+those bytes exist in the skb. The setup-connection control path can also
+read the setup size byte before it is present. bnep_rx_control() has the
+same problem when it is asked to parse an empty control payload.
+
+Reject empty skbs before reading the outer type byte, require a control
+opcode before parsing BNEP_CONTROL, require the setup size byte before
+using it, and make bnep_rx_control() fail zero-length control payloads.
+
+Sanitizer validation reported:
+KASAN slab-out-of-bounds in bnep_rx_frame()
+Read of size 1
+Call trace:
+  dump_stack_lvl() (?:?)
+  print_address_description() (mm/kasan/report.c:373)
+  bnep_rx_frame() (net/bluetooth/bnep/core.c:306)
+  print_report() (?:?)
+  __virt_addr_valid() (?:?)
+  srso_alias_return_thunk() (arch/x86/include/asm/nospec-branch.h:375)
+  kasan_addr_to_slab() (mm/kasan/common.c:45)
+  kasan_report() (?:?)
+  process_one_work() (kernel/workqueue.c:3200)
+  worker_thread() (?:?)
+  __kthread_parkme() (kernel/kthread.c:259)
+  kthread() (?:?)
+  _raw_spin_unlock_irq() (kernel/locking/spinlock.c:204)
+  ret_from_fork() (?:?)
+  __switch_to() (?:?)
+  ret_from_fork_asm() (?:?)
+  kasan_save_stack() (mm/kasan/common.c:52)
+  kasan_save_track() (mm/kasan/common.c:74)
+  __kasan_kmalloc() (?:?)
+  vpanic() (kernel/panic.c:576)
+  panic() (?:?)
+  preempt_schedule_common() (kernel/sched/core.c:7352)
+  preempt_schedule_thunk() (?:?)
+  end_report() (mm/kasan/report.c:219)
+
+Signed-off-by: Zhang Cen <rollkingzzc@gmail.com>
+
+---
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index d44987d4515c..f5070bbd6b57 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -208,9 +208,14 @@ static int bnep_ctrl_set_mcfilter(struct bnep_session *s, u8 *data, int len)
+ 
+ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
+ {
+-	u8  cmd = *(u8 *)data;
++	u8  cmd;
+ 	int err = 0;
+ 
++	if (len < 1)
++		return -EILSEQ;
++
++	cmd = *(u8 *)data;
++
+ 	data++;
+ 	len--;
+ 
+@@ -303,14 +308,21 @@ static int bnep_rx_frame(struct bnep_session *s, struct sk_buff *skb)
+ 
+ 	dev->stats.rx_bytes += skb->len;
+ 
++	if (skb->len < 1)
++		goto badframe;
++
+ 	type = *(u8 *) skb->data;
+ 	skb_pull(skb, 1);
+-	ctrl_type = *(u8 *)skb->data;
+ 
+ 	if ((type & BNEP_TYPE_MASK) >= sizeof(__bnep_rx_hlen))
+ 		goto badframe;
+ 
+ 	if ((type & BNEP_TYPE_MASK) == BNEP_CONTROL) {
++		if (skb->len < 1)
++			goto badframe;
++
++		ctrl_type = *(u8 *)skb->data;
++
+ 		if (bnep_rx_control(s, skb->data, skb->len) < 0) {
+ 			dev->stats.tx_errors++;
+ 			kfree_skb(skb);
+@@ -326,6 +338,9 @@ static int bnep_rx_frame(struct bnep_session *s, struct sk_buff *skb)
+ 		switch (ctrl_type) {
+ 		case BNEP_SETUP_CONN_REQ:
+ 			/* Pull: ctrl type (1 b), len (1 b), data (len bytes) */
++			if (skb->len < 2)
++				goto badframe;
++
+ 			if (!skb_pull(skb, 2 + *(u8 *)(skb->data + 1) * 2))
+ 				goto badframe;
+ 			break;
