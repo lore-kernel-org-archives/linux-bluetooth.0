@@ -1,78 +1,369 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from out-6.smtp.github.com (out-6.smtp.github.com [192.30.252.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846EA3F412F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2026 16:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DA43264E9
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2026 17:28:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778690099; cv=none; b=JZq+Ycz++9vQqbbVOwVHGWVkMemwKUvWTxnYc4lQBLAccHr5AhxBkay/zB2t+UKk5OnZbMYt5zjF65BrtCycQmyajgd8Z1ywKytWslOWsm5YNIZuJYoVD3E9tIkVoWUROCZT5gF1kQa9omJovViyQ6eQSBcV5eEk8AsJg8hPXfs=
+	t=1778693314; cv=none; b=tlVFsIpmLrQ23xiQTwxNuxJK9RHOAktTDYfHKOM+T/kT0NeJrYWjP4X3nJj+VEEe5j9zvobPgIrK02SNgc9TAP0prsBQVXO255JE+ik4oKhmkvRTk6FT8SnjRPU44itTPqU6uSw76aQQL8QgwzxqlcPKUbNFRvWQM6OVdUV9mOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778690099; c=relaxed/simple;
-	bh=P096Iit3Pq9QqlNZEjTZNO6+6l1tEpsE92aD49M31oc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F6NsAm7RvXGNkvpIDstO13c/3b4kuF5ABZyC5JgNu3Mm9E9BnK7nTyBGwJoilxQi/p6ys2IWwuUZ+i6RAzS46U9b38jhOWgB5ub8dNH8zG++ZTzFm6ljnHSnBF3tkyPj4x9PCnKveW5pQMz/cff/1VGQVbhr/Y86N2q8SqSo0Co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=PNk+jRPe; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1778693314; c=relaxed/simple;
+	bh=+hUCqExMKZj3eYnRdB3+scrWy4/f+Wbh/01u/kP1KrE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=COsCzzjooNOgky0iX6zWThIFxYqUNb/0GfaWWcXqnoEcOHKTBygiKz1ntLn3oYlf6hpDMvsHHbMBuFP2oX6SAhsKgvV4ToMngIHKsOGacM3AF8Z5fiTm22yzCUM0bsQo1Z4c8oDq8hNbCl6xAxahEYREyubjGb5HKY9gAB2RK+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Z5oTNH8p; arc=none smtp.client-ip=192.30.252.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="PNk+jRPe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1778690096;
-	bh=P096Iit3Pq9QqlNZEjTZNO6+6l1tEpsE92aD49M31oc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PNk+jRPeRwiMBQQLjdpuXGjKT9OjF/IvBpZkiu6GO4MOMSHH8o57jjJAUWxDvJsYo
-	 wNaaygubjKB592pi3HUZPlYlIQX1zqN3id1Z6eM9EES/RwlRUvYhJCEbucJ3i4is2L
-	 0Ge7oSQUMgVliRHFlafRT353a7PXoCLPaJdo70mOzNbngF0zNEhq+Kvs3rDoaffIln
-	 loggS9KOWeqbSAse0uxPhIXd0pYiMISWk9HmAPbocgnNC5yB/xwj1GRwd7YUH7RcJw
-	 ubIL6wOsaVIsBUIQCJNJdaYV3V15x8XZtiAYUTD7u7dz+ZYLQ6lzVZT2xPKf15RoXp
-	 sR1wnQCJSS9OQ==
-Received: from raghavendra-XPS-13-7390.. (unknown [100.64.1.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: raghavendra)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 4AEF017E12AA;
-	Wed, 13 May 2026 18:34:56 +0200 (CEST)
-From: raghu447 <raghavendra.rao@collabora.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Z5oTNH8p"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1778693310;
+	bh=icTitDZx6RDos6DKC7BJnJKUC4jOt1EAz3KuO2+s+Q8=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Z5oTNH8pB5rovDqq7XTwIYEoHcwJyXWkyc2AoukxCoB2VSUcRNFbXds4KHBl2VCMy
+	 KXwwjEg5CerP21a9mQnaVDpOrmErgdoaRAzGQb1dX6Czn2Mzxe3PcnFR7H5AR5yOBp
+	 iJnfAqMdbtdTPn1gHvP8+dwA9p12m89Y9+B+kCts=
+Received: from github.com (hubbernetes-node-c048ddc.va3-iad.github.net [10.48.12.54])
+	by smtp.github.com (Postfix) with ESMTPA id A1283781155
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 May 2026 10:28:30 -0700 (PDT)
+Date: Wed, 13 May 2026 10:28:30 -0700
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: raghavendra <raghavendra.rao@collabora.com>
-Subject: [PATCH BlueZ v2 1/1] shared/bap: set QoS state when CIS is lost
-Date: Wed, 13 May 2026 22:04:35 +0530
-Message-ID: <20260513163435.11344-2-raghavendra.rao@collabora.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260513163435.11344-1-raghavendra.rao@collabora.com>
-References: <CABBYNZLcvmErUXHUXnAJOMv+saSP7aodVtfRV0QnL2-yXg=z2w@mail.gmail.com>
- <20260513163435.11344-1-raghavendra.rao@collabora.com>
+Message-ID: <bluez/bluez/push/refs/heads/1094320/000000-d2d058@github.com>
+Subject: [bluez/bluez] 57ef69: emulator: btvirt: check pkt lengths, don't get
+ stu...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: raghavendra <raghavendra.rao@collabora.com>
+  Branch: refs/heads/1094320
+  Home:   https://github.com/bluez/bluez
+  Commit: 57ef69b7882151f5e6d94e9be8e3902277f81c80
+      https://github.com/bluez/bluez/commit/57ef69b7882151f5e6d94e9be8e3902277f81c80
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
 
-This is used to pass PTS tests BAP/USR/SCC/BV-167-C and BAP/USR/SCC/BV-168-C.
----
- src/shared/bap.c | 4 ++++
- 1 file changed, 4 insertions(+)
+  Changed paths:
+    M emulator/server.c
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 78ba22259..60710a806 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -3028,6 +3028,10 @@ static void bap_stream_set_io(void *data, void *user_data)
- 		else
- 			bt_bap_stream_start(stream, NULL, NULL);
- 		break;
-+	case BT_BAP_STREAM_STATE_STREAMING:
-+		if (fd < 0)
-+			stream_set_state(stream, BT_BAP_STREAM_STATE_QOS);
-+		break;
- 	case BT_BAP_STREAM_STATE_DISABLING:
- 		if (fd < 0)
- 			bt_bap_stream_stop(stream, NULL, NULL);
--- 
-2.43.0
+  Log Message:
+  -----------
+  emulator: btvirt: check pkt lengths, don't get stuck on malformed
 
+Don't try to parse packet before whole header is received.
+
+If received data has unknown packet type, reset buffer so that we don't
+get stuck.
+
+
+  Commit: 639f99a94734bcc1eb812a8d9dbf4e776017287e
+      https://github.com/bluez/bluez/commit/639f99a94734bcc1eb812a8d9dbf4e776017287e
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
+
+  Changed paths:
+    M emulator/main.c
+
+  Log Message:
+  -----------
+  emulator: btvirt: allow specifying where server unix sockets are made
+
+Make --server to take optional path name where to create the various
+server sockets.
+
+
+  Commit: ad264c862239892f0d9965b0b679ae36c88b5777
+      https://github.com/bluez/bluez/commit/ad264c862239892f0d9965b0b679ae36c88b5777
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
+
+  Changed paths:
+    M emulator/server.c
+
+  Log Message:
+  -----------
+  emulator: btvirt: support SCO data packets
+
+Support also SCO data packets in btvirt.
+
+
+  Commit: 2bf4030bb151631b24a425a82bddc8f3b2649595
+      https://github.com/bluez/bluez/commit/2bf4030bb151631b24a425a82bddc8f3b2649595
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
+
+  Changed paths:
+    M emulator/btdev.c
+
+  Log Message:
+  -----------
+  emulator: btdev: clear more state on Reset
+
+On controller Reset command, initialize most fields in struct btdev to
+zero, similarly to the state just after btdev_create().
+
+This excludes some fields like command bitmasks, which hciemu may have
+adjusted.
+
+To make this easier, add struct_group() macro similar to what kernel
+uses.
+
+
+  Commit: cf32208ed16e44e89474f4faa67293261641b208
+      https://github.com/bluez/bluez/commit/cf32208ed16e44e89474f4faa67293261641b208
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
+
+  Changed paths:
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  test-runner: enable path argument for --unix
+
+Allow specifying the path for the controller socket to be used.
+
+
+  Commit: eef206c5e2f6291febea934eeb08d20ec3ff02b3
+      https://github.com/bluez/bluez/commit/eef206c5e2f6291febea934eeb08d20ec3ff02b3
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
+
+  Changed paths:
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  test-runner: Add -o/--option option
+
+Allow passing arbitrary arguments to QEMU.
+
+
+  Commit: c0775bb788bdabecc573224b3d218c5e8348a38b
+      https://github.com/bluez/bluez/commit/c0775bb788bdabecc573224b3d218c5e8348a38b
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
+
+  Changed paths:
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  test-runner: allow source tree root for -k
+
+Allow passing source tree root for -k option, look up kernel below it.
+
+
+  Commit: f1e9b638a13c9893f4c29d6c958fbf5f9303f1cc
+      https://github.com/bluez/bluez/commit/f1e9b638a13c9893f4c29d6c958fbf5f9303f1cc
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
+
+  Changed paths:
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  test-runner: use virtio-serial for implementing -u device forwarding
+
+Using pci-serial to forward eg. btvirt sockets is unreliable, as qemu or
+kernel seems to be sometimes dropping part of the sent data or insert
+spurious \0 bytes, leading to sporadic errors like:
+
+    kernel: Bluetooth: hci0: command 0x0c52 tx timeout
+    kernel: Bluetooth: hci0: Opcode 0x0c52 failed: -110
+    btvirt: packet error, unknown type: 0
+
+This appears to occur most often when host system is under load, e.g.
+due to multiple test-runners running at the same time.  The problem is
+not specific to btvirt, but seems to be in the qemu serial device layer
+vs. kernel interaction.
+
+Change test-runner to use virtserialport to forward the btvirt
+connection inside the VM, as virtio-serial doesn't appear to have these
+problems.
+
+
+  Commit: a7947e84803d743fdb53948964f71ed312da4038
+      https://github.com/bluez/bluez/commit/a7947e84803d743fdb53948964f71ed312da4038
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
+
+  Changed paths:
+    M doc/ci.config
+    M doc/test-runner.rst
+    M doc/tester.config
+
+  Log Message:
+  -----------
+  doc: enable CONFIG_VIRTIO_CONSOLE in tester config
+
+Enable kernel option that allows using -device virtserialport in qemu.
+This is easier to make work reliably than pci-serial channel.
+
+
+  Commit: 24d0b8f8ec6b7c4f0a52b004bbf94063cda40af5
+      https://github.com/bluez/bluez/commit/24d0b8f8ec6b7c4f0a52b004bbf94063cda40af5
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
+
+  Changed paths:
+    M doc/ci.config
+    M doc/test-runner.rst
+    M doc/tester.config
+
+  Log Message:
+  -----------
+  doc: enable KVM paravirtualization & clock support in tester kernel config
+
+Enable KVM guest and PTP options in tester kernel config.
+
+This allows synchronizing tester VM guest with host clock, needed for
+testers that want to compare timestamps outside the VM guest.
+
+
+  Commit: f106db3fc469d7a7e12997b0ec588b3090c21a03
+      https://github.com/bluez/bluez/commit/f106db3fc469d7a7e12997b0ec588b3090c21a03
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
+
+  Changed paths:
+    A doc/test-functional.rst
+
+  Log Message:
+  -----------
+  doc: add functional/integration testing documentation
+
+Add documentation for functional/integration test suite.
+
+
+  Commit: 79314e1cd2bb69b5cb9178754bec2136e6bd3f8c
+      https://github.com/bluez/bluez/commit/79314e1cd2bb69b5cb9178754bec2136e6bd3f8c
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
+
+  Changed paths:
+    A test/functional/__init__.py
+    A test/functional/conftest.py
+    A test/functional/requirements.txt
+    A test/functional/test_bluetoothctl_vm.py
+    A test/functional/test_btmgmt_vm.py
+    A test/pytest.ini
+    A test/test-functional
+    A test/test-functional-attach
+
+  Log Message:
+  -----------
+  test: add functional/integration testing framework
+
+Add framework for writing tests simulating "real" environments where
+BlueZ and other parts of the stack run on different virtual machine
+hosts that communicate with each other.
+
+Add some smoke tests for bluetoothctl and btmgmt.
+
+The implementation for the VM setup is maintained separately in the
+pytest-bluezenv plugin, https://pypi.org/project/pytest-bluezenv
+
+Implements:
+
+- RPC communication with tester instances running each of the VM hosts,
+  so that tests can be written on the parent host which coordinates the
+  execution.
+
+- Extensible way to add stateful test-specific code inside the VM
+  instances
+
+- Logging control: output from different processes running inside the VM
+  are separated and can be filtered.
+
+- Test runner framework with Pytest, factored into a pytest plugin
+
+- Grouping tests to minimize VM reboots
+
+- Redirecting USB controllers to use for testing
+
+There is no requirement that the tests spawn VM instances.
+
+
+  Commit: c0146e6abc9005ce88f23c625aac786a83c51d8c
+      https://github.com/bluez/bluez/commit/c0146e6abc9005ce88f23c625aac786a83c51d8c
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
+
+  Changed paths:
+    M Makefile.am
+    M configure.ac
+
+  Log Message:
+  -----------
+  build: add functional testing target
+
+This adds check-functional: target that runs the functional test suite.
+
+Also add a --enable-functional-testing=<kernel-image> argument for
+configure that can be used to include it in the check: make target,
+possibly with a predefined kernel image.
+
+
+  Commit: e4b50e8d1946995bb2d9ff46a7d4183b19e08c78
+      https://github.com/bluez/bluez/commit/e4b50e8d1946995bb2d9ff46a7d4183b19e08c78
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
+
+  Changed paths:
+    A test/functional/test_tests.py
+
+  Log Message:
+  -----------
+  test: functional: impose Python code formatting
+
+Check Python code formatting of the functional test suite.
+
+
+  Commit: ba02713d7ebd2af3419b22fc0b0b49b503ceb7fe
+      https://github.com/bluez/bluez/commit/ba02713d7ebd2af3419b22fc0b0b49b503ceb7fe
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
+
+  Changed paths:
+    A test/functional/test_agent.py
+
+  Log Message:
+  -----------
+  test: functional: add some Agent1 interface tests
+
+Add test
+
+test/functional/test_agent.py::test_agent_pair_bredr
+
+
+  Commit: d2d05811090238ea21fe52e00942c57d6b7546de
+      https://github.com/bluez/bluez/commit/d2d05811090238ea21fe52e00942c57d6b7546de
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-13 (Wed, 13 May 2026)
+
+  Changed paths:
+    A test/functional/test_obex.py
+
+  Log Message:
+  -----------
+  test: functional: add basic obex file transfer tests
+
+Add tests for Obex DBus API and obexctl
+
+test/functional/test_obex.py::test_obex_ftp_get
+test/functional/test_obex.py::test_obex_ftp_list
+test/functional/test_obex.py::test_obexctl_list
+
+
+Compare: https://github.com/bluez/bluez/compare/57ef69b78821%5E...d2d058110902
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
