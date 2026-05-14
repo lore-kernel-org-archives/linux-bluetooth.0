@@ -1,74 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93E0F30EF86
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 16:21:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381FA33A007
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 16:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778775674; cv=none; b=C/wM0QEXvg6y1CEtN0QYYtMNtg0yseOI2Vpozn/ctlzvRuF7HV4HoHh9HrfOttlGx0fQJ6oJ/AHbqg2ry8tEiSfcMaAXM8zOJvX5uLbKLLeYpCjV8b52jvK6ixrIORyUcqWSuauSHRKr2Fm3Eco8DIlFrerIAMkj580/CLg1m3g=
+	t=1778777369; cv=none; b=K145kMidcbxyA3FUz2ELHu9c7+OV3kBjfcK2G5Wv6HIYXiiNxA+jDQwMfZWyJ5dQh0HuQV+gHYGcfpEAiK1Qa+Qp2I5AJKGlp3ZmaxJKnkjtiW6HHKoWkwCjjkYcbLa62m+HiaA6X1F9X8j/numjW2XRujTHTnDNnSV7ulH9r4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778775674; c=relaxed/simple;
-	bh=ih/qpJaK/MyC7KtulxNZ5/Pk7GQeac3CQnV0nkUwhXI=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=EK8EQCxIMYM6l8/vUpO1jEAkvWX3hsTwaMblXZbFCOE54/Swjm3BWn/+ylC4wHXExdJ/aeFa7udaIKsqC1MV2qtZ8LVR64YhYF7YztzKkoBBQk9+dXTHPpiTq+bQSe82Mh2oAlsXdxE3mHTJgbwkFsNm8TUL0mgCMkz+S2CflGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uqnOowSG; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778777369; c=relaxed/simple;
+	bh=l+xmCVEyPdAb9K1ctr9c/Ygy/JE438VcPj1UnVYn4A0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tlVDeAC0KWav50aN+Ml2ZLWyAsULeFSk2qDzRh1RNpxxaaBr2GAWAUcYf9ibSav4ME3nCTcfnqVVgu5UNJ/OlBfZpuk0pl24gNDENNWqq+F5fJnHZKr6BpfUTTUGiRK4qgMx/yd6YfOSnd8LjVa5K9Rak+BgxA1QN0fUgS2u0Pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn; spf=pass smtp.mailfrom=std.uestc.edu.cn; dkim=fail (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b=S98Cp1uA reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=std.uestc.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uqnOowSG"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 31173C2BCB3
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 16:21:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778775674;
-	bh=ih/qpJaK/MyC7KtulxNZ5/Pk7GQeac3CQnV0nkUwhXI=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=uqnOowSG+dZa8pt+sj0T5TnhV/M+KWBAPFABK+i5glCwuWOMNjZWlSzGCmYYezEm7
-	 iBxUaXDlhvbSAHZNLDKwFi7eXOY6AXkB3NaS2PAeHGosJrT/f1PrmvQ5nk6d2Wn71V
-	 1R/krCgXCldhmPn0Tn22iHlC7nTS0O7RYzLCAqoX6mud8hULsF6xDisW1GQNaexeCF
-	 a4E6g6xbaNa6zJ9j5GuO4gG8UfaS2+k0AmMCydVBc/Dih9AjfCZ8CxfiaG+DTGobYB
-	 is5gZc1wkrrYjhtGpZ+HKnyMWRM9a+Y+ftkYjv+jbb9rIZ79RpdZnEKNIGlOVg5MPq
-	 hcAFfkQ7RnHYQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 1F2A1C3279F; Thu, 14 May 2026 16:21:14 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221511] MT7925  7.1 rc does not work, but it works in kernel
- 7.0
-Date: Thu, 14 May 2026 16:21:14 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: erpumper@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221511-62941-lk0QbZ7Muy@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221511-62941@https.bugzilla.kernel.org/>
-References: <bug-221511-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b="S98Cp1uA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=std.uestc.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
+	Message-ID:MIME-Version:Content-Transfer-Encoding; bh=c97RPJcOUO
+	W/mKWk18UVkwinIbG8O02sSWjnkaxk8pE=; b=S98Cp1uAFQlpclSzZS8lJrAgTM
+	5WAP+sG+zoxz5l6w9eYtq5OpnYQkCGIooRshW5sZ05SftF91hDHT+yQ8frXOlMFl
+	QUMak3d1fqWdSDDQgI4ScTk/XKIn/Xc3dbdewSW2cbj/GmFdMqNOUOs5P8hg33XI
+	GjuIzB5JEL8kh6Gaw=
+Received: from hotaru.tailb307d0.ts.net (unknown [183.94.22.109])
+	by hzbj-edu-front-2.icoremail.net (Coremail) with SMTP id BLQMCkDWu7sM_QVqXvsVAg--.62713S2;
+	Fri, 15 May 2026 00:49:18 +0800 (CST)
+From: Quan Sun <2022090917019@std.uestc.edu.cn>
+To: linux-bluetooth@vger.kernel.org,
+	kiran.k@intel.com,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org
+Cc: Quan Sun <2022090917019@std.uestc.edu.cn>
+Subject: [PATCH] Bluetooth: btintel: Fix insufficient skb length check in btintel_print_fseq_info()
+Date: Fri, 15 May 2026 00:49:13 +0800
+Message-ID: <20260514164913.3123671-1-2022090917019@std.uestc.edu.cn>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:BLQMCkDWu7sM_QVqXvsVAg--.62713S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tF15Gr48AF4DAFW7ZrWkWFg_yoW8JFW8pa
+	y7GFyUAFs3Gw4IgF12qF4rAr90vw1fWa43GF97Aw15Zwn8CrW0gFZ8KFyjqa4DCrZ5Aw1Y
+	y3Z2qFn7GF1DAr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r1j
+	6r4UM28EF7xvwVC2z280aVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4UJV
+	WxJr1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
+	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
+	1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
+	AIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
+	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxh
+	VjvjDU0xZFpf9x0JUfnY7UUUUU=
+X-CM-SenderInfo: asqsjiyzqzilqqrzq21wgo3vxvwfhvlgxou0/
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221511
+The length check at the top of btintel_print_fseq_info() verifies
+that the skb has at least 66 bytes (sizeof(u32) * 16 + 2), but the
+function actually consumes 74 bytes:
 
---- Comment #3 from erpumper@gmail.com ---
-none
+  2 calls to skb_pull_data(skb, 1)  =  2 bytes
+  18 calls to skb_pull_data(skb, 4) = 72 bytes
 
---=20
-You may reply to this email to add a comment.
+When the firmware returns a packet of exactly 66 bytes, the last two
+skb_pull_data(skb, 4) calls return NULL, which is then passed directly
+to get_unaligned_le32(), resulting in a NULL pointer dereference.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Fix the length check to account for all 74 bytes actually consumed:
+  sizeof(u32) * 16 + 2  ->  sizeof(u32) * 18 + 2
+
+Fixes: a7ba218a44aa ("Bluetooth: btintel: Print Firmware Sequencer information")
+Signed-off-by: Quan Sun <2022090917019@std.uestc.edu.cn>
+---
+ drivers/bluetooth/btintel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index dcaaa4ca02b99..114a8beeab92d 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -3356,7 +3356,7 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
+ 		return;
+ 	}
+ 
+-	if (skb->len < (sizeof(u32) * 16 + 2)) {
++	if (skb->len < (sizeof(u32) * 18 + 2)) {
+ 		bt_dev_dbg(hdev, "Malformed packet of length %u received",
+ 			   skb->len);
+ 		kfree_skb(skb);
+-- 
+2.43.0
+
