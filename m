@@ -1,107 +1,109 @@
-Received: from mail-05.mail-europe.com (mail-05.mail-europe.com [85.9.206.169])
+Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F60130676C;
-	Thu, 14 May 2026 02:45:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.9.206.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574B0357CF5
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 06:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778726708; cv=none; b=KYpM7/QQeYh7XmU7jIKxBJqSr5H7x5qrt15QAM/2jp1Ey9qO93cP2FvAefEdpyUeNgyTv2dPFLV6vW8B4d9P/olgCWbHegsJLVffM0auC7WpDjQpckeEaq2sAIDui7QjPgMltiJnOZEmf4RloY1aeXP4338VpMcFosjns9T5MRc=
+	t=1778738631; cv=none; b=OGC4RFsWyWL++FXPWaZWj9SMJoYOsuCz8jPYHAolyTYsgclSsjonwXq4U2Rkr07mxABTwCxrfbDSN3NjT+81RYX/tnkDK1mHqIdVEzPbNRBupvZeiWW8Y0hCjqQtjvMfu4n5h+nfyJcjmZY2hlpU2T3H1L61gq5RoBin9Ru8H9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778726708; c=relaxed/simple;
-	bh=SILkXwUflzPdjEJbCQ/3qpbB5gDE+H5fM8C44fxIHlo=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=P7MgzfCgo4KZnxnRL28Uimog2r/GOOJJ50YWTJ2ede6R7lf1j2BDQnHq/f63zo7iPLYhWv2poR8vY7J2FTng/3nuHlpR46++11p4spfrjEzffb13B3vtAb7/KWAHsxkfF8TGmmcj69wjoBGxJtcj3/rcvghrus9jPvto4FFs+98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=IaIXncM5; arc=none smtp.client-ip=85.9.206.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1778738631; c=relaxed/simple;
+	bh=SGPXMJFs74VUxvhHjrZJrTOkAsRTRWbxiMW5TgSw5K0=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=i6SPp0+7dXwZv5njPrck1bE+tz0jUwG4lZ6s2xo+9Lx75vMp0Rn53CC++K1x3dV1c8oQOiJLN+0OyJYBQqgft7wvmwZWHlXPz+8ZRQMUT+aTxdhNWb8H34dg9TYbgsGzWd2Oo+MmKFyawjtEleJMVYXGTBkLcIaSa0ck6xRIjng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=BjO+/QFg; arc=none smtp.client-ip=162.62.58.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="IaIXncM5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1778726689; x=1778985889;
-	bh=jrXRkM9lAz7zYKdGDPSkmQy7ff+j3Gi77kdyFz+HJBI=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=IaIXncM55wwlGoecFHt40uq3SBu8GUTvVzuLeYGPwkTBAv8z3dlSN9KEKIIVoLnTL
-	 Y+/+YAuY4udRDXpNuD/WkZW+mHFKayYRsrk5MTUQQE7qm7lzEJDpmVA2sDXstW9947
-	 MUnAL8k7JfrB2RoYUOAWyRdLQ7GlJ1uST17XW6r+0Bm4DmSWKb6COiB+JvcGoFOgqQ
-	 KcHmptc1Uvwym2FKYfxrz59P7StjrRuCL0R8t/1cYUzf83XWXmyaYiTxk0IXKQ57zx
-	 gKsUUnd7a5RdrLaTTxNUTPX8dWT6vLYZWpQs96kAMd3SqTEuVGhGqIQoMb9eoxEfWO
-	 BaZ5DhFEp/B5w==
-Date: Thu, 14 May 2026 02:44:45 +0000
-To: "shuai.zhang@oss.qualcomm.com" <shuai.zhang@oss.qualcomm.com>
-From: makro-kernel <makro-kernel@proton.me>
-Cc: "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>, "marcel@holtmann.org" <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>
-Subject: Re: [PATCH v2] Bluetooth: btusb: Allow firmware re-download when version matches
-Message-ID: <GCBTvsv1x8qAB3ZmSCpTLo7M63lTTXM2c5n1TJLmQuus0g4gViSSJVRZzl6CzehnMdSHDqtZkQA33RYCVSxdAm7tGEeVYCflhV3QgbLIcfg=@proton.me>
-Feedback-ID: 197359692:user:proton
-X-Pm-Message-ID: ce91ed0a5e4d1cceb7211aa4f37f2f404aeebb17
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="BjO+/QFg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1778738617;
+	bh=9frWUvJx74a+RCl0Ue12zO/yVLpFFLAQGv678sl5aBE=;
+	h=From:To:Cc:Subject:Date;
+	b=BjO+/QFgfmx5GZo92H854vzg1uyjoVltbJhlAQ0Fn1k60oU1+XX24PTypPkhe1wlJ
+	 +PWQBhX+Wlp0XUAxVHunCxfNjfXGzsuQTA5La+F4Q8f4legCqh/vi7l6FvMfRFLcJ8
+	 9x5J9FiKpAdoyg3f0gB43xDaXio/YlAACbMuHmE8=
+Received: from localhost.localdomain ([116.128.244.169])
+	by newxmesmtplogicsvrszb51-1.qq.com (NewEsmtp) with SMTP
+	id E319E98; Thu, 14 May 2026 14:03:35 +0800
+X-QQ-mid: xmsmtpt1778738615teqrwjhmu
+Message-ID: <tencent_05373BA21CEEB5195F2ECCED0C77D0C57108@qq.com>
+X-QQ-XMAILINFO: NT7uTz3cNku2/7JwRM7+25tZPfpTr0mIEwJuw0RQOYICwFUA/GUVh8AjYTYDcc
+	 0eWz3/hGDkDEBMwACPbmsTjz6F3R8jCINs9zE6TOrhzvRlBTqGDLph0lKbtfXMfGR/5iCp6on1zV
+	 foBwDg3PbF5zTTrS2L6WVotfDii5WGy+GvQ+qr8lasw5sARqA92fUbrDh5UTbuUqOacVW9ZEtOIY
+	 LZ6axj7WEMJ0hPzgSbNdCkn8kJmnAXNibbRG9qjXU2loFCypHX+QWEMgRMSeGVHsNN0MBoXUHXJu
+	 kGuRvstK+QT/P9gCAaMigtnEQyFJpoFPIdkD14wC3TNHxRW3EJXN4h+EJCNhRY+vIfgdvwwb/JNj
+	 uPRH4og4k/rI3O3jzJ4m7K+L4faHJ68OJrAnSyktvYSTklFGDHsSsRCjRt71Fql193ZeHQdNSv2X
+	 tZPRsbnjKrO7lYyNXT6ErLXi9lE2jSYxmqwsq57+FXcDcAGbeutTmeSPfkgFXDnkNTkGpq46SOlN
+	 tusQRvwWXM6taP+SgabT57wY47JXjR6jpypDzBpOfY6YdbMfO7BC4U7K5rk4M1ShJXaPBYYWGZUw
+	 SWujYAbsvHl2qeX8qHGivrTjkgeQHY5G18XNHhsINgp2FQbtA9ShZQ3jEF/hw7nvNA45+huNJYDV
+	 EXj4PhddAQGsoycUmEMBwBYAxriBAzNIZjjVQFMMwEh2VKz6DVhqu7ieJHHzMq3uQR4FMB+yupFY
+	 jktcBb4AMky5vJSEDdFsAfW5SZrXhU8KEEFGfjozNFxe95WuXB1h8nynrXHzEm5J4tITfngsom37
+	 0PhG3TpnIB0GKMRS+ywHvhOe63aGWQJZcjGtw6M9RlnI40xxvBOkit2cU23eUq8PchRlaRqiJNqm
+	 1UUjEyXM2Ql2eObUQc5PDG1FR0vN22Lz9MpD1ar3YLk4L0h2fr9efPmKjOb6yfhh/r/h/5aTbBqB
+	 /wKPFCUYqu77y/hse68jCzpurZDMQ+/xxgwMwQHZ3cwyf2mtTqxX8nTKZvxz8DX1Ve0ScrVB7pmx
+	 8JGVYNUc1oLs1zkDTP
+X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
+From: Zhao Dongdong <winter91@foxmail.com>
+To: amitkumar.karwar@nxp.com,
+	neeraj.sanjaykale@nxp.com,
+	marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Zhao Dongdong <zhaodongdong@kylinos.cn>
+Subject: [PATCH] bluetooth: btnxpuart: Fix use-after-free in probe error path
+Date: Thu, 14 May 2026 14:03:31 +0800
+X-OQ-MSGID: <20260514060331.221418-1-winter91@foxmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Shuai, Luiz,
+From: Zhao Dongdong <zhaodongdong@kylinos.cn>
 
-I sent a patch earlier today touching the same function for a related
-but distinct failure mode in the same family of chips, and only just
-saw this thread.
+In nxp_serdev_probe(), if hci_register_dev() succeeds but ps_setup()
+fails, the error path jumps to 'probe_fail' which only calls
+hci_free_dev() and asserts the reset GPIO, but does NOT call
+hci_unregister_dev() first.
 
-  https://lore.kernel.org/linux-bluetooth/aD_Lix2EVXOHmbZ4L1CunlWiLqfiKlU_1=
-_FcVh4CBuIgud4kmE_544xjW2zFKsmh4pNAo9yIQ7q8_GZ4YcmgAXPp8LgW9rfWKqnu06WSjgk=
-=3D@proton.me/T/#u
+This leaves the HCI device registered in the system with its backing
+memory freed, leading to a use-after-free when userspace subsequently
+accesses the device (e.g. via hciconfig or bluetoothd).
 
-In my case the *outer* check fails first: on Foxconn USB 0489:e10a
-(Qualcomm WCN6855/WCN785x, ROM 0x00190200) the chip reports
-QCA_CHECK_STATUS =3D 0xe0 (PATCH_UPDATED | SYSCFG_UPDATED) on every
-probe, so btusb_setup_qca() never reaches load_rampatch() or
-load_nvm(), returns 0, and the controller runs unpatched firmware.
+Fix by adding a 'probe_fail_unregister' label that calls
+hci_unregister_dev() before falling through to the existing
+'probe_fail' label. The original 'probe_fail' label is preserved
+for the case where hci_register_dev() itself fails (device was
+never registered, so no unregister is needed).
 
-AVDTP setup later fails on Acquire and A2DP audio cannot stream. The
-PATCH_UPDATED bit appears to persist across cold boots somewhere on
-chip -- originally set by Windows on dual-boot-then-Linux systems
-we've seen, but the bit sticks even after a successful Linux firmware
-upload, so subsequent boots also see 0xe0 and skip.
+Signed-off-by: Zhao Dongdong <zhaodongdong@kylinos.cn>
+---
+ drivers/bluetooth/btnxpuart.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-The rampatch itself also persists on this silicon at least across
-suspend/hibernate resume cycles and driver reload (whether it
-survives a true cold boot I haven't isolated). Either way, once an
-upload has succeeded the chip reports patch_version equal to the
-file's version on subsequent probes, which is exactly the condition
-your patch addresses. With my outer bypass in place but without your
-inner change, the second and subsequent probes hit the existing
-`rver_patch <=3D ver_patch` check, return -EINVAL, and controller
-setup aborts entirely:
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index e7036a48ce48..a4d7747e5be0 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -1907,13 +1907,15 @@ static int nxp_serdev_probe(struct serdev_device *serdev)
+ 	}
+ 
+ 	if (ps_setup(hdev))
+-		goto probe_fail;
++		goto probe_fail_unregister;
+ 
+ 	hci_devcd_register(hdev, nxp_coredump, nxp_coredump_hdr,
+ 			   nxp_coredump_notify);
+ 
+ 	return 0;
+ 
++probe_fail_unregister:
++	hci_unregister_dev(hdev);
+ probe_fail:
+ 	reset_control_assert(nxpdev->pdn);
+ 	hci_free_dev(hdev);
+-- 
+2.25.1
 
-  Bluetooth: hci0: using rampatch file: qca/rampatch_usb_00190200.bin
-  Bluetooth: hci0: QCA: patch rome 0x190200 build 0x8567, firmware rome 0x1=
-90200 build 0x8567
-  Bluetooth: hci0: rampatch file version did not match with firmware
-  (btusb_setup_qca returns -EINVAL, hci0 never finishes registering)
-
-So your fix is doing the right thing here, and on this hardware both
-sides are needed together for the chip to come up cleanly across
-reload / reboot cycles.
-
-In my local tree I skip reuploading on equal versions rather than=20
-re-uploading on every probe:
-
-  if (rver_rom !=3D ver_rom) {
-          bt_dev_err(hdev, "rampatch file ROM did not match controller");
-          err =3D -EINVAL;
-          goto done;
-  }
-
-  if (rver_patch <=3D ver_patch) {
-          bt_dev_info(hdev, "QCA: rampatch already current, skipping downlo=
-ad");
-          err =3D 0;
-          goto done;
-  }
-
-  err =3D btusb_setup_qca_download_fw(hdev, fw, info->rampatch_hdr);
-
-Best,
-Makro
