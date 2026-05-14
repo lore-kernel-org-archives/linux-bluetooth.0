@@ -1,115 +1,109 @@
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D383E2769
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 13:42:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34613DFC9F;
+	Thu, 14 May 2026 14:54:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778766157; cv=none; b=qDWdlvrLSWMcTGfpPvGjMSF4Hw06i4SA9f7reoltGhmRDnVYOcAsnjV8kU8RlWa+35gId5DY0Nhx345HzmjNoeMiBEdTeUbe/0BZoZyADybcERwfeFsWyqA66DT7krKisWQXkorYuhPMk+sh49iGLJKKUU2OlPI1QtVHOupq5A0=
+	t=1778770455; cv=none; b=Wk5L/ijuLGUaYJG4/iO2RJJaE093a9iu/8TI7UDJ43sMMI64bd4h7eal26X8Sm/39PiXe8Fvsx/+8TtQz/17PvbUfaBxgXsTSBaGmPxTFT6N3PRyX3M34JLc2gDKypWyOJD+AaQt5YPYEirOJo+R4OIa7tu56v/30NImtjClrgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778766157; c=relaxed/simple;
-	bh=/BOSYZwdP3Y72UdeTvMYDBpuq5nOXJfxopEqPo/Zaxk=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=QGnMHt0hFQIBjNBm6RWlJuSAMlBMgbHaXuIE6V6YjxYx5dXUdV4P281QgZ7M/CIIwDzWJ0haR+z3xl3sVs44zP+kQzztAqPEt7TSeat7Hl9jdYqRYnW0cY1iSIFO2LgRquYTGrA+O1AgJV2OVMyuLLhVq5Jhj4mkt1ZUp8lfwvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jPc+eU1b; arc=none smtp.client-ip=209.85.222.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1778770455; c=relaxed/simple;
+	bh=IK06vLegn/mVfp/X4lkkns3qtLm8ShFF9GJQ2WwXEdQ=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=EZFKcdg2SG/2kOFk2Hmp5opRf2zwDmwlIG+wVDUrojgvH/0uEDiei/7Wo5TjoMEiXit3yr1fK7NtwHfHUoEZkSsR4y9rH/F+6gnOs3oksDmJxkuU16MGUnr1R7YeyCYBNYDX5sZawKPH3hNbVGGZTWT8yRp+s2gi9c5/1g/lr8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=c1orZlMu; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jPc+eU1b"
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-95cc1a5fe9cso2329698241.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 06:42:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778766154; x=1779370954; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uhJsZp5ktqeMqlyTdzi3zB7+AfTtFaogLD4b5p8yEWU=;
-        b=jPc+eU1bmuJ/VUyZFsgQHSoeqKCq0wiHEGcDxScm1cEIFJbS6GpTztgDTFJQuxSWWq
-         HgZ0jN9R8ghnFtNxoOnPVGhHQpQo1k42fcKXta1fVF/hiMFW9ekkH8q54UHmh/Kzku/Q
-         FVm/xl/KyEakRQbw7KqV+BhK/qKmtlcOipVCujkWLMZU0Y7N+gm4Gkwzy8TCA9pFA9GN
-         hvZzjgpGhMbf79zda29G4qisDbYWG8V4TfuRTyVRJFbPJl7sSYl6z3Yu/OAHTx06yJs/
-         Ik9Yt466D6pRzckgPWmRhxaRzrQLHzxWSK847mDvfzK4APrZLYwA2T8WV9YUde2DnU5v
-         y5eA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778766154; x=1779370954;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uhJsZp5ktqeMqlyTdzi3zB7+AfTtFaogLD4b5p8yEWU=;
-        b=R/LrDsenkOXIcSakYb5M0UaQ4m3T79D5Se6LSGHOhysNTOHkOVe7ctIrwncDbrjqRy
-         ZIIGRgQXCKeZHrtjvpnUgKPnrGPzgwJ08PUzQdy+bFuUDNrLROKRsDJpUyTmaHKMRdGn
-         LiY4OM1yVygruAxU44wcbXFJMTZj/exsWVFfaEWYfyLQ4KYTxpF2lAYB5rAXGHT42t9S
-         W09iR3Ka6EDBK1z5ZIuZwEg4dug43451Cif1om0E1I476R9NOd/Tbmbfw1mT7d42Zvqh
-         Xr9nc27k809p4qBXktqjVZ0gMnFX5YwUBge5CjzKgKDoFgPav5ySF7HofCAaOxRgxWGE
-         IztQ==
-X-Gm-Message-State: AOJu0YzWi0ekCWj9iDCcVl+p+xAzY8iKmUKrEQ8qYFFTWDol/tJkDLOn
-	giiH52g/Uaf4z4/I8m4so5bAp+q0s1s4zBXDE48UnmzhYoiiQ43ChXOOljtDwFoHMCc=
-X-Gm-Gg: Acq92OHY2ND5E1JUFHYoeYjihPt0mlRS8KZBguLSYW9VZ8fdpAjXi+HabruAmcmTPP4
-	uKi856EoR6KGMwUZy3amnnP9Wq5KTRToea0BvfdSjE2nSwa+wOG8g2203E8aJhmBA0SlnGAsP6l
-	XVXUEVa3nNOaZpLLNtaz0vpCsOgbrGx4X3GtugTtlEgrw9HRHkt8PMqh6AzzxeccNoPAFoSujiD
-	qm3wA8UOFxtdLeclhoEOQc19bdpUjz/Hmjt8phWKUeiaGdSYZl3Pzcz+Wr8uhtA5BNcAYohFM7P
-	8f31qD9m59RSQ1ohrd1OLx8ooKDbM2YgGyrGK7fRl3A1qPDuteVrh/O1o9NYSr4Kbmx01RnQoyE
-	mix7C2x3XBxKE1OzBkpYgOb3/UyOyZHXFwp9KFqDrJrC+VgfVBAmnfhr4rGx0cWc/AcjaIzGEAB
-	n/QgQ7DoZJYSsv/rrMn/uyOqzUMX2Z7yHiCAs48RrKVSV4kHK+TzNaZAEj0tFfg7Hm/pOSRSIbT
-	hQK4nLAEvgyz1EEexRVUUdv06Rqb8puPgsnic0=
-X-Received: by 2002:a05:6102:5345:b0:62f:4387:fcb4 with SMTP id ada2fe7eead31-6376e34d644mr3999807137.0.1778766153800;
-        Thu, 14 May 2026 06:42:33 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-6390a6d0f53sm1145532137.9.2026.05.14.06.42.32
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 06:42:33 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1] Bluetooth: hci_sync: Fix not setting mask for HCI_EVT_LE_ALL_REMOTE_FEATURES_COMPLETE
-Date: Thu, 14 May 2026 09:42:24 -0400
-Message-ID: <20260514134224.1396820-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="c1orZlMu"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=In-Reply-To:References:To:From:Subject:Cc:Message-Id:Date:
+	Content-Type:Content-Transfer-Encoding:Mime-Version:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=7M44/6sGyiRepzvAxplph8nNpoUbaAZFmb+wE6bfiPk=; b=c1orZlMuekoD6FTRzhCLXaeUEv
+	wrJwuzX/1Biz++M/NBr4bnjaqMO9haPmLXIOODftqjS3EaN/c9s/hsGDmz242FzNiqiFPBnkeBwq8
+	IwjBH9se2/nbIupCINL1yhB2oxmWtZlhO622N+/BY4Sv27GnIDJor/nbnZ5WVPuRRl0tieVbTXKE1
+	DdGmp/pSlVQz43leFLC5BFI+0bYFKl8R8PUK4fCXzHNRcsBr2yIRyRak11/9Gv4BWr9jGqUWjZFRP
+	E8ra+xHT1ee96tEW47ARBBfBu74hPMwUDZ+Zh0yOMGDN+7ppH07zP7W1PlCapiX5jS/U0bnxvVeEz
+	ninv/M5A==;
+Received: from 177-136-93-131.vmaxnet.com.br ([177.136.93.131] helo=localhost)
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
+	id 1wNXRr-0007FV-T3; Thu, 14 May 2026 16:54:04 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 14 May 2026 11:53:58 -0300
+Message-Id: <DIIHHUJM2CZJ.2OKA9PGHEHBRP@igalia.com>
+Cc: "Marcel Holtmann" <marcel@holtmann.org>, "Luiz Augusto von Dentz"
+ <luiz.dentz@gmail.com>, "Gustavo Padovan" <padovan@profusion.mobi>,
+ <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <kernel-dev@igalia.com>, <syzkaller-bugs@googlegroups.com>,
+ <syzbot+97721dd81f792e838ba0@syzkaller.appspotmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_core: Don't queue tx_work while draining
+ workqueue
+From: "Heitor Alves de Siqueira" <halves@igalia.com>
+To: "Hillf Danton" <hdanton@sina.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260513-hci_send-v1-1-ae3eef758280@igalia.com>
+ <20260514020446.639-1-hdanton@sina.com>
+In-Reply-To: <20260514020446.639-1-hdanton@sina.com>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed May 13, 2026 at 11:04 PM -03, Hillf Danton wrote:
+> On Wed, 13 May 2026 15:55:23 -0300 Heitor Alves de Siqueira wrote:
+>> Syzbot reported a warning when L2CAP calls queue_work() on the hdev
+>> workqueue while it's being drained. This can happen during device reset =
+or
+>> close paths for hci_send_acl(), hci_send_sco() and hci_send_iso().
+>>=20
+>> The workqueue is drained in hci_dev_do_reset() and in hci_dev_close_sync=
+():
+>>   - hci_dev_close_sync() clears the HCI_UP bit before draining
+>>   - hci_dev_do_reset() sets HCI_CMD_DRAIN_WORKQUEUE before draining
+>>=20
+>> Add these checks before queuing tx_work, and free the SKB if it's not
+>> queued for transmission.
+>>=20
+>> Fixes: 3eff45eaf817 ("Bluetooth: convert tx_task to workqueue")
+>> Reported-by: syzbot+97721dd81f792e838ba0@syzkaller.appspotmail.com
+>> Closes: https://syzkaller.appspot.com/bug?extid=3D97721dd81f792e838ba0
+>> Signed-off-by: Heitor Alves de Siqueira <halves@igalia.com>
+>> ---
+>>  net/bluetooth/hci_core.c | 18 ++++++++++++++++++
+>>  1 file changed, 18 insertions(+)
+>>=20
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index c46c1236ebfa..5d5f8ad7d1a8 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -3278,6 +3278,12 @@ void hci_send_acl(struct hci_chan *chan, struct s=
+k_buff *skb, __u16 flags)
+>> =20
+>>  	BT_DBG("%s chan %p flags 0x%4.4x", hdev->name, chan, flags);
+>> =20
+>> +	if (!test_bit(HCI_UP, &hdev->flags) ||
+>> +	    hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE)) {
+>> +		kfree_skb(skb);
+>> +		return;
+>> +	}
+>> +
+>>  	hci_queue_acl(chan, &chan->data_q, skb, flags);
+>> =20
+>>  	queue_work(hdev->workqueue, &hdev->tx_work);
+>>
+> What you add is not enough, go and see how HCI_CMD_DRAIN_WORKQUEUE is
+> checked in hci_cmd_work(), and in hci_dev_do_reset() for why.
 
-This fixes not setting the bit for HCI_EVT_LE_ALL_REMOTE_FEATURES_COMPLETE
-when extended features bit is set otherwise the controller may not
-generate HCI_EVT_LE_ALL_REMOTE_FEATURES_COMPLETE causing
-hci_le_read_all_remote_features_sync to timeout waiting for it.
+I see, I missed the RCU guards for the device flags. Sorry about that,
+I'll add them to v2.
+Thanks for the catch!
 
-Also remove dead code.
-
-Fixes: a106e50be74b ("Bluetooth: HCI: Add support for LL Extended Feature Set")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_sync.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index fd3aacdea512..aff8562a8690 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -4438,6 +4438,9 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
- 		events[4] |= 0x02;	/* LE BIG Info Advertising Report */
- 	}
- 
-+	if (ll_ext_feature_capable(hdev))
-+		events[5] |= BIT(2);
-+
- 	if (le_cs_capable(hdev)) {
- 		/* Channel Sounding events */
- 		events[5] |= 0x08;	/* LE CS Read Remote Supported Cap Complete event */
-@@ -7413,9 +7416,6 @@ static int hci_le_read_all_remote_features_sync(struct hci_dev *hdev,
- 					sizeof(cp), &cp,
- 					HCI_EVT_LE_ALL_REMOTE_FEATURES_COMPLETE,
- 					HCI_CMD_TIMEOUT, NULL);
--
--	return __hci_cmd_sync_status(hdev, HCI_OP_LE_READ_ALL_REMOTE_FEATURES,
--				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
- }
- 
- static int hci_le_read_remote_features_sync(struct hci_dev *hdev, void *data)
--- 
-2.53.0
-
+Best,
+Heitor
