@@ -1,173 +1,120 @@
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E721738F248
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 17:51:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778781090; cv=pass; b=YeoMd3GfI3bWBLKT+5LoZr1D605gfbR3HftdPpGBCw7D7KSqTjFbtF1yAib7k3BhBOsYhRCMojAsSVAztop+2fRVwI+eK+vGNyFKbOFRC/w+qX4mzeUa5JYOqpSDmZl8r6K6CyD/OeN7jFUF0Jok+sXWPz59otBrWA0j0ypXeog=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778781090; c=relaxed/simple;
-	bh=oEZTFGT/zsbjhwuKvWnfYPy3McEOR01XWhw4l9V3p8s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oFYTY+8reKmPXdOda720LVliyNxx8sIDS3RfHE3jL8tb19C85j29c7jRn5isL08+t20Z8NkA7mCR7gdNC9bj3hvW8zGNd7B08UOaWxa2Rj2/UAdwEk1yc640LVEOs3mtWVcvRM4OBasp7S9+jaHpxdNMPfflpMp2t/6N9i6UebM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WYOv8U9k; arc=pass smtp.client-ip=74.125.224.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDAE7372069
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 18:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778782216; cv=none; b=aKetThXRNzjkjxUa3VaQKymwQBA5dz9LQmVkUFsis9FkrzBwand7g3YdK8SpBbkXRmEbwE0ekCjzBSHmIVE9AWLHlBL5tkt418ZchqSWe+So+/JndSqR4ffl1t7SpgTgO9F9D0lLNewFmv9BdGgxa7zG3wY5wJ0/IPMz8Zyxb5c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778782216; c=relaxed/simple;
+	bh=I5DU1a/8sDq7wA3o3yi6lrhVCAISGKns4nN/7sADBag=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oLYPYMN4Iduj+ekDOmUSasZVXgGnWy92FdBRQITm0WGTfxFKckiS5QbKmgU4ADf63pg3gkpGq1jj4E5DUOq5ZeWriYkShnGpzOYBGcPqmBbYM6YCOlOGtogEijlLY2P9LN9T2WTQsFUbx4bcDAudUMgEfNhvXrjmC6iI+lmU8VI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn; spf=pass smtp.mailfrom=std.uestc.edu.cn; dkim=fail (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b=2saY95A5 reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=std.uestc.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WYOv8U9k"
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-654672a6d68so10396508d50.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 10:51:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778781088; cv=none;
-        d=google.com; s=arc-20240605;
-        b=gJV4Nx6NgjhOxqsppROqPeGYheVNFn1ZS63MIm1OeKthbLttT7nzrV3pJ/+TJB90Gx
-         wHTXe2heMg2xAyzmOhT4aQILsp5QcWJIS2ETj8rg+qcPH50Otj0nKPcETBvCFyG0Aak+
-         Y6P0Sf9scRdvEa/QWS3dq/8rB/uCeCMaEMzuvbvaW+/uhUjqccr952QozJ9k2NNYrQe3
-         dn85x1NdisfHUC7hGZn5Vhk/p1bmXiYBZ7Rdj8tmsULuCG82pESU3Jg23GpF3+DjPwg7
-         37U/kiI65SJvlTsdvdKYSiDoRVam9dw6PHmnQUCyuyOvzCxg9k4+BODzK/wlum0kiahc
-         n4dw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=6wDiBZDMexEMEADEYdo6MQjjkOCysVPN+9Ft5KwrZRw=;
-        fh=RUMbgXZfLkgavLFAdeupeFdakNnzHpxScAyrkAfP+aM=;
-        b=hY74E1m+aINzwA/IHEKa8a/1w6Ajx+9rP2vGlNheCCwpNFf9FlRkTpCagVcb5iIGMM
-         I59HVPsb9jhaXlBK37lMlL1WKZNbXm34ugM46ZxQ5lUMe9ywgcLv4q6HBamRQ6GsAW7O
-         gFQzkaxnQCQut6vOPmqOVJdeiwa4rQgpG2gNyJ0egc1zeOnTMIw5GdrBNFsBaZ8caBJC
-         qWCPgVhcc3RsSENI1/bW5ZWngayUq4SG+vQu94BZtAJQ3otZiws82NIgv27UIHkio/mo
-         sjzygbmtOZGDu6q7Erjk/jAzL2q7ixGKTITxDKWU1ohIEvt+4IFC5Lz2xZA0Wq0MvRZF
-         sZJQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b="2saY95A5"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778781088; x=1779385888; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6wDiBZDMexEMEADEYdo6MQjjkOCysVPN+9Ft5KwrZRw=;
-        b=WYOv8U9kRDVZWcHQGhZunhQgkMDOaeuANoqDV6EQmSWDBtReTLpolS3t154WTR3lb2
-         8NHD5SZKRdBYk3aFv2Qzejs54BC99AnBhyuZeD6Yeq+MU/icS/UV5gOx7Tyhq8vt8AXk
-         qkmmT5IUG6o1/2peFbqHZ2H6SvC1BAqQgodC9Bd0OPUPMB7peIvD9/51aUCwAGGa1Lnu
-         lQB188mz52MAGzutTME0f9eJWFkWGZ5QFTKJp9bM0vvnHLNxa9H2lDODY+IX/Y/Bge/k
-         fN8PZ9DTmWmWQeZvrpqDKjtzOxnYou5pMYmESdR1k3p9HBA7B+rnsRTvPiQvxOWdvKVd
-         5cQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778781088; x=1779385888;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=6wDiBZDMexEMEADEYdo6MQjjkOCysVPN+9Ft5KwrZRw=;
-        b=o9CtXSVxDkyHbVGJ9xqXU7Ah+hHoJqe6YKaDZXTrN83twqME2V/ywytUKRHH0rnWNm
-         SaFC+Ze+YPRh9XHsW0suPXmcB0TbNNOvE61ba+AEGL73DWiGVkvyfovqD61QF/lpr1Kc
-         sJ/lb6GicD8v8dfOtB5oRnpEcjQRVvHLuiSvcFij1xRkWJtd93Y+r9K8Eu/0HvGJUKWc
-         225EuR0vP5UgO5Xyf9K2jAWluYpQwM9o3YSQZ3otjP7HyAi67JRrq8HASvQBYoJSEOoL
-         EtfUSUEaxpNluNMiugcyQ+Z7nxoGbsLgZzEAAjOfhZMIJDcXKLFTIqE0G85jPlivwm2o
-         6LXg==
-X-Forwarded-Encrypted: i=1; AFNElJ+/t9rvr8GlETFVZDFJeQZx8bxqinoImLlBWTbuSWS/x4LZ1ssuvskkLI0crTiNfSg+SVAoaNiRZ5OSdtOF/EQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLi9KiHdcEujpCksc8R7sbqiYqSOdMQxgn0mqFSL1vb6dpTaSU
-	VJ6wAfxRU6TJl06Wbk91zV+eoDFdBdEzMIJTWlWAJWF2vzEjnqbaXfrTfXAW6l2Yr8YU3FSKq4C
-	0ZL9vYOc3X7klXu0zPOUgaJDCSG6c+Ro=
-X-Gm-Gg: Acq92OG0dvOR9aut9A+UOYm1dTNN0s+WA/d1t/PkV7YwLpeCFWu7xfLU7/87e0ROXay
-	OehQZcF8+N72ej80RNml6s4kf/YokMnW2hCWdtAuJMgvBVxN0jbRyvIlgDD+vKhnk6em5R/v58h
-	Easbme4itMkxm4Yfxm7M2gqE3xn0t+OJ3frqOrK/XElU31Jp5wNC7BAniYcclwKHuk53vP52yVA
-	MQKuLUi7jBF6xHksmVI55Bkra2HNvPrN1LT6xbitekKDMZ8ji/jUDCizd6D8a1g6kWuNuKFKK5e
-	PYu3jOsUZnv0NFCmR2QFjSl0Sxikn2qn1kgWpog1PuRCgqlbC4J/dESj9JC4qEIbSJ/XeFdsHz6
-	bN3IW
-X-Received: by 2002:a53:c049:0:10b0:651:c047:f09c with SMTP id
- 956f58d0204a3-65e227d52f7mr245379d50.39.1778781087600; Thu, 14 May 2026
- 10:51:27 -0700 (PDT)
+	d=std.uestc.edu.cn; s=dkim; h=Received:Message-ID:Date:
+	MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	In-Reply-To:Content-Type:Content-Transfer-Encoding; bh=vk3Fqdeat
+	pDPshtmaA1B5OOj8FfRicrso7wCv91SdYU=; b=2saY95A5g568kTsJC3h5XyxDJ
+	JruVlDx8L77nvnaSe0EGjppKpDhDRyCMRvpMzqheZZZGXbTCJ/wT0s4VQc0hjI62
+	Px/TtzcpVB+rSGjglZXBi43RAiLkcweVaFI9xWG33+tvDobKkY14+VcWio2gzsV5
+	HvPoGa+rPpbh3TGw2w=
+Received: from [IPV6:240c:c983:1:5c8b:7c38:24c4:d48c:e6a7] (unknown [240c:c983:1:5c8b:7c38:24c4:d48c:e6a7])
+	by hzbj-edu-front-3.icoremail.net (Coremail) with SMTP id BbQMCkAmTzn8DwZqrmwWAg--.57856S3;
+	Fri, 15 May 2026 02:10:06 +0800 (CST)
+Message-ID: <c44ef2c6-ab81-4e29-8427-720fc625ee91@std.uestc.edu.cn>
+Date: Fri, 15 May 2026 02:10:04 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260512-getsock_three-v2-0-30b7b22ef14c@debian.org>
-In-Reply-To: <20260512-getsock_three-v2-0-30b7b22ef14c@debian.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 14 May 2026 13:51:16 -0400
-X-Gm-Features: AVHnY4LxOXAY7x1GGPoD-ZrWMAi2sQqAU3A0fF7icss2dq6JW-g14LN3XOF-d6E
-Message-ID: <CABBYNZ+nvtMHcU9but5VEG891vyO=K0MF3OAGofANxzdLVmw-g@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 0/6] Bluetooth: convert remaining bluetooth
- socket families to getsockopt_iter
-To: Breno Leitao <leitao@debian.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: btintel: Fix insufficient skb length check in
+ btintel_print_fseq_info()
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, kiran.k@intel.com, marcel@holtmann.org
+References: <20260514164913.3123671-1-2022090917019@std.uestc.edu.cn>
+ <CABBYNZJ+qJ4RfRz3W9Uf7Rs5kmyJfN_oqD5o8B6_eLLja8nXpg@mail.gmail.com>
+From: Quan Sun <2022090917019@std.uestc.edu.cn>
+In-Reply-To: <CABBYNZJ+qJ4RfRz3W9Uf7Rs5kmyJfN_oqD5o8B6_eLLja8nXpg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:BbQMCkAmTzn8DwZqrmwWAg--.57856S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxJF1UKF1fXryfGFWDXw4Dtwb_yoW8CFWfpF
+	WUKFyjyFsrGw4UWr12qa1rtF90vw43W34rCF97Arn8uwn8CF40gF98KFyjg3Wqkrs5Ar1S
+	y3WjqFnrCF1DAr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUk2b7Iv0xC_Cr1lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4
+	A2jsIEc7CjxVAFwI0_Gr1j6F4UJwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x0
+	82IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGw
+	Av7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxAI
+	w28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr
+	4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxG
+	rwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8Jw
+	CI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2
+	z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUco7KDUUUU
+X-CM-SenderInfo: asqsjiyzqzilqqrzq21wgo3vxvwfhvlgxou0/
 
-Hi Breno,
+Hi,
 
-On Tue, May 12, 2026 at 7:12=E2=80=AFAM Breno Leitao <leitao@debian.org> wr=
-ote:
->
-> Continue the conversion to .getsockopt_iter for the Bluetooth socket
-> families: hci_sock, ISO, RFCOMM, SCO and L2CAP. The first patch is a
-> small precursor that fixes a long-standing 1-byte put_user write in
-> hci_sock_getsockopt_old() so the subsequent conversion stays mechanical.
->
-> The riskiest change in this series is the SCO BT_CODEC conversion: it
-> is the only one that drops an open-coded ptr cursor in favour of
-> relying on iter_out advancing naturally on every copy_to_iter() call.
-> Every other socket option is a near-mechanical s/copy_to_user/
-> copy_to_iter/ rewrite, but BT_CODEC walks a variable-length list of
-> codecs + capabilities and previously tracked its own write offset by
-> hand. Getting the cursor semantics wrong here would silently truncate
-> or misalign user-visible codec data.
->
-> For more context about the motivation for this change, please check
-> commit 67fab22a7ad ("net: add getsockopt_iter callback to proto_ops")
->
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
-> Changes in v2:
-> - rebase the tree on top of bluetooth-next.
-> - Remove the selftest, which was mixing network and bluetooth together.
-> - Link to v1: https://patch.msgid.link/20260511-getsock_three-v1-0-1461fa=
-8786ab@debian.org
->
-> To: Marcel Holtmann <marcel@holtmann.org>
-> To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> Cc: linux-bluetooth@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
->
-> ---
-> Breno Leitao (6):
->       Bluetooth: hci_sock: write the full optval for getsockopt
->       Bluetooth: hci_sock: convert to getsockopt_iter
->       Bluetooth: ISO: convert to getsockopt_iter
->       Bluetooth: RFCOMM: convert to getsockopt_iter
->       Bluetooth: L2CAP: convert to getsockopt_iter
->       Bluetooth: SCO: convert to getsockopt_iter
->
->  net/bluetooth/hci_sock.c    | 26 +++++++++++--------
->  net/bluetooth/iso.c         | 27 ++++++++++----------
->  net/bluetooth/l2cap_sock.c  | 61 +++++++++++++++++++++++++++------------=
-------
->  net/bluetooth/rfcomm/sock.c | 30 ++++++++++++----------
->  net/bluetooth/sco.c         | 59 ++++++++++++++++++++++-----------------=
-----
->  5 files changed, 114 insertions(+), 89 deletions(-)
-> ---
-> base-commit: c2f0079e8c42fd6814c8d6b1491e3ce0a0e3b3fa
-> change-id: 20260511-getsock_three-d0d7f1b2629e
->
-> Best regards,
-> --
-> Breno Leitao <leitao@debian.org>
+On 2026/5/15 1:35, Luiz Augusto von Dentz wrote:
+> Hi,
+> 
+> On Thu, May 14, 2026 at 12:49 PM Quan Sun
+> <2022090917019@std.uestc.edu.cn> wrote:
+>>
+>> The length check at the top of btintel_print_fseq_info() verifies
+>> that the skb has at least 66 bytes (sizeof(u32) * 16 + 2), but the
+>> function actually consumes 74 bytes:
+>>
+>>    2 calls to skb_pull_data(skb, 1)  =  2 bytes
+>>    18 calls to skb_pull_data(skb, 4) = 72 bytes
+>>
+>> When the firmware returns a packet of exactly 66 bytes, the last two
+>> skb_pull_data(skb, 4) calls return NULL, which is then passed directly
+>> to get_unaligned_le32(), resulting in a NULL pointer dereference.
+>>
+>> Fix the length check to account for all 74 bytes actually consumed:
+>>    sizeof(u32) * 16 + 2  ->  sizeof(u32) * 18 + 2
+>>
+>> Fixes: a7ba218a44aa ("Bluetooth: btintel: Print Firmware Sequencer information")
+>> Signed-off-by: Quan Sun <2022090917019@std.uestc.edu.cn>
+>> ---
+>>   drivers/bluetooth/btintel.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+>> index dcaaa4ca02b99..114a8beeab92d 100644
+>> --- a/drivers/bluetooth/btintel.c
+>> +++ b/drivers/bluetooth/btintel.c
+>> @@ -3356,7 +3356,7 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
+>>                  return;
+>>          }
+>>
+>> -       if (skb->len < (sizeof(u32) * 16 + 2)) {
+>> +       if (skb->len < (sizeof(u32) * 18 + 2)) {
+> 
+> Or we stop doing this manually and the check the return of
+> skb_pull_data, that way we garantee we don't use its returns without
+> checking if it return NULL, which is the whole point in using
+> skb_pull_data otherwise we had just used skb_pull.
+> 
+>>                  bt_dev_dbg(hdev, "Malformed packet of length %u received",
+>>                             skb->len);
+>>                  kfree_skb(skb);
+>> --
+>> 2.43.0
+>>
+> 
+> 
 
-There are some comments from sashiko on this:
+You are right. I will refactor the function to check the return value of 
+each skb_pull_data() call to make it more robust.
 
-https://sashiko.dev/#/patchset/20260512-getsock_three-v2-0-30b7b22ef14c%40d=
-ebian.org
-
-Now Im not sure the truncating is actually used by our tools, but that
-sounds like it could break userspace if we don't check properly, or
-have you already done this for other socket families and it was
-considered to be ok?
-
---=20
-Luiz Augusto von Dentz
