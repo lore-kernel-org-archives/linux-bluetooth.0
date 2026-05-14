@@ -1,118 +1,298 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90EB3BB102
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 12:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31E6222599
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 12:23:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778761066; cv=none; b=j15IGeKprs4H0ZQ9URsvgIPqYSwQhCXWlag4Xl4mBGYvmk05I8FXOBHHMdagkSiJ9/YVtfjiFa05cLe/HAmAzkxn77vWfIB5Lsu+e007hsfi7yXOLyL6gRwXBvv0vXdGYoN+cmZVGIwL5Mq5WVaUq71eQZGELFoccbg5umL+h10=
+	t=1778761431; cv=none; b=FkoRoAHsyqYOz8osJkE3QiS8uVBWW6hNzeaQFGFXHbeFviKL2UcxOJ/y5F57Ahwhn7ARNn2VH2FWPKaqd1897nYMd9L80O3VS26oUUREA7PjDDb2FArdYjdXqIvYV3z9sYcV97EXNDNkE7LwVYTQIvNsQLjRbTxAM9RwlNhWHfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778761066; c=relaxed/simple;
-	bh=FABbjozjbXcKP0I9N/cv9nqdUv2mtNNYV4Bi3pDlCi8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=NvaA/Y1X5vFMVwlrlJmUpOwkYsLSUNg51uFNCVyTFLrkSl04HhY4a4jCy2c+6c/CHylfVyNkqFM/G0s2nzrnEr3b+ItTwp2RcA2v9jcsJO4Gm/ylxEHaExS+RBPEkmzmKhfaX6fWT9lrqySxNz/l0IwZRVJCAdqEal+tLosfFZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nKV7mENp; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1778761431; c=relaxed/simple;
+	bh=tNvdWsz18BZFh8ioxhmzZXU/D+bZ3VXTlHfGNXch/5Y=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=T+NdIsrC+6TkWuC5Oe+eF4wvaz+UCVSK+ululDYmSB5Z8xaCwcZrTNkDeuxt8U37j05nNZKIrhnWhoKgomHXebSz+b+0f6u5I8+4Ftju/571ZFm+0+EGSv3rBCgQn3cCEx6jL+4rrPuxZya3wdj0EiF0usA0uEyc6yFDJtqBRww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=MS0kkfNu; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=tyJFFFUV; arc=none smtp.client-ip=103.168.172.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nKV7mENp"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-90d042fa745so476359985a.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 05:17:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778761062; x=1779365862; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ah79B7lYmPt9G4oNCVorBp/+gJRZsVzX+s5ELnSdiCA=;
-        b=nKV7mENph7xSJCCYiTwVEzoBx1f7xW+0wCk9hkSbJ1ajYd5873kC2YlkpIlsuRAXpw
-         swxVPYjSTICWVIDhPkWi06CxKHHlGZitf7rbQy3ctqbIspDlOTQmAH0TiYcAqDx8oAJL
-         A+DO+xo8jRmdX/TGnX+n0fN0Dl/4GFM42KJet0aoWHIeGhstFPI4J6Tn+tg2kRSjy0jl
-         Wi8hfTjFKOesP/La13fgDcjyUK1r2422AuxFzzfW2YtDH4L3yNz40/zvoDCphaN4FUfC
-         UrtzUgcVd4Kr4GuLfcbEItffnGwwAdpJ6J8oZadSf++Krj3roPqbOdCi1RCSJ1FbO3Bq
-         ISyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778761062; x=1779365862;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ah79B7lYmPt9G4oNCVorBp/+gJRZsVzX+s5ELnSdiCA=;
-        b=RBiU3Sndw2S74eVw0dxIxlLWOHGiBslXXmIHMQ7CYYrfPWtCPK0vftuHCPvzLch17c
-         38n8D25SvwI2GoHymrXQcMFlN87diQTJ4laa3LJ2sZCi/u7OZKWP2J8vsCZLliO1MoAn
-         JoJIOTtOgwIskvWmvPwdR/jX9o/+YUfvOGyrmyv6Iupg3kT5rcnyOz/nI+Fir8Mku3gK
-         FPPywcZfCDfAfxmnETmmsKheoWazDicbDwwh0rEbxg/lN7YTT+n8Ps0nfPzjCJli4cTp
-         kbK1CCqjPON4155eeHGfW0cdsPqGMJrdg5jgxkzsUCK3qPv1fJ+iDN7dRUWsfKHx0UOm
-         ZyPQ==
-X-Gm-Message-State: AOJu0YzzaW0tNMXvb+6lbnTKwdOsvFMcgagMJRDPrNS8TufyI5mt7pNw
-	VD9bCd784UpJH7Q+dp24XalVfMk7wd4BkknkYMLnpl0dZB7aIsIYOy4sFtKKNw==
-X-Gm-Gg: Acq92OEHERl7etmuHPNauRoCKyMZi/bfAF5RnujtBFrbbNYftGCC5JwtT+c8Un3Dj8P
-	VqMzKTyHPqQrwLmDXTTPntbNycXD7tFIqtvAa0l/f0tP0wHjeDCanaYdbAh2WSB8YrkumACaNtK
-	Q4ozpVg1qmNdM9aXH1B0vLYVfPtIJvWe7k7cKQ0MzqrkKJPNtG4BWLRqBErUYCiGXTEIHw8axkH
-	1ySeizt0L7JawZeVtksL5jDNsAUaIf8FyZieaD/R0iS+pN/MISugdc7q2klGp3ZkBUxAsnaaBKH
-	XnSUAskN7IRMauDPt/E/Hl/wqNNsp4Jpkl8s9D/t+QYzUjCcwW2ki5RF0+SzLHTCKfFtODPtgma
-	/auoQDh8uylcpC18bANPBYrvIcz8GrRKPBMWuDBDjC69WBZ99008q55LJqVDV09vmSfT41a4Tty
-	IAeQUMMzQCSR+jk5pH426vK+sb24wiEP/+d0wgZXoJRQ==
-X-Received: by 2002:a05:620a:4102:b0:8ef:f1c0:ab7f with SMTP id af79cd13be357-90f88e9d34emr1152657885a.24.1778761061529;
-        Thu, 14 May 2026 05:17:41 -0700 (PDT)
-Received: from [172.17.0.2] ([64.236.133.103])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-910bc83b85asm226515985a.25.2026.05.14.05.17.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 05:17:41 -0700 (PDT)
-Message-ID: <6a05bd65.291b994c.1423be.a4b8@mx.google.com>
-Date: Thu, 14 May 2026 05:17:41 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4950568447135559882=="
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="MS0kkfNu";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tyJFFFUV"
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 2F72B14001B3;
+	Thu, 14 May 2026 08:23:49 -0400 (EDT)
+Received: from phl-imap-10 ([10.202.2.85])
+  by phl-compute-03.internal (MEProxy); Thu, 14 May 2026 08:23:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1778761429;
+	 x=1778847829; bh=7bnZCjp47BGViglBj9IDRiWSVkdlLJpSr2c/1nvAO1E=; b=
+	MS0kkfNuIBVu9ZKChrrQ+9jarBGmESEn9HuWgK6ntJ5Tv8dRFG+5rAD4GZvsMa7a
+	nxaCm1XAwru5Nnp/9DTz2+5PPxdHF/UBECPV9cmKaIjfOgWEojaYrNJ++KpxCRrN
+	0acnvblVqRQYR85Y3qdRhY3MdBj3XiZxqtp7kVhLXBgQdcVl0WWTR0WFu7BjaRkw
+	dUn9/MbI4htc5WD7/H7TxaG75+hvL2UAZFvEL/jhgUTeZhYp2WytW628XI5bNfZt
+	ow3AvPD04c3GrAgNL4fT+ewa+VSz0T1K/nnFxr7JRQvqdIKx9Lt5xLqmnIpRg8bO
+	Ebc3vJh7da1ByLFXZJhf7g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1778761429; x=
+	1778847829; bh=7bnZCjp47BGViglBj9IDRiWSVkdlLJpSr2c/1nvAO1E=; b=t
+	yJFFFUV/hwo3bVab2erXBfA99effzIQTNe3c/siyRBhCaz1Lgx2gv54td62YnLa0
+	GVHOq2rDZxgEO6p5Ih0Ec2xcHK6cse17kQZfdIeaSvqKs3kWWQCiiO9m7UfTle82
+	QNGuRyqPqFZKNnMNRg3mW54tQyyOXve/qrdYpkE1DM4LgC1mzt3YJ4rY/M2auKMc
+	2BaAGCkfVziNFOdg2dVkjk8d0vh+KYoNsQoyiphzKRDJ96qlZuEzDhlY/vV7IL4y
+	6gVBNwhN8nqT4uQ46gUqlgkI5K43+c7P91hLOOFBrf0JgCnY9pOsZfF9jn/eIosB
+	KQmkr445txZHOqmt6R75w==
+X-ME-Sender: <xms:1L4FauTwq66kMmA1t4ZOnjjuZ09azZGW-qypRnVSjOgszfqLcieHzw>
+    <xme:1L4Fauk8YX8TKDZnK3DfS7t11VrW0L8cvaOZdXBKd8ESce7oK_7aq3dC_CBk7tbr5
+    cxQP0bh72pQMWdsn8bt_N9kpm4ArLvJJX46XJ-TWD9mv8EqAFh6iIc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduvdejheduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnegfrh
+    hlucfvnfffucdlvdefmdenucfjughrpefoggffhffvvefkjghfufgtgfesthhqredtredt
+    jeenucfhrhhomhepfdfuihifvghiucgkhhgrnhhgfdcuoehoshhssehfohhurhguihhmrd
+    ighiiiqeenucggtffrrghtthgvrhhnpeeuveeuleefheetgfevkeegteetffejgfeigfdt
+    uedtveetieehleefjeehteekheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehoshhssehfohhurhguihhmrdighiiipdhnsggprhgtphhtthho
+    peefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehluhhiiidruggvnhhtiiesgh
+    hmrghilhdrtghomhdprhgtphhtthhopehmrghrtggvlheshhholhhtmhgrnhhnrdhorhhg
+    pdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlh
+    drohhrgh
+X-ME-Proxy: <xmx:1L4FahtwMJgEP6s77nsy9zlCT7bbyKXWL7t3h8ODpY3AjlPyq0KgXA>
+    <xmx:1b4FaiOBBv39rBAOFL6UazxDQLmJHoT0cch_4V2N4lCj4v8LeNAMFg>
+    <xmx:1b4Fan3pb2QizcDPNlgYc1iJUTpycQeQxQmlrvdhewoIb9nS9TkbYg>
+    <xmx:1b4FamM5Ov8XvTqkyZVI6lBvlG_McDjTuPKngAOzYdc6gqvmJfIyog>
+    <xmx:1b4FasigZu8Yi5PDKayVsQxmLfFg9lPBPdHnn5gOyPYlWquUeZa2nFCz>
+Feedback-ID: if72e4b10:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id E137E216008A; Thu, 14 May 2026 08:23:48 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, raghavendra.rao@collabora.com
-Subject: RE: [BlueZ,v2,1/1] shared/bap: set QoS state when CIS is lost
-In-Reply-To: <20260514100545.54572-2-raghavendra.rao@collabora.com>
-References: <20260514100545.54572-2-raghavendra.rao@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-ThreadId: A6I4skvcp-pg
+Date: Thu, 14 May 2026 08:23:27 -0400
+From: "Siwei Zhang" <oss@fourdim.xyz>
+To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Cc: "Marcel Holtmann" <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Message-Id: <558a354c-d2b6-4c7c-97cf-606753902b85@app.fastmail.com>
+In-Reply-To: 
+ <CABBYNZL3UVcogeJGiOzEcyGi3TCGf_pCCz+Vd32K3Li0GmPVwQ@mail.gmail.com>
+References: <20260511170929.709823-1-oss@fourdim.xyz>
+ <20260511170929.709823-2-oss@fourdim.xyz>
+ <CABBYNZL3UVcogeJGiOzEcyGi3TCGf_pCCz+Vd32K3Li0GmPVwQ@mail.gmail.com>
+Subject: Re: [PATCH RESEND v4 1/1] Bluetooth: L2CAP: Fix use-after-free in
+ l2cap_sock_new_connection_cb()
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
---===============4950568447135559882==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+On Mon, May 11, 2026, at 3:17 PM, Luiz Augusto von Dentz wrote:
+> Hi,
+>
+> On Mon, May 11, 2026 at 1:09=E2=80=AFPM Siwei Zhang <oss@fourdim.xyz> =
+wrote:
+>>
+>> l2cap_sock_new_connection_cb() accesses l2cap_pi(sk)->chan after
+>> release_sock(parent). Once the parent lock is released, the child
+>> socket sk can be freed by another task.
+>>
+>> Save the channel pointer into a local variable while the parent lock
+>> is still held to prevent this.
+>>
+>> Fixes: 8ffb929098a5 ("Bluetooth: Remove parent socket usage from l2ca=
+p_core.c")
+>> Cc: stable@kernel.org
+>> Assisted-by: Claude:claude-opus-4-7
+>> Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
+>> ---
+>>  net/bluetooth/6lowpan.c    |  5 +++++
+>>  net/bluetooth/l2cap_core.c | 12 ++++++++++++
+>>  net/bluetooth/l2cap_sock.c | 13 ++++++++++++-
+>>  net/bluetooth/smp.c        |  5 +++++
+>>  4 files changed, 34 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+>> index 23a229ab6a33..71c1c04b61e5 100644
+>> --- a/net/bluetooth/6lowpan.c
+>> +++ b/net/bluetooth/6lowpan.c
+>> @@ -755,6 +755,11 @@ static inline struct l2cap_chan *chan_new_conn_c=
+b(struct l2cap_chan *pchan)
+>>
+>>         BT_DBG("chan %p pchan %p", chan, pchan);
+>>
+>> +       /* Match the put that the caller of ops->new_connection() per=
+forms
+>> +        * once it is done with the returned channel pointer.
+>> +        */
+>> +       l2cap_chan_hold(chan);
+>> +
+>>         return chan;
+>>  }
+>>
+>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>> index 7701528f1167..0f6c3c651207 100644
+>> --- a/net/bluetooth/l2cap_core.c
+>> +++ b/net/bluetooth/l2cap_core.c
+>> @@ -4071,6 +4071,9 @@ static void l2cap_connect(struct l2cap_conn *co=
+nn, struct l2cap_cmd_hdr *cmd,
+>>
+>>         __l2cap_chan_add(conn, chan);
+>>
+>> +       /* Drop the ops->new_connection() ref; conn list now pins cha=
+n. */
+>> +       l2cap_chan_put(chan);
+>> +
+>>         dcid =3D chan->scid;
+>>
+>>         __set_chan_timer(chan, chan->ops->get_sndtimeo(chan));
+>> @@ -4970,6 +4973,9 @@ static int l2cap_le_connect_req(struct l2cap_co=
+nn *conn,
+>>
+>>         __l2cap_chan_add(conn, chan);
+>>
+>> +       /* Drop the ops->new_connection() ref; conn list now pins cha=
+n. */
+>> +       l2cap_chan_put(chan);
+>> +
+>>         l2cap_le_flowctl_init(chan, __le16_to_cpu(req->credits));
+>>
+>>         dcid =3D chan->scid;
+>> @@ -5194,6 +5200,9 @@ static inline int l2cap_ecred_conn_req(struct l=
+2cap_conn *conn,
+>>
+>>                 __l2cap_chan_add(conn, chan);
+>>
+>> +               /* Drop the ops->new_connection() ref; conn list now =
+pins chan. */
+>> +               l2cap_chan_put(chan);
+>> +
+>>                 l2cap_ecred_init(chan, __le16_to_cpu(req->credits));
+>>
+>>                 /* Init response */
+>> @@ -7407,6 +7416,9 @@ static void l2cap_connect_cfm(struct hci_conn *=
+hcon, u8 status)
+>>                         chan->dst_type =3D dst_type;
+>>
+>>                         __l2cap_chan_add(conn, chan);
+>> +
+>> +                       /* Drop the ops->new_connection() ref; conn l=
+ist now pins chan. */
+>> +                       l2cap_chan_put(chan);
+>>                 }
+>>
+>>                 l2cap_chan_unlock(pchan);
+>> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+>> index cf590a67d364..295c79cf5cf3 100644
+>> --- a/net/bluetooth/l2cap_sock.c
+>> +++ b/net/bluetooth/l2cap_sock.c
+>> @@ -1497,6 +1497,7 @@ static void l2cap_sock_cleanup_listen(struct so=
+ck *parent)
+>>  static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_=
+chan *chan)
+>>  {
+>>         struct sock *sk, *parent =3D chan->data;
+>> +       struct l2cap_chan *child_chan;
+>>
+>>         if (!parent)
+>>                 return NULL;
+>> @@ -1523,9 +1524,19 @@ static struct l2cap_chan *l2cap_sock_new_conne=
+ction_cb(struct l2cap_chan *chan)
+>>
+>>         bt_accept_enqueue(parent, sk, false);
+>>
+>> +       child_chan =3D l2cap_pi(sk)->chan;
+>> +
+>> +       /* Pin the channel for the caller. Once release_sock(parent) =
+returns,
+>> +        * userspace can accept(2) and immediately close(2) the child=
+ socket,
+>> +        * which would drop the socket's references on the channel an=
+d free
+>> +        * it before the caller (e.g. l2cap_connect_req()) is done us=
+ing the
+>> +        * returned pointer. The matching put is the caller's respons=
+ibility.
+>> +        */
+>> +       l2cap_chan_hold(child_chan);
+>
+> The entire problem might be solvable by not removing `list_add` from
+> `l2cap_create_chan`. This way, it only allocates but does not attach
+> to global_l until __l2cap_chan_add is called which then handles the
+> addition.
 
-Dear submitter,
+Could you please clarify what is "not removing `list_add` from
+`l2cap_chan_create`"? I am not touching that part of code nor removing
+the `list_add`. Do you want me to correspond the `chan` lifetime to `cha=
+n_list`?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1094712
+> Alternatively, we could allocate it first, given the
+> circular dependency involving `l2cap_core`.c->l2cap_sock.c)
+> new_connection -> l2cap_chan_create(l2cap_sock.c->l2cap_core.c) which
 
----Test result---
+This will change the signature of `l2cap_ops.new_connection`, which will=
+ be a large
+refactoring across multiple files.
 
-Test Summary:
-CheckPatch                    PASS      0.40 seconds
-GitLint                       PASS      0.29 seconds
-BuildEll                      PASS      20.02 seconds
-BluezMake                     PASS      614.31 seconds
-MakeCheck                     PASS      12.67 seconds
-MakeDistcheck                 PASS      233.13 seconds
-CheckValgrind                 PASS      253.24 seconds
-CheckSmatch                   WARNING   320.88 seconds
-bluezmakeextell               PASS      164.03 seconds
-IncrementalBuild              PASS      603.36 seconds
-ScanBuild                     PASS      908.51 seconds
+Signature will be changed from
+`struct l2cap_chan	*(*new_connection) (struct l2cap_chan *chan);`
+to
+`void (*new_connection) (struct l2cap_chan *chan, struct l2cap_chan *new=
+_chan)`
+Do you want me to this in this patch or in the follow up patch?
+If in this patch, I will drop the backport cc to stable.
 
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:312:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:312:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:312:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
+> makes the code rather hard to follow.
+>
 
+I totally understand this will create a maintenance problem. I created t=
+his patch
+mainly because it can be easily to be backported to the stable branches =
+and it
+is the safest fix (though ugly). I can send a follow up patch for this t=
+o refactor it
+according to your suggestions.
 
-https://github.com/bluez/bluez/pull/2127
+>>         release_sock(parent);
+>>
+>> -       return l2cap_pi(sk)->chan;
+>> +       return child_chan;
+>>  }
+>>
+>>  static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buf=
+f *skb)
+>> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+>> index 1739c1989dbd..9796c3030434 100644
+>> --- a/net/bluetooth/smp.c
+>> +++ b/net/bluetooth/smp.c
+>> @@ -3231,6 +3231,11 @@ static inline struct l2cap_chan *smp_new_conn_=
+cb(struct l2cap_chan *pchan)
+>>
+>>         BT_DBG("created chan %p", chan);
+>>
+>> +       /* Match the put that the caller of ops->new_connection() per=
+forms
+>> +        * once it is done with the returned channel pointer.
+>> +        */
+>> +       l2cap_chan_hold(chan);
+>> +
+>>         return chan;
+>>  }
+>>
+>> --
+>> 2.54.0
+>>
+>
+>
+> --=20
+> Luiz Augusto von Dentz
 
----
-Regards,
-Linux Bluetooth
-
-
---===============4950568447135559882==--
+Best,
+Siwei
