@@ -1,97 +1,143 @@
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381FA33A007
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 16:49:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98DE36404D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 17:00:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778777369; cv=none; b=K145kMidcbxyA3FUz2ELHu9c7+OV3kBjfcK2G5Wv6HIYXiiNxA+jDQwMfZWyJ5dQh0HuQV+gHYGcfpEAiK1Qa+Qp2I5AJKGlp3ZmaxJKnkjtiW6HHKoWkwCjjkYcbLa62m+HiaA6X1F9X8j/numjW2XRujTHTnDNnSV7ulH9r4A=
+	t=1778778016; cv=none; b=DcvuaCEvOVZif5bGdM2TxbCQRzrMd2fpsSNht+nwZCH+dnGAvdQsdnNKOVKo9URxXTB5ZYPWEe+AYH/0vm0mLEwg1zSwUHOaXj9VE8CM1xZXGLF4/eywa7Hm/ODoMz3gk2dV8lmpyv+U8V1nIbTgC65GCC73sAmd1mxoMYgmT88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778777369; c=relaxed/simple;
-	bh=l+xmCVEyPdAb9K1ctr9c/Ygy/JE438VcPj1UnVYn4A0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tlVDeAC0KWav50aN+Ml2ZLWyAsULeFSk2qDzRh1RNpxxaaBr2GAWAUcYf9ibSav4ME3nCTcfnqVVgu5UNJ/OlBfZpuk0pl24gNDENNWqq+F5fJnHZKr6BpfUTTUGiRK4qgMx/yd6YfOSnd8LjVa5K9Rak+BgxA1QN0fUgS2u0Pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn; spf=pass smtp.mailfrom=std.uestc.edu.cn; dkim=fail (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b=S98Cp1uA reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=std.uestc.edu.cn
+	s=arc-20240116; t=1778778016; c=relaxed/simple;
+	bh=ybft+WP9k/LcgSj0mM5BbqQmNp27SKN2kJLiKr66w1Y=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=shRUHpsqWOH6SPAM2USa8FtoU++4fuWFwssb53fkheVq+dZby+oI5VhGJ7xGqHwUc73wQ9GrpEQ0TLvbL7MMus+rE+XreKrRXw4YHjMZXdbP7F4zistV9UP/jHSaJ/XQIaYgA2xcN1/lc6h/NDy6G+AFZwQAO6J4OtdHGxcXr3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WUILjDrY; arc=none smtp.client-ip=209.85.160.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b="S98Cp1uA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WUILjDrY"
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-43496e6a964so6119832fac.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 10:00:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=std.uestc.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
-	Message-ID:MIME-Version:Content-Transfer-Encoding; bh=c97RPJcOUO
-	W/mKWk18UVkwinIbG8O02sSWjnkaxk8pE=; b=S98Cp1uAFQlpclSzZS8lJrAgTM
-	5WAP+sG+zoxz5l6w9eYtq5OpnYQkCGIooRshW5sZ05SftF91hDHT+yQ8frXOlMFl
-	QUMak3d1fqWdSDDQgI4ScTk/XKIn/Xc3dbdewSW2cbj/GmFdMqNOUOs5P8hg33XI
-	GjuIzB5JEL8kh6Gaw=
-Received: from hotaru.tailb307d0.ts.net (unknown [183.94.22.109])
-	by hzbj-edu-front-2.icoremail.net (Coremail) with SMTP id BLQMCkDWu7sM_QVqXvsVAg--.62713S2;
-	Fri, 15 May 2026 00:49:18 +0800 (CST)
-From: Quan Sun <2022090917019@std.uestc.edu.cn>
-To: linux-bluetooth@vger.kernel.org,
-	kiran.k@intel.com,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org
-Cc: Quan Sun <2022090917019@std.uestc.edu.cn>
-Subject: [PATCH] Bluetooth: btintel: Fix insufficient skb length check in btintel_print_fseq_info()
-Date: Fri, 15 May 2026 00:49:13 +0800
-Message-ID: <20260514164913.3123671-1-2022090917019@std.uestc.edu.cn>
-X-Mailer: git-send-email 2.43.0
+        d=gmail.com; s=20251104; t=1778778012; x=1779382812; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=La6cUY/moh4rWtwHxqW0cnHDp4xW8M80izM+lfXr6e4=;
+        b=WUILjDrYek73LtN02kcsv7uXVE4SIX3zOfdPzcQ9w1XDtw/s8ZeDBoQbGqp3pHmRyA
+         Ag6B8sRwXnIGF5GYvcVUE7OvLwZvJcKBJvs7zGXbUrdFnqTyM32GCeltVNvo8h/5FJdT
+         +g2xvTxWiR2yKnLfXuuGv8XdrDMZtuBIEnItE7o2QTTP8eD5uW8fAvfSQC+1xR3raIY+
+         uD/GQLBU4HYXKBhAJNrBtXr4MxYYwarCxMJwBP3KDYWSBiFzVHLqLtbz8SbaGdrn4rTE
+         N/MY+zteamoKfcQKBJJqRzLrPUIxy1gzDxWuzCVakDwXLmtBgtYYGQz7ughqzQjHXoYy
+         9sUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778778012; x=1779382812;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=La6cUY/moh4rWtwHxqW0cnHDp4xW8M80izM+lfXr6e4=;
+        b=O5N+Q2+OyBxgHqQFVRZU0cRgMovAHB1+AUp1UjDF9ragujd9ia3oB12D+CRQJOblUH
+         tDnVni1sxvJFKEeC0xCS1HE1qCD4vEoaw4EMmLNI2pwPLOEDGN+aucUZXFZ1mcsNj/KU
+         t7jm7JE9Z/T44kl73BfnMPdIkev02hppE8UJjVUlVQomQgFl0OYd0SvKbDICFNSTtFwk
+         u0/v9IebrI2qbTWse8uAHUGHNTuE8drxqZ+GwrP/Y+EupGsEmsyWJ9+/qK1eahJcfxH2
+         sLrCH9Cs17EsikpJMxymoSJJI0KbW06EK3X59jWQRP32m7BFLmYM5Ikpe+6Lk4RggxBK
+         autw==
+X-Gm-Message-State: AOJu0YyZFu2kgOz8PNRy2/oT5PM+7pu9z4PNloOL0FbPRVGR9pNQ4Css
+	s48TnePpNWhwxUJzTxoKkrC+5JmgSE1FEYvm1MqJe0nxoaa82lizdFGl4kPErQ==
+X-Gm-Gg: Acq92OHjnNpR1PUVHc5YVW6t28jQw9gEfChXAy+DN0qQ4vok4Wlk4upUjtdsKTl9G9n
+	rj3FppYoAOKgFQcTPYGt40rqTNw6k7COy2JYDjzPal2i0ZR+7LULoChmMn3GI9EPQPQ5FxXH4Nd
+	87mVbR8MeyCozcpY4NA04d5w2dOHtBm3Vgw1CCCHL/HFFymQm23kxaKpD/SM/X17OkTAxSexcbm
+	I+YYKzxSpYghJl9RaMySYYl//9VkrV3+NDD5ePh9YtByxZDU2fXbI+87YwALsDdUXVn9Fg8mG4T
+	YLXkrzYiHtcWLNSAV82IfDnhn9PigBYFryBaXKxwrEsA/2IIyC3oxPGzzmG+cFAu/2UvvDpgNsz
+	nfXwUukzxV80sJiYgfLy0+56PRvhCyNRoMEmVIzp1LmbQQbMTOEKAJwue0lNvr2zp39/2LL54w1
+	gjCk5Z5b7atuDL2pxz/oXa9IPH3kMDjIs=
+X-Received: by 2002:a05:6820:221e:b0:694:9a0a:6fa9 with SMTP id 006d021491bc7-69c94319189mr185665eaf.26.1778778011810;
+        Thu, 14 May 2026 10:00:11 -0700 (PDT)
+Received: from [172.17.0.2] ([52.176.138.177])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69b8cce2817sm1594905eaf.15.2026.05.14.10.00.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 May 2026 10:00:11 -0700 (PDT)
+Message-ID: <6a05ff9b.cad722b2.1885d9.3b7c@mx.google.com>
+Date: Thu, 14 May 2026 10:00:11 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5571887068750363845=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:BLQMCkDWu7sM_QVqXvsVAg--.62713S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tF15Gr48AF4DAFW7ZrWkWFg_yoW8JFW8pa
-	y7GFyUAFs3Gw4IgF12qF4rAr90vw1fWa43GF97Aw15Zwn8CrW0gFZ8KFyjqa4DCrZ5Aw1Y
-	y3Z2qFn7GF1DAr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r1j
-	6r4UM28EF7xvwVC2z280aVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4UJV
-	WxJr1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-	1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-	AIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
-	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxh
-	VjvjDU0xZFpf9x0JUfnY7UUUUU=
-X-CM-SenderInfo: asqsjiyzqzilqqrzq21wgo3vxvwfhvlgxou0/
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, w15303746062@163.com
+Subject: RE: [v2] Bluetooth: hci_uart: fix UAF in hci_uart_tty_close()
+In-Reply-To: <20260514151722.382161-1-w15303746062@163.com>
+References: <20260514151722.382161-1-w15303746062@163.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The length check at the top of btintel_print_fseq_info() verifies
-that the skb has at least 66 bytes (sizeof(u32) * 16 + 2), but the
-function actually consumes 74 bytes:
+--===============5571887068750363845==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  2 calls to skb_pull_data(skb, 1)  =  2 bytes
-  18 calls to skb_pull_data(skb, 4) = 72 bytes
+This is automated email and please do not reply to this email!
 
-When the firmware returns a packet of exactly 66 bytes, the last two
-skb_pull_data(skb, 4) calls return NULL, which is then passed directly
-to get_unaligned_le32(), resulting in a NULL pointer dereference.
+Dear submitter,
 
-Fix the length check to account for all 74 bytes actually consumed:
-  sizeof(u32) * 16 + 2  ->  sizeof(u32) * 18 + 2
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1094870
 
-Fixes: a7ba218a44aa ("Bluetooth: btintel: Print Firmware Sequencer information")
-Signed-off-by: Quan Sun <2022090917019@std.uestc.edu.cn>
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.64 seconds
+GitLint                       FAIL      0.27 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      26.17 seconds
+CheckAllWarning               PASS      28.47 seconds
+CheckSparse                   PASS      27.00 seconds
+BuildKernel32                 PASS      24.99 seconds
+TestRunnerSetup               PASS      556.38 seconds
+IncrementalBuild              PASS      24.51 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v2] Bluetooth: hci_uart: fix UAF in hci_uart_tty_close()
+WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#85: 
+  ODEBUG: free active (active state 0) object: ffff88804024e870 object type: work_struct hint: hci_uart_write_work+0x0/0x940
+
+total: 0 errors, 1 warnings, 21 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14573255.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2] Bluetooth: hci_uart: fix UAF in hci_uart_tty_close()
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+16: B1 Line exceeds max length (124>80): "  ODEBUG: free active (active state 0) object: ffff88804024e870 object type: work_struct hint: hci_uart_write_work+0x0/0x940"
+17: B1 Line exceeds max length (86>80): "  WARNING: CPU: 0 PID: 338273 at lib/debugobjects.c:612 debug_print_object+0x1a2/0x2b0"
+55: B1 Line exceeds max length (104>80): "- Added explanation for the absence of a standalone reproducer (highly timing-dependent race condition)."
+
+
+https://github.com/bluez/bluetooth-next/pull/190
+
 ---
- drivers/bluetooth/btintel.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index dcaaa4ca02b99..114a8beeab92d 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -3356,7 +3356,7 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
- 		return;
- 	}
- 
--	if (skb->len < (sizeof(u32) * 16 + 2)) {
-+	if (skb->len < (sizeof(u32) * 18 + 2)) {
- 		bt_dev_dbg(hdev, "Malformed packet of length %u received",
- 			   skb->len);
- 		kfree_skb(skb);
--- 
-2.43.0
 
+--===============5571887068750363845==--
