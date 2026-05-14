@@ -1,101 +1,141 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D777F347BA9
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 18:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6789338B143
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 18:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778782915; cv=none; b=NGu/2Rglrepkdd41PHj1NBTqnlOgduMVVFKKqvOSyqwInkMzn1q6+f/TdkkBliXWu/O3UgEObCl6NZhAeCWJ2zrDH6PU/XjdRFfkvhl9SfhugZSQXrRv5NNOMde2npXZ/W55wtutJgL8k90rFGEqY2UHByLgP8ljbtFAdqx2OSo=
+	t=1778784254; cv=none; b=NG46LjnNq5pBg2FEksSLqLGqbPK2tmoCD+QKHQN997uwa0ggldJTEwKDvEZYyU/92uKEMxhh4G7yxFyJSLAI7gvBAyPblnieRyRws9wxkC3EN2fLq/uFAqajAkPPZnOsUuGm7eoqM8cQsJGVsmfoiwMNLcpOjmkUkh9rV5GBDmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778782915; c=relaxed/simple;
-	bh=NGtfuIyBOHQ05iVkh8k7G8w8cO3exgAXDBFvgkcU6+Q=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Fp8mFojOYX/iurqqNRFEIA2Y7sPOtYem7ZFMwrjKVrVMGjYAog1PQ/ocC73Ck6y7FhVW26h8lZLCguiSukPtsMCJuHVrqINH0H2rRQpjPY5hnPnNzAvhc9EsNF3P6HJETs1RXlZWiSLQ0Lh2YTxBHDTsB16IhSsh7yJ3SkbzNjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mONy/U+l; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1778784254; c=relaxed/simple;
+	bh=iUXFRhM5wRWeA9Abs+0EIT0O1F4te9AGIlgE8zrnOe8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oXSs/tyVYIUrLyyRusqzXW04SD57kw+cXItWnbIZqtAAnK4X00P7SmLSwTbwRjJwY1BRo7EqzbKJ1HgYNA/Vnjbl+AtQBkUPqZmgywYtmsQLCK9AC23ugY/OJr9S7f1xipG776rQePzlRGbgMUibgyCFVxpgZMCi3gbUnFv5fD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F1KIZw0j; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mONy/U+l"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-8c92737a8d3so7387236d6.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 11:21:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778782913; x=1779387713; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NGtfuIyBOHQ05iVkh8k7G8w8cO3exgAXDBFvgkcU6+Q=;
-        b=mONy/U+lXtQQ0Buxl/awlPpevgtGDJUwHuZgfYK3Hc8qKepWNdOvhUHEc+/EkdQ5tT
-         tO8T0TbCqEWIUhQVJ9LJWDfjGAriLZ794Vz5vyCHgsAbGTzCUvRNZkGJWW6s1jJBA4JJ
-         EV/BsnZL5qc+pNVc9yB7LykwdvjbKhYyBzAX2SAW9eP/d4famFfpKLsQBgqmBMf03jbe
-         vG0JlY4gyinJ/1zTFc97new0PXcYPSB7KPZPENdIt7hcq3S+1+xiSEAoVDHUAwoVB4Er
-         k++5AwKTP+QDSOUKtEEyievrPP/AJfd9nDMI4EyWR5AV3nncfEcICfeL3+zZc0Fo+vsK
-         82tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778782913; x=1779387713;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NGtfuIyBOHQ05iVkh8k7G8w8cO3exgAXDBFvgkcU6+Q=;
-        b=sp3rfZRmQHArfXz6T7DKiZlNpZfbMYd/ljuMJAigzOyV/mBzQhD9qvYyLsyerIUfbt
-         OWaayZPnUh4wYx/bkQAqpe/a5XlmFKmSaIDtPxQmUPJSBYdErPu92qWQy4fzcHKcpwKd
-         vl7M6Lwt3w3KfmYx+k6pEu5d5RfN0oaTTD5aXmeao1W8b7sud5zorEAc9cEoRAKX3CMx
-         AiimrPcK/gES661n9i1XUvR+OtMcOqc4K2/ijG73osABF6S/PTHOWJDHuIQEszJvhG9R
-         73Q06UUG0u4nHo9Fs+byMPH/2ll04IvX1dXoBM10Dheg4htW26NYuTY1xvORt4wPOE7U
-         gOmQ==
-X-Gm-Message-State: AOJu0YwgtOFaBDMSEqGs2xAu4yoK8cJbngPclVyKlzTFOT44YSx7S8/p
-	+5olgH29AyIx8cnng+a+CrzbPKV/ENYzGBlrpM50UruhbVuuODOFxDOTvAGoug==
-X-Gm-Gg: Acq92OFyHxHNkj8Ftb2tw/DqTdjMKYJfCrywpjd6p0X0a3ZnWN7fgKQdeMHTM2flTbm
-	RORh7+Ecc8TCWHaMMtTdm5bVK+1JnLtbUfH2PqSLFKVxq/ze6If9mFTJ42ofxgzxjFDukdGx6rF
-	Xgv3GgsPsq7aDE8MTQ/9z/wr6wNlyAcLQJB20meyCMR5sNoEkV8FAkXZ6bPFO1GRmOYNp+zX8yC
-	J3zTL1jkXxDaGdB3in2PnlyppzsSNyFPoku6aC7HgxfcGIOelOaAr/xMGwaBsr/n0XfBNEh3xGW
-	YMpiOOQlYaLrwPzP3qmycR5AGl7Z91E8TxAHcY+ZlXu8BZeKv9Mfx13kebk9YSZmkHSAcjoC/Wl
-	n41cvBuVUBpSm1zYGeov13ME8co70tNPTnUmomNIM4xdrmZlCVa3DkQX677MnxkBT8ZNKQqtogH
-	6p3OxKqtllGzi7klsQQrhVrg6LIFjh
-X-Received: by 2002:a05:6214:3c98:b0:8ac:7d2f:c7e0 with SMTP id 6a1803df08f44-8ca0f657973mr14282526d6.23.1778782912827;
-        Thu, 14 May 2026 11:21:52 -0700 (PDT)
-Received: from [172.17.0.2] ([74.235.123.2])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8c90b3d0bdbsm28932046d6.24.2026.05.14.11.21.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 11:21:52 -0700 (PDT)
-Message-ID: <6a0612c0.143d05a0.1cc117.72f3@mx.google.com>
-Date: Thu, 14 May 2026 11:21:52 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4309052093116078783=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F1KIZw0j"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778784251; x=1810320251;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=iUXFRhM5wRWeA9Abs+0EIT0O1F4te9AGIlgE8zrnOe8=;
+  b=F1KIZw0jCTyeBw5mai2jtdzVMcmJWIe5pZfyMZMrU71NMmrLNK1riTgr
+   ZjIKfVByAbHo6/HTThj1aBnLRbDW85BSub/S+ZhtJ3fMXv5jO4BGIO9DA
+   kE5uMaWBxH1CtlGQCMAl5uzNoBMebm231ZzGkaAH7966IeG9XpqwE1Uv8
+   T2Q4WipqvhCsXP9W8AVgxBeC92YQ/BC1zI62cfHLQWzCAKm/YAYVemUgm
+   UkO9n4D/uMcWcd/L/BapCV7UEnRHlUgNa7422oIQD22jwCyP4sHPQ9ex1
+   bOQlMQeoAYJszSSbON6eNLFORb6++9wDr2NUWSt4YQyqFKgey+2x0CyUG
+   Q==;
+X-CSE-ConnectionGUID: yyWfGlLXTMOpbQcSjW7N2A==
+X-CSE-MsgGUID: lhnihgfPTBGnYSud0DiICQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11786"; a="91199069"
+X-IronPort-AV: E=Sophos;i="6.23,235,1770624000"; 
+   d="scan'208";a="91199069"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2026 11:44:10 -0700
+X-CSE-ConnectionGUID: kHE686yPTB+M2SgXyq2ASQ==
+X-CSE-MsgGUID: +9C6t0N0SgOZdpv1ewp87w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,235,1770624000"; 
+   d="scan'208";a="232069756"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmviesa009.fm.intel.com with ESMTP; 14 May 2026 11:44:07 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v2] Bluetooth: btintel_pcie: Fix incorrect MAC access programming
+Date: Fri, 15 May 2026 00:32:48 +0530
+Message-ID: <20260514190248.1275299-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, shivamkalra98@zohomail.in
-Subject: RE: Bluetooth: btmtk: Fix FUNC_CTRL parsing for devices with zero-length payloads
-In-Reply-To: <20260514-bluetooh-fix-mt7922-v1-1-499c878af1e5@zohomail.in>
-References: <20260514-bluetooh-fix-mt7922-v1-1-499c878af1e5@zohomail.in>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4309052093116078783==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+btintel_pcie_get_mac_access() and btintel_pcie_release_mac_access()
+were programming STOP_MAC_ACCESS_DIS and XTAL_CLK_REQ in addition to
+the MAC_ACCESS_REQ handshake. These bits are not part of the host
+MAC-access handshake on the supported parts; the driver was
+programming them incorrectly. Drop the writes so the register update
+contains only the bits the controller actually consumes.
 
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: drivers/bluetooth/btmtk.c:717
-error: drivers/bluetooth/btmtk.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Fixes: b9465e6670a2 ("Bluetooth: btintel_pcie: Read hardware exception data")
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
-Regards,
-Linux Bluetooth
+Changes in v2:
+- Reworded commit message and subject; describe the bits as the driver
+  programming the hardware incorrectly.
+- Added Fixes: tag.
+- Skip the FUNC_CTRL register write when MAC_ACCESS_REQ is already in
+  the desired state in both get/release paths.
 
+v1: https://lore.kernel.org/linux-bluetooth/20260511133932.1217624-1-kiran.k@intel.com/
 
---===============4309052093116078783==--
+ drivers/bluetooth/btintel_pcie.c | 20 ++++++--------------
+ drivers/bluetooth/btintel_pcie.h |  3 ---
+ 2 files changed, 6 insertions(+), 17 deletions(-)
+
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index fda474406003..eba563b66090 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -594,12 +594,10 @@ static int btintel_pcie_get_mac_access(struct btintel_pcie_data *data)
+ 
+ 	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
+ 
+-	reg |= BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS;
+-	reg |= BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ;
+-	if ((reg & BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_STS) == 0)
++	if (!(reg & BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ)) {
+ 		reg |= BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ;
+-
+-	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
++		btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
++	}
+ 
+ 	do {
+ 		reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
+@@ -619,16 +617,10 @@ static void btintel_pcie_release_mac_access(struct btintel_pcie_data *data)
+ 
+ 	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
+ 
+-	if (reg & BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ)
++	if (reg & BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ) {
+ 		reg &= ~BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ;
+-
+-	if (reg & BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS)
+-		reg &= ~BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS;
+-
+-	if (reg & BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ)
+-		reg &= ~BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ;
+-
+-	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
++		btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
++	}
+ }
+ 
+ static void *btintel_pcie_copy_tlv(void *dest, enum btintel_pcie_tlv_type type,
+diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
+index 2db85f71b2f8..7fc8c46ed689 100644
+--- a/drivers/bluetooth/btintel_pcie.h
++++ b/drivers/bluetooth/btintel_pcie.h
+@@ -34,9 +34,6 @@
+ #define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_STS	(BIT(20))
+ 
+ #define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ	(BIT(21))
+-/* Stop MAC Access disconnection request */
+-#define BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS	(BIT(22))
+-#define BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ		(BIT(23))
+ 
+ #define BTINTEL_PCIE_CSR_FUNC_CTRL_BUS_MASTER_STS	(BIT(28))
+ #define BTINTEL_PCIE_CSR_FUNC_CTRL_BUS_MASTER_DISCON	(BIT(29))
+-- 
+2.53.0
+
