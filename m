@@ -1,120 +1,101 @@
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDAE7372069
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 18:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D777F347BA9
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 18:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778782216; cv=none; b=aKetThXRNzjkjxUa3VaQKymwQBA5dz9LQmVkUFsis9FkrzBwand7g3YdK8SpBbkXRmEbwE0ekCjzBSHmIVE9AWLHlBL5tkt418ZchqSWe+So+/JndSqR4ffl1t7SpgTgO9F9D0lLNewFmv9BdGgxa7zG3wY5wJ0/IPMz8Zyxb5c=
+	t=1778782915; cv=none; b=NGu/2Rglrepkdd41PHj1NBTqnlOgduMVVFKKqvOSyqwInkMzn1q6+f/TdkkBliXWu/O3UgEObCl6NZhAeCWJ2zrDH6PU/XjdRFfkvhl9SfhugZSQXrRv5NNOMde2npXZ/W55wtutJgL8k90rFGEqY2UHByLgP8ljbtFAdqx2OSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778782216; c=relaxed/simple;
-	bh=I5DU1a/8sDq7wA3o3yi6lrhVCAISGKns4nN/7sADBag=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oLYPYMN4Iduj+ekDOmUSasZVXgGnWy92FdBRQITm0WGTfxFKckiS5QbKmgU4ADf63pg3gkpGq1jj4E5DUOq5ZeWriYkShnGpzOYBGcPqmBbYM6YCOlOGtogEijlLY2P9LN9T2WTQsFUbx4bcDAudUMgEfNhvXrjmC6iI+lmU8VI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn; spf=pass smtp.mailfrom=std.uestc.edu.cn; dkim=fail (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b=2saY95A5 reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=std.uestc.edu.cn
+	s=arc-20240116; t=1778782915; c=relaxed/simple;
+	bh=NGtfuIyBOHQ05iVkh8k7G8w8cO3exgAXDBFvgkcU6+Q=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Fp8mFojOYX/iurqqNRFEIA2Y7sPOtYem7ZFMwrjKVrVMGjYAog1PQ/ocC73Ck6y7FhVW26h8lZLCguiSukPtsMCJuHVrqINH0H2rRQpjPY5hnPnNzAvhc9EsNF3P6HJETs1RXlZWiSLQ0Lh2YTxBHDTsB16IhSsh7yJ3SkbzNjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mONy/U+l; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b="2saY95A5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mONy/U+l"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-8c92737a8d3so7387236d6.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 11:21:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=std.uestc.edu.cn; s=dkim; h=Received:Message-ID:Date:
-	MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	In-Reply-To:Content-Type:Content-Transfer-Encoding; bh=vk3Fqdeat
-	pDPshtmaA1B5OOj8FfRicrso7wCv91SdYU=; b=2saY95A5g568kTsJC3h5XyxDJ
-	JruVlDx8L77nvnaSe0EGjppKpDhDRyCMRvpMzqheZZZGXbTCJ/wT0s4VQc0hjI62
-	Px/TtzcpVB+rSGjglZXBi43RAiLkcweVaFI9xWG33+tvDobKkY14+VcWio2gzsV5
-	HvPoGa+rPpbh3TGw2w=
-Received: from [IPV6:240c:c983:1:5c8b:7c38:24c4:d48c:e6a7] (unknown [240c:c983:1:5c8b:7c38:24c4:d48c:e6a7])
-	by hzbj-edu-front-3.icoremail.net (Coremail) with SMTP id BbQMCkAmTzn8DwZqrmwWAg--.57856S3;
-	Fri, 15 May 2026 02:10:06 +0800 (CST)
-Message-ID: <c44ef2c6-ab81-4e29-8427-720fc625ee91@std.uestc.edu.cn>
-Date: Fri, 15 May 2026 02:10:04 +0800
+        d=gmail.com; s=20251104; t=1778782913; x=1779387713; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=NGtfuIyBOHQ05iVkh8k7G8w8cO3exgAXDBFvgkcU6+Q=;
+        b=mONy/U+lXtQQ0Buxl/awlPpevgtGDJUwHuZgfYK3Hc8qKepWNdOvhUHEc+/EkdQ5tT
+         tO8T0TbCqEWIUhQVJ9LJWDfjGAriLZ794Vz5vyCHgsAbGTzCUvRNZkGJWW6s1jJBA4JJ
+         EV/BsnZL5qc+pNVc9yB7LykwdvjbKhYyBzAX2SAW9eP/d4famFfpKLsQBgqmBMf03jbe
+         vG0JlY4gyinJ/1zTFc97new0PXcYPSB7KPZPENdIt7hcq3S+1+xiSEAoVDHUAwoVB4Er
+         k++5AwKTP+QDSOUKtEEyievrPP/AJfd9nDMI4EyWR5AV3nncfEcICfeL3+zZc0Fo+vsK
+         82tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778782913; x=1779387713;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NGtfuIyBOHQ05iVkh8k7G8w8cO3exgAXDBFvgkcU6+Q=;
+        b=sp3rfZRmQHArfXz6T7DKiZlNpZfbMYd/ljuMJAigzOyV/mBzQhD9qvYyLsyerIUfbt
+         OWaayZPnUh4wYx/bkQAqpe/a5XlmFKmSaIDtPxQmUPJSBYdErPu92qWQy4fzcHKcpwKd
+         vl7M6Lwt3w3KfmYx+k6pEu5d5RfN0oaTTD5aXmeao1W8b7sud5zorEAc9cEoRAKX3CMx
+         AiimrPcK/gES661n9i1XUvR+OtMcOqc4K2/ijG73osABF6S/PTHOWJDHuIQEszJvhG9R
+         73Q06UUG0u4nHo9Fs+byMPH/2ll04IvX1dXoBM10Dheg4htW26NYuTY1xvORt4wPOE7U
+         gOmQ==
+X-Gm-Message-State: AOJu0YwgtOFaBDMSEqGs2xAu4yoK8cJbngPclVyKlzTFOT44YSx7S8/p
+	+5olgH29AyIx8cnng+a+CrzbPKV/ENYzGBlrpM50UruhbVuuODOFxDOTvAGoug==
+X-Gm-Gg: Acq92OFyHxHNkj8Ftb2tw/DqTdjMKYJfCrywpjd6p0X0a3ZnWN7fgKQdeMHTM2flTbm
+	RORh7+Ecc8TCWHaMMtTdm5bVK+1JnLtbUfH2PqSLFKVxq/ze6If9mFTJ42ofxgzxjFDukdGx6rF
+	Xgv3GgsPsq7aDE8MTQ/9z/wr6wNlyAcLQJB20meyCMR5sNoEkV8FAkXZ6bPFO1GRmOYNp+zX8yC
+	J3zTL1jkXxDaGdB3in2PnlyppzsSNyFPoku6aC7HgxfcGIOelOaAr/xMGwaBsr/n0XfBNEh3xGW
+	YMpiOOQlYaLrwPzP3qmycR5AGl7Z91E8TxAHcY+ZlXu8BZeKv9Mfx13kebk9YSZmkHSAcjoC/Wl
+	n41cvBuVUBpSm1zYGeov13ME8co70tNPTnUmomNIM4xdrmZlCVa3DkQX677MnxkBT8ZNKQqtogH
+	6p3OxKqtllGzi7klsQQrhVrg6LIFjh
+X-Received: by 2002:a05:6214:3c98:b0:8ac:7d2f:c7e0 with SMTP id 6a1803df08f44-8ca0f657973mr14282526d6.23.1778782912827;
+        Thu, 14 May 2026 11:21:52 -0700 (PDT)
+Received: from [172.17.0.2] ([74.235.123.2])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8c90b3d0bdbsm28932046d6.24.2026.05.14.11.21.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 May 2026 11:21:52 -0700 (PDT)
+Message-ID: <6a0612c0.143d05a0.1cc117.72f3@mx.google.com>
+Date: Thu, 14 May 2026 11:21:52 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4309052093116078783=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btintel: Fix insufficient skb length check in
- btintel_print_fseq_info()
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, kiran.k@intel.com, marcel@holtmann.org
-References: <20260514164913.3123671-1-2022090917019@std.uestc.edu.cn>
- <CABBYNZJ+qJ4RfRz3W9Uf7Rs5kmyJfN_oqD5o8B6_eLLja8nXpg@mail.gmail.com>
-From: Quan Sun <2022090917019@std.uestc.edu.cn>
-In-Reply-To: <CABBYNZJ+qJ4RfRz3W9Uf7Rs5kmyJfN_oqD5o8B6_eLLja8nXpg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:BbQMCkAmTzn8DwZqrmwWAg--.57856S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxJF1UKF1fXryfGFWDXw4Dtwb_yoW8CFWfpF
-	WUKFyjyFsrGw4UWr12qa1rtF90vw43W34rCF97Arn8uwn8CF40gF98KFyjg3Wqkrs5Ar1S
-	y3WjqFnrCF1DAr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUk2b7Iv0xC_Cr1lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4
-	A2jsIEc7CjxVAFwI0_Gr1j6F4UJwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x0
-	82IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGw
-	Av7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxAI
-	w28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr
-	4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxG
-	rwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8Jw
-	CI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2
-	z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUco7KDUUUU
-X-CM-SenderInfo: asqsjiyzqzilqqrzq21wgo3vxvwfhvlgxou0/
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, shivamkalra98@zohomail.in
+Subject: RE: Bluetooth: btmtk: Fix FUNC_CTRL parsing for devices with zero-length payloads
+In-Reply-To: <20260514-bluetooh-fix-mt7922-v1-1-499c878af1e5@zohomail.in>
+References: <20260514-bluetooh-fix-mt7922-v1-1-499c878af1e5@zohomail.in>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============4309052093116078783==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On 2026/5/15 1:35, Luiz Augusto von Dentz wrote:
-> Hi,
-> 
-> On Thu, May 14, 2026 at 12:49 PM Quan Sun
-> <2022090917019@std.uestc.edu.cn> wrote:
->>
->> The length check at the top of btintel_print_fseq_info() verifies
->> that the skb has at least 66 bytes (sizeof(u32) * 16 + 2), but the
->> function actually consumes 74 bytes:
->>
->>    2 calls to skb_pull_data(skb, 1)  =  2 bytes
->>    18 calls to skb_pull_data(skb, 4) = 72 bytes
->>
->> When the firmware returns a packet of exactly 66 bytes, the last two
->> skb_pull_data(skb, 4) calls return NULL, which is then passed directly
->> to get_unaligned_le32(), resulting in a NULL pointer dereference.
->>
->> Fix the length check to account for all 74 bytes actually consumed:
->>    sizeof(u32) * 16 + 2  ->  sizeof(u32) * 18 + 2
->>
->> Fixes: a7ba218a44aa ("Bluetooth: btintel: Print Firmware Sequencer information")
->> Signed-off-by: Quan Sun <2022090917019@std.uestc.edu.cn>
->> ---
->>   drivers/bluetooth/btintel.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
->> index dcaaa4ca02b99..114a8beeab92d 100644
->> --- a/drivers/bluetooth/btintel.c
->> +++ b/drivers/bluetooth/btintel.c
->> @@ -3356,7 +3356,7 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
->>                  return;
->>          }
->>
->> -       if (skb->len < (sizeof(u32) * 16 + 2)) {
->> +       if (skb->len < (sizeof(u32) * 18 + 2)) {
-> 
-> Or we stop doing this manually and the check the return of
-> skb_pull_data, that way we garantee we don't use its returns without
-> checking if it return NULL, which is the whole point in using
-> skb_pull_data otherwise we had just used skb_pull.
-> 
->>                  bt_dev_dbg(hdev, "Malformed packet of length %u received",
->>                             skb->len);
->>                  kfree_skb(skb);
->> --
->> 2.43.0
->>
-> 
-> 
+This is an automated email and please do not reply to this email.
 
-You are right. I will refactor the function to check the return value of 
-each skb_pull_data() call to make it more robust.
+Dear Submitter,
 
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: drivers/bluetooth/btmtk.c:717
+error: drivers/bluetooth/btmtk.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4309052093116078783==--
