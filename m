@@ -1,114 +1,147 @@
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5860633ADB1
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 17:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778779433; cv=none; b=U4Cd/5Ntr9eK8VdY3k25EO4qC321GS5WJ+drRP9jHaVZONmQwKtRkwFzVw+wi3vELVNMfL7mB21d1sI9SapiYstkXctjPe5G+UOEB262fDFBtrqXO59eFyXFNqTjHLZATW+kYDisTjWxWqQSU1JrNED9V/z9KsvyABe9Ltaadz0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778779433; c=relaxed/simple;
-	bh=UxCBYGY3s2MIDYx54tYdfNvb9kBnDW1Yy02G6slmgsc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Cpsu77tBCF70d4yqD+be9DJzyGIuydOw1RUCmsmVftwnm/ICnWHRUSQpujAXcNuDDjjjx8637fRW8O3zdZGsjIya9UiAJV9H3D/FgAI8gYRJUwjq9etAOJDGIR9ZSvJTt13LYsgC4ayCm7qhStg0b9Hp+wCXtLnXyY9RZ1jC8D8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cOB51kRW; arc=none smtp.client-ip=209.85.221.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D925F33120E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 17:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778780167; cv=pass; b=egpxsp+MQbPZZZ5XAwgyHSoa/ivA32ml+bmOwdLU60jDO1vB9/bWDNSxgzLgbGaQvnvUo5SWoMCTwWupOM6LlJGIX+GdpTFtl+vQq1xddBBsAn9yNEKVwzKnwrvvByBTULDGSJif3tUcPQb4RdaySXbDkghfgKuyX6A3vUdQwug=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778780167; c=relaxed/simple;
+	bh=3SA5XxObW+CXDbnmsHJjXkPh+navSFbin+FPPF9SL7w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Q/0u61/dDg2G41Hi0vxFvFiUHL27IkAWX83UQMyfFd7teYG85G3W2L3XHIcVzlp5BtXqKhM3eLY0DxSbcfepPIqHGrekQkJ0H8B3GufjLeU5HfJKjhLavC1KZcLbVarZhDswQDwJovhy9lP8PH6XxOVXIBhC6yJvfKRNhCjH8Zc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HpDTboA/; arc=pass smtp.client-ip=74.125.224.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cOB51kRW"
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-57513733658so2662481e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 10:23:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HpDTboA/"
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-65e15fb394bso1263365d50.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 10:36:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778780164; cv=none;
+        d=google.com; s=arc-20240605;
+        b=IhH04VMfWV6BrAa5+31Frduk5nwUYVEKXq9hZgd78WSYvQ3YpyqLJKNUSzR6nKcsAr
+         yF2shNLJfqlHBS/I/WV7GGSauQGBvIs+vciPsNt4iKFTQC4nRyWDKZR4LMv4z76khYmD
+         UwacKQ9f580DjCONlglpfPoNyGC4DLPNXkwGJIQQJEd0AmBttg38smesLso2zo2aBQK7
+         V5g4g3/firAPX2UyD73xv8sqsEbliHaUQykRFopCLrZ8PjS/Yun1A5rBtFYSU/aBxGZh
+         StnJd0flYkxJ6HEP1oWeiiqUpFGYP+4VG7ZKnAPKgv7+cjqWCiSHC4l7rnFkmBybQwSV
+         W+Rg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=yV6OZc/yg9w50Z09VZfQDJlVJUab6QsNfGEhw7xziYQ=;
+        fh=B2UDgDEIiQklVr4F5mosqBE/TrQw4Eh5fAS12/LQFos=;
+        b=hLx20vFnpI0amYwn98oX6CxDMeusNWhZnDXCS4YgDUIvGPwkWQZCGhFnVyTAINRR8R
+         EXZjGfbTwO8pR+BHUj70Jid6Ws17Twepf/TvTyK8STiF8KwittEEzG2JhKh5/WSJn6Zw
+         9QUa88nOmsm1j+L4zaQDkW8S2pEAXoNSJY1cTbAcFWxiLAM2xHCaQA9j88L6hVVGDbxN
+         5oqWwr+f3OzDkvSCgAyurzARU4zF1ThNFiyS2e0kqb+yz7Ud3l25zOwQLGIdIil5Dc5Z
+         EstEu4WoxB2kNRuosyiFqLigMk1SfMbX/wcWlTNjNMQZE7UqyTsry+5+CYtnDwZreaeq
+         VnNA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778779430; x=1779384230; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=F3HI5Nvh1903Kd6e+7GWP1fzYcWJf2b91PQiVaTWuSs=;
-        b=cOB51kRWSYs+ybQ0w1t1OyDgrheghwbOqSZeHsSI5wW6p2YcLLWSAGIiCCg5z7ui5r
-         4I+/84IrpjXLUoMdHJOyLmnKgDF7xaEaJ/zfEVg6q8tAAwqiCqRTlEQ52lT96LLoOaQU
-         H+FhyihdP2PethICpz3PcRLm68zPrnhEiEHiKJ8cWWrQjEOdRTJ2x+VcVlTmCwl9h50y
-         bqHrTf8ElR/c3jmGPwrP7XA/SgVPqnstNKFvccfBbtB0kNur2vHkhOIgQlIG7//8+Kw4
-         SOEzrLB9CdrP6wYsuzNlYIpns6tcxV0/rHVZ7dOoRzchlkFkj29UbYPK9sTAsWXA13aH
-         hBag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778779430; x=1779384230;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1778780164; x=1779384964; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=F3HI5Nvh1903Kd6e+7GWP1fzYcWJf2b91PQiVaTWuSs=;
-        b=QsRNCikUXuXNQis5H6TDZzWUlWh9UjFPot0BuRiJjGNLbhzbDc9I0buw3MovDz4eFs
-         J6r6JHYI7+jIWVzHDc6oybwbazdOIaiKvLACXXEadydKslL3S8MGqmlLWMDjtf1JIZav
-         KIY7XSZkBsc2X7r9l/dJoYLK2SW9GIf12qVEfR9hmUpLH9+ZDOR9x54tWv1whJ8o1Hf5
-         95N+1Y1wcAYh8fN2lSfgFork+Vi5lG6iiWSDJ35zVnPUiYE3405eIUREigqidhD+meho
-         igb4ndjnhyLgUIh5x9bTpfaqqobTQnXSFjiFkTVpQbyV2O8CY4Np76uit2QeVxsZi33V
-         o3Sg==
-X-Gm-Message-State: AOJu0YzqmIdjeDUURCcA9Szbwl03Sev2EBB6dkmu1cLxZeUH97za09ad
-	zVPH6BZiohhPs3SWwSKLBfLjE0/5AZdm8+y9rkm9pbNDQI7dT+rNjILdb+UfFRzWZok=
-X-Gm-Gg: Acq92OH+Tj8rKpap8ZenCYsfisaVnr4jOT9TvOXn5m/m4O9WVEwlJP6+o//n8Veiapm
-	1nsOCo7aEiwVxvuwdcB41pZgLTM4mArmFz7HNPhurNOnmAPU32P44DZv0BtvmTvT0tgEJpBqPzl
-	pl6yFpDtxxwyH/SQiGzSLkrP+nGv1K+L+Npb4spc7NwewYGnSccM3LEPyHPZt+cOvhzfMrgj3bV
-	avDEom2Xj+7Edq+UVrkvV8QSs22EBdlsP2k+JRk3oaOG3OEZHUB/YIsImAkNoUNf57hLQ4p0oOe
-	ine7nzo20wwOtnfbIC+nKCfKgFwfO8PuIN3p2hBN+wVkFjs7382r1XgRfJvaEJT5FUWrfCsw5/3
-	C12nBcD0lX4nCSgKOlC5QNURBTsF7JMeEA7orjhLnILFneb6sMrBRmeVWpBn/68bTwuBBrCS6S7
-	+vLrAU1Et5bY2GLBxC2neaSLV7LIYob/tlDYeRIKnE7oFOGPfym3tmJhAuKu113PETk6hduao5u
-	/JQX6UACf2R3TcZGw==
-X-Received: by 2002:a05:6122:e14e:b0:56f:694e:1f10 with SMTP id 71dfb90a1353d-5760bff04e1mr292136e0c.5.1778779430251;
-        Thu, 14 May 2026 10:23:50 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-575fa2c3040sm1658483e0c.4.2026.05.14.10.23.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 10:23:49 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2026-05-14
-Date: Thu, 14 May 2026 13:23:40 -0400
-Message-ID: <20260514172340.1515042-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        bh=yV6OZc/yg9w50Z09VZfQDJlVJUab6QsNfGEhw7xziYQ=;
+        b=HpDTboA/A11W9aP1xMXcdS81bXf5wOgm3xEIRCvswbjc+5WbnbYnDubaJujK0NFvEY
+         Mpu2/ZtT0s3TaOU8+PIXQHS9WaJ+Y9N+XI+jkijoClbxvz2gtrKmf6AmADPsbxIoXU8+
+         N5OMoFFY2kXBto5JdmEWupJYTDS40meS01LBJULnh6C9X96hMYbMw/lZ/kG4n6ZDacUQ
+         OV4q4DiXa1SNsCJ9ZC7eqsfVbFBc5wAPq8GTFPnHVHeL0G88PcNF7iXjujgdsIhhTVAn
+         aff+CAWuMHjleAQvSYxFKwE5d4WlnI0nNdk8/9Khpe6UcMEjasay0dEKF0DsDEC6Ora6
+         lRiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778780164; x=1779384964;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=yV6OZc/yg9w50Z09VZfQDJlVJUab6QsNfGEhw7xziYQ=;
+        b=k693NIysjbpaDbqBH6ecPtjw2C35t2EuG7VE1NxjAoQlVuL78MZq9rDbDcVSzLzx0B
+         8GYkL4zwY0BgGG2996ODDVH9tzuB+PrC4IN7xMg8uM2zmwCeBlX42HkzjLMseJtwHMF6
+         8Ag2wrXXC8NwV/7lEGCAro9UzRO1QcwPxYsH6rhQ+28mZyv0dGn8TMXnyVSWdy9cjYkE
+         neugYgLfP1scF1U3Rth008G3PPYKpxQz8UmIyXw/DLo7iG7ssVfyIQ/wtXBzFt3XqEui
+         BI7/0H9yWpjG2V3gNfl7/6MAcr9hkXjxgFL7mQQ8Iq791TIHdruv8ekCFzG+kzvdSFnl
+         7oww==
+X-Gm-Message-State: AOJu0YyVEEFykY3VP3AHj7njuB6FyF2ljznf2huLTMJ87SRDogzEiI97
+	s9mI/EZDLB1bbNV/X4CLVaMQo8Bqtf7/Z+++Vwc+X+nrMms1tGp/8XJPo1uOo5TdTyWY7GdXjIu
+	0jZKIVB05rqGTtQRlX0ylUo3fcpnc9Mn0Mx/QOZY=
+X-Gm-Gg: Acq92OESTsbhCntPXTW9m9zFhIeAImX76lqyNk5tI0YZY2OPtF8NmOe/h0WrTiBl5xr
+	NmjS/7Sa3bs74Yt1QeVd1ixsBOrcaeHdNwOcJMDqxuG0LxX1a4B6BejVCa+TpeO0Nqlj5pYWSLt
+	iOFsP+tE8RYmZz0SvD7wm0nqBj+vzX10tQiN1tllyW6UMHziDMH8+LOYaWrjSQak4o6QBi47ble
+	36QdPaTAM21zGUQB3tnWhCL2nhmxLqyxwows6Z+2/v2wJ3zORm6AT2PwuiaWRM7RoVWHFn4bWiU
+	RMEFARoKgWVkHwMQQ5K6sNcW1JwonnNxzmsDwXvLBD1PKQdN/iaq+ul4CCZyX2gxdd13eg==
+X-Received: by 2002:a05:690e:148b:b0:65c:7306:e17e with SMTP id
+ 956f58d0204a3-65e2283781fmr234493d50.44.1778780163787; Thu, 14 May 2026
+ 10:36:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260514164913.3123671-1-2022090917019@std.uestc.edu.cn>
+In-Reply-To: <20260514164913.3123671-1-2022090917019@std.uestc.edu.cn>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 14 May 2026 13:35:52 -0400
+X-Gm-Features: AVHnY4JjrM4Wnr83VigxvwJA9bSWkTC6kBEuw7C93Kf3Zo8QuaJEmUiQSY2M6KU
+Message-ID: <CABBYNZJ+qJ4RfRz3W9Uf7Rs5kmyJfN_oqD5o8B6_eLLja8nXpg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btintel: Fix insufficient skb length check in btintel_print_fseq_info()
+To: Quan Sun <2022090917019@std.uestc.edu.cn>
+Cc: linux-bluetooth@vger.kernel.org, kiran.k@intel.com, marcel@holtmann.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The following changes since commit c78bdba7b9666020c0832150a4fc4c0aebc7c6ac:
+Hi,
 
-  net: phy: DP83TC811: add reading of abilities (2026-05-14 15:17:12 +0200)
+On Thu, May 14, 2026 at 12:49=E2=80=AFPM Quan Sun
+<2022090917019@std.uestc.edu.cn> wrote:
+>
+> The length check at the top of btintel_print_fseq_info() verifies
+> that the skb has at least 66 bytes (sizeof(u32) * 16 + 2), but the
+> function actually consumes 74 bytes:
+>
+>   2 calls to skb_pull_data(skb, 1)  =3D  2 bytes
+>   18 calls to skb_pull_data(skb, 4) =3D 72 bytes
+>
+> When the firmware returns a packet of exactly 66 bytes, the last two
+> skb_pull_data(skb, 4) calls return NULL, which is then passed directly
+> to get_unaligned_le32(), resulting in a NULL pointer dereference.
+>
+> Fix the length check to account for all 74 bytes actually consumed:
+>   sizeof(u32) * 16 + 2  ->  sizeof(u32) * 18 + 2
+>
+> Fixes: a7ba218a44aa ("Bluetooth: btintel: Print Firmware Sequencer inform=
+ation")
+> Signed-off-by: Quan Sun <2022090917019@std.uestc.edu.cn>
+> ---
+>  drivers/bluetooth/btintel.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index dcaaa4ca02b99..114a8beeab92d 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -3356,7 +3356,7 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
+>                 return;
+>         }
+>
+> -       if (skb->len < (sizeof(u32) * 16 + 2)) {
+> +       if (skb->len < (sizeof(u32) * 18 + 2)) {
 
-are available in the Git repository at:
+Or we stop doing this manually and the check the return of
+skb_pull_data, that way we garantee we don't use its returns without
+checking if it return NULL, which is the whole point in using
+skb_pull_data otherwise we had just used skb_pull.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-14
+>                 bt_dev_dbg(hdev, "Malformed packet of length %u received"=
+,
+>                            skb->len);
+>                 kfree_skb(skb);
+> --
+> 2.43.0
+>
 
-for you to fetch changes up to 375ba7484132662a4a8c7547d088fb6275c00282:
 
-  Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-14 09:58:08 -0400)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - af_bluetooth: serialize accept_q access
- - L2CAP: ecred_reconfigure: send packed pdu, not stack pointer
- - btmtk: accept too short WMT FUNC_CTRL events
- - hci_qca: Convert timeout from jiffies to ms
-
-----------------------------------------------------------------
-Jiexun Wang (1):
-      Bluetooth: serialize accept_q access
-
-Michael Bommarito (1):
-      Bluetooth: L2CAP: ecred_reconfigure: send packed pdu, not stack pointer
-
-Pauli Virtanen (1):
-      Bluetooth: btmtk: accept too short WMT FUNC_CTRL events
-
-Shuai Zhang (1):
-      Bluetooth: hci_qca: Convert timeout from jiffies to ms
-
- drivers/bluetooth/btmtk.c         |  4 +-
- drivers/bluetooth/hci_qca.c       | 33 +++++++--------
- include/net/bluetooth/bluetooth.h |  1 +
- net/bluetooth/af_bluetooth.c      | 87 +++++++++++++++++++++++++++++----------
- net/bluetooth/l2cap_core.c        |  2 +-
- 5 files changed, 85 insertions(+), 42 deletions(-)
+--=20
+Luiz Augusto von Dentz
