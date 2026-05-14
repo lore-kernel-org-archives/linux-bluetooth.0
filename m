@@ -1,119 +1,123 @@
-Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2789E3A1680
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 18:47:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C051391835
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 19:04:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778784433; cv=none; b=aINEKpKYJYW6BA1QdZvU/BA3CXQ4Zb2lRPSb6qshafkCAOw+u6DIUB/56Ioq4BgF/2uaKqhLLvUKCKicqbTXMzKbgx/zyyrMavEyxgxmeu9MBHFWx0OFyPhYQtPKloS8QAjlTKg6rbn18Y5dVjmHnFBMQBcQou3C/wqhlmreUGI=
+	t=1778785455; cv=none; b=dgc7jX0dNv8bekFpQ5o7EIrjCL3fSQmDkybL+hDsccGBqWeI1yOcxcijn98Jpf6kR3wkEPnlLKmH7IJmJnGmhP/Db0I4YkPSYxHL3xLpOYGTGItwz9F5wp94DfHhTYWuBwp2b4gnzozK8LWeQlpSjwSy8MvTuE/rquffw+gey8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778784433; c=relaxed/simple;
-	bh=q9zw6foDnDpwejoEkPnlqueIXakfauXIe9XNSZdy02g=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=uQC7YulKAhARkwuOxuS5LU5of5/ZYPoxDoLmStIABMx+BTPaD2g/Kx4dya9jMlnaqvvFbbc1O9w4R2RAjK7/q4vac0wE7DJHNjjZeNhmcKdgOLcgYo9SCyTMkaw2rRfO11FFeNozcBK6V8+QBw4pto9rY3XgvJwfDo6EkU2rbaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oeubCV8c; arc=none smtp.client-ip=74.125.82.44
+	s=arc-20240116; t=1778785455; c=relaxed/simple;
+	bh=RzItCnhYBAnN+/URVuQt1CbdQrGbJc6AsL1htsPXWX8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fdjuvYz/sqGX62VDJJOadw1Kbt7zS/3mb3Sq+A36in5+pWcnGYzl1KuAsYtgLjrQepwYa775uW8OcX4b7Vnq5+Cm3PqR6/jr3Z4vZPz+mdMsPCtlQZ9fpzitlAehMMm/9u9gc3ODfymmpUN/hqRnMiTkf8o5WMnmN+bdBvhZQ4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RJRigutg; arc=none smtp.client-ip=209.85.221.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oeubCV8c"
-Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-132830d8281so2660545c88.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 11:47:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RJRigutg"
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5751e12c524so2885740e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 12:04:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778784428; x=1779389228; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=J0tXhfl5LBudMQW/pveig97tAISZXI+cPQ5gasY7yVM=;
-        b=oeubCV8cbSsP85IzvRZu3x1VYGkdmxMmHYgAOTP7K59MXatQcjmVRgU65KdXF9xiRO
-         Bv+OsBg5+Pjw3tj1ZDEe3fiLkpgisZXACadsEArcZVndi6OeRfKaHtzKLP1TNuRQZHdP
-         00Imt+gDr7aNfHAFNiN4PZO6z2OdKN7IPl09i5ULouRjtGwPqahbtU/lyOeln1goVohE
-         TCJpMjkmz7We4/UpfaJvQOaZhln/96vU+NuDquIwDyYMlUMV49u/gvmbKXtI6mWkreP6
-         9/E7tMcioIUqoXuWGCAchHoObASIKimNesxwOLVlVZqOh5s9bYglfXj2bjKkKkkRnx/I
-         nDlg==
+        d=gmail.com; s=20251104; t=1778785453; x=1779390253; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=M7Nv0bO7NEWZm4ykIbPHL91pyBIPaeeNCtL8w3J2ONE=;
+        b=RJRigutgMbELi7YJPq2IV3tr6H6dE1QBudW/LCEsm70cmJJKOdJAypA1GyItHN4AdN
+         MTiToEX2TIh6LLQD72gE2MCZkhAgPpFefIrqKUkfhq2LXPKXt3voUI5Fu6vaoaaNTpM1
+         pi5IiFbq24EmLcPOJFQyFJOKCBzS9+gE3WWbew5IuMCFv50reLO1N1UMQYbbEdU4CpWN
+         XM5GuIJUqLhgnXHETQvYDAn/BqCEzOlF5KHcjnET7dz1orCxDJwjjIdqHnXEp5uVXWer
+         WAhNABqV0LOqqOZnqkMv27bkCpd0A2Ln6cgLfFz/QWIaY83lZgzAS6rUwNrhEY3pEs9a
+         tO2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778784428; x=1779389228;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J0tXhfl5LBudMQW/pveig97tAISZXI+cPQ5gasY7yVM=;
-        b=H1LF+0SQpJc5Ut05YEn6Ieh1V5GBkVvhSkXCQSDFCiHIPP6+17vct7CrBEGpAAJmHg
-         76SCzb0SI9/z4cebDavAV+T8BOGHtz6GQZbZOH3Uqjs4jA/lt4XOZskWdvBd4DWLuLy8
-         JpbeF+Rde84Li4/U8BQ4v/FMNOEw1uD/crCLQPYpWNCo282VLhPWkgKtWkis742y1pWw
-         YBhubn8toy8Orxr7Np6FTqGFvDU871Cyg1uzpW8f+2fS0uPrNtTnB1Kfl2OKoeC8mgsj
-         kM9O4jV0R309jFFPpa21LtnshTPquABx3/uMwUTGwNSCbizheKdlGBET8XP6BAyZ99hJ
-         DoLw==
-X-Gm-Message-State: AOJu0YxRQpo9NdanZHFeBlixuqy0JUAk9Maxy6QY5i21tYXhI7Zwof6L
-	M+Vj1iUCbLTh4uBw4eCHrAd5k9n321RROuUvvgf+/bMCCucEJjXKecZWdM4TVQ==
-X-Gm-Gg: Acq92OHOXlbuCCI1y9rQtd0JI7lzEN5lflAsRgtIewHMBFarztpWPOPn311pV4swcDN
-	b1+c9RyWlfwAA8XCCKwA0EFYNu7NehfZBGgHUXiZNdy82z0+777arawsDrPP+eSnf+uJylm5EQK
-	rDo0PrQkXs6kU4zKWwLff3WI50tJcnr84pk5MwDJpjcvubxlngJZvHILHqqYMLhIPNKZWu/4qhu
-	5LjFl1Tk8q/E4Kb4TayHisISAQQT+Ngj3HYyRUIOXGy+KGmbgM9W9WJtw/FYpjo9fcsc/I8ZSPh
-	vdEF+4VkLa6HCCPPONhjTswRCqViLVoeEs0k/4X0/drVKyutHqhr03JpMnjrROiUSSwQn5PlRt/
-	p9+oj7YrZNEKVaesEn+bWJaXsPpLx3oG0Us9iLvDzTJtwRijBMGigVEnVRprKw3LT96yeOhqOYj
-	LImqxdDOPLTuBepAraCgGYpm3ENIRL
-X-Received: by 2002:a05:701a:c971:b0:12b:fb81:d69b with SMTP id a92af1059eb24-1350542e923mr138684c88.19.1778784428331;
-        Thu, 14 May 2026 11:47:08 -0700 (PDT)
-Received: from [172.17.0.2] ([20.168.6.182])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-134cbcb9ef5sm5391226c88.2.2026.05.14.11.47.07
+        d=1e100.net; s=20251104; t=1778785453; x=1779390253;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=M7Nv0bO7NEWZm4ykIbPHL91pyBIPaeeNCtL8w3J2ONE=;
+        b=GLn/6BVrn2jhjxJlGUtWi7S3fnSxlOIZ8YElrpX6ZfRHQHhOAZruAwTcXC+ZI4ffUK
+         /lYXfln8hRPsi3uj7pDG6biNXsC6kwXWXEiF3bU8WN7Hqymsi9ooJ2+pPAX76nIYn53x
+         5Xc9u/7Qjl1cjEKuqwP+plR8nABfv7aKU5U4nu3WrwYod8r5/w8LEuFUzfUOFwZQME/s
+         APPSQC9g0yoZ/2EQXglcSBomCj65EX5cGLqMW3BmD0sGH2M5YtOQGssuM0v8k0uyx+xC
+         Us0NqZh2H+vTWobZ8ktU+ssSkJBeExoeBzfzs+Zo8FY+lBee2hFfhMzQ+BaHXtrkThFy
+         YG8g==
+X-Gm-Message-State: AOJu0YxopYvZvhLbRA8LBTftpspEGXQ5ReY0g5c4JazfcmxcySURzTHk
+	k0rSOSJaaUssGXCxBY28EI1S2E6XJj2Tn9ZhBVWh/bMZwxfLiINwqUxqi6Wqqzx+G60=
+X-Gm-Gg: Acq92OHdBcJbT8C8eW+XWfUueFGKR5n3VTZwHGRX8sJAwpC/z3VX8F1dbj5RnBF6vQX
+	np3dsgDEWCpsjM/GnJ9uQ7727UTh/r7fLzynbqTOpkwVlTmpKgRDiHD1miNUBBenChjbMY3nmZw
+	BgHnpCcp+7pnjSndYdlsCf96czXPS/0EQflWNNy9ZEgUgx+v4QV0wTkPDqNKuZ8ZY2MH22FgAEe
+	leV83b3DwlrtfAWozXbRkrpKTXfz8CnsqOtxyo1NuPj/qMXFlv5RosNmIH0Ib17/A79i3VyKMz+
+	nIa6Tm0xyESqQ3Nfn9KpHygjtvN/Zh4Pf3ieuVBTujyrjGK8kkmfWt/BmVr0hU/7z9L2BFyXQ3o
+	lQXftwFmPus+GpxA6x6SIvPpPi+SVNikdg4fXL4r2mJJFYJc2F3+ed2RqjEmxZVuDo7QULZvRME
+	2gyshSXS10nG9e8tdLanzVoseH/5TeAICQHexyOvSY2Iiuq42jZAlXp+09UNo3u+SCL/CXTSOCf
+	JBE0FknxGTHa2pEvA==
+X-Received: by 2002:a05:6122:6e01:b0:56e:e7b5:17d3 with SMTP id 71dfb90a1353d-5760bfb8217mr549445e0c.8.1778785452907;
+        Thu, 14 May 2026 12:04:12 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-575fa2c2f39sm1979373e0c.2.2026.05.14.12.04.11
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 11:47:07 -0700 (PDT)
-Message-ID: <6a0618ab.8e75e0cb.1e3599.0d5c@mx.google.com>
-Date: Thu, 14 May 2026 11:47:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3911006895138112766=="
+        Thu, 14 May 2026 12:04:12 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] test-rap: Fix gatt_ccc_read_cb on big-endian
+Date: Thu, 14 May 2026 15:04:00 -0400
+Message-ID: <20260514190403.1568957-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, 2022090917019@std.uestc.edu.cn
-Subject: RE: Bluetooth: btintel: Fix insufficient skb length check in btintel_print_fseq_info()
-In-Reply-To: <20260514164913.3123671-1-2022090917019@std.uestc.edu.cn>
-References: <20260514164913.3123671-1-2022090917019@std.uestc.edu.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
---===============3911006895138112766==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1094909
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.53 seconds
-GitLint                       FAIL      0.23 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      24.46 seconds
-CheckAllWarning               PASS      27.38 seconds
-CheckSparse                   PASS      26.10 seconds
-BuildKernel32                 PASS      24.20 seconds
-TestRunnerSetup               PASS      539.18 seconds
-IncrementalBuild              PASS      23.25 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: btintel: Fix insufficient skb length check in btintel_print_fseq_info()
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (82>80): "Bluetooth: btintel: Fix insufficient skb length check in btintel_print_fseq_info()"
-
-
-https://github.com/bluez/bluetooth-next/pull/191
-
+Reading CCC values shall return little-endian 16 bits, not native
+format.
 ---
-Regards,
-Linux Bluetooth
+ unit/test-rap.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
+diff --git a/unit/test-rap.c b/unit/test-rap.c
+index 4ca4a715edff..dce592187426 100644
+--- a/unit/test-rap.c
++++ b/unit/test-rap.c
+@@ -253,8 +253,7 @@ static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
+ 	struct ccc_state *ccc;
+ 	uint16_t handle;
+ 	uint8_t ecode = 0;
+-	const uint8_t *value = NULL;
+-	size_t len = 0;
++	uint16_t value = 0;
+ 
+ 	handle = gatt_db_attribute_get_handle(attrib);
+ 
+@@ -264,11 +263,11 @@ static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
+ 		goto done;
+ 	}
+ 
+-	len = sizeof(ccc->value);
+-	value = (void *) &ccc->value;
++	value = cpu_to_le16(ccc->value);
+ 
+ done:
+-	gatt_db_attribute_read_result(attrib, id, ecode, value, len);
++	gatt_db_attribute_read_result(attrib, id, ecode, (void *)&value,
++							sizeof(value));
+ }
+ 
+ static void ras_attached(struct bt_rap *rap, void *user_data)
+@@ -528,7 +527,7 @@ static void test_server(const void *user_data)
+ 	RAS_FIND_INFO
+ 
+ /*
+- * RAS/SR/RCO/BV-01-C – Characteristic Read: RAS Features
++ * RAS/SR/RCO/BV-01-C Â– Characteristic Read: RAS Features
+  *
+  *  ATT: Read Request (0x0a) len 2
+  *       Handle: 0x0003 (RAS Features value handle)
+-- 
+2.53.0
 
---===============3911006895138112766==--
