@@ -1,75 +1,64 @@
-Received: from vii.li (mail.vii.li [37.27.246.212])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084B937EFEA
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 10:05:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.27.246.212
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948263148D0
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 10:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778753105; cv=none; b=rsPbFZMlAV+LWKDv5hR35568ggPeWVluuZfPuAx6ozEqew8Igo5d31G06VZxnwON0pcVAsrQNcUmXfXdPtrlJpkhXND5u9sN+7NGprwVkxSzAksIx5WxypRoh9L08KL9ouiw8jv+0dix/svLEb8hILcK0YAguSkMZegd3cuVxf0=
+	t=1778753161; cv=none; b=pUXES3gqBeBfvFuvS5yQWqz1TKY+02z9SGlr+Z0PEJZnG1Xbif+jkM1grkQl7fv1UfIqS1zEevpvbHvzXM2dvIdctxh8w/qvgf5RbqQ7Sq69B4ZMNzlZEi73JWMKlBoFIEWZSd+KPwVOLF61aiPm+B1ylWfV14pqnR4qkrIwcec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778753105; c=relaxed/simple;
-	bh=3plPWMYnMhd94HUlTtmPr3nmq65p5rQa74mpQ+f3JCg=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=Gb0HDsOFC8WNFU5DDAzdeFYUiMy4T5Zvpx0UzY44K3u66nWPfPpgZa3hnQKqnaMh2SlBYb5yprjFLhF5Lv9KlHJJk35QOUH4H3T5JLc+GYXNbl1m3FJ6CXplyRlSWjEfOQtjBVtAEv1i3u6CNAeovaqxAKRrJfL8e/aKULk6u8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vii.li; spf=pass smtp.mailfrom=vii.li; arc=none smtp.client-ip=37.27.246.212
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vii.li
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vii.li
-Received: from [172.21.22.126] (87-95-113-24.bb.dnainternet.fi [87.95.113.24])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	s=arc-20240116; t=1778753161; c=relaxed/simple;
+	bh=Diyy7esXI2xFjBiP+ztSceKwPn7crdBwPY+LnJ6aKx0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sWzHpjewdTD2TO14DKoJ3sxxUMOlnXzTm5P+1VPfT+6KpenPbVcuqeE5882OyZ1Hf0tBhkUgeJyF3Z1uZ9FCbhL/ZitXOH5li/8tcSTSIqPGDUVdyT4KVlEmccTMvM6gelnPo4uDIa9wGa4WZJGY1z/86Utua4FY3V/yS7e772k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=lY0f5Gtl; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="lY0f5Gtl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1778753157;
+	bh=Diyy7esXI2xFjBiP+ztSceKwPn7crdBwPY+LnJ6aKx0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=lY0f5Gtl40y8GHPBRbji5ZtEdhmOgBlzTgJ3B0Rq+T7xO6FQaONcxGpEeRMi6lld/
+	 5Suy78kOdV9HTVvkwmtMqHf4yz7Fpd8PrdN0OMRhXdNjjQgY72g61W8deD/GQi4UwN
+	 FkIccLBI236KAcCjRWVx3WpH6ccG2XZGS+b0xYMQg4SXXlPiaKgenJZrC5tgXf1Kh/
+	 1QKjO7HmwMWWdm/qIe6zKTP0DhC+rCjVuGJ3NxYq52TMVF/xK4BVzwvPLz4rF2Qhby
+	 Pu0HQBNTAke38bIqSDLFiNGugi10IXyf2yNLtxhgSrCSxgJEBHUrQTyqTjikaJWkN/
+	 oCRWfWstCOdVw==
+Received: from raghavendra-XPS-13-7390.. (unknown [100.64.1.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by vii.li (Postfix) with ESMTPSA id 4F4A13EFAC
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 09:57:29 +0000 (UTC)
-Message-ID: <46f7ee10-3fa8-490c-bb17-5929229206fa@vii.li>
-Date: Thu, 14 May 2026 12:57:28 +0300
+	(Authenticated sender: raghavendra)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 9133817E04F2;
+	Thu, 14 May 2026 12:05:56 +0200 (CEST)
+From: raghu447 <raghavendra.rao@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: raghu447 <raghavendra.rao@collabora.com>
+Subject: [PATCH BlueZ v2 0/1] shared/bap: set QoS state when CIS is lost
+Date: Thu, 14 May 2026 15:35:44 +0530
+Message-ID: <20260514100545.54572-1-raghavendra.rao@collabora.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <CABBYNZLcvmErUXHUXnAJOMv+saSP7aodVtfRV0QnL2-yXg=z2w@mail.gmail.com>
+References: <CABBYNZLcvmErUXHUXnAJOMv+saSP7aodVtfRV0QnL2-yXg=z2w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: linux-bluetooth@vger.kernel.org
-From: =?UTF-8?Q?Taneli_V=C3=A4h=C3=A4kangas?= <taneli@vii.li>
-Subject: MT7922 does not work in 7.1-rc3, works ok in 7.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hey, this might be also a mishap on my side, not yet familiar enough 
-with pacman to say with certainty I didn't mess up something (like 
-firmware loading), but here goes anyway.
+This is used to pass PTS tests BAP/USR/SCC/BV-167-C
+and BAP/USR/SCC/BV-168-C.
 
-Bluetooth is provided by:
-Bus 001 Device 003: ID 0e8d:0616 MediaTek Inc. Wireless_Device
-I believe. This is a gmktec nucbox k8 plus by dmi information.
+raghavendra (1):
+  shared/bap: set QoS state when CIS is lost
 
-With distribution's 7.0 kernel bluetooth shows up fine in Gnome and I 
-can connect my headphones and get audio. Using "linux-git" package, 
-which built 7.1-rc3 (+ some commits on top in torvalds tree). Booting to 
-it, bluetooth can't be enabled in Gnome, everything stays grayed out and 
-no devices are shown. (I tried 7.1-rc1 earlier, which also didn't work, 
-but I didn't take any notes back then.)
+ src/shared/bap.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-The difference in dmesg is that on 7.0:
-[    6.152649] Bluetooth: hci0: Device setup in 173263 usecs
-[    6.152661] Bluetooth: hci0: HCI Enhanced Setup Synchronous 
-Connection command is advertised, but not supported.
-[    6.216582] Bluetooth: hci0: AOSP extensions version v1.00
-[    6.216593] Bluetooth: hci0: AOSP quality report is supported
-8<-- 8<--
-
-And on 7.1-rc3:
-[    6.270455] Bluetooth: hci0: Failed to send wmt func ctrl (-22)
-[    6.270466] Bluetooth: hci0: HCI Enhanced Setup Synchronous 
-Connection command is advertised, but not supported.
-8<-- 8<--
-
-There are some changes in btmtk.c between these versions, but can't see 
-on glance anything wrong with them, only adding support for MT6639.
-
-I'm not on the list, please Cc: if I can provide more info.
-
-Cheers,
-
-	Taneli
+-- 
+2.43.0
 
