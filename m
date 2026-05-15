@@ -1,154 +1,125 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA3248BD48;
-	Fri, 15 May 2026 14:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61BA23AF66C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 14:38:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778853999; cv=none; b=cuE0U6YjDjmLJax7yRNc7eVrmS9x3Gs8+9nQrBAcBvOmb0gDP/7CgKnrkTP4hYaKNvALssG0rSXVF/53YPRP/16+3wB3JE6KbQgat4iqjv1atW+yaxcxvm/kXx8vGQqxAaCmFAHSx+H32724U8eHs+dvKrEFoxE8E1UV+gWrxGg=
+	t=1778855917; cv=none; b=c3CiQEkU0cEClB20svC6/ei24sUtrjc1tAKWBVpe8dmfAIHtyvIItmSbP/0nF/3WsnZxI9bCNOT0jJuvxcNY1GC2pRg1JDOVq7g5gLDWq6w47dKkAMOk6BhglYnJToDx4Cz4sOYRfGw19fqHRP1W7/h4J4kAGA/ZlzyHPirQRyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778853999; c=relaxed/simple;
-	bh=k+83qw1aBVDXTHI3o0EJipdXbePWlFTgXyIEgtF1wPE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QbRtZ5Ab9HDYJphjipO1KLlDOydt6M+H75kImV3QHK4cAyx0xsoxLrRh4Dv7Q8CI+v3TnpQ5qDr6s/VRpUj+ZsTi5SOsbHYHsEtisIrrNsdiNuVS+8pN5JQwhoNrMAZr2S4KMXOybaStiunT1Mjz8qMIkZBBz+z0j3KdSYScafI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=T3c7MisN; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1778855917; c=relaxed/simple;
+	bh=2uIUvMfiF4cgcvYk8bxAE2OZEuMgLEA/pRzxAF1Dg8s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gz9ZP8sdv6Qq7D9nV2EG+92fN/EGsFvLzr34XxgD/ptJBXjNEIghAZE/woIiqKuBjtZL4dJPRzUq3Y62oIl918De/kFqnARVOuAMNuL77XQZ3nNkp7g2DIXB0thjImGixZzVnlz4VvSRD+hbiZ6nxdQfNucJ8+HDz3Pd56Hh2rE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VFHev3kL; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="T3c7MisN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=En
-	OKvtLKxGfFtXrnKl47IbY8wmgcrys1YAusjT/5P6A=; b=T3c7MisN4PwQOUSiYt
-	M8Fxmt7OnjrKyq4S6U/L3RTD5m0YyioLrKOnkFYcCzmO6iox3tsGkbP3vqq8uMBf
-	MhSV1R8hZ8+1JDZKmUsAapITjnf5JL7rJNLdifjpVG2gqai03hyEliUxeiwaAmlg
-	9XMcsTyMahQ6SXGaoCWlS4bXs=
-Received: from 163.com (unknown [])
-	by gzsmtp2 (Coremail) with SMTP id PSgvCgCH1RY9KAdqHenOEg--.16120S2;
-	Fri, 15 May 2026 22:06:01 +0800 (CST)
-From: <w15303746062@163.com>
-To: luiz.dentz@gmail.com,
-	pmenzel@molgen.mpg.de,
-	marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org
-Cc: linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	greg@kroah.com,
-	stable@vger.kernel.org,
-	Mingyu Wang <25181214217@stu.xidian.edu.cn>
-Subject: [PATCH v4] Bluetooth: hci_uart: fix UAF in hci_uart_tty_close()
-Date: Fri, 15 May 2026 22:05:48 +0800
-Message-Id: <20260515140548.393865-1-w15303746062@163.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CABBYNZLjreYY_BczAQr2G6L=iJjBYKksFp53CairG-6V0Cb0EA@mail.gmail.com>
-References: <CABBYNZLjreYY_BczAQr2G6L=iJjBYKksFp53CairG-6V0Cb0EA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VFHev3kL"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-90eb7a63a30so286814685a.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 07:38:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778855915; x=1779460715; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0eN9vNuAp3xUezVO5MEgTAw6ZndItRaIjwbcaUfeDUw=;
+        b=VFHev3kLlB+hNT3artTeSbhNGePXgT/NM2pyc1oHCytgG5QdRQ7vTgS1k0i3E5NV3a
+         hi76eTOdBOA4vMoPdGzgkus4FRz5A7wsGZEdxX/mpJrtBWdW7uCEqgSb+kKzpuHp3vbp
+         WHqH8nF8oK8ehp+XT3xI1RzIY/R1gnOJSVXU+XaliPE//Di05nYGkixykVtDvyYvlX/z
+         9zarhtu2tJG1SbEBPAO6LAnm3CT/OWF7f45Qu2vT3H4y3mBlEiJA/q/qszzNTp++e+fV
+         xVhyVOFUizNXjlV03ri9ehHYK5+fHZTZ0Am+qDt4rFVvZQst3reCCQoPhLvUqHk9KzAr
+         zILw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778855915; x=1779460715;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0eN9vNuAp3xUezVO5MEgTAw6ZndItRaIjwbcaUfeDUw=;
+        b=tZ0SlgzcJCnzmmHr23lux2HpHaLmluAsGdaTKzamukQZh3GQJBN7qWjAuIlaYUxKMl
+         uNCMKXtys0ew6Dqz8eoCH2IcidOE0Wy8j9upSCfhENOxeuksZgJcvswiAJEBPgKb5n6n
+         3BJFDqljJs+b3wNWPR4ROzgoUy+VDItscOM4cZcS07KcrR1CVn4+PBV811cDZr6/g/Hc
+         RMs/BYXrLMLFe/3jDs+NlJzNT+lX7dcIxR6uBUGDKxDNOiFeycv75jmGY/x2JWCO8h14
+         InzfXwYaIdn7wbzIRZqGwqa20ZdDWm63mdAUYkzXVtQ9ECkgSEhlyjAsrQh0214YrF4u
+         yFeA==
+X-Forwarded-Encrypted: i=1; AFNElJ887q0mEAk1ombsk8vhzxAPOzD1SlQPlk/LXlUhIv0Yh36wEvvoU+DvKe5dAgqvBFE2Ub+ZljrOqrpEv51suSI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhTuJ2w5I4lCwz60EKBh4mKqjmNuGLQ4B+cZV7cxVkho4JaQg0
+	R7VpmED3Gr7oGBegRjTgmjqGfTmpDHwuYCC6892RoC9dcSnqSqRYgoMH
+X-Gm-Gg: Acq92OGSSdBTlIfKHHQkX4WyrVQo9Y5p6jGgusHPg2FMduwiWSGWaoyXnXotDCI6JIi
+	P4DGavw6cc8Nb0audFxkGGrsF2uu/Jh/UwWlVUCgYdRzh0wCxQwxSvEfm/S2+57jejvaVDfj2TK
+	jjvoSxJQGs6bnIQ8LdEkF1aOz26jAnQlw+6myOAYV2QXOeO81HFXECoXODMi1RkU/I7cdn2GK4y
+	a3LhBScDpGwUu5ubq0DBflTN1xG/vLT9tJDJi1ysXGtvdrHr87AXpRRSS2fvGAEl8B5GcFCSLj8
+	tao43yNKYHhCZQp1TQm2RvSGt5NA2NY3VClorR5lDllho4YXTzZxsjH+PcoCfugy2w3ghMB2Zjq
+	GL4g4KIk89TD5dLInmfZMFCsbt+8C1Hjx70whDbDsl8CMeZ9OGUG5d2ZnAaK9VKBGg3cdMZ4V6a
+	eJtNDQfcjcv10wmJiAL6sJN7GJA52KMF7XZ/t5kr/aGvDQMw90T8laDRXcGFFbVmipGyTZgEtC2
+	tutMczga72xrI4t87qxKp5CkH60CggK1+swBd5z4tE=
+X-Received: by 2002:a05:620a:444a:b0:90c:c513:2b19 with SMTP id af79cd13be357-911cd9579efmr684135785a.15.1778855915314;
+        Fri, 15 May 2026 07:38:35 -0700 (PDT)
+Received: from server0.tail6e7dd.ts.net (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-910bd8211e2sm562286785a.47.2026.05.15.07.38.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 May 2026 07:38:34 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Daniel Winkler <danielwinkler@google.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: MGMT: validate Add Extended Advertising Data length
+Date: Fri, 15 May 2026 10:38:19 -0400
+Message-ID: <20260515143819.1157807-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PSgvCgCH1RY9KAdqHenOEg--.16120S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxJw43Kr1DZFyDZF13JFWfAFb_yoWrXw1kpF
-	ZxKF90yF4vqFWjkFyDZa1xJFyrKr4ag3y2k34fW3y5Xas8tr4jk3WIyFWIgF1UArs3Cr1S
-	vFWDX3y5WryUZ3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UQAw3UUUUU=
-X-CM-SenderInfo: jzrvjiatxuliiws6il2tof0z/xtbC-wl4XGoHKEm-FAAA31
+Content-Transfer-Encoding: 7bit
 
-From: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+MGMT_OP_ADD_EXT_ADV_DATA is registered as a variable-length command,
+with MGMT_ADD_EXT_ADV_DATA_SIZE as the fixed header size.  The handler
+then uses cp->adv_data_len and cp->scan_rsp_len to validate and copy
+cp->data, but it never checks that those bytes are part of the mgmt
+command payload.
 
-A Use-After-Free (UAF) vulnerability and a subsequent kernel panic were
-observed in hci_uart_write_work() due to a race condition between the
-initialization of the HCI UART line discipline and concurrent TTY hangup.
+A short command can therefore make add_ext_adv_data() pass an
+out-of-bounds pointer into tlv_data_is_valid().  If the bytes beyond
+the command buffer are addressable, they can also be copied into the
+advertising instance as scan response data, where the caller can read
+them back via MGMT_OP_GET_ADV_INSTANCE.  The trigger requires
+CAP_NET_ADMIN in the initial user namespace; KASAN reports an 8-byte
+slab-out-of-bounds read.
 
-This issue was triggered by our custom device emulation and fuzzing
-framework (DevGen) on the v6.18 kernel. Due to the highly timing-dependent
-nature of this race condition (requiring a precise interleaving of
-TIOCVHANGUP and protocol setup), Syzkaller failed to extract a reliable
-standalone C reproducer (reproducer is too unreliable: 0.00).
+Reject commands whose length does not match the fixed header plus both
+advertising data lengths before parsing cp->data.
 
-The crash trace is as follows:
-  ODEBUG: free active (active state 0) object: ffff88804024e870 object type: work_struct hint: hci_uart_write_work+0x0/0x940
-  WARNING: CPU: 0 PID: 338273 at lib/debugobjects.c:612 debug_print_object+0x1a2/0x2b0
-  ...
-  Call Trace:
-   <TASK>
-   debug_check_no_obj_freed+0x3ec/0x520
-   kfree+0x3f0/0x6c0
-   hci_uart_tty_close+0x127/0x2a0
-   tty_ldisc_close+0x113/0x1a0
-   tty_ldisc_kill+0x8e/0x150
-   tty_ldisc_hangup+0x3c1/0x730
-   __tty_hangup.part.0+0x3fd/0x8a0
-   tty_ioctl+0x120f/0x1690
-   __x64_sys_ioctl+0x18f/0x210
-   do_syscall_64+0xcb/0xfa0
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-   </TASK>
-
-The issue arises because the workqueues (init_ready and write_work) are
-only flushed/cancelled if the HCI_UART_PROTO_READY flag is set. However,
-during the protocol initialization phase (HCI_UART_PROTO_INIT), the
-underlying protocol may schedule work. If a hangup occurs before the setup
-completes and the READY flag is set, hci_uart_tty_close() skips the
-teardown of these workqueues and proceeds to free the `hu` struct. When
-the scheduled work executes later, it blindly dereferences the freed `hu`
-struct.
-
-Fix this by moving the workqueue teardown outside the HCI_UART_PROTO_READY
-check. Furthermore, use disable_work_sync() instead of cancel_work_sync()
-to unconditionally disable the works. This ensures that any pending works
-are cancelled and no new submissions can occur before the hci_uart
-structure is freed. Note that hu->init_ready and hu->write_work are
-initialized in hci_uart_tty_open(), so it is always safe to call
-disable_work_sync() on them in hci_uart_tty_close(), even if the protocol
-was never fully attached.
-
-Fixes: 3b799254cf6f ("Bluetooth: hci_uart: Cancel init work before unregistering")
+Fixes: 12410572833a ("Bluetooth: Break add adv into two mgmt commands")
 Cc: stable@vger.kernel.org
-Signed-off-by: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+Assisted-by: Claude:claude-opus-4-7
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
 ---
-Changes in v4:
-- Adopted Luiz's suggestion to use disable_work_sync() instead of 
-  cancel_work_sync() to prevent new work submissions during teardown.
+ net/bluetooth/mgmt.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Changes in v3:
-- Added 'Cc: stable' tag as requested by the stable bot.
-
-Changes in v2:
-- Added KASAN/ODEBUG crash trace.
-
- drivers/bluetooth/hci_ldisc.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 275ea865bc29..333c1e1503e8 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -544,14 +544,20 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 	if (hdev)
- 		hci_uart_close(hdev);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b05bb380e5f8..de5bd6b637b2 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -9110,9 +9110,15 @@ static int add_ext_adv_data(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	struct adv_info *adv_instance;
+ 	int err = 0;
+ 	struct mgmt_pending_cmd *cmd;
++	u16 expected_len;
  
-+	/*
-+	 * Disable workqueues unconditionally before freeing the hu
-+	 * struct, as they might be active during the PROTO_INIT phase.
-+	 * Using disable_work_sync() instead of cancel_work_sync()
-+	 * ensures no new submissions can occur.
-+	 */
-+	disable_work_sync(&hu->init_ready);
-+	disable_work_sync(&hu->write_work);
+ 	BT_DBG("%s", hdev->name);
+ 
++	expected_len = struct_size(cp, data, cp->adv_data_len + cp->scan_rsp_len);
++	if (expected_len != data_len)
++		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_EXT_ADV_DATA,
++				       MGMT_STATUS_INVALID_PARAMS);
 +
- 	if (test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
- 		percpu_down_write(&hu->proto_lock);
- 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
- 		percpu_up_write(&hu->proto_lock);
+ 	hci_dev_lock(hdev);
  
--		cancel_work_sync(&hu->init_ready);
--		cancel_work_sync(&hu->write_work);
--
- 		if (hdev) {
- 			if (test_bit(HCI_UART_REGISTERED, &hu->flags))
- 				hci_unregister_dev(hdev);
+ 	adv_instance = hci_find_adv_instance(hdev, cp->instance);
 -- 
-2.34.1
+2.53.0
 
