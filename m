@@ -1,146 +1,115 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99923932F2;
-	Fri, 15 May 2026 06:50:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128433DF00F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 07:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778827858; cv=none; b=D244a0TI7Kf8QC1JpLSxZs+yk02lEXf3USsiwxFczlSX3qOmE+m6aYlB0i6WdJHNBX6mtkknrLJHlmVhAGceA4U80BDUWeh2Cgzo9WCsH0lkAamyB0etOll3tA3SwNBUJ9IW393gAo8lsBCVF4e5ARxZrWHw3H8dNFtXEwvOBRA=
+	t=1778828497; cv=none; b=Focr+lMD9Omw/VMkMm6l41oBuFZRyubx1Q9MFN4pVB3Qrovz4Ap7wJMMRRrHTirZsi6qK2aPDRYFieNNovxMPvouC9o480Wxtgm+2YCTUA+Oqti5LmftVG7L1jYuOzZ90/Ky8fBOatt5Sn6Vu9nm0L6+9XsPAD+FM9IL9xgV9zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778827858; c=relaxed/simple;
-	bh=XRhCa08VVO3TJqLsrQpmWqneu7Yjwmi3yyTGBY2bW1Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=k7mQfQZUe0TaRHyM+6G8ixr98DqitZpSmS/sMTMtgt+wLYAtZzbePCdwSXI9jZ6zCmHj9SZegBTnZ/tye+IXXdkmD8eXDqmJV5/xHmJ0COwA8UDfqRbeWFMwY/6qrtKmWiy93F3lw0EPDg4BDUAFP7cnWhoYKq9kqZs5rM2TAeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=HCwlnCpV; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1778828497; c=relaxed/simple;
+	bh=C2NNfWrL+p5YS1e4wbllvrK+9AEJBlDuRbnQwlB3BIU=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=qKxZEPQ7sopjfPA0jWdXqa3ab2Y9QEDAstqGunY1FWNhJJo608uVWqvMOUR2V0Se5Xf43RfX45BF46U0iP2rCZ/iphjyQxBB3xp+XOfB9tmRPP7fec9mnzww6A4aA5behYkgbEQ2bL428jl/nmZh6LeMHNP8a9T1v5Snw/lJ8DI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uCbZ372w; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="HCwlnCpV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=pW
-	/tc3tkuQTH/abGF/d2gvg8c3yJSFH791/HNtDzr2k=; b=HCwlnCpV7jFc0lkYl8
-	HAbKPZLquktYu03dZuglAKwwLIjCwoIaP2z2w2kcaIGhT0IJN74+8mpSA9liuRfe
-	FWTY6ElOHSo2Xd1Ea9K99BDaCgE138aVDnQdS0eR1XvT6tH6tv3fmjuRlCdRpN69
-	7jVapihtQrwdF1Oc2DpAqd+tk=
-Received: from 163.com (unknown [])
-	by gzsmtp1 (Coremail) with SMTP id PCgvCgB3g_MjwgZqrjbBDg--.3469S2;
-	Fri, 15 May 2026 14:50:22 +0800 (CST)
-From: <w15303746062@163.com>
-To: pmenzel@molgen.mpg.de,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Cc: linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	greg@kroah.com,
-	stable@vger.kernel.org,
-	Mingyu Wang <25181214217@stu.xidian.edu.cn>
-Subject: [PATCH v3] Bluetooth: hci_uart: fix UAF in hci_uart_tty_close()
-Date: Fri, 15 May 2026 14:50:09 +0800
-Message-Id: <20260515065009.383265-1-w15303746062@163.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <505b56bd-e5fd-4feb-a6e3-1d8269609277@molgen.mpg.de>
-References: <505b56bd-e5fd-4feb-a6e3-1d8269609277@molgen.mpg.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uCbZ372w"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 74558C2BCB0
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 07:01:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778828496;
+	bh=C2NNfWrL+p5YS1e4wbllvrK+9AEJBlDuRbnQwlB3BIU=;
+	h=From:To:Subject:Date:From;
+	b=uCbZ372wxA4sxTd1q0pb7aJhrSvmyG99l0fE2hiYdbrvcYZjSftfPEu82H6I53KvM
+	 8/1dp+q4O6cMqu8plwLUkbV6MBk/MbsWsapPo/CY7TD8NUf2G9l6ktl4DHxew4o0a8
+	 Rt0AX6P9FEwA0d3Go/nUZdaofqOimk/dMllRlcmtBBiKUN9LyUrW+NKdjZ0XvkqTUS
+	 ElZf/9/bO2gJb0rAbKgd2US95XhX7uWyTPWIyqhTQwwzGRYg9CI/hRpjfk5HjSVdsk
+	 bOdg/vtEG1O4O9UMG4HioV14qvjQ042pJHmLyu7pjU/FkdeEKStQ7rUUHocmFVS0+M
+	 nQ8BAYI8EBszw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 61823C4160E; Fri, 15 May 2026 07:01:36 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221521] New: Bluetooth: btusb/mt7921 - Failed to send wmt func
+ ctrl (-22) on MediaTek MT7921 combo adapter
+Date: Fri, 15 May 2026 07:01:36 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: txxlc@pm.me
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-221521-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PCgvCgB3g_MjwgZqrjbBDg--.3469S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxJw43Kr1DZFyDZF13JFWfAFb_yoW5KF4DpF
-	sxKF98AF4ktr4qkF1DZa1xAFyrKF4IgFW2k34fX3y5X3Z8tr4vk3WIkFWIgF1UArZ5Cr4S
-	vFWDX3y5W3WUZw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UQtxgUUUUU=
-X-CM-SenderInfo: jzrvjiatxuliiws6il2tof0z/xtbC-w7Xu2oGwi5OOgAA3p
 
-From: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221521
 
-A Use-After-Free (UAF) vulnerability and a subsequent kernel panic were
-observed in hci_uart_write_work() due to a race condition between the
-initialization of the HCI UART line discipline and concurrent TTY hangup.
+            Bug ID: 221521
+           Summary: Bluetooth: btusb/mt7921 - Failed to send wmt func ctrl
+                    (-22) on MediaTek MT7921 combo adapter
+           Product: Drivers
+           Version: 2.5
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: blocking
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: txxlc@pm.me
+        Regression: No
 
-This issue was triggered by our custom device emulation and fuzzing
-framework (DevGen) on the v6.18 kernel. Due to the highly timing-dependent
-nature of this race condition (requiring a precise interleaving of
-TIOCVHANGUP and protocol setup), Syzkaller failed to extract a reliable
-standalone C reproducer (reproducer is too unreliable: 0.00).
+On kernel 7.0.7, the Bluetooth portion of the MediaTek MT7921 PCIe combo
+adapter fails to initialize. The btusb driver detects the device (hci0), but
+initialization aborts with:
+Bluetooth: hci0: Failed to send wmt func ctrl (-22)
+As a result, bluetoothd starts successfully but reports no available
+controllers. bluetoothctl list returns empty, and GUI managers (blueman,
+bluedevil) cannot enable the adapter. RFKill shows no software/hardware blo=
+cks.
+The Wi-Fi portion (mt7921e) initializes and works correctly.
 
-The crash trace is as follows:
-  ODEBUG: free active (active state 0) object: ffff88804024e870 object type: work_struct hint: hci_uart_write_work+0x0/0x940
-  WARNING: CPU: 0 PID: 338273 at lib/debugobjects.c:612 debug_print_object+0x1a2/0x2b0
-  ...
-  Call Trace:
-   <TASK>
-   debug_check_no_obj_freed+0x3ec/0x520
-   kfree+0x3f0/0x6c0
-   hci_uart_tty_close+0x127/0x2a0
-   tty_ldisc_close+0x113/0x1a0
-   tty_ldisc_kill+0x8e/0x150
-   tty_ldisc_hangup+0x3c1/0x730
-   __tty_hangup.part.0+0x3fd/0x8a0
-   tty_ioctl+0x120f/0x1690
-   __x64_sys_ioctl+0x18f/0x210
-   do_syscall_64+0xcb/0xfa0
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-   </TASK>
+Steps to Reproduce
+    1. Boot system with kernel 7.0.7
+    2. Check dmesg | grep -iE 'bluetooth|btusb|mt7921'
+    3. Run bluetoothctl list
+    4. Observe Failed to send wmt func ctrl (-22) in kernel log and No defa=
+ult
+controller available in BlueZ
 
-The issue arises because the workqueues (init_ready and write_work) are
-only cancelled if the HCI_UART_PROTO_READY flag is set. However, during
-the protocol initialization phase (HCI_UART_PROTO_INIT), the underlying
-protocol may schedule work. If a hangup occurs before the setup completes
-and the READY flag is set, hci_uart_tty_close() skips the cancel_work_sync()
-calls and proceeds to free the `hu` struct. When the delayed workqueue
-executes, it blindly dereferences the freed `hu` struct.
+Relevant logs:
+% sudo dmesg | grep -A2 -B2 'wmt func ctrl'
+[    6.063435] input: HD-Audio Generic Mic as
+/devices/pci0000:00/0000:00:08.1/0000:04:00.6/sound/card1/input16
+[    6.063488] input: HD-Audio Generic Headphone as
+/devices/pci0000:00/0000:00:08.1/0000:04:00.6/sound/card1/input17
+[    6.078123] Bluetooth: hci0: Failed to send wmt func ctrl (-22)
+[    6.078129] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection
+command is advertised, but not supported.
+[    6.133913] mt7921e 0000:03:00.0: HW/SW Version: 0x8a108a10, Build Time:
+20260224110909a
 
-Fix this by moving the cancel_work_sync() calls outside the
-HCI_UART_PROTO_READY check, ensuring that any pending works are
-unconditionally cancelled before the hci_uart structure is freed.
-Note that hu->init_ready and hu->write_work are initialized in
-hci_uart_tty_open(), so it is always safe to call cancel_work_sync()
-on them in hci_uart_tty_close(), even if the protocol was never
-fully attached.
+--=20
+You may reply to this email to add a comment.
 
-Fixes: 3b799254cf6f ("Bluetooth: hci_uart: Cancel init work before unregistering")
-Cc: stable@vger.kernel.org
-Signed-off-by: Mingyu Wang <25181214217@stu.xidian.edu.cn>
----
-Changes in v3:
-- Added 'Cc: stable' tag as requested by the stable bot.
-
-Changes in v2:
-- Added KASAN/ODEBUG crash trace.
-
- drivers/bluetooth/hci_ldisc.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 275ea865bc29..566e1c525ee2 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -544,14 +544,18 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 	if (hdev)
- 		hci_uart_close(hdev);
- 
-+	/*
-+	 * Always cancel workqueues unconditionally before freeing the hu
-+	 * struct, as they might be active during the PROTO_INIT phase.
-+	 */
-+	cancel_work_sync(&hu->init_ready);
-+	cancel_work_sync(&hu->write_work);
-+
- 	if (test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
- 		percpu_down_write(&hu->proto_lock);
- 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
- 		percpu_up_write(&hu->proto_lock);
- 
--		cancel_work_sync(&hu->init_ready);
--		cancel_work_sync(&hu->write_work);
--
- 		if (hdev) {
- 			if (test_bit(HCI_UART_REGISTERED, &hu->flags))
- 				hci_unregister_dev(hdev);
--- 
-2.34.1
-
+You are receiving this mail because:
+You are the assignee for the bug.=
