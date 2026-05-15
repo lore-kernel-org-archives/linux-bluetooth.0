@@ -1,174 +1,138 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f77.google.com (mail-oa1-f77.google.com [209.85.160.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852D8466B66
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 10:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302FC46AED7
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 12:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778842587; cv=none; b=Z0afKOn8lPBrKFxuxIAPd6HiMtuU/QDnVOrsUFXoG80R0mJdn+jmdAfDTgeAhcLK10LFoYwBWSg99j8mH0tw7kxqXlLNbsevHAUnNc5YYkbOQCZJD4kTDpQpDjdm1SpEvNX9OHVpcQcG12ZbhMNzAHfLf/dUQGL7x3wSElTlxNg=
+	t=1778846723; cv=none; b=a8BOH5udCjPYbCNo16XP8bDRrd8RiGyqPp177PMTTkcDWI8JfImWo3EeUzJwEhHP5xvVqp/7uN80G0Y5qQ8OKaYVobFT5+MrD6aSyRHfLvHS9if0Nabx11co0TnGnBYggvC89ruThVl5+tTszwrwY1BQIo1Z6qtqvEwE9EHWcpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778842587; c=relaxed/simple;
-	bh=7pI2CkgOkj1QdKQPeP82rrYu8n8c8T0fbj+4e6fR9P4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EYUuJFfuFB88efmvZV4ELtUP61+AZVA/yFVlTpt1RO4ogcZ3ZK8W5dBmNHnv2utZ8fwW0O2z9yfJ74gCEkxOdqMOF2NEdEk3DICxKAzju4J60RHIQkhDuzFfbxSlehj+tcXQEYHzpjdRRFqwDxj5/6z3WS1DE5qLIo+81k+Qa88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=c/lhJqZ8; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=NgghNvW4; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="c/lhJqZ8";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="NgghNvW4"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64F5VTwo1847950
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 10:56:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	SQl+nNFkbEygaebXDDr/5Cgv/szcdUhD1+tk65nXCHI=; b=c/lhJqZ8Ku0a6NmB
-	YHnKzJ+/8keMK2ZrvYZ81OCuIht2aXsbxAwHblgsG65zAS851io8PI/b+EYw/ROr
-	25vIpn53sqfs4Z8qwm3FwKOkRYftq6McQ1VnOVIHGlX0edoTYWb8g0Ux1jLx4G12
-	GLxzim2frGFv1Ioef7KwBX6e0NcXKeYjIWydGrcZGnfGwW8IuYBQIqC690ht3leO
-	X2eTMGx8cOsByWacd9vJEVeiQbQqPQUOspFeJ10BL8FIfKtGJofLIuY21fWuqJvC
-	30H6yC2XmSm6t1Y3vj/jTmINktkRfH1ZSESGl1e1PeA9kTOQGwWKKdwjbKOQWjqR
-	HKUGZg==
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e5m1t2w1v-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 10:56:23 +0000 (GMT)
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-90f5edb7516so84917285a.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 03:56:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1778842583; x=1779447383; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SQl+nNFkbEygaebXDDr/5Cgv/szcdUhD1+tk65nXCHI=;
-        b=NgghNvW4g3YOCCDm5+kkPswqI5orr7+M1r1eEoC1yQZXx5mgada5TwySTO2kckbNKa
-         mdfqUk8YhS/X3Ou5uBkRBOsXDwy5Zhg81g4PbG/J34UNO8owDQXP9ICYKgUY3jZBdeoz
-         Vv5A0K3Qbti8cSD5PBf7cMw0umO899O/0RBHbVz/srM6vFn3R0UBav3NvMB0gJ17P7LW
-         BzghBHhY8Ci7MnFO8aplDEkN5s2zWhkRkzjXp5CgyZbBAsmGSaJmpzilNFUwhT3EnYBQ
-         4qEQ2IdhSNT40PXo0J/ad1c8iOXDVHJpZPtbqjuK7v/ebQoMSavfilAQiwyRHHzfPPxD
-         9srQ==
+	s=arc-20240116; t=1778846723; c=relaxed/simple;
+	bh=Jer2BC/va0AeVuOM6s5SCldIYf3dZe0BsgnG0Yn7dkU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=uJGWrj0j4TGT5HusjZ/hKkUWhOhQrNojBxFypoKkq4KgtdbYvERJMQjS64W4He2Fe6Jozo2dfMb5EXUMfkcMMfw7MK36024Aahc7wyrSnauAn7W7hAw03QVCEkVwA1X+Nrx3oCjGaNUkRyZZCXW0QUjupbQUyNh57PIEuVEwIlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f77.google.com with SMTP id 586e51a60fabf-439ba95ef42so3071583fac.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 05:05:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778842583; x=1779447383;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SQl+nNFkbEygaebXDDr/5Cgv/szcdUhD1+tk65nXCHI=;
-        b=DbJufTgaV1devRg+kz2gWCXcHx5mI+rc39W4WGRzcS4ck+l9Gl/yQslSalndQoBo0k
-         aAPbfMqtawVWHKwk2tr8Lmln1t16KP1aYOl83O+fM99v86WpdmGh4TZzMh9jEUZK3xlx
-         7KNS1qE7HQPi1ShXeNuzfnMH9LU83g46YKEmCLZnQTFl0YLgZ/Ts/MY5zsn5tohB4quL
-         bRsfMmvy1CQiBCgJ3iG72Kg8vjxWICP47iUWYMncjkQhXI9RqeRGTjXPaFGNMy4aJFNj
-         APA3JQ8zXTIui93QR3p6sY6WV7xYl4QgPYgh/hw/PMdmV3PSc8tAGdXKy+lkce4exiRA
-         0isw==
-X-Forwarded-Encrypted: i=1; AFNElJ+3VW9a6MlzUWTNe2hW3jh0ZepGjEruLo2dHJE+8PLEiBHwGXIqlojzQX2thSl87zabRjVC/QZH99wvBHJWVzg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxj8+8kc1Foh5x+vHF3fXEOZZug6jixe91MPAGvlGlTfctBe/zD
-	D+RE8DLqDxjvzIuSBYRU3sXxsA8D2kpXpuSmdtYYm/XRd7fve4NsuLKVx37oanjMsQV3H4GdQB/
-	AcXUuhZSvks9+vOanjMWm9RFmHE/YallCd8Q5Ov6FlGHuy8VAHczKOa0Dl2/HJoDJ5bPvTzI=
-X-Gm-Gg: Acq92OEctQI8Nig+HcjLsd8hIgv5zYQCkxiY23oZQVdLfTBDHe7ZdjndBccKAjJO/ek
-	MU2QYspJSpFm2WrqMm3n3Bm0AWfR2oRSKC767PIrMsLTmnRXb33KvoBVPHaRiYxc0dL09q7csup
-	gXIQhd/rso2XEl9m8BqVN/yVWlVHXxoTYkNr8RNEKNIu7afHMwB6LD7xZHDTfAR7MEiH8jFrJhL
-	WHJpncqQyYExIha2glnjyoeCYOo8/oENNwLXl6WdchaNLmZ9rUf33ikg+w8NoqzAnLtXtdF3OMY
-	lAA2JFmOyTC4+Zy1hCZeP9s9cfXNAwRpuiA5gYH1KKUPqbwzjW8J1xeXqEMYzHZdREmHY3SDqkQ
-	2IgYaWHw1IB0vbAYmsn0zc7ePM/SOZRIR3CKcjDrpBUkSWXPTakHSVqkyEu9KD/ruuwS3yUh9EA
-	FkJkUqpWglnU8GTA==
-X-Received: by 2002:a05:620a:a410:10b0:911:dfb8:37c9 with SMTP id af79cd13be357-911dfb83b03mr212491585a.3.1778842582861;
-        Fri, 15 May 2026 03:56:22 -0700 (PDT)
-X-Received: by 2002:a05:620a:a410:10b0:911:dfb8:37c9 with SMTP id af79cd13be357-911dfb83b03mr212489585a.3.1778842582381;
-        Fri, 15 May 2026 03:56:22 -0700 (PDT)
-Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-68311660f76sm1784549a12.19.2026.05.15.03.56.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 May 2026 03:56:21 -0700 (PDT)
-Message-ID: <8bb0140c-bdb8-4ff5-aea4-15879a27f13a@oss.qualcomm.com>
-Date: Fri, 15 May 2026 12:56:18 +0200
+        d=1e100.net; s=20251104; t=1778846721; x=1779451521;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xG79SxzP85bk+Ef+HUcBRKzjUlic/7Ew2qFuPNNcY8k=;
+        b=K/SMRO9nB+cmKDwq0EozgDlGpwRoZ6dKxvaLNjAsrKITr1SWhNVe3lS6UrSv3DumT5
+         xK1GsFPGJhzbkgqbAHe/Q4imiDP+LMAIibvsKeUt+hFSKfMfCH5UURjD1xSad6w6DMJr
+         kHuwQdE5rSVhv3S+MJqQC2B2nAPg8/rbBrgQsIn0hBAYFlcKBhkJqTbLnanJBbFNaK7A
+         dRwGdkwFlcb5LQ00gdqTHJf1Cq+GFscun74gUpGxpwwcQiIRBdhIXePQTD8EGWOpdLHu
+         Bs/o9in5QQK7K4QAZQVWTHTeoh+dkkGUvz8fdZCouMCT/zjnAIB4RkEves35Ojzmq7S/
+         loxw==
+X-Gm-Message-State: AOJu0Yz/skkjfbc+1GXrircgYhAUez95vx5gf3tf3CsjEzdN/FyYHAAw
+	Rr8VD5i4N3/aPakFILAXpYIkgNGzSatBocUQK24iICnIIQPA9H6O1d70l+Jd3tQqoUQqhkD7EiS
+	YlC1Pd3UlpQ86MUeAmp/6CMDtztw1BsUucZv7eDj4R6TuhslZt3LGVEA6G5w4lQ==
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] arm64: dts: monaco-arduino-monza: Add Bluetooth UART
- node
-To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com,
-        wei.deng@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
-        mengshi.wu@oss.qualcomm.com
-References: <20260429103537.1282497-1-shuai.zhang@oss.qualcomm.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20260429103537.1282497-1-shuai.zhang@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authority-Analysis: v=2.4 cv=D7Z37PRj c=1 sm=1 tr=0 ts=6a06fbd7 cx=c_pps
- a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22
- a=EUspDBNiAAAA:8 a=Wk1vn-X9fqPfTJa7il0A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=PEH46H7Ffwr30OY-TuGO:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTE1MDExMCBTYWx0ZWRfX7jJ7XhyRNQLx
- mTYW/BTaHOLTosyKkpeu6YqQR94AifDGRtb+n+/jokKMf7qMcnitLjT953LMA+Ga3eZeerlET/h
- 87K94BJ2azz/u46i5DGlTnV2RHHGrcc8ekv6HABi5UwDinQpMwTV9IXTvB+9yAhZGCleB+Jjji0
- 6tt9744YThyLAOLlV00YLbjVAKin0HG6YKbz5lOcSuYYmiUroHO7hO2PIMAgEtM2Zk9HtY+cpQX
- gVResG9M6CWCmCCCcFq8onbhZuwOmnK/1B/C9ScyeqxKYtJqrC39rF9Ikd2r0fI0/Tcqy5Rbvc9
- f/DxRUu9wJ9+bGA/M6vO7lC2hMS12KAbN5mRaFdppaPrPxaXA9ifAMjGmGwT7pwQ1tkVCI4zP2P
- TfmpcjOwKZf80N7ACO2G8+FYtXArssnSOKVm61LUFd9IOLfGtINBxyP8WxX0p6THz9EtNAp3dLN
- HVYg0rhNNalOB2vHQYw==
-X-Proofpoint-ORIG-GUID: WlGc4Bn3oQtmjhmAJM3fRLo7q3tFNHuP
-X-Proofpoint-GUID: WlGc4Bn3oQtmjhmAJM3fRLo7q3tFNHuP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-15_02,2026-05-13_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 lowpriorityscore=0 priorityscore=1501 impostorscore=0
- adultscore=0 phishscore=0 clxscore=1015 bulkscore=0 spamscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
- definitions=main-2605150110
+X-Received: by 2002:a05:6820:1746:b0:688:2480:7fa8 with SMTP id
+ 006d021491bc7-69c942dac4dmr2292738eaf.21.1778846721159; Fri, 15 May 2026
+ 05:05:21 -0700 (PDT)
+Date: Fri, 15 May 2026 05:05:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a070c01.050a0220.358c9.0001.GAE@google.com>
+Subject: [syzbot] [bluetooth?] WARNING in hci_conn_drop (4)
+From: syzbot <syzbot+195b4c12c5b8c9a8eb8b@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 4/29/26 12:35 PM, Shuai Zhang wrote:
-> The QCA2066 Bluetooth chip is powered by a board-level 3.3 V supply
-> provided by the hardware. This change connects the Bluetooth
-> controller via UART10, and the corresponding GPIO is used to enable
-> the Bluetooth chip.
-> 
-> basic function test step:
->  - bluetoothctl power on/off
->  - bluetoothctl scan bredr/le
->  - bluetoothctl pair <remote device address>
->  - bluetoothctl connect <remote device address>
-> 
-> low-state test and state:
->  - rtcwake -d /dev/rtc0 -m no -s 30 && systemctl suspend
-> 
-> cat /sys/kernel/debug/suspend_stats
-> success: 1
-> fail: 0
-> failed_freeze: 0
-> failed_prepare: 0
-> failed_suspend: 0
-> failed_suspend_late: 0
-> failed_suspend_noirq: 0
-> failed_resume: 0
-> failed_resume_early: 0
-> failed_resume_noirq: 0
-> failures:
->   last_failed_dev:
-> 
->   last_failed_errno:    0
->                         0
->   last_failed_step:
-> 
-> Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-> ---
+Hello,
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+syzbot found the following issue on:
 
-Konrad
+HEAD commit:    5cbb61bf4168 arm64/fpsimd: ptrace: zero target's fpsimd_st..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=13f0ebce580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a834c6344141a58b
+dashboard link: https://syzkaller.appspot.com/bug?extid=195b4c12c5b8c9a8eb8b
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+userspace arch: arm64
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/04156ec16593/disk-5cbb61bf.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/6bfa041e2c79/vmlinux-5cbb61bf.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a92d82d8a79e/Image-5cbb61bf.gz.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+195b4c12c5b8c9a8eb8b@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+workqueue: cannot queue hci_conn_timeout on wq hci4
+WARNING: kernel/workqueue.c:2298 at __queue_work+0xf6c/0x12f8 kernel/workqueue.c:2296, CPU#0: kworker/0:5/4769
+Modules linked in:
+CPU: 0 UID: 0 PID: 4769 Comm: kworker/0:5 Tainted: G             L      syzkaller #0 PREEMPT 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/18/2026
+Workqueue: events l2cap_chan_timeout
+pstate: 634000c5 (nZCv daIF +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+pc : __queue_work+0xf6c/0x12f8 kernel/workqueue.c:2296
+lr : __queue_work+0xf6c/0x12f8 kernel/workqueue.c:2296
+sp : ffff800092887810
+x29: ffff800092887850 x28: ffff700012510f78 x27: ffff0000d64aba88
+x26: ffff0000d629f800 x25: 0000000000000008 x24: ffff0000d629f9c0
+x23: dfff800000000000 x22: ffff0000de09572c x21: 0000000004208060
+x20: ffff800089f06000 x19: ffff0000c5968a58 x18: 1fffe00035c20e20
+x17: ffff8000888db000 x16: ffff80008898cfc0 x15: 0000000000000000
+x14: 0000000000000000 x13: 0000000000000001 x12: 0000000000000000
+x11: 0000000000000000 x10: 0000000000ff0100 x9 : 2aca8fde2d60a500
+x8 : 2aca8fde2d60a500 x7 : ffff8000804886d0 x6 : 0000000000000000
+x5 : 0000000000000001 x4 : 0000000000000000 x3 : ffff8000802f13b0
+x2 : 0000000100000000 x1 : ffff0000de095700 x0 : 0000000000000000
+Call trace:
+ __queue_work+0xf6c/0x12f8 kernel/workqueue.c:2296 (P)
+ __queue_delayed_work+0xf4/0x2b4 kernel/workqueue.c:2548
+ queue_delayed_work_on+0xcc/0x140 kernel/workqueue.c:2600
+ queue_delayed_work include/linux/workqueue.h:711 [inline]
+ hci_conn_drop+0x174/0x29c include/net/bluetooth/hci_core.h:1712
+ l2cap_chan_del+0x220/0x48c net/bluetooth/l2cap_core.c:672
+ l2cap_chan_close+0x3e4/0x5ac net/bluetooth/l2cap_core.c:-1
+ l2cap_chan_timeout+0x120/0x29c net/bluetooth/l2cap_core.c:431
+ process_one_work+0x78c/0x173c kernel/workqueue.c:3302
+ process_scheduled_works+0xdc/0x13c kernel/workqueue.c:3385
+ worker_thread+0x770/0xbd0 kernel/workqueue.c:3466
+ kthread+0x2f0/0x3c0 kernel/kthread.c:436
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:842
+irq event stamp: 81246
+hardirqs last  enabled at (81245): [<ffff800080351f60>] __cancel_work+0xf4/0x1a4 kernel/workqueue.c:4454
+hardirqs last disabled at (81246): [<ffff80008034e144>] queue_delayed_work_on+0x54/0x140 kernel/workqueue.c:2596
+softirqs last  enabled at (81238): [<ffff800084aa1108>] spin_unlock_bh include/linux/spinlock.h:396 [inline]
+softirqs last  enabled at (81238): [<ffff800084aa1108>] release_sock+0x150/0x228 net/core/sock.c:3825
+softirqs last disabled at (81234): [<ffff800084aa0fec>] spin_lock_bh include/linux/spinlock.h:348 [inline]
+softirqs last disabled at (81234): [<ffff800084aa0fec>] release_sock+0x34/0x228 net/core/sock.c:3812
+---[ end trace 0000000000000000 ]---
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
