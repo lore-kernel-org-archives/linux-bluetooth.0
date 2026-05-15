@@ -1,203 +1,143 @@
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [185.244.194.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0FB48BD52;
-	Fri, 15 May 2026 15:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.244.194.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3DF3E63AD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 15:12:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778857890; cv=none; b=gG66oRxbBHKMtFtyz3BOwbu4w1mM6xQjZEXKNFB2dm8uZTjyZPo/C18Q34Xr441xI3jCSM7YAg+Cq5PCEHSuUQo5MMagWyEh3Fcjv1IKTHZAQI2LvFdxi7MErIXNj7poKObuf/w/OORB/OLBq3dTNCWmZTBJLpp2ZkhaA+7902Y=
+	t=1778857951; cv=none; b=rESdpDM7uq2OQXmHydGFfSyBzEJCKFQDuHjZfUsd/zWqOPzDgJVl5yQt2aU5jgGI9kVUgUXIliN8aVR/zAmNgpgGvn3HZKBGiOGYerISOuvK7wBM8/wEC6+diUKHrku9PpSeeK4hhXauInxz5971Z30cB14TYIkDZHYwL053rl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778857890; c=relaxed/simple;
-	bh=NIu0Ci9yasRCP6TqXm6xmiCeZw9UVbaW4PiVBp7uO7Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sJkSsMkwPi5Yh1Mq3bnxOARomcIp595gtg7dC0gv7XHrp5Ma1rTHliZFQK52iOkZ9u3oL69MoaGEK9iI6oO9r86CVEcW+olUkXV3wDATZGNqg+kLy50R62+Nb5VbxAj8G0CXS1DULvPT818WIFK4urjAKK2CRp/GA3TOS/hPRRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=YLNaK1W6; arc=none smtp.client-ip=185.244.194.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1778857951; c=relaxed/simple;
+	bh=hr1G/NtSacjkOdGlCTJPGBQQ0o+MbHjBxU14hjaW2+w=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=E4OiUICPgBF4NzByPrIcgOZu7s96tBvQFvwIt0v+TOrZEB8f7HxNRFhdu5eW35MtnypCYmcMxSW8QBbmtMrqb5HKAJSRTfIpQ+GStmBqLAVGwg41gXZc2vgTLpyS18ZYmi/OUeg+UD2boL7VB6Q6nJCsC0fN6PM+wPrJPiFN29c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F+xRgMzq; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="YLNaK1W6"
-Received: from relay01-mors.netcup.net (localhost [127.0.0.1])
-	by relay01-mors.netcup.net (Postfix) with ESMTPS id 4gH9dQ6XPhz95xn;
-	Fri, 15 May 2026 17:11:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1778857882;
-	bh=NIu0Ci9yasRCP6TqXm6xmiCeZw9UVbaW4PiVBp7uO7Q=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YLNaK1W6EX0lbqQ0svrpyEPc5gnn45q0dbG9NRiC/P44oyI5nAODrYMwb/LsoFxhA
-	 vrTmaQM8XMjZ5pjJnNh31EPOLtw+pV1NcmsySgsBJHJct9Wh1JiqI7MvyJ9VVT242h
-	 5YglWAC5Co5YNo93tEeBWs53KO/vjS9C+qE4FKDVd2E909NzwfHaXaDANKrurj1yWx
-	 hGDHKWgG0K8V2weB/Iy5SZwVewH3apzrxJ95b6vLZJqiIFqBNQpcLPK7/AGGXj1qHm
-	 ml/LpVlOO85O1PJUXcQRgwCNMGSf3qDc0Eg82G1ZGR0GCGyPcDbKXDurxdGe+On710
-	 f0tWfdZtWP+NQ==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by relay01-mors.netcup.net (Postfix) with ESMTPS id 4gH9cK5JYpz7x5l;
-	Fri, 15 May 2026 17:10:25 +0200 (CEST)
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4gH9cK0RHlz8sZP;
-	Fri, 15 May 2026 17:10:24 +0200 (CEST)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id DC6685F9AF;
-	Fri, 15 May 2026 17:10:23 +0200 (CEST)
-Authentication-Results: mxe9fb;
-        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <f5cf1c30-48a4-4102-ae00-b74cf02e639e@leemhuis.info>
-Date: Fri, 15 May 2026 17:10:17 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F+xRgMzq"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-50faf8ed9c5so49439551cf.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 08:12:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778857949; x=1779462749; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=4sV1DGCnFC9tHFk58JfRx1PEFSu04Jx0wCMOwC5/LPo=;
+        b=F+xRgMzqsqikL3+Ampx4fnbTHxNje+Gszf7Xtq9dOTy79CoxtIJZo5dlozR1FgcFhO
+         0wRrskqSEWJmXT3pldlBPQcm9pV05wYWCGQrepVBxHzV30zyr9n4NoaGwffAkavaZ6QO
+         rx0FsgQjpcT5AAbj4eXh/+VgtmaMKdYz7K3iu6p2cTeFiVFuZcbik7+J7pw4E46a4Zpm
+         Ls36p46miwDj2rZHvjZ9mi9hTy3DX2WsCO36NXFrtEoT9W5M/+5wUh9BxlHhXTlMtCTF
+         xiee8PwyPXCyof1V4OoK00yZD7fGkzkJfYVcdzD6ou4IYLc5wyc95x01fn8e4QtupeYZ
+         Eyvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778857949; x=1779462749;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4sV1DGCnFC9tHFk58JfRx1PEFSu04Jx0wCMOwC5/LPo=;
+        b=e/JvhGruzoj8cLY/8hPFne0yRePxZupULdjCIyjc12pra6+xFpayPRDMY4GJe9y2LU
+         6a8trNjC6bNbLQJfZhtBGWdUixgM3sA2MM0X58xc9niaBoaeN7z2A2oIiUEKoUvWAtvt
+         Jcg2LSMDPVKfW/sfHK4/c6UIGsrczu3pIIvnlTzv/1XYLxLF3xhK7CtASEIoIcR4JGEQ
+         Yk+ryPGMxhJvn5q1xwWJug5HEzIn4vNrma4/kq2i99y3sd3ybUjNUv8rYUNSlB/tSBUu
+         vG0ne3CeL1urjcnzjsBVM2Ir1moYarbpxIRTNoqmIWveZl8oVcYsPKIjb0YfszwJBAeX
+         J7Lg==
+X-Gm-Message-State: AOJu0Yzstg02m59ktUK0QtGdfJXPPFIWm1Wo/n40crmrJZ3s0bx5Nq1e
+	r/B//vinUW9QD+NJQVzUyyKTX6cQTd+TVmMRzk7xUO74kykcVV8wVXyBUI+IWQ==
+X-Gm-Gg: Acq92OHlaM5RTbdfYKdsnKmC36ZIbPEudEIG75I6voQXnXb1zTCaWLTJn0e+6JxbNO5
+	ObufINHg7oCNQZ0dkM8JHTKmhzEqOEmmanjOxFfBnbiL5WQGjkeXhQGZ65TqtZB7IxJmskIP7zZ
+	OZg03jCMPSQA9eIeYhqEij8kreoSuG2BY0+G/9eORR5+/1w6RHuQNVpAZfrOX+uV+GyIKsSby0B
+	bG3yDNW1SHeQR2thY8VKSVR3MEXRdlNguA9GUNzEnYd0JANPI8Ioq4LAmPZ3uHNp7e0xyUdx06z
+	ei+59eFK3cCun1KKCCwGzLY5813BAw+s0G1vnvhi5c7HunW6iEMJVneYfGSPp2JvZTyS3QVs0Fi
+	9tq/NOpDQD8YamaMgMSkoj72WYjGu/vaZzSYW8EoXnnAlEzdtjQdHUzYLBXKkICUGn/Q2o3XQYt
+	ICsh6EimEpbJAz+wak0AE/7r0tXRoh
+X-Received: by 2002:ac8:57ca:0:b0:50d:89bc:f450 with SMTP id d75a77b69052e-5165a001072mr66819891cf.11.1778857948702;
+        Fri, 15 May 2026 08:12:28 -0700 (PDT)
+Received: from [172.17.0.2] ([20.51.199.20])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51645688c13sm46279931cf.1.2026.05.15.08.12.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 May 2026 08:12:28 -0700 (PDT)
+Message-ID: <6a0737dc.a9c3b6c1.280cbf.bae1@mx.google.com>
+Date: Fri, 15 May 2026 08:12:28 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============9081658030399234046=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] bluetooth 2026-05-14
-To: davem@davemloft.net, kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Linux kernel regressions list <regressions@lists.linux.dev>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Greg KH <gregkh@linuxfoundation.org>
-References: <20260514172340.1515042-1-luiz.dentz@gmail.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-X-Enigmail-Draft-Status: N11222
-Autocrypt: addr=linux@leemhuis.info; keydata=
- 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 MEK4
-In-Reply-To: <20260514172340.1515042-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-PPP-Message-ID: 
- <177885782428.2534966.14422332395235472068@mxe9fb.netcup.net>
-X-NC-CID: 4VsUA7rWd/0eRMFI7BCFOcLGq7AXiqg1amkvb0XAv6M6XP83ZBw=
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, w15303746062@163.com
+Subject: RE: [v4] Bluetooth: hci_uart: fix UAF in hci_uart_tty_close()
+In-Reply-To: <20260515140548.393865-1-w15303746062@163.com>
+References: <20260515140548.393865-1-w15303746062@163.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-[+Linus +Greg]
+--===============9081658030399234046==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On 5/14/26 19:23, Luiz Augusto von Dentz wrote:
-> The following changes since commit c78bdba7b9666020c0832150a4fc4c0aebc7c6ac:
-> 
->   net: phy: DP83TC811: add reading of abilities (2026-05-14 15:17:12 +0200)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-14
-> 
-> for you to fetch changes up to 375ba7484132662a4a8c7547d088fb6275c00282:
-> 
->   Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-14 09:58:08 -0400)
+This is automated email and please do not reply to this email!
 
-It seems this PR sadly came too late for this week's net PR to mainline
-that was merged yesterday.
+Dear submitter,
 
-TWIMC, from my point of view, it would be great if we somehow could
-still get the changes from this PR or at least the btmtk fix it
-contains[1] to mainline this week before -rc4, as it is fixing a
-regression known since 2026-04-24 that at least five people encountered
-with mainline since -rc3 due to 634a4408c0615c ("Bluetooth: btmtk:
-validate WMT event SKB length before struct access") [006b9943b982 in
--next].
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1095463
 
-Another reason: Greg a few hours ago backported the culprit for the
-regression to v7.0.7, v6.18.30, and v6.12.88, which led to a bunch of
-other reports coming in[3]. Greg could, of course, revert it, but
-usually he prefers to just merge the fix. But of course the fix must
-first hit mainline (or at least -next) -- and that might only happen
-next Thursday, as there usually is only one net PR per week. Luiz even
-wanted to "expedite a PR to have it fixed asap"[4], but that didn't work
-out afaics, hence this mail.
+---Test result---
 
-Ciao, Thorsten
+Test Summary:
+CheckPatch                    FAIL      0.78 seconds
+GitLint                       FAIL      0.32 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      26.60 seconds
+CheckAllWarning               PASS      29.40 seconds
+CheckSparse                   PASS      27.88 seconds
+BuildKernel32                 PASS      26.18 seconds
+TestRunnerSetup               PASS      590.38 seconds
+IncrementalBuild              PASS      25.47 seconds
 
-[1] btmtk: accept too short WMT FUNC_CTRL events – also available here:
-https://lore.kernel.org/all/770d36b07311bf88210c187923f243fb9f126f04.1777058551.git.pav@iki.fi/
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v4] Bluetooth: hci_uart: fix UAF in hci_uart_tty_close()
+WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#88: 
+  ODEBUG: free active (active state 0) object: ffff88804024e870 object type: work_struct hint: hci_uart_write_work+0x0/0x940
 
-[2]
-https://lore.kernel.org/lkml/20260508173121.27526-1-mikhail.v.gavrilov@gmail.com/
-https://lore.kernel.org/lkml/f652d5d9841a9b7c100dd19ee97c86099f580724.camel@gmail.com/
-https://bugzilla.kernel.org/show_bug.cgi?id=221511
-https://lore.kernel.org/lkml/20260514-bluetooh-fix-mt7922-v1-1-499c878af1e5@zohomail.in/
-https://lore.kernel.org/lkml/20260514-bluetooh-fix-mt7922-v1-1-499c878af1e5@zohomail.in/
-(+ one more report in a Fedora kernel chatroom)
+total: 0 errors, 1 warnings, 23 lines checked
 
-[3]
-https://bugzilla.kernel.org/show_bug.cgi?id=221521
-https://lore.kernel.org/lkml/51b55b97-615b-4f5e-b454-df646f4058b7@augustwikerfors.se/
-+ a four more people in
-https://bodhi.fedoraproject.org/updates/FEDORA-2026-6b173ffc2a#comment-4646633
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-[4]
-https://lore.kernel.org/all/CABBYNZ+FfhYtU2=J-V4pjKf_vKV=Y5LhVhxS_epKe-qaUUt8_g@mail.gmail.com/
+/github/workspace/src/patch/14575010.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-> ----------------------------------------------------------------
-> bluetooth pull request for net:
-> 
->  - af_bluetooth: serialize accept_q access
->  - L2CAP: ecred_reconfigure: send packed pdu, not stack pointer
->  - btmtk: accept too short WMT FUNC_CTRL events
->  - hci_qca: Convert timeout from jiffies to ms
-> 
-> ----------------------------------------------------------------
-> Jiexun Wang (1):
->       Bluetooth: serialize accept_q access
-> 
-> Michael Bommarito (1):
->       Bluetooth: L2CAP: ecred_reconfigure: send packed pdu, not stack pointer
-> 
-> Pauli Virtanen (1):
->       Bluetooth: btmtk: accept too short WMT FUNC_CTRL events
-> 
-> Shuai Zhang (1):
->       Bluetooth: hci_qca: Convert timeout from jiffies to ms
-> 
->  drivers/bluetooth/btmtk.c         |  4 +-
->  drivers/bluetooth/hci_qca.c       | 33 +++++++--------
->  include/net/bluetooth/bluetooth.h |  1 +
->  net/bluetooth/af_bluetooth.c      | 87 +++++++++++++++++++++++++++++----------
->  net/bluetooth/l2cap_core.c        |  2 +-
->  5 files changed, 85 insertions(+), 42 deletions(-)
-> 
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v4] Bluetooth: hci_uart: fix UAF in hci_uart_tty_close()
 
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+16: B1 Line exceeds max length (124>80): "  ODEBUG: free active (active state 0) object: ffff88804024e870 object type: work_struct hint: hci_uart_write_work+0x0/0x940"
+17: B1 Line exceeds max length (86>80): "  WARNING: CPU: 0 PID: 338273 at lib/debugobjects.c:612 debug_print_object+0x1a2/0x2b0"
+56: B2 Line has trailing whitespace: "- Adopted Luiz's suggestion to use disable_work_sync() instead of "
+
+
+https://github.com/bluez/bluetooth-next/pull/196
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============9081658030399234046==--
