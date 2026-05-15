@@ -1,73 +1,46 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B9137C901
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 06:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99923932F2;
+	Fri, 15 May 2026 06:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778826331; cv=none; b=iJ2hyRMV6OV9rSERJgtoLUVj2fqyt4H6AT8qU4xzU/vCDCU8aRClqpSj4Q5AFCqRia1FdLcI8EK5mYjesZDQjvIFyUWEZKwEm0UOVAlpXednHC94TBumWCDbJfBH7sEk3e66t/SnXBDcmJ92Z+K9m4hvAi5DoPjT3NGJ71vkhX4=
+	t=1778827858; cv=none; b=D244a0TI7Kf8QC1JpLSxZs+yk02lEXf3USsiwxFczlSX3qOmE+m6aYlB0i6WdJHNBX6mtkknrLJHlmVhAGceA4U80BDUWeh2Cgzo9WCsH0lkAamyB0etOll3tA3SwNBUJ9IW393gAo8lsBCVF4e5ARxZrWHw3H8dNFtXEwvOBRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778826331; c=relaxed/simple;
-	bh=zdMaYaIF/WCaUO1A22gCU0P+PgdUjBhJZEz17jz2Bt8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YOQYCKOVvw8FvztAY+7xoPqYHUrJg8E8wqL7McDKee6JDggsBn7pjPubT2rNczdS2CxyrmNQd+WvwEBErdBcoN+/7GR9EXfd5bMGS6Xsc/pssrVSObwqbgCjY6Y24Uh0BqCVz9V4h50tyV9XPwc3gh21ncNO66I+R3s0dfIAleM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gQ49ZISy; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1778827858; c=relaxed/simple;
+	bh=XRhCa08VVO3TJqLsrQpmWqneu7Yjwmi3yyTGBY2bW1Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=k7mQfQZUe0TaRHyM+6G8ixr98DqitZpSmS/sMTMtgt+wLYAtZzbePCdwSXI9jZ6zCmHj9SZegBTnZ/tye+IXXdkmD8eXDqmJV5/xHmJ0COwA8UDfqRbeWFMwY/6qrtKmWiy93F3lw0EPDg4BDUAFP7cnWhoYKq9kqZs5rM2TAeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=HCwlnCpV; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gQ49ZISy"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-488ad135063so72319385e9.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 23:25:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778826328; x=1779431128; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=R1gkR6dt+RMCWBmuIuEthasGqBXKYWjHEwzJZ2BcFqc=;
-        b=gQ49ZISyin+W8yjszGpFSi7ZaUKdSAvM0tNvvdRwICjjvTSEFZTSWMUMuaG50FB22o
-         lXpzYamlmkvSZjUSaESGg7LswCiqg5VtdQHB1rcLNZ/SYniUmSVlK0XY4PnzIzcUjZO1
-         z0v/KYppWaGYUsTGsmLQBpNQpGfjT/NrKwgHPXzoIVijd/vrEomX1vc9FeQBbjywU/76
-         VdgaQHICSOUuDPEwcs+YMp7JWS2fENdnum+FdoVuVVg9KWwMlKPY7rj2EXNNkjoscXUf
-         wVtxDViEx1yiP93S1OAPGAoUdU2xdPFkmP42ft8MROjzL7DsXY6rQ4LVJLdprtOc0Bjv
-         GQKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778826328; x=1779431128;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R1gkR6dt+RMCWBmuIuEthasGqBXKYWjHEwzJZ2BcFqc=;
-        b=FlBCIWCILGO5bS6T4Urp2l+kset43EZLn9qesSWZrQ4/03l5wPBF7ypvoulo24cQeG
-         BOXvTfjCUEUlm+1xkMu3ttDJ+e0RSLJefYgmcZun0HD4whqAxZB+HueRonMpTm6/lFB7
-         6yM06Z91SDydwhaMYODcHbXWgzjBReSypE2kCoPwEyOP3w/4gE+PiUitxWOPs4LDWDv7
-         QvKmWl2IKdwYGSIOvQu2oktYmSGJsumxkN+XFNjwyCdNPaOuh4qvr3E5JzU9dSc/1p7u
-         ECjR/2eRcpMK2o+mKfZGZp/dfftrKOSl8N+8OtDYLGycLARaUelaaGi3Eze2tI+VHRr9
-         Oz5w==
-X-Gm-Message-State: AOJu0YwQOHPBm+7+d1irMrZaJaa+B0PfY+obYfUadUzsnlrOstWHVpnC
-	JCOLyrnyjBnZtR18l2q5Z/ErbT2YCbHSpo60fYYg+8h/S9f8x23FeMWa
-X-Gm-Gg: Acq92OEugGx4GVdLMQ07dOjZ1xRoEJPJGGDglMpGmLeZlvp5YcErFCctdb68/4Rros6
-	ACTfWKjOKYZ85EysagQIpWN5AiuvbiQx+6E8KG8JgYKik+W2g3h8AvfleDdimx4ufcLXBTBnYMd
-	FYPm2XNL7XTAmvGaG0xNDgt33oyZetfvdqA3A8zPrtQ4y9tSGBatssRVbRBM6C95qOJg0nz4L2B
-	+4eB9NdAXOp27YgTmGZu/DKrI8TYEqVpQFJ/AXfxI5OBNTFWmHpgumUKfOFc/Me13MU+jJlh6+L
-	8Xtp6wb8+yOZo/AVl4NUf+XBz+gPWysKxTyEN6/7B4DeVJgR5bhjaO3jd3GO+CddYQIXXQurGwQ
-	ag8xwKwf1l5CqSGdPDT5DdBo/zoXhfpu0u4L5XY3tgwaTIAY29g8xp8cNKlBDuaw3rPyrF++I1n
-	FZ1hZwvui+98GSmKXIbzmAGgqRTCRPxZdrDs9Zsdk+ajj7YElCsu18VVEXPdDssWEuzdh3tbZWU
-	WUk9PtTI5cz1tRAHMVsdQ==
-X-Received: by 2002:a05:600c:3f0f:b0:48f:99a9:bbcc with SMTP id 5b1f17b1804b1-48fe60ecb9cmr29688155e9.10.1778826328398;
-        Thu, 14 May 2026 23:25:28 -0700 (PDT)
-Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0a17ec2sm11016277f8f.24.2026.05.14.23.25.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 23:25:27 -0700 (PDT)
-From: David Carlier <devnexen@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	David Carlier <devnexen@gmail.com>,
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="HCwlnCpV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=pW
+	/tc3tkuQTH/abGF/d2gvg8c3yJSFH791/HNtDzr2k=; b=HCwlnCpV7jFc0lkYl8
+	HAbKPZLquktYu03dZuglAKwwLIjCwoIaP2z2w2kcaIGhT0IJN74+8mpSA9liuRfe
+	FWTY6ElOHSo2Xd1Ea9K99BDaCgE138aVDnQdS0eR1XvT6tH6tv3fmjuRlCdRpN69
+	7jVapihtQrwdF1Oc2DpAqd+tk=
+Received: from 163.com (unknown [])
+	by gzsmtp1 (Coremail) with SMTP id PCgvCgB3g_MjwgZqrjbBDg--.3469S2;
+	Fri, 15 May 2026 14:50:22 +0800 (CST)
+From: <w15303746062@163.com>
+To: pmenzel@molgen.mpg.de,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org
+Cc: linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	greg@kroah.com,
 	stable@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] Bluetooth: ISO: drop ISO_END frames received without prior ISO_START
-Date: Fri, 15 May 2026 07:25:25 +0100
-Message-ID: <20260515062525.57603-1-devnexen@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	Mingyu Wang <25181214217@stu.xidian.edu.cn>
+Subject: [PATCH v3] Bluetooth: hci_uart: fix UAF in hci_uart_tty_close()
+Date: Fri, 15 May 2026 14:50:09 +0800
+Message-Id: <20260515065009.383265-1-w15303746062@163.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <505b56bd-e5fd-4feb-a6e3-1d8269609277@molgen.mpg.de>
+References: <505b56bd-e5fd-4feb-a6e3-1d8269609277@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -75,45 +48,99 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PCgvCgB3g_MjwgZqrjbBDg--.3469S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxJw43Kr1DZFyDZF13JFWfAFb_yoW5KF4DpF
+	sxKF98AF4ktr4qkF1DZa1xAFyrKF4IgFW2k34fX3y5X3Z8tr4vk3WIkFWIgF1UArZ5Cr4S
+	vFWDX3y5W3WUZw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UQtxgUUUUU=
+X-CM-SenderInfo: jzrvjiatxuliiws6il2tof0z/xtbC-w7Xu2oGwi5OOgAA3p
 
-ISO data PDUs carry a packet-boundary flag indicating START, CONT, END
-or SINGLE. The ISO_CONT branch of iso_recv() guards against a missing
-ISO_START by checking conn->rx_len before touching conn->rx_skb, but
-ISO_END does not.
+From: Mingyu Wang <25181214217@stu.xidian.edu.cn>
 
-If a peer sends an ISO_END as the first packet on a fresh ISO
-connection, conn->rx_skb is still NULL and conn->rx_len is zero, so
-skb_put(conn->rx_skb, ...) dereferences NULL and oopses. For BIS,
-where receivers sync to a broadcaster without pairing, any broadcaster
-on the air can trigger this.
+A Use-After-Free (UAF) vulnerability and a subsequent kernel panic were
+observed in hci_uart_write_work() due to a race condition between the
+initialization of the HCI UART line discipline and concurrent TTY hangup.
 
-Mirror the ISO_CONT check at the top of ISO_END so a stray end fragment
-is logged and dropped instead of crashing the host.
+This issue was triggered by our custom device emulation and fuzzing
+framework (DevGen) on the v6.18 kernel. Due to the highly timing-dependent
+nature of this race condition (requiring a precise interleaving of
+TIOCVHANGUP and protocol setup), Syzkaller failed to extract a reliable
+standalone C reproducer (reproducer is too unreliable: 0.00).
 
-Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
+The crash trace is as follows:
+  ODEBUG: free active (active state 0) object: ffff88804024e870 object type: work_struct hint: hci_uart_write_work+0x0/0x940
+  WARNING: CPU: 0 PID: 338273 at lib/debugobjects.c:612 debug_print_object+0x1a2/0x2b0
+  ...
+  Call Trace:
+   <TASK>
+   debug_check_no_obj_freed+0x3ec/0x520
+   kfree+0x3f0/0x6c0
+   hci_uart_tty_close+0x127/0x2a0
+   tty_ldisc_close+0x113/0x1a0
+   tty_ldisc_kill+0x8e/0x150
+   tty_ldisc_hangup+0x3c1/0x730
+   __tty_hangup.part.0+0x3fd/0x8a0
+   tty_ioctl+0x120f/0x1690
+   __x64_sys_ioctl+0x18f/0x210
+   do_syscall_64+0xcb/0xfa0
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+   </TASK>
+
+The issue arises because the workqueues (init_ready and write_work) are
+only cancelled if the HCI_UART_PROTO_READY flag is set. However, during
+the protocol initialization phase (HCI_UART_PROTO_INIT), the underlying
+protocol may schedule work. If a hangup occurs before the setup completes
+and the READY flag is set, hci_uart_tty_close() skips the cancel_work_sync()
+calls and proceeds to free the `hu` struct. When the delayed workqueue
+executes, it blindly dereferences the freed `hu` struct.
+
+Fix this by moving the cancel_work_sync() calls outside the
+HCI_UART_PROTO_READY check, ensuring that any pending works are
+unconditionally cancelled before the hci_uart structure is freed.
+Note that hu->init_ready and hu->write_work are initialized in
+hci_uart_tty_open(), so it is always safe to call cancel_work_sync()
+on them in hci_uart_tty_close(), even if the protocol was never
+fully attached.
+
+Fixes: 3b799254cf6f ("Bluetooth: hci_uart: Cancel init work before unregistering")
 Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-4-7
-Signed-off-by: David Carlier <devnexen@gmail.com>
+Signed-off-by: Mingyu Wang <25181214217@stu.xidian.edu.cn>
 ---
- net/bluetooth/iso.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Changes in v3:
+- Added 'Cc: stable' tag as requested by the stable bot.
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 7cb2864fe872..b971281f0a2b 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -2593,6 +2593,11 @@ int iso_recv(struct hci_dev *hdev, u16 handle, struct sk_buff *skb, u16 flags)
- 		break;
+Changes in v2:
+- Added KASAN/ODEBUG crash trace.
+
+ drivers/bluetooth/hci_ldisc.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 275ea865bc29..566e1c525ee2 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -544,14 +544,18 @@ static void hci_uart_tty_close(struct tty_struct *tty)
+ 	if (hdev)
+ 		hci_uart_close(hdev);
  
- 	case ISO_END:
-+		if (!conn->rx_len) {
-+			BT_ERR("Unexpected end frame (len %d)", skb->len);
-+			goto drop;
-+		}
++	/*
++	 * Always cancel workqueues unconditionally before freeing the hu
++	 * struct, as they might be active during the PROTO_INIT phase.
++	 */
++	cancel_work_sync(&hu->init_ready);
++	cancel_work_sync(&hu->write_work);
 +
- 		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
- 					  skb->len);
- 		conn->rx_len -= skb->len;
+ 	if (test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
+ 		percpu_down_write(&hu->proto_lock);
+ 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+ 		percpu_up_write(&hu->proto_lock);
+ 
+-		cancel_work_sync(&hu->init_ready);
+-		cancel_work_sync(&hu->write_work);
+-
+ 		if (hdev) {
+ 			if (test_bit(HCI_UART_REGISTERED, &hu->flags))
+ 				hci_unregister_dev(hdev);
 -- 
-2.53.0
+2.34.1
 
