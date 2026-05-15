@@ -1,119 +1,112 @@
-Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B44C39A079
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 20:36:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3BA346773
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 00:47:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778790962; cv=none; b=ANBlNBfDo1mkylzu7zJrwWxDWVKMnNIJAzluR6KYg/urJc7nITI0dJPni49CXej0OMiONDAiVG4naGJX6VNWkkjQ0dUpeXgPms0QHehExgvlNZVbTrewT78ntI1J5rdtkokh334BaYJI3/da44ZbDcvPRUccLyLuUl4AHzL2NFQ=
+	t=1778806059; cv=none; b=POuOtHS8JQoR5NJTM6OZC378jwOG911j+YAGdpcxVv1yGEfSNVutSMQdMbOUjvKp4vl+i/sJ8TlmVToTG1HZjST+vGG/wx9iGwxzvZoiM7mDgN2FGUIB3cvtUgHF26zNxRA7MlklWA4N3qEBm49alkb3yTAgwwmU4RLDHkIsvAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778790962; c=relaxed/simple;
-	bh=+FJigNeWSvrOQxI/8SvZSZtlrE2AlYa0UrHeWO1ROSw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=I6mFlpB9POOMJqCt5cvWjotXTAMgRSBuop76igg4VO45ueS0uLzd7LaKJXv3gE4k27PdgmPxZfoaeWyTjsIn6mXivo+CElIBPyPkU5CH7T3Bbc2eyavWOb7z5ZLxpoMcmJRhq5L2pulvLg8yKeJX0LWcjT9rm5s15DNVFAGKwXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=shRUOPFW; arc=none smtp.client-ip=74.125.82.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1778806059; c=relaxed/simple;
+	bh=kEl3z4LG1kGksJPNQYVP6pElhPg1cOG3i0x3D6MURqg=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=MPdHL5De+dUyYO0D0u2MDZdxBJ52gs6Ae1wH26EEGoC5BZkPv3BbDz9aH0zb2mgny941AbS2vDapO7DINmhGAjwhN12SeSTHTKHCxx7A+9s8ZwNpR7U7TWhWosbtQpU1ecqBcdWs1r5NsqA2V3sb3msYXUAuELefxvkAvHbdV8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=SX3coiep; arc=none smtp.client-ip=162.62.58.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="shRUOPFW"
-Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-2ef2a1cc06dso3803355eec.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 May 2026 13:36:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778790960; x=1779395760; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wBKvC1KgzZdWNmQP/SLDBsvejhqSzEvDboXs5K9MQUc=;
-        b=shRUOPFWQwNlEg3qOpcGjSvXwGfdX3jBv98X17gtn0Rj4OKSOIava8W8J59MX1nwmn
-         x5C8YWDTw7/9qjBYedpa04IotHbsNkk29/h0b6xjo14LAp+TNw4uMlSwvYVN9f6d/7tU
-         ySLyW7kiUvVZkKIiBFa+tm0bb9/nXyTEfeYMoqqzG7+2JY7Oq3Po4Qd8HvnU+pA3MChf
-         Kz3gwmn34DFvNUeqT1pb8Mpi+/D7bMkJDYeddLi1Ws0YyvyaB9OLBsyoIp1lky5C3r6R
-         kSE/4u6gcasvgqnrH3PuWBQzWR2yvuReLpFwfNrhbTNSTG0qIyR9X/Krkw8zYrCC+LEn
-         feZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778790960; x=1779395760;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wBKvC1KgzZdWNmQP/SLDBsvejhqSzEvDboXs5K9MQUc=;
-        b=oCmpykY8mh/OM/VW3C1dtezatnkklh4K/Ka7dV0wzaoEcjUdQ2+v2pUfKIkqYOPYEt
-         zKo6VtKM0tCN5Ui13nwJ+Xld4GZIQqOJPKZUWv/GvA1BqBvSerLkEJ4Y40dlRV8flpJ4
-         wDyBAijR24dhwR5IYbo4co776Yxku6IW8K0UxolnQzfkc+cOEm0VbB509Eh78WWAX9Sx
-         UfxmqZyivbjaAEZ/jmKCNoEbU4tsKOrjF0tHuR7m8fEhY/reaN/lnYLX0oHZl/elXqB1
-         n72veejhdMhx4ECEmhKEtvKJYtBStLNlvQlV/Q1xvkNiz4qiSlHnw+SP15dz/I97PHvx
-         y8sw==
-X-Gm-Message-State: AOJu0Yz40bk1G1sR8ONGSzhkBVl5cFmt3VjhqeEoEFzKRrihrYUDSiZV
-	lFGO7uUFe60SQNygdPogLw6+ipzov4EdRIoZJeF59xl2vfPKQmruvViNdypmpw==
-X-Gm-Gg: Acq92OFL+CI2VYIGDHTGgQVAw3ad9wc5hdQhuv49pWX+AwT6seYzfHBnl0jECDu4hwF
-	5YMVzrFwsw61RJFxTxWUz44fsvUpqK/qEknFm/z0paFXuujnLthaKWxRQq67X87duNq6pV+GS+P
-	K1+nfFrZOrTA1AH1aKZjYm64QB5IXyqL2dh+fmy0Sjbj6yO1oDsRc8o12CYPi/QZCyzRmGoL5DI
-	WOZl/hZ9o+E0Gaad0mY7CVJl9RIJ2QXvPBoh2+1DDJHrx9j6la2Z5NTQpAenEvpMJmYYyA+lxRp
-	IXysacLmxpf8Pb62qD1wAcCl5r1RitPYs+p+1e8+BBX9WskeZs8g+v5rOLXKAsEEoEr4cxlZbV/
-	w6DCu0dFS5H5Pfr62Z/m9H+BeRmX4AsmSEzuXJBqW7m0VwAcotS1VxLBHoeCUCsW8q9CPXoa/vY
-	u9eGKRntpiwDJf+EjAKAnPEwvLusLaThctj+9uYiDXZA==
-X-Received: by 2002:a05:7300:be17:b0:2d8:7302:d21 with SMTP id 5a478bee46e88-303986010e1mr548394eec.16.1778790959802;
-        Thu, 14 May 2026 13:35:59 -0700 (PDT)
-Received: from [172.17.0.2] ([52.159.247.198])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30294adddaasm4429530eec.13.2026.05.14.13.35.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2026 13:35:59 -0700 (PDT)
-Message-ID: <6a06322f.d7da0740.26af4f.639f@mx.google.com>
-Date: Thu, 14 May 2026 13:35:59 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7444513135804012402=="
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="SX3coiep"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1778806041;
+	bh=da8IQhoETOJ7uyI2HlnD291IzLbJ3/7ByDDtY40okbI=;
+	h=From:To:Cc:Subject:Date;
+	b=SX3coiepV+wY2P3AIr56WYl4muW9g2qKLG6VLlu4Oq0RIr7hlY4csKMoSWodJJcFN
+	 RcaKktajpPtpgGTPyoG7wOBuchutmPl/oPopyH9e+FLX2FhPCjMAE8ceWrJ35IQd8Q
+	 d91W47jR+QCmVCUXlrGO1BWrvsKzzVozaspPDYiw=
+Received: from localhost.localdomain ([116.128.244.169])
+	by newxmesmtplogicsvrszc56-0.qq.com (NewEsmtp) with SMTP
+	id B8BA7A09; Fri, 15 May 2026 08:46:11 +0800
+X-QQ-mid: xmsmtpt1778805971tjq2ydq9a
+Message-ID: <tencent_F2E2AF1B6F510577B10C6897ED768BBBAF07@qq.com>
+X-QQ-XMAILINFO: NT7uTz3cNku2/7JwRM7+25tZPfpTr0mIE7oltmFT3MPdyBKo9h+oA6/lVqroBK
+	 c7d8ZkVhDX5DOFvpDMk8Er6d6SRiajeOKEoVYQzTEck4l2KfO/vFgYjrHBEUI/Vr6DOWtQExu7gl
+	 biiyjTNLLlZhTURagNvOEF4F3IFEWmhwWMhOpxGGrppg1G+kBZU8fs7+4ZTSTJ/OclXhkbd465iE
+	 h5j4Le7U9/HvwV88yDeed0mRwlCv2Jy8Wlv+T3tAtV3EF8jkyrxpciLqKmQLJP6sbEhE+8ONxEYq
+	 WydLMtrgFki+RGW1XYSWKXZ4eBpuM/vs5KlCwlVD8ow3XZxV8bI8M4Pf0cPurR44lnVoYg8WKon3
+	 QJMJzXIMe6OY21szPL+ELXhzhdHQAnPeaFSa5goWpjQ50LSP+8fDtUmyhmZSPysPz4XexaHL1TTA
+	 7bAuzekafK+j6fmd1m2DZNSnqmqyvwc9BRYKU9aDB/oYbqT/0m369JaWp4NxCqPNYDKKtYbgEPap
+	 TQrxNqsUOhGcaNcVXxJY/O1g/Jnolf3sdeNaj0EHZSw+05yr6ffrK82ebk1aXf8z5hEnuJhdesOt
+	 IXrHbmkjoaJt6N1045YlJfDnfgufKPNcyMh7sMY7HItQoYM8aHpuaHoMrzhdAzb+1ompsqpSZOa0
+	 GDXCdStV6HO2JpT3AqOK2ZGT94WFWFWRGYM3khbgGURqhJ4YfLe9S5qKrvYCiipB8I+qmXlPIOsK
+	 zi5UXRlL1fkQ+VoBpdODeIZzTD1D165tPR44wQFJBjPi1jEk9gM56b0ctvetLZoyEet4Mmy1TNER
+	 6sKs3kn1P6EBHW3oP2NIw68ZtINUCuZDbEGca+vZ3Y9rPZ0KT7yy+pT6nf9/hbvU5ZZ0g3yNlVeO
+	 wxaPSFN3d1YSzt6V7PPQh0M3aZ8AI69cAMq+GvtZKTMVVIl2r1dxQKgEKu0Wmk+DEYkc317JlUnn
+	 Gyoq0uGNDaJO0MYd75/MmFW6ZrmmyORIZ2e34xSm3vR6xrzNiGHlq/fKLWn3sR0MuVcys4tjPBn4
+	 h7l85nn2/ynnpC2+qAKkm4xF9gllk=
+X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
+From: Zhao Dongdong <winter91@foxmail.com>
+To: amitkumar.karwar@nxp.com,
+	neeraj.sanjaykale@nxp.com,
+	marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Zhao Dongdong <zhaodongdong@kylinos.cn>
+Subject: [PATCH v3] Bluetooth: btnxpuart: Fix use-after-free in probe error path
+Date: Fri, 15 May 2026 08:46:07 +0800
+X-OQ-MSGID: <20260515004607.41116-1-winter91@foxmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
-Subject: RE: [v2] Bluetooth: btintel_pcie: Fix incorrect MAC access programming
-In-Reply-To: <20260514190248.1275299-1-kiran.k@intel.com>
-References: <20260514190248.1275299-1-kiran.k@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============7444513135804012402==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Zhao Dongdong <zhaodongdong@kylinos.cn>
 
-This is automated email and please do not reply to this email!
+In nxp_serdev_probe(), if hci_register_dev() succeeds but ps_setup()
+fails, the error path jumps to 'probe_fail' which only calls
+hci_free_dev() and asserts the reset GPIO, but does NOT call
+hci_unregister_dev() first.
 
-Dear submitter,
+This leaves the HCI device registered in the system with its backing
+memory freed, leading to a use-after-free when userspace subsequently
+accesses the device (e.g. via hciconfig or bluetoothd).
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1094956
+Fix by adding a 'probe_fail_unregister' label that calls
+hci_unregister_dev() before falling through to the existing
+'probe_fail' label. The original 'probe_fail' label is preserved
+for the case where hci_register_dev() itself fails (device was
+never registered, so no unregister is needed).
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.75 seconds
-GitLint                       FAIL      0.20 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      26.73 seconds
-CheckAllWarning               PASS      29.20 seconds
-CheckSparse                   PASS      27.72 seconds
-BuildKernel32                 PASS      25.86 seconds
-TestRunnerSetup               PASS      570.97 seconds
-IncrementalBuild              PASS      25.27 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2] Bluetooth: btintel_pcie: Fix incorrect MAC access programming
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-19: B1 Line exceeds max length (87>80): "v1: https://lore.kernel.org/linux-bluetooth/20260511133932.1217624-1-kiran.k@intel.com/"
-
-
-https://github.com/bluez/bluetooth-next/pull/192
-
+Signed-off-by: Zhao Dongdong <zhaodongdong@kylinos.cn>
 ---
-Regards,
-Linux Bluetooth
+v3: fix gitlint WARNING
+v2: fix SubjectPrefix
+---
+ drivers/bluetooth/btnxpuart.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index e7036a48ce48..a4d7747e5be0 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -1907,13 +1907,15 @@ static int nxp_serdev_probe(struct serdev_device *serdev)
+ 	}
+ 
+ 	if (ps_setup(hdev))
+-		goto probe_fail;
++		goto probe_fail_unregister;
+ 
+ 	hci_devcd_register(hdev, nxp_coredump, nxp_coredump_hdr,
+ 			   nxp_coredump_notify);
+ 
+ 	return 0;
+ 
++probe_fail_unregister:
++	hci_unregister_dev(hdev);
+ probe_fail:
+ 	reset_control_assert(nxpdev->pdn);
+ 	hci_free_dev(hdev);
+-- 
+2.25.1
 
---===============7444513135804012402==--
