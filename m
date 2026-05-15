@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A3839934C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 07:04:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FB13E5579
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 07:16:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778828665; cv=none; b=gTMcXhIb9/0wqJC/ZjRc7DvWEbbSpmpFv8jX6T6Xsj/i7/yhP+RYp3dhD10p+Bisr/vbaLjkkxPjLTay/4DF6KLxJ5yMBPsbQMnZP7wMdDdfOKXM+rM4pM77WsRXMygrFC880zR1NhDAoxTTy25rDxc848eEzVJE3W9H/QSq5YE=
+	t=1778829384; cv=none; b=hclSCX4fDO+INTl4M52d2rYcEV31iDoUtsmrxO/x+vHvuS1FAC0B6sxEej3uENibQKipowG00ympJQreGqzwjy3n0OZE8h/e4X5o88/x1Q4tio7DNk/Bv4fYXWThw9//tjqGjc3ikN51y6LBwrIa5Jf507XYYfo5tOhjR2tAITE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778828665; c=relaxed/simple;
-	bh=xJHuNOTFck0Hfgu3WR/1oGttiM8QIR90KeaOiNgaJOk=;
+	s=arc-20240116; t=1778829384; c=relaxed/simple;
+	bh=try0CO4ZlcUISSq3KM9TaczWKxx/KpZGaZSwRvI+1tg=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=U5Ir/9LIa5Mra23eg0CWjsx0SKwOA05eTSRUyx8Sircdgx127A6CB5fvc84TR6kj2aAUEPEYFYoZX5mpj7zAcpSU6eC6kePHYy7+j2HA2Q7ap+V5bWpwz3rP9EePDP6MnwkDMbjp9m9iATkWwwaoBjMPqsamD6PgTqHntT5mAP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rm5e/Ul3; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=CfNqZczNXTRRQbvcI8I7j5vnn6G2JM3hGlOXDe6lI4Z+XxluHMzeZnDtw0SezIm+lu9jX/VNGLz90zAheiDBTSXgzZSDo6O8p44yNvsfkuWIbqknIstxyM0yHcsgM88i+jmAhTCNaXDf1iIpuyatSlyy53uYLmWEwiHV8g3hhvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lmdUoXQl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rm5e/Ul3"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 68651C2BCC7
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 07:04:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lmdUoXQl"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 22543C2BCB0
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 07:16:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778828665;
-	bh=xJHuNOTFck0Hfgu3WR/1oGttiM8QIR90KeaOiNgaJOk=;
+	s=k20201202; t=1778829384;
+	bh=try0CO4ZlcUISSq3KM9TaczWKxx/KpZGaZSwRvI+1tg=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Rm5e/Ul3BrdDQXN3XI9QZRKmPrBP55gb/ByPpCWdWrcce1zrLBJ0k7DN9aE5S2P/v
-	 e4zrY8NiWlu5Zo/cXGDADfiLHmLWzLACqw7Z4ioYyCJdke0fOkSoZzSoNaUKqSPZ4G
-	 eeQeMimGsSyAfZfose44lC5kWBagJe9G6BZcHMuBbQ6Zv3xkHnGu3xlF67hg0qxzRv
-	 fzvdNrCelmLz8+o104i5zPVz40g9GVhQmPjb5wdFknUmws0T5QD3jEkjtMRLvM/+45
-	 7QO6VA7QMyR9I0A/a6RwIsEMvXshLdM4lIGms3kHYy03teG0Pw/Uau2ZoD42BFl9li
-	 Xjp88m2At85KA==
+	b=lmdUoXQlMqSw3F+y+GhvTYdQTGDKwJZ733/Enq3MosRxveR9wv+8C/AILP8qAAEue
+	 PIZs+5JI40NLP42Qf3zPZJBe/x5qK5hFvON9diM6S5WdHEW4hs0HLc9ParETFO7hnD
+	 hp+i1Nh5Ez+L3nu1CRx1tUlQH6ef0RxR8OXkHG9umfLxevbHFGjQoZulsuTX7h4VY+
+	 ZqAoNKIyyor28/lovwzXMCCdncaa+d0y1RK+5YVBuJv1X9IbMfHUdDIU9jjqohRGht
+	 lT0WPsFvvU6HQ28oy2SSSPN4A39gPbmZW5UfFCuxw+glKyfjGmHVRmvHW1JGHhfNJZ
+	 1xLh+oZw2bxMQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 5EC37C41612; Fri, 15 May 2026 07:04:25 +0000 (UTC)
+	id 1291EC41612; Fri, 15 May 2026 07:16:24 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 221521] Bluetooth: btusb/mt7921 - Failed to send wmt func ctrl
  (-22) on MediaTek MT7921 combo adapter
-Date: Fri, 15 May 2026 07:04:25 +0000
+Date: Fri, 15 May 2026 07:16:23 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -47,8 +47,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cf_kernel_version
-Message-ID: <bug-221521-62941-80iSh9LfaI@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-221521-62941-9I1wdfoaMV@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-221521-62941@https.bugzilla.kernel.org/>
 References: <bug-221521-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,11 +64,19 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D221521
 
-txxlc@pm.me changed:
+--- Comment #1 from txxlc@pm.me ---
+Extra info:
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-     Kernel Version|                            |7.0.7
+Kernel info:
+Linux pc 7.0.7-arch1-1.1 #1 SMP PREEMPT_DYNAMIC Fri, 15 May 2026 00:50:13 +=
+0000
+x86_64 GNU/Linux
+
+Hardware:
+% lspci -nn | grep -i '03:00.0\|mt7921'
+03:00.0 Network controller [0280]: MEDIATEK Corp. MT7921 802.11ax PCIe Wire=
+less
+Network Adapter [Filogic 330] [14c3:7961]
 
 --=20
 You may reply to this email to add a comment.
