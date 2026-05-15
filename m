@@ -1,97 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 297A03CF021
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 10:20:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A69C3B840F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 10:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778840446; cv=none; b=BDD8R0CHf8PT2xf1E8hRUTo4PCITEmDjgP6OACai8iNoC620RmFPRY1IVM/+77Cy+1Wv7C/TTuR3azc+91ODsOwPtqzZBnsJk/NVgyb2EhL9i5ernj0S7+x0Fl84F6MB60Rb35dxbgzA97fCU99WGpjqGRcLhod6jOZm4GMUUg8=
+	t=1778840963; cv=none; b=ud4cRUmsMckodKR0yddkTh5L+GwJaJJkZ4JAaqD2YXn3cI6t2VMs8EfUAIw9bpE5W5VNDiFDNc4QWsZ+Hc+lWxjDoCW5S82Zsv/+1PLWfVejmRtZsHV8KRfXgyvP6+ZIrQ7JcJZFjCxUz6qDBLAmi8I2+qavlas2KRL5iqWSk4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778840446; c=relaxed/simple;
-	bh=4IklIiWJ+aJLFWO5n0xmoaRUk3x93T+E09vozC9jgUg=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=OvVB7rc2mdmUZu9lFbqZ7oz7gTcaRMGRolW94aYTGauH8rSxp+3jTXiRX9vfhGP7Yfgt2bd3DWkFAOybRnQHxmcz7RoCxivRmSGC+pro14CzQBd6ku56hks7a5uMbZSI4jjww5VcRk9fE/PdVd4omf4RuNmcrkjIsPuOwiI8jdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qiGYW1cO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778840963; c=relaxed/simple;
+	bh=O14uupD4hxjc3LS8STUk+P1/hwWWkrpczTl4g39IdcE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Cc:Subject; b=GqTntA9tMWpFxp2vv1O7ppjpIVIFvb/5e6uJRKrwBOGdYOGjH3sQiO3Fp/6pG2O/GO9VZvHHjGC0VZZBOoV9+3ztGEfGkV34CEv+8wSwfYyTGXDllQn44CnJ5bi6uhBhbJJbz+SIDdmWa9qqJWEujGIUzCl2vYvJc1r6GkgwNHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bbK7noTS; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qiGYW1cO"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C635AC2BCF5
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 10:20:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778840445;
-	bh=4IklIiWJ+aJLFWO5n0xmoaRUk3x93T+E09vozC9jgUg=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=qiGYW1cOkRYEiTLlwvpPpWVzUpgdmhdcorhnaVOSaoT5KZ/UQjhJMtVZXv7c29Uh5
-	 xCAZc0PUmSfCBNFaLsq4pOrPAjhUKULAlcT8LjP53N/Vc2U3ILrIDW+dQpg2RtCbwv
-	 U0pJoi37ZXIHhunzRHteVbJSO2EiDcGN1LAsdscXPXVQ7NlAHs3VP4Sy7iw8fy7RMQ
-	 g+1RN8+PbosfCLcQfaAjd0abX6A4cABAMzI/R6eW22t38mJbjQ2x6F0Y7S5VUs8ZcK
-	 Wlv+IIUEl+jZQ3WWK4tgidYLweBoYsV3Mcabkwos4Yl7SgPc+239vWW3OP32Glv0v0
-	 1BkbG4ZpKu+nA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id BDE80C53BC5; Fri, 15 May 2026 10:20:45 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221521] Bluetooth: btusb/mt7921 - Failed to send wmt func ctrl
- (-22) on MediaTek MT7921 combo adapter
-Date: Fri, 15 May 2026 10:20:45 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: CODE_FIX
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cf_bisect_commit bug_status bug_file_loc
- resolution
-Message-ID: <bug-221521-62941-wh1XIfLQs4@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221521-62941@https.bugzilla.kernel.org/>
-References: <bug-221521-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bbK7noTS"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-bd4f7f05e90so318491866b.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 03:29:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778840960; x=1779445760; darn=vger.kernel.org;
+        h=subject:cc:to:from:content-transfer-encoding:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=O14uupD4hxjc3LS8STUk+P1/hwWWkrpczTl4g39IdcE=;
+        b=bbK7noTSgmU0KtOycsq5KJuAZz4KgiHTYM4/x4c0I7NUvfzfcErKpEqWkJDncAGwwd
+         xqtHwRhRtrixzrFuEPcdwBSOp7AKBjwkUFymFx8an/H+9glS/6Z7u5cxvst6uLBGlR5i
+         VrNYTA/MSLf08k4g1lrFob/rrfWC59DjIgEeJYImRSu/EJEbH26v2A695UEZXDhkBmPA
+         3vgK4caiUVbVbE5payWKbtGGI+3Xroihz7ABCOCszBldBVzaWgF+82UryYx6eNmAxjqX
+         b17+IdQ5f7GdJXok3Z/DkrPBfk/qO2WUQZ6xFL7BzrnBYce2YO9A0x7dVS7VEpAuoqhg
+         8d6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778840960; x=1779445760;
+        h=subject:cc:to:from:content-transfer-encoding:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O14uupD4hxjc3LS8STUk+P1/hwWWkrpczTl4g39IdcE=;
+        b=olEririF/xzQVxj8B0Rtbvwnt0Ug9GCWsL0Fax+le8ITyaUipfW9B56E4Sd16UW+el
+         BwE/WikYmm5TCuUBxJ6r2BHr9DYBr75ZCNG+EadF494olHU2aTusawj3we/Iaax9+uGG
+         BaIhRvJK48c80gC0E3l21q6bUpjNKLHUF1lBoFo8913wbtSroXvEPColbburn8e5z9lz
+         40UhG1eIhATPSSUxqqte1jPO1hVPqqxIWDIqbp5LYCaT7X92Qe9+VgjQ0mYyvU2abJwh
+         tlx6DVkYK/ZJlRN2Nqg5w5+7OIEaLocHZotHueJs7F7HDHaQdquCCa+p4hMi0EBRyWxy
+         QL2g==
+X-Gm-Message-State: AOJu0YzBiB92xDHy5lXQajsmkvWAsb3VPc8VoAJESaoREVCOTQ0gqeWz
+	9sqLtHqU7hEIkMbKO5S1S4+PbqKkaI+EKls9VAN07Lb25scZYHpOAKjejmlnEBkP
+X-Gm-Gg: Acq92OFtNTWtef32anaOjKcpeMNolQUoQNW0Fyk07lxvw7q2N/UP68EMRCCirljdd08
+	MwSa8kqgUH1TXBnGXI7C3nLnz3CmGF4jnFWK6CToCz/6FX4vB6gWY1Ct4lIw8kK5sVzan+2WCHW
+	YfImiOZo7Ox9HE7HwyvrwDq/BXPFPCZvc7sBl1KwYIdd5v4P4eGFTmiXjHUqLeGbE33gcJTPaZP
+	texVX5B1BXycenOVLj983yTRgVtxgLcMYWnA4fu6eDsYCNHd8vsPRZo/ckodvZ7ckFVohBWg9Dj
+	K//u3ClFHplTYCEdUQI+2Tz8mNPC1+tNMD/1UMNyVmo/1Yib3I3g0CC/tS9YRQCP8ScjYxSkcu+
+	eMYfNVrw4shJghXb/niswYxEzIjDvkAXu4bEzOLUoJrI94gv5NgiaUDFMS+WHldrV5YrdA1nkCs
+	qJ+efFTS9ymp61Syya3qOEeRPiVeLTWZXkXATkdEiDpIstyYw9QINGfudqVM6WS8WGDwQvtC8U0
+	uMaMIjqVeJ6hxuKBx6hrZaMli9fFLcMB8BXmVFZED5P/6wYACvXYTnPmFOuBbS0C+gSltnJAe6H
+	epUFrzIe/RP9gEYlX2ZaVviLbcp5dba+kTQysQ8=
+X-Received: by 2002:a17:907:ea5:b0:bd1:ba57:ec8d with SMTP id a640c23a62f3a-bd5178458abmr167176866b.17.1778840960055;
+        Fri, 15 May 2026 03:29:20 -0700 (PDT)
+Received: from ahossu.localdomain (ip-217-105-56-94.ip.prioritytelecom.net. [217.105.56.94])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bd4f4dea93dsm201976566b.38.2026.05.15.03.29.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 May 2026 03:29:19 -0700 (PDT)
+Message-ID: <6a06f57f.07ac1395.28395d.c7d8@mx.google.com>
+Date: Fri, 15 May 2026 03:29:19 -0700 (PDT)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+From: Alexandru Hossu <hossu.alexandru@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com
+Subject: Bluetooth: ISO: null ptr deref in iso_recv() on ISO_END without prior ISO_START
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221521
-
-Artem S. Tashkinov (aros@gmx.com) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
- Bisected commit-id|634a4408c061                |634a4408c0615c523cf7531790f
-                   |                            |4f14a422b9206
-             Status|NEW                         |RESOLVED
-                URL|                            |https://lore.kernel.org/all
-                   |                            |/5i35wmc4z7sz54jo5uj6ywext2
-                   |                            |enh4ik3oxmfmperqk2v5kc27@pp
-                   |                            |vm6oodzipn/
-         Resolution|---                         |CODE_FIX
-
---- Comment #5 from Artem S. Tashkinov (aros@gmx.com) ---
-This commit should fix it:
-
-https://lore.kernel.org/all/770d36b07311bf88210c187923f243fb9f126f04.177705=
-8551.git.pav@iki.fi/
-
-Not yet pushed to stable but hopefully will be there in time for 7.0.8.
-
-Keep an eye on
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/tre=
-e/queue-7.0
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+SGksCgpJIGZvdW5kIGEgbnVsbCBwb2ludGVyIGRlcmVmZXJlbmNlIGluIGlzb19yZWN2KCkgaW4g
+bmV0L2JsdWV0b290aC9pc28uYy4KCkF0IGxpbmUgMjU5NS0yNTk2OgoKICAgIGNhc2UgSVNPX0VO
+RDoKICAgICAgICBza2JfY29weV9mcm9tX2xpbmVhcl9kYXRhKHNrYiwKICAgICAgICAgICAgc2ti
+X3B1dChjb25uLT5yeF9za2IsIHNrYi0+bGVuKSwgc2tiLT5sZW4pOwoKY29ubi0+cnhfc2tiIGlz
+IHBhc3NlZCB0byBza2JfcHV0KCkgd2l0aG91dCBhIE5VTEwgY2hlY2suCgpJdCBjYW4gYmUgTlVM
+TCBpbiB0d28gY2FzZXMuIEZpcnN0LCBpZiBJU09fRU5EIGFycml2ZXMgd2l0aG91dCBhIHByaW9y
+CklTT19TVEFSVCBmcmFtZSwgY29ubi0+cnhfc2tiIHdhcyBuZXZlciBhbGxvY2F0ZWQuIFNlY29u
+ZCwgdGhlIElTT19DT05UCm92ZXJmbG93IGVycm9yIHBhdGggYXQgbGluZSAyNTgxLTI1ODcgY2Fs
+bHMga2ZyZWVfc2tiKGNvbm4tPnJ4X3NrYikgYW5kCnNldHMgaXQgdG8gTlVMTC4gQSBzdWJzZXF1
+ZW50IElTT19FTkQgaGl0cyB0aGUgc2FtZSBwYXRoLgoKVGhlIElTT19DT05UIGNhc2UgYXQgbGlu
+ZSAyNTc1IGhhcyBhIGd1YXJkOgoKICAgIGlmICghY29ubi0+cnhfbGVuKSB7CiAgICAgICAgZ290
+byBkcm9wOwogICAgfQoKSVNPX0VORCBoYXMgbm8gZXF1aXZhbGVudCBwcm90ZWN0aW9uLgoKU3Vn
+Z2VzdGVkIGZpeDoKCiAgICBjYXNlIElTT19FTkQ6CiAgICAgICAgaWYgKCFjb25uLT5yeF9za2Ip
+CiAgICAgICAgICAgIGdvdG8gZHJvcDsKICAgICAgICBza2JfY29weV9mcm9tX2xpbmVhcl9kYXRh
+KHNrYiwKICAgICAgICAgICAgc2tiX3B1dChjb25uLT5yeF9za2IsIHNrYi0+bGVuKSwgc2tiLT5s
+ZW4pOwoKQXR0YWNrIHN1cmZhY2U6IENJUyByZXF1aXJlcyBhbiBlc3RhYmxpc2hlZCBBQ0wgY29u
+bmVjdGlvbi4gQklTIHJlcXVpcmVzCnRoZSB2aWN0aW0gdG8gc3luYyB0byBhIG1hbGljaW91cyBi
+cm9hZGNhc3Rlci4gTm90IHplcm8tY2xpY2sgYnV0IHJlYWNoYWJsZQpmcm9tIGFuIGFkamFjZW50
+IHVuYXV0aGVudGljYXRlZCBzb3VyY2Ugb24gQ0lTIHBhdGhzLgoKVGVzdGVkIG9uIGxpbnV4LW5l
+eHQgY29tbWl0IGU5OGQyMWMxNzBiMCAoMjAyNi0wNS0wOCkuCgpBbGV4YW5kcnUK
