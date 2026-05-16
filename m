@@ -1,208 +1,101 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA525405C31
-	for <linux-bluetooth@vger.kernel.org>; Sat, 16 May 2026 09:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778925018; cv=pass; b=uOcfpU+pl2ESGv+PWM5vI9br0RpCzhka7sidxy7wRhLtq6JIeM4lr2tULSuTAvly6o7uCmYHDXyP8FzaqXYBaeO0BLCe59KB+BTtOIqDornlpDGb6fImaZXKUNqu5Gm1ka3EySfGEijzpCENxnDkiRjwgHTbZEybpmX84UEy/FA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778925018; c=relaxed/simple;
-	bh=Y4rxyzPpaqe7oR5uYPwTIwSOVgEn0V429skFUYXUETo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=X0554IMm1qmnGwxFCpNaxFNW5VqxZIkDXumHgdlJ1sP/lnmi89yQKxV0REqNVWAl/P9Sy6DdmN5QU+22vHew0UeRmp4Tb4O8VBHqdLLHOXr1lFwxC3phY0dyyefHUwoA7VArAfW57ii3IqnKexLF8qIaYh0mjDj02sZxl0GsT0U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=HVTEuh/Q; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E983A7F5E
+	for <linux-bluetooth@vger.kernel.org>; Sat, 16 May 2026 10:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778926722; cv=none; b=aESS4Ytrs0mpuiXzqM+VGQs/6KWKSAvDCKXCPPGAbAGcjK7alvjKAEooKaVIQfrM9xYibg+SQsOSJLcBDjtvK/rS/GXRKvh2OfMuN4CN+A8UJqJTKJE7qmmptHYi9YsVkRWHy62ieiYr9USNC3W6QSR5VjV2HZLgRoEu8AyxOjs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778926722; c=relaxed/simple;
+	bh=KFrzxTcvsdr6oCP9zCK8cuZFKjC0etS2W17CHcYJN0M=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=HY1/n8LGBQCjacA97fA5bFOtz7nlgted7NGtf+vtFHXi0eZTPx/meT6bZNpAFyTX68JYgEcIz/tgafGTTd3a+DdpiX2+OqdhxLkTCNAKcn1uZMdzbMovF1Za4nW19i09wqN0VQd3dOu+vLQoCxZbYIoAKV7m1ULrtvOckawvfa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=p/vvvxAH; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="HVTEuh/Q"
-Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a01d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4gHfSB0dJKz49Pxd;
-	Sat, 16 May 2026 12:50:01 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1778925003;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d1RRDLcqli35jagBYE+CLURT8EwWMSUlbOhYoRrdl/0=;
-	b=HVTEuh/QgOzuVrUcFG+10J3DoPc5bV380qH4G5me+l/1rGPn5Wjxg3B3I/yJzkSUQnfq1b
-	x4lJTwAu4wR+NJDlK4UADtaz9lq+/tiY8N59lhNwpvXMv7bDWcdW0TM/yMRrckR2q9wedP
-	p9y7AghwP1jCWd0Q2173qpRqO8pbtfWCDuHifyW5Ld/JUj5MZ3VFdiyavVOp84kZAVPKQw
-	qd3ijUGa2QYObOvV7Sp08zwI4UtPvty1hS9R0+Vy284eBFu60ojqFV6jepdpqoFvcXsMDe
-	HOQafnjQs8N9MZc2vke9TagJ9TA8fecAORkABx1LDKKkaNQR/1Ow/eM4IQYPaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1778925003;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d1RRDLcqli35jagBYE+CLURT8EwWMSUlbOhYoRrdl/0=;
-	b=T2zGEq2rXJJQJKLwsRBfUuHTGbdNAxxcA31epjO0+nFxbCfWB8d27DxXSbouqybKk4Y5k9
-	bYe3IB1RVyuWE8kWdw2dquxqDrezCzFhP/oYNoJq/9+EtcsSom2kUbWYF9KTS8qXigVvZK
-	JXpZT37sooPArhUERyv4MASivdeX5lDxLl4TwHvQFLsBaozPUNLzrdT6tHOYdmtU8fLgLK
-	ZsjoulXLR8ytKKJiWkz2ddSTDImOsLZC9yOOMbWJz14rA+SlFNOJUqhHrdrKB2VDcxTg/L
-	37IDQQaxbqwYaQbpJNA+1/wlQpPh2vZDbqBDdwt3N6aOFK/xKEBXOQbJ7Psa5A==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1778925003;
-	b=fZh8G75qQsWZUi2TUqIIL5JlE299Z0MyDRCL95c5c9Rzm4SCd9Kp4aAMy2WSy3359ih/hl
-	pLBHEKnT6BO1OY0wXSzdxVLeXgYqP1Jtr5ovwv0+qCyzvvxbsYPjdjRbCsVX53zrEa5YN5
-	ald/nTJW5LZkeCD6fPc6VuZKEac1dSRXIwka+qroCX44tv2YRCh/QQ/PSvH0M1CePqlsAM
-	x8USAgypMNcwC0lmyj8DPp+xJZdsKS2wzCLOjjgBK9oYEIcQfvok1YfE81fyyjq5ltUQX/
-	7S2VE6PIro8OzlQBWpue235SDzekGE8XZ4+W3DexyveHOoMZtVLVaqR4Y0YTKA==
-Message-ID: <ce6dfd9300592c34c329e8ac2a4a50f7236d9299.camel@iki.fi>
-Subject: Re: [PATCH BlueZ v5 00/16] Functional/integration testing
-From: Pauli Virtanen <pav@iki.fi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Sat, 16 May 2026 12:50:00 +0300
-In-Reply-To: <CABBYNZKaLPxRvMUDsTSByV64=iZKZCbtNZ6FTrjVohefY1+1bg@mail.gmail.com>
-References: <cover.1778688966.git.pav@iki.fi>
-	 <177878100755.31561.18184220318055008237.git-patchwork-notify@kernel.org>
-	 <CABBYNZKaLPxRvMUDsTSByV64=iZKZCbtNZ6FTrjVohefY1+1bg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.1 (3.60.1-1.fc44) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p/vvvxAH"
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-50e97863425so10369781cf.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 16 May 2026 03:18:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778926720; x=1779531520; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=KFrzxTcvsdr6oCP9zCK8cuZFKjC0etS2W17CHcYJN0M=;
+        b=p/vvvxAH7aP/HfY4G9/GvBwIb3GO+GVyMydST7O5byTaNJ4bLSHMzDgkCeyccpyaRz
+         HGK3nmc91aglPwax3Bt0jlDc8dghJ3d1FPXHNIEm/f7WZLVeBtKIU6CsHVkd9eGRCccR
+         9OrDOYQ5pVNGAfz0MpEqv0RE7i6VqEK/46dRsHvCRtUbENU5wn9USlcHP6NFrvVE07Df
+         mqp5ZilOI9Tfh6s6qOPULHmPMknCz8Ivk8VC/9wvOxhrq1ilUdtGrXMwRoatdiR0DlO8
+         9vm92VAu3gZx8z59edpropIyQQFlTrSuCSFwqXS2p6W0ABCtfjvLwA6g+UWglztquReH
+         X7fA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778926720; x=1779531520;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KFrzxTcvsdr6oCP9zCK8cuZFKjC0etS2W17CHcYJN0M=;
+        b=jlCSD/iG0OYiw0OPivGGHO/3iem5D4PYCmN8p74Tf84/YPSIdno33pcZ8zJ2nIn+vK
+         U1VY26xlqTS59z+Z0Bpe+otaw+H1Gp5oAdAmzvjJsAVCeHpsCdpw61RNJUrjWTAVesob
+         S3wZ4kTDABzOiO2unnZV60zJyfoM+MOxfDwtLM4cXeTsL7DFUcNU/flv4VY85/uvrc4O
+         kEZwmFaKkPdFWTZBTeykFRQw6jm/Su8kkZT+qPZfl529x5B3ulqbl9CixygJAZ7a3Lpa
+         1Cn59LOefbTnqmzsCt7gw8n/fj/fVPMBjG/KsI6Q2tMisQzVi0I8V71inbUiMOaIh0qz
+         8VsQ==
+X-Gm-Message-State: AOJu0Yz+wanj18pthPy5+RypG5Wn2TGe7KKySXOC1A2WDcNxAA9CTMUX
+	fjnuv4pKJ7sLewfZmxVzFBjNBJTwpWKC0oDzRdh+MFVdoUFo3lNu39oRUtJPBw==
+X-Gm-Gg: Acq92OGBb3O8jUyZGXlvDKVNvfimbywNp0KKBHu7PtP/CHlOsH9EnUEh/ii1aqiJE6B
+	bfkTmzmxLnxHNZyjvJKBJklaWRLoInVoCRo4Z5Y8O82AdEavRd1VthwtvHW7+SjWH2GVNxh/8Yq
+	qw8Arnte8NF8xY8oTgIaQ46fmg224XNR+QLUe5VyfU69PZJT9k94uVzruxCOGqJ+dGlEFX8pF3H
+	d1RChtb2751InjHMpatcw7Pj7pvF7YYLe2dvrNrriMc7BtBxqlyHbQzne02CbBTUFyPdv7K02zH
+	h0Iklbyb7HOOzl/8szxtZgAuaC54ClTlahBcHqEYsl52Luxnaard+K/FfLKDmJJgDR96nIVLcyS
+	NPAn2gkomvyoyx9nKbNxXl5XE6fOM0V5CXHA0qh2Jawf6vFDYGJpdrO3cex2cL9qijhDvMW2OZ4
+	a2JMgBqz+c25CV1TsGd8NgJifVANs=
+X-Received: by 2002:a05:622a:19a2:b0:50f:783d:8cb2 with SMTP id d75a77b69052e-5165a0683camr100597531cf.26.1778926720443;
+        Sat, 16 May 2026 03:18:40 -0700 (PDT)
+Received: from [172.17.0.2] ([20.25.34.38])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-516456b6856sm70208341cf.7.2026.05.16.03.18.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 May 2026 03:18:40 -0700 (PDT)
+Message-ID: <6a084480.23765db7.988e1.9e39@mx.google.com>
+Date: Sat, 16 May 2026 03:18:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1270937625525934897=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, safa.karakus@secunnix.com
+Subject: RE: [v3] Bluetooth: fix UAF in l2cap_sock_cleanup_listen() vs l2cap_conn_del()
+In-Reply-To: <20260516092139.2618159-1-safa.karakus@secunnix.com>
+References: <20260516092139.2618159-1-safa.karakus@secunnix.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============1270937625525934897==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-to, 2026-05-14 kello 15:11 -0400, Luiz Augusto von Dentz kirjoitti:
-> On Thu, May 14, 2026 at 1:51=E2=80=AFPM <patchwork-bot+bluetooth@kernel.o=
-rg> wrote:
-> >=20
-> > Hello:
-> >=20
-> > This series was applied to bluetooth/bluez.git (master)
-> > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> >=20
-> > On Wed, 13 May 2026 19:17:17 +0300 you wrote:
-> > > Add framework for writing tests simulating "real" environments where
-> > > BlueZ and other parts of the stack run on different virtual machine
-> > > hosts that communicate with each other.
-> > >=20
-> > > *** v5 ***
-> > >=20
-> > > https://github.com/pv/bluez/compare/func-test-v4-r..func-test-v5
-> > >=20
-> > > [...]
-> >=20
-> > Here is the summary with links:
-> >   - [BlueZ,v5,01/16] emulator: btvirt: check pkt lengths, don't get stu=
-ck on malformed
-> >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3De19c771841=
-e9
-> >   - [BlueZ,v5,02/16] emulator: btvirt: allow specifying where server un=
-ix sockets are made
-> >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D5ee43f9993=
-dd
-> >   - [BlueZ,v5,03/16] emulator: btvirt: support SCO data packets
-> >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dcc077e4a12=
-dd
-> >   - [BlueZ,v5,04/16] emulator: btdev: clear more state on Reset
-> >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Df1a303e1d0=
-7a
-> >   - [BlueZ,v5,05/16] test-runner: enable path argument for --unix
-> >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dff2ecb82e4=
-c3
-> >   - [BlueZ,v5,06/16] test-runner: Add -o/--option option
-> >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D82c635c879=
-bf
-> >   - [BlueZ,v5,07/16] test-runner: allow source tree root for -k
-> >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D1929b3a99d=
-2f
-> >   - [BlueZ,v5,08/16] test-runner: use virtio-serial for implementing -u=
- device forwarding
-> >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D908c14fc3a=
-bb
-> >   - [BlueZ,v5,09/16] doc: enable CONFIG_VIRTIO_CONSOLE in tester config
-> >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D7856de4d69=
-d6
-> >   - [BlueZ,v5,10/16] doc: enable KVM paravirtualization & clock support=
- in tester kernel config
-> >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D48cb22a572=
-c7
->=20
-> Push the ones that didn't introduce new functionality, there were some
-> complaints from the likes of checkpatch regarding scripts with execute
-> permission,
+This is an automated email and please do not reply to this email.
 
-This checkpatch warning I don't get, the repository already has a large
-number of executable scripts, and isn't that more convenient?
+Dear Submitter,
 
-IIUC the warning is about +x bits on random source files, which is not
-the case here.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
->  and Id like to go more in detail about how to write tests
-> and what is the RPC message protocol since we could in teory use the
-> same protocol used for autopts for example.
+----- Output -----
 
-Generally the idea in the design here is that the plugins add arbitrary
-test-specific capabilities to the lower tester / IUTs, and the 'test_*'
-functions are the upper tester which uses the plugins to orchestrate
-the test and obtain data to verify the outcome.
+error: patch failed: net/bluetooth/af_bluetooth.c:309
+error: net/bluetooth/af_bluetooth.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
 
-It's straightforward to write test-specific plugins, so you are not
-required to write something like a separate monolithic BTP client.=C2=A0You
-can reuse btpclient etc. of course if useful.
+Please resolve the issue and submit the patches again.
 
-There are several examples of full-stack BlueZ<->BlueZ integration
-tests in the series.
 
-Examples of PTS-style unit tests where lower tester probes specific
-parts should still be figured out are missing though.
+---
+Regards,
+Linux Bluetooth
 
-The main issue here is the lower tester BT stack, it will need to have
-controlled mock functionality. Maybe this could be still BlueZ, but
-with plugins disabled and we do raw ATT / GATT, or through BlueZ GATT
-DBus API. Or, use something like https://google.github.io/bumble/ to
-talk to the btvirt controller directly.
 
-For reusing autopts, I would just add a plugin that launches the client
-in the upper tester / IUT, and talks to it in their XML-RPC protocol,
-encapsulating any protocols used. The autopts protocols appear somewhat
-tied to details of the PTS implementation, doesn't seem like a good
-idea to use it natively as it's more complex and I don't see what would
-be really gained from it.
-
-AFAIK it's not possible to use the full PTS infrastructure here, the
-important parts are closed source and not license compatible.
-
->=20
-> >   - [BlueZ,v5,11/16] doc: add functional/integration testing documentat=
-ion
-> >     (no matching commit)
-> >   - [BlueZ,v5,12/16] test: add functional/integration testing framework
-> >     (no matching commit)
-> >   - [BlueZ,v5,13/16] build: add functional testing target
-> >     (no matching commit)
-> >   - [BlueZ,v5,14/16] test: functional: impose Python code formatting
-> >     (no matching commit)
-> >   - [BlueZ,v5,15/16] test: functional: add some Agent1 interface tests
-> >     (no matching commit)
-> >   - [BlueZ,v5,16/16] test: functional: add basic obex file transfer tes=
-ts
-> >     (no matching commit)
-> >=20
-> > You are awesome, thank you!
-> > --
-> > Deet-doot-dot, I am a bot.
-> > https://korg.docs.kernel.org/patchwork/pwbot.html
-> >=20
-> >=20
-> >=20
->=20
-
---=20
-Pauli Virtanen
+--===============1270937625525934897==--
