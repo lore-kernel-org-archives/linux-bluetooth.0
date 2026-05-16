@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44793D45FE
-	for <linux-bluetooth@vger.kernel.org>; Sat, 16 May 2026 11:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465703D47AF
+	for <linux-bluetooth@vger.kernel.org>; Sat, 16 May 2026 11:15:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778930105; cv=pass; b=Z2BsFI2AwxO6PNxBwpB40LSvGFA8rihAvC1jkPvQv9MxXXA1OHmqkbiNGaMY+KDWqL4pcThvexbKH5awAzxXuygoHZjZ7HYFu1M6UWhYZ6Of/tj16BLUeRAW9Ye8IHADFLdn4GDHPp6UrujFsbB0Ph5hIETNgNty4KjVKjvkFAA=
+	t=1778930105; cv=pass; b=tq3mJUuNXGgWKytaTMrHMAF5bg/nXCFaKViAJrWLxZ29cW0FKLofzOVa+WF0YUNDoBejSIkoTdqpPKeL+18pTRQ/ILAo0PuxijZr5gD9zSxEIJRIVo0iwTRRMJta9NXPs2aUKSUYwp7GV15Nldhzhz0vQqjIrs+TuFpmzDSXm0Y=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1778930105; c=relaxed/simple;
-	bh=yI1ayJd+zw9H0DnJDNAscB832PTgJv4CaEiO6LSYmaE=;
+	bh=/Rbo7TpbjzghAVsxFpPiOKTl5rnQNfqyXBiggM2hs1Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q44f7vozvFvdx1eC34rV2cIgyjY5by0+c77geeNchHSEkCLPdywZuSDzcaVV1WKuWSZX1dLP0YIWTMB9vtWaUongL+VFcz8NltOAq0LMSAgsLR+oHX30f/Veaw1C0OZvRtbGwCK+JbXvUiw5c4J49GajhCxesHUlef2s3B4g+yg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=NZGq+Jol; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=GmZUWsASObGwv9342PsOybAxGj+kUYb1ZnFHZXN9ucyKVq8DTJMpcuPnMLqd8e3imu8Cht1tsF50zrq/1FJciOrTfslMEc4g5w6uYWXhf/GjODsxazBHMHbMrE5SC0kFGV9Tef6YFK+9Ct9Sx9yN/u+gcPedvtAtuOE8fAjF49k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=iZye8d+J; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="NZGq+Jol"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="iZye8d+J"
 Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a01d])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gHhL615q5zyTf;
-	Sat, 16 May 2026 14:14:54 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4gHhL84cvBzydJ;
+	Sat, 16 May 2026 14:14:56 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1778930094;
+	t=1778930097;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8rG8TQsl1T/UuwoPA44G40W1dPklaV0zY9rBqRcpDn0=;
-	b=NZGq+JoldumW0/27JQ1bpdvVToeEyXazcERNcDvDDw/vBI9l5ZsXKHxpbYJGQExReXrY8l
-	fFL2VuBSOAypRUeILQw8LxdujhqeREltGzS/xESLCtKoOFsLwzqob566uvNxrSxOBf+emN
-	ZiabOMLxTu761Q8+augnNwXy6WiJLrA=
+	bh=QyCVYdMFbcquXByPI4NBrQXenyDtFxcc296x9QAlozg=;
+	b=iZye8d+JgRz0WymvuIWSFAtCK4RpyOQN8oadn+NDUhu0Jo+oiBsOcEwu+O1SfVV0OIWHHi
+	iIoqN/HVYs6wD/oV+HCczZ+tt4ULA0or65N9ITY+2OENSZhtxP/1MsTkJbtCGF4OkuSbZ7
+	VY+01iGHS5vi8deceQ/UEQ/nZUpD/9M=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1778930094;
+	s=meesny; t=1778930097;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8rG8TQsl1T/UuwoPA44G40W1dPklaV0zY9rBqRcpDn0=;
-	b=TUpzrrTvRKcWt4yhOxq8Y3//YW4PKZIZRlGfWIQkm7sNqG/eziiP3SeZCmbCymJg23Ev1k
-	UhNG7HZFQZyosTGzoFwSyCwLkOrkHWTnXOXIq7ig/FPJCxyeRspKA+DyW+Psb2VZis/sEf
-	zPL6pQpgpO17OxzqWl/czyGG8vT1C08=
+	bh=QyCVYdMFbcquXByPI4NBrQXenyDtFxcc296x9QAlozg=;
+	b=Iqza3IpuS1xUJhFnT/VVuXsSOCDW2Viu1JSyCJiCXcFq21M29s5cPIReiB1LDGJAdLdjNe
+	PmP1j/MXTzsmgVrkCas3FikYndIwj9ZthC1pbzNj9viunzKhF80zCICWptCd1xLjHXaRex
+	IoKc1Be+qRfin0YjCUqDjqlX9Ahw65I=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1778930094;
-	b=VTj426m/yQChEfFNbFd7M1gtRAjrKHjnggCsxH+6W35uH0a+YePItdPw5p6+Im04ulaKqs
-	iGUf5J8TeYXo/oO+JmgaALTL1C2msmUuM2hBLe3HYKVqeKubRjDdnn//mKvSkU38MjcXd8
-	Ms/7ly2Dqk/a/USAf5TLENaMq8dYRyA=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1778930097;
+	b=LdCHu4Ik2emh5VDdM90o30TDTuviXO9cVeHtf74Y4WKo4t6aHBxbKLECb9Y5ma2i5rPGcr
+	heD2DMGzNaEdA22xaIu0I8x4C3A0I5Ppg5tkTSGK6ZdPwLf46Za2qpSA6viPctPXQbADBu
+	4c7tRHEG1VgFNEfmKUEvIat/raayitE=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [RFC PATCH 1/5] Bluetooth: af_bluetooth: Add minimal context analysis annotations
-Date: Sat, 16 May 2026 14:14:33 +0300
-Message-ID: <342a530a1756cfd136542a33e5d947fd6c0a85d2.1778930064.git.pav@iki.fi>
+Subject: [RFC PATCH 4/5] Bluetooth: L2CAP: Add minimal context analysis annotations
+Date: Sat, 16 May 2026 14:14:36 +0300
+Message-ID: <ec6d9a59a3ce5bff8fe21402fb4f320fd7f9e96f.1778930064.git.pav@iki.fi>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <cover.1778930064.git.pav@iki.fi>
 References: <cover.1778930064.git.pav@iki.fi>
@@ -67,46 +67,30 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add minimal compiler context analysis annotations, required for
-compilation to pass.
+Context analysis has what looks like false positive vs. taking
+conn->lock in l2cap_sock_shutdown().
+
+chan->conn may be deleted concurrently and become NULL while retaking
+chan->lock, but since chan shall not be reused, chan->conn cannot be
+replaced by a different l2cap_conn.
 
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- net/bluetooth/af_bluetooth.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ net/bluetooth/l2cap_sock.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 9d68dd86023c..f42467159947 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -212,6 +212,7 @@ bool bt_sock_linked(struct bt_sock_list *l, struct sock *s)
- EXPORT_SYMBOL(bt_sock_linked);
- 
- void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
-+	__context_unsafe(/* conditional locking */)
- {
- 	const struct cred *old_cred;
- 	struct pid *old_pid;
-@@ -819,7 +820,8 @@ EXPORT_SYMBOL(bt_sock_wait_ready);
- 
- #ifdef CONFIG_PROC_FS
- static void *bt_seq_start(struct seq_file *seq, loff_t *pos)
--	__acquires(seq->private->l->lock)
-+	__acquires_shared(&((struct bt_sock_list *)
-+			    pde_data(file_inode(seq->file)))->lock)
- {
- 	struct bt_sock_list *l = pde_data(file_inode(seq->file));
- 
-@@ -835,7 +837,8 @@ static void *bt_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index cf590a67d364..bbf883098b7f 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1336,6 +1336,7 @@ static int __l2cap_wait_ack(struct sock *sk, struct l2cap_chan *chan)
  }
  
- static void bt_seq_stop(struct seq_file *seq, void *v)
--	__releases(seq->private->l->lock)
-+	__releases_shared(&((struct bt_sock_list *)
-+			    pde_data(file_inode(seq->file)))->lock)
+ static int l2cap_sock_shutdown(struct socket *sock, int how)
++	__context_unsafe(/* complex chan->conn locking */)
  {
- 	struct bt_sock_list *l = pde_data(file_inode(seq->file));
- 
+ 	struct sock *sk = sock->sk;
+ 	struct l2cap_chan *chan;
 -- 
 2.54.0
 
