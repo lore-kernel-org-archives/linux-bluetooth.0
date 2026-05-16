@@ -1,116 +1,267 @@
-Received: from morpheus.develer.net (morpheus.develer.net [2.228.72.60])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC5923536B
-	for <linux-bluetooth@vger.kernel.org>; Sat, 16 May 2026 02:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=2.228.72.60
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FF532236EE
+	for <linux-bluetooth@vger.kernel.org>; Sat, 16 May 2026 03:51:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778898876; cv=none; b=rHZb0ZfhWs2/xNYSPOXRMRRqvyxcelfkessqrLIh23KPis1SIwhUzafTiTXV+cf+o6YDUWeiqdssS7zsz+gTHYN6CVllYuD/yaXPdOT044oraYoYhAKDfcdwwnV5JTchTGnNT7xk4Uzn8KlIneW2HVoOtwjtnwW5zd1KoyMOrEA=
+	t=1778903515; cv=none; b=IzURcziXXQU+7J+yawOoP8n8BPp1yEjw2VGTJ56HtqPeDez3LFHbIwdowMIGQ7crtfG34f03227Mx7zBsls9xKXFELoydvbI4670fvBtnp/Dk/+hwJNasLanfFgCYJ2FNwhOz97wKLbVT7npBbW7/7OoAjG9x+xZnTp6HCz0LTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778898876; c=relaxed/simple;
-	bh=Sr9LQCNEgyUVSUZQJoAkJM8M2xtysEoGe/O3A32DsXA=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=HjfFH8xYZOl+hyPUvXgxjnNXh0IvT0rbw2GjePHgMuwEonD3IIRDMOxj3OGdleWcCZkhZuG1zbU4gQvhCNX0eSVW8s0512Kfdn8bMOM8D3mWHiDFpFwp2oi32ndZV/BC9Ddr9FZYQ7J/cEcSaT1NORNQPwKC+qbP/Pd7CfVOF7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codewiz.org; spf=pass smtp.mailfrom=codewiz.org; dkim=pass (1024-bit key) header.d=codewiz.org header.i=@codewiz.org header.b=Uhn4C4NJ; arc=none smtp.client-ip=2.228.72.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codewiz.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewiz.org
+	s=arc-20240116; t=1778903515; c=relaxed/simple;
+	bh=Lt3qNKQRTpNNgLHIHyjDsZHxXYL2J4pC9fV4vKZ0ji8=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=Sn14SAmWmrXZXPVRd1bM7yWvdxYJ3HTJq0iU/0cvYH9NWKP0fAmIOySFzbL8O3FDAvLFdby1vNaa4dUk+hLxiCt9oVmlbmPTq8q/Mkj6rqcthJQGASV7QIYF0T803tUWzcfqWjdPMHFGYfDI8Dyqq430pF4UKvsLAhRL7U0eIwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn; spf=pass smtp.mailfrom=std.uestc.edu.cn; dkim=fail (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b=X0CO8fMa reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=std.uestc.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=codewiz.org header.i=@codewiz.org header.b="Uhn4C4NJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codewiz.org; s=mail;
-	t=1778898457; bh=Sr9LQCNEgyUVSUZQJoAkJM8M2xtysEoGe/O3A32DsXA=;
-	h=Date:To:Cc:From:Subject:From;
-	b=Uhn4C4NJ7/EZStOjtbKjH09nkHS86u+YtCfJRxL2ohMxkO4/N82ZdEd3YuR9NCJR2
-	 ISsxprB2MMps3CF5O5XNYnMz8ccIwgQccoXWGMouR6K4xjwsvfd2ALb/hXaX0mw2nD
-	 COiUGbX+tfXcNJgrKHuLRlvd55kHjRSlzey0WmWU=
-Received: from [IPV6:2404:7a80:ff26:6c00:7853:dba:2963:526b] (unknown [IPv6:2404:7a80:ff26:6c00:7853:dba:2963:526b])
-	(Authenticated sender: bernie)
-	by morpheus.develer.net (Postfix) with ESMTPSA id 72F4124514C;
-	Sat, 16 May 2026 04:27:36 +0200 (CEST)
-Message-ID: <9f6967e5-c37f-4e21-b0d2-8eea4a0b5809@codewiz.org>
-Date: Sat, 16 May 2026 11:27:32 +0900
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b="X0CO8fMa"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=std.uestc.edu.cn; s=dkim; h=Received:Message-ID:Date:
+	MIME-Version:User-Agent:To:From:Subject:Cc:Content-Type:
+	Content-Transfer-Encoding; bh=f/CX+T14RA0QmiPEv1zrh7fx3H/aUUkHJk
+	zIZx8hvHo=; b=X0CO8fMaOr2QCJGTc98VGZRTQX6/RlyoXU8+k6pMd1CmeEwulS
+	KUtz4/3PLbWnI4kVT3gY2hYZWKCHvbAoC/2a5VF1usfTQIAa5nIIFi39sx+02ttq
+	H9G1Z6ywRQtBd3fK6kjFYuKgxdOuz60pYXZhvkzqBpbCTnZoMq6yZRMas=
+Received: from [IPV6:240c:c983:1:5c8b:50d3:b7bc:dd73:c1ad] (unknown [240c:c983:1:5c8b:50d3:b7bc:dd73:c1ad])
+	by hzbj-edu-front-4.icoremail.net (Coremail) with SMTP id BrQMCkD2lrLG6QdqTD0dAg--.26510S3;
+	Sat, 16 May 2026 11:51:35 +0800 (CST)
+Message-ID: <7dc0dfd1-7e23-43d5-a855-d1c73943d40c@std.uestc.edu.cn>
+Date: Sat, 16 May 2026 11:51:33 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Content-Language: en-US
-To: linux-bluetooth@vger.kernel.org
-Cc: regressions@lists.linux.dev
-From: Bernie Innocenti <bernie@codewiz.org>
-Subject: Bluetooth: btmtk: MT7925 fails "wmt func ctrl" (-EINVAL) since
- 634a4408c061
-Autocrypt: addr=bernie@codewiz.org; keydata=
- xjMEXxKIihYJKwYBBAHaRw8BAQdAEaAGAHL1d+7jYCkWrJabzd1reJYnxeoh45PTz8+7ERXN
- JUJlcm5pZSBJbm5vY2VudGkgPGJlcm5pZUBjb2Rld2l6Lm9yZz7CkAQTFggAOBYhBGkdgfqR
- 5j+13Wxn/QvieBz8fxukBQJfEoiKAhsDBQsJCAcDBRUKCQgLBRYDAgEAAh4BAheAAAoJEAvi
- eBz8fxuk7PEBALTnPaPxYWXvPXxQ7WLcd4BvcfxIh+86O8sfh+OK9M87AP431LAnBx6lLArU
- 8sXlHi9kq5Nx0FEeD0iQkl4f+Wk9C844BF8SiIoSCisGAQQBl1UBBQEBB0CyluVyxU6BIr7q
- 8dkdVt2C6CHSNE1gcNoIOTD3xcG7AgMBCAfCeAQYFggAIBYhBGkdgfqR5j+13Wxn/QvieBz8
- fxukBQJfEoiKAhsMAAoJEAvieBz8fxukLC0A/jSvI5r8WmvrN7GMalg1PqF5JEruVtMIZaTY
- LD/ARox4AP9mgTyGs+XWQvqdw5FiEcAVQal6BT1xTiLFq48PN/v4Aw==
+User-Agent: Mozilla Thunderbird
+To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com, marcel@holtmann.org,
+ "luiz.dentz@gmail.com >> Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+From: Quan Sun <2022090917019@std.uestc.edu.cn>
+Subject: [PATCH v2] Bluetooth: btintel: Use skb_pull_data return for bounds
+ check
+Cc: 2022090917019@std.uestc.edu.cn
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:BrQMCkD2lrLG6QdqTD0dAg--.26510S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3ArW7tF4xAr4DZF17trWrXwb_yoW7KF13p3
+	43CFZ8ZrZ3Aw4aqF1Yqas5GFn0vryfGw1rGrZ2yw17CwsxK3W3J3ZrJ345Ca95Kr4kZF1f
+	ua1vvrs29r4kt3JanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9S14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r1j
+	6r4UM28EF7xvwVC2z280aVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
+	4UJwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIF
+	xwCY1x0262kKe7AKxVWUAVWUtwCY02Avz4vEOx0_Gr4l42xK82IYc2Ij64vIr41l4I8I3I
+	0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWU
+	GVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI
+	0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0
+	rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r
+	4UYxBIdaVFxhVjvjDU0xZFpf9x0JUq385UUUUU=
+X-CM-SenderInfo: asqsjiyzqzilqqrzq21wgo3vxvwfhvlgxou0/
 
-Hi,
+The length check at the top of btintel_print_fseq_info() verifies
+that the skb has at least 66 bytes (sizeof(u32) * 16 + 2), but the
+function actually consumes 74 bytes:
 
-Since commit 634a4408c061 ("Bluetooth: btmtk: validate WMT event SKB 
-length before struct access") my MediaTek MT7925 Bluetooth adapter no 
-longer initializes. The controller never registers and is absent from 
-userspace.
+   2 calls to skb_pull_data(skb, 1)  =  2 bytes
+   18 calls to skb_pull_data(skb, 4) = 72 bytes
 
-I'm seeing this on a Framework 16 (AMD Ryzen AI 9) with a MediaTek 
-MT7925 (USB ID 0e8d:0717) running Fedora Rawhide.
+When the firmware returns a packet of exactly 66 bytes, the last two
+skb_pull_data(skb, 4) calls return NULL, which is then passed directly
+to get_unaligned_le32(), resulting in a NULL pointer dereference.
 
-Firmware is BT_RAM_CODE_MT7925_1_1_hdr.bin and loads fine in both, so 
-this is not a firmware or kconfig issue.
+This patch refactors the function to check the return value of
+`skb_pull_data` instead. This ensures that every time data is pulled
+from the `skb`, we explicitly verify that it didn't return NULL,
+guaranteeing safe access. A `malformed` label is added to handle
+early termination in case the `skb` is too short, preserving the
+original `bt_dev_dbg` logging behavior.
 
-Bad kernel (7.1.0-0.rc3.260515g70eda68668d1.27.fc45.x86_64):
+Fixes: a7ba218a44aa ("Bluetooth: btintel: Print Firmware Sequencer 
+information")
+Signed-off-by: Quan Sun <2022090917019@std.uestc.edu.cn>
+---
+v2:
+   - Remove manual length check and validate every skb_pull_data() return.
+   - Add 'malformed' label for unified error handling.
+   - Fix GitLint title length warning.
 
-   Bluetooth: hci0: HW/SW Version: 0x00000000, Build Time: 20260106153314
-   Bluetooth: hci0: Failed to send wmt func ctrl (-22)
-   Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is 
-advertised, but not supported.
+  drivers/bluetooth/btintel.c | 108 +++++++++++++++++++++++++++---------
+  1 file changed, 81 insertions(+), 27 deletions(-)
 
-Good kernel (7.0.0-62.fc45.x86_64):
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index dcaaa4ca02b99..053be9f88f7c3 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -3356,14 +3356,10 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
+  		return;
+  	}
 
-   Bluetooth: hci0: HW/SW Version: 0x00000000, Build Time: 20260106153314
-   Bluetooth: hci0: Device setup in 296567 usecs
-   Bluetooth: hci0: AOSP extensions version v1.00
+-	if (skb->len < (sizeof(u32) * 16 + 2)) {
+-		bt_dev_dbg(hdev, "Malformed packet of length %u received",
+-			   skb->len);
+-		kfree_skb(skb);
+-		return;
+-	}
+-
+  	p = skb_pull_data(skb, 1);
++	if (!p)
++		goto malformed;
++
+  	if (*p) {
+  		bt_dev_dbg(hdev, "Failed to get fseq status (0x%2.2x)", *p);
+  		kfree_skb(skb);
+@@ -3371,6 +3367,9 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
+  	}
 
+  	p = skb_pull_data(skb, 1);
++	if (!p)
++		goto malformed;
++
+  	switch (*p) {
+  	case 0:
+  		str = "Success";
+@@ -3394,65 +3393,120 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
 
-Bug analysis courtesy of Claude Opus, I haven't verified:
+  	bt_dev_info(hdev, "Fseq status: %s (0x%2.2x)", str, *p);
 
-   The failure (-22 = -EINVAL) comes from the new length guard in the
-   BTMTK_WMT_FUNC_CTRL branch of btmtk_usb_hci_wmt_sync():
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Reason: 0x%8.8x", val);
 
-     case BTMTK_WMT_FUNC_CTRL:
-         if (!skb_pull_data(data->evt_skb, sizeof(wmt_evt_funcc->status))) {
-             err = -EINVAL;
-             goto err_free_skb;
-         }
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Global version: 0x%8.8x", val);
 
-   The first skb_pull_data() (base 7-byte WMT event) succeeds — neither
-   "WMT event too short" nor "Wrong op" is logged — so it is specifically
-   this second 2-byte status pull that returns NULL. The MT7925 FUNC_CTRL
-   response is shorter than the full 9-byte struct
-   btmtk_hci_wmt_evt_funcc the check assumes, so a valid response is now
-   rejected. The pre-commit code tolerated this, hence the regression.
-   The commit's bounds-check intent is sound, but the trailing status
-   field should be treated as optional for devices that return a short
-   event, rather than hard failing.
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Installed version: 0x%8.8x", val);
 
-   The commit was isolated by code inspection: it is the only post-7.0
-   btmtk change introducing an -EINVAL in this path.
+-	p = skb->data;
+-	skb_pull_data(skb, 4);
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
+  	bt_dev_info(hdev, "Fseq executed: %2.2u.%2.2u.%2.2u.%2.2u", p[0], p[1],
+  		    p[2], p[3]);
 
-   The commit is Cc: stable, so affected stable trees likely regress too.
+-	p = skb->data;
+-	skb_pull_data(skb, 4);
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
+  	bt_dev_info(hdev, "Fseq BT Top: %2.2u.%2.2u.%2.2u.%2.2u", p[0], p[1],
+  		    p[2], p[3]);
 
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Fseq Top init version: 0x%8.8x", val);
 
-Happy to test patches or provide full dmesg / btmon traces.
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Fseq Cnvio init version: 0x%8.8x", val);
 
-#regzbot introduced: 634a4408c061
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Fseq MBX Wifi file version: 0x%8.8x", val);
+
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Fseq BT version: 0x%8.8x", val);
+
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Fseq Top reset address: 0x%8.8x", val);
+
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Fseq MBX timeout: 0x%8.8x", val);
+
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Fseq MBX ack: 0x%8.8x", val);
+
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Fseq CNVi id: 0x%8.8x", val);
+
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Fseq CNVr id: 0x%8.8x", val);
+
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Fseq Error handle: 0x%8.8x", val);
+
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Fseq Magic noalive indication: 0x%8.8x", val);
+
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Fseq OTP version: 0x%8.8x", val);
+
+-	val = get_unaligned_le32(skb_pull_data(skb, 4));
++	p = skb_pull_data(skb, 4);
++	if (!p)
++		goto malformed;
++	val = get_unaligned_le32(p);
+  	bt_dev_dbg(hdev, "Fseq MBX otp version: 0x%8.8x", val);
+
+  	kfree_skb(skb);
++	return;
++
++malformed:
++	bt_dev_dbg(hdev, "Malformed packet received");
++	kfree_skb(skb);
+  }
+  EXPORT_SYMBOL_GPL(btintel_print_fseq_info);
 
 -- 
-_ // Bernie Innocenti
-\X/  https://codewiz.org/
+2.43.0
 
