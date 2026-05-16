@@ -1,211 +1,90 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13B5B12FF69;
-	Sat, 16 May 2026 05:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759A2350A0F
+	for <linux-bluetooth@vger.kernel.org>; Sat, 16 May 2026 05:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778909491; cv=none; b=M7s2vUlsbQX/B9SpjwxUu3uod18hCr6pGVxcRZrDJZe8zJ5Dnr53Wkmz5RRhuUaeTWzgAfjemwTM5z3ii4qhk1XOmvhgxpFou6qxasrbrKoH1ILcUz6JIZzL9jK8y9Lc3lBd5/TGX7bSvlrHmIM0Ex9Ly4qEhdV166E2Y6kb2dk=
+	t=1778910692; cv=none; b=VC/RMgS4BN7qqsP0YMeVzizXMZxS6pbtiyKQFmiYabXrN98hPJz76rkGm/aoCvOvQ087OJ7xRqe7G2XOCV6vqAphiq2fkFoZwXmjgbJcf2oKmlWBCkNx7x4BKz24nRkbZs2lMVR7naIcRfwLN/v3lLggpK7+1LJTYN3KTlncSHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778909491; c=relaxed/simple;
-	bh=viFVbCTUEGZlCx/T/JjdBigT2zl5htwyg4XSF9v/S2w=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=G3MucToHpixt3s5HCwE/enCOhxtTzOJkwhRDH3OppHvxZRbuBtL/l/pK1qA6ywc8w+MpsumL3PkZ4JsY2iuctdLmMuw6IoHEtgHvBj1Yd4Jjo8Bik2o7Dxkw1uDYh6zDl3PNIyHVxa5j/2YPrkodKhgXq9y2oymnk2F2gTECox4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Sk+JemyJ; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1778910692; c=relaxed/simple;
+	bh=hFx6/s2sAYF13Pn/shDeL9QZnQJT6/4ZXNYrL1wlKqs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eKsLJ5UL9thrL6CbJZOXMxJIN24rYHaA2g3JFFwiizNsNZjiLRkwTerckHwBbDslH0LhXhDmxVtMnkQ+KCg26hXb+m2pYmsbGQCxpmXHCxgiNOWrrbBJRrUM8LN6rH2am3QMGws5G0EfMZ0bOWjCZ9i1xbw9xGdh7YsPt1eYSKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=ArzGe75j; arc=none smtp.client-ip=188.68.63.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Sk+JemyJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=V+
-	jmmf2+0iPvY5sybQeNTfbjIrV4zPW2sciKzAA1t6k=; b=Sk+JemyJ1Jf531qNIR
-	YEtkC3yzaPc62dse6ClH9TVxhz12UqMd9JsqLfna7CWP5YNtC/JsiORxA30rYvVb
-	BlW123DBuasBQgLhFwGPp2Tw9AgJA08MIiQnPsCfqEh5HOFWSBj2x5t6Xn8hZsUx
-	lxhhYVOlnnNraUfrafvoUt5LI=
-Received: from 163.com (unknown [])
-	by gzsmtp5 (Coremail) with SMTP id QCgvCgA3hbP+AAhqSd3aDw--.5S2;
-	Sat, 16 May 2026 13:30:49 +0800 (CST)
-From: <w15303746062@163.com>
-To: luiz.dentz@gmail.com,
-	pmenzel@molgen.mpg.de,
-	marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org
-Cc: linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	greg@kroah.com,
-	stable@vger.kernel.org,
-	Mingyu Wang <25181214217@stu.xidian.edu.cn>
-Subject: [PATCH v6] Bluetooth: hci_uart: fix UAFs and race conditions in close and init paths
-Date: Sat, 16 May 2026 13:30:36 +0800
-Message-Id: <20260516053036.399005-1-w15303746062@163.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CABBYNZ+r3gm37FW5WqE79bRp+x9UZsaCtyvfz_FdixqEucAxGw@mail.gmail.com>
-References: <CABBYNZ+r3gm37FW5WqE79bRp+x9UZsaCtyvfz_FdixqEucAxGw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="ArzGe75j"
+Received: from mors-relay8203.netcup.net (localhost [127.0.0.1])
+	by mors-relay8203.netcup.net (Postfix) with ESMTPS id 4gHY8v1YdTz8dC4;
+	Sat, 16 May 2026 05:51:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1778910687;
+	bh=hFx6/s2sAYF13Pn/shDeL9QZnQJT6/4ZXNYrL1wlKqs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ArzGe75jC//Onn+iTfNImIVG9a0CxCO4S94F3grozLglivsmu0adbQgwBDvIxmQh2
+	 FYImq7u8QgSJROPtzox0EINJTeVA5H5SrP1sSG27fgcBhgo2xcHNBH1X7U1FUnDDgi
+	 R5CgM75nrw2061eUspBJLSnCMAB44uz+Fy/mUam7auhWPgx5egu06gpeRh1ISgq0rx
+	 RY6EURbaUuFn04fw2HBCUkjjgg2ODGhdXJWQEdX2VrMWvrfKwHUJ379Ij4ThfuS79w
+	 +AKmB5zBxDOizGZGwGQ5Y+nvuD9JB3YuMU318l+ihWUkGVp3DaSft7gn4BTtM/u9Iy
+	 xaNlewOF5uejQ==
+Received: from policy01-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay8203.netcup.net (Postfix) with ESMTPS id 4gHY8v0nxXz8XyK;
+	Sat, 16 May 2026 05:51:27 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at policy01-mors.netcup.net
+X-Spam-Flag: NO
+X-Spam-Score: -2.901
+X-Spam-Level: 
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy01-mors.netcup.net (Postfix) with ESMTPS id 4gHY8t0Mwdz8tZK;
+	Sat, 16 May 2026 07:51:26 +0200 (CEST)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 4AE496038A;
+	Sat, 16 May 2026 07:51:25 +0200 (CEST)
+Authentication-Results: mxe9fb;
+        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <d7b819bd-f3e0-4931-bcd8-6bc4aa50a3f5@leemhuis.info>
+Date: Sat, 16 May 2026 07:51:24 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:QCgvCgA3hbP+AAhqSd3aDw--.5S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3Xr1fZw13Zr4rJF18WFWktFb_yoWxGr1fpF
-	W5KF90yw4UWFW29FsrZF1xAF1rKF4SgFW3C34fG345X398tryYk3WIkaya9F1UGr97AryS
-	vFWUX3y5WFyUAw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j5_-PUUUUU=
-X-CM-SenderInfo: jzrvjiatxuliiws6il2tof0z/xtbDAAnewmoIAQlXUwAA37
+User-Agent: Mozilla Thunderbird
+Subject: Re: Bluetooth: btmtk: regression in 634a4408c breaks MT7922 FUNC_CTRL
+ handshake
+To: Sergey Kasmy <sergey.kasmy@gmail.com>, linux-bluetooth@vger.kernel.org
+Cc: tristan@talencesecurity.com, marcel@holtmann.org,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Linux kernel regressions list <regressions@lists.linux.dev>
+References: 
+ <CAJ8Bt0iC5bVgCRw28YXB1mo+-p_sTM_cp6fF+qVNapyL-Hsayg@mail.gmail.com>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Content-Language: de-DE, en-US
+In-Reply-To: 
+ <CAJ8Bt0iC5bVgCRw28YXB1mo+-p_sTM_cp6fF+qVNapyL-Hsayg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-PPP-Message-ID: <177891068561.3873274.8920997460952381602@mxe9fb.netcup.net>
+X-Rspamd-Server: rspamd-worker-8404
+X-Rspamd-Queue-Id: 4AE496038A
+X-NC-CID: t1C18Qh/gqjwNjo2tqrjUxrg0DCqJL1mKijFd0aPK/rVQjKf7LY=
 
-From: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+On 5/15/26 23:02, Sergey Kasmy wrote:
+> 
+> Commit 634a4408c0615c523cf7531790f4f14a422b9206 ("Bluetooth: btmtk:
+> validate WMT event SKB length before struct access") introduced a
+> regression that breaks my MediaTek MT7922 Bluetooth adapter (USB ID
+> 0e8d:0616).
 
-Vulnerabilities leading to Use-After-Free (UAF) and Null Pointer
-Dereference (NPD) conditions were observed in the lifecycle management
-of hci_uart.
+Thx for the report, this is a known problem, the fix in heading towards
+mainline:
+https://lore.kernel.org/all/CABBYNZ+FfhYtU2=J-V4pjKf_vKV=Y5LhVhxS_epKe-qaUUt8_g@mail.gmail.com/
 
-The primary issue arises because the workqueues (init_ready and write_work)
-are only flushed/cancelled if the HCI_UART_PROTO_READY flag is set during
-TTY close. If a hangup occurs before setup completes, hci_uart_tty_close()
-skips the teardown of these workqueues and proceeds to free the `hu` struct.
-When the scheduled work executes later, it blindly dereferences the freed
-`hu` struct. This issue was triggered by our custom device emulation and
-fuzzing framework (DevGen) on the v6.18 kernel.
-
-The crash trace is as follows:
-  ODEBUG: free active (active state 0) object: ffff88804024e870 object type: work_struct hint: hci_uart_write_work+0x0/0x940
-  WARNING: CPU: 0 PID: 338273 at lib/debugobjects.c:612 debug_print_object+0x1a2/0x2b0
-  ...
-  Call Trace:
-   <TASK>
-   debug_check_no_obj_freed+0x3ec/0x520
-   kfree+0x3f0/0x6c0
-   hci_uart_tty_close+0x127/0x2a0
-   k_ldisc_close+0x113/0x1a0
-   tty_ldisc_kill+0x8e/0x150
-   tty_ldisc_hangup+0x3c1/0x730
-   __tty_hangup.part.0+0x3fd/0x8a0
-   tty_ioctl+0x120f/0x1690
-   __x64_sys_ioctl+0x18f/0x210
-   do_syscall_64+0xcb/0xfa0
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-   </TASK>
-
-Additionally, sister bugs exist in the device registration error paths
-within hci_uart_init_work() and hci_uart_register_dev(). If
-hci_register_dev() fails, the code frees hdev and sets hu->hdev to NULL,
-but leaves hu->write_work active if it was already scheduled during early
-protocol setup phase. When the work executes later, it blindly fetches and
-dereferences the NULL hu->hdev pointer, triggering an unconditioned kernel
-panic.
-
-Furthermore, the error path in hci_uart_init_work() clears the
-HCI_UART_PROTO_READY flag and invokes hu->proto->close(hu) without
-acquiring the hu->proto_lock write lock. Since concurrent callbacks like
-hci_uart_tty_receive() execute under the read lock, this missing
-synchronization allows the protocol state to be destroyed while active
-readers are accessing it.
-
-Fix these synchronization and lifecycle issues by:
-1. Moving the workqueue teardown to the very beginning of
-   hci_uart_tty_close() and using disable_work_sync() to unconditionally
-   prevent new work submissions.
-2. Wrapping the clearance of HCI_UART_PROTO_READY in hci_uart_init_work()
-   with percpu_down_write/percpu_up_write of hu->proto_lock.
-3. Explicitly invoking disable_work_sync(&hu->write_work) before resetting
-   hu->hdev to NULL in both initialization error paths to safely prevent
-   any concurrent re-queuing issues.
-
-Fixes: 3b799254cf6f ("Bluetooth: hci_uart: Cancel init work before unregistering")
-Cc: stable@vger.kernel.org
-Signed-off-by: Mingyu Wang <25181214217@stu.xidian.edu.cn>
----
-Changes in v6:
-- Fixed missing `hu->proto_lock` write lock in hci_uart_init_work() error path to prevent race with readers (reported by Sashiko).
-- Added disable_work_sync() instead of cancel_work_sync() for `hu->write_work` in hci_uart_init_work() and hci_uart_register_dev() error paths to completely block any concurrent re-queuing window before hdev is freed (reported by Sashiko).
-
-Changes in v5:
-- Relocated disable_work_sync() to the very top of hci_uart_tty_close(), 
-  before hci_uart_close(), to ensure no new work is submitted during device teardown.
-
-Changes in v4:
-- Adopted Luiz's suggestion to use disable_work_sync() instead of 
-  cancel_work_sync() in close path to prevent new work submissions.
-
-Changes in v3:
-- Added 'Cc: stable' tag as requested by the stable bot.
-
-Changes in v2:
-- Added KASAN/ODEBUG crash trace.
-
- drivers/bluetooth/hci_ldisc.c | 35 ++++++++++++++++++++++++++++++++---
- 1 file changed, 32 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 275ea865bc29..612fa2890cec 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -194,7 +194,22 @@ void hci_uart_init_work(struct work_struct *work)
- 	err = hci_register_dev(hu->hdev);
- 	if (err < 0) {
- 		BT_ERR("Can't register HCI device");
-+
-+		/*
-+		 * Acquire proto_lock before clearing PROTO_READY and closing
-+		 * the protocol to synchronize with active readers.
-+		 */
-+		percpu_down_write(&hu->proto_lock);
- 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
-+		percpu_up_write(&hu->proto_lock);
-+
-+		/*
-+		 * Disable any pending write_work that may have been queued
-+		 * during the PROTO_INIT phase to prevent UAF/NPD when hdev
-+		 * is freed.
-+		 */
-+		disable_work_sync(&hu->write_work);
-+
- 		hu->proto->close(hu);
- 		hdev = hu->hdev;
- 		hu->hdev = NULL;
-@@ -540,6 +555,15 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 	if (!hu)
- 		return;
- 
-+	/*
-+	 * Disable workqueues unconditionally before tearing down the
-+	 * connection, as they might be active during the PROTO_INIT phase.
-+	 * Using disable_work_sync() ensures no new submissions can occur
-+	 * during or after hci_uart_close().
-+	 */
-+	disable_work_sync(&hu->init_ready);
-+	disable_work_sync(&hu->write_work);
-+
- 	hdev = hu->hdev;
- 	if (hdev)
- 		hci_uart_close(hdev);
-@@ -549,9 +573,6 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
- 		percpu_up_write(&hu->proto_lock);
- 
--		cancel_work_sync(&hu->init_ready);
--		cancel_work_sync(&hu->write_work);
--
- 		if (hdev) {
- 			if (test_bit(HCI_UART_REGISTERED, &hu->flags))
- 				hci_unregister_dev(hdev);
-@@ -692,6 +713,14 @@ static int hci_uart_register_dev(struct hci_uart *hu)
- 
- 	if (hci_register_dev(hdev) < 0) {
- 		BT_ERR("Can't register HCI device");
-+
-+		/*
-+		 * Disable any pending write_work that may have been queued
-+		 * during the proto->open() phase to prevent UAF/NPD when
-+		 * hdev is freed.
-+		 */
-+		disable_work_sync(&hu->write_work);
-+
- 		percpu_down_write(&hu->proto_lock);
- 		clear_bit(HCI_UART_PROTO_INIT, &hu->flags);
- 		percpu_up_write(&hu->proto_lock);
--- 
-2.34.1
-
+Ciao, Thorsten
