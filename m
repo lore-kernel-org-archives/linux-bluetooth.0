@@ -1,267 +1,101 @@
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FF532236EE
-	for <linux-bluetooth@vger.kernel.org>; Sat, 16 May 2026 03:51:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8841A405C4F
+	for <linux-bluetooth@vger.kernel.org>; Sat, 16 May 2026 04:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778903515; cv=none; b=IzURcziXXQU+7J+yawOoP8n8BPp1yEjw2VGTJ56HtqPeDez3LFHbIwdowMIGQ7crtfG34f03227Mx7zBsls9xKXFELoydvbI4670fvBtnp/Dk/+hwJNasLanfFgCYJ2FNwhOz97wKLbVT7npBbW7/7OoAjG9x+xZnTp6HCz0LTg=
+	t=1778906784; cv=none; b=VETS4n5Xc492ZReLc9JkNMTfp31eXbpSgC5XIrfv1welNGRwwml5RxWcWup/aFLC/keFqHTSnMSTRVDw4z62KfjLo1fhJMONOpyzca58lAC47/RFUTPr+Oib0POpN3U05V1Hvj6VP66KlYwtefUq+JorJw7SjgbO6p6IcNbjlYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778903515; c=relaxed/simple;
-	bh=Lt3qNKQRTpNNgLHIHyjDsZHxXYL2J4pC9fV4vKZ0ji8=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=Sn14SAmWmrXZXPVRd1bM7yWvdxYJ3HTJq0iU/0cvYH9NWKP0fAmIOySFzbL8O3FDAvLFdby1vNaa4dUk+hLxiCt9oVmlbmPTq8q/Mkj6rqcthJQGASV7QIYF0T803tUWzcfqWjdPMHFGYfDI8Dyqq430pF4UKvsLAhRL7U0eIwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn; spf=pass smtp.mailfrom=std.uestc.edu.cn; dkim=fail (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b=X0CO8fMa reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=std.uestc.edu.cn
+	s=arc-20240116; t=1778906784; c=relaxed/simple;
+	bh=9FWrd3emjwZ56bVMoqWIjOPR4k0IMq9QjElohqigJS4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=hQQX0JEpPqH1tMjZsw+SFrXRoi4mF+OnikYl0BdpLbUZSdELAm/Bxgo4sBmCuW6FZbgEU8dhLw0QcJd7GjmEZ/5NYXOB5bYrYKn2e/a59/S8/6y3km/ZMQ/pFsBj2+JSsNNTljbcc7RD8XNL/R2tE6iYeuaWDKPECgFJa9UUhHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hkoC57IZ; arc=none smtp.client-ip=74.125.82.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b="X0CO8fMa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hkoC57IZ"
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-2f0ad52830cso684860eec.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 May 2026 21:46:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=std.uestc.edu.cn; s=dkim; h=Received:Message-ID:Date:
-	MIME-Version:User-Agent:To:From:Subject:Cc:Content-Type:
-	Content-Transfer-Encoding; bh=f/CX+T14RA0QmiPEv1zrh7fx3H/aUUkHJk
-	zIZx8hvHo=; b=X0CO8fMaOr2QCJGTc98VGZRTQX6/RlyoXU8+k6pMd1CmeEwulS
-	KUtz4/3PLbWnI4kVT3gY2hYZWKCHvbAoC/2a5VF1usfTQIAa5nIIFi39sx+02ttq
-	H9G1Z6ywRQtBd3fK6kjFYuKgxdOuz60pYXZhvkzqBpbCTnZoMq6yZRMas=
-Received: from [IPV6:240c:c983:1:5c8b:50d3:b7bc:dd73:c1ad] (unknown [240c:c983:1:5c8b:50d3:b7bc:dd73:c1ad])
-	by hzbj-edu-front-4.icoremail.net (Coremail) with SMTP id BrQMCkD2lrLG6QdqTD0dAg--.26510S3;
-	Sat, 16 May 2026 11:51:35 +0800 (CST)
-Message-ID: <7dc0dfd1-7e23-43d5-a855-d1c73943d40c@std.uestc.edu.cn>
-Date: Sat, 16 May 2026 11:51:33 +0800
+        d=gmail.com; s=20251104; t=1778906782; x=1779511582; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=9FWrd3emjwZ56bVMoqWIjOPR4k0IMq9QjElohqigJS4=;
+        b=hkoC57IZPAdePnsB8mPhuMIDUAHms3XVz3uEO3PVfbcU+5ylZDfsvr3yyLBt8E/BJK
+         N+Mac3ShUeZjCATCN9By4LyvrRFc2fddfOx2Zy1qFN/DVl5KhIXhUpGBzeeArX9CpTUg
+         QPlOL1VOopTKEuEKiN2IJXs53X/eBBcpP0JyaUE2xiTlGibLdaG00foe/ksWWsFaUfBH
+         7XDs+O2Avuu2EpdW1HQ4+kCvqpQ134734ogq/Oxtk4WLe3ERTVtkk1xPi42os0tgShxv
+         HhdHwMp8TLQDHBKc6zakFZkeBBwWzr4pHZ+V/umOAQySOwJBxXZMvg+Y4HCO52LYaGAQ
+         9mgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778906782; x=1779511582;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9FWrd3emjwZ56bVMoqWIjOPR4k0IMq9QjElohqigJS4=;
+        b=E2fgVCnHHFjs9EAkBB7+X8qJi9NOmcSwe67S5l+ML+Yw68wZkDmwrA6Wnk79f19CD3
+         KQzwlVN2NBgPR3+b+bvnvUMd1QGyLy/vk3yKgK72lfRQvPOYYTOdirjioDiFgAVfeyi/
+         Q2LukA/2tHlBKujf40rJ5dcS5PrtsKdbpcB7NaVO8TNoWEyoOCDr+Yhh5UJm9/OCOpOW
+         dI/97NNczT891i+PxH5FN6SmjRs5tpxYKY56IrX7YDO4/VINadS+SqmjgQrNIX6hy8SQ
+         /lyAfUBiFEQNaZRJPUh9IpBLOBlyF8eyAiqDBfyPWsNoLBiVGX4Msxd3KImgV9p8CLsV
+         vgvQ==
+X-Gm-Message-State: AOJu0Ywo5XsN4lbHSsb1aByYyfMbNjAsos2r48ZppR2jzgYZHAzs3DS6
+	ZD0DFmZa1bZtmSMnngCjPvhcTkLhhWDPkskW276MEdUCVayiFCiu1jrfXZfR9g==
+X-Gm-Gg: Acq92OGwKt3+wVgrvW3qlJSmXCbq1wtTCkv0QaR5cWUHlP4lqzHrKf7cnodZOFWekVi
+	Zobtv2FVcOqihbhoagEatTz2zkdWYjFUS0DCU+ULf2khdqdre9HLN5Ofb314bJk5oa/3Mp48awN
+	JqWCw2OYKlVb/hMIcsJ+RS6hCVGgA2QWQBxCLP295T7sAAh/wXDFfAzKaBuBmjZuc/fEbMHV+Zk
+	DLWkPEnBWGNcCNpHFjGFfHjoSh6c6neOh/RbOVUtH/pmf8eh5k29CQzK5cLaUsojXQ7w8nc3JpG
+	s9j7DEuzS/9iFzlgEowt4V5E1Tqrqf0qU65EC0Id5zU3TD7kmHg0cw9GKs/6BZdpFlMfjVKAi+5
+	uLpwuzhAeixre4K+Q+S8LGfGcW+sLZjmRQbxRyNMDjbsaUqeacV+pLoPuIYWVFTprVd3iHEmq/X
+	NCXAFXPduDpbbCUrSBXJrYn2tJX7SJ
+X-Received: by 2002:a05:7300:4307:b0:2ea:5057:a331 with SMTP id 5a478bee46e88-30398655963mr3333013eec.21.1778906782099;
+        Fri, 15 May 2026 21:46:22 -0700 (PDT)
+Received: from [172.17.0.2] ([52.159.227.1])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30293e2e686sm10424523eec.5.2026.05.15.21.46.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 May 2026 21:46:21 -0700 (PDT)
+Message-ID: <6a07f69d.d5797644.3a982e.8420@mx.google.com>
+Date: Fri, 15 May 2026 21:46:21 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5091812217174337692=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com, marcel@holtmann.org,
- "luiz.dentz@gmail.com >> Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-From: Quan Sun <2022090917019@std.uestc.edu.cn>
-Subject: [PATCH v2] Bluetooth: btintel: Use skb_pull_data return for bounds
- check
-Cc: 2022090917019@std.uestc.edu.cn
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, 2022090917019@std.uestc.edu.cn
+Subject: RE: [v2] Bluetooth: btintel: Use skb_pull_data return for bounds check
+In-Reply-To: <7dc0dfd1-7e23-43d5-a855-d1c73943d40c@std.uestc.edu.cn>
+References: <7dc0dfd1-7e23-43d5-a855-d1c73943d40c@std.uestc.edu.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5091812217174337692==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:BrQMCkD2lrLG6QdqTD0dAg--.26510S3
-X-Coremail-Antispam: 1UD129KBjvJXoW3ArW7tF4xAr4DZF17trWrXwb_yoW7KF13p3
-	43CFZ8ZrZ3Aw4aqF1Yqas5GFn0vryfGw1rGrZ2yw17CwsxK3W3J3ZrJ345Ca95Kr4kZF1f
-	ua1vvrs29r4kt3JanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9S14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r1j
-	6r4UM28EF7xvwVC2z280aVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
-	4UJwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr
-	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIF
-	xwCY1x0262kKe7AKxVWUAVWUtwCY02Avz4vEOx0_Gr4l42xK82IYc2Ij64vIr41l4I8I3I
-	0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWU
-	GVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI
-	0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0
-	rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r
-	4UYxBIdaVFxhVjvjDU0xZFpf9x0JUq385UUUUU=
-X-CM-SenderInfo: asqsjiyzqzilqqrzq21wgo3vxvwfhvlgxou0/
 
-The length check at the top of btintel_print_fseq_info() verifies
-that the skb has at least 66 bytes (sizeof(u32) * 16 + 2), but the
-function actually consumes 74 bytes:
+This is an automated email and please do not reply to this email.
 
-   2 calls to skb_pull_data(skb, 1)  =  2 bytes
-   18 calls to skb_pull_data(skb, 4) = 72 bytes
+Dear Submitter,
 
-When the firmware returns a packet of exactly 66 bytes, the last two
-skb_pull_data(skb, 4) calls return NULL, which is then passed directly
-to get_unaligned_le32(), resulting in a NULL pointer dereference.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-This patch refactors the function to check the return value of
-`skb_pull_data` instead. This ensures that every time data is pulled
-from the `skb`, we explicitly verify that it didn't return NULL,
-guaranteeing safe access. A `malformed` label is added to handle
-early termination in case the `skb` is too short, preserving the
-original `bt_dev_dbg` logging behavior.
+----- Output -----
 
-Fixes: a7ba218a44aa ("Bluetooth: btintel: Print Firmware Sequencer 
-information")
-Signed-off-by: Quan Sun <2022090917019@std.uestc.edu.cn>
+error: patch failed: drivers/bluetooth/btintel.c:3356
+error: drivers/bluetooth/btintel.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
-v2:
-   - Remove manual length check and validate every skb_pull_data() return.
-   - Add 'malformed' label for unified error handling.
-   - Fix GitLint title length warning.
+Regards,
+Linux Bluetooth
 
-  drivers/bluetooth/btintel.c | 108 +++++++++++++++++++++++++++---------
-  1 file changed, 81 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index dcaaa4ca02b99..053be9f88f7c3 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -3356,14 +3356,10 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
-  		return;
-  	}
-
--	if (skb->len < (sizeof(u32) * 16 + 2)) {
--		bt_dev_dbg(hdev, "Malformed packet of length %u received",
--			   skb->len);
--		kfree_skb(skb);
--		return;
--	}
--
-  	p = skb_pull_data(skb, 1);
-+	if (!p)
-+		goto malformed;
-+
-  	if (*p) {
-  		bt_dev_dbg(hdev, "Failed to get fseq status (0x%2.2x)", *p);
-  		kfree_skb(skb);
-@@ -3371,6 +3367,9 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
-  	}
-
-  	p = skb_pull_data(skb, 1);
-+	if (!p)
-+		goto malformed;
-+
-  	switch (*p) {
-  	case 0:
-  		str = "Success";
-@@ -3394,65 +3393,120 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
-
-  	bt_dev_info(hdev, "Fseq status: %s (0x%2.2x)", str, *p);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Reason: 0x%8.8x", val);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Global version: 0x%8.8x", val);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Installed version: 0x%8.8x", val);
-
--	p = skb->data;
--	skb_pull_data(skb, 4);
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-  	bt_dev_info(hdev, "Fseq executed: %2.2u.%2.2u.%2.2u.%2.2u", p[0], p[1],
-  		    p[2], p[3]);
-
--	p = skb->data;
--	skb_pull_data(skb, 4);
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-  	bt_dev_info(hdev, "Fseq BT Top: %2.2u.%2.2u.%2.2u.%2.2u", p[0], p[1],
-  		    p[2], p[3]);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Fseq Top init version: 0x%8.8x", val);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Fseq Cnvio init version: 0x%8.8x", val);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Fseq MBX Wifi file version: 0x%8.8x", val);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Fseq BT version: 0x%8.8x", val);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Fseq Top reset address: 0x%8.8x", val);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Fseq MBX timeout: 0x%8.8x", val);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Fseq MBX ack: 0x%8.8x", val);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Fseq CNVi id: 0x%8.8x", val);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Fseq CNVr id: 0x%8.8x", val);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Fseq Error handle: 0x%8.8x", val);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Fseq Magic noalive indication: 0x%8.8x", val);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Fseq OTP version: 0x%8.8x", val);
-
--	val = get_unaligned_le32(skb_pull_data(skb, 4));
-+	p = skb_pull_data(skb, 4);
-+	if (!p)
-+		goto malformed;
-+	val = get_unaligned_le32(p);
-  	bt_dev_dbg(hdev, "Fseq MBX otp version: 0x%8.8x", val);
-
-  	kfree_skb(skb);
-+	return;
-+
-+malformed:
-+	bt_dev_dbg(hdev, "Malformed packet received");
-+	kfree_skb(skb);
-  }
-  EXPORT_SYMBOL_GPL(btintel_print_fseq_info);
-
--- 
-2.43.0
-
+--===============5091812217174337692==--
