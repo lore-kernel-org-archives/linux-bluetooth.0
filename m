@@ -1,162 +1,116 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+Received: from morpheus.develer.net (morpheus.develer.net [2.228.72.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FC91CFBA;
-	Sat, 16 May 2026 02:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC5923536B
+	for <linux-bluetooth@vger.kernel.org>; Sat, 16 May 2026 02:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=2.228.72.60
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778898181; cv=none; b=HOFic4CY3oROxgAQY99DTabEvkQtJE2H78/ypnVnhlxK3peBTpf3AcP1vZdXSrJ+G76y7Opns9/pO+whxR0JrSpW/f9X+85F2HQpOl+nKeXE7o2VsfJCzubqQK0Kg9xg/UdXc16Z6m4+V0H5EkoNC8vYToKjxggRqgZR3kzfusw=
+	t=1778898876; cv=none; b=rHZb0ZfhWs2/xNYSPOXRMRRqvyxcelfkessqrLIh23KPis1SIwhUzafTiTXV+cf+o6YDUWeiqdssS7zsz+gTHYN6CVllYuD/yaXPdOT044oraYoYhAKDfcdwwnV5JTchTGnNT7xk4Uzn8KlIneW2HVoOtwjtnwW5zd1KoyMOrEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778898181; c=relaxed/simple;
-	bh=vZ8HI72OFbthSBJEsoHa2z/u4GgfSwQeyQsy/GOGEXY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eGU6PITCWrRKWL4GtwBptUzrSHInGdFTqCH1EtZm+YzGweOoFlysq4qgPj37jSpmr/okzk0YomWpG+napEKbee99y0PDyxx5t6EpSQAbaK7tcBXWSfixqmwE+EBsoIJBnRg62US9Y3MqwBgUBaRGRCAA5YASq3zRIUt5cAZxBRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=VrQQQOYT; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1778898876; c=relaxed/simple;
+	bh=Sr9LQCNEgyUVSUZQJoAkJM8M2xtysEoGe/O3A32DsXA=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=HjfFH8xYZOl+hyPUvXgxjnNXh0IvT0rbw2GjePHgMuwEonD3IIRDMOxj3OGdleWcCZkhZuG1zbU4gQvhCNX0eSVW8s0512Kfdn8bMOM8D3mWHiDFpFwp2oi32ndZV/BC9Ddr9FZYQ7J/cEcSaT1NORNQPwKC+qbP/Pd7CfVOF7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codewiz.org; spf=pass smtp.mailfrom=codewiz.org; dkim=pass (1024-bit key) header.d=codewiz.org header.i=@codewiz.org header.b=Uhn4C4NJ; arc=none smtp.client-ip=2.228.72.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codewiz.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewiz.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="VrQQQOYT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=o8
-	Z/FOlH+CBwFDIxdt/BJ/uYRlERnR/Hp8g+li8D4z8=; b=VrQQQOYT2D/sBVieqQ
-	5pYNcoA55AtWkEPn68KYtgm8wdwfO4PM6fXWrf71YE/mGq+6FZxr7Obxp2CpUhp4
-	v5Ir34BEG+ZL37zKwJ8ypgYSpfZ5Ucqqe28+zlRk5JYKka9qqr6XX94KnPLmjXyQ
-	lA55Z0kqYUhwNn8gIxheNc3P4=
-Received: from 163.com (unknown [])
-	by gzsmtp3 (Coremail) with SMTP id PigvCgD3Vy_K1Adq3dBFDg--.212S2;
-	Sat, 16 May 2026 10:22:15 +0800 (CST)
-From: <w15303746062@163.com>
-To: luiz.dentz@gmail.com,
-	pmenzel@molgen.mpg.de,
-	marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org
-Cc: linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	greg@kroah.com,
-	stable@vger.kernel.org,
-	Mingyu Wang <25181214217@stu.xidian.edu.cn>
-Subject: [PATCH v5] Bluetooth: hci_uart: fix UAF in hci_uart_tty_close()
-Date: Sat, 16 May 2026 10:22:00 +0800
-Message-Id: <20260516022200.396369-1-w15303746062@163.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CABBYNZ+r3gm37FW5WqE79bRp+x9UZsaCtyvfz_FdixqEucAxGw@mail.gmail.com>
-References: <CABBYNZ+r3gm37FW5WqE79bRp+x9UZsaCtyvfz_FdixqEucAxGw@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=codewiz.org header.i=@codewiz.org header.b="Uhn4C4NJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codewiz.org; s=mail;
+	t=1778898457; bh=Sr9LQCNEgyUVSUZQJoAkJM8M2xtysEoGe/O3A32DsXA=;
+	h=Date:To:Cc:From:Subject:From;
+	b=Uhn4C4NJ7/EZStOjtbKjH09nkHS86u+YtCfJRxL2ohMxkO4/N82ZdEd3YuR9NCJR2
+	 ISsxprB2MMps3CF5O5XNYnMz8ccIwgQccoXWGMouR6K4xjwsvfd2ALb/hXaX0mw2nD
+	 COiUGbX+tfXcNJgrKHuLRlvd55kHjRSlzey0WmWU=
+Received: from [IPV6:2404:7a80:ff26:6c00:7853:dba:2963:526b] (unknown [IPv6:2404:7a80:ff26:6c00:7853:dba:2963:526b])
+	(Authenticated sender: bernie)
+	by morpheus.develer.net (Postfix) with ESMTPSA id 72F4124514C;
+	Sat, 16 May 2026 04:27:36 +0200 (CEST)
+Message-ID: <9f6967e5-c37f-4e21-b0d2-8eea4a0b5809@codewiz.org>
+Date: Sat, 16 May 2026 11:27:32 +0900
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird Beta
+Content-Language: en-US
+To: linux-bluetooth@vger.kernel.org
+Cc: regressions@lists.linux.dev
+From: Bernie Innocenti <bernie@codewiz.org>
+Subject: Bluetooth: btmtk: MT7925 fails "wmt func ctrl" (-EINVAL) since
+ 634a4408c061
+Autocrypt: addr=bernie@codewiz.org; keydata=
+ xjMEXxKIihYJKwYBBAHaRw8BAQdAEaAGAHL1d+7jYCkWrJabzd1reJYnxeoh45PTz8+7ERXN
+ JUJlcm5pZSBJbm5vY2VudGkgPGJlcm5pZUBjb2Rld2l6Lm9yZz7CkAQTFggAOBYhBGkdgfqR
+ 5j+13Wxn/QvieBz8fxukBQJfEoiKAhsDBQsJCAcDBRUKCQgLBRYDAgEAAh4BAheAAAoJEAvi
+ eBz8fxuk7PEBALTnPaPxYWXvPXxQ7WLcd4BvcfxIh+86O8sfh+OK9M87AP431LAnBx6lLArU
+ 8sXlHi9kq5Nx0FEeD0iQkl4f+Wk9C844BF8SiIoSCisGAQQBl1UBBQEBB0CyluVyxU6BIr7q
+ 8dkdVt2C6CHSNE1gcNoIOTD3xcG7AgMBCAfCeAQYFggAIBYhBGkdgfqR5j+13Wxn/QvieBz8
+ fxukBQJfEoiKAhsMAAoJEAvieBz8fxukLC0A/jSvI5r8WmvrN7GMalg1PqF5JEruVtMIZaTY
+ LD/ARox4AP9mgTyGs+XWQvqdw5FiEcAVQal6BT1xTiLFq48PN/v4Aw==
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PigvCgD3Vy_K1Adq3dBFDg--.212S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxJw43Kr1DZFyDZF13JFWfAFb_yoWrCw18pF
-	9xKF90ya1DJFWjkFyDZa1xAFyrKFs2g3y2y34fW3y5Xwn8tr1jy3WIyFWI93WUAr95Cr1S
-	vFWqq3y5WFyUZ3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UlQ6XUUUUU=
-X-CM-SenderInfo: jzrvjiatxuliiws6il2tof0z/xtbC-xfGqmoH1NcPIQAA3E
 
-From: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+Hi,
 
-A Use-After-Free (UAF) vulnerability and a subsequent kernel panic were
-observed in hci_uart_write_work() due to a race condition between the
-initialization of the HCI UART line discipline and concurrent TTY hangup.
+Since commit 634a4408c061 ("Bluetooth: btmtk: validate WMT event SKB 
+length before struct access") my MediaTek MT7925 Bluetooth adapter no 
+longer initializes. The controller never registers and is absent from 
+userspace.
 
-This issue was triggered by our custom device emulation and fuzzing
-framework (DevGen) on the v6.18 kernel. Due to the highly timing-dependent
-nature of this race condition (requiring a precise interleaving of
-TIOCVHANGUP and protocol setup), Syzkaller failed to extract a reliable
-standalone C reproducer (reproducer is too unreliable: 0.00).
+I'm seeing this on a Framework 16 (AMD Ryzen AI 9) with a MediaTek 
+MT7925 (USB ID 0e8d:0717) running Fedora Rawhide.
 
-The crash trace is as follows:
-  ODEBUG: free active (active state 0) object: ffff88804024e870 object type: work_struct hint: hci_uart_write_work+0x0/0x940
-  WARNING: CPU: 0 PID: 338273 at lib/debugobjects.c:612 debug_print_object+0x1a2/0x2b0
-  ...
-  Call Trace:
-   <TASK>
-   debug_check_no_obj_freed+0x3ec/0x520
-   kfree+0x3f0/0x6c0
-   hci_uart_tty_close+0x127/0x2a0
-   k_ldisc_close+0x113/0x1a0
-   tty_ldisc_kill+0x8e/0x150
-   tty_ldisc_hangup+0x3c1/0x730
-   __tty_hangup.part.0+0x3fd/0x8a0
-   tty_ioctl+0x120f/0x1690
-   __x64_sys_ioctl+0x18f/0x210
-   do_syscall_64+0xcb/0xfa0
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-   </TASK>
+Firmware is BT_RAM_CODE_MT7925_1_1_hdr.bin and loads fine in both, so 
+this is not a firmware or kconfig issue.
 
-The issue arises because the workqueues (init_ready and write_work) are
-only flushed/cancelled if the HCI_UART_PROTO_READY flag is set. However,
-during the protocol initialization phase (HCI_UART_PROTO_INIT), the
-underlying protocol may schedule work. If a hangup occurs before the setup
-completes and the READY flag is set, hci_uart_tty_close() skips the
-teardown of these workqueues and proceeds to free the `hu` struct. When
-the scheduled work executes later, it blindly dereferences the freed `hu`
-struct.
+Bad kernel (7.1.0-0.rc3.260515g70eda68668d1.27.fc45.x86_64):
 
-Fix this by moving the workqueue teardown to the very beginning of
-hci_uart_tty_close(), outside the HCI_UART_PROTO_READY check and prior to
-calling hci_uart_close(). Furthermore, use disable_work_sync() instead of
-cancel_work_sync() to unconditionally disable the works. This ensures that
-any pending works are cancelled and no new submissions can occur before or
-during the teardown of the device connection. Note that hu->init_ready and
-hu->write_work are initialized in hci_uart_tty_open(), so it is always safe
-to call disable_work_sync() on them in hci_uart_tty_close(), even if the
-protocol was never fully attached.
+   Bluetooth: hci0: HW/SW Version: 0x00000000, Build Time: 20260106153314
+   Bluetooth: hci0: Failed to send wmt func ctrl (-22)
+   Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is 
+advertised, but not supported.
 
-Fixes: 3b799254cf6f ("Bluetooth: hci_uart: Cancel init work before unregistering")
-Cc: stable@vger.kernel.org
-Signed-off-by: Mingyu Wang <25181214217@stu.xidian.edu.cn>
----
-Changes in v5:
-- Moved disable_work_sync() to the very top of hci_uart_tty_close(), 
-  before hci_uart_close(), to prevent any concurrent re-queuing 
-  during device shutdown and resolve Sashiko static analysis warnings.
+Good kernel (7.0.0-62.fc45.x86_64):
 
-Changes in v4:
-- Adopted Luiz's suggestion to use disable_work_sync() instead of 
-  cancel_work_sync() to prevent new work submissions during teardown.
+   Bluetooth: hci0: HW/SW Version: 0x00000000, Build Time: 20260106153314
+   Bluetooth: hci0: Device setup in 296567 usecs
+   Bluetooth: hci0: AOSP extensions version v1.00
 
-Changes in v3:
-- Added 'Cc: stable' tag as requested by the stable bot.
 
-Changes in v2:
-- Added KASAN/ODEBUG crash trace.
+Bug analysis courtesy of Claude Opus, I haven't verified:
 
- drivers/bluetooth/hci_ldisc.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+   The failure (-22 = -EINVAL) comes from the new length guard in the
+   BTMTK_WMT_FUNC_CTRL branch of btmtk_usb_hci_wmt_sync():
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 275ea865bc29..ebdbcd567cd2 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -540,6 +540,15 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 	if (!hu)
- 		return;
- 
-+	/*
-+	 * Disable workqueues unconditionally before tearing down the
-+	 * connection, as they might be active during the PROTO_INIT phase.
-+	 * Using disable_work_sync() ensures no new submissions can occur
-+	 * during or after hci_uart_close().
-+	 */
-+	disable_work_sync(&hu->init_ready);
-+	disable_work_sync(&hu->write_work);
-+
- 	hdev = hu->hdev;
- 	if (hdev)
- 		hci_uart_close(hdev);
-@@ -549,9 +558,6 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
- 		percpu_up_write(&hu->proto_lock);
- 
--		cancel_work_sync(&hu->init_ready);
--		cancel_work_sync(&hu->write_work);
--
- 		if (hdev) {
- 			if (test_bit(HCI_UART_REGISTERED, &hu->flags))
- 				hci_unregister_dev(hdev);
+     case BTMTK_WMT_FUNC_CTRL:
+         if (!skb_pull_data(data->evt_skb, sizeof(wmt_evt_funcc->status))) {
+             err = -EINVAL;
+             goto err_free_skb;
+         }
+
+   The first skb_pull_data() (base 7-byte WMT event) succeeds — neither
+   "WMT event too short" nor "Wrong op" is logged — so it is specifically
+   this second 2-byte status pull that returns NULL. The MT7925 FUNC_CTRL
+   response is shorter than the full 9-byte struct
+   btmtk_hci_wmt_evt_funcc the check assumes, so a valid response is now
+   rejected. The pre-commit code tolerated this, hence the regression.
+   The commit's bounds-check intent is sound, but the trailing status
+   field should be treated as optional for devices that return a short
+   event, rather than hard failing.
+
+   The commit was isolated by code inspection: it is the only post-7.0
+   btmtk change introducing an -EINVAL in this path.
+
+   The commit is Cc: stable, so affected stable trees likely regress too.
+
+
+Happy to test patches or provide full dmesg / btmon traces.
+
+#regzbot introduced: 634a4408c061
+
 -- 
-2.34.1
+_ // Bernie Innocenti
+\X/  https://codewiz.org/
 
