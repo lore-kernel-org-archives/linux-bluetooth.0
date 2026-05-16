@@ -1,59 +1,64 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45BE53D411A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCDC3D34B3
 	for <linux-bluetooth@vger.kernel.org>; Sat, 16 May 2026 11:15:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778930104; cv=pass; b=iEF+0rFL99MSoqQoo3xOcEOuKC9EH8/035+fv3exn7SFKz4hXCbB4mN2o4bfWGzeZM2RZVwrw+dGUjO9+NWyqo80H3RUWB1QlQ+YemND8EAiQYbUmtslqi3tgLqUfYLNZ18XaVRWzcMJ884RICVzWIVxataSrJVOlgvH+24bBxA=
+	t=1778930104; cv=pass; b=edTXDQI5Lak45mGFCjddellmHSHhk8PvlfYFlmv1hsP/oxIfbrKxfOXOZogYyMuC7hKqYJbs3yiJveRtV8GXbLcmA8ApEy4aN2PYlfOH6zQYqEav1fidby39pTNIsEb33GCbGXpz0PV9p1YKt7kEhJvS3/efRs3WAmadG1IT4ng=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1778930104; c=relaxed/simple;
-	bh=Ku19p1MdrG5UrWuRAdDYiGWv4nowoiyp6vfoenLIIL0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ImWMPDD6hkRCgqDoW16yqvSrzBF5g+8i9brQRfhiYfhH7Uvq3jCn8AwW4KFAtpVFb45UDUlknq2C44FxckucsySmivNICsh0RXowxjQka2JiLgn3H8NVFiFj2a70m50TK+ZkerTqpXqnJYU5d5j6tfCCyvu/DV79k4d16bwsl84=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=dKMyu2Fi; arc=pass smtp.client-ip=195.140.195.201
+	bh=31qOIp7NiCUq5KrXYInky5eefaE25D9HzjbRjn0fB0g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VXV6jkvhHQCXkyH+A0fRwcgRWUvMm5cToSRk6aAajZj+Egem3IBUphIkiDqQf7WP12gE5yKYcCHqPASwy1T6KkY4H0ZlfBKaOHqnhe1GTdvYHhquSEOyZVaFQ1AoqJDoFKRAwU8k3kKzPvucTitKzMP54arRlOIJ7zaKPCDNpVA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=DpttR1Gr; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="dKMyu2Fi"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="DpttR1Gr"
 Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a01d])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gHhL46rTWzyPp;
-	Sat, 16 May 2026 14:14:52 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4gHhL66ySqzyck;
+	Sat, 16 May 2026 14:14:54 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1778930093;
+	t=1778930095;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=3Jcw0M61MrzS15TAjMp38mYWKVVvmolWvIFw3uM5ceE=;
-	b=dKMyu2Fil8Xss2euiQHfeJ5mo3Sno849Bi3Q7T9s5lWPaQwwdOPOGC2WggEWl4TkUhGhE2
-	03RMccTe4zr9jadPKsu/sfSoB3zHkWgR+o1n6ve3cHuDfqdcl3zl4XUTo8qjwnTWNG6avz
-	R4UMBb0rqQeHB/GQheWM31J4e0GuhLU=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PIwOMKP4zakXT0AEi1XGiiXd5Pdk2RpfKOm6d3J9Yz4=;
+	b=DpttR1Gr2GrDYvzJa9iUAPFWv/kwDb1DUhzhSr89wLg8r40D6SWNP6iMQ/ZhQDcbAw+YOm
+	b/7WJjOX/y51y1tff4sJLT1yTxZ+EIugwYvpRBHWfcbAF+Olvxtyg+PCS5m4k3mhRhhtzs
+	tatnJplUxTtromv8JIDHzhGyiy5sD+Y=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1778930093;
+	s=meesny; t=1778930095;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=3Jcw0M61MrzS15TAjMp38mYWKVVvmolWvIFw3uM5ceE=;
-	b=UmE3oRzCgrBljx5CPiONDZlpKhYcEHF9fbEYhcFxkwlVIBjmK1GBYAjFpMDuPvZBTdeRc2
-	xmWDFwbI5qwSNoEqIt1Ih0TNt17x+r0Oqd9HfguIUMcZqMrkLg1adpuAKecb/125GZY3Om
-	5rq5v3j4OV1Rt/AS7Z8QOd0K5hnKH/M=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PIwOMKP4zakXT0AEi1XGiiXd5Pdk2RpfKOm6d3J9Yz4=;
+	b=faLIXpc02F7JBwi56rvnq3TuvPt/+1iOfftr666a7mTW67n+3IKniIxl5mYabgXTnxqCWs
+	r9q/U5ivHGEsEPhVjnTpWzfiXzwXj7XlY6Y0L0Jot3mtY4IeL/u9Sk+GvLsaSvG/TYBwzh
+	Eb2fJW40JK7LSP2IppwKfgpKV84/vIs=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1778930093;
-	b=ZH/HSnn5A/poIhhQXUaRaMf8S/ULF3AJxZM871YGwPONduKC2X4XicdbJ6Zw0A13GDznd0
-	1mf7Zqj34FLQIegyiCHYyR8U8xPVpB7Kghg5wmmfvnZwHoOG/1oPIeNdWmO+uTlY+SATui
-	t6KK5gLrtqhQduvUP+bI3f8xlN16Qdk=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1778930095;
+	b=exGaA7JQaOLbs4bdlKzobUjD4Pm2FO4JGi3ck2JwoLvRx8AVpDoQAt6itnsJ+Nck1P58zu
+	cqYMHrY0Urp/7HC9sY4E0QAc/ZohdUmb0Husuz/ucJQChTPos9Knc6/wOeRNMCyA9MaauO
+	yEohzjRojW/vT4EuncDIs5p4r9URqS0=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [RFC PATCH 0/5] Bluetooth: enable context analysis
-Date: Sat, 16 May 2026 14:14:32 +0300
-Message-ID: <cover.1778930064.git.pav@iki.fi>
+Subject: [RFC PATCH 2/5] Bluetooth: hci_core: Add minimal context analysis annotations
+Date: Sat, 16 May 2026 14:14:34 +0300
+Message-ID: <b3ac1e9212d7dac1c9b1e0421188a544a8470a85.1778930064.git.pav@iki.fi>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <cover.1778930064.git.pav@iki.fi>
+References: <cover.1778930064.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,48 +67,44 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Set up compiler context analysis that generate compiler warnings on
-problems that Clang -Wthread-safety can detect:
+Add minimal compiler context analysis annotations, required for
+compilation to pass.
 
-https://docs.kernel.org/dev-tools/context-analysis.html
+compiler-context-analysis.h doesn't have tools to deal with the
+conditional SRCU locking on return value used here, so just disable the
+analysis in places.
 
-Clang 22, and probably Clang 23 [1] will be required.  Sparse locking
-analysis support was removed in commit
-5b63d0ae94ccfd64dcbdb693d88eb3650eb3c64c, this is its successor.
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
+ net/bluetooth/hci_core.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-This series enables the analysis and adds minimal annotations to silence
-some false positives.
-
-Also, one patch to fix what looks like a legitimate locking issue in
-iso.c.
-
-In future, it probably is a good idea to make more use of it and add
-__must_hold, __guarded_by etc annotations.
-
-Kernel test robot appears to be checking for these, but not sure in what
-trees [2]
-
-BlueZ testbot doesn't check these currently but it's possible to add
-https://github.com/bluez/action-ci/pull/4
-
-[1] https://lore.kernel.org/all/CANpmjNN4O=W70sAc5gaVkTAFdrGGOW+XBMyuehfz3_QMiT=uCw@mail.gmail.com/
-[2] https://lore.kernel.org/all/202605060005.JYWpZXr2-lkp@intel.com/
-
-Pauli Virtanen (5):
-  Bluetooth: af_bluetooth: Add minimal context analysis annotations
-  Bluetooth: hci_core: Add minimal context analysis annotations
-  Bluetooth: ISO: lock same hdev as what is released
-  Bluetooth: L2CAP: Add minimal context analysis annotations
-  Bluetooth: enable context analysis
-
- drivers/bluetooth/Makefile   |  2 ++
- net/bluetooth/Makefile       |  2 ++
- net/bluetooth/af_bluetooth.c |  7 +++++--
- net/bluetooth/hci_core.c     |  3 +++
- net/bluetooth/iso.c          | 14 ++++++++------
- net/bluetooth/l2cap_sock.c   |  1 +
- 6 files changed, 21 insertions(+), 8 deletions(-)
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index c46c1236ebfa..fa87cb0bcf7b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -65,6 +65,7 @@ static DEFINE_IDA(hci_index_ida);
+ /* Get HCI device by index.
+  * Device is held on return. */
+ static struct hci_dev *__hci_dev_get(int index, int *srcu_index)
++	__context_unsafe(/* conditional locking */)
+ {
+ 	struct hci_dev *hdev = NULL, *d;
+ 
+@@ -92,11 +93,13 @@ struct hci_dev *hci_dev_get(int index)
+ }
+ 
+ static struct hci_dev *hci_dev_get_srcu(int index, int *srcu_index)
++	__context_unsafe(/* conditional locking vs return */)
+ {
+ 	return __hci_dev_get(index, srcu_index);
+ }
+ 
+ static void hci_dev_put_srcu(struct hci_dev *hdev, int srcu_index)
++	__context_unsafe(/* conditional locking vs return */)
+ {
+ 	srcu_read_unlock(&hdev->srcu, srcu_index);
+ 	hci_dev_put(hdev);
 -- 
 2.54.0
 
