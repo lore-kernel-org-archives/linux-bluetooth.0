@@ -1,151 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BBAA3CAE66
-	for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 18:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7D33CAE72
+	for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 18:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779041249; cv=none; b=E4wucz56le87bury7j+aFQTcOEcRPNaTTAS0/XKgEgZxGocngJiWmYPiJEU4SQnnyLr2fTG9qw9yEpUX5h4CpLQD0+VKTKghGg4TvY4SRFLCpW4X9e2O6nxU7x/HlHihISOgjR/lWLcrQI48qMPat7AnJBxKwscDOwS6ua3zAtI=
+	t=1779041336; cv=none; b=TJVs25okp4ZZdprEF2jHJzunZLTy1Qt+rT6ptgIbNgKfDuW3aeMUNhKyYfJF6GqWa7Zy4hWHFG/BUr50NULdLpriFTxs9eANaRPozxKZ/kd5vQMwYiHvP9aShaUd9pLH2X1ElrHIC4NRNqgh64jypzlROzZ6rMkD/tBGE69qCls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779041249; c=relaxed/simple;
-	bh=7LoqH8yLo6eIGMNybQaVKiPHLTdBaGi9j7TiVXz5T4o=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=PLqnyYxgz4fB4tYVBRhzYy5fcwMH9j4T3EN8dHNPfDDVLpK1rZtbya2tNYmWv84F1ZxkBZa+XLMiTxg7ywFK4I+jIOLpHnWCC56jA6sUMWTuVu8kZa7C+81GvUx36eZM0kqCH4Mf3xG+kTHH6Lu7LtClKUfka/Eqfer68LD/N44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=epayASHZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779041336; c=relaxed/simple;
+	bh=rOgPvVJ9luMy3zvxNUEgiV+7mlyNFSeV5ChMY+xLhFg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rFRSDO8SoCRx/JvQp98Xkj5MkVg+WDOm5L8xXsX0XqHrLPRtMZliV5BtARgt9vLkjpghid+z/W7eGzAFoyf79xbGJ5uVY7LupxA8YTFEWRNWiG9npXc2FTMiMP6PYq5CtSInT1c70rc5Ih+m0fryADyz1H0EAA4N7C2Te+GIlcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZsZ3jaqK; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="epayASHZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AA19EC2BCB0
-	for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 18:07:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779041248;
-	bh=7LoqH8yLo6eIGMNybQaVKiPHLTdBaGi9j7TiVXz5T4o=;
-	h=From:To:Subject:Date:From;
-	b=epayASHZcS9rA92xK1FYTtLuPoH4fLvww5LpzPMlyzqJRoSt3dG6FZtLEf97JxeW8
-	 HKuD/tRaIYzzWOVJ5XB4Iod+xUsLR6XQBUsRxGjLKZt6t99SSLA/D0EvrRPH7XI7vo
-	 0Qx3wQDHXtWH1a8DxMyjuDQ7rZ2QsHKhwINAXxOUxgiLbJ5HN6vJgHVsfq2wnSQDIU
-	 iSzO/Bd95G4NSiEuNekv5QwZoiS17jbOQm5mDAbeH9i/A/PMah6oqPqIjB0uoJDw37
-	 +AO+P3DaWMVVoAPgFYqaYmek2EyY1sHMGHnibfmTeAxjWpaEAlREGjyd6elsACsehn
-	 7R4QqfEfhxxtA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 9571EC433E1; Sun, 17 May 2026 18:07:28 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: =?UTF-8?B?W0J1ZyAyMjE1MzldIE5ldzogTVQ3OTI1IEJsdWV0b290aCBmYWls?=
- =?UTF-8?B?cyB0byBpbml0aWFsaXplIHNpbmNlIGtlcm5lbCA3LjAuOCDigJQgcmVncmVz?=
- =?UTF-8?B?c2lvbiBmcm9tIDcuMC41?=
-Date: Sun, 17 May 2026 18:07:28 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: sphinx-rift-sector@duck.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-221539-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZsZ3jaqK"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-488a9033b2cso9863045e9.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 11:08:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779041334; x=1779646134; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rOgPvVJ9luMy3zvxNUEgiV+7mlyNFSeV5ChMY+xLhFg=;
+        b=ZsZ3jaqKiaMrA38mhvlb8vku3Jq0uuBD+gtuBnO/f+J+d91trvIlRHRXVYDN7NQWKR
+         PUTDQ/IrWbIK76x68eNQ/dozGSFVCwkHhoJnvwjAA59XVEXIQh1u6lxCF5BJtR445wfp
+         c1z6z38STj/er0/mx7/S4bioyJn8gFWGRn8ED+6yC9ZWF2ANigMbTeOHBdCSMjeYwJ7S
+         xcMxVBXDYDPQJBsKHzea18sQcJFqacJXn2od1od9Gb1bEymFt6jTLoRiW09jTkBMgKYI
+         PVd9vDc3R9/XLDpEmTjLcEBUwiAIxEtS3GiufDwdnhZAnCwpr9l6K6ml8MJbCXCt/ISX
+         g72w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779041334; x=1779646134;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=rOgPvVJ9luMy3zvxNUEgiV+7mlyNFSeV5ChMY+xLhFg=;
+        b=iNjFHJquO2Tgk/8qIDef2HQ9P6TOBszJFCIwmgN1JqbVsKga2Xg40V/O1odpsBuMel
+         ai7x4K2pOdCacwTkDra+QcTWJMV2olo/JENK3/lzXEswPbGZXlfRHxne/IEMC0UXDbt3
+         yD0sFpUUmgCwi3Aou2pvBO0hDfMTZWWirxuq8X71yWImzk7V3HKO/cvZU7oEvNqTCNVP
+         4GM8ZtVuT8NQo/vFsn2Nn07NvbAaTOFjOtRaZGHWcTdtZRuu8/bpkPIKmr5OI3kFcYDD
+         bF+/OOJTuq8VPh33UmZS2E6+1YjF7Z5EHM6wDUmNzf6LnA/XreoFmR2Vr9yGG3mZxGPH
+         fxKw==
+X-Gm-Message-State: AOJu0YzFGVK49GlWAycGlqHJ8ny1Fp4rTsC9Ac31QbB83fvvb4VrV/+2
+	xh+aSuwi5u3rj/VIuulSCNad4C5RXvSHDzaBfgv4mXIqp7Gq3lDHbBAd
+X-Gm-Gg: Acq92OFfbTQWmsEbVqCl+aR4wz8sbie501r8Ehp5ct+Cyfh6rSgKXMN+0NRO/eSJVqI
+	x11l2e4Y4R+sg8B5mfBR3aOuJ1N8+cOr7rIhKIjyFdboA2O4yXKQuwVJKPtqu5MUdTlKg3MYk22
+	maJ/OPsLiveho16ZNroHKr2xiQLwNKpJI38ZsbdMey455tRZfjdeecqtBwWsvB8KyYy5f9pQnk3
+	enXsIAxd+MKZBOHSEWzb+/e7pQSc9LYLf7ZvNICGbfVOYhfB5ckIz8QVPCQQe0PChGVXGR4snBi
+	HMImVQQz/TCOOTYVeBfZAy9lGDuCjP61g3F8LbxZuoQdvHPv1EGA9RozElxRBY28zWdW35aUhC2
+	hoiujD/2j/7Qmj44aOmpwtzvuh49RTAq4xrkDnVFqNfci4L4VEltxh47vcgPb6EtfLnU0IHKqy0
+	hj42p0rjWxcqSBSCRxWr/ecLhaLUaw4zDgbT6AbzE0OLLzdBfSwlnUMAFPKnAtReXrVHq/KbxpD
+	w==
+X-Received: by 2002:a05:600c:3b12:b0:488:a824:fdff with SMTP id 5b1f17b1804b1-48fe61ed2cfmr169618865e9.22.1779041333535;
+        Sun, 17 May 2026 11:08:53 -0700 (PDT)
+Received: from node ([202.47.63.86])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48febe585absm65005075e9.19.2026.05.17.11.08.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 May 2026 11:08:52 -0700 (PDT)
+From: Muhammad Bilal <meatuni001@gmail.com>
+To: pmenzel@molgen.mpg.de
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	johan.hedberg@gmail.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: SMP: add missing skb len check in smp_cmd_keypress_notify
+Date: Sun, 17 May 2026 14:08:32 -0400
+Message-ID: <20260517180832.52329-1-meatuni001@gmail.com>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <3a7eaf6e-6e4e-42b1-a136-3ed2befa90e2@molgen.mpg.de>
+References: <20260517145417.31910-1-meatuni001@gmail.com> <3a7eaf6e-6e4e-42b1-a136-3ed2befa90e2@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221539
+Hi Paul,
 
-            Bug ID: 221539
-           Summary: MT7925 Bluetooth fails to initialize since kernel
-                    7.0.8 =E2=80=94 regression from 7.0.5
-           Product: Drivers
-           Version: 2.5
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: sphinx-rift-sector@duck.com
-        Regression: No
+Thanks for the review.
 
-**Hardware:**
-- Framework Laptop 13 (AMD AI 300 series)
-- WiFi/BT chip: MediaTek MT7925 (RZ717)
-- PCIe ID: MEDIATEK Corp. MT7925 (RZ717) Wi-Fi 7 160MHz
-- BT interface: USB (hci0)
+Moving the check after bt_dev_dbg() would not be safe since the debug
+statement reads kp->value, which is exactly what the length check is guarding.
 
-**Working kernel:** 7.0.5
-**Broken kernel:** 7.0.8
-**Firmware:** linux-firmware 20260410
-(mediatek/mt7925/BT_RAM_CODE_MT7925_1_1_hdr.bin)
-**Distro:** NixOS 26.05 (unstable)
+On a truncated SMP_CMD_KEYPRESS_NOTIFY packet, skb->len may be smaller
+than sizeof(*kp) when entering the handler, so evaluating kp->value in
+the debug log would already access out-of-bounds memory before the
+guard is reached.
 
-**Description:**
+Therefore the length check needs to remain before any access to
+kp->value.
 
-Bluetooth on the MediaTek MT7925 stopped working after upgrading the kernel
-from 7.0.5 to 7.0.8. WiFi continues to work via the mt7925e PCIe driver. Th=
-e BT
-USB device enumerates and hci0 is created, but the WMT firmware handshake f=
-ails
-with EINVAL (-22). The adapter cannot be brought up.
-
-This is a regression: the same firmware and hardware work on kernel 7.0.5.
-
-**Symptoms:**
-
-- `hciconfig hci0` shows BD Address: 00:00:00:00:00:00, state DOWN
-- `hciconfig hci0 up` returns: "Can't init device hci0: Invalid argument (2=
-2)"
-- `modprobe -r btusb && modprobe btusb` does not resolve the issue
-- Rebooting does not resolve the issue
-- rfkill shows hci0 not blocked (soft or hard)
-
-**dmesg (relevant lines):**
-
-```
-Bluetooth: Core ver 2.22
-Bluetooth: HCI device and connection manager initialized
-Bluetooth: HCI socket layer initialized
-Bluetooth: L2CAP socket layer initialized
-Bluetooth: SCO socket layer initialized
-usbcore: registered new interface driver btusb
-Bluetooth: hci0: HW/SW Version: 0x00000000, Build Time: 20260106153314
-Bluetooth: hci0: Failed to send wmt func ctrl (-22)
-Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is
-advertised, but not supported.
-mt7925e 0000:c0:00.0: WM Firmware Version: ____000000, Build Time:
-20260106153120
-```
-
-Note: `HW/SW Version: 0x00000000` indicates the chip is not responding to
-version queries during the WMT protocol handshake.
-
-**Steps to reproduce:**
-
-1. Boot a system with MediaTek MT7925 on kernel 7.0.8
-2. Check `hciconfig hci0` =E2=80=94 adapter is DOWN with null BD address
-3. Attempt `hciconfig hci0 up` =E2=80=94 fails with EINVAL
-4. Downgrade to kernel 7.0.5 =E2=80=94 Bluetooth works
-
-**Related:**
-- Bug 219sp688 reports MT7925 BT initialization failures on kernels 6.12=E2=
-=80=936.15,
-but with USB enumeration timeouts (-110). This bug is different: USB
-enumeration succeeds, but the WMT func ctrl command fails (-22).
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Regards,
+Muhammad Bilal
