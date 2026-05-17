@@ -1,28 +1,28 @@
 Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852073093D8
-	for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 16:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA982C1788;
+	Sun, 17 May 2026 17:47:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779036937; cv=none; b=gcdXFPjGnHikXbcLWCXcJvZwnZreEcHHCc6hDIo8fZSsoT62p7c/A7EsmQj7rnAB3+BGLKyY1eqrjs721jVO//4v/PFh9sY6cCtIea6nzY8Jwz5sLH6nEIdHLYlSmGRiTGZ+MFR/+h7aYQCoUDGP8Indk4ZQmfNYj4f1moux59E=
+	t=1779040063; cv=none; b=HvPeXpf9GcxEG32Ua/7Tga7DmczXJRRQd7mnKUIpEP7S+vrZcAxygkSUuxS9pwiw8FRV4WBwZ7kGH8wpVUYT5R/3DUR8PFmXtkgMn7xOMUC1+2Ze/t2fP7Fvhmi45SHwFU0FpF7fwowCzquv5EpIWT1snQsMb9mfhM+IROpFwAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779036937; c=relaxed/simple;
-	bh=KilqzaA0hLDIZ+qQ211YAHNj7GgAvuvoyt4Ky1BySpE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=K2pc4RtxwkMZHbQJvcOI8Jw18MYfbuuCrNhS5BoPG85FsVvhDU1nRMd6bGc6AtF9VKKPdbJPgjNc6RGEy9mYc8eCSp6LeXZqNW4r0sQQSUIQFYKR7n1T5CAruSArxiU0i9Gd+P4uUBBZPz4qVygovNmPCe1M9Yx+FP8Aq6+qETU=
+	s=arc-20240116; t=1779040063; c=relaxed/simple;
+	bh=VofNwlQa8QMZRp9505LXFAm77ygLe0tyLY+2GwwnOsM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MAa0eRFKVnmAGYMtxZ8Jxr0iCXMFxM8FwPF59caad11N+Y3E3hoSlAcCZTs6m46km2Qo7NRtCiBxTwLnpA2F9KlPxjl2psEMi7tZa0zbtHlbfwvFjiMcmVy7b/HXrhcdth+74+IR+nsovLE8b5CXvpq1n5MtKYCpOwb8Zc/qh48=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [172.16.28.56] (user-109-243-196-8.play-internet.pl [109.243.196.8])
+Received: from [192.168.131.144] (sec5.rz2.abl-rz.com [88.198.244.220])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 5BC4D4C2C37D56;
-	Sun, 17 May 2026 18:54:58 +0200 (CEST)
-Message-ID: <e12a170f-5340-4f45-8550-127039de805a@molgen.mpg.de>
-Date: Sun, 17 May 2026 18:54:44 +0200
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 8C9C34C1A0B1B3;
+	Sun, 17 May 2026 19:47:33 +0200 (CEST)
+Message-ID: <3a7eaf6e-6e4e-42b1-a136-3ed2befa90e2@molgen.mpg.de>
+Date: Sun, 17 May 2026 19:47:30 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -30,219 +30,62 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] Bluetooth: btintel: Use skb_pull_data return for
- bounds check
-To: Quan Sun <2022090917019@std.uestc.edu.cn>
-References: <20260517060142.24510-1-2022090917019@std.uestc.edu.cn>
+Subject: Re: [PATCH] Bluetooth: SMP: add missing skb len check in
+ smp_cmd_keypress_notify
+To: Muhammad Bilal <meatuni001@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ marcel@holtmann.org, luiz.dentz@gmail.com, johan.hedberg@gmail.com,
+ stable@vger.kernel.org
+References: <20260517145417.31910-1-meatuni001@gmail.com>
 Content-Language: en-US
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, kiran.k@intel.com,
- linux-bluetooth@vger.kernel.org
 From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260517060142.24510-1-2022090917019@std.uestc.edu.cn>
+In-Reply-To: <20260517145417.31910-1-meatuni001@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Dear Quan,
+Dear Muhammad,
 
 
-Thank you for your patch.
+Thank you for patch.
 
-Am 17.05.26 um 08:01 schrieb Quan Sun:
-> The length check at the top of btintel_print_fseq_info() verifies
-> the skb has at least 66 bytes (sizeof(u32) * 16 + 2), but the
-> function actually consumes 74 bytes (2 * 1 + 18 * 4). When firmware
-> returns a packet of exactly 66 bytes, the last two skb_pull_data()
-> calls return NULL, which is passed directly to get_unaligned_le32(),
-> resulting in a NULL pointer dereference.
-
-How did you find this? Manual review, or some tool?
-
-> Remove the insufficient length check and instead validate every
-> skb_pull_data() return value, branching to a malformed label that
-> logs the error and frees the skb.
-
-Where you able to test the new code on hardware?
-
-> Fixes: a7ba218a44aa ("Bluetooth: btintel: Print Firmware Sequencer information")
-> Signed-off-by: Quan Sun <2022090917019@std.uestc.edu.cn>
-> ---
->   drivers/bluetooth/btintel.c | 106 +++++++++++++++++++++++++++---------
->   1 file changed, 79 insertions(+), 27 deletions(-)
+Am 17.05.26 um 16:54 schrieb Muhammad Bilal:
+> smp_cmd_keypress_notify() accesses the received payload as
+> struct smp_cmd_keypress_notify without verifying that skb->len
+> contains enough data.
 > 
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index 5e9cac090bd8..0c42ee53fe2e 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -3358,14 +3358,9 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
->   		return;
->   	}
+> smp_sig_channel() removes the opcode byte before dispatching to
+> command handlers, so a SMP_CMD_KEYPRESS_NOTIFY packet without a
+> payload leaves skb->len equal to zero on entry to the handler,
+> causing a 1-byte out-of-bounds read from the heap.
+> 
+> Add a length check before accessing the payload and return
+> SMP_INVALID_PARAMS when the packet is too short, matching the
+> pattern used by other SMP command handlers.
+> 
+> Fixes: 1408bb6efb04 ("Bluetooth: Add dummy handler for LE SC keypress notification")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Muhammad Bilal <meatuni001@gmail.com>
+> ---
+>   net/bluetooth/smp.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> index 98f1da4f5..4c98e2a3a 100644
+> --- a/net/bluetooth/smp.c
+> +++ b/net/bluetooth/smp.c
+> @@ -2932,6 +2932,9 @@ static int smp_cmd_keypress_notify(struct l2cap_conn *conn,
+>   {
+>   	struct smp_cmd_keypress_notify *kp = (void *) skb->data;
 >   
-> -	if (skb->len < (sizeof(u32) * 16 + 2)) {
-> -		bt_dev_dbg(hdev, "Malformed packet of length %u received",
-> -			   skb->len);
-> -		kfree_skb(skb);
-> -		return;
-> -	}
-> -
->   	p = skb_pull_data(skb, 1);
-> +	if (!p)
-> +		goto malformed;
->   	if (*p) {
->   		bt_dev_dbg(hdev, "Failed to get fseq status (0x%2.2x)", *p);
->   		kfree_skb(skb);
-> @@ -3373,6 +3368,8 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
->   	}
->   
->   	p = skb_pull_data(skb, 1);
-> +	if (!p)
-> +		goto malformed;
->   	switch (*p) {
->   	case 0:
->   		str = "Success";
-> @@ -3396,65 +3393,120 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
->   
->   	bt_dev_info(hdev, "Fseq status: %s (0x%2.2x)", str, *p);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Reason: 0x%8.8x", val);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Global version: 0x%8.8x", val);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Installed version: 0x%8.8x", val);
->   
-> -	p = skb->data;
-> -	skb_pull_data(skb, 4);
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
->   	bt_dev_info(hdev, "Fseq executed: %2.2u.%2.2u.%2.2u.%2.2u", p[0], p[1],
->   		    p[2], p[3]);
->   
-> -	p = skb->data;
-> -	skb_pull_data(skb, 4);
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
->   	bt_dev_info(hdev, "Fseq BT Top: %2.2u.%2.2u.%2.2u.%2.2u", p[0], p[1],
->   		    p[2], p[3]);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Fseq Top init version: 0x%8.8x", val);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Fseq Cnvio init version: 0x%8.8x", val);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Fseq MBX Wifi file version: 0x%8.8x", val);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Fseq BT version: 0x%8.8x", val);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Fseq Top reset address: 0x%8.8x", val);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Fseq MBX timeout: 0x%8.8x", val);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Fseq MBX ack: 0x%8.8x", val);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Fseq CNVi id: 0x%8.8x", val);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Fseq CNVr id: 0x%8.8x", val);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Fseq Error handle: 0x%8.8x", val);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Fseq Magic noalive indication: 0x%8.8x", val);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Fseq OTP version: 0x%8.8x", val);
->   
-> -	val = get_unaligned_le32(skb_pull_data(skb, 4));
-> +	p = skb_pull_data(skb, 4);
-> +	if (!p)
-> +		goto malformed;
-> +	val = get_unaligned_le32(p);
->   	bt_dev_dbg(hdev, "Fseq MBX otp version: 0x%8.8x", val);
->   
->   	kfree_skb(skb);
-> +	return;
+> +	if (skb->len < sizeof(*kp))
+> +		return SMP_INVALID_PARAMS;
 > +
-> +malformed:
-> +	bt_dev_dbg(hdev, "Malformed packet received");
+>   	bt_dev_dbg(conn->hcon->hdev, "value 0x%02x", kp->value);
 
-It’d be great to log more information, wouldn’t it?
+Add the check after the debug log, so it can be inspected?
 
-> +	kfree_skb(skb);
->   }
->   EXPORT_SYMBOL_GPL(btintel_print_fseq_info);
 >   
+>   	return 0;
 
 
 Kind regards,
