@@ -1,123 +1,115 @@
-Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C437B337B97
-	for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 11:37:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565B4325490
+	for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 14:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779017829; cv=none; b=I5N8aTQroHJt7i28E/pDVAanLAggLK2rUvgeHX40IKi6J/Mwvpgewi3l69bsGRExEzWxzOCLNQ57cGFP94njlcGmiHcWm0Qd1jRjFnYK/ws1AsXYARu6gWqfOaNNhBrfnBMVVFbespDxELJ1Q4QNIZ7ZI/IzrqZ249Cs7MMclTg=
+	t=1779029721; cv=none; b=PWWmo24UF9QLf7K4HIRlGvwompYu0wH4995qpLkAFVHew1aVA3xjiJ+aNPEUOz2NnLYStzXFKxi5tvKeMLRUj4Cau5MG5Nl2TBx6pOBx98Cf+yYiGQB5cIrNP04TvmhSsiVCauq+xKzDihdbHEivhFxdOc+A8/kb8VQ3g81I6k8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779017829; c=relaxed/simple;
-	bh=secDqwrcOP/p+f5wyZDYva+VYYTmp8byCSsyRdXRTpg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Mpj8XfLQa9gRRMavrwCOzn/ZwXbU4rCliNN8nbCWDTk2UDQwqUT4zyfkjJ9q+VFs1G9SVpD7Zg5bXUcacBTij8iA+ExTm/9gCLrUuKACnEq0BxEGq/QzUidpQ9d2GXz3TJqgRpqTorlaFs0Po8NySjm8zLZ8OLgY+40F7LhG1qA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dHcK9OTK; arc=none smtp.client-ip=74.125.82.169
+	s=arc-20240116; t=1779029721; c=relaxed/simple;
+	bh=i5BLItaK7oOYPrFOtKeP2AkbysLIvxhDNelq+76nRF8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pn+0O3uoXES3wrS0G2LJuXPYCni+8lcgUP0JHeSQaFZq7wZ+3e3n45/F240/+qjYjsWh2dIbYJn9IFAYd2ahCwz9E9An0em9rqtE39nIa/Wu6yITQeuf0C6FuWOTcnpJtIYRslteVnUOgANNCry/Dmdgf4P/a4KTBlACrZi3Vj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X6cISo2p; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dHcK9OTK"
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-2f36da5c8fbso1035102eec.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 04:37:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X6cISo2p"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-43d7645adbdso794080f8f.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 07:55:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779017826; x=1779622626; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=O0F+5cBOgIiP1dEKHNznC5g8o8EjuVWXpvOg4WaExnk=;
-        b=dHcK9OTKvtJDRZcytaq/Sr5xmsKk+iOVYCmyUnvhwwoWL8VG2BtewC1KlCyJF+oMT7
-         hJpxT+nFzr2C2kd7sV4zFjkYCVK2Rhge9THOOf7vl0qkgkBO6V/eKBIWUnHcrKFcyTTV
-         7U4c6q4MyL6HqLh+vMLqerNNeP8BLss93rhETkLqeUDbFd+5wVARGpEj93mdVCOT0ryM
-         P4k8kURkS/ypwLKqStOW5JM7EOlIEgOid9Hk+8oKSNDH9Jnnh9qcnPqvhXNOXgAU2A9Q
-         6t4R+7icVVLdysq4tnbVd3CV5/OqSoB3FYjaALRnaaYO5QKZsV0Ff+vAJ1cOvp9bmqVA
-         oEBA==
+        d=gmail.com; s=20251104; t=1779029719; x=1779634519; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z/l4dCK28Qtpju1OTSn9skmQqRPcoauwVCiaFA7ILGc=;
+        b=X6cISo2pQ4YeGP/UrHyE5bt0efVaZfNSN0nAoEtFWPv/hqIzCkqfQKwTX2h6541PLF
+         T4d9PuDBo0Ke55yFxVcF0o3K2Dd7NCRnGZP5h2KyRSLHPsTDmxrnpArjWT6s3aQ+fQwR
+         uZEW283QuK6In4qDPAThr3SKwz2y1JW2m3ZJ9FhJTGvRRIAzUK3mkwxDyJ+b+Wohnre8
+         v7J+3KT38uAzXJEiXCDqVodT0V1VxsMPQhO41/CD0QRkw5ViOfaYCDkIBPgWsGhegl7N
+         +zdC7r0BxaLXcR7uXWcm5dQLEJHikmBYysKth98vLbcei0Niob32kuG3ASxrV1uA2G3o
+         j9eA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779017826; x=1779622626;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1779029719; x=1779634519;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=O0F+5cBOgIiP1dEKHNznC5g8o8EjuVWXpvOg4WaExnk=;
-        b=QTpZPc69migut4GN8mRq1i/1JAnIOIy/0DG4ZxYvbk+j5fgRHQasOrcy4Ao7ubkwnw
-         8ybrRQZBfAqwyqF18sN71s76c5xjgstCAQBZSIbIDyjYV8wTeWxcNhTGwTkfVhL1/dbb
-         UAH5qy813ppH0k876PLYd8n5gL4sLf7zVgBed2vBwPwhheBsEZTfTJ29FI2fkMeQLKAR
-         gh4RPvA3Gr0nSeibj4g7aywoC0WD96rvRm+jEJKVQWcAtNoaHfJQGmmX9bwFhZqxqKBJ
-         kbQg0SdCOIjjjM9QJvKtMpw/6hrohBWLRoD+y9n4o+mjQJ6tvFwKJZdUwAs/zJafz7k5
-         LORg==
-X-Gm-Message-State: AOJu0Ywf1TYKd/Gg1qmBZOE8eFFQvvIfbV1mwatk26/lCjwr4ND0sWsF
-	b5ruLmOIVYPPVi6H2m4YCjRIw43G3JKqZpPMvJ8H5gW5x0XN9+8mBG1hT7VejQ==
-X-Gm-Gg: Acq92OEj8/W24sMuLkrpncRuoYpdlHvDkf/mdYE7S7QJTkYz5PxabQcUeUUtJlVbt6W
-	/rl9Zqbc8YAwH+LsA419XTcAdrLgCOxd6WSuhgu4u2NmL2Cf6PgHeu1jv9u5dwFVeGINLbe8jVD
-	a9KUTS+v6PdS77cR+AQoMvxcTYeA3Ut7C89rMdbyahBdtkc2Qxl8TiLb3CzUCwd0W3LiCwRDL8m
-	f7jWkCkEbD6O6Kbx3UFT7YwUO8FUtooDvX/5leaGhxrUKEit25VmdzF9ExRnnOeCLhuD7DAGAXF
-	CeSMXUQAUWD3DsA/nvA7X54+FxB+JrprY2lAQ6uqJKtTMNKuQNjNeyp+F8o9cijZQ+SkLQvtTjG
-	PzP9IYtJxpaszeo7u1elxCtL48UCGSmFB9I5tiJS5rJJVhF7Qou57fjA19TA7H0/ZdbeZZNeNOo
-	Uh7gTQQNE8dK4Ne05PJ1m7VRe1oQLB3nc=
-X-Received: by 2002:a05:7301:2907:b0:2d3:2983:c87c with SMTP id 5a478bee46e88-303981710b6mr5018816eec.1.1779017826401;
-        Sun, 17 May 2026 04:37:06 -0700 (PDT)
-Received: from [172.17.0.2] ([52.159.226.243])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30296dcb6f6sm14500224eec.17.2026.05.17.04.37.05
+        bh=Z/l4dCK28Qtpju1OTSn9skmQqRPcoauwVCiaFA7ILGc=;
+        b=shHBIsbXb+6W8Qgtqmrx+tAGXD51AiNl4Ji4MxOBk665uM8Ewcl366c/oQ4rOFcFZp
+         zitikapD//ocUcXFaMQ0+EpqmMbHXj13Sr7oSECJq0vuykYemZq4S7vLS5KEzWi/hZ2G
+         ghe1kf71gYDhIp2Tp9gvSMlTCdRU/ttsRGaT7gVy+SYxjl2qbCesxswi5yFzQ/7eIXAY
+         +KDKOo/Jvl2PdKeum5JQLNYJ5k0Z2AwxzRKuvpbptoaqjlCytRjO+wW9ygQA3Wo+Cm8j
+         o7C86hjxloXfVKC7khNtoZH8WRzm4cyjX3nidAMsBiusU5CHrVKG1v1Q6Wta1li1mjt+
+         iQwQ==
+X-Gm-Message-State: AOJu0Yw7N6sVEAJqaNrFfgzT10WwLAgs2tYK2rv7/+qYWwgk41TpyJ+s
+	hLiDubnEdSdR52poAFSR7jOwbdp1DxhH3eD113AGfntmjTgetXtWjJ4PZlVXh7qwEIlJQyhb
+X-Gm-Gg: Acq92OFpgqfGPlbyBBSqqFaKiBtSraNbSZWlldUe2HqmicLVRUo4IvOkUWbCbHo2d5k
+	zTNtZoJ+Qrw+czJDmCVElndSA+AuEaNORgI6Y4GFmpQae1QR/69F93gyl7pJuOrqTjFb4ps0emw
+	5wz4jtZj61/oy8fX6xG6xfCi7TxlQFGxpNxc0mQbCO1R9czuUxHFhQdwP3Dy3FSQZ1D0u0sWF3g
+	WUZ186CYnilX3yKWdSZ1YSwdU60bAO7ZVbuXi+87y4YdKfhP8BsbWHBpfIkkkDN4BZ4x8QB35mA
+	h1yhYMU9bbSYcNGppXb073TJcrlX2X18nVk59fq9vnKFI6Lt0UMxVUk1LU/XBytmWCeS/oCXvOa
+	h2ZHDxnG5xaFxuyZcorbddWHJTdYPxSxwz8yrzdKX9yrqHwt5s5CQRwnRg8dbhWojRXF54xzlEt
+	zpQ8n6DwTJS4S7kCP/vctPy8Ktans+E2d6QoEKSIj79fWSklXKJiZ2j2nvC/ZOsPU4ZWyNrVwoR
+	A==
+X-Received: by 2002:a05:600c:8901:b0:487:1108:48b8 with SMTP id 5b1f17b1804b1-48fe60e367fmr150620875e9.2.1779029718624;
+        Sun, 17 May 2026 07:55:18 -0700 (PDT)
+Received: from node ([202.47.63.86])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fead1c364sm62260885e9.8.2026.05.17.07.55.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 May 2026 04:37:05 -0700 (PDT)
-Message-ID: <6a09a861.d08db960.4b0d5.cde1@mx.google.com>
-Date: Sun, 17 May 2026 04:37:05 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1350611134424868676=="
+        Sun, 17 May 2026 07:55:18 -0700 (PDT)
+From: Muhammad Bilal <meatuni001@gmail.com>
+To: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	johan.hedberg@gmail.com,
+	stable@vger.kernel.org,
+	Muhammad Bilal <meatuni001@gmail.com>
+Subject: [PATCH] Bluetooth: SMP: add missing skb len check in smp_cmd_keypress_notify
+Date: Sun, 17 May 2026 10:54:17 -0400
+Message-ID: <20260517145417.31910-1-meatuni001@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ] media: use custom DBus timeouts only when remote side is waiting
-In-Reply-To: <60b9da865b9beb482f914818c31866ebb00960f7.1779011736.git.pav@iki.fi>
-References: <60b9da865b9beb482f914818c31866ebb00960f7.1779011736.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============1350611134424868676==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+smp_cmd_keypress_notify() accesses the received payload as
+struct smp_cmd_keypress_notify without verifying that skb->len
+contains enough data.
 
-This is automated email and please do not reply to this email!
+smp_sig_channel() removes the opcode byte before dispatching to
+command handlers, so a SMP_CMD_KEYPRESS_NOTIFY packet without a
+payload leaves skb->len equal to zero on entry to the handler,
+causing a 1-byte out-of-bounds read from the heap.
 
-Dear submitter,
+Add a length check before accessing the payload and return
+SMP_INVALID_PARAMS when the packet is too short, matching the
+pattern used by other SMP command handlers.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1096011
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.32 seconds
-GitLint                       PASS      0.20 seconds
-BuildEll                      PASS      20.21 seconds
-BluezMake                     PASS      660.37 seconds
-MakeCheck                     PASS      3.56 seconds
-MakeDistcheck                 FAIL      230.19 seconds
-CheckValgrind                 PASS      225.47 seconds
-CheckSmatch                   PASS      351.66 seconds
-bluezmakeextell               PASS      182.49 seconds
-IncrementalBuild              PASS      670.58 seconds
-ScanBuild                     PASS      1032.73 seconds
-
-Details
-##############################
-Test: MakeDistcheck - FAIL
-Desc: Run Bluez Make Distcheck
-Output:
-
-make[4]: *** [Makefile:10239: test-suite.log] Error 1
-make[3]: *** [Makefile:10347: check-TESTS] Error 2
-make[2]: *** [Makefile:10818: check-am] Error 2
-make[1]: *** [Makefile:10820: check] Error 2
-make: *** [Makefile:10741: distcheck] Error 1
-
-
-https://github.com/bluez/bluez/pull/2129
-
+Fixes: 1408bb6efb04 ("Bluetooth: Add dummy handler for LE SC keypress notification")
+Cc: stable@vger.kernel.org
+Signed-off-by: Muhammad Bilal <meatuni001@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/smp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 98f1da4f5..4c98e2a3a 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -2932,6 +2932,9 @@ static int smp_cmd_keypress_notify(struct l2cap_conn *conn,
+ {
+ 	struct smp_cmd_keypress_notify *kp = (void *) skb->data;
+ 
++	if (skb->len < sizeof(*kp))
++		return SMP_INVALID_PARAMS;
++
+ 	bt_dev_dbg(conn->hcon->hdev, "value 0x%02x", kp->value);
+ 
+ 	return 0;
+-- 
+2.54.0
 
---===============1350611134424868676==--
