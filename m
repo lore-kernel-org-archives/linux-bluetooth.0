@@ -1,93 +1,76 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from out-32.smtp.github.com (out-32.smtp.github.com [192.30.252.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77797405C48
-	for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 10:30:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779013820; cv=pass; b=PBRBxX98thuJlVJm/tH2RB12ED2EQ68v6dQRyd5MvhvpDGYdkajhLFmaCdJ6WTzigDGS/DjsGi+yvazv6hryoYlT1q5RGyre1RP11gqDloQDvPigQUeBEUf+hfK0lXCnpzL3v9zVJ/gwA+kIUJk5izoQbKcq0AsuIWqkc0mgQFM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779013820; c=relaxed/simple;
-	bh=V1ZLXKInfJTF//i2Ch4OAg5QrFtKsshzYaToQ/OB+RA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fd3TOHaEi91+FmHTwsvC68RmeLCGN32ZgyJVwBqq2yd0zj93db7jaMXW4xfB/oWfD2IEVkgCazSdAowLXY9U5reFmz3rd3nf3RMrY1fgoYqduSua2QFsydMtjlOzHCYCXnt2Jc3St+QivHQeG2h1rmuvsiIFdPgZPi84Wt3sXbA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=GsHe5UzN; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490BC30566A
+	for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 10:39:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779014358; cv=none; b=KyPhoKvjOoGshhPSFyxk3OfnwtesM4TA6rkH9nxlV0BquM7xg5UDRKwZtlS48nw5eGIi8UdPWBa+1P1gucCLO+cg/wqXFCLHmT+i10jbmtXeFWk3FVK/9VpLgOwOETF3kvE5u0PneNGognAXUCZNzOEy2n2nFY87519O/XgJz+w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779014358; c=relaxed/simple;
+	bh=V9MKFTgEjNk4EqEutrCTSxUJQXAaJW/hGGu2sSgnOZc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=FNTjxg/WnysT1kGgp1PskFLRJVUzgMO2fXcPSaj8SbiCYSgX1sbWqr3cq9/LGCVZj48htw6jeSvdAJ8PkiguYG6M/UIH00WdWSNmgL5o05RrFkEAgiRAc5SnUSP8E8wb/KocMFmBUin3GAtHM4fh+T7lbktY8gMqL1nuMIhtR5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=IOK93P1N; arc=none smtp.client-ip=192.30.252.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="GsHe5UzN"
-Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:2::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gJHJ92nyjzyTf;
-	Sun, 17 May 2026 13:30:17 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1779013817;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NlG1g3Z9Eo65G+/xdQudbO9ShHCvwh6Vf74xU+HeDRA=;
-	b=GsHe5UzNhfKe6MPOshmgZTt8q3nBFOBkBeDIOtXdTS/a5bUihpcVWtQLXeK0cjAqCQz2Us
-	r3fyDhLstym10JvQfO66ZDug3yhMdq59NBbB4XLQeMy6V1KGSpWB1sTZiZo2SUU7q3QkQI
-	/tBeRPBjcDK2IAzvZm4mg9LKMCnOG/I=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1779013817;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NlG1g3Z9Eo65G+/xdQudbO9ShHCvwh6Vf74xU+HeDRA=;
-	b=W5odLtEAHmoIKFEhKrrQASxqSt5ezDAiKXEL7A9O9Gv5OkhzgbfcqjDhp9c0IuLPaCGdyv
-	Wfj/Y2wDNubjLoLsnhTIwSIWugAFg4Ry4qi/jbT0BKwwem0XzvwplfB0qTA55ztkuMdklf
-	AwcJFCcKASMwz2G8IFFDP+aKMrIeVtc=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1779013817;
-	b=GuUlAiG41EBrSUBBG2tH9Z/tEmyw5hWaiWdtS+KTHBF2w3aD2gvx3JzsVb++bqfrnvuqhb
-	VrAzInvECj+nCxMDqnWJ2bwBFJepsLxfihHWKYynOG+20J6XGYXm6bdDvYYDVWcQmiAkVN
-	OwHlUbMfXGl+geROXkWSoXTEyGxcK/k=
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="IOK93P1N"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1779014356;
+	bh=qcDyDXnDjScsBfFWHfWHm9pKluRgg64K9vK3y6uvr5w=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=IOK93P1N0eVWAt3L1mbAu0+hBei7JLaTPbKs8jtLEay2Kzi31fdgJiXuslHJln9pw
+	 CcsiTtr9xMaDK57zPqCMs4Ay2tzNhXoTwiqUSpbYNqvGi9yn8j00AbVli+cLGhNbYH
+	 czEzSFGoWmuyjK018/EK1c3dif9fv4dPBR2jNO5w=
+Received: from github.com (hubbernetes-node-678d3f8.ac4-iad.github.net [10.52.221.43])
+	by smtp.github.com (Postfix) with ESMTPA id 80624321151
+	for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 03:39:16 -0700 (PDT)
+Date: Sun, 17 May 2026 03:39:16 -0700
+From: Marcel Holtmann <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 3/3] main.conf: fix unintentionally set value
-Date: Sun, 17 May 2026 13:30:10 +0300
-Message-ID: <9f8f586b241d6ea2bc602eff7941972232210907.1779013529.git.pav@iki.fi>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <e7e72c0208f579fd6bb63b76f9d2a1ea3cabd2fc.1779013529.git.pav@iki.fi>
-References: <e7e72c0208f579fd6bb63b76f9d2a1ea3cabd2fc.1779013529.git.pav@iki.fi>
+Message-ID: <bluez/bluez/push/refs/heads/master/4f4dba-45e66b@github.com>
+Subject: [bluez/bluez] 81a4df: build: Fix inclusion of local_node.json and
+ prov_d...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Commit 31e4fb1498f ("monitor: Add decoding support for HIDS 1.1 flags
-and attributes") unintentionally set a non-default value in main.conf.
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 81a4df3e88d7b347244195d05c478d7119c242e2
+      https://github.com/bluez/bluez/commit/81a4df3e88d7b347244195d05c478d7119c242e2
+  Author: Marcel Holtmann <marcel@holtmann.org>
+  Date:   2026-05-17 (Sun, 17 May 2026)
 
-Restore the value back.
----
- src/main.conf | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  Changed paths:
+    M Makefile.tools
 
-diff --git a/src/main.conf b/src/main.conf
-index 39584e225..5846ef92d 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -289,7 +289,7 @@
- # Export claimed services by plugins
- # Possible values: no, read-only, read-write
- # Default: read-only
--ExportClaimedServices = read-write
-+#ExportClaimedServices = read-only
- 
- # Security level:
- # Sets security level of ATT channel, setting security anything other than
--- 
-2.54.0
+  Log Message:
+  -----------
+  build: Fix inclusion of local_node.json and prov_db.json
 
+
+  Commit: 45e66b1c4aed688e1959d38dbb9834d248d12c2d
+      https://github.com/bluez/bluez/commit/45e66b1c4aed688e1959d38dbb9834d248d12c2d
+  Author: Marcel Holtmann <marcel@holtmann.org>
+  Date:   2026-05-17 (Sun, 17 May 2026)
+
+  Changed paths:
+    M .gitignore
+
+  Log Message:
+  -----------
+  build: Include test-util binary to ignore list
+
+
+Compare: https://github.com/bluez/bluez/compare/4f4dba4a7863...45e66b1c4aed
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
