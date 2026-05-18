@@ -1,121 +1,97 @@
-Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28104405C4D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2026 02:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.172
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6783D2AD03
+	for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2026 04:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779072995; cv=none; b=Wa9dmLRGuCEGIyHz2G8rPoy/hF1r7HeCUaJyzkRgyxM6cirVeb84KZqCNMNbg3W2ov1ACJGvoEtgMN1vpIymYRDznwVLRw0cU+3Bb/TKkb9JBNZOeNwKech5oWxL2em1eGhEqodpCGa0b8/ADervPlpVD56jxfZPUWrsnDAhS1c=
+	t=1779076937; cv=none; b=W+ZEzFVrwMBgewfclqtnS0ZAQEkwRbgdn91NEdc4zy1dEs4j/CYAxbs9qYnTQ/IT8y5SR2if9+MbQEjGO6CaheDcVy4DW28jSZ+zFUB/MGDnJUjitrWW7LCxY2fkG0o+smWKAUpo3Mj7ouJcP6Kp0ivzAkv+KVJkhAOFbUKP8PY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779072995; c=relaxed/simple;
-	bh=HRUZChm4dUrHg7lm+Pyr8pcCeNWZ2ViEpo2VbLjapZ4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=nPyyQApeEEQbnJ3I0/IDvy39Ipb5rLD17Fxs0XS7YREXFaEeyr+hY9li4TQPpVYsJ/D7/70SmpdFia4M523FmNZjeyUBA8TBpkdg1t6RBZUHt3/iCFiXs/Cs679UoaxiWtpKjlg0fyPJjGZXpwLFsxCRT4qUMpiKnySNA9sQSt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nF/XebbT; arc=none smtp.client-ip=74.125.82.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1779076937; c=relaxed/simple;
+	bh=FD309anZJFGvb3b1mUlkKSqrkqnrjLS401lzppMi0Hg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KHtGh7Q9hvEV/8xoI+lCq49hlUePPxhfsDCmDUvM2tOkip9mddZkfN20BqXjptlGU1pUD66WuzAOFRt3MYMhjU96TdN6Tggl748iMFf4LUHMMfe2wJceu+txwd2I2v8CFZXG2w7RCaZku4OuCTb/TUN08VSkE1H1923G5IQxziw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn; spf=pass smtp.mailfrom=std.uestc.edu.cn; dkim=fail (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b=zpEJYU7n reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=std.uestc.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nF/XebbT"
-Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-303dbfbec77so599104eec.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 19:56:33 -0700 (PDT)
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b="zpEJYU7n"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779072993; x=1779677793; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=vYuiYCuN6V/xx4HSJfEzMshQbACN89RvvrVsBce0pZw=;
-        b=nF/XebbTbwfyGMlrHjl4m1LN2l6yLcnh/EwxoUiF4pxzmZGTnYFx6Fz8hEYSQOytIo
-         zBsdxRQqc+lVvAp0wtLOJdbx/EudwvTztn/7m1GEwV7WNz6QBqP88UeUjqhMsbmh+Zo7
-         5nesAtgEFZZE0NYevPQFYF+LmRwfdYp/xH3/64F31QKxPAbfp3Map28I3d71ryM2GYCe
-         5plgMC9hNAnordjHOar3nsipTXTOSta5RpQT8UdlWCHqc4Jhzni7IcOSISsB9WYfk4R+
-         fPP9l7aAtNguOLPPfqbhMrQhRrpMBCe6MEA9icZE6OFWOf9t/qcyPGhBEnfC+bq0Bly0
-         Nc3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779072993; x=1779677793;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vYuiYCuN6V/xx4HSJfEzMshQbACN89RvvrVsBce0pZw=;
-        b=Q3ll9lvFBkAbFrpKR1hkoHNKEcR4GGRY/o1bQxo/DomVAs/sEm589G3len/Ap2r/kR
-         uG95L7V8+LCvWRF/zLBtbCEkwJZ1QPHjCJyMHdGISAben39UwNC82/6gse9bsbGiC1Dj
-         UnqZw4a/iiJIJe61HH9TxSDQ3iDE7Oe1zFxrFWydW1bNQEF1DTIiSKV3WIN/ZDioDklJ
-         KX8fdSEh+Y8sPt++4Tir9mDydvw3/LplOuQ4KANOM0tCxMsAyhy5FMAZcNZ/g1BTpE+y
-         uaAH7fxd+X5pqlB+TPP+r3avGs62loVRs8iTd8sswVAJoqsgeqtcFkSr+5Uq0sQi4ixn
-         OYZQ==
-X-Gm-Message-State: AOJu0YzCS7makRC+WUFNkXWEsd6/+j7mKXvlnkodPGY7hS6JyVniQfSq
-	hlGdyl313lImHk4OigQ2ksYq6EgNcHgZxflEsB5AWamjiysVJsNG5C/FuZWGwA==
-X-Gm-Gg: Acq92OGsmtz3uVJCh7eSQkkdJgYjzBSn4jWpSmWgK3fMbuNO8pmyMuRxVH1Hvnm9bxg
-	nasxEJqgDGJgfjtVcC5eAL9akrn6MDj3UlpdAajnRE4MPERA4KCbisTIutpqU66VgMc45Dmpu5T
-	MoigLX7DCfSTHlShNPJZkg8QB68ZUoCk61fOyaGMLtHcgKRjK83pG9/RaJvILO+oCcqSlmtnucx
-	/XSJRcGI5jK+X4ofP2kTj8nBycFJfTUO5UtBtwqBBTI02tfZLhFYHHv8JHxLNvXUDI9+dYo/pyX
-	BKtuboaEDeoowwmjHfgcODVWHcyKx7idaw4oXS/zTlpCxTkKPevLGGgZKgQS1Yy9o3cYVLSgWY/
-	o031mEJJYiWDu0WAE/gRbjWeQrqHsq6mY7+JyBWKz+m5lznrNs0/+hR7huUlwt46hBo2y2PAnTt
-	MMrNFOBgfTgL3m8HUuPPa5tpjxd+sMnJs=
-X-Received: by 2002:a05:7301:7c0b:b0:2e6:e77d:7bcf with SMTP id 5a478bee46e88-30398618b7cmr6201390eec.22.1779072993239;
-        Sun, 17 May 2026 19:56:33 -0700 (PDT)
-Received: from [172.17.0.2] ([128.24.160.164])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-302973bcc5asm12746894eec.22.2026.05.17.19.56.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 May 2026 19:56:32 -0700 (PDT)
-Message-ID: <6a0a7fe0.fb1bf61a.3bbfe1.cf80@mx.google.com>
-Date: Sun, 17 May 2026 19:56:32 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3953742951440786867=="
+	d=std.uestc.edu.cn; s=dkim; h=Received:Message-ID:Date:
+	MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	In-Reply-To:Content-Type:Content-Transfer-Encoding; bh=KkxpiW6iU
+	aQfhcSyWB0dqtx2TvUu+G7SLOwPCZkpSq8=; b=zpEJYU7n1gKXyzFO+I3v5LTN1
+	ewwGatvZJjIHUPCB0fQCJF6q2D1YTtaV4hjE41ZAnKYoDDPfOWOJ7eL/wRVeMOS8
+	XlXmltTDt8DUwyEWa08YYPpJctCRQVKdKWGRp1zWbm9Uy7j6iCwK/urkZDutIURh
+	Ra3mrsEEfY/pCq3r2U=
+Received: from [IPV6:240c:c983:9:f75d:d073:8d85:2c9e:8984] (unknown [240c:c983:9:f75d:d073:8d85:2c9e:8984])
+	by hzbj-edu-front-3.icoremail.net (Coremail) with SMTP id BbQMCkBGbzk3jwpqxEokAg--.4435S3;
+	Mon, 18 May 2026 12:02:04 +0800 (CST)
+Message-ID: <3fa1a0e5-7f6b-42a8-9d46-b02f4738e8fd@std.uestc.edu.cn>
+Date: Mon, 18 May 2026 12:01:58 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, meatuni001@gmail.com
-Subject: RE: Bluetooth: HIDP: fix missing length checks in hidp_input_report()
-In-Reply-To: <20260517234805.116570-1-meatuni001@gmail.com>
-References: <20260517234805.116570-1-meatuni001@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] Bluetooth: btintel: Use skb_pull_data return for
+ bounds check
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, kiran.k@intel.com,
+ linux-bluetooth@vger.kernel.org
+References: <20260517060142.24510-1-2022090917019@std.uestc.edu.cn>
+ <e12a170f-5340-4f45-8550-127039de805a@molgen.mpg.de>
+From: Quan Sun <2022090917019@std.uestc.edu.cn>
+In-Reply-To: <e12a170f-5340-4f45-8550-127039de805a@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:BbQMCkBGbzk3jwpqxEokAg--.4435S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7GF4fAF4DCryDtF1UAF4UCFg_yoWDXrXEga
+	yxZ3srGw1UGFsrAwnaka17ArZrKrWkZry8Zrs5XwsIv3sYvr1qyF4kJwnIvr1IkayxJrnr
+	Can5GrnIywnrujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbs8YjsxI4VWxJwAYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I
+	6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM2
+	8CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0
+	cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I
+	8E87Iv6xkF7I0E14v26r4UJVWxJr1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8I
+	j28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr
+	4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCY
+	1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8Jw
+	C20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAF
+	wI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjx
+	v20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2
+	jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43
+	ZEXa7IU8lfO7UUUUU==
+X-CM-SenderInfo: asqsjiyzqzilqqrzq21wgo3vxvwfhvlgxou0/
 
---===============3953742951440786867==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Dear Paul,
 
-This is automated email and please do not reply to this email!
+Thanks for your review and feedback!
 
-Dear submitter,
+> How did you find this? Manual review, or some tool?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1096211
+This was found via manual code review. I noticed that skb_pull_data(skb, 
+4) is actually called 18 times, meaning the function consumes 74 bytes 
+in total, but the initial check only verified that skb->len was at least 
+66 bytes.
 
----Test result---
+> Where you able to test the new code on hardware?
 
-Test Summary:
-CheckPatch                    PASS      0.61 seconds
-GitLint                       PASS      0.25 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      25.57 seconds
-CheckAllWarning               PASS      27.88 seconds
-CheckSparse                   PASS      26.78 seconds
-BuildKernel32                 PASS      24.79 seconds
-TestRunnerSetup               PASS      530.22 seconds
-TestRunner_l2cap-tester       PASS      378.32 seconds
-TestRunner_iso-tester         PASS      596.24 seconds
-TestRunner_bnep-tester        PASS      18.62 seconds
-TestRunner_mgmt-tester        PASS      2023.70 seconds
-TestRunner_rfcomm-tester      PASS      63.42 seconds
-TestRunner_sco-tester         PASS      141.24 seconds
-TestRunner_ioctl-tester       PASS      133.47 seconds
-TestRunner_mesh-tester        PASS      59.92 seconds
-TestRunner_smp-tester         PASS      17.98 seconds
-TestRunner_userchan-tester    PASS      19.13 seconds
-TestRunner_6lowpan-tester     PASS      51.17 seconds
-IncrementalBuild              PASS      23.75 seconds
+Unfortunately, I wasn't able to test this on actual hardware as I don't
+have access to this specific Intel Bluetooth chip. However, the fix
+strictly ensures that we don't dereference a NULL pointer returned by
+skb_pull_data() when the packet is shorter than expected.
 
+> It’d be great to log more information, wouldn’t it?
 
+That's a very good point. I'm planning to update the malformed label to 
+log the remaining length, like this:
 
-https://github.com/bluez/bluetooth-next/pull/206
+     bt_dev_dbg(hdev, "Malformed packet received, remaining len %u", 
+skb->len);
 
----
-Regards,
-Linux Bluetooth
+Does this look good to you, or would you prefer logging some other details?
 
+Kind regards,
+Quan Sun
 
---===============3953742951440786867==--
