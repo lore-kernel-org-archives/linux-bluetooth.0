@@ -1,55 +1,52 @@
-Received: from out203-205-221-155.mail.qq.com (out203-205-221-155.mail.qq.com [203.205.221.155])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46F9287510
-	for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2026 02:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7FDE371868;
+	Mon, 18 May 2026 02:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779070401; cv=none; b=KA8P9TYdI5t2RGsvJvBJ+DkRdB6k0Mf0ktVwykRm+mZF370xj2erik1mnlBz/IhkOvWdRwxdgJyCoWiGXb+Q8jgL056simrPpiXZMT8SMXMW05GlVA9qgOtgi4jmN1H3nbgiLoN1i+AZybBnX9chRzS9eMvLUro7V33fwOGrRsk=
+	t=1779071139; cv=none; b=VzjfsjUaU2R50KJReMRUL2VQ+sSIpqVe4udOyub4n/E353kyZHxa5Bg4YAM7AooODtogqwFU0RN7bGG66ZLN8kiILrsjBD/tvAY8YBOqanCoqW4qX5wyhA9+SNVvHJOcph7aPuGxgA8kc1vCu+eqltvV1xlPOyKar6pAMBNirJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779070401; c=relaxed/simple;
-	bh=CvXlrQgt5nbjic24fVRRrqtlMrYzoMpTclQwXdzzzKA=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=U54GLRMKDGkKA/8nsPImMqTxN3H257LOj/kP3cvUknMGlRibbqdSBTV40tHhd60fBpHYMH7IvP6vRXxiOTX64sRBjN8V3arfF8Au51OMOBjHHpMahSLUC3oOPYVY7d7HDAVAuegd6t9/maA4QbaiIu+mgrtapbX0US0MiuheYIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=S/4jA/6o; arc=none smtp.client-ip=203.205.221.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="S/4jA/6o"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1779070391;
-	bh=g3aApX6ZvDWELzM4Bkx755eOMaWEW0Pzm8qHjexG6Gg=;
-	h=From:To:Cc:Subject:Date;
-	b=S/4jA/6oaQTAybA17ONd8ZdKtIyqztpGkZ+eW16ePS7fJj1q/s1MnBe0ktS2+Y/Nv
-	 7Cm4d1HYnJC12PHKsbeOVDgUYCuqntTIvnrib2EN/BJpqbxoZ6YVyzyDKUTKxsgNG1
-	 XY/5wpJSCT/jSe+kkPTtzLMDdeuUmcUdthvjiDxE=
-Received: from localhost.localdomain ([116.128.244.169])
-	by newxmesmtplogicsvrszc50-0.qq.com (NewEsmtp) with SMTP
-	id 349946AE; Mon, 18 May 2026 10:13:09 +0800
-X-QQ-mid: xmsmtpt1779070389t5zb098fg
-Message-ID: <tencent_9B9A0B74FBCC9D4EF1CA4D8EE89DFB444606@qq.com>
-X-QQ-XMAILINFO: MpvrJ5NyRx5iSleeuldDu2cxMw0Pp88Efsews//Ips+gsw7AcGRaucy56hPVw6
-	 TFKD5T+mCu7Nie6tVFwlnBlfRds2INGQEV+YdWvS/4z0n+sMwvjDDjurCDC7EUihn/7i771Vob1U
-	 82RibGSxiUEFD/97Pj+BBHe5JOP+x61JiE+PVwl4eclEXWxpijpNA2i/EKMjx15c6j5RW6d8d6eN
-	 UgaJCF74frIw+ByNJTejZ4lQ4Gxnz5HSskEUU9UYXtDy3lze699yCx8S5d62zGT5Hq9/ZZuICWBr
-	 FVXS0TSd2yPwrL/C+PLaVgdr0JA9VwwfLnSajFI0YCEua/BX+iaZaUMXf8/3AKGcY78oKnE+qHqN
-	 Fho8cvk1AugS1P7nLS7aASg6CyONxrSaQiI0DuqEg8pVueEAoVu4W8iPkb4w7YsKdvyXsTHVVQ8c
-	 PDZXAvOC0TIlYHayrou8kC8hPpn8qMMnm0sH0vKE5QI4cjcmY2Yu+77wuRtzhtmRookRMmw4+o8m
-	 T3NE3ABboYUlY5HtNW5IktB0tJ+x6H/1QoaegqYtI7K1UDVyWXxnzLXE9K+Fa23vcZg2xfyf+7tW
-	 H9O4JIksQP25fSOPofz5m6YxHs54DoaB+ydw8jNpYfAhcUH8dvQyr1fe+Axkd5UKIKCD8zQH24OT
-	 gDZ3JAzMVwGLogS6FC079sWqxVxnkGucwN2Vtm/Rj8ZuqJMRu3fl5llVeVMmJ9oegjYI3F9wluyr
-	 u5IxoL0Bm1fXvHqZRBFt+qwFE8LYvOvTOIzXwors1FxGkSaqZG6zf8MDWNlzLnaCOXcgUO/ZDD7a
-	 F3B08rf8QzbC8cgOSxaDOreU0E7koUxr1pNrH6vYgvwpHdvsRhR7IdNz3uQcvwklU8ACZ3uTnfup
-	 VhqesC8LySzr7GbIceepTca8st1X1HcBbYybw2YJmkiT9lbsqxMzrwzQbnnXr+Pr7dmopu1/7gtF
-	 DGMJvMRnOjn5ET15qoyP2VPOGhOSlpzaQ7jL7wWrd1w9jFG8rW8VikvXewXYIts1rvhz5q3vFMR/
-	 T7x9VmFA==
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
-From: Zhao Dongdong <winter91@foxmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Zhao Dongdong <zhaodongdong@kylinos.cn>
-Subject: [PATCH BlueZ] device: fix inverted NULL check in gatt_db clone
-Date: Mon, 18 May 2026 10:12:40 +0800
-X-OQ-MSGID: <20260518021240.87483-1-winter91@foxmail.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1779071139; c=relaxed/simple;
+	bh=uV+jFBUEnGXkLLZqFCtOF97/0ASYUIImSng7OVIxVpU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=erMWDI7IlN8hdmZPzmE4ZvjRw3kT5CrhdmNhqeT+xHqhzfNR5/7kQ3p6/9t7stsqO4E40MzTbDLC+xD7MBsL6f+Wgp2Hd3x7ATA7H9EgjfZS+y96jQ6AkhnQO5pI3wc28YhvnNCV/y36Rc9Nl2ubxxOdkK/3LqTpaKHUy3lv2qM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: d561538e526011f1aa26b74ffac11d73-20260518
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:c236859b-15a4-4d0b-b8c7-16c31383d480,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:e7bac3a,CLOUDID:6e5ed57f5224c0bbdd472a88d5105ce5,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102|865|898,TC:nil,Content:0|15|50,EDM:-
+	3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,A
+	V:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: d561538e526011f1aa26b74ffac11d73-20260518
+X-User: liujiajia@kylinos.cn
+Received: from nature.lan [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <liujiajia@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 341870714; Mon, 18 May 2026 10:25:27 +0800
+From: Jiajia Liu <liujiajia@kylinos.cn>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Sean Wang <sean.wang@mediatek.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Jiajia Liu <liujiajia@kylinos.cn>
+Subject: [PATCH] Bluetooth: btmtk: fix urb->setup_packet leak in error paths
+Date: Mon, 18 May 2026 10:24:02 +0800
+Message-ID: <20260518022402.20398-1-liujiajia@kylinos.cn>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -58,35 +55,35 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Zhao Dongdong <zhaodongdong@kylinos.cn>
+The setup_packet of control urb is not freed if usb_submit_urb fails or
+the submitted urb is killed. Add free in these two paths.
 
-gatt_db_clone() returns NULL on failure so the condition was inverted.
-With the old check a successful clone (non-NULL) would return false and
-skip swapping the device's GATT database, while a failure (NULL) would
-fall through and dereference a NULL pointer a few lines below.
-
-Fix by negating the condition: only bail out early if the clone failed;
-proceed with the swap when the clone actually succeeds.
-
-Fixes: cbe4144 ("set: Attempt to use existing set gatt-db")
-Signed-off-by: Zhao Dongdong <zhaodongdong@kylinos.cn>
+Fixes: a1c49c434e150 ("Bluetooth: btusb: Add protocol support for MediaTek MT7668U USB devices")
+Signed-off-by: Jiajia Liu <liujiajia@kylinos.cn>
 ---
- src/device.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/bluetooth/btmtk.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index 28515054c..bea893301 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -7896,7 +7896,7 @@ bool btd_device_set_gatt_db(struct btd_device *device, struct gatt_db *db)
- 		return false;
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index f70c1b0f8990..5330f06f000a 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -537,6 +537,7 @@ static void btmtk_usb_wmt_recv(struct urb *urb)
+ 		return;
+ 	} else if (urb->status == -ENOENT) {
+ 		/* Avoid suspend failed when usb_kill_urb */
++		kfree(urb->setup_packet);
+ 		return;
+ 	}
  
- 	clone = gatt_db_clone(db);
--	if (clone)
-+	if (!clone)
- 		return false;
+@@ -610,6 +611,7 @@ static int btmtk_usb_submit_wmt_recv_urb(struct hci_dev *hdev)
+ 		if (err != -EPERM && err != -ENODEV)
+ 			bt_dev_err(hdev, "urb %p submission failed (%d)",
+ 				   urb, -err);
++		kfree(dr);
+ 		usb_unanchor_urb(urb);
+ 	}
  
- 	gatt_db_unregister(device->db, device->db_id);
 -- 
-2.25.1
+2.53.0
 
