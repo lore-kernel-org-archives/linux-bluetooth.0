@@ -1,207 +1,117 @@
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [46.38.247.119])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896571EB5E3;
-	Mon, 18 May 2026 04:39:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.38.247.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DD03909BC;
+	Mon, 18 May 2026 05:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779079172; cv=none; b=LqsLE+45ma8Tb/5TO/GMgY4MFRRkvsyB+Pv+3Bm1Qa0GXDAZ9icDqvoGnY4qvpMt2jCSHSiYTdSxNdwkhY2W1Dgp0L/9lWi467uyYnX2Nkxy6Nid+M/zj3d021hUdAqDjq8M1bDwVnzYbumAHRZCc6FvFL+mhqhYvpxXmoprrmQ=
+	t=1779081485; cv=none; b=lAQI+40ofvuKP0SVw5g6R58zmBCRWrbTb1UtokDMFFF8d2TQAZQ7MCNzML/34Vf3c3ZbjIF1FX7fswW4LrsfhCyA9hHG2dKn0snIV/f8xG50Q05nwwCg4u0pR5ZXFnp3fnZRgAgPbLoJGfO4NdCx3GFSPlWiDdPOo2bPtLEccrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779079172; c=relaxed/simple;
-	bh=OzaLGagXIHUtFy4JrSoMFMJIG2DLcb6UhsO9uRYB6g8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eOgjKLCEKDvlAcUWBF16f7NzegWg+Os6a05ANywTWngqj8GxCLmmHpfUQ+d7o8hSkhvU1/4fx+Dh9kKcjePIbGJ8KdB/Ab2M04Yxm+ibLIh9is6QQ6CCkf/J8C9cZbpCde/AbY4pNlS/DtQ3xuVwAix3VFKN+5sGHIfWZ3mW410=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=HAZP68dX; arc=none smtp.client-ip=46.38.247.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1779081485; c=relaxed/simple;
+	bh=43g81XSFBRuKLnE3nx3m6HcBUveV5+phoYj2i75oaZI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ODOyN4UAjSh8hsO1KeIhd+epyMJbd+X/mzl7lx4uZ8UfiOG+A+qLCf1PwP58UBU8oajbWHPoU5ZYbi6ee3KByRrm1tWtxs3BYh3Zmbh4d5nbP5xoeq6AajbAljYNJg0DlkjDOrlngoOkUEiYUlR6ZU3QWSdNaJXVKnSDS1D27kI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=CNMnG5dz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="HAZP68dX"
-Received: from mors-relay-8404.netcup.net (localhost [127.0.0.1])
-	by mors-relay-8404.netcup.net (Postfix) with ESMTPS id 4gJlSp4Hxnz88ZL;
-	Mon, 18 May 2026 06:39:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1779079162;
-	bh=OzaLGagXIHUtFy4JrSoMFMJIG2DLcb6UhsO9uRYB6g8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=HAZP68dXuFErFiaB+INOgkEdsO10jvzRmFUKyFdzVCGCu6WxdgVZDQbVFwGsSllig
-	 9NQjT+wBml17Kn/LBOgncXFxxGdvfo/Q3AWutV6IQHE42mPtxff3NCZnZP+mmCXUif
-	 2UcRag51H4m6H0R/ESavFG60Ke4im7Mhu2GR1yOl7r5KPfs7CCSNEZm7YDyQTILFZ1
-	 IQ0PmHwzCGqDyJhZet5DZY93hYCzWW32FR17QQeIU51rpwXRPDTvNPjeN3MyMkBVi0
-	 9byMT2qUOCvH54YxBAwmTk/BME+dkyNLvAJasLLMo8CIVNbKmuMoUYBsYzC3FWgUFG
-	 n0/c7NztsIfKg==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-8404.netcup.net (Postfix) with ESMTPS id 4gJlSp3bmFz4y9R;
-	Mon, 18 May 2026 06:39:22 +0200 (CEST)
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4gJlSn06SVz8sbH;
-	Mon, 18 May 2026 06:39:21 +0200 (CEST)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id EEDD761859;
-	Mon, 18 May 2026 06:39:19 +0200 (CEST)
-Authentication-Results: mxe9fb;
-        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <e31f3922-a3e4-4993-aad5-d3973e8fd88e@leemhuis.info>
-Date: Mon, 18 May 2026 06:39:19 +0200
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="CNMnG5dz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE423C2BCB7;
+	Mon, 18 May 2026 05:18:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1779081484;
+	bh=43g81XSFBRuKLnE3nx3m6HcBUveV5+phoYj2i75oaZI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CNMnG5dzDemJqPqjKq53rWd/DAjSsxe8Og06CJIu0Wfy58maPNW6iivpGsZNGGErJ
+	 aGnOAtlqDGISKDZL0Lvs70aK2Sm1uX+UNlCvqmAdXkdfCSJTYYxOMlz/a+MWSnsi8d
+	 gWJ09kWToXhZXYvL4y4BE3xp0FyK30q7cfudwuao=
+Date: Mon, 18 May 2026 07:18:08 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Muhammad Bilal <meatuni001@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	marcel@holtmann.org, luiz.dentz@gmail.com, johan.hedberg@gmail.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: HIDP: fix missing length checks in
+ hidp_input_report()
+Message-ID: <2026051801-oops-makeover-da91@gregkh>
+References: <20260517234805.116570-1-meatuni001@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] Bluetooth: btmtk: MT7922 "Failed to send wmt func
- ctrl (-22)" after 634a4408c0615c ("validate WMT event SKB length before
- struct access")
-To: Brandon Arnold <brandon.arnold@gmail.com>, linux-bluetooth@vger.kernel.org
-Cc: luiz.von.dentz@intel.com, tristan@talencesecurity.com,
- chris.lu@mediatek.com, linux-mediatek@lists.infradead.org,
- gregkh@linuxfoundation.org, stable@vger.kernel.org,
- regressions@lists.linux.dev
-References: 
- <CAM07e=vYJE8khJmbsn75SOYye44o8YV8TZsRyF1mFRuUTMCgUw@mail.gmail.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-In-Reply-To: 
- <CAM07e=vYJE8khJmbsn75SOYye44o8YV8TZsRyF1mFRuUTMCgUw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-PPP-Message-ID: <177907916034.1224972.6526818772537645703@mxe9fb.netcup.net>
-X-Rspamd-Server: rspamd-worker-8404
-X-Rspamd-Queue-Id: EEDD761859
-X-NC-CID: PkYu26wWqt6EFZ70ruyetuywmOlLLQScmB9N8nSUyoxWkDceoy4=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260517234805.116570-1-meatuni001@gmail.com>
 
-On 5/18/26 01:25, Brandon Arnold wrote:
-> #regzbot introduced: 634a4408c0615c206885e60ea05f489c426f64b6
-> #regzbot title: MT7922 BT controller never registers (wmt func ctrl
-> -22) after btmtk WMT SKB-length validation
+On Sun, May 17, 2026 at 07:48:05PM -0400, Muhammad Bilal wrote:
+> hidp_input_report() reads keyboard and mouse payload data from an skb
+> without first verifying that skb->len contains enough data.
+> 
+> hidp_recv_intr_frame() pulls the 1-byte HIDP header before dispatching
+> to hidp_input_report(). If a paired device sends a truncated packet,
+> the handler reads beyond the valid skb data, resulting in
+> an out-of-bounds read of skb data.
+> The OOB bytes may be interpreted as phantom key presses or
+> spurious mouse movement.
+> 
+> Add a check that skb->len is non-zero before the type switch, and
+> per-report-type minimum length checks before accessing the payload.
+> 
+> Signed-off-by: Muhammad Bilal <meatuni001@gmail.com>
+> ---
+>  net/bluetooth/hidp/core.c | 19 ++++++++++++++++---
+>  1 file changed, 16 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> index 976f91eeb..03838a6ff 100644
+> --- a/net/bluetooth/hidp/core.c
+> +++ b/net/bluetooth/hidp/core.c
+> @@ -179,12 +179,22 @@ static void hidp_input_report(struct hidp_session *session, struct sk_buff *skb)
+>  {
+>  	struct input_dev *dev = session->input;
+>  	unsigned char *keys = session->keys;
+> -	unsigned char *udata = skb->data + 1;
+> -	signed char *sdata = skb->data + 1;
+> -	int i, size = skb->len - 1;
+> +	unsigned char *udata;
+> +	signed char *sdata;
+> +	int i, size;
+> +
+> +	if (!skb->len)
+> +		return;
+> +
+> +	udata = skb->data + 1;
+> +	sdata = skb->data + 1;
+> +	size = skb->len - 1;
+>  
+>  	switch (skb->data[0]) {
+>  	case 0x01:	/* Keyboard report */
+> +		if (size < 8)
+> +			break;
+> +
+>  		for (i = 0; i < 8; i++)
+>  			input_report_key(dev, hidp_keycode[i + 224], (udata[0] >> i) & 1);
+>  
+> @@ -213,6 +223,9 @@ static void hidp_input_report(struct hidp_session *session, struct sk_buff *skb)
+>  		break;
+>  
+>  	case 0x02:	/* Mouse report */
+> +		if (size < 3)
+> +			break;
+> +
+>  		input_report_key(dev, BTN_LEFT,   sdata[0] & 0x01);
+>  		input_report_key(dev, BTN_RIGHT,  sdata[0] & 0x02);
+>  		input_report_key(dev, BTN_MIDDLE, sdata[0] & 0x04);
+> -- 
+> 2.54.0
+> 
+> 
 
-Thx for the reports, there are quite a few similar ones already; the
-problem is known and the fix (see the link below) should be heading to
-mainline this week and from there go to stable.
+<formletter>
 
-Ciao, Thorsten
+This is not the correct way to submit patches for inclusion in the
+stable kernel tree.  Please read:
+    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+for how to do this properly.
 
-#regzbot dup:
-https://lore.kernel.org/linux-bluetooth/770d36b07311bf88210c187923f243fb9f126f04.1777058551.git.pav@iki.fi/
-
-> Hello there.
-> 
-> I wanted to report the below information about a commit that I
-> confirmed broke my MediaTek MT7922 adapter. The commit is also built
-> into the main Arch Linux package, so it affected me during a routine
-> update (see the BBS link in the report below). This adapter is the one
-> that came with my Framework Laptop 16 system.
-> 
-> Apologies for Claude's verbosity and language but I can confirm I
-> attended the bisect and revert of the offending diff. Thank you!
-> 
-> Workaround in use: pinned to the Arch Linux pre-7.0.7 kernel.
-> 
-> Thanks,
-> Brandon Arnold
-> 
-> Commit 634a4408c0615c ("Bluetooth: btmtk: validate WMT event SKB
-> length before struct access"), backported to 7.0.x stable and shipped
-> in v7.0.7, breaks Bluetooth on the MediaTek MT7922: the WMT function
-> control step fails with -EINVAL and the HCI controller never
-> registers. WiFi on the same chip (mt7921e) is unaffected.
-> 
-> This is NOT a v6.19->v7.0 mainline regression -- mainline v7.0 is
-> GOOD. The regression is the above commit specifically; it is absent
-> from v7.0 and v7.0.6 and present in v7.0.7.
-> 
-> Scope / affected versions
-> -------------------------
-> - GOOD: mainline v7.0, linux-stable v7.0.6 (commit absent)
-> - BAD: linux-stable v7.0.7 (commit present)
-> - Independently reported on Arch (different machine -- Lenovo
-> IdeaPad, MT7922 USB [0489:e0d8]): BROKEN on linux 7.0.7.arch2-1,
-> WORKING on 7.0.6.arch1-1, identical symptom.
-> https://bbs.archlinux.org/viewtopic.php?id=313561
-> 
-> Hardware / firmware (primary reporter)
-> --------------------------------------
-> - Framework Laptop 16 (AMD Ryzen AI 300 Series), board FRANMHCP09 A9
-> - BIOS: INSYDE/Framework 03.04, 2025-11-06
-> - MT7922, PCI [14c3:0616] subsys [14c3:e616]; BT side USB, driver
-> btusb/btmtk; WiFi side mt7921e (works)
-> - linux-firmware 20260410; BT firmware BT_RAM_CODE_MT7922_1_1,
-> HW/SW Version 0x008a008a, Build Time 20260224103448
-> - bluez 5.86
-> 
-> Symptom
-> -------
-> The firmware download and version handshake still succeed (identical
-> HW/SW version line before and after), then:
-> 
-> Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20260224103448
-> Bluetooth: hci0: Failed to send wmt func ctrl (-22)
-> 
-> No "Device setup in N usecs" follows; BlueZ reports "No default
-> controller available". hci0 exists in /sys/class/bluetooth and is not
-> rfkill-blocked. Reproducible deterministically on cold boot,
-> `modprobe -r btusb; modprobe btusb`, and full USB unbind/rebind. It
-> fails even with btusb enable_autosuspend=0, so this is distinct from
-> the known func-ctrl/autosuspend race.
-> 
-> Analysis
-> --------
-> 634a4408c0615c reworks btmtk_usb_hci_wmt_sync() to validate length
-> with skb_pull_data() before casting the WMT event:
-> 
-> - wmt_evt = (struct btmtk_hci_wmt_evt *)data->evt_skb->data;
-> + wmt_evt = skb_pull_data(data->evt_skb, sizeof(*wmt_evt));
-> + if (!wmt_evt) { ... err = -EINVAL; goto err_free_skb; }
-> ...
-> case BTMTK_WMT_FUNC_CTRL:
-> + if (!skb_pull_data(data->evt_skb,
-> + sizeof(wmt_evt_funcc->status))) {
-> + err = -EINVAL; goto err_free_skb;
-> + }
-> wmt_evt_funcc = (struct btmtk_hci_wmt_evt_funcc *)wmt_evt;
-> 
-> For the FUNC_CTRL response from the MT7922, one of these
-> skb_pull_data() calls returns NULL and the function returns -EINVAL
-> (surfaced as "Failed to send wmt func ctrl (-22)"). In effect the
-> length the driver now requires
-> (sizeof(struct btmtk_hci_wmt_evt) + sizeof(status)) exceeds what this
-> controller actually sends for FUNC_CTRL, so a valid handshake is now
-> rejected. The pre-patch code cast and read the same bytes without the
-> strict length gate and worked on this hardware.
-> 
-> Empirical confirmation (mainline, no distro patches)
-> ----------------------------------------------------
-> Built faithfully from the running Arch config (only LOCALVERSION
-> added); no out-of-tree changes.
-> 
-> - mainline v7.0 : GOOD (commit absent)
-> - linux-stable v7.0.7 : BAD (kernel 7.0.7-bisect; WMT func ctrl -22
-> count = 1; hci0 device setup never completes; bluetoothctl shows 0
-> controllers)
-> - v7.0.7 + revert of
-> 70d37a8b9229 (the 7.0.7
-> backport of 634a4408c0615c): GOOD (kernel
-> 7.0.7-bisect-00001-ge33bfb5d7480; WMT func ctrl -22 count = 0; hci0
-> device setup OK; bluetoothctl shows 1 controller)
-> 
-> The reverted tree's drivers/bluetooth/btmtk.c is byte-identical to
-> v7.0.6 (git diff v7.0.6 -- drivers/bluetooth/btmtk.c is empty), so the
-> v7.0.7-vs-revert pair isolates exactly this one commit.
-> 
-> Reproduction
-> ------------
-> 1. Boot a kernel >= v7.0.7-equivalent on MT7922 hardware.
-> 2. `bluetoothctl list` -> no controller.
-> 3. `journalctl -k -b | grep 'wmt func ctrl'` -> -22.
-> 4. Revert 634a4408c0615c (or boot v7.0.6) -> controller registers.
-> 
-> A straight revert restores operation and is offered as the candidate
-> fix; alternatively the length checks should be relaxed to match the
-> MT7922's actual FUNC_CTRL WMT event length. I can test patches, or
-> provide full bad/good kernel logs, btmon/hci traces, and the exact
-> short SKB length on request.
-
+</formletter>
