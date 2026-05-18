@@ -1,175 +1,129 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC83828686
-	for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2026 00:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56CFC17DFE7
+	for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2026 01:00:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779064098; cv=none; b=BZ8thv1nlGhvhl23cAtO+lLtZDNaYNu/4OO6FzqF47slBX8JlLgURG4mSbkBelcqtklPHjKaWEs70ginXR/MENX1LmQeNHEcBJyzlXb0YlPxsc2N4oLB8obpLpq1F1JVt33SZkanEhpJBfX2UrXYKX9yUC9Di89o+0aaX2Xt67o=
+	t=1779066040; cv=none; b=pv0la+r+igLREJ/K9h38AGWeq68/868KEKC/52FEjPSWq8M4zyEMEELJHsMa7SoDZmvki9MYuwTG3P4+NDdO8Y2pwO7BAZtkWxJNzQdayvRh9YzoM3IDEMkaeKbMVCLfEpKRNety8SXHu/MUXGFHoIS6fxn5KppWceWE6Leh24I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779064098; c=relaxed/simple;
-	bh=Y0LxEBhsMr4gNxeNyXGpziEzfGFTgI7ItLbjmKjA4nY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ROAkdle4ZpfaaS6afM+trw2xKtdJE9tWp4N6Bzm15UfILkpzL6LU5OzmLNMnYek5qWgEZmf6rtXWw70R2q6sflFcoZk2UjW1jGux7wdWFn7udaNEBmI2ti7g3sibJKiyVaVqChaSAgoEiO2ttTc3Gf31SuazoyOgE4hr8plfOKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kfd+zD//; arc=none smtp.client-ip=209.85.160.181
+	s=arc-20240116; t=1779066040; c=relaxed/simple;
+	bh=/PAGb0AvVuxMQZ9EWPg+15IzbZMM5u5h1WSSMcsAJIc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=G7VLowqthWsQLg1RzSLhqHIFdhDaY+/U5UaoCSebjlZrE02TM3hjbu8r5e1hZq+zV1ReHd1s5ljB90DPxF0DiT40Ohj+VDGDuliw8pVlCUcqDPTskvpXh0kZ9YB/fp1t2tZAHp2OTf4jBInM2VCVYvJlI9u1Dk9G/5YXag9jsc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T7MqMxRy; arc=none smtp.client-ip=209.85.221.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kfd+zD//"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-50e5c7eb565so22846501cf.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 17:28:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T7MqMxRy"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-44ce78ab5feso1400316f8f.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 18:00:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779064096; x=1779668896; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Dj+Yd73bYH9NPALmuOPqYKQcj6z/TCA/BVWI2XWYRk=;
-        b=kfd+zD//OGbkNygm6MdwT6e5jZpKihCdfd7Q5kDlltCxz0W7w4jHOwRXdToJU4wDPV
-         PB+Vs9LFwNRY958zq+dvQWtGJjtGTB9dfT3vLg6MkQX687CZSlUYBwviol7ES7ScpSs8
-         ekZbyWHW0ls1f5oY5vcsrDu2cLjVX1mzXAP9te0nQgS72INtiEDXbuAhjb9KcSp3VU4s
-         FfgU3Z6mhoL/+21+FUFHxpIzGUZErv/TyXckFIHyr5zpqt4WlyeU7iP35PfwwXwV1AMN
-         nyYAxHAVXWcIBkDPutTCmOSccG9Jj/LmfS5woipnlXzNxB6YgEeGFJeIRd4ualEt/vqC
-         Gcow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779064096; x=1779668896;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1779066038; x=1779670838; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6Dj+Yd73bYH9NPALmuOPqYKQcj6z/TCA/BVWI2XWYRk=;
-        b=KEQUduEIGcthjmkz/Eg/k2HNf5YdAVEqziHnQXi2qluyXfBt9ZPwzQS8Mfb0UToXcm
-         nNGJAsXX8iFo5O0e7mT7o6Z51d6O/igb71/KOp9fJPhAz7jnpionBbf0LZrAIwIgxGBG
-         2XZKetlEF7zk43FFLmEtS/bqM4U7h5ooKJ5UWrLEzDDzyYJjsxlN4oBfgWwnw0L+dVSu
-         WoVp6ba0R0mQvj9nbxal3zPXhyJpgMjndrdhdGtgBk8iwRgROXO1VmLzAng8uqoAVTRm
-         PVASn2Yp0ifNlaQ2VKDDiPXewXe6ZAHyrapXquMq6gfYSXGOG3Sy00boDwFvMGd+ikC7
-         wibw==
-X-Gm-Message-State: AOJu0Yxa6lIwxZQxYbgwsQMhZkoIAfzX97yaIBp8ooLYCc+yO2veYV4m
-	p+BDNywhtWoW2ZtL+y2Tbdf/9hIbinidJmGOXIgjoGte3sf2U2hnMhDq
-X-Gm-Gg: Acq92OHnRHlDNP5+Z2mho+u+bmuQTOOWDYaUMeEPS0iack1aEA859RQdZ7fODpOTH7e
-	DxYnofNG8fe+qATEWrpSjvCcvjD0bJGwemP3NjdJ4/rGuXWavA2iZ/AfnQFGN0XGl8FwE4yA+AD
-	Y2w1122u7o2l5HcfvqurzqZINoSilnghac9088ONqsYkQvMt33ZR0QYJn49CriaudxFOFgkGRqg
-	B+E34T2vnC5CgbWX7ZT33q0NlH9HrbmOwuu+RbJOFFZNBE3+ddcCYRZefbEXYNm12bUmlQzVPzb
-	2hxwEFhY1S5Sqz28jFDStzxIi9GaPU5zRtddiGDRYOepAo98R3cubE93pjIHSgVki3JxksQ5XkW
-	pkNoO1Y2mm+uMZYIFSjPyA09lzPUpoW0rWUmGIM8ZZepRMkAPyt+181gQ98tZl7N6OjPk2HceTL
-	+WfLjH+1p+g4YwESInj/vLmqcNwIKgGF6colz7GE5JQ3rham2aNhnCVBCZpf6OS70WibUz8SDSR
-	FZgJ0d8gcAjs/Sy72ctqSyDS3pEs5SbFH6fNrhq/po=
-X-Received: by 2002:a05:622a:54a:b0:50e:490c:7432 with SMTP id d75a77b69052e-5165a2ca13cmr182033201cf.48.1779064095658;
-        Sun, 17 May 2026 17:28:15 -0700 (PDT)
-Received: from server0.tail6e7dd.ts.net (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ca3619b03fsm37308476d6.37.2026.05.17.17.28.14
+        bh=TpKkJC2kMiT9OA/pGYmBdZ/qheRDKlodtbgW4gbsoLY=;
+        b=T7MqMxRyN3mtIW6mrZt+ka+DGksd+qTs78VrJd/WZoOKJZEFsXPhRTkXyYazSdPUc7
+         e66y9zgd+0HMEbSe1+buknqmv7MPpnbUrvvgNwSum4x15NgQ+8iP8gwBPePMmhz81zup
+         J+zqXBeN49EF/gl/3/qVAuTzlES3RVRJNUmec03ovo6l3LiJvUhDh4Lximc8+KfMU8Or
+         GFHRFY+ZFrZdHLDvTSZilPXaryCh+nF1vQemIpyAKEzDHcwb/HRCob8b2CwapWuGkBLI
+         1GLrudUzoMZzimwt94qIUsziws7bKEeD6EjsD5q5Cru7mLreJFb2iEOg8I8D1inxkyRi
+         +/dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779066038; x=1779670838;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=TpKkJC2kMiT9OA/pGYmBdZ/qheRDKlodtbgW4gbsoLY=;
+        b=iXprzDoLuITYHkBA1U1WqgbFYrC7anRwzsF4SpeB5I1U4l1VKwPlj549DQzahN1wWZ
+         +9O0XHMvxpM3azw3sNUALTTgUqUL21GdGLQcUYen9fwM2HxqiImrE0zrvgxbtq9wPXdf
+         unLVfVpSUPWv1qUObrrqGkqdsB1647/zhmQNyM779naCx92fVIrZZ4Bym4WFKFsUwAHt
+         k8SKMmXSxlxvY8Ed7UwfsZGM2OuqNWehpKacxnFC63sj4jE1gpn4BXGnhTlPhGVAvlPl
+         kQJhHkuNfd8nGLsf5aX4aAasENPbNyG2eDtSUAy8GE+8iAszpgTagt8Bf01OhmwDifmI
+         QHiA==
+X-Gm-Message-State: AOJu0YwljnK0rM56U/j3l1zyQ0oD0bWdPrCxkR6JWt2DguDmDW1kyawu
+	6HZ6nPJGwSKbpdKPbIhv7PCYCyBI6fG4qPC91siUzIj4N2E/yioHahuP
+X-Gm-Gg: Acq92OHYDOLwN56mjihqCCZ3/GjzT4vviHQ7ICzB3+UndaFqKfcb01+Ex4M67LhE9M8
+	ahMJ7EZvok3juKubIUsDbv8JqRCALKDfQGsUxFyrCyue3T20aHRMJj9Vc49gcT7KjWRR5XE3QXc
+	/UWV/Bpnaa/GqbFkYLNT/WHlVlfg9FOITUEe9w5DCqFTKFRl3xnukRbWb4UAmtcobN7u1g5Ww82
+	D2As/ONdu44ZDwmk58Gt4E1skWrF+OjyGj/O/ibQLAMMhPJOzG+QTxKNeeqVyGIKOC4qC2sCh2n
+	eqxFFg2R82PHcQUAqcrsQ2dR25A1lqVLfjWs0sPY/4WVj2WbMOH7xhO20eJbt0Y36bQNY1z98WH
+	sZui9c5xdekd3ointn/OKJXuiMENtRQElkN7CJUUrS3+YmO3gAWarrGC2JwDT1StHVbbVEtveKh
+	rmYSJdlXHhkEfbp8SfjATRU0+5Cw9kqPbjSgZqvV8FGDRdbsxzdaK8BIhrHAZ0lYMct340K4Uo/
+	A==
+X-Received: by 2002:a5d:5f47:0:b0:452:d03a:7abf with SMTP id ffacd0b85a97d-45e5c36bd31mr19056736f8f.15.1779066037595;
+        Sun, 17 May 2026 18:00:37 -0700 (PDT)
+Received: from node ([202.47.63.86])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45d9adc2209sm30687972f8f.0.2026.05.17.18.00.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 May 2026 17:28:14 -0700 (PDT)
-From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Sun, 17 May 2026 18:00:37 -0700 (PDT)
+From: Muhammad Bilal <meatuni001@gmail.com>
+To: michael.bommarito@gmail.com
 Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: L2CAP: rate-limit ECHO_RSP per signaling PDU
-Date: Sun, 17 May 2026 20:28:00 -0400
-Message-ID: <20260518002800.1361430-1-michael.bommarito@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	linux-kernel@vger.kernel.org,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	johan.hedberg@gmail.com
+Subject: Re: [PATCH] Bluetooth: L2CAP: rate-limit ECHO_RSP per signaling PDU
+Date: Sun, 17 May 2026 21:00:19 -0400
+Message-ID: <20260518010019.121323-1-meatuni001@gmail.com>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260518002800.1361430-1-michael.bommarito@gmail.com>
+References: <20260518002800.1361430-1-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-l2cap_sig_channel() walks every L2CAP signaling command packed in
-one inbound ACL frame and dispatches each to l2cap_bredr_sig_cmd().
-The L2CAP_ECHO_REQ handler unconditionally calls
+Hi Michael,
 
-  l2cap_send_cmd(conn, ident, L2CAP_ECHO_RSP, cmd_len, data);
+Thanks for the patch. The ECHO_REQ cap addresses one amplification
+vector, but the same N:1 amplification appears reachable via the
+unknown-command path in the same loop.
 
-per request, with no per-PDU cap and no per-connection rate limit
-anywhere in the path (HCI -> hci_conn -> l2cap_sig_channel ->
-l2cap_bredr_sig_cmd).
+When l2cap_bredr_sig_cmd() returns an error for an unrecognised command
+code, the loop calls l2cap_sig_send_rej() unconditionally:
 
-A peer that packs N L2CAP_ECHO_REQ commands (4 bytes each) into a
-single inbound signaling PDU forces the kernel to emit N separate
-ACL frames carrying L2CAP_ECHO_RSP.  Measured between two
-unmodified upstream kernels over real radio (Intel AX210 attacker,
-Intel BE200 target):
+        err = l2cap_bredr_sig_cmd(conn, cmd, len, skb->data);
+        if (err) {
+                BT_ERR("Wrong link type (%d)", err);
+                l2cap_sig_send_rej(conn, cmd->ident);
+        }
 
-  N=1   :    13 B in,    13 B out,  1 ACL frame back,  23 ms wall
-  N=4   :    25 B in,    52 B out,  4 ACL frames back, 12 ms wall
-  N=16  :    73 B in,   208 B out, 16 ACL frames back, 28 ms wall
-  N=48  :   201 B in,   624 B out, 48 ACL frames back, 67 ms wall
-  N=168 :   681 B in,  2184 B out, 168 ACL frames back, 220 ms wall
+A peer that packs N commands with an unknown code (e.g. 0xFF, len = 0)
+into a single signaling PDU would trigger N calls to
+l2cap_sig_send_rej(), sending N COMMAND_REJ responses,
+bypassing the new L2CAP_SIG_ECHO_BURST limit entirely. This produces
+the same TX queue saturation the patch intends to prevent, and also
+floods the kernel log with N BT_ERR() writes per PDU.
 
-The 10x latency growth at N=168 vs N=1 (220ms vs 23ms) is the
-target's signaling work-queue and radio TX queue saturating on the
-burst.  A sustained flood (50 inbound PDUs of 168 packed echoes
-each) drives ~840 ECHO_RSPs/sec from the target until the kernel's
-input ACL queue back-pressures the attacker; during the attack
-window the target's BT radio is fully occupied answering echoes
-and any other ongoing BT traffic (audio, HID, file transfer) is
-starved.  bluetoothd CPU stays at 0% throughout -- the entire path
-is kernel-side.
+A response counter covering all outbound responses generated per PDU
+would close both paths. Something like:
 
-L2CAP signaling channel CID 0x0001 is pre-auth, so no pairing is
-required to reach the bug.  Reproducible from any device with a
-programmable Bluetooth radio within range of a target running an
-unpatched kernel with CONFIG_BT_BREDR=y (effectively every
-Linux distribution that ships Bluetooth).
+        int resp_count = 0;
 
-Cap the number of echoes answered per inbound signaling PDU to
-L2CAP_SIG_ECHO_BURST (4).  Subsequent ECHO_REQs in the same PDU
-are silently dropped.  Legitimate clients (l2ping, BlueZ test
-suite, specification-compliant L2CAP) send one ECHO_REQ per PDU
-and are unaffected.  Worst-case amplification ratio is now 4:1
-per PDU, bounded.
+        /* in the error path: */
+        if (err) {
+                if (++resp_count <= L2CAP_SIG_ECHO_BURST) {
+                        BT_ERR("Wrong link type (%d)", err);
+                        l2cap_sig_send_rej(conn, cmd->ident);
+                }
+                continue;
+        }
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-4-7
----
- net/bluetooth/l2cap_core.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+        /* existing echo path: */
+        if (cmd->code == L2CAP_ECHO_REQ &&
+            ++resp_count > L2CAP_SIG_ECHO_BURST) {
+                skb_pull(skb, len);
+                continue;
+        }
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 77dec104a9c36..1c1179fddb8ba 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5626,11 +5626,25 @@ static inline void l2cap_sig_send_rej(struct l2cap_conn *conn, u16 ident)
- 	l2cap_send_cmd(conn, ident, L2CAP_COMMAND_REJ, sizeof(rej), &rej);
- }
- 
-+/*
-+ * Maximum L2CAP_ECHO_REQ commands handled in a single inbound
-+ * signaling PDU.  An inbound PDU may legitimately pack multiple
-+ * commands, but a peer that packs many L2CAP_ECHO_REQs into one
-+ * PDU triggers an N:1 outbound ECHO_RSP storm that saturates the
-+ * link's signaling and ACL TX paths.  Cap the number of echoes
-+ * answered per inbound PDU to a small burst.  Subsequent ECHO_REQs
-+ * in the same PDU are silently dropped; the peer can pace itself
-+ * with one ECHO_REQ per PDU (the l2ping shape and the only legit
-+ * use that has ever been observed in the wild).
-+ */
-+#define L2CAP_SIG_ECHO_BURST	4
-+
- static inline void l2cap_sig_channel(struct l2cap_conn *conn,
- 				     struct sk_buff *skb)
- {
- 	struct hci_conn *hcon = conn->hcon;
- 	struct l2cap_cmd_hdr *cmd;
-+	unsigned int echo_count = 0;
- 	int err;
- 
- 	l2cap_raw_recv(conn, skb);
-@@ -5656,6 +5670,13 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
- 			continue;
- 		}
- 
-+		if (cmd->code == L2CAP_ECHO_REQ &&
-+		    ++echo_count > L2CAP_SIG_ECHO_BURST) {
-+			/* Drop excess echoes packed into one PDU. */
-+			skb_pull(skb, len);
-+			continue;
-+		}
-+
- 		err = l2cap_bredr_sig_cmd(conn, cmd, len, skb->data);
- 		if (err) {
- 			BT_ERR("Wrong link type (%d)", err);
--- 
-2.53.0
+Using pr_warn_ratelimited() instead of BT_ERR() in the loop would
+also reduce log amplification independent of the skb path.
 
+Regards,
+Muhammad Bilal
