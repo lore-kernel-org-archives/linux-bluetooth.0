@@ -1,259 +1,121 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E52405C49;
-	Mon, 18 May 2026 02:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28104405C4D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2026 02:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779072635; cv=none; b=NpwRMlThahdz+3e/PvTWXY/hTtZo9FMOqcqF3o9Jo+Xiy4nqg4+m2V9AaylAdRYG4FYpjCrICauDfm+N9Es3YWDEnR4O64cu2UNB/eoj/rebTOlbYQ/sXLAiPhkVLmawah2e9KJNHCvsDHa0M8pfE/9OkIjJKejRBU+k19bp0GY=
+	t=1779072995; cv=none; b=Wa9dmLRGuCEGIyHz2G8rPoy/hF1r7HeCUaJyzkRgyxM6cirVeb84KZqCNMNbg3W2ov1ACJGvoEtgMN1vpIymYRDznwVLRw0cU+3Bb/TKkb9JBNZOeNwKech5oWxL2em1eGhEqodpCGa0b8/ADervPlpVD56jxfZPUWrsnDAhS1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779072635; c=relaxed/simple;
-	bh=kXx/uhDwWXesnq94JEolJT/pDNiJ7wGdabHSID0sl6w=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=f9YkYP9TE1/skpQwA6MLIRVrRe84KUthOHDaO7WQcMA/gAtUNa4cboMb9s/NPR7l/+HRiNw6vNBoNPsW3CiRVaY7XaoEzDM1QncU6wbSgLzS0WZ9iQmlMzPM13reYC/suVPeat0BV0JfR/nENVe6nhrhAGqol1b86OqxyU64D4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=eTswSKoo; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1779072995; c=relaxed/simple;
+	bh=HRUZChm4dUrHg7lm+Pyr8pcCeNWZ2ViEpo2VbLjapZ4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=nPyyQApeEEQbnJ3I0/IDvy39Ipb5rLD17Fxs0XS7YREXFaEeyr+hY9li4TQPpVYsJ/D7/70SmpdFia4M523FmNZjeyUBA8TBpkdg1t6RBZUHt3/iCFiXs/Cs679UoaxiWtpKjlg0fyPJjGZXpwLFsxCRT4qUMpiKnySNA9sQSt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nF/XebbT; arc=none smtp.client-ip=74.125.82.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="eTswSKoo"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Xl
-	uZTSIZQlenLHugZ/HZvvlC7d5/oYyPXrnh/ShBstQ=; b=eTswSKoo5dC4y9Gizn
-	awRm+dfgSxGheKpbffK7wPGrNyRAp1YeVrfzc6iLEDoqw2Gv3Rte5yzi1SH1MoXS
-	4Wk63+lkbLjaJuJvo78itNTFX8SrKqoNgQd9O0n0pbgqTIOt0nT+APRgz3ATXRPe
-	859eYWNqEWUxJBHRAVPAs5W2o=
-Received: from 163.com (unknown [])
-	by gzsmtp4 (Coremail) with SMTP id PygvCgD3hDFPfgpqKzGbEA--.118S2;
-	Mon, 18 May 2026 10:50:05 +0800 (CST)
-From: <w15303746062@163.com>
-To: luiz.dentz@gmail.com,
-	pmenzel@molgen.mpg.de,
-	marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org
-Cc: linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	greg@kroah.com,
-	stable@vger.kernel.org,
-	Mingyu Wang <25181214217@stu.xidian.edu.cn>
-Subject: [PATCH v9] Bluetooth: hci_uart: fix UAFs and race conditions in close and init paths
-Date: Mon, 18 May 2026 10:49:49 +0800
-Message-Id: <20260518024949.439299-1-w15303746062@163.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CABBYNZ+r3gm37FW5WqE79bRp+x9UZsaCtyvfz_FdixqEucAxGw@mail.gmail.com>
-References: <CABBYNZ+r3gm37FW5WqE79bRp+x9UZsaCtyvfz_FdixqEucAxGw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nF/XebbT"
+Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-303dbfbec77so599104eec.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 19:56:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779072993; x=1779677793; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=vYuiYCuN6V/xx4HSJfEzMshQbACN89RvvrVsBce0pZw=;
+        b=nF/XebbTbwfyGMlrHjl4m1LN2l6yLcnh/EwxoUiF4pxzmZGTnYFx6Fz8hEYSQOytIo
+         zBsdxRQqc+lVvAp0wtLOJdbx/EudwvTztn/7m1GEwV7WNz6QBqP88UeUjqhMsbmh+Zo7
+         5nesAtgEFZZE0NYevPQFYF+LmRwfdYp/xH3/64F31QKxPAbfp3Map28I3d71ryM2GYCe
+         5plgMC9hNAnordjHOar3nsipTXTOSta5RpQT8UdlWCHqc4Jhzni7IcOSISsB9WYfk4R+
+         fPP9l7aAtNguOLPPfqbhMrQhRrpMBCe6MEA9icZE6OFWOf9t/qcyPGhBEnfC+bq0Bly0
+         Nc3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779072993; x=1779677793;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vYuiYCuN6V/xx4HSJfEzMshQbACN89RvvrVsBce0pZw=;
+        b=Q3ll9lvFBkAbFrpKR1hkoHNKEcR4GGRY/o1bQxo/DomVAs/sEm589G3len/Ap2r/kR
+         uG95L7V8+LCvWRF/zLBtbCEkwJZ1QPHjCJyMHdGISAben39UwNC82/6gse9bsbGiC1Dj
+         UnqZw4a/iiJIJe61HH9TxSDQ3iDE7Oe1zFxrFWydW1bNQEF1DTIiSKV3WIN/ZDioDklJ
+         KX8fdSEh+Y8sPt++4Tir9mDydvw3/LplOuQ4KANOM0tCxMsAyhy5FMAZcNZ/g1BTpE+y
+         uaAH7fxd+X5pqlB+TPP+r3avGs62loVRs8iTd8sswVAJoqsgeqtcFkSr+5Uq0sQi4ixn
+         OYZQ==
+X-Gm-Message-State: AOJu0YzCS7makRC+WUFNkXWEsd6/+j7mKXvlnkodPGY7hS6JyVniQfSq
+	hlGdyl313lImHk4OigQ2ksYq6EgNcHgZxflEsB5AWamjiysVJsNG5C/FuZWGwA==
+X-Gm-Gg: Acq92OGsmtz3uVJCh7eSQkkdJgYjzBSn4jWpSmWgK3fMbuNO8pmyMuRxVH1Hvnm9bxg
+	nasxEJqgDGJgfjtVcC5eAL9akrn6MDj3UlpdAajnRE4MPERA4KCbisTIutpqU66VgMc45Dmpu5T
+	MoigLX7DCfSTHlShNPJZkg8QB68ZUoCk61fOyaGMLtHcgKRjK83pG9/RaJvILO+oCcqSlmtnucx
+	/XSJRcGI5jK+X4ofP2kTj8nBycFJfTUO5UtBtwqBBTI02tfZLhFYHHv8JHxLNvXUDI9+dYo/pyX
+	BKtuboaEDeoowwmjHfgcODVWHcyKx7idaw4oXS/zTlpCxTkKPevLGGgZKgQS1Yy9o3cYVLSgWY/
+	o031mEJJYiWDu0WAE/gRbjWeQrqHsq6mY7+JyBWKz+m5lznrNs0/+hR7huUlwt46hBo2y2PAnTt
+	MMrNFOBgfTgL3m8HUuPPa5tpjxd+sMnJs=
+X-Received: by 2002:a05:7301:7c0b:b0:2e6:e77d:7bcf with SMTP id 5a478bee46e88-30398618b7cmr6201390eec.22.1779072993239;
+        Sun, 17 May 2026 19:56:33 -0700 (PDT)
+Received: from [172.17.0.2] ([128.24.160.164])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-302973bcc5asm12746894eec.22.2026.05.17.19.56.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 May 2026 19:56:32 -0700 (PDT)
+Message-ID: <6a0a7fe0.fb1bf61a.3bbfe1.cf80@mx.google.com>
+Date: Sun, 17 May 2026 19:56:32 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3953742951440786867=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PygvCgD3hDFPfgpqKzGbEA--.118S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3Xr1fZrWDtw18Xw4rCrWfXwb_yoWfWFW7pF
-	W5KF90kr4kXrW2kw1DZF48JF1rKF1fKayayw1fG3y5Jws8tr1YkF12kayF9F18Cryvkr4S
-	vr4UXrW5u3W7ZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jefO7UUUUU=
-X-CM-SenderInfo: jzrvjiatxuliiws6il2tof0z/xtbC4x3Tt2oKfl1aUwAA3Q
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, meatuni001@gmail.com
+Subject: RE: Bluetooth: HIDP: fix missing length checks in hidp_input_report()
+In-Reply-To: <20260517234805.116570-1-meatuni001@gmail.com>
+References: <20260517234805.116570-1-meatuni001@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+--===============3953742951440786867==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Vulnerabilities leading to Use-After-Free (UAF) and Null Pointer
-Dereference (NPD) conditions were observed in the lifecycle management
-of hci_uart.
+This is automated email and please do not reply to this email!
 
-The primary issue arises because the workqueues (init_ready and
-write_work) are only flushed/cancelled if the HCI_UART_PROTO_READY
-flag is set during TTY close. If a hangup occurs before setup completes,
-hci_uart_tty_close() skips the teardown of these workqueues and
-proceeds to free the `hu` struct. When the scheduled work executes
-later, it blindly dereferences the freed `hu` struct.
+Dear submitter,
 
-Furthermore, several data races and UAFs were identified in the teardown
-sequence:
-1. Calling hci_uart_flush() from hci_uart_close() without effectively
-   disabling write_work causes a race condition where both can concurrently
-   double-free hu->tx_skb. This happens because protocol timers can
-   concurrently invoke hci_uart_tx_wakeup() and requeue write_work.
-2. Calling hci_free_dev(hdev) before hu->proto->close(hu) causes a UAF
-   when vendor specific protocol close callbacks dereference hu->hdev.
-3. In the initialization error paths, failing to take the proto_lock
-   write lock before clearing PROTO_READY leads to races with active
-   readers. Additionally, hci_uart_tty_receive() accesses hu->hdev
-   outside the read lock, leading to UAFs if the initialization error
-   path frees hdev concurrently.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1096211
 
-Fix these synchronization and lifecycle issues by:
-1. Re-ordering hci_uart_tty_close() to clear HCI_UART_PROTO_READY first,
-   followed immediately by a cancel_work_sync(&hu->write_work). Clearing
-   the flag locks out concurrent protocol timers from successfully invoking
-   hci_uart_tx_wakeup(), effectively rendering the cancellation permanent
-   and preventing the tx_skb double-free.
-2. Note: Clearing PROTO_READY early causes hci_uart_close() to skip
-   hu->proto->flush(). This is perfectly safe in the tty_close path
-   because hu->proto->close() executes shortly after, which intrinsically
-   purges all protocol SKB queues and tears down the state.
-3. Relocating hu->proto->close(hu) strictly prior to hci_free_dev(hdev)
-   across all close and error paths to prevent vendor-level UAFs.
-4. Moving the hdev->stat.byte_rx increment in hci_uart_tty_receive()
-   inside the proto_lock read-side critical section to safely synchronize
-   with device unregistration.
-5. Adding cancel_work_sync(&hu->write_work) to hci_uart_close() to safely
-   flush the workqueue before hci_uart_flush() is invoked via the HCI core.
-6. Utilizing cancel_work_sync() instead of disable_work_sync() across
-   all paths to prevent permanently breaking user-space retry capabilities.
+---Test result---
 
-Fixes: 3b799254cf6f ("Bluetooth: hci_uart: Cancel init work before unregistering")
-Cc: stable@vger.kernel.org
-Signed-off-by: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+Test Summary:
+CheckPatch                    PASS      0.61 seconds
+GitLint                       PASS      0.25 seconds
+SubjectPrefix                 PASS      0.09 seconds
+BuildKernel                   PASS      25.57 seconds
+CheckAllWarning               PASS      27.88 seconds
+CheckSparse                   PASS      26.78 seconds
+BuildKernel32                 PASS      24.79 seconds
+TestRunnerSetup               PASS      530.22 seconds
+TestRunner_l2cap-tester       PASS      378.32 seconds
+TestRunner_iso-tester         PASS      596.24 seconds
+TestRunner_bnep-tester        PASS      18.62 seconds
+TestRunner_mgmt-tester        PASS      2023.70 seconds
+TestRunner_rfcomm-tester      PASS      63.42 seconds
+TestRunner_sco-tester         PASS      141.24 seconds
+TestRunner_ioctl-tester       PASS      133.47 seconds
+TestRunner_mesh-tester        PASS      59.92 seconds
+TestRunner_smp-tester         PASS      17.98 seconds
+TestRunner_userchan-tester    PASS      19.13 seconds
+TestRunner_6lowpan-tester     PASS      51.17 seconds
+IncrementalBuild              PASS      23.75 seconds
+
+
+
+https://github.com/bluez/bluetooth-next/pull/206
+
 ---
-Changes in v9:
-- Addressed a critical flaw identified in v8 where premature cancellation of write_work allowed active protocol timers to immediately reschedule it. The teardown sequence in hci_uart_tty_close() now strictly clears HCI_UART_PROTO_READY *before* calling cancel_work_sync(&hu->write_work). This permanently locks out hci_uart_tx_wakeup(), completely resolving the lingering UAF and double-free races.
-- Documented that skipping hu->proto->flush() via early flag clearance is intrinsically safe, as hu->proto->close() executes subsequently to purge all unacked/rel queues.
+Regards,
+Linux Bluetooth
 
-Changes in v8:
-- Corrected the teardown sequence in hci_uart_tty_close() by unconditionally canceling write_work BEFORE hci_uart_close().
-- Moved hu->hdev->stat.byte_rx increment inside the proto_lock read-side critical section in hci_uart_tty_receive() to prevent read-side UAF against concurrent registration failures.
-- Added cancel_work_sync(&hu->write_work) inside hci_uart_close() to eliminate the race condition between write_work and hci_uart_flush() when the interface is brought down via the HCI core.
 
-Changes in v7:
-- Reverted disable_work_sync() back to cancel_work_sync() across all error and close paths to preserve user-space retry capabilities.
-- Synchronized workqueue teardown safely by atomically clearing PROTO_READY / PROTO_INIT under proto_lock prior to calling cancel_work_sync().
-- Fixed a Use-After-Free (UAF) vulnerability in the teardown sequence by relocating hu->proto->close(hu) strictly prior to hci_free_dev(hdev).
-- Added cancel_work_sync(&hu->init_ready) at the very beginning of hci_uart_tty_close() to serialize teardown against active asynchronous registration.
-
-Changes in v6:
-- Fixed missing `hu->proto_lock` write lock in hci_uart_init_work() error path to prevent race with readers (reported by Sashiko).
-- Added disable_work_sync() instead of cancel_work_sync() for `hu->write_work` in hci_uart_init_work() and hci_uart_register_dev() error paths.
-
-Changes in v5:
-- Relocated disable_work_sync() to the very top of hci_uart_tty_close(), 
-  before hci_uart_close(), to ensure no new work is submitted during device teardown.
-
-Changes in v4:
-- Adopted Luiz's suggestion to use disable_work_sync() instead of 
-  cancel_work_sync() in close path to prevent new work submissions.
-
-Changes in v3:
-- Added 'Cc: stable' tag as requested by the stable bot.
-
-Changes in v2:
-- Added KASAN/ODEBUG crash trace.
-
- drivers/bluetooth/hci_ldisc.c | 48 +++++++++++++++++++++++++++++------
- 1 file changed, 40 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 275ea865bc29..47f4902b40b4 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -194,7 +194,15 @@ void hci_uart_init_work(struct work_struct *work)
- 	err = hci_register_dev(hu->hdev);
- 	if (err < 0) {
- 		BT_ERR("Can't register HCI device");
-+
-+		percpu_down_write(&hu->proto_lock);
- 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
-+		percpu_up_write(&hu->proto_lock);
-+
-+		/* Safely cancel work after clearing flags */
-+		cancel_work_sync(&hu->write_work);
-+
-+		/* Close protocol before freeing hdev */
- 		hu->proto->close(hu);
- 		hdev = hu->hdev;
- 		hu->hdev = NULL;
-@@ -263,8 +271,12 @@ static int hci_uart_open(struct hci_dev *hdev)
- /* Close device */
- static int hci_uart_close(struct hci_dev *hdev)
- {
-+	struct hci_uart *hu = hci_get_drvdata(hdev);
-+
- 	BT_DBG("hdev %p", hdev);
- 
-+	cancel_work_sync(&hu->write_work);
-+
- 	hci_uart_flush(hdev);
- 	hdev->flush = NULL;
- 	return 0;
-@@ -531,6 +543,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- {
- 	struct hci_uart *hu = tty->disc_data;
- 	struct hci_dev *hdev;
-+	bool proto_ready;
- 
- 	BT_DBG("tty %p", tty);
- 
-@@ -540,24 +553,38 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 	if (!hu)
- 		return;
- 
--	hdev = hu->hdev;
--	if (hdev)
--		hci_uart_close(hdev);
-+	/* Wait for init_ready to finish to prevent registration races */
-+	cancel_work_sync(&hu->init_ready);
- 
--	if (test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
-+	proto_ready = test_bit(HCI_UART_PROTO_READY, &hu->flags);
-+	if (proto_ready) {
- 		percpu_down_write(&hu->proto_lock);
- 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
- 		percpu_up_write(&hu->proto_lock);
-+	}
- 
--		cancel_work_sync(&hu->init_ready);
--		cancel_work_sync(&hu->write_work);
-+	/*
-+	 * Unconditionally cancel write_work AFTER clearing PROTO_READY.
-+	 * This ensures that concurrent protocol timers cannot requeue
-+	 * write_work via hci_uart_tx_wakeup(), permanently preventing
-+	 * double-free races and UAFs.
-+	 */
-+	cancel_work_sync(&hu->write_work);
-+
-+	hdev = hu->hdev;
-+	if (hdev)
-+		hci_uart_close(hdev); /* proto->flush is safely skipped */
- 
-+	if (proto_ready) {
- 		if (hdev) {
- 			if (test_bit(HCI_UART_REGISTERED, &hu->flags))
- 				hci_unregister_dev(hdev);
--			hci_free_dev(hdev);
- 		}
-+		/* Close protocol before freeing hdev (intrinsically purges queues) */
- 		hu->proto->close(hu);
-+
-+		if (hdev)
-+			hci_free_dev(hdev);
- 	}
- 	clear_bit(HCI_UART_PROTO_SET, &hu->flags);
- 
-@@ -625,11 +652,12 @@ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data,
- 	 * tty caller
- 	 */
- 	hu->proto->recv(hu, data, count);
--	percpu_up_read(&hu->proto_lock);
- 
- 	if (hu->hdev)
- 		hu->hdev->stat.byte_rx += count;
- 
-+	percpu_up_read(&hu->proto_lock);
-+
- 	tty_unthrottle(tty);
- }
- 
-@@ -695,6 +723,10 @@ static int hci_uart_register_dev(struct hci_uart *hu)
- 		percpu_down_write(&hu->proto_lock);
- 		clear_bit(HCI_UART_PROTO_INIT, &hu->flags);
- 		percpu_up_write(&hu->proto_lock);
-+		/* Cancel work after clearing flags */
-+		cancel_work_sync(&hu->write_work);
-+
-+		/* Close protocol before freeing hdev */
- 		hu->proto->close(hu);
- 		hu->hdev = NULL;
- 		hci_free_dev(hdev);
--- 
-2.34.1
-
+--===============3953742951440786867==--
