@@ -1,282 +1,140 @@
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F00E2E3397
-	for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2026 20:48:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779137301; cv=pass; b=TVS1JsIQWxmCCXnosjZd2eOJdjMLkhz52LvnmvqeSeDYahveW49ZvjaYo8xni4kDYKCYa7ijWuJMU0UMulu1h0zFJpY0aTLQOMQCEwDp8XcPNw9RQ84X3LeP6urX01yBNAbhS6XXGNoCIJ2Y8pTx0j4lGEnxhRYvrxxDL242y4Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779137301; c=relaxed/simple;
-	bh=+r3mBlkm7KmdDl3/wsAcVETzI2CR+ddA/nr0lf3syZE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K+5UCq1xQ5ROKcTpyzvVEPMUrTBI9aRP0xzNTfNRlOFODOOkASrLA3CUmqqFLU8jaiavVipel7SeP0vFiGt8RlO147aSzOVanob6p1YveyDyHBAhZn/gDjhSov/6JYJqqArE4dHdsuEiIqUk1awRE1ZrivCj87xMczwYlYHKs44=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A0NDzDxW; arc=pass smtp.client-ip=74.125.224.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1CF824501D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2026 21:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779138221; cv=none; b=MSryva/kME2/YTo29gacouJQ2Vqh7FgtvD5TsBaEz8WvZjKjEofWYIpbfOMkhscIp1YtW60cKaIdWmhNy7degz8K202Zh5UItys1qXgGnO09Gz+fJHTBu574E1YTn8zXh3l7Dr5nEBijwRIyQrAWc+My1cN2XdWZgrrMGPIuzJo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779138221; c=relaxed/simple;
+	bh=rvhUwGfHUijegushTrtPuM1U9phm27YzwPvN9Y58MCk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rXL1wEnE4LQYH4DPY6p76r+zm8eEPl1b+GWM7BFYPGlgg8Zh9MxEqUSwg0I1yXs1Y5hi5Pu4+/qr0xWNwjG68k2RbfVt7Y5p/LklUz3j17XMsEKqJMWzLM3jkjO+iHtZSQDdXgMaUGypEXiJswYlT8srxOd1p+gb/TMUrEWiaQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QC5kCQYa; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A0NDzDxW"
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-65c21049dafso2459229d50.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2026 13:48:19 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779137298; cv=none;
-        d=google.com; s=arc-20240605;
-        b=BD+BhY0/C5aJ7wZ7m5HktVizhjpmiwwf+Ej6XQEb8O3kfMYGiorBudmlOV+uDTf38m
-         lVGrFFCHJs82oDqO7xQvjAjxisHi6hRFTC/CIKDv1L2lqe31ztS6Q1/MqJVSt3hJS5D8
-         WDmmwTEYX350vcV+cu7CvVBgXAPjq+argdwc8kzlkRn0++eW10nGnTnicJ2iqlZaOUt4
-         3KTNREe083w+ra4hyF8o6NwLrNAP55Iai+uLcPeBXGqFgEnC4WUToIRriDZ7ibc6ZCQ0
-         N6sBo9pWrNGOR7m+3Mu/wGnIr9IjR0QfKHHjEMMf4aPnuVsQ7tkWG35guocc5tnIRf02
-         z7GA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=MMgd4sohhog0ZGn5ZmCI1HIVzSl8Alx9SMp3XGD3tbU=;
-        fh=3uQagIskG76CGRkQp5Nqnbl5CzbZ5stLQS1Xll5GfRQ=;
-        b=PJY5Zf1U0VSeR1EqJxsMwUxCe9cxV8r7LVvX3AM+JOv/0eX2TNH/QgIBBBWtHtm3bd
-         YCHUSqfsI1k2fH/EeECLxWY1gXgXN0Mb73fiy9C71/SLs5BVJ2seVJ78x5ZJMfjqiNsU
-         WLWHkMFphv8Wo35A3UnEYO5EZnzSEERD+2IJPQXBYaHUKprjRISlokqAtIxLiljifKUp
-         xI+YackxsvWR7cZ2fgz9sytY0WMXQGrhvfWaHw7nhlrYr6GbBhlQvRYX8ZJ+z/wlbtxc
-         ROEuPNx+e7CRKIzbZhgJIxUakoBxTPT6UDW+nObgNOcxF826HUBSomNLIf+PYNXw98zA
-         9yOg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QC5kCQYa"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-488b0e1b870so41354155e9.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2026 14:03:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779137298; x=1779742098; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1779138218; x=1779743018; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MMgd4sohhog0ZGn5ZmCI1HIVzSl8Alx9SMp3XGD3tbU=;
-        b=A0NDzDxWwJ1fH/e2omudFmmdinnTBXokC7UNQafA6bfK45eFaPjou/9Q9HIj0xlphN
-         V5b7pM65sYhO6fM1b7steSr6hdKXjZUGmuoKK0xSmreCksgPdCdQ11ekw6MblTf2Pcb6
-         3N2sfUMKuebIwF0amlwxvqsFBfhGkk7U82N89t5Lm9/VzAUFc6TiVyYsy4pGlG4t0END
-         4xyAW68ImDVWYwmNKEQ12uwno6SLlopLZDp3RLDR6ZYhhUfjqfcwqH4PmHSOVCz1/MEf
-         y/UaKHChYdpAL8igzeYgvJ6T0aSDWjV+GYS3M9i6hprV7wGRlGgqP8IyxcsWw+WJBxVk
-         rUtA==
+        bh=GcfHzkvFcK1Kvn+Ki27zDsAk+C6WkA6MZMHQlLQTfDQ=;
+        b=QC5kCQYaBTXzLao41t45MRo6nQbjfmvaqYjvwcvDw8yj6P1GiueTGoWjxUI3mzSVuB
+         4NhwgGiHyWzwIc3jcsvq/EfS/z6bg/aYhTHbNtaLAMbQTrMHDz4AhcPAE1p433WKY0WH
+         Im3DVt5lx2FJKwUyoSBK/dk08TCNd2cJ78DVZCTu6HGXkyQjgpjQHAuGFldjtjV/oMvC
+         sj01+lIVxvo4Xnn1jV5ZrVMl7pCI2UuhY3KRMuzxc8tzKu63Jl9W+Fgh40btzY19zShp
+         r2UxvvU6/rfajq6pWvogOaQfLVOgcD8U1pgTLWCcNjAQTm5I7Af+GaHQ4cVRBeaJ/tho
+         S8wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779137298; x=1779742098;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1779138218; x=1779743018;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=MMgd4sohhog0ZGn5ZmCI1HIVzSl8Alx9SMp3XGD3tbU=;
-        b=IEnb2mf5p66dYx5/nCCZUCtCtkr5olFHpPCKMARQESu9Go+1CZXFb9ReuMYOfa4Qeq
-         LfbTqzfMnEZvQH9gcC5N9cD2FaNvaBDm4LOrTwUQxRJsSg72R7lcIrApwMCvb4Mf2ozv
-         ZQPWEWyWaNcRhozt00wNp9/jUuPErrr7sKEqNvw3uUwYM7bvvNnWR/7YVtGZvA4moRgq
-         taR32yvee/PWLS6C1ObPdIg9DlDnOkXm9wL0RWfLREUhYl/WzPlen136YEbxkSOs9+Ie
-         x8geMzwytkFQVgJ5ThsOMzfVjQqjdUwWXHtGMPi0AQNPhjvI+xN74h22nZcHFl10lcpx
-         KtBQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9mOXVCHP/pJ/ru7IpnNOlTfT48R5I2jzBUuwLIytxcwdRXmsQ7GWPgfCvvo1noyof6WrB9GCU8LuYXygQAGeQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHp3oe+lwTRj7JGpqZp9YPvcyN6o3n0RMDmK0pAJtiX4Vb/QA9
-	yO313atcGE+HqcEyifEiIsanV5ccIBiiWwO3+h7yGdZ6sASqwFlMYD9vY1CRFteEAbufFoDg2Nf
-	ujKyCJS116LN4L7ru+ss2mSgz5qNM7gU=
-X-Gm-Gg: Acq92OHgLfr0lsaCn/QiBvhcR5gxZJhVPRKmdjQ3IQ9EVMg20gCyRtJNTfGa+Br7pVK
-	6jOrbfph5Muw9aJdeyuLND4VGmWLJoVMnc1U2aK0E7htb5ewA5ZbhAdhoW06lkaOJLFcUssNAB9
-	+CEAVQVM2h6BJUT/YQdHorWqjCKcgPgoIGTvw8vTDLysYWJDfNBjrn9GbdaTdtOSmbOtJDgH7fX
-	gdE/3PuGEEYz7eLiCd1slMi8Ci41bRIkoM81Nwh/qDqklZBwnQfCKQwugoV6ahqsumBIBsuhjSM
-	xI+S51ksWf4wHRXF8A3ZxE3K5vWnka46bSHJW3RSqwN2TNKpcrNttpZ2RoPb7fm5StA=
-X-Received: by 2002:a05:690e:1402:b0:65d:6f10:d42a with SMTP id
- 956f58d0204a3-65e227cfff6mr16939749d50.39.1779137298499; Mon, 18 May 2026
- 13:48:18 -0700 (PDT)
+        bh=GcfHzkvFcK1Kvn+Ki27zDsAk+C6WkA6MZMHQlLQTfDQ=;
+        b=kFAwZhSGJ2AafBrHpzI9OvjXcLSSEIM7phvu1xDCKtCBIx0Kp0vdb/U+r0WuQuEbLN
+         68JXp0ZRMXn6CFRF0j6t9hbnFDOyUTZwsTKg2ZHzoPIjomrtXcRAmfM8rO4yzOqy7aJg
+         Khj1H7qtATLKt2hFl3C83L1KUI0ug9ox4SSi1cY+mhU4Am+Miv7sqY2PV4l56RlNoqge
+         aGmNc3LnddRLduumwvSGZfuzFxiLjvv2G5RTMb+/F9o/EixuW3GfSiqc6tVDPzMXhfYf
+         kAoy3PvmlrrhlvRMFr4oy3b26bMhwWHYHJ0Hr8VvCgYHdGbzaSkhYeYgpPL6H8nrU3rR
+         qVoQ==
+X-Gm-Message-State: AOJu0YyIOLSXSi0BNlS4x87li+60oKPW2cHXUGSTvVZAMgcz/E4EHEa+
+	NBgM7NEis9HWvX2f+dxvU+f5CboShmxciVbyi2qVT6T5B4I01ivNfdeGBTnoTr5qOOg=
+X-Gm-Gg: Acq92OHUZI1f/CJLWcDeSHPBXNJeGqvqOvkH5a844+1AlX+77EgQPLf9QMbHtVFdBXM
+	gRmmjz4snoyOv/hlWVFscPvlqCfN/B3WFAD1c1ZQ1U1YC1QHBUMrz+3MaJ/m+aqMMG/v4d9axDC
+	bkdGW4hBLPQgWGw2ggSSzheZFXCmbv9iftjDRE2ZDZXWogFc+FVUSNqXdEy5rpsT/esthm3I/8Q
+	CyDEmwExgU04ty3PefzekK4m4tmifUTPF7p8Jzg0JaQ7UW5XQUAbxy8O1+GUFxoagjD1MsCja1C
+	azqU18stqt7K2aI7V8tQ6nNQlU8EHZaqzJOiLnCYr8Ea9UOA14e5M+F0dUPJugHLmsES/9huXAh
+	jzhNJOCiGZt2JpRMrovtlYnXlVtbdB7MEBgukORpmTNKt15Z46RM9JsmN313PriZ1Riz/9AXbag
+	eFwsJiW2E+wzehF5hFM2TJS9/ifT1vBQzV5XDdYLU=
+X-Received: by 2002:a05:600c:6992:b0:48f:e230:2a20 with SMTP id 5b1f17b1804b1-48fe662a1b2mr257792115e9.31.1779138217870;
+        Mon, 18 May 2026 14:03:37 -0700 (PDT)
+Received: from fujitsu.lan (nat-103d.starnet.cz. [109.164.51.103])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49008c047absm45601415e9.0.2026.05.18.14.03.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 May 2026 14:03:37 -0700 (PDT)
+From: Jaroslav Srba <jarys.cz@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	jarys.cz@gmail.com
+Subject: [PATCH v2] Bluetooth: btusb: Add Realtek RTL8852BE BT 0x04c5/0x1670 (Fujitsu)
+Date: Mon, 18 May 2026 23:03:35 +0200
+Message-ID: <20260518210335.1105068-1-jarys.cz@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260518191654.615129-1-jarys.cz@gmail.com>
+References: <20260518191654.615129-1-jarys.cz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260513-hci_send-v1-1-ae3eef758280@igalia.com>
- <20260514020446.639-1-hdanton@sina.com> <DIIHHUJM2CZJ.2OKA9PGHEHBRP@igalia.com>
- <CABBYNZKA3FsovfdWEeZYqFjjNCabjfa7uM48mq+r3G0PTb_JUg@mail.gmail.com> <DILWLB58NRY9.1AS5Z2W6EHAIG@igalia.com>
-In-Reply-To: <DILWLB58NRY9.1AS5Z2W6EHAIG@igalia.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 18 May 2026 16:48:07 -0400
-X-Gm-Features: AVHnY4JBqPVgcJdcjClA34G7Qa7ysrOjSS9sOqddoZvbb5CvwyV01id9DDcIGc4
-Message-ID: <CABBYNZJdJ9GSeHjadoFJS4XRep2gx5R3+272evFgSkFKukg_bg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_core: Don't queue tx_work while draining workqueue
-To: Heitor Alves de Siqueira <halves@igalia.com>
-Cc: Hillf Danton <hdanton@sina.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Gustavo Padovan <padovan@profusion.mobi>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel-dev@igalia.com, 
-	syzkaller-bugs@googlegroups.com, 
-	syzbot+97721dd81f792e838ba0@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Heitor,
+The Fujitsu LIFEBOOK E5512A ships with a Realtek RTL8852BE combo chip
+whose Bluetooth half is exposed as a Fujitsu-rebranded USB device
+0x04c5/0x1670. Without this entry in quirks_table, btusb binds via the
+generic Bluetooth class match but never sets the BTUSB_REALTEK quirk,
+so btrtl_setup_realtek() is never called and the rtl8852bu firmware
+patch is never loaded. As a result HCI works (hci0 UP RUNNING), but
+RF reception is non-functional: inquiry and LE scan find nothing and
+pairing is impossible.
 
-On Mon, May 18, 2026 at 11:21=E2=80=AFAM Heitor Alves de Siqueira
-<halves@igalia.com> wrote:
->
-> Hi Luiz,
->
-> On Fri May 15, 2026 at 10:33 AM -03, Luiz Augusto von Dentz wrote:
-> > Hi Heitor,
-> >
-> > On Thu, May 14, 2026 at 10:54=E2=80=AFAM Heitor Alves de Siqueira
-> > <halves@igalia.com> wrote:
-> >>
-> >> On Wed May 13, 2026 at 11:04 PM -03, Hillf Danton wrote:
-> >> > On Wed, 13 May 2026 15:55:23 -0300 Heitor Alves de Siqueira wrote:
-> >> >> Syzbot reported a warning when L2CAP calls queue_work() on the hdev
-> >> >> workqueue while it's being drained. This can happen during device r=
-eset or
-> >> >> close paths for hci_send_acl(), hci_send_sco() and hci_send_iso().
-> >> >>
-> >> >> The workqueue is drained in hci_dev_do_reset() and in hci_dev_close=
-_sync():
-> >> >>   - hci_dev_close_sync() clears the HCI_UP bit before draining
-> >> >>   - hci_dev_do_reset() sets HCI_CMD_DRAIN_WORKQUEUE before draining
-> >> >>
-> >> >> Add these checks before queuing tx_work, and free the SKB if it's n=
-ot
-> >> >> queued for transmission.
-> >> >>
-> >> >> Fixes: 3eff45eaf817 ("Bluetooth: convert tx_task to workqueue")
-> >> >> Reported-by: syzbot+97721dd81f792e838ba0@syzkaller.appspotmail.com
-> >> >> Closes: https://syzkaller.appspot.com/bug?extid=3D97721dd81f792e838=
-ba0
-> >> >> Signed-off-by: Heitor Alves de Siqueira <halves@igalia.com>
-> >> >> ---
-> >> >>  net/bluetooth/hci_core.c | 18 ++++++++++++++++++
-> >> >>  1 file changed, 18 insertions(+)
-> >> >>
-> >> >> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> >> >> index c46c1236ebfa..5d5f8ad7d1a8 100644
-> >> >> --- a/net/bluetooth/hci_core.c
-> >> >> +++ b/net/bluetooth/hci_core.c
-> >> >> @@ -3278,6 +3278,12 @@ void hci_send_acl(struct hci_chan *chan, str=
-uct sk_buff *skb, __u16 flags)
-> >> >>
-> >> >>      BT_DBG("%s chan %p flags 0x%4.4x", hdev->name, chan, flags);
-> >> >>
-> >> >> +    if (!test_bit(HCI_UP, &hdev->flags) ||
-> >> >> +        hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE)) {
-> >> >> +            kfree_skb(skb);
-> >> >> +            return;
-> >> >> +    }
-> >> >> +
-> >> >>      hci_queue_acl(chan, &chan->data_q, skb, flags);
-> >> >>
-> >> >>      queue_work(hdev->workqueue, &hdev->tx_work);
-> >> >>
-> >> > What you add is not enough, go and see how HCI_CMD_DRAIN_WORKQUEUE i=
-s
-> >> > checked in hci_cmd_work(), and in hci_dev_do_reset() for why.
-> >>
-> >> I see, I missed the RCU guards for the device flags. Sorry about that,
-> >> I'll add them to v2.
-> >> Thanks for the catch!
-> >
-> > Actually this whole thing might be because we try to clean the
-> > workqueue without actually closing the hdev, so I suspect that if we
-> > just remove all the code from hci_dev_do_reset with
-> > hci_dev_do_close+hci_dev_do_open, it might work better and align with
-> > how things work over the MGMT interface:
-> >
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index c46c1236ebfa..6782bbc9b6a7 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -539,47 +539,13 @@ static int hci_dev_do_reset(struct hci_dev *hdev)
-> >
-> >         hci_req_sync_lock(hdev);
-> >
-> > -       /* Drop queues */
-> > -       skb_queue_purge(&hdev->rx_q);
-> > -       skb_queue_purge(&hdev->cmd_q);
-> > -
-> > -       /* Cancel these to avoid queueing non-chained pending work */
-> > -       hci_dev_set_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE);
-> > -       /* Wait for
-> > -        *
-> > -        *    if (!hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE))
-> > -        *        queue_delayed_work(&hdev->{cmd,ncmd}_timer)
-> > -        *
-> > -        * inside RCU section to see the flag or complete scheduling.
-> > -        */
-> > -       synchronize_rcu();
-> > -       /* Explicitly cancel works in case scheduled after setting the =
-flag. */
-> > -       cancel_delayed_work(&hdev->cmd_timer);
-> > -       cancel_delayed_work(&hdev->ncmd_timer);
-> > -
-> > -       /* Avoid potential lockdep warnings from the *_flush() calls by
-> > -        * ensuring the workqueue is empty up front.
-> > -        */
-> > -       drain_workqueue(hdev->workqueue);
-> > -
-> > -       hci_dev_lock(hdev);
-> > -       hci_inquiry_cache_flush(hdev);
-> > -       hci_conn_hash_flush(hdev);
-> > -       hci_dev_unlock(hdev);
-> > -
-> > -       if (hdev->flush)
-> > -               hdev->flush(hdev);
-> > -
-> > -       hci_dev_clear_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE);
-> > -
-> > -       atomic_set(&hdev->cmd_cnt, 1);
-> > -       hdev->acl_cnt =3D 0;
-> > -       hdev->sco_cnt =3D 0;
-> > -       hdev->le_cnt =3D 0;
-> > -       hdev->iso_cnt =3D 0;
-> > +       ret =3D hci_dev_close_sync(hdev);
-> > +       if (ret)
-> > +               goto done;
-> >
-> > -       ret =3D hci_reset_sync(hdev);
-> > +       ret =3D hci_dev_open_sync(hdev);
-> >
-> > +done:
-> >         hci_req_sync_unlock(hdev);
-> >         return ret;
-> >  }
-> >
-> > Seem to work here and as a side effect we get notified over the MGMT
-> > when a user uses hciconfig hci0 reset:
-> >
-> > # tools/hciconfig hci0 reset
-> > bluetoothd[34]: src/shared/mgmt.c:can_read_data() [0x0000] event 0x0006
-> > bluetoothd[34]: src/adapter.c:new_settings_callback() Settings: 0x01fc0=
-ac0
-> > bluetoothd[34]: src/adapter.c:settings_changed() Changed settings: 0x00=
-000001
-> > bluetoothd[34]: src/adapter.c:settings_changed() Pending settings: 0x00=
-000000
-> > bluetoothd[34]: src/adapter.c:cancel_passive_scanning()
-> > bluetoothd[34]: src/adapter.c:adapter_stop() adapter /org/bluez/hci0
-> > has been disabled
-> > bluetoothd[34]: src/shared/mgmt.c:can_read_data() [0x0000] event 0x0008
-> > bluetoothd[34]: src/shared/mgmt.c:can_read_data() [0x0000] event 0x0006
-> > bluetoothd[34]: src/adapter.c:new_settings_callback() Settings: 0x01fc0=
-ac1
-> > bluetoothd[34]: src/adapter.c:settings_changed() Changed settings: 0x00=
-000001
-> > bluetoothd[34]: src/adapter.c:settings_changed() Pending settings: 0x00=
-000000
-> > bluetoothd[34]: src/adapter.c:adapter_start() adapter /org/bluez/hci0
-> > has been enabled
-> > bluetoothd[34]: src/adapter.c:trigger_passive_scanning()
-> > bluetoothd[34]: [signal] org.freedesktop.DBus.Properties.PropertiesChan=
-ged
->
-> Thank you for the review, and for the suggestion! There seems to be a
-> number of similar syzbot reports for the hdev workqueue, so maybe the
-> close+open approach is a simpler solution indeed. I've originally
-> considered implementing a wrapper/helper for workqueue submission in
-> hci_core.c, but if we can eliminate the race condition altogether that'd
-> be even better.
->
-> My only concern is that there seem to be slight differences between
-> what hci_dev_do_reset() does now and what we'd get with
-> hci_dev_close_sync()+hci_dev_open_sync() (e.g. we wouldn't use
-> HCI_CMD_DRAIN_WORKQUEUE anymore). Would this alternative approach be
-> suitable for the stable kernels? And if not, do you think the checks
-> from v1 would be appropriate, in that case?
+Other Fujitsu OEM rebrands of Realtek chips are already in quirks_table
+(0x04c5/0x165c, 0x04c5/0x1675, 0x04c5/0x161f). Add 0x04c5/0x1670 in
+the same "Realtek 8852BE Bluetooth devices" block, alongside 0x04c5/0x165c.
 
-I think, the HCI_Reset is a heavy hammer because it's a global reset.
-Getting all the pieces to cooperate has been causing all sort of
-issues, and in any case I think what hci_dev_do_reset does is simply
-wrong or outdated; for instance it doesn't seem to affect LE, such as
-cancelling scanning or advertising. This is likely because interfaces
-like MGMT don't use it and require a power cycle to reset.
+USB descriptors of the device:
 
---=20
-Luiz Augusto von Dentz
+    Bus 001 Device 004: ID 04c5:1670 Fujitsu, Ltd Bluetooth Radio
+      bDeviceClass          224 Wireless
+      bDeviceSubClass         1 Radio Frequency
+      bDeviceProtocol         1 Bluetooth
+      iManufacturer           1 Realtek
+      iProduct                2 Bluetooth Radio
+
+Tested on Fujitsu LIFEBOOK E5512A (Ryzen 7 PRO 5875U, Ubuntu 25.10,
+kernel 6.17.0-29-generic). After the patch:
+
+  Bluetooth: hci0: RTL: rom_version status=0 version=1
+  Bluetooth: hci0: RTL: loading rtl_bt/rtl8852bu_fw.bin
+  Bluetooth: hci0: RTL: loading rtl_bt/rtl8852bu_config.bin
+  Bluetooth: hci0: RTL: fw version 0x098b154b
+  Bluetooth: hci0: AOSP extensions version v1.00
+
+Scanning, pairing and A2DP audio playback to BT headphones all work
+after the firmware patch is loaded.
+
+Signed-off-by: Jaroslav Srba <jarys.cz@gmail.com>
+---
+Changes in v2:
+ - Drop a long "RTL: examining hci_ver=..." line from the commit body
+   to satisfy checkpatch/gitlint 75-char limit. Chip identification is
+   conveyed by the firmware filename (rtl8852bu_fw.bin) and the
+   subsequent rom_version line, so no information is lost.
+
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7f5fce93d..93fcc02e0 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -543,6 +543,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04c5, 0x165c), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x04c5, 0x1670), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x4006), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0cb8, 0xc549), .driver_info = BTUSB_REALTEK |
+-- 
+2.51.0
+
