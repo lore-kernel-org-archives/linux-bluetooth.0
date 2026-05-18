@@ -1,129 +1,128 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56CFC17DFE7
-	for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2026 01:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779066040; cv=none; b=pv0la+r+igLREJ/K9h38AGWeq68/868KEKC/52FEjPSWq8M4zyEMEELJHsMa7SoDZmvki9MYuwTG3P4+NDdO8Y2pwO7BAZtkWxJNzQdayvRh9YzoM3IDEMkaeKbMVCLfEpKRNety8SXHu/MUXGFHoIS6fxn5KppWceWE6Leh24I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779066040; c=relaxed/simple;
-	bh=/PAGb0AvVuxMQZ9EWPg+15IzbZMM5u5h1WSSMcsAJIc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G7VLowqthWsQLg1RzSLhqHIFdhDaY+/U5UaoCSebjlZrE02TM3hjbu8r5e1hZq+zV1ReHd1s5ljB90DPxF0DiT40Ohj+VDGDuliw8pVlCUcqDPTskvpXh0kZ9YB/fp1t2tZAHp2OTf4jBInM2VCVYvJlI9u1Dk9G/5YXag9jsc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T7MqMxRy; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5D017DFE7
+	for <linux-bluetooth@vger.kernel.org>; Mon, 18 May 2026 01:03:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779066237; cv=pass; b=qkkxj/D/CLk2ANG23LAT9Y8bw9t9cG9jfmJr0qg4PUW1+HKRw5C+Wt/Db2TiKPjDMCmjBysCQxes9yssGfXHHSkeW39aEJgJJVZAxaTZedHlvir0tpGMpPfd4l6PFAkX+Xv9BUCEkSrXnY+whV5V4v8YtsMEd8VB9wm8VQnorF0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779066237; c=relaxed/simple;
+	bh=utx9LGutwgSd8Hcjfc8gIyBXV0dK+4qA8MsZSzPpAvs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QKtdvMTPc8e2VjezPdJJeZC51vUT+vCncvYfi2NgsJiCkYDVMTJ+IqeYidPL+iwRRy6gluVjOI6Chdwd+4ZtZRPaXNuxF9xoYHeRF61ucp2c6UUofAsdr+GiB55dmbCkQoX7IWpEEvVvYnky2dmASkU0Apuumo/AYKph1fJmniA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L9+gqi4s; arc=pass smtp.client-ip=74.125.224.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T7MqMxRy"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-44ce78ab5feso1400316f8f.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 18:00:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L9+gqi4s"
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-651c366f7efso1828020d50.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 17 May 2026 18:03:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779066235; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NxLloU5FQ36EAGHQErqjLz2vW98y75eChHukkhfLkSiWG42m95cDA08XX5LaWVs7JK
+         azWlIEy477GRLi3jyfaKEJLFchJTsQuI54GZJsiDNRgNbydIxHhqkAk4B0cLqCODYXz6
+         zOq4lhxy1z1z7iaz35P2EEEaOjDC3s8JKu7lSkHj+LQfq0recUrtrKpAu0vNGvFu0bWX
+         ovsNkTFXtgujVlPp0KWijyAFixFhqwnwseCBshvwCYtN+7wVBmIT7qt7GLtAie4HnQSh
+         MBF4IDZ5ekQZ0pf05Rt6IsRvLkgaw5rjFZyKQGcAp5chR1TPfOS5MjVI/GDdvEx2ts9W
+         2F7Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=91x4En/yixttZsPqKMUGLJ+HDfp3MoNxeXIT7uGfHLU=;
+        fh=2+BmNno+tUJGzmo49VuhN+L32Ek9bzM9xQkpcErEljA=;
+        b=aWD8lyzVidyeobJd5lKgefnEHJPc0l6mDK4+pHQ1H2LWOwryoqT2Znplmx0gxUjYay
+         0CHnxldS0q9LFg4ltwdL7Ll7dIlWDAVn3BAaZMHqTmDaO/cngMoW6j1KDiDNNY1un6QT
+         R6hMPIAG/kwVuWA/L5N0Kj8aXnicJiKU5Th8PWAUP0kgNp6jajXbBSBSFusqHFrIOZf8
+         LbxpUKR1OivD3qh4vpeMBHnxi6i5RBDUJ63KalTX9goWuzDuH2CYLrMO0NC+LpFPzaTA
+         XmKwjXPCKs8PcibZU5aKL37NHGPrUlIkZBZCyC0bz9/P1ehsgP+aHXIpHG0e9IUgDjGd
+         KdgA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779066038; x=1779670838; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1779066235; x=1779671035; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TpKkJC2kMiT9OA/pGYmBdZ/qheRDKlodtbgW4gbsoLY=;
-        b=T7MqMxRyN3mtIW6mrZt+ka+DGksd+qTs78VrJd/WZoOKJZEFsXPhRTkXyYazSdPUc7
-         e66y9zgd+0HMEbSe1+buknqmv7MPpnbUrvvgNwSum4x15NgQ+8iP8gwBPePMmhz81zup
-         J+zqXBeN49EF/gl/3/qVAuTzlES3RVRJNUmec03ovo6l3LiJvUhDh4Lximc8+KfMU8Or
-         GFHRFY+ZFrZdHLDvTSZilPXaryCh+nF1vQemIpyAKEzDHcwb/HRCob8b2CwapWuGkBLI
-         1GLrudUzoMZzimwt94qIUsziws7bKEeD6EjsD5q5Cru7mLreJFb2iEOg8I8D1inxkyRi
-         +/dw==
+        bh=91x4En/yixttZsPqKMUGLJ+HDfp3MoNxeXIT7uGfHLU=;
+        b=L9+gqi4sfbCSVdXZ4FKehvCq9DL4k6j9ViO9s5+BeyFztpBDeo6P5yTPfQV27slQfF
+         HJkGJL/UEQf5E4WJbfauvnTHs74eAmz1vXlcAY7lEq70HxrM7ctu0u/TXEDv/4liv+3Y
+         ZIBaXf+x0W5cDJoFi7SWUmwxJXrnacO867fKGdX+zjUaRS68kIuYOnqbDidC/RShHHqw
+         F67xfsyObaY41b11p+VFBintSrhEJaBo9PyQ71dpb01/E0D4xbeFQBEtn30J4w63SFu4
+         QL6up6cNLTtqfT3+dM1YLZlsRtF3BELgoQqFCLbCpfTamyPxTpYAOnzi/rVNMDNQ/0YJ
+         Vntw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779066038; x=1779670838;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1779066235; x=1779671035;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=TpKkJC2kMiT9OA/pGYmBdZ/qheRDKlodtbgW4gbsoLY=;
-        b=iXprzDoLuITYHkBA1U1WqgbFYrC7anRwzsF4SpeB5I1U4l1VKwPlj549DQzahN1wWZ
-         +9O0XHMvxpM3azw3sNUALTTgUqUL21GdGLQcUYen9fwM2HxqiImrE0zrvgxbtq9wPXdf
-         unLVfVpSUPWv1qUObrrqGkqdsB1647/zhmQNyM779naCx92fVIrZZ4Bym4WFKFsUwAHt
-         k8SKMmXSxlxvY8Ed7UwfsZGM2OuqNWehpKacxnFC63sj4jE1gpn4BXGnhTlPhGVAvlPl
-         kQJhHkuNfd8nGLsf5aX4aAasENPbNyG2eDtSUAy8GE+8iAszpgTagt8Bf01OhmwDifmI
-         QHiA==
-X-Gm-Message-State: AOJu0YwljnK0rM56U/j3l1zyQ0oD0bWdPrCxkR6JWt2DguDmDW1kyawu
-	6HZ6nPJGwSKbpdKPbIhv7PCYCyBI6fG4qPC91siUzIj4N2E/yioHahuP
-X-Gm-Gg: Acq92OHYDOLwN56mjihqCCZ3/GjzT4vviHQ7ICzB3+UndaFqKfcb01+Ex4M67LhE9M8
-	ahMJ7EZvok3juKubIUsDbv8JqRCALKDfQGsUxFyrCyue3T20aHRMJj9Vc49gcT7KjWRR5XE3QXc
-	/UWV/Bpnaa/GqbFkYLNT/WHlVlfg9FOITUEe9w5DCqFTKFRl3xnukRbWb4UAmtcobN7u1g5Ww82
-	D2As/ONdu44ZDwmk58Gt4E1skWrF+OjyGj/O/ibQLAMMhPJOzG+QTxKNeeqVyGIKOC4qC2sCh2n
-	eqxFFg2R82PHcQUAqcrsQ2dR25A1lqVLfjWs0sPY/4WVj2WbMOH7xhO20eJbt0Y36bQNY1z98WH
-	sZui9c5xdekd3ointn/OKJXuiMENtRQElkN7CJUUrS3+YmO3gAWarrGC2JwDT1StHVbbVEtveKh
-	rmYSJdlXHhkEfbp8SfjATRU0+5Cw9kqPbjSgZqvV8FGDRdbsxzdaK8BIhrHAZ0lYMct340K4Uo/
-	A==
-X-Received: by 2002:a5d:5f47:0:b0:452:d03a:7abf with SMTP id ffacd0b85a97d-45e5c36bd31mr19056736f8f.15.1779066037595;
-        Sun, 17 May 2026 18:00:37 -0700 (PDT)
-Received: from node ([202.47.63.86])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45d9adc2209sm30687972f8f.0.2026.05.17.18.00.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 May 2026 18:00:37 -0700 (PDT)
-From: Muhammad Bilal <meatuni001@gmail.com>
-To: michael.bommarito@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	johan.hedberg@gmail.com
-Subject: Re: [PATCH] Bluetooth: L2CAP: rate-limit ECHO_RSP per signaling PDU
-Date: Sun, 17 May 2026 21:00:19 -0400
-Message-ID: <20260518010019.121323-1-meatuni001@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260518002800.1361430-1-michael.bommarito@gmail.com>
-References: <20260518002800.1361430-1-michael.bommarito@gmail.com>
+        bh=91x4En/yixttZsPqKMUGLJ+HDfp3MoNxeXIT7uGfHLU=;
+        b=NG8segot0KqoLmSQ8Uu5zr2gN9gNwgrnzwY8YzhtThdV7+/kIA+bZxqBwa6eFctx05
+         Nk3em9zoSjW7xS4UbNndFmpW8NXlmRA5vsczoKyiUXsmOQIiI11JcZjzTQs03I/gWlXs
+         5Np2nfGJeXtrEOPqD4uTbYYMgkmpQE9o8REJzcHOuI7Pe7+IPn0/rQv31wtIZUg3Jmkg
+         HPwWllYEbEn3zkvFo+JsYI4dMfpB419pGwYFZTG4Qyz4W3I5YXunbHdTO4lKNnHd8+Ou
+         WZ70aJIHkL802NVgoHfPTq3yY1Dew4QP7bSJwWARouWw6N6YaDHmysWC7rJtFWZ1uzjf
+         KNFg==
+X-Gm-Message-State: AOJu0YzOwu2xJgGs2Fic8ZK7KN5d3BHYsmyw08m9KKwYjX3hgDlSmBUr
+	KP75Yp4tCTDYpM6Wu7gC4WMSuwtz9ALbumEiJ0AlDdiEkG6DmQoVI+G0bbcf9c7oG2SjbCizsuo
+	k5eGH/rkiIgkofl2b9vfGU1DmiFMuFFc=
+X-Gm-Gg: Acq92OFfNdSGEOkJGRdsbXEgdNmYUqyAcYfjPTYEi8VJcxIWsuuW/WBPfOQSh2e/q+i
+	172YYvKhydomicM3NUeambg9APFZIt2pGrpYrtQZ1AAgBGFZoo0YJc4vj6H81snB9LBe6JWH3j3
+	cOuRhBFjyeGJXvZx9A2RzBc8dVvyaiTYwevh+f45sp9yticEnFT6Z88GjE964pWzamgw2mxX8op
+	yu7WdYOW933CVej8ONuTCBDm6c+iW4NaHybuAPHu6YpiBnVKCBaI7qLuDWI39xRPC3/RJnNhPE0
+	Opad63FkDClzD8qIDvGawhcAuO3eU3eML615PIKBzIbFJR0=
+X-Received: by 2002:a05:690e:1556:20b0:64e:f106:60e5 with SMTP id
+ 956f58d0204a3-65e2289734cmr11121438d50.52.1779066234884; Sun, 17 May 2026
+ 18:03:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260518002800.1361430-1-michael.bommarito@gmail.com> <20260518010019.121323-1-meatuni001@gmail.com>
+In-Reply-To: <20260518010019.121323-1-meatuni001@gmail.com>
+From: Michael Bommarito <michael.bommarito@gmail.com>
+Date: Sun, 17 May 2026 21:03:43 -0400
+X-Gm-Features: AVHnY4IEVRSimXev0TAeCWU_HHRbUJx3s-3rbOZEcCheeFff6XadNpyMUP1ClAY
+Message-ID: <CAJJ9bXz-Or+hQnCGYi9AD9+deQQHKewipU4-17CSgrS-4i-uEw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: L2CAP: rate-limit ECHO_RSP per signaling PDU
+To: Muhammad Bilal <meatuni001@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	marcel@holtmann.org, luiz.dentz@gmail.com, johan.hedberg@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,
+On Sun, May 17, 2026 at 9:00=E2=80=AFPM Muhammad Bilal <meatuni001@gmail.co=
+m> wrote:
+> A response counter covering all outbound responses generated per PDU
+> would close both paths. Something like:
+>
+>         int resp_count =3D 0;
+>
+>         /* in the error path: */
+>         if (err) {
+>                 if (++resp_count <=3D L2CAP_SIG_ECHO_BURST) {
+>                         BT_ERR("Wrong link type (%d)", err);
+>                         l2cap_sig_send_rej(conn, cmd->ident);
+>                 }
+>                 continue;
+>         }
+>
+>         /* existing echo path: */
+>         if (cmd->code =3D=3D L2CAP_ECHO_REQ &&
+>             ++resp_count > L2CAP_SIG_ECHO_BURST) {
+>                 skb_pull(skb, len);
+>                 continue;
+>         }
+>
+> Using pr_warn_ratelimited() instead of BT_ERR() in the loop would
+> also reduce log amplification independent of the skb path.
 
-Thanks for the patch. The ECHO_REQ cap addresses one amplification
-vector, but the same N:1 amplification appears reachable via the
-unknown-command path in the same loop.
+Thanks, good catch on both!  Luiz reminded me about
+pr_warn_ratelimited before and I missed that again.
 
-When l2cap_bredr_sig_cmd() returns an error for an unrecognised command
-code, the loop calls l2cap_sig_send_rej() unconditionally:
+I'll give others an opportunity to weigh in and then send an updated v2.
 
-        err = l2cap_bredr_sig_cmd(conn, cmd, len, skb->data);
-        if (err) {
-                BT_ERR("Wrong link type (%d)", err);
-                l2cap_sig_send_rej(conn, cmd->ident);
-        }
-
-A peer that packs N commands with an unknown code (e.g. 0xFF, len = 0)
-into a single signaling PDU would trigger N calls to
-l2cap_sig_send_rej(), sending N COMMAND_REJ responses,
-bypassing the new L2CAP_SIG_ECHO_BURST limit entirely. This produces
-the same TX queue saturation the patch intends to prevent, and also
-floods the kernel log with N BT_ERR() writes per PDU.
-
-A response counter covering all outbound responses generated per PDU
-would close both paths. Something like:
-
-        int resp_count = 0;
-
-        /* in the error path: */
-        if (err) {
-                if (++resp_count <= L2CAP_SIG_ECHO_BURST) {
-                        BT_ERR("Wrong link type (%d)", err);
-                        l2cap_sig_send_rej(conn, cmd->ident);
-                }
-                continue;
-        }
-
-        /* existing echo path: */
-        if (cmd->code == L2CAP_ECHO_REQ &&
-            ++resp_count > L2CAP_SIG_ECHO_BURST) {
-                skb_pull(skb, len);
-                continue;
-        }
-
-Using pr_warn_ratelimited() instead of BT_ERR() in the loop would
-also reduce log amplification independent of the skb path.
-
-Regards,
-Muhammad Bilal
+Thanks,
+Mike
