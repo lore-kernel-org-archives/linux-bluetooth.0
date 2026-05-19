@@ -1,108 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3628F4CA294;
-	Tue, 19 May 2026 12:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5E023392D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 12:16:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779192451; cv=none; b=pXB8KwwH8120IxvhnEp5inX8G6cChWmGdq6ygZUSLptKp4E5k0cYIj4sT+aEhtUXzkrLtUdsgpohBfrva34UEItMI3NDSg+wLn7insMA/Fg5XzA+SRwEDJkT/SMKQWkv1EUcDq0r4Lqd9R5/26kFqurVW+3pGtlRsRxFGy26AHk=
+	t=1779192993; cv=none; b=EYU4nfeYy91M98LBYjZUllCFZmy+Po3PPbrkmyyNCaMCSdrpmwaR+syIWTAWtoHpVF2om71zlJuUwO5+AaSDWRBuUYfKQxorIPB37pGxHr00TS3v8eA9Dl+eYd2369f1klA0u96Fwbkskjla3X6Jc/BD5pW5oSKBdIW7Z+Ox+RU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779192451; c=relaxed/simple;
-	bh=24gjXT5wmA214FuTksvBZxjgz04Ja4qpNigX7sxq6hM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ODCRDUYWlDM9bDMNPsoUOJLnVerjyqbhxeItlgFZfSNXItE8GXzOLRwlwWXCNxIs5T1PaDuYoyKKiIWzMtAtBHABw7u4hnewb4oXaRh1CpqLb9zoNtISaHHNfDmKA6slr/df0EuWRzpOI3RpoeOx0DusG4/t+oJy5WvQNZ8eMbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=gPAceZru; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779192993; c=relaxed/simple;
+	bh=SxZKfmKIR91fM97Ama3ssCqOxgoVYqRvhD/hcMyIBn4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=i4ezRVPk4jbPdSCgwZ9z/7u8/d7dq5LAI6WGm3ReT6tij4xWg0p0Np/9lU9FCN0hAdHpV2Mq0cwCMYuYBkMugW7jnckSd91dvW0iDY2hlxfU+NHjIGxb6Mi4rksSs06DLTMAIKZGrAdu4uLvWYVfjSY/jHEb+YnGpVwB3tTaYPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nWmHJ9NP; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="gPAceZru"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 777D5C2BCC7;
-	Tue, 19 May 2026 12:07:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1779192451;
-	bh=24gjXT5wmA214FuTksvBZxjgz04Ja4qpNigX7sxq6hM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gPAceZru+S9ZuIhn16V91zK89WlwILsx+YuFd/0X3f6mr5V35bCAYgGzZxVQG94An
-	 XeLA3r777h01ClFUmPgrT+qG6kESsr7JJlPG8caR1aRWaxNz6iiadjiTWvOZ/2rBTs
-	 Ftcf22u/gnE0okDk/bJGyZnN1lx4JEEc36yQhWRw=
-Date: Tue, 19 May 2026 14:06:43 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Thorsten Leemhuis <regressions@leemhuis.info>
-Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	Sasha Levin <sashal@kernel.org>, linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, davem@davemloft.net,
-	kuba@kernel.org,
-	Linux kernel regressions list <regressions@lists.linux.dev>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [GIT PULL] bluetooth 2026-05-14
-Message-ID: <2026051909-impurity-nemesis-2f65@gregkh>
-References: <20260514172340.1515042-1-luiz.dentz@gmail.com>
- <f5cf1c30-48a4-4102-ae00-b74cf02e639e@leemhuis.info>
- <4946f5f3-b7e2-4949-89f7-6427015027c6@leemhuis.info>
- <2026051954-revision-sierra-6bb4@gregkh>
- <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nWmHJ9NP"
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-50d6b9bca48so57161831cf.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 05:16:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779192991; x=1779797791; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=W5y5lw312n+xz+cLUyp36fLoe7WVOYfI0rCeRqqlaGk=;
+        b=nWmHJ9NPSW4UjNefwGCVscVr6tO9qeLaO+wGoKmvjn3DSNmlRhTeYTrOPa1tgG7kWz
+         Cq5j/OhdTOtGl+YSoWs/T8V+FUM6otMtnnD6rW7FJRNf+ZO7v32qXHAktWoRBkT75/wQ
+         dIHEK1Ur805fbAqf4o2OTGjUdZtFSGacIa/IPw/gzgMiwaq8Giw6TQosP/QG+NAPtOek
+         +77gCUmyx6DMBnBeom45OwDg9Tk0S0EwaV7xDhFE8nYe38Muew5xToOmvDePuIXt/8gW
+         FP5l1Qo0/H0tekj9Ft9g5HHpJlRoat+3DqQrucgb0X5xPuQFyOtg6+dkwLLTWZoUCEd/
+         +SWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779192991; x=1779797791;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W5y5lw312n+xz+cLUyp36fLoe7WVOYfI0rCeRqqlaGk=;
+        b=nyZch5U7rofTHDy6AxQX4ME1wJwsAj9e/lQxc0Sk3hbhCcPFrJJF0vqlz02axRqMxU
+         tsY8+BRHiB76BTqIbJNzVLYswtWBbAU15fKVdbCKwNdxolF3kz5EnsFLi5He/8sDp9Oi
+         Mgo43LxmTarSawHl+HGv9J+7Um7GsxT4b7imU3d02fhrQ9N65aamOHv5ij3aP2nNgsq+
+         kVe8KDsYJrd9iOejBr5G6Dojbl4itM+wRJVz+l9NXtogAVRJA7Zi48curdR/ynzYYz2s
+         26n+u60xc/w1twQzI4b2WTFeIW+V+cpcv/czxDvk4oErhIXlFrWnLE6QjRBptjbWciS5
+         ixXA==
+X-Gm-Message-State: AOJu0Yw24vkyyQehIb8/s1WstHBzmI92UN/Xqtz02srd1SqGXl0+UvtF
+	jimcID17ctxcgBinEMPuXTj9+N2lSpQLN3JlCEmH42hS1xaNe0mntpFsNR8VoQ==
+X-Gm-Gg: Acq92OHX3cG4FimKvd6MR6XmuTNixFB+welDLfJTOgratUu7HBpoJsep9Sj7fBnyDtW
+	H5YkHBxqjIZ3hbVVVk1wNscd2ZcON2B7sJUaQAWmMKKdBraSOswhAQbAacFh4h/seCP7s8GfaXr
+	ra1oSFK33NXbWOx+sgcxsSOyn3rQvp9kNOk+tsUjf64gtmALdGh+WWbQAMo6XSDs5im6LklgUiz
+	XdN/y7KE9oMkbNGm4lPqGvaZ5lNuYxL0DDdCXbSQg8onyOdzHFoTtq7JsyVaj+ImmdvvSCwgPFl
+	9KrfELNsE8/VyXDA5yRo/JV8UUDAvTjOleog3lNg0QazKhzkbMIAZjcOL6pD9s4t8YMh3Zgr2P5
+	WcDvXcPLZ6heK2yCYfCHOfOr+tRVwN6ULZ5xoSJPJMl5/pZ0B9Ilguwp9ykgu9JkHYxgl4HkyRd
+	txupXV0sROFVBsLJ9RUmmh0es2Mpo=
+X-Received: by 2002:a05:622a:4c11:b0:50f:bb11:df41 with SMTP id d75a77b69052e-5165a25a5c4mr266267661cf.60.1779192991094;
+        Tue, 19 May 2026 05:16:31 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.87.51])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5164581aed3sm160486071cf.23.2026.05.19.05.16.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 05:16:30 -0700 (PDT)
+Message-ID: <6a0c549e.04ac118e.7d5ac.34f8@mx.google.com>
+Date: Tue, 19 May 2026 05:16:30 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0603476793013047469=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, rollkingzzc@gmail.com
+Subject: RE: [v3] Bluetooth: bnep: reject short frames before parsing
+In-Reply-To: <20260519113943.3656062-1-rollkingzzc@gmail.com>
+References: <20260519113943.3656062-1-rollkingzzc@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Tue, May 19, 2026 at 12:53:49PM +0200, Thorsten Leemhuis wrote:
-> On 5/19/26 12:30, Greg KH wrote:
-> > On Tue, May 19, 2026 at 09:04:38AM +0200, Thorsten Leemhuis wrote:
-> >> On 5/15/26 17:10, Thorsten Leemhuis wrote:
-> >>> On 5/14/26 19:23, Luiz Augusto von Dentz wrote:
-> >>>
-> >>>> The following changes since commit c78bdba7b9666020c0832150a4fc4c0aebc7c6ac:
-> >>>>   net: phy: DP83TC811: add reading of abilities (2026-05-14 15:17:12 +0200)
-> >>>>
-> >>>> are available in the Git repository at:
-> >>>>
-> >>>>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-14
-> >>>>
-> >>>> for you to fetch changes up to 375ba7484132662a4a8c7547d088fb6275c00282:
-> >>>>
-> >>>>   Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-14 09:58:08 -0400)
-> >>>
-> >>> It seems this PR sadly came too late for this week's net PR to mainline
-> >>> that was merged yesterday.
-> >>>
-> >>> TWIMC, from my point of view, it would be great if we somehow could
-> >>> still get the changes from this PR or at least the btmtk fix it
-> >>> contains[1] to mainline this week before -rc4, as it is fixing a
-> >>> regression known since 2026-04-24 that at least five people encountered
-> >>> with mainline since -rc3 due to 634a4408c0615c ("Bluetooth: btmtk:
-> >>> validate WMT event SKB length before struct access") [006b9943b982 in
-> >>> -next].
-> >>
-> >> Greg, Sasha, that [1] fix I was talking about now reached -next as
-> >> 162b1adeb057d2 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL
-> >> events") and will likely hit mainline on Thursday or so with the weekly
-> >> -net PR to -mainline. If that's good enough for you, I'd say it would be
-> >> good to pick this up for the next round of stable kernels.
-> > 
-> > That "Fixes:" tag is referring to something that is also not in any
-> > tree, but that commit does have a cc: stable in it.  So do we need both
-> > of these:
-> 
-> Valid question, as yes, there is a slight mixup here:
-> 
-> > 041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length before struct access")
-> 
-> That is already in v7.0.7, v6.18.30, v6.12.88, as 041e88fb0c08 is the
-> -next commit-id for mainline commit-id 634a4408c0615c ("Bluetooth:
-> btmtk: validate WMT event SKB length before struct access") -- the one
-> that is causing the regression that I want to get fixed. So we now only
-> need:
-> 
-> > 162b1adeb057 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL events")
+--===============0603476793013047469==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Ok, but that "Fixes:" tag pointing to an invalid commit is going to be a
-nightmare to track over time, ugh.
+This is automated email and please do not reply to this email!
 
-I'll go queue this up now, thanks.
+Dear submitter,
 
-greg k-h
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1097332
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.77 seconds
+GitLint                       FAIL      0.33 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      25.40 seconds
+CheckAllWarning               PASS      27.62 seconds
+CheckSparse                   PASS      26.64 seconds
+BuildKernel32                 PASS      24.54 seconds
+TestRunnerSetup               PASS      530.16 seconds
+TestRunner_bnep-tester        PASS      18.87 seconds
+IncrementalBuild              PASS      24.16 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v3] Bluetooth: bnep: reject short frames before parsing
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+42: B1 Line exceeds max length (123>80): "Use skb_pull_data() with NULL checks in bnep_rx_frame() instead of direct skb->len guards before fixed header dereferences."
+
+
+https://github.com/bluez/bluetooth-next/pull/216
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0603476793013047469==--
