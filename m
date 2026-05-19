@@ -1,177 +1,152 @@
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [185.244.194.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1223F3B388A;
-	Tue, 19 May 2026 07:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.244.194.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DC93D16EA
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 07:26:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779174425; cv=none; b=GH2fM1XNas6lK4/l8AuvrpmKzDXxLgNwWkHc5srswtspF+RjKSX8iwCK2+5SlMVH9uZizfqk6C7hLDBo80UngH6JKgJCXi57sRiUAWaOrS809hZwYBF8S0wuBC3WVpgv6j+5QvlIV4xfrhKjwKap0aI71wReYQnyyF6mnccm1Io=
+	t=1779175571; cv=none; b=J9KmjHWpZC+X36hp+YxD6pY9xIftEzqe0oVSDukgEvExnYzrBFXHnJOKPfMshpIXXi2rCEXBmkKCMi1o9LcXvntQAT8RZwYz1ZUAXiMOhnpFtcEGZOs7cXmfwKEryDou3k6KnrfIwR7pcEaO8rNXhJbVm2oyl80TyhkZJk3D8AM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779174425; c=relaxed/simple;
-	bh=Kbi02mnUFXxeexEHvbh0wMhOy1M0F4jrVLISqBF8Tbw=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=qj1wXz5cSyfAPUWL4wb0Lqw1Zz1iuh9bkYuaN9ZVpO99G0tnr4kyqCOcocPzxnm7wUfK1DIbLHQqkqw9y08wg1+nHYPAi2X4x7RmijEL0aWPa9JtmUJlAA0R5tyqwor+Px0Uu4T+0zFyhnl9P4RStc3aqjce3nzkA3K/mMh6nVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=TN0ErKKY; arc=none smtp.client-ip=185.244.194.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1779175571; c=relaxed/simple;
+	bh=E5tbrL6gDSZ/C+kamk4PKO0Wqa9UDvCknl/PJPOeSAc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=E1a0RGtGep8J9qwaXbx+dYNF1sWGX6922ZtDDCK11vp8MPO9NPlDurn9sxMPFw9hbcDlbtAev4kxJBc4jKG7vPycp56DYAVZ1R9xoXAQVdXVMkg+Q7temWc0PnYWYYPbXkLQ1QRsN/RFysWdR0iB9ri4pnVUyDVsCAIkdlgfBt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a8VtNZt+; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="TN0ErKKY"
-Received: from relay01-mors.netcup.net (localhost [127.0.0.1])
-	by relay01-mors.netcup.net (Postfix) with ESMTPS id 4gKQf26W0dz96MW;
-	Tue, 19 May 2026 09:04:42 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1779174282;
-	bh=Kbi02mnUFXxeexEHvbh0wMhOy1M0F4jrVLISqBF8Tbw=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=TN0ErKKYRQSuKIq7C2e5MFoo5n0VF25zRxXqyYU65XjDGkAfVe0Am549XQbqMtaos
-	 YqSQLVskTs1JVHz5gss6kdBZmymbqr1wk6vThOY3kAS3wlzGNmbu9fYKn5ySDrw0Ip
-	 NbottmFZFbVgOCXp4ALD0DB4YECF3MSd7d8qFFTk4fzwbbi9A2Pvdkm5xUPgj5Yq+j
-	 7H06OKrHBV+wVnTk4V3WLufpgn7S8YpeJn8nHjiy6jRkKc25p5Nraq7+9XdzVNfRbb
-	 vvH5wZsiEa6MuuI2IubYmKV4cIh3NhDlxTlF6zPsfCMfpnu/ATlKWUBedorizMKiiZ
-	 k45i9/Fgx/dfA==
-Received: from policy01-mors.netcup.net (unknown [46.38.225.35])
-	by relay01-mors.netcup.net (Postfix) with ESMTPS id 4gKQf25nn1z7vS1;
-	Tue, 19 May 2026 09:04:42 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at policy01-mors.netcup.net
-X-Spam-Flag: NO
-X-Spam-Score: -2.898
-X-Spam-Level: 
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy01-mors.netcup.net (Postfix) with ESMTPS id 4gKQf02kjWz8tbD;
-	Tue, 19 May 2026 09:04:40 +0200 (CEST)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 573CD61840;
-	Tue, 19 May 2026 09:04:39 +0200 (CEST)
-Authentication-Results: mxe9fb;
-        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <4946f5f3-b7e2-4949-89f7-6427015027c6@leemhuis.info>
-Date: Tue, 19 May 2026 09:04:38 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a8VtNZt+"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-488b3f8fa2bso32689565e9.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 00:26:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779175568; x=1779780368; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J0yD7Ov4S/iFthQxZco1gvVMz6aNPT7+SQbTZFwmogE=;
+        b=a8VtNZt+5y+ixT244aAYDcFwUDEJcJkqTr8ACOGDp6cbyE9XPvTx06mQiZoDp7F1BC
+         e0d/fPF0f+iWdNr7sAw3lZLJDWeF0wGmQg1HUhUiQY9E99DFDi0scixr0O/WFsRzbbh5
+         x91Q0jqRyNNn0weY6KR10WVirKTZMy2zWmBur7GfTUHWYGRDKV+sSfLRbMoGdjCNDmkr
+         ITl8HayIECN9LEsHxtAdnjCxONeSLUyA7+HHO7slBGlkKn/06w3tmUYJDiCYeYlgAHlW
+         b7H3l73Fbyty9C0JemelCefvLYxuLHV+bm7DXXKJac7yF1Laf2vD5QaSrs7TSmfxh2sh
+         bOGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779175568; x=1779780368;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=J0yD7Ov4S/iFthQxZco1gvVMz6aNPT7+SQbTZFwmogE=;
+        b=BnaIyenPOqBAMXI8hzCR84NacBsvkt7GAA3mU1TIIfwxlvEsXyhqMIEgua3TRi9YIY
+         IO7ALER475+4oB1bAln64YVBAM4ZaEfPv4DVJPWSx5agHnn22Do7NdK/N7Bu3n8kOaGb
+         GL1ijNeaJvhwtWyQxMWPDlfs55mpcUKZ6Nuj6QegdH3QKGcK5rw25ZeCNwTgzOzZsSB8
+         nGLkwgX5OhpfPxRUNPBZdayP0D1lt6OpQ8LpOB41uY7mdFCwjgPw5iqTzIdpXmk3IlFf
+         sFp0QzAmcY3z1+UHGCcJPiOsFLaQdpRSlR6okh71XZBmNNqfrwc93cOcUzb2LvtO+Yuh
+         4QCw==
+X-Gm-Message-State: AOJu0YzLqyFPlICXl1QMpHCVIDFLY91NNh1Ud3YC/TLR9x+aQV1CGtBn
+	QX/3ZZxLeixqqdMHMyz5Syz48wbx4q95B2phwLRbaoT70aT3lbr9Es+bAbwIiqnu8cA=
+X-Gm-Gg: Acq92OEUUQ4qvZskZLCQGFgJN1V8a0LpGZ1dIIzY4OMP7SGD/TKxTmh9YHauQU/mVhw
+	Zo3mETmdfLmxOJLbY+1B0aZcU/3pIYprs3LgvCgzRviYxHqbOYcKTDXfXbJplXKjvQm/vIZRcGL
+	FWZuTRogvtwtnChkv8hk10RSf4nipEbStNdpuoQ2pGVrvWsCoTeAgg5Oi/KZlWiBfwRW1loiQjh
+	6ioQUm6ooX7tXudVD2dacYhED4AeTRbWubOxJJ/41xHF+KM6O5BseVrrCpHJYT/tNyd/mii8T73
+	JsZZA8dWkqmYGZqQOKPwxBtAn/U3sbwogVd040cqo5BBCJv157hGmcNe80Dai0JQCxkNzMKPQ8G
+	sR0L1LjPv5XR43CMJJ9AdHtUCgxhAp9RV8GLsBlGc9QF47hzwPnGVRiZsc7/bxy9ES/y577jGkK
+	swC2mkU6MtRcj6Q8VJ3wjKwTAp6LXEuDNz860W2E9czG0oAdbChmAiTzxZUBIu8Oik9CbPKCW1s
+	Q==
+X-Received: by 2002:a05:600c:8485:b0:48a:5339:a46 with SMTP id 5b1f17b1804b1-48fe537fb70mr3651885e9.9.1779175567423;
+        Tue, 19 May 2026 00:26:07 -0700 (PDT)
+Received: from node ([202.47.63.86])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe4c88e5asm327422845e9.6.2026.05.19.00.26.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 00:26:07 -0700 (PDT)
+From: Muhammad Bilal <meatuni001@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	kees@kernel.org,
+	kuba@kernel.org,
+	stable@vger.kernel.org,
+	Muhammad Bilal <meatuni001@gmail.com>
+Subject: [PATCH v2] Bluetooth: RFCOMM: add minimum length check in rfcomm_recv_frame
+Date: Tue, 19 May 2026 03:25:47 -0400
+Message-ID: <20260519072547.33974-1-meatuni001@gmail.com>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260519042017.29564-1-meatuni001@gmail.com>
+References: <20260519042017.29564-1-meatuni001@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] bluetooth 2026-05-14
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-To: Greg KH <gregkh@linuxfoundation.org>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>,
- Sasha Levin <sashal@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, davem@davemloft.net,
- kuba@kernel.org, Linux kernel regressions list
- <regressions@lists.linux.dev>, Linus Torvalds <torvalds@linux-foundation.org>
-References: <20260514172340.1515042-1-luiz.dentz@gmail.com>
- <f5cf1c30-48a4-4102-ae00-b74cf02e639e@leemhuis.info>
-Content-Language: de-DE, en-US
-In-Reply-To: <f5cf1c30-48a4-4102-ae00-b74cf02e639e@leemhuis.info>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-PPP-Message-ID: 
- <177917427974.1028416.13755667585499179933@mxe9fb.netcup.net>
-X-NC-CID: DUzrp9NfZvXVLNpdroel/q9mtQMCKy5sP1vj16MOZXEFJ2YL3nM=
 
-On 5/15/26 17:10, Thorsten Leemhuis wrote:
-> On 5/14/26 19:23, Luiz Augusto von Dentz wrote:
->
->> The following changes since commit c78bdba7b9666020c0832150a4fc4c0aebc7c6ac:
->>   net: phy: DP83TC811: add reading of abilities (2026-05-14 15:17:12 +0200)
->>
->> are available in the Git repository at:
->>
->>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-14
->>
->> for you to fetch changes up to 375ba7484132662a4a8c7547d088fb6275c00282:
->>
->>   Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-14 09:58:08 -0400)
-> 
-> It seems this PR sadly came too late for this week's net PR to mainline
-> that was merged yesterday.
-> 
-> TWIMC, from my point of view, it would be great if we somehow could
-> still get the changes from this PR or at least the btmtk fix it
-> contains[1] to mainline this week before -rc4, as it is fixing a
-> regression known since 2026-04-24 that at least five people encountered
-> with mainline since -rc3 due to 634a4408c0615c ("Bluetooth: btmtk:
-> validate WMT event SKB length before struct access") [006b9943b982 in
-> -next].
+rfcomm_recv_frame() casts skb->data to struct rfcomm_hdr * and
+immediately dereferences hdr->addr and hdr->ctrl without first
+validating that skb->len is large enough to hold the header. A
+remote device can send a crafted short RFCOMM frame over L2CAP to
+trigger an out-of-bounds read before any session state is checked.
 
-Greg, Sasha, that [1] fix I was talking about now reached -next as
-162b1adeb057d2 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL
-events") and will likely hit mainline on Thursday or so with the weekly
--net PR to -mainline. If that's good enough for you, I'd say it would be
-good to pick this up for the next round of stable kernels.
+The FCS trimming code that follows compounds the problem:
 
-Ciao, Thorsten
+skb->len--; skb->tail--;
 
-P.S.: Side note, in case anyone cares: this regression meanwhile was
-reported at least 14 times by now (only counting upstream reports, there
-are many more in various downstreams).
+If skb->len is already zero the decrement wraps to UINT_MAX, causing
+skb_tail_pointer() to return a pointer far outside the skb and
+producing a second out-of-bounds read when the FCS byte is consumed.
 
-> Another reason: Greg a few hours ago backported the culprit for the
-> regression to v7.0.7, v6.18.30, and v6.12.88, which led to a bunch of
-> other reports coming in[3]. Greg could, of course, revert it, but
-> usually he prefers to just merge the fix. But of course the fix must
-> first hit mainline (or at least -next) -- and that might only happen
-> next Thursday, as there usually is only one net PR per week. Luiz even
-> wanted to "expedite a PR to have it fixed asap"[4], but that didn't work
-> out afaics, hence this mail.
-> 
-> Ciao, Thorsten
-> 
-> [1] btmtk: accept too short WMT FUNC_CTRL events – also available here:
-> https://lore.kernel.org/all/770d36b07311bf88210c187923f243fb9f126f04.1777058551.git.pav@iki.fi/
-> 
-> [2]
-> https://lore.kernel.org/lkml/20260508173121.27526-1-mikhail.v.gavrilov@gmail.com/
-> https://lore.kernel.org/lkml/f652d5d9841a9b7c100dd19ee97c86099f580724.camel@gmail.com/
-> https://bugzilla.kernel.org/show_bug.cgi?id=221511
-> https://lore.kernel.org/lkml/20260514-bluetooh-fix-mt7922-v1-1-499c878af1e5@zohomail.in/
-> https://lore.kernel.org/lkml/20260514-bluetooh-fix-mt7922-v1-1-499c878af1e5@zohomail.in/
-> (+ one more report in a Fedora kernel chatroom)
-> 
-> [3]
-> https://bugzilla.kernel.org/show_bug.cgi?id=221521
-> https://lore.kernel.org/lkml/51b55b97-615b-4f5e-b454-df646f4058b7@augustwikerfors.se/
-> + a four more people in
-> https://bodhi.fedoraproject.org/updates/FEDORA-2026-6b173ffc2a#comment-4646633
-> 
-> [4]
-> https://lore.kernel.org/all/CABBYNZ+FfhYtU2=J-V4pjKf_vKV=Y5LhVhxS_epKe-qaUUt8_g@mail.gmail.com/
-> 
-> 
->> ----------------------------------------------------------------
->> bluetooth pull request for net:
->>
->>  - af_bluetooth: serialize accept_q access
->>  - L2CAP: ecred_reconfigure: send packed pdu, not stack pointer
->>  - btmtk: accept too short WMT FUNC_CTRL events
->>  - hci_qca: Convert timeout from jiffies to ms
->>
->> ----------------------------------------------------------------
->> Jiexun Wang (1):
->>       Bluetooth: serialize accept_q access
->>
->> Michael Bommarito (1):
->>       Bluetooth: L2CAP: ecred_reconfigure: send packed pdu, not stack pointer
->>
->> Pauli Virtanen (1):
->>       Bluetooth: btmtk: accept too short WMT FUNC_CTRL events
->>
->> Shuai Zhang (1):
->>       Bluetooth: hci_qca: Convert timeout from jiffies to ms
->>
->>  drivers/bluetooth/btmtk.c         |  4 +-
->>  drivers/bluetooth/hci_qca.c       | 33 +++++++--------
->>  include/net/bluetooth/bluetooth.h |  1 +
->>  net/bluetooth/af_bluetooth.c      | 87 +++++++++++++++++++++++++++++----------
->>  net/bluetooth/l2cap_core.c        |  2 +-
->>  5 files changed, 85 insertions(+), 42 deletions(-)
->>
-> 
+Add a minimum length check before the header pointer is assigned. A
+well-formed RFCOMM frame requires at least addr(1) + ctrl(1) +
+len(1) + fcs(1) = sizeof(struct rfcomm_hdr) + 1 bytes. This single
+guard prevents both the header out-of-bounds read and the skb->len
+integer underflow.
+
+Note: SeungJu Cheon posted a related patch that adds equivalent
+length checks inside the individual MCC sub-handlers
+(rfcomm_recv_pn, rfcomm_recv_rpn, rfcomm_recv_rls, rfcomm_recv_msc,
+rfcomm_recv_mcc). That fix and this one are complementary and
+independent; neither subsumes the other.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Signed-off-by: Muhammad Bilal <meatuni001@gmail.com>
+---
+ net/bluetooth/rfcomm/core.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index d11bd5337..6b300237c 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1741,7 +1741,7 @@ static int rfcomm_recv_data(struct rfcomm_session *s, u8 dlci, int pf, struct sk
+ static struct rfcomm_session *rfcomm_recv_frame(struct rfcomm_session *s,
+ 						struct sk_buff *skb)
+ {
+-	struct rfcomm_hdr *hdr = (void *) skb->data;
++	struct rfcomm_hdr *hdr;
+ 	u8 type, dlci, fcs;
+ 
+ 	if (!s) {
+@@ -1750,10 +1750,17 @@ static struct rfcomm_session *rfcomm_recv_frame(struct rfcomm_session *s,
+ 		return s;
+ 	}
+ 
++	/* Minimum valid frame: addr(1) + ctrl(1) + len(1) + fcs(1) */
++	if (skb->len < sizeof(*hdr) + 1) {
++		kfree_skb(skb);
++		return s;
++	}
++
++	hdr = (void *) skb->data;
+ 	dlci = __get_dlci(hdr->addr);
+ 	type = __get_type(hdr->ctrl);
+ 
+-	/* Trim FCS */
++	/* Trim FCS - safe: skb->len >= sizeof(*hdr) + 1 >= 1 */
+ 	skb->len--; skb->tail--;
+ 	fcs = *(u8 *)skb_tail_pointer(skb);
+ 
+-- 
+2.54.0
 
