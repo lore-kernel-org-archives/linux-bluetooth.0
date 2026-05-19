@@ -1,163 +1,79 @@
-Received: from phan-van4.scw-tem.cloud (phan-van4.scw-tem.cloud [51.159.124.109])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53ACC33F5B1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 17:38:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.124.109
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99BE343880
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 17:39:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779212282; cv=none; b=dPuD7KDMfQsajUd2gSJ2VxdyyzA5iD+JwI/LLvJPGkLHTUBazn2ee2yOHSTU55ENL/rEvH0TOXLyGF2GdXWuUZbJ0KyhHO+FqdsTcrX1ylkvIH6Sgpz3/lCRHMRSGcrjp8j7mOYOawNgiBmoNkdJi6pi51msXjlER0MSlpKWzEA=
+	t=1779212389; cv=none; b=kRACs7GuoDf38c7CxMDbWNOTw2BXG0LWBU/VPv63xExJolii/Bgz459vUTQnrSO2KhRlgkL/2jQhXK5Pxd+rxpGFuPncPtzxsgozMkC5+Ml4p9GG6211wnE0iwDUndCKWftx1d98DC9A/7fn6RNK2j1d6WBMvMEKG8Mv30Z41to=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779212282; c=relaxed/simple;
-	bh=Hh1YcciGZumXppFcnqOssFAiw5yBXVmcqR70GJ2lvdg=;
-	h=Message-ID:Date:Mime-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NilXn5wMghwFqfIDHwgKwsA+aIIQa+V7nzCkQb/qXvmX+7WIPxH8dhIOfbUC3XwQwuS2+/5Taap4zuwb1F1AobvZkhnicEG2ryMQXIBrpX1T3HMpMg+/E+ecvNIu4SaQqtRT5lXYKeOlpW+B0YzCaorXshiNANoF6IUxVeluezY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=augustwikerfors.se; spf=pass smtp.mailfrom=augustwikerfors.se; dkim=pass (2048-bit key) header.d=augustwikerfors.se header.i=@augustwikerfors.se header.b=lBMZD9Kd; arc=none smtp.client-ip=51.159.124.109
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=augustwikerfors.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=augustwikerfors.se
+	s=arc-20240116; t=1779212389; c=relaxed/simple;
+	bh=0/PRXQoakrcHMCQYbRcKrMP9KTswd9TIhNG4PB86XGA=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=pIa0V3W4ILa00K/PHW/oVn3HxPgWxh0td0z0Ju1+ul7tAuebbld2TJUsg5fLqKFUDDIQAONzx38v6gZ/y/BApm7Ws8kmv3rQ8xqgrLiWKtoxMnrFHvzbtqJNwlfW84rxt4HiODGas8cX+niLZxj++5jTko19L61HAz5jE6872Qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G3p5O5VJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=augustwikerfors.se header.i=@augustwikerfors.se header.b="lBMZD9Kd"
-Message-ID: <e666c332-e2aa-4525-a208-a4a08742d2e0@augustwikerfors.se>
-Date: Tue, 19 May 2026 19:37:35 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G3p5O5VJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9AEA6C2BCB3
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 17:39:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779212388;
+	bh=0/PRXQoakrcHMCQYbRcKrMP9KTswd9TIhNG4PB86XGA=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=G3p5O5VJTioc4eRFpEHilOUaaumIMuWFBicrK7s80vHVCbYDkeWmn65CP/KbViJ/J
+	 jdskxHkdSdWt7lpGnqvT9cu4IcN1NOL5CfSDy6jTgdAJf2E7jTM1ik41JAHODjH6jB
+	 BTRNrPR0iLSG3nSImykovmbb6BG8NWDh9zxPoul+L7twbJul4kdtf4H+B0OesOE0RG
+	 zwh0j389vr/7ww4A91t3cyEVCF20uRu9o56clMPn7/zwDh9uVulCwhOQxCYMM/P91y
+	 odjORe9CFUBl38nEULtUWxb3fd3MN45vwV3j1If02c7o5k9En/sHHWsTFS6ga/SLsY
+	 flyxJzUBopuqg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 88BB6C433E1; Tue, 19 May 2026 17:39:48 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221547] MT7902 Bluetooth: Failed to send wmt func ctrl (-22)
+ regression in 6.18.31 and 6.12.32
+Date: Tue, 19 May 2026 17:39:48 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: olle@vixit.nu
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-221547-62941-MUeIDFBD13@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221547-62941@https.bugzilla.kernel.org/>
+References: <bug-221547-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Subject: Re: [GIT PULL] bluetooth 2026-05-14
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Greg KH <gregkh@linuxfoundation.org>
-Cc: Thorsten Leemhuis <regressions@leemhuis.info>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>,
- Sasha Levin <sashal@kernel.org>, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- Linux kernel regressions list <regressions@lists.linux.dev>,
- Linus Torvalds <torvalds@linux-foundation.org>
-References: <20260514172340.1515042-1-luiz.dentz@gmail.com>
- <f5cf1c30-48a4-4102-ae00-b74cf02e639e@leemhuis.info>
- <4946f5f3-b7e2-4949-89f7-6427015027c6@leemhuis.info>
- <2026051954-revision-sierra-6bb4@gregkh>
- <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
- <2026051909-impurity-nemesis-2f65@gregkh>
- <CABBYNZKKbTXc-okp9P2OncMYXHX9C1XC+pRC7XWOhv-8nPNZ5A@mail.gmail.com>
- <2026051942-uproar-drainpipe-6370@gregkh>
- <CABBYNZKzWgL3nmeA=CtN9s80LRyDiJ97aQXgvfSm9vYUBw_SpA@mail.gmail.com>
-Content-Language: en-US
-From: August Wikerfors <git@augustwikerfors.se>
-In-Reply-To: <CABBYNZKzWgL3nmeA=CtN9s80LRyDiJ97aQXgvfSm9vYUBw_SpA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scw-Domain: augustwikerfors.se
-X-Scw-Tem-Message-Id: b807181e-083e-4510-880a-8e8153927351
-DKIM-Signature: a=rsa-sha256; bh=Txy3fsJraKmT/pLDtNhESFuzdhjEx/YzrQC5SlbqiTY=;
- c=relaxed/relaxed; d=augustwikerfors.se;
- h=message-id:date:subject:to:cc:from;
- s=812a4465-b64d-440c-bdd2-3148e8f56cf0; t=1779212260; v=1;
- b=lBMZD9Kd+T5V+7XewGRsx0w0BZFXZO0Zk9NSl3kzyhehcF9E/YUIMHGil1mpX4Es+P+mhtU0
- ZMqqlJ9MKTebANvtAraehHuBU9ld3Nj93udTNHLRs3pvYgCR15krTgAqM9UROkxRDZUvpJrS7Gy
- RbH74EGsermX8dX9Cd1vrkzxl96q+jF0mvRwXzF1y9wdTAxt/2T4YkuxHNjJ9qWR3GnJ0+wFN1X
- SUWBe2aTbyOZGTdk7knsXDY/eE/FqRpVhvsaU0g+6hJDZF7WWej1h6U6tNF+f/kptb2no/M8ny0
- oLesXcJN22M3hV8wYUPpKLY8WE4yO6DWPsF+R6RtfzqIg==
+MIME-Version: 1.0
 
-On 2026-05-19 17:49, Luiz Augusto von Dentz wrote:
-> Hi Greg,
-> 
-> On Tue, May 19, 2026 at 11:19 AM Greg KH <gregkh@linuxfoundation.org> wrote:
->>
->> On Tue, May 19, 2026 at 09:44:39AM -0400, Luiz Augusto von Dentz wrote:
->>> Hi Greg,
->>>
->>> On Tue, May 19, 2026 at 8:07 AM Greg KH <gregkh@linuxfoundation.org> wrote:
->>>>
->>>> On Tue, May 19, 2026 at 12:53:49PM +0200, Thorsten Leemhuis wrote:
->>>>> On 5/19/26 12:30, Greg KH wrote:
->>>>>> On Tue, May 19, 2026 at 09:04:38AM +0200, Thorsten Leemhuis wrote:
->>>>>>> On 5/15/26 17:10, Thorsten Leemhuis wrote:
->>>>>>>> On 5/14/26 19:23, Luiz Augusto von Dentz wrote:
->>>>>>>>
->>>>>>>>> The following changes since commit c78bdba7b9666020c0832150a4fc4c0aebc7c6ac:
->>>>>>>>>    net: phy: DP83TC811: add reading of abilities (2026-05-14 15:17:12 +0200)
->>>>>>>>>
->>>>>>>>> are available in the Git repository at:
->>>>>>>>>
->>>>>>>>>    git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-14
->>>>>>>>>
->>>>>>>>> for you to fetch changes up to 375ba7484132662a4a8c7547d088fb6275c00282:
->>>>>>>>>
->>>>>>>>>    Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-14 09:58:08 -0400)
->>>>>>>>
->>>>>>>> It seems this PR sadly came too late for this week's net PR to mainline
->>>>>>>> that was merged yesterday.
->>>>>>>>
->>>>>>>> TWIMC, from my point of view, it would be great if we somehow could
->>>>>>>> still get the changes from this PR or at least the btmtk fix it
->>>>>>>> contains[1] to mainline this week before -rc4, as it is fixing a
->>>>>>>> regression known since 2026-04-24 that at least five people encountered
->>>>>>>> with mainline since -rc3 due to 634a4408c0615c ("Bluetooth: btmtk:
->>>>>>>> validate WMT event SKB length before struct access") [006b9943b982 in
->>>>>>>> -next].
->>>>>>>
->>>>>>> Greg, Sasha, that [1] fix I was talking about now reached -next as
->>>>>>> 162b1adeb057d2 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL
->>>>>>> events") and will likely hit mainline on Thursday or so with the weekly
->>>>>>> -net PR to -mainline. If that's good enough for you, I'd say it would be
->>>>>>> good to pick this up for the next round of stable kernels.
->>>>>>
->>>>>> That "Fixes:" tag is referring to something that is also not in any
->>>>>> tree, but that commit does have a cc: stable in it.  So do we need both
->>>>>> of these:
->>>>>
->>>>> Valid question, as yes, there is a slight mixup here:
->>>>>
->>>>>> 041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length before struct access")
->>>>>
->>>>> That is already in v7.0.7, v6.18.30, v6.12.88, as 041e88fb0c08 is the
->>>>> -next commit-id for mainline commit-id 634a4408c0615c ("Bluetooth:
->>>>> btmtk: validate WMT event SKB length before struct access") -- the one
->>>>> that is causing the regression that I want to get fixed. So we now only
->>>>> need:
->>>>>
->>>>>> 162b1adeb057 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL events")
->>>>
->>>> Ok, but that "Fixes:" tag pointing to an invalid commit is going to be a
->>>> nightmare to track over time, ugh.
->>>
->>> Hmm, did we get the wrong hash or something? Usually, that would show
->>> up in the verify-fixes.sh, but perhaps it didn't capture it this time
->>> for some reason, perhaps I'm running an outdated version or something
->>> similar.
->>
->> Something went wrong if we ended up with a patch in the stable trees,
->> yet this fix is referring to it as a different git sha.  Don't know
->> where the disconnect happend :(
-> 
-> 041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length before
-> struct access")
-> 
-> I don't have that in any of our tree either, this is actually
-> 634a4408c061 on all trees in the chain:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/commit/?id=634a4408c061
-> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=634a4408c061
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=634a4408c061
-> 
-> Or actually that was the hash before it got rebased on bluetooth-next tree:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=041e88fb0c08
-> 
-> But I didn't send the PR from that three so perhaps somebody else sent
-> it to stable with the wrong fixes tag?
-I believe the confusion comes from "Bluetooth: btmtk: accept too short 
-WMT FUNC_CTRL events" itself currently having different commit hashes in 
-bluetooth (e3ac0d9f1a20) and bluetooth-next (162b1adeb057). The former 
-correctly refers to "Bluetooth: btmtk: validate WMT event SKB length 
-before struct access" as 634a4408c061 in the Fixes tag and was merged 
-into net yesterday heading for 7.1-rc5. The latter still refers to it as 
-041e88fb0c08. Both are now in next-20260519 but only the latter was in 
-next-20260518 which was the latest at the time of Thorsten's message.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221547
 
-Greg, this means picking e3ac0d9f1a20 instead of 162b1adeb057 should 
-result in a valid Fixes tag.
+--- Comment #2 from ljotom (olle@vixit.nu) ---
 
-Regards,
-August Wikerfors
+Yes, the patch fixes the issue for me as well. Device: Foxconn/Hon Hai
+0489:e0f5 (MT7902). Tested on Arch Linux with linux-lts 6.12.32, manually
+applied the patch and rebuilt the kernel. Bluetooth works correctly, no "Fa=
+iled
+to send wmt func ctrl (-22)" in dmesg.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
