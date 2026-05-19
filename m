@@ -1,87 +1,365 @@
-Received: from out-40.smtp.github.com (out-40.smtp.github.com [192.30.252.139])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEAB3E834A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 08:51:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5183EFFD6;
+	Tue, 19 May 2026 08:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779180669; cv=none; b=si97pFQu13pjnNhopGmFvaC59cVfWHkGeBngGoSH6QMXQgEnDct1DWoJfKX2h2d/9g94EEFjEXQfYXqYlFUrx62k4nCcWY0hn0jXepxiDRSxwMeFx+2MctEWOmAGz9xsfm1+kWv833Ho1I5NyF9sqV3xVhPVTN2VLGvKhgJq1p4=
+	t=1779180964; cv=none; b=Xmy7zW63g4+K3Ofo+wDp0V753eWhEfGCUA/Z47QCPXiDRMH2zcQHnTSbFIei+/v8bhmKSNkk3+YcYSt7tcpYyBPG1PlPvkQswPeZqE0NK1ZK+h7bH2epkjqE59QRPuMsh2F1WJ7/q0gvYW7mfxCEpnP9Y4aelo+WWpKFby8spDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779180669; c=relaxed/simple;
-	bh=WlUd6EXlnS4QbE3ZB8RecJcjOU7DTrboXhvD/k9j0MQ=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Bn+M0nbJBbO6g8RTFZ5qijcK2Vdiu6vkPq/4n//rjspyhgfrAkBPgkUQg0LM2JK4ogL9h0mn9Wpoov118gE+ktWAOdVZn3ciUBPPT3eftx+yNSnSmOgUkc/N/ofHeMSYqd28J/ejqd7atgV4fJrrHW3InDHhJGxLYpTkDhWqpdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Ih5gs8uQ; arc=none smtp.client-ip=192.30.252.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1779180964; c=relaxed/simple;
+	bh=XOOgZkMjmCOdxzWCXCORmGtjbP+hEEndsnlcGi0NxCU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=SziYOOubU7gy5RQNIDLcw+IJXFL7Y0qJ7uLF69YqNXAhsnDdubkf6O/p/l0lp4g5JUXczVpZ8/x4J2VEbqLiKGWV2ey2TPK+dPBOnjIaKpifx+M/LQjhwRCHbGwMd351l/tZXBFM+ItJ1qKSNRMPW68rkIDiA1U3RaMuH+RiqEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W/08SqJg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Ih5gs8uQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1779180667;
-	bh=+wJWsvItUox9QorukhbYgXuqlMU9dpaBydbXBmRzBoY=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Ih5gs8uQK4Yg5vAgBv6oHKuj52W/R72X/H7O93t8TmEM4LrPRPN7F44sCHYjwPuQJ
-	 RKMV/eosvIRBQMZ/wsYPfbHEVXswzZlo/hqK2kHByhlymvrsfQ4rzYj1DhCbq2sFMu
-	 Zp+I+f2NQBd+VTsJKzHTHEE7PHy5EB7bw+MCKYx0=
-Received: from github.com (hubbernetes-node-15f687b.ash1-iad.github.net [10.56.128.72])
-	by smtp.github.com (Postfix) with ESMTPA id 57380921166
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 01:51:07 -0700 (PDT)
-Date: Tue, 19 May 2026 01:51:07 -0700
-From: fdanis-oss <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1097130/000000-e9de59@github.com>
-Subject: [bluez/bluez] f5cc1b: client/btpclient: Fix GAP unpair command
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W/08SqJg"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C38BAC4AF09;
+	Tue, 19 May 2026 08:56:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779180963;
+	bh=XOOgZkMjmCOdxzWCXCORmGtjbP+hEEndsnlcGi0NxCU=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=W/08SqJge8d0vrKD3X4kmKVgjLnFxIMS578xEONrv99xg3cT3jlKNp1C9tPcJXRY9
+	 kvoNZorh0uaUCmZKQu+WS7ULTBAr+jxLL9FGSFDeroE9vCCjNmXMOKj150AFvQKJ09
+	 zBsopjsJJHcGdFMJZBQ/PEpzDw/4rXhVnMhpC4Am0I18l6TqUHJyR6NHP3k5Ey3t/r
+	 Aw9M8o06YXtDSqLtCBs+A8iIMbtqYUB33Afypfq9v9uW0elnbgsAJu0VJRClGyxkTa
+	 dKM8qrH+aSoe33L8Z3rYJFWiTVw/ULf56fLtNClDqQsnJMzx5P03bQFLcilcffxpVk
+	 npqEnXluVl8xA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3B1ECD5BA3;
+	Tue, 19 May 2026 08:56:03 +0000 (UTC)
+From: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>
+Date: Tue, 19 May 2026 14:25:57 +0530
+Subject: [PATCH v3 2/9] power: sequencing: pcie-m2: Allow creating serdev
+ for multiple PCI devices
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260519-pwrseq-m2-bt-v3-2-b39dc2ae3966@oss.qualcomm.com>
+References: <20260519-pwrseq-m2-bt-v3-0-b39dc2ae3966@oss.qualcomm.com>
+In-Reply-To: <20260519-pwrseq-m2-bt-v3-0-b39dc2ae3966@oss.qualcomm.com>
+To: Manivannan Sadhasivam <mani@kernel.org>, 
+ Bartosz Golaszewski <brgl@kernel.org>, 
+ Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+ linux-bluetooth@vger.kernel.org, Wei Deng <wei.deng@oss.qualcomm.com>, 
+ Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=8834;
+ i=manivannan.sadhasivam@oss.qualcomm.com; h=from:subject:message-id;
+ bh=3hsOpES3Yk37WGFT4yl/5CzwdSCPi9DcZBWsaTeP5Ag=;
+ b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBqDCWeN9txK6pvmG+m6zAGfezIzY/zBXdj5TD5b
+ 91zUdvEjTmJATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCagwlngAKCRBVnxHm/pHO
+ 9ZtUB/wMvqBxdPACV5lb9yw6Uvq/PvXWI9NWN6B70hcT8EGdENNm7ImTaTOECBOYdWFEGGxiYgs
+ Ht5iIi1l0pNy3t39TrGX7HeNL1WS1x3kWOdcvTIfxvjaWgxNTvlZlbLI1et0z5lW10/l4R+FHA6
+ 6pda/Hbnko+n0H/a/nV/CwclIW23cugKtZqx2gl71ZrkNI3maMyLWbLg2DPH2OSwUEaTkzBEcsc
+ dMGo1zv0RkJm+t9lWTkDe8E7B3WYXzR2swy4STMHIR7Z57DXPgOPvcS6xbibk8O6m+Omv1nLd4P
+ lGos7BPyteBdELqHkba4FLk03bbTp9AcbOFESe4UTpAKURkl
+X-Developer-Key: i=manivannan.sadhasivam@oss.qualcomm.com; a=openpgp;
+ fpr=C668AEC3C3188E4C611465E7488550E901166008
+X-Endpoint-Received: by B4 Relay for
+ manivannan.sadhasivam@oss.qualcomm.com/default with auth_id=461
+X-Original-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Reply-To: manivannan.sadhasivam@oss.qualcomm.com
 
-  Branch: refs/heads/1097130
-  Home:   https://github.com/bluez/bluez
-  Commit: f5cc1b488ac39a1b869ae43c66cc68c667f5f584
-      https://github.com/bluez/bluez/commit/f5cc1b488ac39a1b869ae43c66cc6=
-8c667f5f584
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-05-19 (Tue, 19 May 2026)
+From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 
-  Changed paths:
-    M client/btpclient/gap.c
+Current code makes it possible to create serdev for only one PCI device.
+But for scaling this driver, it is necessary to allow creating serdev for
+multiple PCI devices.
 
-  Log Message:
-  -----------
-  client/btpclient: Fix GAP unpair command
+Hence, add provision for it by creating 'struct pwrseq_pci_dev' for each
+PCI device that requires serdev and add them to
+'pwrseq_pcie_m2_ctx::pci_devices' list.
 
-Fix unpair_reply() because the device is no more available on
-RemoveDevice reply.
+Tested-by: Wei Deng <wei.deng@oss.qualcomm.com>
+Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+---
+ drivers/power/sequencing/pwrseq-pcie-m2.c | 127 +++++++++++++++++++++---------
+ 1 file changed, 88 insertions(+), 39 deletions(-)
+
+diff --git a/drivers/power/sequencing/pwrseq-pcie-m2.c b/drivers/power/sequencing/pwrseq-pcie-m2.c
+index b2ed336fd5ad..469e130330fa 100644
+--- a/drivers/power/sequencing/pwrseq-pcie-m2.c
++++ b/drivers/power/sequencing/pwrseq-pcie-m2.c
+@@ -7,6 +7,7 @@
+ #include <linux/device.h>
+ #include <linux/delay.h>
+ #include <linux/gpio/consumer.h>
++#include <linux/list.h>
+ #include <linux/mod_devicetable.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
+@@ -19,6 +20,13 @@
+ #include <linux/serdev.h>
+ #include <linux/slab.h>
+ 
++struct pwrseq_pci_dev {
++	struct serdev_device *serdev;
++	struct of_changeset *ocs;
++	struct pci_dev *pdev;
++	struct list_head list;
++};
++
+ struct pwrseq_pcie_m2_pdata {
+ 	const struct pwrseq_target_data **targets;
+ };
+@@ -32,9 +40,9 @@ struct pwrseq_pcie_m2_ctx {
+ 	struct notifier_block nb;
+ 	struct gpio_desc *w_disable1_gpio;
+ 	struct gpio_desc *w_disable2_gpio;
+-	struct serdev_device *serdev;
+-	struct of_changeset *ocs;
+ 	struct device *dev;
++	struct list_head pci_devices;
++	struct mutex list_lock;
+ };
+ 
+ static int pwrseq_pcie_m2_vregs_enable(struct pwrseq_device *pwrseq)
+@@ -178,38 +186,39 @@ static int pwrseq_pcie_m2_match(struct pwrseq_device *pwrseq,
+ }
+ 
+ static int pwrseq_pcie_m2_create_bt_node(struct pwrseq_pcie_m2_ctx *ctx,
++					struct pwrseq_pci_dev *pci_dev,
+ 					struct device_node *parent)
+ {
+ 	struct device *dev = ctx->dev;
+ 	struct device_node *np;
+ 	int ret;
+ 
+-	ctx->ocs = kzalloc_obj(*ctx->ocs);
+-	if (!ctx->ocs)
++	pci_dev->ocs = kzalloc_obj(*pci_dev->ocs);
++	if (!pci_dev->ocs)
+ 		return -ENOMEM;
+ 
+-	of_changeset_init(ctx->ocs);
++	of_changeset_init(pci_dev->ocs);
+ 
+-	np = of_changeset_create_node(ctx->ocs, parent, "bluetooth");
++	np = of_changeset_create_node(pci_dev->ocs, parent, "bluetooth");
+ 	if (!np) {
+ 		dev_err(dev, "Failed to create bluetooth node\n");
+ 		ret = -ENODEV;
+ 		goto err_destroy_changeset;
+ 	}
+ 
+-	ret = of_changeset_add_prop_string(ctx->ocs, np, "compatible", "qcom,wcn7850-bt");
++	ret = of_changeset_add_prop_string(pci_dev->ocs, np, "compatible", "qcom,wcn7850-bt");
+ 	if (ret) {
+ 		dev_err(dev, "Failed to add bluetooth compatible: %d\n", ret);
+ 		goto err_destroy_changeset;
+ 	}
+ 
+-	ret = of_changeset_apply(ctx->ocs);
++	ret = of_changeset_apply(pci_dev->ocs);
+ 	if (ret) {
+ 		dev_err(dev, "Failed to apply changeset: %d\n", ret);
+ 		goto err_destroy_changeset;
+ 	}
+ 
+-	ret = device_add_of_node(&ctx->serdev->dev, np);
++	ret = device_add_of_node(&pci_dev->serdev->dev, np);
+ 	if (ret) {
+ 		dev_err(dev, "Failed to add OF node: %d\n", ret);
+ 		goto err_revert_changeset;
+@@ -218,19 +227,21 @@ static int pwrseq_pcie_m2_create_bt_node(struct pwrseq_pcie_m2_ctx *ctx,
+ 	return 0;
+ 
+ err_revert_changeset:
+-	of_changeset_revert(ctx->ocs);
++	of_changeset_revert(pci_dev->ocs);
+ err_destroy_changeset:
+-	of_changeset_destroy(ctx->ocs);
+-	kfree(ctx->ocs);
+-	ctx->ocs = NULL;
++	of_changeset_destroy(pci_dev->ocs);
++	kfree(pci_dev->ocs);
++	pci_dev->ocs = NULL;
+ 
+ 	return ret;
+ }
+ 
+-static int pwrseq_pcie_m2_create_serdev(struct pwrseq_pcie_m2_ctx *ctx)
++static int pwrseq_pcie_m2_create_serdev(struct pwrseq_pcie_m2_ctx *ctx,
++					struct pci_dev *pdev)
+ {
+ 	struct serdev_controller *serdev_ctrl;
+ 	struct device *dev = ctx->dev;
++	struct pwrseq_pci_dev *pci_dev;
+ 	int ret;
+ 
+ 	struct device_node *serdev_parent __free(device_node) =
+@@ -248,17 +259,23 @@ static int pwrseq_pcie_m2_create_serdev(struct pwrseq_pcie_m2_ctx *ctx)
+ 		return 0;
+ 	}
+ 
+-	ctx->serdev = serdev_device_alloc(serdev_ctrl);
+-	if (!ctx->serdev) {
++	pci_dev = kzalloc(sizeof(*pci_dev), GFP_KERNEL);
++	if (!pci_dev) {
+ 		ret = -ENOMEM;
+ 		goto err_put_ctrl;
+ 	}
+ 
+-	ret = pwrseq_pcie_m2_create_bt_node(ctx, serdev_parent);
++	pci_dev->serdev = serdev_device_alloc(serdev_ctrl);
++	if (!pci_dev->serdev) {
++		ret = -ENOMEM;
++		goto err_free_pci_dev;
++	}
++
++	ret = pwrseq_pcie_m2_create_bt_node(ctx, pci_dev, serdev_parent);
+ 	if (ret)
+ 		goto err_free_serdev;
+ 
+-	ret = serdev_device_add(ctx->serdev);
++	ret = serdev_device_add(pci_dev->serdev);
+ 	if (ret) {
+ 		dev_err(dev, "Failed to add serdev for WCN7850: %d\n", ret);
+ 		goto err_free_dt_node;
+@@ -266,37 +283,64 @@ static int pwrseq_pcie_m2_create_serdev(struct pwrseq_pcie_m2_ctx *ctx)
+ 
+ 	serdev_controller_put(serdev_ctrl);
+ 
++	pci_dev->pdev = pci_dev_get(pdev);
++
++	mutex_lock(&ctx->list_lock);
++	list_add_tail(&pci_dev->list, &ctx->pci_devices);
++	mutex_unlock(&ctx->list_lock);
++
+ 	return 0;
+ 
+ err_free_dt_node:
+-	device_remove_of_node(&ctx->serdev->dev);
+-	of_changeset_revert(ctx->ocs);
+-	of_changeset_destroy(ctx->ocs);
+-	kfree(ctx->ocs);
+-	ctx->ocs = NULL;
++	device_remove_of_node(&pci_dev->serdev->dev);
++	of_changeset_revert(pci_dev->ocs);
++	of_changeset_destroy(pci_dev->ocs);
++	kfree(pci_dev->ocs);
++	pci_dev->ocs = NULL;
+ err_free_serdev:
+-	serdev_device_put(ctx->serdev);
+-	ctx->serdev = NULL;
++	serdev_device_put(pci_dev->serdev);
++	pci_dev->serdev = NULL;
++err_free_pci_dev:
++	kfree(pci_dev);
+ err_put_ctrl:
+ 	serdev_controller_put(serdev_ctrl);
+ 
+ 	return ret;
+ }
+ 
+-static void pwrseq_pcie_m2_remove_serdev(struct pwrseq_pcie_m2_ctx *ctx)
++static void __pwrseq_pcie_m2_remove_serdev(struct pwrseq_pcie_m2_ctx *ctx,
++					   struct pwrseq_pci_dev *pci_dev)
+ {
+-	if (ctx->serdev) {
+-		device_remove_of_node(&ctx->serdev->dev);
+-		serdev_device_remove(ctx->serdev);
+-		ctx->serdev = NULL;
++	if (pci_dev->serdev) {
++		device_remove_of_node(&pci_dev->serdev->dev);
++		serdev_device_remove(pci_dev->serdev);
+ 	}
+ 
+-	if (ctx->ocs) {
+-		of_changeset_revert(ctx->ocs);
+-		of_changeset_destroy(ctx->ocs);
+-		kfree(ctx->ocs);
+-		ctx->ocs = NULL;
++	if (pci_dev->ocs) {
++		of_changeset_revert(pci_dev->ocs);
++		of_changeset_destroy(pci_dev->ocs);
++		kfree(pci_dev->ocs);
+ 	}
++
++	pci_dev_put(pci_dev->pdev);
++	list_del(&pci_dev->list);
++	kfree(pci_dev);
++}
++
++static void pwrseq_pcie_m2_remove_serdev(struct pwrseq_pcie_m2_ctx *ctx,
++					 struct pci_dev *pdev)
++{
++	struct pwrseq_pci_dev *pci_dev, *tmp;
++
++	mutex_lock(&ctx->list_lock);
++	list_for_each_entry_safe(pci_dev, tmp, &ctx->pci_devices, list) {
++		if (!pdev || pci_dev->pdev == pdev) {
++			__pwrseq_pcie_m2_remove_serdev(ctx, pci_dev);
++			if (pdev)
++				break;
++		}
++	}
++	mutex_unlock(&ctx->list_lock);
+ }
+ 
+ static int pwrseq_pcie_m2_notify(struct notifier_block *nb, unsigned long action,
+@@ -320,7 +364,7 @@ static int pwrseq_pcie_m2_notify(struct notifier_block *nb, unsigned long action
+ 	case BUS_NOTIFY_ADD_DEVICE:
+ 		/* Create serdev device for WCN7850 */
+ 		if (pdev->vendor == PCI_VENDOR_ID_QCOM && pdev->device == 0x1107) {
+-			ret = pwrseq_pcie_m2_create_serdev(ctx);
++			ret = pwrseq_pcie_m2_create_serdev(ctx, pdev);
+ 			if (ret)
+ 				return notifier_from_errno(ret);
+ 		}
+@@ -328,7 +372,7 @@ static int pwrseq_pcie_m2_notify(struct notifier_block *nb, unsigned long action
+ 	case BUS_NOTIFY_REMOVED_DEVICE:
+ 		/* Destroy serdev device for WCN7850 */
+ 		if (pdev->vendor == PCI_VENDOR_ID_QCOM && pdev->device == 0x1107)
+-			pwrseq_pcie_m2_remove_serdev(ctx);
++			pwrseq_pcie_m2_remove_serdev(ctx, pdev);
+ 
+ 		break;
+ 	}
+@@ -432,16 +476,20 @@ static int pwrseq_pcie_m2_probe(struct platform_device *pdev)
+ 		goto err_free_regulators;
+ 	}
+ 
++	mutex_init(&ctx->list_lock);
++	INIT_LIST_HEAD(&ctx->pci_devices);
+ 	/*
+ 	 * Register a notifier for creating protocol devices for
+ 	 * non-discoverable busses like UART.
+ 	 */
+ 	ret = pwrseq_pcie_m2_register_notifier(ctx, dev);
+ 	if (ret)
+-		goto err_free_regulators;
++		goto err_destroy_mutex;
+ 
+ 	return 0;
+ 
++err_destroy_mutex:
++	mutex_destroy(&ctx->list_lock);
+ err_free_regulators:
+ 	regulator_bulk_free(ctx->num_vregs, ctx->regs);
+ 
+@@ -453,7 +501,8 @@ static void pwrseq_pcie_m2_remove(struct platform_device *pdev)
+ 	struct pwrseq_pcie_m2_ctx *ctx = platform_get_drvdata(pdev);
+ 
+ 	bus_unregister_notifier(&pci_bus_type, &ctx->nb);
+-	pwrseq_pcie_m2_remove_serdev(ctx);
++	pwrseq_pcie_m2_remove_serdev(ctx, NULL);
++	mutex_destroy(&ctx->list_lock);
+ 
+ 	regulator_bulk_free(ctx->num_vregs, ctx->regs);
+ }
+
+-- 
+2.48.1
 
 
-  Commit: e9de592034e48ad7fc0a10329e41a12ccd0c5c9d
-      https://github.com/bluez/bluez/commit/e9de592034e48ad7fc0a10329e41a=
-12ccd0c5c9d
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2026-05-19 (Tue, 19 May 2026)
-
-  Changed paths:
-    M client/btpclient/gap.c
-
-  Log Message:
-  -----------
-  client/btpclient: Don't remove all devices on GAP Reset command
-
-Currently running auto-pts remove all paired devices, instead of just
-removing the PTS devices.
-This removes this behavior, expecting auto-pts to explicitly remove the
-PTS devices using Unpair command.
-
-
-Compare: https://github.com/bluez/bluez/compare/f5cc1b488ac3%5E...e9de592=
-034e4
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
