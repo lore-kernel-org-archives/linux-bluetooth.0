@@ -1,41 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D063DB32A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 17:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2543DB330
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 17:21:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779211283; cv=none; b=j2pskQ+kA9RgfLaC797eetMHNdp3qcVybMVaBADNn6DwTDIi/KLbPotkAR2HHphSH05rLJy5Vq1IbABNokcnhcyLjD+3TXu31wwrDyArVSleq2zU7RPgob/5HZ4msSXgdyuLZXaUDuj/UJi+yu9GAwe+BWRFzD9q88U+iCVJuXA=
+	t=1779211315; cv=none; b=dd26YJ/UO2yizNWpHgwDHb5q6jtQnV/HgyQguYrGzOOZHwlRZERLoH/beWNRRuGhe2z861eO9gq6Vyo64mH+wQJyU4BrgSNQLVpFnokgPr+e7Lzu1YP5dhQanfG373xbzuSfTyJfQPg7kxPteUjiuTE1pV9Oq4cb66NsDEw10ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779211283; c=relaxed/simple;
-	bh=kKgQKr4/6zpjJHIK+0ldog74hnf4i77nO4OnhB8zfc8=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=gjacn8KyB4qOjLMrVNQMJL0j2xLyW755amHty7REaMSgq4JtjD5LJjtd8vn4+KzR9RrtzvRpvUL4bMm6Aj1DarNVvOHiu/IOedcUmggcSaDKuCOsh0wFpqtPSkB8rdsqd+FjR1f75q+JLPR9P7T9FWtOG0PIODlPEy/91jcdSOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bgNDt17I; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779211315; c=relaxed/simple;
+	bh=he3xxLSWEFYTSCyK4ojOaCU8YwEhaQAtgDnmujczFTc=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SXsJfPyX6QRvDp5pKb3w+42JYCiLATX4aiON1yqnZEdOcumUpAnfTJJvnWxW/TPM/xL4+mfdDvLErpsAeVaT6/CxGiobI+MuH2ITP49awVJoCzoFqYc9RFlK0DO6aqs6WRe0fr9EZklhme7trej3wr0ENlnMZgxp+m6S0aA9Snk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PY8V1/Jd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bgNDt17I"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 91923C2BCB3
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 17:21:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PY8V1/Jd"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id ACDC9C2BCC6
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 17:21:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779211282;
-	bh=kKgQKr4/6zpjJHIK+0ldog74hnf4i77nO4OnhB8zfc8=;
-	h=From:To:Subject:Date:From;
-	b=bgNDt17IbXcSP6S+Wl/T1A8OFopBDQJPISBdVxUxsASx1HV4BIbjLggMazf3QOcYi
-	 6pK1s4AWmNYsj2T9+Jw29LXgX53dLtAqkGq9TSMo909YGV7ACOfIIstgzcPmQ9lJ5L
-	 nFzxcHbUM2eN2Z3dH2vAwQrIMMEDj/BvxtHqnAEvJ2lua2r34FiIYyOqNIsHycf1LK
-	 HfUB1a4I9lGPuwcHWIGmCmCfizySd8A+WEAi4aK/8rOTigYGyckiSB7uTxILXKrXJV
-	 YV4WoFVuhV07WPLe9LHqaQavpMJuFlVRtMgWaOV5dXFcdZ7/gAn4tPHdEZKGYa3N+m
-	 8SKFTNEWLObfw==
+	s=k20201202; t=1779211315;
+	bh=he3xxLSWEFYTSCyK4ojOaCU8YwEhaQAtgDnmujczFTc=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=PY8V1/JdNTyq43ndOruAdJnSPqyeBKpwzSdraILGvwksqgmNmIBFBD7YYJFlCTFHd
+	 4X6t6CFj5wRH8t5K8liWere4ooIwasJ1Xv9Yj60IixnTAiUNpOelBJyqnF3jooR0Dw
+	 lRfBsk1wi3pslgcvJmp/YA2v3Mh+loSanPAJLAewR3OGrjoADbZ7DqiEyEQdTOICAZ
+	 /O0eC4SOZwUqFb8GrqLYzMvoh7YA+eN/tukkwPvyo+wuOrVXIawjh51+dgR+7Zj3wT
+	 CHBgSNpbQFD8HXveFWzGjZCQ6x6kvr9zSfx3kEUcpHKp4Wf1Rq0WkZRTRk9k5LYBRZ
+	 MlK7AATEdmyyg==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 7F31DC433E1; Tue, 19 May 2026 17:21:22 +0000 (UTC)
+	id A33B6C433E1; Tue, 19 May 2026 17:21:55 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: =?UTF-8?B?W0J1ZyAyMjE1NTFdIE5ldzogYnRtdGs6IE1UNzkyMSAoVVNCIElE?=
- =?UTF-8?B?IDBlOGQ6ZTAyMCkgQmx1ZXRvb3RoIGJyb2tlbiBzaW5jZSA3LjAuNyDigJQg?=
- =?UTF-8?B?Zml4IGNvbW1pdCBmb3IgMDQ4OTplMGUyIGRvZXMgbm90IGNvdmVyIHRoaXMg?=
- =?UTF-8?B?UElE?=
-Date: Tue, 19 May 2026 17:21:22 +0000
+Subject: =?UTF-8?B?W0J1ZyAyMjE1NTFdIGJ0bXRrOiBNVDc5MjEgKFVTQiBJRCAwZThk?=
+ =?UTF-8?B?OmUwMjApIEJsdWV0b290aCBicm9rZW4gc2luY2UgNy4wLjcg4oCUIGZpeCBj?=
+ =?UTF-8?B?b21taXQgZm9yIDA0ODk6ZTBlMiBkb2VzIG5vdCBjb3ZlciB0aGlzIFBJRA==?=
+Date: Tue, 19 May 2026 17:21:55 +0000
 X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
+X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
 X-Bugzilla-Product: Drivers
 X-Bugzilla-Component: Bluetooth
@@ -48,10 +48,10 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression attachments.created
-Message-ID: <bug-221551-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cf_kernel_version
+Message-ID: <bug-221551-62941-5v1NMmY1zh@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221551-62941@https.bugzilla.kernel.org/>
+References: <bug-221551-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -65,95 +65,11 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D221551
 
-            Bug ID: 221551
-           Summary: btmtk: MT7921 (USB ID 0e8d:e020) Bluetooth broken
-                    since 7.0.7 =E2=80=94 fix commit for 0489:e0e2 does not=
- cover
-                    this PID
-           Product: Drivers
-           Version: 2.5
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: blocking
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: gagnieux.virgil@proton.me
-        Regression: No
+Virgil GAGNIEUX (gagnieux.virgil@proton.me) changed:
 
-Created attachment 310158
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D310158&action=3Dedit
-dmesg (from kernel 7.0.9, relevant lines)
-
-Regression: Bluetooth controller stops initialising on a MediaTek MT7921
-since kernel 7.0.7. Last known good: 7.0.6.
-
-Same symptom as the regression already discussed and patched for USB ID
-0489:e0e2, but the fix does NOT resolve it for my device (0e8d:e020),
-which suggests the patch missed a code path / device ID.
-
-Hardware
---------
-lspci:  03:00.0 Network controller [0280]: MEDIATEK Corp. Device [14c3:7920]
-        Kernel driver in use: mt7921e
-lsusb:  Bus 003 Device 006: ID 0e8d:e020 MediaTek Inc. Wireless_Device
-
-Kernels tested
---------------
-7.0.6              : Bluetooth works
-7.0.8 / 7.0.9      : broken (mainline Arch build, please confirm if you also
-tested it)
-7.0.9-hardened1-1  : broken (linux-hardened, includes the backport
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-https://github.com/anthraxx/linux-hardened/commit/<=E2=80=A681d80fcd09>
-                    which targets 0489:e0e2 =E2=80=94 it does NOT fix 0e8d:=
-e020)
-
-dmesg (relevant lines)
-----------------------
-[   24.800153] Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time:
-20260224111231
-[   24.922472] Bluetooth: hci0: Failed to send wmt func ctrl (-22)
-[   24.922477] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection
-               command is advertised, but not supported.
-
-Userspace state
----------------
-bluetoothctl list  =E2=86=92 (no output)
-bluetoothctl show  =E2=86=92 No default controller available
-rfkill             =E2=86=92 hci0 not present / soft blocked depending on b=
-oot
-
-Versions
---------
-bluez                     : <colle ta version>
-linux-firmware            : <=E2=80=A6>
-linux-firmware-mediatek   : <=E2=80=A6>
-
-Steps to reproduce
-------------------
-1. Boot kernel >=3D 7.0.7 on a system with MediaTek 14c3:7920 / USB 0e8d:e0=
-20
-2. Bluetooth controller fails to initialise; -EINVAL on wmt func ctrl
-
-Expected
---------
-Controller comes up, same as on 7.0.6.
-
-Related
--------
-- Arch forum thread: https://bbs.archlinux.org/viewtopic.php?id=3D313552
-- Related thread (same symptom, different PID 0489:e0d8):
-  https://bbs.archlinux.org/viewtopic.php?id=3D313561
-- Fix that addresses 0489:e0e2 only:
-  https://github.com/anthraxx/linux-hardened/commit/<=E2=80=A681d80fcd09>
-
-Please note: the existing fix above is referenced because it explicitly
-does NOT cover USB ID 0e8d:e020. A second code path / device-ID entry
-seems to be needed.
-
-I can test patches.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+     Kernel Version|                            |7.0.9-hardened1-1-hardened
 
 --=20
 You may reply to this email to add a comment.
