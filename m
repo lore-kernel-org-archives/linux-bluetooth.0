@@ -1,250 +1,171 @@
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9605A35C1A9
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 18:17:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779214651; cv=pass; b=YHUTyX0ZVvELO8/cRZh/NjRjnhr6j/IUPVHT7lvIaEIW1lzInzugWc14KfQaUgoPRIMmyaMsR6pP6XTzB1oTdWzvqh40DXWg87KqQBFXwcjTeSIWcC8nUFCEw5MYBR16YXL0TgOUz7bj6UCXz5TIDDsoG0DiKkBPexye5imwDZo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779214651; c=relaxed/simple;
-	bh=G6GsEx0eBXyBfSLN6wd69IQecnnT5ccXPjHexwdRDLk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZqqB3OSw0/A6XmYqUsZkiY7HmKsRPEbSfFb5QpV8bwVfssGiHxtV9YuvjY9MnU85JhafvsfEn7y4h5v2k66YgXNuh5nGMc4BFOFGMK2fBWCRx+UMsMnysmUo6MXV3tuSRH94dXCkWu5rEZtXpZgYiNnIWKF57zRwUv4kb8Ol6xk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q72xy1Gy; arc=pass smtp.client-ip=74.125.224.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39971367B85
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 18:18:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779214698; cv=none; b=Dy/nuLHsLNPyzCEj2odc2CFVT1FYGnWnWwqRboV8V0QLxeLjxxLEa1w+0v0duw3pIw2K7t//3mzAZK9vfisTQnwSAsnrjRMvSKFxzW8NeVFUodjwqlsn8e65IXnf7ilKRL8GXpYqgmsjf7QoVSS7AhGrlIFr71IsJXPVmqNCP9k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779214698; c=relaxed/simple;
+	bh=eXHp82baqxaLH1q4iRY469trvVd0cOQSdBovZjXWxvQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qAcBa92irGMNKnqc/3F+twl6FTk6Pq4ViK9K2m0BoitxLnpecTGWzRkxZhlECJq2GMfA4HUh0kUIsW0UgiCnJOz/3A/CkEC/Y9LGzX2BPUsaE1Waua9LkRBVOFqPyZQuzXzDLi93T9edpWLW9qw9z9TLstX1nrDTRbz2b3fCbm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qtGfUqBY; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q72xy1Gy"
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-6579254f996so2539954d50.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 11:17:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779214648; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Y6W2aHrCsriqLY/TKCQ1Lr8rmfjLnUjH9IK9vpVXvlzR6JGmTwoZ2J9Grm2SP32EjZ
-         jOGaK0hFz8BhDdPBWn7SwRzHy4kbTpu/1uPz0++ibmmAr9aECdrwh0Xz3/AXuahEIWJB
-         GNsBf94Jbaa85g2tUZM9Iy4Nu6qbmQdMC41clpLXf/aa/LyK22Wj39pXIMKS0S2GeWlb
-         M0PXP/0QaTnUXWWjq71dI+ri3WNwQ8tbaiDsgUrlhmMCjB+PUj1cZz8kt5vEE1tBTQSA
-         SRTDbN26XKSrVd/GyqxoUerwT5d2JLf8Fpc01hL0Ca5pPN273RHQdF7AO6UtnOya0hoQ
-         S/VA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=tYWeN0ft4OV9FJ2/f7iqDEkUliNeJo8syOXSgyYtJsI=;
-        fh=fAVvqa29TMCSLQ1BWo+IkeTh9vOt2h2EvlnFWIq0DOI=;
-        b=RGrSRLUe+HuD149pOidbyVhCriitmH+LxWdUehABfumWKFDUkIe4HRGdFmPlGniZbu
-         NpiT8OsbmBXQzu/fpjdNQHchj+VCkIzTvI+vjhGfnmF3+BxHChXyX0LonnABthoQcM3N
-         hZ9Gn5zJRExCVcwawoxtMAuHgTipUvrIT0IwlJncb1iLMfO+FJC5V4GSESo0peFGjEz3
-         yxJVsRvDyKU9t168/yQZ6Fn5UhIkGnjunCZPm1F1gA6Jqz9E8vngPrFqBLLG8wSZJFXe
-         AjX3ZmZB5vRK2G68ktAAKr8eXR1KxV2XNhQ6pjcWx+pLNrtrixaHFUbRX9gO4RtnmUzh
-         8E7g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qtGfUqBY"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-4585a116a4aso3212726f8f.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 11:18:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779214648; x=1779819448; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1779214695; x=1779819495; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tYWeN0ft4OV9FJ2/f7iqDEkUliNeJo8syOXSgyYtJsI=;
-        b=Q72xy1GyxqnPPfJDaz/akkbzrhs5ERkIhPNVvJh6SoE7ySefiNYMPxJ4gUpXxlc/0Q
-         W7HlPOLRWxMzm2QqQejUGvy9YOgcBzmj5s2ZPLt/ALaPOx4a0u/wb8BaOP4Z0518w/gm
-         8jlfItwHJ58GtsCy2lh1mFPtd8YteVKL28HtgGClzk3l+QDEZM+BEQtVmg9/oNht5FFo
-         loVHBklE0gigOqfhwwHvUc0r/+XowuYV0tzloRuV++Fe1cnoVsoKqmJa5qqu7MyYVrTY
-         oGNa6iTrAKzIcSsKQkbXyik+R0imrDj4jmKMwAEAV8d+P/E3WSG4KmLlex+hICJDhyIe
-         sZtw==
+        bh=MqmfQ0wqvW/5YkQLpj5T9YPDYLhpHMgWUpuXe2X6Ab4=;
+        b=qtGfUqBYduP1Yqkr80hR5CRBMSAVJ/GH5tic7dtOMSJy0cHxqs0oYFbEFMJXPIyDMa
+         vt5BYb2doWXGl5USANsICHwuIr8zrTlwZMbvyV59toTY14aIkI/DTpmKJ2VUQKu0iJx2
+         jG4TI6zNHoT9cAeRSG85IGvVr0weQpp02Mx8kUTlXQyJkmaGFdDk01FuOzomnKzuuTpz
+         kEeprK3vNKmY1yuDjLIEvI/7eiLxCenY7YL+zyOIIfrnP2cA7mDd1lmp4fGBgGilPLuc
+         XplfuMCpepzt/LvswZdv7UKJx2Wg58FgbM83dCvUrZk1UoVVFsRu41F9G0bbSHaIEg8t
+         rkXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779214648; x=1779819448;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1779214695; x=1779819495;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=tYWeN0ft4OV9FJ2/f7iqDEkUliNeJo8syOXSgyYtJsI=;
-        b=abIxyL8nD6jyDGcmtRAb5IDCnQh5tcTouLGPggaSBL8ySTnonSQcYL4GiYABa08txv
-         CiPk0z4Ge3wGHNqCU0EsttijA+qe1djvrdZfRkZwTCuu+ShOQjYhEp4I2JYkIWXQGjDE
-         Opp0ApyxW2RmnHf+k3i9sVbC2E6pKePDjn+mjhXZ9g4kqW5riHOEYScXmlupMnX3r/dk
-         dNysuUl5w3OCdkuiePzkwswdHrXmf5Vfpf7MK/DGHeyPDzpS0JIKHbIEyeFAsjbfyCDZ
-         E38D8VhkGj/30qm+4CA5lneDVX+AULSrecmUPrYHQJrF3AqZWljaqLrNca8UgiHTdhJ4
-         mHNA==
-X-Gm-Message-State: AOJu0YwV/1h2gas1IgY9+LjO+qCb/pH8xxPjdkShw2zu68k+YvJfvAek
-	r/2Bbqt/n+CYP4cEAuGxgs3U4TdUVlk5ISuQ6qx0tT9CQ/2nnV7PI4Tq65D7PFJ7GMZP0ZL0Zmb
-	2jbrzNvruJ8yrs96/FJgX7wMrF9FWzps=
-X-Gm-Gg: Acq92OGki/pPpuUxzeOPeTmDCUu2UzqWslmLKqMj3gsR0rrM5MglUZzVQq+llrMEMqZ
-	YtUcTc5TifEZaqBHoCWsrCr1/Twf8Nf0sYlqaJ6JVKvQ7bOrI0SyNON7PDiiPWsFO7l9T29YP5W
-	rKamjgRIHlTOVxAbMsEwQoCANOXzOGaepUqRrgm3Ybru5he7OLrceOPyduCCIIQGjwSnqz06bUe
-	dwiIyW2BmhY3RJfvVp4nwDszEVsGDWS6gQlo0nA1JZLWp4fVF4w1NHVrum1pi7MWw62y+c9SJv7
-	O7csCfIVHk/thjCkvvfAA1tMaNaMLvrNV0fh52vHPNGnINg3twyndLlAIanEn5cw5OVH6hEjZng
-	CSGu4
-X-Received: by 2002:a05:690e:138a:b0:65e:449f:4e24 with SMTP id
- 956f58d0204a3-65e449f4f98mr13187495d50.47.1779214648393; Tue, 19 May 2026
- 11:17:28 -0700 (PDT)
+        bh=MqmfQ0wqvW/5YkQLpj5T9YPDYLhpHMgWUpuXe2X6Ab4=;
+        b=YUBoovteiLhP0QrjkfhJDwRVhSbZD2OtfujegbMrAhkHwFmwGBe0lCSHxE8G96uANE
+         rmKlrVGTx2LkyycggfoTZ/En8IAjOdHpJK5dodWcvgrDWYQk5av7Rvcv5B/oCmmkQbWO
+         5rmHuhvfrdJzEI5uNwHxvWS+q1cuVdSf3rUn6N13CroM+5Q+FZ6YScF+gIZIMNiuzJeH
+         1n+ayw/oI5Av/jjhCsZTOSSj7ICkDiP4+UdzkdeGV9XztsN7F6mMjKMRwgm47iivQN4r
+         CqC9tV+NyFvFpYlN1/X41TSEOyn/+/Rad/JC7xK66egywQcPlu8+E1bAIxs+lnxaxnR/
+         /a9w==
+X-Gm-Message-State: AOJu0Yw/bPFQdjgLBcRDXkVILw13bHMBD2N/Q+wcpxtkGWFmJ+UCDyYh
+	l7QIdKIltWFzxQIYTxs0YAFcz1SgOt6Qcb9c4YXbstIQJaYWRlGVyCzLL9W8GeLMmnTuEg==
+X-Gm-Gg: Acq92OFzIyTGTuApAKKL8puVwoyyCOMbGtOqfE9rzh8QBhx756RNn8W/bRpGnFh2Xdo
+	USSIGDPYcBg1uKn0uRgONhFjTrm8OhZWKYxVi5Iv5yjmTdt/PNR5W0QwB49yRuz44VJOfQYF6pB
+	v8nLWKaNXFWHjYA2zIpMpTEtQiVE61HUd6Ct0zWw28tQuDnlkNlY5Jk7AISvg9Q1Quii5Ldx0sD
+	6UQCdicVVyDh6vdrG/dOS7Wc8z7vRqnU/RjbMN7pPNM8/ftzPXT+8SDuFk5PV37NbszssquuaNY
+	MQUuQN2gtltDrUr0BeLCNXqdbUiqmx5I2+WAqjAanMdd9fZLEj1GljSvlhTG3VnAttUo4syzFXB
+	SVdi+z8Bk6HTxr7M22pIJM+ROut6oBi6ZfvBxjlm2bWKy7JMMWKmABDMOK8IC7n7F5rMyQdYgDJ
+	/mWbeEtDmdbgj262FIW3ZAHQv+eQcNKvYBiMjgwB7lxReuzMaHZk62fS8wsaTEwzizNj1RKXVmO
+	BEhtROFQLBo
+X-Received: by 2002:a05:6000:1845:b0:43d:309b:9c4f with SMTP id ffacd0b85a97d-45e5c57d2fdmr33277547f8f.6.1779214695304;
+        Tue, 19 May 2026 11:18:15 -0700 (PDT)
+Received: from node ([202.47.63.86])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0a1aeafsm49915487f8f.23.2026.05.19.11.18.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 11:18:14 -0700 (PDT)
+From: Muhammad Bilal <meatuni001@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Kees Cook <kees@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	stable@vger.kernel.org,
+	Muhammad Bilal <meatuni001@gmail.com>
+Subject: [PATCH v3] Bluetooth: RFCOMM: add minimum length check in rfcomm_recv_frame
+Date: Tue, 19 May 2026 14:17:49 -0400
+Message-ID: <20260519181749.15746-1-meatuni001@gmail.com>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260519042017.29564-1-meatuni001@gmail.com>
+References: <20260519042017.29564-1-meatuni001@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <60b9da865b9beb482f914818c31866ebb00960f7.1779011736.git.pav@iki.fi>
-In-Reply-To: <60b9da865b9beb482f914818c31866ebb00960f7.1779011736.git.pav@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 19 May 2026 14:17:17 -0400
-X-Gm-Features: AVHnY4I-_DCLoom5hSGRKhDTKMkxYrFnfybWhwchwfFwaGyfoMfr70krXNFgZZQ
-Message-ID: <CABBYNZL6+4tY1DiahNoGwC=DZEbzN5k4Z=6B4EQF3mD+WuLYag@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] media: use custom DBus timeouts only when remote
- side is waiting
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Pauli,
+rfcomm_recv_frame() casts skb->data to struct rfcomm_hdr * and
+immediately dereferences hdr->addr and hdr->ctrl without first
+validating that skb->len is large enough to hold the header. A
+remote device can send a crafted short RFCOMM frame over L2CAP to
+trigger an out-of-bounds read before any session state is checked.
 
-On Sun, May 17, 2026 at 5:59=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Under high system load (VM instance on boot) it's observed the 3 sec
-> timeout BlueZ uses for BAP broadcast SetConfiguration may be missed by
-> Wireplumber, as these are set up immediately on startup together with
-> any other setup (eg ALSA) that may need time.
->
-> There's no actual need for using a short custom timeout in BlueZ for
-> this, as in this case there is no remote side that is waiting for a reply=
-.
->
-> Fix by limiting custom timeouts to cases where there is a waiting
-> remote.  A2DP-specific timeout should be used only for A2DP
-> SetConfiguration.  Similarly, using timeout for BAP only makes sense for
-> unicast, and should derive from the ATT timeout.
-> ---
->  profiles/audio/media.c | 25 +++++++++++++++++--------
->  1 file changed, 17 insertions(+), 8 deletions(-)
->
-> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> index cdaafb04e..0297e4c79 100644
-> --- a/profiles/audio/media.c
-> +++ b/profiles/audio/media.c
-> @@ -71,7 +71,11 @@
->  #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
->  #define MEDIA_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
->
-> -#define REQUEST_TIMEOUT (3 * 1000)             /* 3 seconds */
-> +/* Timeout should be less than avdtp request timeout (4 seconds) */
-> +#define A2DP_REQUEST_TIMEOUT_MSEC      (3 * 1000)
-> +
-> +/* Timeout should be less than ATT timeout (30 seconds) */
-> +#define BAP_REQUEST_TIMEOUT_MSEC       (20 * 1000)
+The FCS trimming code that follows compounds the problem:
 
-Is there any particular reason for this to be so long? We don't have
-any custom timeout other than ATT, in the other hand, I'd rather not
-wait 20 seconds for the endpoint to respond. 3 seconds might be too
-short depending on the environment but in a real environment, even one
-second to respond sounds plenty. Perhaps we should only use such a
-high timeout if testing has been set which hints that the environment
-may have been modified to allow the testing harness.
+        skb->len--; skb->tail--;
 
->
->  struct media_app {
->         struct media_adapter    *adapter;
-> @@ -465,16 +469,16 @@ static gboolean media_endpoint_async_call(DBusMessa=
-ge *msg,
->                                         struct media_transport *transport=
-,
->                                         media_endpoint_cb_t cb,
->                                         void *user_data,
-> -                                       GDestroyNotify destroy)
-> +                                       GDestroyNotify destroy,
-> +                                       int timeout_msec)
->  {
->         struct endpoint_request *request;
->
->         request =3D g_new0(struct endpoint_request, 1);
->
-> -       /* Timeout should be less than avdtp request timeout (4 seconds) =
-*/
->         if (g_dbus_send_message_with_reply(btd_get_dbus_connection(),
->                                                 msg, &request->call,
-> -                                               REQUEST_TIMEOUT) =3D=3D F=
-ALSE) {
-> +                                               timeout_msec) =3D=3D FALS=
-E) {
->                 error("D-Bus send failed");
->                 g_free(request);
->                 return FALSE;
-> @@ -521,7 +525,7 @@ static gboolean select_configuration(struct media_end=
-point *endpoint,
->                                         DBUS_TYPE_INVALID);
->
->         return media_endpoint_async_call(msg, endpoint, NULL,
-> -                                               cb, user_data, destroy);
-> +                                               cb, user_data, destroy, -=
-1);
->  }
->
->  static int transport_device_cmp(gconstpointer data, gconstpointer user_d=
-ata)
-> @@ -604,7 +608,8 @@ static gboolean set_configuration(struct media_endpoi=
-nt *endpoint,
->         g_dbus_get_properties(conn, path, "org.bluez.MediaTransport1", &i=
-ter);
->
->         return media_endpoint_async_call(msg, endpoint, transport,
-> -                                               cb, user_data, destroy);
-> +                                               cb, user_data, destroy,
-> +                                               A2DP_REQUEST_TIMEOUT_MSEC=
-);
->  }
->  #endif
->
-> @@ -1093,7 +1098,7 @@ static int pac_select(struct bt_bap_pac *lpac, stru=
-ct bt_bap_pac *rpac,
->         dbus_message_iter_close_container(&iter, &dict);
->
->         if (!media_endpoint_async_call(msg, endpoint, NULL, pac_select_cb=
-,
-> -                                                               data, fre=
-e))
-> +                                                               data, fre=
-e, -1))
->                 return -EIO;
->
->         return 0;
-> @@ -1233,6 +1238,7 @@ static int pac_config(struct bt_bap_stream *stream,=
- struct iovec *cfg,
->         DBusMessage *msg;
->         DBusMessageIter iter;
->         const char *path;
-> +       int timeout_msec;
->
->         DBG("endpoint %p stream %p", endpoint, stream);
->
-> @@ -1243,9 +1249,11 @@ static int pac_config(struct bt_bap_stream *stream=
-, struct iovec *cfg,
->         switch (bt_bap_stream_get_type(stream)) {
->         case BT_BAP_STREAM_TYPE_UCAST:
->                 transport =3D pac_ucast_config(stream, cfg, endpoint);
-> +               timeout_msec =3D BAP_REQUEST_TIMEOUT_MSEC;
->                 break;
->         case BT_BAP_STREAM_TYPE_BCAST:
->                 transport =3D pac_bcast_config(stream, cfg, endpoint);
-> +               timeout_msec =3D -1;
->                 break;
->         default:
->                 transport =3D NULL;
-> @@ -1279,7 +1287,8 @@ static int pac_config(struct bt_bap_stream *stream,=
- struct iovec *cfg,
->         g_dbus_get_properties(conn, path, "org.bluez.MediaTransport1", &i=
-ter);
->
->         if (!media_endpoint_async_call(msg, endpoint, transport,
-> -                                               pac_config_cb, data, free=
-))
-> +                                               pac_config_cb, data, free=
-,
-> +                                               timeout_msec))
->                 return -EIO;
->
->         return 0;
-> --
-> 2.54.0
->
->
+If skb->len is already zero the decrement wraps to UINT_MAX, causing
+skb_tail_pointer() to return a pointer far outside the skb and
+producing a second out-of-bounds read when the FCS byte is consumed.
 
+Replace the open-coded cast with skb_pull_data() which validates
+skb->len against sizeof(*hdr) and advances skb->data atomically.
+Save the original skb->data as frame_start before the pull so that
+__check_fcs() receives the header bytes as required by the RFCOMM
+FCS specification. Guard against a missing FCS byte with an explicit
+skb->len < 1 check. Replace the unsafe skb->tail decrement and
+skb_tail_pointer() call with a direct end-of-data index and skb_trim().
 
---=20
-Luiz Augusto von Dentz
+Note: SeungJu Cheon posted a related patch that adds equivalent
+length checks inside the individual MCC sub-handlers
+(rfcomm_recv_pn, rfcomm_recv_rpn, rfcomm_recv_rls, rfcomm_recv_msc,
+rfcomm_recv_mcc). That fix and this one are complementary and
+independent; neither subsumes the other.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Signed-off-by: Muhammad Bilal <meatuni001@gmail.com>
+
+---
+v3:
+ - Replace open-coded cast with skb_pull_data() per Luiz's review
+ - Save frame_start before skb_pull_data(); pass it to __check_fcs()
+   to preserve correct FCS validation over the header bytes
+ - Replace skb->tail decrement with skb_trim() per Luiz's review
+v2:
+ - Fix GitLint B3: replace tab with spaces in commit body
+ - Add Cc: stable@vger.kernel.org
+---
+ net/bluetooth/rfcomm/core.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index d11bd5337..66eee8a86 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1741,23 +1741,29 @@ static int rfcomm_recv_data(struct rfcomm_session *s, u8 dlci, int pf, struct sk
+ static struct rfcomm_session *rfcomm_recv_frame(struct rfcomm_session *s,
+ 						struct sk_buff *skb)
+ {
+-	struct rfcomm_hdr *hdr = (void *) skb->data;
++	struct rfcomm_hdr *hdr;
++	u8 *frame_start;
+ 	u8 type, dlci, fcs;
+ 
+ 	if (!s) {
+-		/* no session, so free socket data */
+ 		kfree_skb(skb);
+ 		return s;
+ 	}
+ 
++	frame_start = skb->data;
++	hdr = skb_pull_data(skb, sizeof(*hdr));
++	if (!hdr || skb->len < 1) {
++		kfree_skb(skb);
++		return s;
++	}
+ 	dlci = __get_dlci(hdr->addr);
+ 	type = __get_type(hdr->ctrl);
+ 
+ 	/* Trim FCS */
+-	skb->len--; skb->tail--;
+-	fcs = *(u8 *)skb_tail_pointer(skb);
++	fcs = skb->data[skb->len - 1];
++	skb_trim(skb, skb->len - 1);
+ 
+-	if (__check_fcs(skb->data, type, fcs)) {
++	if (__check_fcs(frame_start, type, fcs)) {
+ 		BT_ERR("bad checksum in packet");
+ 		kfree_skb(skb);
+ 		return s;
+-- 
+2.54.0
+
