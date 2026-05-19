@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E62A3F074E;
-	Tue, 19 May 2026 08:56:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58CB33F0AB6;
+	Tue, 19 May 2026 08:56:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779180964; cv=none; b=hxYKwQQCrOi19q4SaRbjxwI9b/eYClTyTifwZslxJBBpsICIGpsFmEgIiecs/1qgYHfeF5KCgkRd2vkC9ZIZZjUQBL0l7gAHu+cnYke6yG8g/aHYS9l1dN8tk49AY2PqRahul1FWjDR+LKtejdOorlLzCZO84/+A0/scuwKl/Po=
+	t=1779180964; cv=none; b=ZwmJmhMCZ49CT7usYlDoAjcSCimYggARXxqR8upZ7DP3CXaiLhyaoo9amWyT+QBBoDhmEkLt6uE6U9O9LxS3iBIs1uikvIWutd5EWtf+csUirJYiGXeNy0a0c/C4mnZOtvBiIQQaJ89a+OZCSG4zTvnZN74B5Tx5NU0apY1gG4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779180964; c=relaxed/simple;
-	bh=68YoT9izcfzey+OgMqPDjVvXKz4xAyWjFsIlXdXFMQQ=;
+	bh=e/f51wmEbEvWCWfBhaFFQM1VJvMDz0N9wvz/68ZdRDw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Q8GWylamsivrzTE/hwlIwv+WyGhohtahZJVtoEywP1TbiJ+PTd0IFF2qd1Z2vqoDsfzZgxcJGk5899OTaUKPLKyZaw6+xx5z3WsgtHPckkYPBd9QfkxdPAh+0VRrvORIdTf6B3o2NSoMcrpTDAN757STZj6SVzJrjYASWJdhhQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mlgTz6H5; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=jMcVE+SKJ2yaMHNGRnSJsXAlJIfQTXtIp42wu6AfyhbhtM1kgxc6eu1khF0UCsroHjV6jgmRvWLOqsbYvkw0GHayQI7jzwfkX1nEUyDC4nEwuJb5L/VgCrODmJQ9GnWxrxdfz8NcVYDvR5C4OYDMYgFHgEDCXK74f8dCOQmEKG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AHWTDqHi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mlgTz6H5"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B0C82C2BCC9;
-	Tue, 19 May 2026 08:56:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AHWTDqHi"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 18BA2C2BCF5;
+	Tue, 19 May 2026 08:56:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779180963;
-	bh=68YoT9izcfzey+OgMqPDjVvXKz4xAyWjFsIlXdXFMQQ=;
+	s=k20201202; t=1779180964;
+	bh=e/f51wmEbEvWCWfBhaFFQM1VJvMDz0N9wvz/68ZdRDw=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=mlgTz6H5Z6kMIo+tPhToU7vONrv2MCBbABQU8JOYo9Mkk/zhz9oT9x3oVA9IGQzSH
-	 uGcx6KYFnh937s119LToQZlfaQWaa3UeIaG+IHur9+32rsm2tyvBoTCa3nlJd61PAn
-	 Y+9vb3iSvP0ycbNMoL5gAFIFwuDoFJbJhT/d71la4CIVFPFqw8YrEXuflbW7q5/LwJ
-	 zmKx+qASfzBxqNNXIDfQoYEAxXreUlsAHrGeipiboAnghosZJ7z7lU/NbR/Xt4Fl7q
-	 hmGMYohZ/vvkxo9E4POOFzfd2vy34P1x2f/Jl41R2+/XvK1QPsAzixikpJUdgd85oK
-	 U/uW8hxCcgJwA==
+	b=AHWTDqHiY4knOo8IxNzxg08wTedQtzUMkH3q/NVEy+xb9PXR0jRk561yGQ9lyT3rr
+	 PTcO9NXJBAaG8OqG3OIwqUcb+Mlngdp3NSqoYptF031Wwu2lXa0Oi69N8yAQG6laJF
+	 ksZC41HeVwfLPAF9Tum9GbBMR9JaRj1f9KOH4umz7IjhMS51v2uKJGipLYeicCYGfH
+	 EO8FMIe1jhyvgCAgb8rqScbepU+RISoiBQXyKTS/nUtRJfpAEFmskZb2vazRRoXb6m
+	 4nHJpIhPvJSHCg3LRSJDsR0lbEnzfBQsdIntHJ1JC/HtmduuFrMlDqhseLvD5RYIag
+	 ctv9xV/q7mRGQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1135CD4F57;
-	Tue, 19 May 2026 08:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 118B1CD4851;
+	Tue, 19 May 2026 08:56:04 +0000 (UTC)
 From: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>
-Date: Tue, 19 May 2026 14:25:56 +0530
-Subject: [PATCH v3 1/9] power: sequencing: pcie-m2: Fix inconsistent
- function prefixes
+Date: Tue, 19 May 2026 14:26:01 +0530
+Subject: [PATCH v3 6/9] power: sequencing: Add an API to return the pwrseq
+ device's 'dev' pointer
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -41,7 +41,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260519-pwrseq-m2-bt-v3-1-b39dc2ae3966@oss.qualcomm.com>
+Message-Id: <20260519-pwrseq-m2-bt-v3-6-b39dc2ae3966@oss.qualcomm.com>
 References: <20260519-pwrseq-m2-bt-v3-0-b39dc2ae3966@oss.qualcomm.com>
 In-Reply-To: <20260519-pwrseq-m2-bt-v3-0-b39dc2ae3966@oss.qualcomm.com>
 To: Manivannan Sadhasivam <mani@kernel.org>, 
@@ -53,16 +53,16 @@ Cc: linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
  linux-bluetooth@vger.kernel.org, Wei Deng <wei.deng@oss.qualcomm.com>, 
  Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2082;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2045;
  i=manivannan.sadhasivam@oss.qualcomm.com; h=from:subject:message-id;
- bh=OzSOLSJTM2+lHbh50xUinPK/5SSZvR5hJw0X+Sc++Us=;
- b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBqDCWdWD0JU00zP67qaszIZN42Iep5F+fvGO6XT
- cdm4VJ7Ge2JATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCagwlnQAKCRBVnxHm/pHO
- 9cezCACnXoJ/9spLcDtcdWp966CMw/XJM1luSmhRbMKjaiiZiAjXTi9Go3i2gCmHzI0Hb70Wo5j
- tYbSLlXPN5HFozEDa50H/qmMqlcrK8QcKaFTSUmx7WtRIgjwH58ev+UqTk4LssB1vRlpSlHectu
- aEtRlBKRRjarGMymg0o039C5dsvc8UXEZPLYxfKLCIR/JdgZxXi/jv1p8lvjf4LQsolcZRmqtTd
- 3BALu5S9xP7xppdeBIs3Us6pJTFJAwgK9vW3qYATBto+BOO+wXnCMOGRM+j/CgUBZFXa3qlfomN
- kykXs/xKsQssVwXadmbya9Tv08wBgp7xPa9OLA2ah+VhN/So
+ bh=zADSByazZrrmfWmx+ulwGuogrsAOGSim5Z5uII1xUr4=;
+ b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBqDCWfDRV7LdUoFWUtrVGtOhWtrgun+hmgmkALV
+ BI78o07556JATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCagwlnwAKCRBVnxHm/pHO
+ 9Q4VB/98OOJrEzs8nK5BnEwlQYPWPS0WHYJegif8o0X9ZYToRMTcvL6miALMbQtqz7yU9gTxq99
+ 8ceA2jp50JMMBTF4wBcFSDM6O8/xCZ0e6jUx90XfPMLjN9Xa+OC433UOQGh5qGALsf9IxoT5XmT
+ FxbjmEB0OO+BSGjPEpzgUJYxd+dp5GVJEfQyWgMqwCew94cngjbKg4DYHABRmco5pApJZZNIITE
+ /gSG4HFkfVzMFo5hcvHvhMWYmst2eu6wksQz8J59kcXbMRVlqiIPz7diSAQnTN+GPb0z9Hs98ZQ
+ BR9OR/NJ3kstNajR5vsY30zqt8j632S9hSrpPpCc8TrV4gbA
 X-Developer-Key: i=manivannan.sadhasivam@oss.qualcomm.com; a=openpgp;
  fpr=C668AEC3C3188E4C611465E7488550E901166008
 X-Endpoint-Received: by B4 Relay for
@@ -72,55 +72,67 @@ Reply-To: manivannan.sadhasivam@oss.qualcomm.com
 
 From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 
-All functions in this driver follow 'pwrseq_pcie_m2' prefix except a few.
-Fix them to avoid inconsistency.
+The consumer drivers can make use of the pwrseq device's 'dev' pointer to
+query the pwrseq provider's DT node to check for existence of specific
+properties.
+
+Hence, add an API to return the pwrseq device's 'dev' pointer to consumers.
+
+Note that since pwrseq_get() would've increased the pwrseq refcount, there
+is no need to increase the refcount in this API again.
 
 Tested-by: Wei Deng <wei.deng@oss.qualcomm.com>
 Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 ---
- drivers/power/sequencing/pwrseq-pcie-m2.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/power/sequencing/core.c | 9 +++++++++
+ include/linux/pwrseq/consumer.h | 7 +++++++
+ 2 files changed, 16 insertions(+)
 
-diff --git a/drivers/power/sequencing/pwrseq-pcie-m2.c b/drivers/power/sequencing/pwrseq-pcie-m2.c
-index ef69ae268059..b2ed336fd5ad 100644
---- a/drivers/power/sequencing/pwrseq-pcie-m2.c
-+++ b/drivers/power/sequencing/pwrseq-pcie-m2.c
-@@ -177,7 +177,7 @@ static int pwrseq_pcie_m2_match(struct pwrseq_device *pwrseq,
- 	return PWRSEQ_NO_MATCH;
+diff --git a/drivers/power/sequencing/core.c b/drivers/power/sequencing/core.c
+index 4dff71be11b6..96ad557297f5 100644
+--- a/drivers/power/sequencing/core.c
++++ b/drivers/power/sequencing/core.c
+@@ -965,6 +965,15 @@ int pwrseq_power_off(struct pwrseq_desc *desc)
+ }
+ EXPORT_SYMBOL_GPL(pwrseq_power_off);
+ 
++struct device *pwrseq_to_device(struct pwrseq_desc *desc)
++{
++	if (!desc)
++		return NULL;
++
++	return &desc->pwrseq->dev;
++}
++EXPORT_SYMBOL_GPL(pwrseq_to_device);
++
+ #if IS_ENABLED(CONFIG_DEBUG_FS)
+ 
+ struct pwrseq_debugfs_count_ctx {
+diff --git a/include/linux/pwrseq/consumer.h b/include/linux/pwrseq/consumer.h
+index 7d583b4f266e..3c907c9e1885 100644
+--- a/include/linux/pwrseq/consumer.h
++++ b/include/linux/pwrseq/consumer.h
+@@ -23,6 +23,8 @@ devm_pwrseq_get(struct device *dev, const char *target);
+ int pwrseq_power_on(struct pwrseq_desc *desc);
+ int pwrseq_power_off(struct pwrseq_desc *desc);
+ 
++struct device *pwrseq_to_device(struct pwrseq_desc *desc);
++
+ #else /* CONFIG_POWER_SEQUENCING */
+ 
+ static inline struct pwrseq_desc * __must_check
+@@ -51,6 +53,11 @@ static inline int pwrseq_power_off(struct pwrseq_desc *desc)
+ 	return -ENOSYS;
  }
  
--static int pwrseq_m2_pcie_create_bt_node(struct pwrseq_pcie_m2_ctx *ctx,
-+static int pwrseq_pcie_m2_create_bt_node(struct pwrseq_pcie_m2_ctx *ctx,
- 					struct device_node *parent)
- {
- 	struct device *dev = ctx->dev;
-@@ -254,7 +254,7 @@ static int pwrseq_pcie_m2_create_serdev(struct pwrseq_pcie_m2_ctx *ctx)
- 		goto err_put_ctrl;
- 	}
++static inline struct device *pwrseq_to_device(struct pwrseq_desc *desc)
++{
++	return NULL;
++}
++
+ #endif /* CONFIG_POWER_SEQUENCING */
  
--	ret = pwrseq_m2_pcie_create_bt_node(ctx, serdev_parent);
-+	ret = pwrseq_pcie_m2_create_bt_node(ctx, serdev_parent);
- 	if (ret)
- 		goto err_free_serdev;
- 
-@@ -299,7 +299,7 @@ static void pwrseq_pcie_m2_remove_serdev(struct pwrseq_pcie_m2_ctx *ctx)
- 	}
- }
- 
--static int pwrseq_m2_pcie_notify(struct notifier_block *nb, unsigned long action,
-+static int pwrseq_pcie_m2_notify(struct notifier_block *nb, unsigned long action,
- 			      void *data)
- {
- 	struct pwrseq_pcie_m2_ctx *ctx = container_of(nb, struct pwrseq_pcie_m2_ctx, nb);
-@@ -364,7 +364,7 @@ static int pwrseq_pcie_m2_register_notifier(struct pwrseq_pcie_m2_ctx *ctx, stru
- 	if (pwrseq_pcie_m2_check_remote_node(dev, 3, 0, "serial")) {
- 		if (pwrseq_pcie_m2_check_remote_node(dev, 0, 0, "pcie")) {
- 			ctx->dev = dev;
--			ctx->nb.notifier_call = pwrseq_m2_pcie_notify;
-+			ctx->nb.notifier_call = pwrseq_pcie_m2_notify;
- 			ret = bus_register_notifier(&pci_bus_type, &ctx->nb);
- 			if (ret)
- 				return dev_err_probe(dev, ret,
+ #endif /* __POWER_SEQUENCING_CONSUMER_H__ */
 
 -- 
 2.48.1
