@@ -1,170 +1,128 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D66633A71B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 10:55:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD53D3A963C;
+	Tue, 19 May 2026 11:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.166
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779188132; cv=none; b=nmNL/kBzn8hjs4KaDVxHpXnzVxLRE2INUZd8D5hkmhy7xP7LH7/2jdxmlGwXDChZlLkCvkRe1ipJ8BhOaRpZSWTUXhzPIoiTAsp9vruFPMiYojDEnb2v+nj1K5GpkXkYEwhVNKqtcF2qhMEf5FjcL0GjUTXVW32w8tf7zFOP8z4=
+	t=1779188511; cv=none; b=QtSRINb+y6OHt7C/wem7vBaIEG5CccfNhcSW+nBs4NyB6aQpzR5Nl4vUaqjVNk6t3jFMBqNOTXpeeQihqwvynPeOQGJWZPt22+8jIJ/ZKEYH3B0Ig0vXzx2+qZ5lkEP9TacayV/lUEMp0YZHkreDZ0pugIbmMwAij6v8PP/Q9dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779188132; c=relaxed/simple;
-	bh=mqYU1/u9xpUS3JkYozdyc1AecTYMIk5VO0WWxONmTBs=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JOzW6CyQhTsqfPShNQMP2IMozRBFCwfy3enomPXkUS1i0EuC84RLvyFgWP9GSsYWHUf1GGxRkr55jLsyQF6IkcHDVq2+JpT8TH6AIKPM8x9jmneIx9XU8j4lnq/1fz2xnEYnrqHaTcKKD2qHNJtxHakkia5BnUshSEzUp1qfd/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=cVy37XpP; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1779188511; c=relaxed/simple;
+	bh=UvKTp4x0mCge/k9ULQ3nfbUrbKhzzezk9rEfjTIgX4I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cSjGdjU8BkCewYeRfai60wJTqIXw2eQ95jx4sBKIZulza6Kvc9VrL8vp0uQiaJVHfi2TR6kIX2Vn3OyVlSiHDo0LY7seTVuSVOIyRId6U9uQckAAXi1l0+LCFy6BbJfdGn6Gh9zXr6mW5KczFf9ae0SBo9hBR8LI6q86n64LVZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=kOjQWObS; arc=none smtp.client-ip=188.68.63.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="cVy37XpP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1779188125;
-	bh=mqYU1/u9xpUS3JkYozdyc1AecTYMIk5VO0WWxONmTBs=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=cVy37XpPb1NPQk3Jk5Etf4uJqMGNjB+py0fAUTc57rQTnpz5n7wIBoQgqVSq1mUk1
-	 prNi4rUlsvtmnj6JSFwQjFCFAXzSPN9l/kg2r3rtv3OJmZ8wt2DavCzn5D9X31jEiN
-	 SIE+Z44czzp/LV+A9SrRrGzmdBoclKeWh2/k0L6PDIO6AhS7EQyV8XCjKtxjeaJjj9
-	 5DPCmR5FL+5cjxVFR6uiM3wARWWxblSSPdjx+qWTeoXQdyID9YR4g0+Bnybl5XjX+O
-	 +92Vyks8RB3s24/cvoT2GU2xbIaeoh+GpFSLe+uUY9x7uS9AXXZ46sJVBUPLBsnBMG
-	 y4axehCRpfr1w==
-Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="kOjQWObS"
+Received: from mors-relay-8202.netcup.net (localhost [127.0.0.1])
+	by mors-relay-8202.netcup.net (Postfix) with ESMTPS id 4gKWkS18FKz44SK;
+	Tue, 19 May 2026 12:53:52 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1779188032;
+	bh=UvKTp4x0mCge/k9ULQ3nfbUrbKhzzezk9rEfjTIgX4I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kOjQWObSkNRSY6GpO9V1lb+edbSnAgNSMZrmsa8fhyxRC+yJP6PCF/xtPa/n9DVeN
+	 O9qkeH2Kx41hiXXph4CcNbEsq+nM7dbVuVM100n/+P20NEeF5rUryKXjcoMOXwFPy9
+	 IPmf6i5OT+DCg78mlGT+i+epBGKvphvC+aHWYjqw5lQXiMM1f5MDzKqIVZuQGDlcmo
+	 mCwEG4R5KsclNKZTGn15qonz/kMR2CAiOfW3wa1AVHhCeOOb0wpT1Zhlm0MPPeF7hr
+	 h6cenmWmMvCAEpIYXt9Am32RuFNNF5LT3uvfV/EPkXL1JXXhPURfhnExAh8xGttreZ
+	 TcV7ksRFU8M5g==
+Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-8202.netcup.net (Postfix) with ESMTPS id 4gKWkS0Nr9z44Lf;
+	Tue, 19 May 2026 12:53:52 +0200 (CEST)
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 0008217E1305
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 12:55:24 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] client/btpclient: Replace advertising defines by shared ones
-Date: Tue, 19 May 2026 12:55:18 +0200
-Message-ID: <20260519105519.226648-3-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260519105519.226648-1-frederic.danis@collabora.com>
-References: <20260519105519.226648-1-frederic.danis@collabora.com>
+	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4gKWkR1Zlnz8sZw;
+	Tue, 19 May 2026 12:53:50 +0200 (CEST)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 25B7761840;
+	Tue, 19 May 2026 12:53:50 +0200 (CEST)
+Authentication-Results: mxe9fb;
+        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
+Date: Tue, 19 May 2026 12:53:49 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] bluetooth 2026-05-14
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
+ Sasha Levin <sashal@kernel.org>, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ davem@davemloft.net, kuba@kernel.org,
+ Linux kernel regressions list <regressions@lists.linux.dev>,
+ Linus Torvalds <torvalds@linux-foundation.org>
+References: <20260514172340.1515042-1-luiz.dentz@gmail.com>
+ <f5cf1c30-48a4-4102-ae00-b74cf02e639e@leemhuis.info>
+ <4946f5f3-b7e2-4949-89f7-6427015027c6@leemhuis.info>
+ <2026051954-revision-sierra-6bb4@gregkh>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Content-Language: de-DE, en-US
+In-Reply-To: <2026051954-revision-sierra-6bb4@gregkh>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-PPP-Message-ID: 
+ <177918803061.1343717.15758093569918065765@mxe9fb.netcup.net>
+X-NC-CID: 5/lidQX7YWK2JsbqflFpPFEJrT/M+G2UxvrEQe6WMwPRweMqOoM=
 
-The advertisement types are already defined in src/shared/ad.h
----
- client/btpclient/gap.c | 44 ++++++++++++++++--------------------------
- 1 file changed, 17 insertions(+), 27 deletions(-)
+On 5/19/26 12:30, Greg KH wrote:
+> On Tue, May 19, 2026 at 09:04:38AM +0200, Thorsten Leemhuis wrote:
+>> On 5/15/26 17:10, Thorsten Leemhuis wrote:
+>>> On 5/14/26 19:23, Luiz Augusto von Dentz wrote:
+>>>
+>>>> The following changes since commit c78bdba7b9666020c0832150a4fc4c0aebc7c6ac:
+>>>>   net: phy: DP83TC811: add reading of abilities (2026-05-14 15:17:12 +0200)
+>>>>
+>>>> are available in the Git repository at:
+>>>>
+>>>>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-14
+>>>>
+>>>> for you to fetch changes up to 375ba7484132662a4a8c7547d088fb6275c00282:
+>>>>
+>>>>   Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-14 09:58:08 -0400)
+>>>
+>>> It seems this PR sadly came too late for this week's net PR to mainline
+>>> that was merged yesterday.
+>>>
+>>> TWIMC, from my point of view, it would be great if we somehow could
+>>> still get the changes from this PR or at least the btmtk fix it
+>>> contains[1] to mainline this week before -rc4, as it is fixing a
+>>> regression known since 2026-04-24 that at least five people encountered
+>>> with mainline since -rc3 due to 634a4408c0615c ("Bluetooth: btmtk:
+>>> validate WMT event SKB length before struct access") [006b9943b982 in
+>>> -next].
+>>
+>> Greg, Sasha, that [1] fix I was talking about now reached -next as
+>> 162b1adeb057d2 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL
+>> events") and will likely hit mainline on Thursday or so with the weekly
+>> -net PR to -mainline. If that's good enough for you, I'd say it would be
+>> good to pick this up for the next round of stable kernels.
+> 
+> That "Fixes:" tag is referring to something that is also not in any
+> tree, but that commit does have a cc: stable in it.  So do we need both
+> of these:
 
-diff --git a/client/btpclient/gap.c b/client/btpclient/gap.c
-index 916626f1d..2d393dd4d 100644
---- a/client/btpclient/gap.c
-+++ b/client/btpclient/gap.c
-@@ -17,6 +17,7 @@
- 
- #include "bluetooth/bluetooth.h"
- #include "bluetooth/uuid.h"
-+#include "src/shared/ad.h"
- #include "src/shared/btp.h"
- #include "btpclient.h"
- #include "core.h"
-@@ -27,17 +28,6 @@
- #define AD_IFACE "org.bluez.LEAdvertisement1"
- #define AG_IFACE "org.bluez.Agent1"
- 
--/* List of assigned numbers for advertising data and scan response */
--#define AD_TYPE_FLAGS				0x01
--#define AD_TYPE_INCOMPLETE_UUID16_SERVICE_LIST	0x02
--#define AD_TYPE_SHORT_NAME			0x08
--#define AD_TYPE_COMPLETE_NAME			0x09
--#define AD_TYPE_TX_POWER			0x0a
--#define AD_TYPE_SOLICIT_UUID16_SERVICE_LIST	0x14
--#define AD_TYPE_SERVICE_DATA_UUID16		0x16
--#define AD_TYPE_APPEARANCE			0x19
--#define AD_TYPE_MANUFACTURER_DATA		0xff
--
- static void register_gap_service(void);
- 
- static struct l_dbus *dbus;
-@@ -899,7 +889,7 @@ static void create_advertising_data(uint8_t adv_data_len, const uint8_t *data)
- 		ad_data = &data[adv_data_len - remaining_data_len + 2];
- 
- 		switch (ad_type) {
--		case AD_TYPE_INCOMPLETE_UUID16_SERVICE_LIST:
-+		case BT_AD_UUID16_SOME:
- 		{
- 			char *uuid = dupuuid2str(ad_data, 16);
- 
-@@ -907,20 +897,28 @@ static void create_advertising_data(uint8_t adv_data_len, const uint8_t *data)
- 
- 			break;
- 		}
--		case AD_TYPE_SHORT_NAME:
--		case AD_TYPE_COMPLETE_NAME:
-+		case BT_AD_NAME_SHORT:
-+		case BT_AD_NAME_COMPLETE:
- 			ad.local_name = malloc(ad_len + 1);
- 			memcpy(ad.local_name, ad_data, ad_len);
- 			ad.local_name[ad_len] = '\0';
- 
- 			break;
--		case AD_TYPE_TX_POWER:
-+		case BT_AD_TX_POWER:
- 			ad.tx_power = true;
- 
- 			/* XXX Value is omitted cause, stack fills it */
- 
- 			break;
--		case AD_TYPE_SERVICE_DATA_UUID16:
-+		case BT_AD_SOLICIT16:
-+		{
-+			char *uuid = dupuuid2str(ad_data, 16);
-+
-+			l_queue_push_tail(ad.solicits, uuid);
-+
-+			break;
-+		}
-+		case BT_AD_SERVICE_DATA16:
- 		{
- 			struct service_data *sd;
- 
-@@ -933,11 +931,11 @@ static void create_advertising_data(uint8_t adv_data_len, const uint8_t *data)
- 
- 			break;
- 		}
--		case AD_TYPE_APPEARANCE:
-+		case BT_AD_GAP_APPEARANCE:
- 			memcpy(&ad.local_appearance, ad_data, ad_len);
- 
- 			break;
--		case AD_TYPE_MANUFACTURER_DATA:
-+		case BT_AD_MANUFACTURER_DATA:
- 		{
- 			struct manufacturer_data *md;
- 
-@@ -954,14 +952,6 @@ static void create_advertising_data(uint8_t adv_data_len, const uint8_t *data)
- 
- 			break;
- 		}
--		case AD_TYPE_SOLICIT_UUID16_SERVICE_LIST:
--		{
--			char *uuid = dupuuid2str(ad_data, 16);
--
--			l_queue_push_tail(ad.solicits, uuid);
--
--			break;
--		}
- 		default:
- 			l_info("Unsupported advertising data type");
- 
-@@ -2455,7 +2445,7 @@ static void btp_gap_device_found_ev(struct l_dbus_proxy *proxy)
- 				ev->eir_len);
- 			eir = &ev->eir[ev->eir_len - n - 4];
- 			eir[0] = n + 3;
--			eir[1] = AD_TYPE_MANUFACTURER_DATA;
-+			eir[1] = BT_AD_MANUFACTURER_DATA;
- 			eir[2] = key >> 8;
- 			eir[3] = key & 0xFF;
- 			memcpy(&eir[4], data, n);
--- 
-2.43.0
+Valid question, as yes, there is a slight mixup here:
 
+> 041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length before struct access")
+
+That is already in v7.0.7, v6.18.30, v6.12.88, as 041e88fb0c08 is the
+-next commit-id for mainline commit-id 634a4408c0615c ("Bluetooth:
+btmtk: validate WMT event SKB length before struct access") -- the one
+that is causing the regression that I want to get fixed. So we now only
+need:
+
+> 162b1adeb057 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL events")
+
+thx!
+
+Ciao, Thorsten
