@@ -1,85 +1,124 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F9B531E844;
-	Tue, 19 May 2026 14:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55A7400DFC;
+	Tue, 19 May 2026 15:19:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779202794; cv=none; b=ulhFSrXC3FEeLHWun7d8eysmU8ptRgWawELAGHVUaL9zzIPxftD9tL5PhUHJGyhDb8S9e73EV6+fWPyj8t8X/eGpsVIO7Aim3X53p6cdOD6gtwJWu70J/Psc74WFcEae0cvDDdMOgXIeNfWKyAvEUJ3KMbCBRc/Kl45maJba7qk=
+	t=1779203949; cv=none; b=MN481U65FwWBiN9EHirg/seJEbPbLAhw/0yqEix5/CRn31VuKd78KDdN1nxg/GfvkFwxKd+0rmKySt+Vd7/yUlsPy8xpi2o8w4zGcuhkluNeBNLTcMLcYirQGQHOFiu15IpxWicvsIBKVNk2BJSKKwLqm2p8fs61lrH0KcTrTaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779202794; c=relaxed/simple;
-	bh=fn8wRJXsxyp+AFFoxptH8Hr8ZrQjWahBapcDZYp1W7k=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BtsZ0SLTpGNotVkJJRYiTWWmL1d5MWRf5b1uw0UU+vCpMkb7+4NiN3zAJwoA+H1ETFfMHRemUboVWBG5x+V7zzuwBikoLbQPfMImaed05YQ8bJeyAQSXUgLMWgy8ppQmMMU1zZ8sfNxxHlOpD/vJw+KdDf/My6Uc8A68qR6b868=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qOX/d4xO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779203949; c=relaxed/simple;
+	bh=nNsxKpDn2GIl+ynVQyOFWi8VuSsq3U/b8KBRqO60zFM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AzyEk9ullhdkcIPCcggow4Xrpp6zSfEPFUgZ+sNAqxtatcMSQ1qcTAthTlvOt7Rkz0Zu03HT6eHnpcOlR0YfiSMygxDEHp4MLyP6yVZYdIKdcwwQ3qpQMa/AYj0v+GM0NIxysOoODOP/4VqnGjpKhda0s6yw2PVq+zlr8NQI8RA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=pARPau/Z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qOX/d4xO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A49BC2BCB3;
-	Tue, 19 May 2026 14:59:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779202794;
-	bh=fn8wRJXsxyp+AFFoxptH8Hr8ZrQjWahBapcDZYp1W7k=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qOX/d4xOPNd8ELT3mAggvcsQ+1JdlTECwgHDN7KgourR36ZGka0mQoMME3MnS9XDu
-	 bo7A0ACyv2G7pE6OpXD8y5SVh8vVr7QyGAhr+Z25jMbj4jMj0kkIfM2iPAU63J2Zp0
-	 /lFjWuz8KVzglsN1xKcgZyehmNaO7mPU9fyf8d1mwJpUFt0PgFWAapKVKWGsH1Zkjk
-	 uKIq+2D9NZ7IxCHCbplGXBmXZH2G2XagXBQ5ZAY2Ff5cu5c5k0t3mraqN1q4kCaeSF
-	 m9UYibeGnhHob3GX3rxRH9NdV0oM/bDW/fzSm1KE84u4SK3u58dYOwlOsX02xiBsaV
-	 gQtUwPlJmkQ3A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 569143930E24;
-	Tue, 19 May 2026 15:00:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="pARPau/Z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D61DCC2BCB8;
+	Tue, 19 May 2026 15:19:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1779203949;
+	bh=nNsxKpDn2GIl+ynVQyOFWi8VuSsq3U/b8KBRqO60zFM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pARPau/Z0VNLvUTTeuvLQ1kKek93j9hxvsdWGgFgrcJFzbpxLC8Lq2BclUqNnOYfr
+	 RUb7w25Z0RUAZZW43ennx6Oe7UvVdovqifsnjYsDZ8/I9QZ5cNlmcHTwSAtLwobNe+
+	 bSfJb3SyPrQg0K36TyXXhH95lBzWq5uiBcd3WfaY=
+Date: Tue, 19 May 2026 17:18:22 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Thorsten Leemhuis <regressions@leemhuis.info>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	Sasha Levin <sashal@kernel.org>, linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	Linux kernel regressions list <regressions@lists.linux.dev>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [GIT PULL] bluetooth 2026-05-14
+Message-ID: <2026051942-uproar-drainpipe-6370@gregkh>
+References: <20260514172340.1515042-1-luiz.dentz@gmail.com>
+ <f5cf1c30-48a4-4102-ae00-b74cf02e639e@leemhuis.info>
+ <4946f5f3-b7e2-4949-89f7-6427015027c6@leemhuis.info>
+ <2026051954-revision-sierra-6bb4@gregkh>
+ <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
+ <2026051909-impurity-nemesis-2f65@gregkh>
+ <CABBYNZKKbTXc-okp9P2OncMYXHX9C1XC+pRC7XWOhv-8nPNZ5A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v9] Bluetooth: hci_uart: fix UAFs and race conditions in
- close
- and init paths
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <177920280488.2756414.8251481561878776667.git-patchwork-notify@kernel.org>
-Date: Tue, 19 May 2026 15:00:04 +0000
-References: <20260518024949.439299-1-w15303746062@163.com>
-In-Reply-To: <20260518024949.439299-1-w15303746062@163.com>
-To: w15303746062 <w15303746062@163.com>
-Cc: luiz.dentz@gmail.com, pmenzel@molgen.mpg.de, marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-kernel@vger.kernel.org, greg@kroah.com, stable@vger.kernel.org,
- 25181214217@stu.xidian.edu.cn
+In-Reply-To: <CABBYNZKKbTXc-okp9P2OncMYXHX9C1XC+pRC7XWOhv-8nPNZ5A@mail.gmail.com>
 
-Hello:
-
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Mon, 18 May 2026 10:49:49 +0800 you wrote:
-> From: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+On Tue, May 19, 2026 at 09:44:39AM -0400, Luiz Augusto von Dentz wrote:
+> Hi Greg,
 > 
-> Vulnerabilities leading to Use-After-Free (UAF) and Null Pointer
-> Dereference (NPD) conditions were observed in the lifecycle management
-> of hci_uart.
+> On Tue, May 19, 2026 at 8:07 AM Greg KH <gregkh@linuxfoundation.org> wrote:
+> >
+> > On Tue, May 19, 2026 at 12:53:49PM +0200, Thorsten Leemhuis wrote:
+> > > On 5/19/26 12:30, Greg KH wrote:
+> > > > On Tue, May 19, 2026 at 09:04:38AM +0200, Thorsten Leemhuis wrote:
+> > > >> On 5/15/26 17:10, Thorsten Leemhuis wrote:
+> > > >>> On 5/14/26 19:23, Luiz Augusto von Dentz wrote:
+> > > >>>
+> > > >>>> The following changes since commit c78bdba7b9666020c0832150a4fc4c0aebc7c6ac:
+> > > >>>>   net: phy: DP83TC811: add reading of abilities (2026-05-14 15:17:12 +0200)
+> > > >>>>
+> > > >>>> are available in the Git repository at:
+> > > >>>>
+> > > >>>>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-14
+> > > >>>>
+> > > >>>> for you to fetch changes up to 375ba7484132662a4a8c7547d088fb6275c00282:
+> > > >>>>
+> > > >>>>   Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-14 09:58:08 -0400)
+> > > >>>
+> > > >>> It seems this PR sadly came too late for this week's net PR to mainline
+> > > >>> that was merged yesterday.
+> > > >>>
+> > > >>> TWIMC, from my point of view, it would be great if we somehow could
+> > > >>> still get the changes from this PR or at least the btmtk fix it
+> > > >>> contains[1] to mainline this week before -rc4, as it is fixing a
+> > > >>> regression known since 2026-04-24 that at least five people encountered
+> > > >>> with mainline since -rc3 due to 634a4408c0615c ("Bluetooth: btmtk:
+> > > >>> validate WMT event SKB length before struct access") [006b9943b982 in
+> > > >>> -next].
+> > > >>
+> > > >> Greg, Sasha, that [1] fix I was talking about now reached -next as
+> > > >> 162b1adeb057d2 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL
+> > > >> events") and will likely hit mainline on Thursday or so with the weekly
+> > > >> -net PR to -mainline. If that's good enough for you, I'd say it would be
+> > > >> good to pick this up for the next round of stable kernels.
+> > > >
+> > > > That "Fixes:" tag is referring to something that is also not in any
+> > > > tree, but that commit does have a cc: stable in it.  So do we need both
+> > > > of these:
+> > >
+> > > Valid question, as yes, there is a slight mixup here:
+> > >
+> > > > 041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length before struct access")
+> > >
+> > > That is already in v7.0.7, v6.18.30, v6.12.88, as 041e88fb0c08 is the
+> > > -next commit-id for mainline commit-id 634a4408c0615c ("Bluetooth:
+> > > btmtk: validate WMT event SKB length before struct access") -- the one
+> > > that is causing the regression that I want to get fixed. So we now only
+> > > need:
+> > >
+> > > > 162b1adeb057 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL events")
+> >
+> > Ok, but that "Fixes:" tag pointing to an invalid commit is going to be a
+> > nightmare to track over time, ugh.
 > 
-> The primary issue arises because the workqueues (init_ready and
-> write_work) are only flushed/cancelled if the HCI_UART_PROTO_READY
-> flag is set during TTY close. If a hangup occurs before setup completes,
-> hci_uart_tty_close() skips the teardown of these workqueues and
-> proceeds to free the `hu` struct. When the scheduled work executes
-> later, it blindly dereferences the freed `hu` struct.
-> 
-> [...]
+> Hmm, did we get the wrong hash or something? Usually, that would show
+> up in the verify-fixes.sh, but perhaps it didn't capture it this time
+> for some reason, perhaps I'm running an outdated version or something
+> similar.
 
-Here is the summary with links:
-  - [v9] Bluetooth: hci_uart: fix UAFs and race conditions in close and init paths
-    https://git.kernel.org/bluetooth/bluetooth-next/c/7db62a762f61
+Something went wrong if we ended up with a patch in the stable trees,
+yet this fix is referring to it as a different git sha.  Don't know
+where the disconnect happend :(
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+thanks,
 
-
+greg k-h
