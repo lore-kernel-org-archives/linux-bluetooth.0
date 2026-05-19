@@ -1,74 +1,85 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696F6320A04
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 14:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F9B531E844;
+	Tue, 19 May 2026 14:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779202357; cv=none; b=kHOeu2L0YUOPROGzgf0YH+2OU62D49u6/YBGsP9j26LAPTdk2/4nhD5uAvyctDz1xKh07Ni+S41ebytdjeDo8t/X0LoteZ9VVnZsJUb8p6w6Q3MoxWnJXPCqQdop7I946dz5EfTVLUalkKB1rQESBBABD6njNw5dQwgteSV4lUg=
+	t=1779202794; cv=none; b=ulhFSrXC3FEeLHWun7d8eysmU8ptRgWawELAGHVUaL9zzIPxftD9tL5PhUHJGyhDb8S9e73EV6+fWPyj8t8X/eGpsVIO7Aim3X53p6cdOD6gtwJWu70J/Psc74WFcEae0cvDDdMOgXIeNfWKyAvEUJ3KMbCBRc/Kl45maJba7qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779202357; c=relaxed/simple;
-	bh=cAmGsQdO/8hZuHnMF9FGzFvGcviAki7ZFuIOi7mz+Ek=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=DRi5AvjgMeQUG8pG0tNX6vyopR4CPOweIwnoeif9dEQakg6adihdPHgKNy0UJ+RtznNSsOFx3BO6oox5vrUIAdZF6GMN/KWhRd8pittUbGfbHvXaD6DTkljMp0Ccy4fwcce526uJn57pDhq0nW9S7CV0+F4aQalCvgGTLiYEdw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I7P5E4O5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779202794; c=relaxed/simple;
+	bh=fn8wRJXsxyp+AFFoxptH8Hr8ZrQjWahBapcDZYp1W7k=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BtsZ0SLTpGNotVkJJRYiTWWmL1d5MWRf5b1uw0UU+vCpMkb7+4NiN3zAJwoA+H1ETFfMHRemUboVWBG5x+V7zzuwBikoLbQPfMImaed05YQ8bJeyAQSXUgLMWgy8ppQmMMU1zZ8sfNxxHlOpD/vJw+KdDf/My6Uc8A68qR6b868=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qOX/d4xO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I7P5E4O5"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 441CBC2BCC9
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 14:52:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qOX/d4xO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A49BC2BCB3;
+	Tue, 19 May 2026 14:59:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779202357;
-	bh=cAmGsQdO/8hZuHnMF9FGzFvGcviAki7ZFuIOi7mz+Ek=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=I7P5E4O5+05soQ0wCSgv5n7TgEGGU96GbqJLJr5R0z5ZhXFKp8xV6zyK3XDoiw18Z
-	 tjBShoz6e3eOsRwWwK2OHRfJncD4fVUYF+wkXZo1PXwtoQMLNNg5qMTqlsd0WYCk9s
-	 h4c0iaQiIXj/+C9GhwuEuD9lI4U9Rbv2qeQXfFYd5H4KRuVKdYtJXzllc0dRtB+fki
-	 enujCVXOr16NM5GQe+zWPKzVOaNDM3nNrSai+uCUJpO4mtXB9UL1NzpRVErbmGP0Uw
-	 DFas6d6yVCnWhiWBE2yseKY7Irs/W9+8hKTVM3iiPL4ek8N0U5jRU+d28TFxY/nBXR
-	 RuWmJHl+X3oJA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 38617C53BC9; Tue, 19 May 2026 14:52:37 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221521] Bluetooth: btusb/mt7921 - Failed to send wmt func ctrl
- (-22) on MediaTek MT7921 combo adapter
-Date: Tue, 19 May 2026 14:52:36 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: CODE_FIX
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221521-62941-ADRH1ihB3M@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221521-62941@https.bugzilla.kernel.org/>
-References: <bug-221521-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1779202794;
+	bh=fn8wRJXsxyp+AFFoxptH8Hr8ZrQjWahBapcDZYp1W7k=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qOX/d4xOPNd8ELT3mAggvcsQ+1JdlTECwgHDN7KgourR36ZGka0mQoMME3MnS9XDu
+	 bo7A0ACyv2G7pE6OpXD8y5SVh8vVr7QyGAhr+Z25jMbj4jMj0kkIfM2iPAU63J2Zp0
+	 /lFjWuz8KVzglsN1xKcgZyehmNaO7mPU9fyf8d1mwJpUFt0PgFWAapKVKWGsH1Zkjk
+	 uKIq+2D9NZ7IxCHCbplGXBmXZH2G2XagXBQ5ZAY2Ff5cu5c5k0t3mraqN1q4kCaeSF
+	 m9UYibeGnhHob3GX3rxRH9NdV0oM/bDW/fzSm1KE84u4SK3u58dYOwlOsX02xiBsaV
+	 gQtUwPlJmkQ3A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 569143930E24;
+	Tue, 19 May 2026 15:00:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v9] Bluetooth: hci_uart: fix UAFs and race conditions in
+ close
+ and init paths
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <177920280488.2756414.8251481561878776667.git-patchwork-notify@kernel.org>
+Date: Tue, 19 May 2026 15:00:04 +0000
+References: <20260518024949.439299-1-w15303746062@163.com>
+In-Reply-To: <20260518024949.439299-1-w15303746062@163.com>
+To: w15303746062 <w15303746062@163.com>
+Cc: luiz.dentz@gmail.com, pmenzel@molgen.mpg.de, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-kernel@vger.kernel.org, greg@kroah.com, stable@vger.kernel.org,
+ 25181214217@stu.xidian.edu.cn
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221521
+Hello:
 
---- Comment #12 from Artem S. Tashkinov (aros@gmx.com) ---
-The patch has landed in 7.0.10. Hooray.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
---=20
-You may reply to this email to add a comment.
+On Mon, 18 May 2026 10:49:49 +0800 you wrote:
+> From: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+> 
+> Vulnerabilities leading to Use-After-Free (UAF) and Null Pointer
+> Dereference (NPD) conditions were observed in the lifecycle management
+> of hci_uart.
+> 
+> The primary issue arises because the workqueues (init_ready and
+> write_work) are only flushed/cancelled if the HCI_UART_PROTO_READY
+> flag is set during TTY close. If a hangup occurs before setup completes,
+> hci_uart_tty_close() skips the teardown of these workqueues and
+> proceeds to free the `hu` struct. When the scheduled work executes
+> later, it blindly dereferences the freed `hu` struct.
+> 
+> [...]
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Here is the summary with links:
+  - [v9] Bluetooth: hci_uart: fix UAFs and race conditions in close and init paths
+    https://git.kernel.org/bluetooth/bluetooth-next/c/7db62a762f61
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
