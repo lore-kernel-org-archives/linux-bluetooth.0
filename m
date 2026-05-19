@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2543DB330
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 17:21:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A106B2F290E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 17:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779211315; cv=none; b=dd26YJ/UO2yizNWpHgwDHb5q6jtQnV/HgyQguYrGzOOZHwlRZERLoH/beWNRRuGhe2z861eO9gq6Vyo64mH+wQJyU4BrgSNQLVpFnokgPr+e7Lzu1YP5dhQanfG373xbzuSfTyJfQPg7kxPteUjiuTE1pV9Oq4cb66NsDEw10ws=
+	t=1779211413; cv=none; b=PbNAUSUvaLWWvzz1fp79jLs/CdgdRGXcWqagH0dWsHv+Nj8/CMkZ/vkgPyFfA4im7xHLUXP5v7A5rI7F7mNq/qA2K7GOIRN/M/c0dZ7AcfD0qv/vCSmLr7j94EwtwL5gG1F6SMolWsnbBO045gjO5nmjwLhlvpbOsGzJdHFGKkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779211315; c=relaxed/simple;
-	bh=he3xxLSWEFYTSCyK4ojOaCU8YwEhaQAtgDnmujczFTc=;
+	s=arc-20240116; t=1779211413; c=relaxed/simple;
+	bh=gzRPUGaSgoeS19Tcj0uwd2kPFGuKaKnmyqmXzF7FNcE=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SXsJfPyX6QRvDp5pKb3w+42JYCiLATX4aiON1yqnZEdOcumUpAnfTJJvnWxW/TPM/xL4+mfdDvLErpsAeVaT6/CxGiobI+MuH2ITP49awVJoCzoFqYc9RFlK0DO6aqs6WRe0fr9EZklhme7trej3wr0ENlnMZgxp+m6S0aA9Snk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PY8V1/Jd; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=fCC6p4n0tWKGlhI0pTb2wpl3IkNuideGRht88VH6vM6O2bcWO5GdyggR1UwDp0SZZKgPIgF7AQFdLPCvLr1+TEeS6jbCtS+Ljx7mhPFquWdFrvNdFDDIfA5Zmyda+0YGYDpD3q12f9WVYtzTAiJD+/5j59zF4R2lC3UbaSeoAzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O5lqvb+/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PY8V1/Jd"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ACDC9C2BCC6
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 17:21:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O5lqvb+/"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4ABA4C2BCB8
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 17:23:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779211315;
-	bh=he3xxLSWEFYTSCyK4ojOaCU8YwEhaQAtgDnmujczFTc=;
+	s=k20201202; t=1779211411;
+	bh=gzRPUGaSgoeS19Tcj0uwd2kPFGuKaKnmyqmXzF7FNcE=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=PY8V1/JdNTyq43ndOruAdJnSPqyeBKpwzSdraILGvwksqgmNmIBFBD7YYJFlCTFHd
-	 4X6t6CFj5wRH8t5K8liWere4ooIwasJ1Xv9Yj60IixnTAiUNpOelBJyqnF3jooR0Dw
-	 lRfBsk1wi3pslgcvJmp/YA2v3Mh+loSanPAJLAewR3OGrjoADbZ7DqiEyEQdTOICAZ
-	 /O0eC4SOZwUqFb8GrqLYzMvoh7YA+eN/tukkwPvyo+wuOrVXIawjh51+dgR+7Zj3wT
-	 CHBgSNpbQFD8HXveFWzGjZCQ6x6kvr9zSfx3kEUcpHKp4Wf1Rq0WkZRTRk9k5LYBRZ
-	 MlK7AATEdmyyg==
+	b=O5lqvb+/XecT6g8VDF+ba6xdrpHHql/V4vCpaBEmDwNpXE8m1IxZjC2Klp/vz1S0q
+	 XaxSufZsLZRsP7FKuLJFBB85ghgpNOQATsU1jgAoBk/dqYEamE7NZGTTBQ1k3rQh1M
+	 qCBwlCIm+Q/B+5I+YoZvbZ1U7qFfDkX6iwunwnoZxmq7Efa+Ufh3JxxGyYQk/KHAnF
+	 xE66/r5WRiHrCZKSnmb4+BU3TJ2FePkc/8abbCv5a0lPipyvOwkL63JFui6Qi02lLB
+	 etFaDSIFPGqxcz3mfvaijCz6BHagr46HqqMWdihLnfEzYXL3zza2MPx60kpu/1ZbPg
+	 SotBf5Uy5shjw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id A33B6C433E1; Tue, 19 May 2026 17:21:55 +0000 (UTC)
+	id 41205C433E1; Tue, 19 May 2026 17:23:31 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: =?UTF-8?B?W0J1ZyAyMjE1NTFdIGJ0bXRrOiBNVDc5MjEgKFVTQiBJRCAwZThk?=
  =?UTF-8?B?OmUwMjApIEJsdWV0b290aCBicm9rZW4gc2luY2UgNy4wLjcg4oCUIGZpeCBj?=
  =?UTF-8?B?b21taXQgZm9yIDA0ODk6ZTBlMiBkb2VzIG5vdCBjb3ZlciB0aGlzIFBJRA==?=
-Date: Tue, 19 May 2026 17:21:55 +0000
+Date: Tue, 19 May 2026 17:23:31 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -43,13 +43,13 @@ X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: blocking
 X-Bugzilla-Who: gagnieux.virgil@proton.me
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: OBSOLETE
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cf_kernel_version
-Message-ID: <bug-221551-62941-5v1NMmY1zh@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-221551-62941-9pKILdtvc0@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-221551-62941@https.bugzilla.kernel.org/>
 References: <bug-221551-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,7 +69,8 @@ Virgil GAGNIEUX (gagnieux.virgil@proton.me) changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
-     Kernel Version|                            |7.0.9-hardened1-1-hardened
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |OBSOLETE
 
 --=20
 You may reply to this email to add a comment.
