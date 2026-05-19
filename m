@@ -1,148 +1,83 @@
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [185.244.194.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891BC30B517;
-	Tue, 19 May 2026 05:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.244.194.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98512FE05B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 05:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779167169; cv=none; b=Z9nFuZyd+gvF611rBkjcII0wmAfNGr9P7LkX3niibglPT0NluMzWlA4/95Y/qbgMlufhMGOCNm2Xf6XEFAcPL2fSdQJ1uRJfHG46wgquV2Ukvw18N4G8nV0Wlp3jsMhvefhYUYV+VSKxDNJS2OTV4yLs8teKSfKMmZSj4WfCTD8=
+	t=1779169727; cv=none; b=lGPzUoO3aCCukDVY5XdRtaDemNq4Q3WkP4nrA6v5LEgEt7t9E+GvMOIB+pe8pqqoNmFQ3Uaxl+wC918jc+Okip2bnMnKo9OxWw99C4S5GMvQB+uGfgulfRAwPTgMt3hmjeApZaxo7iPKeWObIPTRuGIxLCDUMEeSVSi7GpHPXxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779167169; c=relaxed/simple;
-	bh=FAiCEhzhtFbXPSs7rpt5n/p1t2w9wK7VlAtkJJg+KxY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rKQ/h/6P65Ndy+agKBHaS/sLqz2DlBgfvgswcl6WtsRlIardW/HuT+roqbmOvT7DuilotZBHec7Pmm3li0l+839g+YUUb9vDqemuFtxuieR+FJ/yL4miGm+UOr7hOiZs2S++bOLtmlGZPScXlxLqfGJ5IZko7IpCLmHc509Zi6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=K5koFewW; arc=none smtp.client-ip=185.244.194.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1779169727; c=relaxed/simple;
+	bh=/W1KOSj/43EByxH4creotTxz28X00NlBKjMZaMacBBM=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=nQO67L+sRRitRxmp+Z/4/0gris+lcj3N+FS4K74K9leR8A2wXFTQSSpRkLshAFCtFLpAewfbXpjghybRqMsYOTZfdVxQkGgzLkJXLaBfjr00RHUbf/sS5evVXvAPoKG8pH56fI0etRZa5CvE9KsWakX+U1rWYO6DJTGl/pnOk/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h4rHgY2j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="K5koFewW"
-Received: from relay01-mors.netcup.net (localhost [127.0.0.1])
-	by relay01-mors.netcup.net (Postfix) with ESMTPS id 4gKN0z3wSZz94yW;
-	Tue, 19 May 2026 07:05:55 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1779167155;
-	bh=FAiCEhzhtFbXPSs7rpt5n/p1t2w9wK7VlAtkJJg+KxY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=K5koFewWjOv2W8vANcfdXTMyEtXNYiUyZ95mUequ8KmkWT+fgzDTFAXrIehrfI23b
-	 tpJMxJXRrvVJ7+xn5vN2JaIrLvqj8VkZRjgBgbIuNdmizmU7cJ/7Hv4VMJquKzpXFA
-	 qtIBP3sZqn/hWy6MGytcy8e0K5GDF/UCrxcuxvicfvI7VCEje9HMTNwevZZC+uy6xI
-	 /F7xPUTaUjgplsY4uSpTCo7RXmzjbxzOAhnD6NDTAh8OIOpu5JYk7prM5kb/RO5gdL
-	 tNDEgc4aRuVXxVkYJSAeOKxO1e/YIndepX0zm5SWrK/trrflexI7bgCDKojglYwwT0
-	 PIqNktQ2AJ3Rg==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by relay01-mors.netcup.net (Postfix) with ESMTPS id 4gKMzw5nYDz7v62;
-	Tue, 19 May 2026 07:05:00 +0200 (CEST)
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4gKMzw1QcXz8sbH;
-	Tue, 19 May 2026 07:05:00 +0200 (CEST)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 311F861884;
-	Tue, 19 May 2026 07:04:59 +0200 (CEST)
-Authentication-Results: mxe9fb;
-        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <ff4c4ba2-dc26-4b05-87c2-03cc70afdcc5@leemhuis.info>
-Date: Tue, 19 May 2026 07:04:58 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h4rHgY2j"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 43604C2BCF7
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 05:48:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779169727;
+	bh=/W1KOSj/43EByxH4creotTxz28X00NlBKjMZaMacBBM=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=h4rHgY2jLcUUBPvqadL41eqiN5yZLyt7II2ux69m21yX+vU/txULXnSFfs7OxPT16
+	 IrqRDcaeSX8rgrmV77nbt1h83KsGqgO49opnI30w6BCjTFfGf8ONWgj6dixIBDCzNE
+	 fiKE2xOqwhTRoacF8I3tle97tkWmp/vQz4OQXg/HTFEj0d6Kt5qDDXk/xDWA3WTUTa
+	 2tUUtn1RJGI84rR2onREoGGJL8ZWJITgz9qxOANXXIIeUs3y0QWy75ojvW3UkIZ2Ld
+	 GPUaSSEjSvxynHNozIgNIntDSiRE2OE87wcnMfePsXrA5T5M1JpbKNMfs3eYXRaS4S
+	 I1N3vh0hXR+QQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 39A44C53BC9; Tue, 19 May 2026 05:48:47 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221521] Bluetooth: btusb/mt7921 - Failed to send wmt func ctrl
+ (-22) on MediaTek MT7921 combo adapter
+Date: Tue, 19 May 2026 05:48:46 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: jirislaby@gmail.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-221521-62941-7QnPu2VE3n@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221521-62941@https.bugzilla.kernel.org/>
+References: <bug-221521-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] Bluetooth: MT7922 fails to initialize after
- "Bluetooth: btmtk: validate WMT event SKB length before struct access"
-To: Baley Eccles <baleycod@gmail.com>, linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, regressions@lists.linux.dev,
- stable@vger.kernel.org
-References: 
- <CADCSNFD0Ut-jJohTQFczjBgaVf=mBrc2rq4hJQncVZpF4bCoxw@mail.gmail.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-In-Reply-To: 
- <CADCSNFD0Ut-jJohTQFczjBgaVf=mBrc2rq4hJQncVZpF4bCoxw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-PPP-Message-ID: <177916709967.849087.9352424421516320279@mxe9fb.netcup.net>
-X-NC-CID: vq9DJS+14lEdcttPEpzaRJbmdMSDWX9ZqxtKYJX+AwMCHyCP/iQ=
 
-On 5/19/26 06:31, Baley Eccles wrote:
-> Subject: [REGRESSION] Bluetooth: MT7922 fails to initialize after
-> "Bluetooth: btmtk: validate WMT event SKB length before struct access"
-> 
-> Hi all,
-> 
-> I have experienced and looked into a regression on a MediaTek MT7922
-> adapter. Bluetooth works on v6.18.29, fails on v6.18.30, and reverting
-> the bisected commit fixes it.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221521
 
-Thx for the report, there are quite a few similar ones already; the
-problem is known and the fix (see the link below) should be heading to
-mainline this week and from there go to various stable series.
+Jiri Slaby (jirislaby@gmail.com) changed:
 
-Ciao, Thorsten
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |jirislaby@gmail.com
 
-#regzbot dup:
-https://lore.kernel.org/linux-bluetooth/770d36b07311bf88210c187923f243fb9f126f04.1777058551.git.pav@iki.fi/
+--- Comment #11 from Jiri Slaby (jirislaby@gmail.com) ---
+It's not in linus/master, so cannot be in stable. Once it hits linus' tree,
+stable will be poked to pick it up.
 
-> Hardware:
-> MEDIATEK Corp. MT7922 802.11ax PCI Express Wireless Network Adapter [14c3:7922]
-> Subsystem: AzureWave ASUS PCE-AXE59BT [1a3b:5300]
-> 
-> Good kernel:
-> 6.18.29-p2-gentoo-dist
-> Upstream base: v6.18.29
-> 
-> Bad kernel:
-> 6.18.30-p1-gentoo-dist
-> Upstream base: v6.18.30
-> 
-> Failure:
-> bluetoothctl list prints nothing / no default controller is available.
-> 
-> Bad dmesg:
-> Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20260224103448
-> Bluetooth: hci0: Failed to send wmt func ctrl (-22)
-> Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is
-> advertised, but not supported.
-> 
-> Good dmesg:
-> Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20260224103448
-> Bluetooth: hci0: Device setup in 129909 usecs
-> Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is
-> advertised, but not supported.
-> Bluetooth: hci0: AOSP extensions version v1.00
-> Bluetooth: hci0: AOSP quality report is supported
-> Bluetooth: MGMT ver 1.23
-> 
-> Firmware:
-> /lib/firmware/mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin
-> /lib/firmware/mediatek/WIFI_MT7922_patch_mcu_1_1_hdr.bin
-> /lib/firmware/mediatek/WIFI_RAM_CODE_MT7922_1.bin
-> 
-> Bisect result:
-> 624fb79dadc1b65757986a9d0fdde5c0cf3fe179 is the first bad commit
-> 
-> Bluetooth: btmtk: validate WMT event SKB length before struct access
-> 
-> This is a stable backport of upstream commit:
-> 634a4408c0615c523cf7531790f4f14a422b9206
-> 
-> Reverting 624fb79dadc1b65757986a9d0fdde5c0cf3fe179 on top of v6.18.30
-> fixes the issue and Bluetooth works again.
-> 
-> Please let me know if there is any additional logging or testing I can provide.
-> 
-> #regzbot introduced: 624fb79dadc1b65757986a9d0fdde5c0cf3fe179
-> 
-> Cheers,
-> Baley
+Meanwhile backporting to openSUSE.
 
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
