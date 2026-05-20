@@ -1,256 +1,212 @@
-Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E813EAC74;
-	Wed, 20 May 2026 14:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779287213; cv=none; b=C7NGcRpGjM5EYwJxKnWDUDYDrgfodgXHa3JyKRsp8vNFEiyZSZTWRHGFxbjXNzTiIkd5QBjGIs1vThh+mJugKk7yFcrVOyJLLiyn0fzTMIPBQn2JnLvGzHOxxLSZSsNvpYXz201QPYyAe8el6PAj0MHovjPB9nzfCEiQsEaKM6g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779287213; c=relaxed/simple;
-	bh=hAG0Mzd4kJoqrhuJ2dIFEzZBX14v1wi9p6wCLZZpY7c=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=qTY7zdWMIHZTMhe7tOL5g3Q8Nc+UUyiFXXetdwm2g0bnWZTqLwf2JbW0gzw4IQlzLWX/7Lo8fqaMuOhr0y+guUFZQrzPVOi5U7qdIdgG06RhGjqSFM8uMky+ETfFqUhQfyhPGS2ki2hnGup/24l0COFVYDOa7hUQyKy+0zAQyl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=pQPsaYyi; arc=none smtp.client-ip=213.97.179.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F2E3EAC65
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 14:29:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=205.220.180.131
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779287396; cv=pass; b=AeeO98khpnKMI1A44kUPrPx5JajhCnOsRryGc/lwZ6M+s1uQS64IPMqMZyxXojUfVbEBUkT3c//BRROqV+StfnDBAILNYozQXB3YnCiosN2L97SH/CzT/KUXSWYx1cwp9924OGhpqge9/mceD3psTVgq/2lbRaRoVboxEP/tvVY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779287396; c=relaxed/simple;
+	bh=uJ6ceiQOgOhCZfY1iBogXOpFqQfDep+SLyd7qBiSXHw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RREG+ElIEy9dI6YEQJp6EoY2E0uaPcSvtV4EyHlofTNei4QCwQTMJiJB2O4Vx5fZntgbjeI5JHHQkXUdwwluM8bUZyRfSopOS5+hAd5UHUifsQeoHKzMS1htnXbWv+K718GWoF7UhrQbysoezpiRvTo0RijFacw/LwjYplwRb/s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=luJfri1q; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=OsLs4rV4; arc=pass smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="pQPsaYyi"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=In-Reply-To:References:Cc:To:From:Subject:Message-Id:Date:
-	Content-Type:Content-Transfer-Encoding:Mime-Version:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=MGdUED0oXwzbLqsjyN9iLaoKzWmYn4RurXax3rscc9Y=; b=pQPsaYyiYdttsIORekPHK6YleJ
-	TQqYq/Xq5fy1Wq6G96gYct3+Ij/2cRYpRppdf8d1XQrTOEELrXTXX1TDogB76W+MEJfXmJb/gNqCd
-	RPkRQwXlT6eVZu1QzZAMU/0R8ma/aIzPEBkRSOZ5KCXG/CHTym7WTzqHkyUSfpPYYg7uXM0ezmS/L
-	EaIqjOLanus/LvbRebDawnETutL8HJhWZa2EQQoL7PAcTigh/JApMDrRVdxDFbcXAzERJAuECSMPH
-	EnJmHD7OOMArFNHSmrA/rgDJZlR/ZZEQPhgFVWWShd7Vmhg62o2tv/VULKQHyrl39DIWOxuaIDwU3
-	ut6WLCdA==;
-Received: from 177-136-90-227.vmaxnet.com.br ([177.136.90.227] helo=localhost)
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
-	id 1wPhsc-003ru0-Cx; Wed, 20 May 2026 16:26:38 +0200
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="luJfri1q";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="OsLs4rV4"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64K9nQvb446597
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 14:29:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	T6yhqpeA4WQkpL+ACLh3UlGLsTWvYvmaiBfH0Qr/04A=; b=luJfri1qCnaB0Kjj
+	UWrcYoJTqlDFRc/7zTCpwCArKH9okmWvuSK2c3PJRGBpIdrHd3rUxBmvOG/DGM1N
+	ZBZKzqGrmZykPnePYtJOf95m835cGrX9v3dp2ciKbJL1DYyphm/I1TcWQV1dAWKg
+	SFuI9sLqPCFZpWzHKEz67xtpSqtKFXaB7KJLONUUVg6eRRxIgFO/8q5TcaGdThhN
+	/BqkBeHGsbQgjjKxQ5XzXIvtn8h+OjaGx3ses14mebDDvOELLFMr1rbOi8F0UC9g
+	i0E+iX+TJFBeHtkr9cSTbQCcTjHAcBuOWTeX2CE6UIyQHzsgwjSMS/3hqFD+Uclf
+	F9wiNw==
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e9anrh16j-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 14:29:53 +0000 (GMT)
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-90f5248b209so1183632085a.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 07:29:53 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779287393; cv=none;
+        d=google.com; s=arc-20240605;
+        b=iUD4IVxix7Y4xLnvtMahRNaeFwfOGHAG1UPbDTh77k0RXa3syyBjIsfjlAHahPoZ/i
+         qrb4BHcMXOHNwaDAwtc9LYjMXvxUT+vtgbLlYM+5jCttLK88RV7AB7sWrBY1c7JBjDyB
+         VHjwMbQTHeO66KXPgU0CW/o/tERvmQz8h+04y/VvuqNMSs3agvy+UBFvqS9ua//DKarv
+         3jdqD2RZADb2U+magFD3Wi2hPpC7FvFeoLywKgtjgy5TaTQg3vTfAiZ5i3oCf29LDZMO
+         DfXB1WAada1Ty7R70+VLjremmBvHUtPnbyvHViZlWxDlPHfw97yYdn3os5iAvVD0bbzC
+         cOKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=T6yhqpeA4WQkpL+ACLh3UlGLsTWvYvmaiBfH0Qr/04A=;
+        fh=+PXtjb28MbwcU+EwKBDzelej8Jf23bwH/HPYv9ZLoNw=;
+        b=k/otNRmryXiIERmv3wtyj4FJNLpyW8QKscl86qEmmkpiIaZvofs16Vr3vBLuznwwV7
+         pHWVdFfEWEx1kaU3RT18Qgd9J8R30iEuXD6K5lld7QAP74RRm8j0v8zxxBFcwjB3gPQh
+         SMCAfl0u/hdVQBb1imf84INTKAZq9tMTHxigvJxICRV0KoKr+ceRntMO26WtoIsxhXjx
+         cNxO6ibYBqZJ8SR683vOUO5+t/CJLSpmk/IZnKKVD2BQXhBvpkHMbzTHi9vcVIKPPmUo
+         T9gAXlHYIQGcswlFB1i04VYF8FXY/R9YR0lU0w0fOvhpZvWx9qrvRZsMD3/2BNp9jHZj
+         WlWA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1779287393; x=1779892193; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T6yhqpeA4WQkpL+ACLh3UlGLsTWvYvmaiBfH0Qr/04A=;
+        b=OsLs4rV496AdoRsCxEjSxv7ldhYiiUwF0T4Dt1BANAFnOW5C8fKTAwGoMIs2Sxre8e
+         PK0MOerharEiXS+SHvQgBjlilne6DUNq2ZW2aSeAoDrTUyogHNnAKXl7WuellmtS3IDZ
+         M7ObPeskTWj6FlcDI7SyfkuvVI0hHxvrA4NPKkXRoN3KY3WHpAhp3QJ/56oH7D06uGNi
+         Y64nRR/cyFWu+i231++xMtVgABhpHH8cDs5hnAleGnU6GHCqvkOzVDZNZVL/17/gQ/49
+         Aa/7hJ307BJstxSzIkGsgXQv3JqjWHnAbhroG7Dp6tufsOfrRLV3QdDC3R5o0OjTUV1W
+         peZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779287393; x=1779892193;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=T6yhqpeA4WQkpL+ACLh3UlGLsTWvYvmaiBfH0Qr/04A=;
+        b=WR7RZ0Oc1wxrsqS657z9IqHOOKV4ammG07yWGf0RViSAEz/ee4B4tkLzekgl+qm2Oe
+         B+hnGRh/GjejuSB7hbeVsoc3ebphXFvO+9VXLw8GIE09R67w5CgPJhtFnqYMcl+NMF5H
+         BMCUGIqHoPUQ+WWkPMTUKTknJXkkL5kjDZ0qnYnt0TTtVJ9W7t+aNuKiRXfJRQOO98nj
+         LhZChvZNjlsA2vd72BF5OXxTaksb4z+4rOI+IwCc+DK4sF9e6y0QYyV+Zwfd7ZYylECc
+         q7WlT9DOu8iu2wz69Vfwhi7aL/bkLjGzByFfrGM/L7jRH82iG11HHKjXVd+oBUQygD0A
+         stjA==
+X-Forwarded-Encrypted: i=1; AFNElJ8OtMUpQyiVIOOv6t8dpIuiRnL58Yb0xuWO1Qk26fbZ5c+XiymXMdkQj7QdpTlqD7nrdq8yhTGYIQDNz9XSHaM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyA0wZfPTKVUguZu+bd/mSsPwQvJd+egVUqKwXHXXI0RKMdNKU3
+	SJMU1aSxqXdRo0aosfB+Q3nAi3O98De+5qGTAwWw0ceB8vR2QWvKPDkXcnqpHzWWfnPf+xmgkpW
+	A8R7eDkgvJx4chxrIUOd4zpigwZM72BsQvP4Mrcytw94Onl9LU4b5N/mOCSSwcJ0dh5sDSzi68H
+	Cc3amEhPGUCN1b/VoHCyrbaY1XiRDY8iIUP4xs2oScDJf8Rw==
+X-Gm-Gg: Acq92OHMbPXC4uya+DSbE2YAvSWhhehWpjGdfNY5mKRaIJeEgoNhSPzU6c5LplvbjfW
+	3MsKFRPwj+KbHTkhJzyDebCgaRR2jduB0UgeNo14IWSxwHv/97rc2WOwnxeR3RxxIBZsaW4r7PQ
+	NcTNDV5+QZ63B26P4JVs7vMzMBSgRx1mMDhwVvI5c1qNKD4BxKXrr8uHZnJWj7PqXTetUQIsTxG
+	mjEQW5kXttOjP7/igVvfI5DO6hBZKn1xiaAkD4=
+X-Received: by 2002:a05:620a:2890:b0:910:c78d:12ef with SMTP id af79cd13be357-911cf3f7626mr3622213985a.38.1779287392538;
+        Wed, 20 May 2026 07:29:52 -0700 (PDT)
+X-Received: by 2002:a05:620a:2890:b0:910:c78d:12ef with SMTP id
+ af79cd13be357-911cf3f7626mr3622205485a.38.1779287391929; Wed, 20 May 2026
+ 07:29:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+References: <20260520-monza-wireless-v1-0-9f6942310653@oss.qualcomm.com>
+ <20260520-monza-wireless-v1-3-9f6942310653@oss.qualcomm.com> <jetl37zsfcs5kl4b7iarbngrdu4ebp7ag2cvpqvkku6tbl6r5n@qozh6n5fq7f3>
+In-Reply-To: <jetl37zsfcs5kl4b7iarbngrdu4ebp7ag2cvpqvkku6tbl6r5n@qozh6n5fq7f3>
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Wed, 20 May 2026 16:29:40 +0200
+X-Gm-Features: AVHnY4L4rWNphXQmeHCOQKyuxZcVbSpk2c2jukIzCXfC1OBduPiOmLNzgTemvps
+Message-ID: <CAFEp6-0A=LrU44pu2rfUqXW9k9peSu=b2qq_FVs4WZUj-g4pDA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] arm64: dts: qcom: monaco-arduino-monza: Add QCA2066
+ M.2 WiFi/BT support
+To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Cc: Manivannan Sadhasivam <mani@kernel.org>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, linux-pci@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        devicetree@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 20 May 2026 11:26:32 -0300
-Message-Id: <DINKO3RI4YEJ.21OFCL9QM6ZB8@igalia.com>
-Subject: Re: [PATCH] Bluetooth: hci_core: Don't queue tx_work while draining
- workqueue
-From: "Heitor Alves de Siqueira" <halves@igalia.com>
-To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>, "Heitor Alves de
- Siqueira" <halves@igalia.com>
-Cc: "Hillf Danton" <hdanton@sina.com>, "Marcel Holtmann"
- <marcel@holtmann.org>, "Gustavo Padovan" <padovan@profusion.mobi>,
- <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <kernel-dev@igalia.com>, <syzkaller-bugs@googlegroups.com>,
- <syzbot+97721dd81f792e838ba0@syzkaller.appspotmail.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260513-hci_send-v1-1-ae3eef758280@igalia.com>
- <20260514020446.639-1-hdanton@sina.com>
- <DIIHHUJM2CZJ.2OKA9PGHEHBRP@igalia.com>
- <CABBYNZKA3FsovfdWEeZYqFjjNCabjfa7uM48mq+r3G0PTb_JUg@mail.gmail.com>
- <DILWLB58NRY9.1AS5Z2W6EHAIG@igalia.com>
- <CABBYNZJdJ9GSeHjadoFJS4XRep2gx5R3+272evFgSkFKukg_bg@mail.gmail.com>
-In-Reply-To: <CABBYNZJdJ9GSeHjadoFJS4XRep2gx5R3+272evFgSkFKukg_bg@mail.gmail.com>
+X-Proofpoint-GUID: SeyT0mSGGR5rY4lA1z8vdrU8zcx4juji
+X-Proofpoint-ORIG-GUID: SeyT0mSGGR5rY4lA1z8vdrU8zcx4juji
+X-Authority-Analysis: v=2.4 cv=UuJT8ewB c=1 sm=1 tr=0 ts=6a0dc561 cx=c_pps
+ a=HLyN3IcIa5EE8TELMZ618Q==:117 a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=yx91gb_oNiZeI1HMLzn7:22 a=EUspDBNiAAAA:8 a=ncdiEfFe64kH1Y8Ome4A:9
+ a=QEXdDO2ut3YA:10 a=bTQJ7kPSJx9SKPbeHEYW:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIwMDE0MSBTYWx0ZWRfX3q55xWLWnmZ6
+ 4tjB4r+ru9jwnrsM+RXx+fO8ipk2u8dJofzYqXgNsw2S4LHzZgAicaM3mXozHU45bK267Pmxt1d
+ jFhUzFC7MCgDuM6NOBWp3jSELaDBIpwzvU1werturTYTsDmZZPCpp/vQMwphM6mWdJ1LCy4migv
+ 0JB9dnoXb3/MX/DhC37qQdVqTbnnAAkh8v5gXNx7bEk3IhUdBqO8HrRh6ANwZ9o5RSZNHA7tm2r
+ KMZFj9rLf87AJJO9TtRqX4/BcZBWkTYy4BQGPMbD0/VRfKUqMYs7jIJRUS2ZaDbOIE7VAyWF+m+
+ HH33ZjkCdglgUqKpZE9Zpm0euB1N7VLn1SfzJOpd2B9KGvv28LNmuK8n7OgEQAIKHcxrM9tk474
+ 8QcptKVRLoZV3FSHI2i6Xw6vKE/Uq2JmzjIBS2c4txOBy9mQt8HmwhTgEFvldB6ZYzL17Z53uXg
+ u58NWWfgZNKQ4Jav6CQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-20_02,2026-05-18_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 clxscore=1015 lowpriorityscore=0 impostorscore=0
+ priorityscore=1501 suspectscore=0 spamscore=0 malwarescore=0 bulkscore=0
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
+ definitions=main-2605200141
 
-On Mon May 18, 2026 at 5:48 PM -03, Luiz Augusto von Dentz wrote:
-> Hi Heitor,
+On Wed, May 20, 2026 at 2:34=E2=80=AFPM Dmitry Baryshkov
+<dmitry.baryshkov@oss.qualcomm.com> wrote:
 >
-> On Mon, May 18, 2026 at 11:21=E2=80=AFAM Heitor Alves de Siqueira
-> <halves@igalia.com> wrote:
->>
->> Hi Luiz,
->>
->> On Fri May 15, 2026 at 10:33 AM -03, Luiz Augusto von Dentz wrote:
->> > Hi Heitor,
->> >
->> > On Thu, May 14, 2026 at 10:54=E2=80=AFAM Heitor Alves de Siqueira
->> > <halves@igalia.com> wrote:
->> >>
->> >> On Wed May 13, 2026 at 11:04 PM -03, Hillf Danton wrote:
->> >> > On Wed, 13 May 2026 15:55:23 -0300 Heitor Alves de Siqueira wrote:
->> >> >> Syzbot reported a warning when L2CAP calls queue_work() on the hde=
-v
->> >> >> workqueue while it's being drained. This can happen during device =
-reset or
->> >> >> close paths for hci_send_acl(), hci_send_sco() and hci_send_iso().
->> >> >>
->> >> >> The workqueue is drained in hci_dev_do_reset() and in hci_dev_clos=
-e_sync():
->> >> >>   - hci_dev_close_sync() clears the HCI_UP bit before draining
->> >> >>   - hci_dev_do_reset() sets HCI_CMD_DRAIN_WORKQUEUE before drainin=
-g
->> >> >>
->> >> >> Add these checks before queuing tx_work, and free the SKB if it's =
-not
->> >> >> queued for transmission.
->> >> >>
->> >> >> Fixes: 3eff45eaf817 ("Bluetooth: convert tx_task to workqueue")
->> >> >> Reported-by: syzbot+97721dd81f792e838ba0@syzkaller.appspotmail.com
->> >> >> Closes: https://syzkaller.appspot.com/bug?extid=3D97721dd81f792e83=
-8ba0
->> >> >> Signed-off-by: Heitor Alves de Siqueira <halves@igalia.com>
->> >> >> ---
->> >> >>  net/bluetooth/hci_core.c | 18 ++++++++++++++++++
->> >> >>  1 file changed, 18 insertions(+)
->> >> >>
->> >> >> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> >> >> index c46c1236ebfa..5d5f8ad7d1a8 100644
->> >> >> --- a/net/bluetooth/hci_core.c
->> >> >> +++ b/net/bluetooth/hci_core.c
->> >> >> @@ -3278,6 +3278,12 @@ void hci_send_acl(struct hci_chan *chan, st=
-ruct sk_buff *skb, __u16 flags)
->> >> >>
->> >> >>      BT_DBG("%s chan %p flags 0x%4.4x", hdev->name, chan, flags);
->> >> >>
->> >> >> +    if (!test_bit(HCI_UP, &hdev->flags) ||
->> >> >> +        hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE)) {
->> >> >> +            kfree_skb(skb);
->> >> >> +            return;
->> >> >> +    }
->> >> >> +
->> >> >>      hci_queue_acl(chan, &chan->data_q, skb, flags);
->> >> >>
->> >> >>      queue_work(hdev->workqueue, &hdev->tx_work);
->> >> >>
->> >> > What you add is not enough, go and see how HCI_CMD_DRAIN_WORKQUEUE =
-is
->> >> > checked in hci_cmd_work(), and in hci_dev_do_reset() for why.
->> >>
->> >> I see, I missed the RCU guards for the device flags. Sorry about that=
-,
->> >> I'll add them to v2.
->> >> Thanks for the catch!
->> >
->> > Actually this whole thing might be because we try to clean the
->> > workqueue without actually closing the hdev, so I suspect that if we
->> > just remove all the code from hci_dev_do_reset with
->> > hci_dev_do_close+hci_dev_do_open, it might work better and align with
->> > how things work over the MGMT interface:
->> >
->> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> > index c46c1236ebfa..6782bbc9b6a7 100644
->> > --- a/net/bluetooth/hci_core.c
->> > +++ b/net/bluetooth/hci_core.c
->> > @@ -539,47 +539,13 @@ static int hci_dev_do_reset(struct hci_dev *hdev=
-)
->> >
->> >         hci_req_sync_lock(hdev);
->> >
->> > -       /* Drop queues */
->> > -       skb_queue_purge(&hdev->rx_q);
->> > -       skb_queue_purge(&hdev->cmd_q);
->> > -
->> > -       /* Cancel these to avoid queueing non-chained pending work */
->> > -       hci_dev_set_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE);
->> > -       /* Wait for
->> > -        *
->> > -        *    if (!hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE))
->> > -        *        queue_delayed_work(&hdev->{cmd,ncmd}_timer)
->> > -        *
->> > -        * inside RCU section to see the flag or complete scheduling.
->> > -        */
->> > -       synchronize_rcu();
->> > -       /* Explicitly cancel works in case scheduled after setting the=
- flag. */
->> > -       cancel_delayed_work(&hdev->cmd_timer);
->> > -       cancel_delayed_work(&hdev->ncmd_timer);
->> > -
->> > -       /* Avoid potential lockdep warnings from the *_flush() calls b=
-y
->> > -        * ensuring the workqueue is empty up front.
->> > -        */
->> > -       drain_workqueue(hdev->workqueue);
->> > -
->> > -       hci_dev_lock(hdev);
->> > -       hci_inquiry_cache_flush(hdev);
->> > -       hci_conn_hash_flush(hdev);
->> > -       hci_dev_unlock(hdev);
->> > -
->> > -       if (hdev->flush)
->> > -               hdev->flush(hdev);
->> > -
->> > -       hci_dev_clear_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE);
->> > -
->> > -       atomic_set(&hdev->cmd_cnt, 1);
->> > -       hdev->acl_cnt =3D 0;
->> > -       hdev->sco_cnt =3D 0;
->> > -       hdev->le_cnt =3D 0;
->> > -       hdev->iso_cnt =3D 0;
->> > +       ret =3D hci_dev_close_sync(hdev);
->> > +       if (ret)
->> > +               goto done;
->> >
->> > -       ret =3D hci_reset_sync(hdev);
->> > +       ret =3D hci_dev_open_sync(hdev);
->> >
->> > +done:
->> >         hci_req_sync_unlock(hdev);
->> >         return ret;
->> >  }
->> >
->> > Seem to work here and as a side effect we get notified over the MGMT
->> > when a user uses hciconfig hci0 reset:
->> >
->> > # tools/hciconfig hci0 reset
->> > bluetoothd[34]: src/shared/mgmt.c:can_read_data() [0x0000] event 0x000=
-6
->> > bluetoothd[34]: src/adapter.c:new_settings_callback() Settings: 0x01fc=
-0ac0
->> > bluetoothd[34]: src/adapter.c:settings_changed() Changed settings: 0x0=
-0000001
->> > bluetoothd[34]: src/adapter.c:settings_changed() Pending settings: 0x0=
-0000000
->> > bluetoothd[34]: src/adapter.c:cancel_passive_scanning()
->> > bluetoothd[34]: src/adapter.c:adapter_stop() adapter /org/bluez/hci0
->> > has been disabled
->> > bluetoothd[34]: src/shared/mgmt.c:can_read_data() [0x0000] event 0x000=
-8
->> > bluetoothd[34]: src/shared/mgmt.c:can_read_data() [0x0000] event 0x000=
-6
->> > bluetoothd[34]: src/adapter.c:new_settings_callback() Settings: 0x01fc=
-0ac1
->> > bluetoothd[34]: src/adapter.c:settings_changed() Changed settings: 0x0=
-0000001
->> > bluetoothd[34]: src/adapter.c:settings_changed() Pending settings: 0x0=
-0000000
->> > bluetoothd[34]: src/adapter.c:adapter_start() adapter /org/bluez/hci0
->> > has been enabled
->> > bluetoothd[34]: src/adapter.c:trigger_passive_scanning()
->> > bluetoothd[34]: [signal] org.freedesktop.DBus.Properties.PropertiesCha=
-nged
->>
->> Thank you for the review, and for the suggestion! There seems to be a
->> number of similar syzbot reports for the hdev workqueue, so maybe the
->> close+open approach is a simpler solution indeed. I've originally
->> considered implementing a wrapper/helper for workqueue submission in
->> hci_core.c, but if we can eliminate the race condition altogether that'd
->> be even better.
->>
->> My only concern is that there seem to be slight differences between
->> what hci_dev_do_reset() does now and what we'd get with
->> hci_dev_close_sync()+hci_dev_open_sync() (e.g. we wouldn't use
->> HCI_CMD_DRAIN_WORKQUEUE anymore). Would this alternative approach be
->> suitable for the stable kernels? And if not, do you think the checks
->> from v1 would be appropriate, in that case?
+> On Wed, May 20, 2026 at 01:01:44PM +0200, Loic Poulain wrote:
+> > Add support for the QCA2066 (QCNFA765) WiFi/Bluetooth module on the
+> > Arduino VENTUNO Q board. The module is interfaced via LGA and is
+> > compatible with the M.2 Key E.
+> >
+> > Add wireless-lga-connector node using pcie-m2-e-connector binding,
+> > connecting PCIe port 0 to the WiFi interface and UART10 port 3 to
+> > the Bluetooth interface.
+> >
+> > Add pcie@1,0 downstream port node with pciclass,0604 compatible so
+> > the pci-pwrctrl driver can acquire the power sequencer and enable
+> > the M.2 slot before PCIe enumeration.
+> >
+> > Add nfa725b_default_state pinctrl for the W_DISABLE1/2 GPIOs
+> > (gpio56/gpio55) used by the power sequencer.
+> >
+> > Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> > ---
+> >  arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts | 65 +++++++++++++++=
+++++++++
+> >  1 file changed, 65 insertions(+)
+> >
+> > diff --git a/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts b/arch/a=
+rm64/boot/dts/qcom/monaco-arduino-monza.dts
+> > index 93ed575817af1c5e903662c209ead629fe202ee2..6fcad77f320cb82eccb6f07=
+244d185abfb1976d9 100644
+> > --- a/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
+> > +++ b/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
+> > @@ -154,6 +154,39 @@ vreg_nvme: regulator-3p3-m2 {
+> >               enable-active-high;
+> >               startup-delay-us =3D <20000>;
+> >       };
+> > +
+> > +     wireless-lga-connector {
+> > +             compatible =3D "pcie-m2-e-connector";
 >
-> I think, the HCI_Reset is a heavy hammer because it's a global reset.
-> Getting all the pieces to cooperate has been causing all sort of
-> issues, and in any case I think what hci_dev_do_reset does is simply
-> wrong or outdated; for instance it doesn't seem to affect LE, such as
-> cancelling scanning or advertising. This is likely because interfaces
-> like MGMT don't use it and require a power cycle to reset.
+> I think it was discussed that LGA can't be an actual M.2 E-key
+> connector.
 
-ACK, that makes sense. Please disregard this patch, I'll send a
-follow-up with the reset changes and any missing bits from the current
-async reset path.
+I am not sure I followed this discussion. Do you mean that I should
+introduce a dedicated LGA/vendor-compatible string in the compatible
+list of the pcie-m2-e-connector binding, or that LGA-based designs
+should not be described using the pcie-m2-e-connector binding (graph
+representation)?
 
-Thank you for the pointers, Luiz!
+
+>
+> > +             vpcie3v3-supply =3D <&vdc_3v3>;
+> > +             vpcie1v8-supply =3D <&vdc_1v8>;
+> > +             w-disable1-gpios =3D <&tlmm 56 GPIO_ACTIVE_LOW>;
+> > +             w-disable2-gpios =3D <&tlmm 55 GPIO_ACTIVE_LOW>;
+> > +             pinctrl-0 =3D <&nfa725b_default_state>;
+> > +             pinctrl-names =3D "default";
+> > +
+>
+> --
+> With best wishes
+> Dmitry
