@@ -1,86 +1,88 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37883BF66B
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 11:01:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C673DA5C0
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 11:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779274915; cv=none; b=P4GxzDokQiVBjxssOhoQ5/stLKwVWTkLSY2af44LeVK8JuGtfbsmlbtv0l8S+ykMDKkEdbcmMkHYo2aF6CLniv6GtbplNR/n34OdZX7f86/BJLyZTygWEiCjly/jZW+2NX9WvqGTW4HD8AcFjWCzNb0f8i5Nu9AYhFSI9tNNZoY=
+	t=1779274915; cv=none; b=m4X+pYSXkcedJngmlKfkovvUbbbwRwZpRgZ1+i5iJHvgZxahiPSYLNa1tMetut90Dwx00gIinTSCyah9l2wfTNyust5rpEvpznaRk55deRQczl9UO4+PApS7iErQ0SwTBe2FY/wsroNR2rkNY8gxz7257ti2kajGU3JnLZgCu/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779274915; c=relaxed/simple;
-	bh=sxTOeNZUCJiaLQF43tM6RQQ8yErITtuQ1DjdECwZa5A=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=HNV5/BDfq3aONugvWrX54Seqi6IswRGNjU74+nFkgXzfdfAa5yMjWpf31pHm/Hazh4bUTo30FPH4lsiazOyXcS0QfMrLcZTMqhOS2xuZ3uMUoaTr8HZCjdCdu14uRFG7kbTeljm82YCGOW7CR3f6cUq1gnp/p+Db5GMkg7CmxXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Zl66O9O6; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=g7w+VHH/; arc=none smtp.client-ip=205.220.180.131
+	bh=rZymK6zMzN6GZk8l3iT4DzVoSNYOOdaK8F6aD8UoJlc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=daNhMoCeQ0BslfSUYbf1v4hGFZCROhIkZJEWecRaWpLCuUuBGPTPsTY+XH9NFWm+ZjyPPZHECAD7/kvUopl95iC8gECTgqj8Vxu4xxq7P5x2SPF7tfIb0VgUTQGNy1WKN757AUAOqiYzgpkB8ZAbhmCtzQ0vKHvfHoFGYnZH8pY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ic0TwDnK; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=NQ158O1G; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Zl66O9O6";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="g7w+VHH/"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64K9lfm8266960
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 11:01:52 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ic0TwDnK";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="NQ158O1G"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64K7CUsl2065134
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 11:01:53 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=sRQ+frqKGg6yviczCOuRmF
-	JXb9EFREKQHuap6tZIl1Q=; b=Zl66O9O6yQDMjWRBijau+OX8I//BUkL2xHKjp3
-	DZHD7FATKCZqIvzrFFGBxIgpZaYDkN6Unl/KVyYaCCjpvaedOdKeeBYPMaF4DEep
-	HmZBY0+BCn08IELNaQGFTSgiD+yaSjwA3LjeGslunnlE7LVLAhOzeYGKZeJ1BQMy
-	TeWfPVGKGULcnIY9SlTl5aJm2AtZVIHSzZPEWpKmpsyIdZt1esF7SZBDsKHZ0UJs
-	Iuu7DsNbqnUt4UrRo3w9hgZ/AhsKD9g7VEhQiVNIjP+yxKYQ1b0LEt7TBSLXqOTy
-	t2D62+8YJkVCqQMQv7gF1sxw8X10ZnRTq+9fh1VD5f4eUSIw==
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e9amxr8gn-1
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	LKHvX6tqS/qImne6H2K8InjGHU4hq+riBpBr5o2VuU4=; b=ic0TwDnKzGanOxm5
+	RbcpsQH0HAe5ZyWQRw7sqVkw05bJ+keqYSJF2LZDUc6SQrd5Pwb/CEneMHcEIr+J
+	x1bq4G9NB/clpxvTodj59FWElxGKva/PgvoPuCCZ9DsXE02i4Sf+SA7O9NLWN+R6
+	GG/UQv7IWNLQb8mroFMNB+Bu7e8r5tfGM6EhMRSm5CgR2cb+NRXtN1LmJatz5le2
+	f7S44CYXaxYFRoH03VQHlHeGtqfPhvlkAqybNlcn99kTYkGbwlW+h18qxNj59yq7
+	INlLVB/6UNBRmv2LJn3uUR6ADnKv0ED4YOEeQRcoxICLOz/Og6sJ6aW8bnZyaobG
+	EjEC/Q==
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e8t3t4aya-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 11:01:51 +0000 (GMT)
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-6961e8fa90bso12344820eaf.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 04:01:51 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 11:01:53 +0000 (GMT)
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-6967fe3eeb1so6626493eaf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 04:01:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1779274911; x=1779879711; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sRQ+frqKGg6yviczCOuRmFJXb9EFREKQHuap6tZIl1Q=;
-        b=g7w+VHH/91UpwFkDEMysBQOeWdTRzlONCfoJSLaLu8Ijy78OGGsue5RJ9O955YCifC
-         RS2KCkjfmWW/cwLl6ZznEz6/OmSKAwfAFikQTB05oGRwqJ29uGcwkzowUmoBiBT420WY
-         nb2TlHFIoCYpDYHxun6ZTkF/wzoQdFkkNC4IcnpUpTKnIwhjIvV5K0O0IGnLY4uZK4BL
-         5kFZnZH4XzBA82KJTHbWIStRe7QfES5D6xZqmog0tjZXl58TE+xyZjGJhWzXOG9O25Ji
-         FYCEJLYzbHjvWZ+9ORi2mROvbXJbt9oZbV1G1rYAXkfIB6Da91vgWpganmfLSqBWjQmq
-         JFng==
+        d=oss.qualcomm.com; s=google; t=1779274913; x=1779879713; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LKHvX6tqS/qImne6H2K8InjGHU4hq+riBpBr5o2VuU4=;
+        b=NQ158O1GLbsm+1ILC7kZ4nTfwcE9JY6TqcmEOjjTDPuu60ZibZfWAIg/7DzVyPu/lg
+         KeXweem6vmnqQmMkr/9qJtecbYYy9EnQTSjD1uMAK/d5DtxuFmtB1U+UR1NUBqBJrAAE
+         8wyLbLjjCSWcSxKLHU1X7JGXBXkLIHg2CrEccQjxeDR1KNNxh4uBuWj8wq80UplF+I8L
+         JDW4v6VKHOuzDl0La6Hr+78skH8/Jc0hgx4jR//1AcrLm/gfohx2c30Z/y8Ggl6hhj04
+         GMEFk7vPSi4B5wLGgQQmLYbsVL4cJFXELKPdDjtxKJUx3nv2bKAk14703Y2eAcX74S8B
+         iWHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779274911; x=1779879711;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sRQ+frqKGg6yviczCOuRmFJXb9EFREKQHuap6tZIl1Q=;
-        b=remslcO4Rtoo5+ge171L8BpqLtHZLcJgJ0T0EcgibRrrUsvHg7qh05h2dGPDu4M/4o
-         rmZ3EDSeWnzNlWTQluWT3zBmsAnC8DJ1vY8ywWXrF/BwFxeaXBH/uonn+uhBBGw54Jul
-         Rzu2jZANKQ/CEyNAAK9XYsIRRGkeqmDftyZ0qtJcM3JPwowxlvKPzCxTQYiUSy06tGzZ
-         wtTSseuzI8bQRRnBMWjg6L4tZrjLR2IgPGmq0tHWTbRiKuePWayoei29H9kNuW6hEhd5
-         N7FZDnbpilZ9kuilFNC3Pa5R9OLij3HuerKQ6MJ54qzlW+dnw/FrjtJifRQMhJwh3crl
-         2Aow==
-X-Forwarded-Encrypted: i=1; AFNElJ97lF2XJcQZySDysXtcbZkhyHGJiyVwqhGlO48GNJqt1dEjeFMteZIdHqwTDblheNlCzG6g2Ggu9IgxPkcFzks=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTyd2FRndJ+ma6uigbRl/JipihxZ2/nCVCjO59h68FKRkFcGcy
-	urOs0tpIAZduAfNk9w/G/CFlIbQTSgQgidWbGvfj6zupUS+by4yKT2iqFATaec1P8w8JqK4eq1o
-	kDAnvA/RveilDfGSXqWYnh965uq3y+LkNXrnHa+s0ZK7j7QaITbrIUa3hnp/IeHRd6sIZeJY=
-X-Gm-Gg: Acq92OHwf3+/tAwL2DZyWIR7q1eSkXW4XYdwRj8ny0ZT9bN62wz3JLi4894Pb6GZ2XU
-	D+gAH7Xyk7tMTrV+6Q5B52r+YEk1jK19LZ9DsX6D6emC3bdMmioaZzuAfwfRt0Jli0xh64SAwSc
-	f3RdvwQrlX+OZaNlSstBuf44gYDhx75joFzRJuf1EjZn3Cw/Y1U4R0G2PaICyPl3Xud8zgo1EAy
-	t5wmpkKUJHshrGjObphdo2D77nFtrqkYRWaUZpPAPAG3bwZdhJ5qpjTZsVuTtcD6OnCutwq5GkP
-	LsC23c1jJyyrNQhJyQHSqRMWeaB/SkX9k35yY6qD+UwIP/xyVVwU5HYY7zCGhZh8XYgQZ1DDFb6
-	Rcai/k02BqDdZp7CLzBLzxX5ukq/XjEsNtMwmG80E4C+wkyn5Euf1FOjEVmfi7QrUTJlUmy6Rso
-	s2of/Ao+0gUOM2vafx
-X-Received: by 2002:a05:6820:4cc2:b0:69b:73d8:60ba with SMTP id 006d021491bc7-69c942e0844mr16305600eaf.21.1779274911111;
-        Wed, 20 May 2026 04:01:51 -0700 (PDT)
-X-Received: by 2002:a05:6820:4cc2:b0:69b:73d8:60ba with SMTP id 006d021491bc7-69c942e0844mr16305529eaf.21.1779274910402;
-        Wed, 20 May 2026 04:01:50 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779274913; x=1779879713;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=LKHvX6tqS/qImne6H2K8InjGHU4hq+riBpBr5o2VuU4=;
+        b=cBdKbziAtvM5JeQjde7QcfY7IOOzXSD5oH8yBVdaW+gZI0FM0m7mchnKJQYLxjv2IV
+         HJR7K9PaX1cAotdzqsfLLXaWU1YkilsCgdQEt6Fmt0k/GWrqjIu4XCFsJgMuj6W++TTd
+         dXt19vjBthaPvRtvE/5Z5xTmmXR5BqxAAK9DvQdktYdImv2BKifROVpEBTMOlECINEi4
+         ejM6VQ6SESEny9Ss2q67Wc7QNeeB217kleWzm/6kmQjNqtYtJrcbcX8phAa2GUXkprOY
+         9WlAWkwHL5D6kmIbQaaNcSi1b9CRyDG7h6XkZADKScEhOc0fwxLeUAqDH1HZXqeC1zws
+         ufFg==
+X-Forwarded-Encrypted: i=1; AFNElJ9Nf0l73/5hg8E0wNrgXpjrsuitQd2RGh8Hw7qB0Voig/RQLG70VI2wyUZ/wC+TPy0vJ8aQ8c8OEMIIQ1SyP5s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNUwYgvZ3bz/8+olVW34A0nF0I6fN23HdM+PbTgNvp0WodC6+y
+	Gb3Oh3BVh35Jcvnx43K+mcV0iFdilFU7Yt4KeGsrVFUZfDaBRowTRAsbT3Ox0SERkSOkOA8zCPJ
+	D7E0nMcLqRLvq3klT3TAmULNVwCmwVl2whRWpr7Y6qfmMYIsGwBqVaavY6dx+dOnle9oT5bQ=
+X-Gm-Gg: Acq92OHGLQ36lEeM/d++mKhC/h6lK45etI+PPTsMeyO+1uAIiA2n0FEm71FEadIkOdz
+	P0b0kN7T3nvO9dLXEYToEDF1QOTp9BVmg+w4ObCmQuCqqxYsBxDRnWrHr77ScSp76ZrKCWoiWP6
+	WFUrEZSz+XKPRYwvtKi8c+qSAPUqTTIcbsUagehA3BQGqEYELMHZ8aAB9Pog0pkedxWlBTbuUxJ
+	E22cyWj70+bWxmFCNxKaAFWCCMtQZT/GFRGmdYg0R2pzCQ+6oRQJoq6dmOK18FLNzai7TQ938ya
+	yqpV+AHrgF8GXfzsDL7JfiJ06YR+/5qow/U69B+oNPKx2XpjOmImQkYq9BbPrRjflBijxJk0p+8
+	CAZ1DON9iXSWngw7x5g+jBZHPt1H3H5ZA9vMjaYzM9QjCXPyTHtLvs/y170TBeuG+CPJpTWB0Ir
+	RGztdVEDIGhSp9bSc6
+X-Received: by 2002:a05:6820:1606:b0:69b:b52c:c9b7 with SMTP id 006d021491bc7-69c9c01d0a7mr13771708eaf.41.1779274912651;
+        Wed, 20 May 2026 04:01:52 -0700 (PDT)
+X-Received: by 2002:a05:6820:1606:b0:69b:b52c:c9b7 with SMTP id 006d021491bc7-69c9c01d0a7mr13771646eaf.41.1779274912186;
+        Wed, 20 May 2026 04:01:52 -0700 (PDT)
 Received: from QCOM-eG0v1AUPpu.na.qualcomm.com ([2a01:e0a:830:450:9d48:e1ec:d837:6344])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bd4f4eb6320sm840310266b.59.2026.05.20.04.01.48
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bd4f4eb6320sm840310266b.59.2026.05.20.04.01.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 04:01:49 -0700 (PDT)
+        Wed, 20 May 2026 04:01:51 -0700 (PDT)
 From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Subject: [PATCH 0/3] arm64: dts: monaco-arduino-monza: Add support for LGA
- WiFi/BT module
-Date: Wed, 20 May 2026 13:01:41 +0200
-Message-Id: <20260520-monza-wireless-v1-0-9f6942310653@oss.qualcomm.com>
+Date: Wed, 20 May 2026 13:01:42 +0200
+Subject: [PATCH 1/3] power: sequencing: pcie-m2: Add QCA2066 (QCNFA765) BT
+ serdev ID
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -89,11 +91,9 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAJWUDWoC/yWN2wqDMBBEf0Xy3JUYL7FSSv+j+BB1bQON0ayXU
- vHfG/Vl4AzMmZUROo3EimBlDmdN2nYeokvA6rfqXgi68cwEFxlPBQdju5+CRTv8IBFgVqNseRS
- 3cc78qHfY6u8hfJYnOxwm7x3Pkhk/U4e3CG6nlkvoF0c4gBFQjTAL4BDJhFdNIvM0vj4sUThM6
- lNbY0If9/2rUoSwN3osglmGEbg6YeW2/QFWRIry1gAAAA==
-X-Change-ID: 20260520-monza-wireless-e6ce7f013f38
+Message-Id: <20260520-monza-wireless-v1-1-9f6942310653@oss.qualcomm.com>
+References: <20260520-monza-wireless-v1-0-9f6942310653@oss.qualcomm.com>
+In-Reply-To: <20260520-monza-wireless-v1-0-9f6942310653@oss.qualcomm.com>
 To: Manivannan Sadhasivam <mani@kernel.org>,
         Bartosz Golaszewski <brgl@kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
@@ -107,87 +107,55 @@ Cc: linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
         linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
         Loic Poulain <loic.poulain@oss.qualcomm.com>
 X-Mailer: b4 0.14.2
-X-Proofpoint-GUID: BbotcTXrL7Yg9XpOOs1M3YammGrqXKdJ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIwMDEwNiBTYWx0ZWRfX+2pFuv3nwbAa
- 9ETeDvQz0xVrSXQW9x3snMdMJT4wC27T2UxDKyA0tOaWbK9GELiWBXZ9rygtbnE7qVLCWebm1f/
- JIBd/+CaXWPlfVDsejWnzh4ehcoYJKndTkUYSntOyl6kyrexinpUjKqcrYrQjNRokCLrW94hA/P
- 48ifltrXVXYqZ+ZHqN5YSlkpU9KsCFL0bfnisS1O01zRij9u14QQEeWBYvJhlcD6NnXHnDntz/k
- KUoz2ugwybVXS8pUM9PtUdCy4imM8wwyH/VHnznB/CQFyrb7NH4pfKafEmP7GZG/YqrykyQJn2N
- mGTHaBJwGUeXtIFSDz0bVEYH8ZZJbCYaiAKq4+ee0vX/gdHegTR3kUZweUZrMN1quHiPh79csbQ
- 9j1YP3CzICE6ou40v47Om9oYKjiXGfmTupU315iXsuE+THzd46b4YlvSevBDKAd08ymU+4rYfMO
- 0GdUutjIqW/DXBzWFVQ==
-X-Authority-Analysis: v=2.4 cv=TO11jVla c=1 sm=1 tr=0 ts=6a0d949f cx=c_pps
- a=wURt19dY5n+H4uQbQt9s7g==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+X-Proofpoint-GUID: YTv2IWoI93uxm-c6J-bDKUzvn2c02Qxy
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIwMDEwNiBTYWx0ZWRfX7H1gK5QEKV13
+ 1gWsijg28PEIGn5KJe0rebClbBa+vghq45Q2fjmNLWI8C9EcBl1KMEnKOcEJH1f3r/o0sG98BT1
+ zN5n3eihtr8DV/UudEs7BgKEugNfvWMQUILgvTDGFZOzpB+tGSUwffH+lty8mKAi8dC937E+TZv
+ ja+5SB1NIi0jR7W2uRPQF7KIq3zKUPydCZG3FdTncge1YwDVTQkTIBex0NZjnYzi8A6yikQvkbf
+ 2IieNKVNBQdgdw9EqGYoR3tXSvknB2PG3XSEalMLVmoKyx73kHEiTSNbqjLLs2p7+at/Z9Gjfp9
+ 3VQi2D4hr2PrWUh7mnEIIm+ZMNjv9Nvpj+yvl3cxrYPVHNSXFw8EVIt5JF+FgsMNZfVd/IW82nD
+ KbFORlI5TlzW1jHi5fWNWzaQdj8typSOTUWqTHmTQgRx5UR1ENV9+Hs1yValUaSXesg/sFW7X8T
+ g+ommGTIa4TbE3nlQGA==
+X-Proofpoint-ORIG-GUID: YTv2IWoI93uxm-c6J-bDKUzvn2c02Qxy
+X-Authority-Analysis: v=2.4 cv=C4LZDwP+ c=1 sm=1 tr=0 ts=6a0d94a1 cx=c_pps
+ a=lkkFf9KBb43tY3aOjL++dA==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
  a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22 a=VwQbUJbxAAAA:8
- a=EUspDBNiAAAA:8 a=pLl2yMwwk8GGFzfygZEA:9 a=QEXdDO2ut3YA:10
- a=-UhsvdU3ccFDOXFxFb4l:22
-X-Proofpoint-ORIG-GUID: BbotcTXrL7Yg9XpOOs1M3YammGrqXKdJ
+ a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22 a=EUspDBNiAAAA:8
+ a=nYxCwpw-O1B6azs0dq8A:9 a=QEXdDO2ut3YA:10 a=k4UEASGLJojhI9HsvVT1:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-05-20_02,2026-05-18_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 malwarescore=0 clxscore=1015 lowpriorityscore=0
- impostorscore=0 suspectscore=0 spamscore=0 adultscore=0 phishscore=0
- bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
- definitions=main-2605200106
+ suspectscore=0 clxscore=1015 spamscore=0 phishscore=0 priorityscore=1501
+ adultscore=0 bulkscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605130000 definitions=main-2605200106
 
-This series describes support for the onboard WiFi/Bluetooth module
-present on the Arduino VENTUNO Q (monaco) platform.
+Add PCI device ID 17cb:1103 (Qualcomm QCA2066/QCNFA765) to the M.2
+serdev ID table, mapping it to the qcom,qca2066-bt compatible string.
 
-The board provides LGA pads for a wireless module. On the VENTUNO Q
-these pads are populated with an NFA725B module featuring the
-QCA2066 WiFi/BT combo chip. While implemented as an LGA footprint,
-the design is functionally compatible with the M.2 Key E.
-
-The NFA725B exposes WiFi over PCIe and Bluetooth over a UART.
-Both interfaces are gated through the W_DISABLE1# and W_DISABLE2#
-signals, as defined by the M.2 specification and handled here via
-the pcie-m2 power sequencer.
-
-This series models the hardware using the existing pwrseq framework
-and connector bindings, allowing coordinated PCIe and UART bring-up.
-
-Patch 1 registers the QCA2066 PCI device ID (17cb:1103) in the
-pwrseq-pcie-m2 serdev ID table so the Bluetooth device is created
-automatically when the PCIe function is enumerated.
-
-Patch 2 updates hci_qca to retrieve the "uart" power sequencer
-target via the OF graph and use it for Bluetooth power control
-instead of a dedicated GPIO.
-
-Patch 3 adds the required Device Tree description for the board.
-
-This series depends on:
-https://lore.kernel.org/linux-pci/20260507-pwrseq-m2-bt-v2-0-1740bd478539@oss.qualcomm.com
+This allows the pwrseq-pcie-m2 driver to automatically create the
+Bluetooth serdev device when a QCA2066-based M.2 card is enumerated.
 
 Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
 ---
-Loic Poulain (3):
-      power: sequencing: pcie-m2: Add QCA2066 (QCNFA765) BT serdev ID
-      Bluetooth: hci_qca: Support QCA2066 on M.2 connector via pwrseq
-      arm64: dts: qcom: monaco-arduino-monza: Add QCA2066 M.2 WiFi/BT support
+ drivers/power/sequencing/pwrseq-pcie-m2.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
- arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts | 65 +++++++++++++++++++++++
- drivers/bluetooth/hci_qca.c                       | 33 +++++-------
- drivers/power/sequencing/pwrseq-pcie-m2.c         |  2 +
- 3 files changed, 80 insertions(+), 20 deletions(-)
----
-base-commit: aa61612ab641d7d62b0b6889f2c7c9251489f6e3
-change-id: 20260520-monza-wireless-e6ce7f013f38
-prerequisite-message-id: <20260507-pwrseq-m2-bt-v2-0-1740bd478539@oss.qualcomm.com>
-prerequisite-patch-id: f4a7d1957c1776051608bf3d808b2786606c1ae2
-prerequisite-patch-id: 6cd3c33583a9af16b3f6f71517b16b32d8155b7c
-prerequisite-patch-id: 0550c57d69cf112fd4830e62f4388db6f8bf397c
-prerequisite-patch-id: cc10d8079e37ef0ba0c33d0984c95d76361df9dd
-prerequisite-patch-id: d7f4bb2bb4498ac619e67a94f8b59119a5caaf26
-prerequisite-patch-id: c00ce9095b2d3a412229796194828b55642d3d96
-prerequisite-patch-id: 09600595c2e80b12eda3aae39af192847d0f03d0
-prerequisite-patch-id: a6118ed2894c176780ba933750e1068f2819fa4c
-prerequisite-patch-id: 1dee41a33e032094e8dda74ac4e0bada928573d7
+diff --git a/drivers/power/sequencing/pwrseq-pcie-m2.c b/drivers/power/sequencing/pwrseq-pcie-m2.c
+index efeb25ba9c79e20fc8bc8354def8ae423d0f2f2e..f90df88c663985c7702c19911f0c147e3b68984b 100644
+--- a/drivers/power/sequencing/pwrseq-pcie-m2.c
++++ b/drivers/power/sequencing/pwrseq-pcie-m2.c
+@@ -188,6 +188,8 @@ static int pwrseq_pcie_m2_match(struct pwrseq_device *pwrseq,
+ static const struct pci_device_id pwrseq_m2_pci_ids[] = {
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_QCOM, 0x1107),
+ 	  .driver_data = (kernel_ulong_t)"qcom,wcn7850-bt" },
++	{ PCI_DEVICE(PCI_VENDOR_ID_QCOM, 0x1103),
++	  .driver_data = (kernel_ulong_t)"qcom,qca2066-bt" },
+ 	{ } /* Sentinel */
+ };
+ 
 
-Best regards,
 -- 
-Loic Poulain <loic.poulain@oss.qualcomm.com>
+2.34.1
 
