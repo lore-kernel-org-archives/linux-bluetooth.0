@@ -1,174 +1,226 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E74318A92F;
-	Wed, 20 May 2026 13:14:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A08E13B7AE
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 13:50:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779282899; cv=none; b=qdlBWuPqHxnNhsIW8DVVKZn7FozgMIkQLdHNhTeVH3C5PdJETahqBSFxCmmWWjQUXZz2ftMSXEBgk8/2spl9khbylr+j91SfsbE3MW/2NZSj9SeuXiggmyydCftWwO2oWPY8/9qz6gFvaEhz+fOzpXbIdf4gyhHmMbHZxTL/u0g=
+	t=1779285050; cv=none; b=AtyQaHpU+bAI1hQclvLU/YMCejmVerxYU167xq97MtrFoMIQLtDIbmEpjJ92otPC6WxJLQqKRRBbOdHCPVKaWrEczJozeOPQRkN5usH93G0VWgVgY4JB4A3l8CnW2CMiIjB3ciAWi2wwaZrvUjHFM5nOcrgDCPvpMm4mxoJn120=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779282899; c=relaxed/simple;
-	bh=332yNbiHDYC/q9L/Y5HE8KnpnzR9GFg1YT2UZ6XlgcE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I0ArusyJ09DcNqCLDaSz4aeTX/QbcPihmGmJTPlnMUaI0r3Uk5WmmXFQgejS4R1q41mYhZUYx/GvGiIVKpTcN7H3QOE1ycGtpPehO/HMVa6YY5oyDbgolj6YMKJTMl7tEbvfZpZlcHXMOzCsyKlBABtVfMXSU/5uj8i2uAQDKUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=pfjIpnZD; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779285050; c=relaxed/simple;
+	bh=V8kEWX7aacPDgr69xJjI766tL4M9rqVYuHze2pOIrps=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H0dNbEJx1epHdDJ438cKQTA5GIMRzPrnxGIBY9clnC81g58FFHy30toYOH2LTzFLTux12OaaZNhfP1hDlrl0k/Phlc4YU1b329hpnsI5A0cggKXtrjMFwyOqyTUWlCjMetOmdR03TIdNZataXVc5yRsrWo/DZCf9hNdSMPx5Eis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NLuaInrL; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="pfjIpnZD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5EA31F00894;
-	Wed, 20 May 2026 13:14:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1779282898;
-	bh=0QKNnksfj1AdZlcvGjbO9ONmdIYwgP155TcW3tFuYBk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=pfjIpnZDDTzdBq1CciBSb6qLL0OSY1mgfkIi87Qsdh/qJk2G0dcwH5LNpaK4YQmCp
-	 3oBlSlfNxcCdGOBxEKTAeeJF/ch8dkcwba7wAqrTu5KrEM6EKUsZ25U72aOpEgByq1
-	 wCMr9cZxgtiCf/URM350vXXm6I6fiGkstwbAx3MA=
-Date: Wed, 20 May 2026 15:15:01 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: August Wikerfors <git@augustwikerfors.se>,
-	Thorsten Leemhuis <regressions@leemhuis.info>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	Sasha Levin <sashal@kernel.org>, linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	Linux kernel regressions list <regressions@lists.linux.dev>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [GIT PULL] bluetooth 2026-05-14
-Message-ID: <2026052047-silica-grub-0bb2@gregkh>
-References: <4946f5f3-b7e2-4949-89f7-6427015027c6@leemhuis.info>
- <2026051954-revision-sierra-6bb4@gregkh>
- <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
- <2026051909-impurity-nemesis-2f65@gregkh>
- <CABBYNZKKbTXc-okp9P2OncMYXHX9C1XC+pRC7XWOhv-8nPNZ5A@mail.gmail.com>
- <2026051942-uproar-drainpipe-6370@gregkh>
- <CABBYNZKzWgL3nmeA=CtN9s80LRyDiJ97aQXgvfSm9vYUBw_SpA@mail.gmail.com>
- <e666c332-e2aa-4525-a208-a4a08742d2e0@augustwikerfors.se>
- <2026052026-barber-espresso-1d9a@gregkh>
- <CABBYNZJ4woc+unpYN6_dzMLtxhFVUd5+ccv2+EQbDMkYuXQ12A@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NLuaInrL"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-50e614fdb42so39107311cf.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 06:50:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779285048; x=1779889848; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VWLZlw1o5rrWsIR88B5vFwajJpqsIVjTgSharoBZII8=;
+        b=NLuaInrLfwbvjbCjfPE90t+InoopK+JcVVBlyiccs6vKFaHPeSIApxcHagNnO3F6OF
+         NYdPJZXRllw3Y6x6c+aSDSnw2ywYjdbkGJpiasB8VtZPqxb24w4NHA1yIw2cN0iDIEc9
+         UpjuGI3JRjCPZ4helqTCseWKnzUB5Ki5OYdv5u77m4T29aJ6sj8aHu5j+TeDa+XEYnGA
+         +WkgqPiT3hBkEky6shAe1QlDSOhMQ46JPSm0fgmSVtwMS4jfWIDy2pqAYG6AbMmeUjao
+         4issY2+GGYBsVGtcwk/4VM6ufzEdQ4Ug1+SQy1mtNlCyYHKWU2HLGF3NuqEG/YDR1Yuo
+         QSHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779285048; x=1779889848;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VWLZlw1o5rrWsIR88B5vFwajJpqsIVjTgSharoBZII8=;
+        b=Cr+23WnpqocBjtwvCCb9/pZD2KTWWOJujlIdMPUSjlpr2R9g9nPxADl6NVaNOQe0+8
+         acRIoRhMyANJt8fDbwHHO07pmvhXCpwTHtij+4vuKzZAyORO/tfZy+rSQKqhhpfHqjgM
+         mos0F4HQhS8KbnhMEaszbbnYWG9QmqYTPtH1cdKnudruOxhOXRQDLiaIfkVM+s/dM40S
+         nimI1LyP1vxxmlFe5+KJFXgM/khqZZoE6CGiT859AKOatRA9FvW5NbgVwhhhnFTQgKTh
+         1KJTVuJy14eDnX1r2VViB9HnxqgYUog56JVgDMdxt7gkC2rbEQZ4TsQ+RcxUGha5bzSk
+         LfUw==
+X-Forwarded-Encrypted: i=1; AFNElJ9q1Ex9FhXtd53r+iVPn5cvA18qHx5CYfljsKwZdHPRTTUPJlthc24wlFn5HS1i4uDu8Q3VZ1t9tLZcnjgNE20=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywdt3n9J228kaI5w1BTd2yC8tLBQd/mBXZgiN7MbbhHG6otprhx
+	1Y89Jmz3Nhe6QFtnhsxwdMWP+JeeFF0KQkF6NQneJGtzac7cCNOwvSZ1
+X-Gm-Gg: Acq92OGhqDnYeLCFPThEe0bmQju6tgBzhOSNJU2VhKGVK5WKiw37PGSlW95Ds9DNZ+9
+	9CeBJ3C8FWRtNygJklmo0qguPpEx1F9VcglffP1ZnrH5XKvVKIorf72x27AjxGgO9LMfgXGRxDS
+	bjDHxoAMwy3UlFSu6CxMaEaSxwj7uMAC3PkEiIlduMZmU0HVea4hNwM+Or/FoomxrGXfLYn1HRC
+	xYensdW8D5XUpcBJhYHNCByzjpiW53u1ye0+IfIH663WETOMPcYUYUEjjWJclZRPGxo+srlVaYE
+	cy6NZNKpOWzj3jEU3C/Xox0sy/mW4NNn2dKEW8RGpTiw4RGYv/0WwznP7pxTrNC2K+RvdxjBBsr
+	MwoNCp32Qgr3EAuGPaaoZviRhX9MUTHiqUTioaU4GUpUNLPUZxMvFh0WyKmHg7e9c4GdcCJsjNQ
+	vE5jSs0gYJNILnOHOBuzYirwRuufJVDTdkewqT1ClEcHeYUHi84BxxafoEesYBRVf/jRY0RJIEw
+	DUdiOOKB8l/7lrlu0Q8a7NNGHmxOvI=
+X-Received: by 2002:ac8:5cd0:0:b0:50e:60b7:bb40 with SMTP id d75a77b69052e-51659ede9c0mr359598541cf.0.1779285047670;
+        Wed, 20 May 2026 06:50:47 -0700 (PDT)
+Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-516456889dcsm202159561cf.2.2026.05.20.06.50.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2026 06:50:46 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: L2CAP: reject BR/EDR signaling packets over MTUsig
+Date: Wed, 20 May 2026 09:50:34 -0400
+Message-ID: <20260520135034.1060859-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZJ4woc+unpYN6_dzMLtxhFVUd5+ccv2+EQbDMkYuXQ12A@mail.gmail.com>
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 20, 2026 at 09:11:42AM -0400, Luiz Augusto von Dentz wrote:
-> Hi Greg,
-> 
-> On Wed, May 20, 2026 at 8:47 AM Greg KH <gregkh@linuxfoundation.org> wrote:
-> >
-> > On Tue, May 19, 2026 at 07:37:35PM +0200, August Wikerfors wrote:
-> > > On 2026-05-19 17:49, Luiz Augusto von Dentz wrote:
-> > > > Hi Greg,
-> > > >
-> > > > On Tue, May 19, 2026 at 11:19 AM Greg KH <gregkh@linuxfoundation.org> wrote:
-> > > > >
-> > > > > On Tue, May 19, 2026 at 09:44:39AM -0400, Luiz Augusto von Dentz wrote:
-> > > > > > Hi Greg,
-> > > > > >
-> > > > > > On Tue, May 19, 2026 at 8:07 AM Greg KH <gregkh@linuxfoundation.org> wrote:
-> > > > > > >
-> > > > > > > On Tue, May 19, 2026 at 12:53:49PM +0200, Thorsten Leemhuis wrote:
-> > > > > > > > On 5/19/26 12:30, Greg KH wrote:
-> > > > > > > > > On Tue, May 19, 2026 at 09:04:38AM +0200, Thorsten Leemhuis wrote:
-> > > > > > > > > > On 5/15/26 17:10, Thorsten Leemhuis wrote:
-> > > > > > > > > > > On 5/14/26 19:23, Luiz Augusto von Dentz wrote:
-> > > > > > > > > > >
-> > > > > > > > > > > > The following changes since commit c78bdba7b9666020c0832150a4fc4c0aebc7c6ac:
-> > > > > > > > > > > >    net: phy: DP83TC811: add reading of abilities (2026-05-14 15:17:12 +0200)
-> > > > > > > > > > > >
-> > > > > > > > > > > > are available in the Git repository at:
-> > > > > > > > > > > >
-> > > > > > > > > > > >    git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-14
-> > > > > > > > > > > >
-> > > > > > > > > > > > for you to fetch changes up to 375ba7484132662a4a8c7547d088fb6275c00282:
-> > > > > > > > > > > >
-> > > > > > > > > > > >    Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-14 09:58:08 -0400)
-> > > > > > > > > > >
-> > > > > > > > > > > It seems this PR sadly came too late for this week's net PR to mainline
-> > > > > > > > > > > that was merged yesterday.
-> > > > > > > > > > >
-> > > > > > > > > > > TWIMC, from my point of view, it would be great if we somehow could
-> > > > > > > > > > > still get the changes from this PR or at least the btmtk fix it
-> > > > > > > > > > > contains[1] to mainline this week before -rc4, as it is fixing a
-> > > > > > > > > > > regression known since 2026-04-24 that at least five people encountered
-> > > > > > > > > > > with mainline since -rc3 due to 634a4408c0615c ("Bluetooth: btmtk:
-> > > > > > > > > > > validate WMT event SKB length before struct access") [006b9943b982 in
-> > > > > > > > > > > -next].
-> > > > > > > > > >
-> > > > > > > > > > Greg, Sasha, that [1] fix I was talking about now reached -next as
-> > > > > > > > > > 162b1adeb057d2 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL
-> > > > > > > > > > events") and will likely hit mainline on Thursday or so with the weekly
-> > > > > > > > > > -net PR to -mainline. If that's good enough for you, I'd say it would be
-> > > > > > > > > > good to pick this up for the next round of stable kernels.
-> > > > > > > > >
-> > > > > > > > > That "Fixes:" tag is referring to something that is also not in any
-> > > > > > > > > tree, but that commit does have a cc: stable in it.  So do we need both
-> > > > > > > > > of these:
-> > > > > > > >
-> > > > > > > > Valid question, as yes, there is a slight mixup here:
-> > > > > > > >
-> > > > > > > > > 041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length before struct access")
-> > > > > > > >
-> > > > > > > > That is already in v7.0.7, v6.18.30, v6.12.88, as 041e88fb0c08 is the
-> > > > > > > > -next commit-id for mainline commit-id 634a4408c0615c ("Bluetooth:
-> > > > > > > > btmtk: validate WMT event SKB length before struct access") -- the one
-> > > > > > > > that is causing the regression that I want to get fixed. So we now only
-> > > > > > > > need:
-> > > > > > > >
-> > > > > > > > > 162b1adeb057 ("Bluetooth: btmtk: accept too short WMT FUNC_CTRL events")
-> > > > > > >
-> > > > > > > Ok, but that "Fixes:" tag pointing to an invalid commit is going to be a
-> > > > > > > nightmare to track over time, ugh.
-> > > > > >
-> > > > > > Hmm, did we get the wrong hash or something? Usually, that would show
-> > > > > > up in the verify-fixes.sh, but perhaps it didn't capture it this time
-> > > > > > for some reason, perhaps I'm running an outdated version or something
-> > > > > > similar.
-> > > > >
-> > > > > Something went wrong if we ended up with a patch in the stable trees,
-> > > > > yet this fix is referring to it as a different git sha.  Don't know
-> > > > > where the disconnect happend :(
-> > > >
-> > > > 041e88fb0c08 ("Bluetooth: btmtk: validate WMT event SKB length before
-> > > > struct access")
-> > > >
-> > > > I don't have that in any of our tree either, this is actually
-> > > > 634a4408c061 on all trees in the chain:
-> > > >
-> > > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/commit/?id=634a4408c061
-> > > > https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=634a4408c061
-> > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=634a4408c061
-> > > >
-> > > > Or actually that was the hash before it got rebased on bluetooth-next tree:
-> > > >
-> > > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=041e88fb0c08
-> > > >
-> > > > But I didn't send the PR from that three so perhaps somebody else sent
-> > > > it to stable with the wrong fixes tag?
-> > > I believe the confusion comes from "Bluetooth: btmtk: accept too short WMT
-> > > FUNC_CTRL events" itself currently having different commit hashes in
-> > > bluetooth (e3ac0d9f1a20) and bluetooth-next (162b1adeb057). The former
-> > > correctly refers to "Bluetooth: btmtk: validate WMT event SKB length before
-> > > struct access" as 634a4408c061 in the Fixes tag and was merged into net
-> > > yesterday heading for 7.1-rc5. The latter still refers to it as
-> > > 041e88fb0c08. Both are now in next-20260519 but only the latter was in
-> > > next-20260518 which was the latest at the time of Thorsten's message.
-> > >
-> > > Greg, this means picking e3ac0d9f1a20 instead of 162b1adeb057 should result
-> > > in a valid Fixes tag.
-> >
-> > Ok, now done.  Be careful of duplicate commits in different branches
-> > that are marked for backporting with different ids.  It can cause
-> > massive confusion (i.e. don't be like the drm tree...)
-> 
-> Noted. I guess I need to dig into how other trees do to avoid that.
-> The problem seem related to using 2 trees: bluetooth->net (fixes only,
-> rebased on each RC) versus bluetooth-next->net-next (development,
-> rebased once per release).
+net/bluetooth/l2cap_core.c:l2cap_sig_channel() accepts BR/EDR
+signaling packets up to the channel MTU and dispatches each command
+without enforcing the signaling MTU (MTUsig). A Bluetooth BR/EDR peer
+within radio range can send a fixed-channel CID 0x0001 packet that is
+larger than MTUsig and contains many L2CAP_ECHO_REQ commands before
+pairing.
 
-Just never rebase any public tree please.
+In a real-radio stock-kernel run, one 681-byte signaling
+packet containing 168 zero-length ECHO_REQ commands made the target
+transmit 168 ECHO_RSP frames over about 220 ms.
+
+Define Linux's BR/EDR signaling MTU as the spec minimum of 48 bytes and
+reject larger signaling packets before dispatching their commands. When
+the over-MTUsig packet contains a request command, send one
+L2CAP_COMMAND_REJECT_RSP with L2CAP_REJ_MTU_EXCEEDED and the first
+request identifier; packets for which no valid request command is found
+are dropped.
+
+Cc: stable@vger.kernel.org
+Suggested-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Link: https://lore.kernel.org/r/20260518002800.1361430-1-michael.bommarito@gmail.com
+Assisted-by: Claude:claude-opus-4-7
+Assisted-by: Codex:gpt-5-5-xhigh
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+---
+I reproduced the stock behavior with a real-radio BR/EDR ACL link and a
+harness that sends a single fixed-channel signaling packet containing
+packed zero-length ECHO_REQ commands. The patched code builds for
+net/bluetooth/l2cap_core.o on x86_64 defconfig. There are no in-tree
+Bluetooth selftests that reference l2cap_sig_channel(), L2CAP_SIG_MTU,
+or L2CAP_ECHO_REQ.
+
+The unrestricted BR/EDR signaling parser and ECHO_REQ response path both
+trace to the initial git import; no later introducing commit is
+available for a Fixes tag.
+
+Changes in v2:
+- Replace the per-PDU echo-count cap with the MTUsig direction from
+  review.
+- Reject the whole over-MTUsig signaling packet with one
+  L2CAP_REJ_MTU_EXCEEDED command reject.
+- Add L2CAP_SIG_MTU and drop over-MTUsig packets when no valid request
+  command identifier is found.
+
+v1: https://lore.kernel.org/r/20260518002800.1361430-1-michael.bommarito@gmail.com
+---
+ include/net/bluetooth/l2cap.h |  1 +
+ net/bluetooth/l2cap_core.c    | 60 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 61 insertions(+)
+
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 5172afee54943..e0a1f2293679a 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -33,6 +33,7 @@
+ /* L2CAP defaults */
+ #define L2CAP_DEFAULT_MTU		672
+ #define L2CAP_DEFAULT_MIN_MTU		48
++#define L2CAP_SIG_MTU			48	/* BR/EDR signaling MTU */
+ #define L2CAP_DEFAULT_FLUSH_TO		0xFFFF
+ #define L2CAP_EFS_DEFAULT_FLUSH_TO	0xFFFFFFFF
+ #define L2CAP_DEFAULT_TX_WINDOW		63
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 77dec104a9c36..5417e3cb0636d 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5626,6 +5626,55 @@ static inline void l2cap_sig_send_rej(struct l2cap_conn *conn, u16 ident)
+ 	l2cap_send_cmd(conn, ident, L2CAP_COMMAND_REJ, sizeof(rej), &rej);
+ }
+ 
++static bool l2cap_sig_cmd_is_req(u8 code)
++{
++	switch (code) {
++	case L2CAP_CONN_REQ:
++	case L2CAP_CONF_REQ:
++	case L2CAP_DISCONN_REQ:
++	case L2CAP_ECHO_REQ:
++	case L2CAP_INFO_REQ:
++	case L2CAP_CONN_PARAM_UPDATE_REQ:
++	case L2CAP_LE_CONN_REQ:
++	case L2CAP_ECRED_CONN_REQ:
++	case L2CAP_ECRED_RECONF_REQ:
++		return true;
++	}
++
++	return false;
++}
++
++static u8 l2cap_sig_first_req_ident(const struct sk_buff *skb)
++{
++	const u8 *data = skb->data;
++	unsigned int len = skb->len;
++
++	while (len >= L2CAP_CMD_HDR_SIZE) {
++		const struct l2cap_cmd_hdr *cmd = (const void *)data;
++		u16 cmd_len = le16_to_cpu(cmd->len);
++
++		if (cmd->ident && l2cap_sig_cmd_is_req(cmd->code))
++			return cmd->ident;
++
++		if (cmd_len > len - L2CAP_CMD_HDR_SIZE)
++			break;
++
++		data += L2CAP_CMD_HDR_SIZE + cmd_len;
++		len -= L2CAP_CMD_HDR_SIZE + cmd_len;
++	}
++
++	return 0;
++}
++
++static inline void l2cap_sig_send_mtu_rej(struct l2cap_conn *conn, u8 ident)
++{
++	struct l2cap_cmd_rej_mtu rej;
++
++	rej.reason = cpu_to_le16(L2CAP_REJ_MTU_EXCEEDED);
++	rej.max_mtu = cpu_to_le16(L2CAP_SIG_MTU);
++	l2cap_send_cmd(conn, ident, L2CAP_COMMAND_REJ, sizeof(rej), &rej);
++}
++
+ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
+ 				     struct sk_buff *skb)
+ {
+@@ -5638,6 +5687,17 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
+ 	if (hcon->type != ACL_LINK)
+ 		goto drop;
+ 
++	if (skb->len > L2CAP_SIG_MTU) {
++		u8 ident = l2cap_sig_first_req_ident(skb);
++
++		BT_DBG("signaling packet exceeds MTU");
++
++		if (ident)
++			l2cap_sig_send_mtu_rej(conn, ident);
++
++		goto drop;
++	}
++
+ 	while (skb->len >= L2CAP_CMD_HDR_SIZE) {
+ 		u16 len;
+ 
+-- 
+2.53.0
+
