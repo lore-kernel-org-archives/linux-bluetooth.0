@@ -1,111 +1,83 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D0C2BDC1C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 19:50:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D4B1EEA31;
+	Wed, 20 May 2026 02:15:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779220257; cv=none; b=f8BEYqakBZHo0KgcKMxu6Z8ozwlTTGyaw1jfmfJyaVI0Btx0SDDVxEEFKD0yd7knF3le5J+VMyFfhoIftiYO4Dsyzs9acOGgr80bWxnjuA6DSFXC1cjrvuzuAbHfM5rkkwo/Ik8nf8ABWH/9k/3/BeUjKWDPQKzJx9HeQkDeGU8=
+	t=1779243329; cv=none; b=F+CnfhfKXVBYK6FnRXGLHa+SSyB4ioUFqYecW7cd+oWyNa9IlZPnZwSTHugItmDHgPoDlV7XyTM7EJvRNAKdJl9nKTBRhkanAsFuhLMOUK2U2PVdbvoUZltlXayG9nCUhdIYhDXm+I9fY5eL+yPO08UM1MzrtZtGKlPL+Oqmm90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779220257; c=relaxed/simple;
-	bh=LqkKJCL0elgzIHL0lN9uReB29DLgLlZBtpA4RMcJi2k=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=LjQu58gob0YWom2sjZaOQ4gFv6oRyHQ0t0gP3Hn7xgk90W3yI1Y6BsN/1zB8hC0hbTAhpnUGQ+V/f8ic4fgC0sVLpNqXIXpdbZuzOk8tD35avsvRCfWxtg/DYIICIWda4fIkfDPpdzVt2qj4UxsaHlkMhqtZoMPyTzodbwozbzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pywe/i4F; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pywe/i4F"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-9116861f004so947497085a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 May 2026 12:50:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779220255; x=1779825055; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=VQI3187Pa6nxNiUZYrw2Z8kdnMPEHCkRSEVOJeQarE8=;
-        b=Pywe/i4FId7xO50QCQbo6vtflmrBGL3iTgz2K6BmfQD4UpYU8cIVzCx136k5rpiP28
-         pkJ1cjumkSOTyT6JMaDXlawUGnb/Knp5VFZujXrvYWHkTLj3OlvXrnmLcaTwjtMkqfoC
-         JPrJKQiHchTNPkGuFdquOTPEiUgiTGQmpriePd17f/BSfSfg7apTZS+olN9r/RTI4iG+
-         iOGKQ53ZWNfhrlVZYtwPj0Lo6O/a3RJMf2qFRV+nXXkIb8J3e+lUn7sGKRbQWgh1wkd5
-         FC/vyQKhbInbO6ifkyiVpK4BV+6TdxEZy2fwCGRavatjOsFubDdjMFBqhcKtTNMJDEb3
-         Bsrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779220255; x=1779825055;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VQI3187Pa6nxNiUZYrw2Z8kdnMPEHCkRSEVOJeQarE8=;
-        b=EFWc5reGH5BTLqKwW/4NQIBwLypVam3viyIZNqXNYeqTQ55Oe7PfwDor4DU6jrVXm2
-         7uaBuz7RGReB5UxDl/90DEZvCgCLUs2ZfMez5o0DgnBqETmjQqb201ZNzdhKSqndpp+W
-         yNO/CIt13y993YZpOx05/dGBJabYKFFCEkxu4QMwJ6R75cmaZ+jEfQQRnKKtyJYEgetS
-         FPhPjJj5nl1o8pVRyzRY6Tyk/ewBz+zZb+CPMEwVLTwziqwIq66nfe7HHU6Oy3ciAwTU
-         etLJsLo6Shj7QfA1G/JpXvfGsaDFDW6eAcfqGpjZY+iJSLiZvk8H+5SA57w6LU2RKm1t
-         zuvQ==
-X-Gm-Message-State: AOJu0Yx+Szi74b9Z4jOrXDdI4xQK09qezVV0Z6YUGus5z/iUzXOXHlRl
-	SvPRtnP7WzPGTQI/EFM1ODn0Ka7o1tfioHKuxpym658/WMnP7n0dnJSihe/iig==
-X-Gm-Gg: Acq92OG9/vIhsMG7izK++P/d1/ZJive1L1dLb1dRxioAvnxkxAZSBNqsaNfV5383buK
-	McdMHIsikBCbuSQA6s9JHkN/rJ6j1ev4bcLJsp6e+iXUzGIz9gxzYp+Qg0K3Kr+sz5tD+TLDdgr
-	R6bRQOHJRhWVxi8kaXvvzl5bMbhD3AjpgTIAoF1id90/PZ3WsA5j1UWjsdbatmjMwLWFdcT6t1l
-	Sq/qaT6X7Ck0wNIPDJImfLAhiMBamozRKahKezrtzbUWYUAt8FXBYtaKZ2kNsYrxntjkZ75/yEu
-	tLaeOFS5n3cWZGcXL36pt3JvkkFTJhQifqBh+sNQBbluU56JFNyQeqoItztdGaV+iHqBuhDJLcY
-	pTOdFBi6PSeKCwWd59M3xn+QMPzRKIhhhc9Wu27dSXEfuMjyhbXABEv3IC6pYLtjEpbSWE9dyi6
-	xhZ2jfEnRMOpT/6gXNvmlphK8K0NOw+w==
-X-Received: by 2002:a05:620a:1714:b0:914:7e9a:2704 with SMTP id af79cd13be357-9147e9a295amr654966985a.23.1779220255121;
-        Tue, 19 May 2026 12:50:55 -0700 (PDT)
-Received: from [172.17.0.2] ([48.214.54.100])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-910ba182535sm1931184385a.8.2026.05.19.12.50.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2026 12:50:54 -0700 (PDT)
-Message-ID: <6a0cbf1e.c589b5ed.11922b.147e@mx.google.com>
-Date: Tue, 19 May 2026 12:50:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8775050007464314306=="
+	s=arc-20240116; t=1779243329; c=relaxed/simple;
+	bh=IlFcVSGYnP4CZioj5QK3amPqVXAoqDwpqd7DjVHMmUs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QR3xFWx9PBMLFlMB8dHQMtCkCDEcTOIc7BqqivoXSjMqOZ8XlJFPF3Aw12pkET3wNhPDM/qzOICCnko9bxMUgPjrNpafGVoDbdHFF3+CpGVMKxuY4ynvziI6y52N5NQMr0oXMu5XTekJZa1e0SSjgSx4fJGLFAaSXZPSu4hR8Rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: c0371a2e53f111f1aa26b74ffac11d73-20260520
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:5f95d278-0ca8-4f62-be13-634d09b3a2a4,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:e7bac3a,CLOUDID:887d1953b4785460769cf36a49e66563,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102|865|898,TC:nil,Content:0|15|50,EDM:-
+	3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,A
+	V:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: c0371a2e53f111f1aa26b74ffac11d73-20260520
+X-User: liujiajia@kylinos.cn
+Received: from nature.lan [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <liujiajia@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 909766949; Wed, 20 May 2026 10:15:20 +0800
+From: Jiajia Liu <liujiajia@kylinos.cn>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Jiajia Liu <liujiajia@kylinos.cn>
+Subject: [PATCH] Bluetooth: btmtk: remove extra copy in cmd array init
+Date: Wed, 20 May 2026 10:15:00 +0800
+Message-ID: <20260520021500.13504-1-liujiajia@kylinos.cn>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, meatuni001@gmail.com
-Subject: RE: [v4] Bluetooth: RFCOMM: add minimum length check in rfcomm_recv_frame
-In-Reply-To: <20260519184821.18925-1-meatuni001@gmail.com>
-References: <20260519184821.18925-1-meatuni001@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8775050007464314306==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+In btmtk_setup_firmware_79xx, the data length indicated by wmt_params.dlen
+in the cmd buffer is MTK_SEC_MAP_NEED_SEND_SIZE + 1. Except for the first
+byte, the remaining length is MTK_SEC_MAP_NEED_SEND_SIZE. memcpy copied one
+more byte to cmd + 1 than the remaining length. Align the length passed to
+memcpy to avoid exceeding current section map.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1097567
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.73 seconds
-GitLint                       PASS      0.55 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      25.91 seconds
-CheckAllWarning               PASS      29.40 seconds
-CheckSparse                   PASS      26.90 seconds
-BuildKernel32                 PASS      24.98 seconds
-TestRunnerSetup               PASS      526.66 seconds
-TestRunner_rfcomm-tester      PASS      63.53 seconds
-IncrementalBuild              PASS      24.66 seconds
-
-
-
-https://github.com/bluez/bluetooth-next/pull/218
-
+Signed-off-by: Jiajia Liu <liujiajia@kylinos.cn>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btmtk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index ea7a031000cd..53cba71cb07f 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -188,7 +188,7 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
+ 				       MTK_FW_ROM_PATCH_GD_SIZE +
+ 				       MTK_FW_ROM_PATCH_SEC_MAP_SIZE * i +
+ 				       MTK_SEC_MAP_COMMON_SIZE,
+-				       MTK_SEC_MAP_NEED_SEND_SIZE + 1);
++				       MTK_SEC_MAP_NEED_SEND_SIZE);
+ 
+ 				wmt_params.op = BTMTK_WMT_PATCH_DWNLD;
+ 				wmt_params.status = &status;
+-- 
+2.53.0
 
---===============8775050007464314306==--
