@@ -1,179 +1,205 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F353D092E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 12:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779280448; cv=none; b=aIJ5OW/WBzljRfkTxeor+2jYUxCqY0GmG2jcN8Y41raTQ5TCGZk6DIAZXN5LXt4XE8RjUkyQV6hnvQ4s07mnlTkUEUeUUuBlCzJVzkiuu8lOSPqVNH904AedEvZbU8e7iwriA+Da/8yrBytB7mJuEwUs/xFukQa4+usBGpx+BDc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779280448; c=relaxed/simple;
-	bh=FaiYDWv5ktpOfI7FbTjcTMjQgLuV8H8NQfFgpojEVP0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CrruPbCWTEkiASH1PbljKlVghHd24VpuMK7N04pnl4ZTeSmVx24+GYYAcOi2Tob3GRY3Ny3xeMfN6Cjyrc0ceTmGo1UmNx2Lh8POSsAIbGcltVKSiDgUby/iHnOrfoGFjiBNP34xNdmlYef6PiX3zxUmnCI8yCwOIsnj7hyq2rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=pTA9WPbK; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=BY4CKkUr; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A289734750B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 12:45:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779281140; cv=pass; b=shSqns2pgzzI0qAkpP6fPXrn+NSYD7Kz3hwL/q3HAYBO9el0iwkQw4Cxds2lz2a+knbvBBlR4RqVK+J6XV5+iYWuUGSsqT6JYBxSdwwo6GZMnrx1oSFDZFSMDKVOwzFbcqLzYfae/cqffdToMwvThLK91b+nDSjYvtT3qu0f+wU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779281140; c=relaxed/simple;
+	bh=Zr6fDgtgqQ608ihSJ4zPlo5bJFSyQdqQcxPawOC0o4g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UFRUfxbDMKsOPw/h2Z+RA2yfrE06eQUF8oSrWMeudQpxvyhN5ilp0NOV2O3cPXUNy2jqUzfP16ivy0Ma+tN/43aICiJKA3l6+am1YH5v41V71S2eTLBEWnoGyOQpm6D0Jg3fu4r/A4iAZiYe/T6hcnLH6ZLoKGMVMGnzOGqHbFw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C59doYWf; arc=pass smtp.client-ip=74.125.224.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="pTA9WPbK";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="BY4CKkUr"
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64K72a3V1725708
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 12:34:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=sWlv1f+/kOxg4LIib9PaORtM
-	K1pM/yQ62L4lr83A1ew=; b=pTA9WPbKFHaJ3i5vjoo097EkuO7KP9Oh+yMGs95k
-	Yj6c2GeGk2jdInRXdfIk1M1pUTzFVfWSY9TH0JdwXh7FXM3Xy5TMUyJVF9AZj3X4
-	yfm8H9/bg7Y6BgfQHTlNuIVWx5YkoVccRHLCj6gwk1p6G6e2x745Soeyo9/wOw0G
-	fiWmYTwat2dhHEhxf1Pu58zLbcha+qDThXU3gZYw2HtGTq5O0rXvFxKXikZMJSZ+
-	TLqM+AyVDhPR379c1B+QfdIzfghf/DxAFo9qzjSgMx3ZJCGlSVMUFd/M80NCZCDN
-	qd+BY7HB7F3JbcU5TSSTdPsVmLAcHVM+1bHpsuWrFpwaZQ==
-Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com [209.85.222.70])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e8t3qmqv0-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 12:34:06 +0000 (GMT)
-Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-95fc8572552so7978734241.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 05:34:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C59doYWf"
+Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-6530287803cso4872955d50.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 05:45:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779281138; cv=none;
+        d=google.com; s=arc-20240605;
+        b=C11HCVxRqjF8lcMRZIFSjodqtvIiejAP4GlNXXfAUBD6nQSOn8JrUQ5jxAwawEAsAL
+         NGRU9Ljip5KF7j79n1lYu6ORmknikYs1DSGxE0E1H3BnF4hrgLPep7l+w+XLJrjCwuV6
+         t4jKvo10f6+sNdMgwKlSWEsTKUmdVNaLFBf7e19PUqb7WdsGp3SCHBcqwpw17KHCdblE
+         H/N32ovPRv2AQGXIt5XK6AnE0zpWUZ1d5JNpDlQxx0LLJVuiwVnZdodFYSs5apRZgMbB
+         d8/knGX6Tl4fo71+/J4ilUO0uialCtDftk4im2ZqPHPeL5WQMIeztok6kwdwE60T5Pj/
+         rgqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=owE6/rk6CV8oIG5RVGVmceXWUUptpiMPhTe83gMGqsk=;
+        fh=AXRpHkfgyMYqHNri0s95okkWv0qEBAW7zAFeTK3zl0E=;
+        b=FQjNqIWEIwk2NPBFn6IpThJ0FtksGutVAlQAK1ZVQDOnSuWGgdsES3bxneGxuNWiUM
+         fd/U8XCsl9hqL4mbcITSaG5uhMdRjyn9wgSDJoGh00mTqHQVaDxKJjc1NU5oCyYFj3Wb
+         ZMRh1Xe/OQeGBvNaWXBsFQPFSMpBxvxvc0QP7/XjzrVwISmmpB7kxphBMD/uL6OFZh7i
+         3m37ZWcRXxy1NwpNveuh4sl6RXdjO7ZxneBElwT/t7ljCHS7QAujfcslObqoPUvB9tK+
+         9SRyHxQmnl7xhyNnL2E4yIoXFCoLQhYqEMgxeMA5A5I6qxIXJWPuQWPH4kEeLxtaaxyT
+         hEqw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1779280445; x=1779885245; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sWlv1f+/kOxg4LIib9PaORtMK1pM/yQ62L4lr83A1ew=;
-        b=BY4CKkUrUk1+WxrjlrDjTavjur4DNg4Cgwy1eXyzdDiVK2KcKuLtLRxlh3nf3AietZ
-         X7q5x4fKHDU1TJdKxS3ynw5QiTX2LzqgKDeyf1ma+0kK+2b+m8GfjbajLcGSd1It58iX
-         iWsZ0cSncfVa1jYy4ACHXOkDPjx7pNWr/sgPI0rH9KFZRN0t5knzYXbs+XGTuz90qTx7
-         SQ7DfdxXUfITRrAn2RZBLvnklAGMlN20MYwZ/32OOhY4QvNVugd5ZKdxD023jdAkuyZc
-         Z0sjKSEVWdY7HIUWK7B1IExF8qon44CGOzF5vOwKC+ZRF9vyhAHMkqkqUYwCQ7fdTaoh
-         FAMQ==
+        d=gmail.com; s=20251104; t=1779281138; x=1779885938; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=owE6/rk6CV8oIG5RVGVmceXWUUptpiMPhTe83gMGqsk=;
+        b=C59doYWfAs/TqTaHrPNRY8YydQQJwKmlmax+EbsBH6HWM0021uc5j7Za6g61yvL8AT
+         RfXRJWjtBVV7FIexpH5bvLtQAqG/Nw4rEpccNM1rK4uhFT5rGaF23xjI5A+WAMG/G9U2
+         8QekOqfRawtDifzQ/HqTNGl584CaS52ZNu6WNe34xyDNm6uJinIW9ww0VtlGZvQbxr71
+         cJDEL2lSReg4LPu1q1s9hf8NH7GIdir3xgcnrco3hOkWMTHbkqKX2G36njsALVrbFMSI
+         uMj0hh3W//RD0tyYVrUqtctbY1qY4l0t8q47R1yAW69QZWsgpoGD3QconFYCS1SaCm80
+         nzWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779280445; x=1779885245;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sWlv1f+/kOxg4LIib9PaORtMK1pM/yQ62L4lr83A1ew=;
-        b=CoOCnmNLwh3I9mopjlnr7KHGdaEHDImn9XReSwfWqE1g3uu+R6yrc+9H181+GJhowy
-         9nrIopS0bcZ/wqLvW6nMUYs9df21t7h7lxvfvq4EcCr8ORfNpT6B5lM/h5mrOFMEyfEM
-         XU5dvrM3dL9vsz4pBbFKwb69QYKzuINrjBkQ1PqbDV4y6AYthlMS9vyvX2Ni38oBM6Ne
-         ZY4a89UOBpIW0h0uKmABW9eLprmfzmgGJUSM6BIsh73uFVHBUXR0lfVdVCxyRUum4y19
-         /F9GzThMcDkStKC/oYVNEdt5ALopCtgh/v3tkDChj4pag3l0w08rsndUZbVhVm9Gj7PK
-         bVdA==
-X-Forwarded-Encrypted: i=1; AFNElJ8dI/p+/Jqdlmq3gW1b8qePoMl4HkbPzH+V3cksBYLYnOHvJStj1qYCwCfiaWcsdvs/GaV3b2WbcV6rSSlbgPE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yybtd2rZpoUKZUZnNBQNdUqIRCmm7QPcfWbh3JlnNekNmvPyhWJ
-	keWGH+1bmTYnf2GDUVR9wkyn9/cLSfQPyMZJ794s9nNCS1Y5mcven1DI61TyrW8m9dDz1XtgbaK
-	x4FWUoMpp8nGvAdOaNEnizGBG8nZAGWNslC0+gR8gnMJdRxXd/UE3lyaFhWi/l4t4ZVFm96s=
-X-Gm-Gg: Acq92OEFABu05ZTdFnVkU44VNMF4Vtb4XCNau5kRmuOSwI409WA1SSb3eU9S6/fHXZy
-	j08DIS2bDR02+ME5ZGIZ0aUok2V2je7jslPv9hPegUFObetLhIoCbT/8eZHPaLdazyOJTG3NoRT
-	Tuba9AcT9K4xfs0+mF/PVtcdCsAkG3X4ZpAyhbc3wUKodbObg6mZ1H7gaheRNhYZc9IZeMmyr7L
-	j7YOIgX+QxjXJZEB+ZGnPNjKvQkVdstUc5aZh480f2wgAxUFx/hihvsGlzEnkKcdW0N303hlKOo
-	+WJlTr6qBASj1/p8aBhCDJqXF37xHsbh6pKUOod4KGCM00D6c74K2lVOnCwlD5VY7kjMjp4ggY2
-	TIB0JLi8DieOOIgygRozbdkG14alpWEH1YhkHcQXbw6e2hO/0nWyPfgXe5uBYrmPGZwcBxKH/CQ
-	AsC3WpVfrII5avmHI87Ufv163myzI6kgtxLNc=
-X-Received: by 2002:a05:6102:50a9:b0:631:2624:e5ec with SMTP id ada2fe7eead31-63a3eb8bb94mr12999005137.16.1779280445412;
-        Wed, 20 May 2026 05:34:05 -0700 (PDT)
-X-Received: by 2002:a05:6102:50a9:b0:631:2624:e5ec with SMTP id ada2fe7eead31-63a3eb8bb94mr12998977137.16.1779280444859;
-        Wed, 20 May 2026 05:34:04 -0700 (PDT)
-Received: from umbar.lan (2001-14ba-a073-af00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a073:af00:264b:feff:fe8b:be8a])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a90f10c4fasm4905823e87.5.2026.05.20.05.34.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 05:34:03 -0700 (PDT)
-Date: Wed, 20 May 2026 15:34:02 +0300
-From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: Manivannan Sadhasivam <mani@kernel.org>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, linux-pci@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        devicetree@vger.kernel.org
-Subject: Re: [PATCH 3/3] arm64: dts: qcom: monaco-arduino-monza: Add QCA2066
- M.2 WiFi/BT support
-Message-ID: <jetl37zsfcs5kl4b7iarbngrdu4ebp7ag2cvpqvkku6tbl6r5n@qozh6n5fq7f3>
-References: <20260520-monza-wireless-v1-0-9f6942310653@oss.qualcomm.com>
- <20260520-monza-wireless-v1-3-9f6942310653@oss.qualcomm.com>
+        d=1e100.net; s=20251104; t=1779281138; x=1779885938;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=owE6/rk6CV8oIG5RVGVmceXWUUptpiMPhTe83gMGqsk=;
+        b=rNKpxOgf4WKrSBluBbZyMEkXb5w2oYASLLqTZYqfZ+wOrvNBcF0OnuYXHb1lqO9bxA
+         oJQ0Tb0b2YJspxnVzLKiKFLjM9ETxOYWlppxk8U2dQ5UeOkBabLrpn0A0GI1r7RPdIKD
+         VUl4j8UfWPcORCq4JXqCOg7D187pjlN4q6WvHjG6xtcS5tJfX2RyFyoU2uYHXlZidQrF
+         nR6HnlFtMh5X/tAr4lRk6NsGVN1sIOS/qbQAmmuy9MBjX4A0vQq6zohL95ADGt9MaHt9
+         E3mxeRA9dLzniQMOPLoVDggMyTc7o9lMF7gvw8FxfYPMV8ZUApGu1k3SkS4ueLFyD18p
+         4YUA==
+X-Forwarded-Encrypted: i=1; AFNElJ8rWGwCP63fSIhEyhkodeptJzMtyPB0XmzCwmbFOsQmVeD359J7RF1TqWaGslT3RQQMyPfL55/qoqlX2QKaAQc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZrouWUclqdwPPvaNZoU1GMLw1oAA/N6RiuIsLU+lZWSI6Fkdl
+	/cDqKM3Yf4pI4GcmdDszV7Jjm5+ad2kYMR/Q7uiTJM9NIh2LCR6WTnLs/WmMFwBn57ZcIIlI7lk
+	fxRH7Mv3ugLgCU7hh0J5eVS1b0t6WUcQ=
+X-Gm-Gg: Acq92OGfR9P/E+phX5iHLXFQ8ACxa/cH2LjPcZNmvJvuJOEUPISAviZBfGpjQ6Vb3hH
+	ja5d/gvmVnFugKVyl0ywRHGJrBZkfbKs0uPDzDk9hdiwpM/XT8K+Dr1VXegtmOc1cah1FtxawYa
+	tBYHKfjr5r8dXlXII/j0Ilrjn9jjQ6+yPeTnJwRFyASZt62zNPGHnbBc36Q6V05dCOOcxM9UDEB
+	WF7SN174hhkgFKEAowKENwUV3qpKYpxsNimm7blncjCtnhl2XlN4nz1EmYCaXt4WY4bn2NOkUCB
+	47By1u8krpggNWPSzJVj0rO7MDpsdoLTqM9ScG2adH41279uCGryn2TXSfhLEgfSridn3A==
+X-Received: by 2002:a05:690e:4290:10b0:65c:2208:8c6a with SMTP id
+ 956f58d0204a3-65e227dfa70mr18799613d50.42.1779281137588; Wed, 20 May 2026
+ 05:45:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260520-monza-wireless-v1-3-9f6942310653@oss.qualcomm.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIwMDEyMSBTYWx0ZWRfXylOOxtxnS7ae
- UN/S2ZLuvpPxgPimfiCnARKsOcY8s0K1oPbQM6bIlciSuOJ1kVr6bDUwqztG1r4cLPS2gD1vk+q
- W7j+beazobCLxrMHkMxW8uyboIhnlCw2mjJd1sJND3iSZS1QmqGhkHo2Bc5B4lmf2dO8dEfJn/a
- efn/quJNnN3cUQCzuxltDO22XpVI1VU467zIC5WX66fuk2n98TiAV/CLCnRP0AXYsuAmvS5gLq5
- MSrQRm52o4J40m3VZ4yjj5Rjt9ja7umVwULGgJhnalomhQ90vU+0xwMAo7nYdf8bKqG63YTTReV
- VlkWT1/sfely2xGGJmscf5Of7zZmJIRPleFqpFwI4HRhFWovY5/cdFqMbbB3sAl0o5Llw0aj4xq
- K3+SADum6YTIRVYJEkhLCb/K67f6zltzINQbRThKnD3PgV6LHFXxzdOW9LjdPE/5xTSbfun6lGx
- QQpO6UTB0bJLbV8isiA==
-X-Authority-Analysis: v=2.4 cv=N9cZ0W9B c=1 sm=1 tr=0 ts=6a0daa3e cx=c_pps
- a=R6oCqFB+Yf/t2GF8e0/dFg==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=eoimf2acIAo5FJnRuUoq:22 a=EUspDBNiAAAA:8
- a=STQ2a8oQ04ts6E9hehUA:9 a=CjuIK1q_8ugA:10 a=TD8TdBvy0hsOASGTdmB-:22
-X-Proofpoint-GUID: eIDXb_-XLCFBs5TWZErq_uQb2XXaQtx4
-X-Proofpoint-ORIG-GUID: eIDXb_-XLCFBs5TWZErq_uQb2XXaQtx4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-20_02,2026-05-18_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 impostorscore=0 adultscore=0 lowpriorityscore=0
- suspectscore=0 malwarescore=0 spamscore=0 phishscore=0 clxscore=1015
- bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
- definitions=main-2605200121
+References: <20260429121207.1306526-1-shuai.zhang@oss.qualcomm.com>
+ <CABBYNZLP+rBrjhdKJLE7N47Bg-g4-6E3vS3yZXvMKwYQ2rMcUA@mail.gmail.com> <cf77b8bb-5427-4d0c-b212-51947704378a@oss.qualcomm.com>
+In-Reply-To: <cf77b8bb-5427-4d0c-b212-51947704378a@oss.qualcomm.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 20 May 2026 08:45:25 -0400
+X-Gm-Features: AVHnY4LANykzFlJjohSPf1MUwg4Jd1zV9n22FmYZBRYzx2u9wrls38xdDxN_sf8
+Message-ID: <CABBYNZJpW8=KtN9_G2QOp1YqD3ZJhWGVriyLBh7jUGRFEHPyYg@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: btusb: Allow firmware re-download when
+ version matches
+To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com, 
+	wei.deng@oss.qualcomm.com, jinwang.li@oss.qualcomm.com, 
+	mengshi.wu@oss.qualcomm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 20, 2026 at 01:01:44PM +0200, Loic Poulain wrote:
-> Add support for the QCA2066 (QCNFA765) WiFi/Bluetooth module on the
-> Arduino VENTUNO Q board. The module is interfaced via LGA and is
-> compatible with the M.2 Key E.
-> 
-> Add wireless-lga-connector node using pcie-m2-e-connector binding,
-> connecting PCIe port 0 to the WiFi interface and UART10 port 3 to
-> the Bluetooth interface.
-> 
-> Add pcie@1,0 downstream port node with pciclass,0604 compatible so
-> the pci-pwrctrl driver can acquire the power sequencer and enable
-> the M.2 slot before PCIe enumeration.
-> 
-> Add nfa725b_default_state pinctrl for the W_DISABLE1/2 GPIOs
-> (gpio56/gpio55) used by the power sequencer.
-> 
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> ---
->  arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts | 65 +++++++++++++++++++++++
->  1 file changed, 65 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts b/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
-> index 93ed575817af1c5e903662c209ead629fe202ee2..6fcad77f320cb82eccb6f07244d185abfb1976d9 100644
-> --- a/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
-> +++ b/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
-> @@ -154,6 +154,39 @@ vreg_nvme: regulator-3p3-m2 {
->  		enable-active-high;
->  		startup-delay-us = <20000>;
->  	};
-> +
-> +	wireless-lga-connector {
-> +		compatible = "pcie-m2-e-connector";
+Hi Shuai,
 
-I think it was discussed that LGA can't be an actual M.2 E-key
-connector.
+On Wed, May 20, 2026 at 2:26=E2=80=AFAM Shuai Zhang
+<shuai.zhang@oss.qualcomm.com> wrote:
+>
+> Hi Luiz
+>
+> On 4/29/2026 11:17 PM, Luiz Augusto von Dentz wrote:
+> > Hi Shuai,
+> >
+> > On Wed, Apr 29, 2026 at 8:12=E2=80=AFAM Shuai Zhang
+> > <shuai.zhang@oss.qualcomm.com> wrote:
+> >> The Bluetooth host decides whether to download firmware by reading the
+> >> controller firmware download completion flag and firmware version
+> >> information.
+> >>
+> >> If a USB error occurs during the firmware download process (for exampl=
+e
+> >> due to a USB disconnect), the download is aborted immediately. An
+> >> incomplete firmware transfer does not cause the controller to set the
+> >> download completion flag, but the firmware version information may be
+> >> updated at an early stage of the download process.
+> > Hold on, if the download has been aborted then the version should be
+> > reverted, or rather just update once the firmware loading is complete,
+> > so this indicates there is a bug somewhere that needs fixing, not
+> > worked around.
+> >
+> >> In this case, after USB reconnection, the host attempts to re-download
+> >> the firmware because the download completion flag is not set. However,
+> >> since the controller reports the same firmware version as the target
+> >> firmware, the download is skipped. This ultimately results in the
+> >> firmware not being properly updated on the controller.
+> >>
+> >> This change removes the restriction that skips firmware download when
+> >> the versions are equal. It covers scenarios where the USB connection
+> >> can be disconnected at any time and ensures that firmware download can
+> >> be retriggered after USB reconnection, allowing the Bluetooth firmware
+> >> to be correctly and completely updated.
+> >>
+> >> Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+> >> ---
+> >> Changes v2:
+> >> - Update code comments and commit message to reflect the correct logic=
+.
+> >> - Align the commit title with upstream conventions.
+> >> - Link v1
+> >>    https://lore.kernel.org/all/20260108074353.1027877-1-shuai.zhang@os=
+s.qualcomm.com/
+> >> ---
+> >>   drivers/bluetooth/btusb.c | 8 +++++++-
+> >>   1 file changed, 7 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> >> index 572091e60..70abbabea 100644
+> >> --- a/drivers/bluetooth/btusb.c
+> >> +++ b/drivers/bluetooth/btusb.c
+> >> @@ -3550,7 +3550,13 @@ static int btusb_setup_qca_load_rampatch(struct=
+ hci_dev *hdev,
+> >>                      "firmware rome 0x%x build 0x%x",
+> >>                      rver_rom, rver_patch, ver_rom, ver_patch);
+> >>
+> >> -       if (rver_rom !=3D ver_rom || rver_patch <=3D ver_patch) {
+> >> +       /* Allow rampatch when the patch version equals the firmware v=
+ersion.
+> >> +        * A firmware download may be aborted by a transient USB error=
+ (e.g.
+> >> +        * disconnect) after the controller updates version info but b=
+efore
+> >> +        * completion.
+> >> +        * Allowing equal versions enables re-flashing during recovery=
+.
+> >> +        */
+> >> +       if (rver_rom !=3D ver_rom || rver_patch < ver_patch) {
+> > As I said above, this sounds more like a workaround. That said, I
+> > wonder why it would print an error if the version matches, it sounds
+> > to be that if the version matches it should just skip and consider it
+> > has been loaded already in case the actual problem is fixed by setting
+> > the new version only when loading has been completed.
+> >
+> >>                  bt_dev_err(hdev, "rampatch file version did not match=
+ with firmware");
+> >>                  err =3D -EINVAL;
+> >>                  goto done;
+> >> --
+> >> 2.34.1
+>
+> Just checking if there are any updates on this
 
-> +		vpcie3v3-supply = <&vdc_3v3>;
-> +		vpcie1v8-supply = <&vdc_1v8>;
-> +		w-disable1-gpios = <&tlmm 56 GPIO_ACTIVE_LOW>;
-> +		w-disable2-gpios = <&tlmm 55 GPIO_ACTIVE_LOW>;
-> +		pinctrl-0 = <&nfa725b_default_state>;
-> +		pinctrl-names = "default";
-> +
+I had the impression there would be more changes needed, if this not
+the case than let me know, also perhaps we should consider adding a
+Fixes tag since this might help users experiencing problem if they are
+dual booting or somehow got the wrong firmware to be loaded.
 
--- 
-With best wishes
-Dmitry
+>
+> Thanks,
+>
+> Shuai
+>
+> >
+
+
+
+--=20
+Luiz Augusto von Dentz
