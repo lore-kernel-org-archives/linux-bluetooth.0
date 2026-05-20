@@ -1,138 +1,101 @@
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC903769F7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 20:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDC133D506
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 21:28:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779310209; cv=none; b=oqii8/9ASKFaWDaTkX1Cn+dCytpMmI5DL0TAXAnlPBvxhVuVZ6Bk6J2spH/b1UGfg3VFUolF/IcSg5rBo9A41VJ1YVZfw0UZoS4RiAUM+Hnse6eOwW45OVcM5HEIMVi+87iKy6o/Hqi4HbLd+zuriqH/+FaQW9g0mhycSiWOGHA=
+	t=1779312494; cv=none; b=XhJpmaU7vBeOS+U2dpwzucWhma1N+gl1f58wB/ZlFDrQUmxJfP3k/7dbtlR1nHjLOE0/6/KSrkJ+MNXYVtJLiRSV/jziZpPBJDEk59lArvygho8tgnSeNnkYI+8AaA8xiiBIu7u1kepzhO4UB7cVKHUwqbjhLEBnf3SYuhbDeMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779310209; c=relaxed/simple;
-	bh=xY4morXltX4RqPtRrcw5r7QGtep1CcSEbYEzsn8H7jQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=k/ztVp6Em7zre/G60JAQqKi9YMAmhwScrGBJe7fMt2/e2pJ78vlSowUOGmmvgROomeQHBhE9HZpbrtr4Iy+e43EwNX/BPoYbAESCgxu1vHyGei0Q3fIvCA5XJHyHItqF1XRPdvoDck2F+DpBXu5VTsHVmRv5L8VbeS24Z883afs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qJqZcM3e; arc=none smtp.client-ip=209.85.221.172
+	s=arc-20240116; t=1779312494; c=relaxed/simple;
+	bh=dHnOxhgpDUhhrijNcb9PO6g8RInWVDOd+3jUAysZvYw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=rVS4ganA8kMDsnSmUL8wqv5LTeDx3TlpaMVtFncAxIdoTEvCM6K7B0jInuu8Vp82Aib4UMul+9vJTZ9fIXq9nhEo+BtGiJBHGcoA6y+XD+voxjDeinHhx1L56nfstKEQXJNUeJOFrdxezDPqbk0Wt9hB4FBsd1jRO2KQuWuNxVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ct+sTLKH; arc=none smtp.client-ip=74.125.82.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qJqZcM3e"
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-5751136c561so4852283e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 13:50:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ct+sTLKH"
+Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-304106b1204so1854236eec.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 14:28:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779310207; x=1779915007; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XhvkCKsqDmZR9B7mEF0SJvWzY0KRdobltrP9UrFhvDk=;
-        b=qJqZcM3ef+WY3ruDAi3+0mKWXBuOYXjLYy2eduqOmX/6L4fkF0X0F9ehyUMmc1oAgR
-         x8tUPQ8UPXWj7WeyYPXBzQDqb0r7TGKLOPD6t/zVkR2FihbZAh5IYyhWIRZyBw6PCHd7
-         Whrk1gD03wZeQ8aLEOcsHZdLy9FCD4Qwh0YceLKYwdPqqUZvN70apvc+4AeIddCK9tKo
-         lqOlmyj8OqC4uXzveJrev/Mw7mZbYwk6YYwLgxwjqh4eYmS7trxiLzrPMzlPdpKoZYN6
-         Wbi5IR2lwGJCY1wqPpHJtoArO74RiMYEwcv/x/qyoj23V8WtZ9/7ckGT4GteS/JGUeXO
-         2lDA==
+        d=gmail.com; s=20251104; t=1779312491; x=1779917291; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=dHnOxhgpDUhhrijNcb9PO6g8RInWVDOd+3jUAysZvYw=;
+        b=ct+sTLKH7258gubxdVSN3S3mlFEIsZoVJ8/QmQEwBnXfFDsKhL3CNQF1OVH4XqSItJ
+         znRyOSiiXg8Owrt5Fl5aJovLC4lqwB37d6doCSxPK8U3DL4D9+yy1CTU+BwLLp0he+X+
+         aBGYLBhdBAx5n82eOlDdQNMT0YA0L9Q8seVQRfv9nOLiGaHj1ttTXqJYUBMsJjFPsQxi
+         ezar5GkxdFtwKPwJqm2DQOCrBtZVVAUizkSxnValySD0Bdm60HU5lpDGUNMQ7vCcLeHt
+         1jSV6LDwis+OnPB5GgCnAXpHD0I95c3xnmjQeSOk1PYV0Fy+sOEuZHAa/y0cDkcHAH6M
+         7tTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779310207; x=1779915007;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1779312491; x=1779917291;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XhvkCKsqDmZR9B7mEF0SJvWzY0KRdobltrP9UrFhvDk=;
-        b=dOJ+nMq6ExBF1ajYIn3x6ORw3nUxaz0ysr7Drl9EpIXqIDszFqCVlhvlBCOx7tj3sd
-         RPV+WQjR44Y972NE2v/nHEmXE9ftJ5EHxb4Ku7vY7UOtNZ9FGXeMt0JOV63Taru70w2o
-         sfJlXviPurHv7wYetHTafsfFMcrHn+LpSgEFKAg5K7bVVDEy9TTPklfE0fbgQK1SV/hC
-         10MOo8t+12VmaCVAVsetEvNSA1OBZinFd2G5qx3ORdcJ9rGbxdBqxXubFX/B5xJvWC7G
-         RMw3EX8zj+p80jZ78xam+8eO4fa4giTmpNFjqifR5kfDHEB/bVL/6Ygb6subI/ZMbppe
-         MbGw==
-X-Gm-Message-State: AOJu0YzpFL+7+oHHl25Ok4CMUgs0DfKgL0tx2z87vy/OQs4Lcqkn3QOp
-	v8nnJMno0Qe4hlFCO9dsZR78GSk+v98fM1f/ziZEee/DUIZyOu8DP8ss5zI5SM4OBS0=
-X-Gm-Gg: Acq92OHwBqs6fgTlMNq7ZxGo17+oS1MOMBeDCmD4mpJA1l/dcQL0vi8m2IZ1y82zZy3
-	cNGVbjvZwAsMoXBM3PGsqmsCbV5fhP2P3RF+8jfwkfq1VQlCm9i2mVbv6twxWxdFbzISS5WGz54
-	1zrRnc/N+gCDyfS0HCp7k8JwDziiSkEcZpqh71Js5dJlVvMRronMGeA9UulBPr6It8aYfL/Cr+7
-	vomlvHxfCmjQ7ykHOPMLuP/t5gvkv6uLXKHE4Ea0hVbSYw7SVPnxO9XoJB/k+hbZBwlrsMB2Fl6
-	jmJ+OSfgEhAHIEu/3jgDoQb4TQlmKGyobKrUx1FcHoyWXVPttiPT6hw9OUxWv7ZKwK7E8oObbGq
-	zjq7fIiE5ONVPo4maXE/gp4NU4Hxj9KxSVqR5UaR0vd8nkB1jUanzs+CwrOU4QyczN+HN2xgXZJ
-	9IuKrlM9D6aZrYHoiTN2KQ6N3CLK9y0kHOyanCqLk6rpUW9h/TzX4sIOD1CHfayA1M+EB32j8lD
-	uuyOYr6LmerOHtYl+z7D5fSonh2
-X-Received: by 2002:a05:6122:6587:b0:575:9f5:ac57 with SMTP id 71dfb90a1353d-58411e72bcbmr31363e0c.4.1779310206904;
-        Wed, 20 May 2026 13:50:06 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5760f58feacsm13392295e0c.1.2026.05.20.13.50.05
+        bh=dHnOxhgpDUhhrijNcb9PO6g8RInWVDOd+3jUAysZvYw=;
+        b=Olc3I7rckcU/KyBqNsvYdDWcRWmYlvUue3xjihs2Dl3ErAiL5/+pImeAD+vTnEWx+8
+         KNmolQgdpQHNf4qoAWgLL77ryOm+7qi8aTW9WGEutBGZSlKgkbfpxNV0xItmv+KbWrPp
+         ziR+XfQqqsoeZNVco9AtGoKB5A8wBw7E5So7M2kMOL+Wm6LUk7I+ydOXLZXzP20p+RH0
+         RpeY9NEpo5zIFDaMKHZMOhfePQRz+bPVzjsZlSn/DD7AveWoj2pEvNezMGXXlYSYPKwi
+         baTpZofPMCyBg13bOMO7mKTVOveDLhhoBfKHSIuj6K30GZpCTo+/QaxSumZ7cx2BNNvd
+         /GDw==
+X-Gm-Message-State: AOJu0YyRHNcARMpfmdKc3Xv+swyM9ZbnHx0HNmMxpDP/Nd8TT2hPHNRS
+	r9RidXzp15oQC7GnJioNpERB4yY+Xs6eZtPhWSTN+oMDo0+GkcB0pF95FcI0yw==
+X-Gm-Gg: Acq92OETXTEPkUX11eBa3/P28C21FCCIFL29ZcfXxHSepjXjNhtkiSRi7Exi0zZYD4N
+	ApbTmiilnKpM5fA+zJ3AiHwThXl42hzQOtF5ra/1ORf9UcgbsqTiWTzvULzjoTnzK5GyB7UwabY
+	lkIO7K+4vmXjLAKWY2cNQVTtvduqA1YvvlF7gSeUtqEqljK1M084YkhZcJNtKrPUQGIXRYBIydC
+	nN2v3b2Gc0Yinsoza+xR49m7n2VZ22wEMQ+bah/FNd5c750lVcDXKYUrz3u1DLAH5gHrV9p8J96
+	aM8Xj6QNkZhBsfmz4xeC8oORH0u3zm5ct6FRhgGI3OZSlK+pjQpGjE9UbIh5kmlxUOueeB/mE/F
+	7tYgAu3KlnmJ9fsyqIFxUhWY9H6DmNfNOYDSGYytRda8dEYzsDXpVolGAS1JI9wkapaX1XzAZKV
+	lvXQG7LxM/Ex5nmlpFmOL1pI7Nq3brokoW
+X-Received: by 2002:a05:693c:2c93:b0:304:b14:ec53 with SMTP id 5a478bee46e88-3042f9a2ee5mr184807eec.27.1779312490625;
+        Wed, 20 May 2026 14:28:10 -0700 (PDT)
+Received: from [172.17.0.2] ([172.184.173.243])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-302973bcc5asm19535148eec.22.2026.05.20.14.28.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 13:50:06 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2026-05-20
-Date: Wed, 20 May 2026 16:49:58 -0400
-Message-ID: <20260520204959.2902497-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        Wed, 20 May 2026 14:28:10 -0700 (PDT)
+Message-ID: <6a0e276a.fb1bf61a.3bbfe1.5709@mx.google.com>
+Date: Wed, 20 May 2026 14:28:10 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4637644056349138752=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, oss@fourdim.xyz
+Subject: RE: Bluetooth: L2CAP: use chan timer to close channels in cleanup_listen()
+In-Reply-To: <20260520200611.3033410-1-oss@fourdim.xyz>
+References: <20260520200611.3033410-1-oss@fourdim.xyz>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The following changes since commit 375ba7484132662a4a8c7547d088fb6275c00282:
+--===============4637644056349138752==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-14 09:58:08 -0400)
+This is an automated email and please do not reply to this email.
 
-are available in the Git repository at:
+Dear Submitter,
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-20
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-for you to fetch changes up to ab1513597c6cf17cd1ad2a21e3b045421b48e022:
+----- Output -----
 
-  Bluetooth: fix UAF in l2cap_sock_cleanup_listen() vs l2cap_conn_del() (2026-05-20 16:35:47 -0400)
+error: patch failed: net/bluetooth/l2cap_sock.c:1512
+error: net/bluetooth/l2cap_sock.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
 
-----------------------------------------------------------------
-bluetooth pull request for net:
+Please resolve the issue and submit the patches again.
 
- - hci_sync: Fix not setting mask for HCI_EVT_LE_ALL_REMOTE_FEATURES_COMPLETE
- - L2CAP: fix UAF in l2cap_sock_cleanup_listen() vs l2cap_conn_del()
- - ISO: drop ISO_END frames received without prior ISO_START
- - MGMT: validate Add Extended Advertising Data length
- - bnep: Fix UAF read of dev->name
- - btmtk: fix urb->setup_packet leak in error paths
- - btintel_pcie: Fix incorrect MAC access programming
- - hci_uart: fix UAFs and race conditions in close and init paths
 
-----------------------------------------------------------------
-David Carlier (1):
-      Bluetooth: ISO: drop ISO_END frames received without prior ISO_START
+---
+Regards,
+Linux Bluetooth
 
-Jann Horn (1):
-      Bluetooth: bnep: Fix UAF read of dev->name
 
-Jiajia Liu (1):
-      Bluetooth: btmtk: fix urb->setup_packet leak in error paths
-
-Kiran K (1):
-      Bluetooth: btintel_pcie: Fix incorrect MAC access programming
-
-Luiz Augusto von Dentz (1):
-      Bluetooth: hci_sync: Fix not setting mask for HCI_EVT_LE_ALL_REMOTE_FEATURES_COMPLETE
-
-Michael Bommarito (1):
-      Bluetooth: MGMT: validate Add Extended Advertising Data length
-
-Mingyu Wang (1):
-      Bluetooth: hci_uart: fix UAFs and race conditions in close and init paths
-
-Safa Karakuş (1):
-      Bluetooth: fix UAF in l2cap_sock_cleanup_listen() vs l2cap_conn_del()
-
- drivers/bluetooth/btintel_pcie.c | 20 +++++-----------
- drivers/bluetooth/btintel_pcie.h |  3 ---
- drivers/bluetooth/btmtk.c        |  2 ++
- drivers/bluetooth/hci_ldisc.c    | 48 ++++++++++++++++++++++++++++++-------
- net/bluetooth/af_bluetooth.c     | 10 ++++++++
- net/bluetooth/bnep/core.c        |  2 +-
- net/bluetooth/hci_sync.c         |  6 ++---
- net/bluetooth/iso.c              | 14 ++++++++++-
- net/bluetooth/l2cap_sock.c       | 51 ++++++++++++++++++++++++++++++++++------
- net/bluetooth/mgmt.c             |  6 +++++
- net/bluetooth/rfcomm/sock.c      |  9 ++++++-
- net/bluetooth/sco.c              |  9 ++++++-
- 12 files changed, 141 insertions(+), 39 deletions(-)
+--===============4637644056349138752==--
