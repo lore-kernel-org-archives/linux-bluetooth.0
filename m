@@ -1,125 +1,137 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CAE34B40F;
-	Wed, 20 May 2026 16:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC69D36308D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 16:39:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779295010; cv=none; b=ANkMx2p078ucdPCl5lgDwR1pZy0IqIyUzzy87Z5i65ramLwieHbfPnYG3S02PZlZAnqfBocQW1YpuQn/TX91g++bYjniW2rLRb+XxKBnZ32v8hFyMVr9NkfJjGJ2gcD9lLG8K1jbF6Y0yOGuVTFY3ErsBXmMe/N9bdL/lsLfbkI=
+	t=1779295182; cv=none; b=B42azrCKnd3ZoYXsvf8PjhxfkY0wLkhnBNDECgq6hse9OA3jaZKy/nEWtm0k1TWe1+eBinyjrBg4wp6h+rjajQeeB+88sWuF18Dv72f63KhAmX7/CAB5VmTG4gCLFs7mwIlIhLQO/MK6uyeIrYdEOlqqUzLaJZwGC5x6Kctg57w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779295010; c=relaxed/simple;
-	bh=kU3Z+Ms0AdoYLVaiksXX0uvAM+Es8fDhjM0ntMgYaLM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ki3fVfG0U/+x4D0zsJS2e05m0PCrLyj5pWO5h97YtKQ5bQHatijl1xyOgoIaXe9Vn3F9CLVhy35z+J7mIKSUsAOzKWtTGJDvy7VOky+jMHFMvqZIaqbXXR7u7iWPT0TYmj8z5IV+fbu+uTZajRV/MqHG3meUXzOidjkAVrYbCAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=uzisrtqY; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779295182; c=relaxed/simple;
+	bh=hPgvA/x2eYXtKJFQm6D5ukNoB84emVi5Php01kVT4FE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jSstcAPhE0+4C8ehp9Ve9rW0ec+j3LtFcezx2f4YYNxdgFwxKZzyLBQxiwW4WyYjqrWP/DXpEgAM+q2VqaUbd9D+NkGzKZq7VcggbQhbcBLJhlbaLAqnpQL6S0KkV/SP1NwlCuVNWDKqcFxSMH8PA+6wU0HR3NZ3+htX++1gBIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=gK0rBskE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=u4hc2YHZ; arc=none smtp.client-ip=202.12.124.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="uzisrtqY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2AA21F00893;
-	Wed, 20 May 2026 16:36:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1779295008;
-	bh=gAbgbl4C3y//kcYRqyhxCn8H1yjr71nDuSd/voozFkQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=uzisrtqYSpaxZvL2jI8D2nQG3Qixvjx4t+h6qY5Qa2aIHx31GWagRWJHJIYv7mddQ
-	 T74EuNPDzgXl46P4qjXXQh9/V9gzMqXQDcf2tLVSP+75TEkPaCaKmheIfylrF1ddjk
-	 F2wI5irlVGwxEFuScoT1y7gYx1K05q2eXpTjwIVI=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Michal Luczaj <mhal@rbox.co>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	David Wei <dw@davidwei.uk>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Stefan Metzmacher <metze@samba.org>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 7.0 0215/1146] Bluetooth: SCO: check for codecs->num_codecs == 1 before assigning to sco_pi(sk)->codec
-Date: Wed, 20 May 2026 18:07:45 +0200
-Message-ID: <20260520162153.125623386@linuxfoundation.org>
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="gK0rBskE";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="u4hc2YHZ"
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id 5DF0E1D000AE;
+	Wed, 20 May 2026 12:39:38 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Wed, 20 May 2026 12:39:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm2; t=1779295178; x=1779381578; bh=Wn
+	1Vbk8XFpqVt9BAPZDsEQDMB0kvcvJkKMJ+fbxhKyc=; b=gK0rBskE1/DzB5lQYN
+	YgpnM2nuaTmRnQKl0i2wR8d3TV0OCjPXq5QELAtpu3xTx/8hoSMLqUoJmwO8YqMC
+	I+oe14xWBpuHQLlKJsdDo5bmSzUnfLr9xYbom2pDOK/jnuQFNAUCC1JhHbAbOh9R
+	xwIHDTtsiXMyg5EXiGd5GO0g8BV4WAMVrzdFC/y7Ut+Ff1tXRIesl1bfGsRsGuKC
+	dq3Bl0yiaB5JmfR9OyyB2S7b2xd7UExxWX6x+qzpLTZ2ME9OtQBBEG7ct/afqfj6
+	oHrnm/8ia72tscP7iTtkJwqG4IZox/QJmSV7dKtric3No5iAPjbHwu7DgcWQ7sgS
+	EmVw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1779295178; x=1779381578; bh=Wn1Vbk8XFpqVt9BAPZDsEQDMB0kv
+	cvJkKMJ+fbxhKyc=; b=u4hc2YHZgOi0OVBSNpYNwKTGvDsNjBgKwod7ZJVDYiEl
+	xix4qQ/m89B8WDZ01xikmD0SBXYg8dXkTcbFJDOifA3EcRUQG79S6fOUgoIHfwyT
+	NngbrzxmLVi3IzCMbBBoKbSGlv+MMhzun2J3rF2E0DTmEq43DDM4nlvBsIFFh9LK
+	HrfpNNgh2XWOwcLVjLVWcbiofgc/KnNwrZXiIQevHgZThYuiT5g3g895LFl+GTfV
+	P/OFK+v7hLIn8y20/aIDKmgEq40rS7eX+pQdkV11yNt0dEWXFk4mkdoR6vmo7JTJ
+	lyVZyf1luFl0Jhs5SZQB0VI2hc2oDpOybvmkXlsDKg==
+X-ME-Sender: <xms:yeMNanR28Y-a3UCe2peJX-wQSf97X66NAJSvNdhdsSKR419VHaGqJw>
+    <xme:yeMNavqNWCDyYM4JyL06jyoGprZ_oDZF6TruDWvCJm2w8ePaPLFOIvuAy_4dS6Yxi
+    M29CKF5RcAV7svJsGMgnMTnmnKhpiJ-w0NXqSECFBUq0Zxgtg7ETSU>
+X-ME-Received: <xmr:yeMNalKizaYEvAaEYOhDY81FCh_aPwvZbCABiN69K0d_P7FFKhJApqLh7_z5iwBow2-O5i4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddugeehudefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnegfrh
+    hlucfvnfffucdlfeehmdenucfjughrpefhvfevufffkffogggtgfesthekredtredtjeen
+    ucfhrhhomhepufhifigvihcukghhrghnghcuoehoshhssehfohhurhguihhmrdighiiiqe
+    enucggtffrrghtthgvrhhnpeeuhedviefhfeektdeugfejhfekieeluedutdekudfhgfdv
+    gfegleeikefhjeeiteenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsth
+    gvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepohhsshesfhhouhhrughi
+    mhdrgiihiidpnhgspghrtghpthhtohephedpmhhouggvpehsmhhtphhouhhtpdhrtghpth
+    htohepmhgrrhgtvghlsehhohhlthhmrghnnhdrohhrghdprhgtphhtthhopehluhhiiidr
+    uggvnhhtiiesghhmrghilhdrtghomhdprhgtphhtthhopehlihhnuhigqdgslhhuvghtoh
+    hothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshgrfhgrrdhkrghr
+    rghkuhhssehsvggtuhhnnhhigidrtghomhdprhgtphhtthhopehoshhssehfohhurhguih
+    hmrdighiii
+X-ME-Proxy: <xmx:yeMNairznAoPuY9y6aTAN5hJuqwedXLVseoMYI8cZNlF1sDWNUnzbQ>
+    <xmx:yeMNatwBGVOrqqte8wentYuNZwGbMmti8edyn1hBIY0vihE-L2ycew>
+    <xmx:yeMNamPMHVyxLQm-0cho5iaUQ8EzP4f6ISBdIJ1EgwFNrCeDxZve3Q>
+    <xmx:yeMNai5Azpm-hw88X3IZZdr-BJMS-yrAgCYQw1f10Vwj8d58WdjQkA>
+    <xmx:yuMNapD0BFP-zBuTbRshvpt1X17YGJ3Hihin18bP7zajoosmdCdmh-cB>
+Feedback-ID: if72e4b10:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 20 May 2026 12:39:37 -0400 (EDT)
+From: Siwei Zhang <oss@fourdim.xyz>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	=?UTF-8?q?Safa=20Karaku=C5=9F?= <safa.karakus@secunnix.com>,
+	Siwei Zhang <oss@fourdim.xyz>
+Subject: [PATCH v7 RESEND 0/1] Bluetooth: L2CAP: Fix slab-use-after-free in l2cap_sock_cleanup_listen()
+Date: Wed, 20 May 2026 12:38:16 -0400
+Message-ID: <20260520163859.2859782-1-oss@fourdim.xyz>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260520162148.390695140@linuxfoundation.org>
-References: <20260520162148.390695140@linuxfoundation.org>
-User-Agent: quilt/0.69
-X-stable: review
-X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-7.0-stable review patch.  If anyone has any objections, please let me know.
+Hi Bluetooth maintainers,
 
-------------------
+A public patch covering the same UAF in l2cap_sock_cleanup_listen() was posted to linux-bluetooth on April 28 
+by Safa Karakuş. v4 is here:
 
-From: Stefan Metzmacher <metze@samba.org>
+https://lore.kernel.org/linux-bluetooth/AS8P250MB079109F82C16BEDC4F9FE584EB372@AS8P250MB0791.EURP250.PROD.OUTLOOK.COM/
 
-[ Upstream commit 4e10a9ebbf081c16517cdd9366ac618bf38d7d0c ]
+I thanks for Safa's report and patch. I already reported the same issue privately to the maintainers in 
+April 11th. The public patch breaks the embargo and I would like to resend my patch here.
 
-copy_struct_from_sockptr() fill 'buffer' in
-sco_sock_setsockopt() with zeros, so there's no
-real problem.
+Safa's v4 closes the sk-lifetime hole (sock_hold inside bt_accept_dequeue) but does not take conn->lock around
+l2cap_chan_close, so the conn->chan_l list-corruption race in my report is still open after it.
 
-But it actually looks strange to do this,
-without checking all of codecs->codecs[0]
-really comes from userspace:
+My patch closes both: it drops the parent sk_lock, acquires conn->lock → chan->lock in the established order
+to serialize the chan_l mutation, and re-takes the parent sk_lock before returning.
 
-  sco_pi(sk)->codec = codecs->codecs[0];
+Crash stack and C reproducers are available upon request, only for the maintainers.
 
-As only optlen < sizeof(struct bt_codecs) is checked
-and codecs->num_codecs is not checked against != 1,
-but only <= 1, and the space for the additional struct bt_codec
-is not checked.
+Maintainers can also refer to the email thread [Bug] KASAN: slab-use-after-free Read in l2cap_security_cfm
+sent to security@kernel.org on April 11th for more details.
 
-Note I don't understand bluetooth and I didn't do any runtime
-tests with this! I just found it when debugging a problem
-in copy_struct_from_sockptr().
+Detailed Timeline:
 
-I just added this to check the size is as expected:
+April 11th: I privately reported the issue to the maintainers and security@kernel.org
+April 12th: Patch v1
+April 13th: Patch v2
+April 13th: Patch v3
+April 14th: Patch v4
+April 15th: Patch v5
+May 2nd: Patch v6
+May 2nd: Patch v7
+May 20th: Resend v7 with a cover letter
 
-  BUILD_BUG_ON(struct_size(codecs, codecs, 0) != 1);
-  BUILD_BUG_ON(struct_size(codecs, codecs, 1) != 8);
+Best,
+Siwei
 
-And made sure it still compiles using this:
+Siwei Zhang (1):
+  Bluetooth: L2CAP: Fix slab-use-after-free in
+    l2cap_sock_cleanup_listen()
 
-  make CF=-D__CHECK_ENDIAN__ W=1ce C=1 net/bluetooth/sco.o
+ net/bluetooth/l2cap_sock.c | 57 ++++++++++++++++++++++++++++++++------
+ 1 file changed, 49 insertions(+), 8 deletions(-)
 
-Fixes: 3e643e4efa1e ("Bluetooth: Improve setsockopt() handling of malformed user input")
-Cc: Michal Luczaj <mhal@rbox.co>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: David Wei <dw@davidwei.uk>
-Cc: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/bluetooth/sco.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index b84587811ef4f..18826d4b9c0bf 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -1045,7 +1045,8 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
- 
- 		codecs = (void *)buffer;
- 
--		if (codecs->num_codecs > 1) {
-+		if (codecs->num_codecs != 1 ||
-+		    optlen < struct_size(codecs, codecs, codecs->num_codecs)) {
- 			hci_dev_put(hdev);
- 			err = -EINVAL;
- 			break;
 -- 
-2.53.0
-
-
+2.54.0
 
