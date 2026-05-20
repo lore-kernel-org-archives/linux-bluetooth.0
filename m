@@ -1,143 +1,194 @@
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985653491C4
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 19:32:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779305543; cv=none; b=i67ZzfCMVx5g4A/JyOKzxM9kxb+62fhiIcwI87Tuj1t8LwQzqP9Mdc4QFjjnttSn37JL+UdvFnzTjh9bUaTmGokK6tfM3cO8DMwcYtnD6okoQd3J0t/ICdiuhvdQi+y8BI6E4hsA+EShQIdZHMXDyQSwyfDNXXt58XT2AQtuPtc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779305543; c=relaxed/simple;
-	bh=fE7L5X0OAZJPu0MR4qi275DCqHXUYbK31o+O4PycIek=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6F52C11FE
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 19:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779306038; cv=pass; b=mMXlAZoIuDUwxuvmrG56DnCpELlawahnMbyViYSQirt07IK/P64pA7YzlWT378Yr2QeaZig0zg0Eoi/PEnjINBmetgg87AaOPPCqr48EednJT5zMKRv+HJDB0TAbfF4kJ991gQ+7X5yeRpQtHgibQZiioXiw2Z09HdmS1q0C3Qs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779306038; c=relaxed/simple;
+	bh=u7XYhJb+VA0D3mcaCsVMD9Zazn+oLvqmz8k+X2poJvY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BPujS+CtSIdYd7DeU1+z09EV4Uw7h/NvP2wmN5PDLwIRK7e+bI8k5qvnQLoWJKGz3jzpK6/cWBK0UJ+Pyc43MhofVvC3/mIr7cIZoWFNt6rwqDrTxZ6wKzOjEu7MHL0X38AloqJhmJ2MURA72zf3gF7ki1wTlR92Q2nbl6CPyIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=PnGibpC6; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	 To:Cc:Content-Type; b=rEcWGDBxQqa2gszFRvpWn4lfDS4mz13LtGxP/0Q1hgX8vJAIljWe+5qGzQczNuQunX3N+qCuhvUrNBlRwyOgLlGOuV9ofxVYw6j96/zRfcNy+pelo/pG6iLAupuww+pH9vnuP2vfRtMC2E8DncSO+yp4JtZQdEh3Fi9SNrkkeqQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eBEPgd01; arc=pass smtp.client-ip=74.125.224.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="PnGibpC6"
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6870f904c6bso2250057a12.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 12:32:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eBEPgd01"
+Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-65e39d1dd38so4808795d50.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 12:40:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779306036; cv=none;
+        d=google.com; s=arc-20240605;
+        b=MxoCK/I86OJHpFFnP9InBTwwHajAr4ei+kldLFvEGpQ8AXkfVJeayG2GPfd4HmJf2r
+         GeNKuPuh8SEO3Z1l77AUj+dkW7GpMdNVhq3P+gtKMhu0ee1CCLwBx7XJAuczfXuPD6AX
+         E5guWfE9mewVADOT8/a966v2t5BIbuMaELfKadsYgmLmlEW39nMwCrURK92szeIj3Fpe
+         B2qDjTF6no/EMogVeY/OpxRpZXupmgPi//oOX5fv+nICoAeoBnlLuMqkQrv1AH/vxRMv
+         k0RZpfAfpHMdMaX01YGjMKuD48TjjzHsp19hMWGsA6IRnoJDWKgQfziDl5mGT+jglj42
+         yc/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=bWGsRdr3qURko4P+F4or7l1V0AQnNVM7Qh8BOhBeOQg=;
+        fh=xxWjb0GfXkzqM0SlXyEXHwpLk5Z2lCPjM2GQQogQOl8=;
+        b=FIQgNrNyxaDxKdEp68hxFDU/SaP/2dZrxooGOUGqj6vzzDDBA7Jah24EpW26+uZILr
+         v0wHOK0hR/mqWwH7oaPVCkNyYFUuyJOFO8MzST7NhQSFL4LaQvUA38VgJ/tE8aV+NiYe
+         lWXDok4Dimee12o5NlMJhXOfwqv4+r5k05IlQIT+rhWuK2MfWRxyzve4CH8ghqABgJ+J
+         mj6cdOOtWyhthKXICdGYUYsEWVF5PhpcKZb/M9nw4yiqd/zcaJ4FuBkxsJqNkN9aG79r
+         G5T9L5+GxJ7q8nKmVePvG4268/nGgBHtlIkJzg8h0+bmyZjdQ5I8zMdCR/rdgl2ywWeQ
+         WYbQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1779305540; x=1779910340; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XtsLxXbuubW9aHbvOjPZig1kaSvDhEBypwJASxFDBgw=;
-        b=PnGibpC6rUadOiLRkvAXF6JgM6bQwoQyo6ys6Q2CJacxAU73u+6XZ0yoP+Cjb61/li
-         BfqnfLjWnBd4PsT1fMwJ2v4rQGmAeNp+gPIUuo+5tiRgM3j6WvHjyPemyqxdvm8PXT3R
-         7BULDtbzf7AL9/WnfKvWQ66RdEzaVGZnOZF8g=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779305540; x=1779910340;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1779306036; x=1779910836; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XtsLxXbuubW9aHbvOjPZig1kaSvDhEBypwJASxFDBgw=;
-        b=hfDEUI1k4+YgeS4CZ3gllLb2ivZlcY4TBR985Be8x4MhDKtkDuTzsU3dyV9vQnWyf2
-         7CakiiedbiOm5L57hu/hzhRz4h/GXJrT5upST3/apWf62SRoPcqeUZqFQ4bRnaMKYF89
-         caF87FrUJoqcXdwcvQOlzY/ypX/bRwMRW8OMjcs0ZSWDSVOas7Jzd+Zy0UMmSfVmwO9V
-         SahSV1ptd7cw3J9v4OgZBNEfl2I7wz+afvhinX4BI4vtqMdjJ6phxHbTqgOGlUOtIBrG
-         VfDqFdwT8U2nln1TdLfYooTpsOnn2lnBsCT42hBaxvUNk/1D9RmRiq3x+e2KZVVAjBBl
-         Ny3w==
-X-Forwarded-Encrypted: i=1; AFNElJ8oJahapjgifaNUaohiDyT1nh0mSniR8kTF9bgqQBEJw7+M4cIHwduVczmMjmsapZ+UQ0fa4qgp7Ww3JSGzFok=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2+7J7g7aTvkB5llQ3ubW3xAsYK1289/bNNzqx6TrrSf5b0+K8
-	3uIYJKYTM6W8I3wnGpLyHj0kEybXSE5a12cFxWwa0nOC/NTSaVlhpfuzdudp0x3w56aTo1Os9xC
-	YmuToeyYIKw==
-X-Gm-Gg: Acq92OHuio2IamY2rmgVMbmFAvHHb01DCdbJ6tr8pIGHADjp4jKPYa3LFBz0A+FUHS+
-	OflaYh2CSHmYbbzVdx2w4tzh78Xe8ab03j3jLevuAGM9vB/CPBpXvVCbDidPpIgxvmRFjlal6hE
-	+Zu1//CJ4TXZwK21YGBxa6JxncFJZFCe1kgiuc6vq/X3ytFEQNnHLVACnEEITHFcfQMUWPylIN7
-	NPyZoTcTyD0IJ32kG6eyKZfoUxkiuli6xYE81auMUg9UdmB7dmLoxHiHfjfi+/1yXp4rgIXnfkJ
-	08enpEQSmFAnSVTmBTThHXf0JE1AOAd3fzdKz4GvRNfpRy2OK1LjShC+J8ciXa8uP/FMKh4h+kM
-	9wuXQ7zYjR3lw1wOAlNtdslS/QF3g+WKVwT6kTloGBEExDMsB72cO+q2DfLJjURqQyerrA1vIqa
-	ACu6bUbYkYjbnWhB/DqlE9TmZRbbFdwQY1YzPJr2T01bmiZjjD8mhmgiO+tDtnJk1VilApV9ao
-X-Received: by 2002:a17:907:94cd:b0:bd3:7c5d:c712 with SMTP id a640c23a62f3a-bd5177f071emr1306197466b.7.1779305539654;
-        Wed, 20 May 2026 12:32:19 -0700 (PDT)
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com. [209.85.208.46])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bd4f4c2a68dsm911621966b.18.2026.05.20.12.32.18
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 May 2026 12:32:18 -0700 (PDT)
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-67179ed133dso6360174a12.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 12:32:18 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8Q+bGD1zs558wlBzTirWfy22/ix/E8fch6qvJErP9OXRyDcmZtf+cklWlH/FZWGzY3wjKhbH+DfwPY8OWxkB4=@vger.kernel.org
-X-Received: by 2002:a17:907:8305:b0:bd5:2ed4:4ef6 with SMTP id
- a640c23a62f3a-bd52ed45a11mr891164366b.19.1779305538567; Wed, 20 May 2026
- 12:32:18 -0700 (PDT)
+        bh=bWGsRdr3qURko4P+F4or7l1V0AQnNVM7Qh8BOhBeOQg=;
+        b=eBEPgd01fEO72RPQmgXVqdDUqoFkEVBjUcfeMwjBPbv0Q7OI8jaRlIf6AsM+ligBE8
+         hVu2B54teqqCRYJdSSkFSRK+Sj40HNLuUUTJgm65K5OIjx5W7o4vujM/WHJdw1bPyVRf
+         5UcCzyfBsBTmltnh8RX25mxUKXR4Jrai110LalMB2c4pIY9wXfBe4iYfcUe6I9gH+BAB
+         5pKkLPuk/TV/UKdHaLmRLRB5jZ9qRRO/1eYL1+d/hm7Jbl0Duy17Nnd1vuYELeefxrPp
+         LN6ekG/C6bZNqU7mGV9DZbutw7vFZD9uFv+bDZgd1ZSppkCR/6iAsyO/x6wo73n2M2zV
+         l0/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779306036; x=1779910836;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=bWGsRdr3qURko4P+F4or7l1V0AQnNVM7Qh8BOhBeOQg=;
+        b=NGVSWr7uCmI4JiWO8JRBZq7oyPZXKDpnxbizMOb1iISJuMj5t31z9LO8vpv/PkVrkI
+         E8sTPLlGJz3A/EG1C2KRW2L1TGMSNRarEqLOjg5OGn+rt6mw52njnYqTj3CUg6iivWNg
+         h2r1ZkqWT3Akqb5JT2KkeRQgx2B1W4XCG2EY7pxjzZnjqSv5SumoY6VXBWxxs9ei8R2D
+         2v9m4KLfC1SpxBNGp2rKIniQmAIDMVGZfpnOn4CNkaZ6etfL9oA40HvtmIcvyhHPwgSO
+         +Qe3/O+3LBBSRRKRnQBiWG8qFRaZXqfsxNdcJmltPtdtIiT6JPey/DwqWnDK6m2HV1+1
+         OjtQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/KZ2mtV5We+JSecT5JJLYmibzMOYlPAR/dfWXfwDoZ2L+U2VlsFLK4n4iUCGiVll6bfHItu/AUJ2KF0y2Nbo0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeU8Kl6dJk8wtzgwvv+ZThDN3bsBShwRAWMI7uPHclD6hGQWR1
+	974OPZ23ju4tORNlgR4e8KU8ssvAYsbvEe9bX0tTcex10DcXIKF3w+RtnunSDFEuDEVfRLpU3u3
+	yAl4FtIAWvi7+JJQpTTHLW43hPj9OH+o=
+X-Gm-Gg: Acq92OESO0E365s2ypR4n3uNpT4G+zaIFSncgB1Mzf2f4H6BgM9SJ/dteSDKLs2dZiN
+	R/pYLWpndhBL4fwnjoIRwTwKHPhyHt/kc/ILBeg4YG5Y1DvHvZzX06D9dVCsG9RsmGQuP73WvIU
+	0l3YvQCZkGt/BiMt068HMb1LIltjwuaupo/AXBT4x6xee8QcdQPCkJB3fgsucuUdwai6HnNI7+u
+	AAvnT6EGRpE07tuOew7Ir9Pg7HqNd1xsWPR3vv1dzWQmiV3vrupWOjxfNNKzCqgNYFmj36lcoAV
+	hl81kFQ0uPVG8wvFS6ZGbGyzqDr8nUf6Cfuy1PobtSjZfh3MPe9dPrPglJQzO9sh3hFHrA==
+X-Received: by 2002:a05:690e:1699:b0:651:bc7e:467a with SMTP id
+ 956f58d0204a3-65e22893fdemr25269832d50.60.1779306036131; Wed, 20 May 2026
+ 12:40:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <4946f5f3-b7e2-4949-89f7-6427015027c6@leemhuis.info>
- <2026051954-revision-sierra-6bb4@gregkh> <eb5301f9-3133-4fe3-b358-61f14d1ffa5b@leemhuis.info>
- <2026051909-impurity-nemesis-2f65@gregkh> <CABBYNZKKbTXc-okp9P2OncMYXHX9C1XC+pRC7XWOhv-8nPNZ5A@mail.gmail.com>
- <2026051942-uproar-drainpipe-6370@gregkh> <CABBYNZKzWgL3nmeA=CtN9s80LRyDiJ97aQXgvfSm9vYUBw_SpA@mail.gmail.com>
- <e666c332-e2aa-4525-a208-a4a08742d2e0@augustwikerfors.se> <2026052026-barber-espresso-1d9a@gregkh>
- <CABBYNZJ4woc+unpYN6_dzMLtxhFVUd5+ccv2+EQbDMkYuXQ12A@mail.gmail.com>
- <2026052047-silica-grub-0bb2@gregkh> <CABBYNZKnrqHyASMOah795i9eteY7S5AfN3tCWssSRgqBXZwRMw@mail.gmail.com>
-In-Reply-To: <CABBYNZKnrqHyASMOah795i9eteY7S5AfN3tCWssSRgqBXZwRMw@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 20 May 2026 14:32:01 -0500
-X-Gmail-Original-Message-ID: <CAHk-=whwq2_iaf7pTuzVXEcJmng_exwae_bKtgSDdm4BQivGHg@mail.gmail.com>
-X-Gm-Features: AVHnY4JbF0smfoYDE8sbuuYGNoDoNmD1Smk1nthlg9vTbrAZFGd72HXyofmB_k8
-Message-ID: <CAHk-=whwq2_iaf7pTuzVXEcJmng_exwae_bKtgSDdm4BQivGHg@mail.gmail.com>
-Subject: Re: [GIT PULL] bluetooth 2026-05-14
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, August Wikerfors <git@augustwikerfors.se>, 
-	Thorsten Leemhuis <regressions@leemhuis.info>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, Sasha Levin <sashal@kernel.org>, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net, 
-	kuba@kernel.org, Linux kernel regressions list <regressions@lists.linux.dev>
+References: <20260520163859.2859782-1-oss@fourdim.xyz> <CABBYNZ+6bP78+_m_ehhif3xCXxn2ZLQE2q5O3X_03mU8=_T5uA@mail.gmail.com>
+ <ab53262f-329d-4c00-9575-8b3a8e96093a@app.fastmail.com>
+In-Reply-To: <ab53262f-329d-4c00-9575-8b3a8e96093a@app.fastmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 20 May 2026 15:40:24 -0400
+X-Gm-Features: AVHnY4LrhV6I5xjQIb3LICrPNybzZ-aGJgWEG6xICk8MiOPY6B7Ufq3NUGjT26A
+Message-ID: <CABBYNZLWU4gzaLytLBD7V4fnFWyjXB4312tB2q00VRDTT6jb7g@mail.gmail.com>
+Subject: Re: [PATCH v7 RESEND 0/1] Bluetooth: L2CAP: Fix slab-use-after-free
+ in l2cap_sock_cleanup_listen()
+To: Siwei Zhang <oss@fourdim.xyz>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	=?UTF-8?Q?Safa_Karaku=C5=9F?= <safa.karakus@secunnix.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 20 May 2026 at 08:53, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+Hi Siwei,
+
+On Wed, May 20, 2026 at 2:57=E2=80=AFPM Siwei Zhang <oss@fourdim.xyz> wrote=
+:
 >
+> Hi Luiz,
+>
+> On Wed, May 20, 2026, at 2:26 PM, Luiz Augusto von Dentz wrote:
+> > Hi Siwei,
 > >
-> > Just never rebase any public tree please.
+> > On Wed, May 20, 2026 at 12:39=E2=80=AFPM Siwei Zhang <oss@fourdim.xyz> =
+wrote:
+> >>
+> >> Hi Bluetooth maintainers,
+> >>
+> >> A public patch covering the same UAF in l2cap_sock_cleanup_listen() wa=
+s posted to linux-bluetooth on April 28
+> >> by Safa Karaku=C5=9F. v4 is here:
+> >>
+> >> https://lore.kernel.org/linux-bluetooth/AS8P250MB079109F82C16BEDC4F9FE=
+584EB372@AS8P250MB0791.EURP250.PROD.OUTLOOK.COM/
+> >>
+> >> I thanks for Safa's report and patch. I already reported the same issu=
+e privately to the maintainers in
+> >> April 11th. The public patch breaks the embargo and I would like to re=
+send my patch here.
+> >>
+> >> Safa's v4 closes the sk-lifetime hole (sock_hold inside bt_accept_dequ=
+eue) but does not take conn->lock around
+> >> l2cap_chan_close, so the conn->chan_l list-corruption race in my repor=
+t is still open after it.
+> >
+> > Are your changes on top of Safa's though? That seems a lot cleaner to b=
+e honest.
+> >
 >
-> I guess the alternative is to do merges, right?
+> My patch is not on the top of Safa's. The diff looks quite different.
+> I reported both the sk-lifetime UAF and the conn->chan_l list-corruption =
+race
+> privately to the maintainers on April 11th. And patch shortly on April 12=
+th.
 
-No. Back-merges are bad too, unless they have a really damn solid
-reason for them, and some "keep up with other peoples work" is not
-that.
+I'm afraid it doesn't matter if you reported first or not, Safa's fix
+is much easier to understand. However, there still seems to be an
+issue of calling l2cap_chan_del without holding the conn->lock.
 
-The primary model should be that you care about your own work, and
-make sure that that is as stable as possible. Do *NOT* try to chase
-other people's work. Not with merges, not with rebases.
+> >> My patch closes both: it drops the parent sk_lock, acquires conn->lock=
+ =E2=86=92 chan->lock in the established order
+> >> to serialize the chan_l mutation, and re-takes the parent sk_lock befo=
+re returning.
+> >
+> > I rather have each issue handled separately though.
+> >
+>
+> I am happy to handle that separately.
+>
+> Could I get a Reported-by on Safa's patch since I reported the underlying=
+ issue before the public post?
+>
+> Reported-by: Siwei Zhang <oss@fourdim.xyz>
 
-Then when your branch is all done and ready, you ask upstream (in your
-case typically the networking tree) to pull it.
+You can do it yourself, just respond to the thread. Bonus points if
+you add a Tested-by if it actually fixes part of the problem reported.
 
-Some people at that point *jump* to the point where upstream merged from them.
+> I'll send the conn->lock patch (drains accept queue to local list, drops =
+parent sk_lock, acquires conn->lock -> chan_lock in
+> established order) as another patch shortly.
 
-Or another fairly common model is to have just started another branch
-for future work. Keeping independent development branches for
-different features is also a good thing to strive for, because it
-makes it easier for different people to work on different branches
-without messing with each other, but it also means that one feature
-being delayed (due to unexpected problems or whatever) doesn't affect
-other branches. And if done well, it also means that you wouldn't even
-care about the whole "point where upstream merged", because your other
-work simply isn't dependent on things like that.
+Don't quite like that solution though, we should be dropping locks we
+didn't acquire on the same scope, besides it seem that was doing a lot
+of malabarism, perhaps we could just schedule l2cap_chan_timeout with
+something like this:
 
-So there are many ways to deal with them, but rebasing and merging are
-typically the worst ones that should be avoided unless active problems
-happen.
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 4ed745a9c2cf..413b1c63602a 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1529,8 +1529,11 @@ static void l2cap_sock_cleanup_listen(struct
+sock *parent)
+                       state_to_string(chan->state));
 
-Sometimes you have to rebase because of a mistake. Sometimes you need
-to do back-merges. But you should damn well have *reasons* for both
-that aren't "that's just how we work".
+                l2cap_chan_lock(chan);
+-               __clear_chan_timer(chan);
+-               l2cap_chan_close(chan, ECONNRESET);
++               /* Since we cannot call l2cap_chan_close() without
++                * chan->conn, schedule its timer to trigger the close and
++                * cleanup of this channel.
++                */
++               __set_chan_timer(chan, 0);
+                /* l2cap_conn_del() may already have killed this socket
+                 * (it sets SOCK_DEAD); skip the duplicate to avoid a
+                 * double sock_put()/l2cap_chan_put().
 
-Back-merges in particular need to not just be "merge upstream". They
-need a commit message that explains *why* you're merging upstream (and
-not merge some random point, the same way you shouldn't start
-development at some random point of questionable stability).
-
-Rebasing is "invisible" except for the mess it leaves with random
-commit ids (and the problems it can cause for anybody who happened to
-use an older version). So you can't explain it, but it should then be
-explained to upstream why you ask them to pull recent changes that
-clearly cannot have been tested in that form.
-
-                Linus
+Or perhaps it needs to be conditional to having chan->conn since that
+indicates l2cap_chan_del has not run yet, making it safe to use
+__set_chan_timer.
