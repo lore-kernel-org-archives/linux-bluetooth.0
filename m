@@ -1,137 +1,203 @@
-Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC69D36308D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 16:39:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C0636404E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 16:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779295182; cv=none; b=B42azrCKnd3ZoYXsvf8PjhxfkY0wLkhnBNDECgq6hse9OA3jaZKy/nEWtm0k1TWe1+eBinyjrBg4wp6h+rjajQeeB+88sWuF18Dv72f63KhAmX7/CAB5VmTG4gCLFs7mwIlIhLQO/MK6uyeIrYdEOlqqUzLaJZwGC5x6Kctg57w=
+	t=1779295187; cv=none; b=g4mKfhhj+GMDjjdQf+sqFLqXhWEtHUzwDbY1xUDZfRhTJ//9JV7IQ5ZdrN34j+9LZjnqPapyRV7onY55BMhYR72dvcnhScPh+nH3cLcMdJKhLoPwF4MBP7dW4UtVeqF1DYggt8Lp2/io11twygAqc5ZoqbTBS/9nLA/NRtJ2Bds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779295182; c=relaxed/simple;
-	bh=hPgvA/x2eYXtKJFQm6D5ukNoB84emVi5Php01kVT4FE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jSstcAPhE0+4C8ehp9Ve9rW0ec+j3LtFcezx2f4YYNxdgFwxKZzyLBQxiwW4WyYjqrWP/DXpEgAM+q2VqaUbd9D+NkGzKZq7VcggbQhbcBLJhlbaLAqnpQL6S0KkV/SP1NwlCuVNWDKqcFxSMH8PA+6wU0HR3NZ3+htX++1gBIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=gK0rBskE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=u4hc2YHZ; arc=none smtp.client-ip=202.12.124.147
+	s=arc-20240116; t=1779295187; c=relaxed/simple;
+	bh=5rk21phLLOn18anFyujMULAQLbEP84WvcUFHAsaKn4M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=CRBB3GJQjgSpmZ0VtSGVHHzPJOFBQ59fMG8OcXZmN8XbNMevbfYGEq7xsvVAY2TnhJq8g1kjljuCa0NzOgIHGFy8X8RssPl5WEwWm08fDco9AyZnBTlOmvDR+h/YzlV10LsJ4VsDNPXcIdgjkcUg5uOg8F/c8+nh3cYfnNUmt/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=oR9gdxBu; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QX0QqCW7; arc=none smtp.client-ip=202.12.124.157
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="gK0rBskE";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="u4hc2YHZ"
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfout.stl.internal (Postfix) with ESMTP id 5DF0E1D000AE;
-	Wed, 20 May 2026 12:39:38 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="oR9gdxBu";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QX0QqCW7"
+Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 42FAD7A0079;
+	Wed, 20 May 2026 12:39:42 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Wed, 20 May 2026 12:39:38 -0400
+  by phl-compute-07.internal (MEProxy); Wed, 20 May 2026 12:39:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:message-id:mime-version:reply-to
-	:subject:subject:to:to; s=fm2; t=1779295178; x=1779381578; bh=Wn
-	1Vbk8XFpqVt9BAPZDsEQDMB0kvcvJkKMJ+fbxhKyc=; b=gK0rBskE1/DzB5lQYN
-	YgpnM2nuaTmRnQKl0i2wR8d3TV0OCjPXq5QELAtpu3xTx/8hoSMLqUoJmwO8YqMC
-	I+oe14xWBpuHQLlKJsdDo5bmSzUnfLr9xYbom2pDOK/jnuQFNAUCC1JhHbAbOh9R
-	xwIHDTtsiXMyg5EXiGd5GO0g8BV4WAMVrzdFC/y7Ut+Ff1tXRIesl1bfGsRsGuKC
-	dq3Bl0yiaB5JmfR9OyyB2S7b2xd7UExxWX6x+qzpLTZ2ME9OtQBBEG7ct/afqfj6
-	oHrnm/8ia72tscP7iTtkJwqG4IZox/QJmSV7dKtric3No5iAPjbHwu7DgcWQ7sgS
-	EmVw==
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1779295182; x=
+	1779381582; bh=qvSDCxybMlqEBLI6e8lWqkcJBRDlRQCzOmJPg/WXleg=; b=o
+	R9gdxBued7lc7YfDsrzAsHwBRVy0T7zPWeelgLJtiYEbnuLKo21OYSS0izRQNbon
+	BFFbVwRMqziD8IGhVU9SaOfwVostYkre0rrwNcQpC81wmaHMBclVM613aUOlnQKw
+	rrA300jcATZWUpiYwc413O//2XQspzWPnT/MirjorWvnJdNyD6gGWAsBRpsHc5mF
+	qE9kmc/f2JR+yNzuNEfhm+CQMXdSJrSDaa2iKxi4drwbP1dwj1OQCK+gx4NE8Pmr
+	P25M2G4NECCPpHabCcVILBiY19dpMJ98nJ+h5DX3jn6huinbJ2UhOP9cHMA9FdkH
+	uUVeTXf2hfu9NpKa0n5VQ==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1779295178; x=1779381578; bh=Wn1Vbk8XFpqVt9BAPZDsEQDMB0kv
-	cvJkKMJ+fbxhKyc=; b=u4hc2YHZgOi0OVBSNpYNwKTGvDsNjBgKwod7ZJVDYiEl
-	xix4qQ/m89B8WDZ01xikmD0SBXYg8dXkTcbFJDOifA3EcRUQG79S6fOUgoIHfwyT
-	NngbrzxmLVi3IzCMbBBoKbSGlv+MMhzun2J3rF2E0DTmEq43DDM4nlvBsIFFh9LK
-	HrfpNNgh2XWOwcLVjLVWcbiofgc/KnNwrZXiIQevHgZThYuiT5g3g895LFl+GTfV
-	P/OFK+v7hLIn8y20/aIDKmgEq40rS7eX+pQdkV11yNt0dEWXFk4mkdoR6vmo7JTJ
-	lyVZyf1luFl0Jhs5SZQB0VI2hc2oDpOybvmkXlsDKg==
-X-ME-Sender: <xms:yeMNanR28Y-a3UCe2peJX-wQSf97X66NAJSvNdhdsSKR419VHaGqJw>
-    <xme:yeMNavqNWCDyYM4JyL06jyoGprZ_oDZF6TruDWvCJm2w8ePaPLFOIvuAy_4dS6Yxi
-    M29CKF5RcAV7svJsGMgnMTnmnKhpiJ-w0NXqSECFBUq0Zxgtg7ETSU>
-X-ME-Received: <xmr:yeMNalKizaYEvAaEYOhDY81FCh_aPwvZbCABiN69K0d_P7FFKhJApqLh7_z5iwBow2-O5i4>
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm3; t=1779295182; x=1779381582; bh=q
+	vSDCxybMlqEBLI6e8lWqkcJBRDlRQCzOmJPg/WXleg=; b=QX0QqCW7h8p4MT7Nz
+	VbaDoKZP3OMroJAFUDt8wiRs5vYZBpnUtZnpAktu+iF8jlkjDyg0UWqd0reVaFDw
+	s9TrW/h3V73vcrgFftZeVpZ9/z1tag8t8vcQAVyR73tmGnoIU5Eh3QdFu09FQCfF
+	bpSM1g8Z4t+7KUm37zQSkOzvqK4ZCKgLN9XWXzTOhqiEVqLfnAGPxt0mH5Ez5Uj9
+	O8m4NnKDxd1SlzVwkr3gOTVISvZjDpzEhgJImpeGJaHslfW/O+BiaQBWlubL9dNR
+	5UCcUOKkinvWDMbYFU9eV9dEvtorSHwqHyoOsjcvbFVxXmAusQUHdIESPjU3tvTz
+	W6ZEQ==
+X-ME-Sender: <xms:zeMNavTJuVgLXs8RnQ7IXqkINhSFn4d2MPJDaZjO8Y6gchOEVTk4lA>
+    <xme:zeMNanobqZJc_KH_zUmboRMfVcPCWjkPH62PUjxBs0glPAyLk4WaplrPtzbBfn0Kq
+    tYhL5ZRv3y2F9p_bDwcwnN7ecQSRv2yvOWGt5gWvfWqeROq22q-CzKa>
+X-ME-Received: <xmr:zeMNatLhOiSQ2hRrNu6_paRyp9aliGnkI694O0d9eqTMhWARgjVhY7vUb2FulawrmC6RIvo>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddugeehudefucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnegfrh
-    hlucfvnfffucdlfeehmdenucfjughrpefhvfevufffkffogggtgfesthekredtredtjeen
-    ucfhrhhomhepufhifigvihcukghhrghnghcuoehoshhssehfohhurhguihhmrdighiiiqe
-    enucggtffrrghtthgvrhhnpeeuhedviefhfeektdeugfejhfekieeluedutdekudfhgfdv
-    gfegleeikefhjeeiteenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsth
-    gvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepohhsshesfhhouhhrughi
-    mhdrgiihiidpnhgspghrtghpthhtohephedpmhhouggvpehsmhhtphhouhhtpdhrtghpth
-    htohepmhgrrhgtvghlsehhohhlthhmrghnnhdrohhrghdprhgtphhtthhopehluhhiiidr
-    uggvnhhtiiesghhmrghilhdrtghomhdprhgtphhtthhopehlihhnuhigqdgslhhuvghtoh
-    hothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshgrfhgrrdhkrghr
-    rghkuhhssehsvggtuhhnnhhigidrtghomhdprhgtphhtthhopehoshhssehfohhurhguih
-    hmrdighiii
-X-ME-Proxy: <xmx:yeMNairznAoPuY9y6aTAN5hJuqwedXLVseoMYI8cZNlF1sDWNUnzbQ>
-    <xmx:yeMNatwBGVOrqqte8wentYuNZwGbMmti8edyn1hBIY0vihE-L2ycew>
-    <xmx:yeMNamPMHVyxLQm-0cho5iaUQ8EzP4f6ISBdIJ1EgwFNrCeDxZve3Q>
-    <xmx:yeMNai5Azpm-hw88X3IZZdr-BJMS-yrAgCYQw1f10Vwj8d58WdjQkA>
-    <xmx:yuMNapD0BFP-zBuTbRshvpt1X17YGJ3Hihin18bP7zajoosmdCdmh-cB>
+    hlucfvnfffucdlfeehmdenucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddt
+    necuhfhrohhmpefuihifvghiucgkhhgrnhhguceoohhsshesfhhouhhrughimhdrgiihii
+    eqnecuggftrfgrthhtvghrnhepkedtleeiteevueetudevjeefheejueevffejteffvdeh
+    lefftdffleegleduvdfhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrg
+    hilhhfrhhomhepohhsshesfhhouhhrughimhdrgiihiidpnhgspghrtghpthhtohephedp
+    mhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepmhgrrhgtvghlsehhohhlthhmrghnnh
+    drohhrghdprhgtphhtthhopehluhhiiidruggvnhhtiiesghhmrghilhdrtghomhdprhgt
+    phhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorh
+    hgpdhrtghpthhtohepshgrfhgrrdhkrghrrghkuhhssehsvggtuhhnnhhigidrtghomhdp
+    rhgtphhtthhopehoshhssehfohhurhguihhmrdighiii
+X-ME-Proxy: <xmx:zeMNaqr8LSMo1wHft_dNrtHMGWK29Al7Y7FQZuE2HgpThFaAE4_a_w>
+    <xmx:zeMNalwNY9mKqcdWJY2oTlWmBv_47Pqhbr1M2L0S8By74W5wLOU9nw>
+    <xmx:zeMNauOx-alybW2FPznWJMga0iz91r8EZWgk_pV61xubEA4IHSBYng>
+    <xmx:zeMNaq73n-I0Zz-WobDkqsL_PfJSQhI8IahtoG7ONx3YCStmnjz3PQ>
+    <xmx:zuMNahA-_l6NCT-d6GzMkipe8x0h-wGsp8p6Uo7c3GizssDlVER1R_OI>
 Feedback-ID: if72e4b10:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 20 May 2026 12:39:37 -0400 (EDT)
+ 20 May 2026 12:39:41 -0400 (EDT)
 From: Siwei Zhang <oss@fourdim.xyz>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	=?UTF-8?q?Safa=20Karaku=C5=9F?= <safa.karakus@secunnix.com>,
 	Siwei Zhang <oss@fourdim.xyz>
-Subject: [PATCH v7 RESEND 0/1] Bluetooth: L2CAP: Fix slab-use-after-free in l2cap_sock_cleanup_listen()
-Date: Wed, 20 May 2026 12:38:16 -0400
-Message-ID: <20260520163859.2859782-1-oss@fourdim.xyz>
+Subject: [PATCH v7 RESEND 1/1] Bluetooth: L2CAP: Fix slab-use-after-free in l2cap_sock_cleanup_listen()
+Date: Wed, 20 May 2026 12:38:17 -0400
+Message-ID: <20260520163859.2859782-2-oss@fourdim.xyz>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260520163859.2859782-1-oss@fourdim.xyz>
+References: <20260520163859.2859782-1-oss@fourdim.xyz>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Bluetooth maintainers,
+l2cap_sock_cleanup_listen() calls l2cap_chan_close() without holding
+conn->lock. A concurrent task iterating conn->chan_l under conn->lock
+can access a channel that has been removed from the list and freed.
+That can result in a slab-use-after-free.
 
-A public patch covering the same UAF in l2cap_sock_cleanup_listen() was posted to linux-bluetooth on April 28 
-by Safa Karakuş. v4 is here:
+Split cleanup into two phases. Drain the accept queue under the parent's
+sk_lock onto a local list, taking a sock reference on each child so it
+survives the lock drop. Then release the parent and close every drained
+child under conn->lock + chan_lock, using
+l2cap_chan_hold_unless_zero()/l2cap_conn_hold_unless_zero() to cope with
+a teardown that has already started, and skipping any chan whose
+->data has been cleared. Reacquire the parent's sk_lock at the end so
+the caller's contract is preserved.
 
-https://lore.kernel.org/linux-bluetooth/AS8P250MB079109F82C16BEDC4F9FE584EB372@AS8P250MB0791.EURP250.PROD.OUTLOOK.COM/
+Noted that commit ab4eedb790ca
+("Bluetooth: L2CAP: Fix corrupted list in hci_chan_del")
+renamed chan_lock to lock in l2cap_conn.
 
-I thanks for Safa's report and patch. I already reported the same issue privately to the maintainers in 
-April 11th. The public patch breaks the embargo and I would like to resend my patch here.
-
-Safa's v4 closes the sk-lifetime hole (sock_hold inside bt_accept_dequeue) but does not take conn->lock around
-l2cap_chan_close, so the conn->chan_l list-corruption race in my report is still open after it.
-
-My patch closes both: it drops the parent sk_lock, acquires conn->lock → chan->lock in the established order
-to serialize the chan_l mutation, and re-takes the parent sk_lock before returning.
-
-Crash stack and C reproducers are available upon request, only for the maintainers.
-
-Maintainers can also refer to the email thread [Bug] KASAN: slab-use-after-free Read in l2cap_security_cfm
-sent to security@kernel.org on April 11th for more details.
-
-Detailed Timeline:
-
-April 11th: I privately reported the issue to the maintainers and security@kernel.org
-April 12th: Patch v1
-April 13th: Patch v2
-April 13th: Patch v3
-April 14th: Patch v4
-April 15th: Patch v5
-May 2nd: Patch v6
-May 2nd: Patch v7
-May 20th: Resend v7 with a cover letter
-
-Best,
-Siwei
-
-Siwei Zhang (1):
-  Bluetooth: L2CAP: Fix slab-use-after-free in
-    l2cap_sock_cleanup_listen()
-
+Fixes: 3df91ea20e74 ("Bluetooth: Revert to mutexes from RCU list")
+Cc: stable@kernel.org
+Assisted-by: Claude:claude-opus-4-7
+Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
+---
  net/bluetooth/l2cap_sock.c | 57 ++++++++++++++++++++++++++++++++------
  1 file changed, 49 insertions(+), 8 deletions(-)
 
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 71e8c1b45bce..48b018991ced 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1471,27 +1471,68 @@ static int l2cap_sock_release(struct socket *sock)
+ static void l2cap_sock_cleanup_listen(struct sock *parent)
+ {
+ 	struct sock *sk;
++	struct bt_sock *bs, *tmp;
++	LIST_HEAD(killable);
+ 
+ 	BT_DBG("parent %p state %s", parent,
+ 	       state_to_string(parent->sk_state));
+ 
+-	/* Close not yet accepted channels */
++	/* Drain unaccepted children to a local list, pinning each so it
++	 * survives the parent lock-drop below.
++	 */
+ 	while ((sk = bt_accept_dequeue(parent, NULL))) {
+-		struct l2cap_chan *chan = l2cap_pi(sk)->chan;
++		sock_hold(sk);
++		list_add_tail(&bt_sk(sk)->accept_q, &killable);
++	}
+ 
+-		BT_DBG("child chan %p state %s", chan,
+-		       state_to_string(chan->state));
++	/* l2cap_chan_close() must run under conn->lock, but the rx path
++	 * (l2cap_sock_new_connection_cb) takes conn->lock then lock_sock(parent),
++	 * so parent must be released before we close.  Draining the queue
++	 * first means a concurrent cleanup_listen() on the same parent finds
++	 * it empty and is a no-op.
++	 */
++	release_sock(parent);
++
++	list_for_each_entry_safe(bs, tmp, &killable, accept_q) {
++		struct l2cap_chan *chan;
++		struct l2cap_conn *conn;
++
++		sk = (struct sock *)bs;
++		list_del_init(&bs->accept_q);
++
++		chan = l2cap_chan_hold_unless_zero(l2cap_pi(sk)->chan);
++		if (!chan) {
++			sock_put(sk);
++			continue;
++		}
+ 
+-		l2cap_chan_hold(chan);
++		l2cap_chan_lock(chan);
++		conn = l2cap_conn_hold_unless_zero(chan->conn);
++		l2cap_chan_unlock(chan);
++
++		if (conn)
++			mutex_lock(&conn->lock);
+ 		l2cap_chan_lock(chan);
+ 
+-		__clear_chan_timer(chan);
+-		l2cap_chan_close(chan, ECONNRESET);
+-		l2cap_sock_kill(sk);
++		BT_DBG("child chan %p state %s", chan,
++		       state_to_string(chan->state));
++
++		if (chan->data) {
++			__clear_chan_timer(chan);
++			l2cap_chan_close(chan, ECONNRESET);
++			l2cap_sock_kill(sk);
++		}
+ 
+ 		l2cap_chan_unlock(chan);
++		if (conn) {
++			mutex_unlock(&conn->lock);
++			l2cap_conn_put(conn);
++		}
+ 		l2cap_chan_put(chan);
++		sock_put(sk);
+ 	}
++
++	lock_sock_nested(parent, L2CAP_NESTING_PARENT);
+ }
+ 
+ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
 -- 
 2.54.0
 
