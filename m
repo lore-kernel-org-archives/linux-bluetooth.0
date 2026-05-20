@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3199D3F44D9;
-	Wed, 20 May 2026 17:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1623E832A;
+	Wed, 20 May 2026 18:04:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779297934; cv=none; b=FIogsz49fK+DM+qLDVVcmJYrqnjymCTJl6fdWtKTZtyZBmDUSblJjGAkkwU0OYVTr3ugk1XymH3C7pqln/SNTcNlx/MmL/WwNb7Akr8FgPokVHZSI2x8YkXxS/3u4DVVR1RDZJH5ZfqX9q0lQbDM5xZdGoGZAI9PRcard97Zf6U=
+	t=1779300270; cv=none; b=Vz39mn8egNl4LbylDY0xnD7ojv61hRlaRHT13j8JPb0hGcQz1RRxosSNq3osTv/myeCJ4MOm0HkJLp8mZHpvQlcVeuqM1Nbhb9Z3GYONUpAz78VYLa4/CDf2IbYA7aL5yhKCd+9sV7xCkow2RWpBQXb6T7OsISGb6cpUTPARAQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779297934; c=relaxed/simple;
-	bh=IhHyWDNNoY3FhzkRp6JD5AvQW9sXJzdpvMVvB/v3atA=;
+	s=arc-20240116; t=1779300270; c=relaxed/simple;
+	bh=dP4ukKl3t5Q9bHt1hHVvcn/XbTfLle9LWQ4ZDKR+KFQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GoIWRT5YWMhVK5+9/2dFzqNx2qLgcp4wrItMDlQWTeu4/LcDu/CH+FQa7YOF2DPiqyXqbflURsnPCOp6Z6HSZE8VlXEzHbySKLU1I8l92KeOe/e8pOXs91BA5FRDlqALltIzvXBJea3u037p9vlMbJbUnEDm1Y47AOEfDLAtMEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=FUJ6hCzC; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=iC7tIJpkiTrc7HDzYblpIKxClAfumy9I2Q/rNnutKY16VqO38E7N/DfxzcZxKW9azSgLNL7dndY1p5VNzCArBmILshfx/NBBOdiXZgQnIGZbRP0OjWWFq6MQRgPkxAbsHip705jaWklUHFB7uqh1UIFAGvYOanou8xXVqyHMR4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=cCrs4Oru; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="FUJ6hCzC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F5DB1F000E9;
-	Wed, 20 May 2026 17:25:32 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="cCrs4Oru"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D585B1F00896;
+	Wed, 20 May 2026 18:04:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1779297933;
-	bh=P2+DxHe+oq3sjPAUxGBad89hSqlTGqcwumWCX02V1k0=;
+	s=korg; t=1779300269;
+	bh=gdHaQ/fvPhsfTfJAde7DuLpdRF41DI7gkjP9oTHPX/Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=FUJ6hCzCLpAdUe+c55i5Gdz6+6+dh7yFA9AZHdhmg4xAq91pHv6NHEicWheY67Ryk
-	 enmJ0Re3D+n1B4TPYQtOe8PmrKntM77ElUTSRNu0cIgYUUQiT3ZD//Tca0c48vcX5W
-	 Y/R4fEVeX/2Uwm8Lx0noezeVhBym/E9ei8hzU7AI=
+	b=cCrs4OrufWkUZmwJZOLLUvev5n3B/loQrFotrx4aa46oPYUgaOVNtwgN7rBJT2Chm
+	 dkthvUgqNKB5jXLwlj1nRYp+pzj/v1Q2JJ9lKBTucgNJM0z7/0U9g3JTnVgEs3n0gP
+	 AnSz///YOOt7rhMeQ9cBYD7foNupG5YPiYbXL774=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -36,12 +36,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-kernel@vger.kernel.org,
 	Stefan Metzmacher <metze@samba.org>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.18 178/957] Bluetooth: SCO: check for codecs->num_codecs == 1 before assigning to sco_pi(sk)->codec
-Date: Wed, 20 May 2026 18:11:01 +0200
-Message-ID: <20260520162138.413909118@linuxfoundation.org>
+Subject: [PATCH 6.12 110/666] Bluetooth: SCO: check for codecs->num_codecs == 1 before assigning to sco_pi(sk)->codec
+Date: Wed, 20 May 2026 18:15:21 +0200
+Message-ID: <20260520162113.605994740@linuxfoundation.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260520162134.554764788@linuxfoundation.org>
-References: <20260520162134.554764788@linuxfoundation.org>
+In-Reply-To: <20260520162111.222830634@linuxfoundation.org>
+References: <20260520162111.222830634@linuxfoundation.org>
 User-Agent: quilt/0.69
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.18-stable review patch.  If anyone has any objections, please let me know.
+6.12-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -105,10 +105,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 1a38577135d44..9404fdb10ea63 100644
+index ded0c52ccf0b9..d915db52db221 100644
 --- a/net/bluetooth/sco.c
 +++ b/net/bluetooth/sco.c
-@@ -1045,7 +1045,8 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
+@@ -978,7 +978,8 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
  
  		codecs = (void *)buffer;
  
