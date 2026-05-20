@@ -1,101 +1,143 @@
-Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDC133D506
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 21:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80D938F22D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 21:41:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779312494; cv=none; b=XhJpmaU7vBeOS+U2dpwzucWhma1N+gl1f58wB/ZlFDrQUmxJfP3k/7dbtlR1nHjLOE0/6/KSrkJ+MNXYVtJLiRSV/jziZpPBJDEk59lArvygho8tgnSeNnkYI+8AaA8xiiBIu7u1kepzhO4UB7cVKHUwqbjhLEBnf3SYuhbDeMc=
+	t=1779313315; cv=none; b=rRf/FJP4hKC9mQdTMH7Ze+Jkxbgl1O/pmGldEaYERttAK2jOveMS9YwAX+tkMcz8+MPvj3/Cu9bcbCs9LB9gL9mQ7YLOaVbwvKaUiZaL6cWtgFwNpmyw4ygBxHaKFeiS1Sx4kVyAUwMz87O+wIy1RLKwNO0SHP6dB4XNk+XoHLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779312494; c=relaxed/simple;
-	bh=dHnOxhgpDUhhrijNcb9PO6g8RInWVDOd+3jUAysZvYw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=rVS4ganA8kMDsnSmUL8wqv5LTeDx3TlpaMVtFncAxIdoTEvCM6K7B0jInuu8Vp82Aib4UMul+9vJTZ9fIXq9nhEo+BtGiJBHGcoA6y+XD+voxjDeinHhx1L56nfstKEQXJNUeJOFrdxezDPqbk0Wt9hB4FBsd1jRO2KQuWuNxVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ct+sTLKH; arc=none smtp.client-ip=74.125.82.182
+	s=arc-20240116; t=1779313315; c=relaxed/simple;
+	bh=q8FoWYVLPlkL+kH1MsFlOIr4cXjQCeHlCbdbANhazyg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lbNRxawWmSQd8chrfjbUqgOz2tLj+JMs/4CmmTtvWEt3iympuiHzWxqSCBznweuqb/epqDEtvA8yzNzmPiNJPqbRmWxgPaIgill8DMJm2+nEUy/sXtYLd0Fxb7HABz7IpJ/jA02mxJsOz02h6bugHUKpcirJUb9XrX3XrP0v67E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YQZxUipI; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ct+sTLKH"
-Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-304106b1204so1854236eec.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 14:28:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YQZxUipI"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-687e7edaafeso709780a12.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 14:41:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779312491; x=1779917291; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=dHnOxhgpDUhhrijNcb9PO6g8RInWVDOd+3jUAysZvYw=;
-        b=ct+sTLKH7258gubxdVSN3S3mlFEIsZoVJ8/QmQEwBnXfFDsKhL3CNQF1OVH4XqSItJ
-         znRyOSiiXg8Owrt5Fl5aJovLC4lqwB37d6doCSxPK8U3DL4D9+yy1CTU+BwLLp0he+X+
-         aBGYLBhdBAx5n82eOlDdQNMT0YA0L9Q8seVQRfv9nOLiGaHj1ttTXqJYUBMsJjFPsQxi
-         ezar5GkxdFtwKPwJqm2DQOCrBtZVVAUizkSxnValySD0Bdm60HU5lpDGUNMQ7vCcLeHt
-         1jSV6LDwis+OnPB5GgCnAXpHD0I95c3xnmjQeSOk1PYV0Fy+sOEuZHAa/y0cDkcHAH6M
-         7tTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779312491; x=1779917291;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1779313312; x=1779918112; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dHnOxhgpDUhhrijNcb9PO6g8RInWVDOd+3jUAysZvYw=;
-        b=Olc3I7rckcU/KyBqNsvYdDWcRWmYlvUue3xjihs2Dl3ErAiL5/+pImeAD+vTnEWx+8
-         KNmolQgdpQHNf4qoAWgLL77ryOm+7qi8aTW9WGEutBGZSlKgkbfpxNV0xItmv+KbWrPp
-         ziR+XfQqqsoeZNVco9AtGoKB5A8wBw7E5So7M2kMOL+Wm6LUk7I+ydOXLZXzP20p+RH0
-         RpeY9NEpo5zIFDaMKHZMOhfePQRz+bPVzjsZlSn/DD7AveWoj2pEvNezMGXXlYSYPKwi
-         baTpZofPMCyBg13bOMO7mKTVOveDLhhoBfKHSIuj6K30GZpCTo+/QaxSumZ7cx2BNNvd
-         /GDw==
-X-Gm-Message-State: AOJu0YyRHNcARMpfmdKc3Xv+swyM9ZbnHx0HNmMxpDP/Nd8TT2hPHNRS
-	r9RidXzp15oQC7GnJioNpERB4yY+Xs6eZtPhWSTN+oMDo0+GkcB0pF95FcI0yw==
-X-Gm-Gg: Acq92OETXTEPkUX11eBa3/P28C21FCCIFL29ZcfXxHSepjXjNhtkiSRi7Exi0zZYD4N
-	ApbTmiilnKpM5fA+zJ3AiHwThXl42hzQOtF5ra/1ORf9UcgbsqTiWTzvULzjoTnzK5GyB7UwabY
-	lkIO7K+4vmXjLAKWY2cNQVTtvduqA1YvvlF7gSeUtqEqljK1M084YkhZcJNtKrPUQGIXRYBIydC
-	nN2v3b2Gc0Yinsoza+xR49m7n2VZ22wEMQ+bah/FNd5c750lVcDXKYUrz3u1DLAH5gHrV9p8J96
-	aM8Xj6QNkZhBsfmz4xeC8oORH0u3zm5ct6FRhgGI3OZSlK+pjQpGjE9UbIh5kmlxUOueeB/mE/F
-	7tYgAu3KlnmJ9fsyqIFxUhWY9H6DmNfNOYDSGYytRda8dEYzsDXpVolGAS1JI9wkapaX1XzAZKV
-	lvXQG7LxM/Ex5nmlpFmOL1pI7Nq3brokoW
-X-Received: by 2002:a05:693c:2c93:b0:304:b14:ec53 with SMTP id 5a478bee46e88-3042f9a2ee5mr184807eec.27.1779312490625;
-        Wed, 20 May 2026 14:28:10 -0700 (PDT)
-Received: from [172.17.0.2] ([172.184.173.243])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-302973bcc5asm19535148eec.22.2026.05.20.14.28.09
+        bh=h5t5r4M2iJCMhY9Y3g5BpbaSaxYN98wLxatFgP2FtCk=;
+        b=YQZxUipIL3ZA2ejuNDHIE56BWxfIY+R8uUG57g9rLJbtSnMdABJFAUoySHBqN5VXJ4
+         yNvOspgMF2wU5INT9InKDCkY1g+3/04zfl2RNfWQBfeM+rKBpZ6dP9IQR1VA1GohhjAT
+         otx7yWDrVP0/pMHSDr6O4g5C30AkRmvCVxJAftPX+bYyl8PpzyJ2q6JLz32jrPAlQSBk
+         E2kilWioQ1hUTz3qfl0iZW9Bbg9RnuqG+QGycIXJuKF6KQZQFrqcwoU+cKDXBOOxP44q
+         VKbl1OV5dWH0bjQ75tXhsYy8cC3vOGPKssNA2UcmVgb2lnh/MPbOj353K/OD6rg9MBm8
+         asVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779313312; x=1779918112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=h5t5r4M2iJCMhY9Y3g5BpbaSaxYN98wLxatFgP2FtCk=;
+        b=D+tHxZKFeLBxPXxGxHmtISK25wkfCTk6rHw1q2D9CGE0WWVRLfhy0ELvybcIsFVLCD
+         n+Mavz1skCe4ZO6+Bt5TKWrrjs2mYA/75TGtTtTgy3zrXEJrkvIdKAcpGVPEO+92pi8t
+         TjdP3EfXznduI9yhsABUd5X9zLBz5ylfoLA14KP9jeRBCYWJoIFcohdqdm4/Jq4FPo92
+         D/EdvsY2yqYXjPYHwUzVEj8PWfdqUjGr4vpvCoO4fRM0e9wcFY+QVD3Bwc5URdQ0/WFX
+         pTJZCFy5zCY6Av3VekP9thbHpbQkHks4Fw1LxozJDpJs3kh8l29OLfAxxO5DMrNMQZ1Q
+         uiFw==
+X-Gm-Message-State: AOJu0YxikhEBGX+o43vXnOr7ubQpsTsJ6JUYLDQV2tpW4VCGbe1YaYqV
+	85D65b2GCGKB6zB6XbUwuGs1gUTLvRLhnY2CTqve1SEXkMN7kN5j520YI1AUPKBcpzA4RlVk
+X-Gm-Gg: Acq92OEX1RfN4Zk/ye5HxApEAmdf3pJmsBZwgTBZyXUOFy8IFyxBhCpcRU/7nSXEiOr
+	DF7AncJ0/CSb36kH3QVOD5zUhabogSALDcEcRhRZLXgiOHMTeJdaDPbHDD1cvvNMLbKmMk79kDw
+	CKwY19jooRplMqWPZmSvAnE0rB0E++yUVqjuYOljSOwsSF16OlctP7cMLmUY1kZjBuC6q2j71+I
+	uNCaomqE5W3VWiopTNxvQvbXDkCLTYQum05QmZqa7lCz7qwqrMQ0+aiwrg98UHrfPE8LwbzonU4
+	BBgBNvE+007MF5V6zRF9U+T2xIE3SV7hdjOOq3izSAuMg8Ca4oM0yqNxgn0uy55w/oVln7V30Pn
+	otOQA4UC3PnInfiznCN22CfVZ48dtIxiergXR+LniEZWyt/FRfhoJEJLvD/qiVgJcc/agWSHvNf
+	ie3hsPQDMbfGPXS3DASdv2izKjL17KJFygUymVXnhDS89nwku105oezQbKZLB8bPrBlMwIejrte
+	w==
+X-Received: by 2002:a05:6402:358e:b0:682:d56d:1de8 with SMTP id 4fb4d7f45d1cf-683bcd9f01emr13077801a12.14.1779313311894;
+        Wed, 20 May 2026 14:41:51 -0700 (PDT)
+Received: from node ([202.47.63.86])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6882442b03fsm114869a12.12.2026.05.20.14.41.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 14:28:10 -0700 (PDT)
-Message-ID: <6a0e276a.fb1bf61a.3bbfe1.5709@mx.google.com>
-Date: Wed, 20 May 2026 14:28:10 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4637644056349138752=="
+        Wed, 20 May 2026 14:41:51 -0700 (PDT)
+From: Muhammad Bilal <meatuni001@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	johan.hedberg@gmail.com,
+	Muhammad Bilal <meatuni001@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: HIDP: fix missing length checks in hidp_input_report()
+Date: Wed, 20 May 2026 17:41:33 -0400
+Message-ID: <20260520214133.27746-1-meatuni001@gmail.com>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260517234805.116570-1-meatuni001@gmail.com>
+References: <20260517234805.116570-1-meatuni001@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, oss@fourdim.xyz
-Subject: RE: Bluetooth: L2CAP: use chan timer to close channels in cleanup_listen()
-In-Reply-To: <20260520200611.3033410-1-oss@fourdim.xyz>
-References: <20260520200611.3033410-1-oss@fourdim.xyz>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4637644056349138752==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+hidp_input_report() reads keyboard and mouse payload data from an skb
+without first verifying that skb->len contains enough data.
 
-This is an automated email and please do not reply to this email.
+hidp_recv_intr_frame() pulls the 1-byte HIDP header before dispatching
+to hidp_input_report(). If a paired device sends a truncated packet,
+the handler reads beyond the valid skb data, resulting in an
+out-of-bounds read of skb data. The OOB bytes may be interpreted as
+phantom key presses or spurious mouse movement.
 
-Dear Submitter,
+Add a check that skb->len is non-zero before the type switch, and
+per-report-type minimum length checks before accessing the payload.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: net/bluetooth/l2cap_sock.c:1512
-error: net/bluetooth/l2cap_sock.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Cc: stable@vger.kernel.org
+Signed-off-by: Muhammad Bilal <meatuni001@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hidp/core.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 976f91eeb..03838a6ff 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -179,12 +179,22 @@ static void hidp_input_report(struct hidp_session *session, struct sk_buff *skb)
+ {
+ 	struct input_dev *dev = session->input;
+ 	unsigned char *keys = session->keys;
+-	unsigned char *udata = skb->data + 1;
+-	signed char *sdata = skb->data + 1;
+-	int i, size = skb->len - 1;
++	unsigned char *udata;
++	signed char *sdata;
++	int i, size;
++
++	if (!skb->len)
++		return;
++
++	udata = skb->data + 1;
++	sdata = skb->data + 1;
++	size = skb->len - 1;
+ 
+ 	switch (skb->data[0]) {
+ 	case 0x01:	/* Keyboard report */
++		if (size < 8)
++			break;
++
+ 		for (i = 0; i < 8; i++)
+ 			input_report_key(dev, hidp_keycode[i + 224], (udata[0] >> i) & 1);
+ 
+@@ -213,6 +223,9 @@ static void hidp_input_report(struct hidp_session *session, struct sk_buff *skb)
+ 		break;
+ 
+ 	case 0x02:	/* Mouse report */
++		if (size < 3)
++			break;
++
+ 		input_report_key(dev, BTN_LEFT,   sdata[0] & 0x01);
+ 		input_report_key(dev, BTN_RIGHT,  sdata[0] & 0x02);
+ 		input_report_key(dev, BTN_MIDDLE, sdata[0] & 0x04);
+-- 
+2.54.0
 
---===============4637644056349138752==--
