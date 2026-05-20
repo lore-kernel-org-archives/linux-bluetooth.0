@@ -1,129 +1,101 @@
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99F1548EE
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 11:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3976C17D6
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 11:39:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779276991; cv=none; b=CNlJj8VP6n+ubnUOtrbpu22o99wSrAi2fdV1F1qjQOXE0JTnFVDmL6iFmGsxXajG7RAhlR71exDIOLPXJk7XweeQvoKbk9peI7NGtc3qpW5+15bZK0zVVXe3a9cWZH0lMyj91RDqNTrjBilkyNXC2B8CCg9nDvOf6ByuALNTq54=
+	t=1779277179; cv=none; b=kFrckv8pt/wMuDyF/lYoJUafobd+4/qq5THU8ExFdbLPN/9jmk9wWonGbgPd6gFLj/Rq4fnyacjPYeGcdoeZRYHChqjUsvnv05ZjXM6JQ7xLzJEUNDfQvJXG/4rWaTE9zSuy7iEHWPymJdnlZ8zFNI9/xxd5Qq6eCgTMQfoBCOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779276991; c=relaxed/simple;
-	bh=m0wqkp9zrSFHlR9fbC8W2hs2AXAkdV7C0ItK8vHKWXM=;
-	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=SeinglQdDKVF+gx4+TaFH3HBFC+KwzJMj7SbOEfIP201iT6sGSR+eyllAZKCof1xgHHfN2th1wdOrcL/DR2rObX6Ah32sknQ05ba45KFzCa8W82k2lV+i6wHS4GlgU9h3ZRwTw6B6oeM0/67K5J3E1ZbN63OTEt3VIT9XZ9n4Oc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.de; spf=pass smtp.mailfrom=posteo.de; dkim=pass (2048-bit key) header.d=posteo.de header.i=@posteo.de header.b=qQ+G8A32; arc=none smtp.client-ip=185.67.36.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.de
+	s=arc-20240116; t=1779277179; c=relaxed/simple;
+	bh=8Ufa9SiqfFyB70vg2RMuGwzuJ/vLdIEF9YNTEaEliwo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=a+nK71ZKV+0kCBkNnOd7egLquVEm40vHioj+4FhVMqwiiXdCGNqn22725BBWr6lKXuWIXLLSP8uWkGQc5sI0q0F6igI63i7oAQoe5nnv7i7NMPcZNkJnAJtPuV9QnR9bpCwmPkWUxm3kmKHTctUGmNH8ehWshy/SWzjUZSRWp/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U1TO6tHZ; arc=none smtp.client-ip=74.125.82.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=posteo.de header.i=@posteo.de header.b="qQ+G8A32"
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id 7EB11240027
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 13:36:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.de; s=2017;
-	t=1779276986; bh=tXEyRfTpnFLwkQuHJ3oDkW6Ay+3lVK79eFFjXuuXhnM=;
-	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type:
-	 Content-Transfer-Encoding:From;
-	b=qQ+G8A32u3JXEju9xvsLgKrQU2O1SutvIgyK+87zgaV735KyiZfD9+P45H1xYj1W1
-	 glsyjeDabB1wY4o+DL+XG2ONUjnsBQmE7TavC7RfyaYW8AT0cJwNbiCHMg6h3kChge
-	 iMWDt9FOUZ4DeAnMZcpeO/3e68zNG+ZroHvmSxJH2DCJtPYkOL7CWnXc/YJvQbd4q3
-	 7fs4Ig48hqOIhxXWfhYeCnsU827aJCB+7f1EtKxPmW7aQiQV17eB9N+P3nS18Gyk2p
-	 YLaY5M9wCdDmAGNOw7mDwrEDUEZPNYE6zm3XNbSM3RUwMrrQANlbqllEEl5DG62G0T
-	 cJKZm6BCAzqww==
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4gL8d575HSz9rxL;
-	Wed, 20 May 2026 13:36:25 +0200 (CEST)
-Message-ID: <20d6a474-18c9-439b-8b01-a3ef5e8310cd@posteo.de>
-Date: Wed, 20 May 2026 11:36:26 +0000
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U1TO6tHZ"
+Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-132d1b2519eso11318916c88.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 04:39:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779277177; x=1779881977; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=8Ufa9SiqfFyB70vg2RMuGwzuJ/vLdIEF9YNTEaEliwo=;
+        b=U1TO6tHZO1+wmvy+IRM1ZX5tKlstQNbL5r+DX/VMV5llJHUuKDJ9spsw7QqQQOFaG8
+         P77z5JGiu+AAdsPCVg6Ees8f0AOLRf7FqJvrhESzH7gp2poh1NKOUTK24mnRERZKEt9v
+         uRMpRZcoXU7y0eRlCaMO5GHJ39N3Zg3HLw5JbUN//evhk38yeV9nqgDTUhHSzS4D68aZ
+         YrzjHfgqoAb8MKgRx/AaPu8De/Ws3EYd51o+OZ6GetudpCY1fU6ZAe3w/5LTp8LxMSEh
+         AvpVIHEW20iFSrUfI+7WoU+HXTZlEFZlaLPmUemOAPDIovoiD19D/L1Rv4Nx6vXjv/Ag
+         TM0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779277177; x=1779881977;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8Ufa9SiqfFyB70vg2RMuGwzuJ/vLdIEF9YNTEaEliwo=;
+        b=j9c+av+R9IT5g/pCnBu5tblUrReKnbD28KsV/Dw9js1YkqZ4OUvulYUbMyfyqIViCt
+         I7ywjfa1sdJK3XeJEuwZO6zPlRGVYWUb2KTjJj8EreJP7ES+3lu0vsPfQphmbrjZPMyn
+         Ivh2W1ihN7tZrYF8NBgMtF/DgCvLbSbxrZaKBSluGmCDF5S0OkWuAHijpG105HZVHdiG
+         ASYrKiy+FC48WlyiD3nE4hkL1svdY+5heVX0E3Zq235fNe6AEKBh5+MO02qBxi6wu1QS
+         tLKMNESt5XmLGazyjsNMUquHPcVEHp6THAs7XoG5/p7cNEVgWP8Yr1OHHhetYfYoQ1p4
+         rLfQ==
+X-Gm-Message-State: AOJu0YwR7zwu5wrrRxJ/QpdAHwIY2g+3IFjOOfdysYk+C9iJMfW8DAof
+	K0yHvhGpoRlLcXa/cnE2WzKskeuEOZTuITxyqK9+NhS91UJvtVUeJQaBiwhfRA==
+X-Gm-Gg: Acq92OF5Pw+IsQnnbyDDoD3c4sf87qs6HS3y3oLgRIZ2KjqA+AqZupK5LZH7dwWBRCr
+	mUAV2PjtTA105zU2tjmJflKTv/+qAYadbE1P/QIsoMVVH/daL6dsLv5KL54iToLZpMOySlWwj7T
+	HH78hvmjKJ6LvhIo0Cg5q0LCleuTLTVxN8r+yuEllTJjuNaX9ok/sOCZ57MQnD7a1ryl5BNCpHC
+	7P0NXmHMGeXmb/qUg+DZllJlqB9HiB9E5cFVjYwNHpJC8VF5eEZHAui6UxgEu5+kFTGx17Jo2Fe
+	itu+GruzCYgc0t7QdW/gvQwFWnoHilm9uYx+5BD1ZKcPYhLnb9B3eSjqfvX4rzwMB0X5Wg+9eiN
+	tMW6p4qmxfRbv4b5C1hgK2r5Pqoi2UU6FHqEjfAmhs1G1KFyXpva3F9QPs4DbnNsZ+UkOIyIoI3
+	jY9KWu0CajxJjrKiwicc2ppD0qa71ucMsm
+X-Received: by 2002:a05:7022:e16:b0:12d:de3f:d847 with SMTP id a92af1059eb24-13504952f8bmr10853426c88.42.1779277177180;
+        Wed, 20 May 2026 04:39:37 -0700 (PDT)
+Received: from [172.17.0.2] ([172.182.225.136])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-134cbcb9ef5sm25370831c88.2.2026.05.20.04.39.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2026 04:39:36 -0700 (PDT)
+Message-ID: <6a0d9d78.8e75e0cb.1e3599.df5d@mx.google.com>
+Date: Wed, 20 May 2026 04:39:36 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8009204729892366306=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Benjamin Mirko Blume <benjaminblume@posteo.de>
-To: linux-bluetooth@vger.kernel.org
-Cc: Max Chou <max.chou@realtek.com>
-Subject: RTL8922A (0bda:d922): BLE HID disconnects with supervision timeout
- (0x08) during active HFP/SCO call
-Content-Language: en-US, de-DE
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kaihsin.chung@synaptics.corp-partner.google.com
+Subject: RE: Add Synaptics BCM4384 Bluetooth support
+In-Reply-To: <20260520090131.3505676-2-kaihsin.chung@synaptics.com>
+References: <20260520090131.3505676-2-kaihsin.chung@synaptics.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============8009204729892366306==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-Hello,
+This is an automated email and please do not reply to this email.
 
-This is a bug report for what looks like an SCO/eSCO versus BLE 
-airtime-scheduling problem on the Realtek RTL8922A USB combo controller: 
-a BLE-only HID device (mouse) is disconnected with link supervision 
-timeout whenever an HFP voice call (SCO) is active on the same 
-controller. The SCO audio link itself stays up; only the LE HID link 
-starves.
+Dear Submitter,
 
-Adding Max Chou on Cc as the author of the RTL8922A btrtl support.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Environment
-- Controller: Realtek RTL8922A combo, USB 0bda:d922, btusb
-- Firmware: rtl_bt/rtl8922au_fw.bin, fw version 0x41c0c905 
-(linux-firmware 1:20260410), AOSP extensions v1.00
-- Kernel: 6.18.32 x86_64. The same behaviour was present on the previous 
-non-LTS kernel 7.0.9-1, so it is not a kernel-version regression.
-- BlueZ: 5.86
-- Host: Lenovo Yoga 7 14AKP10, AMD Ryzen AI 7 350
-- Peripherals:
-     - Logitech POP Mouse, BLE-only HID (HID-over-GATT), address 
-DB:5C:42:57:1E:1E
-     - Jabra Evolve2 65, HFP headset, SCO/eSCO on the same controller
+----- Output -----
 
-Symptom
-With both the BLE mouse and the Jabra headset connected to the RTL8922A, 
-the mouse works fine until an HFP voice call starts (mic active, so eSCO 
-with the Transparent/wideband codec). Within a few seconds the mouse 
-stops responding and is disconnected. With the headset used only for 
-A2DP playback (ACL) the mouse stays stable; the disconnects coincide 
-specifically with HFP/SCO.
+error: patch failed: Documentation/devicetree/bindings/net/bluetooth/brcm,bcm4377-bluetooth.yaml:23
+error: Documentation/devicetree/bindings/net/bluetooth/brcm,bcm4377-bluetooth.yaml: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
 
-Steps to reproduce
-1. Pair and connect a BLE-only HID (mouse) to the RTL8922A.
-2. Pair and connect an HFP headset to the same controller.
-3. Start a voice call so the headset switches to HFP (eSCO active).
-4. The BLE HID disconnects within seconds.
-
-Evidence (btmon)
-     HCI Event: Disconnect Complete (0x05)  Handle: 16
-         Status: Success (0x00)
-         Reason: Connection Timeout (0x08)
-     MGMT Event: Device Disconnected
-         LE Address: DB:5C:42:57:1E:1E   (the mouse)
-         Reason: Connection timeout
-
-During the disconnect window the bus is saturated with SCO data on the 
-headset handle (about one packet every 2 ms; 91714 SCO packets total in 
-the capture, 534 of them within the 2 s window in which the mouse was 
-silent). The last mouse ACL/ATT packet is at t=202.4 s; the Disconnect 
-Complete is at t=209.4 s, i.e. about 7 s with no serviced LE connection 
-events before the supervision timeout fires. SCO continues uninterrupted 
-before, during and after the LE timeout.
-
-Interpretation and questions
-The controller appears to keep the reserved (e)SCO slots while the LE 
-connection events are starved to the point of supervision timeout. On 
-other controllers (for example Intel) BLE HID survives an active HFP 
-call, so this looks like an RTL8922A firmware coexistence/scheduling 
-issue rather than a hard single-radio limitation.
-- Is this a known limitation of the RTL8922A firmware?
-- Is the SCO/LE arbitration firmware-tunable, or can the host side 
-mitigate it (for example via LE connection parameters)?
-- Could this have regressed between linux-firmware versions? I am happy 
-to bisect linux-firmware if that would help.
-
-Workaround
-Moving the headset onto a separate USB dongle (off the RTL8922A) removes 
-all SCO load from the chip and the BLE HID stays connected.
-
-I have a full btmon trace and can provide a short, payload-scrubbed 
-reproducer (the raw SCO payload contains call audio, so I would strip 
-it). Happy to test patches or gather more logs.
-
-Thanks,
-Benjamin Blume
+Please resolve the issue and submit the patches again.
 
 
+---
+Regards,
+Linux Bluetooth
 
+
+--===============8009204729892366306==--
