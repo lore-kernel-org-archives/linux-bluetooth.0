@@ -1,63 +1,71 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f196.google.com (mail-pf1-f196.google.com [209.85.210.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7397318B9C;
-	Thu, 21 May 2026 05:26:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191F4318B9C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 05:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779341170; cv=none; b=HhSoBKzH9mxrH8ksBkh6AVlnQAyW7wMPgj6MFv6m6Gwel6eJETpRMvUI/setwTrD2vdqNUzyuTokzDC0Zso0fjL/z12IBsQK7Cq+ocpvIp3hWeAiRl+lR35FGaMroIpEipo/TK7xhHgxYzmQB5CHnzr/B3sG09ftFeIcUijLl5c=
+	t=1779341190; cv=none; b=PYLPdptPyQPsHSHYLV/Mg1U/+PlcI3MA2YkEF993o6Grv+SHPw2jwO36/AfGcBfykYsaPMOznGiA0sYjbEBdlUrIrew0SHNn1deUFZ61LYnrOHtAPXiRUv6EOxR3gjUTCt7pMcQ1YZvAv/sEdPcN4Vyd8LHXJqMcb5KPnpCbfqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779341170; c=relaxed/simple;
-	bh=e/4MsCDQRselIYvZ3uaUq+llmN01dyasIeL3er1gv74=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TNIMccQLU2BY7VitpzpvxcMeDeAa9/lCnKePX9/U3IAuyrDUEB+oQG8wK0RWiD8jG2ihMsJFIqp6pTDb4BJYH7BZgU2cu3qZW/gz4vTSxUzs2Rt8YKuunnjwMpe5ymFyHzcHYiisUY22UedoBil29tKJ0u6wrp87IjYjsu43vvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qti.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=pFlw+ubX; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qti.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1779341190; c=relaxed/simple;
+	bh=wOONB0aNuYCXWjs99uZgkfRlO0gOO2Af2A/K3wYEPSo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gFzCDDYIxnD7tBKUhamF8+ePLH2r3/1Dep9ctbRz4nIWP/8trIyZfvR+p8VO4GcVgcrFe16fs9Fy+cdeCGnby23M4f/W9Agu3upGa1bbqGGaes3xirKEJqMh6jWZYoqxyHsB5apgtzuAsRydYRqWu3grpWkUkdCMUrSWyILPiqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Up1dA1kv; arc=none smtp.client-ip=209.85.210.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="pFlw+ubX"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64L2mOxM446688;
-	Thu, 21 May 2026 05:26:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=wjuCR4CwmsQ+B9oSh0hO7FF06UDUgaiGPs5
-	HL06tM68=; b=pFlw+ubXRMFZHFGxx6lx0i6iGyMGRSAsOyJQfPiKkPSfCtmvlOy
-	U6/koccsrswmx8lNiOTxKTxz9rwbkzD361wK+xrLOSMO99UJkWJXxFTXJSqIykPH
-	w7/zQqoWen/Dzwv/1emBCP6XuSrZrf00QUU7yCk/Ok2mu2DbkC4LvCufTyuH1HJC
-	nH0FTtYVpeRRMp7muvgTXzg6ihojlwCYdkwCxaepHFvakHpugSBuhO8cURAg68Xf
-	XyXjDjqmKtPe38aavVTlcu9UJvc+eC6sPtd1CZK+26Wuuzq+ZKA/QGI9LPpRK5fJ
-	r7HVMUQEaVvrf09K79wVyiG7CjF5HC3rfWA==
-Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e9anrm5ah-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 May 2026 05:26:05 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.7/8.18.1.7) with ESMTP id 64L5Q2AA001795;
-	Thu, 21 May 2026 05:26:02 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 4e713jev5e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 May 2026 05:26:02 +0000 (GMT)
-Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 64L5Q2nU001786;
-	Thu, 21 May 2026 05:26:02 GMT
-Received: from shuaz-gv.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 64L5Q2UU001776
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 May 2026 05:26:02 +0000 (GMT)
-Received: by shuaz-gv.ap.qualcomm.com (Postfix, from userid 4467449)
-	id D74044C4; Thu, 21 May 2026 13:26:01 +0800 (CST)
-From: Shuai Zhang <shuaz@qti.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Up1dA1kv"
+Received: by mail-pf1-f196.google.com with SMTP id d2e1a72fcca58-82f8b60e54dso4778925b3a.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 22:26:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779341188; x=1779945988; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=It4O8aFwzCXQnnzJXWNnoxbkN46m+ZVAZARcQcv9gog=;
+        b=Up1dA1kvd4zGOgStvV2odLjHvl1ykaKcfcx4eaamUOpvvXRG8JVQOAg9U+wLLNlaKn
+         NP7JL7S3Yp54JwxlYZr/RdM9nlVPk2nDxgDFkIWuFX7w8u87iayFXeN7Hv7kBhxLr3pZ
+         XH75kJCX3gC+lYvfk7NvjO9tmzkLZ2cI9In7SPFAkUnHRmafMzw7PcYLuWMxLfhXQWgn
+         YGU2B6S5fQey+lNiRrcni14390t0PmIc0L2tzL1VS2Qa9fvPdOpKkRkTT7UoMNKrAlcz
+         MkoaDIjTod7PQWsQIOEm9gUOnkf4TNH4L01psLhj00jYbgNxk5zkb+C80b6CwOuY7Gsi
+         TAFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779341188; x=1779945988;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=It4O8aFwzCXQnnzJXWNnoxbkN46m+ZVAZARcQcv9gog=;
+        b=gRQJAjRr26+zd4v7EPX2PSZ0wLfzcXXaYFQrIS1wrplsa5PN1jn3RSC5FDWSmBLbBa
+         61BYBwqk/x1rQdG4UiH48gejLfeODTiaamdWxcBUiFzFEmJgS+arqc4AIYrvUvAC3FRA
+         JLtVpPG+VkLlNJw7r6FByvWnvt/DQ4PFJg/vpRKlL/dvh83C6RLpzzfZzYk7iTsiculG
+         u8aSEMesCLFiygtVliUFO6mjh8ZXRqbne2vLnwazKhkcyff/tDM6uyD+nze32XShX5/w
+         bPfKg020fD8+0tsf9xKcbTQDH2k3bj4EJbxD4N04q4lhehzvoCpl9CKbR5cVkjtPU60J
+         3DYQ==
+X-Gm-Message-State: AOJu0YzyHuRYdokHSvkPlGkv0yV4ub8gxUXtxnm9uBu/hRK5KVT7fSmM
+	KA1rhkiWXTiiiqxnGINOZExNSMqz7y9fi/aOkLQ5sPZWcT4B0GvRMTDC
+X-Gm-Gg: Acq92OGk68lCkgVWsOTlDb0VWYXMrBD4VirNA3sRFyBBjssZUytRNHgR4kC2tHst/N7
+	5yE68oOVN0RUcwQK4BZK+z781fzlTTnaMwnHHHu/9BhVXhRKPDCoEQpeYAlRBRxeQ1BaCdiSDwy
+	yH/tf9LQ4pfn1/qtEnnwFojaoyNMht88IzunA+NDPMbUzB9hyPCIDKIrcATY7kRADGev1t8KfKg
+	xCdH/o2NYByy+lWOBxVFQJnR/lUkaUfZ3RNze/iV6852W9/sfkVYQ1JmDChumzj6lCZwuUvvCe4
+	8W0hU5GlMGA+cjnt19QZUu0ZSMnx2XzDrZCqdwUqNbuhlRX3lFim8y49dWrjSpTGQCmqDNdCCz3
+	SGhIqcmmZ53Xsd3lGY94ArCIX2ITIhrtfVXiAY1UDK/bpH74FrJ9j2Q322Jgqcg1NejONQ5Rsd6
+	LkH7398HHDvniZPj85G9NZhcEwKlynxtzZefLRee5afg==
+X-Received: by 2002:a05:6a00:bc8c:b0:82f:5125:a327 with SMTP id d2e1a72fcca58-8414adfae02mr1594629b3a.27.1779341188284;
+        Wed, 20 May 2026 22:26:28 -0700 (PDT)
+Received: from localhost ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83f196647aasm21454730b3a.5.2026.05.20.22.26.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2026 22:26:27 -0700 (PDT)
+From: Zhang Cen <rollkingzzc@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
-        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
-        jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com,
-        shuai.zhang@oss.qualcomm.com, stable@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: btusb: Allow firmware re-download when version matches
-Date: Thu, 21 May 2026 13:25:47 +0800
-Message-Id: <20260521052547.2862803-1-shuaz@qti.qualcomm.com>
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zerocling0077@gmail.com,
+	2045gemini@gmail.com,
+	Zhang Cen <rollkingzzc@gmail.com>
+Subject: [PATCH v4] Bluetooth: bnep: reject short frames before parsing
+Date: Thu, 21 May 2026 13:26:11 +0800
+Message-Id: <20260521052611.1815693-1-rollkingzzc@gmail.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -66,95 +74,150 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-GUID: JLPL_EvC0htQoetiVAo_KNKvD8qRoKla
-X-Proofpoint-ORIG-GUID: JLPL_EvC0htQoetiVAo_KNKvD8qRoKla
-X-Authority-Analysis: v=2.4 cv=UuJT8ewB c=1 sm=1 tr=0 ts=6a0e976d cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=yx91gb_oNiZeI1HMLzn7:22 a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8
- a=8BPzjUuknQ10mGxUWxoA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIxMDA0OSBTYWx0ZWRfX3aLwJzDKH1mQ
- t4x99ed8VnROtYa0V9xb7f/a2edeyKusVM7eyzVjXImhsEi7BLJPYZ+gjo/3dwADhwcMPcaaUKf
- C3yIb+7lEQ2mmgkgFKSNxHarLce1YmVRatOl/4cf5NCPouKecn/wpcQXmc696lX88Kd/ozhk15i
- sEDELAst1+jV7xqxd6fWc+72H/d6Ez6u4OJgNtP570Ia2sEeF/2Lp7uf/HBwkRMVh63Cvn4YihD
- QYQr9xAeeDZJ7KrXecTruVGwuGd4FpR9SlFnAFfefRtlvkt65rUEsAvG4Tw4EhaHdIq7zjJV3oG
- 3NrC7STf412Its050vraQtHVau80NNOMkf/guko24ou1OqFNSuGig5fvHJGzFV9xZ1DLuBSfzVG
- Hg0ibVULR7PDp3ixL1lHwyHX6niTs7KWqo69Ud+3Kw8MZhNsWoWM0CM2ingoaBdxJrIUaMOvQKO
- 6hScgofU+eGFVm3FdhQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-20_03,2026-05-18_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 clxscore=1011 lowpriorityscore=0 impostorscore=0
- priorityscore=1501 suspectscore=0 spamscore=0 malwarescore=0 bulkscore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
- definitions=main-2605210049
 
-From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+A BNEP peer can send a short BNEP SDU. bnep_rx_frame() reads the
+packet type byte immediately and, for control packets, reads the control
+opcode and setup UUID-size byte before proving that those bytes are
+present. bnep_rx_control() also dereferences the control opcode without
+rejecting an empty control payload.
 
-The Bluetooth host decides whether to download firmware by reading the
-controller firmware download completion flag and firmware version
-information.
+Use skb_pull_data() for the fixed fields in bnep_rx_frame() so a NULL
+return gates each dereference. Split the control handler so the frame
+path can pass an opcode that has already been pulled, and keep the
+byte-buffer wrapper for extension control payloads.
 
-If a USB error occurs during the firmware download process (for example
-due to a USB disconnect), the download is aborted immediately. An
-incomplete firmware transfer does not cause the controller to set the
-download completion flag, but the firmware version information may be
-updated at an early stage of the download process.
+Validation reproduced this kernel report:
+KASAN slab-out-of-bounds in bnep_rx_frame.isra.0+0x130c/0x1790
+The buggy address belongs to the object at ffff88800c0f7908 which belongs
+to the cache kmalloc-8 of size 8
+The buggy address is located 0 bytes to the right of allocated 1-byte
+region [ffff88800c0f7908, ffff88800c0f7909)
+Read of size 1
+Call trace:
+  dump_stack_lvl+0xb3/0x140 (?:?)
+  print_address_description+0x57/0x3a0 (?:?)
+  bnep_rx_frame+0x130c/0x1790 (net/bluetooth/bnep/core.c:306)
+  print_report+0xb9/0x2b0 (?:?)
+  __virt_addr_valid+0x1ba/0x3a0 (?:?)
+  srso_alias_return_thunk+0x5/0xfbef5 (?:?)
+  kasan_addr_to_slab+0x21/0x60 (?:?)
+  kasan_report+0xe0/0x110 (?:?)
+  process_one_work+0xfce/0x17e0 (kernel/workqueue.c:3200)
+  worker_thread+0x65c/0xe40 (?:?)
+  __kthread_parkme+0x184/0x230 (?:?)
+  kthread+0x35e/0x470 (?:?)
+  _raw_spin_unlock_irq+0x28/0x50 (?:?)
+  ret_from_fork+0x586/0x870 (?:?)
+  __switch_to+0x74f/0xdc0 (?:?)
+  ret_from_fork_asm+0x1a/0x30 (?:?)
 
-In this case, after USB reconnection, the host attempts to re-download
-the firmware because the download completion flag is not set. However,
-since the controller reports the same firmware version as the target
-firmware, the download is skipped. This ultimately results in the
-firmware not being properly updated on the controller.
-
-This change removes the restriction that skips firmware download when
-the versions are equal. It covers scenarios where the USB connection
-can be disconnected at any time and ensures that firmware download can
-be retriggered after USB reconnection, allowing the Bluetooth firmware
-to be correctly and completely updated.
-
-Fixes: 3267c884cefa ("Bluetooth: btusb: Add support for QCA ROME chipset family")
-Cc: stable@vger.kernel.org
-Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Zhang Cen <rollkingzzc@gmail.com>
 ---
-Changes v3:
-- Add Fixes tag pointing to the commit that introduced the version
-  comparison.
-- Link v2
-  https://lore.kernel.org/all/20260429121207.1306526-1-shuai.zhang@oss.qualcomm.com/
+ net/bluetooth/bnep/core.c | 51 ++++++++++++++++++++++++---------------
+ 1 file changed, 31 insertions(+), 20 deletions(-)
 
-Changes v2:
-- Update code comments and commit message to reflect the correct logic.
-- Align the commit title with upstream conventions.
-- Link v1
-  https://lore.kernel.org/all/20260108074353.1027877-1-shuai.zhang@oss.qualcomm.com/
-
- drivers/bluetooth/btusb.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 572091e60..70abbabea 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3550,7 +3550,13 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
- 		    "firmware rome 0x%x build 0x%x",
- 		    rver_rom, rver_patch, ver_rom, ver_patch);
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index 853c8d764..156cd3026 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -206,14 +206,11 @@ static int bnep_ctrl_set_mcfilter(struct bnep_session *s, u8 *data, int len)
+ 	return 0;
+ }
  
--	if (rver_rom != ver_rom || rver_patch <= ver_patch) {
-+	/* Allow rampatch when the patch version equals the firmware version.
-+	 * A firmware download may be aborted by a transient USB error (e.g.
-+	 * disconnect) after the controller updates version info but before
-+	 * completion.
-+	 * Allowing equal versions enables re-flashing during recovery.
-+	 */
-+	if (rver_rom != ver_rom || rver_patch < ver_patch) {
- 		bt_dev_err(hdev, "rampatch file version did not match with firmware");
- 		err = -EINVAL;
- 		goto done;
+-static int bnep_rx_control(struct bnep_session *s, void *data, int len)
++static int bnep_rx_control_cmd(struct bnep_session *s, u8 cmd, void *data,
++			       int len)
+ {
+-	u8  cmd = *(u8 *)data;
+ 	int err = 0;
+ 
+-	data++;
+-	len--;
+-
+ 	switch (cmd) {
+ 	case BNEP_CMD_NOT_UNDERSTOOD:
+ 	case BNEP_SETUP_CONN_RSP:
+@@ -254,6 +251,14 @@ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
+ 	return err;
+ }
+ 
++static int bnep_rx_control(struct bnep_session *s, void *data, int len)
++{
++	if (len < 1)
++		return -EILSEQ;
++
++	return bnep_rx_control_cmd(s, *(u8 *)data, data + 1, len - 1);
++}
++
+ static int bnep_rx_extension(struct bnep_session *s, struct sk_buff *skb)
+ {
+ 	struct bnep_ext_hdr *h;
+@@ -299,19 +304,26 @@ static int bnep_rx_frame(struct bnep_session *s, struct sk_buff *skb)
+ {
+ 	struct net_device *dev = s->dev;
+ 	struct sk_buff *nskb;
++	u8 *data;
+ 	u8 type, ctrl_type;
+ 
+ 	dev->stats.rx_bytes += skb->len;
+ 
+-	type = *(u8 *) skb->data;
+-	skb_pull(skb, 1);
+-	ctrl_type = *(u8 *)skb->data;
++	data = skb_pull_data(skb, sizeof(type));
++	if (!data)
++		goto badframe;
++	type = *data;
+ 
+ 	if ((type & BNEP_TYPE_MASK) >= sizeof(__bnep_rx_hlen))
+ 		goto badframe;
+ 
+ 	if ((type & BNEP_TYPE_MASK) == BNEP_CONTROL) {
+-		if (bnep_rx_control(s, skb->data, skb->len) < 0) {
++		data = skb_pull_data(skb, sizeof(ctrl_type));
++		if (!data)
++			goto badframe;
++		ctrl_type = *data;
++
++		if (bnep_rx_control_cmd(s, ctrl_type, skb->data, skb->len) < 0) {
+ 			dev->stats.tx_errors++;
+ 			kfree_skb(skb);
+ 			return 0;
+@@ -325,23 +337,22 @@ static int bnep_rx_frame(struct bnep_session *s, struct sk_buff *skb)
+ 		/* Verify and pull ctrl message since it's already processed */
+ 		switch (ctrl_type) {
+ 		case BNEP_SETUP_CONN_REQ:
+-			/* Pull: ctrl type (1 b), len (1 b), data (len bytes) */
+-			if (!skb_pull(skb, 2 + *(u8 *)(skb->data + 1) * 2))
++			/* Pull: len (1 b), data (len * 2 bytes) */
++			data = skb_pull_data(skb, 1);
++			if (!data)
++				goto badframe;
++			if (!skb_pull(skb, *data * 2))
+ 				goto badframe;
+ 			break;
+ 		case BNEP_FILTER_MULTI_ADDR_SET:
+-		case BNEP_FILTER_NET_TYPE_SET: {
+-			u8 *hdr;
+-
+-			/* Pull ctrl type (1 b) + len (2 b) */
+-			hdr = skb_pull_data(skb, 3);
+-			if (!hdr)
++		case BNEP_FILTER_NET_TYPE_SET:
++			/* Pull: len (2 b), data (len bytes) */
++			data = skb_pull_data(skb, sizeof(u16));
++			if (!data)
+ 				goto badframe;
+-			/* Pull data (len bytes); length is big-endian */
+-			if (!skb_pull(skb, get_unaligned_be16(&hdr[1])))
++			if (!skb_pull(skb, get_unaligned_be16(data)))
+ 				goto badframe;
+ 			break;
+-		}
+ 		default:
+ 			kfree_skb(skb);
+ 			return 0;
 -- 
-2.34.1
+2.43.0
 
