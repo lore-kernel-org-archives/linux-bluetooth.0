@@ -1,121 +1,226 @@
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965D81F2B8D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 01:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8718828466F;
+	Thu, 21 May 2026 01:56:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779326675; cv=none; b=uWDwWb27MgDufodVbx7Cx76Edo1bdswQmPG03Zj0S6qKECAyQqkdCzwEeZWG0ouQDYzwkOmNj9yZ+b4AxE4XNDoe3lr1FQx0d0yufEN7r70kJ6KeU8VzMWTBKjqbYSTuaFrfH9LrJk5okFY1Z1Gp+0VxXYLEA/phfrYYAmHa/AE=
+	t=1779328609; cv=none; b=uN0fPN3jv/bpzzNxEjQJpS01KjaN3xDS7+DPLU6ffRXz4iXBzHXdztL3P9EFqJ6UrC2drYVXVr9GlrowQC1P44FLHoMrQA/7kTy19oPq9Jp7e63WxNgMZmI0f6Yd5xrnLIeda9hxGAn23JKn90yXuu4+V/mOO2FPCMxrP/O6ED8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779326675; c=relaxed/simple;
-	bh=TdAy1zQzFUKsxLPMJ+A91mq85aZHBiDmMr9m1DL/Qe8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=F6TTA3Fd4hzA39k+Ix+XaE14WAOFDyodgUeCX3+PopMSQWiJgdm6spRmw6BavbD8Ox/HqxUOzzY7fmlmJbidZ8JCCOJEghrkGYUeSYXQvznoxmFtUIj2m1UZNZOS/rRb8oi8ycNjmcE7v6yDGMH4qy8BYb0JdkKKbeI826OJz4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s244yRcs; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1779328609; c=relaxed/simple;
+	bh=AAvEu2XNtqL1MOnrvxoj8L1O9ls/nJgt5AtZ4HWdVcs=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=o9LveXDmAiYpz0T6ar/a5qb56m0mVK49jqg1pX2gJwM+0/6JBmVsJrdqJjmMCWooZoRdpIc1E5mzXPV7AKtj1bEVBtERgaoUh3jwsv9iT3jgrEpa9aeafAViESDPJJENs2lvMeZIFQ/2JKSXoYHWpWsvl51m6OOJT6Y4dRvKqBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=jQO+F7Wi; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=IR3w3euu; arc=none smtp.client-ip=103.168.172.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s244yRcs"
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-911449d9d03so658092185a.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 18:24:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779326673; x=1779931473; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=CoNWf5RtCjd464UHCMo8aW1ATZbwAfpTva2xggkr7DE=;
-        b=s244yRcs9j21B2nl4IfpoL8TrEtC5n/07nA7khutdjXVdM4C4f5fwlJgUy6gu/ExvF
-         nuUCnQ86/XWccdLv9rq/NnyS18Q9bout1GhKMdx2zRMuk9j5v0B88V4qlFmc2TFx3/2H
-         EIb9mvNPtWZ9tixhtfZ4gEkSL61YfLQ0pqHeQKB12I9uqFUCfnT9oIBvkmPVI/UV9oZ8
-         9/HuV4HDHm6WgGyj8zjMo0/e8aqQsnkCJ0t8uqW5EtZRFiB7DSdfIHW2n7cs6ENhnRNG
-         JJ4wU5syz10UsdM7ZIBfMpt8fwtR8BMXx/fl/gFgHI3/4BwtZwTS7QIoxU/9heYxRPlW
-         rYOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779326673; x=1779931473;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CoNWf5RtCjd464UHCMo8aW1ATZbwAfpTva2xggkr7DE=;
-        b=LV9pkxy/OpngwhELzm2FJzIosc/Nt2ISovQkHJj2ioFniCTJ/vtaVx9yzprBN1ePTS
-         wQ+hJudE+WTpDR2w9cMJlC55ognmIOmkhmInxZiY7S5EJbLdaq5dhL8p5+16PuY1KAro
-         /heKZelj++tN/NR8ANa4LA0FU0aiA+/n4wjzmXiu64qOdOHC/BdWK1/MIVDL0mMHM81a
-         tQ28TWg1g28JeS1AK5//vN2pmVxj8aDGHsQllJ9mHKvtk1gb/jST6lqF4ZRjxeoK9LdA
-         IsdXA7YvrNG7MM10+D0FPzXq+4HiAwsWu3aoSBsv0vv0gY+1s9YS6J/aSyD/CfZKQ3NS
-         0ltw==
-X-Gm-Message-State: AOJu0Ywtia2ZWJn6M0zCpvLLHWMswXnzJEiNMpl4UAMQpn4/GBMFhADK
-	vPJTfgCczgl2+cGgX4/lXy5PXioeiHXjU7/cCY9V9aNkjtwqENbsckP1pMC+mg==
-X-Gm-Gg: Acq92OFFCcdmGoraQl9kqMaGQGM/CMBEC/gRXg4JeKc2qPr8u2y88ZZJuI6Dxd6p0V9
-	NxRQwNWTPGAoKOnJxUlWwvFDSeAK+EUu0uNqxPv3vknk7MRjDTKCn8JNePH2S/fTO6ZPbSvn/6B
-	OSg6V/TPQAgiuGn/jBZqSQFYpVpwCIMzK8i+wALUiVF/zZ2fo56/Wn7J8IFbmbS90eIu9xkjFLE
-	s3kjqXkyKo2I3+LjGLgUGcjzH1wawwNTvrtoZOq7OoceQLAvmEmYvDtHqbpMcI5AlOsxma/5hX7
-	l6fdIeLxBMI0L9TPRQ5FKEulsZXDkQoN5m/CdN+b853O7iLpmbNDvkKBJu2y0U/Vokjfy6Jh4uq
-	BY25UjcrX8MJmlcDIlAP8NCNs/zNV0jl4Qn+SvXfn2QzMksWMIcFbAIj6/G8k4XTC3BYjgzupjt
-	ibu+uNRoLvpzVS892b9Qh5ztrzX9uXm42OtUqx53G6
-X-Received: by 2002:a05:620a:4506:b0:90d:501c:50 with SMTP id af79cd13be357-914a2a62ce9mr104549985a.26.1779326673567;
-        Wed, 20 May 2026 18:24:33 -0700 (PDT)
-Received: from [172.17.0.2] ([172.200.23.66])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-910bd823f66sm2260764885a.46.2026.05.20.18.24.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 18:24:33 -0700 (PDT)
-Message-ID: <6a0e5ed1.6f516b66.306230.91cc@mx.google.com>
-Date: Wed, 20 May 2026 18:24:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1619115656289273689=="
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="jQO+F7Wi";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IR3w3euu"
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.phl.internal (Postfix) with ESMTP id B471BEC01EF;
+	Wed, 20 May 2026 21:56:46 -0400 (EDT)
+Received: from phl-imap-10 ([10.202.2.85])
+  by phl-compute-03.internal (MEProxy); Wed, 20 May 2026 21:56:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1779328606;
+	 x=1779415006; bh=Gn5hw+guZ8UBD1xGIQ4e8FEov65ahJfR4ari0ZL5suQ=; b=
+	jQO+F7Wia19fFBAay4lTDoW7VGIm4IAZcTVI9J5+4w0FJm29/2xjpAtjn6NixbZi
+	l9omsBk7GvP+lzyyLok1GBBvS3jePRoUS//zSVgWwA78/pclV4xVEQs93Ofe+WVv
+	7CW/rWsXoJm7RP2+Wgf29EFEjOUIsLMyI+R/67cSg9EM29J9vM/i9lswSdzWa+FC
+	FvBg4wr7pXmYNz+Zn7fzSFX2XrvG8Ph2opy/WLxZqwHbY5ang97hB4m/8b/Xeyto
+	ltcdBpWeTp6BxVHXnqoTDFXjO+xQNCUv0ouZfDoddBz+w0lCdXe0mbI2pcRUlDj8
+	MJm6Lw4IxgYo34B/K5MsTA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1779328606; x=
+	1779415006; bh=Gn5hw+guZ8UBD1xGIQ4e8FEov65ahJfR4ari0ZL5suQ=; b=I
+	R3w3euuluQTsqStBd0lwqWdwXRpFELBhnxDQI6EnlMXWlNEd0ak0nNLtU7IFwIKm
+	eshfpUCE6H7aJceS+Or0KTyEQiavcu9s8/9cG7KvG6yEdyd7HNEHAnUgq+qXJfBD
+	/3BisiW+GoiVOJ5CzC2ixBqd0In/UZ7cQ0ERvuN0tJikD6khiAkHL2z0zGRNk5i6
+	zELrIIroxizRL2CUHeTxljXgOYkBVfT0OM83oSyyNWmzkOFuKbxNnCIzwmRzC7YV
+	rks/kmaPF2GlaNZ1WEMO7U8skkJ852aNJzuSEbUJBVGSudaW+51G480FPs4LEYRx
+	M+WGFRgD33xqpQ0xxAW+Q==
+X-ME-Sender: <xms:XmYOahqBLqd0U_7rKGpLYQnl4SctZK63MUUzOmxFTA0bupf1I1RHxg>
+    <xme:XmYOaucnUWKd8-Bp78G4Vm-bO0_WaGbuOiM01GFNhzegLz7gNsy7E4HfnDnL1u3-G
+    Q1vcu7g3OqWrsYAi1p0F8x0m-72fpUrHy2M0LIQTLk8lCy21A2hHN4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddugeeivdehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnegfrh
+    hlucfvnfffucdlfeehmdenucfjughrpefoggffhffvvefkjghfufgtgfesthhqredtredt
+    jeenucfhrhhomhepfdfuihifvghiucgkhhgrnhhgfdcuoehoshhssehfohhurhguihhmrd
+    ighiiiqeenucggtffrrghtthgvrhhnpeeuveeuleefheetgfevkeegteetffejgfeigfdt
+    uedtveetieehleefjeehteekheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehoshhssehfohhurhguihhmrdighiiipdhnsggprhgtphhtthho
+    peegpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehluhhiiidruggvnhhtiiesgh
+    hmrghilhdrtghomhdprhgtphhtthhopehsrghfrgdrkhgrrhgrkhhushesshgvtghunhhn
+    ihigrdgtohhmpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrd
+    hkvghrnhgvlhdrohhrghdprhgtphhtthhopehsthgrsghlvgesvhhgvghrrdhkvghrnhgv
+    lhdrohhrgh
+X-ME-Proxy: <xmx:XmYOaqRw5mG7eiSip3v0k8GaDOqQ206OO_-1p98LGZOS5w4_Fdmqsw>
+    <xmx:XmYOarObFxYIlEE3UatHMt8aoZ9DpZn4ASdMwOMhVWq-xq4ieq6_ww>
+    <xmx:XmYOarUw3-gLcvftbHOyHZOJltYYH-J6EajmNUZd1ou5lGGf_fDtZQ>
+    <xmx:XmYOaqdB06RsvLwFPI6FlnE2cST4TO9swMJhgvlbOg_daa5DVnSX4Q>
+    <xmx:XmYOauXsuPzJEnK95SrslKzgE-wXa2pbyTRzBKnw0e3HK85TIXyWMqpQ>
+Feedback-ID: if72e4b10:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 79072216008A; Wed, 20 May 2026 21:56:46 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, meatuni001@gmail.com
-Subject: RE: [v3] Bluetooth: HIDP: fix missing length checks in hidp_input_report()
-In-Reply-To: <20260520225643.35683-1-meatuni001@gmail.com>
-References: <20260520225643.35683-1-meatuni001@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-ThreadId: A4i_tNf7zNzg
+Date: Wed, 20 May 2026 21:56:26 -0400
+From: "Siwei Zhang" <oss@fourdim.xyz>
+To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+ =?UTF-8?Q?Safa_Karaku=C5=9F?= <safa.karakus@secunnix.com>,
+ stable@vger.kernel.org
+Message-Id: <10592e60-b93f-4288-8a96-c1c39340de72@app.fastmail.com>
+In-Reply-To: 
+ <CABBYNZJiCTJrde9rYT=NQAk_RUv=ugeAUPnRg6vsjvU5hW4NqQ@mail.gmail.com>
+References: <20260516181504.3076260-1-safa.karakus@secunnix.com>
+ <20260520200611.3033410-1-oss@fourdim.xyz>
+ <CABBYNZJiCTJrde9rYT=NQAk_RUv=ugeAUPnRg6vsjvU5hW4NqQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: L2CAP: use chan timer to close channels in
+ cleanup_listen()
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
---===============1619115656289273689==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+On Wed, May 20, 2026, at 4:29 PM, Luiz Augusto von Dentz wrote:
+> Hi Siwei,
+>
+> On Wed, May 20, 2026 at 4:06=E2=80=AFPM Siwei Zhang <oss@fourdim.xyz> =
+wrote:
+>>
+>> l2cap_chan_close() removes the channel from conn->chan_l, which
+>> must be done under conn->lock.  cleanup_listen() runs under the
+>> parent sk_lock, so acquiring conn->lock would invert the
+>> established conn->lock -> chan->lock -> sk_lock order.
+>>
+>> Instead of calling l2cap_chan_close() directly, schedule
+>> l2cap_chan_timeout with delay 0 to close the channel
+>> asynchronously.  The timeout handler already acquires conn->lock
+>> and chan->lock in the correct order.
+>>
+>> The timer is only armed when chan->conn is still set: if it is
+>> already NULL, l2cap_conn_del() has already processed this channel
+>> (l2cap_chan_del + l2cap_sock_teardown_cb + l2cap_sock_close_cb),
+>> so there is nothing left to do.  If l2cap_conn_del() races in
+>> after the timer is armed, __clear_chan_timer() inside
+>> l2cap_chan_del() cancels it; if the timer has already fired, the
+>> handler returns harmlessly because chan->conn was cleared.
+>>
+>> Fixes: 3df91ea20e74 ("Bluetooth: Revert to mutexes from RCU list")
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
+>> ---
+>>  net/bluetooth/l2cap_sock.c | 16 +++++++++-------
+>>  1 file changed, 9 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+>> index 4ed745a9c2cf..025329636353 100644
+>> --- a/net/bluetooth/l2cap_sock.c
+>> +++ b/net/bluetooth/l2cap_sock.c
+>> @@ -1512,6 +1512,10 @@ static void l2cap_sock_cleanup_listen(struct s=
+ock *parent)
+>>          * pin it (hold_unless_zero() additionally skips a chan alrea=
+dy past
+>>          * its last reference).  We then drop the sk lock before taki=
+ng
+>>          * chan->lock, so sk and chan locks are never held together.
+>> +        *
+>> +        * Since we cannot call l2cap_chan_close() without conn->lock,
+>> +        * schedule l2cap_chan_timeout to close the channel; it alrea=
+dy
+>> +        * acquires conn->lock -> chan->lock in the correct order.
+>>          */
+>>         while ((sk =3D bt_accept_dequeue(parent, NULL))) {
+>>                 struct l2cap_chan *chan;
+>> @@ -1529,14 +1533,12 @@ static void l2cap_sock_cleanup_listen(struct =
+sock *parent)
+>>                        state_to_string(chan->state));
+>>
+>>                 l2cap_chan_lock(chan);
+>> -               __clear_chan_timer(chan);
+>> -               l2cap_chan_close(chan, ECONNRESET);
+>> -               /* l2cap_conn_del() may already have killed this sock=
+et
+>> -                * (it sets SOCK_DEAD); skip the duplicate to avoid a
+>> -                * double sock_put()/l2cap_chan_put().
+>> +               /* Since we cannot call l2cap_chan_close() without
+>> +                * conn->lock, schedule its timer to trigger the close
+>> +                * and cleanup of this channel.
+>>                  */
+>> -               if (!sock_flag(sk, SOCK_DEAD))
+>> -                       l2cap_sock_kill(sk);
+>> +               if (chan->conn)
+>> +                       __set_chan_timer(chan, 0);
+>
+> Great that seems a lot easier to understand than the previous changes.
+> I just don't quite follow why you are removing SOCK_DEAD handling with
+> this?
+>
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1098338
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.74 seconds
-GitLint                       PASS      0.33 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      25.49 seconds
-CheckAllWarning               PASS      28.49 seconds
-CheckSparse                   PASS      26.31 seconds
-BuildKernel32                 PASS      24.53 seconds
-TestRunnerSetup               PASS      525.22 seconds
-TestRunner_l2cap-tester       PASS      378.59 seconds
-TestRunner_iso-tester         PASS      597.04 seconds
-TestRunner_bnep-tester        PASS      19.00 seconds
-TestRunner_mgmt-tester        PASS      2023.48 seconds
-TestRunner_rfcomm-tester      PASS      63.40 seconds
-TestRunner_sco-tester         PASS      141.63 seconds
-TestRunner_ioctl-tester       PASS      133.58 seconds
-TestRunner_mesh-tester        PASS      60.44 seconds
-TestRunner_smp-tester         PASS      17.83 seconds
-TestRunner_userchan-tester    PASS      19.21 seconds
-TestRunner_6lowpan-tester     PASS      50.92 seconds
-IncrementalBuild              PASS      24.01 seconds
-
-
-
-https://github.com/bluez/bluetooth-next/pull/224
-
----
-Regards,
-Linux Bluetooth
+l2cap_sock_cleanup_listen()                     [holds: parent sk_lock]
+    bt_accept_dequeue()                           =E2=86=92 returns chil=
+d sk + ref
+    lock_sock(child sk)
+    l2cap_chan_hold_unless_zero(chan)
+    release_sock(child sk)
+    l2cap_chan_lock(chan)
+    __set_chan_timer(chan, 0)                      =E2=86=92 schedules d=
+elayed work
+    l2cap_chan_unlock(chan)
+    l2cap_chan_put(chan)
+    sock_put(sk)
+        =E2=86=93 (deferred, on workqueue)
+    l2cap_chan_timeout()                          =20
+      mutex_lock(conn->lock)                      =E2=86=90 proper lock =
+order
+      l2cap_chan_lock(chan)
+      l2cap_chan_close(chan, reason)
+        l2cap_chan_del(chan, reason)
+          chan->ops->teardown(chan, err)           =E2=86=92 l2cap_sock_=
+teardown_cb()
+            lock_sock(child sk)
+            sk->sk_state =3D BT_CLOSED
+            sock_set_flag(sk, SOCK_ZAPPED)
+            release_sock(sk)
+      chan->ops->close(chan)                       =E2=86=92 l2cap_sock_=
+close_cb()
+        l2cap_sock_kill(sk)
+          chan->data =3D NULL
+          l2cap_chan_put(chan)
+          sock_set_flag(sk, SOCK_DEAD)
+          sock_put(sk)
 
 
---===============1619115656289273689==--
+l2cap_chan_timeout() will do the l2cap_sock_kill() job for us.
+Previously in Safa's patch, because that does not have conn-lock
+protection, which might result in double kill so there is a defensive
+check. In our version, this is totally not required.
+
+>>                 l2cap_chan_unlock(chan);
+>>
+>>                 l2cap_chan_put(chan);
+>> --
+>> 2.54.0
+>>
+>
+>
+> --=20
+> Luiz Augusto von Dentz
+
+Best,
+Siwei
