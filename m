@@ -1,128 +1,203 @@
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70FB73D8103
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 14:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBC8367F26
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 14:30:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779373609; cv=none; b=RmOvamLa0MrsHf15KTGPmwWsCCImOi2NlbSxoYrjEoQiKWvAsCKIsRvg0eMAjTdJ4qQQc+daWmzrmqvGD3Vb0cGgP0B5zO/HAkyUjkHQr1CcDn4aUi+V2poUa0TCNKiwkM8IWZWyE5UYSvTMMRxx8d9HBXjkxlfBg3o1SpTD2RA=
+	t=1779373837; cv=none; b=V6D/y3m4w9WBY2NLq3q6LiFw+g+WYjV8UYS0N51DHON9A9HDEOKdlpqSzCEEllUFvBgw42S4zXmt0FrNjiPfSScPyMfKkmyDk4mYnJc/VMDUpf/8kam6TxKb6WlTTwMZYJrB665r0Q7DCNIRyg9AQmYDqe6y+2a+wxRTkEHNVE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779373609; c=relaxed/simple;
-	bh=47rUh59DOxjQyDGLlVVdfKwJdbUJs5dqHnAQdoQW2jE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=EMH+wF0FksZ6ydxIKYLbkgJQNuzOTv9R50bmh54vft39Vm+ocSSIjXEtXqeBL7xgx8Fz8cPq5X6JnEZO2bsJrSeNP090JWa9vOHVDgv9oQbrLVcMJnBxG7B4zbgNr+ojqpSIqMup6VT1YBxYHMJJ/jFxeAuV5anaga7rnk37x5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c/dnAs9A; arc=none smtp.client-ip=209.85.160.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1779373837; c=relaxed/simple;
+	bh=3AOZO8QPwcGIlMzYbcDC76gXWWsCfyKrOF6awgw40lw=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Uo99jn5g+/xxxAfCiQ7hZBN69tYAHB0G86PmFNuApYf29Facp5PeRTARXoH9MSYLyGTk4eoih3KdG5pkzmtaGAwaVzJeSjlQsI8pLeUm0UU9T/p3NNTlfnQ9f2WYHIOdasmO6QLCI84eKJxuU31Aby8RqQBe10C+fxTKUYS/EvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ZHEvL69l; arc=none smtp.client-ip=192.30.252.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/dnAs9A"
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-41576c5c01cso4533107fac.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 07:26:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779373607; x=1779978407; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=fV7BT3EzF6tln0RVXrazkDY4LgskIbZ+RwQiv1H0k9s=;
-        b=c/dnAs9AQ03Vb0f3WT/0Er7iXImLr9e7OgiPixhEBSMKvrWq9Z2OO3bjNHWK8ml+ru
-         DUtspM/USreTgHPmQZT4RjwO57eqzd5GyctuyVVOW1pn1rTcp+EeWqhZ71LgMxauRs40
-         cwhenlBPzGhQQvKbSefRZhkH7yNShwP4MfCk8IkvXev7VdOxvsH10KBy+BbvRNbQaw8S
-         VLSs2zfJ9+UnXes3UJSlJXRltoS7SJWU2tJAnmfxBXUCjueBpTFH3BGgKXn30eMHX5Dh
-         LdNyzYrx1HvpbQOvqRLSzFK/7l+AM9o0vLzXYFxRXbJGrvDRAtlFZEt/JwkSpVivyUDJ
-         734Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779373607; x=1779978407;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fV7BT3EzF6tln0RVXrazkDY4LgskIbZ+RwQiv1H0k9s=;
-        b=LtNrJ7nbT4qqyNzTHgCYQhvAAGEKclbq8VE4jQ2Ml1+/t2M2v/s8YntavzGRdUCoup
-         EnlOGbtwAgHq3J16QNJavO350x5s6DMuz6eAsgamWGqNCXdtkqgfWNfGvIvxq8QLiOWQ
-         QWVWVM7Gu+xyxNUyxHGT37KnIdkQhmTpc68n0Y72A9CJIpGZd9WeURvjqGS0NKZ9guSO
-         uJI8jD2zGxSGrhIYKIMbF5XYHvfYsKXAovWzNCsvOw/EJsXYcTAdgwyoqfXdsHOz4tAt
-         LwU5OYwrMteUBcnvOMviVm1hFV6l3D1u5hCnRQsYJqYU416Zx0Fm5h3Ui0m1/92Hjc4D
-         +n8g==
-X-Gm-Message-State: AOJu0YxHyN8S4ykCqzzbuveiZobU0W6f7HtD+hcrc+XySLCg9vMy16Ug
-	w7WobhahP235HdDtLSz0uTyDFzHevorQPnjxqnzIfqqmSegD9F0Qiftec47eYw==
-X-Gm-Gg: Acq92OEBAP5NpBfLzQRtqBNgU21jdOFO26i57E33+xqXYbWEOE20pxrEYFpXCAPReAI
-	2FE/o5lGVgR7k8Xg8zYkrqtbNCVkIGWYzGTm8reylf32nIPugzYxGtmolMCFyoW/vVoI2FWgoCg
-	pTTuNXCmzXjAh+skoJnZeV/VzTgEFaYQCLE72L4TXalWVbhR8NGz8fhnkVTtZJo4w3O8FYeB66z
-	D5bxuGdhMIMlzlIvbOBrxD1RTtay+kQ9dkTMd+Mv9zW63jZhiucrp6bikhW+BrPqmru2bjDxA56
-	1aiqK1CJ3YD5+ylzOPmAACgJxrJ9mDhuy1swcb2przPUySAMU7SD/3WDD24yQCCAyBxJ75Syjn0
-	pf68z0xSUbHm9dqLWy0KkjuMMOuqSrPinfpMTiTcmRxsbzaHEUl/vXUHfBatOOJysxL/89c7xtW
-	I+Hr4buIPokpe3g243DhfqiK52FJxAVnI=
-X-Received: by 2002:a05:6870:1761:b0:430:2495:5ec1 with SMTP id 586e51a60fabf-43b2eb10bfemr2121681fac.31.1779373607277;
-        Thu, 21 May 2026 07:26:47 -0700 (PDT)
-Received: from [172.17.0.2] ([172.212.165.72])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43b4544de2asm596708fac.15.2026.05.21.07.26.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2026 07:26:46 -0700 (PDT)
-Message-ID: <6a0f1626.821cd8d4.2b803.b3e6@mx.google.com>
-Date: Thu, 21 May 2026 07:26:46 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2545167711089129910=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ZHEvL69l"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1779373835;
+	bh=WpyzOkfLOesCwDOn2i+MK5DfaMB0M6ZH5Rh1CO1aaPk=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=ZHEvL69lKb+U39dORZfsOUUZIgH2YUsehWE81i/EqKm4WNRuj0Y1W5gFeoIIlp+WC
+	 UdMzQaxXRUtPJAobh5yd0nntb16Ma85JMgSPRWOYIH9MYaLKArhnzG2jMN9CVqUS1t
+	 IkCalG9Z0NEh/Zhg63CDKYv//SWHj84qbiFtEa/c=
+Received: from github.com (hubbernetes-node-15f979d.ac4-iad.github.net [10.52.13.78])
+	by smtp.github.com (Postfix) with ESMTPA id 82D1894032A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 07:30:35 -0700 (PDT)
+Date: Thu, 21 May 2026 07:30:35 -0700
+From: michael kong <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/757cd9-d167d3@github.com>
+Subject: [bluez/bluez] 247044: tester.config: add missing CRYPTO_AES
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, oss@fourdim.xyz
-Subject: RE: [v2] Bluetooth: L2CAP: use chan timer to close channels in cleanup_listen()
-In-Reply-To: <20260521021249.3258069-1-oss@fourdim.xyz>
-References: <20260521021249.3258069-1-oss@fourdim.xyz>
-Reply-To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
---===============2545167711089129910==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 2470448ed9d7ddff2347215a91b28de3a4565b0c
+      https://github.com/bluez/bluez/commit/2470448ed9d7ddff2347215a91b28=
+de3a4565b0c
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-05-19 (Tue, 19 May 2026)
 
-This is automated email and please do not reply to this email!
+  Changed paths:
+    M doc/ci.config
+    M doc/test-runner.rst
+    M doc/tester.config
 
-Dear submitter,
+  Log Message:
+  -----------
+  tester.config: add missing CRYPTO_AES
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1098389
+Kernel commit 4a1507625b0 ("Bluetooth: SMP: Use AES-CMAC library
+API") removed CRYPTO_AES from the default Bluetooth kernel config.
 
----Test result---
+This causes Bluetooth testbots to fail silently with "Not Run" status:
 
-Test Summary:
-CheckPatch                    PASS      0.66 seconds
-GitLint                       FAIL      0.28 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      25.36 seconds
-CheckAllWarning               PASS      28.35 seconds
-CheckSparse                   PASS      26.31 seconds
-BuildKernel32                 PASS      24.49 seconds
-TestRunnerSetup               PASS      525.81 seconds
-TestRunner_l2cap-tester       FAIL      59.03 seconds
-IncrementalBuild              PASS      24.10 seconds
+Basic Framework - Success - init
+  Read Index List callback
+    Status: 0x00
+Bluetooth: hci0: Opcode 0x0c03 failed: -110
+Bluetooth: hci0: Opcode 0x0c03 failed: -110
+  hciemu: Failed to open vhci
+  Failed to setup HCI emulation
+Basic Framework - Success - pre setup failed
+Basic Framework - Success - done
+...
+SCO CVSD Listen Send - Success                       Not Run
+Total: 30, Passed: 0 (0.0%), Failed: 0, Not Run: 30
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2] Bluetooth: L2CAP: use chan timer to close channels in cleanup_listen()
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-21: B1 Line exceeds max length (109>80): "Cc: <stable@vger.kernel.org> # 0b58004: Bluetooth: fix UAF in l2cap_sock_cleanup_listen() vs l2cap_conn_del()"
-##############################
-Test: TestRunner_l2cap-tester - FAIL
-Desc: Run l2cap-tester with test-runner
-Output:
-Total: 96, Passed: 95 (99.0%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-L2CAP BR/EDR Server - Set PHY 1M                     Failed       0.261 seconds
+Fix by explicitly requiring CRYPTO_AES.
 
 
-https://github.com/bluez/bluetooth-next/pull/230
+  Commit: 0e55974d713b699166fe56f11974e8520596076b
+      https://github.com/bluez/bluez/commit/0e55974d713b699166fe56f11974e=
+8520596076b
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-05-19 (Tue, 19 May 2026)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M client/btpclient/bap.c
+    M client/btpclient/btpclient.c
+    M client/btpclient/btpclient.h
+    M client/btpclient/core.c
+    M client/btpclient/gap.c
+    M client/btpclient/gatt.c
+
+  Log Message:
+  -----------
+  client/btpclient: refactor read-commands bitmap building
+
+Add add_supported_command() and use it across all btp_*_read_commands
+handlers.
+
+This replaces fixed-size bitmask assembly with a dynamically growing
+command bitmap based on opcode index, avoiding shift-width issues with
+higher opcodes.
+This will allow to add opcodes like GAP_SET_EXTENDED_ADVERTISING
+(0x21).
+
+Refactor core, gap, gatt and bap read-commands paths to build response
+bitmaps through the shared helper and preserve existing error handling
+for allocation failures.
+
+Assisted-by: GPT:GPT-5.3-Codex
 
 
---===============2545167711089129910==--
+  Commit: 9074d38c5fed33cd6b611b9663f600c4f68bb741
+      https://github.com/bluez/bluez/commit/9074d38c5fed33cd6b611b9663f60=
+0c4f68bb741
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-05-19 (Tue, 19 May 2026)
+
+  Changed paths:
+    M client/btpclient/gap.c
+
+  Log Message:
+  -----------
+  client/btpclient: Replace advertising defines by shared ones
+
+The advertisement types are already defined in src/shared/ad.h
+
+
+  Commit: 588a0267d8fabf146a0f35c85f30e06394fb526f
+      https://github.com/bluez/bluez/commit/588a0267d8fabf146a0f35c85f30e=
+06394fb526f
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-05-19 (Tue, 19 May 2026)
+
+  Changed paths:
+    M client/btpclient/gap.c
+    M src/shared/btp.h
+
+  Log Message:
+  -----------
+  client/btpclient: Add BTP_OP_GAP_SET_EXTENDED_ADVERTISING support
+
+This set LEAdvertisement1's SecondaryChannel property to "2M" to
+force Extended advertisement type.
+
+
+  Commit: 29fb17c909a0998b09aaee1dc0fb6163bd2619cb
+      https://github.com/bluez/bluez/commit/29fb17c909a0998b09aaee1dc0fb6=
+163bd2619cb
+  Author: michael_kong <kx960506@163.com>
+  Date:   2026-05-21 (Thu, 21 May 2026)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Fix unused value in qos
+
+In bt_bap_parse_base, PresentationDelay is parsed but not written to QoS.=
+
+
+
+  Commit: fd25b4b1e5968a68ab9e9ef626c25d9cb4c24241
+      https://github.com/bluez/bluez/commit/fd25b4b1e5968a68ab9e9ef626c25=
+d9cb4c24241
+  Author: michael_kong <kx960506@163.com>
+  Date:   2026-05-21 (Thu, 21 May 2026)
+
+  Changed paths:
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  transport: Add support for obtaining PresentationDelay in broadcast QoS=
+
+
+
+  Commit: d167d3409e94440da7fb021d7d6d4601b65a83b5
+      https://github.com/bluez/bluez/commit/d167d3409e94440da7fb021d7d6d4=
+601b65a83b5
+  Author: michael_kong <kx960506@163.com>
+  Date:   2026-05-21 (Thu, 21 May 2026)
+
+  Changed paths:
+    M doc/btmon-le-audio.rst
+
+  Log Message:
+  -----------
+  doc: Fix Data Path direction in btmon-le-audio.rst
+
+The Data Path direction 0x01 should be Output (Controller to Host).
+
+
+Compare: https://github.com/bluez/bluez/compare/757cd98f4186...d167d3409e=
+94
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
