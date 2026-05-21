@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79377175A79
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 13:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E5E3D34A8
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 13:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779370197; cv=none; b=hYMnYeUiPidv6UMqgafXI+Ud1LS/QwPnQsOZiWXt2EQEBx00hfwTv35A6eAECy1GaM399tJOX/vbc0qKsi/7PBcHmKxqKXt0ZrDBvAIFKkOLxZrsZOlAIuASdIcUu9WTMDYtigN+86hC4fDrIYGhhXFehFq6OFd5ZViKbJU+5sA=
+	t=1779370199; cv=none; b=omXMvA3W5LKrPDsgtFGCAjWJxv4tM5Qln0iOteuwP4ZHjOu/WpZe3cnUKGlW8Nsx61d+mBt41f3MGL5msO7FCu5ZOXIlZccOYRssoDl8xxqV5CyBuFeBtWCFgeR2doTNas6DHsFAu+7d2fPBJ/1P8UefOcMo+apgZh82tNQpHtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779370197; c=relaxed/simple;
-	bh=v2PotGKJ8BWZc/5NPlWKDt+KBaaoDnQKecw5hCrTsFE=;
+	s=arc-20240116; t=1779370199; c=relaxed/simple;
+	bh=CUTPcbO609FXCT4uoQ0Rj+po8YHvjZffWQW03Jd7WBM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WXbp58TtDgew2PCeT7cQ35O3iOYzu4hMWzKdkSFmlfpwOJ0n5IlPmjMcXpbtaCLrlaxIZtzYZz5DruyCwctV1ohRXk0ugYVsADjCEV81fSdqkZDyd2leG10JdSYlJbizZkVi9guZcQvEfR7adksEOzU3dhGMKEOyV5HOSMv7sXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fb+eLcTU; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=e/AXHKs75N5gqnDOvyUCu0FnOHPVUkdgbIDHmiBHSckt8WHUbxAa2HqQKwtvfajVHRXH3qQ9Rifex7Tey/siUPRojILbxmtb8PRtcmx+7T7nx/D4MZA3bNDT/pGvKzF8q3yM3ekbLRv9FNjx/6rbJdSnQzBS9mR1bYRqfbXCqPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yo2VHTHa; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fb+eLcTU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 611571F000E9;
-	Thu, 21 May 2026 13:29:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yo2VHTHa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDB211F000E9;
+	Thu, 21 May 2026 13:29:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779370196;
-	bh=lSWph1PkPZ+ccwZFf9Wa/x3uBBoqMXit/FtHzPa1HAU=;
+	s=k20260515; t=1779370198;
+	bh=UE5nXXXgEJgxjC7WqbtTxT+U8WtkY0+rzLVY7c5H4o0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Fb+eLcTUOW5blEUd0yh8Tw8Bj0gtmKq21EB0lVxPsUbrRfWV5XTiKQfEWSDsQHg3g
-	 SzR971KaxRQL1mQGkOnR9TN7uwnQckUmrAfRfTMyTGlgdfl1FzRa/T2Cv6z2be529k
-	 gFyZzjCCNGBptr6qMTQRfiw7w1bFQy16Kmyn8dlMpZcv1Nflb/AeISKcqHjcboUWCW
-	 9lijEveq5mHATmHXpTBJ8FKXN2E6cx//dPfI+a898sItYc0CjhiQSZmDKIfSUAxhcJ
-	 nwce/UZt7cRQDzwLmAk3V8oZMq+2Cb5tQxQTckoHcJOjmljB6pf42oDLk+ohPZGa8A
-	 qh3oy4RhNylJg==
+	b=Yo2VHTHaYjlWgGFr7GDTgsNaF5lrv0Fvhq2qKIBmA3fTLqmwhGSIWrFTk5Spiz3M2
+	 Hp83v75KCLJZBTVqQjT8iyi3OCyEtqPL4vn4lGa47o8BttesU0fnyrOoVluFGraXEP
+	 AJ/VtL8PxTEp2CyqZT+A6wiew/bXXfJPP92AuZ2kk4WXrhVyvNxHNZdqEYD85U8Dkd
+	 mylRr8ZdcMlE2O/luc5J+IPsCEcrI0pBDkMEh9BLd2UI76sPMI2Q5tG50tXNyhudga
+	 /qisJ2nOmsLBUNIgGOe5xmJ8zcv++fZKOwAe4AYdad4oXSW9P71C65yxler2akTtrK
+	 2UQPfXwqITzew==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 812FC3930DE1;
-	Thu, 21 May 2026 13:30:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198923930DE1;
+	Thu, 21 May 2026 13:30:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,40 +37,47 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/3] client/btpclient: Add GAP extended advertising
- support
+Subject: Re: [PATCH BlueZ] tester.config: add missing CRYPTO_AES
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177937020614.309926.17020443890346502033.git-patchwork-notify@kernel.org>
-Date: Thu, 21 May 2026 13:30:06 +0000
-References: <20260519105519.226648-1-frederic.danis@collabora.com>
-In-Reply-To: <20260519105519.226648-1-frederic.danis@collabora.com>
-To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
+ <177937020756.309926.1774626011773589967.git-patchwork-notify@kernel.org>
+Date: Thu, 21 May 2026 13:30:07 +0000
+References: 
+ <478a4d370bc0b20b98223507166dfd580ae8477d.1779051031.git.pav@iki.fi>
+In-Reply-To: 
+ <478a4d370bc0b20b98223507166dfd580ae8477d.1779051031.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 19 May 2026 12:55:16 +0200 you wrote:
-> The BTP_OP_GAP_SET_EXTENDED_ADVERTISING command is used by at least the
-> BAP/USR/DISC/BV-01-C test.
+On Sun, 17 May 2026 23:51:30 +0300 you wrote:
+> Kernel commit 4a1507625b0 ("Bluetooth: SMP: Use AES-CMAC library
+> API") removed CRYPTO_AES from the default Bluetooth kernel config.
 > 
-> Since this opcode is defined as 0x21 (33), it does not fit into the
-> current fixed-size command bitmap. This series refactors the way
-> btpclient reports supported auto-PTS commands so it can grow the bitmap
-> dynamically as needed.
+> This causes Bluetooth testbots to fail silently with "Not Run" status:
+> 
+> Basic Framework - Success - init
+>   Read Index List callback
+>     Status: 0x00
+> Bluetooth: hci0: Opcode 0x0c03 failed: -110
+> Bluetooth: hci0: Opcode 0x0c03 failed: -110
+>   hciemu: Failed to open vhci
+>   Failed to setup HCI emulation
+> Basic Framework - Success - pre setup failed
+> Basic Framework - Success - done
+> ...
+> SCO CVSD Listen Send - Success                       Not Run
+> Total: 30, Passed: 0 (0.0%), Failed: 0, Not Run: 30
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,1/3] client/btpclient: refactor read-commands bitmap building
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0e55974d713b
-  - [BlueZ,2/3] client/btpclient: Replace advertising defines by shared ones
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9074d38c5fed
-  - [BlueZ,3/3] client/btpclient: Add BTP_OP_GAP_SET_EXTENDED_ADVERTISING support
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=588a0267d8fa
+  - [BlueZ] tester.config: add missing CRYPTO_AES
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2470448ed9d7
 
 You are awesome, thank you!
 -- 
