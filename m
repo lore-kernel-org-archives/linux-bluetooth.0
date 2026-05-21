@@ -1,120 +1,120 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06CCA25B0B3;
-	Thu, 21 May 2026 02:26:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54A452BDC32
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 02:31:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779330413; cv=none; b=MessowMQ7lxHhvxztjzhGiU1/CatYN9foj8tEYmKvfiBtKo+LpY29LADki670N3Fk/YXH+ZTfn9vcPAHpuZKoUdwRNvaaaGW7+d3CZD56bCrWnLvJvuYoEskiHMFwvKJONa875LtcGo7deRBqAhgPZBD3zM6jvIM91XXRmVFBjw=
+	t=1779330685; cv=none; b=K+OJV++ZdjxWBevAqa3B5/ctbuyXLqyP/xjYniOvd+cX8uxMF1YZfnTFj8AtWmo/iMH6b2K3LtdxQ747rFkkY/EsGJtotp/NpPB24ZQ7UB0jP1CIKkSAUibVaGc4HhFjxuW3JM6eOnxLLErSeRmpVF6H3nLQRQIT9i9DSwuGmQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779330413; c=relaxed/simple;
-	bh=E85d57C73jYXiLQOPXElfnFNfjH0CUP/rfz/C8lN9Ik=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KytpDi7z1/lvOtvdihI49oBeExsYpqtSyNCPurp93OmsMA0+gA6kEQmd6Y9wTHc6Se7aQv4Lb6CZQxHsTJP+j7ROAwI1JSbqOQOTksi9IWxqH0fuzq/7zgnyORlIeFUoWtsQ4TcjoxxKt24WmOroX3T5z/aH8dm+kdxqWmpIkm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 8002152854bc11f1aa26b74ffac11d73-20260521
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:6f5e7ea0-7575-4e6b-8375-ed9e4b2265b3,IP:0,U
-	RL:0,TC:0,Content:7,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:7
-X-CID-META: VersionHash:e7bac3a,CLOUDID:ff14f1f14e3304e428d1110e2a27a3bd,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|865|898,TC:nil,Content:4
-	|15|50,EDM:-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,O
-	SI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 8002152854bc11f1aa26b74ffac11d73-20260521
-X-User: liujiajia@kylinos.cn
-Received: from nature [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <liujiajia@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1895931696; Thu, 21 May 2026 10:26:40 +0800
-Date: Thu, 21 May 2026 10:26:37 +0800
-From: Jiajia Liu <liujiajia@kylinos.cn>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH] Bluetooth: btmtk: remove extra copy in cmd array init
-Message-ID: <ag5tXWHNMAxkonle@nature>
-References: <20260520021500.13504-1-liujiajia@kylinos.cn>
- <CABBYNZLLNFNuSv0UBNQ7C2HTTg5W2m41hBTNpPw822GMAVNuhQ@mail.gmail.com>
+	s=arc-20240116; t=1779330685; c=relaxed/simple;
+	bh=8tVG0Rsy1ooaqIHWZZLJdVLiFTrCEXTvl4lkECweKbQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h/0klGJYtHZ6y0qOCO9tV8cMhOKVywX0Tk1OKgK9Gooj6Asy5uCYU4i7ltBx7ytk1qtjGbjpbq3powfLy2aVXlkCurmqfZnjjs3IszAR60XKlZnkMbOc98/cGs4zQ5jXnqx/Hn6//tzYOU9bsm/nMH/hAx+XheZScACyAJcyiaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=V7WVBbhr; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=qxrT4i70; arc=none smtp.client-ip=103.168.172.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="V7WVBbhr";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="qxrT4i70"
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.phl.internal (Postfix) with ESMTP id BF27EEC00AD;
+	Wed, 20 May 2026 22:31:17 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Wed, 20 May 2026 22:31:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1779330677; x=1779417077; bh=U9AQ8Sj0X/k6TNOl8gQ99
+	DBJlkktlMzzHjfVT0Qojfw=; b=V7WVBbhrA/+sAOFSIk5j2H5UPXwSHjCMAxSUP
+	kHPMd9vjlOJ3CBfbiBAp+HI4l++exmHgrTQ8zVUAyVuXzg8uJyRGJY6FPWpat5tw
+	HoXxKZdSQkF3tvtPtOJ0FNlo5uH4wUGMPRAEB0moMR3DU+ZxlFj/ML71HZpMdCcp
+	u9xQSumtHkeru7rSC24DbncMjhHJgF+0KSMNCgfKz7WqgAQgyyHqHmdZz4AhO931
+	ytnS44jH/HoEzSwchz2z6MaeJqgQRqclUayguvE0HU+jOv/YlNs65pLto52+gEXw
+	LXx2P4DG/6x3QFKbWeM9DFr5s3QrXVL+eS4zDBALDSmwJ24ew==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1779330677; x=1779417077; bh=U9AQ8Sj0X/k6TNOl8gQ99DBJlkktlMzzHjf
+	VT0Qojfw=; b=qxrT4i70oXJUuyoY+idAcub11UbB2ag2wOX6nCe17X+GNOU1LK8
+	NOz+oFNmx/GQqk0fyppO1sf7atXXhDGN9+3VF7TrcC1tWtYTkIrMJJS8RUrdY9b/
+	QAvLfSSQdkCvBmWrosky+lbgLswWkeF+ezPxrhKOKLkvzinmNCITZ9O7v3LO83ny
+	nSxtgat9yCiQZPs0n10zAeKuHauzNeIPJPDCsoJGek2gggQqWaaFMWF9Qfrg9CWv
+	k86OeERx1RA9T0cDl7wYSxYR+/Cswe6y/ndOSp8dHB7rdYckv466q6ENLub7cT8b
+	GWB8Uy6h2pnM3PjLCz9EeFC1nXEQoEpQBeQ==
+X-ME-Sender: <xms:dW4OaixaPUGdi6_I-WJAKRZKyVZX_87eC3bxv9D91PMhUWTtNsrUSQ>
+    <xme:dW4OalSt4ZF4HoOAutyI0hSYX88fiM8Zzlz3yY3d-PPTwp4YQuEeAVnqZIFGmoaoI
+    F2yip50ogCc9pKkgNzugDOu59Af9k7bhpSfSeWouZ8LgCSTFbLzIHbp>
+X-ME-Received: <xmr:dW4OapVSKu535b6PsFpmPRsGnNfj4xi0d8YiBpFNha0q8OIGaSm60V4QsMjLgzqNY_4r64o>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddugeeifedvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnegfrh
+    hlucfvnfffucdlfeehmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecu
+    hfhrohhmpefuihifvghiucgkhhgrnhhguceoohhsshesfhhouhhrughimhdrgiihiieqne
+    cuggftrfgrthhtvghrnhepgeehudejhfdtleevueegudffjeffffdvgfefiefgueejffet
+    vdetvdeugfevffehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
+    hfrhhomhepohhsshesfhhouhhrughimhdrgiihiidpnhgspghrtghpthhtohepgedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtohepmhgrrhgtvghlsehhohhlthhmrghnnhdroh
+    hrghdprhgtphhtthhopehluhhiiidruggvnhhtiiesghhmrghilhdrtghomhdprhgtphht
+    thhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhgpd
+    hrtghpthhtohepohhsshesfhhouhhrughimhdrgiihii
+X-ME-Proxy: <xmx:dW4OanYVs56vAdEEA3kVISQw2KcnCf6ww2QrO-XG5IHzv_lOUK3QgQ>
+    <xmx:dW4Oav1ckUEpRcAdKWBOdFJ7q_CaxlAqmCjS_GGp2Uo90Slg5ad-wA>
+    <xmx:dW4OapgzQvJHXngKFQ2K6lMs1Ieyljn1AWzCfHEO_f9NcckTllNrCQ>
+    <xmx:dW4OajablYiechgyogoTJuKVE6HFEXSf1mu_uWfnBkbAKOCnbLvhng>
+    <xmx:dW4Oamlw2Eoz9YQp2aFGM7hBzxmGICQXMm5bXLGZ0MEqSIDxBiSB-tcc>
+Feedback-ID: if72e4b10:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 20 May 2026 22:31:17 -0400 (EDT)
+From: Siwei Zhang <oss@fourdim.xyz>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Siwei Zhang <oss@fourdim.xyz>
+Subject: [PATCH] Bluetooth: L2CAP: fix chan ref leak in l2cap_chan_timeout() on !conn
+Date: Wed, 20 May 2026 22:30:36 -0400
+Message-ID: <20260521023055.3272712-1-oss@fourdim.xyz>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZLLNFNuSv0UBNQ7C2HTTg5W2m41hBTNpPw822GMAVNuhQ@mail.gmail.com>
 
-On Wed, May 20, 2026 at 08:55:46AM -0400, Luiz Augusto von Dentz wrote:
-> Hi Jiajia,
-> 
-> On Tue, May 19, 2026 at 10:15 PM Jiajia Liu <liujiajia@kylinos.cn> wrote:
-> >
-> > In btmtk_setup_firmware_79xx, the data length indicated by wmt_params.dlen
-> > in the cmd buffer is MTK_SEC_MAP_NEED_SEND_SIZE + 1. Except for the first
-> > byte, the remaining length is MTK_SEC_MAP_NEED_SEND_SIZE. memcpy copied one
-> > more byte to cmd + 1 than the remaining length. Align the length passed to
-> > memcpy to avoid exceeding current section map.
-> >
-> > Signed-off-by: Jiajia Liu <liujiajia@kylinos.cn>
-> > ---
-> >  drivers/bluetooth/btmtk.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-> > index ea7a031000cd..53cba71cb07f 100644
-> > --- a/drivers/bluetooth/btmtk.c
-> > +++ b/drivers/bluetooth/btmtk.c
-> > @@ -188,7 +188,7 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
-> >                                        MTK_FW_ROM_PATCH_GD_SIZE +
-> >                                        MTK_FW_ROM_PATCH_SEC_MAP_SIZE * i +
-> >                                        MTK_SEC_MAP_COMMON_SIZE,
-> > -                                      MTK_SEC_MAP_NEED_SEND_SIZE + 1);
-> > +                                      MTK_SEC_MAP_NEED_SEND_SIZE);
-> >
-> >                                 wmt_params.op = BTMTK_WMT_PATCH_DWNLD;
-> >                                 wmt_params.status = &status;
-> > --
-> > 2.53.0
-> >
-> 
-> Have you tested this on the actual hardware? If not we need a Tested-by.
+__set_chan_timer() takes a l2cap_chan reference via l2cap_chan_hold()
+before scheduling the delayed work.  The normal path in
+l2cap_chan_timeout() drops this reference with l2cap_chan_put() at the
+end, but the early return when chan->conn is NULL skips the put,
+leaking the reference.
 
-Yes, I have tested with MT7922 (0489:e0d8) on linux 7.1-rc4 applied this patch
-and the following two.
+Add the missing l2cap_chan_put() before the early return.
 
-Bluetooth: btmtk: accept too short WMT FUNC_CTRL events
-Bluetooth: btmtk: fix urb->setup_packet leak in error paths
+Fixes: adf0398cee86 ("Bluetooth: l2cap: fix null-ptr-deref in l2cap_chan_timeout")
+Cc: stable@vger.kernel.org
+Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
+---
+ net/bluetooth/l2cap_core.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-setup log of boot and rfkill switch:
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index fdccd62ccca8..5668c92b3f58 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -411,8 +411,10 @@ static void l2cap_chan_timeout(struct work_struct *work)
+ 
+ 	BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
+ 
+-	if (!conn)
++	if (!conn) {
++		l2cap_chan_put(chan);
+ 		return;
++	}
+ 
+ 	mutex_lock(&conn->lock);
+ 	/* __set_chan_timer() calls l2cap_chan_hold(chan) while scheduling
+-- 
+2.54.0
 
-$ dmesg | grep hci0
-
-[    6.108240] Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20260224103448
-[    8.933508] Bluetooth: hci0: Device setup in 2765295 usecs
-[    8.938846] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
-[   57.209143] Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20260224103448
-[   57.366004] Bluetooth: hci0: Device setup in 160450 usecs
-[   57.371248] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
-[  203.687643] Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20260224103448
-[  203.844163] Bluetooth: hci0: Device setup in 158989 usecs
-[  203.849426] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
-[  214.723250] Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20260224103448
-[  214.879380] Bluetooth: hci0: Device setup in 155239 usecs
-[  214.884644] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
-
-> 
-> -- 
-> Luiz Augusto von Dentz
