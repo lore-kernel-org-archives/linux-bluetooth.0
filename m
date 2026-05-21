@@ -1,143 +1,160 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A761825DB12
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 04:27:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7397318B9C;
+	Thu, 21 May 2026 05:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779337681; cv=none; b=uK1UuIGfrMjiRzCWGwTxo8k+nbOGo8UGP1AHFPgPNgpgenir0JPmjfg0FWVLwd3gGWeYfFfCxSdEdtTmBc5o+lH/pNHUTsg7ar25wXyGbHR2MpoAqDcVbN80lff+r/U/2nQaQiro1T4UfoWfkFBQBLa5LR2hogaupnwz+xPorTE=
+	t=1779341170; cv=none; b=HhSoBKzH9mxrH8ksBkh6AVlnQAyW7wMPgj6MFv6m6Gwel6eJETpRMvUI/setwTrD2vdqNUzyuTokzDC0Zso0fjL/z12IBsQK7Cq+ocpvIp3hWeAiRl+lR35FGaMroIpEipo/TK7xhHgxYzmQB5CHnzr/B3sG09ftFeIcUijLl5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779337681; c=relaxed/simple;
-	bh=Ag2jkRY3TbBTC4LD0PikYHmDiviSHNn9GKJawWKQvuQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=q8s0I6CAaC4NlcrNyk9/9ZqBncWrJcCQU+Gu85/tYfDZ8eW/mbua4/MpKgBHTnxMmepyM3d88EqUxb7FQQkEkwmfFLN6mzJL57zafrkjoQwWM+No/krEBolWpvQ0ZtfiMVx4J4jGFgqH8WVJddMxFc7G3OqVl0zrJcVHlU9UrNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OMCjLHET; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1779341170; c=relaxed/simple;
+	bh=e/4MsCDQRselIYvZ3uaUq+llmN01dyasIeL3er1gv74=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TNIMccQLU2BY7VitpzpvxcMeDeAa9/lCnKePX9/U3IAuyrDUEB+oQG8wK0RWiD8jG2ihMsJFIqp6pTDb4BJYH7BZgU2cu3qZW/gz4vTSxUzs2Rt8YKuunnjwMpe5ymFyHzcHYiisUY22UedoBil29tKJ0u6wrp87IjYjsu43vvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qti.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=pFlw+ubX; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qti.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OMCjLHET"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-91066394ef8so447473285a.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 21:27:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779337679; x=1779942479; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/6PPBwBTROA2b0gMltCIvBMiBYnzivhFgQgiuXLGaXo=;
-        b=OMCjLHETV8830ZtiLsR/GXW/GmrE0sSHrR5v7tS22RJokZ0hG1hzXzoIZHO+qfIkMj
-         tkyB8CGl5eq5YR/QVVyHHhyY+X7owFuTEW6bcIpnpmdBR/HiuoFRGFjAsTg/xHOGn6jB
-         w8NtvVCjVzRljn/mVfhYVI2lQGWqJsV0hYtNOUkn2eewxr702o2tUscjXBRmKXeDtEeE
-         Kbur2lSt754zmNljp89dV1Wk47Dej/XEsRcSUPC7PALcgl0/J/pz0NUMRtnkFD+no08S
-         3rqC8qTeYPuewXkCdt9LVnMKDhaTo/FcDDItCRIil8Eb9ntzkalUyvsGqm4bYQ18C8QY
-         IK8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779337679; x=1779942479;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/6PPBwBTROA2b0gMltCIvBMiBYnzivhFgQgiuXLGaXo=;
-        b=UBJluv4Rc09wTbaPvdkp+Hxry3gQ7V4drxE9ebGDcrlCuI+s80i5MsjTftNCu2bb9W
-         +rExgeFcWNVNm1NSMkjVThKFeNeOPaw3IEP75doc5ZXwwhMnp1xPyRBd8NgD5UjAValt
-         j5ixueM5Bxs29Zw4/OFiwVWWClxmo2HN1/QsZxNNQBjFOqIbU+G6gVPWWdx3NOazUQKX
-         K8iQSi+3pxsoNVUqs8Bt8H0u9Iyg3kLiG95Pxe0veRrS7RC/yHEszY5ZomFyiD7ZWj8s
-         aIK8HSRryAye+W51UcLXHCV0909k60fgyGy4pBcT56VUQ2JbrfinfSyjTj2p8OzYLTze
-         gJtg==
-X-Gm-Message-State: AOJu0YwMPldCeLuwfRx43SI2g4NxKbvjwEpnQUU5U+AX91E7790LYIj1
-	2B85zM7N2UgBfdYUPIzxi/gu7osYSZ13uO7j9VtINjT+MjSG9x4I28cwFuV1qw==
-X-Gm-Gg: Acq92OGkGri7X/UhmUs2tk0lvMYqQmn8/34kjq/xkyY+20gf4wijrHJsu15HS6dPbo9
-	jrDah/4NN8xffjOVBh5zJwRdRdKa4U3QtzpHmpGnWgPl27Q/ZgtI83dr3ilJpmrowLqDifyoL3O
-	Etxpru2y4e3hDdijHjfWd3YuRRmrHEZaODZGuMLloDlGcxSIWP6aA93f9JWbWpKIKFaLGc0QFq1
-	0OKHUmlhCUCHHj9W9Djr/rQR8v+hAY9W6NPQz4ckbGbeilCr8bV0trkdtpG7hypEABPeGvmzqv4
-	mf4PPlNA7m7xHFIvzZIwPSznoPzC/Ty4hj3Y//ZpWVjVqcXIa2t69jkutqAhYqNDBKw7ru+l4dR
-	AlqB4A+qF6UafMKDPIqZ7CJGRWHPu9K0rlVk9jb0gISNvuDJ8RrT2KxugxDEK5r9nlt+perwF8l
-	CqZsTj7I3t8Ks5z2Gdo3+kSTIi14FmVQ==
-X-Received: by 2002:a05:620a:44d4:b0:8da:358a:c4d4 with SMTP id af79cd13be357-914a2d37b5emr152832285a.55.1779337678617;
-        Wed, 20 May 2026 21:27:58 -0700 (PDT)
-Received: from [172.17.0.2] ([20.83.175.229])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-910bc83ff00sm2326417185a.26.2026.05.20.21.27.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 21:27:58 -0700 (PDT)
-Message-ID: <6a0e89ce.fb03d9b9.1423b6.052d@mx.google.com>
-Date: Wed, 20 May 2026 21:27:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1681377755566995455=="
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="pFlw+ubX"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64L2mOxM446688;
+	Thu, 21 May 2026 05:26:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=wjuCR4CwmsQ+B9oSh0hO7FF06UDUgaiGPs5
+	HL06tM68=; b=pFlw+ubXRMFZHFGxx6lx0i6iGyMGRSAsOyJQfPiKkPSfCtmvlOy
+	U6/koccsrswmx8lNiOTxKTxz9rwbkzD361wK+xrLOSMO99UJkWJXxFTXJSqIykPH
+	w7/zQqoWen/Dzwv/1emBCP6XuSrZrf00QUU7yCk/Ok2mu2DbkC4LvCufTyuH1HJC
+	nH0FTtYVpeRRMp7muvgTXzg6ihojlwCYdkwCxaepHFvakHpugSBuhO8cURAg68Xf
+	XyXjDjqmKtPe38aavVTlcu9UJvc+eC6sPtd1CZK+26Wuuzq+ZKA/QGI9LPpRK5fJ
+	r7HVMUQEaVvrf09K79wVyiG7CjF5HC3rfWA==
+Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e9anrm5ah-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 May 2026 05:26:05 +0000 (GMT)
+Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA02.qualcomm.com (8.18.1.7/8.18.1.7) with ESMTP id 64L5Q2AA001795;
+	Thu, 21 May 2026 05:26:02 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 4e713jev5e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 May 2026 05:26:02 +0000 (GMT)
+Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 64L5Q2nU001786;
+	Thu, 21 May 2026 05:26:02 GMT
+Received: from shuaz-gv.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 64L5Q2UU001776
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 May 2026 05:26:02 +0000 (GMT)
+Received: by shuaz-gv.ap.qualcomm.com (Postfix, from userid 4467449)
+	id D74044C4; Thu, 21 May 2026 13:26:01 +0800 (CST)
+From: Shuai Zhang <shuaz@qti.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
+        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
+        jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com,
+        shuai.zhang@oss.qualcomm.com, stable@vger.kernel.org
+Subject: [PATCH v3] Bluetooth: btusb: Allow firmware re-download when version matches
+Date: Thu, 21 May 2026 13:25:47 +0800
+Message-Id: <20260521052547.2862803-1-shuaz@qti.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, michael.bommarito@gmail.com
-Subject: RE: [v3] Bluetooth: L2CAP: reject BR/EDR signaling packets over MTUsig
-In-Reply-To: <20260521001327.3729880-1-michael.bommarito@gmail.com>
-References: <20260521001327.3729880-1-michael.bommarito@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-GUID: JLPL_EvC0htQoetiVAo_KNKvD8qRoKla
+X-Proofpoint-ORIG-GUID: JLPL_EvC0htQoetiVAo_KNKvD8qRoKla
+X-Authority-Analysis: v=2.4 cv=UuJT8ewB c=1 sm=1 tr=0 ts=6a0e976d cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=yx91gb_oNiZeI1HMLzn7:22 a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8
+ a=8BPzjUuknQ10mGxUWxoA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIxMDA0OSBTYWx0ZWRfX3aLwJzDKH1mQ
+ t4x99ed8VnROtYa0V9xb7f/a2edeyKusVM7eyzVjXImhsEi7BLJPYZ+gjo/3dwADhwcMPcaaUKf
+ C3yIb+7lEQ2mmgkgFKSNxHarLce1YmVRatOl/4cf5NCPouKecn/wpcQXmc696lX88Kd/ozhk15i
+ sEDELAst1+jV7xqxd6fWc+72H/d6Ez6u4OJgNtP570Ia2sEeF/2Lp7uf/HBwkRMVh63Cvn4YihD
+ QYQr9xAeeDZJ7KrXecTruVGwuGd4FpR9SlFnAFfefRtlvkt65rUEsAvG4Tw4EhaHdIq7zjJV3oG
+ 3NrC7STf412Its050vraQtHVau80NNOMkf/guko24ou1OqFNSuGig5fvHJGzFV9xZ1DLuBSfzVG
+ Hg0ibVULR7PDp3ixL1lHwyHX6niTs7KWqo69Ud+3Kw8MZhNsWoWM0CM2ingoaBdxJrIUaMOvQKO
+ 6hScgofU+eGFVm3FdhQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-20_03,2026-05-18_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 clxscore=1011 lowpriorityscore=0 impostorscore=0
+ priorityscore=1501 suspectscore=0 spamscore=0 malwarescore=0 bulkscore=0
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
+ definitions=main-2605210049
 
---===============1681377755566995455==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
 
-This is automated email and please do not reply to this email!
+The Bluetooth host decides whether to download firmware by reading the
+controller firmware download completion flag and firmware version
+information.
 
-Dear submitter,
+If a USB error occurs during the firmware download process (for example
+due to a USB disconnect), the download is aborted immediately. An
+incomplete firmware transfer does not cause the controller to set the
+download completion flag, but the firmware version information may be
+updated at an early stage of the download process.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1098364
+In this case, after USB reconnection, the host attempts to re-download
+the firmware because the download completion flag is not set. However,
+since the controller reports the same firmware version as the target
+firmware, the download is skipped. This ultimately results in the
+firmware not being properly updated on the controller.
 
----Test result---
+This change removes the restriction that skips firmware download when
+the versions are equal. It covers scenarios where the USB connection
+can be disconnected at any time and ensures that firmware download can
+be retriggered after USB reconnection, allowing the Bluetooth firmware
+to be correctly and completely updated.
 
-Test Summary:
-CheckPatch                    FAIL      1.00 seconds
-GitLint                       FAIL      0.34 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      25.25 seconds
-CheckAllWarning               PASS      28.83 seconds
-CheckSparse                   PASS      27.41 seconds
-BuildKernel32                 PASS      25.53 seconds
-TestRunnerSetup               PASS      526.88 seconds
-TestRunner_l2cap-tester       PASS      376.33 seconds
-IncrementalBuild              PASS      24.88 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v3] Bluetooth: L2CAP: reject BR/EDR signaling packets over MTUsig
-WARNING: The commit message has 'stable@', perhaps it also needs a 'Fixes:' tag?
-
-total: 0 errors, 1 warnings, 0 checks, 66 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14585530.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v3] Bluetooth: L2CAP: reject BR/EDR signaling packets over MTUsig
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-38: B1 Line exceeds max length (84>80): "Link: https://lore.kernel.org/r/20260518002800.1361430-1-michael.bommarito@gmail.com"
-39: B1 Line exceeds max length (84>80): "Link: https://lore.kernel.org/r/20260520135034.1060859-1-michael.bommarito@gmail.com"
-73: B1 Line exceeds max length (82>80): "v1: https://lore.kernel.org/r/20260518002800.1361430-1-michael.bommarito@gmail.com"
-74: B1 Line exceeds max length (82>80): "v2: https://lore.kernel.org/r/20260520135034.1060859-1-michael.bommarito@gmail.com"
-
-
-https://github.com/bluez/bluetooth-next/pull/225
-
+Fixes: 3267c884cefa ("Bluetooth: btusb: Add support for QCA ROME chipset family")
+Cc: stable@vger.kernel.org
+Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
 ---
-Regards,
-Linux Bluetooth
+Changes v3:
+- Add Fixes tag pointing to the commit that introduced the version
+  comparison.
+- Link v2
+  https://lore.kernel.org/all/20260429121207.1306526-1-shuai.zhang@oss.qualcomm.com/
 
+Changes v2:
+- Update code comments and commit message to reflect the correct logic.
+- Align the commit title with upstream conventions.
+- Link v1
+  https://lore.kernel.org/all/20260108074353.1027877-1-shuai.zhang@oss.qualcomm.com/
 
---===============1681377755566995455==--
+ drivers/bluetooth/btusb.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 572091e60..70abbabea 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3550,7 +3550,13 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+ 		    "firmware rome 0x%x build 0x%x",
+ 		    rver_rom, rver_patch, ver_rom, ver_patch);
+ 
+-	if (rver_rom != ver_rom || rver_patch <= ver_patch) {
++	/* Allow rampatch when the patch version equals the firmware version.
++	 * A firmware download may be aborted by a transient USB error (e.g.
++	 * disconnect) after the controller updates version info but before
++	 * completion.
++	 * Allowing equal versions enables re-flashing during recovery.
++	 */
++	if (rver_rom != ver_rom || rver_patch < ver_patch) {
+ 		bt_dev_err(hdev, "rampatch file version did not match with firmware");
+ 		err = -EINVAL;
+ 		goto done;
+-- 
+2.34.1
+
