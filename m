@@ -1,240 +1,142 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABDE239FD9
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 00:13:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45A71D7E5C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 00:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779322415; cv=none; b=YTpSdzu9H68d+krPYgulHmc/V36TtsTKrae/I3FIvX6nmKG8cxamaSXMe6Zo7eYsi8corJRugHSP+ZjiJV0Qek+IQo7j/CdBDY9b8Baljs1aaT11m7jfZi2W7iCvVNLpZlrkVeX7BBCw+LmpjBATV6P0uIsh1e2AabJPigvl/N0=
+	t=1779322610; cv=none; b=MN2GbSTA3KlGWaISeOP8xNDWJLuufHyAbBWtoa+mXu6JBvRyV8o2Z9KmJOblNtyYB3lpdDownXBqicibm+bFMPzGvTv/0bROts8h9QFSv5VMs8U7MDB11+X/pPFcUd4543i40llK1GZSjZv49tb24IoSlsRydLvywS2Px+xX51M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779322415; c=relaxed/simple;
-	bh=FlsmVjLwUtTt/F4MvdmnB8CMJCrNXKRgcWVC4IHb4pY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lie/UZgdBq/A+nlopAQ9o2xCSLQfxc3Rl1CI7fn7FAKq2TpMSVbCV2IOaAn5twaSWQSqPYQB8w87aY0hkFGczdI9E8dUqmnvJ6XqTnhNHqCk8uGsExY3ssKVf3i860QqYVXpYGYBvI++hvQktbI+J1CfbFtfT5eTeOqJSpzRfeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rwMtHCJh; arc=none smtp.client-ip=209.85.219.50
+	s=arc-20240116; t=1779322610; c=relaxed/simple;
+	bh=9vPoORuaUjDVGH1dkrwP1F1BPt3nbNlDzhTJ8Cn0SoY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=bbq8iRCDCWgpX542fO0C/QkW67dWLcmovbS96DktDbYuRePJewFvbkQ+MeJnDS1xFf2aGSfmsDMHxPQrUlavwB5BTfOEmL8fzjYbdfDdbj3LlTs6oQS0ZCBoN928DyklOLMxmhFwrGOL76jpGmfTWaCCiYMIDlSQFGr0K431ENk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g3aiylqf; arc=none smtp.client-ip=209.85.161.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rwMtHCJh"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-8b6ea7716bfso67477966d6.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 17:13:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g3aiylqf"
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-69d5730c579so1047731eaf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 17:16:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779322413; x=1779927213; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Ec1/vUBu03Pfy6PXr2QzxM/B7hkCHbmI2D/iRwpt3o=;
-        b=rwMtHCJhbWKvdE2kSBfBRrgi++M1yJlOZWSPo8LWbCUeT+w7n3HTtU4Ef2ogwE2Cbd
-         UlKX8nKutirYHy+XjM3HgLiyJ1tetB7EeTKunPuApm7pI5UjPv0J7dXfAbMYbW9Dkmsl
-         uvOfO3s4kpjrDI2uumV7H0QWWjPGHBQG8Yw73k84Mi6lTRoMnaRwC+p70FkoCz1xxmcf
-         bsvBkl6JL6lLT9Lo4+w+9klVt996+XbXt5mVC1ZL95uyb1sV+nlodp4ejH+eaXqp/6rW
-         qjGFEsFE3hQjuBuuoahRr63edSLpfqQY7F8yYGWkE+WTLbPigdb9Q9xp0FXeUHzOnztB
-         Bdzg==
+        d=gmail.com; s=20251104; t=1779322608; x=1779927408; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y36PdkqonAPNUmgrob9ZhzBdMD3NERtYhld76spn2zo=;
+        b=g3aiylqf/71Euic/TEIxJTp/+UsJFlhD8WvOoQJ+/ZJr9+ZV06Z6Zcrh3TmjryyR6H
+         yYFfa+s02QDdKP+R/Qgjdw1fuPB/kloWOUYaGJFMqM9EUEmS/A+U3TC78p7AO5kbx7p0
+         C8bgphhE62ynBvzE0uQ6oDReP0u9NRSgbIkmAW1NS0BXbQn59Z2vrjH/qcExNdybameK
+         0G/04AcOAvjXks1A0JPWPRbamaxQuAf/0zUj4z3rTCG9ekNgAJxJjFtJIq+x/K8YEFgm
+         9YlQAxdIKda68/c9SSFrPv/EPARoAf+MSo6qQOt+yfpD3HwFzym1a5tqQRMG9nkkOXf9
+         PL7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779322413; x=1779927213;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1779322608; x=1779927408;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3Ec1/vUBu03Pfy6PXr2QzxM/B7hkCHbmI2D/iRwpt3o=;
-        b=kMB/q5kxVR0Q6voMscHpRatcjzRosGfqOYgkasJuKotPkILFZO/bLQk4FX3DkiymFk
-         VqLrVIU/b8as4e4lo9odePabKdkEf008AhpK5FOmegGeAcL9KbAo8WRefGoWfzzXfysp
-         D6PxAwhJrpnXJo1TMp0LT07E91Y7x8Mzfj6B6U16wqEZrIp87OIg3fM2ZyABENYxUyRH
-         Q0U4Je1V4lB8nF+312CJ/xt710//dm4cMtcLMiP21MQICLzPnUgqc3hXbI1kmUMQHyTU
-         aj94gSo4daAKtSBxlEvVdU/HOCkNWLfOlXb+uEu4F2DJXyFn/Ib7NnjCGk2uVez2unsl
-         kEig==
-X-Forwarded-Encrypted: i=1; AFNElJ8yingrGtvC69ELlkJtdW08VKvUa4vaZxnZbFy1pcesDqA6NAOZSucMYOz8rPC8s38NGpJGsaKgW+1SAX9qipo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKmotsMEea+3ErmUhPfiUsz1jfnAuD2qWgzMphvytR/AOHiPHh
-	DF674AK7Fno4FaPcMvA94FCpWMFSTcKaaoGW3k7AAYiEos8Df9Dux07u
-X-Gm-Gg: Acq92OEoeozCcQmP7ce2PuvzPlV7+wlrDCtX3kzB4qiZU3rXn1Tomi9UAb9EpdsNnhh
-	lSFncIjo5ltb8SBrb+sSogSmsnz9vVq36BHrfRZgnKnLJEJfpG4ou4FCxpZ1EGxg2Po4AhFp5Kt
-	F1PBhdsw3UVvwROs8cwkp5EvrwbRmmGJtzkzmD1sqvvog+MI1x8RjKvDWHv3QtBv5RJPEMmyNJI
-	/i2A9FNj4DUePh+015PEtbuv+bs+7e64fiyxYwN/o7t/+3Hm3f7VkjJURRjYFKA5ztFUnhOdO9a
-	gvKl4VmR2uFTQlHH/gaoOnK/AAgY4K0FHktXxYvTiQOFd/tmMJN3ELQ1H/fYHFF2JKn5PoRqvI+
-	ASnqpkAxNYCKIRnt9WoUhSH1Pbrvv2uNIZM2n9SdHLimGe29qxV9h3OLKqePDyu/akcGSSEdsS/
-	R1xloREKRjmonsChcdPPBgzdn6yTHPEyqLrNVTAaQCcqomXN5Zc/64Q4MScVOuHPEnN4wdFCEhG
-	eTBTkZNxIiBALl264ew
-X-Received: by 2002:a05:6214:1d0d:b0:8ca:1d2d:4a51 with SMTP id 6a1803df08f44-8cc6e6b5769mr11687466d6.49.1779322412647;
-        Wed, 20 May 2026 17:13:32 -0700 (PDT)
-Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ca36096575sm134875496d6.13.2026.05.20.17.13.31
+        bh=Y36PdkqonAPNUmgrob9ZhzBdMD3NERtYhld76spn2zo=;
+        b=FNrVeghV7DA0u6UeDZ2ncYUePjU4ckhWnMcMw3ol9YcJCZgXkQ8pezGiytXxN3bTH9
+         ylKuncNLyS7nfvhAuGVh7zkvn5aRQQKSGC08Zj1JYCnKEHk+Sth3sPw6IIli5FjmlJkw
+         lkYi51M4K9D8RJ9E60ZcAcx2vLN3Orvmt1sqZkenIYXN15Ddy9BBnt97hBjUQBa4K91z
+         IKe4A+qfBttY67N5UJbMaCkDZPAc3AGK5tmqUMB7RcU2qYoXOUGcjl+HbWAh230Yb0o9
+         scSiHkhJeRyRwaid9EWNDLw5mCuD2HTXLH2DEwpnQuJuRM/DuD7VAgxDlr3UyORzJz7v
+         XNOg==
+X-Gm-Message-State: AOJu0Yz2Wc9dOdlMjokZ0Od/Mc2KMWK3yhBCpkY5Lm+4WP+p4zBZqC6i
+	cgLB7Jqe2CGCMwrDLvWAEHhTnp9NOcOso3462yBRC/vmL8coqQSXW1uWXU7T9g==
+X-Gm-Gg: Acq92OHKEkpNghsgWROJBlFxnG9yXaBAYSOrbG3RBUSOwtX59iPcswtZbxKh8y/n7FG
+	ziTBBzWcGcb938dYi5EcrYCRXZaKOtp0kpL65LCfEaHJcB4zj0xw49k25nGRQi5JHw3rwqe0v8h
+	T9mC6pQicb6j/mVWqKU3PtMeCzcQG/oBzIteD0eMXntgvLr+B40dMsszb1em9OcSbzpo8KjITbX
+	6ifBmxpdEqiz8avYJu2HZ7SOceXnjBuNsd//846358+lTT+UkV+ij2JFfmhsTGPM4LWwybZ+EcD
+	9T4zt6k3RJvW84cClYUaMIK2N3hIP8QgRpqqI32nZ7RjiBO1kxDeXfiVT2tXJ/HGIizPPhVe/IG
+	OTpDC4YWWLWHSYH7sztofWvPKjn5XMUqQBkdQ2+rEFECT0m0hTfxalLk3dBU0q2Oa1SMB+oV1SN
+	7b2i1U7h/+5fOujTmV33VgBE/13hh6Dr/0WOcwWXaU1w==
+X-Received: by 2002:a05:6820:1791:b0:69d:6bbf:3fd0 with SMTP id 006d021491bc7-69d6ef03e4amr268648eaf.49.1779322607605;
+        Wed, 20 May 2026 17:16:47 -0700 (PDT)
+Received: from [172.17.0.2] ([172.202.100.49])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43a956fa142sm11590450fac.9.2026.05.20.17.16.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 17:13:32 -0700 (PDT)
-From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: L2CAP: reject BR/EDR signaling packets over MTUsig
-Date: Wed, 20 May 2026 20:13:27 -0400
-Message-ID: <20260521001327.3729880-1-michael.bommarito@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        Wed, 20 May 2026 17:16:47 -0700 (PDT)
+Message-ID: <6a0e4eef.3ee1b803.2b2d14.6a46@mx.google.com>
+Date: Wed, 20 May 2026 17:16:47 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8976751731974627801=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, meatuni001@gmail.com
+Subject: RE: [v2] Bluetooth: HIDP: fix missing length checks in hidp_input_report()
+In-Reply-To: <20260520214133.27746-1-meatuni001@gmail.com>
+References: <20260520214133.27746-1-meatuni001@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============8976751731974627801==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-net/bluetooth/l2cap_core.c:l2cap_sig_channel() accepts BR/EDR
-signaling packets up to the channel MTU and dispatches each command
-without enforcing the signaling MTU (MTUsig). A Bluetooth BR/EDR peer
-within radio range can send a fixed-channel CID 0x0001 packet that is
-larger than MTUsig and contains many L2CAP_ECHO_REQ commands before
-pairing. In a real-radio stock-kernel run, one 681-byte signaling
-packet containing 168 zero-length ECHO_REQ commands made the target
-transmit 168 ECHO_RSP frames over about 220 ms.
+This is automated email and please do not reply to this email!
 
-Impact: a Bluetooth BR/EDR peer within radio range, before pairing, can
-force 168 ECHO_RSP frames from one 681-byte fixed-channel signaling
-packet containing packed ECHO_REQ commands.
+Dear submitter,
 
-Define Linux's BR/EDR signaling MTU as the spec minimum of 48 bytes and
-reject any larger signaling packet with one L2CAP_COMMAND_REJECT_RSP
-carrying L2CAP_REJ_MTU_EXCEEDED before any command is dispatched.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1098310
 
-The Bluetooth Core spec wording for MTUExceeded says the reject
-identifier shall match the first request command in the packet, and
-that packets containing only responses shall be silently discarded.
-Linux intentionally deviates from that prescription: silently
-discarding desynchronizes the peer because the remote stack never
-learns its responses were dropped, and locating the first request
-command requires walking command headers past MTUsig, i.e. processing
-bytes from a packet we have already decided is too large to process.
-We therefore always emit one reject and use the identifier from the
-first command header (a single fixed-offset byte read), falling back
-to zero when the packet is too short to carry a header at all.
+---Test result---
 
-The unrestricted BR/EDR signaling parser and ECHO_REQ response path both
-trace to the initial git import; no later introducing commit is
-available for a Fixes tag.
+Test Summary:
+CheckPatch                    FAIL      0.65 seconds
+GitLint                       PASS      0.27 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      25.15 seconds
+CheckAllWarning               PASS      28.02 seconds
+CheckSparse                   PASS      27.24 seconds
+BuildKernel32                 PASS      26.55 seconds
+TestRunnerSetup               PASS      541.52 seconds
+TestRunner_l2cap-tester       PASS      378.34 seconds
+TestRunner_iso-tester         PASS      597.47 seconds
+TestRunner_bnep-tester        PASS      18.47 seconds
+TestRunner_mgmt-tester        PASS      2023.12 seconds
+TestRunner_rfcomm-tester      PASS      63.46 seconds
+TestRunner_sco-tester         PASS      141.48 seconds
+TestRunner_ioctl-tester       PASS      133.21 seconds
+TestRunner_mesh-tester        PASS      59.62 seconds
+TestRunner_smp-tester         PASS      17.73 seconds
+TestRunner_userchan-tester    PASS      19.12 seconds
+TestRunner_6lowpan-tester     PASS      51.01 seconds
+IncrementalBuild              PASS      26.59 seconds
 
-Cc: stable@vger.kernel.org
-Suggested-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Link: https://lore.kernel.org/r/20260518002800.1361430-1-michael.bommarito@gmail.com
-Link: https://lore.kernel.org/r/20260520135034.1060859-1-michael.bommarito@gmail.com
-Assisted-by: Claude:claude-opus-4-7
-Assisted-by: Codex:gpt-5-5-xhigh
-Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v2] Bluetooth: HIDP: fix missing length checks in hidp_input_report()
+WARNING: The commit message has 'stable@', perhaps it also needs a 'Fixes:' tag?
+
+total: 0 errors, 1 warnings, 0 checks, 34 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14585274.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+https://github.com/bluez/bluetooth-next/pull/223
+
 ---
-Resending as top level message per netdev guidance.
+Regards,
+Linux Bluetooth
 
-I reproduced the stock behavior with a real-radio BR/EDR ACL link and a
-harness that sends a single fixed-channel signaling packet containing
-packed zero-length ECHO_REQ commands, and confirmed on a patched kernel
-that the same packet now produces one L2CAP_REJ_MTU_EXCEEDED command
-reject and zero ECHO_RSP frames. The patched code builds for
-net/bluetooth/l2cap_core.o on x86_64 defconfig with W=1. There are no
-in-tree Bluetooth selftests that reference l2cap_sig_channel(),
-L2CAP_SIG_MTU, or L2CAP_ECHO_REQ.
 
-Changes in v3:
-- Drop l2cap_sig_cmd_is_req() and l2cap_sig_first_req_ident(); the
-  reject is now unconditional and uses only the first command
-  header's identifier byte at a fixed offset. Per Luiz, the spec's
-  "match the first request command identifier" rule would require
-  parsing past MTUsig, and the spec's "silently discard if only
-  responses" rule desynchronizes the peer.
-- Replace the v2 walk with a verbose comment quoting the relevant
-  Bluetooth Core section and documenting why Linux deviates.
-
-Changes in v2:
-- Replace the per-PDU echo-count cap with the MTUsig direction from
-  review.
-- Reject the whole over-MTUsig signaling packet with one
-  L2CAP_REJ_MTU_EXCEEDED command reject.
-- Add L2CAP_SIG_MTU and drop over-MTUsig packets when no valid request
-  command identifier is found.
-
-v1: https://lore.kernel.org/r/20260518002800.1361430-1-michael.bommarito@gmail.com
-v2: https://lore.kernel.org/r/20260520135034.1060859-1-michael.bommarito@gmail.com
----
- include/net/bluetooth/l2cap.h |  1 +
- net/bluetooth/l2cap_core.c    | 47 +++++++++++++++++++++++++++++++++++
- 2 files changed, 48 insertions(+)
-
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 5172afee54943..e0a1f2293679a 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -33,6 +33,7 @@
- /* L2CAP defaults */
- #define L2CAP_DEFAULT_MTU		672
- #define L2CAP_DEFAULT_MIN_MTU		48
-+#define L2CAP_SIG_MTU			48	/* BR/EDR signaling MTU */
- #define L2CAP_DEFAULT_FLUSH_TO		0xFFFF
- #define L2CAP_EFS_DEFAULT_FLUSH_TO	0xFFFFFFFF
- #define L2CAP_DEFAULT_TX_WINDOW		63
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 7701528f11677..0b1e062057695 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5618,6 +5618,15 @@ static inline void l2cap_sig_send_rej(struct l2cap_conn *conn, u16 ident)
- 	l2cap_send_cmd(conn, ident, L2CAP_COMMAND_REJ, sizeof(rej), &rej);
- }
- 
-+static inline void l2cap_sig_send_mtu_rej(struct l2cap_conn *conn, u8 ident)
-+{
-+	struct l2cap_cmd_rej_mtu rej;
-+
-+	rej.reason = cpu_to_le16(L2CAP_REJ_MTU_EXCEEDED);
-+	rej.max_mtu = cpu_to_le16(L2CAP_SIG_MTU);
-+	l2cap_send_cmd(conn, ident, L2CAP_COMMAND_REJ, sizeof(rej), &rej);
-+}
-+
- static inline void l2cap_sig_channel(struct l2cap_conn *conn,
- 				     struct sk_buff *skb)
- {
-@@ -5630,6 +5639,44 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
- 	if (hcon->type != ACL_LINK)
- 		goto drop;
- 
-+	/*
-+	 * Bluetooth Core v5.4, Vol 3, Part A, Section 4: the BR/EDR
-+	 * signaling channel has a fixed signaling MTU (MTUsig) whose
-+	 * minimum and default is 48 octets.  Section 4.1 says that on
-+	 * an MTUExceeded command reject the identifier "shall match
-+	 * the first request command in the L2CAP packet" and that
-+	 * packets containing only response commands "shall be
-+	 * silently discarded".
-+	 *
-+	 * Linux intentionally deviates from that prescription:
-+	 *
-+	 *   1. Silently discarding desynchronizes the peer.  The
-+	 *      remote stack never learns its responses were dropped,
-+	 *      so any state machine waiting on a paired response
-+	 *      stalls until its own timer fires.
-+	 *
-+	 *   2. Locating "the first request command" requires walking
-+	 *      command headers past MTUsig, i.e. processing bytes
-+	 *      from a packet we have already decided is too large to
-+	 *      process.
-+	 *
-+	 * Reject every over-MTUsig signaling packet with one
-+	 * L2CAP_REJ_MTU_EXCEEDED command reject.  The reject's
-+	 * reason field is what tells the peer that the whole packet
-+	 * was discarded; the identifier value is informational, so
-+	 * we use the identifier from the first command header (a
-+	 * single fixed-offset byte read) or zero when the packet is
-+	 * too short to carry even one header.
-+	 */
-+	if (skb->len > L2CAP_SIG_MTU) {
-+		u8 ident = (skb->len >= L2CAP_CMD_HDR_SIZE) ?
-+			   skb->data[1] : 0;
-+
-+		BT_DBG("signaling packet exceeds MTU");
-+		l2cap_sig_send_mtu_rej(conn, ident);
-+		goto drop;
-+	}
-+
- 	while (skb->len >= L2CAP_CMD_HDR_SIZE) {
- 		u16 len;
- 
--- 
-2.53.0
-
+--===============8976751731974627801==--
