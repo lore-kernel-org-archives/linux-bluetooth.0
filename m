@@ -1,77 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-35.smtp.github.com (out-35.smtp.github.com [192.30.252.134])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9584E175A66
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 15:30:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61818368D70
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 15:48:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.134
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779377418; cv=none; b=nVrgmTgTFbX0H/MIoqI9ZEjJD2i8LBJ4Z5Fec7jpUisRSy7SWEHtfNzZTw3B1wNMRJq2q2KK2MeUQGKWjaLdP/JzAEWXTX0tnJmxjckuCT6JC4xskY6ktCqQf/40efxV3RChlKD+oXvDvZy7eqgGgM+8JzvIlb6JNrSaxaqGHD8=
+	t=1779378537; cv=none; b=Vqg9OOnsLc8ZsMN0BAEtTob4sNn0mUDuv0KrN8sfv3bg2k24ceUk13Lmk9qS9ougvrEX8lYyNWUAiWXsPyswmaOwXbDRpU1SdQmhZZR7UkXqw/t+BkqMNx/7Z/aEp5hF14Dz0FJUXO81y123tDK1KePY2rENpWPW6KGGNETF6dQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779377418; c=relaxed/simple;
-	bh=8QCog0wEOgNNzfZyBsllDlqalskqMei3mOYue11m9F0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=t3vRcORa9ZGyWmXZ1rmk9vJSuIXG+f3s60hXa0GYTKT6jEQoL0l5RQKH+Qj1wgmxKLnDV/I5NAjWlvvZqWDf6mzozjv4nrpeGR5Jk4RgDZUQ4m71s8R+grOlMgC4ooi7LWLkHlZDzmVZe8mNspWmD0b2skYl7wIRN8f2f1qFq24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dCDtdm+O; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779378537; c=relaxed/simple;
+	bh=K3UwH8YOcZMihTs3Vdav3Z5LNw3o3Dh4EzAkVvcWoWo=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Jl3MH+xNHjH7PEbKZ9S2MC4Dg9MWiAhMh6my90XynzKPCilumE5r3UKSYEmh4NxOS05jGJwkR1wI2THURgEpf0917vO/+QJeZZYwvbaU9etcm7Ty4ox1cpbM6X1I0kycbiRk+i+JBBIDqXelo4NKzGUA0DJAHXjoyAV8azWg930=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=VTvRQmA9; arc=none smtp.client-ip=192.30.252.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dCDtdm+O"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D8101F000E9;
-	Thu, 21 May 2026 15:30:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779377417;
-	bh=z1zANa9xePQpc5dxO6gs1c1TJ5eNJjrFI+rWeelPoN4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=dCDtdm+OPH+76UHbaIjeishTsXua1K/9ZLQKDEnaiRW0jTcWJ4mJY8VZam7Xrq7gi
-	 1XyghgCV0LFw0TOeRC9Ti3+MLYjhoAITyRbMejhEKK5m/NL1tcUt6bRjuU7pRB7fQM
-	 Ud1PDr4wV5SDQXz4gEG7dom6Qq8eobQB/+th0neowQxhJCvGtUDlYwdkX8TqjmYYgx
-	 KaGpRpHC5A7cghdDQ1XkIkDkrSzq1vOSz6dnfq1L62LEYvQBX/6ftDD2cQax07amjE
-	 JAez4bbGCf/kgzA0nbfCIP53T0wrzFwdlDUI6gP7yyVGxD4vq2zlSs0a0n+MlDNGNc
-	 G5Uz7KoBJ8D7w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9398C3930E02;
-	Thu, 21 May 2026 15:30:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="VTvRQmA9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1779378534;
+	bh=wqmHw1+j8LykOtEDImsEmg7QHEook1RU4602ID7ljj4=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=VTvRQmA9oMMOjWvE9iGPIIXcZT+/h59Kw3wYS8S0m5KZyThg7GBEa+5dpe3dNWD0o
+	 JZAWJ+b5AeVuT2Ts6T0JuB9UPIZSDEFWkmCYauUlGAy9Yg58NhTDdSdU5BB84F74bP
+	 Qr3XV0kzmGCKnyi/gRfnXibSb0gwJdgHeZPXKskY=
+Received: from github.com (hubbernetes-node-3180c8a.ac4-iad.github.net [10.52.145.58])
+	by smtp.github.com (Postfix) with ESMTPA id 259E0740FFA
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 08:48:54 -0700 (PDT)
+Date: Thu, 21 May 2026 08:48:54 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/action-ci/push/refs/heads/main/80ebbf-c1b86b@github.com>
+Subject: [bluez/action-ci] c1b86b: ci: add verify_fixes and verify_signedoff
+ checks f...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: L2CAP: fix chan ref leak in
- l2cap_chan_timeout()
- on !conn
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <177937742713.384060.6353314036524937573.git-patchwork-notify@kernel.org>
-Date: Thu, 21 May 2026 15:30:27 +0000
-References: <20260521023055.3272712-1-oss@fourdim.xyz>
-In-Reply-To: <20260521023055.3272712-1-oss@fourdim.xyz>
-To: Siwei Zhang <oss@fourdim.xyz>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/main
+  Home:   https://github.com/bluez/action-ci
+  Commit: c1b86bca7cacc936bea82b3ca8b2ee4b4fcb6e74
+      https://github.com/bluez/action-ci/commit/c1b86bca7cacc936bea82b3ca8b2ee4b4fcb6e74
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-05-21 (Thu, 21 May 2026)
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M Dockerfile
+    M ci.py
+    M ci/__init__.py
+    A ci/verifyfixes.py
+    A ci/verifysignedoff.py
+    A scripts/verify_fixes.sh
+    A scripts/verify_signedoff.sh
 
-On Wed, 20 May 2026 22:30:36 -0400 you wrote:
-> __set_chan_timer() takes a l2cap_chan reference via l2cap_chan_hold()
-> before scheduling the delayed work.  The normal path in
-> l2cap_chan_timeout() drops this reference with l2cap_chan_put() at the
-> end, but the early return when chan->conn is NULL skips the put,
-> leaking the reference.
-> 
-> Add the missing l2cap_chan_put() before the early return.
-> 
-> [...]
+  Log Message:
+  -----------
+  ci: add verify_fixes and verify_signedoff checks for kernel patches
 
-Here is the summary with links:
-  - Bluetooth: L2CAP: fix chan ref leak in l2cap_chan_timeout() on !conn
-    https://git.kernel.org/bluetooth/bluetooth-next/c/628669434306
+Add scripts from gregkh/gregkh-linux adapted for GitHub Actions:
+- verify_fixes.sh: validates Fixes: tag format, SHA existence, subject
+  match, and ancestry (removed external Linus tree dependency)
+- verify_signedoff.sh: validates author/committer Signed-off-by presence
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Both run against origin/master..HEAD after checkpatch in the kernel CI
+pipeline and report results as warnings to patchwork.
 
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/action-ci/settings/notifications
