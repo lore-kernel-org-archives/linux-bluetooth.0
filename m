@@ -1,77 +1,74 @@
-Received: from out-33.smtp.github.com (out-33.smtp.github.com [192.30.252.132])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D638381B16
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 05:50:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB2B1A6806
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 May 2026 06:09:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779342607; cv=none; b=Odv5cbAh1SzCvQEnUYOOelBxl8IYFMqBbszCuk78Shm2Ev9yMZC2wiv/q3qQZCZK18sksztgdeexlDHdjkYUJyGvFz7RKEy5d2J3cBS4Ss9ctE4V5fka3ZrmBuykQukx+YcfUvl2FC22n1qZmz7YwbZUSRAjw3QeYb7mM3ytAJI=
+	t=1779343777; cv=none; b=ZEmYYjq60HD22xOgGGWxbk/QjG6GP8lcSZU7Kx9AoB/CixFTRQ8wSuVUjeevg1yYgjtn8MVu9NsLhzHKK6WGMz/VZYQekOIofdh7UfdbUHqD1NuCRuknm0aaRuCK+lUcxcJWUzTwTOFuWZ+c+bfIlMJVvey2G+FNUzD3Zwm/5Q4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779342607; c=relaxed/simple;
-	bh=CELOr5C3jd94Qs54zJqJjtHIeAcMXOWn/1Iyx5b1lCA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=YkfWiZf7x3WEmJTvupMsLHpITOF99Ivf81MH8FVaSWYwB6sXfzcuiFQoPNe4JfsgM5Azcj9zsmrt0LQtSqQK429wwcGFaMm+ezgDPoZTZiaZIpaWc9lZqNP9hN4B6A3nNwzwfPxL3WzXE1BpV7/K2K3kBowRrFu8410hdH90X2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=iliWE3Kp; arc=none smtp.client-ip=192.30.252.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1779343777; c=relaxed/simple;
+	bh=wBTrPpz9TJa+8HtBIApobZHQ5SJC1J/dqr5xchxsV8U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nXs/89nSB1JTSXcdG0n2Z5jR9UtOB3sTgcN8q+AJG82iRg6WR1Tx7C///n5506h8Vo730UlcLV81VPgJavsmDFBMCLJrUPNGWnJQtmK6auZTMQTdUBBg4EZWhQ3f/zBO26wrCNfw88DUVLWG08vTc5k0FAO9Vwaukvi5I/AY6+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ikLfHMg4; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="iliWE3Kp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1779342605;
-	bh=SJVwFqpuI88NYxJSOGMtA4Dt6ebLZCdYYVk3lpqIZqo=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=iliWE3KpJic75nKhwBaChyZ0tXZHiefnPDRFy1KL7PygrBGyeGO97skaT6CEKyQb7
-	 IMFsGKeaoMJsZCkZSzphxDb0FgLpZJl5qUko2cE2SssKtauLKefF9UD2QAXJ4wM2it
-	 xeXYX3aOs8ud3zPt+uczhcfTg8nQUE/zPg8n9JUs=
-Received: from github.com (hubbernetes-node-bdc6b66.ac4-iad.github.net [10.52.125.27])
-	by smtp.github.com (Postfix) with ESMTPA id 63AF7740325
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 May 2026 22:50:05 -0700 (PDT)
-Date: Wed, 20 May 2026 22:50:05 -0700
-From: michael kong <noreply@github.com>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ikLfHMg4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Tz
+	TByhR4OMC0xR1LpSVP4d+6nOsnEMdbAahU+UUPBgc=; b=ikLfHMg4ZhH8r0AcRu
+	SLuGR3EiNCEtT5kKIGTNwHAIqALXB32nhlsGhR9yakoRPbqEEtB9oD0IVgf0PWid
+	zfE88DzN8raAI8jyYi4Qo/3fQC7I9Rgbn2/7fKCGMY8qEVYeQdCTw0UZ4dPKM6qi
+	5PiVzR4brKwNLYsz7sJ8/vXPU=
+Received: from A207080518.realsil.com.cn (unknown [])
+	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wAnc5qSoQ5qqoR8Cg--.59506S2;
+	Thu, 21 May 2026 14:09:24 +0800 (CST)
+From: michael_kong <kx960506@163.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1098419/000000-e58872@github.com>
-Subject: [bluez/bluez] 35baf7: shared/bap: Fix unused value in qos
+Cc: michael_kong <kx960506@163.com>
+Subject: [PATCH BlueZ] doc: Fix Data Path direction in btmin-le-audio.rst
+Date: Thu, 21 May 2026 14:09:19 +0800
+Message-Id: <20260521060919.2124-1-kx960506@163.com>
+X-Mailer: git-send-email 2.29.1.windows.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wAnc5qSoQ5qqoR8Cg--.59506S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrKr47tF43CF4fKw4xJrW8JFb_yoWDGwb_Ww
+	1rJFyxArWqk3sxK3ZrXrW7CFn5u3ZrCw1Yg3WavFnYkFn3Awn0yanFqrn2qF92vF9xXFs8
+	ZryjvFWDAw42yjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRE7KIPUUUUU==
+X-CM-SenderInfo: dn0zliqvqwqiywtou0bp/xtbCwxSrZmoOoZQ+UwAA3m
 
-  Branch: refs/heads/1098419
-  Home:   https://github.com/bluez/bluez
-  Commit: 35baf761c1f830861a6bcacf856c4c95029148f9
-      https://github.com/bluez/bluez/commit/35baf761c1f830861a6bcacf856c4c95029148f9
-  Author: michael_kong <kx960506@163.com>
-  Date:   2026-05-21 (Thu, 21 May 2026)
+The Data Path direction 0x01 should be Output (Controller to Host).
+---
+ doc/btmon-le-audio.rst | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-  Changed paths:
-    M src/shared/bap.c
+diff --git a/doc/btmon-le-audio.rst b/doc/btmon-le-audio.rst
+index 50ee11879..47213c92e 100644
+--- a/doc/btmon-le-audio.rst
++++ b/doc/btmon-le-audio.rst
+@@ -454,12 +454,12 @@ On success, the controller assigns BIS connection handles (0x0010,
+ 
+     < HCI Command: LE Setup ISO Data Path (0x08|0x006e) plen 13  #140 [hci0] 0.500003
+           Connection Handle: 0x0010
+-          Data Path Direction: Output (Host to Controller) (0x01)
++          Data Path Direction: Output (Controller to Host) (0x01)
+           Data Path ID: HCI (0x00)
+ 
+     < HCI Command: LE Setup ISO Data Path (0x08|0x006e) plen 13  #145 [hci0] 0.550003
+           Connection Handle: 0x0011
+-          Data Path Direction: Output (Host to Controller) (0x01)
++          Data Path Direction: Output (Controller to Host) (0x01)
+           Data Path ID: HCI (0x00)
+ 
+ **Step 8 -- ISO Data flows** on BIS handles::
+-- 
+2.29.1.windows.1
 
-  Log Message:
-  -----------
-  shared/bap: Fix unused value in qos
-
-In bt_bap_parse_base, PresentationDelay is parsed but not written to QoS.
-
-
-  Commit: e58872a259ad0973107ef479b33a4e2be273bbf6
-      https://github.com/bluez/bluez/commit/e58872a259ad0973107ef479b33a4e2be273bbf6
-  Author: michael_kong <kx960506@163.com>
-  Date:   2026-05-21 (Thu, 21 May 2026)
-
-  Changed paths:
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  transport: Add support for obtaining PresentationDelay in broadcast QoS
-
-
-Compare: https://github.com/bluez/bluez/compare/35baf761c1f8%5E...e58872a259ad
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
