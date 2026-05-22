@@ -1,35 +1,36 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+Received: from out-40.smtp.github.com (out-40.smtp.github.com [192.30.252.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC58347C7
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 May 2026 17:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92CC327BF8
+	for <linux-bluetooth@vger.kernel.org>; Fri, 22 May 2026 17:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779471921; cv=none; b=mHyuHfzXsNWb10AK0IouaJqY9t88X+02aJIM4snDivzdnYyX0noM8DQfqiER3eCEssyZn/uaS1OCoMNm7LesOpzYQMUpzjcT0JxOT+O9oAVplHADWqg2jZS6P21O2Y4az/9OSNG9dfqWqYiPxSxd7TkJd0k9qu5csrg7Qov+3ys=
+	t=1779471976; cv=none; b=BSSd+yvuDeEEhlk5Ta1lmnN7W9s6JnkBbLS4udmSglvObSR24/YQ9rdssypqq3wovJPdxeXoMOdIrkAs7NtZ4EEegom62hWXiTkY4YJy36Kj1efHa7uTNguj59/urXkt2el+ziLRgDjYYcIkxlaHzHwldewtO5APXcoQ7p2Yo+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779471921; c=relaxed/simple;
-	bh=7Ew5FAX6fC/CHib1fEQdc6Yg07BbcgFUdHuUvJAHI3g=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=JV8gt0ByyyGq/1dtlRCpAKowu2BsdFr3Sah750Khu6wGyw0fPaAqZJHhJfYQOzTAI/w19GLpaLv8xMuikEwi8N//9uGqExV3tWa2jhBPcLZpKGvydXri8B9KzD7MNpTnyCwDdZgssGk8UL7/1lzeaGINXBcvLwb0McH3gOi4Zjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=gAvpfyUP; arc=none smtp.client-ip=192.30.252.207
+	s=arc-20240116; t=1779471976; c=relaxed/simple;
+	bh=j75kNfHSewxsrsigE7kZ/bs4SbPusqstXTzeCsmxcdc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=UclkglcTL9C0J07VXzgsgZA6v2UcacnayJBDPFJbTAH2/Vc2k5Bsb9eFeVSW+GUHY/sOfwobt3Lp6+8pyuQujt0lZYS/lF+0qEEc9XPBukPh/m4JRhf5tAXXqWo5GoAIh9RaxIyIKRbbzjrKag80J7zpPPMJyoDJLja42M6CuUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=f3a0uK2O; arc=none smtp.client-ip=192.30.252.139
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="gAvpfyUP"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="f3a0uK2O"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1779471919;
-	bh=buJtTP1USSQ1Z/ICV9DqsQftTD+eA2DlnGeu+1ORkHc=;
+	s=pf2023; t=1779471973;
+	bh=4JwfnxZccbe4xmDsaS1lcf16q/vPTHMY4Co4lIaH+Wg=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=gAvpfyUPEm8JqST/3Q4KKx7ZWOTfZe/Ju71vchIqKwi9adFSZko3fubd12VyaB490
-	 imU8ExmEVRpJcSMSCDNXCdXM6fA+Ob93y0AfhLmiN7rczFvpJs/Y1INrVpqeq8qtBm
-	 /kR3vjXwOqqAAeWs87bCCzCzspqMUoYUMupJm3Mg=
-Received: from github.com (hubbernetes-node-20636c1.ac4-iad.github.net [10.52.220.72])
-	by smtp.github.com (Postfix) with ESMTPA id 6D63BA11DD
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 May 2026 10:45:19 -0700 (PDT)
-Date: Fri, 22 May 2026 10:45:19 -0700
-From: raghava447 <noreply@github.com>
+	b=f3a0uK2OmAqVXYNrwXOUjNoNITDjkjHSD1DTcT/+o1KZJ3S7ok0VzEluVlY5rYy/r
+	 noCrruz1D3cg+qZDnAlB3pl2ng8afqXBZkA10bbVYmy6/xkOW0S/dOTsorDubjI49t
+	 Gpn47xKS4Qir7GQIhjfxzBCtjX++qi7X8hoDbw+Q=
+Received: from github.com (hubbernetes-node-d9360c5.ash1-iad.github.net [10.56.164.50])
+	by smtp.github.com (Postfix) with ESMTPA id F2D1E9210D5
+	for <linux-bluetooth@vger.kernel.org>; Fri, 22 May 2026 10:46:12 -0700 (PDT)
+Date: Fri, 22 May 2026 10:46:12 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/d167d3-f818e9@github.com>
-Subject: [bluez/bluez] f818e9: shared/bap: set QoS state when CIS is lost
+Message-ID: <bluez/bluez/push/refs/heads/1099512/000000-41cabc@github.com>
+Subject: [bluez/bluez] 41cabc: test-mesh-crypto: Don't attempt to run test if
+ AF_...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,22 +43,23 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
+  Branch: refs/heads/1099512
   Home:   https://github.com/bluez/bluez
-  Commit: f818e9d0c9df2537c3415fe9ff45701084dbe012
-      https://github.com/bluez/bluez/commit/f818e9d0c9df2537c3415fe9ff45701084dbe012
-  Author: raghavendra <raghavendra.rao@collabora.com>
-  Date:   2026-05-21 (Thu, 21 May 2026)
+  Commit: 41cabc74bc4c769d4fecddc592d5ee54dac68aac
+      https://github.com/bluez/bluez/commit/41cabc74bc4c769d4fecddc592d5ee54dac68aac
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-05-22 (Fri, 22 May 2026)
 
   Changed paths:
-    M src/shared/bap.c
+    M unit/test-mesh-crypto.c
 
   Log Message:
   -----------
-  shared/bap: set QoS state when CIS is lost
+  test-mesh-crypto: Don't attempt to run test if AF_ALG is not available
 
-This is used to pass PTS tests BAP/USR/SCC/BV-167-C
-and BAP/USR/SCC/BV-168-C.
+This make use of mesh_crypto_check_avail to check if AF_ALG is available
+and if not just bail out which is similar to how test-crypto handles
+when bt_crypto_new returns NULL.
 
 
 
