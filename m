@@ -1,137 +1,132 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA0D3CFF5D;
-	Fri, 22 May 2026 11:08:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F8E3D75DE
+	for <linux-bluetooth@vger.kernel.org>; Fri, 22 May 2026 11:15:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779448139; cv=none; b=TBrd0qM9oeVC2AI38/PgoAAccl8SyV6uICS8i2IcyeOIjrhM+C6ctAOjz7h10GyM40cbfhRQYO5x5rf41U/XE5zw1AexY6bLbIkmvCuV2u+1cGj+Pok8ou16rEWtC2j8llMUMb3aJzKAL2pooJ0AAvbh2rBVYiNOh495qKXDpH0=
+	t=1779448560; cv=none; b=dctxyvVacg12wVVcpt6g/1Ep2zz68Aa7ZEp52XW6v4OFxxu8fUE3wPp1xngNLGfkJftZCdIsJR+TJpM4GR7PZLe+SZnDnBrmAa0A2uyaydH/6sO8TnYGh2W2R7Ij5vhAHK1EfY3c2NQsFLyO0i2xlmdBshHGxuFXB0VRzG+IbDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779448139; c=relaxed/simple;
-	bh=i1OgZQEXIpJ4gFsrJh9ccSR2bnQ4kvlChGJ1Nq/eXwU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sQAvm+wZsrX7XMzy8EjTpbYmemelqpBA0UoHqxRYr7UVkc1dyZKya6xNsQAGfh94MP0QweAdRcqjtr6uE7bE5FWDM6hmI9wTt+jaRXFteeSJpRjpFFRA4CX4e1Zd7oBpNF+bt7TmeFwmcTu8SMdViMr5mZIOgUAmdftDaaJVvqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=cz1ikoaQ; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1779448560; c=relaxed/simple;
+	bh=lTah1Hss3kMZiwSD471yGlYCsNR3U/u63Q8k7Vtx93Q=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Qc//sRdcR1kAa7/J6cXfiqjvgu8gEDiIuJ8lrUk4J+w1z0tm+YLg6NOZa8+aVdfro29FcIRcswoGACeM0NxNbEBaVqhVklok9GMgt4Cm5o/kUBG+C35I0nIfz3knBnQKYuruCRi77URjYpEZ7wHpDkixrdgjHyT28aNDk/mkyI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kGfF1OOi; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--apusaka.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="cz1ikoaQ"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64M98iBb1816103;
-	Fri, 22 May 2026 11:08:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=WlFlTevV7pugW98Ow0Dv1MNdLVqFSLaps+d
-	D8LEsf98=; b=cz1ikoaQCVb/bWs4HCdqQchl4rHhScTN97+PrdI2gBAQ6ojTf+j
-	MmWu5p5eV1ayfOKJ9UYGLe9Pg49XlwTPrq6Rh9jtzN/0sUztxZFxoP1yh/xVQUhq
-	XciFWSyCeN+CDTmk8RgN8SQyI6UDXXFxKpOdjdl991N+cXOILKTQ/AYwE768Lqq2
-	Julb4emA1nSv5YuutPStpz1RXZbUvUwRlSv0MOnem5iZKXqTuyeBGDrBZTCubO0P
-	m/xKVP4PF1nb2acpxGf96xNyG0cVKR1EFY4E/TaJuEE9QjmEAW5kCM2HCOJ5otSa
-	kLUD3zBZC4suDWSiQ+0GxMHosXbTeknWm0w==
-Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4eafrm1nwy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 May 2026 11:08:52 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (8.18.1.7/8.18.1.7) with ESMTP id 64MB8nut010787;
-	Fri, 22 May 2026 11:08:49 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 4e716s25dg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 May 2026 11:08:49 +0000 (GMT)
-Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 64MB8n6Q010780;
-	Fri, 22 May 2026 11:08:49 GMT
-Received: from shuaz-gv.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 64MB8mP8010777
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 May 2026 11:08:49 +0000 (GMT)
-Received: by shuaz-gv.ap.qualcomm.com (Postfix, from userid 4467449)
-	id 172306ED; Fri, 22 May 2026 19:08:48 +0800 (CST)
-From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-To: Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
-        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
-        jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com,
-        shuai.zhang@oss.qualcomm.com, stable@vger.kernel.org
-Subject: [PATCH v1] Bluetooth: hci_qca: Increase SSR delay for rampatch and NVM loading
-Date: Fri, 22 May 2026 19:08:38 +0800
-Message-Id: <20260522110838.1158643-1-shuai.zhang@oss.qualcomm.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kGfF1OOi"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-36603ad6709so6121970a91.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 May 2026 04:15:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1779448558; x=1780053358; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Egmmjo9f2AA1P39cP28CRgmybfRY380QQNUq9twb6kE=;
+        b=kGfF1OOi9CNLxel+TBucbF0qM/NwA/QcN9q39/8MVrIx+K6ACFD5yPmaahjFiuuaHK
+         Lrexfbn1I2YpYfBCJX0/UnwTUtRphpNVIZBPyeL+q2K39R+YAqrbN9UjRkNOfnFWa4DO
+         OW05H1za/fKKzrWS9lbtnCTqoPHkE7wDEbG2jyavD+YjLmSn/cqRf4xTsEbsKV8vMfTg
+         8XJvTRPALGHGpH771CTDbPQ1dVQ/xaE/bwXZLrSDxEx8X/4/f4dqbJoABYg7H4Xe/ueS
+         /2DIYOxH8eqCHwdORt5wPr6xpKCK2Em8q1IXP0jPmXjRcutizda51KgA4Ljqp7MUxwGS
+         Ff3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779448558; x=1780053358;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Egmmjo9f2AA1P39cP28CRgmybfRY380QQNUq9twb6kE=;
+        b=dXLtLFfeW9YYvlDexGOKlxQsOaBEP+g/wosObejs89OKKnlePk7mePJtbiAEzNo2JQ
+         /1ujQO2zdlaHcvLbfLL5Oj4Sm8x1aFNqf0G/yo83lUkFl78DZlnAM28im4AKkWQuODL1
+         yO5FMBmuaHLasR2AxmflMsMa+ZZusYioc4am1U+5nFbhZUF2R8agkEeSivDpic+8nQwN
+         4zodcbsSARJCcJA4xTvJEwSXGv43a8nx+uEtNMLJoSdtJLspqXNK5grRQLLkzZjDY+om
+         12CdPZxU9lneWcZ8Ct1JCxNYIldf2bpQIBvQw7yAAZjKX7aJGwF1BZ+7Hr5mPaiWGiiU
+         oPrA==
+X-Gm-Message-State: AOJu0Yxotu2JvopvgcWN0WIOKOaAk2b8DTnUmwiO8SElKw4vI1yfVMkq
+	/8qYKZZW2DJmiK2tOn350cfNqJqnRuIV1f8btMIPUlnSMNF7+A/gsyaUJ8tik1LdPJoi0ZAdgXZ
+	uuJ/EcUGtnC77oTWMzjZjUCZ3tw/NxdRJbYDcqWl/NDf3u36HWN+O2N6VQbGEjwCzQ4b6C3DHvE
+	7xfmTD8t05BxYQWggmDk4vw1/n0ukzhMTJ/HSopTq4U/LwOfN7PhvFJA==
+X-Received: from pjhk32.prod.google.com ([2002:a17:90a:4ca3:b0:365:f319:942b])
+ (user=apusaka job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4e84:b0:369:747b:48b8
+ with SMTP id 98e67ed59e1d1-36a67734201mr3635604a91.8.1779448558297; Fri, 22
+ May 2026 04:15:58 -0700 (PDT)
+Date: Fri, 22 May 2026 19:15:12 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-ORIG-GUID: oM22Sdkr8Q30GZP6zG0DdFL0KQ2T5aDt
-X-Authority-Analysis: v=2.4 cv=Zekt8MVA c=1 sm=1 tr=0 ts=6a103944 cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=yx91gb_oNiZeI1HMLzn7:22 a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8
- a=SK-ELO-gduZh6qpZz3UA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIyMDExMSBTYWx0ZWRfXwZcazCe8Abjm
- waarRxJEsWjKvz0qUGWgaAQR3fgy2CAUgLwN7kNbEyAsFhVphqXoP11BHN4C2972eilfoCZekbA
- z6jGzlK+wCPGKPIyU/FTPP9VOVrN4lpQTnhYqaOKg7Kc8hTN7+hnBlKb025jh5MeEfCA4xkHiSs
- IgLTKa8bCOwfROOD+etQiHSUZFqBkVf4y4JZBNmVw/ofA1HICQ8hfM/NyCMqBaKFCz3RItmPQgs
- 7hYdxy+kCeJ8Wm7swe/1CGZaM2GtSirUQdSsjDIURkpPzAJZXNeMx1loL1LVGveKGNFEvV57gZ/
- AYJBSL+4XAyOpv3u1GnjuvPdhprBrRGREbFInD+KuhoknHboK5hGJdosHEIdOxEmVNqQfMUG1h9
- J+5ZWkHqxSprjtbwPwabfOKr/x+6urDrXCN0xRfCOHcdBEJ6sKqMxc7WPt8W5aj+ofaH7meJZj0
- QJpHl6CUm1cbzq7g/Jw==
-X-Proofpoint-GUID: oM22Sdkr8Q30GZP6zG0DdFL0KQ2T5aDt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-22_02,2026-05-18_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 malwarescore=0 adultscore=0 lowpriorityscore=0 phishscore=0
- suspectscore=0 spamscore=0 bulkscore=0 clxscore=1011 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605130000 definitions=main-2605220111
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.746.g67dd491aae-goog
+Message-ID: <20260522111540.581113-1-apusaka@google.com>
+Subject: [PATCH BlueZ] monitor: Add support for HCI Event Encryption Change v2
+From: Archie Pusaka <apusaka@google.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>, 
+	Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 
-When bt_en is pulled high by hardware, the host does not re-download
-the firmware after SSR. The controller loads the rampatch and NVM
-internally.
+From: Archie Pusaka <apusaka@chromium.org>
 
-On HMT chip, due to the large firmware file size, the
-loading process takes approximately 70ms. The previous 50ms delay is
-too short, causing the controller to not respond to the reset command
-sent by the host, which leads to BT initialization failure.
-
-Increase the delay to 100ms to ensure the controller has finished
-loading the firmware before the host sends commands.
-
-Steps to reproduce:
-1. Trigger SSR and wait for SSR to complete:
-   hcitool cmd 0x3f 0c 26
-2. Run "bluetoothctl power on" and observe that BT fails to start.
-
-Fixes: fce1a9244a0f ("Bluetooth: hci_qca: Fix SSR (SubSystem Restart) fail when BT_EN is pulled up by hw")
-Cc: stable@vger.kernel.org
-Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+> HCI Event: Encryption Change v2 (0x59) plen 5
+        Status: Success (0x00)
+        Handle: 256 (BR-ACL) Address: 00:11:22:34:56:78
+        Encryption: Enabled with E0 (0x01)
+        Key size: 16
 ---
- drivers/bluetooth/hci_qca.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index ed280399b..184f52f9c 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1680,8 +1680,8 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
- 		mod_timer(&qca->tx_idle_timer, jiffies +
- 				  msecs_to_jiffies(qca->tx_idle_delay));
+ monitor/bt.h     |  8 ++++++++
+ monitor/packet.c | 13 +++++++++++++
+ 2 files changed, 21 insertions(+)
+
+diff --git a/monitor/bt.h b/monitor/bt.h
+index 147b76537..eac6b5ed7 100644
+--- a/monitor/bt.h
++++ b/monitor/bt.h
+@@ -3696,6 +3696,14 @@ struct bt_hci_evt_auth_payload_timeout_expired {
+ 	uint16_t handle;
+ } __attribute__ ((packed));
  
--		/* Controller reset completion time is 50ms */
--		msleep(50);
-+		/* Wait for the controller to load the rampatch and NVM.*/
-+		msleep(100);
++#define BT_HCI_EVT_ENCRYPT_CHANGE_V2		0x59
++struct bt_hci_evt_encrypt_change_v2 {
++	uint8_t  status;
++	uint16_t handle;
++	uint8_t  encr_mode;
++	uint8_t  encr_key_size;
++} __attribute__ ((packed));
++
+ #define BT_HCI_EVT_LE_CONN_COMPLETE		0x01
+ struct bt_hci_evt_le_conn_complete {
+ 	uint8_t  status;
+diff --git a/monitor/packet.c b/monitor/packet.c
+index ff0b1cac2..0de7e6f57 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -12008,6 +12008,17 @@ static void auth_payload_timeout_expired_evt(struct timeval *tv, uint16_t index,
+ 	print_handle(evt->handle);
+ }
  
- 		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
- 		clear_bit(QCA_IBS_DISABLED, &qca->flags);
++static void encrypt_change_evt_v2(struct timeval *tv, uint16_t index,
++					const void *data, uint8_t size)
++{
++	const struct bt_hci_evt_encrypt_change_v2 *evt = data;
++
++	print_status(evt->status);
++	print_handle(evt->handle);
++	print_encr_mode_change(evt->encr_mode, evt->handle);
++	print_key_size(evt->encr_key_size);
++}
++
+ static void le_conn_complete_evt(struct timeval *tv, uint16_t index,
+ 					const void *data, uint8_t size)
+ {
+@@ -13737,6 +13748,8 @@ static const struct event_data event_table[] = {
+ 	{ 0x57, "Authenticated Payload Timeout Expired",
+ 				auth_payload_timeout_expired_evt, 2, true },
+ 	{ 0x58, "SAM Status Change" },
++	{ 0x59, "Encryption Change v2",
++				encrypt_change_evt_v2, 5, true },
+ 	{ 0xfe, "Testing" },
+ 	{ 0xff, "Vendor", vendor_evt, 0, false },
+ 	{ }
 -- 
-2.34.1
+2.54.0.746.g67dd491aae-goog
 
