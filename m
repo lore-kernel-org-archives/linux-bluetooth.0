@@ -1,115 +1,120 @@
-Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD00C3806DC
-	for <linux-bluetooth@vger.kernel.org>; Sun, 24 May 2026 23:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48C130C16B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 May 2026 04:12:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779664051; cv=none; b=skhfc30re/0jEbM5j+GcQCrQvWmvQMvpNFafwOyRVNOKDEit2Q9aEuoiQOk29OzwO5+x/QwPuSabcbtx5eihlrHwyu6ogjehnQplp3shd4OaQmWAdLHhL5AuXp2zvPYLiD8wg8b+tbI8bxu4PSYm03T+7e7fo8sJgXpc2/OTU8U=
+	t=1779682343; cv=none; b=kYR+Hf1u/DRYmxw278SqA0kalvskgKqEh1k0w2w4Uakt0y7Rj1xYwqTv4u2SWlxk9jlIhoa0BmoGYfT9zI1Y0PRnu6AVeOH8SWcOgdFXbWwEunDwwhpZZaGc7k6fFuz6OWNJ3NUC/tbtj5WYYf18dLx2Ku5Mi8jF+QJ/JezGMZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779664051; c=relaxed/simple;
-	bh=iKds1BmZzF3VaAk0BGcHj5pT0VTSwMMvYyYl1HeR/1k=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ZgB2GOvj6aFZHEascXbpG/th1t6//+Q27U+A/lGkFQOUfbcdHgDBZvvL7DwrV+WTsUdV6M/Y5ipUdjOOf/krie/ivB406nJZEyr8LTd/ktIPSGJrv2AU+rQ/j4GvIJtthC81Aoofjpn53+qwhsPBnjVKTnSpRBs7I8fj7loC1bA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k8JzVYui; arc=none smtp.client-ip=74.125.82.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1779682343; c=relaxed/simple;
+	bh=16HDUW0Ovz4wulyEj3TQq0mLoaixvdfvhOFLQ9Di0eo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ApmyfkO7ngy75RDRhVdVCsjB7U/Mqy4fMypZX3GjnwG4ekFd3d9DDDH+p9SWXgTn1vCq5AcXMF9J5VEav8H4Bbt5lIa9FlqwDOEVoctWB1CbJi7dvpQ6IqPBlPlEDRJja6VNSZZWnKVIOKAe6sR6koyij+7eHn0PJJcopi1LyXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=K4YWFSjh; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k8JzVYui"
-Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-135e88b8e55so6623069c88.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 24 May 2026 16:07:29 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="K4YWFSjh"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-44ce78ab5feso7429415f8f.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 24 May 2026 21:12:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779664049; x=1780268849; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZEJjsNmC5VKDOv2KOpxxcaqITqPF4rFOhcQmdBZGAG4=;
-        b=k8JzVYuiBzT/f5lDMcGwvZQur24znn21y9QWAAvmiiq2hBQvhZYWra9IPu/F603cN2
-         j3Dhd/TwJlu/pZR4G3rAqPIsjF5C3sFnpMcAOmpS4BUJHFAjK/+4scsOD8KuU4YGJABC
-         bU1Stys2woB+GzAtiogVhkslrx6OdX1CNVCs83uTDQ73zz4QhsBnz8RSX4WDG/i6MaHu
-         Y22TM6EoxJJPAVUfTwofji18/CCH2mcybgjrpytLUTmjuiDNtUfyqM2XSNZ5QUTLRaOr
-         U52bBQnxTndhu4JyuZsTQin9wqzKVuf8sFxZKak6D/KR9C4EnHx7WMjl3eSZXsLow+pf
-         2H9A==
+        d=streamunlimited.com; s=google; t=1779682339; x=1780287139; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4yBi6BPh+UXXZzgh/Y/uB92Co2L+V2zJvUgtSBj0qPg=;
+        b=K4YWFSjhSh7OCMisa4OJfXzmEyKrB1zBoIErDIau/dIdEWmcwk06jZSIUlFirLx0m/
+         to2/FtY18c4oHO5jD7I06KSZO5gCgp5tYx93c+JUT9cb31cnYJE71KfxAWzR9yGU46ba
+         xHWpRqI1DJb5a55woJ0Y/bZ6RE2ZVIEQwL5hk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779664049; x=1780268849;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1779682339; x=1780287139;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZEJjsNmC5VKDOv2KOpxxcaqITqPF4rFOhcQmdBZGAG4=;
-        b=N4kOrwESaow6uWxFM5C+aYWtFCDPURUCarAyyXfaqfkpcOMn030bJgc4KV4u2WmwAs
-         PFjW1dtTNhcOTxUXUhczgZbjpjCHhOWO2z+1AEyXxekMQOABNkJ2JqCBU2c020wEShkr
-         N08j9GtXhOlN320tYFvwrJuI3JEFOJa2CIvMBQmEQOo0X5O2wuxOpTBjQM3G/HuI9xdm
-         JIK39g1e+sZ7sfapQRMS2UosyPZtgln/q0tpw5nnpj+VX80ZRZSqAT2GN7hX064Bg5A+
-         8qvpGr6Q2T5eD62kPsLdS8CblQTjMjtBLkuTu0Y4uUXaRSqUeUBP6bpLVvzQs92CiQda
-         6+9w==
-X-Gm-Message-State: AOJu0YxIq02jGfxS2xc3yaHWendlsErxr8VWPwrssN3ImdQdCxX35ly9
-	F7UNxDL07+aXFAppVg33S0121TGBkb7ydazq2dJ9FfTwkbrtCTr9ppxf4Mo3DA==
-X-Gm-Gg: Acq92OGZZpq9pHZkIpJWeJfnENzeWCXHf2DX7e1Vr/76UG1rxR8tACzRXhPj6fuMx19
-	e0vsqRF3vkZQp/ezAIoKViA5CCdnE3zDrcxYnPRicanqr9AV/T0sBRGlloSvPziWUMzHPe9YSRM
-	vPKzB1wzWw7CLwxnxlFoR2isgOY7VzFwwP9j8lCRSYWCF3OhY/lTWqcxo+fWNxNAWIAY70pGTmL
-	cZbD6KSsuIzsSOppmH5LxvJnQdnEOVjUWaIZEQIfnfdtScIrkTf1BrRwA8a5RlV54jIiULzVoPp
-	xd6L2SyiNJIYliHfPpL4NmlBDVqtUJW85Y6V5fjutIYy5EHFN3Lrd6bM087upOWFWarlhFpOawo
-	HVixRw9xDdmT7ckQN/jUtvhPsx+dRo2uZYmZGAjZJ42fVgU8tgY2lEWrAxRmR8o+tX0phC4WpEo
-	P4qNco4pDnO3tRlGIvVRzEct4nYJDdCw==
-X-Received: by 2002:a05:7022:912:b0:135:6914:87e1 with SMTP id a92af1059eb24-1365f70ad4emr4017956c88.6.1779664048853;
-        Sun, 24 May 2026 16:07:28 -0700 (PDT)
-Received: from [172.17.0.2] ([52.161.83.197])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1366aa9a8b2sm5956977c88.12.2026.05.24.16.07.28
+        bh=4yBi6BPh+UXXZzgh/Y/uB92Co2L+V2zJvUgtSBj0qPg=;
+        b=SuQLB1wrBE7ZnAj/ucLcEAcxHBjKYUa/ZSoGbwNegk8lGDvAj8xywC0lvR9GL5aH6/
+         LRPf8oTte+fepNOcyFnCTkL4FRTTVfVZsAMy3bLTmPOVW4aFvzxSQVWYIPH2izpsmmI0
+         ALCBirSxpeK7izuRNwQ1WFjtk5/jC1pRvps3fpgb7i29LfQLK9vsEzYOESUwI+MNb3JU
+         KR3emcApwvHTPLENity+4k3HeKQ6zN7fwvba7z+zivYbMfhTTWmwjL1EPOX2NiPkJLop
+         JhBcFLAve1iSHsGRATXyOU9KmdgE5qG+EFR5TBZAopEO8z11YW1ks3lacQGp3FnS5I0x
+         D1aA==
+X-Gm-Message-State: AOJu0Yzifb1zlZKnM0eQf9etUzqwNyuaIXDEoNn1NjCtkT3RJNgJ7VkD
+	E1H3+/mQBTD7IkMb9PAKoeFbke/MzNldYhFzwdsVbKNIilVCwy8YtMg3D5buefU+WgnlaNDZEyM
+	CRkc=
+X-Gm-Gg: Acq92OEWqQ1gtVKaUA5JhVKTrLtA6KOWnu+fT7ucvgCLZzXzOsivJLQNJn9vdUEGuHt
+	t+F1Anie2bqTRKIxeU80tn2xrrBA4ng2+x44fHv7zQ70Yw1zjWWIwskLzzj2XOOPbVjKgHqe2Vh
+	3+E95DuHp++TzbBpKq17f25YfIMEBtKX6vaXOmyomRWuI7uNPeYMgQvqfeapdOyo6+B9QcbnJGx
+	adufa4xNE8FseZmZUK9jSL+EPnV7GCmsxEB8+fbqyR2mXDG09kZEL1vZk/33dON/0UvgWXc0eO6
+	D75htgwzljnRRTIGGAx1ochrZN6E005a+Wcl3/xjE7zIEdbBcNZ4v/AbWYldK47VEk7ER4obrq4
+	rjzd8+HhtHrgMa+TrjZBCnBHUVCGIBOK8CK5pTJySjE+qVZEUsCOjOBgzWTmv7Bj+0ESdoMdZss
+	WCjXzkKneSAgDx65i9evhIf06JhrYyv8TgK+OWy5YcqvcfFyMyrPoOdqzgQI3iXcG52uEsypQD/
+	Wnp1ak=
+X-Received: by 2002:a05:6000:4701:b0:45d:b14b:2412 with SMTP id ffacd0b85a97d-45eb369ca6fmr21020439f8f.6.1779682338988;
+        Sun, 24 May 2026 21:12:18 -0700 (PDT)
+Received: from great-eastern2.home (public-gprs184177.centertel.pl. [46.134.58.178])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eb6cce0a4sm23267478f8f.12.2026.05.24.21.12.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 May 2026 16:07:28 -0700 (PDT)
-Message-ID: <6a1384b0.9652e1b4.2a64de.68da@mx.google.com>
-Date: Sun, 24 May 2026 16:07:28 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3715655250492226172=="
+        Sun, 24 May 2026 21:12:18 -0700 (PDT)
+From: Michal Dzik <michal.dzik@streamunlimited.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Michal Dzik <michal.dzik@streamunlimited.com>
+Subject: [PATCH BlueZ] advertising: add property with advertisement ID
+Date: Mon, 25 May 2026 06:11:51 +0200
+Message-ID: <20260525041151.3893522-1-michal.dzik@streamunlimited.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, tarjeib@gmail.com
-Subject: RE: Add configurable default LE PHY policy
-In-Reply-To: <20260524221421.258593-2-tarjeib@gmail.com>
-References: <20260524221421.258593-2-tarjeib@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============3715655250492226172==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1100107
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.39 seconds
-GitLint                       PASS      0.22 seconds
-BuildEll                      PASS      15.83 seconds
-BluezMake                     PASS      497.32 seconds
-CheckSmatch                   WARNING   252.29 seconds
-bluezmakeextell               PASS      127.97 seconds
-IncrementalBuild              PASS      492.03 seconds
-ScanBuild                     PASS      721.90 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/main.c: note: in included file (through src/device.h):
-
-
-https://github.com/bluez/bluez/pull/2148
-
+Identifier is an internal value, but it must be exposed to client app
+if client app wants to use a advertisement in BAP broadcast
 ---
-Regards,
-Linux Bluetooth
+ doc/org.bluez.LEAdvertisement.rst |  6 ++++++
+ src/advertising.c                 | 13 ++++++++++++-
+ 2 files changed, 18 insertions(+), 1 deletion(-)
 
+diff --git a/doc/org.bluez.LEAdvertisement.rst b/doc/org.bluez.LEAdvertisement.rst
+index aae80f08f..4dd36a0cc 100644
+--- a/doc/org.bluez.LEAdvertisement.rst
++++ b/doc/org.bluez.LEAdvertisement.rst
+@@ -235,3 +235,9 @@ The provided value is used only if the "CanSetTxPower" feature is enabled on the
+ **org.bluez.LEAdvertisingManager(5)**.
+ 
+ Values must be in range [-127 to +20], where units are in dBm.
++
++byte Identifier [read-write, optional]
++``````````````````````````````````````
++
++Identifier of the advertisement. Set by bluetoothd after advertisement is registered with
++**org.bluez.LEAdvertisingManager(5)**.
+diff --git a/src/advertising.c b/src/advertising.c
+index f529ecd14..3b758f51e 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -1511,8 +1511,19 @@ static void add_client_complete(struct btd_adv_client *client, uint8_t status)
+ 		queue_remove(client->manager->clients, client);
+ 		g_idle_add(client_free_idle_cb, client);
+ 
+-	} else
++	} else {
++		DBusMessageIter iter;
++
++		/* Check if the attribute has the Identifier property */
++		if (g_dbus_proxy_get_property(client->proxy, "Identifier",
++								&iter)) {
++			g_dbus_proxy_set_property_basic(client->proxy,
++				"Identifier", DBUS_TYPE_BYTE, &client->instance,
++				NULL, NULL, NULL);
++		}
++
+ 		reply = dbus_message_new_method_return(client->reg);
++	}
+ 
+ 	g_dbus_send_message(btd_get_dbus_connection(), reply);
+ 	dbus_message_unref(client->reg);
+-- 
+2.43.0
 
---===============3715655250492226172==--
