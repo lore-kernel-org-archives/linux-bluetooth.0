@@ -1,104 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D778726738D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 May 2026 16:52:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1FC3ACF11
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 May 2026 16:55:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779727933; cv=none; b=lKcTqeil6CdiEnHDzkwvsV1lLfRsQlpW5cnFAJIJO9oDHwd4v4eFp9vGq60h8zRUfua6EMvQgFJEdp4VtTzno8eCf6EXw4PM9y6PFGmQN0PMdF5nxsd3SvCP/IJT29MeUmcxZ5gdeK1ZOhHvIqMWclqzuYgA3TDn7EJd2vT7UGw=
+	t=1779728130; cv=none; b=AZBjx3r76zc0JTMI0BhaijA3wfLvHjC1v8psJP3uGZEmFdGcDU1jAXi67QFVtWqQVwwXahlu/kBz7Rz+XlV2VMislLtudug5aRndNT0xFKD3OV0vaVrKY1AV8cmcpW6dSL5nruHXEg+pAR477nCTvUWfbf5X7v/Mzk1RQH+SHv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779727933; c=relaxed/simple;
-	bh=GlV7RZkmnW6xNd+oz5JsDygGxoIfJVAx4ZLAOlz8dcQ=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=E/d6LWDEklqlNsuvhV4IensD20RCVTsxhXTpXg+OZ+gJURPDAnfeKdmnVLhHsBSpz/hAg8GekPPRThgzCkkGwty7cXiK85foEdrQAtSNfheCf1MPu98RM4hBIPr7Nh6V+SaFNKsFNmVlYHQLdIsamsNKmOnfcBgWdrGavVUPt2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k1PYWUCo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779728130; c=relaxed/simple;
+	bh=xU7B/rMGy3yK+sCwEorXAkbGAbl8j/xmvgN5VRQ3kkY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=atYgjnnz9hSxlq8Vzv+9ce1k5lN4e+0twL15k9KjaexVJPLvjvku99l5gBnIFgZWGBCKPqoRnaLBHoSH6weEKmKneN/VNXacmiRgN7gvY2JwW0088RPbJJ7FHtUfPiw/15UosdEHf3Y0aMdLTGCAUXLKsLKgs5IkdiE57jCg4hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PbMCugMf; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k1PYWUCo"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6D5D9C2BCB3
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 May 2026 16:52:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779727933;
-	bh=GlV7RZkmnW6xNd+oz5JsDygGxoIfJVAx4ZLAOlz8dcQ=;
-	h=From:To:Subject:Date:From;
-	b=k1PYWUCowrlaK+ye88cTHu1KyVZwqdnsRuodJ+eH7GNDWcekiJ3kqh+0ivzwgM9sj
-	 ipCVj75pHrpxKwM7u03wbEDdQ34K3k0m5uBfpCB6IUHkwCM47oWmaklCNZoNBiyfHr
-	 Ers7tuY8sfHVinMbUv6SaprzaRA7bpnzb6v0k4AFhZOD81jEdyt8B/WTcpLDUGsj5n
-	 i2d+T66aOfKBbiF84mR4fT7knjO6j0W3xIzYwXpU63EXgALsEelWBXqnpSJQD/CAnk
-	 oYe/mMAPiCt3HkQmCItDYH6xLcmWeWwIiG7O47Bx/c9//9wraMODAtTn0za/3GUukV
-	 7LXBG+VolLJMw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 501DEC433E1; Mon, 25 May 2026 16:52:13 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221576] New: btmtk: MT7925 USB Bluetooth fails with "Failed to
- send wmt func ctrl (-22)" since kernel 7.0.7
-Date: Mon, 25 May 2026 16:52:13 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: sergey@batalov.email
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-221576-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PbMCugMf"
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-9102e90bcbeso1028185685a.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 May 2026 09:55:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779728128; x=1780332928; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=QdwkexilDrV/jwD9wojQUfJCLnD4+Zj90vWDYyQg63U=;
+        b=PbMCugMfBe+hGL+zVV35xtrZniarGQTPMKMVKWI0fa9/6T1mVVT4FV8/3bjOir6h4x
+         /zm7Oo7Ygn9NdS+ZvLci9PfWFIeKU/kSoTudIXUYoPx7BolB3VisKmrRy5QRMBWuH7Ev
+         ryBKjbTjIvMCZEzCUlEhRdaIyEGufPia7NoOOkVmwZlugSuKmJUzEOoZ6aqOjeyIAm5z
+         wpKqQB2/PQL7vpmLEtxzTbt1HCicIKhK4dUdPnIDzJoaEwFD0WVWoVqRhw+/1PBbVIc5
+         iX/c+xU/XWgYgxt9SxRhnEFOcYgvIhBvYalFYgOmEAw7pEoKjuseaIX0+D6uYBwGnTN1
+         +hvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779728128; x=1780332928;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QdwkexilDrV/jwD9wojQUfJCLnD4+Zj90vWDYyQg63U=;
+        b=ljPyb4jd2tw/MOfSZs5jt3RxV3HmKq1hjiCfQ7l6gyJyScfevJAW+mgDf4gjyynxcE
+         6Lg+21trUE5DF7spt+up6iFExT1K/N3Zp8dU1S74rLhitLQjoGB7v7a4yQVcnMU6I6YQ
+         fsQE9Ihas2br/qqdKYBgUpw3zBF4DGBjJlrID5i5q0aLYasnDtg4kZH/Pzjbreai6Di6
+         RvPKd5ek0x69JtMYadK3vdsGZj7T3+qAZ46qUBxUX9cRIysazhG7Oek6vtyrGuwNBhYS
+         bD/x7W6EcLpihPJ12VC95W3XefwhG0W9GNgzYr65pd4TwgGQurzJ2yOhTXwQO90QgzQ6
+         7aJw==
+X-Gm-Message-State: AOJu0Yxb2y7X0lmbDE9H3AUkBWM11W8vYgMahAUSUwjVIR+cHnGA64qQ
+	i0xzTAQIQZn1uw58ilBlpLnvejhVGaDlh/Qoa+ftFO93Wo1o/O3V1KjeHhjR4A==
+X-Gm-Gg: Acq92OHraevReG7MZra+Uoy40SOrTlx6CVatO0Ao1Yt11gpbVpsbeQa4x/H/JGPII3z
+	zvmNR8YAXK2tkHAfXzQwBj9cmnWqo2Y9WkzSyREjtgVyY1GzmO4jHfylzERuYXUkRFofoIvyalg
+	D+gp7mmLkpfnKDaIxpB7SdHgrv5iHOGYpfR6tdNnnrW81Y1wtlmXDSZk6yG68FysoUavF+BvUDJ
+	6EjJaI7DNhgZB6e10ihe29O/wT2QsMPCSCojkauRtySAel5k4cxu498Cdtbk5B3+VRNKKWcmF+k
+	K42blEa4gw/wm8FpdElu8ooS7WsmEI4f1/40xpA4DP6qmigbsiYR2oNMbf90p+KsEyN6VSatpCY
+	N1Q0DmBp6iNw7mNZwudSwM29UK+TByQzWHVmux+zJCVleEmYFNNER120zRk4+NRRq4O3yLtl1pW
+	j+pygxz2AEAj2uWNaQeNg5OtXYZih2NQ==
+X-Received: by 2002:a05:620a:438a:b0:8ef:1157:6a05 with SMTP id af79cd13be357-914b49323b9mr2184865985a.19.1779728127628;
+        Mon, 25 May 2026 09:55:27 -0700 (PDT)
+Received: from [172.17.0.2] ([68.154.116.65])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-914c217cf69sm942900185a.24.2026.05.25.09.55.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 May 2026 09:55:27 -0700 (PDT)
+Message-ID: <6a147eff.86c817c2.3c3a8.b8e7@mx.google.com>
+Date: Mon, 25 May 2026 09:55:27 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7675626986084650915=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, tarjeib@gmail.com
+Subject: RE: Add configurable default LE PHY policy
+In-Reply-To: <20260525145010.154170-2-tarjeib@gmail.com>
+References: <20260525145010.154170-2-tarjeib@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221576
+--===============7675626986084650915==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-            Bug ID: 221576
-           Summary: btmtk: MT7925 USB Bluetooth fails with "Failed to send
-                    wmt func ctrl (-22)" since kernel 7.0.7
-           Product: Drivers
-           Version: 2.5
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: sergey@batalov.email
-        Regression: No
+This is automated email and please do not reply to this email!
 
-Regression between kernel 7.0.2 (working) and 7.0.7 (broken) and 7.0.9
-(broken).
+Dear submitter,
 
-Hardware: ThinkPad, MediaTek MT7925 USB Bluetooth
-USB ID: 0e8d:e025 (MediaTek Inc. Wireless_Device)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1100512
 
-Kernel 7.0.2: Bluetooth initializes successfully
-  "Bluetooth: hci0: Device setup in 1774290 usecs"
+---Test result---
 
-Kernel 7.0.7 and 7.0.9: Initialization fails
-  "Bluetooth: hci0: HW/SW Version: 0x00000000, Build Time: 20260414153243"
-  "Bluetooth: hci0: Failed to send wmt func ctrl (-22)"
-  "Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is
-advertised, but not supported."
+Test Summary:
+CheckPatch                    PASS      0.58 seconds
+GitLint                       PASS      0.33 seconds
+BuildEll                      PASS      20.48 seconds
+BluezMake                     PASS      632.11 seconds
+CheckSmatch                   PASS      328.33 seconds
+bluezmakeextell               PASS      167.60 seconds
+IncrementalBuild              PASS      620.54 seconds
+ScanBuild                     PASS      923.33 seconds
 
-Firmware: mediatek/mt7925/BT_RAM_CODE_MT7925_1_1_hdr.bin (present, correct =
-md5)
-Distribution: openSUSE Tumbleweed
 
---=20
-You may reply to this email to add a comment.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+https://github.com/bluez/bluez/pull/2153
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7675626986084650915==--
