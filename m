@@ -1,48 +1,167 @@
-Received: from out-1.smtp.github.com (out-1.smtp.github.com [192.30.252.192])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.forwardemail.net (smtp.forwardemail.net [121.127.44.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31ECA382363
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 May 2026 13:44:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.192
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A76386C10
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 May 2026 13:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=121.127.44.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779716661; cv=none; b=h0rEyVqdOrjHMr7G5SNj3KRAIcvxIQSgjOza7MYULeWQUhm6Zl5iXT6H8wMutUCn6BHCigwyDVfmrNjUFc0lS8oM2GopNmpLtW0G1iAuFXdnAxPnnyyBxCbSigA+t9grZptX/vaafSFFn0KVL1oukmGX1SG5AfoPtT5E04NKkPA=
+	t=1779717500; cv=none; b=L5Uj6pgmzpMG+hpoUO8zcKUlXswe0nHY4TNiei2mklDHOtMML/G+OUaXXZ173jJNxBMtWyq498tcycIR5KxXWPZSX7u0rd5vDoc33befy/kEMXhJZVHUF4srFH48cBtrpw4MrkIdXuPLqub1L2ZDw6dFgPiUXr0VcabQOHreM/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779716661; c=relaxed/simple;
-	bh=igOgy0OV0+8vedVJg6wrDWHeOO20VMTohfpLzTqXglk=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=PBvBrY15NMliw6MnAjUxl7MoVPw8mSsixMV1IWj/dmqZMFdqaJ1omWoVd5d8b5jxewEohlb5B3p3xvdtFIdQewIVKxeJz4m8p7Is9fz7B29JxndKuEFCX41yqMl5Tf242yg+A3RfN0rkCcnIkUszZMIB85SaxiM2InuMwaV3Xg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=WYgoDt8W; arc=none smtp.client-ip=192.30.252.192
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1779717500; c=relaxed/simple;
+	bh=cMwRIGvIt09o6/tnYHncBK0bTpYmYXJsIjtwxL2ZovM=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=BrYhynfWoLFmJCVI6oajhuIT0rHAMErx7JC/MeCqGOytRTrlJXy9RSzlB87J8D8bKYXqMasEQd7k0CF+A5QVFtvIoOZk/RyZCnEck09ChIhAT+f+LxNdGOnuAvYf1pu8rogNa3lrupzGdPrMrCDDGuO0IqHIrXMVsbh4KUS2dIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ubuntu.com; spf=pass smtp.mailfrom=fe-bounces.ubuntu.com; dkim=pass (2048-bit key) header.d=ubuntu.com header.i=@ubuntu.com header.b=OxyKopo/; arc=none smtp.client-ip=121.127.44.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ubuntu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.ubuntu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="WYgoDt8W"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1779716659;
-	bh=kVPeM8bgwGb6/b7/9G0TxgbaJwoz7PXpnST+uqWXpxE=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=WYgoDt8WfFV/nvm8AdUFpSPrIn3dHGYHVGDtNmRfB1jJhY9Km7hicNHdvjZjY1dgS
-	 bttX5rLranZui43o4m6HNxl0nkB2HiSqbxZawq4P+o3rzqCyXdqLDYpk3Y995RM7kQ
-	 9LAU6WL8R4AuycvVvyeOfO3BHPKX0of6+jrCMxH8=
-Received: from github.com (hubbernetes-node-4cc2aaf.va3-iad.github.net [10.48.207.107])
-	by smtp.github.com (Postfix) with ESMTPA id 72C603407B4
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 May 2026 06:44:19 -0700 (PDT)
-Date: Mon, 25 May 2026 06:44:19 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1100262/dc3162-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=ubuntu.com header.i=@ubuntu.com header.b="OxyKopo/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ubuntu.com;
+ h=In-Reply-To: References: Subject: Cc: To: From: Message-Id: Date:
+ Content-Type: Content-Transfer-Encoding: Mime-Version; q=dns/txt;
+ s=fe-953a8a3ca9; t=1779717492;
+ bh=ZeLnFp9m+pf5y3QIUl8+WeK1RXHgtgz8teGgBVub6X0=;
+ b=OxyKopo/LmgS6clVYlhdALv+otjqWjPHdc1EplRl8o0d2oWcMMAfUg9bqYdP/dO9tRHc/ye13
+ 2VTRZTq13PaGMxoMBB0fCKsmt/wKElzlrY+4Zq/CIRd6XPgHJ0tHCDartDlVwOaSBssxgnMEPn+
+ go+Ixb95U5oeBbvOkCmFwQr/N3G9b/0orCI/SzorojTKyHCj2hRW1C2zmb6RyngPGTgcdPm6zJy
+ ja97WllEmtxOBaWbK0Ndpks1Y6MJXTkjr5VM9dbuWFBycxOtOoF4oN+tlaSobe+E2FUWg2wWBSG
+ zogQb0+27F0dKlP7DnNMjH1DqCnDKVwalbC3iry+RlBQ==
+X-Forward-Email-ID: 6a1455716744e73b78d0d539
+X-Forward-Email-Sender: rfc822; jpeisach@ubuntu.com, smtp.forwardemail.net,
+ 121.127.44.73
+X-Forward-Email-Version: 2.8.15
+X-Forward-Email-Website: https://forwardemail.net
+X-Complaints-To: abuse@forwardemail.net
+X-Report-Abuse: abuse@forwardemail.net
+X-Report-Abuse-To: abuse@forwardemail.net
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8; format=Flowed
+Date: Mon, 25 May 2026 09:58:06 -0400
+Message-Id: <DIRT7260SRQZ.1BFF8CX3FJ57G@ubuntu.com>
+From: "Joshua Peisach" <jpeisach@ubuntu.com>
+To: "Sasha Finkelstein" <k@chaosmail.tech>, "Sven Peter" <sven@kernel.org>,
+ "Janne Grunau" <j@jannau.net>, "Neal Gompa" <neal@gompa.dev>, "Marcel
+ Holtmann" <marcel@holtmann.org>, "Luiz Augusto von Dentz"
+ <luiz.dentz@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>
+Cc: <linux-kernel@vger.kernel.org>, <asahi@lists.linux.dev>,
+ <linux-arm-kernel@lists.infradead.org>, <linux-bluetooth@vger.kernel.org>,
+ <netdev@vger.kernel.org>
+Subject: Re: [PATCH v3] Bluetooth: Add Broadcom channel priority commands
+X-Mailer: aerc 0.21.0
+References: <20260525-brcm-prio-v3-1-6259e10233f8@chaosmail.tech>
+In-Reply-To: <20260525-brcm-prio-v3-1-6259e10233f8@chaosmail.tech>
 
-  Branch: refs/heads/1100262
-  Home:   https://github.com/bluez/bluez
+On Mon May 25, 2026 at 8:11 AM EDT, Sasha Finkelstein wrote:
+> --- /dev/null
+> +++ b/net/bluetooth/brcm.c
+> @@ -0,0 +1,38 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2026 The Asahi Linux Contributors
+> + */
+> +
+> +#include <net/bluetooth/bluetooth.h>
+> +#include <net/bluetooth/hci_core.h>
+> +
+> +#include "brcm.h"
+> +
+> +struct brcm_prio_cmd {
+> +	__le16 handle;
+> +	u8 enable;
+> +} __packed;
+> +
+> +int brcm_set_high_priority(struct hci_dev *hdev, struct hci_conn *conn,
+> +			   bool enable)
+> +{
+> +	struct sk_buff *skb;
+> +	struct brcm_prio_cmd cmd;
+> +
+> +	if (!hdev->brcm_capable)
+> +		return 0;
+> +
+> +	if (conn->brcm_high_prio =3D=3D enable)
+> +		return 0;
+> +
+> +	cmd.handle =3D cpu_to_le16(conn->handle);
+> +	cmd.enable =3D !!enable;
+> +
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Probably a dumb question, but worth asking - what is the purpose of the
+"!!"? Wouldn't just passing "enable" be sufficient?
+
+Also, currently, cmd.enable seems to just be set and used in the case
+of boolean conditions. Would it make sense for the enable field in
+brcm_prio_cmd to be a bool or does it not really matter?
+
+> +	skb =3D hci_cmd_sync(hdev, 0xfc57, sizeof(cmd), &cmd, HCI_CMD_TIMEOUT);
+> +	if (IS_ERR(skb))
+> +		return PTR_ERR(skb);
+> +
+> +	conn->brcm_high_prio =3D enable;
+> +	kfree_skb(skb);
+> +	return 0;
+> +}
+> diff --git a/net/bluetooth/brcm.h b/net/bluetooth/brcm.h
+> new file mode 100644
+> index 000000000000..2290fc6cf798
+> --- /dev/null
+> +++ b/net/bluetooth/brcm.h
+> @@ -0,0 +1,19 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2026 The Asahi Linux Contributors
+> + */
+> +
+> +#if IS_ENABLED(CONFIG_BT_BRCMEXT)
+> +
+> +int brcm_set_high_priority(struct hci_dev *hdev, struct hci_conn *conn,
+> +			   bool enable);
+> +
+> +#else
+> +
+> +static inline int brcm_set_high_priority(struct hci_dev *hdev,
+> +					 struct hci_conn *conn, bool enable)
+> +{
+> +	return 0;
+> +}
+> +
+> +#endif
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index c46c1236ebfa..0e74bad496a2 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -46,6 +46,7 @@
+>  #include "msft.h"
+>  #include "aosp.h"
+>  #include "hci_codec.h"
+> +#include "brcm.h"
+> =20
+>  static void hci_rx_work(struct work_struct *work);
+>  static void hci_cmd_work(struct work_struct *work);
+> @@ -3696,6 +3697,9 @@ static void hci_sched_acl_pkt(struct hci_dev *hdev)
+> =20
+>  			skb =3D skb_dequeue(&chan->data_q);
+> =20
+> +			if (skb->priority =3D=3D TC_PRIO_INTERACTIVE)
+> +				brcm_set_high_priority(hdev, chan->conn, true);
+> +
+>  			hci_conn_enter_active_mode(chan->conn,
+>  						   bt_cb(skb)->force_active);
+> =20
+>
+> ---
+> base-commit: 8bc67e4db64aa72732c474b44ea8622062c903f0
+> change-id: 20260407-brcm-prio-b630e6cc3834
+>
+> Best regards,
+> -- =20
+> Sasha Finkelstein <k@chaosmail.tech>
+
