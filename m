@@ -1,90 +1,113 @@
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [121.127.44.73])
+Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85D73264F2
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 May 2026 14:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=121.127.44.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F293ED127
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 May 2026 14:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779718075; cv=none; b=tvSrfSbe745T5gcDhIJRFZLOwgVH1X4IVCLTQH/QXiF+qlWzOO9bTZ0Aol+mQDV4RL1d7Oa0hViO2Q+N8ckEGQG8zymk6SN/eFLdgrVwQkWT7f4wgj72ohwp3vjgndJnG8G+ZVBoCM07rLRONc7zOkakJBxZsEK77QZoJAGjVrE=
+	t=1779718884; cv=none; b=d4JXVfdMeN2CQ60aWShBmMUk8RkWj6yOZvXejACulQyq8oi2H3grEL2jtZXXUumF0+cb5oviSQXNk3gQTghJ5J5lgkT7dwU0X/DcSdBMNywdVJmn1mBDgsvM1tbhj6+X4fpPLVn3cAjrKMqmsqMbf+eR+hnyT3yY/POg6sPECeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779718075; c=relaxed/simple;
-	bh=2Ho2IoV59LwkMD+Wa6e3K4Vn8fLL93pSqnoD57gbJEU=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=jhESMjkImtREvmS3sSjb7fGDX3B+SRqfBkUiNR5MGUPWBgNEwfMOu2B2KxzXfZx8nzxGFiWIhn8oILd4OhwXgMYXbUGeDE0pV6JmNy8rPcaTFpF938wAxVifBV1k1UwacpawSNkb3DUm4ngYdarYkL4j4RhBTTWfBWFlfFNnZaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ubuntu.com; spf=pass smtp.mailfrom=fe-bounces.ubuntu.com; dkim=pass (2048-bit key) header.d=ubuntu.com header.i=@ubuntu.com header.b=IXduTA2s; arc=none smtp.client-ip=121.127.44.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ubuntu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.ubuntu.com
+	s=arc-20240116; t=1779718884; c=relaxed/simple;
+	bh=qQej/vjN2nySfsj5ojH2mdwcZ+2AS0mEK9Rq21/8jSk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=FKUhynS1Us1S5JdNicWAtj5X7gjL03x2iiYCC+8ljyruJk4yOkQNB7U6IUJwLj7WCFK82WOU0ebBjy+RLY0FxYcJKVRZWKgmClIsIFpdQFU7Ok7qmrjgJL79CROVeC2f5K5jwqB1Gg+M60sRgKliVwZZ86XkdAXhSokLmkkKFZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NtWq0Kl8; arc=none smtp.client-ip=74.125.82.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ubuntu.com header.i=@ubuntu.com header.b="IXduTA2s"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ubuntu.com;
- h=In-Reply-To: References: Subject: Cc: To: From: Message-Id: Date:
- Content-Type: Content-Transfer-Encoding: Mime-Version; q=dns/txt;
- s=fe-953a8a3ca9; t=1779718073;
- bh=2Ho2IoV59LwkMD+Wa6e3K4Vn8fLL93pSqnoD57gbJEU=;
- b=IXduTA2s4V4sLkEQHkNFX2pXACy/KU9cYjEMOU5bWy+lFNVbZKI+qc09amJw+lSWrWNvGqyrt
- +dLXVeo2M1ZImCGKq3WojKgvP/DZaxqJ31Mfl9dHQEcwem4SUnCzsDU9DSTklbRRHhVhXc4YlVB
- 5pk2SLqLCr35q5HlJDMY1wHeZE6aSziUiHNmxe55z5nrivtcp+RpX1H0NRR3ymCcuI9Dc6axoRj
- 19kAas8i8JbYu67GV9Z/sPddqucXxhK8c3NXM8xk3tYJW6glFrUVqSQIOsCYXRX+463uIkzqoPU
- VlU3Z0IJSc6FIX66ekrcNV53Pbwe3I8ovikh2hiQ+knw==
-X-Forward-Email-ID: 6a1457b79efc2641fb7d3a63
-X-Forward-Email-Sender: rfc822; jpeisach@ubuntu.com, smtp.forwardemail.net,
- 121.127.44.73
-X-Forward-Email-Version: 2.8.15
-X-Forward-Email-Website: https://forwardemail.net
-X-Complaints-To: abuse@forwardemail.net
-X-Report-Abuse: abuse@forwardemail.net
-X-Report-Abuse-To: abuse@forwardemail.net
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NtWq0Kl8"
+Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-3045c195251so2638559eec.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 May 2026 07:21:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779718881; x=1780323681; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=XrN532ajGkDa1wGJieC/zS3Z65oGErY3Jave9Myqb90=;
+        b=NtWq0Kl8qWpnz6VlUVGvuDEjrtE2CIY8oz32Ktf9y91/6PJU+jDas2PGLM0awDGa8a
+         +vluONgcjljwJiibF4eoDWZg1m67BRR1J/OPrIVjzPjRIE6sMs4ILeiQqqnnJuN7zYA1
+         zvVPObraXGRbFZ7q/hihikkPzzObPJ0Bj5TYtJy+cUfN6bjaYLBQQ29YsqOtJOMKqOeE
+         n3zag1TMVc02RrKiz5be+Yt3jdZiHsp7ySDc7UkYFseuav//pbb+PwsiqrLbD8AC2GgG
+         4aM4xCaN6aNTyqkmGNb+/lAwQDaiwJHSYEGKe/kJtXGBxm4ChVWJdgVcQ0AGG6OpwV4v
+         Y98w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779718881; x=1780323681;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XrN532ajGkDa1wGJieC/zS3Z65oGErY3Jave9Myqb90=;
+        b=hm9LW7z466ogAbBwojiWKEHtFIkhD/Od8aDfK8ID3xoQGtXu5gKyY1wUZwUMTLWsZN
+         s8pXaGU56NufJneTn8UX4GabGt5PxvbSzPYNO3vxg+Q+jzu7oJztSLHZr2jgQqJh6UQU
+         J19wD6rcsd2B5forl5G+3ibioD4vJqBESrW5B2R2iOqMqoDs4x1TBStRf8i90M/RfiXH
+         XH3Zem0pEK0MyxnYejPfxx3YhljblX++Z80HFZEVO2hve2agF4EGMhiIeJwPQTpuKlaP
+         GF6j327ROWMqFLrWPT2v1bfH9oarT3sJz2wgqhFGULPU+T+9V9/1HyiBrl/2lweiXHzx
+         Ubzg==
+X-Gm-Message-State: AOJu0YysaJwW78t8WsIEPW2UR5/LmbXfK+GCC4xhtNQUk9ioITEce25Y
+	YKx1aMZD029lq6UTSuSAZwR4tbG7gO61Fcv6QQVgNHYlREPMmlmi8QJnzi54smQ9
+X-Gm-Gg: Acq92OGtFWPxn6uPFbEH1I9Aqb2PE9kyP0lz5lNafC0z5JH9eq4mJzUdIyT9oVmFPVZ
+	KsEX9/uqGrDS8XbNkyUw3Ws0vXPkk7p8NgXv6w0XRqBb0uQlLFee0tds5n8i0zlFSXXJntk0HKD
+	Y47c5ynK9CLut7r4tFExQUscEalBYNOf3/YwIZyGT9BXFyEYizYBpZw6HheZNPZ2fBZllJBS4uk
+	fQw0B4lUaHV8zW50SI8DDeSbBO9EHTBmDiCGFk0Tyk4VhnSPmQrnXVeYBaYcPLTdgILtvsjKtl+
+	NLFqIgJSjtk9UerkaDtvwHg6uaoJSb9EFgyqfdaRbaJLAn43JPwp3xyFzCgAHY8RlzL/G98bc0P
+	2kt3WitFG5+hxGlihz53bZXFXXn2G9CcIdNOnE6GHCgTQV6IM0b6RkbOHvtVNn6pjZHZPmoe3W+
+	6e1X/wy2NBeTX59G/8fhi0r0pB7BGqUOMGXjYQ2w==
+X-Received: by 2002:a05:7022:1284:b0:134:7497:2153 with SMTP id a92af1059eb24-1365fa42d73mr4983953c88.20.1779718880504;
+        Mon, 25 May 2026 07:21:20 -0700 (PDT)
+Received: from [172.17.0.2] ([40.65.61.42])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1366a4011d9sm6429729c88.6.2026.05.25.07.21.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 May 2026 07:21:19 -0700 (PDT)
+Message-ID: <6a145adf.396644cf.22259f.7075@mx.google.com>
+Date: Mon, 25 May 2026 07:21:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2086898801061662074=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8; format=Flowed
-Date: Mon, 25 May 2026 10:07:50 -0400
-Message-Id: <DIRTEIGVL56X.1W49YU67DXNUQ@ubuntu.com>
-From: "Joshua Peisach" <jpeisach@ubuntu.com>
-To: "Sasha Finkelstein" <k@chaosmail.tech>, "Joshua Peisach"
- <jpeisach@ubuntu.com>
-Cc: "Sven Peter" <sven@kernel.org>, "Janne Grunau" <j@jannau.net>, "Neal
- Gompa" <neal@gompa.dev>, "Marcel Holtmann" <marcel@holtmann.org>, "Luiz
- Augusto von Dentz" <luiz.dentz@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>, <linux-kernel@vger.kernel.org>,
- <asahi@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
- <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH v3] Bluetooth: Add Broadcom channel priority commands
-X-Mailer: aerc 0.21.0
-References: <20260525-brcm-prio-v3-1-6259e10233f8@chaosmail.tech>
- <DIRT7260SRQZ.1BFF8CX3FJ57G@ubuntu.com>
- <172D11E7-AF98-43F8-B41B-907738749EA5@chaosmail.tech>
-In-Reply-To: <172D11E7-AF98-43F8-B41B-907738749EA5@chaosmail.tech>
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, suunj1331@gmail.com
+Subject: RE: [v3] Bluetooth: RFCOMM: validate skb length in MCC handlers
+In-Reply-To: <20260525110443.139485-1-suunj1331@gmail.com>
+References: <20260525110443.139485-1-suunj1331@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Mon May 25, 2026 at 10:05 AM EDT, Sasha Finkelstein wrote:
->
->> On May 25, 2026, at 15:58, Joshua Peisach <jpeisach@ubuntu.com> wrote:
->>=20
->> On Mon May 25, 2026 at 8:11 AM EDT, Sasha Finkelstein wrote:
->>>=20
->>> + cmd.enable =3D !!enable;
->>> +
->>=20
->> Probably a dumb question, but worth asking - what is the purpose of the
->> "!!"? Wouldn't just passing "enable" be sufficient?
->
-> This is a way to enforce that the value is exactly 0 or 1, not 0 or non-z=
-ero.
->
->>=20
->> Also, currently, cmd.enable seems to just be set and used in the case
->> of boolean conditions. Would it make sense for the enable field in
->> brcm_prio_cmd to be a bool or does it not really matter?
->>=20
-> Opposite, actually, this struct is fed to firmware, and it needs to be
-> specifically a u8.
+--===============2086898801061662074==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Got it, thanks!
+This is automated email and please do not reply to this email!
 
-Reviewed-by: Joshua Peisach <jpeisach@ubuntu.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1100421
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.59 seconds
+VerifyFixes                   PASS      0.07 seconds
+VerifySignedoff               PASS      0.07 seconds
+GitLint                       PASS      1.31 seconds
+SubjectPrefix                 PASS      0.09 seconds
+BuildKernel                   PASS      26.59 seconds
+CheckAllWarning               PASS      29.34 seconds
+CheckSparse                   PASS      28.00 seconds
+BuildKernel32                 PASS      25.80 seconds
+TestRunnerSetup               PASS      573.06 seconds
+TestRunner_rfcomm-tester      PASS      25.38 seconds
+IncrementalBuild              PASS      25.10 seconds
+
+
+
+https://github.com/bluez/bluetooth-next/pull/236
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2086898801061662074==--
