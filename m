@@ -1,345 +1,297 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from chaosmail.tech (chaosmail.tech [77.81.229.115])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD19B3537DE
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 May 2026 11:37:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E525A3812D3;
+	Mon, 25 May 2026 12:11:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.81.229.115
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779709051; cv=none; b=nloNQbMVZw/9cXcq5tvVu00xsaIJIkf/N/vx/fSrSSiXyuWwmjr2eXeSKw/JxMLSn1s0HlkozLgpV8/RfUPj1b3AD9fP3OuJn/JAg7DJ7Leyr0JAz7zwUv+efBaRcTNbVvLXIGf8d+IRIWU1uEwePeaiqYbOXt+0dRF7Z9QHTpY=
+	t=1779711108; cv=none; b=rT4fBacztSMcR4UUvmcFTWz13EjFuwWeFfgja04E1WTa6rWZ7oFgpKc5CA4ylLZIWScPzHD6awx9kzar39ac8jJZHAgssbz8YUVWri9OccBQbr7k9sVhhax4uLY2d/AO99tI3LlBGubzX/9JM+62XqUBsQ3ufK0AzzzooOJVxSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779709051; c=relaxed/simple;
-	bh=6tD5yGQzf3bneK2AILFyM6PfCJ0HPz1i9XRhgkatXxo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mM0XPMBRgYjQ3EebDc0Wen2BuR7C9SXznmMG4vqn2K+M2jqXkHqHIXALztsJelbvAGHJ2cITBRZqd/pHgbnDfiNPFVNijbjd+AD9to1zgto/exodFu0gIDYKFojzk7tgj2BqM9FwXNE0AIm7A0fs2rnHFZ4ZbhKb1XTPW4kG3aM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FoO00Aex; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1779711108; c=relaxed/simple;
+	bh=yh+/UfLiqBwqQ3sjftqkvE0efFCAz71iDWkf+c5wSI0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=gMt1F8bQ+Z+p+nCdR4Iqn9xBz8/teZqkLQ7Kzbn07Vpe8AxfYiPnpwHRPwWVfjvtCfwi24LIasADzt8t+1fST/KYR8GMI3u1QJ1+iA15LvEBSRy91G+Ci+HZEOBi6Wv4StjfC0vHFAyevsks2b6WK3nyKRMYANAF1HtqZnc4QR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chaosmail.tech; spf=pass smtp.mailfrom=chaosmail.tech; dkim=pass (1024-bit key) header.d=chaosmail.tech header.i=@chaosmail.tech header.b=vf1IwRLp; arc=none smtp.client-ip=77.81.229.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chaosmail.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chaosmail.tech
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FoO00Aex"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4905529b933so12500005e9.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 May 2026 04:37:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779709048; x=1780313848; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HIJklATqrGhVrcdMzyb5CKqj8wy7z6PLnLlye01BhEU=;
-        b=FoO00Aex2BsD5gpeF7wSzIb7RWFN9hvzYRzMgxeSxHJbhNEbZ8UUf1VCHF+UfnxxRS
-         2ziKNyhK4/t4FFftarvOQ43d9NIQg0tBXiDmC02KTByDSmEtgZpwFqfHFxtHA5ntn6Do
-         H7WINWCFLzqX7rH2DGRRdxITqNkI529X4+FESlEtHlor401KeCIv86+3u9e/ZPwsyhQb
-         2uxcOyuWh4UG/98BcpBNqp5uk5Bux/EY22yrJj9xQH8VVjYfVcjgOO18UuY6JIXTEUAz
-         IcL1arx0aVHbdvrCs5duxJAtRbFvdsf/Jzq1n0owiV2YsyMq4QDGHuMTWcwlYqVmmmIm
-         ltMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779709048; x=1780313848;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=HIJklATqrGhVrcdMzyb5CKqj8wy7z6PLnLlye01BhEU=;
-        b=Yg2jpPp4jepEYuAaNL/1r0fuciVA+x1omztEvinu+xB2zwyxqwvc+lCtDTdlH7tns5
-         ybJ89vZO7GhIheHBexdDc6z+a08dmzuWKNh3n/1nvojX32YaRcrqfK0dBiERjAfqUZ+e
-         CvHspXMhTQatmujmHRSNXbqJQG+BCDFaW9XroKmn7QqfGvqRW11o2VOt+5XLKjqmJxf2
-         n2ILF9NiZKj4H9j3hToc6n1D7wD9HAPFdcsDeEZXj/fqBhDqNx+ykCzjX3Bvg49AXZew
-         kbLGiB8hY0qY0N4MubW9R5spyVxC5ukC1XM4AttcALqRzIpPS+dSiGwXc4NIA3mtW4bx
-         X8xQ==
-X-Gm-Message-State: AOJu0YyAQ9dU9P08ERrHFHiZn12ddriSi0glTqdo6Ybuz6s53NaGMKQm
-	BEWL7XSdmU3dqZBUJu8Amk7kKCDA0oNzQH/MJYS+XXIsrA8/Mhh/1SYJV1SSbd9Ptxg=
-X-Gm-Gg: Acq92OHZPIf3bz1UJnCrqD2rt00oPHJFJVvW8cBtKwfbfS1DyNtAoaqpKOzXx4pX6Xk
-	LNLODvXo+R7xMXXpRSbbhnRqaoEUPz2Yu/70gMCYl9IS35KPYInzCkbyxzkw3Q+mF0PAD5XgmQF
-	XtZ0tCbvJVxTDPZ/7kf6QIyAQcR2nGO2jWxkmQeDcMlCvHBayBut4JKAZJmHlMEkgDjJkbEgXa4
-	C7iL7cHf6tRMEWvMpO/mLgEySdvD/RByatRg1PZEuBWznNU++dMOK2IqZj3clejh3h3LGNedo5a
-	VTSmiIpi8W/U+662s8RhgirzFRETPUZ2dk7fyk1ZSXrv+xfc5gBwFpTE53V0fSRK+hhFjtez+Ka
-	/1XZj9/sKxYRcYfuUpCTRmqjDpg79wCOqdoyGTEd/TeJHUWCu12qXUOEqDKv2on5eF6z2M3f8L8
-	vEouqW8bAfBnmB9ExJwJ4B12BH9mA4Y9VGMcZz38Q0is7VfnXKSw==
-X-Received: by 2002:a05:600c:c83:b0:48f:d612:3c4a with SMTP id 5b1f17b1804b1-49042488b81mr233940555e9.1.1779709047961;
-        Mon, 25 May 2026 04:37:27 -0700 (PDT)
-Received: from bazzite.. ([141.195.57.212])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490428e03d4sm107409855e9.9.2026.05.25.04.37.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 May 2026 04:37:27 -0700 (PDT)
-From: =?UTF-8?q?Tarjei=20Bitust=C3=B8yl?= <tarjeib@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Tarjei=20Bitust=C3=B8yl?= <tarjeib@gmail.com>
-Subject: [PATCH BlueZ v3 1/1] adapter: Add configurable default LE PHYs
-Date: Mon, 25 May 2026 13:37:09 +0200
-Message-ID: <20260525113709.115020-2-tarjeib@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260525113709.115020-1-tarjeib@gmail.com>
-References: <20260524221421.258593-1-tarjeib@gmail.com>
- <20260525113709.115020-1-tarjeib@gmail.com>
+	dkim=pass (1024-bit key) header.d=chaosmail.tech header.i=@chaosmail.tech header.b="vf1IwRLp"
+Received: by chaosmail.tech (Postfix) id D770C1C7F11;
+	Mon, 25 May 2026 12:11:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chaosmail.tech;
+	s=mail; t=1779711096;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Ua2hjTXYJSmbP4jngVjvQ645Iiscu/cT4lcalp5VRsc=;
+	b=vf1IwRLpq6GKsKuzT83xNShYQs+LE/xxKTKVAy30GqmZIpbbBAgs5NDf2QHesHNgc/wBHk
+	blpx4kymWHrH7E3V7PrBW284VGpVYVqDb2g351eJAYDW/ghuckcX6zEX70VWQ+S56wkqPC
+	+R37tr+jpMnxmkYDhtpPtfIV6w+X6mQ=
+From: Sasha Finkelstein <k@chaosmail.tech>
+Date: Mon, 25 May 2026 14:11:16 +0200
+Subject: [PATCH v3] Bluetooth: Add Broadcom channel priority commands
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260525-brcm-prio-v3-1-6259e10233f8@chaosmail.tech>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3WMyw6CMBBFf4XM2pq+bNGV/2FcQJnCJEJJaxoN4
+ d8trFzo8tzccxZIGAkTXKoFImZKFKYC6lCBG5qpR0ZdYZBcGq65ZW10I5sjBdYaxdE4p2qlofz
+ niJ5ee+t2LzxQeob43tNZbOuvShZMMK/qVlhljdH82o8NPY4ujLBVsvxrymIqb/UJO6/Pjf821
+ 3X9AKQsh3fcAAAA
+X-Change-ID: 20260407-brcm-prio-b630e6cc3834
+To: Sven Peter <sven@kernel.org>, Janne Grunau <j@jannau.net>, 
+ Neal Gompa <neal@gompa.dev>, Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org, asahi@lists.linux.dev, 
+ linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+ netdev@vger.kernel.org, Sasha Finkelstein <k@chaosmail.tech>
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1779711095; l=7497;
+ i=k@chaosmail.tech; s=20241124; h=from:subject:message-id;
+ bh=yh+/UfLiqBwqQ3sjftqkvE0efFCAz71iDWkf+c5wSI0=;
+ b=a6xCWP9LECyK5zy/7vv2VP8inEAuz74w69uAdL7ZOPiE2ce0gIklmeUsrnRYI0d/wuj9UE4lO
+ /F0ssoAk+5/ArUgDq8K2X9HpVCGW3Q/nhsdzeA04qMKVLWe1pIw2FZ4
+X-Developer-Key: i=k@chaosmail.tech; a=ed25519;
+ pk=aSkp1PdZ+eF4jpMO6oLvz/YfT5XkBUneWwyhQrOgmsU=
 
-Some controllers mis-handle LE procedures on specific PHYs with
-certain peers. On an Intel AX210-class controller, connecting to a
-Frostbay BLE device can fail during early ATT/GATT setup unless the
-adapter is limited to LE 1M TX/RX.
+Certain Broadcom bluetooth chips (bcm4377/bcm4378/bcm438) need ACL
+streams carrying audio to be set as "high priority" using a vendor
+specific command to prevent 10-ish second-long dropouts whenever
+something does a device scan. This patch sends the command when the
+socket priority is set to TC_PRIO_INTERACTIVE, as BlueZ does for audio.
 
-Add an opt-in [LE] DefaultPHYs setting to bluetoothd and apply it at
-adapter startup using MGMT_OP_GET/SET_PHY_CONFIGURATION while
-preserving non-configurable PHY bits.
+From experimenting with the hardware - this command is not suitable for
+per-skb priority switching, as prioritization is done on the handle
+level, with this command reconfiguring certain radio timings, and
+dropping to low priority in order to send a low packet on the same
+handle as an audio stream is being played on causes the same kind of
+dropout it is supposed to avoid. In addition, the hardware is rather
+picky about when this command can be sent, as sending it during
+connection open results in a timeout. The vendor stacks solve it by
+having high-level visibility into what a connection is used for and
+sending it from userspace when it is known that an audio stream is
+about to start. As we can't have that visibility without introducing a
+new ioctl, the socket priority is used as proxy.
 
-This provides a generic, adapter-wide workaround for controller-
-specific LE PHY interoperability problems affecting scanning and
-connection establishment, without adding device-specific quirks.
-
-v3:
-- Match the queue header include spelling in main.c with device.h to
-	avoid the Sparse redefinition warning seen in CI.
-
-v2:
-- Check MGMT_SETTING_PHY_CONFIGURATION before sending PHY
-	configuration commands.
+Reviewed-by: Neal Gompa <neal@gompa.dev>
+Signed-off-by: Sasha Finkelstein <k@chaosmail.tech>
 ---
- src/adapter.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++
- src/btd.h     |  2 ++
- src/main.c    | 63 +++++++++++++++++++++++++++++++++++++++-
- src/main.conf |  8 ++++++
- 4 files changed, 151 insertions(+), 1 deletion(-)
+Changes in v3:
+- use a struct for command data
+- Link to v2: https://lore.kernel.org/r/20260407-brcm-prio-v2-1-3f745edf49af@gmail.com
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 20f7c3e03..46df362c5 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -4972,6 +4972,84 @@ done:
- 	mgmt_tlv_list_free(list);
+Changes in v2:
+- new ioctl got nack-ed, so let's use sk_priority as the trigger
+- Link to v1: https://lore.kernel.org/r/20260407-brcm-prio-v1-1-f38b17376640@gmail.com
+---
+ MAINTAINERS                      |  2 ++
+ drivers/bluetooth/hci_bcm4377.c  |  2 ++
+ include/net/bluetooth/hci_core.h | 15 +++++++++++++++
+ net/bluetooth/Kconfig            |  7 +++++++
+ net/bluetooth/Makefile           |  1 +
+ net/bluetooth/brcm.c             | 38 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/brcm.h             | 19 +++++++++++++++++++
+ net/bluetooth/hci_core.c         |  4 ++++
+ 8 files changed, 88 insertions(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 10e8253181d3..da4d12ec70d6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2581,6 +2581,8 @@ F:	include/dt-bindings/pinctrl/apple.h
+ F:	include/linux/mfd/macsmc.h
+ F:	include/linux/soc/apple/*
+ F:	include/uapi/drm/asahi_drm.h
++F:	net/bluetooth/brcm.c
++F:	net/bluetooth/brcm.h
+ 
+ ARM/ARTPEC MACHINE SUPPORT
+ M:	Jesper Nilsson <jesper.nilsson@axis.com>
+diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
+index 925d0a635945..5f79920c0306 100644
+--- a/drivers/bluetooth/hci_bcm4377.c
++++ b/drivers/bluetooth/hci_bcm4377.c
+@@ -2397,6 +2397,8 @@ static int bcm4377_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	if (bcm4377->hw->broken_le_ext_adv_report_phy)
+ 		hci_set_quirk(hdev, HCI_QUIRK_FIXUP_LE_EXT_ADV_REPORT_PHY);
+ 
++	hci_set_brcm_capable(hdev);
++
+ 	pci_set_drvdata(pdev, bcm4377);
+ 	hci_set_drvdata(hdev, bcm4377);
+ 	SET_HCIDEV_DEV(hdev, &pdev->dev);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index aa600fbf9a53..53ebb2ae898f 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -642,6 +642,10 @@ struct hci_dev {
+ 	bool			aosp_quality_report;
+ #endif
+ 
++#if IS_ENABLED(CONFIG_BT_BRCMEXT)
++	bool			brcm_capable;
++#endif
++
+ 	int (*open)(struct hci_dev *hdev);
+ 	int (*close)(struct hci_dev *hdev);
+ 	int (*flush)(struct hci_dev *hdev);
+@@ -756,6 +760,10 @@ struct hci_conn {
+ 
+ 	unsigned int	sent;
+ 
++#if IS_ENABLED(CONFIG_BT_BRCMEXT)
++	bool		brcm_high_prio;
++#endif
++
+ 	struct sk_buff_head data_q;
+ 	struct list_head chan_list;
+ 
+@@ -1791,6 +1799,13 @@ static inline void hci_set_aosp_capable(struct hci_dev *hdev)
+ #endif
  }
  
-+static void set_default_le_phys_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
++static inline void hci_set_brcm_capable(struct hci_dev *hdev)
 +{
-+	struct btd_adapter *adapter = user_data;
-+
-+	if (status != MGMT_STATUS_SUCCESS)
-+		btd_error(adapter->dev_id,
-+				"Failed to set default LE PHYs for hci%u: %s (0x%02x)",
-+				adapter->dev_id, mgmt_errstr(status), status);
++#if IS_ENABLED(CONFIG_BT_BRCMEXT)
++	hdev->brcm_capable = true;
++#endif
 +}
 +
-+static void get_default_le_phys_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
-+	const struct mgmt_rp_get_phy_confguration *rp = param;
-+	struct mgmt_cp_set_phy_confguration cp;
-+	uint32_t configurable_phys;
-+	uint32_t selected_phys;
-+	uint32_t next_phys;
-+
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		btd_error(adapter->dev_id,
-+				"Failed to read PHY configuration for hci%u: %s (0x%02x)",
-+				adapter->dev_id, mgmt_errstr(status), status);
-+		return;
-+	}
-+
-+	if (length < sizeof(*rp)) {
-+		btd_error(adapter->dev_id,
-+				"Too small get PHY configuration response for hci%u",
-+				adapter->dev_id);
-+		return;
-+	}
-+
-+	configurable_phys = btohl(rp->configurable_phys);
-+	selected_phys = btohl(rp->selected_phys);
-+
-+	configurable_phys &= MGMT_PHY_LE_TX_MASK | MGMT_PHY_LE_RX_MASK;
-+	next_phys = selected_phys & ~configurable_phys;
-+	next_phys |= btd_opts.default_le_phys & configurable_phys;
-+
-+	if (next_phys == selected_phys)
-+		return;
-+
-+	cp.selected_phys = cpu_to_le32(next_phys);
-+
-+	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_PHY_CONFIGURATION,
-+			adapter->dev_id, sizeof(cp), &cp,
-+			set_default_le_phys_complete, adapter, NULL) > 0)
-+		return;
-+
-+	btd_error(adapter->dev_id,
-+			"Failed to set default LE PHYs for hci%u",
-+			adapter->dev_id);
-+}
-+
-+static void load_default_le_phys(struct btd_adapter *adapter)
-+{
-+	if (!btd_opts.default_le_phys_configured)
-+		return;
-+
-+	if (!(adapter->supported_settings & MGMT_SETTING_LE))
-+		return;
-+
-+	if (!(adapter->supported_settings & MGMT_SETTING_PHY_CONFIGURATION))
-+		return;
-+
-+	if (mgmt_send(adapter->mgmt, MGMT_OP_GET_PHY_CONFIGURATION,
-+			adapter->dev_id, 0, NULL,
-+			get_default_le_phys_complete, adapter, NULL) > 0)
-+		return;
-+
-+	btd_error(adapter->dev_id,
-+			"Failed to read PHY configuration for hci%u",
-+			adapter->dev_id);
-+}
-+
- static void load_devices(struct btd_adapter *adapter)
+ static inline void hci_devcd_setup(struct hci_dev *hdev)
  {
- 	char dirname[PATH_MAX];
-@@ -9455,6 +9533,7 @@ load:
- 	btd_profile_foreach(probe_profile, adapter);
- 	clear_blocked(adapter);
- 	load_defaults(adapter);
-+	load_default_le_phys(adapter);
- 	load_devices(adapter);
+ #ifdef CONFIG_DEV_COREDUMP
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index ee6457d1a5ee..b611942c7b8f 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -107,6 +107,13 @@ config BT_AOSPEXT
+ 	  This options enables support for the Android Open Source
+ 	  Project defined HCI vendor extensions.
  
- 	/* restore Service Changed CCC value for bonded devices */
-diff --git a/src/btd.h b/src/btd.h
-index db2e81239..59f44dc8c 100644
---- a/src/btd.h
-+++ b/src/btd.h
-@@ -140,6 +140,8 @@ struct btd_opts {
- 	bool		device_privacy;
- 	uint32_t	name_request_retry_delay;
- 	uint8_t		secure_conn;
-+	uint32_t	default_le_phys;
-+	bool		default_le_phys_configured;
- 
- 	struct btd_defaults defaults;
- 
-diff --git a/src/main.c b/src/main.c
-index 8aa19a3e3..83be19be3 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -32,6 +32,7 @@
- #include <dbus/dbus.h>
- 
- #include "bluetooth/bluetooth.h"
-+#include "bluetooth/mgmt.h"
- #include "bluetooth/sdp.h"
- 
- #include "gdbus/gdbus.h"
-@@ -43,7 +44,7 @@
- #include "shared/att-types.h"
- #include "shared/mainloop.h"
- #include "shared/timeout.h"
--#include "shared/queue.h"
-+#include "src/shared/queue.h"
- #include "shared/crypto.h"
- #include "bluetooth/uuid.h"
- #include "shared/util.h"
-@@ -132,6 +133,7 @@ static const char *le_options[] = {
- 	"Autoconnecttimeout",
- 	"AdvMonAllowlistScanDuration",
- 	"AdvMonNoFilterScanDuration",
-+	"DefaultPHYs",
- 	"EnableAdvMonInterleaveScan",
- 	NULL
- };
-@@ -145,6 +147,8 @@ static const char *policy_options[] = {
- 	NULL
- };
- 
-+static void parse_default_le_phys(GKeyFile *config);
++config BT_BRCMEXT
++	bool "Enable Broadcom extensions"
++	depends on BT
++	help
++	  This option enables support for the Broadcom defined HCI
++	  vendor extensions.
 +
- static const char *gatt_options[] = {
- 	"Cache",
- 	"KeySize",
-@@ -751,6 +755,7 @@ static void parse_le_config(GKeyFile *config)
- 		return;
- 
- 	parse_mode_config(config, "LE", params, ARRAY_SIZE(params));
-+	parse_default_le_phys(config);
- }
- 
- static bool match_experimental(const void *data, const void *match_data)
-@@ -966,6 +971,62 @@ static void parse_repairing(GKeyFile *config)
- 	g_free(str);
- }
- 
-+struct phy_config_entry {
-+	const char *name;
-+	uint32_t bit;
-+};
+ config BT_DEBUGFS
+ 	bool "Export Bluetooth internals in debugfs"
+ 	depends on BT && DEBUG_FS
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index 41049b280887..d402645dfb7d 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -23,5 +23,6 @@ bluetooth-$(CONFIG_BT_LE) += iso.o
+ bluetooth-$(CONFIG_BT_LEDS) += leds.o
+ bluetooth-$(CONFIG_BT_MSFTEXT) += msft.o
+ bluetooth-$(CONFIG_BT_AOSPEXT) += aosp.o
++bluetooth-$(CONFIG_BT_BRCMEXT) += brcm.o
+ bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
+ bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
+diff --git a/net/bluetooth/brcm.c b/net/bluetooth/brcm.c
+new file mode 100644
+index 000000000000..299d83d465c3
+--- /dev/null
++++ b/net/bluetooth/brcm.c
+@@ -0,0 +1,38 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2026 The Asahi Linux Contributors
++ */
 +
-+static const struct phy_config_entry le_phy_configs[] = {
-+	{ "LE1MTX", MGMT_PHY_LE_1M_TX },
-+	{ "LE1MRX", MGMT_PHY_LE_1M_RX },
-+	{ "LE2MTX", MGMT_PHY_LE_2M_TX },
-+	{ "LE2MRX", MGMT_PHY_LE_2M_RX },
-+	{ "LECODEDTX", MGMT_PHY_LE_CODED_TX },
-+	{ "LECODEDRX", MGMT_PHY_LE_CODED_RX },
-+};
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
 +
-+static void parse_default_le_phys(GKeyFile *config)
++#include "brcm.h"
++
++struct brcm_prio_cmd {
++	__le16 handle;
++	u8 enable;
++} __packed;
++
++int brcm_set_high_priority(struct hci_dev *hdev, struct hci_conn *conn,
++			   bool enable)
 +{
-+	char *str = NULL;
-+	char **tokens;
-+	uint32_t phys = 0;
-+	bool valid = false;
-+	int i;
++	struct sk_buff *skb;
++	struct brcm_prio_cmd cmd;
 +
-+	if (!parse_config_string(config, "LE", "DefaultPHYs", &str))
-+		return;
++	if (!hdev->brcm_capable)
++		return 0;
 +
-+	tokens = g_strsplit_set(str, ", \t", -1);
++	if (conn->brcm_high_prio == enable)
++		return 0;
 +
-+	for (i = 0; tokens[i]; i++) {
-+		const char *token = tokens[i];
-+		size_t j;
++	cmd.handle = cpu_to_le16(conn->handle);
++	cmd.enable = !!enable;
 +
-+		if (!token[0])
-+			continue;
++	skb = hci_cmd_sync(hdev, 0xfc57, sizeof(cmd), &cmd, HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb))
++		return PTR_ERR(skb);
 +
-+		for (j = 0; j < ARRAY_SIZE(le_phy_configs); j++) {
-+			if (strcasecmp(le_phy_configs[j].name, token) != 0)
-+				continue;
++	conn->brcm_high_prio = enable;
++	kfree_skb(skb);
++	return 0;
++}
+diff --git a/net/bluetooth/brcm.h b/net/bluetooth/brcm.h
+new file mode 100644
+index 000000000000..2290fc6cf798
+--- /dev/null
++++ b/net/bluetooth/brcm.h
+@@ -0,0 +1,19 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2026 The Asahi Linux Contributors
++ */
 +
-+			phys |= le_phy_configs[j].bit;
-+			valid = true;
-+			break;
-+		}
++#if IS_ENABLED(CONFIG_BT_BRCMEXT)
 +
-+		if (j == ARRAY_SIZE(le_phy_configs))
-+			warn("Invalid DefaultPHYs token: %s", token);
-+	}
++int brcm_set_high_priority(struct hci_dev *hdev, struct hci_conn *conn,
++			   bool enable);
 +
-+	if (valid) {
-+		btd_opts.default_le_phys = phys;
-+		btd_opts.default_le_phys_configured = true;
-+	}
++#else
 +
-+	g_strfreev(tokens);
-+	g_free(str);
++static inline int brcm_set_high_priority(struct hci_dev *hdev,
++					 struct hci_conn *conn, bool enable)
++{
++	return 0;
 +}
 +
- static bool parse_config_hex(GKeyFile *config, char *group,
- 					const char *key, uint32_t *val)
- {
-diff --git a/src/main.conf b/src/main.conf
-index 5846ef92d..ed955897e 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -247,6 +247,14 @@
- # Default: 500
- #AdvMonNoFilterScanDuration=
++#endif
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index c46c1236ebfa..0e74bad496a2 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -46,6 +46,7 @@
+ #include "msft.h"
+ #include "aosp.h"
+ #include "hci_codec.h"
++#include "brcm.h"
  
-+# Configure the controller's default LE PHY policy used for scanning and
-+# connection establishment. Only configurable LE PHYs are changed; mandatory
-+# PHYs remain selected automatically.
-+# Possible values: comma or space separated list of LE1MTX, LE1MRX, LE2MTX,
-+# LE2MRX, LECODEDTX, LECODEDRX.
-+# Example: keep LE on 1M only.
-+#DefaultPHYs = LE1MTX LE1MRX
+ static void hci_rx_work(struct work_struct *work);
+ static void hci_cmd_work(struct work_struct *work);
+@@ -3696,6 +3697,9 @@ static void hci_sched_acl_pkt(struct hci_dev *hdev)
+ 
+ 			skb = skb_dequeue(&chan->data_q);
+ 
++			if (skb->priority == TC_PRIO_INTERACTIVE)
++				brcm_set_high_priority(hdev, chan->conn, true);
 +
- # Enable/Disable Advertisement Monitor interleave scan for power saving.
- # 0: disable
- # 1: enable
--- 
-2.43.0
+ 			hci_conn_enter_active_mode(chan->conn,
+ 						   bt_cb(skb)->force_active);
+ 
+
+---
+base-commit: 8bc67e4db64aa72732c474b44ea8622062c903f0
+change-id: 20260407-brcm-prio-b630e6cc3834
+
+Best regards,
+--  
+Sasha Finkelstein <k@chaosmail.tech>
 
