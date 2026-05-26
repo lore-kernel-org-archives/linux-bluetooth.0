@@ -1,154 +1,509 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF862853F8
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 19:48:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD6625A2B5
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 20:39:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779824902; cv=none; b=tWCkChgxt+ZIlBmBNat38nrXWrhmbSxhSk3zZvDwx1kPttm9hvzwG/avLwFmS2F91MphAnO1lL4+ecO9RGfQV6hyKubR8YG/fLbonJi7YUk3er01CFSTO5tmQKzsoD4ZVw42hrupxSO1OExF3cVEiji3xtjknyq+qRrXDLtQgEs=
+	t=1779827946; cv=none; b=cp7SqaiwWGYIGPijBmMhnrmOqzcV7DO4q4tQD01s2MTuMak6DdHAYjvsy8dUS9CzxHK/bvGKx9atJX8i3KJ11FeEy1fFQqJdWykA4pR1+fll1+RwFcTCzBQKFQNVhGti19VSHAbMX8At626jdX9QRrkY7MGCFHTfiINBpe7egMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779824902; c=relaxed/simple;
-	bh=GP/ClzRFrxzRKrwi6HTclnbsgEnaK6VITku0Ery4FvA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QQQQOzeNtG+vQv84GmOIbFZB5Suikhvm3y8sh8tyxRgAx6g52ytaiEMhK6dOowUsAczhQXh2k3skaUKguWwM2DgaM7Fds2VRGQTbhLPNlwP+4tHiTMAohFkUJTrHJtD9TZ4PYCrSX440alUAAj611bcQo7+4SfXpab/JdveMOP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=gSLtwMiD; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0sec.ai
+	s=arc-20240116; t=1779827946; c=relaxed/simple;
+	bh=IUMZa0lO8P9DyZlsOrxNBW6GpWIDn/O/Ebpp6vKNCos=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=VQPcreQUNv73Reiw/gbrAAKUUM4FoAqyi+7nW/Qlzpkz10fjQWIcL77tqRIkoeZTUdx7f/tCcMTDpCudHyt9HtdnGPWP5NjHH+8r7+TUMPghXZsIK2KCG1H47lHwvja49AvyrbBKlGeAeqvUvaokN+fdhxTOqXQTNH+ZjsUAHBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=ZuO6llyT; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=a0xRrbXE; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b="gSLtwMiD"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4896c22fcbaso94021715e9.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 12:48:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0sec.ai; s=google; t=1779824899; x=1780429699; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=J/Gh3D868F7R6hzwm/lRWoQqdGX6ghyM671WkjN3eI4=;
-        b=gSLtwMiDbjrxY8iFsAjSkK783JXJtCnUSaYthtVM26Udx/rymgrJMsmG7TXoaCPpzI
-         KdEZmk/duo82xmqD2EHC2fq0pD/gqmXaAH4ot4y2YQ5SyekoPZDSdC9zXv0KFI0gaYT3
-         RFlmgIxGlo4TldQA9h8nr1fjE70ln95A3DyChVu9RUQXggTQhNm5ugToWK6hNutpXbVq
-         SzInbjuR+XJhaFF8QvO4ndX6/6xYQ8o8V4qWXUIZpOjviL4pth7y0EZv5FqhH2jwjgDn
-         T6LUt0G4QG+4b7nv9F8h8qNGXXKizeHh8s1Zg0OHK6ne7TwrePgXwruCb/gksBMXK/Uu
-         XF/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779824899; x=1780429699;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J/Gh3D868F7R6hzwm/lRWoQqdGX6ghyM671WkjN3eI4=;
-        b=SXLrbT+9bbTAV0clJqutDZ5aJb1hwi49/GbltuIwPoBjNNeaA7qEIFQwuwBEjpZtPF
-         LBHvdQIHosTdALXFuCR+O8oGcoT+GjgsNHQl6RsuJF1yIoKgI7wQpcl5z9jBiSi42YS9
-         QwA0/tVlaKVUocHDxHZc7UG7D4D12Sm1QanF/RpFUjTQ0M0EZmMZ+JDVLcoRaq7MhLDu
-         WdebdtR0y63p/Zn6RV+X5MCLrosBh6eue2aZ5/Gt/qdlgsegs1YRpCwJ4qG8c9jjJ5e/
-         yNJQ1/zOcdM4Gqqty9X1fPfxgojUuWx5vhu8qdFTqy2y1HkHjE9+DOlEKQIa2xDY1mZn
-         SVGw==
-X-Gm-Message-State: AOJu0YxL3cDl2oVf//HV5Uv2Hquq1Kovjby43LAVd8+rDGJ0ESaZ0m8T
-	BlqpULVlY8DAxdEHMAA1t258UctuyZRc2+l7Wy5HiiHY0qcTOJjp3SYMIBbvgfS5AE5C
-X-Gm-Gg: Acq92OFpdREDuyEWXcU1BgeGuDbS3hwrWlyWxxcwDaXPhx3/s4ImMejKioscNT6Dz+P
-	fqFKbUQRxlNbd3l3ogH32/q1PWlVYzWSQaNE+P1/r7j8LYUADFoIuu3ufmHtSZ0oS0xFzYfSVba
-	Fr/8C927EfvEs7hBmU+H7TSUMMlT0li/s7sP60nHXzx1KOraO1g9A1VpGxq9Iq07aLGkL2t+fFx
-	wQ6okKDGFteo4azQm3ATp3e+AXajiJ5V6ANUqTNYVxO1PmI/1R271M+bcG13ARHNl8MyZ1+0+xb
-	3ZY+yETyp/ohdy6i7DyElhSXQIOT4wh7bTt5LR+garO2R9uUsB7oEXwaRZzCX9WM6pa5MHuko2A
-	whvTZ13+OaGD9CAOX4vEVVKxr9CtacE8iq83QOeU9uEsvPysTOHG6PhTr/nHhqGJuw2NebTqQeE
-	rUCvtvb8Vmy7YnVV3jC1JooomsBjY8ejimNQFo2nXT1cpc+mPYTbdqtpq4+0jOJLpjr4CBIEnyM
-	I7uMZCOT5cywmn9jB7/nGmJN1UEEYRoo2BLsHbG1q49ELOfqffM0Cc=
-X-Received: by 2002:a05:600d:6450:20b0:48f:e245:394e with SMTP id 5b1f17b1804b1-490426dd0f7mr233796095e9.27.1779824898555;
-        Tue, 26 May 2026 12:48:18 -0700 (PDT)
-Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.223.24])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4907e683746sm2790745e9.2.2026.05.26.12.48.17
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 26 May 2026 12:48:17 -0700 (PDT)
-From: Doruk Tan Ozturk <doruk@0sec.ai>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	security@kernel.org,
-	stable@vger.kernel.org,
-	Doruk Tan Ozturk <doruk@0sec.ai>
-Subject: [PATCH v2] Bluetooth: hci_sync: fix UAF in hci_le_create_cis_sync
-Date: Tue, 26 May 2026 21:48:16 +0200
-Message-ID: <20260526194816.65669-1-doruk@0sec.ai>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="ZuO6llyT";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="a0xRrbXE"
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.phl.internal (Postfix) with ESMTP id BBC84EC0627;
+	Tue, 26 May 2026 16:39:03 -0400 (EDT)
+Received: from phl-imap-10 ([10.202.2.85])
+  by phl-compute-03.internal (MEProxy); Tue, 26 May 2026 16:39:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1779827943;
+	 x=1779914343; bh=njQtgqxYHLi+40YMm+L8gY4/DY4t6FwUX+nCnTBVi04=; b=
+	ZuO6llyTEiy/jK+Ms7E+w4JpuOqzEJSE7m7+NMOt8L7ppuERq9esTOmYebSDZiLk
+	grAB0yoeMSUF8Ipw76VJ23d6W6VoVQOECr/b9+N+mAxMj+lX0IrSU8Y2qY5Li7+u
+	AiaYauObodcFe4cSp+zsZnp4VhtiMd6oZBU0omvWYZh4avrkkOnsnr88R616DQLp
+	71T2Daialxj58Rac/dLGN6Pbq7YFLREa9asBMa3HlN3Gjf5aiFXVKMRur09cvS9H
+	GxINuU66nZwPQ2Mi0bX4ck64wXvgCUoqf78xpQX7X+5h9A3+EDZjHYVwrfXszlhE
+	Rgbj95LTB1E5C5Ougq0McQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1779827943; x=
+	1779914343; bh=njQtgqxYHLi+40YMm+L8gY4/DY4t6FwUX+nCnTBVi04=; b=a
+	0xRrbXEJL9IB+JFojI8HMqJVVeMGSaaRcC3El1CD1MuAd2rqNCWOV9sj3tYii9/C
+	lbPPLtznKFisDoc+49OtD5oiyxYpbVTxGAgRtfCZBE1CM2ykQV6MsQBWcBVTbT2x
+	0Z1oAYza5ZmOqNrSHYNaDWP5bh7H2BKGKRFk+peE+D4MDhP0p4OtmK5kGD0W3XCn
+	DMlCoOjp6pFGoygMevUIBtyYKJ5Wy5JO0HD4izF5i5rgkCkM8l2URqtFcESNb79i
+	F79dLrID6hs1V57X1xTMZoPpY7/PMkMrAfph0KkeLgru7gTPJGdSzctSey7gAw0y
+	lOQ/MxtzHtVolUcw/DCwA==
+X-ME-Sender: <xms:5wQWarbh-6bd17IoQm0CRfguXOhAjNk-Oj5v-iG4WI8GQTr6x-WJDg>
+    <xme:5wQWalNyXykkk8vVBnJj9eZe8LC4uAAjfwlViRx60hi8otPVbzYapYtQgjr9coVS1
+    jHrO_Ji7oaO0KixDnDj8-tl5_h7HqORKCnXqz95hce1E7sPZ0A-svo>
+X-ME-Proxy-Cause: dmFkZTEe1Q6CeobFu9HY5BUJBau+RDCf9ZSxsjloKTk36wgiUjoYC9HrQjcyZXgtjvAZeN
+    0Tw8cow3Z4YA2pjDmGk9Nt34iWZ2ASxPvA9oT8Vjid2tdtIp8VjzYvLwzdtUthBWJ1fFY2
+    Fz4LnqD5dgzKl/hwBP8o4fid3sjaNqvJzYjBILMXpUJtKC2sIpJ1Mo0XYsLL7LmK/FzmcZ
+    Vt0eKRTgvXoD2K8prHmEsaECdsHGpJBG9hK47vKR3NnPl1C3xJQn5NpE8L773fgi22LqSN
+    UCXLO1cVVI7vo0etdwDk9S9XJXEUCr6z1/q/X/B0L9mXiZUTR5xaFWR9nNxh81ySloliO5
+    km1JhT8HZXhhAgz71pRowPhb2RGtDTb8q9ocffG9pV85/vBNryJ4Dyy/CEFTHDi+FEYgDS
+    VoNVI4GEp3T6mJJjf2EIiZSNzBEOVca9k2AAqPwv0yu7ETVLvl0QO3TBPMrEefu3mlvtnv
+    Iy4XBp5ewvQM8Z6w0TU/MGyn9p4EhgebtNbw+RLyWiRN3KnwAUonGmoQFRi4lMVP+50LWh
+    KNI74KExruHYvGcqhoAWp4fbANBou15IgZSX6Iy2f8S+ATe6UZn1TOTpCtO+z69K63JMrV
+    ri8t0+NbNH3sbHqyzevREebLEYHMvmsZKRvqUaJOwL0rNJvhUfOdce9aj12w
+X-ME-Proxy: <xmx:5wQWat2-VxuiTmDWGhCynF8NE8M829H24gHahXZRmyXghDXPn_X6tQ>
+    <xmx:5wQWar1VXfy2yHEoSvHBZ4as3ejgI3n8mxYZsJJxbsFU0sIo8aX3ew>
+    <xmx:5wQWag_LYqmihHn7A3tYNoWHqMSB7x1ZDhAI6QX1oWpqc1GpIpn9NA>
+    <xmx:5wQWao1w5R-T_8J6WaHCVnwdSVdHvuWwxifV2PBlR-PcO0RKf4G7FQ>
+    <xmx:5wQWasoXFsHFyqCseNmXRonkze0zao5VCilCTkEbqidnTDtGTxSaRmbX>
+Feedback-ID: if72e4b10:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 82C95216008A; Tue, 26 May 2026 16:39:03 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-ThreadId: AvY6Iv3jnud7
+Date: Tue, 26 May 2026 16:38:43 -0400
+From: "Siwei Zhang" <oss@fourdim.xyz>
+To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, "Marcel Holtmann" <marcel@holtmann.org>
+Message-Id: <8344cbe8-f539-4da3-a965-a297ef2952d2@app.fastmail.com>
+In-Reply-To: <20260520162030.2842543-2-oss@fourdim.xyz>
+References: <20260520162030.2842543-1-oss@fourdim.xyz>
+ <20260520162030.2842543-2-oss@fourdim.xyz>
+Subject: Re: [PATCH v5 1/1] Bluetooth: L2CAP: Fix use-after-free in
+ l2cap_sock_new_connection_cb()
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-hci_le_create_cis_sync() dereferences conn->conn_timeout after releasing
-both rcu_read_lock() and hci_dev_lock(hdev).  The conn pointer was
-obtained from an RCU-protected iteration over hdev->conn_hash.list and
-is not valid once these locks are dropped.  A concurrent disconnect can
-free the hci_conn between the unlock and the dereference, causing a
-use-after-free read.
+Hi Luiz,
 
-The cancellation mechanism in hci_conn_del() cannot prevent this because
-hci_le_create_cis_pending() queues hci_create_cis_sync with data=NULL:
+On Wed, May 20, 2026, at 12:20 PM, Siwei Zhang wrote:
+> l2cap_sock_new_connection_cb() accesses l2cap_pi(sk)->chan after
+> release_sock(parent). Once the parent lock is released, the child
+> socket sk can be freed by another task.
+>
+> Allocate the channel outside the func to prevent this.
+>
+> Fixes: 8ffb929098a5 ("Bluetooth: Remove parent socket usage from l2cap_core.c")
+> Cc: stable@kernel.org
+> Assisted-by: Claude:claude-opus-4-6
+> Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
+> ---
+>  include/net/bluetooth/l2cap.h |  8 +++--
+>  net/bluetooth/6lowpan.c       | 14 ++++-----
+>  net/bluetooth/l2cap_core.c    | 58 ++++++++++++++++++++++++++++-------
+>  net/bluetooth/l2cap_sock.c    | 48 +++++++++++++++++------------
+>  net/bluetooth/smp.c           | 13 +++-----
+>  5 files changed, 91 insertions(+), 50 deletions(-)
+>
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 5172afee5494..f7a11e6431f0 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -619,7 +619,8 @@ struct l2cap_chan {
+>  struct l2cap_ops {
+>  	char			*name;
+> 
+> -	struct l2cap_chan	*(*new_connection) (struct l2cap_chan *chan);
+> +	int			(*new_connection)(struct l2cap_chan *chan,
+> +						  struct l2cap_chan *new_chan);
+>  	int			(*recv) (struct l2cap_chan * chan,
+>  					 struct sk_buff *skb);
+>  	void			(*teardown) (struct l2cap_chan *chan, int err);
+> @@ -883,9 +884,10 @@ static inline __u16 __next_seq(struct l2cap_chan 
+> *chan, __u16 seq)
+>  	return (seq + 1) % (chan->tx_win_max + 1);
+>  }
+> 
+> -static inline struct l2cap_chan *l2cap_chan_no_new_connection(struct 
+> l2cap_chan *chan)
+> +static inline int l2cap_chan_no_new_connection(struct l2cap_chan *chan,
+> +					       struct l2cap_chan *new_chan)
+>  {
+> -	return NULL;
+> +	return -EOPNOTSUPP;
+>  }
+> 
+>  static inline int l2cap_chan_no_recv(struct l2cap_chan *chan, struct 
+> sk_buff *skb)
+> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> index 23a229ab6a33..286c0b45055b 100644
+> --- a/net/bluetooth/6lowpan.c
+> +++ b/net/bluetooth/6lowpan.c
+> @@ -743,19 +743,19 @@ static inline void chan_ready_cb(struct 
+> l2cap_chan *chan)
+>  	ifup(dev->netdev);
+>  }
+> 
+> -static inline struct l2cap_chan *chan_new_conn_cb(struct l2cap_chan *pchan)
+> +static inline int chan_new_conn_cb(struct l2cap_chan *pchan,
+> +				   struct l2cap_chan *chan)
+>  {
+> -	struct l2cap_chan *chan;
+> -
+> -	chan = chan_create();
+> -	if (!chan)
+> -		return NULL;
+> +	l2cap_chan_set_defaults(chan);
+> 
+> +	chan->chan_type = L2CAP_CHAN_CONN_ORIENTED;
+> +	chan->mode = L2CAP_MODE_LE_FLOWCTL;
+> +	chan->imtu = 1280;
+>  	chan->ops = pchan->ops;
+> 
+>  	BT_DBG("chan %p pchan %p", chan, pchan);
+> 
+> -	return chan;
+> +	return 0;
+>  }
+> 
+>  static void unregister_dev(struct lowpan_btle_dev *dev)
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index fdccd62ccca8..505f32034971 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -4051,10 +4051,16 @@ static void l2cap_connect(struct l2cap_conn 
+> *conn, struct l2cap_cmd_hdr *cmd,
+>  		goto response;
+>  	}
+> 
+> -	chan = pchan->ops->new_connection(pchan);
+> +	chan = l2cap_chan_create();
+>  	if (!chan)
+>  		goto response;
+> 
+> +	if (pchan->ops->new_connection(pchan, chan) < 0) {
+> +		l2cap_chan_put(chan);
+> +		chan = NULL;
+> +		goto response;
+> +	}
+> +
+>  	/* For certain devices (ex: HID mouse), support for authentication,
+>  	 * pairing and bonding is optional. For such devices, inorder to avoid
+>  	 * the ACL alive for too long after L2CAP disconnection, reset the ACL
+> @@ -4132,6 +4138,10 @@ static void l2cap_connect(struct l2cap_conn 
+> *conn, struct l2cap_cmd_hdr *cmd,
+>  		chan->num_conf_req++;
+>  	}
+> 
+> +	/* Drop our local ref; __l2cap_chan_add() pinned chan via the conn list. */
+> +	if (chan)
+> +		l2cap_chan_put(chan);
+> +
+>  	l2cap_chan_unlock(pchan);
+>  	l2cap_chan_put(pchan);
+>  }
+> @@ -4881,6 +4891,7 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
+>  	struct l2cap_le_conn_rsp rsp;
+>  	struct l2cap_chan *chan, *pchan;
+>  	u16 dcid, scid, credits, mtu, mps;
+> +	u16 rsp_mtu, rsp_mps;
+>  	__le16 psm;
+>  	u8 result;
+> 
+> @@ -4893,6 +4904,8 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
+>  	psm  = req->psm;
+>  	dcid = 0;
+>  	credits = 0;
+> +	rsp_mtu = 0;
+> +	rsp_mps = 0;
+> 
+>  	if (mtu < 23 || mps < 23)
+>  		return -EPROTO;
+> @@ -4953,12 +4966,19 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
+>  		goto response_unlock;
+>  	}
+> 
+> -	chan = pchan->ops->new_connection(pchan);
+> +	chan = l2cap_chan_create();
+>  	if (!chan) {
+>  		result = L2CAP_CR_LE_NO_MEM;
+>  		goto response_unlock;
+>  	}
+> 
+> +	if (pchan->ops->new_connection(pchan, chan) < 0) {
+> +		l2cap_chan_put(chan);
+> +		chan = NULL;
+> +		result = L2CAP_CR_LE_NO_MEM;
+> +		goto response_unlock;
+> +	}
+> +
+>  	bacpy(&chan->src, &conn->hcon->src);
+>  	bacpy(&chan->dst, &conn->hcon->dst);
+>  	chan->src_type = bdaddr_src_type(conn->hcon);
+> @@ -4974,6 +4994,8 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
+> 
+>  	dcid = chan->scid;
+>  	credits = chan->rx_credits;
+> +	rsp_mtu = chan->imtu;
+> +	rsp_mps = chan->mps;
+> 
+>  	__set_chan_timer(chan, chan->ops->get_sndtimeo(chan));
+> 
+> @@ -4993,6 +5015,9 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
+>  		result = L2CAP_CR_LE_SUCCESS;
+>  	}
+> 
+> +	/* Drop our local ref; __l2cap_chan_add() pinned chan via the conn list. */
+> +	l2cap_chan_put(chan);
+> +
+>  response_unlock:
+>  	l2cap_chan_unlock(pchan);
+>  	l2cap_chan_put(pchan);
+> @@ -5001,13 +5026,8 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
+>  		return 0;
+> 
+>  response:
+> -	if (chan) {
+> -		rsp.mtu = cpu_to_le16(chan->imtu);
+> -		rsp.mps = cpu_to_le16(chan->mps);
+> -	} else {
+> -		rsp.mtu = 0;
+> -		rsp.mps = 0;
+> -	}
+> +	rsp.mtu = cpu_to_le16(rsp_mtu);
+> +	rsp.mps = cpu_to_le16(rsp_mps);
+> 
+>  	rsp.dcid    = cpu_to_le16(dcid);
+>  	rsp.credits = cpu_to_le16(credits);
+> @@ -5177,12 +5197,18 @@ static inline int l2cap_ecred_conn_req(struct 
+> l2cap_conn *conn,
+>  			continue;
+>  		}
+> 
+> -		chan = pchan->ops->new_connection(pchan);
+> +		chan = l2cap_chan_create();
+>  		if (!chan) {
+>  			result = L2CAP_CR_LE_NO_MEM;
+>  			continue;
+>  		}
+> 
+> +		if (pchan->ops->new_connection(pchan, chan) < 0) {
+> +			l2cap_chan_put(chan);
+> +			result = L2CAP_CR_LE_NO_MEM;
+> +			continue;
+> +		}
+> +
+>  		bacpy(&chan->src, &conn->hcon->src);
+>  		bacpy(&chan->dst, &conn->hcon->dst);
+>  		chan->src_type = bdaddr_src_type(conn->hcon);
+> @@ -5217,6 +5243,9 @@ static inline int l2cap_ecred_conn_req(struct 
+> l2cap_conn *conn,
+>  		} else {
+>  			l2cap_chan_ready(chan);
+>  		}
+> +
+> +		/* Drop our local ref; __l2cap_chan_add() pinned chan via the conn 
+> list. */
+> +		l2cap_chan_put(chan);
+>  	}
+> 
+>  unlock:
+> @@ -7399,7 +7428,11 @@ static void l2cap_connect_cfm(struct hci_conn 
+> *hcon, u8 status)
+>  			goto next;
+> 
+>  		l2cap_chan_lock(pchan);
+> -		chan = pchan->ops->new_connection(pchan);
+> +		chan = l2cap_chan_create();
+> +		if (chan && pchan->ops->new_connection(pchan, chan) < 0) {
+> +			l2cap_chan_put(chan);
+> +			chan = NULL;
+> +		}
+>  		if (chan) {
+>  			bacpy(&chan->src, &hcon->src);
+>  			bacpy(&chan->dst, &hcon->dst);
+> @@ -7407,6 +7440,9 @@ static void l2cap_connect_cfm(struct hci_conn 
+> *hcon, u8 status)
+>  			chan->dst_type = dst_type;
+> 
+>  			__l2cap_chan_add(conn, chan);
+> +
+> +			/* Drop our local ref; __l2cap_chan_add() pinned chan via the conn list. */
+> +			l2cap_chan_put(chan);
+>  		}
+> 
+>  		l2cap_chan_unlock(pchan);
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index dede550d6031..598f24c8f704 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -46,7 +46,8 @@ static struct bt_sock_list l2cap_sk_list = {
+>  static const struct proto_ops l2cap_sock_ops;
+>  static void l2cap_sock_init(struct sock *sk, struct sock *parent);
+>  static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+> -				     int proto, gfp_t prio, int kern);
+> +				     int proto, gfp_t prio, int kern,
+> +				     struct l2cap_chan *chan);
+>  static void l2cap_sock_cleanup_listen(struct sock *parent);
+> 
+>  bool l2cap_is_socket(struct socket *sock)
+> @@ -1507,12 +1508,13 @@ static void l2cap_sock_cleanup_listen(struct 
+> sock *parent)
+>  	}
+>  }
+> 
+> -static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+> +static int l2cap_sock_new_connection_cb(struct l2cap_chan *chan,
+> +					struct l2cap_chan *new_chan)
+>  {
+>  	struct sock *sk, *parent = chan->data;
+> 
+>  	if (!parent)
+> -		return NULL;
+> +		return -EINVAL;
+> 
+>  	lock_sock(parent);
+> 
+> @@ -1520,15 +1522,15 @@ static struct l2cap_chan 
+> *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+>  	if (sk_acceptq_is_full(parent)) {
+>  		BT_DBG("backlog full %d", parent->sk_ack_backlog);
+>  		release_sock(parent);
+> -		return NULL;
+> +		return -ENOBUFS;
+>  	}
+> 
+>  	sk = l2cap_sock_alloc(sock_net(parent), NULL, BTPROTO_L2CAP,
+> -			      GFP_ATOMIC, 0);
+> +			      GFP_ATOMIC, 0, new_chan);
+>  	if (!sk) {
+>  		release_sock(parent);
+> -		return NULL;
+> -        }
+> +		return -ENOMEM;
+> +	}
+> 
+>  	bt_sock_reclassify_lock(sk, BTPROTO_L2CAP);
+> 
+> @@ -1538,7 +1540,7 @@ static struct l2cap_chan 
+> *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+> 
+>  	release_sock(parent);
+> 
+> -	return l2cap_pi(sk)->chan;
+> +	return 0;
+>  }
+> 
+>  static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+> @@ -1939,10 +1941,10 @@ static struct proto l2cap_proto = {
+>  };
+> 
+>  static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+> -				     int proto, gfp_t prio, int kern)
+> +				     int proto, gfp_t prio, int kern,
+> +				     struct l2cap_chan *chan)
+>  {
+>  	struct sock *sk;
+> -	struct l2cap_chan *chan;
+> 
+>  	sk = bt_sock_alloc(net, sock, &l2cap_proto, proto, prio, kern);
+>  	if (!sk)
+> @@ -1953,14 +1955,11 @@ static struct sock *l2cap_sock_alloc(struct net 
+> *net, struct socket *sock,
+> 
+>  	INIT_LIST_HEAD(&l2cap_pi(sk)->rx_busy);
+> 
+> -	chan = l2cap_chan_create();
+> -	if (!chan) {
+> -		sk_free(sk);
+> -		if (sock)
+> -			sock->sk = NULL;
+> -		return NULL;
+> -	}
+> -
+> +	/* The sock owns two refs on chan, matching the puts in
+> +	 * l2cap_sock_kill() and l2cap_sock_destruct(). The caller keeps
+> +	 * its own ref independent of these.
+> +	 */
+> +	l2cap_chan_hold(chan);
+>  	l2cap_chan_hold(chan);
+> 
+>  	l2cap_pi(sk)->chan = chan;
+> @@ -1972,6 +1971,7 @@ static int l2cap_sock_create(struct net *net, 
+> struct socket *sock, int protocol,
+>  			     int kern)
+>  {
+>  	struct sock *sk;
+> +	struct l2cap_chan *chan;
+> 
+>  	BT_DBG("sock %p", sock);
+> 
+> @@ -1986,10 +1986,18 @@ static int l2cap_sock_create(struct net *net, 
+> struct socket *sock, int protocol,
+> 
+>  	sock->ops = &l2cap_sock_ops;
+> 
+> -	sk = l2cap_sock_alloc(net, sock, protocol, GFP_ATOMIC, kern);
+> -	if (!sk)
+> +	chan = l2cap_chan_create();
+> +	if (!chan)
+>  		return -ENOMEM;
+> 
+> +	sk = l2cap_sock_alloc(net, sock, protocol, GFP_ATOMIC, kern, chan);
+> +	if (!sk) {
+> +		l2cap_chan_put(chan);
+> +		return -ENOMEM;
+> +	}
+> +	/* Sock has taken its own refs on chan; drop the chan_create() ref. */
+> +	l2cap_chan_put(chan);
+> +
+>  	l2cap_sock_init(sk, NULL);
+>  	bt_sock_link(&l2cap_sk_list, sk);
+>  	return 0;
+> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> index 1739c1989dbd..25cb5dc580bf 100644
+> --- a/net/bluetooth/smp.c
+> +++ b/net/bluetooth/smp.c
+> @@ -3204,16 +3204,11 @@ static const struct l2cap_ops smp_chan_ops = {
+>  	.get_sndtimeo		= l2cap_chan_no_get_sndtimeo,
+>  };
+> 
+> -static inline struct l2cap_chan *smp_new_conn_cb(struct l2cap_chan *pchan)
+> +static inline int smp_new_conn_cb(struct l2cap_chan *pchan,
+> +				  struct l2cap_chan *chan)
+>  {
+> -	struct l2cap_chan *chan;
+> -
+>  	BT_DBG("pchan %p", pchan);
+> 
+> -	chan = l2cap_chan_create();
+> -	if (!chan)
+> -		return NULL;
+> -
+>  	chan->chan_type	= pchan->chan_type;
+>  	chan->ops	= &smp_chan_ops;
+>  	chan->scid	= pchan->scid;
+> @@ -3229,9 +3224,9 @@ static inline struct l2cap_chan 
+> *smp_new_conn_cb(struct l2cap_chan *pchan)
+>  	 */
+>  	atomic_set(&chan->nesting, L2CAP_NESTING_SMP);
+> 
+> -	BT_DBG("created chan %p", chan);
+> +	BT_DBG("initialised chan %p", chan);
+> 
+> -	return chan;
+> +	return 0;
+>  }
+> 
+>  static const struct l2cap_ops smp_root_chan_ops = {
+> -- 
+> 2.54.0
 
-    hci_cmd_sync_queue(hdev, hci_create_cis_sync, NULL, NULL);
+Could you please check this?
 
-While hci_conn_del() dequeues with data=conn:
-
-    hci_cmd_sync_dequeue(hdev, NULL, conn, NULL);
-
-Since NULL != conn, the lookup in _hci_cmd_sync_lookup_entry() never
-matches, and the pending work item is not cancelled.
-
-Fix this by saving conn->conn_timeout into a local variable while the
-locks are still held, so the stale conn pointer is never dereferenced
-after unlock.
-
-This is the same class of bug as the one fixed by commit
-035c25007c9e ("Bluetooth: hci_sync: Fix UAF in
-le_read_features_complete") which addressed the identical pattern in a
-different function.
-
-Found by 0sec (https://0sec.ai) using automated source analysis.
-
-Fixes: c09b80be6ffc ("Bluetooth: hci_conn: Fix not waiting for HCI_EVT_LE_CIS_ESTABLISHED")
-Cc: stable@vger.kernel.org
-Reported-by: Doruk Tan Ozturk <doruk@0sec.ai>
-Closes: https://lore.kernel.org/linux-bluetooth/20260525162438.96881-1-doruk@0sec.ai/
-Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
----
-v2:
-  - fix commit reference title ("Fix UAF in" not "Fix UAF on")
-  - fix Fixes: tag title to match actual commit
-  - add Closes: tag per checkpatch
-
-Link: https://lore.kernel.org/linux-bluetooth/20260525162438.96881-1-doruk@0sec.ai/
-
- net/bluetooth/hci_sync.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index XXXXXXX..XXXXXXX 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6700,6 +6700,7 @@ int hci_le_create_cis_sync(struct hci_dev *hdev)
- 	DEFINE_FLEX(struct hci_cp_le_create_cis, cmd, cis, num_cis, 0x1f);
- 	size_t aux_num_cis = 0;
- 	struct hci_conn *conn;
-+	u16 timeout = 0;
- 	u8 cig = BT_ISO_QOS_CIG_UNSET;
-
- 	/* The spec allows only one pending LE Create CIS command at a time. If
-@@ -6773,6 +6774,7 @@ int hci_le_create_cis_sync(struct hci_dev *hdev)
- 		set_bit(HCI_CONN_CREATE_CIS, &conn->flags);
- 		cis->acl_handle = cpu_to_le16(conn->parent->handle);
- 		cis->cis_handle = cpu_to_le16(conn->handle);
-+		timeout = conn->conn_timeout;
- 		aux_num_cis++;
-
- 		if (aux_num_cis >= cmd->num_cis)
-@@ -6791,7 +6793,7 @@ int hci_le_create_cis_sync(struct hci_dev *hdev)
- 	return __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_CREATE_CIS,
- 					struct_size(cmd, cis, cmd->num_cis),
- 					cmd, HCI_EVT_LE_CIS_ESTABLISHED,
--					conn->conn_timeout, NULL);
-+					timeout, NULL);
- }
-
- int hci_le_remove_cig_sync(struct hci_dev *hdev, u8 handle)
---
-2.45.0
+Best,
+Siwei
