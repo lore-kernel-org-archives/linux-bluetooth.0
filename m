@@ -1,125 +1,129 @@
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8767835CB91
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 10:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2DDB1FE44A;
+	Tue, 26 May 2026 13:51:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779792723; cv=none; b=H8goxM72mypBAVToEpif0uHQXABE+jqSCHo4s6UVsMVAe4CseCxiK7cErt/cg186mug1sHX5ZZxM48zJ1wiopnikbcy5gtu8d8Fv+nvuO6g8d5gS8cxp6G/pqA1bWQimTh2kI3tlRTlYTlIOmguGYskw2P3B8RrjNGxks/mWrEg=
+	t=1779803479; cv=none; b=MwGfNt3Pyx404rYGn6mAl0mMMp3erp9WhKal9j1Mw+tJs2ip4/ZqAWVB3GnHLo5RvYAvmlO59Q/fCSdehgIdyp8YFTU1oEuyWSsGgsR7UwyoCifbZjl5iU7c8Y9vh0fdlHkITvDSxoY5lTRnuCNsGvoh974zYPoOGjoYe9U/Z5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779792723; c=relaxed/simple;
-	bh=d1XtK2d8Mg0YQlZbiBQkQFmZucUOwu3dt/ghuzwIan4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L/1XhrqdNfh78/TOM75WYYKZvesQm1g5nHnOgwCMIAyq59FDN0PfoftJ8EZnBuVmgptFPokW212ozGB4Y0tL6MYeGTDP3Dr9jE43SeAWNG4g9em9ICIdoWPzkA/2ipGFm4FuE0lYgdhlmiGD0MA8IaZdDEQzCEhRWl44YYSqPDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AzSG4DzD; arc=none smtp.client-ip=209.85.214.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1779803479; c=relaxed/simple;
+	bh=7xU5AHbuTJWg/v3VXXXgEAuoOGUJYGEqz87SG+GdURk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=fG27o38NIRjJ9yf9hlbE5Ey2gXmleT5PGDTxOQNMWA6vjry0PGuJCYF2k3XerBvfmOYlyhPYGyK4dnGl5//4ggid5d49b8Ub1rWG6hU5HdpJ2qUlMLz7uBIDl5fdZ97zoMamWoFBqqLydKFHTvhqJBvlrS6U6UzRpJKMts9aaAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=S+6wPiRY; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AzSG4DzD"
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-2ba17c8cfacso109311755ad.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 03:52:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779792722; x=1780397522; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=y9xlWXn5mE7pkm5ckLftzVtrrd/9HAGB+5lP9+i3WsE=;
-        b=AzSG4DzDpCE9QQp8LuhhytQJ5KYknvBXQYDChlRfH53xd4+jzzGz8e43ZClyuLElUy
-         Kb5fkBdnw0JwTosf0gCrtX9b4z3UlTrI+5B6+vxnr0GR5tLmoNXy6slqti3rMiGL1x9y
-         TIrPxOEF5SrTfpYq6s9BeG4rPtjy7vd3lMaVGmacArcNY67NQUIUqU7qgoJDHjDS0Go9
-         y+Y9+loy79jGDmFGF5F7gtvTCpN6EpH66WaLhpdL1BhT2MmL24wBr8ME9qvxKkD0jxtG
-         ehk8l6/SJjQbZRaTQ06U4WfsJGBqoPwdCEODbpP1M8sxi+lEpk8x2NXzsUce80Czmupo
-         mnKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779792722; x=1780397522;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y9xlWXn5mE7pkm5ckLftzVtrrd/9HAGB+5lP9+i3WsE=;
-        b=qCqfO68hUospO+gkl5EoDrBD1Uqn/A9zrJiQoIHBWGacfYttQG3JwHOvSrOjWb9Ja/
-         fuHXW3eYVmoqAsIyRuRVTWx3H4BDKJMfU3Jo5bv/TXhlPh8ZGIM5f/D/oudYyVqMZSAo
-         dx+RtEfCR+J/cPUpvmzifaeCQix6UuPGystAWASFvYD87NoBnE+UYh8Helll4ExX6UVv
-         uw2yzvPFK+DtDELdQv0RB/VwdqkkVSMNnZtdstSTmuO+7XzVIqtjzILIwrTH0E2oGv4Q
-         VaxjugXdVzEOlKm807PN9sGr0i6+l8O+Qx7na/6HBl6appRZ7BA7VOqW40NteRsKQM2V
-         nvhQ==
-X-Gm-Message-State: AOJu0YzeYCx/bpGSn4fn5uyPZp6dDqbTTmLntI31yAp4VNcujwS7teD8
-	0szTHPV3HCAw1e+cBsNd+daqfZV87sZcraf6zy/6tohKO7QGnQduLJeC
-X-Gm-Gg: Acq92OEdlEQ7ohijhjQnmZ+4mbMZGkP3iVFXmafb2BpNEZ6cDPQbMmeberUqT/ckEot
-	A6LgJK2wi5jsFW7zflO4sovitERXuato5Y3GHS4vAyzFWURwzq0P4wNCzUrnX5542+JiTStNYRL
-	PT6whiETyn1lyUu6UM4kYbt2VbliBy3wqtQu4CbmxSloXkO3THbcd2V1MHtbqPZ+xFkK5wWfHAE
-	XDH31azPXJRjOhxvfMG0GsVADvsV70JbGGYKnH9VQ9yrVYj/8OAU2m2FXVQPiBIH2nYpHqJNXlg
-	UzpAbPKFtld8UBnZHv7M4W8Sn7U8eRL6H9jp6vGPuLyZgcvf6wiiXQdus0r7bF+5ePBUGgTgTnM
-	R6f0KFMf43qjn7KvJMoxJWKmFSqlRSnHPzoJH5TBaMlR/x3IdGejTez6Ix3F40q8kRlUTyLSPhN
-	JAUeSNld5Bga39mvUAJGeaIraSwY9w7aGn5ur0fM2FiXPZfpccoK+8lucZqKzi
-X-Received: by 2002:a17:903:1a2f:b0:2ba:7749:f89a with SMTP id d9443c01a7336-2beb035c500mr190176565ad.11.1779792721648;
-        Tue, 26 May 2026 03:52:01 -0700 (PDT)
-Received: from KIPREYXIAO-MC2.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb56b5886sm108947845ad.20.2026.05.26.03.51.59
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 26 May 2026 03:52:01 -0700 (PDT)
-From: Zhenghang Xiao <kipreyyy@gmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Zhenghang Xiao <kipreyyy@gmail.com>
-Subject: [PATCH bluetooth] Bluetooth: l2cap: clear chan->ident on ECRED reconfiguration success
-Date: Tue, 26 May 2026 18:51:52 +0800
-Message-ID: <20260526105152.78178-1-kipreyyy@gmail.com>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="S+6wPiRY"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Cc:To:In-Reply-To:References:Message-Id:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=H9O+UnZSoUGr8poiTa1psKAAL62vlHP66fwIYRcsJ6g=; b=S+6wPiRYg1phu6+4R5xGk3BEym
+	N4qiuMiGmz4kGfgjROyRvuvDnbcZpqLnqwhmLWcuy06UkMJ8C0xNSrVz81OfzalXOyxJtd909opOT
+	yp4DEpapw/ksPmKB7N4p+T5CHzaWNWgihfFGxAG03JJTZDcqBMc8CnCf9MBDYxPqjIFhPnEVhtmsm
+	TuozWNbQyizPTUKIfZR52d4noBd7zgN2HjdUWKRk+45HIRqf/Mve9j3rPeUYruRDS6HJxtDiAT2ER
+	BiZ1t2e9eoES16nq+lyVZYREgkEQKQu4+xlah2neQrrztnRPR228lSCx71Ix0xPI9yIs3+bEVbYG6
+	ZZ4Jg6sg==;
+Received: from 177-136-90-227.vmaxnet.com.br ([177.136.90.227] helo=[192.168.1.54])
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1wRsBe-008SdX-NS; Tue, 26 May 2026 15:51:14 +0200
+From: Heitor Alves de Siqueira <halves@igalia.com>
+Date: Tue, 26 May 2026 10:50:57 -0300
+Subject: [PATCH v2 1/3] Bluetooth: hci_core: Rework hci_dev_do_reset() to
+ use hci_sync functions
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260526-hci_send-v2-1-596977a9a814@igalia.com>
+References: <20260526-hci_send-v2-0-596977a9a814@igalia.com>
+In-Reply-To: <20260526-hci_send-v2-0-596977a9a814@igalia.com>
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Gustavo Padovan <padovan@profusion.mobi>, Schspa Shi <schspa@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ kernel-dev@igalia.com, Heitor Alves de Siqueira <halves@igalia.com>, 
+ Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+X-Mailer: b4 0.15.2
 
-l2cap_ecred_reconf_rsp() returns early on success without clearing
-chan->ident. Every other L2CAP response handler (l2cap_ecred_conn_rsp,
-l2cap_le_connect_rsp, l2cap_config_rsp) clears chan->ident after a
-successful transaction to prevent the channel from matching subsequent
-responses with the recycled ident value.
+The current HCI reset function in hci_core.c duplicates most of the work
+done by hci_dev_close_sync(), and doesn't handle LE, advertising or
+discovery.
 
-A remote attacker that completed a reconfiguration as the peer can
-replay a failure response with the stale ident, causing the kernel to
-match and destroy the already-established channel via
-l2cap_chan_del(chan, ECONNRESET).
+Instead of porting these to hci_dev_do_reset(), directly call the
+close/open functions from hci_sync to reset the hdev. MGMT now notifies
+when a user performs a reset.
 
-Clear chan->ident for all matching channels on success, and harden the
-failure path by using l2cap_chan_hold_unless_zero() consistent with
-other L2CAP handlers (l2cap_le_command_rej, __l2cap_get_chan_by_ident).
-
-Fixes: 15f02b910562 ("Bluetooth: L2CAP: Add initial code for Enhanced Credit Based Mode")
-Signed-off-by: Zhenghang Xiao <kipreyyy@gmail.com>
+Suggested-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Heitor Alves de Siqueira <halves@igalia.com>
 ---
- net/bluetooth/l2cap_core.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_core.c | 43 +++----------------------------------------
+ 1 file changed, 3 insertions(+), 40 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 7701528f1167..08c70caf24d4 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5458,14 +5458,20 @@ static inline int l2cap_ecred_reconf_rsp(struct l2cap_conn *conn,
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index c46c1236ebfa..28d7929dc593 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -539,46 +539,9 @@ static int hci_dev_do_reset(struct hci_dev *hdev)
  
- 	BT_DBG("result 0x%4.4x", result);
+ 	hci_req_sync_lock(hdev);
  
--	if (!result)
-+	if (!result) {
-+		list_for_each_entry(chan, &conn->chan_l, list) {
-+			if (chan->ident == cmd->ident)
-+				chan->ident = 0;
-+		}
- 		return 0;
-+	}
+-	/* Drop queues */
+-	skb_queue_purge(&hdev->rx_q);
+-	skb_queue_purge(&hdev->cmd_q);
+-
+-	/* Cancel these to avoid queueing non-chained pending work */
+-	hci_dev_set_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE);
+-	/* Wait for
+-	 *
+-	 *    if (!hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE))
+-	 *        queue_delayed_work(&hdev->{cmd,ncmd}_timer)
+-	 *
+-	 * inside RCU section to see the flag or complete scheduling.
+-	 */
+-	synchronize_rcu();
+-	/* Explicitly cancel works in case scheduled after setting the flag. */
+-	cancel_delayed_work(&hdev->cmd_timer);
+-	cancel_delayed_work(&hdev->ncmd_timer);
+-
+-	/* Avoid potential lockdep warnings from the *_flush() calls by
+-	 * ensuring the workqueue is empty up front.
+-	 */
+-	drain_workqueue(hdev->workqueue);
+-
+-	hci_dev_lock(hdev);
+-	hci_inquiry_cache_flush(hdev);
+-	hci_conn_hash_flush(hdev);
+-	hci_dev_unlock(hdev);
+-
+-	if (hdev->flush)
+-		hdev->flush(hdev);
+-
+-	hci_dev_clear_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE);
+-
+-	atomic_set(&hdev->cmd_cnt, 1);
+-	hdev->acl_cnt = 0;
+-	hdev->sco_cnt = 0;
+-	hdev->le_cnt = 0;
+-	hdev->iso_cnt = 0;
+-
+-	ret = hci_reset_sync(hdev);
++	ret = hci_dev_close_sync(hdev);
++	if (!ret)
++		ret = hci_dev_open_sync(hdev);
  
- 	list_for_each_entry_safe(chan, tmp, &conn->chan_l, list) {
- 		if (chan->ident != cmd->ident)
- 			continue;
- 
--		l2cap_chan_hold(chan);
-+		if (!l2cap_chan_hold_unless_zero(chan))
-+			continue;
- 		l2cap_chan_lock(chan);
- 
- 		l2cap_chan_del(chan, ECONNRESET);
+ 	hci_req_sync_unlock(hdev);
+ 	return ret;
+
 -- 
-2.50.1 (Apple Git-155)
+2.54.0
 
