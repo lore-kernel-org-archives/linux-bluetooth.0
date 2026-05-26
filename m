@@ -1,113 +1,165 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7140317745
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 05:06:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A65305666;
+	Tue, 26 May 2026 06:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779771969; cv=none; b=D4I/pyO9ui8KiDoCxn0PBhp5OLM2HA0PSY7UsS+AzqKLKIOFQJQxMkfB5mrb6p1gIcX45JpJgQ+E6umduOoRZl9sZoV9naeOOKn8LmLnY2kdWJt1P0+MbnpsQD7IBzZgxqxmcmMcgLGJy7GMgDDaUMP3BMGtJzlgtbszmcNHIOs=
+	t=1779777849; cv=none; b=Ms5PADJmq+E1ul4qWrq7v/EUdKT/u1Dk6sBoAOQ09Bci/Wt6ty1ndBVFTvImlB7Wv69qhfe5ffsDNsMT8dNs+u7K//NBsQycc3kFBdgseZwH7YAVvlNsH1PEGpmuHX4m8YAxKUATrPwkiNvZb0KQf5b62TiWpSi08w/p7d1Mm6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779771969; c=relaxed/simple;
-	bh=L9w5Kwjj1O8s3GRfJ6tJkdl583oqS9/w8FGxE8/rWM4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=qrTBDuX68RvcTYv75wZj1qriaX29PxcQ3bfSkbi8PD2XEgL7h9nOtO9WZbZeyc50TDVRTiXMBAXzJlUGBoI+JOTt5PQNfxX7w+Z3P/jW9pbl9++I6LE3i6uMIAJNXZvWRmE32ufH+AW96BlZiC3esVyYwYhgvCqSjJvSBlrPizg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YBq/33td; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YBq/33td"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-914b4be9c4bso366772585a.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 May 2026 22:06:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779771967; x=1780376767; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=aJTGpzQY60gVfmEQrCFmY7Vqpdj7px2IUFl0epnQlro=;
-        b=YBq/33tdzse3T79U41nYhkzn9j8w/iN1yTRfUokb7NnPe4Q3e7XihPOuJB3KkLOEAw
-         HNNjGEQdljNeJbzGxVydHJQW/FVRbQKQVnaOYu5tWgmVRQAeAZ39COs21cBXqrWjZZQS
-         WAunV9R5CkGz8te4QHL9uS/RRd2HZ2H3NRe14t0RZrNE9Thh05xY9X+L6A4ZJ+5gutV3
-         rrV9PqFLtEGy6sZ0E3DsNtmP0l23HfJCvk+q3+UrhrEb3MRZySkT3vmn9wzyYsbbq0IS
-         5IAvH0A+Esezx/h7DTbStZpiC66ZeS9c48As3FMEtE8dVxHU0dqmrLsk/Y0HaQMc6il7
-         e2dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779771967; x=1780376767;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aJTGpzQY60gVfmEQrCFmY7Vqpdj7px2IUFl0epnQlro=;
-        b=N8iTh0zaeElXni/PCUFeXwqFQeEV21NtAz2KsGBgCxGAsTJOTdSoPkAHWrwbwmcvEy
-         O4MsWCpZXbvNNa3GGOJGV+cRR3/BmdBxZHTVbTInrK3ioDWB0+m/++ptoRuzqZD+smsB
-         Oj6Bs/TO1lynfZYFRF8N29ZBIJdwcU7eVsbC299biZxGSdl1XGq9HMLY1rN6Z4xjCHOo
-         ay7jY4ox3WuGC7T7WLwHhHPtvi+pNuIi3gDMJb0cAfbs93V9E3PBifXdE2K/dY/0REd+
-         MLlBqK9HI2icHDE+rUO+zl3wvSZAYDpSHJr4VlI6dyPvdZ0gKxJfhhQUfrfYBEsIDv6t
-         Lczg==
-X-Gm-Message-State: AOJu0YxIbi2ijImJJlA7+Oo3KUvD5dOjsgVs2jmvCE+AkdiugUy0zBb4
-	fSlG3jPqFIztjF4IkDwp2KJ2UXn/3jDuCJnhYdvFgJPxSKj3bxntpwuVx7le8w==
-X-Gm-Gg: Acq92OEKqWuTlQHBSHBHfeOk0YyeERS0NzpCvszZC4XLucGJoNkrC9NN/rvzfnB4HCw
-	x3yp4tVrinpTfaamOlRlYY9BrlFa7xXDYeAWIPzOuuwxpNVCZchPJfRZ/91NCQpL3Zj2kXjUVwO
-	hd0g/YSia9MM1MgeqjbNRmHufY7lbkjC/DKb8dLWLR9PLnRYR7JwHRNYZibhHszU7K+KLCN7d2f
-	WD6Rexr/Zb0UlknRciPjqh32BfCvmAvUlTxT9xXc9vmrIdlCaxmrym9CMKJuJBfuOmtuU01SFCz
-	D5Jds8+DsjyewYX/pgKXFm6oS3Zb+tLYazqkRWEn7hBr/u24MtIiBQr1a0oLvM9TEH8rdtgjQv5
-	0rsez7siuICV+XCwiolla4mdhdqF+2REdwY+/CiRqszjzxG7QyRSxvtdmwNmqA78WdFQ2HScFL6
-	NlHXx0mvL6x+EFerzHNCDzDyEamN+4wEYTo1AWV+tFmQ==
-X-Received: by 2002:a05:620a:2985:b0:8cd:b33f:1492 with SMTP id af79cd13be357-914b49cc6dcmr2451833585a.39.1779771967214;
-        Mon, 25 May 2026 22:06:07 -0700 (PDT)
-Received: from [172.17.0.2] ([64.236.176.226])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8cca4705c62sm42244246d6.27.2026.05.25.22.06.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 May 2026 22:06:06 -0700 (PDT)
-Message-ID: <6a152a3e.e05a70a4.3bd94a.0d41@mx.google.com>
-Date: Mon, 25 May 2026 22:06:06 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0828817223330735009=="
+	s=arc-20240116; t=1779777849; c=relaxed/simple;
+	bh=rBUiRkHvmfyHZgQi0XsWud6ohs3cF03I+I5hA5KSywc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IzKEBgmPe/+OAO0S7kOGKxIEG2muaCzm+DqZgEZ4NceSezfNOr+d/DKqmCQrR/sk4Rq+HOciSa4QsTUAgXGHacPRzfsn6sd1fvDz+Uarh+/unSyUvICp9M8oASj+TwP2X4Dk6yfUBhWxFbk/YnobHcWqjIkkrTqBUQUlBnGOoEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.44.33] (unknown [185.238.219.100])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4BAF24C1511A98;
+	Tue, 26 May 2026 08:43:39 +0200 (CEST)
+Message-ID: <51761fe5-2244-457b-bf60-060e43f0cbd1@molgen.mpg.de>
+Date: Tue, 26 May 2026 08:43:34 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, winter91@foxmail.com
-Subject: RE: Bluetooth: 6lowpan: check skb_clone() return value in send_mcast_pkt()
-In-Reply-To: <tencent_859B04510A77948C6A97FF769CBB9262A007@qq.com>
-References: <tencent_859B04510A77948C6A97FF769CBB9262A007@qq.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============0828817223330735009==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 1/1] Bluetooth: L2CAP: fix heap over-read in
+ l2cap_get_conf_opt
+To: Muhammad Bilal <meatuni001@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ luiz.dentz@gmail.com, gregkh@linuxfoundation.org, johan.hedberg@intel.com,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260526021747.31634-1-meatuni001@gmail.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260526021747.31634-1-meatuni001@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1100686
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.68 seconds
-VerifyFixes                   PASS      0.12 seconds
-VerifySignedoff               PASS      0.12 seconds
-GitLint                       PASS      0.30 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      27.63 seconds
-CheckAllWarning               PASS      30.35 seconds
-CheckSparse                   PASS      28.49 seconds
-BuildKernel32                 PASS      26.83 seconds
-TestRunnerSetup               PASS      584.38 seconds
-TestRunner_6lowpan-tester     PASS      22.86 seconds
-IncrementalBuild              PASS      27.60 seconds
+Dear Muhammad,
 
 
+Thank you for your patch.
 
-https://github.com/bluez/bluetooth-next/pull/241
+Am 26.05.26 um 04:17 schrieb Muhammad Bilal:
+> l2cap_get_conf_opt() reads opt->val via a switch on opt->len (1, 2,
+> or 4 bytes).  opt->len is a remote-controlled u8.  All three callers
+> loop on (len >= L2CAP_CONF_OPT_SIZE), so the loop body executes with
+> as few as 2 bytes remaining.  A packet ending with opt->len=4 and
+> only 2 bytes left causes get_unaligned_le32(opt->val) to read 4 bytes
+> past the buffer before the caller can act on the return value.
+> 
+> Commit 7c9cbd0b5e38 ("Bluetooth: Verify that l2cap_get_conf_opt
+> provides large enough buffer") added a post-call len < 0 guard in
+> each caller, but the over-read fires inside l2cap_get_conf_opt()
+> before that guard is reached.
+> 
+> Add a buflen parameter and validate L2CAP_CONF_OPT_SIZE + opt->len
+> <= buflen before any access to opt->val.  Return -EINVAL on
+> violation.  Update all three callers to capture the return value and
+> break on negative.  With the bounds check ensuring the option fits
+> within the remaining buffer, the post-call len < 0 check is no
+> longer needed and is removed.
 
----
-Regards,
-Linux Bluetooth
+By any chance, do you have a reproducer?
+
+> Fixes: 7c9cbd0b5e38 ("Bluetooth: Verify that l2cap_get_conf_opt provides large enough buffer")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Muhammad Bilal <meatuni001@gmail.com>
+> ---
+>   net/bluetooth/l2cap_core.c | 31 ++++++++++++++++++++++++-------
+>   1 file changed, 24 insertions(+), 7 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index fdccd62ccca8..6052ffb280ac 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -3051,12 +3051,23 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn, u8 code,
+>   }
+>   
+>   static inline int l2cap_get_conf_opt(void **ptr, int *type, int *olen,
+> -				     unsigned long *val)
+> +				     unsigned long *val, size_t buflen)
+>   {
+>   	struct l2cap_conf_opt *opt = *ptr;
+>   	int len;
+>   
+> +	/* Guard opt->len dereference: reject if the 2-byte option header
+> +	 * itself does not fit in the remaining buffer.
+> +	 */
+> +	if (buflen < L2CAP_CONF_OPT_SIZE)
+> +		return -EINVAL;
+
+I always wonder, if Linux should log a debug message or even warning.
+
+> +
+>   	len = L2CAP_CONF_OPT_SIZE + opt->len;
+> +
+> +	/* Reject options whose payload extends past the remaining buffer. */
+> +	if ((size_t)len > buflen)
+> +		return -EINVAL;
+
+Ditto.
+
+> +
+>   	*ptr += len;
+>   
+>   	*type = opt->type;
+> @@ -3437,9 +3448,11 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+>   	BT_DBG("chan %p", chan);
+>   
+>   	while (len >= L2CAP_CONF_OPT_SIZE) {
+> -		len -= l2cap_get_conf_opt(&req, &type, &olen, &val);
+> -		if (len < 0)
+> +		int optlen = l2cap_get_conf_opt(&req, &type, &olen, &val, len);
+> +
+> +		if (optlen < 0)
+>   			break;
+> +		len -= optlen;
+>   
+>   		hint  = type & L2CAP_CONF_HINT;
+>   		type &= L2CAP_CONF_MASK;
+> @@ -3675,9 +3688,11 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
+>   	BT_DBG("chan %p, rsp %p, len %d, req %p", chan, rsp, len, data);
+>   
+>   	while (len >= L2CAP_CONF_OPT_SIZE) {
+> -		len -= l2cap_get_conf_opt(&rsp, &type, &olen, &val);
+> -		if (len < 0)
+> +		int optlen = l2cap_get_conf_opt(&rsp, &type, &olen, &val, len);
+> +
+> +		if (optlen < 0)
+>   			break;
+> +		len -= optlen;
+>   
+>   		switch (type) {
+>   		case L2CAP_CONF_MTU:
+> @@ -3946,9 +3961,11 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
+>   		return;
+>   
+>   	while (len >= L2CAP_CONF_OPT_SIZE) {
+> -		len -= l2cap_get_conf_opt(&rsp, &type, &olen, &val);
+> -		if (len < 0)
+> +		int optlen = l2cap_get_conf_opt(&rsp, &type, &olen, &val, len);
+> +
+> +		if (optlen < 0)
+>   			break;
+> +		len -= optlen;
+>   
+>   		switch (type) {
+>   		case L2CAP_CONF_RFC:
+
+The diff looks good.
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
 
---===============0828817223330735009==--
+Kind regards,
+
+Paul
