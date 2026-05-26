@@ -1,48 +1,77 @@
-Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685AE402B8D
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 17:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC02240DFA0
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 17:50:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779817213; cv=none; b=sj3WzZRPXaWD54Oqk54Ryh0PwoOWUQXioM3n2dPedybIrR3uCmTSArSP9M0FP58W8sdh7zAnQ+oUHXzk8LloEyoJOEPaASuAXL9Z7vDqefX4cAupkjPqwfZhAoADsa2VNDAcMt8eRqTUDhKA3qvgWDXpqch4HIJrugZBEL8empA=
+	t=1779817801; cv=none; b=LOZ0iwyulepdTWORQdcqutgxDobH6cpYNRxv79o8I4PA51zlpvwJtMQqpaPBnjMRj/CvMRPXdw/BetwMQitKIIFUkUHGGUoXkeCcHNvOmCLuX4ebit+IxgoG9681epV2smBOk3ADb1u8ccx+qcM7+KsfYZH5uBklSQLYHyrwxNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779817213; c=relaxed/simple;
-	bh=R3I3nmYwd/J1q/R1EfkHtbwABRsq9SxyJBoDN6ANIqM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=RE1ZeBRWc0qmxWA0hod7sxivwSHXI8JgbMf80tadTkYmKJcqWK8fUp0sj0OEi+AdwcsBOv0vK58j079GV2d+tggMWC/OjZBHss/1MWw+jnZ07os7eMHsIjvIFP1AKR4KjsyGMrFEdAW4FD6DWLhdJkN+Ynfsh2Kony8PEcbR/TA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=SNGb1OSQ; arc=none smtp.client-ip=192.30.252.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1779817801; c=relaxed/simple;
+	bh=vs82Yp0TiPvwKQLt9fuezE1ZbPdbt9XHfbHRf3B/OhQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=gRzETix33ZKgNup1XWwjl4gHvzJMcSk8LBwmb2irVwiyvOvycKhbzX5TAOr3BEyw0L0FiBP47LJzs6H1RiQgTc7iPAIBpY7vlpo+cTt9y+JXrkRaQv1n5KvK7d4wodCB01Do95Msfh3yix35pdnvcPGHcZIgQgkTYkt7BvPMABA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MQ+0IRPN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="SNGb1OSQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1779817211;
-	bh=NuhCx+dbU0uVswuaEHVra2oA2yFc9nK27mEbmeoJKQc=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=SNGb1OSQfxu8fqzbDzxvOb7pONlSpL8AwLiXWHRUcvwAPf3cr5D74ZTL/5Q8cTfIT
-	 G4pvOZA83Y64PcMhS8WEFAr+0PQOwj/5widePu3Tq8q6vnGf979TJjf69GcQRQOMmQ
-	 oWEKHjIJoq5C/cGcYJpJHrgycUrwI8sm/N1GLT40=
-Received: from github.com (hubbernetes-node-3ebbe39.ac4-iad.github.net [10.52.146.10])
-	by smtp.github.com (Postfix) with ESMTPA id 955209411E4
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 10:40:11 -0700 (PDT)
-Date: Tue, 26 May 2026 10:40:11 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1099306/6e45cd-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MQ+0IRPN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F3AA1F000E9;
+	Tue, 26 May 2026 17:50:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779817800;
+	bh=XNA29QUOewM6aWG4KDOQPg0X1vMxgsE0akjN30w/YH8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=MQ+0IRPNzR3P+Yu/TkJ4oThtkmdKAJ/8AiTNvMtwYAEaCXkBMaWOjZ3hsJmSgIR4z
+	 73TvM671Qgd+7vmzJcWSuSEpkQDzpSYbJFJ0TO/+iCdz6k5ac60RCGisVtMB0Bh8ru
+	 25A3t3JGldTdHSr4UKzLGaMPyWOvhw78rtrlfx9GA5PMJc+QexcfRAwvtcI71Oocbn
+	 h3TpjCGDHQ5+sn3NYnbBpZGVLg4IwhMQtwE8sR9SerD+0YcD8SkMhISWCuffvJfn8w
+	 aCkOv51MBGynpGFEJx/jD4WbSvuoBd7VOy4b0mJNySA4HTwfcvhgz3bqEZowomoal/
+	 6h7fyEVwE3P3A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 56C10380CEE6;
+	Tue, 26 May 2026 17:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: 6lowpan: check skb_clone() return value in
+ send_mcast_pkt()
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <177981780590.3917724.17525961702845062170.git-patchwork-notify@kernel.org>
+Date: Tue, 26 May 2026 17:50:05 +0000
+References: <tencent_859B04510A77948C6A97FF769CBB9262A007@qq.com>
+In-Reply-To: <tencent_859B04510A77948C6A97FF769CBB9262A007@qq.com>
+To: Zhao Dongdong <winter91@foxmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, zhaodongdong@kylinos.cn
 
-  Branch: refs/heads/1099306
-  Home:   https://github.com/bluez/bluez
+Hello:
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Tue, 26 May 2026 11:21:39 +0800 you wrote:
+> From: Zhao Dongdong <zhaodongdong@kylinos.cn>
+> 
+> The skb_clone() function can return NULL if memory allocation fails.
+> send_mcast_pkt() calls skb_clone() without checking the return value, which
+> can lead to a NULL pointer dereference in send_pkt() when it dereferences
+> skb->data.
+> Add a NULL check after skb_clone() and skip the peer if the clone fails.
+> 
+> [...]
+
+Here is the summary with links:
+  - Bluetooth: 6lowpan: check skb_clone() return value in send_mcast_pkt()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ba550f4bd304
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
