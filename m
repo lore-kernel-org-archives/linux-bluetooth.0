@@ -1,148 +1,147 @@
-Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA99843C075
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 14:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA411C6FF5
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 15:27:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779807458; cv=none; b=gW0SlpgGPRCTfjshPfifpwL/ZdJXJnY3c89y+Nsu/oqcxJXOQuRPM7a6eOY1d+Ff8lXwerVAX7lp0P1IGo1yk1hnn2MJK6hFWrNsXF/xEkLBH9kKU8upRqfqasqGYgnc3WQrWTxMj2z88dHwdYGWeKoa580E/81d+BMSjUpCWbo=
+	t=1779809223; cv=none; b=jbqqzROQPm33PEkjL1oL14i39UzCFnO4tEeIhSdW8pJchKymXzgYzHL5nNAX79pFjK6dQe31xmwBnuShsR4/+uSzR0kzcoUc92etj05KEE0jpI36Uj+Mn7a/y/miLqN0ejAm7ABxKEILVjxLAtdslFZk2kYEdPrB4D5uJO8aJ6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779807458; c=relaxed/simple;
-	bh=NUCHZaO1lkffxCiYlCValSwfz8cgKTD2cva9iggkGWQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=B3vV0MkQFbacpq6Yn3IqsF8Z/WrqczxX01vfodbms6nNKxssCyCrnqduNWtzEmFQ0qwe+Y9rGL7qaVJSGaNCI3YkB/1XHwYiJxB8y6m+HtaF+jPIw0F4fzQRmBec17kE9rKmhY4xIXOn4iHAULmm6cmfCK+6+7vimVLx8a2FRXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VtGxs1bO; arc=none smtp.client-ip=74.125.82.180
+	s=arc-20240116; t=1779809223; c=relaxed/simple;
+	bh=Y5BxuZjOA80+aivnwOynWDbca1eE2jTcwWj6B2ZEiJ0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=N7GUsxFmXL5QZHzAsVaRgJptCVhK4SzbTp0Kge9+tmQ716XyDtKcWIJaAoECvS22OTgHCTfUGXk1QpKzIZlHeSRP/2yeiNlLKPwh7lV+nGHMoSNNUSCowCxzTLNdqTGVKVvXBiV3YETUdSZftU8CQamEA6aXSBHJwicYhCvcE+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fnGwK+YZ; arc=none smtp.client-ip=209.85.222.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VtGxs1bO"
-Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-304545f5206so5833531eec.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 07:57:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fnGwK+YZ"
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-95695190911so2768550241.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 08:27:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779807456; x=1780412256; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0AwcvAWnWIvnPexj+jS2NgCI0t/WWEcWVnIwN9fBx1s=;
-        b=VtGxs1bO4vKf0UQxM3IDXw3LFvAD0yasCMZmHYlQruoDS4iJOCJK2/p0Sg2ABKT8jj
-         2lW1BPJVfC5/bSvNbkFblptdeVnzNSwUOmAHVvDYFJ9l8nAGnaeidCsl9VTTnBZZEt9n
-         gvmb2N5L9eh64XPZuejh2i2IwKCs00k0pqgOetMJxrCMMzDiAOzWhGpNwG0UBX5ZZLx2
-         a5fJuMa1pXggBV8D1BwkdZMqOUnVf/MlEluFeBiwsNhCMSdGROS9GLOLWC6ywlkaJr44
-         RrnEcNI67Pq1Zdm4YVhaW/JIxWvSMuZkM/u9uezLlNHIjMqCEYDNDuBxlXPbhazkmza8
-         adRw==
+        d=gmail.com; s=20251104; t=1779809220; x=1780414020; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1XNxyrfUchCAcIQQGPs6RYmUUyAmjCnMUYM0eNeFLvI=;
+        b=fnGwK+YZ+VE9hoyX2kEIQv5R1vl7OSoVfsR3Ffxpo6MuKD5FdW054Fwb113OYN0xW5
+         G+cfmW3abNhEEc9R/5MCYtxMyb2Om2D0yqRma/6LCb2p3LMOfLRcfCZd9DQMEm/Jezb1
+         EcXAiz1jdxPcIrnK91qr/8rhXHKDTIQr78QAEN7jZtYtSlPWOTzL+dL7tT4Mj47xN8u0
+         CzjMTHRuVC4xo/GdtzwI2Kc2kJ2F5n4RT5z+McfV35SXG2rr+fOjUGvKXZbQzWmYi8ul
+         AelEc998VMfTnVvoduYvAemqLzvuQfB5Os9DcKiVynegHoGOCUvFzy4aifEE7iLrzDjQ
+         JJaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779807456; x=1780412256;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0AwcvAWnWIvnPexj+jS2NgCI0t/WWEcWVnIwN9fBx1s=;
-        b=SDQDA4b6oTgQlj2ipUD+IU3N/MBRcrHF6UA0C9T+UC8+14/b9phANPRptH2ftldrkD
-         arBNa3Egp1eI6GmbDDv95kcNk+k/Le2xJnI7SVO0QnNPrcejDgtxZPS6UmHcCKOB8lsC
-         GagjedNv0Mr59s3B4dFogG2n+J/GjUuoxN69XJmb7DCGXSGbq8JxH1ZlBb0/b9B8+gPs
-         9Me7zge1qSZpA6uHOf3C6qHqXPvTHQIf4YR4irTyhVlTCQoNxrU2p3WaZhlAmTkJIALN
-         dyH3g8ByAmDpGej6SBb5AwOQIg0yXD48gGNhFBfyQZ0nVZBofRAojMLF3QXXBEuRSxeL
-         YxJw==
-X-Gm-Message-State: AOJu0YzSW2SjE8ehQp+qO64wlsaG1Z8IfMVBxJ+dFWgdxfZFxEyZ0pps
-	1Bj5hk+QuEbTJ8UOaGyNYHYrbxjtS1Rk7Ve3T8OP8HQSPJQqgsXztapYF7w69g==
-X-Gm-Gg: Acq92OFwSaa7Kx8kIFzQW8CT8XZUwYwJpGCvndzZ9+ffDSdoVbDslLvXBnhHDYs2VuU
-	sUaEdZqZH0mYZdlYcu/fFmVik7BIEbkqyhsCvpuxENcjaRjhXFmEwAzYK7Qjof+mv5+jjsQdYWq
-	bWZ5MfdVCuNTeZ5k78BOlH58TLxNoAYd138Zgy4wXQIq5udicWt078od3Mp+2z/khi4P2jaeN89
-	79Kqg4dIgbJkvWoSxzghRRIVco005ZNPoIqoVA5lCqJQqFrubxDUB0E+sgdX+VWYTR8QrxFHEy3
-	VkiHrwCsitpzjXDwq3Rh13nE3WtHzdI2iz59UNniMqn2ei48gE8HlfdyznXPvqE9+qbTEWXHUqW
-	ljLIQ/vyOxJvVwvAtb4YSrL58UTkE0/o/e0OFPMgCm7b05jLXXZB2QtT9zciYlmCNfX+3/6hY5r
-	hpclIlj8u5YzjQy25nRw4ae0a7sUhi/Es1kQKoX3SA
-X-Received: by 2002:a05:7300:fd02:b0:2ed:e14:42ea with SMTP id 5a478bee46e88-3044914c539mr8414989eec.35.1779807455719;
-        Tue, 26 May 2026 07:57:35 -0700 (PDT)
-Received: from [172.17.0.2] ([52.190.183.81])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30451ef4af0sm10441995eec.3.2026.05.26.07.57.34
+        d=1e100.net; s=20251104; t=1779809220; x=1780414020;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1XNxyrfUchCAcIQQGPs6RYmUUyAmjCnMUYM0eNeFLvI=;
+        b=VQiq8LCEkFJvKk9zltXvVhdnLP7BKXIOsWPh5XViJEr47U6zvvj+2uIobcFVsNRIjm
+         LuDdlPnbvSEUqTMBM6oquasK/uUavx4tUTbdld9RTg18uoaXTvAyoMuY1RGzgxiCQY4l
+         32/NXl2MKM8v0mE/l5bO+HI7EOfHo5FV4dNlFaAtKbuYjkmiAVE/svRNDslWCv/sVxl8
+         1ZhnE+C2kkoIyHT6FMFRGr2PeiOhKzww7T2Xm+C6ACXJMjXdQsBubr4linFCClC51yOK
+         maKMsjFryZ1e+Qms1idRZNOZMHzPi3+pHpO3CflNRnhdfromL6piG+VmXgvPeQY5784t
+         mViQ==
+X-Gm-Message-State: AOJu0YxRV9jd4lGx0LQYgJEPvqO21U4to8cR8VJinOoGSCIVc1CKa/fH
+	PlnscC/AhVriNq+c4wIcNoTNMqJ0Eh4x9K5yS4uaUP+NhN8eFExMC7gnVn13ww==
+X-Gm-Gg: Acq92OEwCVKsxnF/OMB3pHjntSoXEan+EK/5m1snKXaWkyoiOAy7FMikYV36FQ1lzj8
+	N+HsQ4S+Ld3jxUEyXhW9mE04piIsSdi1SC7F6b5DpUsAwPRZR506AOunf61wHWqX/y+jpmnePrl
+	bf1CLe/aDZ2CMU7JZE7OopyzJMZEB261YC8GDBvzrlQVhuILD0r3smyJRBos7bmrD+fyv0NgxXc
+	Hd3aBNUBeU2ePSU8pKPPrnZgbuzeJbTOqAil2hWKYhyW/Fm+UzYvZvnRoZs9arneKrQi7bO0cTH
+	IjBwm9oYe38W6z4A7vGgbn7PXkgm18OXolP/WZB7z9Oi7L3iPqDESd48zfneXmBIlbVglNpQSc4
+	MC4NslxxnRFH+Qc/BfQPovL95nw5FlDy2BjRM781+ofRwlOmippWcMSMRTYlGn9JqPfr5lPwT2L
+	5EhPh6yEePjfHTtHCoY4u4D/x2WCChmRJDnSiOLRLORC5/AWp2ZsuLA8iyb8iCG43ZKz7atQMG7
+	U5vTMpKrYTwz84l+tNKJkPvGGR4
+X-Received: by 2002:a05:6123:64:b0:56e:f876:5626 with SMTP id 71dfb90a1353d-5865fc02fc9mr8974400e0c.5.1779809220016;
+        Tue, 26 May 2026 08:27:00 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-961737bc13fsm14006247241.3.2026.05.26.08.26.59
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 07:57:35 -0700 (PDT)
-Message-ID: <6a15b4df.4a342cbc.2250be.30d3@mx.google.com>
-Date: Tue, 26 May 2026 07:57:35 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0796148588323243903=="
+        Tue, 26 May 2026 08:26:59 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v4] Bluetooth: L2CAP: Fix possible crash on l2cap_ecred_conn_rsp
+Date: Tue, 26 May 2026 11:26:50 -0400
+Message-ID: <20260526152650.3487624-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, halves@igalia.com
-Subject: RE: Bluetooth: hci_core: Refactor HCI reset functions
-In-Reply-To: <20260526-hci_send-v2-1-596977a9a814@igalia.com>
-References: <20260526-hci_send-v2-1-596977a9a814@igalia.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============0796148588323243903==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+If dcid is received for an already-assigned destination CID the spec
+requires that both channels to be discarded, but calling l2cap_chan_del
+may invalidate the tmp cursor created by list_for_each_entry_safe and
+in fact it is the wrong procedure as the chan->dcid may be assigned
+previously it really needs to be disconnected.
 
-Dear submitter,
+Calling l2cap_chan_clone directly may still lead to l2cap_chan_del so
+instead schedule l2cap_chan_timeout with delay 0 to close the channel
+asynchronously.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1100995
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.61 seconds
-VerifyFixes                   PASS      0.07 seconds
-VerifySignedoff               PASS      0.08 seconds
-GitLint                       FAIL      0.65 seconds
-SubjectPrefix                 PASS      0.20 seconds
-BuildKernel                   PASS      27.79 seconds
-CheckAllWarning               PASS      30.33 seconds
-CheckSparse                   PASS      29.14 seconds
-BuildKernel32                 PASS      26.84 seconds
-TestRunnerSetup               PASS      583.48 seconds
-TestRunner_l2cap-tester       PASS      59.20 seconds
-TestRunner_iso-tester         PASS      81.41 seconds
-TestRunner_bnep-tester        PASS      24.55 seconds
-TestRunner_mgmt-tester        FAIL      215.80 seconds
-TestRunner_rfcomm-tester      PASS      26.17 seconds
-TestRunner_sco-tester         PASS      33.02 seconds
-TestRunner_ioctl-tester       PASS      26.08 seconds
-TestRunner_mesh-tester        FAIL      25.85 seconds
-TestRunner_smp-tester         PASS      23.24 seconds
-TestRunner_userchan-tester    PASS      20.11 seconds
-TestRunner_6lowpan-tester     PASS      22.78 seconds
-IncrementalBuild              PASS      30.90 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2,1/3] Bluetooth: hci_core: Rework hci_dev_do_reset() to use hci_sync functions
-
-1: T1 Title exceeds max length (81>80): "[v2,1/3] Bluetooth: hci_core: Rework hci_dev_do_reset() to use hci_sync functions"
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.256 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.635 seconds
-Mesh - Send cancel - 2                               Timed out    1.989 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/244
-
+Fixes: 15f02b910562 ("Bluetooth: L2CAP: Add initial code for Enhanced Credit Based Mode")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/l2cap_core.c | 27 ++++++++++++++++++++++-----
+ 1 file changed, 22 insertions(+), 5 deletions(-)
 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 5668c92b3f58..74a82a547cca 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5262,6 +5262,7 @@ static inline int l2cap_ecred_conn_rsp(struct l2cap_conn *conn,
+ 	cmd_len -= sizeof(*rsp);
+ 
+ 	list_for_each_entry_safe(chan, tmp, &conn->chan_l, list) {
++		struct l2cap_chan *orig;
+ 		u16 dcid;
+ 
+ 		if (chan->ident != cmd->ident ||
+@@ -5283,8 +5284,10 @@ static inline int l2cap_ecred_conn_rsp(struct l2cap_conn *conn,
+ 
+ 		BT_DBG("dcid[%d] 0x%4.4x", i, dcid);
+ 
++		orig = __l2cap_get_chan_by_dcid(conn, dcid);
++
+ 		/* Check if dcid is already in use */
+-		if (dcid && __l2cap_get_chan_by_dcid(conn, dcid)) {
++		if (dcid && orig) {
+ 			/* If a device receives a
+ 			 * L2CAP_CREDIT_BASED_CONNECTION_RSP packet with an
+ 			 * already-assigned Destination CID, then both the
+@@ -5293,10 +5296,24 @@ static inline int l2cap_ecred_conn_rsp(struct l2cap_conn *conn,
+ 			 */
+ 			l2cap_chan_del(chan, ECONNREFUSED);
+ 			l2cap_chan_unlock(chan);
+-			chan = __l2cap_get_chan_by_dcid(conn, dcid);
+-			l2cap_chan_lock(chan);
+-			l2cap_chan_del(chan, ECONNRESET);
+-			l2cap_chan_unlock(chan);
++
++			/* Check that the dcid channel mode is
++			 * L2CAP_MODE_EXT_FLOWCTL since this procedure is only
++			 * valid for that mode and shouldn't disconnect a dcid
++			 * in other modes.
++			 */
++			if (orig->mode == L2CAP_MODE_EXT_FLOWCTL) {
++				l2cap_chan_lock(orig);
++				/* Disconnect the original channel as it may be
++				 * considered connected since dcid has already
++				 * been assigned; don't call l2cap_chan_close
++				 * directly since that could lead to
++				 * l2cap_chan_del and then removing the channel
++				 * from the list while we're iterating over it.
++				 */
++				__set_chan_timer(orig, 0);
++				l2cap_chan_unlock(orig);
++			}
+ 			continue;
+ 		}
+ 
+-- 
+2.53.0
 
---===============0796148588323243903==--
