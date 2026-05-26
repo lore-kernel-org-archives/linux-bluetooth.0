@@ -1,164 +1,119 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-pg1-f196.google.com (mail-pg1-f196.google.com [209.85.215.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C623D3CF0
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 09:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916262C326F
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 10:34:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779788300; cv=none; b=MuujWJjb1tZBmUXFg+fJwe2HgV190FC61wgpBCAf41HDOpgpd5ODNAeycyi2VZNElOdsMZPuIYXETIVlsWkBorek9QKGPGGVm/0OvRSxUBrVktK+n73eXBjz1rtyaJT+H4E4nmiYMSTNx1Q0Cr7GyjoKsS5SKV+lOvzD+dbpe8w=
+	t=1779791698; cv=none; b=oLEFLDhY5YtYwX21cqPPLx5a9BHPc1tb/IXKjJbxZGLxHfwboFzKD49xI50QQBopCbTrbgQbKlv/9GERwOokwaHveq8obL5j1XHDsf/0pkYbWCIFPMUgNHaCrfpq24EH9MGrgGby8YB6ktwycUfBGxxGhKBOGBc4Z/Dxs0/P4gY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779788300; c=relaxed/simple;
-	bh=RXJWIuO8bbHBBvc8hAmAJEeX88yUO/65JWt4BhqEy1c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t5kuVhdP9lU+MKTHya2HTXkmHCghnQLPAkuh25ws494dWu0+bSl4Xjac544Q0QrKt6TsrVPxEFrdlOn4dWi/BfmyGG/M73xb6m+bNe1+ayd4+uyqX1fWGUavd8vKPfHhZcmsryzYmMwzHsvnCHkWWm5ztiqAUyDWlv13Vby8MWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=lEKKrvK4; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	s=arc-20240116; t=1779791698; c=relaxed/simple;
+	bh=qxgJ+dW28XzzRBAVpcCJuH+RNNnTYgSlxLKdicXGkVU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PZECjsJEHXT52DcMbNxecc1TP0BpuiRvDeMenn1+/8Fb7qMOOCumwDmx0XAYE6T45M/2T7mgiGJFJzIeuhyJa5IHzSdd3/mX1hT9ayeO0891gJ/07mgDjuEtGpIcMNo9cenGcwFQzpHzKHYRbAS+FMXqDiQTGaaD+CdlfrjUAeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ene+drFf; arc=none smtp.client-ip=209.85.215.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b="lEKKrvK4"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-44e1ebb3122so6322600f8f.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 02:38:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ene+drFf"
+Received: by mail-pg1-f196.google.com with SMTP id 41be03b00d2f7-c796163fac5so8242051a12.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 03:34:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1779788297; x=1780393097; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RXJWIuO8bbHBBvc8hAmAJEeX88yUO/65JWt4BhqEy1c=;
-        b=lEKKrvK49QgmB6x/y+qpXA1KA0bnbMEP6IO3yJzfYm3FBYiPa5hAcQMU6Z9eUMT1Ot
-         y2U+uCnwT0Dph9Fy9Wu73sypiEmroqtd7H0h358q8bgNpXyTvNsXFkG5w/uKC4Qt1Aic
-         IftxxMPtWO6sVN3DJ1bwOS2pmDQlaSlNlRSiv3fu9mhf0UoMeKUaxH5ByfzQWHn6nnK1
-         GlIqILqAaaPTbQ3PoNcAKnmiOzbz0r5tbaTbBAdfObngsANtyBiOXgkdVDLygd30rzys
-         VA2yfKASkWiYh9UoDqDQTzHe3OrNl7mGvDRIQxHWoVXEUoWMIdhTceUwajQ6ZOftmbBw
-         IbHQ==
+        d=gmail.com; s=20251104; t=1779791697; x=1780396497; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DgMaTqw1Z6+SL7IbSP0ZtbDSeZHxtr40iJ5WJXi5934=;
+        b=Ene+drFfXLXy7dxkN8OgJP/zqgTd0kKgGxPwkD6EZvV/9TSv4DVzXbFcvLTrVUriX0
+         PYTfmKijtpVCHFME04zKlx5YfwDLegPcF6BhpFI2QBowjtKcrODgekN3iqkC1+X6xD+r
+         ByhXx0ayd/Q8bQeClloEhjEP1TeO3LShe/N3/qdOPqvxbgDJq0HeTrVweNxcGhZEun7M
+         tetRcORj6iz5zegJ4GDSApwvr/BdQXnz0KqNARCoCGzMV6AouDe2A3dORjHmkAZdP+h6
+         MVZ9L1Cwsj4j6ynUNVAOz06Pqh5VjQ73Yue/2sKtDlVyxBWlpSYnxR6nz495XUUY0Lz9
+         tUKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779788297; x=1780393097;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RXJWIuO8bbHBBvc8hAmAJEeX88yUO/65JWt4BhqEy1c=;
-        b=mVBuaxi6voO+CAMrcl3/Rgv9OzZWJHRRrKfUZOYHJle1IgyxzS+XNB23a9GgPYNujM
-         25HZXJiE7E5sb7Pw96Wol1dbYmrWh/CInvL1VXQnD0pniV+3U5hnaRsYCcBjCa0WIsX0
-         zUI4IDuIVQWre+gE2BTHfZ8JjmHHghi8dhf4Sl4Vjqt21vQSN00V7B2nyxMWjJtfO4yD
-         p+dq15J+BNUmBq3l2/nc6gosPgD8Bg6x8Ab+ckFidswOsjZRwMsW40XDjbY57NCivIhJ
-         cGMfJMslrZzTccRzb6PFUVIQPm1Frk7pXs+qtWkfuz/3O0YwReU+qxoh+fo3vPIVwYNA
-         ZLhQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8lcwXdl+KtLo+8sycqfSsDmIm47Gc/EgRTLt01nT9nvTxIhhRvboPJO1GzOE/CcY0gItG+9YwHAAIS7N65nyA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJgCRE7t/fu4rbAj0h+NvzB+4S1pxi8BbZzG2An7g6e+PwLhKw
-	k5N2J0G9ZY/0VZXI6ikgKk1DS5DIUMR2Mc8ZHv22y97rhAW4U5Z/2zAD9QdbgJhLWFU=
-X-Gm-Gg: Acq92OH4qbRjTyB6byNrnhAQljcppvfclh7eVWZ+zc96OkAv0tYmJfEGJj3fPNzPoXQ
-	/JSZGzeA67QkKTnZQXUJq/HUjp6sG+lDKUBCsKCNUXvgWgRNv0dCYI5Spnb8mkhvPMeglV/VZzS
-	dgXJzHaxgN2gRq3oU9D9bExyOB3Fiaw7xo7/qCWGp/og4uUAOnDG2RPZsY+ECNlk1seE/PCQY9O
-	5s8k3SlynlAUzry44XFRQrulrxAF54emtOdoWkgkRBFqu3Y83g287+bzMfUiJYCI5GrT/pfkYeD
-	GIrTkYqbZf7hfc8hY32ufQ7Rk2nkiGorpw7tI5GbrP1naaMXi8H0Y4p+Zy7GnktOuLJxa9SqK41
-	QCGkgmtSk9aiOr99IxdZl30JnWLp9KJ5tLDQox00a65w5hkd77oMs6FNIHJ9ONSX+xhS48iBtN5
-	apyveZ2Z9Moi93IYg6EjQC2kDNcoEPEdjDaso0lsQYrtXu3l2jrI0FZSzHDtJWEzf0s+N1fpNYr
-	XSQDnBYHH+Vtg==
-X-Received: by 2002:a05:6000:1447:b0:452:d03a:7abe with SMTP id ffacd0b85a97d-45eb38b91c3mr32067787f8f.17.1779788297057;
-        Tue, 26 May 2026 02:38:17 -0700 (PDT)
-Received: from localhost (p200300f65f47db047ec792ae18ec05cd.dip0.t-ipconnect.de. [2003:f6:5f47:db04:7ec7:92ae:18ec:5cd])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-45eb6d49132sm34150219f8f.24.2026.05.26.02.38.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 02:38:16 -0700 (PDT)
-Date: Tue, 26 May 2026 11:38:15 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Ulf Hansson <ulfh@kernel.org>, 
-	"Christian A. Ehrhardt" <christian.ehrhardt@codasip.com>, linux-mmc@vger.kernel.org, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Wolfram Sang <wsa+renesas@sang-engineering.com>, 
-	linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
-	linux-bluetooth@vger.kernel.org, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, linux-mediatek@lists.infradead.org, 
-	Ping-Ke Shih <pkshih@realtek.com>, linux-wireless@vger.kernel.org, Felix Fietkau <nbd@nbd.name>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, 
-	Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, 
-	Brian Norris <briannorris@chromium.org>, Francesco Dolcini <francesco@dolcini.it>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: Re: [PATCH v1 1/6] sdio: Add syntactic sugar to store a pointer in
- sdio_driver_id
-Message-ID: <ahVpRY6lxiWbJ7Qc@monoceros>
-References: <cover.1776429984.git.u.kleine-koenig@baylibre.com>
- <c830049dcfcd99f005e2ff6742aace9341c61f13.1776429984.git.u.kleine-koenig@baylibre.com>
- <aeaMkfk_1t98e7SU@monoceros>
- <CABBYNZJzbEmYzTk2m+Y8SoHVouTMA6Gje_55iJsQ6cYtDLftbQ@mail.gmail.com>
+        d=1e100.net; s=20251104; t=1779791697; x=1780396497;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DgMaTqw1Z6+SL7IbSP0ZtbDSeZHxtr40iJ5WJXi5934=;
+        b=c/4Gu7ZKogGNTBT6+tHre/cNDO1WkbrB7+5vIMCZdPPMvco/9S+r2LGGNUqBqwIZyw
+         QI/zKXvjLEKEZ4rLoyf3IY2cApWz+nA6CR7kY/+ozj3FcqEmZX2zaEhOgaOuFDv5zS7v
+         irz6g9Mlo6He44Indj3/A+D8Wh+JBy4vuZ+Ufx7boEqCo1Vyd5EadGsjrsgNnpJmHqu2
+         BbtSjevMXW8niRtcH2nl1/1j8L9NYqpFkZHVj+b7B60+Tq0qnAicIjgoHDt4RoZYd7zK
+         0IVGGBmZpaXkpMLtQwX2c/HUkNJK6Cbdn+FwpO1s8+7cKyn+MVRN/1vfvwpuEtvpV8md
+         9ljw==
+X-Gm-Message-State: AOJu0YzbZxvN5MetlJPY9q62dd12dx7F14fLDrCQj9WdcSfOsUhnM0fM
+	3PsXgIEk9LdaDLyX0pcPcoVDKN53KLDOPiXTr25GwE8PtqSzmVqdoE9I
+X-Gm-Gg: Acq92OErooq+sBbNersZ3PWHS+ZcWE6nTdu9qUzSjje4ckuaXnp7RBk6jBqYxpXYeCk
+	OI6lJtNU5SqYpC29/VhW8ex8Svj8yBsby+mBpch7DAe2aH4hyEFJDCRVUcug2u5icF6RHjKTPbU
+	/TRjGAH9hYT1t/8x6TwtTZ64wnSGJajTXJkfXW2+BynRtNHelxyiFTYExs2bRPGuofeTjIE9Xe4
+	RZE/3v/NbTMRYqr2vZTK6AYYXCZVmyzheS/HMaHNfl56Rk13RMUwMQROw91Y1kH/zXt1zAjzZwq
+	URal3J5qrp0VzuLEUKAV8+xm74QOc/VJx0lY9px9andWKgT+1evXj0QJLSrWzi9+5+eV7cAdFz7
+	flJRuiL8Jz+m3+K5HKmeNPS2iWHHo97R6YEaDC10oVnr5LvXpGhXybIqXTZjQfYgm6MOB9BmPY6
+	cnVDZFHu2g2KAX0jKhN9zOTl8CDp3d8lE0zaJjbhB5MexH8lRGU2XRg/MfNu27
+X-Received: by 2002:a05:6a20:a108:b0:39f:a42:9247 with SMTP id adf61e73a8af0-3b328f56208mr18612092637.37.1779791696981;
+        Tue, 26 May 2026 03:34:56 -0700 (PDT)
+Received: from KIPREYXIAO-MC2.tencent.com ([43.132.141.25])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c85202b946dsm10176488a12.13.2026.05.26.03.34.54
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 26 May 2026 03:34:55 -0700 (PDT)
+From: Zhenghang Xiao <kipreyyy@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Zhenghang Xiao <kipreyyy@gmail.com>
+Subject: [PATCH bluetooth-next] Bluetooth: L2CAP: fix list corruption in l2cap_ecred_conn_rsp
+Date: Tue, 26 May 2026 18:34:41 +0800
+Message-ID: <20260526103441.73180-1-kipreyyy@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="vtihelpcu7j6kvgw"
-Content-Disposition: inline
-In-Reply-To: <CABBYNZJzbEmYzTk2m+Y8SoHVouTMA6Gje_55iJsQ6cYtDLftbQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
+The duplicate DCID handling in l2cap_ecred_conn_rsp() calls
+l2cap_chan_del() on the channel found by __l2cap_get_chan_by_dcid(),
+which may be the 'tmp' pointer of the enclosing
+list_for_each_entry_safe loop. list_del() poisons tmp->list.next with
+LIST_POISON1, and the next iteration dereferences it:
 
---vtihelpcu7j6kvgw
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v1 1/6] sdio: Add syntactic sugar to store a pointer in
- sdio_driver_id
-MIME-Version: 1.0
+  KASAN: wild-memory-access in range [0xdead000000000100-0xdead000000000107]
+  pc : l2cap_recv_frame+0x3b7c/0x7360
 
-On Mon, Apr 20, 2026 at 04:46:56PM -0400, Luiz Augusto von Dentz wrote:
-> Hi Uwe,
->=20
-> On Mon, Apr 20, 2026 at 4:31=E2=80=AFPM Uwe Kleine-K=C3=B6nig (The Capabl=
-e Hub)
-> <u.kleine-koenig@baylibre.com> wrote:
-> >
-> > Hello,
-> >
-> > On Fri, Apr 17, 2026 at 03:10:47PM +0200, Uwe Kleine-K=C3=B6nig (The Ca=
-pable Hub) wrote:
-> > > On all current Linux architectures sizeof(long) =3D=3D sizeof(void *)=
- and
-> > > this is used a lot through the kernel. For example it enables the usu=
-al
-> > > practice to store pointers in sdio_driver_id's .driver_data member.
-> > >
-> > > This works fine, but involves casting and thus isn't type-safe.
-> > > Additionally with the CHERI architecture extension there are machines
-> > > with sizeof(void *) > sizeof(long) for with the traditional approach =
-of
-> > > storing a pointer in .driver_data doesn't work.
-> > >
-> > > By replacing the plain unsigned long .driver_data by an anonymous uni=
-on,
-> > > most of the casting can be dropped and it yields a working solution f=
-or
-> > > CHERI.
-> > >
-> > > All users of struct sdio_driver_id are initialized in a way that is
-> > > compatible with the new definition, so no adaptions are needed there.
-> >
-> > sashiko.dev found s/sdio_driver_id/sdio_device_id/ twice in the commit
-> > log and once in the short log. If you consider applying this patch
-> > please adapt the commit message accordingly.
->=20
-> No problem I can fix them up once applying.
+Break out of the loop after the duplicate handling to avoid iterating
+with the corrupted pointer. Remaining pending channels for the same
+ident are not processed; they will time out via the standard L2CAP
+channel timeout since the response indicates a misbehaving peer. Add a
+NULL check on the second __l2cap_get_chan_by_dcid() call for robustness.
 
-Now that Ulf gave his blessing, would you please merge the first patch
-and the bluetooth ones (#2 and #3)? I will follow up then once your tree
-hits Linus's tree with the remaining patches for wifi.
+Fixes: 15f02b910562 ("Bluetooth: L2CAP: Add initial code for Enhanced Credit Based Mode")
+Signed-off-by: Zhenghang Xiao <kipreyyy@gmail.com>
+---
+ net/bluetooth/l2cap_core.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Please don't forget about s/sdio_driver_id/sdio_device_id/.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 7701528f1167..3456d741fb1c 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5292,10 +5292,12 @@ static inline int l2cap_ecred_conn_rsp(struct l2cap_conn *conn,
+ 			l2cap_chan_del(chan, ECONNREFUSED);
+ 			l2cap_chan_unlock(chan);
+ 			chan = __l2cap_get_chan_by_dcid(conn, dcid);
+-			l2cap_chan_lock(chan);
+-			l2cap_chan_del(chan, ECONNRESET);
+-			l2cap_chan_unlock(chan);
+-			continue;
++			if (chan) {
++				l2cap_chan_lock(chan);
++				l2cap_chan_del(chan, ECONNRESET);
++				l2cap_chan_unlock(chan);
++			}
++			break;
+ 		}
+ 
+ 		switch (result) {
+-- 
+2.50.1 (Apple Git-155)
 
-Thanks
-Uwe
-
---vtihelpcu7j6kvgw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmoVagQACgkQj4D7WH0S
-/k5P8Af7B8UAQJSjX3WHqmRdJihAfbJzuB0qsIl9eOVYHCAaEiAnVpqnjNkntHIU
-lX0CcswR4fXl9pEV+1mobDSLHsbDhg9BtXTuAm4pavvYRoS5isVyCkasNUeNDGt9
-B68NNR4oKyApL/DFvXCG4CPWrhA8TL+m9HE7DCkm2IYcH2TB2WdUCQnnQFV8E94x
-1eyEfCrTCqn5UlW+2urdJLmngSk7o3yv1wJ36pgHxMNQMXU8mPWN4nOCqEZAvtmP
-CrtRviKQ1QpRXNBA7blduSvvqqfr7uQEKta7E2argdEhkor6XY/fTTlu687QRi6n
-Po62G/0XCxIUYpanmYULzD9YbpSlyA==
-=Zdz8
------END PGP SIGNATURE-----
-
---vtihelpcu7j6kvgw--
