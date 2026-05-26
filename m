@@ -1,72 +1,68 @@
-Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833D6402BB0
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 17:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0738401A32
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 17:03:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779815005; cv=none; b=iMHgb8RjLGZyLgBVORBs1xIV94aLbri18ShOP7wbzBYCnBqxvc4dlqaC84JM+EazztyE+VhN5kIkIO1kb0AqWHhMOP5HVDyTWapGmriLM+0kKvt5wrbmhsZE/K84ocs+Tcy3pdHVfXyBUzFxCRylbDFMxv24IGHZtaIB4VrPbxI=
+	t=1779815035; cv=none; b=ltZR4ujNB68A50+JKJdF4v09E6uPGonmlM51o63EreFehMXaifS8vu1MDVx4ErXtASObDH+XYHm9tItCBoo/pzK+cDpTlD3JTI4dmwIJJu6QfyjpGsb4n3Gpz17I2DDcO4DeiwJ+eykPnBT0IvdDn4mgbybpjn7KkBCsL+sI/Ik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779815005; c=relaxed/simple;
-	bh=dd78etAQqz5hjC9CGJC1A/A9NzWdPk6BmX70qi1ie8E=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VEvsCi5kkNNwipO12gMtHIlbD13cSKE6QzjBKZ5ZRdnt5SFpXvi7iZYiRBhC0SVIbfYYXrUJ/VRwx6oa1pyjjYtyTYh6cuy4lkyOTBptmS0swEm+31xcg9lO5DRTQvW3804Wo1fF2O6MWbOjsuDlESNA25OyM2FSZ+XdqQtu75g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QUkkqaEW; arc=none smtp.client-ip=209.85.222.54
+	s=arc-20240116; t=1779815035; c=relaxed/simple;
+	bh=kLK7n+vkcbNbpkN7XtfAaK1ANG/3jmVhnzeALSz9vc4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=P8/y/efILts3gbvS+nPBxy02UtN3VQ5etp2f3WcM6IF6TdPrnYOsptbfUP4+ox9SqVW7PJEE7rxifMhWYiHkzhNcTQHOWgkAanAmi1V2R0F19jij3+yRET+i+qVydUzhGLhImA2AqQ3LzPOA3LvOMZGT8pILOcEE5I18habmVAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ebje1mxF; arc=none smtp.client-ip=209.85.221.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QUkkqaEW"
-Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-9568bae58f7so7247763241.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 10:03:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ebje1mxF"
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-575320e6f2aso8817916e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 10:03:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779815001; x=1780419801; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yf13rR6jaI8wruZQKovSg5s6dxleIAE/w7hkWZuQxVU=;
-        b=QUkkqaEW/qY2TsykmvOzZCySIDaenst61obzPFJ2L7u/oL79vuybT/e1iE5k55Uekg
-         2E/IDkoYwLJ+ZJU1DX9LOng+YwJtcMRXCBorcPZt1gtR6zVkqWT9+wvAwjYYSPba2LPA
-         sAZazY8rtXzFldAsU138k92Goh3oUZRYKX586lTtdGldDCmzpvcEvVFqft1R9h48nRKH
-         TN601TQn270HngxWsIEbd8kSSICl43Kuy14HOH6Zde8iIOuhP3oREf7B2fctj8IMox/N
-         9AeBmIch3G0XjecsqemLZUbxUPGG1cTnYCcLm58YTwOpuM0MdZ3PhHc0djls2FBf/MRk
-         yJUA==
+        d=gmail.com; s=20251104; t=1779815032; x=1780419832; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ub7zbATpGlY9mMap+Zj829sRZ8OviYmLdectZ67fEn4=;
+        b=ebje1mxFe8gN8cwPHT9wrPTCEtXfMtVLMpZlLHG5zv8jIw9CybLBDiQtDQq7c6QJQg
+         uzZOfCipe6xurpR/lwl6QSwkfQgIrlou4Trjt98LPedSp2Ga6UG8lXgFulbu1c7DoxFw
+         HDLzxYX1CL/pUhB+b4NjvaFv5/yJ2oDBtdO6mTJ6bycrgYG1n32Kt+5/5EUDCCPTyGQc
+         ZjLdSldRfRegRD1w28vHV0Fp1b9ZBNLrIaIe29UyuUxoO+ggM1UpxI66UMhX46glhM38
+         pjUpWP9N5yM1pOOg0AE9rVlgXrBFArfqKtYMEAzM+9EVKm0KyVOPzW0ZaqvIwJhiejz7
+         Ojww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779815001; x=1780419801;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yf13rR6jaI8wruZQKovSg5s6dxleIAE/w7hkWZuQxVU=;
-        b=qg6caCoaiqEgHWzmzRM0LcamADoBv6YrGIDezoqWjhSy8svw3vsJMtfOrLVXhpgFmB
-         bBHkWBg81bRSN/ijJQUbu3VH1jDjnxZnuIC/hWt1c0M8P9/btKQAEyv8ZFX+4BvXA29M
-         2K7/IOrAeB0Fkybg4S2hstetPRclENv7rUg1zQLpe4H2YRw8WomSPQStKhidkBIg1j73
-         YC7kz81o4/dlDilvN7Rt+d3sgVobYSIc40aklerxF5zZZWJ14RFg1slDq/FMbaBoP0yk
-         ogZnM8pLAepKjqes7+BYjNP6zeOUuRAD32G+G5CiC4Eo+M040igLgz3PG24MJnuVvMMb
-         A5vw==
-X-Gm-Message-State: AOJu0YwizzLpzKT/nHYGwRULp7exE8BQtDBAVIr/b7duKkGf2+dnNIoK
-	gewNblSaIDILR5m/Neyu0p8JH48Q4BgpbgdWe1pXyt/J57h5I5Ae+QVnZFzTkQ==
-X-Gm-Gg: Acq92OFfJkKgN8J2qLMm1ZabeefNW66DRg/NuTEHDdS15EMsbhWn+T6le5hlPHEMO9G
-	pS3kLbC3RWd7d0bT4ufX4xrAIJpxBhhborkEqgthVUDAtNAOy7USDgTEtIn4GfYgTQOOVvRiron
-	Acb2pQaxlyowIOT6+xTfd7cC52sNAdN9btET4F5eV7P6valr/roby6NoD+baNsuQ1uDMnQ1nNa4
-	TTftDABsVBzoSDkZqRhNVQEJXRpddjIDFWvm9HyoVLx+SlTA7hUsfgMmzxJN60KvHt+8TMYhmcH
-	ArtMVvlO7/8f5wZF2qgcEN74+6wDmTyq8pyhb4s+TOUP062Dv5/wvog0MJYrTWDK3IHbNXRK22O
-	3TVJ0f9BWgF9x9X/UIgwhAIYp0Et2AO13j/CTesglrP266G7OaAOuCtJR+gL7RDj255/mfUYFyM
-	VjxLZSBknG8ae4uSyN/FsfHi7FcyI9H2UqGo+mvTWTFpvvxmgKEZdB7iqiWs4uiLRHTJdZ9zuEF
-	H8OIaaMZpYjt3MuCg==
-X-Received: by 2002:a05:6122:e250:b0:56d:2ca7:fbc3 with SMTP id 71dfb90a1353d-5865fc0355cmr10176187e0c.5.1779815000765;
-        Tue, 26 May 2026 10:03:20 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779815032; x=1780419832;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ub7zbATpGlY9mMap+Zj829sRZ8OviYmLdectZ67fEn4=;
+        b=bJ9V0K/MadfChPwOXomO+0tUw9NNRHLdMxwxNKtPkkBDwdTk31lRAIeZixry6GM3wv
+         GkLKea5wybruY3mZ7jBDnUMVuAt9Kq3QCNjo0Im7dQukY6in4uBCSNFl+Z57qQofWwUn
+         wL5flxU60o9pdLSp8mwCqqeZN/FLzXQSuAbhpSZb35UqagllrZ7JjMT2y4SAsEq2WcEs
+         zB8ARxDfwjlhpgo4au47LMmSJbHmqJUR6LvXS5Zj9Ihhqs97nz7DRq/7JOZkcf9uTtfy
+         o8ml3KeAJhGU50gIEtRMbCOxOmWQf0cGGpQpavjAPzHp4xRHCDJC2xYBrqzp0DzXZhYg
+         o5zA==
+X-Gm-Message-State: AOJu0YzeV4GWuAdA+aZHGVxO5lTiKuYdDQlbLNonaKQCMErZ1fQsapBr
+	+PBS2/i6HxjU9yosboQz9IKOlgwdoKKQkUl4N79JRF+s9B/knLMi7LAH394Auw==
+X-Gm-Gg: Acq92OGsI1ugHqj7Zwy6ISdbZt3MSHvSyEbYvdJeXdHJI02e6Bi8hTWBSQKd3WN73Jc
+	HD7KaZ3gw9eziugJ2r9HYH2+hs3tvRIPmeQpmPaeObJbiGZrzx5OQ3EOeICp4uXIBDj8GQabzoT
+	idcXUVbMFHcxVQGmrD0Nk6D0LJPXX2XCbIr7D1U5rDpMlsGKLBFXxySkVUpnuSdu/u+BjhI91Ll
+	s8eLgXxU05TCAe01ZXQPFKQfuAYYoj8ErJQ+JXqZ3vRjNkaKnBCaYq/GcGkzA4fmlttsGFikdzg
+	F7YlC/mjMq3hb4Be+aIha1I8o0Niz+e7BLqCwQTq/FBTgleMaBy8ePraBmvAQnP2N3tcoXNoQeh
+	QxS/booSCtO2taFekY3nZBNxHRr87LSj0NeGExO7NrUKWxKGz7SVTPLayhrk8F0ltLUMYSr4sxC
+	6NmFyuQStyxGDLG2u9I++hhZ5s0wqtfpvM4qJ78MeCITdB5oJMph4oUG/gm+8yd7pVsvhOGsGKB
+	SPZWzm2OkcQ4sIxny23pPRvSQdm80l+9Y2z9KM=
+X-Received: by 2002:a05:6122:4896:b0:575:27de:3eab with SMTP id 71dfb90a1353d-5866347ff44mr11214424e0c.9.1779815032368;
+        Tue, 26 May 2026 10:03:52 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-588c129cba5sm14603504e0c.14.2026.05.26.10.03.19
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-586f2f79814sm17485247e0c.6.2026.05.26.10.03.49
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 10:03:20 -0700 (PDT)
+        Tue, 26 May 2026 10:03:50 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/2] monitor: Add decoding support for LE Set Host Feature V2
-Date: Tue, 26 May 2026 13:03:09 -0400
-Message-ID: <20260526170309.3529062-2-luiz.dentz@gmail.com>
+Subject: [PATCH v1] Bluetooth: hci_sync: Add support for HCI_LE_Set_Host_Feature [v2]
+Date: Tue, 26 May 2026 13:03:41 -0400
+Message-ID: <20260526170341.3529825-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260526170309.3529062-1-luiz.dentz@gmail.com>
-References: <20260526170309.3529062-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -77,94 +73,69 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add decoding support for LE Set Host Feature V2 (0x2097) command
-which uses a 16-bit bit_number field to support extended LE feature
-pages:
+This adds support for using HCI_LE_Set_Host_Feature [v2] instead of v1
+if LL Extented Features is supported and the controller supports the
+command.
 
-< HCI Command: LE Set Host F.. (0x08|0x0097) plen 3
-        Bit Number: 32
-        Features[0/0][8]:
-        00 00 00 00 01 00 00 00                          ........
-          Connected Isochronous Stream (Host Support)
-        Bit Value: 1
-> HCI Event: Command Complete (0x0e) plen 4
-      LE Set Host Feature V2 (0x08|0x0097) ncmd 1
-        Status: Success (0x00)
-
-Assisted-by: OpenCode:claude-opus-4.6
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- monitor/bt.h     |  7 +++++++
- monitor/packet.c | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 39 insertions(+)
+ include/net/bluetooth/hci.h |  6 ++++++
+ net/bluetooth/hci_sync.c    | 21 ++++++++++++++++++++-
+ 2 files changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/monitor/bt.h b/monitor/bt.h
-index a849c18a96b5..6efccb27e758 100644
---- a/monitor/bt.h
-+++ b/monitor/bt.h
-@@ -3186,6 +3186,13 @@ struct bt_hci_rsp_le_cs_test {
- #define BT_HCI_CMD_LE_CS_TEST_END		0x2096
- #define BT_HCI_BIT_LE_CS_TEST_END		BT_HCI_CMD_BIT(23, 4)
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 572b1c620c5d..26a84dbf548a 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -2486,6 +2486,12 @@ struct hci_rp_le_cs_test {
  
-+#define BT_HCI_CMD_LE_SET_HOST_FEATURE_V2	0x2097
-+#define BT_HCI_BIT_LE_SET_HOST_FEATURE_V2	BT_HCI_CMD_BIT(47, 4)
-+struct bt_hci_cmd_le_set_host_feature_v2 {
-+	uint16_t bit_number;
-+	uint8_t  bit_value;
-+} __attribute__ ((packed));
+ #define HCI_OP_LE_CS_TEST_END			0x2096
+ 
++#define HCI_OP_LE_SET_HOST_FEATURE_V2		0x2097
++struct hci_cp_le_set_host_feature_v2 {
++	__u16	bit_number;
++	__u8	bit_value;
++} __packed;
 +
- #define BT_HCI_CMD_LE_FSU			0x209d
- #define BT_HCI_BIT_LE_FSU			BT_HCI_CMD_BIT(48, 1)
- struct bt_hci_cmd_le_fsu {
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 41f0226c39f8..dcb067ce874f 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -9820,6 +9820,33 @@ static void le_cs_test_cmd(uint16_t index, const void *data, uint8_t size)
- 		cmd->override_parameters_length);
+ /* ---- HCI Events ---- */
+ struct hci_ev_status {
+ 	__u8    status;
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index aff8562a8690..944bd29394c2 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -4583,11 +4583,30 @@ static int hci_set_le_support_sync(struct hci_dev *hdev)
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
  }
  
-+static void le_set_host_feature_v2_cmd(uint16_t index, const void *data,
-+							uint8_t size)
++/* LE Set Host Feature V2 */
++static int hci_le_set_host_feature_v2_sync(struct hci_dev *hdev, u16 bit,
++					   u8 value)
 +{
-+	const struct bt_hci_cmd_le_set_host_feature_v2 *cmd = data;
-+	uint8_t page;
-+	uint8_t features[24] = {};
-+	uint16_t bit_number = le16_to_cpu(cmd->bit_number);
++	struct hci_cp_le_set_host_feature_v2 cp;
 +
-+	print_field("Bit Number: %u", bit_number);
++	memset(&cp, 0, sizeof(cp));
 +
-+	if (bit_number < 64) {
-+		features[bit_number / 8] |= (1 << (bit_number % 8));
-+		print_features(0, features, 0x01);
-+	} else {
-+		uint16_t bit;
++	/* Connected Isochronous Channels (Host Support) */
++	cp.bit_number = bit;
++	cp.bit_value = value;
 +
-+		page = (bit_number - 64) / 24 + 1;
-+		/* Adjust the bit number to be relative to the page */
-+		bit = (bit_number - 64) % 24;
-+		/* Set the bit in the features array */
-+		features[bit / 8] |= (1 << ((bit % 8)));
-+		print_features(page, features, 0x01);
-+	}
-+
-+	print_field("Bit Value: %u", cmd->bit_value);
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_HOST_FEATURE_V2,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
 +}
 +
- static void le_cs_test_rsp(uint16_t index, const void *data, uint8_t size)
+ /* LE Set Host Feature */
+-static int hci_le_set_host_feature_sync(struct hci_dev *hdev, u8 bit, u8 value)
++static int hci_le_set_host_feature_sync(struct hci_dev *hdev, u16 bit, u8 value)
  {
- 	const struct bt_hci_rsp_le_cs_test *rsp = data;
-@@ -11013,6 +11040,11 @@ static const struct opcode_data opcode_table[] = {
- 				true},
- 	{ BT_HCI_CMD_LE_CS_TEST_END, BT_HCI_BIT_LE_CS_TEST_END,
- 				"LE CS Test End" },
-+	{ BT_HCI_CMD_LE_SET_HOST_FEATURE_V2, BT_HCI_BIT_LE_SET_HOST_FEATURE_V2,
-+			"LE Set Host Feature V2",
-+			le_set_host_feature_v2_cmd,
-+			sizeof(struct bt_hci_cmd_le_set_host_feature_v2),
-+			true, status_rsp, 1, true },
- 	{ BT_HCI_CMD_LE_FSU, BT_HCI_BIT_LE_FSU,
- 				"LE Frame Space Update", le_fsu_cmd,
- 				sizeof(struct bt_hci_cmd_le_fsu),
+ 	struct hci_cp_le_set_host_feature cp;
+ 
++	if (ll_ext_feature_capable(hdev) && hdev->commands[47] & BIT(4))
++		return hci_le_set_host_feature_v2_sync(hdev, bit, value);
++
+ 	memset(&cp, 0, sizeof(cp));
+ 
+ 	/* Connected Isochronous Channels (Host Support) */
 -- 
 2.53.0
 
