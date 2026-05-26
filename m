@@ -1,80 +1,164 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48E833CCFA9
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 07:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C623D3CF0
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 09:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779782030; cv=none; b=UbN2UehUhfycC8tfC/64KFnCe5oFp7fL8Dcd0Q2n9EzVVynrUmPymyqpZ2BHOgVji1f6JBU3gKFm41pURamoz9ADR5tARw12FkjxC0Autcr3lOZ7G0saOMnP/jP9H5FpE++xE+Hp+rc8FIP7cVBil55+zOX+yRhHSBqmiv7vrAE=
+	t=1779788300; cv=none; b=MuujWJjb1tZBmUXFg+fJwe2HgV190FC61wgpBCAf41HDOpgpd5ODNAeycyi2VZNElOdsMZPuIYXETIVlsWkBorek9QKGPGGVm/0OvRSxUBrVktK+n73eXBjz1rtyaJT+H4E4nmiYMSTNx1Q0Cr7GyjoKsS5SKV+lOvzD+dbpe8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779782030; c=relaxed/simple;
-	bh=02KWLKSjnjaZY/yRW2s4T5+Bd7Sk2a5sdoVYCOmrqvk=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jck1/yeHHC/sWz3DaK6fMz/fLgT+lhRez11iTwI95DPyGssCFyKj/CmuLTT6oFIDp99glJaJgl4h3ylPuN9mGp7docQHu+uhzet87Zt58j/6b60uwenyIbUNiWvIPBoRYTh9KsotieJDcjw4MZ/X/m7MZa5h7coVghRS04ZWGRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UT+nItI6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779788300; c=relaxed/simple;
+	bh=RXJWIuO8bbHBBvc8hAmAJEeX88yUO/65JWt4BhqEy1c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t5kuVhdP9lU+MKTHya2HTXkmHCghnQLPAkuh25ws494dWu0+bSl4Xjac544Q0QrKt6TsrVPxEFrdlOn4dWi/BfmyGG/M73xb6m+bNe1+ayd4+uyqX1fWGUavd8vKPfHhZcmsryzYmMwzHsvnCHkWWm5ztiqAUyDWlv13Vby8MWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=lEKKrvK4; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UT+nItI6"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1B02FC2BCC7
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 07:53:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779782030;
-	bh=02KWLKSjnjaZY/yRW2s4T5+Bd7Sk2a5sdoVYCOmrqvk=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=UT+nItI6/9A2Fusi0tPnWZTm9JRFtlRM55Ovg9z/nK6ljMpJO6GR+i/d2UCrZqDn4
-	 9vl1dcehAavJfttdPPKbKw4bmFIMJG+RUFdjcepaDr6YcqWFaLrdn7adt+jFGMTr/2
-	 iPjmSNgeyLlHRCOXw1b9/I6buSKH5qbgv0WC7nLTvSGDjptmGgQ99zlL8kV5lgri6D
-	 PSoB8hVFORPYhVypopdk5RKofQBpv9NCmMYxIix9MchgOPchOUBDDgAOQydd4HCHz/
-	 c7yYWK3/PdhWaCaU6Oa3xPSAKpaHHsdKhmMxzS4dyVy6KfGsC9syn6tArDeVA1rECi
-	 zMeCkGZSXJ2kA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 12E3EC3279F; Tue, 26 May 2026 07:53:50 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221521] Bluetooth: btusb/mt7921 - Failed to send wmt func ctrl
- (-22) on MediaTek MT7921 combo adapter
-Date: Tue, 26 May 2026 07:53:49 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: CODE_FIX
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-221521-62941-UiX617uG4V@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221521-62941@https.bugzilla.kernel.org/>
-References: <bug-221521-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b="lEKKrvK4"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-44e1ebb3122so6322600f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 02:38:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre.com; s=google; t=1779788297; x=1780393097; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RXJWIuO8bbHBBvc8hAmAJEeX88yUO/65JWt4BhqEy1c=;
+        b=lEKKrvK49QgmB6x/y+qpXA1KA0bnbMEP6IO3yJzfYm3FBYiPa5hAcQMU6Z9eUMT1Ot
+         y2U+uCnwT0Dph9Fy9Wu73sypiEmroqtd7H0h358q8bgNpXyTvNsXFkG5w/uKC4Qt1Aic
+         IftxxMPtWO6sVN3DJ1bwOS2pmDQlaSlNlRSiv3fu9mhf0UoMeKUaxH5ByfzQWHn6nnK1
+         GlIqILqAaaPTbQ3PoNcAKnmiOzbz0r5tbaTbBAdfObngsANtyBiOXgkdVDLygd30rzys
+         VA2yfKASkWiYh9UoDqDQTzHe3OrNl7mGvDRIQxHWoVXEUoWMIdhTceUwajQ6ZOftmbBw
+         IbHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779788297; x=1780393097;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RXJWIuO8bbHBBvc8hAmAJEeX88yUO/65JWt4BhqEy1c=;
+        b=mVBuaxi6voO+CAMrcl3/Rgv9OzZWJHRRrKfUZOYHJle1IgyxzS+XNB23a9GgPYNujM
+         25HZXJiE7E5sb7Pw96Wol1dbYmrWh/CInvL1VXQnD0pniV+3U5hnaRsYCcBjCa0WIsX0
+         zUI4IDuIVQWre+gE2BTHfZ8JjmHHghi8dhf4Sl4Vjqt21vQSN00V7B2nyxMWjJtfO4yD
+         p+dq15J+BNUmBq3l2/nc6gosPgD8Bg6x8Ab+ckFidswOsjZRwMsW40XDjbY57NCivIhJ
+         cGMfJMslrZzTccRzb6PFUVIQPm1Frk7pXs+qtWkfuz/3O0YwReU+qxoh+fo3vPIVwYNA
+         ZLhQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8lcwXdl+KtLo+8sycqfSsDmIm47Gc/EgRTLt01nT9nvTxIhhRvboPJO1GzOE/CcY0gItG+9YwHAAIS7N65nyA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJgCRE7t/fu4rbAj0h+NvzB+4S1pxi8BbZzG2An7g6e+PwLhKw
+	k5N2J0G9ZY/0VZXI6ikgKk1DS5DIUMR2Mc8ZHv22y97rhAW4U5Z/2zAD9QdbgJhLWFU=
+X-Gm-Gg: Acq92OH4qbRjTyB6byNrnhAQljcppvfclh7eVWZ+zc96OkAv0tYmJfEGJj3fPNzPoXQ
+	/JSZGzeA67QkKTnZQXUJq/HUjp6sG+lDKUBCsKCNUXvgWgRNv0dCYI5Spnb8mkhvPMeglV/VZzS
+	dgXJzHaxgN2gRq3oU9D9bExyOB3Fiaw7xo7/qCWGp/og4uUAOnDG2RPZsY+ECNlk1seE/PCQY9O
+	5s8k3SlynlAUzry44XFRQrulrxAF54emtOdoWkgkRBFqu3Y83g287+bzMfUiJYCI5GrT/pfkYeD
+	GIrTkYqbZf7hfc8hY32ufQ7Rk2nkiGorpw7tI5GbrP1naaMXi8H0Y4p+Zy7GnktOuLJxa9SqK41
+	QCGkgmtSk9aiOr99IxdZl30JnWLp9KJ5tLDQox00a65w5hkd77oMs6FNIHJ9ONSX+xhS48iBtN5
+	apyveZ2Z9Moi93IYg6EjQC2kDNcoEPEdjDaso0lsQYrtXu3l2jrI0FZSzHDtJWEzf0s+N1fpNYr
+	XSQDnBYHH+Vtg==
+X-Received: by 2002:a05:6000:1447:b0:452:d03a:7abe with SMTP id ffacd0b85a97d-45eb38b91c3mr32067787f8f.17.1779788297057;
+        Tue, 26 May 2026 02:38:17 -0700 (PDT)
+Received: from localhost (p200300f65f47db047ec792ae18ec05cd.dip0.t-ipconnect.de. [2003:f6:5f47:db04:7ec7:92ae:18ec:5cd])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-45eb6d49132sm34150219f8f.24.2026.05.26.02.38.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 May 2026 02:38:16 -0700 (PDT)
+Date: Tue, 26 May 2026 11:38:15 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Ulf Hansson <ulfh@kernel.org>, 
+	"Christian A. Ehrhardt" <christian.ehrhardt@codasip.com>, linux-mmc@vger.kernel.org, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Wolfram Sang <wsa+renesas@sang-engineering.com>, 
+	linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
+	linux-bluetooth@vger.kernel.org, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, linux-mediatek@lists.infradead.org, 
+	Ping-Ke Shih <pkshih@realtek.com>, linux-wireless@vger.kernel.org, Felix Fietkau <nbd@nbd.name>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, 
+	Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, 
+	Brian Norris <briannorris@chromium.org>, Francesco Dolcini <francesco@dolcini.it>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: Re: [PATCH v1 1/6] sdio: Add syntactic sugar to store a pointer in
+ sdio_driver_id
+Message-ID: <ahVpRY6lxiWbJ7Qc@monoceros>
+References: <cover.1776429984.git.u.kleine-koenig@baylibre.com>
+ <c830049dcfcd99f005e2ff6742aace9341c61f13.1776429984.git.u.kleine-koenig@baylibre.com>
+ <aeaMkfk_1t98e7SU@monoceros>
+ <CABBYNZJzbEmYzTk2m+Y8SoHVouTMA6Gje_55iJsQ6cYtDLftbQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="vtihelpcu7j6kvgw"
+Content-Disposition: inline
+In-Reply-To: <CABBYNZJzbEmYzTk2m+Y8SoHVouTMA6Gje_55iJsQ6cYtDLftbQ@mail.gmail.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221521
 
-Artem S. Tashkinov (aros@gmx.com) changed:
+--vtihelpcu7j6kvgw
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 1/6] sdio: Add syntactic sugar to store a pointer in
+ sdio_driver_id
+MIME-Version: 1.0
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |sergey@batalov.email
+On Mon, Apr 20, 2026 at 04:46:56PM -0400, Luiz Augusto von Dentz wrote:
+> Hi Uwe,
+>=20
+> On Mon, Apr 20, 2026 at 4:31=E2=80=AFPM Uwe Kleine-K=C3=B6nig (The Capabl=
+e Hub)
+> <u.kleine-koenig@baylibre.com> wrote:
+> >
+> > Hello,
+> >
+> > On Fri, Apr 17, 2026 at 03:10:47PM +0200, Uwe Kleine-K=C3=B6nig (The Ca=
+pable Hub) wrote:
+> > > On all current Linux architectures sizeof(long) =3D=3D sizeof(void *)=
+ and
+> > > this is used a lot through the kernel. For example it enables the usu=
+al
+> > > practice to store pointers in sdio_driver_id's .driver_data member.
+> > >
+> > > This works fine, but involves casting and thus isn't type-safe.
+> > > Additionally with the CHERI architecture extension there are machines
+> > > with sizeof(void *) > sizeof(long) for with the traditional approach =
+of
+> > > storing a pointer in .driver_data doesn't work.
+> > >
+> > > By replacing the plain unsigned long .driver_data by an anonymous uni=
+on,
+> > > most of the casting can be dropped and it yields a working solution f=
+or
+> > > CHERI.
+> > >
+> > > All users of struct sdio_driver_id are initialized in a way that is
+> > > compatible with the new definition, so no adaptions are needed there.
+> >
+> > sashiko.dev found s/sdio_driver_id/sdio_device_id/ twice in the commit
+> > log and once in the short log. If you consider applying this patch
+> > please adapt the commit message accordingly.
+>=20
+> No problem I can fix them up once applying.
 
---- Comment #14 from Artem S. Tashkinov (aros@gmx.com) ---
-*** Bug 221576 has been marked as a duplicate of this bug. ***
+Now that Ulf gave his blessing, would you please merge the first patch
+and the bluetooth ones (#2 and #3)? I will follow up then once your tree
+hits Linus's tree with the remaining patches for wifi.
 
---=20
-You may reply to this email to add a comment.
+Please don't forget about s/sdio_driver_id/sdio_device_id/.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Thanks
+Uwe
+
+--vtihelpcu7j6kvgw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmoVagQACgkQj4D7WH0S
+/k5P8Af7B8UAQJSjX3WHqmRdJihAfbJzuB0qsIl9eOVYHCAaEiAnVpqnjNkntHIU
+lX0CcswR4fXl9pEV+1mobDSLHsbDhg9BtXTuAm4pavvYRoS5isVyCkasNUeNDGt9
+B68NNR4oKyApL/DFvXCG4CPWrhA8TL+m9HE7DCkm2IYcH2TB2WdUCQnnQFV8E94x
+1eyEfCrTCqn5UlW+2urdJLmngSk7o3yv1wJ36pgHxMNQMXU8mPWN4nOCqEZAvtmP
+CrtRviKQ1QpRXNBA7blduSvvqqfr7uQEKta7E2argdEhkor6XY/fTTlu687QRi6n
+Po62G/0XCxIUYpanmYULzD9YbpSlyA==
+=Zdz8
+-----END PGP SIGNATURE-----
+
+--vtihelpcu7j6kvgw--
