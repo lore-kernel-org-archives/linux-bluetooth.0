@@ -1,396 +1,141 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [217.72.192.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621D812B94
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 18:58:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779821933; cv=pass; b=TgcdrfKJktbv7Fo6wLAVZsIXWrPJdGG5HYkksyQE2BLp57b+gNQzi6K7QkCI6w7UxBI8whBvAJgUCM9K7BsBZelYSmxqvO1voHP0nklqQ3RDb8rOwgIFVMCBv1u6sAmByu/r/hrqjTx9nLq4SckFbXkmS6LjrDWzpoO+C3/Y1JA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779821933; c=relaxed/simple;
-	bh=qPNQadfM0D7kxRso6AWDMPDoJ6GcWvDOpPrlMPIgHK4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tH5qa57OCNJjALoq0WPMqjHlhir27YglTj5lkqO4E6a9WiLapfKUNgNnr9rvPne8d+qLEVCFTw5ERu9C0Rtw56X+3WuUZ9YCAFrQQsM47hXcSN1lfWlYUWih4CT7jalCG+MhSsboI42womgWJ0Ab4tiz6uCkNQhMW2XirNOHdgY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XohFq5uL; arc=pass smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64C537702A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 19:03:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779822216; cv=none; b=JZoUqUrUxSv976iL0e8YY/yeDccT2DZnwXEZzJXrKGX7QdbsFTVDbWt9kLsZuafojDAf7StA4+9eC/HN+Y8CddVuO3w0VceefQ2KohJd9nFSMBrq7CApuUIq7EVJSnmxYLEDU8ZGzO0FyczDsj/VcdJqn+1IgnWuzJ9SEyDayzE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779822216; c=relaxed/simple;
+	bh=xPH2YOTkTCxfT4iz0W+VOKRckU0swvCdzZz0ye2y5xY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=tXrXD4lInjAfcH0/mNt58YuYqVusSk8BZStA5nqsk9d3JcnMZhzyaZpzHeZb39XfXStR1+s7FMNx3xQKbBeigU6d64Wg3bduE6PlEVZCny4ntazEWDYAL6sTDuztdkK4i8lPDvEtc44enL5itxyeQIcUu2jLxtRmfUEHUaKu3YU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=nils.helmig@web.de header.b=ghPOisFd; arc=none smtp.client-ip=217.72.192.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XohFq5uL"
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7cff695e6b1so77968537b3.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 11:58:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779821930; cv=none;
-        d=google.com; s=arc-20240605;
-        b=FDBmJJ/BnEY++KloXJP0fi2v+1BZRJLUCX4hMKAK2yq5FvxM0IEXN0aRVHrZhcpKB8
-         ie+NsiNAXAV1Ybojtz1ZylX4UwulcU1I50bdA0hADJUm+zvyVtIytbIjfnFSAuVbia5P
-         rb0ntgAP9yJ1N8fKml5ClPnpw4Nh6AMFHw91Ta1JMp9BjuYgFAatKUQvbYPlsfA/Hv8s
-         57X+DlMlorRLHt+sYluYWEuW4e49m2Nqdg3epVpJviaPP1kdS3jYyRRbuO2TgDdhCruT
-         PNBuLL75w+REEKIuyvndcM60K3P9amYIx/YSlA3rqGnhj2U0BIkZ2+K0w1rC6I774R3I
-         rwhQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=cOd35e1KHX7zgHOt2UFpwjLHppJmW2KT8BAf+G9dtVU=;
-        fh=v4Z3N2Htbr8NtGqMLkQjkIE/EbeUcf6lhEWEAm07n3g=;
-        b=aRtwpq5m9vQ1LFsDpNviGWVnPE8JiuR2LYFKq01fgVDbjiJW4GsEOR9/vYcXcYO3/k
-         9kL6NC39zchzQJBrNsJ70qjH5yndIoc8DyxItEnFscUWoy5+9zlH7DXah0n9S7VARQw3
-         WpwcCA6yVqnz9MXGRJjI5g13aZN7uXdULM506uILoNXrb5OwL5kgqWm3Dxqt1HauQKFX
-         aiSsjoIycISoigPCa0rUxZQStYJbkrY0VY9jU07if1QjSW3bqQ9AwMPY5GHlTF0NW+Lh
-         /RiegguHPS+Q26u3Rf4huNTWE+r1vGjESM/WNudq6gzO6Lr2DUCLZEImq1w4yk5mOlZD
-         bkSA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779821930; x=1780426730; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cOd35e1KHX7zgHOt2UFpwjLHppJmW2KT8BAf+G9dtVU=;
-        b=XohFq5uLLwj2XLqkPqfOQ0fcV/kZRrXtzrihFbINJrgJdzyK2M0dcQfbRn2yFO1Z0X
-         br6KxVYAU7CvUwUov66zurMT/V4jM8SukgwQZXDF2NAF/TVQB6Gp5hWA9M0lFgHjV61n
-         xEJ9NoDjCwvemT4Y6qFdS2CVVMiYbFfJm9HFXljUgnvA1uAMlDoXt9BhHCLWYTTY/VuN
-         diN844tEm0qEcJ8aWNeEYP2AjnkOyLhoNOVJ/H3rFOzziGyoAzPtqUGIIPi7N7nbJEL7
-         JMlXRLSR0zkSMEMbCpjEv+WDoUsHWNImY+4eHkO5FcFaLRso3gM9UrL3EenhtzxOt6OV
-         Oz1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779821930; x=1780426730;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=cOd35e1KHX7zgHOt2UFpwjLHppJmW2KT8BAf+G9dtVU=;
-        b=ULHENoeYCx16T3SlQEsTA2ptdRdKpj/QEaMGKetE1Gow5WeRHHif4xzL/WqJb4dhgP
-         okEwgyiYIFUY32zxB2ZOvkKbzfVAEUaVlBWIN4ctYaXIZ+ZQB/6Y329I0u0umpO+GWs+
-         m0IPNOK7Od5xu9mwd3bL4lC0G4n7b76SBehyiHrJztPNooS9/e7ok9BSYz+uc5pILhQq
-         6gzbgAFslSbE7kTf4TpSG54i6xWEhje4//iev9/t8k20s7Ic7QsV3rOgfukclXEKtCzQ
-         NlFyEJ0wDwwC2SybfJp+N9MMOZsQWU+reNvxYIncR2NEBMs3eryR0b1q5RKEb1bUZsPG
-         4yGQ==
-X-Gm-Message-State: AOJu0YyxQOvlYUmjIdZVCLGTKxEWBevk3ED2aQCoGFy38xYNneeNVnQz
-	7ypa3mI3mGPLwqsg+uiQvCkwCXokyGZutVTj7sGIdl6BDG8N2g9A1gi2PYokSxaxIVNalaI1TQW
-	1BPpWZcH4N/bhXae6a+yzYs2jEZZ7UR60WgSu+G2c8Q==
-X-Gm-Gg: Acq92OEqatpsVwPFgg7jSXdCnmrjZ/yhHnH9R0uON3gFiZeQ/jvFuS8uSgdaVsDCKrO
-	PN9o2GhnfAbn4nhVgcNwap8rucU3F6T1/0OqSq13Oep0r4p96JgM49BtOIbyUYa5vTWQj/l4gVv
-	Xg08bvqlPL+ldbJ7C5qqc5OqNbG2kHYbO4gYtj5teQFHnZABDyB69gk3Zl5KyOTrwhn6nkjxXD2
-	VAiYnI/ganYajbNX6QYCVVeP3a7JLUh4S1p0cA7F5BfXD9hHIaO9fTwRPReV4PCGBtlbxbjWB1B
-	KaASmpyMyXBdnyoCTc5Ti+geihk/Tezwetk+gtMeDJHDhQvVKnh/vGPxf+tm5A==
-X-Received: by 2002:a05:690c:7341:b0:7b3:edc7:9b8f with SMTP id
- 00721157ae682-7d3351c9f16mr229152437b3.0.1779821930248; Tue, 26 May 2026
- 11:58:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=web.de header.i=nils.helmig@web.de header.b="ghPOisFd"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1779822206; x=1780427006; i=nils.helmig@web.de;
+	bh=xPH2YOTkTCxfT4iz0W+VOKRckU0swvCdzZz0ye2y5xY=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
+	 References:MIME-Version:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=ghPOisFdv4OQhkCbwJ580i2GSPaI117mu5i0wk779bm9bwVmnA+suhW9Hjc4ie6H
+	 DGCuPI669+OP71Gl5bvvOIpQmfVCX+xCfv3HeS7eAGeUfo1a2AJRUd2BMBIUwzP28
+	 nehbvVv+Tl1Y03WzCDP6Fn+Mhn5FEY1YJo6Yr5RUFPa1zpxmYXuVkt7L8rJKtUCXg
+	 12he1kU9IzGnIWjEZSX5K6t62WVVh6k/o93e9apYHqmS52J79xv5jjEuQXdVN2dkz
+	 ThIkK0BwFnwDCl6P2JqjHTAyiZ12JaRMydwK7QquQCKyPJH6P92E0MNxbVYdn77rk
+	 BCdPeDPuW3e65sW5vQ==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from client.hidden.invalid by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MPaIK-1wfe9f44p8-00MLck; Tue, 26
+ May 2026 21:03:26 +0200
+From: Nils Helmig <nils.helmig@web.de>
+To: bluez.test.bot@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	nils.helmig@web.de
+Subject: RE: [v2] Bluetooth: btusb: Add TP-Link UB600 for Realtek 8761BUV
+Date: Tue, 26 May 2026 21:03:23 +0200
+Message-ID: <20260526190323.5930-1-nils.helmig@web.de>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <69ed185e.050a0220.107d78.67fa@mx.google.com>
+References: <69ed185e.050a0220.107d78.67fa@mx.google.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260524221421.258593-1-tarjeib@gmail.com> <20260524221421.258593-2-tarjeib@gmail.com>
- <CABBYNZLNrWP4-ZtqxL61UR8fxnp+6_Wfwdtfhq=bx2g=VeVLyg@mail.gmail.com>
-In-Reply-To: <CABBYNZLNrWP4-ZtqxL61UR8fxnp+6_Wfwdtfhq=bx2g=VeVLyg@mail.gmail.com>
-From: =?UTF-8?Q?Tarjei_Bitust=C3=B8yl?= <tarjeib@gmail.com>
-Date: Tue, 26 May 2026 20:58:14 +0200
-X-Gm-Features: AVHnY4LNXHPDsIb_Vo-LiVwoqVpi6A-gpZyny3joTnQ46PnlK95sm0r5MKJSFPw
-Message-ID: <CAJQCZbArSLor2zLC2cb_-AC1bAZJcNnzX5xvhug1xr1fr7DCNg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/1] adapter: Add configurable default LE PHYs
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:ZlIgM22HJ0Rq5lBE24sCLvt3VRvzXkeEVBdyseP3boj4pTS3ZD5
+ i2UvTkotJSZy3gXlWCOXxAojMNAml0/KjNd6Os/vOfxk02N9FN1cWJH5wNdLFZozZJgJ3ui
+ Fw6lHtpNl6DjyHcdgNrWGyfS5rQAgCkgCQluFNUtQuxGiqBicqlDs7V68UMF8wlvK6DqJog
+ /VPmZmolsEv2YX0jXMAUA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:pk+tU/plWJY=;A0v+j2+rMR1U9U9fj63RgzDXLhc
+ 8aXQ6UMS5HsSffTFaga+XkJnJdsxSOp19CNdANGC4LBnliyGXBenpNZZNlC2+rDouSYDLQRCQ
+ 1FULl3myy7mWQ4UPhSQbYZU+gIZNF3U/Xd2GEBxFaW/xkIpjSEzEyuLR6BpvTwowVJ1EuSosY
+ QwzFOUJ/szwzdJ8sceas7qBnTo7xfkdLQdUOYCgMoiFd3AlHty/6kx36b15Q9ntoxkz2frqK+
+ 8teomnZs5C4GtHcY6LYXJpuu1BdSU70TzabhkEClp0Q9eG7duwGjJ24jB5C54ZpPCIJeQPeq2
+ To2DFcOke+RFnyPY3c+ONwMCTuqU5GI2haHu6WwoIf+/11J8jnki3aQ/rqCDVMBtZ+y5ihZfz
+ KkV3tskdx4znz8OHcIOr8/HYZYW4lFW8E3e/Ke/w2K3EqaX9txVTocNK0RF8+IhDj5osNPULx
+ nX7dVpbNddXUfFukvrhdgVHP9qhsIbEK9aO0JEihhaU/2m38hiTEyALCeWElWj2P6vwmTI68x
+ bndmm/tcycnbcizdn8zbCHrTUcqVmMlUpAekFqojUwRlxx+vsLf17u/d1/njhIGUNtKwQFiqi
+ YJFmYIJwpMXUTh5SRYH4DWohBKI5WaqqlYagKHtrYIARJ8T53rt/NzuDGuX4pS73pRr37uJvv
+ W8obyxrb46RO82ql7UN24tqBJmc7tPBhqkmu3ZfO5Scdd+x9/+jlh4wZ+IqGGo1vVmElSIZjN
+ o46ipbccaC8Ang8jiNjKkxkVm1nV2+fWfjhuIZNb0at4VT8GML7vfqMFK3bdcX0UDGdf9RyMR
+ /VnnJiP0v7YzCK0oHFrEoCxoxgDnG6EjnltYE07wx8Leb8kK+wCVlO2zETtbEE2d3U2fMicwX
+ /5szUHlypiT06YuNoKQ8baqhGLIZgAC/EsdJuuTv2V0CokfyVbHN6lnUsfv6kG22Dtq7v4qMk
+ FT/ckmLlc+MdKYjh8yp4AfkCxWOlg+NS/hZ9EEKLRfT09+6YPClBCUPXVuMrCFnjobIs09Yzo
+ KO3dyPr6LLc98bqteG3YQGDoS6msGITkPi2SAT5myNkVMfrvVm83uwN9wiRttZN2x6gs46DS8
+ kc2yefV0oP+rrdy09iOSlfVK1i+fyI0pZrodPo8xkZbs2LUoiI5oyLkcAjHSA7I6kmO1I2ZjR
+ 9TwW3XYJtZt+2DH9E4hYvbqxLfUgTPG+wCrdNH8L1M0wT+yP5uWXZ+6dSkdJw14Yz5MCH1dxv
+ DDX/JOpJxiwdNGW+RPnTRJsk0gxzZimOB3+Gk0BrReLElWiByb8GXdmPJ9G3ddWPzkZ5RoKf+
+ CVLcw6iLy2sFBZbCsi1i4x1yYluiex5R5hPl8PUKvWoU8dASxTtbyUTz3HWsy7PkHiUa8jZJ+
+ VKj4u3Xjc5nOgebCYRAHKHpyVqIkkSr9cNg+1hO5DqcNgX6CbzbdP0yzsRW43iPvpWXOLrmSW
+ sEwxzrZmNtwUPXmS42FB8ri9W6pXSLyqSbmXS25uMobjuGrYEIlOOBiX+VjMOekiLXiWyguoN
+ nm7RrBoyQU9ORlhoL8nWMBNJF5wz038o2/Ne8C5pbjRTEtVn6hsCZkLxBV+GEilCNUp6WYFWx
+ ns4TXK2ECHBR8Y5enu7n3jnrcp60U9LGB98mWB9MwRk5F9UCuQnM5O7ysjCGTtklIZGyArq/r
+ WZI+kV4Pfp9U/SAaN7q7ylhMkMRqUAfv8AqfwQWStpqXE4KHBq/CA1MTBnJ2KisfX3eHtBpan
+ lCILDP5SCvSsnfekKi6l/edeCBVWAPosiXTdvbrr7nk/3UsQv85ju+bkke99IJEHGztzUkgLN
+ OSuWC6uUSFviZ03dVM3S9pVu11Dy1JmxBlm6DSbIHmx1MR+I4L7rNXTltFbncJZJp5TcVA4Ca
+ XLT02CnfHeTayCBjlsmkst8TEkLF8tnCTUToXNwYzJqxUaGeSKwJDUg8Jy4pd4NJg7LJ+YgCB
+ rHs1ZVs9cUqVcYmrBwU6pMQNI4URPslbm4HI/Jc816r2+1XfxKWEsGFDqDKhVxwOdOs20xCN5
+ QbhR5LhCWJVVemoPSIpt9gGEtp8eP47GMkZcMo5Vklx6ZpZROcGA49iu66q/LHerH3mIRDS/E
+ Y9yXV87ifdj42Gv6Cng7954+vc0ZClHf+PhrBpHdejS//lFqtim1rlWQgMo37WrdDi11l2wnP
+ UMAIYm0xHrdvnwybigp33ikjAIceLWq8U/nzcAz3h0MOcIYfTRG8ZfBDyJ9o1wYyp5EwNI7Ag
+ 3oCDsh2k3WmSIx6u8jUqOzoDwRzFo6XCH5BsI/ZfKKXdSCw/SLVLzWkvEhMrjS03ArMnAun8a
+ fNvB87qHxWwO1r+nrRt+n7CHFOKi7caIQwwRG+fjZ15uu+YZ3EF+pppKCYd2F2tl03B/nC+Gx
+ EmY/xixCzWGmq+gglI8uCH5Fi1C1b47lknoVWBI0dSdHIqF2YLrfsgiTWWyK4TIElADcSFfKx
+ MuEZFI/NTRsnGasf02KSmfBuNUDJ0k3dhffc6Y2Fcf4Gjtouri5M8sBWFSNVtS0vZYH67whu/
+ X9EDBqQPAdhz1hrT893x6/VOQ+vvZORDxhlZvxGhFHFZgPfgQPYJz4XzK9NlU7M5hUf+jdYbi
+ xEcU0bWfejlJ6AyA9k2GMcCW0oZK80V2f6uqsoThtay7qebR2mPNvmwe8tLMBHOX9vVXtPmTX
+ iBKaNB9ldJOJsIk0NmpXkvCHB0l0RxRUR6QnXA+qXAjhRCjNNWmYS5QFYvbFuwJ999FZk9Wwl
+ t7L16wmvvxtsVH3tqxTn6cIml/MHtlMI201T1UzlC34sBzK15Cgi/8DOosmXF8UqCJkYFTCA/
+ WMNf4m0OXvb3PB0/G80ahWRVZRZl/aP/CUrnJ3emePFMpP/gXAqp9/KRvzQhisxJK/xUrtq/i
+ iLt/KPi8/2dX3f2dHO0eS3ZPAVNC65WLHy3iZBAL31ekxH67t1THDYeaIfUWst08+sESDbP0A
+ 4dDk07/TCg/yOTGXZY0fvf5njS1Hi/2trSMhK6E7q8dVVE+Za6uHNdeacWFa+DUjWxVd1ZCdE
+ hisCyxhF3ZiRlfyu04Ov+ZSaBnK3RHwz1yFr1lQJRSTuSJJyRKVviwpY5bkrRLvhb3sqcOu8q
+ CrmAObUc0Z1B2nFhKmj9K+i0DxR6vE0H2EMlZ+RQpqlOYSZ2bsznzTUKyPENKwSrBhOJf1a27
+ r1FhJ4Tvf430oCuq0I0w4Mh2A8QBAK3weYyOGRfMnSJwxuVgzrAJtHgChRSpopkiEk1qEyVqf
+ l+cnZ1H8O2zbFnve8VRuZlymeFh5bGHRo4vFtG63iGtTSB58Y30vR+kakYvlHwm2/Pa32hyZY
+ kNlodXGxvaH5hc9pNqcvli4uEIjIJHobHuLFi+91zLVfAKv2ZvfMucREqqe33MLjbrsGaHSHu
+ HaC5jfX67Xjthazx59+qs4c6vwpip0jC8rIJoVL1/L4OIOwbNv2q3bWVQJGRZOjaUamgU2Nzo
+ hJWC2fvzgZ1+/R1/n+1x/g5RZaN+AiQWsGliozGxTXmdF77C6jN945D5ljB916Ms2jJJAG88b
+ DE+OmDIyRKCNTJzQHvANlechxIrXOu2NlE0YWuvzS5ed5rbnCRNXe6RMU9TGLbzi8kPNS3Ei1
+ J4DBHEEvW2BHKU2S3PzBEJ3HgqYYOsdcTwogMiIgg4Ihmlwn303vsj4ZW7aWhgeIXgoJb9aU+
+ BPuiQ+MiR4jDjllNRxK3ZCea8WriqN6MozqWxIjAh9mdp2hPLgTbEsM6NlaxDJxKQWAa+txhs
+ 9PEPtgqmcOz5kDxrn/xsVkFVzqq9tczTvgzXbhfc47SidPDwjyQ/vTV0/vCFrDItlztIXwk0y
+ PanVGpgyz7qn6Ft1Nq2t8843X7NQ8ypG9q0NOFwaXb/2I4MJKjoK1g8ZBD0ttkH9AHSYf0E8R
+ /fm92XxMY3+cU3VP5O7ddQRJli2eiCGm7hI4KujNhZwswUS9uUdsuTtCCytDmJgMpo4tTJBpS
+ LQrLR9SZghDnKBUhgNAoYAoXDI8uckzqml/9wBOj0EZbfHMxVO3hYdU7D+2hUlVJIxASMSMzm
+ snOV9f/gzi30+baz3nAb1fBZTuisM2Bxaf5qBdt4xcjYH5GSR3cytF9pT7xrAenpvU5XQJO/i
+ 5pvobsxHTVgifTP6IJZkq6GZPs7ZD13ASh5Len7y4cAMTlFEpr+4sYXHKaikm8sxeYf8Y1ZYb
+ lYAKtjJ4cB+RnA3HoGADYo5yPEeQ34IeSObzWbWw6u44safvE75vVEtlqUufby00AvaK75Xng
+ zpiUhVvRTrqdkZhQeEaGPir4ZwHInGzIWLZr5K3tI2ZSIKVh2xZ6aZ0LC+TAcFSn8wn//FjAd
+ R/+zePMI/NxVKSt3IQ98cSV0e/oYE1o4uQocXa8Ns8kNhuURToNMkL69zVM/AC8ldayX3aydz
+ Ol06zYPdAQDVwMZ2AmLxLmdSW9fLcrcT0Urb+35XTzrnNK4LzaX7SfxgbyWmABlHBgmMvBJ4Q
+ YimdO/97Tfm+/Bc6UlDv8TtR10l1Sj0d60M3cK/DO9JSYMyd3E1etRGtiIjqxW+Ex2zL5Hkry
+ CWZNs0Pcyhl0u/uaPaPN/ymL0KdmQ3/bB7azGgsqXKZs4wCGuUKksaAZCdob3jCsqkQV0eEm8
+ ykos3NKm3h9K7Mua4V1j21pjNmMH8S2bREZy0J3eQpqy3cN8C63kjNsRHjR9b4V9iK3bqLPbS
+ 7FrYR/L/sMnTS7EzRC7ElSRUG5OF/6M+zrJbdHsjzYaeA8V2KPiBuaXA4To2DxobUmxl4f7E2
+ BDe7WgqdE1MyKScHZW7QbS8w61DKg6bG71BqlcJsKljNwFwSOD7UgTXnFrjWOa1Dijtf4GKRP
+ TeNEk6YjAiTLa73VUPNKPXQVxfmQqG5U432tJbDr6fzU2b4aYS3oSke2ILMrxLTZn+jx/CnWg
+ RyUTy/jISFVhPWnC36H/QUE3sc3d/tVBWUf1NEVWxbI0zErWzfy61jI3thGg66hGJKTPbPvmX
+ dGlYKShcbULIK9ISVIbYI0avfU17HMDQHMYL+Yxd5MvKazv3+R+wwY4wdNYRCCrVKku/ZJ+ip
+ fwXRRF8FCXeKLU5v4Zo2KE6/uBqODQq6PQjHG41LOD16rHorSDDnw286wlMdoFzMZnQ0gFml3
+ bWdlXAZJ1dz5/Yn+SDA9nMiZBeeOiP11DF3QMnSWSEupCPWR2uiQsSjV15G1Gdhj4RUnKkT2T
+ zx2CD3w+Ug+IGwvU0QjQNdb5ULdDg2GDUc3V/oIPViiuWmkFetXKNl8ooiWz702w7rQB2lJfd
+ hh02fNO2t9ST4yoCLo70KhsppUxJrDS5dxHIVOhPjtPKyKc5u8ZgCkIXrH/RQZrgJQop3UyoI
+ bFeK2k0lM1Nl14yafHSbpQ58Z60trZwzC01WRqX7EkbM+1tVRxp0NYuv2KY1qGN78Cah4fWHb
+ MWXWaiSZ1f4edXBU6GSFqDew==
 
-Yea you're right, I assumed too much here. I have only identified it
-with my Frostbay device, not any other device. I've made a GitHub
-issue with btmon logs and others that should show the issue.
-I do still suspect that this is an issue for other BLE devices on the
-Intel AX210 though.
-Issue is 2155.
+From: nils.helmig@web.de
+
+I saw that the merge request https://github.com/bluez/bluetooth-next/pull/127 is closed. Any news on this patch? Is there something I should do?
 
 Regards,
-Tarjei
-
-
-tir. 26. mai 2026 kl. 16:27 skrev Luiz Augusto von Dentz <luiz.dentz@gmail.=
-com>:
->
-> Hi Tarjei,
->
-> On Sun, May 24, 2026 at 6:14=E2=80=AFPM Tarjei Bitust=C3=B8yl <tarjeib@gm=
-ail.com> wrote:
-> >
-> > Some controllers mis-handle LE procedures on specific PHYs with
-> > certain peers. On an Intel AX210-class controller, connecting to a
-> > Frostbay BLE device can fail during early ATT/GATT setup unless the
-> > adapter is limited to LE 1M TX/RX.
->
-> Perhaps there should be a GitHub issue explaining exactly what the
-> problem is with btmon logs, etc, Then we can evaluate if this needs a
-> workaround like this or if we should detect that certain PHYs should
-> not be used.
->
-> > Add an opt-in [LE] DefaultPHYs setting to bluetoothd and apply it at
-> > adapter startup using MGMT_OP_GET/SET_PHY_CONFIGURATION while
-> > preserving non-configurable PHY bits.
-> >
-> > This provides a generic, adapter-wide workaround for controller-
-> > specific LE PHY interoperability problems affecting scanning and
-> > connection establishment, without adding device-specific quirks.
->
-> Well it is not really controller specific though, since it applies to
-> any controller on the system. Also, I believe this could be a device
-> specific problem so you might be taking away 2M support entirely when
-> it could actually be supported with another device.
->
-> > ---
-> >  src/adapter.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  src/btd.h     |  2 ++
-> >  src/main.c    | 61 +++++++++++++++++++++++++++++++++++++++++
-> >  src/main.conf |  8 ++++++
-> >  4 files changed, 147 insertions(+)
-> >
-> > diff --git a/src/adapter.c b/src/adapter.c
-> > index 20f7c3e03..fcbb65e38 100644
-> > --- a/src/adapter.c
-> > +++ b/src/adapter.c
-> > @@ -4972,6 +4972,81 @@ done:
-> >         mgmt_tlv_list_free(list);
-> >  }
-> >
-> > +static void set_default_le_phys_complete(uint8_t status, uint16_t leng=
-th,
-> > +                                       const void *param, void *user_d=
-ata)
-> > +{
-> > +       struct btd_adapter *adapter =3D user_data;
-> > +
-> > +       if (status !=3D MGMT_STATUS_SUCCESS)
-> > +               btd_error(adapter->dev_id,
-> > +                               "Failed to set default LE PHYs for hci%=
-u: %s (0x%02x)",
-> > +                               adapter->dev_id, mgmt_errstr(status), s=
-tatus);
-> > +}
-> > +
-> > +static void get_default_le_phys_complete(uint8_t status, uint16_t leng=
-th,
-> > +                                       const void *param, void *user_d=
-ata)
-> > +{
-> > +       struct btd_adapter *adapter =3D user_data;
-> > +       const struct mgmt_rp_get_phy_confguration *rp =3D param;
-> > +       struct mgmt_cp_set_phy_confguration cp;
-> > +       uint32_t configurable_phys;
-> > +       uint32_t selected_phys;
-> > +       uint32_t next_phys;
-> > +
-> > +       if (status !=3D MGMT_STATUS_SUCCESS) {
-> > +               btd_error(adapter->dev_id,
-> > +                               "Failed to read PHY configuration for h=
-ci%u: %s (0x%02x)",
-> > +                               adapter->dev_id, mgmt_errstr(status), s=
-tatus);
-> > +               return;
-> > +       }
-> > +
-> > +       if (length < sizeof(*rp)) {
-> > +               btd_error(adapter->dev_id,
-> > +                               "Too small get PHY configuration respon=
-se for hci%u",
-> > +                               adapter->dev_id);
-> > +               return;
-> > +       }
-> > +
-> > +       configurable_phys =3D btohl(rp->configurable_phys);
-> > +       selected_phys =3D btohl(rp->selected_phys);
-> > +
-> > +       configurable_phys &=3D MGMT_PHY_LE_TX_MASK | MGMT_PHY_LE_RX_MAS=
-K;
-> > +       next_phys =3D selected_phys & ~configurable_phys;
-> > +       next_phys |=3D btd_opts.default_le_phys & configurable_phys;
-> > +
-> > +       if (next_phys =3D=3D selected_phys)
-> > +               return;
-> > +
-> > +       cp.selected_phys =3D cpu_to_le32(next_phys);
-> > +
-> > +       if (mgmt_send(adapter->mgmt, MGMT_OP_SET_PHY_CONFIGURATION,
-> > +                       adapter->dev_id, sizeof(cp), &cp,
-> > +                       set_default_le_phys_complete, adapter, NULL) > =
-0)
-> > +               return;
-> > +
-> > +       btd_error(adapter->dev_id,
-> > +                       "Failed to set default LE PHYs for hci%u",
-> > +                       adapter->dev_id);
-> > +}
-> > +
-> > +static void load_default_le_phys(struct btd_adapter *adapter)
-> > +{
-> > +       if (!btd_opts.default_le_phys_configured)
-> > +               return;
-> > +
-> > +       if (!(adapter->supported_settings & MGMT_SETTING_LE))
-> > +               return;
-> > +
-> > +       if (mgmt_send(adapter->mgmt, MGMT_OP_GET_PHY_CONFIGURATION,
-> > +                       adapter->dev_id, 0, NULL,
-> > +                       get_default_le_phys_complete, adapter, NULL) > =
-0)
-> > +               return;
-> > +
-> > +       btd_error(adapter->dev_id,
-> > +                       "Failed to read PHY configuration for hci%u",
-> > +                       adapter->dev_id);
-> > +}
-> > +
-> >  static void load_devices(struct btd_adapter *adapter)
-> >  {
-> >         char dirname[PATH_MAX];
-> > @@ -9455,6 +9530,7 @@ load:
-> >         btd_profile_foreach(probe_profile, adapter);
-> >         clear_blocked(adapter);
-> >         load_defaults(adapter);
-> > +       load_default_le_phys(adapter);
-> >         load_devices(adapter);
-> >
-> >         /* restore Service Changed CCC value for bonded devices */
-> > diff --git a/src/btd.h b/src/btd.h
-> > index db2e81239..59f44dc8c 100644
-> > --- a/src/btd.h
-> > +++ b/src/btd.h
-> > @@ -140,6 +140,8 @@ struct btd_opts {
-> >         bool            device_privacy;
-> >         uint32_t        name_request_retry_delay;
-> >         uint8_t         secure_conn;
-> > +       uint32_t        default_le_phys;
-> > +       bool            default_le_phys_configured;
-> >
-> >         struct btd_defaults defaults;
-> >
-> > diff --git a/src/main.c b/src/main.c
-> > index 8aa19a3e3..97c64845b 100644
-> > --- a/src/main.c
-> > +++ b/src/main.c
-> > @@ -32,6 +32,7 @@
-> >  #include <dbus/dbus.h>
-> >
-> >  #include "bluetooth/bluetooth.h"
-> > +#include "bluetooth/mgmt.h"
-> >  #include "bluetooth/sdp.h"
-> >
-> >  #include "gdbus/gdbus.h"
-> > @@ -132,6 +133,7 @@ static const char *le_options[] =3D {
-> >         "Autoconnecttimeout",
-> >         "AdvMonAllowlistScanDuration",
-> >         "AdvMonNoFilterScanDuration",
-> > +       "DefaultPHYs",
-> >         "EnableAdvMonInterleaveScan",
-> >         NULL
-> >  };
-> > @@ -145,6 +147,8 @@ static const char *policy_options[] =3D {
-> >         NULL
-> >  };
-> >
-> > +static void parse_default_le_phys(GKeyFile *config);
-> > +
-> >  static const char *gatt_options[] =3D {
-> >         "Cache",
-> >         "KeySize",
-> > @@ -751,6 +755,7 @@ static void parse_le_config(GKeyFile *config)
-> >                 return;
-> >
-> >         parse_mode_config(config, "LE", params, ARRAY_SIZE(params));
-> > +       parse_default_le_phys(config);
-> >  }
-> >
-> >  static bool match_experimental(const void *data, const void *match_dat=
-a)
-> > @@ -966,6 +971,62 @@ static void parse_repairing(GKeyFile *config)
-> >         g_free(str);
-> >  }
-> >
-> > +struct phy_config_entry {
-> > +       const char *name;
-> > +       uint32_t bit;
-> > +};
-> > +
-> > +static const struct phy_config_entry le_phy_configs[] =3D {
-> > +       { "LE1MTX", MGMT_PHY_LE_1M_TX },
-> > +       { "LE1MRX", MGMT_PHY_LE_1M_RX },
-> > +       { "LE2MTX", MGMT_PHY_LE_2M_TX },
-> > +       { "LE2MRX", MGMT_PHY_LE_2M_RX },
-> > +       { "LECODEDTX", MGMT_PHY_LE_CODED_TX },
-> > +       { "LECODEDRX", MGMT_PHY_LE_CODED_RX },
-> > +};
-> > +
-> > +static void parse_default_le_phys(GKeyFile *config)
-> > +{
-> > +       char *str =3D NULL;
-> > +       char **tokens;
-> > +       uint32_t phys =3D 0;
-> > +       bool valid =3D false;
-> > +       int i;
-> > +
-> > +       if (!parse_config_string(config, "LE", "DefaultPHYs", &str))
-> > +               return;
-> > +
-> > +       tokens =3D g_strsplit_set(str, ", \t", -1);
-> > +
-> > +       for (i =3D 0; tokens[i]; i++) {
-> > +               const char *token =3D tokens[i];
-> > +               size_t j;
-> > +
-> > +               if (!token[0])
-> > +                       continue;
-> > +
-> > +               for (j =3D 0; j < ARRAY_SIZE(le_phy_configs); j++) {
-> > +                       if (strcasecmp(le_phy_configs[j].name, token) !=
-=3D 0)
-> > +                               continue;
-> > +
-> > +                       phys |=3D le_phy_configs[j].bit;
-> > +                       valid =3D true;
-> > +                       break;
-> > +               }
-> > +
-> > +               if (j =3D=3D ARRAY_SIZE(le_phy_configs))
-> > +                       warn("Invalid DefaultPHYs token: %s", token);
-> > +       }
-> > +
-> > +       if (valid) {
-> > +               btd_opts.default_le_phys =3D phys;
-> > +               btd_opts.default_le_phys_configured =3D true;
-> > +       }
-> > +
-> > +       g_strfreev(tokens);
-> > +       g_free(str);
-> > +}
-> > +
-> >  static bool parse_config_hex(GKeyFile *config, char *group,
-> >                                         const char *key, uint32_t *val)
-> >  {
-> > diff --git a/src/main.conf b/src/main.conf
-> > index 5846ef92d..ed955897e 100644
-> > --- a/src/main.conf
-> > +++ b/src/main.conf
-> > @@ -247,6 +247,14 @@
-> >  # Default: 500
-> >  #AdvMonNoFilterScanDuration=3D
-> >
-> > +# Configure the controller's default LE PHY policy used for scanning a=
-nd
-> > +# connection establishment. Only configurable LE PHYs are changed; man=
-datory
-> > +# PHYs remain selected automatically.
-> > +# Possible values: comma or space separated list of LE1MTX, LE1MRX, LE=
-2MTX,
-> > +# LE2MRX, LECODEDTX, LECODEDRX.
-> > +# Example: keep LE on 1M only.
-> > +#DefaultPHYs =3D LE1MTX LE1MRX
-> > +
-> >  # Enable/Disable Advertisement Monitor interleave scan for power savin=
-g.
-> >  # 0: disable
-> >  # 1: enable
-> > --
-> > 2.43.0
-> >
-> >
->
->
-> --
-> Luiz Augusto von Dentz
+Nils Helmig
