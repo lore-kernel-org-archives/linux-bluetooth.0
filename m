@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38FBB376497
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 15:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E999376494
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 May 2026 15:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779810000; cv=none; b=TzkD7QQZS3K4RSTwYuj6zlVJACU98uTGTlxXLEWOSxr6QYesI3c2X/Z0alcfEGC7rRgMpPZcIHVv35ZufKe0CfG0QinmfrMwzarI4Oxp7doEmks0c7XF7sr1+RfEPW1Y6ih3yFrtCI1yYPbMqc0Vaf+aa+ZSpOdN3G6sGguTGHk=
+	t=1779810001; cv=none; b=idxhd2DY0ou29ddoSgsRYU5fB5daUoWqdInm87jJiY8dcRldDI+V+rpl2AQrGzTKmcgpPFAm+DuzWT1i/ZvrhzsTkXmtpgTuuYcMeJ++WSRFgtCkhRCoQSblRpcpy5ZPXafWWqXhdFR3ZqaF7449axtLOamF5nS4gyqtvlD6m1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779810000; c=relaxed/simple;
-	bh=AJ5duEGCeREopjhXZfklxzvLWdjo8upZbqlMTEGE5nA=;
+	s=arc-20240116; t=1779810001; c=relaxed/simple;
+	bh=K/sqeHuTc8Csl7L56/I4WNejEzg6If9cJM10MHHCBsY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DqwlnLIz70P/JbRyJM9tlmh2Xee6YTDpSJukZqQlqKZ9sujrRAoYwOSjVbzBS3x+gXu9WIluITahfC3wlbtuxzFY2v2HWybVL7mh+jyXnRxkRYQAlgAyqIx/DINEE3+ZWpWJLYSyXMvZcfq8WD5fWTpVZf/m2bbBnPi3tuUzFsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TeU+LKM3; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=YUMI/5JBjFEn9jwTHHAlHOlLyLvI/98SsCSH0NMyjNxC3dChNboD2z0MPuZiSWwRVS5SC21qos0pEUIupdEBzIz0S4VlcXrmnOBocV8eQrdVmLCASNwpGbvFNQ+Bkj6gsM++P/9AODPwjKf/GiILk4PJ4yfqxHAIANDyu27LaJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BGg6GWrp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TeU+LKM3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D50E61F000E9;
-	Tue, 26 May 2026 15:39:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BGg6GWrp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B11F1F00A3A;
+	Tue, 26 May 2026 15:40:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779809998;
-	bh=QkqFa5qRiosl+st0zXpsa4mL4yHFdxtbJlhF6qZGcyc=;
+	s=k20260515; t=1779810000;
+	bh=f28uvSQvjei7xIPLPtxL9rwv4gBUK8gUBl+VKMm6Xng=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=TeU+LKM3fslre6VJ5PDCNgJlh0tNowHKWdGi8yJearfloNizh3DzeWlrMsKBWaLdY
-	 Xe1l6BBnkgav2TGv9xyGqdEiT7SqKqpQBK2e2AwZjKfxkHlFsu2GGHEawFF0jOfuNU
-	 WlKVbOxdIg3SgmlAXAFmfuVNWJH1ULcbE5oth3N4f+/CHs6Caxk8KtFDVnt0vTVkt/
-	 3i9x0Xgm9dHRC9EoGSACP6QnnIS9NQxTcVLIheJEm9ZM1lrvo2lZkd+ayXvNjyfqYa
-	 xboHfReO3T+xVTu44ZFVl44uaRM47n+2IBOf1R0mF9PESxaGuFKk7VZEpRTfgSp0Ws
-	 8RwCOd9ByxtkA==
+	b=BGg6GWrphH41Q5ypSkhEVArub+Ifw+yUGDZa1FAF9ztSScIdiiSBMI8+t/mUv7fCh
+	 u4hAVEvqnFCqCuMAzVJ8zVy6tjyOv6daWQzLji5sMS7BBQ7Z6a79lR5AQJmUeUsTwi
+	 leLn/qcb9zB5SsNVtFAygChZbjN2YHFODGpFfX+zCUG3kC+EZPFx9vlojE4a+juCcg
+	 dGls0DPCCUvhS+N5mB6l+z4JSSv9spjpw4iMAxnb8UnbvBLCkJVWnlytCVnutoGpxe
+	 qLMoZSZlR3qZoGg6HyIQPvEXhvjEK0kVi37b61p19hP6On+9PTePJchrzCaTBSZNjA
+	 u+AS1mTz7ZkiQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 197FF380CEDF;
-	Tue, 26 May 2026 15:40:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 79335380CEDF;
+	Tue, 26 May 2026 15:40:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,35 +37,37 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] test-mesh-crypto: Don't attempt to run test if
- AF_ALG is not available
+Subject: Re: [PATCH BlueZ] monitor: Add support for HCI Event Encryption
+ Change v2
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <177981000464.3867281.7386793683102864787.git-patchwork-notify@kernel.org>
-Date: Tue, 26 May 2026 15:40:04 +0000
-References: <20260522164912.3253018-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260522164912.3253018-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+ <177981000613.3867281.18131405745411383647.git-patchwork-notify@kernel.org>
+Date: Tue, 26 May 2026 15:40:06 +0000
+References: <20260522111540.581113-1-apusaka@google.com>
+In-Reply-To: <20260522111540.581113-1-apusaka@google.com>
+To: Archie Pusaka <apusaka@google.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+ chromeos-bluetooth-upstreaming@chromium.org, apusaka@chromium.org
 
 Hello:
 
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 22 May 2026 12:49:12 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Fri, 22 May 2026 19:15:12 +0800 you wrote:
+> From: Archie Pusaka <apusaka@chromium.org>
 > 
-> This make use of mesh_crypto_check_avail to check if AF_ALG is available
-> and if not just bail out which is similar to how test-crypto handles
-> when bt_crypto_new returns NULL.
-> ---
->  unit/test-mesh-crypto.c | 3 +++
->  1 file changed, 3 insertions(+)
+> > HCI Event: Encryption Change v2 (0x59) plen 5
+>         Status: Success (0x00)
+>         Handle: 256 (BR-ACL) Address: 00:11:22:34:56:78
+>         Encryption: Enabled with E0 (0x01)
+>         Key size: 16
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ,v1] test-mesh-crypto: Don't attempt to run test if AF_ALG is not available
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b8d42b282b3c
+  - [BlueZ] monitor: Add support for HCI Event Encryption Change v2
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b493164ffbff
 
 You are awesome, thank you!
 -- 
