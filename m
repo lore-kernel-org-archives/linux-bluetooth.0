@@ -1,49 +1,81 @@
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E603BB10A;
-	Wed, 27 May 2026 08:18:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.46.229.174
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1853DD534
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2026 09:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779869929; cv=none; b=LJcBstPyRqu3Ih0rs0pC7K9RF41Gg1A/61bLyGo8DQkNK9bOroqzS/TNTtjHWU5i7RhFpcGp+td6Nx5ZYzIZRxceVr0Df934rgP7pCGG/58Iqje6jxDS6nqmJempENllrPiGeV/fLYK2Ex61yyPvPdn7LzbTLNIzWcl7sgSAMx0=
+	t=1779872951; cv=none; b=g0zSquWdUTDeiP2f+/S6kz4mLM9IQMv+8ar/wec7KYO3AfFiLrIGFU/VfYhKeJksS8o+IYMlkZT/aqDiTr2NygGA6ssAYXr/XSCUqPcvg5Yh1PDdmUcWBKaw02/XBgverSy6SSvvtfRQH5wT7ztKtK31QNRF55k41F6XqChSvkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779869929; c=relaxed/simple;
-	bh=syfk5959tJHAPWULL5+nOqHgS2Vt+pN5sQcrmx2+q1w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WHKIT5QSQ2c08rz9FPxOZdEVZkOnSnB4ScZFDswvWX7XaXpiV767hXZTkYkEOhFYPoI718TjP49OJfSGcvwNgLTxD6/xnr5SLT7U91OZ36Ywb4XE42aDZArq4/+D908oJaYY5EvwIHt5GVdGD7qkM75kKeqCrUT9cpXi7vFJC9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=QEL+pgSx; arc=none smtp.client-ip=207.46.229.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn
+	s=arc-20240116; t=1779872951; c=relaxed/simple;
+	bh=xYy1/j4PQat72RkJ2qs58ZdiYDbBTsDsaIkP/Qz8WmY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fr5RFUFhN2WziFUerP3tlzOeYOJg1UJR2sl8vw/YyMcqDWC8oEiXmChha6o+k3IcXRWN9dPQC32cIfucEFuXOrrEZjGHHpW/ENE5Pm6DoL+LgI/CIUdg3xPw4Ie8bD1SGo56PB+teuROuDo2KB7dGpDgjuqrm9RT2vNY0ramAWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=synaptics.corp-partner.google.com; spf=pass smtp.mailfrom=synaptics.corp-partner.google.com; dkim=pass (2048-bit key) header.d=synaptics-corp-partner-google-com.20251104.gappssmtp.com header.i=@synaptics-corp-partner-google-com.20251104.gappssmtp.com header.b=I/J5WfVR; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=synaptics.corp-partner.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=synaptics.corp-partner.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b="QEL+pgSx"
+	dkim=pass (2048-bit key) header.d=synaptics-corp-partner-google-com.20251104.gappssmtp.com header.i=@synaptics-corp-partner-google-com.20251104.gappssmtp.com header.b="I/J5WfVR"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-36a8ee1e28cso3850251a91.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2026 02:09:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=2rub8
-	xVFH79HgKRt47yMxbSOY6mYiviajCZO6Mf7T5k=; b=QEL+pgSxblLp9DWSugux8
-	gguAPIWCC+lsykNdN3bz1BL63x+vsVOwTjA62HksH9jrMuYD54Yj7Mtut3mH1Pqd
-	wxyrG3bG67SiNfygShp1SRDqdUk7cRJgGmjOCwCwszoDMS0jF+AO5IGOXgRhOHay
-	HQeun4ksVS8WI1vq+BcCjI=
-Received: from localhost.localdomain (unknown [211.102.241.99])
-	by web3 (Coremail) with SMTP id ygQGZQA3go_ZqBZqOrztAQ--.39780S2;
-	Wed, 27 May 2026 16:18:33 +0800 (CST)
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-To: netdev@vger.kernel.org
-Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
-	Alexander Aring <alex.aring@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org,
+        d=synaptics-corp-partner-google-com.20251104.gappssmtp.com; s=20251104; t=1779872950; x=1780477750; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YzP4nn3r/gwn1is3A2tYi+9xfNYB+0iqmEG+7KOfkLY=;
+        b=I/J5WfVRfzjhf5qjwyUsAHvbOe3VTsw/jzfUkEHs2iYR6+JsaK5DIeKteNMKUQQQyQ
+         MRu1uSc/PsnxCSMz5HlgcpjlVdRRroJDuEbTF2rbbVtDoM5P8bbkc9F7Ir/TGzmhX862
+         CQeNu+p1UBX/hvI6kg9Hy77yhz8dzm1w/bptybDywsv5ghbteQEeBsyKyD5j+oGYzXrP
+         bUXsxeaTz6AZiZRofWWzthR5QnRsYM+NCJ42zkd0D1Kgok0exEsF7KwC6mjGal+lZ0sw
+         MJI3q7oSRAfdx+MowNxL58MuG0zQDGc7P7FNszz/NOR2qqmuGD+LGCqmdU01W74vz0yc
+         uR2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779872950; x=1780477750;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=YzP4nn3r/gwn1is3A2tYi+9xfNYB+0iqmEG+7KOfkLY=;
+        b=h27PfMJnzFgvgzC9EjzTus0e4C6DKrc2v4T6j3gUdmVy3TWZRMvDgYiQm4XavhaOy7
+         mz8C07WAoX2yXesHozCCNwEXMykIDF0nGxpAstNiwXOTIuJaJ8RxpmCuCIwe4COhB626
+         MvweFtPmIF0hVxoZpqfC1xDYSPAOvFmjixv99R4zSrMIqoY+WfPTKNp4QSESvV1YD+e1
+         oYiquTiswTBJZbmpd3MfpOnA79iasXVh/7+1mvo5iwEd6xM2qPHPL0wdkRelLGt2Ys7r
+         zxtknOuJyKp0DOgmQz4EFIGzSZ9vfU0LXGzHIyRQDC9Qk1+6NVzd7XWhFuOG0cWHfso3
+         uBuw==
+X-Gm-Message-State: AOJu0YyBo4Sv09Rn+Zoquw7k86VCZsoUE7H1l7KQXM/82iXuAljquu1K
+	3ONEU2v5mfUtgH5R/4CwMyHiyXdv1zWIsElNpRLuEo3FacSHnbedktibOsxyU0AJtJRPTN7/lrc
+	nLpxcWg==
+X-Gm-Gg: Acq92OGosaS5NT+gnmEh2pJugFyL1iAeF+mEsCYaXC2EpRtzJg+rjR7hAKwxwh+PlRn
+	xf58SG5Xp7RCrPK2t/+/3IKRwT0YFf52kOwffLvY0HmnSpIeHJS0yqSb0epa2dwI2we3DFD/LB3
+	0k60OP965nxjKwOWkY03V9lxIcpOKDxJuvlQufegjI/ElxDu6mkM6/Fvjsl/RJfHWKmmbnp6Vax
+	ctn3vRGJ6aQePyVYO5GnhUqSma2lpAnPfVtcX0Lcchnisu7mY0WAdqn9sbHp0uoaSoScAbsdJTz
+	BcAyz6eHfP84IgiDOhy+/40+YOA/ILQqlUNeWdmBXFxr4Cy3BM3ihYNV6sA4mPjGqpHGWYKv45h
+	/wNDvYuQ3DBonDHGNNanvx+vGaK6xvna++9ZA9EkTXBTq/AqBODbZu52VFqwA159SM00VkJdhW1
+	UR51W5wCnhp8wZ2ErOdPxZ/zaoD6udtkFeMO5H61nehstQEzidStXYzDbquswLcAvg04btSYgH8
+	8rQk47zNe8r+tS8Bg0Bgw3nSxErfJLdz4Ywfj8=
+X-Received: by 2002:a17:903:1247:b0:2bd:c5f8:504f with SMTP id d9443c01a7336-2beb0702144mr236239085ad.40.1779872949672;
+        Wed, 27 May 2026 02:09:09 -0700 (PDT)
+Received: from TPE-build-server-2.synaptics-inc.local (59-124-75-166.hinet-ip.hinet.net. [59.124.75.166])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bed2061c59sm92430365ad.2.2026.05.27.02.09.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 May 2026 02:09:09 -0700 (PDT)
+From: kaihsin Chung <kaihsin.chung@synaptics.corp-partner.google.com>
+X-Google-Original-From: kaihsin Chung <kaihsin.chung@synaptics.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	devicetree@vger.kernel.org,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
 	linux-kernel@vger.kernel.org,
-	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-	Ao Wang <wangao@seu.edu.cn>,
-	Xuewei Feng <fengxw06@126.com>,
-	Qi Li <qli01@tsinghua.edu.cn>,
-	Ke Xu <xuke@tsinghua.edu.cn>
-Subject: [PATCH net] 6lowpan: fix off-by-one in multicast context address compression
-Date: Wed, 27 May 2026 16:18:01 +0800
-Message-ID: <20260527081806.42747-1-zhaoyz24@mails.tsinghua.edu.cn>
-X-Mailer: git-send-email 2.46.2
+	Kaihsin Chung <kaihsin.chung@synaptics.com>
+Subject: [PATCH v7 0/2] Add Synaptics BCM4384 Bluetooth support
+Date: Wed, 27 May 2026 17:08:47 +0800
+Message-ID: <20260527090849.3647601-1-kaihsin.chung@synaptics.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260408083217.1915419-1-kaihsin.chung@synaptics.com>
+References: <20260408083217.1915419-1-kaihsin.chung@synaptics.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -51,77 +83,24 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygQGZQA3go_ZqBZqOrztAQ--.39780S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tw1rtw18tw45WF4UJr4rAFb_yoW8Zry3pa
-	s7A3s0yF97JrW3u392yw1jvw17uF4kJrWay340ya4YvFn0gF10yr18KFWkJas0yrWYk34j
-	qFWUCrWYyan8GrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67
-	AK6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
-	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc4
-	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
-	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
-	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjXTm3UU
-	UUU==
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQEAAWoWnq0YHQAAsL
 
-The second memcpy in lowpan_iphc_mcast_ctx_addr_compress() uses
-&data[1] as destination and &ipaddr->s6_addr[11] as source, but
-both should be offset by one: &data[2] and &ipaddr->s6_addr[12]
-respectively.
+From: Kaihsin Chung <kaihsin.chung@synaptics.com>
 
-This off-by-one has two consequences:
-1. data[1] is overwritten with s6_addr[11], corrupting the RIID
-   field in the compressed multicast address
-2. data[5] is never written, so uninitialized kernel stack memory
-   is transmitted over the network via lowpan_push_hc_data(),
-   leaking kernel stack contents
+This series adds support for the Synaptics BCM4384
+Bluetooth controller.
 
-The correct inline data layout must match what the decompression
-function lowpan_uncompress_multicast_ctx_daddr() expects:
-  data[0..1] = s6_addr[1..2]  (flags/scope + RIID)
-  data[2..5] = s6_addr[12..15] (group ID)
+Patch 1 adds the DT compatible string.
+Patch 2 adds Bluetooth driver support.
 
-Also zero-initialize the data array as a defensive measure against
-similar bugs in the future.
+kaihsin Chung (2):
+  dt-bindings: net: bluetooth: Add brcm,bcm4383-bt
+  Bluetooth: btbcm: Add Synaptics 4384 chip support
 
-Fixes: 5609c185f24d ("6lowpan: iphc: add support for stateful compression")
-Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-Reported-by: Ao Wang <wangao@seu.edu.cn>
-Reported-by: Xuewei Feng <fengxw06@126.com>
-Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-Assisted-by: GLM:GLM-5.1
-Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
----
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index e116d30..37eaff3 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -1086,12 +1086,12 @@ static u8 lowpan_iphc_mcast_ctx_addr_compress(u8 **hc_ptr,
- 					      const struct lowpan_iphc_ctx *ctx,
- 					      const struct in6_addr *ipaddr)
- {
--	u8 data[6];
-+	u8 data[6] = {};
- 
- 	/* flags/scope, reserved (RIID) */
- 	memcpy(data, &ipaddr->s6_addr[1], 2);
- 	/* group ID */
--	memcpy(&data[1], &ipaddr->s6_addr[11], 4);
-+	memcpy(&data[2], &ipaddr->s6_addr[12], 4);
- 	lowpan_push_hc_data(hc_ptr, data, 6);
- 
- 	return LOWPAN_IPHC_DAM_00;
+ .../devicetree/bindings/net/broadcom-bluetooth.yaml         | 1 +
+ drivers/bluetooth/btbcm.c                                   | 6 +++++-
+ drivers/bluetooth/hci_bcm.c                                 | 1 +
+ 3 files changed, 7 insertions(+), 1 deletion(-)
 
-
---
+-- 
 2.43.0
 
