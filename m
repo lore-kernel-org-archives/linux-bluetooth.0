@@ -1,71 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-41.smtp.github.com (out-41.smtp.github.com [192.30.252.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05A92EE262;
-	Thu, 28 May 2026 02:24:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB3614BF97
+	for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2026 05:38:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779935072; cv=none; b=rpdpxgiKPLa9xEi6DGPLuaa+k7ImMr2PexAktglELVbROdk46iYBxh65QiQ/Av5yzbhtPwbrqrAhN5eMSBuPT3Xchx/CFU80uHsohZhuvpiB6Q1KL5gSlmsxnyofWSR6By65OaC5065CMGVeQ8qY0aXZxuPICwmboyhnkefH2qY=
+	t=1779946735; cv=none; b=Uwm8zLM1lifxQIzjO6QcQOxW5NKAWwZZsi2dMI5+s+xhO8G/XB85oY7drpdCI3UXRQvO4uU6z2Mt0wMGLsm9P0y+ti/fIPlY7c917ftn+Ux+r2gcmm1qOr5gkFndBgqi9I8j1pYb5QkGwPP8I74Qyu8kJHmLocCDBVpbwHHUMeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779935072; c=relaxed/simple;
-	bh=FrW6PftFBAVq3gevUoJO1cg6Pi9ObKSk+65QC3n7FfM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E3ao7FRwcrNctDHRuwYBCNGVe4T4ib1ksEW+1hZs9SSjD7b7Kw/sxUiMehnhDeEyFLcZED65nnPw16l2ULQz7nyJm3dzNt39949rIfFxYMGVlLUfJCWJbGw5jZTXbrnYhFphB3E/IgShaNzLpjvLKLlwBwLmMqALOroSR7DBhbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aGi1WKia; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779946735; c=relaxed/simple;
+	bh=QUc7pzsYyCkdt1af+Ra61Q2LjlQUv0PQ/n4zasP9ddc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=iixoahq/bA6VQmUi89joV4SogqnpF1hFlZvmChDB0P86gCw8oFMGiTpBuDEp5mvjcn0N9wfhnaKk670t+bVvc3ThgvxZJde2hXRmkeGXoi5LP9ha4gbzKFJ+fPy1Hvk8vechU9CwUFmCsl5pefFL3Wq7NIZFbqu7GGPtbXRQk7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=mL9czWA8; arc=none smtp.client-ip=192.30.252.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aGi1WKia"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D0091F000E9;
-	Thu, 28 May 2026 02:24:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779935071;
-	bh=71zXM8ehCxjxqijFW0yk7Di/LCroQJafshpfLzrG8Hc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=aGi1WKiaihe+TVzOzo94L8e1qsqhBxZXjqjF1q3q+1amlkqSZ1lNI3qz3II7wGUdB
-	 dDwLICoKRIH3LbbgcU6jVcVslIWKSzYnvApQfHxnMd/w3addpxjX48iw368x00QJiA
-	 gcpmc8eHYZFi/4HrlYVCJYOqYs9WJwrjGhlCbDla/y/KfYDWPyIEjSZ2cInMTM5ydS
-	 TmENjv1N+U7U6X3HaIARw3ojE+tIeZRyeW0VzDnjzbshxM2xtMQWJ0fAb6+bklWlEX
-	 IyeNKg1o3dzVlGFOmyswSEMEIs0JfsNRAYxGkey0/3XFevxWR4z1k++34Eeob9B3pF
-	 9LR4npiPe0Glg==
-Date: Wed, 27 May 2026 19:24:30 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [GIT PULL] bluetooth 2026-05-27
-Message-ID: <20260527192430.1b490571@kernel.org>
-In-Reply-To: <20260527211246.371451-1-luiz.dentz@gmail.com>
-References: <20260527211246.371451-1-luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="mL9czWA8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1779946733;
+	bh=kIvJq3gfm2r6kkgFudIgVuWOQ92evotE1uVAWZkk1vc=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=mL9czWA8DpXd+KXcn+l0YcE4vTcM+VvYD5QuTCuJyWs5WltB7PxW07CX8wfjDQfHY
+	 yaKQnXTZ3xKHyECUsBMpn9uEbRIcgiYdZNCUoIXPj6NnbzHJnC7fF21tVHOGu/S9nX
+	 lWxf/hcLJ6nxMWYhT79U+O/pC7MU0S0ey3JuMeP0=
+Received: from github.com (hubbernetes-node-6d89ac6.ash1-iad.github.net [10.56.208.79])
+	by smtp.github.com (Postfix) with ESMTPA id 7462284053A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 May 2026 22:38:53 -0700 (PDT)
+Date: Wed, 27 May 2026 22:38:53 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1086507/1c15a4-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Wed, 27 May 2026 17:12:46 -0400 Luiz Augusto von Dentz wrote:
-> The following changes since commit ab1513597c6cf17cd1ad2a21e3b045421b48e022:
-> 
->   Bluetooth: fix UAF in l2cap_sock_cleanup_listen() vs l2cap_conn_del() (2026-05-20 16:35:47 -0400)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-27
-> 
-> for you to fetch changes up to df35e8e0c8c4160c881bb673e3c7ee010824fbd5:
-> 
->   Bluetooth: hci_sync: Reset device counters in hci_dev_close_sync() (2026-05-27 16:44:02 -0400)
+  Branch: refs/heads/1086507
+  Home:   https://github.com/bluez/bluez
 
-Are you still rebasing? Or did Linus convince you not to? :)
-Looks like we are missing your sign-off on:
-
-Commit c3d01980c64a ("Bluetooth: l2cap: clear chan->ident on ECRED reconfiguration success")
-	committer Signed-off-by missing
-	author email:    kipreyyy@gmail.com
-	committer email: luiz.von.dentz@intel.com
-	Signed-off-by: Zhenghang Xiao <kipreyyy@gmail.com>
-
-If you're planning to no longer rebase your tress - don't worry about
-it. It's not a deal breaker. If you are rebasing anyway - could you
-amend?
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
