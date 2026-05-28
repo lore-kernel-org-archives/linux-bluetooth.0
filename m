@@ -1,60 +1,55 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.f-solutions.fi (mail.f-solutions.fi [178.213.234.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59BF92475F7
-	for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2026 16:19:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D0240912B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2026 18:38:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.213.234.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779985178; cv=none; b=KdilWRjnOIpC7P5B8PqAJ4tJIjLLjrVFbA5bb3QdZgjktOxH6iIrVO6AmzE/y9roQmr41W7L9GTyuH4AAyQyXT0bNYcG6CFwoBepcWiihBmnUNQ/qcEnzM+fXCDaTKN9rfQDbav7BZWC1FB5KO2DV3EjU/Po7+62ZDEW5OHjn4M=
+	t=1779993504; cv=none; b=pCljD1bPDSvw5R1JZpxqNkTUBiODr0wi1Y2Znv79wWVDQJEJ3k+1XJFGBLr1kt9bAgyFxOfkpBnHrcSVk0cMkTXc8whNqEBTauYF2qkMKXi52aBOi2TeRBaq/CMwbBErW86mqYzb+zTyG2osaeTUvM7jJcc4zviNCojEp4aGkWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779985178; c=relaxed/simple;
-	bh=BPdrQ/37E8TIzU4txhu0P5umINbW9n02lUcGhkgFMd8=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=XVdQv+fUDQPF3kVnZZSk4Qi6nSPQGdjC1xlE5oHwDk3P1T3IGXt+dWQQhKltqfqcRx49Ui1z1I3kHO9+UMmDztOkB+DV+K511wTpmpmt6V9vd5Ue9pcEAoHd+XlgQaCHNZTG/adyAaWCr+h+n7iwH5RxOsdANPL19y+EXAXN5eE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HmtgfA4A; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779993504; c=relaxed/simple;
+	bh=5jUrnyfihoXDU7Z8FOoNFg341HBr8e/hMd0eVqprV9o=;
+	h=Message-ID:Subject:From:To:Date:Content-Type:MIME-Version; b=A5RkJtHybrKqYhxXm/OSoX0UbHoRvBUdxEdK3VFcwBDDwBrpj4LylDDJvfzK/FJewUuGiRFI/YtmTTwxJZgBxzBQ/8FJfUmE0Fzi4LPenGCHTECYxqFCSNUl47oYknxOOHZehQ0HEBgVRRjGtcpNVfN7HoorvPEwdMZ56cKjsOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strokeplan.com; spf=pass smtp.mailfrom=strokeplan.com; dkim=pass (2048-bit key) header.d=strokeplan.com header.i=@strokeplan.com header.b=nTZWSJye; arc=none smtp.client-ip=178.213.234.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strokeplan.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strokeplan.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HmtgfA4A"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E4117C2BCC7
-	for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2026 16:19:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779985177;
-	bh=BPdrQ/37E8TIzU4txhu0P5umINbW9n02lUcGhkgFMd8=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=HmtgfA4A8vOkYsY0p1IZbio96tI+OVMWK/MBT4uKW8J48fRYpMCY4wfDCxUuRG/hi
-	 bUKngFL2HmrPQZrLxhz0/7aSZXl9HNkKyVuahT15P9VMLzgqvhQm+4w+FXtnwVGKqU
-	 QtQEj/+AogNASY+gYVii4kHaipgODgC1DjmuZDmXUAENMNjqI6BR7R/x1bMj2rND8K
-	 3aLQAWbD7G+5OxS58/qfc1UrTIj0wWmdhJHwVBgNPscTEznj5Hz8ywoSDhabMyuMW6
-	 OTJdkqbu8Sobyp39FE6IPxqanaXi5cF3jXyPNvaSdbVRxJuNkkrnawTn5EPXnHE9Ac
-	 YrOafm8ilZAdg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id CBC4EC433E1; Thu, 28 May 2026 16:19:37 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (2048-bit key) header.d=strokeplan.com header.i=@strokeplan.com header.b="nTZWSJye"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=strokeplan.com;
+ i=@strokeplan.com; q=dns/txt; s=fsolrsa; t=1779993499; h=message-id :
+ subject : from : to : date : content-type : content-transfer-encoding
+ : mime-version : from;
+ bh=5jUrnyfihoXDU7Z8FOoNFg341HBr8e/hMd0eVqprV9o=;
+ b=nTZWSJyeOdgbTKKtzy1iBvF3lxCb2JMcADgTONwpSiK0k6Wj8VjY03SOAuEeHQeQYFCX/
+ l6WI2pnZxcoNgIMZ54HRk9tivPOEXaceO7nKBNRwgFQwZaIBOPqQ/sKaclp6VDxr5z2cpIj
+ IE1s+u4flKoEbTmzANPBL4coA5b65khVc/kwi3aDXB+EbcSoLnz4Qc0u7yGr6B9VoSMK6Tb
+ IwJAJ7oKMQsoeMwpsbulsbj8JZQngVCExef7IOivgkHRXBS5mt8sLkldtLYIylQ+La0B2Ov
+ rXezHxk1p4c0DzYgJfzpRMjaauaNjRXdI/BjAg1SNgHWK8U4LWOhfeOjsGUA==
+Received: from [10.49.194.39] (mobile-access-567367-100.dhcp.inet.fi [86.115.103.100])
+ by mail.f-solutions.fi (Postfix) with ESMTPSA id 31AFC30BCCDE
+	for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2026 21:38:19 +0300 (EEST)
+Message-ID: <74db472595986d0dec795353ea5f1eed7a3bd8e2.camel@strokeplan.com>
+Subject: Fwd: Correct contact people(s) and Linux branch for my HID driver?
+From: Mikko Laanti <mikko.laanti@strokeplan.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 220237] Bluetooth: MediaTek MT7925 (0e8d:7925) fails to load
- firmware with timeout (-110)
-Date: Thu, 28 May 2026 16:19:37 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: are.mehus@protonmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-220237-62941-5fCLXqzSSV@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220237-62941@https.bugzilla.kernel.org/>
-References: <bug-220237-62941@https.bugzilla.kernel.org/>
+Date: Thu, 28 May 2026 21:38:18 +0300
+Autocrypt: addr=mikko.laanti@strokeplan.com; prefer-encrypt=mutual;
+ keydata=mQENBFnrH9wBCADiV0G0VVA/qs9rr9DqG2xvlcRzMVrtdP5Fw+rRdb6dUJq68aPcSNcQ4
+ NtyosYX/w+NoTH3LrdjkiFno+4EBbnqnYDfA+U1UU1NSt6WnciMauAJkYVyJFtb41wUPJizAMFyuo
+ 8/75tD54jSz3JjxnMinYZ8x86UON8jCeAOET7L1KxbRC4tQeSABn7MebTOKUIBntVJnfA+ieqFOXf
+ R4wW5RnjBBbIjjDmaS2XlulzdxqZSgp9DVijwKkM/pONFdP+7f0W6LDkPvpJriVXvjuNuNwt+LrBp
+ r8tmPmSocr69Ju9S55Kt9uuymxGTzqtFtKt/6V0AAw/LEv8+XCxh/JLpABEBAAG0Kk1pa2tvIExhY
+ W50aSA8bWlra28ubGFhbnRpQHN0cm9rZXBsYW4uY29tPokBTgQTAQgAOBYhBO9qaRpgftuPkzg3l3
+ VWKEbXWIs3BQJZ6x/cAhsDBQsJCAcCBhUICQoLAgQWAgMBAh4BAheAAAoJEHVWKEbXWIs3nHMIAKr
+ U9JEWP9/PblxyX4kC3dE+td+Zw3BuOlUvj44yDIai6/zrjuYeOCf6/M6p/ZqjQlXpl0UKbtZA2bzs
+ cf7GIMM/hX2R7xk24CDm0g3ecQdzCDsNrYFXY9AMIkkgJKgnV3NSI1p0GxPkce9W9UyYkmSc07x9X
+ gLkKRlyTAnRctsyppmvnCjqfgMRoYBVFy0Wu0ocLY2RZT7YIAMgZV/sbrb6eeoChxN8QHIpnHhSKh
+ djWBBuLAm0YISJ9K+yWfk6ORIBUHppezjF71gjbw202931JI08adQYPNTSj82ricCfzf4zAkHgA9/
+ 9PDLQ+LOm8E8aTAKKip7fMcu5Je0HusU=
+Organization: Strokeplan Oy
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+User-Agent: Evolution 3.58.3 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,58 +57,109 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220237
+Hi,
 
---- Comment #7 from Are Mehus (are.mehus@protonmail.com) ---
-Also fixed for me on 7.0.10.
+I have witten following driver for bluetooth HID device iRig BlueTurn.
+To whom should I contact? If it is accepted, to what git Linux kernel
+branch should I it check-in?
 
-Thank you!
+Regards,
+
+Mikko Laanti
 
 
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ *  HID driver for IK Multimedia iRig BlueTurn devices
+ *
+ *  Copyright (c) 2026 Mikko Laanti <strokeplan@gmail.com>
+ */
 
+#include <linux/hid.h>
+#include <linux/module.h>
 
-Sent from Proton Mail for iOS.
+#include "hid-ids.h"
 
--------- Original Message --------
-On Thursday, 05/28/26 at 18:14 bugzilla-daemon@kernel.org wrote:
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220237
+MODULE_AUTHOR("Mikko Laanti <strokeplan@gmail.com");
+MODULE_DESCRIPTION("iRig BlueTurn devices");
+MODULE_LICENSE("GPL");
 
---- Comment #6 from Cameron VanHouzen (cameron@vanhouzen.me) ---
-Note that this issue is now fixed for me in kernel version 7.0.10
+/* Changes in Makefile
+obj-$(CONFIG_HID_IRIG_BLUETURN)	+=3D hid-irig-blueturn.o
 
-=3D=3DINITIAL DEVICE DETECTION=3D=3D
-May 27 20:57:29 kernel: usb 1-12: new high-speed USB device number 10 using
-xhci_hcd
-May 27 20:57:29 kernel: usb 1-12: New USB device found, idVendor=3D0e8d,
-idProduct=3D0717, bcdDevice=3D 1.00
-May 27 20:57:29 kernel: usb 1-12: Product: Wireless_Device
-May 27 20:57:29 kernel: usb 1-12: Manufacturer: MediaTek Inc.
-May 27 20:57:29 kernel: usb 1-12: SerialNumber: 000000000
+ * Changes in Kconfig
+config HID_IRIG_BLUETURN
+	tristate "iRig BlueTurn devices"
+	help
+	Support for iRig BlueTurn devices, which are not fully
+compliant with the
+	HID standard.
+	hid-irig-blueturn
 
-=3D=3DFIRMWARE LOAD=3D=3D
-May 27 20:57:33 kernel: Bluetooth: Core ver 2.22
-May 27 20:57:33 kernel: Bluetooth: HCI device and connection manager
-initialized
-May 27 20:57:33 kernel: Bluetooth: HCI socket layer initialized
-May 27 20:57:33 kernel: Bluetooth: L2CAP socket layer initialized
-May 27 20:57:33 kernel: Bluetooth: SCO socket layer initialized
-May 27 20:57:33 kernel: usbcore: registered new interface driver btusb
-May 27 20:57:33 kernel: Bluetooth: hci0: HW/SW Version: 0x00000000, Build T=
-ime:
-20260414153243
-May 27 20:57:35 kernel: Bluetooth: hci0: Device setup in 1835871 usecs
-May 27 20:57:35 kernel: Bluetooth: hci0: HCI Enhanced Setup Synchronous
-Connection command is advertised, but not supported.
+	To compile this driver as a module, choose M here: the module
+	will be called hid-irig-blueturn.ko.
 
---
-You may reply to this email to add a comment.
+ * Changes in hid-ids.h
+#define USB_VENDOR_ID_IK_MULTIMEDIA	0x0214
+#define USB_VENDOR_ID_IK_MULTIMEDIA_IRIG_BLUETURN	0x0002
+*/
 
-You are receiving this mail because:
-You are on the CC list for the bug.
-You reported the bug.
+/*
+ * The iRig BlueTurn (Page turner) foot controlled bluetooth keyboard
+uses unnumbered keyboard messages
+ * iRig BlueTurn can be configured to three possible configurations for
+its two buttons:
+ * 	1. ARROW_UP/ARROW_DOWN
+ *	2. PAGE_UP/PAGE_DOWN
+ *	3. ARROW_LEFT/ARROW_RIGHT
+ * E.g. A compliant bluetooth keyboard sends Up Arrow:  01 00 00 52 00
+00 00 00 00 (first data byte means it is "numbered")
+ *      IK multimedia iRig BlueTurn sends Up Arrow:     00 00 00 52 00
+00 00 00
+ * Without this driver and iRig BlueTurn connected, you'll get system
+log dmesg error:
+ * "Event data for report 0 was too short (8 vs 7)"   (hid-core.c:
+hid_report_raw_event)
+ */
 
---=20
-You may reply to this email to add a comment.
+static int irig_blueturn_raw_event(struct hid_device *hdev, struct
+hid_report *report,
+	u8 *data, int size)
+{
+	/* iRig Blueturn always sends unnumbered 8 bytes i.e. 64 bits
+data reports.
+	 * hid-core.c: hid_report_raw_event() decreases data size by
+one because keyboard messages should be numbered.
+	 * We decrease report size here so that it will pass data size
+test in hid-core.c:hid_report_raw_event()
+	 * Right way would be to adjust data so that it looks exactly
+like compliant keyboard, but we cannot set
+	 * the size because it has been passed to this
+irig_blueturn_raw_event as a value, not as a reference.
+	 * So we have to decrease report size here so that it will
+pass data size test in hid-core.c:hid_report_raw_event()
+	*/
+	int ret =3D 0;
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+	if (report->size =3D=3D 64) 	// 64 bits length
+	{
+		report->size =3D 56;	// decrease it to 56 bit
+	}
+
+	return ret;
+}
+
+static const struct hid_device_id irig_blueturn_id_table[] =3D {
+	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_IK_MULTIMEDIA,
+			 USB_VENDOR_ID_IK_MULTIMEDIA_IRIG_BLUETURN) },
+	{ }
+};
+MODULE_DEVICE_TABLE(hid, irig_blueturn_id_table);
+
+static struct hid_driver irig_blueturn_driver =3D {
+	.name			=3D "irig blueturn",
+	.id_table		=3D irig_blueturn_id_table,
+	.raw_event 		=3D irig_blueturn_raw_event,
+};
+
+module_hid_driver(irig_blueturn_driver);
