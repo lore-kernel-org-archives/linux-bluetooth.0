@@ -1,60 +1,60 @@
-Received: from mail-pf1-f196.google.com (mail-pf1-f196.google.com [209.85.210.196])
+Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B3A3537C4
-	for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2026 07:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 439E834D91F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2026 07:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779955010; cv=none; b=fG6DbPZGWhQ1N3Y3BC31+HDEcn8NpVOIuAEs1F9qHSfgc7i5+UPx+SVmcbkjyQkbaPPMERvWtFjcKqiKLwAmS6Iqta4242GwM6D09kMUvgEp/mG0c0yMv3fXztO9uEnWiB0AH8b+VrXD10aGLYOqKufSj+1P4NAWBNVvSnhCIjo=
+	t=1779955029; cv=none; b=S7KSJn9AN2a2bltkvNydfO4VmB0rpHMcfidC4T1RisDjvXww44ATsDG2BvitU7/5OvZ3KT4TY9h0dlc8N0BH1CXc5TSH19QbCWTreTHjfptWV4nqq+E6zy+GAGgX6E308tZ+uSZZxenkCphb/lkDDEZIwTuaw/Bi3nf6LLzvMBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779955010; c=relaxed/simple;
-	bh=xn2ZpQDfvA3V7bictycQWFTddQPbTtrDSKV2NFgxYNQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YBv4qIuzPHgSeRfsXogt+y5hxaiAPIjb7h4ux9Ax39ZEa4Dk7DPnVeSu88qWl4yTX1hwNu3c0BgYcKJOIQQCMZ8XuHOJsKfZVbutSTP7wJaVv0YQjkZoUEuDJpxd+Y7kGNv76LeyWmiedcFzLW4T0ZufyzVrkGridSLEWIpjCCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N7vyeHpo; arc=none smtp.client-ip=209.85.210.196
+	s=arc-20240116; t=1779955029; c=relaxed/simple;
+	bh=oP8rIIoUzxg9hIZd2waDjppIEnI2BrHnfGO8z+KL5N8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Fvl5UGfwkUdy1DqszACK6C9HAUU3PWMQInXeSjhIzLE0NLOT1cffL7M+F/1585KJMP8+dU49LZnRf75Csy5dmAtaayXdVS9QNQpXsQSkD295sTkceAfLf2u9468hxqo9TtUCmGLjZqP3qKcvNE/vXHhpwAkYxv/AhMwTNtejZHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DHYyzKTk; arc=none smtp.client-ip=209.85.214.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N7vyeHpo"
-Received: by mail-pf1-f196.google.com with SMTP id d2e1a72fcca58-82fbf5d4dc2so8719372b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2026 00:56:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DHYyzKTk"
+Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-2baca4df358so80047835ad.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 May 2026 00:57:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779955008; x=1780559808; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779955027; x=1780559827; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=k65PqWHZBHIv163pOSIQ8s0eEgaZ9inb49lpABoe+QA=;
-        b=N7vyeHpoGLjm7yQc2uyOJQa8Un5VdV61eMVvFmRfi4GeSmz1EzGuF23/LX6PW6paKe
-         v5DMhs7J8s2QhjzHMMo1YQsyZRCSvkaNikAgr6V/DHVzr7lUZPZ1o9eDPoZ+0ksF8owk
-         +5uE16ZlM/d6EDnnuAxD5QMLlE6Vn+OvrDMwB4uXLOqIhXqPi/NtikXeNFKJTmA7NruB
-         Peranl2SZxQ0RJBumomwEy2BkDbId4JbpG0bZW6LL99mW7d/OSZrJ+bklaeUvnT/AJjm
-         SWZTIcu+6Eyd3kMgznV/CZuihrcG3UKbzUVU1d7C/YldgEh8FuAMXSZQtriIJnlkCAN3
-         OkXQ==
+        bh=E0szyu0aLTYDrwsxxxTLCxZBA4Psj+By733/2324tjo=;
+        b=DHYyzKTkhPEyK6s9S0lc4TUuWXa/8/oaATZ7fxfPBp97CzLF/QvYbPno/60MHPgGwx
+         FE1A5vtAbIW5wEx3mp3hIelRY/O27SpZ9NcjWcLRMQQccp5+0ynSMl/4o9B+AedGA9/w
+         l1qYKo+GKqYRYFtBVXlvGHAUqOfax4WxI3X+L3Plq2ICiF3lwTg4vGX10PaVdBaeHsCW
+         5E/v/VfSqhHMKfI0JHgoHnKudbGLSCXIFfdivf7CMKcJyVsQRmjd7SpvX24O43POsgmR
+         ntMm4YFVIcg2nBElg1DnauDswrBqlyPxgndLjOjAX91AOkr3TqOXsCH2dSvVQf5+EsH1
+         XakA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779955008; x=1780559808;
+        d=1e100.net; s=20251104; t=1779955027; x=1780559827;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k65PqWHZBHIv163pOSIQ8s0eEgaZ9inb49lpABoe+QA=;
-        b=cqwboPLiTrrcV7Bw0Gv6Ut2+/JXkavwctwiBAusqgW2fDxP9iPcdtJoABw5iH18tS+
-         7d3QK1D4SElw9cdP3nfYmz+eZlv1A8DRqsxx3ljYIvnnZqQgHq6R6psBVguQqG1jc20t
-         w+TXDTLCdhRdln8VnQI8XyjO0tnSLh4tJhBCv7urgRaGeU+A+PU79VsWbTnNxw6VL5n2
-         TPvpWADIBfWRlwWoyJ6AOgKCQ6/uvhS9qSGjFka/mkGERUrHHbBwcJgqjruTcHx/RHnf
-         DNQC1e8C9l2LqsJEQRVC8zaw5YWllJygC2jbfczNL65GjQTb4KD2GNUDE95tgD/obtzQ
-         H6KA==
-X-Gm-Message-State: AOJu0YzyQFEZmDUaXt3B7k/tNtNAWBgCJ83HsEdqigbjfoC0xXMCzgjZ
-	NQKkpjQuPwvuzpTOPGMH9lPBMkwVmOm+nwZ+Y98hb/GjqCbUItBFsRtX
-X-Gm-Gg: Acq92OGaLHgv8JAHwGpO+efWQ3d0qeJgLRiTm3Z5Vo3XIfEoXk4Zq38tIfmx5s2bIrw
-	tuYaEc20vB+hrZc8xAeC7bp2nXGdjHsYvJ+lQ5+DlYUZnaqt48Q2aSIasqZlQHFkaH8YOcn/O6b
-	5XB4qEO0RGVeZ2KTTrQDTU7F8VhUKbZgVjEmG0fkD5Fm30xlWYtzg5CKTE8uT/ZTX4fOADQR6Dy
-	+E7pBwVmpHKzO55LahD4aAIsKUI1JP+/Ln7uBgRYlEEVzlIoVToxxED1MVxtb5m2snV/m9zgGMS
-	gtBoVssHRy5t3I2jNJXSBcSyA2dmljbzwo1gMSKZq6ZhkTyjY6BYYo4SNWU00ikWYPCZVs8W8oU
-	7VdBGEAkuKPGucMUhvqgYJH1MrtSPoarVCnFhu60ibSWgAdhTTXnZcYUtRaBWpnX42jeomTlM/G
-	xRDM95iPKr8RzKhtWKp/3MXoTUNJyCwEiDVDE8yzy15Q==
-X-Received: by 2002:a05:6a00:2447:b0:835:4776:7d7b with SMTP id d2e1a72fcca58-8415f65c44bmr28228201b3a.42.1779955007847;
-        Thu, 28 May 2026 00:56:47 -0700 (PDT)
+        bh=E0szyu0aLTYDrwsxxxTLCxZBA4Psj+By733/2324tjo=;
+        b=O8Cmev90kVmLQ14Pcu8XQyqCxXOJZQSG0tCv3VObV8O7Us5WuB84EtEvhHBvYEOQlu
+         18JcTkzfMepPdnal+fCBDwtP6RXjZUv4vHggZOD/ra1+yF58TieP8Lu73aknaZX+LEXA
+         gz6PdJLFsEosYwnI/YyhYaLPqqoFGBY9RApuGvX8wpraX8X1aPfpAXugcDDqUcTnQrZd
+         aY+fNci7AbDAS9KmBDJ9amXTxdk5jjxcptGh4AkzLc+JfpMn/mRqeIvaPceYuQwoUCeE
+         YEjUMVMn8+A2ORD57KgpOPjXN+lCkBcuBz1GePHSvJqVNrNkXtTeKlyMih8ZsXB/ITY7
+         V2Cg==
+X-Gm-Message-State: AOJu0YwAZamXjTFIxVEpreq1ic/V7kfBaa4u1tU75JuIKsS25SfyV+AZ
+	JXYAYC7xlUsi96lELtdZxAvpiZfKXemdAEC+z9ekhUKr4EeJIZfYzs6m
+X-Gm-Gg: Acq92OHh4sfhEYJ6gh6mcrYEXNVj3wg6c3SCZs1LBWW6plRGjM6+MR6DKIpNJSWAUIM
+	gzZFn2+pRuD3LAb0A2/AXKFhwFvYVi0WUsr2WMgTMsHA+Zb1W4b/oFPR2mRxj7qdbKACO7pFW77
+	jdfnGFdGyeek5oAvJhZc7Cdo/4W7Jmnx48eqDN5JztAMOA6+lr44NTxzQg1kwZHmrtjlPHBIMf0
+	G0DZGm2CsKZ6o4n1Ly4Xp5tx5GUagIYZnxzVTtPbQMFKUxt3G8QWCctAE47NLu8uG0Mhe9ubbC2
+	Gn7CgCLKp7I2wj3fEwDmdahuXhicCD+n4a4udu3j7SSE0RbE9CGQ7azmXiJL5k2a+5lH5Rjih99
+	NFOfXqGDb1KcYu65C8CFw+rzuBbqysENiTCqj0zppkN4oFNBqE+NEIiGJWvXuLBfWLcbPfutTFW
+	KiPqVML75PIXUAOygi9gLPBoaAT1zQRxsIy84nUv7ddA==
+X-Received: by 2002:a17:903:2b0c:b0:2ae:825b:49a5 with SMTP id d9443c01a7336-2beb0582ba0mr266026775ad.0.1779955027507;
+        Thu, 28 May 2026 00:57:07 -0700 (PDT)
 Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-841d72f8c7esm4273633b3a.52.2026.05.28.00.56.43
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb5903bcasm182119355ad.77.2026.05.28.00.57.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 May 2026 00:56:46 -0700 (PDT)
+        Thu, 28 May 2026 00:57:06 -0700 (PDT)
 From: Zhang Cen <rollkingzzc@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -62,9 +62,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	zerocling0077@gmail.com,
 	2045gemini@gmail.com
-Subject: [PATCH v2] Bluetooth: RFCOMM: hold listener socket in rfcomm_connect_ind()
-Date: Thu, 28 May 2026 15:56:41 +0800
-Message-Id: <20260528075641.3416308-1-rollkingzzc@gmail.com>
+Subject: [PATCH v2] Bluetooth: MGMT: validate advertising TLV before type checks
+Date: Thu, 28 May 2026 15:57:01 +0800
+Message-Id: <20260528075701.3417224-1-rollkingzzc@gmail.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -74,122 +74,63 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-rfcomm_get_sock_by_channel() scans rfcomm_sk_list under the list lock,
-but returns the selected listener after dropping that lock without
-taking a reference. rfcomm_connect_ind() then locks the listener,
-queues a child socket on it, and may notify it after unlocking it.
+tlv_data_is_valid() reads each advertising data field length from
+data[i], then inspects data[i + 1] for managed EIR types before
+checking that the current field still fits inside the supplied buffer.
 
-The buggy scenario involves two paths, with each column showing the
-order within that path:
+A malformed field whose length byte is the last byte of the buffer can
+therefore make the parser read one byte past the advertising data.
 
-rfcomm_connect_ind():            listener close:
-  1. Find parent in              1. close() enters
-     rfcomm_get_sock_by_channel()   rfcomm_sock_release().
-  2. Drop rfcomm_sk_list.lock    2. rfcomm_sock_shutdown()
-     without pinning parent.        closes the listener.
-  3. Call lock_sock(parent) and  3. rfcomm_sock_kill()
-     bt_accept_enqueue(parent,      unlinks and puts parent.
-     sk, true).
-  4. Read parent flags and may   4. parent can be freed.
-     call sk_state_change().
+Move the existing element-length check before any type-octet inspection
+so each non-empty element is proven to contain its type byte before the
+parser looks at data[i + 1].
 
-If close wins the race, parent can be freed before
-rfcomm_connect_ind() reaches lock_sock(), bt_accept_enqueue(), or the
-deferred-setup callback.
+KASAN reported an out-of-bounds read in tlv_data_is_valid(), reached
+through add_advertising() and hci_mgmt_cmd().
 
-Take a reference on the listener before leaving rfcomm_sk_list.lock.
-After lock_sock() succeeds, recheck that it is still in BT_LISTEN
-before queueing a child, cache the deferred-setup bit while the parent
-is locked, and drop the reference after the last parent use.
-
-KASAN reported a slab-use-after-free in lock_sock_nested() from
-rfcomm_connect_ind(), with the freeing stack going through
-rfcomm_sock_kill() and rfcomm_sock_release().
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Fixes: 2bb36870e8cb ("Bluetooth: Unify advertising instance flags check")
 Signed-off-by: Zhang Cen <rollkingzzc@gmail.com>
 ---
 v2:
-- Wrap the interleaving description to satisfy GitLint.
-- Add a Fixes tag.
+- Drop the MGMT_OP_ADD_EXT_ADV_DATA hunk; bluetooth-next already
+  validates that command length.
+- Keep only the tlv_data_is_valid() element-ordering fix.
+- Add a Fixes tag and avoid the raw KASAN headline that triggered
+  checkpatch.
 
- net/bluetooth/rfcomm/sock.c | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+ net/bluetooth/mgmt.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 38d2355114cff..ed31d5f4fc76f 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -123,7 +123,7 @@ static struct sock *__rfcomm_get_listen_sock_by_addr(u8 channel, bdaddr_t *src)
- }
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index de5bd6b637b20..027b266ccc747 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -8638,6 +8638,12 @@ static bool tlv_data_is_valid(struct hci_dev *hdev, u32 adv_flags, u8 *data,
+ 		if (!cur_len)
+ 			continue;
  
- /* Find socket with channel and source bdaddr.
-- * Returns closest match.
-+ * Returns closest match with an extra reference held.
-  */
- static struct sock *rfcomm_get_sock_by_channel(int state, u8 channel, bdaddr_t *src)
- {
-@@ -137,15 +137,25 @@ static struct sock *rfcomm_get_sock_by_channel(int state, u8 channel, bdaddr_t *
- 
- 		if (rfcomm_pi(sk)->channel == channel) {
- 			/* Exact match. */
--			if (!bacmp(&rfcomm_pi(sk)->src, src))
-+			if (!bacmp(&rfcomm_pi(sk)->src, src)) {
-+				sock_hold(sk);
- 				break;
-+			}
- 
- 			/* Closest match */
--			if (!bacmp(&rfcomm_pi(sk)->src, BDADDR_ANY))
-+			if (!bacmp(&rfcomm_pi(sk)->src, BDADDR_ANY)) {
-+				if (sk1)
-+					sock_put(sk1);
++		/* If the current field length would exceed the total data
++		 * length, then it's invalid.
++		 */
++		if (i + cur_len >= len)
++			return false;
 +
- 				sk1 = sk;
-+				sock_hold(sk1);
-+			}
- 		}
+ 		if (data[i + 1] == EIR_FLAGS &&
+ 		    (!is_adv_data || flags_managed(adv_flags)))
+ 			return false;
+@@ -8654,12 +8660,6 @@ static bool tlv_data_is_valid(struct hci_dev *hdev, u32 adv_flags, u8 *data,
+ 		if (data[i + 1] == EIR_APPEARANCE &&
+ 		    appearance_managed(adv_flags))
+ 			return false;
+-
+-		/* If the current field length would exceed the total data
+-		 * length, then it's invalid.
+-		 */
+-		if (i + cur_len >= len)
+-			return false;
  	}
  
-+	if (sk && sk1)
-+		sock_put(sk1);
-+
- 	read_unlock(&rfcomm_sk_list.lock);
- 
- 	return sk ? sk : sk1;
-@@ -945,6 +955,7 @@ int rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc *
- {
- 	struct sock *sk, *parent;
- 	bdaddr_t src, dst;
-+	bool defer_setup = false;
- 	int result = 0;
- 
- 	BT_DBG("session %p channel %d", s, channel);
-@@ -958,6 +969,11 @@ int rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc *
- 
- 	lock_sock(parent);
- 
-+	if (parent->sk_state != BT_LISTEN)
-+		goto done;
-+
-+	defer_setup = test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags);
-+
- 	/* Check for backlog size */
- 	if (sk_acceptq_is_full(parent)) {
- 		BT_DBG("backlog full %d", parent->sk_ack_backlog);
-@@ -985,9 +1001,11 @@ int rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc *
- done:
- 	release_sock(parent);
- 
--	if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags))
-+	if (defer_setup)
- 		parent->sk_state_change(parent);
- 
-+	sock_put(parent);
-+
- 	return result;
- }
- 
+ 	return true;
 -- 
 2.43.0
 
