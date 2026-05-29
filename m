@@ -1,101 +1,101 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28CB5246774
-	for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2026 08:36:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B3B3451B3
+	for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2026 08:54:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.46.229.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780043794; cv=none; b=LaHOr0rBlYNXHufIM537N9V7aDBsKCIz+1EXBuYEuYmx3Q55BmNM49LcW0oFVPwAHKCfV2MdF+on33sYAjqyifPCkS++gqf0ighi4wdeiszKHCbc1w5h2UoTpGmK+pERnhni8z35IQJPhwy2UGqLKzEH3YYNIKCSDqkQyEOh+V0=
+	t=1780044879; cv=none; b=WDLl4JuO82lE7vnmwppu+w9QqYqylhxga+Alxu7hgVIeu5XmdugdkfyTAUbZ9U0CYq409EN8MzsTKg5iuddDZ+riysGjL+7MhlnGOm8t4esPYGR19oOhPL+Itu6A3q0fi/J3qAQq4Om7RdGtjab2JGq3MU6FEY0AI4NuYCt2UlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780043794; c=relaxed/simple;
-	bh=4wicoqvadV2/HNQm4wFw3ZNKX9pLOBD5nuu171A7xJE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=OKPkxxyFgcSt6+XUsJHhu/X02Sk9VKUA/nR9xA57IAxnjt8vVCFQ8LVjxdJ00oZbUm8dGM6UUEdFIcplbdvPcAc0aeDdtRhTS8j50NcBOya+B18aFt03sh2jbfo+gIh/gAzizsiUbVuTA3dwoXevHUPtRVc+UErljkLuav5xkDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kXfHXuAd; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kXfHXuAd"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-90fe17c157aso1446085885a.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2026 01:36:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780043792; x=1780648592; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=4wicoqvadV2/HNQm4wFw3ZNKX9pLOBD5nuu171A7xJE=;
-        b=kXfHXuAdf/jLPHwayeyGjTzvT5PZ3HQHA1bsduwLaDFr1OF1R1gG/mt3LPoV9nkG92
-         7GxiNS70u9OYNFushFklRSVcRAWMDXcOLDVoljPmeUa8OzBlKBl0hB4OhoY2Hyp7d7S9
-         QLHc/KlMGmzziFSBvMM9CJjkPU3ed3GGai21p07hbqEH5CENN7TY2k0OIAZxIr4ChhQp
-         652mOlptMM1Sah+MLMrDtH/k08C1vkY2ufkkxTZnkQ0DHIPm9XG43iGfpJVW9vMY/uF1
-         rQDj+iiA1BH1TMpqQ8GAGEe5OXvxzGhblX5Pk4WYbyBxnnhjk0+pmbAgp/hCEjhc86cO
-         hkfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780043792; x=1780648592;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4wicoqvadV2/HNQm4wFw3ZNKX9pLOBD5nuu171A7xJE=;
-        b=HxHXUvOoyTfj1mlVGzmkSEfcOL64ZwvvbXDg289HPf0MITCBWR9WLqzC+eVx07tIkS
-         IiDRww2OlZMZtkYM/crkQ+qAYX1hwHvnfrWaY+WsPGgWv1Opwr+gD+uHLgYgDJiL5zDb
-         EwdQLNR++zCg04xcBDBihMpkglyQliqfS5JSIjiR109XK8SGNrEcff3myN/BMHBdAOlk
-         nBO5ZI1yEVclSIheJIAabkT8PZ+klO0YAvbYYpWWw2OD9GSfqWXNWa2YYz46aP/6Zxwd
-         r7J1eGpCMD1xQ0kzQ9OCfzeblxgxLAs2JlwEKnRjhaUgZVlzA2gs5A4fRJZ0QZw4xB0A
-         jQ7Q==
-X-Gm-Message-State: AOJu0YwbNKH+vhJlVOJrnBs2ksr/XbjUW/gAt0734zN0WjQ4ItuKacf7
-	eP3zzUd/8pCT7xcIVe+76LzjBd49BTr+KCIe3GHYJOqul+ru9MvfGiVIlNA0xA==
-X-Gm-Gg: Acq92OGaNuLjTDOTKJI0+xDU1k7+f06zqqwU0MSRmNvizpWDvH3BJiTYh1X+YK7Kx14
-	m5flPsZV1/nn+a252RPn5iu/3/nc096i6OGU3L7YA47QL8AMhLCplm3G+LjHY6pitgCMZiISes+
-	qDvz9lN5TAwm4R4VXItXs09FHKrArn9Qkli21riiDBogyvr5WcV+qgsGQBHWbcjbjwUi/p8oPQK
-	JF29jSKmivkE1vp7uZ5OI0E73uhSKr3KS7jchD4CUViLh/wqXRcDQyLuass0cYI136kbtq5nIsB
-	uNQ9Zl1cwqDnq4e8nrCiEg0OFlylWJYCtBmXWT8rv6LBGyU4QeI4DE77VFFeX20f7vfanI3ENBJ
-	BGuPnJyhFKSeqz2NB1CoQtZfD/SYph0TNmK+J9nNcKvE2H5MoPf2xCanwHUxY5OOiA8pTyPgV0k
-	SLGo2mqN2gWVdoHhDgGhoQjJ3fkJ9yJMCHp4aIQJCIKuY=
-X-Received: by 2002:a05:620a:1996:b0:8cf:c0c9:bca with SMTP id af79cd13be357-9152fd1cdf4mr241750185a.17.1780043792019;
-        Fri, 29 May 2026 01:36:32 -0700 (PDT)
-Received: from [172.17.0.2] ([135.232.208.132])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-9153244c085sm124392685a.6.2026.05.29.01.36.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 May 2026 01:36:31 -0700 (PDT)
-Message-ID: <6a19500f.87f7828a.4df2a.7f05@mx.google.com>
-Date: Fri, 29 May 2026 01:36:31 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4407033358839976784=="
+	s=arc-20240116; t=1780044879; c=relaxed/simple;
+	bh=Y9AmtMAi0ocjlIczd/CugU6QtLFw13kpTXbBmyg7WnQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YArou95LwnlXXRQptEYF0lf6QpajqWeZfs/ylMnzNqrIQyyjJ4kQwyQ6zA5rfenSOUcDAb5FO4gHe9ut+pq7ye5rTG2MuH3sLDll5m9yFYYtbC/0mbLb67a8gaaXRP1lBhGBl1A1anesE+Cn3ljTorW+2STbL8ri5nrrWt3IEjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=207.46.229.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowADH6sREVBlqlV48AA--.5681S3;
+	Fri, 29 May 2026 16:54:31 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	yuantan098@gmail.com,
+	zcliangcn@gmail.com,
+	bird@lzu.edu.cn,
+	xuyq21@lenovo.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH 1/1] Bluetooth: hci_sync: reject oversized Broadcast Announcement prepend
+Date: Fri, 29 May 2026 16:54:23 +0800
+Message-ID: <9089784d08f1afd038b4ce0df1fb89904f4879ee.1779634468.git.xuyq21@lenovo.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1779634468.git.xuyq21@lenovo.com>
+References: <cover.1779634468.git.xuyq21@lenovo.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, sanghyun.park.cnu@gmail.com
-Subject: RE: Bluetooth: SCO: Fix use-after-free on listening socket in sco_conn_ready()
-In-Reply-To: <CAOrxSK5OMUHuXzb5dsVMwy_N_6=BX69Cp98J8QVTKVFDGYY7tw@mail.gmail.com>
-References: <CAOrxSK5OMUHuXzb5dsVMwy_N_6=BX69Cp98J8QVTKVFDGYY7tw@mail.gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygmowADH6sREVBlqlV48AA--.5681S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kw1xGFW3Gw4UXr4UJw1rtFb_yoW8ArW7pr
+	9xKFn8AFyDArWxJry8ta1xWrW0yrs7ZrW7GFZ0yas5Xwn8tr40gry29Fy2q3W8CrZY9a4j
+	vF4qqFya93yDGaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvG1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
+	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
+	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
+	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
+	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_JF0_Jw1lc2xSY4AK6svP
+	MxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr
+	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
+	17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
+	C0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY
+	6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
+	73UjIFyTuYvjfUYCJmUUUUU
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQ0CCWoZTE8BEwAAsl
 
---===============4407033358839976784==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Yuqi Xu <xuyq21@lenovo.com>
 
-This is an automated email and please do not reply to this email.
+Existing advertising instances can already hold the maximum extended
+advertising payload. When hci_adv_bcast_annoucement() prepends the
+Broadcast Announcement service data to that payload, the combined data
+may no longer fit in the temporary buffer used to rebuild the
+advertising data.
 
-Dear Submitter,
+Reject that case before copying the existing payload and report the
+failure through the device log. This keeps the existing advertising
+data intact and avoids overrunning the temporary buffer.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: net/bluetooth/sco.c:1323
-error: net/bluetooth/sco.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Fixes: 5725bc608252 ("Bluetooth: hci_sync: Fix broadcast/PA when using an existing instance")
+Cc: stable@kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Assisted-by: Codex:GPT-5.4
+Signed-off-by: Yuqi Xu <xuyq21@lenovo.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_sync.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index fd3aacdea512..7cf37749ebaa 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1725,6 +1725,11 @@ static int hci_adv_bcast_annoucement(struct hci_dev *hdev, struct adv_info *adv)
+ 	/* Generate Broadcast ID */
+ 	get_random_bytes(bid, sizeof(bid));
+ 	len = eir_append_service_data(ad, 0, 0x1852, bid, sizeof(bid));
++	if (adv->adv_data_len > sizeof(ad) - len) {
++		bt_dev_err(hdev, "No room for Broadcast Announcement");
++		return -EINVAL;
++	}
++
+ 	memcpy(ad + len, adv->adv_data, adv->adv_data_len);
+ 	hci_set_adv_instance_data(hdev, adv->instance, len + adv->adv_data_len,
+ 				  ad, 0, NULL);
+-- 
+2.54.0
 
---===============4407033358839976784==--
