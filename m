@@ -1,62 +1,62 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D272E38D687
-	for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2026 17:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2285738F626
+	for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2026 17:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780076057; cv=none; b=kgQEcKWTNIZ8UotY9TjprYRdcW4PRwufDh2H0GjOxY3aDv3Au3wv+UDtT5hgLIFMjv8sZpk5leDTg1yIvtI5HyiAj0IvJVcyjbf8nsjvXbtqBgf8IRVWDPnX1W2GH2miV5Ppf7vpiYyCv6aUuV43uKLUkWsdRNGEYksYf84GJ10=
+	t=1780076061; cv=none; b=YeVQ8TGJyC+Xa9JeOLBLbD3whQVwXU1bCin//5r6D1tskTFF+pI78lMl+Di5NHvStnH3PnEc6YwXKuQOQB81yza+7jGXfdfq3Y81L55+avqbIOCnKs7V5ZGr0ne01J9DMeLdDcXrtiFgWLXaxU3gqppuobXYkp5DYZJlKzVKmqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780076057; c=relaxed/simple;
-	bh=azSALTPQ56sMNNtKHXYrGxYYobQm99m8pEWlJiJK9HM=;
+	s=arc-20240116; t=1780076061; c=relaxed/simple;
+	bh=RdQD4wue90+v4yUM2xCSZUvp66yPWE/ku+bI86gv7wU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aSMEGBfTZIEVPp8nIMj2Gm1y4Q0yroR9zjg9u7+TbfiJBcNPkMZYrdCyRZe5D+uhKlhXFFLMi4nacp2qnE4hb5WS3XTUmQFUrkd/e2XtvGH4nKtdRjtNugcNwpNfsuYKgtKLg8tGCC/j0MIwd0FaBFD32AfHgLC3/46qEymMgLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PS71q5r7; arc=none smtp.client-ip=209.85.215.170
+	 MIME-Version; b=Hu4jKA73WTFr7ZYERIkTlFJ6nT85nG0qYR58M1L8qWvxQpxvlagAebLX0C0+VOGoGHLzrAbxZOiwoXCZ4xealXgJ3C1wERhTFPVa3zFzEdo/mHHSvy6quYJgJQ0Ae7XWY7tUkdY4aAmoy1RI3k4Hi1uGYyqj/4e5BqffAEaHP1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PCaGwlVI; arc=none smtp.client-ip=209.85.216.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PS71q5r7"
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c857fba35cfso213196a12.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2026 10:34:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PCaGwlVI"
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-3664df32e91so15763652a91.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2026 10:34:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780076055; x=1780680855; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780076059; x=1780680859; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=inVdfYyaHrC2ebCMrnnMifw7kxLNFvRNmB5wGenE+qI=;
-        b=PS71q5r7pM26gIbNTzdQ4Fz73II7UYS+5ziyaE2TTAXIpmwQ7rn2BwvbscFK0qYnL9
-         Y6WYPFSaB1Wrp18cSkYeltTygTe444qCD5xAMPXFLRga1yY1sPPD6V/uC0oyiY9coyVr
-         u9vflWh+saYxQ1rdx3Mupz7PmHEIzwO4I7XMK//HT0DjZ6wViTzK1viZwrSZ3t9r3g7+
-         Cz7mYCU8ppibw5b0demkqErx0RaiYhxcCu4dQNvZVlrasleWjviRAeCRC6czbsxQeSEa
-         CvhglmHeXGojhwxtPIkJxyOvNDu7SQvw9gyz2xgk47F4YSwYK4PkTrlUwKI87QauCb1E
-         FKHQ==
+        bh=VSsUh1Q1AG0bKmm3IulRp5n1yyJwXsFuTPbDToRe2u0=;
+        b=PCaGwlVIzmnF5fUNM9BmjrUJrDm5rAernFAyiHc9KCfR26fFJU9ASM/ulIg80uYGCX
+         3sdCRwSuQMmlOUHj5yiLY+mS0Y21aEGqQRBL218rX+sBVSMVUcgAKmFRhT01cTAD4fzn
+         pq63RyRdOf0qkL5o2/izvBoA6hFJh8b0UKYeqz1jmBm07BmwR1HQVoR6zht23v8wNw2U
+         13P+2/oS1vCgwY4yKNftdn2KMdri7ct+EVS6j8ZSHYx9Qf9X7GiOg+abYLPeUHod+9yT
+         imbTT4Cr4xpJfw3sPU2JNHyxyqR+xKb7AK8AA6eiVJ7exqXHhCuOu0VWVmhbIxPDigJq
+         1vfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780076055; x=1780680855;
+        d=1e100.net; s=20251104; t=1780076059; x=1780680859;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=inVdfYyaHrC2ebCMrnnMifw7kxLNFvRNmB5wGenE+qI=;
-        b=TE6zBa2B2sfdlH5ccNs/cihrnIrOUpdoQqpLV82xlSSrcbH8mYJPuOyWZ6vXfpqGpj
-         26NH2kUmWBgBATQx/Ks0Zqe2xfmSDRfOPJNL+i3AbD9FlpHslv3Dc3kq7WmlM1HyNdQn
-         DtEmipAtqvdv8dePvM8uyq21/tN6OIUOJOm1ghpA2JDMdIj30JzPY61Cl6ngXQaeHo+b
-         lNmifubkkWnas8W4evNS+NrhMyeayI3p6cGP+gF/325Yrg+x0nT5fgcuRjtxroFQuApO
-         dihFI7SfiIkX4bvqTht97BBjMKrTBUaiyX7MGSolUoVEVX88j2gItSvexD4JpeoH1F9C
-         aXAg==
-X-Gm-Message-State: AOJu0YyjYBmFl4kIQg9zy/kQ6BNqOuKh7+ry+JledT4w1IOvv1uxG/mE
-	bbgFPqb8vYQLbXqkhTQiHhUCiDQLaTK9O4I0dpMdqiviE80Vko54SjW6
-X-Gm-Gg: Acq92OEC6veB7jmSEZo7Wxb0CZj/9fMT+2u7nFsxw9nl/FldND/HkOcV9kucaympXea
-	wDxWPqeQw6EdY1DfJOilVv+kwFeXpSv4U8AsWwoBuG60dB+kORVUG4sgikD4lfgWYJ/Drtk+QbT
-	sZ+3Fyas7MPOqLTqqgHuKMgx5lxKsJLGitf4Ny2l8XUeuqDF+vKRxnmzxgf+cg1+Y4FgdOg/BPU
-	dUBzn0ctF33MX1wE1QoNi0XP+IQDgrakr1VWHRNKP4gw52tTvsGN49P4ypwYopKNq/LS1rQzK6J
-	khVfALq5x/SR84arT97wc84xaN4LK61dNVqizDDfc8Fbs0fxQ/cE4ukpzt6BRTezb+EdI0V+Hc4
-	sttNMIxYYGQfVUwfF9NW7G5ObTQUyTXFa3sybKJWZ1/sUGGo0nR0WYl2gI9FnZAXKQgyHUJDDWm
-	szYI81eHETC5/yGMcmSJ6pyAwpla2P9YJzi5TdByCqR4S07DqkOEu/VZVx+g==
-X-Received: by 2002:a05:6a21:4e01:b0:398:840d:39aa with SMTP id adf61e73a8af0-3b427f7611dmr225863637.29.1780076055124;
-        Fri, 29 May 2026 10:34:15 -0700 (PDT)
+        bh=VSsUh1Q1AG0bKmm3IulRp5n1yyJwXsFuTPbDToRe2u0=;
+        b=V80AeTFgG5JcaBGpf9jg819Ny/dw1SmwjxM9LeyaFg5qGTpTfSeWJmO1ZYcKRTT5Qu
+         Q31v9QSBfIDucg3FYUHRPmjQ44vXniALVLMeq5Y345kkVjx630+vF53pd62YCeZYP/ur
+         FMKOfdb7rVFF5m/ZANFZYTHMaTvEJw/l6pNrogDNNeSg/KtLrW9MNhwhHdY4TFXe97od
+         ZoJRpUr0PH1ogYL9wr0rvdAKwPJAQgMDSzr6rExeBErNclwSuFrMsdOT92TuYOsQx3D7
+         iCsm4KgQ4/8vbrHV9f5dr0idvbygQbkMXu4a7ETUDg08fzlZ7e0yLBSLvC0EaeP+bN0i
+         bEbQ==
+X-Gm-Message-State: AOJu0Yx75GCCRGwm1BL44e5s7gsG2SEVipMDkJxkBnAu67nGSdWyEkAP
+	/rrJW8XzXzXUON/va8pxnlNZLQdjdpBxYvzVikgVxdftpWaJvTD1uLl8
+X-Gm-Gg: Acq92OEYc9rh1BpuD4sOkD9p3O+cUDtAZBap/KC94hrS0XjFnIVhdxQV9z8VzkNR1kM
+	Z39kHnNVXnUYZhhXiJLz/qd2ZU+dsT2W3BkDg9gm4SjLr+yFptD9E/7Q1lu7//pgpqw3WEz1cDw
+	cxXseNTYp+a1VesRQFI/ekJw7aa4zT1m5vd92mqiW8/JHwxc3CyPJqI138Xg0BVuUwCYEUAve3B
+	cMzsBFWW4g3IqrP+Dh7qLTd0fBWI68/CnWwwF7d4dCx77NJDFOgkVEu8/nLblUsj0M2x4SHv87G
+	MXm6iTTcLHKT747qioMmIvoceakw8T8/hi7wiMtdYZtT/D2lkDRIXIgpTaBT8uScY585c4JEoVR
+	M6tUjSKifjYquFqnecy4O9GXIYAIaBKm9o2vWT8w3abzhhXZVRZQYpp0m0k6NTS6mmeKnQM8vp4
+	2DrtCPhlFaL1w+ISOilZfdWuyos234BOzgF7OBrADDsaLmoEEOLzo9D8ki1g==
+X-Received: by 2002:a17:90b:590e:b0:36b:211f:fa75 with SMTP id 98e67ed59e1d1-36c4ff4cfd4mr188994a91.8.1780076059232;
+        Fri, 29 May 2026 10:34:19 -0700 (PDT)
 Received: from fedora ([61.74.238.173])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c85772ba4adsm2361027a12.23.2026.05.29.10.34.12
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c85772ba4adsm2361027a12.23.2026.05.29.10.34.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 May 2026 10:34:14 -0700 (PDT)
+        Fri, 29 May 2026 10:34:18 -0700 (PDT)
 From: SeungJu Cheon <suunj1331@gmail.com>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com
@@ -66,9 +66,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	skhan@linuxfoundation.org,
 	linux-kernel-mentees@lists.linux.dev,
 	SeungJu Cheon <suunj1331@gmail.com>
-Subject: [PATCH v1 1/2] Bluetooth: ISO: Fix data-race on iso_pi fields in hci_get_route calls
-Date: Sat, 30 May 2026 02:33:46 +0900
-Message-ID: <20260529173347.43967-2-suunj1331@gmail.com>
+Subject: [PATCH v1 2/2] Bluetooth: SCO: Fix data-race on dst in sco_connect
+Date: Sat, 30 May 2026 02:33:47 +0900
+Message-ID: <20260529173347.43967-3-suunj1331@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260529173347.43967-1-suunj1331@gmail.com>
 References: <20260529173347.43967-1-suunj1331@gmail.com>
@@ -80,24 +80,26 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-iso_connect_bis(), iso_connect_cis(), iso_listen_bis(), and
-iso_conn_big_sync() all call hci_get_route() reading iso_pi(sk)->dst,
-iso_pi(sk)->src, and iso_pi(sk)->src_type without holding lock_sock.
+sco_sock_connect() copies the destination address into
+sco_pi(sk)->dst under lock_sock, then releases the lock and calls
+sco_connect(), which reads dst back without holding any lock in
+hci_get_route() and hci_connect_sco().
 
-These fields can be concurrently written by another thread calling
-connect() or setsockopt() on the same socket, leading to torn reads
-or TOCTOU mismatches.
+If two threads call connect() on the same socket concurrently with
+different addresses, one thread can overwrite dst before the other
+thread's sco_connect() reads it.
 
-Fix by snapshotting dst, src, and src_type into local variables under
-lock_sock before calling hci_get_route() in all four functions.
+Fix by snapshotting dst into a local variable under lock_sock at
+the start of sco_connect(), matching the approach used for ISO in
+the previous patch.
 
 BUG: KCSAN: data-race in memcmp+0x45/0xb0
 
-race at unknown origin, with read to 0xffff8880122135cf of 1 bytes by task 333 on cpu 1:
+race at unknown origin, with read to 0xffff88800e6b0dd0 of 1 bytes by task 315 on cpu 0:
  memcmp+0x45/0xb0
- hci_get_route+0x27e/0x490
- iso_connect_cis+0x4c/0xa10
- iso_sock_connect+0x60e/0xb30
+ hci_connect_acl+0x1b7/0x6b0
+ hci_connect_sco+0x4d/0xb30
+ sco_sock_connect+0x27b/0xd60
  __sys_connect_file+0xbd/0xe0
  __sys_connect+0xe0/0x110
  __x64_sys_connect+0x40/0x50
@@ -105,112 +107,44 @@ race at unknown origin, with read to 0xffff8880122135cf of 1 bytes by task 333 o
  do_syscall_64+0x133/0x590
  entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Fixes: 241f51931c35 ("Bluetooth: ISO: Avoid circular locking dependency")
+Fixes: 9a8ec9e8ebb5 ("Bluetooth: Fix three socket race condition bugs in sco.c")
 Signed-off-by: SeungJu Cheon <suunj1331@gmail.com>
 ---
- net/bluetooth/iso.c | 51 ++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 39 insertions(+), 12 deletions(-)
+ net/bluetooth/sco.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index d7af617cda45..58bb3a10d49f 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -337,12 +337,19 @@ static int iso_connect_bis(struct sock *sk)
- 	struct iso_conn *conn;
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index f1799c6a6f87..c9f6a8aaee57 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -312,11 +312,16 @@ static int sco_connect(struct sock *sk)
+ 	struct sco_conn *conn;
  	struct hci_conn *hcon;
  	struct hci_dev  *hdev;
-+	bdaddr_t src, dst;
-+	u8 src_type;
- 	int err;
++	bdaddr_t dst;
+ 	int err, type;
  
--	BT_DBG("%pMR (SID 0x%2.2x)", &iso_pi(sk)->src, iso_pi(sk)->bc_sid);
+-	BT_DBG("%pMR -> %pMR", &sco_pi(sk)->src, &sco_pi(sk)->dst);
 +	lock_sock(sk);
-+	bacpy(&dst, &iso_pi(sk)->dst);
-+	bacpy(&src, &iso_pi(sk)->src);
-+	src_type = iso_pi(sk)->src_type;
++	bacpy(&dst, &sco_pi(sk)->dst);
 +	release_sock(sk);
 +
-+	BT_DBG("%pMR (SID 0x%2.2x)", &src, iso_pi(sk)->bc_sid);
++	BT_DBG("%pMR -> %pMR", &sco_pi(sk)->src, &dst);
  
--	hdev = hci_get_route(&iso_pi(sk)->dst, &iso_pi(sk)->src,
--			     iso_pi(sk)->src_type);
-+	hdev = hci_get_route(&dst, &src, src_type);
+-	hdev = hci_get_route(&sco_pi(sk)->dst, &sco_pi(sk)->src, BDADDR_BREDR);
++	hdev = hci_get_route(&dst, &sco_pi(sk)->src, BDADDR_BREDR);
  	if (!hdev)
  		return -EHOSTUNREACH;
  
-@@ -430,12 +437,19 @@ static int iso_connect_cis(struct sock *sk)
- 	struct iso_conn *conn;
- 	struct hci_conn *hcon;
- 	struct hci_dev  *hdev;
-+	bdaddr_t src, dst;
-+	u8 src_type;
- 	int err;
+@@ -336,7 +341,7 @@ static int sco_connect(struct sock *sk)
+ 		break;
+ 	}
  
--	BT_DBG("%pMR -> %pMR", &iso_pi(sk)->src, &iso_pi(sk)->dst);
-+	lock_sock(sk);
-+	bacpy(&dst, &iso_pi(sk)->dst);
-+	bacpy(&src, &iso_pi(sk)->src);
-+	src_type = iso_pi(sk)->src_type;
-+	release_sock(sk);
-+
-+	BT_DBG("%pMR -> %pMR", &src, &dst);
- 
--	hdev = hci_get_route(&iso_pi(sk)->dst, &iso_pi(sk)->src,
--			     iso_pi(sk)->src_type);
-+	hdev = hci_get_route(&dst, &src, src_type);
- 	if (!hdev)
- 		return -EHOSTUNREACH;
- 
-@@ -1210,11 +1224,18 @@ static int iso_listen_bis(struct sock *sk)
- {
- 	struct hci_dev *hdev;
- 	int err = 0;
-+	bdaddr_t src, dst;
-+	u8 src_type;
- 	struct iso_conn *conn;
- 	struct hci_conn *hcon;
- 
--	BT_DBG("%pMR -> %pMR (SID 0x%2.2x)", &iso_pi(sk)->src,
--	       &iso_pi(sk)->dst, iso_pi(sk)->bc_sid);
-+	lock_sock(sk);
-+	bacpy(&dst, &iso_pi(sk)->dst);
-+	bacpy(&src, &iso_pi(sk)->src);
-+	src_type = iso_pi(sk)->src_type;
-+	release_sock(sk);
-+
-+	BT_DBG("%pMR -> %pMR (SID 0x%2.2x)", &src, &dst, iso_pi(sk)->bc_sid);
- 
- 	write_lock(&iso_sk_list.lock);
- 
-@@ -1227,8 +1248,7 @@ static int iso_listen_bis(struct sock *sk)
- 	if (err)
- 		return err;
- 
--	hdev = hci_get_route(&iso_pi(sk)->dst, &iso_pi(sk)->src,
--			     iso_pi(sk)->src_type);
-+	hdev = hci_get_route(&dst, &src, src_type);
- 	if (!hdev)
- 		return -EHOSTUNREACH;
- 
-@@ -1564,9 +1584,16 @@ static void iso_conn_big_sync(struct sock *sk)
- {
- 	int err;
- 	struct hci_dev *hdev;
-+	bdaddr_t src, dst;
-+	u8 src_type;
-+
-+	lock_sock(sk);
-+	bacpy(&dst, &iso_pi(sk)->dst);
-+	bacpy(&src, &iso_pi(sk)->src);
-+	src_type = iso_pi(sk)->src_type;
-+	release_sock(sk);
- 
--	hdev = hci_get_route(&iso_pi(sk)->dst, &iso_pi(sk)->src,
--			     iso_pi(sk)->src_type);
-+	hdev = hci_get_route(&dst, &src, src_type);
- 
- 	if (!hdev)
- 		return;
+-	hcon = hci_connect_sco(hdev, type, &sco_pi(sk)->dst,
++	hcon = hci_connect_sco(hdev, type, &dst,
+ 			       sco_pi(sk)->setting, &sco_pi(sk)->codec,
+ 			       READ_ONCE(sk->sk_sndtimeo));
+ 	if (IS_ERR(hcon)) {
 -- 
 2.52.0
 
