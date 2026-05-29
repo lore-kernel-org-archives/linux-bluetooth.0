@@ -1,140 +1,151 @@
-Received: from mout.web.de (mout.web.de [217.72.192.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16172338906
-	for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2026 13:43:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780062222; cv=none; b=toqQcb+qT05ha4REsYv9Sj/y57Bxup2jkYpcqDjtx5Tr8L7HD7/631SyEWBuUmjrgxd9to5OpkUkTaiH+gqbykr0xiPoT05MV7gWN6XF25DjlBM7T9U4wdo7SnbwPN07TjGqH9WTpmSgJ8rovbZxaAzChI+zC4Ivpg8xDZMrinI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780062222; c=relaxed/simple;
-	bh=BGK072g3b4OPcHMzLPmWdGEE1jACAz5Luen3ivkgf1w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ku9w6giqi9YIByD32zRL053YkT5cvp5QxZzjXakS2XaOUQwm3bd3PZe4nHkiYA8Qbo3llJAC5NhYnBHPrlLO7cHIHGuVHqcUry5oQbR1bf14VLp1B745xNbPFCF9Tdxcz5TZ3j4xAuUPkBGyvIE2eEfS+QvhOPENr/6kSlEGw20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=nils.helmig@web.de header.b=hD5Lfa/z; arc=none smtp.client-ip=217.72.192.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4950881AA8
+	for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2026 14:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.177
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780063742; cv=pass; b=D9gPhcdnEgM7IB5waMtqWJPrI+s0QuAGohIDjHVFOouPxXe/oxDvhamTrWGtT8IKAWF+BbVmAYD+n27ovRhjB9dyjZDN0T3ZDreGdxUocSnpPU1VTT6du5w19Gr1urlT35YygGqOfjPNuUi5IY7ntUMc8cn+0DZD5yn5QUtIWvk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780063742; c=relaxed/simple;
+	bh=bTaqyjLNGfP7BWbb8T9S9ODeqalxRMSSVZgKjJFnYvY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mzJr8L5z+WMu3y8USQLmvCY669TrlmZddZe+6wsB2HQbnKa4hel0Q3FvwV5qSDWAS8C91vOkM/r+3R5MZstWfdgk1SrZgRr5GB1cjHParkV+PtBtchkp0XMGWhd4kuPjV6GM7pI8BRWTvTHmUNHGSAFKO311IN3AbdsfAQqO6RA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f8+qa0bF; arc=pass smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=nils.helmig@web.de header.b="hD5Lfa/z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1780062217; x=1780667017; i=nils.helmig@web.de;
-	bh=BGK072g3b4OPcHMzLPmWdGEE1jACAz5Luen3ivkgf1w=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=hD5Lfa/zI5MvUtF80b5CvNvMVklDjQcETPmImTjpMRQos71qPeVhGNUSTRphyRed
-	 kQqPjsQ2fx13Fc73zTBKM9dFx4FqmVDAp/Zn+8RY/UL36G8MtbMn9L1M1vUBkuulw
-	 eiKwpDrDZRkRqrqWXJMZixIg9OpZOSor9LI6o+JurCyiYq/JedWgdOwdN7RwlXBFL
-	 e7prsHV0wjAJ6S1MtvcSC0PvsJfrIA/QiyrV0j6PXGFjO2dfK7dgVYKB8hEOhWhVL
-	 URe3OMMXmKo+d3LGrpwA/u6UErWpccnNo3zv0RG+BYvMKwFcCraiYzEq0gYGTAi9X
-	 V2/W4/lVOw1mg/K63g==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from client.hidden.invalid by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1Mmyr7-1xCDjj45JP-00jI4E; Fri, 29
- May 2026 15:38:25 +0200
-From: Nils Helmig <nils.helmig@web.de>
-To: bluez.test.bot@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	nils.helmig@web.de
-Subject: RE: [v2] Bluetooth: btusb: Add TP-Link UB600 for Realtek 8761BUV
-Date: Fri, 29 May 2026 15:38:24 +0200
-Message-ID: <20260529133824.5835-1-nils.helmig@web.de>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <69ed185e.050a0220.107d78.67fa@mx.google.com>
-References: <69ed185e.050a0220.107d78.67fa@mx.google.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f8+qa0bF"
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-7de68222e96so5831837b3.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 May 2026 07:09:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780063739; cv=none;
+        d=google.com; s=arc-20240605;
+        b=C9buh3y9kG9sHjhZBSOPJLQQvFLan9km1nVxD/fm3QjN290o4vCGrPU4WcLmynqy0w
+         xjAUjtHIsfwyAjL13fOZx81vcQqn4+pIxYOidIB/uErEJnb+c12U5XQ8C2qYbJCDAP5D
+         QuYY+61D4d2aRds4qdm5exP55Eu3qR5FQyuBot+L1Tgw7k5KZk+IfBqGxNBWkafA4x0z
+         UfdyNMkai3E2f0hlQAwTzIM8mCN+bbla+wCM4+UBdAj/XaM4SGkkwUSUSr3VKhQNtF2Y
+         gtE+R1NAGxp0l0fHP/tKfL6b8jQvahvZfutF2vKe9HrX9DN1Vr1YLGu4E63cefXUb6ht
+         cWsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=jjJFOp1LuWZyDHXIumBsIBytEUQ0fTPTPVN/urXdtuY=;
+        fh=dOf1tXAM8Yuoamwsgnq3p1y50ssZ/Y7RmqQXYlmAlXs=;
+        b=I/OHbXZGwOjV4P3sphVURhZWx2l4HR4CsEB9pT7v/etH0WbRGWQrmo1Csv2+DQmetf
+         5LL94J4kiKQYUOjDDlcDsnSgeQ33G9wH+HZutVdpl96H8o0RJ56VgM3ALdEbqOxC8CHG
+         x1SYcFRtRpUTiGxrjRMddVPaGcshF9Es4c9B8OwfvwWBfEklecsVUn9Po30b1/ohvHlK
+         m+vxsamIYIYCVUm9ooiaqGZl164fV6MiFCIOamqLKeVmiT+d7RmJp4YA1l3NT19GJ+/M
+         +/Te9TyB8p+EMqqaKlTXwQpVjI2JhNu/Vr1LPTtJq1aP8H+MNk7QLKmZ1UirW/wPuDAo
+         QeXw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780063739; x=1780668539; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jjJFOp1LuWZyDHXIumBsIBytEUQ0fTPTPVN/urXdtuY=;
+        b=f8+qa0bFh2edcgt1IEm+0xHf3cy7+Gfq0VgCirti/2dDnXd4eRICyUen9GbjcwvVgR
+         k0eGcr6Q3DzGEeJF1ac2YWlMjJGzLFf4NkBg+eAz/uL6JztZQDhGa1eSmxKpkdNShi8T
+         RQ0RcEE2zscYw36Vr1DTuE105ovKwisv9vUcA0IgqMeAg1OjPgV+1f4SVidnlgbI6vKW
+         cbbcPiptObRdtz+FKMZcH2O/fnUYU+/BoTIiAbeTPY4TdJxY2IcdQqBJNlqWJAV5edzW
+         DX+Z0XDjcr5AH/hCE6qFmq0HyE1ebq7HiO0V+/Ca/9V3FO+U34kmIJZHTcgOKDUx4Rqt
+         xYYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780063739; x=1780668539;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=jjJFOp1LuWZyDHXIumBsIBytEUQ0fTPTPVN/urXdtuY=;
+        b=IOX6MeAkdD66YMNojC8REl/Y1I/twmU69EwnqgFA766L5/V4Y9aXKdQk+SW1z8M3Fj
+         sutH1WyiasOzdrOXvsS+fMc4tElixSMIberUSOjOiImyraLHM3n9WOWKm0ZY86u0V5a5
+         X81SXUkHrLtXRhNPYHFVr3heBfMpZdx30IWggoAHrZZzXossCayxw/dioC5+uEJGdZju
+         TVe8z4yQUqjyJu0SiOEq96SJMGiBs3t6Ic1lLh+SdPMRe5bx6IacOTxWUxjAUbNLnFF6
+         A+HTfeNjRDFg8eXgN/fmtCS8zhY+20E6/mgn0hEWiPAUk27tbpN4pYMO3NmK7kIdm3nK
+         N+Hg==
+X-Gm-Message-State: AOJu0YzJ9MEfvF2ncFWV0+VnjTSncpmkkHmjarFpvf8bT0AYmS3A5zo+
+	KMxG1mh15YISxHKA4O4qnq0h/VMhWuRSqHxdPs8Gn6NL+w2FZlGgmyyTMf4CBEFDii87DOblAbo
+	u2Ai/tuujnaAOXG0F0IJ4BFMHSaMDhEw7pgTc4Oo=
+X-Gm-Gg: Acq92OGp7X7OzPvJ8FnAvESzcn1ALXcUxTRgivvC5YQNFN4/ddchtWOw0CXPFzdnpXK
+	z55aLKYeLhOiIxhQWLO2ThhTyAdvKCQrjkOPA2jjxsoqfXqjjIJkm82wKyMa/CUUdopYlx69zTX
+	8UTdaEe8CxG9OfDb9Rbtvg0aJtb1NC7hQjK3dnPmdihal/0eHJfKhx7d6/h0Oag01Cx3uEK8puh
+	JQWFVw+XAwLD8La9SHf3VZI3BhRsAVED6Fa93bvrMmIVSBKrDnMjwdyL8TXtff93Z48OQS+NOQR
+	k6pkhNed2Jm+jk0LxlBWFHaAmGRlQcmd2faJtevLC5p+VV+o8yP41ahUqQizx9Ar+P6Txhh6OaA
+	l0WFbY1qEXXBf
+X-Received: by 2002:a05:690c:3589:b0:7db:ccda:a404 with SMTP id
+ 00721157ae682-7de469d18f9mr25582687b3.6.1780063739108; Fri, 29 May 2026
+ 07:08:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:e0t3b5iTjrDmw7HIcJRBFIaKr3Kc3we6kIDyipMSmsFVlN3yPQt
- ee0dadQ6y/beHT5v/ARt38sqsDeoU9Mo8Q+siLX+qzR51Mfk58Tqu8GwhDXfeteBEsiUFH2
- d/GsPw+WG3Rif+ie9KHbYkuXwbQwiPKUGFbHdM+sPabKl7sAHbpUcWRE5QHckv0fztuvgnF
- Ay3L9ru8IYD962+SBY6LA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:KJE4R4qMn9c=;53BvGBs8f69JFJbLnVaRjfaQwY5
- HhTAeJ05gx6DANokEd0IKt8trgTteL2K4EGnvFamIHTkiPuXm8Mdp3glMqJV/HDjMGl49CiJR
- FDPsGxTF6Q4IGClqizcUuNr1OHu4LLOAjRixxqmilL44UBiMVF6oyBXlSoqhre//QIP7xpkeO
- dGb5fggFATQsra7etXAH1irm/DVTwCLl1T6N4EnJ1Eq6Si7bnZuCK/wjFHtPSNdo1yih70j03
- L6C8WJ/zbszUUIGAZlBWZGhCl0Fa0FbThVRIUCvzjrs2rb88bNrNYEj6GHLu2Gvv1llhjMGOT
- 2osE1xxvxVYB2ZVUzuE/KrAW3d0iu5jQndeMrjXF4qMZao2qAJw/omYc75QmMVCtoRtUZPhcY
- YsOiIV7kbzL+OwHP9Qoe1Ph5wHtrlSOiS/G0AVqEyH9rpuYk5CXg7SKNP9epSZWok2qjDyLH1
- 5uhpOO0EWnoSBbQxUyRAhalODph1KE6LI7X2mm16Ym3/0eJ+J4XfN6Ixm9PQRItRzeKh7Hp62
- 5zs23KmADNGNJbVhrZLXBoDGKGwKaeR/GLRp7PG8x75cUgcfKxzy3gEJJHMK/lUrdqMhCJN4Q
- MOt+iDLUw2ME90KZ8JGuNct9/KXp34N4X+LCbS6fyXZ+lvyge9zyritghSKhbEO25NtByvJ/Y
- qbTvvsJjQZrvQ63l70Jm7Ie2SsX8DSTm8WhU/evDWgsQoehXpUDiFKfx7fPFI10NbJuPt3u7Y
- 9n9Og+VUVeHYM9xhYVU9ePbQBG+myoiwuMTRtTeTSm7DwULS2yOmEBKQDsLa3ZO6fNhmjnrV5
- ddKSJVWbjEuPasluxc9LGYYEo+V6EJYhGs6+DJ8EugM8hSRWRprmgaJR8r5wxYmHfwQfxPLyQ
- M05rSa78Li41XmyaLAQ+++BlZ+ZmaVnlSySuH3hDrUTNh4e8Zy9L1c17EcFelrOF/V504qpg+
- hzsGS2pvQIlsA4WUrvH9Lt938Bdwecbidhq+j33eFuX0gXy8R5SBoqmPVZ8e/kdJuOmhSelfP
- 0aW8g5qeS7Ni/+8JdrDLF8R1SveFv+41aQN6KpduDQeoJku5QGOyxa1BisEAEuGM8Nc9xZ8G0
- s4V81d8wSfgV9urK1GQvJSkNIHn5qlvKhghlQT76HG91KWkDmnZ9eJR4t9PXm2XoW5tM1vSKL
- bs60GmAry4O355/Kpggh41Bb+HFwudEJhjQUCf5XweQFeFGUU1ObW1fHWX7KuuiyAku7MQ1z5
- 4YoBh8eGq9VSzlqmdGXQQ9bvd/edCTEGeLk+aobCVtYks70vN01fDuFRnVlDMsdPksCsyUYrw
- sNz8e2CpvfXR9DTakBvv072Ck+R9s+qZyIlO+DFk7/rYI7OPun4lgC3qdqKDN+XSV30IVFsmv
- CGQgboevTi2P2V9Bq0IbE+yNnSC5+MBXB6QAaULInOgJ9LMHWga0oOJTNUJ1u/nPzIwWfgyi8
- ccj67eK5OiX7oQbLJk0kI8rsd8WAHvvFvHNdN8bZNM7QTbtpTHnLdFFRCPXwfWuz5iF6XG1dX
- scB+39l/Sy9zw74z6gAkHM9zGEpKjYmhywP7hQmvfGpzgd5rhxOmhw5RqDF97tCmj8SZsp26E
- D8Ks6xyoql1HaJo9g2yM1t0eMD3PuakE2zxV/ML6fdnK4O0wDTOesF5G/0R12IOq0Po88wAEF
- f+D1GzEJDO7tqqRPl1nSBYCeVq/w3p0wtUQ9yDJaGiZU+NLoSPW3Mynji5ZVV371+zEHt6j0c
- b+3gaO0EOfDmRiKV7Fuo2lHARiWQCdisW3qq73ocvqMB1veglJ4dApRlSvxRbFgczx7A5edsn
- Lu8d3xkwG69hyNRBzaUD26+NAiN3LJbbSuuL/sn6ivjGAvtAbmxmh8v7QAydi7UY7bcypEYxP
- +G76DhdxNSW/CfWdUrWEVWotKZ758rhyy8Pf0znhqI+s75YwfndGTKqNkcw9TQaZ1dlHm+173
- wsipiIqI9F16qNisdWHtHQxRMPqcXvCTCsxvKE09We1BxtL+MuvX3C3VyKglbxVZHCrt7pd+R
- uGatgK1XAQXg+C/CrIxZj4spwNMJeYqDNokG7M99S8BZEWLf+s46mie6bgHQaYjHHezbqEVtu
- XNlhevXL7rJPEnWXrVktE7mIavmi6IJsxi1b8VRVgkfaQG2LjBir6Lcr/38h7vnI9xwquVWyK
- qUZYZNC1a4oueSOqvCM2RCkcQHOg+yP0AASXumLDRUVAXlEuYWG+ta6sgo1fl59NsPKJmlc8S
- WnYnqhRReN8P5k2PySiy6syJYBLGLqqyEk1d0YhaHZz5xfu6m4CAbaLx35EcDh3lnBWmeRKfl
- IMdU0rxXrqHHXx/TC7lvDqEXXRDkE9ewdv+kAYZzJ2g9yp/PVMigxCbu1JMCD8vIXfVQE3L+c
- fv1HGmuERZu/CApz+TLqwvPGQZwI70EdzK4SDjWKgfTjOoGRYtVTJtAn5Xq3oQ726hHDiuFRj
- kit2CHD8eFex2Jp83CeCwkRcXaoxLtHSP3l7mxcn3LnPrYu6K/ayIsqnqyiFsxsQ9VXS34lfK
- YOcUWgmAXxIFiG2RIlsJMozJrF8clZ1EJeMiTsonfGBypON6MJfzfez6lip5yyesS5qkJuZPY
- bffzOPjDgSC5T7c8ITnI0IcQZIapw7CuTFlJpCCu9CNvNNoh+wibA7HdYBzNpu0WeRANQgXMW
- PhlkRe7gT9lecN8XIEPVxCYkjpnc1HUCEcawuquBrhOPQbuemSxEmDqFvctpchls2PLNy9TCG
- gtkyWaYDxPVxW1LsSlH8y7GQnOPGvd8FRQT7wcQk0+SN28js0k3kk06b257a75aUaUAT6hJJ8
- b6eA8knU3wt4j2ewJX9edZF+XZLq9yKQ60d1WirW70/Cg2TZBuwlqilYV2R5wMrd8F08lnq+m
- 3hnx+zMqYQZEiV47+vhhDT6BrVbhFMqDhXrY62R8eHWwlTLOQYvriJIU4feUBsfewrvRtg5vL
- N2MLTxdWH5QZfkmxlTaHiyKSAk/ygR7R0RJ2191na+nQ0gML7tUf6rwJxen9vGNSmowuOFQsU
- UJVWg9jcYnRYSeOPfYs5PLtkcTj2/pBmwO+irnkakVSBYh0IsiXQQlx9z5XMW32QxK9Yt8/qC
- Yh50GOtkbrBcMJdXjr9YedNCXIV7bCDx4KEZRBsHRPTNb9bEJWBQPPstJqBZtQcp3MChv7Zvp
- SjwpLaksY/TzeGeXghAf5/DiCCb2cL77sswtS2LOJfFZ8cRshgEXGyNt8BRnLBu8jfTESdXgp
- PWIuj/6Od+CHFYqoUkpQgBHOHzS1aKByAcpPjx/0sIK0vERA78GzqlA4ldWEPsGL7NgCreGy/
- pJwKfTNI3Ew+HvlB2DPyAJ4PCirVwO3pI4Q3tT4O0rwTs22mnYlIkx9RrnZs50CorQc2XS+G2
- 7lvJJt/b5W3GjMAbG0gknbkEpKtuV3eCm5x4GM5wdD2P14AKuEGCsdsPMmYhLFXkGNurdHbBk
- XiLRw9JMz/RyU9EOgjt//+vWgmaxGyQbOZ5//FGv0wv6w38QZtbsvHAivcvYvu0bmyG8wxvpN
- XHyMspIbnhddbO0NzreFq7dAw6psgUAr02nm6uDLeltQdTpKIhlirSz7BmCLZqgszcXBTw/KO
- Yr9knaxaZkUWXpCLHkOKDoLZWHY+zqAoMYA7LFzyjM9I1Ox6sTPJNcuxl+yf8SlXyLskCpeRh
- 4Kv5V6gLstA6t5n+XKvKrQl4ynajv3GDcWGLQT16K4myuE7voAuYQiGyYy/dh4svFrpaa5OEu
- boqQl/I858TtHuG4+Nl+9kmjjxE/RKVSiVwEzCl71EXTYswDNQnDR5gQcw50CjbTIkqxeNKWT
- lDxCwep9pwWHiGgjumZxMeqKUWKPBwFStjtM+RHxaWQLAIOLAKfdyd0Z9PImxkBS0/duh5n8L
- tPdkVDV2GHGNd2h1EJD+hFpO6FKgyLlF7+5glT/+X/yT5gsS7KWO1IjaP9StuqyFcxijVEH8C
- oxH0ZandWhxAeRjbrTZjzesZ/HfIco6XC5Ri8aDT2mBadOWs0E8ROaJe1a95DVkjAYiID7Ytg
- C+hag8j0VcjKp+joid7q96qZUCn8aOdInBrKuDkuL3x4mGtm9JvZA71roPhQ7Yo+6hnGN+ykF
- 8fAx6GR9u+OjvIgIy+OBE9oPFu3Baqc7SSljEh+QZxRkpD/qUhsgTM1bI9eOBCohDd2KHAOZK
- ckg81rjc/bd2A7aYGlO4Gw/JVcG+XMA2xlnMLk169V8Mc4mVvCml2wOBZRmLc1L+2ZzO2jtHJ
- BUBU3hzsoXpB2BA0f3iOoOs+KDcnpXpCDtJC29cRzFS3d1h/u2bvGRGS+221UqYITfv9wbgxO
- m8doQhjVAZ9dG1OLYJAq7tT7XGKLwFIRTwv3/Mz6vRCy/8F5m7BbOg0z4g9xOQbTU66NaXX/8
- PFeVzEvQP/oG0STodMxDOHdhfLhJ7fswIKmGCN32NCBoomjladOxw30diwbMPh0C/hNNb0s/r
- ERSkuPXUnmQDlbsGbG5W0dtym30IqvDlqXtPKXRZHH3RuyiuC831x3Z1f6fkglKK18DSFewXr
- 0n3iB3G6MW2BcPoKWP0uDD5hHOjEI+33wqytrTgVfYotDh4A6iAzS10SW8AyHTHqy9SjwxkN1
- CY0p9r0UvC0hhSzXMIcAI7IPHpe3eSvRivgGQZwQ77awicg+fu4oMON3hVd5SGpVqSWlxtF73
- vtDXkl9iWs4Pnq6VFl6rk8qJs6TaM6rLGlejpCTQ28rCRy21os7A46qLgpcQXq8jBVT2SvYvU
- tvobqH6NPq7OQjwDxuA7BYNRqZu9me6bWsUz+HSWPBrjwIU8v35WLV4zz2KPvLbVtm4UR2eL0
- m5f3x4r4oKMufWPODkOqyHTVcurq17msGegpSdmZ4hjgC4jqvAIWmJXfzCMJvljZ/JujUJroC
- hrwO7GMzjXxNxgF/DJKaasKyJnDJflnWtinhAfuOSfiajxLo46dF0tVNCLpL9kBJ5h/PXT+td
- t/TjqpYZxECNZXgVg+DXIW27GTUEigM7O1Obj5wEqquidBL6AQBoVHE05BMBBdlj6wt7WO9yC
- M1/sjFLs5Wn+nyB7dBY1DQJbDArzWtSwUb1uA7iczy8OY2ln9FE+h1n/gjJs5Jm6CEkIW0CZh
- a4q8hLftC+fGtQ2GsZFarAFmOuEnHrgI1FnfEnkGpJCH1MHVUe71VtE0k8Uqru/e37/egIyY3
- /Ahlc50swKlxaemdgeNil9UrBMmPifszpyhXfiePupkhXbQDgmXXwdCXvtfsbLTSSXLJ0lZgp
- ycHmmUqN1UhUiEfvy7BkAJUOAbKpLv4CspzCDiZwrD4SOGDFN3DRYB+VfNQJOe8tfdsu0wa0V
- h9bYWXYdC9L6spgYHb6D1h8WLZK0eay0g==
+References: <cover.1779633761.git.xuyq21@lenovo.com> <4927cae4fe043f3e2aa80f4ee6bed05e4fb5a6d4.1779633761.git.xuyq21@lenovo.com>
+In-Reply-To: <4927cae4fe043f3e2aa80f4ee6bed05e4fb5a6d4.1779633761.git.xuyq21@lenovo.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 29 May 2026 10:08:46 -0400
+X-Gm-Features: AVHnY4JLbnwmK81W2sGlebVDgLa8m20IUvrZZeSXdCxVJOFe9JQWqR54emVNHBw
+Message-ID: <CABBYNZ+UDuA=HDFrs4hUHfJyL9buWM52JsZZTbS4SQC5Q6WE7A@mail.gmail.com>
+Subject: Re: [PATCH 1/1] Bluetooth: hci_codec: validate capability record length
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, kiran.k@intel.com, 
+	chethan.tumkur.narayan@intel.com, ravishankar.srivatsa@intel.com, 
+	yuantan098@gmail.com, zcliangcn@gmail.com, bird@lzu.edu.cn, xuyq21@lenovo.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I saw that the merge request https://github.com/bluez/bluetooth-next/pull/127 is closed. Any news on this patch? Is there anything I should do?
+Hi Ren,
 
-Regards,
-Nils Helmig
+On Fri, May 29, 2026 at 9:12=E2=80=AFAM Ren Wei <n05ec@lzu.edu.cn> wrote:
+>
+> From: Yuqi Xu <xuyq21@lenovo.com>
+>
+> hci_read_codec_capabilities() validates each capability entry before
+> adding its serialized size to len and advancing the skb.
+>
+> The current check only compares skb->len against caps->len, even
+> though the code consumes the length byte and the payload. Validate
+> the full record size so the cached capability length matches the
+> bytes available in the command response.
+>
+> Fixes: 8961987f3f5f ("Bluetooth: Enumerate local supported codec and cach=
+e details")
+> Cc: stable@kernel.org
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Assisted-by: Codex:GPT-5.4
+> Signed-off-by: Yuqi Xu <xuyq21@lenovo.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> ---
+>  net/bluetooth/hci_codec.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/hci_codec.c b/net/bluetooth/hci_codec.c
+> index 3cc135bb1d30..5bc5003c387c 100644
+> --- a/net/bluetooth/hci_codec.c
+> +++ b/net/bluetooth/hci_codec.c
+> @@ -100,7 +100,7 @@ static void hci_read_codec_capabilities(struct hci_de=
+v *hdev, __u8 transport,
+>                                 caps =3D (void *)skb->data;
+>                                 if (skb->len < sizeof(*caps))
+>                                         goto error;
+> -                               if (skb->len < caps->len)
+> +                               if (skb->len < sizeof(caps->len) + caps->=
+len)
+>                                         goto error;
+
+Id go with skb_pull_data instead, that could probably be used first to
+pull caps, and then another time for caps->len.
+
+>                                 len +=3D sizeof(caps->len) + caps->len;
+>                                 skb_pull(skb,  sizeof(caps->len) + caps->=
+len);
+> --
+> 2.54.0
+>
+
+
+--=20
+Luiz Augusto von Dentz
