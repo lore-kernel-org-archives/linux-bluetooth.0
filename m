@@ -1,223 +1,145 @@
-Received: from mail-oo1-f80.google.com (mail-oo1-f80.google.com [209.85.161.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6FA35677E
-	for <linux-bluetooth@vger.kernel.org>; Sat, 30 May 2026 20:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0832D5408
+	for <linux-bluetooth@vger.kernel.org>; Sat, 30 May 2026 21:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780174647; cv=none; b=BrfbdazwZKVeu7cNTzbagZkf9GEv3cLAmVLxcLtJKCjjS9AWyCuxOUDsXI+0OWiMN8bBEX9dXyKHBjHjmAQUT3yUFDCOTpcizp5B16D/Mh5+gYp0yZeZihT7lMXpVFO54eVQClXJ9BxoX788L+soy0KE+2GXbZ9JdukUpJ4gwVI=
+	t=1780177125; cv=none; b=mM+ohSeDDL54xRm0JdbPpFWOgT3QK0l4QpIR36g9Nnx5/QH0m1hMTQ4kVj4GHUnt/sBGkhDI/FSdvuCpNIESAoh4JGBeEqLcbfz51L0Ki3lhiCVrY+IIIs7XD7bRbpp0WPspPw5mx83Cwa088x0rHfLF4ljHeXUhd3Mhw4aXj9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780174647; c=relaxed/simple;
-	bh=DRHa9OxqmG0hqQkN3OjoAsvq0C1PoJ5DD6C02q6PgG4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=CfT7magcbwmOxQZlkRR+v3pU2e29GycGemopmlkPC80T59OV+kK7oq9ro4joGM8SKfaG9ZPtBfUtHnTNBKI3e0QBSS6MK8dUkmz9O4nv39CA334XDxMzhixLmkYyeCKxWlaRnM1yLhoLQVdceZ93hQbZUXqy99TPWlnnl9RvLhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f80.google.com with SMTP id 006d021491bc7-69da719e003so7598260eaf.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 30 May 2026 13:57:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780174644; x=1780779444;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=d41PyxmaHtCW6N2ZBxhSTJMRc5koTfgrZJzQd8AhWwk=;
-        b=ZQbKzyg2Zl4G/vx5jFaWcMwXIgJLh2i+zAvPsomzh8TAF3PL2Bn6rxogmR5hc4Ylhe
-         VtJSbeX96K16HieAIT8TDGcVtVrlJglwc1HVwFXu4RiA6x29BDvTVT7xCKBiDqeaOnhr
-         pYoNX690Ls/Ea+VifucHK0oMERI3EXRbFToQypqtiVMoPQBDSPMD6xVrN25KiR4fHndj
-         rKhaUrEffcXJHkckIKhPBqU7OH0ouAKmtU8/j5tDzrt1Y4KwUZaWhRkCXkJWSPeXTabq
-         lqOedlx2S1ThecHnyLxcDvhb/jsZSOv92JMcvwTWywk480gY3Gp5QSMoABcFYk2oo23r
-         brcA==
-X-Gm-Message-State: AOJu0YwK/Vwsi1CkbDOAEp9SEx0FWbG2LO+xjwVFY18Vj191QSom7Jvh
-	fitmE+W0t0lXFHxwl+8H1yhnuHdzsTQ3rQ61mEYN/f3SkcAvA8KGPcJ6r9oyq3mAswpRQPnON2T
-	XNXN3dqk1xl0Pp6eE3S+qUUKsgJGJ8UsCjjyjKaC6UGM2MWGMvOr2RWaj8uzgrA==
+	s=arc-20240116; t=1780177125; c=relaxed/simple;
+	bh=xigOy34CuWt1yPhZAaxndGtKiUaWVQglbZX2Qnj822M=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Y0/PkrsX8GG/x1hntPvWy4ahxOPS+FOduFXteRfYwfMoyqbZMbDoBJl/JsGmUhaErNoR5NmDt6iwOn/R1QKcN6a7hMXGHHVl8jmecIVoaKyswOotC7DcrXntzA+AxfwWB7IN7RfWTrsTo4t8GLneucYCFHezwi1HBSCU1orRCs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VEFKFrm7; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VEFKFrm7"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A79E1C19425
+	for <linux-bluetooth@vger.kernel.org>; Sat, 30 May 2026 21:38:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1780177124;
+	bh=xigOy34CuWt1yPhZAaxndGtKiUaWVQglbZX2Qnj822M=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=VEFKFrm7v5RRpKdWL2nvaZzD2WZbCN1bG0hzqs63x/MEUiPPtZSdA2fR+ftqgKkDf
+	 Y/k/8kc7ZQUGblWw7B06GdJQo6c1UiNdO7w5jnAxdBLGHFcxlmwCbDJ3yjlBEbF/MX
+	 0oKQyTe574jKvkb4XHGMFzDgJyXVcDcs5+VvJa8KJhNbuE96ChlGwVHZv5ojXPuQX/
+	 cHfN4prIlIsrJzD+HqcNI4D/B1eFUwnpgdFHFfag9de9nvYlOilkMD0eGnzr03m3Qx
+	 VGfuhzEWj+ii29fUr1MVTHlStUzCks9mrdFP+ygMgLNa0uw50nsmfd2yAOnLZ3hw3P
+	 g3lMbTkOOLWig==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 88094C3279F; Sat, 30 May 2026 21:38:44 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221598] Bluetooth: btusb/btrtl RTL8821C 0bda:c821 HFP/mSBC
+ microphone stutters with bursty SCO RX delivery
+Date: Sat, 30 May 2026 21:38:44 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: apocarteres@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-221598-62941-lfsHy6DFAb@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221598-62941@https.bugzilla.kernel.org/>
+References: <bug-221598-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2018:b0:694:9252:1992 with SMTP id
- 006d021491bc7-69e102af1c9mr2310903eaf.0.1780174643704; Sat, 30 May 2026
- 13:57:23 -0700 (PDT)
-Date: Sat, 30 May 2026 13:57:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a1b4f33.fbc46276.d3ed.045a.GAE@google.com>
-Subject: [syzbot] [bluetooth?] memory leak in init_srcu_struct_fields
-From: syzbot <syzbot+535ecc844591e50588a5@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221598
 
-syzbot found the following issue on:
+--- Comment #7 from Alexander Paderin (apocarteres@gmail.com) ---
+Additional update after isolating user-space HCI traffic:
 
-HEAD commit:    f377d0025eb0 Merge tag 'sh-for-v7.1-tag2' of git://git.ker..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1737bb48580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9645c21cfd1d3e8f
-dashboard link: https://syzkaller.appspot.com/bug?extid=535ecc844591e50588a5
-compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=164ed748580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10e6576c580000
+I found a strong practical mitigation/confounder: stopping/removing Blueman
+significantly improves the HFP/mSBC microphone quality on this machine.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5d8163677f58/disk-f377d002.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/cf2fcdb8200b/vmlinux-f377d002.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e9fb70799318/bzImage-f377d002.xz
+Before this test, Blueman UI processes were running:
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+535ecc844591e50588a5@syzkaller.appspotmail.com
+- `blueman-manager`
+- `blueman-applet`
+- `blueman-tray`
 
-BUG: memory leak
-unreferenced object 0xffff888111f49600 (size 512):
-  comm "syz.0.17", pid 5937, jiffies 4294945495
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc 6e7d3fde):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4574 [inline]
-    slab_alloc_node mm/slub.c:4898 [inline]
-    __kmalloc_cache_noprof+0x371/0x480 mm/slub.c:5414
-    kmalloc_noprof include/linux/slab.h:950 [inline]
-    kzalloc_noprof include/linux/slab.h:1188 [inline]
-    init_srcu_struct_fields+0x2c0/0x350 kernel/rcu/srcutree.c:207
-    hci_alloc_dev_priv+0x37/0x680 net/bluetooth/hci_core.c:2453
-    hci_alloc_dev include/net/bluetooth/hci_core.h:1763 [inline]
-    hci_uart_register_dev drivers/bluetooth/hci_ldisc.c:644 [inline]
-    hci_uart_set_proto drivers/bluetooth/hci_ldisc.c:720 [inline]
-    hci_uart_tty_ioctl+0x173/0x460 drivers/bluetooth/hci_ldisc.c:774
-    tty_ioctl+0xaca/0xd60 drivers/tty/tty_io.c:2801
-    vfs_ioctl fs/ioctl.c:51 [inline]
-    __do_sys_ioctl fs/ioctl.c:597 [inline]
-    __se_sys_ioctl fs/ioctl.c:583 [inline]
-    __x64_sys_ioctl+0xf4/0x140 fs/ioctl.c:583
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xee/0xf80 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+The bad traces with Blueman running contained frequent HCI control traffic,
+especially:
 
-BUG: memory leak
-unreferenced object (percpu) 0x607e4d93d800 (size 384):
-  comm "syz.0.17", pid 5937, jiffies 4294945495
-  hex dump (first 32 bytes on cpu 0):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc 593bdea7):
-    pcpu_alloc_noprof+0x7c7/0xed0 mm/percpu.c:1896
-    init_srcu_struct_fields+0x2eb/0x350 kernel/rcu/srcutree.c:224
-    hci_alloc_dev_priv+0x37/0x680 net/bluetooth/hci_core.c:2453
-    hci_alloc_dev include/net/bluetooth/hci_core.h:1763 [inline]
-    hci_uart_register_dev drivers/bluetooth/hci_ldisc.c:644 [inline]
-    hci_uart_set_proto drivers/bluetooth/hci_ldisc.c:720 [inline]
-    hci_uart_tty_ioctl+0x173/0x460 drivers/bluetooth/hci_ldisc.c:774
-    tty_ioctl+0xaca/0xd60 drivers/tty/tty_io.c:2801
-    vfs_ioctl fs/ioctl.c:51 [inline]
-    __do_sys_ioctl fs/ioctl.c:597 [inline]
-    __se_sys_ioctl fs/ioctl.c:583 [inline]
-    __x64_sys_ioctl+0xf4/0x140 fs/ioctl.c:583
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xee/0xf80 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+- `Read RSSI` (`0x1405`)
+- `Read Transmit Power Level` (`0x0c2d`)
 
-BUG: memory leak
-unreferenced object (percpu) 0x607e4d93d980 (size 384):
-  comm "syz.0.18", pid 5940, jiffies 4294945497
-  hex dump (first 32 bytes on cpu 0):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc 593bdea7):
-    pcpu_alloc_noprof+0x7c7/0xed0 mm/percpu.c:1896
-    init_srcu_struct_fields+0x2eb/0x350 kernel/rcu/srcutree.c:224
-    hci_alloc_dev_priv+0x37/0x680 net/bluetooth/hci_core.c:2453
-    hci_alloc_dev include/net/bluetooth/hci_core.h:1763 [inline]
-    hci_uart_register_dev drivers/bluetooth/hci_ldisc.c:644 [inline]
-    hci_uart_set_proto drivers/bluetooth/hci_ldisc.c:720 [inline]
-    hci_uart_tty_ioctl+0x173/0x460 drivers/bluetooth/hci_ldisc.c:774
-    tty_ioctl+0xaca/0xd60 drivers/tty/tty_io.c:2801
-    vfs_ioctl fs/ioctl.c:51 [inline]
-    __do_sys_ioctl fs/ioctl.c:597 [inline]
-    __se_sys_ioctl fs/ioctl.c:583 [inline]
-    __x64_sys_ioctl+0xf4/0x140 fs/ioctl.c:583
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xee/0xf80 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+After stopping/removing Blueman, the same headset/machine produced much cle=
+aner
+captures. The subjective microphone stutter also became noticeably better.
 
-BUG: memory leak
-unreferenced object 0xffff88811d010a00 (size 512):
-  comm "syz.0.19", pid 5951, jiffies 4294945502
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc 2d3d1dd8):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4574 [inline]
-    slab_alloc_node mm/slub.c:4898 [inline]
-    __kmalloc_cache_noprof+0x371/0x480 mm/slub.c:5414
-    kmalloc_noprof include/linux/slab.h:950 [inline]
-    kzalloc_noprof include/linux/slab.h:1188 [inline]
-    init_srcu_struct_fields+0x2c0/0x350 kernel/rcu/srcutree.c:207
-    hci_alloc_dev_priv+0x37/0x680 net/bluetooth/hci_core.c:2453
-    hci_alloc_dev include/net/bluetooth/hci_core.h:1763 [inline]
-    hci_uart_register_dev drivers/bluetooth/hci_ldisc.c:644 [inline]
-    hci_uart_set_proto drivers/bluetooth/hci_ldisc.c:720 [inline]
-    hci_uart_tty_ioctl+0x173/0x460 drivers/bluetooth/hci_ldisc.c:774
-    tty_ioctl+0xaca/0xd60 drivers/tty/tty_io.c:2801
-    vfs_ioctl fs/ioctl.c:51 [inline]
-    __do_sys_ioctl fs/ioctl.c:597 [inline]
-    __se_sys_ioctl fs/ioctl.c:583 [inline]
-    __x64_sys_ioctl+0xf4/0x140 fs/ioctl.c:583
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xee/0xf80 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Summary of RX mSBC/H2 continuity results:
 
-BUG: memory leak
-unreferenced object (percpu) 0x607e4d93db00 (size 384):
-  comm "syz.0.19", pid 5951, jiffies 4294945502
-  hex dump (first 32 bytes on cpu 0):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc 593bdea7):
-    pcpu_alloc_noprof+0x7c7/0xed0 mm/percpu.c:1896
-    init_srcu_struct_fields+0x2eb/0x350 kernel/rcu/srcutree.c:224
-    hci_alloc_dev_priv+0x37/0x680 net/bluetooth/hci_core.c:2453
-    hci_alloc_dev include/net/bluetooth/hci_core.h:1763 [inline]
-    hci_uart_register_dev drivers/bluetooth/hci_ldisc.c:644 [inline]
-    hci_uart_set_proto drivers/bluetooth/hci_ldisc.c:720 [inline]
-    hci_uart_tty_ioctl+0x173/0x460 drivers/bluetooth/hci_ldisc.c:774
-    tty_ioctl+0xaca/0xd60 drivers/tty/tty_io.c:2801
-    vfs_ioctl fs/ioctl.c:51 [inline]
-    __do_sys_ioctl fs/ioctl.c:597 [inline]
-    __se_sys_ioctl fs/ioctl.c:583 [inline]
-    __x64_sys_ioctl+0xf4/0x140 fs/ioctl.c:583
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xee/0xf80 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+| run | extra HCI polling | RX H2 markers | bad seq | bad seq/k | bad dist |
+bad dist/k |
+|---|---:|---:|---:|---:|---:|---:|
+| old control | yes | 3486 | 21 | 6.02 | 23 | 6.60 |
+| no-Blueman control 1 | no | 4301 | 6 | 1.39 | 15 | 3.49 |
+| no-Blueman control 2 | no | 4312 | 6 | 1.39 | 6 | 1.39 |
+| bad noisy watch-only run | yes | 3949 | 454 | 114.97 | 425 | 107.62 |
+| bad noisy raw-open repeat | yes | 4812 | 453 | 94.14 | 385 | 80.01 |
 
-connection error: failed to recv *flatrpc.ExecutorMessageRawT: EOF
+TX remained clean in all runs (`bad_sequence=3D0`, `bad_distance=3D0`).
 
+Important caveat: I then tried to reproduce the issue without Blueman by
+injecting the same polling manually after eSCO setup. The stress script sen=
+t 25
+pairs of:
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+- `Read RSSI` (`0x1405`)
+- `Read Transmit Power Level` (`0x0c2d`)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+That did not reproduce the catastrophic bad runs:
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+| run | polling | RX H2 markers | bad seq | bad seq/k | bad dist | bad dist=
+/k |
+|---|---:|---:|---:|---:|---:|---:|
+| no-Blueman control 2 | no | 4312 | 6 | 1.39 | 6 | 1.39 |
+| artificial HCI polling stress | 25 RSSI + 25 TX-power reads | 3778 | 16 |
+4.24 | 13 | 3.44 |
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+So `Read RSSI` / `Read Transmit Power Level` alone is not proven to be the
+direct root cause. The stronger conclusion is:
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+- Removing Blueman is a real practical mitigation on this RTL8821C/0bda:c821
+system.
+- Extra user-space HCI management/control traffic is a strong confounder and
+can correlate with much worse RX mSBC continuity.
+- The underlying failure still appears to be RX-only H2/mSBC continuity los=
+s:
+host TX stays clean, eSCO setup parameters remain normal, and RX still has =
+some
+breaks even in the clean no-Blueman baseline.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+Relevant local captures/reports:
 
-If you want to undo deduplication, reply with:
-#syz undup
+- `captures/sco-control-test-20260531-002158.snoop`
+- `captures/sco-control-test-20260531-002431.snoop`
+- `captures/hci-poll-stress-test-20260531-003222.snoop`
+- `reports/control-no-blueman-20260531-002158-findings.md`
+- `reports/control-no-blueman-repeat-20260531-002431-findings.md`
+- `reports/hci-poll-stress-20260531-003222-findings.md`
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
