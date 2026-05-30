@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85DA962809
-	for <linux-bluetooth@vger.kernel.org>; Sat, 30 May 2026 15:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE5D3438AC
+	for <linux-bluetooth@vger.kernel.org>; Sat, 30 May 2026 16:21:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780155145; cv=none; b=duS2+BqmHgRRDvNAgH2D3flqZjhqhyk/9HCudTdtFXnftn6M0UXE4ouIcz8MFI4oZirp1us2MuW6VggYS2PxCnDNoZMVxOxf15jAxhuTAK4YNDgF9y5lQcgrbMDpLZIkCSVTpqPVdPobwI9v/sPkR8/kQ3zsLXz/e7yv9FT6VOY=
+	t=1780158095; cv=none; b=EpoM8E/VYt8G5U0HdidX+bgJmOSyjBKh283x+eWcTPqBcssVx9hbEnE0vmJPrx2Dr243MB/SpCn//pjw2MdseDkQsae4EPRYqy01zbQ5S03FtQP2e7CKpoGi3QCoWbUru5NFXa+BslLaI+xeuh+r6xh8laoldd1dh87R5SSPs6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780155145; c=relaxed/simple;
-	bh=1ufAmrzqxLQjRqPwC50H08abW5/SzxTpkiHhapg4C/8=;
+	s=arc-20240116; t=1780158095; c=relaxed/simple;
+	bh=FIdCSPbyPpBna6vA1v3bKcOZif6VT8M7PC5oTXUPeok=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=AG8mXd+4NqAYlfxzb59WGp89asSiIdplZTcLs3/HLuwMf6zqG2GlY+cQGOnpt9r3zN9z/YaA8bu48AipxVa+0A+V5ZFBuJcu8ojdPsqBXaKqJ/Po4GAAJbeOMdwepeWNkcDTf5m05dHOPWxhm8pl4ISl2gz5fZ5qDVzpwgNL7F4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gOH6F20Q; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=PfAW8qtKUQwWSP9j93DPTTU3gVxG3fAn09CNDkTOm9Es1DvI03IMLAwblvj2iRUpZ9c9ISZ64Ai8Eldncgwy/de4H2woDsG2t4brky+xKx7XgsVvYQUw9VHPVtaQ7NyrJuoK+x9Hp5AXL30hL3WBK6ZZv+bAycwfEGdlazbLouM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FYZajdG4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gOH6F20Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0D72CC2BCC4
-	for <linux-bluetooth@vger.kernel.org>; Sat, 30 May 2026 15:32:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FYZajdG4"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CADC0C19425
+	for <linux-bluetooth@vger.kernel.org>; Sat, 30 May 2026 16:21:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1780155145;
-	bh=1ufAmrzqxLQjRqPwC50H08abW5/SzxTpkiHhapg4C/8=;
+	s=k20201202; t=1780158094;
+	bh=FIdCSPbyPpBna6vA1v3bKcOZif6VT8M7PC5oTXUPeok=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=gOH6F20QHLwJl3sZKydhc9ElS8J9WSG7k6AbTLaCxfbWKvjuY4lDV4mHU3FMBKgbV
-	 jlEYegeQ/uowX9AqB4do99aREdUx23VxrRyFiwASJXm3K7ATyxNnPWEUsoJkWfAImp
-	 7vf86weRSIM1aPvBvUeswYICKacXQvrgecfWm/Ecb2+Y6vWlQsgrXAFeNjxjFYRUcL
-	 c2gWlVQYZGjUo7oWmDtlOGdhQo8FQlogkcEof0speOS8g760qlEFSEsycEDvOzXLLu
-	 M8bj+rEaQyve4PlnGu5AZq8poCmh0mt/gsJch6DXL7XK/QPYhcRTu8nw142S0uTb88
-	 3bw99dRLnAd0w==
+	b=FYZajdG4lWlA/5XvtlFgy+0jl2r/z+pOepbe0DSSOoWK9znDczp6xC0xH5PhGgJPq
+	 hn0y6Z1JjkJyQDUdNON8jmkeMGHY5TawxJ2soFwk42i6JrK+uLxjbCSKOoTVnrf+vF
+	 ip+Ps9SxZAg+1JqLBm0Xs3STt3phVPlhWTNv4zDCAe36wIHTWEN/TReNwFngte6M2+
+	 eAHnBzQdlweLscfrifPHz/kYlYmPi74TP6ffCveJRN+Ukb48deCskvYASkO30I4+DC
+	 JPBoo9Dgg54lUNoKUq+OvaAfWuTIaSesPbASRBO4dzIzsRghLk0s/19rqws/LVzQMy
+	 Gif47SB6T9vRg==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id E61A9C3279F; Sat, 30 May 2026 15:32:24 +0000 (UTC)
+	id B0689C3279F; Sat, 30 May 2026 16:21:34 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 221598] Bluetooth: btusb/btrtl RTL8821C 0bda:c821 HFP/mSBC
  microphone stutters with bursty SCO RX delivery
-Date: Sat, 30 May 2026 15:32:24 +0000
+Date: Sat, 30 May 2026 16:21:34 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -47,8 +47,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: rep_platform
-Message-ID: <bug-221598-62941-Y4aG6ocpoU@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: attachments.created
+Message-ID: <bug-221598-62941-53efKiBhPh@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-221598-62941@https.bugzilla.kernel.org/>
 References: <bug-221598-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,11 +64,13 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D221598
 
-Alexander Paderin (apocarteres@gmail.com) changed:
+--- Comment #5 from Alexander Paderin (apocarteres@gmail.com) ---
+Created attachment 310214
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D310214&action=3Dedit
+binary usbmon SCO/H2 analysis update
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-           Hardware|All                         |Intel
+Archive with simultaneous btmon capture, binary usbmon JSONL.GZ capture,
+analysis reports and scripts.
 
 --=20
 You may reply to this email to add a comment.
