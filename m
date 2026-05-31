@@ -1,66 +1,70 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61233368D4A
-	for <linux-bluetooth@vger.kernel.org>; Sun, 31 May 2026 10:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05272345CBC
+	for <linux-bluetooth@vger.kernel.org>; Sun, 31 May 2026 10:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780222712; cv=none; b=bHsWQFmt27Er1cf3OABNE5UWXL9+skWVTwFenAi1zA5ORS+fombA++Bx4Odo2NkGl/J5UAj5b5R7MKGfIX0eqYMTq1O87vXvICUViBnmP8IXYNKZwz83vqsJPs05xoDpL8afPQ8muYU4V2Y1yo3sghf2ifIbZe5t+riTv3gYMas=
+	t=1780222713; cv=none; b=FSOe+fcXY4zvvsjf2t/glOdYX4wC/GM1IfNc7VjWi97ZQTyCnl9aCnR/niFD3KG7m1oyEXvvr25SDMUo5Z1eoE6UsIUNvjCPsG65s4w6nThCzcb6y50wc3c80NjyhlpRQIjanGZIcu6bShcy7uaq2u61xlqfsLBRokgTK36Mtqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780222712; c=relaxed/simple;
-	bh=jW8RPyCPCC8S8v2TWTsaWGbqpjJy7byDhmB3sdgy2Vw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YatCC1QhXALObZ3I5fGNjbB0HWqR61qNc7XtLBBWPDK5OIjf+ba0aS2TbGR0b+xJHPwQerebmI8omvLiNwePlrwHfdsmhUeRSI51Y7b/JUNO+QUOZNaooZpAdedFQ34FnDILAPTOXagFvj/UEwJ4v2XfBGoodvfUv2QhrF9VSFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=KtfoaOGP; arc=none smtp.client-ip=209.85.208.50
+	s=arc-20240116; t=1780222713; c=relaxed/simple;
+	bh=pF1YLTsmopNGrKFhrJ4Z06IwlkUfjdls1r9dkTuMYVw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=quw738PyBFtceP28bl3RLTBcCfyARb+eMqkf5blWbSTKoTZ80SM6bwyPvir5aWZCPEkTfxobBtkWgPb6gUgoZOWyUmXHEjEq9VX6FR1mk5H99foi8o39ZQoZ23RYywo7yGdLyb5eMcJqmrQjg14VzLf2HZuri1JKFA/2Ck3GSks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=MuimFAEQ; arc=none smtp.client-ip=209.85.208.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="KtfoaOGP"
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6870ad8072eso11532691a12.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 31 May 2026 03:18:29 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="MuimFAEQ"
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-68d233bf083so596711a12.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 31 May 2026 03:18:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1780222708; x=1780827508; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Bd1Hf3VuUjzL9yKeLsLVCvJ0+C3p0AGl32xUujIoX4=;
-        b=KtfoaOGPNfcx8i/Y8rcbEce5tQJgZ29AHji7G02x5IzCaVuuTcVkR0xcDJQ4xoSQWg
-         i0JfBLB4iadjaJ8dHuHM1wgH3PgNHHGtkhJnbVshrLGKwcKi1FAItibVUd/htkuwh1Fq
-         mtgGEqKIRX0mUrBddIASKN3EXwk3tYv7yD1RU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780222708; x=1780827508;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=streamunlimited.com; s=google; t=1780222709; x=1780827509; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9Bd1Hf3VuUjzL9yKeLsLVCvJ0+C3p0AGl32xUujIoX4=;
-        b=OUD62z27XqSTTCIUviWszti+1vQ+kI1OyVnafWl5MhEI+yYl6mi+bcxuCHaX5WbTUF
-         yG1I7TC6nZVg2bxKPwuaRtqbbOt9dQo+0iFoZcLOSkG6LjTbklV9xPQFM/W2JnG69kQH
-         77rDbvRm3y0f+eR40B94vKstbcdHry3xXkmwKROrzMa1fRak7hN+NGEw49zi2HTMoG6r
-         YlbAu/cvMuVjpHlPvyzTtPFe6j7kNAMaqpx+GFMd0kmZUcSWKCsadGl1J0QsvEzoFWv9
-         EyfDSjfu7+zl1I0IhgIX0GbN0BEhOCv6B8JLshs5Avqt8vQV4KJzEHW9gEymErFeCnO6
-         Q9NQ==
-X-Gm-Message-State: AOJu0Yyq7yLfXp70Zol3p5ohj9FmaHkVhAv2hMwwD4+x3D+GltV83HFt
-	PoNovQZPc0LDhRMRka5sMjeb8Ry1hxC/opi0f0LDVsSeKxmoDyBKshbyGoNTHqGAD8N+fsNCYe/
-	gn9J2/A==
-X-Gm-Gg: Acq92OGFl7D7Mle/ahXZR0nq4kCi3AEItLJieVjY/fv5iM8tq9bR2lgVG1hemVWQQ56
-	RlE0ZMhSmUZhfgY1SgX21TC4cZbRHpBhTYKrIdrQ8fT3ywNe0xiTwIfpvjl8KLpG85/f62tN44I
-	/AQtuSnHRKlbbNcyT0uHuJ3zaK6aEeF8HY2Npjtuy4sFPjPcZ2cX19dT4j/wTe92tRSIklhe4+E
-	c9R7IfGFFVXXZlcPwK0lSCLyrRAu/bPmkH+YYZmr88tQWfEd0E4rWn3VgrZCiJ5RpToSIG2URNf
-	m9c254kQLyWuKVIKy/x2Ljt+yRTcf0YMsHSvXX/OcHGMT0n33ATJQepvp04RQkG5oPReiJRSIr+
-	YlTwbjz7XAJc7VSj3aqnymKf8+1aPdiNWgZM3AkQ819yl4FVNfWNNFoNoFP24Kpe9/eQ18x60+s
-	2syR422JBcSFOLX/DMEbbcEHyyiiuf0C+NPRZTJ6J+JOrlV61T3iFBmKuf+MgfN76Ybg6YL+K9+
-	wY2uKSLGPVlMkcwVFs+3u0=
-X-Received: by 2002:a05:6402:ea2:b0:67c:fb8e:41c8 with SMTP id 4fb4d7f45d1cf-68c94f6e8e3mr2205594a12.12.1780222708630;
-        Sun, 31 May 2026 03:18:28 -0700 (PDT)
+        bh=2im6ERplsh5bqJNRwbMnLW3mFU8/SjatcavZXhIbxCI=;
+        b=MuimFAEQlHwfqPFvRQFqJBeaNLTiL9j66Pw87BWTtdDPSbA61hjapYUPafkdxw/VB7
+         UEuHjdfnb9mfWmU5mcmmFGkjUYjUbsJrb9OuFH+J3XYrzp/t59vlU+dQ4Ilf8m2BpkDa
+         k09bXNd1cl5odm5603N4WsSvmqy7TYan6bcvo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780222709; x=1780827509;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=2im6ERplsh5bqJNRwbMnLW3mFU8/SjatcavZXhIbxCI=;
+        b=nEn+R8CIzLujWSFqHlAezAsUs6KNXMc8GyzuluhdeVW6b9vLC8BB1Jb16Okawl8YXY
+         AFPtRcFUUfduZVTcRWB2lnIOrmcxop0b8X/riTlziCkTJxH6zRGa6gBRehyCv7yklGJX
+         9mkM02xwqeGjdj0xjbmELb8bMjorjLAgTDBBqUkEbaTwoGm2Ba9UfPVAhhGvmiaLUOY/
+         CT989jkbkPCjBL9fIntwJ8H8B174kBlyXUSxXX1IWmdfpOmSNi6oYNc0XvF04lyR3N6w
+         IWkttVa0jxcmiVL+xzw0xBKIjeGBwktpB5RW/cfYcCDjGHtrf2tdcEv0XnlPn+GyX1ZX
+         yTnQ==
+X-Gm-Message-State: AOJu0YxzjycbJj7Bvy10ERk7gUJv54lLtH6tS3uJrqx7Vvut949uYAn/
+	bFp3XesU4Lsbt8k8RvoRW/e34RkmoBq3RANOEA7bfVcSB83Qqa6fBLX8nGqZWBrCY1X58lSr5sF
+	Kr7hh9g==
+X-Gm-Gg: Acq92OH4MSvreTKzSkgHxR7I2CJjW46gacQk5QxdBv0L/4xQziQYHeVwj8I0k2wiDyB
+	LLcANXrRVRQOazm9jhrM5285lHQ2ec+HcEAcYSPOBPB8nztCfFF0yvU0HO8Xn6qA6A+mV1A2sF9
+	t0yLXr3arOSV4NDK+p0RE8/60SQCXAqHEvfPj7MvGUh4F2LCuSWIOHMSxwb9O/rteDNpa3V+3hk
+	RRTkbS7FHe+AHg09zl8jWAhdyl3MhiMNl8p6c4LZF/zVqLX/gBWnojEbPqwS3dDanAz0JkMkOik
+	LMhyalzlwP9nE3tCcG9zYihs8kZ8QhuOcPUN12qxARLJ2jL7oGkuWRC1NKJpsSXqgf2hV9709+K
+	u5MC+bmIrK3eZ+kTUmZu6Svfl3c4M1IDPdkA8znHAWdVOz1b8MCP8mM/eAeLvylkPFj2xkDBhAW
+	8XfwHrlfO7okyhCf49Fd4g1DFwNhGVY6M95t9XJvgrlB4y8qT6LcjBthTGXjbsOkC8oIXf/VdoA
+	0xii2rtFHOY
+X-Received: by 2002:a05:6402:1943:b0:674:2565:f27a with SMTP id 4fb4d7f45d1cf-68c8cb30c19mr2976888a12.19.1780222709558;
+        Sun, 31 May 2026 03:18:29 -0700 (PDT)
 Received: from great-eastern2.. (user-46-113-6-2.play-internet.pl. [46.113.6.2])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-68ceb6f98f8sm974823a12.0.2026.05.31.03.18.27
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-68ceb6f98f8sm974823a12.0.2026.05.31.03.18.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 May 2026 03:18:28 -0700 (PDT)
+        Sun, 31 May 2026 03:18:29 -0700 (PDT)
 From: Michal Dzik <michal.dzik@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michal Dzik <michal.dzik@streamunlimited.com>
-Subject: [PATCH BlueZ v2 0/2] advertising: add property with advertisement Instance
-Date: Sun, 31 May 2026 12:17:52 +0200
-Message-ID: <20260531101754.3325247-1-michal.dzik@streamunlimited.com>
+Subject: [PATCH BlueZ v2 1/2] advertising: add property with advertisement Instance
+Date: Sun, 31 May 2026 12:17:53 +0200
+Message-ID: <20260531101754.3325247-2-michal.dzik@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260531101754.3325247-1-michal.dzik@streamunlimited.com>
+References: <20260531101754.3325247-1-michal.dzik@streamunlimited.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -69,19 +73,52 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-I renamed Identifier to Instance and added support in client
+Instance is an internal value, but it must be exposed to client app if
+client app wants to use a advertisement in BAP broadcast.
+---
+ doc/org.bluez.LEAdvertisement.rst |  6 ++++++
+ src/advertising.c                 | 13 ++++++++++++-
+ 2 files changed, 18 insertions(+), 1 deletion(-)
 
-Michal Dzik (2):
-  advertising: add property with advertisement Instance
-  client: add advertisement instance support
-
- client/advertising.c              | 38 +++++++++++++++++++++++++++++++
- client/advertising.h              |  1 +
- client/main.c                     |  7 ++++++
- doc/org.bluez.LEAdvertisement.rst |  6 +++++
- src/advertising.c                 | 13 ++++++++++-
- 5 files changed, 64 insertions(+), 1 deletion(-)
-
+diff --git a/doc/org.bluez.LEAdvertisement.rst b/doc/org.bluez.LEAdvertisement.rst
+index aae80f08f..dbfc5f0bc 100644
+--- a/doc/org.bluez.LEAdvertisement.rst
++++ b/doc/org.bluez.LEAdvertisement.rst
+@@ -235,3 +235,9 @@ The provided value is used only if the "CanSetTxPower" feature is enabled on the
+ **org.bluez.LEAdvertisingManager(5)**.
+ 
+ Values must be in range [-127 to +20], where units are in dBm.
++
++byte Instance [read-write, optional]
++``````````````````````````````````````
++
++Instance of the advertisement. Set by bluetoothd after advertisement is registered with
++**org.bluez.LEAdvertisingManager(5)**.
+diff --git a/src/advertising.c b/src/advertising.c
+index 8970e65f7..c8b00a887 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -1390,8 +1390,19 @@ static void add_client_complete(struct btd_adv_client *client, uint8_t status)
+ 		queue_remove(client->manager->clients, client);
+ 		g_idle_add(client_free_idle_cb, client);
+ 
+-	} else
++	} else {
++		DBusMessageIter iter;
++
++		/* Check if the attribute has the Instance property */
++		if (g_dbus_proxy_get_property(client->proxy, "Instance",
++								&iter)) {
++			g_dbus_proxy_set_property_basic(client->proxy,
++				"Instance", DBUS_TYPE_BYTE, &client->instance,
++				NULL, NULL, NULL);
++		}
++
+ 		reply = dbus_message_new_method_return(client->reg);
++	}
+ 
+ 	g_dbus_send_message(btd_get_dbus_connection(), reply);
+ 	dbus_message_unref(client->reg);
 -- 
 2.43.0
 
