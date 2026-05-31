@@ -1,141 +1,150 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABAEF1E492D
-	for <linux-bluetooth@vger.kernel.org>; Sun, 31 May 2026 18:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025AC21773D
+	for <linux-bluetooth@vger.kernel.org>; Sun, 31 May 2026 19:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780253640; cv=none; b=up+HCgyR7h9Slinc9cRHDem+31D2FIdvgOHJV9K8MYOAbzYvK+/JDxKvxlEo3l/AYFHYEpdQd1ZdYx6v48Je3oU+Qr5++4RucySyl3DCh/pmMnwQfaKjoSCh84pITjqqYf9kgVP8IbwgIekOsPtCKnRso6e/kEtcTOpcWsxEBgE=
+	t=1780255935; cv=none; b=UjDl/kN1CAIBeDZsQX64Ei0oW25sXUVQ8JInUQ8/Acjlq5uL6WO8ZtvG0UOXrIv6l0Dyqztwxw9Yk94bVwOf7U7BDCFkolbFlCZRM3QP+PniTTCm4GxR3q4yf4ctZVdv4HUVoK75TpMqr9IamxG/EQzEJRdSk/qm0oafp9ZvJfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780253640; c=relaxed/simple;
-	bh=tlVMrBxRS+UJLeASwMVg94vHLb/S8hmVDe1PiOuwpnI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=USElnGjLHbFTEZCykr5aJFeaaW2O5m8SoZVOOreEhOue6CpySTdJdWoKh5+TbFFvuKi+nSIb3t7C0xR+GiqgYNImkZv+gy99MTafrXmfqTCvaYI0SrWkIBE/9Xl9DkRbE3whtk980ALGOkhqwX69ru0TLvhndWalRU/adaKwd1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hO3nQjZv; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1780255935; c=relaxed/simple;
+	bh=FbGsRLZpUlJtqbbdGk3xfhJkOqs/KBbEcvbIfHle6D0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=XxvsfWo8Wn8ao79d7teWfrRBHvV01kdZGXH25VthZql86Vvt+ChqrvT/YXEWIkQy2RffYJ+pvZSA74rNSKa/tVHd1Dyw3sq0LYrv5yztDQqFZTqXygH7mIiM8b9knumRNl51c/uaYlKrBQs2p2Q4b3SOSCNu7YwQ19/WzqSwTMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sWGpmXw/; arc=none smtp.client-ip=209.85.160.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hO3nQjZv"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-36ba285e98bso2898510a91.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 31 May 2026 11:53:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sWGpmXw/"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-5174a34800fso8968161cf.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 31 May 2026 12:32:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780253639; x=1780858439; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yCfnDp4TVil5GLFtV2CJjvE4FzB7iM9xNBhhS1ttWQs=;
-        b=hO3nQjZvbcLcGpz2b73SVTnAw1aFawAdjyNvCVrgFb2O2rJCVmsPaipbeeTjhUCSGZ
-         UQVI+3eOGeaEh+hk3j7e2lPyaf4N0Wep/CSMaEoKVrlXy+avmh/wKZQjlQBmnjPlHQJ9
-         9KKaRUzIxYm0cZFiN0wwuiSCfTEg7VyznoKNpIu6ez+R9k33yxMlzpNR1JF7qWCYWG2f
-         ePa8Ogkq8GzhaVmYS0MmjGCpcoD27akcdisqpmp8nZWwrifgRSgu+52Eadcmn18l28St
-         Fydl3OB4rMbu4aqglrRNCOcfg7sgjkPlyWZs7NoLE7bCPIvaYM7Snk5Imr1xJSuO9gzy
-         vRrw==
+        d=gmail.com; s=20251104; t=1780255933; x=1780860733; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=rFKRbMzUv7S8XYXLMAnlnQc3u3fZTVtBF7KZQYtPmXE=;
+        b=sWGpmXw/bWAER7Va90nsy65JgpEox7uhmiwqQbr1QuIsGmlKLfVLSf/lptRf6ACkSf
+         NEo0yeOTcEgFkr89cZktmkquz/xtvI7LaCYyOUbzH30kGLWLf8/MqGeERKp4Grhpxq33
+         SIe45N2x4u7TSWMBteCsFEmb6IcJ+QG2PnfN6fwuVQksO8Mbwcgr1reAILYrg2F/XZAy
+         DTCQmfwoCdzG3ft5D1/PWVzH4p1To28pz0Dhz5Gsva3egm00CQRxhL5qSC1UhHdB5tkk
+         2c7/a8QWkd0Rj3TIa5TxYl4iKSvC8KbZulHTC6CHh2IiI6lUALr5SS6ui8GV7uy2UTqk
+         uPYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780253639; x=1780858439;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1780255933; x=1780860733;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yCfnDp4TVil5GLFtV2CJjvE4FzB7iM9xNBhhS1ttWQs=;
-        b=mKlhHzysur0u7iUudO21QyW7xsLhf75Uz8A+TRt0TcV6uZJXuEPhnjWKUuAmvObEbR
-         8Gs4ZRdgho9yq3dnGImduWc/Ft+mE9kb0qatR/kTNIDZ9K2m8mR9W4IHgzBZ2AkWilZ/
-         UH99q9feQ4KCNdTeMMzcuxhs/YcmIt2y/J1jqbMcllkcm9JNeQNqKFR/NHPSRrAh+Fnx
-         p0yDw74HwtYL0zeQbFUTWJlPJOPNeJgXgxGHLiyiV3ExCrLZDj/KCPP1j9eSVBANAGxZ
-         9HemrPhfclMjvEplQ82myP1YVbtRvcIS+yXv4lQ9UraPwXIZEEotxtub7SbXXIykVSXU
-         skuQ==
-X-Gm-Message-State: AOJu0Yw9dMTTLKYlC9C4K/jmt9gXz8pRiEERE1BUFcLpY2tNLIXOSc08
-	SJVPQz1zBMIjmJaSYfsm/HrCF5+GEAf9ivbu32KP6Xmt+0TSc2rvGhHJ
-X-Gm-Gg: Acq92OFZXloweaTx6FlmLhX8StIOaSDJ/rshLn21R/j/VObPZs9HWADKOF1EBYMMSq0
-	PaRRLs6ve3Z3oGjgyS9j6JFfFiEycObOdAFj093S9+SD3EdYO3HRkz2dPUWm3SReJoLJDmW4W8x
-	4nCXYF3SsWffFRIfR9H4pT6QXF4Sq6D6eDOB7vBn4UW4c9EaD4f42RLr7SVlV8wEBfOBQXF22Ju
-	5nBAWeH1owUTOmStVoJTXp7NMqg+7Zre5k0rVR9McjHWz38/4Nxm5IFsd2R5rQKeSf7PZw5Ufkg
-	v1+rfeOqS62sOwk42Y8grQmxEPzDfvt6NgJic3Af1v/clUlRqFjQ+j6MuMp88KyD+pn1ALUgQN2
-	zRl7K2bCC1b3IU/AlRGhMCYg9XR+C/ERYvPs3Qj1bMyt0apN+Arh0pn+V6Imj2hLlNAEq6VR/7e
-	SuD0OIecttA2oKN/xwH4gUWBZUCHgi5PivYaDOFoxakjJ79MhWEiFGgMqmB69DUP6rHiElR620K
-	lAKLTVkkPHaTzIVz6nP5H5mK0FVow==
-X-Received: by 2002:a17:90b:35c2:b0:36b:8873:d96d with SMTP id 98e67ed59e1d1-36c4ff65291mr7107251a91.11.1780253638891;
-        Sun, 31 May 2026 11:53:58 -0700 (PDT)
-Received: from rustle-HP-Pavilion-Laptop-14-dv2xxx.. ([49.205.241.70])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36d654999a0sm5839594a91.0.2026.05.31.11.53.55
+        bh=rFKRbMzUv7S8XYXLMAnlnQc3u3fZTVtBF7KZQYtPmXE=;
+        b=ZuA+EXVgx+rjJjNchD4C+5tkM2F1w+3t0SnZPkM/sJ/Z84oda0RMSHew9GOAIB0WZq
+         z8yUy52LA0JWC1KE4+ZNAQti4e/cyvF8Pj8o0t9WmkxfuNsbsRcOxBlIszO6Qf3DoPMP
+         dZfo/xv/tXUxgijwf3Tyjq/VlGAmZv0zDBLUPNzU3P0v3R5rDIP080nPrvjMJ+UQ7MDO
+         9VylpnXaTNJrNBXSSHtvb45p6pNDIr6mdRk+kAUd2YnL6ftxH9u3inILVJYM+0mP+Piu
+         NPODTBqVM3iDoRJcYbpnqhyNZWijyDfElCWI1Gf1yD/i51LxOZ017zVaqV+S1kjQgCwS
+         5MOQ==
+X-Gm-Message-State: AOJu0YxEi6GdXauTt5Zr92aCtutNt2Bof0iDmjsr7e9pq1jXh8uYKx0+
+	PXk5eFALpcfH9vMPrET4AvurV2FUPy0i83Uv/O5+y/a1p2W2IHlYVkz2mFNJsQ==
+X-Gm-Gg: Acq92OFyVwmdIxG3viHWLMtzlznnlKV0s8flORcbPYJto99nmHbt0QFz+9m4BfwIMHK
+	zQoyZ95HuaBQtDD1SMX1KMe/7x2CfNUYCYFAwCsjQVqF0rygLDP07F/dIOEOmytg6/l+hBfxSUZ
+	4jUGXFF9FgU5yCQ8+680W7PG9Ei9dYxGtPWdEeWwZ2imHdbjnMdrMeIDGy84sDjKu9fzSDQpA7/
+	Gp1AI14stx+VdA4xsNog8T/xH76tG+Ogb/UIv3zWrDSZO9HEvCfXHKihVnNvO9+3YWWBo7vKX2y
+	WBGAy81/w4cHlYslyDGfrHyVdEu9v6cSIhs5EVoLEtmliQEA18bA/RcwtYpZB7Y8yA4LG5H3pyy
+	y0JtN6+Hbvfls4JY1lZQJ3Pao92dcZkTPmkEQEHpob1RcIUZ/sCIL2TYaVO03kgACSWNzvi0CJy
+	6oYsTdWDmrfNxc+BVUwdbSzRu4R71YFsDP3oQDnhmvPQ==
+X-Received: by 2002:ac8:59c4:0:b0:50f:ad91:8912 with SMTP id d75a77b69052e-5173a61746cmr132384961cf.13.1780255932933;
+        Sun, 31 May 2026 12:32:12 -0700 (PDT)
+Received: from [172.17.0.2] ([172.174.198.68])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51741b06e54sm37754641cf.6.2026.05.31.12.32.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 May 2026 11:53:58 -0700 (PDT)
-From: Bharath Reddy <kbreddy.rpbc@gmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	Bharath Reddy <kbreddy.rpbc@gmail.com>,
-	syzbot+535ecc844591e50588a5@syzkaller.appspotmail.com
-Subject: [PATCH v4] Bluetooth: fix memory leak in error path of hci_alloc_dev()
-Date: Mon,  1 Jun 2026 00:23:39 +0530
-Message-Id: <20260531185339.107188-1-kbreddy.rpbc@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Sun, 31 May 2026 12:32:12 -0700 (PDT)
+Message-ID: <6a1c8cbc.8d510ab8.182f74.9adf@mx.google.com>
+Date: Sun, 31 May 2026 12:32:12 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7423018637070842147=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kbreddy.rpbc@gmail.com
+Subject: RE: [v4] Bluetooth: fix memory leak in error path of hci_alloc_dev()
+In-Reply-To: <20260531185339.107188-1-kbreddy.rpbc@gmail.com>
+References: <20260531185339.107188-1-kbreddy.rpbc@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Early failures in Bluetooth HCI UART configuration leak SRCU percpu
-memory.
+--===============7423018637070842147==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-When device initialization fails before hci_register_dev() completes,
-the HCI_UNREGISTER flag is never set. As a result, when the device
-reference count reaches zero, bt_host_release() evaluates this flag as
-false and falls back to a direct kfree(hdev).
+This is automated email and please do not reply to this email!
 
-Because hci_release_dev() is bypassed, the SRCU struct initialized
-early in hci_alloc_dev() is never cleaned up, resulting in a leak of
-percpu memory.
+Dear submitter,
 
-Fix the leak by explicitly calling cleanup_srcu_struct() in the
-fallback (unregistered) branch of bt_host_release() before freeing
-the device.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1103659
 
-Reported-by: syzbot+535ecc844591e50588a5@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=535ecc844591e50588a5
-Tested-by: syzbot+535ecc844591e50588a5@syzkaller.appspotmail.com
-Fixes: 1d6123102e9f ("Bluetooth: hci_core: Fix use-after-free in vhci_flush()")
-Signed-off-by: Bharath Reddy <kbreddy.rpbc@gmail.com>
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.75 seconds
+VerifyFixes                   PASS      0.14 seconds
+VerifySignedoff               PASS      0.14 seconds
+GitLint                       FAIL      0.34 seconds
+SubjectPrefix                 PASS      0.14 seconds
+BuildKernel                   PASS      24.71 seconds
+CheckAllWarning               PASS      27.34 seconds
+CheckSparse                   PASS      26.77 seconds
+BuildKernel32                 PASS      24.39 seconds
+TestRunnerSetup               PASS      521.61 seconds
+TestRunner_l2cap-tester       PASS      58.27 seconds
+TestRunner_iso-tester         PASS      71.09 seconds
+TestRunner_bnep-tester        PASS      19.01 seconds
+TestRunner_mgmt-tester        FAIL      210.04 seconds
+TestRunner_rfcomm-tester      PASS      25.47 seconds
+TestRunner_sco-tester         PASS      32.52 seconds
+TestRunner_ioctl-tester       PASS      25.65 seconds
+TestRunner_mesh-tester        FAIL      25.96 seconds
+TestRunner_smp-tester         PASS      23.39 seconds
+TestRunner_userchan-tester    PASS      19.79 seconds
+TestRunner_6lowpan-tester     PASS      22.57 seconds
+IncrementalBuild              PASS      23.69 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v4] Bluetooth: fix memory leak in error path of hci_alloc_dev()
+
+27: B2 Line has trailing whitespace: " - Added missing curly braces to the if/else block in bt_host_release() "
+32: B2 Line has trailing whitespace: " - Fixed a NULL pointer dereference caused by v1. "
+33: B2 Line has trailing whitespace: " - Moved cleanup_srcu_struct() to the fallback (unregistered) branch "
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.246 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.303 seconds
+Mesh - Send cancel - 2                               Timed out    1.995 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/261
+
 ---
-Changes in v4:
- - Include patch version history.
+Regards,
+Linux Bluetooth
 
-Changes in v3:
- - Added missing curly braces to the if/else block in bt_host_release() 
-   to resolve a checkpatch.pl warning.
- - Added Fixes and Closes tags.
 
-Changes in v2:
- - Fixed a NULL pointer dereference caused by v1. 
- - Moved cleanup_srcu_struct() to the fallback (unregistered) branch 
-   of bt_host_release() instead of unconditionally calling hci_release_dev().
-
-Changes in v1:
- - Initial patch (failed because it bypassed the HCI_UNREGISTER check).
-
- net/bluetooth/hci_sysfs.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 041ce9adc378..8957ce7c21b7 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -83,10 +83,12 @@ static void bt_host_release(struct device *dev)
- {
- 	struct hci_dev *hdev = to_hci_dev(dev);
- 
--	if (hci_dev_test_flag(hdev, HCI_UNREGISTER))
-+	if (hci_dev_test_flag(hdev, HCI_UNREGISTER)) {
- 		hci_release_dev(hdev);
--	else
-+	} else {
-+		cleanup_srcu_struct(&hdev->srcu);
- 		kfree(hdev);
-+	}
- 	module_put(THIS_MODULE);
- }
- 
--- 
-2.34.1
-
+--===============7423018637070842147==--
