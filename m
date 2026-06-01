@@ -1,113 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B3C349B0A
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jun 2026 19:03:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1CC7364EA5;
+	Mon,  1 Jun 2026 19:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780340612; cv=none; b=FQMZ9tikIOjyMKAtmKH9ZsyXRrf1PgazNzZJ5JzYdDh/SHXaaemVZS3eLgybBW4irAqFJx6TcifIWWyJWPsLdBAxTMAZ+z4f6QsdBtUtnfMTCyVbWc+UqdVZC4nIMGfB0iqQ8AZU1WrgtnRIhj8NfqNjvpdaUm8nlmjw6/UOqDQ=
+	t=1780341004; cv=none; b=uBaKaVSSnV6tYYRpVaNJBoMcjBFHw54I2msy+H/fbMXa2VTV+RFelvFYgaLRJWqICcadCQ+c+TNpnIdLHRLLKSqW+Ni7bvrwrpnHAgw8WYmjwirTHDU0LnZjmQei5jtr3GnR8XTk65zW/dE7hyI6WfV/vVrA1Lt4NuCWjiUVyc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780340612; c=relaxed/simple;
-	bh=bxVB+Gjqj6PoNxD11qzLpgPofueS0E+Hd+MJ/6E6OAM=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ePjYfUSXfdaceubAsMsYENa/395Q4fa8JUJ383psOy+8GK123GwEXK5akD5agbPsIihqoRlzQFP8BolFmsD/s4TijBDeizAitfy0itbrDlZG3gUZkDcpphFHGfey8wH1KbwwEKv7+X0JJ9vJlKqLan2VktCcHLoP1eGQyhDxrq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NsjRmQX/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1780341004; c=relaxed/simple;
+	bh=4mTbPWtbXMA+Hm6QHY+n699R/X0Ek79GYR7L3HpIlE0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ZBcv/NJjnguBSeX6yp2G0/DCOQshrbtD5z7IxjlXORWN1/cACT20jJuKlpO0c6k4TJzsIilYXCiA88u/TqdjSxFXelw8Tyr3KnWx2bHZM1fHa9nimDPTOPRLnEvic/DXaAx7+bYXibqZwN1xZC519MHG/19GccUMqK8MAwr2vqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kvLCVzus; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NsjRmQX/"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 65B85C2BCB8
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jun 2026 19:03:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1780340612;
-	bh=bxVB+Gjqj6PoNxD11qzLpgPofueS0E+Hd+MJ/6E6OAM=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=NsjRmQX/raUaNgSwNCU4EOHCdjxPpmK6F0sP7IT38JPumiI1ftZ3zqd//IpSQExCg
-	 I3COLTO5ZjeFGZSGf+uginkUgu8wEu3qgAL+pSNTXeLM6uN0mAyeK4lgqPq7Ns1yPQ
-	 g82OtPCOfp8vhN0GN300FfiFG20000jIaEt8DzKPzpQrPM1jLaZAnDlYWx6qnrULDV
-	 rlvuTE4PQJ8fGROWEcWuh1HaHgbttEjSfjMSImhiReLE7M11/cMSPtwTogCuRllLTY
-	 Wpr9mkrFRh9mvaTZPgKc3l5G/A0PDKagtaeIjeebHzQHXRCAmKBJVq1WM/JpQpqPEV
-	 GGya0R2VeFSNA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 517FFC53BBF; Mon,  1 Jun 2026 19:03:32 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221552] btmtk: MT7921 (USB 0e8d:e020 / PCI 14c3:7920) Bluetooth
- broken since 7.0.7 - fix for 0489:e0e2 does not cover this PID
-Date: Mon, 01 Jun 2026 19:03:32 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: gpbagayatkar@gmail.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: INSUFFICIENT_DATA
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221552-62941-Eu1Y388iBP@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221552-62941@https.bugzilla.kernel.org/>
-References: <bug-221552-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kvLCVzus"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74AC91F00893;
+	Mon,  1 Jun 2026 19:10:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780341003;
+	bh=z26v2DaPN9zHzIgN3kwWr0iyk7uBm630pFoLMAhbVjk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=kvLCVzusPqjU+ir28Wmog5B12bOlkjOd14pmd4Jlxtny253Pa/fyyUcNPUBS/fDLs
+	 pPNdwFFgfbsI/6WiI1XytuibaEnUg7RUq7ulo3Y3KSmgLnMJWbW5KASe1IHE5eaFnj
+	 MaqGPWKnIkXmuwk5zP8ziwXptW5EPml1tRD5zs6qwFIgJbwoIPuyvB9blwHzTfJ7c2
+	 ZIkFnbBltfLNpyQDLh1sdz/4O83nf/osSZd2ygDYvJO7Vdl8Ug/nNMOYNqpacF0o2H
+	 OvLxfNlSLnvuYCTVkxCVrjD9DQfLx3dPqHDoXt0vNUZUe9IPSwIdvAzeadU9DpUED6
+	 5eK+Vt43qUFZw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 16C8738119F4;
+	Mon,  1 Jun 2026 19:10:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 0/2] Bluetooth: hci_qca: fix NULL pointer dereferences for
+ non-serdev devices
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <178034100604.57646.7464742328539604683.git-patchwork-notify@kernel.org>
+Date: Mon, 01 Jun 2026 19:10:06 +0000
+References: <20260601-fix_none_serdev-v1-0-8d0497ba83b0@oss.qualcomm.com>
+In-Reply-To: <20260601-fix_none_serdev-v1-0-8d0497ba83b0@oss.qualcomm.com>
+To: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Cc: brgl@kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com,
+ mengshi.wu@oss.qualcomm.com, dmitry.baryshkov@oss.qualcomm.com,
+ quic_saluvala@quicinc.com, zijun_hu@icloud.com, luiz.von.dentz@intel.com,
+ bartosz.golaszewski@oss.qualcomm.com, linux-arm-msm@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221552
+Hello:
 
---- Comment #3 from Gunjan Bagayatkar (gpbagayatkar@gmail.com) ---
-While I cannot speak for OP,
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-what I can confirm is,
+On Mon, 01 Jun 2026 04:30:54 -0700 you wrote:
+> When a QCA controller is attached via a non-serdev path (e.g. hci_uart
+> line discipline), hu->serdev is NULL. A couple of code paths dereference
+> it unconditionally, leading to NULL pointer dereferences.
+> 
+> This series fixes two such cases:
+> 
+>  - qca_setup() dereferences the result of
+>    serdev_device_get_drvdata(hu->serdev).
+>  - qca_dmp_hdr() dereferences hu->serdev->dev.driver->name.
+> 
+> [...]
 
-I was facing similar issue as OP on similar machine, and after upgrading to
-7.0.10 it is fixed.
+Here is the summary with links:
+  - [1/2] Bluetooth: hci_qca: fix NULL pointer dereference in qca_setup() for non-serdev device
+    https://git.kernel.org/bluetooth/bluetooth-next/c/7bfdd3d9129c
+  - [2/2] Bluetooth: hci_qca: fix NULL pointer dereference in qca_dmp_hdr() for non-serdev device
+    https://git.kernel.org/bluetooth/bluetooth-next/c/4fcae45539b9
 
-Bluetooth works (discovering devices, pairing, listening to music, all work)
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-My specs:
 
-model: Lenovo LOQ 15AHP10
-wifi chip: MediaTek MT7921
-OS: openSUSE Tumbleweed
-previous known-good kernel: unknown (newly bought machine)
-kernel with failing bluetooth: 7.0.9
-kernel with working bluetooth: 7.0.10
-I received new kernel via distribution rolling upgrade
-
-lspci -nnk :
-  03:00.0 Network controller [0280]: MEDIATEK Corp. Device [14c3:7920]
-        DeviceName: Realtek
-        Subsystem: Lenovo Device [17aa:e020]
-        Kernel driver in use: mt7921e
-(same as OP)
-
-lsusb :
-Bus 001 Device 004: ID 0e8d:e020 MediaTek Inc. Wireless_Device
-(same as OP)
-
-modinfo btmtk
-  filename:=20=20=20=20=20=20
-/usr/lib/modules/7.0.10-2-default/kernel/drivers/bluetooth/btmtk.ko.zst
-  firmware:       mediatek/mt7925/BT_RAM_CODE_MT7925_1_1_hdr.bin
-  firmware:       mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin
-  firmware:       mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin
-  firmware:       mediatek/mt7668pr2h.bin
-  firmware:       mediatek/mt7663pr2h.bin
-  firmware:       mediatek/mt7622pr2h.bin
-  (2 new lines than OP. this is working state)
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
