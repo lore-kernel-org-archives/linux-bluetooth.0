@@ -1,148 +1,146 @@
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714BA175A79;
-	Mon,  1 Jun 2026 14:21:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80D892D839C
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jun 2026 16:22:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780323710; cv=none; b=dvku+MaY8ST1l4DDkEQ7GXG6teL6HnmXSQlCnKoazmQKpllh3+JpD0JItNumPmkGFAUmNnUACL/mrIaeg8xrsshEMupGncapeOLXsuWs35J1OUiNc3/9XmJNl6HVOl5JrJjV+q68PyLq2zFktSieAnS2lLWBVm3FVLvQC646wqc=
+	t=1780330969; cv=none; b=UpyopjhW8BLylTsCt6WVLpajic4Cz66gx4w18C11MZAf1pk3Ggvpya7DObLTG9cpG3NhtMZElT9q0rrGQHeK8myUeqkLs6MANG0XmXXCW9+aEXXPRbdbU+k2fpbrX+X5l21DVWXxmNWY0ec3Yjm9icQRoo1BOQ2cjP/dGEUqU0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780323710; c=relaxed/simple;
-	bh=IOcxPEHICCL51BKS06FyAFs8cw1ni6OLEKerno7YO5o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R9rR5cSqPpbrzNzfGjNlVgLyAj/7gIGvWp5qcItScWM+ykNrYGbaHJ7uZBBwXetbO1d1EH15MQ9QH7XEOUDNPBK8/xLPpaaHqYU8pApVhSSY++uKZ6V3ni75EBu6bBJ/RPeWO+8i1Y+MsIKvlF1ArLQYnql91QlAqm4noF81af0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=sSAUDiDC; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
+	s=arc-20240116; t=1780330969; c=relaxed/simple;
+	bh=XbDa7ahvkbouj4nXflmBjHzwiZb+OcXPwS3KDXfIhLI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RlSpN1gF+a0yfkMpd8rgUxZWFJdQqvLpRt149SWZML9t6BfI25o43M+yoX94b8vdbQfv+Hj2gOWls/Oji3KUsw1RTcvwv099VYgWqXWKjuYO0urek9claEfSSTbshITbu2tcMAz/8FBbLBylBMuHcmFgyGlOxKSktIsx+ZRhg7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vpb38Ga5; arc=none smtp.client-ip=74.125.82.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="sSAUDiDC"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Reply-To:Content-ID:Content-Description;
-	bh=ld8GsU1c1V5Fz4U8E6o0CkhW7dY85l6LqJOFpHNFmks=; b=sSAUDiDCq5NGSHv+nC+l+qz+Vj
-	lC/Gmk8HutkP0z9ZfJbS8rJEh8J7xUVl582c6HkKJVRq4S0o1oJpWTpb9fFhfz6XjIUl2HU1pMVUd
-	pPDiqBOmGN+ctv5derWtH/PoW7qvNXwZEk/b4m7CxwdUB9Tl9tFYWR+pKM2taEn+TDEB7WksASSn2
-	bzXvFegZfjXeVMk4ODi5RwzC5gQR3SiWB8jBNdVjy2W4FEKQUxImN/OC3wfnRXo4ZzghmUf+rg/aj
-	AJy8zonYFpgJYYdUAm7eJgpZJ04D3d15Ejn3Yj2XAIqfzo/OhlX2dBWTtRviXFr6+JbTB4iSyZ5ci
-	VAv81dWQ==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wU3WI-002Eg1-34;
-	Mon, 01 Jun 2026 14:21:35 +0000
-Date: Mon, 1 Jun 2026 07:21:29 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v2 0/6] Bluetooth: convert remaining bluetooth
- socket families to getsockopt_iter
-Message-ID: <ah2GaClhUehy5ys9@gmail.com>
-References: <20260512-getsock_three-v2-0-30b7b22ef14c@debian.org>
- <CABBYNZ+nvtMHcU9but5VEG891vyO=K0MF3OAGofANxzdLVmw-g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vpb38Ga5"
+Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-137335bc3caso8512934c88.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jun 2026 09:22:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780330968; x=1780935768; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2jX84Zk+X2wna8QCsEP2HWNpN4PTnI4XWkcFVPYbSFY=;
+        b=Vpb38Ga59+ox5SEAcGcWf6IMHUJ/r7/e3QjfbF9tJ8+rceSyBeDs2zeBx1ouMJgmp6
+         E2gFEKI/wHo9fTbt0ch9zsQeFN2UbUevZSjVDNbc8+jkTVuXMohi0eJOyiXbBHStZQL2
+         sZL1xxz+y1SV1voohcq5q3ebWNsHudyH6hwDEpI0fMgTwBVtrsN4mRVV7rh9Gf+5CTWp
+         w/yhQvNd55L71ZDUvtjzOU6LNvj23pm8Iv5teRZgIwQWpUcrg3bAmn1NlSnLMKZwJvq0
+         V+Y+6FRSxWKBs+wxG32bqo+D1PweQbcKPA0qOLOsIKtMioVCbvM1yaKCdE8FyBBuFDVn
+         BN4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780330968; x=1780935768;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2jX84Zk+X2wna8QCsEP2HWNpN4PTnI4XWkcFVPYbSFY=;
+        b=mKxuICXYj92albbjwocJ5/HZ88AtBtzUsOhoCuxQ41MWgr5doxIf6N9rgF70z+Af8n
+         fqFd0CRUi4ayolqNLcA/QvLmLQnwWvmqAJPvqBhe+kzSM/rZyYZ4RCNe/F29TLN7O0Cp
+         mdQMVfu8xgbL5AdW+oOpw1WZwFn/m3I/8mzKtwgEAcREw+v+IgrEjgkNbJjMVY0pX9jY
+         8epPtZPg1hOtpBnPNVSVkLScnHX04Z+xv1mXoOszwXqMSaV8XabWs3kyy+dG+JEdceE/
+         jPm0k6Mbk79wSBDVHUCfG2iBAQRsFpeWtzPvD/Vsp7f+5reIFtzzzXaVG9qKoUgYoK/s
+         xGGw==
+X-Gm-Message-State: AOJu0YwjM9Z7kzO89Uo1uHPO+8eYj0fiwkMrs7mVxu3d3og/u4Q75GAp
+	Y5BEvjOSCWMQzC0NxMbtIRiT6AzSn1xMYj8sf0lRsF8GEGs6rTwfXK2uDIcpobUYaKo=
+X-Gm-Gg: Acq92OG1NAAER9rKVAhJ9veM+IdG7w5ckFI3FqtAKWIMGQEIMhbODj7G5hz0kbaoAGR
+	jhtx54u6I5GyMVGETxMwhFDlat6KnheC6hACA7qzGy/tMop+ywx4Th1fSj5lW3TLxEIAYH5zAmZ
+	xTOQk3bQgerwA9kSGf9ekj8i50OiuQT1uMsmtEwJL5pje3+vCb1S5c3ek7OeqgMa3O+PcL2VTJG
+	SGMhJGndIIl8XlVF3w2N91VyeG3+VTtlpLrY+//J8TnvUa7IZTzZuD2o402YNr532m0xDRANBKB
+	3quN0SVgTuIjX8KsX4IKwYWVF4sgRW4nUsJtAmVaTAYZKxKshY6fH7GfkghMC+kAfm9i5iP0+xB
+	QsLeTPCGjLOykUo978WMgjyYyokQBDFjTRrMqXkZfAIbQ575Aips04Nijzfj5Q7NEvJT/a8zZQM
+	IXCnVp7XLTAorAJBpULsB1XjwMKCJG6bkcGkFDglxyq3zhQYiMrxipL+oFZj5+pLHGst4HnCc=
+X-Received: by 2002:a05:7022:e24:b0:134:df4a:2821 with SMTP id a92af1059eb24-137d42a2f43mr5506484c88.40.1780330967474;
+        Mon, 01 Jun 2026 09:22:47 -0700 (PDT)
+Received: from fx.tailc0aff1.ts.net ([206.206.192.132])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-137b2d04287sm9134597c88.0.2026.06.01.09.22.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jun 2026 09:22:46 -0700 (PDT)
+From: Xiang Mei <bestswngs@gmail.com>
+X-Google-Original-From: Xiang Mei <xmei5@asu.edu>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Weiming Shi <bestswngs@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH bluetooth] Bluetooth: eir: Fix stack OOB write in eir_create_adv_data()
+Date: Mon,  1 Jun 2026 09:22:04 -0700
+Message-ID: <20260601162203.1253918-2-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZ+nvtMHcU9but5VEG891vyO=K0MF3OAGofANxzdLVmw-g@mail.gmail.com>
-X-Debian-User: leitao
 
-Hello Luiz,
+From: Weiming Shi <bestswngs@gmail.com>
 
-On Thu, May 14, 2026 at 01:51:16PM -0400, Luiz Augusto von Dentz wrote:
-> On Tue, May 12, 2026 at 7:12 AM Breno Leitao <leitao@debian.org> wrote:
-> >
-> > Continue the conversion to .getsockopt_iter for the Bluetooth socket
-> > families: hci_sock, ISO, RFCOMM, SCO and L2CAP. The first patch is a
-> > small precursor that fixes a long-standing 1-byte put_user write in
-> > hci_sock_getsockopt_old() so the subsequent conversion stays mechanical.
-> >
-> > The riskiest change in this series is the SCO BT_CODEC conversion: it
-> > is the only one that drops an open-coded ptr cursor in favour of
-> > relying on iter_out advancing naturally on every copy_to_iter() call.
-> > Every other socket option is a near-mechanical s/copy_to_user/
-> > copy_to_iter/ rewrite, but BT_CODEC walks a variable-length list of
-> > codecs + capabilities and previously tracked its own write offset by
-> > hand. Getting the cursor semantics wrong here would silently truncate
-> > or misalign user-visible codec data.
-> >
-> > For more context about the motivation for this change, please check
-> > commit 67fab22a7ad ("net: add getsockopt_iter callback to proto_ops")
-> >
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> > Changes in v2:
-> > - rebase the tree on top of bluetooth-next.
-> > - Remove the selftest, which was mixing network and bluetooth together.
-> > - Link to v1: https://patch.msgid.link/20260511-getsock_three-v1-0-1461fa8786ab@debian.org
-> >
-> > To: Marcel Holtmann <marcel@holtmann.org>
-> > To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> > Cc: linux-bluetooth@vger.kernel.org
-> > Cc: linux-kernel@vger.kernel.org
-> >
-> > ---
-> > Breno Leitao (6):
-> >       Bluetooth: hci_sock: write the full optval for getsockopt
-> >       Bluetooth: hci_sock: convert to getsockopt_iter
-> >       Bluetooth: ISO: convert to getsockopt_iter
-> >       Bluetooth: RFCOMM: convert to getsockopt_iter
-> >       Bluetooth: L2CAP: convert to getsockopt_iter
-> >       Bluetooth: SCO: convert to getsockopt_iter
-> >
-> >  net/bluetooth/hci_sock.c    | 26 +++++++++++--------
-> >  net/bluetooth/iso.c         | 27 ++++++++++----------
-> >  net/bluetooth/l2cap_sock.c  | 61 +++++++++++++++++++++++++++------------------
-> >  net/bluetooth/rfcomm/sock.c | 30 ++++++++++++----------
-> >  net/bluetooth/sco.c         | 59 ++++++++++++++++++++++---------------------
-> >  5 files changed, 114 insertions(+), 89 deletions(-)
-> > ---
-> > base-commit: c2f0079e8c42fd6814c8d6b1491e3ce0a0e3b3fa
-> > change-id: 20260511-getsock_three-d0d7f1b2629e
-> >
-> > Best regards,
-> > --
-> > Breno Leitao <leitao@debian.org>
->
-> There are some comments from sashiko on this:
->
-> https://sashiko.dev/#/patchset/20260512-getsock_three-v2-0-30b7b22ef14c%40debian.org
->
-> Now Im not sure the truncating is actually used by our tools, but that
-> sounds like it could break userspace if we don't check properly, or
-> have you already done this for other socket families and it was
-> considered to be ok?
+eir_create_adv_data() builds the advertising data into a fixed-size
+buffer of "size" bytes (31 for the legacy path in hci_set_adv_data_sync()).
+It may prepend a 3-byte "Flags" AD structure, but the per-instance
+advertising data is then copied without checking that it still fits:
 
-You're right — to clarify, the patch changes behavior when the user
-provides a short optlen, preventing the overflow that existed before:
+skip_flags:
+	if (adv) {
+		memcpy(ptr, adv->adv_data, adv->adv_data_len);
 
- - Old code: put_user(opt, (u32 __user *)optval) unconditionally
-   writes sizeof(*ptr) bytes regardless of optlen, so optlen < 4
-   would overflow the user buffer and return 0.
+The "Flags" structure is added whenever BR/EDR is disabled
+(LE_AD_NO_BREDR), which is the normal state for an LE-only controller.
+However, the mgmt length validator tlv_data_max_len() only reserves
+those 3 bytes when the user-supplied adv_flags carries a managed-flags
+bit (DISCOV / LIMITED_DISCOV / MANAGED_FLAGS). Adding an instance with
+flags == 0 reserves nothing, so adv_data_len is accepted up to the full
+buffer size. At advertise time the 3 flag bytes are still prepended,
+and the subsequent memcpy() writes 3 + adv_data_len bytes into the
+size-byte buffer, overflowing it by the attacker-controlled tail of
+adv_data:
 
- - New code: copy_to_iter() respects the optlen boundary, eliminating
-   the overflow — but now a short buffer fails the strict length check
-   and returns -EFAULT instead of 0.
+  BUG: KASAN: stack-out-of-bounds in eir_create_adv_data (net/bluetooth/eir.c:302)
+  Write of size 31 at addr ffff88800b7e7bac by task kworker/u9:0/51
+  Workqueue: hci0 hci_cmd_sync_work
+   __asan_memcpy (mm/kasan/shadow.c:106)
+   eir_create_adv_data (net/bluetooth/eir.c:302)
+   hci_update_adv_data_sync (net/bluetooth/hci_sync.c:1689)
+   hci_schedule_adv_instance_sync (net/bluetooth/hci_sync.c:2015)
+   hci_cmd_sync_work (net/bluetooth/hci_sync.c:332)
+  This frame has 1 object:
+   [32, 64) 'cp'
 
-I don't believe any legitimate userspace relies on the old overflow
-behavior, though there's a theoretical risk of breakage. I'm not deeply
-familiar with the Bluetooth ecosystem specifically, but, I would prefer to
-avoid the buffer overflow in such case.
+The inconsistency dates back to when the managed "Flags" field was first
+added to the Add Advertising path: the prepended LE_AD_NO_BREDR flag does
+not depend on the user-supplied adv_flags, but tlv_data_is_valid() only
+reserved room when MGMT_ADV_FLAG_DISCOV was set. Commit 47c03902269a
+("Bluetooth: eir: Fix possible crashes on eir_create_adv_data") later
+added the "size" argument and bounds-checked the "Flags" and "Tx Power"
+AD structures, but left this copy unguarded. Guard it the same way so
+the data is only copied when it fits.
 
-I've addressed a similar issue in another subsystem recently:
+The bug is reachable by a local user with CAP_NET_ADMIN that owns an
+LE-only controller using the legacy advertising path.
 
-https://lore.kernel.org/all/20260521-fix_llc-v2-1-ab44cc09179c@debian.org/
+Fixes: b44133ff03be ("Bluetooth: Support the "discoverable" adv flag")
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+---
+ net/bluetooth/eir.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Anyway, let me know if you need me to change it.
---breno
+diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
+index 3f72111ba651..e574f8f61e16 100644
+--- a/net/bluetooth/eir.c
++++ b/net/bluetooth/eir.c
+@@ -297,7 +297,7 @@ u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr, u8 size)
+ 	}
+ 
+ skip_flags:
+-	if (adv) {
++	if (adv && ad_len + adv->adv_data_len <= size) {
+ 		memcpy(ptr, adv->adv_data, adv->adv_data_len);
+ 		ad_len += adv->adv_data_len;
+ 		ptr += adv->adv_data_len;
+-- 
+2.43.0
 
