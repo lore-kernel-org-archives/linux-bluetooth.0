@@ -1,187 +1,133 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156A935677E
-	for <linux-bluetooth@vger.kernel.org>; Sun, 31 May 2026 22:41:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780267312; cv=pass; b=KSEXt1rfYnnxh28ysdMGJ+jf0g5CVEsRUCN1qyybwaT4S9LDfpKeP3axv+nLGAiCoGM97Ld5bK2mhsmICNfKyIGqunZrRymdEG5BK9VOZJ2tDP2FHLbMlqA6WRBS7lE+HfoyoVfyV/p2bg7uasPTkjxj8HIwWXOV+dyvtD2Rj/M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780267312; c=relaxed/simple;
-	bh=DwqmmYGhzLJZcKctFbT7fQlI57XOCuUvJS2TlMvi4UU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c/fCy8nQJC7laEyg7DHmwt9ryIs+GfsQ7GopADBlAxN8aw8roODJvTgeHCaS04F7YtlhcYchJkpXO+huoCY3rz9qJZm2bsfLGKKa2Uk0L6oWgvJpydE9mnNAtHsbY9NCmYScRRwpr7y2rzUAnqHfRxjOWqZSn1WbuM5oec4wxIc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K/cG1AeK; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=asuJOGG5; arc=pass smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K/cG1AeK";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="asuJOGG5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1780267310;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fE4JU+gsz+ECemqk45eUb2e+nliPviu8zBW1jL7IQco=;
-	b=K/cG1AeK/u0z8AeDsASsIwXKNfY1+zTcl70hKkwoCdr3vVgPCvd5wW/vyBEHvXaQ9h5hrc
-	J2Gt+7ughxrEdMKVCJZrmgUqa5QK3HX+Vatg1SPv2N4iNFk4BX3rJ6pedyIfIvIGp3+HhO
-	DOG9dhyfkbWFGPYL6d/yc64l0OeoWQQ=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-582-hmfyRtmAP9meqKLMnDLz3g-1; Sun, 31 May 2026 18:41:47 -0400
-X-MC-Unique: hmfyRtmAP9meqKLMnDLz3g-1
-X-Mimecast-MFC-AGG-ID: hmfyRtmAP9meqKLMnDLz3g_1780267306
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5aa43c27d47so3186661e87.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 31 May 2026 15:41:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780267306; cv=none;
-        d=google.com; s=arc-20240605;
-        b=jGNnzFFlX/x6Qyi78/WvZUs1/hNctM91aQe6GuffmNrC0ThT/0hj0REoIojOSH8mmY
-         27UTK8QXFriUq6PJHBmF4j9hBTDurFFJ66RbA4FrQijINrFzCkEujwpG2KiOiznEj8Pb
-         I2iQz9hs5863SFojMwlccdyEjNnUqRcME+jmFRrjQjg1ZRFFIfdsM8r6aXByO8EPgAVs
-         cyEpdFAtrcJH4Qk8YNfATHWmpZvwfdHtASFPEVIQE7RGy0wwU+wWeGWGGmglIoeXb6HJ
-         z8kCStYI0o85NXe+Hl+XHjJSzjQJ8AWec2e84mzh5oeWXFYKn01C4mv+LFPi+GmwumLK
-         OhnA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=fE4JU+gsz+ECemqk45eUb2e+nliPviu8zBW1jL7IQco=;
-        fh=EYm3D1yUioq/k3t7w/CEgWpbVZVreL6mxNp2ix6iq+A=;
-        b=aKUo2wp94GxWOUFgIjH7n8WiDCLkCzKXfPG472FTzvA5U3nOIkr0mV9pjnAwzkiZaz
-         SZ/6HTwxFT/JWjb2uTUrrleGWheY9SDjIPFq1fgHSDNodqUeWryfc6uoI5KyGzbIEoQb
-         /0dk/IDAKxI0pnPxhfR1TjhHRWthENYvgBT+xcZEKSVhwYWLSMF86tSeZ9B+fJIhAbh3
-         1Eq4Pk7GDh9uVfyxT6RtTb6NF8nojCazcBADjppjjZz4rbOWEBvFpF+Zos1ypCRBDV2J
-         1qhIuOKa4BmVurFFagfxqko3AAYqjt0rIHtODhUbbVEln5hld9nLVepidTcktrt3K1YC
-         e4zw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1780267306; x=1780872106; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fE4JU+gsz+ECemqk45eUb2e+nliPviu8zBW1jL7IQco=;
-        b=asuJOGG5Ik+X70IysGdueIpobpCYSEe/esN26gT3Z0vJVThLoj7gKsee82cG2EpCi5
-         A1yBepsAKfxLZNWa3OcXzDGQu8whGgdXzi2BAPrN6BDPVp6a2WjpaHtXI1VuIswdImMA
-         OS5ZEoCdRxD4ikZ9XRP84KspwOXo7viFs7FATe3Jj+NOP8PJbQx0HVrkcWkNVoLfJjOv
-         dVNa8xjhTwV91vNSk9pJ8JRyz0nnaVGjjKhdngPrBhQJAhW0bvqstscXfn9ann70rbBn
-         TNR+q08Oy0ZvwRQl02NxZWQUKYa+5qTkSfQTkSauD/DVwdcf+ZIDCKa3wJmSpZMUmCGP
-         V33g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780267306; x=1780872106;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fE4JU+gsz+ECemqk45eUb2e+nliPviu8zBW1jL7IQco=;
-        b=W/KAojiExLxlFzdpUiwhvN4ExtkyRn72xcjVsvn8g6UYcrjasXA7s0vGQcyhSUP2H/
-         QR7OQvgKS1q4HWKJYGWHT0cvFqBlh64PxgzF/J+rF+PlfAgEHtTULESGZ7YqEKVhy0aP
-         kaS6FtEWKKkxCAlmXDg+STL97Hiaq4bPiEHSh7eDbAqSXgt3Amdy9qcl/FJQFZ247jgK
-         0BlzoTXXX3lI/I0YD4wToepg6/JiD9m0fysNeBA4FmaN1O0N9jtvsYuRST7UDMmY9xln
-         67HsJ/JYA8MYvfuT4S9XgwTBTa49r2BoUIcPR7cpcMDAWbpade+HM+pRQYo3kOOI2BFt
-         8wNg==
-X-Forwarded-Encrypted: i=1; AFNElJ84hjr73XOdSQLJJpyo180K4AkKOQqg7tsKhL72Jxe6vf6dqmH4NDrYdUdkcywLMgb5XYVgNWGcFSzIRgiJgZQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPeTVlrggqZWPeguflCGpGdRptcvi+0WXFFD+HnNhUxNwkTnIn
-	dcs36e85msWCVu5i8bdHGmpbCZNfCro4UFlD6wY94nins2TMyvZk7szg4WuPbDOsFw8h1Oinef6
-	cVyLL6LRMd1LtOxj2vBQLyB0C2p5cI6DCzIkmGtn7MtXA2tpuf1K5+v8dH5aUfDNufAKYbj4Ork
-	CTV7uhAUTZe+zsSCZ5k5b+5X89asZ7MkR0U4Vu551Tte6T
-X-Gm-Gg: Acq92OEwbcgQmrgQ5TW01K5zqAoPufVcghnDDwr4bZZn7sNMVKQu3UxWW8DfRi7pxjc
-	QhnTbiglwjl7OReK0rFNN/wqrnEOe9HI4oqeY6QFP+VqSunzor2IYJbGaaI4sfmmw9H9C/W6Yz6
-	InWmkjQhyH3VEELwmr9l/TjqjbB5iDaisD+/6Cwg0C8HQ5rbMDYPudQZi7J04lQkbPEKQYjaDxz
-	JYomN/vjIYiPKlIb95vr7q8lcqa7xz/rtOIhh5iWIltlvK2Lg==
-X-Received: by 2002:a05:651c:23c4:20b0:394:642:c648 with SMTP id 38308e7fff4ca-39664eaa587mr13988521fa.7.1780267305625;
-        Sun, 31 May 2026 15:41:45 -0700 (PDT)
-X-Received: by 2002:a05:651c:23c4:20b0:394:642:c648 with SMTP id
- 38308e7fff4ca-39664eaa587mr13988491fa.7.1780267305279; Sun, 31 May 2026
- 15:41:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0D21F03D9;
+	Mon,  1 Jun 2026 01:26:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780277194; cv=none; b=a89/VdwN7pcIIfemWHKVpTpW9shLozDryjQDl4VoKRTpPgR0ZBGABSU7JXPayKUbNecWPS6B9iCCkIEnl+hEEECKHtkDOzj4YmmekC492aX2TnGsmev8CI1u4LtOdP3P5eH/zb1zLQ5UUkAP61tlcG4cK8kwMe6ZSiMwR9goyp8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780277194; c=relaxed/simple;
+	bh=0dLAJP2eab5FWZONr07We0DiGMa4IOMF9oKxmwQSUrA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=crMdO51god9X3+/r1VRAwH5NKyuXEiu8ZmOfiKBw551UwaJ7Nvg5EbkZz2TsWrimvti8xZa2AJBR+K+3+Yqz0Q5ZeesrV9Cyln4ilpe6Rv6XU+SeA56QHzbMGT/vKWgyil7N2z8TVYjy8BPtukRQXAMppSyzsvatLZ8E1fAKdvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: e84de2205d5811f1aa26b74ffac11d73-20260601
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:24c51549-1e18-400c-8802-ec5a900f6814,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:e7bac3a,CLOUDID:333bd0a667cb5c44efe9e3ad2e5ffd6e,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102|865|898,TC:nil,Content:0|15|50,EDM:-
+	3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,A
+	V:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: e84de2205d5811f1aa26b74ffac11d73-20260601
+X-User: liujiajia@kylinos.cn
+Received: from nature.lan [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <liujiajia@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 32413899; Mon, 01 Jun 2026 09:26:26 +0800
+From: Jiajia Liu <liujiajia@kylinos.cn>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Brian Gix <brian.gix@intel.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jiajia Liu <liujiajia@kylinos.cn>
+Subject: [PATCH] Bluetooth: hci_sync: fix simultaneous discovery stuck in FINDING
+Date: Mon,  1 Jun 2026 09:26:20 +0800
+Message-ID: <20260601012620.11764-1-liujiajia@kylinos.cn>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260527081806.42747-1-zhaoyz24@mails.tsinghua.edu.cn>
-In-Reply-To: <20260527081806.42747-1-zhaoyz24@mails.tsinghua.edu.cn>
-From: Alexander Aring <aahringo@redhat.com>
-Date: Sun, 31 May 2026 18:41:34 -0400
-X-Gm-Features: AVHnY4LJsPgo1bw4BMrZmqSj2uYEh9dzW3bfFOpiMMU9XPGtTORtUTQD6jb1c5c
-Message-ID: <CAK-6q+i6JsNA0twRp29P_wotODGr98rxo_CcE0n_BAhH_ofUsQ@mail.gmail.com>
-Subject: Re: [PATCH net] 6lowpan: fix off-by-one in multicast context address compression
-To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Cc: netdev@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>, 
-	Ao Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>, Qi Li <qli01@tsinghua.edu.cn>, 
-	Ke Xu <xuke@tsinghua.edu.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi,
+When hci_inquiry_complete_evt is called between le_scan_disable and
+le_set_scan_enable_complete and no remote name needs to be resolved,
+the interleaved discovery with SIMULTANEOUS quirk gets stuck in
+DISCOVERY_FINDING. le_set_scan_enable_complete does not check inquiry
+state. No one sets DISCOVERY_STOPPED in this process.
 
-On Wed, May 27, 2026 at 4:19=E2=80=AFAM Yizhou Zhao
-<zhaoyz24@mails.tsinghua.edu.cn> wrote:
->
-> The second memcpy in lowpan_iphc_mcast_ctx_addr_compress() uses
-> &data[1] as destination and &ipaddr->s6_addr[11] as source, but
-> both should be offset by one: &data[2] and &ipaddr->s6_addr[12]
-> respectively.
->
-> This off-by-one has two consequences:
-> 1. data[1] is overwritten with s6_addr[11], corrupting the RIID
->    field in the compressed multicast address
-> 2. data[5] is never written, so uninitialized kernel stack memory
->    is transmitted over the network via lowpan_push_hc_data(),
->    leaking kernel stack contents
->
-> The correct inline data layout must match what the decompression
-> function lowpan_uncompress_multicast_ctx_daddr() expects:
->   data[0..1] =3D s6_addr[1..2]  (flags/scope + RIID)
->   data[2..5] =3D s6_addr[12..15] (group ID)
->
-> Also zero-initialize the data array as a defensive measure against
-> similar bugs in the future.
->
-> Fixes: 5609c185f24d ("6lowpan: iphc: add support for stateful compression=
-")
-> Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-> Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-> Reported-by: Ao Wang <wangao@seu.edu.cn>
-> Reported-by: Xuewei Feng <fengxw06@126.com>
-> Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-> Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-> Assisted-by: GLM:GLM-5.1
-> Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-> ---
-> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> index e116d30..37eaff3 100644
-> --- a/net/6lowpan/iphc.c
-> +++ b/net/6lowpan/iphc.c
-> @@ -1086,12 +1086,12 @@ static u8 lowpan_iphc_mcast_ctx_addr_compress(u8 =
-**hc_ptr,
->                                               const struct lowpan_iphc_ct=
-x *ctx,
->                                               const struct in6_addr *ipad=
-dr)
->  {
-> -       u8 data[6];
-> +       u8 data[6] =3D {};
->
->         /* flags/scope, reserved (RIID) */
->         memcpy(data, &ipaddr->s6_addr[1], 2);
->         /* group ID */
-> -       memcpy(&data[1], &ipaddr->s6_addr[11], 4);
-> +       memcpy(&data[2], &ipaddr->s6_addr[12], 4);
->         lowpan_push_hc_data(hc_ptr, data, 6);
->
->         return LOWPAN_IPHC_DAM_00;
+  < HCI Command: LE Set Extended Scan Enable  #1764 [hci0] 608.610392
+          Extended scan: Disabled (0x00)
+          Filter duplicates: Disabled (0x00)
+          Duration: 0 msec (0x0000)
+          Period: 0.00 sec (0x0000)
+  > HCI Event: Inquiry Complete (0x01)        #1765 [hci0] 608.610548
+          Status: Success (0x00)
+  > HCI Event: Command Complete (0x0e)        #1766 [hci0] 608.611589
+        LE Set Extended Scan Enable (0x08|0x0042) ncmd 2
+          Status: Success (0x00)
 
-Looks good to me.
+Add scan_disable_complete to check state and stop discovery if stuck.
+Tested with bluetooth AX201 (8087:0026) in Dell Vostro 13 laptop.
 
-Acked-by: Alexander Aring <aahringo@redhat.com>
+  [4517.963204] hci0: state 0 -> 1
+  [4518.096858] hci0: state 1 -> 2
+  [4528.353765] hci0: state 2 -> 0
+  [4528.353776] hci0: state finding to stopped
+  [4533.966844] hci0: state 0 -> 1
+  [4534.097702] hci0: state 1 -> 2
+  [4544.478600] hci0: state 2 -> 0
 
-Thanks.
+Fixes: 8ffde2a73f2c ("Bluetooth: Convert le_scan_disable timeout to hci_sync")
+Signed-off-by: Jiajia Liu <liujiajia@kylinos.cn>
+---
+ net/bluetooth/hci_sync.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
 
-- Alex
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index aff8562a8690..4cb1c82cc3f0 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -361,6 +361,28 @@ static int interleaved_inquiry_sync(struct hci_dev *hdev, void *data)
+ 	return hci_inquiry_sync(hdev, DISCOV_INTERLEAVED_INQUIRY_LEN, 0);
+ }
+ 
++static void scan_disable_complete(struct hci_dev *hdev, void *data, int err)
++{
++	if (err)
++		return;
++
++	hci_dev_lock(hdev);
++
++	if (hdev->discovery.type != DISCOV_TYPE_INTERLEAVED)
++		goto unlock;
++
++	if (hci_test_quirk(hdev, HCI_QUIRK_SIMULTANEOUS_DISCOVERY)) {
++		if (!test_bit(HCI_INQUIRY, &hdev->flags) &&
++		    hdev->discovery.state == DISCOVERY_FINDING) {
++			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
++			bt_dev_dbg(hdev, "state finding to stopped");
++		}
++	}
++
++unlock:
++	hci_dev_unlock(hdev);
++}
++
+ static void le_scan_disable(struct work_struct *work)
+ {
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev,
+@@ -373,7 +395,8 @@ static void le_scan_disable(struct work_struct *work)
+ 	if (!hci_dev_test_flag(hdev, HCI_LE_SCAN))
+ 		goto _return;
+ 
+-	status = hci_cmd_sync_queue(hdev, scan_disable_sync, NULL, NULL);
++	status = hci_cmd_sync_queue(hdev, scan_disable_sync, NULL,
++				    scan_disable_complete);
+ 	if (status) {
+ 		bt_dev_err(hdev, "failed to disable LE scan: %d", status);
+ 		goto _return;
+-- 
+2.53.0
 
