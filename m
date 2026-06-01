@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D037436A000;
-	Mon,  1 Jun 2026 19:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92ED9368277;
+	Mon,  1 Jun 2026 19:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780341005; cv=none; b=MgNGXYLab9TVsy1Br/KcYgvnEo57aOBeI7crv9bEFqG+jKPJ8fJCLsVcxz99uHtCpLyZtmuDtPfanBcJzEhkKE7OLgDECOZhLwA4M6tukmUUgk1vLMYnuO6aLtnCaPNo8E+IIfcoNMHpIDkPqnzEmY0Su8iOTYCs7Blrc0GywaI=
+	t=1780341007; cv=none; b=N/+fVNcKConzdRiq0gS5D18A0oKD48MwGRGbaas8M2m4P1vzi5PU5sgPK5GiL/tjLwtyh+AE4gVU9qkvDPd9+vedXttQQ4bUsK1PjC60Uh7GjfK7Tg0kZUknptED99WXG6Wr5Bln5NFxu4kbH/+K7L3sWU/ZcW/y1UmeDLabJ14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780341005; c=relaxed/simple;
-	bh=j9UFCS8LPGV9BjMmAYlivuF43WOG91jPQR/KLpEyvBo=;
+	s=arc-20240116; t=1780341007; c=relaxed/simple;
+	bh=I7UmvdUjoFLTIC2ZoC5qWyh7MVa+3Unu68oe6fQ7lxM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rxEEgYe+wRCDx/nqq3W6PQqVJdiyk9uk8CudvJandKfixuel/mkCFKHpBLZtCMDEwn89Pm4SN8MbG2Wp6SpEGvV06zLtl1AF2uMnq/BKVZF95ZpwDHH49zawREsr0KEnoJwBbRm5NL0l4qFqMKmmW1YZO1jfWEI7G2LCSkm2xfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VjHH51ls; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=aeGqW/aCHJ+D///w5X7TeKN/RByaxj1W3OlTBrV1Rq+TYpzqvtxJibweXo/Ck4RJSzF4IBvzgANhnNEXKS/UeakX5nGrDkJIpy57R6RmMJRszp2IYyOyO+3gXRNH9cKVDQlntVm+6STw6qJkvpLCSBIfKUKdFWMWDLzc66Om5Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZogtGBht; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VjHH51ls"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7C801F00898;
-	Mon,  1 Jun 2026 19:10:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZogtGBht"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BCA11F00898;
+	Mon,  1 Jun 2026 19:10:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780341004;
-	bh=W/2LSBQaJFcFsT8kbBFhvAJrJfpKiU3ht2fXzVJxDwg=;
+	s=k20260515; t=1780341006;
+	bh=GngcClpbyWaRvoRhgKSg+ORwyCjQbQVmBCSr0fu2eZs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=VjHH51lsvkY7wir4jr4uy6XFScby+plWDsl+UaurGobPwzcCwhac3BujKTmYrJ+So
-	 k35sKVpop6PhgpdzQhe5HbEMK1K/dtIU1xbwOgi2vh/KnaGibTS2nWvpQt4KyaCFOH
-	 VLUhXbJQrTyr5CU0vJy4N4DZqfViYmygj346UZBgDWdF/5o45yhAJpvD8rfsmrZaGQ
-	 ++AoT5qY+FzSyDu8MIe/+lFvsyZpQWnN+HSn0zH5ESUvG/BqISS4F4ya07BUZMEfzI
-	 QZN/RJ/hWNtCjevJyLu2ORWxapYa2Hi2x/cHXJ6EiKwvWaBJr2oYBfDOmh/WHjibZN
-	 wRcgTqP+K0lWA==
+	b=ZogtGBhtz42SAp69NnYYQJUTuKJtzZmfdZCfmHdhRJD7dXyJcSKmrkDKDVCGvhUVe
+	 PVyIjSGnW+Wwil0Rh+9zlHDjEtr3VzuG/OmfKQhja9VEWUM42dXtWAuaqwoGJMNP/y
+	 A8msXa070gKDOLC1aKO7T2TgVi4tXK3SolEUCNUDxbvXqEB1YmgCmU4vwBhDFlFCn1
+	 qkuJMO4OBy21sNRj/3aEmLvBk6rpSUG77HkCiaYYulOsp3hHsfBXeeWhhJHSvLc2A7
+	 lU0r86JejD1Wtc8aMsooTt4N9V9paw3bbutukvihWH85vyJOREZ5LTmCoSiFkFNsnH
+	 wGJpzwlHQSZhg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 568D338119F4;
-	Mon,  1 Jun 2026 19:10:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0A3538119F4;
+	Mon,  1 Jun 2026 19:10:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,39 +37,40 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5] Bluetooth: fix memory leak in error path of
- hci_alloc_dev()
+Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Fix null pointer dereference
+ in
+ remove
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178034100713.57646.870172727099680394.git-patchwork-notify@kernel.org>
-Date: Mon, 01 Jun 2026 19:10:07 +0000
-References: <20260601032426.119034-1-kbreddy.rpbc@gmail.com>
-In-Reply-To: <20260601032426.119034-1-kbreddy.rpbc@gmail.com>
-To: Bharath Reddy <kbreddy.rpbc@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzkaller-bugs@googlegroups.com,
- syzbot+535ecc844591e50588a5@syzkaller.appspotmail.com
+ <178034100838.57646.11704665987158144101.git-patchwork-notify@kernel.org>
+Date: Mon, 01 Jun 2026 19:10:08 +0000
+References: <20260601102612.2164388-1-chandrashekar.devegowda@intel.com>
+In-Reply-To: <20260601102612.2164388-1-chandrashekar.devegowda@intel.com>
+To: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-pci@vger.kernel.org,
+ bhelgaas@google.com, ravishankar.srivatsa@intel.com,
+ chethan.tumkur.narayan@intel.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon,  1 Jun 2026 08:54:26 +0530 you wrote:
-> Early failures in Bluetooth HCI UART configuration leak SRCU percpu
-> memory.
+On Mon,  1 Jun 2026 15:56:11 +0530 you wrote:
+> Add a NULL check for pci_get_drvdata() in btintel_pcie_remove() to
+> prevent a null pointer dereference. This can occur when
+> btintel_pcie_remove() is called concurrently from the PLDR
+> device_reprobe path on another CPU, after pci_set_drvdata(pdev, NULL)
+> has already been executed.
 > 
-> When device initialization fails before hci_register_dev() completes,
-> the HCI_UNREGISTER flag is never set. As a result, when the device
-> reference count reaches zero, bt_host_release() evaluates this flag as
-> false and falls back to a direct kfree(hdev).
+> Fixes: 8c0693e29dba ("Bluetooth: btintel_pcie: Support Product level reset")
+> Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v5] Bluetooth: fix memory leak in error path of hci_alloc_dev()
-    https://git.kernel.org/bluetooth/bluetooth-next/c/cf767a2d88f7
+  - [v1] Bluetooth: btintel_pcie: Fix null pointer dereference in remove
+    https://git.kernel.org/bluetooth/bluetooth-next/c/2bf22888ea6d
 
 You are awesome, thank you!
 -- 
