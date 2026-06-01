@@ -1,60 +1,62 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016D838947F
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jun 2026 11:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E453A05D7
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jun 2026 11:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780312765; cv=none; b=uX1PZHWkb3d8V5PxYJQq9qd7tsMk7FmigIgsDP7uz4066OOOPm2jHndTFKie6qB0hhscd7qPIbCOhmLU80uwgh+34b8PzXe8a6e6W5N39Jrzl9g5YA77nN5rFQUUss1MD3KhIrc4/Uql74a7Rn0kCyNG4/ZDZR3iqFM+BFciJAU=
+	t=1780312769; cv=none; b=DzWkDT5CCUafrzGIy0+ud7yzFf5Hx/JMPZZfYIo0Nr2Lf9svU5yG1HJqKiTJeyz7zZYXlAfrlkAIbDIPW3Ro0ZJyB7i+Plf0ugOeJfoqJs+fkBHSKczU9gj7Ld8QtdYSqRLsjjJwfCshEsvecFrhunaGFjYWKWu2/J31HcK1hY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780312765; c=relaxed/simple;
-	bh=J8FZmtgSM37RNzXn+Uy7DFPcpuJB8jWk2wbQx4hB7jI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ebs9DUo4kVanRhv5EmxCVq2lWDbfx22ZKW+QkT4tiROkxmFzFjqJZQ2Bf9cnNeeR5MgpIsi7xOWVVLT5YQrnNdVsQ1QY1ZE5a+eWQWwkCqvigDw7IlnJMpv6Lfnbn8uQSDOzl/Ihms/KQoXt6PXVjW0Os2uJ/qhtRIGe33/4WPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rrj1DBvP; arc=none smtp.client-ip=209.85.214.179
+	s=arc-20240116; t=1780312769; c=relaxed/simple;
+	bh=r1b7vn+lGatrknXbAvVwotu7fWbwwO872DxkoS8HYHI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Dtn4W1MFS3bzC9F/wLISinfjPkx0QY9yhwrVjPglW1MZEacWI33+YWlXsQrMJFRrh2pTUnxfC6CI11tdIjUZRibj1NKxAUIbtza1yeOH/myTXNh/2qtQNIhjsRuS3TIxO+O13zq48yl9i5ex0lPK480WtdBGy3Cq+0Wpya3G0kI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i5UcaovM; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rrj1DBvP"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2bea7176c72so81659615ad.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jun 2026 04:19:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i5UcaovM"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2bf18c30bb2so24327435ad.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jun 2026 04:19:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780312763; x=1780917563; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=j1yaCrs/RG3cEhV+R3dst7KhkNMCm6jYadJmv3o3t9Q=;
-        b=rrj1DBvPzipP9AgR2GfuUcPlFaGakbaVJlQGRJXBB9K/oEZVQoEeh7sYcNBodnwr0y
-         ZQuoKad3NqTGAbbpvlhjNalwdYLah2g7S+pGwJzolZMmvFPlKQUwhb4s424uTV9hsstQ
-         tDDgJj+QKwl4BvlXMrv6r5bC/egud1TUfveCBXrEyoEqXtzpT7e4iKZYZ8Ei6uT64+JW
-         6xC78vDXdPtxcgHALJbFlQG18ES/zQEhpVk98XuV0ggOQ6WbcvwMR9xweAhgtrCk/Z6t
-         uHYkSybXJoy9EjPdb9pYaC6RE7JCYRsOAd6cVZlrElsQZ9w948Z4Ae5+xC6CnePDfrIK
-         yNxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780312763; x=1780917563;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1780312767; x=1780917567; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j1yaCrs/RG3cEhV+R3dst7KhkNMCm6jYadJmv3o3t9Q=;
-        b=IDfkt+71qG+/sYW7PE+2Abi3T58mlh1GQGVpMmDWX8TxUA2WOwj7QoOwwMD1WUq66L
-         VxbKOXqR79w9Hn5Gbp8agw5UHNgn/p450U7OCSIdQ05atJoT9+KOHcv3z6qtRXBX/FRr
-         lNLQCYgH9T0VTYVjysK87XIQJb+5RoxqOIBmRo9zDdl/rrgNu/uw5+atV/Yn6WMwu0uG
-         IXvWiuYCfnrr4s5EDMmA5zCIMEwkLtFtB7ABq+9MgUzZoxE0Ndu5OYbp4d1r0vnB/a+O
-         v/LviC3FuhPEnERyivvM3ctMNHT/M9E3IUq0RKNrmLe1xeCDDOg82nswwAg2dvjpneyE
-         1IXA==
-X-Gm-Message-State: AOJu0Yx/w3NU6X6ACn7n5aNlIxTKjMMUCA0aTVopxsARN96HcSesAlLG
-	Fet7hPnhHW6cvD7gytKFFOnnF1bDchrQeT6BUoo6CMqV702/yz1cJMQrpX1X2A==
-X-Gm-Gg: Acq92OHuwe/v7ahbsUavVW4PfzjIM/i2Xsogfux+fMNuQW/Z+NTru5/iYdM2y0YrI5m
-	9y/aW+TiIWPcdj8KxEr5XYaxNu1Rn74j4Uqb4d1wZ87SXW/RMJwwtfyTNDr8u0NqifxvgnHjYz8
-	SvelGiXxana4zPA3jPsN6ssMUjzOQKeWRXoroXYTro67yxyXlGI7uyLjx/FhXFud1S0GW+4+rHc
-	lnuNnsQcE0ZNBOz3qsif0JauKmppAN1dV7+zZTFLtyahEFOtMRvemW3f2Sb4Vh0/36W2NULiQX1
-	YJha5rvhZ5AbhMcugVSyRjWeDxEw+WoSHUmpbAbdADFOFKw8hhQF9vF0qOhb8ZiKXc3z0x4bi67
-	EC7+JPjbKGRnYqxEb/2e+PRLrQ3ApOKNBibJ1GLVLDjQwnCzd9BMPaI5mbkc7TzFdAxj3iCUXo6
-	J2aHpVwn6+7thPKHWMsl7JBJmDOOq0S3ObW+Qi0PkSlI3nwCMAH/4PdyrVrQ==
-X-Received: by 2002:a17:902:ef49:b0:2c0:c625:4010 with SMTP id d9443c01a7336-2c0c625439bmr69679175ad.32.1780312763044;
-        Mon, 01 Jun 2026 04:19:23 -0700 (PDT)
+        bh=trLwXz/lpaWzxovhRJBB3Gy3OOIDVqjW6QaVX3Vvw88=;
+        b=i5UcaovMY3cJdrGsHLryoZIgg57B6S29B9TGaaenr8UwMilQAwPMVbu0aBao602gqs
+         ksWsduen3voETBlz8ztjJQab6jE6bQfbWR6nI/xwoVVQcS9yJ9tGhG4H9KOPhRebYMbS
+         /7U/7i2uOdIYWJ4rmAnDJHLQ8xaQABgpQriPfPSJrDvmjxcoV2+CbHLRE+7/pTFCZEB+
+         9jGs+HTBtqBseJHd4zNV2Mi2XnYySdAuwLajhiFTLwjBNpVynnOu5vh+N9t4ihuH91Ef
+         9UOgDocun5chYGeStyBgWwK6g3SPPtCCT6vWEU+bfQQGUI5mH9o9C4KxXFt8C7oqsgoi
+         7yYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780312767; x=1780917567;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=trLwXz/lpaWzxovhRJBB3Gy3OOIDVqjW6QaVX3Vvw88=;
+        b=E9myMZJbiMmtGrUIjyDIZlvvOBiiHTd4a+AEtpf/vSkbqfpw3x9BmKaLLAqfZRljSg
+         sVSVn5/ytRylDqTZLReADEbJ4VeNcqvQqf4krsSECx/R7C9dJzH1xQQysZsb+fpjFLi5
+         UMie+tMnlyJ+G7hWLg7gVUpUsUq13HFW1uemyurAz8O8If+C2jyXPpUves9t2fDrqqfm
+         //bobzEiCWOONHgig90QzVyxyvbXr+ZhNih01k8ZdZVfBU9Y5NgTQfWK4xYvHIotHuCg
+         K2ojKuXTEX38cIjxi2BFeczv8E8wSz+T3idFRqykXUBQGBiwr8/Xu1YzaXypcClaSSLT
+         VPSg==
+X-Gm-Message-State: AOJu0YwaKFi68PxiKLQz1p+LQkp/UOmu8kxjB2QYNyDWK5/0LQos/vGb
+	MKa5O38OZ3V1tYcrtM8/vSRk4LqvRhA3oWU16jNDDIQXMCWb3nr2JyF8
+X-Gm-Gg: Acq92OGHROHvTQdpxW9xecxgqgM3L4Dsq0FjQ4+nzQnrAZWHLXmW+5L/M6K8XRebnxG
+	gVZGj0aQ4RaTcxhUT7xbTTDtPNu90Z7Hj8Y/7rEolwJYhUobQ8oN/KOD7E9eUfGwMz88dhzuxyM
+	jh8wgrmZ2IEruOXN7YFJIgySWK2f07hDeGeJI1uE0BN4rnSTgAHeJU8Z9SctkmYtZ8Bc/HErPNa
+	R0VTJPg08NAH82zIpIC9YW5dC+PRcZ9hbKYiiQmXaK12rcLwVYPBUAA7Vc+71IhMtcP/kyEUzz0
+	EyU9rNB4o27qWL5khHHNtJILff67Bb67BxgIkkZHd7kpXuMaVe05bxiLJl4rZtQ4inbUa+0+q5i
+	zJ396PwakfU0bW2cGDbFHMCCW30DF/EYLKL0r21HGV/sLU0wK0IOHwqjbCXnQZ2UxllnX8r5m8t
+	4Nk+0i4Sdi6Wiqaj558apfFYyk8MQdbfa7Iml2O5yv7CzZrQhK40yDhVtA5Q==
+X-Received: by 2002:a17:903:28d:b0:2c0:a555:80d6 with SMTP id d9443c01a7336-2c0a5559517mr100032355ad.2.1780312767090;
+        Mon, 01 Jun 2026 04:19:27 -0700 (PDT)
 Received: from fedora ([61.74.238.173])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf239e702fsm104225475ad.4.2026.06.01.04.19.20
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf239e702fsm104225475ad.4.2026.06.01.04.19.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jun 2026 04:19:22 -0700 (PDT)
+        Mon, 01 Jun 2026 04:19:26 -0700 (PDT)
 From: SeungJu Cheon <suunj1331@gmail.com>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com
@@ -64,10 +66,12 @@ Cc: linux-bluetooth@vger.kernel.org,
 	skhan@linuxfoundation.org,
 	linux-kernel-mentees@lists.linux.dev,
 	SeungJu Cheon <suunj1331@gmail.com>
-Subject: [PATCH v2 0/2] Bluetooth: Fix data-races in SCO/ISO connect paths
-Date: Mon,  1 Jun 2026 20:19:06 +0900
-Message-ID: <20260601111908.232707-1-suunj1331@gmail.com>
+Subject: [PATCH v2 1/2] Bluetooth: ISO: Fix data-race on iso_pi fields in hci_get_route calls
+Date: Mon,  1 Jun 2026 20:19:07 +0900
+Message-ID: <20260601111908.232707-2-suunj1331@gmail.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260601111908.232707-1-suunj1331@gmail.com>
+References: <20260601111908.232707-1-suunj1331@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -76,37 +80,149 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The connect paths read socket address and config fields without
-lock_sock() and pass them to hci_get_route() and hci_connect_*(),
-while connect()/bind()/setsockopt() can update them concurrently.
+iso_connect_bis(), iso_connect_cis(), iso_listen_bis(), and
+iso_conn_big_sync() call hci_get_route() using iso_pi(sk)->dst,
+iso_pi(sk)->src, and iso_pi(sk)->src_type without holding lock_sock().
 
-Patch 1 covers ISO (iso_connect_bis/cis, iso_listen_bis,
-iso_conn_big_sync), patch 2 covers SCO (sco_connect).
+These fields may be modified concurrently by connect() or setsockopt()
+on the same socket, resulting in data-races reported by KCSAN.
 
-The added lock_sock() sections are reached with the lock not held and
-released before hci_get_route()/hci_dev_lock(), so no recursive locking
-or new lock ordering is introduced.
+Fix this by snapshotting the required fields under lock_sock() before
+calling hci_get_route().
 
-Tested on KCSAN + PROVE_LOCKING with VHCI reproducers on the SCO and
-ISO CIS connect paths; the hci_get_route() race no longer reproduces
-and no lockdep splat is seen.
+BUG: KCSAN: data-race in memcmp+0x45/0xb0
 
-Changes in v2:
-- ISO: cache bc_sid too, and pass cached src/dst/bc_sid to
-  __iso_get_sock_listen_by_sid() in iso_listen_bis() (missed in v1)
-- ISO: use cached bc_sid in BT_DBG() in iso_connect_bis()
-- SCO: also snapshot src, setting and codec; v1 only did dst
-- reword: the fix stops torn reads, it does not close the TOCTOU window
-- fix the SCO Fixes: tag title
+race at unknown origin, with read to 0xffff8880122135cf of 1 bytes
+by task 333 on cpu 1:
+ memcmp+0x45/0xb0
+ hci_get_route+0x27e/0x490
+ iso_connect_cis+0x4c/0xa10
+ iso_sock_connect+0x60e/0xb30
+ __sys_connect_file+0xbd/0xe0
+ __sys_connect+0xe0/0x110
+ __x64_sys_connect+0x40/0x50
+ x64_sys_call+0xcad/0x1c60
+ do_syscall_64+0x133/0x590
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-SeungJu Cheon (2):
-  Bluetooth: ISO: Fix data-race on iso_pi fields in hci_get_route calls
-  Bluetooth: SCO: Fix data-race on sco_pi fields in sco_connect
-
+Fixes: 241f51931c35 ("Bluetooth: ISO: Avoid circular locking dependency")
+Signed-off-by: SeungJu Cheon <suunj1331@gmail.com>
+---
  net/bluetooth/iso.c | 60 +++++++++++++++++++++++++++++++++------------
- net/bluetooth/sco.c | 20 +++++++++++----
- 2 files changed, 59 insertions(+), 21 deletions(-)
+ 1 file changed, 44 insertions(+), 16 deletions(-)
 
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index d7af617cda45..b4196ccaf766 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -337,12 +337,20 @@ static int iso_connect_bis(struct sock *sk)
+ 	struct iso_conn *conn;
+ 	struct hci_conn *hcon;
+ 	struct hci_dev  *hdev;
++	bdaddr_t src, dst;
++	u8 src_type, bc_sid;
+ 	int err;
+ 
+-	BT_DBG("%pMR (SID 0x%2.2x)", &iso_pi(sk)->src, iso_pi(sk)->bc_sid);
++	lock_sock(sk);
++	bacpy(&src, &iso_pi(sk)->src);
++	bacpy(&dst, &iso_pi(sk)->dst);
++	src_type = iso_pi(sk)->src_type;
++	bc_sid = iso_pi(sk)->bc_sid;
++	release_sock(sk);
+ 
+-	hdev = hci_get_route(&iso_pi(sk)->dst, &iso_pi(sk)->src,
+-			     iso_pi(sk)->src_type);
++	BT_DBG("%pMR (SID 0x%2.2x)", &src, bc_sid);
++
++	hdev = hci_get_route(&dst, &src, src_type);
+ 	if (!hdev)
+ 		return -EHOSTUNREACH;
+ 
+@@ -430,12 +438,19 @@ static int iso_connect_cis(struct sock *sk)
+ 	struct iso_conn *conn;
+ 	struct hci_conn *hcon;
+ 	struct hci_dev  *hdev;
++	bdaddr_t src, dst;
++	u8 src_type;
+ 	int err;
+ 
+-	BT_DBG("%pMR -> %pMR", &iso_pi(sk)->src, &iso_pi(sk)->dst);
++	lock_sock(sk);
++	bacpy(&src, &iso_pi(sk)->src);
++	bacpy(&dst, &iso_pi(sk)->dst);
++	src_type = iso_pi(sk)->src_type;
++	release_sock(sk);
++
++	BT_DBG("%pMR -> %pMR", &src, &dst);
+ 
+-	hdev = hci_get_route(&iso_pi(sk)->dst, &iso_pi(sk)->src,
+-			     iso_pi(sk)->src_type);
++	hdev = hci_get_route(&dst, &src, src_type);
+ 	if (!hdev)
+ 		return -EHOSTUNREACH;
+ 
+@@ -1208,18 +1223,25 @@ static int iso_sock_connect(struct socket *sock, struct sockaddr_unsized *addr,
+ 
+ static int iso_listen_bis(struct sock *sk)
+ {
+-	struct hci_dev *hdev;
+-	int err = 0;
+ 	struct iso_conn *conn;
+ 	struct hci_conn *hcon;
++	struct hci_dev *hdev;
++	bdaddr_t src, dst;
++	u8 src_type, bc_sid;
++	int err = 0;
++
++	lock_sock(sk);
++	bacpy(&src, &iso_pi(sk)->src);
++	bacpy(&dst, &iso_pi(sk)->dst);
++	src_type = iso_pi(sk)->src_type;
++	bc_sid = iso_pi(sk)->bc_sid;
++	release_sock(sk);
+ 
+-	BT_DBG("%pMR -> %pMR (SID 0x%2.2x)", &iso_pi(sk)->src,
+-	       &iso_pi(sk)->dst, iso_pi(sk)->bc_sid);
++	BT_DBG("%pMR -> %pMR (SID 0x%2.2x)", &src, &dst, bc_sid);
+ 
+ 	write_lock(&iso_sk_list.lock);
+ 
+-	if (__iso_get_sock_listen_by_sid(&iso_pi(sk)->src, &iso_pi(sk)->dst,
+-					 iso_pi(sk)->bc_sid))
++	if (__iso_get_sock_listen_by_sid(&src, &dst, bc_sid))
+ 		err = -EADDRINUSE;
+ 
+ 	write_unlock(&iso_sk_list.lock);
+@@ -1227,8 +1249,7 @@ static int iso_listen_bis(struct sock *sk)
+ 	if (err)
+ 		return err;
+ 
+-	hdev = hci_get_route(&iso_pi(sk)->dst, &iso_pi(sk)->src,
+-			     iso_pi(sk)->src_type);
++	hdev = hci_get_route(&dst, &src, src_type);
+ 	if (!hdev)
+ 		return -EHOSTUNREACH;
+ 
+@@ -1564,9 +1585,16 @@ static void iso_conn_big_sync(struct sock *sk)
+ {
+ 	int err;
+ 	struct hci_dev *hdev;
++	bdaddr_t src, dst;
++	u8 src_type;
++
++	lock_sock(sk);
++	bacpy(&src, &iso_pi(sk)->src);
++	bacpy(&dst, &iso_pi(sk)->dst);
++	src_type = iso_pi(sk)->src_type;
++	release_sock(sk);
+ 
+-	hdev = hci_get_route(&iso_pi(sk)->dst, &iso_pi(sk)->src,
+-			     iso_pi(sk)->src_type);
++	hdev = hci_get_route(&dst, &src, src_type);
+ 
+ 	if (!hdev)
+ 		return;
 -- 
 2.52.0
 
