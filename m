@@ -1,189 +1,107 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481F13AE19F
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jun 2026 13:54:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDAB3A4F5F
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jun 2026 14:05:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780322082; cv=none; b=FBlsGTwhh7f+swZD2CLh/l0UydVyBGBawGS6CAXOkbQqT7omP4pwh3cPEYkKoTvVRopf8wYyveZsK9nXYz+u4Y7N1llejs2mX07VDyT/PYKYl0upz5NI4UOUMXSSG7qfhsJHpsz8B0jOf1Pv991QtYVfI7T3FKXSDznUl9WDZeM=
+	t=1780322702; cv=none; b=FQilNv197CaN/MAMF/hb44r73Otfp/rGTpLC3Nie31yMWJywIsUOxP4bUYvpOfnHv7G+BMUtR0h9CnUtBdq2NjaHI8ZQc38lDwJeiV7RM1OXSlVbeqXEElI23IxBitIfMF+I2dmWhE5OmK0HzN7vL7/R9B0Rm+7D/jq8YnBfDl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780322082; c=relaxed/simple;
-	bh=Q3ZengQ4IRLYGNBWNlpT/D14IZyioia1aG8jgyEp4ko=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gl7kg6ndHLCFA+84XDbLwDYZYK3Um0AXWdVeoeJdb9+JU/xikpjtr27IKl6GvifZOlHAbQXJvIYXN+Sm+1s3Eqemx5Toji3P9/3Hnt47mH10+rpfaBfqlES/VVJxRJA1ai5PdHZbHt8R+1n/aXJxw26/AtliizTkxD3aGxNBZD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=mLx6/naC; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Hwqk+Ihx; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1780322702; c=relaxed/simple;
+	bh=NX6zMCqQi9fcIrqGHvPsXzuXdZh0Mwl/ruXYqoZLnyU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GPlV6p/XQq+V/wVaFLDpZuCb+Pu0kYvVA3yerJFU2cN7veac47bYm/efJca326iA+35lX/8IEITxDHX8zWJCFPFNlfjAPOGEAHSbfodNWLWk48O0Z0Rlz9gCz1C1iNh9WsNUWOwY/216wlMp0IgBXBpd9wFzVNWDY/wM1/C9CIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=TJQFzNPd; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AlpuY/MB; arc=none smtp.client-ip=103.168.172.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="mLx6/naC";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Hwqk+Ihx"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6518dUFu3563632
-	for <linux-bluetooth@vger.kernel.org>; Mon, 1 Jun 2026 13:54:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	tsQa+ooxL+KuyWD5mAiKr5e5uyRG+3xbCwHL6U6EsC0=; b=mLx6/naCcM8HzVqR
-	G15vzsmGz5ceDbttRzUdtzZPnV3cnSZhAb9Lh2mN7B5zYX82u9gadkBsH/BM60IN
-	pqalWF/KsB2nPa4PIohAPjIIr6Cpho/reP0VZnXfvUnO0iXip7sta3H+GFx0i+J4
-	u3t7y3czd9oyoUjn0tCGelrAk7djqBKOWfYfoQemk3CoEZgwI9ERP9QEqrEBLZ0X
-	nolNi8vXtvR/er1kYX9uAcz2EcjtSVNEhwtvbS0xczHUwEzSh5LmXG3yXAm0chdq
-	uS1EuSpkFF0vjAB65FPmeouuE1+A9PFrzeUp4qlmTxfEbayLc7A/7MX+/oenlFXo
-	PtfUSQ==
-Received: from mail-dy1-f197.google.com (mail-dy1-f197.google.com [74.125.82.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4eh6rxs96y-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jun 2026 13:54:40 +0000 (GMT)
-Received: by mail-dy1-f197.google.com with SMTP id 5a478bee46e88-304f1820babso3788607eec.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jun 2026 06:54:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1780322079; x=1780926879; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tsQa+ooxL+KuyWD5mAiKr5e5uyRG+3xbCwHL6U6EsC0=;
-        b=Hwqk+Ihxtn0tatYJGeMy2OF9+ls2d+r8k8zQVhW6t0ZZxegjpiNt5hRNsQLhE2BkRv
-         Iffu0d3VpN6vppx1FMVd29rR1OQPibSn+actuZg0wlTNt0zRi91Y18F7tUc2+ovTexHr
-         SDTtEMGPXnH3IWixkygeZRLkpQst9vv/JrloTfNo48b7wHmrufT6fLFgbEIS+0g6M1Qz
-         GrU7sDf/RGkUHxVsfKNE0oF19Kq3o5q3YNxnMs/zUGz/dC+Lhhwjx5Dq6YtxA3aIO6g6
-         LTeoM/peL6wGez4suaOOmkBA94tGcSfvqFHRm2vmUDxU5ngMwL6SoPsMEmsMyQRvojVp
-         wOQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780322079; x=1780926879;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tsQa+ooxL+KuyWD5mAiKr5e5uyRG+3xbCwHL6U6EsC0=;
-        b=Yao/K1ATer7Npbv019CcF4bEUa7PYUbzPQW03/SZ7XavIsf+J6E+oDQRA4mTA/nyXZ
-         +6ljBZNM72v5+hQJc49uSKYd4yKuR1Y/iLEcwbEdmh989F2J3HLmbCdfEV7A2L2dOtfg
-         bDBcqfE3jkpdJ7I4J6eBH9QNZnZQ3AySHQhyB3tSq6M3PMwcrSji1xl/KIl885BfAA/6
-         F1RjH9VUG/aIa/mNAyAPOGiBxVrpxePOx7vppZFU5Di9A7kbQ0kG46FZhEiJ9XFMf4wD
-         Dwg3yFaJUs+iiimGMqys/uqdQbcvXG6ZMzzX9CR2tbWVuPaeYJCMQ4zWwYnSRemXVMPq
-         n5UQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8AndwKzLQOI7I4ilhDpKR41p3JEij4MTgSUeB3vLIPqzY5q+X9/rIIfIU084ekPsq45mOm8nogjuh27KMdWPw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjXTEpUa3saPOf4wHbyGVfYdT3j2fkZyg5bIhbObovNmSBT9bI
-	eoVjf15A+JnnsF/6gfUkoI7ic9rUkQxmBMtc2fWKy1PKmAl00gEUaepCDMORu7yUl8RCPJRXkca
-	DK02a3u0qEPVH7mOhWAALd2FzhidjyjntQSRUt09nZ9DPsqRgp53HE8OagT3+h6TnK7aBoZE=
-X-Gm-Gg: Acq92OFHJgWgKRVpVY2WUMQbM8uwpXrpSmS2yPrYuydOEsW/igXN4IySDhGNrhLKQp8
-	rX7mI4qJI+Ep2mnqUwfMW5BAA5maHYje1isqYTeT3y457d7bgezETE5O6BUWKWNjzi8Qu9tMhbc
-	gDV2hbUBHFdM1mHLzPrH2CfDrEOyhJLU7Ncr7QlzZ7Lho5BXpLjoQiAlbI9ufb9mQB671pOpWyQ
-	4Vc8rfih1VVuutX5q6Iwh/pUJ0sKx2wXFEdZWlMOT9qwO34LsHCG0fTv7Rye5mps3EPs3fA93oP
-	ihIGP4yBOlj1ZQltNgF200tyu2/SKGabfxM89AyXIw7NWNCHW+agu3uyb/8/9h+5VycaDhScDAX
-	Q2yQUI1pgYnVgBGg442o3aNdo67IADyNt+0kv/fkvKhze4Ow00Ygaq6Mc/v6u6TavYOTlDWo0rC
-	pcJz735H7YvwObzQJY
-X-Received: by 2002:a05:7300:72c5:b0:2f2:6dde:df66 with SMTP id 5a478bee46e88-304fa628f82mr5384241eec.22.1780322079091;
-        Mon, 01 Jun 2026 06:54:39 -0700 (PDT)
-X-Received: by 2002:a05:7300:72c5:b0:2f2:6dde:df66 with SMTP id 5a478bee46e88-304fa628f82mr5384181eec.22.1780322078081;
-        Mon, 01 Jun 2026 06:54:38 -0700 (PDT)
-Received: from [10.227.110.203] (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-304ed5a0b7dsm9202218eec.22.2026.06.01.06.54.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jun 2026 06:54:37 -0700 (PDT)
-Message-ID: <e5b487ea-151f-4d22-b046-b72447c023cf@oss.qualcomm.com>
-Date: Mon, 1 Jun 2026 06:54:35 -0700
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="TJQFzNPd";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AlpuY/MB"
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.phl.internal (Postfix) with ESMTP id D0E92EC0074;
+	Mon,  1 Jun 2026 10:04:59 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Mon, 01 Jun 2026 10:04:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1780322699; x=1780409099; bh=vL+0oet1fzRZjCJMAryXC
+	v2Z7vQdRa28WOvWmT4vhcs=; b=TJQFzNPdSPDBFSl64BIRhqch1OgsCjFOtqjAm
+	q3wRynw4U/xSsKCaiDLyMkHXMR0RKrK6mUUhYKiF6r2gLRNBMaejIU/kjjat+Bsx
+	4ahVD3xe0VRXKDdaG8HDRPyb8dUBbOJn5SiEn7p0skE2TKOHx5F3QB07O9AUnGgI
+	d9k0nzTkMBYor5pmdNQsxS/0UwLcQernmfeupvwMvLkzNo02N5r3s4p13WzQI9Ip
+	gj/8Y9e+XPJfw+VH90RxZ5P+1IzOBiGjSXTbhAA6O5StroVW3ihPXI5AEEvyWt9R
+	tCE2HCPKJY/hxNg+DaUqK7lBUFTzEZR8RWenSqJLHEOH+Pwew==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1780322699; x=1780409099; bh=vL+0oet1fzRZjCJMAryXCv2Z7vQdRa28WOv
+	WmT4vhcs=; b=AlpuY/MB6PfgmgejjsfiW3/KiUqivk3CEl6i47B1e+P8LvoCoBv
+	IVL3eeo+nSq3Z0U1RxMPAV5nwvh5eu3PTWS6jrAdxoljKhRemXfJykGMwsPQFatA
+	cSovs4swYLlvpFAbp62C0pWuVIoz8j0vkf7p5z4hRuQ/GlXN/FnHo/jYJWzDSkJf
+	k+lSxxA/Ez9L+c8ZbgHnQAVye2phN1Bopxy8HHFpcRojB6wrrWRf+lN6ZqVbHrvZ
+	G1pzDn765GOZsQN9WkglGvcF67HlHD/sVVaRIcKXBsxbKXOulinBjcv8gQwyLXW1
+	uwWkVw5o5YTsvxKDwOiJ82eiOMpupmOK3kA==
+X-ME-Sender: <xms:i5Edatne28HmjysrHPdwnETy8PdJv1j_RlMq8rDtowjGH0vlmJWbdg>
+    <xme:i5Edav2YDxZEivnGxrjFnlkEOR6jZdk8VW18iVTeHNVkYuhj77u9_1a5jYCMBWy6w
+    _A_EqUtG3UUCoKNk2kJifetypx9cV6fvG0xL2OgVIE3EYb918QGsgg>
+X-ME-Received: <xmr:i5Edaop_PUUiNSxlmm_rw6RHOnAj7g6sGbwfRTS3o7dg9kQsSi4Yj8FPJg7ezDonFvtW8ao>
+X-ME-Proxy-Cause: dmFkZTGfZRm9kWhtF58O+/ubqvLNQMTyBaM6l8LdwS4fYRClO8nR50iT8SKln5cWDB/iQO
+    KYOXHvW/xQrWfOb4Iuw6mp+mPt84vYNJXCggizKNhdOeGPZlyi5mCQ9q9GhqlyWA16l6g4
+    j7YQ6S8Knr3l5Xvpcub/B+od3AH4WC1k61vaPNZ5+LD1f+wkCxEjt2V01sCJRp89oG2SiI
+    Xri982Zad9GUH9M3lECMCvOUi8qJJ67f01IzH+NHhRPR7MLpWJU8zy8BewGKPWGYm5u2PV
+    01LLmOkQjFeRshSFGZlmCyJbpFxW10/Ty4AULMTJfMTiT0Lxb1H80ksDE3FV+D7OdZGQRQ
+    uwvEtXAknPNHyOjqLJXj1exgGWx0cPCQCutZis1MgWUyiBcaOFqP4Z2Oxu3wWiHqDB/N4K
+    SVCLuZwWnuKQ8w/QA5eAWeq1Jht4oecwraQkNiFFEKOm32Yk7mcSiujLJEme762P+fkT21
+    BLXpLu8f9gbSPY/JpMFs6fTdr3UYk8hCOeLIAei2SvPKDYCdMo68ydO249ZI1xC2R/YzPA
+    WPREPQ50YyQC3gTK6plnp6SqLjMF9nlCBvFy3hZDqR96Hx2UGw2xJwxSFTR4KKa0rMbFok
+    4y94dADqBR0I31X/f6I0BL3OtfYrNDlLU6igCkg/esJUqyb9+XwkR7efQbBQ
+X-ME-Proxy: <xmx:i5EdasdXHdRuuebVItPWx1o6tALVVx3NtW7rNtVHrEFvQlnn1E5TUw>
+    <xmx:i5EdanpfENiHr0mJX9F730bYcegr9BggDiJn4S86JtEVb5yogFVvnQ>
+    <xmx:i5EdatGQztN1R3TklLF4JvoN1CY5sn7DFPwr5N42RMvimJUJ7WzbfA>
+    <xmx:i5EdanuCpgtM7kD8CGY5_lbxFi5cl_tt4KQCNpo4VRRm09xqE2Rdpw>
+    <xmx:i5Edava_O0B7qiGMRKyPdUXUyQW8l7HQ4urd2ot-0AcqLC8McyZ4wBcy>
+Feedback-ID: if72e4b10:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 1 Jun 2026 10:04:59 -0400 (EDT)
+From: Siwei Zhang <oss@fourdim.xyz>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Siwei Zhang <oss@fourdim.xyz>
+Subject: [PATCH v7 0/1] Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()
+Date: Mon,  1 Jun 2026 10:03:58 -0400
+Message-ID: <20260601140444.1676239-1-oss@fourdim.xyz>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/7] wifi: ath11k: enable support for WCN6851
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-        Rob Herring <robh@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Qiang Yu <qiang.yu@oss.qualcomm.com>,
-        Jeff Johnson <jjohnson@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
- <conor+dt@kernel.org>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-        Rocky Liao <quic_rjliao@quicinc.com>,
-        Bjorn Andersson
- <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        ath11k@lists.infradead.org, devicetree@vger.kernel.org,
-        Bartosz Golaszewski <brgl@bgdev.pl>, linux-bluetooth@vger.kernel.org
-References: <20260601-sm8350-wifi-v1-0-242917d88031@oss.qualcomm.com>
- <20260601-sm8350-wifi-v1-2-242917d88031@oss.qualcomm.com>
-From: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
-Content-Language: en-US
-In-Reply-To: <20260601-sm8350-wifi-v1-2-242917d88031@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: 7iFCnGKA7fKVkFhwiicb6gtPkP_boKee
-X-Authority-Analysis: v=2.4 cv=dsfrzVg4 c=1 sm=1 tr=0 ts=6a1d8f20 cx=c_pps
- a=Uww141gWH0fZj/3QKPojxA==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22
- a=bC-a23v3AAAA:8 a=EUspDBNiAAAA:8 a=8x70SPmrBkAdAYyFYvgA:9 a=QEXdDO2ut3YA:10
- a=PxkB5W3o20Ba91AHUih5:22 a=FO4_E8m0qiDe52t0p3_H:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAxMDEzOSBTYWx0ZWRfX8A4v7cUrkaYH
- Xjl7ZcViE5m6ry8bIuMjkR/OEK5XWut85JpN4Ji87S+4gIdfMz7C6uKI1TAfq34R2VJTDyjGmEo
- bk5Wqu4WPIGXoxfv4KQ3J8p2C+wtg2OTvgDL25LBevhjVt2SDgdQZ03YyeVoiXZngv3o9aXGa/F
- Zr1V2jMRKgVo5Jqiml9TxZmWlWLPPRC+puoRlD0q2SiLZakNdaoRa7Qe5+Hw+iNmReK3nLuUAtI
- orGI9OZJIWn9dJ3axE4SG2BBwJt0FTUn9VoRA1/hvPPxzapjOB8p0Sa1H0jaoVfL4/gQETOrvTL
- RxJadTSLwWx2wxyLx+ZKnnjcsORyo3ewsZULvpzuIlTmplG29YVF/436WEOUTny3PVVTLSdGNgI
- bnCFEDaNL24+9BIKUbqU5I16oKwHaS01dHkk7b34iVy0FwGs9hdvKAnEjr3xBBaic8W4ffW7wxB
- NziaKFFu2BPmOP23SmA==
-X-Proofpoint-ORIG-GUID: 7iFCnGKA7fKVkFhwiicb6gtPkP_boKee
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-01_04,2026-05-28_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 priorityscore=1501 lowpriorityscore=0 bulkscore=0
- clxscore=1011 adultscore=0 impostorscore=0 malwarescore=0 spamscore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605210000
- definitions=main-2606010139
+Content-Transfer-Encoding: 8bit
 
-On 6/1/2026 2:46 AM, Dmitry Baryshkov wrote:
-> The WCN6851, found e.g. on SM8350 platforms, is an earlier version of
-> WCN6855 platform. It identifies itself as hw1.1. Copy WCN6855 hw 2.0
-> configuration to support hw1.1 version.
-> 
-> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-> ---
->  drivers/net/wireless/ath/ath11k/core.c | 92 ++++++++++++++++++++++++++++++++++
->  drivers/net/wireless/ath/ath11k/core.h |  1 +
->  drivers/net/wireless/ath/ath11k/mhi.c  |  1 +
->  drivers/net/wireless/ath/ath11k/pci.c  |  9 ++++
->  drivers/net/wireless/ath/ath11k/pcic.c | 11 ++++
->  5 files changed, 114 insertions(+)
-> 
-> diff --git a/drivers/net/wireless/ath/ath11k/core.c b/drivers/net/wireless/ath/ath11k/core.c
-> index 3f6f4db5b7ee..7e997016cf6e 100644
-> --- a/drivers/net/wireless/ath/ath11k/core.c
-> +++ b/drivers/net/wireless/ath/ath11k/core.c
-> @@ -393,6 +393,98 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
->  		.cfr_num_stream_bufs = 0,
->  		.cfr_stream_buf_size = 0,
->  	},
-> +	{
-> +		.name = "wcn6855 hw1.1",
-> +		.hw_rev = ATH11K_HW_WCN6855_HW11,
-> +		.fw = {
-> +			.dir = "WCN6855/hw1.1",
-> +			.board_size = 256 * 1024,
-> +			.cal_offset = 128 * 1024,
-> +		},
-...> +		.num_vdevs = 2 + 1,
+Compared to v2, addresses comments on https://sashiko.dev/#/patchset/20260415204842.2363950-1-oss%40fourdim.xyz .
 
-this value is being modified to 4 in:
-https://msgid.link/20260525020711.2590815-1-wei.zhang@oss.qualcomm.com
+Compared to v3, rebase against bluetooth-next.
 
-It is merging into ath-next today and should reach linux-next very soon.
+Compared to v4, allocate the channel outside the function and pass it in as an argument to avoid the use-after-free.
 
-/jeff
+Compared to v5, extract the channel init to a separate function.
 
+Compared to v6, balance puts and holds on chans.
+
+Siwei Zhang (1):
+  Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()
+
+ include/net/bluetooth/l2cap.h |  8 +++--
+ net/bluetooth/6lowpan.c       | 32 +++++++++++--------
+ net/bluetooth/l2cap_core.c    | 60 ++++++++++++++++++++++++++---------
+ net/bluetooth/l2cap_sock.c    | 48 ++++++++++++++++------------
+ net/bluetooth/smp.c           | 18 +++++------
+ 5 files changed, 106 insertions(+), 60 deletions(-)
+
+-- 
+2.54.0
 
