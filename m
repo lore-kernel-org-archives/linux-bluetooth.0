@@ -1,16 +1,16 @@
 Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F66C2F0C48;
-	Tue,  2 Jun 2026 21:54:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948151DEFE8;
+	Tue,  2 Jun 2026 22:03:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780437258; cv=none; b=cnGmKD0EX6P/H8FRO2qovXjQ8MERCqVvNXmYs/X4tU38Gx82V7b8LHqobSLl3inahS4x4wqF9crnLfQ4R/47zcHyr6stgm58mczd+K2loYhSLfAh/xuMixkrgbN1SCOCt6jiRrA2o/trgd6HEm07F+BA86Hkv/KlJUyGJ2fJtqA=
+	t=1780437842; cv=none; b=kb/ydQ3+n6AG+PdXjH28bKIJ7tUyIKCHt0OtRK9du4e/e2tJWWqiVaL9yFbh0WArXTugYd5A57xVDKMb0JehBrAGnlj2r3gx7aaCGqg5BYdfCRm2QU57EJNegn97qvgM4vZNcXzemmWXJtcsLpVVcFhkeSXqTIa/0Xcv6cbBQLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780437258; c=relaxed/simple;
-	bh=D+eCpPoIodjYhScI6E9xSwx9WM2A3Hy6DngcWZ/Kh+c=;
+	s=arc-20240116; t=1780437842; c=relaxed/simple;
+	bh=CFpv1O20FVkw88uDWgFDldrx4rP602XqtCgOdR5d7bA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZkjcdIyV9K8Y1AvWmE5t6YZX6GYh6ZVkMxZsuzHUvUcqh8uKCktgZnKPuSDjHhzFh2aUouGV3HBG5XvrBxed5fGo1gJKYvajqUZOlhYVQJpOcv54VKzbfBdaI3r4rpN5BG0dut6jrKQzXcV3PAuzs4A4agVy+8TDICzSmEE3BPM=
+	 In-Reply-To:Content-Type; b=CrVYqG3016ldWDlPK0VfJDI0I7GyH65kTUdTFi9ejGu+FI00JAVOxh3rKjR6ard30SmVCjcM7jGrJN6fqTgWXRQweaNjpO4i+Yzw3U4E9HS+HpCgW36sabGZfqobQ9Mii+Bav1YCevTsgUpqHEQIaZ3F51yvsd9fLNp164q/Nxo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
@@ -19,10 +19,10 @@ Received: from [192.168.0.192] (ip5f5af118.dynamic.kabel-deutschland.de [95.90.2
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id EB2B14C1A4F360;
-	Tue, 02 Jun 2026 23:53:30 +0200 (CEST)
-Message-ID: <95453e74-636d-4a9f-91c0-189366423180@molgen.mpg.de>
-Date: Tue, 2 Jun 2026 23:53:29 +0200
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id BBF824C1A4F36E;
+	Wed, 03 Jun 2026 00:03:54 +0200 (CEST)
+Message-ID: <37658214-8e22-40ae-81b8-3eab87b43735@molgen.mpg.de>
+Date: Wed, 3 Jun 2026 00:03:53 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -30,144 +30,73 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] Bluetooth: hci_event: fix simultaneous discovery stuck
- in FINDING
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Jiajia Liu <liujiajia@kylinos.cn>, Marcel Holtmann <marcel@holtmann.org>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- Jiajia Liu <liujia6264@gmail.com>
-References: <20260602070032.51248-1-liujiajia@kylinos.cn>
- <fc5c142e-3187-42a2-af4d-9103858da93e@molgen.mpg.de>
- <CABBYNZK1GLGu+xdKng3O4b=NrNwxB6ZAyfXSn8DE4WptXN=5CQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Add support for TP-Link TL-UB250
+To: Cris <cxs1494089474@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260602135419.3092500-1-cxs1494089474@gmail.com>
 Content-Language: en-US
 From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <CABBYNZK1GLGu+xdKng3O4b=NrNwxB6ZAyfXSn8DE4WptXN=5CQ@mail.gmail.com>
+In-Reply-To: <20260602135419.3092500-1-cxs1494089474@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-[Cc: -brian.gix@intel.com (bouncing)]
-
-Dear Luiz,
+Dear Cris,
 
 
-Am 02.06.26 um 18:43 schrieb Luiz Augusto von Dentz:
+Thank you for your patch.
 
-> On Tue, Jun 2, 2026 at 10:41 AM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
-
->> Am 02.06.26 um 09:00 schrieb Jiajia Liu:
->>> When hci_inquiry_complete_evt is called between le_scan_disable and
->>> le_set_scan_enable_complete and no remote name needs to be resolved,
->>> the interleaved discovery with SIMULTANEOUS quirk gets stuck in
->>> DISCOVERY_FINDING. le_set_scan_enable_complete does not check inquiry
->>> state. No one sets DISCOVERY_STOPPED in this process.
->>>
->>> Add state check in le_set_scan_enable_complete and change state if
->>> the state is DISCOVERY_FINDING. Tested with AX201 (8087:0026) in Dell
->>
->> … change state to DISCOVERY_STOPPED …
->>
->> I’d add a new paragraph for the Tested part.
->>
->>> Vostro 13. Discovering disabled MGMT Event below is reported when
->>> running into the above condition.
->>
->> Thank you for sharing the test device. Could you please document how to
->> get into this state exactly? Some Xiaomi device?
+Am 02.06.26 um 15:54 schrieb Cris:
+> Add USB ID 2357:0607 for TP-Link TL-UB250.
 > 
-> What are you talking about here by saying Xiaomi device? He literally
-> said Dell Vostro 13, a laptop, and this is a local only procedure,
-> there is no remote device involved here.
+> This is a Realtek RTL8761BUV based Bluetooth adapter.
+> 
+> Without this entry the device is picked up by the generic Bluetooth USB
+> class match and exposes hci0, but the Realtek setup path is not used and
+> rtl8761bu firmware/config are not loaded.
+> 
+> The controller reports Realtek Semiconductor Corporation as the
+> manufacturer and LMP subversion 0x8761. With this entry added, btusb
+> loads rtl_bt/rtl8761bu_fw.bin and rtl_bt/rtl8761bu_config.bin
+> successfully.
+> 
+> Use the same flags as the existing TP-Link 2357:0604 entry.
 
-In the trace below a Xiaomi device shows up, if I am not mistaken.
+Please add the relevant part of `/sys/kernel/debug/usb/devices` to the 
+commit message [1]
 
->>>    @ MGMT Command: Start Discovery (0x0023)    {0x0001} [hci0] 10885.970873
->>>            Address type: 0x07
->>>              BR/EDR
->>>              LE Public
->>>              LE Random
->>>    ...
->>>    < HCI Command: LE Set Extended Scan Enable    #38205 [hci0] 10886.131438
->>>            Extended scan: Enabled (0x01)
->>>            Filter duplicates: Enabled (0x01)
->>>            Duration: 0 msec (0x0000)
->>>            Period: 0.00 sec (0x0000)
->>>    > HCI Event: Command Complete (0x0e) plen 4   #38206 [hci0] 10886.133295
->>>          LE Set Extended Scan Enable (0x08|0x0042) ncmd 2
->>>            Status: Success (0x00)
->>>    @ MGMT Event: Discovering (0x0013) plen 2   {0x0001} [hci0] 10886.133414
->>>            Address type: 0x07
->>>              BR/EDR
->>>              LE Public
->>>              LE Random
->>>            Discovery: Enabled (0x01)
->>>    < HCI Command: Inquiry (0x01|0x0001) plen 5   #38207 [hci0] 10886.133528
->>>            Access code: 0x9e8b33 (General Inquiry)
->>>            Length: 10.24s (0x08)
->>>            Num responses: 0
->>>    > HCI Event: Command Status (0x0f) plen 4     #38208 [hci0] 10886.141333
->>>          Inquiry (0x01|0x0001) ncmd 2
->>>            Status: Success (0x00)
->>>    ...
->>>    < HCI Command: LE Set Extended Scan Enable    #38242 [hci0] 10896.381802
->>>            Extended scan: Disabled (0x00)
->>>            Filter duplicates: Disabled (0x00)
->>>            Duration: 0 msec (0x0000)
->>>            Period: 0.00 sec (0x0000)
->>>    > HCI Event: Inquiry Complete (0x01) plen 1   #38243 [hci0] 10896.383419
->>>            Status: Success (0x00)
->>>    > HCI Event: Command Complete (0x0e) plen 4   #38244 [hci0] 10896.394378
->>>          LE Set Extended Scan Enable (0x08|0x0042) ncmd 2
->>>            Status: Success (0x00)
->>>    @ MGMT Event: Device Found (0x0012) plen 22 {0x0001} [hci0] 10896.394497
->>>            LE Address: 88:12:AC:92:43:69
->>>            RSSI: -101 dBm (0x9b)
->>>            Flags: 0x00000004
->>>              Not Connectable
->>>            Data length: 8
->>>            Company: Xiaomi Inc. (911)
->>>              Data[0]:
->>>            16-bit Service UUIDs (complete): 1 entry
->>>              Xiaomi Inc. (0xfdaa)
->>>    @ MGMT Event: Discovering (0x0013) plen 2   {0x0001} [hci0] 10896.394506
->>>            Address type: 0x07
->>>              BR/EDR
->>>              LE Public
->>>              LE Random
->>>            Discovery: Disabled (0x00)
->>>
->>> Fixes: 8ffde2a73f2c ("Bluetooth: Convert le_scan_disable timeout to hci_sync")
->>> Signed-off-by: Jiajia Liu <liujiajia@kylinos.cn>
->>> ---
->>>
->>> Changes in v2:
->>> - move the handler to hci_event.c
->>> - remove unnecessary bt_dev_dbg
->>> - update commit message
->>>
->>> ---
->>>    net/bluetooth/hci_event.c | 7 +++++++
->>>    1 file changed, 7 insertions(+)
->>>
->>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->>> index eea2f810aafa..1cd5f97daafe 100644
->>> --- a/net/bluetooth/hci_event.c
->>> +++ b/net/bluetooth/hci_event.c
->>> @@ -1769,6 +1769,13 @@ static void le_set_scan_enable_complete(struct hci_dev *hdev, u8 enable)
->>>
->>>                hci_dev_clear_flag(hdev, HCI_LE_SCAN);
->>>
->>> +             if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
->>> +                 hci_test_quirk(hdev, HCI_QUIRK_SIMULTANEOUS_DISCOVERY) &&
->>> +                 !test_bit(HCI_INQUIRY, &hdev->flags) &&
->>> +                 hdev->discovery.state == DISCOVERY_FINDING) {
->>> +                     hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
->>> +             }
->>> +
->>>                /* The HCI_LE_SCAN_INTERRUPTED flag indicates that we
->>>                 * interrupted scanning due to a connect request. Mark
->>>                 * therefore discovery as stopped.
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Cris <cxs1494089474@gmail.com>
+
+If possible, a full name would be nice.
+
+> ---
+>   drivers/bluetooth/btusb.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 3aef21d4c..3cbb3c22e 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -831,6 +831,8 @@ static const struct usb_device_id quirks_table[] = {
+>   						     BTUSB_WIDEBAND_SPEECH },
+>   	{ USB_DEVICE(0x2357, 0x0604), .driver_info = BTUSB_REALTEK |
+>   						     BTUSB_WIDEBAND_SPEECH },
+> +	{ USB_DEVICE(0x2357, 0x0607), .driver_info = BTUSB_REALTEK |
+> +						     BTUSB_WIDEBAND_SPEECH },
+>   	{ USB_DEVICE(0x0b05, 0x190e), .driver_info = BTUSB_REALTEK |
+>   						     BTUSB_WIDEBAND_SPEECH },
+>   	{ USB_DEVICE(0x2550, 0x8761), .driver_info = BTUSB_REALTEK |
+
+With the commit message improved, please feel free to add:
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
 
 Kind regards,
 
 Paul
+
+
+[1]: 
+https://lore.kernel.org/linux-bluetooth/20260530123934.4583-1-nils.helmig@web.de/
