@@ -1,75 +1,75 @@
-Received: from mail-ot1-f65.google.com (mail-ot1-f65.google.com [209.85.210.65])
+Received: from mail-ot1-f68.google.com (mail-ot1-f68.google.com [209.85.210.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB5E2E173D
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 21:05:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4937439E17C
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 21:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.68
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780434352; cv=pass; b=OQWLkqeavbUIGnJOAGj7UQfSl+u9MAzTH2DCdf27bogIpllrOZAOFR2fuxs1qUsig2Is4ZDH6Rfrj5YCjwfz1OOTtylhv7sW62AUMCKQZebMfewqlQRT3iAK0B47Bp99hrnjY3u2MQhG2t9vm2pjIVPv0GdSgBHb/mM7hFDrbZ0=
+	t=1780434666; cv=pass; b=gcjMjFj+XGGWk3Vre2zjZctRMwRvN2FXz0uLbYGcFiYk6v9mqA6M+UGyXzPm5E9eWo3jy+4VtCEBh9nM+OjOn0ZJRdgzd8RfyiDDKjFLc03xYXzHfBygLQfVDtMSAGT2UO4e2i6/X0cRrmJvgGDpYi3COJFlDX6e5AvZmAAGAA8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780434352; c=relaxed/simple;
+	s=arc-20240116; t=1780434666; c=relaxed/simple;
 	bh=IAWOulyn60q5CU5nFcEIg2txVq35DKFJNgeRnC6hixc=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=d63VWNjC5rVcrY9oiNKm1gaVvBjADUuxqRol9aX4P7DEswFcp0+rRh6CFDZPE0Zq/sXOUp0ibsnl3BM2Z2oeHfHN2ly/tNABhx5JakqrS2uKi+cVjpuuxwT3QFugg3SfWoINNFqMcsBuDZcs12ALmdLZ4h1FA93A5zHK6OyQC00=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qIhc1Nj2; arc=pass smtp.client-ip=209.85.210.65
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=YBgdeP7ACrDknrzLnEd2qZpzzpxCAEC0bNe4KSa+E5y5PjYhaAFFlg8KeljvpUZ8KeMWPc1XQbFQ3xH/W3vcACJqfsNV9DQGnz5cW5+bx6U1pOBAk0fbCElH0ew4baNPy4rcMoGtARMHLw816sVd7DxA78L4tWTxmubOVhecBEs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MblmTJTy; arc=pass smtp.client-ip=209.85.210.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qIhc1Nj2"
-Received: by mail-ot1-f65.google.com with SMTP id 46e09a7af769-7e636d1bedbso7218496a34.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 14:05:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780434350; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MblmTJTy"
+Received: by mail-ot1-f68.google.com with SMTP id 46e09a7af769-7e615efd7d7so8907374a34.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 14:11:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780434664; cv=none;
         d=google.com; s=arc-20240605;
-        b=lQDSAGuyhasWqAsOFL6V1odQllRzl7FvoRNXRqhL95N5laxXFiScrLLBM6IwwxZMFF
-         CrxmNQilh9EAgBDNWWReTZa50nCIjVLSmedGrKpYwH4nnM5mrjMTRh3Ree/OYuqk36lo
-         AvMQAxLosUOOfgyA5P9b6I186EDNFNChW/1pAG+/gEEU4eCr1xBSl7dg4jm4gcjwXT40
-         Wa7sZQiEQLmOZWUHZ99zKGh+A8O53Ne8iEdceQmgt1OzxsdCfF6KDInBP4u0G/H7J4hJ
-         N6ZUVluk/G9l8aMskG1qLLypCTEuspz4NO/5N02VynGIW1zxPChGIYhi4H2NlauAzjlh
-         /HVA==
+        b=ZQeLM+WcsPSJN++55YJ5q8AQomE25GCXioPfjaZNPJMoe7Kfo/TcPJ/bEi5E6U8QQ/
+         EAOV4igV42vAOYUcJ+t/gjLp/hdE3oupZDfbDqPnq1ER5cCykAsPA6/h5QVRn8XSfRP+
+         8si/vngZWmahATnsxmGzP+F/RTKeV/YPh2C+UoRiDQozi/4MTnnG1R6ucf5pEZ3yZ+bB
+         4nvthZycGnwvaGgYc03ECE/WTYpr5xUlsw0h4yvZl6fksQAtQG/nw0EwsW1I7q9c5qks
+         Uwqlopiab3rhkg7qGS9NWonaAjo8KuRyh/w9QmLWMI7sLxRDEEpzMZeoktGLZdGR/di1
+         eFcA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
         bh=RkS7VxSSYQtTbcXAPMSGUiHQM/PKSapt1RSCo5tDvpc=;
-        fh=eqw94iKt7cJM+7cVeUO1KlsatqJgVocc9Ewz52ske6k=;
-        b=ZNeBEKHCofJHuYC++msrvxOQ9UWmnX3t0/md/gAezAZ8QJ5sH/y9ZP9nYBresldl5l
-         a3Sc6+/8cbZGjOuPxv4cYqRFkj43Dc22roW79Lw8KGs++gmY844SxLlhyp/ENKAH/qoH
-         WBfOJGnA+yuL+ylj8qk8RDHkBWuJd+MvxMB6KqIjysyjRNEEn8V0xDquRJLbLpCjXfU6
-         3MgL1Oi6tL8YUDBtdFGWd3sD5ash4T4EWkzRKRy1hmtvO1AKQgugWlrBAHSVEnUFGdf7
-         1MiVylH4B6vG5qIMcro2vXBFTCcUZ1Y4FT2zmucv2ixVeluUcF3d+oYeRYtNygPb/SC9
-         jQ3g==;
+        fh=QhYhU9j/WBVHzYnSB3qWVjokyx036cV9orQDjLkbELo=;
+        b=cKmdOJNGrt69SsuwOysg59j8lfV7G8t9CBOz3snSCRyexMbxZvLjIV63nqkmyVbths
+         PPg4sAoZxcJQnRUxFH6r0HlQ3bxGlfEVuxN9d1vk8Oxvlxgzt4r4OYJkJgxGRWl/ZrTS
+         p8YUVdyoUIAlLhgm8pQ4D0tzU0oFFQWupBqOiw8WqvvsTnK+rdt0aRnzRckATzFsUfNq
+         l+f2QaYyjAolkk0TM9XlyKJr7Fsc/F7KSSzfmsTJsVFRDyeDqZ+SMPlHP2yBu/+pnZcB
+         O2bDnuTK6y8CSK6p0lkvd2ejOzd8wB7duW+nd66hbclQhQz71LABjxzMcwQQX1vGBsJI
+         pnkg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780434350; x=1781039150; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+        d=gmail.com; s=20251104; t=1780434664; x=1781039464; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
         bh=RkS7VxSSYQtTbcXAPMSGUiHQM/PKSapt1RSCo5tDvpc=;
-        b=qIhc1Nj2rz3LNxDrL/l8YlKa9KGLP85yo1tqfnBxnBF4oOGl6bXHa2A5TasoKKgZye
-         AuuntS7CplBFr/YtxiervYhRkn1Rjj1Y4aUwqZgxwKoicc6vAlxZNYAyAboR482eXtwz
-         D+IefB9x2Pjx2jbph2cbxLFqhFEjnY6Vv9jFhwrekBAHY+iMmB083Nw1czF4gWLHRZiU
-         rK7e7LQT689ukX1PUMPXKr+tNZDs/5EH2ts+cBJewnW4RSCnSV3pPcoDYytoNewnkw/a
-         /4f0UuwDXpOdE3n71YddArwEpiXGKESCv17gm5pArh3ENF1t0bMZoOCs/b215hncPYAz
-         eMzA==
+        b=MblmTJTyen99EdWk+Rb9cKyrLa70lf7HqxLKsI+2L4T6rq2RMF/RY6QsyRRpc67Y2x
+         4/wMiSmyjC+30fqnzUf8TJXtNZwNQkPKs7pK22hK81L1d80bdI/oW0pNVu3N2shHOHCP
+         sHLqJpbqP65u4pVobFp79yL4+ZNoVJ2TJHp5aOcY1gMgkrV0j/Tm4rMu2DCCMcBGTu6O
+         O5GfiHwFzfSjyBtnc9SM04TMhNNc6cQryVp33zmqYwJHRKDlSEJPiSmKIbONDcL6GvUp
+         fCzhqJCiYWB6oh+zkBe9T+GgzQnBhcDG2QgoJvY1XAqaO4sKEkWhwcQaIidLuRp5UWCj
+         L5nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780434350; x=1781039150;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+        d=1e100.net; s=20251104; t=1780434664; x=1781039464;
+        h=to:subject:message-id:date:from:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
         bh=RkS7VxSSYQtTbcXAPMSGUiHQM/PKSapt1RSCo5tDvpc=;
-        b=TXD0twBKUrSpFbtPjKSa4GkysuBSQ+e3djiIyQWJ1O1g6DBEBebeSFuBWFncCjUkUT
-         AuzbWXQJtnBYH2K3u9NixZ8qrWOslo1QDdHcOQ+N4P5gh5nseKtDZmqd/K7Qanw20CzQ
-         1gvXU4WF6RDl4pkHcbV2DBs1hgbxX6rgFj8fsEYdcDQ+/43NNI2EuMe1vIF9XPM+gVQm
-         n537ulYQmO4qJqjvRPodrjmx+oVWWun5+99286soao/QqG3QnUB5IE3ZUi7+ZOuKJ92H
-         UjytikPqO+E2uyI35vU/YRaZoN9qtvszvWolU/R3IjC67W+Rbvlu+KKLVvICaRXph596
-         daqA==
-X-Gm-Message-State: AOJu0YwpsrKZsGw1UEKCiz69HhHrGQTu9SWkLlxmAY8V9/5a7WpEheTE
-	l3heExqDWx/1AuG/pDCIcEmFiTmXRA1+Ks3+2HF6TH89cxPhuFej00Ktw5Rp4kTSQKPGZXDFQgF
-	YwNi6V6k0sYoHJDyGAf+xtMj//6Ct6k9fIXvLXyRH
-X-Gm-Gg: Acq92OFr/UvJmw8Qa7C1uX1DLLjfn4F6/y1QT5zNYVX9zbSzMfMGmcEZvrq+FPF1FUF
-	jMDVziJ0CzEQS/W++ZMuaCXT5Azk+Y7kr8oA0HNn+2k9mKA90JutCmNEpSMI2wPnh64F36svm6f
-	2ZGSg4tY4u7UQ4ru62qZOpIUV0h6/zEBSuRjjqSLLwf4YcoceGfP9mil2a0+TZ1TiuNdFtGYXbO
-	FvqgunDjh3Nd738TtHlEkt1RU1200VucxTO/cuYdBI0DThZxqSX+cqlDiI2snO6+IRdNb37Is9W
-	X3kFVhRan3oL6C/LrA==
-X-Received: by 2002:a05:6830:f8e:b0:7dc:a256:5e2e with SMTP id
- 46e09a7af769-7e6e94af477mr228793a34.1.1780434350148; Tue, 02 Jun 2026
- 14:05:50 -0700 (PDT)
+        b=hiTxrdqqxxAMDskEH14D1wNz6OTuy0zj46bRB8rYRtc67wdrRh42OmiFLlbpwelZN9
+         S3KFmGOnHmVtOv+VbEYPCY7jSqNIwJEIp7egMvHzapY8fD+K1Ejt2jQ0S+2ardIMg06a
+         n/rOAw7h2669imHO932JuWFOzauYOATyAAOtNpBWuzywZpn32JstaHMAdMBJKMWK9FfB
+         YXbC3YGGAhEhbUQntvkmtOZraoJLCn0DtnFfsCUvjUGT1mdRqSABZki6Ry0vUMOK2fNp
+         dgq/I8unnWfjUitI93hoLLllyJhDB51eyfLE4VDGJATTMQqmQtlepW7bAYEU0JuqCSjE
+         pTRw==
+X-Gm-Message-State: AOJu0Yz2vVjby95kJDK+eYmOWosBSA60lm3BN+MvaFkwgvUXiZy/hh1q
+	RmVKIRCCQjis+LoJHYEaWB5Ytk7iU0qry+3l3ZNXUDc3YULMdyexE0lfddRO9Os9WnhuqHnsnZ3
+	4+s7Olfh0yuwPRpDdYK5YkTV2qxeEDBNfr6b3Lpz8
+X-Gm-Gg: Acq92OFslnI2SLTh1h6mKxPUme89fEdvbSYiv1x3L+FOt9YqJOapzOqtctMPEIJlJuw
+	iEqgLjjq41yY9c+GoBzvVxWTdpRape6/zmzCbrbnKA4E3jGHO/6qT2GqVYeIuNg668YYaAGTsYM
+	ni8kMIk8DpZikrmKru0t+gnsH9uFGzieXP5MohOXEIvE2zl6XQGKCo7p97eWPVk0hB7v7r9/Psr
+	GDvB5Lfq036mzKJS944uaUVirD7qUPE5b9ulXs0fjpu+u28qDM8lyFrf706plQaNVzp/YmQZd7a
+	9KajnRp4SlWCsG5yaP5qMwmuGg94
+X-Received: by 2002:a05:6830:640a:b0:7d9:f50f:9691 with SMTP id
+ 46e09a7af769-7e6e8fb2c4emr243406a34.0.1780434664207; Tue, 02 Jun 2026
+ 14:11:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -77,12 +77,11 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: Jordan Walters <jaggyaur@gmail.com>
-Date: Tue, 2 Jun 2026 17:05:39 -0400
-X-Gm-Features: AVHnY4K7oA6BEZ_Ym4O5hEIJ1zsRXxq6kglDR-P_Jflai-pJpgb-pszJL1R19R0
-Message-ID: <CACXZaU47FFpcucqfAsVz3nWQL8m6shuEav=bz4-8FL315fZDpA@mail.gmail.com>
+Date: Tue, 2 Jun 2026 17:10:53 -0400
+X-Gm-Features: AVHnY4Jo5j5KsMdE0_CjnH7Dr2uUfnQcjxp_TER95-FV2ehI-A5QpChFeKKfKQo
+Message-ID: <CACXZaU6yawhfya+89xnBuaSOZQQm-Vj2+hiFjs92EoHdn77Xnw@mail.gmail.com>
 Subject: [PATCH] Bluetooth: Fix Use-After-Free in hci_unregister_dev
 To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "marcel@holtmann.org" <marcel@holtmann.org>
 Content-Type: text/plain; charset="UTF-8"
 
 The hci_unregister_dev() function fails to disable the cmd_timer and ncmd_timer
