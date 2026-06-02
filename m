@@ -1,92 +1,93 @@
-Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E8F1624C0
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 14:21:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 968653F0A81
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 14:42:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.50
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780410095; cv=pass; b=LQzOghbOFPbsbQHcj1ATh0/kZH162qbAjFWR3UJxxyNYSsUxEcA9UWCGkewcio+GZy55WmOiJzzST6SWVPkWSauSuPEfRBNOrrtfkVcbqQ1g3+0ja+bCdQuZt2k0pAqieQ49hs3aJblVTXPLkCSBdE431WwgUD2tiNFwYyK34LU=
+	t=1780411362; cv=pass; b=uVewXCCAYtQyHK0FSZiDyhZ65Hr8al7Xhuku6Mjy2+Ccwhc9rjtChDo+EyRn7vs7/PdtHNLvDZmsMnYc4uMrk1fUJyc7ay8F73jawULI3oBpyRKGd9XS3Dq6B800uXWjM/32FzRsMSg4Ase9aR41I3HY4UXoWp7N/lqYu/BKFL8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780410095; c=relaxed/simple;
-	bh=HW/00tBUd6qs14BeZ315DIXYCZBRNZJHW9mRTj1YyIE=;
+	s=arc-20240116; t=1780411362; c=relaxed/simple;
+	bh=ADXso+oQPFZJ7xpVosSBr6LJE1P0hy/0qyw9A6F2sKI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fSbmYNVMhUkagEnfVY08J9Q5j3d+rsGzjYJfSamcIMcza18ijlRDGJDgwICHIv2QMQw7Fa6ZlQXY0wkum29oQX6yZLM9T+D8Uj9UFE2ath1WFwkOGlVHsi29Hj1gYjdb7TE4kSC2r1x4gqIYX7FB7ino1+YVZq3ldpOuskXpNBQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YxSlEc2l; arc=pass smtp.client-ip=74.125.224.52
+	 To:Cc:Content-Type; b=mtz8FNrG6VbDah+2Xig7Yw2/Fh6n0UbPsCW9KJPThp1O8/XS48HFXs/RAOm9OYiCty8IOAwsWUJwSYRsqhmvMMhknLLc8+QOzEYmkpJhdzJverS7NbM8cNRgYHUuJ9YtJiKE7a+2uOw6xp+bcW4vizgn9i3jYzb0g+HpUihh+Ao=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lEMJXyry; arc=pass smtp.client-ip=74.125.224.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YxSlEc2l"
-Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-66043ecf6b3so5196669d50.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 07:21:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780410093; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lEMJXyry"
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-66077e90382so2444072d50.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 07:42:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780411360; cv=none;
         d=google.com; s=arc-20240605;
-        b=eSoU9Y39j7F1CG10aSi0PkiThFKW4hCuyYExr/rRw0GZ7iO1vXLVfIaZIT4gbBONf9
-         VMQq+BjxOBrjYyUxHEDZvbIzyL6t7CN3IoKDfTPzi7YMK6/0XBYZp98icmAHzBZsvhrb
-         FVPXO6FZp6fUNpJ2ziSasoH78LcW71RtVMD1Nv+TnsQvziCP7DII9855o4ZvVW+cztq0
-         FG9B1e7qVSLyjLGclsZyCaIxUsgdYgh6do4Yj2nUMNvjsf2NjK1Mwt0giVGX/ctS42M9
-         25h+Sd4x2iNPqp3QCh0LxrZ7jXYkOJA3YEyEwb9MR6Lj/22dmX5CcuC/jH4DIPTfUR/L
-         +g8A==
+        b=lRPm4CC/fD0cjcR84WCnS34E+2UBBbfAmTTsmnxNC4+iYOFhD4iAb9icqoD4ztGXJt
+         593QOWYZsMqOIZTZG8tXVaHKW45Nm4hr3JxmzUkPdn1efZNhzMjFP/lu3Cm380Yx//Zf
+         WRjghOrorfxJHMN07wt66uqzutv6/Rz7AJ1ya+kCgTIl8D2s32yr1cbzbAa4BEdYuTq/
+         GerQ93vJBZ+lJu0p5b957ZXksYqAAT+cfvFgiKPjhEn/gmcKgMhdqTAQeathhqfOEb3t
+         SP3kHZw/+kPcqF+pMQiUSkCzvOXy/frjELVexPuwYeRxcFUp8taxQ7tN6rGv5+y6ubE8
+         jwfA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=DcoqbAD0uVLNISY5xAIedMKSLtK3D83wKiOGey0HFqI=;
+        bh=iwkhuyiOCt2Z42K02jLJMy4qUn7sTv78SG+LDS2SumM=;
         fh=2DqQXOfvJHXMo1igz8u9erxgiACEuYxcA4BdaZ6Gcbc=;
-        b=EGu+C+gKM1DvMzv/A4TGQp9nVaijRElVo1L/gEGAluijWEarKq5RxnQ9oQ+zsJU9Mn
-         jL06hK9WK6SoKscQ6Bv9kQhTZo4B6ReP1a31v2nqHIvl4GDcTTVZh0Re7aE/t3juJX37
-         mxCyr0WClFwUZHIithS4EsRlGdesM1/WQ/JnYP4WxZJg3hPpoqwxXBZc8swsKXgc8HkL
-         eA7NWXmmSC7xEitOoOfUN9ShK9a7zySY7tK26MgpO/Rv1taiwOLzUipfAMkCLHDWsNYC
-         0mRSEoWyVTxJtIvSFlIF8HWwWWDZRBFJpVZmw6OV0zVXt5TYj/taW4+KZfYPnxBy2aHY
-         NdYQ==;
+        b=VWAd9Yil9+axSZDcbNvIqnio/Xbg7val47MYfX1CRXH8hqAgQaezkw+lD5j3lWEfr6
+         dGqTWNnx2vhXN2ZhKJ998tPRKr7/FM1et63b4tLTocbeuNTiK1919CjhLqrSjkCaG4Nw
+         jQoGzA5dXdCVMf0pU08hdOUZtx1aJbf5Qln6tk60HlzO/Z2oQGNuuJslSlMv7mf6Qusl
+         l4xVcHLf3f20s/ZBL7uRc3XhY//7OoKqRzuHl6BeHRxdZktrq7yw0wG8dwraEUk8rKHu
+         jxRD5jPE5IgyHSvrc6QOPFIVn2iRI/zskPv2H4Z0HBvZUgMzF1w1iutekI/m62zmoEPl
+         vCiA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780410093; x=1781014893; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780411360; x=1781016160; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DcoqbAD0uVLNISY5xAIedMKSLtK3D83wKiOGey0HFqI=;
-        b=YxSlEc2lnowZQ0SsON+y7r+1ta5vZ6gTqCAG1IGtDvTR7UgaidNjeJnJvp4zaCYTeT
-         y3UFSJLoa4KKx13gTMg2A4VjIBVe6mJTB3nXsqn3pZXJeZknHWkFFPhsnjK8R87rxgtL
-         Kf8JtA+6PvZh6TVcQ8rsE11XBcZCHrquUAsbV1GalwUrWgiw5GsO3NgaHhZKFTY2f6OX
-         bdceoU3yBBItN6PlA0S3jUx/KqcKLmUvzJuadV92ftTsvk049jYALPGkJPjZ5+x4V/XB
-         yfzlZAaaRnlzCZwI1tuqYaQuZV1qODk5TY5Nhotxrw+XhI8QpIIRPLQ2kI815eIBNXJI
-         dQRA==
+        bh=iwkhuyiOCt2Z42K02jLJMy4qUn7sTv78SG+LDS2SumM=;
+        b=lEMJXyryiS1Tl12oWZC/G62bJBx793JspW3L0UmOEG63Qw2JNgTi73+HwVru6zH8az
+         NVhiWOMC9Vs7uEeWRn4BJQhDk3jwAoGjNBh6le09HKHOJ7u44CTpkv4uoN8oQ5PbmYY5
+         0ifmoHNCTVS3Rm9vkomR1c7SDgQwi/vN+/IfBvsqitWKKQ0ujQYGL1MuVarZcvQPwhhZ
+         S0/pAQoDCdJzNdkm9uiGNgBwH31TA4dhP7N7s67nohbLxsRpBYp00CvvhPO0yFYWGZ3r
+         YVWkT8iNz3ORdif8Ki3znwwmMNxU5LmvzCKuESsId8QZO3+WxJUovrT2TzRgj+E5RW/u
+         ppwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780410093; x=1781014893;
+        d=1e100.net; s=20251104; t=1780411360; x=1781016160;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=DcoqbAD0uVLNISY5xAIedMKSLtK3D83wKiOGey0HFqI=;
-        b=Qoo5QrG7hP+5RXdbpJgsSf8kfr6SHgKeeoLNuFk/Pcy5cXQhhfPyavwzV/37CcGiOa
-         MuLrAlIlWExAePa2bexNwhIx9N35POhgKCL4LuioQIoN+yi/7KsQl9G3uio3YAJ8kNpf
-         hHm6qUUMyXXb3Zhi82VjDuiiheFsJyg+9/NXawvXX6xOpTlJIf10hFHbg+N5vCNux5DX
-         pBNRvaAIa07M5SBhCUOMUVpf+CqZb4htlz9C3/4dTDQLsF5g0sNIx9UnsKzChfY6xXxa
-         luBPMn3Q3xoyCV75GkIl3YejbIOpmIrCRfJRsNFmVT11Ww/U82oAWqE0kKSD1s3E9Umh
-         +KPg==
-X-Gm-Message-State: AOJu0YzxhU9vM2B4As1F34Ow2SJOG25cDc8Gs8Pt1MsFvJ+gc4eXauJw
-	KwE+rhXZoFQfxi6MfhrRPI3f/sBSoF3TJrSEoDjiuRXetqYba0UhLG7tIUVjvKXchRaQrAnZhZp
-	d6GoChiuQ2jWZO74VRA2uA/Q3gkWp0POmWEe9Pgw=
-X-Gm-Gg: Acq92OGhWdKZFamMhBZNA1mQmKzHpAoLLLcvjDAqVIngynyxoSaQPMRVOHqL+5+8Eq1
-	UjZGAxx3+l607hFmdm6HKbiybofHacAdBSlQN6VQE+wQfE1P8LWuIAgoRhcKY47cWuqs5rotWXI
-	KFb7AQswTjwBE98PScD2BcjK6UyHcCDe2swAs8ad5Zu9pweZgC+A3s9gvQqHHbfjjsR//CunHeB
-	OXs41Bx3m1O7o+WlFhG9+DMtaLszTuCS1/6XrhQF35Q93rzk7xkAiMI1xHwfzddfw/RWbuBbsjk
-	gRnKydxbb8ury5vcGlk5yqQFfYzSh7FUxTWTJoprCkggi4mLBnnKP0zwKFlJKXMTLjhsCFOnKSW
-	Teg==
-X-Received: by 2002:a53:d14b:0:b0:654:5120:60aa with SMTP id
- 956f58d0204a3-6605ffcfbfdmr10541096d50.45.1780410092989; Tue, 02 Jun 2026
- 07:21:32 -0700 (PDT)
+        bh=iwkhuyiOCt2Z42K02jLJMy4qUn7sTv78SG+LDS2SumM=;
+        b=ZpOComwpI4TUEafH3YWnknKcgtEHQEtO52rXQNl4twgp0WjRiDey1zppKL9mXqhUZj
+         iDEK1atqtrY9C9SFGuWW+eHKSedoPhsnGN9e3tC7pBivaQw3Q11BAh26HJNGDaIdXIW6
+         tD4PZmplJvvejo/n5XAzOjlF5JFC8nSExmKo6VTKjPoZ6yxImwJYJnrwx70FSnp8LBQ6
+         JpIQGVrq+9cAL81UAj5F9xfk4GbglVtxDPTfRn+kw6xzmWP9p3BAbir6wRJ4WXdSf7R8
+         pnlyceBTXXmWWPtqttYakpplV7p8PXjIB04su8ZX1IqPkY8YXGDnDoF7CY7bnpcA9K6I
+         axgA==
+X-Gm-Message-State: AOJu0YziKCHtkLReq709O+8847BrOrZLdUnhiKC9/lg97OJBfdJlcGbM
+	96ly7FWvrlctlc52H0c4DxhjPKVUTmdwEaibINMgBpR7GpEzU6yBJDqwcf8U2GWd1uSiTLonp5N
+	elRnYoM/dfxxw8FGWYAAgQ1NixXaekSiGJ73G4Yw=
+X-Gm-Gg: Acq92OGmocxquWEZOzioMjnj3lDM60KItTUzggxjNjpUGIt1uvuy3EyFarhNtGmQ75d
+	qeiOQuPux2i2dpYlWHV8X+rS1Gsv1muhq6PnM+mqfZRbqUFnE3tg5DgjayELvpn8A4N/2B3nr3L
+	ovi4D+BddiQFW+91SlFwA9shXwiyLGHBd1O+QDHdjilelG3zrmqCxH0JoINDP6vlLyu2qn4R+mv
+	DKJQ7nm/q11W8j9tozEGgus34Xzpoeb/X5mqO4IY6hn8NtyIovTQ+6GaRmWq6/odcGJXEYPZ1Ll
+	HEh2PtPaSQSWe2QTE6CRZzW/+Ac4aGEzmwKMpU7v+As3L8QEFPgiMfl+JmrkLufXosoe7KRcNws
+	Zpg==
+X-Received: by 2002:a05:690e:120a:b0:660:406f:61a0 with SMTP id
+ 956f58d0204a3-6605fc53f99mr13384497d50.65.1780411360303; Tue, 02 Jun 2026
+ 07:42:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260522054015.431152-1-wei.deng@oss.qualcomm.com> <20260602031719.679979-1-wei.deng@oss.qualcomm.com>
-In-Reply-To: <20260602031719.679979-1-wei.deng@oss.qualcomm.com>
+References: <20260522054015.431152-1-wei.deng@oss.qualcomm.com>
+ <20260602031719.679979-1-wei.deng@oss.qualcomm.com> <CABBYNZ+vSQWjJyajPxoBs3endFOkU2JGOFoBKvePu8YvZSMEXQ@mail.gmail.com>
+In-Reply-To: <CABBYNZ+vSQWjJyajPxoBs3endFOkU2JGOFoBKvePu8YvZSMEXQ@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 2 Jun 2026 10:21:21 -0400
-X-Gm-Features: AVHnY4IJAAw001GOuCJBU95FipRUIbpMOyryEqd6F1OS-wohHk9PK4BKeutvO2A
-Message-ID: <CABBYNZ+vSQWjJyajPxoBs3endFOkU2JGOFoBKvePu8YvZSMEXQ@mail.gmail.com>
+Date: Tue, 2 Jun 2026 10:42:28 -0400
+X-Gm-Features: AVHnY4J7vLCJyR-7VuSbULzULXVjOEZASpOMcALlqvr3JXKTzkeRhcaN9A5Py1Y
+Message-ID: <CABBYNZKZhamDmBjpKW3GjtF3jrNfLXUTzYaNyz1vbdrgM_Lu4A@mail.gmail.com>
 Subject: Re: [PATCH v2] profile: Set L2CAP IMTU for external profile listeners
 To: Wei Deng <wei.deng@oss.qualcomm.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -95,63 +96,60 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Mon, Jun 1, 2026 at 11:18=E2=80=AFPM Wei Deng <wei.deng@oss.qualcomm.com=
-> wrote:
+On Tue, Jun 2, 2026 at 10:21=E2=80=AFAM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> bt_io_listen() in ext_start_servers() creates the L2CAP listening
-> socket for external profiles without an explicit IMTU. This causes
-> the socket to use the L2CAP minimum of 672 bytes, which is advertised
-> to the peer in L2CAP_CONFIGURATION_RSP.
+> Hi,
 >
-> As a result, when acting as a server (receiver), the peer limits its
-> outgoing PDU size to our advertised 672 bytes. This leads to small
-> OBEX body chunks (~669 bytes) and severely degraded Rx throughput,
-> while Tx throughput is unaffected since the peer's IMTU is not
-> constrained by our setting.
+> On Mon, Jun 1, 2026 at 11:18=E2=80=AFPM Wei Deng <wei.deng@oss.qualcomm.c=
+om> wrote:
+> >
+> > bt_io_listen() in ext_start_servers() creates the L2CAP listening
+> > socket for external profiles without an explicit IMTU. This causes
+> > the socket to use the L2CAP minimum of 672 bytes, which is advertised
+> > to the peer in L2CAP_CONFIGURATION_RSP.
+> >
+> > As a result, when acting as a server (receiver), the peer limits its
+> > outgoing PDU size to our advertised 672 bytes. This leads to small
+> > OBEX body chunks (~669 bytes) and severely degraded Rx throughput,
+> > while Tx throughput is unaffected since the peer's IMTU is not
+> > constrained by our setting.
+> >
+> > The obexd client side (obexd/client/bluetooth.c) already sets IMTU to
+> > BT_RX_MTU (32767) for outgoing connections. Mirror that on the server
+> > side by setting BT_IO_OPT_IMTU to BT_RX_MTU in ext_start_servers(),
+> > so incoming connections advertise the same maximum receive capability.
+> >
+> > Signed-off-by: Wei Deng <wei.deng@oss.qualcomm.com>
+> > ---
+> >  src/profile.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > diff --git a/src/profile.c b/src/profile.c
+> > index dfc5f7161..297959f3c 100644
+> > --- a/src/profile.c
+> > +++ b/src/profile.c
+> > @@ -55,6 +55,8 @@
+> >  #define MAS_DEFAULT_CHANNEL    16
+> >  #define MNS_DEFAULT_CHANNEL    17
+> >
+> > +#define BT_RX_MTU              32767
+> > +
+> >  #define BTD_PROFILE_PSM_AUTO   -1
+> >  #define BTD_PROFILE_CHAN_AUTO  -1
+> >
+> > @@ -1411,6 +1413,7 @@ static uint32_t ext_start_servers(struct ext_prof=
+ile *ext,
+> >                                         BT_IO_OPT_MODE, ext->mode,
+> >                                         BT_IO_OPT_PSM, psm,
+> >                                         BT_IO_OPT_SEC_LEVEL, ext->sec_l=
+evel,
+> > +                                       BT_IO_OPT_IMTU, BT_RX_MTU,
 >
-> The obexd client side (obexd/client/bluetooth.c) already sets IMTU to
-> BT_RX_MTU (32767) for outgoing connections. Mirror that on the server
-> side by setting BT_IO_OPT_IMTU to BT_RX_MTU in ext_start_servers(),
-> so incoming connections advertise the same maximum receive capability.
->
-> Signed-off-by: Wei Deng <wei.deng@oss.qualcomm.com>
-> ---
->  src/profile.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/src/profile.c b/src/profile.c
-> index dfc5f7161..297959f3c 100644
-> --- a/src/profile.c
-> +++ b/src/profile.c
-> @@ -55,6 +55,8 @@
->  #define MAS_DEFAULT_CHANNEL    16
->  #define MNS_DEFAULT_CHANNEL    17
->
-> +#define BT_RX_MTU              32767
-> +
->  #define BTD_PROFILE_PSM_AUTO   -1
->  #define BTD_PROFILE_CHAN_AUTO  -1
->
-> @@ -1411,6 +1413,7 @@ static uint32_t ext_start_servers(struct ext_profil=
-e *ext,
->                                         BT_IO_OPT_MODE, ext->mode,
->                                         BT_IO_OPT_PSM, psm,
->                                         BT_IO_OPT_SEC_LEVEL, ext->sec_lev=
-el,
-> +                                       BT_IO_OPT_IMTU, BT_RX_MTU,
+> This is doing it for all service registered via ProfileManager which
+> is not going to fly, instead we probably need to add a MTU option so
+> the profile entity can pass it instead of getting the default.
 
-This is doing it for all service registered via ProfileManager which
-is not going to fly, instead we probably need to add a MTU option so
-the profile entity can pass it instead of getting the default.
-
->                                         BT_IO_OPT_INVALID);
->                 if (err !=3D NULL) {
->                         error("L2CAP server failed for %s: %s",
-> --
-> 2.34.1
->
->
-
-
---=20
-Luiz Augusto von Dentz
+Actually there are no options, it's built from `default_setting`,
+which doesn't set any MTU for some reason. For the OBEX profiles it
+probably makes sense to add an MTU field so it gets properly set.
