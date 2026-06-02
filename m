@@ -1,177 +1,173 @@
-Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 888B238BF6C;
-	Tue,  2 Jun 2026 18:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780425526; cv=pass; b=mD7HjnYtaVrnu1Dl5zvYNkEHsi6L+T/29igeWtFggJ6GG0T6bM0GaOBksn8hjMT7YOm5VeBPuKv274X9uvu/yI133zLQcP+KZvaGtCZ7ux0xZw9BrPDPPoQYCXQ4WxO6BTRiR1WM+rJymOTOqOXq071IsJFKCr9bSyLTMTwqia0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780425526; c=relaxed/simple;
-	bh=/vC9qk/++wVxd8/XAI/30MRORw4uUJcw1ko9SHcAF1w=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=j5lNwED7BtU3lz7O95ObhI2XiWzttMUyKjQ6/trZMeDIanrF67g2AiWdJJosSfzmmMPA2Fb4FWTuXTacWrLRviyyfwY1YQvnivoEJ8635B0jPzaUDjJrjMSkvRBJiqmVhfA43NF7KYkylakm2MidmqbzzF9XT01u+zKt2uuH984=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rong.moe; spf=pass smtp.mailfrom=rong.moe; dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b=qIDsWr5j; arc=pass smtp.client-ip=136.143.188.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rong.moe
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rong.moe
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC398396B8C
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 19:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780427694; cv=none; b=uZfx55kFALNt0i3rHD2PFuamEQdBB+EkU+M8UEkEGjMruN9s9F+R8xWiV1h1XSvtMMNaLUJlTObOMtmiY2gzZgNRER6V7OLAE16T1qvwa/uA1IEfJvMmZG9xrtv4bUjhO1/C+rk7XuLuJGmWCCNVLeC0jbB2ulqMfN/c1W9qnPM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780427694; c=relaxed/simple;
+	bh=aXz8S7RjF8A505KCa+a7+pLiBHLJz6ujgxDO/ZMQqR0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=RHHAwDcofeA2wxlmiJySHK9qDVboAmnWyYyY/N070vFh7g8rNhkB9s+o+qnOIBB2kerDVuTRAw2JIDzQJO8DNvqiL0Y0ciaHtlOOWQA9tCmzcyiDz9NL6guMjhsDrLzoxQj+eYhy8z/+YLdhH/0oCW9sgiZs+bvfZW8ERRhDUrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mgvAtfYb; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b="qIDsWr5j"
-ARC-Seal: i=1; a=rsa-sha256; t=1780425508; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=TvA/v8z3zJpF6ASip88x0r5DmZ+Ubddx5xhoYTPwmXl0KG9ySNblDLqt8b1bYDScnyEdZqW/WJp16M1UybL1Zohx6qIBtyCEF5SIXFWBXGz5wl9h9BbZoZcdw3RXCrS7YAD9fCgC9zfSfPKPIPsmnur0kIMc/QOfcRWxCHH9G+Q=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1780425508; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=o6QSHn+bWpbFxZV+XX27moTnu4Gwm7clToWp0ddbfl0=; 
-	b=djO7bNSIgCdP6AXpFPqS/mImLg4ffyO1uTzNsrtF7CSoE0Rd3ht4f5W+OoUpZZOLwPYCgBjTQF+XEEl5QTteEvofZEj08xy5ZXQ65dPBsANgr4N86epH/EO4r6bsr7+U5Gqscv3OjhkDbHdG09Jn55VLnW7D1fEOeY6tuyHVi5E=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=rong.moe;
-	spf=pass  smtp.mailfrom=i@rong.moe;
-	dmarc=pass header.from=<i@rong.moe>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1780425508;
-	s=zmail2048; d=rong.moe; i=i@rong.moe;
-	h=From:From:Date:Date:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Message-Id:To:To:Cc:Cc:Reply-To;
-	bh=o6QSHn+bWpbFxZV+XX27moTnu4Gwm7clToWp0ddbfl0=;
-	b=qIDsWr5jZkzSVcnuQikmp3szrn+vZTVeytDgrP5qLV1h9QBPI9JYm+zXTtFs4KPM
-	/DyOo0a1Qf4Lx02FLWAWafu/Uju1/8AGysTNxfxOYWu9OKU6wuzx9jf3B55ro8q0Nb8
-	Yz+3z1Gc6SuCG3J1Dbqnh0FXGaWQIarqIKu9167ADv3kYzv8qcN9IuZI5wS0wLm8gQe
-	wL9+mO507Xw/KdS7aIDycT7syCwf4EE5oHlX+D7UYo9p6FoPkWWCgcQdpQiVXJN+6EU
-	GQP/zVf7UycquEFzss7M/VTFFBXp77ZQuecvoxZDkebKC16i4qV6CB5gcV24tqEK7hP
-	lDwmTwDA9A==
-Received: by mx.zohomail.com with SMTPS id 1780425506915761.0970031020775;
-	Tue, 2 Jun 2026 11:38:26 -0700 (PDT)
-From: Rong Zhang <i@rong.moe>
-Date: Wed, 03 Jun 2026 02:38:10 +0800
-Subject: [PATCH] Bluetooth: btmtk: Disable remote wakeup for MT7922/MT7925
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mgvAtfYb"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-8ccdf8d4ac5so51765716d6.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 12:14:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780427692; x=1781032492; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=2kHrV/NlfrF9PO3koj1Gc9lKOE+z4g+5AJzLuIy6yp8=;
+        b=mgvAtfYb8XzxzJKciMH+N3c2EBjR8NsU+dnmCCRLrkDkLGt3N5on7CUn/PzIWcRQiR
+         jqs+Rx6B9PeNy28ga8RB0TcrsNH1wPcRCXCjlW+ftioYo01ec9Z9o1EEUuGR2KNRxsT3
+         QkTFMRvJyxKAvH/CflOtFQgG1FvvwSpQuHnoev47w0SD31nME4JWLWhkYqQXERKXiKUS
+         B4V3U4aWC5BY0Nd5Gaxb+jtwzUtnurzJ4wzJQ+iAbnak0/UaPdP3YhezFcYReUsOpJ3C
+         tcRvSPP3lYgB5qnE2Fzojx75eQNenFuwPK5ZQmk845N7qCb1LcmWEQBlwKI+MUXuj/7o
+         xxWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780427692; x=1781032492;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2kHrV/NlfrF9PO3koj1Gc9lKOE+z4g+5AJzLuIy6yp8=;
+        b=GjBJ/S5QRcOo5eya6597kEn3Wz8Z9VgpdoU04gWrJF8ECYWylrUn5CxC5SvBGUl6AQ
+         bXTXjUM5Ds4JUNJpaamkOWMEm4SlYvdb3B2V/55dQ+BWiqlzwZRO6z7p6yak4u2uKJed
+         IXNiXOmPLXF/z1O/hAu79887z2p3XP48MOR3wcAPHVRXlD/nN1m+Gg+T8sV0Sg+dZzSz
+         xSkbHqb5diPsPM/7LjAHQyMzFrX6oBQzc1m0HQy9aGXeGknGhb8TeRbPbexGit5L46Ue
+         Lmh3spi8wYXypENp4Ousn2Gqd4Rr6nMbc8QLYMAev1wkBokKlsQc3oluB36MoX7cy/4M
+         cUEg==
+X-Gm-Message-State: AOJu0YwDEBeDx1I0w75oq7QqyWNfEzzQ1di9nMaogBj/0AcrYnysUkxp
+	HUXt0gOQuI0lnfDddP7lKYucuEV7+9jtVV5LZ1lzzmYe6pO/KEn6h8+jYorVLw==
+X-Gm-Gg: Acq92OGNz9ilkbKCmD6CsBdLDmjtlnMZY5M/2fRuH97r3R97utKILKVtSNEJvyIJARS
+	lf+cEBTrozqMG6u/4HHKxFlxXxHskAq8HtUrOa99TEgOlbIegF2XuI1gONaZwV3oEuq/TYkmauL
+	1HpmBVWYm6STcf+tUWa49dj+3T9hXfHiLa6BwnqFtg2DNScI7ZAIbGbfmryejsjTxUjYtguiXAj
+	D5WsDLlr4dWOpGCW5M0d7zeZHHsn+Ix7NnMPryZOpjeT7C62Zx9YRMRi4vJDZXhNK5oJZklTarD
+	q/DLeepqswxOijXr+ZQDa2IwsvaQR0LIfCvf0VTQUBQvAZuDwFrJYq90EjLYhJYireLW5BbhPj7
+	ioXzDYft32lgPhvSLgijbpN1wIXh/n9JlxytYOqCR6T3BF/mvJw0FJEZMerJew1jMYFZWBREFI3
+	sGrp6y5Daf2MsO99P94PFOmQRG3Fv4Z1F7rE/SZL1bFw==
+X-Received: by 2002:a05:6214:e69:b0:8ce:c26e:b75c with SMTP id 6a1803df08f44-8cecb2593a4mr15447786d6.10.1780427691795;
+        Tue, 02 Jun 2026 12:14:51 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.95.146])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ceccda2601sm458886d6.6.2026.06.02.12.14.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 12:14:51 -0700 (PDT)
+Message-ID: <6a1f2bab.ff298dd7.3321df.a21f@mx.google.com>
+Date: Tue, 02 Jun 2026 12:14:51 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2761713654600875759=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, bestswngs@gmail.com
+Subject: RE: [v2] Bluetooth: eir: Fix stack OOB write when prepending the Flags AD
+In-Reply-To: <20260602170621.1454711-2-bestswngs@gmail.com>
+References: <20260602170621.1454711-2-bestswngs@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============2761713654600875759==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260603-btmtk-remote-wakeup-v1-1-5c1006442f36@rong.moe>
-X-B4-Tracking: v=1; b=H4sIABEjH2oC/yXMSw6CMBRG4a2QO/YObJsIboU4KPUvXgmP9IEmh
- L1bYfgNztkoIggi3auNAlaJMk8F10tF7mWnHizPYrJGKaW15i6NaeCAcU7gjx2QFzaN8cY1N+v
- rmkq5BHj5Htf2cTrm7g2X/iva9x8Aib94dwAAAA==
-X-Change-ID: a4222333-btmtk-remote-wakeup-494f4c97af88
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- Rong Zhang <i@rong.moe>
-X-Mailer: b4 0.16-dev-d5d98
-X-ZohoMailClient: External
 
-These NICs are often reported to lose their Bluetooth interfaces, i.e,
-their USB interfaces suddenly become completely unresponsive, causing
-the USB core to reset them, only to find that they are no longer
-accessible. A power cycle is required to make the Bluetooth interfaces
-recover.
+This is automated email and please do not reply to this email!
 
-After some investigations, I found that their USB autosuspend remote
-wakeup capabilities are so broken that they are precisely the culprit
-behind the issue:
+Dear submitter,
 
-  [27452.608056] hub 3-0:1.0: state 7 ports 5 chg 0000 evt 0020
-  [27452.702018] usb 3-5: usb wakeup-resume
-  [27452.716038] usb 3-5: Waited 0ms for CONNECT
-  [27452.716642] usb 3-5: finish resume
-  /* usbmon showed that the device was completely unresponsive to any
-     URBs after the remote wakeup */
-  [27457.836030] usb 3-5: retry with reset-resume
-  [27457.956046] usb 3-5: reset high-speed USB device number 4 using xhci_hcd
-  [27463.332047] usb 3-5: device descriptor read/64, error -110
-  [27478.948117] usb 3-5: device descriptor read/64, error -110
-  [27479.172430] usb 3-5: reset high-speed USB device number 4 using xhci_hcd
-  [27484.332035] usb 3-5: device descriptor read/64, error -110
-  [27499.940039] usb 3-5: device descriptor read/64, error -110
-  [27500.164060] usb 3-5: reset high-speed USB device number 4 using xhci_hcd
-  [27505.196142] xhci_hcd 0000:67:00.0: Timeout while waiting for setup device command
-  [27510.576045] xhci_hcd 0000:67:00.0: Timeout while waiting for setup device command
-  [27510.784038] usb 3-5: device not accepting address 4, error -62
-  [27510.912215] usb 3-5: reset high-speed USB device number 4 using xhci_hcd
-  [27515.948307] xhci_hcd 0000:67:00.0: Timeout while waiting for setup device command
-  [27521.324380] xhci_hcd 0000:67:00.0: Timeout while waiting for setup device command
-  [27521.525107] usb 3-5: device not accepting address 4, error -62
-  [27521.525928] usb usb3-port5: logical disconnect
-  [27521.525996] usb 3-5: gone after usb resume? status -19
-  [27521.526230] usb 3-5: can't resume, status -19
-  [27521.526434] usb usb3-port5: logical disconnect
-  [27521.526469] usb usb3-port5: resume, status -19
-  [27521.526493] usb usb3-port5: status 0503, change 0004, 480 Mb/s
-  [27521.526528] usb 3-5: USB disconnect, device number 4
-  [27521.526736] usb 3-5: unregistering device
-  [27521.804029] usb 3-5: new high-speed USB device number 5 using xhci_hcd
-  [27527.076067] usb 3-5: device descriptor read/64, error -110
-  [27542.692027] usb 3-5: device descriptor read/64, error -110
-  [27542.916047] usb 3-5: new high-speed USB device number 6 using xhci_hcd
-  [27548.068043] usb 3-5: device descriptor read/64, error -110
-  [27563.684073] usb 3-5: device descriptor read/64, error -110
-  [27563.792133] usb usb3-port5: attempt power cycle
-  [27563.924381] hub 3-0:1.0: port_wait_reset: err = -11
-  [27563.925213] usb usb3-port5: not enabled, trying reset again...
-  [27564.184398] usb 3-5: new high-speed USB device number 7 using xhci_hcd
-  [27569.196322] xhci_hcd 0000:67:00.0: Timeout while waiting for setup device command
-  [27574.572040] xhci_hcd 0000:67:00.0: Timeout while waiting for setup device command
-  [27574.776053] usb 3-5: device not accepting address 7, error -62
-  [27574.900165] usb 3-5: new high-speed USB device number 8 using xhci_hcd
-  [27579.948039] xhci_hcd 0000:67:00.0: Timeout while waiting for setup device command
-  [27585.324331] xhci_hcd 0000:67:00.0: Timeout while waiting for setup device command
-  [27585.528040] usb 3-5: device not accepting address 8, error -62
-  [27585.528389] usb usb3-port5: unable to enumerate USB device
-  [27585.528424] hub 3-0:1.0: state 7 ports 5 chg 0000 evt 0020
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1104768
 
-To reproduce the issue, these conditions must be met:
-- a noisy radio environment (cafe or office) to cause frequent remote
-  wakeup events
-- no Bluetooth device is connected, so autosuspend is not prohibited
-- the Bluetooth interface is opened, so remote wakeup is enabled when
-  the device runs into autosuspend
+---Test result---
 
-Then I can reproduce the issue within sereval hours each time.
+Test Summary:
+CheckPatch                    FAIL      0.69 seconds
+VerifyFixes                   PASS      0.11 seconds
+VerifySignedoff               PASS      0.11 seconds
+GitLint                       FAIL      0.28 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      24.67 seconds
+CheckAllWarning               PASS      27.02 seconds
+CheckSparse                   PASS      26.04 seconds
+BuildKernel32                 PASS      24.01 seconds
+TestRunnerSetup               PASS      529.67 seconds
+TestRunner_l2cap-tester       PASS      60.82 seconds
+TestRunner_iso-tester         PASS      80.07 seconds
+TestRunner_bnep-tester        PASS      18.82 seconds
+TestRunner_mgmt-tester        FAIL      215.41 seconds
+TestRunner_rfcomm-tester      PASS      25.46 seconds
+TestRunner_sco-tester         PASS      32.57 seconds
+TestRunner_ioctl-tester       PASS      26.03 seconds
+TestRunner_mesh-tester        FAIL      25.87 seconds
+TestRunner_smp-tester         PASS      27.08 seconds
+TestRunner_userchan-tester    PASS      19.66 seconds
+TestRunner_6lowpan-tester     PASS      22.53 seconds
+IncrementalBuild              PASS      23.19 seconds
 
-Increasing TRSMRCY or setting USB_QUIRK_RESET doesn't help at all.
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v2] Bluetooth: eir: Fix stack OOB write when prepending the Flags AD
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#136: 
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Assisted-by: Claude:claude-opus-4-8
 
-Since the remote wakeup capability is super broken, just disable it to
-get rid of the troubles. The device can still be autosuspended when
-the bluetooth interface is closed, which won't break the device as
-remote wakeup is unneeded in this case.
+total: 0 errors, 1 warnings, 0 checks, 15 lines checked
 
-Link: https://bbs.archlinux.org/viewtopic.php?id=308169
-Link: https://bbs.bee-link.com/d/7694-gtr9-pro-ai-max-395-usb-issues
-Signed-off-by: Rong Zhang <i@rong.moe>
----
- drivers/bluetooth/btmtk.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 8ff66b276af0..3d2a8598892b 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -1379,6 +1379,16 @@ int btmtk_usb_setup(struct hci_dev *hdev)
- 		break;
- 	case 0x7922:
- 	case 0x7925:
-+		/*
-+		 * A remote wakeup could cause the device completely unresponsive, and
-+		 * recovering from such a state needs a power cycle.
-+		 *
-+		 * Since the remote wakeup capability is super broken, just disable it
-+		 * to get rid of the troubles. The device can still be autosuspended
-+		 * when the bluetooth interface is closed.
-+		 */
-+		device_set_wakeup_capable(&btmtk_data->udev->dev, false);
-+		fallthrough;
- 	case 0x7961:
- 	case 0x7902:
- 	case 0x6639:
+/github/workspace/src/patch/14607518.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2] Bluetooth: eir: Fix stack OOB write when prepending the Flags AD
+
+8: B3 Line contains hard tab characters (\t): "	memcpy(ptr, adv->adv_data, adv->adv_data_len);"
+16: B1 Line exceeds max length (82>80): "  BUG: KASAN: stack-out-of-bounds in eir_create_adv_data (net/bluetooth/eir.c:301)"
+39: B1 Line exceeds max length (81>80): "v2: drop the kernel-added "Flags" AD when it does not fit with the instance data,"
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.247 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.452 seconds
+Mesh - Send cancel - 2                               Timed out    1.990 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/275
 
 ---
-base-commit: e43ffb69e0438cddd72aaa30898b4dc446f664f8
-change-id: a4222333-btmtk-remote-wakeup-494f4c97af88
+Regards,
+Linux Bluetooth
 
-Thanks,
-Rong
 
+--===============2761713654600875759==--
