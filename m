@@ -1,59 +1,59 @@
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21DE3859F0
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 21:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08EC739891F
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 21:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780434036; cv=none; b=fTGzW0t7qqmsLC+ATnpZLynbjZRLNov6Amjngxr9AKDK5O5Bj9Z4cJzAVgy/1urim/WGf6Fcn3gsHnxmX+oRyK8e0hNKsVse2MgTCwcGHxZ1Ot8ptQh8gO3A4gWWsovbRTeiCMTsyahFPBZZ8yjb0MhB3w6U/IAgnyPlFLRUHo8=
+	t=1780434037; cv=none; b=sK9SBdF2585r7Y2hvFzPLp7KSRFQhh2yp56OehZ3L1Y03vSKfbpBndeiYVuYfRVOWz94bnkrWmKV9cxa+D+ileDylRD77zLv6dk3OYd586K6mgK5JSj0Eksy4xA9Zry7VB8cJb8JC2a6mkpr7MG7KddmFq0FMwBOMch2HtWxJIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780434036; c=relaxed/simple;
-	bh=91FRLqo09leHOfEK6+9ARCLfYWmf271AJ9VtRWEON58=;
+	s=arc-20240116; t=1780434037; c=relaxed/simple;
+	bh=1VICLYTtT8TpkDFPVJf85WdgCa9waJ5stKoKHelrvLQ=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=arQqO3EDO00a4gdNB8LSUNkIuE7GxcEg9g/RQ4ID9TdPDSzs+eWBNP/cn50H7zTg5uD1n8orZfFBOZ43YPS4JS/zTzxuCwMFDbgG7j4TxpsdsVJy618rM6GwjOZAnKk0Bx6t413UF4GNyrsznLzbnz3gJWDAPq1yYeW/smLu69M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jezd62Zy; arc=none smtp.client-ip=209.85.222.45
+	 MIME-Version; b=j6QWoHUVC1kMADLbEocMYWxZqPzH2zCJc8aEMb1CPI4xIG8F7nI/1Zr18yKKc1qd0i8eAcoWhhTUZWgd9AX+PQp+3tPmYJ1EAQ1cKLiM8XNtggFneRJOvq4AUBMCKkIjsWwh7LkhKsykcKqLgT8bfbh6loBEc1E5N/1Cn8eS7Uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qpSup+Tr; arc=none smtp.client-ip=209.85.222.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jezd62Zy"
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-9639e91e773so1899737241.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 14:00:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qpSup+Tr"
+Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-9639b1ef167so1634522241.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 14:00:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780434034; x=1781038834; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780434035; x=1781038835; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yV3gywVs9F9RhUHwuQZGUDFPvVFFnaQ2a77xeZdNJC0=;
-        b=Jezd62ZygKjX7lNxXdnY7vixZ0V8QyLif3xlHgmNHmhl8XP/TxMDVxpHKGOtwA2qM8
-         VSDLqYFMJkIj+csjuahZNl7gSLbIlL8wAwjgW/ThHY3LZsyvNbLT737MXG3AYlVKTkwV
-         Bh9L/0wH+geogFuuxYPz1GV2MW39SfYw1Rf9INe/RsyjrYhaK8WUvj2tWw8msAMH30oG
-         XpEokIvR3eOCP+5v+7pfYmkDISUWW64GSO5/riDAB8rDcI8QtBFWDD5L/nWux+Fg6wDN
-         /50fve3OoxIevF+x+Zl1KlT73hmeiOU361/cLgwVyjl4vVUszt13HXo2PK6kRISbMQbX
-         bw6Q==
+        bh=m7N9eqTcdvHE0GcR2OZ5t0K+PXwREL+74RQ/0cgTyDM=;
+        b=qpSup+TrHuZU1tcLw/K+pVx//bxDbOwVTsaf0Oib13psZhlcgE7WGlGmUwlhTRStZ8
+         hqRK727Qglo8w30Co8Gp2Blh/vCy18EYDLpJ4Z7e68tDM85cfAjJaOg81cSb0KLLLUrh
+         L4yW+r77Kz5t6m9ZFPEf7BIaNdYvuhqrl7q7Gj0qAIWNS+1hNVUfQIvX1SR6CFuDMx66
+         +2IG58vSCPxCUPtKh892y7W0XznVVy2vUYEMxyTu1OsDLSQWtTGGVg9FR2yDeRVD15GJ
+         /XzpZYTIT/AAyX9sRPclMnzUzgwLMKuRMhbF6aP33uD9So/2gdzQdu7/n88pmctPiNS4
+         SYuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780434034; x=1781038834;
+        d=1e100.net; s=20251104; t=1780434035; x=1781038835;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=yV3gywVs9F9RhUHwuQZGUDFPvVFFnaQ2a77xeZdNJC0=;
-        b=bq/jNVSHp6SKXr3obESaBXaYpo2mNJRXpWwRoh576iRVYK7T3j6CqeHfd6zDc9Tlp3
-         cUuntW3runh8p4DXBpiPcZNqTsuagVZrdK+kz+oHpju9vaVP5YqlpBd8EI2q5wZhwxWq
-         SQ+Zu6a3tmbgaEE8CZYJFXidu4bjihCwxbBYK57CHGXqCNricY+ML9akdJXlOvBS0Yxa
-         wZgQHUJdFB4OKXds1ce889QYOottQQLuQj9qY4F6WMW2YAI7xX0vg+bhmqODggcb3u0G
-         JwvBHBExBroxAfpa79iGWHRU98imnkuJenWLuSDVvIupT99A+OAvC5ywjYJ6RCEhTsW1
-         Zr5Q==
-X-Gm-Message-State: AOJu0Yz47wG2ZaOB/pbk7X+S6Aejw/WZn1AAAL5y1fCGlRXFb5gZFOJr
-	tm/CeixdooITBdFNhl5hX7hrnnWJ8p258DgIvwm2w/5cGfJjrPkDdvCPDt4A7kk0H9A=
-X-Gm-Gg: Acq92OERb7IauhyUzb/rnadkZUtdYqnJVSg3ll+PNTPVYyvbp4S39q+Rybb5+1Pl7PT
-	O9EDRBnkxUERZjfZNayTAnvjqbSJD2o49Cwfeuv39pw5g13RL5sB+uEiFmlNfJU7NJZ422tdqEz
-	x1gPqVgQzFWr3PRVNFMlgGuu/irb6Owb4hpYdFmW5svg4FyRxhIT1zkqEVhDlKPz1qwxRsEjwzS
-	wzAi0f0KyUrejMGea8rpPl7uGAuUM2Erla5yhBw+76ojeDC/Rt2Ec6FPa6fXEaMpep8olXouLZW
-	SfUHVbcbDOSBvdv/M5XoC2nfFIUgNI46m1QUsLvrWSCP3fstMjNNW35C+tkMoAxCrGvo1G9y+rp
-	6gJ63jKF8LSSijWtTa3rD1wr7hQd2M/XNMr/R1ePv626+7gpzuj4EXA+hUS0WVulo4gyAtQ4ax+
-	+7z7oG7HpHsExImJoE9/qWgnWP1KMw+a5T3miTyD9CV+Y+yF8slrVH7TxAWL2E51aYFqPf4Cn5k
-	js1BEyn7YwCJ7neNGKoXciLSKnq
-X-Received: by 2002:a05:6102:9d3:b0:631:b834:e052 with SMTP id ada2fe7eead31-6ec2f00709fmr187974137.12.1780434033668;
-        Tue, 02 Jun 2026 14:00:33 -0700 (PDT)
+        bh=m7N9eqTcdvHE0GcR2OZ5t0K+PXwREL+74RQ/0cgTyDM=;
+        b=KnweW0LHyGqib3MNM7g0LUW8gBflafL79JpBcDvQHKS4gaRjaPOBs3hMZl5KW4cHPG
+         tbf4kxLBZGNK/IELwscgcpvT4Nhpxkede9roKQRnm+g0WiyMBGwcLVHoFAaVEfCtt43g
+         clqtZ92n85JMuUnuGocgPUKQfKP8RnjvYhBMiRv2Ta8ig+25aCs5i48sp4ZMvIdar8jZ
+         Jj6/EkmD08gmH/5D6JXgTG0v45yx9VSd+OXhVDQ0JedIz1cQ4zjHVu7AHhaKm95vsHit
+         P8v/HIq1NzkopWBguZkJOvHEJOMUiwxY1devQhYXOKdDMusFTtRZFfTQ/cqDPdPQf84q
+         gJVQ==
+X-Gm-Message-State: AOJu0Yz1vV0vIcyqvZfdqrr4Pm4r9S17dvyOKJ1PeqdIM9B4MrM3lorS
+	XwP6HiZxL5pTbYSERXNcufQvTPuoEmBPPwJFyetOj1QBRNLmPLT12p96g8DuO+haqNs=
+X-Gm-Gg: Acq92OEiDOzffFwp//9oj0Cai1a09+kITn/CKvgz1HsBkXa8gY5LLYro3jM+fcwvhaX
+	vX8C9SLylRAfTXVlZlicDpLVy2ucoV7/dRDVbXdqDdLoCT8Nrp1bPREZdqw/8Y+uyDAFwBc9uG8
+	RY/wvZ2gOerwByVv56n/YSe0pCsAvrciw64e2tOePItKCFRjbTj8nchYIl36fzr8kzHNefiz70G
+	gmSBdLOKtWmYirhTqAd4rUfxn0uS/iKxpaiuyJWC2GlENDQ1A4CtIn587OyWEP/5IP9eZCcKC3S
+	o4cvYyB8pDxqbtsObSb8C8DXpvbhUEBR6jOMbsKOUrs2NfWgViHwCb+RbHVc2RfK6dpnOY/dYp/
+	UV6o6dkQ142d6Z4sNIoZrDcA5+pThXsqKCYOChY+jNsf2CTKumWLrkwDL4jvry01oGpI8qUn59Q
+	yfPV5K/6I/Do8ZMbsSqdztzfwiuTbbKjU8Fjk1bPA41lkquDKexlBpwOF9C1CXjQAAlXfTOhepA
+	lwjT8NaE9hdkYFXUdRALdG7wxjv
+X-Received: by 2002:a05:6102:32c4:b0:5ff:c5c8:2734 with SMTP id ada2fe7eead31-6ec4881b223mr195146137.25.1780434034711;
+        Tue, 02 Jun 2026 14:00:34 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
         by smtp.gmail.com with ESMTPSA id ada2fe7eead31-6eb6668702fsm496943137.10.2026.06.02.14.00.33
         for <linux-bluetooth@vger.kernel.org>
@@ -61,9 +61,9 @@ Received: from lvondent-mobl5 ([72.188.211.115])
         Tue, 02 Jun 2026 14:00:33 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/4] profiles/audio/bass: Handle PA_SYNC_NO_SYNC in handle_mod_src_req
-Date: Tue,  2 Jun 2026 17:00:20 -0400
-Message-ID: <20260602210022.213562-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 3/4] profiles/audio/bass: Fix delegator reprobing after disconnect
+Date: Tue,  2 Jun 2026 17:00:21 -0400
+Message-ID: <20260602210022.213562-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260602210022.213562-1-luiz.dentz@gmail.com>
 References: <20260602210022.213562-1-luiz.dentz@gmail.com>
@@ -77,160 +77,93 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When the delegator receives a Modify Source operation with pa_sync set
-to PA_SYNC_NO_SYNC while already synchronized to PA, release all
-setups instead of updating BIS sync which would not apply the
-requested termination.
+delegator_disconnect left the old delegator in the delegators queue
+after calling device_remove_profile. When a new delegator was created
+for the same device (e.g. on a subsequent Add Source after Modify
+Source removal), delegator_attach would find the stale entry and
+return early, leaving the new delegator without a service. This
+caused the "Unable to probe service" error and prevented the BASS
+bcode exchange from working on reconnection.
 
-Also reset the encryption state to no encryption when the last BIS
-index is cleared from a subgroup, so subsequent source additions
-start with a clean encryption state.
+Fix by removing the delegator from the queue, clearing service user
+data, and calling delegator_free before disconnecting the service
+and removing the profile. This also fixes a potential use-after-free
+where delegator_disconnect accessed dg fields after device_remove_profile
+could trigger delegator_detach -> delegator_free through the
+bap_detached callback chain.
+
+Also add validation in bass_req_bcode to detect and discard invalid
+(all-zeros) broadcast codes that may have been stored from a previous
+connection.
 ---
- profiles/audio/bass.c | 72 ++++++++++++++++++++++++++++++++++++++++---
- src/shared/bass.c     |  6 ++++
- 2 files changed, 73 insertions(+), 5 deletions(-)
+ profiles/audio/bass.c | 35 ++++++++++++++++++++++++++++++-----
+ 1 file changed, 30 insertions(+), 5 deletions(-)
 
 diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
-index f018f8b3ad7f..5eb7bff076bb 100644
+index 5eb7bff076bb..a5ef80fbc835 100644
 --- a/profiles/audio/bass.c
 +++ b/profiles/audio/bass.c
-@@ -420,7 +420,13 @@ static void setup_clear(struct bass_setup *setup, int bis)
- 
- 	bt_bass_clear_bis_sync(dg->src, bis);
- 	setup->stream = NULL;
--	queue_remove(setup->dg->setups, setup);
-+
-+	if (!queue_remove(setup->dg->setups, setup))
-+		/* Setup has already been removed from the queue (e.g. during
-+		 * handle_mod_src_req PA_SYNC_NO_SYNC processing). Skip
-+		 * disconnect check and free since the caller handles cleanup.
-+		 */
-+		return;
- 
- 	/* Remove any pending bcode request associated with setup */
- 	req = queue_remove_if(dg->bcode_reqs, match_bcode_setup, setup);
-@@ -596,6 +602,8 @@ static void bass_remove_bis(struct bass_setup *setup)
- {
- 	struct queue *links = bt_bap_stream_io_get_links(setup->stream);
- 
-+	DBG("%p", setup);
-+
- 	queue_foreach(links, stream_unlink, setup->stream);
- 	bt_bap_stream_release(setup->stream, NULL, NULL);
- }
-@@ -618,6 +626,8 @@ static void setup_disable_streaming(void *data, void *user_data)
- 
- static void bass_add_bis(struct bass_setup *setup)
- {
-+	DBG("%p", setup);
-+
- 	queue_foreach(setup->dg->setups, setup_disable_streaming, NULL);
- 	setup_configure_stream(setup);
- }
-@@ -1941,8 +1951,40 @@ static int handle_set_bcode_req(struct bt_bcast_src *bcast_src,
- 	return 0;
- }
- 
-+static bool check_bis_sync(struct bt_bass_mod_src_params *params, uint8_t bis)
-+{
-+	uint32_t bitmask = 1 << (bis - 1);
-+	struct iovec iov = {
-+		.iov_base = params->subgroup_data,
-+		.iov_len = 0,
-+	};
-+
-+	/* Calculate subgroup data length based on each subgroup's
-+	 * bis_sync (4 bytes) + meta_len (1 byte) + meta fields.
-+	 */
-+	for (uint8_t i = 0; i < params->num_subgroups; i++) {
-+		uint32_t bis_sync;
-+		uint8_t meta_len;
-+
-+		iov.iov_len += sizeof(bis_sync) + sizeof(meta_len);
-+
-+		memcpy(&bis_sync, params->subgroup_data + iov.iov_len -
-+				sizeof(bis_sync) - sizeof(meta_len),
-+				sizeof(bis_sync));
-+		memcpy(&meta_len, params->subgroup_data + iov.iov_len -
-+				sizeof(meta_len), sizeof(meta_len));
-+
-+		if (le32_to_cpu(bis_sync) & bitmask)
-+			return true;
-+
-+		iov.iov_len += meta_len;
-+	}
-+
-+	return false;
-+}
-+
- static void bass_update_bis_sync(struct bass_delegator *dg,
--				struct bt_bcast_src *bcast_src)
-+				struct bt_bass_mod_src_params *params)
- {
- 	const struct queue_entry *entry;
- 
-@@ -1954,11 +1996,14 @@ static void bass_update_bis_sync(struct bass_delegator *dg,
- 
- 		state = bt_bap_stream_get_state(setup->stream);
- 
--		if (!setup->stream && bt_bass_check_bis(bcast_src, setup->bis))
-+		DBG("stream %p: BIS %d state %s(%u)", setup->stream, setup->bis,
-+				bt_bap_stream_statestr(state), state);
-+
-+		if (!setup->stream && check_bis_sync(params, setup->bis))
- 			bass_add_bis(setup);
- 		else if (setup->stream &&
- 				state == BT_BAP_STREAM_STATE_STREAMING &&
--				!bt_bass_check_bis(bcast_src, setup->bis))
-+				!check_bis_sync(params, setup->bis))
- 			bass_remove_bis(setup);
+@@ -257,9 +257,17 @@ static void bass_req_bcode(struct bt_bap_stream *stream,
  	}
+ 
+ 	if (dg->bcode) {
+-		/* Broadcast Code has already been received before. */
+-		setup_set_bcode(dg->bcode, setup, reply, reply_data);
+-		return;
++		uint8_t empty_bcode[BT_BASS_BCAST_CODE_SIZE] = {0};
++
++		if (memcmp(dg->bcode, empty_bcode, BT_BASS_BCAST_CODE_SIZE)) {
++			/* Broadcast Code has already been received before. */
++			setup_set_bcode(dg->bcode, setup, reply, reply_data);
++			return;
++		}
++
++		error("dg %p has invalid bcode", dg);
++		free(dg->bcode);
++		dg->bcode = NULL;
+ 	}
+ 
+ 	/* Create a request for the Broadcast Code. The request
+@@ -376,20 +384,37 @@ static void setup_free(void *data)
+ 	free(setup);
  }
-@@ -1981,9 +2026,26 @@ static int handle_mod_src_req(struct bt_bcast_src *bcast_src,
- 	if (err)
- 		return err;
  
-+	DBG("PA sync state %d", sync_state);
++static void delegator_free(struct bass_delegator *dg);
 +
- 	switch (sync_state) {
- 	case BT_BASS_SYNCHRONIZED_TO_PA:
--		bass_update_bis_sync(dg, bcast_src);
-+		if (params->pa_sync == PA_SYNC_NO_SYNC) {
-+			/* Release all setups. Note: bass_remove_bis may
-+			 * trigger synchronous state transitions that call
-+			 * setup_clear which will return early since the
-+			 * setup has already been removed from the queue.
-+			 */
-+			struct bass_setup *setup;
-+
-+			while ((setup = queue_pop_head(dg->setups))) {
-+				bass_remove_bis(setup);
-+				setup_free(setup);
-+			}
-+
-+			delegator_disconnect(dg);
-+		} else
-+			bass_update_bis_sync(dg, params);
- 		break;
- 	case BT_BASS_NOT_SYNCHRONIZED_TO_PA:
- 		if (params->pa_sync == PA_SYNC_NO_PAST) {
-diff --git a/src/shared/bass.c b/src/shared/bass.c
-index 19cc9531d617..65ee4a8cbb18 100644
---- a/src/shared/bass.c
-+++ b/src/shared/bass.c
-@@ -1930,6 +1930,12 @@ int bt_bass_clear_bis_sync(struct bt_bcast_src *bcast_src, uint8_t bis)
- 		if (sgrp->bis_sync & bitmask) {
- 			sgrp->bis_sync &= ~bitmask;
+ static void delegator_disconnect(struct bass_delegator *dg)
+ {
+ 	struct btd_device *device = dg->device;
+ 	struct btd_service *service = dg->service;
++	struct btd_profile *profile = btd_service_get_profile(service);
  
-+			/* If there are no BIS index left then reset encryption
-+			 * state to no encryption.
-+			 */
-+			if (!sgrp->bis_sync)
-+				bcast_src->enc = BT_BASS_BIG_ENC_STATE_NO_ENC;
+ 	DBG("%p", dg);
+ 
++	/* Remove delegator from the queue and free it before removing the
++	 * service profile. This prevents delegator_attach from finding a
++	 * stale entry when a new delegator is created for the same device,
++	 * and also avoids use-after-free since device_remove_profile may
++	 * trigger bap_detached -> delegator_detach which would otherwise
++	 * try to free the delegator again.
++	 */
++	queue_remove(delegators, dg);
++	btd_service_set_user_data(service, NULL);
++	delegator_free(dg);
 +
- 			iov = bass_parse_bcast_src(bcast_src);
- 			if (!iov)
- 				return -ENOMEM;
+ 	/* Disconnect service so BAP driver is cleanup properly and bt_bap is
+ 	 * detached from the device.
+ 	 */
+ 	btd_service_disconnect(service);
+ 
+-	/* Remove service since delegator shold have been freed at this point */
+-	device_remove_profile(device, btd_service_get_profile(service));
++	/* Remove service since delegator has been freed at this point.
++	 * delegator_detach (triggered by bap_detached) will be a no-op
++	 * since the delegator has already been removed from the queue.
++	 */
++	device_remove_profile(device, profile);
+ 
+ 	/* If the device is no longer consider connected  it means no other
+ 	 * service was connected so it has no longer any use and can be safely
 -- 
 2.54.0
 
