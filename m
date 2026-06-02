@@ -1,272 +1,133 @@
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A876A360EC7
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 15:02:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780412532; cv=pass; b=jQzrsGMqMC99R6SHDV4B+zFmjxZVFyAEm+Vint3EVkKz45jgLimJGl//Yk0LzJZGpXYYG/1UBKj/2A7RFoZ/MWoPUoZv/nGjR/r52ar75DiUtunpBnr82Qt7cJQkQF5EC3qmX6eic6qrGKEkcyY8xGqoXrBVRtPqW7axXX32NSc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780412532; c=relaxed/simple;
-	bh=2hXSN8NgND6QBHDue5Fkydpp9df7M3UdaglcY7YCfzc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NfRaC1vYxYGzk64YZbIf4zfP5plUJDF7PXJ72UdcCG4qyOmbjXISPlYvac6xv/KxrJyh+1HrE9vvSGzUNVTnVHvoevjkH8ldbvnWjnv7gp8PMZx7zlqH+903OJscIJ/MC+feEdYRAdUy4DpEVVbnjrI4U/vnpIqrUfXxQQeKMQM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GIYdtZdT; arc=pass smtp.client-ip=74.125.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9141F3E9584
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 15:24:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780413886; cv=none; b=oWpZ5XWO5whFy4fvl6/3w+ug+2BC9zoWkhL4CGZMHX/ovteFnlUf0Sq64A07m90tUjvo3rcv5HqtA28+yt/E4JgCk8qJ1hZGarvr28F/KXMOsUHma50nYRMQOJCeF7B/qL3b00XeGc20Z+MIFot8DEfBq9dZtk9EBe52kb8/Oak=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780413886; c=relaxed/simple;
+	bh=an0jTbIlSc8Q8Ji9GWRuA/H78P7tU2vYyPLACOYzsiU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=I5mb69jcpen5x16E6Wq4UnuIa/BuNv1ec2IzP9OT1WmvrmRThvzzeFynv23ltgUVhDKkANdHDt7vB1BJ4+gluCwsSlY22EMwOPbNYjnNY4ik6XfLHMddTPSj78P0TH0e5Ewvwq27l4KQcTpahFxtfmL4S5toOoOFSJoWyIw78Lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QzHITRWw; arc=none smtp.client-ip=209.85.217.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GIYdtZdT"
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-660463977b1so4877418d50.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 08:02:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780412531; cv=none;
-        d=google.com; s=arc-20240605;
-        b=hJ3w7YfejGb6nkrv4jEfQpI/To9G7VVUFotV+UbJrvYnu8QJfij50lG0dbNd2dkUIx
-         r2XjZtQ64+MEZKzWI76HQOQRBgRXH6oj5vD5daFNm/PVN+R8Vrw5CPP1kAx0Ss9Z2qRz
-         1edcOx8qMDWpVgVux0bqiB/wBOXPQfbf62A5Q2L/dkzkImNTEQWxDoj5pIVayqSPUCq3
-         nmEa0l/19DHNsj9Mw0husc3BZIwFCvyJKOobILQ6Gb16lwXhiCNCC8w4kycvN1OyqlLr
-         czv+/A5KYnr2puRXDOMibFQXreJKiFFnV8Ms4iF9h3wULQOOqUnCw+xXBLtbbOkOXvTQ
-         rh7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=NA6OL4UIXqcHlVS4y4AlNkc6cNibgN+LuxFkyYjT4UQ=;
-        fh=ZFlyP5+YKgJkmoBW5+QP1miOu0vNYasz89rr0yCZ/+4=;
-        b=jcultMNF86FaXn62NSubCc0PPoIJkWJShjm3E0D/LW0E8T5V70y4vpBHrSkLvr1skf
-         sjMUn3Xr+t3dSqLB45RKxKkungl0MikKf9KIFI/pZASjChEG1FV3JHCy4jxmD8RLNNa9
-         Az21/EeF6SG4Zw6U5UHhVUDsIFRPP4nOIA/W+IA2ViP4bIiixGsLBo7F9h90O+SpKjnP
-         9mOv4ZtCkC7RWXVzrXU/WxRiBlR9IH4Ot/cKC+YyPBNCVXxCHKXuZ+FQ4UIWHBYtabrN
-         spZwg5YcNx/7H57Mp411CcqtDwBoYFUdcglbdlYJxavy/SqsrRX9rSjrNRyRud5OAlz3
-         wHaQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QzHITRWw"
+Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-6c3154fa47fso2969671137.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 08:24:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780412531; x=1781017331; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NA6OL4UIXqcHlVS4y4AlNkc6cNibgN+LuxFkyYjT4UQ=;
-        b=GIYdtZdTHzHRlfsoWMaob+sI7NBP7hJYrqJwmyTSO0B2l5jHR1juc4oBfSR1u21Q9d
-         E36U8F6QSTCvoQEs1NdygotAXGM6RhlMhaSOXE5VFO3IRxdDuXHcuhIWDa2FlOPJLPfm
-         wmqc+5FozW+GKDvL+o/cpwrqXneJGQ+2PB/oJi89nIbJ863qcw7pWfLOW32QPc0NqNOc
-         Zj04P1XeYzOWXa9NB0WSVb02kB8DhgdnF8o6XY7snGCfYo9PxB1NCL6BBEuxYp+kpwX/
-         mHHwBB/l0D2VwnvVYR9zpl0w23iPzao5TbyJdjnM8Nfe0QsXb1XO0VLKifufMeWtVxPl
-         KU4A==
+        d=gmail.com; s=20251104; t=1780413884; x=1781018684; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=hMNRCKA86A8Hv7+Hg7ykyhMO/Yo3e2twKYc55gRa/6Q=;
+        b=QzHITRWwadw5ejQV3LfZbSpmD8f7JxsGoaKs5uyJO5yL3EykvirclD23BbTkvGDb6+
+         hYsFsJZVdt1mBEgvK4SqVLQBi5LX64Le2pjIP4yu59vnBqmE43rS9El1+pvfVEU2wGm2
+         uKuS0l695M3gurHbZ+H6uXaebIzbDxnBp8k4D+ZVBryvIqN6/z0Di1RVvqU3Fs/dgFIh
+         gd5v+bdVh2Pso6nxAQbC6ynlSzdp6Jzfkqzga03PU6moia2mgCqB2JUl5A0CHz2fm11Y
+         /hCN2ne53MekDxcf23IIFPS9YMaYk/QojfONIvb6AeN72DKDbXmnrQSKDHYfQmplcZRb
+         PMFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780412531; x=1781017331;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NA6OL4UIXqcHlVS4y4AlNkc6cNibgN+LuxFkyYjT4UQ=;
-        b=k6pvZ3uiwvSihrJgzwS1HmfO+TfcOaQsOjLbDCkLu4TLancfzsqnzEJTQPC3pnhNIG
-         jBFztkzX2LgomlJ8eSicEIDnJCx4SJiQmJA2KEtLVKAI1NGFZuqHExP5zHgnUEHQi0cX
-         KgoRs4zxTT0kLGH2wwRONZ1zUTqRUyJo0r7xwzexmtA3SxojhtCDCMSooP0Z7l07t6Zl
-         qyGaBDdHtw+iPOgotz8WLQh2CHR+5Ffq7grF2RsIM4vicbExgu8pFEsosYWv0iy+AQhj
-         5wLP5BYOi/+7eco3Vc58bLShaVD6gOqZUuOgOwt6O94G5uq6PTTBfVUuW1WJy+DeUKSm
-         xDbw==
-X-Gm-Message-State: AOJu0YyhmcEScKU/PMuPXE5okFl+95BRBVAqX4YpExXk0nTSHf7vf6D+
-	MQu8ZtYhoz9FBpxnTAUZjaDpjZ5g3vkRua1wjHxZYIQD7pVwmwsCmt5a+SpwirTINqf963yiBLt
-	3/25S/pFwTmGdDt4zWp2+PQHeRPW0Ma0=
-X-Gm-Gg: Acq92OEdBvaQhgmGOA+uDj+aiBkd33Rl/tWr71WEdHk2aNY9ESbk/xFRyeetgZjvfjF
-	d7q5kRGqCZCTkuaBkMaFHfUgXf15EvgOa4s6FvGmQwNJxukmHC+q86xxyhahZAcHLjsJILBOv0+
-	ygiqS3izsbJ70rrfxIW3bhuvT4bT2lQBRZtEUj1Ro2rMDMl7zLTzR4zpAlSjdImL3MN0f43sHqk
-	R1d080UgMg/JJmVDeWpxBua8f4bWU6KSaZPARflH3uI5i5Rfd3jm/AmBCibkk8nslZxVPDPgvFj
-	RVbCR35Fu82sXCmoED/+qnlNgbGZjd2zeVQuYP+kNdPKdIF3/vGG51LfzJCyRz3JR1yrfaVoWfs
-	OPg==
-X-Received: by 2002:a53:b1c2:0:b0:660:77b5:5342 with SMTP id
- 956f58d0204a3-660d5e505a9mr109556d50.2.1780412530268; Tue, 02 Jun 2026
- 08:02:10 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1780413884; x=1781018684;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hMNRCKA86A8Hv7+Hg7ykyhMO/Yo3e2twKYc55gRa/6Q=;
+        b=pXYwzQV7PH4JZ1Cr2vmRHo3QIqLK2mOl47VjgnPYaFrkenjLoBy3hHT3VQwoIo/RwY
+         ss+lmMtodfM0+1JK1xTZQcnZ8IPpZ5y87gwV2PGELJKDN03rVbsaGmYwvt9lNrYuHBSx
+         RMQ5uiNKro9kYt0B23k4HNvhk7mD+5nTCvGELtL/v02f+ZTysgj50xFgSwo+aAXt4/qe
+         JryfJAU0v+1hOfJP6C2laJMU1H6U3weBrfU4stbZCpn7Kl6RNd6LU9v6nhXsQaeD29B7
+         dGtmMog22qk+C8R+vfvxfl/pAJhWws7kFQy81AkxqpnTqV6EG5VsOh8XXXmQZ643kfqI
+         tlPA==
+X-Gm-Message-State: AOJu0Ywe4e6kQn5HAGq7NblPxMURhxnZswDzlTUUywX5ID7XUcl7o36w
+	+fF0V6yXaY2zjNbAbI/hbvKleSWBksEDnKkxnEsnBlpMAXXaXJch1NqBi+5kcA==
+X-Gm-Gg: Acq92OHsRlwckxN6NlZJblcLJDEDRG+4l06ppwQ/cEQFhorSSAqEEsc50pj8+L7fwCe
+	4KzfpkNLmJ9H4ym8/A2DsMNxTbBBdrw2j+jH7QdcVaXz1qq3AIw0zU1SoOYrPuKXSTcW1QR08+x
+	98nSJMF6M54SRP4NdftVzMiadvmtQP6hOI/fV7S3L8P8I/sX/z6sVAtuFui1T1jdePW4NNEwgFw
+	rXVJ74B9aQPzndtAipIOVpTbLScJ+Hl1QuWPgpT/m/RAyz5DVIO15XWOufQz3PHQ7UGtInu/f9N
+	jLol4CwtQ08auaJfmwMbMpheLL2GNiJYGl6jwwuo4s2ndXgkf9omyEL4CzwbHuUBK6v1Q4FaFyb
+	smPKgdQV7mYQpjZkcZd0rmNrDHm0fTRHBgncnb47JfjNMOoSU/amhXyYO229tHH6gbwRI6FEw3/
+	LmqQfjBnTO2M6/9ZcJPPYs4AKAE4nEegnNpKCZXnfU51G9G0boQSWlfQ==
+X-Received: by 2002:a05:6102:580a:b0:6ce:7e04:ddae with SMTP id ada2fe7eead31-6ea2acdd709mr237587137.18.1780413883527;
+        Tue, 02 Jun 2026 08:24:43 -0700 (PDT)
+Received: from [172.17.0.2] ([135.232.201.244])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ccea0663fesm119807436d6.14.2026.06.02.08.24.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 08:24:43 -0700 (PDT)
+Message-ID: <6a1ef5bb.4c95d0d1.2fc0e9.f59b@mx.google.com>
+Date: Tue, 02 Jun 2026 08:24:43 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7884258646167957114=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260602082925.7061-1-raghavendra.rao@collabora.com> <20260602082925.7061-2-raghavendra.rao@collabora.com>
-In-Reply-To: <20260602082925.7061-2-raghavendra.rao@collabora.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 2 Jun 2026 11:01:59 -0400
-X-Gm-Features: AVHnY4KQksJ408YLuzrJU2fLB1Tc0h5Umm2xxy3jAQOkRe_FSdRK8btVlpvZG_c
-Message-ID: <CABBYNZ+UzUk+MHSo87vttd7YF-s3Zuzsywf+wnoOboaD2bLhFg@mail.gmail.com>
-Subject: Re: [BlueZ PATCH 1/1] shared/bap: add ASE Control Point error responses
-To: raghu447 <raghavendra.rao@collabora.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, cxs1494089474@gmail.com
+Subject: RE: Bluetooth: btusb: Add support for TP-Link TL-UB250
+In-Reply-To: <20260602135419.3092500-1-cxs1494089474@gmail.com>
+References: <20260602135419.3092500-1-cxs1494089474@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Raghu,
+--===============7884258646167957114==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 2, 2026 at 4:35=E2=80=AFAM raghu447 <raghavendra.rao@collabora.=
-com> wrote:
->
-> From: raghavendra <raghavendra.rao@collabora.com>
->
-> These changes are required to Pass BAP/USR/SPE/BI-01[5]-C tests.
-> ---
->  src/shared/bap.c | 78 ++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 76 insertions(+), 2 deletions(-)
->
-> diff --git a/src/shared/bap.c b/src/shared/bap.c
-> index 8fc2fb14d..ce56efbb2 100644
-> --- a/src/shared/bap.c
-> +++ b/src/shared/bap.c
-> @@ -3304,6 +3304,33 @@ static uint8_t stream_enable(struct bt_bap_stream =
-*stream, struct iovec *meta,
->         return 0;
->  }
->
-> +static bool ascs_metadata_rsp(struct bt_bap_endpoint *ep, struct iovec *=
-meta,
-> +                                                       struct iovec *rsp=
-)
-> +{
-> +       struct bt_ltv *ltv;
-> +       uint16_t context;
-> +
-> +       ltv =3D meta->iov_base;
-> +       if (meta->iov_len >=3D sizeof(*ltv) && ltv->type =3D=3D 0xfc) {
+This is automated email and please do not reply to this email!
 
-What is this for? Why is it checking for type 0xfc?
+Dear submitter,
 
-> +               ascs_ase_rsp_add(rsp, ep->id,
-> +                               BT_ASCS_RSP_METADATA_UNSUPPORTED, ltv->ty=
-pe);
-> +               return true;
-> +       }
-> +
-> +       if (meta->iov_len >=3D sizeof(*ltv) + sizeof(context) &&
-> +                       ltv->type =3D=3D 0x02 && ltv->len =3D=3D 0x03) {
-> +               context =3D get_le16(ltv->value);
-> +               if (!context || (context & 0xf000)) {
-> +                       ascs_ase_rsp_add(rsp, ep->id,
-> +                                       BT_ASCS_RSP_METADATA_INVALID,
-> +                                       ltv->type);
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1104655
 
-This seems to check if the metadata is a context and then checks if
-it's setting undefined bits. I'm not sure if this will age well,
-though, because the moment any of those bits are defined, this check
-will become invalid. Perhaps the intent is to check if the context is
-set to a value outside the supported contexts, in which case it should
-be rejected? But then we shouldn't hardcode 0xf000, instead we should
-probably use something like: ~supported_context.
+---Test result---
 
-> +                       return true;
-> +               }
-> +       }
-> +
-> +       return false;
-> +}
-> +
->  static uint8_t ep_enable(struct bt_bap_endpoint *ep, struct bt_bap *bap,
->                         struct bt_ascs_enable *req, struct iovec *iov,
->                         struct iovec *rsp)
-> @@ -3335,6 +3362,9 @@ static uint8_t ep_enable(struct bt_bap_endpoint *ep=
-, struct bt_bap *bap,
->                 return 0;
->         }
->
-> +       if (ascs_metadata_rsp(ep, &meta, rsp))
-> +               return 0;
-> +
->         if (!ep->stream) {
->                 DBG(bap, "No stream found");
->                 ascs_ase_rsp_add(rsp, ep->id,
-> @@ -3568,6 +3598,9 @@ static uint8_t ep_metadata(struct bt_bap_endpoint *=
-ep,
->         meta.iov_base =3D util_iov_pull_mem(iov, req->len);
->         meta.iov_len =3D req->len;
->
-> +       if (ascs_metadata_rsp(ep, &meta, rsp))
-> +               return 0;
-> +
->         return stream_metadata(ep->stream, &meta, rsp);
->  }
->
-> @@ -3673,6 +3706,23 @@ static struct iovec *ascs_ase_cp_rsp_new(uint8_t o=
-p)
->         return iov;
->  }
->
-> +static void ascs_ase_cp_rsp_add_truncated(struct iovec *rsp)
-> +{
-> +       ascs_ase_rsp_add_errno(rsp, 0x00, -ENOMSG);
-> +}
-> +
-> +static bool ascs_ase_cp_rsp_invalid_len(uint8_t op, size_t len, uint8_t =
-num)
-> +{
-> +       switch (op) {
-> +       case BT_ASCS_METADATA:
-> +               return len =3D=3D num;
-> +       case BT_ASCS_RELEASE:
-> +               return true;
-> +       default:
-> +               return false;
-> +       }
-> +}
-> +
->  static void ascs_ase_cp_write(struct gatt_db_attribute *attrib,
->                                 unsigned int id, uint16_t offset,
->                                 const uint8_t *value, size_t len,
-> @@ -3697,7 +3747,7 @@ static void ascs_ase_cp_write(struct gatt_db_attrib=
-ute *attrib,
->                 return;
->         }
->
-> -       if (len < sizeof(*hdr)) {
-> +       if (!len) {
->                 DBG(bap, "invalid len %u < %u sizeof(*hdr)", len,
->                                                         sizeof(*hdr));
->                 gatt_db_attribute_write_result(attrib, id,
-> @@ -3705,9 +3755,26 @@ static void ascs_ase_cp_write(struct gatt_db_attri=
-bute *attrib,
->                 return;
->         }
->
-> +       if (len < sizeof(*hdr)) {
-> +               DBG(bap, "invalid len %u < %u sizeof(*hdr)", len,
-> +                                                       sizeof(*hdr));
-> +
-> +               rsp =3D ascs_ase_cp_rsp_new(value[0]);
-> +               ascs_ase_cp_rsp_add_truncated(rsp);
-> +               ret =3D 0;
-> +               goto respond;
-> +       }
-> +
->         hdr =3D util_iov_pull_mem(&iov, sizeof(*hdr));
->         rsp =3D ascs_ase_cp_rsp_new(hdr->op);
->
-> +       if (!hdr->num) {
-> +               DBG(bap, "invalid Number_of_ASEs 0");
-> +               ascs_ase_cp_rsp_add_truncated(rsp);
-> +               ret =3D 0;
-> +               goto respond;
-> +       }
-> +
->         for (handler =3D handlers; handler && handler->str; handler++) {
->                 if (handler->op !=3D hdr->op)
->                         continue;
-> @@ -3716,7 +3783,14 @@ static void ascs_ase_cp_write(struct gatt_db_attri=
-bute *attrib,
->                         DBG(bap, "invalid len %u < %u "
->                                   "hdr->num * handler->size", len,
->                                   hdr->num * handler->size);
-> -                       ret =3D BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
-> +
-> +                       if (ascs_ase_cp_rsp_invalid_len(hdr->op, iov.iov_=
-len,
-> +                                                               hdr->num)=
-) {
-> +                               ascs_ase_cp_rsp_add_truncated(rsp);
-> +                               ret =3D 0;
-> +                       } else
-> +                               ret =3D BT_ATT_ERROR_INVALID_ATTRIBUTE_VA=
-LUE_LEN;
-> +
->                         goto respond;
->                 }
->
->
+Test Summary:
+CheckPatch                    FAIL      1.09 seconds
+VerifyFixes                   PASS      0.12 seconds
+VerifySignedoff               PASS      0.12 seconds
+GitLint                       PASS      0.31 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      25.93 seconds
+CheckAllWarning               PASS      28.33 seconds
+CheckSparse                   PASS      26.99 seconds
+BuildKernel32                 PASS      24.85 seconds
+TestRunnerSetup               PASS      527.95 seconds
+IncrementalBuild              PASS      24.62 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: btusb: Add support for TP-Link TL-UB250
+WARNING: The commit message has 'stable@', perhaps it also needs a 'Fixes:' tag?
+
+total: 0 errors, 1 warnings, 8 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14607133.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
---=20
-Luiz Augusto von Dentz
+
+
+https://github.com/bluez/bluetooth-next/pull/274
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7884258646167957114==--
