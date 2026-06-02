@@ -1,110 +1,58 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30D253BB128
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 08:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8A233932EA
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 08:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780387220; cv=none; b=AkKhLcqdrIgBjlZ9NDoNNhNikbo4e3/WJTQpraH+d8jbjJsOHgYaBU2meaEvK4Tsrk8VBom6yIQR/vNICzhRYAj2FHIwW50825HpvdEMH82P+0bTxp/vVDD4kG78Jjb1Pary6+KKY9eOGY1Fi3aUSBDRtXDQTK7Ezzn/0L82j0Q=
+	t=1780388982; cv=none; b=ICfvboQ2RYfxMni5euA3c4ykdXhzEJTFql3wp3gidOUd2M78n8gCo0rNHwITALRpz6u29BIAXBqP39UTXGRXBaAIJ3FfKCw0Xn7qydkqEcaoKfVpOA6xfWBpkIFSB6HpnoH3vHXmSOARgMcW2w9TaFDHyuIcxfB4Da1lmbNpg+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780387220; c=relaxed/simple;
-	bh=37KTjZRL4G5Ngm5H44pJADKwMDqne/yoFzMJDKE33lg=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OP7bX2kP9uLphp/QynRddTkLVcJ59fLzGyeDJA4Dm5b3doMaYIPozCJnckMWQiT0e3sp91bk+mQbv0x+lYwl2+Lr75HEB1bm9kh8yWX3SvZBbio+7nYI6d44mHF21bTYWlO26GEqw5LnRQYwrT3WQb8p1mH3U8LdfcpZ4NYhTss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KzNDbDXU; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780388982; c=relaxed/simple;
+	bh=Xsq5jjJg8vjN/ReEfY1EOUwbaYNEWhuBAKvUF8Rrln8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MBxCwIA8yDlqShIxYN+/mSIc74/h2YTwo8+TyoN31yd0IRRrj08iP4zIrfHrDR6DMgHu/J+mV/JBtidSAgwT6vJl/DVXJ9JUfNV0TmcVXZMuFwv5WqxnCF3txygNk6O0nyo0oefZppwVAkDq7x4bPF0/5f4mr539xQHia4STl9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=OFNkE440; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KzNDbDXU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC8C41F0089F
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 08:00:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780387218;
-	bh=YcHbUW0/z6MxMlX2QsScaV0gwWaW5ODpoWMz4NoUgZw=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=KzNDbDXUP0/GMeHK0OA58vp1P+iuRNQD3rXvWS3Jv2YLR3nFB6b/Fsx3qmeJ9uDtY
-	 ST49GW2bUSnc6WwFndPZPApLCXbsnR06mrP4zB8k9T249WuHHDIXZRQiHvHqBOkV2c
-	 5jaQVnUAyYkqjMmE2dY9YINfcGHjlYu8PtkJHoYBAaSvW+1FTUn0ScSt2Ato0gHTc6
-	 rm7b5UIX8yQAUqd24jQ8X7TVgQKKjYa1zo+yjfKih3vuOduO5hmqKKLibfOyOFsTX2
-	 hQOWS5oS67SUnmx0GLc6u8uoqOBQ4p2/bY9LxIpEsAvtSXRpyUcjmKkNX1FGrOd1CQ
-	 qceuqgMB41GDA==
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-39669bcaadfso24607541fa.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 01:00:18 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ85tYNfPDGvfZoxYkJ8YV/9KCkW+oEOM3Ii7Wj0PRSiprhJofgrOpZFqeWhuLnOKLN1F/TzB6XuzwEj4ATG1cg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoBvDtvDvRnmLI/8pcOOLxE5FmhCxW+84ljtCVLco5bahiDyo8
-	dZcAwN2rPUPg4Hh3nPLhiH8noMXHF0/C5Qk1//3/cH+QbpQTwIretP5qjmn4G7AKLwRxbwhxk7o
-	DZcvV0h8dLl4fSi08p/LvGImSBgEFOf175I9zBDHDwA==
-X-Received: by 2002:a2e:8614:0:b0:396:9630:5ed with SMTP id
- 38308e7fff4ca-3969a81a943mr7988131fa.15.1780387217586; Tue, 02 Jun 2026
- 01:00:17 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 2 Jun 2026 03:00:15 -0500
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 2 Jun 2026 03:00:15 -0500
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260601-sm8350-wifi-v1-7-242917d88031@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="OFNkE440"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1780388978;
+	bh=Xsq5jjJg8vjN/ReEfY1EOUwbaYNEWhuBAKvUF8Rrln8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=OFNkE440z6AaYSef06GUq26JDhdq4nj0D3msO6Z3Qok9VoUKil0pulydmeK3Xrrjl
+	 3mVxwvkXoEGDtgQNBCejoZST1nf60VtIaBGp1I6F1PaWkjsJkr6OhWmNDOBVkKVQXM
+	 9EGbklEpkvNT7zb3mAoeIz74Jt6AXNWx58gaaoFtguBWMnDpcy3r2szZr/yh+pE1Z/
+	 BcINtlyGTuDuAI2LtnEp19QDVECLU62WYIZzoy4H1kcWZTbTclilY8suZNHr/GPiWX
+	 MfUGAwG6Khgo764EqpAh11xCIGcZl5eejiorOdyoRH766VYbbGaEK6eNr71x8khzJf
+	 7lNxchjQfh+bA==
+Received: from raghavendra-XPS-13-7390.. (unknown [100.64.1.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: raghavendra)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 1B20917E05B8;
+	Tue,  2 Jun 2026 10:29:37 +0200 (CEST)
+From: raghu447 <raghavendra.rao@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: raghu447 <raghavendra.rao@collabora.com>
+Subject: [BlueZ PATCH 0/1] shared/bap: add ASE Control Point error responses
+Date: Tue,  2 Jun 2026 13:59:24 +0530
+Message-ID: <20260602082925.7061-1-raghavendra.rao@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260601-sm8350-wifi-v1-0-242917d88031@oss.qualcomm.com> <20260601-sm8350-wifi-v1-7-242917d88031@oss.qualcomm.com>
-Date: Tue, 2 Jun 2026 03:00:15 -0500
-X-Gmail-Original-Message-ID: <CAMRc=MfmosOiaYONd1Cs_G8M4bgL6k844gmANUD-tg_H+VcEqA@mail.gmail.com>
-X-Gm-Features: AVHnY4LpWcxff9jncmRnjmUuLE6aaoj7VaQIrr97syxQJ21dl10x_BOM0i6sA48
-Message-ID: <CAMRc=MfmosOiaYONd1Cs_G8M4bgL6k844gmANUD-tg_H+VcEqA@mail.gmail.com>
-Subject: Re: [PATCH 7/7] arm64: dts: qcom: sm8350-hdk: describe WiFi/BT chip
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath11k@lists.infradead.org, devicetree@vger.kernel.org, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, linux-bluetooth@vger.kernel.org, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lorenzo Pieralisi <lpieralisi@kernel.org>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, Qiang Yu <qiang.yu@oss.qualcomm.com>, 
-	Jeff Johnson <jjohnson@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Mon, 1 Jun 2026 11:46:55 +0200, Dmitry Baryshkov
-<dmitry.baryshkov@oss.qualcomm.com> said:
-> The SM8350 HDK has onboard WiFi/BT chip, WCN6851. It is an earlier
-> version of well-known WCN6855 WiFI/BT SoC. Describe the PMU, BT and WiFI
-> parts of the device.
->
-> The firmware isn't (yet) available as a part of linux-firmware, so it
-> was verified with the firmware files from the vendor-supplied package
-> (wcn prefix was applied to Bluetooth firmware files to make them follow
-> upstream driver changes, vendor provided hpbtfw10.tlv and hpnv10.b06).
->
-> Bluetooth: hci0: QCA Product ID   :0x00000013
-> Bluetooth: hci0: QCA SOC Version  :0x400c0110
-> Bluetooth: hci0: QCA ROM Version  :0x00000100
-> Bluetooth: hci0: QCA Patch Version:0x00001017
-> Bluetooth: hci0: QCA controller version 0x01100100
-> Bluetooth: hci0: QCA Downloading qca/wcnhpbtfw10.tlv
-> Bluetooth: hci0: QCA Downloading qca/wcnhpnv10.b06
-> Bluetooth: hci0: QCA setup on UART is completed
-> Bluetooth: hci0: HFP non-HCI data transport is supported
->
-> ath11k_pci 0000:01:00.0: BAR 0 [mem 0x60400000-0x605fffff 64bit]: assigned
-> ath11k_pci 0000:01:00.0: MSI vectors: 32
-> ath11k_pci 0000:01:00.0: wcn6855 hw1.1
-> mhi mhi0: Requested to power ON
-> mhi mhi0: Power on setup success
-> mhi mhi0: Wait for device to enter SBL or Mission mode
-> ath11k_pci 0000:01:00.0: chip_id 0x0 chip_family 0xb board_id 0x6 soc_id 0x400c0110
-> ath11k_pci 0000:01:00.0: fw_version 0x110c80c8 fw_build_timestamp 2021-05-25 21:43 fw_build_id WLAN.HSP.1.1.c3-00200-QCAHSPSWPL_V1_V2_SILICONZ-1
-> ath11k_pci 0000:01:00.0 wlp1s0: renamed from wlan0
->
-> For the reference, the driver looks for the board data for
-> bus=pci,vendor=17cb,device=1103,subsystem-vendor=17cb,subsystem-device=0108,qmi-chip-id=0,qmi-board-id=6,variant=QC_8350_HDK
->
-> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-> ---
+This patch adds the responses that are expected by PTS.
+These changes are requited to Pass PTS tests BAP/USR/SPE/BI-01[5]-C.
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+raghavendra (1):
+  shared/bap: add ASE Control Point error responses
+
+ src/shared/bap.c | 78 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 76 insertions(+), 2 deletions(-)
+
