@@ -1,120 +1,99 @@
-Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
+Received: from mail-qk1-f193.google.com (mail-qk1-f193.google.com [209.85.222.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 633B43C13EE
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 22:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C9193546EF
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 23:35:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780439239; cv=none; b=KFHrS2x3dfeL8Rl/AUDB5k6FZFmJrBKwhPHPZxSas9EdHANO1/VWAQfAXamkJSalqv+XE+FxDGmcUuepbKiCXu97l+KYybQ79+eAdyC0zSS2QC6t0zU10w71zDXocEqx9Th4dvDpWg4PQtUYLTH3veUrn1u6xwvHR9t4thP7fz8=
+	t=1780443313; cv=none; b=CWrtDm6sLcauvZ554hiVr235CAw4Kp+KrvA6HJgdgZa+B8kM3fj6+Ts6+rq8/8N+uXVg+Rt/bsMIRSSWmR0vqIYlZUtrsQy5a2XyQQW0dudyHb7UapEA8+Zm6KjX7rNLjYQWAkfqFYxSoJIi1yPpNT1iAF8M/i3wACCL/C+TCW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780439239; c=relaxed/simple;
-	bh=BMZx7z/Xega+fBvyoduK6lf/TYmOYDzcfVs3x1hjpwg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=eQNthmSTitqBQChGrsGle3kV8nY0lqGc0ACi9v9ruPB/PdHg7zII5/TWrG7nMuyoSm+DIEeWEfb8iVmQAIRrmTYezDSa1x6/7ks0ait6VTfEqhyt7Pp9Od6AgkOCo2vkKRi6tB8MbZAg/C0sWOLZQMJxuNMhWN3VdfiCVnvtqOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K43ZJD23; arc=none smtp.client-ip=74.125.82.173
+	s=arc-20240116; t=1780443313; c=relaxed/simple;
+	bh=5WGH1E3+q5dh3QjHIL39ElESPr6aOtwdfQlqg2sCihk=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZsiJ9KDDOZDw1AgUC008DmtBNZ2E8hbrssFYfpkTyxKp2Jogs9doIeNxzZnbU7yxIqwiHkvLrCnfiwa6D7K2ky76AhsHlGaus14OxALIxt0M5Df50d7qgp/DVAJtJ//gzwjN8mrsENAFIZjkNvaa6yRnX94GbQYRlrupGlmENag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j4Bs36Of; arc=none smtp.client-ip=209.85.222.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K43ZJD23"
-Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-304e6c6464dso1623230eec.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 15:27:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j4Bs36Of"
+Received: by mail-qk1-f193.google.com with SMTP id af79cd13be357-915660e5b8eso320145885a.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 16:35:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780439237; x=1781044037; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z8lsP68O3hz5AFuTQWfRJxTbtYeSbPfP8JyV3eEZ6oU=;
-        b=K43ZJD23CedrRH3wJ8B5E3QJd7TWeQnXkfXvT07TfekqHGeWEE7HL1y9Tcvk8PXBxx
-         0dK732ictllhi/1vqC32/hIbDe5X68qU6XRVKggnDFt5xGImFTGH26XJiHlHdhrBojri
-         MlGzS/acG5RPXMY5KbRb3izmZYVEqCB9+Efp9a5CT2SVgtMo+by4+5CBDSQdKMzZUu1Z
-         mr1Ist6UB4kp/HfAkGGdxeyA/Uc5a0iNkBqZJVGjtM52I3lM9mCRfi0+EKk/j1CtPbBV
-         yM4J+HdR++1CxvsVo1RaMALix3/ERyqb6j9ubH29HODHbgGgDZifYDsZNfsQvR8Rfsp3
-         XFGw==
+        d=gmail.com; s=20251104; t=1780443311; x=1781048111; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VH9hbNCtShw6JmD3y+vRYHGyk8aXTiMz2VCmZ5+oy/k=;
+        b=j4Bs36OfD9vPcXRXDzRnj7GhNMKtMb1bl92WBVTzdp3dvBVIk8FZJTy5w1p4ThpE8i
+         rdk38YY/CRVPqJTg5dbDgcqciNk4yBHwWdrR4PI7mN0EiVrRhvl6BJy/YP/F4mmPhiJr
+         gDBWP64MobxVBSaz7E+rDpUcwZtVvG26rA+o5U4f9hli93nTA2fE6xYuDO2zjwM8VMAr
+         ofwC70j/CPW7WpjzNmd2eQOLJgRuExWLXtxdW3zg0tuwZyvLYr1Se7huJH3HfjnEtnjF
+         3sAa4D4XgxguUnniHPtI0q7sEEf3Z6VD3P9otNt/T1h8S0IFRS75Yj6W45pAI7OMDVH+
+         oXiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780439237; x=1781044037;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z8lsP68O3hz5AFuTQWfRJxTbtYeSbPfP8JyV3eEZ6oU=;
-        b=DcIoa9jzL2BQ7gF/u9Qu2goZG8uEnX0IAIYjGMwzTaoM9v3l1SfY8Enp+8ugTvpoLZ
-         i2MCT3QrzHKVwVGH5atQe/Nnb1GCNVKZGcHt1cUSSlmzmVCN4ugT8dPRZfPbdbkzlEgO
-         1KQhWJVSkI0sHg0ZumIDvAlfxI1HMP0agBdvT6wuFUEKYzz5FAxmXhIkH/SG1lOOg64p
-         ZGDPLFCWyn+7cBdaNa5/kCuWqT3nHBXRMJY+70ZJT0A7ttNgumsvHoQGaI4QSNI1wg3g
-         d1rQTpaaB8X4UEcj5Ir1WH3riWhV3VxaCv9XXhC34MiV1m3DCNCj7lfneM5d8LFQ7VUJ
-         c9kw==
-X-Gm-Message-State: AOJu0YxUwW3t8VZLhnHuXIkVV7LJzDl6V9lcxBLtwrLcCsxt1DnrnKXV
-	/l5KlgzFOm68ucLJ+FscLSu83RC3QNqpBWFvqtGdcb225u/Q1Ugm+C9zCNGmHA==
-X-Gm-Gg: Acq92OGsLDozxTcA6OXJlwXvCHQY8Mt5Vxlk8s30t5xFnWJGDje135hZJbwfpRFPXTA
-	rdS/ePA+i2KhGdOeMmWnMEgzSK4PV16i7S9hRpcgMdao658D1hV9MA6BPr2e8B0ORsRuEBUYdmo
-	hBXSr/b8HA1g/HP0Yiwz/MwDUUP+tT7t82wHk8lOpzTpDhYQ8NQbLzzL2Hag2M90giHzYUjrSqB
-	v/zgt4ZszOnCdWrB7QjX5zFacZ/h+/BWXcj7bt2LcK0N9fotPvkXR/DdyigSNXuwLFwMAGU+Q+k
-	5uhiifASdcv7yVKHq1EQzw44uAeYktQGpJrzPViHmdTQI1z6/s8ZYj6sSusvApAYUOhElOl17/4
-	BnXbTTAN6EH0AT2emP1c7UWxwCShiERzRl8IZOYEb3WWkzOhw6XpeG38km4VhfHGkJykJe9S+s1
-	A4QNhu57G3NpKN8NhBL8JaXmnrw1uWSDv7fYneBM5ZcA==
-X-Received: by 2002:a05:7300:dc03:b0:2ef:8b91:212 with SMTP id 5a478bee46e88-3074faa0516mr421621eec.14.1780439237351;
-        Tue, 02 Jun 2026 15:27:17 -0700 (PDT)
-Received: from [172.17.0.2] ([172.208.153.19])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3074db528dcsm922298eec.3.2026.06.02.15.27.16
+        d=1e100.net; s=20251104; t=1780443311; x=1781048111;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VH9hbNCtShw6JmD3y+vRYHGyk8aXTiMz2VCmZ5+oy/k=;
+        b=sQHe8EjSlCmLdRQKiEUIje81VyJ3G7TOpLG8gf/aK1r4xP0PsaaYLurwKuJeBm/KR6
+         E9ToL4aOxa7QgBsJpCY0UR98GT1cKyL2kvT/SY7q+CBLAB8iB7NJBNj0tc6MpXZ4UMPU
+         SyQr8wKecxkhDfpVT196a9W2q7qb57UdFSbImNlPnrQ61Rhvs5spxu2ickRorNv4RtKW
+         ++XndW6q5GFsYn8B36eELnIYPxqfErubziYLuehMbu7g3/mg+SU675gpBnnO/LcEUR2c
+         3bfQCh/XZv3/OkG2DP8dwrncQ6EWuEbyRGRNlHqoQ/YJmnLTpsnm9T656fbD+jgYfEnU
+         oEPQ==
+X-Gm-Message-State: AOJu0Yx0zhmamSHB1dJoEmRHeJii0BQDlMbkElRk4n+mt2hZR8Z4Q1c1
+	tB7AHYEqv8hz0VdFuFVg15gho5sr75d4rgDCZ4Lcv6zFxqAm5VsVdjIxzofAfeqtQQ==
+X-Gm-Gg: Acq92OHJIt2r8xrOhh73m2od/wYY8RPraaV7zoiS7aoaEaxmfdpb5sDmeJx+oiwTsY1
+	HRA1Rr/bkMzDrozQVvgthEXU2B/KLPF+DXo64fIiDM652Mj7QMBzFJvl5nVIOIP465VLkVHbeRH
+	EkbdN62DgUYsn3gmMLDCH6vDsn8LSREbv91Od2XNqajEb1poKPUqWo67yiPc4YaFpfQqHC4BeB/
+	8pQ1aZOIOrPEVJ1BtqgAcSTT06363tGI7ac1cHTp/xy7XVW4qcGmvXvji10PJGFtfhmoehOxr3k
+	5Bl9vNpjvazRPKqjT8QjS8QBofeOUFMhkVeqcItb3k89eqRwSWbtiWIZZQ0crEde57Gz6ZjzHh5
+	OssK60cSQlyac3Eu7HJ+mds8Gd+U6nX9vgIvyOnyajUhoWZYhsnqvzcXb5skC+prAAB9p+DhfBB
+	DaUFC7DsHY7LZkWuJ5NRyB7VeZ9A==
+X-Received: by 2002:a05:620a:318f:b0:915:5379:b511 with SMTP id af79cd13be357-9158a8095a8mr225650285a.43.1780443311386;
+        Tue, 02 Jun 2026 16:35:11 -0700 (PDT)
+Received: from rainbow ([146.70.171.112])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9158a2465e7sm84251085a.19.2026.06.02.16.35.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jun 2026 15:27:16 -0700 (PDT)
-Message-ID: <6a1f58c4.4a342cbc.a61e4.60bf@mx.google.com>
-Date: Tue, 02 Jun 2026 15:27:16 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4305235679094399350=="
+        Tue, 02 Jun 2026 16:35:11 -0700 (PDT)
+From: Jordan Walters <jaggyaur@gmail.com>
+To: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix Use-After-Free in hci_unregister_dev
+Date: Tue,  2 Jun 2026 19:34:14 -0400
+Message-ID: <20260602233414.209730-1-jaggyaur@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1,1/4] profiles/audio/bass: Use BASS_Modify_Source when assistant is active
-In-Reply-To: <20260602210022.213562-1-luiz.dentz@gmail.com>
-References: <20260602210022.213562-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
---===============4305235679094399350==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The hci_unregister_dev() function fails to disable the cmd_timer and ncmd_timer
+before freeing the hci_dev structure. If an asynchronous event or timeout occurs
+during device teardown, the timer callbacks may execute after the device has
+been freed, leading to a KASAN slab-use-after-free panic.
 
-This is automated email and please do not reply to this email!
+This patch adds the necessary disable_delayed_work_sync() calls to securely flush
+the timers before the teardown sequence proceeds.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1104856
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.75 seconds
-GitLint                       FAIL      1.01 seconds
-BuildEll                      PASS      20.78 seconds
-BluezMake                     PASS      686.70 seconds
-MakeCheck                     PASS      18.37 seconds
-MakeDistcheck                 PASS      252.36 seconds
-CheckValgrind                 PASS      298.96 seconds
-CheckSmatch                   PASS      352.74 seconds
-bluezmakeextell               PASS      185.30 seconds
-IncrementalBuild              PASS      687.41 seconds
-ScanBuild                     PASS      1066.94 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v1,1/4] profiles/audio/bass: Use BASS_Modify_Source when assistant is active
-
-1: T1 Title exceeds max length (83>80): "[BlueZ,v1,1/4] profiles/audio/bass: Use BASS_Modify_Source when assistant is active"
-
-
-https://github.com/bluez/bluez/pull/2168
-
+Signed-off-by: Jordan Walters <gloambit@gloam.sh>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-
---===============4305235679094399350==--
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 28d7929dc59..1cbc666527c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2671,6 +2671,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	disable_work_sync(&hdev->tx_work);
+ 	disable_work_sync(&hdev->power_on);
+ 	disable_work_sync(&hdev->error_reset);
++	disable_delayed_work_sync(&hdev->cmd_timer);
++	disable_delayed_work_sync(&hdev->ncmd_timer);
+ 
+ 	hci_cmd_sync_clear(hdev);
+ 
