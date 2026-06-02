@@ -1,244 +1,145 @@
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1FA0372049
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 16:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780418612; cv=pass; b=ubXN6YT/O3h82x6f1Eb4PuRUwN+HoW0b5cl7WuxAb5nycB4cwo9DH4NZZgzrxrOeEY2lVnrvEOXdTgXSgC3GupBnsD5UFiQybrgE/jK11ei4A6pScuFp9imra52nPu6CZyH29b3sW98Z/96LCS1986XJXA/l7TEWdQ8t9LwkbdA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780418612; c=relaxed/simple;
-	bh=ef67Cs5mlDD4nA81Y2zzgtZB7fbIa2D0X6VcANU5/M0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KdsszDP8LhzveYSG5P2KU21KSA1k8q218z9FJCL4YD6dhCDiT/Quwu/zMMdD3bsoqRCbseBRdUvOcjA3wLOx/047Qkl1Wx5t0A80wVQYIUchvX0Ldkv30Z73znlisa/u4tUYPeuU94Aagk5OAzlsyPuKIDxQyiI0eJGVl6mc3qs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KZvIZiyP; arc=pass smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8333F4137
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 17:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780420002; cv=none; b=TwVJuQz4ZTOtwL7NqfM8tO0hyfPUpjBvQawRS+qYipTHB6TpTHkFwKRboJoDmSE1H0oQHFBfX9C5dab3cdm8Fj0kAoiQz52t7ul5dYiNwj4cN0cT2jWaL9aVS4G+xseSIiclkus9We0ATkovb7N9t9F58HoWOMJ+Ph/1vLwl5og=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780420002; c=relaxed/simple;
+	bh=Bl3uE87V4+Vf8cpIROkGPVGhCj5LvqUs/uEkG8IUj6M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UHMR1YrVdIVHG+Az9w8gpoSs+IWakb5E//18P4JaTYYveumWKcLAeXQeBXVsLq7fs7gz7XZOul8oiObb5UztYBtd210dPoFT7ccSHe3ctFE6oU/Omg02XsYTXOdHZd7lO07uPOxTvgvquQHsbG/fyUEw+R4zRW47fqhBmKdJbTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NAFoBobu; arc=none smtp.client-ip=74.125.82.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KZvIZiyP"
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-7e8833c99fcso14642217b3.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 09:43:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780418610; cv=none;
-        d=google.com; s=arc-20240605;
-        b=CJUmuKeV5KumXitxivpbVgs3G0MOGCn0DyWJx5eBv+5/7Oh+o+lHnQD5cy2MDMch9+
-         0DSCIeAfTlhPTdEaw54f1CSnVxZ3f6oU+b463JA0QfNV7EKBEfYV3kxBN1ZFf5BONjwY
-         eDxskzoe8j3/G6+1EBGnak8RLvEXbck+6sTcHWFE+dFiJw1bziVvHsLwCe6fY2GCCrDy
-         DHp7MzQ75AM0Muxy8ANrDVSxq8S+7BlHAjScVG93VmxfTKsx/QhW/nfTNDO5wlsDkTAq
-         aDxvhDrSBZuJDiTboxS8NLPyVSGhkdU1IA+7GPlrROlhHKh9/OMT6vguCR7SVW4peYdL
-         ceHg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=K7/yR/6yJQMUOUNFEFlQIz6R4csXrk7PwebzPFHLL6A=;
-        fh=99aSovJA+BhU7KmfKSo8sR8jURIHW/fHE+XHpqSCLDQ=;
-        b=j2avFA9AvfykZY1t2ySbAtTCaLOzAk8ibBsnA8RGho3TsFXVlT+mRUng7X+5ds8KcU
-         glggI596wruHX+CTmKaQjRf6p8qsCM9OJje3WhZ55er/JqCVhAbva+BQRSQdn5Jvfcr+
-         Tc86A4M+ruXBV5DZMWCHmaoD9xfsHkj38LiH12Qw+oytEu/ufbKulOKAOasrqJHbxuur
-         jdNOSQev68R/ShGGUCPQflX+C2D3vzNRuNs/9yQjmxQyn8dMssSJrZU69yxYFuYZhDVW
-         7BQYXsX3SHfwKKFWYCn2+OO2BF+LAlSrNqGorRWpMSzhCfT5aIzflz8PWhI7Ehk3jFMm
-         mj2g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NAFoBobu"
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-1363e78746eso14762703c88.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 10:06:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780418610; x=1781023410; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K7/yR/6yJQMUOUNFEFlQIz6R4csXrk7PwebzPFHLL6A=;
-        b=KZvIZiyPUVCmPoUV7QaE+9hjQKd7JVuCRDROqwWYfOvhbZfdjhl10CgLeHgHY0UzA6
-         gAoDC+k98TjlYIQ+vXzqfAKBwuaSnfJvbZ3QFMUJqcVJpWBDMmNr/PrrSu7mG1XgcOSL
-         HsBKHm5/AshHaLe6uogpOgBL9FwvUQ7fOCnJYFVI1E6mTo+X+qgQKAandLhAKcEm3Gqr
-         fI7A+qxZPLxnk8McGtyKouReHkmL14SsnYZ/Az3pss9g/WxwpfIdlIDjGxMhPJwDklBg
-         C1aWkf85YmOjLvUodSQmM3kAkzVOVf6GM/tqh7GpfeIc8WDDuIXk/y4/LZ1Vi/JFMZ+a
-         yqBw==
+        d=gmail.com; s=20251104; t=1780419999; x=1781024799; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YfY3gW1bToFTm6OdfmLQuzmiuL3/uQdYF//iDFnkcOo=;
+        b=NAFoBobuQtgopFK5GaDSl+gw/r8ku1tG8x89qbjqRwmHAY1JqKUAT6tUnIIO3HRb0+
+         WjF7T8gKE9/DCBZZs3oEsLO6IMMvXZUIKkyMQNKkVqZ9R7iHB8/ROee/1OvAD96PGl8o
+         bktBanho0/L2RyHnc7OReEL09LooX3WOGe2RIK4SEMtpmWiFL1CAtb9PwdhgiG89IdnF
+         scH0BwPq24Nsy88SKK5ySkMEcuTQtn0M1i4hmv8CUYwNN6tDHSaVsOOcFrtxlcVqC2/l
+         o/7p+7jx9P5zrTbtuTwIhcdTOZeKdg7jXrT8SJiXIlGM/gagfMAvCKUPdmclo1LnFFSd
+         XWgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780418610; x=1781023410;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=K7/yR/6yJQMUOUNFEFlQIz6R4csXrk7PwebzPFHLL6A=;
-        b=VoNVwk/BThzog/+NiTg6KhGANrTRCx9sPCDKW5n9Xqs796OEF2eElxuCLF1R09rvW7
-         uvXv4ku1xjTuCR1mIc8NchOeXBZ3+vh5VS/f7cE7t6dCQem0OQ0QgG0wMr8Qydkl+7Pt
-         kuWDr6VQclfUMpIuTWrb/lR9Qf9rgl+rr4TFCNfNaRutS1b+TFkpLppH4dvwGSflCOaw
-         hTxVjsGWP2eIr9mg5Odw9ykS1omyvX9A0Ko4/2QZAW8thDd8VxDEGzRI/5t5ZPXnFbde
-         6QoJYa8PAS2b9iTAkPzDJGvL2Wvbn9x37NCXbEFU23aiC0akszqnS+16yFCj7XjujmeU
-         D8Mg==
-X-Forwarded-Encrypted: i=1; AFNElJ+UrQQ6CTiMBcr5+mXXhfMXwGLol84ylas5r9Ioo6rwhdQbLfa7vUft65QtS4Kl1foYEIEk0GiWrVXWzHG1uM0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4sz0moSunkXGGldJytdbU7c1eDBEAkRBgyO3XEBCzIIy/IFlS
-	aAhQWheIKZaifOChfe1mdOxehtODt8Kk6EmE2q9CKOXLdPdyBKOZrrbWcjW1t/lzKrrOwMlxRfu
-	Op2e7hUDBTazoj5cBniZ1rkSdhrfDxrY=
-X-Gm-Gg: Acq92OFdKi2m4vmLYTOpZ+c+gaIpbp2uLGZVY4X/9NhDEAWomiOJb5D36v8Ukf+Yc82
-	FI4N0V3/VVd4SEprzi6+4cQ2gqVra2fpRT4CguSPcuArMuMz1xoKIpY75bKufYMaSXND+S+iyMa
-	tJd9sM7cMXbatg3yC7rHGZzXndKcA/JToZlPiTL6jJhNKDBkugk74JEJnBX4esY++Il/thjJtiK
-	LvGPPZuhfDMF+yG5LtnLr0AUJdQjZ4XzxWC27eVsAgFeEg0QGa7vJAjr8wvSHEyBgtO9IKLuDU8
-	6EUrkDPHg/sN55ZicK8/y6y+4mxgmscnJrE1bU52MJoJLHXT3YBdMDAxUHiFPZlPlawjcCj3fyX
-	WSxP5gvnS0wcRXu8=
-X-Received: by 2002:a05:690e:130d:b0:660:40a6:4c9f with SMTP id
- 956f58d0204a3-660d6119435mr534727d50.54.1780418609787; Tue, 02 Jun 2026
- 09:43:29 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1780419999; x=1781024799;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YfY3gW1bToFTm6OdfmLQuzmiuL3/uQdYF//iDFnkcOo=;
+        b=Ez2+o3JnbOtp9BA3fuBu6et4pjTzINnrzvkooq51psmfWyiGF3z/3VgJoVyTMtP5QQ
+         rNiWr+qrohk26U0aw0tkD/XDRkIrHeY3y+DuWcQ5A6zRNGiJc40WwJu8aFMim3Ae4Pto
+         bYtkzoQekiWgZcsz2IDkBBD8SDrr/ybGyf2r0lGNjTCNEP7uDP7u3RMS8NDAee4xJghd
+         3gV0aDAh3aGXAfqVXqV7nPSTvp9qsdugDTTKsF1K2tSIn+yz8mGNLqvW7u/Nt5KrMx9N
+         JNJYD0ygSBvVzFZxfH0EecT4LE+nzXCPw+Dowva+zEIpdRwusykj9/0HCOq2THQVC76q
+         AmMg==
+X-Forwarded-Encrypted: i=1; AFNElJ8fZWKDS08oJeti5yYXx8fIxKirK1n9w2ky/9IFqz/JXynT0ijMdXwlnSYMKOQMEVVdT68F4hzr3+oADfz68FI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymJ+ariIVoTnchWs0GBpR93wO3gH6sw/BcJPOW2WmdeNhMQ0YF
+	XM/Cb/NO8s/ScJZwQ0GNQTzhgTr6/lI3LMPRP/5izAFCAX5+0VqWmMKE
+X-Gm-Gg: Acq92OG07Lh9eerWZYhAOkihb8SbGKA0KIAbrBHqFxTRczA4gsyFOKo0CPEhTQwDuMB
+	eeSK7jc+SmAhF37K5MDO2lVAxYttp4rlE2Nm4P3rQD1LQQ4ns4QKe0S1tCTj/2DUvs42gFQC9F3
+	/5WoRzSHPq9f+gG6T1jezzOjrgKkwOLMYZ+PQmHAWRK3i8lxtYLQ+Y1d2o4H4efo5JOgN+4bC3e
+	ns4m3Wa+FEuOtifkcyMQN2xIp6NtIAxPTM55c4mxcAi432lEc5tof4ektCeWr5m0h09+cmVtzIK
+	wsXDKInxPzaBAD23Tl0ZH1Mr39Jo2Ny2hBspWhjG4F9pq03gu2Qkh8PFPcQBTsrD0SYiBFgjCn9
+	ThHen/tOnvA6NWE920k22IqUUlGNo0lL0BBQp9rPEb3gpC271kDydCUfBwrF1R3rqet9Wtl/ASz
+	h3Y2OfiJQZgOSPSyU6vpM44uZ5WszR45KbLniW/uBVnazR501HwQhjUwhOzni0PM1zHpAtFvbob
+	mqB3rEiZkz66uGSEMyiXII=
+X-Received: by 2002:a05:7022:ec88:b0:12d:de3f:d84e with SMTP id a92af1059eb24-137d42c2977mr7409925c88.39.1780419999005;
+        Tue, 02 Jun 2026 10:06:39 -0700 (PDT)
+Received: from SLSGDTSWING002.tail0ac356.ts.net ([129.126.109.177])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-137f53f06c4sm264969c88.0.2026.06.02.10.06.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 10:06:38 -0700 (PDT)
+From: Weiming Shi <bestswngs@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Arman Uguray <armansito@chromium.org>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>,
+	Weiming Shi <bestswngs@gmail.com>
+Subject: [PATCH v2] Bluetooth: eir: Fix stack OOB write when prepending the Flags AD
+Date: Wed,  3 Jun 2026 01:06:21 +0800
+Message-ID: <20260602170621.1454711-2-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260602070032.51248-1-liujiajia@kylinos.cn> <fc5c142e-3187-42a2-af4d-9103858da93e@molgen.mpg.de>
-In-Reply-To: <fc5c142e-3187-42a2-af4d-9103858da93e@molgen.mpg.de>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 2 Jun 2026 12:43:17 -0400
-X-Gm-Features: AVHnY4IHiw5zLo2H9IcCVSz1fPQ2W3Z4a5Ga-dTuzozBZt4tDq1rMK-08mFBwyY
-Message-ID: <CABBYNZK1GLGu+xdKng3O4b=NrNwxB6ZAyfXSn8DE4WptXN=5CQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: hci_event: fix simultaneous discovery stuck
- in FINDING
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Jiajia Liu <liujiajia@kylinos.cn>, Marcel Holtmann <marcel@holtmann.org>, 
-	Brian Gix <brian.gix@intel.com>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Jiajia Liu <liujia6264@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Paul,
+eir_create_adv_data() builds the advertising data into a fixed-size
+buffer ("size", 31 for the legacy path). It may prepend a 3-byte "Flags"
+AD structure (LE_AD_NO_BREDR on an LE-only controller) and then copies
+the per-instance data without checking that it still fits:
 
-On Tue, Jun 2, 2026 at 10:41=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de>=
- wrote:
->
-> Dear Jiajia,
->
->
-> Thank you for your patch.
->
-> Am 02.06.26 um 09:00 schrieb Jiajia Liu:
-> > When hci_inquiry_complete_evt is called between le_scan_disable and
-> > le_set_scan_enable_complete and no remote name needs to be resolved,
-> > the interleaved discovery with SIMULTANEOUS quirk gets stuck in
-> > DISCOVERY_FINDING. le_set_scan_enable_complete does not check inquiry
-> > state. No one sets DISCOVERY_STOPPED in this process.
-> >
-> > Add state check in le_set_scan_enable_complete and change state if
-> > the state is DISCOVERY_FINDING. Tested with AX201 (8087:0026) in Dell
->
-> =E2=80=A6 change state to DISCOVERY_STOPPED =E2=80=A6
->
-> I=E2=80=99d add a new paragraph for the Tested part.
->
-> > Vostro 13. Discovering disabled MGMT Event below is reported when
-> > running into the above condition.
->
-> Thank you for sharing the test device. Could you please document how to
-> get into this state exactly? Some Xiaomi device?
+	memcpy(ptr, adv->adv_data, adv->adv_data_len);
 
-What are you talking about here by saying Xiaom devicei? He literally
-said Dell Vostro 13, a laptop, and this is a local only procedure,
-there is no remote device involved here.
+tlv_data_max_len() only reserves those 3 bytes when the user-supplied
+flags carry a managed-flags bit, so an instance added with flags == 0 is
+accepted with adv_data_len up to the full buffer. At advertise time the
+flags are still prepended, and the memcpy() writes 3 + adv_data_len
+bytes into the size-byte buffer:
 
-> >   @ MGMT Command: Start Discovery (0x0023)    {0x0001} [hci0] 10885.970=
-873
-> >           Address type: 0x07
-> >             BR/EDR
-> >             LE Public
-> >             LE Random
-> >   ...
-> >   < HCI Command: LE Set Extended Scan Enable    #38205 [hci0] 10886.131=
-438
-> >           Extended scan: Enabled (0x01)
-> >           Filter duplicates: Enabled (0x01)
-> >           Duration: 0 msec (0x0000)
-> >           Period: 0.00 sec (0x0000)
-> >   > HCI Event: Command Complete (0x0e) plen 4   #38206 [hci0] 10886.133=
-295
-> >         LE Set Extended Scan Enable (0x08|0x0042) ncmd 2
-> >           Status: Success (0x00)
-> >   @ MGMT Event: Discovering (0x0013) plen 2   {0x0001} [hci0] 10886.133=
-414
-> >           Address type: 0x07
-> >             BR/EDR
-> >             LE Public
-> >             LE Random
-> >           Discovery: Enabled (0x01)
-> >   < HCI Command: Inquiry (0x01|0x0001) plen 5   #38207 [hci0] 10886.133=
-528
-> >           Access code: 0x9e8b33 (General Inquiry)
-> >           Length: 10.24s (0x08)
-> >           Num responses: 0
-> >   > HCI Event: Command Status (0x0f) plen 4     #38208 [hci0] 10886.141=
-333
-> >         Inquiry (0x01|0x0001) ncmd 2
-> >           Status: Success (0x00)
-> >   ...
-> >   < HCI Command: LE Set Extended Scan Enable    #38242 [hci0] 10896.381=
-802
-> >           Extended scan: Disabled (0x00)
-> >           Filter duplicates: Disabled (0x00)
-> >           Duration: 0 msec (0x0000)
-> >           Period: 0.00 sec (0x0000)
-> >   > HCI Event: Inquiry Complete (0x01) plen 1   #38243 [hci0] 10896.383=
-419
-> >           Status: Success (0x00)
-> >   > HCI Event: Command Complete (0x0e) plen 4   #38244 [hci0] 10896.394=
-378
-> >         LE Set Extended Scan Enable (0x08|0x0042) ncmd 2
-> >           Status: Success (0x00)
-> >   @ MGMT Event: Device Found (0x0012) plen 22 {0x0001} [hci0] 10896.394=
-497
-> >           LE Address: 88:12:AC:92:43:69
-> >           RSSI: -101 dBm (0x9b)
-> >           Flags: 0x00000004
-> >             Not Connectable
-> >           Data length: 8
-> >           Company: Xiaomi Inc. (911)
-> >             Data[0]:
-> >           16-bit Service UUIDs (complete): 1 entry
-> >             Xiaomi Inc. (0xfdaa)
-> >   @ MGMT Event: Discovering (0x0013) plen 2   {0x0001} [hci0] 10896.394=
-506
-> >           Address type: 0x07
-> >             BR/EDR
-> >             LE Public
-> >             LE Random
-> >           Discovery: Disabled (0x00)
-> >
-> > Fixes: 8ffde2a73f2c ("Bluetooth: Convert le_scan_disable timeout to hci=
-_sync")
-> > Signed-off-by: Jiajia Liu <liujiajia@kylinos.cn>
-> > ---
-> >
-> > Changes in v2:
-> > - move the handler to hci_event.c
-> > - remove unnecessary bt_dev_dbg
-> > - update commit message
-> >
-> > ---
-> >   net/bluetooth/hci_event.c | 7 +++++++
-> >   1 file changed, 7 insertions(+)
-> >
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index eea2f810aafa..1cd5f97daafe 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -1769,6 +1769,13 @@ static void le_set_scan_enable_complete(struct h=
-ci_dev *hdev, u8 enable)
-> >
-> >               hci_dev_clear_flag(hdev, HCI_LE_SCAN);
-> >
-> > +             if (hdev->discovery.type =3D=3D DISCOV_TYPE_INTERLEAVED &=
-&
-> > +                 hci_test_quirk(hdev, HCI_QUIRK_SIMULTANEOUS_DISCOVERY=
-) &&
-> > +                 !test_bit(HCI_INQUIRY, &hdev->flags) &&
-> > +                 hdev->discovery.state =3D=3D DISCOVERY_FINDING) {
-> > +                     hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-> > +             }
-> > +
-> >               /* The HCI_LE_SCAN_INTERRUPTED flag indicates that we
-> >                * interrupted scanning due to a connect request. Mark
-> >                * therefore discovery as stopped.
->
->
-> Kind regards,
->
-> Paul
+  BUG: KASAN: stack-out-of-bounds in eir_create_adv_data (net/bluetooth/eir.c:301)
+  Write of size 31 at addr ffff88800a547bdc by task kworker/u9:0/65
+  Workqueue: hci0 hci_cmd_sync_work
+   __asan_memcpy (mm/kasan/shadow.c:106)
+   eir_create_adv_data (net/bluetooth/eir.c:301)
+   hci_update_adv_data_sync (net/bluetooth/hci_sync.c:1310)
+   hci_schedule_adv_instance_sync (net/bluetooth/hci_sync.c:1817)
+   hci_cmd_sync_work (net/bluetooth/hci_sync.c:332)
+  This frame has 1 object:
+   [32, 64) 'cp'
 
+The "Flags" structure is added by the kernel, not requested by
+userspace, so only prepend it when it fits together with the instance
+advertising data; when there is no room for both, drop the flags rather
+than the user-provided data.
 
+Reachable by a local user with CAP_NET_ADMIN owning an LE-only
+controller on the legacy advertising path.
 
---=20
-Luiz Augusto von Dentz
+Fixes: b44133ff03be ("Bluetooth: Support the "discoverable" adv flag")
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+---
+v2: drop the kernel-added "Flags" AD when it does not fit with the instance data,
+    instead of dropping the user data .
+
+ net/bluetooth/eir.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
+index 3f72111ba651..1de5f9df6eec 100644
+--- a/net/bluetooth/eir.c
++++ b/net/bluetooth/eir.c
+@@ -283,10 +283,12 @@ u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr, u8 size)
+ 		if (!flags)
+ 			flags |= mgmt_get_adv_discov_flags(hdev);
+ 
+-		/* If flags would still be empty, then there is no need to
+-		 * include the "Flags" AD field".
++		/* Only add the "Flags" if it fits together with the instance
++		 * advertising data; drop it rather than overflow the buffer.
+ 		 */
+-		if (flags && (ad_len + eir_precalc_len(1) <= size)) {
++		if (flags &&
++		    (ad_len + eir_precalc_len(1) +
++		     (adv ? adv->adv_data_len : 0) <= size)) {
+ 			ptr[0] = 0x02;
+ 			ptr[1] = EIR_FLAGS;
+ 			ptr[2] = flags;
+-- 
+2.43.0
+
