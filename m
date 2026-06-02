@@ -1,96 +1,98 @@
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E0014A619
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 20:32:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D063090C4
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jun 2026 20:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780432349; cv=none; b=ISj8SCMFCL1vFvT1iJMMU7+j9BO3tEi59L4ibVbmzGsAhPiun76m5JL3G7ZpwFg633FXtTme61+4LsipawMOIcaY6nKPj0oWuiVKWYWlMkqRaYrXfSbwlaDLS7GjaRne3sha6wPUanhNrN+3fqrDuh9Jje/6Th2UQJmEoHCkP10=
+	t=1780433278; cv=none; b=Jt8as4jII5wwe3CVyIpxszcThUP1gwVg0oTEtntN+quN4z/k4ZH/o2wJ29R+DOm+9ZGXa0sA/IvwaLWOh3NHHnZ+KpP8vcUSPxR4fPfqxAslnCNyHmATKlXCX/xxoeiVp4QLbETtRiGuAZwwpZT3NvLNi/Q9Vx4EGLDCoESQMnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780432349; c=relaxed/simple;
-	bh=UAjNaqFigzrGjvTO3eJoeWhSbtO95FApZcWU16dvi/o=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=jHAFG7O7I8GiX+nZ8yvA/5kkcKFymGx7QC0zcneJZ+VfsPd/+5zxYc++4LNgjPbieTR96KhM8dl8BJ92P7FFXs+cOKzaEsESQaVikUyvZdT/yP1Erp0jKvutevMs3Lrtk4no+e00ESTWbb+X25HPDCHCzqimayLc29zAS3CRT18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-69e47dbf2a7so277208eaf.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 13:32:27 -0700 (PDT)
+	s=arc-20240116; t=1780433278; c=relaxed/simple;
+	bh=F8hkybGzCNZKb7H62YvHl4QYlKgR4yC31cloCzVWZDw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=RqxevKUkjnvC3XAQUwRPSfN3vzPhp2wSacKRT+2dtKC2mKiGnNzuPKCHh+yoVPlhADxUmU5Zl2cMQ7LFX+2siohfyNapwsiKW+7C1e/tpEzAspzNjh1XDjPjXT12EBKb3jk3F5pDzPQCShUZL4eaBLLpLTT/BTMZM/mZkkTC8hA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gp6A1N3D; arc=none smtp.client-ip=209.85.221.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gp6A1N3D"
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-5a0e9e798e4so906414e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 13:47:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780433276; x=1781038076; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YUcrjUc9R9bmZQeAuYACMb7r2PjbvCgVNNhMNI4ncss=;
+        b=Gp6A1N3DIBvaGjOSOGKMhd1IeY2qfq8QzavUM5xS7lUvbz31CWBgcxdHDpZfBRXElk
+         Eo+aO/n3VbFt2YhJvpOE5sKG+qnS0AmmQdbKcmTwmrGmESim5uAu8uCHEYlWCWYVSvZD
+         XMSazVoN/sc9hRR3Rd4LIlGRRlLQ1U4uOZ8bd+CXhRiXl5IP56xqNtIxqMhbASq3nKuJ
+         PLFtte5xIanlDG9C9GCCCcpFotM/usXvpB+c5NdugiIvms0XR/qA+lMUYunroM07L4mt
+         SJ+zsWG081lRESr/8vrBV+2kCwchx1lH9WL/BS+AEcV6D3hzLnnzfNILD43dY6phzK16
+         2frA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780432347; x=1781037147;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5pEnv0Shjf47V7AfpubXhYEZNx2P0+HCGmXw0XWFsOg=;
-        b=UvkDnst3eeY/X6GwGIjWy37vzt1nCZrugtLGpWQRVZIeIpaVLfi78IwNkdHsOT0XsX
-         ttf5sfreg1Iz962z9yjoWnbjEg4WYJnq4U3RMQqbnWIi+WpVovFSEIfoxF11e+DL6v6U
-         FTvn15jTiu4AfK1Mdbeld1Xc0mbGOPcDvWgejvlTut9SoLzRnACIgir86S5ULPCH7QzI
-         Sz8rFgbVcNiayocgJB4eMBFnjKTCUuLzGtdIHRfLzM3JAigjiAx2rZXWD4p4UQM4yZQm
-         3kP9sQhq3oYO0JyfWlx3/GBqWTSACeni8UkI8atu21qC3h1pp4T/LpkF5e+xonBaMsrN
-         KWbA==
-X-Gm-Message-State: AOJu0Yyd1b2Irzya3uv6U0DKG/+KnDs2E4EMHxkVF/KzTsuxWea7Ibo1
-	5Q0hB03lOFdqww+lHU99hsbgd7U9cd8Enr1b9kUzj0Sd/nJ9wwDjYezJO8C0shdagQ1l2NdxpAz
-	+4lyoUMW74pdJBxaxT2xgSJ3RnbELTUYl2edr5cpjSDRVe5LKxXkCy1i8zhc=
+        d=1e100.net; s=20251104; t=1780433276; x=1781038076;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YUcrjUc9R9bmZQeAuYACMb7r2PjbvCgVNNhMNI4ncss=;
+        b=s47Ra5X9kzvnNFEwbCDofj7pjHk9luVyeFJnj3tIPXVZIjj7XNIjLS2sgLeV3pQ8wx
+         aQKMZ/0bUO0egT9pCflidi304EYvhL7fwFHmp9Xxuu6m0RHZi3aK0lsOOdB0Jg4a4tIg
+         K71KkM/aswTs+E8R+OtZdGVII+aYWcjptAufc6an10bOAfyn1SPR/1M3fi3SD+Km3w6c
+         /SfziN1RdhIR/NY4vXrRd+rEbnt5tpGEDxRrGFVD+mqtWPr8OOu+VyUZ2CjdHPl3Tm8Y
+         RHhhI7LQWF+u6Zob28NmIZG09+YQotECO/1OCsFrnOsYd84m/UbT5wh9RVmMe3oMapMG
+         NY6w==
+X-Gm-Message-State: AOJu0YzA62mdFLguemLG+YKyvWMYADqHoeWm0i6YAFg4vy66543xnyzp
+	oH6ZHVDyWqXA+Qw78FYzmxXq5i6oUJGy2pJ102vdEKsjX4YJ5uHLi1ZmIH4MxJ8p2CY=
+X-Gm-Gg: Acq92OEyyckiPLV9LkC9ocDxqcjiDbTnshrK0fkW1XA5WmzGrP7J7NSGLQbxWXcUQ25
+	0xZ6cofuDSNP/U7/q4+zKUV9A9PgH0jRJxDPCLdNjPmQ/oYyUrbxKngJD/2/0j0Bze39I43nhm6
+	rs2vGEkQefn5Z7n5zvu2uBNTBQ5YSZJVa8SeEGvVn1E4yM80LxSZRTdUqCaDmSCChkyWrgN0MvT
+	GPG1v5wvQn5cErz1pLBtWJjhjqQVbNdvbRiAKy9lby1C0L6Ea9HqTJywhsZR9vDZZpMCUUTKmgr
+	LdY9PrdevWs596DjEplg6ZmNKaIqakpZHpqqJnUrIQ1jt2XuqHlh2xNzB3XCWugGakPuCiR767v
+	KKu/bFxOKTlKCwAxlfrQ3SBXGd8yirpYJK/KjRi/OQ68iF7Ruo987zugYmg3JoolXj/OTGZpTkO
+	aVOMJTaW7ZE4dMUPADiY0BqwiBp855/C4LUV6pMRBuzITbC6JlVFQ0szOdbdOlL4JEKI1Tloqir
+	LggU3EuHPf8ADHAJR+FQ4JMe2qu
+X-Received: by 2002:a05:6122:1796:b0:5a2:4391:1730 with SMTP id 71dfb90a1353d-5a6e5de0c31mr402857e0c.7.1780433276304;
+        Tue, 02 Jun 2026 13:47:56 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5a6dd211687sm560477e0c.16.2026.06.02.13.47.54
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 13:47:55 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] advertising: Fix sending extra bytes with MGMT_OP_ADD_EXT_ADV_DATA
+Date: Tue,  2 Jun 2026 16:47:49 -0400
+Message-ID: <20260602204749.210857-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:e844:0:b0:69e:5d9:7e49 with SMTP id
- 006d021491bc7-69e48cf973bmr165066eaf.34.1780432346989; Tue, 02 Jun 2026
- 13:32:26 -0700 (PDT)
-Date: Tue, 02 Jun 2026 13:32:26 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a1f3dda.7b89b7e1.205e57.0007.GAE@google.com>
-Subject: [syzbot] Monthly bluetooth report (Jun 2026)
-From: syzbot <syzbot+list9c475ae69cc5384cb852@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello bluetooth maintainers/developers,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is a 31-day syzbot report for the bluetooth subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/bluetooth
-
-During the period, 4 new issues were detected and 0 were fixed.
-In total, 27 issues are still open and 102 have already been fixed.
-There are also 8 low-priority issues.
-
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  9301    Yes   WARNING in call_timer_fn
-                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
-<2>  564     Yes   WARNING: ODEBUG bug in hci_release_dev (2)
-                   https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
-<3>  367     No    WARNING in l2cap_chan_del
-                   https://syzkaller.appspot.com/bug?extid=3272785b7a1fc9b510f6
-<4>  345     Yes   KASAN: wild-memory-access Read in l2cap_connect_cfm
-                   https://syzkaller.appspot.com/bug?extid=0e4ebcc970728e056324
-<5>  203     Yes   KASAN: slab-use-after-free Read in l2cap_sock_new_connection_cb
-                   https://syzkaller.appspot.com/bug?extid=cdae834448ec8c3602fe
-<6>  111     Yes   INFO: task hung in hci_cmd_sync_clear (3)
-                   https://syzkaller.appspot.com/bug?extid=217e3f1283cafe80586e
-<7>  97      Yes   KASAN: slab-use-after-free Read in l2cap_sock_ready_cb (2)
-                   https://syzkaller.appspot.com/bug?extid=9265e754091c2d27ea29
-<8>  33      No    WARNING: held lock freed in bt_accept_dequeue
-                   https://syzkaller.appspot.com/bug?extid=4c5f0c6f8cc60159bdbf
-<9>  165     Yes   KASAN: slab-use-after-free Read in bt_accept_unlink
-                   https://syzkaller.appspot.com/bug?extid=a1595e656a83ea5b78eb
-<10> 91      Yes   general protection fault in l2cap_chan_timeout (3)
-                   https://syzkaller.appspot.com/bug?extid=f0908ddc8b64b86e81f2
-
+MGMT_OP_ADD_EXT_ADV_DATA expects the command to be of size of
+struct mgmt_cp_add_ext_adv_data not mgmt_cp_add_advertising.
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ src/advertising.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+diff --git a/src/advertising.c b/src/advertising.c
+index c8b00a887911..1ed09c902b4b 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -1498,8 +1498,7 @@ static void add_adv_params_callback(uint8_t status, uint16_t length,
+ 		}
+ 	}
+ 
+-	param_len = sizeof(struct mgmt_cp_add_advertising) + adv_data_len +
+-							scan_rsp_len;
++	param_len = sizeof(*cp) + adv_data_len + scan_rsp_len;
+ 
+ 	cp = malloc0(param_len);
+ 	if (!cp) {
+-- 
+2.54.0
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
