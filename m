@@ -1,320 +1,141 @@
-Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55717E0E8
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2026 13:16:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780492598; cv=pass; b=tgyRg7bwykXANDWHuX/FEPysKGiaZqRApmTNkEUHh7/FxiqLGR2K817WWU5xoHgpAKxSh6UtpHBGywUeCOCo0iId6yOrW8YrOmADeGLFY97ceRM3UL1+7LBsvAXKaC6Pgqr79UsXaNReBQ9+iQjO+WUm9oglvAl4Cy7oItPe8pk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780492598; c=relaxed/simple;
-	bh=cNaZRaYNVbotiqeftdh2tXUrfem/yMoXoFcICFrpdHY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XzaGOg4FmlwegTofAxK6aHrG60mexTtP1d/whfnYMP51Yad/tPR5XlkTMobQexTvNAYeTYYC+aDFzeOL+n4ni1d++y4N6y+FOqFIGRQUWUxWzqbU3B7lNyqkZY/MxemGSzCsSBcilDkuB3BLpFuIorN5tHE3DQ9XfeTprCfou5c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TfhniITx; arc=pass smtp.client-ip=74.125.82.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D6E2FD1DA
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2026 13:31:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780493478; cv=none; b=mZydUUGZnAAol/CMVmHbgiEYFM/7yYXO/7moqFZGHRmyn+9YDUi9LdWn1fNo12NnYy0KWeU8KfUniK7v5i68ThJVYGY4bAIYRf0h97t/4NnVlzT8rCRtfB1qvrxt+1uG8+8ZFAoQX7/HKFDLOufMj8TlDtrtPuIJAy1Ekgydmck=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780493478; c=relaxed/simple;
+	bh=Ko6t/nLyuESMWj5AStE8p1jMFXuENbEXwj/tmAm5NfI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=rPHW1VP2mqTzJ9opB6WIsl5DmkyFcsQfxzgNzK697X9R5TDEA+gi0KrNMFWWYMo3fdR6SYF6ZtyUbeNwYE1LYaT9MMdBtxze9PkcV0TnXg43eAIEVP2ZdBC1aaCDQSr84aiqE2x4A/jLk2G2MmTGeLyYjEFtr+WqbaiVg6i9h64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Ilt6InWD; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=cpLyre2n; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TfhniITx"
-Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-137335bc3caso11288648c88.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2026 06:16:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780492596; cv=none;
-        d=google.com; s=arc-20240605;
-        b=djEkot0P1kOVleZQZexdhWE+aXcyzOW1Cz9kIXsw5Q8Q0qP8odNxZi7Z6eIkphDipi
-         kwNdkTG6gHsaeAzrOUiegWPBaoGUxax73gNtK2Z8R3eF5+9szVEw5wJ1pHE9LeIQgUNb
-         X5ixHm2PrORgwcnZwuKq6+ou55iUi+/UUbTvQTjepUo6Zo1lt0F3QqZj18qYmYvNye+1
-         DckFJFtOWjtZ/UK60aDnZN+/2QlJOiDBbhlxf8ll5fVnMh6J7N7trtGLfhOixdL2OeeQ
-         tJlUyKL4aRUJVpgmvszQGU1w8St+rihcKH1JZQ03wpyhTZn+SmxNdCXJ1gj3jQPAiNLb
-         0ApA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=4/LDPLcAVwSR2b5SqhhCH6zmznY4YB2j1xPm1amo8J4=;
-        fh=/guXn8Tp4E7lpHhXvN2ajLOyf2f3geg1SO/3q7RkUVk=;
-        b=aysSUV6nN4GP/iV+SYQOqBq8PWwwOVKrYWUI+C//3g09ux1zrEGI0miE+8284PMwFA
-         gZO3CUaXa0zls7GAmLOhnhPH2ja3CKGyTs76Y3Ku2RSVx9hUyqAH6dcKC4DhAHAgyIHw
-         eiWC+ExBVxl2IXJTLhjvkvYooM5oQhn3mbgexx8HP+RICwTzmlNUKEwOH3x2hBRxHoG/
-         /+jKPWvO+wm0L5MArpLegvxsdsL73CMpoV5FKzdGfsj+CNFxa7tK3V2vNJh1ve5QdEWl
-         7JprJvDh4cUilWqBgWu6UTqaPq0n1wxACqn7fALs7tpwN+FQkjXV8T3hkKbsfcibXkON
-         roRg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Ilt6InWD";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="cpLyre2n"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 653CfIcG2076119
+	for <linux-bluetooth@vger.kernel.org>; Wed, 3 Jun 2026 13:31:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=qcppdkim1; bh=KzCsdghRtIv
+	VrMCNgAFGi13T6qH2zXLUCFyhuKFsiek=; b=Ilt6InWDIbZs77ZpjA8HczUXWqU
+	Cbxco8I0cvPgfP18YQ403Rgp4zIBKGZjfb87iRcs+D33G0MXqYHUH9+X/72WuieC
+	H4I4gmGAJ5ZRiDzV+H1XcqNGCcSzwtoPquzifauEdSfznx+mJHYEvliGaZDK15ep
+	ZKHZw9U7pvCpw1PL6vlVd8M3CNpB9YS0r+V2/i1vNkuRmY12Rkp7RNvqGmWMjH+5
+	yu4lfn2H5hOdG5MgMsg7Qb1gbCYLRxgcs7+qaDMQeqsz0sVn6ehfHOBONnPHRPg0
+	CMEXlDvMzrxyzYSs0bvMH+93xqwEghOGvwKIQsthX3VBMYWS4TgAUmAcxcg==
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ejev19qt1-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2026 13:31:15 +0000 (GMT)
+Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7e60aeda837so3518774a34.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2026 06:31:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780492596; x=1781097396; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4/LDPLcAVwSR2b5SqhhCH6zmznY4YB2j1xPm1amo8J4=;
-        b=TfhniITx9arE3gc52cLV8v+4DGEHeBpYw1+8FECve8qjOrA9AZf8ZRgtAnZAQyEury
-         YdD+F7RlGuuLrKNaNBZ3ep1mhZQPVq5n3p/bBlNIdSYFPHXXxQb5aiEYqVZe4iBeYMbT
-         5ZpOYpaY2qXpVXvZCjnUYYeUByErBhmtK0juRJYCzyDYs/NGzuqmiU2YDakwCSWDyQze
-         1fk7u/tRJfwUw7nkRfDDOn5sNNM/MgiVtu3n+CpyLDleS7e8bn1GehJmyqsUE5ItlwaO
-         2UsPi6cWwg8/Ag+5QxbNNJ+DuwqhoaR1Esm46WSuHpx3Jy8Jhzv34sxd+Ac+lJpSEgzE
-         BJ5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780492596; x=1781097396;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=oss.qualcomm.com; s=google; t=1780493474; x=1781098274; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4/LDPLcAVwSR2b5SqhhCH6zmznY4YB2j1xPm1amo8J4=;
-        b=M0Sj6L8IdyGqufGql5vtVlYBU0pp+Z9sc2J6/ZOHUutRP7C29xzKzYHkBAzonAcjoF
-         YN9LUPhC+vG4DHwJTOr0hDTv0Rq+nagDwphXXt0tZKe5jvybA4r82xOinJB7UVyC/MNc
-         ecI73iBxB7SNXnvwqoFgDoqnKzS1Osn6uoftakJZoJpErKJ5ukjEGYAQHmsrcHat1N6z
-         9/K7Iyom6LL1yMVUA7keRQmeNZlajDm3coqhRySNDqKRRBkqlwIvEbFS7M0kas8SuvLO
-         FNL6GavdQZiCO1JQropeCtnuyaJhMO0dSceZg2czIx8XsjGAsQj9asfYWlp3CYgKiHs/
-         CxhQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8FrNp5nAaKBSa6rflWtYqm+HoeFPNcbF9XJTM9Gq3y1qT8XI++teNN8CKkde7SHkkj7XMvPBoKHg1GtKb8U68=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1qBX/Zc5YWbPKsd66UlShfb7iLtFGIDmwmLf3xe5C8J6dfUtX
-	wqa9bY6RuO6n145GYOfy8Tosi0+jZkRk8Cow+ubq0MaeDaPFrQen5+yTLeBBpS3F4rGgPOAKczg
-	+glXeNqM+8YDkPsy8Vc/Cg0dOD2Gn/mcj2huP6a4r
-X-Gm-Gg: Acq92OGZJpJCnRIzPhTlFoPZlPJhZtTTCHMO5AbEVTRUzu078bRa/nJRizrU3/nlmgH
-	+VlyVaWInQ2jRHYDGH8pjo5Uf3++xU6XKAqX4rmt636cFturCX4NWP4Yj8NibzLrqxhXxBkWsQs
-	2Wn0SSWIdf8nJIowYXG/YAv8Djbz1TKYAsXD647HHhFlPOrMUeRojVxMK1ee0dLH2gdNB74AqPJ
-	UV+TJkPQY7/PzM2IDeB8pcFi+Rqo3lvQyXZWlDDu6cbnhi/r2RQT5qVtJj3PCRo8uzLpcY1vqgP
-	SQh6E1MZubnFYnSGeil1W0V+921mtL0V7Cov9idAZxA7My90
-X-Received: by 2002:a05:7022:6181:b0:137:9399:fc59 with SMTP id
- a92af1059eb24-137f6bdcbf7mr1212301c88.21.1780492594934; Wed, 03 Jun 2026
- 06:16:34 -0700 (PDT)
+        bh=KzCsdghRtIvVrMCNgAFGi13T6qH2zXLUCFyhuKFsiek=;
+        b=cpLyre2nTPSTJvOFd3yrssUnvszsdol2tzjN8hJwcnw5A3UVRtJ/kon6kUMRRd8ClS
+         hZbWTxsRRkhLhlukgiWBb40QbgYSs3DinGGFsnsu+kHf2OcIyibrNOOKX4ZwjCzucn8b
+         CefWvFgXo0UK3rXtOb9vtNQrhg99chA4QJPk74tQJ3mm075Dzk+7QNBAcID8Xgjm1/HI
+         pAN/qhNAXIJBfRmK0jgY102rxgrEGKkHlNYoTUUE0ooEqNQi6VmOGQ9J2ja4qf38hnzZ
+         BdiJOu3kmawdrpyr2o+6uBDdt6T+4cIMUpZ3cr/E1AD3Gsj4GbXo+/bG1itHx+0SX7VJ
+         dyOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780493474; x=1781098274;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=KzCsdghRtIvVrMCNgAFGi13T6qH2zXLUCFyhuKFsiek=;
+        b=Oqbrj/dJH6UrpG4bkHzIRC53FJagHoxn3YMxYazJaTqW16iYW4mkBfTCR4seFT687k
+         OXh9EdykI2cud3owStedLMW8PKt8D8RdIIi4oftUySWZXbsupTx7SSEfRJa4SYNs/Dse
+         MKqqzvezXaVxE1+w5P8fz5T7ye+UOvcTtk02HwI1qSDmUaosKIM6KO1FacwEr/oUatCj
+         cu976XtMIj9NPGGzFyaXLsCrmdAiNpPKhBIogx+qcs/xPtg/9lnKons5lnDIcdXppAr/
+         QwVPB0rd+B38vSlLXXtbIq5sS3a8WmRMjC0+AIIgha4d6B9kiLL4MfgdeGatLBMgrSkC
+         V3HQ==
+X-Gm-Message-State: AOJu0YxOablt31HFWB+3Uq92WO3zX9mfU9cDolmPlB+DHF2nSTuexMT3
+	2egJimBCGRde0aTeld2EMNc63f1tb2nexbhThBTYLdPON7x7qMF4v9s6fQSm972Gp6mn7E+cMnn
+	F8YpCmBPINhxK74hdAXd501dmnaFe2jZoDVC5Q6BTSW6eHci7TSbpfFfr8KNTdT1X0WNKYak=
+X-Gm-Gg: Acq92OG0bg9R/SlC+arG/fbrPTA+ARzzlLumtbzJs5s+9D+GUTUuXNi0C8CaGocT0Lx
+	NWrue7mIPVIwn5ZWO8ztnIg30AEzPRpXVVFDA9Ubzs9tSKmMaKoiu0wqiRrNamZXsrejuSf/Yoe
+	LAEd1SxoTbl90susftsEUZzHvmbKqGDE5JtvLHb9h95NoVbnVTOj4KF7I5IAuPWugKcb7xYY2eZ
+	v3bQH70XF/DYBwm9JSanFBVV77STrRr6hB5+Z7VVchNdIL/O5y7QXkvnVx+HvIEYWNkyrUbdPL2
+	1kHHahpddNijALVBX6oEZI5ZFcECpf8kSas2Q4nF4jmNf7TtzIDiEXFLMr7foK2y6Smw8BM7GtQ
+	WQSZfigyMNTWdMb4QPE+lLXR+GFYSJEL5BhKwT+0OepyfEs0HqiMl84xwp/VwMR/D6bzmTcjayU
+	OPPfh46sA=
+X-Received: by 2002:a05:6830:6ad5:b0:7e3:f809:7984 with SMTP id 46e09a7af769-7e6e616078amr1389661a34.1.1780493474482;
+        Wed, 03 Jun 2026 06:31:14 -0700 (PDT)
+X-Received: by 2002:a05:6830:6ad5:b0:7e3:f809:7984 with SMTP id 46e09a7af769-7e6e616078amr1389637a34.1.1780493473849;
+        Wed, 03 Jun 2026 06:31:13 -0700 (PDT)
+Received: from hu-weiden-sha.qualcomm.com (i-global052.qualcomm.com. [199.106.103.52])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e6e78e14acsm1744711a34.14.2026.06.03.06.31.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jun 2026 06:31:13 -0700 (PDT)
+From: Wei Deng <wei.deng@oss.qualcomm.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com,
+        cheng.jiang@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
+        shuai.zhang@oss.qualcomm.com
+Subject: Re: [PATCH v2] profile: Set L2CAP IMTU for external profile listeners
+Date: Wed,  3 Jun 2026 19:01:08 +0530
+Message-Id: <20260603133108.2607981-1-wei.deng@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CABBYNZKZhamDmBjpKW3GjtF3jrNfLXUTzYaNyz1vbdrgM_Lu4A@mail.gmail.com>
+References: <20260602031719.679979-1-wei.deng@oss.qualcomm.com> <CABBYNZ+vSQWjJyajPxoBs3endFOkU2JGOFoBKvePu8YvZSMEXQ@mail.gmail.com> <CABBYNZKZhamDmBjpKW3GjtF3jrNfLXUTzYaNyz1vbdrgM_Lu4A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260603123111.2334409-1-elver@google.com>
-In-Reply-To: <20260603123111.2334409-1-elver@google.com>
-From: Marco Elver <elver@google.com>
-Date: Wed, 3 Jun 2026 15:15:58 +0200
-X-Gm-Features: AVHnY4KuQXD3HrTxoWO5Tnzvr7x3SwPaXBWTAYTMTTrqkVyWiOEkQnfudggFSok
-Message-ID: <CANpmjNPQCx8rynFhOUfqgagP-KBh0pJsXz6PQt6G3LomdzVJYw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: L2CAP: Fix UAF in l2cap_chan_timeout
-To: elver@google.com
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kasan-dev@googlegroups.com, stable@vger.kernel.org, 
-	Siwei Zhang <oss@fourdim.xyz>, Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: Th6-v6JWm3TPXSo549ZeDo0qynnGmtG5
+X-Authority-Analysis: v=2.4 cv=PNE/P/qC c=1 sm=1 tr=0 ts=6a202ca3 cx=c_pps
+ a=z9lCQkyTxNhZyzAvolXo/A==:117 a=b9+bayejhc3NMeqCNyeLQQ==:17
+ a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22 a=pGLkceISAAAA:8
+ a=GXHleoNMpaRgz9xUpwkA:9 a=EyFUmsFV_t8cxB2kMr4A:22
+X-Proofpoint-GUID: Th6-v6JWm3TPXSo549ZeDo0qynnGmtG5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAzMDEzMCBTYWx0ZWRfX7oBOJ5vDFhAM
+ Ts4hOU7njlHtNHKFwvupX3qHBtZhT7VCYxwEMvGBkx7AnCjgQaAlspv8orT/glRZdE4eRFveNtS
+ NNcq9hkdEy1vIVwakxL54nS+06wAWstrL73UV5zr6q7DKNpxYjW8SMakjImBipuv1KslTo7zv4p
+ hwPrIUC7fnKR7/3cGayhdZXBmqcVCyGA9EU2GNZGlrOP5o1v7doXMrLkGNIcto0ITLqCdagkQey
+ GEwFRinvJiM6nc6L36r/jlecWK6ZfO4kbh6Psp2VV3mwC/tKlGbqerT/i55IR4QBEw2uOenOYz0
+ FygCR+OVrEjEaKl73gHuUH9WRUlZqpZau+4dEocqryEHeJ/7aKgHgHlvtSkM1TS8NHFzbD8TQn8
+ 7KKFsw+JqW+XbNVK0m/82sWTl8r6gnzkJnPd14+vXM7yo7GpardF4ySKafLeLaMk72U3fke+vXd
+ 9cImVtL/ualgrmoKzww==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-03_04,2026-05-28_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 bulkscore=0 clxscore=1015 malwarescore=0 spamscore=0
+ adultscore=0 impostorscore=0 suspectscore=0 priorityscore=1501
+ lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605210000
+ definitions=main-2606030130
 
-On Wed, 3 Jun 2026 at 14:31, Marco Elver <elver@google.com> wrote:
->
-> l2cap_chan_timeout() accesses chan->conn without holding a reference to
-> the connection object. If l2cap_conn_del() races and tears down the
-> connection while the timer is waiting for locks, it can result in a
-> use-after-free when the timer wakes up and attempts to acquire
-> conn->lock:
->
-> | BUG: KASAN: slab-use-after-free in instrument_atomic_read_write include/linux/instrumented.h:112 [inline]
-> | BUG: KASAN: slab-use-after-free in atomic_long_try_cmpxchg_acquire include/linux/atomic/atomic-instrumented.h:4456 [inline]
-> | BUG: KASAN: slab-use-after-free in __mutex_trylock_fast kernel/locking/mutex.c:161 [inline]
-> | BUG: KASAN: slab-use-after-free in mutex_lock+0x4f/0xa0 kernel/locking/mutex.c:318
-> | Write of size 8 at addr ffff8881298d9550 by task kworker/2:1/83
-> |
-> | CPU: 2 UID: 0 PID: 83 Comm: kworker/2:1 Not tainted 7.1.0-rc6-next-20260601-dirty #6 PREEMPT(full)
-> | Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
-> | Workqueue: events l2cap_chan_timeout
-> | Call Trace:
-> |  <TASK>
-> |  instrument_atomic_read_write include/linux/instrumented.h:112 [inline]
-> |  atomic_long_try_cmpxchg_acquire include/linux/atomic/atomic-instrumented.h:4456 [inline]
-> |  __mutex_trylock_fast kernel/locking/mutex.c:161 [inline]
-> |  mutex_lock+0x4f/0xa0 kernel/locking/mutex.c:318
-> |  l2cap_chan_timeout+0x5d/0x1b0 net/bluetooth/l2cap_core.c:422
-> |  process_one_work kernel/workqueue.c:3326 [inline]
-> |  process_scheduled_works+0x7c8/0xfb0 kernel/workqueue.c:3409
-> |  worker_thread+0x8a9/0xcf0 kernel/workqueue.c:3490
-> |  kthread+0x346/0x430 kernel/kthread.c:436
-> |  ret_from_fork+0x1a3/0x470 arch/x86/kernel/process.c:158
-> |  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-> |  </TASK>
-> |
-> | Allocated by task 320:
-> |  l2cap_conn_add+0xa7/0x820 net/bluetooth/l2cap_core.c:7075
-> |  l2cap_connect_cfm+0xdb/0xd70 net/bluetooth/l2cap_core.c:7452
-> |  hci_connect_cfm include/net/bluetooth/hci_core.h:2139 [inline]
-> |  hci_remote_features_evt+0x52f/0x9f0 net/bluetooth/hci_event.c:3760
-> |  hci_event_func net/bluetooth/hci_event.c:7796 [inline]
-> |  hci_event_packet+0x561/0xa70 net/bluetooth/hci_event.c:7847
-> |  hci_rx_work+0x370/0x890 net/bluetooth/hci_core.c:4040
-> |  process_one_work kernel/workqueue.c:3326 [inline]
-> |  process_scheduled_works+0x7c8/0xfb0 kernel/workqueue.c:3409
-> |  worker_thread+0x8a9/0xcf0 kernel/workqueue.c:3490
-> |  kthread+0x346/0x430 kernel/kthread.c:436
-> |  ret_from_fork+0x1a3/0x470 arch/x86/kernel/process.c:158
-> |  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-> |
-> | Freed by task 322:
-> |  hci_disconn_cfm include/net/bluetooth/hci_core.h:2154 [inline]
-> |  hci_conn_hash_flush+0x101/0x1f0 net/bluetooth/hci_conn.c:2736
-> |  hci_dev_close_sync+0x889/0xde0 net/bluetooth/hci_sync.c:5405
-> |  hci_dev_do_close net/bluetooth/hci_core.c:502 [inline]
-> |  hci_unregister_dev+0x1f7/0x370 net/bluetooth/hci_core.c:2679
-> |  vhci_release+0x12a/0x180 drivers/bluetooth/hci_vhci.c:690
-> |  __fput+0x369/0x890 fs/file_table.c:510
-> |  task_work_run+0x160/0x1d0 kernel/task_work.c:233
-> |  get_signal+0xf5b/0x1120 kernel/signal.c:2810
-> |  arch_do_signal_or_restart+0x4d/0x600 arch/x86/kernel/signal.c:337
-> |  __exit_to_user_mode_loop kernel/entry/common.c:64 [inline]
-> |  exit_to_user_mode_loop+0x85/0x510 kernel/entry/common.c:98
-> |  __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
-> |  syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:230 [inline]
-> |  syscall_exit_to_user_mode include/linux/entry-common.h:318 [inline]
-> |  do_syscall_64+0x263/0x3d0 arch/x86/entry/syscall_64.c:100
-> |  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> |
-> | Last potentially related work creation:
-> |  hci_connect_cfm include/net/bluetooth/hci_core.h:2139 [inline]
-> |  hci_remote_features_evt+0x52f/0x9f0 net/bluetooth/hci_event.c:3760
-> |  hci_event_func net/bluetooth/hci_event.c:7796 [inline]
-> |  hci_event_packet+0x561/0xa70 net/bluetooth/hci_event.c:7847
-> |  hci_rx_work+0x370/0x890 net/bluetooth/hci_core.c:4040
-> |  process_one_work kernel/workqueue.c:3326 [inline]
-> |  process_scheduled_works+0x7c8/0xfb0 kernel/workqueue.c:3409
-> |  worker_thread+0x8a9/0xcf0 kernel/workqueue.c:3490
-> |  kthread+0x346/0x430 kernel/kthread.c:436
-> |  ret_from_fork+0x1a3/0x470 arch/x86/kernel/process.c:158
-> |  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-> |
-> | The buggy address belongs to the object at ffff8881298d9400
-> |  which belongs to the cache kmalloc-512 of size 512
-> | The buggy address is located 336 bytes inside of
-> |  freed 512-byte region [ffff8881298d9400, ffff8881298d9600)
->
-> Fix it by holding a reference to the connection when the channel timer
-> is scheduled, and releasing it when the timer is either canceled or
-> executes to completion.
->
-> Since l2cap_chan_del() nullifies chan->conn to disassociate the channel
-> during teardown, the timer handler might read NULL from chan->conn even
-> if it held a reference. To address this, introduce a `timer_conn` field
-> to `struct l2cap_chan` to store the connection pointer associated with
-> the active timer. The timer handler uses this field to acquire locks and
-> release the connection reference, and skips channel closing operations
-> if chan->conn has already been nullified by teardown.
->
-> Fixes: 75780ca4c6a8 ("Bluetooth: L2CAP: use chan timer to close channels in cleanup_listen()")
-> Cc: <stable@vger.kernel.org>
-> Cc: Siwei Zhang <oss@fourdim.xyz>
-> Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> Assisted-by: Gemini:gemini-3.1-pro-preview
-> Reported-by: https://sashiko.dev/#/patchset/20260521021249.3258069-1-oss%40fourdim.xyz
-> Signed-off-by: Marco Elver <elver@google.com>
+Hi Luiz,
 
-Sigh, Sashiko points out more problems here:
-https://sashiko.dev/#/patchset/20260603123111.2334409-1-elver%40google.com
+On Tue, Jun 2, 2026 at 10:42 AM Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>
+> Actually there are no options, it's built from `default_setting`,
+> which doesn't set any MTU for some reason. For the OBEX profiles it
+> probably makes sense to add an MTU field so it gets properly set.
 
-> Can this lockless read of chan->timer_conn cause a use-after-free or double
-> free if another thread re-arms the timer concurrently?
+Thanks for the clarification. Agreed -- I'll add an imtu field to
+default_settings and populate it only for the OBEX profiles (OPP, FTP,
+PSE, MAS, MNS), then have ext_start_servers() apply it via bt_io_set()
+only when the field is set, so non-OBEX listeners keep their current
+behavior.
 
-I haven't analyzed this further yet, so consider this patch a
-bug-report-only. If anyone finds a better fix sooner, please go ahead.
+I'll send V3 with that approach shortly.
 
-> ---
->  include/net/bluetooth/l2cap.h | 18 ++++++++++++++++--
->  net/bluetooth/l2cap_core.c    | 26 +++++++++++++++-----------
->  2 files changed, 31 insertions(+), 13 deletions(-)
->
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index e0a1f2293679..83719777512e 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -514,6 +514,7 @@ struct l2cap_seq_list {
->
->  struct l2cap_chan {
->         struct l2cap_conn       *conn;
-> +       struct l2cap_conn       *timer_conn; /* for chan_timer */
->         struct kref     kref;
->         atomic_t        nesting;
->
-> @@ -835,6 +836,9 @@ static inline void l2cap_chan_unlock(struct l2cap_chan *chan)
->         mutex_unlock(&chan->lock);
->  }
->
-> +struct l2cap_conn *l2cap_conn_get(struct l2cap_conn *conn);
-> +void l2cap_conn_put(struct l2cap_conn *conn);
-> +
->  static inline void l2cap_set_timer(struct l2cap_chan *chan,
->                                    struct delayed_work *work, long timeout)
->  {
-> @@ -843,8 +847,13 @@ static inline void l2cap_set_timer(struct l2cap_chan *chan,
->
->         /* If delayed work cancelled do not hold(chan)
->            since it is already done with previous set_timer */
-> -       if (!cancel_delayed_work(work))
-> +       if (!cancel_delayed_work(work)) {
->                 l2cap_chan_hold(chan);
-> +               if (work == &chan->chan_timer && chan->conn) {
-> +                       l2cap_conn_get(chan->conn);
-> +                       chan->timer_conn = chan->conn;
-> +               }
-> +       }
->
->         schedule_delayed_work(work, timeout);
->  }
-> @@ -857,8 +866,13 @@ static inline bool l2cap_clear_timer(struct l2cap_chan *chan,
->         /* put(chan) if delayed work cancelled otherwise it
->            is done in delayed work function */
->         ret = cancel_delayed_work(work);
-> -       if (ret)
-> +       if (ret) {
-> +               if (work == &chan->chan_timer && chan->timer_conn) {
-> +                       l2cap_conn_put(chan->timer_conn);
-> +                       chan->timer_conn = NULL;
-> +               }
->                 l2cap_chan_put(chan);
-> +       }
->
->         return ret;
->  }
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index c4ccfbda9d78..491b03bf6903 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -406,7 +406,7 @@ static void l2cap_chan_timeout(struct work_struct *work)
->  {
->         struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
->                                                chan_timer.work);
-> -       struct l2cap_conn *conn = chan->conn;
-> +       struct l2cap_conn *conn = chan->timer_conn;
->         int reason;
->
->         BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
-> @@ -421,23 +421,27 @@ static void l2cap_chan_timeout(struct work_struct *work)
->          * this work. No need to call l2cap_chan_hold(chan) here again.
->          */
->         l2cap_chan_lock(chan);
-> +       chan->timer_conn = NULL;
-> +
-> +       if (chan->conn) {
-> +               if (chan->state == BT_CONNECTED || chan->state == BT_CONFIG)
-> +                       reason = ECONNREFUSED;
-> +               else if (chan->state == BT_CONNECT &&
-> +                        chan->sec_level != BT_SECURITY_SDP)
-> +                       reason = ECONNREFUSED;
-> +               else
-> +                       reason = ETIMEDOUT;
->
-> -       if (chan->state == BT_CONNECTED || chan->state == BT_CONFIG)
-> -               reason = ECONNREFUSED;
-> -       else if (chan->state == BT_CONNECT &&
-> -                chan->sec_level != BT_SECURITY_SDP)
-> -               reason = ECONNREFUSED;
-> -       else
-> -               reason = ETIMEDOUT;
-> -
-> -       l2cap_chan_close(chan, reason);
-> +               l2cap_chan_close(chan, reason);
->
-> -       chan->ops->close(chan);
-> +               chan->ops->close(chan);
-> +       }
->
->         l2cap_chan_unlock(chan);
->         l2cap_chan_put(chan);
->
->         mutex_unlock(&conn->lock);
-> +       l2cap_conn_put(conn);
->  }
->
->  struct l2cap_chan *l2cap_chan_create(void)
-> --
-> 2.54.0.1013.g208068f2d8-goog
->
+-- 
+Best Regards,
+Wei Deng
