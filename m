@@ -1,115 +1,76 @@
-Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5720373BF4
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2026 17:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A6A368D75;
+	Wed,  3 Jun 2026 17:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780508440; cv=none; b=lhCBEqyXYSNEu8kA+pcS8VPxvh68oLbmeT6pWjv+k6OW4F7Hgks4LkWminAEK8BFsRKEomhQkmri66z3XCQ8xik2ijNzlb2UQZWVKQlIZUXhoqMb3fd7bq+U/2f52A0royzthNXeD1qbvatorkiZP/kEltAZ/92pVRlSt++aQTw=
+	t=1780509006; cv=none; b=FkEsMGhVsGDTzxkK85p8o2fK2fskULXcAGMlHxTd3HDjEG8e8PRt3isNWfAxvl1mc1JFsHBx6ER3iSdmAIxCqw+SCEceKAthAZ2Y1/Py+699N+7ORatlhg21hn1uEvL6m8HXHYvZRSAEbIgFqgofeJLnVCSRdy37fK6xylPHono=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780508440; c=relaxed/simple;
-	bh=LMaoEPAC1kVqDM/4Fz1+kwbe0r1Pv6VQUd2W7mJ8DxU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=axPQPM8KRXeiaxZNG+cd8DhxbyHaUYp/INDz/jJDGU/rQY1drJQ4J75cbc4q400I0NQAPU1kn8EQww32q6La36Om/nYdZauCtp3+yPyyp2+iQYLZxt6S6wVtWCzaOh7ueEBnKV+pBBXCOgA61Og4I55lQFP7bwLDtBsoRxYpQic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m8kDYgYU; arc=none smtp.client-ip=74.125.82.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1780509006; c=relaxed/simple;
+	bh=T2soeqRrzKZ3b5MqhdrmSEbyrOpk2SGauKHJN3/zuRc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=kZ5HfwLMICuyGgY7RfijtC/OWU8jjwr4qgR5AxyRYiKDfPlKzLUF5BEri3txEheP4nYf0hdeHpEEcYBHIjTs85ObpX16R8poiyn4RtaOGwlwlrYyfrJa4pfRGf1/MQVfYcglovosj26nJyR1C6MlcCoWEAVA8OgSMES0fLqrXu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RBL9T2BB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m8kDYgYU"
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-137dd5161feso47653c88.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jun 2026 10:40:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780508438; x=1781113238; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=iwooFR8LmZe9WN5ZchISQADle1FOazcbPHkHYZN34eI=;
-        b=m8kDYgYUyL4pS6A2cW1b3r1WfPAr8txIkGuogeu9OS9oEOPBWOw54CDJfiRw5X5nrc
-         pAA8oy+PP4d8ZUNV/9rvUinD31vkIqry9IotqlP4DRUgk4pMC4eg0QCknsrsDkiGAUHv
-         LW4ByLgWKw90xdiXlUSvNRpNOqskNil28k/dcw0NRjzuGlMgyC01fRuIG3krQWGliU8Q
-         xfXnt4uDMAASvVSR6a19X57XLemEiuLvEZZQhc8ikxZ5gFnzsyh5QPfdwX47nAxi92Yw
-         h1uH4xPzx8IMXJWYq7C+h2IhQzPH4woClcpNaylEzIBHlQxc5QdZgkEK7Soph7w3GC6g
-         8TKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780508438; x=1781113238;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iwooFR8LmZe9WN5ZchISQADle1FOazcbPHkHYZN34eI=;
-        b=cGtYM3diUpY3NS+Rp73vOcdi0uCMsE5FeWLTfwYXM5PV/nEw42Ndi7CwXdlPvwPnwA
-         p6fBTEHFJCsvrKt3PONO/5N5/e2wooUHUALX4gLx9GwIiOKhhAGmLRfSAZYZMX59d68P
-         O3Q2zNJ/I/fU9soTBjRZCaxR4I64bpqim1y+dcvzpEbtFS/1S3o+Zko8OnuuQwhRdIZ7
-         xs1hfyMP3w1RYPNs8K12+6/sTvG9wcIBmKMZVHdvMazsnMlGbpYXhv43McSSnwTOVDwr
-         soj9ULf9lMU9H/HJ0B0ZRbGxhxZ5E4C4muPzZqC1OEq8wcA+/dZu3CO8C7r+sTGkMmZH
-         I1hw==
-X-Gm-Message-State: AOJu0YxmE2k+oEzJwDH8TjX5IZNvKBeSFU6yJzX7+KdBMJ4prvp3eXz1
-	JJKXgipdTkjq2m27ahzwo+0c+c8AAkz98KRTt6vbKeIPLlv2vvHaeb8T2Z6spg==
-X-Gm-Gg: Acq92OFfm8FIbHVPa3IShFh7ltmzf+/NF4YPjK38WQ47vkotBuEVw5GLoDuAEK1+jcx
-	SqALQJ4Ar/dqkgY6FrJ+xcfM08VUMdWjJkAPjN0pnUtJWAGlEXfKo7lIZbAC/fQZiBI5y5WDlsE
-	Hu1OuXBHVDhaVpk6U7ALg92skEev9x/00XCvlQtNabLY1kQRqK8mVGpERDBnik5B+XLS4q0NqOV
-	ePJB7sBout+5AnJjLDzeKQMiBe2CkDiSRUrsVJSbj9koCjZf/fGTp6hGlewVyV6lveT032+9yQJ
-	HdOxjLn0JI4l0KqFDYj+RlWufuAKlR4lMZxm5OESV4noB1K/ShwxXa+b8GU0HFXZnM+FhfU8s0y
-	xR09HKp65P0ZDA/HidzMeJWjpVqE0OzPbzmwJj5R+nm2oSe/KTSjEV4Pzx72DNz6aj8zFpro3hn
-	FsFsB/t1jfgpuGl6Evl4VpbMqAftIrlmSJ2bVV7zmzNOLATT/gB56g
-X-Received: by 2002:a05:7300:8185:b0:2c8:6361:ab2e with SMTP id 5a478bee46e88-3074fa96538mr2224376eec.8.1780508437812;
-        Wed, 03 Jun 2026 10:40:37 -0700 (PDT)
-Received: from [172.17.0.2] ([52.159.227.194])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3074deaab1asm2668976eec.17.2026.06.03.10.40.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jun 2026 10:40:37 -0700 (PDT)
-Message-ID: <6a206715.d08db960.1426c9.5ab5@mx.google.com>
-Date: Wed, 03 Jun 2026 10:40:37 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2591991289470153258=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RBL9T2BB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EA931F00893;
+	Wed,  3 Jun 2026 17:50:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780509005;
+	bh=+n/GXcJ6n/EbgqDGtN02MqZZuEqO5oRtaPHXFMPJvu8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=RBL9T2BBdfT+ebVf4WkmCK1biCP386nQiegvh1g2771MSgt2+w0TpR+p/ErLkpXDK
+	 Nv7NLA9utpMIuy0amaSkJxfecbsnHlRHmZFtKoCiYxJytKKFANpTzFRy52/vesIWjH
+	 FzF2KUIMLj6cHmYUyu1951xR78ib8xwShJUxQRVPPe4bpcSobTRxDWbd0yKmA51U0B
+	 EfUEUqTJp8sya2/JxE0a2amfELyWN5/yfTLoFb9U7Iei8Y+5AtAofVPWgpuudFqVc7
+	 Tx5ySaq+GpEBZavjhNC9F0BAB9Omma8EfuWm784VpgwkPJi4VrtGpcN25yMycp35I8
+	 pQP1gUo6jqIOA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0F0239308BE;
+	Wed,  3 Jun 2026 17:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, oss@fourdim.xyz
-Subject: RE: Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()
-In-Reply-To: <20260603150835.3539963-2-oss@fourdim.xyz>
-References: <20260603150835.3539963-2-oss@fourdim.xyz>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] Bluetooth: btusb: Add support for TP-Link TL-UB250
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <178050900665.1520440.1096131778194850357.git-patchwork-notify@kernel.org>
+Date: Wed, 03 Jun 2026 17:50:06 +0000
+References: <20260603035818.926654-1-cxs1494089474@gmail.com>
+In-Reply-To: <20260603035818.926654-1-cxs1494089474@gmail.com>
+To: Cris <cxs1494089474@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ luiz.dentz@gmail.com, linux-kernel@vger.kernel.org, pmenzel@molgen.mpg.de
 
---===============2591991289470153258==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Wed,  3 Jun 2026 11:58:18 +0800 you wrote:
+> Add USB ID 2357:0607 for TP-Link TL-UB250.
+> 
+> This is a Realtek RTL8761BUV based Bluetooth adapter.
+> 
+> Without this entry the device is picked up by the generic Bluetooth USB
+> class match and exposes hci0, but the Realtek setup path is not used and
+> rtl8761bu firmware/config are not loaded.
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1105389
+Here is the summary with links:
+  - [v2] Bluetooth: btusb: Add support for TP-Link TL-UB250
+    https://git.kernel.org/bluetooth/bluetooth-next/c/7e7dff125429
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.55 seconds
-VerifyFixes                   PASS      0.10 seconds
-VerifySignedoff               PASS      0.07 seconds
-GitLint                       PASS      0.32 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      26.94 seconds
-CheckAllWarning               PASS      29.57 seconds
-CheckSparse                   PASS      27.88 seconds
-BuildKernel32                 PASS      26.28 seconds
-TestRunnerSetup               PASS      580.30 seconds
-TestRunner_l2cap-tester       PASS      60.03 seconds
-TestRunner_smp-tester         PASS      23.45 seconds
-TestRunner_6lowpan-tester     PASS      22.67 seconds
-IncrementalBuild              PASS      25.76 seconds
-
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-https://github.com/bluez/bluetooth-next/pull/283
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2591991289470153258==--
