@@ -1,202 +1,131 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C522032D;
-	Wed,  3 Jun 2026 02:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90193A383B
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jun 2026 03:58:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780454764; cv=none; b=GTIwXWRr9tBwnRn8cz4LPc++9gowf49AN7Oc6K5yIjMDIQe17UvnbP6NJjr09KSNGAGKfIfBxVecaYMDKBIw5dOhugJGz4NsCxoNBDtWB/W4i79XyUHgGnYPZsSyiW7IyqMVzGaS7UNR4vGH4b9z3ZhvhjojXQSAfnry3Gz5r6w=
+	t=1780459106; cv=none; b=YPMqX1vbVUwb1ac5pX9g57SYuSOopVQz/IlZTnrg6iYutPCAjK6EdOCXD6mfEqB/fFuvR6l9oDqznCUzaWHJlpFRQr7RslTyEim/s3/JZnukS4JzTM5xn4mMxtv4Tld2kQ5TnmevVKwj654TZLFs8sJQMcpco42tP5Cg9uBYMJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780454764; c=relaxed/simple;
-	bh=ICo8lMYVakV6Ta7fv6iuDA34hXiG6u5KtUYup6JaJes=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=igmuahNLzQEZs61gtDYr4K0QGMhC+Py8wq96DgtjExaGSIT8Y7H2NRO2rfSGPwXmI0bup8kBjP+iNVEb+ZwK4hPf3x/a0UALKlq9tMlH0c0RC/Cp/NzRqgnIPhs9f11aaHM3pmL7qpZMDK53HMkaBeSStnSx1kN3Pgil/XxDu6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 582130a45ef611f1aa26b74ffac11d73-20260603
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:7049767b-854b-46ef-aae0-c73364a6f954,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:e7bac3a,CLOUDID:ba5301e009c589663605536515002ee7,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|865|898,TC:nil,Content:0
-	|15|50,EDM:-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,O
-	SI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 582130a45ef611f1aa26b74ffac11d73-20260603
-X-User: liujiajia@kylinos.cn
-Received: from nature [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <liujiajia@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 179738225; Wed, 03 Jun 2026 10:45:55 +0800
-Date: Wed, 3 Jun 2026 10:45:52 +0800
-From: Jiajia Liu <liujiajia@kylinos.cn>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jiajia Liu <liujia6264@gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: hci_event: fix simultaneous discovery
- stuck in FINDING
-Message-ID: <ah-VYK0LqpG8ft7g@nature>
-References: <20260602070032.51248-1-liujiajia@kylinos.cn>
- <fc5c142e-3187-42a2-af4d-9103858da93e@molgen.mpg.de>
- <CABBYNZK1GLGu+xdKng3O4b=NrNwxB6ZAyfXSn8DE4WptXN=5CQ@mail.gmail.com>
- <95453e74-636d-4a9f-91c0-189366423180@molgen.mpg.de>
+	s=arc-20240116; t=1780459106; c=relaxed/simple;
+	bh=6RPH5rtDXtkK4yUyqEM5Au1jbwxSqjpgyXKuxFi6dss=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=SI+vyvaGTGG7Y1Ejhj+iWdYOQtJZ/HEfN1Y+Yc+m1jC9Pbkyd+jWeaITR79U+9CNBqCUXcyAeQNkmFVtMRvXuXDLBTNMAEDZpRr6yBQQJaMRmn/yQpXN0xWLr5HvIzHPa1kgoxJ5UASvXAwIHVh+2A3+kqFtxVLtveW/iRhdwzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n7rblj1w; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n7rblj1w"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-c8571db044eso3232683a12.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jun 2026 20:58:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780459103; x=1781063903; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=psoPn1Kp1CWc+ZhuoSVYjwdtwLY21M9el76WqXa5Jtc=;
+        b=n7rblj1w9vq0+kL0rQvhmBC8FVCahY0KuHBLwuLp+dMRngvqBbxSu8cOdMeBMx+rWG
+         L1PmGXa9HZBHxLN8gRavYfe9BC4j9fWHF89Y3uBm1HvtziKHlxxhKzoarnOg3vxWEMTx
+         8YpCZDxx8thg3rvv3alYKoj6m+ANHkO0XPGKRef7C9T3EZhji/6KWiaxuIHYh6Z5wRZ8
+         B3278LGhQscXHNl5FdflOpxh42kL4Ne09+fpJ+LPjBeCovFSoY/iFq0VOq090L1/xpJZ
+         9JEL/s9ya8mZqLvcT+xAdijvl5udf8rT9GKdHbLEw4Z4ej36qgMUymHksDRqEbJ91PI3
+         vfYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780459103; x=1781063903;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=psoPn1Kp1CWc+ZhuoSVYjwdtwLY21M9el76WqXa5Jtc=;
+        b=YgeSZ/tEzpBs7GjBlGy5K/tnw3gTU37gxTBDVgpDy15QpI1Wr6qPA47VvMm3X2r68R
+         A2Ob5/s5pacbaQwOtrF3Y8UHNwJMYSyhRsq7pAKlqzCIdlOh0ezWgd+92m05M973hSKz
+         9DoVdX2dhefUG0eKY6JsQ62P1QbSO2rtody1Lxhq/eXmEMJsk+qYolNwHXqz8JsZPJ8G
+         2sTxeoWHOmZWxyJvVuCZ6jAYum3ok8M2my/CJTSKGOqGT8o36gfqYo0uRIQ1TvzBi9YW
+         R4giL1wc+t3Ac3VMtsiEYUeYny9DpF4gSIuMgT9PbJjN4Wou3lgk2Tu/DN1qANeySKtU
+         plHg==
+X-Gm-Message-State: AOJu0YylOM93F/RerG/L22DwVSIrxAWPH6ag65xSR8dt8mbDWKXrwOie
+	NLElzwpdT0MwsaapTMXFWPcN/mBhpNFN7tu4FkluX41Gwno22Fq/sYEa4Wi/iX4VYgfhLw==
+X-Gm-Gg: Acq92OFT0aW5ah2FRUIjGKbSjpQGFpnE5G601WLM9dxRaAxXivkZxlVOkjkSBFNj+sr
+	wA/Dr6NcLFZaUHbT0O3v8dbHrrL/3mbQeGGLT5RzhH6Ym+JPfOn4AAdi2KACV//DSKS1cCFa3rF
+	Gs5CxGQC6Eqm0IJ8rm9SJc9lSkXscY/PnUq5izez2qiWqsJWgUPDKQSe2L93QI8ztkCg2omqO4F
+	ni2zgtr9GCnF+n2nIdl/7ZfzEjBnq7GN9z68GoXZfo5YimqfUk9SYIr+HWbJLPRzEMkPJibPJyS
+	XirTpnXNmRcdGtv5UX07jivkZq4p7RdOtaYPyxoIjjhTRORuDniBc14zvmb+kWMCufuy4E2m3fs
+	5Li53y+ORS5Lg6saVJISpkfN3ul7PCXso3Hp86OpjZAxImqpzE51vTSBS687cg5bWbciz8jh676
+	YMqXAo4shkCiTMzBm0qBI0PONnx9mOOb3cxN0G7TjPoF/bdr2jp37NapQ+te5Mag==
+X-Received: by 2002:a05:6a21:4582:b0:39c:a78e:dba9 with SMTP id adf61e73a8af0-3b4978d6459mr1913708637.40.1780459102917;
+        Tue, 02 Jun 2026 20:58:22 -0700 (PDT)
+Received: from CrisStation.. ([103.220.9.171])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c85deeb2bdesm759754a12.0.2026.06.02.20.58.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 20:58:22 -0700 (PDT)
+From: Cris <cxs1494089474@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-kernel@vger.kernel.org,
+	pmenzel@molgen.mpg.de,
+	Cris <cxs1494089474@gmail.com>
+Subject: [PATCH v2] Bluetooth: btusb: Add support for TP-Link TL-UB250
+Date: Wed,  3 Jun 2026 11:58:18 +0800
+Message-Id: <20260603035818.926654-1-cxs1494089474@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260602135419.3092500-1-cxs1494089474@gmail.com>
+References: <20260602135419.3092500-1-cxs1494089474@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <95453e74-636d-4a9f-91c0-189366423180@molgen.mpg.de>
 
-On Tue, Jun 02, 2026 at 11:53:29PM +0200, Paul Menzel wrote:
-> [Cc: -brian.gix@intel.com (bouncing)]
-> 
-> Dear Luiz,
-> 
-> 
-> Am 02.06.26 um 18:43 schrieb Luiz Augusto von Dentz:
-> 
-> > On Tue, Jun 2, 2026 at 10:41 AM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
-> 
-> > > Am 02.06.26 um 09:00 schrieb Jiajia Liu:
-> > > > When hci_inquiry_complete_evt is called between le_scan_disable and
-> > > > le_set_scan_enable_complete and no remote name needs to be resolved,
-> > > > the interleaved discovery with SIMULTANEOUS quirk gets stuck in
-> > > > DISCOVERY_FINDING. le_set_scan_enable_complete does not check inquiry
-> > > > state. No one sets DISCOVERY_STOPPED in this process.
-> > > > 
-> > > > Add state check in le_set_scan_enable_complete and change state if
-> > > > the state is DISCOVERY_FINDING. Tested with AX201 (8087:0026) in Dell
-> > > 
-> > > … change state to DISCOVERY_STOPPED …
-> > > 
-> > > I’d add a new paragraph for the Tested part.
-> > > 
-> > > > Vostro 13. Discovering disabled MGMT Event below is reported when
-> > > > running into the above condition.
-> > > 
-> > > Thank you for sharing the test device. Could you please document how to
-> > > get into this state exactly? Some Xiaomi device?
-> > 
-> > What are you talking about here by saying Xiaomi device? He literally
-> > said Dell Vostro 13, a laptop, and this is a local only procedure,
-> > there is no remote device involved here.
-> 
-> In the trace below a Xiaomi device shows up, if I am not mistaken.
+Add USB ID 2357:0607 for TP-Link TL-UB250.
 
-There should be no requirements for Bluetooth devices. To keep the serial
-number of packet continuous, I didn't remove the Device Found MGMT Event.
-It looks like someone's TV device.
+This is a Realtek RTL8761BUV based Bluetooth adapter.
 
-The producer is Open the bluetooth panel of gnome-control-center and wait.
-If the device list on the pannel is not flushed again and becomes empty,
-it probably gets into this state. btmon or dynamic debug of
-hci_discovery_set_state can confirm the state.
+Without this entry the device is picked up by the generic Bluetooth USB
+class match and exposes hci0, but the Realtek setup path is not used and
+rtl8761bu firmware/config are not loaded.
 
-It think it depends on the timing of Inquiry Complete Event. There is a
-very small time slot between disabling LE scan and disabling completion.
-If Inquiry Complete Event arrives in the slot, there is a chance to hit
-the state.
+The controller reports Realtek Semiconductor Corporation as the
+manufacturer and LMP subversion 0x8761. With this entry added, btusb
+loads rtl_bt/rtl8761bu_fw.bin and rtl_bt/rtl8761bu_config.bin
+successfully.
 
-> 
-> > > >    @ MGMT Command: Start Discovery (0x0023)    {0x0001} [hci0] 10885.970873
-> > > >            Address type: 0x07
-> > > >              BR/EDR
-> > > >              LE Public
-> > > >              LE Random
-> > > >    ...
-> > > >    < HCI Command: LE Set Extended Scan Enable    #38205 [hci0] 10886.131438
-> > > >            Extended scan: Enabled (0x01)
-> > > >            Filter duplicates: Enabled (0x01)
-> > > >            Duration: 0 msec (0x0000)
-> > > >            Period: 0.00 sec (0x0000)
-> > > >    > HCI Event: Command Complete (0x0e) plen 4   #38206 [hci0] 10886.133295
-> > > >          LE Set Extended Scan Enable (0x08|0x0042) ncmd 2
-> > > >            Status: Success (0x00)
-> > > >    @ MGMT Event: Discovering (0x0013) plen 2   {0x0001} [hci0] 10886.133414
-> > > >            Address type: 0x07
-> > > >              BR/EDR
-> > > >              LE Public
-> > > >              LE Random
-> > > >            Discovery: Enabled (0x01)
-> > > >    < HCI Command: Inquiry (0x01|0x0001) plen 5   #38207 [hci0] 10886.133528
-> > > >            Access code: 0x9e8b33 (General Inquiry)
-> > > >            Length: 10.24s (0x08)
-> > > >            Num responses: 0
-> > > >    > HCI Event: Command Status (0x0f) plen 4     #38208 [hci0] 10886.141333
-> > > >          Inquiry (0x01|0x0001) ncmd 2
-> > > >            Status: Success (0x00)
-> > > >    ...
-> > > >    < HCI Command: LE Set Extended Scan Enable    #38242 [hci0] 10896.381802
-> > > >            Extended scan: Disabled (0x00)
-> > > >            Filter duplicates: Disabled (0x00)
-> > > >            Duration: 0 msec (0x0000)
-> > > >            Period: 0.00 sec (0x0000)
-> > > >    > HCI Event: Inquiry Complete (0x01) plen 1   #38243 [hci0] 10896.383419
-> > > >            Status: Success (0x00)
-> > > >    > HCI Event: Command Complete (0x0e) plen 4   #38244 [hci0] 10896.394378
-> > > >          LE Set Extended Scan Enable (0x08|0x0042) ncmd 2
-> > > >            Status: Success (0x00)
-> > > >    @ MGMT Event: Device Found (0x0012) plen 22 {0x0001} [hci0] 10896.394497
-> > > >            LE Address: 88:12:AC:92:43:69
-> > > >            RSSI: -101 dBm (0x9b)
-> > > >            Flags: 0x00000004
-> > > >              Not Connectable
-> > > >            Data length: 8
-> > > >            Company: Xiaomi Inc. (911)
-> > > >              Data[0]:
-> > > >            16-bit Service UUIDs (complete): 1 entry
-> > > >              Xiaomi Inc. (0xfdaa)
-> > > >    @ MGMT Event: Discovering (0x0013) plen 2   {0x0001} [hci0] 10896.394506
-> > > >            Address type: 0x07
-> > > >              BR/EDR
-> > > >              LE Public
-> > > >              LE Random
-> > > >            Discovery: Disabled (0x00)
-> > > > 
-> > > > Fixes: 8ffde2a73f2c ("Bluetooth: Convert le_scan_disable timeout to hci_sync")
-> > > > Signed-off-by: Jiajia Liu <liujiajia@kylinos.cn>
-> > > > ---
-> > > > 
-> > > > Changes in v2:
-> > > > - move the handler to hci_event.c
-> > > > - remove unnecessary bt_dev_dbg
-> > > > - update commit message
-> > > > 
-> > > > ---
-> > > >    net/bluetooth/hci_event.c | 7 +++++++
-> > > >    1 file changed, 7 insertions(+)
-> > > > 
-> > > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > > index eea2f810aafa..1cd5f97daafe 100644
-> > > > --- a/net/bluetooth/hci_event.c
-> > > > +++ b/net/bluetooth/hci_event.c
-> > > > @@ -1769,6 +1769,13 @@ static void le_set_scan_enable_complete(struct hci_dev *hdev, u8 enable)
-> > > > 
-> > > >                hci_dev_clear_flag(hdev, HCI_LE_SCAN);
-> > > > 
-> > > > +             if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
-> > > > +                 hci_test_quirk(hdev, HCI_QUIRK_SIMULTANEOUS_DISCOVERY) &&
-> > > > +                 !test_bit(HCI_INQUIRY, &hdev->flags) &&
-> > > > +                 hdev->discovery.state == DISCOVERY_FINDING) {
-> > > > +                     hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-> > > > +             }
-> > > > +
-> > > >                /* The HCI_LE_SCAN_INTERRUPTED flag indicates that we
-> > > >                 * interrupted scanning due to a connect request. Mark
-> > > >                 * therefore discovery as stopped.
-> 
-> 
-> Kind regards,
-> 
-> Paul
+Relevant part of /sys/kernel/debug/usb/devices:
+
+T:  Bus=01 Lev=02 Prnt=06 Port=00 Cnt=01 Dev#=  9 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=2357 ProdID=0607 Rev= 2.00
+S:  Product=TP-Link TL-UB250 Adapter
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+
+Use the same flags as the existing TP-Link 2357:0604 entry.
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Signed-off-by: Cris <cxs1494089474@gmail.com>
+---
+Changes in v2:
+- Add the relevant /sys/kernel/debug/usb/devices excerpt.
+- Drop Cc stable to avoid the checkpatch warning without a Fixes tag.
+- Add Reviewed-by from Paul Menzel.
+
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 3aef21d4c..3cbb3c22e 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -831,6 +831,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x2357, 0x0604), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x2357, 0x0607), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0b05, 0x190e), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x2550, 0x8761), .driver_info = BTUSB_REALTEK |
+-- 
+2.34.1
