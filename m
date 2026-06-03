@@ -1,49 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B6A3AA1B5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688BD3A875E;
 	Wed,  3 Jun 2026 14:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780497450; cv=none; b=NuIfk8ZQBsm9Z0CT7iXGqJG4tYVDuXkttV7rkIdTd6n7loKYxoSHU1HILuwS/o+W8kBNoBQQyExhDLsF1JtKiYazd7XafKbLNKHRM4OehFyswtT5EuCaAxplSSynMDbfEkShYDGJRPzf4p6GdIvwO6C71DII8Swzx2Hwz4qGyu8=
+	t=1780497450; cv=none; b=hHccn85Ztye38HjPSpqUjdSX6XdDrH18pdrS3E4lDRx6WjasQMDCi6VP9imjiFKCvrLPtY/miTvB6kn3vohoq332gJIRenrqzSfUprVi/2ak0IqZxx/Fyq3/sHBGYhQNUnkEOYVHJWpKF7TYBOhAq9ars6d1U0spNpRRgKVjX+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780497450; c=relaxed/simple;
-	bh=zcn1dK/29EDlDuUjELmkDL4xNInnWxDqRDZS9QfhRPg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BRt2jmc35k7xtvTdb3I2lFsby9qaYd8eUDbCUXDVa36FZasejXpZhQ/DrBqpglbZ6ZBQEGDqkt8HAcR/Zt3p1128byVGN2KHkBSxpbCtLrgwJCid6WHUw9qPFZSUOve7d+dHGgK5ITA9eINErzXF5LlQvLiYtX/uGrLhxWqu8uA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fpbhsxjB; arc=none smtp.client-ip=100.103.45.18
+	bh=vOG1j+RBZzZDmPRW4Ip7Ohh/+zr4eA1sH7Jzdx+DBdc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FQ3aO/pcI2no80lpbDbt7YpmlHlL3AidtRAn5isMxO4iWcJXFcuG7+nVezT4Bdjbnz/h8R+mVFV3HkHhLd/3PpovTcQ/z00TJUbWBVtDpz1Lud/ES6Y612+L4La9f8ErED7GQgmYD/io0BIb83Gn3B6ehLayFZXj4cpFHKw80AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OYrgsKzz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fpbhsxjB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18F591F00893;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OYrgsKzz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19E901F00898;
 	Wed,  3 Jun 2026 14:37:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1780497449;
-	bh=fqO4LZkLQ5FT3GK1shuzVv/gvIRfqdWBmfuDHOglRjQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=fpbhsxjBaAq7gaOcNGbE7pCZ+Sa52LF2PKsVNqv99+RTrxWKjQ/UveS+G41+2Vped
-	 HbKF71khqgYCbLJXN4dbnVWMx7Um8XAXJhRSqIefy6VCi6GzqiBnIErKkvok7sNuYW
-	 hJmJLjR0aAFWObLOGA+oIyP8FtVdIUFeLxb2qKVc63tJTGkxsdXuldpkaxsqNNIIDS
-	 hz7ie65Z2mro96ZVoPFXzoI88/nuXV7LCG5K6RuSVHb83qxZVOZ1m74a69aGoVGMuT
-	 j2hn4uolKjeGiggVAi8EqFHPbHRz7AzgIWvYOxhwhbdWC4WfWySJ3x8w+8SofESB10
-	 2yAONO6eX6L9g==
+	bh=FAnKXQD3bvCVFIfyYorBgm/CkR5JT97inhbW0TVjPEw=;
+	h=From:To:Cc:Subject:Date;
+	b=OYrgsKzzt1H6DxRRT1DJUd98M04qK4+QCkDkXmtfMM8WZzqjtuSTNdng7BESnaUfY
+	 W21rlFjVDjPQolQiDLsK/ZeYQyMtHTQoIO7sBRimDDQPWy2F6mvhSyBukqtUzOPGCp
+	 gpcTZqsTnb5FgrUAYXlPp5G4gULHaZmI/ouCrM6I6C6RVxE1nPWwoJ9+VrMVivo8lT
+	 ecHpmoAy6Gr15v7cWXY4ty8DFvbkgfwIsa6PeNgAtpyxHS58P3u1jQ/O78+G0s7Nj/
+	 vCeoVCNvdDo4bOtHL4FiLqxoUY6X0hPAVeD4fMVH/ZOBa3v+/xCbq4RnvPzOGr8Khb
+	 5n7HH9k2By1PA==
 Received: from johan by xi.lan with local (Exim 4.99.3)
 	(envelope-from <johan@kernel.org>)
-	id 1wUmik-0000000AYB1-373j;
+	id 1wUmik-0000000AYAw-2y0R;
 	Wed, 03 Jun 2026 16:37:26 +0200
 From: Johan Hovold <johan@kernel.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Johan Hovold <johan@kernel.org>,
-	stable@vger.kernel.org,
-	Rajat Jain <rajatja@google.com>
-Subject: [PATCH v3 RESEND 2/5] Bluetooth: btusb: fix use-after-free on marvell probe failure
-Date: Wed,  3 Jun 2026 16:36:40 +0200
-Message-ID: <20260603143643.2514595-3-johan@kernel.org>
+	Johan Hovold <johan@kernel.org>
+Subject: [PATCH v3 RESEND 0/5] Bluetooth: btusb: fix wakeup irq devres lifetime
+Date: Wed,  3 Jun 2026 16:36:38 +0200
+Message-ID: <20260603143643.2514595-1-johan@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260603143643.2514595-1-johan@kernel.org>
-References: <20260603143643.2514595-1-johan@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -52,62 +47,40 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Make sure to stop any TX URBs submitted during Marvell OOB wakeup
-configuration on later probe failures to avoid use-after-free in the
-completion callback.
+[ This one was posted two months ago and appears to have been archived
+  in patchwork so resending (with Paul's RB added to patch 1/5). ]
 
-This issue was reported by Sashiko while reviewing a fix for a wakeup
-source leak in the btusb probe errors paths.
+This series fixes a couple of use-after-free issues and a wakeup source
+leak on probe failure and a (currently benign) OOB wakeup interrupt
+devres lifetime issue.
 
-Link: https://sashiko.dev/#/patchset/20260402092704.2346710-1-johan%40kernel.org
-Fixes: a4ccc9e33d2f ("Bluetooth: btusb: Configure Marvell to use one of the pins for oob wakeup")
-Cc: stable@vger.kernel.org	# 4.11
-Cc: Rajat Jain <rajatja@google.com>
-Signed-off-by: Johan Hovold <johan@kernel.org>
----
- drivers/bluetooth/btusb.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+Included is also a related cleanup.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index c8015cee240f..d0a83a1ffdf2 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4218,7 +4218,7 @@ static int btusb_probe(struct usb_interface *intf,
- 	if (id->driver_info & BTUSB_INTEL_COMBINED) {
- 		err = btintel_configure_setup(hdev, btusb_driver.name);
- 		if (err)
--			goto out_free_dev;
-+			goto err_kill_tx_urbs;
- 
- 		/* Transport specific configuration */
- 		hdev->send = btusb_send_frame_intel;
-@@ -4381,7 +4381,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		err = usb_set_interface(data->udev, 0, 0);
- 		if (err < 0) {
- 			BT_ERR("failed to set interface 0, alt 0 %d", err);
--			goto out_free_dev;
-+			goto err_kill_tx_urbs;
- 		}
- 	}
- 
-@@ -4389,7 +4389,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		err = usb_driver_claim_interface(&btusb_driver,
- 						 data->isoc, data);
- 		if (err < 0)
--			goto out_free_dev;
-+			goto err_kill_tx_urbs;
- 	}
- 
- 	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_BCM) && data->diag) {
-@@ -4425,6 +4425,8 @@ static int btusb_probe(struct usb_interface *intf,
- 		usb_set_intfdata(data->isoc, NULL);
- 		usb_driver_release_interface(&btusb_driver, data->isoc);
- 	}
-+err_kill_tx_urbs:
-+	usb_kill_anchored_urbs(&data->tx_anchor);
- out_free_dev:
- 	if (data->reset_gpio)
- 		gpiod_put(data->reset_gpio);
+Johan
+
+
+Changes in v3:
+ - fix use-after-free on registration failure (new patch)
+ - fix use-after-free on marvell probe failure (new patch)
+
+Changes in v2:
+ - fix wakeup source leak (new patch)
+ - fix disconnect-while-suspended issue by making interrupt non-managed
+ - amend devres lifetime fix commit message with a reference to changed
+   devres behaviour
+ - clean up error handling (new patch)
+
+
+Johan Hovold (5):
+  Bluetooth: btusb: fix use-after-free on registration failure
+  Bluetooth: btusb: fix use-after-free on marvell probe failure
+  Bluetooth: btusb: fix wakeup source leak on probe failure
+  Bluetooth: btusb: fix wakeup irq devres lifetime
+  Bluetooth: btusb: clean up probe error handling
+
+ drivers/bluetooth/btusb.c | 61 +++++++++++++++++++++++++++------------
+ 1 file changed, 43 insertions(+), 18 deletions(-)
+
 -- 
 2.53.0
 
