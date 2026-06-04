@@ -1,679 +1,236 @@
-Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
+Received: from mx07-001d1705.pphosted.com (mx07-001d1705.pphosted.com [185.132.183.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16C3326D51
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 15:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780588382; cv=none; b=PXm6bjzjSDlVdeqWbltc0m9FKBWLisjdVTmBX6AoRqek0Z0FMQP84lwQ/ivEMm5+xNax5KeURaQBMo6R8cVo56uWB0tUwxLTD0HHHVGoZ2ybVk/9Z2YVrgGk2bxAUzoVoX3tO+uQUD+5MTqIWcY4CiJ62ScsSVXcGuy+SzO0hUg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780588382; c=relaxed/simple;
-	bh=Uqu/39NmdRixgonhqmWwIFIMGnq21wdpiXPNnK4szR4=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=ctHJ6lyxCSahNyb5AaqF2iXRHdN77uXUIi5wb+WWmzAwQTwT1J/cU/ojDBCeU5Ob26B6HqQt+ZBw0Vt2R3gaMd1I9/PxebYFGO5IHoioonzYU0yq3xYw8k+5AqfjOcZmiKGzAZp5s4ft/zxUYj+ODjNZHM9GqJ6Md2QadpVKdwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=KD09O+oN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Jjo/w8dM; arc=none smtp.client-ip=103.168.172.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7363A6B68;
+	Thu,  4 Jun 2026 16:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=185.132.183.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780591212; cv=fail; b=Lqc12iiPgo96gIkiw96PFHhMh5icSR42SDv3tZZXanoZkve7HPvoxmdPypF3KgY0CyBfUQi/PrqlOujL7AzknhUE8Wt6rHruiT1sYCxdLfcz/4EN5ipk3ZsmILGDAdvc8hfexPNrPfPpIBomo8IhJK73gOoBMQtG0NL4/FBQUQ0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780591212; c=relaxed/simple;
+	bh=99xJ2KO40U7rfdXCyo1FQv7gCS0FuOXv6N846wdTDIo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=SsHPrMyaAK2+5Na8sHizjUCZSHWX/TCoq5PEdi40/XDcrORxfW0M5sgfdQ/rg2JqruLPJpY8WSPM6jjyP08bUogev3xJzcPhTedWv3+42/3aactKY5LCjMjhhajhLUzj+l9uzkUCK593cYN9AzbkopCZcEY/zyTkeIp3DiUL9iE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sony.com; spf=pass smtp.mailfrom=sony.com; dkim=pass (2048-bit key) header.d=sony.com header.i=@sony.com header.b=okAzoY1+; arc=fail smtp.client-ip=185.132.183.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sony.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sony.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="KD09O+oN";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Jjo/w8dM"
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfout.phl.internal (Postfix) with ESMTP id 02688EC01CC;
-	Thu,  4 Jun 2026 11:52:59 -0400 (EDT)
-Received: from phl-imap-10 ([10.202.2.85])
-  by phl-compute-03.internal (MEProxy); Thu, 04 Jun 2026 11:52:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1780588378;
-	 x=1780674778; bh=qM4+L44EF3fnqZXm6B+ZohVsdVQaQJLYGPmQ0Y6gCyY=; b=
-	KD09O+oNCyatJJ1ifVoKZkEs9Asa51kfb550x0wyAlGCesEPtrM9TWiSh0ghl0yL
-	bCvj9mv+qB3fHRVLFGinfqJY8Qae1tsXL6hLLxYxMDhSbgUYB6aT4lAxm96+6pQV
-	Si6U/5QZBzEvKU2qonjye7VTqgBr1b0M9rRaWNo0fVH0eISZwxMPBP7yzHFE5vJ6
-	tXKpCXtUscIWdskDnOH2LmeDVd20qGhixVK6UlOXdTgRf2Ba4HUv4ga8pVY2lhm8
-	1rr2HqRgBa4PY1sL1Vb01wbXqLZu1o39I7Qw7ae6v4zXTKdjq0wc7f14GTQMPwSF
-	IiWjZtNaJXhd4vE3FZhakQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1780588378; x=
-	1780674778; bh=qM4+L44EF3fnqZXm6B+ZohVsdVQaQJLYGPmQ0Y6gCyY=; b=J
-	jo/w8dMw/DyhdsmzoKtpKN3Gjhc6zA8unClaY/aI9blvwpOR5yzMh+hdqkEFQvq4
-	b/r4wfXKvavpFMYAhrfd49aBKJ0CwmWK0orVw9LmPLAaD5bGOQ/esGdyXXmrSIT3
-	s7uyNiAsVbtMISt40QcSrmtjWX76jsYNh6xd8nwJCZQKNsobKF7qQkwCWC+p7D9Q
-	FBc4wlU8/YkVVldiV2gd0k1AmvnW4xz+jzuVBciAQwD1ciEpsNTibye69zomhMhy
-	+vepgyKoMEiq2ONHo/gvgD1f3vYLmcAEGp9IOjPkpgmR6ESluOWDLThQk0rQsrQD
-	biGn2iLCFovQgPIot+rdw==
-X-ME-Sender: <xms:Wp8harszg86vvYUb8Ot8WfHHYdHjnWEPvuE5BuSz7qARu-r_HSLyzA>
-    <xme:Wp8hanTcSYSimkfUhbdTdGqrmggUMtcnenHG_azptg3pljDCuOXps5YYU7hjbrtOP
-    Abk1i6AmvUpWkmCEWmjzfY46Tk6HR6mVHrxJqYXN0gD0PTYuWavA6o>
-X-ME-Proxy-Cause: dmFkZTE9qSh412wQtFDPlT/WkhQYum9Vsk410WMR1DZRsDNGIPqH4AL9tyLa88gAueq/xz
-    kM6ppTGwmIOBHSLIfJJHwPKBrEmkiY9aRNHC3RhMeYvowz8ZeV4Qu/P7bR+3PUi4EWZP3H
-    BXutZAXOPgORjc3ZXYo34XBTT1NbBfCvDnWNKH/x9QkcciBuO5BOHGkcFgEVQFFoF5qTE5
-    iqADWbSiNMnLaEfOFgRO54VvEEPUkYQln5s/ecyoAr94Gjvs8U46cL27wt3PCo1J+u38qj
-    FED8CZIWQAuInwKI3BfnU1IgRZ8G9qghOm9d0Qa/Z9tQuAPRgIDyPWsjJyfRkOwMrJ7Afl
-    K4HU3NXTVFKBMjTBjUkjbYjSgNhPsfPkW26zjnrV3CQ9KnHrwmIwGjv9+qj8gDriZcZPeD
-    XXjqeLLKuL9gcqYidtsy+b5AOa7DJvy9tTFl011PWnr7MDBcZwta0BOq9roPrbUq582/oW
-    wJJU8ok1pV5kuLvJfUOLyRc53EtI2GbZ2LRqfNr0AU6dVwJOkJ5x5oKG80kY8vh9jJKLAu
-    4nsqjwEz25j8JK51p6OHQBtcCoupHzulHB8wCFXLevfu/CJVEYfiT/j0nVThf3o1ltJ3Qr
-    uhb0bDKaLP6L1ErY1a+rjeQkNogykCdWSX2kXkYYKkCXrdD2m0p2V/qRHXYw
-X-ME-Proxy: <xmx:Wp8haqb_vQGo1zT9AeXwYAo8esrLEl65zDXmFbuClmsIdmGp4i52ww>
-    <xmx:Wp8harVGdzokVjSkKhjeumwmfIXQtMx4IxDD2JWBMQJ8QrTQ2pnP6w>
-    <xmx:Wp8hasg28hyF--lhzq98m6_-QWePj_yVgHDEcYBwpmf-VmUiNc_VgA>
-    <xmx:Wp8hapXuUH4YlglrV-ykhVQvbuaCVFyBDQufZb66ximx0m20FdO3dQ>
-    <xmx:Wp8hasA1cBKF_5yZmYvObI264AHReve3bbrvl6oZ70wWqY30Nf5ez707>
-Feedback-ID: if72e4b10:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id B9BAE216008A; Thu,  4 Jun 2026 11:52:58 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=sony.com header.i=@sony.com header.b="okAzoY1+"
+Received: from pps.filterd (m0209329.ppops.net [127.0.0.1])
+	by mx08-001d1705.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 654Erv4r1010319;
+	Thu, 4 Jun 2026 16:38:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sony.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=p1; bh=99xJ2KO
+	40U7rfdXCyo1FQv7gCS0FuOXv6N846wdTDIo=; b=okAzoY1+tBPac6olJTzZrHD
+	Pg2RqsniWZ7HBo7q//yv49an3/3t4rYiB7j6BTrayzlWMTTPpUhtzVe06JA6ixRv
+	ZxMVkqTShOoDqRA17wiAC6JlDYPF8fJUrzxP3Faugvulgg296vfuBy2E1L8jZNIF
+	fHK4JA0TDYXsFF6zdIChlI3L0n0qgB6YyVWRd9CqyjKUsRdQYFa8nbN5YdP1HuAu
+	q9xZUlx9MtapcS3ncBZsEu2SJZV5/rM/iKBIZqxV9uPrytXPPk2DOXXsrlm2qDUE
+	M1NfFt5kVB6AiySiqBXC2UCmQigaSYAXOwxkSsGsCfP8kFiN4m+wf7Ko1WHP+8w=
+	=
+Received: from ch4pr04cu002.outbound.protection.outlook.com (mail-northcentralusazon11013061.outbound.protection.outlook.com [40.107.201.61])
+	by mx08-001d1705.pphosted.com (PPS) with ESMTPS id 4efphw6k3f-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Thu, 04 Jun 2026 16:38:32 +0000 (GMT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RMU2tVKV4/Y172SRjVydHB+zvMCsPBzgAXODQsX1n0GV/nZfNaVg0etsLc8gxsBufYeVD4D6pl45GSkNEmBbw4PgGFTd4l2YEJgQk2ogDJc/SL/x8oypMNprHvaERU/QWc6llphlAmXQzyArCX9cd4Oa2ixA13vJZcvZuVvA4ADyRyynxuZUvpNpRJSOgkVPphK4RyfYJIdzzPUHx1CfFTXCE/sSsW1yNkbI6oQkcNY1hh9CxuM3yosnmQKQERrcUkSMnQcksvKE8jXztWBe7hT3eHp1/CDo4gLWDdj+hl7Kc2Qi17OPkMzOF15gfLXZrORvzGH87ErAEzQI+7NDnQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=99xJ2KO40U7rfdXCyo1FQv7gCS0FuOXv6N846wdTDIo=;
+ b=x9h3vVT1zoby2x0GOlfXVEdNdioga3b8uBQqM/7lgXe+vaD7mtvRUpYfsPyvBR3VDEfBZwI2AuK27OzbFs8XitPV9VVWyKwQNRUleSitV60S+MjQgNcfGDVcRTAB5qPrW5tVXaOCQRS0t6zlMi6uvFeUcm9tRkv3xNK2/8jGCDiLCLHU2ohe4ShLYaKkmW2/amGjT4paANKpjFlJIvu5w/RxfBfalW7AbdoHC6rZx2SmFa3bhYRvL3tq41R3t6UH/sIMRM5CMJbN2k4oox5IjNL0jlCs7v3sA0eXk1fVcovTXyhmkvsMAWF1BehBV3HVeA0tjPjWcm4gIimZYRNTNw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=sony.com; dmarc=pass action=none header.from=sony.com;
+ dkim=pass header.d=sony.com; arc=none
+Received: from MW5PR13MB5632.namprd13.prod.outlook.com (2603:10b6:303:197::16)
+ by DM8PR13MB5208.namprd13.prod.outlook.com (2603:10b6:8:6::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.92.7; Thu, 4 Jun 2026 16:38:26 +0000
+Received: from MW5PR13MB5632.namprd13.prod.outlook.com
+ ([fe80::29e9:b355:cabf:66f1]) by MW5PR13MB5632.namprd13.prod.outlook.com
+ ([fe80::29e9:b355:cabf:66f1%3]) with mapi id 15.21.0092.006; Thu, 4 Jun 2026
+ 16:38:25 +0000
+From: "Bird, Tim" <Tim.Bird@sony.com>
+To: Bastien Nocera <hadess@hadess.net>,
+        "marcel@holtmann.org"
+	<marcel@holtmann.org>,
+        "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
+        "jannh@google.com" <jannh@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "kiran.k@intel.com" <kiran.k@intel.com>,
+        "chharry@chromium.org"
+	<chharry@chromium.org>,
+        "gustavo@padovan.org" <gustavo@padovan.org>,
+        "prameela.j04cs@gmail.com" <prameela.j04cs@gmail.com>,
+        "salvatore.benedetto@intel.com" <salvatore.benedetto@intel.com>,
+        "maxk@qualcomm.com" <maxk@qualcomm.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-spdx@vger.kernel.org" <linux-spdx@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v2] Bluetooth: Add SPDX id lines to some source files
+Thread-Topic: [PATCH v2] Bluetooth: Add SPDX id lines to some source files
+Thread-Index: AQHc87rtD8cMQsYTXkuJqTxLtVmCnbYuREGAgABQdGA=
+Date: Thu, 4 Jun 2026 16:38:25 +0000
+Message-ID:
+ <MW5PR13MB5632FBFA947B82F49EBC6926FD102@MW5PR13MB5632.namprd13.prod.outlook.com>
+References: <20260604004125.715884-1-tim.bird@sony.com>
+ <1b4540a3814b2e6106f48435df8692beaf177f8a.camel@hadess.net>
+In-Reply-To: <1b4540a3814b2e6106f48435df8692beaf177f8a.camel@hadess.net>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW5PR13MB5632:EE_|DM8PR13MB5208:EE_
+x-ms-office365-filtering-correlation-id: 6bc39e3e-c8e7-46b5-25c7-08dec257b335
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|1800799024|10070799003|366016|38070700021|921020|4143699003|18002099003|22082099003|11063799006|56012099006|6133799003;
+x-microsoft-antispam-message-info:
+ r6P8uPdzGvrPWquxqc7bJov7qLlvYXvdkGgeEyfqz2Q98al7Lehj/CRdd624bOFvhcTCFDYTsRUaG0Ft+p473vhmxJjI20D6mSFAAVuxAHG6gRMC3dDo0UurrP0M5dW54e7VVGTlNDodr8/HhmDkvbu1jwiY3SdZkQTX9KCVBHcEbgvV5Mt9bMja/MWuC2Uk2Oy00sL8kjmKbTOP3XbGYhOqmYpiy1RZ4C8iqoajB+eRwSHnvCxdc+30rPiueXDvgstd9GXaxOa9hxib3r4qi8GAYO8IhpzC+gSK7a+Van1FUBnqZc/qpowf0nvXI1g+wfogYWEFPvoUlqeaIyHvly3e04vytfaLn0WSt6vQGfyqkyjxKkG0DmB8FirwQ4UbrINpwZF+O65JYiWHiYYnkHZGq4HLhnVYiUM8iQ2ADowThN1VOm/SdFd/vnbdRmvJC0I63ZZMMsMNSVFL5+LqxpNW4Fi4rAGFIivzOF70X4RC3L5S5FOUMAJA9fIbs9MjyxiIJAamvQwx23EaWexmBq6lJ92XhYxGbU60e60BPjk78Vl1VXLGv+FOV7ZRBzFO4IfYGdesWRSaUnS1IiIgp24vUhD4yi/7DeuKuMoZU4gXdXZtf1MXkA1T69tDxIII2Dozbqp/UVZespBZ1pkUDaisOiULX55Ytx67WB1DsdUGxtqyYbU71R7oMZ/SsNswBUhmRiw6JjnCAbSlXda3Lg==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR13MB5632.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(10070799003)(366016)(38070700021)(921020)(4143699003)(18002099003)(22082099003)(11063799006)(56012099006)(6133799003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?RFovampDVnI0cTBJLzZJeW01QkY4YUViamJ6S1lWc0VYcVhyZWo2Q2dqc3hy?=
+ =?utf-8?B?YlJOa3c3b1ZZKzRFcC9GUno2Um1pMkZWa1JRdDhKSm56ZEtRMGNzREE2Ylcv?=
+ =?utf-8?B?VkRWMWZNOStuWXorYlkrMnBWb3lIVUpHeHMvd1NUcFdkRzlpTFNpa3p5aDlP?=
+ =?utf-8?B?SWtwU0x4L3JFU2NoeEdjQTYyME1sbHc5YXFtZkNwNFhIcENzZ1dNWEFPdHli?=
+ =?utf-8?B?bG9TV0hESjIvU3hTQS9KZ1Y2UUNmOHFHbmFBLy95LzhrQy9Pc2FzeXUzOGpn?=
+ =?utf-8?B?b1lyTm9UZUpLekhobXd1Tm16QzhtMEQ0b0t5cXdlTUhJa0tuMzR0dDhMcW5Y?=
+ =?utf-8?B?d0JWUzNmQXQvZ244KzRNeWRya3d4b051TmJKbnp4YWNvK2ZUTlE1c3BlSXhk?=
+ =?utf-8?B?WHYyR0dxTHlWRGUxSUVYZSswK2gvOFFES013NmlSVldia3JKZTZPVGJmN216?=
+ =?utf-8?B?ODZ4cTdhclhVZUJRdEdBNEVCUDdRcVNheFJtV2NpN1BkYUhSN0xYNHN6eXUw?=
+ =?utf-8?B?TFFJWlk1RWxZeUJzUWZWelA3MlMvdHNWZkJubmZ4cVBpNzl6MDJYclVZaWdv?=
+ =?utf-8?B?aGZoYmRVQllBMmxWWUN0cEZRRHdFem56Tm0wbmlNbFFYclIrZkNyNW5EZEtS?=
+ =?utf-8?B?TzZQYnhPbFB3WXhTdnloV1R0anVzQXdhb0MyVktuRi9RYnZBdGtqRGE0QWk4?=
+ =?utf-8?B?eDRXNHZ1MC93UUovMTJqbVVvRm9jOXo4NDVRL09uRFJNTFRrNWxva0pqeW9I?=
+ =?utf-8?B?Uno0ZGRxMUlaNnQyQnQ2RGpXSUlKd2phYzRXbjR4eER0NlhVTHFuZklsVXIy?=
+ =?utf-8?B?OS9FckpMdlQxOTRDQ3RwOUZOY2UzMThhSDVZcE4xQ2Q3eUI0SVZJY2sxNUhV?=
+ =?utf-8?B?UkRLVHpVVG9LbjA4UmEzNmRDNi9RRTErV09HaDU5azJRckdDdmVscjU1ZkJ0?=
+ =?utf-8?B?V2p4ZUtZOFVJUTg5bWlYZ05tamtBa3lUZ0IyeTNwbGJONG9pWTFnQktRYVRv?=
+ =?utf-8?B?VlFJakVpSVQ2OWJpRkJ2aVZYRkRmV0NkMFhJSjZsZER6dnYrQ2w3eitlMWdK?=
+ =?utf-8?B?dEVUSGF2SHlNQXh4Vk5BR21RZTVKWk5SRzJFOUJzWjA2WWpXSC8rNHBtWGto?=
+ =?utf-8?B?OHR2S0NGN0x1NVcyRTZ1S2hIdmpFbmVoUEZIRWFySVhVUVJzSXorTnRNSExr?=
+ =?utf-8?B?UlljTWlpUS9ZWkNBSCtrM2NCV0lzbk1xckphRW1YMXhGblY1RS9ucVFGai9j?=
+ =?utf-8?B?cENoOUM2UkkvY3pKZE9IVWYzYmpiMDBvdEYwL3hJTHZ0UURMR3NlTEJkVFlx?=
+ =?utf-8?B?K2JSbVROTmZLQS9hc0IxbGxTYngyTE9yVXRyVzJiLzlKOXRrbVkyVk5UMzJy?=
+ =?utf-8?B?Zy85MkhXUlpRaW1kenZaWkZtY212aWFyMnRjUHVORm1jdE5jakhsb0gxRDRE?=
+ =?utf-8?B?S0NLbVAwZVloWTBkWDBUNFZYQURibHBiSmZoNUJHRVJRMnFnTm12SjJLaEg2?=
+ =?utf-8?B?QkNnSXZkaFp5UzNvVlk3WGZra1NBclYzZ2dwSUdEVEhKNFVOeUZ5ZjVGRU9I?=
+ =?utf-8?B?L0VXWWl3SEpjYXhtcHdFODREamJjUHVNZHd6QjRyODhVem01aEZHVm1SK21Z?=
+ =?utf-8?B?RGdPM0tySVY4dE1TUXN2R0JybEFDM25PeVFuN3lMU0ZhdUowdGxhSlZ3T1I2?=
+ =?utf-8?B?djY4RDRrZHY1dlc1Qmp0c2RSeFIxY2hkeFNITjdIWUs0Umk3RS94eHNqZzVD?=
+ =?utf-8?B?VU5EZVhnTWt1TE95Qm55RWFiZ0l2QTM2WFVDR3ZmTW5MWDd0eGNGWU9PWHlq?=
+ =?utf-8?B?OC94cUM2Y1ErRG5tWXp5OWR3NWNYNmFXQ2JwMDRkTjZWamJ2U3RNSkEzNS9Z?=
+ =?utf-8?B?c3M2bGM0UzFMNFgyVDhNVGFhanprdHdOendXbjlpZUt1ZjBHakYrY0NOTURs?=
+ =?utf-8?B?UUxJdXFwb0lsRUcrTnplY1F6NGtVTE9Zai9VaDJOM2VodW9RdDliVkdXRHdz?=
+ =?utf-8?B?QUpmays0KzQ5Q3RNMUhaQkpMTlNOSW0zaDN4LzRMRmVtVmZqQy9FN2RSNExY?=
+ =?utf-8?B?UnZhRzNlcHduRVVXYjBvaHE4cVJqZWdJTVV6aFAxU1VBbkgyZ09mbnUyenpD?=
+ =?utf-8?B?cjBDK1U2aTZnTHdqZmMyRGloRlJGUSs5TkltUEFQeGZoU2NaTTEzdzU0QXc2?=
+ =?utf-8?B?Nzc5LzQveU5oOHZmZmk1T3BwL0ZwSUxuNm55U1hEMllNbTBGWVNpcHZ3c0Iv?=
+ =?utf-8?B?SnU4KzF3OFN3NWNFVWdrQ1dsQmhUTFNCNFVSMFR3MERGcWp5ZEw1bWR3c0Jh?=
+ =?utf-8?B?NEVHamlIQkNMMTkvb0pOSWFhU09hT3lRcUNSOHZwLy9ENm53VTJnQXB4UHAv?=
+ =?utf-8?Q?+7LcWG6VhdVVBn7rNeiPiuVxh7Vz0cWOK1r81?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: Ark7h5MHViQF
-Date: Thu, 04 Jun 2026 11:52:38 -0400
-From: "Siwei Zhang" <oss@fourdim.xyz>
-To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <d01691b5-1651-4399-9208-b845dfeffb9c@app.fastmail.com>
-In-Reply-To: 
- <CABBYNZ+zZCTDqoJo4X9oqo-8gGkEXv6-Y=50oU-CVXmTztAsAA@mail.gmail.com>
-References: <20260603150835.3539963-1-oss@fourdim.xyz>
- <20260603150835.3539963-2-oss@fourdim.xyz>
- <CABBYNZ+zZCTDqoJo4X9oqo-8gGkEXv6-Y=50oU-CVXmTztAsAA@mail.gmail.com>
-Subject: Re: [PATCH v9 1/1] Bluetooth: L2CAP: Fix use-after-free in
- l2cap_sock_new_connection_cb()
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-Exchange-RoutingPolicyChecked:
+	g0PJ6B5kBmpw55dBln9+wJW3TVzKVi5fcpzrbwgfKguCQGRfhRURhaZYi5f8yg5NIzyD/2lpFwt2XR0bbiyowwhwtFEV4IBpI797ljkPgMIUWBEqPoDgXqql/TEJx4d+RI9Grl5iJIBne/yGBzmZ5uobYoRs4HQg8s6wfSUh/1BFkLuUqpzy/VSkq7VPDa3+vYFnxBd2MUh9EJhoI02BW1h5HgZt/VnbEbB/fmaIZIJMgqNWt1kNCXgq0jtk2PDKJYCpg89gJ3CpbfIyLJNxtt2Hy1jsBFE7XcvL/MrOTYIWg3fMEIhGIpPhakalUCuDwXjmRYTRZecJFVaIdzn+Rg==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	NMhU9gZmgFbMpW2mBJ2wxJLLoZk/24XH3JUVtygYwaymxsKNX929Yw1n5eE5n85qGZ8GhR4EHYPcUhM1Hzez12r7/KPmXENAOeNWiMXMf50fm09v1sHnGPfjOVm/P5+NsywDvK+3ZYX7yNh2slUCy6mVE3ZLfphWGpBGPib8lRcxkr4R0PeELy7GUe2jaUPIvXB4ifIhiLSvSLEqPcAEqPYUxZFmI8I6TdsgBt/jdWa6Uv0duDupywkEyxPZ86esO0vyCNgA2Bh5RaItvxGmGUynsD3SZXhzPMHXumVQi1eetJ0xfDI9eMuJRw1RU0T464QO2SNwY5xrHMoiAKuCgKh7gj+4fjYwJJqlo/4xwP7STPw05bQ+RuHuQZNnc8Dgt1r1DlY1Hf1GdUOOnPD/FuBP/1pEzHeIkMHd3NxYhib2H6cFZFE2yc6AdCmmCbcjrRdVKfiFYA53JKnOQolaKCYS8T8IXrMna+fPmDt274MLnA9B98eiiKrutHAfhF6WN7iEy+jYwEh345hFDcJ9G5C+5w4iVyKDJaxIp2kwXSF32+1M1bMI5cDj2W8NE6ONdZexZglxz/iwNGWX+cgQ7XDhXAnICVRVRBiogRYkGrcXIFnqPnBXJZVCWqzVmH+q
+X-OriginatorOrg: sony.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW5PR13MB5632.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6bc39e3e-c8e7-46b5-25c7-08dec257b335
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jun 2026 16:38:25.7210
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 66c65d8a-9158-4521-a2d8-664963db48e4
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 96pqEo+5z0ezy7gxvh731rH6zgf/l+zkJAjPzULkdoGcQ7aI4DY36uCneeTI3gYO0QyiyJojph/Ky2E5iM3OtQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR13MB5208
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA0MDE2MyBTYWx0ZWRfX7GlRMJkl7H2L
+ 9aDPKDEwKVKuAB/f74nR2bgsRdujHvwO5wuhy5FQj+V4EaR2bL3CZgi3cekIbBPSxIU+GDPlzhn
+ CnGAg+lbRu25UOA2lflS1AELEcvBlzbgViQbSJMOWob/eBlUKvj9MfTdqy0nMKoWQMX4KFVFdL1
+ H6PcIXvAMuHWbGlsw85LcARyQXUGzooL1Zdy7TGHIU3BB12ee9ZlhmNzNaGvBfhrC9Xzcyus5s3
+ 2fDpHiJKy++9HgwaKNVbeuMSYBBe5uyqXDg3FnV2Zk3DUpPWP85kxyfW8Fff8QHPd0W7uyOFMhs
+ 7lNxjDiUvZhXbTf4NqxGcxNTQwLQJ9KMHXap5rkoNsF0Wy+YW10LtrNmKquAdLm18Cat/Ps5OR7
+ uckFUwDMJ3syuSnAcjO+cnEYiAJI6jYi/urY6AWKCaXVl/hlzGOmJEPWW4azYAygZknk67mQRy+
+ PjJuqjdVxoF6co2UsKQ==
+X-Proofpoint-ORIG-GUID: g6H6Kc8RC2sLMBLkOT8MEmmFeVUdV0id
+X-Proofpoint-GUID: g6H6Kc8RC2sLMBLkOT8MEmmFeVUdV0id
+X-Authority-Analysis: v=2.4 cv=TO91jVla c=1 sm=1 tr=0 ts=6a21aa08 cx=c_pps
+ a=6O9SViV89A8ZJb2Gg0v8VA==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=FelO9ux0wxsA:10 a=xR56lInIT_wA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=KAb5x4SsHD3PzxGk7EmX:22 a=pQehfwC0D4oxWvs5GOjV:22 a=NEAV23lmAAAA:8
+ a=JAcjjVAEAAAA:8 a=vugxpd_pAAAA:8 a=iP7vMvkZAAAA:8 a=0QPK_YWQbrcEsa51EGwA:9
+ a=QEXdDO2ut3YA:10 a=Acyig5GiBk5jV-JuFR3u:22 a=dlIDbnWlQMEhdIxAeUMX:22
+ a=SKixG8JwDLmn6dAKAxWB:22
+X-Sony-Outbound-GUID: g6H6Kc8RC2sLMBLkOT8MEmmFeVUdV0id
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-04_04,2026-05-28_03,2025-10-01_01
 
-Hi Luiz,
-
-On Wed, Jun 3, 2026, at 2:17 PM, Luiz Augusto von Dentz wrote:
-> Hi Siwei,
->
-> On Wed, Jun 3, 2026 at 11:09=E2=80=AFAM Siwei Zhang <oss@fourdim.xyz> =
-wrote:
->>
->> l2cap_sock_new_connection_cb() accesses l2cap_pi(sk)->chan after
->> release_sock(parent). Once the parent lock is released, the child
->> socket sk can be freed by another task.
->>
->> Allocate the channel outside the func to prevent this.
->>
->> Fixes: 8ffb929098a5 ("Bluetooth: Remove parent socket usage from l2ca=
-p_core.c")
->> Cc: stable@kernel.org
->> Assisted-by: Claude:claude-opus-4-8
->> Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
->> ---
->>  include/net/bluetooth/l2cap.h | 10 +++--
->>  net/bluetooth/6lowpan.c       | 31 +++++++------
->>  net/bluetooth/l2cap_core.c    | 41 ++++++++++++-----
->>  net/bluetooth/l2cap_sock.c    | 83 +++++++++++++++++++++------------=
---
->>  net/bluetooth/smp.c           | 17 ++++---
->>  5 files changed, 113 insertions(+), 69 deletions(-)
->>
->> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2=
-cap.h
->> index e0a1f2293679..7f5e4647f6e0 100644
->> --- a/include/net/bluetooth/l2cap.h
->> +++ b/include/net/bluetooth/l2cap.h
->> @@ -620,7 +620,9 @@ struct l2cap_chan {
->>  struct l2cap_ops {
->>         char                    *name;
->>
->> -       struct l2cap_chan       *(*new_connection) (struct l2cap_chan=
- *chan);
->> +       int                     (*new_connection)(struct l2cap_conn *=
-conn,
->> +                                                 struct l2cap_chan *=
-chan,
->> +                                                 struct l2cap_chan *=
-new_chan);
->>         int                     (*recv) (struct l2cap_chan * chan,
->>                                          struct sk_buff *skb);
->>         void                    (*teardown) (struct l2cap_chan *chan,=
- int err);
->> @@ -884,9 +886,11 @@ static inline __u16 __next_seq(struct l2cap_chan=
- *chan, __u16 seq)
->>         return (seq + 1) % (chan->tx_win_max + 1);
->>  }
->>
->> -static inline struct l2cap_chan *l2cap_chan_no_new_connection(struct=
- l2cap_chan *chan)
->> +static inline int l2cap_chan_no_new_connection(struct l2cap_conn *co=
-nn,
->> +                                              struct l2cap_chan *cha=
-n,
->> +                                              struct l2cap_chan *new=
-_chan)
->>  {
->> -       return NULL;
->> +       return -EOPNOTSUPP;
->>  }
->>
->>  static inline int l2cap_chan_no_recv(struct l2cap_chan *chan, struct=
- sk_buff *skb)
->> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
->> index cb1e329d66fd..94863af97a44 100644
->> --- a/net/bluetooth/6lowpan.c
->> +++ b/net/bluetooth/6lowpan.c
->> @@ -624,6 +624,15 @@ static bool is_bt_6lowpan(struct hci_conn *hcon)
->>         return true;
->>  }
->>
->> +static void chan_init(struct l2cap_chan *chan)
->> +{
->> +       l2cap_chan_set_defaults(chan);
->> +
->> +       chan->chan_type =3D L2CAP_CHAN_CONN_ORIENTED;
->> +       chan->mode =3D L2CAP_MODE_LE_FLOWCTL;
->> +       chan->imtu =3D 1280;
->> +}
->> +
->>  static struct l2cap_chan *chan_create(void)
->>  {
->>         struct l2cap_chan *chan;
->> @@ -632,11 +641,7 @@ static struct l2cap_chan *chan_create(void)
->>         if (!chan)
->>                 return NULL;
->>
->> -       l2cap_chan_set_defaults(chan);
->> -
->> -       chan->chan_type =3D L2CAP_CHAN_CONN_ORIENTED;
->> -       chan->mode =3D L2CAP_MODE_LE_FLOWCTL;
->> -       chan->imtu =3D 1280;
->> +       chan_init(chan);
->>
->>         return chan;
->>  }
->> @@ -745,19 +750,19 @@ static inline void chan_ready_cb(struct l2cap_c=
-han *chan)
->>         ifup(dev->netdev);
->>  }
->>
->> -static inline struct l2cap_chan *chan_new_conn_cb(struct l2cap_chan =
-*pchan)
->> +static inline int chan_new_conn_cb(struct l2cap_conn *conn,
->> +                                  struct l2cap_chan *pchan,
->> +                                  struct l2cap_chan *chan)
->>  {
->> -       struct l2cap_chan *chan;
->> -
->> -       chan =3D chan_create();
->> -       if (!chan)
->> -               return NULL;
->> -
->> +       chan_init(chan);
->>         chan->ops =3D pchan->ops;
->>
->> +       /* Take the conn list reference; see l2cap_new_connection(). =
-*/
->> +       __l2cap_chan_add(conn, chan);
->> +
->>         BT_DBG("chan %p pchan %p", chan, pchan);
->>
->> -       return chan;
->> +       return 0;
->>  }
->>
->>  static void unregister_dev(struct lowpan_btle_dev *dev)
->> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->> index c4ccfbda9d78..62acf90837fb 100644
->> --- a/net/bluetooth/l2cap_core.c
->> +++ b/net/bluetooth/l2cap_core.c
->> @@ -4007,6 +4007,31 @@ static inline int l2cap_command_rej(struct l2c=
-ap_conn *conn,
->>         return 0;
->>  }
->>
->> +/* Allocate and initialise a channel for an incoming connection.
->> + *
->> + * ->new_connection() initialises the channel and links it into @con=
-n with
->> + * __l2cap_chan_add(). The l2cap_chan_create() reference becomes the=
- one owned
->> + * by the parent subsystem (l2cap_pi(sk)->chan, conn->smp or peer->c=
-han) and is
->> + * released by its teardown callback; the conn list reference is rel=
-eased by
->> + * l2cap_chan_del().
->> + */
->> +static struct l2cap_chan *l2cap_new_connection(struct l2cap_conn *co=
-nn,
->> +                                              struct l2cap_chan *pch=
-an)
->> +{
->> +       struct l2cap_chan *chan;
->> +
->> +       chan =3D l2cap_chan_create();
->> +       if (!chan)
->> +               return NULL;
->> +
->> +       if (pchan->ops->new_connection(conn, pchan, chan) < 0) {
->> +               l2cap_chan_put(chan);
->> +               return NULL;
->> +       }
->
-> I don't quite get why we can't just place __l2cap_chan_add here
-> instead of having it called by new_connection callbacks?
->
-
-It's specifically the l2cap_sock_new_connection_cb() case - the very
-use-after-free this patch fixes. The __l2cap_chan_add() has to happen wh=
-ile
-the parent lock is still held, and only the callback holds that lock.
-
-The reference counting on the new child chan starts at one ref,=20
-owned by the new socket:
-
-	/* l2cap_new_connection() */
-	chan =3D l2cap_chan_create();		/* refcount =3D 1 */
-	if (!chan)
-		return NULL;
-
-	pchan->ops->new_connection(conn, pchan, chan);
-
-and inside the socket callback:
-
-	/* l2cap_sock_new_connection_cb() */
-	lock_sock(parent);
-	...
-	sk =3D l2cap_sock_alloc(..., new_chan);	/* sk owns the chan_create ref =
-*/
-	...
-	l2cap_sock_init(sk, parent);
-
-	__l2cap_chan_add(conn, new_chan);	/* (A) conn list takes a ref */
-	bt_accept_enqueue(parent, sk, false);	/* (B) sk now on accept queue */
-
-	release_sock(parent);			/* (C) parent lock dropped */
-	return 0;
-
-The moment we hit (C), sk is reachable through the parent's accept queue=
-, so
-another task can grab and tear it down:
-
-	accept() -> l2cap_sock_kill() -> l2cap_sock_put_chan()
-		chan->data =3D NULL;
-		l2cap_chan_put(chan);		/* drops the sk's chan ref */
-
-If __l2cap_chan_add() at (A) hadn't already taken the conn list referenc=
-e,
-that put would drop the last ref and free new_chan. Control then returns=
- up
-to l2cap_new_connection(), which hands the now-freed chan back to
-l2cap_connect():
-
-	/* l2cap_connect() - runs after the callback returns */
-	chan =3D l2cap_new_connection(conn, pchan);
-	if (!chan)
-		goto response;
-	...
-	bacpy(&chan->src, &conn->hcon->src);	/* <-- UAF on freed chan */
-	chan->psm  =3D psm;
-	chan->dcid =3D scid;
-
-The conn list reference taken at (A), before (C), is what keeps new_chan
-alive across the release_sock() window so l2cap_connect() can keep using=
- it.
-
-So __l2cap_chan_add() can't move out to l2cap_new_connection(): by the t=
-ime
-the callback returns, the parent lock is already dropped and chan may al=
-ready
-be freed - which is exactly the race. It has to be taken inside the call=
-back,
-under the parent lock, before the socket is exposed.
-
-The other callbacks (6lowpan, smp) have no equivalent lock-drop window.
- I kept __l2cap_chan_add() inside all of the ->new_connection() callbacks
-just to keep the "callback links the channel into conn" contract uniform.
-
->> +
->> +       return chan;
->> +}
->> +
->>  static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_=
-hdr *cmd,
->>                           u8 *data, u8 rsp_code)
->>  {
->> @@ -4053,7 +4078,7 @@ static void l2cap_connect(struct l2cap_conn *co=
-nn, struct l2cap_cmd_hdr *cmd,
->>                 goto response;
->>         }
->>
->> -       chan =3D pchan->ops->new_connection(pchan);
->> +       chan =3D l2cap_new_connection(conn, pchan);
->>         if (!chan)
->>                 goto response;
->>
->> @@ -4071,8 +4096,6 @@ static void l2cap_connect(struct l2cap_conn *co=
-nn, struct l2cap_cmd_hdr *cmd,
->>         chan->psm  =3D psm;
->>         chan->dcid =3D scid;
->>
->> -       __l2cap_chan_add(conn, chan);
->> -
->>         dcid =3D chan->scid;
->>
->>         __set_chan_timer(chan, chan->ops->get_sndtimeo(chan));
->> @@ -4955,7 +4978,7 @@ static int l2cap_le_connect_req(struct l2cap_co=
-nn *conn,
->>                 goto response_unlock;
->>         }
->>
->> -       chan =3D pchan->ops->new_connection(pchan);
->> +       chan =3D l2cap_new_connection(conn, pchan);
->>         if (!chan) {
->>                 result =3D L2CAP_CR_LE_NO_MEM;
->>                 goto response_unlock;
->> @@ -4970,8 +4993,6 @@ static int l2cap_le_connect_req(struct l2cap_co=
-nn *conn,
->>         chan->omtu =3D mtu;
->>         chan->remote_mps =3D mps;
->>
->> -       __l2cap_chan_add(conn, chan);
->> -
->>         l2cap_le_flowctl_init(chan, __le16_to_cpu(req->credits));
->>
->>         dcid =3D chan->scid;
->> @@ -5179,7 +5200,7 @@ static inline int l2cap_ecred_conn_req(struct l=
-2cap_conn *conn,
->>                         continue;
->>                 }
->>
->> -               chan =3D pchan->ops->new_connection(pchan);
->> +               chan =3D l2cap_new_connection(conn, pchan);
->>                 if (!chan) {
->>                         result =3D L2CAP_CR_LE_NO_MEM;
->>                         continue;
->> @@ -5194,8 +5215,6 @@ static inline int l2cap_ecred_conn_req(struct l=
-2cap_conn *conn,
->>                 chan->omtu =3D mtu;
->>                 chan->remote_mps =3D mps;
->>
->> -               __l2cap_chan_add(conn, chan);
->> -
->>                 l2cap_ecred_init(chan, __le16_to_cpu(req->credits));
->>
->>                 /* Init response */
->> @@ -7470,14 +7489,12 @@ static void l2cap_connect_cfm(struct hci_conn=
- *hcon, u8 status)
->>                         goto next;
->>
->>                 l2cap_chan_lock(pchan);
->> -               chan =3D pchan->ops->new_connection(pchan);
->> +               chan =3D l2cap_new_connection(conn, pchan);
->>                 if (chan) {
->>                         bacpy(&chan->src, &hcon->src);
->>                         bacpy(&chan->dst, &hcon->dst);
->>                         chan->src_type =3D bdaddr_src_type(hcon);
->>                         chan->dst_type =3D dst_type;
->> -
->> -                       __l2cap_chan_add(conn, chan);
->>                 }
->>
->>                 l2cap_chan_unlock(pchan);
->> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
->> index 025329636353..87f4c0db5c0c 100644
->> --- a/net/bluetooth/l2cap_sock.c
->> +++ b/net/bluetooth/l2cap_sock.c
->> @@ -46,7 +46,8 @@ static struct bt_sock_list l2cap_sk_list =3D {
->>  static const struct proto_ops l2cap_sock_ops;
->>  static void l2cap_sock_init(struct sock *sk, struct sock *parent);
->>  static struct sock *l2cap_sock_alloc(struct net *net, struct socket =
-*sock,
->> -                                    int proto, gfp_t prio, int kern);
->> +                                    int proto, gfp_t prio, int kern,
->> +                                    struct l2cap_chan *chan);
->>  static void l2cap_sock_cleanup_listen(struct sock *parent);
->>
->>  bool l2cap_is_socket(struct socket *sock)
->> @@ -1287,6 +1288,23 @@ static int l2cap_sock_recvmsg(struct socket *s=
-ock, struct msghdr *msg,
->>         return err;
->>  }
->>
->> +/* Release the sock's ref on chan and clear the pointer so that the =
-ref is
->> + * dropped exactly once even if both l2cap_sock_kill() and
->> + * l2cap_sock_destruct() run. Setting chan->data to NULL first stops=
- any other
->> + * task from dereferencing the now-dead sock pointer.
->> + */
->> +static void l2cap_sock_put_chan(struct sock *sk)
->> +{
->> +       struct l2cap_chan *chan =3D l2cap_pi(sk)->chan;
->> +
->> +       if (!chan)
->> +               return;
->> +
->> +       chan->data =3D NULL;
->> +       l2cap_pi(sk)->chan =3D NULL;
->> +       l2cap_chan_put(chan);
->> +}
->> +
->>  /* Kill socket (only if zapped and orphan)
->>   * Must be called on unlocked socket, with l2cap channel lock.
->>   */
->> @@ -1297,13 +1315,9 @@ static void l2cap_sock_kill(struct sock *sk)
->>
->>         BT_DBG("sk %p state %s", sk, state_to_string(sk->sk_state));
->>
->> -       /* Sock is dead, so set chan data to NULL, avoid other task u=
-se invalid
->> -        * sock pointer.
->> -        */
->> -       l2cap_pi(sk)->chan->data =3D NULL;
->> -       /* Kill poor orphan */
->> +       l2cap_sock_put_chan(sk);
->>
->> -       l2cap_chan_put(l2cap_pi(sk)->chan);
->> +       /* Kill poor orphan */
->>         sock_set_flag(sk, SOCK_DEAD);
->>         sock_put(sk);
->>  }
->> @@ -1546,12 +1560,14 @@ static void l2cap_sock_cleanup_listen(struct =
-sock *parent)
->>         }
->>  }
->>
->> -static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_=
-chan *chan)
->> +static int l2cap_sock_new_connection_cb(struct l2cap_conn *conn,
->> +                                       struct l2cap_chan *chan,
->> +                                       struct l2cap_chan *new_chan)
->>  {
->>         struct sock *sk, *parent =3D chan->data;
->>
->>         if (!parent)
->> -               return NULL;
->> +               return -EINVAL;
->>
->>         lock_sock(parent);
->>
->> @@ -1559,25 +1575,33 @@ static struct l2cap_chan *l2cap_sock_new_conn=
-ection_cb(struct l2cap_chan *chan)
->>         if (sk_acceptq_is_full(parent)) {
->>                 BT_DBG("backlog full %d", parent->sk_ack_backlog);
->>                 release_sock(parent);
->> -               return NULL;
->> +               return -ENOBUFS;
->>         }
->>
->>         sk =3D l2cap_sock_alloc(sock_net(parent), NULL, BTPROTO_L2CAP,
->> -                             GFP_ATOMIC, 0);
->> +                             GFP_ATOMIC, 0, new_chan);
->>         if (!sk) {
->>                 release_sock(parent);
->> -               return NULL;
->> -        }
->> +               return -ENOMEM;
->> +       }
->>
->>         bt_sock_reclassify_lock(sk, BTPROTO_L2CAP);
->>
->>         l2cap_sock_init(sk, parent);
->>
->> +       /* Link the channel into conn before exposing the new socket =
-via the
->> +        * accept queue. Once release_sock() below drops the parent l=
-ock the
->> +        * socket may be freed by another task, dropping its referenc=
-e on
->> +        * new_chan; the conn list reference taken here keeps new_cha=
-n alive so
->> +        * the caller can safely use it after ->new_connection() retu=
-rns.
->> +        */
->> +       __l2cap_chan_add(conn, new_chan);
->> +
->>         bt_accept_enqueue(parent, sk, false);
->>
->>         release_sock(parent);
->>
->> -       return l2cap_pi(sk)->chan;
->> +       return 0;
->>  }
->>
->>  static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buf=
-f *skb)
->> @@ -1874,10 +1898,7 @@ static void l2cap_sock_destruct(struct sock *s=
-k)
->>
->>         BT_DBG("sk %p", sk);
->>
->> -       if (l2cap_pi(sk)->chan) {
->> -               l2cap_pi(sk)->chan->data =3D NULL;
->> -               l2cap_chan_put(l2cap_pi(sk)->chan);
->> -       }
->> +       l2cap_sock_put_chan(sk);
->>
->>         list_for_each_entry_safe(rx_busy, next, &l2cap_pi(sk)->rx_bus=
-y, list) {
->>                 kfree_skb(rx_busy->skb);
->> @@ -1978,10 +1999,10 @@ static struct proto l2cap_proto =3D {
->>  };
->>
->>  static struct sock *l2cap_sock_alloc(struct net *net, struct socket =
-*sock,
->> -                                    int proto, gfp_t prio, int kern)
->> +                                    int proto, gfp_t prio, int kern,
->> +                                    struct l2cap_chan *chan)
->>  {
->>         struct sock *sk;
->> -       struct l2cap_chan *chan;
->>
->>         sk =3D bt_sock_alloc(net, sock, &l2cap_proto, proto, prio, ke=
-rn);
->>         if (!sk)
->> @@ -1992,16 +2013,7 @@ static struct sock *l2cap_sock_alloc(struct ne=
-t *net, struct socket *sock,
->>
->>         INIT_LIST_HEAD(&l2cap_pi(sk)->rx_busy);
->>
->> -       chan =3D l2cap_chan_create();
->> -       if (!chan) {
->> -               sk_free(sk);
->> -               if (sock)
->> -                       sock->sk =3D NULL;
->> -               return NULL;
->> -       }
->> -
->> -       l2cap_chan_hold(chan);
->> -
->> +       /* The sock takes ownership of the caller's reference on chan=
-. */
->>         l2cap_pi(sk)->chan =3D chan;
->>
->>         return sk;
->> @@ -2011,6 +2023,7 @@ static int l2cap_sock_create(struct net *net, s=
-truct socket *sock, int protocol,
->>                              int kern)
->>  {
->>         struct sock *sk;
->> +       struct l2cap_chan *chan;
->>
->>         BT_DBG("sock %p", sock);
->>
->> @@ -2025,10 +2038,16 @@ static int l2cap_sock_create(struct net *net,=
- struct socket *sock, int protocol,
->>
->>         sock->ops =3D &l2cap_sock_ops;
->>
->> -       sk =3D l2cap_sock_alloc(net, sock, protocol, GFP_ATOMIC, kern=
-);
->> -       if (!sk)
->> +       chan =3D l2cap_chan_create();
->> +       if (!chan)
->>                 return -ENOMEM;
->>
->> +       sk =3D l2cap_sock_alloc(net, sock, protocol, GFP_ATOMIC, kern=
-, chan);
->> +       if (!sk) {
->> +               l2cap_chan_put(chan);
->> +               return -ENOMEM;
->> +       }
->> +
->>         l2cap_sock_init(sk, NULL);
->>         bt_sock_link(&l2cap_sk_list, sk);
->>         return 0;
->> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
->> index 1739c1989dbd..2d31c3c7bbc0 100644
->> --- a/net/bluetooth/smp.c
->> +++ b/net/bluetooth/smp.c
->> @@ -3204,16 +3204,12 @@ static const struct l2cap_ops smp_chan_ops =3D=
- {
->>         .get_sndtimeo           =3D l2cap_chan_no_get_sndtimeo,
->>  };
->>
->> -static inline struct l2cap_chan *smp_new_conn_cb(struct l2cap_chan *=
-pchan)
->> +static inline int smp_new_conn_cb(struct l2cap_conn *conn,
->> +                                 struct l2cap_chan *pchan,
->> +                                 struct l2cap_chan *chan)
->>  {
->> -       struct l2cap_chan *chan;
->> -
->>         BT_DBG("pchan %p", pchan);
->>
->> -       chan =3D l2cap_chan_create();
->> -       if (!chan)
->> -               return NULL;
->> -
->>         chan->chan_type =3D pchan->chan_type;
->>         chan->ops       =3D &smp_chan_ops;
->>         chan->scid      =3D pchan->scid;
->> @@ -3229,9 +3225,12 @@ static inline struct l2cap_chan *smp_new_conn_=
-cb(struct l2cap_chan *pchan)
->>          */
->>         atomic_set(&chan->nesting, L2CAP_NESTING_SMP);
->>
->> -       BT_DBG("created chan %p", chan);
->> +       /* Take the conn list reference; see l2cap_new_connection(). =
-*/
->> +       __l2cap_chan_add(conn, chan);
->>
->> -       return chan;
->> +       BT_DBG("initialised chan %p", chan);
->> +
->> +       return 0;
->>  }
->>
->>  static const struct l2cap_ops smp_root_chan_ops =3D {
->> --
->> 2.54.0
->>
->
->
-> --=20
-> Luiz Augusto von Dentz
-
-Best,
-Siwei
+SGV5IEJhc3RpZW4sDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQmFz
+dGllbiBOb2NlcmEgPGhhZGVzc0BoYWRlc3MubmV0Pg0KPiBIZWxsbyBUaW0sDQo+IA0KPiBPbiBX
+ZWQsIDIwMjYtMDYtMDMgYXQgMTg6NDEgLTA2MDAsIFRpbSBCaXJkIHdyb3RlOg0KPiA+IE1hbnkg
+Ymx1ZXRvb3RoIHNvdXJjZSBmaWxlcyBhcmUgbWlzc2luZyBTUERYLUxpY2Vuc2UtSWRlbnRpZmll
+cg0KPiA+IGxpbmVzLiBBZGQgYXBwcm9wcmlhdGUgSURzIHRvIHRoZXNlIGZpbGVzLCBhbmQgcmVt
+b3ZlIG90aGVyDQo+ID4gbGljZW5zZSBsaW5lcyBmcm9tIHRoZSBoZWFkZXJzLg0KPiANCj4gSSB0
+aGluayBpdCB3b3VsZCBiZSB1c2VmdWwgdG8gc2VwYXJhdGUgdGhlIGNoYW5nZXMgaW4gZHJpdmVy
+cy9ibHVldG9vdGgNCj4gYW5kIHRoZSBvbmVzIGluIHtpbmNsdWRlLyx9bmV0L2JsdWV0b290aC4N
+Cg0KSSB0aG91Z2h0IGFib3V0IHRoYXQuICBUaGVyZSdzIG9ubHkgb25lIGZpbGUgaW4gZHJpdmVy
+cy9ibHVldG9vdGggaW4gdGhpcyBwYXRjaCwgDQphbmQgaXQncyBnb3QgYSB2ZXJ5IHN0cmFpZ2h0
+Zm9yd2FyZCBhbmQgdW5hbWJpZ3VvdXMgbGljZW5zZSBzaXR1YXRpb24uDQpJIHRob3VnaHQgaXQg
+d291bGQgYmUgZWFzaWVyIGZvciB0aGUgQmx1ZXRvb3RoIG1haW50YWluZXJzIHRvIHNlZSBvbmUg
+cGF0Y2gNCmluc3RlYWQgb2YgbXVsdGlwbGUsIGJ1dCBJIGNhbiBicmVhayB0aGF0IG9uZSBmaWxl
+IG91dCBpZiBuZWVkZWQuDQoNClRoZXNlIHR5cGVzIG9mIGNoYW5nZXMgYXJlIHVzdWFsbHkgZG9u
+ZSBpbiBiYXRjaGVzLCB3aXRoIHBhdGNoIGJvdW5kYXJpZXMNCm1hdGNoaW5nIG1haW50YWluZXIg
+b3Igc3ViLXN5c3RlbSBib3VuZGFyaWVzLCByYXRoZXIgdGhhbiBkaXJlY3RvcnkNCmJvdW5kYXJp
+ZXMuDQoNCj4gDQo+IFdoeSBkbyBzb21lIG9mIHRoZSBpZCBsaW5lcyB1c2UgQy1zdHlsZSBjb21t
+ZW50cyBhbmQgb3RoZXJzIEMrKy1zdHlsZQ0KPiBjb21tZW50cz8gKC8qICovIHZzLiAvLykgPw0K
+DQpUaGlzIGlzIGR1ZSB0byBzb21lIG9sZCBwYXJzZXJzIHRoYXQgb3BlcmF0ZSBvbiBrZXJuZWwg
+c291cmNlIG5vdCBoYW5kbGluZw0KLy8gaW4gLmggZmlsZXMgdmVyeSB3ZWxsLg0KU2VlIERvY3Vt
+ZW50YXRpb24vcHJvY2Vzcy9saWNlbnNlLXJ1bGVzLnJzdCAoU2VjdGlvbiAyIG9uIFN0eWxlOikN
+CiANCj4gPiBMZWF2ZSB0aGUgd2FycmFudHkgZGlzY2xhaW1lciBpbiBmaWxlcyB3aGVyZSB0aGUg
+bGljZW5zZSBJRCBpcw0KPiA+IEdQTC0yLjAgYnV0IHRoZSB3b3JkaW5nIG9mIHRoZSBkaXNjbGFp
+bWVyIGlzIHNsaWdodGx5IGRpZmZlcmVudA0KPiA+IGZyb20gdGhhdCBvZiB0aGUgR1BMIHYyIGRp
+c2NsYWltZXIuDQo+ID4NCj4gPiBJdCBpcyBub3QgZGlmZmVyZW50IGVub3VnaCB0byBjYXVzZSBs
+aWNlbnNpbmcgY29uZmxpY3RzLCBidXQgaXMNCj4gPiBrZXB0IHRvIGhvbm9yIHRoZSBvcmlnaW5h
+bCBjb250cmlidXRvcnMnIGxlZ2FsIGludGVudC4NCj4gDQo+IEdvb2Qgam9iIGRvaW5nIHRoaXMs
+IGRvIHlvdSBrbm93IGlmIHRoZXJlJ3MgYSBwbGFuIHRvIGF1dG9tYXRlIHRoaXMNCj4gc29tZWhv
+dz8NCg0KQSBsb3Qgb2Ygd2hhdCBjb3VsZCBiZSBkb25lIGF1dG9tYXRpY2FsbHkgd2FzIGFscmVh
+ZHkgZG9uZSwgaW4gDQoyMDE3IGJ5IEdyZWcgS0ggYW5kIGluIDIwMTkgYnkgVGhvbWFzIEdsZWl4
+bmVyLiAgSSdtIGZvbGxvd2luZyB1cA0Kbm93IG9uIGZpbGVzIHRoYXQgd2VyZSBlaXRoZXIgb3Zl
+cmxvb2tlZCwgb3IgaGF2ZSBzcGVjaWFsIGlzc3Vlcy4NCg0KSSBkbyB1c2UgdG9vbHMgZm9yIGFu
+YWx5c2lzIGFuZCB0byBoZWxwIGF1dG9tYXRlIHNvbWUgdGFza3MuDQpTZWUgaHR0cHM6Ly9naXRo
+dWIuY29tL3RiaXJkMjBkL3NwZHgtcHJvamVjdA0KDQo+IEl0IHdvdWxkIGJlIGdyZWF0IHRvIGJl
+IGFibGUgdG8gcmUtcnVuIGEgc2NyaXB0IG9uIHRvcCBvZiBhDQo+IGNvZGViYXNlIHRvIHZlcmlm
+eSB0aGF0IG5vIHNvdXJjZXMgd2VyZSBtaXNzZWQsIGFuZCB0aGF0IHdlIGdvdCB0aGUNCj4gc2Ft
+ZSBsaWNlbnNlIElEIGFzc2lnbmVkIGZvciB0aGUgc2FtZSBsaWNlbnNlIHZlcmJpYWdlIGluIHRo
+ZSBzb3VyY2UNCj4gaGVhZGVycy4NCg0KU2VlIHNjcmlwdHMvc3BkeGNoZWNrLnB5Lg0KDQpJIGFs
+c28gaGF2ZSBzb21lIGF1dG9tYXRpb24gdGhhdCBjaGVja3MNCnRoZSBvdmVyYWxsIHN0YXR1cyAo
+YnkgdG9wLWxldmVsIGtlcm5lbCBkaXJlY3RvcnkpLCB3aXRoIHJlc3VsdHMgcG9zdGVkIGhlcmU6
+DQpodHRwczovL2JpcmRjbG91ZC5vcmcvYmMvS1Rlc3RfTWlzc2luZ19TUERYDQoNClNvbWUgb2Yg
+dGhlIHRvb2xzIEkgdXNlIGNoZWNrIHRoZSBsaWNlbnNlIHZlcmJpYWdlIGluIHRoZSBzb3VyY2Ug
+aGVhZGVycywNCmJ1dCBJIGFsc28gbWFudWFsbHkgY29tcGFyZSB0aGUgdmVyYmlhZ2UgdG8gbWFr
+ZSBzdXJlIEkgYW0gYXNzaWduaW5nDQp0aGUgcmlnaHQgbGljZW5zZS4gIEluIHRoZSBjYXNlIG9m
+IHRoZXNlIEJsdWV0b290aCBmaWxlcywgdGhlIHZlcmJpYWdlIGlzIHF1aXRlDQpjbGVhciBhYm91
+dCB0aGUgaW50ZW5kZWQgbGljZW5zZSwgYnV0IEkgZ290IGNhdWdodCBieSBzb21lIGRpZmZlcmVu
+Y2VzDQppbiB0aGUgd2FycmFudHkgZGlzY2xhaW1lciB0aGF0IEkgbWlzc2VkLCBtYWtpbmcgYSBz
+ZWNvbmQgdmVyc2lvbiBvZiB0aGlzDQpwYXRjaCBuZWNlc3NhcnkuDQogICAtLSBUaW0NCg0KUC5T
+LiBJIGdhdmUgYSB0YWxrIG9uIHRoaXMgd29yayBhdCBPcGVuIFNvdXJjZSBTdW1taXQgTm9ydGgg
+QW1lcmljYSBhIGZldyB3ZWVrcyBhZ28uDQpZb3UgY2FuIGZpbmQgbXkgc2xpZGVzIGFuZCBpbmZv
+IGFib3V0IHRoYXQgdGFsayBoZXJlOiANCmh0dHBzOi8vb3NzZWxjbmEyMDI2LnNjaGVkLmNvbS9l
+dmVudC8ySlF0Qy9zcGR4LWFuZC1zYm9tLXdvcmstZm9yLXRoZS1saW51eC1rZXJuZWwtdGltLWJp
+cmQtc29ueS1lbGVjdHJvbmljcw0KDQo=
