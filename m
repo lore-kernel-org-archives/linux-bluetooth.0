@@ -1,88 +1,88 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 679E93939C0
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 08:52:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650CA3D88FC
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 08:53:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780563134; cv=none; b=qrBfM7IQA650jX3ZLZd4KX9ImBym2v5g14Dm1qn0KGh1Nb+UUf/7DO669wSXV3o1+JtIydo78/YAXTRZJacJz8Pz2jwwavPJSzPflKR5P8J5V5qxoLfez87HCext+oJ48CrnT6XcTTFLIoacQMz+cowskdbgiJ6wyBtpHUu7knE=
+	t=1780563232; cv=none; b=S3Ou1p22k8G49WyCThXWcurYQC0vz3LJCDV5M9c0qGbaP9IiUX70GjhDv7Yqhvnq2iPwqFw7RI+DAB8W8dGmLZMTjfOCprrShMsY3UjL0lPP0u5+eFXfAFXEA4s2mxiflt4OdP8VBgzACHZR3BDzJWFh+08seIGQPUFCUm8GBLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780563134; c=relaxed/simple;
-	bh=IIx9X1xLPVvb0uGohYTfoaM9TYP8C+vAx+GQ1ZISL4o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BFzlHKkxHq7xef6Yv9pIiaXD0dadArvrj7x/bzqSFQ+I5hDtaK8nQ3B9R4vYQM914RV4SCA1A5xqfwX25rkU8lWRUeEUxthPmmbk3kY6gA/+nPn6+FdYUd5PZ2f/Y8PQ70RvIqrAttZRHJdwiI7IqZdEhM5UxmRjW0nNoloB+HU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=OrzHIzak; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=cDTH7op3; arc=none smtp.client-ip=205.220.168.131
+	s=arc-20240116; t=1780563232; c=relaxed/simple;
+	bh=dIiMryYUw5Mv6nmZs7bwuYgnOCyqej9E4eqjLRZGidY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XoYJ+xJ5USdcT4qbXADhg0ZCwlURBlqAHmZBa7gXg1DWCZX1YV4LMzNgJlorJb87XU+nyiUGCVw54hqqhfeEHuE6bYOFo9o1sEx6O2sGHPNIBbgfN/9V3pmzlIiZfeZk3EnWocI5VbldcUUu6WSxbZ9fXTI7ip6zcCrTYV8BgqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=dc3+aIbR; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=V7uyNyLO; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="OrzHIzak";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="cDTH7op3"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6542NQNX2262005
-	for <linux-bluetooth@vger.kernel.org>; Thu, 4 Jun 2026 08:52:11 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="dc3+aIbR";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="V7uyNyLO"
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6548UaEw1132273
+	for <linux-bluetooth@vger.kernel.org>; Thu, 4 Jun 2026 08:53:50 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=PmrNGRaKiyqIPzJp9+nw6IqvctUphFx+4XU
-	uTpxFnLs=; b=OrzHIzakLwW4RBiBsd+EqH3eYEImWgWBza+hi6eOrLAiTBo2qkX
-	mjzWovCdY1xBeq/INu9zzX2LsXfgbbUWi1If9ESRhsxknz+p/1+czgMOEihwO6O1
-	uBaG1ldV8OElnFz8+93gN8i37m9hKxlmvF2Se7hK3s1hOdntgwE/Uwvs5/tdsCMY
-	OW9V1mszIQNJnbJljQIsvgXpMIwil6bZRWSGK3hkCucJcINRHszkzPrIWz0IaZwI
-	38M2zLhZYrk6z3NYDhz2KmjCrmxgRRR23pbuJwnsSaCcsj5xjmi+BTNGXzu6I0S8
-	ZJP4vvvqyYZBi2VtBvgRaay9LsveNyafBZg==
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ejr2mk7pg-1
+	:subject:to; s=qcppdkim1; bh=yYpJ1gy3lLFaLRpcQNikyGtUus4UkjRx4lU
+	r54+HldM=; b=dc3+aIbRC6RuciIeJzLZl+e9bfzAYWmcis8Bm+hbcB8+d8bLS0X
+	bCYms3m5rlmFiC9QrtUSmBIL2qmyUIWX+gYQg+T6ibiRVTsvpTkD6qsDK7ipkVNj
+	MqDbIDJgUoFYmVkJ3oadcfAFCNa5s+B7Ry/6vcYLAzkUU90UVrtTpGtJQMFfC6s1
+	T8a6ZwwbOd2kJRq/B7noCFnHbycHkgchW+DCd0DDM1fruTBu3Tdce06hSY+oCnRy
+	7FyAI0o73+DdN6LQnGAq5lszgDJ52M4heTac6vKDFmiJH7KDEoiG6JqHS13bvB+s
+	sG3IDuioiW+En7AGb55JX+NnAHeylmBCnmA==
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ek5wsg2pb-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jun 2026 08:52:11 +0000 (GMT)
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2bfdd99f6b7so9853135ad.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jun 2026 01:52:11 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jun 2026 08:53:50 +0000 (GMT)
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2bf004bf8beso5769135ad.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jun 2026 01:53:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1780563131; x=1781167931; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1780563229; x=1781168029; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PmrNGRaKiyqIPzJp9+nw6IqvctUphFx+4XUuTpxFnLs=;
-        b=cDTH7op3PkGIOPzvptWHlKbnazAP2iBxsqHLO/s7SeKFtlBpu4vMl1jLBJRPz/xby5
-         4v6150b+RzxgnFBRTA8sOX2FQey9aZLuKRtRgvYPYd0qZSyGeivfO56ho4m0CqzFmbaU
-         Z6UBKlIs+PNSYPQSRdt6a8gS3/NiflzeKSfoxdfqgxKgonvViPqFztJ8jAb5GRA6u10E
-         uR0oo2WHN+cPArT6KUQD+Cq22p1WrzqDQtJAKiXIg3qtxhKJA83Zk4Xtu/R/HXM8H/k5
-         jtY7npAnG3DH+tAAj6YJtY9b99Pp6j3T9olwgXW3dt3ZlnXpUWzJZ/bLl2ezY2FQt+6J
-         jGRA==
+        bh=yYpJ1gy3lLFaLRpcQNikyGtUus4UkjRx4lUr54+HldM=;
+        b=V7uyNyLO6tRwrop1+fBAr8cMVaTSRqw1Gm5/xbQ9Weqx1ex+9zGwXPg/PT+Sb7TATn
+         tE5h6TgeWHQVmg+xZ1/LeWjkYC5wgJdvHC/cXeTNieyUPKlR8zsz+hlDIQ9M+3vWXtFA
+         7A7fJXqZeRgzC4SS2MfMVstjoNPKkR4SJ1/3RCm9Sw4+jwAeoj+ARZ8IZOKKU80Ul59B
+         h/jo88FRG22eYgeODeND1GqV55rEbZp6HM3jZgygMcET6cuLGpIeDGd+RPzp8XXIFV8K
+         xwKD8BeTOVsQirp5qI7tXHLFkmORzuM1BozpW/nakfBbxSC3tLgEH25ikvP4epZnpptz
+         i7UA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780563131; x=1781167931;
+        d=1e100.net; s=20251104; t=1780563229; x=1781168029;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PmrNGRaKiyqIPzJp9+nw6IqvctUphFx+4XUuTpxFnLs=;
-        b=cYc+Nw6Jt+DSiIM9JRoAdqriWX48L2X7bckMmVOzMju+0uHHzSSFyS1EfFdtCNwiHJ
-         cHGh+LLJKrz1c+MfryLoGaZt7NwzEnVJY7hUzPkD6qLO9t0xF55O+K/1VBtIKfO/SJjr
-         HAd+idNsSLPCxucXS369mu8iWdoYryKiCDoBUuybpFBZc0hrX4Gn+44wqVO9Tx5YIWNd
-         Kmb90eEn2ZWRTEJk7rVZ9waC8Ni+RVG/NfYRxoHAiY6Q9xA4ezkQdzQYRxSI1ED/J/qQ
-         HR2u5CFgcqm+KHCobrtJTX8gicM9Ia8jxojUseQw6ypTpDoYtJQ1OFAozIvHJb99JevU
-         OOUA==
-X-Gm-Message-State: AOJu0YzFlxtnNW1k45gJ+FVx7e35hamjk2eLbu636TFwZBJauVz0jhvZ
-	KuA0BZWj0m4eo+bp8rAj2/Fq1irNmyiYmRNs0DMKDbWFeOqePX+hdxTRQMhWH+skfyc8A5gSVAY
-	PAZEIT7wmohUdPQHJ4C10Bvp9lUVPP2Vrvq8fatDuOmCzgVNbkndbp16WzMsCtwZVRwUUlHK8I/
-	737oc=
-X-Gm-Gg: Acq92OE4T9rD/67Sn/bkAbnsXtvdlr/RmJNrWtB9D9N3c/GDq27GT5vy59bz050900y
-	zolJpGgP+y/Or6uy8C9phB5nEKqLHmcrlZxQWtfJpEHhXqeDAA75z43FP7BSnY3q8IJJwuvCpk0
-	tMmu3qokk+rrpV2os9Ke26u88MO6MxBJ0dDvkJ+I5xVv9Mzf1WFY/D1f04JIQaM7Ajcw4W4wRYf
-	Ac5rA40oMhBI+4qaHyAu+WWHN9iCnKwEyoYc3VkUEbdCirIz29E3xAlybEyNLukiNAyd0Dm3UaZ
-	5jx/qg2WNMQgmyDD72VuWEwOcQmOfSOxmSB/jv3GcFiypwd+DBxwo9IK29IqVsrpvLSh102r/If
-	ucD8+o+1ReTdWaOevSDZHuy+xSL1sPo0QIRjJAwmS3n93E+X5Bh3SXg==
-X-Received: by 2002:a17:903:f90:b0:2b2:4bf9:1766 with SMTP id d9443c01a7336-2c1644a0a46mr76688925ad.33.1780563130603;
-        Thu, 04 Jun 2026 01:52:10 -0700 (PDT)
-X-Received: by 2002:a17:903:f90:b0:2b2:4bf9:1766 with SMTP id d9443c01a7336-2c1644a0a46mr76688395ad.33.1780563129798;
-        Thu, 04 Jun 2026 01:52:09 -0700 (PDT)
+        bh=yYpJ1gy3lLFaLRpcQNikyGtUus4UkjRx4lUr54+HldM=;
+        b=DAysuDm6FwCiH8CULHViewtqKxPfh7oC4m78BBQ4cUBfZ5RrSKBoPRLx0z9/DlUmQW
+         D/yxJmAJeXRJXRtcMezPSeNEDJZWJdSiccVIJbRBTwp4oBDioBSCPWlmBFsNRtml16eK
+         F4gv3uU63az2X/NA5XcF7kEW64czykubeJDUkv9ZOcxBMlqszhU/TXy9P3Xllb22LW9z
+         8ZocmincLhqQX+jbbdRRoQ2Bj1COggxb1T1s26QVxHKkzK80r3a10T1DZRjnGRFVpX57
+         9iaizm88JNhZTHPKoJouR7QIw/CU5KBekD3GoDsXh8SvF9S5aBk6qvJpJ1FYdUViEHo3
+         43dg==
+X-Gm-Message-State: AOJu0YxCTuTNXaYMJH+nw0LmqTi1rW2h0wniT1KKGWCVY0kxepy4XhTg
+	YY4FvcyEZVtBGQm0ApmYc9S3RHWrDYhtPFflRw8IW4362uvOYlD+tsbNsxBXGffDbZaze5BuntO
+	lywXTFGprqXjBl2dhROy98ZDzrW4RRsvMpi0cTtLhTvZySKzhjAb7djmq3JHfZmIxhOxJbnyXLL
+	8QyFw=
+X-Gm-Gg: Acq92OFqVPWM31DroHQBGxEHxl2qYO+6/AVLuLGI7nZ2ebn14QfG5so487IFQ8zjWC3
+	ONHfTvcxoYbGZ42dSysKBOfGKD16UifRxOLeYzDPVM+uNQTEa3VsuwqvdfcaeVZQis0o8EXiJdJ
+	NRzxJYKvJ6FkUHmOqOPU/BnjqSYMkX1UUzs3/zvzObzYnylPewtK7ZDoaWfXDx16l7mTXj9ITBP
+	Pd04ll7ELbSFk5j5vRMNQt1h9RSOY8BBeGt673JcBu9k3usFnHJ6Ht/l1DbrufUUf9vDRze0v0H
+	6bJWmSgjCfxe6UyBCP7EAxK5rCTDg2+sl3u0di407izZjN5KmjO3wdVcYrVZghWRtU2tIvxneg+
+	0cjczwfc/NKsFVG5rFtfiS/66DnErls4C9T4gYGDsdhk03YjDHfhSgg==
+X-Received: by 2002:a17:902:ecc9:b0:2b2:3bb6:fbf8 with SMTP id d9443c01a7336-2c163c5f630mr71433025ad.16.1780563229177;
+        Thu, 04 Jun 2026 01:53:49 -0700 (PDT)
+X-Received: by 2002:a17:902:ecc9:b0:2b2:3bb6:fbf8 with SMTP id d9443c01a7336-2c163c5f630mr71432795ad.16.1780563228707;
+        Thu, 04 Jun 2026 01:53:48 -0700 (PDT)
 Received: from hu-prathm-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c16609e61csm51755045ad.43.2026.06.04.01.52.07
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f8792bsm50910925ad.23.2026.06.04.01.53.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jun 2026 01:52:09 -0700 (PDT)
+        Thu, 04 Jun 2026 01:53:48 -0700 (PDT)
 From: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
 X-Google-Original-From: Prathibha Madugonde <prathm@qti.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
         quic_anubhavg@quicinc.com
-Subject: [PATCH BlueZ] shared/rap: Add client ranging registration and notification parsing
-Date: Thu,  4 Jun 2026 14:22:05 +0530
-Message-Id: <20260604085205.4135084-1-prathm@qti.qualcomm.com>
+Subject: [PATCH BlueZ v1] profiles/ranging: Read measured_freq_offset field-16 bit as per Core Spec
+Date: Thu,  4 Jun 2026 14:23:44 +0530
+Message-Id: <20260604085344.4135265-1-prathm@qti.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -91,1030 +91,58 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: y7aA6V5yLenGOD7IAsMR0c4RxgGLEm5w
-X-Proofpoint-ORIG-GUID: y7aA6V5yLenGOD7IAsMR0c4RxgGLEm5w
-X-Authority-Analysis: v=2.4 cv=A91c+aWG c=1 sm=1 tr=0 ts=6a213cbb cx=c_pps
- a=MTSHoo12Qbhz2p7MsH1ifg==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+X-Proofpoint-GUID: Dgwtf0UdxMqOmAieTyZfaO9FXqDoVvnS
+X-Proofpoint-ORIG-GUID: Dgwtf0UdxMqOmAieTyZfaO9FXqDoVvnS
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA0MDA4NSBTYWx0ZWRfXwRmD9lgeezjd
+ Tc/SUn4iTsu9AZlbsmlo9Wi/KauFFZgNBHaWMTIJ+q8UBQjkQCC0k4M2zmCKBoLKjYAbhsfj2Yw
+ m2bQAcrlspZy2ZW2GsdSaMW8H6Zm90ajOjSu2+V/Eh/fXuDwTILE2OBztaPgDB1KT7OCE2lPnRY
+ DsMUfXNxgOyioeiiPzLMxB78p3ZbyGXhT9RKu7L7YSXUtA7lMTt9cBJPHOVreNjt/TQkFu/M+3r
+ WxjXOLi5a9g9lrxCPI9VefqVsXl7mYdb9iylsF9EJrU6VT9DI3/55bQC8EurEwqGYAz/E0489zg
+ lwmVed7tLHSIk6IX6j/W8dfqbgb19MlyiG4u23V0mh8SKkemvppv7TPom7VhNGPf4xgRMVUmj2J
+ ZMeUodtVlDOV+q4uzs07HFhFtSlx0gjfvlMMArRsrPESXh7959byphhfxG411AnIiYXIgSeFIsk
+ FYUMJvKDw3gY182ovGw==
+X-Authority-Analysis: v=2.4 cv=POc/P/qC c=1 sm=1 tr=0 ts=6a213d1e cx=c_pps
+ a=cmESyDAEBpBGqyK7t0alAg==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
  a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22 a=EUspDBNiAAAA:8
- a=EO0lqv_L5rkqU9pbgacA:9 a=GvdueXVYPmCkWapjIL-Q:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA0MDA4NSBTYWx0ZWRfX7zd8H1HZd9JO
- KIaQ3qbqLMQ4qmXCxa3vk4xiYGdBC5TaH6vsVeFL26CV4udPf5im+mNoXHxf7/QCgTLwML5c7ZX
- CWfT+z19UPPF4k1GC8FHSJ03z1ieRN/xGmOxY2lg+hwsl2I1c6qk+dxdugxKSlfIVcdxERzcjDY
- c3BKZXeZWkanAvL2m0Idu/HFtl5mVto0KBvfN8/vJqo+CB6lb5S6KIZCCdGA2Bwg2GEQhhAlN2N
- 0fu3sICFB/78R+0L1RnkoolGhdbFGE+sBamVeT4JRRkZAIg+IJzzjQpM2tuMQyqyBDyomJvIk4i
- NURXLmiarNmoMiyvIE8CJwmiibECwvvkJAUxruJi+eUWr7uuFDOe5pe7h5P8dzH+mx6N+iPQAFx
- /HWzWotqy+8iNTbHCaBe1kivJTv7tuxWrCniNzDTgt/93wMKllGMld0lw+mVryvYESaXuYEovb9
- kHbSpcqBIGwbovKk3eQ==
+ a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22 a=EUspDBNiAAAA:8
+ a=E5Skqz63k400YZ54I58A:9 a=1OuFwYUASf3TG4hYMiVC:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-06-04_02,2026-05-28_03,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 phishscore=0 spamscore=0 suspectscore=0 malwarescore=0
- bulkscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015 impostorscore=0
+ lowpriorityscore=0 phishscore=0 malwarescore=0 clxscore=1015 bulkscore=0
+ impostorscore=0 priorityscore=1501 spamscore=0 adultscore=0 suspectscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606040085
 
 From: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
 
-Read the RAS Features characteristic to determine whether the remote
-device supports real-time ranging. If supported, register for real-time
-characteristic notifications using the reqtracker for the CS initiator
-role.
-
-Parse incoming segmented RAS ranging data notifications by accumulating
-segments via iovec and parsing complete subevent headers and CS mode 0-3
-step data, including IQ/tone PCT samples, once the last segment arrives.
-
-Changes in v2:
-Removed unneccsary DBG logs and unused variables.
-Use helper functions for readablitiy and code indentation.
-
-Changes in v5:
-Fix use-after-scope in read_ras_features where a stack-local padded
-buffer was referenced after leaving its scope via iov. Use get_le32
-on a properly scoped buffer instead.
-
-Add null checks for resptracker and reqtracker in HCI subevent
-callbacks to prevent crashes when config complete has not yet been
-received.
-
-Fix Mode 0 frequency offset parsing: the Measured Frequency Offset
-field is 16 bits per the CS spec, not 32 bits. Update
-CS_MODE_ZERO_WIRE_INIT_SIZE from 7 to 5 accordingly.
-
-Fix step mode extraction mask from 0x7F to 0x03 since CS mode is
-only 2 bits (modes 0-3).
-
-Refactor parse_mode_three to call parse_mode_one and parse_mode_two
-directly, eliminating duplicated code. Similarly refactor
-get_mode_three_length to use get_mode_one_length + get_mode_two_length.
-
-Fix typo 'reflecter' to 'reflector' in comments.
-
-Fix DBG format specifiers: use %u for uint16_t length parameters.
-
-Remove double blank line in fill_initiator_data_from_cs_subevent_result
-and add TODO comments to stub functions.
 ---
- src/shared/rap.c | 787 ++++++++++++++++++++++++++++++++++++++++++++++-
- src/shared/rap.h |   2 +-
- 2 files changed, 779 insertions(+), 10 deletions(-)
+ profiles/ranging/rap_hci.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/shared/rap.c b/src/shared/rap.c
-index 145da2060..390fd3080 100644
---- a/src/shared/rap.c
-+++ b/src/shared/rap.c
-@@ -29,6 +29,9 @@
- #define DBG(_rap, fmt, ...) \
- 	rap_debug(_rap, "%s:%s() " fmt, __FILE__, __func__, ##__VA_ARGS__)
- 
-+#define SIGN_EXTEND_TO_16(val, bits) \
-+	((int16_t)(((val) ^ (1U << ((bits)-1))) - (1U << ((bits)-1))))
-+
- #define RAS_UUID16			0x185B
- 
- /* Total number of attribute handles reserved for the RAS service */
-@@ -43,6 +46,11 @@
- #define RAS_STEP_ABORTED_BIT   0x80/* set step aborted */
- #define RAS_SUBEVENT_HEADER_SIZE 8
- 
-+#define CS_MODE_ZERO_WIRE_INIT_SIZE 5
-+#define CS_MODE_ZERO_WIRE_REF_SIZE 3
-+#define CS_MODE_ONE_WIRE_SIZE_MIN 6
-+#define CS_MODE_ONE_WIRE_SIZE_MAX 12
-+
- enum pct_format {
- 	IQ = 0,
- 	PHASE = 1,
-@@ -134,6 +142,28 @@ static inline void ranging_header_set_pct_format(struct ranging_header *hdr,
- 				((format & 0x03) << 6);
- }
- 
-+static inline uint8_t ranging_header_get_antenna_mask(
-+					const struct ranging_header *hdr)
-+{
-+	if (!hdr)
-+		return 0;
-+
-+	return hdr->antenna_pct & 0x0F;
-+}
-+
-+static inline uint8_t antenna_mask_count_paths(uint8_t antenna_mask)
-+{
-+	uint8_t count = 0;
-+	uint8_t i;
-+
-+	for (i = 0; i < 4; i++) {
-+		if (antenna_mask & (1u << i))
-+			count++;
-+	}
-+
-+	return count;
-+}
-+
- struct ras_subevent_header {
- 	uint16_t start_acl_conn_event;
- 	uint16_t frequency_compensation;
-@@ -149,9 +179,21 @@ struct ras_subevent_header {
- #define RAS_DONE_STATUS_PACK(ranging, subevent) \
- 	((uint8_t)(((ranging) & 0x0F) | (((subevent) & 0x0F) << 4)))
- 
-+#define RAS_DONE_STATUS_UNPACK_RANGING(packed) \
-+	((uint8_t)((packed) & 0x0F))
-+
-+#define RAS_DONE_STATUS_UNPACK_SUBEVENT(packed) \
-+	((uint8_t)(((packed) >> 4) & 0x0F))
-+
- #define RAS_ABORT_REASON_PACK(ranging, subevent) \
- 	((uint8_t)(((ranging) & 0x0F) | (((subevent) & 0x0F) << 4)))
- 
-+#define RAS_ABORT_REASON_UNPACK_RANGING(packed) \
-+	((uint8_t)((packed) & 0x0F))
-+
-+#define RAS_ABORT_REASON_UNPACK_SUBEVENT(packed) \
-+	((uint8_t)(((packed) >> 4) & 0x0F))
-+
- struct ras_subevent {
- 	struct ras_subevent_header subevent_header;
- 	uint8_t subevent_data[];
-@@ -206,6 +248,11 @@ struct cstracker {
- 	uint16_t last_start_acl_conn_evt_counter;
- 	uint16_t last_freq_comp;
- 	int8_t last_ref_pwr_lvl;
-+
-+	/* Client - first segment carries this */
-+	struct ranging_header   ranging_header_;
-+	/* Client - subsequent segments appended using iovec */
-+	struct iovec segment_data;
- };
- 
- /* Ranging Service context */
-@@ -254,6 +301,7 @@ struct bt_rap {
- 	void *debug_data;
- 	void *user_data;
- 	struct cstracker *resptracker;
-+	struct cstracker *reqtracker;
- };
- 
- static struct queue *rap_db;
-@@ -274,6 +322,28 @@ struct bt_rap_ready {
- 	void *data;
- };
- 
-+typedef void (*rap_notify_t)(struct bt_rap *rap, uint16_t value_handle,
-+			const uint8_t *value, uint16_t length,
-+			void *user_data);
-+
-+struct bt_rap_notify {
-+	unsigned int id;
-+	struct bt_rap *rap;
-+	rap_notify_t func;
-+	void *user_data;
-+};
-+
-+typedef void (*rap_func_t)(struct bt_rap *rap, bool success,
-+			uint8_t att_ecode, const uint8_t *value,
-+			uint16_t length, void *user_data);
-+
-+struct bt_rap_pending {
-+	unsigned int id;
-+	struct bt_rap *rap;
-+	rap_func_t func;
-+	void *userdata;
-+};
-+
- uint16_t default_ras_mtu = 247; /*Section 3.1.2 of RAP 1.0*/
- uint8_t ras_segment_header_size = 1;
- 
-@@ -542,6 +612,11 @@ static void rap_free(void *data)
- 		rap->resptracker = NULL;
- 	}
- 
-+	if (rap->reqtracker) {
-+		free(rap->reqtracker);
-+		rap->reqtracker = NULL;
-+	}
-+
- 	queue_destroy(rap->notify, free);
- 	queue_destroy(rap->pending, NULL);
- 	queue_destroy(rap->ready_cbs, rap_ready_free);
-@@ -641,6 +716,12 @@ static void cs_tracker_init(struct cstracker *t)
- 	t->last_start_acl_conn_evt_counter = 0;
- 	t->last_freq_comp = 0;
- 	t->last_ref_pwr_lvl = 0;
-+
-+	/* Initialize ranging header using helper functions */
-+	memset(&t->ranging_header_, 0, sizeof(t->ranging_header_));
-+	/* Initialize segment accumulator */
-+	t->segment_data.iov_base = NULL;
-+	t->segment_data.iov_len = 0;
- }
- 
- static void ras_features_read_cb(struct gatt_db_attribute *attrib,
-@@ -1646,7 +1727,7 @@ static void form_ras_data_with_cs_subevent_result(struct bt_rap *rap,
- 	if (length < base_len)
- 		return;
- 
--	DBG(rap, "Received CS subevent result subevent: len=%d", length);
-+	DBG(rap, "Received CS subevent result subevent: len=%u", length);
- 
- 	handle_local_subevent_result(rap,
- 		true,			/* has header fields */
-@@ -1677,7 +1758,7 @@ static void form_ras_data_with_cs_subevent_result_cont(struct bt_rap *rap,
- 	if (length < base_len)
- 		return;
- 
--	DBG(rap, "Received CS subevent result continue subevent: len=%d",
-+	DBG(rap, "Received CS subevent result continue subevent: len=%u",
- 		length);
- 
- 	resptracker = rap->resptracker;
-@@ -1698,6 +1779,41 @@ static void form_ras_data_with_cs_subevent_result_cont(struct bt_rap *rap,
- 		cont->step_data);
- }
- 
-+static void fill_initiator_data_from_cs_subevent_result_cont(struct bt_rap *rap,
-+		const struct rap_ev_cs_subevent_result_cont *cont,
-+		uint16_t length)
-+{
-+	size_t base_len = offsetof(struct rap_ev_cs_subevent_result_cont,
-+					step_data);
-+
-+	if (!rap || !rap->reqtracker || !cont)
-+		return;
-+
-+	if (length < base_len)
-+		return;
-+
-+	DBG(rap, "Received CS subevent result continue subevent: len=%u",
-+		length);
-+}
-+
-+static void fill_initiator_data_from_cs_subevent_result(struct bt_rap *rap,
-+		const struct rap_ev_cs_subevent_result *data,
-+		uint16_t length)
-+{
-+	size_t base_len = offsetof(struct rap_ev_cs_subevent_result,
-+					step_data);
-+
-+	if (!rap || !rap->reqtracker || !data)
-+		return;
-+
-+	/* Defensive check: base header must be present */
-+	if (length < base_len)
-+		return;
-+
-+	DBG(rap, "Received CS subevent result subevent: len=%u", length);
-+	/* TODO: Store initiator subevent result data */
-+}
-+
- void bt_rap_hci_cs_subevent_result_cont_callback(uint16_t length,
- 						const void *param,
- 						void *user_data)
-@@ -1705,9 +1821,14 @@ void bt_rap_hci_cs_subevent_result_cont_callback(uint16_t length,
- 	const struct rap_ev_cs_subevent_result_cont *cont = param;
- 	struct bt_rap *rap = user_data;
- 
--	DBG(rap, "Received CS subevent CONT: len=%d", length);
-+	DBG(rap, "Received CS subevent CONT: len=%u", length);
-+
-+	if (rap->resptracker && rap->resptracker->role == CS_REFLECTOR)
-+		form_ras_data_with_cs_subevent_result_cont(rap, cont, length);
- 
--	form_ras_data_with_cs_subevent_result_cont(rap, cont, length);
-+	if (rap->reqtracker && rap->reqtracker->role == CS_INITIATOR)
-+		fill_initiator_data_from_cs_subevent_result_cont(rap, cont,
-+								length);
- }
- 
- void bt_rap_hci_cs_subevent_result_callback(uint16_t length,
-@@ -1717,10 +1838,14 @@ void bt_rap_hci_cs_subevent_result_callback(uint16_t length,
- 	const struct rap_ev_cs_subevent_result *data = param;
- 	struct bt_rap *rap = user_data;
- 
--	DBG(rap, "Received CS subevent: len=%d", length);
-+	DBG(rap, "Received CS subevent: len=%u", length);
- 
- 	/* Populate CsProcedureData and send RAS payload */
--	form_ras_data_with_cs_subevent_result(rap, data, length);
-+	if (rap->resptracker && rap->resptracker->role == CS_REFLECTOR)
-+		form_ras_data_with_cs_subevent_result(rap, data, length);
-+
-+	if (rap->reqtracker && rap->reqtracker->role == CS_INITIATOR)
-+		fill_initiator_data_from_cs_subevent_result(rap, data, length);
- }
- 
- void bt_rap_hci_cs_procedure_enable_complete_callback(uint16_t length,
-@@ -1731,7 +1856,7 @@ void bt_rap_hci_cs_procedure_enable_complete_callback(uint16_t length,
- 	struct bt_rap *rap = user_data;
- 	struct cstracker *resptracker;
- 
--	DBG(rap, "Received CS procedure enable complete subevent: len=%d",
-+	DBG(rap, "Received CS procedure enable complete subevent: len=%u",
- 	    length);
- 
- 	if (!rap->resptracker) {
-@@ -1753,7 +1878,7 @@ void bt_rap_hci_cs_sec_enable_complete_callback(uint16_t length,
+diff --git a/profiles/ranging/rap_hci.c b/profiles/ranging/rap_hci.c
+index 8e65e5ef8..23678ed98 100644
+--- a/profiles/ranging/rap_hci.c
++++ b/profiles/ranging/rap_hci.c
+@@ -601,7 +601,7 @@ static void parse_mode_zero_data(struct iovec *iov,
+ 				 struct cs_mode_zero_data *mode_data,
+ 				 uint8_t cs_role)
  {
- 	struct bt_rap *rap = user_data;
+-	uint32_t freq_offset;
++	uint16 freq_offset;
  
--	DBG(rap, "Received CS security enable subevent: len=%d", length);
-+	DBG(rap, "Received CS security enable subevent: len=%u", length);
- }
+ 	if (iov->iov_len < 3) {
+ 		DBG("Mode 0: too short (<3)");
+@@ -614,7 +614,7 @@ static void parse_mode_zero_data(struct iovec *iov,
+ 	DBG("CS Step mode 0");
  
- void bt_rap_hci_cs_config_complete_callback(uint16_t length,
-@@ -1763,11 +1888,12 @@ void bt_rap_hci_cs_config_complete_callback(uint16_t length,
- 	const struct rap_ev_cs_config_cmplt *data = param;
- 	struct bt_rap *rap = user_data;
- 	struct cstracker *resptracker;
-+	struct cstracker *reqtracker;
- 
- 	if (!rap)
- 		return;
- 
--	DBG(rap, "Received CS config complete subevent: len=%d", length);
-+	DBG(rap, "Received CS config complete subevent: len=%u", length);
- 
- 	if (!rap->resptracker) {
- 		resptracker = new0(struct cstracker, 1);
-@@ -1781,6 +1907,19 @@ void bt_rap_hci_cs_config_complete_callback(uint16_t length,
- 	resptracker->config_id = data->config_id;
- 	resptracker->role = data->role;
- 	resptracker->rtt_type = data->rtt_type;
-+
-+	if (!rap->reqtracker) {
-+		reqtracker = new0(struct cstracker, 1);
-+		cs_tracker_init(reqtracker);
-+		rap->reqtracker = reqtracker;
-+	}
-+
-+	reqtracker = rap->reqtracker;
-+
-+	/* Basic fields */
-+	reqtracker->config_id = data->config_id;
-+	reqtracker->role = data->role;
-+	reqtracker->rtt_type = data->rtt_type;
- }
- 
- struct bt_rap *bt_rap_new(struct gatt_db *ldb, struct gatt_db *rdb)
-@@ -1815,6 +1954,632 @@ done:
- 	return rap;
- }
- 
-+static void ras_pending_destroy(void *data)
-+{
-+	struct bt_rap_pending *pending = data;
-+	struct bt_rap *rap = pending->rap;
-+
-+	if (queue_remove_if(rap->pending, NULL, pending))
-+		free(pending);
-+}
-+
-+static void ras_pending_complete(bool success, uint8_t att_ecode,
-+				const uint8_t *value, uint16_t length,
-+				void *user_data)
-+{
-+	struct bt_rap_pending *pending = user_data;
-+
-+	if (pending->func)
-+		pending->func(pending->rap, success, att_ecode, value, length,
-+					  pending->userdata);
-+}
-+
-+static void rap_read_value(struct bt_rap *rap, uint16_t value_handle,
-+			   rap_func_t func, void *user_data)
-+{
-+	struct bt_rap_pending *pending;
-+
-+	pending = new0(struct bt_rap_pending, 1);
-+	pending->rap = rap;
-+	pending->func = func;
-+	pending->userdata = user_data;
-+
-+	pending->id = bt_gatt_client_read_value(rap->client, value_handle,
-+						ras_pending_complete, pending,
-+						ras_pending_destroy);
-+	if (!pending->id) {
-+		DBG(rap, "Unable to send Read request");
-+		free(pending);
-+		return;
-+	}
-+
-+	queue_push_tail(rap->pending, pending);
-+}
-+
-+static void ras_register(uint16_t att_ecode, void *user_data)
-+{
-+	struct bt_rap_notify *notify = user_data;
-+
-+	if (att_ecode)
-+		DBG(notify->rap, "RAS register failed 0x%04x", att_ecode);
-+
-+	(void)notify;
-+}
-+
-+static void rap_notify(uint16_t value_handle, const uint8_t *value,
-+				uint16_t length, void *user_data)
-+{
-+	struct bt_rap_notify *notify = user_data;
-+
-+	if (notify->func)
-+		notify->func(notify->rap, value_handle, value, length,
-+					 notify->user_data);
-+}
-+
-+static void rap_notify_destroy(void *data)
-+{
-+	struct bt_rap_notify *notify = data;
-+	struct bt_rap *rap = notify->rap;
-+
-+	if (queue_remove_if(rap->notify, NULL, notify))
-+		free(notify);
-+}
-+
-+static unsigned int bt_rap_register_notify(struct bt_rap *rap,
-+					uint16_t value_handle,
-+					rap_notify_t func,
-+					void *user_data)
-+{
-+	struct bt_rap_notify *notify;
-+
-+	notify = new0(struct bt_rap_notify, 1);
-+	notify->rap = rap;
-+	notify->func = func;
-+	notify->user_data = user_data;
-+
-+	DBG(rap, "register for notifications");
-+
-+	notify->id = bt_gatt_client_register_notify(rap->client,
-+					value_handle, ras_register,
-+					rap_notify, notify,
-+					rap_notify_destroy);
-+	if (!notify->id) {
-+		DBG(rap, "Unable to register for notifications");
-+		free(notify);
-+		return 0;
-+	}
-+
-+	queue_push_tail(rap->notify, notify);
-+
-+	return notify->id;
-+}
-+
-+static inline bool parse_segmentation_header(struct iovec *iov,
-+					     struct segmentation_header *s)
-+{
-+	uint8_t byte;
-+
-+	if (!util_iov_pull_u8(iov, &byte))
-+		return false;
-+
-+	s->first_segment = (byte & 0x01) ? 1 : 0;
-+	s->last_segment = (byte & 0x02) ? 1 : 0;
-+	s->rolling_segment_counter = (byte >> 2) & 0x3F;
-+
-+	return true;
-+}
-+
-+static void parse_i_q_sample(struct iovec *iov, int16_t *i_sample,
-+				int16_t *q_sample)
-+{
-+	uint32_t buffer;
-+	uint32_t i12;
-+	uint32_t q12;
-+
-+	if (!util_iov_pull_le24(iov, &buffer)) {
-+		*i_sample = 0;
-+		*q_sample = 0;
-+		return;
-+	}
-+
-+	i12 =  buffer        & 0x0FFFU;   /* bits 0..11 */
-+	q12 = (buffer >> 12) & 0x0FFFU;   /* bits 12..23 */
-+
-+	*i_sample = SIGN_EXTEND_TO_16(i12, 12);
-+	*q_sample = SIGN_EXTEND_TO_16(q12, 12);
-+}
-+
-+static size_t get_mode_zero_length(enum cs_role remote_role)
-+{
-+	return (remote_role == CS_ROLE_INITIATOR) ?
-+		CS_MODE_ZERO_WIRE_INIT_SIZE :
-+		CS_MODE_ZERO_WIRE_REF_SIZE;
-+}
-+
-+static void parse_mode_zero(struct bt_rap *rap, struct iovec *mode_iov,
-+			    enum cs_role remote_role)
-+{
-+	uint8_t packet_quality;
-+	int8_t packet_rssi_dbm;
-+	uint8_t packet_ant;
-+	uint16_t init_measured_freq_offset = 0;
-+
-+	if (!util_iov_pull_u8(mode_iov, &packet_quality) ||
-+	    !util_iov_pull_u8(mode_iov, (uint8_t *)&packet_rssi_dbm) ||
-+	    !util_iov_pull_u8(mode_iov, &packet_ant)) {
-+		DBG(rap, "Mode 0: failed to parse common fields");
-+		return;
-+	}
-+
-+	if (remote_role == CS_ROLE_INITIATOR) {
-+		if (!util_iov_pull_le16(mode_iov, &init_measured_freq_offset)) {
-+			DBG(rap, "Mode 0: failed to parse freq offset");
-+			return;
-+		}
-+	}
-+
-+	/* TODO: Store this data as reflector data */
-+}
-+
-+static size_t get_mode_one_length(bool include_pct)
-+{
-+	if (include_pct)
-+		return CS_MODE_ONE_WIRE_SIZE_MAX;
-+	return CS_MODE_ONE_WIRE_SIZE_MIN;
-+}
-+
-+static void parse_mode_one(struct bt_rap *rap, struct iovec *mode_iov,
-+			   enum cs_role remote_role, bool include_pct)
-+{
-+	uint8_t packet_quality;
-+	uint8_t packet_nadm;
-+	int8_t packet_rssi_dbm;
-+	int16_t time_value;
-+	uint8_t packet_ant;
-+	int16_t pct1_i = 0, pct1_q = 0;
-+	int16_t pct2_i = 0, pct2_q = 0;
-+
-+	if (!util_iov_pull_u8(mode_iov, &packet_quality) ||
-+	    !util_iov_pull_u8(mode_iov, &packet_nadm) ||
-+	    !util_iov_pull_u8(mode_iov, (uint8_t *)&packet_rssi_dbm) ||
-+	    !util_iov_pull_le16(mode_iov, (uint16_t *)&time_value) ||
-+	    !util_iov_pull_u8(mode_iov, &packet_ant)) {
-+		DBG(rap, "Mode 1: failed to parse fixed fields");
-+		return;
-+	}
-+
-+	if (include_pct) {
-+		parse_i_q_sample(mode_iov, &pct1_i, &pct1_q);
-+		parse_i_q_sample(mode_iov, &pct2_i, &pct2_q);
-+	}
-+
-+	/* TODO: Store this data as reflector data */
-+}
-+
-+static size_t get_mode_two_length(uint8_t num_antenna_paths)
-+{
-+	uint8_t num_tone_data = num_antenna_paths + 1;
-+
-+	return 1 + (4 * num_tone_data);
-+}
-+
-+static void parse_mode_two(struct bt_rap *rap, struct iovec *mode_iov,
-+			   uint8_t num_antenna_paths)
-+{
-+	uint8_t ant_perm_index;
-+	int16_t tone_pct_i[5];
-+	int16_t tone_pct_q[5];
-+	uint8_t tone_quality[5];
-+	uint8_t k;
-+	uint8_t num_paths = (num_antenna_paths + 1) < 5 ?
-+				(num_antenna_paths + 1) : 5;
-+
-+	if (!util_iov_pull_u8(mode_iov, &ant_perm_index)) {
-+		DBG(rap, "Mode 2: failed to parse ant_perm_index");
-+		return;
-+	}
-+
-+	for (k = 0; k < num_paths; k++) {
-+		int16_t i_val, q_val;
-+
-+		if (mode_iov->iov_len < 4) {
-+			DBG(rap, "Mode 2: insufficient PCT for "
-+				"path %u (rem=%zu)",
-+				k, mode_iov->iov_len);
-+			break;
-+		}
-+		parse_i_q_sample(mode_iov, &i_val, &q_val);
-+		tone_pct_i[k] = i_val;
-+		tone_pct_q[k] = q_val;
-+
-+		util_iov_pull_u8(mode_iov, &tone_quality[k]);
-+		DBG(rap, "tone_quality_indicator : %d",
-+			tone_quality[k]);
-+		DBG(rap, "[i, q] : %d, %d",
-+			tone_pct_i[k],
-+			tone_pct_q[k]);
-+	}
-+
-+	DBG(rap, "    cs_mode_two_data: ant_perm_idx=%u",
-+		ant_perm_index);
-+
-+	/* TODO: Store this data as reflector data */
-+}
-+
-+static size_t get_mode_three_length(uint8_t num_antenna_paths, bool include_pct)
-+{
-+	return get_mode_one_length(include_pct) +
-+		get_mode_two_length(num_antenna_paths);
-+}
-+
-+static void parse_mode_three(struct bt_rap *rap, struct iovec *mode_iov,
-+			     enum cs_role remote_role, bool include_pct,
-+			     uint8_t num_antenna_paths)
-+{
-+	/* Mode 3 = Mode 1 + Mode 2 */
-+	parse_mode_one(rap, mode_iov, remote_role, include_pct);
-+
-+	if (mode_iov->iov_len > 0)
-+		parse_mode_two(rap, mode_iov, num_antenna_paths);
-+}
-+
-+static bool parse_subevent_header(struct iovec *iov,
-+					struct ras_subevent_header *hdr)
-+{
-+	uint16_t start_acl, freq_comp;
-+	uint8_t done_byte, abort_byte, ref_pwr, num_steps;
-+
-+	if (!util_iov_pull_le16(iov, &start_acl) ||
-+	    !util_iov_pull_le16(iov, &freq_comp) ||
-+	    !util_iov_pull_u8(iov, &done_byte) ||
-+	    !util_iov_pull_u8(iov, &abort_byte) ||
-+	    !util_iov_pull_u8(iov, &ref_pwr) ||
-+	    !util_iov_pull_u8(iov, &num_steps))
-+		return false;
-+
-+	hdr->start_acl_conn_event = start_acl;
-+	hdr->frequency_compensation = freq_comp;
-+	hdr->ranging_done_status = RAS_DONE_STATUS_UNPACK_RANGING(done_byte);
-+	hdr->subevent_done_status = RAS_DONE_STATUS_UNPACK_SUBEVENT(done_byte);
-+	hdr->ranging_abort_reason =
-+		RAS_ABORT_REASON_UNPACK_RANGING(abort_byte);
-+	hdr->subevent_abort_reason =
-+		RAS_ABORT_REASON_UNPACK_SUBEVENT(abort_byte);
-+	hdr->reference_power_level = (int8_t)ref_pwr;
-+	hdr->num_steps_reported = num_steps;
-+
-+	return true;
-+}
-+
-+static bool parse_step(struct bt_rap *rap, struct iovec *iov,
-+			struct cstracker *reqtracker,
-+			uint8_t num_antenna_paths, uint8_t step_idx)
-+{
-+	uint8_t mode_byte, step_mode;
-+	bool include_pct;
-+	enum cs_role remote_role;
-+	size_t step_payload_len;
-+	struct iovec mode_iov;
-+	void *payload;
-+
-+	if (!util_iov_pull_u8(iov, &mode_byte)) {
-+		DBG(rap, "Insufficient data for step %u", step_idx);
-+		return false;
-+	}
-+
-+	if (mode_byte & RAS_STEP_ABORTED_BIT) {
-+		DBG(rap, "  Step %u: mode=%u (aborted)",
-+			step_idx, mode_byte & 0x03);
-+		return true;
-+	}
-+
-+	step_mode = mode_byte & 0x03;
-+	include_pct = (reqtracker->rtt_type == 0x01 ||
-+			reqtracker->rtt_type == 0x02);
-+	remote_role = (reqtracker->role == CS_ROLE_INITIATOR) ?
-+			CS_ROLE_REFLECTOR : CS_ROLE_INITIATOR;
-+
-+	switch (step_mode) {
-+	case CS_MODE_ZERO:
-+		step_payload_len = get_mode_zero_length(remote_role);
-+		break;
-+	case CS_MODE_ONE:
-+		step_payload_len = get_mode_one_length(include_pct);
-+		break;
-+	case CS_MODE_TWO:
-+		step_payload_len = get_mode_two_length(num_antenna_paths);
-+		break;
-+	case CS_MODE_THREE:
-+		step_payload_len = get_mode_three_length(num_antenna_paths,
-+								include_pct);
-+		break;
-+	default:
-+		DBG(rap, "  Step %u: unknown mode=%u", step_idx, step_mode);
-+		return true;
-+	}
-+
-+	DBG(rap, "  Step %u: mode=%u payload_len=%zu",
-+	    step_idx, step_mode, step_payload_len);
-+
-+	payload = util_iov_pull(iov, step_payload_len);
-+	if (!payload) {
-+		DBG(rap, "Insufficient data for step %u payload "
-+			"(need %zu, have %zu)",
-+			step_idx, step_payload_len, iov->iov_len);
-+		return false;
-+	}
-+
-+	mode_iov.iov_base = payload;
-+	mode_iov.iov_len = step_payload_len;
-+
-+	switch (step_mode) {
-+	case CS_MODE_ZERO:
-+		parse_mode_zero(rap, &mode_iov, remote_role);
-+		break;
-+	case CS_MODE_ONE:
-+		parse_mode_one(rap, &mode_iov, remote_role, include_pct);
-+		break;
-+	case CS_MODE_TWO:
-+		parse_mode_two(rap, &mode_iov, num_antenna_paths);
-+		break;
-+	case CS_MODE_THREE:
-+		parse_mode_three(rap, &mode_iov, remote_role, include_pct,
-+						num_antenna_paths);
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	return true;
-+}
-+
-+static void parse_subevent_steps(struct bt_rap *rap, struct iovec *iov,
-+				struct cstracker *reqtracker,
-+				uint8_t num_antenna_paths, uint8_t num_steps)
-+{
-+	uint8_t i;
-+
-+	for (i = 0; i < num_steps; i++) {
-+		if (!parse_step(rap, iov, reqtracker, num_antenna_paths, i))
-+			break;
-+	}
-+}
-+
-+static void parse_ras_data_segments(struct bt_rap *rap,
-+			       struct cstracker *reqtracker)
-+{
-+	struct iovec iov;
-+	uint8_t antenna_mask;
-+	uint8_t num_antenna_paths;
-+
-+	if (!rap || !reqtracker)
-+		return;
-+
-+	DBG(rap, "Complete RAS data received: %zu bytes",
-+	    reqtracker->segment_data.iov_len);
-+
-+	antenna_mask =
-+		ranging_header_get_antenna_mask(&reqtracker->ranging_header_);
-+	num_antenna_paths = antenna_mask_count_paths(antenna_mask);
-+
-+	iov = reqtracker->segment_data;
-+
-+	while (iov.iov_len >= RAS_SUBEVENT_HEADER_SIZE) {
-+		struct ras_subevent_header hdr;
-+
-+		if (!parse_subevent_header(&iov, &hdr))
-+			break;
-+
-+		DBG(rap, "Parsed subevent: start_acl=%u "
-+			"freq_comp=%d ref_pwr=%d steps=%u",
-+		    hdr.start_acl_conn_event,
-+		    hdr.frequency_compensation,
-+		    hdr.reference_power_level,
-+		    hdr.num_steps_reported);
-+
-+		parse_subevent_steps(rap, &iov, reqtracker,
-+					num_antenna_paths,
-+					hdr.num_steps_reported);
-+
-+		if (hdr.subevent_done_status ==
-+		    SUBEVENT_DONE_ALL_RESULTS_COMPLETE ||
-+		    hdr.ranging_done_status ==
-+		    RANGING_DONE_ALL_RESULTS_COMPLETE) {
-+			DBG(rap, "Ranging procedure complete");
-+			break;
-+		}
-+	}
-+
-+	free(reqtracker->segment_data.iov_base);
-+	reqtracker->segment_data.iov_base = NULL;
-+	reqtracker->segment_data.iov_len = 0;
-+}
-+
-+static bool process_first_segment(struct bt_rap *rap,
-+					struct cstracker *reqtracker,
-+					struct iovec *iov, bool last_segment)
-+{
-+	uint16_t counter_config_val;
-+	int8_t selected_tx_power;
-+	uint8_t antenna_pct;
-+
-+	if (!util_iov_pull_le16(iov, &counter_config_val) ||
-+	    !util_iov_pull_u8(iov, (uint8_t *)&selected_tx_power) ||
-+	    !util_iov_pull_u8(iov, &antenna_pct)) {
-+		DBG(rap, "First segment too short for ranging header");
-+		return false;
-+	}
-+
-+	ranging_header_set_counter(&reqtracker->ranging_header_,
-+				counter_config_val & 0x0FFF);
-+	ranging_header_set_config_id(&reqtracker->ranging_header_,
-+				(counter_config_val >> 12) & 0x0F);
-+	reqtracker->ranging_header_.selected_tx_power = selected_tx_power;
-+	reqtracker->ranging_header_.antenna_pct = antenna_pct;
-+
-+	DBG(rap, "First segment: parsed ranging header "
-+	    "(counter=%u, config_id=%u, tx_pwr=%d)",
-+	    counter_config_val & 0x0FFF,
-+	    (counter_config_val >> 12) & 0x0F,
-+	    selected_tx_power);
-+
-+	if (reqtracker->segment_data.iov_base) {
-+		free(reqtracker->segment_data.iov_base);
-+		reqtracker->segment_data.iov_base = NULL;
-+		reqtracker->segment_data.iov_len = 0;
-+	}
-+
-+	if (iov->iov_len > 0) {
-+		if (!util_iov_append(&reqtracker->segment_data,
-+					iov->iov_base, iov->iov_len)) {
-+			DBG(rap, "Failed to initialize segment accumulator");
-+			return false;
-+		}
-+		DBG(rap, "First segment: initialized accumulator "
-+		    "with %zu bytes", iov->iov_len);
-+	}
-+
-+	if (!last_segment)
-+		return false;
-+
-+	DBG(rap, "Single-segment: first=1, last=1");
-+	return true;
-+}
-+
-+static void ras_realtime_notify_cb(struct bt_rap *rap, uint16_t value_handle,
-+				   const uint8_t *value, uint16_t length,
-+				   void *user_data)
-+{
-+	struct iovec iov = { .iov_base = (void *)value, .iov_len = length };
-+	struct segmentation_header seg_hdr;
-+	struct cstracker *reqtracker;
-+
-+	if (!rap || !value || length == 0) {
-+		DBG(rap, "Invalid notification data");
-+		return;
-+	}
-+
-+	DBG(rap, "Received real-time notification: handle=0x%04x len=%u",
-+	    value_handle, length);
-+
-+	if (!parse_segmentation_header(&iov, &seg_hdr)) {
-+		DBG(rap, "Failed to parse segmentation header");
-+		return;
-+	}
-+
-+	DBG(rap, "Segment: first=%u last=%u counter=%u",
-+	    seg_hdr.first_segment, seg_hdr.last_segment,
-+	    seg_hdr.rolling_segment_counter);
-+
-+	if (!rap->reqtracker) {
-+		DBG(rap, "reqtracker is not initialised");
-+		return;
-+	}
-+
-+	reqtracker = rap->reqtracker;
-+
-+	if (seg_hdr.first_segment) {
-+		if (!process_first_segment(rap, reqtracker, &iov,
-+						seg_hdr.last_segment))
-+			return;
-+	} else {
-+		if (iov.iov_len > 0) {
-+			if (!util_iov_append(&reqtracker->segment_data,
-+						iov.iov_base, iov.iov_len)) {
-+				DBG(rap, "Failed to append segment data");
-+				return;
-+			}
-+			DBG(rap, "Continuation segment: appended "
-+			    "%zu bytes (total=%zu)",
-+			    iov.iov_len,
-+			    reqtracker->segment_data.iov_len);
-+		}
-+	}
-+
-+	/* Last segment: parse complete RAS data */
-+	if (seg_hdr.last_segment)
-+		parse_ras_data_segments(rap, reqtracker);
-+}
-+
-+static void read_ras_features(struct bt_rap *rap, bool success,
-+			uint8_t att_ecode,
-+			const uint8_t *value, uint16_t length,
-+			void *user_data)
-+{
-+	struct iovec iov = { .iov_base = (void *)value, .iov_len = length };
-+	uint32_t features = 0;
-+	struct ras *ras;
-+	bool supports_realtime;
-+	bool retrieve_lost;
-+	bool abort_operation;
-+
-+	if (!success) {
-+		DBG(rap, "Unable to read RAS Features: error 0x%02x",
-+			att_ecode);
-+		return;
-+	}
-+
-+	ras = rap_get_ras(rap);
-+
-+	if (length == 0 || length > 4) {
-+		DBG(rap, "Invalid RAS Features length: %u (expected 1-4)",
-+			length);
-+		return;
-+	}
-+
-+	if (length < 4) {
-+		uint8_t padded[4] = { 0 };
-+
-+		memcpy(padded, value, length);
-+		features = get_le32(padded);
-+		DBG(rap, "RAS Features: short read (%u bytes), zero-pad to 4",
-+		    length);
-+	} else if (!util_iov_pull_le32(&iov, &features)) {
-+		DBG(rap, "Unable to parse RAS Features value");
-+		return;
-+	}
-+
-+	DBG(rap, "RAS Features: 0x%08x", features);
-+
-+	supports_realtime = (features & 0x01) != 0;
-+	retrieve_lost = (features & 0x02) != 0;
-+	abort_operation = (features & 0x04) != 0;
-+
-+	DBG(rap, "RAS Features - Real-time: %s, Retrieve Lost: %s, Abort: %s",
-+	    supports_realtime ? "Yes" : "No",
-+	    retrieve_lost ? "Yes" : "No",
-+	    abort_operation ? "Yes" : "No");
-+
-+	DBG(rap, "RAS features read successfully, capabilities determined");
-+
-+	/* Register for real-time characteristic notifications if supported */
-+	if (supports_realtime && ras && ras->realtime_chrc && rap->client) {
-+		uint16_t value_handle;
-+		bt_uuid_t uuid;
-+
-+		if (gatt_db_attribute_get_char_data(ras->realtime_chrc,
-+					NULL, &value_handle,
-+					NULL, NULL, &uuid)) {
-+			unsigned int notify_id;
-+
-+			notify_id = bt_rap_register_notify(rap,
-+						value_handle,
-+						ras_realtime_notify_cb,
-+						NULL);
-+			if (!notify_id)
-+				DBG(rap, "Failed to register for "
-+					"real-time notifications");
-+			else
-+				DBG(rap, "Registered for real-time "
-+					"features: id=%u", notify_id);
-+		}
-+	} else {
-+		DBG(rap, "On demand ranging "
-+			"remote device - skipping notification "
-+			"registration");
-+	}
-+}
-+
- static void foreach_rap_char(struct gatt_db_attribute *attr, void *user_data)
- {
- 	struct bt_rap *rap = user_data;
-@@ -1848,6 +2613,10 @@ static void foreach_rap_char(struct gatt_db_attribute *attr, void *user_data)
- 			return;
- 
- 		ras->feat_chrc = attr;
-+		if (rap->client) {
-+			rap_read_value(rap, value_handle,
-+					read_ras_features, rap);
-+		}
+ 	if (cs_role == CS_INITIATOR && iov->iov_len >= 4) {
+-		util_iov_pull_le32(iov, &freq_offset);
++		util_iov_pull_le16(iov, &freq_offset);
+ 		mode_data->init_measured_freq_offset = freq_offset;
  	}
- 
- 	if (!bt_uuid_cmp(&uuid, &uuid_realtime)) {
-diff --git a/src/shared/rap.h b/src/shared/rap.h
-index c9431aecd..d3ced61b1 100644
---- a/src/shared/rap.h
-+++ b/src/shared/rap.h
-@@ -92,7 +92,7 @@ struct cs_mode_zero_data {
- 	uint8_t packet_quality;
- 	uint8_t packet_rssi_dbm;
- 	uint8_t packet_ant;
--	uint32_t init_measured_freq_offset;
-+	uint16_t init_measured_freq_offset;
- };
- 
- struct cs_mode_one_data {
+ }
 -- 
 2.34.1
 
