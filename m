@@ -1,85 +1,103 @@
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from out-7.smtp.github.com (out-7.smtp.github.com [192.30.252.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A063421F0F
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 11:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518FB3D6CB1
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 11:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780572143; cv=none; b=fomRrmMGagzkmE7wQWolzP2j1UOZRaf+qnCRmo9LxSzRW/xHH6A/0c7/IdQqS0lwmuw4wi0BEH1TEu5rUmHl+AehqwcK3zxwDunfWSIe24+hDHgdm9q/nY/65x7MrcRAacWmPLOsAuymdtEsuAzP3Nqc9HqrSG4pYNz9Q3UHzPc=
+	t=1780572298; cv=none; b=FnTjWsU+y8thTUbWD0VgFQzppN1SYDrrUwQdsmwqA4bPqEI83vWpCMtoQK3XI00VIBLLNHfuLg/5Mij2HZKBnunY0RcVj26j3/8fqxtGNVUshWmR816Q8TQPaC746plAx4m2NVNieNEcRVyT3/Ar+O7ACG2v3Egi6eJhVPSRsFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780572143; c=relaxed/simple;
-	bh=c+/RPS93PMLLyxLjwM6M2ZXc7WTpOfvYWi5OrILg8N4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ijzcDb2pLALZpwTiCJkFGVUb25PRT7wtPJ9Cdv8aYUPPeWVlwS9mRPBBnN7VldiWgaPVA75HVXWjTMWV/rmKuZNrlsEIJri30LSDzx9dD9zzvik5NJERiM3JS47VghI/O8SbdfrcrKT4SzEi+GWaSeJFAJul/OYnW7R14EEXzpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id EA0CD3EBA8;
-	Thu,  4 Jun 2026 11:22:18 +0000 (UTC)
-Message-ID: <b62bcc3b0d5ba09ed47c593078d66834bfae161e.camel@hadess.net>
-Subject: Re: [PATCH BlueZ v2] profiles/ranging: Read measured_freq_offset
- field-16 bit as per Core Spec
-From: Bastien Nocera <hadess@hadess.net>
-To: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>, 
-	linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com,
- quic_hbandi@quicinc.com, 	quic_anubhavg@quicinc.com
-Date: Thu, 04 Jun 2026 13:22:18 +0200
-In-Reply-To: <20260604100233.4193077-1-prathm@qti.qualcomm.com>
-References: <20260604100233.4193077-1-prathm@qti.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.1 (3.60.1-1.fc44) 
+	s=arc-20240116; t=1780572298; c=relaxed/simple;
+	bh=HISBh6tWXKBork3kzWs6emU/Nnv6rBIGBMvw1Fp4+pc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=u57IW1xUxOxlaewZYYM7aPYEyJvbRJx3S2KEtOPGSmJ+CQC/icd+9o7GSmkul/C/5B8Lb8puj+IWAcZ9ebPRL3Mq+Ly/PusyELDeHWmVVrWw/LjPS3fLoLyJ20zClvrXDqN5p/CFtl1pvig42qc6DX+6JS1UaB1IqvVez9mdAbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=CH44dpmp; arc=none smtp.client-ip=192.30.252.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="CH44dpmp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1780572296;
+	bh=GxLvu8lKtIGZb/ISt+IMVnCni8eQzMKCFNKPaEkw4Ts=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=CH44dpmpvoDwJIGs7Hvyh1EK2pppha1zJAmB19KsHHBtVl3UqaDucyKjRse4m0NJ7
+	 Roiw/Baur/Zjaqok57fZ6VUmqGEoMxJzAQCTjhlOugvQRZykM36U3cos3QNr6fKIDB
+	 QtP8HPxgKfRZ8KOGlJ9wEO5BAnPrCmSI2jWfXS/E=
+Received: from github.com (hubbernetes-node-c000180.va3-iad.github.net [10.48.209.48])
+	by smtp.github.com (Postfix) with ESMTPA id 90FA378045D
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 04:24:56 -0700 (PDT)
+Date: Thu, 04 Jun 2026 04:24:56 -0700
+From: prathibhamadugonde <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1105806/000000-0b64d6@github.com>
+Subject: [bluez/bluez] 0b64d6: shared/rap: Add client ranging registration and
+ no...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: dmFkZTF5CZk13hrzcZSjvMDzzkePC9tKj20z1ePKjOHnFerxFJvxIvIS6BH4sBpIFqAY+EcHbKf6cSZ64DHGlgufLsA0wtiHEabw1itcBO8Q3pGfW1QXnB7dpFzM50/ddS9MuJJwtSL00hYKmqohtZXgELWx5ltsNivEtuQoyG1aZYfrtuhmFsgfE/I6n2qtidfewDPSY4VRksLFguxgwCOGRG4NndXlexcKQ3UgaWECy6Xhjp+sRVi48wqC0UZ9MUDjEgt0nR9BX7c3mYipXS6MT3XWioaYGW7zK4lA6ODS30gBxacJ7AQUnMs4O5asnrRaUr2gHRq2oyvigiArLFM8WMxvCvxgpForPJz9YrAKoBo6vmg8fNKqnOywZn+jXyTxw2bNSLkuLl0VVJiUGI2yTggpM5u8ZeOjE52R9UTsfF0XVDC4P8NwxyHt+TWswpeDansnbQOVFarmiXcPMGqbsnGpHNW+6AqHbcLstrulL37webEci7XAJNTh7Irc0XgwKLBbd60mYZvXw3rnj39RlxS92uvuXU31Oej1couz8C8FwpIi2VQ3itU+xslD7+tBWCIwP0V8dOnMO5KUAI43mF3w5rQRt2udqvZHiVUY+sl4TMggUlWzG/t8nV81wc0coirzGqXVVzzzH0dT9XxnlkHNrptVbxwGOL4If7Fw4SuxvQ
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Thu, 2026-06-04 at 15:32 +0530, Prathibha Madugonde wrote:
-> From: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
+  Branch: refs/heads/1105806
+  Home:   https://github.com/bluez/bluez
+  Commit: 0b64d66091079975c6b59586bd299d12ca19f809
+      https://github.com/bluez/bluez/commit/0b64d66091079975c6b59586bd299d12ca19f809
+  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
+  Date:   2026-06-04 (Thu, 04 Jun 2026)
 
-Could you please add a reference in the commit message to the part of
-the Core spec that's relevant?
+  Changed paths:
+    M src/shared/rap.c
+    M src/shared/rap.h
 
->=20
-> Fix in V2:
-> Fixed compilation issue.
+  Log Message:
+  -----------
+  shared/rap: Add client ranging registration and notification parsing
 
-This should appear under the "---", so that it doesn't get into the
-commit message itself when the patch gets applied.
+Read the RAS Features characteristic to determine whether the remote
+device supports real-time ranging. If supported, register for real-time
+characteristic notifications using the reqtracker for the CS initiator
+role.
 
-> ---
-> =C2=A0profiles/ranging/rap_hci.c | 4 ++--
-> =C2=A01 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/profiles/ranging/rap_hci.c b/profiles/ranging/rap_hci.c
-> index 8e65e5ef8..febe23384 100644
-> --- a/profiles/ranging/rap_hci.c
-> +++ b/profiles/ranging/rap_hci.c
-> @@ -601,7 +601,7 @@ static void parse_mode_zero_data(struct iovec
-> *iov,
-> =C2=A0				 struct cs_mode_zero_data
-> *mode_data,
-> =C2=A0				 uint8_t cs_role)
-> =C2=A0{
-> -	uint32_t freq_offset;
-> +	uint16_t freq_offset;
-> =C2=A0
-> =C2=A0	if (iov->iov_len < 3) {
-> =C2=A0		DBG("Mode 0: too short (<3)");
-> @@ -614,7 +614,7 @@ static void parse_mode_zero_data(struct iovec
-> *iov,
-> =C2=A0	DBG("CS Step mode 0");
-> =C2=A0
-> =C2=A0	if (cs_role =3D=3D CS_INITIATOR && iov->iov_len >=3D 4) {
-> -		util_iov_pull_le32(iov, &freq_offset);
-> +		util_iov_pull_le16(iov, &freq_offset);
-> =C2=A0		mode_data->init_measured_freq_offset =3D freq_offset;
-> =C2=A0	}
-> =C2=A0}
+Parse incoming segmented RAS ranging data notifications by accumulating
+segments via iovec and parsing complete subevent headers and CS mode 0-3
+step data, including IQ/tone PCT samples, once the last segment arrives.
+
+Changes in v2:
+Removed unneccsary DBG logs and unused variables.
+Use helper functions for readablitiy and code indentation.
+
+Changes in v5:
+Fix use-after-scope in read_ras_features where a stack-local padded
+buffer was referenced after leaving its scope via iov. Use get_le32
+on a properly scoped buffer instead.
+
+Add null checks for resptracker and reqtracker in HCI subevent
+callbacks to prevent crashes when config complete has not yet been
+received.
+
+Fix Mode 0 frequency offset parsing: the Measured Frequency Offset
+field is 16 bits per the CS spec, not 32 bits. Update
+CS_MODE_ZERO_WIRE_INIT_SIZE from 7 to 5 accordingly.
+
+Fix step mode extraction mask from 0x7F to 0x03 since CS mode is
+only 2 bits (modes 0-3).
+
+Refactor parse_mode_three to call parse_mode_one and parse_mode_two
+directly, eliminating duplicated code. Similarly refactor
+get_mode_three_length to use get_mode_one_length + get_mode_two_length.
+
+Fix typo 'reflecter' to 'reflector' in comments.
+
+Fix DBG format specifiers: use %u for uint16_t length parameters.
+
+Remove double blank line in fill_initiator_data_from_cs_subevent_result
+and add TODO comments to stub functions.
+
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
