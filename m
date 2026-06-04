@@ -1,35 +1,47 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A244133A032;
-	Thu,  4 Jun 2026 02:20:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526F039183C
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 05:21:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780539628; cv=none; b=Jk1vuYu+IRcxu5NpQ/tHHNS7jd8f7bg7ys/+j4nJQs+OX9L30WlDEBF1NB5+TaLBpI7eRGaC3gNx+ZIqHSgMOQAk19dkOeKYC7jlSha5FqvL+0atQwiTpsmlHxT9CUzJAXseD4vpHffBXP4Jlan4HI3TS0UbTFxNESzMzyeTKu8=
+	t=1780550481; cv=none; b=ELOP+2dGF3acY3FbVpSMGyNr4uWthzwtn1B6QE/vgO/aDGKQftQvi/v9rx1S40YD/Vurr4fjzCdN8CbsDAVGavwETagL5AaAKuHMFeFFeKby0hJqSsRNPMAyp+ZMhWWJndDhee5hgPDtXVBTu60BR6WXLpjfCQpkEYkxCZAJUzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780539628; c=relaxed/simple;
-	bh=vumErFYlhVPPbcxQLTxYJ3J5X5puUs+zubcrx43Sr5o=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RGpKltAZ4B9rsv2MqcMOfUKexMFLuNi5VzrDAss71jdDPX+q+xQdL+tjHwmYJsQTQLo0EtUpw1DJOcgLtu2B1THXzMNxubYqvRRnTFw8KWJMvqeNduAJp0bc8D5/pggaNFKgo8LLmaibChjQc+ENxDAg41Uc6MpQLXFG+S4jEjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mvNfsPIK; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780550481; c=relaxed/simple;
+	bh=e6nd00oBwh5kl8ZurgUvFZsTPUmfjSD6QeOaXTMm9g0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=FkcmR/jP/cA4q/rpJgKV76sUPEleml1IReAepGHSqFBIO46goLZS8x7CBzcVcupuhs2prhWxB82VSfuMZURCsjcI/HllcPmtNkjLLQJCyji8NPzOqilHoRrPAWM8InSSWjtmLJo8vqp2y2qcAeicUX/Pzip6byC4N8lAGZsmZvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=kAQ7wuDJ; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mvNfsPIK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30F811F00898;
-	Thu,  4 Jun 2026 02:20:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780539620;
-	bh=mCksd8Oo8+Q+S0kNqShN+SnXDAHBCybVQ1V46Ezk9Eo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=mvNfsPIKpHUR5EIFekJHMXWnFit4X/SLVwsgR/iO+w5X8wWUZjO8L+yDLZdBK17Gb
-	 c+usL9h6jIdKK/aPAxV0q1969USfUMLe07bG4tBLq6QQxbTRivqwc8LCxNISjKfxFW
-	 HBFWfCDeibvLetUyPVAyjEI/PSD6AqCbRY1V7y4Tmq8x2YuzF+5GpYZfUPv7V8MKiy
-	 39G4+toBScM+0KQT8DDISjebglLhx3v6EeDMuyCCrNFv7sYJ6EAY/yb1bVjRH4yUR9
-	 6haHwiGHqJxIhs0qHf1TzO+iiMn6qmgo5Rq8sp40GhnXKZ8WImUiL2cOvyZop4Gznw
-	 2kPgaojLlPzOA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93D3339308E1;
-	Thu,  4 Jun 2026 02:20:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="kAQ7wuDJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1780550473;
+	bh=e6nd00oBwh5kl8ZurgUvFZsTPUmfjSD6QeOaXTMm9g0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=kAQ7wuDJuW/jX1JoVzCPkP5BR+cOjrKdUno/ZmSTVEYnnk1JvwOJC5xp/P5J77gVJ
+	 Krjl0qrKIYm3SN2kGhEG9VNXEFFF0yAFLw2x4iPl7NUiuLDiHKLJa8zZcc2xvWBoKH
+	 yGb12HRueVcucMzKZjX2BaVGk5vrOQhCvDG6SY/UBYj/0AJJv5BgIF0OBo5dXkJtbd
+	 NLla8w25vP3tqZcNwRorrSN9Nm75IK4BG63timtC/4Fca6+ZO5KL5jp12ZNA7Jntp2
+	 z34hu/eHt++nUglGP7E05A6yNbyC5AKrZHVhvmMUtQs6oDm3a6F8lyrMI0azRexHYx
+	 SXoNQPAzPMMdg==
+Received: from raghavendra-XPS-13-7390.. (unknown [100.64.1.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: raghavendra)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 9A89717E05B5;
+	Thu,  4 Jun 2026 07:21:12 +0200 (CEST)
+From: raghu447 <raghavendra.rao@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: raghu447 <raghavendra.rao@collabora.com>
+Subject: [BlueZ PATCH v2 0/1] shared/bap: add ASE Control Point error responses
+Date: Thu,  4 Jun 2026 10:50:51 +0530
+Message-ID: <20260604052052.10667-1-raghavendra.rao@collabora.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <CABBYNZ+UzUk+MHSo87vttd7YF-s3Zuzsywf+wnoOboaD2bLhFg@mail.gmail.com>
+References: <CABBYNZ+UzUk+MHSo87vttd7YF-s3Zuzsywf+wnoOboaD2bLhFg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,40 +49,15 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth 2026-06-03
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178053962113.2207566.5562894926058000252.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Jun 2026 02:20:21 +0000
-References: <20260603162714.342496-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260603162714.342496-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
 
-Hello:
+This patch adds the responses that are expected by PTS.
+This patch adds the SPE unit tests.
+These changes are required to Pass PTS tests BAP/USR/SPE/BI-01[5]-C.
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+raghavendra (1):
+  shared/bap: add ASE Control Point error responses
 
-On Wed,  3 Jun 2026 12:27:14 -0400 you wrote:
-> The following changes since commit cdf88b35e06f1b385f7f6228060ae541d44fbb72:
-> 
->   Bluetooth: hci_sync: Reset device counters in hci_dev_close_sync() (2026-05-28 08:52:21 -0400)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-06-03
-> 
-> [...]
-
-Here is the summary with links:
-  - [GIT,PULL] bluetooth 2026-06-03
-    https://git.kernel.org/netdev/net/c/d20da9130830
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+ src/shared/bap.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++--
+ unit/test-bap.c  | 64 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 152 insertions(+), 2 deletions(-)
 
