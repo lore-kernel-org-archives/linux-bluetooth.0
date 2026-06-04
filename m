@@ -1,48 +1,82 @@
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E42B3CF97F
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 21:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819763D45FA
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 21:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780607647; cv=none; b=LkZ7hAPeCCAu7Ncn4dENFur4nt2EivIikp9SsYv0tcN+CM59xWQktYD5jIxnDPFQC6G5FUxggEy40vvkVzqesj++xq+XsZPUnibWuOt3iwKQoqiFhxkAEYb6cI+upWpV/4YBTanlJowSKwyPXKjRiHnQ2WVPEkEC+PIHOPz75Lk=
+	t=1780609516; cv=none; b=GpgMmRdScrNusfXG6vcYJ64vrjevgoOeySN8dk3KDVYZuSJOi3FR8pYTpHJ9CsVYwUVQQYcQdssyFl2Kktd1fhSE6pPeK8JAtq+9tR3wjL7LV7HISytJyPk0vBUM9hbS9hhbxJ7c5vo50oER2AzgwE2Sh6uyt5Nhkk+e6Z0hkiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780607647; c=relaxed/simple;
-	bh=DARZMPZ94LfV6NG+DRv3BWIoudUOXv8mkVAesEwJZL4=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Ki3dRd39X2zxE6WfL8w+UDGX58T15jX0KxclmZVnxo+xf9pVYhdWao6jParoBOlaQ4aI6DopJl+iHz8GtMjOQuhhNXAsAHz4Wo4tCA3U2FiyJTg6i9lKCMTWtVGWZTH9kJOaYNObYhY0uOjEdAa+8zLIfPWKAX0IWAC1jhL/D0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Ws1dK1OI; arc=none smtp.client-ip=192.30.252.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1780609516; c=relaxed/simple;
+	bh=ptU8MGa8ABPtUHukfRxeCQ9hoajVi4wLkN3SUWTI8p8=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OWrzl4p/ZOwbDdXpDlCauQW9bQ+xQ7z0QwStGgcNB1ReSvfZRyjdWfFE3MHI+U90i8n5Mb/pT0Pk8KxbdQwpRH5PKwylFjMMikER36O56/2Jm906Q52GdzALqkoFatCS6EQb4A6MovPUaeNFP++5CCKfM+aGRUgF1ZUJ8NhmKMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tz+YLm7h; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Ws1dK1OI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1780607645;
-	bh=s/qU+Vb51zlonJhfmJNotBPzkFtE5uFAiDYLjTbhtpg=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Ws1dK1OIpqE4wZe6uYzoHFsfEbkSakVu3J8ZkZPoshA0bwaG7adF5Xw7P/5QItY4d
-	 r4KSq0X3PHxBCBKg3xkLLDgP3Z093rzhKTbc9dxOJnPvu2tdEwTlmW2FjJCosDDMQc
-	 aH4DDJSzh2y4Ilw3lV4bY3pftCTqcpNAzP2cmVck=
-Received: from github.com (hubbernetes-node-cd525c4.va3-iad.github.net [10.48.171.37])
-	by smtp.github.com (Postfix) with ESMTPA id 79A722810E1
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 14:14:05 -0700 (PDT)
-Date: Thu, 04 Jun 2026 14:14:05 -0700
-From: BluezTestBot <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tz+YLm7h"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 31C17C2BCB8
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 21:45:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1780609516;
+	bh=ptU8MGa8ABPtUHukfRxeCQ9hoajVi4wLkN3SUWTI8p8=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=tz+YLm7hVvH0BSMY8+TNWGuUcO9gjfjl/ZBtIeMgOl4hZiH3TfsNbubwYGtG2yIFD
+	 NfaTlkk+vI12Is3L9VJnXPJEL4WIAhjE0CpN2J4Daqq56EKgqITk3CTg4AfuNga/Zf
+	 IWFpJCwmpsePl2iqfRWvza4Rf8LZw1zI0EfVEw+bKKwdO/uKwAM5JgepnLNhNGF3Gn
+	 aFArl/Yj1KHddr92Swp+GgVa8pgVZaYMEjzqNDl6oZhWtmhBXljwoJYOU7Zxuy0alw
+	 e5hi/fcfBJDuY9+x+1ph4MUH+IfukinBD83+o9U9bIiT5wffxsolqJ8SLivYbnmKmp
+	 v8i4WwG1T1VaA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 1F335C41614; Thu,  4 Jun 2026 21:45:16 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1105806/0b64d6-000000@github.com>
-Subject: [bluez/bluez]
+Subject: [Bug 220703] Bluetooth connection is sporadic, quality is poor -
+ halts and stammers with linux-firmware-network-20250917_1
+Date: Thu, 04 Jun 2026 21:45:15 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: bob.hepple@gmail.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: ANSWERED
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-220703-62941-rrckhPy3VA@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-220703-62941@https.bugzilla.kernel.org/>
+References: <bug-220703-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
 
-  Branch: refs/heads/1105806
-  Home:   https://github.com/bluez/bluez
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220703
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Bob Hepple (bob.hepple@gmail.com) changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |ANSWERED
+
+--- Comment #2 from Bob Hepple (bob.hepple@gmail.com) ---
+This appears to be resolved as of linux-6.18.32_1 and Firmware Version: 83-=
+7.26
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
