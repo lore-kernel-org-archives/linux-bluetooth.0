@@ -1,35 +1,36 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A07403123
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 11:25:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73674403123
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 11:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780572304; cv=none; b=OIRLhJ203NfmB8mR/68Ya8m6jJ6o0ZX2wiFO9o/6WQorFNsxD02NuGTFoTpmFf49uuu2Jjn/5RgKxM3QZjuAHL6eE3YmicgNzSRJQGvVA+VBmyN8bOE69R1Uv5Z0w5/iFr86sUVyQuKEpwjCfx1YtgIvEqK8O3IDKxU1oWtzWbc=
+	t=1780572306; cv=none; b=LXwuxIYJnjkZeDKbCbD5h6yde5f3+SNHD25VOP5UzlGEVZeOM6EHu13YbaLmUU+ZQnarCT7yZrPivc6Ch5kkdtU9wbpQ54MbqJx040PFAEV1Wjc2ilQOMAiMo6XsqvP++aodN3/7LNrEw8046tYzyZ7YJf26DqBEjx2DjoRgFHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780572304; c=relaxed/simple;
-	bh=3Dsmmd2KN/0+VLbbT00Q0txLyLIP3mmeRzt6CV5DPcM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=AXlN3iRxO70pQvk1T0KzjjxF5dbQMPTKEDed1Ha7k2EGCuS2jYalg8+/beczN9Urn1qhnHE1LvoOgDUgEpHW1tI3lyerEbH6IdoQ8gYG3L3qQUsTEL/tY4JCUSHkl5xIgoxb4sYSLo2XkdtDIvyvRX7s9uN1/1jI2sIp3cwfbY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=LN7rIM+8; arc=none smtp.client-ip=192.30.252.209
+	s=arc-20240116; t=1780572306; c=relaxed/simple;
+	bh=nNSOFosAJPbV3AMD5UmG567338OEh7AseQa/gmIEdCs=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=vA3Qv9wfOxaS5X/4YhOi81E7fnNKqciEiCUOnkvwxvugCvyBOkdiJg29LngqWQ5qLYWEzx7avUc0WGF5CRJa9gUUDvqtN5VE2j0w2K8kNg5afTolHzgQ5qqo4slyMLx7ndzpXGRofgXO23EqXIHrqz3llxz7jiz70/oEHY2/3aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=cOBtVHm7; arc=none smtp.client-ip=192.30.252.207
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="LN7rIM+8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="cOBtVHm7"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1780572302;
-	bh=zUniqSA2yu8QHmE+Cmvu31l6vDHbjKiQXBwbuHmVMrY=;
+	s=pf2023; t=1780572304;
+	bh=Yua6BFlJUrre45IxDz16lMZyzNSXxFckIwjFFwhmhqg=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=LN7rIM+8Z2aRnkN+2K9wLmutTIsDktHu/bUJdcapqyepl1bgVnai3/RRe+O/nuGaP
-	 1H3cq2SF/i/VrvLyC7clJav1lh3N23a/5F9wEED+dICJOG/7FsVPUSvBQhhQ3JYw8V
-	 pOFfmpkxqvQlu+MyQbA+eSiSPwlbr/HOykOKJiW0=
-Received: from github.com (hubbernetes-node-b7b39d0.ash1-iad.github.net [10.56.200.77])
-	by smtp.github.com (Postfix) with ESMTPA id 60AC0521116
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 04:25:02 -0700 (PDT)
-Date: Thu, 04 Jun 2026 04:25:02 -0700
-From: fundawang <noreply@github.com>
+	b=cOBtVHm7BuiL9oPlgfkzdsA6X/ZvZXeCSKFLx9I0U3EK0IBoOCMtEcli4ClsJjh2D
+	 TazpxuzuvJURK+3l1ZGtTdTJqsLd+l5jC75NFSa6hLjdx/d9e8Ay2KlmUt/VBgg/z0
+	 W7bn7TnZytX6kQ4u0eTr6YIJir4N1PNGTCHU2yHQ=
+Received: from github.com (hubbernetes-node-7db4f4f.ac4-iad.github.net [10.52.142.16])
+	by smtp.github.com (Postfix) with ESMTPA id B7126A024D
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 04:25:04 -0700 (PDT)
+Date: Thu, 04 Jun 2026 04:25:04 -0700
+From: prathibhamadugonde <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1105842/000000-d02777@github.com>
-Subject: [bluez/bluez] d02777: build: Support libical 4.0
+Message-ID: <bluez/bluez/push/refs/heads/1105853/000000-db3304@github.com>
+Subject: [bluez/bluez] db3304: profiles/ranging: Read measured_freq_offset
+ field-...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,28 +43,22 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1105842
+  Branch: refs/heads/1105853
   Home:   https://github.com/bluez/bluez
-  Commit: d02777b690980cce8cc761b1ab040ba58e704c5e
-      https://github.com/bluez/bluez/commit/d02777b690980cce8cc761b1ab040ba58e704c5e
-  Author: Funda Wang <fundawang@yeah.net>
+  Commit: db3304369a708b9189777e2ad89026a3d384e010
+      https://github.com/bluez/bluez/commit/db3304369a708b9189777e2ad89026a3d384e010
+  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
   Date:   2026-06-04 (Thu, 04 Jun 2026)
 
   Changed paths:
-    M configure.ac
+    M profiles/ranging/rap_hci.c
 
   Log Message:
   -----------
-  build: Support libical 4.0
+  profiles/ranging: Read measured_freq_offset field-16 bit as per Core Spec
 
-libical 4.0 split off some vcal related functions to a separate shared
-library, libicalvcal. As libicalvcal depends on libical itself, first
-check for libicalvcal being available, and if it fails, check for
-just libical.
-
-Closes: https://github.com/bluez/bluez/issues/2090
-
-Tested-by: Bastien Nocera <hadess@hadess.net>
+Fix in V2:
+Fixed compilation issue.
 
 
 
