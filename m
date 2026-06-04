@@ -1,77 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-29.smtp.github.com (out-29.smtp.github.com [192.30.252.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7AF3B8407
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 19:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68002376467
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 21:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780602007; cv=none; b=gT3i8Akp74PfPpWPfgcVK1KQqwlH/j7f0ZXr9M2DGbXyEK0Wf/rK9GBfyb//Nt8Tgru845yh8lhUkh2sDesPBv4Mrcxa5k9XhNYbtDsnw01XssLJ1dtREZFEq6mwaFYWBBofV2LB0kjSM7dQNzX34uyj/82w/ClX0uE8e6crdO8=
+	t=1780607591; cv=none; b=s/pRQW1f3hpkutapULBDapU4uV7eSDlvaaWYznqFsjrIPcCLQHxpiR+aFbb2KqUd51IZoZMTKIekA3TWDx0f1ey4ccGUwoP6AarSBA4kIlgUwBFIWxw10litFzND9BARbxzQaebnxrfM5nBUY55bjghkPrxuudnqvmLwzCtfV+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780602007; c=relaxed/simple;
-	bh=Y+sOVLWBsMsbOK58TwdD3S7dIj6rRYE56wv2l81A6Zg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=l8cBGbBYIEnWNG3gA/Zu//rnmrLoUIrD1uHG74Dys4pmbutidQFAjVkvd0AvH30Wjen4ts478pAVwkZIC0UansKZNT3b1gcjbbfvBPni9nGj20+ebu+52l4x0iegbtBFk23l5rl1A0Z9HCK/s/U6nuEkNj9o5nFGaENB+h2Qf9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OceWvVzg; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780607591; c=relaxed/simple;
+	bh=wOHLa+gGpEAIcZcXxxRHQrONyOmBT79esx8005iGa9w=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=mi1FinEqriGyVmljP5cpbc9UH8+SDhE1uum92iJXtr0JSKFmrPyzhjUPpyb7cWcdmbppmqF1yaNGw9tRm9fYQTUYbqLEQkzs8dIHtTVKjW81AnTYzo17waeOhj2UGxJCfbp8megqECCOvD4YqPQx9oFebY9csRfLKv/q2UE10tM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ZI4rqxHf; arc=none smtp.client-ip=192.30.252.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OceWvVzg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 472131F00893;
-	Thu,  4 Jun 2026 19:40:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780602006;
-	bh=hNd2JO6AbRZvY3WYh1QvNNDD8yi8JdWmgQGQ3MBuIxc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=OceWvVzgQJs+7HbUAbptdAaZX6J9i094SqLENBkFrZTaGw4v4yA63Aikc7GUOqtLn
-	 F6L4FSo3Euu0jnzqJtfs96pQtG4w7q5Nmn9fA69WcMYkeKh6IrKg9WxbIQrgnTjRy2
-	 zNCPdv8ZMuQQOBV5eoCrqxOUNhdLohzis1NEUlH0Htk8qsSJurowGID6fh0EJAKod6
-	 I+5YPgSTlV+lzOCW9+5Ak9BVWaVOuXCTt/HoVW5uPab756HsyOUP/UyuiiVW90sJkK
-	 cVeiOB+djH9XEIW980yZKsUF6i/7EsB5midW0OdzNhCNh9eAkXinXxOKclEQXTMkCZ
-	 Y6BFbhGLrMTzQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4F6B23930A1A;
-	Thu,  4 Jun 2026 19:40:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ZI4rqxHf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1780607589;
+	bh=dpE7jfGX+6bwZ/tpt2P+WeqwmW+xp8gkrMk6jMg3oIE=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=ZI4rqxHfPuCLoCnoxC+J5U2dz1XXXaBS5CbCZ3Yidnw+X0eonelRQKdSxZQSE7IlG
+	 IglogO+Q8TkOHpM5cvHL11Gfbkfb3+5ubAtoF7N/n81oVtrtYO2hp9qlj3oj5PrBNZ
+	 sUmhcU6oe7RVnGl+XATjuVeOSN7SHSOOvQxQruOo=
+Received: from github.com (hubbernetes-node-0f1cf93.ac4-iad.github.net [10.52.183.64])
+	by smtp.github.com (Postfix) with ESMTPA id A09A332000B
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 14:13:09 -0700 (PDT)
+Date: Thu, 04 Jun 2026 14:13:09 -0700
+From: prathibhamadugonde <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/c6bc42-42b2c5@github.com>
+Subject: [bluez/bluez] bc5713: shared/rap: Add client ranging registration and
+ no...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2] profiles/ranging: Read measured_freq_offset
- field-16
- bit as per Core Spec
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <178060200686.2994037.2969505068362825008.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Jun 2026 19:40:06 +0000
-References: <20260604100233.4193077-1-prathm@qti.qualcomm.com>
-In-Reply-To: <20260604100233.4193077-1-prathm@qti.qualcomm.com>
-To: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
- quic_mohamull@quicinc.com, quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: bc5713d69e1e4ef87bc097ecbe941a2162bf0eac
+      https://github.com/bluez/bluez/commit/bc5713d69e1e4ef87bc097ecbe941a2162bf0eac
+  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
+  Date:   2026-06-04 (Thu, 04 Jun 2026)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/rap.c
+    M src/shared/rap.h
 
-On Thu,  4 Jun 2026 15:32:33 +0530 you wrote:
-> From: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-> 
-> Fix in V2:
-> Fixed compilation issue.
-> 
-> ---
->  profiles/ranging/rap_hci.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+  Log Message:
+  -----------
+  shared/rap: Add client ranging registration and notification parsing
 
-Here is the summary with links:
-  - [BlueZ,v2] profiles/ranging: Read measured_freq_offset field-16 bit as per Core Spec
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=42b2c543a70c
+Read the RAS Features characteristic to determine whether the remote
+device supports real-time ranging. If supported, register for real-time
+characteristic notifications using the reqtracker for the CS initiator
+role.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Parse incoming segmented RAS ranging data notifications by accumulating
+segments via iovec and parsing complete subevent headers and CS mode 0-3
+step data, including IQ/tone PCT samples, once the last segment arrives.
 
 
+  Commit: 42b2c543a70c882ed12efa06334588b0c45ae0f3
+      https://github.com/bluez/bluez/commit/42b2c543a70c882ed12efa06334588b0c45ae0f3
+  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
+  Date:   2026-06-04 (Thu, 04 Jun 2026)
+
+  Changed paths:
+    M profiles/ranging/rap_hci.c
+
+  Log Message:
+  -----------
+  profiles/ranging: Fix measured_freq_offset
+
+As per Core spect it is 2 octects not 4.
+
+
+Compare: https://github.com/bluez/bluez/compare/c6bc42d69661...42b2c543a70c
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
