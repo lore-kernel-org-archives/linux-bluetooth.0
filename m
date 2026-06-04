@@ -1,48 +1,76 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25DEC368D74
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 19:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1C13A59BA
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 19:40:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780601655; cv=none; b=RFY7ic5Pk0g96kBUnJBy/VNEGJ6bAt+snJ+5ag6zzsM7XOmXDOsnHCqGhDk8pWElw18U6Jd6Q5rOMNz83cKXoe9anZKM/whKUBBTkZkByeY0zEJjHymNv6wZwKSFQhLQJMQ1w6HU6ZjZJX5ymhKwMlSR2yjWGPgN/cDu9QrGTeE=
+	t=1780602005; cv=none; b=t4ZS8dk1zmGkcXJ3DrVd1wT1uzkgysCMgXuTbQ9iIWOghBXZx7K0p+3W2Llh3UNG6CLw4uEcOrhSC9SKqeK8J9T8URWQNoWGlTwsEEkQEGL8SmkR90lXZQofM7OrWlAxVSgDZPDfxYTqGvtOXX1HtxIx/hHZnlr7Jbm13Dgh69w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780601655; c=relaxed/simple;
-	bh=6i01xGe7BdIWBR+QvEBNj2MFL5GA0ZlqJdKWzpku2O4=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=i6zKMNlvsJZaPV+27H3WI3e63Uo0FkXjUQjSKBMuimmYldsnw/txg7sOJhTsSW+80DHuz31O3lBqIP7JA9vhXSWZKBM4nFnfNXu6mTMdYBmHX6zsXxK9mcff9r0fIQaEhDOtKOlt7HTAcsw7uoveEjRs+8+tS8qWwlzVj/oXt9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Zv8KoiR1; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1780602005; c=relaxed/simple;
+	bh=wzgC6kUQieTXw2NPmUsJhEC+oFkGOb7j51aQUYXRr2M=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Yvf9OST1CNnxB8Zh7jkp/GZj6apM8WCvDvfFdinw2aZXW9G5/gExAb7iG7JRtaKfPwKlW+2/vpysuFiwF/HKzBDaEOMMJapF7utsUV/4Fgdl2mhC/lrn2L424RzLWqaQ/r28PwHu0ooG2oSdvANyDNDyWZjUOG67hggpp/iz7xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PLNLCnqc; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Zv8KoiR1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1780601653;
-	bh=1AMQZH7kr4dSWhltKLQuW6c0Smwhgqupp0Vdz0hvuWA=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Zv8KoiR1jpNbb2ORNbb9bQ6fXprdVxuRcgfPUbNNAtonnIJQuo1mf492pl/qnSLvL
-	 BNfOVmDIE5FokfjFLVH9Q2CQlYHKHhaCdsXqp7bQ5XauXX8pgDGk3r6bg/+cRYjSep
-	 w8eCIZ/vPV4IyZ2Csx53C4vPCI64YrYuliE0Cd4g=
-Received: from github.com (hubbernetes-node-e354f21.ash1-iad.github.net [10.56.182.40])
-	by smtp.github.com (Postfix) with ESMTPA id 6A9A63667AE
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jun 2026 12:34:13 -0700 (PDT)
-Date: Thu, 04 Jun 2026 12:34:13 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1105837/f47761-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PLNLCnqc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 349E41F00893;
+	Thu,  4 Jun 2026 19:40:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780602004;
+	bh=QhCHtoBY1Xgwoa2hoFOmHSi0qA16nAnQx0kSkflphY8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=PLNLCnqcW45C4h3bEJkGpmQT60SDvLKLtxQlKH8BciToLobazal2gtCjd3oO3kzk9
+	 f3lI9U5s5UZXjsWwiwdPORZpJGC4oL1RYiGikbpgU3x8+IuI5WHnVodYGd8xo7pNKt
+	 gyOB9n9CaoPyR/8fGa64mzxBzm+ZPPX/pMzPx+AB07F8DFBpZWcM9CnRZJdNBLE56E
+	 5OHWzNMN1GsRdofl6/vEoL+6wJ5+3ezAZKZ1cNsdM6jIuwCV0UElxKY1AnPb/k+ceH
+	 UxbWogdPso9CsWcvR85aY196JdcQB25d5+9C9opswR7pu53Pe+7kjydINkU6ToSeVU
+	 g7z4PRCCQzoSw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3A49C3930A1A;
+	Thu,  4 Jun 2026 19:40:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] shared/rap: Add client ranging registration and
+ notification parsing
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <178060200515.2994037.6060072322845213765.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Jun 2026 19:40:05 +0000
+References: <20260604085205.4135084-1-prathm@qti.qualcomm.com>
+In-Reply-To: <20260604085205.4135084-1-prathm@qti.qualcomm.com>
+To: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+ quic_mohamull@quicinc.com, quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
 
-  Branch: refs/heads/1105837
-  Home:   https://github.com/bluez/bluez
+Hello:
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Thu,  4 Jun 2026 14:22:05 +0530 you wrote:
+> From: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
+> 
+> Read the RAS Features characteristic to determine whether the remote
+> device supports real-time ranging. If supported, register for real-time
+> characteristic notifications using the reqtracker for the CS initiator
+> role.
+> 
+> [...]
+
+Here is the summary with links:
+  - [BlueZ] shared/rap: Add client ranging registration and notification parsing
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=bc5713d69e1e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
