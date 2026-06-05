@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FED779CD
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jun 2026 16:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A263A5E6F
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jun 2026 16:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780677010; cv=none; b=MNwdcZ9qWu1CJX/Izh46wGQnXcgWd1Jp71sLRaU7xumEyfSHPIF2fDbtDZ5nUflC7Mhe4Y66W3C7lrjp7lGVWd0T5pDzqWhrOi1YOAo930Mw212Co2hBNvg+iJPl2gkZqHfzOWoKJ2GcaBya/nkv8OEEag4xwwHF06W24h2Yb8c=
+	t=1780677012; cv=none; b=qyr+H0YpOgjVqFP70lCMJDIYGdezsXAYRrnjY3j1bYfqiOd+7+hYMeT1kHuOflLhjH43raedlQXMLK+ZhPxmSF2ReRAKouUghu2ZxWWshOV9YwWNgyq35M7HEmxifrT7uuEvz6uCoW66gaUjcm4h+QYEz0ZgCNUdHg9I4Pd7yKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780677010; c=relaxed/simple;
-	bh=BQCZEnpULoxV60A814NBfOYdiv1n1o4w3iXsUfYRwKw=;
+	s=arc-20240116; t=1780677012; c=relaxed/simple;
+	bh=DEgJ9vPRd1BQ5A3At1dzE2oEbrSeiGf9Sm6rL85WeWk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=unQBWubTjKlOuJf0+8DF0zEkr8T8byfP6Ywh+tOROLg1fEDIfSOykMKhE+P7EU6HPuOfX5OZRFu37BqoWDU6jG72ZfOLPx/QYIX9bT3Xy6iICxVTOKeQ/G1DOUPPUU7u334f5y0Pk2uFkVoRSiwQnuG51mOEVQU8i7DcT+7SthA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jPBtatie; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=cazgwGlf8P/vL3K6NYe1eYd5DVMVWiU3JUQ7BpzGDlLhehMVyVVP6ns3CWJIFQx2Mb5QQP5R6dp22kYLrHMzdj+s12vwCvhpoLZfP2ozItlwhIyUeDejLT4E39B+51vpzytesFpNp7uviU5dhKKMlJ7bKQec62vqYT1/f+CfmLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jn04byG0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jPBtatie"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0753C1F00893;
-	Fri,  5 Jun 2026 16:30:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780677005;
-	bh=nqT3XlsjzHfAZAdH6RUzLWJ3lYRpV1DoqWTo/jF2aoA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=jPBtatierEblA+33O8VVDIj6vnQ9xIalmD/fpNuTOFXI2K/2qdIkrEKAAZ0AQ+Ug+
-	 /folVjD3BY9lHOfVYV6CbdyUDbByggxrrG6waBxG29AK0sVYAZ8bT1aMQ0FphtYGVM
-	 K18XWIr0EIE8KSQzu27rRnQH/v1/4EUCwQvjt8qmsu5whV4H05UQ1Rb1blk0ZYwKwU
-	 hKV66vR4pLInD0U2bmWnK/BLiy5+3DZpfsDdxlUqlPFwhyMaaX4dNKm2paw/b2XsQC
-	 8qC8Ng1Sj0R8Sog+dwGIy6UAG6ph2OQ5TeWf38Xr+bPibNhTxExZQew5haH3e9Bx5D
-	 2FW7ndULQUrHw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939FE3930BAC;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jn04byG0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 813551F00898;
 	Fri,  5 Jun 2026 16:30:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780677006;
+	bh=bO1RgQqbCXiac6nai3yiW3Z8392CMwN7XBg2muqGsSI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=jn04byG0zyoa1ASLcicrq9LY1FUEaYGHCohGXl9rdSyhV+6/7Xd5/bHUBR1SRq0c+
+	 bDxYf2f7LNUSU1p6z/TQWndjm/LJ8wuvHroLbJ3rH8oIxR6TSVbLi/S/rOX+jtgIm1
+	 ayNLE1HQvE9+Ry+EBcIbrIK0y76xSbfyVMuAI4zON4y0EsVUWMeVxmKMnSJl1X92b8
+	 MOnJ2dDtSakaDyg62M+v0b9ZjQzrk09IQCOTBNGMlhJml84gk4e1SBz3c2U0INcD+x
+	 xslHn7XypBc6lRL3lP+DGcR/pq69z2l+/lC6UZ6s/6m2sSZwmVMQf8f7sEUB1S0zpL
+	 eSLbj3zfG9x+w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 1983E3930BAC;
+	Fri,  5 Jun 2026 16:30:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,37 +37,44 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] obexd: fix PBAP PullPhoneBook failure with ebook
- backend
+Subject: Re: [BlueZ] test-mesh-crypto: Fix retval for skipped test
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178067700540.3831182.14159878683070316070.git-patchwork-notify@kernel.org>
-Date: Fri, 05 Jun 2026 16:30:05 +0000
-References: <20260522060312.1503481-1-zhiyuan.sheng@oss.qualcomm.com>
-In-Reply-To: <20260522060312.1503481-1-zhiyuan.sheng@oss.qualcomm.com>
-To: Zhiyuan Sheng <zhiyuan.sheng@oss.qualcomm.com>
-Cc: linux-bluetooth@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
- shuai.zhang@oss.qualcomm.com
+ <178067700663.3831182.17546933147006464108.git-patchwork-notify@kernel.org>
+Date: Fri, 05 Jun 2026 16:30:06 +0000
+References: <20260605093555.1969171-1-hadess@hadess.net>
+In-Reply-To: <20260605093555.1969171-1-hadess@hadess.net>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 22 May 2026 14:03:12 +0800 you wrote:
-> phonebook_pull() in phonebook-ebook.c does not set *err = 0 on the
-> success path, unlike phonebook-tracker.c and phonebook-dummy.c. The
-> caller vobject_pull_open() in pbap.c declares 'ret' without
-> initialization and passes &ret to phonebook_pull(), so 'ret' retains
-> an indeterminate stack value when the ebook backend is in use. The
-> subsequent 'if (ret < 0)' check then incorrectly triggers and rejects
-> the request with Internal Server Error.
+On Fri,  5 Jun 2026 11:35:53 +0200 you wrote:
+> Skipped tests should return 77, so they will be marked as skipped in
+> reports:
+>   $ make check
+>   make --no-print-directory check-TESTS
+>   [...]
+>   PASS: unit/test-gatt
+>   SKIP: unit/test-mesh-crypto
+>   [...]
+>   ============================================================================
+>   Testsuite summary for bluez 5.86
+>   ============================================================================
+>   # TOTAL: 39
+>   # PASS:  38
+>   # SKIP:  1
+>   [...]
+>   ============================================================================
 > 
 > [...]
 
 Here is the summary with links:
-  - [v1] obexd: fix PBAP PullPhoneBook failure with ebook backend
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7a0c8ebf91e6
+  - [BlueZ] test-mesh-crypto: Fix retval for skipped test
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=80e9eb51c4c9
 
 You are awesome, thank you!
 -- 
