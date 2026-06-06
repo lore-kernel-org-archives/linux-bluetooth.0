@@ -1,101 +1,157 @@
-Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9772DF153
-	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Jun 2026 21:21:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3D14071C6
+	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Jun 2026 23:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780780898; cv=none; b=AVjbiWOIL5z+D4iFcZgH4usIGFEcJSHbqAu6XMdeczK5862CNmUxCNsCz9YYF2u4GR8hwgFT/ci/GaG8J47LNOjVqg+nvMEm9bhZiAx/PsNAJMlBIf9d2ukf0IE94U0gApK/gsAB0utTpJW/sFwUIYPv53ZboGr9O3p/+6cdKNY=
+	t=1780788305; cv=none; b=hkQvPYHb9rNznv0ct6qnHwNfVaTQF3tS+ShWkNEEY3zJe4GhrUxrtgMGafhu9B/9Vrplmgv35vfnResq/WpcBeY+SA00cmJbf5mJUWydg/07lngCmrGFEUIbGElULek6y0nPirFMAkj17tsaEvHR79EE7iUPGU5HZW8ddFfRT5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780780898; c=relaxed/simple;
-	bh=XVjpdTI2KXyL/G2mXGNBcv8a+FRyDdBv3cpLUj460lE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=eAtKCCtCE1myDdiYlnAp1N/lOeXyqN+wNC7Q6fgeMlEBZU4vm/71keAUY/c7TFISlk+/nubnRzkyEtdGuDLGorLddI1Vvi09/EqLuIHWz5pUJHWwjpdp98ewYvcBhHRtN4Gs+cyUrxpfzWjorafJGyKnPsEeRR1Qafnu8aOzM6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DHkxEESV; arc=none smtp.client-ip=74.125.82.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1780788305; c=relaxed/simple;
+	bh=oGqFP+GhbUaNUpuyj+tSy0hbC8yVx7BJnEmIxAWLUxE=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=XyDc1nFqStv6VnJrzqzoilH4eKfiU9TXIC66vh1px6l0Pb68tVPvLBB3XfY3aOPPAssSv0fvnPNtSl5tf/f9IGFRqvyBzLbHLqWRvl+7CG4j5rM9Q3OQiesM4y1zZsgTKWT0soZ7V4+Qv+OpfnkUTfkeGVbkZ6bUvRkmrMXLTIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rzhwKK9X; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DHkxEESV"
-Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-3078e0dcd67so1094152eec.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 06 Jun 2026 14:21:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780780896; x=1781385696; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XVjpdTI2KXyL/G2mXGNBcv8a+FRyDdBv3cpLUj460lE=;
-        b=DHkxEESVD8A2EUbzi1tYd7HIqxOeg26gblwiZ8jAtYp+Gz1amDKJ+Ci/Z98cDjGSrI
-         AH7aZsVbMTb6JLpDx4H4UjrSuccpdJT1Q/h7PgJn8Evx9zb1v5vRkecyJCMDsIpqfpry
-         GzTTkfsxKIOBYfK1MD7ydFl2G5LNVB1oMdJq5BOzwTEVk8/BNdLK8fVAhBLqhVwtaS3F
-         /LX91hP0Jfycho4W6e6eB36unGOz6naM6slvr5xSY9oSzDmwaYGBZlFlUZeAbFhPYfkt
-         eHI+UN44EDPOEiEK8v7itOr29jFzQtoq6iYFMMaIo91QB4L3Zu//xi/OsVRHg8bYSZA0
-         o6cA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780780896; x=1781385696;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XVjpdTI2KXyL/G2mXGNBcv8a+FRyDdBv3cpLUj460lE=;
-        b=EexbsIHwsULMm2GG4bqE/WT/bS7n3n4FDm/5f55+VXCQ6maavnRijAllc2dI78ZOM0
-         PEYLmns8c6JGOZmZqlp6VThG1KtjkPGCUCxd40pMg1rozuAtVEVwBm4Req9pdQ8ykM7S
-         rdyNg3yYkwRdif+4Mt3qNYBtL6XgOdOoaktruqO423y+HLaOVWtscnsZrMRrDAoxmlhv
-         Nr+sQeeHC42oA+n/Hc7sc6y7ceBgwU08ORo5M6EWNUzmCceUdTUDQ0zlAx1ZwyCQ5+Zm
-         C2TvDYz4ZCVkFvWG+lpiaO7rJ6Rg+G6fa+pDbamSNMV/qeQkPVpHXBgZ+gjdw4ZJ6XlE
-         H1XA==
-X-Gm-Message-State: AOJu0Yxp3/cUpZIm0LcomWaJ6AaXcENyk02R/HgOhcTmHejXXDE5VXdx
-	TOf7DuKiBIY/3vyQeFxb2U/QtfC9UAViXvyBUUzAOF/bVCYeuZpE6RdEKbiNDw==
-X-Gm-Gg: Acq92OHPsSAA4fDQGqjqHENH6OdfzHr0guoMxuTeOL2WkJMbk0uEXN4B5vHSHlKt2to
-	Q/t0/PGYKGpoONns8B4+94dMoTz/roz6VRFqGTWGCAX8qzqkeEP/DeZUY0jlvPKVdFfqDq8rRw+
-	Vjf9YM51stVvBBCRuR+gZz6ApoUWW7uoQqrv6R2ITdmCYhyJv/JTevas//B67Y80CSN0h6l9I3G
-	0+6N2IpFgIGYOLDslGPLFYCbv7JRb5D/Lx7LLIwFmlS1ohqzS1rnC0LQBzXoJX39tgyVNgryHnc
-	C2tTK1QgF/GRFrGz8eE3w2Le1xRb3dk3SLlRn3Imh+3ReJGH7PpDlUenLlkydWXAbrKiZEvcvd4
-	b0LM7z/vdxfd2xfUAx2LHEWDYulsdx9D9r6yH7XgZa7aMunCZxqsuqxTY0JPj4N3uzMbfyUiSNI
-	BYkd23+vTVo3CdXgVCQQSs2wi7eL63bDRjcrHCay89Zg==
-X-Received: by 2002:a05:7300:572a:b0:2da:a813:a5fd with SMTP id 5a478bee46e88-3077b229ff5mr5175183eec.22.1780780896080;
-        Sat, 06 Jun 2026 14:21:36 -0700 (PDT)
-Received: from [172.17.0.2] ([172.182.196.48])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3074df349d8sm11790270eec.22.2026.06.06.14.21.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Jun 2026 14:21:35 -0700 (PDT)
-Message-ID: <6a248f5f.fb1bf61a.318c3d.973f@mx.google.com>
-Date: Sat, 06 Jun 2026 14:21:35 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0131554983337269007=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rzhwKK9X"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D1B06C2BCF4
+	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Jun 2026 23:25:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1780788304;
+	bh=oGqFP+GhbUaNUpuyj+tSy0hbC8yVx7BJnEmIxAWLUxE=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=rzhwKK9XV+NX20bluUflQypC4Bo5mEU064NlojeuxTq2XAl3k1p8XSyxXdICqAwU8
+	 CwMGsURX6huJ54lbpla/7HUQcckFWb5bmo7ikN6Ly0Ea/kC0J9A3cdSrVB/pvFwubm
+	 QmZR7C5d21yk7a+6iBUGixrX1FgMVmfuLkgSQ4IlP2zAMFXiiMgye9N2CU6y/7glhF
+	 UwNXbDf9LXKFHfe6r7rOJbMN5jBOGkAnb99y4Byr+hArZbrQllfYpRClfOYAdIC/O4
+	 35KRsL6LQgUePLu4rlAWHpuGts4vuQ91jGenJ27n+9avdSrWmZqHHjaWZQb+oqykUe
+	 cenKnu0qNdUgQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id C536BC41614; Sat,  6 Jun 2026 23:25:04 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221521] Bluetooth: btusb/mt7921 - Failed to send wmt func ctrl
+ (-22) on MediaTek MT7921 combo adapter
+Date: Sat, 06 Jun 2026 23:25:04 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: p@atiq.xyz
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-221521-62941-k42rC1AY8w@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221521-62941@https.bugzilla.kernel.org/>
+References: <bug-221521-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, david.laight.linux@gmail.com
-Subject: RE: [net-next] net/bluetooth/bnep: Use strscpy() to copy device name
-In-Reply-To: <20260606202633.5018-26-david.laight.linux@gmail.com>
-References: <20260606202633.5018-26-david.laight.linux@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============0131554983337269007==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221521
 
-This is an automated email and please do not reply to this email.
+Solarized (p@atiq.xyz) changed:
 
-Dear Submitter,
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |p@atiq.xyz
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+--- Comment #15 from Solarized (p@atiq.xyz) ---
+repros on kernel 7.0.9 on Asus ProArt 7606WV (has mediatek wireless chip)
 
------ Output -----
+if you peak into kernel log using `journalctl` you will find this:
 
-error: patch failed: net/bluetooth/bnep/core.c:639
-error: net/bluetooth/bnep/core.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
+```plain
+Jun 06 13:19:30 kernel: cs35l56-hda i2c-CSC3556:00-cs35l56-hda.0: DSP1:
+cirrus/cs35l56-b0-dsp1-misc-10431e63-spkid1-amp1.bin (v1): v3.11.16
+Jun 06 13:19:30 kernel: cs35l56-hda i2c-CSC3556:00-cs35l56-hda.0: DSP1: mis=
+c:
+C:\Users\gchen\Desktop\Asus_proj\CY24\MP\H7606W\240830\init\10431E63_240830=
+_V1_A0-init.bin
+Jun 06 13:19:30 kernel: Bluetooth: hci0: Failed to send wmt func ctrl (-22)
+Jun 06 13:19:30 kernel: Bluetooth: hci0: HCI Enhanced Setup Synchronous
+Connection command is advertised, but not supported.
+Jun 06 13:19:30 kernel: zram0: detected capacity change from 0 to 33554432
+Jun 06 13:19:30 kernel: cs35l56-hda i2c-CSC3556:00-cs35l56-hda.1: Calibrati=
+on
+applied
+Jun 06 13:19:30 kernel: cs35l56-hda i2c-CSC3556:00-cs35l56-hda.0: Calibrati=
+on
+applied
+Jun 06 13:19:30 kernel: cs35l56-hda i2c-CSC3556:00-cs35l56-hda.1: Tuning PI=
+D:
+0x531116, SID: 0x201104, TID: 0x3c8830
+Jun 06 13:19:30 kernel: cs35l56-hda i2c-CSC3556:00-cs35l56-hda.0: Tuning PI=
+D:
+0x531116, SID: 0x201004, TID: 0x3c8830
+Jun 06 13:19:31 kernel: NVRM: testIfDsmSubFunctionEnabled: GPS ACPI DSM cal=
+led
+before _acpiDsmSupportedFuncCacheInit subfunction =3D 10.
+Jun 06 13:19:31 kernel: NVRM: testIfDsmSubFunctionEnabled: GPS ACPI DSM cal=
+led
+before _acpiDsmSupportedFuncCacheInit subfunction =3D 11.
+Jun 06 13:19:31 kernel: [drm] Initialized nvidia-drm 0.0.0 for 0000:64:00.0=
+ on
+minor 1
 
-Please resolve the issue and submit the patches again.
+```
+which indicates broken bluetooth mediatek driver.
 
 
----
-Regards,
-Linux Bluetooth
+And, service log, shows following
 
+```plain
+$ journalctl --boot --unit bluetooth.service
+Jun 06 13:19:29 systemd[1]: Starting bluetooth.service - Bluetooth service.=
+..
+Jun 06 13:19:29 (uetoothd)[1329]: bluetooth.service: ConfigurationDirectory
+'bluetooth' already exists but the mode is different. (File system: 755
+ConfigurationDirectoryMode: 555)
+Jun 06 13:19:29 bluetoothd[1329]: Bluetooth daemon 5.72
+Jun 06 13:19:29 bluetoothd[1329]: Starting SDP server
+Jun 06 13:19:29 bluetoothd[1329]: src/plugin.c:plugin_init() System does not
+support csip plugin
+Jun 06 13:19:29 bluetoothd[1329]: profiles/audio/micp.c:micp_init() D-Bus
+experimental not enabled
+Jun 06 13:19:29 bluetoothd[1329]: src/plugin.c:plugin_init() System does not
+support micp plugin
+Jun 06 13:19:29 bluetoothd[1329]: src/plugin.c:plugin_init() System does not
+support vcp plugin
+Jun 06 13:19:29 bluetoothd[1329]: src/plugin.c:plugin_init() System does not
+support mcp plugin
+Jun 06 13:19:29 bluetoothd[1329]: src/plugin.c:plugin_init() System does not
+support bass plugin
+Jun 06 13:19:29 bluetoothd[1329]: src/plugin.c:plugin_init() System does not
+support bap plugin
+Jun 06 13:19:29 bluetoothd[1329]: Bluetooth management interface 1.23
+initialized
+Jun 06 13:19:29 systemd[1]: Started bluetooth.service - Bluetooth service.
+```
 
---===============0131554983337269007==--
+Related:
+-
+https://lore.kernel.org/all/81bcf9fd-2f07-4fc6-be90-da4e448379e4@leemhuis.i=
+nfo/
+-
+https://www.reddit.com/r/linuxhardware/comments/1tfn5ev/mediatek_mt7921_blu=
+etooth_not_initializing/
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
