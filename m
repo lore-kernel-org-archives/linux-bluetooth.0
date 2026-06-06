@@ -1,158 +1,111 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F7F3033DE
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jun 2026 20:33:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0691D0DEE
+	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Jun 2026 00:17:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780691598; cv=none; b=o4B+21N7ZRZmWGXO66ScLFNQwiOPxHJfoMiTo1j76PXBHQ+OBHcAI077h6a9axYj9f/Y+h+BsKYdFQSLHeHnLg+LcPbNWwhl90hXWhzswdVsk/U6mXLLsgzv36dXHSekaaZIzttHR43tlzin2mm25QepgLKKkDDXJvVqXzhRnLA=
+	t=1780705033; cv=none; b=Rb+abB/hjtZPgilb2bsrgWvVWU5/hKeO5pmoIRiRuyGcaRY+fEnYJha4zYK5mqZIzRFbI9eyBiN/mOgAdxPwV1wJwshuIx9qWn9YI2X0JwaIplfHbO1HOW3r9YlB9SfDFC6RgwQQcmq220sCBZw49PMQvcpT2M9D9AOqJdBBZK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780691598; c=relaxed/simple;
-	bh=D2K2ZxT6+QxgYdHgiosE4S26JC10493uB6v4XMF3q8A=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=DrVB7pNErcAK6/tvJGYBqwhqxu4xenOiLMXjeAFYgLRN3Y/cconOlKnDmmOwGHhQSH/sY6YvWSpGBsWgnltb7hEZWR2Ps/poyr4iSwKms8nnypHTld8a07bQZO+rXEKet7R3FmomXm6xmA0vBZc9/9ABW8kClR07OsM33ta3//Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iQ1e7e4g; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1780705033; c=relaxed/simple;
+	bh=q5y43Zu/SkNREXt+ZPWx/AARwYfDd/w4NtbhBczKEkI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t0NoR/PK4Abcc3sKvlNp6BvF9AOTWQDMBajNim+P5zgZVbuVNmt/wsNOyUnABBFZ+jaO5NDaEGYQArHJe+aTQ6uoCbTUMTVA7xuaBH208sEKeO1NX97+rN3ecQMGnDWcTl58hYWsT0NnCPD9k1LDCXrPfplwN6NmK1B4p9jKU2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I9RJemCS; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iQ1e7e4g"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-9156b74006aso174626085a.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jun 2026 13:33:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780691596; x=1781296396; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=1VK45th8eTQwQy3vkaHUsa7lZgXj9scEEjJUkEn9zmg=;
-        b=iQ1e7e4gHPxupQ261r2ptUnPPd45kq5Oi6TjUDETnqpKN2O2HZdfnZaR3dSSXnQxYy
-         2+d8t1lfA11P0fAXPUXuwdH7wULbUuGKDIulY70u959O3igTag/9/49aMyaxBIif+qba
-         imhco+wgb14x+OxHaTAPTgyJ28EkWP4iIma/h7goslStR4dYgp35ouakudD3mMEJNMCC
-         fYnLszI/xtOZ2sk6s97W0dY3qNq0YpH+jC3kPUY7qgVJblkzfs00/s0NAmoKvRnHIz6o
-         2w3gmPxPTWPQNOZy7y5EAabARIGBQMtbMTYlfl4FMTeRwFA9bymDK32IF2kmEzQ4Lst5
-         iLvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780691596; x=1781296396;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1VK45th8eTQwQy3vkaHUsa7lZgXj9scEEjJUkEn9zmg=;
-        b=W8ybiidJ94N4YvPGBQBA7OVY9HBZ9rGieCP7xy3u3QZmNz0m7OBQg9OHwU1zC4yohv
-         q4oPeD5B0MtWlp4fT6bqOielecNJ2b//vIHlLvkY8DZEvRl7wfgJI3jwxgtkZzSXwF6F
-         kZ5jMdBF+0vdl52yzbzRYjnXYnUCeXyqXYu/29hjmKGKWk0IbwmryfWH8bk048LXmVOH
-         X0+ylHgh9btIRYkaQZFr9BYYjr5kDB0CENUaPmY0WNwllhWA/A4kfxR5gQGcm+pL7hF6
-         fiQjOQ98lK0FAz2h0E6F+QRssjmWTUvAMx3C5bVCnqqXtDh5kzmUKONEgZylbQZ9qHNZ
-         2N5w==
-X-Gm-Message-State: AOJu0YzsKyXpcEjFWCgIPKXDSG9Tyfr7tukGQ2GfIGTXKBNOVwW40Vjh
-	Kp5MHa4VVrZlUZEoZv3v6wJu1QsHvJr2cP5J+hv3kfLLe6BqCKw8yMQrSX9PxQ==
-X-Gm-Gg: Acq92OFCef4WVQuOlQrw1cz+1QMEcpIVsOAhbVqDzqvH+A4i6HFPljyMTDBkJaYZ0rC
-	knKIm7L3FTn2KzH6DjIio0p/y1/2blw79GeurrBNQ2jWFOJLieLomQ6paROC6OiTgpsAQCD8osn
-	M7pfLlP0gYOf/d3rFDyZVeP2/y/W4lYcg3i1ivnWetUttWmXxINEnMsMzhJ31xc/pj0MVsd9w3F
-	za3zUIDybi3uRpTxLmZFL73gtwAVwiWu4iP0nHFop8yRNndIVRv2Avg6/b271ec1cdDoYwA4D9/
-	FteMa1D266K2M+/m3FTQjOxXN2zs7rn/NbhNOy0VKiEaNTYz5V3RiJjxhT+vmsY3K1laF6l7BTL
-	6i+LC+ho0WUGDO7biDYTFYdgBFmDTNshL7GLTC6e1mL3zhrqdJD71bj8Eqpkh/F8KkdKPupMovQ
-	VWHhDE2Cmj+61hbtL7h0KkdjpJ0L8ePcNsNYiXgJk=
-X-Received: by 2002:a05:620a:6cc7:b0:915:8d82:b149 with SMTP id af79cd13be357-915a9ccb099mr955046185a.27.1780691595643;
-        Fri, 05 Jun 2026 13:33:15 -0700 (PDT)
-Received: from [172.17.0.2] ([51.8.121.165])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-9158a37cae4sm988560385a.29.2026.06.05.13.33.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jun 2026 13:33:15 -0700 (PDT)
-Message-ID: <6a23328b.42730a79.2a321b.379b@mx.google.com>
-Date: Fri, 05 Jun 2026 13:33:15 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0280291637988939360=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I9RJemCS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780705030; x=1812241030;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=q5y43Zu/SkNREXt+ZPWx/AARwYfDd/w4NtbhBczKEkI=;
+  b=I9RJemCS4NEgoA2pzqrs0jjSgx7hMJuGbhkZ+AUaDOfJbEkQ42z+rWDR
+   HY26ClB7xdsK4hgSeg/sqZDMJbAvpJzaBSYfuerxjHoZKXONGDWXkvQoC
+   /TPewzUueYlygYpl0VNkEeGfp6FIXlpoqE0IsRQCaUTKtF9jKl4xQHt9r
+   sdY3Kyp6lPXyZMW2jgSuemYbPStAVSwLjsvdOiJ9olmQt1fkA6jbxxwSu
+   iiB5vX9RbNoXQrtvJFhY+7xA41ZaoQsvsKVR4oGaghzckZ55267UoTp2C
+   tdhG1oeGrzR5OohqvBrhZl972LRUkF30NIA0+gE5Na0tie/WrhhQPCw4n
+   Q==;
+X-CSE-ConnectionGUID: OsKW72WlSlW6vOTK2EBw1Q==
+X-CSE-MsgGUID: 3Pwgy/LXR+qjiCckNmiGnA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11808"; a="81288988"
+X-IronPort-AV: E=Sophos;i="6.24,189,1774335600"; 
+   d="scan'208";a="81288988"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2026 17:17:10 -0700
+X-CSE-ConnectionGUID: +DQrjPX3RMOfdtQZ+Q/aKA==
+X-CSE-MsgGUID: vHC9BsgpQzOjlPBpTZJTQw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,189,1774335600"; 
+   d="scan'208";a="238623960"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmviesa009.fm.intel.com with ESMTP; 05 Jun 2026 17:17:05 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1] Bluetooth: btintel_pcie: Add 50 ms delay before MAC init on BlazarIW
+Date: Sat,  6 Jun 2026 06:06:37 +0530
+Message-ID: <20260606003637.94628-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, elver@google.com
-Subject: RE: [v2] Bluetooth: L2CAP: Fix UAF in channel timeout by holding conn ref
-In-Reply-To: <20260605142351.2306664-1-elver@google.com>
-References: <20260605142351.2306664-1-elver@google.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============0280291637988939360==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On BlazarIW, fast restart cycles fail because the D0 entry to MAC
+init does not complete in time. As a result, MAC initialization
+does not proceed and the controller fails to transition past the
+ROM boot stage.
 
-This is automated email and please do not reply to this email!
+Add a 50 ms delay (worst case as per HW analysis) before doing MAC
+init in btintel_pcie_enable_bt() so the shared hardware reset flow
+has time to complete. The delay is gated on the BlazarIW PCI device
+id 0x4D76 so other Intel BT PCIe controllers are unaffected.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1106678
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.98 seconds
-VerifyFixes                   PASS      0.14 seconds
-VerifySignedoff               PASS      0.14 seconds
-GitLint                       FAIL      0.35 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      25.50 seconds
-CheckAllWarning               PASS      28.24 seconds
-CheckSparse                   PASS      26.60 seconds
-BuildKernel32                 PASS      24.91 seconds
-TestRunnerSetup               PASS      524.91 seconds
-TestRunner_l2cap-tester       PASS      58.70 seconds
-IncrementalBuild              PASS      23.81 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v2] Bluetooth: L2CAP: Fix UAF in channel timeout by holding conn ref
-WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
-#98: 
-| BUG: KASAN: slab-use-after-free in instrument_atomic_read_write include/linux/instrumented.h:112 [inline]
-
-ERROR: Unrecognized email address: 'https://sashiko.dev/#/patchset/20260521021249.3258069-1-oss%40fourdim.xyz'
-#218: 
-Reported-by: https://sashiko.dev/#/patchset/20260521021249.3258069-1-oss%40fourdim.xyz
-
-WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
-#218: 
-Reported-by: https://sashiko.dev/#/patchset/20260521021249.3258069-1-oss%40fourdim.xyz
-Signed-off-by: Marco Elver <elver@google.com>
-
-total: 1 errors, 2 warnings, 0 checks, 60 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14613573.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2] Bluetooth: L2CAP: Fix UAF in channel timeout by holding conn ref
-
-8: B1 Line exceeds max length (107>80): "| BUG: KASAN: slab-use-after-free in instrument_atomic_read_write include/linux/instrumented.h:112 [inline]"
-9: B1 Line exceeds max length (125>80): "| BUG: KASAN: slab-use-after-free in atomic_long_try_cmpxchg_acquire include/linux/atomic/atomic-instrumented.h:4456 [inline]"
-10: B1 Line exceeds max length (93>80): "| BUG: KASAN: slab-use-after-free in __mutex_trylock_fast kernel/locking/mutex.c:161 [inline]"
-11: B1 Line exceeds max length (84>80): "| BUG: KASAN: slab-use-after-free in mutex_lock+0x4f/0xa0 kernel/locking/mutex.c:318"
-14: B1 Line exceeds max length (100>80): "| CPU: 2 UID: 0 PID: 83 Comm: kworker/2:1 Not tainted 7.1.0-rc6-next-20260601-dirty #6 PREEMPT(full)"
-15: B1 Line exceeds max length (95>80): "| Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014"
-20: B1 Line exceeds max length (91>80): "|  atomic_long_try_cmpxchg_acquire include/linux/atomic/atomic-instrumented.h:4456 [inline]"
-
-
-https://github.com/bluez/bluetooth-next/pull/289
-
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btintel_pcie.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 2baef130d101..b09878d71025 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -799,6 +799,11 @@ static void btintel_pcie_dump_traces(struct hci_dev *hdev)
+ 		bt_dev_err(hdev, "Failed to dump traces: (%d)", ret);
+ }
+ 
++static bool btintel_pcie_is_blazariw(struct pci_dev *pdev)
++{
++	return pdev->device == 0x4D76;
++}
++
+ /* This function enables BT function by setting BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT bit in
+  * BTINTEL_PCIE_CSR_FUNC_CTRL_REG register and wait for MSI-X with
+  * BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0.
+@@ -818,6 +823,14 @@ static int btintel_pcie_enable_bt(struct btintel_pcie_data *data)
+ 	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_CI_ADDR_MSB_REG,
+ 			      (u64)data->ci_p_addr >> 32);
+ 
++	/* On BlazarIW, the D0 entry to MAC init does not complete in
++	 * time. Wait 50 ms (worst case as per HW analysis) for the
++	 * shared hardware reset flow to complete before proceeding with
++	 * MAC init.
++	 */
++	if (btintel_pcie_is_blazariw(data->pdev))
++		msleep(50);
++
+ 	/* Reset the cached value of boot stage. it is updated by the MSI-X
+ 	 * gp0 interrupt handler.
+ 	 */
+-- 
+2.54.0
 
---===============0280291637988939360==--
