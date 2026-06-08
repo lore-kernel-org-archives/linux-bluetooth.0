@@ -1,117 +1,113 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C63343AA51F
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 22:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 999E0286419
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 23:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780956958; cv=none; b=dt0oQTiy2xTTwVFHVdtfhxpTOu3YLQg8Y6CUsl0qdeIIcKEVhezi9pIfQucuDhEF0+hP2kucEWHuv2anTIN1s0jNMpP16tJru2eeUgX3G7SJYL3WA9TNJovSgbV2MEcvlBZjtaUwTK+PqYDjqH4Xc4EuZ0xL4hOsVXi0akuZQRk=
+	t=1780963024; cv=none; b=mKW8MwFfwdiBevbVVFODWfb5cIj5xxz46Exr6rQs+vB6UTfHtIiL2Egsg3N/ORkrvuigJ6708L6YWwD/r8ujEAsorT9YEbORgaO+vXir7Fn104OdmzBQgYU+RP3EEoom4HAPzKUjfxnzmnI3C70tpjl8+emBuujc2sxyuKFAjug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780956958; c=relaxed/simple;
-	bh=PrFMZldHCPg+FAVMfy2MGixAyx8j63RWqtF8ANo7RvU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=f+qSihm6pZAUNYDxWYmFX24Me5SyeunyhcKnOih7lTt2HB13h3/JMmVY+aLGEBeS1LXVX27EFKYll0a7JnUvhRJPiHwQ0JSiCPRtz8eZqYhJjZdFo+8m4QUyrev/bN3OM2IMCxMuQH09ExsM0VFOaSQe2zbizPUvswpr8agMilI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=tJKIp3La; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1780963024; c=relaxed/simple;
+	bh=1e60y1YvUvuORJYbuhr7jqlxOPjvKFhYPwJp2niIn6M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jpdtuUEEOtN6Qx7sfbsgA7LeYSOlkbYHJ74Vj1BAAHEwDFqjt5tGBrYySr67j5CWoPgAmwJbj7tg50wMPss5mcDhFPMsA4Axls7qrXBhgAjanylctIOoCsnhFraVPdzPdHFGt71p5CP6He2J9hsLPEypuxHPy4pS2my5W8orkm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=E7NYRlAq; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trailofbits.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tJKIp3La"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-9156ceb55ffso422341285a.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 15:15:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b="E7NYRlAq"
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-8cceaacd07bso54353336d6.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 16:57:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780956957; x=1781561757; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=LJCNAHOtPr+4Uy6wB7VVfUC361Sfu1fSrvNlkQrTE74=;
-        b=tJKIp3Lazi0QeMnGuUs2tcXuv/qki6UwH5nX+Vhnlim4VUFwwa1nObwvcFKLmuTSBL
-         1PxcgCnQIOisjHUMKhDBLiFrAUeM4X7k+h/YlsdAQ1qlhykKFfW2II08/v32ymXqw8jE
-         6DLVcaoWx2TFNNIRv0heIa8DSXfc9OO3KY/GVVUHe/OTYBocyiRpPwedNtpeEO7v0ChE
-         sLaXFWjwYQRLj5WGl0Ggauh54mHiAnq4pLpN/FQRX39lnEZnPtH/ACJcz1uphLM798nw
-         yYKsDrp0uk11ER3JSEMUrbNj7TJCy7ptv0OPh59/1FjYfWd7Xxea4cc0ZdnvMztdGUMR
-         cgLg==
+        d=trailofbits.com; s=google; t=1780963022; x=1781567822; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2csAZjIYmZB0vxCmR03xoe0HVBnxRLdQ9Io0BwGsIVc=;
+        b=E7NYRlAq9LVFpMWf6lpX6WRYMCJu2eRmy/Fz/2xqE4J5XPMOUVD5Gzy3mkBZ5WzjdG
+         07ojuQnQscwgH0dycURxRPaOUxOR1v6NYO1QBtMK9I6Oi9AfpttMrmsIS30eOmWP3C+/
+         toS5kvBrFkd9C4DGxEeH54JPwcktsTFT30Rj6r2AiIrjLc9XnDb5yd3oFkFuLuPajIrp
+         fvVBiq++168dqgnKRNljCOyj3LGrGgNeayZA21XxoMqlt/bvll6CIp0SU5LIHP22VVnG
+         k6wExDqXALHt4TwoTFF2bsspUS/dAncz34t0mG2/yYkuei1ywqmdm4YcsVgeuTvqHyv/
+         lrnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780956957; x=1781561757;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1780963022; x=1781567822;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LJCNAHOtPr+4Uy6wB7VVfUC361Sfu1fSrvNlkQrTE74=;
-        b=YjvPzMWlWZwVfcJxI+FljPPYqSmfiSsLEL8pTz9+PMbAjcQ8ffmRlICK5dKmb86CCj
-         2AtbdmAmHL0XE0wb2Dv9jvOzM+cYEHqkYvOkUdIsFtB1LDEa/D9tty57TqyQ+bZACOC6
-         UgpEZIZioK2u+rG6X0Ux/t9BhC7g/Nwa6Tk7KfD4gIkobbZaDcGk4KTh+Twgh3fJSg2k
-         CcTWMNKVQYT39u/Ii8gmAXRFyzqGPT46SLnSOD+UaqiS18ther4OKA60ojI1skRcynD4
-         wWauisICqLET+ToBmadL7bNowbLSqTIaZ0FXOoJk0uhyDhQK7y6HwLgqHZ+qKSZcloC+
-         fNkQ==
-X-Gm-Message-State: AOJu0Yw2sKdonJFzbYqwRs3Q5eqcHsduPTBjtP4JSMke3eEk5ACYZEsK
-	PenPvt5Oov31YkicgednuI639CsT1Bkq+X569ZfBNLJdBJUAjXZSPzVjrWTLRQ==
-X-Gm-Gg: Acq92OHTlz1fjn7qmY+ye31nNNupJxdM9DBNT+et5yyO6ob44jy4E9fOCPd0TfOdNdM
-	vsFqdMsaq0q1pvc8mgr3vwuMvJFI/LouGSc6EgIj7hLkB5/f0ya1ZINNV55e+op6NKfxCYCnfNA
-	cX4/jguKz13mykJu0TRBqje7BK4pGCr0itpad6huND+L8ARys/MeB0Oj+KiKDPYj7AP8qDLYJyF
-	mlfwcg4Y5k+BqOOd/sX8kG81Eaf5tW31p1SDpd+PmDHLBzV/cZJFGYy8KQmWzSNWAa8lgcIFNFY
-	szLG8dd+NDYICrJ3XybbpM2uvsh6coMd4omLgRdf0W/eBimeZWMD6GOLrUvZHH+10O7S5zH4mkg
-	dJQEkH/VADcVAuImDcmK9HSmsOEst+9xGkXdP8TVD6nCeAMDBYDBt1Sjmxmt+MC/sj1lce/gY8a
-	tmh1B7DZuYDDAtWui3BfXz7En5DvPlDKwnE9qyOzk=
-X-Received: by 2002:a05:620a:bcb:b0:915:9a18:bc1f with SMTP id af79cd13be357-915a9db8013mr2724357885a.41.1780956956589;
-        Mon, 08 Jun 2026 15:15:56 -0700 (PDT)
-Received: from [172.17.0.2] ([48.214.55.32])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-9158a3e35dbsm1886976785a.42.2026.06.08.15.15.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 15:15:55 -0700 (PDT)
-Message-ID: <6a273f1b.d5c1a6d7.14e272.4328@mx.google.com>
-Date: Mon, 08 Jun 2026 15:15:55 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4632538683045676389=="
+        bh=2csAZjIYmZB0vxCmR03xoe0HVBnxRLdQ9Io0BwGsIVc=;
+        b=AQ/895n7gEXWtN8z9lVjlMmSg9PLK9uXqTrhtlFwibKOi/zD6SmFhKQ3ZNYX1j28Jl
+         FEyGziq6ZnoaPAzCgF/0x0uoIMSgNpWRtRQWiGHQ/DIM2S/nX6vurclhwPOtTgemQoqX
+         LcgX+eW+NBqaT3b0rnP8Yq31YlN3IAHlNH6CXLYc+Q+Yhd0aLbWG9XwESBafQaLMIt+a
+         NHEl9uB7id7bQsRXF01GXyfF0HMNjDQvqj0oxzrEKLYH7PhS346w27un4S/HlF6ku3bu
+         jpKM9+lQVxGLknnfzvDFqsxCP4/Y3j4A/Q4e0d2q8HOh47Z2CDALw4eG35ONo9/m5hjJ
+         +ywQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/xknlortc0ttati3A9CLagZwGc9pxQN1yUtPkyOCK/Ra66ZnFdUN1GjA34ug7lB/ynoOVtxACVa4WBhi5fTlU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcqdRu4l7jYRH56sk72IgNDZHRNgg6Y2AMYy7fzxkRhMlyz/16
+	eJLjT1JIGBooYS4horDp7LN9Se3y1kbsnChXUSz4uBeXNFOn213aoV958zQX5l7KkZY=
+X-Gm-Gg: Acq92OGTF96Sgnw6dRJz8mMhmalfSJQN0CYpd+lKpFiiV3a7Mz7SMT+G/aGRA+CgPbj
+	A82bb/JEBTc7MJ8Szwq6KISm2duXHhk+FzZUDedXUbaOrOPGUDX8U2VCuO2/tbJaC7F8z8NJo95
+	59Wxt+VVATGDTJRpFb/nS4h0yxuOaSgEjgdWCG/rLnTH7LwBCxbnRbtNvqe9+SHhsH/bSb59DiI
+	Mti3E/EWHPuBDkYIurs1OPU6i0CYw3/W0KH7D5lFQcyCNoz0RjZsr5k3LAGjzFuZ3XC1m0kZilh
+	yubBmRFFjNgx9iD442M00NtDXzFCy4xtDmJQNQmXV3xOlN1wjtSPHhk43ayXAx5L+Zq/dd6kV9t
+	rY0tIUQqVmptLVovZh7WZIJV/lTT5Me513K2IHUOoVHDoyqYRnajInmdDqAX78XPEB4V2XNIZTU
+	7Va3kTpBXMyw1zniScez6nBmd8UGE+loEtKYm+AA==
+X-Received: by 2002:a05:622a:4cf:b0:50d:82db:773e with SMTP id d75a77b69052e-51795b60f16mr261294271cf.47.1780963022607;
+        Mon, 08 Jun 2026 16:57:02 -0700 (PDT)
+Received: from localhost ([161.35.96.86])
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-8cecd275dd2sm178779946d6.47.2026.06.08.16.57.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jun 2026 16:57:01 -0700 (PDT)
+From: Samuel Moelius <sam.moelius@trailofbits.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Samuel Moelius <sam.moelius@trailofbits.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org (open list:BLUETOOTH SUBSYSTEM),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] Bluetooth: hci: validate codec capability element length
+Date: Mon,  8 Jun 2026 23:56:28 +0000
+Message-ID: <20260608235627.1233330.bc5338ecae62.bluetooth-hci-codec-cap-short-oob@trailofbits.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1,1/2] shared/hci: Avoid redundant BPF filter updates on duplicate events
-In-Reply-To: <20260608205009.97585-1-luiz.dentz@gmail.com>
-References: <20260608205009.97585-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4632538683045676389==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Read Local Codec Capabilities returns a sequence of capability elements.
+Each element starts with a one-byte length followed by that many payload
+bytes.
 
-This is automated email and please do not reply to this email!
+hci_read_codec_capabilities() checks that the skb contains the length
+byte, but then validates only caps->len against the remaining skb
+length.  A malformed controller response with one remaining byte and
+caps->len set to one passes that check even though the element needs two
+bytes.  The parser then records a two-byte capability and copies one
+byte beyond the advertised response payload into the codec list.
 
-Dear submitter,
+Validate the full element size, including the length byte, before adding
+it to the accumulated capability length.  This preserves all well-formed
+capability elements and drops only truncated controller responses.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1108111
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.99 seconds
-GitLint                       FAIL      0.67 seconds
-BuildEll                      PASS      20.62 seconds
-BluezMake                     PASS      632.10 seconds
-CheckSmatch                   PASS      331.99 seconds
-bluezmakeextell               PASS      166.70 seconds
-IncrementalBuild              PASS      640.51 seconds
-ScanBuild                     PASS      948.65 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v1,1/2] shared/hci: Avoid redundant BPF filter updates on duplicate events
-
-1: T1 Title exceeds max length (81>80): "[BlueZ,v1,1/2] shared/hci: Avoid redundant BPF filter updates on duplicate events"
-
-
-https://github.com/bluez/bluez/pull/2197
-
+Assisted-by: Codex:gpt-5.5-cyber-preview
+Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_codec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/hci_codec.c b/net/bluetooth/hci_codec.c
+index 3cc135bb1d30..5bc5003c387c 100644
+--- a/net/bluetooth/hci_codec.c
++++ b/net/bluetooth/hci_codec.c
+@@ -100,7 +100,7 @@ static void hci_read_codec_capabilities(struct hci_dev *hdev, __u8 transport,
+ 				caps = (void *)skb->data;
+ 				if (skb->len < sizeof(*caps))
+ 					goto error;
+-				if (skb->len < caps->len)
++				if (skb->len < sizeof(caps->len) + caps->len)
+ 					goto error;
+ 				len += sizeof(caps->len) + caps->len;
+ 				skb_pull(skb,  sizeof(caps->len) + caps->len);
+-- 
+2.43.0
 
---===============4632538683045676389==--
