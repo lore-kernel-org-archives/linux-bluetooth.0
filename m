@@ -1,93 +1,93 @@
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F047912CDA5
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 14:23:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58AE1DED49
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 14:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780928637; cv=pass; b=JFZVxCxDDF6x+ChA3BUPdGlo1Vz1eOuC/wcjPpvzwuL4pUsNvNN/WU2Bc0uPg8w9cya4/FFHKfMSJZQukBmE52b2nCfEiBLxQHBovAjrXQ83Zb/0xsWJ8+gfoJaLj8kfu9+35vurNuPths1BqKyNoSz4jeKEstKJ0fQ+vai0CxY=
+	t=1780928825; cv=pass; b=gpjXEwiy7luirJb4LC6JsqgTe4G8z81UJ/XYQ7jChb15fXACsVZ6PxVpUDs0hSLDnLUmvAMwbVKBNAAJGSyC4vc+w9ONg4XJ0Mg1fomJCTXEeZJm1a7XBXtzvCKZdYqkRamFIUMFpP1TTbWNeIsK2kUASdWo/uIh0cFYVfI4JzU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780928637; c=relaxed/simple;
-	bh=QxueBsHXFQjSHyV/U7EvSE8NOt8T4849CGMBoHBQm1k=;
+	s=arc-20240116; t=1780928825; c=relaxed/simple;
+	bh=gv7PZz+kJFYWo62N6Bl/Dtq8oJlTmODv8TJH7Xq3Ox4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O861bCqsL89yMaqv0UP3Fr4+L+TsII8SQZ/RnOHyXidqlg1XrHkn9KXkqeQZzrEq61xZjyJo1CzqamgHdw1YycJa6P1lC7lC9+kpxazKxVbjIAx9tuda9HXPdjsGC6DK2d57IEzCfqDnMF8OL47h2ew2y4/BmGKwmXfdWYyrJyk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nOW3XlBZ; arc=pass smtp.client-ip=74.125.224.48
+	 To:Cc:Content-Type; b=HYtQ3vw9DIgcJ7WYlfhNGshmdKBZWzB160/KCuzaqe6Nya4hZoerXa129sjXKZGY31Z85lniTCIqLFoK+vy5y0Ae0/36I4/EoKytqin9Msl/ISI4zO7zeqFMjNAYvL6V2f2Ip7QnrmseC3xMQfF0YqSAtWAmd3iNogCt+DZ7zOk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hmLAlHQS; arc=pass smtp.client-ip=74.125.224.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nOW3XlBZ"
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-66062a414fcso4728336d50.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 07:23:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780928635; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hmLAlHQS"
+Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-6604176b575so3864311d50.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 07:27:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780928823; cv=none;
         d=google.com; s=arc-20240605;
-        b=Yl19/qnCDm8es2CMf5iB3MgFYEy4vxOnjSQ6+2vM/L2Q1FTc0Kgckf7pSbwDptvko9
-         kbIEjoly0d/fjMSupLffjwWTXySuwxfBK8QmlLPdq8TcGne/nDa73iMeQ8Osxzvff3Uj
-         AtThkxaJw1zTcTkyDNyBFeQNQrfXYOl0hTXAFbh6shculHP1WA5FZEw0awipTqHgOiQI
-         3R++QX4IUBNNFptWhIPMwrnymw6Qb31UvgOzW3tF64Ftv58KnTbxxI7q20UxszVH5oIb
-         2gNvE4mqvwXk6nptmQWmzgN9Bhwm0p5lWLQMJbA4nFmVslL8JNxTbhU2y/NgJXelPc74
-         RaaQ==
+        b=H7K0/Q3YbhE9y07TWGYaRXD+0MjbxOkBY6hR1V/259fuxT0DHpHWDUieBcNHeTZJEx
+         SxnrVxfLKWSGvfY5xDWO8jdnmybEnrAzWeTAGMN9v8+kSLIDpfKozzJiX+KRgDDxiFej
+         /kkpo/+zKLd70L9uAOihJpP5HoZXArhAG8vRKcECIhqrYb/KX8uN3DZsgs0IpQiTVbBX
+         em9Yg93cGSZA8Jljc+scxMibNpJ+TAV2xOPR5QW6LePX4PmUEFmPhom9bgJgRuZIf2KL
+         q+SBnQ/FOLqhDH8sQpGbrvX2dtA4HmN/6RfTfwU5XInvBCECaOvePI85dH+GR5MKsxbq
+         I+PA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=EuwY8fP5zJs9qJWGIvB6LhZiAxbucgrNdSd9F9j+jIQ=;
+        bh=K/AqGcMLTD+BJdmdVfsyo+NJlI4L7XUdCShrVn0/zHw=;
         fh=tyq0gYhA4cMcqn+bWakZSAdnDDyh/si+tlAcgOGyoy0=;
-        b=YQjoysTnGqeO3EnJKb5KC/guZ9WWFrvHb9IURG7hq/JKZPQJsiDRSouUkBwlVQLMQ9
-         Pq/4Phzqj/m/Xrf9PVWo4n73t7lZC3TQNalNFldC3EQoGUabtMHSGBH3hRr59h8gWzt2
-         W/PfiV0Qjl3Vta7y9YeLdBNHBJ5o3xFcNBO38ZFymwb4YFLYwqp+ktHCGKCnFDzFcdJy
-         9kZ15TtCJ6ReAUloMIpDDZxdfW1drhZqmDqVYsG0lDYn+6NgY9WwXKQDtO6f6RMZnRyz
-         Mmn1zk9i0TKKJeFLPzNjluRC/5vLkqGA0PSfSVMCuvwRPNgaQx3MOQQsjNC3W3Lz+3A0
-         iCdg==;
+        b=k30UA6327ChJexG6v8qQvnAxkxsllqLJsobt3g3aYTO/UMbmKDMMJP5FKYmnOcQ71l
+         DDVYG9adofDqZrJHWmmLQqy1kSmV2S7bOKduG4L289EI3at/tyu8NOf0VrzKcEGhFhAW
+         Xe55Y7Pwpb6btBESkwN9q//jqaqITOGp/OWZH7rXg+rfSFA76wzpYKd9XxyheF/QfOwN
+         7fujGKJpW5q2GOY0T0RM7vIg09ksoc/rmjAP6i7y2Dd8EeXhcyRhgKXKP/nI1IvPsFx6
+         2A7Pi3WQixkyzLDWAP7dZwKD+vSSVxpHFZBADQ1kJMonY4BTcXsEUvw48LGftbFCeKOP
+         xT0A==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780928635; x=1781533435; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780928823; x=1781533623; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EuwY8fP5zJs9qJWGIvB6LhZiAxbucgrNdSd9F9j+jIQ=;
-        b=nOW3XlBZqgRkx+yjBDzH3db6caYEkRkeLK0cZDiRG8Ug2hbkfxKChZhMhcI09pPUD6
-         L/pHOBiTmvpviy6MZnzrYVwcau58SX8UBo2cELlQvNvfd1K4EeY4ZXHfhWpmDoHa6c/B
-         VGeiWsZr+VzQYs1Ms5819+phi3ztabt03PbtgACtJbU/i3zFhWSWmGXY28yzPmrSTEKl
-         X+Mtz85Tp10TD6LQVppU2l/924Wd5XXSbDXZDfVrr9jEcAujVfjxtcObfO+wzQ8oR3kg
-         7jgJIh8V9ufFSGJ+RT1JztOgtFRzEPNVp54C4Ii7zn6SMGfaQtuIhooCpx0YJCCjnBAU
-         WwgQ==
+        bh=K/AqGcMLTD+BJdmdVfsyo+NJlI4L7XUdCShrVn0/zHw=;
+        b=hmLAlHQSWEzV/QnhKps4Hq02LpeleYMx+GzMJWbHr+xMgLITkpSefPKxZgL6ravpo/
+         cixnUaAy3aOpoemZWPQrLPb8agM/y3LzyC17yeXlPSiyxi6m4uQFmzGE6RHeXN6VpY7D
+         qsUJO4uT/tujvqmiDvdD1SF6tdtiYi5uGTU70B3e0ZqOlFbVBRkP8up1F2AH+Aw/gTi0
+         vEoQdOcPuvd62K3HYk1gzbEIHGw9mbVtsS7p9SyNy1yG0MbTtGn9vVK91OHMBx61ioZT
+         38zicyrCDCfkneZUMYKDrfgztF71I4FNB+sBItlOqqhCbdQY4XjivR5mis7YmqqAGWD3
+         TXPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780928635; x=1781533435;
+        d=1e100.net; s=20251104; t=1780928823; x=1781533623;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=EuwY8fP5zJs9qJWGIvB6LhZiAxbucgrNdSd9F9j+jIQ=;
-        b=QQyoS/ScP+8xQK/gVysd034gy3qpqujJSL+LvFe7clERIf6Ug6GuYyXkYh06MGIFkJ
-         P2iFE/R7ks6QSIV22KhntgADz37CfhZcSZYNTAX4exoEXHkC/aKCzGiSwvkMopI5oPLm
-         AOBTK6pSBgrTvzdCiRKXCZskFA5HiPs+/r6+t2Ao507EPMDYDuqCPbkBaG4Z0GOmkBni
-         +CcWZohpko7cPDbprIYcTszbvW2pdS9unMpUal4YB6gO6Z3NWCRoVizMue/J3tsKiG/+
-         7K5J7J1gvXzWS1YUgCYWTWPNWQiNeTq4Z0IsPNd9c6XjxGbCVyWnJOozd9KAm7M6S6mV
-         4/vw==
-X-Gm-Message-State: AOJu0YxhjX87QNS8Su2UalQUkb8NggXMewVpm54VbOryTbXj3nS/f4b3
-	ibrlDdRnguwdrCAsUnhNwuzvm//h5dMZJC+mkZg8nPaQFM9mLoWVBrkk05gScPlXj80X0a09l7v
-	B0tZqp9RnXAzpFr0sFYwQr7lUssgxKXM=
-X-Gm-Gg: Acq92OFpfruGSUOS8fbsEG0GGVIyYTPe7/Btg1HXiarYK8eeDLaOn7Tt7vSahrQPex8
-	JudgP7wMlUGaeYE5iirOG1uC05j1AtWxdensotHqInR9hwgoBzbIDI35mioUwGKB0WaEoH5zWqJ
-	+x3/IheYHqnhiFdK/ok4aLnGOV0R/LQgTXeIplxj1DEXDG9O9N8xdD8T9ZlZy/5YMVJ6wwtM+IO
-	9QITKfVRiW84LTLz37duOQyhdxaj8vmfNxDIFvkuTmqOrnwpwToKcc0aITY8C7Y3hQEK8gw5iQh
-	vYYVBY0g7ReKJVnuD1QX41veabUyEkelJEB/lXXU5NBIuQmxoIAwHwAWS88HYAjCdLeSA6/YZho
-	jPeXi
-X-Received: by 2002:a05:690e:43c1:b0:660:8ae8:b98e with SMTP id
- 956f58d0204a3-66106f43cfdmr9426340d50.35.1780928634870; Mon, 08 Jun 2026
- 07:23:54 -0700 (PDT)
+        bh=K/AqGcMLTD+BJdmdVfsyo+NJlI4L7XUdCShrVn0/zHw=;
+        b=WDcmhjq1dQQKcXCr/IKfBHN0KYMVYrzKp8RP/lFgIg3jh13xMsLJEpGhWa3hF3RviK
+         CyT5zgH9xFf+z41Xk1mx8rUORgSilNaPYIm9PzhAvssKl8FNAezuKkJKqzqhPfegym/0
+         iZ4ScnTeKobsnJZPtr+MqUJGtT3BSSMALHXV73T7+tpXsz+0jqXAhouGOcEdo4pZv+7J
+         lTf/KTIEb6dYLv1UXEVCKuxftgo2dT8PjxK1XHK0cPilBY0kUWcMhI/X5i0XQtbxmLyJ
+         kAS9gc2IIrlAWLBYhFKFhPAA9OvfteubQ46Rvb42s5qvKHKHm/pzrcq+B8SEQ2U10XWO
+         Pokg==
+X-Gm-Message-State: AOJu0YwbmjXljqzQkZ2bxPMWrWev2/pi4IlLM4s4RYfR1tuErijXpj3P
+	jJ0n3DwKNJkEJMv7TAFuj3YhxbOiQM5E9RWGzPlpBdKFozN7iKF8l8L2eiUEBlo34kVPN+y/00Y
+	wEcIjkY9Q+MtiW9TvXIveFWfeLMxg8FA=
+X-Gm-Gg: Acq92OEiQtI0CKjMakTdtfNryKeiBinBFrQaezvir4WfBD7vzXXuZxYxSaqeGNSykYR
+	s6Swect8IWCf9oP/KTxQ/emO92OI1uN9gID3a7y5q89IpcUe/wHPh63Wjz3J7LBIJTg6sxbE3+6
+	esPjbjm9uJljsSxfMGo2WVwkWMKwW7sgU7GWH/+1HtV3TiHWZ2T7aTIvfCQcUK1nbGU5w765rdU
+	5j13fAMVyQuWx5X0r01NFFTW98GCWMextW1Ik06BCNKjj5q6OKjK+9hHICHVjeGyHJ1WzX1Pl1b
+	r7QokqP8xANIASOKGZ0TvJ0kdT8RrgprK3XVsRYhmUrQ2WmFRm0Rka6QZynAcQGwfyDagLwLMv4
+	smpDs
+X-Received: by 2002:a53:d908:0:b0:660:9420:56c0 with SMTP id
+ 956f58d0204a3-66106f58309mr10003245d50.32.1780928822840; Mon, 08 Jun 2026
+ 07:27:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260608091140.3606008-1-simon.mikuda@streamunlimited.com>
-In-Reply-To: <20260608091140.3606008-1-simon.mikuda@streamunlimited.com>
+References: <20260608112923.3722754-1-simon.mikuda@streamunlimited.com> <20260608112923.3722754-2-simon.mikuda@streamunlimited.com>
+In-Reply-To: <20260608112923.3722754-2-simon.mikuda@streamunlimited.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 8 Jun 2026 10:23:42 -0400
-X-Gm-Features: AVVi8CctMTG4j3w4hWU75M0Xp0wP86Lh71XIpVYU8UiggTt5GH_fszRR9fv73ro
-Message-ID: <CABBYNZLRz2iqR-eQNjXsJnyeZ8aONnjgaQDO6bRWVqfVy8SbbQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] hog: Fix starting encryption on some BLE remotes
+Date: Mon, 8 Jun 2026 10:26:50 -0400
+X-Gm-Features: AVVi8Cco5nCgjGem_4maJx2NMydeZ0hmjD984xVJoysyvzdD7NcGxf1t8MQnQXw
+Message-ID: <CABBYNZKzQXiW1oB7JZQeMdxyk=8qmnUBKCk-CTLYY=D4evb+kw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] avdtp: Fix error handling for AVDTP_OPEN cmd
 To: Simon Mikuda <simon.mikuda@streamunlimited.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -95,55 +95,54 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi Simon,
 
-On Mon, Jun 8, 2026 at 5:20=E2=80=AFAM Simon Mikuda
+On Mon, Jun 8, 2026 at 7:42=E2=80=AFAM Simon Mikuda
 <simon.mikuda@streamunlimited.com> wrote:
 >
-> When BLE remote doesn't reply with Insufficient Authentication Error
-> encryption is not started.
+> We have to return BAD_STATE when local SEP is available instead of
+> BAD_ACP_SEID.
 >
-> Good remote:
-> < ACL Data TX: Handle 64 flags 0x00 dlen 7
->       ATT: Read Request (0x0a) len 2
->         Handle: 0x0021 Type: HID Information (0x2a4a)
-> > ACL Data RX: Handle 64 flags 0x02 dlen 9
->       ATT: Error Response (0x01) len 4
->         Read Request (0x0a)
->         Handle: 0x0000
->         Error: Insufficient Authentication (0x05)
-> < HCI Command: LE Start Encryption (0x08|0x0019) plen 28
->         Handle: 64 Address: xx:xx:xx:xx:xx:xx (OUI xx-xx-xx)
->         Random number: ...
->         Encrypted diversifier: ...
->         Long term key: ...
->
-> Bad remote:
-> < ACL Data TX: Handle 64 flags 0x00 dlen 7
->       ATT: Read Request (0x0a) len 2
->         Handle: 0x001e Type: HID Information (0x2a4a)
-> > ACL Data RX: Handle 64 flags 0x02 dlen 9
->       ATT: Read Response (0x0b) len 4
+> This fixes: AVDTP/SNK/ACP/SIG/SMG/BI-26-C
 > ---
->  profiles/input/hog.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  profiles/audio/avdtp.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 >
-> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-> index f50a0f217..845087c9d 100644
-> --- a/profiles/input/hog.c
-> +++ b/profiles/input/hog.c
-> @@ -189,6 +189,9 @@ static int hog_accept(struct btd_service *service)
->                 if (!bt_gatt_client_set_security(client,
->                                                 BT_ATT_SECURITY_MEDIUM))
->                         return -ECONNREFUSED;
-> +       } else if (auto_sec) {
-> +               bt_gatt_client_set_security(btd_device_get_gatt_client(de=
-vice),
-> +                               BT_ATT_SECURITY_MEDIUM);
-
-So this forces encryption even without bonding; why?
-
+> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> index 7cfc9a80d..6be6e99b4 100644
+> --- a/profiles/audio/avdtp.c
+> +++ b/profiles/audio/avdtp.c
+> @@ -1771,13 +1771,14 @@ static gboolean avdtp_open_cmd(struct avdtp *sess=
+ion, uint8_t transaction,
+>                 return FALSE;
 >         }
 >
->         /* TODO: Replace GAttrib with bt_gatt_client */
+> -       stream =3D find_stream_by_lseid(session, req->acp_seid);
+> -       if (!stream) {
+> +       sep =3D find_local_sep_by_seid(session, req->acp_seid);
+> +       if (!sep) {
+>                 err =3D AVDTP_BAD_ACP_SEID;
+>                 goto failed;
+>         }
+>
+> -       if (stream->state !=3D AVDTP_STATE_CONFIGURED) {
+> +       stream =3D find_stream_by_lsep(session, sep);
+> +       if (!stream || stream->state !=3D AVDTP_STATE_CONFIGURED) {
+>                 err =3D AVDTP_BAD_STATE;
+>                 goto failed;
+>         }
+
+Looks valid but we should update avdtp-pts.rst with instructions on
+how to pass AVDTP/SNK/ACP/SIG/SMG/BI-26-C then.
+
+> @@ -1790,7 +1791,6 @@ static gboolean avdtp_open_cmd(struct avdtp *sessio=
+n, uint8_t transaction,
+>                                                         AVDTP_OPEN, NULL,=
+ 0);
+>         }
+>
+> -       sep =3D stream->lsep;
+>         if (sep->ind && sep->ind->open && !session->pending_open) {
+>                 if (!sep->ind->open(session, sep, stream, &err,
+>                                         sep->user_data))
 > --
 > 2.43.0
 >
