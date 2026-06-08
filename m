@@ -1,65 +1,101 @@
-Received: from out-35.smtp.github.com (out-35.smtp.github.com [192.30.252.134])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755FE367298
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 11:29:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.134
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44BEC33F5A8
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 11:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780918192; cv=none; b=SOU8Fqo3Wr0IrHEfWinw0liUcFVIQ9uUoHdEYgKGGo6OwsgwweebGD+TmAovgnUgRJh6gEa1mBzma3szUVyKO0to37WetOp2psSsPp5epFgGLaSBVcj8dLfefdrXHGVxBRtvNd93ZlHQ4ZQ5JybKHkiovucQjYUaoKkpaEZdijw=
+	t=1780918684; cv=none; b=qNxR1e+wV98Bz9ni69bvd9pbvUZ5E5PlUQbAnTAxiIWgGRfwAbkrMSmppxJe4Wl1wlqaEmM4R/52KlmVkL4SMUjaSBcYYlW6znOd7NG5NoCdjJsLFXcXxHExTMrMVlwmbdUAauW+EcwZtkOH4qeEMbMov2hXv7+UuSb9sB6AiEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780918192; c=relaxed/simple;
-	bh=nv2qNe9YepXu+K3twUMVH10S3aWdBjuBGwwVONokYQM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=RPbvHWz+ob5QDW4t+PBm03vDLLN4kkzF8EzWpVUqhcmfHwmBaqovQLyQO/Uf3RCvoWRhsO+/8hG0SREqZ4556orjKpsIZ24SPj/4nup24ySHUThjh0fbyCG+rnAQTtgv7rSKHVprnjWf/OF6xhs8SnR63cT9K7B8wF5OLaXDZvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=XA57q+fg; arc=none smtp.client-ip=192.30.252.134
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1780918684; c=relaxed/simple;
+	bh=r5MfQTKPgIYhU8z23cVUP0s/DTEW2AV3xN96Iar4h7U=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=DEVFXgl/Yx1iup0Asy6V9Yl9+vMea3We3UkCba0+1WSpvCskxBCoAfUsTj/jbzYv+UEcYurOEPTBVD175LUXm998vErwE/YG3J3FN7NAz2sq4PLz7D7ao4g+GchsVoJcMcuek4I+h7SAFAOryG158694e6k+Bex3zypH5vOSaLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=q1lWPbjh; arc=none smtp.client-ip=209.85.167.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="XA57q+fg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1780918184;
-	bh=oclHxxUjSgrscyrYmUR0TEndQnsXhCspyoM0UQvxw2I=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=XA57q+fgMb07ix3zid8kag/yNAw4FJ/DZ/hq4p8w+Mb9QWuGXk3AQqokuwTdA+S7L
-	 UmUE2h8U/TR5N+UBlSy5GAz4OrdlTgSPyoBNZFRHjbzuFmt6ilQk8CSPfg2NZIEDXT
-	 TBC14SAYc50p3Ol6O8fwGzNA/oCZftUDPHiksqOo=
-Received: from github.com (hubbernetes-node-dec98d2.ac4-iad.github.net [10.52.206.127])
-	by smtp.github.com (Postfix) with ESMTPA id 70485741123
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 04:29:44 -0700 (PDT)
-Date: Mon, 08 Jun 2026 04:29:44 -0700
-From: =?UTF-8?B?xaBpbW9uIE1pa3VkYQ==?= <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1107787/000000-f254fc@github.com>
-Subject: [bluez/bluez] f254fc: device: Fix auth_retry timeout not being
- removed o...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q1lWPbjh"
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-4854166e1efso4161823b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 04:38:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780918682; x=1781523482; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=r5MfQTKPgIYhU8z23cVUP0s/DTEW2AV3xN96Iar4h7U=;
+        b=q1lWPbjhsZf6TPpz/AgqUczJRLxsHGhoSo4z1mmcvIC00EN+qeOnjC6qDYNxNf9Qpt
+         zEDX00qsVkW0szysUObeQXmSzTJ+os82Mbs2p/Bb8bf+sx+r2d7r6rxlYql7t/36m0Ga
+         gC70OnqO6UI7TKcIBoHeQ5ai4PQjMghKGNyTQUW8jwcahhAMJMjiOw7WhFkasKHZfUhS
+         Tp8WGPBnENQ6nXy1xUqEwwZLStYhA+eDKCk6p+kEdj3neIuooLUmvZ0dpgCiwtgeYIKx
+         yBqV32keiPlyKizxYk6tUqDL1EXsBKFUnjQRrejSbTIyAaRgk+LQYs93sQXcQiK55lTa
+         XgjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780918682; x=1781523482;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r5MfQTKPgIYhU8z23cVUP0s/DTEW2AV3xN96Iar4h7U=;
+        b=cHSAPUC2y7TIQnPsMfaAq2s/p9Fsz8C8yvXN1Eh5jz011FVCnKEnr1EUfLf4sFP5eU
+         jzMRWpOC6ZntwCLZnu2MPzBhRJqjuG7Uheb1OAw2s/imGcyMGbRp8KPeEIoJrzueVjqp
+         u5uBai+sxejPO0jZIKF4RdJjrwArqZCewVWSTE5vlTsCfeiznIFoZsy9tWHvZ/XxXTVN
+         rCj+farwhhJUCstAvUSGytYE4+JxLlcl/ZA/B10jWEIDuqUAiE1hVHeGkmzc2fBLFtJS
+         87g0pKr2ool3JlAKbDOedfriqy3FGmQvrcJGNQHxLMO3SJHsaQMXeXqToVXYx6f1alRq
+         E/OA==
+X-Gm-Message-State: AOJu0YxgNKUHVMPK6xKxDdLvs83VLzUc0EMuJPCYLVMSqKdq6KpEvsFO
+	WQAzqlSyGHuBo3eXjqqy01c/MTh82eueRSxUAepCK0VtMSrug2hjRFmstta/Pw==
+X-Gm-Gg: Acq92OG5khwXxtTR+nge4MUSFgr7knpZOneUF9RAt7syvtGxBXyOS7vglitLlCeDOKg
+	ldM8HEHjfsyPFbsnWyeOnJUYO6Gl/bCr0iUjyIzz/b2/HODANY0fQGS286LPuTmQGk/l9vSY6kg
+	xCs92SNjv3npcb9/y4NssXHSduMihY0MiDy2HajGbWI4joALhUNKaDX84S/piiSyQ/N2v7i1XjZ
+	etAmoiEGbrh+FtMVs53n7ZsSch5iHnWyvaPQiphwipw73FJNzkC4Zd781EkFplRykrvXkp6tPoC
+	IJxAG54LXs+fQGkxeMsHFEvXmUipXfL/O6tVEVzNOpqB0pbw/A2JCwkvD/mfnKOIVWbEJtI1aO/
+	jqseQWVeGY7BrsTpYIwJeFxT2t+BtpNrM7OhF3+yhP59/grqzeJcgOyCGLaFVuOsJp7H89OhXzV
+	C7McE2tMV91JrlfJT/AMhPL3XX9t2CCGdcN+uZzeqqQA==
+X-Received: by 2002:a05:6808:d46:b0:485:46bf:9127 with SMTP id 5614622812f47-4868dce4233mr9371225b6e.12.1780918682184;
+        Mon, 08 Jun 2026 04:38:02 -0700 (PDT)
+Received: from [172.17.0.2] ([52.173.219.149])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4865b745773sm14076924b6e.6.2026.06.08.04.38.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jun 2026 04:38:01 -0700 (PDT)
+Message-ID: <6a26a999.1170b354.aeb03.1bd0@mx.google.com>
+Date: Mon, 08 Jun 2026 04:38:01 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3156461467333901524=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, dmitry.baryshkov@oss.qualcomm.com
+Subject: RE: arm64: dts: qcom: enable WiFi/BT on SM8350 HDK
+In-Reply-To: <20260608-sm8350-wifi-v2-1-efb68f1ff04c@oss.qualcomm.com>
+References: <20260608-sm8350-wifi-v2-1-efb68f1ff04c@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============3156461467333901524==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1107787
-  Home:   https://github.com/bluez/bluez
-  Commit: f254fcf4fb7340e4a2d14d3ca63b918dd7868dfe
-      https://github.com/bluez/bluez/commit/f254fcf4fb7340e4a2d14d3ca63b918dd7868dfe
-  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
-  Date:   2026-06-08 (Mon, 08 Jun 2026)
+This is an automated email and please do not reply to this email.
 
-  Changed paths:
-    M src/device.c
+Dear Submitter,
 
-  Log Message:
-  -----------
-  device: Fix auth_retry timeout not being removed on reconnect
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-timeout_remove() was called with 0 instead of the actual timer ID
-because auth_retry_id was zeroed before the call.
+----- Output -----
+
+error: patch failed: drivers/pci/controller/dwc/pcie-qcom.c:1907
+error: drivers/pci/controller/dwc/pcie-qcom.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
 
 
+---
+Regards,
+Linux Bluetooth
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+
+--===============3156461467333901524==--
