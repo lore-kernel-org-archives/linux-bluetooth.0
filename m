@@ -1,64 +1,64 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B245F25782A
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 11:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA5A366566
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 11:24:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780917638; cv=none; b=ZF+KvTs9I27ycCzP/ImTFQrwPCMiL3gqLlVDoNn34bbCmTuzvxICGmtt9H+SU5fwiCF3wRKMY+P5PvdkKpnbHoYFUe/OJLP9EYF5WowYeQWIt0Udc0bMZGaew3Vc61f0tObMb+oWTMsUCbC0xa07rtxdaImbZjK+vLuyOZadvZM=
+	t=1780917853; cv=none; b=eecSCWkSUcVR4S4ZhASMpGSwaiIni0rcfE7lQzrgNmfF0/4oMkdfmiOuGcBBesJLY2cfj6OS0Djed4943rM4aiQ853PnGmrx3ugzin94hqJUP7r34nR4f8iMASBUTR+0/O2BrNDaapekQyHTl3FxFxPpR+F5/uFOLyqKstSNg1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780917638; c=relaxed/simple;
-	bh=m4zhwM36PJ9sxJ4e5ZOUq2QIB/YL6VSaJl7IeFjUM9Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oPyckRO+phUtPc1zM7esy6cocKTJwPD5NELf4EKXsnwUQ/YwuqtJuVnltCd1lxs/knPvIjMJmLjdk/9unI2++Q/Lzk3ynAHwEFcTDBEFPZHwFJxDAQCunEOFe7FIh4xP8ep1s1cU2MTnVv4xeScahdA9kyolBJu6dGPRB4Ts2sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=Plrq6JZA; arc=none smtp.client-ip=209.85.128.47
+	s=arc-20240116; t=1780917853; c=relaxed/simple;
+	bh=4rXq9qW7/EiMPkd5SsageHbopzlcz1cEyMNkPseffSw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rd4YYgNhxnjbllXBSN2jG/vG0qKHVpnkSezPRa8dXMMNZrc7g9UOyZUWH28q9g77m07T/h/MhuAI4X5xSjIvUHt6gecME3lPKQ1Id87NIdCnEdnQyWnQq6xmnWhBpZJsP8FbVk1ZG/uplCmHinGqxMuDYczNNFpyqomZQPssooU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=JojPIQfm; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="Plrq6JZA"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-490ae94a89eso34509785e9.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 04:20:36 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="JojPIQfm"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-490b915ded5so35300025e9.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 04:24:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1780917635; x=1781522435; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1780917850; x=1781522650; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=k/B1LxvX9nP/MbBQXWJTrJg8EbOk8suOHKeCfP94cqg=;
-        b=Plrq6JZAPN66TjLJ48lIHNotTBi+qa4MVlsL2EenaOjLqcNI2TV1KfgzZyPJsAzF4z
-         YaaTRgR3u5is64GZ0pYcuSJ+NwDfxEb0dvk86TtYCdxE3g2b+zi8IxgGXtecmxtd2U/L
-         WK4hR/f+tSvaVKNEi58l4IuXMnqLR0e0z3I7o=
+        bh=bVFDoZLpD7ldCZHNHISOrqKvkJ+jhCvIyZMORA1/Sw0=;
+        b=JojPIQfmlZfVHkflI0zlwAHm44Sqf8efQt6IeOb9CFPpgRgDYoCGwX5ZHBAR9a3MsH
+         DenAZ8GC7RFja7YcAJ7qH0tObFu2pQQixM0q00/7/LOx0tToHwAli9SS4xa0joEmNrU5
+         lVD/Thf5h383r4asbiU9aq2KtEWxCLtDQwwv8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780917635; x=1781522435;
+        d=1e100.net; s=20251104; t=1780917850; x=1781522650;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k/B1LxvX9nP/MbBQXWJTrJg8EbOk8suOHKeCfP94cqg=;
-        b=JTnZ/slVS2JlyQ/TmOGm7KV2lHKIcGzyYuTR1dWAsSN//NGTp+fG8R0ysOJ5MN7fSv
-         2t82alIQASKn6+8iUuqX9tWPPvdRm7bVFyZ8qM9GyvuPWOOWprF2izrXNQtcYtqTx3UA
-         mGT8BCL57xU7rZcZ8c5W35g7RS2+FXlmDCgxdi7IwTE4UgOvleNUDM02h7ZauIjFvqwO
-         E5VxejdJ/YmYnZ41P0oDtTbQa+9H3E7pzCgVMkLWpYsK5RStl9qthPkSr4dqMh3eavzo
-         5K2wiYxkPP/qzq2x5WDbBLMxtQfyDNM4+XRhTWg3zcjBjY8Q4DUprP3AtMmfC/JPStcf
-         TDrw==
-X-Gm-Message-State: AOJu0YykkLLkyVwhQutj6nwDMPoBu9l87hL0OL1GV8jsG6EwkIlHyLUN
-	7TG/P7uznBr0NYd0rCxRrj4FIx4YkqY6in3JmEzi5vfaCw+adc9WdCXDOEzfeUYO0ItLc5QlrFz
-	HVxD+
-X-Gm-Gg: Acq92OGhKj0t2m3knQei9N47DpQygn4mJs1in89dtkXFGWQkm8p7SUEEH2QiNHXU0Ux
-	IG/8/W12pa1HsH2ogCcel79XoU0KsnwDgb1o1//ZEBd3VUF4WX07xJXym2nKHN2Cg4afprdBp9z
-	ZeXe2HsyZY+xyYmeOU/fCyId2V41H29dDWUePkeeli3ZyMMq9CL8mrAaqN32WM9u7793lIs1hSC
-	f/B54ZD2Z2Oy9NTYHT5M8jJ7EQImjNhu1VetegOekeHWnnAG5CK86Pw+FRQBFXmihXJOdmobeMD
-	aD7mQ8NjGlrIp6hjYOEyl7ZLYVgQEHSuNGKuwfUjSsHgbGfhvoVHNm1Jncd23cR+ykYxdxXu0pj
-	Z0eMs6iMPvyPoHYPtOXRIen2JSi4CdgfQqTJYm9f/4e44yMrbDy3JxPHOqG6RtOLdM4tInrqJ7G
-	QHCM/a5RlEOBhClwVY1xdU+0E+wNSvbOH+SyNbhwmFIr1MgyR5lqxM2w==
-X-Received: by 2002:a05:600c:3f1b:b0:490:c0d8:d517 with SMTP id 5b1f17b1804b1-490c2598543mr245664575e9.3.1780917635060;
-        Mon, 08 Jun 2026 04:20:35 -0700 (PDT)
+        bh=bVFDoZLpD7ldCZHNHISOrqKvkJ+jhCvIyZMORA1/Sw0=;
+        b=OnsfkKNitOrdsnb5zvZTsiv67neaBgdl9Lgst///RVAIcH+QnxTUK7EvAWN/PxlBQG
+         wsBY7zPn1z/iSf37Y6Rg8iozM5ehMh5B6cjy4i3whQQBu1m55MYMjSX0/W7st93ZCY87
+         krtbVJirVsLFOAme52+WfQ4cya8gGQ5cIj97I3wycJMRG6ZkSlLumnobnoRiaPNN10Sh
+         HooY7yDhsgdM6bpfH/Ul2N2zyMUofoedzsoEqI8q6oBHIDINU1FNuHxV/zY2kEeTp8Pz
+         6ar47wWxdqLQ3tQMaTzAlrSIDhvRoZh/xnRpibQlrQ4pwvRC4l8Tfw550Whv/7aXTqi+
+         5l2w==
+X-Gm-Message-State: AOJu0YwUgADe9OyWgq/TeE4NZZjwY4MopZy0FSTx7ozsjJyQtrIfxWBq
+	wFyKYybpfCxrjuaLKFvta9O9KA/BI1if2+w5QMEL7bbFaE5yN9zKDjx+CXV9/05H9WxT73BL8aU
+	a7o4F
+X-Gm-Gg: Acq92OFYOcFRt5BAUtXJBlnwso7S8kTAfUp1lYh+3ZrGxuECNLdweuQjTF5GV+Hur1+
+	i0zBdWX10OQu2mg7od6A8DdRS4masrmbS04AICHMd1drOWYqQVz0EjBnEifyKALPCIaHLQyPofI
+	ntPdg3h0AVKW1XUdhykNMopEY19G3f2feDOo5DRpmNPaec9WdWJ0pW1dFNqK4vKFCzUbaOuk560
+	6btxFLUPahmL3/W3nKtPDi0tSWDoECgX87XXZ0TGUEN5D9HjEgB3Ef6bD8i0i60o7V0Ku9Ddljx
+	afljVKwVexBUWtB7Rok8uspp6P/gwH0HwqDiPq5a9ox0uCOt79TUMU88qQEwEtgQw2JhDNLH0Lc
+	p3HgYU6hv9pzx6taLHcAFUKYjhZHEl5PJRMWw2Rj5ED9zJZ0wcNpCEe6tB4uR7LL9MF1MDzW07V
+	K6qx1lGlyRZLv6r1kIJa44hMOC5Rzxpt630/HRMAeOKSH+QUtWntl4nA==
+X-Received: by 2002:a05:600c:35cc:b0:48f:d5a0:284e with SMTP id 5b1f17b1804b1-490c263fd13mr294434235e9.28.1780917850205;
+        Mon, 08 Jun 2026 04:24:10 -0700 (PDT)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:2869:769f:34b:70a7])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3b5b82sm418558465e9.1.2026.06.08.04.20.34
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3cc0f8sm385841585e9.8.2026.06.08.04.24.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 04:20:34 -0700 (PDT)
+        Mon, 08 Jun 2026 04:24:09 -0700 (PDT)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ] bap: Fix CCC value for ASE control point
-Date: Mon,  8 Jun 2026 13:20:28 +0200
-Message-ID: <20260608112028.3686726-1-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ] device: Fix auth_retry timeout not being removed on reconnect
+Date: Mon,  8 Jun 2026 13:24:03 +0200
+Message-ID: <20260608112403.3720840-1-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -68,23 +68,26 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-WriteWithoutResponse was missing
+timeout_remove() was called with 0 instead of the actual timer ID
+because auth_retry_id was zeroed before the call.
 ---
- src/shared/bap.c | 1 +
- 1 file changed, 1 insertion(+)
+ src/device.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 8fc2fb14d..968b85730 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -3776,6 +3776,7 @@ static struct bt_ascs *ascs_new(struct gatt_db *db)
- 					&uuid,
- 					BT_ATT_PERM_WRITE,
- 					BT_GATT_CHRC_PROP_WRITE |
-+					BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP |
- 					BT_GATT_CHRC_PROP_NOTIFY,
- 					NULL, ascs_ase_cp_write,
- 					ascs);
+diff --git a/src/device.c b/src/device.c
+index bea893301..8f7ec5654 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3810,8 +3810,8 @@ void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type,
+ 	struct bearer_state *state = get_state(dev, bdaddr_type);
+ 
+ 	if (dev->auth_retry_id) {
+-		dev->auth_retry_id = 0;
+ 		timeout_remove(dev->auth_retry_id);
++		dev->auth_retry_id = 0;
+ 		dev->auth_failures = 0;
+ 	}
+ 
 -- 
 2.43.0
 
