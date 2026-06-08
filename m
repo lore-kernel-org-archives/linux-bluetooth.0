@@ -1,93 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274F73128D4
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 14:30:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B5C47F2C1
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 14:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780929044; cv=none; b=QEl17CseYz6S2XwLqT2lzFlQw3g8U3zp3O+48DY0l0rG+W8FtQpTWXKDz6OWc2lWXk3AFULotA58fcqK6a9kKyfk3hh3MW3CR2VQPGYs0dLDHLLvdEJT7ZsndwRvxGt4Hz3pEX27W+t2r/Er9q8I1eBsC0kiIJriVVnf0U93alg=
+	t=1780930554; cv=none; b=El1a3t/tFNwBPCpLX3HwLsDfWMuqAMLaeBxxpH60MT1K3gXu2/QqL+vtEK/c7Ge8Kce10jVRi+ePUpZ2aBKbwGDlfT1ePYplvaHr0f2T/xGiuTxlWdk3Ufb+wqY6u+mnLaH+aCYymCxKahIMxZkmXv/UAqgdDL2l/Yh5/UUNdHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780929044; c=relaxed/simple;
-	bh=DgevYk+trI9a01XYiR93DkcK4FlvyCsJcciplo5M4a4=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gXtSz7JEaItDsIiNbiQf1pV988naR5FQRvnt/0OmASbhD53Rx+pR2LxjjirtlGIWfK9H1PwZFyp6OidCA9+wo/msfGbJB9kgMJ5Ym19bk4JOKF1uJR6B6CeQAmJEAcpprflA+0oKNEpfduD5IVwTfTHzGq0ZdslNtFAk93Y+I0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yq6+gp7o; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780930554; c=relaxed/simple;
+	bh=A5ujWRSWAsgy+LVRPZw7ncAFb3UaW5uXpCCHOPVDfD8=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=CBhWM0KPa3oXraWwROm6hy7fAXA5V/6ADhv/xQac3hl309NJIpV/LIUHOkXBOt/QEyfQ7/l57fnOO9ZAVhA+SOYyiW7CJcFyFfOOrYFvd1s2MCWmuu/DT75D3OUF723lFcfoSH3ILNHL7w2macPfBOTOAFr9kJ6gAMh7qJBZXiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Hvklw72D; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yq6+gp7o"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAA141F0089B
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 14:30:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780929042;
-	bh=DgevYk+trI9a01XYiR93DkcK4FlvyCsJcciplo5M4a4=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=Yq6+gp7o+t+YQI0mcfmczBWPQRT/vd6mpMnL5zm7lJV5zufTqvuUZFav2lmFFR1zr
-	 vU2EVs2llYOb0dtHlYEy9NzYr8JNJOb9R1lU5oyaRfZwTC3rjT9WFZNADXH/tZMrle
-	 rQWEi5ICOGsWewXIS0NwPziENp+foPhZM/T9FRSdghgNLaHkUvpi++XUTe79xgkI13
-	 mJw1ghKOSb9H72lLnbQC9gNsmjTHJqMFItaCAHvhmMAdMrViPbYjMDv0qYB1s2n2AK
-	 kjAgcHKa7c135LL3iv5tW2H8Cj5Lg7JHQ1PfB1H1fFtJmIM6y7uSF6hbjgUcRa/JXR
-	 UDwXwOdmoqi8w==
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-137d464c47eso3243189c88.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 07:30:42 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8gpWZF0LrgyIhNb6U5Cam4SuQSFK3um2r4QZQ6EK2Sj2psPvfQJ0i2MLz8KItPMiMOyNBbljkg1vFmLKwD7ak=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwB85IeB8ooI+NfjuERwzpbIv9Qq0UsF9p+k05vl2R3g6GkgisJ
-	DcKBQDUzfq8FzPPD1uSjOPJ93r/mYNd5ISwQar2OkpHGsKHhmqy++49MlhYVGL5XWcG6Hldf8d0
-	K/ZqXZylowD6zQI1c2P5/6J2Mb5TW9dgiUXnfyuu3NQ==
-X-Received: by 2002:a05:701a:c951:b0:12d:b8e5:5e2 with SMTP id
- a92af1059eb24-13807dbc1f2mr6212351c88.23.1780929042235; Mon, 08 Jun 2026
- 07:30:42 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 8 Jun 2026 07:30:38 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 8 Jun 2026 07:30:38 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260608-sm8350-wifi-v2-1-efb68f1ff04c@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Hvklw72D"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1780930547;
+	bh=tQsImV+zFB+KYWKhVrU1eY7jRu25BcWYMnoWGDszs18=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Hvklw72DEj2fxTCOgIVShwe/xtALHYKgrNVWp0iq5mES4ehUDMkCZl/krDChFY0oZ
+	 /qsnUKovlVbT3zKFy0l7Ca9qCbQYGHYzwvpM05tBZMebSjobcIIwBkG0Ykb1MloWg/
+	 S6ccRcpTlv9RL0JInHe0MD15OB1qKmY7iozhNSXs=
+Received: from github.com (hubbernetes-node-fc00fe2.ash1-iad.github.net [10.56.174.27])
+	by smtp.github.com (Postfix) with ESMTPA id 3162A60118E
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 07:55:47 -0700 (PDT)
+Date: Mon, 08 Jun 2026 07:55:47 -0700
+From: =?UTF-8?B?xaBpbW9uIE1pa3VkYQ==?= <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1107789/000000-4db6f6@github.com>
+Subject: [bluez/bluez] f9278b: avdtp: Fix GET_CONFIGURATION cmd
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260608-sm8350-wifi-v2-0-efb68f1ff04c@oss.qualcomm.com> <20260608-sm8350-wifi-v2-1-efb68f1ff04c@oss.qualcomm.com>
-Date: Mon, 8 Jun 2026 07:30:38 -0700
-X-Gmail-Original-Message-ID: <CAMRc=MctdRxo4WFf6F9A1pFOeTq8us6brdSEzTZsNPFwqrSnNQ@mail.gmail.com>
-X-Gm-Features: AVVi8CcaZhXYOpCv2x74C9QF-11-iy12puwZY5pM4Q7NOmmptdOTSpcIOV1fL7E
-Message-ID: <CAMRc=MctdRxo4WFf6F9A1pFOeTq8us6brdSEzTZsNPFwqrSnNQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/7] PCI: qcom: fix parsing of PERST# in the legacy case
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: Manivannan Sadhasivam <mani@kernel.org>, Lorenzo Pieralisi <lpieralisi@kernel.org>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, Qiang Yu <qiang.yu@oss.qualcomm.com>, 
-	Jeff Johnson <jjohnson@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	linux-arm-msm@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath11k@lists.infradead.org, devicetree@vger.kernel.org, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Mon, 8 Jun 2026 08:59:19 +0200, Dmitry Baryshkov
-<dmitry.baryshkov@oss.qualcomm.com> said:
-> Commit deed8aec62dc ("PCI: qcom: Handle mixed PERST#/PHY DT
-> configuration") fixed support for the "mixed" platforms which declare
-> PERST# pin the RC node and the PHY in the RP node, however it also broke
-> support for a majority of existing platforms, which declare both PERST#
-> and PHY in the RC node, because now PERST# is first acquired in
-> qcom_pcie_parse_ports(), which then returns -ENODEV (as there are no
-> PHYs in the RP nodes). Later qcom_pcie_parse_legacy_binding() tries to
-> acquire the PERST# GPIO again and fails with -EBUSY (as the GPIO has
-> already been requested).
->
-> Move parsing of RC's perst-gpios to qcom_pcie_probe(), making it obvious
-> that it's shared for both cases and skip parsing it in both functions.
->
-> Fixes: deed8aec62dc ("PCI: qcom: Handle mixed PERST#/PHY DT configuration")
-> Closes: https://lore.kernel.org/r/gieaybsg2ckxpctvqj77nlwu7utama2yeyvebkonmexsxrra3v@v3fobqasxnmy/
-> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-> ---
+  Branch: refs/heads/1107789
+  Home:   https://github.com/bluez/bluez
+  Commit: f9278b28dabae5f252432a1a1258477ac8ace703
+      https://github.com/bluez/bluez/commit/f9278b28dabae5f252432a1a1258477ac8ace703
+  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
+  Date:   2026-06-08 (Mon, 08 Jun 2026)
 
-Acked-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+  Changed paths:
+    M profiles/audio/avdtp.c
+
+  Log Message:
+  -----------
+  avdtp: Fix GET_CONFIGURATION cmd
+
+This fixes AVDTP/SNK/ACP/SIG/SMG/BV-12-C
+
+
+  Commit: 4db6f6a6d2440bc13d522ae3d66917d8146cc296
+      https://github.com/bluez/bluez/commit/4db6f6a6d2440bc13d522ae3d66917d8146cc296
+  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
+  Date:   2026-06-08 (Mon, 08 Jun 2026)
+
+  Changed paths:
+    M profiles/audio/avdtp.c
+
+  Log Message:
+  -----------
+  avdtp: Fix error handling for AVDTP_OPEN cmd
+
+We have to return BAD_STATE when local SEP is available instead of
+BAD_ACP_SEID.
+
+This fixes: AVDTP/SNK/ACP/SIG/SMG/BI-26-C
+
+
+Compare: https://github.com/bluez/bluez/compare/f9278b28daba%5E...4db6f6a6d244
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
