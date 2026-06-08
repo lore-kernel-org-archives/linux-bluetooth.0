@@ -1,386 +1,159 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FFC933F390
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E3B355055
 	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 11:17:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780917430; cv=none; b=lq/ZQT6g5sgD4UIahKQroga8dOMmPDHlQa5mIuv/NjYKQK0Ttok7RBLrz06p8wW4htB/McnNZ646Vf1Rl7BnLqYR9jZVBU4NL/SiRJHCwZpwktFnpE4+5UJpwexg/bYXIex8rZwgRXCjZFnyH0VI+g32sFtBwO74/BI2cEVDMDM=
+	t=1780917431; cv=none; b=WO9deZW4hEw4efkpM21jZn457y0WabgL7F1DojTPZAwIFf8d6ZoPYoip+rmSi4D3wGdF794Yk1ZPx25Dp60b6b8ZA73mMOvtB3pKtrTR/BDy9hNOsj0y1aiPxlKwTJ5xRqCeGJvStOqnELlLeEMh4mHOnVo9OiSoJFwc4PGQCK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780917430; c=relaxed/simple;
-	bh=vvLJtoOfykHLv8Na3fR6zMHq3xxP6leuqwO6vq0KVo4=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pToARlkQwTioCEjGjTaaewy17JxDM7s+0zvp4nFoCgHNQPKzGnbLx69uY77xCx2SObPpSenSrN+KIGklBur8JA7ca25lf7eRkdsGzLQvdBRCZ1TbETPtoG6HFr6CggR+V0oI1qx4Tp4LdiCKMD7JmHeX/9G7Yu3Ubk4ejb1XGw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VbwHGfli; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780917431; c=relaxed/simple;
+	bh=S5e9YOaqvNq979UUcnMBgFqqMUFbh0/iPY2Pq/qY8/U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nyuQehxeKB1XZdnwXGj44EatLMDw8eBKCim4LmXi9Xfy2qzhUQVu4qLAHsENZcCcFOynL2f2HdEhWBBoTTrXJhZIg9jiEMXUvSR2znzDMsTePLSUbdSh4bZ2YfLDLCIx56cHTnYQU84ias+F3v7tDIOSKzp6ljw89WhdSGubMEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=hlknlrTP; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VbwHGfli"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EAF61F0089C
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 11:17:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780917429;
-	bh=JS7UICwqoceyTJ7x6+zt9hPHx1tUVGLh3IUeEbiEO/E=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=VbwHGfliIdwk9JXaFZYquMjbU07FGfEnZbKqmVoTASKM2x18Mx6vfJXwRerRkUrIt
-	 aFGXPc/weu47pZCgNBCHPcMdt7wQK3pMO0EOeWh/ECswutp7eFduvv2jKyHG9mv7Yi
-	 ipEYd97OYE8AySHKO7DgdbEN44/Mr8kGdaVpQUpZNEDWL7Q+5NjFwepmD/z3nwOXqh
-	 c8idOfVDrsFF8b+0tWgWkQJgC3FwY6O4bw9M+g8DnRipU4GbyuwBVHDpITQBFl7Hkf
-	 I1aHeC2EhjR05xRJN0eok/8WaUCT0uSR8lOeN1pIlX2MvIkpuwqfL4y2haA4adBfy1
-	 wy1S9h0h7m+JA==
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5aa69131836so3528731e87.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 04:17:08 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ/8bt5s9mi9bXlEYdRRnDlh27wo5oM/YiGzii7vEYVUj4RZQiNQqgusQsN/r7sIFkPd2QD6piyO+cOI9vk2Odw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4QZKTl6YAEiI8xWNUCTCjbP25RGh/prM+kPnqbW4nokQ//bIb
-	jE4wIiOVPAiN0qfWdDiw5EB3x3tefW60i9y0nBLxiiZxl+U8lTY9Je4BqskF4vj/Cb1USc+U+ZF
-	8mJFLmwH7qxL6iJ4wZe9viXbXV1wRNxxfuH4TXTgdRw==
-X-Received: by 2002:a05:6512:1114:b0:5a8:8222:7fc9 with SMTP id
- 2adb3069b0e04-5aa87ba35c2mr3672220e87.13.1780917427508; Mon, 08 Jun 2026
- 04:17:07 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 8 Jun 2026 04:17:05 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 8 Jun 2026 04:17:05 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260608-block-as-nvmem-v3-4-82681f50aa35@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="hlknlrTP"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-490ac10e337so38669875e9.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 04:17:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=streamunlimited.com; s=google; t=1780917428; x=1781522228; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qA0XFgyRMis53NeLOn0e3G0zsFo48aEvQQVVBgLP8ks=;
+        b=hlknlrTPBh1IX7CCKW+p7pmCscR5f4+W4xtFVX5WgYIEyUD287zVLfyDYPCAqHMc+R
+         xAfRKGvUeXf9b3hsAyaRsYJztYlI62yOtsDKDrE3s0ScLAMflb2t7PLoZh+A3uY7sJeW
+         GRBwmoIQ8cXHlLqSwdfTslp69dPaHgRPgUXVw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780917428; x=1781522228;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qA0XFgyRMis53NeLOn0e3G0zsFo48aEvQQVVBgLP8ks=;
+        b=UIMRemNLmJbGJJYR2S7rtuqzgHRbtY9nbkIL3JJUMjpSmkb2Mse9mW1IAOCQHpCwqP
+         IKsDDa4MMNkN4VqF0RHpYSDOZ9puBxYMSDx78Jyp6XTJoHy9lYi2ULCto5xoTjxNeU5I
+         TUc1ynOJoMPyEsGMDtFwgOm+We4VTSE+XKCq8Jce8atuwi+/eEckxZAj8MNieTthBGzX
+         Pj3Lud+8OxiqEd1F8OH2u78TqfPW6ZFjZTPuMMSG0PzrfCtu0uy+LSQ9v8in128MvtUv
+         ADTA6x/hy4EDhxaXvpTRjLLKDgaEljeVggqwKqGGLMNv1dJ7qLIh2bT7JP81JS6DSNtz
+         OfOA==
+X-Gm-Message-State: AOJu0YyFsWT5JvJ6OcWjIyVNv6BuUMSsSINIzncrDK7aMT3aAW/ses84
+	bqBpnSCWoHS0R87U8AJbmDsKfq4pxXGVEKEPKAQbt3VGNIBVWyhUX6ay0vDJSpOVJLCD/7rstTN
+	/Mb6P
+X-Gm-Gg: Acq92OHxtwrD7sy0jJOdXAHTphHncv99VS3NSdJh/eVTAKJBir04dDrakOlc44Ga7b/
+	SUTHaYkMq43bFGIlTqjNkkHiydcp35fIrEl8AdYLhAjir0MobtqFbsr2bjRLZc8gYoRpBa7HG4F
+	JKs1lHhgJqP2pmdETaN6xJt3xk8CJTxxJp5YH1OsVXoJNyUfNk+THKwGn5TWjzjNn0+AiX0UkWQ
+	i4PVsxw8ciCZWraSj+OWIzfHZE/a/SM0TTTAqhMVqjrpliNkk1Ugf70LNtgW2ITvUMzxVO970HE
+	QbZy2R8PQoUh94poyN+1Tn4H7cDVJAbto230LdbG6AowQiscRdCrhUArHWRYUn+dWtbGPaU7qJg
+	aOIJUU87PXC+dFM1Ab30ZkpFXLcD19n8f5Q5fEBYkMgVyMjnyxMl0G/3xzVULLMeTAd8vLNWwAj
+	YaJL2Jg1y5FBsZTUbW1jyffce/VnNHx6diqqtALslxqhf5z2AM6gBeYg1kLUOb4sOC
+X-Received: by 2002:a05:600c:8208:b0:490:bb37:9d49 with SMTP id 5b1f17b1804b1-490c25b136amr250358425e9.11.1780917428377;
+        Mon, 08 Jun 2026 04:17:08 -0700 (PDT)
+Received: from SMI-ubuntu.sueba ([2a01:390:0:101:2869:769f:34b:70a7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490c2c9ea37sm441841115e9.0.2026.06.08.04.17.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jun 2026 04:17:08 -0700 (PDT)
+From: Simon Mikuda <simon.mikuda@streamunlimited.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ] a2dp: Add codec prioritization
+Date: Mon,  8 Jun 2026 13:16:58 +0200
+Message-ID: <20260608111658.3686364-1-simon.mikuda@streamunlimited.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260608-block-as-nvmem-v3-0-82681f50aa35@oss.qualcomm.com> <20260608-block-as-nvmem-v3-4-82681f50aa35@oss.qualcomm.com>
-Date: Mon, 8 Jun 2026 04:17:05 -0700
-X-Gmail-Original-Message-ID: <CAMRc=McmoWvezeH05_5AR7ZbAyg1L567HsKWbuD7711LwnjV0Q@mail.gmail.com>
-X-Gm-Features: AVVi8Cesm3odc32Z-SPOxn8Wmr5vbPlz43scUvzgQJv_WkuDGH2g_rYPFhE9BsE
-Message-ID: <CAMRc=McmoWvezeH05_5AR7ZbAyg1L567HsKWbuD7711LwnjV0Q@mail.gmail.com>
-Subject: Re: [PATCH v3 4/7] block: implement NVMEM provider
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, daniel@makrotopia.org, Ulf Hansson <ulfh@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Saravana Kannan <saravanak@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Mon, 8 Jun 2026 12:50:41 +0200, Loic Poulain
-<loic.poulain@oss.qualcomm.com> said:
-> From: Daniel Golle <daniel@makrotopia.org>
->
-> On embedded devices using an eMMC it is common that one or more partitions
-> on the eMMC are used to store MAC addresses and Wi-Fi calibration EEPROM
-> data. Allow referencing the partition in device tree for the kernel and
-> Wi-Fi drivers accessing it via the NVMEM layer.
->
-> To safely defer the freeing of the provider private data until all
-> consumers have released their cells, a nvmem_dev() accessor is added to
-> the NVMEM core to expose the struct device embedded in struct nvmem_device.
-> This allows registering a devm action on the nvmem device itself, ensuring
-> the private data outlives any active cell references.
->
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> Co-developed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> ---
->  block/Kconfig                  |   9 +++
->  block/Makefile                 |   1 +
->  block/blk-nvmem.c              | 171 +++++++++++++++++++++++++++++++++++++++++
->  drivers/nvmem/core.c           |  13 ++++
->  include/linux/nvmem-consumer.h |   6 ++
->  5 files changed, 200 insertions(+)
->
-> diff --git a/block/Kconfig b/block/Kconfig
-> index 15027963472d7b40e27b9097a5993c457b5b3054..0b33747e16dc33473683706f75c92bdf8b648f7c 100644
-> --- a/block/Kconfig
-> +++ b/block/Kconfig
-> @@ -209,6 +209,15 @@ config BLK_INLINE_ENCRYPTION_FALLBACK
->  	  by falling back to the kernel crypto API when inline
->  	  encryption hardware is not present.
->
-> +config BLK_NVMEM
-> +	bool "Block device NVMEM provider"
-> +	depends on OF
-> +	depends on NVMEM
-> +	help
-> +	  Allow block devices (or partitions) to act as NVMEM providers,
-> +	  typically used with eMMC to store MAC addresses or Wi-Fi
-> +	  calibration data on embedded devices.
-> +
->  source "block/partitions/Kconfig"
->
->  config BLK_PM
-> diff --git a/block/Makefile b/block/Makefile
-> index 7dce2e44276c4274c11a0a61121c83d9c43d6e0c..d7ac389e71902bc091a8800ea266190a43b3e63d 100644
-> --- a/block/Makefile
-> +++ b/block/Makefile
-> @@ -36,3 +36,4 @@ obj-$(CONFIG_BLK_INLINE_ENCRYPTION)	+= blk-crypto.o blk-crypto-profile.o \
->  					   blk-crypto-sysfs.o
->  obj-$(CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK)	+= blk-crypto-fallback.o
->  obj-$(CONFIG_BLOCK_HOLDER_DEPRECATED)	+= holder.o
-> +obj-$(CONFIG_BLK_NVMEM)                += blk-nvmem.o
-> diff --git a/block/blk-nvmem.c b/block/blk-nvmem.c
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..99c7728fb7bccdc2216780a73a89a9210f925049
-> --- /dev/null
-> +++ b/block/blk-nvmem.c
-> @@ -0,0 +1,171 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * block device NVMEM provider
-> + *
-> + * Copyright (c) 2024 Daniel Golle <daniel@makrotopia.org>
-> + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-> + *
-> + * Useful on devices using a partition on an eMMC for MAC addresses or
-> + * Wi-Fi calibration EEPROM data.
-> + */
-> +
-> +#include <linux/cleanup.h>
-> +#include <linux/mutex.h>
-> +#include <linux/nvmem-provider.h>
-> +#include <linux/nvmem-consumer.h>
-> +#include <linux/of.h>
-> +#include <linux/pagemap.h>
-> +#include <linux/property.h>
-> +
-> +#include "blk.h"
-> +
-> +
+This change will select best codec when connecting to A2DP:
+LDAC > AptX HD > AptX > AAC > SBC
+---
+ profiles/audio/avdtp.c | 51 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 50 insertions(+), 1 deletion(-)
 
-Stray newline?
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index d475a545e..a8733a7e1 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -42,6 +42,8 @@
+ #include "sink.h"
+ #include "source.h"
+ 
++#include "a2dp-codecs.h"
++
+ #define AVDTP_PSM 25
+ 
+ #define MAX_SEID 0x3E
+@@ -1293,10 +1295,49 @@ static struct avdtp_stream *find_stream_by_lseid(struct avdtp *session,
+ 	return find_stream_by_lsep(session, sep);
+ }
+ 
++static unsigned int get_codec_priority(
++				struct avdtp_media_codec_capability *codec_cap)
++{
++	unsigned int priority = codec_cap->media_codec_type;
++
++	if (codec_cap->media_codec_type == A2DP_CODEC_VENDOR) {
++		a2dp_vendor_codec_t *vendor_codec = (void *) codec_cap->data;
++
++		switch (A2DP_GET_VENDOR_ID(*vendor_codec)) {
++		case APTX_VENDOR_ID:
++			return priority + 100;
++		case APTX_HD_VENDOR_ID:
++			return priority + 200;
++		case LDAC_VENDOR_ID:
++			return priority + 300;
++		}
++	}
++
++	return priority;
++}
++
++static int sep_codec_cmp(gconstpointer a, gconstpointer b)
++{
++	const struct avdtp_remote_sep *sep1 = a;
++	struct avdtp_service_capability *cap1 = sep1->codec;
++	unsigned int priority1 = get_codec_priority((void *) cap1->data);
++
++	const struct avdtp_remote_sep *sep2 = b;
++	struct avdtp_service_capability *cap2 = sep2->codec;
++	unsigned int priority2 = get_codec_priority((void *) cap2->data);
++
++	if (priority1 < priority2)
++		return 1;
++	if (priority1 > priority2)
++		return -1;
++	return 0;
++}
++
+ struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+ 						struct avdtp_local_sep *lsep)
+ {
+ 	GSList *l;
++	GSList *sorted = NULL;
+ 
+ 	for (l = session->seps; l != NULL; l = g_slist_next(l)) {
+ 		struct avdtp_remote_sep *sep = l->data;
+@@ -1325,7 +1366,15 @@ struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+ 				continue;
+ 
+ 		if (sep->stream == NULL)
+-			return sep;
++			sorted = g_slist_insert_sorted(sorted, sep,
++							sep_codec_cmp);
++	}
++
++	if (sorted) {
++		struct avdtp_remote_sep *sep = sorted->data;
++
++		g_slist_free(sorted);
++		return sep;
+ 	}
+ 
+ 	return NULL;
+-- 
+2.43.0
 
-> +/* List of all NVMEM devices */
-> +static LIST_HEAD(nvmem_devices);
-> +static DEFINE_MUTEX(devices_mutex);
-> +
-> +struct blk_nvmem {
-> +	struct nvmem_device	*nvmem;
-> +	dev_t			devt;
-> +	struct list_head	list;
-> +};
-> +
-> +static int blk_nvmem_reg_read(void *priv, unsigned int from,
-> +			      void *val, size_t bytes)
-> +{
-> +	blk_mode_t mode = BLK_OPEN_READ | BLK_OPEN_RESTRICT_WRITES;
-> +	struct blk_nvmem *bnv = priv;
-> +	size_t bytes_left = bytes;
-> +	struct file *bdev_file;
-> +	loff_t pos = from;
-> +	int ret = 0;
-> +
-> +	bdev_file = bdev_file_open_by_dev(bnv->devt, mode, priv, NULL);
-> +	if (!bdev_file)
-> +		return -ENODEV;
-> +
-> +	if (IS_ERR(bdev_file))
-> +		return PTR_ERR(bdev_file);
-> +
-> +	while (bytes_left) {
-> +		pgoff_t f_index = pos >> PAGE_SHIFT;
-> +		struct folio *folio;
-> +		size_t folio_off;
-> +		size_t to_read;
-> +
-> +		folio = read_mapping_folio(bdev_file->f_mapping, f_index, NULL);
-> +		if (IS_ERR(folio)) {
-> +			ret = PTR_ERR(folio);
-> +			goto err_release_bdev;
-> +		}
-> +
-> +		folio_off = offset_in_folio(folio, pos);
-> +		to_read = min(bytes_left, folio_size(folio) - folio_off);
-> +		memcpy_from_folio(val, folio, folio_off, to_read);
-> +		pos += to_read;
-> +		bytes_left -= to_read;
-> +		val += to_read;
-> +		folio_put(folio);
-> +	}
-> +
-> +err_release_bdev:
-> +	fput(bdev_file);
-
-There's a __free() action defined in linux/file.h so you can use:
-
-	struct file *bdev_file __free(fput) = ...
-
-and avoid this label.
-
-> +
-> +	return ret;
-> +}
-> +
-> +static int blk_nvmem_register(struct device *dev)
-> +{
-> +	struct device_node *child, *np = dev_of_node(dev);
-> +	struct block_device *bdev = dev_to_bdev(dev);
-> +	struct nvmem_config config = {};
-> +	struct blk_nvmem *bnv;
-> +
-> +	/* skip devices which do not have a device tree node */
-> +	if (!np)
-> +		return 0;
-> +
-> +	/* skip devices without an nvmem layout defined */
-> +	child = of_get_child_by_name(np, "nvmem-layout");
-> +	if (!child)
-> +		return 0;
-> +	of_node_put(child);
-
-Same as above, can be:
-
-	struct device_node *child __free(device_node) == ...
-
-> +
-> +	/*
-> +	 * skip block device too large to be represented as NVMEM devices,
-> +	 * the NVMEM reg_read callback uses an unsigned int offset
-> +	 */
-> +	if (bdev_nr_bytes(bdev) > UINT_MAX)
-> +		return -EFBIG;
-
-This will mean a failed probe. Wouldn't it be better to use -ENODEV?
-
-> +
-> +	bnv = kzalloc_obj(*bnv);
-> +	if (!bnv)
-> +		return -ENOMEM;
-> +
-> +	config.id = NVMEM_DEVID_NONE;
-> +	config.dev = &bdev->bd_device;
-> +	config.name = dev_name(&bdev->bd_device);
-> +	config.owner = THIS_MODULE;
-> +	config.priv = bnv;
-> +	config.reg_read = blk_nvmem_reg_read;
-> +	config.size = bdev_nr_bytes(bdev);
-> +	config.word_size = 1;
-> +	config.stride = 1;
-> +	config.read_only = true;
-> +	config.root_only = true;
-> +	config.ignore_wp = true;
-> +	config.of_node = to_of_node(dev->fwnode);
-> +
-> +	bnv->devt = bdev->bd_device.devt;
-> +	bnv->nvmem = nvmem_register(&config);
-> +	if (IS_ERR(bnv->nvmem)) {
-> +		dev_err_probe(&bdev->bd_device, PTR_ERR(bnv->nvmem),
-> +			      "Failed to register NVMEM device\n");
-> +		kfree(bnv);
-> +		return PTR_ERR(bnv->nvmem);
-> +	}
-> +
-> +	scoped_guard(mutex, &devices_mutex)
-> +		list_add_tail(&bnv->list, &nvmem_devices);
-
-I'm not sure I understand the need to store these? Whatever you need to do in
-remove() can be scheduled in a devres action here.
-
-> +
-> +	return 0;
-> +}
-> +
-> +static void blk_nvmem_unregister(struct device *dev)
-> +{
-> +	struct blk_nvmem *bnv_c, *bnv_t, *bnv = NULL;
-> +
-> +	scoped_guard(mutex, &devices_mutex) {
-> +		list_for_each_entry_safe(bnv_c, bnv_t, &nvmem_devices, list) {
-> +			if (bnv_c->devt == dev_to_bdev(dev)->bd_device.devt) {
-> +				bnv = bnv_c;
-> +				list_del(&bnv->list);
-> +				break;
-> +			}
-> +		}
-> +
-> +		if (!bnv)
-> +			return;
-> +	}
-> +
-> +	nvmem_unregister(bnv->nvmem);
-> +	kfree(bnv);
-> +}
-> +
-> +static struct class_interface blk_nvmem_bus_interface __refdata = {
-> +	.class = &block_class,
-> +	.add_dev = &blk_nvmem_register,
-> +	.remove_dev = &blk_nvmem_unregister,
-> +};
-> +
-> +static int __init blk_nvmem_init(void)
-> +{
-> +	int ret;
-> +
-> +	ret = class_interface_register(&blk_nvmem_bus_interface);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
-> +}
-> +device_initcall(blk_nvmem_init);
-> diff --git a/drivers/nvmem/core.c b/drivers/nvmem/core.c
-> index 311cb2e5a5c02d2c6979d7c9bbb7f94abdfbdad1..ee3481229c20b3063c86d0dd66aabbf6b5e29169 100644
-> --- a/drivers/nvmem/core.c
-> +++ b/drivers/nvmem/core.c
-> @@ -2154,6 +2154,19 @@ const char *nvmem_dev_name(struct nvmem_device *nvmem)
->  }
->  EXPORT_SYMBOL_GPL(nvmem_dev_name);
->
-> +/**
-> + * nvmem_dev() - Get the struct device of a given nvmem device.
-> + *
-> + * @nvmem: nvmem device.
-> + *
-> + * Return: pointer to the struct device of the nvmem device.
-> + */
-> +struct device *nvmem_dev(struct nvmem_device *nvmem)
-> +{
-> +	return &nvmem->dev;
-> +}
-> +EXPORT_SYMBOL_GPL(nvmem_dev);
-
-This should still be a separate patch.
-
-> +
->  /**
->   * nvmem_dev_size() - Get the size of a given nvmem device.
->   *
-> diff --git a/include/linux/nvmem-consumer.h b/include/linux/nvmem-consumer.h
-> index 34c0e58dfa26636d2804fcc7e0bc4a875ee73dae..ce387c89dc8e4bc1241f3b6f36be8c6c95e282ed 100644
-> --- a/include/linux/nvmem-consumer.h
-> +++ b/include/linux/nvmem-consumer.h
-> @@ -82,6 +82,7 @@ int nvmem_device_cell_write(struct nvmem_device *nvmem,
->
->  const char *nvmem_dev_name(struct nvmem_device *nvmem);
->  size_t nvmem_dev_size(struct nvmem_device *nvmem);
-> +struct device *nvmem_dev(struct nvmem_device *nvmem);
->
->  void nvmem_add_cell_lookups(struct nvmem_cell_lookup *entries,
->  			    size_t nentries);
-> @@ -220,6 +221,11 @@ static inline const char *nvmem_dev_name(struct nvmem_device *nvmem)
->  	return NULL;
->  }
->
-> +static inline struct device *nvmem_dev(struct nvmem_device *nvmem)
-> +{
-> +	return NULL;
-> +}
-> +
->  static inline void
->  nvmem_add_cell_lookups(struct nvmem_cell_lookup *entries, size_t nentries) {}
->  static inline void
->
-> --
-> 2.34.1
->
->
-
-Bart
