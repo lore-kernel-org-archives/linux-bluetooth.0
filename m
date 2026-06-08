@@ -1,48 +1,109 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DCCB47F2F0
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 14:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A92D2DE6E6;
+	Mon,  8 Jun 2026 15:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780930569; cv=none; b=CpnPe+AosapuPIP5MoR5E/05Vc2lqwWzGFVXtgB1Vk9KJ1iuqmeSD72FKzXjbfHmS1jNoEeSB1Nwr/q53lb5iygZtp+3Cy7vRkJ/+6RScFW31DbGJ1quPO11VEh93xVp2MSCgWX68AVho8mlCKavhH0xK0VgEnuztze5+L5oWjw=
+	t=1780931918; cv=none; b=Oab7fH1qWCq8GrRDueksgly1/5OPpy0biGcm6dAdlA987xZWYthmmpplIx2jCgrX+Lk5CWc4mJt3u282+ae/ZhPRvDQA7Fp22sWSrDyURicTvdBYiyt9RCriqISW+VW2JWr7s7FPdpaAxyalm6ASRgG7jR15xgR92i0ZzvjGJvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780930569; c=relaxed/simple;
-	bh=S14rZMQbE4ZFBgeOOr4+XozMCMrMdbS3zJWiZ+HqX4A=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ZSLoM/HTVcbudhMKy8JqblLp/8S+Y/rYJ2eiPWXuB4X+fb9Lv1I6zPwhKOlu0HhCCrbdhe1XFtrRNQBZScMEsFDMeDxGoF/AcOo7az/NoQdsTWOrQN4lwFfXF4LR3LPAHbDMgAl3mt+O/qkpQr1DhA1h/IpB7S4vwYRTv4+w7SM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=dMqSpUVW; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1780931918; c=relaxed/simple;
+	bh=rueb+9AYc2E2/iUiDTkPBeaIesWk6ngSanqF7eTX95s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gzd3LKbM4+o19+TQ863v8mUi24JXLyDWLwLDceGFTH/sRlk4aPJxITbeFIo037xHM1zc52PNCHkf8XJma5fTo1kb/RqGWCgbqs/lAiYN2Ws4GsJns5K7ZHy28iSVnaHd0fsDlGVubYutVXKvYu1Orm5jYWtY8sEmixLLKVLEc6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fRs+R4j7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="dMqSpUVW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1780930565;
-	bh=nw2/ea7b+bdyAhgX6L+0AsASDSYx5m8BrzwlAOxyCSc=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=dMqSpUVWhJE77Ekty1imj+FBWkeBZR0HYoIjK0FZ/8nx9SThv5xWkrpGJA11inO73
-	 Fbq6qwpdHPUSqN9xm1IWZfVSre7Qk6I8UkFwTcmCeFY06PhTD1jwYn0cz7SsXuxKWQ
-	 fVKtCjXNv0vKW8XvyclBG2XeCcpg7Wy+c20672ws=
-Received: from github.com (hubbernetes-node-6870de7.va3-iad.github.net [10.48.174.50])
-	by smtp.github.com (Postfix) with ESMTPA id F29B3500538
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 07:56:04 -0700 (PDT)
-Date: Mon, 08 Jun 2026 07:56:04 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1107759/2c1a4f-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fRs+R4j7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 702691F00898;
+	Mon,  8 Jun 2026 15:18:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780931916;
+	bh=sTLCZKrnRtrIRJXJzO4FzQsnVEhHnjPYOb7yuw7wgNo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=fRs+R4j7/J1Yn4/cFT+KTS79N/Xda5tsPWkpeG2flEfh2ea4eOBOkoB7ARKhDyB4p
+	 xYo/mNKG5ERQfWzfjw5FMPAvTEPzBlLTOO+6O+NHI/goeAdhvnCCZs16Cq78YCUPSa
+	 8CwHyh50xzXgT+8mxPOvYIKiN9cUzt06Wp8JnYlnsGcZMqdOqFKx01/bpz3JrObu5V
+	 3OvPqn/HrnTbyd3vyY5ggAJXjYrhGluVABNtSZAwo0q/G01HaWB6C/4JsDDrA7IzhT
+	 VrDxF9G/9u7LhpGwET19n9BD9+BjGbMhQfZxSvQJfd2gHjdpQmVWeagA/qMkOPfDF9
+	 uKHR34IqaOPQA==
+Date: Mon, 8 Jun 2026 10:18:35 -0500
+From: Rob Herring <robh@kernel.org>
+To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Cc: Manivannan Sadhasivam <mani@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	Qiang Yu <qiang.yu@oss.qualcomm.com>,
+	Jeff Johnson <jjohnson@kernel.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Rocky Liao <quic_rjliao@quicinc.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	linux-arm-msm@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+	ath11k@lists.infradead.org, devicetree@vger.kernel.org,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	linux-bluetooth@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Subject: Re: [PATCH v2 0/7] arm64: dts: qcom: enable WiFi/BT on SM8350 HDK
+Message-ID: <20260608151835.GA2707238-robh@kernel.org>
+References: <20260608-sm8350-wifi-v2-0-efb68f1ff04c@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260608-sm8350-wifi-v2-0-efb68f1ff04c@oss.qualcomm.com>
 
-  Branch: refs/heads/1107759
-  Home:   https://github.com/bluez/bluez
+On Mon, Jun 08, 2026 at 09:59:18AM +0300, Dmitry Baryshkov wrote:
+> The SM8350 HDK has an onboard WCN6851 WiFi/BT chip, which for a long
+> time was not supported. Bring up different pieces required to enable
+> this SoC.
+> 
+> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+> ---
+> Changes in v2:
+> - Bumped num_vdevs to 4 to follow other similar devices (Jeff)
+> - Link to v1: https://patch.msgid.link/20260601-sm8350-wifi-v1-0-242917d88031@oss.qualcomm.com
+> 
+> ---
+> Dmitry Baryshkov (7):
+>       PCI: qcom: fix parsing of PERST# in the legacy case
+>       wifi: ath11k: enable support for WCN6851
+>       regulator: dt-bindings: qcom,qca6390-pmu: document WCN6851
+>       dt-bindings: bluetooth: qcom,wcn6855-bt: document WCN6851
+>       arm64: dts: qcom: sm8350: expand UART18 to 4 pins config
+>       arm64: dts: qcom: sm8350: modernize PCIe entries
+>       arm64: dts: qcom: sm8350-hdk: describe WiFi/BT chip
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Before adding new devices, can you (Qcom) fix the all the existing DT 
+warnings related to QCom WiFi/BT:
+
+      6 (qcom,wcn6855-bt): 'vddrfa1p7-supply' is a required property
+      6 (qcom,wcn6855-bt): Unevaluated properties are not allowed ('vddrfa1p8-supply' was unexpected)
+      2 (qcom,wcn6855-bt): 'vddwlmx-supply' is a required property
+      2 (qcom,wcn6855-bt): 'vddwlcx-supply' is a required property
+      2 (qcom,wcn6855-bt): 'vddbtcmx-supply' is a required property
+      2 (qcom,wcn6855-bt): 'vddaon-supply' is a required property
+      2 (pci17cb,1103): 'vddwlmx-supply' is a required property
+      2 (pci17cb,1103): 'vddwlcx-supply' is a required property
+      2 (pci17cb,1103): 'vddrfacmn-supply' is a required property
+      2 (pci17cb,1103): 'vddrfa1p8-supply' is a required property
+      2 (pci17cb,1103): 'vddrfa1p2-supply' is a required property
+      2 (pci17cb,1103): 'vddrfa0p8-supply' is a required property
+      2 (pci17cb,1103): 'vddpcie1p8-supply' is a required property
+      2 (pci17cb,1103): 'vddpcie0p9-supply' is a required property
+      2 (pci17cb,1103): 'vddaon-supply' is a required property
+
+Rob
