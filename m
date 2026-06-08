@@ -1,112 +1,204 @@
-Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA19372EDD
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 12:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073B9371876
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 12:12:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780920057; cv=none; b=koJ0MbGOC0xsGpwXsOONUfrIkhc5Ss9WTqLbLR5mcoz3Nug6nJ7iz3L/UtEdC6BnaUXNTQ1YwrhB/1cc46VY1uGazc2f9j8ufsscB715ThvsAOEfqBRrL6bgJSs9bEI59KJ06QeoAwI4tFOeuknpD5cuhjguPDHuNOCREj59XRg=
+	t=1780920763; cv=none; b=JKmm0/sPuXogoBR2GIG5CXWUn2oyYlr8oNhuL+gDymFcwbttlrG1VylEM0G1ZbBPosnVjNOCy5Di/WdeqrhhxM9w5Blu+W6HTPK7KFQojoN1ZkO19qcOYinh9e6Wm7ZaS+jMFc8D+tbNifhphq1LHxmMg9CK6YjTnZyjmS5b+6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780920057; c=relaxed/simple;
-	bh=pfb3Y2AN56PPYzb/Ab6oXw5P/jRa1+lkmeDJMe//6Lc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=drImcn4HKkna9jGZfUz1nkbVmQnYwbBAxk1PPQE/6i3WXXCzcjZ3EzWJoDxhdqQfPt+BDEFFflOZ4VA13lSmUNHBSimAmsVP9mRWtiBYCvD1/UD+I0h5YW+jfqIcc41MfuxTt7mcokh/3Tl76KZvxGFQWkOT0RzT48sBooOYGcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fw5NPlTD; arc=none smtp.client-ip=74.125.82.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1780920763; c=relaxed/simple;
+	bh=86J+eFE1bDy6G8hYPbAU2HpM3XVModZMkH2bMzzsymI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jqnTyzYVi2bANkpUAkLg9+YkpfpPihSCliLzfrgg/2LgZyPjgu3s3nJg67dQoWgixuu+SU2pzznILVPjBVjss+yS9+MyXFFu8R3uUSt1Emj2QS0BWUTCYpkzZAYx2nKzgv5MbMkNr89bqyQsw8R0+9sMZviJLa4+76M+qLtS85U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=g2PW9ST4; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fw5NPlTD"
-Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-304e83724bfso4947691eec.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 05:00:55 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="g2PW9ST4"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-490cf322ed0so8265525e9.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 05:12:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780920055; x=1781524855; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=W/0+d7yr997gbONRsGH6a+/aITer8u6NCF1XyST6h4k=;
-        b=Fw5NPlTDOSrxC50XeB3Ozqip+YbJuGHbsJ1x9popruLkMUw0r89ZxVUYR+j4xIyOgB
-         JvEPMgFY0IqAgJQyM9b+JZPBbTYMZRJOm7cwgFLPPUiS2uziIDUQY+lBAmDNiAn0EWNa
-         htqV3KrMUG2GKmBG5ESXnlvoSk85a5vbXjQxpGbaDuBpVEPnX6p4zcAtBJftKlRtx2Hq
-         iP9y20YShOL/pkdS3vDp05DmYCmCed4h3+8RDRgZzbijG3UqzHNhcEFE0nYR0AYKemb0
-         HJ99HK5j6nq2qcpVtmBv+fJ8aGgEvT7OFxJW37eziO8o2c+hYgR174C1A6qkKzSP/AbE
-         XNjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780920055; x=1781524855;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=streamunlimited.com; s=google; t=1780920759; x=1781525559; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=W/0+d7yr997gbONRsGH6a+/aITer8u6NCF1XyST6h4k=;
-        b=eV2S1tRwR+mmUecatc+0AZVks/v13ZlEdJMzIJcH5dS1L3KHLEKbf6H5WvNFna4QvW
-         14C4IFaIR+IKe3m/kiLNIVMRt/vtJVaxbHB3cQSJ/yvLL5Kx1VSPAINO+NRaFMPsuH2N
-         o8NfCICAYpTC2oiWqP2uEbnhte1ZSdH9qsRdXKVuJ5ykEPdX7YnnA/K71G4KMRLGaybX
-         wcZ03TisV1nn664k66BLxQOMvYU5wLl3EZauVk0O+TyEzRQnXD0UauTUA09jxuUbFjGM
-         Af5UuqqEM85j3riYQ6/2G9/vX0cyiiOfSS5eyyHDUe3HNRGion8j1aKuLZUsh5xOw7BG
-         aidQ==
-X-Gm-Message-State: AOJu0YwFizRYbgy2dhkPq2lOo1dG4+q04cGZREqtYowIeBQeiyi7f334
-	Y5DLRMsik71T+dLgkr6fgJNLG2Ivq/yH3vp7Ut5/P5IxiEpcUtq/ZO8VoZrElA==
-X-Gm-Gg: Acq92OHuoM7x+NS31IvkQRdl68jfyCSyMbpX1E2CVf4gUv8mnYQL+iZXivt2q2fjZ9f
-	W7kT1MYqilY1skwECXD0gZdbuwGPfUfdYq8jksz8OxfCLzOFKX5aI9YLEs21lBQDOzKUgON4Jv+
-	NMbdHpIzcdXlsNudrQsfYS8+ZrDAJZrhcYUcFL902TJ14GI9ZLegI+E9O0wda40tG6EfV/dgK+7
-	4tvIFbWBPOFF2AZp4fOPJzWQQSKFTN3emMXLcQzYcStnVsZCEE74LvjSUvKniW/FrT853/rTBiy
-	E5QKF/tivkt9R49YUksmXl7DSQVrQVWDdqVlRmHX5mXv2XpLkd/uycGPUTWgpgjGdPGIcD6VgSc
-	yX5SpXcqT6KTnGda0C+BMHonRCpSfORxTNNYO4Os49PtGYAkhbTjAr1JHml6C+UhjlRDWd9z8Rl
-	yi/huxKgZXXtPl6tkMWhwJ5XLHhub2V3mH4WCLFCk=
-X-Received: by 2002:a05:7300:7494:b0:2f3:3daf:3496 with SMTP id 5a478bee46e88-3077b7811f6mr7150947eec.26.1780920054643;
-        Mon, 08 Jun 2026 05:00:54 -0700 (PDT)
-Received: from [172.17.0.2] ([20.169.53.36])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3074df191d0sm24584834eec.21.2026.06.08.05.00.53
+        bh=vLAtDG1zp36QUZcsSX5UT6nKo4edcwss8vaUuCQDJBg=;
+        b=g2PW9ST43bZ0Rc9/F1SXZk42ZLr0+aCZVBX21ywRd+wbLXBJSYAuZ827pdJFBZklSO
+         BgAevacT02xqTlWPxaIWdVcCVxk5TAt6jNSxSPf86XrJ0CGOgnzdOVvovm5efIVTxpsQ
+         FKmS9bGvkXiYcms3RpeTKWokpQFDFH/zuQets=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780920759; x=1781525559;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vLAtDG1zp36QUZcsSX5UT6nKo4edcwss8vaUuCQDJBg=;
+        b=FMiipg7odHWdQNerOxublG03GZ9HALJK9XoStb1ru7hA8YKeStQ+MZu2IoxIifBX0S
+         BVAAxN+aDpCicwaq8Iavs1yvauUBhFnPR27jx0q8G7gML8Y50M9q7MVmJVQPmhnZkd4h
+         jlNosT2A6v3yrXr8EKW5YhbOUZCXFe3pG6cGQ6MHqqKCpRTkBb+gGSwYPMYzuQ9cfkSt
+         PDV8ujZu55rtooD9xpWQgetZMeXKUwJIeLRqd24KSMVcVWbHGlMr5+8vBlYPZnWiekTH
+         TSPqb20giEGGekwplCTFeCDu2PMKSBZoXJ3uWoZmFynK1TZp7hDOo2TEWPkFYY0OCvCa
+         sh+Q==
+X-Gm-Message-State: AOJu0YyipYppRd3ZIWf44b4jijBHnz3UeAeeAIY0bVK7j8snEEDW1yNn
+	jSUtbVztPbB5meXKBq6PQUqq1OqoC4hPyBxQLiUbQ4Zk6Rg7hHokDf4I4mWTOeAaC+9sOrmp08S
+	cNMIn
+X-Gm-Gg: Acq92OHEwOMb6belDPDF7WauiG2BszF8/HElJtlYswUt00fpFAyTQ13BSeEIk0KoriN
+	9s270cEPzefZ5FUC1ICRnQIoZH6mxmB2Os2cHp1LZr9gCn6IxxQoJLw0Om9Pm+XEwnDgt6O4+dn
+	EnxZXkJcKaVhq1nhP05510mfOlmbLo8Ikf2eiyNJbJRMiFwBkMukbHzjenyJu43KYwROhszPKIe
+	TLE5D7P8BXmPKTVYfBpmWyPGo05TEAsiJ5BaKkz0biB7fAZC6mGmh3C4j+c5KvdhsG63iGeGDYt
+	7mHK2zffQFzGEjLjEeGR1nJQX3tAyURbeqkZNhx44HD9GEgKj4UeIQd1qxMR65ZdmAqhxwdxhkZ
+	1cHDrXQW/m7W8MecepWXV1ZPLrdPGOO3laq7PbJnQJyY2Flbyxzb4nOUljeFbFbkH3I7YXHUhXI
+	0Uwk4HScj4ASFyWNKWKV8YpOFEjE+uY/5xGUNERM99Djo1bF4WcD9hRQ==
+X-Received: by 2002:a05:600c:154d:b0:490:44eb:c1ec with SMTP id 5b1f17b1804b1-490c260f3cdmr249168835e9.27.1780920759395;
+        Mon, 08 Jun 2026 05:12:39 -0700 (PDT)
+Received: from SMI-ubuntu.sueba ([2a01:390:0:101:2869:769f:34b:70a7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3d6c65sm381234765e9.12.2026.06.08.05.12.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 05:00:54 -0700 (PDT)
-Message-ID: <6a26aef6.44930dee.3c8499.3424@mx.google.com>
-Date: Mon, 08 Jun 2026 05:00:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7924412370152597685=="
+        Mon, 08 Jun 2026 05:12:39 -0700 (PDT)
+From: Simon Mikuda <simon.mikuda@streamunlimited.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ 2/2] client/player: Add get-config command
+Date: Mon,  8 Jun 2026 14:12:25 +0200
+Message-ID: <20260608121226.3727101-2-simon.mikuda@streamunlimited.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260608121226.3727101-1-simon.mikuda@streamunlimited.com>
+References: <20260608121226.3727101-1-simon.mikuda@streamunlimited.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, simon.mikuda@streamunlimited.com
-Subject: RE: [BlueZ] hog: Fix starting encryption on some BLE remotes
-In-Reply-To: <20260608091140.3606008-1-simon.mikuda@streamunlimited.com>
-References: <20260608091140.3606008-1-simon.mikuda@streamunlimited.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============7924412370152597685==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1107612
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.27 seconds
-GitLint                       PASS      0.20 seconds
-BuildEll                      PASS      12.59 seconds
-BluezMake                     PASS      379.88 seconds
-MakeCheck                     PASS      0.57 seconds
-MakeDistcheck                 PASS      147.74 seconds
-CheckValgrind                 PASS      116.75 seconds
-CheckSmatch                   PASS      184.84 seconds
-bluezmakeextell               PASS      95.68 seconds
-IncrementalBuild              PASS      402.48 seconds
-ScanBuild                     PASS      507.29 seconds
-
-
-
-https://github.com/bluez/bluez/pull/2184
+Content-Transfer-Encoding: 8bit
 
 ---
-Regards,
-Linux Bluetooth
+ client/player.c                 | 57 +++++++++++++++++++++++++++++++++
+ doc/bluetoothctl-endpoint.rst   | 11 +++++++
+ doc/org.bluez.MediaEndpoint.rst | 13 ++++++++
+ 3 files changed, 81 insertions(+)
 
+diff --git a/client/player.c b/client/player.c
+index c5e4beef0..e0477c538 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -4571,6 +4571,60 @@ enter_cc:
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+ 
++static void get_config_reply(DBusMessage *message, void *user_data)
++{
++	DBusError error;
++	DBusMessageIter iter, array;
++	uint8_t *data;
++	int len, i;
++
++	dbus_error_init(&error);
++
++	if (dbus_set_error_from_message(&error, message) == TRUE) {
++		bt_shell_printf("Failed to get configuration: %s\n",
++								error.name);
++		dbus_error_free(&error);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (!dbus_message_iter_init(message, &iter) ||
++			dbus_message_iter_get_arg_type(&iter) !=
++							DBUS_TYPE_ARRAY) {
++		bt_shell_printf("Invalid GetConfiguration reply\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	dbus_message_iter_recurse(&iter, &array);
++	dbus_message_iter_get_fixed_array(&array, &data, &len);
++
++	bt_shell_printf("Configuration (%d bytes):", len);
++
++	for (i = 0; i < len; i++)
++		bt_shell_printf(" %02x", data[i]);
++
++	bt_shell_printf("\n");
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static void cmd_get_config_endpoint(int argc, char *argv[])
++{
++	GDBusProxy *proxy;
++
++	proxy = g_dbus_proxy_lookup(endpoints, NULL, argv[1],
++						BLUEZ_MEDIA_ENDPOINT_INTERFACE);
++	if (!proxy) {
++		bt_shell_printf("Endpoint %s not found\n", argv[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (g_dbus_proxy_method_call(proxy, "GetConfiguration", NULL,
++				get_config_reply, NULL, NULL) == FALSE) {
++		bt_shell_printf("Failed to call GetConfiguration\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++}
++
+ static const struct bt_shell_menu endpoint_menu = {
+ 	.name = "endpoint",
+ 	.desc = "Media Endpoint Submenu",
+@@ -4591,6 +4645,9 @@ static const struct bt_shell_menu endpoint_menu = {
+ 						cmd_config_endpoint,
+ 						"Configure Endpoint",
+ 						endpoint_generator },
++	{ "get-config",   "<endpoint>", cmd_get_config_endpoint,
++						"Get Endpoint Configuration",
++						endpoint_generator },
+ 	{ "presets",      "<endpoint>/<UUID> [codec[:company]] [preset] "
+ 						"[codec config] [metadata]",
+ 						cmd_presets_endpoint,
+diff --git a/doc/bluetoothctl-endpoint.rst b/doc/bluetoothctl-endpoint.rst
+index 019e64e38..b8277dd57 100644
+--- a/doc/bluetoothctl-endpoint.rst
++++ b/doc/bluetoothctl-endpoint.rst
+@@ -154,6 +154,17 @@ Note:
+ If the endpoint was registered by an audio server, it can't be configured from bluetoothctl.
+ This must be done by the audio server as well.
+ 
++get-config
++----------
++
++Get Endpoint Configuration.
++
++:Usage: **> get-config <endpoint>**
++:Uses: **org.bluez.MediaEndpoint(5)** method **GetConfiguration**
++:<endpoint>: Path to the remote endpoint to query
++:Example Get configuration of remote endpoint:
++	| **> get-config /org/bluez/hci0/dev_00_11_22_33_44_55/sep1**
++
+ presets
+ -------
+ 
+diff --git a/doc/org.bluez.MediaEndpoint.rst b/doc/org.bluez.MediaEndpoint.rst
+index d1b9c8114..7518caf25 100644
+--- a/doc/org.bluez.MediaEndpoint.rst
++++ b/doc/org.bluez.MediaEndpoint.rst
+@@ -96,6 +96,19 @@ Examples:
+ 
+ :bluetoothctl: > endpoint.config <endpoint> <local endpoint> [preset]
+ 
++array{byte} GetConfiguration()
++``````````````````````````````
++
++Retrieve the current configuration of the remote endpoint.
++
++Sends an AVDTP GET_CONFIGURATION command to the remote endpoint and returns
++the configuration as a raw byte array containing AVDTP service capabilities.
++
++Possible errors:
++
++	:org.bluez.Error.NotAvailable:
++	:org.bluez.Error.Failed:
++
+ array{byte} SelectConfiguration(array{byte} capabilities)
+ `````````````````````````````````````````````````````````
+ 
+-- 
+2.43.0
 
---===============7924412370152597685==--
