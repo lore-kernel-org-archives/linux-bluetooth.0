@@ -1,36 +1,36 @@
-Received: from out-5.smtp.github.com (out-5.smtp.github.com [192.30.252.196])
+Received: from out-43.smtp.github.com (out-43.smtp.github.com [192.30.252.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB943403F1
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 11:29:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020A325782A
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 11:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780918161; cv=none; b=gjanyraX/HbzMWZmzC4S6WfmuNZtBDb7ZD5QuTnKg0p9q+TawQZ9416yaLXcPN04fYJG0h5RDXNKknCTRo8vQfrYE99UbTO2NgEadLJERnPP3QUyZuhseItUAm+rqLG2lpU2bZXOsLV83PRjFZm6V8iJuKkwUkjbNiJbI9At5og=
+	t=1780918165; cv=none; b=MD4p72Tg8LObLMP4sPSWBgXbdsop46PdQV7ltT2zNh/hOoJdZUH7/eyjSsxGgTGyUCm+RjTpejn9IyC7NfC64wFuMOJPSnSjP00fMtLLXGpdR61WnpeUiSRNG8MZX4eMWtbtT3FNmct+NUTHC41niaU+KSHsr7OG0S/ANGxztSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780918161; c=relaxed/simple;
-	bh=JEPYiuuZKwEg+BkVHPiD3aO/iXc2NzKFQC3ipGksjWM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Suy0rKhgWsoDWNxeAVMBEN8vQW08FRI6YvzWz7/XCGHMhEkMzKt++3FY62J27sdueOIjnv2/QBMeUXaZUOAM1J6Gl8JhZkhLsxTL8KvamXKNBuQFvRavK5cS3RtZGsle5/jQqNnnQnyY3k1LUdK/0YFRronzXS4M4pgwLb6bj58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=isJcuffi; arc=none smtp.client-ip=192.30.252.196
+	s=arc-20240116; t=1780918165; c=relaxed/simple;
+	bh=HNkpEMjDMntMYpro5W5inj8vFmtEx+EcFmI0tPNlSJ0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=aCQnowKCruC0m1O168pvUIfCbZhYlkmPgLpUttSTuNkx5VGDe7VzfuQhm0iKkKfGJ8AsDvYSUDi5QdX6h9VBJUVs+qHDiszNXphLZEfY+Q3mCs4vKcXPXLDmN5qXSDrNVIKpylqUYWlSkLEUAvcgATthmqmXGkC1jmztSbd6h4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=G0YHf4SD; arc=none smtp.client-ip=192.30.252.142
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="isJcuffi"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="G0YHf4SD"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1780918159;
-	bh=vhkF7bjO0DfyYn6+r4Hta2jACggy3/sVZoGgnAk1G4I=;
+	s=pf2023; t=1780918163;
+	bh=PQD/SZiI5mbi2Z6jL2uGz8etSVYLcynBeycDWqAvpCw=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=isJcuffigIjcYYdJYQQmKKbMhegxHrnjWNs9XF3hhjeLFFgaFTTUD5BGY3U0JRDcL
-	 drlVhVoOyxhxC9AAfVHV6h3HvC3YGhi/covhtzGwvBmxNwytfM8qENlEoQMKMNjW46
-	 Goj+EGacADIEjtldRjKuWBxqMrgvw4HAo8NiffKw=
-Received: from github.com (hubbernetes-node-b1ec7b6.va3-iad.github.net [10.48.177.35])
-	by smtp.github.com (Postfix) with ESMTPA id A2730781248
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 04:29:19 -0700 (PDT)
-Date: Mon, 08 Jun 2026 04:29:19 -0700
+	b=G0YHf4SDdrpHf2s/fSwUIwxZWxDKuV4M8/XDqy4gEBadOyXC4mfGKMANB4GkL8Olt
+	 z9asl72UzR1WgAqsKTPe/kaZiZAQaIZjirl3of1/bPRzm0gqVAbJ5yY024nmg4MBGa
+	 By5GMoJiX/KgjpCL32muLVk7LtCGa+t/Fkb340ac=
+Received: from github.com (hubbernetes-node-b746d89.ash1-iad.github.net [10.56.202.84])
+	by smtp.github.com (Postfix) with ESMTPA id 2E9A6841088
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 04:29:23 -0700 (PDT)
+Date: Mon, 08 Jun 2026 04:29:23 -0700
 From: =?UTF-8?B?xaBpbW9uIE1pa3VkYQ==?= <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1107612/000000-671363@github.com>
-Subject: [bluez/bluez] 671363: hog: Fix starting encryption on some BLE
- remotes
+Message-ID: <bluez/bluez/push/refs/heads/1107759/000000-2c1a4f@github.com>
+Subject: [bluez/bluez] a8832a: device: Refactor device_discover_services
+ function
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,45 +43,59 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1107612
+  Branch: refs/heads/1107759
   Home:   https://github.com/bluez/bluez
-  Commit: 671363a7c1e274bcbe475da9290f886a12229d61
-      https://github.com/bluez/bluez/commit/671363a7c1e274bcbe475da9290f886a12229d61
+  Commit: a8832a9553fb3b9c4c41723a5498f84ae1f0e280
+      https://github.com/bluez/bluez/commit/a8832a9553fb3b9c4c41723a5498f84ae1f0e280
   Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
   Date:   2026-06-08 (Mon, 08 Jun 2026)
 
   Changed paths:
-    M profiles/input/hog.c
+    M profiles/input/server.c
+    M src/adapter.c
+    M src/device.c
+    M src/device.h
 
   Log Message:
   -----------
-  hog: Fix starting encryption on some BLE remotes
+  device: Refactor device_discover_services function
 
-When BLE remote doesn't reply with Insufficient Authentication Error
-encryption is not started.
-
-Good remote:
-< ACL Data TX: Handle 64 flags 0x00 dlen 7
-      ATT: Read Request (0x0a) len 2
-        Handle: 0x0021 Type: HID Information (0x2a4a)
-> ACL Data RX: Handle 64 flags 0x02 dlen 9
-      ATT: Error Response (0x01) len 4
-        Read Request (0x0a)
-        Handle: 0x0000
-        Error: Insufficient Authentication (0x05)
-< HCI Command: LE Start Encryption (0x08|0x0019) plen 28
-        Handle: 64 Address: xx:xx:xx:xx:xx:xx (OUI xx-xx-xx)
-        Random number: ...
-        Encrypted diversifier: ...
-        Long term key: ...
-
-Bad remote:
-< ACL Data TX: Handle 64 flags 0x00 dlen 7
-      ATT: Read Request (0x0a) len 2
-        Handle: 0x001e Type: HID Information (0x2a4a)
-> ACL Data RX: Handle 64 flags 0x02 dlen 9
-      ATT: Read Response (0x0b) len 4
+After refactoring we can reuse function once more in function
+void device_bonding_complete(...)
 
 
+  Commit: 04c3a58df0f657149e12565edc87174882fd22f5
+      https://github.com/bluez/bluez/commit/04c3a58df0f657149e12565edc87174882fd22f5
+  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
+  Date:   2026-06-08 (Mon, 08 Jun 2026)
+
+  Changed paths:
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Rename start_discovery function
+
+Rename it to start_discovery_cb to indicate that it is callback function
+from timer.
+
+
+  Commit: 2c1a4f11da736bc4218d869fdaca7d5ac8cd1ec8
+      https://github.com/bluez/bluez/commit/2c1a4f11da736bc4218d869fdaca7d5ac8cd1ec8
+  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
+  Date:   2026-06-08 (Mon, 08 Jun 2026)
+
+  Changed paths:
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Fix returning discovery error for Device.Pair
+
+If discovery was requesed from pair request we will report successfull
+pairing even if there was an error during discovery.
+
+
+Compare: https://github.com/bluez/bluez/compare/a8832a9553fb%5E...2c1a4f11da73
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
