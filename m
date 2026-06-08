@@ -1,93 +1,93 @@
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09E830DD1D
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 13:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F9C33DEC2
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 13:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780926256; cv=pass; b=iqERzWB8LvaYefOy8+9m4Ds4w1SSlnmVxYpVM7IaSNda2YL3MQSj0R/xVCHxIKYj/7l6LitoxNhtX216F26yIyHsE7gVEGQCKtgk04wsH2Yjh16VyYnflI4Zdya3H8HUZ+y2CzawfVk2JruHX3ilDQh/Ct9GfKWBzsNcsCKq468=
+	t=1780926544; cv=pass; b=GGaH8rNbhY6Qsmu7vHIFc4DVMgypxcF+Hr4hgZo+xpWOiqqGLAK7OKCcZ8ObJaHeikWXDNVgpKwr5xNsq/f4VWvtcxbomWF8qLANdQd5m3iL3ukcWUqx2CChMjQFkWmF6claYE7NFPgswnTuoeB4Q7pdm9u+wc5dNl1s6n+EvVs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780926256; c=relaxed/simple;
-	bh=ezd/PoLvI0Z1RoKgF/d1R5fy+N3FNSX0KL1ZMfAbnqo=;
+	s=arc-20240116; t=1780926544; c=relaxed/simple;
+	bh=27f55uUsf/NeLL+ozt166XxYkPciWXtYi/uoe7VfszM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PSKfOFnboBz41xQb9pri0+POpwUKyqTJ8AdE/diHMb0cWiOejL1yWUDWNcyJZly1xCkV74vKHPxVbQz2Z7nWfAiuEDEAq2AHg01/r8sboqrJ7bT27CvbUbomqxsalu8wKxau5ELGQUuZqytBLdtdcO0+l7V4LcCyG6FL0fZ/h3I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dae/y64b; arc=pass smtp.client-ip=209.85.128.176
+	 To:Cc:Content-Type; b=WiXlQvC4CxJbMXgxnbKOITwF/4PRF5HPft8uI9kP4Xqy/3oILRT7IWa5SsocWeUHjI7tRKQe8+ygWqNzTJzN39fOZhTjalx+GGRgBcY44KGQsfSLv44idXOuaUGCYljaR8aKzaHNMk/gODK5RnzR+Onv5i2C73KRqs28Su96CMI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=r2ll88Jr; arc=pass smtp.client-ip=74.125.224.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dae/y64b"
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-7e8833c99fcso49052417b3.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 06:44:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780926254; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r2ll88Jr"
+Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-6603246b66dso4286969d50.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 06:49:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780926543; cv=none;
         d=google.com; s=arc-20240605;
-        b=CsAeaZn3sSBZFZCI0A745ZqrrE0le4ABhEdaF1DpMrbQ3y4jnzmoSdjcty+3Albqlu
-         cGy+7y/xmAdn27S/wMzGjpNXwmn1n1isIjSnMzGmUVBuqWs5mQO/V1v9IbVuQ9RS4iRx
-         qGK2ixwI7BSmtIUQUaNgh07SkY2v/pOLXxqGK55Ex14g1hriF37G8I9hc1M2vBC2iAfp
-         /RslQU0xF28N0NuchlNYQwMYRTMxgA18vs6hbwH/5deJSy8mYm0cDbXitGqPNF02v8o4
-         JntXoG6yPveXnrW0PIhmqRP9WYZeUtk2jy+/0wghEsxAbxcHD67Hcb8GNu+JRbapF9Eb
-         jTCg==
+        b=V9hjClxX44rskvTHTH3vtnDdUeuMgvjPiEU3q34JHgD/UGojVcLtpP554jyY9e63GO
+         UAPoPH/Cf264uHHodF48cepcCmhKlWWdDOgj18v3iXRTa7G+6qAvbq4Y+g9dNeCvDWxw
+         YMSPJ1vyDGlR1knZNymlexwM8bBnEG2UWxA4SZAm/GwEb+TQo7o9c64HAa+SRpAPM19e
+         3wsAnP0zxxMmnsl5N6iqECUqJ9bZABRHTCeVeMukJjQn/rYPYMMao6/3UfPFIuM8cv5f
+         W3mBTb4uRlMceGCNyzA0Qbgai04bhKUV+E5NTzyGKHZQ4MXsvXHTUGkSOosUV0sNujyE
+         gnOw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=pMDHZIEIudUtq/ww46UkAChtFT5NXaZLDi5z3sNKrvQ=;
+        bh=3rJ+OnVyAbZqi93HvWlQx93MJtyUJfD5PT9D/T9kkBY=;
         fh=tyq0gYhA4cMcqn+bWakZSAdnDDyh/si+tlAcgOGyoy0=;
-        b=EDHVxlTqvHTBPdUv8EESB/CLdd2yogMRHsryyp7SWCPHtFiTv5+nHKQZFP00MX6XVN
-         v9X51bm9XS9ZMW75/MjGMckoZNemPWUwqJR21e/rEtyrdInlEHdwz00xl5xXBfMYSnnA
-         kcQM+0QvFvyp4Dkcq3Zm3C914NkCbGynC7dyBqSUvLWWzqfwNeWBffTrH+waMo8IXRwN
-         aIFQB5GDHaelDYMeog+ekV1hu/jQq2Zr4rX6nizCb+32335JU4jULRx8qNgnl34jyo7w
-         Fhek4wBMOv3jiLOQnXZFVhKo7ZzSBoCkKEoN04jeQLBJSDrtBbbu42XIXOOFk4dBIh5T
-         dpoA==;
+        b=QQc4MMzyZe0UCWdbH7lAQD0eon2RyM0WS3DuSc7uesYDWXczI6TB2YSFyUGk2/zab2
+         nzXZVJ5nvpN1vYT/rp6x5z0t2xesav+jNElRpu33AEIcud0FX7fy3xRtYnDW4pMFldya
+         8mGFMvXHXgLliizS/yo1Mrq64cPCHDjl4wUZjjPasG1HBZGVc5iHfGbSPKp7vvTm/ifl
+         Ew+6jumm4F7reVUyECeoPqAKiiplzgRwxtxOPgwKNRP7ZreUCrdEh9pJieijNCTe7yMY
+         1LtCzFWXzdMbgZmnzOSBhaHIB/zdx7Q1vFXCeFUQ44KGYFQbiV/iG0YoobkfS7G16TpZ
+         7bHA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780926254; x=1781531054; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780926543; x=1781531343; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pMDHZIEIudUtq/ww46UkAChtFT5NXaZLDi5z3sNKrvQ=;
-        b=dae/y64bdjgo8vcR14gGIWVvXXPRGnBhoVkA/7vtxzG/NfNXsq65/XPzUb0cNeBWMz
-         eu2x7pCqIcqjlvHIlQe+RJCqCmYzARS9BpPfm5BnmYPTeCKnAw6Rn/lTjKIa/78/2urB
-         PpqHRn6Yj52CMkefKOWBvnzClVLWfQXcCK+OrnxsCndZYQ6hTc3+QCaxgY9EPvVxkFsY
-         T61ddbr7YM/J4iXjpmeZbfi0xxfwaCR1N3PB+7P2Ha7dO1gJM3S0JFsWG6mGQlrIiOeN
-         5kKou4cdvpbkxNqwV8kiqJtmTgj0Ltz8EEIdYWFUc61xQBdCFWlwfSoy2Ptn9VMXZiye
-         na5g==
+        bh=3rJ+OnVyAbZqi93HvWlQx93MJtyUJfD5PT9D/T9kkBY=;
+        b=r2ll88JrbqfZy6ZCq1s0yR1UNAvR9n+nIWgABu7u1KpE8mLIs+AwBWuUkHVtbl1nPq
+         g+rtEhXR5XZ2DvX9AVqEA1kEp9dmhUUBUsHC5P8KbrZmfTp9q54L2h9lACINGjssm9mG
+         NYhaFFl4ksYMQjQvgbb2yqeb2Drn9UemSbq9x3NFPnZUTUfPskFz1WXO/Zyhi2wrbEPB
+         r8CIWyP+O/eJqcJR6bamH9aEDSYkocjQd+QY8ryhAZqLgt9xSh16afskU3NQhSFhJEXh
+         tks2qvlwX9a/FxHgvGaG6gt35pnKq9TtvlpAsOjB5y8CRkn/B0F33KgTrBwrYTsia1F4
+         D32A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780926254; x=1781531054;
+        d=1e100.net; s=20251104; t=1780926543; x=1781531343;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=pMDHZIEIudUtq/ww46UkAChtFT5NXaZLDi5z3sNKrvQ=;
-        b=B2vP+LTuG7R3nGpbU3LCzFAeqNFjG7yvNUfS6HhrjX415K4HRqQMaRo6q/8wX8h3hQ
-         Pm7cwfogrAE7tDcv5/Xqgb5ODmaC8oWllYnk2ASHu/sT5f4fAbl/vgTbP8D6xggKQ5zY
-         RSugZ7POlxWFaktke72X7MRoDRjRkfbBO55EVNxRYdN92P7sUsaHxKuffz9bTBrmfX+e
-         YNedfbIHqKLZWR84vRDW904pfXg9lZSqre4s5ZJnwEiYErLOTbIuA7AerHf0NDr+0KBy
-         vsOzNuPFvUjdyVhUP7FJpk+wUv3cxFVQePDQ4kTutTHXtxOC1/yeS2vPegE1lAHiDzxA
-         2ixA==
-X-Gm-Message-State: AOJu0Yz3yUxAxsj7GUSxN7x6xtAykiyd0afbXDC+EFQw8Mcfw6hiVXE3
-	lvJdfaC/AD+RbZmpz3KrETvyl8sIZYo0OL2cIypBwvltVltoR+/ng5edOJw4SmnrVboBJWpTwA8
-	9sm9Lef9y25ik+X3H6eCeqFGZRocPyWXViMuhR1MYdA==
-X-Gm-Gg: Acq92OFx6yftbk5azROOBSQC1dnCftsFp6aLvLFQwUwXQBRNbfsH/tyYl0ETDO+8E8y
-	I2B3b2H4YX/5sF+o/V2X8W++2sa7fu5nmmljVoFXJFMcXhjL+PIwbOC65Z7TFhG80STTQygjxAV
-	tbm+hNsJkTt3Gezmvk6y9fDPAkmFLtIUcDLo1OHVFyYfpgeWzC3PFPMKq068Ublf9qG5xA4950C
-	33tj5WBugVlWlSH2TWqDYvKrOWPxcjtS/+ADDDHH115nAdky0yySMceplX4NzEWsxzdwRe79AQH
-	IoEsURwJ2CS/c49Tib4Oms4XQVeY6a2N3SytNNQPPsXC89cbG0cSdRg0WEZjcdaCZ3jPGsrvmxk
-	EjR/E
-X-Received: by 2002:a05:690e:43d3:b0:660:6971:db68 with SMTP id
- 956f58d0204a3-66107019871mr8665525d50.35.1780926253570; Mon, 08 Jun 2026
- 06:44:13 -0700 (PDT)
+        bh=3rJ+OnVyAbZqi93HvWlQx93MJtyUJfD5PT9D/T9kkBY=;
+        b=lMHP/CAPQuQHlQA6AXa7lP2dW8Wv15seC0ghyX/dlqgCGSgres1xp5zrezHxOpr12w
+         UZ0szGtzIjZ8K3yQuGGeycwNAOaW0q26dPyCDlG7X8Bm6p0Yd/VnA53dTDoXY3XJ8rBZ
+         Lz28kuMu27IqmDCiRwy5UwBXX1SYrexZKmaNY32+zfYbSyjVJS28AZHRGBZo7yEdnd92
+         0bsacyuqlm/VoXnDv61tGQtqfHvFUw+6kbvQVXTcfYUIc+H5QAuIW2ZbXGVeUJB9dEh5
+         AHkdFGjeTWKC2JJKAA4r0rE76OTjQI9PnXRKRAVfvY3iHTgsSqwudjaac35Elu0KGuBJ
+         Po+Q==
+X-Gm-Message-State: AOJu0YxxiKuHUmFT68gY/6S+zsE0WMbBo6V1y4Lfhn5W0tubltJ+Cqlv
+	PNvgKJg1j2uxZltQ5QN+DQ+Te4o88Tn/Bhi0Ap5r4nL37WbOKScaQatWc9csVIXd/1WlZk3KX9A
+	Iumzaz1SzmuLfV40GS9R4CxMgioRhCfovb3ivsB8=
+X-Gm-Gg: Acq92OEoOlJa4qm/fZ5JoXQvxwTZi7+/nb4RxN6ftyK3MV1Ia9M2o2LrpVxVBxnK7iu
+	9pwJbqIOjKHPopc0Z5kZWRMRMD0+egOXDYtd7E4t+HRGVAFqlBD1r6B/4yjz6E5343WxjKJJIe2
+	qO4LndnEo2LbvkwSiGedKNEUlEbLkcd6d+BF7o2OrPtG2x7vdRdB/dTWDuZYNvDOFitvUdFwhmc
+	OrHVTwFrxjNktlo7DxWUBW3xInY7xYvlflAhwyFqLTuyObjPWy8Qv8N4/vz6NWv7/IIzJ4j6RMP
+	6j8xA7PYKSdup6061O1A0Nca4bBwCOiggbS2t7WCbFoPskAO71MGf+XItzH2Uur0TEE9qjELkke
+	EvWa3
+X-Received: by 2002:a05:690e:484f:b0:660:4538:2331 with SMTP id
+ 956f58d0204a3-66106f38f8dmr9134238d50.36.1780926542763; Mon, 08 Jun 2026
+ 06:49:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260608112028.3686726-1-simon.mikuda@streamunlimited.com>
-In-Reply-To: <20260608112028.3686726-1-simon.mikuda@streamunlimited.com>
+References: <20260608111658.3686364-1-simon.mikuda@streamunlimited.com>
+In-Reply-To: <20260608111658.3686364-1-simon.mikuda@streamunlimited.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 8 Jun 2026 09:44:01 -0400
-X-Gm-Features: AVVi8CeTWJxtwS4EclpUVR-xuhEKyUPdfeGjbuYMrEXqr8jLmCVBI944ggZspz8
-Message-ID: <CABBYNZ+yoX-HWoNg4=wcqbZWp1fyK=_cEzhwd8m3P_jQWO41mg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] bap: Fix CCC value for ASE control point
+Date: Mon, 8 Jun 2026 09:48:51 -0400
+X-Gm-Features: AVVi8CdXxH0xbZShxeptt6xNZlRWx7GPCRtwTLjT7VU7A5p48ljmsmAIbxMicGU
+Message-ID: <CABBYNZ+HPDOdhW+236pd8BRp1L+he4d4=sEQd5Q+5OZ+xPgO1w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] a2dp: Add codec prioritization
 To: Simon Mikuda <simon.mikuda@streamunlimited.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -95,64 +95,110 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi Simon,
 
-On Mon, Jun 8, 2026 at 7:31=E2=80=AFAM Simon Mikuda
+On Mon, Jun 8, 2026 at 7:19=E2=80=AFAM Simon Mikuda
 <simon.mikuda@streamunlimited.com> wrote:
 >
-> WriteWithoutResponse was missing
+> This change will select best codec when connecting to A2DP:
+> LDAC > AptX HD > AptX > AAC > SBC
 > ---
->  src/shared/bap.c | 1 +
->  1 file changed, 1 insertion(+)
+>  profiles/audio/avdtp.c | 51 +++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 50 insertions(+), 1 deletion(-)
 >
-> diff --git a/src/shared/bap.c b/src/shared/bap.c
-> index 8fc2fb14d..968b85730 100644
-> --- a/src/shared/bap.c
-> +++ b/src/shared/bap.c
-> @@ -3776,6 +3776,7 @@ static struct bt_ascs *ascs_new(struct gatt_db *db)
->                                         &uuid,
->                                         BT_ATT_PERM_WRITE,
->                                         BT_GATT_CHRC_PROP_WRITE |
-> +                                       BT_GATT_CHRC_PROP_WRITE_WITHOUT_R=
-ESP |
->                                         BT_GATT_CHRC_PROP_NOTIFY,
->                                         NULL, ascs_ase_cp_write,
->                                         ascs);
+> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> index d475a545e..a8733a7e1 100644
+> --- a/profiles/audio/avdtp.c
+> +++ b/profiles/audio/avdtp.c
+> @@ -42,6 +42,8 @@
+>  #include "sink.h"
+>  #include "source.h"
+>
+> +#include "a2dp-codecs.h"
+> +
+>  #define AVDTP_PSM 25
+>
+>  #define MAX_SEID 0x3E
+> @@ -1293,10 +1295,49 @@ static struct avdtp_stream *find_stream_by_lseid(=
+struct avdtp *session,
+>         return find_stream_by_lsep(session, sep);
+>  }
+>
+> +static unsigned int get_codec_priority(
+> +                               struct avdtp_media_codec_capability *code=
+c_cap)
+> +{
+> +       unsigned int priority =3D codec_cap->media_codec_type;
+> +
+> +       if (codec_cap->media_codec_type =3D=3D A2DP_CODEC_VENDOR) {
+> +               a2dp_vendor_codec_t *vendor_codec =3D (void *) codec_cap-=
+>data;
+> +
+> +               switch (A2DP_GET_VENDOR_ID(*vendor_codec)) {
+> +               case APTX_VENDOR_ID:
+> +                       return priority + 100;
+> +               case APTX_HD_VENDOR_ID:
+> +                       return priority + 200;
+> +               case LDAC_VENDOR_ID:
+> +                       return priority + 300;
+> +               }
+> +       }
+
+Nak, not going to accept fixed, made up, ranking, the ranking should
+be per endpoint source by ordering from higher to lower priority.
+
+> +       return priority;
+> +}
+> +
+> +static int sep_codec_cmp(gconstpointer a, gconstpointer b)
+> +{
+> +       const struct avdtp_remote_sep *sep1 =3D a;
+> +       struct avdtp_service_capability *cap1 =3D sep1->codec;
+> +       unsigned int priority1 =3D get_codec_priority((void *) cap1->data=
+);
+> +
+> +       const struct avdtp_remote_sep *sep2 =3D b;
+> +       struct avdtp_service_capability *cap2 =3D sep2->codec;
+> +       unsigned int priority2 =3D get_codec_priority((void *) cap2->data=
+);
+> +
+> +       if (priority1 < priority2)
+> +               return 1;
+> +       if (priority1 > priority2)
+> +               return -1;
+> +       return 0;
+> +}
+> +
+>  struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+>                                                 struct avdtp_local_sep *l=
+sep)
+>  {
+>         GSList *l;
+> +       GSList *sorted =3D NULL;
+>
+>         for (l =3D session->seps; l !=3D NULL; l =3D g_slist_next(l)) {
+>                 struct avdtp_remote_sep *sep =3D l->data;
+> @@ -1325,7 +1366,15 @@ struct avdtp_remote_sep *avdtp_find_remote_sep(str=
+uct avdtp *session,
+>                                 continue;
+>
+>                 if (sep->stream =3D=3D NULL)
+> -                       return sep;
+> +                       sorted =3D g_slist_insert_sorted(sorted, sep,
+> +                                                       sep_codec_cmp);
+> +       }
+> +
+> +       if (sorted) {
+> +               struct avdtp_remote_sep *sep =3D sorted->data;
+> +
+> +               g_slist_free(sorted);
+> +               return sep;
+>         }
+>
+>         return NULL;
 > --
 > 2.43.0
 >
+>
 
-CCCD explicitly requires ATT Write Request as per amber.bluetooth.com:
-
-Core GATT does not allow Write Without Response for the standard
-=E2=80=9CWrite Characteristic Descriptor=E2=80=9D sub-procedure. For a CCCD=
- write, the
-defined descriptor-write procedure uses ATT_WRITE_REQ / ATT_WRITE_RSP,
-not ATT_WRITE_CMD.
-
-The exact source is Core Specification 6.3, Vol 3, Part G, Section
-4.12.3. That section says Write Characteristic Descriptor uses
-ATT_WRITE_REQ, and the server returns ATT_WRITE_RSP if successful. The
-procedure mapping in Core Specification 6.3, Vol 3, Part G, Section
-4.12 lists only these descriptor sub-procedures: Read Characteristic
-Descriptor, Read Long Characteristic Descriptor, Write Characteristic
-Descriptor, and Write Long Characteristic Descriptor. It does not
-include a descriptor variant of Write Without Response.
-
-Supporting mapping is also explicit in Core Specification 6.3, Vol 3,
-Part G, Section 4.13:
-
-Write Without Response maps to Characteristic Value Write
-Write Characteristic Descriptor is a separate procedure
-
-So for your original ASCS question, the answer remains:
-
-ASE CCCD configuration is not specified as Write Without Response
-The Core GATT descriptor write procedure is a write with response
-A CCCD write should use ATT_WRITE_REQ, not ATT_WRITE_CMD
-
-One subtle but important distinction: Write Without Response exists
-for Characteristic Value writes under Core Specification 6.3, Vol 3,
-Part G, Section 4.9.1. That does not make it a valid GATT
-sub-procedure for descriptor writes such as CCCD.
 
 --=20
 Luiz Augusto von Dentz
