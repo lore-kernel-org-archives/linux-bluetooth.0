@@ -1,35 +1,35 @@
-Received: from out-43.smtp.github.com (out-43.smtp.github.com [192.30.252.142])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020A325782A
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 11:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BFE93655DD
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 11:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780918165; cv=none; b=MD4p72Tg8LObLMP4sPSWBgXbdsop46PdQV7ltT2zNh/hOoJdZUH7/eyjSsxGgTGyUCm+RjTpejn9IyC7NfC64wFuMOJPSnSjP00fMtLLXGpdR61WnpeUiSRNG8MZX4eMWtbtT3FNmct+NUTHC41niaU+KSHsr7OG0S/ANGxztSo=
+	t=1780918168; cv=none; b=iSdVbw/svzTP+/RV2iIJgmBLK3q/fpxnH6X+AQk3hQ/n9iuuURCZ9asKeCmSbqT5dk4em39FilT2Pfe6KP+MDKYkligXbaPwuSoUz4tqJ+P6r2lur6uEYLAxqvIeg1wBLGURkgJQEc6JCyXtqT0B3oVYIxr6ibHgN+Z9JYCDES0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780918165; c=relaxed/simple;
-	bh=HNkpEMjDMntMYpro5W5inj8vFmtEx+EcFmI0tPNlSJ0=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=aCQnowKCruC0m1O168pvUIfCbZhYlkmPgLpUttSTuNkx5VGDe7VzfuQhm0iKkKfGJ8AsDvYSUDi5QdX6h9VBJUVs+qHDiszNXphLZEfY+Q3mCs4vKcXPXLDmN5qXSDrNVIKpylqUYWlSkLEUAvcgATthmqmXGkC1jmztSbd6h4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=G0YHf4SD; arc=none smtp.client-ip=192.30.252.142
+	s=arc-20240116; t=1780918168; c=relaxed/simple;
+	bh=5pmwfw2bStUn8N4zvZJFDTIEFUZW2vVsw3ULVuYTDY0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=pJH6rvfO2X9r4QXmM52NuNj/H0dHZAmb8XIVjd38Y8wTIIRPLF/H4bWyeE+QlJ6ij/MMZJq5wQ0GrIBTGNTmBU6Tc60vx89YihirKCI2k6dgGUl67Yo1tgeFSvHA0LtTxxQ0nFdmOGPotbUaBjBX/0dhHEeVwJh8cleEaGUbHS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=dIJxtAae; arc=none smtp.client-ip=192.30.252.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="G0YHf4SD"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="dIJxtAae"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1780918163;
-	bh=PQD/SZiI5mbi2Z6jL2uGz8etSVYLcynBeycDWqAvpCw=;
+	s=pf2023; t=1780918166;
+	bh=Qadh4ByU1qNW4Hb/J0fhZG7HaWWFHFx/Nmlfk5uHZxg=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=G0YHf4SDdrpHf2s/fSwUIwxZWxDKuV4M8/XDqy4gEBadOyXC4mfGKMANB4GkL8Olt
-	 z9asl72UzR1WgAqsKTPe/kaZiZAQaIZjirl3of1/bPRzm0gqVAbJ5yY024nmg4MBGa
-	 By5GMoJiX/KgjpCL32muLVk7LtCGa+t/Fkb340ac=
-Received: from github.com (hubbernetes-node-b746d89.ash1-iad.github.net [10.56.202.84])
-	by smtp.github.com (Postfix) with ESMTPA id 2E9A6841088
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 04:29:23 -0700 (PDT)
-Date: Mon, 08 Jun 2026 04:29:23 -0700
+	b=dIJxtAaeKh0yAYzs2FRrSWBRBnbcXbiXd4IQ/pEx7ab3soLp/926xL8nnemhJrH2k
+	 w5M3ZlMGIRdOkqEjrkukaE7AF3xEDf8ccEOhyF3gk9ELonX7BgeiZuKKUeDZTzKfXs
+	 PdmauntXqHvjSKV1tX8KRqkJIhBxGRHkCOf3vpes=
+Received: from github.com (hubbernetes-node-4231746.va3-iad.github.net [10.48.14.24])
+	by smtp.github.com (Postfix) with ESMTPA id 7F4295012CA
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 04:29:26 -0700 (PDT)
+Date: Mon, 08 Jun 2026 04:29:26 -0700
 From: =?UTF-8?B?xaBpbW9uIE1pa3VkYQ==?= <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1107759/000000-2c1a4f@github.com>
-Subject: [bluez/bluez] a8832a: device: Refactor device_discover_services
+Message-ID: <bluez/bluez/push/refs/heads/1107770/000000-374f7c@github.com>
+Subject: [bluez/bluez] f77e33: device: Refactor device_discover_services
  function
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -43,10 +43,10 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1107759
+  Branch: refs/heads/1107770
   Home:   https://github.com/bluez/bluez
-  Commit: a8832a9553fb3b9c4c41723a5498f84ae1f0e280
-      https://github.com/bluez/bluez/commit/a8832a9553fb3b9c4c41723a5498f84ae1f0e280
+  Commit: f77e3342b063f9d0d24481b9c9072cf65715dbd6
+      https://github.com/bluez/bluez/commit/f77e3342b063f9d0d24481b9c9072cf65715dbd6
   Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
   Date:   2026-06-08 (Mon, 08 Jun 2026)
 
@@ -64,8 +64,8 @@ After refactoring we can reuse function once more in function
 void device_bonding_complete(...)
 
 
-  Commit: 04c3a58df0f657149e12565edc87174882fd22f5
-      https://github.com/bluez/bluez/commit/04c3a58df0f657149e12565edc87174882fd22f5
+  Commit: 5208e0e39be7f840cf6aac9843753ab01ebc96ad
+      https://github.com/bluez/bluez/commit/5208e0e39be7f840cf6aac9843753ab01ebc96ad
   Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
   Date:   2026-06-08 (Mon, 08 Jun 2026)
 
@@ -80,8 +80,8 @@ Rename it to start_discovery_cb to indicate that it is callback function
 from timer.
 
 
-  Commit: 2c1a4f11da736bc4218d869fdaca7d5ac8cd1ec8
-      https://github.com/bluez/bluez/commit/2c1a4f11da736bc4218d869fdaca7d5ac8cd1ec8
+  Commit: 374f7c2ed37f7927205a770d66c5b9b1f0f890ad
+      https://github.com/bluez/bluez/commit/374f7c2ed37f7927205a770d66c5b9b1f0f890ad
   Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
   Date:   2026-06-08 (Mon, 08 Jun 2026)
 
@@ -96,6 +96,6 @@ If discovery was requesed from pair request we will report successfull
 pairing even if there was an error during discovery.
 
 
-Compare: https://github.com/bluez/bluez/compare/a8832a9553fb%5E...2c1a4f11da73
+Compare: https://github.com/bluez/bluez/compare/f77e3342b063%5E...374f7c2ed37f
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
