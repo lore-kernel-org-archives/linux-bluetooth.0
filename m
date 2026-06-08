@@ -1,91 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1134A3546F2
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 11:19:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B245F25782A
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 11:20:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780917583; cv=none; b=HnWcj6urYnai2/G7O3wq9qJBvm9+XzGOyffFW0MMNJtifnpIQfxJZoJVLq6/BTfQH/wmvmIxgwhdjNeMDps80S/EHpzRexzCUNDUBki5addtsho77tbI6GyVD0QphuroNdADhrsDeMh522jMCgdNWaUDeuZVvIuWCh1d4+Z1IZ8=
+	t=1780917638; cv=none; b=ZF+KvTs9I27ycCzP/ImTFQrwPCMiL3gqLlVDoNn34bbCmTuzvxICGmtt9H+SU5fwiCF3wRKMY+P5PvdkKpnbHoYFUe/OJLP9EYF5WowYeQWIt0Udc0bMZGaew3Vc61f0tObMb+oWTMsUCbC0xa07rtxdaImbZjK+vLuyOZadvZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780917583; c=relaxed/simple;
-	bh=f5NAJHcxzb5iVdVk5j6K75Yy6lO9LRzQdplxfReb0dE=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=freFvEx9d5Mpu+ZwrL0SKq7JvW2eoh/CynFpVc3rfW8+V0bJ3goaNGzeXo2gsxF49Hur+Dr0dn8euNnRZGVXOIVaOoSyLv3qhN4g56zfSaoiGbtrdPvkzjGNJrAkBz4toGW0UactR0Rb/2z4VO/1t8dUG/UJXQdTaX//ZZipZd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IBsVzN3o; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780917638; c=relaxed/simple;
+	bh=m4zhwM36PJ9sxJ4e5ZOUq2QIB/YL6VSaJl7IeFjUM9Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oPyckRO+phUtPc1zM7esy6cocKTJwPD5NELf4EKXsnwUQ/YwuqtJuVnltCd1lxs/knPvIjMJmLjdk/9unI2++Q/Lzk3ynAHwEFcTDBEFPZHwFJxDAQCunEOFe7FIh4xP8ep1s1cU2MTnVv4xeScahdA9kyolBJu6dGPRB4Ts2sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=Plrq6JZA; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IBsVzN3o"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC5BA1F0089E
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 11:19:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780917581;
-	bh=f5NAJHcxzb5iVdVk5j6K75Yy6lO9LRzQdplxfReb0dE=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=IBsVzN3ogan36/89OV9DntGbgRlO4EaXnUSl9l4MdOfxxYGiF7wtHMJ/Vre/u0SPh
-	 6LrQTxHcl/GimI+L88il4sYmFnvjJli3ro9qv4gcbWUAVdIu2VUru9+5iChQS6CNf0
-	 KOmZtnyvu8OnqHxbc9gn5ZS/iqm1RYFnLXvzbgiyt4LafFAHIzykDtrfrc1igLJ8Vw
-	 QlAMaOmQZnPR7o9OoVQKyTqFJ3ywv6pRPR18ji/sJftlYY7BHSWJ8CCqsT33hbU+tE
-	 RwAB7znD0I9tXF5KTsW+Hgfc3DWr44iQYOYqZ0/oivzKPLv6P5hZc1SKl8GJgG8R2t
-	 MhNqn2aBDsiSg==
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5aa63daf2a5so4222303e87.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 04:19:41 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ+YVbTEQfV5L52r41G8smpOZcBUDqGwBSsXN62WBaFdjfqwncKbXcq5eqee/KOmO/b1SPKAldaZUdR9N61RZ3Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFMbMDqFEFz+2o8M3aeGIY7Yjt2pISsmBUqxLiCeYXOIHnVLpG
-	0XXN+QfyOPuK5oas+4EdTC5IjFPNyMgH2f0q5L7UOsQCnM6QKmfEigkFbdErNgU3OsyV0nt/RIN
-	3OhCditScPwdEs3CvnAcIhZju2MCCpfRbCiQosgZJLQ==
-X-Received: by 2002:a05:6512:33cc:b0:5aa:6aba:76f8 with SMTP id
- 2adb3069b0e04-5aa87bc8d69mr3784333e87.30.1780917580513; Mon, 08 Jun 2026
- 04:19:40 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 8 Jun 2026 04:19:38 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 8 Jun 2026 04:19:38 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260608-block-as-nvmem-v3-6-82681f50aa35@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="Plrq6JZA"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-490ae94a89eso34509785e9.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 04:20:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=streamunlimited.com; s=google; t=1780917635; x=1781522435; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=k/B1LxvX9nP/MbBQXWJTrJg8EbOk8suOHKeCfP94cqg=;
+        b=Plrq6JZAPN66TjLJ48lIHNotTBi+qa4MVlsL2EenaOjLqcNI2TV1KfgzZyPJsAzF4z
+         YaaTRgR3u5is64GZ0pYcuSJ+NwDfxEb0dvk86TtYCdxE3g2b+zi8IxgGXtecmxtd2U/L
+         WK4hR/f+tSvaVKNEi58l4IuXMnqLR0e0z3I7o=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780917635; x=1781522435;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k/B1LxvX9nP/MbBQXWJTrJg8EbOk8suOHKeCfP94cqg=;
+        b=JTnZ/slVS2JlyQ/TmOGm7KV2lHKIcGzyYuTR1dWAsSN//NGTp+fG8R0ysOJ5MN7fSv
+         2t82alIQASKn6+8iUuqX9tWPPvdRm7bVFyZ8qM9GyvuPWOOWprF2izrXNQtcYtqTx3UA
+         mGT8BCL57xU7rZcZ8c5W35g7RS2+FXlmDCgxdi7IwTE4UgOvleNUDM02h7ZauIjFvqwO
+         E5VxejdJ/YmYnZ41P0oDtTbQa+9H3E7pzCgVMkLWpYsK5RStl9qthPkSr4dqMh3eavzo
+         5K2wiYxkPP/qzq2x5WDbBLMxtQfyDNM4+XRhTWg3zcjBjY8Q4DUprP3AtMmfC/JPStcf
+         TDrw==
+X-Gm-Message-State: AOJu0YykkLLkyVwhQutj6nwDMPoBu9l87hL0OL1GV8jsG6EwkIlHyLUN
+	7TG/P7uznBr0NYd0rCxRrj4FIx4YkqY6in3JmEzi5vfaCw+adc9WdCXDOEzfeUYO0ItLc5QlrFz
+	HVxD+
+X-Gm-Gg: Acq92OGhKj0t2m3knQei9N47DpQygn4mJs1in89dtkXFGWQkm8p7SUEEH2QiNHXU0Ux
+	IG/8/W12pa1HsH2ogCcel79XoU0KsnwDgb1o1//ZEBd3VUF4WX07xJXym2nKHN2Cg4afprdBp9z
+	ZeXe2HsyZY+xyYmeOU/fCyId2V41H29dDWUePkeeli3ZyMMq9CL8mrAaqN32WM9u7793lIs1hSC
+	f/B54ZD2Z2Oy9NTYHT5M8jJ7EQImjNhu1VetegOekeHWnnAG5CK86Pw+FRQBFXmihXJOdmobeMD
+	aD7mQ8NjGlrIp6hjYOEyl7ZLYVgQEHSuNGKuwfUjSsHgbGfhvoVHNm1Jncd23cR+ykYxdxXu0pj
+	Z0eMs6iMPvyPoHYPtOXRIen2JSi4CdgfQqTJYm9f/4e44yMrbDy3JxPHOqG6RtOLdM4tInrqJ7G
+	QHCM/a5RlEOBhClwVY1xdU+0E+wNSvbOH+SyNbhwmFIr1MgyR5lqxM2w==
+X-Received: by 2002:a05:600c:3f1b:b0:490:c0d8:d517 with SMTP id 5b1f17b1804b1-490c2598543mr245664575e9.3.1780917635060;
+        Mon, 08 Jun 2026 04:20:35 -0700 (PDT)
+Received: from SMI-ubuntu.sueba ([2a01:390:0:101:2869:769f:34b:70a7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3b5b82sm418558465e9.1.2026.06.08.04.20.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jun 2026 04:20:34 -0700 (PDT)
+From: Simon Mikuda <simon.mikuda@streamunlimited.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ] bap: Fix CCC value for ASE control point
+Date: Mon,  8 Jun 2026 13:20:28 +0200
+Message-ID: <20260608112028.3686726-1-simon.mikuda@streamunlimited.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260608-block-as-nvmem-v3-0-82681f50aa35@oss.qualcomm.com> <20260608-block-as-nvmem-v3-6-82681f50aa35@oss.qualcomm.com>
-Date: Mon, 8 Jun 2026 04:19:38 -0700
-X-Gmail-Original-Message-ID: <CAMRc=MdRZ_7jzDErZOxeBYE+awL2fe1KcKqC=Yi1gDD28ra=zg@mail.gmail.com>
-X-Gm-Features: AVVi8Cew2n-YmjEp_T_Fkca1TPT0Dv6DfUiL88X7yEcZLGkS30SEi9F-0nG9RjI
-Message-ID: <CAMRc=MdRZ_7jzDErZOxeBYE+awL2fe1KcKqC=Yi1gDD28ra=zg@mail.gmail.com>
-Subject: Re: [PATCH v3 6/7] Bluetooth: hci_sync: Add NVMEM-backed BD address retrieval
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, daniel@makrotopia.org, Ulf Hansson <ulfh@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Saravana Kannan <saravanak@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Mon, 8 Jun 2026 12:50:43 +0200, Loic Poulain
-<loic.poulain@oss.qualcomm.com> said:
-> Some devices store the Bluetooth BD address in non-volatile
-> memory, which can be accessed through the NVMEM framework.
-> Similar to Ethernet or WiFi MAC addresses, add support for
-> reading the BD address from a 'local-bd-address' NVMEM cell.
->
-> As with the device-tree provided BD address, add a quirk to
-> indicate whether a device or platform should attempt to read
-> the address from NVMEM when no valid in-chip address is present.
-> Also add a quirk to indicate if the address is stored in
-> big-endian byte order.
->
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> ---
+WriteWithoutResponse was missing
+---
+ src/shared/bap.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 8fc2fb14d..968b85730 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -3776,6 +3776,7 @@ static struct bt_ascs *ascs_new(struct gatt_db *db)
+ 					&uuid,
+ 					BT_ATT_PERM_WRITE,
+ 					BT_GATT_CHRC_PROP_WRITE |
++					BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP |
+ 					BT_GATT_CHRC_PROP_NOTIFY,
+ 					NULL, ascs_ase_cp_write,
+ 					ascs);
+-- 
+2.43.0
+
