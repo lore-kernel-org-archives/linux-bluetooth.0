@@ -1,93 +1,87 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-5.smtp.github.com (out-5.smtp.github.com [192.30.252.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA5A366566
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 11:24:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB943403F1
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 11:29:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780917853; cv=none; b=eecSCWkSUcVR4S4ZhASMpGSwaiIni0rcfE7lQzrgNmfF0/4oMkdfmiOuGcBBesJLY2cfj6OS0Djed4943rM4aiQ853PnGmrx3ugzin94hqJUP7r34nR4f8iMASBUTR+0/O2BrNDaapekQyHTl3FxFxPpR+F5/uFOLyqKstSNg1c=
+	t=1780918161; cv=none; b=gjanyraX/HbzMWZmzC4S6WfmuNZtBDb7ZD5QuTnKg0p9q+TawQZ9416yaLXcPN04fYJG0h5RDXNKknCTRo8vQfrYE99UbTO2NgEadLJERnPP3QUyZuhseItUAm+rqLG2lpU2bZXOsLV83PRjFZm6V8iJuKkwUkjbNiJbI9At5og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780917853; c=relaxed/simple;
-	bh=4rXq9qW7/EiMPkd5SsageHbopzlcz1cEyMNkPseffSw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rd4YYgNhxnjbllXBSN2jG/vG0qKHVpnkSezPRa8dXMMNZrc7g9UOyZUWH28q9g77m07T/h/MhuAI4X5xSjIvUHt6gecME3lPKQ1Id87NIdCnEdnQyWnQq6xmnWhBpZJsP8FbVk1ZG/uplCmHinGqxMuDYczNNFpyqomZQPssooU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=JojPIQfm; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
+	s=arc-20240116; t=1780918161; c=relaxed/simple;
+	bh=JEPYiuuZKwEg+BkVHPiD3aO/iXc2NzKFQC3ipGksjWM=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Suy0rKhgWsoDWNxeAVMBEN8vQW08FRI6YvzWz7/XCGHMhEkMzKt++3FY62J27sdueOIjnv2/QBMeUXaZUOAM1J6Gl8JhZkhLsxTL8KvamXKNBuQFvRavK5cS3RtZGsle5/jQqNnnQnyY3k1LUdK/0YFRronzXS4M4pgwLb6bj58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=isJcuffi; arc=none smtp.client-ip=192.30.252.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="JojPIQfm"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-490b915ded5so35300025e9.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 04:24:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1780917850; x=1781522650; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bVFDoZLpD7ldCZHNHISOrqKvkJ+jhCvIyZMORA1/Sw0=;
-        b=JojPIQfmlZfVHkflI0zlwAHm44Sqf8efQt6IeOb9CFPpgRgDYoCGwX5ZHBAR9a3MsH
-         DenAZ8GC7RFja7YcAJ7qH0tObFu2pQQixM0q00/7/LOx0tToHwAli9SS4xa0joEmNrU5
-         lVD/Thf5h383r4asbiU9aq2KtEWxCLtDQwwv8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780917850; x=1781522650;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bVFDoZLpD7ldCZHNHISOrqKvkJ+jhCvIyZMORA1/Sw0=;
-        b=OnsfkKNitOrdsnb5zvZTsiv67neaBgdl9Lgst///RVAIcH+QnxTUK7EvAWN/PxlBQG
-         wsBY7zPn1z/iSf37Y6Rg8iozM5ehMh5B6cjy4i3whQQBu1m55MYMjSX0/W7st93ZCY87
-         krtbVJirVsLFOAme52+WfQ4cya8gGQ5cIj97I3wycJMRG6ZkSlLumnobnoRiaPNN10Sh
-         HooY7yDhsgdM6bpfH/Ul2N2zyMUofoedzsoEqI8q6oBHIDINU1FNuHxV/zY2kEeTp8Pz
-         6ar47wWxdqLQ3tQMaTzAlrSIDhvRoZh/xnRpibQlrQ4pwvRC4l8Tfw550Whv/7aXTqi+
-         5l2w==
-X-Gm-Message-State: AOJu0YwUgADe9OyWgq/TeE4NZZjwY4MopZy0FSTx7ozsjJyQtrIfxWBq
-	wFyKYybpfCxrjuaLKFvta9O9KA/BI1if2+w5QMEL7bbFaE5yN9zKDjx+CXV9/05H9WxT73BL8aU
-	a7o4F
-X-Gm-Gg: Acq92OFYOcFRt5BAUtXJBlnwso7S8kTAfUp1lYh+3ZrGxuECNLdweuQjTF5GV+Hur1+
-	i0zBdWX10OQu2mg7od6A8DdRS4masrmbS04AICHMd1drOWYqQVz0EjBnEifyKALPCIaHLQyPofI
-	ntPdg3h0AVKW1XUdhykNMopEY19G3f2feDOo5DRpmNPaec9WdWJ0pW1dFNqK4vKFCzUbaOuk560
-	6btxFLUPahmL3/W3nKtPDi0tSWDoECgX87XXZ0TGUEN5D9HjEgB3Ef6bD8i0i60o7V0Ku9Ddljx
-	afljVKwVexBUWtB7Rok8uspp6P/gwH0HwqDiPq5a9ox0uCOt79TUMU88qQEwEtgQw2JhDNLH0Lc
-	p3HgYU6hv9pzx6taLHcAFUKYjhZHEl5PJRMWw2Rj5ED9zJZ0wcNpCEe6tB4uR7LL9MF1MDzW07V
-	K6qx1lGlyRZLv6r1kIJa44hMOC5Rzxpt630/HRMAeOKSH+QUtWntl4nA==
-X-Received: by 2002:a05:600c:35cc:b0:48f:d5a0:284e with SMTP id 5b1f17b1804b1-490c263fd13mr294434235e9.28.1780917850205;
-        Mon, 08 Jun 2026 04:24:10 -0700 (PDT)
-Received: from SMI-ubuntu.sueba ([2a01:390:0:101:2869:769f:34b:70a7])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3cc0f8sm385841585e9.8.2026.06.08.04.24.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 04:24:09 -0700 (PDT)
-From: Simon Mikuda <simon.mikuda@streamunlimited.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="isJcuffi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1780918159;
+	bh=vhkF7bjO0DfyYn6+r4Hta2jACggy3/sVZoGgnAk1G4I=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=isJcuffigIjcYYdJYQQmKKbMhegxHrnjWNs9XF3hhjeLFFgaFTTUD5BGY3U0JRDcL
+	 drlVhVoOyxhxC9AAfVHV6h3HvC3YGhi/covhtzGwvBmxNwytfM8qENlEoQMKMNjW46
+	 Goj+EGacADIEjtldRjKuWBxqMrgvw4HAo8NiffKw=
+Received: from github.com (hubbernetes-node-b1ec7b6.va3-iad.github.net [10.48.177.35])
+	by smtp.github.com (Postfix) with ESMTPA id A2730781248
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 04:29:19 -0700 (PDT)
+Date: Mon, 08 Jun 2026 04:29:19 -0700
+From: =?UTF-8?B?xaBpbW9uIE1pa3VkYQ==?= <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ] device: Fix auth_retry timeout not being removed on reconnect
-Date: Mon,  8 Jun 2026 13:24:03 +0200
-Message-ID: <20260608112403.3720840-1-simon.mikuda@streamunlimited.com>
-X-Mailer: git-send-email 2.43.0
+Message-ID: <bluez/bluez/push/refs/heads/1107612/000000-671363@github.com>
+Subject: [bluez/bluez] 671363: hog: Fix starting encryption on some BLE
+ remotes
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-timeout_remove() was called with 0 instead of the actual timer ID
-because auth_retry_id was zeroed before the call.
----
- src/device.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  Branch: refs/heads/1107612
+  Home:   https://github.com/bluez/bluez
+  Commit: 671363a7c1e274bcbe475da9290f886a12229d61
+      https://github.com/bluez/bluez/commit/671363a7c1e274bcbe475da9290f886a12229d61
+  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
+  Date:   2026-06-08 (Mon, 08 Jun 2026)
 
-diff --git a/src/device.c b/src/device.c
-index bea893301..8f7ec5654 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3810,8 +3810,8 @@ void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type,
- 	struct bearer_state *state = get_state(dev, bdaddr_type);
- 
- 	if (dev->auth_retry_id) {
--		dev->auth_retry_id = 0;
- 		timeout_remove(dev->auth_retry_id);
-+		dev->auth_retry_id = 0;
- 		dev->auth_failures = 0;
- 	}
- 
--- 
-2.43.0
+  Changed paths:
+    M profiles/input/hog.c
 
+  Log Message:
+  -----------
+  hog: Fix starting encryption on some BLE remotes
+
+When BLE remote doesn't reply with Insufficient Authentication Error
+encryption is not started.
+
+Good remote:
+< ACL Data TX: Handle 64 flags 0x00 dlen 7
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x0021 Type: HID Information (0x2a4a)
+> ACL Data RX: Handle 64 flags 0x02 dlen 9
+      ATT: Error Response (0x01) len 4
+        Read Request (0x0a)
+        Handle: 0x0000
+        Error: Insufficient Authentication (0x05)
+< HCI Command: LE Start Encryption (0x08|0x0019) plen 28
+        Handle: 64 Address: xx:xx:xx:xx:xx:xx (OUI xx-xx-xx)
+        Random number: ...
+        Encrypted diversifier: ...
+        Long term key: ...
+
+Bad remote:
+< ACL Data TX: Handle 64 flags 0x00 dlen 7
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x001e Type: HID Information (0x2a4a)
+> ACL Data RX: Handle 64 flags 0x02 dlen 9
+      ATT: Read Response (0x0b) len 4
+
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
