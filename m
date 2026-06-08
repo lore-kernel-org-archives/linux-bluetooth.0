@@ -1,65 +1,69 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09963B4404
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 10:39:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 364843B71BD
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jun 2026 10:39:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780915161; cv=none; b=i7Z+TwzGAMdk8gHJipnfkt6pabX9HTQIoztHhlTuHdAanCGc86Ozm5tafukug1QY039HjHqRdIu7/pW406uqVOzLcnj/Wun4oSodcOjA+hsxuI7wfbaIT8osSqcqrsy1VSKNrl+CSDC6wNISFy4tX3YJbbRS0aCtT5DBqhCggxk=
+	t=1780915164; cv=none; b=Z8ZARSYQ+wOsjfiY+pYhppqeQ7Rbfp3PlJwOANInH2Ww3dvy5vmPasPDez+C05e4rxyDqykkj5nBEN/CZBPK+zBrN+FUbr0Y/7zp/gudVMJYclFHuhbaa4bAivOAOK8LILTrO8z7FJ9XMo3lYZa7f570oV/ECL63v3BXlShjeg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780915161; c=relaxed/simple;
-	bh=PYZbFEmYUpWWrgQTqXVPvlTnWJtE/AdAjggyNTHliqg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O7OYuOfdN/6vmL9IoJIVPP3C/k4V/qVw7DQXmJBCYfgTs0KepM3VPCAlIKO//uP9HJ0MM5nVFlb006rMUx7cXKrhHvRTaJ/9nG8YzRjcl+xxbqm40TOvnl9eB/j1VpaWDB3ZseT7tXz5OuWCrzF2iB5XBfmqXoHtSk8cz3wvssk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=jkQLROVo; arc=none smtp.client-ip=209.85.221.48
+	s=arc-20240116; t=1780915164; c=relaxed/simple;
+	bh=bIEcrbWKTjr4pdE/d5hVwDxlPG4KK/Mcqo+brxKcI78=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AKhh0edofFVPFa7D6/hIcpkpVETbRg5V2xAGvMAB0chba2WemFv9JShMcKgdQmLUdYqCskkdKCmORJomeAYCw21XNUOY/wYu7XWItTruauqWxxaDGda+IctUR9q3D1crwmXOAw5p9BhS90iENqwPB+cuTmIt810sl78ThXWf/Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=r+xyZC+p; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="jkQLROVo"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-45ee5cdbd28so3001392f8f.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 03:39:18 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="r+xyZC+p"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-490b613a17bso40278205e9.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jun 2026 03:39:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1780915157; x=1781519957; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AEEIrB+R5pSSDHSkkuWP/0OiHHc+/Q7WebsY0Xu8rBc=;
-        b=jkQLROVoKxCqlJVVwrZNFeLDt3DqtOKwp6P/osak3LS5d3CzQm94C0i9HvrAoADJ6t
-         9hlqoiSLRGgUBaVMNiY8odwaNCm2vgNrfnAMNVTeE6WyNuOpgxnc+Edd80u9fqyiRixL
-         DhtXEj2RAu05b0WI0CoGGs4qdBokhvPYn2csw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780915157; x=1781519957;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=streamunlimited.com; s=google; t=1780915160; x=1781519960; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AEEIrB+R5pSSDHSkkuWP/0OiHHc+/Q7WebsY0Xu8rBc=;
-        b=bdjAg22g+QuZJPrNuiswr8t0j+MlP8RoJvSEpxbszVXo6aJQ9BKjiBZEwdeIvwEapq
-         xfcMhvmZsd5XuDmm0KTfZ9yJ8+4Mim8nAGFInaMUrTzhkkdMHrnZEolh9COWMyROHHZi
-         fJU3Ru1Y+O8c9yAbzorpvWAU6uMhnOSK1/t2aVlGmOLwgJQf1TXaujqKjOTGuOCHTeqy
-         csIRpqIJizRdE/0ERUa/0GaNJOUYl5ZLcGMNmDjHxxljiHBtnWqqKy3VpGolup5SLgy1
-         huXY24HLWgamn2dsFP2aFITU2FOgLgH/4VCMGsyb7h5Jn/QvX700fM/T4tuz4qZ+iGjx
-         0fpg==
-X-Gm-Message-State: AOJu0YzRH++5ceGtlKOBIZcn4k5sRXmncsJWCD+HIRHAieMlvAulmkQp
-	rqoQtNlsodu2jSc5iQYDfkRCffyS3YCb6Hvw0ZWKfIrbNIF/eDb+CBsAaZLfGtQs14mPjLe8EMr
-	ecqBy
-X-Gm-Gg: Acq92OEdjo8YsNf+DUFFT/KAvBaMIEoG89q5R1/Y3J12Hj5QYUZiRSQwYdO0wCmToMM
-	+tLKX2u7jmxHOPNS28V7FpG3/jl2SrnOEH0HT2mUJLqVjQ6wB6AkSnM7My+ufxh0faOVxUVvObn
-	EwkBRkP3Rdi13+csUhMwBXGQ8aLBvZXls+lNteT1kPZm1lT7ZanDUyKxah6jOOcbfIf2CJlMqNG
-	36B+LXR5/MEf+RSdm5W9pgdrCbkpOc7veCT43LXvp8weoLFeKf925AoQRVWeIvCcsnd1Zft8Zbf
-	zXEMaEUV5sArl9khxwqZognf1uM5fKmyJHwvhNzME9j0X0aln518owUbAe8VSJl6Yow1DLdrmmU
-	8FGpA/86gS1J8eiZZdAWbFeGr4R1mzwkCy2LsV4ujGtTdCbOpbDHeKdfFlqnSoR9DtHseUdBCA+
-	06jAJSXVgMp15S/b9bJu6fPkdjmfbqdJYI26qhz/qbsJirdJQMd8B/Vtf6vwmS/zHQ
-X-Received: by 2002:a05:6000:220f:b0:45e:8526:7dcb with SMTP id ffacd0b85a97d-46032b7355amr21050183f8f.7.1780915157119;
-        Mon, 08 Jun 2026 03:39:17 -0700 (PDT)
+        bh=ZG6L6EOWOBOmDDux5xjI8XWy+wHtnPSV2XzZIQyATRI=;
+        b=r+xyZC+pXZOLgcuxfO1c31B8z89XU222tiOQtmeK7dOmeIdPlHL0io95+ERFW2MxD4
+         V+ZTWmOm/su9WfNtOPm0g4dmr+2yirMuGbFdXG66PFG70YL3KC23fzjrUlEXAU3aI5Mn
+         x9o4MqvjuFJUL1S+fo7aAt375t/JpxxHiid68=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780915160; x=1781519960;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZG6L6EOWOBOmDDux5xjI8XWy+wHtnPSV2XzZIQyATRI=;
+        b=pSGN9dCFs7LJZ27eeZn3ecK16DQuE5tv1eBHIUkjhhkhydkg6zQB3fNRtj3gsKRnQH
+         4G4LMxmZoG+GCAX7IWBWz+k23qvA9FAwXv90yirJUWpkyRpxLE+8oMGGXiGpYVKsLnE2
+         ny7Q+2G5mVNbTZzTD4QTxpDIQ1NV9KDzf7I81tvivCT3CXos8d9A4e2esY7yg/9VMZbl
+         tAbDr5eFvTP9nc+lxhS/QNLV79bD/mvV/ysj6QcAOOjz8C4hMDMWQK3Mm1v/EoTolZeX
+         FWErQKdFW91BzArOnIi0Md5H90f1O9G34EKQpGrzPkCfyYQZebN6zj0eMWWRddcpjnj9
+         cTpw==
+X-Gm-Message-State: AOJu0YyehXVW37VgP8aUPnKHGXOj9wR/7h0cv4pLesrkCYZQNJRPLVjQ
+	x7ZLqRrz6K+69SIO3m3B+feRlN3wM8zkET69SS+36a3xcpHds3iHEPcWCm5ulpLl+5vztog0ctP
+	jIN+l
+X-Gm-Gg: Acq92OEoywc5EcwBjKTLjSaEOrY4R8/awaYGItR5Y6XJgNP7pR5ir7znthuCEgF8oNu
+	Vl96PJwePvxt9CNgGc6lNydnHbQIroaxDs/5ELZh6E/yXH1cxV1HYp5a/E/k2n+XfvUAjKEypSQ
+	GvV+CRyzWla63/8jf16DFrzn7pn8bFuCgErgof6xhzk2fzah7f62suGIWLak/7G2uTEVRO7sjHU
+	4xRcIBiyF/rtPZhxJqh1sTVMkA6YoTrrHOtkNlHBPbsWj9Q2nzGje4/e2R57XR48k2qX+ChfNE3
+	ZU/5yeLOoRFEi0ln3oDogHghM1PSsQT4e2X586OKslLNIi1BiiZrtiayxwQk/KjpNuMsdYbr90K
+	fiZyGp3kUXq4JSVDPVJlIiTYdT8jXi3I4RiTKAKAmjb4SgmW69wYM+O2eKTtlMl17O5y8hwWtxL
+	PIj3R+5bzybsxqtvSck9tpqDwV1978itzJ5mFnDONxsUQDViRQQHul1A==
+X-Received: by 2002:a05:600c:35c9:b0:490:b8c0:d471 with SMTP id 5b1f17b1804b1-490c261317amr242555705e9.23.1780915160480;
+        Mon, 08 Jun 2026 03:39:20 -0700 (PDT)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:2869:769f:34b:70a7])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f351d69sm92776130f8f.29.2026.06.08.03.39.16
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f351d69sm92776130f8f.29.2026.06.08.03.39.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 03:39:16 -0700 (PDT)
+        Mon, 08 Jun 2026 03:39:20 -0700 (PDT)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ 1/3] device: Refactor device_discover_services function
-Date: Mon,  8 Jun 2026 12:39:03 +0200
-Message-ID: <20260608103905.3614057-1-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ 2/3] device: Rename start_discovery function
+Date: Mon,  8 Jun 2026 12:39:04 +0200
+Message-ID: <20260608103905.3614057-2-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260608103905.3614057-1-simon.mikuda@streamunlimited.com>
+References: <20260608103905.3614057-1-simon.mikuda@streamunlimited.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -68,108 +72,43 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-After refactoring we can reuse function once more in function
-void device_bonding_complete(...)
+Rename it to start_discovery_cb to indicate that it is callback function
+from timer.
 ---
- profiles/input/server.c |  2 +-
- src/adapter.c           |  2 +-
- src/device.c            | 24 +++++++-----------------
- src/device.h            |  3 ++-
- 4 files changed, 11 insertions(+), 20 deletions(-)
+ src/device.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/profiles/input/server.c b/profiles/input/server.c
-index 97579152e..93c73f8d2 100644
---- a/profiles/input/server.c
-+++ b/profiles/input/server.c
-@@ -102,7 +102,7 @@ static void sixaxis_browse_sdp(const bdaddr_t *src, const bdaddr_t *dst,
- 	data->psm = psm;
- 
- 	if (psm == L2CAP_PSM_HIDP_CTRL)
--		device_discover_services(device);
-+		device_discover_services(device, BDADDR_BREDR, NULL);
- 
- 	device_wait_for_svc_complete(device, sixaxis_sdp_cb, data);
- }
-diff --git a/src/adapter.c b/src/adapter.c
-index 03593d962..cc753fbd6 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3717,7 +3717,7 @@ static void device_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 		device_attach_att(device, io);
- 	}
- 
--	device_discover_services(device);
-+	device_discover_services(device, data->dst_type, NULL);
- 
- 	g_io_channel_unref(io);
- 	dbus_message_unref(data->msg);
 diff --git a/src/device.c b/src/device.c
-index bea893301..0c2ee7d8d 100644
+index 0c2ee7d8d..da70f9cc0 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -2812,10 +2812,7 @@ DBusMessage *device_connect_profiles(struct btd_device *dev,
- resolve_services:
- 	DBG("Resolving services for %s", dev->path);
- 
--	if (bdaddr_type == BDADDR_BREDR)
--		err = device_browse_sdp(dev, msg);
--	else
--		err = device_browse_gatt(dev, msg);
-+	err = device_discover_services(dev, bdaddr_type, msg);
- 	if (err < 0) {
- 		return btd_error_failed(msg, bdaddr_type == BDADDR_BREDR ?
- 			ERR_BREDR_CONN_SDP_SEARCH : ERR_LE_CONN_GATT_BROWSE);
-@@ -6834,14 +6831,15 @@ void device_cancel_browse(struct btd_device *device, uint8_t bdaddr_type)
- 	browse_request_free(device->browse);
+@@ -7185,7 +7185,7 @@ bool device_is_connectable(struct btd_device *device)
+ 	return state->connectable;
  }
  
--int device_discover_services(struct btd_device *device)
-+int device_discover_services(struct btd_device *device,
-+				uint8_t bdaddr_type, DBusMessage *msg)
+-static bool start_discovery(gpointer user_data)
++static bool start_discovery_cb(gpointer user_data)
  {
- 	int err;
+ 	struct btd_device *device = user_data;
  
--	if (device->bredr)
--		err = device_browse_sdp(device, NULL);
-+	if (bdaddr_type == BDADDR_BREDR)
-+		err = device_browse_sdp(device, msg);
- 	else
--		err = device_browse_gatt(device, NULL);
-+		err = device_browse_gatt(device, msg);
+@@ -7364,7 +7364,7 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
+ 			DBG("setting timer for reverse service discovery");
+ 			device->discov_timer = timeout_add_seconds(
+ 							DISCOVERY_TIMER,
+-							start_discovery,
++							start_discovery_cb,
+ 							device, NULL);
+ 		}
+ 	}
+@@ -7409,7 +7409,7 @@ unsigned int device_wait_for_svc_complete(struct btd_device *dev,
  
- 	if (err == 0 && device->discov_timer) {
- 		timeout_remove(device->discov_timer);
-@@ -7354,15 +7352,7 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
- 		DBG("Proceeding with service discovery");
- 		/* If we are initiators remove any discovery timer and just
- 		 * start discovering services directly */
--		if (device->discov_timer) {
--			timeout_remove(device->discov_timer);
--			device->discov_timer = 0;
--		}
--
--		if (bdaddr_type == BDADDR_BREDR)
--			device_browse_sdp(device, bonding->msg);
--		else
--			device_browse_gatt(device, bonding->msg);
-+		device_discover_services(device, bdaddr_type, bonding->msg);
+ 		dev->discov_timer = timeout_add_seconds(
+ 						0,
+-						start_discovery,
++						start_discovery_cb,
+ 						dev, NULL);
+ 	}
  
- 		bonding_request_free(bonding);
- 	} else if (!state->svc_resolved) {
-diff --git a/src/device.h b/src/device.h
-index b36f9af66..b890f23d4 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -207,7 +207,8 @@ bool device_remove_svc_complete_callback(struct btd_device *dev,
- struct btd_service *btd_device_get_service(struct btd_device *dev,
- 						const char *remote_uuid);
- 
--int device_discover_services(struct btd_device *device);
-+int device_discover_services(struct btd_device *device,
-+			uint8_t bdaddr_type, DBusMessage *msg);
- int btd_device_connect_services(struct btd_device *dev, GSList *services);
- 
- bool btd_device_flags_enabled(struct btd_device *dev, uint32_t flags);
 -- 
 2.43.0
 
