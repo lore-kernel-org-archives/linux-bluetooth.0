@@ -1,64 +1,64 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B6B3DEAFC
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 21:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC3837268F
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 21:27:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781039494; cv=none; b=JA3vnSYogvNz9yhwdCMSV3UW/kBpZibpUy9n6fwzfYMgS71a/ZJ8zYvhPF4+t2A32eDws1DwEjOCGKSN4zgzlTaJJeM++YT+mUEpxPLS5z83//bX7apxxl3eTNFIbbMaf9vQMc5PTY2Vmk4KPCG759nOqEYWcrG0U8mMyEWe6go=
+	t=1781040431; cv=none; b=TiWUMGtTTQQ41PP/End8HtmDktRVA07fRO2IG89l5HdugCb9/X4pj0nHo0oJz+mpQ+ok9cwAreHjHn+DcA6jIgeay25rxLpokpdXIqShCBXgGCFqr6YQFuKkbWGOGboAHzOxluaZZ88agEEwqO1aLZif9hJFDqAahbwDFCv14hA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781039494; c=relaxed/simple;
-	bh=x9vKfpzQbBeESpz6uCkGln5CtP1hHDPp4aofWd1F9zo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XXm4XYvCRDu/a1Ce4NGdBZEJdpefW6K5y4u6AFEaEft2xrD7JtYGVdUpecMbN1sp8ddK8XobGeq/XxNSY+ctN+t+DIiZ0OWij4p2FhR0K9jlF/JBuQIGy8gIJswciiHKmDbymFMCh0fZr21PUtNZ2g3AeZMQvTSdmjgBRumOL/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=T+E+kof2; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1781040431; c=relaxed/simple;
+	bh=/+jGkkj/7JUjzSj6CQ3QPsXLLUw78o/GUOLRsBc01BQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qn8e1omSNzQFwYPGXvUMgnpSssq0BlRvYxLf20nmLEgmGUIZvUtj+xj4j3aetMTwl/GjPp1vNWbXQm3+LxMsanoYSE5gKeKTeucRySDkDZ36bvhosmc2sYeON97dgpDgMS487uFhLhhXvfHxx3+CwATMCnKTbqRLxfj7V8dLBn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=xmgndfQ0; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="T+E+kof2"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-490b43e2b95so49806785e9.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 14:11:32 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="xmgndfQ0"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-490b1bbcf3aso50237045e9.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 14:27:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1781039491; x=1781644291; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1781040428; x=1781645228; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IAeak349+yUScSoLf0dgVAalzeiHiaCVqrfFt5LGUCI=;
-        b=T+E+kof2GyjeD6jODmWVIiw4kAQ61gEiCidsECfGIXuoBtSfMFCMQPlCOdTcaTGhOL
-         fbDW/mhashFPLcE0+VRaJSO3BIWmatnv30WhHC2n6/BdSot8JuZ9BnJ0DbO+rPE1xDcI
-         RFD15ULRRS/1ZIFvGEdZ0rm4Hhg+l1VJPKEsg=
+        bh=VFRNTmR+YZqxY27sYWgVXnxvuoz8WXSmcQC62s72+bE=;
+        b=xmgndfQ0YS7TxRD64QGMhloia1eyDsq9bOPGJSBx5GPXuMvaaBWoa2Z8Qml4XpKnR/
+         7W6fSKt1dX4kh1Kz6A04te+GU2XwbmwDF+TzGNVslgXmLymown8qNQOiKSABH2NHfgWq
+         rTEyoLQQS1mAqT2Fy15ij+fjd6Yk2MzUjtJwU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781039491; x=1781644291;
+        d=1e100.net; s=20251104; t=1781040428; x=1781645228;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IAeak349+yUScSoLf0dgVAalzeiHiaCVqrfFt5LGUCI=;
-        b=q5ULQfyb4XoKQTWxvF4OGPl3hcRRNupTECBJuyafxRgvCs0q9tgpf1dmVv0yP3ELr7
-         leLQdbRxXTvtgX03k7hWYZ0pRezbn7nO9EzWvN//S73Sxh3Jsuf1Vj7++9B+SfqQ031I
-         ULEKOIVroAEUtGJgZzVxZ/qpp4oYFcDUlpxo1IjY4UTcBFNr0tA9uxNXtwLHWtC+p56g
-         YvrMcCmOgNgJebNb6WbUe3fLrkRNKKZOPO+tircTouZ4iPld8FC0sXo5sLOe6OLuraI2
-         /HqN1Wm6DAGTvoB8NHT+O3z/mK0+VmP7dFH/60nCaH7wBZ0qySrojP1ARiEy1OYyJDin
-         JoBw==
-X-Gm-Message-State: AOJu0YxF70Rc9d2eXNkkrZy9hXrKHJYzyXvJnDIPg7hCFFE0uG8WnAmy
-	zpE7hZbg7wMalGZg3kV5lATnm1lXKwRsvPpXQhvVvewHVLg7yjwWiI15CHOb4itbZOEu/neFmLL
-	NQfMW
-X-Gm-Gg: Acq92OEEqe72eKgWJL/nFJQ42DelowzS46Ee1z3V8W0YwkfuYBiSmBnUz8kbhPRBEKK
-	fWLI3WWVn91Ym8JHSjNgI26uvG2f/B37lSTWwXhlUltmLp8iKSo5ENHlX6jM5D/SoOlyFR4BwMu
-	3K0plcDygB7ocOp0kE1/r3TuKUnZyq92zPfaQAVfEAcKbaALxQstaCb80AThszXju4HAdHD0pCn
-	OIxzPVAIaP0ZGh7F/ZibLTWp6aAV1+RAaepcUzWk2D7dd2qbdBz9VQ7VC4yUBWy2amKz/BYeTU4
-	gM+qD1ZOGHJsMbnGAU6cAon69gOd16e1mkNjRNBr6tDBzXhpiqTIn5Zve/2flZoFo+WfoSph5sL
-	JIMV4NdLoSiFAPM+z73qDk1EOaSRmIKF0YgEZr2b6EkbTrjrX4xzDdfO8JMwDFVr3iWEdUhx4+V
-	zUS2OsxFIHgfJ6LHfK3gA4Ne8THWIzVB7zHomVD88a3zdAaVyuNU0CSV8=
-X-Received: by 2002:a05:600c:4708:b0:490:bd66:e522 with SMTP id 5b1f17b1804b1-490c26038d2mr348207815e9.29.1781039490756;
-        Tue, 09 Jun 2026 14:11:30 -0700 (PDT)
+        bh=VFRNTmR+YZqxY27sYWgVXnxvuoz8WXSmcQC62s72+bE=;
+        b=ig6N7BLlCAQhb6xKQNEghHiN0sAa2h7+ex4wfRJZf645iEcArH/C0azNheB0ybB/Pm
+         /ClWNzT6iU8A4BcOLxijM1Emdxz9X4ZI40+gBjxg+PktizJGrfTB1sVuzHBgDoaXVYnk
+         CARw9AQepmSg21ql6z+Bvet6OjUe6cDPezaO+3x4oYLR23r8e4yzh7pLPDl0KiHvIjTU
+         F9hTQUWILbG6O9DD///aEbozRC6AtC0Jw+gVkgomCbdLap8FVWxNbJgF6F2hMXpF2eCF
+         pMwXqzn1W3FcRq/KpXs6R526P9P5cTt/2kfwrI8dNS8ar0s8hMZW5/25GGCg5mgwRD3b
+         A75A==
+X-Gm-Message-State: AOJu0YzQfULerfKRH5piPMTURR31BYqoDvI2WyLM7ImV5tzrDlbQk4No
+	8vsB+e9s+p/gOidoRVENMDwdo7kduDy1UWreHH4ijKzewkoq9EVJrYbgSttfN1mNOk37HdkN3Rc
+	Jn+Iq
+X-Gm-Gg: Acq92OG8AhIERDVl8ns19p2GP+eiwYsbuEzkxzMT+iPGaLxKfuvuryZGxlJVyR1W4VC
+	/bj2pMfXztaLR8ku0XgzNx0PjDjROXVXD/HSFVQ9IPZ7nsXkf7z0ZMUyLvsUKXC6ZC4GdGc67kO
+	dA73XzcJtUvoZWyUSnsp1lXZS0VcLBjYFdTQ625MSHcdWl30G4Ts8LhbqDNcD5MmpfJ9PpZHBFf
+	+tVrKG+Q1rw8sUSiKmz/hyNz4sOcVPi6Vx4mjyn6mcAv349LGk84cKcq9sge3U5uywZ1PCDdp2q
+	EDhh+ZL92TZH2DOcjL8RXqnS6zBL4Hb5+aSEVpsNzn7tkcyk2opBplbSgllLK9PaKYWrL9Vu+Ux
+	ufPptN0C1EZg5fJL8jp/ORmG62LkpvIpm+Rmx9LB4N2lHDaEz8LbRpJpmvF9hDbvDRP5O/8cRZS
+	ZEDB/j00AsrBdnreX/Q6e8FSNgxIajpRqaQSjvATBUcwIzpXhPwP0+ae0=
+X-Received: by 2002:a05:600c:4586:b0:490:5191:6e26 with SMTP id 5b1f17b1804b1-490d7223752mr52563775e9.18.1781040427951;
+        Tue, 09 Jun 2026 14:27:07 -0700 (PDT)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:e2e3:d5f1:fbcb:c827])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f2dcb13sm66218394f8f.2.2026.06.09.14.11.30
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3918fcsm587514875e9.3.2026.06.09.14.27.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 14:11:30 -0700 (PDT)
+        Tue, 09 Jun 2026 14:27:07 -0700 (PDT)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ] transport: Complete Acquire for Sink ASE entering Enabling
-Date: Tue,  9 Jun 2026 23:11:29 +0200
-Message-ID: <20260609211130.3887817-1-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ] avrcp: Abort continuing response on fragmented CT replies
+Date: Tue,  9 Jun 2026 23:26:56 +0200
+Message-ID: <20260609212656.3900190-1-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -68,95 +68,57 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On the QoS to Enabling transition the IO is not yet available because
-the CIS is not established, so the handler returns early and a pending
-Acquire is left unanswered once the IO later arrives.
+Send AbortContinuingResponse when a Get Element Attributes reply
+arrives fragmented, as the CT side does not reassemble fragments.
 
-Notify the connecting callbacks once the fd is attached so the
-transport can re-run the Enabling handling and complete the Acquire.
+Fixes PTS test AVRCP/CT/RCR/BV-03-C
 ---
- profiles/audio/transport.c |  7 +++++++
- src/shared/bap.c           | 28 +++++++++++++++++++---------
- 2 files changed, 26 insertions(+), 9 deletions(-)
+ profiles/audio/avrcp.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 4b9d26c5e..22a755064 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -2397,6 +2397,13 @@ static void bap_connecting(struct bt_bap_stream *stream, bool state, int fd,
- 		return;
- 
- 	bap_update_links(transport);
-+
-+	/* IO connected; re-run Enabling to complete a deferred Acquire. */
-+	if (!state && fd >= 0 && bt_bap_stream_get_state(stream) ==
-+					BT_BAP_STREAM_STATE_ENABLING)
-+		bap_state_changed(stream, BT_BAP_STREAM_STATE_ENABLING,
-+					BT_BAP_STREAM_STATE_ENABLING,
-+					user_data);
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index b6823753f..56564dcab 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -2473,6 +2473,24 @@ static void avrcp_parse_attribute_list(struct avrcp_player *player,
+ 	}
  }
  
- static bool transport_bap_is_playback(struct media_transport *transport)
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index deb85b264..09f671a15 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -3006,6 +3006,20 @@ static bool bap_stream_io_attach(struct bt_bap_stream *stream, int fd,
- 	return true;
- }
- 
-+static void bap_stream_notify_connecting(struct bt_bap_stream *stream,
-+						bool connecting, int fd)
++static void avrcp_abort_continuing(struct avrcp *session, uint8_t pdu_id)
 +{
-+	const struct queue_entry *entry;
++	uint8_t buf[AVRCP_HEADER_LENGTH + 1];
++	struct avrcp_header *pdu = (void *) buf;
 +
-+	for (entry = queue_get_entries(stream->bap->state_cbs); entry;
-+						entry = entry->next) {
-+		struct bt_bap_state *state = entry->data;
++	memset(buf, 0, sizeof(buf));
 +
-+		if (state->connecting)
-+			state->connecting(stream, connecting, fd, state->data);
-+	}
++	set_company_id(pdu->company_id, IEEEID_BTSIG);
++	pdu->pdu_id = AVRCP_ABORT_CONTINUING;
++	pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
++	pdu->params_len = cpu_to_be16(1);
++	pdu->params[0] = pdu_id;
++
++	avctp_send_vendordep_req(session->conn, AVC_CTYPE_CONTROL,
++					AVC_SUBUNIT_PANEL, buf, sizeof(buf),
++					NULL, session);
 +}
 +
- static void bap_stream_set_io(void *data, void *user_data)
- {
- 	struct bt_bap_stream *stream = data;
-@@ -3042,6 +3056,10 @@ static void bap_stream_set_io(void *data, void *user_data)
- 			bt_bap_stream_stop(stream, NULL, NULL);
- 		break;
- 	}
+ static gboolean avrcp_get_element_attributes_rsp(struct avctp *conn,
+ 						uint8_t code, uint8_t subunit,
+ 						uint8_t transaction,
+@@ -2490,6 +2508,13 @@ static gboolean avrcp_get_element_attributes_rsp(struct avctp *conn,
+ 	if (code == AVC_CTYPE_REJECTED)
+ 		return FALSE;
+ 
++	/* Abort fragmented responses as reassembly is not supported */
++	if (pdu->packet_type == AVRCP_PACKET_TYPE_START ||
++			pdu->packet_type == AVRCP_PACKET_TYPE_CONTINUING) {
++		avrcp_abort_continuing(session, AVRCP_GET_ELEMENT_ATTRIBUTES);
++		return FALSE;
++	}
 +
-+	/* Notify IO connected so transports can complete pending requests. */
-+	if (fd >= 0)
-+		bap_stream_notify_connecting(stream, false, fd);
- }
+ 	count = pdu->params[0];
  
- static void ascs_ase_rsp_add_errno(struct iovec *iov, uint8_t id, int err)
-@@ -7028,7 +7046,6 @@ static void bap_stream_io_connecting(void *data, void *user_data)
- {
- 	struct bt_bap_stream *stream = data;
- 	int fd = PTR_TO_INT(user_data);
--	const struct queue_entry *entry;
- 
- 	if (!stream)
- 		return;
-@@ -7038,14 +7055,7 @@ static void bap_stream_io_connecting(void *data, void *user_data)
- 	else
- 		bap_stream_io_detach(stream);
- 
--	for (entry = queue_get_entries(stream->bap->state_cbs); entry;
--							entry = entry->next) {
--		struct bt_bap_state *state = entry->data;
--
--		if (state->connecting)
--			state->connecting(stream, stream->io ? true : false,
--							fd, state->data);
--	}
-+	bap_stream_notify_connecting(stream, stream->io ? true : false, fd);
- }
- 
- int bt_bap_stream_io_connecting(struct bt_bap_stream *stream, int fd)
+ 	if (be16_to_cpu(pdu->params_len) - 1 < count * 8) {
 -- 
 2.43.0
 
