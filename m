@@ -1,36 +1,36 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1681848A2CA
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 16:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A1037B003
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 16:38:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781023063; cv=none; b=QGpj4SahrfSmI+DeMi6JQFk/AgNTlfd8IamwkWixNbWlmh/mwGZUCq4+Y4HsxwqDORqVRf0OKHLy+wOSSAMz9Xt2xMZXQLYJ3vOW90UtkLhEDOevkcaZ38k5ooyemBmlPl60bXCDnD3WfGjBO0eNM7k/lzwMCOq1Yek/+Xgo2Sc=
+	t=1781023112; cv=none; b=HnCvNIi38nOmtkjvoyW35zNVPEscSeVokEw+t3NDoEZ2J0FKzEWXjWKlcwW6Hqsnb7kQ3Ibec+RVhkHaKpDwqayyAKO6hPIIHBOjOQca/e7f/j+JJ6EHorycMgPdzVz1EtJvV3gAQzSIkU8ZaKse4KxdEAP3d5IsgfTaCYKLdec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781023063; c=relaxed/simple;
-	bh=7kxjQOmA1fEuEqLiwwdFglNowIwR++JAIV6U84Vw0Qk=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=OqilE1HspErjRt5ePup8d1fb0NR+lBChnGF1IAQv5HXfJPGVAS++yW/MGpwleAf5wZ5F4LWYxfM1RGC4ABBJZ3UMeGBIzEMJVegV9sbmCmwpJoGg5+5kYzvMIqPNElPbnUTpviqdWdtYmKdjqw/IsnMxirptTj3WCITuHD550ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=fBJfoNWu; arc=none smtp.client-ip=192.30.252.200
+	s=arc-20240116; t=1781023112; c=relaxed/simple;
+	bh=xRCxJpI0y9t7FOk4HIAjxhFsuhOSkUqXXOyQRs3Ni2g=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=SyZE0Jgz+29ImHQ2quSlqkR/g4V6UWXwTWganr0kmFM8rXSC+/LWxl9XEQj4al7PS3fLCZ6RT5O8wH77QeyLaa6DS4aq8nXgmxOV8TLfo3cPgTDUDLuq4k0Q/cNYY9qReOZDtjrqQkv4MzSgcwceF6Wu4JKGOl8PS1zOU6z6dEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=EtW5esKq; arc=none smtp.client-ip=192.30.252.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="fBJfoNWu"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="EtW5esKq"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1781023061;
-	bh=faZCliEgjsSIhZ1sUyrRFCdyp3UxV7041BbDQ965WPQ=;
+	s=pf2023; t=1781023110;
+	bh=qvCsdUGke164WX2o5/nEDctW2ehECAaeCiXsy7mZvRo=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=fBJfoNWu/awRyBZeiE20P32ot1/agE1zsIeDS4x9VXmvglxoE5ApBLyb2NR02hYcn
-	 MAgOu4hu0elFEbqzpqDS9PeKqfA2NQO2N4WzUKPjqW2amayn7g5svS1UQ87tv7V9Wu
-	 NBly+TqHBuP5h08ekmZAHCjab1KC+kI31btdTOe0=
-Received: from github.com (hubbernetes-node-ed3185a.va3-iad.github.net [10.48.160.15])
-	by smtp.github.com (Postfix) with ESMTPA id 488D250101E
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 09:37:41 -0700 (PDT)
-Date: Tue, 09 Jun 2026 09:37:41 -0700
-From: raghava447 <noreply@github.com>
+	b=EtW5esKqQP2rRyEnxJSK7NDrR1cNwsdvzyJg4pXJ3BGA+aDigK3LF22T4qLrjjmkm
+	 Zmz3QI61b8Ne2tJ3ANGZLmSea2PDFa8/bDMxDti2nGlXv7r+EEkauwEgSS2hweQV0i
+	 Sn8X+VnW5bSQgIK/K+M/8CmMzBN4dK8zTnG6WuNo=
+Received: from github.com (hubbernetes-node-30d569b.ash1-iad.github.net [10.59.97.39])
+	by smtp.github.com (Postfix) with ESMTPA id BB46136117F
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 09:38:30 -0700 (PDT)
+Date: Tue, 09 Jun 2026 09:38:30 -0700
+From: hadess <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/622a46-912d67@github.com>
-Subject: [bluez/bluez] 27eb49: shared/hci: Avoid redundant BPF filter updates
- on ...
+Message-ID: <bluez/bluez/push/refs/heads/1108616/000000-e22bd8@github.com>
+Subject: [bluez/bluez] 2fe40b: shared/util: Fix warnings when cleaning up NULL
+ po...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,85 +43,122 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
+  Branch: refs/heads/1108616
   Home:   https://github.com/bluez/bluez
-  Commit: 27eb493882aed659339579adb29ca99b61042379
-      https://github.com/bluez/bluez/commit/27eb493882aed659339579adb29ca99b61042379
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-06-08 (Mon, 08 Jun 2026)
-
-  Changed paths:
-    M src/shared/hci.c
-
-  Log Message:
-  -----------
-  shared/hci: Avoid redundant BPF filter updates on duplicate events
-
-Skip updating the BPF socket filter in bt_hci_register and
-bt_hci_register_subevent when the event/subevent is already
-registered, since it is already part of the filter.
-
-Similarly, skip updating the filter in bt_hci_unregister and
-bt_hci_unregister_subevent when other handlers for the same
-event/subevent still remain in the queue.
-
-This avoids unnecessary setsockopt(SO_ATTACH_FILTER) calls when
-multiple handlers are registered for the same event code.
-
-
-  Commit: 9320e1cb47494aa67cf86bc0dda1913f4e489478
-      https://github.com/bluez/bluez/commit/9320e1cb47494aa67cf86bc0dda1913f4e489478
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-06-08 (Mon, 08 Jun 2026)
-
-  Changed paths:
-    M src/shared/hci.c
-
-  Log Message:
-  -----------
-  shared/hci: Debounce SO_ATTACH_FILTER with timeout_add(0)
-
-Coalesce multiple BPF filter updates into a single SO_ATTACH_FILTER
-setsockopt call by deferring the update to the next event loop
-iteration using timeout_add(0, ...).
-
-When bt_hci_register_event or bt_hci_register_subevent is called
-multiple times in succession (e.g. from bt_rap_attach_hci), each call
-previously triggered a full filter rebuild and setsockopt. Now,
-schedule_evt_filter() simply marks a pending update which fires once
-in filter_timeout() after all synchronous registrations complete.
-
-
-  Commit: 8bc6dd81c9c21137f0b63ac59db49c26b6af6c65
-      https://github.com/bluez/bluez/commit/8bc6dd81c9c21137f0b63ac59db49c26b6af6c65
-  Author: raghu447 <raghavendra.rao@collabora.com>
+  Commit: 2fe40bee6c48c4d72506d98d3283b8d1e981a75d
+      https://github.com/bluez/bluez/commit/2fe40bee6c48c4d72506d98d3283b8d1e981a75d
+  Author: Bastien Nocera <hadess@hadess.net>
   Date:   2026-06-09 (Tue, 09 Jun 2026)
 
   Changed paths:
-    M src/shared/bap.c
+    M src/shared/util.h
 
   Log Message:
   -----------
-  shared/bap: add ASE Control Point error responses
+  shared/util: Fix warnings when cleaning up NULL pointers
 
-These changes are required to Pass BAP/USR/SPE/BI-01[5]-C tests.
+Don't try to free NULL pointers in cleanup callbacks, some of the
+functions we use to free pointers might not support being passed
+non-NULL values.
+
+Fixes: 2e0533f977cc ("shared/util: Add helper for "cleanup" variable attribute")
 
 
-  Commit: 912d67d1d3a46f5ef946eec2dbe310b97247f085
-      https://github.com/bluez/bluez/commit/912d67d1d3a46f5ef946eec2dbe310b97247f085
-  Author: raghu447 <raghavendra.rao@collabora.com>
+  Commit: c58eb86c244e8fbdc32f9d58f395ad387ca67f09
+      https://github.com/bluez/bluez/commit/c58eb86c244e8fbdc32f9d58f395ad387ca67f09
+  Author: Bastien Nocera <hadess@hadess.net>
   Date:   2026-06-09 (Tue, 09 Jun 2026)
 
   Changed paths:
-    M unit/test-bap.c
+    M src/shared/util.h
 
   Log Message:
   -----------
-  unit/bap: add SPE tests
+  shared/util: Better type-checking in _steal_* commands
 
-Add unit tests for the PTS BAP/USR/SPE/BI-01[5]-C tests.
+Replace _steal_() and _steal_fd_() inline functions with macros, so that
+we can have better type-checking. This would have avoided crashes seen
+in the original patchset, where we passed a pointer instead of a pointer
+to a pointer.
+
+Example usage:
+CLEANUP_FREEFUNC(GKeyFile, g_key_file_free);
+GKeyfile *load_config(void) {
+  _cleanup_type_(GKeyFile) GKeyFile *keyfile = NULL;
+  [...]
+  return _steal_(keyfile);
+}
+
+static int open_file(void) {
+  _cleanup_fd_ int fd = -1;
+  [...]
+  return _steal_fd_(fd);
+}
+
+This is inspired by similar code in Pipewire's spa helpers, as pointed
+out by Pauli Virtanen <pav@iki.fi>.
 
 
-Compare: https://github.com/bluez/bluez/compare/622a46ebcd72...912d67d1d3a4
+  Commit: ab59047bfee892cae87896575ad65c8b6944e7da
+      https://github.com/bluez/bluez/commit/ab59047bfee892cae87896575ad65c8b6944e7da
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-06-09 (Tue, 09 Jun 2026)
+
+  Changed paths:
+    M doc/maintainer-guidelines.rst
+
+  Log Message:
+  -----------
+  doc: Recommend using _cleanup_ and friends
+
+
+  Commit: b6f94e7d47b312ab1d373abf9a7bf1d7d32d50b4
+      https://github.com/bluez/bluez/commit/b6f94e7d47b312ab1d373abf9a7bf1d7d32d50b4
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-06-09 (Tue, 09 Jun 2026)
+
+  Changed paths:
+    M src/main.c
+
+  Log Message:
+  -----------
+  main: Use _cleanup_() to simplify configuration parsing
+
+Use helpers to simplify temporary string usage, and cleanup in error
+paths.
+
+
+  Commit: 09fbfb78eb0834cdbe9f7353b186d481b17321f6
+      https://github.com/bluez/bluez/commit/09fbfb78eb0834cdbe9f7353b186d481b17321f6
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-06-09 (Tue, 09 Jun 2026)
+
+  Changed paths:
+    M client/mgmt.c
+
+  Log Message:
+  -----------
+  client: Use _cleanup_fd_ to simplify urandom access
+
+fd gets auto-closed before exiting the scope.
+
+
+  Commit: e22bd838f275c5144501bbbf961b91a28871c9e0
+      https://github.com/bluez/bluez/commit/e22bd838f275c5144501bbbf961b91a28871c9e0
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2026-06-09 (Tue, 09 Jun 2026)
+
+  Changed paths:
+    M tools/btattach.c
+
+  Log Message:
+  -----------
+  btattach: Use _cleanup_fd_ to simplify error paths
+
+Use _cleanup_fd_ and _steal_fd() to simplify error paths, and only
+"steal" the file descriptor on success.
+
+
+Compare: https://github.com/bluez/bluez/compare/2fe40bee6c48%5E...e22bd838f275
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
