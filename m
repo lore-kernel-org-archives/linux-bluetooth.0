@@ -1,64 +1,64 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25968346A14
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 21:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B6B3DEAFC
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 21:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781039484; cv=none; b=koKWLkd8nAoRj1jEOPbKGBXpqg40xqV5itvjtOtSpt8hS+t5zL4wJs4P2TJ4/LXLd+j+9f3Xbmk/Ml5Czn5zNBMqndCtitUUfTO8l1QcIdeDtHstvhQ4wnIc0X+iM45EQASGSsiNwb8DlZlf5W1eSQ8vXaFnvJGG5/LjBbuOVqU=
+	t=1781039494; cv=none; b=JA3vnSYogvNz9yhwdCMSV3UW/kBpZibpUy9n6fwzfYMgS71a/ZJ8zYvhPF4+t2A32eDws1DwEjOCGKSN4zgzlTaJJeM++YT+mUEpxPLS5z83//bX7apxxl3eTNFIbbMaf9vQMc5PTY2Vmk4KPCG759nOqEYWcrG0U8mMyEWe6go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781039484; c=relaxed/simple;
-	bh=xPyNKpOvcmVaqFGF9KfJ6xXVFTZGbtriB/NGmeXi+Bg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YgJHePvL2efECoj7hrnb/vvCOihh0+WBCF7mBDorEb6wUvSBcWBOHlnT/u+x0K7AHHW6x/oGmxNmmMYVV4/TbQDq1XNNqyrhy7Lh7d7Bl/f+r0kvV2An/XJsxzdXzDuZOA+iHgCro3nm28ckSSNdj+ns9/ZIQozT0eZLcUJEh3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=ElKv/mJA; arc=none smtp.client-ip=209.85.128.41
+	s=arc-20240116; t=1781039494; c=relaxed/simple;
+	bh=x9vKfpzQbBeESpz6uCkGln5CtP1hHDPp4aofWd1F9zo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XXm4XYvCRDu/a1Ce4NGdBZEJdpefW6K5y4u6AFEaEft2xrD7JtYGVdUpecMbN1sp8ddK8XobGeq/XxNSY+ctN+t+DIiZ0OWij4p2FhR0K9jlF/JBuQIGy8gIJswciiHKmDbymFMCh0fZr21PUtNZ2g3AeZMQvTSdmjgBRumOL/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=T+E+kof2; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="ElKv/mJA"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4908b92904fso69353285e9.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 14:11:22 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="T+E+kof2"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-490b43e2b95so49806785e9.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 14:11:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1781039481; x=1781644281; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1781039491; x=1781644291; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jo2LCUiTKc+EU+TemJ4HpkN6AQ88ay1x2Q3Rlo7+7Fo=;
-        b=ElKv/mJAK86orWKe3LBDUGBLkd8dP2kTD3JhTbDcNLfFT1rS/OXxRfAWhkl+LnIwtM
-         8nG/M3NIZtRP/qBA9dpv3tFJK07LnnqnyRT1KcRFzNvMyoI1x6IXuM8sr5OZeGchGkQJ
-         sYkYVhp6l08xS8IAWFgwQlfwYaPQTqpLE2buI=
+        bh=IAeak349+yUScSoLf0dgVAalzeiHiaCVqrfFt5LGUCI=;
+        b=T+E+kof2GyjeD6jODmWVIiw4kAQ61gEiCidsECfGIXuoBtSfMFCMQPlCOdTcaTGhOL
+         fbDW/mhashFPLcE0+VRaJSO3BIWmatnv30WhHC2n6/BdSot8JuZ9BnJ0DbO+rPE1xDcI
+         RFD15ULRRS/1ZIFvGEdZ0rm4Hhg+l1VJPKEsg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781039481; x=1781644281;
+        d=1e100.net; s=20251104; t=1781039491; x=1781644291;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Jo2LCUiTKc+EU+TemJ4HpkN6AQ88ay1x2Q3Rlo7+7Fo=;
-        b=VqTMv0zM3qY+2W0qX4nW0I2HRclmGVnOgwAiZ/QHoMAbjFQUId/og8viqOKnLtdlKu
-         a1yp/ESeN164OTWQDaE4sWTYtuhMXU/xIcoUBhZSiR4PBoImNoGWyVD3z02CKywaC15R
-         xRonTKf/PpQYUg/1D13dzbWQyH8zUNcUoToTNcNICueYfNLXdYe8uZzhI801se8kzbgS
-         MthKs4G5oA77pST/VOtx9kbMbDN0Q7iDsxeLLgspHi2wlYn0EvfR9igrhNazR/eIb5BS
-         Rh43SfBlRHRBcRnjlRGNlC8BMwkzoPNe85CMAvuxFzZvGwkDCyWJivk+45t1PypBJ8bG
-         qKRw==
-X-Gm-Message-State: AOJu0Yzlu+niHgVNg/vSCRoqDbSZJ4dtqOrHIT4hG5N2abxzTzLdsXqP
-	+/NAoLhHjebvlL1oGrvunRa8wOv9fiYweK1a2rg8ps1rInv1IbtE1aL1mUeDvRMNGTmvn13Z+6j
-	ToHhL
-X-Gm-Gg: Acq92OE4kvEzcIEIz8gVrCfIvzKVnfcPv5lYOdH3Or/FgE9m0BbT0z3Urs9PiO+1r5V
-	o1GVj/HOMdcWjk9aVixV2HA5up7XXhzmXSTO2mDaOQJRmNXkANFkwR1HIXB1POgGshsvVCU8nn0
-	fA6coUmHrGk2h/4/ryniGJX2IJaARtXoz05Mxl0CSbbyA2zxI+NuoydVxRYpQoQuBZ5lCM+DdFu
-	zCUaI2xyq37Tf3Zv3MeAg9Xk62xczuZAEb/wX/hRpWambz6l7IJIvGDYTO5y90FDDnJtg1sov4l
-	z57LMwu+OCkYHGTO63I9sUIIMtm5ml0NMy4cPuM7FanARcdVHPW+NY/BmiBSACVXTBMW+muIdOM
-	WgbLKt2sKOI3uG+5+NaYQeMBnoi87qqJgsXvTeKspAQzbO2gKiet/rLZ31NYP7ClnYAGqA7i0mf
-	hrAJQCxhsdoyJdppzBILCcIcUGKX4/J7re4FYoaNWXvCv/kQUzUbnWQ200sRhKNq7e8w==
-X-Received: by 2002:a05:600c:4ec7:b0:490:44eb:c1dd with SMTP id 5b1f17b1804b1-490c26441b6mr365260935e9.29.1781039481596;
-        Tue, 09 Jun 2026 14:11:21 -0700 (PDT)
+        bh=IAeak349+yUScSoLf0dgVAalzeiHiaCVqrfFt5LGUCI=;
+        b=q5ULQfyb4XoKQTWxvF4OGPl3hcRRNupTECBJuyafxRgvCs0q9tgpf1dmVv0yP3ELr7
+         leLQdbRxXTvtgX03k7hWYZ0pRezbn7nO9EzWvN//S73Sxh3Jsuf1Vj7++9B+SfqQ031I
+         ULEKOIVroAEUtGJgZzVxZ/qpp4oYFcDUlpxo1IjY4UTcBFNr0tA9uxNXtwLHWtC+p56g
+         YvrMcCmOgNgJebNb6WbUe3fLrkRNKKZOPO+tircTouZ4iPld8FC0sXo5sLOe6OLuraI2
+         /HqN1Wm6DAGTvoB8NHT+O3z/mK0+VmP7dFH/60nCaH7wBZ0qySrojP1ARiEy1OYyJDin
+         JoBw==
+X-Gm-Message-State: AOJu0YxF70Rc9d2eXNkkrZy9hXrKHJYzyXvJnDIPg7hCFFE0uG8WnAmy
+	zpE7hZbg7wMalGZg3kV5lATnm1lXKwRsvPpXQhvVvewHVLg7yjwWiI15CHOb4itbZOEu/neFmLL
+	NQfMW
+X-Gm-Gg: Acq92OEEqe72eKgWJL/nFJQ42DelowzS46Ee1z3V8W0YwkfuYBiSmBnUz8kbhPRBEKK
+	fWLI3WWVn91Ym8JHSjNgI26uvG2f/B37lSTWwXhlUltmLp8iKSo5ENHlX6jM5D/SoOlyFR4BwMu
+	3K0plcDygB7ocOp0kE1/r3TuKUnZyq92zPfaQAVfEAcKbaALxQstaCb80AThszXju4HAdHD0pCn
+	OIxzPVAIaP0ZGh7F/ZibLTWp6aAV1+RAaepcUzWk2D7dd2qbdBz9VQ7VC4yUBWy2amKz/BYeTU4
+	gM+qD1ZOGHJsMbnGAU6cAon69gOd16e1mkNjRNBr6tDBzXhpiqTIn5Zve/2flZoFo+WfoSph5sL
+	JIMV4NdLoSiFAPM+z73qDk1EOaSRmIKF0YgEZr2b6EkbTrjrX4xzDdfO8JMwDFVr3iWEdUhx4+V
+	zUS2OsxFIHgfJ6LHfK3gA4Ne8THWIzVB7zHomVD88a3zdAaVyuNU0CSV8=
+X-Received: by 2002:a05:600c:4708:b0:490:bd66:e522 with SMTP id 5b1f17b1804b1-490c26038d2mr348207815e9.29.1781039490756;
+        Tue, 09 Jun 2026 14:11:30 -0700 (PDT)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:e2e3:d5f1:fbcb:c827])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3e5a00sm505061405e9.15.2026.06.09.14.11.21
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f2dcb13sm66218394f8f.2.2026.06.09.14.11.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 14:11:21 -0700 (PDT)
+        Tue, 09 Jun 2026 14:11:30 -0700 (PDT)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ] shared/bap: Transition ASE to QoS Configured on CIS loss
-Date: Tue,  9 Jun 2026 23:11:20 +0200
-Message-ID: <20260609211120.3887737-1-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ] transport: Complete Acquire for Sink ASE entering Enabling
+Date: Tue,  9 Jun 2026 23:11:29 +0200
+Message-ID: <20260609211130.3887817-1-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -68,35 +68,95 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-stream_io_disconnected() only handled the Releasing state, leaving
-Enabling, Streaming and Disabling ASEs stuck when the CIS was lost
-unexpectedly. The ASE shall autonomously move to QoS Configured on loss
-of the CIS and notify the peer; add that transition.
+On the QoS to Enabling transition the IO is not yet available because
+the CIS is not established, so the handler returns early and a pending
+Acquire is left unanswered once the IO later arrives.
 
-Fixes PTS test BAP/USR/SCC/BV-167-C
+Notify the connecting callbacks once the fd is attached so the
+transport can re-run the Enabling handling and complete the Acquire.
 ---
- src/shared/bap.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ profiles/audio/transport.c |  7 +++++++
+ src/shared/bap.c           | 28 +++++++++++++++++++---------
+ 2 files changed, 26 insertions(+), 9 deletions(-)
 
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index 4b9d26c5e..22a755064 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -2397,6 +2397,13 @@ static void bap_connecting(struct bt_bap_stream *stream, bool state, int fd,
+ 		return;
+ 
+ 	bap_update_links(transport);
++
++	/* IO connected; re-run Enabling to complete a deferred Acquire. */
++	if (!state && fd >= 0 && bt_bap_stream_get_state(stream) ==
++					BT_BAP_STREAM_STATE_ENABLING)
++		bap_state_changed(stream, BT_BAP_STREAM_STATE_ENABLING,
++					BT_BAP_STREAM_STATE_ENABLING,
++					user_data);
+ }
+ 
+ static bool transport_bap_is_playback(struct media_transport *transport)
 diff --git a/src/shared/bap.c b/src/shared/bap.c
-index deb85b264..350ed53d9 100644
+index deb85b264..09f671a15 100644
 --- a/src/shared/bap.c
 +++ b/src/shared/bap.c
-@@ -6779,6 +6779,14 @@ static bool stream_io_disconnected(struct io *io, void *user_data)
- 	if (stream->ep->state == BT_ASCS_ASE_STATE_RELEASING)
- 		stream_set_state(stream, BT_BAP_STREAM_STATE_CONFIG);
- 
-+	/* On loss of the CIS the ASE shall autonomously transition to QoS
-+	 * Configured and notify the peer.
-+	 */
-+	if (stream->ep->state == BT_ASCS_ASE_STATE_STREAMING ||
-+			stream->ep->state == BT_ASCS_ASE_STATE_ENABLING ||
-+			stream->ep->state == BT_ASCS_ASE_STATE_DISABLING)
-+		stream_set_state(stream, BT_BAP_STREAM_STATE_QOS);
-+
- 	bt_bap_stream_set_io(stream, -1);
- 	return false;
+@@ -3006,6 +3006,20 @@ static bool bap_stream_io_attach(struct bt_bap_stream *stream, int fd,
+ 	return true;
  }
+ 
++static void bap_stream_notify_connecting(struct bt_bap_stream *stream,
++						bool connecting, int fd)
++{
++	const struct queue_entry *entry;
++
++	for (entry = queue_get_entries(stream->bap->state_cbs); entry;
++						entry = entry->next) {
++		struct bt_bap_state *state = entry->data;
++
++		if (state->connecting)
++			state->connecting(stream, connecting, fd, state->data);
++	}
++}
++
+ static void bap_stream_set_io(void *data, void *user_data)
+ {
+ 	struct bt_bap_stream *stream = data;
+@@ -3042,6 +3056,10 @@ static void bap_stream_set_io(void *data, void *user_data)
+ 			bt_bap_stream_stop(stream, NULL, NULL);
+ 		break;
+ 	}
++
++	/* Notify IO connected so transports can complete pending requests. */
++	if (fd >= 0)
++		bap_stream_notify_connecting(stream, false, fd);
+ }
+ 
+ static void ascs_ase_rsp_add_errno(struct iovec *iov, uint8_t id, int err)
+@@ -7028,7 +7046,6 @@ static void bap_stream_io_connecting(void *data, void *user_data)
+ {
+ 	struct bt_bap_stream *stream = data;
+ 	int fd = PTR_TO_INT(user_data);
+-	const struct queue_entry *entry;
+ 
+ 	if (!stream)
+ 		return;
+@@ -7038,14 +7055,7 @@ static void bap_stream_io_connecting(void *data, void *user_data)
+ 	else
+ 		bap_stream_io_detach(stream);
+ 
+-	for (entry = queue_get_entries(stream->bap->state_cbs); entry;
+-							entry = entry->next) {
+-		struct bt_bap_state *state = entry->data;
+-
+-		if (state->connecting)
+-			state->connecting(stream, stream->io ? true : false,
+-							fd, state->data);
+-	}
++	bap_stream_notify_connecting(stream, stream->io ? true : false, fd);
+ }
+ 
+ int bt_bap_stream_io_connecting(struct bt_bap_stream *stream, int fd)
 -- 
 2.43.0
 
