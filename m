@@ -1,64 +1,64 @@
-Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C80039903E
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 09:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A428367B83
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 09:30:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780996535; cv=none; b=tl2vhZzAON1JdPwhxRAi+CNSX7szRl4p+W+6IIT9NYuarnhXVQHBayUpeAtI3CKXm+nMMpbvoYULJhQPPc0djq2NhHnx/ehKDdS3XcJMAGPC6Y/y8vGkzEdbhinXpMnkCbQNKf70XWGwPAaE84lp3oF2REDsLbFOfoZJX5C7nTQ=
+	t=1780997451; cv=none; b=Fn/WtctGGuhGsViPbN1pKkGVsaAqWKdzqwoDc2+o77RJTOvC92etjBs8tEnlbV613hKAVvCaHddPpXKb2x67fUGIpCxJW5l8BSwfHcip4bojKKeLPxTXaoO4LmcNfTRA1J4LQm/43/GawVBLSgttEnr7puNve6+PSI0v8+KW4lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780996535; c=relaxed/simple;
-	bh=cXLkyCOfzehlvEpqb2LxFjYezNjigWDaQp/sblYJXb8=;
+	s=arc-20240116; t=1780997451; c=relaxed/simple;
+	bh=QGj5KaDb8t5dQBxezjRkXEsqjrZGv4pqrumUk29zgqk=;
 	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Mkh6iacDwKkQ4w7omJ0RJTyqMVpt1PKrALK6On6IehszJM3jDdr2qECbRTNcYsKX7d4bTCiWsVvU/fx+sFnyPGQj6woGrCrHU0+fc3O3I/o4AtATLPo0HVlxXiwqvq72/lMLOk2qW/7jIxc7Sjv/WOIuhVsVCXWkYQS/CezhCVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lKAxu5iS; arc=none smtp.client-ip=74.125.82.180
+	 In-Reply-To:References; b=aPt9ZcvGVe/AdQcBC8pKcd06BOkV6vx7jXsFdUYVJOgPEHYRDDkVRWlKanAJ+ua6ANf/Y3yEGR+bhqr94OE1cuttW4XIX4UgTKDdQf5ChH01+1tftM5+5LkjszNilcbcV8td3UvZd+M0vjsddhEjWw3AFJ40gj7SutHzcZQPUrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LWyPswrv; arc=none smtp.client-ip=209.85.222.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lKAxu5iS"
-Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-304c520fe9aso8659069eec.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 02:15:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LWyPswrv"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-9158c621ebbso636149285a.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 02:30:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780996534; x=1781601334; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780997449; x=1781602249; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XlOo6oQ7Bg4z9+cHC1jk6LNYB4JXIabT8RooAIcJSqI=;
-        b=lKAxu5iS9k0pz6djAIFWFsCsTyyyAkEy4f10oz3KBm3/JAV3av4cQXi+xiqDqJXc4w
-         wx0Xv1iTUzXDDJ138hihrm0tcoRsTxTNs648kdHuwFrdBOTw7uM6aVCUxDZJzrCk4H2R
-         uU7NQW8DJcLMKTTZ/6hyxzSQ+QurmHtFWUKnSRzUxhb+JHLQMiAscclcNAgHjxLRTKYZ
-         Wwl/eiHoE2mDsmb8QQDlrfBPK7zY5mojkv7KLYs43OJqWH8nDIatlUfDEPON0F3xhxic
-         V5vnr4BbrSlWPNv1Le/A1iPx0xESxaccqJvP+OvmZM7kcwH9XAWQTWrpdsiseqKcIUNu
-         u5Rg==
+        bh=FDXHuFV4ybCXX9kmL5LLBuCmWFzkTQOtiEqmBcLo35g=;
+        b=LWyPswrvocH5cYwVlN9uAPeVsl+DE+sOTaJrNw9VwoXml/O9hBTjafL5LCprPU4Irg
+         hBYK6DZ2eKlaTJuaWOZ2Jcr/zTktYRuZ5BOOKTnaIWeBro4YKJLulVoR8/X38ge1KelP
+         fCxec/as8YU0ZNQCZnrRILwuBkVZ3n/ayvh79Gvp1zh2XJ7AXWtp3ov6qCeMgslibQNx
+         CT4vWLAjU65/ij/AzDMjQDJEjfWvmIF5NnR97EEBcCVEgwX9WzuMfubwg2lLEDDE7+52
+         1gHYx3V4Q7hDeUJqnAt+WL3DAvPHHsg5WsXHML0p+qqu3Cd41BjhBAnJCa4TZNkJ4m9F
+         q4tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780996534; x=1781601334;
+        d=1e100.net; s=20251104; t=1780997449; x=1781602249;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XlOo6oQ7Bg4z9+cHC1jk6LNYB4JXIabT8RooAIcJSqI=;
-        b=ee13uBOBOgdbVJBI9dQzMvjfBgiCnWtcwlrQnC5GYWMogkLeD6rT9dV7I/DQ6adoof
-         qZnjaH88QwwFRqWO19CNKXh/oY6OZkYf2x16NKnakUGpBrY5GbsZoJK0KiUKFxNFtkjP
-         Z1rofWxF9LFncCI+aCgqu/W1+EL7vKbeR1+YkzGRNRuMRthMX5jfjQNl5g9C5MsXno6b
-         Myb5zD67Z3kXHMecfJ/Yxho3HK6dWuI2QqPCaj4kTKS6ddozOmWR3BmydW9raWIbEwHf
-         mnBSJNpAYK9SJbQe5GOwaAxUSuA+Gunh/Of+AHX4mr6AEvvJS/B29dDqCbimkuhZqSqc
-         5JXA==
-X-Gm-Message-State: AOJu0Yzh1vQQrQNUTQuTeEb61vInN44W8/JLI/9hM0tk7Kcj0DrWmwC4
-	cAUT7nl2KIoajT7r/ZyV0p6o33HqH+oIoA+pBlUVqPM8PLMU9ojxiWe2zbcn//bE
-X-Gm-Gg: Acq92OGVxUIS4AY6jWMspmKno/Zlkx3paDvuA/4/Nr4nt0J1qtYbn84YlsBXra7kVFi
-	XeLW56bLaTj5BkBFFCb1owQ0ieS24BjuqJQLryO88F0Xpa6c6tg7oEZR6cXrfQ/s44DGG/ZuYKW
-	5olUabuY1Z53SqfvUYv1pY/U+5qk+vmrPdu6G6PljwyINbe+GWadFEFIlG4iBaQUrHPtcoCGKP3
-	70/lfFhZvv6p3R1JZRHZM3BA6hANw3/cBp/0NxjLkBl/Nq6az4i2WB4VScLtaYJhB037P8cTJB8
-	UVds2bqfdk9WXg6dazb2PAp6ajmIsHOe8BBkuWq5U+7hen7cQxjJR94wI3Osc9EpJY1Lz8ggAS1
-	ko2gAoReQBBXz19mQu3eGVG+8WdgiD8W9FRx4WoV9lpvner+CVxhvAmpI+QSUyHWH1wBqog9lkS
-	O5qmeBwNq9LLhmBJL3ciMRMB/q2bLNKhDr1zMbWsWZ+Q==
-X-Received: by 2002:a05:7300:818b:b0:307:140f:d511 with SMTP id 5a478bee46e88-3077b8b172amr11011763eec.33.1780996533635;
-        Tue, 09 Jun 2026 02:15:33 -0700 (PDT)
-Received: from [172.17.0.2] ([57.151.143.177])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3074df9bbd4sm18618367eec.30.2026.06.09.02.15.33
+        bh=FDXHuFV4ybCXX9kmL5LLBuCmWFzkTQOtiEqmBcLo35g=;
+        b=SlHjuj4tpTshGt+Dtf/67FgRo3XfckyOPgwEO+MBgzs/8iFB8ouOBarJwN0PWE4bJj
+         aYnhp0fRdXwY24uzOgEKUHAHxAQ9gDOjJoFFWIBeQp2GlFbJ6dzO+WhxuhwzH1wQQSNz
+         qko0rJclk9Dl74Yg9ZUQNoGLlwrt9ZPqt66IOb3Agb/q/VdxoQfAqB2SgBM3mmxUnEwQ
+         QJONnSFyEgGnykIeKjNen5HrE7LvmVERonEAsXZK0BfRYXKEoqIJFlKs+pxEPKPXGaR7
+         kQ7xQcnoQIKDj/g/0TpJ/8miqhi+UHyND7zTuG2V2DXRrs12b7N9OZvcuLRbw1szYHPP
+         yhlw==
+X-Gm-Message-State: AOJu0YzSFCW7lYCXl+bAVncege6MHk9a3YpQoVLsMM2fyh4j2QnRQ4Ap
+	3C3+jfvAaBx78pRAreakKl0PYrR2p8K1is4t7TsizZ5Fi2/4pWYn3g7WKouhSQ==
+X-Gm-Gg: Acq92OG7TP7QLEx9mRAu54iEEyRVOzZlfjdx8VNTZGjNF2KcFTQ5fROCJhSnFE5LdtX
+	l1iQkuCf7ojcTjOiqGNcZpaqmWJUxC6hLmCaenhY33Z1EwjDgJORvyRZ7ex2AZToEFZB7ItRvCU
+	mkpUdbLKpLHOPVOCRma7xq1U3IRGe/nNuM6XiH4Yfsc2yb/FoE4+uSHvWInWD5jwJHntV8yv2Xd
+	Rp4espcXChSnIsc/pMv38Vpz9LgvOQxWy1CLeSx9MZcFV/nA3EMGSxYiOJ5j5gM1EjnWTxWVonD
+	MR2ZIDMTxc6GECQ+nRWWaOobxC0C7Hm9OrOZaMznFRfPu0YAYtjxvIAhAVEu+NM69gcV75sFJHP
+	cNMpmBEeUYGhPaWWpa/ex7KkI60hSmce09LCCB5NfOgD+VwYtPSGQ3xadghocRmOyeBSyMZa7D0
+	JNCfbS18byQ2OcKMUBTRQOmINtixRvYvI/EZ+ZNtsr
+X-Received: by 2002:a05:620a:269e:b0:915:ab83:6963 with SMTP id af79cd13be357-915ab8396c4mr2928714685a.15.1780997448975;
+        Tue, 09 Jun 2026 02:30:48 -0700 (PDT)
+Received: from [172.17.0.2] ([20.51.198.199])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9158a237330sm2132326985a.16.2026.06.09.02.30.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 02:15:33 -0700 (PDT)
-Message-ID: <6a27d9b5.7554299c.24e399.86f3@mx.google.com>
-Date: Tue, 09 Jun 2026 02:15:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3194914917412797519=="
+        Tue, 09 Jun 2026 02:30:47 -0700 (PDT)
+Message-ID: <6a27dd47.77e39773.24a495.6164@mx.google.com>
+Date: Tue, 09 Jun 2026 02:30:47 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2990051391661115959=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -66,13 +66,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, xiuzhuo.shang@oss.qualcomm.com
-Subject: RE: [v1] Bluetooth: qca: Add BT FW build version log
-In-Reply-To: <20260609075417.1160702-1-xiuzhuo.shang@oss.qualcomm.com>
-References: <20260609075417.1160702-1-xiuzhuo.shang@oss.qualcomm.com>
+To: linux-bluetooth@vger.kernel.org, zhaoyz24@mails.tsinghua.edu.cn
+Subject: RE: 6lowpan: fix NHC entry use-after-free on error path
+In-Reply-To: <20260609080054.4541-1-zhaoyz24@mails.tsinghua.edu.cn>
+References: <20260609080054.4541-1-zhaoyz24@mails.tsinghua.edu.cn>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============3194914917412797519==
+--===============2990051391661115959==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -83,30 +83,112 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1108364
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1108371
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      0.51 seconds
-VerifyFixes                   PASS      0.09 seconds
-VerifySignedoff               PASS      0.09 seconds
-GitLint                       PASS      0.23 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      19.65 seconds
-CheckAllWarning               PASS      21.90 seconds
-CheckSparse                   PASS      20.60 seconds
-BuildKernel32                 PASS      19.93 seconds
-TestRunnerSetup               PASS      414.40 seconds
-IncrementalBuild              PASS      21.45 seconds
+CheckPatch                    FAIL      0.75 seconds
+VerifyFixes                   PASS      0.13 seconds
+VerifySignedoff               PASS      0.14 seconds
+GitLint                       PASS      0.34 seconds
+SubjectPrefix                 FAIL      0.13 seconds
+BuildKernel                   PASS      28.31 seconds
+CheckAllWarning               PASS      31.95 seconds
+CheckSparse                   PASS      29.63 seconds
+BuildKernel32                 PASS      27.13 seconds
+TestRunnerSetup               PASS      596.34 seconds
+TestRunner_l2cap-tester       PASS      65.08 seconds
+TestRunner_iso-tester         PASS      86.94 seconds
+TestRunner_bnep-tester        PASS      20.27 seconds
+TestRunner_mgmt-tester        FAIL      224.52 seconds
+TestRunner_rfcomm-tester      PASS      26.68 seconds
+TestRunner_sco-tester         PASS      34.10 seconds
+TestRunner_ioctl-tester       PASS      27.51 seconds
+TestRunner_mesh-tester        FAIL      26.96 seconds
+TestRunner_smp-tester         PASS      24.40 seconds
+TestRunner_userchan-tester    PASS      21.02 seconds
+TestRunner_6lowpan-tester     PASS      23.79 seconds
+IncrementalBuild              PASS      26.60 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+6lowpan: fix NHC entry use-after-free on error path
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#120: 
+Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
+
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#121: 
+Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
+Reported-by: Ao Wang <wangao@seu.edu.cn>
+
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#122: 
+Reported-by: Ao Wang <wangao@seu.edu.cn>
+Reported-by: Xuewei Feng <fengxw06@126.com>
+
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#123: 
+Reported-by: Xuewei Feng <fengxw06@126.com>
+Reported-by: Qi Li <qli01@tsinghua.edu.cn>
+
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#124: 
+Reported-by: Qi Li <qli01@tsinghua.edu.cn>
+Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
+
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#125: 
+Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
+Assisted-by: GLM:GLM-5.1
+
+total: 0 errors, 6 warnings, 0 checks, 10 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14618776.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
 
-https://github.com/bluez/bluetooth-next/pull/297
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.265 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.252 seconds
+Mesh - Send cancel - 2                               Timed out    1.985 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/298
 
 ---
 Regards,
 Linux Bluetooth
 
 
---===============3194914917412797519==--
+--===============2990051391661115959==--
