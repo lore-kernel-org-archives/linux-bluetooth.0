@@ -1,146 +1,183 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B6F3AB26C
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 16:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781022342; cv=none; b=Bh+fZp0M+HqFVFD3cjOVjTsZhe2K9WjCQTGPXFakS+0sN2i3sswAFS1TrXG5U1aO6S8JeDaOB44T9igVB5N/91kP66vDOC9vcESNxiZmowmnHtcDjS1SKvdrtPfxdZGBVKFJ5ENggI2YCyVfCpDtRtSEeGNyoENC0STJ7YOAeC4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781022342; c=relaxed/simple;
-	bh=2056/iH79J4phdV8ILdEDrs/XERYdOmsAyzfVSq3rvY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p0X6+W9HBTvT/A4a6skw73t5o4H9MHCB/r+ClIGVWRRqAWahH3CaaVIPuuQ45t5akd7nbNKd/UuFeCFUKKQo/0A44PozVX0IPMLFwBBlmsQ/oUqIAYy1l6I/LiIANcbbmhZ6i1NRwiEEAwVlg5PQKBHColB11ECD8ID23rZJKtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=BaGTHkco; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA00F3BED06
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 16:35:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781022924; cv=pass; b=tccy2TYM9BQh0CsFEclMRfszqsaQlec2LOpWhQ8Z6WFp7TjhlfgDrSY4qreURURpmBFD/u9GkdtEYNbWnFXuJWo4VcjtUxP3pwj4jCnldBVMyTotwgJJm0TwzbU34/im2gdwjbQuZAirwaeLJbFDQCIuyQajW6a3sPjJ1A0rs0E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781022924; c=relaxed/simple;
+	bh=VlmNs/mmWySdkvCbtvlw1SpTtQaE+rFQQtAyUtz3ku8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IStCOQ2sUuzUwsbQQGwTPHtMkCVkUj0jjxygY7fk5RGAvb295CySuLHsxzuzqNjca4QapaUb2pbbKbua7bn9gCFpjnnj92XtnZsxj1eqI1mtKGj8I/lstGYk65X/3YH81trSNjsoMoVAIQ0wWo4NoLq77btKaqf3UXerAuWBNK8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gnh69Cr1; arc=pass smtp.client-ip=209.85.161.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="BaGTHkco"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-490b9318997so42228975e9.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 09:25:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gnh69Cr1"
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-69e1eba21a6so3898112eaf.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 09:35:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781022922; cv=none;
+        d=google.com; s=arc-20240605;
+        b=QaJHowu0h0flihpvjU0WudbCjkB3JSajU+Pb2/EGkmdiR2eNPesgd4STi4o2rkw9l2
+         xHEjhLNma0MYkpgrzFqir72g91afG7EMV4EjQs1dyqLKEo5PmEelk25skeDX6JmIuyLs
+         oGi9TEYZcinJIvGiMc5VVgp8kMduvmWnAiMyJzCALdynAl3FMaTW51YMhNpNCXgb/ry3
+         KEzEy1znSNdodJ35dOo8S80ubUvBnRHOd1OwEPmvervSSjMHTIuxyTVyg+etz8NyVPIa
+         p+9hWUO6m1pCLMv+xYPlAzUeluhNSh3KYpNT2Qwqrd5m/5M40k15x+V1fozuLx0PP/EN
+         JbVw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=JsHDIWK/DEuMxgFHaPqAWYQl6k2nKERtlHiE+nLuWcM=;
+        fh=tyq0gYhA4cMcqn+bWakZSAdnDDyh/si+tlAcgOGyoy0=;
+        b=ln6Caxs8iOJgbrqsY7g5g8+/ys7b3GaJz3ZZQ7snRphB5oZeLN1pMhHuhUYUHSVRCm
+         0aJo+a7uyUPo/TAXRP7zJwxRKjJ71wpCC/hKrjHqeEn1tA0+zo2QlzEICiJcCn39bTqQ
+         HBLbagMXEuLTFRyV151UL8kqF/SqJyh0vFXqMDEFrXlLvr5+salGimFU5oCKYCewVasm
+         BCrfj9b/ENkfzw4krogGQdg72eYoAXxbPsD3C+u+pPrRgNPTZqeX/eXb9i3Fxp/x08Kl
+         xGaM0EIC/Q1thgcJExikyuZGkE1d7caerDyA3tGZPVwsgp3A8tLqt9Wo+PadZzIs5nwS
+         cjMQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1781022339; x=1781627139; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KWiIkYN1GIpafBcxhdphohwu2d7SHbJo4BJqg0Pr9Oo=;
-        b=BaGTHkcoZ0FQHL2BQYiNYf3crNX1ytAyShIKlIOBkcoM13EisHhSYLkGtpwwZ4EX9r
-         ByotlOyifD077opvj+6/Y/mA09pHCGy4T+j9LFzlx4CwpIqFNnUlRbWFUGOVtx4QP+xX
-         0kVCTjDDadvO2RJLUq6Taj4h5/ezP2xLbx1Ps=
+        d=gmail.com; s=20251104; t=1781022922; x=1781627722; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JsHDIWK/DEuMxgFHaPqAWYQl6k2nKERtlHiE+nLuWcM=;
+        b=Gnh69Cr1+J8uNmevXeTgVJ07DSyrV/TnF/O+EFN6U5T+lEqtzm6TEB/DJpWFZZgGMs
+         QS+yi71Qo20JVNVVT1At6t8iELMrrY0EEAdNOANZzONuwwVwTGm10VuWXZaKJDm56kb9
+         QxkCqdt3NIO7NBERMrJQNBdtM0po/agsq+FSYuzvbzpY672TA5x/WdfJfHaRftrOte/+
+         rn7/o3iuGAPePeLi/mezN1ecrhBaxtSsfM4b6oMGuEdyP9bAGQSm/PTdEonB1cYRn816
+         rCVVgo7bGNcIM5UsUGsI+z5h6AOQbwetCzGV/qSQxSIiehGRwQJKyLskxlerlC28vMjJ
+         /Ceg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781022339; x=1781627139;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KWiIkYN1GIpafBcxhdphohwu2d7SHbJo4BJqg0Pr9Oo=;
-        b=H2DG79rhEdyX1fHNbuqzw02h+ilHFxmzHTEnedtOU11ZdtuGFrPLBhmFSHAq+TKT1r
-         hInozRqFli1J1OTNLp5QzV/3AOrYg+/5rkd0O0Nxi8DxF4klDQxP5XbeuAlFrliG/1An
-         KDTqzikwuE+oNG7KsRRmObU5daIIWE0bp/ltozK1HiYEjKQWU2iVj5lCItBHYIQU1K4O
-         vQU+QWxAVqSzOTc2Uu8JNQ1fgMl0O77PZ+Hdc9pn1HBqJgZ9rfUzMMy1lHW+uWiszMvx
-         q2oBCsVXClPBTvqKIhcfxFymNiR2nxfSsB3omq9ZXDfLVpz4eoJWRHOzP84rDvshFONJ
-         kj5A==
-X-Gm-Message-State: AOJu0YxrY4UcPHn2iMsoDUXuHoYDS/EA+pX2gr+IRD10RWFZ4gv2JMDd
-	10EFx78koDmG7aJxpI4n+0OTrQn6qkgdn41iJqpdbBd+qGsCg0MFyf64yiEELHuQYFddIx+TzOj
-	t3GJV
-X-Gm-Gg: Acq92OEz3B3cU0OlHV0Mtla0Cx8BL2YyL1UcNtgCgqmrzr/gviF95f1TzFRoWRDHiv6
-	rQqJ5Vl+UYbviuO1SatINN5Vh5tyCszs0XUmUqG69uZMTcl/fVvPyueudGGXVECQHN/bHI+UZ3W
-	xtodzBK1OonggUpKOKcxuMSSRNmqpyjqRRHvUAwu7y/s80PeJurNMF8yVMqzdYe0rKPLt7FfGeI
-	rqgm0LObUCFufnqqcMggBwoTkiAU8QccP590zuJAlf20MxSgS2LWEGM/rk2hFCn/dHboINYyvS0
-	jcRodEhdLafdUl1zHtnzNGs3P0ixo9YfhIZvyJCi36mdzjTYyDR3ZCxrQSCbFLgjgATU6ho8TbL
-	I60vXGw5FEwxuuMLUjTv3sLNJbyv72LUCwsPPy9qh2vsSy+zufrBmhzOSxHRx4EYQql5xAtZzGS
-	X9A0AdY4RIR0rP0+J5zjfeA3dRyshR3QzhHFihtkx4V07mKi8oIj3NzA==
-X-Received: by 2002:a05:600c:3f0e:b0:490:bb45:79ef with SMTP id 5b1f17b1804b1-490c2508a5emr375700635e9.0.1781022339012;
-        Tue, 09 Jun 2026 09:25:39 -0700 (PDT)
-Received: from [10.122.244.41] ([84.245.120.9])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f360bd6sm68082628f8f.36.2026.06.09.09.25.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jun 2026 09:25:38 -0700 (PDT)
-Message-ID: <11d03be6-8f9c-4b8c-8bd7-0b7d9c9d87b4@streamunlimited.com>
-Date: Tue, 9 Jun 2026 18:25:37 +0200
+        d=1e100.net; s=20251104; t=1781022922; x=1781627722;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=JsHDIWK/DEuMxgFHaPqAWYQl6k2nKERtlHiE+nLuWcM=;
+        b=SYTvRGPQlBijsAy5iNw8dBKWO130czc/hXkPGtPCb42SBknWne8RcaPv8MBWfvo0bU
+         8Hmon0U50JBM/zh0qR/ygbZzOblnbunbmONKYqWkT4NG7LD4LG4yjq0a58wGsfmX0FFT
+         UDHAhyX90mcH/x8Yi5c+CKzFlSlZWoERn+IcuJBfpB1KDePBaEKok65ZPh7bFJw8Qe8K
+         hQclIQTts6vS9YLLGSAO17+3Ssp239IXlsdK3AwqCiIOlX27b84JihyKzDPKUTxadwJ1
+         GeuDzzkd8YTq5bNvzpJehqQAYU2gS6D2Io/48Wr51GBGk0wk24VCIGrhENG6SVWnzTfV
+         M8Bg==
+X-Gm-Message-State: AOJu0YxV+nTi9TSFMJypFbaAhQJkr1S34QKsTvNo5DpL1WKkeNg6fjrT
+	T9shqZyIFB5rxDc7yzwPTJKrzYp/LoOwSPpbhrtuD4C7j//3ZKG7aUqwNTY3b61TthuXPqUDP39
+	y2aOKpUIqv5XcOuyr6THm4fKgtxdsHaz7qMOL
+X-Gm-Gg: Acq92OEofjxU2wSOY93Fz6ZjApfO8dzmfjSIcnNeTiRXnCjvLqI/v7AW/R2Zxa0Yxif
+	Aq5VN/2eyzb/h5JoxFctiArTZ/wKfH6crkv4Ud0HwZgkcJYIUd87BAzEciaeL/+fm1xv2EpyERu
+	jce5KuM4PxKlKLVRxX7erTR/9h8RQN814avtf8PkClJvE8GAlfTWlxPl0qha/RruLh+kdZ1Qi7S
+	YgMUXQKMoV5hrRJUFnapRpBdlk36DayoXj43M6ZBbrYvfHENvI9KHXEtuFZLpBjpzKLS71wwyP0
+	UP80Yi0bzMAr1Ul9olS6Pl+HMNDvnY2tR8N/C/eXqOsmn2GX316dwI0bDo4EE6IQ4VJHmdyA3P/
+	EX8iz
+X-Received: by 2002:a05:6820:4b84:b0:69b:94ac:da1e with SMTP id
+ 006d021491bc7-69e68c1af93mr11171587eaf.31.1781022921704; Tue, 09 Jun 2026
+ 09:35:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ] hog: Fix starting encryption on some BLE remotes
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 References: <20260608091140.3606008-1-simon.mikuda@streamunlimited.com>
- <CABBYNZLRz2iqR-eQNjXsJnyeZ8aONnjgaQDO6bRWVqfVy8SbbQ@mail.gmail.com>
-Content-Language: en-US
-From: Simon Mikuda <simon.mikuda@streamunlimited.com>
-In-Reply-To: <CABBYNZLRz2iqR-eQNjXsJnyeZ8aONnjgaQDO6bRWVqfVy8SbbQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ <CABBYNZLRz2iqR-eQNjXsJnyeZ8aONnjgaQDO6bRWVqfVy8SbbQ@mail.gmail.com> <11d03be6-8f9c-4b8c-8bd7-0b7d9c9d87b4@streamunlimited.com>
+In-Reply-To: <11d03be6-8f9c-4b8c-8bd7-0b7d9c9d87b4@streamunlimited.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 9 Jun 2026 12:35:10 -0400
+X-Gm-Features: AVVi8CcKn6PEUYWdTYrfnTcazfzbO0GiltffsyJeggBt5L0N-1LLS0zyBlhHlr0
+Message-ID: <CABBYNZLomccRxaXOMDxbJ2ksks-2C30h9+oSn1ZRn1cKohThfA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] hog: Fix starting encryption on some BLE remotes
+To: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Luiz.
-I don't think it forces encryption without bonding.
-The diff is:
-          if (!device_is_bonded(device, 
-btd_device_get_bdaddr_type(device))) {
-     ........
-+        } else if (auto_sec) {
-+  bt_gatt_client_set_security(btd_device_get_gatt_client(device),
-+                                BT_ATT_SECURITY_MEDIUM);
-          }
+Hi Simon,
 
-so it means device IS bonded and auto_sec is enabled
-
-
-On 6/8/26 16:23, Luiz Augusto von Dentz wrote:
-> Hi Simon,
+On Tue, Jun 9, 2026 at 12:25=E2=80=AFPM Simon Mikuda
+<simon.mikuda@streamunlimited.com> wrote:
 >
-> On Mon, Jun 8, 2026 at 5:20 AM Simon Mikuda
-> <simon.mikuda@streamunlimited.com> wrote:
->> When BLE remote doesn't reply with Insufficient Authentication Error
->> encryption is not started.
->>
->> Good remote:
->> < ACL Data TX: Handle 64 flags 0x00 dlen 7
->>        ATT: Read Request (0x0a) len 2
->>          Handle: 0x0021 Type: HID Information (0x2a4a)
->>> ACL Data RX: Handle 64 flags 0x02 dlen 9
->>        ATT: Error Response (0x01) len 4
->>          Read Request (0x0a)
->>          Handle: 0x0000
->>          Error: Insufficient Authentication (0x05)
->> < HCI Command: LE Start Encryption (0x08|0x0019) plen 28
->>          Handle: 64 Address: xx:xx:xx:xx:xx:xx (OUI xx-xx-xx)
->>          Random number: ...
->>          Encrypted diversifier: ...
->>          Long term key: ...
->>
->> Bad remote:
->> < ACL Data TX: Handle 64 flags 0x00 dlen 7
->>        ATT: Read Request (0x0a) len 2
->>          Handle: 0x001e Type: HID Information (0x2a4a)
->>> ACL Data RX: Handle 64 flags 0x02 dlen 9
->>        ATT: Read Response (0x0b) len 4
->> ---
->>   profiles/input/hog.c | 3 +++
->>   1 file changed, 3 insertions(+)
->>
->> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
->> index f50a0f217..845087c9d 100644
->> --- a/profiles/input/hog.c
->> +++ b/profiles/input/hog.c
->> @@ -189,6 +189,9 @@ static int hog_accept(struct btd_service *service)
->>                  if (!bt_gatt_client_set_security(client,
->>                                                  BT_ATT_SECURITY_MEDIUM))
->>                          return -ECONNREFUSED;
->> +       } else if (auto_sec) {
->> +               bt_gatt_client_set_security(btd_device_get_gatt_client(device),
->> +                               BT_ATT_SECURITY_MEDIUM);
-> So this forces encryption even without bonding; why?
+> Hi Luiz.
+> I don't think it forces encryption without bonding.
+> The diff is:
+>           if (!device_is_bonded(device,
+> btd_device_get_bdaddr_type(device))) {
+>      ........
+> +        } else if (auto_sec) {
+> +  bt_gatt_client_set_security(btd_device_get_gatt_client(device),
+> +                                BT_ATT_SECURITY_MEDIUM);
+>           }
 >
->>          }
->>
->>          /* TODO: Replace GAttrib with bt_gatt_client */
->> --
->> 2.43.0
->>
->>
+> so it means device IS bonded and auto_sec is enabled
+
+Hmm, but in that case doesn't the following code trigger first:
+
+https://github.com/bluez/bluez/blob/master/src/device.c#L6469
+
+So either there is a bug or the code you are adding is just a NOP
+because the security has already been set to BT_ATT_SECURITY_MEDIUM.
+
 >
+> On 6/8/26 16:23, Luiz Augusto von Dentz wrote:
+> > Hi Simon,
+> >
+> > On Mon, Jun 8, 2026 at 5:20=E2=80=AFAM Simon Mikuda
+> > <simon.mikuda@streamunlimited.com> wrote:
+> >> When BLE remote doesn't reply with Insufficient Authentication Error
+> >> encryption is not started.
+> >>
+> >> Good remote:
+> >> < ACL Data TX: Handle 64 flags 0x00 dlen 7
+> >>        ATT: Read Request (0x0a) len 2
+> >>          Handle: 0x0021 Type: HID Information (0x2a4a)
+> >>> ACL Data RX: Handle 64 flags 0x02 dlen 9
+> >>        ATT: Error Response (0x01) len 4
+> >>          Read Request (0x0a)
+> >>          Handle: 0x0000
+> >>          Error: Insufficient Authentication (0x05)
+> >> < HCI Command: LE Start Encryption (0x08|0x0019) plen 28
+> >>          Handle: 64 Address: xx:xx:xx:xx:xx:xx (OUI xx-xx-xx)
+> >>          Random number: ...
+> >>          Encrypted diversifier: ...
+> >>          Long term key: ...
+> >>
+> >> Bad remote:
+> >> < ACL Data TX: Handle 64 flags 0x00 dlen 7
+> >>        ATT: Read Request (0x0a) len 2
+> >>          Handle: 0x001e Type: HID Information (0x2a4a)
+> >>> ACL Data RX: Handle 64 flags 0x02 dlen 9
+> >>        ATT: Read Response (0x0b) len 4
+> >> ---
+> >>   profiles/input/hog.c | 3 +++
+> >>   1 file changed, 3 insertions(+)
+> >>
+> >> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+> >> index f50a0f217..845087c9d 100644
+> >> --- a/profiles/input/hog.c
+> >> +++ b/profiles/input/hog.c
+> >> @@ -189,6 +189,9 @@ static int hog_accept(struct btd_service *service)
+> >>                  if (!bt_gatt_client_set_security(client,
+> >>                                                  BT_ATT_SECURITY_MEDIU=
+M))
+> >>                          return -ECONNREFUSED;
+> >> +       } else if (auto_sec) {
+> >> +               bt_gatt_client_set_security(btd_device_get_gatt_client=
+(device),
+> >> +                               BT_ATT_SECURITY_MEDIUM);
+> > So this forces encryption even without bonding; why?
+> >
+> >>          }
+> >>
+> >>          /* TODO: Replace GAttrib with bt_gatt_client */
+> >> --
+> >> 2.43.0
+> >>
+> >>
+> >
+
+
+
+--=20
+Luiz Augusto von Dentz
