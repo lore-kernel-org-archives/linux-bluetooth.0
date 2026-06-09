@@ -1,44 +1,44 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B63E3F58E7
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 10:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F483F4DEF
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 10:26:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781000778; cv=none; b=HO+b87APjRwvyqnLTE8tDNQehhelrNrRcPFgJww1NDnfk6zC0PQeWqDuR2Xwsrp2uGYn6CQrw5h9MXchylOKH12EPIfkqHipFpX5w+KX2tKPXWRqfKcXOlAQH+g1RiPD6dRlUSe4OBvXohzp9mH4qXqWRBs8GtGXot9utqGLPsc=
+	t=1781000781; cv=none; b=JVO272H7GyRk+mlTDqFXO9ccu8KSjvZxg7kb2DBSdWLPgd3tkzWVTH9auDuiUgUY2uZ7vesyoY4A4vQabDAIix0PjYbRD/Gx6yXW+YUS1buln1yFgNjgEpbAE2/1o1s9W1bzRWLrf6HK7HOU4S/gmfBwF6hA8hKF1nXpHKg9Yj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781000778; c=relaxed/simple;
-	bh=rV5DspxWK02U00+TesXFoZ4Nsyb6PG3zvCc9fmTUMx4=;
+	s=arc-20240116; t=1781000781; c=relaxed/simple;
+	bh=fwb4jIMwLvSGx1zvY+dy+u2gJnYZQm3Iu48XlAx/XMM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k1RWtid8TZtcEHLDkkaOimY42DmN11yhMgms9nuGft7vz8fV+Pe2ek0oNJDKs4EbL70pmSdJmG2olryS01dzrMclyTjeStL60diDqySPrze/AHYtfBEfx0WK/PTv0SXOTZu9rRkvARFJFjW7aKBpQK9fW6TaP38w0g4K3IwJzRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=SqHmHAPB; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version; b=f+O9a/qIkONSvm79ewltRPIEFyLJldpGcU5e72CAxGmSAUHiDFzuwkOn2NcIHMg6aoLXvDYdKRwRS1/Nr74Pa5ohBswX5pe1+8YQh1yJDe5R7wC5Rv7YcqM+GimZGiaQi5962wnCJjT48T2s5b9wVu+hUfszR3VY3wCRdsDLC4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=qNEYdDyG; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="SqHmHAPB"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="qNEYdDyG"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1781000776;
-	bh=rV5DspxWK02U00+TesXFoZ4Nsyb6PG3zvCc9fmTUMx4=;
+	s=mail; t=1781000773;
+	bh=fwb4jIMwLvSGx1zvY+dy+u2gJnYZQm3Iu48XlAx/XMM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SqHmHAPBgFmgo1hY1T3Nw1kAWkjJVpOqPBjbUOx8K8fbPs0rdEXmPkO7x21qhyq6+
-	 6C97jULVTgouhkFFHs0bhbxDKyHuVSJF+jiSUFBWlESvSnStXVKUHbx8DiaYPzL0wT
-	 XZWm2y37bt2p5UXyN+ItaAKkQ4nhBECGPjN0QlHtC8OJ9V6w9gZoOGcWqmA8rgiZsj
-	 dWw8IRxOPeKJikuRR55b1SiH1MNdGlTAKmRvhoccxtEfuhA+Eln2MwV0oq5THUOGhi
-	 Rsls+b+/JfLcHqfilxWtt7tYmRXxzhwZEGE/vUlBGBcVNYdOfK3kLF6rW2T4te+VaF
-	 n7Ixbpl0a4sZQ==
+	b=qNEYdDyGmUryPqUO9dGx+ECdiCDQUvLJedlotXX80Aq2JX9tQwoEWtzOEOP9WQf48
+	 M2JuUtQujmtLUDaXwZJkqp9PdFALwRQMMCgnjVmNar56mhfROj0vxWVA3D0dg1a2BN
+	 2EnCLhtjTP5xoZR6DEkaHNxlocbyuoNwgzZzBm3BM1k9p34j2aoUtLOlu8eWb0kAib
+	 bXF47wnLvNElgeeDUCr7y5Y6fPRcs0Y48jKJK1SpajXOedoUCL2VIccnxsvY6rFsEP
+	 WDisc1pVxSRMNVtjpSD6aHwqaVpji5FwT0L/92s+zw4axNtIMLtsTWPFKFOBdvMymf
+	 drzrxvC5MFtfA==
 Received: from raghavendra-XPS-13-7390.. (unknown [100.64.1.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: raghavendra)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 2908817E0D03;
-	Tue,  9 Jun 2026 12:26:15 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 32CD117E0416;
+	Tue,  9 Jun 2026 12:26:11 +0200 (CEST)
 From: raghu447 <raghavendra.rao@collabora.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: raghu447 <raghavendra.rao@collabora.com>
-Subject: [BlueZ PATCH v3 2/2] unit/bap: add SPE tests
-Date: Tue,  9 Jun 2026 15:55:48 +0530
-Message-ID: <20260609102548.6887-3-raghavendra.rao@collabora.com>
+Subject: [BlueZ PATCH v3 1/2] shared/bap: add ASE Control Point error responses
+Date: Tue,  9 Jun 2026 15:55:47 +0530
+Message-ID: <20260609102548.6887-2-raghavendra.rao@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260609102548.6887-1-raghavendra.rao@collabora.com>
 References: <CABBYNZKQuFeXvtEE3d3nOUbkKZTAFsfB=1=NDFp48CFEg2e-=Q@mail.gmail.com>
@@ -51,90 +51,161 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add unit tests for the PTS BAP/USR/SPE/BI-01[5]-C tests.
+These changes are required to Pass BAP/USR/SPE/BI-01[5]-C tests.
 ---
- unit/test-bap.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ src/shared/bap.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 88 insertions(+), 2 deletions(-)
 
-diff --git a/unit/test-bap.c b/unit/test-bap.c
-index 3a67e7016..e43d1d2ef 100644
---- a/unit/test-bap.c
-+++ b/unit/test-bap.c
-@@ -4349,6 +4349,69 @@ static void test_scc_metadata(void)
- 	test_usr_scc_metadata();
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 8fc2fb14d..edb84efca 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -57,6 +57,11 @@
+ 		(1<<BAP_DURATION_LTV_TYPE)|\
+ 		(1<<BAP_FRAME_LEN_LTV_TYPE))
+ 
++#define BAP_METADATA_PREF_CONTEXT_LTV_TYPE	0x01
++#define BAP_METADATA_CONTEXT_LTV_TYPE		0x02
++#define BAP_METADATA_PROGRAM_INFO_LTV_TYPE	0x03
++#define BAP_METADATA_LANGUAGE_LTV_TYPE		0x04
++
+ struct bt_bap_pac_changed {
+ 	unsigned int id;
+ 	bt_bap_pac_func_t added;
+@@ -3304,6 +3309,40 @@ static uint8_t stream_enable(struct bt_bap_stream *stream, struct iovec *meta,
+ 	return 0;
  }
  
-+#define ASE_CP_RSP(_op, _ase, _code, _reason) \
-+	IOV_DATA(0x1b, CP_HND, _op, 0x01, _ase, _code, _reason)
-+
-+#define ASE_CP_RSP_TRUNCATED(_op) \
-+	IOV_DATA(0x1b, CP_HND, _op, 0xff, 0x00, 0x02, 0x00)
-+
-+#define SPE_CP_TRUNCATED(_op) \
-+	IOV_DATA(0x52, CP_HND, _op), \
-+	ASE_CP_RSP_TRUNCATED(_op)
-+
-+#define SPE_CP_ZERO_ASES(_op) \
-+	IOV_DATA(0x52, CP_HND, _op, 0x00), \
-+	ASE_CP_RSP_TRUNCATED(_op)
-+
-+#define SPE_METADATA_TRUNCATED(_ase) \
-+	IOV_DATA(0x52, CP_HND, 0x07, 0x01, _ase), \
-+	ASE_CP_RSP_TRUNCATED(0x07)
-+
-+#define SPE_METADATA_UNSUPPORTED(_ase) \
-+	SCC_SRC_ENABLE, \
-+	IOV_DATA(0x52, CP_HND, 0x07, 0x01, _ase, 0x02, 0x01, 0xfc), \
-+	ASE_CP_RSP(0x07, _ase, 0x0a, 0xfc)
-+
-+#define SPE_METADATA_INVALID_CONTEXT(_ase) \
-+	SCC_SRC_ENABLE, \
-+	IOV_DATA(0x52, CP_HND, 0x07, 0x01, _ase, 0x04, 0x03, 0x02, \
-+			0x00, 0x10), \
-+	ASE_CP_RSP(0x07, _ase, 0x0c, 0x02)
-+
-+/* Unicast Server Rejects Invalid ASE Control Point Procedures
-+ *
-+ * Test Purpose:
-+ * Verify the behavior of a Unicast Server IUT when a Unicast Client writes
-+ * invalid ASE Control Point parameters.
-+ *
-+ * Pass verdict:
-+ * The IUT sends a notification of the ASE Control Point characteristic with
-+ * the expected Response_Code and Reason values.
-+ */
-+static void test_usr_spe(void)
++static bool ascs_metadata_rsp(struct bt_bap_endpoint *ep, struct iovec *meta,
++							struct iovec *rsp)
 +{
-+	define_test("BAP/USR/SPE/BI-01-C [USR ASE Control Point truncated]",
-+			test_setup_server, test_server, NULL,
-+			SPE_CP_TRUNCATED(0x03));
-+	define_test("BAP/USR/SPE/BI-02-C [USR ASE Control Point zero ASEs]",
-+			test_setup_server, test_server, NULL,
-+			SPE_CP_ZERO_ASES(0x03));
-+	define_test("BAP/USR/SPE/BI-03-C [USR Update Metadata truncated]",
-+			test_setup_server, test_server, NULL,
-+			SPE_METADATA_TRUNCATED(SRC_ID(0)));
-+	define_test("BAP/USR/SPE/BI-04-C [USR Update Metadata unsupported]",
-+			test_setup_server, test_server, &cfg_src_enable,
-+			SPE_METADATA_UNSUPPORTED(SRC_ID(0)));
-+	define_test("BAP/USR/SPE/BI-05-C [USR Update Metadata invalid context]",
-+			test_setup_server, test_server, &cfg_src_enable,
-+			SPE_METADATA_INVALID_CONTEXT(SRC_ID(0)));
++	struct bt_ltv *ltv;
++	uint16_t supported_context = 0;
++	uint16_t context;
++
++	if (ep->stream && ep->stream->lpac)
++		supported_context = ep->stream->lpac->qos.supported_context;
++
++	ltv = meta->iov_base;
++	if (meta->iov_len >= sizeof(*ltv) &&
++			(ltv->type < BAP_METADATA_PREF_CONTEXT_LTV_TYPE ||
++			ltv->type > BAP_METADATA_LANGUAGE_LTV_TYPE)) {
++		ascs_ase_rsp_add(rsp, ep->id,
++				BT_ASCS_RSP_METADATA_UNSUPPORTED, ltv->type);
++		return true;
++	}
++
++	if (meta->iov_len >= sizeof(*ltv) + sizeof(context) &&
++			ltv->type == BAP_METADATA_CONTEXT_LTV_TYPE &&
++			ltv->len == sizeof(context) + 1) {
++		context = get_le16(ltv->value);
++		if (!context || (context & ~supported_context)) {
++			ascs_ase_rsp_add(rsp, ep->id,
++					BT_ASCS_RSP_METADATA_INVALID,
++					ltv->type);
++			return true;
++		}
++	}
++
++	return false;
 +}
 +
-+static void test_spe(void)
-+{
-+	test_usr_spe();
-+}
-+
- #define SNK_ENABLE \
- 	IOV_DATA(0x52, 0x22, 0x00, 0x03, 0x01, 0x01, 0x04, 0x03, 0x02, 0x01, \
- 			00), \
-@@ -10259,6 +10322,7 @@ int main(int argc, char *argv[])
- 	tester_init(&argc, &argv);
+ static uint8_t ep_enable(struct bt_bap_endpoint *ep, struct bt_bap *bap,
+ 			struct bt_ascs_enable *req, struct iovec *iov,
+ 			struct iovec *rsp)
+@@ -3335,6 +3374,9 @@ static uint8_t ep_enable(struct bt_bap_endpoint *ep, struct bt_bap *bap,
+ 		return 0;
+ 	}
  
- 	test_disc();
-+	test_spe();
- 	test_scc();
- 	test_bsrc_scc();
- 	test_bsnk_scc();
++	if (ascs_metadata_rsp(ep, &meta, rsp))
++		return 0;
++
+ 	if (!ep->stream) {
+ 		DBG(bap, "No stream found");
+ 		ascs_ase_rsp_add(rsp, ep->id,
+@@ -3568,6 +3610,9 @@ static uint8_t ep_metadata(struct bt_bap_endpoint *ep,
+ 	meta.iov_base = util_iov_pull_mem(iov, req->len);
+ 	meta.iov_len = req->len;
+ 
++	if (ascs_metadata_rsp(ep, &meta, rsp))
++		return 0;
++
+ 	return stream_metadata(ep->stream, &meta, rsp);
+ }
+ 
+@@ -3673,6 +3718,23 @@ static struct iovec *ascs_ase_cp_rsp_new(uint8_t op)
+ 	return iov;
+ }
+ 
++static void ascs_ase_cp_rsp_add_truncated(struct iovec *rsp)
++{
++	ascs_ase_rsp_add_errno(rsp, 0x00, -ENOMSG);
++}
++
++static bool ascs_ase_cp_rsp_invalid_len(uint8_t op, size_t len, uint8_t num)
++{
++	switch (op) {
++	case BT_ASCS_METADATA:
++		return len == num;
++	case BT_ASCS_RELEASE:
++		return true;
++	default:
++		return false;
++	}
++}
++
+ static void ascs_ase_cp_write(struct gatt_db_attribute *attrib,
+ 				unsigned int id, uint16_t offset,
+ 				const uint8_t *value, size_t len,
+@@ -3697,7 +3759,7 @@ static void ascs_ase_cp_write(struct gatt_db_attribute *attrib,
+ 		return;
+ 	}
+ 
+-	if (len < sizeof(*hdr)) {
++	if (!len) {
+ 		DBG(bap, "invalid len %u < %u sizeof(*hdr)", len,
+ 							sizeof(*hdr));
+ 		gatt_db_attribute_write_result(attrib, id,
+@@ -3705,9 +3767,26 @@ static void ascs_ase_cp_write(struct gatt_db_attribute *attrib,
+ 		return;
+ 	}
+ 
++	if (len < sizeof(*hdr)) {
++		DBG(bap, "invalid len %u < %u sizeof(*hdr)", len,
++							sizeof(*hdr));
++
++		rsp = ascs_ase_cp_rsp_new(value[0]);
++		ascs_ase_cp_rsp_add_truncated(rsp);
++		ret = 0;
++		goto respond;
++	}
++
+ 	hdr = util_iov_pull_mem(&iov, sizeof(*hdr));
+ 	rsp = ascs_ase_cp_rsp_new(hdr->op);
+ 
++	if (!hdr->num) {
++		DBG(bap, "invalid Number_of_ASEs 0");
++		ascs_ase_cp_rsp_add_truncated(rsp);
++		ret = 0;
++		goto respond;
++	}
++
+ 	for (handler = handlers; handler && handler->str; handler++) {
+ 		if (handler->op != hdr->op)
+ 			continue;
+@@ -3716,7 +3795,14 @@ static void ascs_ase_cp_write(struct gatt_db_attribute *attrib,
+ 			DBG(bap, "invalid len %u < %u "
+ 				  "hdr->num * handler->size", len,
+ 				  hdr->num * handler->size);
+-			ret = BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
++
++			if (ascs_ase_cp_rsp_invalid_len(hdr->op, iov.iov_len,
++								hdr->num)) {
++				ascs_ase_cp_rsp_add_truncated(rsp);
++				ret = 0;
++			} else
++				ret = BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
++
+ 			goto respond;
+ 		}
+ 
