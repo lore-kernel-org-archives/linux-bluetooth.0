@@ -1,63 +1,64 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E876E368D6F
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 16:13:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B0D3BA239
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 16:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781021631; cv=none; b=GD5d7QFjL037LnYcfWUVohb4wAfgGr34+0yBx1Cne4W+hIlqDfJorHod796FU24AgCoOsjYA2DFLj1r3Ex+VTJ+sGybtFpauSfpKMYRm9jJQeN6jNPXiagKH9EeXHzjhUZLFFCKMdeeT1/0aRDa2GoyWuAqRDa74QfSQDj0WxJs=
+	t=1781021905; cv=none; b=k7URA3AWK5OIdiWfzI0QZsbv+L1YYZ4tpT0mbWbtLceLfQEEWxyCx1pCiLfJpHnPsL4fls766epM0WWLQR/IzjjZDQ1+cFF6lJx9v7WiJkF2mOLM92blnbFgEmcdybXWpD1pBuZ5PY6xDoK4i5Lov3/SbwNDK+37j+dEYmjn2J8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781021631; c=relaxed/simple;
-	bh=1V/Ez3WKzYEA/N6YMvF/nL9C7iLyuGt49p69la6yvQ8=;
+	s=arc-20240116; t=1781021905; c=relaxed/simple;
+	bh=Rn94p7sYmD/w4OSshFEetShPhQwkKypxpG7kkcnTG4s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L3+n2hIc7UohJ1Q+keILsCsVPlW1P4W8kXHUkD+Kaaiz+UUlHgtMX2I79O/ZRJ0+j2LWZ3DaH5dUawUCb52fBEvSzvu4SAlRpkZlOcn7Vf1H2e10jk7tSfGHvUQArfruV0BoO1pjPNNR3EoBy8V+VYNDBw8XluYg+jNdMgX654U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=GgAbizua; arc=none smtp.client-ip=209.85.221.44
+	 In-Reply-To:Content-Type; b=aKhoNcSuTd8YOqWSPnYXwWprgc20sZwa4uwi51BfzLyYMrn11CK4RtjY+1gioVWbfmplFzXr6g2XvzXYwIeXg86nfeE1TzBl0V5yqUOtGwWdabRDSyAszjqLz8bi28skz6oC9BsthYGGhQhr84AdyJI/wuQM2WTcSeKCnLLOZok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=RtBpNT4s; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="GgAbizua"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-45eec22fab7so2974273f8f.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 09:13:47 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="RtBpNT4s"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-490af320e2aso62796175e9.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 09:18:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1781021626; x=1781626426; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1781021899; x=1781626699; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=QgrmfBC+ByaSjPmpzscQtbPdsSCH+GPmpEBS3nsxw9U=;
-        b=GgAbizua+rEHK2/Oi5nGgQue5O6usoiEnpSUdtIHuq0GdFZZjNs+fphKSQJJeqzqTg
-         LJkoO1FTwarInDtg1nMLlhkh4TzTM5VALUWp/Qqyne0VmTDgiebnQHLVnkeShBvjkJ8N
-         6rLRQProWbjKvRdm/Y+Y/7PkxT8lzQ4/7WwGk=
+        bh=cKjDaHvMusivhoihc8XQqwcmmdsEc79N0ly+xWbpwLs=;
+        b=RtBpNT4snnIwbO4RbFlCrnCQ3M+2P8q9FAv3aVh30rFQlDYMkoUMm12YZBvjMCkDJT
+         eDgXzMgssAaiXFC0hkocXFpK57gAZnheWAsDGWzOAMOH+xmUgn70a3/5nA1XqdW1Wl44
+         ZQAlYlEpwGDSWLvWTGKcyQhj0Bks2eqcG93E4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781021626; x=1781626426;
+        d=1e100.net; s=20251104; t=1781021899; x=1781626699;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=QgrmfBC+ByaSjPmpzscQtbPdsSCH+GPmpEBS3nsxw9U=;
-        b=AEF6kI8akjote0+nxKMktdhNr1C8BZZg2xNjxpqzMGZhop3r8WP331iq3kqeAuRHqB
-         jqGKoPClFpzMLF8x2srCrNrWAthmeY8vH0HEjBXzhbl40KszMpT8k/nvsvPh33Q/cXY1
-         MJf0iHeqAUIFxIpqVU76Z6uV39BTZL7ohkoW598bnRrJIgc6X+O83M583GgX9yXOMtbq
-         uek+PSGaxql6JWHgFn4KJQnRBufNNFxwiqG89Zf/XWdnt5PBYTV6RE1x1gJUxk8khXJ7
-         nPKMpesf64UitXzTrZvmseUtE7j+v8G+SIPybnafLiuQOYXNN4MkviOE71ydOfHQ8b4c
-         +tcA==
-X-Gm-Message-State: AOJu0Yxdl+QuKAAB0nJyuNI80SWn5Jg8Al8NyRBgyzrBdQ5h1xc7mE3T
-	/m3SLINgbAE6i2Jx0d5TJDu0RFPUy5/6BUtuhfmoPdzurBRWdi8Nx/8hJQP88DRJtAPokBuXrhH
-	i0dkx
-X-Gm-Gg: Acq92OEJoFfJru93AT53dX5aoJt7h9aeWgdAw62o4KgcDALXtP+rPElqwz5wOHv/LBp
-	OsGMjJViZskSg8J35sEX/4ZDy0GBfDFIesUh//1TrIs/bGhWAHxYg24hQnsdq5C7H45jJbHUBny
-	ItRy49tZySlrTl/+lBB6PMU9LYjsk0W+O3Z0DG9UWBZfbmPJEcTvlrdSSCgzb/uyzZo/aWjVZhk
-	3j9AZBs/CsAEBEynyMru/Q1GHZhs6gh1AUPHKJZJyLG0e9J286fklzHSl+toOkFvRso1yGsL+iB
-	n41+BTLBWOlQN5MXflSZmL/spdO8tG16mZJ6zjNCUkNhZ9VHd4NtUbAuCK5HxUyXnyORHROw77s
-	fHf83rkEiJJSbiAnJO91QfN91CL7M6F39ucpO9MTP/wSYrzdss3L0O6kNHmyCD10dTElXjhx1Tz
-	BaluT+UheHsY9JoyZ9cfMjmeXgLy11/pf+RBfYPGegz+Sol4GCj77E7XvNcYjmvn3X
-X-Received: by 2002:adf:e509:0:b0:441:239e:2bb8 with SMTP id ffacd0b85a97d-460304f0ad9mr25532379f8f.7.1781021626059;
-        Tue, 09 Jun 2026 09:13:46 -0700 (PDT)
+        bh=cKjDaHvMusivhoihc8XQqwcmmdsEc79N0ly+xWbpwLs=;
+        b=DchPkuQEpDEXZHaAMlhFMjTXSrCVSUHWNaHUhUAQ6EXkZPiUjGJE2kf0dhwIi7Ulhb
+         5mP+xMCK/+M4Cfz1p7n2cb08VtKi3GGNJYHNJVVensy2GSzqNSLbBTKpxN6877EpNiNV
+         zpxD595XOvQMGgGNgATlTs/x427agN/kZOZIqGmNQvqhv3bWqQVvZJn4uSxqeUrB7O4R
+         Z3X9mxFa7qhQpMj1dr1ETMHrUKNqfdE/xlNgBSftR+RCgzDbdnBXlPJ+mv60Ph3asrLq
+         uC1WyeUVfcT5MP0/2yTItyKzBR4/4k5g8Tdw7AAfyhrPQkTd5Rv76VcZR4hcK1p83v9Z
+         atiA==
+X-Forwarded-Encrypted: i=1; AFNElJ9KYsRwVXPrT8ZyU7FA9xnRZ7bxx1awExHrUXnB81a3iD4Z3MBXCFY7CueTwHcFCVUtHoJppWbYwmcjYQdUfQ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIGZ6mnOZhzENKUf82k52e/eK63S+bwWYR2AuJaryl/PO/jrTe
+	bn0dXofzcmiZftHaXYY1OQmRDDIGdkG8AkkuuyVyEH0fUOuvJcueUPeOYdi/va2yItXXeVcRAfi
+	2u4gZ
+X-Gm-Gg: Acq92OGVhJFWPoZNuhIIO8zQIYAfflQhw2npnEDtwZn4OhzKuYY5NoIMVa+Yw2QVLZR
+	fiZVhbfe/dTBZ0qfB1wlLYB1DVudgTsSb9frg24mrKSYJls7oKqbJPFUHqxCDqTt4NYZL31oWJ3
+	rlM+7mcopVp27yPWlNqgxJmmhFH4iEF6BOBckDwzpoQdtHVp00fpxW3QRCDyaPr5/hapvQyu9IE
+	mQ/RU/UFp+sItDSnKVyMK6cOb7I9s+xE7mfkG73DqeIntT28LgBdLZbaCASOujQSXVe8m9ULIAd
+	ZcKTx4VlypVGwYYDrJBWtZhTP0dYyIZ0lcDHCxJ2LqbV6WFpso0XCmHjpVR4OYfRl15AOHslipS
+	GhVMbJRCZ5vIptzU6l2RsWxjwf3RcN+2apRkK5nZVhiKpKhJfYvxNHhvwYePUJ4VjG+CJ+32q0d
+	9n1yrxV7rGz5h67kMZWP40iIh0f5KLSibczx4wI6xlYb/u7fQ/BcJ1C4bWf+Hy5VUZ
+X-Received: by 2002:a05:600c:5246:b0:489:c57:7836 with SMTP id 5b1f17b1804b1-490c25ff39amr340516955e9.27.1781021898834;
+        Tue, 09 Jun 2026 09:18:18 -0700 (PDT)
 Received: from [10.122.244.41] ([84.245.120.9])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f344541sm59604474f8f.22.2026.06.09.09.13.45
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc39eb04sm496839235e9.6.2026.06.09.09.18.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jun 2026 09:13:45 -0700 (PDT)
-Message-ID: <1ec8bd78-5a60-4bfd-b079-a1a78207bc1c@streamunlimited.com>
-Date: Tue, 9 Jun 2026 18:13:44 +0200
+        Tue, 09 Jun 2026 09:18:18 -0700 (PDT)
+Message-ID: <fb060ed1-084d-41e7-98a5-28de3db274e1@streamunlimited.com>
+Date: Tue, 9 Jun 2026 18:18:17 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,312 +66,143 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ 1/2] avdtp: Add GetConfiguration DBus function
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-References: <20260608121226.3727101-1-simon.mikuda@streamunlimited.com>
- <CABBYNZKkiRaDQFUrMp65=DF-37gBnSJ0H__bj-iA4Nx2Y=Yhkw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] a2dp: Add codec prioritization
+To: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20260608111658.3686364-1-simon.mikuda@streamunlimited.com>
+ <f10de0ea2a69c48b40d66b79d4236b17f932c05c.camel@iki.fi>
 Content-Language: en-US
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
-In-Reply-To: <CABBYNZKkiRaDQFUrMp65=DF-37gBnSJ0H__bj-iA4Nx2Y=Yhkw@mail.gmail.com>
+In-Reply-To: <f10de0ea2a69c48b40d66b79d4236b17f932c05c.camel@iki.fi>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Yes, the configuration is exposed, but it is the configuration we 
-already selected or accepted.
-You are right, it is to pass PTS test cases, but i think there are 2 
-valid points:
-1. Provide API completeness
-2. Theoretically, it is "useful", you could GetConfiguration of other 
-endpoints that are configured from other remote device
+Hi,
 
-You are right, this API certainly won't be used and has no valid use 
-case, so if this is not merged it is no big deal. But you can pass PTS 
-test cases, and you can retrieve "fresh" configuration from remote devices.
+in our use case it was something like this:
 
-It can be hidden by some configuration, but i have no idea how. Can you 
-give some pointers on this?
+we have endpoints:
 
+AAC, SBC
 
-On 6/8/26 15:59, Luiz Augusto von Dentz wrote:
-> Hi Simon,
+later we've added LDAC and to ensure compatibility with already paired 
+devices we had to add it to the end of the list:
+
+AAC, SBC, LDAC
+
+So when we've initiated connection to remote that supports LDAC, it was 
+not selected.
+
+But now i think your idea:
+
+    What could be useful is something that allows per-device priority
+    selection, e.g. DBus callback that BlueZ uses to query which endpoint
+    to configure, before starting SelectConfiguration.
+
+Is the way to go, definitely better than static priority in bluez.
+
+On 6/8/26 17:58, Pauli Virtanen wrote:
+> Hi,
 >
-> On Mon, Jun 8, 2026 at 8:15 AM Simon Mikuda
-> <simon.mikuda@streamunlimited.com> wrote:
->> Change avdtp_get_configuration to accept remote SEP instead of stream a
->> and add an async callback for response/reject handling; the old function
->> was not used anywhere (unit-test just copied signature), so it was
->> changed in place.
->>
->> Add a GetConfiguration async D-Bus method to the remote SEP interface that
->> returns the retrieved configuration as a byte array.
->>
->> This can be used to pass: AVDTP/SRC/INT/SIG/SMG/BV-11-C
+> ma, 2026-06-08 kello 13:16 +0200, Simon Mikuda kirjoitti:
+>> This change will select best codec when connecting to A2DP:
+>> LDAC > AptX HD > AptX > AAC > SBC
+> Currently it's media server's job to decide what A2DP codec to use.
+>
+> What they do for this sort of static ordering, is to register endpoints
+> in the wanted priority order, so I think another mechanism for fixed
+> ordering is not really needed.
+>
+> What could be useful is something that allows per-device priority
+> selection, e.g. DBus callback that BlueZ uses to query which endpoint
+> to configure, before starting SelectConfiguration.
+>
+> I'm not sure this is highly needed though, as iirc BlueZ remembers what
+> configuration was used on previous connects, and if BlueZ gets it wrong
+> the sound server can just reconfigure as needed at the cost of some
+> extra delay when connecting.
+>
 >> ---
->>   profiles/audio/a2dp.c  | 63 ++++++++++++++++++++++++++++++++++
->>   profiles/audio/avdtp.c | 76 ++++++++++++++++++++++++++++++++++++++++--
->>   profiles/audio/avdtp.h |  9 ++++-
->>   3 files changed, 144 insertions(+), 4 deletions(-)
->>
->> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
->> index c7e0fc75c..8dcf510ca 100644
->> --- a/profiles/audio/a2dp.c
->> +++ b/profiles/audio/a2dp.c
->> @@ -2168,11 +2168,74 @@ static DBusMessage *set_configuration(DBusConnection *conn, DBusMessage *msg,
->>          return NULL;
->>   }
->>
->> +static void get_configuration_cb(struct avdtp *session, GSList *caps,
->> +                               struct avdtp_error *err, void *user_data)
->> +{
->> +       DBusMessage *msg = user_data;
->> +       DBusMessage *reply;
->> +       DBusMessageIter iter, array;
->> +       GSList *l;
->> +
->> +       if (err) {
->> +               reply = btd_error_failed(msg, "GetConfiguration rejected");
->> +               goto done;
->> +       }
->> +
->> +       reply = dbus_message_new_method_return(msg);
->> +
->> +       dbus_message_iter_init_append(reply, &iter);
->> +       dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
->> +                                       DBUS_TYPE_BYTE_AS_STRING, &array);
->> +
->> +       for (l = caps; l; l = g_slist_next(l)) {
->> +               struct avdtp_service_capability *cap = l->data;
->> +               uint8_t *ptr = (uint8_t *) cap;
->> +               int i;
->> +
->> +               for (i = 0; i < cap->length + 2; i++)
->> +                       dbus_message_iter_append_basic(&array,
->> +                                                       DBUS_TYPE_BYTE,
->> +                                                       &ptr[i]);
->> +       }
->> +
->> +       dbus_message_iter_close_container(&iter, &array);
->> +
->> +done:
->> +       g_dbus_send_message(btd_get_dbus_connection(), reply);
->> +       dbus_message_unref(msg);
->> +       g_slist_free_full(caps, g_free);
->> +}
->> +
->> +static DBusMessage *get_configuration(DBusConnection *conn,
->> +                                               DBusMessage *msg, void *data)
->> +{
->> +       struct a2dp_remote_sep *rsep = data;
->> +       struct a2dp_channel *chan = rsep->chan;
->> +       int err;
->> +
->> +       if (chan->session == NULL)
->> +               return btd_error_not_available(msg);
->> +
->> +       err = avdtp_get_configuration(chan->session, rsep->sep,
->> +                                       get_configuration_cb,
->> +                                       dbus_message_ref(msg));
->> +       if (err < 0) {
->> +               dbus_message_unref(msg);
->> +               return btd_error_failed(msg, strerror(-err));
->> +       }
->> +
->> +       return NULL;
->> +}
->> +
->>   static const GDBusMethodTable sep_methods[] = {
->>          { GDBUS_ASYNC_METHOD("SetConfiguration",
->>                                          GDBUS_ARGS({ "endpoint", "o" },
->>                                                  { "properties", "a{sv}" } ),
->>                                          NULL, set_configuration) },
->> +       { GDBUS_ASYNC_METHOD("GetConfiguration",
->> +                                       NULL,
->> +                                       GDBUS_ARGS({ "configuration", "ay" }),
->> +                                       get_configuration) },
-> The configuration is already exposed via MediaTransport properties:
->
-> https://github.com/bluez/bluez/blob/master/doc/org.bluez.MediaTransport.rst#arraybyte-configuration-readonly
->
-> So if this is only to satisfy PTS, maybe it should be hidden behind
-> main.conf:Testing, that said we do have a dedicated tool for passing
-> PTS testing, avdtptest, and if you had grepped for
-> AVDTP/SRC/INT/SIG/SMG/BV-11-C you would have found it is documented in
-> avdtp-pts.rst:
->
-> https://github.com/bluez/bluez/blob/7a0c8ebf91e69c3b2d2d48f8f4b0074fddde1fa4/doc/qualification/avdtp-pts.rst#L258
->
->>          { },
->>   };
+>>   profiles/audio/avdtp.c | 51 +++++++++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 50 insertions(+), 1 deletion(-)
 >>
 >> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
->> index d475a545e..5f0424c81 100644
+>> index d475a545e..a8733a7e1 100644
 >> --- a/profiles/audio/avdtp.c
 >> +++ b/profiles/audio/avdtp.c
->> @@ -348,6 +348,11 @@ struct discover_callback {
->>          void *user_data;
->>   };
->>
->> +struct getconf_callback {
->> +       avdtp_get_configuration_cb_t cb;
->> +       void *user_data;
->> +};
+>> @@ -42,6 +42,8 @@
+>>   #include "sink.h"
+>>   #include "source.h"
+>>   
+>> +#include "a2dp-codecs.h"
 >> +
->>   struct avdtp_stream {
->>          GIOChannel *io;
->>          uint16_t imtu;
->> @@ -406,6 +411,7 @@ struct avdtp {
->>          char *buf;
->>
->>          struct discover_callback *discover;
->> +       struct getconf_callback *getconf;
->>          struct pending_req *req;
->>
->>          unsigned int dc_timer;
->> @@ -1093,6 +1099,24 @@ static void finalize_discovery(struct avdtp *session, int err)
->>          session->discover = NULL;
+>>   #define AVDTP_PSM 25
+>>   
+>>   #define MAX_SEID 0x3E
+>> @@ -1293,10 +1295,49 @@ static struct avdtp_stream *find_stream_by_lseid(struct avdtp *session,
+>>   	return find_stream_by_lsep(session, sep);
 >>   }
->>
->> +static void finalize_getconf(struct avdtp *session, int err)
+>>   
+>> +static unsigned int get_codec_priority(
+>> +				struct avdtp_media_codec_capability *codec_cap)
 >> +{
->> +       struct getconf_callback *getconf = session->getconf;
->> +       struct avdtp_error avdtp_err;
+>> +	unsigned int priority = codec_cap->media_codec_type;
 >> +
->> +       if (!getconf)
->> +               return;
+>> +	if (codec_cap->media_codec_type == A2DP_CODEC_VENDOR) {
+>> +		a2dp_vendor_codec_t *vendor_codec = (void *) codec_cap->data;
 >> +
->> +       session->getconf = NULL;
+>> +		switch (A2DP_GET_VENDOR_ID(*vendor_codec)) {
+>> +		case APTX_VENDOR_ID:
+>> +			return priority + 100;
+>> +		case APTX_HD_VENDOR_ID:
+>> +			return priority + 200;
+>> +		case LDAC_VENDOR_ID:
+>> +			return priority + 300;
+>> +		}
+>> +	}
 >> +
->> +       avdtp_error_init(&avdtp_err, AVDTP_ERRNO, err);
->> +
->> +       if (getconf->cb)
->> +               getconf->cb(session, NULL, &avdtp_err, getconf->user_data);
->> +
->> +       g_free(getconf);
+>> +	return priority;
 >> +}
 >> +
->>   static void release_stream(struct avdtp_stream *stream, struct avdtp *session)
+>> +static int sep_codec_cmp(gconstpointer a, gconstpointer b)
+>> +{
+>> +	const struct avdtp_remote_sep *sep1 = a;
+>> +	struct avdtp_service_capability *cap1 = sep1->codec;
+>> +	unsigned int priority1 = get_codec_priority((void *) cap1->data);
+>> +
+>> +	const struct avdtp_remote_sep *sep2 = b;
+>> +	struct avdtp_service_capability *cap2 = sep2->codec;
+>> +	unsigned int priority2 = get_codec_priority((void *) cap2->data);
+>> +
+>> +	if (priority1 < priority2)
+>> +		return 1;
+>> +	if (priority1 > priority2)
+>> +		return -1;
+>> +	return 0;
+>> +}
+>> +
+>>   struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+>>   						struct avdtp_local_sep *lsep)
 >>   {
->>          struct avdtp_local_sep *sep = stream->lsep;
->> @@ -1144,6 +1168,7 @@ static void avdtp_free(void *data)
->>          g_slist_free_full(session->seps, sep_free);
->>
->>          g_free(session->buf);
->> +       g_free(session->getconf);
->>
->>          btd_device_unref(session->device);
->>          g_free(session);
->> @@ -1162,6 +1187,7 @@ static void connection_lost(struct avdtp *session, int err)
->>          session->streams = NULL;
->>
->>          finalize_discovery(session, err);
->> +       finalize_getconf(session, err);
->>
->>          avdtp_set_state(session, AVDTP_SESSION_STATE_DISCONNECTED);
->>
->> @@ -3008,6 +3034,20 @@ static gboolean avdtp_parse_resp(struct avdtp *session,
->>                                  next->signal_id == AVDTP_GET_ALL_CAPABILITIES)))
->>                          finalize_discovery(session, 0);
->>                  return TRUE;
->> +       case AVDTP_GET_CONFIGURATION:
->> +               DBG("GET_CONFIGURATION request succeeded");
->> +               if (session->getconf) {
->> +                       struct getconf_callback *cb = session->getconf;
->> +                       GSList *caps;
+>>   	GSList *l;
+>> +	GSList *sorted = NULL;
+>>   
+>>   	for (l = session->seps; l != NULL; l = g_slist_next(l)) {
+>>   		struct avdtp_remote_sep *sep = l->data;
+>> @@ -1325,7 +1366,15 @@ struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+>>   				continue;
+>>   
+>>   		if (sep->stream == NULL)
+>> -			return sep;
+>> +			sorted = g_slist_insert_sorted(sorted, sep,
+>> +							sep_codec_cmp);
+>> +	}
 >> +
->> +                       session->getconf = NULL;
->> +                       caps = caps_to_list(((struct getcap_resp *) buf)->caps,
->> +                                       size - sizeof(struct getcap_resp),
->> +                                       NULL, NULL, NULL);
->> +                       cb->cb(session, caps, NULL, cb->user_data);
->> +                       g_free(cb);
->> +               }
->> +               return TRUE;
->>          }
->>
->>          /* The remaining commands require an existing stream so bail out
->> @@ -3115,6 +3155,19 @@ static gboolean avdtp_parse_rej(struct avdtp *session,
->>                  error("GET_CAPABILITIES request rejected: %s (%d)",
->>                                  avdtp_strerror(&err), err.err.error_code);
->>                  return TRUE;
->> +       case AVDTP_GET_CONFIGURATION:
->> +               if (!seid_rej_to_err(buf, size, &err))
->> +                       return FALSE;
->> +               error("GET_CONFIGURATION request rejected: %s (%d)",
->> +                               avdtp_strerror(&err), err.err.error_code);
->> +               if (session->getconf) {
->> +                       struct getconf_callback *cb = session->getconf;
+>> +	if (sorted) {
+>> +		struct avdtp_remote_sep *sep = sorted->data;
 >> +
->> +                       session->getconf = NULL;
->> +                       cb->cb(session, NULL, &err, cb->user_data);
->> +                       g_free(cb);
->> +               }
->> +               return TRUE;
->>          case AVDTP_OPEN:
->>                  if (!seid_rej_to_err(buf, size, &err))
->>                          return FALSE;
->> @@ -3536,18 +3589,35 @@ unsigned int avdtp_stream_add_cb(struct avdtp *session,
->>          return stream_cb->id;
->>   }
->>
->> -int avdtp_get_configuration(struct avdtp *session, struct avdtp_stream *stream)
->> +int avdtp_get_configuration(struct avdtp *session,
->> +                                       struct avdtp_remote_sep *rsep,
->> +                                       avdtp_get_configuration_cb_t cb,
->> +                                       void *user_data)
->>   {
->>          struct seid_req req;
->> +       int err;
->>
->>          if (session->state < AVDTP_SESSION_STATE_CONNECTED)
->>                  return -EINVAL;
->>
->> +       if (session->getconf)
->> +               return -EBUSY;
->> +
->>          memset(&req, 0, sizeof(req));
->> -       req.acp_seid = stream->rseid;
->> +       req.acp_seid = rsep->seid;
->>
->> -       return send_request(session, FALSE, stream, AVDTP_GET_CONFIGURATION,
->> +       err = send_request(session, FALSE, NULL, AVDTP_GET_CONFIGURATION,
->>                                                          &req, sizeof(req));
->> +       if (err < 0)
->> +               return err;
->> +
->> +       if (cb) {
->> +               session->getconf = g_new0(struct getconf_callback, 1);
->> +               session->getconf->cb = cb;
->> +               session->getconf->user_data = user_data;
->> +       }
->> +
->> +       return 0;
->>   }
->>
->>   static void copy_capabilities(gpointer data, gpointer user_data)
->> diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
->> index 10c8f496b..45c54086f 100644
->> --- a/profiles/audio/avdtp.h
->> +++ b/profiles/audio/avdtp.h
->> @@ -267,8 +267,15 @@ int avdtp_set_configuration(struct avdtp *session,
->>                                  GSList *caps,
->>                                  struct avdtp_stream **stream);
->>
->> +typedef void (*avdtp_get_configuration_cb_t)(struct avdtp *session,
->> +                                               GSList *caps,
->> +                                               struct avdtp_error *err,
->> +                                               void *user_data);
->> +
->>   int avdtp_get_configuration(struct avdtp *session,
->> -                               struct avdtp_stream *stream);
->> +                               struct avdtp_remote_sep *rsep,
->> +                               avdtp_get_configuration_cb_t cb,
->> +                               void *user_data);
->>
->>   int avdtp_open(struct avdtp *session, struct avdtp_stream *stream);
->>   int avdtp_start(struct avdtp *session, struct avdtp_stream *stream);
->> --
->> 2.43.0
->>
->>
->
+>> +		g_slist_free(sorted);
+>> +		return sep;
+>>   	}
+>>   
+>>   	return NULL;
