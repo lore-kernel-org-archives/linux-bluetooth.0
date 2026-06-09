@@ -1,29 +1,29 @@
 Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A4433D509
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 14:23:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD4B34040F
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 14:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781015026; cv=none; b=duRAx+BweCwzkmU8FcPwrqLhIqMa9d4nkPL9dlLxwFOXM5wacBzzMXEpSY1tMjmQVu+XjBebPDE5mrU/Iz2txNnb6U+vvGXTPNGfQeCjBDHa+wRpB76NLdKSeZRexNXIqXyXnPgmHmUpPPUzuNoI7WRdtN9SKO5OT+tO9XqRanc=
+	t=1781015028; cv=none; b=jn2chGqbljMQtTBAWD/td1YEI1OgbUM8JGIynFlfR3dIG6U8T3TFbtdz/Q4sDkuvDzIz6dgHN3toRpA6ho9/Mm95BaqeZx9Jr6D27ZLhcXTbPHwzNWDEFf9Hg9S4OAA+nsWvjFmQu5gEufLG5dhl64o3ReKpU9WuTovnj2ltg3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781015026; c=relaxed/simple;
-	bh=z6xXELvFyRbNAPwXDRoBaNswniZkJZxWaaKdrgLDFb0=;
+	s=arc-20240116; t=1781015028; c=relaxed/simple;
+	bh=MVflxJhAcQ9gnPhD1D36CXbF0dfUmW5XyoV5snqRA0g=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NwZnLrsw5SgCnm2KAs5ja+2DJUVBr+dhS0Gt2LV/Lt2lQM2JINu0RREqdYJGSoXaf/o+SZ72YnhuceQ6T4cGtVv7Ouev5ONGqZQ4nnCJdnGobdqyFzFMdUHhrjDSTwltEvV38roPXFfR9FP+bFDFI/PBHRL+VmGCDqC40zpoXP0=
+	 MIME-Version; b=eRzV3dxeJbumVnLYgf5kr1mgtTJvBbw30H8xCqy66CDwcieMh8pyBS9HwpECrL7/PHcrmIAKxYEdM8Ya993AuVZaHzmfQvnEe1TDy10RegdBlE62+4kP70DfNCxthh1pdqCGUPLI7CvoLu5BLYo2q/ec2ugpjWu1Ij/uV5FDoyA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id 462F85816F4
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id 5AFC9582994
 	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 13:58:53 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D22883EDD5
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 13:58:45 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 909973EDD7
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 13:58:46 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ 2/6] shared/util: Better type-checking in _steal_* commands
-Date: Tue,  9 Jun 2026 15:50:54 +0200
-Message-ID: <20260609135837.476561-3-hadess@hadess.net>
+Subject: [BlueZ 5/6] client: Use _cleanup_fd_ to simplify urandom access
+Date: Tue,  9 Jun 2026 15:50:57 +0200
+Message-ID: <20260609135837.476561-6-hadess@hadess.net>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260609135837.476561-1-hadess@hadess.net>
 References: <20260609135837.476561-1-hadess@hadess.net>
@@ -37,66 +37,38 @@ Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 X-GND-State: clean
 X-GND-Score: 0
-X-GND-Cause: dmFkZTEVlSdXhFUvSV8QQx6yOrxge8LgLVsxPuUsLns/yksmkNx+qdDvLvza5bKGN8WNxSHwt+f8VbZ4lJPoURNdRMWp8SMuewEQUfgBMkY/jbgr+LyXuM7iW1giNJiHgNHw6TWCI3u/pWopj0uku4KXuEzF2U7Jkv7EHtBXrrJV7gBwCRlXQDiK2LO8ylQk6uzIFcjqpCrorpKwg3w0D6ojMjAneIde2+9Xgn2LOidAqfgBRNsXEa58H2+xUe5E0Ri8LlvlWBN+ajBkbQKIGVS8FIytq/3m1RxPUluCTzu51875p3iUUbERbtkhDOOaRjgxLdx7vcvY3Bj/fS1GlcpyS/+RZBFvIYzeI4pdIfm0MYEKd5RuIIwsUbWtR6cK60FWPULDDZWP+bf823vwBRl+zwokLPaWYDMMg31bY2mP0Qx3OpVFigxijpccMVOvsxGQeIF8rHEg/AwXN+PKyzbvfWsiQXj4T2IP9Lx4TGsmiubgx5FM1lmkY+9uE03WFh2DSC0pp77MITVSwYYbtynMsRAvN8tGnnmZagJ7U8hZXjLNAucOvrf5bieZ7bdRuuH5hiSFvMYXdA4p4CQ4H4NCYKzZKYw5ckslc8Trb2ScW6dEaIk2W/OAJ2jctgT8DH2VNTwyptcTRhBPcvpX1yhljrkSb1tgbgVv9JjBwD5lF7cRTw
+X-GND-Cause: dmFkZTEVlSdXhFUvSV8QQx6yOrxge8LgLVsxPuUsLns/yksmkNx+qdDvLvza5bKGN8WNxSHwt+f8VbZ4lJPoURNdRMWp8SMuewEQUfgBMkY/jbgr+LyXuM7iW1giNJiHgNHw6TWCI3u/pWopj0uku4KXuEzF2U7Jkv7EHtBXrrJV7gBwCRlXQDiK2LO8ylQk6uzIFcjqpCrorpKwg3w0D6ojMjAneIde2+9Xgn2LOidAqfgBRNsXEa58H2+xUe5E0Ri8LlvlWBN+ajBkbQKIGVS8FIytq/3m1RxPUluCTzu51875p3iUUbERbtkhDOOaRjgxLdx7vcvY3Bj/fS1GlcpyS/+RnVESAA97zOGpkwgH00GJyahY8dFhWg8ELEGEZEmLNDSoNrQY6+ml87t5W2CGdCkB92bo52AXT3LA2+2UgI2/GeZJYARvoSjua31BJo42AbLkQoEIeBQ/sXFXmbTK5nNtVlw2aqJluVDiOCctFAiaQPxcHjfHZ27IEEabfYW85MKmsjznDqSgkU2kTu3QO0YgDDUQh031L6APaN+5JX5qTvLzrMc9t83Dix8Kh0nGr9AyojR0m8rJvu7UI5uytItSE9VJvS5ZGZ2AUlg9vWRMjb3dR49M8GuS9S4F7veI5Ziu4EOuwdCtQzqaepM19AvT/WN8QzpO08sT9X2mcREg+Q
 
-Replace _steal_() and _steal_fd_() inline functions with macros, so that
-we can have better type-checking. This would have avoided crashes seen
-in the original patchset, where we passed a pointer instead of a pointer
-to a pointer.
-
-Example usage:
-CLEANUP_FREEFUNC(GKeyFile, g_key_file_free);
-GKeyfile *load_config(void) {
-  _cleanup_type_(GKeyFile) GKeyFile *keyfile = NULL;
-  [...]
-  return _steal_(keyfile);
-}
-
-static int open_file(void) {
-  _cleanup_fd_ int fd = -1;
-  [...]
-  return _steal_fd_(fd);
-}
-
-This is inspired by similar code in Pipewire's spa helpers, as pointed
-out by Pauli Virtanen <pav@iki.fi>.
+fd gets auto-closed before exiting the scope.
 ---
- src/shared/util.h | 21 ++++++++-------------
- 1 file changed, 8 insertions(+), 13 deletions(-)
+ client/mgmt.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/src/shared/util.h b/src/shared/util.h
-index dd8e5288f55b..dacbff67f067 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -100,20 +100,15 @@ static inline void freep(void *p)
- 	free(*(void **) p);
- }
+diff --git a/client/mgmt.c b/client/mgmt.c
+index 50558a313866..e199c30540e4 100644
+--- a/client/mgmt.c
++++ b/client/mgmt.c
+@@ -2681,7 +2681,7 @@ static void cmd_privacy(int argc, char **argv)
+ 			return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 		}
+ 	} else {
+-		int fd;
++		_cleanup_fd_ int fd = -1;
  
--static inline void *_steal_(void *p)
--{
--	void **orig = (void **) p;
--	void *ret = *orig;
--	*orig = NULL;
--	return ret;
--}
-+#define _exchange_(var, new_value) ({		\
-+	__typeof__(var) *orig = &(var);		\
-+	__typeof__(var) ret = *orig;		\
-+	*orig = new_value;			\
-+	ret;					\
-+})
+ 		fd = open("/dev/urandom", O_RDONLY);
+ 		if (fd < 0) {
+@@ -2691,11 +2691,8 @@ static void cmd_privacy(int argc, char **argv)
  
--static inline int _steal_fd_(int *fdp)
--{
--	int fd = *fdp;
--	*fdp = -1;
--	return fd;
--}
-+#define _steal_(p) _exchange_(p, NULL)
-+#define _steal_fd_(fd) _exchange_(fd, -1)
+ 		if (read(fd, cp.irk, sizeof(cp.irk)) != sizeof(cp.irk)) {
+ 			error("Reading from urandom failed");
+-			close(fd);
+ 			return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 		}
+-
+-		close(fd);
+ 	}
  
- static inline void closefd(int *fdp)
- {
+ 	if (send_cmd(mgmt, MGMT_OP_SET_PRIVACY, index, sizeof(cp), &cp,
 -- 
 2.54.0
 
