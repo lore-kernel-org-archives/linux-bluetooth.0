@@ -1,274 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80983EFFC7
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 08:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C80039903E
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 09:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780995165; cv=none; b=jd2OWLNxVHNpJq3Ji9oj4SI3Ej5reh9PzrYKBy2qIbU01hJrXwomUBANTRha87gDpQG42bOJb65r93OuNqH6VA4ei81Ay4EWT/AKAfMRiiB+Jc/T8Hip7gydgc2wGULmhmY82w9UHAsbuP/RFJNwvvJursRZxk5ZrFXcsLGf0Yg=
+	t=1780996535; cv=none; b=tl2vhZzAON1JdPwhxRAi+CNSX7szRl4p+W+6IIT9NYuarnhXVQHBayUpeAtI3CKXm+nMMpbvoYULJhQPPc0djq2NhHnx/ehKDdS3XcJMAGPC6Y/y8vGkzEdbhinXpMnkCbQNKf70XWGwPAaE84lp3oF2REDsLbFOfoZJX5C7nTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780995165; c=relaxed/simple;
-	bh=arxBa/I5OMuUe31zlFw9FIdw/x5CyGBQyDOGbtnD1B4=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nc9zcNAw0XRk7Mdbh/uKnTTWfu1uH7IhEEgRTIk89KuPoavqZcH8pTYUjU+myPtLnHVQ0/nqnyBCsIENtHxwQCMTifB4NJ0DNmBiwmqEG5CntW0hnRogONYZ95riBcp0NNI1hiDqKY+FbYqhfR50XGspDc/Yk/WHcZRbysdYVIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oYJ1zHnf; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780996535; c=relaxed/simple;
+	bh=cXLkyCOfzehlvEpqb2LxFjYezNjigWDaQp/sblYJXb8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Mkh6iacDwKkQ4w7omJ0RJTyqMVpt1PKrALK6On6IehszJM3jDdr2qECbRTNcYsKX7d4bTCiWsVvU/fx+sFnyPGQj6woGrCrHU0+fc3O3I/o4AtATLPo0HVlxXiwqvq72/lMLOk2qW/7jIxc7Sjv/WOIuhVsVCXWkYQS/CezhCVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lKAxu5iS; arc=none smtp.client-ip=74.125.82.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oYJ1zHnf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81E041F00A07
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 08:52:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780995163;
-	bh=gLHsoW9IY4xTW+mqNcT4Ks1Lq68OrUZPn+tOTIXDiGY=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=oYJ1zHnfDT4YMGvOCplutT1L7Qnic4h6qdEHQ2918TlyaHHWETJHhLcljdD+ILriU
-	 LRh3S+Q4NZnIKNscajWc5RPP2v4dT4VUTBGa032eEpaTnpkw1DgaM7bGg9leIL1wRr
-	 YGqXacLAyXAiunRI1OK8mkcxfZhnTmSKjlErwFyR8SP7jmgWE2MWg/k8mB7WCNWBSR
-	 UDSUD48yDp1tgJSnGqABYEtrnWDrhJiIfinMK9qolWW/C86DFAK6HwvhvzZs5GqpFq
-	 zIslg3cZk6Qw8MMo16UWTBlDi3nBMRaGEUFvIsAKA65xiVe7oSErO9sZaRGvGfzUQC
-	 MPn4KRBLy3BTA==
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-3967726bc47so48610871fa.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 01:52:43 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8r/a3+dP2gXbopYkMfvHk59A7hVw6YkVGsxddNl+b8YqzMPcj9WuWEif4TIwgYwcGsWuNsfEpcCfPiXbMBK8w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydvbJxg6FT5y9nxlcgIWk8CDAUZV/i76waYMv5nOkqhCDOzt/j
-	kK+pqxcyTtm1zsNreub/9pphDf4MFnsoTF7W6fVgLCiYdymyWzrb4++/CddMUlhWbaIu+nx9od2
-	eYzNnFaI1SiLe3nKgVq6OuNn1/w/wQp05NuylIH2gHw==
-X-Received: by 2002:a05:6512:4885:b0:5aa:66a5:66cb with SMTP id
- 2adb3069b0e04-5aa87bc2726mr3742484e87.25.1780995161909; Tue, 09 Jun 2026
- 01:52:41 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 9 Jun 2026 04:52:39 -0400
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 9 Jun 2026 04:52:39 -0400
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260609-block-as-nvmem-v4-4-45712e6b22c6@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lKAxu5iS"
+Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-304c520fe9aso8659069eec.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 02:15:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780996534; x=1781601334; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=XlOo6oQ7Bg4z9+cHC1jk6LNYB4JXIabT8RooAIcJSqI=;
+        b=lKAxu5iS9k0pz6djAIFWFsCsTyyyAkEy4f10oz3KBm3/JAV3av4cQXi+xiqDqJXc4w
+         wx0Xv1iTUzXDDJ138hihrm0tcoRsTxTNs648kdHuwFrdBOTw7uM6aVCUxDZJzrCk4H2R
+         uU7NQW8DJcLMKTTZ/6hyxzSQ+QurmHtFWUKnSRzUxhb+JHLQMiAscclcNAgHjxLRTKYZ
+         Wwl/eiHoE2mDsmb8QQDlrfBPK7zY5mojkv7KLYs43OJqWH8nDIatlUfDEPON0F3xhxic
+         V5vnr4BbrSlWPNv1Le/A1iPx0xESxaccqJvP+OvmZM7kcwH9XAWQTWrpdsiseqKcIUNu
+         u5Rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780996534; x=1781601334;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XlOo6oQ7Bg4z9+cHC1jk6LNYB4JXIabT8RooAIcJSqI=;
+        b=ee13uBOBOgdbVJBI9dQzMvjfBgiCnWtcwlrQnC5GYWMogkLeD6rT9dV7I/DQ6adoof
+         qZnjaH88QwwFRqWO19CNKXh/oY6OZkYf2x16NKnakUGpBrY5GbsZoJK0KiUKFxNFtkjP
+         Z1rofWxF9LFncCI+aCgqu/W1+EL7vKbeR1+YkzGRNRuMRthMX5jfjQNl5g9C5MsXno6b
+         Myb5zD67Z3kXHMecfJ/Yxho3HK6dWuI2QqPCaj4kTKS6ddozOmWR3BmydW9raWIbEwHf
+         mnBSJNpAYK9SJbQe5GOwaAxUSuA+Gunh/Of+AHX4mr6AEvvJS/B29dDqCbimkuhZqSqc
+         5JXA==
+X-Gm-Message-State: AOJu0Yzh1vQQrQNUTQuTeEb61vInN44W8/JLI/9hM0tk7Kcj0DrWmwC4
+	cAUT7nl2KIoajT7r/ZyV0p6o33HqH+oIoA+pBlUVqPM8PLMU9ojxiWe2zbcn//bE
+X-Gm-Gg: Acq92OGVxUIS4AY6jWMspmKno/Zlkx3paDvuA/4/Nr4nt0J1qtYbn84YlsBXra7kVFi
+	XeLW56bLaTj5BkBFFCb1owQ0ieS24BjuqJQLryO88F0Xpa6c6tg7oEZR6cXrfQ/s44DGG/ZuYKW
+	5olUabuY1Z53SqfvUYv1pY/U+5qk+vmrPdu6G6PljwyINbe+GWadFEFIlG4iBaQUrHPtcoCGKP3
+	70/lfFhZvv6p3R1JZRHZM3BA6hANw3/cBp/0NxjLkBl/Nq6az4i2WB4VScLtaYJhB037P8cTJB8
+	UVds2bqfdk9WXg6dazb2PAp6ajmIsHOe8BBkuWq5U+7hen7cQxjJR94wI3Osc9EpJY1Lz8ggAS1
+	ko2gAoReQBBXz19mQu3eGVG+8WdgiD8W9FRx4WoV9lpvner+CVxhvAmpI+QSUyHWH1wBqog9lkS
+	O5qmeBwNq9LLhmBJL3ciMRMB/q2bLNKhDr1zMbWsWZ+Q==
+X-Received: by 2002:a05:7300:818b:b0:307:140f:d511 with SMTP id 5a478bee46e88-3077b8b172amr11011763eec.33.1780996533635;
+        Tue, 09 Jun 2026 02:15:33 -0700 (PDT)
+Received: from [172.17.0.2] ([57.151.143.177])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3074df9bbd4sm18618367eec.30.2026.06.09.02.15.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jun 2026 02:15:33 -0700 (PDT)
+Message-ID: <6a27d9b5.7554299c.24e399.86f3@mx.google.com>
+Date: Tue, 09 Jun 2026 02:15:33 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3194914917412797519=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260609-block-as-nvmem-v4-0-45712e6b22c6@oss.qualcomm.com> <20260609-block-as-nvmem-v4-4-45712e6b22c6@oss.qualcomm.com>
-Date: Tue, 9 Jun 2026 04:52:39 -0400
-X-Gmail-Original-Message-ID: <CAMRc=MfuiPMkSm=-G6VEJpqKhos0TD_pf0ScBGqfwLHT0uk8yQ@mail.gmail.com>
-X-Gm-Features: AVVi8CdMNP5sFIeAEVbUoYuLWXzUgm0hg-3EmseMekoB0Smn-0P2VeLQzdselx8
-Message-ID: <CAMRc=MfuiPMkSm=-G6VEJpqKhos0TD_pf0ScBGqfwLHT0uk8yQ@mail.gmail.com>
-Subject: Re: [PATCH v4 4/8] block: implement NVMEM provider
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, daniel@makrotopia.org, Ulf Hansson <ulfh@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Saravana Kannan <saravanak@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, xiuzhuo.shang@oss.qualcomm.com
+Subject: RE: [v1] Bluetooth: qca: Add BT FW build version log
+In-Reply-To: <20260609075417.1160702-1-xiuzhuo.shang@oss.qualcomm.com>
+References: <20260609075417.1160702-1-xiuzhuo.shang@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Tue, 9 Jun 2026 09:52:29 +0200, Loic Poulain
-<loic.poulain@oss.qualcomm.com> said:
-> From: Daniel Golle <daniel@makrotopia.org>
->
-> On embedded devices using an eMMC it is common that one or more partitions
-> on the eMMC are used to store MAC addresses and Wi-Fi calibration EEPROM
-> data. Allow referencing the partition in device tree for the kernel and
-> Wi-Fi drivers accessing it via the NVMEM layer.
->
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> Co-developed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> ---
->  block/Kconfig     |   9 +++++
->  block/Makefile    |   1 +
->  block/blk-nvmem.c | 114 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 124 insertions(+)
->
-> diff --git a/block/Kconfig b/block/Kconfig
-> index 15027963472d7b40e27b9097a5993c457b5b3054..0b33747e16dc33473683706f75c92bdf8b648f7c 100644
-> --- a/block/Kconfig
-> +++ b/block/Kconfig
-> @@ -209,6 +209,15 @@ config BLK_INLINE_ENCRYPTION_FALLBACK
->  	  by falling back to the kernel crypto API when inline
->  	  encryption hardware is not present.
->
-> +config BLK_NVMEM
-> +	bool "Block device NVMEM provider"
-> +	depends on OF
-> +	depends on NVMEM
-> +	help
-> +	  Allow block devices (or partitions) to act as NVMEM providers,
-> +	  typically used with eMMC to store MAC addresses or Wi-Fi
-> +	  calibration data on embedded devices.
-> +
->  source "block/partitions/Kconfig"
->
->  config BLK_PM
-> diff --git a/block/Makefile b/block/Makefile
-> index 7dce2e44276c4274c11a0a61121c83d9c43d6e0c..d7ac389e71902bc091a8800ea266190a43b3e63d 100644
-> --- a/block/Makefile
-> +++ b/block/Makefile
-> @@ -36,3 +36,4 @@ obj-$(CONFIG_BLK_INLINE_ENCRYPTION)	+= blk-crypto.o blk-crypto-profile.o \
->  					   blk-crypto-sysfs.o
->  obj-$(CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK)	+= blk-crypto-fallback.o
->  obj-$(CONFIG_BLOCK_HOLDER_DEPRECATED)	+= holder.o
-> +obj-$(CONFIG_BLK_NVMEM)                += blk-nvmem.o
-> diff --git a/block/blk-nvmem.c b/block/blk-nvmem.c
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..a6e62fa98675ee9bcb9c7035a611b5a573ab9091
-> --- /dev/null
-> +++ b/block/blk-nvmem.c
-> @@ -0,0 +1,114 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * block device NVMEM provider
-> + *
-> + * Copyright (c) 2024 Daniel Golle <daniel@makrotopia.org>
-> + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-> + *
-> + * Useful on devices using a partition on an eMMC for MAC addresses or
-> + * Wi-Fi calibration EEPROM data.
-> + */
-> +
-> +#include <linux/file.h>
-> +#include <linux/nvmem-provider.h>
-> +#include <linux/nvmem-consumer.h>
-> +#include <linux/of.h>
-> +#include <linux/pagemap.h>
-> +#include <linux/property.h>
-> +
-> +#include "blk.h"
-> +
-> +static int blk_nvmem_reg_read(void *priv, unsigned int from,
-> +			      void *val, size_t bytes)
-> +{
-> +	blk_mode_t mode = BLK_OPEN_READ | BLK_OPEN_RESTRICT_WRITES;
-> +	dev_t devt = (dev_t)(uintptr_t)priv;
-> +	size_t bytes_left = bytes;
-> +	loff_t pos = from;
-> +	int ret = 0;
-> +
-> +	struct file *bdev_file __free(fput) = bdev_file_open_by_dev(devt, mode, priv, NULL);
-> +	if (IS_ERR(bdev_file))
-> +		return PTR_ERR(bdev_file);
-> +
-> +	while (bytes_left) {
-> +		pgoff_t f_index = pos >> PAGE_SHIFT;
-> +		struct folio *folio;
-> +		size_t folio_off;
-> +		size_t to_read;
-> +
-> +		folio = read_mapping_folio(bdev_file->f_mapping, f_index, NULL);
-> +		if (IS_ERR(folio)) {
-> +			ret = PTR_ERR(folio);
-> +			break;
-> +		}
-> +
-> +		folio_off = offset_in_folio(folio, pos);
-> +		to_read = min(bytes_left, folio_size(folio) - folio_off);
-> +		memcpy_from_folio(val, folio, folio_off, to_read);
-> +		pos += to_read;
-> +		bytes_left -= to_read;
-> +		val += to_read;
-> +		folio_put(folio);
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +static int blk_nvmem_register(struct device *dev)
-> +{
-> +	struct block_device *bdev = dev_to_bdev(dev);
-> +	struct nvmem_config config = {};
-> +
-> +	/* skip devices which do not have a device tree node */
-> +	if (!dev_of_node(dev))
-> +		return 0;
-> +
-> +	/* skip devices without an nvmem layout defined */
-> +	struct device_node *child __free(device_node) =
-> +		of_get_child_by_name(dev_of_node(dev), "nvmem-layout");
-> +	if (!child)
-> +		return 0;
-> +
-> +	/*
-> +	 * skip block device too large to be represented as NVMEM devices,
-> +	 * the NVMEM reg_read callback uses an unsigned int offset
-> +	 */
-> +	if (bdev_nr_bytes(bdev) > UINT_MAX) {
-> +		dev_warn(dev, "block device too large to be an NVMEM provider\n");
-> +		return -ENODEV;
+--===============3194914917412797519==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Wait, I must have suggested -ENODEV here on too little coffee. This callback
-is called from device_add(), not when the device is bound so it's not the same
-thing as returning -ENODEV from probe().
+This is automated email and please do not reply to this email!
 
-On the other hand, we don't want to not provide the block device just because
-someone added a DT property on one that's too big. I'd say: warn, but return 0.
-Does it make sense?
+Dear submitter,
 
-> +	}
-> +
-> +	config.id = NVMEM_DEVID_NONE;
-> +	config.dev = dev;
-> +	config.name = dev_name(dev);
-> +	config.owner = THIS_MODULE;
-> +	config.priv = (void *)(uintptr_t)dev->devt;
-> +	config.reg_read = blk_nvmem_reg_read;
-> +	config.size = bdev_nr_bytes(bdev);
-> +	config.word_size = 1;
-> +	config.stride = 1;
-> +	config.read_only = true;
-> +	config.root_only = true;
-> +	config.ignore_wp = true;
-> +	config.of_node = to_of_node(dev->fwnode);
-> +
-> +	return PTR_ERR_OR_ZERO(devm_nvmem_register(dev, &config));
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1108364
 
-And that was a wrong suggestion on my part too because I was under the
-impression that we're in the probe() path, not device_add(). You can't use
-devres here as the device at this point is not yet bound and may never be.
+---Test result---
 
-Which leads me to the second point: this is not the moment to add the nvmem
-provider. This should happen at or after probe(). Once nvmem_register()
-returns, you have a visible nvmem resource but nothing backing it in the block
-layer.
+Test Summary:
+CheckPatch                    PASS      0.51 seconds
+VerifyFixes                   PASS      0.09 seconds
+VerifySignedoff               PASS      0.09 seconds
+GitLint                       PASS      0.23 seconds
+SubjectPrefix                 PASS      0.08 seconds
+BuildKernel                   PASS      19.65 seconds
+CheckAllWarning               PASS      21.90 seconds
+CheckSparse                   PASS      20.60 seconds
+BuildKernel32                 PASS      19.93 seconds
+TestRunnerSetup               PASS      414.40 seconds
+IncrementalBuild              PASS      21.45 seconds
 
-Either do this in block core when registering a new device or schedule
-a notifier here for the BUS_NOTIFY_BOUND_DRIVER event and do it in the notifier
-callback.
 
-Sorry, I should have paid more attention, I forgot how the class interface
-works.
 
-> +}
-> +
-> +static struct class_interface blk_nvmem_bus_interface __refdata = {
-> +	.class = &block_class,
-> +	.add_dev = &blk_nvmem_register,
-> +};
-> +
-> +static int __init blk_nvmem_init(void)
-> +{
-> +	int ret;
-> +
-> +	ret = class_interface_register(&blk_nvmem_bus_interface);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
-> +}
-> +device_initcall(blk_nvmem_init);
->
-> --
-> 2.34.1
->
->
+https://github.com/bluez/bluetooth-next/pull/297
 
-Bart
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3194914917412797519==--
