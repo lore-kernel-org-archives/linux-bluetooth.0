@@ -1,36 +1,35 @@
-Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
+Received: from out-34.smtp.github.com (out-34.smtp.github.com [192.30.252.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D342F313550
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 18:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA12D36EAAE
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 18:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781030138; cv=none; b=ZvB8PRxr7rQMz0axfEIpn772xfx5SNLw4GPDAQRzCvVHAr8JtNXVh9yFOxcvzIcSuox/7Cu6DX23SViN8cAknObmS3Ead0LPQcl02eFtpMM9flrd5a1GiIc0SF8zMIVNZla67Bc0VVpvNXN+mb+djEeh5QJG40YJUZf4ra0p1sA=
+	t=1781030141; cv=none; b=tdZe5MJNa/JWiyrjvpXSyT9PXIJ0aWI9zN7AK2a2TebvDAsIcAPP0rS6Zq/81s3zS8NM5f90gjrFYkamHGumK8Bi40TMV6vTAMBonl/UUdUOZ7IJezXuoPVrvfRCcKCqd/e1QHmE4QlIMUerT3eSOsJPt5tQD1Zxk/lAe4IkN/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781030138; c=relaxed/simple;
-	bh=Lpa8wAhx3vQ+HJ4vz7zhzF1h+EKDtj9mfLYFikoFyuw=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=s4o6U78htzc9NrjDWAxQaZErDWzUuyseRmvI2k7FyrVspmCyTvhGQWtcQaen4GbdWfgk44p6AZWe2I1HuGwCbbjQZPWjysJuw3VdYPf1mHdWePKvzS2LnxgAKsFpEG7CtGUdov2TnWwAzwUC8TWaG/M7zieM5HpD8Y+9DQSCt5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=T9t1CXqT; arc=none smtp.client-ip=192.30.252.201
+	s=arc-20240116; t=1781030141; c=relaxed/simple;
+	bh=RaGkSvUDk+34zw3FsmKhHVoecIJpiET0WfkrPAWD4HU=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=SDsfkDepxg/Hbqmy0XwwMeGw4V/b09EmmtxeOEiu8tVMK9dLnFj3QCcj/lUTKInj3fxhi5WxZuIAo6Dxpq+SHGvlZo7A99SDh4v6eTwChmuuIIBwD6qRVdxWogKX2FJzYQCOc+1yvR8CJZv2x6h5y1w5lMCePuxl0Cmtf38LamY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Hk408LQp; arc=none smtp.client-ip=192.30.252.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="T9t1CXqT"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Hk408LQp"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1781030136;
-	bh=imjj3samZzf8JYG2GA43p/yF5dzorhXRJiSxVRUGofk=;
+	s=pf2023; t=1781030139;
+	bh=QAUbpaXWhSPM7E9fK7ZGWchGab/YMP5EPt49CLjxyEc=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=T9t1CXqTeM/dA13HCNdHt40TYGA6X6NVtRBWGfy99OxpmjH+Oag6s4ZM3Pxe20uBy
-	 bqf+xNmKOOk9mMCiM3RS36WsSeDSIGKS7mACaS43PnTRARlwojvJNPV/khEra6pL7Y
-	 0hJNyeN73/SMuvYAsFZoJEQkMyfab7M/knvI26Q4=
-Received: from github.com (hubbernetes-node-1f5efd2.va3-iad.github.net [10.48.205.42])
-	by smtp.github.com (Postfix) with ESMTPA id 2B0AE1811E2
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 11:35:36 -0700 (PDT)
-Date: Tue, 09 Jun 2026 11:35:36 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
+	b=Hk408LQpY3uwB/ZoB+qm1Vbv1cNsgOX4x3RnwSyoVPL/7YsJPwiQYpiGfWU5Lz9zG
+	 ZtSuBKQl+clxnahh8KMJYxjXChUtddm6ASzckKNiai1R7lVhNmcO/jR4+8VQN6ILI/
+	 wK+r29tDsc/Slv4SS8QvkC0xf+SEALbkCpn8RLD8=
+Received: from github.com (hubbernetes-node-9f939f0.ac4-iad.github.net [10.52.160.26])
+	by smtp.github.com (Postfix) with ESMTPA id 3456D74127D
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 11:35:39 -0700 (PDT)
+Date: Tue, 09 Jun 2026 11:35:39 -0700
+From: =?UTF-8?B?xaBpbW9uIE1pa3VkYQ==?= <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1108736/000000-2f53c2@github.com>
-Subject: [bluez/bluez] 7ecb11: btio: Handle EOPNOTSUPP from accept() to
- prevent b...
+Message-ID: <bluez/bluez/push/refs/heads/1108770/000000-c01f9b@github.com>
+Subject: [bluez/bluez] 1fd31c: media: Add Mute property to MediaTransport1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,91 +42,49 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1108736
+  Branch: refs/heads/1108770
   Home:   https://github.com/bluez/bluez
-  Commit: 7ecb11301c829a12cc274ed2a0f7c89c63354a87
-      https://github.com/bluez/bluez/commit/7ecb11301c829a12cc274ed2a0f7c89c63354a87
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Commit: 1fd31cca12a6e9a34e93ec3d1fc1814ffce2a0e4
+      https://github.com/bluez/bluez/commit/1fd31cca12a6e9a34e93ec3d1fc1814ffce2a0e4
+  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
   Date:   2026-06-09 (Tue, 09 Jun 2026)
 
   Changed paths:
-    M btio/btio.c
+    M doc/org.bluez.MediaTransport.rst
+    M profiles/audio/transport.c
+    M profiles/audio/vcp.c
+    M profiles/audio/vcp.h
+    M src/shared/vcp.c
+    M src/shared/vcp.h
 
   Log Message:
   -----------
-  btio: Handle EOPNOTSUPP from accept() to prevent busy loop
+  media: Add Mute property to MediaTransport1
 
-When accept() returns EOPNOTSUPP on an L2CAP SEQPACKET server socket
-(e.g. AVCTP browsing channel, PSM 0x1b), the error is permanent and
-retrying will never succeed. Previously, only EBADFD was treated as
-fatal, causing server_cb to return TRUE for EOPNOTSUPP. Since the fd
-remains readable, this creates an infinite busy loop that hangs
-bluetoothd.
+Boolean, optional, readwrite. Only present for LE Audio (BAP) unicast
+transports backed by VCS. A2DP has no mute concept in AVRCP.
 
-Treat EOPNOTSUPP the same as EBADFD by returning FALSE to remove the
-GLib IO watch and stop the loop.
+bt_vcp_set_mute() writes VCS Control Point Mute/Unmute for a client
+session, or updates Volume State for a server session.
+bt_vcp_get_mute() returns the cached value updated by Volume State
+notifications.
 
 
-  Commit: c3e01f6ca296d8d8a22fd0fde7a2a59ec21ea0bc
-      https://github.com/bluez/bluez/commit/c3e01f6ca296d8d8a22fd0fde7a2a59ec21ea0bc
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Commit: c01f9bd015cbe527b9f30a6338fb393da034e782
+      https://github.com/bluez/bluez/commit/c01f9bd015cbe527b9f30a6338fb393da034e782
+  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
   Date:   2026-06-09 (Tue, 09 Jun 2026)
 
   Changed paths:
-    M src/profile.c
+    M client/player.c
 
   Log Message:
   -----------
-  profile: Check if bearer is enabled on registration
+  client/player: Add transport.mute command
 
-btd_profile_register now verifies that the profile's bearer type is
-compatible with btd_opts.mode before registering. If the required bearer
-is not enabled (e.g. LE-only profile when mode is BR/EDR, or BR/EDR-only
-profile when mode is LE), registration is rejected with -ENOTSUP.
+Mirrors transport.volume. Accepts on/off, yes/no, 1/0.
 
 
-  Commit: a900f8944421290ab80fead5908f8eec0f164053
-      https://github.com/bluez/bluez/commit/a900f8944421290ab80fead5908f8eec0f164053
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-06-09 (Tue, 09 Jun 2026)
-
-  Changed paths:
-    M profiles/audio/a2dp.c
-    M profiles/audio/avrcp.c
-    M profiles/audio/hfp-hf.c
-    M profiles/audio/micp.c
-    M profiles/input/manager.c
-    M profiles/network/manager.c
-    M src/gatt-database.c
-
-  Log Message:
-  -----------
-  plugins: Check btd_profile_register return value
-
-Ensure all plugin init functions check the return value of
-btd_profile_register. If registration fails (e.g. bearer not enabled),
-the plugin init propagates the error instead of continuing with an
-unregistered profile.
-
-
-  Commit: 2f53c2749db24ab84461c02ba7a2b52f6b2269d4
-      https://github.com/bluez/bluez/commit/2f53c2749db24ab84461c02ba7a2b52f6b2269d4
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2026-06-09 (Tue, 09 Jun 2026)
-
-  Changed paths:
-    M src/bearer.c
-
-  Log Message:
-  -----------
-  bearer: Check btd_opts.mode on btd_bearer_new
-
-Only create the bearer interface if the corresponding transport is
-enabled. Return NULL if BREDR bearer is requested in LE-only mode or
-LE bearer in BREDR-only mode, so the D-Bus interface is never
-registered for unsupported bearers.
-
-
-Compare: https://github.com/bluez/bluez/compare/7ecb11301c82%5E...2f53c2749db2
+Compare: https://github.com/bluez/bluez/compare/1fd31cca12a6%5E...c01f9bd015cb
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
