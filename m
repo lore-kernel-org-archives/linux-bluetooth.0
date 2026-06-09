@@ -1,32 +1,29 @@
 Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C597B33ADB9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5AB933EAEC
 	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 14:23:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781015025; cv=none; b=Ym07TL1MnloMxUqSjn8IW7DXNJ+uCORicDD2RXHEwH/gUU5qz9Fx0KHsVLHRSyAGKjcIuoTdaIkcI7/lOZvLi7Q2wUQRzKYhx4ejh6gGlsgq2dn5q8TOfst2u+MlU2OvCBVXSR+UwOSjFXbSbUeHvl0JY+qVQdl0mgfWbz3EqiE=
+	t=1781015025; cv=none; b=udZL7QzOchSzTg2kAM12xu4TPg7E06w3bjBkDCE14aiNkQORaNZHVHIwWKjL3BhEQPrT0xkAegzuYE0Vmqa9uj5UQYqH72HokUXZJCXvQqgNsz8YlluTpAoX65wxA3eysHQ0TJd3YcL3rdQNRZst3Vvkmv3w3yzzjFTra0MHUS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1781015025; c=relaxed/simple;
-	bh=f5k+UBbddWMtu4uYixxu0BXMZ3Qs0wI3HE8o0YFFDkU=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EWb6dXMgQgGmHwrG1s5JplF9S6rE9Cvl/oJhS8nNzjA5icezAbs4wZtketCK0k92gdt6ibF20HoTWSN4vgYT5zhgCL0at+8TmoHBJkVhyV/Mh3+W3Y/ZcTM+x4aJZDHSUI3cjDmwnLq/OFbkr69hzlUkeFwkSYzn1jJI7X9Pcbo=
+	bh=VHoEPPeRIvUsnTxhbShT/rYphGZdaFcN6+IQIpUeDNc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=G4X6xYjyFnn0Gi2orYoAgGoU1BWe4PgsWtjnYwlCU0KGt804GYGoIVPOx/Rgc4DD43TtPkU/ZfC0b9doRlL+t4LK6Lt4Z3d/K5qthLxwoGY/bQK66xmJTr3FkSkjRKkt1sLumxmluQb/G7uoPBKhiVbkI9uNaXJcagEBziwWu04=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
 Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id 37B7B5814DE
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id 6E3AF58153D
 	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 13:58:52 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 9DA9E3EDCE
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 692593EDB4
 	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 13:58:45 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ 1/6] shared/util: Fix warnings when cleaning up NULL pointers
-Date: Tue,  9 Jun 2026 15:50:53 +0200
-Message-ID: <20260609135837.476561-2-hadess@hadess.net>
+Subject: [BlueZ 0/6] "cleanup" variable attribute follow-up
+Date: Tue,  9 Jun 2026 15:50:52 +0200
+Message-ID: <20260609135837.476561-1-hadess@hadess.net>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260609135837.476561-1-hadess@hadess.net>
-References: <20260609135837.476561-1-hadess@hadess.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,30 +34,39 @@ Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 X-GND-State: clean
 X-GND-Score: 0
-X-GND-Cause: dmFkZTEVlSdXhFUvSV8QQx6yOrxge8LgLVsxPuUsLns/yksmkNx+qdDvLvza5bKGN8WNxSHwt+f8VbZ4lJPoURNdRMWp8SMuewEQUfgBMkY/jbgr+LyXuM7iW1giNJiHgNHw6TWCI3u/pWopj0uku4KXuEzF2U7Jkv7EHtBXrrJV7gBwCRlXQDiK2LO8ylQk6uzIFcjqpCrorpKwg3w0D6ojMjAneIde2+9Xgn2LOidAqfgBRNsXEa58H2+xUe5E0Ri8LlvlWBN+ajBkbQKIGVS8FIytq/3m1RxPUluCTzu51875p3iUUbERbtkhDOOaRjgxLdx7vcvY3Bj/fS1GlcpyS/+RiZefJYnSCAHMG3wiZjxPX//tFrFVkMmwgjhncYh8ECQ1lHXYVX0FVgeYPwxavWMXO1gNv0TI1Kb8K4OH3cUMihIS2+juUgvq+zFLakM9DxpUAqqJ042dB3XMPtmucO1IypaROWyy1FZVpFs+d+1tRs1EknPlilP43TJnpATZbtc49LoPRMFj7P9C5/SuvogYlXoYV77dPw1PUBSRtDxH67doh5Gxy40D4+VOsn3z+LMuplE5eoQ634JluhslsQRQZ9SRZREiliVbeaFOsiYsdk3wdSEq2a0tS+ysfGGxhAe4DDGCEO7wKROoSplv4Bq0haF71Gi7zbi/zHjqAPFDWw
+X-GND-Cause: dmFkZTFgPMyUc0Nl1syOYJ7qo+6FQ50zZcUWhV424JsJzBJKXWHh3n5o4kBPSDbJLiY/8mqPZzzaeaCq9YfLQc2OqnQGffTms5dL9RSlJyuGqiLWU0FGXJUcBiqvw8WjE5nylZeTdbLarItcXpyldXLoFo1CPM3+KwjJvsYai5Nb3QVAeB+fO737BeHGRPjJ48lrqeKVgS5AQQ4W4hRScWXTpXnxfU7C8IVIg3kKH1qqOCvVSfIU4hAf1PrZcMRdJYTud670R1wR+Hi6Zv2p6eyXYqsXrZPitdC3AAsE6UhryqHR7xfnmKS7ggosNaBEHgPNbUHWuuP5iO97DjF7m08tAtIHNrrnBEFMaw3njUGL0P5nbKpjAagJVKIIaTgH/UKoqwXtgpz9j2cNXI9jhXe6OmAdQCmoslDL5jpRu8+lpSUB++3AVGSMXoCmm7oatjkWNarZZUtmq3hEirxb0WnHCUcuORl/9uy2WFyqkMDiv4kC7X1aNKApFJ3XrGrEDfVVYYNSJTKHOgno0Lhq4zz5GXRVKPAigFYmR6NeBCCO+2LwCcvFYhVepfmhBms5IfU26WUFfRgP1FDJcrmDSUkJslGCQTcaGl4B9p4JoF2RyHMnVNLLfSWJOD3pMwZmw+6+XEgmzVytRtF6F/jnDYjMJv1i24aiE56MUA4AWwd3W4u+uA
 
-Don't try to free NULL pointers in cleanup callbacks, some of the
-functions we use to free pointers might not support being passed
-non-NULL values.
+Follow-up to the partially applied "Add helper for "cleanup" variable
+attribute" patchset.
 
-Fixes: 2e0533f977cc ("shared/util: Add helper for "cleanup" variable attribute")
----
- src/shared/util.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This new version:
+- fixes the crasher seen starting up bluetoothd
+- fixes the warnings seen starting up bluetoothd, seen when free'ing
+  NULL variables
+- reimplements the _steal_ functions as macros to better type-check at
+  compile-time
+- mentions _steal_ macros in the style docs.
 
-diff --git a/src/shared/util.h b/src/shared/util.h
-index 562a5af31751..dd8e5288f55b 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -127,7 +127,7 @@ static inline void closefd(int *fdp)
- }
- 
- #define CLEANUP_FREEFUNC(type, func) \
--	static inline void cleanup_##type (type **_ptr) { (func) (*_ptr); }
-+	static inline void cleanup_##type (type **_ptr) { if (*_ptr != NULL) (func) (*_ptr); }
- 
- #define _cleanup_(f) __attribute__((cleanup(f)))
- #define _cleanup_type_(type) __attribute__((cleanup(cleanup_##type)))
+The original patchset also caught a bug in the meson port where the
+config file path wasn't made absolute, so bluetoothd couldn't find the
+config file when starting up, so I never saw those warnings and crashes.
+This bug is now fixed in the meson port branch.
+
+Bastien Nocera (6):
+  shared/util: Fix warnings when cleaning up NULL pointers
+  shared/util: Better type-checking in _steal_* commands
+  doc: Recommend using _cleanup_ and friends
+  main: Use _cleanup_() to simplify configuration parsing
+  client: Use _cleanup_fd_ to simplify urandom access
+  btattach: Use _cleanup_fd_ to simplify error paths
+
+ client/mgmt.c                 |   5 +-
+ doc/maintainer-guidelines.rst |   6 ++
+ src/main.c                    | 108 ++++++++++++----------------------
+ src/shared/util.h             |  23 +++-----
+ tools/btattach.c              |  18 ++----
+ 5 files changed, 60 insertions(+), 100 deletions(-)
+
 -- 
 2.54.0
 
