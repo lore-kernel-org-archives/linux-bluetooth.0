@@ -1,109 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B605442EEB0
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 15:08:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D297E327C0D
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 15:20:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781017693; cv=none; b=OTb9mGfM32rH9fcE25WsfcxBxq/TAjwUW8aDk4B+2M2vdVO9O6itbkaOGBZCbT9PwuDtQOFiQbQHxbWrbWWbfrQeEvbKVKt3hvsfCeC/1l+WGSi1qVSY0IVYBRxyBr+D9zbcWPcBz7YlkYHSBodVeNxPqrETyZb2FQfwtvEMe9s=
+	t=1781018421; cv=none; b=NyiLNhOpdw6sULqFo/9+5UxXQhn0/dJzazMfhNnFI1T7JI1Lp+hvn9lJizCf6lThhBckyCjlOxmwCwmVXUiLBT/X2DsCDQS4Owaa/SFPp0S8+C3jc38wK+N6ZI106+Zh/TUeG4OeNktgtrd1WgJY5t6dhpGUaJW9w402yf3/9xY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781017693; c=relaxed/simple;
-	bh=8RQzS/guGeUh9IekreaooLKsffT7w7gVdCLwxOdRxME=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=StPUwsFvXnoXmFmO6rTBhIY+Xz3tz6twFQTprOvz0P8+IDUqbJsxCF6mGrsEiShiJJr2raa/zll+Z32cghfiTH07PzBNUOwAsqNdod326k66bzZlSkhNV42O8DitHn3Agy1cf2OWJz+8gTRayk7Pe8YYYx0Kwl/8GUdZDLNuQ7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mOh602dA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1781018421; c=relaxed/simple;
+	bh=baSWkwMlzxOlK+mAOEZ5uuOXS9yDRYJCZHB5/9q4Wb8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=q9kf8w69gOS8Pq3h2yG7mdqrir81Szcf4p5O7aJKg1mtCRZcFrGKpAXdVAB0d6fPUaBlCDcxqC6Lut1LKKjUAnobqZK8H28XHUi9YtgP+p9ZK2FIAsUvOexudmPb0NdVhlHpOoNQC6PxbsAV2/OQj9wioFiZpD2Yh76OUqoNUj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kTg9B/18; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mOh602dA"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6A186C2BCB9
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 15:08:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1781017693;
-	bh=8RQzS/guGeUh9IekreaooLKsffT7w7gVdCLwxOdRxME=;
-	h=From:To:Subject:Date:From;
-	b=mOh602dAiGbk/srtjLKI4b7dbl+LoO4a/5CLlCxPTTsKwIU8o2G/glMfHyc6dlNef
-	 4loYVjJhPLduPrIeHex0lKOImz57hIk8O+nsed/ZO2wY+9lJt2Y/J0Zb54hwhm9nlt
-	 8GYiOKTee14mjcikaTleHui/wPQ7FAn0Atc9dxL1Z31T/F0vIPlwQsqZkp3y8mlfEF
-	 jefDMyit5TVmbjymADJkZlmBU7qDomjXdBNlu/fhRrpbKW+Q52C9ih6IB+ZOa4+8ac
-	 CKmvQzdJz0Qwx6EoUqNfpIQpHk1DULDY04dshQOnqxflDVWH1a6gQ+yBvfh6JEk8He
-	 d8COUuFhNiY2Q==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 4D2E1C3279F; Tue,  9 Jun 2026 15:08:13 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221627] New: MT7925E - System locks up with flashing caps lock
-Date: Tue, 09 Jun 2026 15:08:13 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: tom@helix.me.uk
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression attachments.created
-Message-ID: <bug-221627-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kTg9B/18"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B8FE1F00893;
+	Tue,  9 Jun 2026 15:20:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781018420;
+	bh=toR//4Z1S/ehEPnRVGhGER+gkCVAePcOExisb+/oYnc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=kTg9B/188zIRrgKd3Q50ggLyFVeTS5Ium86uMjCPDAigDXifjUiNwVZwyKQFnXNWs
+	 28qzsIdiIBqIrAB87Nh6TafT5TS1dJqrBD5JlyHDpbng3/lX4rk1duCjintLwpKb+A
+	 RDfywtF1ouIDbbJnH8EGYpDbgj+a6BvJF33HIbAv72p9jd+3FZU/RCf19CeiVtf8a+
+	 xr9s6wT+bWiQCZrUS3G6OiPokQlS2HOuh9b+8lutiHcZ1E1IsYM+CKSc6f3uIolF/J
+	 48ja+P6jJfbL2J49sPW+h/lAFA5E29bHYQ0dm/2fhZD6LaV8Miun9vnIfN+GKEdwSv
+	 5E69dLvgd9fnQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19A633930901;
+	Tue,  9 Jun 2026 15:20:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [BlueZ PATCH v3 0/2] shared/bap: add ASE Control Point error
+ responses
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <178101841863.2087958.17757230484857347841.git-patchwork-notify@kernel.org>
+Date: Tue, 09 Jun 2026 15:20:18 +0000
+References: <20260609102548.6887-1-raghavendra.rao@collabora.com>
+In-Reply-To: <20260609102548.6887-1-raghavendra.rao@collabora.com>
+To: raghu447 <raghavendra.rao@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221627
+Hello:
 
-            Bug ID: 221627
-           Summary: MT7925E - System locks up with flashing caps lock
-           Product: Drivers
-           Version: 2.5
-          Hardware: AMD
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: tom@helix.me.uk
-        Regression: No
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Created attachment 310284
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D310284&action=3Dedit
-kernel config and wifi/bluetooth journals
+On Tue,  9 Jun 2026 15:55:46 +0530 you wrote:
+> Added bap unit tests in a seperate patch.
+> These changes are required to Pass BAP/USR/SPE/BI-01[5]-C tests.
+> 
+> raghu447 (2):
+>   shared/bap: add ASE Control Point error responses
+>   unit/bap: add SPE tests
+> 
+> [...]
 
-I'm not sure the circumstance that causes the crash, but it doesn't happen =
-with
-bluetooth soft blocked. I'm guessing it's during scanning. I have no devices
-paired, but many bluetooth devices in the house.
+Here is the summary with links:
+  - [BlueZ,v3,1/2] shared/bap: add ASE Control Point error responses
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8bc6dd81c9c2
+  - [BlueZ,v3,2/2] unit/bap: add SPE tests
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=912d67d1d3a4
 
-However it could still be an issue with the wifi.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-I have a MT7925 as my WiFi module with the MT7925E driver installed as a
-module. No other WiFi cards are compiled into the kernel.
 
-I'm running on a Framework Laptop 13 / AMD Ryzen 7 7840U on 7.1.0-rc7.
-
-I can't find any logs related to the crashing, however when restarting (hol=
-ding
-power, then turning back on) Sometimes the TTY gets filled with errors and =
-the
-system locks up again. I haven=E2=80=99t had this happen for a while but wi=
-ll attach a
-screenshot of these logs when it happens again.
-
-I've attached my kernel config file and the logs I have.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
