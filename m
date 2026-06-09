@@ -1,147 +1,112 @@
-Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECC631F992
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 14:23:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112C71BD9C9
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 14:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781015028; cv=none; b=ERFCwOA5abVPhc/H1/hg5cgeewZJzpIhY1mIEPfuR6Q1q+1zZiN2++4XxgcEwFqFnvTX0TUP6ndIp5ReKBXlOPD7KsKwMct0Qn1s3pkmHygi0yfMf9YyBp1YkBQASd18pjDalEEjeWzUNTewjOXfp+HWBe66TUnH2sFA1BRMavs=
+	t=1781015901; cv=none; b=HPWe7qHR0YCQj8x61ELsy2Y58nSpHq8RN0a/oLjp+UVU8QtECJtHTbOiupQXOqku44ZGuoyNyQ+2uENMGo2spzILqvKLa+4nRucS2eAPe/hJ5BUSHowE3jjVIVr1HUQVUt+f608aW0qm17snwM9hj8bVh0PuC2Bv0ZO87LjUmtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781015028; c=relaxed/simple;
-	bh=ZQSgk/UJCKPnsx7nkLQQR2l6Ona5fhkC4kXQWyISoLw=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FP5T4UjxtQYdV0IBkWyRt21CsIvBJnhNpT01zQMrT0N+mFgSQTthCFq4KPPm3fwRVusdhpkUwBPc8rXrPErjONayPWvaj1HK3oZVChJyrUcQILJG1ZpAmammUCIzPVU39Rih8EF5IJKbGdJ/zRGHoX0bByE/OkMJtXWLWpL/YlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id 5D96B5829C8
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 13:58:54 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C2C933EDD8
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jun 2026 13:58:46 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ 6/6] btattach: Use _cleanup_fd_ to simplify error paths
-Date: Tue,  9 Jun 2026 15:50:58 +0200
-Message-ID: <20260609135837.476561-7-hadess@hadess.net>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260609135837.476561-1-hadess@hadess.net>
-References: <20260609135837.476561-1-hadess@hadess.net>
+	s=arc-20240116; t=1781015901; c=relaxed/simple;
+	bh=lj0REuKVIWY/lFM/RIs4pZupJD6P5ssN/DzsfmDHaok=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ohJW03fbITCnPs9vyFzSW4+c9AVAhEwQj15W+brwbVYCe73lVVoT8r8Air6tilH7q32MabsUxxX1tsMA3fIl9Y+UkuoVLUgqirKvSt5oadQFounsQPcBELAI37trih0PZ0aA1H8lRic0PLCEE42VHIyg3Ct2OgZWebZtSf4muk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CND6tEgD; arc=none smtp.client-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CND6tEgD"
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5a7c7e13b84so3190113e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 07:38:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781015899; x=1781620699; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=merqoAK78fKAf7cy3ETNC/2XhphELpl6aXxtHZdzIWo=;
+        b=CND6tEgDH0ZrkOv1lS0koVmEM4kG+gsN+UY6BCjZ5n9mQD31fApThHF6ucc3CBxQOr
+         QBoZp9AH7Ihky9Ujz/VGiH87BaRx6mAeLP9xuoAqfVdtB7HoHVRoh89/ZeYWOqaSI23p
+         ux1k+dqL8k8TTU/mQpCZ8vHUbbsPpEXwbvSFhLE8Rib2LjVqyH42yhh8eXFyGMe33BMz
+         ya0RTZt8nPCeDRoZy/U+QR8DuC25tVLRyX8TYBUO7lmOeMY/Si0UBADG0aCk1RPLxvxg
+         hE7jwQc+/GE0Ms1fnP4GKnmroBDzWD22nPTDWSW3P6WBEC6wJdyDeW3aeSlXoDnMpNWj
+         vqdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781015899; x=1781620699;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=merqoAK78fKAf7cy3ETNC/2XhphELpl6aXxtHZdzIWo=;
+        b=Q/SuVR+6MBE0tFQZ83cE6BYNr8K8coe/lFECRmfz2AYcIYYVZD8zeF57JJhBhEhctV
+         RAoPCvHUnlLiymx1y4KsIxvjVNQWLIcRpVLWK2LYpnzC7b2of3okQ8gxeoAjC+vtTuG9
+         1wqx6A8CD/KA+ZfTQVHuc1BZdc4Z24Pm/Ae1YNjCofTbAx12EI65F1/tYSXePwUwWG02
+         oF9+R1ab6wViY/hAbLNXH1u89bCGEGngPsRqbJk206+CTdUt4084sApHRTaP3b5294zq
+         N2FHz3tOZX8ubN7u5BVRbUcs9vRBB8zKPgqD9qv2wnr+7yExRD4LogTg04eNoIrAORW3
+         luNA==
+X-Gm-Message-State: AOJu0YxcwFqIKdig4ljYJRFViWYhni8APyCMZ3UPCPZcifXspNnDIwDU
+	r5emcrS80zc+lZXsv/2cfzQkslA+p6iYkvgDWeNATpX5jLIOlS1MDEIX0JlGqAng
+X-Gm-Gg: Acq92OEc7oOKu7xKSFlh8Mx9BCqpisb+mmZpd1VYaJciVz+dyCVA43sTiXGdvFVAcRr
+	y34T2oyKWpPpVkUqahTll6j7+YGVPvmb1DybtCkw8emxcMnMDukVCw42z+vcxlimgYSEXcNZnYp
+	zqWtOBwjZEelkErTLI1in3e4dZ4XPocwaJ7MSxaw4cOcKqq0FdedjZ/2t8PITSvxgI6iSGZAsqj
+	RWR6vtPVuSUhp95zdQr8mecaJM8EBqedwj8EqFXsBsJJe0jMiinKXmQr/uJf6PJsWSa6Jwkh1xJ
+	Yxzzki2+ZyZhVrCAj3ZBFJNT38t6qDnNknpikbULYSH01AFeJFZdOn7mbAKqiR8DIqwsjGUrUCk
+	Vw/SxekhJiAlFSoktUHI7FdelS56Pi9ZLNJ7NBwx/BYoNEBnQ4ps5U1Kr9gUWArv4arKciVWhT3
+	OM7A4KNBjUqTSXVke6JKAOxAhIXvKhA57GwKM9gr+zjQ==
+X-Received: by 2002:a05:6122:d11:b0:55b:d85:5073 with SMTP id 71dfb90a1353d-5ac4dcf272bmr11022404e0c.4.1781015898869;
+        Tue, 09 Jun 2026 07:38:18 -0700 (PDT)
+Received: from [172.17.0.2] ([20.102.103.146])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8cecd26b9d5sm223162556d6.44.2026.06.09.07.38.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jun 2026 07:38:17 -0700 (PDT)
+Message-ID: <6a282559.4ed8569f.af6dc.2fca@mx.google.com>
+Date: Tue, 09 Jun 2026 07:38:17 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2586074962628091088=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: hadess@hadess.net
-X-GND-State: clean
-X-GND-Score: 0
-X-GND-Cause: dmFkZTEVlSdXhFUvSV8QQx6yOrxge8LgLVsxPuUsLns/yksmkNx+qdDvLvza5bKGN8WNxSHwt+f8VbZ4lJPoURNdRMWp8SMuewEQUfgBMkY/jbgr+LyXuM7iW1giNJiHgNHw6TWCI3u/pWopj0uku4KXuEzF2U7Jkv7EHtBXrrJV7gBwCRlXQDiK2LO8ylQk6uzIFcjqpCrorpKwg3w0D6ojMjAneIde2+9Xgn2LOidAqfgBRNsXEa58H2+xUe5E0Ri8LlvlWBN+ajBkbQKIGVS8FIytq/3m1RxPUluCTzu51875p3iUUbERbtkhDOOaRjgxLdx7vcvY3Bj/fS1GlcpyS/+RCS88NNC2zLfCQdHG6XPnV+C6HIaWfQ3jJfqI+wyZRAtWgMLpVUnWwXKxekwPkWzFsUTNastfpWl7xTFKtJ/YKIPu5iBZPh9cbZ/5H0I64WJEObBfF3uowwQ+ZIOZO/3NtmMnw+wbVwJYyH6ULGyL+KOmrx0TZhHcmD+nACxQdAT4LNekQe/Yu+nOZBjBibZ1YCMOfCV/q9EacoG8AQi6MSoYEaFRmjLW6MNujx+kLJ3f7BX7T255+8JRb6z6EJHyOHpsEwwMgwVr/GBugtbUm5+CixNgTZ2XFd/7fifuRqyVCrpQRux6I1upP0xDHzlk3lh2iIX0v4e2QPezFarzFg
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, senozhatsky@chromium.org
+Subject: RE: Bluetooth: btmtksdio: fix infinite loop in btmtksdio_txrx_work()
+In-Reply-To: <20260609121329.1262170-1-senozhatsky@chromium.org>
+References: <20260609121329.1262170-1-senozhatsky@chromium.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Use _cleanup_fd_ and _steal_fd() to simplify error paths, and only
-"steal" the file descriptor on success.
+--===============2586074962628091088==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1108559
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.74 seconds
+VerifyFixes                   PASS      0.13 seconds
+VerifySignedoff               PASS      0.13 seconds
+GitLint                       PASS      0.37 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      26.65 seconds
+CheckAllWarning               PASS      29.25 seconds
+CheckSparse                   PASS      27.91 seconds
+BuildKernel32                 PASS      26.67 seconds
+TestRunnerSetup               PASS      550.04 seconds
+IncrementalBuild              PASS      25.31 seconds
+
+
+
+https://github.com/bluez/bluetooth-next/pull/299
+
 ---
- tools/btattach.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/btattach.c b/tools/btattach.c
-index 5f7d19093698..4918c79f65c7 100644
---- a/tools/btattach.c
-+++ b/tools/btattach.c
-@@ -40,7 +40,8 @@
- static int open_serial(const char *path, unsigned int speed, bool flowctl)
- {
- 	struct termios ti;
--	int fd, saved_ldisc, ldisc = N_HCI;
-+	_cleanup_fd_ int fd = -1;
-+	int saved_ldisc, ldisc = N_HCI;
- 
- 	fd = open(path, O_RDWR | O_NOCTTY);
- 	if (fd < 0) {
-@@ -50,13 +51,11 @@ static int open_serial(const char *path, unsigned int speed, bool flowctl)
- 
- 	if (tcflush(fd, TCIOFLUSH) < 0) {
- 		perror("Failed to flush serial port");
--		close(fd);
- 		return -1;
- 	}
- 
- 	if (ioctl(fd, TIOCGETD, &saved_ldisc) < 0) {
- 		perror("Failed get serial line discipline");
--		close(fd);
- 		return -1;
- 	}
- 
-@@ -73,19 +72,17 @@ static int open_serial(const char *path, unsigned int speed, bool flowctl)
- 
- 	if (tcsetattr(fd, TCSANOW, &ti) < 0) {
- 		perror("Failed to set serial port settings");
--		close(fd);
- 		return -1;
- 	}
- 
- 	if (ioctl(fd, TIOCSETD, &ldisc) < 0) {
- 		perror("Failed set serial line discipline");
--		close(fd);
- 		return -1;
- 	}
- 
- 	printf("Switched line discipline from %d to %d\n", saved_ldisc, ldisc);
- 
--	return fd;
-+	return _steal_fd_(fd);
- }
- 
- static void local_version_callback(const void *data, uint8_t size,
-@@ -99,7 +96,8 @@ static void local_version_callback(const void *data, uint8_t size,
- static int attach_proto(const char *path, unsigned int proto,
- 			unsigned int speed, bool flowctl, unsigned int flags)
- {
--	int fd, dev_id;
-+	_cleanup_fd_ int fd = -1;
-+	int dev_id;
- 
- 	fd = open_serial(path, speed, flowctl);
- 	if (fd < 0)
-@@ -107,20 +105,17 @@ static int attach_proto(const char *path, unsigned int proto,
- 
- 	if (ioctl(fd, HCIUARTSETFLAGS, flags) < 0) {
- 		perror("Failed to set flags");
--		close(fd);
- 		return -1;
- 	}
- 
- 	if (ioctl(fd, HCIUARTSETPROTO, proto) < 0) {
- 		perror("Failed to set protocol");
--		close(fd);
- 		return -1;
- 	}
- 
- 	dev_id = ioctl(fd, HCIUARTGETDEVICE);
- 	if (dev_id < 0) {
- 		perror("Failed to get device id");
--		close(fd);
- 		return -1;
- 	}
- 
-@@ -140,7 +135,6 @@ static int attach_proto(const char *path, unsigned int proto,
- 
- 		if (!hci) {
- 			fprintf(stderr, "Failed to open HCI user channel\n");
--			close(fd);
- 			return -1;
- 		}
- 
-@@ -149,7 +143,7 @@ static int attach_proto(const char *path, unsigned int proto,
- 					(bt_hci_destroy_func_t) bt_hci_unref);
- 	}
- 
--	return fd;
-+	return _steal_fd_(fd);
- }
- 
- static void uart_callback(int fd, uint32_t events, void *user_data)
--- 
-2.54.0
 
+--===============2586074962628091088==--
