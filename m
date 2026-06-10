@@ -1,173 +1,168 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA52028FFF6
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 13:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141934028E8
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 13:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781096737; cv=pass; b=MCeut5SlNVxxhIab4HRxkkrA8QsmC0hUvd279xBANu1vK0t17R5jJW16o7d78FXL1rTWk3pOGPK+VOHkYud01hUWGvgDulVD1xOqOOxOGjj7rzf/MM/LF0i/YvUEFJvkhHaxGRAPX8KU0rBphfXa20vwPKub1+0iXrgNgBS+FcU=
+	t=1781096798; cv=pass; b=WoqWRKnBOedw0yYHNBe1hyhb2qoVdPiD+x/XHYUBlnei0747St5nHxYNRaAUKsqWA/jCjXTa2z2d6eq5iq3mhkg0OXpdnaSsRQnMEd4mZ+EAtVa2NxOesE9mw6ANFWC5N8d/4mJbwozqk27jayzFp8r1VcZCwNPmaA/6ZvArhD8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781096737; c=relaxed/simple;
-	bh=QHUqVSv2KaaURqb9cPHR7aND7tqFpUEAhdFRJWdcb1g=;
+	s=arc-20240116; t=1781096798; c=relaxed/simple;
+	bh=FON1CoKM0rF1uFhumS7et83MHpk9d5AZyBQCPyEfjKY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qt1Zbl2sby20x58LvtVcgsIAe1jH5vcIYvXJpPG/oJ9dGqbAvYafwQ+BH2HJC0fxpdiFhjw1buDKrAILJUVeXskiDwW5HW6MLPByypjiGvTKUyIEG8ik4RE5FelC44yL/q7J3mRn279bcW60Bpw2iUv/IL4cNfgaIMyCbv9fFEM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iDWiPKVy; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pbZMc/Xw; arc=pass smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 To:Cc:Content-Type; b=j0cogrC3/Aw32jzBI8R7HKbFzkPsQbeicE9ndgrh4ijJSqQ0oXSjJJFiuNOt4iVFepx4+5p2CrPMCfB1KkwngHVyJJLC7e9cYUUyUmCLKDZg/QzYOBvzzsVfgZ2WY0xzEGK8UFEiVvJs42If/P8mRy37R2Np9vhODxrXxybvQAg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GQr4PeJm; arc=pass smtp.client-ip=74.125.224.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iDWiPKVy";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="pbZMc/Xw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781096735;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=G2D3C9qGXxnBkSiArm8IjX1qpS0bzoF+XigWv7ieCiA=;
-	b=iDWiPKVy/VQNbsXOjKvEYGaWY8dc8b4PoQnAnDI6pGBB2ousEYSHxGYsD1jWj7MDnvWjcK
-	65Hf5nhz2o3yq8mwhQJ5tJY2I7M/A+jfz0058G+K69sQSR4tS0PxmaMSVcsmMrUttBLOEb
-	66n/fBIuMWoDIM5TvgM1vfA+faNuCVI=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-629-VzosC5kSMNuIRzQ7z4tpog-1; Wed, 10 Jun 2026 09:05:33 -0400
-X-MC-Unique: VzosC5kSMNuIRzQ7z4tpog-1
-X-Mimecast-MFC-AGG-ID: VzosC5kSMNuIRzQ7z4tpog_1781096732
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-3967754fcf7so28432651fa.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 06:05:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781096732; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GQr4PeJm"
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-66077c46c5cso5992196d50.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 06:06:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781096796; cv=none;
         d=google.com; s=arc-20240605;
-        b=NQFUjej6MSlYex7APgS9eH+rpPBs6Xvq5tOc9LLUfDIBjBGo8Ub+8sidDIV6Svgt49
-         b2WMczs/++7LtcWFVm4poGbVWVSO7eS/IxiVTMY75Om0JtY7173UsrFXeyP+vvcs11PF
-         SrDJx+XeFP2o8ahnvt/BDQjPa61it8XQWydRfoaKZeE6HSypnVfOckEgG2JmxZySpwfK
-         3S6s8xx/X1A0OfGz7AIMCWVrypSvz4xQ/du5BxlF7tFUuz4ifpKepNX4l0uh6tJFyvGO
-         r7u2QMlc6t24BlfEmIbK/pvTdrda5aTPx9K0YYzYnMdGQJAaIUIY6bJFtjRPSq14pZQs
-         3fvA==
+        b=GS9YXzAaKIVmQrGKFx+ggbc40FFvyRimwzdb4lFFana3Vn6PVOV9XOQhOgKqDWLUDl
+         L4YJCCjd0fCtrDHEsku7mNBJ6FLC46f0ECHpol9xAdSETLodQZm8DplXTHd4HORGHNMz
+         EhFzfGhnn3PqxS+amrYLoiVld+P0j2D1bSLyptCalbNUrzyAzQHx+CqBdLrcoJOsnxBU
+         tySW4IC4JGCksEEfsEgtggAYKdTqVhRbUhhH2j4D05IoXUbwKPmlppmXL2RCz4UkuzSX
+         TLFcS6MyOkU8PjnrdAgYZNFXNfBIdh1DTgzTkYP/+rl/PWhv0BI5BeI0BuCm9H8vs7X9
+         e80g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=G2D3C9qGXxnBkSiArm8IjX1qpS0bzoF+XigWv7ieCiA=;
-        fh=ED00QSh55h0fJ4iyua95oenxdgMT2u2G3qCz1hcMnao=;
-        b=X9BCYaU7wVJMJqTiE3iySBjQP4i4H49BdBB6fz8pMuu3bpS0lScEq9mp//tsIpiNQ4
-         e9TlTXa/ZeWv4O6tvwUY3RKKB+ja/DfOsKtPjTQga8sEWyXJH/opdC6NiI5CuyyHwKwm
-         qCLiyl8cJjZkOtyOeb1+7nUTTTURrJB/VN6XgZvIVYlvUjf+/M0AtCHcSKAa1uvamoF4
-         M+YwoK3Ig5EeRRKf2oLnOLro38Sae0fm5lNLYKzNolYMQa6P5ijUl37NvxBGrmHTrLa1
-         1FPZ0WB3XrmwPJCeEMg4qcjRuEep/FT6mmVE5eGpwTN7nJZ+Bq1Ne5jLUv6jKHr9PG6/
-         pt8Q==;
+        bh=7wMnEXqbxoYhFkOWgFz+4A88tJVsu+eaTHJQLIWdC2o=;
+        fh=1lai2hMMrhvWubpUepE0bblohQpWi2VePt0uB1TFfOE=;
+        b=EBWkYKDv4iZuBW52xWMDnhc+eko5+pZE/i6pWHKb4EKN1fOhx83mBWT6G+6mz88/uR
+         zzaADBuKuUM7wCvyHS7/z8JiDiv7SC6i08+xi9/Ff8TF1QPwDDP7L0ot1XrovxHmrRVs
+         CKP3s7Jet+OHhTOtzbKEe/S051yzOhyhuJ9/aOxtZtwC3ZMt6BoRkmQ+3xPd3wnXNx7m
+         H/qfbF/W+vc185L5SefHTB8Zdibwrve/uwqlRPck2eepydz3uxHHDDGDKpzBCSvitskq
+         58J7IkbZJmMKOsUsYSHke8x+Voxn7CRVGwCOkGdY2bDAKwIgEUPGsEPGbxRvKlKoaOvd
+         1Y9g==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1781096732; x=1781701532; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781096796; x=1781701596; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=G2D3C9qGXxnBkSiArm8IjX1qpS0bzoF+XigWv7ieCiA=;
-        b=pbZMc/Xw+cPI5jy3mjU1SS2z8qNoejkT16j3tFJa1c/2w/H79vvfg1xiLjjrsUWccp
-         ivurrxwIi0A/sIfXvtKNKXHGiXqO5lBB9sOtdMSfuQ99a9A9WxDgfzC8vX3+OJEDnBhU
-         2onfxob1uNwfnPDYaSzG+EVflq4NYkhGtqTMVBfS0Gp1pZftiL/AHqEFahSnBs5RBlyk
-         U+YFYD11zHaj3DqbGWL/0pVotQGTgcnJTZ068WANRNl8DFO9K1DAwziGLIU1lH9BpYhp
-         TQOWXU+dD/drm/4OR9zjqJkkSBXzehx1OzEcFqMurxWDwRp2OQcAoCG/fYu73sUI0+R2
-         3CeQ==
+        bh=7wMnEXqbxoYhFkOWgFz+4A88tJVsu+eaTHJQLIWdC2o=;
+        b=GQr4PeJmFWDYubkWswXKoeIvdX5i8j4nDvVUCWG3vE0Bga5Ed1I/DEWxU7ATNWVryf
+         YvSPeXnk5j1fdILGTuvzc7L4Tqq+GI3BqVCcP52iOtgvgBaTEe2gLQeY0USZZp0PmDRs
+         zxd0aHqydlBEO88Zg2JY7vqpHFt4vA/k3R4BAFfmF8TObgvybY9d2IOHvmCXTr2u1Tiv
+         2CPK4xDOVdkZ9xnAKId1FVKhfU/P2X0Gn89W+v/z+ZZD2azttsN4DkBI0H0VNiBHGI7t
+         Cbi8LqO7CKUk2l5NZepDGDn4WFWtm31DMWXbDsyWyWZPEEBt/XMp3ErKdAhSOiRDh77K
+         ZPaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781096732; x=1781701532;
+        d=1e100.net; s=20251104; t=1781096796; x=1781701596;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=G2D3C9qGXxnBkSiArm8IjX1qpS0bzoF+XigWv7ieCiA=;
-        b=ZY6YIFTJ1Ch61Ryr8jOBJ+HnBMIjsqBV08y56eBn+ZJBDKtEc6GBugQCH7fl0IqElN
-         vi6mCpoO/7aK29xIjIcABF6YF6+mV2ar/8G21pM+OjeLylwzps0wOn5lsW4P3ZqTcQBG
-         JPEL+TDHglC7WoqYW4b+LPrOJ5poV8yVcFaU5g2LcvZVexdQcmNfgZteV0CSji61Kz/u
-         4zqYN/ddwE8QjivL6eH4hkvIgkTHGlaRVJmLJoEfcKWymJcmyJ3RD4nzx5TBA33hBfT2
-         FNJRVzRSspeS8eLoR6mETqGWrfu3XxOFlNgvF+jPmYQXPtKCe/bEz2L3/CmLNYWEXD+Z
-         R9TQ==
-X-Gm-Message-State: AOJu0YxJ4vVQ5Brs6RFpYhBl5tpnaJxFdtSL/WnufeCLjIosre3jc80s
-	6KLE6hrwLQ5YqIrsI9VsUYhyVHNhV20a5w3Q5u+EzU3VyX8yxXiGbLxcZLkCEsWkODCRHGFKvOZ
-	LG1aBZap9PMHa0xI3KD77i3V+DTnf1aQsFlHjkHCraBcN/A1RsuZLtKhLcI7sZMNi5ht8YlGdWP
-	MPDMlVM9Tp4A0FR/O3RY2s+zlbNl0tz45DOaBwbyWfgaNc
-X-Gm-Gg: Acq92OFYQ+cYP4IKtLStaL2f1SBBtjBtYusvriMD0EjqZV04Ecb5xJTvtdxFttOwiSk
-	YymEOpTdTVOy1FSWNJ2o9EgAJpwysYd4RQnkZL+GPtw2PDolyrOEZsvXzcKKNz46YMMOmRLEAYW
-	wUznE4e5/C+bNDTwxHqsEXOf/3V/iEX82pKlZX6QO0/oJQD74WLIRKiBtT1YAnlYivE9Vk3WGFX
-	AxmJ0bKnyX+fFhzAWA1WTG4tdvPj+JTaHspYM7ysjjcrai7
-X-Received: by 2002:a05:651c:30e2:b0:394:987:945e with SMTP id 38308e7fff4ca-397f76b9dcamr15846041fa.1.1781096731867;
-        Wed, 10 Jun 2026 06:05:31 -0700 (PDT)
-X-Received: by 2002:a05:651c:30e2:b0:394:987:945e with SMTP id
- 38308e7fff4ca-397f76b9dcamr15845841fa.1.1781096731250; Wed, 10 Jun 2026
- 06:05:31 -0700 (PDT)
+        bh=7wMnEXqbxoYhFkOWgFz+4A88tJVsu+eaTHJQLIWdC2o=;
+        b=MOqqounmNWb7g8anKwjXnIVdQS2XuQ4v8HlNV/eeGJRdfnpCwA4ExebpMj3nkj8RVI
+         P0F8bwEYdUweo9YuQSNC48GYV2LsV2O16YrXGaDTSXQZT7hLJIJJGayv9PpG7cJ34dei
+         Gv5vdOSpD9hpwFaArkEhWF9ipWNShp/UvAZbfDSvhVQExVJV1iJWRf8UWslvuGEnuc6H
+         cH5aAvi7FSXbAhqipM21aMIqMJsZ7Hi+RSbZP5bUeHHXlbh8iaL+LicO5c8oH2ztfZt/
+         lgWZtCrl8kx7nK099udjRHkOG6F1NMw8UqINg4tImFY4hMLc16O/lJlJokmtMfuW9myh
+         nW+A==
+X-Forwarded-Encrypted: i=1; AFNElJ8ws2eRKa2dUNd41/A2Is1/fv70jFEvue1zFLIJzrwI4LbOcTEf+DASHypuW6u30UD0PDFG66mQmNKZlVmxL4I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMMg0DPI2wr8KmNZIAXQ7vIbVuZCmwG6Oqwz6cKLAbkPVo+a8R
+	DH2qcDZutvJRRAatjXgpYxJVhcXbTf4Jskege9ZsZw21Q1Accp4jxuwCVOXbdszB57nYv8RNIop
+	zKXLEHRU9GCm3Lxc/cuOLhTXv4tfzC8k=
+X-Gm-Gg: Acq92OGZ/aJ9ZywbNqHntQJc+NKy+mjFZmmvjR9nhl18AYy9191TfEbMBxbuvpRVjZf
+	Etvex8UPdBBaeW2ELdNoHtY4IHWSG6gSjrDuQs11sKFUaAgoQlWHDyGkVJ3hGzllrl459kJssjH
+	ayJVZZqUwWy+8yGI9T09QEBrTN++oCsMegmx8OqukrUamm1TWWKEkdMZs2+h+VBY8Rx+m6Wl+3Y
+	Fqsynh9cVC+kxrGaJ53OvN70OJJtyM+PxxMCF+wNDNxKpVGLdtIYf4F73RYj7taJuZCXp2rYwbr
+	Wrec/J+N1Lhi785uKrW/eWtpwmQVrD8rYkVBBqpCrtOx+7u/pji6I5AvcUvBGXDW+/2CQEMo9wc
+	aYg==
+X-Received: by 2002:a05:690e:134d:b0:651:c468:99a2 with SMTP id
+ 956f58d0204a3-66108356e4emr23038007d50.45.1781096795910; Wed, 10 Jun 2026
+ 06:06:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260609080054.4541-1-zhaoyz24@mails.tsinghua.edu.cn>
-In-Reply-To: <20260609080054.4541-1-zhaoyz24@mails.tsinghua.edu.cn>
-From: Alexander Aring <aahringo@redhat.com>
-Date: Wed, 10 Jun 2026 09:05:20 -0400
-X-Gm-Features: AVVi8CdjmsGRE34cD71VHNMaCGfKHZ-mvsXk7Qa_Y4MIS1SxRudAtkLHluKhK4k
-Message-ID: <CAK-6q+jL4D6cCwJYr3AMb_h_gVxCamNrG=bRrEczhN8PVRVPOg@mail.gmail.com>
-Subject: Re: [PATCH] 6lowpan: fix NHC entry use-after-free on error path
-To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Cc: linux-bluetooth@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-wpan@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>, 
-	Ao Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>, Qi Li <qli01@tsinghua.edu.cn>, 
-	Ke Xu <xuke@tsinghua.edu.cn>, stable@vger.kernel.org
+References: <20260609211111.3887657-1-simon.mikuda@streamunlimited.com>
+ <0744a915b7ea628647a17fa9aad0aa4365f83989.camel@iki.fi> <fa0febe1-5866-4a3f-9f86-ae70e9d4b22d@streamunlimited.com>
+In-Reply-To: <fa0febe1-5866-4a3f-9f86-ae70e9d4b22d@streamunlimited.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 10 Jun 2026 09:06:23 -0400
+X-Gm-Features: AVVi8Cc1fh8z4eAoiSiTBl7tDORY2MFrKaAJ1lZdY7eUFZnlokYaQB1jbl6gM_Q
+Message-ID: <CABBYNZKD7WGUpkQk94ruAnPw=ToGnChbRUjuBVTMJ7+fZ2M4vg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/bap: Don't link ucast streams before CIS IDs
+ are assigned
+To: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Cc: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Simon,
 
-On Tue, Jun 9, 2026 at 4:03=E2=80=AFAM Yizhou Zhao
-<zhaoyz24@mails.tsinghua.edu.cn> wrote:
+On Wed, Jun 10, 2026 at 3:51=E2=80=AFAM Simon Mikuda
+<simon.mikuda@streamunlimited.com> wrote:
 >
-> lowpan_nhc_do_uncompression() looks up an NHC descriptor while holding
-> lowpan_nhc_lock.  If the descriptor has no uncompress callback, the error
-> path drops the lock before printing nhc->name.
+> I looked into it and 0 is valid ID (probably not used, but still valid).
 >
-> lowpan_nhc_del() removes descriptors under the same lock and then relies
-> on synchronize_net() before the owning module can be unloaded.  That only
-> waits for net RX RCU readers.  lowpan_header_decompress() is also exporte=
-d
-> and can be reached from callers that are not necessarily covered by the n=
+> There is a ugly part in bluez though, when stream is allocated cig and
+> cis in qos struct are 0 not 0xff:
+>
+> stream =3D new0(struct bt_bap_stream, 1);   /* qos all-zero: cig/cis =3D =
+0 */
+>
+> and also in tests there are some struct comparisons that also use
+> cig/cis =3D=3D 0. Some parts check for 0xff (BT_ISO_QOS_CIG_UNSET,
+> BT_ISO_QOS_CIS_UNSET)
+
+We should probably initialize it with unset and then check if CIS/CIG
+have been set upon linking.
+
+> Maybe more clean fix would be to hook this up to state, so that when
+> CIG/CIS is not at least configured it is rejected e.g.:
+>
+> if (stream->ep->state < BT_ASCS_ASE_STATE_QOS || link->ep->state <
+> BT_ASCS_ASE_STATE_QOS)
+>          return -EINVAL;
+>
+> Also probably i should cleanup all structs (code and tests), so that cig
+> and cis are initialized properly with 0xff. And then provide the fix?
+>
+> On 6/10/26 00:03, Pauli Virtanen wrote:
+> > ti, 2026-06-09 kello 23:11 +0200, Simon Mikuda kirjoitti:
+> >> bap_ucast_io_link pairs streams whose CIG/CIS IDs match, but the IDs
+> >> are unset in Codec Configured state, so a Sink and Source bound for
+> >> different CISes get linked. The stray link later propagates a
+> >> disconnect to the wrong ASE and breaks Receiver Start Ready.
+> >>
+> >> Skip linking until QoS Configured assigns the IDs.
+> >>
+> >> Fixes PTS test BAP/USR/STR/BV-362-C
+> >> ---
+> >>   src/shared/bap.c | 6 ++++++
+> >>   1 file changed, 6 insertions(+)
+> >>
+> >> diff --git a/src/shared/bap.c b/src/shared/bap.c
+> >> index deb85b264..98537de60 100644
+> >> --- a/src/shared/bap.c
+> >> +++ b/src/shared/bap.c
+> >> @@ -2679,6 +2679,12 @@ static int bap_ucast_io_link(struct bt_bap_stre=
+am *stream,
+> >>                      stream->ep->dir =3D=3D link->ep->dir)
+> >>              return -EINVAL;
+> >>
+> >> +    /* Don't link until QoS Configured assigns the CIS IDs; while uns=
 et
-> core RX critical section, for example the Bluetooth 6LoWPAN L2CAP receive
-> path.
+> >> +     * the check above would pair unrelated streams.
+> >> +     */
+> >> +    if (!stream->qos.ucast.cis_id || !link->qos.ucast.cis_id)
+> >> +            return -EINVAL;
+> > Zero is valid CIS ID?
+> >
+> >> +
+> >>      if (stream->client && !(stream->locked && link->locked))
+> >>              return -EINVAL;
+> >>
 >
-> This leaves a race where one task drops lowpan_nhc_lock in the error path=
-,
-> another task unregisters and frees the matching descriptor after
-> synchronize_net() returns, and the first task then dereferences nhc->name
-> for the warning.
->
-> With the post-unlock window widened, KASAN reports:
->
->   BUG: KASAN: slab-use-after-free in lowpan_nhc_do_uncompression+0x1f4/0x=
-220
->   Read of size 8
->   lowpan_nhc_do_uncompression
->   lowpan_header_decompress
->
-> Fix this by printing the warning before dropping lowpan_nhc_lock, so the
-> descriptor name is read while unregister is still excluded.  The malforme=
-d
-> packet is still rejected with -ENOTSUPP.
->
-> Fixes: 92aa7c65d295 ("6lowpan: add generic nhc layer interface")
-> Cc: stable@vger.kernel.org
-> Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-> Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-> Reported-by: Ao Wang <wangao@seu.edu.cn>
-> Reported-by: Xuewei Feng <fengxw06@126.com>
-> Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-> Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-> Assisted-by: GLM:GLM-5.1
-> Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
 
-looks good. Thanks.
 
-Acked-by: Alexander Aring <aahringo@redhat.com>
-
-- Alex
-
+--=20
+Luiz Augusto von Dentz
