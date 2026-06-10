@@ -1,116 +1,82 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BDDB40D579
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 07:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8230438D6A2
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 08:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781078257; cv=none; b=GmVuLKYkn2wOW1FuCTMZUKfattwpM2/sddkU9KORQ/tKquEB3qIoO0yl2u76Y3fpnXN81DEOwHm39/INrA0yGLBtQnXYK2+N+Bu3bMFPaVbfodfm/7wXd32dVz2IMMvusuI6WgKwAleIvmAxxzPdZB+sMvdmy1j99rCTXMsujEg=
+	t=1781079474; cv=none; b=ELVv7w5fMEGWqlTrH8gB7YuguvIKQL2pjCiDNaXpSttxCkrOVlJV7oNR9ifE985fZjQW3RGpPwLEANfjlVxgXogNuvmYFaMXUmWNxZ1b9q3ftm9KRswouAQJi2a7zW2XW7XsCZ1cdSSYUHebwBTh2VkVd01sDAo1GCBH+YhplvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781078257; c=relaxed/simple;
-	bh=rGuzvrf8gdJXMb0PFWucTyRWAus9ud2K1GdT5L5CCSQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=CfXwTCWMZWb76kI9fGMteI/Mxeu84cUe2MGqPtZy6Ytv007BP7qaunlRlDnLROpYSeraX+HPl07rywjK1WM7hJEskWPzEIvKOBUr18CWdev5TrAnDIZcOPfcuRxAFrUJHBB68FT+V561B7grCGL0ihwOuax8ee3zsi8sLt9r2eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=qcK4Trj7; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
+	s=arc-20240116; t=1781079474; c=relaxed/simple;
+	bh=EztlkaJd9gHp+3rz396EIvkoYHLVnmoIMg7Ox8UJMiw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oDI3v9WoqInBcExLrME3fgG1TCVFotVmz67LIjLgS7mm1Wds9DVbFxtCmtL7dwC7NvDOEWXoExG5iU96kSxhv3gXuqEjxintoVLHLbz5qYCYLBNejAXmso+hBqzUpQAE6d9t1N3SHfvdCtKTbU+GtSzYvmU1/t0dFJdPKKkwRI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NwJkHWty; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="qcK4Trj7"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-490aaeabdb4so41490945e9.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 00:57:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1781078254; x=1781683054; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=a+WZKUkOv9ib6EI2/ew1/IGUAL8x/KpMYqsqnngx5L4=;
-        b=qcK4Trj7hySkfDJ9esmvyXggRCJ8RyeHDKGUsytBk3oHGhVn7rMVLt3QvCqEUGFryD
-         NnDf+L7nuRdC0W9JtVKkYlNb3e/iRbPFzsVU9vh4WEOJQMPzpFKRkWNH5wj3bTs8aqHm
-         Mk4NHlhy8u0VjQ0Je0OthW9Y8psDlOSIGgZUk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781078254; x=1781683054;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=a+WZKUkOv9ib6EI2/ew1/IGUAL8x/KpMYqsqnngx5L4=;
-        b=B0MGbk3aaZKF0Fh8wfCRMizlNx8VafbrOkJ3rTaKyRsPkysbUUAw5Ukjnduc9yROQL
-         vouKVe4uIuTyuugcMEmhfSK6rFTUkW1GNfe3lWtGinULp+P9EgP6L5QOHlvRMU4pCJAe
-         fzHvgTqXl319alj1/szpkXS4fZXWiAahok1yvoQaK9mtKsCf0wuebF4V0AGq2XFaaGkj
-         hiky6lRO9zvzdO6rvei5B3iXm0weGfan3T0vJpTiHnr8lZG9FwFWk24yI533zHKcsmpE
-         dlu+AqarM7K0VgGvZoDFmhnJxwz6k8GNku27JiaUGKtoIuuLtNubIhOKMnEWqToFUP4X
-         To2g==
-X-Forwarded-Encrypted: i=1; AFNElJ+qZLKKCEmO/Kxu+xN/Rq8c6r1f7yFri/TFLrcZiNJKbTmoduintpk6My+UdiQ2l6irE0w1qRu2mdlkhvIWGFM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygJ2sbUWF4pLGBXvUvoJ0j47BH17UBvmim2ZGQmDWspS1aVvDE
-	wuSNVPLoUTMBvjMZe8NUgiUVBpcsByvqzXhGsvsesWXmbTUrqQkq37xj7v/g5Vwi2LdSg090vAg
-	aq4hD
-X-Gm-Gg: Acq92OGUNzmIp9JNuoZ1wBN+vwoLmcoas+c5wxzVmLqGgXqrexfYIXZzhDYA0olBLGc
-	Pqxzr0GRhPzyducoZKPmaKjPKb+C5Wr/lZAqyNjkJUmaAmEvNFU/7M5zNFOfRWG348tBHuI49O+
-	OTG97xIJhmzeBB0rNsKBv1gLEqY8hAixkJTzmzk2OvyHcaeqR2k+LnEqr4TSLBCfODdCs1TjeF4
-	8iBMzCKjUc9cfFf8GftYRaXhExyeEazUqRU7rJASlwBwNTTNJAetevaIbWnekVEAWrYoIxdl/OL
-	DiIX4kQsUP0WugT0h+FdihyI3biCuw292/gP5bjaLcip//Zc38Yw1NpzzBsSsEICRTF9xCN/3r2
-	MSeoWA3t+3wULENIcnGQZ05e5/ZxLpjbpuxJrLA+4gK0NVaQs+nAloHQ/6Kl8TPJQO10qSV3XjR
-	Ou64KCCNrM1l4PdPRYLuDv+WNuh7mwYZNhCnTszBqGPS3lCsv6S0sh1g==
-X-Received: by 2002:a05:600c:3486:b0:490:b2a6:8c2a with SMTP id 5b1f17b1804b1-490c258f419mr343048515e9.5.1781078253852;
-        Wed, 10 Jun 2026 00:57:33 -0700 (PDT)
-Received: from [10.122.244.41] ([84.245.120.9])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490dc47d4e0sm46358885e9.0.2026.06.10.00.57.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jun 2026 00:57:33 -0700 (PDT)
-Message-ID: <ac997f34-8c43-4935-bc78-90fa5eef714b@streamunlimited.com>
-Date: Wed, 10 Jun 2026 09:57:32 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NwJkHWty"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A1E41F008A0
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 08:17:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781079473;
+	bh=EztlkaJd9gHp+3rz396EIvkoYHLVnmoIMg7Ox8UJMiw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=NwJkHWtys4/Ts7sNo65xaI3Nci/MaGBDTPfUdh/5hYGSJvnLRtg7tHn8WHKmNepUt
+	 Mu7zpGuT3175nI0QN8z3Iv4HvDZ0g11AgraPlhD6NekgKzH5k2k+089chzMCMsqeof
+	 XzStHhVmnVT1bxdxQprX/cXyWl3FRs4TlhcQyeG2dSY1IeQmFTsB9qd9/Xorxe/ogg
+	 1dIKFCR+pbVciXDH9ZEk+CubFJbUDYihHbsRE1XDAvsFsoilgCs5V4VHhdP0hlRenJ
+	 OXrv4RbRSP0AWobRhxBnmbACaGpvP90/2D7Ww5sMKTGF4QmVVlmHaqyeFcYpkGCfyt
+	 pPw+pVyAZ2oyw==
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-3967724bed1so69917671fa.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 01:17:53 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ8Up9nPJteCg1L7BUYUCBgVmXqLjiZNGx/C6nflMx4mh0h9Yp7gPktQcUjNyO1lz2vGjNy9qutABB6La5z/TIA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYPFN3sS288uy6P0tB5jjsYTsAwDKbqMXmXf9sapavjzTXZLUR
+	eS8EjxAF8lHsxpNW8QAzsD3pPq5Zwb1vZLYlIck/K1MgOYd+yZVn2leIyf6J08MXJS5HCOxx42N
+	T9SXiwk+CwYHtuur0OnUMw9cHjrYTkLRaS6ePClc93w==
+X-Received: by 2002:a05:6512:1114:b0:5aa:7ad2:f4d5 with SMTP id
+ 2adb3069b0e04-5aa87bad505mr786523e87.38.1781079471995; Wed, 10 Jun 2026
+ 01:17:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ] shared/bap: Transition ASE to QoS Configured on CIS
- loss
-To: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
-References: <20260609211120.3887737-1-simon.mikuda@streamunlimited.com>
- <e89af328197d3fb429c08b7a3107d7fd8e05ac00.camel@iki.fi>
-Content-Language: en-US
-From: Simon Mikuda <simon.mikuda@streamunlimited.com>
-In-Reply-To: <e89af328197d3fb429c08b7a3107d7fd8e05ac00.camel@iki.fi>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260609075417.1160702-1-xiuzhuo.shang@oss.qualcomm.com>
+ <20260610064232.2385866-1-xiuzhuo.shang@oss.qualcomm.com> <CAMRc=MdojC6T1RuqRNE-ssoRw1pKyUHyOS9AD0ROfCpPPOqw1A@mail.gmail.com>
+ <c0eee7b4-50ee-4635-b8d6-fe9cb4ea05a8@oss.qualcomm.com>
+In-Reply-To: <c0eee7b4-50ee-4635-b8d6-fe9cb4ea05a8@oss.qualcomm.com>
+From: Bartosz Golaszewski <brgl@kernel.org>
+Date: Wed, 10 Jun 2026 10:17:38 +0200
+X-Gmail-Original-Message-ID: <CAMRc=Mfiedea-sjp_c7OHcgwXSY2NWHHx1ZhcF0qHk9qL8yx2g@mail.gmail.com>
+X-Gm-Features: AVVi8Ccm_OV-7Z3UodygMzh6-MiEsifxELJBKPIHj2hdMprATO4EGMaRr9pt9Ek
+Message-ID: <CAMRc=Mfiedea-sjp_c7OHcgwXSY2NWHHx1ZhcF0qHk9qL8yx2g@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: qca: Add BT FW build version to kernel log
+To: Xiuzhuo Shang <xiuzhuo.shang@oss.qualcomm.com>
+Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com, 
+	quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com, 
+	shuai.zhang@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com, 
+	jinwang.li@oss.qualcomm.com, 
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-this check is for ep (struct bt_bap_endpoint) that is used only for 
-unicast. broadcasts use different state in struct bt_bap_stream, so it 
-should be OK
-
-On 6/10/26 00:15, Pauli Virtanen wrote:
-> ti, 2026-06-09 kello 23:11 +0200, Simon Mikuda kirjoitti:
->> stream_io_disconnected() only handled the Releasing state, leaving
->> Enabling, Streaming and Disabling ASEs stuck when the CIS was lost
->> unexpectedly. The ASE shall autonomously move to QoS Configured on loss
->> of the CIS and notify the peer; add that transition.
->>
->> Fixes PTS test BAP/USR/SCC/BV-167-C
->> ---
->>   src/shared/bap.c | 8 ++++++++
->>   1 file changed, 8 insertions(+)
->>
->> diff --git a/src/shared/bap.c b/src/shared/bap.c
->> index deb85b264..350ed53d9 100644
->> --- a/src/shared/bap.c
->> +++ b/src/shared/bap.c
->> @@ -6779,6 +6779,14 @@ static bool stream_io_disconnected(struct io *io, void *user_data)
->>   	if (stream->ep->state == BT_ASCS_ASE_STATE_RELEASING)
->>   		stream_set_state(stream, BT_BAP_STREAM_STATE_CONFIG);
->>   
->> +	/* On loss of the CIS the ASE shall autonomously transition to QoS
->> +	 * Configured and notify the peer.
->> +	 */
->> +	if (stream->ep->state == BT_ASCS_ASE_STATE_STREAMING ||
->> +			stream->ep->state == BT_ASCS_ASE_STATE_ENABLING ||
->> +			stream->ep->state == BT_ASCS_ASE_STATE_DISABLING)
->> +		stream_set_state(stream, BT_BAP_STREAM_STATE_QOS);
->> +
->>   	bt_bap_stream_set_io(stream, -1);
->>   	return false;
->>   }
-> iirc it may be also broadcast source here, does it do the right thing?
+On Wed, Jun 10, 2026 at 9:36=E2=80=AFAM Xiuzhuo Shang
+<xiuzhuo.shang@oss.qualcomm.com> wrote:
 >
+> Hi Bart,
+>
+> The main change in v2 was the commit message =E2=80=94 I added the motiva=
+tion and an example log line as
+>
+> Paul requested on v1. Carrying your Acked-by (given on v1) forward was ju=
+st to avoid losing it. So
+>
+> v2 wasn't sent solely to collect a tag.
+>
+
+Well, I don't know it because you didn't add a changelog to v2. Please
+add something like "Changes in v2:" in the future.
+
+Bartosz
