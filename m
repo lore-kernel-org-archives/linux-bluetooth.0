@@ -1,139 +1,126 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E55377031
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 06:43:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675D837D118
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 06:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781073832; cv=none; b=Cm82GCBDM8WUd6+aB3NVIimooRB5L5Fmkk+iBObJn7AfUXor84GJmsOf+LgPTL+SxLqkKUMfy3S/xFYjMeWFSVC8ZLw18kSu5r6jH1gOaIaJ66zAWL0c7L132XMQqtE7QeNmDaobcVRnsajnP9s8WlLxu2sT4NpRyVjbntT3pZw=
+	t=1781074367; cv=none; b=BTkZ0VEOQK8P2hPdI5oaEQmSawVawtCidD+VxON38NVvHQs1KXduifqnYC5ti6U3L3UnoXSQDP+k2Ehm7f8MMkjY/EwlMJ9Sw5Qm7c4s8etykKfmbMh102ebgQJhM8Hg2XIEVdfYCZq7lo6EPd1UEeHDVZlY2KdjG2X65f2rGu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781073832; c=relaxed/simple;
-	bh=P8MXJH4jiVdlq4ROMB77XBf0uWf6NqtO0PAQ74FlQZ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oAAGbjcPfuVig/CUwRnONHqs9xG4xWS7PrzASbyZLBp9oJNHfGKWGFNmuze0BNjxg9O4QY0yuK2rC6F+2Q0KICXBwyzNuOYmjhFWBWqiABGOAXc+N3AEscHIj6zSrnt+3UbXrrkXkrtnZ8XYvuQy9Q12y/fqn3OlihDHekPaHFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QAYjCGao; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1781074367; c=relaxed/simple;
+	bh=vOnGpFzXQy6Ue55vjQTHyr5ELkmmon8dURMGdcmFhq4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YqtjTHrgWQpzjsrq69CtiqEydwu9pGPMzDgL9v+MTRM6te1RUeWvIJTbgk4GueLdf8vXY5VC/BJy742ZWURSIzbyHl+mN4wUgoMFKWOqgVYghVqpBHaUFhL9hTBPAQ/YfeUT7R6d2XLlKu9tfmm4tMBWzpVyoIFaQBeA/aWkBI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lw/Zxtk/; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QAYjCGao"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c85825bbc4fso3875448a12.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 23:43:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781073830; x=1781678630; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z+1LSkSiRz8zCBnMMY+UJOT/B2iSGc2AMMXb8SeE7pw=;
-        b=QAYjCGaoo2Q+TuNvwecKcbUZ6BgV3uoOOTh8ODdY4LONGL2SneJZyjFOcGHCldOudJ
-         X4hWsV4/IPEcReIuEmBkNphQ6aXpc4zJ/YNz2GX1rGDdb6QWoBWwPvjFbWXSnlBVakq2
-         TEM3ZwV3gvULw5Hrsx1BLN9wGv/oC2Pw4Umq+LfnjF5n+1n61w+hAznMZgfJzTBp75A3
-         ypzZH8W2Kd0rOCLQVvyajRcT2mDKmy21v//qoUMfVWShPa/GFo5adKvI7JYo81FDLecu
-         AWPA/02UcvHo3cAtO67Ivub12TigxkB72Xoch+AI5R1UbzVzWDE8as+K9jhwCbd1HX1O
-         I36g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781073830; x=1781678630;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z+1LSkSiRz8zCBnMMY+UJOT/B2iSGc2AMMXb8SeE7pw=;
-        b=qcFQioW6YzC2fB5BMLD6PvYDDdZ6YY2HSVPnoSrQWDdSeGLsrHR2PAiQ6iSpWO2rEQ
-         /dKytfL/Ult16tHFb8cUiena4uXY6aY1hNtGIZWlqx55F5/Rz53x6uskvantjwzyawn9
-         Ln9wdIDOVmQb8QtWyTwxmJKoke+nprk7bK8IAnth89WnX6jhJlUHrJaZNUe3wv+Hl5Or
-         ZxqznpkAh45r2FzdSBJ0CehYzrxadhwxp7Z99h25I1cJUx1qZXblqN+0bfmGClnlsBj5
-         /tccfveQzMpCkZE68PkauqTrmXKsPb/tbsC6NfduzZvJGq73SpKnFJ/XJZn7F+sVLsGW
-         pb+Q==
-X-Forwarded-Encrypted: i=1; AFNElJ//jijD8VIGUMCMmkv93x8AE1c91co9i8+BOvv/vwaboxwA45b0nJ0I2dXHS5CEBQPNcjsFa4VCeCyknPexrsc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx++mydbNowvDH6ItTY654QT2EH//+N1rYURWcYPydfRm6Uphxq
-	50qcNiiFm7cJ1q8zMm+pSDQkXChNQrAoajus2izvS5drpYZo7LurG7UIMzkIEhVeg11w9g==
-X-Gm-Gg: Acq92OFJfrmMqfC5Lur/sBGH8LHmL/jc3sr8lIeQvsmUNRvEKDKmf7K6eIujJZU9iuL
-	fFP9+v5FM5AumPZQcsu6R+YOY+SucKAyTvFPilUID8deA0l9Q/OHu4DAL4kZV1tdzJZTMmoydob
-	Ho1e8HPzLPfHEGRTvbK18lAdDvYSaRAbnWcJHy32N9oDzS/uGwwEMlJ0ztchHdMHNnRa6wZkIyn
-	7q8Ryds/1Z4oppZ3aqmd83B4crsJ2B+rvmItvf5fXkLGR+RUptMjJIRGqPV99aYSPFvwGeofyTN
-	DwCoR6iVddUmAGl+jlf3ckldZTi3Le7o0wdAxTQj0OAMTfbLfyrRSU2sT0Mj5xMJksOtGh/GLnS
-	XpYSHIY2aO+sUH+TuXOVeGJFCXbp44AeDSoqb3jqh3x8ZOKIMaUpBI/VdTYLX2uE1fTVPacD61k
-	eXv3CGXm/2TwfQWQkjLYfmRU/vOris6gBi3xGGWq+vY+pzMgq67Q5UGvwNnOKNeZXogvCTk7UFN
-	qN1Da1xne00E2EY10HgjlVjeQ==
-X-Received: by 2002:a17:903:2342:b0:2bf:1fbd:b946 with SMTP id d9443c01a7336-2c1e7898d9cmr245728775ad.0.1781073830129;
-        Tue, 09 Jun 2026 23:43:50 -0700 (PDT)
-Received: from secrnd-cstp.tailb7f510.ts.net ([125.131.91.97])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f6d389sm225331355ad.16.2026.06.09.23.43.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 23:43:49 -0700 (PDT)
-From: Sanghyun Park <sanghyun.park.cnu@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Sanghyun Park <sanghyun.park.cnu@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: SCO: Fix use-after-free in sco_conn_ready() connect path
-Date: Wed, 10 Jun 2026 15:43:09 +0900
-Message-ID: <20260610064309.591113-2-sanghyun.park.cnu@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lw/Zxtk/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29AAE1F0089A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 06:52:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781074365;
+	bh=gp7gs+XC0EzFwQ29+WJ2/FdyGtwF8lME7kmYDPgSmxU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=lw/Zxtk/uYBjSvZYWFj6HdIOEj+NSHDSM7Z42xZclJNvYzAOKkJlN3S4ZX1iYYLfa
+	 xQ7XK3CCGbC0AAf5fQOPf5l4kbcwJkt5J3000ORpx7Kt0Kvnm+nAOnnF7t/dZbioAv
+	 v8B+ewve1MWTUuFEejffYYPdmStl0WBwgRTir9pfL96l7yR5cu4oStHagQ+Im6O/yS
+	 o20fgBTPEBAmVnXV1dy15i5M2RxfJuzkXgW/FGjJXfhyvLQKdsZOUoItpXu5HxCjn8
+	 Y56NYqxRGpOvv2o2dMebqi+y/CEIuH9KHZAK2TmrWgZMUhfUPWbSq4GvH9M4UxcSBS
+	 c97GPUlCxoz8g==
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-39676ff4674so58762051fa.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 23:52:45 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+Khm4Y+3r1NLm6Jg+LyF4QQRoBo409t38Mmm952jkqXYb8x7K8Re3+SjyMgmfS2ItjhGGRnQ9FHnRFHPi+Kx4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytoJACs+pNDjpzPVQvx0jt1WA7vChAHgdbecjRPQGJ3JXFPnH5
+	QmueQ8iaXpm5jn/Z73PJb878UuKGRT1pMtzjrPd0TODYucVnx2nPJQLjKZkymoafGMymroCpf63
+	/lotQoCKuFPPbcClt/lKVFUaHNcfHuB4=
+X-Received: by 2002:a05:651c:2116:b0:396:71a5:783 with SMTP id
+ 38308e7fff4ca-396d08af1c7mr65181281fa.10.1781074363645; Tue, 09 Jun 2026
+ 23:52:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260609121329.1262170-1-senozhatsky@chromium.org>
+In-Reply-To: <20260609121329.1262170-1-senozhatsky@chromium.org>
+From: Sean Wang <sean.wang@kernel.org>
+Date: Wed, 10 Jun 2026 01:52:31 -0500
+X-Gmail-Original-Message-ID: <CAGp9LzpBUReZtrTEKgUr-+yvB+3tcs5hw7ziC4WaMRFNa2AYpg@mail.gmail.com>
+X-Gm-Features: AVVi8CfFDZy0_kkkc64au-27MTcEf01nNZPOagVpGocBD_aPXkss6uRWyZD9Xok
+Message-ID: <CAGp9LzpBUReZtrTEKgUr-+yvB+3tcs5hw7ziC4WaMRFNa2AYpg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btmtksdio: fix infinite loop in btmtksdio_txrx_work()
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Mark-yw Chen <mark-yw.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, 
+	Tomasz Figa <tfiga@chromium.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-sco_conn_ready() reads conn->sk without holding the connection lock or
-taking a socket reference. A concurrent close() can detach and free that
-socket before sco_conn_ready() calls lock_sock(sk), resulting in a
-use-after-free.
+Hi,
 
-Fix this by taking the connection lock and using sco_sock_hold() to read
-conn->sk with a reference held before calling lock_sock(). Drop the
-reference with sock_put() after releasing the socket lock.
+On Tue, Jun 9, 2026 at 7:19=E2=80=AFAM Sergey Senozhatsky
+<senozhatsky@chromium.org> wrote:
+>
+> Every once in a while we see a hung btmtksdio_flush() task:
+>
+>  INFO: task kworker/u17:0:189 blocked for more than 122 seconds.
+>  __cancel_work_timer+0x3f4/0x460
+>  cancel_work_sync+0x1c/0x2c
+>  btmtksdio_flush+0x2c/0x40
+>  hci_dev_open_sync+0x10c4/0x2190
+>  [..]
+>
+> It all boils down to incorrect time_is_before_jiffies() usage in
+> btmtksdio_txrx_work().  The btmtksdio_txrx_work() loop is expected
+> to be terminated if running for longer than 5*HZ.  However the
+> timeout check is twisted:  time_is_before_jiffies(old_jiffies + 5*HZ)
+> evaluates to true when old_jiffies + 5*HZ is in the past i.e. when a
+> timeout has occurred.  Using OR with time_is_before_jiffies(txrx_timeout)
+> means that:
+> - before the 5-second timeout: the condition is `int_status || false`,
+>   so it loops as long as there are pending interrupts.
+> - after the 5-second timeout: the condition becomes `int_status || true`,
+>   which is always true.
+>
+> When the loop becomes infinite btmtksdio_txrx_work() loop never
+> terminates and never releases the SDIO host.
+>
+> Fix loop termination condition to actually enforce a 5*HZ timeout.
+>
+> Fixes: 26270bc189ea4 ("Bluetooth: btmtksdio: move interrupt service to wo=
+rk")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> ---
+>  drivers/bluetooth/btmtksdio.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.=
+c
+> index 5b0fab7b89b5..c6f80c419e90 100644
+> --- a/drivers/bluetooth/btmtksdio.c
+> +++ b/drivers/bluetooth/btmtksdio.c
+> @@ -620,7 +620,7 @@ static void btmtksdio_txrx_work(struct work_struct *w=
+ork)
+>                         if (btmtksdio_rx_packet(bdev, rx_size) < 0)
+>                                 bdev->hdev->stat.err_rx++;
+>                 }
+> -       } while (int_status || time_is_before_jiffies(txrx_timeout));
+> +       } while (int_status && time_is_after_jiffies(txrx_timeout));
 
-Race:
+yes, loop continues only while there is interrupt work and the timeout
+deadline is still in the future
 
-  CPU0 (hci_rx_work)                 CPU1 (userspace close)
-  ============================       ==========================
-  sco_conn_ready(conn):
-    sk = conn->sk
-                                     close(sco_fd)
-                                       sco_sock_release()
-                                         sco_sock_close()
-                                           __sco_sock_close()
-                                             sco_chan_del()
-                                               conn->sk = NULL
-                                         sock_orphan()
-                                         sco_sock_kill()
-                                           sock_put(sk) -> frees sk
-    lock_sock(sk)
-    // UAF: sk may already be freed
+Reviewed-by: Sean Wang <sean.wang@mediatek.com>
 
-Signed-off-by: Sanghyun Park <sanghyun.park.cnu@gmail.com>
----
- net/bluetooth/sco.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Thanks for fixing this long-standing  issue.
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 6383db54657..c2c4b5a5b82 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -1306,16 +1306,21 @@ static int sco_sock_release(struct socket *sock)
- static void sco_conn_ready(struct sco_conn *conn)
- {
- 	struct sock *parent;
--	struct sock *sk = conn->sk;
-+	struct sock *sk;
- 
- 	BT_DBG("conn %p", conn);
- 
-+	sco_conn_lock(conn);
-+	sk = sco_sock_hold(conn);
-+	sco_conn_unlock(conn);
-+
- 	if (sk) {
- 		lock_sock(sk);
- 		sco_sock_clear_timer(sk);
- 		sk->sk_state = BT_CONNECTED;
- 		sk->sk_state_change(sk);
- 		release_sock(sk);
-+		sock_put(sk);
- 	} else {
- 		sco_conn_lock(conn);
- 
--- 
-2.48.1
+>
+>         /* Enable interrupt */
+>         if (bdev->func->irq_handler)
+> --
+> 2.54.0.1064.gd145956f57-goog
+>
+>
