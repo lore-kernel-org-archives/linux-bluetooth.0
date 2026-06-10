@@ -1,69 +1,73 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE5F3AC00;
-	Wed, 10 Jun 2026 06:43:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E55377031
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 06:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781073787; cv=none; b=c7dFdzjlB8R1kk+34zYtkcQjuFxxMRgmc4kE2tSQCsIPmWGZ00cqf5gF+0VP3UbYng1IJ0u+YSVpwot1ZzZvTDnAMzoDO4N8vgUPmUXRG9G6zncJGWrM1DdiMiWKxunS+9T4tzh0MMR5OkesfjPksLb3lhkTV+k7LzHlb32iB8c=
+	t=1781073832; cv=none; b=Cm82GCBDM8WUd6+aB3NVIimooRB5L5Fmkk+iBObJn7AfUXor84GJmsOf+LgPTL+SxLqkKUMfy3S/xFYjMeWFSVC8ZLw18kSu5r6jH1gOaIaJ66zAWL0c7L132XMQqtE7QeNmDaobcVRnsajnP9s8WlLxu2sT4NpRyVjbntT3pZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781073787; c=relaxed/simple;
-	bh=HN7bfMFw4GGzj46CZbfoOD9OP4+EHA8cTT47FIisQ4Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=klqS+SSSc/WeAHrHtVE/Uu8reTbygw5H8n+wj0ibQTqw5B1eY85k0BKs7raNjH7sF27L/8murpm8myaP/rrh/xY3FGcUsRwOxDYDsN752P1yl+pXtfZhTuzzWO+NztC8wkkRQ2D7vs8K+3cXgeZpvyLGj1PTYv49Xdcjk5yrqvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=U55sLG0V; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1781073832; c=relaxed/simple;
+	bh=P8MXJH4jiVdlq4ROMB77XBf0uWf6NqtO0PAQ74FlQZ0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oAAGbjcPfuVig/CUwRnONHqs9xG4xWS7PrzASbyZLBp9oJNHfGKWGFNmuze0BNjxg9O4QY0yuK2rC6F+2Q0KICXBwyzNuOYmjhFWBWqiABGOAXc+N3AEscHIj6zSrnt+3UbXrrkXkrtnZ8XYvuQy9Q12y/fqn3OlihDHekPaHFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QAYjCGao; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="U55sLG0V"
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65A2ei654061021;
-	Wed, 10 Jun 2026 06:43:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=TKnsWr9jxQi
-	JH5It4e8qmbTuS+kOI3sS3apHM+UCRDc=; b=U55sLG0VkLDwesKl1gjOwfD/Dl9
-	nXQRaxpAiSTlKiJqHozEe0q4oftB00gmtYNd/lwjw5HgA5QrdkmstZ6sFYHlZEFO
-	ryZP2Sz1Vpf2H9J9e+i1vC0E0qnVN2P7ucMGdu6cC7FLWppgLLE7X6w65Tkaxkjd
-	igpgV+btpAu+FJeJNdBdIgtRZV23N2E4r0wN7DX1Y90kQNO7IxZL9kwQyUK+DXMM
-	knYgQDJqUpp4vBF/VCn8hzslpnH1PVCCYVeJZKMF8aco2bkogIl4OAFIYqnTX7lt
-	cRFBvw1bcJRELjqPyv30xrfysahEzHWJx8yKfLlZUO9jUi4ceVkxxq3e6xA==
-Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4epwnh14ut-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Jun 2026 06:43:00 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.7/8.18.1.7) with ESMTP id 65A6gwWx025215;
-	Wed, 10 Jun 2026 06:42:58 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 4emcmjnngg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Jun 2026 06:42:58 +0000 (GMT)
-Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 65A6gwL4025202;
-	Wed, 10 Jun 2026 06:42:58 GMT
-Received: from bt-iot-sh03-lnx.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 65A6gvO9025200
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Jun 2026 06:42:58 +0000 (GMT)
-Received: by bt-iot-sh03-lnx.qualcomm.com (Postfix, from userid 2385805)
-	id 0541F4339C; Wed, 10 Jun 2026 14:42:57 +0800 (CST)
-From: Xiuzhuo Shang <xiuzhuo.shang@oss.qualcomm.com>
-To: Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
-        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
-        shuai.zhang@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com,
-        jinwang.li@oss.qualcomm.com, xiuzhuo.shang@oss.qualcomm.com,
-        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Subject: [PATCH v2] Bluetooth: qca: Add BT FW build version to kernel log
-Date: Wed, 10 Jun 2026 14:42:32 +0800
-Message-ID: <20260610064232.2385866-1-xiuzhuo.shang@oss.qualcomm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260609075417.1160702-1-xiuzhuo.shang@oss.qualcomm.com>
-References: <20260609075417.1160702-1-xiuzhuo.shang@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QAYjCGao"
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c85825bbc4fso3875448a12.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jun 2026 23:43:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781073830; x=1781678630; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z+1LSkSiRz8zCBnMMY+UJOT/B2iSGc2AMMXb8SeE7pw=;
+        b=QAYjCGaoo2Q+TuNvwecKcbUZ6BgV3uoOOTh8ODdY4LONGL2SneJZyjFOcGHCldOudJ
+         X4hWsV4/IPEcReIuEmBkNphQ6aXpc4zJ/YNz2GX1rGDdb6QWoBWwPvjFbWXSnlBVakq2
+         TEM3ZwV3gvULw5Hrsx1BLN9wGv/oC2Pw4Umq+LfnjF5n+1n61w+hAznMZgfJzTBp75A3
+         ypzZH8W2Kd0rOCLQVvyajRcT2mDKmy21v//qoUMfVWShPa/GFo5adKvI7JYo81FDLecu
+         AWPA/02UcvHo3cAtO67Ivub12TigxkB72Xoch+AI5R1UbzVzWDE8as+K9jhwCbd1HX1O
+         I36g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781073830; x=1781678630;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z+1LSkSiRz8zCBnMMY+UJOT/B2iSGc2AMMXb8SeE7pw=;
+        b=qcFQioW6YzC2fB5BMLD6PvYDDdZ6YY2HSVPnoSrQWDdSeGLsrHR2PAiQ6iSpWO2rEQ
+         /dKytfL/Ult16tHFb8cUiena4uXY6aY1hNtGIZWlqx55F5/Rz53x6uskvantjwzyawn9
+         Ln9wdIDOVmQb8QtWyTwxmJKoke+nprk7bK8IAnth89WnX6jhJlUHrJaZNUe3wv+Hl5Or
+         ZxqznpkAh45r2FzdSBJ0CehYzrxadhwxp7Z99h25I1cJUx1qZXblqN+0bfmGClnlsBj5
+         /tccfveQzMpCkZE68PkauqTrmXKsPb/tbsC6NfduzZvJGq73SpKnFJ/XJZn7F+sVLsGW
+         pb+Q==
+X-Forwarded-Encrypted: i=1; AFNElJ//jijD8VIGUMCMmkv93x8AE1c91co9i8+BOvv/vwaboxwA45b0nJ0I2dXHS5CEBQPNcjsFa4VCeCyknPexrsc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx++mydbNowvDH6ItTY654QT2EH//+N1rYURWcYPydfRm6Uphxq
+	50qcNiiFm7cJ1q8zMm+pSDQkXChNQrAoajus2izvS5drpYZo7LurG7UIMzkIEhVeg11w9g==
+X-Gm-Gg: Acq92OFJfrmMqfC5Lur/sBGH8LHmL/jc3sr8lIeQvsmUNRvEKDKmf7K6eIujJZU9iuL
+	fFP9+v5FM5AumPZQcsu6R+YOY+SucKAyTvFPilUID8deA0l9Q/OHu4DAL4kZV1tdzJZTMmoydob
+	Ho1e8HPzLPfHEGRTvbK18lAdDvYSaRAbnWcJHy32N9oDzS/uGwwEMlJ0ztchHdMHNnRa6wZkIyn
+	7q8Ryds/1Z4oppZ3aqmd83B4crsJ2B+rvmItvf5fXkLGR+RUptMjJIRGqPV99aYSPFvwGeofyTN
+	DwCoR6iVddUmAGl+jlf3ckldZTi3Le7o0wdAxTQj0OAMTfbLfyrRSU2sT0Mj5xMJksOtGh/GLnS
+	XpYSHIY2aO+sUH+TuXOVeGJFCXbp44AeDSoqb3jqh3x8ZOKIMaUpBI/VdTYLX2uE1fTVPacD61k
+	eXv3CGXm/2TwfQWQkjLYfmRU/vOris6gBi3xGGWq+vY+pzMgq67Q5UGvwNnOKNeZXogvCTk7UFN
+	qN1Da1xne00E2EY10HgjlVjeQ==
+X-Received: by 2002:a17:903:2342:b0:2bf:1fbd:b946 with SMTP id d9443c01a7336-2c1e7898d9cmr245728775ad.0.1781073830129;
+        Tue, 09 Jun 2026 23:43:50 -0700 (PDT)
+Received: from secrnd-cstp.tailb7f510.ts.net ([125.131.91.97])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f6d389sm225331355ad.16.2026.06.09.23.43.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jun 2026 23:43:49 -0700 (PDT)
+From: Sanghyun Park <sanghyun.park.cnu@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Sanghyun Park <sanghyun.park.cnu@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: SCO: Fix use-after-free in sco_conn_ready() connect path
+Date: Wed, 10 Jun 2026 15:43:09 +0900
+Message-ID: <20260610064309.591113-2-sanghyun.park.cnu@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,58 +75,65 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEwMDA2MSBTYWx0ZWRfXxb7koRghlkDz
- mqiBRgJvYmPYWuVKtIV/Le5+Q+90ouX89RPQj+xxcOfXEa8hCbPz8IOspcN6lLVx6+LMel73A4v
- PKHL6HmZO8LDUB1JaP46NDUhb5deaofBuUhcwL7wSMTbl3exuSE1aVLfhk+NBsZ3Ayzf57VLXWT
- 6CImGpeq+pxOOXH2nQibsfGm438t85ZlR7SiuCjnX796yL9/0n4/WrFgX/MSnuDzEBwjc1GJdm5
- bnywSvM9wLKrjqqauYtw8rHbZM1PUkcTvg4Wtys9P1NyKye8a8gRmJmDOy3WFAYJnrkZiYDb2NQ
- DvyriuuqUXdm3/YV6bzkF6FaxyvpntVuwXoGiNXGgYyKMnv0WS2rHkmhe1AO0N1KWuGAxFhn9N+
- kvkBTg7yyxG8fC5XwA7Gx1yNaMKkgm8uLy1CXZTzvVM0XV/YA4XI0tOvNaWg1JGJpgTHpmIVQdS
- p52bpGo0ctG07pLT+7A==
-X-Authority-Analysis: v=2.4 cv=Xce5Co55 c=1 sm=1 tr=0 ts=6a290774 cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=eoimf2acIAo5FJnRuUoq:22 a=EUspDBNiAAAA:8 a=M_F3e0kD36ftvvs9-vUA:9
-X-Proofpoint-ORIG-GUID: 4FDwjlsF8H4w0fG3EC-sGY9JlPIRBcMw
-X-Proofpoint-GUID: 4FDwjlsF8H4w0fG3EC-sGY9JlPIRBcMw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-10_01,2026-06-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 phishscore=0 malwarescore=0 impostorscore=0 adultscore=0
- priorityscore=1501 lowpriorityscore=0 suspectscore=0 bulkscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606100061
 
-Firmware version is critical for bug triage. Users reporting issues
-typically share dmesg output rather than debugfs contents, requiring
-extra communication rounds to collect this information. Log the FW
-build version directly to the kernel log so it is immediately
-available in bug reports.
+sco_conn_ready() reads conn->sk without holding the connection lock or
+taking a socket reference. A concurrent close() can detach and free that
+socket before sco_conn_ready() calls lock_sock(sk), resulting in a
+use-after-free.
 
-Acked-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Signed-off-by: Xiuzhuo Shang <xiuzhuo.shang@oss.qualcomm.com>
+Fix this by taking the connection lock and using sco_sock_hold() to read
+conn->sk with a reference held before calling lock_sock(). Drop the
+reference with sock_put() after releasing the socket lock.
+
+Race:
+
+  CPU0 (hci_rx_work)                 CPU1 (userspace close)
+  ============================       ==========================
+  sco_conn_ready(conn):
+    sk = conn->sk
+                                     close(sco_fd)
+                                       sco_sock_release()
+                                         sco_sock_close()
+                                           __sco_sock_close()
+                                             sco_chan_del()
+                                               conn->sk = NULL
+                                         sock_orphan()
+                                         sco_sock_kill()
+                                           sock_put(sk) -> frees sk
+    lock_sock(sk)
+    // UAF: sk may already be freed
+
+Signed-off-by: Sanghyun Park <sanghyun.park.cnu@gmail.com>
 ---
-Example output:
-  Bluetooth: hci0: QCA FW build version: BTFW.MOSELLE.1.1.3-00106-MSL_PATCHZ-1
- drivers/bluetooth/btqca.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/bluetooth/sco.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index dda76365726f..04ebe290bc78 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -143,6 +143,8 @@ static int qca_read_fw_build_info(struct hci_dev *hdev)
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 6383db54657..c2c4b5a5b82 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -1306,16 +1306,21 @@ static int sco_sock_release(struct socket *sock)
+ static void sco_conn_ready(struct sco_conn *conn)
+ {
+ 	struct sock *parent;
+-	struct sock *sk = conn->sk;
++	struct sock *sk;
  
- 	hci_set_fw_info(hdev, "%s", build_label);
+ 	BT_DBG("conn %p", conn);
  
-+	bt_dev_info(hdev, "QCA FW build version: %s", build_label);
++	sco_conn_lock(conn);
++	sk = sco_sock_hold(conn);
++	sco_conn_unlock(conn);
 +
- 	kfree(build_label);
- out:
- 	kfree_skb(skb);
+ 	if (sk) {
+ 		lock_sock(sk);
+ 		sco_sock_clear_timer(sk);
+ 		sk->sk_state = BT_CONNECTED;
+ 		sk->sk_state_change(sk);
+ 		release_sock(sk);
++		sock_put(sk);
+ 	} else {
+ 		sco_conn_lock(conn);
+ 
 -- 
-2.43.0
-
+2.48.1
