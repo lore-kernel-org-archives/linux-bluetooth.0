@@ -1,168 +1,114 @@
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141934028E8
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 13:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781096798; cv=pass; b=WoqWRKnBOedw0yYHNBe1hyhb2qoVdPiD+x/XHYUBlnei0747St5nHxYNRaAUKsqWA/jCjXTa2z2d6eq5iq3mhkg0OXpdnaSsRQnMEd4mZ+EAtVa2NxOesE9mw6ANFWC5N8d/4mJbwozqk27jayzFp8r1VcZCwNPmaA/6ZvArhD8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781096798; c=relaxed/simple;
-	bh=FON1CoKM0rF1uFhumS7et83MHpk9d5AZyBQCPyEfjKY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j0cogrC3/Aw32jzBI8R7HKbFzkPsQbeicE9ndgrh4ijJSqQ0oXSjJJFiuNOt4iVFepx4+5p2CrPMCfB1KkwngHVyJJLC7e9cYUUyUmCLKDZg/QzYOBvzzsVfgZ2WY0xzEGK8UFEiVvJs42If/P8mRy37R2Np9vhODxrXxybvQAg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GQr4PeJm; arc=pass smtp.client-ip=74.125.224.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B43437F8D6
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 13:07:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781096858; cv=none; b=QI1h9s3CzfDUguROSw4T0aPZctiJmNVUwXwHNagaGio4Z+2nGJBleaXDt9/ofeufcu+q/NuPhpDYyJJ3CGenwFT4xIcOqoCT9semAOEIbUqJJ6XeKGi3xUgzjiqNvIVQBLLAz8+rj+VTurStAInJBX7mmuGd3t5PlURL2dUI1SQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781096858; c=relaxed/simple;
+	bh=/TYS/6pwP8Z+vcQdTyI0NcBOM1/FRDWLjWRbltWe7EM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DAUTkt5LfRhsHMA4lSWTJMs+ZTabuGuqbfCaWYZocPPVVD2BgVINn27NL9lOXXE2ptjlQ4pK93xoA373ZAbTmLACq/5X8nlfeeOpycGkagbjYDJU5aNZdEfxERDQqIbeQjeDeo7BjuGzF39VmOkRIisc0Od30gXkwY7ZM026BF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=QsrsYSiS; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=BGetkHBZ; arc=none smtp.client-ip=202.12.124.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GQr4PeJm"
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-66077c46c5cso5992196d50.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 06:06:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781096796; cv=none;
-        d=google.com; s=arc-20240605;
-        b=GS9YXzAaKIVmQrGKFx+ggbc40FFvyRimwzdb4lFFana3Vn6PVOV9XOQhOgKqDWLUDl
-         L4YJCCjd0fCtrDHEsku7mNBJ6FLC46f0ECHpol9xAdSETLodQZm8DplXTHd4HORGHNMz
-         EhFzfGhnn3PqxS+amrYLoiVld+P0j2D1bSLyptCalbNUrzyAzQHx+CqBdLrcoJOsnxBU
-         tySW4IC4JGCksEEfsEgtggAYKdTqVhRbUhhH2j4D05IoXUbwKPmlppmXL2RCz4UkuzSX
-         TLFcS6MyOkU8PjnrdAgYZNFXNfBIdh1DTgzTkYP/+rl/PWhv0BI5BeI0BuCm9H8vs7X9
-         e80g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=7wMnEXqbxoYhFkOWgFz+4A88tJVsu+eaTHJQLIWdC2o=;
-        fh=1lai2hMMrhvWubpUepE0bblohQpWi2VePt0uB1TFfOE=;
-        b=EBWkYKDv4iZuBW52xWMDnhc+eko5+pZE/i6pWHKb4EKN1fOhx83mBWT6G+6mz88/uR
-         zzaADBuKuUM7wCvyHS7/z8JiDiv7SC6i08+xi9/Ff8TF1QPwDDP7L0ot1XrovxHmrRVs
-         CKP3s7Jet+OHhTOtzbKEe/S051yzOhyhuJ9/aOxtZtwC3ZMt6BoRkmQ+3xPd3wnXNx7m
-         H/qfbF/W+vc185L5SefHTB8Zdibwrve/uwqlRPck2eepydz3uxHHDDGDKpzBCSvitskq
-         58J7IkbZJmMKOsUsYSHke8x+Voxn7CRVGwCOkGdY2bDAKwIgEUPGsEPGbxRvKlKoaOvd
-         1Y9g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781096796; x=1781701596; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7wMnEXqbxoYhFkOWgFz+4A88tJVsu+eaTHJQLIWdC2o=;
-        b=GQr4PeJmFWDYubkWswXKoeIvdX5i8j4nDvVUCWG3vE0Bga5Ed1I/DEWxU7ATNWVryf
-         YvSPeXnk5j1fdILGTuvzc7L4Tqq+GI3BqVCcP52iOtgvgBaTEe2gLQeY0USZZp0PmDRs
-         zxd0aHqydlBEO88Zg2JY7vqpHFt4vA/k3R4BAFfmF8TObgvybY9d2IOHvmCXTr2u1Tiv
-         2CPK4xDOVdkZ9xnAKId1FVKhfU/P2X0Gn89W+v/z+ZZD2azttsN4DkBI0H0VNiBHGI7t
-         Cbi8LqO7CKUk2l5NZepDGDn4WFWtm31DMWXbDsyWyWZPEEBt/XMp3ErKdAhSOiRDh77K
-         ZPaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781096796; x=1781701596;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7wMnEXqbxoYhFkOWgFz+4A88tJVsu+eaTHJQLIWdC2o=;
-        b=MOqqounmNWb7g8anKwjXnIVdQS2XuQ4v8HlNV/eeGJRdfnpCwA4ExebpMj3nkj8RVI
-         P0F8bwEYdUweo9YuQSNC48GYV2LsV2O16YrXGaDTSXQZT7hLJIJJGayv9PpG7cJ34dei
-         Gv5vdOSpD9hpwFaArkEhWF9ipWNShp/UvAZbfDSvhVQExVJV1iJWRf8UWslvuGEnuc6H
-         cH5aAvi7FSXbAhqipM21aMIqMJsZ7Hi+RSbZP5bUeHHXlbh8iaL+LicO5c8oH2ztfZt/
-         lgWZtCrl8kx7nK099udjRHkOG6F1NMw8UqINg4tImFY4hMLc16O/lJlJokmtMfuW9myh
-         nW+A==
-X-Forwarded-Encrypted: i=1; AFNElJ8ws2eRKa2dUNd41/A2Is1/fv70jFEvue1zFLIJzrwI4LbOcTEf+DASHypuW6u30UD0PDFG66mQmNKZlVmxL4I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMMg0DPI2wr8KmNZIAXQ7vIbVuZCmwG6Oqwz6cKLAbkPVo+a8R
-	DH2qcDZutvJRRAatjXgpYxJVhcXbTf4Jskege9ZsZw21Q1Accp4jxuwCVOXbdszB57nYv8RNIop
-	zKXLEHRU9GCm3Lxc/cuOLhTXv4tfzC8k=
-X-Gm-Gg: Acq92OGZ/aJ9ZywbNqHntQJc+NKy+mjFZmmvjR9nhl18AYy9191TfEbMBxbuvpRVjZf
-	Etvex8UPdBBaeW2ELdNoHtY4IHWSG6gSjrDuQs11sKFUaAgoQlWHDyGkVJ3hGzllrl459kJssjH
-	ayJVZZqUwWy+8yGI9T09QEBrTN++oCsMegmx8OqukrUamm1TWWKEkdMZs2+h+VBY8Rx+m6Wl+3Y
-	Fqsynh9cVC+kxrGaJ53OvN70OJJtyM+PxxMCF+wNDNxKpVGLdtIYf4F73RYj7taJuZCXp2rYwbr
-	Wrec/J+N1Lhi785uKrW/eWtpwmQVrD8rYkVBBqpCrtOx+7u/pji6I5AvcUvBGXDW+/2CQEMo9wc
-	aYg==
-X-Received: by 2002:a05:690e:134d:b0:651:c468:99a2 with SMTP id
- 956f58d0204a3-66108356e4emr23038007d50.45.1781096795910; Wed, 10 Jun 2026
- 06:06:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="QsrsYSiS";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="BGetkHBZ"
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 5D5CB7A016E;
+	Wed, 10 Jun 2026 09:07:35 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Wed, 10 Jun 2026 09:07:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1781096855; x=1781183255; bh=njZ7HCXA42R1pJaHWqCJ8
+	2cE/aCwZRjX4//xFw44ccQ=; b=QsrsYSiSRdyaJElzHPnKxkU6q9TGp7M0//HGY
+	M8qGSPl4XdNhU1Ou+WH9bSzSbV0zhjtpePZr0kXkJMX0+0DirTiW3N26mjyyWDnE
+	HpCt93H870qfQUxJi/1LneF1hhxmLDPHJjOk9oxXvjRlhQXS8xu9cEQhQA2q7pwL
+	r+fXVi0WYuSX7ejAvqsLoC2s7H/CF27aTcQ2UpC0UW7rSsFmRB6mcryI2NPWcYfT
+	bRUY7z+vgZbnDGA/boiWQdUIaithkGJ04kB6KSzIGL3rC97ykwxm74oRXs8Dw6mf
+	0o93SsFy4Kpgbgt7Qn5ZubbGELouWQU25clsQwzrMbJd63vCQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1781096855; x=1781183255; bh=njZ7HCXA42R1pJaHWqCJ82cE/aCwZRjX4//
+	xFw44ccQ=; b=BGetkHBZHiOJtWml85GSvD9dQslAca8BKLAD9IrJdGZriZVf6AE
+	+xs9aeTJL8sUxF3+rEhJfD5o6gDqXhbJS9Ym7PA+bVXWqehlksywsI0JNhOmgoWP
+	MCn5CcyWjC3Ua/rmSPG4i493p3ul/w5Qs71wchE2M6TwCk6ECKg0DeKh68LeR+aR
+	S17WyFvvw6q1tFKNTUhFlPADT1pz7Eq7/4DEgLg58AvOR/7OvLnjjwa47WEBQJUa
+	fsw5Di8fWAnS/6MEMLMjPFakNTGjdMZJ+jEMUmjTDJsuue7soKLhV0xroy6AEPzA
+	c3Uwzt3Wu/IqpWj4/0OU001mljQyqsTvE2g==
+X-ME-Sender: <xms:lmEpavifjCoFynUnD3pWke-b9ZjtTnrfC7umETEsY73zEQkULCb60w>
+    <xme:lmEpajfkCrDKW_h8XpW3mcC16Kk4c-1XpHKzinu1ZomOiOtZ_1YOMIXmOOhwZVi9t
+    5x8ZCb7Oky-4mHV__HzjAvhjSAGf0msj4fdlCheUDGhrNeaa9NTe_E>
+X-ME-Received: <xmr:lmEpased3gYGexVQ9-oNw5JYutAxc0CEKWYqSrnIPw6FoT74tEclqI8QLA_-a3ptzJQu5cg>
+X-ME-Proxy-Cause: dmFkZTGaBWgkyw+UyRMxZOB1n8e/cBQoxUgCwXBF4uCJDirP4sjMNzwMU9spFbRcgIFs44
+    p1jTLFYESGQXaP8IizUU1hLqRarzsdOdI1sS0T+1Qj54cqOJktp/4Y9c4XRmsmHmDMa9oT
+    XxH4sScS4BntM4De/IDrLNY8NgVAMTQzFPP+RFC5bkouTQHd0fMcVrvp74OcIjKchPWaDC
+    D/hjCvOpdcHeYz/sCnJ5NtM/nnjiwlSbTyNYooNJF0kE2Y2YCwZmeg1xsIOxG5BZlj6xo3
+    GASJiTo4Q1+mmWpMyTRW+ZXal6aZhIBkMG6QyPCsv06UG5vTRx4xQxn8qdp1LN5++9xCIb
+    i5err0LUUdOSWUknBEtTLHd1YemYpylpH8+NSwNt/Hq/sxkbK+o5zCFi9MjE/OaEexOAE8
+    4NOWOKU4Al8XhgksMTtvzPQ9wXAouv2eETj1dyOFEk/aBeNxsjNisMpSVCRnqNxnFARNai
+    dc/3eoQlU8YSvxEu03jyJPFn8i333MwkSq198q7l6TWSfgVo0ntwHORBbyx6Dsq3Css6aO
+    Hqt8uoW6omZ2Ko2bIKTw9lC6iEUu4LHQWhFvqhXJfm2VnWAhIuIWjXeEWHS/glwyUhPHZi
+    CpSRfiYPvpLCXQSPw4RIGC5kh323+lM6VuzVFHXjhYeLRgBXthqmoF9sMJTw
+X-ME-Proxy: <xmx:lmEpal97yNxrWkR-2Q8IEt3Tv7ZSVhk4h28xZhUDQn1CXrg1A08kOA>
+    <xmx:lmEpagldKahruBqwXPN55ZUS9Lti72Fnkmt08k95k6lP10ACa2EZiw>
+    <xmx:lmEpav8zEGAzzcIZbHMcKiehM3K3AGvI9QdM3L8ifVNugP1ip3KDUQ>
+    <xmx:lmEpamlHhPSVWvFsrkIt-zSdwN_A6Nmgu6_k-s_d3AEAAM_Ih-Kc2A>
+    <xmx:l2EpajdZlFJc8EVJEPEeTufizyFRNdrgbj_8Y2MTh3bRMQfO-huDx_Ck>
+Feedback-ID: if72e4b10:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 10 Jun 2026 09:07:34 -0400 (EDT)
+From: Siwei Zhang <oss@fourdim.xyz>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Siwei Zhang <oss@fourdim.xyz>
+Subject: [PATCH] Bluetooth: hci_conn: Fix null ptr deref in hci_abort_conn()
+Date: Wed, 10 Jun 2026 09:06:24 -0400
+Message-ID: <20260610130648.1091326-1-oss@fourdim.xyz>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260609211111.3887657-1-simon.mikuda@streamunlimited.com>
- <0744a915b7ea628647a17fa9aad0aa4365f83989.camel@iki.fi> <fa0febe1-5866-4a3f-9f86-ae70e9d4b22d@streamunlimited.com>
-In-Reply-To: <fa0febe1-5866-4a3f-9f86-ae70e9d4b22d@streamunlimited.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 10 Jun 2026 09:06:23 -0400
-X-Gm-Features: AVVi8Cc1fh8z4eAoiSiTBl7tDORY2MFrKaAJ1lZdY7eUFZnlokYaQB1jbl6gM_Q
-Message-ID: <CABBYNZKD7WGUpkQk94ruAnPw=ToGnChbRUjuBVTMJ7+fZ2M4vg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/bap: Don't link ucast streams before CIS IDs
- are assigned
-To: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Cc: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Simon,
+hci_abort_conn() reads hci_skb_event(hdev->sent_cmd) when a connection
+is pending, but hdev->sent_cmd can be NULL while req_status is still
+HCI_REQ_PEND, leading to a NULL pointer dereference and a general
+protection fault from the hci_rx_work() receive path.
 
-On Wed, Jun 10, 2026 at 3:51=E2=80=AFAM Simon Mikuda
-<simon.mikuda@streamunlimited.com> wrote:
->
-> I looked into it and 0 is valid ID (probably not used, but still valid).
->
-> There is a ugly part in bluez though, when stream is allocated cig and
-> cis in qos struct are 0 not 0xff:
->
-> stream =3D new0(struct bt_bap_stream, 1);   /* qos all-zero: cig/cis =3D =
-0 */
->
-> and also in tests there are some struct comparisons that also use
-> cig/cis =3D=3D 0. Some parts check for 0xff (BT_ISO_QOS_CIG_UNSET,
-> BT_ISO_QOS_CIS_UNSET)
+Check hdev->sent_cmd before dereferencing it.
 
-We should probably initialize it with unset and then check if CIS/CIG
-have been set upon linking.
+Fixes: a13f316e90fd ("Bluetooth: hci_conn: Consolidate code for aborting connections")
+Cc: stable@vger.kernel.org
+Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
+---
+ net/bluetooth/hci_conn.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> Maybe more clean fix would be to hook this up to state, so that when
-> CIG/CIS is not at least configured it is rejected e.g.:
->
-> if (stream->ep->state < BT_ASCS_ASE_STATE_QOS || link->ep->state <
-> BT_ASCS_ASE_STATE_QOS)
->          return -EINVAL;
->
-> Also probably i should cleanup all structs (code and tests), so that cig
-> and cis are initialized properly with 0xff. And then provide the fix?
->
-> On 6/10/26 00:03, Pauli Virtanen wrote:
-> > ti, 2026-06-09 kello 23:11 +0200, Simon Mikuda kirjoitti:
-> >> bap_ucast_io_link pairs streams whose CIG/CIS IDs match, but the IDs
-> >> are unset in Codec Configured state, so a Sink and Source bound for
-> >> different CISes get linked. The stray link later propagates a
-> >> disconnect to the wrong ASE and breaks Receiver Start Ready.
-> >>
-> >> Skip linking until QoS Configured assigns the IDs.
-> >>
-> >> Fixes PTS test BAP/USR/STR/BV-362-C
-> >> ---
-> >>   src/shared/bap.c | 6 ++++++
-> >>   1 file changed, 6 insertions(+)
-> >>
-> >> diff --git a/src/shared/bap.c b/src/shared/bap.c
-> >> index deb85b264..98537de60 100644
-> >> --- a/src/shared/bap.c
-> >> +++ b/src/shared/bap.c
-> >> @@ -2679,6 +2679,12 @@ static int bap_ucast_io_link(struct bt_bap_stre=
-am *stream,
-> >>                      stream->ep->dir =3D=3D link->ep->dir)
-> >>              return -EINVAL;
-> >>
-> >> +    /* Don't link until QoS Configured assigns the CIS IDs; while uns=
-et
-> >> +     * the check above would pair unrelated streams.
-> >> +     */
-> >> +    if (!stream->qos.ucast.cis_id || !link->qos.ucast.cis_id)
-> >> +            return -EINVAL;
-> > Zero is valid CIS ID?
-> >
-> >> +
-> >>      if (stream->client && !(stream->locked && link->locked))
-> >>              return -EINVAL;
-> >>
->
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 54eabaa46960..43fdacb2c9b2 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -3188,7 +3188,8 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
+ 	 * hci_connect_le serializes the connection attempts so only one
+ 	 * connection can be in BT_CONNECT at time.
+ 	 */
+-	if (conn->state == BT_CONNECT && READ_ONCE(hdev->req_status) == HCI_REQ_PEND) {
++	if (conn->state == BT_CONNECT && READ_ONCE(hdev->req_status) == HCI_REQ_PEND &&
++	    hdev->sent_cmd) {
+ 		switch (hci_skb_event(hdev->sent_cmd)) {
+ 		case HCI_EV_CONN_COMPLETE:
+ 		case HCI_EV_LE_CONN_COMPLETE:
+-- 
+2.54.0
 
-
---=20
-Luiz Augusto von Dentz
