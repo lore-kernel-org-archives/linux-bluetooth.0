@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8CA5356773
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 18:40:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C54358373
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jun 2026 18:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781116812; cv=none; b=iHwHr2iNe1uHy7ka8lObO70OlYk7P38rWsZ4iUbUoOZb6UZAz9+GhoCpCrz98akaxUW9F6jO2t5HQYzCgAO0UdbnyvTMj9EqUL0D+8ViP1RGJzOW/SjZKV/VgttN3sCWPIzKBNN1fKKvUGgVcNeBSLrj2uq6THglNS9TyX0XX7k=
+	t=1781116814; cv=none; b=FQztL6AusBwmr+CmbYIrX6Jcu9/ZlpmYKYxcRsBibhODl7iVIcORXfxl9u58tucGHGLuTBstpjpxhOyrvPnK4QLD3LhtmdTfJV7ZRmXH3i/+vhEouS+CKJ8zsi0aqf0OsH8aSNSfr/muxoP/qqVflEiMF9iA9mwgQb1c51enLfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781116812; c=relaxed/simple;
-	bh=ZtioOipYp1g6Eb56s+v6aFrZl2oG/ZRmGLOtZm4LWqk=;
+	s=arc-20240116; t=1781116814; c=relaxed/simple;
+	bh=+OXAsTGZJR1armlXto5Oxb7Vxc8Me+C64fDOYpM6Wks=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qESp9g/pY/r4rRoZOh1h6rSGwMph5j4R1B4SWtH39v8IHnD8xlS3MtLRa1dK9Dk8vixWqZi6FYsZZYOHIKX7NFm87vg7085jKUsLaW/fRnZIoCkZkwpdQc8Bl0/+6UCpzFAvjU534mQqNjGH6JrCUE0MUpvX9F7u8osUq7mrxCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DIdz7TLn; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=CWtIQn4g8Iq6VvFwVRLfia10kps6F7mLGmKDB4/ZQtaTpZzHPxqhhretArbUvn8yDqTy2Hzv10XLrIUmqg1qQLgBCfcT3uufhH4O01gknhIVcadmJOJ2oi6ybYog9X2oD3tc66vLO5y3SvLoXcJWjSecEkBNRS6GxWn23H5xIXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=orTstAdN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DIdz7TLn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E0691F00899;
-	Wed, 10 Jun 2026 18:40:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="orTstAdN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 141C81F00898;
+	Wed, 10 Jun 2026 18:40:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781116811;
-	bh=z8xmG1te6Zs2+hyVoIYx5uqrho7e40hNSN9nNtu9gS0=;
+	s=k20260515; t=1781116813;
+	bh=DSiKT2EAE8wTyBqJfbw5cT/ijYFo2lSjhRsyBKtcIfM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=DIdz7TLn5ik7QI5DheiEaoSJpmmutUm7Fmygx8CBdFH3WBOoYAV/5sSbMd3xXo6FN
-	 lSHue7S8XxAdGRAERUGiBfKbLWt5mhL/zJ8pjRTcTie9qp4oTdzpXQ36C9IBQ59KG2
-	 Vf135MYyPzqK+K+ruUfETa9QMGzwxjVxtf/ufRVloT5hjzcDLgrmrS/wLDnMcJBXZc
-	 Cj82+OUwXQ/BcF8lSbuUsZ6VYt1pTAK1AEqPBFz+eZ0fhqAk+Fausayy1oYRYQOAbW
-	 iR+0zNv3u/5BvZHd+SDfiwu9qL/iPEnWaOFXhN5zbc3dLBUy1/gRJ5C9wlPgrJtMEg
-	 nOwV67qECiT/g==
+	b=orTstAdNUkGy9LKHdUl94g9ujtdAwJhYYn8WOkEsQOd+NSt4atU1yTjdcEYvPB+au
+	 W7PIbGXfkmUR24Yd0XcvLh+91FNteWIVPXLiiZXhK3zV7R0Db7hJDidf9o6eJW33o2
+	 GF5yVcPplUBSewR43RqQI/DyGSwgvy0SXIP2nr1aHai65J8GDRExnkKYcM173jjD2O
+	 UBydTdUuX4sInQGhPPn8z6zJp0ehFeY5de6jqGwqD8xRnMexBxGSMhzS5bqVE2Uj52
+	 e9THPeE34BEqmkENYfHeg9ykWNaR0snHiNApJ/wAy07j/LPssNSfBXLTIfn0v6vzjE
+	 a88cWQFEVU+9g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939203930DEB;
-	Wed, 10 Jun 2026 18:40:10 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 197F43930DEB;
+	Wed, 10 Jun 2026 18:40:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,14 +37,14 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] avrcp: Abort continuing response on fragmented CT
- replies
+Subject: Re: [PATCH BlueZ] shared/bap: Report invalid-length ASE CP write via
+ notification
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178111680913.3588149.12989657974958763377.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Jun 2026 18:40:09 +0000
-References: <20260609212656.3900190-1-simon.mikuda@streamunlimited.com>
-In-Reply-To: <20260609212656.3900190-1-simon.mikuda@streamunlimited.com>
+ <178111681063.3588149.6278164701179181672.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Jun 2026 18:40:10 +0000
+References: <20260609211104.3887577-1-simon.mikuda@streamunlimited.com>
+In-Reply-To: <20260609211104.3887577-1-simon.mikuda@streamunlimited.com>
 To: Simon Mikuda <simon.mikuda@streamunlimited.com>
 Cc: linux-bluetooth@vger.kernel.org
 
@@ -53,18 +53,19 @@ Hello:
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue,  9 Jun 2026 23:26:56 +0200 you wrote:
-> Send AbortContinuingResponse when a Get Element Attributes reply
-> arrives fragmented, as the CT side does not reassemble fragments.
+On Tue,  9 Jun 2026 23:11:04 +0200 you wrote:
+> A zero-length write to the ASE Control Point returned an ATT error, but
+> ASCS requires the write to succeed at ATT level and the failure to be
+> carried by a CP notification. Build a response with the truncated error
+> code and return success instead.
 > 
-> Fixes PTS test AVRCP/CT/RCR/BV-03-C
-> ---
->  profiles/audio/avrcp.c | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
+> Fixes PTS tests ASCS/SR/SPE/BI-01-C and BI-02-C
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ] avrcp: Abort continuing response on fragmented CT replies
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=249e2bedfacf
+  - [BlueZ] shared/bap: Report invalid-length ASE CP write via notification
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2e00b83c0788
 
 You are awesome, thank you!
 -- 
