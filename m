@@ -1,87 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-39.smtp.github.com (out-39.smtp.github.com [192.30.252.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378A22DCBE3
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 14:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A7E318ED2
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 14:34:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781188190; cv=none; b=s5fCMNLvleMAu8JuLdxwARNKfLavWAqsgQpTSDQq+wU4ddgtBBtVDNNJcZCOXiUtoc42fkF9Pe6LfANm1uhfik5eitEbpTKFbrMQIf30tNGXwAxMmySg5y7/QtjEHlyh5SBbVoZzNfergAIHOrlkHvVSWifKGcO41oEl19muIqs=
+	t=1781188489; cv=none; b=lBO1fiSVGiGjiXhpq6bc4QUgzg6RfC3jOWaesbNdA4WcvABldbe/Yi9ELYAcusato8qjfc/+YTH6IbF5HH4yuDLqo1XVfgClZm7iXNXMc2D2BESR92tLIFQXU4wNj9VhA78RMyz2B/KfcQ2lYM2X+GzUtuKpx1RmZ3NT4mmK5VI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781188190; c=relaxed/simple;
-	bh=rVkD4Ex/RUEEvXGKN/m9jjpz3+le1i8Rgjc1RnafSlc=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=seByExjvy7fsCVxIdBBAdqqzS+Wp/t/nlBjbO16+ED8eJWGUdN61NRT9RStH54SBFuAwLvEmlYFVWsJagcfV3xGjjcL5sb8nCF1CGsE/p6Wok3ZD22YyYABVAKuTx+5NjGHjzYT7CBy+8pBltoRi3wQ0eluuxnK+XqgleJXPNOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CNGSYo0y; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1781188489; c=relaxed/simple;
+	bh=Xo0egXZiP3Sn1YVzSASNfx0bZv186Io9CTDSD7Z447U=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=cNVOiOPgy/D3jb8Lqa0ge6sWTUHZ+Yd3stPhgskk+wUqkb4y+tCfMf9VyhYiOPV2+YniF6o0u6YgBfEWA1iJwgxMlTZz7ir2h/YJyozubCqhxQRmOVfTCn6ONFgBpWv+ACXRDamzBokG4pkDR020SIITaQ5yiETH0WS8ofoiq5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=YEZYyqi9; arc=none smtp.client-ip=192.30.252.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CNGSYo0y"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C0768C2BCC7
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 14:29:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1781188189;
-	bh=rVkD4Ex/RUEEvXGKN/m9jjpz3+le1i8Rgjc1RnafSlc=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=CNGSYo0yMliRom9Nz6JDyni2JgDywaGL4g2KEsIRP/i1DZNXA+IV/AJTnnV1VHeQz
-	 HEpfUf2b65mR4LO+rWjcwKLPILJq8VU729LDQ7YYx/msRbiSPC1g0G0633XjvUhySC
-	 KidAhw0HoEGkw4gxuUNHTKBElLslIX/ddMcauDL7isQgLD2+e3Hss+xARCPU8YVVB4
-	 NHZUh0n03PpK7SmctJmtDRyIXqHHPuBFaPn1+NvyNe2B8tYAgPHBsgVGhxFRgMhNTy
-	 U+QEJxuKkG+GF3rY9MldKLqVjGJ3p6CMJEuGcyGRyA43rXY5v6E8gMDUCoa4Iv7dGM
-	 rBwqsl15Nm0Vw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id A5169C41612; Thu, 11 Jun 2026 14:29:49 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="YEZYyqi9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1781188483;
+	bh=F2lisIbPOGw4iQWpUKxJUswfksEwuywgTVo3votDgrU=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=YEZYyqi9sS35KmMqojO0xkaxkSC9A6yuysAjsonsZ1OI6Ggvgwt6SsLwk1PFhJKzZ
+	 +ve/yrpoBiOj8Qk+8PbBLSd1eZrd6s/i+j9I3gpASBDKjolEhL4KL+21wxynPM8BVN
+	 uzzNim4+bIjABZSnvz9NKwmMyvxAFrU++pMYVRS4=
+Received: from github.com (hubbernetes-node-418dfcb.ash1-iad.github.net [10.56.202.61])
+	by smtp.github.com (Postfix) with ESMTPA id AB71C9230F1
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 07:34:43 -0700 (PDT)
+Date: Thu, 11 Jun 2026 07:34:43 -0700
+From: Bhavani <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221637] Regression for Intel Corporation Device a876 (rev 10)
-Date: Thu, 11 Jun 2026 14:29:49 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: nibheis@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-221637-62941-xWNo0w0JHI@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221637-62941@https.bugzilla.kernel.org/>
-References: <bug-221637-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Message-ID: <bluez/bluez/push/refs/heads/1109997/000000-cccd99@github.com>
+Subject: [bluez/bluez] bff7ad: shared: rap: Check role before sending CS Sec
+ Enab...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221637
+  Branch: refs/heads/1109997
+  Home:   https://github.com/bluez/bluez
+  Commit: bff7ad1e29b4d1e5e84861d6333264b75964144e
+      https://github.com/bluez/bluez/commit/bff7ad1e29b4d1e5e84861d6333264b75964144e
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-06-11 (Thu, 11 Jun 2026)
 
-Pierre-Olivier Vall=C3=A8s (nibheis@gmail.com) changed:
+  Changed paths:
+    M src/shared/rap.h
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |nibheis@gmail.com
+  Log Message:
+  -----------
+  shared: rap: Check role before sending CS Sec Enable cmd
 
---- Comment #1 from Pierre-Olivier Vall=C3=A8s (nibheis@gmail.com) ---
-FYI, same bug on same hardware was also reported downstream here:
+Add the is_central parameter to verify whether
+the local role is central before sending
+the HCI CS Security Enable command.
 
-https://gitlab.archlinux.org/archlinux/packaging/packages/linux-firmware/-/=
-work_items/45
 
-From https://gitlab.com/kernel-firmware/linux-firmware.git:
-commit 99a2479f94e13da021288b016ec55243ac31fae5 (2026-01-16): works
-commit ed10eae8facb3b4bf2da7104cec95afdf0209114 (2026-03-13): fails
-commit 7df47664dd1d94111858b3224c15908517c73e73 (2026-04-23): fails
+  Commit: b9336fa7b1d580b5ac18464fb6710de8117bcffe
+      https://github.com/bluez/bluez/commit/b9336fa7b1d580b5ac18464fb6710de8117bcffe
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-06-11 (Thu, 11 Jun 2026)
 
---=20
-You may reply to this email to add a comment.
+  Changed paths:
+    M profiles/ranging/rap.c
+    M profiles/ranging/rap_hci.c
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+  Log Message:
+  -----------
+  profiles: ranging: Add CS Initiator cmd and evt handling
+
+Introduce support for LE Channel Sounding (CS)
+ranging procedures in the Initiator role by enabling
+required HCI command sequencing and event handling.
+
+Add handling of core HCI LE CS commands and events
+This enables cs capability discovery, cs configuration
+management and execution of CS ranging procedures
+in the Initiator role.
+
+
+  Commit: cccd993d1349ae9973ff03ea2fc9b21a70f0bd8a
+      https://github.com/bluez/bluez/commit/cccd993d1349ae9973ff03ea2fc9b21a70f0bd8a
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-06-11 (Thu, 11 Jun 2026)
+
+  Changed paths:
+    M src/shared/rap.h
+
+  Log Message:
+  -----------
+  shared: rap: remove the old wrapper API
+
+Replace API bt_rap_set_conn_handle with
+bt_rap_set_conn_hndl which has extra parameter
+to avoid compilation error for individual patches
+
+
+Compare: https://github.com/bluez/bluez/compare/bff7ad1e29b4%5E...cccd993d1349
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
