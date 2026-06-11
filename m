@@ -1,104 +1,155 @@
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE27D3D1712
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 17:22:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200F548166E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 17:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781198577; cv=none; b=Bjqh2hTQ9B/mTXJVFx5oa3VHsIrx3m2O0744K27l0uDYBYYFrQ6pQZJmG/Z4lJlqFAlacNFFnE2jT2gWIz8fOE29q5zDYFs/jjVcwEBXvggmnVJuX7PXiFfylyR41vfgnfQvfPkLXvUqwvyoIjtYiWA2pP4L5zEL4/Gxvv6sS/k=
+	t=1781200434; cv=none; b=twmk2ks44u0zGGUE+snBBBvOFJIsGCTbqHiNoAyyG0QeKEwcx9xKtUlSehyuoA+4THAMV7eynMkjqicegMlKubPjZVGyUdhWKRDvfNcLsTboS9UG7qLzCxBBjO1FCrVWA7wLrUgjYwSn/XxxAKRFhole8Mq3dg1oscOKVnVrJek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781198577; c=relaxed/simple;
-	bh=RDo5LBmQlWj/Cks1GTmDGsejy4j23of7UFqZDUtEnW8=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JdRZ0a+lhmz5ejOkt4saSWrmOo65WyGgMxAuMF0PguSXysFwd+0AfmqOugX3CwqrrJGUEe+Xby578F8tP8kBbfl2XlhcevLKDNXS1Gmn6At3axM/BUrF6Sz/34jK2LQxKRPn6vBUfFuwKUWCx0b2Tq6E4+N3fo+5Of9wDrbJLDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PczR43c9; arc=none smtp.client-ip=209.85.222.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1781200434; c=relaxed/simple;
+	bh=0lO+YBGjDrqJ4X32a/zxx2KfU49/PLMPuj+cdlwD+BA=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=MlqR8H7Ncmuct6B41yfa26BsvVTOpOpHGVr1akumk8ciZp5LVvPKli9hPpDCJ8YNwZibcAGGAbJzCFw7fMS5l4cEHnZi9ErpSrmc3R3RCNFxDQiaVilUpuA6PdqcVIIVDCdW2Kcv/61ZNy92INgi3+UT3rLR2qHJFfoGZF4u/co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=DPdK2oVy; arc=none smtp.client-ip=192.30.252.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PczR43c9"
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-96395a59ff6so32967241.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 10:22:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781198569; x=1781803369; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=O+5PZQ+O9EKebWQFeGVU0C1w+W1WS9wpVh9ZPl0zH6c=;
-        b=PczR43c9MYaCMK4BpjiWSsatwGzxwVHhwYFSgfcZS6Lc6XhIe0wuBVV5QzVoSNdJ59
-         y2Sl/W7djdrhYI/3cbVTgHfyFAqEkrAFMnOSHJp3wCNQ0R85fQLwm+IwzMDzVEhCVkHq
-         5bFIDgZjni0/oM06O720j5QVwBKhASX57nxod6iOwO4q5oGk/CBUdiqrWSXLMixGjnOm
-         y4gr9OdKbVu9aJPtAROFl69vq52JFEuxqmE4/dJXKG8oGb88sHkUlW0Ha11USN2QVbqq
-         XO3u2SNdio9aJwBDzz+eEGmHiK/x0Qx6eQIiEKcvrMtp25PZGIfVvWoogaSEdG1RIEA8
-         w6GA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781198569; x=1781803369;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=O+5PZQ+O9EKebWQFeGVU0C1w+W1WS9wpVh9ZPl0zH6c=;
-        b=pnDhoIZ9t9u4lXeMhAM+41swd5OKA0aJ7AylyVIi7vWy/EVMudkfAs70ur63at9Yp+
-         EicVoEGeZwBayrrzoe/55WqwLyxWkUmllySgZlBJMlwb4+Rh4Nkql8TzeXUcERh4ZWP4
-         wk5cRM8p9vZEKSAG4SP3n5tuCwI2QPZAEBv7oBtDJhZkM9/zHF2leKjzgcqASTXcbbaG
-         R+IRrV20oQ9xzrV3Wa1tf50hp/rb/hTmSeV95jt7YDwyTpHFP0Uw7AO0+3OOkexAK71J
-         oW/sbxuUPbflyPLry6Yj3UdZNIndhefcB2pywJUWXsR5IdRPwkOqIlDtnERf6ZZMXBD3
-         66cg==
-X-Gm-Message-State: AOJu0Yw5bUMtpH0+xsScL3M/po5iZTzuuFO4MO/4t+1NnUotoS0MfhNa
-	3enVA9uKZakZ8G/+YX+oYa6+ghOIR2ZMVR7u2VF7bCJxYQwFziq8wlS9N4s1mnvi
-X-Gm-Gg: Acq92OEay7QwtvyN9BG+OmClk93/XYkOzTcf1LE0GQ5d8Tq22ac2Qrwzuul4BYSboKc
-	JkbM/Vcd5IoymrRtehTwxoY8iiE20ZxR2wUTlAt5Yps9VmJ3X0y7s6oh7ulHJawsTGWos4NsN2s
-	SSYNo+DMrkpdDRHtRaFQMFYKlpxOX4Qf4Av2/fTBlv4lF76dhDgH2sAaz2YGNC3J0CPVg97ym14
-	k24cCjm2hbEUx8Cob4FoqnfJ6CiySAJphUg1HP4eJjq387vUkGf5bpdciIt8CtwQjQ1Bf3ci10D
-	fl1f/Xhh4HJwBhNHcbXljtkLf6ilz3h8UzIXwiL6kx2HR4liKjnF7QnI9gQ9qZOF4W+3n5+tnwY
-	khOBgbNH+ASatqMh1gq5NEGKjjBoEMfFndqEsiC8oOSGR2p/IkLh4WhuRdPhKDVcNsqx3q01U6n
-	0kOKMUJCHt+GjA4iU/TZB+/jSfdlE30425GUzjPbliGAONkMvjq7Lo9E6kgjL5YNiV2R5ksRszr
-	3X05UJG3a/gX3/qPg==
-X-Received: by 2002:a05:6102:548b:b0:632:29a5:2b27 with SMTP id ada2fe7eead31-71d5cc7fe1cmr2385788137.3.1781198569499;
-        Thu, 11 Jun 2026 10:22:49 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-71d9267bb61sm1689828137.9.2026.06.11.10.22.48
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jun 2026 10:22:48 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="DPdK2oVy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1781200432;
+	bh=8SQs5UkVNb4AGaFxRi355/Yvbg4Hi1a767aoypA/nug=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=DPdK2oVyDDv0vCuk+YEG37adVungQvHFU1KfBKuWVCwjuF57U39D6EWP9sD268oUn
+	 fUOGdyI3NTmhBi4qDdvTc59Ad+uNSneQ0q4WZoFNi6QlSQ6IfCoh0cvUsBI9kGoChU
+	 5MMuDy5S0uI0LBzjFtocP6be/nZKOM5Kw9QoM5x0=
+Received: from github.com (hubbernetes-node-d8e11ce.va3-iad.github.net [10.48.180.64])
+	by smtp.github.com (Postfix) with ESMTPA id 5111D1811E1
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 10:53:52 -0700 (PDT)
+Date: Thu, 11 Jun 2026 10:53:52 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 4/4] doc: Document Push behavior when MediaAssistant is active
-Date: Thu, 11 Jun 2026 13:22:35 -0400
-Message-ID: <20260611172235.92930-4-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260611172235.92930-1-luiz.dentz@gmail.com>
-References: <20260611172235.92930-1-luiz.dentz@gmail.com>
+Message-ID: <bluez/bluez/push/refs/heads/1110215/000000-ca320e@github.com>
+Subject: [bluez/bluez] b5b40a: profiles/audio/bass: Use BASS_Modify_Source
+ when a...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/1110215
+  Home:   https://github.com/bluez/bluez
+  Commit: b5b40a4bd3dd23a5569c616ebaf14126881b7ed1
+      https://github.com/bluez/bluez/commit/b5b40a4bd3dd23a5569c616ebaf14126881b7ed1
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-11 (Thu, 11 Jun 2026)
+
+  Changed paths:
+    M profiles/audio/bass.c
+
+  Log Message:
+  -----------
+  profiles/audio/bass: Use BASS_Modify_Source when assistant is active
+
+When a MediaAssistant is already active (streaming), a subsequent Push
+should send Modify Source with PA_SYNC_NO_SYNC and bis_sync=0 to
+remove the broadcast source, rather than adding a duplicate source.
+
+Split push() into push_add_src() and push_mod_src() helpers. The push
+dispatcher checks the assistant state: ACTIVE non-local assistants and
+LOCAL assistants with a tracked source entry both route to
+push_mod_src, while all others proceed with push_add_src.
+
+Add per-device source tracking for LOCAL assistants via a bass_src
+struct (keyed by bt_bass pointer) stored in a per-assistant srcs
+queue. This is needed because LOCAL assistants never change state, so
+we cannot rely on the state machine alone to detect active sources.
+
+Also fix the bass_src_changed BID filter: the previous check rejected
+non-local assistants when BID was zero, but this incorrectly excluded
+LOCAL assistants in REQUESTING state whose BID happens to be non-zero.
+Change to reject assistants whose own BID is non-zero when the
+notification BID is zero, which correctly matches local streams.
+
+
+  Commit: e7d235efae7ed33f0ae0df91205277668181e0f4
+      https://github.com/bluez/bluez/commit/e7d235efae7ed33f0ae0df91205277668181e0f4
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-11 (Thu, 11 Jun 2026)
+
+  Changed paths:
+    M profiles/audio/bass.c
+    M src/shared/bass.c
+
+  Log Message:
+  -----------
+  profiles/audio/bass: Handle PA_SYNC_NO_SYNC in handle_mod_src_req
+
+When the delegator receives a Modify Source operation with pa_sync set
+to PA_SYNC_NO_SYNC while already synchronized to PA, release all
+setups instead of updating BIS sync which would not apply the
+requested termination.
+
+Also reset the encryption state to no encryption when the last BIS
+index is cleared from a subgroup, so subsequent source additions
+start with a clean encryption state.
+
+
+  Commit: ef38d6371550e7596888e8198d328c802520bd18
+      https://github.com/bluez/bluez/commit/ef38d6371550e7596888e8198d328c802520bd18
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-11 (Thu, 11 Jun 2026)
+
+  Changed paths:
+    M profiles/audio/bass.c
+
+  Log Message:
+  -----------
+  profiles/audio/bass: Fix delegator reprobing after disconnect
+
+delegator_disconnect left the old delegator in the delegators queue
+after calling device_remove_profile. When a new delegator was created
+for the same device (e.g. on a subsequent Add Source after Modify
+Source removal), delegator_attach would find the stale entry and
+return early, leaving the new delegator without a service. This
+caused the "Unable to probe service" error and prevented the BASS
+bcode exchange from working on reconnection.
+
+Fix by removing the delegator from the queue, clearing service user
+data, and calling delegator_free before disconnecting the service
+and removing the profile. This also fixes a potential use-after-free
+where delegator_disconnect accessed dg fields after device_remove_profile
+could trigger delegator_detach -> delegator_free through the
+bap_detached callback chain.
+
+Also add validation in bass_req_bcode to detect and discard invalid
+(all-zeros) broadcast codes that may have been stored from a previous
+connection.
+
+
+  Commit: ca320ea1e889ef325c64aaf9d41e32acdc7285d0
+      https://github.com/bluez/bluez/commit/ca320ea1e889ef325c64aaf9d41e32acdc7285d0
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-11 (Thu, 11 Jun 2026)
+
+  Changed paths:
+    M doc/org.bluez.MediaAssistant.rst
+
+  Log Message:
+  -----------
+  doc: Document Push behavior when MediaAssistant is active
 
 Document that calling Push on an assistant already in active state uses
 BASS_Modify_Source to update the existing source rather than adding a
 new one.
----
- doc/org.bluez.MediaAssistant.rst | 4 ++++
- 1 file changed, 4 insertions(+)
 
-diff --git a/doc/org.bluez.MediaAssistant.rst b/doc/org.bluez.MediaAssistant.rst
-index 45143cee8dbf..2f29a7b5c253 100644
---- a/doc/org.bluez.MediaAssistant.rst
-+++ b/doc/org.bluez.MediaAssistant.rst
-@@ -27,6 +27,10 @@ void Push(dict properties)
- 
- Send stream information to the remote device.
- 
-+If the assistant is in the "active" state, this method uses
-+BASS_Modify_Source to update the existing source on the remote device
-+instead of adding a new one with BASS_Add_Source.
-+
- :dict properties:
- 
- Indicate stream properties that will be sent to the peer.
--- 
-2.54.0
 
+Compare: https://github.com/bluez/bluez/compare/b5b40a4bd3dd%5E...ca320ea1e889
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
