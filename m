@@ -1,375 +1,357 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6581D34B437
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 06:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781159408; cv=none; b=p3yomoX9w7G5b9JVoJQHaJr+0D++I1bbPpEOXxoApQz9al+d9VRZIQyoLCTmG7Ly2Y+tFx5M+16W0AwrugUlN3dFXDCVckDjUVRXzekoSNkTk/3t5XSMY1Fur4wRkleJ4H+mB5o8q3rsGPlWXTkEetcS3ATOdjAtjIf18zq8H4s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781159408; c=relaxed/simple;
-	bh=IyGr9ltk/+u88vYFkkGn+I0hPilrsjEefFIKnHqIAwc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hSd29cmGeR5d7hDhUuMp5hrQU74QsMNKwkOjNhByD+JTSrP+key8IHpIjSgAqmJfViN+0nvxsPWD/22gmQx57EsO6YGlxaPowT4mEvfb9FMeD/gXtD9ztoxMsv3jraXTNis3r1zxEwrnEDnXeigJP3oBLkL5fad8Qh1KQLgm+BE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.213] (p57bd9f9e.dip0.t-ipconnect.de [87.189.159.158])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 964674C28871A7;
-	Thu, 11 Jun 2026 08:29:44 +0200 (CEST)
-Message-ID: <bd28b9a0-4574-4dee-90d6-c68cc6468f1b@molgen.mpg.de>
-Date: Thu, 11 Jun 2026 08:29:43 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4CD932937A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 07:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781162638; cv=pass; b=Fqd1Lxrw7K7omRpfGpUVYEa1KzscFpEvSErBppX1e5GvgjVPScvkBh11JaVKhMxXeEJO5v5GA5nAzk2VS2MQQ9r3nyClcnIys6MFXkJDR7QomdeiuHko+vMn67c8x2xUGH+pKQ18YvcK8V0Xe9Uq5KxhXpy+GErUaravU/mQAEM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781162638; c=relaxed/simple;
+	bh=euHtg3kmLYFccJG1FlDqYEdWnmLK20sDsdYXLtkCIak=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=MO+fg0NbbJ6f9FgCy2FyPwb6URcEY9/j6CNzRl1+kCpHFNdZqrkG9JQ4W7ZD28H7WwlmqkL7FKdV65pOuaRASZChx3itHOndLbM3lQZzQI8SNfKP2f5bVM8yAc6zELGcsXPqhFx7vg714o8QfEnsoikamCsoUijrIAxgZ5aqDaI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Taqsn2k3; arc=pass smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Taqsn2k3"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5aa68dbb38aso7442137e87.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 00:23:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781162635; cv=none;
+        d=google.com; s=arc-20240605;
+        b=TTt4yvVa0KhV5w50LZZea7pD5BGU7ZHrPCdWuFeyEbC2QSP5Rhr25gjAOQW8OLMLGL
+         tpmaJerPN7Ht/FmYmdAn00FP57W9Rn1OOhShqxVfXxcAEbkQLjbQsYZ2ivJn+Y73wSqm
+         5PECTPgPgLojtu2gF0GfCZL9LSHFyaYzYG7HxsduNm3uVQhyJTyx3bVNeseb52SLPjVW
+         9RbAa4C5vRBc/oab13LLTcGr9rSWTWdRJNGbAYj9YKXe0UvfigbYRocwMJyC2p3unYiD
+         N/hfSjEf7VoCqLUYqzwNFhz0ahSrMKehRWRBS+8M/Pgf+db74kMrMbHn6AgVXsHtlguI
+         pAlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=2FolJ3+CT8mQyGXI/4aNDnr5rUXBI08pNfHsJ3xVTN8=;
+        fh=4lGQI6056MBa4/oovMyIYaKLn+Wz/24RGvUivMmQP8E=;
+        b=dMYr+ovf5xrObAU8Qa+m79LlxMIB9UlnhBOFk2/PbRvmjyUrU+W37AtQvA/Sy9avQT
+         GZYsV8XnhBAces6NOn5gthj4htocZ0ED1wrNppy0LpVE33AtVteX6k8roLnd1XCtl+y+
+         qEerAQhzyqVK0OwbhYfmYeiuOF13QyAZZhVAqLPcHyjwmQLXefjXUjbSqpUyinw26rZ6
+         FPUvv8hyttvHKISmy5gz0cCGNeiz/RDz2VVJjsDAFKtGv3v3U9p8fkXAL9vtCRet2NF/
+         FUebF7E9LfJjUAoIsZF+8X6erH/U83G6herGOCzIJYgY1JaD5rcxG9giBBSva7gi8cFN
+         ZvQg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781162635; x=1781767435; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2FolJ3+CT8mQyGXI/4aNDnr5rUXBI08pNfHsJ3xVTN8=;
+        b=Taqsn2k3ZoXyHRxeD+AX8iDpbOywHDpzBkD5ldolG4OL/DpydXSjqRYwhAXUEcA9Gt
+         WEdTFT60igEmHPmoSZSd5T7Dobd7NZWCj3p2fZ/AUYSWTfho3EMSmxehakaKC0g2pPKc
+         T+Ptc96pB+iQk4AC2QpIEoTHw52f+yu2N6vFmFyJeYqvOCaONou6N/GvzWXX6GaNGuu1
+         BSvi9ctLerkX+GCemyRZJSskAryh55+OvpIFQlg/x+YKqunF/0A6wRXYeiVmauLiHoMd
+         Au9aZRzSUukdunYi2Zg1GDfjejFtS+/JriNj4AxgCUZueEQPXofd/7eOAwNM05ZelJfB
+         GW+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781162635; x=1781767435;
+        h=to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2FolJ3+CT8mQyGXI/4aNDnr5rUXBI08pNfHsJ3xVTN8=;
+        b=VQ/QgdTcSdf0hcepkKgM0nVLLr5y8JqDfJBFVH9zHOFx+8tBEBg4PNch0M0YHe4BG9
+         8BOq0DAWi1atOhKFkADXns/NeIE9qIab92O0AwfQE7WgDqk+jkBCkME7t8DHSfVNC+MJ
+         Di4EiD0SphZsiaO9pdZxhkkdnia5xwDBQ/KC5oM3WlywqSP8J/xN/ld4CuJAR78EIrAL
+         pfgCu6TyhSNmp0m/duoNe9AzRWFNdIrEgXAz4Aglv8DeB64m4zotkheiQtQoUiMAKa/g
+         E1GFPMYaxn3y+H328R2FSm8TOzBQ1ksthfcpMbQMrqsBlzDqKwUcy/UEHbqA3zBKe0DU
+         oChQ==
+X-Gm-Message-State: AOJu0YwoX2nk3t/7gCyyQCULDCYXOzikqab3eNBJDY9ZiRVvEPqunJq9
+	aGqF8eUn2FWCzNaFk5xbosWpOb0CyELmn/6SANXBFyrNTbM+0o/oMUBWjIUTFjTa9JhFY2dB14k
+	ca4kwbdCtFYnzhdwXG9gk7TAjAUToC5exn5yP
+X-Gm-Gg: Acq92OGUCv1UzE69hswxNM9g/NPSEX7ZHUG8NKH99g6MIe7nQOiw2WfdY/3yloIWUWE
+	W3VhgydhdpWn6KHZmo/k98ptWC+/IFWAcUXzRJYeK2p8fPJT7vwTkejHbHiObEhQOnyAgTohyCt
+	a/uf2rYKABKPFMoNPtnOTuB16wGoO4IeZgVHqS87KZqGpoFbzaPwq7R+s3dUMa5v3v+8U3e4XaD
+	103fX75HmulbRqhT06WTDBRNz5EvUTjy7qmtPJ+LhaEXOd1YG251vhcT+TfX5AYMBLImJmXvP7Z
+	9C+16/P1bonN9HKRgQ==
+X-Received: by 2002:a05:6512:31d0:b0:5aa:6e87:f22c with SMTP id
+ 2adb3069b0e04-5ad27ab1a42mr431982e87.12.1781162634584; Thu, 11 Jun 2026
+ 00:23:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] Bluetooth: btintel_pcie: Separate coredump work from
- RX work
-To: Kiran K <kiran.k@intel.com>, Ravindra <ravindra@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com
-References: <20260610162544.240444-1-kiran.k@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260610162544.240444-1-kiran.k@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: "J.L." <ihipop@gmail.com>
+Date: Thu, 11 Jun 2026 15:23:42 +0800
+X-Gm-Features: AVVi8Cc5Aq5pDC7EVpSUMgQSmC1rzg6e8vKG9EDaICacWtUxot_IuAJCrVckXsE
+Message-ID: <CAAO-DPssqW4tSbk=iiYBZyx7WxNqsMEZh0Oo4pNjY1333daDtA@mail.gmail.com>
+Subject: [obexd/map] PushMessage does not expose outgoing MAP handle, causing
+ MNS status events to be dropped
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Dear Ravindra, dear Kiran,
+Hi,
 
+While debugging the BlueZ obexd MAP SMS sending flow, I found a race
+condition in the outgoing message path.
 
-Thank you for your patch.
+When an application sends an SMS through
+org.bluez.obex.MessageAccess1.PushMessage(), it only receives a
+Transfer1 object. It does not receive the MAP message handle assigned
+by the remote MSE. If the phone later reports SendingSuccess /
+MessageShift / DeliverySuccess through MNS before obexd has created a
+Message1 object for that handle, these events are silently ignored.
 
-Am 10.06.26 um 18:25 schrieb Kiran K:
-> From: Ravindra <ravindra@intel.com>
-> 
-> Sharing a single workqueue between coredump processing and RX
-> delays evacuation of RX events while a coredump is in progress.
+As a result, a D-Bus client cannot reliably associate a PushMessage
+transfer with the resulting MAP message handle or sent/delivery
+status.
 
-How big is the delay?
+Test environment:
 
-Is the coredump processed on the Bluetooth device?
+- OS: Manjaro Linux rolling
+- Kernel: Linux 6.12.91-1-MANJARO x86_64
+- BlueZ source baseline: 5.86
+- BlueZ source commit: 74770b1fd2be612f9c2cf807db81fcdcc35e6560
+- Commit subject: Release 5.86
 
-> The firmware's RX buffers can overflow during that window, leading
-> to dropped events. The issue was observed in HID use cases where
-> HID reports arrive in bursts and quickly fill the RX path while a
-> coredump is being collected.
+Problem description:
 
-How big are the RX buffers, and does Linux log an error in this situation?
+1. The client calls MessageAccess1.PushMessage().
+2. The returned Transfer1 object becomes complete. The message is
+accepted by the phone and the phone starts sending it.
+3. The phone reports an MNS event such as:
 
-> Move coredump processing to a dedicated ordered coredump_workqueue
-> with its own coredump_work, so coredumps run independently of RX.
-> All four coredump trigger sources (FW assert, HW exception, user
-> sysfs trigger, and resume-error detection) are switched to this new
-> workqueue. Ordering serialises concurrent triggers without blocking
-> RX.
+    <event type="SendingSuccess"
+           handle="0400000000008A1C"
+           folder="telecom/msg/sent"
+           msg_type="SMS_GSM" />
 
-Please paste the logs, and please describe the test setup, how to force 
-a coredump, and then, how the workqueues can be displayed to see it’s 
-working.
+   It may also report MessageShift or DeliverySuccess.
+4. However, if obexd has not yet created a Message1 object for this
+handle in `map->messages`, SendingSuccess / MessageShift will just
+return. No Message1 object is created, and no state change is exposed
+to the D-Bus client.
+5. The client is left with an unreliable workaround: after PushMessage
+completes, immediately call ListMessages("outbox") or
+ListMessages("sent") and hope that obexd materializes a Message1
+object from the listing result. This is not atomic and still races
+with status/folder transitions on the phone side.
 
-> Signed-off-by: Ravindra <ravindra@intel.com>
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> ---
-> changes in v2:
-> - Fix the race condition reported by Sashiko b/w reset_work() and
->    .remove()
-> 
->   drivers/bluetooth/btintel_pcie.c | 102 +++++++++++++++++++++++++------
->   drivers/bluetooth/btintel_pcie.h |   5 ++
->   2 files changed, 87 insertions(+), 20 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-> index 52293d19c817..e2f64d42c11c 100644
-> --- a/drivers/bluetooth/btintel_pcie.c
-> +++ b/drivers/bluetooth/btintel_pcie.c
-> @@ -1457,7 +1457,7 @@ static void btintel_pcie_msix_fw_trigger_handler(struct btintel_pcie_data *data)
->   	if (!test_and_set_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags))
->   		data->dmp_hdr.trigger_reason = BTINTEL_PCIE_TRIGGER_REASON_FW_ASSERT;
->   
-> -	queue_work(data->workqueue, &data->rx_work);
-> +	queue_work(data->coredump_workqueue, &data->coredump_work);
->   }
->   
->   static void btintel_pcie_msix_hw_exp_handler(struct btintel_pcie_data *data)
-> @@ -1474,16 +1474,21 @@ static void btintel_pcie_msix_hw_exp_handler(struct btintel_pcie_data *data)
->   	if (!test_and_set_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags))
->   		data->dmp_hdr.trigger_reason = BTINTEL_PCIE_TRIGGER_REASON_FW_ASSERT;
->   
-> -	queue_work(data->workqueue, &data->rx_work);
-> +	queue_work(data->coredump_workqueue, &data->coredump_work);
->   }
->   
-> -static void btintel_pcie_rx_work(struct work_struct *work)
-> +static void btintel_pcie_coredump_worker(struct work_struct *work)
->   {
->   	struct btintel_pcie_data *data = container_of(work,
-> -					struct btintel_pcie_data, rx_work);
-> -	struct sk_buff *skb;
-> +					struct btintel_pcie_data, coredump_work);
->   	int err;
->   
-> +	/* hdev is NULL until setup_hdev() succeeds, and is cleared on
-> +	 * teardown after disable_work_sync() drains us; bail in that case.
-> +	 */
-> +	if (!data->hdev)
-> +		return;
+Source analysis:
 
-Excuse my ignorance, but why should the worker not run in this case? Was 
-the coredump processed?
+1. The D-Bus API documentation says PushMessage only returns a
+Transfer1 object, not the MAP message handle
 
-> +
->   	if (test_bit(BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS, &data->flags)) {
->   		err = btintel_pcie_dump_fwtrigger_event(data);
->   		if (err)
-> @@ -1507,6 +1512,13 @@ static void btintel_pcie_rx_work(struct work_struct *work)
->   		btintel_pcie_read_hwexp(data);
->   		clear_bit(BTINTEL_PCIE_HWEXP_INPROGRESS, &data->flags);
->   	}
-> +}
-> +
-> +static void btintel_pcie_rx_work(struct work_struct *work)
-> +{
-> +	struct btintel_pcie_data *data = container_of(work,
-> +					struct btintel_pcie_data, rx_work);
-> +	struct sk_buff *skb;
->   
->   	/* Process the sk_buf in queue and send to the HCI layer */
->   	while ((skb = skb_dequeue(&data->rx_skb_q))) {
-> @@ -2181,9 +2193,11 @@ static int btintel_pcie_send_frame(struct hci_dev *hdev,
->   
->   static void btintel_pcie_release_hdev(struct btintel_pcie_data *data)
->   {
-> -	struct hci_dev *hdev;
-> +	struct hci_dev *hdev = data->hdev;
-> +
-> +	if (!hdev)
-> +		return;
->   
-> -	hdev = data->hdev;
->   	hci_unregister_dev(hdev);
->   	hci_free_dev(hdev);
->   	data->hdev = NULL;
-> @@ -2603,6 +2617,10 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
->   	btintel_pcie_synchronize_irqs(data);
->   
->   	flush_work(&data->rx_work);
-> +	/* Drain any in-flight coredump and block new ones across reset.
-> +	 * Safe from self-deadlock: coredump_work runs on a separate wq.
-> +	 */
-> +	disable_work_sync(&data->coredump_work);
->   
->   	bt_dev_dbg(data->hdev, "Release bluetooth interface");
->   	if (data->reset_type == BTINTEL_PCIE_IOSF_PRR_PLDR) {
-> @@ -2610,16 +2628,27 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
->   		 * pci_rescan_remove_lock. This mutex serializes against PCI device
->   		 * addition/removal (hotplug), so no device can be added to or
->   		 * removed from the bus list while this code runs.
-> +		 *
-> +		 * device_reprobe() inside btintel_pcie_perform_pldr() destroys
-> +		 * 'data' via .remove(); a fresh probe re-INIT_WORKs the
-> +		 * coredump_work with disable count 0, so we must not call
-> +		 * enable_work() on this path.
->   		 */
->   		btintel_pcie_perform_pldr(data);
->   		goto out;
->   	}
->   	btintel_pcie_release_hdev(data);
->   
-> -	err = pci_reset_function(pdev);
-> +	/* Use pci_try_reset_function() rather than pci_reset_function() to
-> +	 * avoid an ABBA deadlock against btintel_pcie_remove(): the PCI core
-> +	 * calls .remove() with device_lock held, and remove() then waits for
-> +	 * this work via cancel_work_sync(); pci_reset_function() would in
-> +	 * turn try to acquire the same device_lock, deadlocking both paths.
-> +	 */
-> +	err = pci_try_reset_function(pdev);
+    doc/org.bluez.obex.MessageAccess.rst:179-195
 
-This is not mentioned in the commit message. Should that be a separate 
-commit for easier review, and easier backporting to the LTS series?
+    PushMessage(string sourcefile, string folder, dict args) transfers
+a bMessage.
+    The returned object path represents the newly created transfer and
+is used to check transfer success/failure.
+    The documentation does not expose a MAP message handle or define a
+way to associate the transfer with a message handle.
 
->   	if (err) {
->   		BT_ERR("Failed resetting the pcie device (%d)", err);
-> -		goto out;
-> +		goto out_enable;
->   	}
->   
->   	btintel_pcie_enable_interrupts(data);
-> @@ -2629,7 +2658,7 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
->   	if (err) {
->   		BT_ERR("Failed to enable bluetooth hardware after reset (%d)",
->   		       err);
-> -		goto out;
-> +		goto out_enable;
->   	}
->   
->   	btintel_pcie_reset_ia(data);
-> @@ -2639,8 +2668,15 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
->   	err = btintel_pcie_setup_hdev(data);
->   	if (err) {
->   		BT_ERR("Failed registering hdev (%d)", err);
-> -		goto out;
-> +		goto out_enable;
->   	}
-> +
-> +out_enable:
-> +	/* Balance disable_work_sync() above on every exit. Leaving the
-> +	 * counter incremented on a failed reset would permanently disable
-> +	 * coredump_work even after a later successful reset.
-> +	 */
-> +	enable_work(&data->coredump_work);
->   out:
->   	pci_dev_put(pdev);
->   	pci_unlock_rescan_remove();
-> @@ -2774,7 +2810,6 @@ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
->   	hdev->bus = HCI_PCI;
->   	hci_set_drvdata(hdev, data);
->   
-> -	data->hdev = hdev;
->   	SET_HCIDEV_DEV(hdev, &data->pdev->dev);
->   
->   	hdev->manufacturer = 2;
-> @@ -2793,15 +2828,17 @@ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
->   	err = hci_register_dev(hdev);
->   	if (err < 0) {
->   		BT_ERR("Failed to register to hdev (%d)", err);
-> -		goto exit_error;
-> +		hci_free_dev(hdev);
-> +		return err;
->   	}
->   
-> +	/* Publish hdev only after successful registration; the coredump
-> +	 * worker bails on !data->hdev, so it never observes a half-set-up
-> +	 * device.
-> +	 */
-> +	data->hdev = hdev;
->   	data->dmp_hdr.driver_name = KBUILD_MODNAME;
->   	return 0;
-> -
-> -exit_error:
-> -	hci_free_dev(hdev);
-> -	return err;
->   }
->   
->   static int btintel_pcie_probe(struct pci_dev *pdev,
-> @@ -2832,9 +2869,16 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
->   	if (!data->workqueue)
->   		return -ENOMEM;
->   
-> +	data->coredump_workqueue = alloc_ordered_workqueue(KBUILD_MODNAME "_cd", 0);
-> +	if (!data->coredump_workqueue) {
-> +		destroy_workqueue(data->workqueue);
-> +		return -ENOMEM;
-> +	}
-> +
->   	skb_queue_head_init(&data->rx_skb_q);
->   	INIT_WORK(&data->rx_work, btintel_pcie_rx_work);
->   	INIT_WORK(&data->reset_work, btintel_pcie_reset_work);
-> +	INIT_WORK(&data->coredump_work, btintel_pcie_coredump_worker);
->   
->   	data->boot_stage_cache = 0x00;
->   	data->img_resp_cache = 0x00;
-> @@ -2877,6 +2921,8 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
->   	/* reset device before exit */
->   	btintel_pcie_reset_bt(data);
->   
-> +	destroy_workqueue(data->coredump_workqueue);
-> +
->   	pci_clear_master(pdev);
->   
->   	pci_set_drvdata(pdev, NULL);
-> @@ -2894,13 +2940,20 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
->   		return;
->   	}
->   
-> +	/* Permanently block coredump triggers and drain the worker before
-> +	 * tearing down. Must run before cancel_work_sync(&reset_work) so
-> +	 * the disable counter stays >= 1 even after reset_work()'s
-> +	 * balanced enable_work() (counter 2 -> 1, never reaching 0).
-> +	 */
-> +	disable_work_sync(&data->coredump_work);
-> +
->   	/* Cancel pending reset work. Skip only when remove() is called from
->   	 * within the reset work itself (PLDR device_reprobe path) to avoid
->   	 * deadlock. current_work() returns the work_struct of the caller if
->   	 * we are in a workqueue context.
->   	 */
->   	if (current_work() != &data->reset_work)
-> -		cancel_work_sync(&data->reset_work);
-> +		disable_work_sync(&data->reset_work);
->   
->   	btintel_pcie_disable_interrupts(data);
->   
-> @@ -2920,6 +2973,7 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
->   
->   	btintel_pcie_release_hdev(data);
->   
-> +	destroy_workqueue(data->coredump_workqueue);
->   	destroy_workqueue(data->workqueue);
->   
->   	btintel_pcie_free(data);
-> @@ -2935,11 +2989,19 @@ static void btintel_pcie_coredump(struct device *dev)
->   	struct  pci_dev *pdev = to_pci_dev(dev);
->   	struct btintel_pcie_data *data = pci_get_drvdata(pdev);
->   
-> +	if (!data)
-> +		return;
-> +
->   	if (test_and_set_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags))
->   		return;
->   
->   	data->dmp_hdr.trigger_reason  = BTINTEL_PCIE_TRIGGER_REASON_USER_TRIGGER;
-> -	queue_work(data->workqueue, &data->rx_work);
-> +	/* queue_work() returns false if the work is disabled (reset or
-> +	 * remove in progress); clear the in-progress bit so a later
-> +	 * trigger can succeed once the work is re-enabled.
-> +	 */
-> +	if (!queue_work(data->coredump_workqueue, &data->coredump_work))
-> +		clear_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags);
->   }
->   #endif
->   
-> @@ -3080,7 +3142,7 @@ static int btintel_pcie_resume(struct device *dev)
->   				      &data->flags)) {
->   			data->dmp_hdr.trigger_reason =
->   				BTINTEL_PCIE_TRIGGER_REASON_FW_ASSERT;
-> -			queue_work(data->workqueue, &data->rx_work);
-> +			queue_work(data->coredump_workqueue, &data->coredump_work);
->   		}
->   		set_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags);
->   		btintel_pcie_reset(data->hdev);
-> diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-> index e4a8fa479188..7caee093e316 100644
-> --- a/drivers/bluetooth/btintel_pcie.h
-> +++ b/drivers/bluetooth/btintel_pcie.h
-> @@ -466,6 +466,8 @@ struct btintel_pcie_dump_header {
->    * @workqueue: workqueue for RX work
->    * @rx_skb_q: SKB queue for RX packet
->    * @rx_work: RX work struct to process the RX packet in @rx_skb_q
-> + * @coredump_workqueue: dedicated workqueue for coredump collection
-> + * @coredump_work: work struct for coredump trace collection
->    * @dma_pool: DMA pool for descriptors, index array and ci
->    * @dma_p_addr: DMA address for pool
->    * @dma_v_addr: address of pool
-> @@ -514,6 +516,9 @@ struct btintel_pcie_data {
->   	struct work_struct	rx_work;
->   	struct work_struct      reset_work;
->   
-> +	struct workqueue_struct	*coredump_workqueue;
-> +	struct work_struct	coredump_work;
-> +
->   	struct dma_pool	*dma_pool;
->   	dma_addr_t	dma_p_addr;
->   	void		*dma_v_addr;
+2. map.c implements PushMessage as a PUT transfer, with a NULL queue callback
 
+    obexd/client/map.c:1829-1851
 
-Kind regards,
+    In push_message():
 
-Paul
+        transfer = obc_transfer_put("x-bt/message", folder, filename,
+NULL, 0, &err);
+        obc_transfer_set_apparam(transfer, apparam);
+
+        if (!obc_session_queue(map->session, transfer, NULL, NULL, &err))
+            goto fail;
+
+        return obc_transfer_create_dbus_reply(transfer, message);
+
+    There is no MAP-level completion callback here, so there is no
+chance to bind the PushMessage result to a MAP handle in
+`map->messages`.
+
+    map_push_message() only parses the D-Bus arguments and then calls
+push_message():
+
+    obexd/client/map.c:1944-1980
+
+3. The transfer completion path only updates Transfer1 status;
+PushMessage currently has no callback
+
+    obexd/client/transfer.c:657-685
+
+    xfer_complete() sets the Transfer1 status to complete/error and
+invokes the callback only if one exists.
+
+    Since PushMessage queues the transfer with a NULL callback, the
+MAP layer is not notified that the PUT completed in a way that would
+allow it to parse or preserve the resulting MAP handle.
+
+4. The gobex PUT response path does not expose final response
+AppParams to the MAP layer
+
+    gobex/gobex-transfer.c:181-220
+
+    transfer_response() handles GET response bodies, but for PUT it
+calls transfer_complete() directly on success. If the remote MSE
+returns a message handle or related AppParams in the PUT response,
+that information is not currently exposed to obexd/client/map.c.
+
+5. ListMessages lazily creates Message1 objects
+
+    obexd/client/map.c:1274-1325
+
+    In msg_element(), while parsing a message listing:
+
+        handle = strtoull(values[i], NULL, 16);
+
+        msg = g_hash_table_lookup(data->messages, &handle);
+        if (msg == NULL) {
+            msg = map_msg_create(data, handle, parser->request->folder, NULL);
+            ...
+        }
+
+    map_msg_create() registers org.bluez.obex.Message1 and inserts it
+into `data->messages`:
+
+    obexd/client/map.c:959-985
+
+    This means Message1 creation depends on either a NewMessage event
+or a ListMessages result. PushMessage itself does not create the
+corresponding Message1.
+
+6. MNS parsing does recognize SendingSuccess / DeliverySuccess /
+MessageShift and their handle
+
+    obexd/client/map-event.h:13-35
+    obexd/client/mns.c:151-177
+
+    mns.c parses SendingSuccess / DeliverySuccess / MessageShift into
+map_event and parses the handle.
+
+7. However, status/folder MNS events require an existing Message1
+object, otherwise they are silently dropped
+
+    obexd/client/map.c:2075-2093
+
+    map_handle_status_changed():
+
+        msg = g_hash_table_lookup(map->messages, &event->handle);
+        if (msg == NULL)
+            return;
+
+    obexd/client/map.c:2095-2116
+
+    map_handle_folder_changed():
+
+        msg = g_hash_table_lookup(map->messages, &event->handle);
+        if (!msg)
+            return;
+
+    obexd/client/map.c:2118-2150
+
+    map_handle_notification() dispatches SendingSuccess /
+DeliverySuccess / MessageShift to these status/folder handlers.
+Therefore, if Message1 has not yet been created by NewMessage or
+ListMessages, these events are silently ignored.
+
+Race conditions:
+
+1. There is a gap between PushMessage completion and Message1 creation
+
+    PushMessage completion only tells the application that the
+bMessage has been PUT to the remote MSE.
+    obexd does not create a Message1 at that point and does not expose
+the remote handle to the D-Bus client.
+
+2. MNS events may arrive before the client can run the ListMessages workaround
+
+    The phone may send SendingSuccess / MessageShift shortly after the
+PUT completes.
+    If the client has not yet called ListMessages("outbox") or
+ListMessages("sent"), obexd has no matching handle in `map->messages`,
+so the event is dropped.
+
+3. The ListMessages workaround is not reliable
+
+    A client can call ListMessages("outbox") after PushMessage
+completes, causing obexd to create Message1 objects from the listing
+result.
+    However, the message may already have moved from outbox to sent,
+or the phone-side state may already have changed, so outbox listing
+may miss it.
+    Listing sent instead still does not provide an atomic ordering
+guarantee with respect to MNS events.
+    There is no way for an application to atomically obtain the handle
+immediately after PushMessage completion.
+
+Expected behavior:
+
+After PushMessage succeeds, obexd should provide a reliable way for
+the D-Bus client to obtain the MAP message handle, or at least ensure
+that subsequent MNS status/folder events for that handle are not
+dropped just because Message1 has not yet been materialized.
+
+Possible fixes:
+
+1. Create or cache an outgoing message entry when PushMessage completes
+
+    If the MAP PUT response provides a message handle, obexd could
+create or cache
+    a handle-indexed outgoing message entry in the PushMessage completion path.
+
+    This entry could be exported immediately as org.bluez.obex.Message1, or, if
+    exposing a partially populated D-Bus object is not desirable, it could first
+    be kept as an internal-only entry. The important part is that subsequent MNS
+    events such as SendingSuccess / MessageShift / DeliverySuccess can find the
+    handle instead of returning early.
+
+    With the current map_msg_create() implementation, creating Message1 also
+    registers the D-Bus object and would make clients observe an
+    org.freedesktop.DBus.ObjectManager.InterfacesAdded signal for
+    org.bluez.obex.Message1. If maintainers prefer not to emit InterfacesAdded
+    at this stage, a separate internal stub/cache path could be added, and the
+    object could be exported later when enough message metadata is available.
+
+2. Add a D-Bus API that exposes the real MAP message handle and allows
+   handle-based access
+
+    MAP itself already has a handle-based GetMessage operation. BlueZ also
+    already uses this model internally: org.bluez.obex.Message1.Get() formats
+    msg->handle and sends an OBEX GET request with type "x-bt/message":
+
+        obexd/client/map.c:450-485
+
+            snprintf(handle, sizeof(handle), "%" PRIx64, msg->handle);
+            transfer = obc_transfer_get("x-bt/message", handle,
+target_file, &err);
+
+    However, the current D-Bus API only exposes Get() on an existing
+    org.bluez.obex.Message1 object. There is no MessageAccess1 method such as
+    GetMessageByHandle() or CreateMessageFromHandle(), and MessageAccess1 only
+    exposes ListMessages() and PushMessage():
+
+        obexd/client/map.c:1986-2008
+
+    This means a client that already knows the real MAP handle still cannot use
+    it unless obexd has first materialized a Message1 object through
+    NewMessage or ListMessages.
+
+    A possible API-level fix would be to preserve the MAP-specific response
+    metadata on the Transfer1 object returned by PushMessage. For example, when
+    the remote MSE returns a handle or other MAP application parameters for the
+    pushed message, obexd could expose them as Transfer1 properties, at minimum
+    with Handle  itself, With that, the client can atomically obtain
+the real handle from the
+    PushMessage transfer result, then query or materialize the corresponding
+    message by handle. Today this is not possible because the handle is not
+    preserved or exposed after PushMessage completes, so clients are forced to
+    infer the message by racing ListMessages(folder) against remote status and
+    folder changes.
+
+Questions:
+
+1. Is this an expected limitation of the current obexd MAP client, or
+should this be considered a bug?
+2. Which fix direction would be preferred: creating Message1 in the
+PushMessage completion path, adding a D-Bus signal?
+3. I can  provide a redacted btmon capture and the corresponding
+MAP-event-report snippets to show the actual event ordering observed
+on real devices if needed
+
+Thanks.
