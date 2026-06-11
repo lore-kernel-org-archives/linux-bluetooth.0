@@ -1,258 +1,109 @@
-Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D4E3DB309
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 15:20:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4043940960C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 15:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781191261; cv=none; b=J2nVmzqPYuapM1UsyfDh3ofbLw3JnXidT0Y4pJt3dLzFZ3U//5gMo19T601yih5AGqEz3kJvVZDrLpasqyWcag8xZgkwnZozDXG8H+/RpdiF8ScQRa/fUaZ30pg8uZwxUTv+++vuO0Fghk+X2sMlhlmUUwzcLlYvZQEFYTo8a4Y=
+	t=1781191265; cv=none; b=MfffT6uLDl7coQxlMeE/R4Od5XPUzMx5m9Bk6Tk6C8i0HZu6/XWP7QMi8K7SYID+gBDmZTeSmvhpe3tu4b198bkG1x15DTaD1ZYmjxnJnfwE9C6UXeireoRpCCZ8nLd4xqh38LpfSKL6wKEjCVhEz3erqP28N09WDTFZLSXS54w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781191261; c=relaxed/simple;
-	bh=WRS8O3TIROBJ141L2c5QSA2tcAFSdLoliuyn9SFKa3s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CFL8bHvpINahq7Iq6Ne0GSkRXaPG9FL9gonj2HsCaT4swdYbDuxn0jRWTGxr/Wnzxd628Mvena8TUo3Ci2Evem4NOMjYts7lZeEwPEaK+7Be8kAH5IfQ4OXOotrMVY1VhiPfOLy2TvRRyiVxxAvXUbfOn5HsF28Wzl36DceapSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=MltY7yN2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=au7wzE9W; arc=none smtp.client-ip=103.168.172.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
+	s=arc-20240116; t=1781191265; c=relaxed/simple;
+	bh=OGG+e3ZnB1WlDm6Pn4oaOoBnO4JWbYFXPMIOPdnNc0o=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=sOFFkcpKtHb54BKAIXAzwXFx3aCnfkGj891CHzc2bRzMNnjugR7F5uhQB/G9VA17g/yq90g+7wM81iGlvfrQUeukZIlo4aOlEHDjEaXEwwAWSV5aQJ5VyxAOYTkAmirIvdp1zFH1CR/02YFPRXdSGYqj/5FX8ldqBTBUBp6Brsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MDuAmkUr; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="MltY7yN2";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="au7wzE9W"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 2B43C14000F9;
-	Thu, 11 Jun 2026 11:20:59 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Thu, 11 Jun 2026 11:20:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm3; t=1781191259; x=1781277659; bh=tKMANmpoF3pbtplO5VGja
-	geBrreMiwT/OBf4CIqlK98=; b=MltY7yN298hLWmpwFibA+qTzVeLlyO+p+ES6k
-	TP3QVV2QxS21Y8fY6tWXlQLfXS4gIahVw22dbsR+95RirWFGdGhDS4BaS+Qdk3CW
-	6HfjWokq8rcjR37SIXbHh9ZtMi4QmNFIEz58hnyc9BMo0VdFgZiZRJ0FGNgwuBQP
-	SD9H3iuODuk9zPyhuf9WM4EUd2J0kLp1CnCTfXi3I+hAZoHLgVhUp3UHXfMSGuHJ
-	AWBOUY/D911EnA1yqe3HQOVETdpqRQE5xe7wV61rEiQdPGk7DBWuL5B6m4NKJURK
-	L0ibKdvMCtApHlxcMtWLJIy/r9TzRL4cK3f0IKE7mJ+RrDq4g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1781191259; x=1781277659; bh=tKMANmpoF3pbtplO5VGjageBrreMiwT/OBf
-	4CIqlK98=; b=au7wzE9WGbM7ATHscd+MU2jfii5mWPdwxG1IHbsUeKbxbGwZe4q
-	hrDLdimyh3+Lncg0aK4tAbwvlxgUX51bwWPPvk3w+Y4PoAc5VyMb5VhFw2sbxETh
-	uY14G7XckppgANy1NSqeAR2VbV6jSvoCk5/z/50omEc5y0Fl8dKvukq9SfT+Dnz3
-	7Ukk/B12q9QJppJJDXkLD2v/p7qKC8xaMCwLjXwzOxew2zNkn7yxOo8FxWoXzWo0
-	4MVFgTV2VVybqTu6By8x8Hc+Sd+IXx06/ib+dIOc8GLFB3KPvC+qpZ7yMxyfr/Ws
-	9KKEZGdZgP6TzhciSO8lYBjqN3JYuNHwmIQ==
-X-ME-Sender: <xms:W9IqagP6jyCvXebnQk7_Zeb_bOPjrPaizYILCNDkYB6deWKvmBxzoA>
-    <xme:W9IqauYcgv5JJNGiG0JS0KmfIP9XwbvDxmhPH9dTFmCB5Nf9KhrInJI-RVEyNAhqb
-    iYRpE_yqlL0OIBN4UaeK_Q5bK3Rhngy68BBiD6r3CxuaehwnGP1Y6sC>
-X-ME-Received: <xmr:W9Iqakr64o--UATz0Ie3T5VcJC6OGrbMuvcVmEyE0UauaHuL2tb2RqiQgiLfQZyyBkQjUvg>
-X-ME-Proxy-Cause: dmFkZTGR+M3A9n0WovApy4nYX9oEEBnPbev5LuTN4Gnn/sy9SMnllzTJnek5opLIYJaYOT
-    ToH7LNZFW2F6jAkDmYIbG6pfNpUweFgiFKBJLIDxcxvhtO23rdqfSM04UPmjs+FiyIzxF2
-    0L+82G7L1FWhVecfe3qC/iXn9YfxgPgG2MI+ctzspTwXdBV9YMhdIjQ+ZyQw9QoRDLl89a
-    Z3Q5TyPqq5wAE4R8TcMNVgQyUg9aqhV9kF4+HW5fwwvmHwbQpOodRdRulqqrPatMC1UwwP
-    5yRwwe3d7Fznb+ahqPdj09U2Xi+4aBGbAcYJQvEqwkrJeYQTQ7tygStouhsnuQsA3EXrFV
-    p9dzHkUrOR99QNhMy+rfFGqVd9+jrQYWJMxgWMVoSGd6IlLDVP3mnt8nOnT34JZbpc//6h
-    qFNLUXv4XORIR0jLoDNvH4O9Ryfs17bgvjrEWfn+iMucRlpyxhwy9YvXXz4i0ozPDpxh7L
-    zC5q+UX5Z+WpqZ7n9KvnRaWh+gDVLYNcAa6NM8qd4BQ5eXbmGywFYia5g6YuErAM55DJnv
-    9gIRCkP50qHq/K4RVacIGUeIMZ4jDD0FfN0ufDnh8OxppFiOHCIsGxlTSf9chYx8/pp0Gh
-    ns+Xsj1mqMNZN44CV3MnrUzZks3OUZIrleQnGle/PcYwvsXzTw439x7e9X7w
-X-ME-Proxy: <xmx:W9IqaiaRhQEyOnif1QWVeTqV2n8y_-5AaBCWta7_TAxq1NJ2hF3X7w>
-    <xmx:W9IqasRssNNxI_gNYcvD9jN5sE2tWuwQXzkGObS5KzdQhQjQNy3FLg>
-    <xmx:W9Iqap7oF-tDusPNTndEinmYlR6wE8wuTFIDl3jBaSElrRsnZDcyzg>
-    <xmx:W9IqahwJp3fMPOPdW8va_WXRqCGD74IJJQah2k3oWc8muVFuXbFClQ>
-    <xmx:W9Iqaqai-ATOeCc8qBwYgSfeTekx59UG7cr86NcfrjNi4Qju-m3sSQKm>
-Feedback-ID: if72e4b10:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 11 Jun 2026 11:20:58 -0400 (EDT)
-From: Siwei Zhang <oss@fourdim.xyz>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Siwei Zhang <oss@fourdim.xyz>
-Subject: [PATCH v3] Bluetooth: hci_conn: Fix null ptr deref in hci_abort_conn()
-Date: Thu, 11 Jun 2026 11:19:52 -0400
-Message-ID: <20260611152039.2176565-1-oss@fourdim.xyz>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MDuAmkUr"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-91563abd6a9so393443685a.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 08:21:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781191263; x=1781796063; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=FI9CpF+vsLkoVT7GjfqVVlDBvpIE0PCRTTr7wCKeCH0=;
+        b=MDuAmkUr92ciplhswgylkFunkFqkIh0pCr8bTBYopsWRw1RvlYX3AsUJIKgEIsEXvg
+         O35S3dMaMxO4lfzuWmA6dwpRMDCPKl+ye2JNbCjXiaH0UZyr+u5KqqxsRw8aG+/JXmJy
+         COpKJcZoq7Hq8mbXBR2VH7cFbBMIeviXXXvdZr1WigrLwtRe2cmmrapA9k6ksxyi296+
+         Rf33BvD9Oe0V/TTJFjrh6OuiczwRx9+Ju4ptNPFQCbGjbHxLpXMdb6S33AGRWnNrWaiu
+         3F+e6B5+VFzyd/MhEgngVl6amQefRwcm4WIe3RqMcD6C1nve2rY4ww0qG/ZMucM6vVhL
+         XtkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781191263; x=1781796063;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FI9CpF+vsLkoVT7GjfqVVlDBvpIE0PCRTTr7wCKeCH0=;
+        b=P9iDAbqccflKa5wBXW+CwSn0kvzscAXa0fWfXFQUYzUQUG/M2D2oJ5rtKPBvKMXfG7
+         wqzsqRLbdF0hVLj+EkICFPGHzHR9t73dukU3Kdfn3VdZRmmNIMb4eH59YH0mu7cm/meC
+         9cdQeqTEKss4l2tigCoQsgb5LOQDa6Ij9L6bqRYdgte5WarcMa11LsWPJWmlCf4OhEKG
+         1zT6Tt0mN6kb2aBMf0P1CTt+GHps9wIsBPV1aRs44IVqci1YHZklfGmp+covL2fDvgiE
+         cWv0YVJ1MjM56FnGiLtKkHFurrPDINpG0qJzZDbkxtgyRujBP/7tBVxqu59tY3LlGctL
+         td1Q==
+X-Gm-Message-State: AOJu0YxCodysZ7L8Fq4vWxaNM8I2aPH7MqTjhnxVQ7WZHQ8nGNky+/UW
+	xrrCDPT8XbeQQQ4CgO/PAzjzQSKQ+9t4T33WiSPTi05jQZ2dj1SAKaDC72voDQ==
+X-Gm-Gg: Acq92OHPsA/0b43b2lPMLytyLCupU9CYL5WtV024ndZqwVMpy7oli7S2SxZdbEGYesa
+	oWVEcaeGe+HykhLCN11WLRMjXXWqjMxNxX3X9z6twHlwKYuIuXShcPl6whIlxn2jyR73crGyH1g
+	n3RoPmMqLa3fT96vgCxEHbSC/DKiKWlP898rfyY++5r37GD0VoyRNfVfpLxq7B/Vym1l/i6rvrz
+	2VyYDD8Kjxor9U8CPhW9pWZ33XSnyvoryt2aVmqpiPO+wYprmGZbTrqbh2q8KgecJe+Lk/VDekx
+	42YSzTCWdFv3GBAKu6txxAu0wSe3rGrBKbbD59tobGAdaWxzIHTAxDiFByUKu4/CL35K7JDu5N2
+	8cpppzeWnF0Sa0t/XXLL99r506sqojkCnnukRWvZYnivLwPix2Ig1bderCunxzs7K63J1uZEHnS
+	eMKz03XH2ptoVMwhhoIg2XjGXbNcibY1tYmmd7NsHo
+X-Received: by 2002:a05:620a:4412:b0:914:c032:5870 with SMTP id af79cd13be357-9160ad0dcefmr434805385a.38.1781191262997;
+        Thu, 11 Jun 2026 08:21:02 -0700 (PDT)
+Received: from [172.17.0.2] ([64.236.145.74])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9160ae26238sm209359285a.33.2026.06.11.08.21.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jun 2026 08:21:02 -0700 (PDT)
+Message-ID: <6a2ad25e.19aa4c8d.3683b8.9b14@mx.google.com>
+Date: Thu, 11 Jun 2026 08:21:02 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2677920481744007439=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, naga.akella@oss.qualcomm.com
+Subject: RE: Initial Channel Sounding Support for
+In-Reply-To: <20260611120044.1641009-2-naga.akella@oss.qualcomm.com>
+References: <20260611120044.1641009-2-naga.akella@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-hci_abort_conn() read hci_skb_event(hdev->sent_cmd) when a connection
-was pending, but hdev->sent_cmd can be NULL while req_status is still
-HCI_REQ_PEND, leading to a NULL pointer dereference and a general
-protection fault from the hci_rx_work() receive path.
+--===============2677920481744007439==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Instead of inspecting hdev->sent_cmd, track the in-flight create
-connection command with a new per-connection HCI_CONN_CREATE flag and
-route all cancellation through hci_cancel_connect_sync(), which dequeues
-the command if still queued, or cancels the pending request if this
-connection owns the in-flight create command. CIS uses the same path
-via the existing HCI_CONN_CREATE_CIS flag.
+This is automated email and please do not reply to this email!
 
-Fixes: a13f316e90fd ("Bluetooth: hci_conn: Consolidate code for aborting connections")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1109997
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.88 seconds
+GitLint                       PASS      0.95 seconds
+BuildEll                      PASS      22.94 seconds
+BluezMake                     PASS      611.29 seconds
+CheckSmatch                   PASS      327.26 seconds
+bluezmakeextell               PASS      164.50 seconds
+IncrementalBuild              PASS      656.58 seconds
+ScanBuild                     PASS      942.40 seconds
+
+
+
+https://github.com/bluez/bluez/pull/2217
+
 ---
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_conn.c         | 21 ++--------
- net/bluetooth/hci_sync.c         | 66 ++++++++++++++++++++++++++------
- 3 files changed, 58 insertions(+), 30 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index aa600fbf9a53..aa554c34f9ec 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -988,6 +988,7 @@ enum {
- 	HCI_CONN_AUTH_FAILURE,
- 	HCI_CONN_PER_ADV,
- 	HCI_CONN_BIG_CREATED,
-+	HCI_CONN_CREATE,
- 	HCI_CONN_CREATE_CIS,
- 	HCI_CONN_CREATE_BIG_SYNC,
- 	HCI_CONN_BIG_SYNC,
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 54eabaa46960..eba4a548bef5 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -3181,26 +3181,11 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
- 
- 	conn->abort_reason = reason;
- 
--	/* If the connection is pending check the command opcode since that
--	 * might be blocking on hci_cmd_sync_work while waiting its respective
--	 * event so we need to hci_cmd_sync_cancel to cancel it.
--	 *
--	 * hci_connect_le serializes the connection attempts so only one
--	 * connection can be in BT_CONNECT at time.
-+	/* Cancel the connect attempt. A return of 0 means the create command
-+	 * was still queued and got dequeued, so there is nothing to disconnect.
- 	 */
--	if (conn->state == BT_CONNECT && READ_ONCE(hdev->req_status) == HCI_REQ_PEND) {
--		switch (hci_skb_event(hdev->sent_cmd)) {
--		case HCI_EV_CONN_COMPLETE:
--		case HCI_EV_LE_CONN_COMPLETE:
--		case HCI_EV_LE_ENHANCED_CONN_COMPLETE:
--		case HCI_EVT_LE_CIS_ESTABLISHED:
--			hci_cmd_sync_cancel(hdev, ECANCELED);
--			break;
--		}
--	/* Cancel connect attempt if still queued/pending */
--	} else if (!hci_cancel_connect_sync(hdev, conn)) {
-+	if (!hci_cancel_connect_sync(hdev, conn))
- 		return 0;
--	}
- 
- 	/* Run immediately if on cmd_sync_work since this may be called
- 	 * as a result to MGMT_OP_DISCONNECT/MGMT_OP_UNPAIR which does
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index df23245d6ccd..1fe19ddbbc2c 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6668,6 +6668,12 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
- 					     &own_addr_type);
- 	if (err)
- 		goto done;
-+
-+	/* Mark create connection in flight so hci_cancel_connect_sync() can
-+	 * cancel it while blocking on the connection complete event.
-+	 */
-+	set_bit(HCI_CONN_CREATE, &conn->flags);
-+
- 	/* Send command LE Extended Create Connection if supported */
- 	if (use_ext_conn(hdev)) {
- 		err = hci_le_ext_create_conn_sync(hdev, conn, own_addr_type);
-@@ -6703,6 +6709,8 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
- 				       conn->conn_timeout, NULL);
- 
- done:
-+	clear_bit(HCI_CONN_CREATE, &conn->flags);
-+
- 	if (err == -ETIMEDOUT)
- 		hci_le_connect_cancel_sync(hdev, conn, 0x00);
- 
-@@ -6982,10 +6990,19 @@ static int hci_acl_create_conn_sync(struct hci_dev *hdev, void *data)
- 	else
- 		cp.role_switch = 0x00;
- 
--	return __hci_cmd_sync_status_sk(hdev, HCI_OP_CREATE_CONN,
--					sizeof(cp), &cp,
--					HCI_EV_CONN_COMPLETE,
--					conn->conn_timeout, NULL);
-+	/* Mark create connection in flight so hci_cancel_connect_sync() can
-+	 * cancel it while blocking on the connection complete event.
-+	 */
-+	set_bit(HCI_CONN_CREATE, &conn->flags);
-+
-+	err = __hci_cmd_sync_status_sk(hdev, HCI_OP_CREATE_CONN,
-+				       sizeof(cp), &cp,
-+				       HCI_EV_CONN_COMPLETE,
-+				       conn->conn_timeout, NULL);
-+
-+	clear_bit(HCI_CONN_CREATE, &conn->flags);
-+
-+	return err;
- }
- 
- int hci_connect_acl_sync(struct hci_dev *hdev, struct hci_conn *conn)
-@@ -7039,20 +7056,45 @@ int hci_connect_le_sync(struct hci_dev *hdev, struct hci_conn *conn)
- 
- int hci_cancel_connect_sync(struct hci_dev *hdev, struct hci_conn *conn)
- {
--	if (conn->state != BT_OPEN)
--		return -EINVAL;
-+	hci_cmd_sync_work_func_t func = NULL;
-+	hci_cmd_sync_work_destroy_t destroy = NULL;
-+	int create_flag = -1;
- 
- 	switch (conn->type) {
- 	case ACL_LINK:
--		return !hci_cmd_sync_dequeue_once(hdev,
--						  hci_acl_create_conn_sync,
--						  conn, NULL);
-+		func = hci_acl_create_conn_sync;
-+		create_flag = HCI_CONN_CREATE;
-+		break;
- 	case LE_LINK:
--		return !hci_cmd_sync_dequeue_once(hdev, hci_le_create_conn_sync,
--						  conn, create_le_conn_complete);
-+		func = hci_le_create_conn_sync;
-+		destroy = create_le_conn_complete;
-+		create_flag = HCI_CONN_CREATE;
-+		break;
-+	case CIS_LINK:
-+		/* LE Create CIS is shared by the whole CIG and cannot be
-+		 * dequeued per-connection; only cancel it in-flight below.
-+		 */
-+		create_flag = HCI_CONN_CREATE_CIS;
-+		break;
-+	default:
-+		return -ENOENT;
- 	}
- 
--	return -ENOENT;
-+	/* The create command is in exactly one of two states: still queued, or
-+	 * in flight. The create flag is only set once the worker has dequeued
-+	 * the entry and started running it, so the two states are mutually
-+	 * exclusive. Try to dequeue first: if it succeeds the command had not
-+	 * started yet and we are done. Otherwise the worker already pulled it
-+	 * off the queue (the dequeue is a no-op here), so if this connection
-+	 * owns the in-flight create command, cancel the pending request.
-+	 */
-+	if (func && hci_cmd_sync_dequeue_once(hdev, func, conn, destroy))
-+		return 0;
-+
-+	if (create_flag >= 0 && test_bit(create_flag, &conn->flags))
-+		hci_cmd_sync_cancel(hdev, ECANCELED);
-+
-+	return -EBUSY;
- }
- 
- int hci_le_conn_update_sync(struct hci_dev *hdev, struct hci_conn *conn,
--- 
-2.54.0
 
+--===============2677920481744007439==--
