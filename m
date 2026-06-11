@@ -1,199 +1,155 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EFA536CE1E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 19:45:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85861E9B37
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 20:02:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781207105; cv=none; b=QXEBy9hqDuzOewpUQv0iw5/qiSBsefge/sYJ/zgAcgMzjqX5MP7kAsn0lnSHyb2bbel/9sZjZKPqxPTgTPMtZex982P3WO5DyDBmoU1gczQ56FTXYRvkeDRZHUzXLW2z4WOofWTKUPG6OzCfXEO47XFT2e8AMxG0cINABk2PmAc=
+	t=1781208149; cv=none; b=loTxXDLakwjp4A5yCyDXa9M1OWpzhhpC30nDupeCmJ6w1a8+l8jYcjBij/UZL84wjxyE9tX7S9Y/WP23LmLn7hRfStFBepzhXSA+mHGhUuEG8vENVQL1HZAI63EoLMP62sCL2maaIRbtSgRRlpwb0QAkgnQ354W3RlHq9eSvCUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781207105; c=relaxed/simple;
-	bh=01ioWAHb5nCsaIc11XbExlYS4Qk3/qMPjNMVsOpw1as=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H+drvFKSH6uAUnVhaqAZTVmTrlN1DLxlvgt7MuXCTBds65wgWKmLG7Gb8v1hyeLXZhaii0WFwJdyoFxEOid2Raiuo1iB52qdJyd1hbsCVma3jbfqr/fNLYDWOmdWHwp61rt87Wl2vDMhG35Ns3eoTex0kG3ScnVx+3F1hhAqdEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=NsgxwsD3; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=ChWt09wZ; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1781208149; c=relaxed/simple;
+	bh=t+Sa6JYVqje+X2VmqbLlHZ0WlmiDP284+5c9LlzSHz0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Dx8ehIX/Qlc3RB3iQb/zZUE4+xFSUFJR1z1BGgHqhy7WS51Ry7w6btBxovvDOgO4a/CdvknVl3YJH23+0eoOCkatKsMV3grEhv17KAfc4jKNXiZpuDiJ/9bpROmuvy1Yhb01cr/0bAeHWxeuIU1JZgb+kx8IesjkEx39rGwmB2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=HmQxW+aN; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="NsgxwsD3";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="ChWt09wZ"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65BJ3Oqj1389256
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 19:45:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=ET6MuyER7wxqL0ASDlEV4k/M
-	QK1DNFn9BvrzLC069vE=; b=NsgxwsD3g9/tq9EhZ6i+/tcISCfFF7/04AjnxCFQ
-	Ml6KjDCaTQdVQ7/O+jrLiaCqhWqWALIh+4xScFrNXEJjaxa1e99uVeRza6pIO8kS
-	6hcsGgFXizRuscbj97lpaijwrWQV32/x0QIgBLPfPHqms3EOJ/heK1CG59rjJks8
-	XV6fgwZKlJCHBOm0dRHCYTgP9E+a8EAYjLoul37S9v7b3hIxpOEZW8RMrrxqWjId
-	vv3NZrNwStAj/Ls5lRcxQqAhDm2KQ4s1hfuEc5mXEJ+IjcJuAYgagI1a3Cklagkc
-	U/PqeV6jk8kaHrttj5udUw1psw4Zas8zGTIZ5y9LooMAnA==
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4er1658p7w-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 19:45:03 +0000 (GMT)
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-5177bddf6e0so5072891cf.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 12:45:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1781207102; x=1781811902; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ET6MuyER7wxqL0ASDlEV4k/MQK1DNFn9BvrzLC069vE=;
-        b=ChWt09wZlxE5j1/g37hBp5uXGbKO3DITbM5UEWqcp6HjvCdkXcxW5JJ/yGswHUFnoh
-         KMICONwmJTHsYjM7qc3gaPB38fzQjhrX8fHA/Gjt2ptoMqQPskck/aLvrF9RdDasNT98
-         t6EdtAkki3lZq7TRTvJZ6Yicazt7hDL72Amutc2l2QvGf4zrlx8ScuV6lyhIYP3yJr7h
-         gxnNqHzXgTZDW8DNipL5C99ueaWKlMXQbPFdgyzme26GPweMdfDe3uCp7c0R/ZJUF9Ek
-         YlAebBhW9AFwK9EMfmBCpwkhYYRkWhOCIfjOhBlmNe4FVrvwuLzk5LkgMgodpnoKpQqX
-         ntrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781207102; x=1781811902;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ET6MuyER7wxqL0ASDlEV4k/MQK1DNFn9BvrzLC069vE=;
-        b=fp3w2fixcMCXTo1bX93r4ohsaxkRb5iMPXRVGJ53yTHUUIe7WBV7xrsx5a7pQ5ELhO
-         W6TPVxBYR/hBkSQevluERIPsmDK/s1keF+eLZURYvsPKB7NnTFqw0yRFlvvjBsy0+39o
-         taqou5UGc+iwGoRJulYWpWhFhWjbbWcrOXMn/Oq6LnYPXEB0x9TDYv+u7JIWfiOS3RGa
-         +A3oy4cztQFWd5AV8oZLPscxPzEEPiB6nLmExV/tMposjIR6MLrSDYguyZ2sF+TiQZhS
-         4OPP9FgCgcllEf4AhOpcnsqcKpO8WhjtaGmCbyME/vqCrEg7uQ1r+ntiJYKPIi2XAPIH
-         f1Sw==
-X-Forwarded-Encrypted: i=1; AFNElJ+8weceukpKykJNgK7nRTNNGkBXb6EMCBEjn8Jlxa1T08NgD+9DJ9h/w69yfmOb7hmBLTJSHtyy7VLY1VHX2EM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzz3lgVaSGIJAxBSefkGGHcPh1W9XW4pUXQJteqkM0duevfM64E
-	3tX33dNvMhyZIVjxUer6549dYcoDvc5jOhP97xj7BddPkV2azt6RtOSxRpOcQassdhnMPtcdxx9
-	vfwUUEdzmyVjRxZcVgqFidlF5mYvMO7JQw7cwvbxeZl0SqKZMtTM/Y7GJRwKHyPmeSaehxvo3Hk
-	771Us=
-X-Gm-Gg: Acq92OGUv0UJH3jArIJG/vH8wT6ffamUD9gYrmXcv3nDCIqx1UBr4z3jFcZ9ROymIWI
-	dP2saHtpl3kI4Z+pTtugAtQLy5O15EwjLGa/J4v7FXAtPSPyXflCg6fiQX2ND+FJ/8WAv5d5frl
-	xM6uTH/FldxpOeBUy81/3I4mHdtI5nH7AMFCjZFY+N3YVoTJ6rcUJUAAwVU4Y4W78JF6ivJmTPg
-	ta7qcl76IX7FmoGkySy+I28wAekX0uWxO8oMEE6SqOC17QL9mvxfa4zfEaMRsjBHiwwrAkZVjbD
-	r7tichYJmiVHtfub5nNkjwc6JDbwD7TQ/cbcgpVCX7S3NMVlb+zNfCfDbgdN3/zzKQxrZ5kuZ7U
-	E1K1+cU5MjQg29czkYoMQqiEpYXm8STNYHe8at0vnIw2hs0fIwA2wK4x9N/gXkmwU6QDVr1jsXD
-	7h4cjHYhDOGKdogeN1pcsbhSf8KZkjkI80/6w=
-X-Received: by 2002:a05:622a:14c8:b0:516:ddfa:b6b9 with SMTP id d75a77b69052e-517fbe619e8mr1984821cf.23.1781207102429;
-        Thu, 11 Jun 2026 12:45:02 -0700 (PDT)
-X-Received: by 2002:a05:622a:14c8:b0:516:ddfa:b6b9 with SMTP id d75a77b69052e-517fbe619e8mr1984411cf.23.1781207101976;
-        Thu, 11 Jun 2026 12:45:01 -0700 (PDT)
-Received: from umbar.lan (2001-14ba-a073-af00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a073:af00:264b:feff:fe8b:be8a])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5ad2cb46b25sm103098e87.34.2026.06.11.12.45.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jun 2026 12:45:00 -0700 (PDT)
-Date: Thu, 11 Jun 2026 22:44:59 +0300
-From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Cc: Manivannan Sadhasivam <mani@kernel.org>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-        Rob Herring <robh@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-        Qiang Yu <qiang.yu@oss.qualcomm.com>,
-        Jeff Johnson <jjohnson@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-        Rocky Liao <quic_rjliao@quicinc.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, linux-arm-msm@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
-        devicetree@vger.kernel.org, Bartosz Golaszewski <brgl@bgdev.pl>,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 7/7] arm64: dts: qcom: sm8350-hdk: describe WiFi/BT chip
-Message-ID: <dz4qovpquxgynnzviqg6g23oa2o3trlkznremnmlqfnlj3b62x@oqgcuvalfcph>
-References: <20260601-sm8350-wifi-v1-0-242917d88031@oss.qualcomm.com>
- <20260601-sm8350-wifi-v1-7-242917d88031@oss.qualcomm.com>
- <955691e1-e40d-4584-861e-8f29db4ba8a9@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="HmQxW+aN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1781208147;
+	bh=CYuAP7IGML0fFWdQmWG9rQiIKFS6FmstToKOQ59LtuU=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=HmQxW+aNG4nQnSJNRi9VN+XASnCRwES/8GJO79QOpaKix1apt+cjP6aD63OnS34SK
+	 2BiOkejKO1P5pI3s4WWeEH1LMLIiDCL/P7vcXMZmhZwfpXRh6mAsdvBl9/h5SdB8yQ
+	 6I0KqiMXO7+qRbreQlF3KLheC+16J0Fp3Uqry/Fs=
+Received: from github.com (hubbernetes-node-d2161f0.va3-iad.github.net [10.48.12.74])
+	by smtp.github.com (Postfix) with ESMTPA id F00E480040C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 13:02:26 -0700 (PDT)
+Date: Thu, 11 Jun 2026 13:02:26 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/5d836f-40f2e3@github.com>
+Subject: [bluez/bluez] ea6b63: profiles/audio/bass: Use BASS_Modify_Source
+ when a...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <955691e1-e40d-4584-861e-8f29db4ba8a9@oss.qualcomm.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjExMDE5OCBTYWx0ZWRfX0BEfuFfa+s8J
- c24ZBYFttt9rVvSnSNEsaNa2rEOxN6WP5Duq6oL/kD6oPErlvGzpzteeSErl3/7o4fOiitqJCjj
- 550gsQBBjcGiKxUaQw+9ebEkxz2N0U5bum8bylvuwYnBw6NApiOWWExb5n6TGllggTWxReRD5uE
- RDWfSiIKpoIu0ZBfWLLpgQ9R1V+JRUvx5jFKwa+xjWnBgQ/cZCP4bAYdP9bpIWx8+BsOaJdLyk/
- nUKeqUHqS9Mhuf6qDpovmh450vpSVVZd7isYyenJz+ubnS45cq7CZb1B52jcR3KiQtRg8CU8wAw
- E9fT5u6qqi1zmUxZLT+kBXFQRfXDNVF+EYAgyp+6bJ2/wqG2jNkGwslU2c1rX7t4AWQoAY2Gmgc
- ASYVtQCCcrsdmSGRrvSpZDxYUavdGYKQYAHgMBojGtIr14pAzfAg7ABdEqVwV/jbjb1eQEYGjv/
- pTTmkAcP2403+WPzTLQ==
-X-Authority-Analysis: v=2.4 cv=LNpWhpW9 c=1 sm=1 tr=0 ts=6a2b103f cx=c_pps
- a=JbAStetqSzwMeJznSMzCyw==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22 a=NvgA2eVT_OJx7K5CLicA:9
- a=CjuIK1q_8ugA:10 a=uxP6HrT_eTzRwkO_Te1X:22
-X-Proofpoint-ORIG-GUID: UQelNqFE5CjGptcd-rwQka7OYsiZslVn
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjExMDE5OCBTYWx0ZWRfX8nM6N8t2Mpym
- biJDAlgdQj7tRqcRPInEELA5b5ZkP3mkljYozQ0+EFrJlRcGq1J8oDR+EW53FHyQOHrVSpnEH+8
- bzeXRIRW2iwFLaafLLQNmCUFWFerBjI=
-X-Proofpoint-GUID: UQelNqFE5CjGptcd-rwQka7OYsiZslVn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-11_04,2026-06-11_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 malwarescore=0 adultscore=0 priorityscore=1501 phishscore=0
- clxscore=1015 spamscore=0 bulkscore=0 lowpriorityscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606040000 definitions=main-2606110198
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Thu, Jun 11, 2026 at 02:09:27PM +0200, Konrad Dybcio wrote:
-> On 6/1/26 11:46 AM, Dmitry Baryshkov wrote:
-> > The SM8350 HDK has onboard WiFi/BT chip, WCN6851. It is an earlier
-> > version of well-known WCN6855 WiFI/BT SoC. Describe the PMU, BT and WiFI
-> > parts of the device.
-> 
-> [...]
-> 
-> > +	wcn6855-pmu {
-> > +		compatible = "qcom,wcn6851-pmu", "qcom,wcn6855-pmu";
-> > +
-> > +		pinctrl-0 = <&bt_en>, <&wlan_en>, <&swctrl>;
-> > +		pinctrl-names = "default";
-> > +
-> > +		wlan-enable-gpios = <&tlmm 64 GPIO_ACTIVE_HIGH>;
-> > +		bt-enable-gpios = <&tlmm 65 GPIO_ACTIVE_HIGH>;
-> > +		swctrl-gpios = <&tlmm 153 GPIO_ACTIVE_HIGH>;
-> > +
-> > +		vddio-supply = <&vreg_s10b_1p8>;
-> > +		vddaon-supply = <&vreg_s11b_0p95>;
-> > +		vddpmu-supply = <&vreg_s11b_0p95>;
-> > +		vddpmumx-supply = <&vreg_s2e_0p85>;
-> > +		vddpmucx-supply = <&vreg_s11b_0p95>;
-> > +		vddrfa0p95-supply = <&vreg_s11b_0p95>;
-> > +		vddrfa1p3-supply = <&vreg_s12b_1p25>;
-> > +		vddrfa1p9-supply = <&vreg_s1c_1p86>;
-> > +		vddpcie1p3-supply = <&vreg_s12b_1p25>;
-> > +		vddpcie1p9-supply = <&vreg_s1c_1p86>;
-> 
-> [...]
-> 
-> > @@ -373,6 +437,13 @@ vreg_l7e_2p8: ldo7 {
-> >  			regulator-name = "vreg_l7e_2p8";
-> >  			regulator-min-microvolt = <2800000>;
-> >  			regulator-max-microvolt = <2800000>;
-> > +
-> > +			/*
-> > +			 * This is used by the RF front-end for which there is
-> > +			 * no way to represent it in DT (yet?).
-> > +			 */
-> > +			regulator-boot-on;
-> > +			regulator-always-on;
-> 
-> msm-5.4 maps this to bt-vdd-asd-supply (asd being a keyboard smash,
-> perhaps?) - what is its actual use?
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: ea6b63562d9d249b5925d09813aa01510123aae8
+      https://github.com/bluez/bluez/commit/ea6b63562d9d249b5925d09813aa01510123aae8
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-10 (Wed, 10 Jun 2026)
 
-WiFI/BT RF front-end, a separate chip containing amplifiers, couplers,
-etc.
+  Changed paths:
+    M profiles/audio/bass.c
 
-It is a separate chip (or a module), it is not powered on by the PMU,
-etc.
+  Log Message:
+  -----------
+  profiles/audio/bass: Use BASS_Modify_Source when assistant is active
 
--- 
-With best wishes
-Dmitry
+When a MediaAssistant is already active (streaming), a subsequent Push
+should send Modify Source with PA_SYNC_NO_SYNC and bis_sync=0 to
+remove the broadcast source, rather than adding a duplicate source.
+
+Split push() into push_add_src() and push_mod_src() helpers. The push
+dispatcher checks the assistant state: ACTIVE non-local assistants and
+LOCAL assistants with a tracked source entry both route to
+push_mod_src, while all others proceed with push_add_src.
+
+Add per-device source tracking for LOCAL assistants via a bass_src
+struct (keyed by bt_bass pointer) stored in a per-assistant srcs
+queue. This is needed because LOCAL assistants never change state, so
+we cannot rely on the state machine alone to detect active sources.
+
+Also fix the bass_src_changed BID filter: the previous check rejected
+non-local assistants when BID was zero, but this incorrectly excluded
+LOCAL assistants in REQUESTING state whose BID happens to be non-zero.
+Change to reject assistants whose own BID is non-zero when the
+notification BID is zero, which correctly matches local streams.
+
+
+  Commit: 590aae8b695082185b2354e9f194078804fd9f2b
+      https://github.com/bluez/bluez/commit/590aae8b695082185b2354e9f194078804fd9f2b
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-10 (Wed, 10 Jun 2026)
+
+  Changed paths:
+    M profiles/audio/bass.c
+    M src/shared/bass.c
+
+  Log Message:
+  -----------
+  profiles/audio/bass: Handle PA_SYNC_NO_SYNC in handle_mod_src_req
+
+When the delegator receives a Modify Source operation with pa_sync set
+to PA_SYNC_NO_SYNC while already synchronized to PA, release all
+setups instead of updating BIS sync which would not apply the
+requested termination.
+
+Also reset the encryption state to no encryption when the last BIS
+index is cleared from a subgroup, so subsequent source additions
+start with a clean encryption state.
+
+
+  Commit: 5b0c20727569e0ad6fee2c7d92dd375fa0fb45b1
+      https://github.com/bluez/bluez/commit/5b0c20727569e0ad6fee2c7d92dd375fa0fb45b1
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-10 (Wed, 10 Jun 2026)
+
+  Changed paths:
+    M profiles/audio/bass.c
+
+  Log Message:
+  -----------
+  profiles/audio/bass: Fix delegator reprobing after disconnect
+
+delegator_disconnect left the old delegator in the delegators queue
+after calling device_remove_profile. When a new delegator was created
+for the same device (e.g. on a subsequent Add Source after Modify
+Source removal), delegator_attach would find the stale entry and
+return early, leaving the new delegator without a service. This
+caused the "Unable to probe service" error and prevented the BASS
+bcode exchange from working on reconnection.
+
+Fix by removing the delegator from the queue, clearing service user
+data, and calling delegator_free before disconnecting the service
+and removing the profile. This also fixes a potential use-after-free
+where delegator_disconnect accessed dg fields after device_remove_profile
+could trigger delegator_detach -> delegator_free through the
+bap_detached callback chain.
+
+Also add validation in bass_req_bcode to detect and discard invalid
+(all-zeros) broadcast codes that may have been stored from a previous
+connection.
+
+
+  Commit: 40f2e34b373944cf8142154881ce69f92c2be68d
+      https://github.com/bluez/bluez/commit/40f2e34b373944cf8142154881ce69f92c2be68d
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-10 (Wed, 10 Jun 2026)
+
+  Changed paths:
+    M doc/org.bluez.MediaAssistant.rst
+
+  Log Message:
+  -----------
+  doc: Document Push behavior when MediaAssistant is active
+
+Document that calling Push on an assistant already in active state uses
+BASS_Modify_Source to update the existing source rather than adding a
+new one.
+
+
+Compare: https://github.com/bluez/bluez/compare/5d836f1c697c...40f2e34b3739
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
