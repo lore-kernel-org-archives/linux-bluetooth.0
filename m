@@ -1,72 +1,68 @@
 Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0A319DF62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D05A3126D7
 	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 17:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781198573; cv=none; b=QyONFq9TA5fVkv3X8qoCD/qvEIlCEW0d6I0hRBRLIf6mfbVpzjHjPpHtD/D+61pAMR46OpJz9H5wC3gU6byUmTLG8BJwkL9CZJIBNPreo0O8mwt7FdHMBlzUb5H6WRFIZLCY6lKbgnArDc2Iu3WeFuP2Yu3xOG0WFk98Lkqdvas=
+	t=1781198574; cv=none; b=pAqZ1cj2/+tL+F2xDYWs6to6MgBtRflzHjHGBBpjmCpe8n6803adn4FYWLhKZYXZryrhZ7CzrY7/pO5wkp+mOEbIjWBRBKliIJH78p9qGGDyo+AueW+FEgBAkLj2eMYpswUJTwpjGyjeU+EjvRaZADepI5jzRX74tf68FqkhPZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781198573; c=relaxed/simple;
-	bh=91FRLqo09leHOfEK6+9ARCLfYWmf271AJ9VtRWEON58=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YSKfxBq88JCkRsyVUAtnoUn3h78q77b79A5r5OXOtLSDrjvqAe4wZ6hMdrWteJO2IUimWDNDgXhAM8rsA1OZP6TeuO5dge9RGMisxKwemd84p9z5J2kxWFPbeNk6Tx+kBSLYrOyfycmp0SyUAWt2ZX6DQo6Ke6jeiIFRo6sQ8dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VCsF3gtN; arc=none smtp.client-ip=209.85.222.52
+	s=arc-20240116; t=1781198574; c=relaxed/simple;
+	bh=PqDIdaaZc8UafpHGMD+reh70UOQFUpKQ27LZohEWEqg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=rFekmg2mV+c6KpkCbehDS364BgrXH8ZxR+qGP7pAh2O34eW5B9bUdzEGlO0lYyo8DllvVAgF4LKlAyoe/0GvhFggDOTQOwV80aE8GA9wLqu7eajlvKgR1fFBKg4WLBOS590glENyOFC7OSSokdVdKnjH9FmWScv6u8UDms2dfXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ynsr0JBa; arc=none smtp.client-ip=209.85.222.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VCsF3gtN"
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-9639b1ef167so19416241.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ynsr0JBa"
+Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-96392241154so33739241.1
         for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jun 2026 10:22:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20251104; t=1781198565; x=1781803365; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yV3gywVs9F9RhUHwuQZGUDFPvVFFnaQ2a77xeZdNJC0=;
-        b=VCsF3gtNQDge2waJTryp9j9135CF4x5iV+zIsez5BljiL0s/R39lB864vBTcr11w1D
-         Qbkli+iu4E+TEukxBOUi5jcj7GCtArRCGQqVubP1JSLD/S9PBTKmL6eqKbTsHihiYLN7
-         HARt0zbieEyhnLPOT2q/QUcY3mTMx0csaH47WpzmQhuca95x53pRjerwX23RWb8Jlnw8
-         RFSfMRbSqdjcyolxKFv0r/qj4YcX57a45fmHrX/vzgsIF9519iHX6GpaTrYzoUr/faRA
-         qkh5heyc091h3AfgWegKCzBB7ZRjRJFz2CqNWzpLIo/0eSL0A/Spq3HuuPSRVrK2C4kJ
-         CdAw==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1dzSDoPVuAz9gPAU+yPJ2gHXE6Gv8zhX+IRndkTDJCk=;
+        b=Ynsr0JBabGHuN0/Gh9lHFmMPCUREMISfM4olImr56DmCN0WAyxiyfieOmGHTFFdCFr
+         X7c3PFyCFt42mjty3YlvdNijqAkmc7Ec+CRIm8aMJYyUWgWF45fmFeUiSaw72+aAEoGi
+         LaE32hBu3z6BWJsUqG3iBiqwxbWIn62j04+hCHYVg4DfZBKP/8NShIPDjnxT8l3ceS93
+         mw6LJJ7TqvSBBg5Tu/grYNLUznEHh48gnXp5cm/KhtxBw3EfDjluqHo4MWqqoU8BJrqQ
+         MTxOoO3Snq+KjMIJNpzg1N/nYlLTiXu9NjuZAEHB3KgDY0GBt43XCqntTfgBFPGOoHo9
+         Zggg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1781198565; x=1781803365;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yV3gywVs9F9RhUHwuQZGUDFPvVFFnaQ2a77xeZdNJC0=;
-        b=ZC9X3Rg3GaFj+7KOKlpNEEVL0vJ+3QSBsDJgaehbUNUxSlM7IQ3qBQtL8/0kd6cr1h
-         QFHmQ1YdSlOhFn2+KdLTIJRUJk0O/vw802/xO4hMlqLG1XIYcCbMnoyVazxUBGLSKeXD
-         tcHGonOAGQgizwFDAA7ptdaL+tT40uDWewfsvl+KxAi7uVSYptG1acXrt4cDTXUE/Lv7
-         EBF02MH3437X03de8TmukkfSlaT39/autzgIfMMYs/VD1YxQWNXrbHn6M3MmdULnwvTW
-         VgRrOJYabCmsaIEjzJOhyaJgsnbE+O2vpoG8QjjewLn6bYih3ObF7Vaga3dBKwiY/Fui
-         27VQ==
-X-Gm-Message-State: AOJu0Yy7exCxYT0Dhyz+85h9SFOSMHwIzxroLHK+xUJuWzz4a0ZYtHRT
-	50VHTZNhFCcxije9kb+rBiMNMe2MzpcN7dtzNHutEPDZ9ogZSrRpprc/qdTEckzh
-X-Gm-Gg: Acq92OHEqvIHyeTqUEQFjqtmq7p5+vJDRbrpxCM85PKwKOf4/zWkEEQt2QqF8CluJCy
-	cphkLpNMKpkCIaIx3hiVMI2l2FLGenaLL8X6FlAGlv3GOFRSxXVih23L58yvXfZ8Ek/0NzJxGg7
-	nOHx1ZjAtcUe4Oat60bsLOaE6KE+04yV1kheAsr+nRMqCvQdeU0EDG0cKuXTQ0MM+kFyIOhJWcg
-	zb9F/1+hsrRxCQc/eEcxtXL8lc/YSTwYm4zyx6D/NBOccdB2dzpA5krs/qFOZZR5kfodDJLEXAw
-	ZDnFQuNvKF/RoxW0JY24d0fvxkHDFU8iAjTqLsd3CjHpgpXfsbvMYdM6yHhgn1RQEO9Lf+sa6Z6
-	nGOqfsB1gELZqAbbmKtsm04aI+i+ldsbhr/ocNcnlAQ61+6jBzpEwQB3yLqXBsd2Gr75BNdCipA
-	IRBh3ituW6Fi3IA9cb9Kgb6wuocWxDVSSicy2GSf411q5dUeayOCFtwTLEOOWEdpJBviDKF0IC3
-	IPdZmdOuwpWy1ZBVsvVJhEilaU/
-X-Received: by 2002:a05:6102:580a:b0:612:7ddc:52ee with SMTP id ada2fe7eead31-71d5c471e3bmr2412817137.15.1781198565008;
-        Thu, 11 Jun 2026 10:22:45 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1dzSDoPVuAz9gPAU+yPJ2gHXE6Gv8zhX+IRndkTDJCk=;
+        b=GCfyD/ysDDKdEJ3HfXfYDMNvKkJZkM9qcLcP9Eakpe1Rsn5lCcRzryj1QKHulye1Mf
+         ZeSdjiJpz8QEtSEY8NGZ1//4JRRZU1t2bbmPUEUWe84ZC+GDEk9Bu8oKwj3pXyRDMUMm
+         QMdpLPlyeAS0X56GmaqKIvPFoxBsIL+WoYZmaNUEFAVddW9GFCQIyCbmfBpVsQnF88rP
+         bNf/it/tiurJUw3CnozLeG9JrK5kHgeOJHCb+Ejs3U6egxzi5+3KBB+eht+G/JULx2+T
+         tNwJLGoqEr+NJUFtarBAKbnMf9TpUHyp1OzEw6ANn0yNHl0GB0wD6KXEjAVQVM7C67dZ
+         fvGQ==
+X-Gm-Message-State: AOJu0Yx/6Esu66z7I9mbrj57/lrHRKqdztsWJvoB1jat8VZF5mf7HmG0
+	y4nweYxQmBvQZZUix5+bV0/4kem19sJxo0JL9xvst0IKRWF01ldYYFvhbJ1pjwRK
+X-Gm-Gg: Acq92OFgOk3wTsM8AslLH1fI/w0pGqqEnXGILHqROjxJrccYEuEuHMCm//9i7OCFxA7
+	ki85YJbelC5UI3JAo85xiYkA6ApDwphNERmmJvWPpuhFbiFHsnw0MfPNiObmVbPE0GMmk09VTz7
+	Tbnum0SE8C1iQq+hNGUA7Yt1mGE//btPpkL/H5LoXEXXNJBu4MEtj1bPFrA5iH2To5Md9XNQ6pM
+	2Z3qE3VGNceshjoy5a2XFFcwi08Mqr/QLM+QX/EQQEB4gN4n7JzclVRxLwcZulQyu/wRYUgoYuL
+	//S/W2QW4BFVDnIirQVoVCyzmc3p9hQIGh6aDGa34igB1H39QRvizlJcanMjonLdGj1CjrJ/4w0
+	JYUie23TbgSa+FQjTKt5rm2DahW8hWZuUwTOoSdNIiQ4pdmyWxOD/VEIglMn7ZBh8H94axa7SRf
+	9dvlTXBK4a+UD0kEuj9fheYtcALSYJ81hxFZQ+lYtsGCm10XoLwEBCwrG3h2GeuxYuzTo4qjy8B
+	Cfptbfi6ZUl+j/jaQ==
+X-Received: by 2002:a05:6102:26d6:b0:650:967f:fb32 with SMTP id ada2fe7eead31-71d5d49bb76mr2536565137.3.1781198563551;
+        Thu, 11 Jun 2026 10:22:43 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-71d9267bb61sm1689828137.9.2026.06.11.10.22.43
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-71d9267bb61sm1689828137.9.2026.06.11.10.22.41
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jun 2026 10:22:44 -0700 (PDT)
+        Thu, 11 Jun 2026 10:22:42 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/4] profiles/audio/bass: Handle PA_SYNC_NO_SYNC in handle_mod_src_req
-Date: Thu, 11 Jun 2026 13:22:33 -0400
-Message-ID: <20260611172235.92930-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 1/4] profiles/audio/bass: Use BASS_Modify_Source when assistant is active
+Date: Thu, 11 Jun 2026 13:22:32 -0400
+Message-ID: <20260611172235.92930-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260611172235.92930-1-luiz.dentz@gmail.com>
-References: <20260611172235.92930-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -77,160 +73,297 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When the delegator receives a Modify Source operation with pa_sync set
-to PA_SYNC_NO_SYNC while already synchronized to PA, release all
-setups instead of updating BIS sync which would not apply the
-requested termination.
+When a MediaAssistant is already active (streaming), a subsequent Push
+should send Modify Source with PA_SYNC_NO_SYNC and bis_sync=0 to
+remove the broadcast source, rather than adding a duplicate source.
 
-Also reset the encryption state to no encryption when the last BIS
-index is cleared from a subgroup, so subsequent source additions
-start with a clean encryption state.
+Split push() into push_add_src() and push_mod_src() helpers. The push
+dispatcher checks the assistant state: ACTIVE non-local assistants and
+LOCAL assistants with a tracked source entry both route to
+push_mod_src, while all others proceed with push_add_src.
+
+Add per-device source tracking for LOCAL assistants via a bass_src
+struct (keyed by bt_bass pointer) stored in a per-assistant srcs
+queue. This is needed because LOCAL assistants never change state, so
+we cannot rely on the state machine alone to detect active sources.
+
+Also fix the bass_src_changed BID filter: the previous check rejected
+non-local assistants when BID was zero, but this incorrectly excluded
+LOCAL assistants in REQUESTING state whose BID happens to be non-zero.
+Change to reject assistants whose own BID is non-zero when the
+notification BID is zero, which correctly matches local streams.
 ---
- profiles/audio/bass.c | 72 ++++++++++++++++++++++++++++++++++++++++---
- src/shared/bass.c     |  6 ++++
- 2 files changed, 73 insertions(+), 5 deletions(-)
+ profiles/audio/bass.c | 176 +++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 150 insertions(+), 26 deletions(-)
 
 diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
-index f018f8b3ad7f..5eb7bff076bb 100644
+index 1fd7704a77a2..f018f8b3ad7f 100644
 --- a/profiles/audio/bass.c
 +++ b/profiles/audio/bass.c
-@@ -420,7 +420,13 @@ static void setup_clear(struct bass_setup *setup, int bis)
+@@ -108,9 +108,16 @@ struct bass_assistant {
+ 	struct iovec *meta;
+ 	struct iovec *caps;
+ 	enum assistant_state state;
++	uint8_t src_id;
++	struct queue *srcs;		/* Per-device source tracking */
+ 	char *path;
+ };
  
- 	bt_bass_clear_bis_sync(dg->src, bis);
- 	setup->stream = NULL;
--	queue_remove(setup->dg->setups, setup);
++struct bass_src {
++	struct bt_bass *bass;
++	uint8_t src_id;
++};
 +
-+	if (!queue_remove(setup->dg->setups, setup))
-+		/* Setup has already been removed from the queue (e.g. during
-+		 * handle_mod_src_req PA_SYNC_NO_SYNC processing). Skip
-+		 * disconnect check and free since the caller handles cleanup.
-+		 */
-+		return;
- 
- 	/* Remove any pending bcode request associated with setup */
- 	req = queue_remove_if(dg->bcode_reqs, match_bcode_setup, setup);
-@@ -596,6 +602,8 @@ static void bass_remove_bis(struct bass_setup *setup)
- {
- 	struct queue *links = bt_bap_stream_io_get_links(setup->stream);
- 
-+	DBG("%p", setup);
+ struct bass_delegator {
+ 	struct btd_device *device;	/* Broadcast source device */
+ 	struct btd_service *service;
+@@ -158,6 +165,17 @@ static void bass_data_remove(struct bass_data *data);
+ static void bis_probe(uint8_t sid, uint8_t bis, uint8_t sgrp,
+ 			struct iovec *caps, struct iovec *meta,
+ 			struct bt_bap_qos *qos, void *user_data);
 +
- 	queue_foreach(links, stream_unlink, setup->stream);
- 	bt_bap_stream_release(setup->stream, NULL, NULL);
- }
-@@ -618,6 +626,8 @@ static void setup_disable_streaming(void *data, void *user_data)
- 
- static void bass_add_bis(struct bass_setup *setup)
- {
-+	DBG("%p", setup);
-+
- 	queue_foreach(setup->dg->setups, setup_disable_streaming, NULL);
- 	setup_configure_stream(setup);
- }
-@@ -1941,8 +1951,40 @@ static int handle_set_bcode_req(struct bt_bcast_src *bcast_src,
- 	return 0;
- }
- 
-+static bool check_bis_sync(struct bt_bass_mod_src_params *params, uint8_t bis)
++static bool match_src_data(const void *data, const void *match_data)
 +{
-+	uint32_t bitmask = 1 << (bis - 1);
-+	struct iovec iov = {
-+		.iov_base = params->subgroup_data,
-+		.iov_len = 0,
-+	};
++	const struct bass_src *src = data;
++	const struct bt_bass *bass = match_data;
 +
-+	/* Calculate subgroup data length based on each subgroup's
-+	 * bis_sync (4 bytes) + meta_len (1 byte) + meta fields.
-+	 */
-+	for (uint8_t i = 0; i < params->num_subgroups; i++) {
-+		uint32_t bis_sync;
-+		uint8_t meta_len;
-+
-+		iov.iov_len += sizeof(bis_sync) + sizeof(meta_len);
-+
-+		memcpy(&bis_sync, params->subgroup_data + iov.iov_len -
-+				sizeof(bis_sync) - sizeof(meta_len),
-+				sizeof(bis_sync));
-+		memcpy(&meta_len, params->subgroup_data + iov.iov_len -
-+				sizeof(meta_len), sizeof(meta_len));
-+
-+		if (le32_to_cpu(bis_sync) & bitmask)
-+			return true;
-+
-+		iov.iov_len += meta_len;
-+	}
-+
-+	return false;
++	return src->bass == bass;
 +}
 +
- static void bass_update_bis_sync(struct bass_delegator *dg,
--				struct bt_bcast_src *bcast_src)
-+				struct bt_bass_mod_src_params *params)
++static struct bass_src *assistant_add_src(struct bass_assistant *assistant,
++					struct bt_bass *bass, uint8_t id);
+ static void bis_remove(struct bt_bap *bap, void *user_data);
+ 
+ 
+@@ -1010,35 +1028,62 @@ static void assistant_past(struct bass_assistant *assistant)
+ 	free(addr);
+ }
+ 
+-static DBusMessage *push(DBusConnection *conn, DBusMessage *msg,
+-							  void *user_data)
++static DBusMessage *push_mod_src(struct bass_assistant *assistant,
++					DBusMessage *msg)
++{
++	struct bt_bass_bcast_audio_scan_cp_hdr hdr;
++	struct bt_bass_mod_src_params params = {0};
++	struct iovec iov = {0};
++	uint32_t bis_sync = 0;
++	uint8_t meta_len = 0;
++	int err;
++
++	hdr.op = BT_BASS_MOD_SRC;
++
++	params.id = assistant->src_id;
++	params.pa_sync = PA_SYNC_NO_SYNC;
++	params.pa_interval = PA_INTERVAL_UNKNOWN;
++	params.num_subgroups = assistant->sgrp + 1;
++
++	util_iov_append(&iov, &params, sizeof(params));
++
++	for (uint8_t sgrp = 0; sgrp < params.num_subgroups; sgrp++) {
++		util_iov_append(&iov, &bis_sync, sizeof(bis_sync));
++		util_iov_append(&iov, &meta_len, sizeof(meta_len));
++	}
++
++	err = bt_bass_send(assistant->data->bass, &hdr, &iov);
++	if (err) {
++		DBG("Unable to send BASS Write Command");
++		return btd_error_failed(msg, strerror(-err));
++	}
++
++	free(iov.iov_base);
++
++	if (assistant->device) {
++		assistant_set_state(assistant, ASSISTANT_STATE_IDLE);
++	} else {
++		struct bass_src *src;
++
++		src = queue_remove_if(assistant->srcs, match_src_data,
++						assistant->data->bass);
++		free(src);
++	}
++
++	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++}
++
++static DBusMessage *push_add_src(struct bass_assistant *assistant,
++					DBusMessage *msg)
  {
+-	struct bass_assistant *assistant = user_data;
+ 	struct bt_bass_bcast_audio_scan_cp_hdr hdr;
+ 	struct bt_bass_add_src_params params = {0};
+ 	struct iovec iov = {0};
+ 	uint32_t bis_sync = 0;
+ 	uint8_t meta_len = 0;
+ 	int err;
+-	DBusMessageIter props, dict;
+ 	struct io *io;
+ 
+-	DBG("");
+-
+-	dbus_message_iter_init(msg, &props);
+-
+-	if (dbus_message_iter_get_arg_type(&props) != DBUS_TYPE_ARRAY) {
+-		DBG("Unable to parse properties");
+-		return btd_error_invalid_args(msg);
+-	}
+-
+-	dbus_message_iter_recurse(&props, &dict);
+-
+-	if (assistant_parse_props(assistant, &dict)) {
+-		DBG("Unable to parse properties");
+-		return btd_error_invalid_args(msg);
+-	}
+-
+ 	hdr.op = BT_BASS_ADD_SRC;
+ 
+ 	if (assistant->device) {
+@@ -1130,11 +1175,52 @@ static DBusMessage *push(DBusConnection *conn, DBusMessage *msg,
+ 
+ 	free(iov.iov_base);
+ 
+-	assistant_set_state(assistant, ASSISTANT_STATE_PENDING);
++	if (assistant->state == ASSISTANT_STATE_LOCAL)
++		assistant_add_src(assistant, assistant->data->bass, 0);
++	else
++		assistant_set_state(assistant, ASSISTANT_STATE_PENDING);
+ 
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
+ 
++static DBusMessage *push(DBusConnection *conn, DBusMessage *msg,
++							  void *user_data)
++{
++	struct bass_assistant *assistant = user_data;
++	DBusMessageIter props, dict;
++
++	DBG("");
++
++	dbus_message_iter_init(msg, &props);
++
++	if (dbus_message_iter_get_arg_type(&props) != DBUS_TYPE_ARRAY) {
++		DBG("Unable to parse properties");
++		return btd_error_invalid_args(msg);
++	}
++
++	dbus_message_iter_recurse(&props, &dict);
++
++	if (assistant_parse_props(assistant, &dict)) {
++		DBG("Unable to parse properties");
++		return btd_error_invalid_args(msg);
++	}
++
++	if (assistant->state == ASSISTANT_STATE_ACTIVE) {
++		return push_mod_src(assistant, msg);
++	} else if (assistant->state == ASSISTANT_STATE_LOCAL) {
++		struct bass_src *src;
++
++		src = queue_find(assistant->srcs, match_src_data,
++						assistant->data->bass);
++		if (src) {
++			assistant->src_id = src->src_id;
++			return push_mod_src(assistant, msg);
++		}
++	}
++
++	return push_add_src(assistant, msg);
++}
++
+ static const GDBusMethodTable assistant_methods[] = {
+ 	{GDBUS_EXPERIMENTAL_ASYNC_METHOD("Push",
+ 					GDBUS_ARGS({ "Props", "a{sv}" }),
+@@ -1235,6 +1321,7 @@ static void assistant_free(void *data)
+ 	g_free(assistant->path);
+ 	util_iov_free(assistant->meta, 1);
+ 	util_iov_free(assistant->caps, 1);
++	queue_destroy(assistant->srcs, free);
+ 
+ 	free(assistant);
+ }
+@@ -2015,9 +2102,33 @@ static void bass_handle_bcode_req(struct bass_assistant *assistant, int id)
+ 	free(iov.iov_base);
+ }
+ 
++static struct bass_src *assistant_add_src(struct bass_assistant *assistant,
++					struct bt_bass *bass, uint8_t id)
++{
++	struct bass_src *src;
++
++	if (!assistant->srcs)
++		assistant->srcs = queue_new();
++
++	src = queue_find(assistant->srcs, match_src_data, bass);
++	if (src) {
++		src->src_id = id;
++		return src;
++	}
++
++	src = new0(struct bass_src, 1);
++	src->bass = bass;
++	src->src_id = id;
++
++	queue_push_tail(assistant->srcs, src);
++
++	return src;
++}
++
+ static void bass_src_changed(uint8_t id, uint32_t bid, uint8_t state,
+ 				uint8_t enc, uint32_t bis_sync, void *user_data)
+ {
++	struct bass_data *data = user_data;
  	const struct queue_entry *entry;
  
-@@ -1954,11 +1996,14 @@ static void bass_update_bis_sync(struct bass_delegator *dg,
+ 	for (entry = queue_get_entries(assistants); entry;
+@@ -2032,9 +2143,9 @@ static void bass_src_changed(uint8_t id, uint32_t bid, uint8_t state,
+ 			continue;
  
- 		state = bt_bap_stream_get_state(setup->stream);
+ 		/* If BID is not set it may happen to be local stream so ignore
+-		 * non-local assistants.
++		 * non-local assistants unless their BID is also not set.
+ 		 */
+-		if (!bid && assistant->state != ASSISTANT_STATE_LOCAL)
++		if (!bid && assistant->bid)
+ 			continue;
  
--		if (!setup->stream && bt_bass_check_bis(bcast_src, setup->bis))
-+		DBG("stream %p: BIS %d state %s(%u)", setup->stream, setup->bis,
-+				bt_bap_stream_statestr(state), state);
-+
-+		if (!setup->stream && check_bis_sync(params, setup->bis))
- 			bass_add_bis(setup);
- 		else if (setup->stream &&
- 				state == BT_BAP_STREAM_STATE_STREAMING &&
--				!bt_bass_check_bis(bcast_src, setup->bis))
-+				!check_bis_sync(params, setup->bis))
- 			bass_remove_bis(setup);
- 	}
- }
-@@ -1981,9 +2026,26 @@ static int handle_mod_src_req(struct bt_bcast_src *bcast_src,
- 	if (err)
- 		return err;
+ 		if (state == BT_BASS_SYNC_INFO_RE) {
+@@ -2066,21 +2177,34 @@ static void bass_src_changed(uint8_t id, uint32_t bid, uint8_t state,
+ 				break;
  
-+	DBG("PA sync state %d", sync_state);
-+
- 	switch (sync_state) {
- 	case BT_BASS_SYNCHRONIZED_TO_PA:
--		bass_update_bis_sync(dg, bcast_src);
-+		if (params->pa_sync == PA_SYNC_NO_SYNC) {
-+			/* Release all setups. Note: bass_remove_bis may
-+			 * trigger synchronous state transitions that call
-+			 * setup_clear which will return early since the
-+			 * setup has already been removed from the queue.
-+			 */
-+			struct bass_setup *setup;
-+
-+			while ((setup = queue_pop_head(dg->setups))) {
-+				bass_remove_bis(setup);
-+				setup_free(setup);
+ 			/* Match BIS index */
+-			if (bis & bis_sync)
++			if (bis & bis_sync) {
++				assistant->src_id = id;
+ 				assistant_set_state(assistant,
+ 						ASSISTANT_STATE_ACTIVE);
 +			}
-+
-+			delegator_disconnect(dg);
-+		} else
-+			bass_update_bis_sync(dg, params);
- 		break;
- 	case BT_BASS_NOT_SYNCHRONIZED_TO_PA:
- 		if (params->pa_sync == PA_SYNC_NO_PAST) {
-diff --git a/src/shared/bass.c b/src/shared/bass.c
-index 19cc9531d617..65ee4a8cbb18 100644
---- a/src/shared/bass.c
-+++ b/src/shared/bass.c
-@@ -1930,6 +1930,12 @@ int bt_bass_clear_bis_sync(struct bt_bcast_src *bcast_src, uint8_t bis)
- 		if (sgrp->bis_sync & bitmask) {
- 			sgrp->bis_sync &= ~bitmask;
+ 			break;
+ 		case BT_BASS_BIG_ENC_STATE_DEC:
+ 			/* Only handle assistant objects that
+ 			 * have requested a Broadcast Code
+ 			 */
+-			if (assistant->state != ASSISTANT_STATE_REQUESTING)
++			if (assistant->state != ASSISTANT_STATE_REQUESTING &&
++				assistant->state != ASSISTANT_STATE_LOCAL)
+ 				break;
  
-+			/* If there are no BIS index left then reset encryption
-+			 * state to no encryption.
-+			 */
-+			if (!sgrp->bis_sync)
-+				bcast_src->enc = BT_BASS_BIG_ENC_STATE_NO_ENC;
+ 			/* Match BIS index */
+-			if (bis & bis_sync)
++			if (bis & bis_sync) {
++				assistant->src_id = id;
 +
- 			iov = bass_parse_bcast_src(bcast_src);
- 			if (!iov)
- 				return -ENOMEM;
++				if (assistant->state ==
++						ASSISTANT_STATE_LOCAL) {
++					assistant_add_src(assistant, data->bass,
++								id);
++					break;
++				}
++
+ 				assistant_set_state(assistant,
+ 						ASSISTANT_STATE_ACTIVE);
++			}
+ 			break;
+ 		default:
+ 			continue;
 -- 
 2.54.0
 
