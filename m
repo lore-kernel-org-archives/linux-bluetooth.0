@@ -1,140 +1,115 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85393603F8
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2026 14:33:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A652E312819
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2026 14:35:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781274799; cv=none; b=KL7uG0V+R35Jga332qgrfC0F3cST4+iufJcvZ5PzBWU/m2YI9VpMRAwc+6NJdmreJvdEN4WpCqbf0LpJahCgOya9GYxLxpLT3OVXPg93H/VFEju0H4rEJqzOiVKXg6hxAa7GCeuX+4VnZ9sa2Ytj1FQYtImcFecFbo01cMhy5zI=
+	t=1781274919; cv=none; b=JwQLJT+N1vv7n5+1bmBZ2H0b83VUUauCXcrK/mnEADtgO9YgbcaXDWm7vZt3hOwr7CnOTiP7mSq2MeUIT1zzlkK8ULL+8vs4hiOtVyRq6eGwoq6g6ZjfZMD+V1sTn0bUDtIXckuu+E2WWjY3diE+V5JDxRU8L9w02bwyfhl8ZEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781274799; c=relaxed/simple;
-	bh=tMuFqRJtSjW/BtSIGP7fEghEyWX1qeHJdf7t1D8fGrc=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=ag66B9Ea9RTjPm66SPAPbvv821TPtNGyzvrpBPJP3BKvC9RlTqefZ4yu8S593z/IV/NVGoRvzow0X83RRau+Oe1LUIOGg4XjrVzLL2eIgFtxha97BE/jUSNKKC96jozZb9lHLkxg4xHkSDWmhD4MyMkx6Xg+xTNAD2arffZoeRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=nD3x6+aw; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
+	s=arc-20240116; t=1781274919; c=relaxed/simple;
+	bh=IDByotaC80HObteyFucUck8JEoCTO3ZeuaF901zLIWE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FRgNERC+uaUl/67qxJn8aZV+XObz9ZGfaRSr6DjdGaRvV1RK8qsAeDf2EllrwM6/JuDDIDTzL82Q6a1BW22KFPSB1LhFUBm6sX3jVetQoze4TuqMFupeTxGtXv2o1wSlW9PikNHbgEd30L1PyDx4+cpcjKJrYhwirCIRIcm9Iic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=CdABEfVG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HvIZEFL4; arc=none smtp.client-ip=202.12.124.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="nD3x6+aw"
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-bdb3fd39045so158144466b.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2026 07:33:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1781274795; x=1781879595; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TTLM106efnje673B2OyrJhDO3JKyBJ//Wa8kKGBktzg=;
-        b=nD3x6+awdWyy26Ksyt968dbDCZ8Qpn3bIemKFD9LS0X1++6tQ7bvece/nKWDtBtsuh
-         hAt6hwlxDXWWafeDGCRENBNqbLHjOh/UNwv0iLHubDlDHbuq5QHbFLd0g3YOecbEEs5I
-         K7WfYomB0W/2J/mgxj1vAVocYnyhyZVMWWhwhtT0c8FKb+T8jguBpLQaIapdJ5+o7LU+
-         r1cfWuq1CBr16kFmSjod5ZToTQWKHsIQA6TdalfCugDvV5kqpRY+UjM9KJF0m63Pigrl
-         D3QZhb+LfppCTRo+aeuXi4ulSWlnv0K5lEHr/TYiamrkbCpwsB9qihEdl7/XTxmeJhiu
-         MyjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781274795; x=1781879595;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TTLM106efnje673B2OyrJhDO3JKyBJ//Wa8kKGBktzg=;
-        b=mvj5opJSvc7LYiEi9m1X9uA3/HBPN1q3LJ2tzkiZXEw3p1e3R9YTNwFhW1MItlnYW9
-         agGoB7FW05+dpyJTXrSvw3kPivknqKOQnPVIPaW6rw7GcHr0yFo/IHYbjBHrwVgcpt8+
-         k477/FvPTMWC1/1em6H5Xvj0Ih9bh7k558u6i2ixpewjAPzTxA9/2GiHAPIM8RTR2dSc
-         c4kf48PT6ONmIabtzpePbrlFPKBY7uz/paB71Kyg0gJApzOKPz4rYbgnmVn1m2U7eFc7
-         pjNJ+I6kcAHMIsFWpCgSpaPoHUSReR/FZyyhMgQgfkvlhb4eDF/6Oz9WEpsHLigk78CC
-         ykxQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8cQTsEmdExpB782+TXH1E073m7aAz8THvNUJBT3hGMZEs3B1lBXnXpHvLLBXSFWY9dJiHf2TqoylbIjKbij9k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEFnbyldMV/nfWmBiQMldLFw2GwwaoCrbsBE4gffkbloa++0D7
-	+fo08wmZRWH+fp3tAmMsmmHd8xAQDduAiRbO+EXm+ZYRiJfDmEg6ep1GkvQezjpkeAc=
-X-Gm-Gg: Acq92OFf/LKFTWWAcMxqz870S4TyZZW+y7LNxxjAsC1Cqd8D8zRUXbtENKdRHy5Ssk/
-	ldarnOZrXhcXltVCx/oL6B65/d0G4XHeCWnkgfcwFIdWFm3h+uiVr5k4nO10NavMw50e6FMwJkn
-	xCvaIPXH8rYbkU2PYA1NW/m3bGtJn0gddvNWTl36BlcHnAMV2p6El5gdK0gtHfDuP5awKLhSmDv
-	3Ad47/CkhVD9amIW9mMb46G1jjbmVNWJTQmeBnNiBiHZ7mwOOUbGoqe93YScA/6TRCuXrVnvth+
-	wGzRylqO6jDdEL0g4i1RMV+1GgeU9IxlZNu+6DoRIab2djtN0VM2M/Cfc9ibDdYggPYNY2OCAmg
-	yu6AkytQnZWDaxbYXpF7UE5haTrXShr0ir3e60Tm44apMXwDpmrxq0+Iea7MGV/GTFiNusT0Dpd
-	D5xUV0AarVlJ673wXUaRcwXZEhOeS6OP7BvO24MWmUs0Fe8sDugUA+nkaPyI5pmjb4iTqrr5QEu
-	tBD9rVM8cqsP/pD5GtaH0eBu+hRXPoDvrvlGw==
-X-Received: by 2002:a17:907:9994:b0:beb:bf23:ac78 with SMTP id a640c23a62f3a-bfe2aefcebcmr149500366b.44.1781274795114;
-        Fri, 12 Jun 2026 07:33:15 -0700 (PDT)
-Received: from localhost (2001-1c00-3b89-c600-b4d0-bc9f-f60e-913a.cable.dynamic.v6.ziggo.nl. [2001:1c00:3b89:c600:b4d0:bc9f:f60e:913a])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bfdb4b32308sm110137366b.19.2026.06.12.07.33.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Jun 2026 07:33:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="CdABEfVG";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HvIZEFL4"
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfout.stl.internal (Postfix) with ESMTP id BA3451D00197;
+	Fri, 12 Jun 2026 10:35:16 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-10.internal (MEProxy); Fri, 12 Jun 2026 10:35:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1781274916; x=1781361316; bh=ryFjvBhAX9M3U4WL2fcfp
+	Y8v8xHYRqgw3JVkGF2wxkM=; b=CdABEfVGXAlJMtoKYWy8wnVhWledtwD1+8CnI
+	d3P2dp6qs1vDBsstarK8eddPylhf71KwZi+zNkpIdvb6DuIWpqitvC9OKk3bzfTz
+	6TT4qjitsVTycz1hh/w7x1zumK4V0i9dOiMAszImdL/ZO283/SZwef5uihm3Ysoo
+	MDKtG+C1uTCk/bsPhF6QI3BQ3EEboH6Md1wMaTwiFdtaDQXf1ABpUCGbun8rnfYJ
+	ly7HErwO2aDGPf3TSUvBBsJ8uvxOmmHRFfheR/D8g/FkVNuD49iTMmWfm1lu569U
+	Zz1nrDmUYnsUFDZk/JuIG0KwvcTWIUCu7SzeiEjVw7cbqh8Cw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1781274916; x=1781361316; bh=ryFjvBhAX9M3U4WL2fcfpY8v8xHYRqgw3JV
+	kGF2wxkM=; b=HvIZEFL4CxrILYCSXp+uCZqif9qcQiZ2ma+12arbHC54l8y1/QV
+	bgz5+/rQvrXpzzCuQNk2OhnN05EngIIMVDv2pyjnVCwOoYXAU7nlWCmTDOwFH4lJ
+	w7WeBTYPFZe7MDnBOwI6dLRZo6eGRZElvnRwpPZ2F4cD3s/xz+7v2iAsdKdwQYeF
+	6UMDwnSIWd0Xsy0yJwOOnM8ualzcwnaEPFKGvKdlB2xrn2haiFviAJJK6qqrtTtn
+	vrjRvLx6EIW+M8bqJbzyaEnKcb1XNVBoQLHB2sF26pjDT/z2H+qPGokolzcVN7XB
+	eHzSLF0F7QcEJuWz8WwWuhuaXkorHr0e+4A==
+X-ME-Sender: <xms:JBksatQFDO0fvv3D-u9aLY_uYfSitEgQIkrbYJ_3x3PhN5-hzpUdjQ>
+    <xme:JBksauPqnKROU1OfTwAOdznxH7LG_l-fiKOqc5idis2l0VT0wdsB1n7lvH9d_lEi-
+    oN3dgCQ3aqxhAMak2rUGYHaC6EDjdOIT-WyCH1kBmAPVFzCcVVnH2o>
+X-ME-Received: <xmr:JBksagP9manioqLf60-hZBf5mdsaDcE5lxWH9SptKByGl51AWX8PmZDg66hT48ZZh2vB0h0>
+X-ME-Proxy-Cause: dmFkZTELU42rbWsnZm5g3wsXzzgCo0QFaYxQvc56PT1xMIUX/XUWK9i4Bvzwc1EiwlwnaW
+    CeQjKlRuNPldg5s5TkZuRbrfkGuG1erADkv7lJxMgvL6wR0w5eCWY215GFskJ2oHI1hl7v
+    hFAE6ZMIYul0W/Y0KiWOM6FbDMxAFzwOthIh+WO/qq4dYQbB/lHTycZfo6+husZoAzXtRT
+    xkjoMLsflwFVFBGtuP5iD6Dl/9U/QTkmXL8WcbfC4sm/CP5xHvEWiTRfoMuegC61DLwXu3
+    lwMKfv+vR/vJigDz0+FLMobf2+E5uT0zQlcVMf84Ici9f/iTiQGMlJPXTjln8IPSDtPpmS
+    G1abxJHvU8eEtojKxdQCSmQF9jDuGC5VQBVIseAOEOQfRoIL4MGSMR3fN2sPMVFJyplyGV
+    WlZ9uWmGi/YOga83USMw43FrokMN1v0je0gaRTYmWtQ+J0jNr1PeYebPDgoPDE+6tMuJNp
+    UKZqSByEf3aPHQ1aKMjt9S3KrdyWffPLUaWks9KioZ/xRSUdbyRp2ACuA2RwcL2meHQpyU
+    m+A0+3o3s1A3oBE23o5QnbLeFP8gOpO57PdVqbHonqxs0IChLZE4TJAB2PDNvdnvsUkM+E
+    /Y6Uq+PYdsJXGpoQA165k2O+iMxtC8kAYtOwBzJRS5flTPWaRYSmRCeC9Dnw
+X-ME-Proxy: <xmx:JBksauvvb1EHDCAdqfuH8ynlaxFb9gda8uUWvhmSGltOX5BsY5IwZA>
+    <xmx:JBksaqXEO58VK59hcGULsVOcn0slLvoYJOpE5pVtE-AlFnOt9y9o2w>
+    <xmx:JBksamt5zOc8wyoL998fNPaa7-9z1HCZ200mE5abOfziDG3QDB0fNg>
+    <xmx:JBksamXenI2Mha9V_y_vCvb_8Mdgg4fgCFxchKFTzOrDU1GqK3SfTQ>
+    <xmx:JBksauPuROUWHU5JLLRe42VRDAP8YuSv_-k2mCjQDgLfR8LNmFGMzhRo>
+Feedback-ID: if72e4b10:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 12 Jun 2026 10:35:16 -0400 (EDT)
+From: Siwei Zhang <oss@fourdim.xyz>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Siwei Zhang <oss@fourdim.xyz>
+Subject: [PATCH v11 0/1] Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()
+Date: Fri, 12 Jun 2026 10:34:26 -0400
+Message-ID: <20260612143449.3045055-1-oss@fourdim.xyz>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 12 Jun 2026 16:33:13 +0200
-Message-Id: <DJ757RE8OYHO.2XEXNTLVIJ497@fairphone.com>
-From: "Luca Weiss" <luca.weiss@fairphone.com>
-To: "Luca Weiss" <luca.weiss@fairphone.com>, "Bjorn Andersson"
- <andersson@kernel.org>, "Konrad Dybcio" <konradybcio@kernel.org>, "Rob
- Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
- "Conor Dooley" <conor+dt@kernel.org>, "Alexander Koskovich"
- <AKoskovich@pm.me>, "Liam Girdwood" <lgirdwood@gmail.com>, "Mark Brown"
- <broonie@kernel.org>, "Bartosz Golaszewski" <brgl@kernel.org>, "Marcel
- Holtmann" <marcel@holtmann.org>, "Luiz Augusto von Dentz"
- <luiz.dentz@gmail.com>, "Balakrishna Godavarthi"
- <quic_bgodavar@quicinc.com>, "Rocky Liao" <quic_rjliao@quicinc.com>,
- "Johannes Berg" <johannes@sipsolutions.net>, "Jeff Johnson"
- <jjohnson@kernel.org>
-Cc: <~postmarketos/upstreaming@lists.sr.ht>, <phone-devel@vger.kernel.org>,
- <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
- <linux-wireless@vger.kernel.org>, <ath11k@lists.infradead.org>
-Subject: Re: [PATCH v2 2/7] dt-bindings: bluetooth: qcom,wcn6750-bt:
- Document WCN6755 Bluetooth
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260403-milos-fp6-bt-wifi-v2-0-393322b27c5f@fairphone.com>
- <20260403-milos-fp6-bt-wifi-v2-2-393322b27c5f@fairphone.com>
-In-Reply-To: <20260403-milos-fp6-bt-wifi-v2-2-393322b27c5f@fairphone.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi Luiz,
+Compared to v2, addresses comments on https://sashiko.dev/#/patchset/20260415204842.2363950-1-oss%40fourdim.xyz .
 
-On Fri Apr 3, 2026 at 3:52 PM CEST, Luca Weiss wrote:
-> Document the WCN6755 Bluetooth using a fallback to WCN6750 since the two
-> chips seem to be completely pin and software compatible. In fact the
-> original downstream kernel just pretends the WCN6755 is a WCN6750.
+Compared to v3, rebase against bluetooth-next.
 
-Could you please pick up this patch (or provide an Ack if you want Bjorn
-to pick this up with the rest of the series).
+Compared to v4, allocate the channel outside the function and pass it in as an argument to avoid the use-after-free.
 
-Regards
-Luca
+Compared to v5, extract the channel init to a separate function.
 
->
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> ---
->  .../devicetree/bindings/net/bluetooth/qcom,wcn6750-bt.yaml     | 10 ++++=
-++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6750=
--bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6750-bt.=
-yaml
-> index 8606a45ac9b9..79522409d709 100644
-> --- a/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6750-bt.yam=
-l
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6750-bt.yam=
-l
-> @@ -12,8 +12,14 @@ maintainers:
-> =20
->  properties:
->    compatible:
-> -    enum:
-> -      - qcom,wcn6750-bt
-> +    oneOf:
-> +      - items:
-> +          - enum:
-> +              - qcom,wcn6755-bt
-> +          - const: qcom,wcn6750-bt
-> +
-> +      - enum:
-> +          - qcom,wcn6750-bt
-> =20
->    enable-gpios:
->      maxItems: 1
+Compared to v6, balance puts and holds on chans.
+
+Compared to v7, rebase against bluetooth-next and refactor the chan refcounting.
+
+Compared to v8, adopt the philosophy of one assignment one reference. Make refcounting easier to follow.
+
+Compared to v9, rework on l2cap_chan_set_defaults so that new chan's default comes from pchan and
+can be used by __l2cap_chan_add.
+
+Compared to v10, rebase against bluetooth-next.
+
+Siwei Zhang (1):
+  Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()
+
+ include/net/bluetooth/l2cap.h |  10 ++--
+ net/bluetooth/6lowpan.c       |  18 +-----
+ net/bluetooth/l2cap_core.c    |  78 ++++++++++++++++++++-----
+ net/bluetooth/l2cap_sock.c    | 103 ++++++++++++++++------------------
+ net/bluetooth/smp.c           |  27 ++-------
+ 5 files changed, 127 insertions(+), 109 deletions(-)
+
+-- 
+2.54.0
 
