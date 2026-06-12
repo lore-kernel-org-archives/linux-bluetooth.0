@@ -1,83 +1,68 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54472D1303;
-	Thu, 11 Jun 2026 22:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DF61E5724;
+	Fri, 12 Jun 2026 00:16:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781217020; cv=none; b=NOir6LvFH/ilhqFhLnoKMRzA+/nCMBwByIAZAEvTPU/NCIlVBzAS5ew3YtJNSN3vaEYY023gwtF3D/mnXtW5g4sWKZdT1XaTed4xBJJ/M1lArUsaGr1L0xUa4K9vvF47Qf84ZyZZpp+1ePpCdobn3Ee1nY7B1pI5q7Ldb3WOoW0=
+	t=1781223361; cv=none; b=NzpZD4rnNgZNJkwJt3gfGPX/UT4COX78itvU5+8RyRDNBSN88A1niY0CSY4jNCCbvmZY8V9/DgBt15ELy1h5CQWJWOn9jjQtQiMsGAAFOikuzoWpeafruAGwG4paWbLNQF00dngZ1cB7BjaQgjQkGOXTom3DQ1HqExGJLv5ISko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781217020; c=relaxed/simple;
-	bh=eiT7h/e3FoeYoNZj6W0e0ctH5vKCvLL5rqIVcRkUu48=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gnsacmLzHPnJb2H2HPS29i1WIrzH2qVN4CbMiwEsQzsAOm+HWo6PRFG6RQHg4uctBFNUDbPM/MUS589VbHoRrUW77UHAB2gk6YaYSRbb9crLd4jPntcbzezcOpsIqJYct+fFV7JqT1xyhvWGpsh4jvQeXJKMIHD8kqubNEQhABA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DLwn2qea; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781223361; c=relaxed/simple;
+	bh=trPl9E/NPOcIiL9fnNtUJ6Qojjjrc0W8ccKb6LqsizI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ifu+TUbHt6If5+rK/tglNLHsWCCu9fn7FpJEVcj6MkhhsrMBh27RHbacbhDwCcUp9Z6JJIBgm66yEh/JMjLCVHUNhJU7HejZu+alIsROLRh9EXhqCWWpGe6j7tYKiF7SxsehR+iRRWPObDL8763356Y2qd1g7yBw285gJ1ZA5pU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TU4WZbZh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DLwn2qea"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8A901F00A3A;
-	Thu, 11 Jun 2026 22:30:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TU4WZbZh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC6BC1F000E9;
+	Fri, 12 Jun 2026 00:15:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781217018;
-	bh=USld46YDXirMgWtuzZU2ioEbXHi6IBJv4M4nBp60DEE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=DLwn2qeaXXg7Z1JAyX+XncKWYMnsaPSFX6NgnJMygXUq8X0ZJhunG5aABOqSBCFw9
-	 4IXenByviZQbHdNzUY3opiA/6+BZS1rRo7/2n0rhMPHvWjYTMQfrbKCm6312F6u7yU
-	 g0fv+A2zH71O+elwBnT0BvbvYJ6Q3TfvVV+p6c0c56i+QyvajfxCnhMXJ7SjO8GW+o
-	 PymucFWy+T1NbHrFIvRhz+KtHZfEx14uD2MXSShftY1Z/rclZsG/TRlvaKG5gBGhaq
-	 gn68oXa/hYzyMiorWq6B6EvC3KAg9NKVXZ/ZstoM9eQDTFrIg+NXWGOM4pSrscp/EU
-	 YnkEvOobYSSKQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198FB3930FAD;
-	Thu, 11 Jun 2026 22:30:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1781223360;
+	bh=knIMGB9uT3vqgP2ooIIsZTSTNdIsZh95XjgznEq18uk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=TU4WZbZhjKH5pttXmE+QJ1fkcv2E53JkUtMgctLXcR1vayDfw8Vt2HaIXXGpwyNZv
+	 oeS+gR98y0txB1vAPRNcOqw1LsKMjZyVTIOJsKiQLn4SgmVXU0ec92WgE4Fa2+xgWg
+	 ogBwDxaaBSmwSJBZ9A0pMs/P90FgBbohygF65qkhnk7wChZctHxo+h1tdpNMG19Tta
+	 Po6FB1BNyYHmDX8v5+KbctQsEn7g/hCDeiJu8gVsm6Ep/8V6LgOswpDtfWNgZsgnoU
+	 YpBZdLuZKWTlgKXmI+VbAAhHbjcVbMdHsSqSTIWwHA4C4mR6OP2zY9dGmPoPn7dPwM
+	 1YaLl9oEu+itQ==
+Date: Thu, 11 Jun 2026 17:15:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [GIT PULL] bluetooth 2026-06-10
+Message-ID: <20260611171559.5219cce9@kernel.org>
+In-Reply-To: <20260610180050.419401-1-luiz.dentz@gmail.com>
+References: <20260610180050.419401-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] 6lowpan: fix NHC entry use-after-free on error path
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178121701563.389578.2230008630812658511.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Jun 2026 22:30:15 +0000
-References: <20260609080054.4541-1-zhaoyz24@mails.tsinghua.edu.cn>
-In-Reply-To: <20260609080054.4541-1-zhaoyz24@mails.tsinghua.edu.cn>
-To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Cc: linux-bluetooth@vger.kernel.org, alex.aring@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, yangyx22@mails.tsinghua.edu.cn,
- wangao@seu.edu.cn, fengxw06@126.com, qli01@tsinghua.edu.cn,
- xuke@tsinghua.edu.cn, stable@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue,  9 Jun 2026 16:00:52 +0800 you wrote:
-> lowpan_nhc_do_uncompression() looks up an NHC descriptor while holding
-> lowpan_nhc_lock.  If the descriptor has no uncompress callback, the error
-> path drops the lock before printing nhc->name.
+On Wed, 10 Jun 2026 14:00:50 -0400 Luiz Augusto von Dentz wrote:
+> bluetooth pull request for net:
 > 
-> lowpan_nhc_del() removes descriptors under the same lock and then relies
-> on synchronize_net() before the owning module can be unloaded.  That only
-> waits for net RX RCU readers.  lowpan_header_decompress() is also exported
-> and can be reached from callers that are not necessarily covered by the net
-> core RX critical section, for example the Bluetooth 6LoWPAN L2CAP receive
-> path.
-> 
-> [...]
+>  - hci_core: Fix UAF in hci_unregister_dev()
+>  - hci_event: fix simultaneous discovery stuck in FINDING
+>  - hci: validate codec capability element length
+>  - eir: Fix stack OOB write when prepending the Flags AD
+>  - L2CAP: Fix UAF in channel timeout by holding conn ref
+>  - btusb: fix use-after-free on registration failure
+>  - btusb: fix use-after-free on marvell probe failure
+>  - btusb: fix wakeup source leak on probe failure
+>  - btusb: fix wakeup irq devres lifetime
+>  - btmtk: fix URB leak in alloc_mtk_intr_urb error path
+>  - vhci: validate devcoredump state before side effects
 
-Here is the summary with links:
-  - 6lowpan: fix NHC entry use-after-free on error path
-    https://git.kernel.org/netdev/net/c/1720db928e5a
+Missed the PR :( Sorry about that :(
+*iif* you're still rebasing the tree - could you mend the fixes tag?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Commit: 13d7c52acbb8 ("Bluetooth: L2CAP: Fix UAF in channel timeout by holding conn ref")
+	Fixes tag: Fixes: 75780ca4c6a8 ("Bluetooth: L2CAP: use chan timer to close channels in cleanup_listen()")
+	Has these problem(s):
+		- Target SHA1 does not exist
