@@ -1,90 +1,107 @@
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC08C38F94C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2026 14:58:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781276309; cv=none; b=j0xYIU2ngPVZz7sTdWavVCsPdMjeDtMoqLvOGUYkbL4KtUTowFD3QAm+HNqJZ4Yc/+BvFj9gtmGYiYFCQHLArx9yIjSeu09TwImHO3MV81MwtUHoedlKecVawCQSwUziM7rgIqumQ2rafzCSIF8DF5Wp0yPLqdkniKi3lCLqYdo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781276309; c=relaxed/simple;
-	bh=bi5rkM/OeMtxJO7mF06HNTYmj4v+pcKsTmBmQA2d8EU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=vBN2HcAiQNPZsa9Til5/eQouALEQyUze8jNbl/ox0z6rfoLyRqILO5D6GR+rnIXi7lwKVBie8SNpLRiYRlfJ99FHQbGgeJAyHuHcZCQEDtRocJ+ESCMmYYHpUNFXP7pKFVS99AX5Uqt7pFvpTeZIwSqqVUxanDXjAutZS96469A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hornang.me; spf=pass smtp.mailfrom=hornang.me; dkim=pass (2048-bit key) header.d=hornang.me header.i=@hornang.me header.b=AfOt/64W; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VZ+Jn28T; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hornang.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hornang.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139601F151C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2026 15:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781276431; cv=pass; b=E0g4MFRkkG7KtqwiiF3O2NnE5bZYsaOjrg08U1MOGSFQC84VyxwiQvXexPIRzvrRYuPizzJYO5hmFHMXCHA9q94LXlSpOAP38bSs1BdoRENvPj6KOeT/1b2Mebh13/9J+1McYxQ82kPS0v/2Mk4ltOsrgXb1X7Wld81NW+GgePY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781276431; c=relaxed/simple;
+	bh=Yb1avHp1oAumCqSgwa6dvrj6QSmjNEyJgIVzKSU/13Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=F5HF2zND49GvRpbK5koRUMJVPlE+rI4A9+ua9jIDirKxb7DfWqFohfAvp1nDa9aEyId902eiE7lucN0K4UIA9Fjv/HgBF9BRlarzL7JRF4Aw2raXHS0C7kVU37anTuRoWWo5FL7X3U5fC6kncg37Fk/ZjzSbb6UyT3vB8+xNs0Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fIlplk57; arc=pass smtp.client-ip=74.125.224.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hornang.me header.i=@hornang.me header.b="AfOt/64W";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="VZ+Jn28T"
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfout.stl.internal (Postfix) with ESMTP id 2DEA81D0013F;
-	Fri, 12 Jun 2026 10:58:27 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Fri, 12 Jun 2026 10:58:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hornang.me; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1781276306; x=
-	1781362706; bh=bi5rkM/OeMtxJO7mF06HNTYmj4v+pcKsTmBmQA2d8EU=; b=A
-	fOt/64WiHJRDISh42FbaBPMPmOnbFYaEJyroWRql5xyyFbEkISCUScWc6r8inVvb
-	Dx2clFWDg/CqCCSUWkSnLRIqFd2qvc+xDqlM47v2Z25RFY8bBlPxG+QqdytDZ4IT
-	miSZQbpRsPnDtc/mEc3El3ywvB7qlsVeee+S/+Gh7MkEtE9KgnRcEWLHvH6PGgzO
-	w07qBBRF5xqbjiL+zzCANXfoIWKEabRCD59rwXcE7Pi5s39CqrBlLXSsWRsc0vma
-	99qsxgkNg2tdo3BNyOGmr32mg8wasWMV25mGeOd2vxtuZii7tXqsLTA+MiIz7gzD
-	Ha9IeE3WBpuyhF1yDy7Pg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1781276306; x=1781362706; bh=b
-	i5rkM/OeMtxJO7mF06HNTYmj4v+pcKsTmBmQA2d8EU=; b=VZ+Jn28T03FVcU6sm
-	jFxRB8OLne66w6q6Q5QB/TltTDJ9G1MB1X6EsASshMbj5IpQBqYAO9OaFVqUiFL6
-	6v7NJm3UF5h1qRNffIbuTVoBv1+DRfgmJJqtFYxCIvi6+yUno0wXvtlOHh847cQq
-	7MsXPNo0/KJFpBpQkFpNovG2mbkHMltpV/c4PFtUxeqZ2iKx86xz0W3I5pWbcm3j
-	t2ZIoWicJ1BQyJAOM7xKAA0fSrLmFnUAh2Szs/1HdjZnoWnWnAi5FYY0Lkjl+7s2
-	9kxXmVi955UqqnKCIKs1KF7G+PUx7cfXTx83ad2hXfSsyucdL3Qdgnkq6mowWvSP
-	LxJtQ==
-X-ME-Sender: <xms:kh4sasd8hYFZIf6-qAkZqEF69bMekfE-hHMINMJmsC7o_vivfXCDzA>
-    <xme:kh4salOrkxCqJaeL6Q7kN0gQcWhJkrVchepKchfNZzAhQk_9amOFZDM_RARw09qQZ
-    IxU8PbmJo9oEJqdLOiS_b71ap3Cb6tgoz1BYHrIOY0qrgCBf9bOzn0>
-X-ME-Received: <xmr:kh4saiiSOhP9u74QP3VsqoHK99rJHN1oNI54U4_Xvz8FcJ_x-_feC_inCg_FNkcJFii1lx47Xc_Qgs7No7dd05IC5otDatYWIp2bw1Y>
-X-ME-Proxy-Cause: dmFkZTEL/EH6XGQNYT95nLnopZ09+4OIddvrSeevVEp75brA7p1LsrDvaAP1syWHa3+93c
-    JGFUgQWTPEg19Vu5GZbnyW0GG09MzydSt8RLsOoeYY9j2TRq0/HrSNfGrW4pA6NRF6QVDU
-    6sj2vMgnvEcpPWwOswPosRGtEbtPx4cfc/xoehJ6MhLFFIeP+7mb2XTzlVfngFdaNSFVe+
-    X/74WHOpZR+0LWALvX0VyREwxt/822eHAPv2H75bUvwcgXqt8gLa04U4cLOgCGAkt3a3Lb
-    0y3GbZET3we0QTYMGrhUhERWOuvAm5rkPcV3F5PbhOXYrvHUSEdesByrM0lWOuTGF8W4qn
-    Ls3P8azGDW9j0UkxFS07A9TJcyWTSWYyIymJv6F/3r3g0xW0T2Jsn9tI1/u+wwoIAHVQXx
-    UJ7q9cM+7Z2EZHE9576L8P42c6ZsL6exPsbeUeH9+ygzmRkGAIS6hRUa+RsBQqJ7KBGvbV
-    kUVKvsVlgnnXywzICu/rUc+3nwWYdaFBbs+YJszbKyXbOn+tp/EesEUWAm39Gt37hu/7ct
-    LnAs4TfZxN9+twH4NwVq2C8ztb4TqUj8zLguA2EZl2pqMdXtxpZttaTwdwieUlHTR7IS1b
-    OnN8FgmDA3n+XmBSQB9kl5PPgEwYrWc3mWUoc8q+1TaIoKvUDpaLs7i/4x/g
-X-ME-Proxy: <xmx:kh4sag05QBVvlPgx0Kb8kvyGtHS1OPo2zwI74REMgksYWF7e6ijTYg>
-    <xmx:kh4sakgu10ozKP8AWPr9xAgi9sk3is_OP0BEZn0oqkh_33MtnG2C0g>
-    <xmx:kh4saoeyKZotyocQaOW7dyqrAwyg8ppNfAdJIhjk2jf1Fq3fNChhew>
-    <xmx:kh4savlghUgLNP7UL715ZB9B96cQJ6JeD10B22uxfZkBcWwkW50WhQ>
-    <xmx:kh4saiSTiILkEEJyrG74VYRxdBQwtOqNXzHksw3li3PelRkO4zV3-vbK>
-Feedback-ID: i9c9648fe:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 12 Jun 2026 10:58:25 -0400 (EDT)
-From: Stig Hornang <stig@hornang.me>
-To: stig@hornang.me
-Cc: linux-bluetooth@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org
-Subject: Re: [PATCH] Bluetooth: L2CAP: fix tx ident leak for commands without a response
-Date: Fri, 12 Jun 2026 16:58:10 +0200
-Message-ID: <20260612145809.181685-2-stig@hornang.me>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260612143818.167643-1-stig@hornang.me>
-References: <20260612143818.167643-1-stig@hornang.me>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fIlplk57"
+Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-66062a414fcso1192559d50.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2026 08:00:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781276429; cv=none;
+        d=google.com; s=arc-20240605;
+        b=SVGsCULazSqyUtDeLriCJiCgvim+v9Bgko3GblaRtrCtU8Q0FyqMi8v3pd+C2ITHH0
+         Z1xnMzb94M/73Yjrr7yG+c/uxo6ccBzL4A7ATG1y/EqaZqCKqtFdXySMIjbxskKAlTef
+         4WjvWWcSpdMbAzdoWnhYREXgdhXLqOHcJMUFEjoWljTsW6S5oHifkarT6gd2xXxXmujY
+         dZ1agYxsOwxM8qvb8YOYiLDLaiO6Ooq84jaUrAhhR8+8uUKTRVdvf4QLdo7tkNY2gs1t
+         FVIjQW1D0rx08SuEyH5QLcujgeJ60KLYeM6AEC9Z8ynAn/EoQz4tpoLgSDd9ozk817jH
+         AIfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Yb1avHp1oAumCqSgwa6dvrj6QSmjNEyJgIVzKSU/13Q=;
+        fh=8H86giGP8UyruoOkodB38xgLkH0tFuZUiZihicAgRfo=;
+        b=GTAfbov7GQ5G4alLatT2j2f/Z7y7r9r88DgtKaf6gnCmekuIO6psE0IMAs+vqmJ+CD
+         6iLXyWTtaERJD4zfg3OdzNozHK9ZxtQH/ODzAtsKfgkKgcl9h3nb7MpcrYRqLdWs7Fsl
+         Bw/TwSnXhKHgHQ4ABqMPfiew9m9ED8R2pyjEio8dGhhcyP7fG0TVdADsX876dc+HDBzp
+         JaaRcVV+DMjwz5znJqrs466zUYT1A/6s5Vuy9hhtUYFArjjDhYn4nJplRgUwdEyqRcjW
+         YdngZjndFWxw/pRPw/bQ5m1U4J/py7OysTjqGHljq86/QkHBhhHABMlqH5Y4/YWlaX0J
+         +IFQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781276429; x=1781881229; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Yb1avHp1oAumCqSgwa6dvrj6QSmjNEyJgIVzKSU/13Q=;
+        b=fIlplk57e6LLkbQWUQDeXzgpeQH/z1VDoAhyastOwXmeJ7xnzfVGS4xKGyNs8KEDyf
+         e6FAGdOehlrhHTDVKv4LazJ1qqkZP/0DaVc0l/OBRMlsgeYmyQjpLJppRF6DsZ6Z842N
+         /bKfhG0NwmU1x6dzrobw+jgsJj1MOnVUwtVmm3zAokQOdOpOO9sMryA0TfEwO639gDNA
+         NFc7wJS8eN9tcyhgzz+YCJHvfF6174s0CnerjIPMH58VU+mRL+Wbe4uRFuTZZM6ZHM5l
+         r7ShC8i16vZ1VA1OilJnDMHYH9rJNAodQaATQkJomChabXd11xBCSodCZ/c9pPOK5VDV
+         jCVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781276429; x=1781881229;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Yb1avHp1oAumCqSgwa6dvrj6QSmjNEyJgIVzKSU/13Q=;
+        b=rgpou9zJBx2Y0lwYoavSIQKkSyrT/GtTm43/MJkaa3taVHTN8FAApd/GqyXa8weYOk
+         Alhjzm+qI0EjEJmVfLB0uZm2RsWbdWSbMny8f5UdAj1QXupLKc/0vd4LpRcM7Z/2Y4t1
+         3ztpi575fa7tNXp0xTIF/EUl7R8YMvsoTzisPtIrT4DpVeYCVQemFg0lfz2NhgZ9ZAYu
+         L9+Sf2wdXhjILswrzGQ8Q6kRodF1C/sIwLOBZZ3zoWwRN89iUEEtVPi8LdHKwBRpo9YN
+         dXmvMYHC6v+4JpofgS7Kh9fQhwEt1vd9WB9Vcw1g3KJlgo8e9HXtuLhQtwvTcti0A7/t
+         shuA==
+X-Gm-Message-State: AOJu0YwRKJEITmqvNmjPGrLb9B1TKEhkp8UMclgoo6BrdYEi6Be99DBY
+	0ZRIXYZ7zvB/S5k4/e8iplf6fX5RRwGTAMuQG1xNHQDpfI6ZALEbkVind8hJSyUK/Vnq3lU/pPm
+	awvmyMnqxdBcpxuBsHwfC0M2jNwY/EVsBkHDa
+X-Gm-Gg: Acq92OETQKZ/pQsXaBACn3DAT+A66dOQwZ83Q1RlGSrMZiyB+YQVYSLkV1u5PL2akXq
+	zJi6YBOmZofI9GGfcDE8g1opnsgkpIAzLrz2cjPWQnwqq80GTqub1IDjnJUFxYo/BmNjwdBD+Zz
+	cSCz8uNEKn0Qr7CtuBODO5PcCtxYhyKNO7ziHocmssdgMNd9/rNjVCbcTztNStLnHhLeGFJG+jO
+	eHYyVP6HXclt8R48TGOGhMQORjq0Su7Jnw0bwKYbuW6seq5OCMT5AFyYTLtsJrlZZPwymLvJIHV
+	3FnD1WeaUzqoOHlxjTW8Bvlkqs814rFGVohJvr3IN9X8ObZJ2b+CuGpb0MtEONIWeUg3nQ==
+X-Received: by 2002:a05:690e:439a:b0:660:4090:90e8 with SMTP id
+ 956f58d0204a3-66277fc95e2mr1930357d50.29.1781276428899; Fri, 12 Jun 2026
+ 08:00:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260612143818.167643-1-stig@hornang.me> <20260612145809.181685-2-stig@hornang.me>
+In-Reply-To: <20260612145809.181685-2-stig@hornang.me>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 12 Jun 2026 12:00:17 -0300
+X-Gm-Features: AVVi8CcBcfZb6e-hh9n8AgLIa31g5t-WMuI62_b0BnYoFCtbMVC2F1i39sYVHC8
+Message-ID: <CABBYNZLUhedTTRcUeDX+2_0Nr3+xCXeUq87EHnK6sweybQmUQg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: L2CAP: fix tx ident leak for commands without
+ a response
+To: Stig Hornang <stig@hornang.me>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Found out it was already reported and suggested fix here: https://bugzilla.kernel.org/show_bug.cgi?id=221629
+Hi Stig,
+
+On Fri, Jun 12, 2026 at 11:58=E2=80=AFAM Stig Hornang <stig@hornang.me> wro=
+te:
+>
+> Found out it was already reported and suggested fix here: https://bugzill=
+a.kernel.org/show_bug.cgi?id=3D221629
+
+There was not a proper patch though so Id just add a Reported-by.
+
+--=20
+Luiz Augusto von Dentz
