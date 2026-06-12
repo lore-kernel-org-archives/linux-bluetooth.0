@@ -1,114 +1,140 @@
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73AD38A717
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2026 14:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85393603F8
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2026 14:33:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781274609; cv=none; b=EB2jwZzKWmr7cuf4rM0nJ/a/9Zo+Lky/AmAXkf3Mn95cc93+gG4QcFhxaoOEMq5T9tRpgymplyk+63l30Pxy+JlkEUGUljsUqt90SNRJkjW/xY5gJvGhTbuetSUqio1HSpFgWKVtPIi218l0n/vYg8GxzQ31P4D52RB5bwjc1Ds=
+	t=1781274799; cv=none; b=KL7uG0V+R35Jga332qgrfC0F3cST4+iufJcvZ5PzBWU/m2YI9VpMRAwc+6NJdmreJvdEN4WpCqbf0LpJahCgOya9GYxLxpLT3OVXPg93H/VFEju0H4rEJqzOiVKXg6hxAa7GCeuX+4VnZ9sa2Ytj1FQYtImcFecFbo01cMhy5zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781274609; c=relaxed/simple;
-	bh=42vq0s1CW6pS5npu7NBYbdRSd18x/BIg0hFEwy9H4rw=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=mZdHUo31f9wxBwLJu47B19corfTJB/aFzYkJRYKKgxhQUX7zwPby4O2yllmoCW5iBjaFsGPxRTQjmvzDuOKNAisb3cWqwQ9NjVkbYW9CnZ+Vq1dRiCSnNA7oZ6NdfhewOCIbq1NKaprZNzOoWU+JgavYIV62l78Y4Pmyes4eSlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c4RCOGLS; arc=none smtp.client-ip=209.85.221.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1781274799; c=relaxed/simple;
+	bh=tMuFqRJtSjW/BtSIGP7fEghEyWX1qeHJdf7t1D8fGrc=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=ag66B9Ea9RTjPm66SPAPbvv821TPtNGyzvrpBPJP3BKvC9RlTqefZ4yu8S593z/IV/NVGoRvzow0X83RRau+Oe1LUIOGg4XjrVzLL2eIgFtxha97BE/jUSNKKC96jozZb9lHLkxg4xHkSDWmhD4MyMkx6Xg+xTNAD2arffZoeRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=nD3x6+aw; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c4RCOGLS"
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-59d4aa96ef2so680841e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2026 07:30:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="nD3x6+aw"
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-bdb3fd39045so158144466b.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2026 07:33:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781274607; x=1781879407; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fC0FS23L2Hrrdg7BKtz+clG1pu/KUe07eS2fGcZDIu8=;
-        b=c4RCOGLSQbejv+Qws7MPivV16k1ulNkIcfnn5ww9Bc3gAto3Id0764qz018nNqOdWs
-         Hdh7W3+q2q2fgTsDK/esLD0I+Gt8jzBLCRzJ1kY23SqhjmL1yXi0SbAnEZ1VCzfSQTFq
-         lfKiB0diQWs1Jttj/fWXdgo3B83bK65lo9coz42yKornu7Y89hSIbqQM47v6Tp546x8o
-         ZChH7snQ8Db+E7hMZ6UiGSkYINFQZ/ZjvyUl+yGeBHrMn79Rqp+bhsSCJYo++/BNLNsl
-         gGwhazeyWRKvniqjarcduuV3HnOQYMQtTW97ik/Yyz5lSdUUlZiuPpZBGAonse5Ra7Bu
-         jgLw==
+        d=fairphone.com; s=fair; t=1781274795; x=1781879595; darn=vger.kernel.org;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TTLM106efnje673B2OyrJhDO3JKyBJ//Wa8kKGBktzg=;
+        b=nD3x6+awdWyy26Ksyt968dbDCZ8Qpn3bIemKFD9LS0X1++6tQ7bvece/nKWDtBtsuh
+         hAt6hwlxDXWWafeDGCRENBNqbLHjOh/UNwv0iLHubDlDHbuq5QHbFLd0g3YOecbEEs5I
+         K7WfYomB0W/2J/mgxj1vAVocYnyhyZVMWWhwhtT0c8FKb+T8jguBpLQaIapdJ5+o7LU+
+         r1cfWuq1CBr16kFmSjod5ZToTQWKHsIQA6TdalfCugDvV5kqpRY+UjM9KJF0m63Pigrl
+         D3QZhb+LfppCTRo+aeuXi4ulSWlnv0K5lEHr/TYiamrkbCpwsB9qihEdl7/XTxmeJhiu
+         MyjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781274607; x=1781879407;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fC0FS23L2Hrrdg7BKtz+clG1pu/KUe07eS2fGcZDIu8=;
-        b=ltdVYmtBFnzAqijkV0W8lZoSbCMmaPiu7A+x9V16MqjbZPxHHwcCeVjMoV5TJGkulI
-         KSOfJmx8EedsQgN/ycdOyqd/Mr5qArr99KLulYc+6kqj4cSA6FHb7O9jvt6OrdZ8LphK
-         UsHKQibFALlHl7fjRVbiS6gOe6zP00hBSVVVq6Rl+wAmAR/FTl//nbxS2QIlrD7T1e7t
-         2lai6DkS6OQLPkbkWNum0oXnSXBU6wgSJ4Fb4x8iPvlT2y2lGon6jqrZfZRpySsvh9Ar
-         4K1JDeoxpshtbTrzY0SHL83xW/pBspaasK6mHJ8AjIBVm4GenC48wyfVdeX+cvWvRR0K
-         RXZw==
-X-Gm-Message-State: AOJu0Yy17oCSfN82L48kr1Z4hSh5Yo1foXCG3+pp78ddaapzoSBLiboF
-	Ullrj5qZ/hjtrXyv0apJ65jN7hdKckXNK1NiN/Sd04hw+Du90hkPW37zqPabPYYN
-X-Gm-Gg: Acq92OH9OgfzKkWIaaVJ6XugQ1SYKR/tCqSVSEt4nUUHWk941aMPAku+q/NwrDw1NJj
-	tFjsCY56Y3+BK1kpn3WYZvjTb0gKL/oVvpiOnxDFJ1XKqHgUhwptyy3Zzp3pmnOiJkvU87aI4IG
-	Yc+6tVyfxHzqjucLt6/ibZ78eA7LAT2f5a/Q4+isoZueEfnWWwUEhCOphfEcGtpt5+MRas9Uxsm
-	V9yNQRcZMK4H9As7LLPejBOrIYJZS0qxA0hqmppq46d9unzVW7okOd2GAzZ7ma112QiuKJHM/xo
-	qJ/ljhvzuBVptX+1/lmVdIDX38ZTH6kt5bvaR5vyQ7YcsyF1dz6/L40PVK55FmDya8d9mdg9OBi
-	dxdUweUt+7Ou7ZUCNV8sGvGL1XT3NmK0jeRZtr0aKha16z1R2+Jvjk9pTJ0Gi7wp76grRmAQO4D
-	nlo+cidjxrVwg9LnZGxMC6xxe/M+fsZILs5UgozCEFc6hXB/TrbxKrLcEP+f8hbGvr8UeVR/bvA
-	8GY6zBM3GFQzW3FpQ==
-X-Received: by 2002:a05:6102:1611:b0:633:7d88:c77d with SMTP id ada2fe7eead31-71e88fda267mr1729559137.29.1781274606784;
-        Fri, 12 Jun 2026 07:30:06 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-71e85ab7f41sm1566953137.0.2026.06.12.07.30.05
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jun 2026 07:30:06 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1] Bluetooth: 6lowpan: Fix using chan->conn as indication to no remote netdev
-Date: Fri, 12 Jun 2026 10:29:57 -0400
-Message-ID: <20260612142957.524526-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        d=1e100.net; s=20251104; t=1781274795; x=1781879595;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TTLM106efnje673B2OyrJhDO3JKyBJ//Wa8kKGBktzg=;
+        b=mvj5opJSvc7LYiEi9m1X9uA3/HBPN1q3LJ2tzkiZXEw3p1e3R9YTNwFhW1MItlnYW9
+         agGoB7FW05+dpyJTXrSvw3kPivknqKOQnPVIPaW6rw7GcHr0yFo/IHYbjBHrwVgcpt8+
+         k477/FvPTMWC1/1em6H5Xvj0Ih9bh7k558u6i2ixpewjAPzTxA9/2GiHAPIM8RTR2dSc
+         c4kf48PT6ONmIabtzpePbrlFPKBY7uz/paB71Kyg0gJApzOKPz4rYbgnmVn1m2U7eFc7
+         pjNJ+I6kcAHMIsFWpCgSpaPoHUSReR/FZyyhMgQgfkvlhb4eDF/6Oz9WEpsHLigk78CC
+         ykxQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8cQTsEmdExpB782+TXH1E073m7aAz8THvNUJBT3hGMZEs3B1lBXnXpHvLLBXSFWY9dJiHf2TqoylbIjKbij9k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEFnbyldMV/nfWmBiQMldLFw2GwwaoCrbsBE4gffkbloa++0D7
+	+fo08wmZRWH+fp3tAmMsmmHd8xAQDduAiRbO+EXm+ZYRiJfDmEg6ep1GkvQezjpkeAc=
+X-Gm-Gg: Acq92OFf/LKFTWWAcMxqz870S4TyZZW+y7LNxxjAsC1Cqd8D8zRUXbtENKdRHy5Ssk/
+	ldarnOZrXhcXltVCx/oL6B65/d0G4XHeCWnkgfcwFIdWFm3h+uiVr5k4nO10NavMw50e6FMwJkn
+	xCvaIPXH8rYbkU2PYA1NW/m3bGtJn0gddvNWTl36BlcHnAMV2p6El5gdK0gtHfDuP5awKLhSmDv
+	3Ad47/CkhVD9amIW9mMb46G1jjbmVNWJTQmeBnNiBiHZ7mwOOUbGoqe93YScA/6TRCuXrVnvth+
+	wGzRylqO6jDdEL0g4i1RMV+1GgeU9IxlZNu+6DoRIab2djtN0VM2M/Cfc9ibDdYggPYNY2OCAmg
+	yu6AkytQnZWDaxbYXpF7UE5haTrXShr0ir3e60Tm44apMXwDpmrxq0+Iea7MGV/GTFiNusT0Dpd
+	D5xUV0AarVlJ673wXUaRcwXZEhOeS6OP7BvO24MWmUs0Fe8sDugUA+nkaPyI5pmjb4iTqrr5QEu
+	tBD9rVM8cqsP/pD5GtaH0eBu+hRXPoDvrvlGw==
+X-Received: by 2002:a17:907:9994:b0:beb:bf23:ac78 with SMTP id a640c23a62f3a-bfe2aefcebcmr149500366b.44.1781274795114;
+        Fri, 12 Jun 2026 07:33:15 -0700 (PDT)
+Received: from localhost (2001-1c00-3b89-c600-b4d0-bc9f-f60e-913a.cable.dynamic.v6.ziggo.nl. [2001:1c00:3b89:c600:b4d0:bc9f:f60e:913a])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bfdb4b32308sm110137366b.19.2026.06.12.07.33.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Jun 2026 07:33:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 12 Jun 2026 16:33:13 +0200
+Message-Id: <DJ757RE8OYHO.2XEXNTLVIJ497@fairphone.com>
+From: "Luca Weiss" <luca.weiss@fairphone.com>
+To: "Luca Weiss" <luca.weiss@fairphone.com>, "Bjorn Andersson"
+ <andersson@kernel.org>, "Konrad Dybcio" <konradybcio@kernel.org>, "Rob
+ Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
+ "Conor Dooley" <conor+dt@kernel.org>, "Alexander Koskovich"
+ <AKoskovich@pm.me>, "Liam Girdwood" <lgirdwood@gmail.com>, "Mark Brown"
+ <broonie@kernel.org>, "Bartosz Golaszewski" <brgl@kernel.org>, "Marcel
+ Holtmann" <marcel@holtmann.org>, "Luiz Augusto von Dentz"
+ <luiz.dentz@gmail.com>, "Balakrishna Godavarthi"
+ <quic_bgodavar@quicinc.com>, "Rocky Liao" <quic_rjliao@quicinc.com>,
+ "Johannes Berg" <johannes@sipsolutions.net>, "Jeff Johnson"
+ <jjohnson@kernel.org>
+Cc: <~postmarketos/upstreaming@lists.sr.ht>, <phone-devel@vger.kernel.org>,
+ <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+ <linux-wireless@vger.kernel.org>, <ath11k@lists.infradead.org>
+Subject: Re: [PATCH v2 2/7] dt-bindings: bluetooth: qcom,wcn6750-bt:
+ Document WCN6755 Bluetooth
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260403-milos-fp6-bt-wifi-v2-0-393322b27c5f@fairphone.com>
+ <20260403-milos-fp6-bt-wifi-v2-2-393322b27c5f@fairphone.com>
+In-Reply-To: <20260403-milos-fp6-bt-wifi-v2-2-393322b27c5f@fairphone.com>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-b66774b48dd9 ("Bluetooth: L2CAP: Fix UAF in channel timeout by holding
-conn ref") don't reset the chan->conn to NULL anymore making the bt#
-netdev not be remove once the last l2cap_chan_del is removed.
+On Fri Apr 3, 2026 at 3:52 PM CEST, Luca Weiss wrote:
+> Document the WCN6755 Bluetooth using a fallback to WCN6750 since the two
+> chips seem to be completely pin and software compatible. In fact the
+> original downstream kernel just pretends the WCN6755 is a WCN6750.
 
-Instead of restoring the original behavior this remove the logic of
-keeping the interface after the last channel is removed because it
-never worked as intended and the l2cap_chan_del always detach its
-l2cap_conn which results in always removing the channel anyway.
+Could you please pick up this patch (or provide an Ack if you want Bjorn
+to pick this up with the rest of the series).
 
-Fixes: b66774b48dd9 ("Bluetooth: L2CAP: Fix UAF in channel timeout by holding conn ref")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/6lowpan.c | 10 ----------
- 1 file changed, 10 deletions(-)
+Regards
+Luca
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index cb1e329d66fd..dba0c9128cf6 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -801,16 +801,6 @@ static void chan_close_cb(struct l2cap_chan *chan)
- 
- 	BT_DBG("chan %p conn %p", chan, chan->conn);
- 
--	if (chan->conn && chan->conn->hcon) {
--		if (!is_bt_6lowpan(chan->conn->hcon))
--			return;
--
--		/* If conn is set, then the netdev is also there and we should
--		 * not remove it.
--		 */
--		remove = false;
--	}
--
- 	spin_lock(&devices_lock);
- 
- 	list_for_each_entry_rcu(entry, &bt_6lowpan_devices, list) {
--- 
-2.54.0
+>
+> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+> ---
+>  .../devicetree/bindings/net/bluetooth/qcom,wcn6750-bt.yaml     | 10 ++++=
+++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6750=
+-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6750-bt.=
+yaml
+> index 8606a45ac9b9..79522409d709 100644
+> --- a/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6750-bt.yam=
+l
+> +++ b/Documentation/devicetree/bindings/net/bluetooth/qcom,wcn6750-bt.yam=
+l
+> @@ -12,8 +12,14 @@ maintainers:
+> =20
+>  properties:
+>    compatible:
+> -    enum:
+> -      - qcom,wcn6750-bt
+> +    oneOf:
+> +      - items:
+> +          - enum:
+> +              - qcom,wcn6755-bt
+> +          - const: qcom,wcn6750-bt
+> +
+> +      - enum:
+> +          - qcom,wcn6750-bt
+> =20
+>    enable-gpios:
+>      maxItems: 1
 
