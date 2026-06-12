@@ -1,83 +1,79 @@
-Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
+Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBAF385D79
-	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2026 14:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F39312819
+	for <linux-bluetooth@vger.kernel.org>; Fri, 12 Jun 2026 14:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781274923; cv=none; b=OfpcFJ+MU8Ft1hD/7m5J/Xsiv1kYpzkUQtdxIel4e1pgwBA4FJofTKRpK0hR5WonfBmF2ugN/L/gIR+Wmw8gY54bLsLS7vZ8zlcO60r2vFwQEfp0X/MLkEBo0LemnZZLVH3BGlpWPfsbfwP5WacliOSyiV8QKgaHk6A2nsCdmXY=
+	t=1781275111; cv=none; b=P1FSSgR4sSX8ee1W707Mu1QwxnmOiglFb2i0BTARx903x5InIfC00OEmOCM81uqY8M/hAxynU3p5B7wu/GmRk31EJ8V0aFh8Yxii71qsgHsxemM4ebHBCnFErlf78j+xwYJiuguWr0R8JMsLYpKk3SJHwD3Bezm8wdK3TePkxZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781274923; c=relaxed/simple;
-	bh=znGhs0gxxS1tAII53AQmDeQNVYFJZDr/KKcE9hHQFTw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cF23lQHdYHew8EPeTxJOdOoK5HoaeIjRmOHOq1XP1pmH30J5zY+Ra1P8sgFOlizFxxkFYHupved1WUDHKm/BU5QWjrzP+W+U5YMeNGTGJPB2ZewSBMItOihMdwjLSzw4GoRGOlVFpis+Z1uTz+mupP1XexLpRgJicrLrAUxZrZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=SEPQPqp1; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=XWyQhrR7; arc=none smtp.client-ip=202.12.124.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
+	s=arc-20240116; t=1781275111; c=relaxed/simple;
+	bh=Zf9BFyNfp4luVAn/p8NXF1JNodQLnd8uDU3J2V75aqU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GhxiQ79SEMGW3Bl4IhRec19pAgNqZROugM0L16heXUfyRyE3fi9rzSeSMat1RAbVycS1ZBxdoxBBsulRqaAvFTggDJxi4OvaKTqqxI4jHgW1+yDA7JO+r7oJAo/pAAuiu1teLor0+5KPG1uDseiW75kp7kWF1x4Lwz0XVSlPyKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hornang.me; spf=pass smtp.mailfrom=hornang.me; dkim=pass (2048-bit key) header.d=hornang.me header.i=@hornang.me header.b=SLyYi2eV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Hk0zpKVe; arc=none smtp.client-ip=202.12.124.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hornang.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hornang.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="SEPQPqp1";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XWyQhrR7"
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfout.stl.internal (Postfix) with ESMTP id 067C81D0008A;
-	Fri, 12 Jun 2026 10:35:21 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Fri, 12 Jun 2026 10:35:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1781274920; x=
-	1781361320; bh=5p4x8U/fifYc0pT/WtHZ2BB1E4R3eX9KeJei3EKHVjQ=; b=S
-	EPQPqp1+wd1NNrx9EC7P1x0Kj/KuJQv8jHfg/2mo4GMJblcTqOD7UKuQQ/mvy4mW
-	CN5WRvMBB4VDpPvhVO0CxRRyMmwZUurur+VM0rVNW00W1J4xgwfGdSI7grWbR9pF
-	JHh/wXgLcDyaZstlA0irx3xeWRKEvhQsFV9aXbtrgmdIfpJg2bLRhxlNlDxjOP7e
-	u3BzmFxlhE4RdlUh+W1N/Qv6SqbOt8a4MlExFWlRXqugIXJ/pRTy18cddAxu+vVd
-	LvrWeLj52evQED2blqYfOUVgxc3Z4zFGCjHUms5jLgDJ4o+DE9hFqAL0LKcY6j+u
-	KHmd7GwEBNjZOA++sux5A==
+	dkim=pass (2048-bit key) header.d=hornang.me header.i=@hornang.me header.b="SLyYi2eV";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Hk0zpKVe"
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 68C5C7A016A;
+	Fri, 12 Jun 2026 10:38:28 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Fri, 12 Jun 2026 10:38:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hornang.me; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1781275108; x=1781361508; bh=mzJLsdPaxj7dNRpLgbUgz
+	8n48W8PLNGlNN/5gaW74NM=; b=SLyYi2eVSkznR27hlomaAHO0YLZDKK6vEXSp8
+	ZQJeKpc4zxNEujYT0JK7tP0DCiXIHxYUHhgx1pQkSCiLjSUh8Iv6bnOMgJSWk12n
+	wvzGCo0dHt/PwYp61mmOQfdtSUMSjoulCTTc0CNpXnMWJjU0NKiWOHFpAN06TRoo
+	SXQsfZ1uybLr3ard7VN8WLPcCVGJpjCwBQfQYYf15mlrfuKkYgb9/Yat1wL4axok
+	FOB+foNjyZhV28mcxSJZVvogK/Ph7O9kBEdQAMQL3Mu6BL2uTRHmUqP+2rfxzIjH
+	gI/QkFdV15Uba5KdZv1buMhyexdrD46K+FIX+hmxNdOQaSv+w==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1781274920; x=1781361320; bh=5
-	p4x8U/fifYc0pT/WtHZ2BB1E4R3eX9KeJei3EKHVjQ=; b=XWyQhrR7t2AnnOuHZ
-	WcUgPD8usWVi+p9N76EzcrmyC2i3WXe1+2qbWJbbpy4jaRUKFT31kO4QClaTEzI5
-	DxgTLYYl2FecnsT9aVyLwPHOlzTExffwLT+YQCKy8gVkMhDdC8f5nQkTJGeIDu0I
-	R9oiiRuXHINO4L00pRk9+B4lFRgTsS/K+iGmJwsfYstrBprf0GaR1GcUeBEh3y67
-	nziPcdLUQQ9cTdPVRpuTZI9OA+j5gHh4gEkurHYuNzcDT1TG8gvEsc4OmxE6aRS6
-	s9+kYcl0YA9FecL90KBhCGPN+FmRymgmbc5EnSz/Qhaa8SrvkXdvQt9lffHvDSnA
-	pTS5Q==
-X-ME-Sender: <xms:KBksajUnQ9j1aL-3bveDI84X86RbDC8WRyGIZXxQvq0b82ExJHtNKA>
-    <xme:KBksajBHfzaAIB8WXno9UoDdewUaVwqC5PUxdRrEED3UiQQofFAl2-wOjzCU23avO
-    I4iWgZeYNG97iXrqDJv7qKg-0XqqOD5uip6EbU_4jjgGQU8Dt43U1c>
-X-ME-Received: <xmr:KBksasx35AJiasgI8ucwz9TcWOOZ_focrWZN7YbQGXuJJHnpgsK6sX77lbUffBu4r2_fRLU>
-X-ME-Proxy-Cause: dmFkZTF6OPDL7brE22f5iV6BtLHPA4JtNJpOX029wTi0j2t32McBIqxPWhxL1mPoPwv9Zz
-    BXRLqiWtsCUfs/rGgOyqHnfp4G2KwSnDTlzIMMHkAxzVZaDS9hhkdsaVU8U8OFC79kdNeG
-    y1Ppmzj481kwcML4IQ80URvCCps54brJQXGFtH5rgwQ6+9haesew7QbEyU0KwxUaPlxyI2
-    NPoFW9FW2SLLJnzVlucQmiYMZwP0l93OLb7vNWDm8v5bkUR5QfDraqSMgXHOZW3xoh/+Hg
-    vJskqXbegrMb3iiQN8vqxg/gjDhcY1CkadHIg0vdMMN9G4vuWiTYocSHjMGJ2oZbY5nzb+
-    0OMLNeo9MUGZcMSY5joJ4VdwLbCh90NbpBsk0KJK8zfkzqUILJ10DKu2BK59rey6dh7qV2
-    pDAJcQWEhFxmENMsJh//DKv5M4HxkyOVh6e1ft+C256ULcwOgSZbMVHXHtpTHAsY8Zs/6x
-    6vJuROpoj6XgLPYQdFzu4I/hWV+DjCJ5OgMDQPgnS3IVnl5V2l6ug7X9+9x6tgGpH+lT3h
-    TTEss6qJ1yw4rMRpG2zSqBMw59ktB0+vRjKGMEpLeEgGnAowCUhV2QQCGBSIGoIfyBuRwD
-    1tgHJM2MxlEUKKvM/BWE/vBThBRvPoDTTK5QY+qtT69cBxxZihPBInYObPRQ
-X-ME-Proxy: <xmx:KBksaoDNwr9xhyDUexFSOxOlXhg48Kw0TDOZ3Ud3gDV2uNYtwwPiHw>
-    <xmx:KBksahb784bMsWHHvWS5BPsJQtWlgmD8kt_rXdU6UShEavkjYipa4g>
-    <xmx:KBksaogtUUBd0AEVP4H1OZtfcCg2v6CAjTG7h-dwWOTQcIlrAILQ5g>
-    <xmx:KBksar6cq6gUBUWuuuLAPaoWnkzoTW7vNa6RU2vkPv7sxH5QzqD-IQ>
-    <xmx:KBksalYjpIEmtZdC7Yq3zhEMtavftl2TCofSNhogCMb7lf-42BMKbed_>
-Feedback-ID: if72e4b10:Fastmail
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1781275108; x=1781361508; bh=mzJLsdPaxj7dNRpLgbUgz8n48W8PLNGlNN/
+	5gaW74NM=; b=Hk0zpKVeCULcObhFLNTL1W0ndDDEhfszzRVWO8cBpCz/N1a1BIf
+	+Jq5O6HDU7UWsIkVbdPUNex/3uM6yY7ZO9IXH32g9pe5L9m7O/4XrpSLlFUNDw6X
+	OCFop1JCPc5EzGD3smmPfj/0BgBdln99H9xE7uXsZXE8wJqtFRFKTucMpxaWbDBm
+	tSDyFud6Db5WPHVII1K7+fgP51n0yTUz24/egic9az+Oh+MR6f/+vcGJFTMa6mLf
+	6jczXuU/nYR+SjTjfDrzOSAE0XFRTkhl9bSna0p/y4W6H/nvVKmEzv9bqSy+wOTg
+	ifdKLGAk+al61JCsRllmx5E3C7sRXqxMNhg==
+X-ME-Sender: <xms:4xksasVX0xjzjUIQ4jY0mEqKTL2sCPXgSuOaChg44oTKyvL4Mgo4fQ>
+    <xme:4xksankdopVOXddsi0J9alXFaWgaPB2PJGDB1l7JjmpEyePSIjQRLPHeFpq8JW77n
+    i0W9oxVSaBm0lVon1cRCs47XLD5gIV0WQqIw4kEoK2oFXZp9fYxrJ8>
+X-ME-Received: <xmr:4xksalZQ9-P9YqYNUQKaPsPWcstQesG4nvOtkqtM0GRB4YgMFeGZt43jLEoArVOT5sVkSTOp96qfFYlc2BQfVh1kgeGeb4adVKtL0go>
+X-ME-Proxy-Cause: dmFkZTGWPSe2TIkkMn135iguxO9qlFGvAvlWym44kl9olX2C6Ix7XJPqg7hjGp9jBscHcc
+    a7GjEKgYp1/R/0X4Gu4zE5SJTTv8HJLXljlMD4Bg/zBZXuSXqkaq/IW19S6YtrPrMegP56
+    PdeInORfehct/Y15Amk+RlzCd3WvcwdZ1JaI1O1eCvoVPQ2XW47Z83uMhwccBrOp/PkiV5
+    hxeC1r2Ym/T71Gu6kkh6f9d6Q53yw4Okri3U+BQ2asATErg326uXYpSpQ1m+1ugCXGA+ad
+    u+agT99+O/BWiO+moqvLXaKZ6BkpdIxA6aWRS7zTnhCX8yvO5NM86dvkbBSj9JLRGZNMql
+    nV98mE5czPEmrSNzLYqeRFylQZrZ0nuG284sHafg+h40Y6jJUrWYR+SVNlZvB2oaeP6lnv
+    AjK62EVmH6BhaMpcRHRnMeDEn2PeFf3A/ghI9mycd9i0bn8mph6ziSts2HIzJl1M5yn+os
+    iM4fa9Gcr7fBCesj1tk4HuX/6JtyiXmuO2Lg/z2cxH9xOESRzGNWm6A+GbYi+kzrehQCH6
+    xyaul2Rl/IuwvbcILpBURPpas+Wve6pIRL+d9c9ab7XAY1ZcwBMoDNTryHoRkBi+VlROfm
+    irS1vTEd2KA4o8fgY2SvohAJxNJmRH8uw63yt5EQL6PPQQyGL2CzlynMBL2Q
+X-ME-Proxy: <xmx:4xksaqOG4r66DSIOvoUZeCn1p5ZbxjDHN2rB03v574Nkes3UEDUo0A>
+    <xmx:4xksaib77vDtjVsbfpPUhwtxmGP0sX55RAPPG1S5_5GMVT2uT2IyyA>
+    <xmx:4xksag1hAxVc2LlBH0OOTO3780z10Y-n5NEAn3QKGq0Ybfl5gc15Kw>
+    <xmx:4xksagcUiUE_u7wWZ3eTtixVZYIm1sb0ChiNrQNFK9XNiApuEfwu8Q>
+    <xmx:5BksamKpoYoAcE8lfui_gNxYUh6Su_tc0eUsliTwaaW49LJy2AbAeXpa>
+Feedback-ID: i9c9648fe:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 12 Jun 2026 10:35:20 -0400 (EDT)
-From: Siwei Zhang <oss@fourdim.xyz>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Siwei Zhang <oss@fourdim.xyz>
-Subject: [PATCH v11 1/1] Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()
-Date: Fri, 12 Jun 2026 10:34:27 -0400
-Message-ID: <20260612143449.3045055-2-oss@fourdim.xyz>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260612143449.3045055-1-oss@fourdim.xyz>
-References: <20260612143449.3045055-1-oss@fourdim.xyz>
+ 12 Jun 2026 10:38:26 -0400 (EDT)
+From: Stig Hornang <stig@hornang.me>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	Stig Hornang <stig@hornang.me>
+Subject: [PATCH] Bluetooth: L2CAP: fix tx ident leak for commands without a response
+Date: Fri, 12 Jun 2026 16:38:18 +0200
+Message-ID: <20260612143818.167643-1-stig@hornang.me>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -86,543 +82,84 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-l2cap_sock_new_connection_cb() returned l2cap_pi(sk)->chan after
-release_sock(parent). Once the parent lock is dropped the newly
-enqueued child socket sk is reachable via the accept queue, so another
-task can accept and free it before the callback dereferences sk,
-resulting in a use-after-free.
+Commit 6c3ea155e5ee ("Bluetooth: L2CAP: Fix not tracking outstanding
+TX ident") changed ident allocation to use an IDA, releasing idents in
+l2cap_put_ident() when the matching response command is received.
 
-Rework the ->new_connection() op so the core, rather than the callback,
-owns the child channel's lifetime. The op now receives a pre-allocated
-new_chan and returns an errno instead of allocating and returning a
-channel. l2cap_new_connection() allocates the child channel and links
-it into the conn list via __l2cap_chan_add() before invoking the
-callback, so the conn-list reference keeps the channel alive once
-release_sock(parent) exposes the socket to other tasks.
+But identifiers allocated for commands that have no response defined
+are never released. In particular L2CAP_LE_CREDITS is sent repeatedly for
+the lifetime of an LE CoC channel, so a peer streaming data to the
+host exhausts the 1-255 ident range after 254 credit packets. From
+then on l2cap_get_ident() fails:
 
-Channel configuration that was duplicated in l2cap_sock_init() and the
-various new_connection callbacks is consolidated into
-l2cap_chan_set_defaults(), which now inherits from the parent channel
-when one is supplied.
+    kernel: Bluetooth: Unable to allocate ident: -28
 
-Fixes: 8ffb929098a5 ("Bluetooth: Remove parent socket usage from l2cap_core.c")
-Cc: stable@kernel.org
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
+and every subsequent L2CAP_LE_CREDITS packet is sent with ident 0,
+which is invalid (Core Spec, Vol 3, Part A, Section 4: "Signaling
+identifier 0x00 is an invalid identifier and shall never be used in
+any command"). Remote stacks that validate the ident drop these
+commands, never receive new credits, and the channel stalls
+permanently. With default socket buffers this happens after roughly 0.5 MB
+of received data (the exact amount depends on the socket receive buffer):
+
+  < ACL Data TX: Handle 2048 flags 0x00 dlen 12
+        LE L2CAP: LE Flow Control Credit (0x16) ident 0 len 4
+          Source CID: 64
+          Credits: 1
+
+Release the ident immediately after sending L2CAP_LE_CREDITS since no
+response will ever release it. Use a local variable instead of
+chan->ident so that an ident that an EXT_FLOWCTL channel may be waiting on
+(e.g. a pending reconfigure) is not overwritten by a credit packet.
+
+Also add the missing L2CAP_LE_CONN_RSP case to l2cap_put_ident() so
+idents allocated for outgoing L2CAP_LE_CONN_REQ commands are released
+when the response arrives.
+
+Fixes: 6c3ea155e5ee ("Bluetooth: L2CAP: Fix not tracking outstanding TX ident")
+Assisted-by: Claude:claude-opus-4.8
+Assisted-by: Fable:5
+Signed-off-by: Stig Hornang <stig@hornang.me>
 ---
- include/net/bluetooth/l2cap.h |  10 ++--
- net/bluetooth/6lowpan.c       |  18 +-----
- net/bluetooth/l2cap_core.c    |  78 ++++++++++++++++++++-----
- net/bluetooth/l2cap_sock.c    | 103 ++++++++++++++++------------------
- net/bluetooth/smp.c           |  27 ++-------
- 5 files changed, 127 insertions(+), 109 deletions(-)
+ net/bluetooth/l2cap_core.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 1640cc9bf83a..ef6ce1c20a4f 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -617,7 +617,8 @@ struct l2cap_chan {
- struct l2cap_ops {
- 	char			*name;
- 
--	struct l2cap_chan	*(*new_connection) (struct l2cap_chan *chan);
-+	int			(*new_connection)(struct l2cap_chan *chan,
-+						  struct l2cap_chan *new_chan);
- 	int			(*recv) (struct l2cap_chan * chan,
- 					 struct sk_buff *skb);
- 	void			(*teardown) (struct l2cap_chan *chan, int err);
-@@ -882,9 +883,10 @@ static inline __u16 __next_seq(struct l2cap_chan *chan, __u16 seq)
- 	return (seq + 1) % (chan->tx_win_max + 1);
- }
- 
--static inline struct l2cap_chan *l2cap_chan_no_new_connection(struct l2cap_chan *chan)
-+static inline int l2cap_chan_no_new_connection(struct l2cap_chan *chan,
-+					       struct l2cap_chan *new_chan)
- {
--	return NULL;
-+	return -EOPNOTSUPP;
- }
- 
- static inline int l2cap_chan_no_recv(struct l2cap_chan *chan, struct sk_buff *skb)
-@@ -961,7 +963,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
- void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
- void l2cap_chan_rx_avail(struct l2cap_chan *chan, ssize_t rx_avail);
- int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator);
--void l2cap_chan_set_defaults(struct l2cap_chan *chan);
-+void l2cap_chan_set_defaults(struct l2cap_chan *chan, struct l2cap_chan *pchan);
- int l2cap_ertm_init(struct l2cap_chan *chan);
- void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
- void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index cb1e329d66fd..6e57b4b95c94 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -632,7 +632,7 @@ static struct l2cap_chan *chan_create(void)
- 	if (!chan)
- 		return NULL;
- 
--	l2cap_chan_set_defaults(chan);
-+	l2cap_chan_set_defaults(chan, NULL);
- 
- 	chan->chan_type = L2CAP_CHAN_CONN_ORIENTED;
- 	chan->mode = L2CAP_MODE_LE_FLOWCTL;
-@@ -745,21 +745,6 @@ static inline void chan_ready_cb(struct l2cap_chan *chan)
- 	ifup(dev->netdev);
- }
- 
--static inline struct l2cap_chan *chan_new_conn_cb(struct l2cap_chan *pchan)
--{
--	struct l2cap_chan *chan;
--
--	chan = chan_create();
--	if (!chan)
--		return NULL;
--
--	chan->ops = pchan->ops;
--
--	BT_DBG("chan %p pchan %p", chan, pchan);
--
--	return chan;
--}
--
- static void unregister_dev(struct lowpan_btle_dev *dev)
- {
- 	struct hci_dev *hdev = READ_ONCE(dev->hdev);
-@@ -901,7 +886,6 @@ static long chan_get_sndtimeo_cb(struct l2cap_chan *chan)
- 
- static const struct l2cap_ops bt_6lowpan_chan_ops = {
- 	.name			= "L2CAP 6LoWPAN channel",
--	.new_connection		= chan_new_conn_cb,
- 	.recv			= chan_recv_cb,
- 	.close			= chan_close_cb,
- 	.state_change		= chan_state_change_cb,
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 62133eef9d2f..fab942661fb0 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -522,7 +522,10 @@ void l2cap_chan_put(struct l2cap_chan *c)
- }
- EXPORT_SYMBOL_GPL(l2cap_chan_put);
- 
--void l2cap_chan_set_defaults(struct l2cap_chan *chan)
-+/* Initialise @chan with default values, inheriting from the parent channel
-+ * @pchan when it is given.
-+ */
-+void l2cap_chan_set_defaults(struct l2cap_chan *chan, struct l2cap_chan *pchan)
- {
- 	chan->fcs  = L2CAP_FCS_CRC16;
- 	chan->max_tx = L2CAP_DEFAULT_MAX_TX;
-@@ -536,6 +539,31 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan)
- 	chan->retrans_timeout = L2CAP_DEFAULT_RETRANS_TO;
- 	chan->monitor_timeout = L2CAP_DEFAULT_MONITOR_TO;
- 
-+	if (pchan) {
-+		BT_DBG("chan %p pchan %p", chan, pchan);
-+
-+		chan->chan_type = pchan->chan_type;
-+		chan->imtu = pchan->imtu;
-+		chan->omtu = pchan->omtu;
-+		chan->mode = pchan->mode;
-+		chan->fcs = pchan->fcs;
-+		chan->max_tx = pchan->max_tx;
-+		chan->tx_win = pchan->tx_win;
-+		chan->tx_win_max = pchan->tx_win_max;
-+		chan->sec_level = pchan->sec_level;
-+		chan->conf_state = pchan->conf_state;
-+		chan->flags = pchan->flags;
-+		chan->tx_credits = pchan->tx_credits;
-+		chan->rx_credits = pchan->rx_credits;
-+
-+		if (chan->chan_type == L2CAP_CHAN_FIXED) {
-+			chan->scid = pchan->scid;
-+			chan->dcid = pchan->scid;
-+		}
-+
-+		return;
-+	}
-+
- 	chan->conf_state = 0;
- 	set_bit(CONF_NOT_COMPLETE, &chan->conf_state);
- 
-@@ -4010,6 +4038,38 @@ static inline int l2cap_command_rej(struct l2cap_conn *conn,
- 	return 0;
- }
- 
-+/* Allocate and initialise a channel for an incoming connection.
-+ *
-+ * The channel inherits its configuration from @pchan and is linked into @conn
-+ * before ->new_connection() runs, so the conn list reference keeps it alive if
-+ * the callback exposes it (e.g. via the socket accept queue) before this
-+ * returns. The l2cap_chan_create() reference is taken over by the subsystem on
-+ * success and dropped here on failure.
-+ */
-+static struct l2cap_chan *l2cap_new_connection(struct l2cap_conn *conn,
-+					       struct l2cap_chan *pchan)
-+{
-+	struct l2cap_chan *chan;
-+
-+	chan = l2cap_chan_create();
-+	if (!chan)
-+		return NULL;
-+
-+	l2cap_chan_set_defaults(chan, pchan);
-+	chan->ops = pchan->ops;
-+
-+	__l2cap_chan_add(conn, chan);
-+
-+	if (pchan->ops->new_connection &&
-+	    pchan->ops->new_connection(pchan, chan) < 0) {
-+		l2cap_chan_del(chan, 0);
-+		l2cap_chan_put(chan);
-+		return NULL;
-+	}
-+
-+	return chan;
-+}
-+
- static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
- 			  u8 *data, u8 rsp_code)
- {
-@@ -4056,7 +4116,7 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
- 		goto response;
- 	}
- 
--	chan = pchan->ops->new_connection(pchan);
-+	chan = l2cap_new_connection(conn, pchan);
- 	if (!chan)
- 		goto response;
- 
-@@ -4074,8 +4134,6 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
- 	chan->psm  = psm;
- 	chan->dcid = scid;
- 
--	__l2cap_chan_add(conn, chan);
--
- 	dcid = chan->scid;
- 
- 	__set_chan_timer(chan, chan->ops->get_sndtimeo(chan));
-@@ -4958,7 +5016,7 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
- 		goto response_unlock;
- 	}
- 
--	chan = pchan->ops->new_connection(pchan);
-+	chan = l2cap_new_connection(conn, pchan);
- 	if (!chan) {
- 		result = L2CAP_CR_LE_NO_MEM;
- 		goto response_unlock;
-@@ -4973,8 +5031,6 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
- 	chan->omtu = mtu;
- 	chan->remote_mps = mps;
- 
--	__l2cap_chan_add(conn, chan);
--
- 	l2cap_le_flowctl_init(chan, __le16_to_cpu(req->credits));
- 
- 	dcid = chan->scid;
-@@ -5182,7 +5238,7 @@ static inline int l2cap_ecred_conn_req(struct l2cap_conn *conn,
- 			continue;
- 		}
- 
--		chan = pchan->ops->new_connection(pchan);
-+		chan = l2cap_new_connection(conn, pchan);
- 		if (!chan) {
- 			result = L2CAP_CR_LE_NO_MEM;
- 			continue;
-@@ -5197,8 +5253,6 @@ static inline int l2cap_ecred_conn_req(struct l2cap_conn *conn,
- 		chan->omtu = mtu;
- 		chan->remote_mps = mps;
- 
--		__l2cap_chan_add(conn, chan);
--
- 		l2cap_ecred_init(chan, __le16_to_cpu(req->credits));
- 
- 		/* Init response */
-@@ -7478,14 +7532,12 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- 			goto next;
- 
- 		l2cap_chan_lock(pchan);
--		chan = pchan->ops->new_connection(pchan);
-+		chan = l2cap_new_connection(conn, pchan);
- 		if (chan) {
- 			bacpy(&chan->src, &hcon->src);
- 			bacpy(&chan->dst, &hcon->dst);
- 			chan->src_type = bdaddr_src_type(hcon);
- 			chan->dst_type = dst_type;
--
--			__l2cap_chan_add(conn, chan);
- 		}
- 
- 		l2cap_chan_unlock(pchan);
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 4853f1b33449..6d34d8470a80 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -43,7 +43,8 @@ static struct bt_sock_list l2cap_sk_list = {
- static const struct proto_ops l2cap_sock_ops;
- static void l2cap_sock_init(struct sock *sk, struct sock *parent);
- static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
--				     int proto, gfp_t prio, int kern);
-+				     int proto, gfp_t prio, int kern,
-+				     struct l2cap_chan *chan);
- static void l2cap_sock_cleanup_listen(struct sock *parent);
- 
- bool l2cap_is_socket(struct socket *sock)
-@@ -1284,6 +1285,23 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 	return err;
- }
- 
-+/* Release the sock's ref on chan and clear the pointer so that the ref is
-+ * dropped exactly once even if both l2cap_sock_kill() and
-+ * l2cap_sock_destruct() run. Setting chan->data to NULL first stops any other
-+ * task from dereferencing the now-dead sock pointer.
-+ */
-+static void l2cap_sock_put_chan(struct sock *sk)
-+{
-+	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-+
-+	if (!chan)
-+		return;
-+
-+	chan->data = NULL;
-+	l2cap_pi(sk)->chan = NULL;
-+	l2cap_chan_put(chan);
-+}
-+
- /* Kill socket (only if zapped and orphan)
-  * Must be called on unlocked socket, with l2cap channel lock.
-  */
-@@ -1294,13 +1312,9 @@ static void l2cap_sock_kill(struct sock *sk)
- 
- 	BT_DBG("sk %p state %s", sk, state_to_string(sk->sk_state));
- 
--	/* Sock is dead, so set chan data to NULL, avoid other task use invalid
--	 * sock pointer.
--	 */
--	l2cap_pi(sk)->chan->data = NULL;
--	/* Kill poor orphan */
-+	l2cap_sock_put_chan(sk);
- 
--	l2cap_chan_put(l2cap_pi(sk)->chan);
-+	/* Kill poor orphan */
- 	sock_set_flag(sk, SOCK_DEAD);
- 	sock_put(sk);
- }
-@@ -1543,12 +1557,13 @@ static void l2cap_sock_cleanup_listen(struct sock *parent)
- 	}
- }
- 
--static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
-+static int l2cap_sock_new_connection_cb(struct l2cap_chan *chan,
-+					struct l2cap_chan *new_chan)
- {
- 	struct sock *sk, *parent = chan->data;
- 
- 	if (!parent)
--		return NULL;
-+		return -EINVAL;
- 
- 	lock_sock(parent);
- 
-@@ -1556,25 +1571,28 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
- 	if (sk_acceptq_is_full(parent)) {
- 		BT_DBG("backlog full %d", parent->sk_ack_backlog);
- 		release_sock(parent);
--		return NULL;
-+		return -ENOBUFS;
- 	}
- 
- 	sk = l2cap_sock_alloc(sock_net(parent), NULL, BTPROTO_L2CAP,
--			      GFP_ATOMIC, 0);
-+			      GFP_ATOMIC, 0, new_chan);
- 	if (!sk) {
- 		release_sock(parent);
--		return NULL;
--        }
-+		return -ENOMEM;
-+	}
- 
- 	bt_sock_reclassify_lock(sk, BTPROTO_L2CAP);
- 
- 	l2cap_sock_init(sk, parent);
- 
-+	/* The conn list reference taken by l2cap_new_connection() keeps new_chan
-+	 * alive once release_sock() lets another task free this socket.
-+	 */
- 	bt_accept_enqueue(parent, sk, false);
- 
- 	release_sock(parent);
- 
--	return l2cap_pi(sk)->chan;
-+	return 0;
- }
- 
- static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
-@@ -1871,10 +1889,7 @@ static void l2cap_sock_destruct(struct sock *sk)
- 
- 	BT_DBG("sk %p", sk);
- 
--	if (l2cap_pi(sk)->chan) {
--		l2cap_pi(sk)->chan->data = NULL;
--		l2cap_chan_put(l2cap_pi(sk)->chan);
--	}
-+	l2cap_sock_put_chan(sk);
- 
- 	list_for_each_entry_safe(rx_busy, next, &l2cap_pi(sk)->rx_busy, list) {
- 		kfree_skb(rx_busy->skb);
-@@ -1907,30 +1922,12 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
- 	BT_DBG("sk %p", sk);
- 
- 	if (parent) {
--		struct l2cap_chan *pchan = l2cap_pi(parent)->chan;
--
- 		sk->sk_type = parent->sk_type;
- 		bt_sk(sk)->flags = bt_sk(parent)->flags;
- 
--		chan->chan_type = pchan->chan_type;
--		chan->imtu = pchan->imtu;
--		chan->omtu = pchan->omtu;
--		chan->conf_state = pchan->conf_state;
--		chan->mode = pchan->mode;
--		chan->fcs  = pchan->fcs;
--		chan->max_tx = pchan->max_tx;
--		chan->tx_win = pchan->tx_win;
--		chan->tx_win_max = pchan->tx_win_max;
--		chan->sec_level = pchan->sec_level;
--		chan->flags = pchan->flags;
--		chan->tx_credits = pchan->tx_credits;
--		chan->rx_credits = pchan->rx_credits;
--
--		if (chan->chan_type == L2CAP_CHAN_FIXED) {
--			chan->scid = pchan->scid;
--			chan->dcid = pchan->scid;
--		}
--
-+		/* Channel configuration is inherited from the parent by
-+		 * l2cap_new_connection().
-+		 */
- 		security_sk_clone(parent, sk);
- 	} else {
- 		switch (sk->sk_type) {
-@@ -1956,7 +1953,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
- 			chan->mode = L2CAP_MODE_BASIC;
- 		}
- 
--		l2cap_chan_set_defaults(chan);
-+		l2cap_chan_set_defaults(chan, NULL);
- 	}
- 
- 	/* Default config options */
-@@ -1975,10 +1972,10 @@ static struct proto l2cap_proto = {
- };
- 
- static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
--				     int proto, gfp_t prio, int kern)
-+				     int proto, gfp_t prio, int kern,
-+				     struct l2cap_chan *chan)
- {
- 	struct sock *sk;
--	struct l2cap_chan *chan;
- 
- 	sk = bt_sock_alloc(net, sock, &l2cap_proto, proto, prio, kern);
- 	if (!sk)
-@@ -1989,16 +1986,7 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
- 
- 	INIT_LIST_HEAD(&l2cap_pi(sk)->rx_busy);
- 
--	chan = l2cap_chan_create();
--	if (!chan) {
--		sk_free(sk);
--		if (sock)
--			sock->sk = NULL;
--		return NULL;
--	}
--
--	l2cap_chan_hold(chan);
--
-+	/* The sock takes ownership of the caller's reference on chan. */
- 	l2cap_pi(sk)->chan = chan;
- 
- 	return sk;
-@@ -2008,6 +1996,7 @@ static int l2cap_sock_create(struct net *net, struct socket *sock, int protocol,
- 			     int kern)
- {
- 	struct sock *sk;
-+	struct l2cap_chan *chan;
- 
- 	BT_DBG("sock %p", sock);
- 
-@@ -2022,10 +2011,16 @@ static int l2cap_sock_create(struct net *net, struct socket *sock, int protocol,
- 
- 	sock->ops = &l2cap_sock_ops;
- 
--	sk = l2cap_sock_alloc(net, sock, protocol, GFP_ATOMIC, kern);
--	if (!sk)
-+	chan = l2cap_chan_create();
-+	if (!chan)
- 		return -ENOMEM;
- 
-+	sk = l2cap_sock_alloc(net, sock, protocol, GFP_ATOMIC, kern, chan);
-+	if (!sk) {
-+		l2cap_chan_put(chan);
-+		return -ENOMEM;
-+	}
-+
- 	l2cap_sock_init(sk, NULL);
- 	bt_sock_link(&l2cap_sk_list, sk);
- 	return 0;
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 031d3022cb1e..c4470958b0d5 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -3201,34 +3201,19 @@ static const struct l2cap_ops smp_chan_ops = {
- 	.get_sndtimeo		= l2cap_chan_no_get_sndtimeo,
- };
- 
--static inline struct l2cap_chan *smp_new_conn_cb(struct l2cap_chan *pchan)
-+static inline int smp_new_conn_cb(struct l2cap_chan *chan,
-+				  struct l2cap_chan *new_chan)
- {
--	struct l2cap_chan *chan;
--
--	BT_DBG("pchan %p", pchan);
--
--	chan = l2cap_chan_create();
--	if (!chan)
--		return NULL;
--
--	chan->chan_type	= pchan->chan_type;
--	chan->ops	= &smp_chan_ops;
--	chan->scid	= pchan->scid;
--	chan->dcid	= chan->scid;
--	chan->imtu	= pchan->imtu;
--	chan->omtu	= pchan->omtu;
--	chan->mode	= pchan->mode;
-+	new_chan->ops = &smp_chan_ops;
- 
- 	/* Other L2CAP channels may request SMP routines in order to
- 	 * change the security level. This means that the SMP channel
- 	 * lock must be considered in its own category to avoid lockdep
- 	 * warnings.
- 	 */
--	atomic_set(&chan->nesting, L2CAP_NESTING_SMP);
--
--	BT_DBG("created chan %p", chan);
-+	atomic_set(&new_chan->nesting, L2CAP_NESTING_SMP);
- 
--	return chan;
-+	return 0;
- }
- 
- static const struct l2cap_ops smp_root_chan_ops = {
-@@ -3288,7 +3273,7 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
- 
- 	l2cap_add_scid(chan, cid);
- 
--	l2cap_chan_set_defaults(chan);
-+	l2cap_chan_set_defaults(chan, NULL);
- 
- 	if (cid == L2CAP_CID_SMP) {
- 		u8 bdaddr_type;
--- 
-2.54.0
+@@ -4810,6 +4810,7 @@ static void l2cap_put_ident(struct l2cap
+ 	case L2CAP_ECHO_RSP:
+ 	case L2CAP_INFO_RSP:
+ 	case L2CAP_CONN_PARAM_UPDATE_RSP:
++	case L2CAP_LE_CONN_RSP:
+ 	case L2CAP_ECRED_CONN_RSP:
+ 	case L2CAP_ECRED_RECONF_RSP:
+ 		/* First do a lookup since the remote may send bogus ids that
+@@ -6632,6 +6633,7 @@ static void l2cap_chan_le_send_credits(s
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct l2cap_le_credits pkt;
+ 	u16 return_credits = l2cap_le_rx_credits(chan);
++	int ident;
 
+ 	if (chan->mode != L2CAP_MODE_LE_FLOWCTL &&
+ 	    chan->mode != L2CAP_MODE_EXT_FLOWCTL)
+@@ -6649,9 +6651,18 @@ static void l2cap_chan_le_send_credits(s
+ 	pkt.cid     = cpu_to_le16(chan->scid);
+ 	pkt.credits = cpu_to_le16(return_credits);
+
+-	chan->ident = l2cap_get_ident(conn);
++	ident = l2cap_get_ident(conn);
++
++	l2cap_send_cmd(conn, ident, L2CAP_LE_CREDITS, sizeof(pkt), &pkt);
+
+-	l2cap_send_cmd(conn, chan->ident, L2CAP_LE_CREDITS, sizeof(pkt), &pkt);
++	/* L2CAP_LE_CREDITS has no response so the ident is never released by
++	 * l2cap_put_ident() - release it right away, otherwise the tx_ida
++	 * range is exhausted after 254 packets and from then on credits are
++	 * sent with the invalid ident 0, which some remote stacks ignore,
++	 * stalling the channel.
++	 */
++	if (ident > 0)
++		ida_free(&conn->tx_ida, ident);
+ }
+
+ void l2cap_chan_rx_avail(struct l2cap_chan *chan, ssize_t rx_avail)
