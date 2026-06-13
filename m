@@ -1,58 +1,63 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC02A316189
-	for <linux-bluetooth@vger.kernel.org>; Sat, 13 Jun 2026 15:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78A6379C29;
+	Sat, 13 Jun 2026 15:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781364024; cv=pass; b=C3x3fLsbeJbwg+n07yncE36og7y+8LYMytbUpPhoIeLmR08U4/xeclzeAWsx3RWK5iCCR9I/A5VTrE9Z3UDH05qFSQEtwA68mZ3oYzRhjpqNcc0ISx14Jt3ddaUQB7871ab1O7WKnfbmlJWjZyQTn8Pgxbu2QU0EU0dOgxzMP0s=
+	t=1781364611; cv=pass; b=eKSsHkBiUWgPIgo5iln9J948fuXQ6BoF5vEpFXOEEE7Ly4Ydb3yxWga+NV+Dp4K7BjqG3ySXhtbRYP9LKD12ANnRABTexTs2rZhgOZIC0on2IiNCVTz5a7YqplHw8JndsqjyzSraTz61/q4Nd4apcsr8hSfIsnNLP+aQlxdWqD4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781364024; c=relaxed/simple;
-	bh=LomUNveBJXsYF7kdteWgCADSXy+uNV8SRAzlr32cswQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=USuBMeUN/HLnKZ20Jx7rVhNpZmN8zYSumIfd75IZEt58MEWlv4/XuhVIs2oSjqQKzrOM15Se2esdipiWaDvAqm30R+bntDLvU0OPBvj9km0ue7SEB0cDfeS+aHcu0FtQs9N/fjwLpJYQYz5WdxlFk1LuORhmWU2deUWxwggGLAw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=lvydhAoc; arc=pass smtp.client-ip=195.140.195.201
+	s=arc-20240116; t=1781364611; c=relaxed/simple;
+	bh=S5dYuLv4N6nSh5hPQxsSe7bwHSQolb/RIp7nc0RL5mo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nvZZTZhuUVoNNcXxVx3imJZgp2kGOhtPkIY61aYpWjTVZUcVbugUh6n8h/568hOX+hYI91DJFE24w/1aOiYiLEdBE5KWDM31FewZ1U3Fo8e+hp1Lc/2HmVFcUh3gPjHS04oE18JFycruT9YLE18oHDo2B+5so33jna0e2L+iuNc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=LtaD9Kax; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="lvydhAoc"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="LtaD9Kax"
 Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a03d])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gd0SG0vxrzyWH;
-	Sat, 13 Jun 2026 18:20:13 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4gd0gX118dzyWH;
+	Sat, 13 Jun 2026 18:30:00 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1781364014;
+	t=1781364601;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=tlpOXuihhUVZbyMIbMj3bi9i3CWarBMsCIJDwzy4I70=;
-	b=lvydhAoclpUjkgW0+zAHdek/lKVVztbvDfwxy4/okMa6DGKgjTlEhaCo5Cp+eetQpxSyXH
-	bLPKZ/3dJd/3uB5Ddb8cGP8yBe2lt7etRKICsqiDjknWwZp1kJdHudUeFj6KQocmfWBjdy
-	LSeqcTXdSzeB88/ala1o6aEz3Qqskbg=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1781364014;
-	b=fgeWDwS/blzzKiKSXLWBvecDOkzmQun8KYhQ5e/kQdqFFIQxClKMMBBC7UKskSNtwqNXf0
-	dzNsD0tFcy9qliDKPm/rGZdJT5G3lBn/Y70wg7uvaLstsTV1TBhG2PoqS6/3Qh+SogwXks
-	CykhtKFxJwKqtskcg1JjgLfcdyrxuWM=
+	bh=88kYt8eEzESBaOFkzHodNaDnLTBS/6KbUlbalEizkuQ=;
+	b=LtaD9KaxYsUBRvLjRL3HZ3fm+hbqg3IpBEjjeL7uNiNLIO6JKoqOP4vza/48ow6NUo+RQ3
+	nMz/mUyqet4TixRacAXeb/sFBP/g8r7xDBaLgizt+LbEkuuahP6n6EjOzTm00gAiAJuZdO
+	bo0yPSrdUnNJH/5LmaJ5J4DpAaBAslk=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1781364601;
+	b=c/V1stdoTxgI5F+IotZtXx1Nn/PSuYXn5Dp08Mt/X3VSbSMNONN5J4yx3Xu1wKfzl+4Mth
+	Vqv6AVAmcYZMSzW2KfmFwKy96YZ+CuhWQdGYm0Sa4Ss6ZGeTTwe7/e81kNdpSdKBZjNVT1
+	8U9ox/jSqmkNVeytZO4rOBueYxBUgwA=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1781364014;
+	s=meesny; t=1781364601;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=tlpOXuihhUVZbyMIbMj3bi9i3CWarBMsCIJDwzy4I70=;
-	b=lOMNuxy3F02xm7Eh9L+L6iC8om5qGviAJN41rfaGK28tlJC48xSDMcSDzU2PZGS2BpLaFH
-	AXrMyXPINNnZ/yasAcBTSBSwqmbedtg5KfPkGVLzyZwKNqC82YMBn5qx82DEe3iHL2jGMI
-	SOOMqqxVrznBI9zerVZ/TyrbwFX7aTA=
+	bh=88kYt8eEzESBaOFkzHodNaDnLTBS/6KbUlbalEizkuQ=;
+	b=jyl6WKH7bM6pbuj6iUc+6dMbSuNvJirPEO5WryTycekiA2S4zmn9rCYyPkGHrNwTkiu5/a
+	PQkhcaadpyI7VkWpepVBsYGi2XeWwyzjwbsIY1PNueiTeQ22RTuVfjLklq1iG/9jC9H59c
+	WhWczRVcjeBZ7Uam+7+hK5CqPjc1hQ0=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] emulator: btvirt: support debug for -s socket server
-Date: Sat, 13 Jun 2026 18:20:09 +0300
-Message-ID: <11cf79f1f980e5da2202f84bf66e3847048cc34d.1781363977.git.pav@iki.fi>
+Cc: Pauli Virtanen <pav@iki.fi>,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	25181214217@stu.xidian.edu.cn,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_uart: clear HCI_UART_SENDING when write_work is canceled
+Date: Sat, 13 Jun 2026 18:29:57 +0300
+Message-ID: <6888691461070a011d31632e6dcbfd73016dcc6e.1781364475.git.pav@iki.fi>
 X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -62,152 +67,61 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Support btdev debug -d when using socket server -s.
+HCI_UART_SENDING bit in tx_state means write_work is pending and blocks
+queueing it again.  Currently this bit is not cleared when canceling the
+work in hci_uart_close(), which blocks future writes when device is
+reopened later if write_work was pending.
 
-$ btvirt -d -s
-...
-bredrle: host10: > 01 13 0c f8 00 00 00 00 00 00 00 00 00 00 00 00  ................
-bredrle: host10:   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-...
+Fix by clearing HCI_UART_SENDING when canceling the work.
+
+Also make clearing of tx_skb safe by using disable_work_sync +
+enable_work instead of just cancel_work_sync.  hci_uart_flush() purges
+the proto tx queue so we can cancel the pending write_work there,
+instead of doing it just in hci_uart_close().
+
+Fixes: c1bb9336ae6b ("Bluetooth: hci_uart: fix UAFs and race conditions in close and init paths")
+Link: https://lore.kernel.org/linux-bluetooth/07e0a28650773abec711ee492fdb1bf5d21a6c98.camel@iki.fi/
+Cc: stable@vger.kernel.org
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- emulator/main.c   | 16 ++++++++++++++++
- emulator/server.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
- emulator/server.h |  5 +++++
- 3 files changed, 66 insertions(+)
+ drivers/bluetooth/hci_ldisc.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/emulator/main.c b/emulator/main.c
-index 09d6e9adb..c21640adc 100644
---- a/emulator/main.c
-+++ b/emulator/main.c
-@@ -80,6 +80,13 @@ static void vhci_debug(const char *str, void *user_data)
- 	printf("vhci%u: %s\n", i, str);
- }
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 47f4902b40b4..b0708ec9751c 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -239,10 +239,17 @@ static int hci_uart_flush(struct hci_dev *hdev)
  
-+static void server_debug(const char *str, void *user_data)
-+{
-+	const char *name = user_data;
+ 	BT_DBG("hdev %p tty %p", hdev, tty);
+ 
++	disable_work_sync(&hu->write_work);
 +
-+	printf("%s: %s\n", name, str);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	struct server *server1;
-@@ -231,6 +238,15 @@ int main(int argc, char *argv[])
- 		server5 = server_open_unix(SERVER_TYPE_MONITOR, path);
- 		if (!server5)
- 			fprintf(stderr, "Failed to open monitor server\n");
-+
-+		if (debug_enabled) {
-+			server_set_debug(server1, server_debug, "bredrle",
-+									NULL);
-+			server_set_debug(server2, server_debug, "bredr", NULL);
-+			server_set_debug(server3, server_debug, "amp", NULL);
-+			server_set_debug(server4, server_debug, "le", NULL);
-+			server_set_debug(server5, server_debug, "mon", NULL);
-+		}
+ 	if (hu->tx_skb) {
+ 		kfree_skb(hu->tx_skb); hu->tx_skb = NULL;
  	}
  
- 	if (tcp_port) {
-diff --git a/emulator/server.c b/emulator/server.c
-index 7790867b7..4538e8f04 100644
---- a/emulator/server.c
-+++ b/emulator/server.c
-@@ -39,10 +39,14 @@ struct server {
- 	enum server_type type;
- 	uint16_t id;
- 	int fd;
-+	server_debug_func_t debug_callback;
-+	server_destroy_func_t debug_destroy;
-+	void *debug_data;
- };
- 
- struct client {
- 	int fd;
-+	struct server *server;
- 	struct btdev *btdev;
- 	uint8_t *pkt_data;
- 	uint8_t pkt_type;
-@@ -223,6 +227,18 @@ static int accept_client(int fd)
- 	return nfd;
- }
- 
-+static void dev_debug(const char *str, void *user_data)
-+{
-+	struct client *client = user_data;
-+	struct server *server = client->server;
-+	char buf[512];
++	if (test_and_clear_bit(HCI_UART_SENDING, &hu->tx_state))
++		wake_up_bit(&hu->tx_state, HCI_UART_SENDING);
 +
-+	if (server->debug_callback) {
-+		snprintf(buf, sizeof(buf), "host%d: %s", client->fd, str);
-+		server->debug_callback(buf, server->debug_data);
-+	}
-+}
++	enable_work(&hu->write_work);
 +
- static void server_accept_callback(int fd, uint32_t events, void *user_data)
+ 	/* Flush any pending characters in the driver and discipline. */
+ 	tty_ldisc_flush(tty);
+ 	tty_driver_flush_buffer(tty);
+@@ -271,12 +278,8 @@ static int hci_uart_open(struct hci_dev *hdev)
+ /* Close device */
+ static int hci_uart_close(struct hci_dev *hdev)
  {
- 	struct server *server = user_data;
-@@ -240,6 +256,8 @@ static void server_accept_callback(int fd, uint32_t events, void *user_data)
+-	struct hci_uart *hu = hci_get_drvdata(hdev);
+-
+ 	BT_DBG("hdev %p", hdev);
  
- 	memset(client, 0, sizeof(*client));
- 
-+	client->server = server;
-+
- 	client->fd = accept_client(server->fd);
- 	if (client->fd < 0) {
- 		free(client);
-@@ -271,6 +289,7 @@ static void server_accept_callback(int fd, uint32_t events, void *user_data)
- 	}
- 
- 	btdev_set_send_handler(client->btdev, client_write_callback, client);
-+	btdev_set_debug(client->btdev, dev_debug, client, NULL);
- 
- done:
- 	if (mainloop_add_fd(client->fd, EPOLLIN, client_read_callback,
-@@ -413,4 +432,30 @@ void server_close(struct server *server)
- 		return;
- 
- 	mainloop_remove_fd(server->fd);
-+
-+	if (server->debug_destroy)
-+		server->debug_destroy(server->debug_data);
-+
-+	server->debug_callback = NULL;
-+	server->debug_destroy = NULL;
-+	server->debug_data = NULL;
-+
-+	free(server);
- }
-+
-+bool server_set_debug(struct server *server, server_debug_func_t callback,
-+			void *user_data, server_destroy_func_t destroy)
-+{
-+	if (!server)
-+		return false;
-+
-+	if (server->debug_destroy)
-+		server->debug_destroy(server->debug_data);
-+
-+	server->debug_callback = callback;
-+	server->debug_destroy = destroy;
-+	server->debug_data = user_data;
-+
-+	return true;
-+}
-+
-diff --git a/emulator/server.h b/emulator/server.h
-index 7d6b7be74..1844a9871 100644
---- a/emulator/server.h
-+++ b/emulator/server.h
-@@ -24,3 +24,8 @@ struct server;
- struct server *server_open_unix(enum server_type type, const char *path);
- struct server *server_open_tcp(enum server_type type, uint16_t port);
- void server_close(struct server *server);
-+
-+typedef void (*server_debug_func_t)(const char *str, void *user_data);
-+typedef void (*server_destroy_func_t)(void *user_data);
-+bool server_set_debug(struct server *server, server_debug_func_t callback,
-+				void *user_data, server_destroy_func_t destroy);
+-	cancel_work_sync(&hu->write_work);
+-
+ 	hci_uart_flush(hdev);
+ 	hdev->flush = NULL;
+ 	return 0;
 -- 
 2.54.0
 
