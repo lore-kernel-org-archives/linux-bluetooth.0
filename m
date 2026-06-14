@@ -1,36 +1,35 @@
-Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
+Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3915E376BC2
-	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 12:08:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803EE23AE9B
+	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 12:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781438920; cv=none; b=HHcHQLa4kHJqrKgKmDRuldccr2rZvdBbGQv9i1gp9eNB29pkiTMmkSJ8xa2uldnWnL2OWnWalrTbGJDfYqJb/DtQRhvTHARhu/ZTTdAzycv9Q8UJGHRVA/2j5VyGe7S8e8LIwE3wHvCxrarF6vOq/KRObenP37MDwfPgKlrdYNk=
+	t=1781438924; cv=none; b=h9UE3xFMGHSHW37FgZ301InLlFztLxqwiYzp3jotJpbs2u3sQNeBGv/w27a4OQ/5Nk5PJj3HFA4ZJGmxUIjoRX8IPs7xOE8I389HlFyOsLD5XujqFsSxf3Z8ZpC2r313N9cpOAkxR/DuWu0E6gn9fPMr0wKmmV5RhLVPOr6sGbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781438920; c=relaxed/simple;
-	bh=kO5d3UjNXSegRz8ZO1cDh984LzXfkpFyJSwtwrhkC04=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=YLuwnHONLsLM8tkaY+k019CzRhHeHQ2wyGPvFx8XnCR3+0MVBLjvUWeqT3RZKO9s1b4wtg0No/G2pKkmL9Ur7FVDEVQt+objtbY+QTsiV8CUKyuY15Ac2b+vksF1qbVVMDHOFAzeJfHJ9FByHtnki9+sN1mxU6pfKwBKlgLZVWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ROw2icr1; arc=none smtp.client-ip=192.30.252.201
+	s=arc-20240116; t=1781438924; c=relaxed/simple;
+	bh=iEBWd5stksROjhEyksfwCi6tzZadJs815PLHoVbKXIc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=lvW6qj2kBctq4TPB8nStcVepkhzjz8rX+uS51wtbcfWnUL2MUAIsG1B9K+pkpTkndNgfoYCrUMNR0RNeHAg5HVAzw6qShqDW0MEPldYfxbEjvoavPxIimknZeJYmfZCMAIHmRcyxXjoz7WWII+w2WD+293BwJNNxop3zqQ/KIOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=jyeSqsMU; arc=none smtp.client-ip=192.30.252.209
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ROw2icr1"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="jyeSqsMU"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1781438918;
-	bh=G8DxS5WMg7AxMblsuSUMOaus3KPdIHXagwRb3CkCIic=;
+	s=pf2023; t=1781438922;
+	bh=P2YJyxtx4A0YiQUOKZVmfagIWfxAWquCKHQh1H0okkE=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=ROw2icr1bfzXdJ1b+nSdJO6xeEqo0flBeQpFB7kTbmAFq+wNzrAlbTvQPddmdpqM3
-	 rMfHeiPeYezNowMVh0GrzmaYQ4o2EmzXOUHUXl351M5ZLqEKTcraZcBt4WRCz9xxZL
-	 KCFn/gFbRmAE0Qs6O44i3/1H4GZZ4aqhGCO9nRr8=
-Received: from github.com (hubbernetes-node-5f57d0b.va3-iad.github.net [10.51.89.35])
-	by smtp.github.com (Postfix) with ESMTPA id 8355B1803C5
-	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 05:08:38 -0700 (PDT)
-Date: Sun, 14 Jun 2026 05:08:38 -0700
-From: Pauli Virtanen <noreply@github.com>
+	b=jyeSqsMUAuF783JxJ3Kcthnx8Hx06OI36FP5tXpvYwKLIgPjyx/BkKkxMuX0sglhG
+	 ZPFHrKMLu3UiI8dAIGw/WrLtEGQqVunjYpw6MW4U2+OkMeJvGrGT1b+z2RcsBtEVpK
+	 55JR2nQSWJFwTgzp+Ex1nl/0yNQ9gwj5dyL3Y8J4=
+Received: from github.com (hubbernetes-node-bf1b5ca.ash1-iad.github.net [10.56.191.33])
+	by smtp.github.com (Postfix) with ESMTPA id A687F520FF8
+	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 05:08:42 -0700 (PDT)
+Date: Sun, 14 Jun 2026 05:08:42 -0700
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1111256/000000-ddb5d4@github.com>
-Subject: [bluez/bluez] ddb5d4: media: use custom DBus timeouts only when
- remote s...
+Message-ID: <bluez/bluez/push/refs/heads/1111248/964d7f-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,31 +42,7 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1111256
+  Branch: refs/heads/1111248
   Home:   https://github.com/bluez/bluez
-  Commit: ddb5d4c135465f5645d42dbe978912fbf0552ee1
-      https://github.com/bluez/bluez/commit/ddb5d4c135465f5645d42dbe978912fbf0552ee1
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-06-14 (Sun, 14 Jun 2026)
-
-  Changed paths:
-    M profiles/audio/media.c
-
-  Log Message:
-  -----------
-  media: use custom DBus timeouts only when remote side is waiting
-
-Under high system load (VM instance on boot) it's observed the 3 sec
-timeout BlueZ uses for BAP broadcast SetConfiguration may be missed by
-Wireplumber, as these are set up immediately on startup together with
-any other setup (eg ALSA) that may need time.
-
-There's no actual need for using a short custom timeout in BlueZ for
-this, as in this case there is no remote side that is waiting for a reply.
-
-Fix by limiting custom timeouts to cases where there is a waiting
-remote, and use separate defines for A2DP and BAP.
-
-
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
