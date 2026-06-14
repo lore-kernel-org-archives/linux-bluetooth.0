@@ -1,187 +1,90 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A472EB5B8
-	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 11:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781436150; cv=pass; b=RdagCpKBYsk56drK01r0T7kOvlRnwQdvv8I3mJHb+DvY8vMD+opw6JGnTQUNfxWLQrXlqcVDtur6Mi+w0I/CSsa6gWV2ZdUKgtAWwRWaPD7o4Ip7w93WwUgw9EBkl+733p8pWuPHOKOWARhi55F5LXOmYsDJt36rQ+okEPxeYMU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781436150; c=relaxed/simple;
-	bh=9A9/Ig2rSjRAWSevw+6sF9YuAlTtbTYq1xUB2pCdHwg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e4MH/xg+x8t6u0/cQsDcSvdfFJw6Fb/sLU5UHCkc4Io1VVDVCj1xEZ8OGCJNHPZel//Wh4xKAEfHddutqZYSi/29M+Oqnanq7LRL7ZlKnA+4r42GA04YBh5ctMDHHCQLnKoJhJOcxCao858Y7BfYj2FT6BxDttX9QjjtBfXhGbU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=Q6AyFfo2; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3E823AE9B
+	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 12:08:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781438914; cv=none; b=d8PeGS/6WeDrG0kL1RmbVzb5cmJRBqdwqQ2se9tre/db43BBqn4K6DhV+MxgwlDKaXjsIEVuL8m4vyxgF+dCsRQPGf5R8s3ypk7fUSv1ZczYGbtTsUH9lArOt1jFF0tFoNfE+i9C1uAVs96Z32v9hjtI9TEdY4cmftS8QA22wZQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781438914; c=relaxed/simple;
+	bh=Ipvorna3Eb3pFE1avDnXupp7TDRjUpC5tT1yKMYhWK4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Ps/PI33VMQXsBrceIhtRizzE1c9ymjDbTzMJ1EBFyzYEPvbkkTAIjxKfwB0hVhfdQ+H+SJpMi2y+Q6MWPKOJ8LuHJHTfdA5aVHXi3sWQwNVuOrANWBxLxRmolLE0BTBmfi/x503k7QyZuHm4b6whSYn+KGVUhWdi/gyXL3Dob4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=i3Vff4VM; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="Q6AyFfo2"
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:1::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gdW7Q3rSvzyTm;
-	Sun, 14 Jun 2026 14:22:26 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1781436147;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=rmEc55X5EZBrBX7xl2izLmOiZe0xh2RCQGJVxA4Ag8k=;
-	b=Q6AyFfo2LHdCdLaa8nfzM92HDSylFc9FSTm4AmKvfIkzudO8kcoPqAmBYJ47kSj8e9FgeT
-	DK2sDcxk3Y2lmfG9k2vdUQtgef3YBPwa0wKIVnO+xWmUqaRTJdn//wjb3UiVRBaLQRFqdc
-	j8tq4wo0l+cjPhigwF0p+w0lZ7F41Tw=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1781436147;
-	b=OrMrlf7IPAtk71U9pzeWcjl2czRl9W3bS1GFBryeYyyTLaKE8wek4VO5hyoeSVj8V0SCLj
-	+jmQp5OyCwHfKkFGw6R1UNDEXwtd2BTAMc35x4FHrds0AnjUmEfSHjEGuQTtdhG1qSRAft
-	V1Egxw2nt2QnfOMbIQfGnFrnh3wlWvk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1781436147;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=rmEc55X5EZBrBX7xl2izLmOiZe0xh2RCQGJVxA4Ag8k=;
-	b=PY5FwF7UHo/QdG3BWU2R5DHZvRXzw9nSiynYpTekAke0wouAdEEybcZT9XUEqUH9kq5Ruq
-	hWZjlZBkRxRffGszp+HuU8OX3Vm4zTL1wR9EEEyaQOYz9el3TjJ/uetqi+Bb16koTOm+mc
-	SiP2zVdu3n8zZIOihbcbzbuBaC7PWzY=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="i3Vff4VM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1781438911;
+	bh=bslRLJtkNE3dzGrMi2s2HhcL+tbUplZ6IpVcXaPMsMw=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=i3Vff4VMmXN4scv0g1F/GbY1NAkXgfyTGrJiTMezXAw4Q3ueQL0k08pxWEv16pYkG
+	 B+25iIDf9ZxdibHevfeaZtl0yphuutZxDmz09vUY37Atu9Y/pnQeZpRZ9Ug8g9x/OK
+	 DtRrFJT/jnF0TvcYv7ZjEgGz2BJJi1Gaemi0OKDU=
+Received: from github.com (hubbernetes-node-8683ea7.ash1-iad.github.net [10.56.144.38])
+	by smtp.github.com (Postfix) with ESMTPA id CC4B2601024
+	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 05:08:31 -0700 (PDT)
+Date: Sun, 14 Jun 2026 05:08:31 -0700
+From: =?UTF-8?B?xaBpbW9uIE1pa3VkYQ==?= <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2] media: use custom DBus timeouts only when remote side is waiting
-Date: Sun, 14 Jun 2026 14:22:23 +0300
-Message-ID: <499a2bfcdd6ed488104bad57b285ddc9c7788f7e.1781436012.git.pav@iki.fi>
-X-Mailer: git-send-email 2.54.0
+Message-ID: <bluez/bluez/push/refs/heads/1111249/000000-df5403@github.com>
+Subject: [bluez/bluez] 038ea1: shared/bap: Transition ASE to QoS Configured on
+ CI...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Under high system load (VM instance on boot) it's observed the 3 sec
-timeout BlueZ uses for BAP broadcast SetConfiguration may be missed by
-Wireplumber, as these are set up immediately on startup together with
-any other setup (eg ALSA) that may need time.
+  Branch: refs/heads/1111249
+  Home:   https://github.com/bluez/bluez
+  Commit: 038ea13b8cc1c3e46a4ef8d4956af74696470a39
+      https://github.com/bluez/bluez/commit/038ea13b8cc1c3e46a4ef8d4956af74696470a39
+  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
+  Date:   2026-06-14 (Sun, 14 Jun 2026)
 
-There's no actual need for using a short custom timeout in BlueZ for
-this, as in this case there is no remote side that is waiting for a reply.
+  Changed paths:
+    M src/shared/bap.c
 
-Fix by limiting custom timeouts to cases where there is a waiting
-remote, and use separate defines for A2DP and BAP.
----
+  Log Message:
+  -----------
+  shared/bap: Transition ASE to QoS Configured on CIS loss
 
-Notes:
-    v2: shorter BAP_REQUEST_TIMEOUT_MSEC, no particular reason to have
-        it 20 sec. Use that for cases where there may be remote side,
-        i.e. all except us being bcast source.
+stream_io_disconnected() only handled the Releasing state, leaving
+Enabling, Streaming and Disabling ASEs stuck when the CIS was lost
+unexpectedly.
 
- profiles/audio/media.c | 30 ++++++++++++++++++++++--------
- 1 file changed, 22 insertions(+), 8 deletions(-)
+The ASE shall autonomously move to QoS Configured on loss of the
+CIS and notify the peer
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index cdaafb04e..5d9ea2cbc 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -71,7 +71,11 @@
- #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
- #define MEDIA_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
- 
--#define REQUEST_TIMEOUT (3 * 1000)		/* 3 seconds */
-+/* Timeout should be less than avdtp request timeout (4 seconds) */
-+#define A2DP_REQUEST_TIMEOUT_MSEC	(3 * 1000)
-+
-+/* Timeout should be less than ATT timeout (30 seconds) */
-+#define BAP_REQUEST_TIMEOUT_MSEC	(3 * 1000)
- 
- struct media_app {
- 	struct media_adapter	*adapter;
-@@ -465,16 +469,16 @@ static gboolean media_endpoint_async_call(DBusMessage *msg,
- 					struct media_transport *transport,
- 					media_endpoint_cb_t cb,
- 					void *user_data,
--					GDestroyNotify destroy)
-+					GDestroyNotify destroy,
-+					int timeout_msec)
- {
- 	struct endpoint_request *request;
- 
- 	request = g_new0(struct endpoint_request, 1);
- 
--	/* Timeout should be less than avdtp request timeout (4 seconds) */
- 	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(),
- 						msg, &request->call,
--						REQUEST_TIMEOUT) == FALSE) {
-+						timeout_msec) == FALSE) {
- 		error("D-Bus send failed");
- 		g_free(request);
- 		return FALSE;
-@@ -521,7 +525,7 @@ static gboolean select_configuration(struct media_endpoint *endpoint,
- 					DBUS_TYPE_INVALID);
- 
- 	return media_endpoint_async_call(msg, endpoint, NULL,
--						cb, user_data, destroy);
-+						cb, user_data, destroy, -1);
- }
- 
- static int transport_device_cmp(gconstpointer data, gconstpointer user_data)
-@@ -604,7 +608,8 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
- 	g_dbus_get_properties(conn, path, "org.bluez.MediaTransport1", &iter);
- 
- 	return media_endpoint_async_call(msg, endpoint, transport,
--						cb, user_data, destroy);
-+						cb, user_data, destroy,
-+						A2DP_REQUEST_TIMEOUT_MSEC);
- }
- #endif
- 
-@@ -1093,7 +1098,7 @@ static int pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 	dbus_message_iter_close_container(&iter, &dict);
- 
- 	if (!media_endpoint_async_call(msg, endpoint, NULL, pac_select_cb,
--								data, free))
-+								data, free, -1))
- 		return -EIO;
- 
- 	return 0;
-@@ -1233,6 +1238,7 @@ static int pac_config(struct bt_bap_stream *stream, struct iovec *cfg,
- 	DBusMessage *msg;
- 	DBusMessageIter iter;
- 	const char *path;
-+	int timeout_msec;
- 
- 	DBG("endpoint %p stream %p", endpoint, stream);
- 
-@@ -1243,9 +1249,16 @@ static int pac_config(struct bt_bap_stream *stream, struct iovec *cfg,
- 	switch (bt_bap_stream_get_type(stream)) {
- 	case BT_BAP_STREAM_TYPE_UCAST:
- 		transport = pac_ucast_config(stream, cfg, endpoint);
-+		timeout_msec = BAP_REQUEST_TIMEOUT_MSEC;
- 		break;
- 	case BT_BAP_STREAM_TYPE_BCAST:
- 		transport = pac_bcast_config(stream, cfg, endpoint);
-+
-+		/* If we are sink, BASS remote may be waiting: custom timeout */
-+		if (bt_bap_stream_get_dir(stream) == BT_BAP_SOURCE)
-+			timeout_msec = BAP_REQUEST_TIMEOUT_MSEC;
-+		else
-+			timeout_msec = -1;
- 		break;
- 	default:
- 		transport = NULL;
-@@ -1279,7 +1292,8 @@ static int pac_config(struct bt_bap_stream *stream, struct iovec *cfg,
- 	g_dbus_get_properties(conn, path, "org.bluez.MediaTransport1", &iter);
- 
- 	if (!media_endpoint_async_call(msg, endpoint, transport,
--						pac_config_cb, data, free))
-+						pac_config_cb, data, free,
-+						timeout_msec))
- 		return -EIO;
- 
- 	return 0;
--- 
-2.54.0
+Fixes PTS test BAP/USR/SCC/BV-167-C
 
+
+  Commit: df54038451324d0a5be729ba7cd155b5a8c0b27e
+      https://github.com/bluez/bluez/commit/df54038451324d0a5be729ba7cd155b5a8c0b27e
+  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
+  Date:   2026-06-14 (Sun, 14 Jun 2026)
+
+  Changed paths:
+    M unit/test-bap.c
+
+  Log Message:
+  -----------
+  unit/bap: Add CIS loss test
+
+Verify a Source ASE in the Enabling state transitions to QoS Configured
+rather than Disabling when its CIS is lost.
+
+Assisted-by: ClaudeCode:claude-opus-4.8
+
+
+Compare: https://github.com/bluez/bluez/compare/038ea13b8cc1%5E...df5403845132
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
