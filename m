@@ -1,112 +1,90 @@
-Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E20A3955F8
-	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 14:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D0D358D00
+	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 23:41:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781448900; cv=none; b=o0rp0vC1ES5xTGV4BV41b03L7tJjo3aPtGJ1KR2dl8keG1O0Cw/ABdusT8EUjq7Cbh1iJS8PmzfAqVsYHH55dCxuUCV5g0q2vZDnIosnx54DrD4K25+MZ50MOLBj9HPvLfz6Mq+iP4XnYi/bC02Pwki5Pjd9K5es87jDuk09Bbk=
+	t=1781480490; cv=none; b=eLRON3Di1SlQYqlzyXjyAYnVn1VXmRMD7L3Kl2lXtj/FOVX4jof1IT0iJhSUu5ml4W2gUCbGc45HCvSLJcO7OQ5T4sC5POJd/Tq5uD6m0pbwM+HlpISKTTzxLHM+hv22Z36SixXOLJAqJwCoYB86LCKLVBaPlc7DWKMVvsM10oI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781448900; c=relaxed/simple;
-	bh=RNtiE5wEaW9uf7nwfkKEo2NAM7CiZHiV355sypO+l6o=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=lByCPeWzXEUu0cWNKyca/RF0iSYOYqzenpAOSUWLSGlquIP12ecr0ZuD0XZd5CHu72PGwJN1cGFHTCtFy/cLnT+RRgCxUHzAabxiVOt4TxCBn4YZ5NBxepA6aSU0YZuEqlF5DD1TIF2HmeJzd1J0PoVEVue72xWMD/9sgxOnTxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IpCuefPg; arc=none smtp.client-ip=74.125.82.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1781480490; c=relaxed/simple;
+	bh=RglxYYFu1Sknszd+3S9uEVP2ksYvq9uljiRaGb+bFDI=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=kf9nu7+H9j76FZYXDkMj0HaoKNg5pDQQL5XWE1skbszlP/Mvl7mmHCM3wywVyoErbBEG5/ts2IVLKKi/MAN7SIBUwrCCNMN01Ivh9yGv4ayCP4Jz144TaS2plOpDYgd0eUfc5VvdVHF/d3+QXJ4AuhJV8UViXreSoCk8k6QuQaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eHxjE1GO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IpCuefPg"
-Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-304f590dd91so2808249eec.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 07:54:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781448898; x=1782053698; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Or/G/k0/8a6BKDEserbeeztyND/nEfk/nSFCFlZpVn4=;
-        b=IpCuefPgZkeOcB74D7Guk6Lnk3LN0TYdoGx5ybR4eEG+gWMchwnSajwayryeCF6Vxs
-         2wj+Rxg2eXANdDTBv3RllrMiFPFjxbdp6iMot8y6UTzRpIh+ivpiR0yx4qzRFeegeNh/
-         KsRJvlDZpQNkvY/PBYTsC4yQ8l+HTJsza4vZGo0Og3reognU8QIfYMWYJjZaK73HderO
-         +oMCHKf1jQOlUx7X7Cp5vGSPw9XfGrSp6JsnJMnKSoUA2FPyyBsvXdxgeJRGy5TRKpzq
-         AWwnK2qYy7z+QL3uhKQCwd8Bf+PYLrvz0iFlSaEzA9WUkazOp1OhF4hTZWCKerPq4iV4
-         PtTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781448898; x=1782053698;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Or/G/k0/8a6BKDEserbeeztyND/nEfk/nSFCFlZpVn4=;
-        b=YNAZSiJF4q3V1RrioZFKGPfsCNbI71pJeB9X3ARx+pvrtc7AOuljFUF/nnMfGZC5ic
-         EqYorDzZMWPRw+HMwZec3pbs1eFvyy3iZmP+6NtaeGyRe7K+z6VJ8AVN1OrbPZ+VKaMg
-         ZbTGvOiTPm4FPSRw77akoxPIsoUnRBR1dzqSaDxp7wYBi/hPzCnkFGyB7UrKpv+FS/ev
-         dQTvswMJ8xyBS5Y2lY98Cw9XqacdatsxfG/LLTi7KOEaSMat/tHT2Q/E2vzK9R9KytqI
-         WlcKFovHg1v4OGRTnvyJymciA1nKr41zBW2Sfzt3eYOeU3AQQ7+07h2U4Fgrlfl+Vj+6
-         FwAg==
-X-Gm-Message-State: AOJu0YzMhOmQYsPtP0WylP5tkVcXrHhGGn8zA2PcMUeRHWhb+v0mz5oK
-	Y1LFraAmojbhjtJRlTjMjw+v3MEsdHgdQPGQn4NSKvvsHdwGdcUI5WcS6/8FGQ==
-X-Gm-Gg: Acq92OEiLLop1qTEvvU8CqAwi473RO1QCtyqx74iKcdNk0SOOZBRJFJKJ4lg/T5mN+R
-	oY28NTY0/MjXgGKOP7ImswC+iLtLdHZujg+6Y3LcSABphf19vMs6kRLb5kleas+Zypb/lt2QzPk
-	5WhvLXw2uumNMeFAWTKkIO6l0MTawf6v2yeKPHNhk3Fn1ociCgOmNeO+DIpk8Pd9jvFI7O0ynD+
-	95fmEXUgH+dQUW0ZZ8H/pGmcwtnMZfyMExEmcGr/Mlkps1MzmJAlWlerDz2+vvhbKwQ/usbOSsw
-	LFd6uJ6Vc+YRsskUTnfGMIz16fIhx9YPikU0N3mT14PSVJ0f7WIvlRA5TA2m9F30D2WGmiVtz0F
-	oUJBuGH8rQIEevpgIOHACt2hNuG1Qr4m+mc3YF29CJIE62HYeo18LNoHnLuTTaAbIrBQgDYfU1/
-	1carFx0UQ+IEZ/mMAXeFW6Gzeusr4ilIjrCQnLEew6
-X-Received: by 2002:a05:7300:320f:b0:304:de94:1c2c with SMTP id 5a478bee46e88-308200c908cmr6047696eec.34.1781448898029;
-        Sun, 14 Jun 2026 07:54:58 -0700 (PDT)
-Received: from [172.17.0.2] ([20.163.39.232])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081e4898c0sm11593630eec.3.2026.06.14.07.54.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Jun 2026 07:54:57 -0700 (PDT)
-Message-ID: <6a2ec0c1.4a342cbc.316e90.c3f9@mx.google.com>
-Date: Sun, 14 Jun 2026 07:54:57 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7412414883148886672=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eHxjE1GO"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2DAEBC4AF0E
+	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 23:41:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1781480490;
+	bh=RglxYYFu1Sknszd+3S9uEVP2ksYvq9uljiRaGb+bFDI=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=eHxjE1GO59twce8W9Tzgn+mvWdqXMRSpIeyf89pDzzstMTylmdWjIpG30JZbV2hjh
+	 EFGBp/gNGnRzouDOf8SqGnj5RSx9tNruwIncqrYG9dY6q+4KatGpUmDWE22ynf4+km
+	 hTfY3sfhWct6crGksr6B4vLIZySBt66UM719qR2IFlzU7e5LW77X+caTl6TPN7JUid
+	 PowpQP4t5RtRawYdKYZ5+tjz9GGy7e5SY0Vvbet2IUMti94nx7ArTCDoXmkFc+NPX7
+	 RG8q228Z7WL1o8etA3QKDpGWsPgNpkWYFKXp3HR+qKUl75xzMyvIcQK3xyUqfb0jH0
+	 O5lm9TAs2iqxw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 1AD86C53BBF; Sun, 14 Jun 2026 23:41:30 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221637] Regression for Intel Corporation Device a876 (rev 10)
+Date: Sun, 14 Jun 2026 23:41:29 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: kiran.k@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-221637-62941-gSxdco6tgJ@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221637-62941@https.bugzilla.kernel.org/>
+References: <bug-221637-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kirill.kz.902@gmail.com
-Subject: RE: [RESEND] Bluetooth: btusb: Add new VID/PID 0x0489/0xe156 for MT7902
-In-Reply-To: <20260614141258.1011-1-kirill.kz.902@gmail.com>
-References: <20260614141258.1011-1-kirill.kz.902@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============7412414883148886672==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221637
 
-This is automated email and please do not reply to this email!
+Kiran (kiran.k@intel.com) changed:
 
-Dear submitter,
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |kiran.k@intel.com
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1111290
+--- Comment #7 from Kiran (kiran.k@intel.com) ---
+Hi Biance, Paul,
 
----Test result---
+Appreciate if you can test and feedback with the below patch.
 
-Test Summary:
-CheckPatch                    PASS      0.42 seconds
-VerifyFixes                   PASS      0.08 seconds
-VerifySignedoff               PASS      0.08 seconds
-GitLint                       PASS      0.19 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      15.77 seconds
-CheckAllWarning               PASS      17.33 seconds
-CheckSparse                   PASS      17.61 seconds
-BuildKernel32                 PASS      15.26 seconds
-TestRunnerSetup               PASS      314.57 seconds
-IncrementalBuild              PASS      14.93 seconds
+https://kernel.googlesource.com/pub/scm/linux/kernel/git/bluetooth/bluetoot=
+h-next/+/5917dd39db2bfc8b1b4c6ea8ed99adb4badef707
 
+Seeing the error pattern in dmesg, appears like the issue has been fixed
+already and the patch is present in bluetooth-next,
 
+Thanks,
+Kiran
 
-https://github.com/bluez/bluetooth-next/pull/315
+--=20
+You may reply to this email to add a comment.
 
----
-Regards,
-Linux Bluetooth
-
-
---===============7412414883148886672==--
+You are receiving this mail because:
+You are the assignee for the bug.=
