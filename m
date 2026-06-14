@@ -1,110 +1,125 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B9CF35294E
-	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 10:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E78302140
+	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 11:05:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781434229; cv=none; b=TfBaceWMOvqo5yiaUIUFIjBZ0opsB9GHDDLmitoDrkTstOWvCngFDVcRRayE130n1IsBKWyOyVgu1rEyIMuaSeVRFflU+rGxfPnN93btQMkVn+YJ8ObvdaclyaMoO0IECpquTnOi8LF4I7RLEzR4Bn0xrpuZsglbbuDSz8VWyMc=
+	t=1781435121; cv=none; b=SdtzcXK8uJr8G1Q+p9KPL4AwtOTorwmxbkWTnjWjnKoQLz9Ex6Vhgr7p3mfddJNFFYZxJYv3Uv0KAneoRo4MhhZsaK8axiXh81J7U/KNzPCswz2NfkjxyupLU6gPU6oaPzTXmHVAH8xtwDaC2099/tNRFHdBOQnZkLDsUiS8HBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781434229; c=relaxed/simple;
-	bh=/kk8iw63V/fPd1/W36Gzr5d72iq5913zwYMLPedxSqc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=daSoy+MDXyoTSfGPeDE3+RhjznaiBTxcR3QQXl7cHvwNQCvRAdc5XjPuLGlW2iUcCcyEA2s8x9k+eG7IEhGcxRjiAw0MJCcprEz2aZ2OzLOdQbX5w5sbW+KQfxwYBTGpY6bqEDZwzdSzKV7zqZMQLundWWShgggWryahn9BkxeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=WCUyEzsq; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
+	s=arc-20240116; t=1781435121; c=relaxed/simple;
+	bh=cK0wJZu39pNNoZ9GZaMEfiVjjDEi0ygtAANw1znVT1s=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=m1fGM2LMAfyxLDNPPImEC9yFvApyNvxg1+Lu8YqzGu3hbwRiwFa/Ac3UqnIQ7ORWdlE674sMNmvtrJjC1FphpMd2dC20ZlJ1viYCAUTgM2aYnbrAu9A3M7hgRhSIvtbP+4JZuKgC6nGBSyxasBkiMi4YysMnaX2kAR3npjptITY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iN4nh6Ap; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="WCUyEzsq"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-49222b6e871so9176695e9.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 03:50:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iN4nh6Ap"
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-9158c621ebbso314299785a.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 04:05:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1781434226; x=1782039026; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u7wRDerEKiBp/b2Hp8v4JE1nBNLT8skqdPRg092EK3U=;
-        b=WCUyEzsqqBHVA5CnywPv+WSZq3TnPWYTDgKTY2vcJIWiSA30DHs0OgCMv4NpNQByqI
-         jGZJo3bLHM8e5UuyzARCvS2iFzlAVibgcpebp+O9IzIfBR6uP/7EwwJpKfJdw9sbHdam
-         j7yo4Tp8LT9eaTwxjg2crlPgozO7VB7XQYVec=
+        d=gmail.com; s=20251104; t=1781435119; x=1782039919; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=uzxuDEhuh+qRSTGT9I3TUd3qHcKttuGX/qouEyZp6M0=;
+        b=iN4nh6ApWGuxFskz+nFru2al7XorwQLVJ/Ffi2ywVm04rAV66AdOqq3773ZUbV13zc
+         J5zegAIBbcCKMLqitb13/HQpwQLEr56WJRF75DItUR6JnfnMh14y8/93RC2nFA3J2smP
+         Xr1sgEV5mpPX7zn+bwONBNXz+Ex9c/qYuMJB7WymfrZd5Y0DFzRyqQB8fi845GD8w7gA
+         eBHSY4mXwLneuKA8+8TZAoEXHu9h10BDjzlCfV3JY7IXmKdsbRUAzmuXI6N5N3H3TD6x
+         9iteBeauL+Q11r8T8b1iMwyia+5X45FcX5u+R/qJU/R2+tx2V/Q81XqfWMzvd7VCjam/
+         zVrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781434226; x=1782039026;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=u7wRDerEKiBp/b2Hp8v4JE1nBNLT8skqdPRg092EK3U=;
-        b=DQri2B50SHWeVUO3Nvc2jC44lJdO2KmkcfDLd6doF2MhEIgDXEdimiUW0T5lpDo+UO
-         LMlBEwdwSEql1eiCq0Tmlc7Z/EKHiYeTUqf2086r8G7xgrxk3NveTZgBsVdX24iLVmko
-         e8+qOKlNeaHrgSI/dqzUzI7J+T3/QLCEZJXroIc4ZiPkqojj95bAkeAj/n7p/lUw9tNE
-         xrhwR9RPFSZeTG5P5UEeyX788JLCPeRh1lDJ330NgrmDeLxjBmNYeuQF0yf3BnjVtc6P
-         41UcGjbhNGp3ODi1O1Tk7Y52WXZJZSFz3WYNu58u2vczorkudEkkqLdJBIgPHtEx+XGT
-         uYoA==
-X-Gm-Message-State: AOJu0YyPwyhVSDhIvamN4gytGjBUARkO1qvL8TaAnYqcgjgfXMZ8Y85f
-	HbN/7TkkFb6Jtt9CwP3gFGdqWF8NmMT1X0k//tbL5NoQE1wIkmk9JNRKbNn7AeCLdNIFdeBYY5D
-	HjMhn
-X-Gm-Gg: Acq92OHhDJV0m8oe3oh+bu9nKsRzH0bfwTMd8p62ZU6lZ+5pVkYSxOhuM4fG45RxsZZ
-	ITioC2zy0iYxuJLth8dmLuqsWLBIt/tB+6RoqLoUYk1aPJ0yM/YZz7cja4HyaqPlavbcNiCHphr
-	/KVCTy3U0bLvCVA4KSt9S27NdHrA9SN4PxhBgP7aWk54cC9EBIP4CK1Yf1/kTm4OY3/0IwCvXS9
-	5nUL9II5FfIE1pMoyoQABd+vpvwh2sqQX6QABisou4nn19UtHtu6LyqGr003EG0+JBRUDLY+MR/
-	kRg1lR40Ns7BUUniW+DUT5SuIYgdAADJbDLQby/BDyUgRJXAN7M3WPEzQvIguw2F7N9bIRZePtX
-	Xu4va4+1ulj13PqwGdMPaJwBpHo/EwULnljsQwCwnjJCIHvYflSI7w2xq0/DSjq7wl0f6/sA9rE
-	6atudFrL8MVtUtQ7y4VeyhqRMaScpiTn+ydHYw52pPAjKS
-X-Received: by 2002:a05:600c:3144:b0:48f:e3e7:3d39 with SMTP id 5b1f17b1804b1-490ec4d523dmr127050025e9.11.1781434225873;
-        Sun, 14 Jun 2026 03:50:25 -0700 (PDT)
-Received: from SMI-ubuntu.sueba ([2a01:390:0:101:eb61:bfa9:279d:6464])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490ea95c51dsm166655505e9.1.2026.06.14.03.50.25
+        d=1e100.net; s=20251104; t=1781435119; x=1782039919;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uzxuDEhuh+qRSTGT9I3TUd3qHcKttuGX/qouEyZp6M0=;
+        b=oKp5TAs773la5ejHjh0JMtmS0+z0IST0f6gg8oeA9AdUONvJS4X9UtzIbfnZ4noDJ+
+         Vi302Vyq1xiZwzldjl5mxKaYONVVaIm8nsWE2cvx6RDOAZhWdPV20DwBvSZqTc9KAC6l
+         auW7ouea+u97i2WEkrEK/XFlxy0+Um2t233pmxUOlnh5f5p3+rWc3r33c8tAPZYnjCcJ
+         r6yJYNubtMP+3FsMpNeqsji33ROvUq930OqPjjdtww1AEc4ztgsMdbMWwP5A137841o5
+         uv6nr+VzWjb5f7Mc+wMLfuBGAyDSfOwYTi67sMQCdKcBpy9hAEVuqDdIJOdVBeRWoqXy
+         lnxQ==
+X-Gm-Message-State: AOJu0YwHs2fpC/aqJl9CZASpaRkFPvujz4mxBQ0XyVmduDNMBfnMwG3V
+	2xhiCEl/yL3ugsQGbXfF0gdQVqTpU1hXLaU9yRHqE1u7KJHh51M34udGqeCBhw==
+X-Gm-Gg: Acq92OFX3+n8zHiHmiX7HRvQXa5y0C9k6+/d/uIMubX4/RoCG5zlutIkZRdrv1xZLQt
+	XzmFqYgcJEqI9yHpdAV2oadCdu2eeWLPMGJ7Ed4Z+/T8f+I4J3WOt3nnZSagXl5cGi5kYOZ4sNd
+	srvohYRzinX7+P2+nKyoaMtCjQ3yGeAQHyfS4jalf2pyQcQW9AkyaFVZLVGz8yTe+H7ED4GX98M
+	hzluUGYzZOWLOa7X4jxkXtMvlzkdSv+RPbcsKl8V45Q10wexUr8XIaYa3kAaqyeAHypRqXjiHNt
+	SmO6FULYRsG0RTMkxU+bvjaKSWdczB/v7M9buPeg47uK3GixSFkgq8XuRjKYzjiTPU+ByU8HBEV
+	7scdJzDb/8H8DU1CBDXDuNsGUhiy+fyOH0YL5SJpAhgoJGFqErPcSsGnd1k78U7L9xBzEbws4cp
+	uYAe5Aqoco0oyYH1T2WU2zeBrL0YpCJlmIwT58ShbEZw==
+X-Received: by 2002:a05:620a:270e:b0:915:776d:52fe with SMTP id af79cd13be357-917f262f93dmr950182185a.57.1781435118867;
+        Sun, 14 Jun 2026 04:05:18 -0700 (PDT)
+Received: from [172.17.0.2] ([20.127.239.244])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-91619ed7f16sm720507085a.1.2026.06.14.04.05.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Jun 2026 03:50:25 -0700 (PDT)
-From: Simon Mikuda <simon.mikuda@streamunlimited.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ v3 2/2] shared/bap: Don't link server ucast streams before CIS IDs are assigned
-Date: Sun, 14 Jun 2026 12:50:16 +0200
-Message-ID: <20260614105016.1147112-2-simon.mikuda@streamunlimited.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260614105016.1147112-1-simon.mikuda@streamunlimited.com>
-References: <fa0febe1-5866-4a3f-9f86-ae70e9d4b22d@streamunlimited.com>
- <20260614105016.1147112-1-simon.mikuda@streamunlimited.com>
+        Sun, 14 Jun 2026 04:05:18 -0700 (PDT)
+Message-ID: <6a2e8aee.27211789.1b7c5f.22ef@mx.google.com>
+Date: Sun, 14 Jun 2026 04:05:18 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6241693924910608694=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, simon.mikuda@streamunlimited.com
+Subject: RE: [BlueZ,v2,1/2] shared/bap: Initialize ucast/bcast IDs as unset
+In-Reply-To: <20260614095520.1090106-1-simon.mikuda@streamunlimited.com>
+References: <20260614095520.1090106-1-simon.mikuda@streamunlimited.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-bap_ucast_io_link pairs streams whose CIG/CIS IDs match, but the IDs
-are unset in Codec Configured state, so a Sink and Source bound for
-different CISes get linked. The stray link later propagates a
-disconnect to the wrong ASE and breaks Receiver Start Ready.
+--===============6241693924910608694==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Skip linking until QoS Configured assigns the IDs.
+This is automated email and please do not reply to this email!
 
-Fixes PTS test BAP/USR/STR/BV-362-C
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1111248
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.92 seconds
+GitLint                       FAIL      0.63 seconds
+BuildEll                      PASS      20.70 seconds
+BluezMake                     PASS      656.66 seconds
+MakeCheck                     PASS      18.62 seconds
+MakeDistcheck                 PASS      246.18 seconds
+CheckValgrind                 PASS      294.94 seconds
+CheckSmatch                   WARNING   355.15 seconds
+bluezmakeextell               PASS      183.39 seconds
+IncrementalBuild              PASS      673.90 seconds
+ScanBuild                     PASS      1033.04 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v2,2/2] shared/bap: Don't link server ucast streams before CIS IDs are assigned
+
+1: T1 Title exceeds max length (86>80): "[BlueZ,v2,2/2] shared/bap: Don't link server ucast streams before CIS IDs are assigned"
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
+
+
+https://github.com/bluez/bluez/pull/2229
+
 ---
- src/shared/bap.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index e8fbf0899..6ba9d3e06 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -2679,6 +2679,15 @@ static int bap_ucast_io_link(struct bt_bap_stream *stream,
- 			stream->ep->dir == link->ep->dir)
- 		return -EINVAL;
- 
-+	/* The server pairs Sink and Source by matching CIG/CIS, but those are
-+	 * unset until QoS Configured, so it would link unrelated ASEs (CIS 0
-+	 * is otherwise a valid ID). Clients gate linking on the lock instead.
-+	 */
-+	if (!stream->client &&
-+			(stream->qos.ucast.cis_id == BT_ISO_QOS_CIS_UNSET ||
-+			link->qos.ucast.cis_id == BT_ISO_QOS_CIS_UNSET))
-+		return -EINVAL;
-+
- 	if (stream->client && !(stream->locked && link->locked))
- 		return -EINVAL;
- 
--- 
-2.43.0
 
+--===============6241693924910608694==--
