@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B20E9331A5B
-	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 10:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986F039C012
+	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 10:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781432834; cv=pass; b=hKLQBvXEvytgKFV2hujnyEhPl/VJmIWVD8e7g4Larh6TgUb4nKAWFb9+NnUb8G2DGzAQr9Ti/SyvcWQygO9dwWLHtEJHej1wtNCQw6kK+KJhgkH7ERTpOolni3DoCoGjTOuUQeYDYVQo8tnnklQBQG5S0nxEbDuPnVvUCyXwYio=
+	t=1781432835; cv=pass; b=Ei+hsAuShF2oPMsGzxPRNNuZ92vKy9F0Gu8knJcpzgm7+5mn9yWMMUioxLG/CT1huO9bO1wUFro3V2vamXbP6buPZhKjhx4jUQzSlqNlGWcaBcfUvi5FCaq0PPvfR7BdBJBJDGP7R3zMLEjxojJEDIskb+qcEcumR13SyvRP6v4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781432834; c=relaxed/simple;
-	bh=dzF1tqbh5nlnp6Yy7Sm35+aq7QNVtfaIjxBZOfF7AH0=;
+	s=arc-20240116; t=1781432835; c=relaxed/simple;
+	bh=FT0dymlvmytiygNXsJJWvpnxOO/06OhGcw9GqQ+akk4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AR9HdMPoN0wb4WiQbrIOLPlZGJtdUoxcgEA21jJ+IBfip0mz/jGf8DL+7dBY+QZGbc6fDXZ5zqNnjRfDa5C12uLxsrO8eGRjOeeYZcHC0aBpN0oRIXY9kl5zYHJZWKDaPVe8Nz67yoGNLzwigQTO2LdYvKQ3eiarAFH2441Uecw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=T3rkYbVx; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=KJ5UNFuERiA9hnfoWGfHMi9vMbel1e/mDzDbYrgtbouXmhdBBe3i3Va1Ra68TU67LD7to04tXFxig7LAYioi9pAtO/ixHXUMDfkXtuSH1VRW7KqrT4ezlO3VMp8DNC8QWCKDl3rCS6lGxe6AvnD1UoQWah19WtD2Fj4G7kvyfqs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=ZKR0zs1E; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="T3rkYbVx"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="ZKR0zs1E"
 Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:1::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gdTvf0k09z1067;
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4gdTvf71ZRz10D3;
 	Sun, 14 Jun 2026 13:27:10 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1781432830;
+	t=1781432831;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wrJGaFplf6FbxNsy+a3YiOp6QX/hU5sfH08j/7jrDJs=;
-	b=T3rkYbVxdSurbSiJHp93hSucRZLHkR3H1L3bWDoRGdjg+erVWNGY7Gdb8u3yWoXZy00inE
-	zDbXjuJnblitZfW4yOj6tBWMP9ixVorxopxJQ1vyYiwVhji8tIDzrXZ0Ohb6bOHFY6VXqo
-	omjSXAoUyMqmV6xj5rhW1dhAA5WdyQ4=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1781432830;
-	b=OfxlrZTcs4pBYl2b2v8bazh1L80h/5L08qtmGLlhn2RE2UiQnYOl/dN1X8uiETqoWGjkkG
-	GTSnGQRqCVmFxT72NuCC2aOAt8sKToWKG9SYzqN8WxQiudJPrq9p+/+vH127FPGFMmf+m1
-	xNT3CFg2+Louca3velCk4Tf09LPHBng=
+	bh=QdPeKbsPJeMBc4B6S56Xix3EG90RSZvCvJy1AG2h+hM=;
+	b=ZKR0zs1EUgcu5xruBGAzWfgHaWvbuiRFVwGY879mam1b00cea4SAj0urbfij33yqlrGmeZ
+	5UyKsSKnn7tAyOd/Jzou9olvMeKwZOcB76x6qZReXoQMjIQtrpNXZbgpQCBbNkarAqABHH
+	7PnZqOVGIYkxvoQMA/gl0GNm+l/OTmo=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1781432831;
+	b=KTqOdjmTmrPDI9I3JNn6j1aaJ0tyXv12/1WB84ztHlPxKkr5ogY6zVOqAOOrMcVT8zH+3u
+	FgARX639AIG1ci2GulB6TXfQX6V5TZuOiijp1gnJCa/gISmxSFNgJ/z/TeYWU9RlD8foCs
+	KuQQ6AIB4X7pJM7L7ogtij9UDAsKcrE=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1781432830;
+	s=meesny; t=1781432831;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wrJGaFplf6FbxNsy+a3YiOp6QX/hU5sfH08j/7jrDJs=;
-	b=pZ3DWm1eozl1zZdhubAcXLCr/Ql6FWB7h1zwmx/rFDBH8bsS74/2Wa+UVsIvaKmiPPbq6E
-	9TZMpPElP3p8wb9Ha0iQHU9D0xggbC93oSDFyg5tI8koQzCoVd914chIjoqiJyRUbzS5AJ
-	k7msoFQYp2i89Iozy/CslNmTw8wDW1o=
+	bh=QdPeKbsPJeMBc4B6S56Xix3EG90RSZvCvJy1AG2h+hM=;
+	b=yvhiHGVnhNsZeQqYoPbTpmtOb+LXCqGN7fk5fbPYmljLzKlXLpqWDMhh/kp87uiouO7Jjr
+	fu7RK5wx3qt2Ahwey5qCsyOZyk9Ja6O/fg7hDjDkZWUUMvTL6bwE8ZWvOKF3w5RQyV5AsZ
+	D6s/s/3wmekM5+GUYE+4EdfD9Hl6/po=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH v2 2/5] Bluetooth: hci_core: Add minimal context analysis annotations
-Date: Sun, 14 Jun 2026 13:27:03 +0300
-Message-ID: <703fba3011512b53b8ceb731157603c0f1d98cd6.1781432726.git.pav@iki.fi>
+Subject: [PATCH v2 5/5] Bluetooth: enable context analysis
+Date: Sun, 14 Jun 2026 13:27:06 +0300
+Message-ID: <10709d3c2f82cf32b3e85d1d2ed5758f5fb4a0a7.1781432726.git.pav@iki.fi>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <cover.1781432726.git.pav@iki.fi>
 References: <cover.1781432726.git.pav@iki.fi>
@@ -67,45 +67,67 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add minimal compiler context analysis annotations, required for
-compilation to pass.
-
-compiler-context-analysis.h doesn't have tools to deal with the
-conditional SRCU locking on return value used here, so just disable the
-analysis in places instead of refactoring, in order to not make code
-changes here.
+Enable compiler context analysis for Bluetooth subsystem and drivers.
 
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- net/bluetooth/hci_core.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/bluetooth/Makefile    | 2 ++
+ net/bluetooth/Makefile        | 2 ++
+ net/bluetooth/bnep/Makefile   | 2 ++
+ net/bluetooth/hidp/Makefile   | 2 ++
+ net/bluetooth/rfcomm/Makefile | 2 ++
+ 5 files changed, 10 insertions(+)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5ba9fe8261ec..d1e78ae7728e 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -62,6 +62,7 @@ static DEFINE_IDA(hci_index_ida);
- /* Get HCI device by index.
-  * Device is held on return. */
- static struct hci_dev *__hci_dev_get(int index, int *srcu_index)
-+	__context_unsafe(/* conditional locking */)
- {
- 	struct hci_dev *hdev = NULL, *d;
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index bafc26250b63..e6b1c1180d1d 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -50,3 +50,5 @@ hci_uart-$(CONFIG_BT_HCIUART_AG6XX)	+= hci_ag6xx.o
+ hci_uart-$(CONFIG_BT_HCIUART_MRVL)	+= hci_mrvl.o
+ hci_uart-$(CONFIG_BT_HCIUART_AML)	+= hci_aml.o
+ hci_uart-objs				:= $(hci_uart-y)
++
++CONTEXT_ANALYSIS := y
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index 41049b280887..ff466ea97436 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -25,3 +25,5 @@ bluetooth-$(CONFIG_BT_MSFTEXT) += msft.o
+ bluetooth-$(CONFIG_BT_AOSPEXT) += aosp.o
+ bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
+ bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
++
++CONTEXT_ANALYSIS := y
+diff --git a/net/bluetooth/bnep/Makefile b/net/bluetooth/bnep/Makefile
+index 8af9d56bb012..f42015cc3245 100644
+--- a/net/bluetooth/bnep/Makefile
++++ b/net/bluetooth/bnep/Makefile
+@@ -6,3 +6,5 @@
+ obj-$(CONFIG_BT_BNEP) += bnep.o
  
-@@ -89,11 +90,13 @@ struct hci_dev *hci_dev_get(int index)
- }
+ bnep-objs := core.o sock.o netdev.o
++
++CONTEXT_ANALYSIS := y
+diff --git a/net/bluetooth/hidp/Makefile b/net/bluetooth/hidp/Makefile
+index f41b0aa02b23..53e139e41bdc 100644
+--- a/net/bluetooth/hidp/Makefile
++++ b/net/bluetooth/hidp/Makefile
+@@ -6,3 +6,5 @@
+ obj-$(CONFIG_BT_HIDP) += hidp.o
  
- static struct hci_dev *hci_dev_get_srcu(int index, int *srcu_index)
-+	__context_unsafe(/* conditional locking vs return */)
- {
- 	return __hci_dev_get(index, srcu_index);
- }
+ hidp-objs := core.o sock.o
++
++CONTEXT_ANALYSIS := y
+diff --git a/net/bluetooth/rfcomm/Makefile b/net/bluetooth/rfcomm/Makefile
+index 593e5c48c131..15f909f40f25 100644
+--- a/net/bluetooth/rfcomm/Makefile
++++ b/net/bluetooth/rfcomm/Makefile
+@@ -7,3 +7,5 @@ obj-$(CONFIG_BT_RFCOMM) += rfcomm.o
  
- static void hci_dev_put_srcu(struct hci_dev *hdev, int srcu_index)
-+	__context_unsafe(/* conditional locking vs return */)
- {
- 	srcu_read_unlock(&hdev->srcu, srcu_index);
- 	hci_dev_put(hdev);
+ rfcomm-y			:= core.o sock.o
+ rfcomm-$(CONFIG_BT_RFCOMM_TTY)	+= tty.o
++
++CONTEXT_ANALYSIS := y
 -- 
 2.54.0
 
