@@ -1,125 +1,187 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E78302140
-	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 11:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781435121; cv=none; b=SdtzcXK8uJr8G1Q+p9KPL4AwtOTorwmxbkWTnjWjnKoQLz9Ex6Vhgr7p3mfddJNFFYZxJYv3Uv0KAneoRo4MhhZsaK8axiXh81J7U/KNzPCswz2NfkjxyupLU6gPU6oaPzTXmHVAH8xtwDaC2099/tNRFHdBOQnZkLDsUiS8HBc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781435121; c=relaxed/simple;
-	bh=cK0wJZu39pNNoZ9GZaMEfiVjjDEi0ygtAANw1znVT1s=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=m1fGM2LMAfyxLDNPPImEC9yFvApyNvxg1+Lu8YqzGu3hbwRiwFa/Ac3UqnIQ7ORWdlE674sMNmvtrJjC1FphpMd2dC20ZlJ1viYCAUTgM2aYnbrAu9A3M7hgRhSIvtbP+4JZuKgC6nGBSyxasBkiMi4YysMnaX2kAR3npjptITY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iN4nh6Ap; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A472EB5B8
+	for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 11:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781436150; cv=pass; b=RdagCpKBYsk56drK01r0T7kOvlRnwQdvv8I3mJHb+DvY8vMD+opw6JGnTQUNfxWLQrXlqcVDtur6Mi+w0I/CSsa6gWV2ZdUKgtAWwRWaPD7o4Ip7w93WwUgw9EBkl+733p8pWuPHOKOWARhi55F5LXOmYsDJt36rQ+okEPxeYMU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781436150; c=relaxed/simple;
+	bh=9A9/Ig2rSjRAWSevw+6sF9YuAlTtbTYq1xUB2pCdHwg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e4MH/xg+x8t6u0/cQsDcSvdfFJw6Fb/sLU5UHCkc4Io1VVDVCj1xEZ8OGCJNHPZel//Wh4xKAEfHddutqZYSi/29M+Oqnanq7LRL7ZlKnA+4r42GA04YBh5ctMDHHCQLnKoJhJOcxCao858Y7BfYj2FT6BxDttX9QjjtBfXhGbU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=Q6AyFfo2; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iN4nh6Ap"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-9158c621ebbso314299785a.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jun 2026 04:05:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781435119; x=1782039919; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=uzxuDEhuh+qRSTGT9I3TUd3qHcKttuGX/qouEyZp6M0=;
-        b=iN4nh6ApWGuxFskz+nFru2al7XorwQLVJ/Ffi2ywVm04rAV66AdOqq3773ZUbV13zc
-         J5zegAIBbcCKMLqitb13/HQpwQLEr56WJRF75DItUR6JnfnMh14y8/93RC2nFA3J2smP
-         Xr1sgEV5mpPX7zn+bwONBNXz+Ex9c/qYuMJB7WymfrZd5Y0DFzRyqQB8fi845GD8w7gA
-         eBHSY4mXwLneuKA8+8TZAoEXHu9h10BDjzlCfV3JY7IXmKdsbRUAzmuXI6N5N3H3TD6x
-         9iteBeauL+Q11r8T8b1iMwyia+5X45FcX5u+R/qJU/R2+tx2V/Q81XqfWMzvd7VCjam/
-         zVrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781435119; x=1782039919;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uzxuDEhuh+qRSTGT9I3TUd3qHcKttuGX/qouEyZp6M0=;
-        b=oKp5TAs773la5ejHjh0JMtmS0+z0IST0f6gg8oeA9AdUONvJS4X9UtzIbfnZ4noDJ+
-         Vi302Vyq1xiZwzldjl5mxKaYONVVaIm8nsWE2cvx6RDOAZhWdPV20DwBvSZqTc9KAC6l
-         auW7ouea+u97i2WEkrEK/XFlxy0+Um2t233pmxUOlnh5f5p3+rWc3r33c8tAPZYnjCcJ
-         r6yJYNubtMP+3FsMpNeqsji33ROvUq930OqPjjdtww1AEc4ztgsMdbMWwP5A137841o5
-         uv6nr+VzWjb5f7Mc+wMLfuBGAyDSfOwYTi67sMQCdKcBpy9hAEVuqDdIJOdVBeRWoqXy
-         lnxQ==
-X-Gm-Message-State: AOJu0YwHs2fpC/aqJl9CZASpaRkFPvujz4mxBQ0XyVmduDNMBfnMwG3V
-	2xhiCEl/yL3ugsQGbXfF0gdQVqTpU1hXLaU9yRHqE1u7KJHh51M34udGqeCBhw==
-X-Gm-Gg: Acq92OFX3+n8zHiHmiX7HRvQXa5y0C9k6+/d/uIMubX4/RoCG5zlutIkZRdrv1xZLQt
-	XzmFqYgcJEqI9yHpdAV2oadCdu2eeWLPMGJ7Ed4Z+/T8f+I4J3WOt3nnZSagXl5cGi5kYOZ4sNd
-	srvohYRzinX7+P2+nKyoaMtCjQ3yGeAQHyfS4jalf2pyQcQW9AkyaFVZLVGz8yTe+H7ED4GX98M
-	hzluUGYzZOWLOa7X4jxkXtMvlzkdSv+RPbcsKl8V45Q10wexUr8XIaYa3kAaqyeAHypRqXjiHNt
-	SmO6FULYRsG0RTMkxU+bvjaKSWdczB/v7M9buPeg47uK3GixSFkgq8XuRjKYzjiTPU+ByU8HBEV
-	7scdJzDb/8H8DU1CBDXDuNsGUhiy+fyOH0YL5SJpAhgoJGFqErPcSsGnd1k78U7L9xBzEbws4cp
-	uYAe5Aqoco0oyYH1T2WU2zeBrL0YpCJlmIwT58ShbEZw==
-X-Received: by 2002:a05:620a:270e:b0:915:776d:52fe with SMTP id af79cd13be357-917f262f93dmr950182185a.57.1781435118867;
-        Sun, 14 Jun 2026 04:05:18 -0700 (PDT)
-Received: from [172.17.0.2] ([20.127.239.244])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-91619ed7f16sm720507085a.1.2026.06.14.04.05.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Jun 2026 04:05:18 -0700 (PDT)
-Message-ID: <6a2e8aee.27211789.1b7c5f.22ef@mx.google.com>
-Date: Sun, 14 Jun 2026 04:05:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6241693924910608694=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="Q6AyFfo2"
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:1::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4gdW7Q3rSvzyTm;
+	Sun, 14 Jun 2026 14:22:26 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1781436147;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=rmEc55X5EZBrBX7xl2izLmOiZe0xh2RCQGJVxA4Ag8k=;
+	b=Q6AyFfo2LHdCdLaa8nfzM92HDSylFc9FSTm4AmKvfIkzudO8kcoPqAmBYJ47kSj8e9FgeT
+	DK2sDcxk3Y2lmfG9k2vdUQtgef3YBPwa0wKIVnO+xWmUqaRTJdn//wjb3UiVRBaLQRFqdc
+	j8tq4wo0l+cjPhigwF0p+w0lZ7F41Tw=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1781436147;
+	b=OrMrlf7IPAtk71U9pzeWcjl2czRl9W3bS1GFBryeYyyTLaKE8wek4VO5hyoeSVj8V0SCLj
+	+jmQp5OyCwHfKkFGw6R1UNDEXwtd2BTAMc35x4FHrds0AnjUmEfSHjEGuQTtdhG1qSRAft
+	V1Egxw2nt2QnfOMbIQfGnFrnh3wlWvk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1781436147;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=rmEc55X5EZBrBX7xl2izLmOiZe0xh2RCQGJVxA4Ag8k=;
+	b=PY5FwF7UHo/QdG3BWU2R5DHZvRXzw9nSiynYpTekAke0wouAdEEybcZT9XUEqUH9kq5Ruq
+	hWZjlZBkRxRffGszp+HuU8OX3Vm4zTL1wR9EEEyaQOYz9el3TjJ/uetqi+Bb16koTOm+mc
+	SiP2zVdu3n8zZIOihbcbzbuBaC7PWzY=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v2] media: use custom DBus timeouts only when remote side is waiting
+Date: Sun, 14 Jun 2026 14:22:23 +0300
+Message-ID: <499a2bfcdd6ed488104bad57b285ddc9c7788f7e.1781436012.git.pav@iki.fi>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, simon.mikuda@streamunlimited.com
-Subject: RE: [BlueZ,v2,1/2] shared/bap: Initialize ucast/bcast IDs as unset
-In-Reply-To: <20260614095520.1090106-1-simon.mikuda@streamunlimited.com>
-References: <20260614095520.1090106-1-simon.mikuda@streamunlimited.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============6241693924910608694==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Under high system load (VM instance on boot) it's observed the 3 sec
+timeout BlueZ uses for BAP broadcast SetConfiguration may be missed by
+Wireplumber, as these are set up immediately on startup together with
+any other setup (eg ALSA) that may need time.
 
-This is automated email and please do not reply to this email!
+There's no actual need for using a short custom timeout in BlueZ for
+this, as in this case there is no remote side that is waiting for a reply.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1111248
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.92 seconds
-GitLint                       FAIL      0.63 seconds
-BuildEll                      PASS      20.70 seconds
-BluezMake                     PASS      656.66 seconds
-MakeCheck                     PASS      18.62 seconds
-MakeDistcheck                 PASS      246.18 seconds
-CheckValgrind                 PASS      294.94 seconds
-CheckSmatch                   WARNING   355.15 seconds
-bluezmakeextell               PASS      183.39 seconds
-IncrementalBuild              PASS      673.90 seconds
-ScanBuild                     PASS      1033.04 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v2,2/2] shared/bap: Don't link server ucast streams before CIS IDs are assigned
-
-1: T1 Title exceeds max length (86>80): "[BlueZ,v2,2/2] shared/bap: Don't link server ucast streams before CIS IDs are assigned"
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
-
-
-https://github.com/bluez/bluez/pull/2229
-
+Fix by limiting custom timeouts to cases where there is a waiting
+remote, and use separate defines for A2DP and BAP.
 ---
-Regards,
-Linux Bluetooth
 
+Notes:
+    v2: shorter BAP_REQUEST_TIMEOUT_MSEC, no particular reason to have
+        it 20 sec. Use that for cases where there may be remote side,
+        i.e. all except us being bcast source.
 
---===============6241693924910608694==--
+ profiles/audio/media.c | 30 ++++++++++++++++++++++--------
+ 1 file changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index cdaafb04e..5d9ea2cbc 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -71,7 +71,11 @@
+ #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
+ #define MEDIA_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
+ 
+-#define REQUEST_TIMEOUT (3 * 1000)		/* 3 seconds */
++/* Timeout should be less than avdtp request timeout (4 seconds) */
++#define A2DP_REQUEST_TIMEOUT_MSEC	(3 * 1000)
++
++/* Timeout should be less than ATT timeout (30 seconds) */
++#define BAP_REQUEST_TIMEOUT_MSEC	(3 * 1000)
+ 
+ struct media_app {
+ 	struct media_adapter	*adapter;
+@@ -465,16 +469,16 @@ static gboolean media_endpoint_async_call(DBusMessage *msg,
+ 					struct media_transport *transport,
+ 					media_endpoint_cb_t cb,
+ 					void *user_data,
+-					GDestroyNotify destroy)
++					GDestroyNotify destroy,
++					int timeout_msec)
+ {
+ 	struct endpoint_request *request;
+ 
+ 	request = g_new0(struct endpoint_request, 1);
+ 
+-	/* Timeout should be less than avdtp request timeout (4 seconds) */
+ 	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(),
+ 						msg, &request->call,
+-						REQUEST_TIMEOUT) == FALSE) {
++						timeout_msec) == FALSE) {
+ 		error("D-Bus send failed");
+ 		g_free(request);
+ 		return FALSE;
+@@ -521,7 +525,7 @@ static gboolean select_configuration(struct media_endpoint *endpoint,
+ 					DBUS_TYPE_INVALID);
+ 
+ 	return media_endpoint_async_call(msg, endpoint, NULL,
+-						cb, user_data, destroy);
++						cb, user_data, destroy, -1);
+ }
+ 
+ static int transport_device_cmp(gconstpointer data, gconstpointer user_data)
+@@ -604,7 +608,8 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
+ 	g_dbus_get_properties(conn, path, "org.bluez.MediaTransport1", &iter);
+ 
+ 	return media_endpoint_async_call(msg, endpoint, transport,
+-						cb, user_data, destroy);
++						cb, user_data, destroy,
++						A2DP_REQUEST_TIMEOUT_MSEC);
+ }
+ #endif
+ 
+@@ -1093,7 +1098,7 @@ static int pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+ 	dbus_message_iter_close_container(&iter, &dict);
+ 
+ 	if (!media_endpoint_async_call(msg, endpoint, NULL, pac_select_cb,
+-								data, free))
++								data, free, -1))
+ 		return -EIO;
+ 
+ 	return 0;
+@@ -1233,6 +1238,7 @@ static int pac_config(struct bt_bap_stream *stream, struct iovec *cfg,
+ 	DBusMessage *msg;
+ 	DBusMessageIter iter;
+ 	const char *path;
++	int timeout_msec;
+ 
+ 	DBG("endpoint %p stream %p", endpoint, stream);
+ 
+@@ -1243,9 +1249,16 @@ static int pac_config(struct bt_bap_stream *stream, struct iovec *cfg,
+ 	switch (bt_bap_stream_get_type(stream)) {
+ 	case BT_BAP_STREAM_TYPE_UCAST:
+ 		transport = pac_ucast_config(stream, cfg, endpoint);
++		timeout_msec = BAP_REQUEST_TIMEOUT_MSEC;
+ 		break;
+ 	case BT_BAP_STREAM_TYPE_BCAST:
+ 		transport = pac_bcast_config(stream, cfg, endpoint);
++
++		/* If we are sink, BASS remote may be waiting: custom timeout */
++		if (bt_bap_stream_get_dir(stream) == BT_BAP_SOURCE)
++			timeout_msec = BAP_REQUEST_TIMEOUT_MSEC;
++		else
++			timeout_msec = -1;
+ 		break;
+ 	default:
+ 		transport = NULL;
+@@ -1279,7 +1292,8 @@ static int pac_config(struct bt_bap_stream *stream, struct iovec *cfg,
+ 	g_dbus_get_properties(conn, path, "org.bluez.MediaTransport1", &iter);
+ 
+ 	if (!media_endpoint_async_call(msg, endpoint, transport,
+-						pac_config_cb, data, free))
++						pac_config_cb, data, free,
++						timeout_msec))
+ 		return -EIO;
+ 
+ 	return 0;
+-- 
+2.54.0
+
