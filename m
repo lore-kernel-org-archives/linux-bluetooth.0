@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64F53AE6F4
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 19:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6EA83B19BB;
+	Mon, 15 Jun 2026 19:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781551810; cv=none; b=a2HgCQ7ltKpPD84ATWcSXeuat9xM9wolD7Q5/t+WQA/vQjn1yw1opfGk/odG/aDzT3EyZaZkZyTh0i3+QFzxdYHR1AzevXQ22SQfVYSSIOb63BlEufk84Pkg4iKDqynRJooUvaCrmrymmE14RGv30Z0ejP3JjJTZvKuNCVdqg5E=
+	t=1781552410; cv=none; b=BytyOg/UJL5JJzWWejbYLQt0LfT7aU3E4egW7kl/iRy4y4oQskn/0JyadzTrR/eOVvVoeS40+o77TxjL5/wECin7XIi9grdusHdBeLlz3FNeAnpjqhXve1fxny5JE5FD0czu+3UMhgdJDktDtXGVT6IELM7BfaEdruLUI8RcZOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781551810; c=relaxed/simple;
-	bh=R+R5JGM9313EA1YXf6uNdOHdC0ciEnateLlSQseXpvU=;
+	s=arc-20240116; t=1781552410; c=relaxed/simple;
+	bh=QHQIWrojcKf9PmJqXpVpbH1+2qdWj54z8wuiLNCL/B4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SzNnvGKmrcgbjzdx8Bn4M+cVGRHIRNcpMJDnfNqdZmeF9AelnGk62Z/fsqyQpLf6MwQtMF8od2/LoJ0WS/w4BVeNpJB5ilu2M2sANfQmObREN5rsQfWOkAOihvMywUNcIkiq8V/jjt7msDWs8kK+S/H2DWSgH4iEIbGUVDFwc8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=etVtDBgW; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=k+5dGX9kIKrX/mEV38eLhpDRTvXGnh+GGcrObbiW3875f8CJs4VgAWD6x4GXH9xbh+ZJBt5fvLFiVNjv0V134stweARhYYNV4zcY8srx1sXu4O5C7znsRR3yTWq8eAqsjZa3Rl6iNKNletbIIXIfswlTrtZzYvzrSXXcBc9aey0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V4qwsYlL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="etVtDBgW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82BB01F000E9;
-	Mon, 15 Jun 2026 19:30:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V4qwsYlL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDD4E1F000E9;
+	Mon, 15 Jun 2026 19:40:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781551809;
-	bh=LDi8GYFlic8FpCHDdM+f23/XQn6TjVHfV5mh1OafFv4=;
+	s=k20260515; t=1781552409;
+	bh=Rq4vR0sNZ5Kh8zd/SvSc5LaUbYo7/21ssgczAWlqxoQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=etVtDBgWT0n+TJr1R8NSM6FxmvKUpR/fDmaQvjPo6K+w1zO3Vf1l+TulGXONRUuZX
-	 7ETChd//86kWw4xU8wB38LXz0nplFF/x10ZkkApMMg+BCjGkaC+IgA6yRhhE7F/10f
-	 Vq5Tb9FbZZR8zw7Q5C+9qEzoT6/4aYDXx6IKOQBZVsczPQ5lfyvtTSlcjlQpY5jv2s
-	 u9M5WscspiKFXffyt0SZJeD/I4Dtiszpn3kU6F10yRfKm6+7O6AYZgRFyUejp9cDwa
-	 oBhtlY+e+ZmbQ6znsD9h+yohD/qaeV8rP1iEzn6xiZPxMdoYwRiPRuPFcqBXxpbbcr
-	 K5+ePKzr7szGg==
+	b=V4qwsYlLa2h4iHyNF36ermXAlYHQ4d4DiaqKD95glPuCrskr6l/IPoI2GiMpghJX0
+	 CmUepZXQEnLn7k3rzJNS4jXpd73kiEF2yObX/tQIt4bddJijcL0v/nolNJ9hES4nMV
+	 Wvkvk8Ux0pWpoSqrHsxM/ZsfjMpOgI5W5xBhiWDUhp8KfOGj8g1tapmOdokxyE/Gkn
+	 n/mNIBDYYOa7ow2yDN2VDZeUIe4kpEgWYFvTEOtroLCj9JZo53nqU9Jicx6OgIVCee
+	 wB6sCCd7THhgsMWs9opcohw5PpaQ8oySTavmKIw5GnlDS5K1oV/hY7KKIPTr3s325h
+	 iVmo3cblNi9KQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0A3E3839A06;
-	Mon, 15 Jun 2026 19:30:05 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 199153839A06;
+	Mon, 15 Jun 2026 19:40:06 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,34 +37,42 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v3 1/2] shared/bap: Initialize ucast/bcast IDs as
- unset
+Subject: Re: [PATCH] Bluetooth: MGMT: Fix UAF of hci_conn_params in
+ add_device_complete
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178155180439.261971.4637861728508977400.git-patchwork-notify@kernel.org>
-Date: Mon, 15 Jun 2026 19:30:04 +0000
-References: <20260614105016.1147112-1-simon.mikuda@streamunlimited.com>
-In-Reply-To: <20260614105016.1147112-1-simon.mikuda@streamunlimited.com>
-To: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Cc: linux-bluetooth@vger.kernel.org
+ <178155240489.265251.9283382501593618053.git-patchwork-notify@kernel.org>
+Date: Mon, 15 Jun 2026 19:40:04 +0000
+References: <20260615150922.1737274-1-sam@bynar.io>
+In-Reply-To: <20260615150922.1737274-1-sam@bynar.io>
+To: Samuel Page <sam@bynar.io>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sun, 14 Jun 2026 12:50:15 +0200 you wrote:
-> Also change some lines where CIS should be used instead of CIG
-> ---
->  src/shared/bap.c | 13 +++++++++++++
->  unit/test-bap.c  |  4 ++--
->  2 files changed, 15 insertions(+), 2 deletions(-)
+On Mon, 15 Jun 2026 16:09:22 +0100 you wrote:
+> add_device_complete() runs from the hci_cmd_sync_work kworker, which
+> holds only hci_req_sync_lock and *not* hci_dev_lock.  It calls
+> hci_conn_params_lookup() and then dereferences the returned object
+> (params->flags) without taking hci_dev_lock:
+> 
+> 	params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
+> 					le_addr_type(cp->addr.type));
+> 	...
+> 	device_flags_changed(NULL, hdev, &cp->addr.bdaddr,
+> 			     cp->addr.type, hdev->conn_flags,
+> 			     params ? params->flags : 0);
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ,v3,1/2] shared/bap: Initialize ucast/bcast IDs as unset
-    (no matching commit)
-  - [BlueZ,v3,2/2] shared/bap: Don't link server ucast streams before CIS IDs are assigned
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5297cf2b6af6
+  - Bluetooth: MGMT: Fix UAF of hci_conn_params in add_device_complete
+    https://git.kernel.org/bluetooth/bluetooth-next/c/cb20f6afc25b
 
 You are awesome, thank you!
 -- 
