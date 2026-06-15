@@ -1,362 +1,420 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63ED13FC5C5
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 14:49:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814003D9028
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 15:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781534978; cv=none; b=pnn+idgOpB592tmyEJ1r7CrUz0hZ+SdtHu+Zp08LUc8EZE5II1eNQnzk0F4DJuX6W4grnsTgQfDRGzJstFFrNcTir9tOlH0h+HOZ12DuKYWbN5gvYIpOYnERxRg1Y8l1Tcb/JghGDMWnKLK9u7BbV1YSVOdE89aG/3bCzwX6FmM=
+	t=1781535995; cv=none; b=LLSvx7Dsb1h9/GtQRvEELP/88pP37JwsfsiUOuMHtlbnKm5gEr0N2sPNCMuTbiK9BmC4twaD+hQOILA304cetkEmGigLc2HoSqiFXlkOWf3jJIIAENqXu9f2jlopjaOBh3UQ/Do44Y9nB7fyew65F7D2SYUx5xuRxGO/sNKjp38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781534978; c=relaxed/simple;
-	bh=2RYayaSn8smOv44zUgw4M3T04txByl1jBU4IPpQ91jA=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=JclzkPbRg/d39UR4ijoKFkvZoRELeURHUdoJ7ivYuxCpqu231E2SJcfRFpbeBtMTjCydZ1c9Y0se/D1aU8Kx/qSpRm/q/OiIXCW3oEoXHjy9Aef+U4bKx+8Rp9U0lW/7b0BHC/EU36tNcPAH8R1fdcBfXT1/ao7hwwOfs3/uZxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vKGz2feD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1781535995; c=relaxed/simple;
+	bh=Uot8cnw0quCr3uW2ivN4g6LMzM4kGhNsVlHk6YkAz2U=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=qRjtFQC/j9oIY69ngAv4pX17yv8jHcDZB9MpoMVu/4ihcZdCtZAYXksJlb4IgZxfsdXIJVna8HF4f0mu9qcrDJE/K/nO60ikudMIcn+CMPkK/hUc9hLjsMQCUNX/Ul0XRavfmSghF4A6+MkEiefGxCoBveEj5V8HHg8O0LBkZFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=lghFVgyu; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OaUT+4K/; arc=none smtp.client-ip=202.12.124.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vKGz2feD"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F2F84C2BCB9
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 14:49:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1781534978;
-	bh=2RYayaSn8smOv44zUgw4M3T04txByl1jBU4IPpQ91jA=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=vKGz2feD0Ofip+TmvnucvyRvEfQqOFlEW8aj1FQR2tCGbMHd7pz2VelQaWVT2FMKc
-	 XX5nYnnXaBfiomDzsw9rXFZ7KgcsCC5NrN8dYuF7eB2bUu7DYp24dBwbgjdfCKSIfj
-	 XoTOiE6LPhJMDY2Ry7txyVbaJ6HlcyR9zEMIcyfRn9ALGJOmePnaXUmvodx/pdX4sa
-	 bOOd2ZUJyCaT70arNALdZkx/k2HsIR4IpXMhwbMfg3miODbUzFAlqUhT3jVIru2gsS
-	 AJEWYjGBb1+QmH7SGd+QfZV4HXA75BN2cLdLrTxAAVDllM6Lqp3vFlwlf3+eIjX1e+
-	 sRpX5zgbV49VQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id DC4A1C53BBF; Mon, 15 Jun 2026 14:49:37 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221637] Regression for Intel Corporation Device a876 (rev 10)
-Date: Mon, 15 Jun 2026 14:49:37 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: furstenau+kernelbugWGvWw1PW1l@posteo.net
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221637-62941-hFoxxqCteY@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221637-62941@https.bugzilla.kernel.org/>
-References: <bug-221637-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="lghFVgyu";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OaUT+4K/"
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id BE3057A007F;
+	Mon, 15 Jun 2026 11:06:32 -0400 (EDT)
+Received: from phl-imap-10 ([10.202.2.85])
+  by phl-compute-03.internal (MEProxy); Mon, 15 Jun 2026 11:06:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1781535992;
+	 x=1781622392; bh=SO3p12ZsDxXS4zzt10g0dhvBOnM+ATlaFemfN/QBGI4=; b=
+	lghFVgyuxRP4vHaZzvAiWw4Ip+fdY4b2JB1LZNm85BkKQorFMX5CAO0Sjt+aMUJ4
+	bGcwrOS9ud/4W2+fn+dpUhyeruCrMXVUuPEgrV260pilQrhu4JEI3URl1LlDMQfE
+	g19D7C3MskhMk3aZZ/Wwd6s0XZe7z6Oq7ciczp1tUiBwRlE/gbJSjfm8oTb4rANn
+	L5Ze6r+3KvaQvZWF5vzb/GULa1i77LbLKhIlFsEvtizy9wcLzGZ8JR2P46wQ6gCw
+	RBC8r3Ga2XvMRUDs4WiQSVN4DKk6DRN4MwNEGz5fxZ1pIWF5G228PmEnTOOFKbA1
+	BWUBHRF1imO+wbZg+JPnjg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1781535992; x=
+	1781622392; bh=SO3p12ZsDxXS4zzt10g0dhvBOnM+ATlaFemfN/QBGI4=; b=O
+	aUT+4K/BlWKLIHjX+BwH8GWuXOx5vzRrjDI1kpzbv5uVq0s3s8MZfwZoadvYqLTu
+	Fb8gR3hOJI+al5Hi0Nt6aBwtY8myC+O0PUA1te/mCZr3lj8YIoox3JcO4vGh9HtH
+	kdKCMlhcVY7Ze+p3E0YJmYMhs8npZVq/uCMEpgZUfbZ//+4UAdVkLzy9KaXtcvsP
+	zpTzctsN3gPTxpsxXvndYEHyi44VMYWVb9pDU6tQLjC024oYVhcSuCWB8pIokdzj
+	GzETWORasJxZ/IcQE2FgqPI1hPk2sAObDECoCqTfzJYEmeta31+I90oyGhFeaMtE
+	U6COjbGb57WsStF9QyiIw==
+X-ME-Sender: <xms:-BQwavtzwbX9jtXUaRNMXvRSSlkm-UcqN_48hD8MzkjFlNwEkgb5MQ>
+    <xme:-BQwarS3hKLoaT46KcewMuYpmuGVtCjhw2K5vn3jxyNy37zgGy1WRB4QFOE4N5d-f
+    otjh1GyakYTRh7qR8Gfl8a5IT8Hng4LKdYhf6cGLivJLCAKRGRlbw>
+X-ME-Proxy-Cause: dmFkZTEqzzRyyFnjQS5iKgYtreIF40r44LQsyF6PCPg2iCWOspuJriPqaesaeC4sj7n5Yt
+    92C8+ilw6zhkdQ5wImdBK858SAmAbbFYmiVgUOoDM4qhlgY5D0yXqvuQ6YTpGfugTKSy1K
+    En5M+1jZhQsfUq3Gq3sF46gqTDVBc9VWa4GzAfgbJI9xtZZv5MIzsxn4obG2ucgLg47Ntw
+    Wp5DkAAdcbyatqKTn0I2jC1yOjs4AZOq4Eqw0fZyxf/GxFF74qW7XDgVENwEhJi76QkQ5H
+    PujuQhLLXufR6VnvgpxHtqT5csW4UdvW8wELtHQcz2dDSms5APSj+27NWQpqPC4YVLI/p4
+    5fpTWOnUU5/a+frDVimBsoVTk/QWvQsBZLv3CQHDPHBG9LzdZTyJGvhydYtyjvK02GMPPZ
+    UXopLaP5e1Jdx6QFPslC/WO7qH2iYTgTH4iFU+1EM9VPNVTpsSVA6GOTHkgCYFQYSQ2TNg
+    K5yWS0sa/GGtkhbcy9pgw1NYGzRldbp0slX8q6IIo7SavrW6kmE94Ad+lehCgEkCVvkPSb
+    MlUVdT76gsT7+llqlRnhS6BRJsLyORiTCJP37X36SxdqygRA/f479Uk4U3l1nV9dfo6pAY
+    gapnnmC+lC+UhhO2/NdtMHxExMUDvBJoCbgoCNFAhz5w9/SwGMRCmrMdmseg
+X-ME-Proxy: <xmx:-BQwanXROVar7UbCC3A5CEo_kJDrz5uNYn2u7O9CFVt95rgP6MmAUw>
+    <xmx:-BQwatZayQ_x_xLbfhcyIq9hTMbXFiiuCDsQwjcdYoDZDeruu4Qk4g>
+    <xmx:-BQwat0m4Z4bHl7_22xyJxmSvfj0aqIVzEgbfPbxgH2XDq-Sio9iIw>
+    <xmx:-BQwavhnGrcBnLHqPMiAumD5gNWZzJkMofzZguBmDNCItlF1j7Xj4g>
+    <xmx:-BQwahq7T4O23IZLIuakgJcqUokDqyiAm9nVma73XVpWo5dcDZ1NA_KV>
+Feedback-ID: if72e4b10:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 4F8C7216008B; Mon, 15 Jun 2026 11:06:32 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-ThreadId: Ay15wreZGY9N
+Date: Mon, 15 Jun 2026 11:06:11 -0400
+From: "Siwei Zhang" <oss@fourdim.xyz>
+To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Cc: "Pauli Virtanen" <pav@iki.fi>, "XIAO WU" <xiaowu.417@qq.com>,
+ linux-bluetooth@vger.kernel.org
+Message-Id: <cbe3c81f-7919-4a13-b636-5d2bc776e094@app.fastmail.com>
+In-Reply-To: 
+ <CABBYNZKRTpmnQ44UWH_0jFwQY9OOP5LAHE2+1ZZn-Ckic4wGZQ@mail.gmail.com>
+References: <20260615131131.1459372-1-oss@fourdim.xyz>
+ <CABBYNZKRTpmnQ44UWH_0jFwQY9OOP5LAHE2+1ZZn-Ckic4wGZQ@mail.gmail.com>
+Subject: Re: [PATCH v5 1/2] Bluetooth: hci_conn: Fix null ptr deref in hci_abort_conn()
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221637
+Hi Luiz,
 
---- Comment #9 from Bianca F=C3=BCrstenau (furstenau+kernelbugWGvWw1PW1l@po=
-steo.net) ---
-I applied the patch and it mostly worked.
+On Mon, Jun 15, 2026, at 10:09 AM, Luiz Augusto von Dentz wrote:
+> Hi Siwei,
+>
+> On Mon, Jun 15, 2026 at 9:12=E2=80=AFAM Siwei Zhang <oss@fourdim.xyz> =
+wrote:
+>>
+>> hci_abort_conn() read hci_skb_event(hdev->sent_cmd) when a connection
+>> was pending, but hdev->sent_cmd can be NULL while req_status is still
+>> HCI_REQ_PEND, leading to a NULL pointer dereference and a general
+>> protection fault from the hci_rx_work() receive path.
+>>
+>> Instead of inspecting hdev->sent_cmd, track the in-flight create
+>> connection command with a new per-connection HCI_CONN_CREATE flag and
+>> route all cancellation through hci_cancel_connect_sync(). The create
+>> command is in exactly one of two states: still queued, or in flight.
+>> hci_cancel_connect_sync() holds cmd_sync_work_lock across the whole
+>> decision: the worker takes this lock to dequeue every entry, so while=
+ it
+>> is held a queued command cannot start running and an in-flight command
+>> cannot complete and let the next command become pending. This keeps t=
+he
+>> flag test and hci_cmd_sync_cancel() atomic with respect to the worker,
+>> so a queued command is simply dequeued, and an in-flight command owned
+>> by this connection is cancelled without the risk of cancelling an
+>> unrelated command that became pending in the meantime. CIS uses the s=
+ame
+>> path via the existing HCI_CONN_CREATE_CIS flag.
+>>
+>> hci_acl_create_conn_sync() and hci_le_create_conn_sync() clear
+>> HCI_CONN_CREATE after the create command completes, but the command
+>> status handler can free conn via hci_conn_del() (for example when the
+>> controller rejects the connection) while the worker is still blocked =
+on
+>> the connection complete event. Hold a reference on conn across the
+>> create command so the flag can be cleared without a use-after-free.
+>>
+>> Fixes: a13f316e90fd ("Bluetooth: hci_conn: Consolidate code for abort=
+ing connections")
+>> Cc: stable@vger.kernel.org
+>> Suggested-by: XIAO WU <xiaowu.417@qq.com>
+>> Assisted-by: Claude:claude-opus-4-8
+>> Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
+>> ---
+>>  include/net/bluetooth/hci_core.h |  1 +
+>>  net/bluetooth/hci_conn.c         | 21 +------
+>>  net/bluetooth/hci_sync.c         | 96 ++++++++++++++++++++++++++++--=
+--
+>>  3 files changed, 88 insertions(+), 30 deletions(-)
+>>
+>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth=
+/hci_core.h
+>> index aa600fbf9a53..aa554c34f9ec 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -988,6 +988,7 @@ enum {
+>>         HCI_CONN_AUTH_FAILURE,
+>>         HCI_CONN_PER_ADV,
+>>         HCI_CONN_BIG_CREATED,
+>> +       HCI_CONN_CREATE,
+>>         HCI_CONN_CREATE_CIS,
+>>         HCI_CONN_CREATE_BIG_SYNC,
+>>         HCI_CONN_BIG_SYNC,
+>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+>> index 54eabaa46960..eba4a548bef5 100644
+>> --- a/net/bluetooth/hci_conn.c
+>> +++ b/net/bluetooth/hci_conn.c
+>> @@ -3181,26 +3181,11 @@ int hci_abort_conn(struct hci_conn *conn, u8 =
+reason)
+>>
+>>         conn->abort_reason =3D reason;
+>>
+>> -       /* If the connection is pending check the command opcode sinc=
+e that
+>> -        * might be blocking on hci_cmd_sync_work while waiting its r=
+espective
+>> -        * event so we need to hci_cmd_sync_cancel to cancel it.
+>> -        *
+>> -        * hci_connect_le serializes the connection attempts so only =
+one
+>> -        * connection can be in BT_CONNECT at time.
+>> +       /* Cancel the connect attempt. A return of 0 means the create=
+ command
+>> +        * was still queued and got dequeued, so there is nothing to =
+disconnect.
+>>          */
+>> -       if (conn->state =3D=3D BT_CONNECT && READ_ONCE(hdev->req_stat=
+us) =3D=3D HCI_REQ_PEND) {
+>> -               switch (hci_skb_event(hdev->sent_cmd)) {
+>> -               case HCI_EV_CONN_COMPLETE:
+>> -               case HCI_EV_LE_CONN_COMPLETE:
+>> -               case HCI_EV_LE_ENHANCED_CONN_COMPLETE:
+>> -               case HCI_EVT_LE_CIS_ESTABLISHED:
+>> -                       hci_cmd_sync_cancel(hdev, ECANCELED);
+>> -                       break;
+>> -               }
+>> -       /* Cancel connect attempt if still queued/pending */
+>> -       } else if (!hci_cancel_connect_sync(hdev, conn)) {
+>> +       if (!hci_cancel_connect_sync(hdev, conn))
+>>                 return 0;
+>> -       }
+>>
+>>         /* Run immediately if on cmd_sync_work since this may be call=
+ed
+>>          * as a result to MGMT_OP_DISCONNECT/MGMT_OP_UNPAIR which does
+>> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+>> index df23245d6ccd..06b87e9cd999 100644
+>> --- a/net/bluetooth/hci_sync.c
+>> +++ b/net/bluetooth/hci_sync.c
+>> @@ -6611,6 +6611,11 @@ static int hci_le_create_conn_sync(struct hci_=
+dev *hdev, void *data)
+>>
+>>         bt_dev_dbg(hdev, "conn %p", conn);
+>>
+>> +       /* Hold a reference so conn stays valid for the HCI_CONN_CREA=
+TE
+>> +        * clear_bit() at done.
+>> +        */
+>> +       hci_conn_get(conn);
+>> +
+>>         clear_bit(HCI_CONN_SCANNING, &conn->flags);
+>>         conn->state =3D BT_CONNECT;
+>>
+>> @@ -6623,6 +6628,7 @@ static int hci_le_create_conn_sync(struct hci_d=
+ev *hdev, void *data)
+>>                     hdev->le_scan_type =3D=3D LE_SCAN_ACTIVE &&
+>>                     !hci_dev_test_flag(hdev, HCI_LE_SIMULTANEOUS_ROLE=
+S)) {
+>>                         hci_conn_del(conn);
+>> +                       hci_conn_put(conn);
+>>                         return -EBUSY;
+>>                 }
+>>
+>> @@ -6668,6 +6674,12 @@ static int hci_le_create_conn_sync(struct hci_=
+dev *hdev, void *data)
+>>                                              &own_addr_type);
+>>         if (err)
+>>                 goto done;
+>> +
+>> +       /* Mark create connection in flight so hci_cancel_connect_syn=
+c() can
+>> +        * cancel it while blocking on the connection complete event.
+>> +        */
+>> +       set_bit(HCI_CONN_CREATE, &conn->flags);
+>> +
+>>         /* Send command LE Extended Create Connection if supported */
+>>         if (use_ext_conn(hdev)) {
+>>                 err =3D hci_le_ext_create_conn_sync(hdev, conn, own_a=
+ddr_type);
+>> @@ -6703,11 +6715,14 @@ static int hci_le_create_conn_sync(struct hci=
+_dev *hdev, void *data)
+>>                                        conn->conn_timeout, NULL);
+>>
+>>  done:
+>> +       clear_bit(HCI_CONN_CREATE, &conn->flags);
+>> +
+>>         if (err =3D=3D -ETIMEDOUT)
+>>                 hci_le_connect_cancel_sync(hdev, conn, 0x00);
+>>
+>>         /* Re-enable advertising after the connection attempt is fini=
+shed. */
+>>         hci_resume_advertising_sync(hdev);
+>> +       hci_conn_put(conn);
+>>         return err;
+>>  }
+>>
+>> @@ -6982,10 +6997,25 @@ static int hci_acl_create_conn_sync(struct hc=
+i_dev *hdev, void *data)
+>>         else
+>>                 cp.role_switch =3D 0x00;
+>>
+>> -       return __hci_cmd_sync_status_sk(hdev, HCI_OP_CREATE_CONN,
+>> -                                       sizeof(cp), &cp,
+>> -                                       HCI_EV_CONN_COMPLETE,
+>> -                                       conn->conn_timeout, NULL);
+>> +       /* Hold a reference so conn stays valid for the HCI_CONN_CREA=
+TE
+>> +        * clear_bit() below.
+>> +        */
+>> +       hci_conn_get(conn);
+>> +
+>> +       /* Mark create connection in flight so hci_cancel_connect_syn=
+c() can
+>> +        * cancel it while blocking on the connection complete event.
+>> +        */
+>> +       set_bit(HCI_CONN_CREATE, &conn->flags);
+>> +
+>> +       err =3D __hci_cmd_sync_status_sk(hdev, HCI_OP_CREATE_CONN,
+>> +                                      sizeof(cp), &cp,
+>> +                                      HCI_EV_CONN_COMPLETE,
+>> +                                      conn->conn_timeout, NULL);
+>> +
+>> +       clear_bit(HCI_CONN_CREATE, &conn->flags);
+>> +       hci_conn_put(conn);
+>> +
+>> +       return err;
+>>  }
+>>
+>>  int hci_connect_acl_sync(struct hci_dev *hdev, struct hci_conn *conn)
+>> @@ -7039,20 +7069,62 @@ int hci_connect_le_sync(struct hci_dev *hdev,=
+ struct hci_conn *conn)
+>>
+>>  int hci_cancel_connect_sync(struct hci_dev *hdev, struct hci_conn *c=
+onn)
+>>  {
+>> -       if (conn->state !=3D BT_OPEN)
+>> -               return -EINVAL;
+>> +       struct hci_cmd_sync_work_entry *entry;
+>> +       hci_cmd_sync_work_func_t func =3D NULL;
+>> +       hci_cmd_sync_work_destroy_t destroy =3D NULL;
+>> +       int create_flag =3D -1;
+>> +       int err =3D -EBUSY;
+>>
+>>         switch (conn->type) {
+>>         case ACL_LINK:
+>> -               return !hci_cmd_sync_dequeue_once(hdev,
+>> -                                                 hci_acl_create_conn=
+_sync,
+>> -                                                 conn, NULL);
+>> +               func =3D hci_acl_create_conn_sync;
+>> +               create_flag =3D HCI_CONN_CREATE;
+>> +               break;
+>>         case LE_LINK:
+>> -               return !hci_cmd_sync_dequeue_once(hdev, hci_le_create=
+_conn_sync,
+>> -                                                 conn, create_le_con=
+n_complete);
+>> +               func =3D hci_le_create_conn_sync;
+>> +               destroy =3D create_le_conn_complete;
+>> +               create_flag =3D HCI_CONN_CREATE;
+>> +               break;
+>> +       case CIS_LINK:
+>> +               /* LE Create CIS is shared by the whole CIG and canno=
+t be
+>> +                * dequeued per-connection; only cancel it in-flight =
+below.
+>> +                */
+>> +               create_flag =3D HCI_CONN_CREATE_CIS;
+>
+> Instead of doing everything in the same function, it probably makes
+> more sense to add dedicated functions for each type, for example,
+> `hci_acl_cancel_create_conn_sync`, etc.
+>
 
-Quick note: I was unable to figure out how to non-manually get a patch file
-from the googlesource site and this incurred several hours of delay while I=
- did
-something else before I had the idea of trying to find the patch on kernel.=
-org:
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t/patch/?id=3D5917dd39db2bfc8b1b4c6ea8ed99adb4badef707
+int hci_cancel_connect_sync(struct hci_dev *hdev, struct hci_conn *conn)
+{
+	switch (conn->type) {
+	case ACL_LINK:
+		return hci_cancel_create_conn_sync(hdev, conn, HCI_CONN_CREATE,
+						   hci_acl_create_conn_sync,
+						   NULL);
+	case LE_LINK:
+		return hci_cancel_create_conn_sync(hdev, conn, HCI_CONN_CREATE,
+						   hci_le_create_conn_sync,
+						   create_le_conn_complete);
+	case CIS_LINK:
+		return hci_cancel_create_conn_sync(hdev, conn,
+						   HCI_CONN_CREATE_CIS, NULL,
+						   NULL);
+	default:
+		return -ENOENT;
+	}
+}
 
-When I applied the patch to 7.0.11, the Bluetooth worked with the current
-firmware and the dmesg logs looked the same as with the old firmware except=
- for
-timings and version identifiers. When I applied the patch to 7.0.12, the
-Bluetooth still worked but there were a lot of gp1 mailbox interrupts and n=
-ew
-warnings in the dmesg logs. This seems unexpected to me, but if it seems
-expected to Kiran et al., I do not have any further issue with this. If it
-seems unexpected to you, too, it might warrant further investigation.
+I would like to have something like this.=20
+hci_acl_cancel_create_conn_sync will have an unnecessary wrapper.
+What do you think?
 
-Am I seeing correctly that the patch is already in 7.1.0? If so, it seems
-unnecessary to revert anything for me as my understanding of the release
-strategy of NixOS for the configuration I am running is that my next kernel
-will be 7.1.0 anyway. If I am wrong about that, the consequence is only that
-applying updates takes me an hour instead of a few minutes at most if one of
-the updates was to the kernel. Definitely quite annoying, but also not terr=
-ibly
-prohibitive, as the device stays usable during the update process. (Still,
-nothing I would look forward to doing a dozen times until 7.2.0 releases or
-something.)
+>> +               break;
+>> +       default:
+>> +               return -ENOENT;
+>>         }
+>>
+>> -       return -ENOENT;
+>> +       /* The create command is either still queued or in flight. Ho=
+ld
+>> +        * cmd_sync_work_lock across the test and the cancel: the wor=
+ker takes
+>> +        * this lock to dequeue every entry, so while it is held no o=
+ther command
+>> +        * can become pending, which keeps hci_cmd_sync_cancel() from=
+ racing with
+>> +        * completion and cancelling an unrelated command.
+>> +        */
+>> +       mutex_lock(&hdev->cmd_sync_work_lock);
+>> +
+>> +       /* The flag is set while the worker blocks on the connection =
+complete
+>> +        * event, so if it is set this connection owns the pending re=
+quest.
+>> +        */
+>> +       if (create_flag >=3D 0 && test_bit(create_flag, &conn->flags)=
+) {
+>> +               hci_cmd_sync_cancel(hdev, ECANCELED);
+>> +               goto unlock;
+>> +       }
+>> +
+>> +       /* Otherwise it may still be queued; dequeue it. A successful=
+ dequeue
+>> +        * means it never started, so there is nothing to disconnect.
+>> +        */
+>> +       if (func) {
+>> +               entry =3D _hci_cmd_sync_lookup_entry(hdev, func, conn=
+, destroy);
+>> +               if (entry) {
+>> +                       _hci_cmd_sync_cancel_entry(hdev, entry, -ECAN=
+CELED);
+>> +                       err =3D 0;
+>> +               }
+>> +       }
+>> +
+>> +unlock:
+>> +       mutex_unlock(&hdev->cmd_sync_work_lock);
+>> +       return err;
+>>  }
+>>
+>>  int hci_le_conn_update_sync(struct hci_dev *hdev, struct hci_conn *c=
+onn,
+>> --
+>> 2.54.0
+>>
+>
+>
+> --=20
+> Luiz Augusto von Dentz
 
-Linux 7.0.11 with 5917dd39, Firmware 20260519 $ sudo dmesg | grep -i blueto=
-oth
-[   31.058834] Bluetooth: Core ver 2.22
-[   31.058854] NET: Registered PF_BLUETOOTH protocol family
-[   31.058855] Bluetooth: HCI device and connection manager initialized
-[   31.058860] Bluetooth: HCI socket layer initialized
-[   31.058862] Bluetooth: L2CAP socket layer initialized
-[   31.058864] Bluetooth: SCO socket layer initialized
-[   31.085847] Bluetooth: hci0: Device revision is 0
-[   31.085852] Bluetooth: hci0: Secure boot is enabled
-[   31.085854] Bluetooth: hci0: OTP lock is disabled
-[   31.085855] Bluetooth: hci0: API lock is enabled
-[   31.085855] Bluetooth: hci0: Debug lock is disabled
-[   31.085856] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
-[   31.085858] Bluetooth: hci0: Bootloader timestamp 2023.33 buildtype 1 bu=
-ild
-45995
-[   31.086590] Bluetooth: hci0: Found device firmware:
-intel/ibt-0190-0291-iml.sfi
-[   31.086594] Bluetooth: hci0: Boot Address: 0x30098800
-[   31.086595] Bluetooth: hci0: Firmware Version: 99-13.26
-[   31.142382] Bluetooth: hci0: Waiting for firmware download to complete
-[   31.142386] Bluetooth: hci0: Firmware loaded in 54485 usecs
-[   31.144680] Bluetooth: hci0: Waiting for device to boot
-[   31.144682] Bluetooth: hci0: Device booted in 2235 usecs
-[   31.144683] Bluetooth: hci0: Waiting for device transition to d0
-[   31.144683] Bluetooth: hci0: Device moved to D0 in 0 usecs
-[   31.144815] Bluetooth: hci0: dsbr: enable: 0x01 value: 0x0b
-[   31.148426] Bluetooth: hci0: Found device firmware:
-intel/ibt-0190-0291-pci.sfi
-[   31.148435] Bluetooth: hci0: Boot Address: 0x10000800
-[   31.148436] Bluetooth: hci0: Firmware Version: 99-13.26
-[   31.684955] Bluetooth: hci0: Waiting for firmware download to complete
-[   31.684977] Bluetooth: hci0: Firmware loaded in 523972 usecs
-[   31.721113] Bluetooth: hci0: Received gp1 mailbox interrupt
-[   31.721318] Bluetooth: hci0: Waiting for device to boot
-[   31.721770] Bluetooth: hci0: Device booted in 35918 usecs
-[   31.721773] Bluetooth: hci0: Waiting for device transition to d0
-[   31.721837] Bluetooth: hci0: Device moved to D0 in 61 usecs
-[   31.722508] Bluetooth: hci0: Found Intel DDC parameters:
-intel/ibt-0190-0291-pci.ddc
-[   31.722682] Bluetooth: hci0: Applying Intel DDC parameters completed
-[   31.723019] Bluetooth: hci0: Firmware timestamp 2026.13 buildtype 1 build
-117603
-[   31.723022] Bluetooth: hci0: Firmware SHA1: 0xde043160
-[   31.723308] Bluetooth: hci0: Fseq status: Success (0x00)
-[   31.723311] Bluetooth: hci0: Fseq executed: 00.00.04.202
-[   31.723312] Bluetooth: hci0: Fseq BT Top: 00.00.04.202
-[   33.048540] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[   33.048544] Bluetooth: BNEP socket layer initialized
-[   33.049844] Bluetooth: MGMT ver 1.23
-[   43.952601] Bluetooth: RFCOMM TTY layer initialized
-[   43.952611] Bluetooth: RFCOMM socket layer initialized
-[   43.952613] Bluetooth: RFCOMM ver 1.11
-
-Linux 7.0.12 with 5917dd39, Firmware 20260519 $ sudo dmesg | grep -i blueto=
-oth
-[  235.299907] Bluetooth: Core ver 2.22
-[  235.299924] NET: Registered PF_BLUETOOTH protocol family
-[  235.299925] Bluetooth: HCI device and connection manager initialized
-[  235.299929] Bluetooth: HCI socket layer initialized
-[  235.299932] Bluetooth: L2CAP socket layer initialized
-[  235.299935] Bluetooth: SCO socket layer initialized
-[  235.340849] Bluetooth: hci0: Device revision is 0
-[  235.340854] Bluetooth: hci0: Secure boot is enabled
-[  235.340854] Bluetooth: hci0: OTP lock is disabled
-[  235.340855] Bluetooth: hci0: API lock is enabled
-[  235.340855] Bluetooth: hci0: Debug lock is disabled
-[  235.340856] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
-[  235.340857] Bluetooth: hci0: Bootloader timestamp 2023.33 buildtype 1 bu=
-ild
-45995
-[  235.341842] Bluetooth: hci0: Found device firmware:
-intel/ibt-0190-0291-iml.sfi
-[  235.341845] Bluetooth: hci0: Boot Address: 0x30098800
-[  235.341846] Bluetooth: hci0: Firmware Version: 99-13.26
-[  235.403312] Bluetooth: hci0: Waiting for firmware download to complete
-[  235.403315] Bluetooth: hci0: Firmware loaded in 60029 usecs
-[  235.405554] Bluetooth: hci0: Waiting for device to boot
-[  235.405579] Bluetooth: hci0: Device booted in 2206 usecs
-[  235.405580] Bluetooth: hci0: Waiting for device transition to d0
-[  235.405580] Bluetooth: hci0: Device moved to D0 in 0 usecs
-[  235.405731] Bluetooth: hci0: dsbr: enable: 0x01 value: 0x0b
-[  235.408475] Bluetooth: hci0: Found device firmware:
-intel/ibt-0190-0291-pci.sfi
-[  235.408482] Bluetooth: hci0: Boot Address: 0x10000800
-[  235.408482] Bluetooth: hci0: Firmware Version: 99-13.26
-[  235.653214] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.653367] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.653539] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.653673] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.654661] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.654798] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.654998] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.655161] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.656670] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.656790] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.676405] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.676593] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.680410] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.680540] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.680908] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.681047] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.684592] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.684693] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.684817] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.684924] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.685464] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.685583] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.685708] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.685831] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.689008] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.689155] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.690617] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.690721] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.694404] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.694523] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.694671] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.694785] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.695897] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.696005] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.696186] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.696299] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.699381] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.699483] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.701368] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.701469] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.702431] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.702535] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.703859] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.703953] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.704123] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.704230] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.704426] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.704528] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.704714] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.704803] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.705816] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.705899] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.706020] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.706147] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.706801] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.706905] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.710379] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.710481] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.710639] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.710747] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.716898] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.717012] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.718284] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.718378] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.718593] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.718679] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.719490] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.719575] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.719732] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.719816] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.721102] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.721200] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.721444] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.721541] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.723024] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.723163] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.724594] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.724685] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.725061] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.725141] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.725816] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.725918] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.878235] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.878324] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.878449] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.878530] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.885430] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.885514] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.886566] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.886633] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.886755] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.886847] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.914645] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.914746] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1003)
-[  235.963268] Bluetooth: hci0: Waiting for firmware download to complete
-[  235.963274] Bluetooth: hci0: Firmware loaded in 541794 usecs
-[  235.999442] Bluetooth: hci0: Received gp1 mailbox interrupt
-[  235.999526] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db100f)
-[  235.999536] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db100f)
-[  235.999659] Bluetooth: hci0: Waiting for device to boot
-[  236.000092] Bluetooth: hci0: Device booted in 35942 usecs
-[  236.000093] Bluetooth: hci0: Waiting for device transition to d0
-[  236.000158] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa0db1007)
-[  236.000162] Bluetooth: hci0: Device moved to D0 in 67 usecs
-[  236.001511] Bluetooth: hci0: Found Intel DDC parameters:
-intel/ibt-0190-0291-pci.ddc
-[  236.001689] Bluetooth: hci0: Applying Intel DDC parameters completed
-[  236.002010] Bluetooth: hci0: Firmware timestamp 2026.13 buildtype 1 build
-117603
-[  236.002012] Bluetooth: hci0: Firmware SHA1: 0xde043160
-[  236.002292] Bluetooth: hci0: Fseq status: Success (0x00)
-[  236.002293] Bluetooth: hci0: Fseq executed: 00.00.04.202
-[  236.002294] Bluetooth: hci0: Fseq BT Top: 00.00.04.202
-[  236.035455] Bluetooth: hci0: Controller device warning (boot_stage:
-0xa09b1047)
-[  237.596110] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[  237.596115] Bluetooth: BNEP socket layer initialized
-[  237.598181] Bluetooth: MGMT ver 1.23
-[  250.315840] Bluetooth: RFCOMM TTY layer initialized
-[  250.315848] Bluetooth: RFCOMM socket layer initialized
-[  250.315852] Bluetooth: RFCOMM ver 1.11
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Best,
+Siwei
