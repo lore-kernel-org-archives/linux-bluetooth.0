@@ -1,153 +1,130 @@
-Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25CC8413613
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 17:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B4F719F11B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 18:09:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781543082; cv=none; b=fri0cLfcLXIDLZEaZwKy3jRSyZGi6jaWGfxaifQ8UX5HBV7mJb/VJ53dF+bohTf1PjbVkt+PmoVcCzaFhbeXBUEtsVSqYwzA87CZsHD9gpm/mowaBGYOWI1RnoRiigB4umkt06jvWHPy0a+sujqH+iCNP28TpjsoEGjMdRdiXvA=
+	t=1781546944; cv=none; b=AV9Hm6akb+iEQk8rb1FHH7SA6IQnnDry3sAQbUXZIRwEGI4TSEfiNu2V5gJsy1qooQEL1F6OfvZ0zj5w6/KSXuNgGJY+KbJ+FqBkgzmVjmw8tjW27tIfkVl6RnqhjfgrDQ55E1CgLmTlbGF5f8lBF+ThkS6tWNc3d/bCLKIqieo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781543082; c=relaxed/simple;
-	bh=jnbWROcw7C95hKk6GcsF3kqgQrH+TLTrfqLkSmQkCQc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=bwcBfkqk4CKLUA10BTblj6LL2cMK1CL5NQEtFo9dxbX6sV8GY04BKqydouLz0VbXrbwf6IDjsrYXaV4Ite8DqOGhTA4I6SPkeLaJaXS/PBDqWZfEC8lCPVXXbaJvMn7rLHWXyG318MpRWjnpOYsx4XAiokxMd4fWOuUvn9NChD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=japm5pcI; arc=none smtp.client-ip=74.125.82.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1781546944; c=relaxed/simple;
+	bh=mMtgPsEVQRv9zyyCA+LgPIw31NIb/ec3IqMD0bQx3yQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=lJ/vSStl/N2HR/RsHvoRgFrFMaOrqVB3EIzGc2SsAD6FJBcNzoV4i9D6+D3oocU/oLZRRydNQGXHrVm9P4lulTlb6TSok97SEwwx07OqJ/gVrIjYreX0l05VtrPU+qG8hyE8ce7QgsaTDk6RH6+0Tf7+8QzM8cuECLmyWHVLhvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=EozaK/o7; arc=none smtp.client-ip=192.30.252.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="japm5pcI"
-Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-1370417c01cso4639150c88.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 10:04:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781543080; x=1782147880; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=4De+l5oUxOBGxpCYLzK6bCNObFtRm+SxyI56OFSWeNY=;
-        b=japm5pcIivTo075UixuR9vzywTHkfj/fFiqfc6fHWFHFu5yVjoC7qb5Khg/ffnG3b7
-         zOuVTicMdywpoGZatEp4657b7lvP/rWoxcCQ6GT8R0NwCNNyJjw+6JfsSBK9/WBW/AGy
-         +aW5fQYoCJ2NG5IAKtfFCDEmTSRJlyi9CxRgU98P4RttL6zH41ZlLQ1O0Sm0f7rZodVs
-         wxzxFQsNaHYnkTgItN08vIbQykjCm0i+9LLvPxwUXPtiwAHOB5uvwxstf91xIU1KmtQB
-         vOi5TtiVYxlIHrPuFbBSk09u8hUSjSQyM0KizpmMRPfik+Agif+2s2QHmx/1RY1ezMsN
-         nEtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781543080; x=1782147880;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4De+l5oUxOBGxpCYLzK6bCNObFtRm+SxyI56OFSWeNY=;
-        b=ZxpXrwx165oCBPPoLZgesDjPjfCA285ItgsMv9H+4G3A0he0ECe2rhuu2fUkoVNfsG
-         hlt1jjbwpcv/NLXJN1SXHtCUCLDLZ7MEwWfqJTfWlMwim7BB1ziqhJBa4Rsx34NhQvVL
-         pUx9T/gftP5bKQd+UfO0C13hNaiHutVWCVgHv3RLTn9hNPDDq3T+FT69MgilTc/FWISy
-         4YLwztB7yGA3Ok7Kkd0Y0zP10/bWsLCzHI/1OOvv/JL6H48450vhe1DHruHOukqBPeI4
-         HLWaKjCN6p3DuIZBTMwsb2YvVInKeWVp0g34uRydtRoNdLzL/5z6bQ6K+X0c1CMmxZ9X
-         ndTQ==
-X-Gm-Message-State: AOJu0YyFtbXnBbPb9ka9B2uMTh6yJm2LqiTf0ViF+f8E2lJdrrhEWHE7
-	XIHrhbRW6OJokkmZCZVoU0o0vcVF5TtpbRSoUK5z95hj2Eycyi7XB8L1RIKGrQ==
-X-Gm-Gg: Acq92OGsUb8RQPwX8KGubnRFz1JG1qLRQD1NUIzgbNeLMhElMo7VKGmcOMggmrdS1Ji
-	cjDERpf4XDGC6wER0VblI7kzjwcipCLotsG4ljAhIsQOV8zpmd+a8IShqv3IQuvRBP1JDzcZqSG
-	HwhK4e6PCSRE7ZvAw3Hsyz7Mw/xwUYkr1Kwif9iYBuYhQGgR/XGuSEOqgkW9xHo2fQ8r8iemVAI
-	MRdFby9OFDwal9QuuzpLva5ZmVIeb9lEoXNsd6CL4OZcw+bhCM4LDlhGMCsibekFHGANeJZ5KRX
-	f2q/5Jbx+bnPtCo4E64QxFKZWNOmTP94Ef1PdbToMM+mdT8CceQ+ccNAqzZWucDEzKeZ1y+Q6K9
-	pMfDB16ppL0WoDf9E9pmFamEjiaQTL6PPAAjnL2A6KXuoMCGAHVWgLhDP4M3itUc00X9Shns1Ik
-	qLDJgq1MQFPzCaizRK+Pqkn2CMWxiigZ1b
-X-Received: by 2002:a05:7300:a54c:b0:30b:9e70:5bf5 with SMTP id 5a478bee46e88-30ba5f125d5mr34775eec.17.1781543079954;
-        Mon, 15 Jun 2026 10:04:39 -0700 (PDT)
-Received: from [172.17.0.2] ([172.215.209.244])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081eb8f8b2sm15655875eec.27.2026.06.15.10.04.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 10:04:39 -0700 (PDT)
-Message-ID: <6a3030a7.f732ad81.18cf48.63cc@mx.google.com>
-Date: Mon, 15 Jun 2026 10:04:39 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6671157589426588300=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="EozaK/o7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1781546942;
+	bh=sUsJFRIPtwhLW43weMa1mivBIx7N5hDp5cC5YF2qz50=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=EozaK/o7YFIV5zntwR8B7F5uBarvmKwlOjiTpIbabcFLJ22mBv6yVaw4kNPb9b2f6
+	 65UtLO9uCRjlDZPGljeKh98f1wG+RHVMexPIHOuz3Tg+ESP0LWhnBD+JL112hZdgxG
+	 Y71+bYSCk6ZDBZMuhnezfz7NYXRP9QRgxnqJULdc=
+Received: from github.com (hubbernetes-node-d206f49.va3-iad.github.net [10.48.15.56])
+	by smtp.github.com (Postfix) with ESMTPA id 7D39C280151
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 11:09:02 -0700 (PDT)
+Date: Mon, 15 Jun 2026 11:09:02 -0700
+From: =?UTF-8?B?xaBpbW9uIE1pa3VkYQ==?= <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/40f2e3-9c36e4@github.com>
+Subject: [bluez/bluez] 237d4d: shared/bap: Transition ASE to QoS Configured on
+ CI...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, oss@fourdim.xyz
-Subject: RE: [v6,1/2] Bluetooth: hci_conn: Fix null ptr deref in hci_abort_conn()
-In-Reply-To: <20260615153527.1583705-1-oss@fourdim.xyz>
-References: <20260615153527.1583705-1-oss@fourdim.xyz>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============6671157589426588300==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 237d4d5d20a556ea11f6cf5d0013884a0a70962e
+      https://github.com/bluez/bluez/commit/237d4d5d20a556ea11f6cf5d0013884a0a70962e
+  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
+  Date:   2026-06-15 (Mon, 15 Jun 2026)
 
-Dear submitter,
+  Changed paths:
+    M src/shared/bap.c
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1111791
+  Log Message:
+  -----------
+  shared/bap: Transition ASE to QoS Configured on CIS loss
 
----Test result---
+stream_io_disconnected() only handled the Releasing state, leaving
+Enabling, Streaming and Disabling ASEs stuck when the CIS was lost
+unexpectedly.
 
-Test Summary:
-CheckPatch                    PASS      1.82 seconds
-VerifyFixes                   PASS      0.09 seconds
-VerifySignedoff               PASS      0.09 seconds
-GitLint                       PASS      0.47 seconds
-SubjectPrefix                 PASS      0.16 seconds
-BuildKernel                   PASS      26.58 seconds
-CheckAllWarning               PASS      28.89 seconds
-CheckSparse                   PASS      27.60 seconds
-BuildKernel32                 PASS      25.49 seconds
-TestRunnerSetup               PASS      571.42 seconds
-TestRunner_l2cap-tester       PASS      58.94 seconds
-TestRunner_iso-tester         PASS      96.66 seconds
-TestRunner_bnep-tester        PASS      30.75 seconds
-TestRunner_mgmt-tester        FAIL      207.20 seconds
-TestRunner_rfcomm-tester      PASS      30.92 seconds
-TestRunner_sco-tester         PASS      31.50 seconds
-TestRunner_ioctl-tester       PASS      26.69 seconds
-TestRunner_mesh-tester        FAIL      25.83 seconds
-TestRunner_smp-tester         PASS      22.80 seconds
-TestRunner_userchan-tester    PASS      19.22 seconds
-TestRunner_6lowpan-tester     FAIL      45.81 seconds
-IncrementalBuild              PASS      43.45 seconds
+The ASE shall autonomously move to QoS Configured on loss of the
+CIS and notify the peer
 
-Details
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.234 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.808 seconds
-Mesh - Send cancel - 2                               Timed out    1.989 seconds
-##############################
-Test: TestRunner_6lowpan-tester - FAIL
-Desc: Run 6lowpan-tester with test-runner
-Output:
-Total: 8, Passed: 3 (37.5%), Failed: 5, Not Run: 0
-
-Failed Test Cases
-Client Connect - Disconnect                          Timed out    5.480 seconds
-Client Recv Dgram - Success                          Timed out    4.991 seconds
-Client Recv Raw - Success                            Timed out    4.993 seconds
-Client Recv IPHC Dgram - Success                     Timed out    4.999 seconds
-Client Recv IPHC Raw - Success                       Timed out    4.993 seconds
+Fixes PTS test BAP/USR/SCC/BV-167-C
 
 
-https://github.com/bluez/bluetooth-next/pull/318
+  Commit: 986e220b77ea7803af0279200db7b011667302d7
+      https://github.com/bluez/bluez/commit/986e220b77ea7803af0279200db7b011667302d7
+  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
+  Date:   2026-06-15 (Mon, 15 Jun 2026)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M unit/test-bap.c
+
+  Log Message:
+  -----------
+  unit/bap: Add CIS loss test
+
+Verify a Source ASE in the Enabling state transitions to QoS Configured
+rather than Disabling when its CIS is lost.
+
+Assisted-by: ClaudeCode:claude-opus-4.8
 
 
---===============6671157589426588300==--
+  Commit: bd9eac15a27ac2eb14f9b2f69d046088d687bfa3
+      https://github.com/bluez/bluez/commit/bd9eac15a27ac2eb14f9b2f69d046088d687bfa3
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-06-15 (Mon, 15 Jun 2026)
+
+  Changed paths:
+    M profiles/audio/media.c
+
+  Log Message:
+  -----------
+  media: use custom DBus timeouts only when remote side is waiting
+
+Under high system load (VM instance on boot) it's observed the 3 sec
+timeout BlueZ uses for BAP broadcast SetConfiguration may be missed by
+Wireplumber, as these are set up immediately on startup together with
+any other setup (eg ALSA) that may need time.
+
+There's no actual need for using a short custom timeout in BlueZ for
+this, as in this case there is no remote side that is waiting for a reply.
+
+Fix by limiting custom timeouts to cases where there is a waiting
+remote, and use separate defines for A2DP and BAP.
+
+
+  Commit: 9c36e4189e32f4b8ab1376749dda4b97e71af9af
+      https://github.com/bluez/bluez/commit/9c36e4189e32f4b8ab1376749dda4b97e71af9af
+  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
+  Date:   2026-06-15 (Mon, 15 Jun 2026)
+
+  Changed paths:
+    M src/gatt-database.c
+
+  Log Message:
+  -----------
+  gatt-database: Prefer notifications over indications
+
+When both notifications and indications are enabled (CCC value=0x0003)
+we will send notifications by default.
+
+
+Compare: https://github.com/bluez/bluez/compare/40f2e34b3739...9c36e4189e32
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
