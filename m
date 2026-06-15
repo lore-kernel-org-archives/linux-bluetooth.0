@@ -1,78 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074EB3064B2
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 18:10:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62132EB5B8
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 18:10:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781547013; cv=none; b=aMppKN274cWETDH2pHIvzjW4+lLL0hDiPArPLeMtGuEebHBLnFaw2ND/un+BNIPrhvSoj5jJ5jqHZmcYUNfpoxOFAWX4GuWJevneMPzSIyQA/5vm5ajpp0LKVuqt5FTOXcmQwPCntvbFdC88tHz3WDi/YC1CaG4jtRWxj8OHzaE=
+	t=1781547017; cv=none; b=VLpAyoRjqRbfLmjZqZbGkhschzZq5zkxbi2EM1z7oWeZZqrY63JNUvYgZmyKNQnELYZCu1iTWzXhVSoKJvL8zxKYAgYi+toxENT7kcy4rdfHpNF6hHeWPTttGybproUewvGYvdq9OqtNcWq3y5dIEww32V/4QQOywcJbmbsejP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781547013; c=relaxed/simple;
-	bh=SyBzDH2Pe0HsgTjYwWD2W+NC7uB+DonM8p25C1jaS1g=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nSI+TyUbvXhP8gPGKTg8kBv8gta93Pgfh0tHrERu4ma1Zvk02z9+hMvzT6E/BBWPlIM1OnEXuEjni17Shsf3OK/WYTcKy52bFWdTdx/Xfa6HdwZAE/04aKTfyVOFCYlS0Za0ADjhf//rFcTAswswqDr4pfQERn9YXuyrAwdlGvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iBug0rsu; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781547017; c=relaxed/simple;
+	bh=vt4MZw74squZwSuNIHqVBqGmbRfwTiUybHBgV1SnZdg=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Sy5tXj2eZMU7W56rFmuBeEozcQsLLrvNqPwFEIdEWcuETdSk7SecC0ZYCvS9I3w2it7ythC+mE4BAT+9AncshDTqXP9YWYXWTbe5TqN6YXGhkCfjMeGsz8RalghrrADDnvrFhgGdiCnwy3PwvfhuZAQ6Dl/D6DG+UfLyW0121gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=SO4utPTS; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iBug0rsu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4D221F000E9;
-	Mon, 15 Jun 2026 18:10:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781547011;
-	bh=vHFBupYw9MSOmbiWNWLr3UIfqnNc0hADHqZxevGE38s=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=iBug0rsuvM0DiIQYdjY6bkNmLE0tabqG22Lqv7zbk7nIRxiAqHisYslSP+SgBPCbn
-	 3Y2cBPPJBKGjIkVs60lP89ams2f2UNwAYGrhXPl7kXI9Bpjt50+BVmpBZCZPL21rVy
-	 WAIgs/3CReBXsQOd5sS3jqmsN2+hfFd7lSbas/MtpUx6lj4xNUqaAUbXscYKdFA+qn
-	 OCZH80kJVzNvLpo7yD8CMMnDoJMNQgPSLL/VzwQW14mtn0NpiSh3+eFaEvnfA4jTjv
-	 jx/NDLqNybJCwasuoXyxInwe97earXxvJb/a/TnYjYrV7+xrD5xDWogQ81fdxeu4cG
-	 A4Wv4plMm2iwA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198543839A06;
-	Mon, 15 Jun 2026 18:10:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="SO4utPTS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1781547016;
+	bh=wpXwL4pf/UzYzWaUpffF6iifMn2FXRuq5Qrk9AcgOPg=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=SO4utPTSk7Rs+RyXyEsOO/2ZdVGb4onOBYya2Jbo0USYPLUGn9hYU7hj4C5+mUNwp
+	 FnGNtXeRyldvyDmKfiE07GIoKgRJqN01tFl0RCOmmbDEp9eNTrwXAlXyAwmTi7R+pr
+	 V2XdiGE8D38MRkOC6LmnntXwZqBSFQye9tHJyYo4=
+Received: from github.com (hubbernetes-node-7c2ab5f.ash1-iad.github.net [10.56.194.49])
+	by smtp.github.com (Postfix) with ESMTPA id 1A9F760104B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 11:10:16 -0700 (PDT)
+Date: Mon, 15 Jun 2026 11:10:16 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1111256/ddb5d4-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH RESEND] Bluetooth: btusb: Add new VID/PID 0x0489/0xe156
- for
- MT7902
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <178154700663.231677.10761395159710291118.git-patchwork-notify@kernel.org>
-Date: Mon, 15 Jun 2026 18:10:06 +0000
-References: <20260614141258.1011-1-kirill.kz.902@gmail.com>
-In-Reply-To: <20260614141258.1011-1-kirill.kz.902@gmail.com>
-To: Kirill Shubin <kirill.kz.902@gmail.com>
-Cc: luiz.dentz@gmail.com, marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org,
- sean.wang@mediatek.com, sean.wang@kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/1111256
+  Home:   https://github.com/bluez/bluez
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Sun, 14 Jun 2026 17:12:58 +0300 you wrote:
-> From: Sean Wang <sean.wang@mediatek.com>
-> 
-> Add VID 0489 & PID e156 for MediaTek MT7902 USB Bluetooth chip.
-> 
-> The information in /sys/kernel/debug/usb/devices about the Bluetooth
-> device is listed as the below.
-> 
-> [...]
-
-Here is the summary with links:
-  - [RESEND] Bluetooth: btusb: Add new VID/PID 0x0489/0xe156 for MT7902
-    https://git.kernel.org/bluetooth/bluetooth-next/c/5d31430fc208
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
