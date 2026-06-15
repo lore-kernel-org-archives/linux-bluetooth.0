@@ -1,80 +1,85 @@
 Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925553F5BF7
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 15:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DFA2405C5B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jun 2026 15:35:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781537750; cv=none; b=gn7ijSP6d+OoynZe5fnME2XjcSKrhXsI6umLa+VhCf7fbXlGHzSKJ53+tOCMs2yaaa1mhju9oWH1iWCc21Wanc4lpteGLeqDdFeLfSoT8D2fo6B7JIv+QQHYFDU1drQc3qmxtQNjewu0gdJt7C1GgH1jBiIeuPEDUIdU0MWmuuA=
+	t=1781537752; cv=none; b=BEmv6RxJnxdcA/McHZNKudazv+XNjBwHFyzNhtYlFtkfxBbD+x4pqPlQuSJ1QxKXgxbTUWoikl+3Q9UFNEBQuKV5Ss+AhLxllZaRJsym/ZhZQvS+1apYuOFiN3lx0//jlGzdppsRQj1VpWSZFX/LeKouDnNX5ml+lj7yHUVJ3pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781537750; c=relaxed/simple;
-	bh=7oBTv+6/hayvwUCPUxINXKgQf9WmyYpqt2FO+7mfFJo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GUUwtSyzujXTU9bkUb+qN0lpoPc0sgTBe776rf6s0Hv36uocShd/KTBinvlFUJlPZFFceUGleLzDEf5bKB5hfL1c6bE/T6qrv/rvUnVJt+odP99Vj5itadFAOrkkA4uh9B0XYheSbOIiGZyiuuVEVWpLQA8MWhM2ZKRuDz8zFUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=H3AtY/af; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AGnfcwF2; arc=none smtp.client-ip=202.12.124.158
+	s=arc-20240116; t=1781537752; c=relaxed/simple;
+	bh=VGAjdfBEnTUl1mva6o9msf94i7marQlUeHSmYkHmYq0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bPO1MxOQMIFR29S//sHYCmLHPENbcD/Gc8g1CdoCFRSCOz93v1IyQXTNwzgkohRgxQfhNnm898rDr7TA/DaXYOK2+IU/MyDH2+q3BBEqnY+Q1xr4s6vml/WitbpFkchjb81+/H3WDtkNXh3fPM08U3LEdamHGAP0tJnbOodrc4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=W8DfFQoK; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=S2h6JWgw; arc=none smtp.client-ip=202.12.124.158
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="H3AtY/af";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AGnfcwF2"
-Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id A9F617A0158;
-	Mon, 15 Jun 2026 11:35:47 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="W8DfFQoK";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="S2h6JWgw"
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id A98707A010F;
+	Mon, 15 Jun 2026 11:35:48 -0400 (EDT)
 Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-08.internal (MEProxy); Mon, 15 Jun 2026 11:35:48 -0400
+  by phl-compute-09.internal (MEProxy); Mon, 15 Jun 2026 11:35:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm3; t=1781537747; x=1781624147; bh=HlAdsSmqJtO+BDiHqadnC
-	ROH4Ldu+XW0KLz3ML28/nE=; b=H3AtY/afw6QqwfHujvniAaZGZyro3F1Nkkuh2
-	jszz+M+dr+ApgZCvzLulRxe7j5Qf02YybSbnfwtsdp+A299IhWx8WKtabwMt3Lix
-	yBMaXzB5Am+ciWWVeNOhYzcx/SIMmBFve+m/x7aCONWZeO9Uq5651kMqjn8naawf
-	6MoNxFSBVff3MLx6+e9w2v2OLWm0so74NqzHLTRcgrDJJIWaCvEmJjZHptS0j355
-	myuDaeKau/vvbUtgMTMdF8V3LKdC1IanuslawJVK6Cb7uyGauGa0WZnBxaFvZ8Ak
-	jJq5juzDmtMrNpry3NPGrxFoqS5WUIt8doIR8boAAvc/UsrOg==
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1781537748; x=
+	1781624148; bh=h0nVIc1sEebwSWFb8/6Rd0AOalhx+hEokGEFT5SCnsw=; b=W
+	8DfFQoKS8krRwDxrzs3dRhzaYUQK+GYCnylSwwzX9z9h1t00I0Kfa2pZFmZG2T/C
+	NGS+raE0UJZSXGA//e88Ttjm/h8Zi3ZbHcGUpInDCG5j4JkoR9gU4RNxTvOtBjB8
+	BdoziOGr88DHxM2xFRC87F7A1s0OzmgJPw+i/UB1FhvfzoiXWQUqxn0Ejz4ZUXt4
+	TVkGEgQP6CHSdNezTjuor8NvlNux+YzqyNGVUzyB8B249bXCqXYq+byqhfMDyuFI
+	VZVaq4dhGUBn5fHAkZT71E3cbRmc5n35gZt8QJ/6fx5NMhtPqcIJosrGHvLHmPAz
+	mNfQ5CPJG2al1X13JrksA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1781537747; x=1781624147; bh=HlAdsSmqJtO+BDiHqadnCROH4Ldu+XW0KLz
-	3ML28/nE=; b=AGnfcwF2AF7Uthjqp+VD2mT7zceuXii8JnDlJBayDTBai1K77dK
-	U9YnLGy9+HtFolQBN/bmvImJE0phU8AAMCQBnllYtvhHdfIQ/tzzYsFjIUKes33P
-	ozWEuuezCpeirmUoUBgHlESjruM7/FskU6EeIJxPFYKhYoz6gJbju09w+9f0tUwX
-	b9lHdBCQfpWdKay+anuii3LYF9nKYh7SMfMPkqeaiJS5jtFeOKAj0of64m9Hs7KC
-	SuTz4b31H93DAcX2jpxwleB8b4paEnPGI3NSKsRuNlPA1eTswiqJMaZDMPTww1s/
-	DUHMD9HHMMHKDCcO+K86JVszzyQiry+MwWA==
-X-ME-Sender: <xms:0xswaoU1V6AlAR9lesVPmBPPVcGVZAy1r8Bfrz0JpAi0eHAkYcVoSw>
-    <xme:0xswajcuAGeZO-4-WfCJouTKPAEhSqqpb1Q28ytkcPQpIqKsJjYVyFTwZs2DwFlbx
-    44YcxFpYxTe6khA5yjxFOytj-yShJ43G3HmgduWyDTStwOFnpCocbY>
-X-ME-Received: <xmr:0xswakuqX_TtXkXvVdRO8wn_22J9lCC_YMCgrV4Tbtz7j2DtlSZWne9rlQQV8P0LTmfZNpE>
-X-ME-Proxy-Cause: dmFkZTE7uUFTYA8FQpmTRaUkCMQ/ILMFuXpQEuiNLo+HVi9S5DTmhM33e0nu9lVd0Wa/x9
-    qzylNvH8yd0DWWrXzGZZB8O7DfHSh4EgbDcszzf+Uxh6r+a+ODFE4eKB4I3AeRt7b39O7N
-    WvYh7hCYpz84dKqOIXfohkvEKXjY/PHqyBw1bOMPJgxREsgq/fVsrfEbaFP4N5OJh8x+lW
-    OYvFTTfPik9McQpLKY5KQDszoevFWY2vxn4Wo9Pw/Dg/c5aDAIK4RXE8PlxGfVBfWQWVVo
-    oN6JUYxSjZWnGrffvM7FPe0P6vplZ8vvjbOOL4cGpLK+SieoVrtPQVvYmcoas+iaTcUogR
-    xVQFfvEgtwpdiNJtEqoxiqxK3hQ/oQGyoE+Lnjwm+BQzzsvEjHYUl+QhutaH0maRpJZ3M7
-    N14t6lOIteg2s7MIK/w5PUtW9xvYxN9G79s3ZHOCtbDttk9ox5/uib3cbS6hE7WpIeqxPJ
-    lsARtoLJIUyKAgOU2jcoZ+v9Or3gP3NG4LcjBsaeMl6oeG9xj0oofCQUsGYTnz62LENUAJ
-    8jkHILr8NqawLOjRKbmmrt3GE8Y9PH24LN7lY+ACG5zeEMEUFgepTw41WvHSSImFSSde/4
-    AbZSgoeAluSbbpBe2i0fzUTM7MPDOrtHXKFJXHYTI6T4E7HO3Q4EE4BCyk1w
-X-ME-Proxy: <xmx:0xswai8OgIyOSI6-2sdIPS52GqKt5B8YwvGU4FKYVS0KBrz2tc97ng>
-    <xmx:0xswav0ArunMr-_r4hw2OXZJiuxihB6ebRooHRxb8-rxs0DgMEN_OA>
-    <xmx:0xswanATMicA2v2YcZ6f3MeGcsqf6Dkr2tmEJXgOj_kQK3Q57RnnSA>
-    <xmx:0xswarcuQg-PoZ_ul-36Upla6qIEFhtRsyVJFfCvmQvUAocePEUxFQ>
-    <xmx:0xswav8sTD4g6sv3v1sg_Y7jVF1AXx7LcklIIyBeoO_tTk0kCVNt5asH>
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm1; t=1781537748; x=1781624148; bh=h
+	0nVIc1sEebwSWFb8/6Rd0AOalhx+hEokGEFT5SCnsw=; b=S2h6JWgwrPcLp8kp9
+	YL//KmsAtWnNKQAXp6t5OpkQPDIMAhcHwaX6G4w4s0gTje65Ml/PUbweFKSyxLNF
+	syOLUAudpvktMGYx0wUWVlUL1nMWBNwx8hNO2Kbu+BtdqhSurw8AhTsFU7iSgjsH
+	oFu24syLY6c7WD7WsXuM8eb23htpFc8RRN2qfD02B4B8Yy4EY8oxmjhWE89I5qut
+	jzaWloFDX+AOuhqHleX4DLnhg3FB/YH1psyY7w5AIHoCvfAJMGaZo+AtX+GUn/T9
+	E5ilfhQK7QMogIKcBG/YO+zgk1K+aEUvQDfA33qPNYb4i6BuSnVkJfnufzn4NC3X
+	EOSBA==
+X-ME-Sender: <xms:1Bswap47fM60eXZfcezcXSE4ySL8agaZV3vlDM2gCu4IXRvZeJ9P9w>
+    <xme:1Bswatw8Sp1lUwb6_mpk9CWZorl2HpQTE-3p6apqu3pbhlXKKf5287OXoUBSWhBKP
+    4nDON8UkHbhxDgaY6FKtK7id3Z5MN5uVtmzs1kmRT_yKbMr8fhGFJV->
+X-ME-Received: <xmr:1BswaowkLDGdgGNqV4MxPcYNVzugab7L9LusaeXB7wRepjdwS-8-OMSVQNOi-T1qgqpFuyo>
+X-ME-Proxy-Cause: dmFkZTFTmZP9HVjvt/nPkc+97j07Sz3Waeg45tErepInKmn+4j/2aUWc+YLWZfU8BsbgWb
+    YnttoV8uAlXBpmpfx9J9XWEPg4Qgm3395uypJGKbIXFKdma9DISgBGGecW/UipHZ5ZBJW2
+    JLJD/U+QWUe6J04u11l+RVPjkBJpWSAoIo9eotnGF2286smNGPUDThJgbiFv3Eq4w7o+q9
+    aiqeN8YHKRJk2oDGpiOFKqPyhfzyf9A501q+ztTBsPSkohh6Af4kv3qvlJivYqSxY05w/r
+    gfHDjAXxqpt1jWJDzvRxvkLhNIfeut17YYC8AXKwNOvSw0sdO2vkUOUfiynB4Bv6E1knW9
+    Mdfzc3pVnH4EYYCgw4nFuA8QqO7zSbi3Fd/dAgc2/AsccIa5lGTXUWP7DInvxXOMdkNact
+    TDaIwC2cLjPOHuYhd6w1tOhlA220bb957p1a6o7V9Dz4CrGjPUapg+Au3Xo4i2vJ6lFyMU
+    0EaGPOKWYL9ck0FygtrpqeY2FE411AVyVfiysWLjqjPjSBKbmXzRTRCtSoH3BMVXWBfhVI
+    HxdBUHc2bd6umifWJh9JZpEO2l965D60xkLKvG0ErIyB8/qRxcIC8b7dc/ToLwd2gVrcop
+    /N89HdHiz4nvAmn+ZBnEdTXuRJNnbCSHFcNlaKlViPGw6Wx9KuaJBINuGqZw
+X-ME-Proxy: <xmx:1BswatyBUjcBXdSZVNQiqkchsE4nte6JoapazmqyOGATTm6K9M7r4A>
+    <xmx:1BswaqavsmIPEfXLV4Ddq9qJHm-JZ3weLUn_DCsqpUZJk-McpamK3A>
+    <xmx:1BswamVH6HRjN9LWTxibqT9h80fnMduxP_ZoJzZjrTa4oqCp0uYP3Q>
+    <xmx:1BswaghsYDSi2iKKk74VqLOfHa3PAqkM1IX7U1Qaxyc3fhvYWzcbRw>
+    <xmx:1BswajyP_7S4ZksucK9vwJ4ShqqKB7wALCUkif5QIgype8mOJXSgfeF0>
 Feedback-ID: if72e4b10:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 15 Jun 2026 11:35:46 -0400 (EDT)
+ 15 Jun 2026 11:35:48 -0400 (EDT)
 From: Siwei Zhang <oss@fourdim.xyz>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Pauli Virtanen <pav@iki.fi>,
 	XIAO WU <xiaowu.417@qq.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	Siwei Zhang <oss@fourdim.xyz>
-Subject: [PATCH v6 1/2] Bluetooth: hci_conn: Fix null ptr deref in hci_abort_conn()
-Date: Mon, 15 Jun 2026 11:33:05 -0400
-Message-ID: <20260615153527.1583705-1-oss@fourdim.xyz>
+Subject: [PATCH v6 2/2] Bluetooth: hci_sync: Remove unused hci_cmd_sync_dequeue_once()
+Date: Mon, 15 Jun 2026 11:33:06 -0400
+Message-ID: <20260615153527.1583705-2-oss@fourdim.xyz>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260615153527.1583705-1-oss@fourdim.xyz>
+References: <20260615153527.1583705-1-oss@fourdim.xyz>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -83,280 +88,70 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-hci_abort_conn() read hci_skb_event(hdev->sent_cmd) when a connection
-was pending, but hdev->sent_cmd can be NULL while req_status is still
-HCI_REQ_PEND, leading to a NULL pointer dereference and a general
-protection fault from the hci_rx_work() receive path.
+hci_cmd_sync_dequeue_once() had a single in-tree caller,
+hci_cancel_connect_sync(), which now holds cmd_sync_work_lock across the
+in-flight create flag test and the dequeue and so open-codes the lookup
+and cancel under that lock. That leaves the exported
+hci_cmd_sync_dequeue_once() with no in-tree user, so remove it along with
+its declaration.
 
-Instead of inspecting hdev->sent_cmd, track the in-flight create
-connection command with a new per-connection HCI_CONN_CREATE flag and
-route all cancellation through hci_cancel_connect_sync(), which
-dispatches to a dedicated per-type cancel function. The create command
-is in exactly one of two states: still queued, or in flight. The cancel
-function holds cmd_sync_work_lock across the whole decision: the worker
-takes this lock to dequeue every entry, so while it is held a queued
-command cannot start running and an in-flight command cannot complete
-and let the next command become pending. This keeps the flag test and
-hci_cmd_sync_cancel() atomic with respect to the worker, so a queued
-command is simply dequeued, and an in-flight command owned by this
-connection is cancelled without the risk of cancelling an unrelated
-command that became pending in the meantime. CIS uses the same flag
-mechanism via HCI_CONN_CREATE_CIS but cannot be dequeued per-connection.
-
-hci_acl_create_conn_sync() and hci_le_create_conn_sync() clear
-HCI_CONN_CREATE after the create command completes, but the command
-status handler can free conn via hci_conn_del() (for example when the
-controller rejects the connection) while the worker is still blocked on
-the connection complete event. Hold a reference on conn across the
-create command so the flag can be cleared without a use-after-free.
-
-Fixes: a13f316e90fd ("Bluetooth: hci_conn: Consolidate code for aborting connections")
-Cc: stable@vger.kernel.org
-Suggested-by: XIAO WU <xiaowu.417@qq.com>
-Assisted-by: Claude:claude-opus-4-8
 Signed-off-by: Siwei Zhang <oss@fourdim.xyz>
 ---
- include/net/bluetooth/hci_core.h |   1 +
- net/bluetooth/hci_conn.c         |  21 +----
- net/bluetooth/hci_sync.c         | 133 +++++++++++++++++++++++++++----
- 3 files changed, 123 insertions(+), 32 deletions(-)
+ include/net/bluetooth/hci_sync.h |  3 ---
+ net/bluetooth/hci_sync.c         | 26 --------------------------
+ 2 files changed, 29 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index aa600fbf9a53..aa554c34f9ec 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -988,6 +988,7 @@ enum {
- 	HCI_CONN_AUTH_FAILURE,
- 	HCI_CONN_PER_ADV,
- 	HCI_CONN_BIG_CREATED,
-+	HCI_CONN_CREATE,
- 	HCI_CONN_CREATE_CIS,
- 	HCI_CONN_CREATE_BIG_SYNC,
- 	HCI_CONN_BIG_SYNC,
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 54eabaa46960..eba4a548bef5 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -3181,26 +3181,11 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index 73e494b2591d..818e62d9fe9e 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -84,9 +84,6 @@ void hci_cmd_sync_cancel_entry(struct hci_dev *hdev,
+ 			       struct hci_cmd_sync_work_entry *entry);
+ bool hci_cmd_sync_dequeue(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+ 			  void *data, hci_cmd_sync_work_destroy_t destroy);
+-bool hci_cmd_sync_dequeue_once(struct hci_dev *hdev,
+-			      hci_cmd_sync_work_func_t func, void *data,
+-			      hci_cmd_sync_work_destroy_t destroy);
  
- 	conn->abort_reason = reason;
- 
--	/* If the connection is pending check the command opcode since that
--	 * might be blocking on hci_cmd_sync_work while waiting its respective
--	 * event so we need to hci_cmd_sync_cancel to cancel it.
--	 *
--	 * hci_connect_le serializes the connection attempts so only one
--	 * connection can be in BT_CONNECT at time.
-+	/* Cancel the connect attempt. A return of 0 means the create command
-+	 * was still queued and got dequeued, so there is nothing to disconnect.
- 	 */
--	if (conn->state == BT_CONNECT && READ_ONCE(hdev->req_status) == HCI_REQ_PEND) {
--		switch (hci_skb_event(hdev->sent_cmd)) {
--		case HCI_EV_CONN_COMPLETE:
--		case HCI_EV_LE_CONN_COMPLETE:
--		case HCI_EV_LE_ENHANCED_CONN_COMPLETE:
--		case HCI_EVT_LE_CIS_ESTABLISHED:
--			hci_cmd_sync_cancel(hdev, ECANCELED);
--			break;
--		}
--	/* Cancel connect attempt if still queued/pending */
--	} else if (!hci_cancel_connect_sync(hdev, conn)) {
-+	if (!hci_cancel_connect_sync(hdev, conn))
- 		return 0;
--	}
- 
- 	/* Run immediately if on cmd_sync_work since this may be called
- 	 * as a result to MGMT_OP_DISCONNECT/MGMT_OP_UNPAIR which does
+ int hci_update_eir_sync(struct hci_dev *hdev);
+ int hci_update_class_sync(struct hci_dev *hdev);
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index df23245d6ccd..a3df69bdec1e 100644
+index a3df69bdec1e..753198b401ac 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -6611,6 +6611,11 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
- 
- 	bt_dev_dbg(hdev, "conn %p", conn);
- 
-+	/* Hold a reference so conn stays valid for the HCI_CONN_CREATE
-+	 * clear_bit() at done.
-+	 */
-+	hci_conn_get(conn);
-+
- 	clear_bit(HCI_CONN_SCANNING, &conn->flags);
- 	conn->state = BT_CONNECT;
- 
-@@ -6623,6 +6628,7 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
- 		    hdev->le_scan_type == LE_SCAN_ACTIVE &&
- 		    !hci_dev_test_flag(hdev, HCI_LE_SIMULTANEOUS_ROLES)) {
- 			hci_conn_del(conn);
-+			hci_conn_put(conn);
- 			return -EBUSY;
- 		}
- 
-@@ -6668,6 +6674,12 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
- 					     &own_addr_type);
- 	if (err)
- 		goto done;
-+
-+	/* Mark create connection in flight so hci_cancel_connect_sync() can
-+	 * cancel it while blocking on the connection complete event.
-+	 */
-+	set_bit(HCI_CONN_CREATE, &conn->flags);
-+
- 	/* Send command LE Extended Create Connection if supported */
- 	if (use_ext_conn(hdev)) {
- 		err = hci_le_ext_create_conn_sync(hdev, conn, own_addr_type);
-@@ -6703,11 +6715,14 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
- 				       conn->conn_timeout, NULL);
- 
- done:
-+	clear_bit(HCI_CONN_CREATE, &conn->flags);
-+
- 	if (err == -ETIMEDOUT)
- 		hci_le_connect_cancel_sync(hdev, conn, 0x00);
- 
- 	/* Re-enable advertising after the connection attempt is finished. */
- 	hci_resume_advertising_sync(hdev);
-+	hci_conn_put(conn);
- 	return err;
+@@ -860,32 +860,6 @@ void hci_cmd_sync_cancel_entry(struct hci_dev *hdev,
  }
+ EXPORT_SYMBOL(hci_cmd_sync_cancel_entry);
  
-@@ -6982,10 +6997,25 @@ static int hci_acl_create_conn_sync(struct hci_dev *hdev, void *data)
- 	else
- 		cp.role_switch = 0x00;
- 
--	return __hci_cmd_sync_status_sk(hdev, HCI_OP_CREATE_CONN,
--					sizeof(cp), &cp,
--					HCI_EV_CONN_COMPLETE,
--					conn->conn_timeout, NULL);
-+	/* Hold a reference so conn stays valid for the HCI_CONN_CREATE
-+	 * clear_bit() below.
-+	 */
-+	hci_conn_get(conn);
-+
-+	/* Mark create connection in flight so hci_cancel_connect_sync() can
-+	 * cancel it while blocking on the connection complete event.
-+	 */
-+	set_bit(HCI_CONN_CREATE, &conn->flags);
-+
-+	err = __hci_cmd_sync_status_sk(hdev, HCI_OP_CREATE_CONN,
-+				       sizeof(cp), &cp,
-+				       HCI_EV_CONN_COMPLETE,
-+				       conn->conn_timeout, NULL);
-+
-+	clear_bit(HCI_CONN_CREATE, &conn->flags);
-+	hci_conn_put(conn);
-+
-+	return err;
- }
- 
- int hci_connect_acl_sync(struct hci_dev *hdev, struct hci_conn *conn)
-@@ -7037,22 +7067,97 @@ int hci_connect_le_sync(struct hci_dev *hdev, struct hci_conn *conn)
- 	return (err == -EEXIST) ? 0 : err;
- }
- 
--int hci_cancel_connect_sync(struct hci_dev *hdev, struct hci_conn *conn)
-+static int hci_acl_cancel_create_conn_sync(struct hci_dev *hdev,
-+					   struct hci_conn *conn)
- {
--	if (conn->state != BT_OPEN)
--		return -EINVAL;
-+	struct hci_cmd_sync_work_entry *entry;
-+	int err = -EBUSY;
-+
-+	/* cmd_sync_work_lock makes the HCI_CONN_CREATE test and the cancel
-+	 * atomic against the worker, which takes this lock to dequeue every
-+	 * entry: while it is held no other command can become pending, so
-+	 * hci_cmd_sync_cancel() cannot cancel an unrelated command.
-+	 */
-+	mutex_lock(&hdev->cmd_sync_work_lock);
-+
-+	/* In flight: this connection owns the pending request, cancel it. */
-+	if (test_bit(HCI_CONN_CREATE, &conn->flags)) {
-+		hci_cmd_sync_cancel(hdev, ECANCELED);
-+		goto unlock;
-+	}
-+
-+	/* Still queued: a successful dequeue means it never started, so there
-+	 * is nothing to disconnect.
-+	 */
-+	entry = _hci_cmd_sync_lookup_entry(hdev, hci_acl_create_conn_sync, conn,
-+					   NULL);
-+	if (entry) {
-+		_hci_cmd_sync_cancel_entry(hdev, entry, -ECANCELED);
-+		err = 0;
-+	}
-+
-+unlock:
-+	mutex_unlock(&hdev->cmd_sync_work_lock);
-+	return err;
-+}
-+
-+static int hci_le_cancel_create_conn_sync(struct hci_dev *hdev,
-+					  struct hci_conn *conn)
-+{
-+	struct hci_cmd_sync_work_entry *entry;
-+	int err = -EBUSY;
-+
-+	/* cmd_sync_work_lock keeps the HCI_CONN_CREATE test and the cancel
-+	 * atomic against the cmd_sync worker.
-+	 */
-+	mutex_lock(&hdev->cmd_sync_work_lock);
- 
-+	if (test_bit(HCI_CONN_CREATE, &conn->flags)) {
-+		hci_cmd_sync_cancel(hdev, ECANCELED);
-+		goto unlock;
-+	}
-+
-+	entry = _hci_cmd_sync_lookup_entry(hdev, hci_le_create_conn_sync, conn,
-+					   create_le_conn_complete);
-+	if (entry) {
-+		_hci_cmd_sync_cancel_entry(hdev, entry, -ECANCELED);
-+		err = 0;
-+	}
-+
-+unlock:
-+	mutex_unlock(&hdev->cmd_sync_work_lock);
-+	return err;
-+}
-+
-+static int hci_cis_cancel_create_conn_sync(struct hci_dev *hdev,
-+					   struct hci_conn *conn)
-+{
-+	/* LE Create CIS is shared by the whole CIG and cannot be dequeued
-+	 * per-connection, so only an in-flight command can be cancelled.
-+	 * cmd_sync_work_lock keeps the test and the cancel atomic against the
-+	 * cmd_sync worker.
-+	 */
-+	mutex_lock(&hdev->cmd_sync_work_lock);
-+
-+	if (test_bit(HCI_CONN_CREATE_CIS, &conn->flags))
-+		hci_cmd_sync_cancel(hdev, ECANCELED);
-+
-+	mutex_unlock(&hdev->cmd_sync_work_lock);
-+	return -EBUSY;
-+}
-+
-+int hci_cancel_connect_sync(struct hci_dev *hdev, struct hci_conn *conn)
-+{
- 	switch (conn->type) {
- 	case ACL_LINK:
--		return !hci_cmd_sync_dequeue_once(hdev,
--						  hci_acl_create_conn_sync,
--						  conn, NULL);
-+		return hci_acl_cancel_create_conn_sync(hdev, conn);
- 	case LE_LINK:
--		return !hci_cmd_sync_dequeue_once(hdev, hci_le_create_conn_sync,
--						  conn, create_le_conn_complete);
-+		return hci_le_cancel_create_conn_sync(hdev, conn);
-+	case CIS_LINK:
-+		return hci_cis_cancel_create_conn_sync(hdev, conn);
-+	default:
-+		return -ENOENT;
- 	}
+-/* Dequeue one HCI command entry:
+- *
+- * - Lookup and cancel first entry that matches.
+- */
+-bool hci_cmd_sync_dequeue_once(struct hci_dev *hdev,
+-			       hci_cmd_sync_work_func_t func,
+-			       void *data, hci_cmd_sync_work_destroy_t destroy)
+-{
+-	struct hci_cmd_sync_work_entry *entry;
 -
--	return -ENOENT;
- }
- 
- int hci_le_conn_update_sync(struct hci_dev *hdev, struct hci_conn *conn,
+-	mutex_lock(&hdev->cmd_sync_work_lock);
+-
+-	entry = _hci_cmd_sync_lookup_entry(hdev, func, data, destroy);
+-	if (!entry) {
+-		mutex_unlock(&hdev->cmd_sync_work_lock);
+-		return false;
+-	}
+-
+-	_hci_cmd_sync_cancel_entry(hdev, entry, -ECANCELED);
+-
+-	mutex_unlock(&hdev->cmd_sync_work_lock);
+-
+-	return true;
+-}
+-EXPORT_SYMBOL(hci_cmd_sync_dequeue_once);
+-
+ /* Dequeue HCI command entry:
+  *
+  * - Lookup and cancel any entry that matches by function callback or data or
 -- 
 2.54.0
 
