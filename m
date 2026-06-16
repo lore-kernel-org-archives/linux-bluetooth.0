@@ -1,61 +1,61 @@
 Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70A842982C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 11:12:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B143642DFE0
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 11:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781608373; cv=none; b=LJqa8cafIGuf79edDez2y2V842XZCOoad/0k7Hi5JzkKKCGoVY358UE7dJDKtyU4ZTL5zy8TCoYpOO94enYAx+qQ/NG06easQXPXY3bbHEhILODn8T4xeJzopRqluyu0aFy2X0svQcElpSK8R4LVRwJ4dweH1TNvKW1eYCZa0F4=
+	t=1781608376; cv=none; b=ZKMU5YXb0HzerUoRxnqZPLhQQW3arh5hamjhVyHgGAWXua48BUr61qlHUv/qBIO983KMLDTXSsVszeVviaGRX+geL/SFEyfqp1kevVSI5DgRw/j3ZskRtCDYsiDhgd0/MlKtnPv2PdZDDNw9zAmZ+UlsmFiID7TBUyvAiU6vWIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781608373; c=relaxed/simple;
-	bh=wPk0jvbiLk1gnxWCbBjPWoSYq2XDqp+9aHn95n8KQik=;
+	s=arc-20240116; t=1781608376; c=relaxed/simple;
+	bh=XzhCB5GzyvJph4pAksg0ijeF4yJPIDyIY2jjs6KRlQA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DGJgmaT0dOLYiQOvSq3Pud+8WINRCKgwPr4qbSND+NUFpQlC2sd0Crmvd81pAgxsPHUjgHgVMzIPaXr/q5gBVgWes9rMAP2qHtyW+yUcyymZXQ4lR2g1VO0s/k9fM3jcCAC8Jzb/KOZXCgzQA157/ZmpMz3vt0hp5qngynhuhUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=CRHOB04C; arc=none smtp.client-ip=209.85.210.174
+	 MIME-Version; b=ORRCgNoUUk/feP1HPWMlLVWl24aEkfFaWrc3VTkE/JGlbZaFagRUcsE3C2QvJBDFyov9Ew//+qx9piEICHj71fnP6JZxgOqBIYmVbV+mASphkcoXe/sI1Kte2SQngkqWvzNqkVeHhX3KTya2N//jd0huGKnEddQxqLPTggng1mA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Qo2I+q5P; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="CRHOB04C"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-8423f1d8902so2043589b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 04:12:50 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Qo2I+q5P"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-842307472d4so1627099b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 04:12:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1781608370; x=1782213170; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1781608375; x=1782213175; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=on8hqRmuM/Ky2/WGRUWRuZiJutnnNXtBaovb+8l2mm4=;
-        b=CRHOB04CMAZ0FIHIqixvSm16DquGUwE/M4wDyyNgza76pSO4guxxOV+WlTwUn+BGvF
-         pO/NfJIF01xfUe3D9mQkmPcKMwZ/vxbz0p33+IO4Qylb7edf6YC0YYZXw0CcwiBUqNPo
-         h/VfSc3kjXUQyxOkE4vNELxYWcQKSi/7oQcg4=
+        bh=OjucF5goefZfuxikv7tCuZJMVpoPtgqO36vnpR26lfo=;
+        b=Qo2I+q5PflWGczlHlRiUo/fRgc2c3r7zrJNkD4+/3E1B2zfC8BOXqkTtmtgIEv6cTO
+         voOXW+VFx9CDIjM0E/mj8aLuFTGT4wbfENSQUclvoSOVqz2Dfaugg9dYrQomw4wnhgCT
+         kRveK0IFvF4nzqmleiR/fTeS3/ExciBCpZCzo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781608370; x=1782213170;
+        d=1e100.net; s=20251104; t=1781608375; x=1782213175;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=on8hqRmuM/Ky2/WGRUWRuZiJutnnNXtBaovb+8l2mm4=;
-        b=D0eXuJwQtIi6TPvmoNvw3nOX0Eet27pAR6FAlm5GgsjLhwtgpBjEH3XFqjrfZQKrNk
-         WuabaXUNz++c8p++WyKLMONtEAW/umZHCnpVpDWOjC5mu0l0qMWBRVpxGPJwejhZMDbu
-         3jPFt/Ou9k3AdLXryvOqyb0Od5AdsoLsnoTL543T4pLu9cxGiGYEG15XL02NRxbp9/jx
-         J12mmX6b+RspQezyhKTOo37OKnZ9McHxJ7nFvCB6Q8s0XWCeX9GByiCUBac8BFiGYKiP
-         0GUpspTrCyeacxvxaP9CRT1ksYHtchK0hB5xSd8oKExxEIO1HphmNO543WeUoVTQoGov
-         TbQg==
-X-Forwarded-Encrypted: i=1; AFNElJ/lqT6n4n1JBXs84DwAD2brJSFgHMR4YiVfdqorCWkL+0IH+GxC2iQigqB8omJvGgHNyirFPgK7M+EVbJAXHFE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmLu0fptRN5EL0l7NSVfOnC1SjjMBdnegI8Eh7inniE/fi0D0z
-	sc9wpphwIxE3ns9izLVfAjeWTT/a+K5zCYe6/O83q5fEIzKqvBWZs+nci63PWUKANg==
-X-Gm-Gg: Acq92OGf+B3trD1mFOsB+jR81OBvADKZcQyTX12mW1K0WRmPzWkXPQxfLfX3YbG/bAs
-	gwyG+omliwuvjfHYfbCUXkftrxVyNlWS9J577I0CSvy3D3Kyge20lf/VheMyZOnmLsM1an3icDy
-	5diYJGJG7WESJSL17otjggN/TMgWZcGawwKCeZTM0OOgC2zVlP5IyeAv28bWXtHl+Zs7aKvv6v5
-	gzjvC68c+/vAGa2nQWQ8NDdl2vnoM9/09kdzekZtAZnJpnaofPBnVvqO+q6KV41TXY6oP+ORq93
-	G1K0iJB0HiNcpwPdwY3iP5Z52annZUda4fYtRQFeaSqeKHotUC+HuZhLxUc2bVSJTIYeJs4QxNF
-	vCoCDyYO8sz/cct9sl/mUPuGZdbe4pKSa8Q36Uv+2BaWflaqGrZwAg69fDPkv/IgUXupcpi4X1K
-	nDrkOM4yWXUBL8vNMMAEomvJLYDu+JMJJOnkRkdb8YJqnJWLVLssdcJ5KD/quJbjNMhOVrMwkop
-	ZFn02wgr6L5
-X-Received: by 2002:a05:6a00:9285:b0:82f:abc8:ae0 with SMTP id d2e1a72fcca58-844e19879d5mr16162588b3a.17.1781608370193;
-        Tue, 16 Jun 2026 04:12:50 -0700 (PDT)
+        bh=OjucF5goefZfuxikv7tCuZJMVpoPtgqO36vnpR26lfo=;
+        b=ZpdnSWwIIYe+YofJlwnuDMnGvwtMdxQW8MyS88vhPK2+YZMZHt8ao6svM2aTj/cuPQ
+         9/eXdQOcbJ8Q8DFsFl56J+xcTZ1K1HtQJvRBHSi97wInn3aG3aXABP2D7wHunF4ViDsj
+         WbdIKtRLMtAVCa8VyQuQLF0v9Voh1xdAxXVB8whJH7r+99UbbNjRwSp/6sPMIdwXnnJl
+         f3l5nQQQPjNLr2jz9EvkIOxwD3ZzCBHxPrakltryPqSsCbnrQWsUX5326ZofKHQIJ2R1
+         I8xt9i/5A1JSejBiZ7AyY8/flyxs8qhCEy3K5qsJcu9mkL/lRA8eqda5b7AU7h46AefH
+         K1wQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/n6wU+d9T1OmePl1r9qStb91tk9qOOw4V98t9JQNRBpDTLPSdQu+sF+3G/21wIFc5e9BTFmQPuKN4CVevXk0o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXabG2gaq1zBSBm68jnAZWo5GjwY5iUH70emJMrQqvHsax8vJd
+	zyvA8CX8lWBlfcLSsI73oiDjLrasgcAgFe320Du06rofbp9HyiH0sVwPI/IFbMhuxg==
+X-Gm-Gg: Acq92OE93zHe+xTV/eGxFS+Dk5H8xVWvDa1pPvczXI9Y4VVC3fMJkWfjVYRXcG8cvQN
+	2PfGqYsF7ja/m18grhzokZOExQZRDS0c1uZtkBQY852iYsMy3k1a0dHGQ5vmnDgB9paMTXu9Bmy
+	HTU5HP/E4Lr9uFC+dH2R8W4T8wUoYE+2Fr8LAp4M4x0wDEoXp3SBNa4KEthNifZefUXxiNX16Q9
+	sBLA/o3M0lqy4adBQ3QEkEB2jErXbju5I2nEXQp8EmVYqx2iiT1tpfVSUoW0xXhOcehfQKl/uDC
+	/YfCdCAoegNiLHUOBvDEJK0p4U9boFiUtaegDzLdMElYl1I3MbJDLY0Xp0obbt4PIjOSGVdBiE/
+	KAlYt7CJpe5T8BqJRdyrkyVFBLtFtByRMONDnNRdT5He/gw9mPRR51mA+TLVvzZ3If81kqv0C/v
+	i3/YKqaZKzss/if/12rHvLq4u8J3yNKsp0L+PnQBctpx38q7BJ9/LLAlbPAxIIvAjUFs3fCp0nq
+	kKxrR2atWCU
+X-Received: by 2002:a05:6a00:1d85:b0:841:de16:8a8f with SMTP id d2e1a72fcca58-8451530c1d1mr3127048b3a.7.1781608375147;
+        Tue, 16 Jun 2026 04:12:55 -0700 (PDT)
 Received: from tigerii.tok.corp.google.com ([2a00:79e0:2031:6:a0b:fabb:5b62:b85b])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434b05921bsm12906321b3a.59.2026.06.16.04.12.47
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434b05921bsm12906321b3a.59.2026.06.16.04.12.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 04:12:49 -0700 (PDT)
+        Tue, 16 Jun 2026 04:12:54 -0700 (PDT)
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -68,9 +68,9 @@ Cc: Tomasz Figa <tfiga@chromium.org>,
 	linux-mediatek@lists.infradead.org,
 	Sergey Senozhatsky <senozhatsky@chromium.org>,
 	stable@vger.kernel.org
-Subject: [PATCH v2 1/3] Bluetooth: btmtksdio: correct btmtksdio_txrx_work() loop timeout check
-Date: Tue, 16 Jun 2026 20:12:06 +0900
-Message-ID: <20260616111224.152140-2-senozhatsky@chromium.org>
+Subject: [PATCH v2 3/3] Bluetooth: btmtksdio: call cancel_work_sync() outside of host lock scope
+Date: Tue, 16 Jun 2026 20:12:08 +0900
+Message-ID: <20260616111224.152140-4-senozhatsky@chromium.org>
 X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
 In-Reply-To: <20260616111224.152140-1-senozhatsky@chromium.org>
 References: <20260616111224.152140-1-senozhatsky@chromium.org>
@@ -82,38 +82,79 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The btmtksdio_txrx_work() loop is expected to be terminated if running
-for longer than 5*HZ.  However the timeout check is reversed:
-time_is_before_jiffies(old_jiffies + 5*HZ) evaluates to true when
-old_jiffies + 5*HZ is in the past i.e. when a timeout has occurred.
-Using OR with time_is_before_jiffies(txrx_timeout) means that:
-- before the 5-second timeout: the condition is `int_status || false`,
-  so it loops as long as there are pending interrupts.
-- after the 5-second timeout: the condition becomes `int_status || true`,
-  which is always true.
+cancel_work_sync() should be called outside of host lock scope
+in order to avoid circular locking scenario:
 
-Fix loop termination condition to actually enforce a 5*HZ timeout.
+CPU0					CPU1
+					close()/reset()
+					sdio_claim_host()
+txrx_work
+  sdio_claim_host() // sleeps
+					cancel_work_sync() // sleeps
+
+In addition, when txrx_work() runs concurrently with close()/reset()
+it better not to re-enable interrupts by testing for BTMTKSDIO_FUNC_ENABLED
+and not BTMTKSDIO_HW_RESET_ACTIVE before C_INT_EN_SET write.  However,
+btmtksdio_close() clears the BTMTKSDIO_FUNC_ENABLED too late (after
+cancel_work_sync() call).  Move BTMTKSDIO_FUNC_ENABLED bit-clear earlier
+so that txrx_work can see concurrent close().
 
 Fixes: 26270bc189ea4 ("Bluetooth: btmtksdio: move interrupt service to work")
 Cc: stable@vger.kernel.org
 Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 ---
- drivers/bluetooth/btmtksdio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/bluetooth/btmtksdio.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index 5b0fab7b89b5..c6f80c419e90 100644
+index d8c8d2857527..207d04cc2282 100644
 --- a/drivers/bluetooth/btmtksdio.c
 +++ b/drivers/bluetooth/btmtksdio.c
-@@ -620,7 +620,7 @@ static void btmtksdio_txrx_work(struct work_struct *work)
- 			if (btmtksdio_rx_packet(bdev, rx_size) < 0)
- 				bdev->hdev->stat.err_rx++;
- 		}
--	} while (int_status || time_is_before_jiffies(txrx_timeout));
-+	} while (int_status && time_is_after_jiffies(txrx_timeout));
+@@ -625,7 +625,9 @@ static void btmtksdio_txrx_work(struct work_struct *work)
+ 	} while (int_status && time_is_after_jiffies(txrx_timeout));
  
  	/* Enable interrupt */
- 	if (bdev->func->irq_handler)
+-	if (bdev->func->irq_handler)
++	if (bdev->func->irq_handler &&
++	    test_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state) &&
++	    !test_bit(BTMTKSDIO_HW_RESET_ACTIVE, &bdev->tx_state))
+ 		sdio_writel(bdev->func, C_INT_EN_SET, MTK_REG_CHLPCR, NULL);
+ 
+ 	sdio_release_host(bdev->func);
+@@ -741,6 +743,8 @@ static int btmtksdio_close(struct hci_dev *hdev)
+ 	if (!test_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state))
+ 		return 0;
+ 
++	clear_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state);
++
+ 	sdio_claim_host(bdev->func);
+ 
+ 	/* Disable interrupt */
+@@ -748,11 +752,12 @@ static int btmtksdio_close(struct hci_dev *hdev)
+ 
+ 	sdio_release_irq(bdev->func);
+ 
++	sdio_release_host(bdev->func);
+ 	cancel_work_sync(&bdev->txrx_work);
++	sdio_claim_host(bdev->func);
+ 
+ 	btmtksdio_fw_pmctrl(bdev);
+ 
+-	clear_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state);
+ 	sdio_disable_func(bdev->func);
+ 
+ 	sdio_release_host(bdev->func);
+@@ -1295,7 +1300,10 @@ static void btmtksdio_reset(struct hci_dev *hdev)
+ 
+ 	sdio_writel(bdev->func, C_INT_EN_CLR, MTK_REG_CHLPCR, NULL);
+ 	skb_queue_purge(&bdev->txq);
++
++	sdio_release_host(bdev->func);
+ 	cancel_work_sync(&bdev->txrx_work);
++	sdio_claim_host(bdev->func);
+ 
+ 	gpiod_set_value_cansleep(bdev->reset, 1);
+ 	msleep(100);
 -- 
 2.54.0.1136.gdb2ca164c4-goog
 
