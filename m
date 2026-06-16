@@ -1,59 +1,61 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781E542DFE0
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 11:12:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70A842982C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 11:12:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781608369; cv=none; b=oKNVw5TkDlTZYaz5fIi6aE7qvW5nnjkO0i/w4kh5QtTe3u3l4ipn+EX7wjLKaZVVn0TeycfNQypb3rJCZb10agB5zpXxe4VLOYD/1tBhVseb1I9F3kB/RiNBDxKhiOUJ8JQDWiQ2ol7QM9v4nrYoUOx9fRsbmMP6sANSjzKtrpg=
+	t=1781608373; cv=none; b=LJqa8cafIGuf79edDez2y2V842XZCOoad/0k7Hi5JzkKKCGoVY358UE7dJDKtyU4ZTL5zy8TCoYpOO94enYAx+qQ/NG06easQXPXY3bbHEhILODn8T4xeJzopRqluyu0aFy2X0svQcElpSK8R4LVRwJ4dweH1TNvKW1eYCZa0F4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781608369; c=relaxed/simple;
-	bh=NVj8lbteHXh5JVB7mWhqe9AMboZt32iPu0AGrrjU7ZA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eWk9qdWaZEJkLEF6nNJ+nZjDEsUINsJGxXNKTLLO1sZJv2IgsErF7bLZrjPKR2W5PzMvOmio6LGzOnFjocBPS/ZAJcwTOPN8fTgOaCBE8Y/ypc2y8PNnI1qUVZYy+YXRUn+9GfPg+crIpGnOybXmzr53CSbQiCCEamBBS3Na5gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=VxfM/TNt; arc=none smtp.client-ip=209.85.210.172
+	s=arc-20240116; t=1781608373; c=relaxed/simple;
+	bh=wPk0jvbiLk1gnxWCbBjPWoSYq2XDqp+9aHn95n8KQik=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DGJgmaT0dOLYiQOvSq3Pud+8WINRCKgwPr4qbSND+NUFpQlC2sd0Crmvd81pAgxsPHUjgHgVMzIPaXr/q5gBVgWes9rMAP2qHtyW+yUcyymZXQ4lR2g1VO0s/k9fM3jcCAC8Jzb/KOZXCgzQA157/ZmpMz3vt0hp5qngynhuhUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=CRHOB04C; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="VxfM/TNt"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-842358aaf36so1716383b3a.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 04:12:48 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="CRHOB04C"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-8423f1d8902so2043589b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 04:12:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1781608368; x=1782213168; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DsaDqBODBOe0uQd4CZKQhSELJgMWAA7Q260cUecRjlk=;
-        b=VxfM/TNtru0sraxqF+DrMiKRxqX8fMENhmYT9w44o/73bJerXs8hPKgxOtYHdJmTm7
-         vIpc/Uhjd0VEgaNXxez1cQHYTHgGieoppQub+yI0vdRItYMeLwpQW6tP1ZMYKoQ7PyAz
-         rzI9CdMuLW9GJyhFt1GRjZc1xiFc9140QY5mk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781608368; x=1782213168;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=chromium.org; s=google; t=1781608370; x=1782213170; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DsaDqBODBOe0uQd4CZKQhSELJgMWAA7Q260cUecRjlk=;
-        b=rCySc4+S9r+Zn6RJ41vJ0j84Mw4y6GdgqCXDWCib8Pjy/ecMC8+WkmE+TB3ZGWyUW5
-         vJeV3J51I41/YqyWibUL31qFW+DmCcpJOXzYkguvGu2TwrVR6YvHYgP8fmeEHpVKM3Gg
-         9XaTk7ZDyn7xbycSZBswbLn8ufZMgN3/GAYxSSUs+UPV6oPnypJx0CBuiZip2S//Y+Ji
-         /+TLaj9+2dS1PStSNzUEv3t90v0VRVUUMarfYYBpuWkcAigg6qkx8GV59E+26MTpp76h
-         t/Vheg8D84nLIK2OMiWMCmFPEHJs9zLvL1u4B3NzRkaUXLFxvBxJaTVbt55gR9tjGwto
-         Zrnw==
-X-Forwarded-Encrypted: i=1; AFNElJ8Y1o+sixqIfc4mqYPC5LiOTtgJJ2z50MDRSqwfdB3moWatGC3fl9fFZ7cUbY5tnePI4HAQEkdslTO0zs8kvHI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdX99m8/LBE+Nwx0cEeHgCLJ05o1QdvcOS1bZSf80Qz7LL0czV
-	heHY2wJOsqAi8ds3HgUFkfnLTHoSZR4zh1Ur1zgIOOI6lE4upWYP1emsUHtHt5vPgg==
-X-Gm-Gg: Acq92OEyEpQOrVn5udlYuzE7OYqaQZC9Y71NH15OhPoR+DKe1PCEdFRxEqdnFXYfDrI
-	vNFy7hVkWRd5gNWyNcmJ/4FN7HewFOmUhaYa6DTKz1L9Mrq2ui97rQlMuYhdvG/xqcQZ9phiOOJ
-	mWwltyiEMYBbvvHK6lY72OoMXyJJTJhhcGwu8Uoo3asV5uWx2xrXJcCmMATFII2i6m/Yn4uh/L0
-	OC+yu48Z3VeShXGfvA/BPKb2Byt3Oe4VP+74xkCXjwYCKREhuAMQHmAXwISvCKZnz5YFgLYQeuZ
-	wp4QU+q3pI0e6Ci+Ty6YJs5QGAM0040uiViywnRJH9vcqWWq5vILnVdL5V+ZlISuxUhEvK9ige4
-	P99ykV6Gg+xz4mqzopcX8fhlGfAJi/eN28LKUKYOd0oqlkyMA/9FF1fVRjY95C7+h8mUId61Saa
-	vBTWP3MblGomhKJ097WsD7y3jHK0uyZIPM4/iksKy3Jf7INIzNTkMJdFv8V6IUP/QpXy2eTMo/o
-	NAwmzaVRAKi4mxomFzIgp8=
-X-Received: by 2002:a05:6a00:3691:b0:842:4af4:3099 with SMTP id d2e1a72fcca58-844e1998f75mr15786071b3a.20.1781608367732;
-        Tue, 16 Jun 2026 04:12:47 -0700 (PDT)
+        bh=on8hqRmuM/Ky2/WGRUWRuZiJutnnNXtBaovb+8l2mm4=;
+        b=CRHOB04CMAZ0FIHIqixvSm16DquGUwE/M4wDyyNgza76pSO4guxxOV+WlTwUn+BGvF
+         pO/NfJIF01xfUe3D9mQkmPcKMwZ/vxbz0p33+IO4Qylb7edf6YC0YYZXw0CcwiBUqNPo
+         h/VfSc3kjXUQyxOkE4vNELxYWcQKSi/7oQcg4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781608370; x=1782213170;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=on8hqRmuM/Ky2/WGRUWRuZiJutnnNXtBaovb+8l2mm4=;
+        b=D0eXuJwQtIi6TPvmoNvw3nOX0Eet27pAR6FAlm5GgsjLhwtgpBjEH3XFqjrfZQKrNk
+         WuabaXUNz++c8p++WyKLMONtEAW/umZHCnpVpDWOjC5mu0l0qMWBRVpxGPJwejhZMDbu
+         3jPFt/Ou9k3AdLXryvOqyb0Od5AdsoLsnoTL543T4pLu9cxGiGYEG15XL02NRxbp9/jx
+         J12mmX6b+RspQezyhKTOo37OKnZ9McHxJ7nFvCB6Q8s0XWCeX9GByiCUBac8BFiGYKiP
+         0GUpspTrCyeacxvxaP9CRT1ksYHtchK0hB5xSd8oKExxEIO1HphmNO543WeUoVTQoGov
+         TbQg==
+X-Forwarded-Encrypted: i=1; AFNElJ/lqT6n4n1JBXs84DwAD2brJSFgHMR4YiVfdqorCWkL+0IH+GxC2iQigqB8omJvGgHNyirFPgK7M+EVbJAXHFE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmLu0fptRN5EL0l7NSVfOnC1SjjMBdnegI8Eh7inniE/fi0D0z
+	sc9wpphwIxE3ns9izLVfAjeWTT/a+K5zCYe6/O83q5fEIzKqvBWZs+nci63PWUKANg==
+X-Gm-Gg: Acq92OGf+B3trD1mFOsB+jR81OBvADKZcQyTX12mW1K0WRmPzWkXPQxfLfX3YbG/bAs
+	gwyG+omliwuvjfHYfbCUXkftrxVyNlWS9J577I0CSvy3D3Kyge20lf/VheMyZOnmLsM1an3icDy
+	5diYJGJG7WESJSL17otjggN/TMgWZcGawwKCeZTM0OOgC2zVlP5IyeAv28bWXtHl+Zs7aKvv6v5
+	gzjvC68c+/vAGa2nQWQ8NDdl2vnoM9/09kdzekZtAZnJpnaofPBnVvqO+q6KV41TXY6oP+ORq93
+	G1K0iJB0HiNcpwPdwY3iP5Z52annZUda4fYtRQFeaSqeKHotUC+HuZhLxUc2bVSJTIYeJs4QxNF
+	vCoCDyYO8sz/cct9sl/mUPuGZdbe4pKSa8Q36Uv+2BaWflaqGrZwAg69fDPkv/IgUXupcpi4X1K
+	nDrkOM4yWXUBL8vNMMAEomvJLYDu+JMJJOnkRkdb8YJqnJWLVLssdcJ5KD/quJbjNMhOVrMwkop
+	ZFn02wgr6L5
+X-Received: by 2002:a05:6a00:9285:b0:82f:abc8:ae0 with SMTP id d2e1a72fcca58-844e19879d5mr16162588b3a.17.1781608370193;
+        Tue, 16 Jun 2026 04:12:50 -0700 (PDT)
 Received: from tigerii.tok.corp.google.com ([2a00:79e0:2031:6:a0b:fabb:5b62:b85b])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434b05921bsm12906321b3a.59.2026.06.16.04.12.45
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434b05921bsm12906321b3a.59.2026.06.16.04.12.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 04:12:47 -0700 (PDT)
+        Tue, 16 Jun 2026 04:12:49 -0700 (PDT)
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -64,11 +66,14 @@ Cc: Tomasz Figa <tfiga@chromium.org>,
 	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCH v2 0/3] Bluetooth: btmtksdio: teardown fixes
-Date: Tue, 16 Jun 2026 20:12:05 +0900
-Message-ID: <20260616111224.152140-1-senozhatsky@chromium.org>
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	stable@vger.kernel.org
+Subject: [PATCH v2 1/3] Bluetooth: btmtksdio: correct btmtksdio_txrx_work() loop timeout check
+Date: Tue, 16 Jun 2026 20:12:06 +0900
+Message-ID: <20260616111224.152140-2-senozhatsky@chromium.org>
 X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
+In-Reply-To: <20260616111224.152140-1-senozhatsky@chromium.org>
+References: <20260616111224.152140-1-senozhatsky@chromium.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -77,35 +82,38 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is v2 of teardown fixes.
+The btmtksdio_txrx_work() loop is expected to be terminated if running
+for longer than 5*HZ.  However the timeout check is reversed:
+time_is_before_jiffies(old_jiffies + 5*HZ) evaluates to true when
+old_jiffies + 5*HZ is in the past i.e. when a timeout has occurred.
+Using OR with time_is_before_jiffies(txrx_timeout) means that:
+- before the 5-second timeout: the condition is `int_status || false`,
+  so it loops as long as there are pending interrupts.
+- after the 5-second timeout: the condition becomes `int_status || true`,
+  which is always true.
 
-We noticed a number of cases when btmtk close/teardown would hung:
+Fix loop termination condition to actually enforce a 5*HZ timeout.
 
-     INFO: task kworker/u17:0:189 blocked for more than 122 seconds.
-     __cancel_work_timer+0x3f4/0x460
-     cancel_work_sync+0x1c/0x2c
-     btmtksdio_flush+0x2c/0x40
-     hci_dev_open_sync+0x10c4/0x2190
-     [..]
+Fixes: 26270bc189ea4 ("Bluetooth: btmtksdio: move interrupt service to work")
+Cc: stable@vger.kernel.org
+Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+---
+ drivers/bluetooth/btmtksdio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-There are several issues with the teardown (close/reset) code
-in the driver.  First, the btmtksdio_txrx_work() potentially
-can spin forever (infinite loop).  Second, close/flush can
-deadlock when run concurrently with btmtksdio_txrx_work().
-
-v1 -> v2:
-- added two more patches (deadlock fix, interrupts re-enabling
-  enhancement)
-
-Sergey Senozhatsky (3):
-  Bluetooth: btmtksdio: correct btmtksdio_txrx_work() loop timeout check
-  Bluetooth: btmtksdio: test for bug IO errors in btmtksdio_txrx_work()
-  Bluetooth: btmtksdio: call cancel_work_sync() outside of host lock
-    scope
-
- drivers/bluetooth/btmtksdio.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
-
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index 5b0fab7b89b5..c6f80c419e90 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -620,7 +620,7 @@ static void btmtksdio_txrx_work(struct work_struct *work)
+ 			if (btmtksdio_rx_packet(bdev, rx_size) < 0)
+ 				bdev->hdev->stat.err_rx++;
+ 		}
+-	} while (int_status || time_is_before_jiffies(txrx_timeout));
++	} while (int_status && time_is_after_jiffies(txrx_timeout));
+ 
+ 	/* Enable interrupt */
+ 	if (bdev->func->irq_handler)
 -- 
 2.54.0.1136.gdb2ca164c4-goog
 
