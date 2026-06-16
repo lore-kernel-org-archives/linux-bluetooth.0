@@ -1,297 +1,101 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D5635201E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 14:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAC630C360
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 15:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781621951; cv=none; b=Py0H4QFF6BSSnC7AkqS/0JdUXbbGe4mvl+pEVcD4q/HhpKOg/64yYVlvYp8gzIEth6MmIyPHm3jpPzG6M+JMlbXb2sCSTmWJMlBT0SML4rSqJ/LB0gAxUmSEmL9neS4KjL1kmczPXl7gerVDo2fleoVAKzi+a4W2su3zuY86XTo=
+	t=1781623809; cv=none; b=ZkMidadOUlHHNTqWpyOgvpUyq7vifE0rnNwYgWtIVPBtWPDKo0pn9KdqXc9FL+kxtRY4hMK/8ypTs84wWNdTWuNcAwCEtn0z5t+Zkv9V2/lVq7gJ3Grj6MdlyLSnBtLxCgQ6OgQqs+U3Ojp4SM9e90nKtJmqvuCaGws9AO1021s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781621951; c=relaxed/simple;
-	bh=oQYrAJ6SufV6gxGAtlR1UU3RkZ2lYBbUc65ezJ5Op3Y=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:
-	 Content-Type; b=ubpz/HLbgkhz1Y9Ql3gncyWc2OGe6uv/kq5wVOEKvHacdHzF3J0pIgWhSJJOYNry61TeoIjdIvmaeGxtAHKrLTCGkJJHhv9MePYhDCcxD1nhEj1Gy/DXOibQmkHoPBridnyAH9t7lVKP0diG1y17ac2I0CmHjuEeeYE+A7mC8LM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=QP/rpM86; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1781623809; c=relaxed/simple;
+	bh=GtPJY3yyoWgRWuWEvWWoy2sZJYXQbsSsxMGnFnO/8u0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=jtngnedbNI67iidXO0vlvSSJ7NN5VyCB/2+yF7HpeW9SVFpv8XZoOSp7y19bizTQoZEyr7TgfC+OATAwPB1eP5wJKIWarMrbI64BjMBdl+cSq3cRueG7l62zsF1OFCLAg53TRZlw/oPCi+Afe1Jhta/hOuh5x+1/PtYJ+3mAbm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nza/tTYr; arc=none smtp.client-ip=74.125.82.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="QP/rpM86"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1781621948;
-	bh=oQYrAJ6SufV6gxGAtlR1UU3RkZ2lYBbUc65ezJ5Op3Y=;
-	h=From:To:Subject:Date:From;
-	b=QP/rpM863oez9ccKSWQ0CgJUNKtQDK4AyhcbtW29lzmaXYja4St2YSsfvYH7HVSV7
-	 jzQajtrIMC1cXdcK2Vg02Y9eoA7B5KbrLG7sZa6ziog86J0WTI0SwYCMd9OcARspbc
-	 BS3qwXKizSxOO153tYD4wxu55jYUsCRT5jMo2w5fKYwvKE619m5wJ6Rczdjp8hDuo/
-	 y9tBAWlexnlxSpCLMBoKS4aspC662uTLNsRl+AIIC7nv+F06+K3LHkAb9EAT/5boda
-	 KKpkfV1B414W544oFOm/FBOfcgaY9qeleW9jxjhkfG7H9IATzFenx0WUusQWQ4vt41
-	 L1qcYZQHmMFgg==
-Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id D458D17E03CE
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 16:59:07 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: MGMT: Add management security level changed event
-Date: Tue, 16 Jun 2026 16:58:55 +0200
-Message-ID: <20260616145855.342740-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nza/tTYr"
+Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-30bc871ecdfso13535eec.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 08:30:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781623807; x=1782228607; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=GtPJY3yyoWgRWuWEvWWoy2sZJYXQbsSsxMGnFnO/8u0=;
+        b=Nza/tTYr7yS8ourWTH+9Y1aRGKYSGDxQ9p08Nqf5oYpWV0fv4LCHn3zvmgmP213wVb
+         VoisTjYOQYbd0Le9Q98pjMDn7hKssUVOB/r66fw3XrtGqOJVDGKqRnTG5T2jHeIPjjCg
+         ZnOjt/94c59Z10ATLbwTtfBv+ZM5vA4DRD6I5QywIxCmMdaM9lED9sAhkV7MzArISrLV
+         ulRVWDB5NCnR3kPMiSm2o7Ab2EONBxe5vN1ZQ64nVqzlCMP27IYGtaOYsyPsfkEyr7cu
+         I23W1DWki8w36smRfG+l3PgLpm98S8e2s94s4N4cRCqlCSIBgGZPYC6U6rNAv0aaAFtv
+         aGCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781623807; x=1782228607;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GtPJY3yyoWgRWuWEvWWoy2sZJYXQbsSsxMGnFnO/8u0=;
+        b=nc4jEIG2PQXveaZD+YlwOnCPT9tDMR+IWiAtz2iB6MmSOhqE0+qlZHaTuz87jfTVOx
+         l67CrkCm9LSfeGYfEGeD09WkRelHy7RncBgy5/oxzi/BfcBHlRb6TIAIAdW04epRJKt4
+         Cq79AGxCpb0Bi/3nG8tayw/457kTUHCup9kzbXu7CHWBVmLgAUon7ja+yHmFY+BZdH/L
+         tAWdlMayiEjODrbFhawT6N/TJ8PKY4XNVp2eA6nX2WRutKteLj48sAv/Mjm+bOi1RKz2
+         v1a+nRocZ0wGIcl4IfjS/gJwR6PwB2OK8YIEBXh735MCHlDH8YSGjPeTYw3hLVTW7cod
+         xekw==
+X-Gm-Message-State: AOJu0YzvPM4mYrlWJ/6YC/YDm8DV77IKXgBOCsuGmh6KQQ3ib19IeqgL
+	PP5nNtb7sTMLXk5BWxTDckGqdYg+Oy1tEaqbNrGXQBtCdWRDqqJaUP6wM53ejQ==
+X-Gm-Gg: Acq92OGsVBtu6zgl9j9Xow96doyU5tgnS6dr8rS2rBr+1LZMRF6ASwzPKE4+PZf8tto
+	cs8CRahyrx023y5uZolDT2ufSfeHcd2efu3xneUArFnfpQng6h9n9Q4y39jxVVabm3BOQUogDAG
+	2v/mdv64tgd7T5AWxKUfjUrcu0H2pntAfbU/ey8mRfLb7BAHCr0dJMqnVWI2ToHgfKquFqHjMjB
+	4qYtAWc7krArMeteTrqrXDv9eL7tbZXXko6IPnPGvtH1ilaV47m+5xaiTyAhAwIV917DvO2bCDY
+	eFBd6biKvalja4CjebV/z+dKPEcm1hpDrrcAyUzBOmUNTivSDsNO96skieMAk9+r+fFuAvpeZjs
+	GQ+MK68rSXFLZJ/jSnuDJxAGqOCGW5xCzBYbYyUAe3JCuxPld5/d0+kK9XXfClfBeYmokHux88A
+	tJWe0oZrcuqmtTGBXmCwxysC3BJCvDMrU=
+X-Received: by 2002:a05:7301:5f81:b0:304:bf07:f19e with SMTP id 5a478bee46e88-30ba5f72ee9mr2366580eec.28.1781623806856;
+        Tue, 16 Jun 2026 08:30:06 -0700 (PDT)
+Received: from [172.17.0.2] ([172.215.218.17])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081e5fefecsm19390543eec.13.2026.06.16.08.30.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jun 2026 08:30:06 -0700 (PDT)
+Message-ID: <6a316bfe.d7da0740.24009f.c155@mx.google.com>
+Date: Tue, 16 Jun 2026 08:30:06 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8702690346909826721=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, senozhatsky@chromium.org
+Subject: RE: Bluetooth: btmtksdio: teardown fixes
+In-Reply-To: <20260616111224.152140-2-senozhatsky@chromium.org>
+References: <20260616111224.152140-2-senozhatsky@chromium.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Add an event on device security level or encryption type change to
-let user space know which level is currently in use.
-Reset security level to 0 on disconnection so further connections
-will correctly report security level changes.
+--===============8702690346909826721==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This will be used for BlueZ qualification automation.
+This is an automated email and please do not reply to this email.
 
-Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: drivers/bluetooth/btmtksdio.c:620
+error: drivers/bluetooth/btmtksdio.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
-v1->v2:
- - Add encryption type to the mgmt event
- - Send event on security level or encryption type change
+Regards,
+Linux Bluetooth
 
- include/net/bluetooth/hci_core.h | 15 +++++++++++++--
- include/net/bluetooth/mgmt.h     | 11 +++++++++++
- net/bluetooth/hci_conn.c         |  8 ++++++++
- net/bluetooth/hci_event.c        | 20 ++++++++++++++++++--
- net/bluetooth/mgmt.c             | 20 ++++++++++++++++++++
- 5 files changed, 70 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 7e15da47fe3a..2920229c7f0b 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -2177,6 +2177,8 @@ static inline void hci_auth_cfm(struct hci_conn *conn, __u8 status)
- 		conn->security_cfm_cb(conn, status);
- }
- 
-+void mgmt_security_level_changed(struct hci_conn *conn);
-+
- static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
- {
- 	struct hci_cb *cb;
-@@ -2199,11 +2201,20 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
- 		encrypt = 0x01;
- 
- 	if (!status) {
--		if (conn->sec_level == BT_SECURITY_SDP)
-+		bool sec_level_changed  = false;
-+
-+		if (conn->sec_level == BT_SECURITY_SDP) {
- 			conn->sec_level = BT_SECURITY_LOW;
-+			sec_level_changed = true;
-+		}
- 
--		if (conn->pending_sec_level > conn->sec_level)
-+		if (conn->pending_sec_level > conn->sec_level) {
- 			conn->sec_level = conn->pending_sec_level;
-+			sec_level_changed = true;
-+		}
-+
-+		if (sec_level_changed)
-+			mgmt_security_level_changed(conn);
- 	}
- 
- 	mutex_lock(&hci_cb_list_lock);
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 08daed7a96d5..69e0f3503e79 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -1192,3 +1192,14 @@ struct mgmt_ev_mesh_device_found {
- struct mgmt_ev_mesh_pkt_cmplt {
- 	__u8	handle;
- } __packed;
-+
-+#define MGMT_CONN_SEC_ENCRYPT_NONE		0x00
-+#define MGMT_CONN_SEC_ENCRYPT_E0		0x01
-+#define MGMT_CONN_SEC_ENCRYPT_AES_CCM		0x02
-+
-+#define MGMT_EV_SECURITY_LEVEL_CHANGED		0x0033
-+struct mgmt_ev_security_level_changed {
-+	struct mgmt_addr_info addr;
-+	__u8   level;
-+	__u8   enc_type;
-+} __packed;
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index c335372e4062..c9fb134c8891 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1200,6 +1200,11 @@ static void hci_conn_unlink(struct hci_conn *conn)
- 	if (!conn->parent) {
- 		struct hci_link *link, *t;
- 
-+		conn->sec_level = BT_SECURITY_SDP;
-+		clear_bit(HCI_CONN_ENCRYPT, &conn->flags);
-+		clear_bit(HCI_CONN_AES_CCM, &conn->flags);
-+		mgmt_security_level_changed(conn);
-+
- 		list_for_each_entry_safe(link, t, &conn->link_list, list) {
- 			struct hci_conn *child = link->conn;
- 
-@@ -1502,6 +1507,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	}
- 
- 	conn->sec_level = BT_SECURITY_LOW;
-+	mgmt_security_level_changed(conn);
- 	conn->conn_timeout = conn_timeout;
- 	conn->le_adv_phy = phy;
- 	conn->le_adv_sec_phy = sec_phy;
-@@ -1729,6 +1735,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 	conn->state = BT_CONNECT;
- 	set_bit(HCI_CONN_SCANNING, &conn->flags);
- 	conn->sec_level = BT_SECURITY_LOW;
-+	mgmt_security_level_changed(conn);
- 	conn->pending_sec_level = sec_level;
- 	conn->conn_timeout = conn_timeout;
- 	conn->conn_reason = conn_reason;
-@@ -1777,6 +1784,7 @@ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
- 		int err;
- 
- 		acl->sec_level = BT_SECURITY_LOW;
-+		mgmt_security_level_changed(acl);
- 		acl->pending_sec_level = sec_level;
- 		acl->auth_type = auth_type;
- 		acl->conn_timeout = timeout;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index b6d963ce26d0..15086780b766 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -762,6 +762,7 @@ static u8 hci_cc_read_enc_key_size(struct hci_dev *hdev, void *data,
- 			status = HCI_ERROR_AUTH_FAILURE;
- 			clear_bit(HCI_CONN_ENCRYPT, &conn->flags);
- 			clear_bit(HCI_CONN_AES_CCM, &conn->flags);
-+			mgmt_security_level_changed(conn);
- 		}
- 
- 		/* Update the key encryption size with the connection one */
-@@ -3184,6 +3185,8 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 	}
- 
- 	if (!status) {
-+		bool encrypt_change = false;
-+
- 		status = hci_conn_set_handle(conn, __le16_to_cpu(ev->handle));
- 		if (status)
- 			goto done;
-@@ -3206,8 +3209,10 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 		if (test_bit(HCI_AUTH, &hdev->flags))
- 			set_bit(HCI_CONN_AUTH, &conn->flags);
- 
--		if (test_bit(HCI_ENCRYPT, &hdev->flags))
-+		if (test_bit(HCI_ENCRYPT, &hdev->flags)) {
- 			set_bit(HCI_CONN_ENCRYPT, &conn->flags);
-+			encrypt_change = true;
-+		}
- 
- 		/* "Link key request" completed ahead of "connect request" completes */
- 		if (ev->encr_mode == 1 && !test_bit(HCI_CONN_ENCRYPT, &conn->flags) &&
-@@ -3217,11 +3222,15 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 			key = hci_find_link_key(hdev, &ev->bdaddr);
- 			if (key) {
- 				set_bit(HCI_CONN_ENCRYPT, &conn->flags);
-+				encrypt_change = true;
- 				hci_read_enc_key_size(hdev, conn);
- 				hci_encrypt_cfm(conn, ev->status);
- 			}
- 		}
- 
-+		if (encrypt_change)
-+			mgmt_security_level_changed(conn);
-+
- 		/* Get remote features */
- 		if (conn->type == ACL_LINK) {
- 			struct hci_cp_read_remote_features cp;
-@@ -3507,6 +3516,7 @@ static void hci_auth_complete_evt(struct hci_dev *hdev, void *data,
- 		clear_bit(HCI_CONN_AUTH_FAILURE, &conn->flags);
- 		set_bit(HCI_CONN_AUTH, &conn->flags);
- 		conn->sec_level = conn->pending_sec_level;
-+		mgmt_security_level_changed(conn);
- 	} else {
- 		if (ev->status == HCI_ERROR_PIN_OR_KEY_MISSING)
- 			set_bit(HCI_CONN_AUTH_FAILURE, &conn->flags);
-@@ -3622,9 +3632,12 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
- 			if ((conn->type == ACL_LINK && ev->encrypt == 0x02) ||
- 			    conn->type == LE_LINK)
- 				set_bit(HCI_CONN_AES_CCM, &conn->flags);
-+
-+			mgmt_security_level_changed(conn);
- 		} else {
- 			clear_bit(HCI_CONN_ENCRYPT, &conn->flags);
- 			clear_bit(HCI_CONN_AES_CCM, &conn->flags);
-+			mgmt_security_level_changed(conn);
- 		}
- 	}
- 
-@@ -5215,8 +5228,10 @@ static void hci_key_refresh_complete_evt(struct hci_dev *hdev, void *data,
- 	if (conn->type != LE_LINK)
- 		goto unlock;
- 
--	if (!ev->status)
-+	if (!ev->status) {
- 		conn->sec_level = conn->pending_sec_level;
-+		mgmt_security_level_changed(conn);
-+	}
- 
- 	clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
- 
-@@ -5847,6 +5862,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 	mgmt_device_connected(hdev, conn, NULL, 0);
- 
- 	conn->sec_level = BT_SECURITY_LOW;
-+	mgmt_security_level_changed(conn);
- 	conn->state = BT_CONFIG;
- 
- 	/* Store current advertising instance as connection advertising instance
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index dc55763f9e58..b02181f945d8 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -177,6 +177,7 @@ static const u16 mgmt_events[] = {
- 	MGMT_EV_CONTROLLER_RESUME,
- 	MGMT_EV_ADV_MONITOR_DEVICE_FOUND,
- 	MGMT_EV_ADV_MONITOR_DEVICE_LOST,
-+	MGMT_EV_SECURITY_LEVEL_CHANGED,
- };
- 
- static const u16 mgmt_untrusted_commands[] = {
-@@ -10534,6 +10535,25 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	mgmt_adv_monitor_device_found(hdev, bdaddr, report_device, skb, NULL);
- }
- 
-+void mgmt_security_level_changed(struct hci_conn *conn)
-+{
-+	struct mgmt_ev_security_level_changed ev;
-+
-+	bacpy(&ev.addr.bdaddr, &conn->dst);
-+	ev.addr.type = link_to_bdaddr(conn->type, conn->dst_type);
-+	ev.level = conn->sec_level;
-+
-+	if (!test_bit(HCI_CONN_ENCRYPT, &conn->flags))
-+		ev.enc_type = MGMT_CONN_SEC_ENCRYPT_NONE;
-+	else if (test_bit(HCI_CONN_AES_CCM, &conn->flags))
-+		ev.enc_type = MGMT_CONN_SEC_ENCRYPT_AES_CCM;
-+	else
-+		ev.enc_type = MGMT_CONN_SEC_ENCRYPT_E0;
-+
-+	mgmt_event(MGMT_EV_SECURITY_LEVEL_CHANGED, conn->hdev, &ev, sizeof(ev),
-+		   NULL);
-+}
-+
- void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		      u8 addr_type, s8 rssi, u8 *name, u8 name_len)
- {
--- 
-2.43.0
-
+--===============8702690346909826721==--
