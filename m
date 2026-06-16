@@ -1,115 +1,107 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 374EE43901C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 11:12:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE2F345757
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 12:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781608377; cv=none; b=KRX/VVDaG6Ah0d+lPpjxiaUL6JZv6Z9FfNSauq6sbLTd4JfFs84rVveBrKGnGuTyQKkLtr3rJstal1vBB1/YtpEyKCCi53/Frg2b67b4x/F9o+3+tP3ZhJnb+EThFdIq5fy4asSuRmSEfyWQwjt2CBqO5ObZC8hqNhfhB4kMd2A=
+	t=1781612393; cv=none; b=B14nXOVa5iZAqKEeRxIRXbsdW/aZ0ieYM/cPM+se8xApdO+VFXqPnEXwXuA1ikKMY7g7ZWbFXj5bQKuGL1rEFwbVmrz+GwLZQjd7sQhw9H9ztj9twX9w/kuEG9rOV2U08Yc0cvHoWf2iqytZ0u/1OSG+jSa04/hPxR3xgTPoyOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781608377; c=relaxed/simple;
-	bh=4Z8MER+upsXsPgDv1PcDe7VVV+NEP+nEb0Z9kgnbjwU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=irSXmX1pq8unIeYXJc02BiwiW9rAVooiYFnWZ5YGOV3cO1FLhikGVIXCzxNHIXk9T1zk3NZJSHlNY4L2VGkZHqgTDe0VhK3ZlRPmnWgO5yKKgwd2wQVwlqUlbfi8cpl9wDKh5bsvW6kMF+UUBW0d/Ki3UEqMtFIZcXJyx+VQvRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=HnSlpc6B; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1781612393; c=relaxed/simple;
+	bh=w3YEWe6+KwTC7+dBT6YZSbgDWKDODFgI9QSujDk10Wk=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=qBT4ACoOb72wCAZFmv+UmZXdwXMJhU1nqj1OflYTo/AE83z699hZ8D5RYiXfDBvLpMNUZDNtEYfLmHv1LPJYVqHS2TfM4Q5wB+dujuBC5YQzreUDLTjxuJzZM+N80HeZ+GaiJWg2I8J8K4Y47aIH2FQVf+s3bxf3fei2HDcULDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=j/Rw4oYb; arc=none smtp.client-ip=192.30.252.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="HnSlpc6B"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-84275887a3fso3657488b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 04:12:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1781608372; x=1782213172; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yx01qzHYL7zapV7JT7OmgAtxcHhwEqISMkYtU1aw3M4=;
-        b=HnSlpc6BanbzaypVi1/pSWe0awb1WpbFqWJyPOUjEzaGWQrMR0OwNWSZ+L80iWYKiW
-         9S7RybzC5142ldnyDO9lgSd6DDGc5lBzgdriv0h3fKmpywM+7TnVbYM7fp0FAkXtj6+w
-         AG6hzNTMcSIP5J5iDIGrrlNKCtXx6H8NnjFn0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781608372; x=1782213172;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=yx01qzHYL7zapV7JT7OmgAtxcHhwEqISMkYtU1aw3M4=;
-        b=HypwHjdbjpF2gK510WjK/mQiHMP4Qf+U6hzCf8zwW4D1NEdCjAIVGtRj+B7ho/Ew4t
-         6ryHFWR4AXK/IKSudPWP3qpt+jiczkaGvtcjWxhTHh5QWfMYltPbywS7A+UJbpjRquzY
-         IywYH23WIj/jt3M+6i2aTQXcZ5IVj1vaDIBdP6VQYFf2zufqkVnR++x3B9UrueLqxVI0
-         qFFbXWCq/KmHqjhg7tbaHDSnYnDeim42jrwp8VKkvZWFvdoNZ7G7X2CMuSfi90G0j8Eb
-         aVwYK49M9VtdgNndPNfuRqFAMi0VCwSHVl9P7crxoDerXK7oGvjlZiZ+WOUVWpvlcvcP
-         5SIg==
-X-Forwarded-Encrypted: i=1; AFNElJ8mj5gf4oZOmZwYeHqua2cBkMovwD8/LUp6bw7V2/jDn0iKrz+kbuDYmtt29OwF8k5sMxCmaKCdF3fmQ5JsgM8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyyd+OWVS7Glk1x3nznrGcRDz7S6AfMK+qOiFJvafoe3/3uhHIl
-	4nBxEBNcVtBqZYqFhxA+6aR3JNaSyIpmhR62/Y9bMM33rnMcXwnFjYNPtL1e/9Cmiw==
-X-Gm-Gg: Acq92OEh2JHfGTLFPLr3DfWqYJIXdKn4e5dUmdYElN7HVGny4tLuTM+xfBfwG5Mtdy/
-	WYJFM5l01bc8snBwSInZNIdyjMCQ15HC0sjZAZucCGhZepHn+MIpoBJ/i+MkiVwBBSUJfZvWcfQ
-	8RPrZVfRll9nlljJyyTelk0t7Mgk6XtD6+60kVTj8X4fKYE7fnQxmt11wJKvg+3a8XVE0ofNRso
-	avoHnEebQwl5Eh6VgujhinZ4HJ1SLcIzGGxtf6xWLSziwBB0DBkqSg0Qpus+W925gOxGBof3A3S
-	FlJhhtVXFI8knKqKKrrmL9lm2phKRBsnrGIYMIfg57muZeVAhtMH+7nXYSK4+fh20PFOt2JAjs7
-	9VDzW74wigVeB6XCTLYw7YmhPAlHcC60zlXDe6Hv/c3sWdigt7DH0AJnlQ9BXQDwHeT/7Pidfzr
-	RHgTo1LOmjrqCClm0W0dUduuOi6/WNxTly7VerjshV+4al4v9ydIsW4/PhSlgcQp0XlReoqiXfx
-	BZvN9PvlAk1
-X-Received: by 2002:a05:6a00:6f55:b0:842:6344:f33a with SMTP id d2e1a72fcca58-84513e1747fmr2470656b3a.3.1781608372537;
-        Tue, 16 Jun 2026 04:12:52 -0700 (PDT)
-Received: from tigerii.tok.corp.google.com ([2a00:79e0:2031:6:a0b:fabb:5b62:b85b])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434b05921bsm12906321b3a.59.2026.06.16.04.12.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 04:12:52 -0700 (PDT)
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Mark-yw Chen <mark-yw.chen@mediatek.com>,
-	Sean Wang <sean.wang@mediatek.com>
-Cc: Tomasz Figa <tfiga@chromium.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	stable@vger.kernel.org
-Subject: [PATCH v2 2/3] Bluetooth: btmtksdio: test for bug IO errors in btmtksdio_txrx_work()
-Date: Tue, 16 Jun 2026 20:12:07 +0900
-Message-ID: <20260616111224.152140-3-senozhatsky@chromium.org>
-X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
-In-Reply-To: <20260616111224.152140-1-senozhatsky@chromium.org>
-References: <20260616111224.152140-1-senozhatsky@chromium.org>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="j/Rw4oYb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1781612391;
+	bh=gClBhwvIbp1cHPBZXuVvd6NEk101NilfISWbYF5pmTo=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=j/Rw4oYbRPZ0G+shDZ9qTDUMjyazU3B8IaDBQMQB3Gl+S0nbq5U7flL0BciZuRUAq
+	 ZbySVyGcwggZQHYJxRskM8dx3tvhuhD8ie2pCLiz64REOM12N0zEBBB+z6OgDTq1Hw
+	 +pPerNShr/tjBIGOkEjWYTeFl75aibN8hG+V4oWo=
+Received: from github.com (hubbernetes-node-3e494ce.ac4-iad.github.net [10.52.210.53])
+	by smtp.github.com (Postfix) with ESMTPA id 90457941170
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 05:19:51 -0700 (PDT)
+Date: Tue, 16 Jun 2026 05:19:51 -0700
+From: Bhavani <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1112111/000000-d8e60b@github.com>
+Subject: [bluez/bluez] 654362: shared: rap: Check role before sending CS Sec
+ Enab...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-btmtksdio_txrx_work() loop termination condition checks for
-int_status being non-zero, however, this evaluates to true
-even when sdio_readl() encounters BUS I/O error (in which
-case int_status is 0xffffffff).  Break out of the loop if
-sdio_readl() errors out.
+  Branch: refs/heads/1112111
+  Home:   https://github.com/bluez/bluez
+  Commit: 654362f5880156fdf3467baf04bbab7407477be4
+      https://github.com/bluez/bluez/commit/654362f5880156fdf3467baf04bbab7407477be4
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-06-16 (Tue, 16 Jun 2026)
 
-Fixes: 26270bc189ea4 ("Bluetooth: btmtksdio: move interrupt service to work")
-Cc: stable@vger.kernel.org
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
----
- drivers/bluetooth/btmtksdio.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+  Changed paths:
+    M src/shared/rap.h
 
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index c6f80c419e90..d8c8d2857527 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -574,7 +574,9 @@ static void btmtksdio_txrx_work(struct work_struct *work)
- 	txrx_timeout = jiffies + 5 * HZ;
- 
- 	do {
--		int_status = sdio_readl(bdev->func, MTK_REG_CHISR, NULL);
-+		int_status = sdio_readl(bdev->func, MTK_REG_CHISR, &err);
-+		if (err < 0 || int_status == 0xffffffff)
-+			break;
- 
- 		/* Ack an interrupt as soon as possible before any operation on
- 		 * hardware.
--- 
-2.54.0.1136.gdb2ca164c4-goog
+  Log Message:
+  -----------
+  shared: rap: Check role before sending CS Sec Enable cmd
 
+Add the is_central parameter to verify whether
+the local role is central before sending
+the HCI CS Security Enable command.
+
+
+  Commit: e98e534dcc27c8861a626cb5968da391c29246aa
+      https://github.com/bluez/bluez/commit/e98e534dcc27c8861a626cb5968da391c29246aa
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-06-16 (Tue, 16 Jun 2026)
+
+  Changed paths:
+    M profiles/ranging/rap.c
+    M profiles/ranging/rap_hci.c
+
+  Log Message:
+  -----------
+  profiles: ranging: Add CS Initiator cmd and evt handling
+
+Introduce support for LE Channel Sounding (CS)
+ranging procedures in the Initiator role by enabling
+required HCI command sequencing and event handling.
+
+Add handling of core HCI LE CS commands and events
+This enables cs capability discovery, cs configuration
+management and execution of CS ranging procedures
+in the Initiator role.
+
+
+  Commit: d8e60b357ae7e770262746b47809bb8ac6a21368
+      https://github.com/bluez/bluez/commit/d8e60b357ae7e770262746b47809bb8ac6a21368
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-06-16 (Tue, 16 Jun 2026)
+
+  Changed paths:
+    M src/shared/rap.h
+
+  Log Message:
+  -----------
+  shared: rap: remove the old wrapper API
+
+Replace API bt_rap_set_conn_handle with
+bt_rap_set_conn_hndl which has extra parameter
+to avoid compilation error for individual patches
+
+
+Compare: https://github.com/bluez/bluez/compare/654362f58801%5E...d8e60b357ae7
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
