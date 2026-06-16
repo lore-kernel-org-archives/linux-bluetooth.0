@@ -1,148 +1,136 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64EC3397338
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 07:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3559940BCAA
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 07:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781594590; cv=none; b=Y7R3WydMwGhWoDRK+0vSu7BBqcZLxvk+qCDIpLbOSe2Gm6kW0kihJ75uxIKtiT5OCQJoGeurLyqDUteW7wY5iJCVurXCZwAJSMNDNJpkzBvJp1CMdowXL7d+3B+Br9x6gav1CFk5x4CUwg8a5n1MxWy6RbVLvUWCSJu+51pN5OA=
+	t=1781596198; cv=none; b=ULClWulyXatqQAVt+/VctKIBw9MQKRiH6kg+kHTEY1AbThE2L2dvRKg4znlRnZYp/Q1vSmnnOtfjqkEWB0E0bauxPc2J2pcDUqzXRK/jIMuYvJnfsKbWSLTWDPO9VGDp5J7AJBdcVkux/8oarLuQNIE5y02yEGzma5Oa/dniZ3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781594590; c=relaxed/simple;
-	bh=OfnxlrQu3zZvNXWxRd4GFgpu0dcdiGo/gFWo+ZCMsq4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sZanwjQ+TMnCmE3OSbZm9FLZKuOYCIFJH1KgA7Kt0JBWUOGqB6EU3Yi5RcGIlZgKodmK7S5QL1SdwtndOAJOOVcqgEgyK0by/YEF/3RCw9hOzmCmuk4M3wnKUbX0D27XK9YHzAyDzwbA7vtGEiTzu0fbxDJPpUbcZQxSsrzOlBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=GxjVVAfI; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=haMaXJ1X; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1781596198; c=relaxed/simple;
+	bh=J0mb5zIXwfgqhQSz9m9c5vdy9XnkrfZqjTH5IvCK+DQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=YROfciVZPN8uMAD7GqHYVMK6yBljmDHub7FPGlpteqTNdd2jhgSYp8Z2iBrpIDO2LOuuGXQYU0bOUh3derk49Y/G4oPLJub1hGWrulCStY2wEWLoVj+5qA/AkBMfv+JHC7baiQx94m7LN3G1NQ/WmIj6drOhU5tEkBUBZal0Sm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mgK5rF3r; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="GxjVVAfI";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="haMaXJ1X"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65G64X6H2336921
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 07:23:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=4UWFPgBgkV3
-	0UGI8Ubgxp0yzF83aG7nzSfZodfDG6t8=; b=GxjVVAfIuezEKTDbPTGAOAgiMhT
-	gCYLosMrCXnb8Ah1exPbJPwIPtVkuc/17Uk+pqxvFjSWQH4a/VF8jNB+BUP4VlWk
-	dZ42YBkqmUb5cV/ZtKAu4Xz0Umd496m43rKs+cgKSZumRrL3Vpxan6EtzutNLzFd
-	L32x/sVO4Z8qPJRkzawHkRKq8g3tPVRdsegzPO2zyhDyBcnZIDgbpGt2nQ/xHUpr
-	puD3jz8kN2L9hLBaTJGwHSHj40cijzeIRnJiUZ+OYLtKo7jz7qWaFXazh856eJc5
-	5ZiMu0tDb7cYUazyIg48nLEboBzPqgDCICfkc1kZibRN4g9j57G0sEM8hpw==
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4etew0ng1d-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 07:23:08 +0000 (GMT)
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-8423f6247c6so5002802b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 00:23:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mgK5rF3r"
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-36dac5d5d05so2106538a91.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jun 2026 00:49:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1781594588; x=1782199388; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4UWFPgBgkV30UGI8Ubgxp0yzF83aG7nzSfZodfDG6t8=;
-        b=haMaXJ1XYp9Q7ROx8tfkJ1r9aCZADfRRGVnarPM5xjRL6E3hzASd1ejbefXuPos8YI
-         +NDZ7JKRagnwKbj/i/vxIIbnAAQB1Jbaf+kN3g8fMVN8j8Q/GGojZ0FY2SUM6jzi6ETA
-         r3qgG6o/EmQgB0TfUpzPLiG6ltHtXSXuWsD9CEjwoR1Eh/ZgLWo1/ZuuOL6vzv6g5YYo
-         LHY+YSZBTdtOY+P0w8czNFFyzaBLUOpjiyn2bXhkplhbTP0m2onniVafqRNjRIqi4DXH
-         leEEGISPoEyp8Bdhb+71ng7Co8DIJRHt+YbinB3tDf64aVOW0og99T0jvOlG8H5y1AN3
-         4Y2w==
+        d=gmail.com; s=20251104; t=1781596196; x=1782200996; darn=vger.kernel.org;
+        h=mime-version:content-transfer-encoding:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+YRjjKwd+HfHNFTmY+ywFQxNy37HvLFGrVP/h6UuY+g=;
+        b=mgK5rF3rXWK+u4sgPatTIaRvnzOmUbxVuWB1FTit3+p+3iARPpjFTGu4tbBzmnrJCK
+         afeqfCxA3KZtTjA+2+1G3yLHFGcLN84OQVIZe95XlBjGvOiB4jfLdCdNWjZk2IyQrH1b
+         kcA7XYllo7aWA+Tcyzb4XP1NBnp4Aj5X7T8KhwGnhXsOsRirmRpDNfBy/V/HyDZroYCO
+         G4ejPIly6Hp3BV6eo2yhI68A2WseNrc5zjwIttwQGGMFZ3/jwxjlviSTgSXqKq+GjuDs
+         d+fEYxeaXzuqMA0gtyQ2hVD7t7P44CehugxXXwqoMtx5O36Ppb+Vy0EAqDRr3e/7JCOK
+         wDvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781594588; x=1782199388;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=4UWFPgBgkV30UGI8Ubgxp0yzF83aG7nzSfZodfDG6t8=;
-        b=Vzrlb2tJ4CpIDRhHCfkg2z0aR+1hqsZ+XJYkA7vwC4gQejHT+ZZUHgQ0LSfgb1561F
-         67UiGN9L8wJWtZJ1ULm1Sy3J8qzuaiLFFRYBj6t/Mv2sE/5ybm1OtpRuOOE2JXSNuhcK
-         KI55MS03wLD7VBFo+GsmScfGSvQW+Lkt7dOo/0aTyMUZEGrFHeEmxFOVuUuVa5eAcVM1
-         P1/zyrcSCamIpJ+K1m48jVQM2Wtriao3WMQaUWCQa8ozmawkbZ2vYwlku1s1Lbk1pDq3
-         8wwMr+2c+Ys6KHgiejD5dMO1SsJNLyVor4cJ+OrtasAPKMylS35TEH1LrVISitX29vRi
-         U7cw==
-X-Gm-Message-State: AOJu0YwkirJSI/WyIHtC1w5GE3uUKUXEtpK82pDQVsZA3FQck1mr0D0v
-	KqGS3a1oLfjDpOD0m43yjhraLbdeniIBa0Ct5lhBoogKNg8WhFkVHBY6yOqjFIa1xhJE8BOai2A
-	5dxqM3diHizZ1VRs+NNAETfiLQkrifCwy4nLjiJUbWBeYt3vEnHWb+CYJqYiv4/nUVIwP3dDt0D
-	hrv8A=
-X-Gm-Gg: Acq92OFdLIcpEtUOKmfn6VGltyaYLIGk1ZtilvlmJPj7wmUngcOPvtNteZg80MtYoC8
-	JSsoC5uJ7z6pzIZ8XvOVTZ0QnOh1TA760GciBNq0sLIZgeUcm09RyT/VxGBqr+2ev65CRz4tQs8
-	T4mHwXzIsyBTbAsq5momXboJrcYbep1asdzPxez88s60XJuAjenyRsYukWNzU1TRLHT3wgekJI8
-	xHJttNEp2W+U08JJumvV37BrTDdTbmHSOC5x3Zake/XADlvscfirNoaK1dAI/aOZUXtp1thH3pQ
-	rBCI4WY/JWqZX6bNF876XCSjrVOG19s1iRRWJ8JkP/zupYOmFi5Vkg+MdnRbDdCoJewJV77R51w
-	jyn9wjBfcxYqJZAlb4dH1y5kdssvV+XbqUEJQU37i36IJav+BFt4=
-X-Received: by 2002:a05:6a00:12e3:b0:82f:425b:4c27 with SMTP id d2e1a72fcca58-845154fce9emr2401438b3a.14.1781594588016;
-        Tue, 16 Jun 2026 00:23:08 -0700 (PDT)
-X-Received: by 2002:a05:6a00:12e3:b0:82f:425b:4c27 with SMTP id d2e1a72fcca58-845154fce9emr2401419b3a.14.1781594587687;
-        Tue, 16 Jun 2026 00:23:07 -0700 (PDT)
-Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434b057461sm14394934b3a.58.2026.06.16.00.23.05
+        d=1e100.net; s=20251104; t=1781596196; x=1782200996;
+        h=mime-version:content-transfer-encoding:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+YRjjKwd+HfHNFTmY+ywFQxNy37HvLFGrVP/h6UuY+g=;
+        b=jddN500lav90HBZvh0aFDolyZq08OlC5ti3pZisEtR3+Fxp33mJha1RfMXa1w1XJeN
+         Ux8NCRf1kJG2FNXMAFTQDMlicZbons0PLqGhJhYJKldtqCfsMomi4taiIz+VTLEikrzL
+         GciqImMu3bLAZg53lpQDqQQXm+ldd/OTYVcfjXyT2AN3hGRwyDYug2CQCcSJJjLlVM/L
+         O8bHEwuyAM/Ny7Zdd/i24jcihmLoo1sWuCbenx9CZn5x9OVEN2rcuInEHTjHs05rAkJt
+         rcIJrMMLvflAPHTKM9O9ZFmgiQzTJyz+UuKhp4sfFgEg49OYmiIaRCwJSjFJwjEj1rB9
+         yExw==
+X-Forwarded-Encrypted: i=1; AFNElJ+lQwOSS3QYR22nCDbE4ZznNbbQDXNAaABjF723kY0LerdLJGbkY6zFwSKiHVrcaEfkxDQOzW2gW/Vzst43V7U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPoth4ddF+M27WXpjKt/VgQp/fPcKqqML4JXatw7k5HJDaA8UN
+	//h78Tzpts3IhLiy//A6VEZUj8VNGEqdGxtJhtHIrDDx3+BhNSnepXlUSr4F5Q==
+X-Gm-Gg: Acq92OG++NBeNnsO/of+fBxJE/ip82fZZ+RHiOEtn9vpvnTnhKAOEKCEP2Haot1X3V8
+	46jD762l55IrpegMiAw4Bpst2YbkoOCt/YwIqokQ6oLeQMMlY7oTKJGyI6FX5fGxWO9LA6Kor03
+	J1GClCNkQLGV3zJyrEzf8IJh8BZWhjrnH/0KhRyu5maOZqUOZiZhn4cCQudgAM3+/HImZcWUBoX
+	oO0XldTuLLcsZ88x1wMeFSBsI2mss/7lDC0CencgAgpEYHkWyG4RKVX7E9C8xaQX9RWi82dyGI2
+	D7xpcieJpPJOL/uh27MVvgQr5N1OSpKrRWxlj/BWu4wSqLCDcsUiNcqnTmFOhLABFjSq/nR/f7e
+	eUN3DLEV2fYUI6JwL6QpiR/RyUr6KI21gZeJgHqbqfUwWLxCELM0vc1/7sgzHBm1plAYm2Yavfy
+	FCYkxOKu6+ZteLq1+D3/+ZPpt8VHsmAX6GJK4rysHKDiN1TG+O
+X-Received: by 2002:a17:90a:e70d:b0:36b:9798:4f67 with SMTP id 98e67ed59e1d1-37c2bc73c79mr14927629a91.8.1781596196484;
+        Tue, 16 Jun 2026 00:49:56 -0700 (PDT)
+Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37c5228eb67sm1944299a91.9.2026.06.16.00.49.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 00:23:07 -0700 (PDT)
-From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
-        quic_anubhavg@quicinc.com,
-        Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Subject: [PATCH BlueZ v4 3/3] shared: rap: remove the old wrapper API
-Date: Tue, 16 Jun 2026 12:52:45 +0530
-Message-Id: <20260616072245.3700010-4-naga.akella@oss.qualcomm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260616072245.3700010-1-naga.akella@oss.qualcomm.com>
-References: <20260616072245.3700010-1-naga.akella@oss.qualcomm.com>
+        Tue, 16 Jun 2026 00:49:56 -0700 (PDT)
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+To: Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+ Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: btnxpuart: out of bounds read of firmware in nxp_recv_fw_req_v3()
+Date: Tue, 16 Jun 2026 15:49:52 +0800
+Message-ID: <178159619299.2177923.13356195860330189592@maoyixie.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE2MDA3MyBTYWx0ZWRfX+7fx5KUwU4Q4
- 75P1w7WqWy8JEhgTA/sfle6AHkl6ZnScPp7rTLqUcH7jbUBVj6lQvX0bNOHtNIQMGpbM9OEiBwL
- gpzcYiPtVX8LTZl9Bd9fiJ+1k2kU3Eg=
-X-Authority-Analysis: v=2.4 cv=QLlYgALL c=1 sm=1 tr=0 ts=6a30f9dc cx=c_pps
- a=rEQLjTOiSrHUhVqRoksmgQ==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22 a=S_ld5syL9isSlWfUGIQA:9
- a=zZCYzV9kfG8A:10 a=2VI0MkxyNR6bbpdq8BZq:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE2MDA3MyBTYWx0ZWRfX4vkwoJ7SPdpv
- 35G88aNuAFJ2lyAtlmgTFtWx2LMQY6msztiI4JYPA3wICSqETZmnbaafc0Z5ehPYzwh6eZYm4jt
- gVV13mrZNGuCOTTyyxU+4xHrgNSf1kwG3lqsUCWex+HFzggVVM+Qccq/M5YyFskERZ+mmK2Lv63
- xJup38v/SYbeRgPaOjrtCIMtT14Y41c5h+3SpX+f2DbWFuYVxhg0AOlR8CteQonsXcQeswR0RhB
- L/i5I6KDQvwm/auljJy3Iaq6gWuBidy2wrOo2Rlg4A7fxqDFIgjDU4jEl1c49IicLeElPiAngLC
- kl2RiBKAteVK0slFatS9ApkvOw1dIKafkEcylx0Z8fWJrCnFaFOBDX0ewA25BDNfxn9PbhiG/eK
- YWjGxyE5kSelIGWdk2TkobOJTYm6YjMJYD7/MIuOU1ZSwfrIjlAIfbMr/yFWexZ7HIw3XK96M26
- Fe0yLwNFuvhgChpCjBA==
-X-Proofpoint-GUID: tlwfleztx2gG94ONpHJ_Lzq53Z83xjP6
-X-Proofpoint-ORIG-GUID: tlwfleztx2gG94ONpHJ_Lzq53Z83xjP6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-16_02,2026-06-15_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 clxscore=1015 priorityscore=1501 adultscore=0 spamscore=0
- bulkscore=0 suspectscore=0 impostorscore=0 phishscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606040000 definitions=main-2606160073
 
-Replace API bt_rap_set_conn_handle with
-bt_rap_set_conn_hndl which has extra parameter
-to avoid compilation error for individual patches
----
- src/shared/rap.h | 4 ----
- 1 file changed, 4 deletions(-)
+Hi all,
 
-diff --git a/src/shared/rap.h b/src/shared/rap.h
-index 7db68478c..7bc49f03d 100644
---- a/src/shared/rap.h
-+++ b/src/shared/rap.h
-@@ -212,10 +212,6 @@ void *bt_rap_attach_hci(struct bt_rap *rap, struct bt_hci *hci,
- void bt_rap_detach_hci(struct bt_rap *rap, void *hci_sm);
- 
- /* Connection handle mapping functions */
--/* Old API preserved as wrapper */
--bool bt_rap_set_conn_handle(void *hci_sm, struct bt_rap *rap, uint16_t handle,
--			const uint8_t *bdaddr, uint8_t bdaddr_type);
--
- bool bt_rap_set_conn_hndl(void *hci_sm,
- 			struct bt_rap *rap,
- 			uint16_t handle,
--- 
+I think nxp_recv_fw_req_v3() in drivers/bluetooth/btnxpuart.c can read past t=
+he
+end of the firmware image. I would appreciate it if you could take a look.
 
+The chip's v3 firmware download request carries a u32 offset and a u16 len. T=
+he
+handler checks only the lower bound, then sends firmware from that offset.
+
+	offset =3D __le32_to_cpu(req->offset);
+	if (offset < nxpdev->fw_v3_offset_correction) {
+		... goto free_skb;
+	}
+	nxpdev->fw_dnld_v3_offset =3D offset - nxpdev->fw_v3_offset_correction;
+	serdev_device_write_buf(nxpdev->serdev,
+		nxpdev->fw->data + nxpdev->fw_dnld_v3_offset, len);
+
+Nothing checks that fw_dnld_v3_offset + len stays within nxpdev->fw->size. So=
+ a
+chip that asks for an offset or len past the firmware image makes the kernel =
+read
+past nxpdev->fw->data and send that memory back to the chip over UART.
+
+The v1 handler already bounds this. nxp_recv_fw_req_v1() guards the same writ=
+e.
+
+	if (nxpdev->fw_dnld_v1_offset + len <=3D nxpdev->fw->size)
+		serdev_device_write_buf(...);
+
+The v3 handler is missing that check.
+
+I reproduced the read on 7.1-rc7 by replaying the serdev_device_write_buf()
+source read, with the firmware image ending at an unmapped page.
+
+  BUG: unable to handle page fault for address: ...
+  #PF: error_code(0x0000) - not-present page      (a read)
+  RIP: 0010:... (the fw->data + offset read)
+
+The fix I tried bounds the request against the image size, like the v1 path d=
+oes.
+
+	 	nxpdev->fw_dnld_v3_offset =3D offset - nxpdev->fw_v3_offset_correction;
+	+	if (nxpdev->fw_dnld_v3_offset >=3D nxpdev->fw->size ||
+	+	    len > nxpdev->fw->size - nxpdev->fw_dnld_v3_offset) {
+	+		bt_dev_err(hdev, "FW download out of range");
+	+		goto free_skb;
+	+	}
+	 	serdev_device_write_buf(nxpdev->serdev,
+	 		nxpdev->fw->data + nxpdev->fw_dnld_v3_offset, len);
+
+This needs a misbehaving controller, not a remote attacker. It still looks li=
+ke
+an out of bounds read to me. Does this look right, and is that the place to b=
+ound
+it? Happy to send a proper patch once you confirm.
+
+Thanks,
+Maoyi
+https://maoyixie.com/
