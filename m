@@ -1,150 +1,130 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7B33B42FA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2026 06:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A722B165F16
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2026 07:18:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781679488; cv=none; b=HLCeFm7vK+TERey/JL8GbW+o9azY8aKnG9YlPRIFPIEJ7FRlXd6HgwXgAS1O8ac8UXnihBlnaBzLs/h9Xgy1hON6AbejQwMaDVQLpDOp2MrSgmVwkW7RWxp9Usl+DwxidJ37RiFqtuDDOalZWpbiZ7C2yd9p+8rGuyKxHmW38is=
+	t=1781680713; cv=none; b=cfoamWZCN6TRY8B+T052oSyq6hgPBzdRnYNRuz8U2YaaMhm6pTqhauOuLu8ascqrqVkkPjwY170rCLPDIm0uUJsbcm19k4h8k8MnB5AJF01X4OqkDWqrqhrjzeJvxFLxUUbmXnijvFMdtM6ei3Us/77MF14Uvu1z1Bc2xHEimr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781679488; c=relaxed/simple;
-	bh=Pr+cliIEe+YItP1n/fovfNDbomZ//W1AIoAD4WNAPeI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=pFSxvdzivu3BdFDOoyq/pt0aVLmD2yS2tfo+AUXWJmHg7duGKkCs2sfyv+5npljeEtL142oEexz0o6/DsnOjgCnVt3ZNkzYniM6cPdsPxOVBAhgnDo4cSuJL9e7gFqjoP6JVpKXggTMkwDsFmBxMx+dKdjWvGCj73f3orxE/Mdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.217] (p57bd9073.dip0.t-ipconnect.de [87.189.144.115])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id A64E54C1A4F360;
-	Wed, 17 Jun 2026 08:57:41 +0200 (CEST)
-Message-ID: <3147f351-22bb-4d2a-aab5-58cf208ca735@molgen.mpg.de>
-Date: Wed, 17 Jun 2026 08:57:40 +0200
+	s=arc-20240116; t=1781680713; c=relaxed/simple;
+	bh=dqLcMC6K9J0/1pNeV9weTbp3cK/bzbXbG94OS5+CowA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=PhSjeJ7hHVUaIrI/751FUZGrDUgsH0qRGzrf1sRlqYlIvCdOkYaLfXtIQz0vkNitOspQYw7jkve7ic3pKp9586eYXY57tDiRQ9gpt7zsELVLc281MAh1flSTcxKGoJulab+uyuBlfmR/aBcJOkOGN1iVvOf2VOu1dx6UT/zuQSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Le/V2SGX; arc=none smtp.client-ip=74.125.82.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Le/V2SGX"
+Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-30bd47b9f0fso317444eec.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2026 00:18:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781680712; x=1782285512; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=kQ4q8McL13+LWIuj+NeI0oWjxd22o+sLh/ySB1gd/aQ=;
+        b=Le/V2SGXXdYdir67iEks/0zm64FCW1cLhS1LKoyjemsaAAmjKjmaxAp4dazg25ZfUE
+         C2RbBOi4Ff9R0GZ0vmzrIJbRLHRKfBPlVwoYM521dsSYEZ1aOckRhT1HJmDq8m9vexnt
+         xMj+ebOoq8u+MsdjShkEcob0RBdczFpM9vZg1VHz+XuqTDeYaGRbuphFuD0BkeaXyl11
+         Bi6azPiOkhL28aEaNe2HiPckKlL83EJBcVbIxmaMPaR7djuvly9HmOcLIC7FRoCC3b4F
+         +omgeb5IfLFCWBKkAeUaCulXvxuG9dwm5foirOvMOSD/h946DLbYgri2220piIBiICZQ
+         aVQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781680712; x=1782285512;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kQ4q8McL13+LWIuj+NeI0oWjxd22o+sLh/ySB1gd/aQ=;
+        b=DKtpkXcna+vTgJ8DpaiOiJULgN1GS4OXESDP3BmkHtubMiyN/0pXF03qid64TskelA
+         CMktUEj+30sdr9xVgj23FM2qhCJh/gguaRyc6eCE6iQSHCj2ORQhPoDYUBTuiGpw4jb7
+         bd+DA2h4xsIfOU7ow03pDM3Prxb+EN3mxFn0rRjje6Ce32kEaQgs7jgtrtWKUPV4h3qA
+         pgG65aP2KYgyC1jopmig2ANbcUgmXcLoHfDnLJA6rFTDKbVA6zUjofRLR5XuzBlHyxXa
+         PJ4hsPDfA0e4OwqHUyKjtnX5Z/0kvFsu2HqeteMvhfJgt5aoSZg+6NcMoGJJBpqYGMZU
+         wrJQ==
+X-Gm-Message-State: AOJu0YxtBm9jo2XJid41O5eCZTApK6KeiGNBKg1kmbIHROTQ8APIH3km
+	hJ1s5zlnutgHCPguWusFaNMucRbI5EoLgTpSnP6aZKTGgbkO9AMqclIlkV2lxw==
+X-Gm-Gg: AfdE7cmMJYY9dFQ182pLHVqfzZ3J3ys4D2pt5ct+wSYxNmb571FUQMWxZ4CA14TO6CY
+	BH65HDzerhK77DTdf6UeqoaE5BYIyMIqUm28aqOY4omjJCb5eLK32Ul+05VZOcwj0R5D+8NnMNK
+	bXY5ScLw8Zv5EvU8KQ+if0JKxcs7vsEEqxXdWLwS6GFy6zTQ4tIDzkWgXXUam9DzLQ3Yiup4KUn
+	mSfQqeLUtvLkuA3hkMuU+j9gf/eH6KtlqgnNPYlGVEcxi5Fmplh+qAqsYXiKus19KpRs0OqkdBD
+	+YeT+NIf4ZbkudJY7Mi4iQ5IsEGygQ7vkdaRHUnqWgFhxvG/homLRw3QYwmjvD0lVHI0xll5TJB
+	6qSWcxyMi84jvLkfrRFJEbbh6pm3LPdjFRPF84WQjR5ooUDfVOP5+s7zWD6ffFRCYYWCqNQGFKn
+	67OE20OWWboqIIDRwQuOQ=
+X-Received: by 2002:a05:693c:3105:b0:307:287f:9bbc with SMTP id 5a478bee46e88-30bca0a3900mr1286993eec.25.1781680711700;
+        Wed, 17 Jun 2026 00:18:31 -0700 (PDT)
+Received: from [172.17.0.2] ([172.208.154.7])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30bdcba4b1bsm595323eec.20.2026.06.17.00.18.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jun 2026 00:18:31 -0700 (PDT)
+Message-ID: <6a324a47.14d9b9dc.267f5a.d138@mx.google.com>
+Date: Wed, 17 Jun 2026 00:18:31 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6244412206844455701=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Bug 221660] New: btmtk (MT7921K / RZ608): BR/EDR outgoing
- connection always fails with Page Timeout (0x04); scan/receive works, same
- device pairs fine on Windows
-To: Sean Wang <sean.wang@mediatek.com>, Sean Wang <sean.wang@kernel.org>
-References: <bug-221660-62941@https.bugzilla.kernel.org/>
-Content-Language: en-US
-Cc: =?UTF-8?B?Q2hyaXMgTHUgKOmZuOeomuazkyk=?= <Chris.Lu@mediatek.com>,
- linux-mediatek@lists.infradead.org, linux-bluetooth@vger.kernel.org
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <bug-221660-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, senozhatsky@chromium.org
+Subject: RE: Bluetooth: btmtksdio: teardown fixes
+In-Reply-To: <20260617064543.574704-2-senozhatsky@chromium.org>
+References: <20260617064543.574704-2-senozhatsky@chromium.org>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============6244412206844455701==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-[Cc: +Mediatek]
+This is automated email and please do not reply to this email!
 
-Am 17.06.26 um 00:39 schrieb bugzilla-daemon@kernel.org:
-> https://bugzilla.kernel.org/show_bug.cgi?id=221660
-> 
->              Bug ID: 221660
->             Summary: btmtk (MT7921K / RZ608): BR/EDR outgoing connection
->                      always fails with Page Timeout (0x04); scan/receive
->                      works, same device pairs fine on Windows
->             Product: Drivers
->             Version: 2.5
->      Kernel Version: 7.0.12-arch1-1
->            Hardware: AMD
->                  OS: Linux
->              Status: NEW
->            Severity: normal
->            Priority: P3
->           Component: Bluetooth
->            Assignee: linux-bluetooth@vger.kernel.org
->            Reporter: bynxmusic@gmail.com
->          Regression: No
-> 
-> Created attachment 310333
->    --> https://bugzilla.kernel.org/attachment.cgi?id=310333&action=edit
-> btmon HCI trace (binary + decoded) of the Page Timeout + system info
-> 
-> btmtk (MT7921K / RZ608): every BR/EDR outgoing connection fails with Page
-> Timeout (0x04). Scan/receive works, and the same device pairs fine on Windows.
-> 
-> HARDWARE
->    WiFi+BT combo: MediaTek MT7921K (RZ608) Wi-Fi 6E, PCI 14c3:0608, driver mt7921e
->    Bluetooth function: USB 0e8d:0608 (MediaTek Inc. Wireless_Device), btusb + btmtk
->    Motherboard onboard radio, AMD desktop platform
-> 
-> SOFTWARE
->    Kernel: 7.0.12-arch1-1 (x86_64), Arch Linux (rolling)
->    linux-firmware: 20260519-1 ; linux-firmware-mediatek: 20260519-1
->    BlueZ: 5.86
->    BT controller firmware: HW/SW Version 0x008a008a, Build Time 20260224111243
->    BT firmware blob loads OK: mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin
-> 
-> WHAT WORKS
->    Controller initializes cleanly every boot ("hci0: Device setup in ~160000
->    usecs", AOSP extensions v1.00). Inquiry/scan works: remote devices (a
->    Skullcandy Crusher Evo headset and a Samsung TV) are reliably discovered with
->    RSSI, so the RX path is fine.
-> 
-> THE BUG
->    Every outgoing connection (page) to any BR/EDR device times out. HCI Create
->    Connection is issued and accepted (Command Status: Success), but roughly 7.7
-> s
->    later the controller returns Connect Complete with Status: Page Timeout (0x04).
->    BlueZ reports org.bluez.Error.ConnectionAttemptFailed. The remote device never
->    registers a connection. The same headset on the same PC pairs and works
->    perfectly under Windows, so this is not dead hardware or a peripheral issue;
->    it is the btmtk/MT7921K outgoing-connection path on Linux.
-> 
-> KEY HCI TRACE (btmon), captured with the WiFi driver (mt7921e) UNLOADED, i.e.
-> WiFi/BT coexistence ruled out:
-> 
->    < HCI Command: Create Connection (0x01|0x0005) plen 13   #9  [hci0] 14.208614
->            Address: 88:08:94:13:8F:94 (Skullcandy)
->            Packet type: 0xcc18 (DM1/DH1/DM3/DH3 ...)
->    > HCI Event: Command Status (0x0f) plen 4               #10 [hci0] 14.209664
->          Create Connection (0x01|0x0005) ncmd 1
->            Status: Success (0x00)
->    > HCI Event: Connect Complete (0x03) plen 11            #11 [hci0] 21.899975
->            Status: Page Timeout (0x04)
->            Handle: 0
->            Address: 88:08:94:13:8F:94 (Skullcandy)
->            Link type: ACL (0x01)
-> 
->    Also seen intermittently in dmesg during attempts:
->    Bluetooth: hci0: ACL packet for unknown connection handle 3837
-> 
-> STEPS TO REPRODUCE
->    1. Boot with MT7921K onboard Bluetooth.
->    2. Put any BR/EDR device (e.g. a freshly factory-reset BT headset) in pairing
->       mode.
->    3. In bluetoothctl: scan on (device IS discovered), then pair <MAC>.
->    4. Pairing fails with org.bluez.Error.ConnectionAttemptFailed; btmon shows
->       Connect Complete: Page Timeout (0x04).
-> 
-> EXPECTED vs ACTUAL
->    Expected: Create Connection succeeds and pairing/bonding proceeds (as on
->    Windows).
->    Actual: every Create Connection ends in Page Timeout; no outgoing connection
->    ever completes.
-> 
-> ALREADY RULED OUT
->    - USB autosuspend: disabled via options btusb enable_autosuspend=0 (confirmed
->      power/control=on). No change.
->    - WiFi/BT coexistence: Page Timeout persists even with mt7921e fully unloaded
->      (modprobe -r mt7921e); the trace above is from that state. Also tested with
->      rfkill block wifi. No change.
->    - LE vs BR/EDR bearer: tested with and without Experimental, and with
->      ControllerMode = bredr. No change.
->    - Stale/half state: reproduced after a fresh cold boot (controller not
-> wedged).
->    - Remote device: Crusher Evo factory-reset; nothing else paired to it
->      (phone/TV BT off); works on Windows.
-> 
-> ATTACHMENTS
->    - bt-hci-trace.btsnoop: full binary btmon capture of one failed pairing.
->    - bt-bugreport.txt: full system diagnostic bundle (versions, lspci/lsusb, dmesg).
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1112708
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.09 seconds
+VerifyFixes                   PASS      0.09 seconds
+VerifySignedoff               PASS      0.09 seconds
+GitLint                       FAIL      0.47 seconds
+SubjectPrefix                 PASS      0.16 seconds
+BuildKernel                   PASS      25.03 seconds
+CheckAllWarning               PASS      27.24 seconds
+CheckSparse                   PASS      25.75 seconds
+BuildKernel32                 PASS      23.81 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      526.47 seconds
+IncrementalBuild              PASS      25.43 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v3,2/2] Bluetooth: btmtksdio: call cancel_work_sync() outside of host lock scope
+
+1: T1 Title exceeds max length (81>80): "[v3,2/2] Bluetooth: btmtksdio: call cancel_work_sync() outside of host lock scope"
+6: B3 Line contains hard tab characters (\t): "CPU0					CPU1"
+7: B3 Line contains hard tab characters (\t): "					close()/reset()"
+8: B3 Line contains hard tab characters (\t): "					sdio_claim_host()"
+11: B3 Line contains hard tab characters (\t): "					cancel_work_sync() // sleeps"
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/324
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6244412206844455701==--
