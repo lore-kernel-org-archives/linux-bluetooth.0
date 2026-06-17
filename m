@@ -1,48 +1,86 @@
-Received: from out-30.smtp.github.com (out-30.smtp.github.com [192.30.252.129])
+Received: from forward201d.mail.yandex.net (forward201d.mail.yandex.net [178.154.239.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B68547F2E9
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2026 15:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76CD302753
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2026 15:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781709376; cv=none; b=PdvPuMBemcZVmzBsqNKL5va79rUMl6JV+KjyqJ1Aye0c5BiXIbcw6Gy6fnf/I7/Gjp1no19WIIsOfs+bODBqYCYM4akvK+GFkoC+CZBd9i9/a0o3FdvTGLHjbcGpOLN+P8aWq6sJKV/rsY8u5dZ5kpbfzGK5AKtLxTuVw6S/1o4=
+	t=1781710763; cv=none; b=dAL/psp88wncpMK4Ej4GxtFJXHA9sS4whp8o2p6J+qWHIWKCpeZHHoOf6Z79TkRfVYcmO82A1dt4tF4/zwjEPlw94ctVbPUfdVejlHtsP1TULuK3Fe2ny0eE/r8EcoITZkcrSfty+FHZLx5wEY2z7nBCNt61by18LvzkyfZ8BnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781709376; c=relaxed/simple;
-	bh=pk/Jq1Tj/7qCOpz/nAxBBhYzfUMvws/ZCpbbPbpbH3g=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=g6GqK/tLCKRtHPVz8OPVV7HblqCgDi17/xiysY+hSSxIeWKNxtXWnSGU5DtyShJ8wCM04xgqa8j0nMtGLXuiQeAYXV8diYsrR0P6iRHXEn5fNZjxKdvLOQF0r9qgUSqcC6Pr1ar2mo6sL+iwDI1WcAbD9z6MwiJZq/zrhkyhdCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=WFAcunpN; arc=none smtp.client-ip=192.30.252.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1781710763; c=relaxed/simple;
+	bh=hAde8Pi+/J3tXRLFcIp1JY71AVclSjljsSJIuztIfbk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oW0+5c6GBgZmyVl+n5rApM9OynL+6QKxcnjy71eAtv9RbMMPzdBMB4vKlU66WbiEitE3356JyA1OUnHesSBGeu5rzTu0+PCAHjJSqllr2M2vAkvXBClDYADGMqBAv828q0qC6YOjqsDGb1fSKD7djkpNSPOURR+qzoNWt70azXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=e4pb889F; arc=none smtp.client-ip=178.154.239.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="WFAcunpN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1781709373;
-	bh=wty6EmOomSPWziMxLi3e1Oxqu+L7t5syemGJdlO82ug=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=WFAcunpNyjT7Tz5x0zYCyZge7jxCaGxlbUpdJP57a42I0LGNC25BLl/svhx3tn5SY
-	 JvqqqMJ0mpNiL0OgkwNqnVHygGbONWUjyVZNqa22CbP7WGnxRl1MAhKzeNowr6ur0+
-	 S0ArP+Gu/eQsI8EfxknxMoZ7BcTGYJD/qNGJfmwI=
-Received: from github.com (hubbernetes-node-bc18804.ac4-iad.github.net [10.55.89.13])
-	by smtp.github.com (Postfix) with ESMTPA id 2B01D3232EA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2026 08:16:13 -0700 (PDT)
-Date: Wed, 17 Jun 2026 08:16:13 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1112111/d8e60b-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="e4pb889F"
+Received: from forward102d.mail.yandex.net (forward102d.mail.yandex.net [IPv6:2a02:6b8:c41:1300:1:45:d181:d102])
+	by forward201d.mail.yandex.net (Yandex) with ESMTPS id 0F31E83231
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2026 18:33:14 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-84.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-84.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:26c5:0:640:cf7d:0])
+	by forward102d.mail.yandex.net (Yandex) with ESMTPS id ADB10C0120;
+	Wed, 17 Jun 2026 18:33:05 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-84.klg.yp-c.yandex.net (smtp) with ESMTPSA id 4XTjtvmg8W20-GlYhcsjH;
+	Wed, 17 Jun 2026 18:33:05 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1781710385; bh=MwCKNo3F1q1xvlAAlFqH+RRQoQhg+3zLSBDivGPBqx0=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=e4pb889Fab756JDTE06ypDA1V/wqX5XzYzNTNuURSLlSo0ItovboKyE/kwiuVMCMh
+	 atkF58mdGk3XrUFLlqlwjhHU4CWk3fSQS6u8LauaZu+Ond3b4zMeJp1pCzyYmpU6II
+	 SB8EUM5GCx2FcBPllJ2sXss9/7U8vmBys+G/R3is=
+Authentication-Results: mail-nwsmtp-smtp-production-main-84.klg.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Dmitry Antipov <dmantipov@yandex.ru>
+Subject: [PATCH] Bluetooth: simplify force_no_mitm_write() with kstrtobool_from_user()
+Date: Wed, 17 Jun 2026 18:30:19 +0300
+Message-ID: <20260617153019.981515-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1112111
-  Home:   https://github.com/bluez/bluez
+Simplify 'force_no_mitm_write()' by using the convenient
+'kstrtobool_from_user()'.
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+---
+ net/bluetooth/hci_debugfs.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+index 0635e4641db4..aadffaaff20e 100644
+--- a/net/bluetooth/hci_debugfs.c
++++ b/net/bluetooth/hci_debugfs.c
+@@ -1161,16 +1161,12 @@ static ssize_t force_no_mitm_write(struct file *file,
+ 				   size_t count, loff_t *ppos)
+ {
+ 	struct hci_dev *hdev = file->private_data;
+-	char buf[32];
+-	size_t buf_size = min(count, (sizeof(buf) - 1));
+ 	bool enable;
++	int err;
+ 
+-	if (copy_from_user(buf, user_buf, buf_size))
+-		return -EFAULT;
+-
+-	buf[buf_size] = '\0';
+-	if (kstrtobool(buf, &enable))
+-		return -EINVAL;
++	err = kstrtobool_from_user(user_buf, count, &enable);
++	if (err)
++		return err;
+ 
+ 	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_NO_MITM))
+ 		return -EALREADY;
+-- 
+2.54.0
+
