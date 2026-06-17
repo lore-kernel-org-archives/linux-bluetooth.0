@@ -1,120 +1,112 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883E73CE4AC;
-	Wed, 17 Jun 2026 08:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F54B3AD510
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2026 09:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781686201; cv=none; b=t40rENTlVpNqYa46YXTtEwt+J19AMN01g2icoVVxEJDeTTLv3RxNDYJLBHb37Iaw/ZIVKCJ0rCTwt8nAOVO+KsslajUXYFztEDLaodBWB+K82xUc1/6Pjywgs0381w7cKVwVSLUJU0qL5TStZgpynlsj5gMq2z0V6vzkbEPFULQ=
+	t=1781688227; cv=none; b=lmTUuoYLY+4qmhWInr0gUkenHTGSeV0GJjkTaEELBrG37nosKrAS9yMMHE8x2pnnCFsqyCDOtKvVe/9gKA4F+9vGOZmmYMOslA0z0QNR8yVyjPzWJ6n9K56QTOUpbnxRQ2Adu6WMP1PPYDnm224QPNByRuuDH6XQ2cvLr563bw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781686201; c=relaxed/simple;
-	bh=cv950APeKD0DB+iuERkSO8FBZ3KsMnzQGLfM7kA4Tpk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WUrTdty8PXW18WvK87kXHO6yCjVLg5AGtBAdn/0z8/BooAA/DLF5LOnQqnfGF2TYu+i3JusTloJEyPrVXdf6YufjyCPA99NvVomzeWArXYlEnq+9kFElvwlKLr3xtfsvezVsz74sHCKf9SdWi02iMcpl6nN4uOFkDeKwFsRAb94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 7D3744C2C37F03;
-	Wed, 17 Jun 2026 10:49:41 +0200 (CEST)
-Message-ID: <42de470f-21a7-464e-876f-254a60ac3637@molgen.mpg.de>
-Date: Wed, 17 Jun 2026 10:49:40 +0200
+	s=arc-20240116; t=1781688227; c=relaxed/simple;
+	bh=/jzXzj5kl9OSHAAxQ44sAsgzPukMryR3eIcUT6hyEEI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TymiRuJxHDj2T29kyF8Nn7FBbLrfa73/dHfXoffzKFQSQEzsfesrkB+0mdmk0j+attaG01chOS4ABlcap06IWq04uhAgYRD3wsgsHrkAAt6OfPSRCZjcgZB5KnsRqvz9+3tuKcld9ih23yLCg03FpirLo0nTTsXrK+OCV6Av03Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-bf1cdcfd6deso666370366b.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2026 02:23:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781688224; x=1782293024;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=/+gQwJOoMqlr++NVRfL9ZMDY7vxhH1sfFQiAI4dSbrA=;
+        b=GmD/7ca1U0OsDE+uqrPd9anccPynpNccpv55SrEYO7BrbCMeOIRTwkifZ4dRDpnhiq
+         7bvDqC3kU8GoPp8efRkc76aSEeXQtox7MyLGAPBqWWoFqyUfFdM1nzjBfyHw/MzjQTII
+         mwnfimzfH3MbH9RFcUssM3DaO0IOSsCLWUR8z62tKsNm+bBqYZTiMSDskKRMkYfKU9sr
+         rnjx24PkCFMx7zKT6K44E2Z6/eWwqDi6Yev0Y3o4XEckXPSlMY5mABTUBOMwQMdHqTqu
+         2nMTsZZPf9I/HYgI6SslfNu9ZHnRXTE+A+ucAmvZGdIAdW0ZVhgHXN7sL6mBHhbPzZi4
+         v07Q==
+X-Forwarded-Encrypted: i=1; AFNElJ9h4GVvgzXyh9wvPMnJFsEIqfu5BfJ9/gucxuJh24AGWuStYkfyqVMJbzH9UoCZjZ/Qb9RA475FIWbFWfwyC58=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxI+qWXVsBa6MCrcOeig6epLHhfcm3ICMIiijgvLOjXRAhqjeU
+	Td94jxlxAW6UbIIBgDblXYzQi8jFAUjm++yUtS8Tw1ZlWdpLntGJ//TTx3cfGh2f
+X-Gm-Gg: Acq92OHnhby4HJk98127/krx/F6TfXw0MfCIzlhmlqMt69aAlfivBecv8EHPvM7NGRi
+	bew1IqmfdRsn12EhFzhLUUzK357oLaREaWYSFKjjoKhgJWi3r7udGx7S4bms1ad0Olz6I42kgJE
+	5haCZPR2hf9+iseyRwnj/S9BWvn5gyXMCl7BiIB2nNP+WUsb7gyoCQBU2IVSuuuMOQgF3AVVit6
+	MY+beSuUCYu883dq0wCo+F6xS1xIzGOXiRV+T+zj20XGt3DYb98e4zE+izKsx+WGNzCjl2VkZmK
+	/Ro/t24CkcrHXK6N1UPiSKKanTRhKOYVNxBUYpF7Kn6g1t4Vz4PH96NNQW33tUY3q4JdHrkFXP9
+	OaD2S9c+9UPi5/U1ifGHiCFBSdBdEMzF+bUYcsR1TxuhvoOoRYV3+5pwRCiAvPBzWJmr8nvFKaf
+	ariTwFgs611oYdpYhN0cC40yS+cCFI230eYSrP9EmVH3Br
+X-Received: by 2002:a17:907:db02:b0:bb8:b593:edba with SMTP id a640c23a62f3a-c05a73aef45mr226149866b.38.1781688221874;
+        Wed, 17 Jun 2026 02:23:41 -0700 (PDT)
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com. [209.85.128.41])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c06079325adsm60942966b.58.2026.06.17.02.23.41
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jun 2026 02:23:41 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4905529b933so54798675e9.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jun 2026 02:23:41 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ/DFNq9dEAGYwB9pe77qVdqFrj/NZwgmlUSiZzcrtFFhyLuLPtfarqmhZsFI3ERjZXO3Z91tDK5AKPjR7PobDI=@vger.kernel.org
+X-Received: by 2002:a05:600c:c0c8:b0:490:ba61:7981 with SMTP id
+ 5b1f17b1804b1-492333e2958mr41775425e9.23.1781688220892; Wed, 17 Jun 2026
+ 02:23:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: btmtk: Add MT7928 support
-To: =?UTF-8?B?Q2hyaXMgTHUgKOmZuOeomuazkyk=?= <Chris.Lu@mediatek.com>
-Cc: =?UTF-8?B?V2lsbC1DWSBMZWUgKOadjuaUv+epjik=?= <Will-CY.Lee@mediatek.com>,
- =?UTF-8?B?U3RldmUgTGVlICjmnY7oppboqqAp?= <steve.lee@mediatek.com>,
- luiz.dentz@gmail.com, marcel@holtmann.org, =?UTF-8?B?U1MgV3UgKOW3q+aGsg==?=
- =?UTF-8?B?5qyjKQ==?= <ss.wu@mediatek.com>, linux-kernel@vger.kernel.org,
- johan.hedberg@gmail.com, Sean Wang <Sean.Wang@mediatek.com>,
- linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org
-References: <20260616030132.532184-1-chris.lu@mediatek.com>
- <6b29b553-d703-448d-9275-62912a62e356@molgen.mpg.de>
- <03e0a6787272a445448a3189b4b575aa85396fb0.camel@mediatek.com>
- <4501985d-c8df-4121-89fd-0b4eb09273c6@molgen.mpg.de>
- <c983c544a39606e1468158a7b6fdc77b6ca5c8a2.camel@mediatek.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <c983c544a39606e1468158a7b6fdc77b6ca5c8a2.camel@mediatek.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20260617035421.341457-2-iam@sung-woo.kim>
+In-Reply-To: <20260617035421.341457-2-iam@sung-woo.kim>
+From: Sungwoo Kim <iam@sung-woo.kim>
+Date: Wed, 17 Jun 2026 05:23:24 -0400
+X-Gmail-Original-Message-ID: <CAJNyHpK4rSoS9pFPY-B5w6dD0ZbW87GRYtaZ8TWgb4HKjyj4Fg@mail.gmail.com>
+X-Gm-Features: AVVi8CeSjEMxjQM-b6mnhCgP9OdjLRJ24225jyJp2MlExgC9Pp0LHE8S4SFo5f8
+Message-ID: <CAJNyHpK4rSoS9pFPY-B5w6dD0ZbW87GRYtaZ8TWgb4HKjyj4Fg@mail.gmail.com>
+Subject: Re: [PATCH RFC] bluetooth: hci: Fix null-ptr-deref in hci_conn_timeout
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Dave Tian <daveti@purdue.edu>, Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Dear Chris,
+On Tue, Jun 16, 2026 at 11:55=E2=80=AFPM Sungwoo Kim <iam@sung-woo.kim> wro=
+te:
+>
+> RFC only.
+>
+> The hci_conn_timeout() function dereferences hdev->sent_cmd when handling
+> connection timeouts. However, an HCI_EV_HARDWARE_ERROR can trigger an
+> asynchronous reset sequence that sets hdev->sent_cmd to NULL via
+> hci_dev_close_sync().
+>
+> hdev->sent_cmd is dereferenced when conn->disc_work timeout:
+>
+> hci_conn_timeout()
+>   hci_abort_conn()
+>     switch (hci_skb_event(hdev->sent_cmd)) {
+>       ...
+>
+> However, an HCI hardware error event (HCI_EV_HARDWARE_ERROR) resets the
+> hci device, setting hdev->sent_cmd =3D NULL asynchornously:
+>
+> hci_hardware_error_evt()
+>   hci_error_reset() (async)
+>     hci_dev_do_close()
+>       hci_dev_close_sync()
+>         hdev->sent_cmd =3D NULL;
+>
+> As a result, a race condition exists between conn->disc_work execution
+> and the reset path, which can lead to a NULL pointer dereference when
+> hci_abort_conn() accesses hdev->sent_cmd.
 
+The Sashiko review[1] looks correct.
+The race window is invalid because hci_conn_hash_flush() synchronously
+disables all conn->disc_work, so hci_abort_conn() cannot execute
+concurrently with hdev->sent_cmd being cleared.
 
-Thank you for your reply.
+[1] https://sashiko.dev/#/patchset/20260617035421.341457-2-iam%40sung-woo.k=
+im
 
-Am 17.06.26 um 10:34 schrieb Chris Lu (陸稚泓):
-
-> On Wed, 2026-06-17 at 08:53 +0200, Paul Menzel wrote:
->>
->> External email : Please do not click links or open attachments until
->> you have verified the sender or the content.
-
->> Am 17.06.26 um 04:16 schrieb Chris Lu (陸稚泓):
->>
->>> On Tue, 2026-06-16 at 12:24 +0200, Paul Menzel wrote:
->>
->>>> Am 16.06.26 um 05:01 schrieb Chris Lu:
->>>>> Add support for MT7928 (device ID 0x7935) which requires
->>>>> additional
->>>>> firmware (CBMCU firmware) loading before Bluetooth firmware.
->>>>
->>>> Please detail what CBMCU firmware is.
->>>
->>> CBMCU is a new component on MT7928 to handle common part shared across
->>> the combo chip (Wi-Fi/Bluetooth's subsystem), providing a better user
->>> experience through improved coordination between subsystems.
->>
->> Thank you, but please add it to the commit message.
->>
->>>>> Implement two-phase CBMCU firmware download: Phase 1 loads
->>>>> section with type 0x5 containing global descriptor,
->>>>> section maps and signature data; Phase 2 loads remaining
->>>>> firmware sections. Add retry mechanism for concurrent download
->>>>> protection.
->>>>
->>>> What is type 0x5? How big is the firmware, and how long does it
->>>> take?
->>>>
->>>>> After CBMCU firmware loads successfully, the driver continues
->>>>> to load corresponding BT firmware based on device ID through
->>>>> fallthrough to case 0x7922/0x7925.
->>>>
->>>> Please add the new log message to the commit message.
->>
->> Thank you for adding those. Please also mention, where to find the
->> new firmware.
->>
->> […]
-> 
-> Since MT7928 hasn't been deployed in any commercially available
-> products yet, MediaTek currently plans to send driver patch first and
-> upload firmware part after done a series of internal test to make sure
-> the quality.
-
-Understood. Also something for the commit message. ;-)
-
-I wonder, if this should only be put into Linus’ master branch, once the 
-firmware is available.
-
-
-Kind regards,
-
-Paul
-
-
->> PS: Also, Pauli’s question should be answered in the commit message
->> (internal/external name). (If questions show up during review, it’s a
->> good indicator to amend the commit message answering these
->> questions.)
+[snip]
