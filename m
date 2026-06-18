@@ -1,147 +1,147 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AE03ED122
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2026 10:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74EB02DEA6B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2026 10:25:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781778124; cv=none; b=ZrGES/UZBR6md8WfKt6EY7Mh7x3Ivrx3ltM5M7lMXjD55q9TjTzgIowiANzQiStC5d0DkYOuD99LcoenHKTexquVTyTCsBbp1f5FAzh/RYMMiKN3edKcZMvtU/R2WqreWhaOEJHQBMEmMKJl7MHwYCPDt2ObsAtFNLaTRzCqASs=
+	t=1781778344; cv=none; b=leH30B3jaKPQBveB2S/Eo41yNez2JWB0Z9lSW5ncGWHX4Nx/MtKfmJfXCfgpM3bLEPHwwLvVvhC3Ol8lkYZZetsK8mf+aTB+Rt07JdJdohcefL47U2hmhqAXj6HFRcz0rhdDm0xIhqvLyImP2Wn5s95UbvuP6iAr+Oo7P1p8Vwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781778124; c=relaxed/simple;
-	bh=GuRUxuyBM/jgJRuEQdC9cuuhV7C5V99Gc6YG2EEW9i4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KDj6NKhWeA9PbNKIYbS41wkNUsexg+coMAFp5/+sCL8nvp4SAQJ50jq6+waH8NZKxo6OsW8Qbc/8D20FtTwsSa+WTjFCyIgBte1eEAhxJZBmTSDe7agGd1A6chrrfQtJa2eUcgKWmbWng7B0KsyM7lQQqVRdM6psoZeHncEzMM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b78N3kH2; arc=none smtp.client-ip=209.85.214.177
+	s=arc-20240116; t=1781778344; c=relaxed/simple;
+	bh=yskryxokDTBN/oBKxzcucuNDsX7i2fU8nGS7uWAZ6+U=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=tZEjTOpvlhjxWAwfhx2H5s4b4FtQhUDLGRQ2FVtVMUKFiAc9DQezEiGZUj+qyc2xag+uaQ5dz/bnwlgapZHpBmf05jKmJuiEuEuf+UYl3oBtweAl+B0TAjE65a5POh+5ByM+3yix0WdXA/oEHKnrImzfjZFMAp1TBzYWDwjRv8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MwqPTyvC; arc=none smtp.client-ip=74.125.82.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b78N3kH2"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2c6b3f71648so10075845ad.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2026 03:21:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MwqPTyvC"
+Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-30bbe98c3f0so382690eec.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2026 03:25:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781778115; x=1782382915; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=12aw8L2LxvabE17+3w8O0vXmmi5lXIQ6VLJurOZaRHw=;
-        b=b78N3kH20WaAMiXAzPP5ne92bj7hAko4BK3Wv/Rtq8KwF9fK1jMSaVgwTqxXkEMkNy
-         Z80SL+SaseHm8QSzJvtwGk7bb9tyLcH/99RGsaHs+wDcNYl80zjcjWvgkhFUUZ3xKbap
-         0qjty6uzAheb9kIjZkwatvFp4N0CXqN/h9Mh5EWSTUWKggu8vH5JwmRmOwIUuqdjlcRW
-         sXQCdttJSjF2aCqO1uEkjQD4LOrjcS6nFrRl1Fm6Cngv8MDQ/pwXgzxg7GZ10y1D7SZD
-         1oEWVwmmhwu2zMoFZVdbbLoRY8ftcThXRn4sqndfTnkGbllL5WrGeWOJBAg6q4zOCFYt
-         z2JA==
+        d=gmail.com; s=20251104; t=1781778341; x=1782383141; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=EpFyTNgQBtP7GUs/HfBnep+JtHge2F3La7+q+xzs608=;
+        b=MwqPTyvCzLouaihJZcO4Fkd+oHP+AMu9mYJy98o7ZlTrm4rhDBtnez8XsPQafl+pCy
+         cOS9DNk6OnKJKkAH4y2MRasZyc2Eap+9AUXQrBucoBKWiFb626VgEAYNLZ48qNHLprLe
+         70snoR9iJt3RkPGMUYWqpEeML4HXk6O1FBi+BG/ZC5YcwVU42nLru1Wv3T0M6JPKWOIm
+         7ijKB/uiSUE+FA5G/kw0bVjAoxcd6IudIu2cJSfST2J1402lM3eHk5hu8oD9PHKkyzCW
+         oR9Qr0yiyXwRgJlL0rSXWZo7tyw8Te0INs8rVHDMHRVe7Sy3/xHei+BzdIm9hSwh6WxW
+         svCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781778115; x=1782382915;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1781778341; x=1782383141;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=12aw8L2LxvabE17+3w8O0vXmmi5lXIQ6VLJurOZaRHw=;
-        b=EMN3nRafGGejsBML2fsD9NuQDbwx06eQ9lRxwD7AaO9nS6oK7gpWhRsR43tmWy/hG6
-         5vKDJPspmxkAAoj2fIwOukw9/z1ikf2oc0zlHzRfCPFK+Uk62ikuWyijxfIq4IXuTL58
-         ABTi8jkooPS4oqrgh2h1axovTC9QV2gcf8FmV1c2Ftl5/ptC00uu4JFLP07n4D8s4yPY
-         86i03qlFbwdDBJLu1woK0CEZgx4Smtpw533UsWEpqicjK81w0PLJir90cD894RgnqLET
-         ZTI3B5XqcWYQuU20vJsJHV3bodtQCdqDjvFVUvatcbg47TgbT7BiBozgQs/fqFjQ+t1w
-         fDOw==
-X-Gm-Message-State: AOJu0Yw5YFPE0S4ezQMd8rA4NzL7LD/qvOIMbI9YY86OB4zHQk6Tmk9Y
-	OVl2nLN+C1yfSogXM6qxpPa0iQHfPDFOT+k8qUxJLNo/Yvg3IlFxwlqe
-X-Gm-Gg: AfdE7ckjCswwLqPn7nQL+rAkXbgq2/lklYMnPdsX8+ILY9niak0UXEYrTZpVv1QKTh3
-	hFZKF0Ik/8In5wuTCjW+RwBTYROuHNQaViEygWPFj3v2g3lI9RrJN3oN72kbh4VQZxjpp0lzcIV
-	jOVH2W/znQp4pRXl8zEKCaD3TxqxwGxTKnfCQUb81kJnbjohOE8O+RbNr1CLe8HigQLOh4HbIrb
-	NQXyr48eR1ak8w41d7vWz1YpHUTcC3PUUCkWnfZwYWPhUf17dvel5EWVHle7tGZ6GpO70Qknn5E
-	BnFflTEi8+MnorkVF1XMEfX/ZZJ59PfrOOrGcNfsEFUnyiaZKMHizSizjj20z8X8EKdaCuPUqjz
-	pQvEHQ+MZoLyuxl5r+0HNd6G8zlh/i73oBRgxCQS/eWrZ7SMb1nn4yFfK5hC/2a4C4aQWg9dkAs
-	S9elDK978=
-X-Received: by 2002:a17:903:2305:b0:2c2:15c7:ad77 with SMTP id d9443c01a7336-2c6bc277a05mr79625915ad.37.1781778115508;
-        Thu, 18 Jun 2026 03:21:55 -0700 (PDT)
-Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c6a1878426sm76398575ad.64.2026.06.18.03.21.53
+        bh=EpFyTNgQBtP7GUs/HfBnep+JtHge2F3La7+q+xzs608=;
+        b=BnXbxOZaB55djLVoeYlzXUnuLdPlssglgKebA7pdGV07LVdAcdoNkbLfMyMG8MLpFo
+         S7ZGNYotBc+cyawtuylfon7dOe/gEIl4Zvt3gsU7KuYZibqslipqMnxe97HNgX1NHMoc
+         7oCV2sMvdN6nCye1HsNNpSDUzuSNZBCb94WQujbTsiuw+MlzlUmtH1DkRUERbe+n/buw
+         Xu4N+ceYaG4IWVLvIpkgEh9XaSSRlkQG1jGfFBugeFULGlBtrw9cbdpihAF8zxR7IMXi
+         x/2x4SF4E+aE3eB6aAS8WC2CTVEFA8tp7u82W22MHwz/E8ZpFFEWJDdcHWDiJHbAl7fX
+         ZVXA==
+X-Gm-Message-State: AOJu0YxScCp7GMhyLb9hM4UT1phjcYOChXe5+KwFaiGf4/yw0wrlXchA
+	LjGHvl5CKozKk/c4cCSKKpYXlaZG6pqu95o0FelfnEfkDV2lJwq+9GJwwLSMmQ==
+X-Gm-Gg: AfdE7clDmpVGAC1HBFME8kZ1PmzZMQCaVCd5R8UaOMOH5mBuy/uJaJxAbEToY7mO20m
+	VftBfcZWwoL9dGM46XJdYpnPDXnnrVRIpsl45NojvZLCGdYMDJ9WqDMSbcbxtq2IbVRA/PDnBbW
+	3rYyv35/ACSY/Bc9ajgZsvdcad9fkV/p75D52lEocpHVW9HRS/yb6CP++V6uRyJ51snEGxEts67
+	/Xz+o2RbWKTYayJ+EnzJAxghF9rJd2PTA5a1a26UTHPqOSuUknYgleUY+wPRYHbATUur7v7tLko
+	N6A29pDxVmBRXvJcE9ZbBGz79VU7VSiCLk3xaEVQOWjxqg63QgTC9SYdsrw2AcivcFNumjAE3Zw
+	GhTYS7Gb9eOesfw/fnyxCeJHyE8PUtHhEp3LtlhLlI18uXUVAcMWFqzbQfKpULFPwfGjVZMoXKs
+	OBrdi0603YiMg3w8caZM/z
+X-Received: by 2002:a05:7300:bc11:b0:30b:fb9c:f8ff with SMTP id 5a478bee46e88-30bfb9d0809mr756282eec.6.1781778341325;
+        Thu, 18 Jun 2026 03:25:41 -0700 (PDT)
+Received: from [172.17.0.2] ([57.154.167.209])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081e92096esm26280778eec.15.2026.06.18.03.25.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2026 03:21:55 -0700 (PDT)
-From: Cen Zhang <zzzccc427@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	baijiaju1990@gmail.com,
-	zzzccc427@gmail.com
-Subject: [PATCH] Bluetooth: hci_debugfs: serialize force_bredr_smp writes
-Date: Thu, 18 Jun 2026 18:21:50 +0800
-Message-Id: <20260618102150.3340673-1-zzzccc427@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Thu, 18 Jun 2026 03:25:40 -0700 (PDT)
+Message-ID: <6a33c7a4.ccb52036.2c1070.093f@mx.google.com>
+Date: Thu, 18 Jun 2026 03:25:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6761948228636108030=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, chandrashekar.devegowda@intel.com
+Subject: RE: [v2,1/2] Bluetooth: hci_core: Add reset_type parameter to hdev->reset() callback
+In-Reply-To: <20260618085016.9173-1-chandrashekar.devegowda@intel.com>
+References: <20260618085016.9173-1-chandrashekar.devegowda@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-force_bredr_smp_write() calls smp_force_bredr() without hci_dev_lock().
-That helper checks HCI_FORCE_BREDR_SMP, updates hdev->smp_bredr_data, and
-then toggles the force flag.  Two same-value writers can therefore both
-pass the -EALREADY gate and run the same enable or disable transition on
-one hdev.
+--===============6761948228636108030==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The buggy scenario involves two paths, with each column showing the order
-within that path:
+This is automated email and please do not reply to this email!
 
-debugfs writer A:                         debugfs writer B:
-  1. parse enable = false                   1. parse enable = false
-  2. test HCI_FORCE_BREDR_SMP as set        2. test HCI_FORCE_BREDR_SMP as set
-  3. read hdev->smp_bredr_data              3. read hdev->smp_bredr_data
-  4. clear hdev->smp_bredr_data             4. clear hdev->smp_bredr_data
-  5. call smp_del_chan(chan)                5. call smp_del_chan(chan)
-  6. toggle HCI_FORCE_BREDR_SMP             6. toggle HCI_FORCE_BREDR_SMP
+Dear submitter,
 
-If writer B reaches step 3 after writer A has cleared
-hdev->smp_bredr_data but before writer A toggles HCI_FORCE_BREDR_SMP,
-writer B still passed the old flag check and can pass NULL into
-smp_del_chan().  The double toggle can also leave the force flag
-mismatched with the requested state.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1113309
 
-Take hci_dev_lock() around smp_force_bredr() in the debugfs write path so
-each request observes and applies one stable BR/EDR SMP transition.
+---Test result---
 
-Validation reproduced this kernel report:
-KASAN null-ptr-deref in smp_del_chan+0x31/0x90
-RIP: 0033:0x7faae680d340
-RIP: 0010:smp_del_chan+0x31/0x90 [bluetooth]
-Read of size 8
-Call trace:
-  dump_stack_lvl+0x66/0xa0
-  kasan_report+0xe0/0x110
-  smp_del_chan+0x31/0x90
-  smp_force_bredr+0x69/0xc0
-  trace_clock_x86_tsc+0x20/0x20
-  srso_alias_return_thunk+0x5/0xfbef5
-  lock_acquire+0xd0/0x300
-  ksys_write+0xd2/0x170
-  full_proxy_write+0x9e/0xd0
-  vfs_write+0x1b0/0x810
-  find_held_lock+0x2b/0x80
-  do_user_addr_fault+0x65a/0x890
-  rcu_is_watching+0x20/0x50
-  do_syscall_64+0x115/0x6a0 (arch/x86/entry/syscall_64.c:87)
-  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Test Summary:
+CheckPatch                    PASS      3.18 seconds
+VerifyFixes                   PASS      0.07 seconds
+VerifySignedoff               PASS      0.07 seconds
+GitLint                       PASS      0.40 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      26.91 seconds
+CheckAllWarning               PASS      30.25 seconds
+CheckSparse                   PASS      28.70 seconds
+BuildKernel32                 PASS      26.46 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      581.35 seconds
+TestRunner_l2cap-tester       PASS      58.38 seconds
+TestRunner_iso-tester         PASS      92.91 seconds
+TestRunner_bnep-tester        PASS      18.82 seconds
+TestRunner_mgmt-tester        FAIL      208.89 seconds
+TestRunner_rfcomm-tester      PASS      25.41 seconds
+TestRunner_sco-tester         PASS      33.27 seconds
+TestRunner_ioctl-tester       PASS      25.48 seconds
+TestRunner_mesh-tester        FAIL      25.95 seconds
+TestRunner_smp-tester         PASS      23.08 seconds
+TestRunner_userchan-tester    PASS      19.83 seconds
+TestRunner_6lowpan-tester     PASS      22.69 seconds
+IncrementalBuild              PASS      27.01 seconds
 
-Fixes: 300acfdec916 ("Bluetooth: Introduce force_bredr_smp debugfs option for testing")
-Assisted-by: Codex:gpt-5.5
-Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.236 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.705 seconds
+Mesh - Send cancel - 2                               Timed out    1.985 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/330
+
 ---
- net/bluetooth/hci_debugfs.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 99e2e9fc70e8..89cc93f5984e 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -524,7 +524,9 @@ static ssize_t force_bredr_smp_write(struct file *file,
- 	if (err)
- 		return err;
- 
-+	hci_dev_lock(hdev);
- 	err = smp_force_bredr(hdev, enable);
-+	hci_dev_unlock(hdev);
- 	if (err)
- 		return err;
- 
--- 
-2.43.0
 
+--===============6761948228636108030==--
