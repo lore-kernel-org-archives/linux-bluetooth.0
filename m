@@ -1,247 +1,314 @@
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012048.outbound.protection.outlook.com [52.101.66.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA02D3E833E;
-	Thu, 18 Jun 2026 10:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781777402; cv=fail; b=OlosvspgG3NuSa6X3jRk3Dk4dUbRAjYINPp1jzMXJUufYPkcNr/m5Q54yokfQ1rGTCZyI5iTaKlZQEohrmiU2ceXdhXkrrEhBEtQiiiKUY5C16OOKt/Tj9/PGylTTSpBDkA5HRcVuzFKIgoQAajIGe1CjNzOMzU2MEa8p5nfEw0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781777402; c=relaxed/simple;
-	bh=YYfCjtm78W7zrB1vpCPgH9+pibezgVe2FY5Ewc8ptuk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jkFZNAFRwa+6H4STNi50KSmMXX00WRO0qxkCF9J61f4MIGuPZe1DmavkhVgJDytp3C7GbgqcvdTrFlYFphYnu38pLeY89/QOWP3QCicRq8mnaNSg8l+ihaMfldnEMb7lp3umKb66EE8dK4m8o2OrhZjwdG4AF2OzbtBgEFWQs9k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=UB1sDxQ2; arc=fail smtp.client-ip=52.101.66.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00053EB810
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2026 10:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781778106; cv=none; b=la3LdMD5VkTDsWs4In9PVnO8zGfGGDEeTaEq812g/uy64Unzs5BuYGfKjeXsSUWBH5cW4GvOLxYZz1aoAJOxDfOzVQd0xLKNce4nPZmGdWnPk00HOUVAlZ8jDiUDYMGkLg1guJBEvx7flkAmG3iS0ifStKN546iVBAI3Vnp9TMM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781778106; c=relaxed/simple;
+	bh=6+8eoWxJcpT/sebUE2GsFY0qTTSnnEafCi3GZ3MyjcE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bCWlqAUCxG386Rbt7bYQnFj3YIrfnGIZ8O1tb7EI6UW+bvGLt3g3ljntoPxRg0nC87xoeQrC7tCUGvYuolsJHd3NBqn1EHP2zW5+6egqT/0+D/DTuewejQoobeGgQYxwBuKg6NL45udjNvewA8HHgGG/N89qAOAoKJ3czp8QiBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=efxIIFUK; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="UB1sDxQ2"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Hf52diWsSGIULb4RRA9bFdJtA1/fPgTpKA0c2qGhcKhgjJLgsc42V9JW/pVW4zEQwWxmwk/UDgDjHLSKNKJQIQuujGQFMwfDMz6gsJixeiPjJJesFtir0s4qXCa8sHPclu4bkfGFS+7mx682EgcZdZcAu5vl4OTqAhAryuBJG653R/Lx0XRaB9QafJuwWB3A7t9NHgZT36RRpikXRLtgYzw/FdpZj/h8mi7Vl9Jxc8xHD6WzeuWqFzT8mlmlMxkzwTi449E6nrJ7Sh1QaiLk6EgCH1oOsfY4lEKht5MPVPY7e3mLqr1AMewZzjBpTMG7RMI96/QFmvV8ULhZcPwuFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f48RV4ofvmwfRHkoXli/oMlDLzN76hal50VkdpUe5W0=;
- b=T231C9Vv2ZUPPjotMM0SuvJPbwvN7C9Xrub8K4v31w7axTd9St8ijblSvKzD6a+rgcjWP0JZSrNEgaSUtLeAocNCPCxqV8L1d1Nj/KTh+9anUzLQ47kpou62vcT808A/UIbWl5830Cal/Is39bytE7hQUJbZP4qNrq9HQ5ccN0Ef7wloaqUi8LCtD3gkVNWXPlmwWMZlSche1EayzCEieKcBCkWa0HlL0kAvGOJkZ3LHVV0JTCL6el1Kt+bLuJDbIPGuADR8eV0pJH3n1y5y7lU13xyQe1PSmbZECX3kW/cD8xPbfIvORHzxO1DQsj5gCy6EtysQzK0yqup98ePXQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=f48RV4ofvmwfRHkoXli/oMlDLzN76hal50VkdpUe5W0=;
- b=UB1sDxQ2rT6fDii+OHgCQaa758zXrzXc2xLPaeike/BXCT0/vJRn6kOV842cvkFfTdBXin+bzugZcGYKLQHJLKD5hRQb6MpCxPu2XSVYt2ht7nTWiN/MftboGHY5/kNXhKYCcCmZRwzKfMxvNnDpuuh8RnB0BfWdvVKavdKZrFNJKhutNx9MKgUvtdi4KRRKypmN07AxDoPNVxdA9RUMUjbydpQC9agRq7wTMWc/+mRADWSiKLi0vONBT7CuDc8gkysDNeZlusBZVvoKVRqbT2x2xq/PNu6sNW7izYeKQaAQH9uJmA7W4VUUO0r6/2/Izp3QAziFGe6cSnaM7oYi7Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-Received: from VI2PR04MB11276.eurprd04.prod.outlook.com (2603:10a6:800:296::7)
- by PA1PR04MB10818.eurprd04.prod.outlook.com (2603:10a6:102:48d::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.13; Thu, 18 Jun
- 2026 10:09:50 +0000
-Received: from VI2PR04MB11276.eurprd04.prod.outlook.com
- ([fe80::60d7:a8e5:eb88:9be]) by VI2PR04MB11276.eurprd04.prod.outlook.com
- ([fe80::60d7:a8e5:eb88:9be%5]) with mapi id 15.21.0113.015; Thu, 18 Jun 2026
- 10:09:50 +0000
-From: "Sherry Sun (OSS)" <sherry.sun@oss.nxp.com>
-To: robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	Frank.Li@nxp.com,
-	s.hauer@pengutronix.de,
-	kernel@pengutronix.de,
-	festevam@gmail.com,
-	amitkumar.karwar@nxp.com,
-	neeraj.sanjaykale@nxp.com,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	hongxing.zhu@nxp.com,
-	l.stach@pengutronix.de,
-	lpieralisi@kernel.org,
-	kwilczynski@kernel.org,
-	mani@kernel.org,
-	bhelgaas@google.com,
-	brgl@kernel.org
-Cc: imx@lists.linux.dev,
-	linux-pci@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	devicetree@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="efxIIFUK"
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-36d8b644473so562566a91.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jun 2026 03:21:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781778101; x=1782382901; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2GMwLptCg7U1JVw3ATsMoR2HLFJPGiUmWXGkyS4wkDM=;
+        b=efxIIFUKiQByyX7pSbvBLArF/BDaC6lj39AXq1qBHQgFKO1OahLVGWOMuilboRANDt
+         0UxGTUlAYDZON0IK/AaFpeD9o6gDC+rDzZYPFpEImJbngHtvDqYYz3cddFK0vXJPYnn1
+         f3H6R1rD7YBJ830wo3L6Klk07k4fARuFbmkGMFgz5lVq98nY6wQZBZVBMfvVedcJDsij
+         BcxNFycSBkk8dvFYxmJiigQMcATStkagkxG+yj11vW91xntgXUq8QNJRYMg/9CODywIT
+         bUOW4XiCrhOol/y3MuF/9KijOdQw7vTcMxN4ur6ouhC4NbW71JecPu0zQJXE/7T83hqb
+         /t9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781778101; x=1782382901;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2GMwLptCg7U1JVw3ATsMoR2HLFJPGiUmWXGkyS4wkDM=;
+        b=BiL3/EhjkS3XmNoupvrrctivkmyusV2+AIrZTXHeM64oRLxfEjrZburM5x2U2OWACY
+         aTuhDflXhhSDV1yiuAj0dU/jElDNScFBmHongXmRd1J1mJgfisouMzAqZ0rivsDYqKlQ
+         iQy1Y1rTogcdsDhEQqjg3+ZXD6w7PxxRAqmd19wwg4t1s4mmE/wi/F8oeITZWIyBcTjb
+         QkL/shEBqaea8iVu/9ekI3yx8g4v5WUiDZVUN80TfL9X68l5E4svVFDr+/6i/HEJGJGZ
+         l8zcNq+fOkAGFlgLY0i0HGgFNGN3zm9fvdV/xnSGdlUlQ4ucd7UfoOO4TYGNrANTOFJU
+         owkg==
+X-Gm-Message-State: AOJu0Yx9qIL2ZY1aYvhiKtgZz5U+MSPhskR4bso9Bnes76VlQ7KjrBEc
+	4cwbu/Jm5XTWIkB2SpHXWCSEPYdeU2ErLgJSe1yveBUfDNMtYXy3Wm5n
+X-Gm-Gg: AfdE7ckBnRUTomhxRxWz/u81WQWaxfhhiT52f1nflHPHVWSFVirsVrREwelkpDSIqVL
+	FmTxsERFzMkbsuWEMSde2GpZxqsscivhQ3i/82dgmDskew14IrpP2E2YNydYx6neLnyCwvIXsJ7
+	O5Q46JayZMuGKQiSS94GCIl9TQmZJYxST9RFF7hhKTuCGIAEeMEMnW6Q8eZTtsGARrn75xWQYIB
+	snYSvfMQZPFp1KUfLupBjNU885/fK49dnQcTP0BYmNJmUbdF9jrTvzTdKNWo2Yrr32wQY+wWs5r
+	Ek5EgxzLS0ap+eA5sPcMVD+cd1WpFySETIdgVYYS3CfFrkYvHVfrAV/nMve2QrBVmGHMhqd3qGv
+	X+f7Utua+NQku+kLRMQnvD9kV7HvxI45/C6J7S9VyeB8JBxVnsVD8hpb/e8uDXkx/F/7HJ/CbNo
+	2qg0MCt88=
+X-Received: by 2002:a17:90b:1fcf:b0:377:4a58:fe0b with SMTP id 98e67ed59e1d1-37c93703da8mr6535042a91.7.1781778100407;
+        Thu, 18 Jun 2026 03:21:40 -0700 (PDT)
+Received: from localhost ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37c52092ee3sm9305116a91.0.2026.06.18.03.21.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jun 2026 03:21:39 -0700 (PDT)
+From: Cen Zhang <zzzccc427@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	sherry.sun@nxp.com
-Subject: [PATCH 8/8] arm64: dts: imx8qxp-mek: Describe the PCIe M.2 Key E connector
-Date: Thu, 18 Jun 2026 18:10:47 +0800
-Message-ID: <20260618101047.4185497-9-sherry.sun@oss.nxp.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260618101047.4185497-1-sherry.sun@oss.nxp.com>
-References: <20260618101047.4185497-1-sherry.sun@oss.nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MA5PR01CA0237.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:1f4::13) To VI2PR04MB11276.eurprd04.prod.outlook.com
- (2603:10a6:800:296::7)
+	baijiaju1990@gmail.com,
+	zzzccc427@gmail.com
+Subject: [PATCH] Bluetooth: mgmt: copy pending command data under the list lock
+Date: Thu, 18 Jun 2026 18:21:34 +0800
+Message-Id: <20260618102134.3339999-1-zzzccc427@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VI2PR04MB11276:EE_|PA1PR04MB10818:EE_
-X-MS-Office365-Filtering-Correlation-Id: c23b1f2b-c379-4f2c-2335-08decd21bbf8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|23010399003|7416014|376014|366016|19092799006|11063799006|56012099006|18002099003|22082099003|921020;
-X-Microsoft-Antispam-Message-Info:
-	jR6OOT7Mp7JM/85VnDwtYn9ndN+1Jbu38JfFdgXuDTtno061aRJpTVQjdB5ug5A/jJDk/o9hjgLPRIRHzqFKout34NWXEnx+NDwzTU5HzqGAgPKm21GcwbFXtPR0gkeNbGlwOeTFWccpQ4X7X9KIRbD5y+gjgrU1H/GEaPLNOItr6qe6M0tYDKSTuqDfiWYErda3RxhM2CuWQ3T3pXksLj2GYdUbjjZkSSj8HuPbElOdcoOEDTejs1NF/rwd2yQn0J5vT8pgYv1mSDO+FOB/SpF/xHgnWfv/ouxiN52bqJtpV2R2XSSaVIwN4hwfHnysHpRVj92rbLKyj1JOMpGN1nkpAL9sQCv1/MT707x7YotW3TWvE+8jmWnb9wuozC0xPIn7I+FaD1wXnXDrCEfx2qQpuKiHBEZ8EpBYoubgPE06KDswL+LaSoB6SqOyxL7edb8tN5/uTj2Hlrf8ox9G8Y8vfHxh6N4UkoZ8ByqzjnSfts0xSrIcMwnlLL6TlmrInDEF7IDkPMYcvvnH5Z/cCEwcj3RKrfoMo9RGc+Cf6nC+vve/w7pgbQieBQZHJCpktbMgk4mT4tpWAMMEfdMeNFL3PNKucovMhq06/G4WSeQlqouqbvd2ayame4kjs/x/aG/V73Wi47nHCMJbLES2HTE/9zCaRPdruYd1GhpuwAHomMBFoMg/ARY38aifyBmMuJ3By/lLFOgvksHm6rpLSdUZzGhnz4TxoOhNNEnPf1s=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI2PR04MB11276.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(7416014)(376014)(366016)(19092799006)(11063799006)(56012099006)(18002099003)(22082099003)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?WYSxWsraHR+x0xzp1FDVf/FDBRMaWta4R5CDuc8cIUZgyKmid1p+0zpL/m4s?=
- =?us-ascii?Q?2UXqnYU2fUMPVY4lf1PoKFBNG2yt7lO5nl6TOqlX0lTLgy6vScBGObD7eWDv?=
- =?us-ascii?Q?Xri7sP5oeSn+BPA10N2dolrgPDJA6QG+ZauoTXn8aSh+igUFS5Iuq0JNGXWH?=
- =?us-ascii?Q?G9VNV5HhTlN9VzYlLtGFxuU9lfLzargWk05SX/00+uFG+y/FTpJ0ld8KFwBe?=
- =?us-ascii?Q?rz8nrTVxyLVr8GtwrkmFboLmaWqcOiSDSWrxpjFnbXKPI1JNrmSDDytdD1vD?=
- =?us-ascii?Q?Rs82Ob6B4lnkrRE6BPxazw73OfC5kRwUPojk3W7Ou6UhDW5mjV4ChR8KW9xZ?=
- =?us-ascii?Q?AbFCBFgbfOgzml2WqCC6E4Pk8xX0nffk5GBJnNIL6dBYPgDxuuu6DsRrxy6F?=
- =?us-ascii?Q?O7tG3j2AcnZWUbzz8VboxvurFXhBfqs3xd13VzboTsZy0L3ml+r64m6mTn1P?=
- =?us-ascii?Q?tOTBd4znUkA9YAO7k7SHge4c/LKqZyGOkAi9J++0iFWAvtAQITq62SQf/RRG?=
- =?us-ascii?Q?l9vGbf+brfoF8Fq771UxqPZahPbmboVt3RGvtvgYGs2p8DpSeE3U4sReOOn7?=
- =?us-ascii?Q?15xTAdGMEdIQmYO8HhoZ/qE4qUaJ6kBi8E3xuackV/IGFSnnBuunoNinLgQo?=
- =?us-ascii?Q?T+d0PzrkWG5lKK47bW5kHRBaATGf3zRk81cVHZUnf4IN94yFKB5KyPTUyL2a?=
- =?us-ascii?Q?PTdzcS5dYXF6RPWfjnyUa7OmuAJE8KG4xmQnvN3VI0xA3/8l7Ct7FRf+ajfj?=
- =?us-ascii?Q?1WBiWiO52De23/wnvF7me4sSOy7M8Rfm53emNkcArttiQ/7KVJZdYzDE/x1s?=
- =?us-ascii?Q?gV+oUH5TU2rd5zOYqyYOct9Le30SYhO+4om2/dMvLBNCmgpfSQ306MeMPdtJ?=
- =?us-ascii?Q?lKm8pM+pYz+ljhZPphEAtwwgw+NTgRHynGSePyKLFiONQxqU/7awAifXDyYq?=
- =?us-ascii?Q?h2jEpM9FvAbvMfM+JsYxNL76YHTV3oBXsDGzoYmBEHu7Vf8HjBQVb6PgD2s9?=
- =?us-ascii?Q?P8ZDkrHIM1KIYDLUBHZ9YUdkuiQWhMqliv/C4YdgXJcnGxz8PDdj/dc4BRP1?=
- =?us-ascii?Q?03iPfPaFfJtU2Whlki8MW+OsL39xeEHLNZq1KyjcQ85YwZ1VN4sy8dIMksfN?=
- =?us-ascii?Q?bKqrsaMgpTPVxuOvRuuJ/gtrCyTdDlamdEShAgTwIwrILri8TLOr4C8KnHqe?=
- =?us-ascii?Q?GdBbgTILswJV0tqq1U+8E3c7qPZ6xcKZu4K/67+6f5Jq4NSVfYblnlADuwXx?=
- =?us-ascii?Q?6XzlygvtPp3jTrDFHmY8LbljfD813DXnDixIQfCAnpkip0nm6kqaVO2+VGQx?=
- =?us-ascii?Q?uC2Sgk86O9+qW2jia10pKwYtHNUnBbfL4K9NBZRYMOevUj0kolTQYpMz9HBZ?=
- =?us-ascii?Q?5/9EQwOHrhtyAhuvTth0jfXoWLqHAxrkWKiFkfEHIAX0777eDUhqaLseax3I?=
- =?us-ascii?Q?g+FXAkYDliClHl8TAAeEm+gRjbTq2qEYjL3G8BSsGPb0SI6tx9PaJAfPv51J?=
- =?us-ascii?Q?JMzK6cJ6gfzJJJwM/1AF9kbvROQt0NgXWicwbv5Elo6elxj+BTYiH7OaWZFP?=
- =?us-ascii?Q?Fjd3zLdqPOeu4SzAL5l0yzuNdQKg6PbMG8oOwNRO7r+IIyVWYWPOzvNrv1xk?=
- =?us-ascii?Q?HVoZOgw+3AKKHKI2W/vFd9rUStpTJ8cckiCi0XJPFK9EFtdq6M6AI2Dxb2OU?=
- =?us-ascii?Q?HeFYUcSJEkHnP1+nQfFtPlsR7vKPh86GYWtQo0HMfC1siDC1fw2329hD1AGD?=
- =?us-ascii?Q?qb0AGjNwjJbFxOnnUNy1f1ZWkg4soUh0tiFNp78aKLxajXcMu9Ni?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c23b1f2b-c379-4f2c-2335-08decd21bbf8
-X-MS-Exchange-CrossTenant-AuthSource: VI2PR04MB11276.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2026 10:09:50.6178
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: n3HIHQL6mUAxIaoRv0Hq9x7sYf+6CJ55NnjeHQlRZVQCT7cRcR/Y1Ua+RGPLKTB/1mbdZTtZHsRPjtNDftsEmkmQyfhI4fVViM0sdXWV3xJS8Iiwh78lJhz226ecJzA7
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB10818
+Content-Transfer-Encoding: 8bit
 
-From: Sherry Sun <sherry.sun@nxp.com>
+mgmt_pending_find() only protects the pending list lookup. Once it
+returns, a caller that dereferences the returned command has no lifetime
+guarantee unless another lock or ownership transfer keeps the command from
+being removed and freed.
 
-The i.MX8QXP-MEK has the PCIe M.2 Mechanical Key E connector to connect
-wireless connectivity cards over PCIe and UART interfaces. Hence,
-describe the connector node and link it with the PCIe b Root Port and
-LPUART1 nodes through graph port/endpoint.
+mgmt_powering_down() only needs the requested SET_POWERED mode, but it
+currently keeps the raw pending command pointer after the list lock has
+been dropped and then reads cmd->param and cp->val.
 
-The M.2 Key E connector is powered by a 3.3V fixed regulator
-(reg_3v3) on board.
+The buggy scenario involves two paths, with each column showing the order
+within that path:
 
-Signed-off-by: Sherry Sun <sherry.sun@nxp.com>
+hci_suspend_dev()/hci_resume_dev():     SET_POWERED completion:
+  1. mgmt_powering_down() calls           1. mgmt_set_powered_complete()
+     pending_find()
+  2. pending_find() drops                 2. mgmt_pending_valid() delists
+     mgmt_pending_lock                       the command
+                                          3. mgmt_pending_free() frees the
+                                             command and parameter buffer
+  3. mgmt_powering_down() reads
+     cmd->param
+  4. mgmt_powering_down() reads
+     cp->val
+
+Add a helper that copies a requested pending-command parameter slice while
+mgmt_pending_lock is still held. Use it for the mgmt_mode readers in
+mgmt.c so they take a snapshot of the pending request instead of keeping an
+unlocked raw command pointer just to inspect the requested mode.
+
+Validation reproduced this kernel report:
+BUG: KASAN: slab-use-after-free in mgmt_powering_down+0xa0/0xf0
+
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x66/0xa0
+ print_report+0xce/0x5f0
+ ? mgmt_powering_down+0xa0/0xf0
+ ? srso_alias_return_thunk+0x5/0xfbef5
+ ? __virt_addr_valid+0x19f/0x330
+ ? mgmt_powering_down+0xa0/0xf0
+ kasan_report+0xe0/0x110
+ ? mgmt_powering_down+0xa0/0xf0
+ mgmt_powering_down+0xa0/0xf0
+ hci_suspend_dev+0xc0/0x2d0
+ ? vhci_suspend_work+0x31/0x50
+ process_one_work+0x4fd/0xbc0
+ ? __pfx_process_one_work+0x10/0x10
+ ? srso_alias_return_thunk+0x5/0xfbef5
+ ? srso_alias_return_thunk+0x5/0xfbef5
+ ? __list_add_valid_or_report+0x37/0xf0
+ ? __pfx_vhci_suspend_work+0x10/0x10
+ ? srso_alias_return_thunk+0x5/0xfbef5
+ worker_thread+0x2d8/0x570
+ ? srso_alias_return_thunk+0x5/0xfbef5
+ ? __pfx_worker_thread+0x10/0x10
+ kthread+0x1ad/0x1f0
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork+0x3c9/0x540
+ ? __pfx_ret_from_fork+0x10/0x10
+ ? srso_alias_return_thunk+0x5/0xfbef5
+ ? __switch_to+0x2e9/0x730
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork_asm+0x1a/0x30
+ </TASK>
+
+Allocated by task 336 on cpu 2 at 98.764916s:
+ kasan_save_stack+0x33/0x60
+ kasan_save_track+0x17/0x60
+ __kasan_kmalloc+0xaa/0xb0
+ mgmt_pending_new+0x44/0x130
+ mgmt_pending_add+0x22/0x110
+ set_powered+0x1ad/0x310
+ hci_sock_sendmsg+0x96b/0xf80
+ sock_write_iter+0x28e/0x2a0
+ do_iter_readv_writev+0x211/0x390
+ vfs_writev+0x266/0x7b0
+ do_writev+0x191/0x1d0
+ do_syscall_64+0x115/0x6a0
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 314 on cpu 0 at 101.816391s:
+ kasan_save_stack+0x33/0x60
+ kasan_save_track+0x17/0x60
+ kasan_save_free_info+0x3b/0x60
+ __kasan_slab_free+0x5f/0x80
+ kfree+0x313/0x590
+ mgmt_pending_foreach+0x144/0x190
+ __mgmt_power_off+0xca/0x250
+ hci_dev_close_sync+0x8ba/0xb00
+ hci_set_powered_sync+0x384/0x480
+ hci_cmd_sync_work+0x187/0x210
+ process_one_work+0x4fd/0xbc0
+ worker_thread+0x2d8/0x570
+ kthread+0x1ad/0x1f0
+ ret_from_fork+0x3c9/0x540
+ ret_from_fork_asm+0x1a/0x30
+
+Assisted-by: Codex:gpt-5.5
+Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
 ---
- arch/arm64/boot/dts/freescale/imx8qxp-mek.dts | 54 ++++++++++++++-----
- 1 file changed, 41 insertions(+), 13 deletions(-)
+ net/bluetooth/mgmt.c      | 37 ++++++++++++++++++-------------------
+ net/bluetooth/mgmt_util.c | 27 +++++++++++++++++++++++++++
+ net/bluetooth/mgmt_util.h |  2 ++
+ 3 files changed, 47 insertions(+), 19 deletions(-)
 
-diff --git a/arch/arm64/boot/dts/freescale/imx8qxp-mek.dts b/arch/arm64/boot/dts/freescale/imx8qxp-mek.dts
-index a9b967d0a9be..c9fe4034cc2d 100644
---- a/arch/arm64/boot/dts/freescale/imx8qxp-mek.dts
-+++ b/arch/arm64/boot/dts/freescale/imx8qxp-mek.dts
-@@ -40,6 +40,37 @@ memory@80000000 {
- 		reg = <0x00000000 0x80000000 0 0x40000000>;
- 	};
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d23ca1dd0893..91272640864a 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -960,19 +960,25 @@ static struct mgmt_pending_cmd *pending_find(u16 opcode, struct hci_dev *hdev)
+ 	return mgmt_pending_find(HCI_CHANNEL_CONTROL, opcode, hdev);
+ }
  
-+	m2-connector {
-+		compatible = "pcie-m2-e-connector";
-+		vpcie3v3-supply = <&reg_3v3>;
-+		w-disable1-gpios = <&pca9557_a 2 GPIO_ACTIVE_LOW>;
++static bool pending_find_copy(u16 opcode, struct hci_dev *hdev, void *data,
++			      size_t len)
++{
++	return mgmt_pending_find_copy(HCI_CHANNEL_CONTROL, opcode, hdev,
++				      data, len);
++}
 +
-+		ports {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+
-+			port@0 {
-+				#address-cells = <1>;
-+				#size-cells = <0>;
-+				reg = <0>;
-+				m2_e_pcie_ep: endpoint@0 {
-+					reg = <0>;
-+					remote-endpoint = <&pcieb_port0_ep>;
-+				};
-+			};
-+
-+			port@3 {
-+				#address-cells = <1>;
-+				#size-cells = <0>;
-+				reg = <3>;
-+				m2_e_uart_ep: endpoint@0 {
-+					reg = <0>;
-+					remote-endpoint = <&lpuart1_ep>;
-+				};
-+			};
-+		};
-+	};
-+
- 	reg_usdhc2_vmmc: usdhc2-vmmc {
- 		compatible = "regulator-fixed";
- 		regulator-name = "SD1_SPWR";
-@@ -157,15 +188,6 @@ reg_3v3: regulator-3v3 {
- 		regulator-max-microvolt = <3300000>;
- 	};
+ u8 mgmt_get_adv_discov_flags(struct hci_dev *hdev)
+ {
+-	struct mgmt_pending_cmd *cmd;
++	struct mgmt_mode cp;
  
--	reg_pcieb: regulator-pcie {
--		compatible = "regulator-fixed";
--		regulator-max-microvolt = <3300000>;
--		regulator-min-microvolt = <3300000>;
--		regulator-name = "mpcie_3v3";
--		gpio = <&pca9557_a 2 GPIO_ACTIVE_HIGH>;
--		enable-active-high;
--	};
+ 	/* If there's a pending mgmt command the flags will not yet have
+ 	 * their final values, so check for this first.
+ 	 */
+-	cmd = pending_find(MGMT_OP_SET_DISCOVERABLE, hdev);
+-	if (cmd) {
+-		struct mgmt_mode *cp = cmd->param;
+-		if (cp->val == 0x01)
++	if (pending_find_copy(MGMT_OP_SET_DISCOVERABLE, hdev, &cp,
++			      sizeof(cp))) {
++		if (cp.val == 0x01)
+ 			return LE_AD_GENERAL;
+-		else if (cp->val == 0x02)
++		else if (cp.val == 0x02)
+ 			return LE_AD_LIMITED;
+ 	} else {
+ 		if (hci_dev_test_flag(hdev, HCI_LIMITED_DISCOVERABLE))
+@@ -986,17 +992,13 @@ u8 mgmt_get_adv_discov_flags(struct hci_dev *hdev)
+ 
+ bool mgmt_get_connectable(struct hci_dev *hdev)
+ {
+-	struct mgmt_pending_cmd *cmd;
++	struct mgmt_mode cp;
+ 
+ 	/* If there's a pending mgmt command the flag will not yet have
+ 	 * it's final value, so check for this first.
+ 	 */
+-	cmd = pending_find(MGMT_OP_SET_CONNECTABLE, hdev);
+-	if (cmd) {
+-		struct mgmt_mode *cp = cmd->param;
 -
- 	reg_audio: regulator-audio {
- 		compatible = "regulator-fixed";
- 		regulator-max-microvolt = <3300000>;
-@@ -696,8 +718,10 @@ &lpuart1 {
- 	pinctrl-0 = <&pinctrl_lpuart1>;
- 	status = "okay";
+-		return cp->val;
+-	}
++	if (pending_find_copy(MGMT_OP_SET_CONNECTABLE, hdev, &cp, sizeof(cp)))
++		return cp.val;
  
--	bluetooth {
--		compatible = "nxp,88w8987-bt";
-+	port {
-+		lpuart1_ep: endpoint {
-+			remote-endpoint = <&m2_e_uart_ep>;
-+		};
- 	};
- };
+ 	return hci_dev_test_flag(hdev, HCI_CONNECTABLE);
+ }
+@@ -9826,18 +9828,15 @@ static void unpair_device_rsp(struct mgmt_pending_cmd *cmd, void *data)
  
-@@ -746,8 +770,12 @@ &pcie0_ep {
+ bool mgmt_powering_down(struct hci_dev *hdev)
+ {
+-	struct mgmt_pending_cmd *cmd;
+-	struct mgmt_mode *cp;
++	struct mgmt_mode cp;
  
- &pcieb_port0 {
- 	reset-gpios = <&lsio_gpio4 0 GPIO_ACTIVE_LOW>;
--	vpcie-supply = <&reg_pcieb>;
--	vpcie3v3aux-supply = <&reg_pcieb>;
+ 	if (hci_dev_test_flag(hdev, HCI_POWERING_DOWN))
+ 		return true;
+ 
+-	cmd = pending_find(MGMT_OP_SET_POWERED, hdev);
+-	if (!cmd)
++	if (!pending_find_copy(MGMT_OP_SET_POWERED, hdev, &cp, sizeof(cp)))
+ 		return false;
+ 
+-	cp = cmd->param;
+-	if (!cp->val)
++	if (!cp.val)
+ 		return true;
+ 
+ 	return false;
+diff --git a/net/bluetooth/mgmt_util.c b/net/bluetooth/mgmt_util.c
+index 6ea107c0e054..5d6d13ccadd2 100644
+--- a/net/bluetooth/mgmt_util.c
++++ b/net/bluetooth/mgmt_util.c
+@@ -233,6 +233,33 @@ struct mgmt_pending_cmd *mgmt_pending_find(unsigned short channel, u16 opcode,
+ 	return NULL;
+ }
+ 
++bool mgmt_pending_find_copy(unsigned short channel, u16 opcode,
++			    struct hci_dev *hdev, void *data, size_t len)
++{
++	struct mgmt_pending_cmd *cmd, *tmp;
++	bool found = false;
 +
-+	port {
-+		pcieb_port0_ep: endpoint {
-+			remote-endpoint = <&m2_e_pcie_ep>;
-+		};
-+	};
- };
++	mutex_lock(&hdev->mgmt_pending_lock);
++
++	list_for_each_entry_safe(cmd, tmp, &hdev->mgmt_pending, list) {
++		if (hci_sock_get_channel(cmd->sk) != channel)
++			continue;
++
++		if (cmd->opcode != opcode)
++			continue;
++
++		if (cmd->param_len >= len) {
++			memcpy(data, cmd->param, len);
++			found = true;
++		}
++		break;
++	}
++
++	mutex_unlock(&hdev->mgmt_pending_lock);
++
++	return found;
++}
++
+ void mgmt_pending_foreach(u16 opcode, struct hci_dev *hdev, bool remove,
+ 			  void (*cb)(struct mgmt_pending_cmd *cmd, void *data),
+ 			  void *data)
+diff --git a/net/bluetooth/mgmt_util.h b/net/bluetooth/mgmt_util.h
+index 20810cf06e81..4cccb71c8a1f 100644
+--- a/net/bluetooth/mgmt_util.h
++++ b/net/bluetooth/mgmt_util.h
+@@ -51,6 +51,8 @@ int mgmt_cmd_complete(struct sock *sk, u16 index, u16 cmd, u8 status,
  
- &scu_key {
+ struct mgmt_pending_cmd *mgmt_pending_find(unsigned short channel, u16 opcode,
+ 					   struct hci_dev *hdev);
++bool mgmt_pending_find_copy(unsigned short channel, u16 opcode,
++			    struct hci_dev *hdev, void *data, size_t len);
+ void mgmt_pending_foreach(u16 opcode, struct hci_dev *hdev, bool remove,
+ 			  void (*cb)(struct mgmt_pending_cmd *cmd, void *data),
+ 			  void *data);
 -- 
-2.50.1
+2.43.0
 
