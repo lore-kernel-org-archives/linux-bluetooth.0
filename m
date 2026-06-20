@@ -1,33 +1,52 @@
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891BC3AC00
-	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Jun 2026 10:57:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.46.229.174
+Received: from smtp153-171.sina.com.cn (smtp153-171.sina.com.cn [61.135.153.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6128321A92F
+	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Jun 2026 11:21:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.135.153.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781953040; cv=none; b=HJKwnbWc7ig0/30WlwH4z4vV5fiVyy8TQbEDSA0yfLXt8gPepOCOpEj+IB0aVvC3yshFFUuR6jhvTwoe/EwDpNAVBB4t1xZM8x6VJLYQzA7wMFEL3HlhO2EBjwJ7GWeifl+sbJwm9IpJTQODkIXswtFVC5CzrHlvSYen5KfFFw8=
+	t=1781954497; cv=none; b=A0Aayk66MLt9vFml2cfTCQvlg8uaJweDcHf/TzD+cZ4HFb56n8HBP9OGiYFBD2HHP1Vj8K8QVOAJQgDYeRh6kJTsg9a7vXiZKlirQm6SOHiJ+0KfmF3q1Nsp3QY4rcvacxaPSRXbhXG3P/LFFWQQPzSiEHRFDYhgjswrsAOtthA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781953040; c=relaxed/simple;
-	bh=mUusZpG4NGYCtcRNUxY46FNZnSW9JhLFHjP9ujtieWE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V0uahu23+CVPiHti/EojnN2tDibFg9FXZTs1VJ6uuYoNoCbiYMNRmtp0cO4rEYof0/f83McSqRGPICPffncJavq62IwHhiUtH5k+ie08JY7l39m3y+Bc6GLC7E7/9DVrYKOMa13t3xrXz+HD2fMliD7P8S19n53x4fDfCchT+50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hust.edu.cn; spf=pass smtp.mailfrom=hust.edu.cn; arc=none smtp.client-ip=207.46.229.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hust.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hust.edu.cn
-Received: from hust.edu.cn (unknown [172.16.0.50])
-	by app2 (Coremail) with SMTP id HwEQrAB3TjX+cTZq1fEyAA--.3751S2;
-	Sat, 20 Jun 2026 18:57:02 +0800 (CST)
-Received: from uu22.. (unknown [38.79.119.137])
-	by gateway (Coremail) with SMTP id _____wDXD+r3cTZqgc4+AA--.61S2;
-	Sat, 20 Jun 2026 18:57:01 +0800 (CST)
-From: Yinhao Hu <dddddd@hust.edu.cn>
-To: marcel@holtmann.org
-Cc: luiz.dentz@gmail.com,
+	s=arc-20240116; t=1781954497; c=relaxed/simple;
+	bh=p0nAU1XbqHm6KaWCSJfair7wRbE8v3zDIK+mqVIdXj0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=PSdsvyjDcSF8s3N9i1y5vmBysweWY5bd81q3tN9s1Le3ppZwXuFpz0AVppjH1aPZau1QUTNghXpDz3huz+z9ho+OZiQgotOdwrT7oFesm+MRgDQIrdPYLdr0TLDE50cTC6gfTZW1qxeaB91ZEDZpn4zQaa1Q6MVX/UJId48Yvrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=uQ5VV1Ss; arc=none smtp.client-ip=61.135.153.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="uQ5VV1Ss"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1781954492;
+	bh=IIwH0sh+gMsNHDLU5JAlplgMjvQSpTaUy7naREahOuM=;
+	h=From:Subject:Date:Message-ID;
+	b=uQ5VV1SsBe7ebyB91J631POxqTvus1NPMNlX/M6CVJn7wI6q92CDXFJsK0PQJTKBh
+	 jAJjKMk+BadCLyjRc3MgYUe0a/hS4crS3Onf6+J+5CY1xz7jSKnbO7iYWviQccesBr
+	 EnpsCurxzdJ5uSGOhU1GGyS7J1QotSEDoaJMMaqE=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
+	by sina.com (10.54.253.34) with ESMTP
+	id 6A36779100000AC5; Sat, 20 Jun 2026 19:20:50 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 7519896291969
+X-SMAIL-UIID: 0D695E472D764220B13A5F012F61CE24-20260620-192050-1
+From: Hillf Danton <hdanton@sina.com>
+To: =?UTF-8?q?Safa=20Karaku=C5=9F?= <safa.karakus@secunnix.com>
+Cc: syzbot <syzbot+674ff7e4d7fdfd572afc@syzkaller.appspotmail.com>,
 	linux-bluetooth@vger.kernel.org,
-	dzm91@hust.edu.cn,
-	hust-os-kernel-patches@googlegroups.com,
-	Yinhao Hu <dddddd@hust.edu.cn>
-Subject: [PATCH] Bluetooth: btrtl: set error code when RTL_SEC_PROJ read fails
-Date: Sat, 20 Jun 2026 03:56:40 -0700
-Message-ID: <20260620105640.1369098-1-dddddd@hust.edu.cn>
-X-Mailer: git-send-email 2.43.0
+	linux-kernel@vger.kernel.org,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Write in bt_accept_dequeue
+Date: Sat, 20 Jun 2026 19:20:36 +0800
+Message-ID: <20260620112038.1900-1-hdanton@sina.com>
+In-Reply-To: <6a35e17e.6813c476.3c3d96.0001.GAE@google.com>
+References: 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -35,76 +54,225 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:HwEQrAB3TjX+cTZq1fEyAA--.3751S2
-Authentication-Results: app2; spf=neutral smtp.mail=dddddd@hust.edu.cn
-	;
-X-Coremail-Antispam: 1UD129KBjvJXoW7trWfurWkKryfGw1DWry8Xwb_yoW8ArWrpr
-	ZxGa4qyr45Jr4rJr47AF18AF909FWvqayYkrZ0ka4rArnYyrn5ZFyjkFy0qw1DurWkJF1Y
-	yFs3G3W8C3WUGaUanT9S1TB71UUUUj7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmFb7Iv0xC_Zr1lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
-	cIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjx
-	v20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwA2z4x0Y4vE
-	x4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAaw2AFwI0_JF
-	0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27wAqx4xG
-	64xvF2IEw4CE5I8CrVC2j2WlYx0EF7xvrVAajcxG14v26r4UJVWxJr1lYx0E74AGY7Cv6c
-	x26r4fZr1UJr1lYx0Ec7CjxVAajcxG14v26r4UJVWxJr1lOx8S6xCaFVCjc4AY6r1j6r4U
-	M4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxAIw2
-	8IcVCjz48v1sIEY20_GFW3Jr1UJwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AK
-	xVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
-	AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI
-	42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMI
-	IF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2
-	KfnxnUUI43ZEXa7IU0imRUUUUUU==
-X-CM-SenderInfo: bgsqjkiyqyjko6kx23oohg3hdfq/
 
-btrtl_initialize() returns ERR_PTR(ret) at the err_free label, so every
-path that jumps there must leave a negative error code in ret.
+> Date: Fri, 19 Jun 2026 17:40:30 -0700
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    8c13415c8a43 Merge tag 'media/v7.2-1' of git://git.kernel...
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=12f94d56580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=6a86d80fdec25236
+> dashboard link: https://syzkaller.appspot.com/bug?extid=674ff7e4d7fdfd572afc
+> compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/3ecc105c1b32/disk-8c13415c.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/cda6390db722/vmlinux-8c13415c.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/5f3d326d7d36/bzImage-8c13415c.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+674ff7e4d7fdfd572afc@syzkaller.appspotmail.com
+> 
+> ==================================================================
+> BUG: KASAN: slab-use-after-free in instrument_atomic_read_write include/linux/instrumented.h:112 [inline]
+> BUG: KASAN: slab-use-after-free in atomic_fetch_add_relaxed include/linux/atomic/atomic-instrumented.h:252 [inline]
+> BUG: KASAN: slab-use-after-free in __refcount_add include/linux/refcount.h:283 [inline]
+> BUG: KASAN: slab-use-after-free in __refcount_inc include/linux/refcount.h:366 [inline]
+> BUG: KASAN: slab-use-after-free in refcount_inc include/linux/refcount.h:383 [inline]
+> BUG: KASAN: slab-use-after-free in sock_hold include/net/sock.h:839 [inline]
+> BUG: KASAN: slab-use-after-free in bt_accept_dequeue+0x6bd/0x920 net/bluetooth/af_bluetooth.c:348
+> Write of size 4 at addr ffff888036a17080 by task syz.2.3018/19569
+> 
+> CPU: 0 UID: 0 PID: 19569 Comm: syz.2.3018 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+> Tainted: [L]=SOFTLOCKUP
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/09/2026
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:94 [inline]
+>  dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
+>  print_address_description mm/kasan/report.c:378 [inline]
+>  print_report+0x13d/0x4b0 mm/kasan/report.c:482
+>  kasan_report+0xdf/0x1c0 mm/kasan/report.c:595
+>  check_region_inline mm/kasan/generic.c:186 [inline]
+>  kasan_check_range+0x10f/0x1e0 mm/kasan/generic.c:200
+>  instrument_atomic_read_write include/linux/instrumented.h:112 [inline]
+>  atomic_fetch_add_relaxed include/linux/atomic/atomic-instrumented.h:252 [inline]
+>  __refcount_add include/linux/refcount.h:283 [inline]
+>  __refcount_inc include/linux/refcount.h:366 [inline]
+>  refcount_inc include/linux/refcount.h:383 [inline]
+>  sock_hold include/net/sock.h:839 [inline]
+>  bt_accept_dequeue+0x6bd/0x920 net/bluetooth/af_bluetooth.c:348
 
-The RTL_SEC_PROJ register read stored its result in a separate variable
-rc and jumped to err_free on failure without updating ret. At that point
-ret is still 0 from the previous successful read, so btrtl_initialize()
-returns ERR_PTR(0), i.e. NULL. btrtl_setup_realtek() only checks
-IS_ERR(), then passes the NULL pointer to btrtl_download_firmware(),
-which dereferences it:
+Sounds like ab1513597c6c ("Bluetooth: fix UAF in l2cap_sock_cleanup_listen()
+vs l2cap_conn_del()") fails to fix the root cause.
 
-Oops: general protection fault
-RIP: btrtl_download_firmware+0x39
-btrtl_setup_realtek
-btusb_setup_realtek
-hci_dev_open_sync
-
-Read the register into ret directly and drop the now-redundant rc so the
-failure propagates as a negative error pointer.
-
-Fixes: cd8dbd9ef600 ("Bluetooth: btrtl: Avoid loading the config file on security chips")
-Signed-off-by: Yinhao Hu <dddddd@hust.edu.cn>
----
- drivers/bluetooth/btrtl.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 62f9d4df3a4f..eb6fdf8592c2 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -1073,7 +1073,6 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 	u16 hci_rev, lmp_subver;
- 	u8 hci_ver, lmp_ver, chip_type = 0;
- 	int ret;
--	int rc;
- 	u8 key_id;
- 	u8 reg_val[2];
- 
-@@ -1185,8 +1184,8 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 		goto err_free;
- 	}
- 
--	rc = btrtl_vendor_read_reg16(hdev, RTL_SEC_PROJ, reg_val);
--	if (rc < 0)
-+	ret = btrtl_vendor_read_reg16(hdev, RTL_SEC_PROJ, reg_val);
-+	if (ret < 0)
- 		goto err_free;
- 
- 	key_id = reg_val[0];
--- 
-2.43.0
-
+>  l2cap_sock_cleanup_listen+0x47/0x4d0 net/bluetooth/l2cap_sock.c:1517
+>  l2cap_sock_release+0x69/0x280 net/bluetooth/l2cap_sock.c:1466
+>  __sock_release+0xb3/0x260 net/socket.c:710
+>  sock_close+0x1c/0x30 net/socket.c:1501
+>  __fput+0x3ff/0xb50 fs/file_table.c:512
+>  task_work_run+0x150/0x240 kernel/task_work.c:233
+>  get_signal+0x1bd/0x21e0 kernel/signal.c:2810
+>  arch_do_signal_or_restart+0x91/0x7e0 arch/x86/kernel/signal.c:337
+>  __exit_to_user_mode_loop kernel/entry/common.c:66 [inline]
+>  exit_to_user_mode_loop+0x139/0x6f0 kernel/entry/common.c:101
+>  __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
+>  syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:230 [inline]
+>  syscall_exit_to_user_mode include/linux/entry-common.h:318 [inline]
+>  do_syscall_64+0x666/0x870 arch/x86/entry/syscall_64.c:100
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7fc6feb9ce59
+> Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fc6ff9a4028 EFLAGS: 00000246 ORIG_RAX: 0000000000000120
+> RAX: fffffffffffffe00 RBX: 00007fc6fee15fa0 RCX: 00007fc6feb9ce59
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000005
+> RBP: 00007fc6fec32e6f R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000800 R11: 0000000000000246 R12: 0000000000000000
+> R13: 00007fc6fee16038 R14: 00007fc6fee15fa0 R15: 00007ffdf85f63a8
+>  </TASK>
+> 
+> Allocated by task 19587:
+>  kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
+>  kasan_save_track+0x14/0x30 mm/kasan/common.c:78
+>  poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
+>  __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:415
+>  kasan_kmalloc include/linux/kasan.h:263 [inline]
+>  __do_kmalloc_node mm/slub.c:5334 [inline]
+>  __kmalloc_noprof+0x302/0x840 mm/slub.c:5347
+>  _kmalloc_noprof include/linux/slab.h:973 [inline]
+>  sk_prot_alloc+0x10b/0x2a0 net/core/sock.c:2252
+>  sk_alloc+0x36/0xe80 net/core/sock.c:2308
+>  bt_sock_alloc+0x3b/0x3c0 net/bluetooth/af_bluetooth.c:148
+>  l2cap_sock_alloc.constprop.0+0x33/0x1e0 net/bluetooth/l2cap_sock.c:1983
+>  l2cap_sock_new_connection_cb+0x10f/0x260 net/bluetooth/l2cap_sock.c:1562
+>  l2cap_connect_cfm+0x4e2/0xf80 net/bluetooth/l2cap_core.c:7481
+>  hci_connect_cfm include/net/bluetooth/hci_core.h:2136 [inline]
+>  hci_remote_features_evt+0x4f4/0x9b0 net/bluetooth/hci_event.c:3764
+>  hci_event_func net/bluetooth/hci_event.c:7800 [inline]
+>  hci_event_packet+0x8e9/0xcd0 net/bluetooth/hci_event.c:7851
+>  hci_rx_work+0x451/0xfc0 net/bluetooth/hci_core.c:4039
+>  process_one_work+0xa23/0x1940 kernel/workqueue.c:3322
+>  process_scheduled_works kernel/workqueue.c:3405 [inline]
+>  worker_thread+0x5ef/0xe50 kernel/workqueue.c:3486
+>  kthread+0x370/0x450 kernel/kthread.c:436
+>  ret_from_fork+0x72b/0xd50 arch/x86/kernel/process.c:158
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+> 
+> Freed by task 19569:
+>  kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
+>  kasan_save_track+0x14/0x30 mm/kasan/common.c:78
+>  kasan_save_free_info+0x3b/0x70 mm/kasan/generic.c:584
+>  poison_slab_object mm/kasan/common.c:253 [inline]
+>  __kasan_slab_free+0x5f/0x80 mm/kasan/common.c:285
+>  kasan_slab_free include/linux/kasan.h:235 [inline]
+>  slab_free_hook mm/slub.c:2700 [inline]
+>  slab_free mm/slub.c:6310 [inline]
+>  kfree+0x22b/0x6c0 mm/slub.c:6625
+>  sk_prot_free net/core/sock.c:2291 [inline]
+>  __sk_destruct+0x88c/0xab0 net/core/sock.c:2391
+>  sk_destruct+0xc8/0xf0 net/core/sock.c:2419
+>  __sk_free+0xf4/0x3e0 net/core/sock.c:2430
+>  sk_free+0x61/0x90 net/core/sock.c:2441
+>  sock_put include/net/sock.h:2020 [inline]
+>  bt_accept_unlink+0x22a/0x370 net/bluetooth/af_bluetooth.c:267
+>  bt_accept_dequeue+0x791/0x920 net/bluetooth/af_bluetooth.c:336
+>  l2cap_sock_cleanup_listen+0x47/0x4d0 net/bluetooth/l2cap_sock.c:1517
+>  l2cap_sock_release+0x69/0x280 net/bluetooth/l2cap_sock.c:1466
+>  __sock_release+0xb3/0x260 net/socket.c:710
+>  sock_close+0x1c/0x30 net/socket.c:1501
+>  __fput+0x3ff/0xb50 fs/file_table.c:512
+>  task_work_run+0x150/0x240 kernel/task_work.c:233
+>  get_signal+0x1bd/0x21e0 kernel/signal.c:2810
+>  arch_do_signal_or_restart+0x91/0x7e0 arch/x86/kernel/signal.c:337
+>  __exit_to_user_mode_loop kernel/entry/common.c:66 [inline]
+>  exit_to_user_mode_loop+0x139/0x6f0 kernel/entry/common.c:101
+>  __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
+>  syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:230 [inline]
+>  syscall_exit_to_user_mode include/linux/entry-common.h:318 [inline]
+>  do_syscall_64+0x666/0x870 arch/x86/entry/syscall_64.c:100
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> The buggy address belongs to the object at ffff888036a17000
+>  which belongs to the cache kmalloc-2k of size 2048
+> The buggy address is located 128 bytes inside of
+>  freed 2048-byte region [ffff888036a17000, ffff888036a17800)
+> 
+> The buggy address belongs to the physical page:
+> page: refcount:0 mapcount:0 mapping:0000000000000000 index:0xffff888036a16000 pfn:0x36a10
+> head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+> flags: 0xfff00000000240(workingset|head|node=0|zone=1|lastcpupid=0x7ff)
+> page_type: f5(slab)
+> raw: 00fff00000000240 ffff88813fe3b000 ffffea000132c210 ffffea00009e2810
+> raw: ffff888036a16000 0000000800080005 00000000f5000000 0000000000000000
+> head: 00fff00000000240 ffff88813fe3b000 ffffea000132c210 ffffea00009e2810
+> head: ffff888036a16000 0000000800080005 00000000f5000000 0000000000000000
+> head: 00fff00000000003 fffffffffffffe01 00000000ffffffff 00000000ffffffff
+> head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
+> page dumped because: kasan: bad access detected
+> page_owner tracks the page as allocated
+> page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 10, tgid 10 (kworker/0:1), ts 48507424327, free_ts 27518573283
+>  set_page_owner include/linux/page_owner.h:32 [inline]
+>  post_alloc_hook+0xfd/0x120 mm/page_alloc.c:1853
+>  prep_new_page mm/page_alloc.c:1861 [inline]
+>  get_page_from_freelist+0x812/0x3d20 mm/page_alloc.c:3941
+>  __alloc_frozen_pages_noprof+0x27c/0x2b60 mm/page_alloc.c:5221
+>  alloc_slab_page mm/slub.c:3289 [inline]
+>  allocate_slab mm/slub.c:3404 [inline]
+>  new_slab+0xa2/0x670 mm/slub.c:3447
+>  refill_objects+0xe3/0x430 mm/slub.c:7241
+>  refill_sheaf mm/slub.c:2827 [inline]
+>  __pcs_replace_empty_main+0x375/0x660 mm/slub.c:4692
+>  alloc_from_pcs mm/slub.c:4790 [inline]
+>  slab_alloc_node mm/slub.c:4924 [inline]
+>  __do_kmalloc_node mm/slub.c:5333 [inline]
+>  __kmalloc_node_track_caller_noprof+0x6b5/0x890 mm/slub.c:5438
+>  kmalloc_reserve+0xe8/0x350 net/core/skbuff.c:637
+>  __alloc_skb+0x185/0x710 net/core/skbuff.c:715
+>  alloc_skb include/linux/skbuff.h:1386 [inline]
+>  mld_newpack.isra.0+0x18e/0xa20 net/ipv6/mcast.c:1773
+>  add_grhead+0x299/0x340 net/ipv6/mcast.c:1884
+>  add_grec+0x1389/0x1930 net/ipv6/mcast.c:2023
+>  mld_send_cr net/ipv6/mcast.c:2148 [inline]
+>  mld_ifc_work+0x3c5/0xc10 net/ipv6/mcast.c:2694
+>  process_one_work+0xa23/0x1940 kernel/workqueue.c:3322
+>  process_scheduled_works kernel/workqueue.c:3405 [inline]
+>  worker_thread+0x5ef/0xe50 kernel/workqueue.c:3486
+>  kthread+0x370/0x450 kernel/kthread.c:436
+> page last free pid 5380 tgid 5380 stack trace:
+>  reset_page_owner include/linux/page_owner.h:25 [inline]
+>  __free_pages_prepare mm/page_alloc.c:1397 [inline]
+>  __free_frozen_pages+0x794/0x10a0 mm/page_alloc.c:2938
+>  qlink_free mm/kasan/quarantine.c:163 [inline]
+>  qlist_free_all+0x47/0xf0 mm/kasan/quarantine.c:179
+>  kasan_quarantine_reduce+0x1a0/0x1f0 mm/kasan/quarantine.c:286
+>  __kasan_slab_alloc+0x69/0x90 mm/kasan/common.c:350
+>  kasan_slab_alloc include/linux/kasan.h:253 [inline]
+>  slab_post_alloc_hook mm/slub.c:4610 [inline]
+>  slab_alloc_node mm/slub.c:4939 [inline]
+>  kmem_cache_alloc_noprof+0x241/0x6d0 mm/slub.c:4946
+>  vm_area_alloc+0x1f/0x160 mm/vma_init.c:32
+>  __mmap_new_vma mm/vma.c:2547 [inline]
+>  __mmap_region+0x104d/0x2dd0 mm/vma.c:2771
+>  mmap_region+0x35d/0x620 mm/vma.c:2857
+>  do_mmap+0xc63/0x12f0 mm/mmap.c:560
+>  vm_mmap_pgoff+0x29e/0x470 mm/util.c:581
+>  ksys_mmap_pgoff+0xe4/0x610 mm/mmap.c:606
+>  __do_sys_mmap arch/x86/kernel/sys_x86_64.c:89 [inline]
+>  __se_sys_mmap arch/x86/kernel/sys_x86_64.c:82 [inline]
+>  __x64_sys_mmap+0x125/0x190 arch/x86/kernel/sys_x86_64.c:82
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0x115/0x870 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> Memory state around the buggy address:
+>  ffff888036a16f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>  ffff888036a17000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> >ffff888036a17080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>                    ^
+>  ffff888036a17100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>  ffff888036a17180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> ==================================================================
