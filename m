@@ -1,35 +1,35 @@
-Received: from out-8.smtp.github.com (out-8.smtp.github.com [192.30.252.199])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A612F0C79
-	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Jun 2026 20:09:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8922F0C79
+	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Jun 2026 20:09:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781986150; cv=none; b=mG4bDRissBYXqGk9tF0ez7K9CfAkELo886hLw84zf8W6dY8JdDNOMFsVkF4loJ1nS8F4GW2f5yvSYDr4B6gEDJsyPngAu1oo1xzTIIMYbEhYgqJgne0ZlcHfTYNG2JyoRe87N69Aj5VC0KTkuK60GKkg95TGBRQ0W95n0BcHerU=
+	t=1781986152; cv=none; b=jlz8trudUhuaL0Jjk95Rt5+5k7EauDke1f0K4HH8/rkFYxp5tabisZzFukRw5+sMDLJH6lY6E9+csLKv3Bb47/CRKJlD6ARTAwHwPHjxNM69p3/Ab7G53x/mKJka7UhhddxzG266BJw/dqiA2BAcVIkSVGsbhvxlcDlxB5AgDrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781986150; c=relaxed/simple;
-	bh=neZm9LBGwNzfzjKojfp4BshSvr8Q12WhBntZI9Z/bEg=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=j9QdYTNOIwnrO7d5bsbvCCOZu9qjVhPA5rGzuW/cHl4sh0zBvOyyeh1v5L9nrEUgPHCZDN77NePH3OJNVOP2Kw6qqukt1U7+8DcRWaO5X2BSY3knDg343ett/ykXWHjhyHt8G2Ykry10nHOJ77DMkgcNv4uBDfw76YVlgNAatcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=BBeQW3hO; arc=none smtp.client-ip=192.30.252.199
+	s=arc-20240116; t=1781986152; c=relaxed/simple;
+	bh=Clc8OBOTg3H8/GvVzdXuPouCmBZqsC+neTHnKod8h0k=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=YxcrIlZYbglMFfSoEb56MYwaw1Q3UvQDep5FhiO9goIC6kGXWvit9CCCBwX7jhLfrPaGIPGe13XvlLOh3NxsJCMwX8ATMI0w+ZTj5she7dCgKv6ReIeHh0DQXX8FP/Yk1PGKzwRMuBpOclQWkI9vsk1PaScVvMUpxlwLsHoEzrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=g6wieJtc; arc=none smtp.client-ip=192.30.252.207
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="BBeQW3hO"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="g6wieJtc"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1781986148;
-	bh=1xdHnFHUvxbsgxObuKqet/szsKyvI0FPZuYyb6pvZvc=;
+	s=pf2023; t=1781986150;
+	bh=sCj3Oi8Uo8oqxRZCEcvrVpvoX+z9mGpkI0ErKSB3Khg=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=BBeQW3hOQG7j1hhyBJe8K3jBwtkhrGmNcmHxxigtCaJnTUF4hW4eHsILIWN2BIyBw
-	 3aUJOAFajEECSuM0OcMTnkXOTNTn6/7UU/K0hvzyuRfRfULregvKZ6vYJpBvzu6KAi
-	 lCGFjLEQU0kniQFTPcMgegSQr9wWRzJQaQ0YpVDc=
-Received: from github.com (hubbernetes-node-b3bfa84.va3-iad.github.net [10.48.124.82])
-	by smtp.github.com (Postfix) with ESMTPA id 389ED78040D
-	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Jun 2026 13:09:08 -0700 (PDT)
-Date: Sat, 20 Jun 2026 13:09:08 -0700
+	b=g6wieJtcMV96zM2AN9PvaNWyNNARWEVaCJXyOazcpo+S47VEvc9goPQnxNd6EHvRT
+	 KsA7b1hbMLP9SW1gnMfbHYxYcmjTxlPOWWEi+LBIUz6OYsh7B5ly2/AviNr0TQDJNx
+	 rYudDjfDQPsoMhugEDhRrxF/UCbAlYja7SZ27O3Q=
+Received: from github.com (hubbernetes-node-722180b.ac4-iad.github.net [10.52.152.37])
+	by smtp.github.com (Postfix) with ESMTPA id EDCB1A0243
+	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Jun 2026 13:09:10 -0700 (PDT)
+Date: Sat, 20 Jun 2026 13:09:10 -0700
 From: Geraldo Netto <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1114241/000000-dc20a9@github.com>
-Subject: [bluez/bluez] 92081f: audio: harden a2dp parsers
+Message-ID: <bluez/bluez/push/refs/heads/1114243/000000-ffaded@github.com>
+Subject: [bluez/bluez] cfc7fc: shared: harden btsnoop trace parsing
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,39 +42,42 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1114241
+  Branch: refs/heads/1114243
   Home:   https://github.com/bluez/bluez
-  Commit: 92081f8ff1f50f6acd338bea9222e9bebe6e319c
-      https://github.com/bluez/bluez/commit/92081f8ff1f50f6acd338bea9222e9bebe6e319c
+  Commit: cfc7fc7c0b3c95c9445764d5a2d21323e803c32d
+      https://github.com/bluez/bluez/commit/cfc7fc7c0b3c95c9445764d5a2d21323e803c32d
   Author: Geraldo Netto <geraldonetto@gmail.com>
   Date:   2026-06-20 (Sat, 20 Jun 2026)
 
   Changed paths:
     M Makefile.am
-    M Makefile.plugins
-    A profiles/audio/a2dp-helpers.c
-    A profiles/audio/a2dp-helpers.h
-    M profiles/audio/a2dp.c
-    A unit/test-a2dp.c
+    M monitor/analyze.c
+    M monitor/control.c
+    M src/shared/btsnoop.c
+    M src/shared/btsnoop.h
+    A unit/test-btsnoop.c
+    A unit/test-btsnoop.h
 
   Log Message:
   -----------
-  audio: harden a2dp parsers
+  shared: harden btsnoop trace parsing
 
 
-  Commit: dc20a9c9a09e4dd566a0bfa5edde8be179545880
-      https://github.com/bluez/bluez/commit/dc20a9c9a09e4dd566a0bfa5edde8be179545880
+  Commit: ffadedbfd700d2cc08c39a6a0ffddba0184a72b0
+      https://github.com/bluez/bluez/commit/ffadedbfd700d2cc08c39a6a0ffddba0184a72b0
   Author: Geraldo Netto <geraldonetto@gmail.com>
   Date:   2026-06-20 (Sat, 20 Jun 2026)
 
   Changed paths:
-    M profiles/audio/a2dp-helpers.c
+    M Makefile.am
+    A unit/test-btsnoop-pklg.c
+    M unit/test-btsnoop.c
 
   Log Message:
   -----------
-  audio: reduce a2dp parser complexity
+  unit: split btsnoop pklg tests
 
 
-Compare: https://github.com/bluez/bluez/compare/92081f8ff1f5%5E...dc20a9c9a09e
+Compare: https://github.com/bluez/bluez/compare/cfc7fc7c0b3c%5E...ffadedbfd700
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
