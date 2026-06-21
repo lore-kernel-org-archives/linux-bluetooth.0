@@ -1,72 +1,68 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE35282F39
-	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2026 16:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664A9256C70
+	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2026 18:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782059002; cv=none; b=KcoVVPuFbzJchLDkewKeYyUsDUgKfh3cpDqU+IIGXzfuh0QsRnkKF7dbzH7CVOU/t5VqQrpjV1nzXCj12yPptd247BLkd7fcMVGQXVqGqqxxKtqj4HUFQ4O1tlZ2N5RPNG1AC6BA2dyiBU40HCHjHTq1RnWWCljoSEizBWHWBR8=
+	t=1782065742; cv=none; b=XsXwQk1lsg1XaFEUyFLLQKpIPXar3QSh24u7woX9HxA5gqiLKqqUa/CMovJRuY/K+Ku7X1zqkjkQ6+bhFQsSIjiOHB9CF8Pte1/+yI2r0ATJozdnc/+gigInr07Iz8Gnwh17XWp5A1xgtrHD5ffOKsoGdjsqlBdJiDnSxPS4yfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782059002; c=relaxed/simple;
-	bh=9D3krCGzGGlRpYwm56oiCtazTMOUWfsdff/eOQAoLCc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qKeGD2gRuTLH3LcMvYvQ8ZCVNtGY8YE/dyyMC/hQITx093dG0sFvtdGaIGJL1LZdAaTyr98mkEBp8rk9tJ7p4Nv6LZbEowgIwzWJMrjveoo3hkJvrPCL8BgC/sE56Fy+Ya73/oDElFxnxWCIntVgHhcT/Irqx17q6sgx5turMa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FxpgSqxr; arc=none smtp.client-ip=209.85.218.46
+	s=arc-20240116; t=1782065742; c=relaxed/simple;
+	bh=TaALAuDJ0TmpYlRGBRWMGYhozlxw8wMmArBCUrVfaSA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aLfLKqqfKeI4u8vNf2cRcCTjHQ/SeKPIDOmjQ5CCmk6SDL9KjC2KuUiEC7G+6RKRCjLNZdN+nl77Bm50eq0LCYmXvf3JSNLrRcXkQHrabX6R/mpQAJ3GsQE71Zvn7NuGokHPStlBNK43lgw3t5zAt4bjRtvPRWs/32e9ELzeq68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=huFSbYCq; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FxpgSqxr"
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-bed2195323cso547516066b.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2026 09:23:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="huFSbYCq"
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-84537777d45so2843709b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2026 11:15:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782058999; x=1782663799; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782065740; x=1782670540; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bybjcRHpNKQC6YvGZ5klSk+Kw3IBZ+UA74h0Z6azPxw=;
-        b=FxpgSqxrnao4Vm8hwmKmqnK2juuVgYq2RXc97q9qUqRJPYC9JZbXDSaIVENzznvWIS
-         KPbm3j+tZoTTmXRNPGeQ1eb24v0nki5bL6Rb7Ej0T1DDLB//PWyZPtwDtU9SIw8EBdk6
-         E+cioNtbyiDUAomJvc7saJkW7rhuX9SnJrFV5RCjeqowN5sW+2a/eP/S7jFxCJAsrxSs
-         lxVZdcSRJbLH4oG5b+2SNDBx5TaxNvTD6ZcTfuQwATCIb1qALJJbQznwop+PuzWk5YBW
-         QKtVVvV1H5mG1lP4cjhBMH89x0UrCwGLvb0fl9xRd3hLE6lNfDB2VT6/wnxBtWqTTDp8
-         Zhuw==
+        bh=wihKiFvuTP2M/6FQn+pGmb07oXm+jqpEqGHMH6pjD1w=;
+        b=huFSbYCqLWn67OfMRCHqPeurAj5t0t4CNpWPJ6MoTIjf2BQPfa53KtJfF0IOHOVWLh
+         eMUCxzLHqO+YDZU6Vwu3M6P4pUeDW0mOdcyEn92JbPtCeophgw4y+982ZqOCqiVrkn6i
+         6jjiA0tlW/a/iDM+FFiFxHHpVrnaSgCuei9esEPqN08z6ZU/5ig3Dc3ntfL/jfkOH2yy
+         wNW4HACdkWoYIZyHzKJ7Ouh2Bvgg7YdmG6Qhrwa3bwD/F3clW8WME4gJwGVICpQhp/UB
+         QMTKKzTUxJHQ87Xye5zKcWp0s2unHeIfY/5T2ORdevfON+By6Z7aJNqoLUMoET1NHkv+
+         DpTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782058999; x=1782663799;
+        d=1e100.net; s=20251104; t=1782065740; x=1782670540;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bybjcRHpNKQC6YvGZ5klSk+Kw3IBZ+UA74h0Z6azPxw=;
-        b=MX2bkl2as6fZQAFYYzWieVqBmhhTl6Qfg4/mrx3p0YnKV53+TGddVF6k+8kVG/TECm
-         MakgdqJAg4L+FxAOQFxn1UlD8IWw38ty9El7sHiXM1GFo/qK1EipZdFg+37F9VEuDXjL
-         Fe9pGAt9XytoqJK0EK/7Ubp+Pqre2zthUVsupI0N37AkOv0dtaH8lkNlSUwnUfvo97Av
-         WNxEgT0VRlR+OBiiVIsoZScSMwF9ZGx+YvqsBjPyqTN2GPDFXwuipX57v6NQCT/Au9ZN
-         1C3SvRXyxgjBsJXGuWRCHo1h8tFdqA8O1vIb/UdQskxtLNgQ6X2xP6jDWQmQ6n3cfpGC
-         BF4g==
-X-Gm-Message-State: AOJu0Yz4fYQMdczpG7JMdsWEZPS/+htTzGGJ3642/4fijxNoQ9ytu83y
-	ns3i0ofWHQRPTFHW/6YhS1cCS0xpaKDp603fwylifCofLmJCwrgaW0UQgLsP6ezxlfd5cA==
-X-Gm-Gg: AfdE7cmCKCIh2HZu9ZNW3+Dqe5uIiOFoBfRVcQd+LlKldVHd05YLgWDAs00A5eiYce3
-	93GKoNwfEWuRkPpmSHZgcutyOTFwttLWh+fc180yED3IfkmcLIzH9ggO+qbR9Vgj92rnmzmShAO
-	RrtiCqAJP0g66MmIxJYhrUOMmDL/XskTaVdAM0a7+X4WC0Dbz3hFYXOuFqBrbKJv3V5kwCgWt8X
-	8ZA7MS0zX0G9QXjb1Efppp3EFMdn6cLOjPIHsn6BT9lCUCfd1l4C6+vAe6voaPTyovALRc/Xcx+
-	vfWkqXs9wPeY6Zd7xBaQdKYPo1qXXGg9iPu6eHrihNc+HyAbSTaMThNGKtzV3D6mDOMvT4xuEzs
-	zjmNw+B41uuNF7a72l6HdP9e/Cpf1/+qt3dVqKXfyxWU3z0Xe4LaQnAVUWSaTFWeohYIJhET0Sy
-	EjyAoB8xc2ebzY53E/gvP8AwKIJJuJlsNbrBi4ZWtONVjUsvelrz8Ji/cM/jetJzE=
-X-Received: by 2002:a17:907:3f89:b0:bf0:550:d9f with SMTP id a640c23a62f3a-c0b743ac8e1mr482252966b.31.1782058998924;
-        Sun, 21 Jun 2026 09:23:18 -0700 (PDT)
-Received: from node ([202.47.63.86])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c0c5ef8acaesm216907366b.27.2026.06.21.09.23.15
+        bh=wihKiFvuTP2M/6FQn+pGmb07oXm+jqpEqGHMH6pjD1w=;
+        b=blu6hakuYAABKA3DZ7m9fVx+zPPm1000DtEUZls12eMKnGJD+Sw3HEAM2WMp50qyuo
+         b4UKKoQsmAo4NIJ7bhAZaGmL44eqj6Dq1GnJ2zuYdRQMCIyj+DHIHGf7rE84zNIAt2Ev
+         dZG2A9ZbYtPkQ5VpIhg1NnzC9g+lAeMv41kRsZSUMwG5fL8y/cZ12PnL+zZW8L4Bhlwk
+         JzGPSzlLnZN9F82PeeGajZ2f9yfgoQUSlnv6K+2LbD8rHr92vdC0zmHKenYwQL8E3wl7
+         krw+8djBCA+uX5X8hKtVFzCjv5QJmgVPU14PyEuBND2nGqqGdmK87HeaqrX4FxDlno7e
+         br7Q==
+X-Gm-Message-State: AOJu0YzkyAK0flwcHAZ8LXqPtGagbfsDIggS+NXQd0Do/dxmkgSuhHAd
+	KPvKc1FReYarQUCX9whFOZfd9Ifo2guO3VMFaPqQ/WbcDwipyBuUOcyiY2Js4Q==
+X-Gm-Gg: AfdE7ckzyVeH+1ciwRLMq0AXf5gQoaUrKYxzTbGDAxumn0d8UzPW5LP0SHJQ0QIGnq8
+	CApYdYTMRpHS+mVRtHGYYpcVrH0NVHqqlRwu6ws+IookULdgat1vcI0McH45exvzuP8xVvBYLiQ
+	OONz5OfYEtcxxukvA7U5Gg21xr0WuqGXj+oE2tHRSz6nPWttyWkMrM3ZKwto10dK7KLEADH8LqQ
+	3123DXQkJ9V2wShEAZ0Rrqj+24Uxg2XxGOQJ2MjNEmB4KBW0fsdc8kb1YN9y8v0ZzTYC9DGKyyh
+	WXVUEdtqmzJ/eTWjve2tmGj9HPP1hv+XUElNxsVmIdd7LEYg21b/VqdcZkjR1YcTjhLjnPT4Jdk
+	D+GXkB5+mbaClb2/Vy2K0bsw539DDNXBab+ioTN0/Wi6Oro66uv+l17gsiUT+C+STfhZvviBhsg
+	yXEtyhXJHP2f7xJXY15R5A+5vkiFtGnC2/qN1IMXHTcFdW6cmf8Ve9JmulUUsknFyFbhv1eCrUI
+	PvLwhrlNBwTv6ppxVxICZmfiWk+6EZpNs8crdE0YpGoTsEW+6ZiT2geuQ==
+X-Received: by 2002:a05:6a00:4c81:b0:835:532a:3468 with SMTP id d2e1a72fcca58-845507edebemr13238521b3a.20.1782065740558;
+        Sun, 21 Jun 2026 11:15:40 -0700 (PDT)
+Received: from kapoor.mahindrauniversity.edu.in ([122.184.65.229])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84564d89dd8sm5162063b3a.15.2026.06.21.11.15.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Jun 2026 09:23:17 -0700 (PDT)
-From: Muhammad Bilal <meatuni001@gmail.com>
+        Sun, 21 Jun 2026 11:15:40 -0700 (PDT)
+From: Arnav Kapoor <kapoorarnav43@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Iulia Tanasescu <iulia.tanasescu@nxp.com>,
-	Muhammad Bilal <meatuni001@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: ISO: avoid NULL deref of conn in iso_conn_big_sync()
-Date: Sun, 21 Jun 2026 21:23:05 +0500
-Message-ID: <20260621162305.219763-1-meatuni001@gmail.com>
-X-Mailer: git-send-email 2.54.0
+Cc: Arnav Kapoor <kapoorarnav43@gmail.com>
+Subject: [PATCH] src: Remove dead assignments in batocomp
+Date: Sun, 21 Jun 2026 23:45:34 +0530
+Message-ID: <20260621181534.92005-1-kapoorarnav43@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -75,71 +71,33 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-iso_conn_big_sync() drops the socket lock to call hci_get_route() and
-then re-acquires it, but dereferences iso_pi(sk)->conn->hcon afterwards
-without re-checking that conn is still valid.
+The return values of udev_hwdb_unref() and udev_unref()
+are assigned to local variables that are never read again.
 
-While the lock is dropped, the connection can be torn down under the
-same socket lock: iso_disconn_cfm() -> iso_conn_del() -> iso_chan_del()
-sets iso_pi(sk)->conn to NULL (and the broadcast teardown path can also
-clear conn->hcon on its own). When iso_conn_big_sync() re-acquires the
-lock and reads conn->hcon, conn may be NULL, causing a NULL pointer
-dereference (hcon is the first member of struct iso_conn).
+Remove the unnecessary assignments.
 
-This path is reached from iso_sock_recvmsg() for a PA-sync broadcast
-sink socket (BT_SK_DEFER_SETUP | BT_SK_PA_SYNC), so the dropped-lock
-window can race with connection teardown driven by controller events.
-
-Re-validate iso_pi(sk)->conn and its hcon after re-acquiring the socket
-lock and bail out if the connection went away, as already done in the
-sibling iso_sock_rebind_bc().
-
-Fixes: 7a17308c17880d ("Bluetooth: iso: Fix circular lock in iso_conn_big_sync")
-Cc: stable@vger.kernel.org
-Signed-off-by: Muhammad Bilal <meatuni001@gmail.com>
+Found by scan-build.
 ---
- net/bluetooth/iso.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ src/oui.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 3abd8111dda83..7186e8d88c757 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -1589,6 +1589,7 @@ static void iso_conn_big_sync(struct sock *sk)
- {
- 	int err;
- 	struct hci_dev *hdev;
-+	struct iso_conn *conn;
- 	bdaddr_t src, dst;
- 	u8 src_type;
- 
-@@ -1611,8 +1612,17 @@ static void iso_conn_big_sync(struct sock *sk)
- 	hci_dev_lock(hdev);
- 	lock_sock(sk);
- 
-+	/* The socket lock was dropped for hci_get_route(), so the connection
-+	 * may have been torn down meanwhile: iso_chan_del() clears conn and
-+	 * the broadcast teardown path can clear conn->hcon on its own. Check
-+	 * both before dereferencing conn->hcon.
-+	 */
-+	conn = iso_pi(sk)->conn;
-+	if (!conn || !conn->hcon)
-+		goto unlock;
-+
- 	if (!test_and_set_bit(BT_SK_BIG_SYNC, &iso_pi(sk)->flags)) {
--		err = hci_conn_big_create_sync(hdev, iso_pi(sk)->conn->hcon,
-+		err = hci_conn_big_create_sync(hdev, conn->hcon,
- 					       &iso_pi(sk)->qos,
- 					       iso_pi(sk)->sync_handle,
- 					       iso_pi(sk)->bc_num_bis,
-@@ -1621,6 +1631,7 @@ static void iso_conn_big_sync(struct sock *sk)
- 			bt_dev_err(hdev, "hci_big_create_sync: %d", err);
+diff --git a/src/oui.c b/src/oui.c
+index e20297b93..4d9c3c3e7 100644
+--- a/src/oui.c
++++ b/src/oui.c
+@@ -47,10 +47,10 @@ char *batocomp(const bdaddr_t *ba)
+ 		}
  	}
  
-+unlock:
- 	release_sock(sk);
- 	hci_dev_unlock(hdev);
- 	hci_dev_put(hdev);
+-	hwdb = udev_hwdb_unref(hwdb);
++	udev_hwdb_unref(hwdb);
+ 
+ done:
+-	udev = udev_unref(udev);
++	udev_unref(udev);
+ 
+ 	return comp;
+ }
 -- 
-2.54.0
+2.53.0
 
