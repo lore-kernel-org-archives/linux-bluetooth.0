@@ -1,66 +1,61 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A713314C5
-	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2026 12:54:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782046489; cv=pass; b=jzY0V84B8gClkl814P2LfWj5gN+cFlp2sls3jOSG6ehNoAvdAet/Tzd+K9wmi7m1cRYdtkZr/tzALSuR3wB7Z1GveePqS0UxmtanQm8TrgDTou59VUlB0BcW3knhBqviR55oAyYr5RnHHuJYokpTYiZZvZ8ytj0eOVUgsS5DoSs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782046489; c=relaxed/simple;
-	bh=OAJSpQsNxQX7H+Ale7b424lwFgaVC0dfJPiP0vd6p+0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qg5zIQB3et9GgaWg+RlPkKxiMLDdnDC0G6+Ff6LETfo6ys43732oYTsKQLvI3hsw58EvbVv+H6eP9fkjDCrtrwuQSuW3xHKOU04TGtq9l0oxt8zxwoG8kIj3lPpi/og8KjtlYBL8fJSNbuLFLQGJ/JtZ48VSjRTVzvz+Z0B7gK4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=hSc9IFtY; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 915653C07A
+	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2026 14:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782052659; cv=none; b=cVkgY8oOOSqDsJw7JeKwn+zzmSO7s+CqsJw4eR2KszIkpzVlrhsVp1G+EJVPTGCQfafQewUgHykKI/AnYXGYEUlXRh3iOGQkQ9XXvzms/+Ec8pHzoknwNdGDw/eojj04hyqmi46+fGm5Wm54pQYFg9lCzHAaIxJvawiGQvlwOhI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782052659; c=relaxed/simple;
+	bh=6k9Qg3SndkyNFUp6f7waH8tnlUX322gY5oKDZp9Bbnk=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=sUKTG3Fi8Qugv0IQFFZ/6pUYGsSAKj0RfTX2wtPC18jUj1vvx3BAByZQL5ZJk+sg4ZwaysHp91vLU8eAMpvSpoZCR/ZjU07M4AAIwo80MpSx4XxXQ/T3vWYUhEgwkh6DlXqcQeWXHT4U1FUkxRpoZYkN5Mftbnni1rQxT8qa4xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=eUzjm+ve; arc=none smtp.client-ip=192.30.252.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="hSc9IFtY"
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:4::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gjrrZ2Z6QzyPw;
-	Sun, 21 Jun 2026 15:54:38 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1782046479;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=J/01VLXMAahxLd8+EnGivaaEOsCkeHt2DTpBs9sZBjk=;
-	b=hSc9IFtY4KprpU+fiXHNSntj1wuQyydmPoMpibwAzT7YewrhaVYJTQ4lZiZmE+g++lzee2
-	Irr5FBjS53r3yvn35dEuttmReNwWlBhdBb1vRCcOYlGlHs6Y9ACvzJPXXp1fHLpksGp+25
-	is/ijiIpdE0k5Ne+W3UrvDx3nzIXpNc=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1782046479;
-	b=AkO4TD6rftbMafDQFYkgOcXco2J6abV/wTYsikA5+8Yz5cM5gSgYfnSDQ3BKB+uLLch/Rm
-	uJR6IQyTFaWhlvvaHRp6VE8VtrV32axVcWPXbQeedGZ+6Phe8gJjEarbNF+O+/6qvi4K+j
-	aLWbeZmgM7Dvb9i/B5GMrjpJQ7MHRAI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1782046479;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=J/01VLXMAahxLd8+EnGivaaEOsCkeHt2DTpBs9sZBjk=;
-	b=MEra9Mk5onwCc3HCd4IesAX+0YzL32YSt0NG1ptaYu7iGosOqBzjqc/lImzT0mgIg2Uj9d
-	hUY/ruhKEts9vftoSf3uVz0RQ6wD93wuukkitLh9cwIKoL5dFqMWon0hoVtKv5yYuL2iqR
-	CkkwFz9qhfR2CgX9DgN28TtHKv8SVgs=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="eUzjm+ve"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1782052657;
+	bh=oSIzVVU9UYJALkbksKfzNugb8eVZwOaF63xyzKar8UU=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=eUzjm+veOZb1H+Vpi+mZhoxB5Q10pCSw2agoCLqfsYCBd0E25GZTJBjwvXyfbiKPO
+	 we83GfG8hGV52NXY+KF293/+wXXta7lEe2rHgrBIF5NytWZht+SNbLucpulu3Q6mVw
+	 i8ptgBRbyT65d8YIWjgKWuRD8I593vuMIo2t1eXs=
+Received: from github.com (hubbernetes-node-fc8dbb3.va3-iad.github.net [10.48.177.36])
+	by smtp.github.com (Postfix) with ESMTPA id EB69C28049D
+	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2026 07:37:37 -0700 (PDT)
+Date: Sun, 21 Jun 2026 07:37:37 -0700
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] unit: test-bap: disable optimization to speed up compilation
-Date: Sun, 21 Jun 2026 15:54:34 +0300
-Message-ID: <e0650488e684f464f69cf013d1654f46bb862d46.1782046466.git.pav@iki.fi>
-X-Mailer: git-send-email 2.54.0
+Message-ID: <bluez/bluez/push/refs/heads/1114334/000000-d6996f@github.com>
+Subject: [bluez/bluez] d6996f: unit: test-bap: disable optimization to speed
+ up c...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/1114334
+  Home:   https://github.com/bluez/bluez
+  Commit: d6996fb9bdcdf329c692eed1461e7515fcd5e05d
+      https://github.com/bluez/bluez/commit/d6996fb9bdcdf329c692eed1461e7515fcd5e05d
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-06-21 (Sun, 21 Jun 2026)
+
+  Changed paths:
+    M unit/test-bap.c
+
+  Log Message:
+  -----------
+  unit: test-bap: disable optimization to speed up compilation
 
 Compilation of this file with optimization takes 12 min with ASAN, 1 min
 without.  This is too long, and the -O2 doesn't serve purpose for unit
@@ -70,27 +65,7 @@ Disable optimization to reduce to 30 sec with ASAN (5 sec without).
 
 autoconf puts global -O2 in CFLAGS that cannot be overridden eg. with
 unit_test_bap_CFLAGS. Use pragma instead.
----
- unit/test-bap.c | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/unit/test-bap.c b/unit/test-bap.c
-index 318b405a7..4e89ba6af 100644
---- a/unit/test-bap.c
-+++ b/unit/test-bap.c
-@@ -13,6 +13,12 @@
- #include <config.h>
- #endif
- 
-+#if defined(__GNUC__)
-+/* Speed up compilation */
-+#pragma GCC optimize ("O0")
-+#undef _FORTIFY_SOURCE
-+#endif
-+
- #define _GNU_SOURCE
- #include <unistd.h>
- #include <string.h>
--- 
-2.54.0
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
