@@ -1,35 +1,36 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD9E26E706
-	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2026 19:07:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDAE274B2A
+	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2026 19:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782068866; cv=none; b=WOwNLpMAJbTEYt6gNlmfpVb/aNSGq/hKh38uxEJgCp6vJudWZKPy6u/q/52Y7e9vAFpU9ZAMcIzDHchTDbQpQcLo+F1hqYk/ZsI/REL5P3UE/ICyTnFJDDGOqWFE2Ggw62tm5ODX2dxn3qyI6b+xZnl6eKuceQUeGXQTVyGQ4aM=
+	t=1782068870; cv=none; b=bxJ0AnBhwVmPKvv6616SRBRglyQMw/widZcf4oWGapNsSPt6WKMil6bsshDx0z+PpRH3NGzt8P8PYQBriW4SkeGo9/o6/1x6y2QBaG9RAAanMTOTVDOpHee5HQvVBmV9mLCPUmlb94Jwn0U18YWo8xJMQ4Nxpgjl7/aLUy2EZjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782068866; c=relaxed/simple;
-	bh=58pP7jzx/Hf+6pLGOC/Z8GbLGa7K7xSAb5jZPVJAjhs=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=snqouY1yM0cErb0tBdUaSHkG58ys/M0hvqQLL7DHK45pR5VeQf6847TtBCjtK2mjnZUEJWboXzDZpo4dEIA/b27lQMtw3sJSzHPzJare64yUyEdqPkRSqG+dL2ziIxKPk0CPI0QVaaySS3s9ElOoqnxcqXjm1vfzUEJmmEnWX/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=cRPR5Hc+; arc=none smtp.client-ip=192.30.252.208
+	s=arc-20240116; t=1782068870; c=relaxed/simple;
+	bh=JN6QWX+eylTfqEPh7xvs/e/GKZo38etey+C7ntu5Sig=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=RHTSydI2CD3PoIbLgNIo+w5UqN/UERpqjo0PcVl8xeSPUknAdX+8cyPqQNxL9/HWKHRuNw3XXMTrbKX0pDH7e/2W44MJkY1Yc+QIZWaclwbtD6c3t7U4N6LrcTAyXZZUzzpuMKKn3FT8dORA9TcCUv+jOddvLRVjDE+SPsQ5rD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=iK9UqPqx; arc=none smtp.client-ip=192.30.252.203
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="cRPR5Hc+"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="iK9UqPqx"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1782068865;
-	bh=+Q1Sfekvs0+jIy8Qkg7XRtvRbOxEDAyURZlXhhwX88s=;
+	s=pf2023; t=1782068868;
+	bh=VEKkGPeeS2OmkPeLUV4AWOo8kIpCwliDhFwmFEt+ZwQ=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=cRPR5Hc+wWT9fYGbVjrIRkZfj6Z3dsRLZdB4/SHNKyfXvmu+j0uHP6UtU0u6LpU9T
-	 8RYOiO2ny6P5imqaCwsf+SpXL6ZyD6Dbs/JTv2iDktcA3YLkEYB190l4+AxnoFditm
-	 wtgfHwLi/fgSeJLTlvDJquTtcH+D2hZ9Eux4YKLo=
-Received: from github.com (hubbernetes-node-1d4212a.ash1-iad.github.net [10.56.152.34])
-	by smtp.github.com (Postfix) with ESMTPA id 22443600E2A
-	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2026 12:07:45 -0700 (PDT)
-Date: Sun, 21 Jun 2026 12:07:45 -0700
+	b=iK9UqPqx1bKopf4mGxHu/eyz7rhVqt/tsokEsYzdtypHHJVUuQRd5WhwU/bZ55u7M
+	 qw1mkBz6jqit+Z3DdLb0zqorpg0E7kJGRhK4H50EyDEiTJmOqOKG9lpuCShnHBGLfc
+	 xLmORbVhQEcj/H1GMsOBnZ3b8BMXUwESx2eVu/AQ=
+Received: from github.com (hubbernetes-node-2e8a199.va3-iad.github.net [10.48.201.60])
+	by smtp.github.com (Postfix) with ESMTPA id 7886E800FB8
+	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2026 12:07:48 -0700 (PDT)
+Date: Sun, 21 Jun 2026 12:07:48 -0700
 From: Arnav Kapoor <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1114380/000000-64653d@github.com>
-Subject: [bluez/bluez] 64653d: src: Remove dead assignments in batocomp
+Message-ID: <bluez/bluez/push/refs/heads/1114381/000000-7da905@github.com>
+Subject: [bluez/bluez] 7da905: monitor: Remove dead assignments in hwdb
+ helpers
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,19 +43,19 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1114380
+  Branch: refs/heads/1114381
   Home:   https://github.com/bluez/bluez
-  Commit: 64653dc2e8ca4dc20ea5f3b0c22fa2c5979dbf13
-      https://github.com/bluez/bluez/commit/64653dc2e8ca4dc20ea5f3b0c22fa2c5979dbf13
+  Commit: 7da905fd1f43fd80867c319a9a13cd9b9eef6530
+      https://github.com/bluez/bluez/commit/7da905fd1f43fd80867c319a9a13cd9b9eef6530
   Author: Arnav Kapoor <kapoorarnav43@gmail.com>
   Date:   2026-06-21 (Sun, 21 Jun 2026)
 
   Changed paths:
-    M src/oui.c
+    M monitor/hwdb.c
 
   Log Message:
   -----------
-  src: Remove dead assignments in batocomp
+  monitor: Remove dead assignments in hwdb helpers
 
 The return values of udev_hwdb_unref() and udev_unref()
 are assigned to local variables that are never read again.
@@ -62,6 +63,7 @@ are assigned to local variables that are never read again.
 Remove the unnecessary assignments.
 
 Found by scan-build.
+Signed-by : Arnav Kapoor <kapoorarnav43@gmail.com>
 
 
 
