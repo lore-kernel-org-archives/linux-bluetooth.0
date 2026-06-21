@@ -1,67 +1,67 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664A9256C70
-	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2026 18:15:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1C31A0712
+	for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2026 18:27:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782065742; cv=none; b=XsXwQk1lsg1XaFEUyFLLQKpIPXar3QSh24u7woX9HxA5gqiLKqqUa/CMovJRuY/K+Ku7X1zqkjkQ6+bhFQsSIjiOHB9CF8Pte1/+yI2r0ATJozdnc/+gigInr07Iz8Gnwh17XWp5A1xgtrHD5ffOKsoGdjsqlBdJiDnSxPS4yfU=
+	t=1782066434; cv=none; b=rSmKZIjVvwduvlSDH3s8XZZIavX1eJ+NPrGTX1mqJ+Kdpf53fvZSpLmQVJNfABPHXJsketsvAqxze4nMwoSxi1LmEtVHHBiIJyF/oFZAuxLToJlmWwddlvl2RiNO3p+ycLLR+qCFeHhMC9F2BG7LwvVApDvxtNjdZf+mGR/V+wc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782065742; c=relaxed/simple;
-	bh=TaALAuDJ0TmpYlRGBRWMGYhozlxw8wMmArBCUrVfaSA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aLfLKqqfKeI4u8vNf2cRcCTjHQ/SeKPIDOmjQ5CCmk6SDL9KjC2KuUiEC7G+6RKRCjLNZdN+nl77Bm50eq0LCYmXvf3JSNLrRcXkQHrabX6R/mpQAJ3GsQE71Zvn7NuGokHPStlBNK43lgw3t5zAt4bjRtvPRWs/32e9ELzeq68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=huFSbYCq; arc=none smtp.client-ip=209.85.210.181
+	s=arc-20240116; t=1782066434; c=relaxed/simple;
+	bh=k0qQcX4P0JiFu8fWSPGmpKBZjGHP8yL9WwrqkaHsZ1E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=crtFY9DoWJba6nL0+0p+YJ/LdYbu7tilioyyN94bu1IEl1tXJAqhBIE4Aj/nFYFMUvdURLpaoHwI5yyFuSj8p7A9dXnS/6WvjAGaltsiKYYz9Ild0ol+N9B4397SaneqdehPBB9UmBKXyD/B6GVdNMy2MnucIRZh91+WAbh44pM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R0qZhgOY; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="huFSbYCq"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-84537777d45so2843709b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2026 11:15:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R0qZhgOY"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2c77d52bec4so2179875ad.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Jun 2026 11:27:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782065740; x=1782670540; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782066432; x=1782671232; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wihKiFvuTP2M/6FQn+pGmb07oXm+jqpEqGHMH6pjD1w=;
-        b=huFSbYCqLWn67OfMRCHqPeurAj5t0t4CNpWPJ6MoTIjf2BQPfa53KtJfF0IOHOVWLh
-         eMUCxzLHqO+YDZU6Vwu3M6P4pUeDW0mOdcyEn92JbPtCeophgw4y+982ZqOCqiVrkn6i
-         6jjiA0tlW/a/iDM+FFiFxHHpVrnaSgCuei9esEPqN08z6ZU/5ig3Dc3ntfL/jfkOH2yy
-         wNW4HACdkWoYIZyHzKJ7Ouh2Bvgg7YdmG6Qhrwa3bwD/F3clW8WME4gJwGVICpQhp/UB
-         QMTKKzTUxJHQ87Xye5zKcWp0s2unHeIfY/5T2ORdevfON+By6Z7aJNqoLUMoET1NHkv+
-         DpTQ==
+        bh=HA4VXtjm+GeKmvAD2XV2LMq0z7lMqG+qKMME+pWEgPI=;
+        b=R0qZhgOYVN1ixZDQuT9S6KTkJeD2BqcUgtnOQa6RGVPo6tNl/oD8ujNfZd38HqFa11
+         JyAxJhToTv7ws4Y5eza2ScUEDOKMo6jEtJz1Nhz0VfNgW1GYVOBGiWQVAIskHtkKcw9h
+         SBaPfuqg4PaTEBA3/5jbuX+SzQ3Xd96fJ7/y9q6zsgUcloAkMOHNFy5nbAAIVo1tMWGm
+         iffl8f5zjRwiTMYmEUYUvPJIZrBGf/EYhH4L4v4VtCKDGMYMBtRfRdQEUInwQTqCmDWE
+         xe3zUnomjO2tjjd6tZL3vWXMLmKWXx8wAa4IR2VG9tC4OUnkmoRuqNpCGdKDqXGI4+WZ
+         rx0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782065740; x=1782670540;
+        d=1e100.net; s=20251104; t=1782066432; x=1782671232;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wihKiFvuTP2M/6FQn+pGmb07oXm+jqpEqGHMH6pjD1w=;
-        b=blu6hakuYAABKA3DZ7m9fVx+zPPm1000DtEUZls12eMKnGJD+Sw3HEAM2WMp50qyuo
-         b4UKKoQsmAo4NIJ7bhAZaGmL44eqj6Dq1GnJ2zuYdRQMCIyj+DHIHGf7rE84zNIAt2Ev
-         dZG2A9ZbYtPkQ5VpIhg1NnzC9g+lAeMv41kRsZSUMwG5fL8y/cZ12PnL+zZW8L4Bhlwk
-         JzGPSzlLnZN9F82PeeGajZ2f9yfgoQUSlnv6K+2LbD8rHr92vdC0zmHKenYwQL8E3wl7
-         krw+8djBCA+uX5X8hKtVFzCjv5QJmgVPU14PyEuBND2nGqqGdmK87HeaqrX4FxDlno7e
-         br7Q==
-X-Gm-Message-State: AOJu0YzkyAK0flwcHAZ8LXqPtGagbfsDIggS+NXQd0Do/dxmkgSuhHAd
-	KPvKc1FReYarQUCX9whFOZfd9Ifo2guO3VMFaPqQ/WbcDwipyBuUOcyiY2Js4Q==
-X-Gm-Gg: AfdE7ckzyVeH+1ciwRLMq0AXf5gQoaUrKYxzTbGDAxumn0d8UzPW5LP0SHJQ0QIGnq8
-	CApYdYTMRpHS+mVRtHGYYpcVrH0NVHqqlRwu6ws+IookULdgat1vcI0McH45exvzuP8xVvBYLiQ
-	OONz5OfYEtcxxukvA7U5Gg21xr0WuqGXj+oE2tHRSz6nPWttyWkMrM3ZKwto10dK7KLEADH8LqQ
-	3123DXQkJ9V2wShEAZ0Rrqj+24Uxg2XxGOQJ2MjNEmB4KBW0fsdc8kb1YN9y8v0ZzTYC9DGKyyh
-	WXVUEdtqmzJ/eTWjve2tmGj9HPP1hv+XUElNxsVmIdd7LEYg21b/VqdcZkjR1YcTjhLjnPT4Jdk
-	D+GXkB5+mbaClb2/Vy2K0bsw539DDNXBab+ioTN0/Wi6Oro66uv+l17gsiUT+C+STfhZvviBhsg
-	yXEtyhXJHP2f7xJXY15R5A+5vkiFtGnC2/qN1IMXHTcFdW6cmf8Ve9JmulUUsknFyFbhv1eCrUI
-	PvLwhrlNBwTv6ppxVxICZmfiWk+6EZpNs8crdE0YpGoTsEW+6ZiT2geuQ==
-X-Received: by 2002:a05:6a00:4c81:b0:835:532a:3468 with SMTP id d2e1a72fcca58-845507edebemr13238521b3a.20.1782065740558;
-        Sun, 21 Jun 2026 11:15:40 -0700 (PDT)
+        bh=HA4VXtjm+GeKmvAD2XV2LMq0z7lMqG+qKMME+pWEgPI=;
+        b=GZ6Jbk2rGLPxKtGBofbmi+5GNCn57aJBS3+ErokNnI4jhs1eqZ+bAN5EatDOXQ7NEl
+         0FQQglh44TAy+CNLf9JgIRC8Au3gjrgg9PkeBN9QGRbZI1PSIJYPv0KItpguKIQgV/E6
+         DmCxkVgAvuB0j7YReRfoZxyj20qJcgxzin517ix5BhnGBHjusFCPtzZedIvs9pjcuD19
+         ZGYAxw3MIJkxCUW1C/Wb6EUHG6pNVjRvKWPeY7+AMEsnEPAEX6Xj1XdctYYo/+bB6640
+         cGh4cLTklAtnhkasTvnjk3vBN+MOxhQ2NQlihb1ST0sscSnat15iE0eV1bk9fKAkC8Qc
+         eGqA==
+X-Gm-Message-State: AOJu0YyYYo98S7/AC548HlsA+en3+K38lg7ua6d1GyPtOIDJL0t8ohAU
+	k6ObQ9C7kxqdnMyo5IRf8o8PydawLlls2hLzQh3BdVK7HF8yj1tVffd5qUNvBA==
+X-Gm-Gg: AfdE7ckGWDw8EjK35dfGJwgb4yiXHcX3T3i0YisAaZf+1O71nWPM2QzWbH2nm91mBTK
+	VdN/pWZ160wVRHryA0JC/kKjS586DLcboWYttrFBmc0FGNq6FLMK/G0wkjkrq3R6xDyjyetsuZ5
+	wQltb6LdWC9KOr6aCXVx+app6VjVSTGcnai9qoRvQtq7bqBSnuMaRb1iuviGOXddj54BG6GqSnt
+	atuWAhwTioip+Uc2iuMkvsGsynxyk/dLadmxsC5vUiNK0DC9U3i5Xs0mDXx/K7hhMo9xO5NA66e
+	K+m8+H6bcqK/0+bPQ0Tdijc5SLUB6KTfLtDDNw3Y/zbslp+bldkfJ01hp+txcuYN4a/Ik4OQFHz
+	VPrRMfmGbBkytC9mIu1Kvp4VHCkstgcyfEeD7KTOCTkqELGxUDHnU3hoKIOx7mwwkpad8g1VMKs
+	5HUQnv4N62j/mqPPjHLYArn+8nXuXYmF1EWZEztjNfrUrFz53ErbiXZbzUrp6M6a6nljG8bMxJe
+	EGhCH0Jc2ZL2+f1QwDheMOjbHoHuI3B7ke67uhKguKeNF60RHTqPqfd3w==
+X-Received: by 2002:a17:902:ce02:b0:2c6:d06c:a3e6 with SMTP id d9443c01a7336-2c7195f6381mr94981515ad.23.1782066432460;
+        Sun, 21 Jun 2026 11:27:12 -0700 (PDT)
 Received: from kapoor.mahindrauniversity.edu.in ([122.184.65.229])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84564d89dd8sm5162063b3a.15.2026.06.21.11.15.38
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c743bfea46sm51972655ad.69.2026.06.21.11.27.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Jun 2026 11:15:40 -0700 (PDT)
+        Sun, 21 Jun 2026 11:27:12 -0700 (PDT)
 From: Arnav Kapoor <kapoorarnav43@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arnav Kapoor <kapoorarnav43@gmail.com>
-Subject: [PATCH] src: Remove dead assignments in batocomp
-Date: Sun, 21 Jun 2026 23:45:34 +0530
-Message-ID: <20260621181534.92005-1-kapoorarnav43@gmail.com>
+Subject: [PATCH 2/2] monitor: Remove dead assignments in hwdb helpers
+Date: Sun, 21 Jun 2026 23:57:05 +0530
+Message-ID: <20260621182705.118840-1-kapoorarnav43@gmail.com>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -77,26 +77,44 @@ are assigned to local variables that are never read again.
 Remove the unnecessary assignments.
 
 Found by scan-build.
+Signed-by : Arnav Kapoor <kapoorarnav43@gmail.com>
 ---
- src/oui.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ monitor/hwdb.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/src/oui.c b/src/oui.c
-index e20297b93..4d9c3c3e7 100644
---- a/src/oui.c
-+++ b/src/oui.c
-@@ -47,10 +47,10 @@ char *batocomp(const bdaddr_t *ba)
+diff --git a/monitor/hwdb.c b/monitor/hwdb.c
+index 6c0d052bb..245b32b0e 100644
+--- a/monitor/hwdb.c
++++ b/monitor/hwdb.c
+@@ -56,12 +56,12 @@ bool hwdb_get_vendor_model(const char *modalias, char **vendor, char **model)
+ 			*model = strdup(udev_list_entry_get_value(entry));
+ 	}
+ 
+-	hwdb = udev_hwdb_unref(hwdb);
++	udev_hwdb_unref(hwdb);
+ 
+ 	result = true;
+ 
+ done:
+-	udev = udev_unref(udev);
++	udev_unref(udev);
+ 
+ 	return result;
+ }
+@@ -103,12 +103,12 @@ bool hwdb_get_company(const uint8_t *bdaddr, char **company)
  		}
  	}
  
 -	hwdb = udev_hwdb_unref(hwdb);
 +	udev_hwdb_unref(hwdb);
  
+ 	result = true;
+ 
  done:
 -	udev = udev_unref(udev);
 +	udev_unref(udev);
  
- 	return comp;
+ 	return result;
  }
 -- 
 2.53.0
