@@ -1,204 +1,168 @@
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7E63B2FF6
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2026 13:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782136521; cv=pass; b=aeBeNLIHJADkz6JUXwK8Vqo+/FTXgKPiASti55kkuhfGiKx3EmD3Scr4cF1LIFGyUeVhW0u8qDwRpYKtVHfiWSFEGedz44xvX9c70wbdhWmPCW8gWru3JaMG8Cvmfex05M0UO4HIugW04ix6iCXvhGarHzJKaY/ELWMZUBu8R2I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782136521; c=relaxed/simple;
-	bh=spCSafN16Q3nAV0EKzYqUajKGKlUklgsDgQrTxz1smo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=umAoErmrleb7/rnd5is5yyLS4DOBAchTAweL5HiRbMf0Zu3gYcKl6MHe2aowZq+Sz9d7DVECd+7ev+IxxlcgoMi6qI2cPXGRG2uxIsXQwibkkt5lJPuBXx0N4AzvNI0jiYRcu484VI1wvTRwZSau2jiFoMKm1UkR8g/s7hNHbGc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZFLW/bQB; arc=pass smtp.client-ip=74.125.224.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97ECB3126CA
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2026 14:52:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782139943; cv=none; b=Vjh8xHeHGGPDRLhruqLY1bLQyOJtGGuUfEfBsQ3/Uo2PbiiyLtclKhpisyyPDQHXyziyewrknEw3MzVBhntn9K5N6gurxnpeYrGJKltwo7nVUs+4jTAOrsj6a1FviUtAdoUY6mUojv4KXU3TXcx8ri1rCHgq64+J6biPKSBJzfs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782139943; c=relaxed/simple;
+	bh=KlQAV2tDciJBHz066Lqbt/JQnFkB38ZiAvjkY7Pa/04=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=IgK4i9hyA/J7cccefYWCzkd+AuYhHGaUrqEmk1dOMs2oCluRMbw293D0qxvNGrFubBP8zZ/oiv2JA+mjHqzvczemGWUpsENhEP54R1NATero0hsrjC4QprGUWK2eP1ObG8w4yx0/9uY7mHNumkamrTcQSClUJWaEA7uWjTL5KRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=EfitfEpL; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=kreqyUsv; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZFLW/bQB"
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-6611689dc10so5156128d50.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2026 06:55:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782136520; cv=none;
-        d=google.com; s=arc-20240605;
-        b=UkW7VKtZ2AtDAJoMA20FgUALuKq/bATqZqN/EyCsnqumYIw87+BSr2c5OqDWU0fZ8K
-         +xxeGRVUyKHiNyqzRbYbaeoU3c7ZviJOy/x1Bia0SyBHq56M6QlW64njkgvaXPtxU9FB
-         qxjbBWuRQMcAQiF71d4AB+B21cKP7Qz1nUzzLS/O6nTuxnrecRqNcZMIgAtZMZGCVUxx
-         pt9Ym4mpEcJ5A5qNHskmrEw+IT0MtqwW9EgQuC1TQNegPVj5phjBfV+zOxhLIfPhsO34
-         yxPA8E9dwZkHZ/vhgCsG2oSUvwjVPU9WBkrJdr0higEdJnXJMu59ej8ibGruHmHW+/xH
-         vnWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=dke5TrNkGe9UBkjytTbWSHukFz3N4mY88uBqHNTvmmk=;
-        fh=A/Q/jNPcPJyWlB/0KiTqrmPoa5p+gzL1PJrZG/U2mxs=;
-        b=S8HOkz8j9qSL9AfFljzuWUbRhYMa/IGUhlZokiGxYaCZfCI6dR/W+sd+iNYMg7mKon
-         o0kTqCedVYQtov/FWrUQYXmCtdTHIPNilPOwqw2hTbVaqv4mOKhrwAhTYIkTb0LI/Lpd
-         FN/mN5oSAhH45f3GPNpJwN88otIvrP+avV+imtGXx9MbuPRPl6VcC7cpKuYJfUX8XRVI
-         kiV0aghRqufD5wS614lAqBivXaxInLf1t3gQ/VgDe+2D9DiyIbxM5Lu75DIJT1H1hBZo
-         kN2rzK/Cv6KFwbFW4Ki1XeUCRMgvEbvMeD0QD/H26njBcunSCqfGa8ufwqxosXtLlMXT
-         cbew==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="EfitfEpL";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="kreqyUsv"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65MDGK69776499
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2026 14:52:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	14Obbvd4z6NdWA1t1SKXJ5JFfXqzhEWCNw4XBeZhqg0=; b=EfitfEpL6hP4X6cO
+	doBXFjvzTXMdqwECZ3qoSqGWR9srDnHGG0/kgBqjMTlTmDD1c8TFjy8OCKy2YIpr
+	kFqFs0lCR7ZsKqQDYVsG0GUJWduz/bzTHw0GELnqdsDrDOnFrkVbEghIBq5QBlwp
+	tLs/FYiQqWZwDz3NmYvMCG3iQsBECvUuWBSQI/3qw6Pfl9lskTsl7JIDd01peaQe
+	wsIG/rQ4w8XanJXI3IGqub86JnJn88PINGxJZfxzshf3ewOsM9Ijn+0b/r0VavO7
+	Gr9lAzMYfu0igSMHF14vrl4ufduuhnbA0QCu7cAbS0gPdrm6wgKE6m3Sp+6B7lgJ
+	JdJCpQ==
+Received: from mail-dl1-f72.google.com (mail-dl1-f72.google.com [74.125.82.72])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ey2yj90d3-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2026 14:52:17 +0000 (GMT)
+Received: by mail-dl1-f72.google.com with SMTP id a92af1059eb24-1399e7a6d05so584437c88.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2026 07:52:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782136520; x=1782741320; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dke5TrNkGe9UBkjytTbWSHukFz3N4mY88uBqHNTvmmk=;
-        b=ZFLW/bQBhtJJcawUpZcjFdcxMqhoPcO3QRrW1+LCvfj7mL6YyowoQuhox2B9Q/riHY
-         eq8dc/hwZGc1Oh24JtmZzCLIWvatvQPJ3DaQR7BckGX1jTbdDmNdL+iOd5TaydMpvHV9
-         e4MbRyYU/rXZatPgXdpc/RNVkzJPK3xz+K88/7ZPlhxHyf1JA6z74yfZ1oTuGvOGdkco
-         +r5kzi2wDaARixeG+NeHEXOFgSlFUR7RNNHPy661YWYU+xaOAv13oUmwYgQVYQYwIsC1
-         ZlBoawIG36tE2l+8m28G2A2VfgNNm/8XAFYQ3ovrTbBDFlI6m0rjFssBOMwXsrxnVSu9
-         4Iiw==
+        d=oss.qualcomm.com; s=google; t=1782139937; x=1782744737; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=14Obbvd4z6NdWA1t1SKXJ5JFfXqzhEWCNw4XBeZhqg0=;
+        b=kreqyUsvjG8i8urZeCvHpdHWwf3tLUt11wLQESqX5hLgTOscROuBq49LogRJoIaStI
+         2F7EWDKJ92kK1O0+xZ+JhbeN82F+f7F+2caq8s8exN9WrP4YY60vp62Y5EtKCfZVcnjf
+         bv2TI05jEXvmi4hYvc6dDspbbDcxmnUiiEPC4BZEbYDJ1UaJnANgV0OVnO4AVuSY7hSd
+         SyXtTo0s8CrE04p1qLOb1UlwL6Xx9vudFAn7jwFrX6LZew9gRg6PtV5Jazn88VoSw7Z+
+         7Nz+t9hJ67UOtZ9esAgSz4esPO5v5nQVny3YkCmAa8WjKgzs+Iv3hWVQLCXXPJyfiKO0
+         npZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782136520; x=1782741320;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=dke5TrNkGe9UBkjytTbWSHukFz3N4mY88uBqHNTvmmk=;
-        b=HkBgnaSrzpt9mIUmdtmBt6ZreoeoXNpOOrydRZQcOS2hWx5MZuhNmJlK8BQ+sg9+lS
-         uUA805th5HWpPOFkCExClsHkzNjuIu8f5NatgX57HVqIeBnNuxJzuoSf75EnXDxPJh2G
-         v9ajwbHlDd4bcD9Xmc/CyXvO8uOq8230ueikhsEUtSsospN1m73HALO7mdIZjEuoCQc4
-         Fst+oYKJXbilkjN0LJVOstzvdk+JDo2j1BbxDAzkmXYSdDFzxPSoRHI+hHRWsgm+6P3Q
-         aidsnPTAlSRFFQPdhkHR4ct1hE0Mh4eCX9WfutmjkncBZFqZFZdvzkCr7JCQNL3EhYsn
-         pKPA==
-X-Gm-Message-State: AOJu0YzcF6Mp8Y22hxRgK1YnVRHCWoZ2++XeQCzlld7kB8OPa+ZuB55w
-	sl9l+WoBKrLV8eRmZm04YpvwDuFeincm7wk4BUXiiIQ9CXU7v61kjNWb2S4nZ8b9Mr/8HnLgmUJ
-	u7Xem+l6Z+1taJ+ts0jGqQ9c9VgN23bYZ8PHgH9E=
-X-Gm-Gg: AfdE7cmSxxyK1GiOHAHwjsQcMnUt/tRGI/6sBtwp8w//UykUqSfD3fqODCh6lyZsydB
-	4E+NvO8cRSDpIS947NL4h30PKLccEGusJsEuZGQFQdKviRBdqhvunoM3qBEgOIDVareD8ZCsNpe
-	4t9LV0W7LiuR7FWjJ/BjxBJQmagX/Sec93R7HcuxuUsYtk4V+q5l+oWQYLf4dK1gXW2o+NKRSE9
-	VitUVcJ3BrvVhOU9dQagrEwgQW6scblv12oPyX7Cv/53evGVfRsKINhOL75AzVLV/70LHNgA2Tt
-	xrlcWWBEVljuGiudZ4oAiSkjr9msOdMJWloIj8PYAJ7IQgtrmoyNNj48/Xc=
-X-Received: by 2002:a05:690e:e85:b0:660:ffe0:2df1 with SMTP id
- 956f58d0204a3-6630335ace3mr12058708d50.42.1782136519508; Mon, 22 Jun 2026
- 06:55:19 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782139937; x=1782744737;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=14Obbvd4z6NdWA1t1SKXJ5JFfXqzhEWCNw4XBeZhqg0=;
+        b=Q5VWpN1eh46TlvrJQNjtb3NoMCHEa6MQAfdHoS4fBiuco6rJRQy9Rpz5hSlavc56g/
+         Kto/LF0WwOwwSVfrROjDNWD+vM9oQWrXwEYGuQpgdFXgfU91M4eyRUxqI02RhmZjnsOh
+         vLR/QYwsH+KxEr0ZIc04FsHvD/a/zDAC3yxsSf4glEdYL7nrIMYOePZO/zjSJsHDt9kZ
+         r73E7Mz6WBtqJuMj5XMo0jGJ95rVK5mWyiJNowtCRaXLolBuE/Edu6mpttu5uJ7HrfDQ
+         +hG5XTekOCGn4Jc+7yd1zmyLpakL+fkgLcthmoST4+O6dwzfPsdIldtvxvwATQ7Kst03
+         o5Vw==
+X-Forwarded-Encrypted: i=1; AHgh+Rqz7V4Q90Zpl/arRPCNBbZamRumcAM09pxNAFiFNGgCOHXjx/2fGG8XWOamoJlx7U+mds6oVc1xk9/iJTcoy6I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXBCYc65ls0vut8F65ia4MfxV2fO39ehu9mduWvorJa5U1N3BB
+	yqGE8R3MjXQMTYSAD88f3yEbfHx3g+yiMOG+OXwJomFoH4lUyEhInE/FFHK0FEoUNVAZ+poWLvR
+	2NLGg37+mBAvI6KNgTqdPF4GXugCiSwDzBq7RnJKTojn76rxjuRXshzxZuIz6zYk6PZ4oLpQ=
+X-Gm-Gg: AfdE7cnQenlgTz3EcTBfTxpLloYqwjLHxXEzcDim6ps2wuK5+SbVdiGe1GVO57Rtxz5
+	yQcNeqSnfY+XpOrxd5biFKeQC+51ZNkcXrS0n8tToPKo8EfP+v1YP8YzjQLMD67MDKxzIS+6878
+	UHbOjXxPky+vQ4ucMeoHKndhAyroFzItRp+CSUPRcKW372awnZXzcGXKsRZB9W6GacSZwMiOLnT
+	oPbdjSAnqmLLkmc4guZWt/f/t8ueZPwT0HZjc/IocUiw3gP6VQIObOgUHGF4x9qTg08//7ga/q6
+	AGEK1fvWWfxO9dHcvEZ1MAvAB//deQB7nKh1xMjDRAoKdbotSCEPbLNhQOetVR97V86tluXsTT1
+	kBczIlAPNsLaYKz1iZKcwmkcnXkiI+3ak+CiEa9HeRjAvov6OkDx1wnIXvQ==
+X-Received: by 2002:a05:7300:730c:b0:2d5:9438:2a02 with SMTP id 5a478bee46e88-30c52186229mr317956eec.1.1782139936916;
+        Mon, 22 Jun 2026 07:52:16 -0700 (PDT)
+X-Received: by 2002:a05:7300:730c:b0:2d5:9438:2a02 with SMTP id 5a478bee46e88-30c52186229mr317933eec.1.1782139936391;
+        Mon, 22 Jun 2026 07:52:16 -0700 (PDT)
+Received: from hu-zijuhu-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30c1bddfe34sm12025561eec.20.2026.06.22.07.52.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jun 2026 07:52:15 -0700 (PDT)
+From: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Date: Mon, 22 Jun 2026 07:52:14 -0700
+Subject: [PATCH 01/13] Bluetooth: btusb: Initialize @priv_size at
+ declaration in btusb_probe()
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260620191735.2675946-1-geraldonetto@gmail.com> <20260620191735.2675946-3-geraldonetto@gmail.com>
-In-Reply-To: <20260620191735.2675946-3-geraldonetto@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 22 Jun 2026 09:55:08 -0400
-X-Gm-Features: AVVi8CcApMI_V9hzN9euzLV2zgBTqx8HxI0Km9Ptso9_T5vz3wf-NOjD_0eUnEw
-Message-ID: <CABBYNZL7g7A8jVAUKqrr4KTGOfwjfR=pN7FetD=9erog2w4X4Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] audio: reduce a2dp parser complexity
-To: Geraldo Netto <geraldonetto@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260622-bt_bugfix-v1-1-11f936d84e72@oss.qualcomm.com>
+References: <20260622-bt_bugfix-v1-0-11f936d84e72@oss.qualcomm.com>
+In-Reply-To: <20260622-bt_bugfix-v1-0-11f936d84e72@oss.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Ben Young Tae Kim <ytkim@qca.qualcomm.com>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Matthias Kaehlcke <mka@chromium.org>
+Cc: Zijun Hu <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        linux-arm-msm@vger.kernel.org, Zijun Hu <zijun.hu@oss.qualcomm.com>
+X-Mailer: b4 0.14.3
+X-Proofpoint-ORIG-GUID: KHq6c4cioJKbV_GJUCvzpN6NLR67vpnm
+X-Proofpoint-GUID: KHq6c4cioJKbV_GJUCvzpN6NLR67vpnm
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjIyMDE0NyBTYWx0ZWRfX68pI7Gmg5tgQ
+ vmrLt7SCWSJIq6OwxrXgKj0WmM7P2e8DA1UUd4x6QbY0zgkGNTm6JGIMsZRfsS6qYATXpsR+A3y
+ K3i03CPkqPiZ7iXCLMXFT0FdaM7gnk0=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjIyMDE0NyBTYWx0ZWRfX0vfp9ytO2WpW
+ m+StCTq1JxiCF41r4eKsfSdCOTJNg9BLkb4f8zbRhGKboBid0MH2GLc2o8EXMV/krHBL/TCAMsy
+ DBQ3XOlwpIf0jPZSWXN1DjsogK9ZPC3rc1Zml127gFd+p/DKKqouiBpfqNCG4i8FIajIF6pcQta
+ JDHsAHLllNxBYzIOT5vvlxgzHrejbhW/g1dt8lWtGds1EyyPB52OYT8z6gsgMx9f2oSixqf+M37
+ 4WEKl+Ir4JLNTc1snRvxbM5dUNaFfPIGnletuDWfWfrAbBylS5Y6UR2LNN4JsT8Svp5En4or7hN
+ ha+VL7donqM8f76hAk0Qyt9JEVlOe0nAGtRl2B4pAOrzum8rLAF61YHDgGihe4K5fxbqf1jkYDi
+ NTy/kymYnG5ZKZqe2B5Ix+QCF/9b14dYHaudNHYfcZWK9xUKbrpsj5MV7UWrppBGVNJriFT/QS6
+ N1U1uwSckHGYbXm1+ZQ==
+X-Authority-Analysis: v=2.4 cv=YLSvDxGx c=1 sm=1 tr=0 ts=6a394c21 cx=c_pps
+ a=bS7HVuBVfinNPG3f6cIo3Q==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22
+ a=EUspDBNiAAAA:8 a=7HHrRZN38_5rRL6TGbMA:9 a=QEXdDO2ut3YA:10
+ a=vBUdepa8ALXHeOFLBtFW:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-22_02,2026-06-22_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 malwarescore=0 bulkscore=0 clxscore=1015 phishscore=0
+ adultscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606220147
 
-Hi Geraldo,
+Initialize @priv_size at declaration to reduce a redundant assignment.
 
-On Sat, Jun 20, 2026 at 3:18=E2=80=AFPM Geraldo Netto <geraldonetto@gmail.c=
-om> wrote:
->
-> ---
->  profiles/audio/a2dp-helpers.c | 55 +++++++++++++++++++++++++++--------
->  1 file changed, 43 insertions(+), 12 deletions(-)
->
-> diff --git a/profiles/audio/a2dp-helpers.c b/profiles/audio/a2dp-helpers.=
-c
-> index 035236df6..09dc6db91 100644
-> --- a/profiles/audio/a2dp-helpers.c
-> +++ b/profiles/audio/a2dp-helpers.c
-> @@ -74,6 +74,46 @@ static bool parse_caps(const char *value, uint8_t *cap=
-s, size_t caps_len,
->         return true;
->  }
->
-> +static bool has_delay_field(const char *value)
-> +{
-> +       return value[0] !=3D '\0' && value[1] !=3D '\0' &&
-> +                       g_ascii_isxdigit(value[0]) &&
-> +                       g_ascii_isxdigit(value[1]) &&
-> +                       value[2] =3D=3D ':';
-> +}
-> +
-> +static bool parse_endpoint_header(const char **value, uint8_t *type,
-> +                                                       uint8_t *codec)
-> +{
-> +       if (!parse_hex_byte(value, type) || !parse_colon(value))
-> +               return false;
-> +
-> +       if (!parse_hex_byte(value, codec) || !parse_colon(value))
-> +               return false;
-> +
-> +       return true;
-> +}
-> +
-> +static bool parse_delay_field(const char **value, uint8_t *delay)
-> +{
-> +       *delay =3D 0;
-> +
-> +       if (!has_delay_field(*value))
-> +               return true;
-> +
-> +       parse_hex_byte(value, delay);
-> +       parse_colon(value);
-> +
-> +       return *delay <=3D 1;
-> +}
-> +
-> +static bool valid_endpoint_args(const char *value,
-> +                               const uint8_t *type, const uint8_t *codec=
-,
-> +                               const bool *delay_reporting, const size_t=
- *size)
-> +{
-> +       return value && type && codec && delay_reporting && size;
-> +}
-> +
->  bool a2dp_parse_capabilities_array(DBusMessageIter *value,
->                                         uint8_t **caps, int *size)
->  {
-> @@ -106,27 +146,18 @@ bool a2dp_parse_persisted_endpoint(const char *valu=
-e, uint8_t *type,
->         const char *pos;
->         uint8_t delay =3D 0;
->
-> -       if (!value || !type || !codec || !delay_reporting || !size)
-> +       if (!valid_endpoint_args(value, type, codec, delay_reporting, siz=
-e))
->                 return false;
->
->         *size =3D 0;
->
->         pos =3D value;
-> -       if (!parse_hex_byte(&pos, type) || !parse_colon(&pos))
-> +       if (!parse_endpoint_header(&pos, type, codec))
->                 return false;
->
-> -       if (!parse_hex_byte(&pos, codec) || !parse_colon(&pos))
-> +       if (!parse_delay_field(&pos, &delay))
->                 return false;
->
-> -       if (pos[0] !=3D '\0' && pos[1] !=3D '\0' &&
-> -                       g_ascii_isxdigit(pos[0]) && g_ascii_isxdigit(pos[=
-1]) &&
-> -                       pos[2] =3D=3D ':') {
-> -               parse_hex_byte(&pos, &delay);
-> -               parse_colon(&pos);
-> -               if (delay > 1)
-> -                       return false;
-> -       }
+Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
+---
+ drivers/bluetooth/btusb.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-I'm not really sure this is any better to be honest. It sounds like
-comments explaining the parsing logic are needed, but otherwise, I
-can't quite follow the changes you are proposing with this.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7f14ce96319b..5209e2418493 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -4082,7 +4082,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 	struct btusb_data *data;
+ 	struct hci_dev *hdev;
+ 	unsigned ifnum_base;
+-	int err, priv_size;
++	int err, priv_size = 0;
+ 
+ 	BT_DBG("intf %p id %p", intf, id);
+ 
+@@ -4152,8 +4152,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 	init_usb_anchor(&data->ctrl_anchor);
+ 	spin_lock_init(&data->rxlock);
+ 
+-	priv_size = 0;
+-
+ 	data->recv_event = hci_recv_frame;
+ 	data->recv_bulk = btusb_recv_bulk;
+ 
 
->         if (!parse_caps(pos, caps, caps_len, size))
->                 return false;
->
-> --
-> 2.43.0
->
->
+-- 
+2.34.1
 
-
---=20
-Luiz Augusto von Dentz
