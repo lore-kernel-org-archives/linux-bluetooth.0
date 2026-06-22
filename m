@@ -1,148 +1,102 @@
-Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38353BF699
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2026 15:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782142523; cv=pass; b=HkFwRk1reajsC6YrgstRxiXokss62rz15qeoR52oVXkw9icn+hqWYjYiWqJ6wTSKgRcYKswWkrT0a+CIKt9mVj7pi6rpm3g8vCS051iFeYaGWg6LxzSjM+arOG8aWCaPB/ezjqTxhGrj71fFl+rWS8uaA3+RYd30nJG2WMvGVVw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782142523; c=relaxed/simple;
-	bh=5OCGKPyrQcnRpkWX0WedQu6uHAkVuPmEI/fEX9pGYvI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=h6YxcPbhAB8NRNv2z7fPOzNB5lAZdQObyP+kOXegc7QflcpUj25Suun47jJWfX3UARphc2CoZSrYtaBTqiByb3WLkQxW8lrkDTS9/PNNdcCJFDd/jidZukMiqtd+CkCAPFUyZ/TeYGydeh+3GDY3/UnpGJBf596bYDqUS4QCcRw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BP8D5q7Q; arc=pass smtp.client-ip=74.125.224.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B124E3C0A1F;
+	Mon, 22 Jun 2026 15:42:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782142943; cv=none; b=OqDmXQg6OmkT2u9yl8uWy+unDVso9bAdqL6UAW51vqt8DdK6Qn07bM6Eo0H9l9VUsGX5UMmKMtTFtU1UjOFhPPORSiTUrdnFAViJIdIoG9yAp03u30HBsoVIttqm1wgdXVORHQnF8QGwz8jbLQidLUIf9Fh3AWHHJoOjHv1Rxds=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782142943; c=relaxed/simple;
+	bh=DemoEo0SOlDZDn9K4lZLLKEwtb5DdtGHL6Gcq9T5edY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gkSziqNhDrUWTY1v50f1zFkru6vAve4yMcv7qmuIOnGRH3aKV97Nthutf5VJlbsPxFGSgf+Kwu2eDZSoFHF3VfNUta8L7FIQqmPYFmwgRC+kN9Htj2ehg+jGWORf+ORQmkKvpqGwVWq447wa0vXJfWF+586I23wdgdKMkei/UqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QpWZktXY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BP8D5q7Q"
-Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-662dd616cdbso4651197d50.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2026 08:35:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782142521; cv=none;
-        d=google.com; s=arc-20240605;
-        b=BD6Oq4XjsrPxcAujyzPZ9wfIzFQO0nwtISIF+rMD4kW8bf+DUO45KeDksz2lhkJxFR
-         O6P263a6Q9wDAyPDGY806QXYwRVDF8bh35DhZH5DqV587aNAlK2Jq+hmJ/lEKZrygIZt
-         VKQeAY+HNyqQOtN7GBawZ/YgamVCow8nXuhrjFWIk/+uXKcHz7cgN0CHq4yg6Rw+TGNH
-         3Rdo2oRPfmHgrd+Wn0tEBT4OK1vZ/wtHPHoDJdKRugiEI4vKOy09ZibClf1+u+PAqlQe
-         RaHQ1LAwUDChkGlnnae40J8q0G+7N9hj0u45lXEDLSn6Z6SAZdcNZt6zjXwD9zOWJ248
-         1PXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=9lW9Qh0iORARavHIyVNPtLhkXeZSz2NoMcvEmgnoHpA=;
-        fh=oCNJDrcV/UdwQjvAZaf7zt0XodYIIXOz6Bm0ICRaqvw=;
-        b=i207S3NiWMyrH6ahR0rB2M21+suico9eR9i4d5/XXWTBoUlPcCMBJvM/3nRhLxEmh4
-         9A3NHW9nT0HPCgH4ejLotlPC0BcK+V7Wom13zZgI4K/fkMMfVW6HO4TFm4U6NnSHu6G+
-         /WQwJ/ID9X3MNO2PRFnt9miyfRjMPQWwhEUlpThLZ/W4Ew9qyjwTJv+L4N0ils7wU8+F
-         01UKz5BxEJIHvxJI/PpEI3Er3n+AQ+gi3vc+hzT0jgjabqm7uhw85ZNAyMyTZIvmTpOt
-         jKGEYAxqHJi5/WYaZQtSafXT7yoXSlXl2ffIj+nZlduAKOBOz4vpVGmJvztGGWTITrk/
-         vYCg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782142521; x=1782747321; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9lW9Qh0iORARavHIyVNPtLhkXeZSz2NoMcvEmgnoHpA=;
-        b=BP8D5q7QAFXc2dU6kSAWX8FJpNws7BxjJmgj6Yugkgcqx6DHdc4/9j+cyF7kwgSlGO
-         UunqtejmT8WCLSPXh2eWiV6kkn2b5sN6p1u2wlYorPcRUs/LAiQVlgWdvp6u0DZOFQVg
-         KbC2eCi0ScEaevkhDKSMnfGbGHTRcWLOMf4pQPJsm0Tl33Z4zxf/SdKvlgOfBkZHzoo0
-         cLX4395WZE3YSKscaHHshOVwjXYlzKQZA+YowMjq9jAA2QceNwtZZ2DEHMmSzIUGPAyQ
-         UojP0XpgoJviHdryKy2kogdNJjrYnp3xYBIznvXcFk8rJJiCHCeBttswkAOcXD22NKcv
-         +v7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782142521; x=1782747321;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9lW9Qh0iORARavHIyVNPtLhkXeZSz2NoMcvEmgnoHpA=;
-        b=bzDwmZft17Th3Y67y4fJXyCFaeEbWO9RQjN8FxbWAkR2ptysqHqZN4wH9XvOulha/Q
-         dapUdk5LzjpYvYLUGtgZcX7iJnTG6ewtK7gtRWVI3KUbZtQd1XK9aV1jOY5FR2qxv4Au
-         6yuq8BCu1wi4Tn16AlLA7hZpOi7n3CqMqagT4LrITEmbhna8cOdKuYxVMci7VYD0hIYa
-         KsG41mQ9lu0tBOqYKTZWpMPdH/F4OVvSvQu7X89ZxSBtKVVcGQg2e4BJbGCuNXtnyScl
-         egEFcUkCcmX+unDX1O7gVqPtcGQAqkm1ssrZYCUyrTk0rWjodi1gpCrk53y9pAng/MaR
-         YrHg==
-X-Forwarded-Encrypted: i=1; AHgh+RpalD/vgLe5sucxbFw8qb5kVk8/+nK0LLuN6j5lw9Q+p5Xifp+MTgNICcwHzb7KW/akc1YlMO+FxyMCRCxhzEc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7eJd+rNrX5Bs421TGnQkZ603OCW3GpKDG8WgzmBSgO0+tyxlH
-	dai08jZ/fY13j3tBgTwqrsN9f3tRmqqgH747fIU9sFUb9UzOR6ZVSLts8bca/l0uHT5qMwtg2my
-	h2qyAPPS9d09pMtlG4uuOorMgI9eS4kY=
-X-Gm-Gg: AfdE7ckqB6jAbZx6p22DQzAxlozQzPcVBTtsC362AwtOK+YruX5urerdRFnReec8UVk
-	0Ew6HXAT0B6iX9zrFOIxD8vwuklRVhAvYB1//ZxYkpzcnsbltqqSDYd1Cbk1oM3K5givb26ldKB
-	47EWm6ZmEWrOqayWbOH38RAtlEA3WPtCSBvaklhAnf6AFRpTBxZQnXKTJ/xLZI1ikQF2gIhRnE7
-	uDTEjHftwbUQh9VrpcB9EZ8IdLSLTeUmvJGEQIebp2H54JSFeb+XV1+3eqrM0HNPKjEd9up1ZyF
-	C8ZZMLd2qTTf0iyLjTsbWQHcXqxqN6H9vj7OTYDnMsPIC4bP4QqEiKsL
-X-Received: by 2002:a05:690e:e83:b0:663:9de:2049 with SMTP id
- 956f58d0204a3-66309de20f0mr11680467d50.13.1782142520865; Mon, 22 Jun 2026
- 08:35:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QpWZktXY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7E631F000E9;
+	Mon, 22 Jun 2026 15:42:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782142942;
+	bh=h0E00buD9oFi1l3xPWxuJLb9QwIMsgt/Kp7Y9WZb8rM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=QpWZktXYyPViHwjudKgsTg97/fRthbwJv0/aE9xz87I0WB+0qZ0vwULG7Tfj4Yul6
+	 3gJasZdeh5TGkhxrURJYtvHxLIZtV0Z+xSJfToUzbfQ+ubzAFQb1ala3gDj0cZyTJN
+	 QFxruOvCX0OMIpTy10Yzy9h77zkShRtZ3Tg1J+k0j8cJfHAj8weJ2bhplVUdp4EPjN
+	 zwlZkUbctMRDtYX7QvJPLurKJaIPu2ZrYTata5K9uSOufPxMZkDu4is6y1I+8HkJfa
+	 3ufjkAyPkBRnCPxYfcvfZJSFTIk+S46VfJomoViLyeQpe9YFf8lm9uU7vvr88iicNb
+	 fAIknGe2bI53A==
+Date: Mon, 22 Jun 2026 17:42:08 +0200
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: "Sherry Sun (OSS)" <sherry.sun@oss.nxp.com>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	Frank.Li@nxp.com, s.hauer@pengutronix.de, kernel@pengutronix.de, 
+	festevam@gmail.com, amitkumar.karwar@nxp.com, neeraj.sanjaykale@nxp.com, 
+	marcel@holtmann.org, luiz.dentz@gmail.com, hongxing.zhu@nxp.com, 
+	l.stach@pengutronix.de, lpieralisi@kernel.org, kwilczynski@kernel.org, 
+	bhelgaas@google.com, brgl@kernel.org, imx@lists.linux.dev, linux-pci@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org, sherry.sun@nxp.com
+Subject: Re: [PATCH 2/8] power: sequencing: pcie-m2: Add PCI ID for NXP
+ 88W9098 and AW693 Bluetooth
+Message-ID: <hpit5ljwbfui2dqnjzinrv5mteib3vmxkhwv3uyv3adcjlkljs@cl646qxhafcy>
+References: <20260618101047.4185497-1-sherry.sun@oss.nxp.com>
+ <20260618101047.4185497-3-sherry.sun@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260622-bt_bugfix-v1-0-11f936d84e72@oss.qualcomm.com> <20260622-bt_bugfix-v1-8-11f936d84e72@oss.qualcomm.com>
-In-Reply-To: <20260622-bt_bugfix-v1-8-11f936d84e72@oss.qualcomm.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 22 Jun 2026 11:35:08 -0400
-X-Gm-Features: AVVi8CeOpIYHL5-TwNBim9QeQWw0S_IkyHa2Yq5HluoguIJRtBcH4I32gcuco4w
-Message-ID: <CABBYNZ+z6XcZXejs18fbX-MSFBmaGC0Reoqn549N-8sn==z2Ug@mail.gmail.com>
-Subject: Re: [PATCH 08/13] Bluetooth: hci_sync: Fix return value of hci_reset_sync()
-To: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Ben Young Tae Kim <ytkim@qca.qualcomm.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Matthias Kaehlcke <mka@chromium.org>, 
-	Zijun Hu <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-arm-msm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260618101047.4185497-3-sherry.sun@oss.nxp.com>
 
-Hi Zijun,
+On Thu, Jun 18, 2026 at 06:10:41PM +0800, Sherry Sun (OSS) wrote:
+> From: Sherry Sun <sherry.sun@nxp.com>
+> 
+> 88W9098 is a NXP Wi-Fi/BT combo chip with PCI device ID 0x2b43 under
+> Marvell Extended vendor ID. AW693 is a NXP Wi-Fi/BT combo chip with
+> PCI device ID 0x3003 under NXP/Philips vendor ID.
+> 
+> Add both chips to pwrseq_m2_pci_ids[] so that the pwrseq-pcie-m2 driver
+> can create the Bluetooth serdev device when these cards are inserted into
+> a PCIe M.2 Key E connector.
+> 
+> Both chips use "nxp,88w8987-bt" as the serdev compatible string, which
+> is the entry point for the btnxpuart driver. The driver identifies the
+> actual chip variant at runtime via chip ID auto-detection and loads the
+> appropriate firmware accordingly.
+> 
+> Signed-off-by: Sherry Sun <sherry.sun@nxp.com>
 
-On Mon, Jun 22, 2026 at 10:52=E2=80=AFAM Zijun Hu <zijun.hu@oss.qualcomm.co=
-m> wrote:
->
-> hci_reset_sync() may return positive HCI status byte as-is, but callers
-> in the chain hci_reset_sync() -> hci_init0_sync() -> hci_unconf_init_sync=
-()
-> check errors with < 0, so a positive status is silently ignored.
->
-> Fix by converting positive HCI status to a negative errno using
-> bt_to_errno().
->
-> Fixes: d0b137062b2d ("Bluetooth: hci_sync: Rework init stages")
-> Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Reviewed-by: Manivannan Sadhasivam <mani@kernel.org>
+
+- Mani
+
 > ---
->  net/bluetooth/hci_sync.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index fce9f9526cb5..601d44ef975f 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -3678,8 +3678,10 @@ int hci_reset_sync(struct hci_dev *hdev)
->
->         err =3D __hci_cmd_sync_status(hdev, HCI_OP_RESET, 0, NULL,
->                                     HCI_CMD_TIMEOUT);
-> +       if (err < 0)
-> +               return err;
->
-> -       return err;
-> +       return -bt_to_errno(err);
+>  drivers/power/sequencing/pwrseq-pcie-m2.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/power/sequencing/pwrseq-pcie-m2.c b/drivers/power/sequencing/pwrseq-pcie-m2.c
+> index 94c3f4b7ee36..9217ffcfa6e5 100644
+> --- a/drivers/power/sequencing/pwrseq-pcie-m2.c
+> +++ b/drivers/power/sequencing/pwrseq-pcie-m2.c
+> @@ -186,6 +186,10 @@ static int pwrseq_pcie_m2_match(struct pwrseq_device *pwrseq,
 >  }
+>  
+>  static const struct pci_device_id pwrseq_m2_pci_ids[] = {
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL_EXT, 0x2b43),
+> +	  .driver_data = (kernel_ulong_t)"nxp,88w8987-bt" },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_PHILIPS, 0x3003),
+> +	  .driver_data = (kernel_ulong_t)"nxp,88w8987-bt" },
+>  	{ PCI_DEVICE(PCI_VENDOR_ID_QCOM, 0x1107),
+>  	  .driver_data = (kernel_ulong_t)"qcom,wcn7850-bt" },
+>  	{ PCI_DEVICE(PCI_VENDOR_ID_QCOM, 0x1103),
+> -- 
+> 2.50.1
+> 
 
-There seem to be 2 consecutive changes to hci_reset_sync that conflict
-with each other, also the expectation should be that positive errors
-are HCI errors and negative errors are stack generated ones, so the
-callers should really check `err` and not `err < 0`.
-
->  static int hci_init0_sync(struct hci_dev *hdev)
->
-> --
-> 2.34.1
->
-
-
---=20
-Luiz Augusto von Dentz
+-- 
+மணிவண்ணன் சதாசிவம்
