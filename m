@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB55733F385
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2026 17:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26B433FE15
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2026 17:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782147630; cv=none; b=Z2jr+PZby3VMAlg1rPo+yWJk65IxxSOzjwt4GaiHxyp4tH2e6EdeakGab2YB9o18Z9UnwdG9dX4+4OWTVhgffGajl7xghxABWSAKVd8KZQg/u8qY7eQLQnB0xiGii+cu+SmIjBDkM5+USaLnQVmcyNUCj75JxsL6amXpDk1/k20=
+	t=1782147631; cv=none; b=puqTnIWjVvjxEO39setH/rYv2UDfCoiBFaS0m89UfiBKK6GgA4TMUnWjP1JwrOTPcKqt+1gfyZcU72DdfHb0Zduru/y/0o+frIigWGBTkZi9g5fKrWKla5e1HIh/eMmTCcugdwKYHQ44RoQd72gXVc/p1kjWUhG0VouUpDylXFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782147630; c=relaxed/simple;
-	bh=axagS1//Ok/0EQqo2OslBN2L6U2cuvTR9nAmsH9Jt3s=;
+	s=arc-20240116; t=1782147631; c=relaxed/simple;
+	bh=szbThxw3na3G4VHrBEGMIioRaIqlDWmTFncZbZXf3+g=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jXgVoL/fIJBv8ZC5OtI0Ce4m6roUCmPBE0d6v/elQiQf5+bLil86xY9sE7+7qfnfI8B8czX2SEqyxN9zVrm6ra0NCxpInty5HVbJy0wrThYkfTnIi+lzCdjfkT22yKz94sGd66rEN6cxC97sxj5P3KZ6eSIhNCMOY+O4xfIfPuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QHGRX3uj; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=mZMsqEWsuqis5/CtAE1U5gakOuLUCoQz18Hw3Nu6NujPzdNIia3mXKIowwQbkmsJeqCQjAos7g6is7aSvYeUUQ7cKzivQ8rUu4IQQ+iuG5Z8jLdzZVb5Tf3RkKhZaIccICh0mShfrCvIicfot9LhIZVRFiEI9TDn7e7IwBy98jM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C7bjL+6V; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QHGRX3uj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C36C91F000E9;
-	Mon, 22 Jun 2026 17:00:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C7bjL+6V"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47A821F000E9;
+	Mon, 22 Jun 2026 17:00:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782147628;
-	bh=xH7DGduVgCh/AAi4SibQgFujKssNpfqsd0Ot9Al5oCI=;
+	s=k20260515; t=1782147630;
+	bh=GFT8d/eQKlL2N1uN/YZ7HXJQCYCU709CaBUVwlLDLlI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=QHGRX3uj4dEw7yfTLv24HOgTedwjrryn8JztlEGou9RkZ+oL7YkD/nG48ncd0vLIu
-	 R9PFKCxXzk164D0T+DR0XnYzcNYjAjJgkZ0rjwwPWGO/t9AN8uLC908Q6TYCC9WvFH
-	 08WVoIQ0JjTD31bGRTShlIoLeDJTX0mdT/RxjpVw135YJDiprzrkZ897dVp5/GZBct
-	 KUVTGC8UPKUMGr/n4e1D07vk+NlTjEujPEZCkVjIzv7p3mskS0DfrJMBRtfrmBMSjH
-	 WlHTg0KprekJ0mctMI/Rg3ihP584YqkkikeH+AYd46CWykpkcp0iM+IgVHGfaeC2jO
-	 1YhXQ+Tpj4/YA==
+	b=C7bjL+6VjZOHBBmvDRNVWLuWDEPkpkwCFJGxSfg26vizuEjdr65gYKykqcrQ/71aF
+	 Vp+mnlAcIU1GGLrUjCBsehW7P7wiA3E4YjUAaItygMUsWwUoGkFPveM4y8EXk/+vYF
+	 L9RF0atIIFm6XQkDlTODTmX2HAbAnFntk5rcF3k6jaTbkfRGj1JPb7E/vwBoNE+5kH
+	 OzC4BnLs1k6pb5SqAJ3yoGxVuY5jMnChFD1OAiy0sjQXW1k6K2KcOwXmlzYZ9IIL8n
+	 q/B18Vk8qeyyPH40Ks2zFNFDLLMj/xksXKh3DXxgEyWaLdHrfmQcdTCUVh8svw8wlq
+	 WuGXaQeRRghxA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939813930917;
-	Mon, 22 Jun 2026 17:00:20 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 197AF3930917;
+	Mon, 22 Jun 2026 17:00:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,51 +37,44 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v6 1/2] Bluetooth: hci_conn: Fix null ptr deref in
- hci_abort_conn()
+Subject: Re: [PATCH v2 0/5] Bluetooth: enable context analysis
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178214761929.1322955.16732313923860679614.git-patchwork-notify@kernel.org>
-Date: Mon, 22 Jun 2026 17:00:19 +0000
-References: <20260615153527.1583705-1-oss@fourdim.xyz>
-In-Reply-To: <20260615153527.1583705-1-oss@fourdim.xyz>
-To: Siwei Zhang <oss@fourdim.xyz>
-Cc: luiz.dentz@gmail.com, pav@iki.fi, xiaowu.417@qq.com,
- linux-bluetooth@vger.kernel.org
+ <178214762073.1322955.15712319484363446864.git-patchwork-notify@kernel.org>
+Date: Mon, 22 Jun 2026 17:00:20 +0000
+References: <cover.1781432726.git.pav@iki.fi>
+In-Reply-To: <cover.1781432726.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 15 Jun 2026 11:33:05 -0400 you wrote:
-> hci_abort_conn() read hci_skb_event(hdev->sent_cmd) when a connection
-> was pending, but hdev->sent_cmd can be NULL while req_status is still
-> HCI_REQ_PEND, leading to a NULL pointer dereference and a general
-> protection fault from the hci_rx_work() receive path.
+On Sun, 14 Jun 2026 13:27:01 +0300 you wrote:
+> v2:
+> - Add annotations to RFCOMM
+> - Enable analysis also for BNEP, RFCOMM, HIDP
 > 
-> Instead of inspecting hdev->sent_cmd, track the in-flight create
-> connection command with a new per-connection HCI_CONN_CREATE flag and
-> route all cancellation through hci_cancel_connect_sync(), which
-> dispatches to a dedicated per-type cancel function. The create command
-> is in exactly one of two states: still queued, or in flight. The cancel
-> function holds cmd_sync_work_lock across the whole decision: the worker
-> takes this lock to dequeue every entry, so while it is held a queued
-> command cannot start running and an in-flight command cannot complete
-> and let the next command become pending. This keeps the flag test and
-> hci_cmd_sync_cancel() atomic with respect to the worker, so a queued
-> command is simply dequeued, and an in-flight command owned by this
-> connection is cancelled without the risk of cancelling an unrelated
-> command that became pending in the meantime. CIS uses the same flag
-> mechanism via HCI_CONN_CREATE_CIS but cannot be dequeued per-connection.
+> ***
+> 
+> Set up compiler context analysis that generate compiler warnings on
+> problems that Clang -Wthread-safety can detect:
 > 
 > [...]
 
 Here is the summary with links:
-  - [v6,1/2] Bluetooth: hci_conn: Fix null ptr deref in hci_abort_conn()
-    https://git.kernel.org/bluetooth/bluetooth-next/c/76c2d047410b
-  - [v6,2/2] Bluetooth: hci_sync: Remove unused hci_cmd_sync_dequeue_once()
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8047d832767f
+  - [v2,1/5] Bluetooth: af_bluetooth: Add minimal context analysis annotations
+    https://git.kernel.org/bluetooth/bluetooth-next/c/077b1a4fdaa3
+  - [v2,2/5] Bluetooth: hci_core: Add minimal context analysis annotations
+    https://git.kernel.org/bluetooth/bluetooth-next/c/2f798c97b743
+  - [v2,3/5] Bluetooth: L2CAP: Add minimal context analysis annotations
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a9cdc2959c77
+  - [v2,4/5] Bluetooth: RFCOMM: Add minimal context analysis annotations
+    https://git.kernel.org/bluetooth/bluetooth-next/c/14cb114880c7
+  - [v2,5/5] Bluetooth: enable context analysis
+    https://git.kernel.org/bluetooth/bluetooth-next/c/9218167503ef
 
 You are awesome, thank you!
 -- 
