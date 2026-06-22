@@ -1,102 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B124E3C0A1F;
-	Mon, 22 Jun 2026 15:42:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA693D1ABD
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2026 15:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782142943; cv=none; b=OqDmXQg6OmkT2u9yl8uWy+unDVso9bAdqL6UAW51vqt8DdK6Qn07bM6Eo0H9l9VUsGX5UMmKMtTFtU1UjOFhPPORSiTUrdnFAViJIdIoG9yAp03u30HBsoVIttqm1wgdXVORHQnF8QGwz8jbLQidLUIf9Fh3AWHHJoOjHv1Rxds=
+	t=1782143793; cv=none; b=i5HHEdlSvWaMAQFdXDf2f5ExiZGb+YqiAe+iYJovj3LjQinIo4gIjCkeSuISAqWgGztEO8wLkWfKBuxMlwsE47syqf+GT3SKurIzosJF2qMSMrnI1zUnYvN2zgddQFEU3wqwwOIbhc1sFSEHWx8WrxfOAKg4y6kjuivimMUbe/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782142943; c=relaxed/simple;
-	bh=DemoEo0SOlDZDn9K4lZLLKEwtb5DdtGHL6Gcq9T5edY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gkSziqNhDrUWTY1v50f1zFkru6vAve4yMcv7qmuIOnGRH3aKV97Nthutf5VJlbsPxFGSgf+Kwu2eDZSoFHF3VfNUta8L7FIQqmPYFmwgRC+kN9Htj2ehg+jGWORf+ORQmkKvpqGwVWq447wa0vXJfWF+586I23wdgdKMkei/UqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QpWZktXY; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782143793; c=relaxed/simple;
+	bh=YHF7UKFkaCtEVBpyg99ZSl5MDHu9O6SG4Rt7Q9P7Zkg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=jboYhhypRv72HJtASEp2p49BMcVwyyKDXtZWgi0k1fMBSwf2cr9ww491V+oiv0ANzgrbz2WIAYx50QBOeLt/eQIqSB2Z0d444luAG1tKqQ74SI0nCM+o6Y6N0GlnXvBK7UubdPDfSP2LY/40QFjIaU/H1ZAnD0UDefgq7BNZKag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AiPOLL3i; arc=none smtp.client-ip=209.85.221.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QpWZktXY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7E631F000E9;
-	Mon, 22 Jun 2026 15:42:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782142942;
-	bh=h0E00buD9oFi1l3xPWxuJLb9QwIMsgt/Kp7Y9WZb8rM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=QpWZktXYyPViHwjudKgsTg97/fRthbwJv0/aE9xz87I0WB+0qZ0vwULG7Tfj4Yul6
-	 3gJasZdeh5TGkhxrURJYtvHxLIZtV0Z+xSJfToUzbfQ+ubzAFQb1ala3gDj0cZyTJN
-	 QFxruOvCX0OMIpTy10Yzy9h77zkShRtZ3Tg1J+k0j8cJfHAj8weJ2bhplVUdp4EPjN
-	 zwlZkUbctMRDtYX7QvJPLurKJaIPu2ZrYTata5K9uSOufPxMZkDu4is6y1I+8HkJfa
-	 3ufjkAyPkBRnCPxYfcvfZJSFTIk+S46VfJomoViLyeQpe9YFf8lm9uU7vvr88iicNb
-	 fAIknGe2bI53A==
-Date: Mon, 22 Jun 2026 17:42:08 +0200
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: "Sherry Sun (OSS)" <sherry.sun@oss.nxp.com>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	Frank.Li@nxp.com, s.hauer@pengutronix.de, kernel@pengutronix.de, 
-	festevam@gmail.com, amitkumar.karwar@nxp.com, neeraj.sanjaykale@nxp.com, 
-	marcel@holtmann.org, luiz.dentz@gmail.com, hongxing.zhu@nxp.com, 
-	l.stach@pengutronix.de, lpieralisi@kernel.org, kwilczynski@kernel.org, 
-	bhelgaas@google.com, brgl@kernel.org, imx@lists.linux.dev, linux-pci@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org, sherry.sun@nxp.com
-Subject: Re: [PATCH 2/8] power: sequencing: pcie-m2: Add PCI ID for NXP
- 88W9098 and AW693 Bluetooth
-Message-ID: <hpit5ljwbfui2dqnjzinrv5mteib3vmxkhwv3uyv3adcjlkljs@cl646qxhafcy>
-References: <20260618101047.4185497-1-sherry.sun@oss.nxp.com>
- <20260618101047.4185497-3-sherry.sun@oss.nxp.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AiPOLL3i"
+Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-5bbe617d624so29657e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2026 08:56:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782143791; x=1782748591; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TJoNjs+98JPi2eONIlVves9ZMVYEPhAq5R2L7Tf9I9Q=;
+        b=AiPOLL3iKJsDorDnth4Nk8/lU47Yvg+HoA84cw6qgq9oPPjJ673/XRR2J/TFkHgPVB
+         f12Vj+hirHB+YzSgbDcdzlues/Mvg6axVCBWUICBWBV4NYoeAz34a0Lw+1WcFN6FNrSY
+         V0iVEzeVpV/5w6SYNWWpDZSWOD7/U3lRPiqcZgkY97OZYXZSAr9kFvesiZYDDXxCc2Xa
+         MXLqc45H3JcyX6sXfedmsQsErfcfNurPCG/Brxy0YMV12uYSmx1+eDCzLbNr5PoxU77R
+         N+xJ7SH5HpKxRAolDs3unGcq5WnXIOB0fpzMEV/rJJM5YhsPXsQZp64QSYLPBO4Or6kY
+         6pAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782143791; x=1782748591;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TJoNjs+98JPi2eONIlVves9ZMVYEPhAq5R2L7Tf9I9Q=;
+        b=Ldn2eNr1aoEnmKmfGP5L6IIDXPC7wgUhhZrO8BNVtr6NHQyF2QNmDfe0S0aiTUN+1A
+         LqjTLiTmSw60JnrnbYw0OiTEx1AiOegci2Vrvai3xTX6aWNaUc9LYaDSyD4ADXHLeI1r
+         tTwemG7QiwnCM2M/IKlizM5Tc6JCRe6v8nC2D7i1lCSEnK0JiOm7v8cHL2+ve7FY/uwp
+         FXqmgH+YwkTOv1SkyKLHN8jVDgmG/r3F/Ier9kPJFyYGSGr03ok8xx0Qbvhk/1cNHdlH
+         QnVYxt/1sBbnjX9qwExkMdi5NhT9Wwz3z+us1uSP4lN9UvoQPch0+Un3R51WVbvVCT0C
+         C2vg==
+X-Gm-Message-State: AOJu0YwqloYhycqq6NqIP7NC5zIFun1Hiq3ykJk/YcXo85Qtcovpzs2b
+	3EiN7wF+37EMQIt34UpaDv3rE0DzMtp32wX7M0mxrCVUscFI91paSrNvqw+tcD9pmxY=
+X-Gm-Gg: AfdE7cksDUTII+VTTui563ycZ6jyKZfiLkxhL4UMMrOPKVUEUZV20rjFATtLDIb4WaO
+	51jeNbMRIXmhFcXC9HsdJxYKrkSVQeCkBN+DdRfsqmgQV9afoCramXZvsciPSoc8Dtl5AU+uNN9
+	TJkKpP0tYPcw0iD8rVG8lBQzEVX8p6xfpS01uEZUbqVITWlTlbd0wa42ZUAurjaJjIuh7UlsXaB
+	zC7qmuy52SX9wQj0C/0KFKMyWyZPJ1UvmXOeqoxRT4JImxuP79j4F8HJVhlNbYipGTRoakaftgc
+	rDT2GTNw8ggf1V2Oz6UfM9bn7cA23yCt38tnO7M+TEXvrKc0o8NNcmAnae/L5Pf5rXE7JsnTjg+
+	RoemwTPcueEU12HnJ5f34qgkxXIZUbTDEn2yCyZKfTrQPjuwbxLnEBmZ8UUj8y2MobHgejQZDlr
+	KN8Ey1D0Yp3o5FcX1YF8CdVLLCaxaDXJkYAUKiNkEMnecbZ2PRk7Ot0AQo7XYPKtCxv/tzmP0d5
+	ZuQiMI=
+X-Received: by 2002:a05:6122:3d11:b0:5a1:b296:78fc with SMTP id 71dfb90a1353d-5bc2ac55ffamr74130e0c.1.1782143790995;
+        Mon, 22 Jun 2026 08:56:30 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5bbfb878c91sm7082028e0c.6.2026.06.22.08.56.30
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jun 2026 08:56:30 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2] a2dp: Fix handling of codec capability storage
+Date: Mon, 22 Jun 2026 11:56:21 -0400
+Message-ID: <20260622155621.675255-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260618101047.4185497-3-sherry.sun@oss.nxp.com>
 
-On Thu, Jun 18, 2026 at 06:10:41PM +0800, Sherry Sun (OSS) wrote:
-> From: Sherry Sun <sherry.sun@nxp.com>
-> 
-> 88W9098 is a NXP Wi-Fi/BT combo chip with PCI device ID 0x2b43 under
-> Marvell Extended vendor ID. AW693 is a NXP Wi-Fi/BT combo chip with
-> PCI device ID 0x3003 under NXP/Philips vendor ID.
-> 
-> Add both chips to pwrseq_m2_pci_ids[] so that the pwrseq-pcie-m2 driver
-> can create the Bluetooth serdev device when these cards are inserted into
-> a PCIe M.2 Key E connector.
-> 
-> Both chips use "nxp,88w8987-bt" as the serdev compatible string, which
-> is the entry point for the btnxpuart driver. The driver identifies the
-> actual chip variant at runtime via chip ID auto-detection and loads the
-> appropriate firmware accordingly.
-> 
-> Signed-off-by: Sherry Sun <sherry.sun@nxp.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Reviewed-by: Manivannan Sadhasivam <mani@kernel.org>
+Codec capability is one byte long (max 255) the storage format is
+02hhx which means each byte ends up as 2 characters so the buffer
+needs to be doubled in order to handle capabilities of that size.
 
-- Mani
+Reported-by:  p0her (_@p0her_) in TeamH4C working with TrendAI Zero Day Initiative
+Reported-by: Michael Bommarito <michael.bommarito@gmail.com>
+---
+ profiles/audio/a2dp.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-> ---
->  drivers/power/sequencing/pwrseq-pcie-m2.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/power/sequencing/pwrseq-pcie-m2.c b/drivers/power/sequencing/pwrseq-pcie-m2.c
-> index 94c3f4b7ee36..9217ffcfa6e5 100644
-> --- a/drivers/power/sequencing/pwrseq-pcie-m2.c
-> +++ b/drivers/power/sequencing/pwrseq-pcie-m2.c
-> @@ -186,6 +186,10 @@ static int pwrseq_pcie_m2_match(struct pwrseq_device *pwrseq,
->  }
->  
->  static const struct pci_device_id pwrseq_m2_pci_ids[] = {
-> +	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL_EXT, 0x2b43),
-> +	  .driver_data = (kernel_ulong_t)"nxp,88w8987-bt" },
-> +	{ PCI_DEVICE(PCI_VENDOR_ID_PHILIPS, 0x3003),
-> +	  .driver_data = (kernel_ulong_t)"nxp,88w8987-bt" },
->  	{ PCI_DEVICE(PCI_VENDOR_ID_QCOM, 0x1107),
->  	  .driver_data = (kernel_ulong_t)"qcom,wcn7850-bt" },
->  	{ PCI_DEVICE(PCI_VENDOR_ID_QCOM, 0x1103),
-> -- 
-> 2.50.1
-> 
-
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index a5e002784c02..c8adc3122563 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -971,7 +971,7 @@ static void store_remote_sep(void *data, void *user_data)
+ {
+ 	struct a2dp_remote_sep *sep = data;
+ 	GKeyFile *key_file = user_data;
+-	char seid[4], value[256];
++	char seid[4], value[9 + 512];
+ 	struct avdtp_service_capability *service = avdtp_get_codec(sep->sep);
+ 	struct avdtp_media_codec_capability *codec;
+ 	unsigned int i;
+@@ -2373,7 +2373,7 @@ static void load_remote_sep(struct a2dp_channel *chan, GKeyFile *key_file,
+ 		uint8_t codec;
+ 		uint8_t delay_reporting;
+ 		GSList *l = NULL;
+-		char caps[256];
++		char caps[513];
+ 		uint8_t data[128];
+ 		int i, size;
+ 
+@@ -2386,10 +2386,10 @@ static void load_remote_sep(struct a2dp_channel *chan, GKeyFile *key_file,
+ 			continue;
+ 
+ 		/* Try loading with delay_reporting first */
+-		if (sscanf(value, "%02hhx:%02hhx:%02hhx:%s", &type, &codec,
++		if (sscanf(value, "%02hhx:%02hhx:%02hhx:%512s", &type, &codec,
+ 					&delay_reporting, caps) != 4) {
+ 			/* Try old format */
+-			if (sscanf(value, "%02hhx:%02hhx:%s", &type, &codec,
++			if (sscanf(value, "%02hhx:%02hhx:%512s", &type, &codec,
+ 								caps) != 3) {
+ 				warn("Unable to load Endpoint: seid %u", rseid);
+ 				g_free(value);
+@@ -2398,7 +2398,7 @@ static void load_remote_sep(struct a2dp_channel *chan, GKeyFile *key_file,
+ 			delay_reporting = false;
+ 		}
+ 
+-		for (i = 0, size = strlen(caps); i < size; i += 2) {
++		for (i = 0, size = strlen(caps); i < size && i >= 2; i += 2) {
+ 			uint8_t *tmp = data + i / 2;
+ 
+ 			if (sscanf(caps + i, "%02hhx", tmp) != 1) {
 -- 
-மணிவண்ணன் சதாசிவம்
+2.54.0
+
