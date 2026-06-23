@@ -1,115 +1,91 @@
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79C440D595
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 16:49:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D1531AABF;
+	Tue, 23 Jun 2026 16:51:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782233355; cv=none; b=UMKOlzyu28DlEfewUjfsnRf9gZBRncBpuDEnoBDPHBIRfZ7EN8990b2RdE80kEm0R5ATumXl8WW9sn+yeXfCRUsZq/2KkqjtnOfE28OC4g7C1FIpFGzLF/wiSowWDxR16BR6H8uXGhHc+zhgYIO7YUd/jqHmsUPNDRvWzcyQzFk=
+	t=1782233469; cv=none; b=LDrkfvEXEDEpA17r3PBoCGNReI3+tMjfba22iwWcj5krOrjZrNkFf393VNgBHiVLoL9QwJ60vbqQUoNzqYqWacs2LOrehoyiUEihJ0EE6BPh9tBnRu67ieqlhu/Duj+U7NJ5j5erP/bE7glB3z1Y7cSZH+HC/clTBmU1KaFSgmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782233355; c=relaxed/simple;
-	bh=IELWQX3G5/UMwDKody6SHce3MJiNzGBN+KsNYmejkWU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=fDd1AL4y3GEMzVtAfVT9pLvZ4I+M/C/m3J6pg9MHfhXjQTiRyyMsv5ggKboJYENdovRxkrGbP92YGRX+mYy/piz7b4GMicY1zPAjnVyNo05VgxK21SolHuehc1PW8njKVKKNNMaM7tfIUBX+O0OWIAgFc55KHrUTLh/BtEDx/3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 06E9B3ECB9;
-	Tue, 23 Jun 2026 16:49:04 +0000 (UTC)
-Message-ID: <9c2c4a94e961534703e3e9648261628c85248501.camel@hadess.net>
-Subject: Re: [PATCH BlueZ v2] a2dp: Fix handling of codec capability storage
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 23 Jun 2026 18:49:04 +0200
-In-Reply-To: <CABBYNZLWKRTnFEg3vuoqs0yzD4nEQW6Pajn7WdQf-pT6KtvPSw@mail.gmail.com>
-References: <20260622155621.675255-1-luiz.dentz@gmail.com>
-	 <95343429b8f06e1c88e2c642471f6f8495e11280.camel@hadess.net>
-	 <CABBYNZLWKRTnFEg3vuoqs0yzD4nEQW6Pajn7WdQf-pT6KtvPSw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	s=arc-20240116; t=1782233469; c=relaxed/simple;
+	bh=jEIfOz8L3Xvj/I99+aKSmhRVI9moHWAB23vzqWdnkhQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kUpqXJ1uXCKFppCwk7jHyyoMb3v+omyF/n8RurnIjU9idb2BWNDbkGIFhaG9eTnySpWt26oAEsl10CsJ7ckgC3d65n2LaEK6fajgQH7KgGZO7Hz44HDskeiadE7HlBv9M3DRSZMvyGBDXC6e565jhtQD4aTDnnGf9Tf3z2NsFLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eb50iDUH; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eb50iDUH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C7BC1F000E9;
+	Tue, 23 Jun 2026 16:51:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782233468;
+	bh=br1dDqQSE3Y/rlJoCar3aldqoF93foDqyKQcutQqY9s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=eb50iDUHq00+xrXaIrlUViHsFtPLU4oDzdWikR5Bkk78aU56/2xe07iQ91ISc//Zl
+	 kHUAsfjK1Y3U2rb523vLCRbrdbCqBBWUmRgKGNG9oeupcVoz3FDSbF3wYHGF/R1EWB
+	 6pIUmeYYYyq9hfLyFg1AdhSPhZ01XPbzwZakM+i+u07Q9vnjKGY0XCaa2pj6sZekwk
+	 eAGVHPQ7OERb7En2c4Zm9SM6ogQnJf5x3v7Um48ZiSS2msWbq+AJ3Ls+0Ag6Hk1Tcq
+	 U058ws8hmOS4bxcwd1AnPcJtcEvdc237m8bjr1S8vk7TEO5Pglj0D1Du8AX7Z7D9RL
+	 KmSxq8pCB7o4g==
+Date: Tue, 23 Jun 2026 09:49:32 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-doc@vger.kernel.org, linux-api@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-bluetooth@vger.kernel.org, ell@lists.linux.dev
+Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
+Message-ID: <20260623164932.GA1793@sol>
+References: <20260430011544.31823-1-ebiggers@kernel.org>
+ <7d08a6df54279e9915f5df6bd4e5e5dde52b4fe1.camel@hadess.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-Cause: dmFkZTF8hXuUNDMAs9luM8bxh9VuGAx2Et6grJVuuf1OnoPvM60AYlw54HThOav4kwqOwjMSXMxOM+FD+MqVL64VWh6mf//LLSPcW/F6d0LDmisiLs45AchoP2Gy6E9FSzg6/MhIEK4vR30PA21tgqISMR/qF7b27gXFjOigBBW93RvfM1uwxC7nVtWzRzJ0OpGIOUlJ/N4OZwSrwrCA7NfFItHy8qDQwI8MDIVZ4tKHnDufPnvr4YTwUZr5KvTpJajYN1+mhabbn2Kd71iR2yNusxlAXEV7YaOZoc3tCUSEI1u2fxJtuHbC/e9xmzFhxdFPOmJ5jx6K2BmOzwOt7cWbeXLkRCSsoUK5b3gkFxx5XLE9o2wNlU551SFB5UM57ckGuSOuIv8SEiLhdkhwYA35+uCzP6vMoj5SbX/hgmnl6DJxj9wyTF9f1qLOLDGUZAFTerrdD6o6e4WdW0Yc9PrpWJrEk99TMrEI45AkJgkY8IhdyZiP/kGFGnpyhIJKH97SYOsakOcZZjLtzqU2KvjfD6KV7mKbD/HUJ0Qnk0u69+2MKrlTkC53aQMk1pmg3RwGSCUCp6wtif0PHhIKPAsOJVKe/P2yBPDlYV51Sv9vZjcBx+zDlqiNBGPeMotUm1g5khvBrothwwIBbjqo3+SOZ4jNTzhdMDWFR5sCl4e08K/Rhg
-X-GND-State: clean
-X-GND-Score: -100
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7d08a6df54279e9915f5df6bd4e5e5dde52b4fe1.camel@hadess.net>
 
-T24gVHVlLCAyMDI2LTA2LTIzIGF0IDEwOjMwIC0wNDAwLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6
-IHdyb3RlOgo+IEhpIEJhc3RpZW4sCj4gCj4gT24gVHVlLCBKdW4gMjMsIDIwMjYgYXQgODoxOOKA
-r0FNIEJhc3RpZW4gTm9jZXJhIDxoYWRlc3NAaGFkZXNzLm5ldD4KPiB3cm90ZToKPiA+IAo+ID4g
-T24gTW9uLCAyMDI2LTA2LTIyIGF0IDExOjU2IC0wNDAwLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6
-IHdyb3RlOgo+ID4gPiBGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LnZvbi5kZW50
-ekBpbnRlbC5jb20+Cj4gPiA+IAo+ID4gPiBDb2RlYyBjYXBhYmlsaXR5IGlzIG9uZSBieXRlIGxv
-bmcgKG1heCAyNTUpIHRoZSBzdG9yYWdlIGZvcm1hdCBpcwo+ID4gPiAwMmhoeCB3aGljaCBtZWFu
-cyBlYWNoIGJ5dGUgZW5kcyB1cCBhcyAyIGNoYXJhY3RlcnMgc28gdGhlIGJ1ZmZlcgo+ID4gPiBu
-ZWVkcyB0byBiZSBkb3VibGVkIGluIG9yZGVyIHRvIGhhbmRsZSBjYXBhYmlsaXRpZXMgb2YgdGhh
-dCBzaXplLgo+ID4gPiAKPiA+ID4gUmVwb3J0ZWQtYnk6wqAgcDBoZXIgKF9AcDBoZXJfKSBpbiBU
-ZWFtSDRDIHdvcmtpbmcgd2l0aCBUcmVuZEFJCj4gPiA+IFplcm8KPiA+ID4gRGF5IEluaXRpYXRp
-dmUKPiA+ID4gUmVwb3J0ZWQtYnk6IE1pY2hhZWwgQm9tbWFyaXRvIDxtaWNoYWVsLmJvbW1hcml0
-b0BnbWFpbC5jb20+Cj4gPiA+IC0tLQo+ID4gPiDCoHByb2ZpbGVzL2F1ZGlvL2EyZHAuYyB8IDEw
-ICsrKysrLS0tLS0KPiA+ID4gwqAxIGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCA1IGRl
-bGV0aW9ucygtKQo+ID4gPiAKPiA+ID4gZGlmZiAtLWdpdCBhL3Byb2ZpbGVzL2F1ZGlvL2EyZHAu
-YyBiL3Byb2ZpbGVzL2F1ZGlvL2EyZHAuYwo+ID4gPiBpbmRleCBhNWUwMDI3ODRjMDIuLmM4YWRj
-MzEyMjU2MyAxMDA2NDQKPiA+ID4gLS0tIGEvcHJvZmlsZXMvYXVkaW8vYTJkcC5jCj4gPiA+ICsr
-KyBiL3Byb2ZpbGVzL2F1ZGlvL2EyZHAuYwo+ID4gPiBAQCAtOTcxLDcgKzk3MSw3IEBAIHN0YXRp
-YyB2b2lkIHN0b3JlX3JlbW90ZV9zZXAodm9pZCAqZGF0YSwgdm9pZAo+ID4gPiAqdXNlcl9kYXRh
-KQo+ID4gPiDCoHsKPiA+ID4gwqDCoMKgwqDCoCBzdHJ1Y3QgYTJkcF9yZW1vdGVfc2VwICpzZXAg
-PSBkYXRhOwo+ID4gPiDCoMKgwqDCoMKgIEdLZXlGaWxlICprZXlfZmlsZSA9IHVzZXJfZGF0YTsK
-PiA+ID4gLcKgwqDCoMKgIGNoYXIgc2VpZFs0XSwgdmFsdWVbMjU2XTsKPiA+ID4gK8KgwqDCoMKg
-IGNoYXIgc2VpZFs0XSwgdmFsdWVbOSArIDUxMl07Cj4gPiAKPiA+IFdoYXQncyB0aGUgIjkiIHZh
-bHVlIGZyb20/IFNob3VsZG4ndCBpdCBiZSAxMSBmb3IgdGhlIGxlbmd0aCBvZjoKPiA+ICIlMDJo
-aHg6JTAyaGh4OiUwMmhoeDoiCj4gCj4gMyAqIDIgKCUwMmhoeCkgKyAzICg6KSA9IDkKCklmIHlv
-dSdyZSBkb2luZyBhIGZpeHVwLCBtaWdodCBiZSBhIGdvb2QgaWRlYSB0byBhZGQgYXMgYSBjb21t
-ZW50LAp0aGFua3MhCgo+IAo+ID4gVGhlICJUcnkgbG9hZGluZyB3aXRoIGRlbGF5X3JlcG9ydGlu
-ZyBmaXJzdCIgdmFyaWFudD8KPiA+IAo+ID4gPiDCoMKgwqDCoMKgIHN0cnVjdCBhdmR0cF9zZXJ2
-aWNlX2NhcGFiaWxpdHkgKnNlcnZpY2UgPQo+ID4gPiBhdmR0cF9nZXRfY29kZWMoc2VwLT5zZXAp
-Owo+ID4gPiDCoMKgwqDCoMKgIHN0cnVjdCBhdmR0cF9tZWRpYV9jb2RlY19jYXBhYmlsaXR5ICpj
-b2RlYzsKPiA+ID4gwqDCoMKgwqDCoCB1bnNpZ25lZCBpbnQgaTsKPiA+ID4gQEAgLTIzNzMsNyAr
-MjM3Myw3IEBAIHN0YXRpYyB2b2lkIGxvYWRfcmVtb3RlX3NlcChzdHJ1Y3QKPiA+ID4gYTJkcF9j
-aGFubmVsCj4gPiA+ICpjaGFuLCBHS2V5RmlsZSAqa2V5X2ZpbGUsCj4gPiA+IMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgIHVpbnQ4X3QgY29kZWM7Cj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIHVpbnQ4X3QgZGVsYXlfcmVwb3J0aW5nOwo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCBHU0xpc3QgKmwgPSBOVUxMOwo+ID4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IGNoYXIgY2Fwc1syNTZdOwo+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNoYXIgY2Fw
-c1s1MTNdOwo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB1aW50OF90IGRhdGFbMTI4
-XTsKPiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaW50IGksIHNpemU7Cj4gPiA+IAo+
-ID4gPiBAQCAtMjM4NiwxMCArMjM4NiwxMCBAQCBzdGF0aWMgdm9pZCBsb2FkX3JlbW90ZV9zZXAo
-c3RydWN0Cj4gPiA+IGEyZHBfY2hhbm5lbCAqY2hhbiwgR0tleUZpbGUgKmtleV9maWxlLAo+ID4g
-PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY29udGludWU7Cj4g
-PiA+IAo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAvKiBUcnkgbG9hZGluZyB3aXRo
-IGRlbGF5X3JlcG9ydGluZyBmaXJzdCAqLwo+ID4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IGlmIChzc2NhbmYodmFsdWUsICIlMDJoaHg6JTAyaGh4OiUwMmhoeDolcyIsICZ0eXBlLAo+ID4g
-PiAmY29kZWMsCj4gPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKHNzY2FuZih2YWx1
-ZSwgIiUwMmhoeDolMDJoaHg6JTAyaGh4OiU1MTJzIiwKPiA+ID4gJnR5cGUsICZjb2RlYywKPiA+
-ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgJmRlbGF5X3JlcG9ydGluZywgY2FwcykgIT0KPiA+ID4gNCkg
-ewo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgLyogVHJ5
-IG9sZCBmb3JtYXQgKi8KPiA+ID4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgaWYgKHNzY2FuZih2YWx1ZSwgIiUwMmhoeDolMDJoaHg6JXMiLAo+ID4gPiAmdHlwZSwK
-PiA+ID4gJmNvZGVjLAo+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCBpZiAoc3NjYW5mKHZhbHVlLCAiJTAyaGh4OiUwMmhoeDolNTEycyIsCj4gPiA+ICZ0eXBl
-LCAmY29kZWMsCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgCj4gPiA+IGNhcHMKPiA+ID4gKSAhPSAzKSB7Cj4gPiA+
-IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgd2FybigiVW5hYmxlIHRvIGxvYWQgRW5kcG9pbnQ6IHNlaWQKPiA+ID4gJXUiLCByc2VpZCk7
-Cj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgZ19mcmVlKHZhbHVlKTsKPiA+ID4gQEAgLTIzOTgsNyArMjM5OCw3IEBAIHN0YXRp
-YyB2b2lkIGxvYWRfcmVtb3RlX3NlcChzdHJ1Y3QKPiA+ID4gYTJkcF9jaGFubmVsCj4gPiA+ICpj
-aGFuLCBHS2V5RmlsZSAqa2V5X2ZpbGUsCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCBkZWxheV9yZXBvcnRpbmcgPSBmYWxzZTsKPiA+ID4gwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgfQo+ID4gPiAKPiA+ID4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCBmb3IgKGkgPSAwLCBzaXplID0gc3RybGVuKGNhcHMpOyBpIDwgc2l6ZTsgaSArPSAyKQo+ID4g
-PiB7Cj4gPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZm9yIChpID0gMCwgc2l6ZSA9IHN0
-cmxlbihjYXBzKTsgaSA8IHNpemUgJiYgaSA+PQo+ID4gPiAyOwo+ID4gPiBpICs9IDIpIHsKPiA+
-ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHVpbnQ4X3QgKnRt
-cCA9IGRhdGEgKyBpIC8gMjsKPiA+ID4gCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCBpZiAoc3NjYW5mKGNhcHMgKyBpLCAiJTAyaGh4IiwgdG1wKSAhPSAx
-KSB7Cj4gCj4gCg==
+On Tue, Jun 23, 2026 at 02:44:28PM +0200, Bastien Nocera wrote:
+> Hey,
+> 
+> Replying to this older patch.
+> 
+> On Wed, 2026-04-29 at 18:15 -0700, Eric Biggers wrote:
+> <snip>
+> > This isn't intended to change anything overnight.  After all, most Linux
+> > distros won't be able to disable the kconfig options quite yet, mainly
+> > because of iwd.  But this should create a bit more impetus for these
+> > userspace programs to be fixed, and the documentation update should also
+> > help prevent more users from appearing.
+> 
+> There are 2 other users that I know of: bluez, and the ell library
+> (used by iwd and bluez).
+>
+> From what I could tell, bluetoothd uses AF_ALG for cryptography:
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/shared/crypto.c
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/tools/mesh-gatt/crypto.c
+> 
+> It uses "ecb(aes)" and "cmac(aes)" as algorithms.
+> 
+> Finally, it also uses them both again:
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/mesh/crypto.c
+> through ell:
+> https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/ell/cipher.c
+> 
+> Because that's a question that also came up, bluetoothd also uses the
+> CAP_NET_ADMIN capability.
+> 
+> I'll let Luiz and Marcel take it over from here.
+> 
 
+We're aware of that and are taking it into account in the allowlist:
+https://lore.kernel.org/linux-crypto/20260622234803.6982-1-ebiggers@kernel.org/
+If you have any feedback on the allowlist, please respond to that patch.
+
+- Eric
