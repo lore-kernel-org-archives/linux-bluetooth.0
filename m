@@ -1,79 +1,119 @@
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57453D413C;
-	Tue, 23 Jun 2026 12:44:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABDF954652
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 12:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782218680; cv=none; b=UvozculmCazwj+/GFQxi4DOE7geza0N4xcNX/KXNz28fHAMIoB78jwB4E7Lt5nFg9js1kvWc6SgHQkrZI+9u5N459FZRCOAdS5qZDaZnCDt6jCTxUpIDHgCNRo9uvIyF0UBF+rscnCiIeHJFFf4msbH7tQzIrlKOORs9YO8PkHk=
+	t=1782218775; cv=none; b=Lt1aGbRSTC09dyXZgDqYiWjIFxw429JWHDBW7ZXiUfGGR+5j2xpe/VDKOBHHwBmiLLKSw3SHD7UHPK1STEFDusrjtLZY0YIN6K3WFf48VhzdaDjcZLFNOqfil8FKv8oVZQeZLUofzhiC+eplzXgKAgPrWQpN2g7MGFfUzEbRMfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782218680; c=relaxed/simple;
-	bh=Os+Dq9xu4+1uB0pLfKgdOOhC4ysk0rTzQttxlAmQB2Q=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Ia5P6IdzsmEtIyUeanNjrJHqgw3xWa3m5jAglRrdgzzv4WUWG4gAi+WCd3NfPVhX2+TLDpNAvrfJwNiSNMsHMoZ5tzUqe6ymBKwhiubN8UzhQOhFzBjCQCuhDzJxLPYxKmPgWp0nPlnv3Su4fPSvczXC22geSp3jU9VNQ8csW+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 242DA3F62F;
-	Tue, 23 Jun 2026 12:44:29 +0000 (UTC)
-Message-ID: <7d08a6df54279e9915f5df6bd4e5e5dde52b4fe1.camel@hadess.net>
-Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
-From: Bastien Nocera <hadess@hadess.net>
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org, 
- Herbert Xu <herbert@gondor.apana.org.au>, Marcel Holtmann
- <marcel@holtmann.org>, Luiz Augusto von Dentz	 <luiz.dentz@gmail.com>
-Cc: linux-doc@vger.kernel.org, linux-api@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Linus Torvalds
-	 <torvalds@linux-foundation.org>, linux-bluetooth@vger.kernel.org, 
-	ell@lists.linux.dev
-Date: Tue, 23 Jun 2026 14:44:28 +0200
-In-Reply-To: <20260430011544.31823-1-ebiggers@kernel.org>
-References: <20260430011544.31823-1-ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	s=arc-20240116; t=1782218775; c=relaxed/simple;
+	bh=m1J1Hxl6Bi6iNwUOjuK8EcITJ10mHnRQmRTC28V4mfg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=WQl7ENwBph6KLyCXzqdPpz0zBs3Mp7+HBZQJeudaISbd7UzZNGhVL/jMZz5Z6N+6YSm2/mUZiE30+iuzcx4s5zvawD0ewtwFd7Z+NU2MFd3FDUZTRVLD71AmKBJ4Nt29gQzaovG5oHydMnEQQ205kiDtkX1eWN39loWaHuzbo5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VCwqHRe1; arc=none smtp.client-ip=74.125.82.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VCwqHRe1"
+Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-30bc806fcf8so6327722eec.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 05:46:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782218774; x=1782823574; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=oWNHdYI9FHYfXEDwW2Ya3EftLN79Yj0AYTnb0ObkF/8=;
+        b=VCwqHRe1eGUXJgfntBMcJ/NCzVjHq16IIHj7d9eNqH04o3EgetuJQJpSdLHHSAX5Ru
+         P7VvEnZAjmWME37aMzFKCp0/QS5s52vpFpGXfcZHMa0GQY0s86XOuNb1Vh3om7cfmHsG
+         dLIx28ZdExo0KNbsQfJ1Uc580HLk23HVw6UnLR3seIgshQGdypFgKkYg2w3N8FP3aziA
+         KXka0ybKrzIi3BGb8gS2QkIzysRVcSjqLOHYjltBI3Q67icMHYVoYlg37z1CkG0rC4kA
+         GqKtOk2T6uOHUbkPX+GO9O5I6SsMzGdvohjhL6eOWBoDgOf30B6Au3ROa0/LOVPqh960
+         dPTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782218774; x=1782823574;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oWNHdYI9FHYfXEDwW2Ya3EftLN79Yj0AYTnb0ObkF/8=;
+        b=B+tVrVu9SlwXb0KWL9qqX2z/RgRMYX2xbFptFT6L83hRPJkwX8YuU701gIhbkFhSHw
+         0Wrjqbn4V0LnbL6JIHonudSNuds/put1F44iMorHFQ0BOxdggry8b5Styh6F6JJFmF+v
+         4xHLqQoO6Q6PRu6SZh90HgRFXDmHbDyeFMU9wUDcq3fp4F91L9z7myUXQVwSBGH8so1f
+         0EQt5ICOCfNXlDFOai+xJGO5a/qPKWnftf1H12o3KG2jYgw6w5hf1AfCgcoBna+U98mD
+         XxxBiFpaET54dPjG3OFa+hkqoq6ld1B45P8VzqT+9yrJDiReMzNKDoxkUdY06SW2m8Yr
+         ntKw==
+X-Gm-Message-State: AOJu0YwwgAh+ng/yFAucMRRIXSdoBwCHnYzi5sfhJeQGejAnhZT7uVuV
+	eKHnkErnT1e6FDUp0g29U70+ognJRMDWyr1x0TwnIjoRDa1DQGFO3HjBA3kVtg==
+X-Gm-Gg: AfdE7ckJGe/9o+BxDeozC7Ff5Fx1djb5hmZ1TmpKemvFUWbPIq6TdBzZ8/t7a4Yi1cO
+	4OKbMfXXbh+1xrB1uNaAlN8nihcgHHbKjvU1b4+NqpXlPuKHVDZGco7HiASj7IGFV1gFK3cR6L7
+	E0acwkz/PmF12ONflHm8VdG2mFYET/ZgiVA5aiWtb2istFnlOpxowAXgO6+/Bxy8ORAeoNhLTCF
+	zYQXY003fUyxWwHGnZHTw8K43BgMsvEtc4BVjalmXybPKuodQwA+hdPZIY4yQpGxPjVLvAtmFPU
+	35vp/dTviANWb6cnoZ1WQcO8i4xEXhoRxFNYd5d10ubn+Ix9715X8jRDqrFJ2+ASPLCq4E5w9wV
+	wUYY68roojPH2LomPo2l//BI/7AH2wp5u7MJjYq1Ub7CYjqfyEBz0op9QqgbqMQ2Z+AHF1lxv0R
+	y1JhPrGm6cGG0eD3WP
+X-Received: by 2002:a05:7301:9c88:b0:30c:4058:3bf9 with SMTP id 5a478bee46e88-30c58c181famr2175626eec.19.1782218773762;
+        Tue, 23 Jun 2026 05:46:13 -0700 (PDT)
+Received: from [172.17.0.2] ([52.234.1.99])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30c44ec51b9sm8710768eec.29.2026.06.23.05.46.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jun 2026 05:46:13 -0700 (PDT)
+Message-ID: <6a3a8015.db4aec44.3b9108.77f4@mx.google.com>
+Date: Tue, 23 Jun 2026 05:46:13 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0700028680537097344=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: dmFkZTFSdMa/vorSWAPy5DzVBQOrA5W2CderI2r8bhYQ2EoH5VrunMUW4F+lob0aw2PDQT52P9oKJQ7Bc+ZmGg5FLS47m3kHsnL0/eV+3XWE+F4diLFd8e9nu3o4i32idkosmDFchhVJC3nly1ComxK8P/aL7NCh427bMVxArtJi1+8zJU4qnakVtn4pXwS7gUXQQSGFPcaGkbHlc52LfmJWg5Xlm6xwGFN1wb+UetO4FCFwrmL/QezjIkqk8BlkUF15JvJlOtt2gFYzNZmEYZ+TOeu/SqzT814a85hCNogSS4A43b3ro+RlPF01qEkspz+C4G6uVBR7jPZ+DmeQGzPLSmwjWQvgzyK7ED+22J3K815RYB90/WyR2jJ9E+TpSEIuCjN8yCT9Yy7Q6O1DSR0bardG347BFh/ZgxCO/vzJnJPBcWOy3l8rUtv2mcI9/7igbu5SToeLaMIlxZXaEWrDNH82KK7lW9VqNWH0lbp84/CzQdtjlUtmcTkGrOxNzhyj13LOnkQCuPheAYpdX9EuSX/votNGV+SVkYYkw5gNS6im/7I+GjfubVIzPQCTNDnUyH59CZ7d70rqNUuEI/Pyzh8pIUgMSpNmHKmxW3UxhDAiHIYYZR7VC+ql1VKY0cF1nKpy2Tm6hdy+emcJtd/OYrPa/UUCSRd+hTMdJRbN/GPThg
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, monesss315@gmail.com
+Subject: RE: Bluetooth: btusb: Add IMC Networks MT7922 device 0x13d3:0x3625
+In-Reply-To: <20260623114937.6385-1-monesss315@gmail.com>
+References: <20260623114937.6385-1-monesss315@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hey,
+--===============0700028680537097344==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Replying to this older patch.
+This is automated email and please do not reply to this email!
 
-On Wed, 2026-04-29 at 18:15 -0700, Eric Biggers wrote:
-<snip>
-> This isn't intended to change anything overnight.=C2=A0 After all, most L=
-inux
-> distros won't be able to disable the kconfig options quite yet, mainly
-> because of iwd.=C2=A0 But this should create a bit more impetus for these
-> userspace programs to be fixed, and the documentation update should also
-> help prevent more users from appearing.
+Dear submitter,
 
-There are 2 other users that I know of: bluez, and the ell library
-(used by iwd and bluez).
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1115344
 
-From what I could tell, bluetoothd uses AF_ALG for cryptography:
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/shared/crypto.c
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/tools/mesh-gatt/cry=
-pto.c
+---Test result---
 
-It uses "ecb(aes)" and "cmac(aes)" as algorithms.
+Test Summary:
+CheckPatch                    PASS      0.91 seconds
+VerifyFixes                   PASS      0.15 seconds
+VerifySignedoff               PASS      0.17 seconds
+GitLint                       PASS      0.46 seconds
+SubjectPrefix                 PASS      0.23 seconds
+BuildKernel                   PASS      19.93 seconds
+CheckAllWarning               PASS      21.83 seconds
+CheckSparse                   PASS      27.75 seconds
+BuildKernel32                 PASS      19.44 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      417.08 seconds
+IncrementalBuild              PASS      19.35 seconds
 
-Finally, it also uses them both again:
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/mesh/crypto.c
-through ell:
-https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/ell/cipher.c
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
 
-Because that's a question that also came up, bluetoothd also uses the
-CAP_NET_ADMIN capability.
 
-I'll let Luiz and Marcel take it over from here.
+https://github.com/bluez/bluetooth-next/pull/339
 
-Cheers
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0700028680537097344==--
