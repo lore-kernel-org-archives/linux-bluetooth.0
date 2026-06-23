@@ -1,106 +1,116 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C248B3D525B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 11:50:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2622DC78C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 12:18:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782215421; cv=none; b=aF2tpJg7pJv+ujz2oxStDTB8xf4keh0e6wSYMJX1EQKcI/J+U5D54Sj7fWsZ01radp+fKjljvCCrQW/TFW/Zy83rq75iu4JGvBNk79qQ9g9hGewLVp3ed57PuZn4KqKrianzzyp/9l0EJYwjZf+QTPlo+vBnUMufefOcDwyFflk=
+	t=1782217103; cv=none; b=oaPyl7Jr3lAM7Jg3rrcrfYVFRiQQJVou/3tVdA6woffxdl/eVMtPGTuV1tQoBLdvT4S2fjcN+FZA54TpGcWR7jOHKDp9scgqzY+/g4M2MeA2TacYmiH/+vYPyOnHGs1Y8ltw6uYC9qWQQCFqVF7JypShUgOP+OkwgUgttWf/EEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782215421; c=relaxed/simple;
-	bh=oI0KuffAA+8x15OOEZoPj6tKHW2NuHFMUq7CH+SGxoQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ww3I2KafvTNiyzIkOZ9zwUG9F5ASGwmNpgi95SCESL5RL06F0jageKBrqu/ox4aHyCSQtW0B1QzmQxRzWNBuQ/pdjCYIddWxYaH9YWZBJSPoRnjKdSohTb/QBiCc/eWlwX++cZj8NOmBBIjGemo5K3wPknCx9ABEqHKEG0Pb0bM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b1PgRUCg; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b1PgRUCg"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-bed19623d6eso790640866b.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 04:50:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782215418; x=1782820218; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6zwRgFZ4zvNpw9/glOYY5J1sB2MWzBUbSkl5SBwRQXk=;
-        b=b1PgRUCgvJLnknofeA0iIbEeMYL9ArhjsEM9Ax/r3bcwKiRSlpEKRY9n/3XvxjU9wl
-         N4fy8YjQPX/zWGR0y8IQ0bdtbWx9FDsQYqiX8VrW9HELoFT+TPbgMCP+g1L//Cd8k/gj
-         Ev1LA3MZBg8lXvZCiPuM5Tn6XyIIAr9xNn9B5idUcsW1gCvleFMQ4aml/XtbDic4EKUj
-         O7Uvz75NQ/JU6Oec/ctTw5mrBixcq+1RNdUBnZv5X/4Fw2ROCLO2kCEiFrPqOltlRwQb
-         /3fmDreqF11JCRP+VGFhLoUB0RgrMxrEUccXVZgwgoOmRp2/sEeaJf0I7tCmxkWtZek1
-         0P3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782215418; x=1782820218;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6zwRgFZ4zvNpw9/glOYY5J1sB2MWzBUbSkl5SBwRQXk=;
-        b=aoir51TERC6A2FLavJCKEsYZWUzlDTZMAcTpQTL7jDFD41TeeylB3c/eeItAhdA1fm
-         T2eZ/mFV1RxKOC8YtFFjLaodgkVoiUBIOoFwqcScfDNBUn+5ht++KgYxzkqLPwokRu7A
-         yqtXinjuoo/kMccn9pcpc7oaqFGj8sUKMdaYDuJLMp5NLdr687uORlae8Qq9yVUqmjRr
-         IYOObLIKBzdbY8E3oEzAf61xMG0xy1jGOXInN41aHNhAywFDgHP1lPq0u9Q6d0I1RBoa
-         7HVOJqSXAG4I/DB1ShTLO0sysTbRvDludq84TH4d/ANrQyWqwPRDklyL+6SlD7/5sCaS
-         o9bQ==
-X-Gm-Message-State: AOJu0YyUdQIk7gpoAJ6rnX4VW4340Z2Onf85lyoBU4MUU7eIxBs2AR+3
-	P7xNel+ApvkEj6E6dKeN04DrO/c3IdS09/ryXzE/MwGIPgdGNxb23MNY50QZ71RJdaKp60TV
-X-Gm-Gg: AfdE7clplKQy4rvpQZSpOnF4xxRshOIB+RoJrPaCUxs9oTT3m8uSnyESYVTnijvSDwA
-	dJgau8mScS1gQgEp+GMRvkg6AG14KjgL3C8X3heRrdTYFLSaH38hG9LVdf0NNKVzeTNeZBgqmd7
-	3o9CO2kTDs78YHxfPq45yfNXvApB4Om8rzQcGu7ok3Jh5xcoYAgzwCiA9OsQeyfXUEQZjnyxy+8
-	UBc/yz3L+/CX0viPzYIQioLtUH31RmPV6oY0EUXQIYrILXwvkUNnEdjxIFfTr1tTRYUO/HSWQ7c
-	dzDmq11P/u1T7v5QkTjwK3fTRepIFQv7jQMEynR9mFZg8sUJHpgYu3kmvDhxAm10TG6/jE/3mo2
-	GC4ySRyciC8IbhLoH2Z9UIaln9Ebvz7RE8ecfGyWFKFSk3zCpiJGTQ7GhquLnNS3Rp4uAQGfkSn
-	yBRd9dEoi0sTkYARQ=
-X-Received: by 2002:a17:907:a394:b0:c10:1041:65a4 with SMTP id a640c23a62f3a-c1080b8e977mr126431266b.42.1782215417780;
-        Tue, 23 Jun 2026 04:50:17 -0700 (PDT)
-Received: from KonecFunkcii ([121.127.33.175])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c0c61610bacsm514808766b.58.2026.06.23.04.50.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2026 04:50:17 -0700 (PDT)
-From: monesss315 <monesss315@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	Gustavo Evgucci <monesss315@gmail.com>
-Subject: [PATCH] Bluetooth: btusb: Add IMC Networks MT7922 device 0x13d3:0x3625
-Date: Tue, 23 Jun 2026 14:49:37 +0300
-Message-ID: <20260623114937.6385-1-monesss315@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1782217103; c=relaxed/simple;
+	bh=vSuJqpw4IC/b/ofyF9h9S/KSLeQfHeulVBlBDiaKXdc=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=BkuGBrI6Ugo9neKJOEWNlBl7Di8EQeZQAqQyhnwQL8VUbU6NRtYh6VAp+VlPy9Hb/UJz55zOnFnF+YPeuXBRPoW2b6ArLHTADhl0rjZMqUgg3e9p2YWkWjoEiivfKEpvf2LcDjPg3GVU0MVVXyOsYGkNcD078GO+kz3eEkEuHC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0E5981F75D;
+	Tue, 23 Jun 2026 12:18:19 +0000 (UTC)
+Message-ID: <95343429b8f06e1c88e2c642471f6f8495e11280.camel@hadess.net>
+Subject: Re: [PATCH BlueZ v2] a2dp: Fix handling of codec capability storage
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org
+Date: Tue, 23 Jun 2026 14:18:19 +0200
+In-Reply-To: <20260622155621.675255-1-luiz.dentz@gmail.com>
+References: <20260622155621.675255-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-GND-Sasl: hadess@hadess.net
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: dmFkZTGinoaFGGeh9rrdR3gXqHx+yQjJq0OR7qQQJDNVRqAc6aK4us36z/gOpFqRDZQXwK7dp+ot4dpqQZYxlKKNQAYOPYkk1yeILyl6tIVxkEjRXV+u9aIvIKN8HcB5k5qzo2EkxsVm0Yr1aQVLa26gexU5n/XeZm07a1LWFMGv0hyz7/TcxIrKrLcSPb+PR7gkDMvvhG9MkYIVZTwfhprFi+vq12xN7CtqotPoui/jJ9fGHzfjnAFOLxfxqbvSkZQVCYGcfeysDa2B9LyqNTdTJR6j+HW7Afdii611v1mv/XKl7jxovW4KwfoH6uYWbE2meQfQY+eW6ruHXA9EQJ51IUlpBwjO1ia37TiyzgeP25IWt5ns+3ATpiO5OoBSuwF+i0WAOYVWM3eLKnFNpD5Hcczm8OoFR41dPHa/ffourOpZvI6ouh8qdiUIDKcYm8PHupBXP58IFBO4Yb4t5nQA66z9+yKz/xv4I234YdH7+ym8pLvmLL93W9JCUV6Hq6Zxqw8huq/UJ8RK4yXmElavK6a1MZwYssB0rprYV9kdUm/ZKJK4rHlb1uiO6uj0ICXxfAFmSQ20GOZpe3KA19Dhkl+9dkM91iU/m9HkQzTB/guH+eMGCLWRtzkZxrPY2AeiXoyJTHwJk7J2hdlOwvSwU5XlG+SQ3EwReuomRy8ktOUtXw
 
-From: Gustavo Evgucci <monesss315@gmail.com>
+On Mon, 2026-06-22 at 11:56 -0400, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>=20
+> Codec capability is one byte long (max 255) the storage format is
+> 02hhx which means each byte ends up as 2 characters so the buffer
+> needs to be doubled in order to handle capabilities of that size.
+>=20
+> Reported-by:=C2=A0 p0her (_@p0her_) in TeamH4C working with TrendAI Zero
+> Day Initiative
+> Reported-by: Michael Bommarito <michael.bommarito@gmail.com>
+> ---
+> =C2=A0profiles/audio/a2dp.c | 10 +++++-----
+> =C2=A01 file changed, 5 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> index a5e002784c02..c8adc3122563 100644
+> --- a/profiles/audio/a2dp.c
+> +++ b/profiles/audio/a2dp.c
+> @@ -971,7 +971,7 @@ static void store_remote_sep(void *data, void
+> *user_data)
+> =C2=A0{
+> =C2=A0	struct a2dp_remote_sep *sep =3D data;
+> =C2=A0	GKeyFile *key_file =3D user_data;
+> -	char seid[4], value[256];
+> +	char seid[4], value[9 + 512];
 
-The IMC Networks MT7922 Bluetooth adapter with USB ID 13d3:3625 is not
-recognized as a MediaTek device because it is missing from the btusb
-device ID table. As a result, btmtk firmware loading is never triggered
-and the HCI reset command times out with -ETIMEDOUT.
+What's the "9" value from? Shouldn't it be 11 for the length of:
+"%02hhx:%02hhx:%02hhx:"
+The "Try loading with delay_reporting first" variant?
 
-Add the device with BTUSB_MEDIATEK | BTUSB_WIDEBAND_SPEECH flags,
-consistent with the neighboring 13d3:3627, 13d3:3628 and 13d3:3630
-entries which use the same chip.
-
-Tested on: MediaTek MT7922 (Wi-Fi 6E combo card, IMC Networks BT USB
-interface), kernel 7.0.11-arch1-1.
-
-Signed-off-by: Gustavo Evgucci <monesss315@gmail.com>
----
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -755,6 +755,8 @@ static const struct usb_device_id btusb_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3613), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x13d3, 0x3625), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3627), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3628), .driver_info = BTUSB_MEDIATEK |
--- 
-2.x.x
+> =C2=A0	struct avdtp_service_capability *service =3D
+> avdtp_get_codec(sep->sep);
+> =C2=A0	struct avdtp_media_codec_capability *codec;
+> =C2=A0	unsigned int i;
+> @@ -2373,7 +2373,7 @@ static void load_remote_sep(struct a2dp_channel
+> *chan, GKeyFile *key_file,
+> =C2=A0		uint8_t codec;
+> =C2=A0		uint8_t delay_reporting;
+> =C2=A0		GSList *l =3D NULL;
+> -		char caps[256];
+> +		char caps[513];
+> =C2=A0		uint8_t data[128];
+> =C2=A0		int i, size;
+> =C2=A0
+> @@ -2386,10 +2386,10 @@ static void load_remote_sep(struct
+> a2dp_channel *chan, GKeyFile *key_file,
+> =C2=A0			continue;
+> =C2=A0
+> =C2=A0		/* Try loading with delay_reporting first */
+> -		if (sscanf(value, "%02hhx:%02hhx:%02hhx:%s", &type,
+> &codec,
+> +		if (sscanf(value, "%02hhx:%02hhx:%02hhx:%512s",
+> &type, &codec,
+> =C2=A0					&delay_reporting, caps) !=3D
+> 4) {
+> =C2=A0			/* Try old format */
+> -			if (sscanf(value, "%02hhx:%02hhx:%s", &type,
+> &codec,
+> +			if (sscanf(value, "%02hhx:%02hhx:%512s",
+> &type, &codec,
+> =C2=A0								caps
+> ) !=3D 3) {
+> =C2=A0				warn("Unable to load Endpoint: seid
+> %u", rseid);
+> =C2=A0				g_free(value);
+> @@ -2398,7 +2398,7 @@ static void load_remote_sep(struct a2dp_channel
+> *chan, GKeyFile *key_file,
+> =C2=A0			delay_reporting =3D false;
+> =C2=A0		}
+> =C2=A0
+> -		for (i =3D 0, size =3D strlen(caps); i < size; i +=3D 2) {
+> +		for (i =3D 0, size =3D strlen(caps); i < size && i >=3D 2;
+> i +=3D 2) {
+> =C2=A0			uint8_t *tmp =3D data + i / 2;
+> =C2=A0
+> =C2=A0			if (sscanf(caps + i, "%02hhx", tmp) !=3D 1) {
