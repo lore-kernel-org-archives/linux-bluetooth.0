@@ -1,205 +1,115 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 612B130DD11
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 16:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79C440D595
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 16:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782231217; cv=none; b=gUThsfMhkXpF41AqqF3gSLvuhARP77TwaJsh4YjpBkmMXTMTYv3EAVSE7bpTx8rqkIElODQ3e7BV719m3sDgcumF3u+FH2U2SrakebAgxHp9Uvlt5irFfkaufTOIdorrVeh10u8Q08Kg1iMo+aUWVZYaY1y6gD84QuAYPS2LdxY=
+	t=1782233355; cv=none; b=UMKOlzyu28DlEfewUjfsnRf9gZBRncBpuDEnoBDPHBIRfZ7EN8990b2RdE80kEm0R5ATumXl8WW9sn+yeXfCRUsZq/2KkqjtnOfE28OC4g7C1FIpFGzLF/wiSowWDxR16BR6H8uXGhHc+zhgYIO7YUd/jqHmsUPNDRvWzcyQzFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782231217; c=relaxed/simple;
-	bh=mqKNJRkfAlKUqRVH2cfSksLX/YmAVc8fM8MaLA7N52w=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fLEqHvYIJJ1d40chTXgw5dnaJfnNfAeAV9+9mW3jcR4+PlEEWph7kPh7uG7iBws1yqBxPgzmwx5fPdcVTSwwyz3OAfoMydI+D1jzQCA/ErRxthL8iVvQAwZQEqqQxh6zUtgfQNY2t0vwASuQkYxDT4OMOiqgXdtWRC4yeQgYlMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AXRj7A6r; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AXRj7A6r"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2c6bc87f4d5so113615ad.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 09:13:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782231216; x=1782836016; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jkVGxnxspHuqAovAYwUnBg1/tuXYyLAM387SHWuJlmQ=;
-        b=AXRj7A6ryL5i3qmQohWrj47zShRpb9M+I0Gl1GljFnSvf2rq3cTSchQNzduPjd+Av7
-         n4SU5lGs9g6aXLUsapNstjKJenXi+lTGEQ++sAq5XLWDrXALWARix2n7HpL17TfrCybJ
-         Gk9iUFLsJIJH2zfHLyzuX6QDuSJkBYtEK/OCYVxwGdj76ZBMQyJYi+y4FtyfP/aswKEy
-         hZG1lBVAtzWrqASWyH4h6K19PmvvCBifP3ofX5Yhusxuq8hPjhwcKCAisl+htbQnGV1x
-         20qe1zSwQUmTPKJ8Wn045andTvJWmD3GF7bZw48T1b+T7HucEcerKsfd5TKLkuCVNrFU
-         20Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782231216; x=1782836016;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jkVGxnxspHuqAovAYwUnBg1/tuXYyLAM387SHWuJlmQ=;
-        b=Ir7o0o62RRFbjyQi0ljYM60n+c3Hz+58a4V75PBAiqrgMjIPt/cPDGksmV9j/OWCpq
-         YtJjhk+0G/qzmEHckQ+VHR3QmEYHOQmJ8ckJyRj9h1BThoX1JR1miJ7aHbzWnEvaYw5j
-         aqHwiBjV89dcONVQHy3eR5HNkkfZHHpb3Sul2ESBRm7a0rpn/eD+DM5GyT9FwCO7fA4u
-         R7ifQkHu4PsDV0ZOtKpxGwEvu4OWCwYGeZ247XznleggiJeB6z7q9jYETDBCM5U2uoj7
-         qOtJp3JoyQQeVgP7DwY+HTjaZrcsB5xmnfFoyze0hzcs/3pdfpUVG7nCY1N7BEXjtpYG
-         I1NA==
-X-Gm-Message-State: AOJu0YyJquGuqFDeKn+kf/SkWMZavusEtKucf7NenOueX1UBc4o/3KYH
-	FWMTuDwzLJbGzQPy5iLuMxWOoaG6wmZONX1POE+f+l46WRA51vS/okQz
-X-Gm-Gg: AfdE7cmSst6MhuytZGR9vOlolFgz/3AqnkJTF2Apf2dgBW2AB8oyzaE+vyCaie+5tNK
-	Fz8QYRxW6rbCGEK2HIhnIBfYiBWNYyUfLfQbTztehst3LdPxlcfpBpDd4XA0GlmuYLHtsR6GK9B
-	Zm4xd36X3X14+k0R8NNS+MaU3Qp0qQ3kgjoHZqDzs5PxomOZF4YgHO95smY1bUmlJUgoSCKjUuQ
-	NIh7SXZIEZDqnUA0kAR9d6owFL3jfUXaCuSXPNu6RFtVyg1H05+oSHqjr73cGrAIizY2UXV2EAG
-	flxmzrGUKN+GViqU/dNowkYn/WMw8lYzBM/qw9f8hgrgYJwXwJASEJ6nmG87x8kcw4jFtjGb09E
-	3+IaCuOWFaYeS2STFGb8XU0uaptB3O1m7/3RxuqXFW1BVUBr2kjeK1Hg4tHVzIpzEOEcUd32ZgM
-	o84WZSo8A=
-X-Received: by 2002:a17:902:cf08:b0:2c1:ef9:450e with SMTP id d9443c01a7336-2c742b3e132mr156591665ad.27.1782231215325;
-        Tue, 23 Jun 2026 09:13:35 -0700 (PDT)
-Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c7435bad30sm113237435ad.12.2026.06.23.09.13.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2026 09:13:34 -0700 (PDT)
-From: Cen Zhang <zzzccc427@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	baijiaju1990@gmail.com,
-	zzzccc427@gmail.com
-Subject: [PATCH] Bluetooth: MGMT: Fix adv monitor add failure cleanup
-Date: Wed, 24 Jun 2026 00:13:28 +0800
-Message-Id: <20260623161328.2177234-1-zzzccc427@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1782233355; c=relaxed/simple;
+	bh=IELWQX3G5/UMwDKody6SHce3MJiNzGBN+KsNYmejkWU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=fDd1AL4y3GEMzVtAfVT9pLvZ4I+M/C/m3J6pg9MHfhXjQTiRyyMsv5ggKboJYENdovRxkrGbP92YGRX+mYy/piz7b4GMicY1zPAjnVyNo05VgxK21SolHuehc1PW8njKVKKNNMaM7tfIUBX+O0OWIAgFc55KHrUTLh/BtEDx/3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 06E9B3ECB9;
+	Tue, 23 Jun 2026 16:49:04 +0000 (UTC)
+Message-ID: <9c2c4a94e961534703e3e9648261628c85248501.camel@hadess.net>
+Subject: Re: [PATCH BlueZ v2] a2dp: Fix handling of codec capability storage
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 23 Jun 2026 18:49:04 +0200
+In-Reply-To: <CABBYNZLWKRTnFEg3vuoqs0yzD4nEQW6Pajn7WdQf-pT6KtvPSw@mail.gmail.com>
+References: <20260622155621.675255-1-luiz.dentz@gmail.com>
+	 <95343429b8f06e1c88e2c642471f6f8495e11280.camel@hadess.net>
+	 <CABBYNZLWKRTnFEg3vuoqs0yzD4nEQW6Pajn7WdQf-pT6KtvPSw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-GND-Sasl: hadess@hadess.net
+X-GND-Cause: dmFkZTF8hXuUNDMAs9luM8bxh9VuGAx2Et6grJVuuf1OnoPvM60AYlw54HThOav4kwqOwjMSXMxOM+FD+MqVL64VWh6mf//LLSPcW/F6d0LDmisiLs45AchoP2Gy6E9FSzg6/MhIEK4vR30PA21tgqISMR/qF7b27gXFjOigBBW93RvfM1uwxC7nVtWzRzJ0OpGIOUlJ/N4OZwSrwrCA7NfFItHy8qDQwI8MDIVZ4tKHnDufPnvr4YTwUZr5KvTpJajYN1+mhabbn2Kd71iR2yNusxlAXEV7YaOZoc3tCUSEI1u2fxJtuHbC/e9xmzFhxdFPOmJ5jx6K2BmOzwOt7cWbeXLkRCSsoUK5b3gkFxx5XLE9o2wNlU551SFB5UM57ckGuSOuIv8SEiLhdkhwYA35+uCzP6vMoj5SbX/hgmnl6DJxj9wyTF9f1qLOLDGUZAFTerrdD6o6e4WdW0Yc9PrpWJrEk99TMrEI45AkJgkY8IhdyZiP/kGFGnpyhIJKH97SYOsakOcZZjLtzqU2KvjfD6KV7mKbD/HUJ0Qnk0u69+2MKrlTkC53aQMk1pmg3RwGSCUCp6wtif0PHhIKPAsOJVKe/P2yBPDlYV51Sv9vZjcBx+zDlqiNBGPeMotUm1g5khvBrothwwIBbjqo3+SOZ4jNTzhdMDWFR5sCl4e08K/Rhg
+X-GND-State: clean
+X-GND-Score: -100
 
-hci_add_adv_monitor() publishes a new adv_monitor in
-hdev->adv_monitors_idr before the powered MSFT setup step. The MSFT
-offload add path can then fail either locally before the controller add
-command completes, or in the MSFT add callback. In the current queued
-management add flow, hci_cmd_sync_work() still invokes
-mgmt_add_adv_patterns_monitor_complete() with the original pending command
-after msft_add_monitor_pattern() returns.
+T24gVHVlLCAyMDI2LTA2LTIzIGF0IDEwOjMwIC0wNDAwLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6
+IHdyb3RlOgo+IEhpIEJhc3RpZW4sCj4gCj4gT24gVHVlLCBKdW4gMjMsIDIwMjYgYXQgODoxOOKA
+r0FNIEJhc3RpZW4gTm9jZXJhIDxoYWRlc3NAaGFkZXNzLm5ldD4KPiB3cm90ZToKPiA+IAo+ID4g
+T24gTW9uLCAyMDI2LTA2LTIyIGF0IDExOjU2IC0wNDAwLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6
+IHdyb3RlOgo+ID4gPiBGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LnZvbi5kZW50
+ekBpbnRlbC5jb20+Cj4gPiA+IAo+ID4gPiBDb2RlYyBjYXBhYmlsaXR5IGlzIG9uZSBieXRlIGxv
+bmcgKG1heCAyNTUpIHRoZSBzdG9yYWdlIGZvcm1hdCBpcwo+ID4gPiAwMmhoeCB3aGljaCBtZWFu
+cyBlYWNoIGJ5dGUgZW5kcyB1cCBhcyAyIGNoYXJhY3RlcnMgc28gdGhlIGJ1ZmZlcgo+ID4gPiBu
+ZWVkcyB0byBiZSBkb3VibGVkIGluIG9yZGVyIHRvIGhhbmRsZSBjYXBhYmlsaXRpZXMgb2YgdGhh
+dCBzaXplLgo+ID4gPiAKPiA+ID4gUmVwb3J0ZWQtYnk6wqAgcDBoZXIgKF9AcDBoZXJfKSBpbiBU
+ZWFtSDRDIHdvcmtpbmcgd2l0aCBUcmVuZEFJCj4gPiA+IFplcm8KPiA+ID4gRGF5IEluaXRpYXRp
+dmUKPiA+ID4gUmVwb3J0ZWQtYnk6IE1pY2hhZWwgQm9tbWFyaXRvIDxtaWNoYWVsLmJvbW1hcml0
+b0BnbWFpbC5jb20+Cj4gPiA+IC0tLQo+ID4gPiDCoHByb2ZpbGVzL2F1ZGlvL2EyZHAuYyB8IDEw
+ICsrKysrLS0tLS0KPiA+ID4gwqAxIGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCA1IGRl
+bGV0aW9ucygtKQo+ID4gPiAKPiA+ID4gZGlmZiAtLWdpdCBhL3Byb2ZpbGVzL2F1ZGlvL2EyZHAu
+YyBiL3Byb2ZpbGVzL2F1ZGlvL2EyZHAuYwo+ID4gPiBpbmRleCBhNWUwMDI3ODRjMDIuLmM4YWRj
+MzEyMjU2MyAxMDA2NDQKPiA+ID4gLS0tIGEvcHJvZmlsZXMvYXVkaW8vYTJkcC5jCj4gPiA+ICsr
+KyBiL3Byb2ZpbGVzL2F1ZGlvL2EyZHAuYwo+ID4gPiBAQCAtOTcxLDcgKzk3MSw3IEBAIHN0YXRp
+YyB2b2lkIHN0b3JlX3JlbW90ZV9zZXAodm9pZCAqZGF0YSwgdm9pZAo+ID4gPiAqdXNlcl9kYXRh
+KQo+ID4gPiDCoHsKPiA+ID4gwqDCoMKgwqDCoCBzdHJ1Y3QgYTJkcF9yZW1vdGVfc2VwICpzZXAg
+PSBkYXRhOwo+ID4gPiDCoMKgwqDCoMKgIEdLZXlGaWxlICprZXlfZmlsZSA9IHVzZXJfZGF0YTsK
+PiA+ID4gLcKgwqDCoMKgIGNoYXIgc2VpZFs0XSwgdmFsdWVbMjU2XTsKPiA+ID4gK8KgwqDCoMKg
+IGNoYXIgc2VpZFs0XSwgdmFsdWVbOSArIDUxMl07Cj4gPiAKPiA+IFdoYXQncyB0aGUgIjkiIHZh
+bHVlIGZyb20/IFNob3VsZG4ndCBpdCBiZSAxMSBmb3IgdGhlIGxlbmd0aCBvZjoKPiA+ICIlMDJo
+aHg6JTAyaGh4OiUwMmhoeDoiCj4gCj4gMyAqIDIgKCUwMmhoeCkgKyAzICg6KSA9IDkKCklmIHlv
+dSdyZSBkb2luZyBhIGZpeHVwLCBtaWdodCBiZSBhIGdvb2QgaWRlYSB0byBhZGQgYXMgYSBjb21t
+ZW50LAp0aGFua3MhCgo+IAo+ID4gVGhlICJUcnkgbG9hZGluZyB3aXRoIGRlbGF5X3JlcG9ydGlu
+ZyBmaXJzdCIgdmFyaWFudD8KPiA+IAo+ID4gPiDCoMKgwqDCoMKgIHN0cnVjdCBhdmR0cF9zZXJ2
+aWNlX2NhcGFiaWxpdHkgKnNlcnZpY2UgPQo+ID4gPiBhdmR0cF9nZXRfY29kZWMoc2VwLT5zZXAp
+Owo+ID4gPiDCoMKgwqDCoMKgIHN0cnVjdCBhdmR0cF9tZWRpYV9jb2RlY19jYXBhYmlsaXR5ICpj
+b2RlYzsKPiA+ID4gwqDCoMKgwqDCoCB1bnNpZ25lZCBpbnQgaTsKPiA+ID4gQEAgLTIzNzMsNyAr
+MjM3Myw3IEBAIHN0YXRpYyB2b2lkIGxvYWRfcmVtb3RlX3NlcChzdHJ1Y3QKPiA+ID4gYTJkcF9j
+aGFubmVsCj4gPiA+ICpjaGFuLCBHS2V5RmlsZSAqa2V5X2ZpbGUsCj4gPiA+IMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIHVpbnQ4X3QgY29kZWM7Cj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgIHVpbnQ4X3QgZGVsYXlfcmVwb3J0aW5nOwo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCBHU0xpc3QgKmwgPSBOVUxMOwo+ID4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IGNoYXIgY2Fwc1syNTZdOwo+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNoYXIgY2Fw
+c1s1MTNdOwo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB1aW50OF90IGRhdGFbMTI4
+XTsKPiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaW50IGksIHNpemU7Cj4gPiA+IAo+
+ID4gPiBAQCAtMjM4NiwxMCArMjM4NiwxMCBAQCBzdGF0aWMgdm9pZCBsb2FkX3JlbW90ZV9zZXAo
+c3RydWN0Cj4gPiA+IGEyZHBfY2hhbm5lbCAqY2hhbiwgR0tleUZpbGUgKmtleV9maWxlLAo+ID4g
+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY29udGludWU7Cj4g
+PiA+IAo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAvKiBUcnkgbG9hZGluZyB3aXRo
+IGRlbGF5X3JlcG9ydGluZyBmaXJzdCAqLwo+ID4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IGlmIChzc2NhbmYodmFsdWUsICIlMDJoaHg6JTAyaGh4OiUwMmhoeDolcyIsICZ0eXBlLAo+ID4g
+PiAmY29kZWMsCj4gPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKHNzY2FuZih2YWx1
+ZSwgIiUwMmhoeDolMDJoaHg6JTAyaGh4OiU1MTJzIiwKPiA+ID4gJnR5cGUsICZjb2RlYywKPiA+
+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgJmRlbGF5X3JlcG9ydGluZywgY2FwcykgIT0KPiA+ID4gNCkg
+ewo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgLyogVHJ5
+IG9sZCBmb3JtYXQgKi8KPiA+ID4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgaWYgKHNzY2FuZih2YWx1ZSwgIiUwMmhoeDolMDJoaHg6JXMiLAo+ID4gPiAmdHlwZSwK
+PiA+ID4gJmNvZGVjLAo+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCBpZiAoc3NjYW5mKHZhbHVlLCAiJTAyaGh4OiUwMmhoeDolNTEycyIsCj4gPiA+ICZ0eXBl
+LCAmY29kZWMsCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgCj4gPiA+IGNhcHMKPiA+ID4gKSAhPSAzKSB7Cj4gPiA+
+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgd2FybigiVW5hYmxlIHRvIGxvYWQgRW5kcG9pbnQ6IHNlaWQKPiA+ID4gJXUiLCByc2VpZCk7
+Cj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgZ19mcmVlKHZhbHVlKTsKPiA+ID4gQEAgLTIzOTgsNyArMjM5OCw3IEBAIHN0YXRp
+YyB2b2lkIGxvYWRfcmVtb3RlX3NlcChzdHJ1Y3QKPiA+ID4gYTJkcF9jaGFubmVsCj4gPiA+ICpj
+aGFuLCBHS2V5RmlsZSAqa2V5X2ZpbGUsCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBkZWxheV9yZXBvcnRpbmcgPSBmYWxzZTsKPiA+ID4gwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAgfQo+ID4gPiAKPiA+ID4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCBmb3IgKGkgPSAwLCBzaXplID0gc3RybGVuKGNhcHMpOyBpIDwgc2l6ZTsgaSArPSAyKQo+ID4g
+PiB7Cj4gPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZm9yIChpID0gMCwgc2l6ZSA9IHN0
+cmxlbihjYXBzKTsgaSA8IHNpemUgJiYgaSA+PQo+ID4gPiAyOwo+ID4gPiBpICs9IDIpIHsKPiA+
+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHVpbnQ4X3QgKnRt
+cCA9IGRhdGEgKyBpIC8gMjsKPiA+ID4gCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBpZiAoc3NjYW5mKGNhcHMgKyBpLCAiJTAyaGh4IiwgdG1wKSAhPSAx
+KSB7Cj4gCj4gCg==
 
-The buggy scenario involves two paths, with each column showing the order
-within that path:
-
-MSFT add handling                  MGMT completion
-1. insert monitor and handle       1. receive sync error
-2. send MSFT add command           2. call add-monitor completion
-3. callback sees bad response      3. load cmd->user_data
-4. callback frees monitor          4. read monitor->handle
-
-Local MSFT setup failures have the other half of the same ownership bug:
-they return an error after the IDR insertion, but no later code removes the
-failed monitor from the IDR.
-
-Keep ownership with the pending management command until its completion.
-For normal management adds, the MSFT add callback now records successful
-controller state and returns errors to its caller. The management
-completion frees the monitor on non-success after copying the response
-handle, while resume/reregister callback-error cleanup remains in the
-MSFT callback. The success path keeps the existing bookkeeping.
-
-Validation reproduced this kernel report:
-BUG: KASAN: slab-use-after-free in mgmt_add_adv_patterns_monitor_complete+0xfb/0x260 [bluetooth]
-
-Call Trace:
- <TASK>
- dump_stack_lvl+0x66/0xa0
- print_report+0xce/0x5f0
- ? mgmt_add_adv_patterns_monitor_complete+0xfb/0x260 [bluetooth]
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? __virt_addr_valid+0x19f/0x330
- ? mgmt_add_adv_patterns_monitor_complete+0xfb/0x260 [bluetooth]
- kasan_report+0xe0/0x110
- ? mgmt_add_adv_patterns_monitor_complete+0xfb/0x260 [bluetooth]
- mgmt_add_adv_patterns_monitor_complete+0xfb/0x260 [bluetooth]
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? 0xffffffffc00d00da
- ? __pfx_mgmt_add_adv_patterns_monitor_complete+0x10/0x10 [bluetooth]
- ? __pfx_mgmt_add_adv_patterns_monitor_complete+0x10/0x10 [bluetooth]
- ? hci_cmd_sync_work+0x1ab/0x210 [bluetooth]
- hci_cmd_sync_work+0x1c0/0x210 [bluetooth]
- ? __pfx_mgmt_add_adv_patterns_monitor_complete+0x10/0x10 [bluetooth]
- process_one_work+0x4fd/0xbc0
- ? __pfx_process_one_work+0x10/0x10
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? __list_add_valid_or_report+0x37/0xf0
- ? __pfx_hci_cmd_sync_work+0x10/0x10 [bluetooth]
- ? srso_alias_return_thunk+0x5/0xfbef5
- worker_thread+0x2d8/0x570
- ? __pfx_worker_thread+0x10/0x10
- kthread+0x1ad/0x1f0
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x3c9/0x540
- ? __pfx_ret_from_fork+0x10/0x10
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? __switch_to+0x2e9/0x730
- ? __pfx_kthread+0x10/0x10
- ret_from_fork_asm+0x1a/0x30
- </TASK>
-
-Allocated by task 471 on cpu 3 at 285.205389s:
- kasan_save_stack+0x33/0x60
- kasan_save_track+0x17/0x60
- __kasan_kmalloc+0xaa/0xb0
- add_adv_patterns_monitor_rssi+0xd5/0x230 [bluetooth]
- hci_sock_sendmsg+0x96b/0xf80 [bluetooth]
- __sys_sendto+0x2bc/0x2d0
- __x64_sys_sendto+0x76/0x90
- do_syscall_64+0x115/0x6a0
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 454 on cpu 2 at 285.217112s:
- kasan_save_stack+0x33/0x60
- kasan_save_track+0x17/0x60
- kasan_save_free_info+0x3b/0x60
- __kasan_slab_free+0x5f/0x80
- kfree+0x313/0x590
- msft_add_monitor_sync+0x54a/0x570 [bluetooth]
- hci_add_adv_monitor+0x133/0x180 [bluetooth]
- hci_cmd_sync_work+0x187/0x210 [bluetooth]
- process_one_work+0x4fd/0xbc0
- worker_thread+0x2d8/0x570
- kthread+0x1ad/0x1f0
- ret_from_fork+0x3c9/0x540
- ret_from_fork_asm+0x1a/0x30
-
-Fixes: a2a4dedf88ab ("Bluetooth: advmon offload MSFT add monitor")
-Assisted-by: Codex:gpt-5.5
-Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
----
- net/bluetooth/mgmt.c | 2 ++
- net/bluetooth/msft.c | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d23ca1dd0893..e5403c58a957 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -5375,6 +5375,8 @@ static void mgmt_add_adv_patterns_monitor_complete(struct hci_dev *hdev,
- 		if (monitor->state == ADV_MONITOR_STATE_NOT_REGISTERED)
- 			monitor->state = ADV_MONITOR_STATE_REGISTERED;
- 		hci_update_passive_scan(hdev);
-+	} else {
-+		hci_free_adv_monitor(hdev, monitor);
- 	}
- 
- 	mgmt_cmd_complete(cmd->sk, cmd->hdev->id, cmd->opcode,
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index 2f008167cbaa..d7badce8746c 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -291,7 +291,7 @@ static int msft_le_monitor_advertisement_cb(struct hci_dev *hdev, u16 opcode,
- 	monitor->state = ADV_MONITOR_STATE_OFFLOADED;
- 
- unlock:
--	if (status)
-+	if (status && msft->resuming)
- 		hci_free_adv_monitor(hdev, monitor);
- 
- 	hci_dev_unlock(hdev);
--- 
-2.43.0
