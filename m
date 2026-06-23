@@ -1,29 +1,34 @@
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2622DC78C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 12:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57453D413C;
+	Tue, 23 Jun 2026 12:44:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782217103; cv=none; b=oaPyl7Jr3lAM7Jg3rrcrfYVFRiQQJVou/3tVdA6woffxdl/eVMtPGTuV1tQoBLdvT4S2fjcN+FZA54TpGcWR7jOHKDp9scgqzY+/g4M2MeA2TacYmiH/+vYPyOnHGs1Y8ltw6uYC9qWQQCFqVF7JypShUgOP+OkwgUgttWf/EEE=
+	t=1782218680; cv=none; b=UvozculmCazwj+/GFQxi4DOE7geza0N4xcNX/KXNz28fHAMIoB78jwB4E7Lt5nFg9js1kvWc6SgHQkrZI+9u5N459FZRCOAdS5qZDaZnCDt6jCTxUpIDHgCNRo9uvIyF0UBF+rscnCiIeHJFFf4msbH7tQzIrlKOORs9YO8PkHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782217103; c=relaxed/simple;
-	bh=vSuJqpw4IC/b/ofyF9h9S/KSLeQfHeulVBlBDiaKXdc=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BkuGBrI6Ugo9neKJOEWNlBl7Di8EQeZQAqQyhnwQL8VUbU6NRtYh6VAp+VlPy9Hb/UJz55zOnFnF+YPeuXBRPoW2b6ArLHTADhl0rjZMqUgg3e9p2YWkWjoEiivfKEpvf2LcDjPg3GVU0MVVXyOsYGkNcD078GO+kz3eEkEuHC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
+	s=arc-20240116; t=1782218680; c=relaxed/simple;
+	bh=Os+Dq9xu4+1uB0pLfKgdOOhC4ysk0rTzQttxlAmQB2Q=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Ia5P6IdzsmEtIyUeanNjrJHqgw3xWa3m5jAglRrdgzzv4WUWG4gAi+WCd3NfPVhX2+TLDpNAvrfJwNiSNMsHMoZ5tzUqe6ymBKwhiubN8UzhQOhFzBjCQCuhDzJxLPYxKmPgWp0nPlnv3Su4fPSvczXC22geSp3jU9VNQ8csW+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0E5981F75D;
-	Tue, 23 Jun 2026 12:18:19 +0000 (UTC)
-Message-ID: <95343429b8f06e1c88e2c642471f6f8495e11280.camel@hadess.net>
-Subject: Re: [PATCH BlueZ v2] a2dp: Fix handling of codec capability storage
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 242DA3F62F;
+	Tue, 23 Jun 2026 12:44:29 +0000 (UTC)
+Message-ID: <7d08a6df54279e9915f5df6bd4e5e5dde52b4fe1.camel@hadess.net>
+Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
 From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	linux-bluetooth@vger.kernel.org
-Date: Tue, 23 Jun 2026 14:18:19 +0200
-In-Reply-To: <20260622155621.675255-1-luiz.dentz@gmail.com>
-References: <20260622155621.675255-1-luiz.dentz@gmail.com>
+To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org, 
+ Herbert Xu <herbert@gondor.apana.org.au>, Marcel Holtmann
+ <marcel@holtmann.org>, Luiz Augusto von Dentz	 <luiz.dentz@gmail.com>
+Cc: linux-doc@vger.kernel.org, linux-api@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Linus Torvalds
+	 <torvalds@linux-foundation.org>, linux-bluetooth@vger.kernel.org, 
+	ell@lists.linux.dev
+Date: Tue, 23 Jun 2026 14:44:28 +0200
+In-Reply-To: <20260430011544.31823-1-ebiggers@kernel.org>
+References: <20260430011544.31823-1-ebiggers@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
@@ -36,81 +41,39 @@ MIME-Version: 1.0
 X-GND-Sasl: hadess@hadess.net
 X-GND-State: clean
 X-GND-Score: -100
-X-GND-Cause: dmFkZTGinoaFGGeh9rrdR3gXqHx+yQjJq0OR7qQQJDNVRqAc6aK4us36z/gOpFqRDZQXwK7dp+ot4dpqQZYxlKKNQAYOPYkk1yeILyl6tIVxkEjRXV+u9aIvIKN8HcB5k5qzo2EkxsVm0Yr1aQVLa26gexU5n/XeZm07a1LWFMGv0hyz7/TcxIrKrLcSPb+PR7gkDMvvhG9MkYIVZTwfhprFi+vq12xN7CtqotPoui/jJ9fGHzfjnAFOLxfxqbvSkZQVCYGcfeysDa2B9LyqNTdTJR6j+HW7Afdii611v1mv/XKl7jxovW4KwfoH6uYWbE2meQfQY+eW6ruHXA9EQJ51IUlpBwjO1ia37TiyzgeP25IWt5ns+3ATpiO5OoBSuwF+i0WAOYVWM3eLKnFNpD5Hcczm8OoFR41dPHa/ffourOpZvI6ouh8qdiUIDKcYm8PHupBXP58IFBO4Yb4t5nQA66z9+yKz/xv4I234YdH7+ym8pLvmLL93W9JCUV6Hq6Zxqw8huq/UJ8RK4yXmElavK6a1MZwYssB0rprYV9kdUm/ZKJK4rHlb1uiO6uj0ICXxfAFmSQ20GOZpe3KA19Dhkl+9dkM91iU/m9HkQzTB/guH+eMGCLWRtzkZxrPY2AeiXoyJTHwJk7J2hdlOwvSwU5XlG+SQ3EwReuomRy8ktOUtXw
+X-GND-Cause: dmFkZTFSdMa/vorSWAPy5DzVBQOrA5W2CderI2r8bhYQ2EoH5VrunMUW4F+lob0aw2PDQT52P9oKJQ7Bc+ZmGg5FLS47m3kHsnL0/eV+3XWE+F4diLFd8e9nu3o4i32idkosmDFchhVJC3nly1ComxK8P/aL7NCh427bMVxArtJi1+8zJU4qnakVtn4pXwS7gUXQQSGFPcaGkbHlc52LfmJWg5Xlm6xwGFN1wb+UetO4FCFwrmL/QezjIkqk8BlkUF15JvJlOtt2gFYzNZmEYZ+TOeu/SqzT814a85hCNogSS4A43b3ro+RlPF01qEkspz+C4G6uVBR7jPZ+DmeQGzPLSmwjWQvgzyK7ED+22J3K815RYB90/WyR2jJ9E+TpSEIuCjN8yCT9Yy7Q6O1DSR0bardG347BFh/ZgxCO/vzJnJPBcWOy3l8rUtv2mcI9/7igbu5SToeLaMIlxZXaEWrDNH82KK7lW9VqNWH0lbp84/CzQdtjlUtmcTkGrOxNzhyj13LOnkQCuPheAYpdX9EuSX/votNGV+SVkYYkw5gNS6im/7I+GjfubVIzPQCTNDnUyH59CZ7d70rqNUuEI/Pyzh8pIUgMSpNmHKmxW3UxhDAiHIYYZR7VC+ql1VKY0cF1nKpy2Tm6hdy+emcJtd/OYrPa/UUCSRd+hTMdJRbN/GPThg
 
-On Mon, 2026-06-22 at 11:56 -0400, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->=20
-> Codec capability is one byte long (max 255) the storage format is
-> 02hhx which means each byte ends up as 2 characters so the buffer
-> needs to be doubled in order to handle capabilities of that size.
->=20
-> Reported-by:=C2=A0 p0her (_@p0her_) in TeamH4C working with TrendAI Zero
-> Day Initiative
-> Reported-by: Michael Bommarito <michael.bommarito@gmail.com>
-> ---
-> =C2=A0profiles/audio/a2dp.c | 10 +++++-----
-> =C2=A01 file changed, 5 insertions(+), 5 deletions(-)
->=20
-> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> index a5e002784c02..c8adc3122563 100644
-> --- a/profiles/audio/a2dp.c
-> +++ b/profiles/audio/a2dp.c
-> @@ -971,7 +971,7 @@ static void store_remote_sep(void *data, void
-> *user_data)
-> =C2=A0{
-> =C2=A0	struct a2dp_remote_sep *sep =3D data;
-> =C2=A0	GKeyFile *key_file =3D user_data;
-> -	char seid[4], value[256];
-> +	char seid[4], value[9 + 512];
+Hey,
 
-What's the "9" value from? Shouldn't it be 11 for the length of:
-"%02hhx:%02hhx:%02hhx:"
-The "Try loading with delay_reporting first" variant?
+Replying to this older patch.
 
-> =C2=A0	struct avdtp_service_capability *service =3D
-> avdtp_get_codec(sep->sep);
-> =C2=A0	struct avdtp_media_codec_capability *codec;
-> =C2=A0	unsigned int i;
-> @@ -2373,7 +2373,7 @@ static void load_remote_sep(struct a2dp_channel
-> *chan, GKeyFile *key_file,
-> =C2=A0		uint8_t codec;
-> =C2=A0		uint8_t delay_reporting;
-> =C2=A0		GSList *l =3D NULL;
-> -		char caps[256];
-> +		char caps[513];
-> =C2=A0		uint8_t data[128];
-> =C2=A0		int i, size;
-> =C2=A0
-> @@ -2386,10 +2386,10 @@ static void load_remote_sep(struct
-> a2dp_channel *chan, GKeyFile *key_file,
-> =C2=A0			continue;
-> =C2=A0
-> =C2=A0		/* Try loading with delay_reporting first */
-> -		if (sscanf(value, "%02hhx:%02hhx:%02hhx:%s", &type,
-> &codec,
-> +		if (sscanf(value, "%02hhx:%02hhx:%02hhx:%512s",
-> &type, &codec,
-> =C2=A0					&delay_reporting, caps) !=3D
-> 4) {
-> =C2=A0			/* Try old format */
-> -			if (sscanf(value, "%02hhx:%02hhx:%s", &type,
-> &codec,
-> +			if (sscanf(value, "%02hhx:%02hhx:%512s",
-> &type, &codec,
-> =C2=A0								caps
-> ) !=3D 3) {
-> =C2=A0				warn("Unable to load Endpoint: seid
-> %u", rseid);
-> =C2=A0				g_free(value);
-> @@ -2398,7 +2398,7 @@ static void load_remote_sep(struct a2dp_channel
-> *chan, GKeyFile *key_file,
-> =C2=A0			delay_reporting =3D false;
-> =C2=A0		}
-> =C2=A0
-> -		for (i =3D 0, size =3D strlen(caps); i < size; i +=3D 2) {
-> +		for (i =3D 0, size =3D strlen(caps); i < size && i >=3D 2;
-> i +=3D 2) {
-> =C2=A0			uint8_t *tmp =3D data + i / 2;
-> =C2=A0
-> =C2=A0			if (sscanf(caps + i, "%02hhx", tmp) !=3D 1) {
+On Wed, 2026-04-29 at 18:15 -0700, Eric Biggers wrote:
+<snip>
+> This isn't intended to change anything overnight.=C2=A0 After all, most L=
+inux
+> distros won't be able to disable the kconfig options quite yet, mainly
+> because of iwd.=C2=A0 But this should create a bit more impetus for these
+> userspace programs to be fixed, and the documentation update should also
+> help prevent more users from appearing.
+
+There are 2 other users that I know of: bluez, and the ell library
+(used by iwd and bluez).
+
+From what I could tell, bluetoothd uses AF_ALG for cryptography:
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/shared/crypto.c
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/tools/mesh-gatt/cry=
+pto.c
+
+It uses "ecb(aes)" and "cmac(aes)" as algorithms.
+
+Finally, it also uses them both again:
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/mesh/crypto.c
+through ell:
+https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/ell/cipher.c
+
+Because that's a question that also came up, bluetoothd also uses the
+CAP_NET_ADMIN capability.
+
+I'll let Luiz and Marcel take it over from here.
+
+Cheers
