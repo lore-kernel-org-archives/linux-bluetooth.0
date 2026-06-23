@@ -1,181 +1,172 @@
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8822F3D648C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 15:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782227755; cv=pass; b=vE9myihkOtN1O0WsVwfxF0dv0E7wDaOlIcLaYfJ3uTq/kx5Zri5pzoyeptiuO2vAo7YfhKh8MQPiUK/mmxzFk6aXuUmPX3GeL9ZHyIVXDAwDTZ9o9Z0G9/ypCwwxRXVLn4WnBWTWlh5KC/7j8oFfbchdFoM2VCzO6yf/LBIoFe0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782227755; c=relaxed/simple;
-	bh=9FHNVmWcJBcG98C8NkFiK/TrxJ6VxfRitXrENJYTlIQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UO2GwxqXKW6hP1RFZ81N4V0ahL6gbMrX3NKNk8OPyRPTOf9VOjN2tTdupj5Jo/fQn7iLKERUczEgtLaFKhDjD7i9hPaf5zH51PBrt9YGeqGijRIOFTNRr3swpUelDxKxa9t5FWKGWAJ0Ws/Og2u+ZXiQ/mT6lEZNklhBiKWCBQ8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M/o2AN2H; arc=pass smtp.client-ip=74.125.224.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59ABF30D3EB
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 16:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782231158; cv=none; b=huLjGTqxQ07KNX8c//DbVBN+4TrcEqR8/SOiQ+Xn1JHLwY5SpCrYwoTszGbynApE/j5+yB84aLlkkoGGrpBBdzqSgED7A7jRXQvUJW4kGiTKTaVzD2Z48vEtBsOU39pJtBSj7wnTBNlppk6dUh2+H8GuMLM3XrnG3+qYdrVLV04=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782231158; c=relaxed/simple;
+	bh=1M8YyDfaz1w+LKiqXP2doP/R/TOE6VLW0PHN2roXYBY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SPCpBQ4ga/YFjA48ZsVMLeqR5zcHJ0ZIPtsRjWEconfWKwtkoIQuXLGi4340gTFxOu5kQ1NtV4UOGbvEk9JojgDX6NktfBol2FrgPvG+ihPWH0d4reLxW+JnVS9h5X4XLit7DM+H2RIl37H+vKB8tA5nt8Y5ks+L5Yu6xGieZgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fZuLHP5a; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M/o2AN2H"
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-662b95934dcso6150255d50.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 08:15:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782227752; cv=none;
-        d=google.com; s=arc-20240605;
-        b=agKfYaeiUjSFPoeJRDfD2p5BF7Nav5f+2IGVRiGrQwx5n0tkN4LBM/ZRnqp5lg6jaZ
-         7Za2FCg/o4p+GZoSwXVNlZ4qfQ2rTtLoRb2UeyaQdaOf5UZxH2FHa6EKVj14oZaaxZR8
-         7DAlX9ruHbZ7symcCSZ8BPsjLppWljQSz95GZ540j1ypryrVc+n3FJzHNIKKenBQ9K7E
-         8h6aF2Fq7X9TdXr2hDbK6xg6nuwqQyQRycuZv4BM+I6hu7LVSSDMuQHayqECq6ldosh7
-         IqvK68u1w2FaGzRXuhNTMypSV6JL1X9t8BvJP/WBP67/GEM2NjSBXxXqA+1HTL8v1nHC
-         cdIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=CXverWsEjFyfFL+7lJTDmK4Q98NaeiAYyXjXANHv5oI=;
-        fh=Wc6KNPNA9TRA5puFYvYtZHOO+aJZk857HwKnQgXw0uo=;
-        b=lu6f5CKUC/0mArfIYK6frS4VCSVRbjdcfU6+QRAoK9r7VK7tqxIbGV1yZlxNKrhNYd
-         iqywwCgbf+GavyR+X9IhOpA64JRtcbEVCpX5FglmcCblFmnXUWyrhNp0HlsCm9yI7JAy
-         UU0Y5jKVCUorFWZWpe8TD5cvbgdXtsqBxl9Q+0GiFg3LrqiZ/GPsWdsUc+F6QLV0Meza
-         3kjr0U4FhYWVAgDCZhVrG7leMGrA6jAbq2gBd5aQtXzmWTSyh3wSIyagoJiP2vh2a9vj
-         oaSqevoN57aCXabfZN4AOBL+2bwvQQDDZ8SplybfHrjkR3n3BckPc0zP7W72RjaQpIZb
-         1s/g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fZuLHP5a"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2c69921bd15so96495ad.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 09:12:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782227752; x=1782832552; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CXverWsEjFyfFL+7lJTDmK4Q98NaeiAYyXjXANHv5oI=;
-        b=M/o2AN2HGaSflj57EugfluUQ6dnsrt8ZbMkq/JFCBDYw5B57L29isU+LVNBCvJE8zf
-         SElTZECdEhPfbxfyjSCvrlIVXtBfk+4uc42JPCDBaR0u7j8diShUFVrugAHcPCwmODKs
-         Lfh57IUlG4Nv2OGg22NHJ/WFYrM8/TY5BHiICB3Velu9Fzs5b9+LAZAXuyHZqPP764F6
-         eVmN6B06ZjfigevAwNB6IJsb5+l89uRaZbZ/4RbUpJ+yTYdKM4kDi0ESJABz7bntoi44
-         R23/2AUHGPp5eQirmSc+S+hSfKzuRIpUcfYoycN0xxCkCFS7p8yRymELxOwf9bRg8LCx
-         XmLw==
+        d=gmail.com; s=20251104; t=1782231157; x=1782835957; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XDEgpC9wykmJssSOhbmhRIHMgaSzKaJTLQi/kpCV6Ic=;
+        b=fZuLHP5a9ZddwoPE1YE1VXrJhPsDJ825fBfA3ChJpFZcyc3UaLw9sqyj9G3s6MKVYk
+         FjfDLNbPoVNBThyRulOOH2oiBhDACzA9z8hP2Ut9Wig1yXqZjd7oDV1t50G4eYUQk5q7
+         KQpcbvW1BelTBvpKdGriFV8yTvOicep0HL5falzRLWb78619sLzea7a5Dij3OjxzmO+2
+         V3UwOYg+RDhTmjChqsI5CN2byGX5VZL2QJ4PKbhqKevzPkxi8y/lyer/cvXrG1sisIS8
+         VMWk8+XV7F7w/H1wx+mbKhWlRxFfFKQW8GWC8Qgu5qe5DJfAhlyqyylcVgXLVzcZLF2z
+         wpGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782227752; x=1782832552;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=CXverWsEjFyfFL+7lJTDmK4Q98NaeiAYyXjXANHv5oI=;
-        b=s565QUSI1YxrOineruhwWfqmOIAJlDqtUsCQEyMYT0GqLNcBaXglryAWTrInqexHjO
-         PSpOf/Ix22NtN6kxysGDW6dCaI4EIzhQVHWYmavJdy4Ll+hqqL48JXoL2QaxsiOTEmq2
-         rdCw3bdP8dKl/cGtbLfMPhq68bXKMZf1ZMa5QDv4oOSE4m2LIyzkSrhhCNOU8dTRTTYK
-         lLLnU7eiR+IPTr+iEesj6KVOwRWDyFjhLeE/8/no1UhobU7c+1DiF2vJvCWQz6umn9F9
-         2toe0LFD+lXlZ/yHSGKouzlV87PMR6y4uzkXJityKNfq5Xr+8rWpI/8bwMO7WGhCSiW5
-         rhPw==
-X-Forwarded-Encrypted: i=1; AHgh+RrfLG4ks+gMXiPX93PhlhGAEnmofT2nDFFGv56EuRJ9e8fn4CS57L0/25lE0ALZlN7DYCZhxJB4fErwfPgHuz0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUjhrs3jYd87ezUdsvoFMil1r1xTkb9qGAPekQueaNHSj1I7iO
-	RNjgzBNQSemcHf0hr8zXXw76ymYCkSoQkC7WldBnK2qtssyFG1OwKZsHxZv/5xAP18VUUvU2QkY
-	1VqVz+HiE5CSpZEshCB+TTBNoqEqbDng=
-X-Gm-Gg: AfdE7ckEv/z6g6+XhjbHj+u59HE5sXWez4KpFiwlGB/RYwpIy0Pvp+kl+VQoVq39lMg
-	OkbhPLgUFpIOnYH8UZtGvxwnlM2o6siR+KEJHy11YFIIBDwBO4Jv2NtAa9+zVSpi6egMxSE9mfr
-	2+Kxq4KlB2kNXSjHE0vHOCX357+hxK7/mHz3bN4ja+eO6K0lAjHGGP9mG23O4317/t99nP7UCNe
-	2fgMi9vDnfRSUaqqdbv0Bh4oSKmlGrJIRE05Nn/HEBR/FCR4qJWpVjFmauQhRi8dlxhlYbpY3p+
-	zayMNmTfe1Pwqqv5geXtGOeq6b1YV1wrFwB996cU47C3RFkdUapxokst6g7V1a3F81Vkgw==
-X-Received: by 2002:a05:690e:1685:b0:661:1669:b784 with SMTP id
- 956f58d0204a3-66359e1b367mr2989515d50.10.1782227752366; Tue, 23 Jun 2026
- 08:15:52 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782231157; x=1782835957;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XDEgpC9wykmJssSOhbmhRIHMgaSzKaJTLQi/kpCV6Ic=;
+        b=K8EyoXT49IUV1+ytIX6oX/ntX1iJIFl4e5lZsGAhFI9NUnMZbIrmPL4EAaMFuuZVaf
+         OAX4kw5IjDSOt6h707edCQPBgM89Fo94i8RzTKTPhGHqf5FIKtw08HiGr6LuAQ/B1M24
+         e73rxUY11nkfGC327yMZqEQtfTQ59wPfJiYcXPUeLx8izn07Gr66S/rYX8fUvBZ0IiIt
+         1UVBLKpRXDwaIGT9grLC2ZOb0idXpPWmWLkV5eHQr/2sdbiQHxNPdywTS0vNxFjThAEm
+         hRgjIFJJZGpJ3dHYEbMFJkDKONsN3MOYrI6WdFAJIaBRrJ2mbOa0OXyjS6o09/MnRV1k
+         4lmw==
+X-Gm-Message-State: AOJu0YwDR6GSR1AhhnmH73XtqE6qG9W0oskqBlhXCb/N6+Q9TEXmg2+B
+	4LAle8qFunIaARGZ87/FT3TP/A6+PZV/4/UgeQsE2jyR7I9n2wpD2SKq
+X-Gm-Gg: AfdE7cn9aqmH3AzhPgGL/85K5Ro5dxnYqccR/xRhdA8Q9I3mKs0uDae34xENYIGCULb
+	M0IFA6Q4+jsdCoBsdq6NSkFBeZ9BszHisB4wk6+AYBxFr3zMgXfDEL9RfnQx5ndtdtZZmm0EXGN
+	Tr7UXhMYR3GLhidcwYU/EFy6Vk/OajG2t0y6fBp5jrMmVVd8cPErPwWV+LpVbFdA7W+okH43Go4
+	j0S2HYStkY3am0OMjcc+fkl/BeOSAeOZRjkGB4e9T7vFrTuRhO2Wfh//ZipAADCzP4dTbyAfgl+
+	BSvGwV0TrdEWfY31WhjHU6AYsOSeLJgwR9grZFniZF5HLHDnTG5lmvcf3x0dNJGg3cvEL0Dnb+m
+	xIXJ7Y749MualHuSVNbiaETqeyDY/zlLxJElffhvSd7Nhlcxze4BXsofElJPP98DsF/lMAnM+6n
+	Ugyp+eFas=
+X-Received: by 2002:a17:902:e742:b0:2b2:ebed:7af5 with SMTP id d9443c01a7336-2c7c9978aa8mr34510985ad.13.1782231156388;
+        Tue, 23 Jun 2026 09:12:36 -0700 (PDT)
+Received: from localhost ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c743bfdcb6sm107054185ad.57.2026.06.23.09.12.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jun 2026 09:12:36 -0700 (PDT)
+From: Cen Zhang <zzzccc427@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	baijiaju1990@gmail.com,
+	zzzccc427@gmail.com
+Subject: [PATCH] Bluetooth: 6lowpan: avoid untracked enable work
+Date: Wed, 24 Jun 2026 00:12:29 +0800
+Message-Id: <20260623161229.2174546-1-zzzccc427@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260622-bt_bugfix-v1-0-11f936d84e72@oss.qualcomm.com> <20260622-bt_bugfix-v1-12-11f936d84e72@oss.qualcomm.com>
-In-Reply-To: <20260622-bt_bugfix-v1-12-11f936d84e72@oss.qualcomm.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 23 Jun 2026 11:15:40 -0400
-X-Gm-Features: AVVi8CdjPC23MT8XtfsB0gA2x6V-ssAXhEUBUmsu09uEhc_AAYJZ5Stoac-Nuzg
-Message-ID: <CABBYNZKx3+08Ajisy7-sHi0TZJNrbgzBzdszcKfiZUiNOdhByA@mail.gmail.com>
-Subject: Re: [PATCH 12/13] Bluetooth: btqca: Fix undetected error HCI status
- in qca_send_reset()
-To: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Ben Young Tae Kim <ytkim@qca.qualcomm.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Matthias Kaehlcke <mka@chromium.org>, 
-	Zijun Hu <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-arm-msm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Zijun,
+lowpan_enable_set() allocates a temporary work item and schedules
+do_enable_set() on system_wq, then returns to debugfs. The debugfs active
+operation has ended at that point, but the worker still executes module
+text and manipulates enable_6lowpan and listen_chan.
 
-On Mon, Jun 22, 2026 at 10:52=E2=80=AFAM Zijun Hu <zijun.hu@oss.qualcomm.co=
-m> wrote:
->
-> qca_send_reset() uses __hci_cmd_sync() which returns an skb but never
-> reads the HCI status byte from skb->data[0], so a non-zero error status
-> returned by the controller is silently ignored.
->
-> Fix by replacing qca_send_reset() with __hci_reset_sync() which
-> properly extracts and converts the HCI status byte to a negative errno.
->
-> Fixes: 83e81961ff7e ("Bluetooth: btqca: Introduce generic QCA ROME suppor=
-t")
-> Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
-> ---
->  drivers/bluetooth/btqca.c | 22 ++--------------------
->  1 file changed, 2 insertions(+), 20 deletions(-)
->
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index 04ebe290bc78..875216e15603 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -190,25 +190,6 @@ static int qca_send_patch_config_cmd(struct hci_dev =
-*hdev)
->         return err;
->  }
->
-> -static int qca_send_reset(struct hci_dev *hdev)
-> -{
-> -       struct sk_buff *skb;
-> -       int err;
-> -
-> -       bt_dev_dbg(hdev, "QCA HCI_RESET");
-> -
-> -       skb =3D __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIME=
-OUT);
-> -       if (IS_ERR(skb)) {
-> -               err =3D PTR_ERR(skb);
-> -               bt_dev_err(hdev, "QCA Reset failed (%d)", err);
-> -               return err;
-> -       }
-> -
-> -       kfree_skb(skb);
-> -
-> -       return 0;
-> -}
-> -
->  static int qca_read_fw_board_id(struct hci_dev *hdev, u16 *bid)
->  {
->         u8 cmd;
-> @@ -990,7 +971,8 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baud=
-rate,
->         }
->
->         /* Perform HCI reset */
-> -       err =3D qca_send_reset(hdev);
-> +       bt_dev_dbg(hdev, "QCA HCI_RESET");
-> +       err =3D __hci_reset_sync(hdev);
+bt_6lowpan_exit() removes the debugfs files and immediately closes and
+puts listen_chan. It has no pointer to the queued work item, so it cannot
+cancel or flush it before tearing down the state that the worker uses.
 
-So All the fuss about the reset is just to use it here? Actually the
-distinction between -err and status is rather important. The first
-means the command didn't run (timeout, cancel, etc), or it did run but
-returned a status !=3D 0. If you want to capture both then you must use
-if (err). And yes there are parts of the code that test for < 0, but
-that is either a bug or they are intentionally ignoring the reset
-status as it is probably a non-recoverable error at that point.
+The buggy scenario involves two paths, with each column showing the order
+within that path:
 
->         if (err < 0) {
->                 bt_dev_err(hdev, "QCA Failed to run HCI_RESET (%d)", err)=
-;
->                 return err;
->
-> --
-> 2.34.1
->
+debugfs enable write              module exit
+1. lowpan_enable_set() allocates  1. bt_6lowpan_exit() removes
+   set_enable work                   the debugfs file
+2. schedule_work() queues         2. bt_6lowpan_exit() closes
+   do_enable_set()                   and puts listen_chan
+3. the write operation returns    3. module teardown can continue
+4. do_enable_set() later runs
+   against stale state
 
+Run the enable state transition synchronously in lowpan_enable_set()
+instead. The simple debugfs setter can sleep, and this file already handles
+the 6LoWPAN control write synchronously under the same set_lock. Once the
+setter returns, debugfs removal covers the whole operation and exit can no
+longer race with an untracked work item.
 
---=20
-Luiz Augusto von Dentz
+Validation reproduced this kernel report:
+BUG: KASAN: slab-use-after-free in do_enable_set+0x113/0x2e0
+Workqueue: events do_enable_set [bluetooth_6lowpan]
+The buggy address belongs to the object at ffff888109cb8000
+
+Fixes: 90305829635d ("Bluetooth: 6lowpan: Converting rwlocks to use RCU")
+Assisted-by: Codex:gpt-5.5
+Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
+---
+ net/bluetooth/6lowpan.c | 27 ++++-----------------------
+ 1 file changed, 4 insertions(+), 23 deletions(-)
+
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index cb1e329d66fd..249feca42501 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -1093,23 +1093,15 @@ static void disconnect_all_peers(void)
+ 	} while (nchans);
+ }
+ 
+-struct set_enable {
+-	struct work_struct work;
+-	bool flag;
+-};
+-
+-static void do_enable_set(struct work_struct *work)
++static void do_enable_set(bool flag)
+ {
+-	struct set_enable *set_enable = container_of(work,
+-						     struct set_enable, work);
+-
+-	if (!set_enable->flag || enable_6lowpan != set_enable->flag)
++	if (!flag || enable_6lowpan != flag)
+ 		/* Disconnect existing connections if 6lowpan is
+ 		 * disabled
+ 		 */
+ 		disconnect_all_peers();
+ 
+-	enable_6lowpan = set_enable->flag;
++	enable_6lowpan = flag;
+ 
+ 	mutex_lock(&set_lock);
+ 	if (listen_chan) {
+@@ -1121,22 +1113,11 @@ static void do_enable_set(struct work_struct *work)
+ 
+ 	listen_chan = bt_6lowpan_listen();
+ 	mutex_unlock(&set_lock);
+-
+-	kfree(set_enable);
+ }
+ 
+ static int lowpan_enable_set(void *data, u64 val)
+ {
+-	struct set_enable *set_enable;
+-
+-	set_enable = kzalloc_obj(*set_enable);
+-	if (!set_enable)
+-		return -ENOMEM;
+-
+-	set_enable->flag = !!val;
+-	INIT_WORK(&set_enable->work, do_enable_set);
+-
+-	schedule_work(&set_enable->work);
++	do_enable_set(!!val);
+ 
+ 	return 0;
+ }
+-- 
+2.43.0
+
