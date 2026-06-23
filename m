@@ -1,82 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ADFC38D402;
-	Tue, 23 Jun 2026 17:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99463911CD
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 17:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782236743; cv=none; b=sPWiLE80ZJAKx3pJeFOd5UKlfZXjOxjkc3uVY0xnVqpNlUTTBH9Vsme5CGkyPzd4cIOF6sl1iPcfUmD3Sv55u04KX57PPWvniLxPbVhHS9/F9o/L2AgXgI+s8fcoQU1WHOXJ7FiPEljgzVWGSLFDlyCt8/24knvCMg91QuY1OME=
+	t=1782237413; cv=none; b=A5wU9xmjGcifGDBk39OTNF/+4BQwnh5A/u6KdxKSHcjKc9HvXfN5eNW6V5yPdxVBSRcnbIH9WDhwLS+EdWAMl0bYwfJXYEgf6j++mpwRZCqqv8fLMyRFAUj/RzzISsqMThJ05hc80WCIuTvm0VmwJfgzsEtAW2yQnJ+Su2pH10w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782236743; c=relaxed/simple;
-	bh=3F9JITuCL3Q6WQ6xO8GFZEPkn54o5MhYIkDteUmsJQs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QXgJA250LwXiLWLDrfBk/INuj5keUNlawOkRL0rR1VNyb7IzWjjOZw+moSUoGW0RqTtNF48/Lht+ZeLHC6q9aL+4BZMaxX6IFY0fQUDNRBgYkfQD863HZ5cytzV87agGomOu0Px8+MoecGPZiaxmznyz++6gdB/NSYgpE5YZE34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KZb6fF0r; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782237413; c=relaxed/simple;
+	bh=Zyap3+1DY7IUVJrSN1zoHEETz8JZHrl3PP/SMtF8syw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=CP/HIE6VDswdlgcwrdhfn6gvndM10VqMAxmHwAM6MS/srkpYWnBiOV3ZNmbADxjXbxOKmjbhBd+AHe6sCp7jBSRx29H6FEWkOwgiLOivRIwyDkKx/w50iK/lX687H2LlVxvzU4d34MKmDCi5UA8OD3HFSxD2tAVQLnHQz9+Uvo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l9VoCYRF; arc=none smtp.client-ip=74.125.82.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KZb6fF0r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD8631F000E9;
-	Tue, 23 Jun 2026 17:45:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782236742;
-	bh=Z+KZ7eLxT5XKrkOXLovvKv/03+JktkzJGUFB56VR1HU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=KZb6fF0rRvPTq0y+NX7mUS2XZkwqXbOXxp5+J+3YS1qDcDb8BilWCDG2+zBOz1SMV
-	 mbMl/oiDXG1zuZlQzVwpwdTiEFdmFCSyUoXgu+xNV4dAYf7GR47W1UP4et+BYNN0G3
-	 LvWO+F52Fbrxz6Qp405L7NSQXe738vxss7zru9Q6f29Zz9eAw2CQyKo2iXOLY6bE5Q
-	 Od8M+lZCB6/o9AKwUoFrpuIhaGLmbvhH8nuZqMJsGjlYW5OfYBet3qhk5ls4g6u4np
-	 sMwbFOYD5QCjmPLcQ2DZysn+uLEr/VWYx+oXg77XJZ+Hzm/FqjfzKyz5xZGriOf00N
-	 OMt64tfFkuw2A==
-Date: Tue, 23 Jun 2026 17:45:39 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Demi Marie Obenour <demiobenour@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, iwd@lists.linux.dev,
-	linux-hardening@vger.kernel.org, Milan Broz <gmazyland@gmail.com>,
-	Andy Lutomirski <luto@amacapital.net>
-Subject: Re: [PATCH] crypto: af_alg - Add af_alg_restrict sysctl, defaulting
- to 1
-Message-ID: <20260623174539.GA1850517@google.com>
-References: <20260622234803.6982-1-ebiggers@kernel.org>
- <CABBYNZ+QLvkYkn_EcBZ4+GopyhKqJLcfCoABYcw1VamavbSvhg@mail.gmail.com>
- <20260623165208.GB1793@sol>
- <01b73988-b35c-4ce8-8463-4589fe18b0b0@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l9VoCYRF"
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-13810b63a1aso284275c88.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 10:56:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782237411; x=1782842211; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=8hhAC3+z3n8iA+lr0Vp8y8n4JhorV/w+3WCbi6TEZ+w=;
+        b=l9VoCYRFIpD4vnUdSh4ls3JsvvtT5EgZVYk1rtNDK0bfsk+cgeZ/WbsX3JyVUL2XTR
+         f9UJh14OoAYblzDzx4OC0f3kKsZorvoshzPL3nNiuuUcSPUHE1Ok9//1bCTK9g+koRbm
+         91B+79RJEmOc30ENn0qjj6GOTKZyRW2WEBTk8x/BD6GNMyyDnSaes+iwHUtahLqWYDF9
+         9f85nKzwmbwyBk/psK4Y+5WQfKF+ttsTi0ZqOOQ6e7jHjFLRT2M7i7JccoFkYiBhPctN
+         l0umHv0f5JjULhhOdaDegKKNEFACiOwTrV2zV3cPLh3axWwF97ZnXnMCB40RrnLdjOss
+         K7Lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782237411; x=1782842211;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8hhAC3+z3n8iA+lr0Vp8y8n4JhorV/w+3WCbi6TEZ+w=;
+        b=s34T7A6uRHoLtmLUSEPDDEBgH9ezWh+PuN3SRQu0f2zkBO+u7IUU31/AjZUPImQ8wv
+         iRCwFSZy/bA0lYdNmj0nYxPWuXfVubmwCOMzfSM1ra97oNFBmY5jd7vuVpp5GUEYVoZA
+         UEwhu6IbF/Li/UXYeX4BixuDeImfhViV1DqffWqbMpT0rvx2noc68fCa/dc8o1TPVTi6
+         lpaRSw5balqRwHguMdhxjz0aCYMn9XHXKpN0fa6gYuTJ/IxXd/Bi6YQrIvxAmzDOxDZ8
+         OI/JhZu8CJQvSsReEelEU7O/AH9I6YyaNxVDw7r8uKK3uAgtzh7yy9c8FXMUmOdihcUd
+         34aA==
+X-Gm-Message-State: AOJu0YwELnDLpVRMIhe0HuP/tAw85n8ZUxABZiUfbCKoSFcwfIwrTmIq
+	V7Q4KBzGexqSWUMCIJvGJ7Xt9UL/GHJNQMfks5Ts96VJh6mpFxb/GM/aFbnj1g==
+X-Gm-Gg: AfdE7ckBw0ebhGtO9jt15AMEZtXza887EZPVMbpAwc1rIWHsSITi454dVc1EFjkKusU
+	M+bevkXhbvb+1sTNFM9YDy4RkbVUjtOlGMx6V+25GzswrdVsJnU2vrBpmJl36WfCExBdeYzrq+t
+	Qin7LObtdwbORn8hzmPgLlNXwD8RMKN+f9trIVNvNNP7g03DcB3a+zK7MC+ivAJf2VAX9sSOeAB
+	5uyq1gVCwkIAPqchfRuM572bakyLP/hSpKWLZRB14DLjjyYR7IuATduyhGURk62uNYawB7rapHf
+	kg08QiJYXfq3/74cOaVg7X9thAWZgYeUIfSnODI8Ixp6y2nMzHFBt7AlpVCO6NJthoZU8KPKZP2
+	I4v+771URw7HQWShWZP6K9DiKP6jzM2BW+rt/49/ItnrrwqgkzOFuB2y56JL8NkYhqQoLJHtGct
+	0nvwBO4PQFBYRDEyYQMazr
+X-Received: by 2002:a05:7022:419e:b0:137:fc2b:1efe with SMTP id a92af1059eb24-139ad6968demr11389301c88.11.1782237410839;
+        Tue, 23 Jun 2026 10:56:50 -0700 (PDT)
+Received: from [172.17.0.2] ([20.171.123.136])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-139adcc5f14sm15560720c88.6.2026.06.23.10.56.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jun 2026 10:56:50 -0700 (PDT)
+Message-ID: <6a3ac8e2.7d41f3a1.30d65b.1123@mx.google.com>
+Date: Tue, 23 Jun 2026 10:56:50 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1214127820533152108=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <01b73988-b35c-4ce8-8463-4589fe18b0b0@gmail.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zzzccc427@gmail.com
+Subject: RE: Bluetooth: 6lowpan: avoid untracked enable work
+In-Reply-To: <20260623161229.2174546-1-zzzccc427@gmail.com>
+References: <20260623161229.2174546-1-zzzccc427@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Tue, Jun 23, 2026 at 01:29:20PM -0400, Demi Marie Obenour wrote:
-> On 6/23/26 12:52, Eric Biggers wrote:
-> > On Tue, Jun 23, 2026 at 11:04:14AM -0400, Luiz Augusto von Dentz wrote:
-> >>> +===  ==================================================================
-> >>> +0    AF_ALG is unrestricted.
-> >>> +
-> >>> +1    AF_ALG is supported with a limited list of algorithms. The list
-> >>> +     is designed for compatibility with known users such as iwd and
-> >>> +     bluez that haven't yet been fixed to use userspace crypto code.
-> >>
-> >> Is the expectation that we go shopping for userspace crypto here?
-> > 
-> > Yes, same as what 99% of userspace already does.  Probably you'll just
-> > want to link to OpenSSL, but it could be something else if you want.
-> 
-> Hard disagree on OpenSSL.  It's not a good library.
-> 
-> See <https://cryptography.io/en/latest/statements/state-of-openssl/>.
-> 
-> Distributions should ship AWS-LC and either rebuild reverse
-> dependencies when needed, or work with upstream to catch ABI breaks.
+--===============1214127820533152108==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-I don't like OpenSSL either, but it's the de facto standard on most
-distros.  While perhaps distros should make that switch, there's no need
-to wait for that to move away from AF_ALG.
+This is automated email and please do not reply to this email!
 
-- Eric
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1115489
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.09 seconds
+VerifyFixes                   PASS      0.21 seconds
+VerifySignedoff               PASS      0.20 seconds
+GitLint                       PASS      0.55 seconds
+SubjectPrefix                 PASS      0.21 seconds
+BuildKernel                   PASS      25.67 seconds
+CheckAllWarning               PASS      29.14 seconds
+CheckSparse                   PASS      28.07 seconds
+BuildKernel32                 PASS      25.73 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      540.18 seconds
+TestRunner_6lowpan-tester     PASS      22.55 seconds
+IncrementalBuild              PASS      24.29 seconds
+
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/340
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1214127820533152108==--
