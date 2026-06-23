@@ -1,110 +1,83 @@
-Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA05938D6A9
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 19:14:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8745217723;
+	Tue, 23 Jun 2026 19:19:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782242083; cv=none; b=ZyX7PNNZkURxufHs1+HGSFeEBDrwq24YyCezc+hiaehGSaaSALxX/537tOkCWINVgMSFt+mdVj2ikfaJCXsfsjaCo1i3hPjR2wltHJAd96cmWLucs1Mo5OudLwdCd9u5rXfQ4vNqMuOjgCSAXqs9hJpkSpZPLDNfkZmy/dWT+ws=
+	t=1782242391; cv=none; b=oSz204pgNYdtsglBuZcKP9s7/NntSfgWORSwWCO7xJuXdY/LusSmjKyD6tkqneTnxnOO8Ix729HDVrsVl9TW79QP22scRUMDUi4yZAtM/F/JtLuoLqVqiDsmoAw1WJZumj0p72y6y60s1BgNDazq8+a4CFVLOU8HgmdDGOpnmmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782242083; c=relaxed/simple;
-	bh=plijgziijp9hhUa5uABfsKnFvq39ih7JQbrkXC9sNkc=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kdxcNuRTUNn9FQcDp6/ES5m4YJJU3NOxq9aRDK8GFbPWe0h5++71cHwZuORnv0M1gjf8Jeev2kKz33anUWgHjXBgiKYJi+JmY36+HKqA8Uswcnt9DOoaUtPqH9tv20btLgq3I70jWYcLtP7+r3KbPdmf6Dp59BtLtoZUzuxFPvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T9Q3yeu9; arc=none smtp.client-ip=209.85.217.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782242391; c=relaxed/simple;
+	bh=IP1C75csOqxm9rutyLOdY/Y1l5DuXUNjY9pJyU0uJEc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D8DZZrO5SEt756hU6lNjGAYX7xmejaYnAWg2f1HqqHFmshsdLlDRGRAXhO8ukICj9DyMD6LvCjtqCiglulggdBVBw6OxSm353XQYCzCAid/Fjz4Wd9aovPDR6fO/qi6qQIm1vIXWUm794VfxcjevVq+12yRVdQwJxhx8l6HrYE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c0g3Ipr/; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T9Q3yeu9"
-Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-6c3154fa46dso125757137.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 12:14:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782242081; x=1782846881; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hWgaia2diaamOEoQjYG+qo0oKTLO6sMeVn1sN3nRFw0=;
-        b=T9Q3yeu9vTBIFIOMGjrEuE5YxPZR4AjADxp8dTtoxHhi8eMx7cEpGCLi3RELUaS+NW
-         SyMoh95+KBjMoFOoqkZ/FVSTW3ze0IMIsDMW0OQZ8ZlDsovXhOZJ7XD50MUOenQ+K5oZ
-         6lElbgX2JGnVGxSHLv0q2adu9jfZGxF/09oYIFHG5oD2knlkiQ2Hs3tyRU4YAsYrswj7
-         efXlA/L2l26vhg4Q5rRmC2+Ur87Ra2Ag5wXlcXu94oE/AIrEoCkCYNkY2rGXJDLQNIi0
-         q/sK57rH56SaZiBt4ItEBdZOLyVXfKKxdUdg7sY7OfiNhdI9kUzPvzmpFnrePGLtzTJH
-         +qug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782242081; x=1782846881;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=hWgaia2diaamOEoQjYG+qo0oKTLO6sMeVn1sN3nRFw0=;
-        b=IW3xnAj1X2hdh215KZ1JhTbSk4/lJUH4WZAyAX21DrBUkFEFDhmNxp2KJxftPfyF5H
-         4nRmTowQYFlMkGVqeR+xhZQsWxhCgT70l5kldyGMkMiwg6KsJ4QVeXHtPQqltwOsHNE0
-         JWmrc6+aVwZdJinz8hT6TgQ9nhCDee6UMnpAW24W9S5qb37lHgbvSjcYUfLGvH7l2Z5f
-         Fb+9CIN76koSGca95n8kU20H15b0012p8wc4sB0oowcq60JUApyqkRxCQSgrfWCmsWjz
-         Ve7Wjcc+RremoFBddr0VoW8pXptGVotJ2MJEU3wcyGb37PKcHG8j1Rmt1bwDP1fopOj+
-         Jg8Q==
-X-Gm-Message-State: AOJu0Yzij7ihvVb67PaY99ASYZaYLPLFxY1By6yYOOhRxj5jwZ95EqBm
-	AxLURrL38EjhAkrdFhlOCZBOmEsEACo/5j5cD9PML0dhiZ5VsssiU/teyu7NwAxKGkVfbg==
-X-Gm-Gg: AfdE7cklQpIKuKGCHB9JtEIf9FTGscPHUFwvM1Att3Y4BjRZ1HMfnjA3TRMJe6828jG
-	g7guEhrCWC7RczYifSMh/dSsromJ7dFuc6x17XTuEFpn461C1Te0UkKeCuy3IZ6nQsuKkdD+Cc3
-	RWuzyDFYttmKLNTmlXobxWnJv6LYyHlsdHuzUclUUIxnxCiWHpioT3jADK4LrPeMdycBlzi4fE3
-	0G5bTfLxv+sDYC5RNUDr9ou1iihJUB8k1eDzyW0LDOGTDqvVJCry3AaaGgWMvv3ObpQnUf0YNrp
-	PrGF0Ht59H/fwlxN86GJ8sgJYAU2LYLnb5Wp28GUOznos71PPFMS4poTrgS+O0O02XH11ETIygH
-	qV3xxizHB4jUB6UWcaMIjVHmcFVwYp+fV6B0G93Nsl5MHOuxTT2fSA1qld5AIKPCrfcQ8DWsL2a
-	NybFBkWzTYUXsQLpFrgikj3p1H0TC5oOfyi/8VgSYZKm7REBtoAR9OZprD51bSe8ySiI2MjaxTc
-	+RdPAQ=
-X-Received: by 2002:a05:6102:548d:b0:604:f849:462e with SMTP id ada2fe7eead31-72fd815dd92mr2713131137.25.1782242080738;
-        Tue, 23 Jun 2026 12:14:40 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-9670c0e9590sm8965546241.3.2026.06.23.12.14.40
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2026 12:14:40 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 3/3] shared/bap: Don't transition to IDLE inside bap_bcast_set_state
-Date: Tue, 23 Jun 2026 15:14:32 -0400
-Message-ID: <20260623191432.270241-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260623191432.270241-1-luiz.dentz@gmail.com>
-References: <20260623191432.270241-1-luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c0g3Ipr/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C95AB1F000E9;
+	Tue, 23 Jun 2026 19:19:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782242390;
+	bh=RbRcMq45lJL75Wy8wrzm8CIwVwH9qDYXAES++CJmSQU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=c0g3Ipr/jnG4piITeIEBSOZd4N9x40N5t4MWHm/ywG1uUiqB1E71RWdo/HFjXYnxt
+	 HGrI8PBxBn1qARMQA1/AZZIrudVLzHNI7OO+zogsuQ65sP6lGsNZCXrQTGCUEttASD
+	 ngVdGTMIWMgwddbgAOJ4WnyC3Cl9gjHogvKBzaZ21A3d/Mbb/nUrhI8qtqUdtfMWHy
+	 4L9qgOc68MA5CmWpwSMX6TV4BqUX4fahq27AXT0Xkbqk48do563/4MEYjjHU6sy+zz
+	 t4YxUF7kfgUdd8lpiQKNUTyNb1fxejLezz5+FMRzVdBOR+XXKXfixejT/7jozdOM9k
+	 uthHgc40SZnOQ==
+Date: Tue, 23 Jun 2026 19:19:48 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Bastien Nocera <hadess@hadess.net>, linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-doc@vger.kernel.org, linux-api@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, ell@lists.linux.dev
+Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
+Message-ID: <20260623191948.GD1850517@google.com>
+References: <20260430011544.31823-1-ebiggers@kernel.org>
+ <7d08a6df54279e9915f5df6bd4e5e5dde52b4fe1.camel@hadess.net>
+ <20260623164932.GA1793@sol>
+ <CAHk-=wgNG=F3xO9PjL0RcKy3UWvq0Np9uZu+nFUQBAA8So9xdA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wgNG=F3xO9PjL0RcKy3UWvq0Np9uZu+nFUQBAA8So9xdA@mail.gmail.com>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Tue, Jun 23, 2026 at 11:56:10AM -0700, Linus Torvalds wrote:
+> On Tue, 23 Jun 2026 at 09:51, Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > We're aware of that and are taking it into account in the allowlist:
+> 
+> Note that if we can  just unconditionally make it depend on
+> CAP_NET_ADMIN, that would be good - independently of any allowlist.
+> 
+> Because if iwd and abluetoothd are the main two users, and both of
+> those already require CAP_NET_ADMIN anyway...
 
-Remove the recursive stream_set_state(IDLE) call from the RELEASING
-case in bap_bcast_set_state. This call re-entered bap_bcast_set_state
-while the state_cbs queue was still being iterated, causing a
-use-after-free if a callback unregistered itself during notification.
----
- src/shared/bap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+There's also cryptsetup, including unprivileged benchmarking and also
+(in theory) formatting support, and pre-7.0 versions of iproute2 which
+used it for computing SHA-1 hashes of BPF programs.
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 9dd07bc5f2e2..6086924a9cb7 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -2436,7 +2436,6 @@ static void bap_bcast_set_state(struct bt_bap_stream *stream, uint8_t state)
- 		break;
- 	case BT_ASCS_ASE_STATE_RELEASING:
- 		bap_stream_io_detach(stream);
--		stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
- 		break;
- 	case BT_ASCS_ASE_STATE_ENABLING:
- 		if (bt_bap_stream_get_io(stream))
-@@ -2579,6 +2578,7 @@ static unsigned int bap_bcast_release(struct bt_bap_stream *stream,
- 					void *user_data)
- {
- 	stream_set_state(stream, BT_BAP_STREAM_STATE_RELEASING);
-+	stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
- 
- 	return 1;
- }
--- 
-2.54.0
+If we broke unprivileged 'cryptsetup benchmark', some people would
+definitely notice.  However, since it's just a manually-run benchmark
+anyway, users could just run it with sudo.
 
+I don't know about the iproute2 case.
+
+It depends how aggressive we want to be.  My current proposal
+(https://lore.kernel.org/linux-crypto/20260622234803.6982-1-ebiggers@kernel.org/)
+has the entries in the allowlist marked as either privileged or
+unprivileged.  There are just a few unprivileged ones, for cryptsetup
+and iproute2 as mentioned.  But we could try doing away with the
+unprivileged ones entirely and see who complains.
+
+- Eric
