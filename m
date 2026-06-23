@@ -1,123 +1,101 @@
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FF838AC7C;
-	Tue, 23 Jun 2026 03:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E3A3A9636
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jun 2026 05:59:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782186100; cv=none; b=KsB0jQfZbihM4jfrrgTknUKjIixENsFUcDhcna48kNwG3e9nBNR0ApS8EtipYkXTtwVxvPXAuMKA6wdShvD1gXaiHO6zAsfQZqDpwx+n9nFbejYUUA0tMQfNqGOIkQaQal9RueorhiOSnMyou51jfwlabg6pZ/qUdZgeo3Lacwc=
+	t=1782194360; cv=none; b=f/wpa+hq1Dmf5DqkIhvKF3IXYHtcmLIUo9ChT09OIc1OS/UJLIWZ/HeiIS8O96g3Uj62HieSmyN+T46gE7AjFvDjvnxjmLU4+O2YTfKMt0LwxIH1lL1xY89FauVwh08Mw+oZtVSPl5o8hhkofA/1i7248lbdFdHXzC+Xo9v6Tus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782186100; c=relaxed/simple;
-	bh=9Ib0AukvYPOsoGsWQyCGLipGQdH5/cbEhNVOatWh/vo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GiMKjNF6SiesF5fa+cF+NaWuDfKuKN1pSzbcmHwj26F9bETayWnuE7RNTSJvW/4nZE5h0dJrIhGprg3Bbv/Z7E7E3JP6JAatl/K3WJ+mkGIDqg9r8nCtgU8TedZbSmj8GvorJbNAadVdLBYVCNdCjPgXLFZbEyqXdHHdBHZjkLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=KVjXFbK4; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	s=arc-20240116; t=1782194360; c=relaxed/simple;
+	bh=JSloXPBo3IiJyYL9BKohEh4L3eaIIKlXOGBtzPOEYE0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=RXhByyIaxm1x+HwoiDgSudSL4uGt/g/JtdSaZYS9ft92UyoJJUQ2iZR3kaOcV/bpLLaHWdD06uCRnar0Tb1/gEcXtubEpTO/Aq14cEKwqfHZc0ykDj0ATpttBrJrrlHpA+7hSO/b3LT4aD2aDYZV7ko8ngnfDusBaKmXyuLeMss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DwDnREPB; arc=none smtp.client-ip=74.125.82.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="KVjXFbK4"
-X-UUID: 69999c4e6eb511f1b1788b6acf885367-20260623
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=Rf8Qx530uyjSnlqctfbH+IvTng3HgG/62FPMUNx8CjU=;
-	b=KVjXFbK4ND9G8ci4vd+ltXwZ4kS6kv21HqqGl8Pskb1ekWhjkltnMn+8teeu8SnmNJIPAnFIxvfFzqVrIUsnrJhkQYGQ0eSXsnVjSHmwae7fSRodvuje7I+D1c/U8fO7/5ATeBL5nAeFH8r5ij/rKID/1Yw3XpLORw/m1s1GiU4=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.17,REQID:d8163d43-ecd6-4589-a6e0-178fe8caa393,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:d497b38,CLOUDID:c053ea9a-edf9-44ae-882f-ca49f640ce85,B
-	ulkID:nil,BulkQuantity:0,SF:81|82|102|836|865|888|898,TC:-5,Content:0|15|5
-	0,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0,OSA
-	:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 69999c4e6eb511f1b1788b6acf885367-20260623
-Received: from mtkmbs14n2.mediatek.inc [(172.21.101.76)] by mailgw01.mediatek.com
-	(envelope-from <chris.lu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1071092933; Tue, 23 Jun 2026 11:41:26 +0800
-Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
- mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 23 Jun 2026 11:41:25 +0800
-Received: from mtksitap99.mediatek.inc (10.233.130.16) by
- mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.2562.29 via Frontend Transport; Tue, 23 Jun 2026 11:41:25 +0800
-From: Chris Lu <chris.lu@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
-	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>, linux-kernel
-	<linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH v4 1/2] Bluetooth: btmtk: Replace magic numbers with WMT packet flag enum
-Date: Tue, 23 Jun 2026 11:41:20 +0800
-Message-ID: <20260623034121.691031-2-chris.lu@mediatek.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20260623034121.691031-1-chris.lu@mediatek.com>
-References: <20260623034121.691031-1-chris.lu@mediatek.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DwDnREPB"
+Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-139b914bab6so2226187c88.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jun 2026 22:59:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782194359; x=1782799159; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=JSloXPBo3IiJyYL9BKohEh4L3eaIIKlXOGBtzPOEYE0=;
+        b=DwDnREPB3mtUSZ8CnoAjCkwrYa0AbMZDoqKb1P42KMyqYfKF8yAZw4xkU9oJ3nyfyp
+         0cSDac4fbF8/YldQRnNtwLbtjwpc7/uygNKeLw82gap9QKDvh5wfrrF7ptTWta5HKyxu
+         6YtlXSEoYgxKO6Rb4lSTn/baEfEOSj2U7jrCYiDcyZxg1BJv5js5KqW7OlRuuYvnZ5em
+         lPXG30ZlOjQkss8qZkFMwRxtld5GsTUDLjcFpU8zPF/BdA8WWBUbukeA8hECfKB1E2+I
+         EJPaECDiS4nJ0CyaJ/Rlwm3M+3T/17eMs5gUxSjRObz7SigSqChQZGjXAh9NYxERX9u4
+         EH6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782194359; x=1782799159;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JSloXPBo3IiJyYL9BKohEh4L3eaIIKlXOGBtzPOEYE0=;
+        b=krKyeaKU1icSnaHWl/Aug0vUqt5SBiY8077J0tXoy02WRXNI8zxn3dUMCz1rac2RlD
+         GyJ3wtSHAuoMa4Z7TdxtthdxH2gyEjU6EaOa4s1D9T1Qrmr7Z4rsN6xJSzo4F9MCRzpx
+         ChHkta9J5h88dwjqoRFOrfN9JM9SZ9VG/OLsor8XVTn+R9hI/yza3vbEWMLsiC8r7gy8
+         ElJSkgZsV1vx3cFfPYUmy+5FAr8TgEezShDQA32y+UuKA5g2oi/NW98wdvr38Mx+wfMV
+         rnmrEl2yboBHIq8wShkUZHouds8kxLoqnN7Uah4A/tqY7ZrnAdEHOGS04ElFjCD3Irsm
+         aA1Q==
+X-Gm-Message-State: AOJu0YzZgw8B/nGT7WHocv5fWYnzCmyFLNc71LWa5wH8gQ78dBosfaI9
+	WjoDsrWDw7xA7sL6n7OyUMOPxoZODRDWDESKelu9cp0SCweAqAemINsvn2NDsQ==
+X-Gm-Gg: AfdE7cnO2CMqac8K8RkY+1jLZBn/rUS9S4EiFvtTtV0HkLdCqh0PYZtFLeCRW0/Xwh8
+	WTvHAL+Y5CUdb7Bt0kVFK2pqFBrRLknsaab3DgHzadycAkvB+N6v+vUKKraYBiYD/iHgzDVbz85
+	UeWHxo9oBpufU7bncezvo6BaNAdT5Bxl5QUsquv7I1e9v0gXkugR4FVtAiesgiEc+XGyY/JpnZr
+	hp5aX19hzyfrN9LFKUnilKkOwa6z+vj6M7QQ594t0ExtdPdqGwcfXS3PVEsZMWm1zqm40k+LEet
+	RvoLbtEgXd8SYGe//dWlhc0CLOSZF66aCKn3uMKlM6i7m+TBsFK9oohXC7kCtcgFzs6mhAu0Lu6
+	21xPpQ2sc097IBe+G31PjJz6vxbLx3SQ4XAZwgfGjjAL5WLXQbaCoYuQ9Iif9FPlFD9uEWlzOxw
+	AZhZF8aeX3ypBaVIPArA==
+X-Received: by 2002:a05:7022:4a6:b0:139:ba7d:84a2 with SMTP id a92af1059eb24-139c6f439ddmr691954c88.21.1782194358715;
+        Mon, 22 Jun 2026 22:59:18 -0700 (PDT)
+Received: from [172.17.0.2] ([20.171.20.28])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-139adcc5f14sm11977928c88.6.2026.06.22.22.59.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jun 2026 22:59:17 -0700 (PDT)
+Message-ID: <6a3a20b5.7d41f3a1.30d65b.be20@mx.google.com>
+Date: Mon, 22 Jun 2026 22:59:17 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4992126362517205767=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, sherry.sun@oss.nxp.com
+Subject: RE: Add PCIe M.2 Key E connector support for NXP i.MX boards
+In-Reply-To: <20260623030736.1421537-2-sherry.sun@oss.nxp.com>
+References: <20260623030736.1421537-2-sherry.sun@oss.nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Add BTMTK_WMT_PKT_* enum to represent WMT download packet sequence flags,
-improving code readability. Replace magic numbers (1, 2, 3) in
-btmtk_setup_firmware_79xx() with descriptive enum values:
+--===============4992126362517205767==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-- BTMTK_WMT_PKT_START (1): First packet of a sequence
-- BTMTK_WMT_PKT_CONTINUE (2): Continuation packet
-- BTMTK_WMT_PKT_END (3): Final packet of a sequence
+This is an automated email and please do not reply to this email.
 
-Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: drivers/pci/controller/dwc/pci-imx6.c:1382
+error: drivers/pci/controller/dwc/pci-imx6.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- drivers/bluetooth/btmtk.c | 6 +++---
- drivers/bluetooth/btmtk.h | 6 ++++++
- 2 files changed, 9 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 02a96342e964..21c08ee1cdbf 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -230,12 +230,12 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
- 			while (dl_size > 0) {
- 				dlen = min_t(int, 250, dl_size);
- 				if (first_block == 1) {
--					flag = 1;
-+					flag = BTMTK_WMT_PKT_START;
- 					first_block = 0;
- 				} else if (dl_size - dlen <= 0) {
--					flag = 3;
-+					flag = BTMTK_WMT_PKT_END;
- 				} else {
--					flag = 2;
-+					flag = BTMTK_WMT_PKT_CONTINUE;
- 				}
- 
- 				wmt_params.flag = flag;
-diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-index c83c24897c95..51c18dde0a80 100644
---- a/drivers/bluetooth/btmtk.h
-+++ b/drivers/bluetooth/btmtk.h
-@@ -66,6 +66,12 @@ enum {
- 	BTMTK_WMT_ON_PROGRESS,
- };
- 
-+enum {
-+	BTMTK_WMT_PKT_START = 1,
-+	BTMTK_WMT_PKT_CONTINUE = 2,
-+	BTMTK_WMT_PKT_END = 3,
-+};
-+
- struct btmtk_wmt_hdr {
- 	u8	dir;
- 	u8	op;
--- 
-2.45.2
 
+--===============4992126362517205767==--
