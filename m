@@ -1,79 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-32.smtp.github.com (out-32.smtp.github.com [192.30.252.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D67223DCE
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jun 2026 19:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED8103E2AB6
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jun 2026 20:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782329529; cv=none; b=FwPG2qg6EZmBASJM1tOzkDh0iqNGuCkkyeaZ84u+oGAxW0oHOGEb8vZuqJPhfoNTTmG+fj/thJMV80ToKhNtSe/aRJkFlshoWwM2D8XiJDkopOVAYN19u9/7ODYjr3qo01mMno3rqkuMaSn1vVyBOGKgaPeWHAl6BBhbl2z5DCE=
+	t=1782334755; cv=none; b=bW30sgWyI7RSoX9WUTTjA+raMUrGXSHb0/4CQAsVlf515qwSe2tocu6JFxIUL87CQoDiNmi3cRZcbo9wEQUHFI2tgumg2HmUt4Whfjwsgoj6lAsNnN+B/yFqhCosmsy8tnWr6MdXyWGr/USMby/hWRMWPpCGbtSukSTAiLvzggM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782329529; c=relaxed/simple;
-	bh=/mRDXVt0hDublYq4pF4L/EdEPrOql7uOVnOlaYy9N8Y=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FzXHOTJd0HGSHn4kECx0SmRQF5AZH7QXYDJAOJpK6xG62hrPUiPS3+HGIPR0IdJx3LSPBWFYJWQA8OwLTpai6zN68U4fQckNJcdzEtcqoHeZ+k2jM9RkU8zBSsay7mH3jxJU1+bObICwPLHW4Lb9epoO/hZdb1YiK/Sh1ngFB7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RyexdCkS; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782334755; c=relaxed/simple;
+	bh=Li39nxxi8ULbo0a61RNqHV1AUoRHCqtowJ/pcSUiRg4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=i9awttPZxXQWzxiQ6HQHfffN3z5dKap4XED+Ugnyz4AoGl2JAMZ4y083ZuHLZzy02K5AXcGxEAqvrP2U0BdceKJOZX2Kei+3fz4xDKt7rCmEPVMm4kIvWBpK67BdsykFpqFxurvIjJVqpbN+OppDYNBoebpC0NhP5wtToBANZRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=MkgKFXu+; arc=none smtp.client-ip=192.30.252.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RyexdCkS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F2A41F000E9;
-	Wed, 24 Jun 2026 19:32:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782329528;
-	bh=/iNLCLqs/mxbn7/U9SjG7v1epXf7H4jqX86GlepQ0s8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=RyexdCkStkowspQjwbzIIRpvDBl2FIuyBExcff+OQPNJMa334UYDPFBxN5EwoP6S3
-	 7ECsrxX3lvIRTxqYbHaUrOdf+XWF6MaeGUYeJjtkwrv9vl0w9a7TL4gHRBZbYKf7M6
-	 nJiheqeZO6heNgMrJxhGoo045WWqi72RTFxW1mKfvIKJxVWD4wfwkaXpd+LB8vzNSW
-	 QSXVdfCsrBtAqFeXFAcexoTkCodj4oxPaAsVbIyIg6YjTKZ0cUbtf7hrWX4WJP1P0H
-	 /Sk1LxabqUADHY7ArmDKZG3TDprZbMJSYK4IWHH/nTrHxrkqgJAQ/6zO8ncWfmwB7R
-	 9WZ5wxzNZT++g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 569133AA6A68;
-	Wed, 24 Jun 2026 19:31:58 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="MkgKFXu+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1782334753;
+	bh=slKcyATaAVTf7H4u67LIBlvKKtSDV/7mGnXrspJjuRM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=MkgKFXu++2XRzbPEHP+xTywgTgBx5p1gctw2st5GUectucfyoJZh1fpQ+gVIf8bBP
+	 gFMJsE41xJT4hzlLTW/CUKtPTzElTp9HV6hkmjdBR0h8WQEFis/bKXJX0O8o+6gGrr
+	 toPaXm689N2wEy9gXGDQp77Yp7tlOzlbg/qRjRyI=
+Received: from github.com (hubbernetes-node-65e19b2.ac4-iad.github.net [10.52.222.64])
+	by smtp.github.com (Postfix) with ESMTPA id 11DE53213E6
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jun 2026 13:59:13 -0700 (PDT)
+Date: Wed, 24 Jun 2026 13:59:13 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1115319/c62fba-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] unit: test-bap: disable optimization to speed up
- compilation
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <178232951697.2888927.106360092002367263.git-patchwork-notify@kernel.org>
-Date: Wed, 24 Jun 2026 19:31:56 +0000
-References: 
- <e0650488e684f464f69cf013d1654f46bb862d46.1782046466.git.pav@iki.fi>
-In-Reply-To: 
- <e0650488e684f464f69cf013d1654f46bb862d46.1782046466.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/1115319
+  Home:   https://github.com/bluez/bluez
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Sun, 21 Jun 2026 15:54:34 +0300 you wrote:
-> Compilation of this file with optimization takes 12 min with ASAN, 1 min
-> without.  This is too long, and the -O2 doesn't serve purpose for unit
-> tests.
-> 
-> Disable optimization to reduce to 30 sec with ASAN (5 sec without).
-> 
-> autoconf puts global -O2 in CFLAGS that cannot be overridden eg. with
-> unit_test_bap_CFLAGS. Use pragma instead.
-> 
-> [...]
-
-Here is the summary with links:
-  - [BlueZ] unit: test-bap: disable optimization to speed up compilation
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=eb9b35c8d13d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
