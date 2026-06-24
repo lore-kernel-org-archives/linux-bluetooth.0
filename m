@@ -1,148 +1,139 @@
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B392D23A6
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jun 2026 10:56:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B112DE70D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jun 2026 11:54:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782298587; cv=none; b=XwMQh9d+U8OXT6vaQVnPLSNL+R9RMT5N50zvXAM2aXQhYFqIHZtlu8GtqlcB8mFznG/kSuUx1nS2p6Iqg0/EEovNzopoCqZgZJti8kdk59hFrs3ONXooqpp6b8ozO/3y8QTzOWwb9R0S+SDLUdudcrn8l/ZN7k7EPkU2/wTcbVE=
+	t=1782302088; cv=none; b=q+JA3dsF98m44U0xOmWqDtZYRoOZiXRLAx2UWF/W5UsDbC7sudxWMqx2fse8kfXpxbpA5WL5lveQ8imzVjHW+TJw0+PhXycMlmV7imm/9hKutQ1cJ+xS6zT3MxccyT7/ONYR8X5kp8q0x+1PzoQZ7kt0jzcc36+J30WfEomq3X4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782298587; c=relaxed/simple;
-	bh=OAskSojY9S9GzYSrZYLXDAReXtrR+BnRjCU+yWxpozY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tMLrNaMl4Nm+7XcJOY7RxXi3ZRJfEpjIId2GW/MX1IQzWCYxsM/fgPTrHm1ip+7SHK72zidtXojFtviPY/Yj6zw90aJ1poV38IDyHfdWrBhSyQGiFkelIetsCuqbDiJ5RiuhxWK1X/96Hos1zEZozi7htradkuS9dA+Vz+gdxVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=o8ZOZqM8; arc=none smtp.client-ip=209.85.208.42
+	s=arc-20240116; t=1782302088; c=relaxed/simple;
+	bh=NJIUWSJ2/5oDMgmPZyUjT8tDUusKNoorVLMnWl2KDBc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L9qz43zLlGcevyC2aHsLfnqTwgGIojGrIesjiowYlgORRAhEJFIaqKNdmKtUWTcZ50RvAjskz9RsLl/JnmDLDdOnIk8yGxqtChlE6a0pwPx7IDIHcNVjKSDxFvWHDkDD/AAscCMLYt3Ie9I7EsnRAtEj1cfLKzC8uTI6UW5doxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aoOVIkaA; arc=none smtp.client-ip=209.85.216.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o8ZOZqM8"
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-691c5776f95so1478522a12.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jun 2026 03:56:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aoOVIkaA"
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-37de8c6a2b6so245101a91.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jun 2026 04:54:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782298585; x=1782903385; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wVpUsPMcOUp7aStO4/HxyiJ7/oBFz2LYmxiU2GOTN6E=;
-        b=o8ZOZqM8yDNUIzsT1xgrKYsFpdCEV3AEUZWzxfMBIYg7cQun8KkVFzFLza5IVsXUo4
-         a1/6ArEMuiDf+rCm5yKbQ/kXWx6ZlNDd9ajtEItwOs4nj6whYfnPj1EVRzwbbL8b8CoC
-         YsEI3JDhqPyFPImO8QU1TqEahjU5bu8QB1Cfg069iiU9TbbBkQLzHt78n8Qxp96YFN0F
-         ZNyD8uNRuVERP73BKnCCUpuPf4DIEnyh2pcTDX7agTbx72B/fR9qy6Uy3AfbdWLPeXTE
-         X5LwOFKPCXM5VYEKkrFY1sEGNNgYV1LQ66KHR+ncLzlPzYkboKa3dsz+WabLEZeDTj9C
-         lmsw==
+        d=gmail.com; s=20251104; t=1782302087; x=1782906887; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fLb/Hu2mPOrI011yJ3nUBFQGzs37RCJxz/GfG5VFFBE=;
+        b=aoOVIkaALslTqjLFx46D8tono8mk+5wj8B7VAE1FMVOeDFt4T8aiTOVwjqxulZETli
+         Jc/D+LSeic/KiSPbc3D/O8e7yEXgsC3REclumPOkFnjjzXrRYiDnt3B/UO2LT1lX6Tax
+         M3hxUmDjSxzV7GlFRwaWmF/bWE+DitCG0F+2qaOuaHZItc/KRP8u67LasoynheyBv3xL
+         B0SI3Phe0LfPnSu8ikvWl/ITxdwXOA8LxoB1Kb2mKg8+BmYMjohu4yXZT9fPUL2+SEVh
+         TjSXxUGEc79O4FT8tUre9DaKu0HM/t4yE3bNdecEPwd7WqkndxByv2SZ4eiKiGX4QBKG
+         7j7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782298585; x=1782903385;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wVpUsPMcOUp7aStO4/HxyiJ7/oBFz2LYmxiU2GOTN6E=;
-        b=LUQSsmbsCFT6a5kl8GkOkm1xr5WiBtilZ2Hcqj5zn/kRL63JZ061oe4Fq/spzWtVIp
-         W25SY9Sf8z5vceVCW9tX2MOHs+6n08E6Pxfe9uDpuH/qnxuB50uTUtGq7j2i3REyuWU4
-         5sQ1xCOeR6o+4/Dn2tvjwQnN8yP+7lMSaw2T2cL6qMNbj8o25c914WcVB72b7wYBAV+L
-         dk78wd+r3zbuW29KBnqmemM6KlIw+suQOm8dOKRjj9WWO/Bznqvo5EJYrAmhIjlmUehj
-         v4l6hAu5eR3lFEbPd1AppWUNFm3h/lTOalKbzCPBEfwnASnPmUX8AcK8LdEj/mJSzG+/
-         DBpw==
-X-Forwarded-Encrypted: i=1; AHgh+Rrdv+zbWRYjlkgcrvhkNO24dmGGii80P3oTH4HXnQLMDWIV0DVnL2zXB5vPRNShxAqyJRIpospyqp31RAupq8k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyujIR6a6/bmkPuxaZeilvvw+kxH2nMukXQO/jLk8UQfJXGvdVE
-	21f9dB2Q3E6im73IJp7VV7t+LLeFXD4lvsPxZb7M3YNc5z8jP3VBiDNB
-X-Gm-Gg: AfdE7ck6EyyqkDwlpURuEKbLXdgMqz66snAI0aZaHPkJUJSyNQXvdJ7k5Dy8E6qfoiC
-	dtLlRhFLLU+YFQ2mEocsgTvvrUve/VN9vEjoAmOHoq4sEW+cc5caVmhMxirdktLfc83fbJvdnwN
-	RMGyOoFlH9edAz8iAR9z5ztMqT1mkH1mTy+cAEwvXyZP/0bvTRWELuzyqrARTVZ4q3XBFKtkwMp
-	ZMoVvvKD5A4/nkZBUnRWXSyvtUoHUFJUaxtDJy12WB8tQmo0d2AJ1DIFzHgVUonsWcZgKJkACzj
-	KGM1XjiZLvyUMWdic9yYZ9EQH+nCr72b1Vv8E0Bs8qKr7k7j9Nk3Qy0SvmoP1YekgW/ILrGX4Zu
-	e0nc6Q7CNRuq58UtsHMtUHmEsbePIyk/6G23DdcNoazzL3JYpBkL+cLwTjjFfjdkaajIctCJPIJ
-	NbrgeNSf9Z
-X-Received: by 2002:a05:6402:3218:b0:697:b10a:35ce with SMTP id 4fb4d7f45d1cf-697dba620e2mr3554762a12.1.1782298584851;
-        Wed, 24 Jun 2026 03:56:24 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-697f3ac5df0sm1005336a12.1.2026.06.24.03.56.23
+        d=1e100.net; s=20251104; t=1782302087; x=1782906887;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fLb/Hu2mPOrI011yJ3nUBFQGzs37RCJxz/GfG5VFFBE=;
+        b=HLHn99VnbquWn0PfrUm3jvv2xjmK6xFnuXzbGeShfRXgPqhYBvLQYxBVTybVEAjAjt
+         Ker/wWLYH8SABv93gBqZCV++w9hPT8odSdspa0/HL9u6i2Q0ZSkJRfTkIbkLigFPVW/S
+         v9uRNLHX+0A1r5YOKVvkqYYRhp6yIyXlJ5RzokxVOZ3ySNHnHDFxxuLxKSkqa16sDpU/
+         FGyFod8viVH6dTcyeX5ObVD37AmxPA3glGzgmHdKplVkpYbTFUTiNU23nc+vS3wHPUuI
+         rCPaiTQdYrLTPjLOTuJBP5rpqoMn0I4r6jMWkjaD5xoZVIuKpEbPU8Fid8RBish8MAJi
+         eg9g==
+X-Gm-Message-State: AOJu0Yz1iZY456qFzXKHrIBpJQ0HLGFAf0lQT+4ODpyD98d28SAgVEFX
+	6shDIQl+Cxr2xyLhEwGfcwNdPOOLkYDBDiWf5Gv4Jy6KvFNC032VLtJjUdS8NC9n
+X-Gm-Gg: AfdE7cmD5xdx5GoqiLEgZbUc87mMCFfIRlpnOJR61zXbAKNk36759/0s7PbKYsbnkiQ
+	6QQ5Zo06rbSUJuvjq1bkxxXymgdmI1QcDzsBGzP8iob1Iw9NmuhGx44YbTJ7nne2Jdy+NZ/rhq8
+	Nw/ysIBVZvnmzzAlt2gz97CLN3V8or0aashNb84YWOEHGYQsvy7TH+P1saKDTFgOp62tB94kTVc
+	2IvdfiGBy+Q7dNNLzgz56abITQD0zTIf24wQY0qBfvM0cVVja74VGS99PLcx/Ch7eonMOyoClFs
+	+5vugk/pg19GKCHpxkicDa4XpLUQjn4obsRn1zyRPRlmC5hgnBnU/oIXBFttSrFP1Y5CFmSs2Z9
+	m02ftmbJLxWGU2q7QImL44zf8MiCxo01xIntj9RY+ax94pEanvqtmdPNjwZXhBs8iQwViQh2p/Q
+	EtzIWlijI6xIOEo3dW2BM/rL/rp+79KHbToDH7AHffC1Zbt4+41VHak8kO1ZqA0XPFE5YoDf4wR
+	aRO3Q==
+X-Received: by 2002:a17:90b:3c41:b0:36d:7a76:827b with SMTP id 98e67ed59e1d1-37de4668d5bmr3113121a91.14.1782302086811;
+        Wed, 24 Jun 2026 04:54:46 -0700 (PDT)
+Received: from nugod-NUC15CRHU5.tail9f095a.ts.net ([218.237.104.87])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37de3a843fcsm2359422a91.3.2026.06.24.04.54.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 03:56:24 -0700 (PDT)
-Date: Wed, 24 Jun 2026 13:56:20 +0300
-From: Dan Carpenter <error27@gmail.com>
-To: Haoxiang Li <haoxiang_li2024@163.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, yangyingliang@huawei.com,
-	mst@redhat.com, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: virtio_bt: unregister HCI device on open
- failure
-Message-ID: <aju31PkIMuvyIcCR@stanley.mountain>
-References: <20260624084333.2885144-1-haoxiang_li2024@163.com>
+        Wed, 24 Jun 2026 04:54:46 -0700 (PDT)
+From: HyeongJun An <sammiee5311@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	HyeongJun An <sammiee5311@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: eir: Fix OOB read in eir_get_service_data()
+Date: Wed, 24 Jun 2026 20:54:39 +0900
+Message-ID: <20260624115439.868817-1-sammiee5311@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260624084333.2885144-1-haoxiang_li2024@163.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 24, 2026 at 04:43:33PM +0800, Haoxiang Li wrote:
-> virtbt_probe() registers the HCI device before calling
-> virtbt_open_vdev(). If opening the virtio Bluetooth
-> device fails, the error path frees the HCI device without
-> unregistering it.
-> 
-> Fixes: dc65b4b0f90a ("Bluetooth: virtio_bt: fix device removal")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
-> ---
->  drivers/bluetooth/virtio_bt.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
-> index 140ab55c9fc5..bf6827431bb8 100644
-> --- a/drivers/bluetooth/virtio_bt.c
-> +++ b/drivers/bluetooth/virtio_bt.c
-> @@ -397,6 +397,7 @@ static int virtbt_probe(struct virtio_device *vdev)
->  	return 0;
->  
->  open_failed:
-> +	hci_unregister_dev(hdev);
->  	hci_free_dev(hdev);
->  failed:
->  	vdev->config->del_vqs(vdev);
+eir_get_service_data() walks the advertising data looking for a Service
+Data field with a matching UUID.  eir_get_data() returns a pointer to the
+matched field's data (field + 2) and reports dlen = field_len - 1 (the
+data length only), while the field actually spans field_len + 1 = dlen + 2
+bytes once its length and type bytes are counted.
 
-I have written a blog about how to write error handling.
-https://staticthinking.wordpress.com/2022/04/28/free-the-last-thing-style/
+On a UUID mismatch the loop advances:
 
-Originally this code using One Err style error handling where every
-error path just did "goto fail".  It's also using ComeFrom label names
-which don't say what the goto does only where the goto is...  Ideally if
-hci_register_dev() failed it would use the unwind ladder to clean up it
-instead calls hci_free_dev() and then goto fail.
+	eir += dlen;
+	eir_len -= dlen;
 
-The beauty of writing a normal kernel style unwind ladder is that it
-writes the cleanup function automatically...  Let's look at the cleanup
-function here.
+The pointer advance is correct, but eir_len is decremented by only dlen --
+2 less than the bytes the field really spans (and less still when
+eir_get_data() skipped preceding non-Service-Data fields).  eir_len thus
+over-counts the remaining buffer, and the error compounds across fields.
+As eir_get_data() bounds its walk by this inflated eir_len, it ends up
+reading the length/type bytes of a "field" past the end of the buffer.
 
-   406  static void virtbt_remove(struct virtio_device *vdev)
-   407  {
-   408          struct virtio_bluetooth *vbt = vdev->priv;
-   409          struct hci_dev *hdev = vbt->hdev;
-   410  
-   411          hci_unregister_dev(hdev);
-   412          virtio_reset_device(vdev);
-   413          virtbt_close_vdev(vbt);
+For an ISO broadcast sink the buffer is hcon->le_per_adv_data[], filled
+from the periodic-advertising reports of a remote broadcaster and parsed
+by eir_get_service_data() in net/bluetooth/iso.c.  A crafted PA payload
+packed with mismatching Service Data fields drives the walk past the
+array into adjacent struct hci_conn memory -- a remotely triggerable
+out-of-bounds read; when a drifted field happens to match the BAA UUID
+the out-of-bounds bytes are copied into iso_pi(sk)->base and become
+readable from user space via getsockopt(BT_ISO_BASE).
 
-I'm really uncomfortable with having the hci_unregister_dev()
-before the close.  Potential use after free?
+Keep eir_len in sync with the pointer by recomputing it from the end of
+the buffer on each iteration.
 
-   414  
-   415          hci_free_dev(hdev);
-   416          vbt->hdev = NULL;
-   417  
-   418          vdev->config->del_vqs(vdev);
-   419          kfree(vbt);
+Fixes: 8f9ae5b3ae80 ("Bluetooth: eir: Add helpers for managing service data")
+Cc: stable@vger.kernel.org
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: HyeongJun An <sammiee5311@gmail.com>
+---
+ net/bluetooth/eir.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-The probe function should free "vbt" but it doesn't so that's
-another leak.
-
-   420  }
-
-So this fix is fine but it's also only a partial fix.
-
-regards,
-dan carpenter
-
+diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
+index 1de5f9df6eec..a55696820b22 100644
+--- a/net/bluetooth/eir.c
++++ b/net/bluetooth/eir.c
+@@ -369,6 +369,7 @@ u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ 
+ void *eir_get_service_data(u8 *eir, size_t eir_len, u16 uuid, size_t *len)
+ {
++	const u8 *eir_end = eir + eir_len;
+ 	size_t dlen;
+ 
+ 	while ((eir = eir_get_data(eir, eir_len, EIR_SERVICE_DATA, &dlen))) {
+@@ -381,7 +382,7 @@ void *eir_get_service_data(u8 *eir, size_t eir_len, u16 uuid, size_t *len)
+ 		}
+ 
+ 		eir += dlen;
+-		eir_len -= dlen;
++		eir_len = eir_end - eir;
+ 	}
+ 
+ 	return NULL;
+-- 
+2.43.0
 
