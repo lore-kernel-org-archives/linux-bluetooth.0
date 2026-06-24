@@ -1,136 +1,148 @@
-Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3E032ECD1D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jun 2026 09:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B392D23A6
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jun 2026 10:56:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782292471; cv=none; b=u/962kOrUrdGaXK1m5YTXqnHBNvq47PlZnwJxYIkHOOARuN3YuVBFDaWSlugUKIq0v7V+bCZbJEARVbosDQ4DWgr/Zur76+m3PhhilvagT089VDyckAzdzPXOYSP58xzFtL3bEAREU2QchWBzkxWJDDmKSyvE2uczK9bDPqykJ8=
+	t=1782298587; cv=none; b=XwMQh9d+U8OXT6vaQVnPLSNL+R9RMT5N50zvXAM2aXQhYFqIHZtlu8GtqlcB8mFznG/kSuUx1nS2p6Iqg0/EEovNzopoCqZgZJti8kdk59hFrs3ONXooqpp6b8ozO/3y8QTzOWwb9R0S+SDLUdudcrn8l/ZN7k7EPkU2/wTcbVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782292471; c=relaxed/simple;
-	bh=apZwyhRlHhsDDETZ4GtAokl0tu0ytkkV9hEW9Iot71w=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=UeW29T1cfJAsHyGWph697zzDmGOkAdZDRE9OIIaqgkdKUd2t4f/BYe4b3vv3hH24GLvuyqqhwZx3jRF6CcV5KHu6W3Q+oLNrIoKDJ0f5URx3igP+8TcxEDqD1L3djNfOmhQbbLn9cK75SmQF2tS3870SVL+pxK3ZVVWNLzR4M6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZjDoIupi; arc=none smtp.client-ip=74.125.82.174
+	s=arc-20240116; t=1782298587; c=relaxed/simple;
+	bh=OAskSojY9S9GzYSrZYLXDAReXtrR+BnRjCU+yWxpozY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tMLrNaMl4Nm+7XcJOY7RxXi3ZRJfEpjIId2GW/MX1IQzWCYxsM/fgPTrHm1ip+7SHK72zidtXojFtviPY/Yj6zw90aJ1poV38IDyHfdWrBhSyQGiFkelIetsCuqbDiJ5RiuhxWK1X/96Hos1zEZozi7htradkuS9dA+Vz+gdxVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=o8ZOZqM8; arc=none smtp.client-ip=209.85.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZjDoIupi"
-Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-30c52cc5285so1129990eec.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jun 2026 02:14:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o8ZOZqM8"
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-691c5776f95so1478522a12.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jun 2026 03:56:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782292469; x=1782897269; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cZZN3eUOlEddK3dwJMqeQa/tSsGD/kQCfKlckbN584k=;
-        b=ZjDoIupi964j3tVoUxDjOHnpbga8QM+RDcJT516qHQyFiKj4IoFjzEjKTAq6ySdxQc
-         67EsBcawTVqpV7W427Y94pyww+c83QkRPqmvddEpoJmDUpcg1jPEkp9acWA6eZUS8ZUr
-         wRorh9tvs86ZWK1+h03YuKiJaFhaZAZ0aJaGtrlO1EDI+ntwS2JHP78TVyXScMDEBNXW
-         1QkAmQ7zvYSnyOBIEXxNABEIbxNFAB0ixbFIRF4JhQ+8eWEpf5rMAU6nzs7TRtQLk4QW
-         9scqrx3NRBX7IfbnXIul+rKaRMmc4KMdkvb3RdEcTHX+CzbpuQltYnNEeKZzYK1AJwYd
-         CPow==
+        d=gmail.com; s=20251104; t=1782298585; x=1782903385; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wVpUsPMcOUp7aStO4/HxyiJ7/oBFz2LYmxiU2GOTN6E=;
+        b=o8ZOZqM8yDNUIzsT1xgrKYsFpdCEV3AEUZWzxfMBIYg7cQun8KkVFzFLza5IVsXUo4
+         a1/6ArEMuiDf+rCm5yKbQ/kXWx6ZlNDd9ajtEItwOs4nj6whYfnPj1EVRzwbbL8b8CoC
+         YsEI3JDhqPyFPImO8QU1TqEahjU5bu8QB1Cfg069iiU9TbbBkQLzHt78n8Qxp96YFN0F
+         ZNyD8uNRuVERP73BKnCCUpuPf4DIEnyh2pcTDX7agTbx72B/fR9qy6Uy3AfbdWLPeXTE
+         X5LwOFKPCXM5VYEKkrFY1sEGNNgYV1LQ66KHR+ncLzlPzYkboKa3dsz+WabLEZeDTj9C
+         lmsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782292469; x=1782897269;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cZZN3eUOlEddK3dwJMqeQa/tSsGD/kQCfKlckbN584k=;
-        b=Mfr8rwQFDBFBIx/FKS9nluEn8FIODM3/KieVsC+cXAot/HmAUgvrnX0zRrpThGaKmb
-         uwmNOw8VnGJFbWMX7UyAXHXvyxegn7D2tsaGFSfkhFmo2BM8jgAuGw9KXw+2bKed4wAL
-         IMfyyW8BmVaez6LdDyssbOQlF7BkdIL1wJtDSWYKUTXdnsycVTMF9Wny2U10Uka2kM6i
-         pXCTxwr5PVZ1VRweqpbgt+Q+9UazAHl0yl5y+2xqfBj7kj8FRvBlBhZW/DtJj1VEOabe
-         RzuUgillegdpXph9byn/IZPiVZVMwbFSVkWtuHW3ACbxF5/e8MI5xFP51daZTsMer4Ld
-         c4tA==
-X-Gm-Message-State: AOJu0YwRZuDbmcIhiNcxDUaHJX7/twtz3luzp2cg/Kj+U0L2JJWc4jaa
-	Ur3RlxfJPK+an+3C6lhobL32lliiH38MZwAm9t3u6JQ3mFaE3vKCGb8naDHoqQ==
-X-Gm-Gg: AfdE7ckN20TiKWLnt98kDgRw9XJlmqcG90rg+2xb3nse8X9+MfT8g4IJ3KBGIVvWeNm
-	LYwWx3Lr84LdrwWZtm4ZJlfRM184vdcUSkD4Lg7t8iMMsyPS6VMsVb6tvi1HHCh/m5xNzYwO2dL
-	9S9OpySsU2BGapOZN+2Olv09DtJ/OxHYTBnXrXp/o8cmpTk5N96J7uIOHLTUadF0j+2payKeTpH
-	EvpCP35TibRyuvkmVjOunmYh+zQHUB0NxzH8IzTUi8JXKIavmNyfOEHhqjDrgVVL2kRTlFY/Urd
-	2ac5cu3btAImQ75Q29IkVGZsxtav840g6aI8VJvEY9kEQ7BqoxQaXmIQnA6w1pKsotEP+rfgMCp
-	arXthbcA4+JCq8ZmFRyVor2j+sb/bl8gFsRItGaghoUol0UU2PvE8AGR7jE2cXVK2TloRM+ZWqV
-	DfmYAYnLaNsASuF4Rj2wiD
-X-Received: by 2002:a05:7300:b58b:b0:307:287f:9bbc with SMTP id 5a478bee46e88-30c693386bfmr2200673eec.25.1782292468903;
-        Wed, 24 Jun 2026 02:14:28 -0700 (PDT)
-Received: from [172.17.0.2] ([172.182.193.98])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30c6eabb7a5sm2254330eec.26.2026.06.24.02.14.28
+        d=1e100.net; s=20251104; t=1782298585; x=1782903385;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wVpUsPMcOUp7aStO4/HxyiJ7/oBFz2LYmxiU2GOTN6E=;
+        b=LUQSsmbsCFT6a5kl8GkOkm1xr5WiBtilZ2Hcqj5zn/kRL63JZ061oe4Fq/spzWtVIp
+         W25SY9Sf8z5vceVCW9tX2MOHs+6n08E6Pxfe9uDpuH/qnxuB50uTUtGq7j2i3REyuWU4
+         5sQ1xCOeR6o+4/Dn2tvjwQnN8yP+7lMSaw2T2cL6qMNbj8o25c914WcVB72b7wYBAV+L
+         dk78wd+r3zbuW29KBnqmemM6KlIw+suQOm8dOKRjj9WWO/Bznqvo5EJYrAmhIjlmUehj
+         v4l6hAu5eR3lFEbPd1AppWUNFm3h/lTOalKbzCPBEfwnASnPmUX8AcK8LdEj/mJSzG+/
+         DBpw==
+X-Forwarded-Encrypted: i=1; AHgh+Rrdv+zbWRYjlkgcrvhkNO24dmGGii80P3oTH4HXnQLMDWIV0DVnL2zXB5vPRNShxAqyJRIpospyqp31RAupq8k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyujIR6a6/bmkPuxaZeilvvw+kxH2nMukXQO/jLk8UQfJXGvdVE
+	21f9dB2Q3E6im73IJp7VV7t+LLeFXD4lvsPxZb7M3YNc5z8jP3VBiDNB
+X-Gm-Gg: AfdE7ck6EyyqkDwlpURuEKbLXdgMqz66snAI0aZaHPkJUJSyNQXvdJ7k5Dy8E6qfoiC
+	dtLlRhFLLU+YFQ2mEocsgTvvrUve/VN9vEjoAmOHoq4sEW+cc5caVmhMxirdktLfc83fbJvdnwN
+	RMGyOoFlH9edAz8iAR9z5ztMqT1mkH1mTy+cAEwvXyZP/0bvTRWELuzyqrARTVZ4q3XBFKtkwMp
+	ZMoVvvKD5A4/nkZBUnRWXSyvtUoHUFJUaxtDJy12WB8tQmo0d2AJ1DIFzHgVUonsWcZgKJkACzj
+	KGM1XjiZLvyUMWdic9yYZ9EQH+nCr72b1Vv8E0Bs8qKr7k7j9Nk3Qy0SvmoP1YekgW/ILrGX4Zu
+	e0nc6Q7CNRuq58UtsHMtUHmEsbePIyk/6G23DdcNoazzL3JYpBkL+cLwTjjFfjdkaajIctCJPIJ
+	NbrgeNSf9Z
+X-Received: by 2002:a05:6402:3218:b0:697:b10a:35ce with SMTP id 4fb4d7f45d1cf-697dba620e2mr3554762a12.1.1782298584851;
+        Wed, 24 Jun 2026 03:56:24 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-697f3ac5df0sm1005336a12.1.2026.06.24.03.56.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 02:14:28 -0700 (PDT)
-Message-ID: <6a3b9ff4.eea6ab6e.1b3c3d.0787@mx.google.com>
-Date: Wed, 24 Jun 2026 02:14:28 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3973170215780046965=="
+        Wed, 24 Jun 2026 03:56:24 -0700 (PDT)
+Date: Wed, 24 Jun 2026 13:56:20 +0300
+From: Dan Carpenter <error27@gmail.com>
+To: Haoxiang Li <haoxiang_li2024@163.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, yangyingliang@huawei.com,
+	mst@redhat.com, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: virtio_bt: unregister HCI device on open
+ failure
+Message-ID: <aju31PkIMuvyIcCR@stanley.mountain>
+References: <20260624084333.2885144-1-haoxiang_li2024@163.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
-Subject: RE: Bluetooth: btmtk: Add MT7928 support
-In-Reply-To: <20260624075505.1318804-2-chris.lu@mediatek.com>
-References: <20260624075505.1318804-2-chris.lu@mediatek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260624084333.2885144-1-haoxiang_li2024@163.com>
 
---===============3973170215780046965==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Wed, Jun 24, 2026 at 04:43:33PM +0800, Haoxiang Li wrote:
+> virtbt_probe() registers the HCI device before calling
+> virtbt_open_vdev(). If opening the virtio Bluetooth
+> device fails, the error path frees the HCI device without
+> unregistering it.
+> 
+> Fixes: dc65b4b0f90a ("Bluetooth: virtio_bt: fix device removal")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
+> ---
+>  drivers/bluetooth/virtio_bt.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
+> index 140ab55c9fc5..bf6827431bb8 100644
+> --- a/drivers/bluetooth/virtio_bt.c
+> +++ b/drivers/bluetooth/virtio_bt.c
+> @@ -397,6 +397,7 @@ static int virtbt_probe(struct virtio_device *vdev)
+>  	return 0;
+>  
+>  open_failed:
+> +	hci_unregister_dev(hdev);
+>  	hci_free_dev(hdev);
+>  failed:
+>  	vdev->config->del_vqs(vdev);
 
-This is automated email and please do not reply to this email!
+I have written a blog about how to write error handling.
+https://staticthinking.wordpress.com/2022/04/28/free-the-last-thing-style/
 
-Dear submitter,
+Originally this code using One Err style error handling where every
+error path just did "goto fail".  It's also using ComeFrom label names
+which don't say what the goto does only where the goto is...  Ideally if
+hci_register_dev() failed it would use the unwind ladder to clean up it
+instead calls hci_free_dev() and then goto fail.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1115762
+The beauty of writing a normal kernel style unwind ladder is that it
+writes the cleanup function automatically...  Let's look at the cleanup
+function here.
 
----Test result---
+   406  static void virtbt_remove(struct virtio_device *vdev)
+   407  {
+   408          struct virtio_bluetooth *vbt = vdev->priv;
+   409          struct hci_dev *hdev = vbt->hdev;
+   410  
+   411          hci_unregister_dev(hdev);
+   412          virtio_reset_device(vdev);
+   413          virtbt_close_vdev(vbt);
 
-Test Summary:
-CheckPatch                    PASS      4.09 seconds
-VerifyFixes                   PASS      0.52 seconds
-VerifySignedoff               PASS      0.60 seconds
-GitLint                       FAIL      1.96 seconds
-SubjectPrefix                 PASS      0.69 seconds
-BuildKernel                   PASS      26.78 seconds
-CheckAllWarning               PASS      29.55 seconds
-CheckSparse                   PASS      28.50 seconds
-BuildKernel32                 PASS      25.87 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      568.81 seconds
-IncrementalBuild              PASS      31.08 seconds
+I'm really uncomfortable with having the hci_unregister_dev()
+before the close.  Potential use after free?
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v5,2/3] Bluetooth: btmtk: Improve BT firmware logging
+   414  
+   415          hci_free_dev(hdev);
+   416          vbt->hdev = NULL;
+   417  
+   418          vdev->config->del_vqs(vdev);
+   419          kfree(vbt);
 
-11: B1 Line exceeds max length (92>80): "[  212.878783] Bluetooth: hci1: Loading BT firmware: mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin"
-12: B1 Line exceeds max length (93>80): "[  212.889614] Bluetooth: hci1: BT HW ver: 0x7922, SW ver: 0x008a, Build Time: 20260224103448"
-14: B1 Line exceeds max length (115>80): "[  216.048890] Bluetooth: hci1: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported."
-[v5,3/3] Bluetooth: btmtk: Add MT7928 support
+The probe function should free "vbt" but it doesn't so that's
+another leak.
 
-24: B1 Line exceeds max length (92>80): "[  159.784050] usb 1-3: New USB device found, idVendor=0e8d, idProduct=7935, bcdDevice= 1.00"
-29: B1 Line exceeds max length (97>80): "[  159.795736] Bluetooth: hci1: Loading CBMCU firmware: mediatek/mt7928/CBMCU_CODE_MT7935_1_1.bin"
-30: B1 Line exceeds max length (102>80): "[  159.807197] Bluetooth: hci1: CBMCU HW ver: 0x7935, SW ver: 0x0000, Build Time: 20260601T161751+0800"
-32: B1 Line exceeds max length (99>80): "[  160.143013] Bluetooth: hci1: Loading BT firmware: mediatek/mt7928/BT_RAM_CODE_MT7935_1_1_hdr.bin"
-33: B1 Line exceeds max length (93>80): "[  160.152775] Bluetooth: hci1: BT HW ver: 0x7935, SW ver: 0x0000, Build Time: 20260527000816"
-35: B1 Line exceeds max length (115>80): "[  163.242280] Bluetooth: hci1: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported."
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
+   420  }
+
+So this fix is fine but it's also only a partial fix.
+
+regards,
+dan carpenter
 
 
-https://github.com/bluez/bluetooth-next/pull/344
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3973170215780046965==--
