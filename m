@@ -1,126 +1,138 @@
-Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F7BB3CF699
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2026 10:16:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AF3357CEC;
+	Thu, 25 Jun 2026 13:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782382581; cv=none; b=t6YQL+vUSKpaP+Su90V0NHGWBuALDmip0TU1fh2xOjoxI6bZYuGSzioDaepu7g8PiwMo6VJjz5BeOhjA3WJBg/cRzRl2prpejF3ReB1mZgTh2476NEh3Dq36lKgqUxTO6eM+30C0ZkfilMIFogJHja7P9PvE/S7AIy2yXMbjLs4=
+	t=1782395896; cv=none; b=aTL87sraGAurnQ8Tu0Ou1/ewZSpxkDfVh8O37PyhBhYdPXeTfYz5pdDsEhSiYkvyOMvYwYQ+KPJ7OScdOAbFwD+6BSpdlB2U0OHi6wBvFiAt2PixDKgLmFLouI4vnSdzoQdNlCqAWjVo/wuobR/vJhe/VCD8TCOaMJYSr3RcGFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782382581; c=relaxed/simple;
-	bh=G7yM2OYrX4GfdsaIhwSxiyuPighG69ZvG1g4uIRccGs=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=X3GlYR5E1PeujGLg9eXWbQcQiONfn0GXdMiO44l8Oum6FesKaLUX6yXUWpP06l/qQHsUZ0/S/SCyelZ+/uD+M42XaPTx4IjVx031q1lCZZWYK4CZP2U/+m45YRFqgYBq3iWQcm5raOVJqmOO/w9BB+gYEftlXCPFdU+MGWViWNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nDzh2hZJ; arc=none smtp.client-ip=74.125.82.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782395896; c=relaxed/simple;
+	bh=RGff6wbAowP+PbMvxE3XECwfvAVmOKFM/zfNKT7rMnE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E57K/GZo7C3Z7DtJuz+Kdij9dCCC6DeU3PmR0/iJFAtz73Vfh7d7TzEQQ8cmvx6cTzkAhKylwVm9Qzvwg98/UjiJgyazecsCfbQ7vUEkNncx1SfBNBpesuaCMlXhFy1FEwwzCwKa6x+xop7CGb7a7dap09fCOHNA23jmirWMjnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hxzCeslC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nDzh2hZJ"
-Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-139a71baa35so5501679c88.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2026 03:16:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782382579; x=1782987379; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=z9XYR4mGBZ+1KtOqpOUYIQ0iu39OEaM4PkxxNBKTqh4=;
-        b=nDzh2hZJYyysSelk5fFbEo5wmw5eRKfSicQnVPbGTWRWe4pjiUo52V3cHGDYsCfYsF
-         TeQAKoeIOf9TJeXYzHZ+xMhH7Rr2ZialxGGdf5GmSqimSrErzITWvOamVuZN0z7oV5eX
-         wBkat8w3rUl0XYlNAZH47sZNkzcoVCSBnDlLAwnhDiu1Az+JjflzRIpMrvIYXxiwKD1P
-         9StPolTzHx6NLL12juPaJLxrXBPpZoYjdwYyd+tqzngb7C/uVooztJxs+8b28ymFh+Sh
-         wpGegP3MMWmdiM4vCtzyZnHzDifhXPzFEPw3kLXWbi7hS1hsvL1FklVBUMNjkJPNZJJE
-         X7Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782382579; x=1782987379;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z9XYR4mGBZ+1KtOqpOUYIQ0iu39OEaM4PkxxNBKTqh4=;
-        b=qVFPbxH9yHtaFY/pFotNNUYePiyPav5NsbRqHOFrTa0w87AQiyzm8hae/vPjzaofBz
-         UwFOaN+sTJs7Vg28E5KsCPCRj8u/hqpZKeYHqUmO7XnmHCkQCNHRERIdrGQ4qexicrJU
-         magq4BrZ1G04huqkQh06XdaikoNCqQdVLNUL2m/jP2OAhJxspVaj4wmmzS5NpHUZW1xS
-         j+nEPueWTccKAsgSdVMp/lJT3ReesYwPUdzeqktbe8VZxYuXlGKzUyGYxxZSj/mLF7/S
-         UtfpSlnDFtOf2rT0tKqEYHHY5QipTuTrIysStbsxI3UK/+Vd2fZqJA1u2y3a3+6Pai6D
-         dkww==
-X-Gm-Message-State: AOJu0YzSRIqRyDOcM+QSmhVnTzmsbRb6qmpAnUv3IczOTD4/FPXKWCVN
-	ccRTxBUvu3md/LYbGNJ8RrfjZofk+fcCILd46AuELqZP9BKFL7aWkAn7W1Itdw==
-X-Gm-Gg: AfdE7clW6RDbn2JDyaRTsmZB1otCJ1etTPS6SmqPR5OPKaUrtKbGuWz8TH/4PVq+4WB
-	r21srpfS2CSuHBrx9ahDioyPb4QTgaJXD+KUFLu3N05q3ngDNvWvfgZvmTProAiUfIsbcprGi3u
-	7+i8fj6lsdx4E7NuOmF6u/aRXh3UO3tUjIcLgcspax1cAfD+GpGaZg+4lxgPiwITHPvtHyPLzlc
-	hWSaqi6aX2eWh0IBP9ih+OqgsN73pUDKgN/8tXn0f6HiaNbBm5krFPB4KjIOoW9Zl2xmZHMkqv0
-	P8uzfHQ7ZyPQYanaFbsXE9otmSR7LyVdKJ4+XUpj/1sxSyUsmTL9Km5yqcztHh/A9d2ZzcxPme8
-	Uux91XXeXTLVDVNsA4LegVyKsEL6Cgu6vnd07vy6vBlOL5He/L7KmqIZ2TLDKsBba5R2icDgjjB
-	8/SS8/QWqM9YfjWu/hsKDp
-X-Received: by 2002:a05:7022:788:b0:139:cca6:54e1 with SMTP id a92af1059eb24-139db9edd46mr1748811c88.8.1782382579082;
-        Thu, 25 Jun 2026 03:16:19 -0700 (PDT)
-Received: from [172.17.0.2] ([128.24.160.228])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-139d90e971dsm10494485c88.10.2026.06.25.03.16.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jun 2026 03:16:18 -0700 (PDT)
-Message-ID: <6a3cfff2.f399dad6.73579.f28d@mx.google.com>
-Date: Thu, 25 Jun 2026 03:16:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2328976748369125495=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hxzCeslC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64D931F00A3A;
+	Thu, 25 Jun 2026 13:58:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782395895;
+	bh=KaLc+quV2pMprMYuRbpfQ+2ZIV/dZbs72AcURaa/OQ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=hxzCeslCh1paaQ8/HrAjwhqZTAelNUsRIjBPlx5RHMj5LtK3w3RfPFIdBadUna4DE
+	 nq1McAB8FAmEl6SanbsC8zX00pnFnB6gdenCE1yK7Mls2mrfPpqdZOZlICMJhSlCHp
+	 owurHl9hTH3dFmHUYBNfsXeZ/YfGAJiT09NVgU0XtajdCDy1VixADEppORjAVB+AyL
+	 Srwy1bXrdRe68sJOuwDd4A+yc7YovE0g0Us/8eSiN14f8ViGgKT0ZL6emGWChcULD7
+	 Dh/5U9EcTyLwdZL405n5v1knnQqGzFwMJGNORvcn0/wvDL+xcomdrFyxBqnGOlVI/m
+	 +67YJTWsze+KQ==
+Date: Thu, 25 Jun 2026 15:57:54 +0200
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Sherry Sun <sherry.sun@nxp.com>
+Cc: "Frank Li (OSS)" <frank.li@oss.nxp.com>, 
+	"Sherry Sun (OSS)" <sherry.sun@oss.nxp.com>, "robh@kernel.org" <robh@kernel.org>, 
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>, 
+	Frank Li <frank.li@nxp.com>, "s.hauer@pengutronix.de" <s.hauer@pengutronix.de>, 
+	"kernel@pengutronix.de" <kernel@pengutronix.de>, "festevam@gmail.com" <festevam@gmail.com>, 
+	Amitkumar Karwar <amitkumar.karwar@nxp.com>, Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>, 
+	"marcel@holtmann.org" <marcel@holtmann.org>, "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>, 
+	Hongxing Zhu <hongxing.zhu@nxp.com>, "l.stach@pengutronix.de" <l.stach@pengutronix.de>, 
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, "kwilczynski@kernel.org" <kwilczynski@kernel.org>, 
+	"bhelgaas@google.com" <bhelgaas@google.com>, "brgl@kernel.org" <brgl@kernel.org>, 
+	"imx@lists.linux.dev" <imx@lists.linux.dev>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>
+Subject: Re: [PATCH V2 1/8] PCI: imx6: Add skip_pwrctrl_off flag support
+Message-ID: <ozh6q3xazym5dfwvp4re7zwaqcaqmms7pbrzwelzsfldxs6lju@bshacga5usqs>
+References: <20260623030736.1421537-1-sherry.sun@oss.nxp.com>
+ <20260623030736.1421537-2-sherry.sun@oss.nxp.com>
+ <ajqZBM6IkbDLiVu2@SMW015318>
+ <VI0PR04MB121147C305022511469FB603A92ED2@VI0PR04MB12114.eurprd04.prod.outlook.com>
+ <ajwOvZUlOEQzmjsu@SMW015318>
+ <VI0PR04MB12114BCBD405505888063284492EC2@VI0PR04MB12114.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, monesss315@gmail.com
-Subject: RE: [v2] Bluetooth: btusb: Add USB ID 13d3:3625 for MediaTek MT7922
-In-Reply-To: <20260625083230.300651-1-monesss315@gmail.com>
-References: <20260625083230.300651-1-monesss315@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <VI0PR04MB12114BCBD405505888063284492EC2@VI0PR04MB12114.eurprd04.prod.outlook.com>
 
---===============2328976748369125495==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, Jun 25, 2026 at 07:25:46AM +0000, Sherry Sun wrote:
+> > Subject: Re: [PATCH V2 1/8] PCI: imx6: Add skip_pwrctrl_off flag support
+> > 
+> > On Wed, Jun 24, 2026 at 07:09:26AM +0000, Sherry Sun wrote:
+> > > > Subject: Re: [PATCH V2 1/8] PCI: imx6: Add skip_pwrctrl_off flag
+> > > > support
+> > > >
+> > > > On Tue, Jun 23, 2026 at 11:07:28AM +0800, Sherry Sun (OSS) wrote:
+> > > > > From: Sherry Sun <sherry.sun@nxp.com>
+> > > > >
+> > > > > Use dw_pcie_rp::skip_pwrctrl_off to avoid powering off devices
+> > > > > during suspend to preserve wakeup capability of the devices and
+> > > > > also not to power on the devices in the init path.
+> > > > > This allows controller power-off to be skipped when some devices(e.g.
+> > > > > M.2 cards key E without auxiliary power) required to support PCIe
+> > > > > L2 link state and wake-up mechanisms.
+> > > > >
+> > > > > Signed-off-by: Sherry Sun <sherry.sun@nxp.com>
+> > > > > ---
+> > > > >  drivers/pci/controller/dwc/pci-imx6.c | 36
+> > > > > +++++++++++++++++----------
+> > > > >  1 file changed, 23 insertions(+), 13 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/pci/controller/dwc/pci-imx6.c
+> > > > > b/drivers/pci/controller/dwc/pci-imx6.c
+> > > > > index 0fa716d1ed75..ff5a9565dbbf 100644
+> > > > > --- a/drivers/pci/controller/dwc/pci-imx6.c
+> > > > > +++ b/drivers/pci/controller/dwc/pci-imx6.c
+> > > > > @@ -1382,16 +1382,20 @@ static int imx_pcie_host_init(struct
+> > > > > dw_pcie_rp
+> > > > *pp)
+> > > > >  		}
+> > > > >  	}
+> > > > >
+> > > > > -	ret = pci_pwrctrl_create_devices(dev);
+> > > > > -	if (ret) {
+> > > > > -		dev_err(dev, "failed to create pwrctrl devices\n");
+> > > > > -		goto err_reg_disable;
+> > > > > +	if (!pci->suspended) {
+> > > > > +		ret = pci_pwrctrl_create_devices(dev);
+> > > >
+> > > > Is possible move pci_pwrctrl_create_devices() of
+> > > > pci_pwrctrl_create_devices
+> > > >
+> > > > and call it direct at probe() function, like other regulator_get function.
+> > > >
+> > >
+> > > Hi Frank,
+> > > That makes sense. However, if we move pci_pwrctrl_create_devices () to
+> > > probe(), we may need to add the following goto err_pwrctrl_destroy
+> > > path in imx_pcie_probe() to properly handle errors from
+> > > pci_pwrctrl_power_on_devices(), is that acceptable?
+> > 
+> > Can you add a API devm_pci_pwrctrl_create_devices() ?
+> > 
+> 
+> Hi Frank, we cannot unconditionally destroy the pwrctrl devices
+> when probing fails by using devm API.
+> Since we need to check the return value of
+> pci_pwrctrl_power_on_devices() for example EPROBE_DEFER to decide
+> whether to destroy the pwrctrl devices to avoid the deferred probe loop.
+> 
+> You can find more related discussion here.
+> https://lore.kernel.org/all/tutxwjciedqoje5wxvtin4h637auni5zzpvb7rtfg4uticxoux@yfl6xg7oht7t/
+> 
 
-This is automated email and please do not reply to this email!
+Yes. Ideally we should try to do a blocking wait in the pwrctrl core until all
+the pwrctrl drivers are probed, instead of deferring probe. Hopefully, I'll get
+to it soon.
 
-Dear submitter,
+- Mani
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1116370
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.08 seconds
-VerifyFixes                   PASS      0.27 seconds
-VerifySignedoff               PASS      0.21 seconds
-GitLint                       FAIL      0.52 seconds
-SubjectPrefix                 PASS      0.24 seconds
-BuildKernel                   PASS      27.04 seconds
-CheckAllWarning               PASS      29.69 seconds
-CheckSparse                   PASS      29.46 seconds
-BuildKernel32                 PASS      26.30 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      500.16 seconds
-IncrementalBuild              PASS      25.76 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2] Bluetooth: btusb: Add USB ID 13d3:3625 for MediaTek MT7922
-
-63: B1 Line exceeds max length (82>80): "    - Add /sys/kernel/debug/usb/devices output to the commit message (Paul Menzel)"
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-
-
-https://github.com/bluez/bluetooth-next/pull/351
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2328976748369125495==--
+-- 
+மணிவண்ணன் சதாசிவம்
