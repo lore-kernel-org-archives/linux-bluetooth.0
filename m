@@ -1,138 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AF3357CEC;
-	Thu, 25 Jun 2026 13:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7393033F5;
+	Thu, 25 Jun 2026 14:10:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782395896; cv=none; b=aTL87sraGAurnQ8Tu0Ou1/ewZSpxkDfVh8O37PyhBhYdPXeTfYz5pdDsEhSiYkvyOMvYwYQ+KPJ7OScdOAbFwD+6BSpdlB2U0OHi6wBvFiAt2PixDKgLmFLouI4vnSdzoQdNlCqAWjVo/wuobR/vJhe/VCD8TCOaMJYSr3RcGFI=
+	t=1782396631; cv=none; b=nnNeG56L53zcsgyTQA8uC2rCoG/UA//QzUh1qJLuEXk/H7oxmQYf7vaMONw3R8jCRLEPZKVPZUuv+2M0Ev4svrju0mlXRouo6XregYIq1Bd2jNg56PvE6TCcQo/9OfkNT67+5RgZnGSAIL4eeyAn2NfEe/GbNCJLXGNBm7hV9HE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782395896; c=relaxed/simple;
-	bh=RGff6wbAowP+PbMvxE3XECwfvAVmOKFM/zfNKT7rMnE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E57K/GZo7C3Z7DtJuz+Kdij9dCCC6DeU3PmR0/iJFAtz73Vfh7d7TzEQQ8cmvx6cTzkAhKylwVm9Qzvwg98/UjiJgyazecsCfbQ7vUEkNncx1SfBNBpesuaCMlXhFy1FEwwzCwKa6x+xop7CGb7a7dap09fCOHNA23jmirWMjnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hxzCeslC; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782396631; c=relaxed/simple;
+	bh=D6SplHxUa3QnaLv8HkHyckjDvA/Fprxyfd+YMfQx7G8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EpYCjUIWjjNUWSOXd2Ux+nJJ6R/ou/hkQUGddnLjevnHuiUv2mIXXp8Vf63G2GNxEnQF1JaVx9MSfCIZH367ISAZTu1Kwptua2TeFyzSvYv5jYHlIlqEVnh0/5oPba+2T2+y8mDT2El4siOfR5wpzFkauu/z6VE9l0JgXBrPSYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ubJVFQTV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hxzCeslC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64D931F00A3A;
-	Thu, 25 Jun 2026 13:58:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782395895;
-	bh=KaLc+quV2pMprMYuRbpfQ+2ZIV/dZbs72AcURaa/OQ0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hxzCeslCh1paaQ8/HrAjwhqZTAelNUsRIjBPlx5RHMj5LtK3w3RfPFIdBadUna4DE
-	 nq1McAB8FAmEl6SanbsC8zX00pnFnB6gdenCE1yK7Mls2mrfPpqdZOZlICMJhSlCHp
-	 owurHl9hTH3dFmHUYBNfsXeZ/YfGAJiT09NVgU0XtajdCDy1VixADEppORjAVB+AyL
-	 Srwy1bXrdRe68sJOuwDd4A+yc7YovE0g0Us/8eSiN14f8ViGgKT0ZL6emGWChcULD7
-	 Dh/5U9EcTyLwdZL405n5v1knnQqGzFwMJGNORvcn0/wvDL+xcomdrFyxBqnGOlVI/m
-	 +67YJTWsze+KQ==
-Date: Thu, 25 Jun 2026 15:57:54 +0200
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Sherry Sun <sherry.sun@nxp.com>
-Cc: "Frank Li (OSS)" <frank.li@oss.nxp.com>, 
-	"Sherry Sun (OSS)" <sherry.sun@oss.nxp.com>, "robh@kernel.org" <robh@kernel.org>, 
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>, 
-	Frank Li <frank.li@nxp.com>, "s.hauer@pengutronix.de" <s.hauer@pengutronix.de>, 
-	"kernel@pengutronix.de" <kernel@pengutronix.de>, "festevam@gmail.com" <festevam@gmail.com>, 
-	Amitkumar Karwar <amitkumar.karwar@nxp.com>, Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>, 
-	"marcel@holtmann.org" <marcel@holtmann.org>, "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>, 
-	Hongxing Zhu <hongxing.zhu@nxp.com>, "l.stach@pengutronix.de" <l.stach@pengutronix.de>, 
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, "kwilczynski@kernel.org" <kwilczynski@kernel.org>, 
-	"bhelgaas@google.com" <bhelgaas@google.com>, "brgl@kernel.org" <brgl@kernel.org>, 
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>
-Subject: Re: [PATCH V2 1/8] PCI: imx6: Add skip_pwrctrl_off flag support
-Message-ID: <ozh6q3xazym5dfwvp4re7zwaqcaqmms7pbrzwelzsfldxs6lju@bshacga5usqs>
-References: <20260623030736.1421537-1-sherry.sun@oss.nxp.com>
- <20260623030736.1421537-2-sherry.sun@oss.nxp.com>
- <ajqZBM6IkbDLiVu2@SMW015318>
- <VI0PR04MB121147C305022511469FB603A92ED2@VI0PR04MB12114.eurprd04.prod.outlook.com>
- <ajwOvZUlOEQzmjsu@SMW015318>
- <VI0PR04MB12114BCBD405505888063284492EC2@VI0PR04MB12114.eurprd04.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ubJVFQTV"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DFD19C2BCB3;
+	Thu, 25 Jun 2026 14:10:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1782396631;
+	bh=D6SplHxUa3QnaLv8HkHyckjDvA/Fprxyfd+YMfQx7G8=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=ubJVFQTV+/Y0T9PjEfy0BIHmEqqIZ5iLhuPzgkeMBStfEWlJB970ldJ7/RumWT8hI
+	 zNxpj6Zj20HuZiXZ0SMVJa6B0eG+ZlOKhOEofnmlnntB09dgIbWChXVpJFOx4XvSBD
+	 224CQRtOsHY4d3HDnf6KWfomftv+4ZZx2sx37y5WNlN3MCY8VVDeCjwF+LThs2MjkB
+	 Uwq1qFwSuw5cL0umlvYHmIIWPsH3Fx09cgR5Ld8xz10IQ6l6MF7PFK5UCQNiwPnJKy
+	 TZSN/9+D7vLIPiq5zcxQIMhyrayx6JagYhZpKPZ+JBTGaC2kVtOp7mcisE1TILXtms
+	 HCt9LiTQV99Yg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8ECDCDE001;
+	Thu, 25 Jun 2026 14:10:30 +0000 (UTC)
+From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
+Subject: [PATCH 0/6] Add support for IPQ5018 Bluetooth
+Date: Thu, 25 Jun 2026 18:10:04 +0400
+Message-Id: <20260625-ipq5018-bluetooth-v1-0-d999be0e04f7@outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <VI0PR04MB12114BCBD405505888063284492EC2@VI0PR04MB12114.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWNQQrCMBREr1Ky9kuammiLiPeQLpL0R4NN0+a3R
+ RDvbrSbgTcwb96MMHkk1hRvlnD15OOQodwVzD70cEfwXWYmuFBcCQl+nCQvT2D6BecY5wdw5Zx
+ Stu6OsmJ5NyZ0/vV33tqNE05LVs9byQIS6b+6Kc6buRTZGO0TNMGwBgywSuBQS+Sm4s65ml8j0
+ X5adG9jCPscl9+b0YTwa/zcFIeu1KYSB2fNkbWfzxfm+j9+3wAAAA==
+X-Change-ID: 20260625-ipq5018-bluetooth-06ff66c9d753
+To: Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulfh@kernel.org>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Johannes Berg <johannes@sipsolutions.net>, 
+ Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+ Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+ Rocky Liao <quic_rjliao@quicinc.com>, 
+ Saravana Kannan <saravanak@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konradybcio@kernel.org>, 
+ Mathieu Poirier <mathieu.poirier@linaro.org>, 
+ Philipp Zabel <p.zabel@pengutronix.de>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
+ linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+ George Moussalem <george.moussalem@outlook.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782396628; l=3321;
+ i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
+ bh=D6SplHxUa3QnaLv8HkHyckjDvA/Fprxyfd+YMfQx7G8=;
+ b=6MKZWbfvyN9Pd5FoUIlXKVCW9PgXMLB8ekM5lOyqEenPO3HzLmd7aZqmcGLCiB4/V1w9BQ4rO
+ W7+WbfMcF11AMEj2N5zJ0b/Tu+DnFmNpy3aZ9Tv7SmbNEM6abwmYVk2
+X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
+ pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
+X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
+ with auth_id=364
+X-Original-From: George Moussalem <george.moussalem@outlook.com>
+Reply-To: george.moussalem@outlook.com
 
-On Thu, Jun 25, 2026 at 07:25:46AM +0000, Sherry Sun wrote:
-> > Subject: Re: [PATCH V2 1/8] PCI: imx6: Add skip_pwrctrl_off flag support
-> > 
-> > On Wed, Jun 24, 2026 at 07:09:26AM +0000, Sherry Sun wrote:
-> > > > Subject: Re: [PATCH V2 1/8] PCI: imx6: Add skip_pwrctrl_off flag
-> > > > support
-> > > >
-> > > > On Tue, Jun 23, 2026 at 11:07:28AM +0800, Sherry Sun (OSS) wrote:
-> > > > > From: Sherry Sun <sherry.sun@nxp.com>
-> > > > >
-> > > > > Use dw_pcie_rp::skip_pwrctrl_off to avoid powering off devices
-> > > > > during suspend to preserve wakeup capability of the devices and
-> > > > > also not to power on the devices in the init path.
-> > > > > This allows controller power-off to be skipped when some devices(e.g.
-> > > > > M.2 cards key E without auxiliary power) required to support PCIe
-> > > > > L2 link state and wake-up mechanisms.
-> > > > >
-> > > > > Signed-off-by: Sherry Sun <sherry.sun@nxp.com>
-> > > > > ---
-> > > > >  drivers/pci/controller/dwc/pci-imx6.c | 36
-> > > > > +++++++++++++++++----------
-> > > > >  1 file changed, 23 insertions(+), 13 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/pci/controller/dwc/pci-imx6.c
-> > > > > b/drivers/pci/controller/dwc/pci-imx6.c
-> > > > > index 0fa716d1ed75..ff5a9565dbbf 100644
-> > > > > --- a/drivers/pci/controller/dwc/pci-imx6.c
-> > > > > +++ b/drivers/pci/controller/dwc/pci-imx6.c
-> > > > > @@ -1382,16 +1382,20 @@ static int imx_pcie_host_init(struct
-> > > > > dw_pcie_rp
-> > > > *pp)
-> > > > >  		}
-> > > > >  	}
-> > > > >
-> > > > > -	ret = pci_pwrctrl_create_devices(dev);
-> > > > > -	if (ret) {
-> > > > > -		dev_err(dev, "failed to create pwrctrl devices\n");
-> > > > > -		goto err_reg_disable;
-> > > > > +	if (!pci->suspended) {
-> > > > > +		ret = pci_pwrctrl_create_devices(dev);
-> > > >
-> > > > Is possible move pci_pwrctrl_create_devices() of
-> > > > pci_pwrctrl_create_devices
-> > > >
-> > > > and call it direct at probe() function, like other regulator_get function.
-> > > >
-> > >
-> > > Hi Frank,
-> > > That makes sense. However, if we move pci_pwrctrl_create_devices () to
-> > > probe(), we may need to add the following goto err_pwrctrl_destroy
-> > > path in imx_pcie_probe() to properly handle errors from
-> > > pci_pwrctrl_power_on_devices(), is that acceptable?
-> > 
-> > Can you add a API devm_pci_pwrctrl_create_devices() ?
-> > 
-> 
-> Hi Frank, we cannot unconditionally destroy the pwrctrl devices
-> when probing fails by using devm API.
-> Since we need to check the return value of
-> pci_pwrctrl_power_on_devices() for example EPROBE_DEFER to decide
-> whether to destroy the pwrctrl devices to avoid the deferred probe loop.
-> 
-> You can find more related discussion here.
-> https://lore.kernel.org/all/tutxwjciedqoje5wxvtin4h637auni5zzpvb7rtfg4uticxoux@yfl6xg7oht7t/
-> 
+Hello,
 
-Yes. Ideally we should try to do a blocking wait in the pwrctrl core until all
-the pwrctrl drivers are probed, instead of deferring probe. Hopefully, I'll get
-to it soon.
+This patch series introduces Bluetooth support for IPQ5018.
 
-- Mani
+Bluetooth firmware on the IPQ5018 platform runs on the M0 co-processor.
+The firmware is loaded by the host into a dedicated reserved memory
+carveout and authenticated by TrustZone. A Secure Channel Manager (SCM)
+call safely brings the peripheral core out of reset.
 
+A shared memory ring buffer topology handles runtime data frame
+transport between the host APSS and the M0 core. An outgoing APCS IPC
+bit and an incoming GIC interrupt handle host/guest signaling.
+
+This series has been tested and verified on various IPQ5018 router
+boards utilizing firmware extracted from GPL distributions, using both
+mdt and mbn file formats.
+
+[   14.781511] Bluetooth: hci0: QCA Product ID   :0x00000016
+[   14.781583] Bluetooth: hci0: QCA SOC Version  :0x20180100
+[   14.785926] Bluetooth: hci0: QCA ROM Version  :0x00000100
+[   14.791546] Bluetooth: hci0: QCA Patch Version:0x00003ded
+[   14.796698] Bluetooth: hci0: QCA controller version 0x01000100
+[   14.802217] Bluetooth: hci0: QCA Downloading qca/mpnv10.bin
+[   16.393850] Bluetooth: hci0: QCA Build Info: BTFW.MAPLE.1.0.0-00102-MPL_ROM_PATCHZ-1
+
+Best regards,
+George Moussalem
+
+Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+---
+George Moussalem (6):
+      dt-bindings: remoteproc: document M0 Bluetooth Subsystem secure PIL
+      remoteproc: qcom: Add M0 BTSS secure PIL driver
+      Bluetooth: btqca: Add IPQ5018 support
+      dt-bindings: net: bluetooth: Document Qualcomm IPQ5018 Bluetooth controller
+      Bluetooth: Introduce Qualcomm IPQ5018 IPC based HCI driver
+      arm64: dts: qcom: ipq5018: add nodes required for Bluetooth support
+
+ .../bindings/net/bluetooth/qcom,ipq5018-bt.yaml    |  63 ++
+ .../bindings/remoteproc/qcom,m0-btss-pil.yaml      |  72 ++
+ arch/arm64/boot/dts/qcom/ipq5018.dtsi              |  34 +-
+ drivers/bluetooth/Kconfig                          |  11 +
+ drivers/bluetooth/Makefile                         |   1 +
+ drivers/bluetooth/btqca.c                          |  16 +
+ drivers/bluetooth/btqca.h                          |   3 +
+ drivers/bluetooth/btqcomipc.c                      | 939 +++++++++++++++++++++
+ drivers/remoteproc/Kconfig                         |  12 +
+ drivers/remoteproc/Makefile                        |   1 +
+ drivers/remoteproc/qcom_m0_btss_pil.c              | 261 ++++++
+ 11 files changed, 1412 insertions(+), 1 deletion(-)
+---
+base-commit: 4d1ab324fcb7d20df5a071edb0304461846fdc12
+change-id: 20260625-ipq5018-bluetooth-06ff66c9d753
+prerequisite-message-id: <20260612-block-as-nvmem-v5-0-95e0b30fff90@oss.qualcomm.com>
+prerequisite-patch-id: 6ce8686c1683f468d86b4502f5ec9d19c392a382
+prerequisite-patch-id: e362f7fcbacff716b7ef720e6780786a7d88c013
+prerequisite-patch-id: 9168930e40551e842c8171d5433a6f39ad4b78a4
+prerequisite-patch-id: 64fecfbd1e085d7d2ab0ae23295ca34ec8e14c5e
+prerequisite-patch-id: 566804aaa690ee9aa285d0fd75fd16d94fbadebf
+prerequisite-patch-id: dc18bec338f54b3051f4523f9d1d3c0566a20ccd
+prerequisite-patch-id: b6b3eb46429936ab49423d295433daf47981db0f
+prerequisite-patch-id: 75caa99e3bbcdf41b6462b9f5f703bea1d4a65fa
+prerequisite-patch-id: 35e9968f482f78ca233eb0306d9c5fdbff093175
+
+Best regards,
 -- 
-மணிவண்ணன் சதாசிவம்
+George Moussalem <george.moussalem@outlook.com>
+
+
