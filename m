@@ -1,293 +1,239 @@
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazolkn19013080.outbound.protection.outlook.com [52.103.14.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E8536DA1F;
-	Thu, 25 Jun 2026 14:25:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.14.80
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782397508; cv=fail; b=Ek2JH4jCmWi43dktpJjyx+mRIbW80YeZRaYU/bSQ2UOI/wFr50PS9vohCgOnfIFmOV7YKaNVgC/LP6IQ1LkN0XXpx6x/3J0i2H+QN5126pGKcvs2EAoVRhLA6RUEexyhKlG0mig103Ay9S0MFUrWBSeL+hFaiSy4ti6sosapS00=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782397508; c=relaxed/simple;
-	bh=QXMjPsbLeLaacEWqZ4530hUF414/zTYYbViKR2WL638=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=XbOYNyj+0CEqubFmP+ciV3gl5CaoNqJ+bjRN4SxPZOYFO4b2p0OMxWgZubOYtZq7hnUs2r4jf2usaVLRTeDIFR834NO2oLTgElDPK3fOXSGUWqn7PARVpxyXyI5XDgXvmmirxJ9dbNUlLmGtnhlaJ1mTiyPKHcc0tSF/I3iBLe0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=f9FsrxA8; arc=fail smtp.client-ip=52.103.14.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE127192B75
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2026 15:47:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782402435; cv=none; b=bGBbZPGj/CGRGr4AwtYKwQlrzXAPx7vnUs1wxlPF0EGxtZysJJek/jjd4wgQSSlBXsSDHbltMAdVW8To/MClP23994W0xv9Ro616HMGSIqhTdy+2epP/eya0LpsH8ghB3DsiKQBSxu/RS/NHFAQ9oAtHY2BTYPlD5fcHRfDLFoQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782402435; c=relaxed/simple;
+	bh=y1tGCXfFrYiPwOfJId41dnxkkRPzB/YsWNfC61rN0k8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ZInErjA9OvnQqkiL2ZwEB2kru72O6VXmORqZj5HRbt3vhtt7PVeaaL7wrk7BsKyxVraBtE1PR6s50DeMhTJ+S2xE2ATzsG5+ajp4xjXnLQItkwHfDV9GA+IqScwSonLEvJsNRBp6r/iqaNiKhNeuTv1TwljwgzImW/8DQkP5/jI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kFbGmPWQ; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="f9FsrxA8"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ztx/9WQrzyr+G5Bd8QPV5r+D3VUujlwT7m1F0olZ+8cg3vDlYsC4h0tHqsjfJenU4LvWS9dPgelfglrcptA/ar/gr4MwA4VZlY7eye/i1V0m3zzij+0zC9iDqT9173fzAsWV6AflLESAbwFrRwiagvU8I/vay5ngcTQsOveoZE26gLtUbURF2ih0LsbmtmtXxdU508jNXmd0xR/cVM/yj2CY6Fx06pWl3w2vZ0dUYJaBQJe3uFDsytt+54VghwBAbXW4JyQuJ6g00oeuRoQdyQdzJu9PDaWReuMGnZ+t/TZqPC9eXiRwgBwWmdBL5S09awaO82BhHjbNwJSMgi2Z8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=g5f9VsYJwLq4AYpPqV2rvGHdoEUUyi99/rKpR3Dw37Y=;
- b=cek61uSJ93+otlWMo5I1t+ldsRLns4beCfUod7ErJ8vXZjN8TLysCRRjg+BU3/F6JRGp/8vcdHV5F3SlDqWaTLN4mrnwjyTMIM72FW/ujaUZb75YW3SGqZoIXJmcCtpm9C2cAhCLEPclQmHdL3rDiS9a0libSWFJ0kd9G9I2AJZopsGXsfUujPc7RfRO4m0mrBNkQR11X9zoyqWVYPWXyI0/gw/p8wfHfWuZ+/QjxTmmoCIVlEBNI7zdu0yYcwLB1AcUnM8i+nI8pKj5YJjIIEAnZ58eiu4DNtnnUai5Qmfa1ZuSwNOrBNu9czNHBjGPXzAkBU7QwzRETiXi+ptZUg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=g5f9VsYJwLq4AYpPqV2rvGHdoEUUyi99/rKpR3Dw37Y=;
- b=f9FsrxA8GpiEXy9hRHeSNNccVs6Iv0eoNcunMXs9Lc1P6fVnF43gIegeahd1vJ1KPPqtsLYRaR9Nd7ARgYG6kUQM/jCYn5l0RPgXAydBtLgfr6WSwSef9isEpdDJxM7Xn7eB830SvWhbxNLjES685imqGdcaHKilJNWf7bzOVgCMwaKG0JpMVqspuCZChRYqwOTFF0E/l//CbW3Q5kxevI1SFx/WGdStJ683bgjQnFxpQyYsyCSmUu0Z54WReX/3eRApdA4CBaCKQBt7UvQ36/gokKxbcRLC2jLDEL2GAfA2tawftvGGSj8okr9H/Dz+h0la8dHnDF7BA4Zh2mE5/g==
-Received: from SN7PR19MB6736.namprd19.prod.outlook.com (2603:10b6:806:263::12)
- by SJ0PR19MB4622.namprd19.prod.outlook.com (2603:10b6:a03:28b::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.16; Thu, 25 Jun
- 2026 14:25:03 +0000
-Received: from SN7PR19MB6736.namprd19.prod.outlook.com
- ([fe80::4b6c:b84f:b71c:d0a]) by SN7PR19MB6736.namprd19.prod.outlook.com
- ([fe80::4b6c:b84f:b71c:d0a%3]) with mapi id 15.21.0159.007; Thu, 25 Jun 2026
- 14:25:02 +0000
-Message-ID:
- <SN7PR19MB6736656C55BC6DA32A3E75CA9DEC2@SN7PR19MB6736.namprd19.prod.outlook.com>
-Date: Thu, 25 Jun 2026 18:24:48 +0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/6] remoteproc: qcom: Add M0 BTSS secure PIL driver
-To: Philipp Zabel <p.zabel@pengutronix.de>, Jens Axboe <axboe@kernel.dk>,
- Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Johannes Berg <johannes@sipsolutions.net>,
- Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Rocky Liao <quic_rjliao@quicinc.com>, Saravana Kannan
- <saravanak@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
- linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
- linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org
-References: <20260625-ipq5018-bluetooth-v1-0-d999be0e04f7@outlook.com>
- <20260625-ipq5018-bluetooth-v1-2-d999be0e04f7@outlook.com>
- <439f76c3fcafdfb91cca426fcae17ef776776eab.camel@pengutronix.de>
-Content-Language: en-US
-From: George Moussalem <george.moussalem@outlook.com>
-In-Reply-To: <439f76c3fcafdfb91cca426fcae17ef776776eab.camel@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AS4P195CA0034.EURP195.PROD.OUTLOOK.COM
- (2603:10a6:20b:65a::22) To SN7PR19MB6736.namprd19.prod.outlook.com
- (2603:10b6:806:263::12)
-X-Microsoft-Original-Message-ID:
- <aab339ca-6b5c-472b-9737-87d41e49e8a4@outlook.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kFbGmPWQ"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-519f758bd33so18577921cf.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2026 08:47:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782402433; x=1783007233; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=QBymzey7IhlkaJkRh2S7qkBybbZSByeoITRDZQ1rLb0=;
+        b=kFbGmPWQNjMG6EEc4zRtcoJMsihot3CHDHf8FWs1rrDTY9Wvedew0nqBDMWt1D562P
+         ujzZmu4vdcmNn/KeikrOhF4IIqGH5hWVvQ3H3gg1fy6y2gRT6UzwMs8Y6p91aw0Iqh+x
+         GiJzembo0ZWX+fhOU4d7vs9hp4QWKCNBirtA2ixUSPzjlCx0i8+Y1Micm8MISyjfgp3b
+         G2CKZ5Uh6Y2jsvq8tiwb/r6EmC+tPRxuZ621D5n/xPDOsA7yIdaRm4szJrj5pwNodR7q
+         /NVlWGYcInvqiXEhfF1bhZQQ7Glg3TJlv+SuHX0p8pI99Ha/L2aDG1TavXu9omU35PQA
+         +L8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782402433; x=1783007233;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QBymzey7IhlkaJkRh2S7qkBybbZSByeoITRDZQ1rLb0=;
+        b=aZ02aHAySBy7rw4+qBqkOeB/ZxCwnLAAnKyaw/IrNiRZjMP8dVOX4X58doMklIMpZv
+         uzHPilsciPJ00l31k50bqDPNoJLtp1V5RC4p4+uwNbzmyCG3jXCunveCcDK6fQnhR7bz
+         QG+yDI6X1q3f+7kGkWOF6rbwFk92/5k43P5VVNxZDCtzREhsQ3oirKF143n1+dqxZlay
+         8jQEAm+Lu9j9hXZPIWR6aHjqtjRS6R6xZAVcqUALjle+6yhgskdYbkhEgpNbqo5gYvE5
+         9y0U8kFSFHAgLecY1KWjbJdWFRwJKthlr02tJdAUCG32Vc1YA5G6Me+bqcXivxH/GuGR
+         urrw==
+X-Gm-Message-State: AOJu0Yy/g0eZRp6kxybTpxObCNuNUKMhtctjJedF4ukLxEl+bge7nbCu
+	4zPdwogHa2t3rTjy8LJbcG/hen0kT/83LWUZ/PaQHTWqKE+aOifZgT8Vgwo5+Npl
+X-Gm-Gg: AfdE7clf7AwVTIYPPNW8j0xJ1M+VboSO/fKTynvkJJ66HLxMM6xEjS1tUyRGMsgQXIj
+	agpqGqwKjcUO/DWhBmXByNwmbYwL8i9y40RTqjOKtEmA3iNiS3YpsdhornjzMS69867n15/RxdW
+	HifV/U49QDvi5GBXXHOO9060/xTA+siaYOmEbrBMqeLX5N7jRVxLMvevPohMgX3/g3MUhA193k7
+	SBEkdFMUlpfDPZuUhmfVVAFU17eENt8xLLm8VRpw5gG5F81CEzV+qZ6rv3Qb7UOnhQRA2DQx+ci
+	KvS8PZKQ1gRl4bd97tceb8Je4BJrRvxr+330JtNnb2wA75cKJUi21QcAv7DgTVFOTQ3GFbuUURT
+	Mr6gjExFWkxrTkkD7pe6vr1lkGv6zys/XtWGdMNLe462LIq35wj//ewh8iM4s/dENw88IdGNkJR
+	NNYO0cwanb7NRhoTgw0v4i
+X-Received: by 2002:a05:622a:1b07:b0:517:6508:e1f4 with SMTP id d75a77b69052e-51a72a824aemr43846711cf.42.1782402432632;
+        Thu, 25 Jun 2026 08:47:12 -0700 (PDT)
+Received: from [172.17.0.2] ([20.127.214.209])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-926005a1892sm853169885a.38.2026.06.25.08.47.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jun 2026 08:47:12 -0700 (PDT)
+Message-ID: <6a3d4d80.0aaa7f3a.91870.9e46@mx.google.com>
+Date: Thu, 25 Jun 2026 08:47:12 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7611692904576294823=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR19MB6736:EE_|SJ0PR19MB4622:EE_
-X-MS-Office365-Filtering-Correlation-Id: 12ef7d2f-83b5-4fcb-7ca9-08ded2c58b11
-X-MS-Exchange-SLBlob-MailProps:
-	dx7TrgQSB6cUe9t9Fs5HiQGsDL5YS4Qs2BZu8RFnRVvnmRZ50OLmZvuZddTIKQYBJDJ3dcbD3MjGALgl4piH4lEY7nWQfLnigh26shyJrzR0iaVV0q/zQmEsbLxBgIDkXm/L1wyOMTKpF4jB9lK/Unf5SU4v8/ESc9wgvqTMq0MrxksKbrAQTsTXwdzjINiNXm0UixeQvUY7A0jx2niOf7+HoH4MOdqXKrQhRUf3eZGFIZj35V8cuGwjSwJu0r7baLWc3mS0UrIAoio0GAN/VU/Dl1ajWzzrNzt1SxtV9F5YQB8jyK7yJOxvz/06QOulIsIMkr+NhX9MthJE4CelwFV17hOMH8VOn9lZpayf1DZvj6ZEDkaEHSOIVEJw6bsdrpc96XyCPCRtUn5/xvESko9bdjAiH75lblNu12hhw5gcY/BY63eLQsRfInl7bFo5R57kMuU1meV12GG8oalsj4uRpRFzzehxtwgE2Eb7/RtrOO774ixxsSWmPxziJ0lnvgJ59BVO8MEb8Y1S8jb+eI5NmKQnWUNUcN/7n4Cx/6N+j6/xvkUvDzcJSnGTPbIGYaONdiWM/4J0mkpUPAl8xPjs/KzfK+I7r1BNRKugDkdxx2XZP5pKs83uj5Df1tbX7FqfCk9rAF5Mx4DTZNULrTQ8pIuFIO83XkemQZQRcAMQurIZ0twiA1547/NBhk8LG4J5+eSqiceHopoO2Pw+wPKW96tBakwxBGnks+VWBDhWeLpQF8rnPq4bXYmZ4U6FWju6HWmJ7i4=
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|4140399003|15080799012|25010399006|23021999003|37011999003|19110799012|5072599009|8060799015|41001999006|6090799003|24021099003|53005399003|40105399003|41105399003|3412199025|440099028|12091999003;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ZjQyTmMzNVBJYW54eHdzekd0Rktoem9kYm5IanIvRHFWZjNuSllVZGp4cVFj?=
- =?utf-8?B?WTZlWDRvRXFOeXZMekNxV2VFd0F3cjBUM3MzQW9zTWUyemM2c3puZzMxTzR1?=
- =?utf-8?B?U0Y3UWZtaGNZMTkzWS9lZmgxVkdaWUpLVlBYYmdDcmltQkdVdThtR2cxbjVH?=
- =?utf-8?B?aVhZcjNrT1MwUVE4TW1Lc0RFa2pRUnVYVnpGdnFSd0hxeXFsZ3JzbDJnNUEr?=
- =?utf-8?B?Skk0SEdFWTJLMEN5OGFOcG8xWVdkVGZ2SEJ1SzA3aVAxMC9nbVN2WDU1Y0pH?=
- =?utf-8?B?TG54VmEzc3htVmdjM1F1QmhxYVJFQjJQMWVaaTVxcjAzVHA4eVowNXNCcm5Y?=
- =?utf-8?B?dWx4UFFXUzladW5GQ1Fzc2ZVbCtPTGExRmpMTHAxNnFXQk1aUFFBOXRiaUZQ?=
- =?utf-8?B?Q1QyeGV3Mmp1ajNUS0k5dUpDWm5QN2pXbDdDSG1OVGl1Sjg2cGhlODVoSFhj?=
- =?utf-8?B?NWs5ZFRlNU1XbkpzSEU1UGdFYUkzY3g0bzU1blVPUjQzaTNycmQzQ3dEckhN?=
- =?utf-8?B?Z2RGS29BdzRmWlVBS2tvdTQ2dWc0SklhditwVVFkME43bEdMUXMwNGxVWnUz?=
- =?utf-8?B?dVR0dEMwM1JNMGZjSmFuMXh2ZjUxMXBHd3ErQldPbWhwdG1VcUJ6cWtSMW4y?=
- =?utf-8?B?UndWTVJKOHdaN2FRZjcyV0ZIdHo3MFlKdmJ1eVpjc2xJdGxHbnh6UjhLbWJi?=
- =?utf-8?B?TlZYODM3eUhTOGxuNytnME9vVTVyYi9EcnBpZmZ2MUdtM1JSdkhzZngwZWV1?=
- =?utf-8?B?RUVrdGFnQTZNbXB5Q015RTdQOWtSU3IvMjRtVlQ1a1JsdVBYMzZibjl0VTBH?=
- =?utf-8?B?bStwMEUrdmRHSTJMcWFCVWxkRjF4cGF6RWNaL2kxai9LdWhWQzNrVnJLS05a?=
- =?utf-8?B?RmlMM1diTE1aYkIyWXpNSVJaMTYyZ09takFwQkdHbGFNT3hSM0h4VmNFalA5?=
- =?utf-8?B?OE9ieGtxaWxHeW5EemwrL29GQmNPYjB3NENkK1gvbG1JUE5CSTBNSE8yU0ph?=
- =?utf-8?B?S2NyLzhEcE8rVWViUU41dnYxeDlLVGNZdXNvRDVUTXlkeHVROW10RGg2eklk?=
- =?utf-8?B?MGpzcWVQcktER2UzQ2U5TFMzTWdxY0ZTb1o2KzZtN3JBSHMrL0JMaUJrTEJF?=
- =?utf-8?B?TWFlaG0valFEbTdZNGZJK2g0WFdlb2RHZFBjYU9sbXJpWlJ5RUJEdHZmVFV4?=
- =?utf-8?B?TlBYVTBVdDZTUndhRmtOVGxSWDcwRitWYnJzUmdZWHdQTlFSR3owWDdnVkl4?=
- =?utf-8?B?ck9ub0phSElodjZSMXM4TS9xVzRHTXNsYTZFYVNFVUp3RFpoUHdGWm1QSlNK?=
- =?utf-8?B?TmpnZENWWjEwa0R5a1ZHM3FoaHZudWo2czZMVU5GMXBTdXNiWjVVUzBDem1a?=
- =?utf-8?B?MDJpYXBLQlJ4V0FydUluNFBNOE9tSFAzVHZBSStYSjcwZWJjN0hjZWpwUllZ?=
- =?utf-8?B?elJMS0hacjgrZXlDQ3Q3bEcxSVQ4YmJqTkYyNGtTQjM0bVVFVEo1TU02MTNO?=
- =?utf-8?Q?BvQPYo=3D?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cnVVd3c3UCt3UUVtdGp6WklMdlowTWhaaDdxdUZiZHdkbGtaSGZMejBPQmU3?=
- =?utf-8?B?UkxkemhUTHEzWnFjU2xNc3Vtcngyc2IzdHJSS0xTSzJlTW9uZm5JU2FwUTJz?=
- =?utf-8?B?dWlHZTAxcjVJbWgxNzF6WFNVKzh3S3MvT2J6RTN3RlFKem4rOFh5ZmZpK2Va?=
- =?utf-8?B?VUs2VSs4OEg3L2VVQW5iRWhlWUNXQ0FQSTMvVEdXem4ycmNpTUI1SmRURWxO?=
- =?utf-8?B?c2ZVb25UY0wreFphb0NVZDlUSm96eDduTEJtQ21vZWl6Z1dQTjd4YVdKdXNo?=
- =?utf-8?B?VkJub2xEbE1SNTlLelNvMVJUeTdRdURiYktjbmRTY2RNdWRrSzhBRWpXMDFq?=
- =?utf-8?B?NmVIODVmR0xTcEdjOUE3Y1YrVVBOcTcwY1ZuNVN2dkhPTFF3MEpHZU5BT3o0?=
- =?utf-8?B?eGx5Z05WQitDZkNkNGNsRHNRS1c4RXBZUmhiUTNnbWtXSDRSZEN0UGNWamp2?=
- =?utf-8?B?MnJqUVJKYWVONHRYK3M2OTlhYXpKcGlDNytjZXZ2VUQzdmlmOVdUVXR6NWdw?=
- =?utf-8?B?SDZ1bVhEWnVoN2gxQzRiTDFXWGxSd2V5dk9zbDkyZUJKbXgyRzFQcHA4bWIv?=
- =?utf-8?B?bHA3c0hFeGN3K0JIZFhOdjBFWTlnRHYyYXRXRzlEZmlUWEFteVBEdVl5N3lx?=
- =?utf-8?B?SjA2VThTUDMreTFqamprcTBpajZYMW9PaTM1UW9IVnF3Rm5xODQza01Yb3Ex?=
- =?utf-8?B?SEw3MXlvK2VnOVU4dlNPaWZDaXJBSXBOTVhJWXllQ3kzWXdFcVNVSjI5cG5a?=
- =?utf-8?B?VmpvbHF1ZUFRVHRCMytvdHhZUXZ3SkdqKzVhS21rYno1SEZYMjV3ZUI0Zkx2?=
- =?utf-8?B?RVRIdmcrTUdSdWlhWFJPcktxK0NLNTRPaWVHd0JnVUVzblpmSm8wSmlGdTkx?=
- =?utf-8?B?bnFkSDZqZEJaZ1M4Q0pMaDluQlBneURRODF5M2RZNDB4SDZzZk92L2pINXQ0?=
- =?utf-8?B?NXlRRzM3NDE5R2hMQTk1VXo3a0NIeXlPU0UyRXU2TkJFalh4WnpvYjlCSTJF?=
- =?utf-8?B?aUN1MC9yTW1NYVhSNENmQkRtcE85QlBCZ3NETGVmOFZiSWxoSmptc25JOGJD?=
- =?utf-8?B?L3FCQXUwWlVzbWRXT1RBdFdYcnJmWTZtODZwb0piZmRHa0YyNENqUXVoNDZM?=
- =?utf-8?B?bGx3bVpnR1l0Q1NYYVpQRmx1NENDcnV4VytyaHRIZCtiVFcyU1o1M3I5QVpI?=
- =?utf-8?B?VVpiWlB4bW1OMkVzZVc3VHFJdzlVMUV4cWk4akZNZDBBZFdCZDc1QUc5UlNC?=
- =?utf-8?B?R0hWNXAvdG1BVzFsbS9wbFZiR3lLK1FkMnVyYURIY2VaWXhsVnM1MitxcXcw?=
- =?utf-8?B?M3ZtdDFoMU5NS3RLLzc4aFdxeGZERW9nRHp1a2RZODVFaUI4eUZIdm5BcHRs?=
- =?utf-8?B?aHZwdXBJU0swRGdMU2lqWU54bTl4bElDS2Z0a0tHYllLL3IxZkxUVlZwcXhx?=
- =?utf-8?B?eStWV1RGRWJBZEs0QVE1UlpoSFVrdGYxVGdURXd1L3lCbHhHZUFtTktQQjI4?=
- =?utf-8?B?OWlPdFhISVFQVWRVcnQxVk1HejdaRGc3OTRMT0VqWFVQc0NxVVZSNmZxd1Qw?=
- =?utf-8?B?Z1VOZWY2ZE5ISVpvUkRrS1QvVXN3T08vZk5SZ3RPWXFPamduNEVvaWIySmhh?=
- =?utf-8?B?U2lRWWJFNnBSUEhVOWdsUEdnTXEyTW1abXB5K1UxeEVXQlp3YnM1eUJXOXdD?=
- =?utf-8?B?MjUvOUUrSG0rRjZBNU1tc1lKUXRNc0tMVDYzYUV1cmdJRExaTnVLdUpka0Q3?=
- =?utf-8?B?TXRtbHNCTjVCekM2MzBRTnNCTkhVY29mR1dCMVNsMzd5ZTJlQVZtTFczUEVi?=
- =?utf-8?B?YmpuSkFQRzdiYm1TMGM3OS8xUFcwZ1RHZThqVWZVV0FsQkVIdFhoNUNLdGgv?=
- =?utf-8?B?OGc4M3R6emlIN1c5dWZsVStpdlVMQWVkNXIySStLV0l2aFE9PQ==?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12ef7d2f-83b5-4fcb-7ca9-08ded2c58b11
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR19MB6736.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2026 14:25:02.2196
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR19MB4622
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, george.moussalem@outlook.com
+Subject: RE: Add support for IPQ5018 Bluetooth
+In-Reply-To: <20260625-ipq5018-bluetooth-v1-1-d999be0e04f7@outlook.com>
+References: <20260625-ipq5018-bluetooth-v1-1-d999be0e04f7@outlook.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Thanks, that was quick!
+--===============7611692904576294823==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On 6/25/26 18:18, Philipp Zabel wrote:
-> On Do, 2026-06-25 at 18:10 +0400, George Moussalem via B4 Relay wrote:
->> From: George Moussalem <george.moussalem@outlook.com>
->>
->> Add support to bring up the M0 core of the bluetooth subsystem found in
->> the IPQ5018 SoC.
->>
->> The signed firmware loaded is authenticated by TrustZone. If successful,
->> the M0 core boots the firmware and the peripheral is taken out of reset
->> using a Secure Channel Manager call to TrustZone.
->>
->> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
->> ---
->>  drivers/remoteproc/Kconfig            |  12 ++
->>  drivers/remoteproc/Makefile           |   1 +
->>  drivers/remoteproc/qcom_m0_btss_pil.c | 261 ++++++++++++++++++++++++++++++++++
->>  3 files changed, 274 insertions(+)
->>
-> [...]
->> diff --git a/drivers/remoteproc/qcom_m0_btss_pil.c b/drivers/remoteproc/qcom_m0_btss_pil.c
->> new file mode 100644
->> index 000000000000..7168e270e4d4
->> --- /dev/null
->> +++ b/drivers/remoteproc/qcom_m0_btss_pil.c
->> @@ -0,0 +1,261 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * Copyright (c) 2026 The Linux Foundation. All rights reserved.
->> + */
->> +
->> +#include <linux/clk.h>
->> +#include <linux/delay.h>
->> +#include <linux/elf.h>
->> +#include <linux/firmware/qcom/qcom_scm.h>
->> +#include <linux/io.h>
->> +#include <linux/kernel.h>
->> +#include <linux/of_reserved_mem.h>
->> +#include <linux/platform_device.h>
->> +#include <linux/reset.h>
->> +#include <linux/soc/qcom/mdt_loader.h>
->> +
->> +#include "qcom_common.h"
->> +
->> +#define BTSS_PAS_ID	0xc
->> +
->> +struct m0_btss {
->> +	struct device *dev;
->> +	phys_addr_t mem_phys;
->> +	phys_addr_t mem_reloc;
->> +	void __iomem *mem_region;
->> +	size_t mem_size;
->> +	struct reset_control *btss_reset;
-> 
-> Why is this stored here? It doesn't seem to be used.
+This is automated email and please do not reply to this email!
 
-will remove it and use devm_reset_control_get_exclusive_deasserted as
-suggested below.
+Dear submitter,
 
-> 
-> [...]
->> +static int m0_btss_pil_probe(struct platform_device *pdev)
->> +{
->> +	// struct reset_control *btss_reset;
-> 
-> It looks like this shouldn't be commented out.
-> 
->> +	struct device *dev = &pdev->dev;
->> +	const char *fw_name = NULL;
->> +	struct m0_btss *desc;
->> +	struct clk *lpo_clk;
->> +	struct rproc *rproc;
->> +	int ret;
->> +
->> +	ret = of_property_read_string(dev->of_node, "firmware-name",
->> +				      &fw_name);
->> +	if (ret < 0)
->> +		return ret;
->> +
->> +	rproc = devm_rproc_alloc(dev, "m0btss", &m0_btss_ops,
->> +				 fw_name, sizeof(*desc));
->> +	if (!rproc) {
->> +		dev_err(dev, "failed to allocate rproc\n");
->> +		return -ENOMEM;
->> +	}
->> +
->> +	desc = rproc->priv;
->> +	desc->dev = dev;
->> +
->> +	ret = m0_btss_alloc_memory_region(desc);
->> +	if (ret)
->> +		return ret;
->> +
->> +	lpo_clk = devm_clk_get_enabled(dev, "btss_lpo_clk");
->> +	if (IS_ERR(lpo_clk))
->> +		return dev_err_probe(dev, PTR_ERR(lpo_clk),
->> +				     "Failed to get lpo clock\n");
->> +
->> +	desc->btss_reset = devm_reset_control_get(dev, "btss_reset");
-> 
-> Please use devm_reset_control_get_exclusive() directly.
-> 
->> +	if (IS_ERR_OR_NULL(desc->btss_reset))
->> +		return dev_err_probe(dev, PTR_ERR(desc->btss_reset),
->> +				     "unable to acquire btss_reset\n");
->> +
->> +	ret = reset_control_deassert(desc->btss_reset);
->> +	if (ret)
->> +		return dev_err_probe(rproc->dev.parent, ret,
->> +				     "Failed to deassert reset\n");
-> 
-> Shouldn't this be asserted on remove? Otherwise after an unbind/bind
-> cycle probe will enable the clock with reset already deasserted.
-> That may or may not be problematic.
-> 
-> Consider using devm_reset_control_get_exclusive_deasserted().
-> 
-> 
-> regards
-> Philipp
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1116589
 
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      10.08 seconds
+VerifyFixes                   PASS      0.27 seconds
+VerifySignedoff               PASS      0.31 seconds
+GitLint                       FAIL      3.87 seconds
+SubjectPrefix                 FAIL      1.71 seconds
+BuildKernel                   PASS      25.31 seconds
+CheckAllWarning               PASS      27.86 seconds
+CheckSparse                   PASS      28.46 seconds
+BuildKernel32                 PASS      24.83 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      459.56 seconds
+TestRunner_l2cap-tester       PASS      58.15 seconds
+TestRunner_iso-tester         PASS      74.50 seconds
+TestRunner_bnep-tester        PASS      19.39 seconds
+TestRunner_mgmt-tester        FAIL      211.62 seconds
+TestRunner_rfcomm-tester      PASS      25.51 seconds
+TestRunner_sco-tester         PASS      32.73 seconds
+TestRunner_ioctl-tester       PASS      25.67 seconds
+TestRunner_mesh-tester        FAIL      26.17 seconds
+TestRunner_smp-tester         PASS      23.93 seconds
+TestRunner_userchan-tester    PASS      19.86 seconds
+TestRunner_6lowpan-tester     PASS      22.74 seconds
+IncrementalBuild              PASS      37.70 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[1/6] dt-bindings: remoteproc: document M0 Bluetooth Subsystem secure PIL
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#108: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 72 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14645041.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[2/6] remoteproc: qcom: Add M0 BTSS secure PIL driver
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#147: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 286 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14645042.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[4/6] dt-bindings: net: bluetooth: Document Qualcomm IPQ5018 Bluetooth controller
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#106: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 63 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14645044.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[5/6] Bluetooth: Introduce Qualcomm IPQ5018 IPC based HCI driver
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#150: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 963 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14645046.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[4/6] dt-bindings: net: bluetooth: Document Qualcomm IPQ5018 Bluetooth controller
+
+1: T1 Title exceeds max length (81>80): "[4/6] dt-bindings: net: bluetooth: Document Qualcomm IPQ5018 Bluetooth controller"
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 488 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.245 seconds
+LL Privacy - Unpair 1                                Timed out    1.861 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.742 seconds
+Mesh - Send cancel - 2                               Timed out    1.989 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/352
+
+---
 Regards,
-George
+Linux Bluetooth
 
+
+--===============7611692904576294823==--
