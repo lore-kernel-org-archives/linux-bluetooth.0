@@ -1,642 +1,1371 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665633126CA
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2026 18:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4164B3126CA
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2026 18:39:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782412690; cv=pass; b=fiKRKaR0rJVlx5ZDokyXdhw1h2s2vAK2P1+2CUuDggYAqwZNehM3mXUah+/rG7B2iydPEoSA6cRgGDdDmpGo1CoXvhSfUWPemguEdDw9fbzkMpMhcvY1mo+Aj0Q7rKj2vyGoZWXseBRnfQ6EmFQhn88c+QHApSkxJm1DvD5CvnA=
+	t=1782412798; cv=pass; b=hjxvOixFMUJ/nsIu+RHhVSQxkHIU6Ejl1sYqJe0Co5l2uJpPmvd2DkGqLZ5ppFzdkN/mCYa44CH/0p9B51kF3T79jl4a7ij1QtO7Ozdsd1PjiZnpw3vt08D8wwQXyMOD/H9cZBnClNt9hkJbrPfk069LlRvmP7r9lHhxbb0h7B4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782412690; c=relaxed/simple;
-	bh=K8AU7D0EUiiTQGFhtne3ZvzRgaDcst+8aMEGiHAUAdI=;
+	s=arc-20240116; t=1782412798; c=relaxed/simple;
+	bh=4PwpWCqnqwbZaHj6bMLECfvTTbX6VvhsXsddQLcEdH0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mkgR9kE4g5FEvea62odogC5t1/T0IGV7rAtOwLTavKQd1xDL7fU4e3eSlksO5tv2yuEXGW6Q6RPrJipf37LelyMhXThoOOT/L3zmFwJ7EZOgHBl6x5HLqxdLQfJ5WNTW9SDxu59FmmEDOc7jWbo7JuxUEe8UkIoZr3zpD8bfxGU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rGxdaiar; arc=pass smtp.client-ip=209.85.128.175
+	 To:Cc:Content-Type; b=txsMaHrkA178cLZM+8q3pXsO7O2x9HRfQD1uGp3LML5OjtI+W3xnHvTfupy0gxQANnoIvWPB5/jbNQfZlG/i6td8WqrRZvFT47f5YzpvO1ZpJNMJsM8wlO7z7Rv3uYthfshuRYkhJtAjVN+XKI26HD2wNWG84SSlUxQO1lQEd38=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n6onKLA2; arc=pass smtp.client-ip=74.125.224.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rGxdaiar"
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-800619d5e7eso4572637b3.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2026 11:38:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782412687; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n6onKLA2"
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-6647c26a4a3so236239d50.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2026 11:39:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782412794; cv=none;
         d=google.com; s=arc-20260327;
-        b=k9317CJR9FYYOpmLOVmAwYCoasNbYYfY0HGIdnmQ9Q08rMnLcXUySgfh4/9dnEBKuo
-         n7chqzArK0UR2UptULko5caGrhoTkf5/ALkytbswSyKsW37NzluLPS/trBFm7l7cSt1U
-         byCPt6PZYp/RQbvnvm7ENMD/Te8ThcbSCHe7ynyqKVhoBF5v2a5kypW2I8HYKZ8DICdo
-         yCNikDvrxQ6L/4FseF528fu/dI2R2Xt05qb4LSv8mZFrxJ83+ZcVmH0u6r5VEgUNlu06
-         qHuX5eViwti4vctmsmmidYqBnm0Ll99h/nyqCZhj0Ryo9/B5QO4OgcsFK6+JNLMEmwgj
-         pDKA==
+        b=RssCUziRyIW9oO3cjpFnmQsp3+1wyWuWtyGFMxJBip6FJSGfxdZjqntk7yxM2QP+Xs
+         0YSLoZWvMPv9oU2UIHHRfctLr6URSoUDIIkWz8sLYR55mzbUz4D9FUZVJWRU0J4+DbKa
+         QgV1cY6rmwOrmXBtktDvnFwamQriyGv/rMwW61gtwqNOB56l3eDo/+IXt4H8y9pmSNnb
+         wNm2hnUk/Ou05IJLBpw2XR0AIEmbwGkLbQdqPcs0+cJp8Q7e0PUMTkJ+qKKGs9yLK+M6
+         DUql3mBNpSOYuhSSyZWfQbsV4JmIblJOUHMs3eIJLu07jN0r7VcM18lDi/5xplK8xIo8
+         tSeg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=Bj+H8KyqSqZJemvQ7/+PsCTryvM5ixfErY6XCGM2XsE=;
-        fh=6UxMcYllVRH5YvMbeS2T5Rg/hmIr5L/RWhoNsZehY/g=;
-        b=cnGkWMOLbeC5fhs3bLBhbIXaTyPT68XMOrv6p05TP86D4QcgW6f97U0gkYB4OwrRpt
-         CoN1ZnZ3OlOF48VtgYG6y2bHF3WhLB7UbKi7su4/SHT4OKZLm3CQrEDTCHn6QO+5t3Al
-         sYN/JnuG3VXjoZtDKXcp2nCPB97AT60auByHZdx1QbehDvdawTZPELYDZW7w7HLiRzc/
-         ENW8GaRSMosJRq9zxbfUy94hA9inJ7HDU/jt14+3r2/wKAw/hrRNHLpR2QGcvF9J+2JF
-         7CUZNPs8M21gqXFpOO/McO81kvBYnxSWag//q3kYDyaX7vWt34LTI21Dlxiz9J5fdjFm
-         Mrig==;
+        bh=NLGFpRO6oCXazxFNN01n2/MLSgwZq8gccBHj2LTrKEI=;
+        fh=Hsrkh+BqVPZXNjdDgNsvcM7WWtRde7T76hOAeQdJ7FI=;
+        b=E5r9zJaqWLUjrOXszgrLj7ACcV1t21WqCnttd2yOFjtxzKPvvtt6HT8Z/TzMbXfNjx
+         t5hPeO7OSaNGcdwDsaFswwa493Z97TmOUzz17jpSec0H3UDEJDNFoDntK0bnJykSjyTG
+         GrOJJ3Bfb4ZzENnGarguECjfIRkfR78pG+DIDBRDtalPFxCXYszxwv1w6fD0E3bTUlqB
+         4HBfbqSoRBz4g9n7cAv/3PCFqAOjtKuxhd8w9AaDZdHF2uNRjgYgbZN4399qcg1w/37+
+         BrY5mNt8GY4MrbXFPGBSJTCj6tniquWayUwdbJ7OssC8EqzZitA0zgnCqi/sdNVC5YlX
+         cMww==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782412687; x=1783017487; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782412794; x=1783017594; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Bj+H8KyqSqZJemvQ7/+PsCTryvM5ixfErY6XCGM2XsE=;
-        b=rGxdaiarNcJtk3Ovw5InKw4mnjt2GPWiqebZLIGbMxWwTUlnV1vk0zBawpytOIgGMZ
-         /oipx+r8+4C7I2EXWV5vS61ErEQSr3tabuy5lXNMa8DJBl1wF0j/KaWwyd4S6zBYljVA
-         +n43SXnNU8BQ3HMWCIoRBcTklpGWqC/1JAi8mf3BWhpWPexeMULJDlYDqmwGwn8YSMdQ
-         1gyluHOr+pp8Xy8Eq6sZLeCMnsEijtX9KyKtqo6uwfLhHTvtIbqxc8He1lsUlma3Nkqn
-         QObKpsTARvKcae4gP/tFs+S4deDuuhadMelyKfaR7sWzj3sb5LUu5L0Gynl71jITcIkS
-         /i0A==
+        bh=NLGFpRO6oCXazxFNN01n2/MLSgwZq8gccBHj2LTrKEI=;
+        b=n6onKLA2gRb1Z4801a7L475M/ZovsgZK8XL1nPL2kKml6s+0wA0us7YcXjnxDBzhXW
+         PH8FEqYcZe23BSasJ3rk2TbY3nu/AwWOhdVS8Dvm0rxzmQhiZFe+e8hwSlAHsapCs6Bv
+         nixckDgCMvxd4GuTIBc99A4KWUgBbpGcpmPmFnJWJ5fq3skl/Lt31eoUyYaR1JTHtPnC
+         lmPUYzruWxNml8BzF7Pa2SNq8YjVJrvPqMY8vKCz4cVGSN8vithP6LEkDqoobLE8Kv6I
+         wjg2Hwyl9oVWRmIPjG9mSkh4Vbg+6vmZa9jQ9DOuw6KpshY6c8KlrQDUBpHAyDajzmBV
+         0iZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782412687; x=1783017487;
+        d=1e100.net; s=20251104; t=1782412794; x=1783017594;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Bj+H8KyqSqZJemvQ7/+PsCTryvM5ixfErY6XCGM2XsE=;
-        b=R+rOEjyksEd1oh2EaYh596FDonzzAXbTzF9f2d8v44xqPvf7zLa45C9flGSnTsW5Qs
-         NEjISlCMt7Q9UAoqYwvrg1i+k8ifn5Psk7FoSEDC1DoyKapruO9HkOtw/fxpCw5kT37K
-         9f1RQIsLBvbGIJH4z3A8phdliiU0LePVUjIzMf2+lXoXlxl3VhZ7pBOYa1GbcGCgi1Bc
-         Vrr0Ut8MioMyfK1dADs3d589CG6xdic2lNYKa18SGZVSk5DfxJfo7G8jFIfoq/SV2kfx
-         Da3mPntzVZ0/dgJMNGu9XAvTJ052JeUWhbuVH5jxJBAFQtAx062iBSJhDapFj0/DIGFF
-         06Gw==
-X-Forwarded-Encrypted: i=1; AHgh+Rof+39SCBV/P8f11gw1/bSofbcvWF3UPJXmpxbk0+CRhueGXQFMbOaHTVo/kt2Sf6iOtUqTzXUxfGbn5zFV/6w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywd/MGf0uKyPywVc3cthSO7VvdkNEK4WLgcHj4Tw4YSfVAUFcBt
-	e06/nsD8L6CEZvmOmoJY2lSn/zVxuuPFYjhXxoKzothZ3qMyiDbeRAxvmcdNFTRx81fDaiGJepv
-	5gMvo8vGeBAhYGcKGSYVCObQemzOEfYkTOXxq17H4pikm
-X-Gm-Gg: AfdE7cmSJkxSFh5aj7yI+DPfg8FMLfEau0UbMLd09+zwL72HURNH9oeEygRvXVkPQuV
-	dxH3nQv9Z6ZFCkbFYoCYbqQLiOPk7ZT9jtYRsf1jZDTFbsoSPOzwtpskMSF8w9hujg1Zm4oOGHs
-	TYHzfUGHdmANaCqNMAkG0uNy01iV/f0RUYXrrKidugDAxo9TtVqKBUXfUdc6CQICE6dX1+eCzVV
-	q1hS5i/ts085t3dtm3xxmV/TGIqpcX/XrY5+EeluyCMKyMiDRpVZ/kRZAR2vOLVvsxDK7DqQbzS
-	Q87o7ZbQtyBQep227LKE389r42mWe3Okoapi2vHj5NQHbRNO5uj8cP9E1Eg=
-X-Received: by 2002:a05:690e:bc5:b0:662:e60e:c64d with SMTP id
- 956f58d0204a3-66487e66e64mr3055298d50.60.1782412686983; Thu, 25 Jun 2026
- 11:38:06 -0700 (PDT)
+        bh=NLGFpRO6oCXazxFNN01n2/MLSgwZq8gccBHj2LTrKEI=;
+        b=QrYl1E2QnKkgOkg4KGYxblywbUgSF40A3OVA6KXUOMSNvTiRLnV5bC04Zmcqf3guxp
+         O7h4jPSLOspLitKBucpBmmnVQ/nM6tcPQvYhUD1gYYjVjJcQzRhGI9mCwNftQxFpq1Sw
+         Eay4KJ4tbyy/JzAUk/ATHFcd1lHj0wHC4rS29BeErLFljqTEp4M6RXPwqkV2zFj07sO3
+         59Tye8O63qKSF5HnRo0VSE0Lo3We7p266OFdTAkR8pUHN7ZfigeL1s+mjyJEkWzYj7IU
+         yDVorr52SM0yyNGCiFgEtPtGoR9CDBf4eJJjwjhPU85T0kih69SA31DHNS4eBq4YsBnT
+         D7Cw==
+X-Forwarded-Encrypted: i=1; AHgh+Rocl06jx1ssSwRO6Alpbn/cQAQwcY5SxfTO/60OpWI+jFaP1m51XcfMZ7/nw3dZqE+h326FplZ3XdQ35ww8pVI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJ2ATwDajcQjmICUx6MJlzlhrXJ0jo7nmgBRVLD1cCUQwTRaeB
+	sAU/tdtyFHSisB5sw2js6DtgqCVtxR9LKJKkmK10aF5MikIzrH36FWdG4Ym6TupLpVu0pWt3XfR
+	4l0cXucTADLQwuwc6D+1jaEKFyUmsLhk=
+X-Gm-Gg: AfdE7ckoc/8mD9RVFwhm1rdlfXxH73u8m1aYmOq0tILGUC0zfGPfs4OtYkLuLwV2QAK
+	YKKv4y4Rn+VLlaJqBXFB5j16L5jQ+e7ow9ItCXB0XcBU3KvGq0vUK8QF6ACEQtmm76aSjnez1up
+	SsI0PpsfyWsWKt0KKMe+ehftRDGtGmW8CS0fmxyxW3eThbr8NMEQ0F/VygbNPlnfWPKw/Nq00Cl
+	e6Sq1lINR9/jMp5AVl3zTba+efWGng7+mMYw5PilIMJmwDniunlUB+woem4qvLlhqgxUwmJ8NE6
+	L+ZrC1df15nlPUhJ/MfywCS2icONaQ2yIDbDAJcJPWBJO2IjI2ElaIn6IDw=
+X-Received: by 2002:a05:690e:a4f:b0:65c:468:7b6f with SMTP id
+ 956f58d0204a3-66487c6ca7emr3096937d50.25.1782412794009; Thu, 25 Jun 2026
+ 11:39:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260624075505.1318804-1-chris.lu@mediatek.com> <20260624075505.1318804-4-chris.lu@mediatek.com>
-In-Reply-To: <20260624075505.1318804-4-chris.lu@mediatek.com>
+References: <CABBYNZ+_aocMGOdugwF3uP9h3NN4Dv5XYRyiN50W0AJ3rSETTA@mail.gmail.com>
+ <20260624053334.3151885-1-hildawu@realtek.com>
+In-Reply-To: <20260624053334.3151885-1-hildawu@realtek.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 25 Jun 2026 14:37:56 -0400
-X-Gm-Features: AVVi8CcSVHHZu_oc-Fw56cPbLv6uQyk2gutBATSnej4XAyrGkPeisStV2zybtbY
-Message-ID: <CABBYNZ+yLUnQrcecDBMGGL5VmvgmOjqJ=v82iicp1e6PCoXhcw@mail.gmail.com>
-Subject: Re: [PATCH v5 3/3] Bluetooth: btmtk: Add MT7928 support
-To: Chris Lu <chris.lu@mediatek.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>, 
-	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>, 
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-mediatek <linux-mediatek@lists.infradead.org>, Paul Menzel <pmenzel@molgen.mpg.de>
+Date: Thu, 25 Jun 2026 14:39:42 -0400
+X-Gm-Features: AVVi8CdBm99nquagbbj_KhXgrtyEYoQ5pv4WfI1Bb4I3Szha2bfJ0SAXpvd4WR0
+Message-ID: <CABBYNZK075E597LHYN3QbK2NOqmb59iZTC4kQ_fNy9O3kgHLiA@mail.gmail.com>
+Subject: Re: [PATCH v5] Bluetooth: btrtl: Add firmware format v3 support
+To: Hilda Wu <hildawu@realtek.com>
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, alex_lu@realsil.com.cn, 
+	jason_mao@realsil.com.cn, zoey_zhou@realsil.com.cn, max.chou@realtek.com, 
+	kidman@realtek.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Chris,
+Hi Hilda,
 
-On Wed, Jun 24, 2026 at 3:57=E2=80=AFAM Chris Lu <chris.lu@mediatek.com> wr=
-ote:
+On Wed, Jun 24, 2026 at 1:33=E2=80=AFAM Hilda Wu <hildawu@realtek.com> wrot=
+e:
 >
-> Add support for MT7928 (internal device ID is MT7935) which requires
-> additional firmware (CBMCU firmware) loading before Bluetooth firmware.
+> Realtek updated its Bluetooth firmware format to v3.
+> This patch extends the btrtl driver to recognise and parse the new v3 fil=
+e
+> format, including:
+> - New signature string and image ID definitions
+> - Extension of btrtl_device_info to store v3-specific metadata
+> - Logic to extract and load firmware data out of v3 images
+> - Maintains compatibility with existing v2 firmware format
 >
-> CBMCU is a new component on MT7928 to handle common part shared across
-> the combo chip (Wi-Fi/Bluetooth's subsystem), providing a better user
-> experience through improved coordination between subsystems.
+> This is required for future Realtek Bluetooth chips that ship with
+> v3 firmware.
+> The RTL8922D is the first IC to use firmware format V3, so the following
+> example uses the RTL8922D's log as expected fw format v3 output:
 >
-> Implement two-phase CBMCU firmware download: Phase 1 loads section with
-> type 0x5 containing global descriptor, section maps and signature data;
-> Phase 2 loads remaining firmware sections. Add retry mechanism for
-> concurrent download protection.
+> Bluetooth: btrtl_read_chip_id() hci0: RTL: chip_id status=3D0x00 id=3D0x3=
+7
+> Bluetooth: btrtl_initialize() hci0: RTL: examining hci_ver=3D0d
+> hci_rev=3D000d lmp_ver=3D0d lmp_subver=3D8922
+> Bluetooth: rtl_read_rom_version() hci0: RTL: rom_version status=3D0 versi=
+on=3D1
+> Bluetooth: btrtl_initialize() hci0: RTL: btrtl_initialize: key id 0
+> Bluetooth: rtl_load_file() hci0: RTL: loading rtl_bt/rtl8922du_fw.bin
+> Bluetooth: rtl_load_file() hci0: RTL: loading rtl_bt/rtl8922du_config.bin
+> Bluetooth: rtlbt_parse_firmware_v3() hci0: RTL: key id 0
+> Bluetooth: rtlbt_parse_section_v3() hci0: RTL: image (f000:00), chip id
+> 55, cut 0x02, len 00007185
+> Bluetooth: rtlbt_parse_section_v3() hci0: RTL: image version: 35fd7908
+> Bluetooth: rtlbt_parse_config() hci0: RTL: config file:
+> rtl_bt/rtl8922du_config_f000.bin
+> Bluetooth: rtlbt_parse_section_v3() hci0: RTL: image (f002:00), chip id
+> 55, cut 0x02, len 000078f5
+> Bluetooth: rtlbt_parse_section_v3() hci0: RTL: image version: 47b6874d
+> Bluetooth: rtlbt_parse_config() hci0: RTL: config file:
+> rtl_bt/rtl8922du_config_f002.bin
+> Bluetooth: rtlbt_parse_firmware_v3() hci0: RTL: image payload total len:
+> 0x0000ea7a
+> Bluetooth: rtl_finalize_download() hci0: RTL: Watchdog reset status 00
+> Bluetooth: rtl_finalize_download() hci0: RTL: fw version 0x47b6874d
 >
-> After CBMCU firmware loads successfully, the driver continues to load
-> corresponding BT firmware based on device ID through fallthrough to
-> case 0x7922/0x7925.
+> Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
+> Signed-off-by: Zoey Zhou <zoey_zhou@realsil.com.cn>
+> Signed-off-by: Hilda Wu <hildawu@realtek.com>
 >
-> The firmware(CBMCU_CODE_MT7935_1_1.bin/BT_RAM_CODE_MT7935_1_1_hdr.bin)
-> required for MT7928 will be scheduled for upload to linux-firmware at
-> a later stage.
->
-> MT7928 bring-up kernel log:
-> [  159.784050] usb 1-3: New USB device found, idVendor=3D0e8d, idProduct=
-=3D7935, bcdDevice=3D 1.00
-> [  159.784107] usb 1-3: New USB device strings: Mfr=3D5, Product=3D6, Ser=
-ialNumber=3D7
-> [  159.784140] usb 1-3: Product: Wireless_Device
-> [  159.784166] usb 1-3: Manufacturer: MediaTek Inc.
-> [  159.784192] usb 1-3: SerialNumber: 000000000
-> [  159.795736] Bluetooth: hci1: Loading CBMCU firmware: mediatek/mt7928/C=
-BMCU_CODE_MT7935_1_1.bin
-> [  159.807197] Bluetooth: hci1: CBMCU HW ver: 0x7935, SW ver: 0x0000, Bui=
-ld Time: 20260601T161751+0800
-> [  160.123155] Bluetooth: hci1: CBMCU firmware download completed
-> [  160.143013] Bluetooth: hci1: Loading BT firmware: mediatek/mt7928/BT_R=
-AM_CODE_MT7935_1_1_hdr.bin
-> [  160.152775] Bluetooth: hci1: BT HW ver: 0x7935, SW ver: 0x0000, Build =
-Time: 20260527000816
-> [  163.242266] Bluetooth: hci1: Device setup in 3367430 usecs
-> [  163.242280] Bluetooth: hci1: HCI Enhanced Setup Synchronous Connection=
- command is advertised, but not supported.
-> [  163.355900] Bluetooth: hci1: AOSP extensions version v2.00
-> [  163.355956] Bluetooth: hci1: AOSP quality report is supported
-> [  163.357902] Bluetooth: MGMT ver 1.23
->
-> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> Reviewed-by: Sean Wang <sean.wang@mediatek.com>
 > ---
->  drivers/bluetooth/btmtk.c | 355 +++++++++++++++++++++++++++++++++++++-
->  drivers/bluetooth/btmtk.h |   3 +
->  2 files changed, 357 insertions(+), 1 deletion(-)
+> V4 -> V5::
+> - Add independent support for RTL8922D section
+> - Introduce macros to improve code readability
+> - Document firmware format v3 and its differences
+> - Align implementation with reviewer feedback
 >
-> diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-> index dc40820bfea0..1b08db862c20 100644
-> --- a/drivers/bluetooth/btmtk.c
-> +++ b/drivers/bluetooth/btmtk.c
-> @@ -21,6 +21,12 @@
->  #define MTK_FW_ROM_PATCH_SEC_MAP_SIZE  64
->  #define MTK_SEC_MAP_COMMON_SIZE        12
->  #define MTK_SEC_MAP_NEED_SEND_SIZE     52
-> +#define MTK_SEC_MAP_LENGTH_SIZE        4
-> +#define MTK_SEC_CBMCU_DESC     0x5
+> V3 -> V4:
+> - Rework skb->data access and add clarifying comments
+> - Fix latent issues
+>
+> V2 -> V3:
+> - Address coccinelle warning
+>
+> V1 -> V2:
+> - Add missing symbols
+> - Resolve build warnings
+> ---
+>  drivers/bluetooth/btrtl.c | 698 +++++++++++++++++++++++++++++++++++++-
+>  drivers/bluetooth/btrtl.h | 102 ++++++
+>  drivers/bluetooth/btusb.c |   3 +
+>  3 files changed, 786 insertions(+), 17 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+> index 49ecb18fea45..450b32bcfa63 100644
+> --- a/drivers/bluetooth/btrtl.c
+> +++ b/drivers/bluetooth/btrtl.c
+> @@ -22,6 +22,12 @@
+>  #define RTL_CHIP_8723CS_XX     5
+>  #define RTL_EPATCH_SIGNATURE   "Realtech"
+>  #define RTL_EPATCH_SIGNATURE_V2        "RTBTCore"
+> +#define RTL_EPATCH_SIGNATURE_V3        "BTNIC003"
+> +#define RTL_PATCH_V3_1         0x01
+> +#define RTL_PATCH_V3_2         0x02
+> +#define IMAGE_ID_F000          0xf000
+> +#define IMAGE_ID_F001          0xf001
+> +#define IMAGE_ID_F002          0xf002
+>  #define RTL_ROM_LMP_8703B      0x8703
+>  #define RTL_ROM_LMP_8723A      0x1200
+>  #define RTL_ROM_LMP_8723B      0x8723
+> @@ -33,7 +39,14 @@
+>  #define RTL_ROM_LMP_8922A      0x8922
+>  #define RTL_CONFIG_MAGIC       0x8723ab55
+>
+> -#define RTL_VSC_OP_COREDUMP    0xfcff
+> +#define RTL_VSC_OP_DOWNLOAD_CMD                0xfc20
+> +#define RTL_VSC_OP_READ_VENDER         0xfc61
+> +#define RTL_VSC_OP_WRITE_VENDOR                0xfc62
+> +#define RTL_VSC_OP_READ_ROM_VER                0xfc6d
+> +#define RTL_VSC_OP_READ_CHIP_ID                0xfc6f
+> +#define RTL_VSC_OP_COREDUMP            0xfcff
+> +#define RTL_VSC_OP_CHECK_DOWNLOAD_STATE        0xfdcf
+> +#define RTL_VSC_OP_WDG_RESET_CMD       0xfc8e
+>
+>  #define IC_MATCH_FL_LMPSUBV    (1 << 0)
+>  #define IC_MATCH_FL_HCIREV     (1 << 1)
+> @@ -50,12 +63,16 @@
+>
+>  #define        RTL_CHIP_SUBVER (&(struct rtl_vendor_cmd) {{0x10, 0x38, 0=
+x04, 0x28, 0x80}})
+>  #define        RTL_CHIP_REV    (&(struct rtl_vendor_cmd) {{0x10, 0x3A, 0=
+x04, 0x28, 0x80}})
+> -#define        RTL_SEC_PROJ    (&(struct rtl_vendor_cmd) {{0x10, 0xA4, 0=
+xAD, 0x00, 0xb0}})
+> +#define        RTL_SEC_PROJ_V2 (&(struct rtl_vendor_cmd) {{0x10, 0xA4, 0=
+xAD, 0x00, 0xb0}})
+> +#define        RTL_SEC_PROJ_V3 (&(struct rtl_vendor_cmd) {{0x10, 0xA4, 0=
+x0D, 0x01, 0xa0}})
+>
+>  #define RTL_PATCH_SNIPPETS             0x01
+>  #define RTL_PATCH_DUMMY_HEADER         0x02
+>  #define RTL_PATCH_SECURITY_HEADER      0x03
+>
+> +#define CHIP_ID_V3_BASE                55
+> +#define RTL_VENDOR_WRITE_TYPE          0x21
 > +
-> +/* CBMCU WMT command flags */
-> +#define BTMTK_CBMCU_FLAG_QUERY_STATUS  0xF0
-> +#define BTMTK_CBMCU_FLAG_ENABLE_PATCH  0xF1
+>  enum btrtl_chip_id {
+>         CHIP_ID_8723A,
+>         CHIP_ID_8723B,
+> @@ -99,8 +116,11 @@ struct btrtl_device_info {
+>         int cfg_len;
+>         bool drop_fw;
+>         int project_id;
+> +       u32 opcode;
+> +       u8 fw_type;
+>         u8 key_id;
+>         struct list_head patch_subsecs;
+> +       struct list_head patch_images;
+>  };
 >
->  /* It is for mt79xx iso data transmission setting */
->  #define MTK_ISO_THRESHOLD      264
-> @@ -120,6 +126,11 @@ void btmtk_fw_get_filename(char *buf, size_t size, u=
-32 dev_id, u32 fw_ver,
->                 snprintf(buf, size,
->                          "mediatek/mt%04x/BT_RAM_CODE_MT%04x_1_%x_hdr.bin=
-",
->                          dev_id & 0xffff, dev_id & 0xffff, (fw_ver & 0xff=
-) + 1);
-> +       /* MT7928 */
-> +       else if (dev_id =3D=3D 0x7935)
-> +               snprintf(buf, size,
-> +                        "mediatek/mt7928/BT_RAM_CODE_MT%04x_1_1_hdr.bin"=
-,
-> +                        dev_id & 0xffff);
->         else if (dev_id =3D=3D 0x7961 && fw_flavor)
->                 snprintf(buf, size,
->                          "mediatek/BT_RAM_CODE_MT%04x_1a_%x_hdr.bin",
-> @@ -736,6 +747,7 @@ static int btmtk_usb_hci_wmt_sync(struct hci_dev *hde=
-v,
->                         status =3D BTMTK_WMT_ON_UNDONE;
->                 break;
->         case BTMTK_WMT_PATCH_DWNLD:
-> +       case BTMTK_WMT_CBMCU_DWNLD:
->                 if (wmt_evt->whdr.flag =3D=3D 2)
->                         status =3D BTMTK_WMT_PATCH_DONE;
->                 else if (wmt_evt->whdr.flag =3D=3D 1)
-> @@ -872,6 +884,336 @@ static u32 btmtk_usb_reset_done(struct hci_dev *hde=
-v)
->         return val & MTK_BT_RST_DONE;
+>  static const struct id_table ic_id_table[] =3D {
+> @@ -371,6 +391,33 @@ static const struct id_table *btrtl_match_ic(u16 lmp=
+_subver, u16 hci_rev,
+>         return &ic_id_table[i];
 >  }
 >
-> +static int btmtk_cbmcu_patch_status(struct hci_dev *hdev,
-> +                                   wmt_cmd_sync_func_t wmt_cmd_sync,
-> +                                   u8 *patch_status)
+> +static int btrtl_read_chip_id(struct hci_dev *hdev, u8 *chip_id)
 > +{
-> +       struct btmtk_hci_wmt_params wmt_params;
-> +       int status, err, retry =3D 20;
+> +       struct rtl_rp_read_chip_id *rp;
+> +       struct sk_buff *skb;
+> +       int ret =3D 0;
 > +
-> +       do {
-> +               wmt_params.op =3D BTMTK_WMT_CBMCU_DWNLD;
-> +               wmt_params.flag =3D BTMTK_CBMCU_FLAG_QUERY_STATUS;
-> +               wmt_params.dlen =3D 0;
-> +               wmt_params.data =3D NULL;
-> +               wmt_params.status =3D &status;
+> +       skb =3D __hci_cmd_sync(hdev, RTL_VSC_OP_READ_CHIP_ID, 0, NULL, HC=
+I_INIT_TIMEOUT);
+> +       if (IS_ERR(skb))
+> +               return PTR_ERR(skb);
 > +
-> +               err =3D wmt_cmd_sync(hdev, &wmt_params);
-> +               if (err < 0) {
-> +                       bt_dev_err(hdev, "Failed to query CBMCU patch sta=
-tus (%d)", err);
-> +                       return err;
-> +               }
+> +       rp =3D skb_pull_data(skb, sizeof(*rp));
+> +       if (!rp) {
+> +               ret =3D -EIO;
+> +               goto out;
+> +       }
 > +
-> +               *patch_status =3D (u8)status;
+> +       rtl_dev_info(hdev, "chip_id status=3D0x%02x id=3D0x%02x",
+> +                    rp->status, rp->chip_id);
 > +
-> +               if (*patch_status =3D=3D BTMTK_WMT_PATCH_PROGRESS) {
-> +                       msleep(100);
-> +                       retry--;
-> +               } else {
-> +                       break;
-> +               }
-> +       } while (retry > 0);
+> +       if (chip_id)
+> +               *chip_id =3D rp->chip_id;
 > +
-> +       return 0;
+> +out:
+> +       kfree_skb(skb);
+> +       return ret;
 > +}
 > +
-> +static int btmtk_query_cbmcu_section(struct hci_dev *hdev,
-> +                                    wmt_cmd_sync_func_t wmt_cmd_sync,
-> +                                    u8 cbmcu_type,
-> +                                    const u8 *section_map,
-> +                                    u32 cert_len)
+>  static struct sk_buff *btrtl_read_local_version(struct hci_dev *hdev)
+>  {
+>         struct sk_buff *skb;
+> @@ -397,8 +444,7 @@ static int rtl_read_rom_version(struct hci_dev *hdev,=
+ u8 *version)
+>         struct rtl_rom_version_evt *rom_version;
+>         struct sk_buff *skb;
+>
+> -       /* Read RTL ROM version command */
+> -       skb =3D __hci_cmd_sync(hdev, 0xfc6d, 0, NULL, HCI_INIT_TIMEOUT);
+> +       skb =3D __hci_cmd_sync(hdev, RTL_VSC_OP_READ_ROM_VER, 0, NULL, HC=
+I_INIT_TIMEOUT);
+>         if (IS_ERR(skb)) {
+>                 rtl_dev_err(hdev, "Read ROM version failed (%ld)",
+>                             PTR_ERR(skb));
+> @@ -427,7 +473,7 @@ static int btrtl_vendor_read_reg16(struct hci_dev *hd=
+ev,
+>         struct sk_buff *skb;
+>         int err =3D 0;
+>
+> -       skb =3D __hci_cmd_sync(hdev, 0xfc61, sizeof(*cmd), cmd,
+> +       skb =3D __hci_cmd_sync(hdev, RTL_VSC_OP_READ_VENDER, sizeof(*cmd)=
+, cmd,
+>                              HCI_INIT_TIMEOUT);
+>         if (IS_ERR(skb)) {
+>                 err =3D PTR_ERR(skb);
+> @@ -449,6 +495,26 @@ static int btrtl_vendor_read_reg16(struct hci_dev *h=
+dev,
+>         return 0;
+>  }
+>
+> +static int btrtl_vendor_write_mem(struct hci_dev *hdev, u32 addr, u32 va=
+l)
 > +{
-> +       struct btmtk_hci_wmt_params wmt_params;
-> +       u8 cmd[64];
-> +       int status, err;
+> +       struct rtl_vendor_write_cmd cp;
+> +       struct sk_buff *skb;
+> +       int err =3D 0;
 > +
-> +       cmd[0] =3D 0;
-> +       cmd[1] =3D cbmcu_type;
-> +
-> +       if (cbmcu_type =3D=3D 0)
-> +               put_unaligned_le32(cert_len, &cmd[2]);
-> +       else
-> +               memcpy(&cmd[2], section_map, MTK_SEC_MAP_NEED_SEND_SIZE);
-> +
-> +       wmt_params.op =3D BTMTK_WMT_CBMCU_DWNLD;
-> +       wmt_params.flag =3D 0;
-> +       wmt_params.dlen =3D cbmcu_type ?
-> +               MTK_SEC_MAP_NEED_SEND_SIZE + 2 :
-> +               MTK_SEC_MAP_LENGTH_SIZE + 2;
-> +       wmt_params.data =3D cmd;
-> +       wmt_params.status =3D &status;
-> +
-> +       err =3D wmt_cmd_sync(hdev, &wmt_params);
-> +       if (err < 0) {
-> +               bt_dev_err(hdev, "Failed to query CBMCU section (%d)", er=
-r);
+> +       cp.type =3D RTL_VENDOR_WRITE_TYPE;
+> +       cp.addr =3D cpu_to_le32(addr);
+> +       cp.val =3D cpu_to_le32(val);
+> +       skb =3D __hci_cmd_sync(hdev, RTL_VSC_OP_WRITE_VENDOR, sizeof(cp),=
+ &cp, HCI_INIT_TIMEOUT);
+> +       if (IS_ERR(skb)) {
+> +               err =3D PTR_ERR(skb);
+> +               bt_dev_err(hdev, "RTL: Write mem32 failed (%d)", err);
 > +               return err;
 > +       }
 > +
-> +       /* Query should return UNDONE status for successful section query=
- */
-> +       if (status !=3D BTMTK_WMT_PATCH_UNDONE) {
-> +               bt_dev_err(hdev, "CBMCU section query status error (%d)",=
- status);
+> +       kfree_skb(skb);
+> +       return 0;
+> +}
+> +
+>  static void *rtl_iov_pull_data(struct rtl_iovec *iov, u32 len)
+>  {
+>         void *data =3D iov->data;
+> @@ -462,6 +528,31 @@ static void *rtl_iov_pull_data(struct rtl_iovec *iov=
+, u32 len)
+>         return data;
+>  }
+>
+> +
+> +static void btrtl_insert_ordered_patch_image(struct rtl_section_patch_im=
+age *image,
+> +                                            struct btrtl_device_info *bt=
+rtl_dev)
+> +{
+> +       struct list_head *pos;
+> +       struct list_head *next;
+> +       struct rtl_section_patch_image *node;
+> +
+> +       list_for_each_safe(pos, next, &btrtl_dev->patch_images) {
+> +               node =3D list_entry(pos, struct rtl_section_patch_image, =
+list);
+> +
+> +               if (node->image_id > image->image_id) {
+> +                       __list_add(&image->list, pos->prev, pos);
+> +                       return;
+> +               }
+> +
+> +               if (node->image_id =3D=3D image->image_id &&
+> +                   node->index > image->index) {
+> +                       __list_add(&image->list, pos->prev, pos);
+> +                       return;
+> +               }
+> +       }
+> +       __list_add(&image->list, pos->prev, pos);
+> +}
+> +
+>  static void btrtl_insert_ordered_subsec(struct rtl_subsection *node,
+>                                         struct btrtl_device_info *btrtl_d=
+ev)
+>  {
+> @@ -633,6 +724,279 @@ static int rtlbt_parse_firmware_v2(struct hci_dev *=
+hdev,
+>         }
+>
+>         *_buf =3D ptr;
+> +       btrtl_dev->fw_type =3D FW_TYPE_V2;
+> +       return len;
+> +}
+> +
+> +static int rtlbt_parse_config(struct hci_dev *hdev,
+> +                             struct rtl_section_patch_image *patch_image=
+,
+> +                             struct btrtl_device_info *btrtl_dev)
+> +{
+> +       const struct id_table *ic_info =3D NULL;
+> +       const struct firmware *fw;
+> +       char tmp_name[32];
+> +       char filename[64];
+> +       u8 *cfg_buf;
+> +       char *str;
+> +       char *p;
+> +       size_t len;
+> +       int ret;
+> +
+> +       if (btrtl_dev && btrtl_dev->ic_info)
+> +               ic_info =3D btrtl_dev->ic_info;
+> +
+> +       if (!ic_info)
+> +               return -EINVAL;
+> +
+> +       str =3D ic_info->cfg_name;
+> +       if (btrtl_dev->fw_type =3D=3D FW_TYPE_V3_1) {
+> +               if (!patch_image->image_id && !patch_image->index) {
+> +                       snprintf(filename, sizeof(filename), "%s.bin", st=
+r);
+> +                       goto load_fw;
+> +               }
+> +               goto done;
+> +       }
+> +
+> +       len =3D strlen(str);
+> +       if (len > sizeof(tmp_name) - 1)
+> +               len =3D sizeof(tmp_name) - 1;
+> +       memcpy(tmp_name, str, len);
+> +       tmp_name[len] =3D '\0';
+> +
+> +       str =3D tmp_name;
+> +       p =3D strsep(&str, ".");
+> +
+> +       ret =3D snprintf(filename, sizeof(filename), "%s", p);
+> +       if (patch_image->config_rule && patch_image->need_config) {
+> +               switch (patch_image->image_id) {
+> +               case IMAGE_ID_F000:
+> +               case IMAGE_ID_F001:
+> +               case IMAGE_ID_F002:
+> +                       ret +=3D snprintf(filename + ret, sizeof(filename=
+) - ret,
+> +                                       "_%04x", patch_image->image_id);
+> +                       break;
+> +               default:
+> +                       goto done;
+> +               }
+> +       } else {
+> +               goto done;
+> +       }
+> +
+> +       snprintf(filename + ret, sizeof(filename) - ret, ".%s", str ? str=
+ : "bin");
+> +
+> +load_fw:
+> +       rtl_dev_info(hdev, "config file: %s", filename);
+> +       ret =3D request_firmware(&fw, filename, &hdev->dev);
+> +       if (ret < 0) {
+> +               if (btrtl_dev->fw_type =3D=3D FW_TYPE_V3_2) {
+> +                       len =3D 4;
+> +                       cfg_buf =3D kvmalloc(len, GFP_KERNEL);
+> +                       if (!cfg_buf)
+> +                               return -ENOMEM;
+> +
+> +                       memset(cfg_buf, 0xff, len);
+> +                       patch_image->cfg_buf =3D cfg_buf;
+> +                       patch_image->cfg_len =3D len;
+> +                       return 0;
+> +               }
+> +               goto err_req_fw;
+> +       }
+> +       rtl_dev_info(hdev, "config file: %s found", filename);
+> +       cfg_buf =3D kvmalloc(fw->size, GFP_KERNEL);
+> +       if (!cfg_buf) {
+> +               ret =3D -ENOMEM;
+> +               goto err;
+> +       }
+> +       memcpy(cfg_buf, fw->data, fw->size);
+> +       len =3D fw->size;
+> +       release_firmware(fw);
+> +
+> +       patch_image->cfg_buf =3D cfg_buf;
+> +       patch_image->cfg_len =3D len;
+> +done:
+> +       return 0;
+> +err:
+> +       release_firmware(fw);
+> +err_req_fw:
+> +       rtl_dev_info(hdev, "config file: [%s] not found", filename);
+> +       return ret;
+> +}
+> +
+> +static int rtlbt_parse_section_v3(struct hci_dev *hdev,
+> +                                 struct btrtl_device_info *btrtl_dev,
+> +                                 u32 opcode, u8 *data, u32 len)
+> +{
+> +       struct rtl_section_patch_image *patch_image;
+> +       struct rtl_patch_image_hdr *hdr;
+> +       u16 image_id;
+> +       u16 chip_id;
+> +       size_t patch_image_len;
+> +       u8 *ptr;
+> +       int ret =3D 0;
+> +       size_t i;
+> +       struct rtl_iovec iov =3D {
+> +               .data =3D data,
+> +               .len  =3D len,
+> +       };
+> +
+> +       hdr =3D rtl_iov_pull_data(&iov, sizeof(*hdr));
+> +       if (!hdr)
+> +               return -EINVAL;
+> +
+> +       if (btrtl_dev->opcode && btrtl_dev->opcode !=3D opcode) {
+> +               rtl_dev_err(hdev, "invalid opcode 0x%02x", opcode);
+> +               return -EINVAL;
+> +       }
+> +
+> +       if (!btrtl_dev->opcode) {
+> +               btrtl_dev->opcode =3D opcode;
+> +               switch (btrtl_dev->opcode) {
+> +               case RTL_PATCH_V3_1:
+> +                       btrtl_dev->fw_type =3D FW_TYPE_V3_1;
+> +                       break;
+> +               case RTL_PATCH_V3_2:
+> +                       btrtl_dev->fw_type =3D FW_TYPE_V3_2;
+> +                       break;
+> +               default:
+> +                       return -EINVAL;
+> +               }
+> +       }
+> +
+> +       patch_image_len =3D (u32)le64_to_cpu(hdr->patch_image_len);
+> +       chip_id =3D le16_to_cpu(hdr->chip_id);
+> +       image_id =3D le16_to_cpu(hdr->image_id);
+> +       rtl_dev_info(hdev, "image (%04x:%02x), chip id %u, cut 0x%02x, le=
+n %08zx"
+> +                    , image_id, hdr->index, chip_id, hdr->ic_cut,
+> +                    patch_image_len);
+> +
+> +       if (btrtl_dev->key_id !=3D hdr->key_id) {
+> +               rtl_dev_err(hdev, "invalid key_id (%u, %u)", hdr->key_id,
+> +                           btrtl_dev->key_id);
+> +               return -EINVAL;
+> +       }
+> +
+> +       if (hdr->ic_cut !=3D btrtl_dev->rom_version + 1) {
+> +               rtl_dev_info(hdev, "unused ic_cut (%u, %u)", hdr->ic_cut,
+> +                           btrtl_dev->rom_version + 1);
+> +               return -EINVAL;
+> +       }
+> +
+> +       if (btrtl_dev->fw_type =3D=3D FW_TYPE_V3_1 && !btrtl_dev->project=
+_id)
+> +               btrtl_dev->project_id =3D chip_id;
+> +
+> +       if (btrtl_dev->fw_type =3D=3D FW_TYPE_V3_2 &&
+> +           chip_id !=3D btrtl_dev->project_id) {
+> +               rtl_dev_err(hdev, "invalid chip_id (%u, %d)", chip_id,
+> +                           btrtl_dev->project_id);
+> +               return -EINVAL;
+> +       }
+> +
+> +       ptr =3D rtl_iov_pull_data(&iov, patch_image_len);
+> +       if (!ptr)
+> +               return -ENODATA;
+> +
+> +       patch_image =3D kzalloc_obj(*patch_image);
+> +       if (!patch_image)
+> +               return -ENOMEM;
+> +       patch_image->index =3D hdr->index;
+> +       patch_image->image_id =3D image_id;
+> +       patch_image->config_rule =3D hdr->config_rule;
+> +       patch_image->need_config =3D hdr->need_config;
+> +
+> +       for (i =3D 0; i < DL_FIX_ADDR_MAX; i++) {
+> +               patch_image->fix[i].addr =3D
+> +                       (u32)le64_to_cpu(hdr->addr_fix[i * 2]);
+> +               patch_image->fix[i].value =3D
+> +                       (u32)le64_to_cpu(hdr->addr_fix[i * 2 + 1]);
+> +       }
+> +
+> +       patch_image->image_len =3D patch_image_len;
+> +       patch_image->image_data =3D kvmalloc(patch_image_len, GFP_KERNEL)=
+;
+> +       if (!patch_image->image_data) {
+> +               ret =3D -ENOMEM;
+> +               goto err;
+> +       }
+> +       memcpy(patch_image->image_data, ptr, patch_image_len);
+> +       patch_image->image_ver =3D
+> +               get_unaligned_le32(ptr + patch_image->image_len - 4);
+> +       rtl_dev_info(hdev, "image version: %08x", patch_image->image_ver)=
+;
+> +
+> +       rtlbt_parse_config(hdev, patch_image, btrtl_dev);
+> +
+> +       ret =3D patch_image->image_len;
+> +
+> +       btrtl_insert_ordered_patch_image(patch_image, btrtl_dev);
+> +
+> +       return ret;
+> +err:
+> +       kfree(patch_image);
+> +       return ret;
+> +}
+> +
+> +static int rtlbt_parse_firmware_v3(struct hci_dev *hdev,
+> +                                  struct btrtl_device_info *btrtl_dev)
+> +{
+> +       struct rtl_epatch_header_v3 *hdr;
+> +       int rc;
+> +       u32 num_sections;
+> +       struct rtl_section_v3 *section;
+> +       u32 section_len;
+> +       u32 opcode;
+> +       int len =3D 0;
+> +       int i;
+> +       u8 *ptr;
+> +       struct rtl_iovec iov =3D {
+> +               .data =3D btrtl_dev->fw_data,
+> +               .len  =3D btrtl_dev->fw_len,
+> +       };
+> +
+> +       rtl_dev_info(hdev, "key id %u", btrtl_dev->key_id);
+> +
+> +       hdr =3D rtl_iov_pull_data(&iov, sizeof(*hdr));
+> +       if (!hdr)
+> +               return -EINVAL;
+> +       num_sections =3D le32_to_cpu(hdr->num_sections);
+> +
+> +       rtl_dev_dbg(hdev, "timpstamp %08x-%08x", *((u32 *)hdr->timestamp)=
+,
+> +                   *((u32 *)(hdr->timestamp + 4)));
+> +
+> +       for (i =3D 0; i < num_sections; i++) {
+> +               section =3D rtl_iov_pull_data(&iov, sizeof(*section));
+> +               if (!section)
+> +                       break;
+> +
+> +               section_len =3D (u32)le64_to_cpu(section->len);
+> +               opcode =3D le32_to_cpu(section->opcode);
+> +
+> +               rtl_dev_dbg(hdev, "opcode 0x%04x", section->opcode);
+> +
+> +               ptr =3D rtl_iov_pull_data(&iov, section_len);
+> +               if (!ptr)
+> +                       break;
+> +
+> +               rc =3D 0;
+> +               switch (opcode) {
+> +               case RTL_PATCH_V3_1:
+> +               case RTL_PATCH_V3_2:
+> +                       rc =3D rtlbt_parse_section_v3(hdev, btrtl_dev, op=
+code,
+> +                                                   ptr, section_len);
+> +                       break;
+> +               default:
+> +                       rtl_dev_warn(hdev, "Unknown opcode %08x", opcode)=
+;
+> +                       break;
+> +               }
+> +               if (rc < 0) {
+> +                       rtl_dev_err(hdev, "Parse section (%u) err (%d)",
+> +                                   opcode, rc);
+> +                       continue;
+> +               }
+> +               len +=3D rc;
+> +       }
+> +
+> +       rtl_dev_info(hdev, "image payload total len: 0x%08x", len);
+> +       if (!len)
+> +               return -ENODATA;
+> +
+>         return len;
+>  }
+>
+> @@ -678,6 +1042,9 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev=
+,
+>         if (btrtl_dev->fw_len <=3D 8)
+>                 return -EINVAL;
+>
+> +       if (!memcmp(btrtl_dev->fw_data, RTL_EPATCH_SIGNATURE_V3, 8))
+> +               return rtlbt_parse_firmware_v3(hdev, btrtl_dev);
+> +
+>         if (!memcmp(btrtl_dev->fw_data, RTL_EPATCH_SIGNATURE, 8))
+>                 min_size =3D sizeof(struct rtl_epatch_header) +
+>                                 sizeof(extension_sig) + 3;
+> @@ -813,10 +1180,11 @@ static int rtlbt_parse_firmware(struct hci_dev *hd=
+ev,
+>         memcpy(buf + patch_length - 4, &epatch_info->fw_version, 4);
+>
+>         *_buf =3D buf;
+> +       btrtl_dev->fw_type =3D FW_TYPE_V1;
+>         return len;
+>  }
+>
+> -static int rtl_download_firmware(struct hci_dev *hdev,
+> +static int rtl_download_firmware(struct hci_dev *hdev, u8 fw_type,
+>                                  const unsigned char *data, int fw_len)
+>  {
+>         struct rtl_download_cmd *dl_cmd;
+> @@ -827,6 +1195,13 @@ static int rtl_download_firmware(struct hci_dev *hd=
+ev,
+>         int j =3D 0;
+>         struct sk_buff *skb;
+>         struct hci_rp_read_local_version *rp;
+> +       u8 dl_rp_len =3D sizeof(struct rtl_download_response);
+> +
+> +       if (is_v3_fw(fw_type)) {
+> +               j =3D 1;
+> +               if (fw_type =3D=3D FW_TYPE_V3_2)
+> +                       dl_rp_len++;
+> +       }
+>
+>         dl_cmd =3D kmalloc_obj(*dl_cmd);
+>         if (!dl_cmd)
+> @@ -840,15 +1215,15 @@ static int rtl_download_firmware(struct hci_dev *h=
+dev,
+>                         j =3D 1;
+>
+>                 if (i =3D=3D (frag_num - 1)) {
+> -                       dl_cmd->index |=3D 0x80; /* data end */
+> +                       if (!is_v3_fw(fw_type))
+> +                               dl_cmd->index |=3D 0x80; /* data end */
+>                         frag_len =3D fw_len % RTL_FRAG_LEN;
+>                 }
+>                 rtl_dev_dbg(hdev, "download fw (%d/%d). index =3D %d", i,
+>                                 frag_num, dl_cmd->index);
+>                 memcpy(dl_cmd->data, data, frag_len);
+>
+> -               /* Send download command */
+> -               skb =3D __hci_cmd_sync(hdev, 0xfc20, frag_len + 1, dl_cmd=
+,
+> +               skb =3D __hci_cmd_sync(hdev, RTL_VSC_OP_DOWNLOAD_CMD, fra=
+g_len + 1, dl_cmd,
+>                                      HCI_INIT_TIMEOUT);
+>                 if (IS_ERR(skb)) {
+>                         rtl_dev_err(hdev, "download fw command failed (%l=
+d)",
+> @@ -857,7 +1232,7 @@ static int rtl_download_firmware(struct hci_dev *hde=
+v,
+>                         goto out;
+>                 }
+>
+> -               if (skb->len !=3D sizeof(struct rtl_download_response)) {
+> +               if (skb->len !=3D dl_rp_len) {
+>                         rtl_dev_err(hdev, "download fw event length misma=
+tch");
+>                         kfree_skb(skb);
+>                         ret =3D -EIO;
+> @@ -868,6 +1243,9 @@ static int rtl_download_firmware(struct hci_dev *hde=
+v,
+>                 data +=3D RTL_FRAG_LEN;
+>         }
+>
+> +       if (is_v3_fw(fw_type))
+> +               goto out;
+> +
+>         skb =3D btrtl_read_local_version(hdev);
+>         if (IS_ERR(skb)) {
+>                 ret =3D PTR_ERR(skb);
+> @@ -885,6 +1263,237 @@ static int rtl_download_firmware(struct hci_dev *h=
+dev,
+>         return ret;
+>  }
+>
+> +static int rtl_check_download_state(struct hci_dev *hdev,
+> +                                   struct btrtl_device_info *btrtl_dev)
+> +{
+> +       struct sk_buff *skb;
+> +       int ret =3D 0;
+> +       u8 *state;
+> +
+> +       skb =3D __hci_cmd_sync(hdev, RTL_VSC_OP_CHECK_DOWNLOAD_STATE, 0, =
+NULL, HCI_CMD_TIMEOUT);
+> +       if (IS_ERR(skb)) {
+> +               rtl_dev_err(hdev, "write tb error %lu", PTR_ERR(skb));
 > +               return -EIO;
 > +       }
 > +
-> +       return 0;
-> +}
-> +
-> +static int btmtk_download_cbmcu_section(struct hci_dev *hdev,
-> +                                       wmt_cmd_sync_func_t wmt_cmd_sync,
-> +                                       const u8 *fw_data,
-> +                                       u32 dl_size)
-> +{
-> +       struct btmtk_hci_wmt_params wmt_params;
-> +       u32 sent_len, total_size =3D dl_size;
-> +       int err;
-> +
-> +       wmt_params.op =3D BTMTK_WMT_CBMCU_DWNLD;
-> +       wmt_params.status =3D NULL;
-> +
-> +       while (dl_size > 0) {
-> +               sent_len =3D min_t(u32, 250, dl_size);
-> +
-> +               if (dl_size =3D=3D total_size)
-> +                       wmt_params.flag =3D BTMTK_WMT_PKT_START;
-> +               else if (dl_size =3D=3D sent_len)
-> +                       wmt_params.flag =3D BTMTK_WMT_PKT_END;
-> +               else
-> +                       wmt_params.flag =3D BTMTK_WMT_PKT_CONTINUE;
-> +
-> +               wmt_params.dlen =3D sent_len;
-> +               wmt_params.data =3D fw_data;
-> +
-> +               err =3D wmt_cmd_sync(hdev, &wmt_params);
-> +               if (err < 0) {
-> +                       bt_dev_err(hdev, "Failed to send CBMCU section da=
-ta (%d)", err);
-> +                       return err;
+> +       /* Other driver might be downloading the combined firmware. */
+> +       state =3D skb_pull_data(skb, sizeof(*state));
+> +       if (state && *state =3D=3D 0x03) {
+> +               btrealtek_set_flag(hdev, REALTEK_DOWNLOADING);
+> +               ret =3D btrealtek_wait_on_flag_timeout(hdev, REALTEK_DOWN=
+LOADING,
+> +                                                    TASK_INTERRUPTIBLE,
+> +                                                    msecs_to_jiffies(500=
+0));
+> +               if (ret =3D=3D -EINTR) {
+> +                       bt_dev_err(hdev, "Firmware loading interrupted");
+> +                       goto out;
 > +               }
 > +
-> +               dl_size -=3D sent_len;
-> +               fw_data +=3D sent_len;
+> +               if (ret) {
+> +                       bt_dev_err(hdev, "Firmware loading timeout");
+> +                       ret =3D -ETIMEDOUT;
+> +               } else {
+> +                       ret =3D -EALREADY;
+> +               }
+> +
 > +       }
 > +
-> +       return 0;
+> +out:
+> +       kfree_skb(skb);
+> +       return ret;
 > +}
 > +
-> +static int btmtk_enable_cbmcu_patch(struct hci_dev *hdev,
-> +                                   wmt_cmd_sync_func_t wmt_cmd_sync)
+> +static int rtl_finalize_download(struct hci_dev *hdev,
+> +                                struct btrtl_device_info *btrtl_dev)
 > +{
-> +       struct btmtk_hci_wmt_params wmt_params;
-> +       int err;
+> +       struct hci_rp_read_local_version *rp_ver;
+> +       u8 params[2] =3D { 0x03, 0xb2 };
+> +       struct sk_buff *skb;
+> +       int ret =3D 0;
+> +       u16 opcode;
+> +       u32 len;
+> +       u8 *p;
 > +
-> +       wmt_params.op =3D BTMTK_WMT_CBMCU_DWNLD;
-> +       wmt_params.flag =3D BTMTK_CBMCU_FLAG_ENABLE_PATCH;
-> +       wmt_params.dlen =3D 0;
-> +       wmt_params.data =3D NULL;
-> +       wmt_params.status =3D NULL;
-> +
-> +       err =3D wmt_cmd_sync(hdev, &wmt_params);
-> +       if (err < 0) {
-> +               bt_dev_err(hdev, "Failed to enable CBMCU patch (%d)", err=
+> +       opcode =3D RTL_VSC_OP_WDG_RESET_CMD;
+> +       len =3D 2;
+> +       if (btrtl_dev->opcode =3D=3D RTL_PATCH_V3_1) {
+> +               opcode =3D RTL_VSC_OP_DOWNLOAD_CMD;
+> +               params[0] =3D 0x80;
+> +               len =3D 1;
+> +       }
+> +       skb =3D __hci_cmd_sync(hdev, opcode, len, params, HCI_CMD_TIMEOUT=
 );
-> +               return err;
+> +       if (IS_ERR(skb)) {
+> +               rtl_dev_err(hdev, "Watchdog reset err (%ld)", PTR_ERR(skb=
+));
+> +               return -EIO;
+> +       }
+> +       p =3D skb_pull_data(skb, 1);
+> +       if (!p) {
+> +               ret =3D -ENODATA;
+> +               goto out;
+> +       }
+> +       rtl_dev_info(hdev, "Watchdog reset status %02x", *p);
+> +       kfree_skb(skb);
+> +
+> +       skb =3D btrtl_read_local_version(hdev);
+> +       if (IS_ERR(skb)) {
+> +               ret =3D PTR_ERR(skb);
+> +               rtl_dev_err(hdev, "read local version failed (%d)", ret);
+> +               return ret;
 > +       }
 > +
-> +       return 0;
+> +       rp_ver =3D skb_pull_data(skb, sizeof(*rp_ver));
+> +       if (rp_ver)
+> +               rtl_dev_info(hdev, "fw version 0x%04x%04x",
+> +                            __le16_to_cpu(rp_ver->hci_rev),
+> +                            __le16_to_cpu(rp_ver->lmp_subver));
+> +out:
+> +       kfree_skb(skb);
+> +       return ret;
 > +}
 > +
-> +static int btmtk_load_cbmcu_firmware(struct hci_dev *hdev,
-> +                                    const char *fwname,
-> +                                    wmt_cmd_sync_func_t wmt_cmd_sync,
-> +                                    u32 dev_id)
+> +static int rtl_security_check(struct hci_dev *hdev,
+> +                             struct btrtl_device_info *btrtl_dev)
 > +{
-> +       struct btmtk_patch_header *hdr;
-> +       struct btmtk_global_desc *globaldesc;
-> +       struct btmtk_section_map *sectionmap;
-> +       const struct firmware *fw;
-> +       const u8 *fw_ptr;
-> +       u8 *cert_buf =3D NULL;
-> +       u32 section_num, section_offset, dl_size, cert_len;
-> +       int i, err;
+> +       struct rtl_section_patch_image *tmp =3D NULL;
+> +       struct rtl_section_patch_image *image =3D NULL;
+> +       u32 val;
+> +       int ret;
 > +
-> +       err =3D request_firmware(&fw, fwname, &hdev->dev);
-> +       if (err < 0) {
-> +               bt_dev_err(hdev, "Failed to load CBMCU firmware file %s (=
-%d)",
-> +                          fwname, err);
-> +               return err;
-> +       }
-> +
-> +       if (fw->size < MTK_FW_ROM_PATCH_HEADER_SIZE + MTK_FW_ROM_PATCH_GD=
-_SIZE) {
-> +               bt_dev_err(hdev, "CBMCU firmware too small: size=3D%zu, m=
-in=3D%u",
-> +                          fw->size,
-> +                          MTK_FW_ROM_PATCH_HEADER_SIZE + MTK_FW_ROM_PATC=
-H_GD_SIZE);
-> +               err =3D -EINVAL;
-> +               goto err_release_fw;
-> +       }
-> +
-> +       fw_ptr =3D fw->data;
-> +       hdr =3D (struct btmtk_patch_header *)fw_ptr;
-> +       globaldesc =3D (struct btmtk_global_desc *)(fw_ptr + MTK_FW_ROM_P=
-ATCH_HEADER_SIZE);
-> +       section_num =3D le32_to_cpu(globaldesc->section_num);
-> +
-> +       if (fw->size < MTK_FW_ROM_PATCH_HEADER_SIZE + MTK_FW_ROM_PATCH_GD=
-_SIZE +
-> +                      (size_t)MTK_FW_ROM_PATCH_SEC_MAP_SIZE * section_nu=
-m) {
-> +               bt_dev_err(hdev, "CBMCU firmware truncated: size=3D%zu, e=
-xpected=3D%zu (section_num=3D%u)",
-> +                          fw->size,
-> +                          MTK_FW_ROM_PATCH_HEADER_SIZE + MTK_FW_ROM_PATC=
-H_GD_SIZE +
-> +                          (size_t)MTK_FW_ROM_PATCH_SEC_MAP_SIZE * sectio=
-n_num,
-> +                          section_num);
-> +               err =3D -EINVAL;
-> +               goto err_release_fw;
-> +       }
-> +
-> +       bt_dev_info(hdev, "CBMCU HW ver: 0x%04x, SW ver: 0x%04x, Build Ti=
-me: %s",
-> +                   dev_id & 0xffff, le16_to_cpu(hdr->swver), hdr->dateti=
-me);
-> +
-> +       /* Phase 1: Download section type MTK_SEC_CBMCU_DESC */
-> +       for (i =3D 0; i < section_num; i++) {
-> +               sectionmap =3D (struct btmtk_section_map *)
-> +                       (fw_ptr + MTK_FW_ROM_PATCH_HEADER_SIZE +
-> +                        MTK_FW_ROM_PATCH_GD_SIZE +
-> +                        MTK_FW_ROM_PATCH_SEC_MAP_SIZE * i);
-> +
-> +               /* Only process MTK_SEC_CBMCU_DESC section in Phase 1 */
-> +               if ((le32_to_cpu(sectionmap->sectype) & 0xFFFF) !=3D MTK_=
-SEC_CBMCU_DESC)
+> +       list_for_each_entry_reverse(tmp, &btrtl_dev->patch_images, list) =
+{
+> +               /* Check security hdr */
+> +               if (!tmp->fix[DL_FIX_SEC_HDR_ADDR].value ||
+> +                   !tmp->fix[DL_FIX_SEC_HDR_ADDR].addr ||
+> +                   tmp->fix[DL_FIX_SEC_HDR_ADDR].addr =3D=3D 0xffffffff)
 > +                       continue;
-> +
-> +               section_offset =3D le32_to_cpu(sectionmap->secoffset);
-> +               dl_size =3D le32_to_cpu(sectionmap->secsize);
-> +
-> +               if (dl_size =3D=3D 0)
-> +                       continue;
-> +
-> +               if (section_offset > fw->size ||
-> +                   dl_size > fw->size - section_offset) {
-> +                       bt_dev_err(hdev, "CBMCU Phase 1 section out of bo=
-unds");
-> +                       err =3D -EINVAL;
-> +                       goto err_release_fw;
-> +               }
-> +
-> +               cert_len =3D MTK_FW_ROM_PATCH_GD_SIZE +
-> +                          MTK_FW_ROM_PATCH_SEC_MAP_SIZE * section_num +
-> +                          dl_size;
-> +
-> +               /* Query cbmcu section */
-> +               err =3D btmtk_query_cbmcu_section(hdev, wmt_cmd_sync, 0, =
-NULL,
-> +                                               cert_len);
-> +               if (err < 0)
-> +                       goto err_release_fw;
-> +
-> +               cert_buf =3D kmalloc(cert_len, GFP_KERNEL);
-> +               if (!cert_buf) {
-> +                       err =3D -ENOMEM;
-> +                       goto err_release_fw;
-> +               }
-> +
-> +               /* Copy Global Descriptor + All Section Maps */
-> +               memcpy(cert_buf,
-> +                      fw_ptr + MTK_FW_ROM_PATCH_HEADER_SIZE,
-> +                      MTK_FW_ROM_PATCH_GD_SIZE + MTK_FW_ROM_PATCH_SEC_MA=
-P_SIZE * section_num);
-> +
-> +               /* Copy Phase 1 section data */
-> +               memcpy(cert_buf + MTK_FW_ROM_PATCH_GD_SIZE +
-> +                      MTK_FW_ROM_PATCH_SEC_MAP_SIZE * section_num,
-> +                      fw_ptr + section_offset,
-> +                      dl_size);
-> +
-> +               /* Download Phase 1 section */
-> +               err =3D btmtk_download_cbmcu_section(hdev, wmt_cmd_sync,
-> +                                                  cert_buf, cert_len);
-> +               kfree(cert_buf);
-> +               cert_buf =3D NULL;
-> +
-> +               if (err < 0) {
-> +                       bt_dev_err(hdev, "Failed to download CBMCU Phase =
-1 section (%d)", err);
-> +                       goto err_release_fw;
-> +               }
-> +
+> +               rtl_dev_info(hdev, "addr 0x%08x, value 0x%08x",
+> +                            tmp->fix[DL_FIX_SEC_HDR_ADDR].addr,
+> +                            tmp->fix[DL_FIX_SEC_HDR_ADDR].value);
+> +               image =3D tmp;
 > +               break;
 > +       }
 > +
-> +       /* Phase 2: Download other sections (type !=3D MTK_SEC_CBMCU_DESC=
-) */
-> +       for (i =3D 0; i < section_num; i++) {
-> +               sectionmap =3D (struct btmtk_section_map *)
-> +                       (fw_ptr + MTK_FW_ROM_PATCH_HEADER_SIZE +
-> +                        MTK_FW_ROM_PATCH_GD_SIZE +
-> +                        MTK_FW_ROM_PATCH_SEC_MAP_SIZE * i);
-> +
-> +               /* Skip MTK_SEC_CBMCU_DESC section in Phase 2 */
-> +               if ((le32_to_cpu(sectionmap->sectype) & 0xFFFF) =3D=3D MT=
-K_SEC_CBMCU_DESC)
-> +                       continue;
-> +
-> +               section_offset =3D le32_to_cpu(sectionmap->secoffset);
-> +               dl_size =3D le32_to_cpu(sectionmap->bin_info_spec.dlsize)=
-;
-> +
-> +               if (dl_size =3D=3D 0)
-> +                       continue;
-> +
-> +               if (section_offset > fw->size ||
-> +                   dl_size > fw->size - section_offset) {
-> +                       bt_dev_err(hdev, "CBMCU Phase 2 section %d out of=
- bounds", i);
-> +                       err =3D -EINVAL;
-> +                       goto err_release_fw;
-> +               }
-> +
-> +               /* Query cbmcu section */
-> +               err =3D btmtk_query_cbmcu_section(hdev, wmt_cmd_sync, 1,
-> +                                               (u8 *)&sectionmap->bin_in=
-fo_spec,
-> +                                               0);
-> +               if (err < 0)
-> +                       goto err_release_fw;
-> +
-> +               /* Download section data */
-> +               err =3D btmtk_download_cbmcu_section(hdev, wmt_cmd_sync,
-> +                                                  fw_ptr + section_offse=
-t,
-> +                                                  dl_size);
-> +               if (err < 0) {
-> +                       bt_dev_err(hdev, "Failed to download CBMCU sectio=
-n %d (%d)", i, err);
-> +                       goto err_release_fw;
-> +               }
-> +       }
-> +
-> +       bt_dev_info(hdev, "CBMCU firmware download completed");
-> +
-> +err_release_fw:
-> +       release_firmware(fw);
-> +       return err;
-> +}
-> +
-> +static int btmtk_setup_cbmcu_firmware(struct hci_dev *hdev,
-> +                                     wmt_cmd_sync_func_t wmt_cmd_sync,
-> +                                     u32 dev_id)
-> +{
-> +       char cbmcu_fwname[64];
-> +       u8 patch_status;
-> +       int err;
-> +
-> +       err =3D btmtk_cbmcu_patch_status(hdev, wmt_cmd_sync, &patch_statu=
-s);
-> +       if (err < 0)
-> +               return err;
-> +
-> +       bt_dev_dbg(hdev, "CBMCU patch status: 0x%02x", patch_status);
-> +
-> +       if (patch_status !=3D BTMTK_WMT_PATCH_UNDONE)
+> +       if (!image)
 > +               return 0;
 > +
-> +       snprintf(cbmcu_fwname, sizeof(cbmcu_fwname),
-> +                "mediatek/mt7928/CBMCU_CODE_MT%04x_1_1.bin",
-> +                dev_id & 0xffff);
-> +
-> +       bt_dev_info(hdev, "Loading CBMCU firmware: %s", cbmcu_fwname);
-> +
-> +       err =3D btmtk_load_cbmcu_firmware(hdev, cbmcu_fwname, wmt_cmd_syn=
-c, dev_id);
-> +       if (err < 0) {
-> +               bt_dev_err(hdev, "Failed to download CBMCU firmware (%d)"=
-, err);
-> +               return err;
+> +       rtl_dev_info(hdev, "sec image (%04x:%02x)", image->image_id,
+> +                    image->index);
+> +       val =3D image->fix[DL_FIX_PATCH_ADDR].value + image->image_len -
+> +                                       image->fix[DL_FIX_SEC_HDR_ADDR].v=
+alue;
+> +       ret =3D btrtl_vendor_write_mem(hdev, image->fix[DL_FIX_PATCH_ADDR=
+].addr,
+> +                                    val);
+> +       if (ret) {
+> +               rtl_dev_err(hdev, "write sec reg failed (%d)", ret);
+> +               return ret;
 > +       }
-> +
-> +       err =3D btmtk_enable_cbmcu_patch(hdev, wmt_cmd_sync);
-> +       if (err < 0)
-> +               return err;
-> +
 > +       return 0;
 > +}
 > +
->  int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id)
->  {
->         u32 val;
-> @@ -896,7 +1238,7 @@ int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32=
- dev_id)
->                 if (err < 0)
->                         return err;
->                 msleep(100);
-> -       } else if (dev_id =3D=3D 0x7925 || dev_id =3D=3D 0x6639) {
-> +       } else if (dev_id =3D=3D 0x7925 || dev_id =3D=3D 0x6639 || dev_id=
- =3D=3D 0x7935) {
->                 err =3D btmtk_usb_uhw_reg_read(hdev, MTK_BT_RESET_REG_CON=
-NV3, &val);
->                 if (err < 0)
->                         return err;
-> @@ -1381,6 +1723,15 @@ int btmtk_usb_setup(struct hci_dev *hdev)
->         case 0x7668:
->                 fwname =3D FIRMWARE_MT7668;
->                 break;
-> +       case 0x7935:
-> +               /* Requires CBMCU firmware before BT firmware */
-> +               err =3D btmtk_setup_cbmcu_firmware(hdev, btmtk_usb_hci_wm=
-t_sync,
-> +                                                dev_id);
-> +               if (err < 0) {
-> +                       bt_dev_err(hdev, "Failed to set up CBMCU firmware=
- (%d)", err);
-> +                       return err;
+> +static int rtl_download_firmware_v3(struct hci_dev *hdev,
+> +                                   struct btrtl_device_info *btrtl_dev)
+> +{
+> +       struct rtl_section_patch_image *image, *tmp;
+> +       struct rtl_rp_dl_v3 *rp;
+> +       struct sk_buff *skb;
+> +       u8 *fw_data;
+> +       int fw_len;
+> +       int ret =3D 0;
+> +       u8 i;
+> +
+> +       if (btrtl_dev->fw_type =3D=3D FW_TYPE_V3_2) {
+> +               ret =3D rtl_check_download_state(hdev, btrtl_dev);
+> +               if (ret) {
+> +                       if (ret =3D=3D -EALREADY)
+> +                               return 0;
+> +                       return ret;
 > +               }
-> +               fallthrough;
->         case 0x7922:
->         case 0x7925:
->                 /*
-> @@ -1598,3 +1949,5 @@ MODULE_FIRMWARE(FIRMWARE_MT7922);
->  MODULE_FIRMWARE(FIRMWARE_MT7961);
->  MODULE_FIRMWARE(FIRMWARE_MT7925);
->  MODULE_FIRMWARE(FIRMWARE_MT7927);
-> +MODULE_FIRMWARE(FIRMWARE_MT7928);
-> +MODULE_FIRMWARE(FIRMWARE_MT7928_CBMCU);
-> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-> index 51c18dde0a80..5fe4964b031b 100644
-> --- a/drivers/bluetooth/btmtk.h
-> +++ b/drivers/bluetooth/btmtk.h
-> @@ -9,6 +9,8 @@
->  #define FIRMWARE_MT7961                "mediatek/BT_RAM_CODE_MT7961_1_2_=
-hdr.bin"
->  #define FIRMWARE_MT7925                "mediatek/mt7925/BT_RAM_CODE_MT79=
-25_1_1_hdr.bin"
->  #define FIRMWARE_MT7927                "mediatek/mt7927/BT_RAM_CODE_MT66=
-39_2_1_hdr.bin"
-> +#define FIRMWARE_MT7928                "mediatek/mt7928/BT_RAM_CODE_MT79=
-35_1_1_hdr.bin"
-> +#define FIRMWARE_MT7928_CBMCU  "mediatek/mt7928/CBMCU_CODE_MT7935_1_1.bi=
-n"
+> +       }
+> +
+> +       list_for_each_entry_safe(image, tmp, &btrtl_dev->patch_images, li=
+st) {
+> +               rtl_dev_dbg(hdev, "image (%04x:%02x)", image->image_id,
+> +                           image->index);
+> +
+> +               for (i =3D DL_FIX_CI_ID; i < DL_FIX_ADDR_MAX; i++) {
+> +                       if (!image->fix[i].addr ||
+> +                           image->fix[i].addr =3D=3D 0xffffffff) {
+> +                               rtl_dev_dbg(hdev, "no need to write addr =
+%08x",
+> +                                           image->fix[i].addr);
+> +                               continue;
+> +                       }
+> +                       rtl_dev_dbg(hdev, "write addr and val, 0x%08x, 0x=
+%08x",
+> +                                   image->fix[i].addr, image->fix[i].val=
+ue);
+> +                       if (btrtl_vendor_write_mem(hdev, image->fix[i].ad=
+dr,
+> +                                                  image->fix[i].value)) =
+{
+> +                               rtl_dev_err(hdev, "write reg failed");
+> +                               ret =3D -EIO;
+> +                               goto done;
+> +                       }
+> +               }
+> +
+> +               fw_len =3D image->image_len + image->cfg_len;
+> +               fw_data =3D kvmalloc(fw_len, GFP_KERNEL);
+> +               if (!fw_data) {
+> +                       rtl_dev_err(hdev, "Couldn't alloc buf for image d=
+ata");
+> +                       ret =3D -ENOMEM;
+> +                       goto done;
+> +               }
+> +               memcpy(fw_data, image->image_data, image->image_len);
+> +               if (image->cfg_len > 0)
+> +                       memcpy(fw_data + image->image_len, image->cfg_buf=
+,
+> +                              image->cfg_len);
+> +
+> +               rtl_dev_dbg(hdev, "patch image (%04x:%02x). len: %d",
+> +                           image->image_id, image->index, fw_len);
+> +               rtl_dev_dbg(hdev, "fw_data %p, image buf %p, len %u", fw_=
+data,
+> +                           image->image_data, image->image_len);
+> +
+> +               ret =3D rtl_download_firmware(hdev, btrtl_dev->fw_type, f=
+w_data,
+> +                                           fw_len);
+> +               kvfree(fw_data);
+> +               if (ret < 0) {
+> +                       rtl_dev_err(hdev, "download firmware failed (%d)"=
+, ret);
+> +                       goto done;
+> +               }
+> +
+> +               if (image->list.next !=3D &btrtl_dev->patch_images &&
+> +                   image->image_id =3D=3D tmp->image_id)
+> +                       continue;
+> +
+> +               if (btrtl_dev->fw_type =3D=3D FW_TYPE_V3_1)
+> +                       continue;
+> +
+> +               i =3D 0x80;
+> +               skb =3D __hci_cmd_sync(hdev, RTL_VSC_OP_DOWNLOAD_CMD, 1, =
+&i, HCI_CMD_TIMEOUT);
+> +               if (IS_ERR(skb)) {
+> +                       ret =3D -EIO;
+> +                       rtl_dev_err(hdev, "Failed to issue last cmd fc20,=
+ %ld",
+> +                                   PTR_ERR(skb));
+> +                       goto done;
+> +               }
+> +               ret =3D 2;
+> +               rp =3D skb_pull_data(skb, sizeof(*rp));
+> +               if (rp)
+> +                       ret =3D rp->err;
+> +               kfree_skb(skb);
+> +               if (ret =3D=3D 2) {
+> +                       /* Verification failure */
+> +                       ret =3D -EFAULT;
+> +                       goto done;
+> +               }
+> +       }
+> +
+> +       if (btrtl_dev->fw_type =3D=3D FW_TYPE_V3_1) {
+> +               ret =3D rtl_security_check(hdev, btrtl_dev);
+> +               if (ret) {
+> +                       rtl_dev_err(hdev, "Security check failed (%d)", r=
+et);
+> +                       goto done;
+> +               }
+> +       }
+> +
+> +       ret =3D rtl_finalize_download(hdev, btrtl_dev);
+> +
+> +done:
+> +       return ret;
+> +}
+> +
+>  static int rtl_load_file(struct hci_dev *hdev, const char *name, u8 **bu=
+ff)
+>  {
+>         const struct firmware *fw;
+> @@ -918,7 +1527,7 @@ static int btrtl_setup_rtl8723a(struct hci_dev *hdev=
+,
+>                 return -EINVAL;
+>         }
 >
->  #define HCI_EV_WMT 0xe4
->  #define HCI_WMT_MAX_EVENT_SIZE         64
-> @@ -54,6 +56,7 @@ enum {
->         BTMTK_WMT_RST =3D 0x7,
->         BTMTK_WMT_REGISTER =3D 0x8,
->         BTMTK_WMT_SEMAPHORE =3D 0x17,
-> +       BTMTK_WMT_CBMCU_DWNLD =3D 0x58,
->  };
+> -       return rtl_download_firmware(hdev, btrtl_dev->fw_data,
+> +       return rtl_download_firmware(hdev, FW_TYPE_V0, btrtl_dev->fw_data=
+,
+>                                      btrtl_dev->fw_len);
+>  }
 >
+> @@ -933,7 +1542,7 @@ static int btrtl_setup_rtl8723b(struct hci_dev *hdev=
+,
+>         if (ret < 0)
+>                 goto out;
+>
+> -       if (btrtl_dev->cfg_len > 0) {
+> +       if (!is_v3_fw(btrtl_dev->fw_type) && btrtl_dev->cfg_len > 0) {
+>                 tbuff =3D kvzalloc(ret + btrtl_dev->cfg_len, GFP_KERNEL);
+>                 if (!tbuff) {
+>                         ret =3D -ENOMEM;
+> @@ -949,9 +1558,14 @@ static int btrtl_setup_rtl8723b(struct hci_dev *hde=
+v,
+>                 fw_data =3D tbuff;
+>         }
+>
+> +       if (is_v3_fw(btrtl_dev->fw_type)) {
+> +               ret =3D rtl_download_firmware_v3(hdev, btrtl_dev);
+> +               goto out;
+> +       }
+> +
+>         rtl_dev_info(hdev, "cfg_sz %d, total sz %d", btrtl_dev->cfg_len, =
+ret);
+>
+> -       ret =3D rtl_download_firmware(hdev, fw_data, ret);
+> +       ret =3D rtl_download_firmware(hdev, btrtl_dev->fw_type, fw_data, =
+ret);
+>
+>  out:
+>         kvfree(fw_data);
+> @@ -1021,7 +1635,7 @@ static int rtl_read_chip_type(struct hci_dev *hdev,=
+ u8 *type)
+>         const unsigned char cmd_buf[] =3D {0x00, 0x94, 0xa0, 0x00, 0xb0};
+>
+>         /* Read RTL chip type command */
+> -       skb =3D __hci_cmd_sync(hdev, 0xfc61, 5, cmd_buf, HCI_INIT_TIMEOUT=
+);
+> +       skb =3D __hci_cmd_sync(hdev, RTL_VSC_OP_READ_VENDER, 5, cmd_buf, =
+HCI_INIT_TIMEOUT);
+>         if (IS_ERR(skb)) {
+>                 rtl_dev_err(hdev, "Read chip type failed (%ld)",
+>                             PTR_ERR(skb));
+> @@ -1047,6 +1661,7 @@ static int rtl_read_chip_type(struct hci_dev *hdev,=
+ u8 *type)
+>  void btrtl_free(struct btrtl_device_info *btrtl_dev)
+>  {
+>         struct rtl_subsection *entry, *tmp;
+> +       struct rtl_section_patch_image *image, *next;
+>
+>         kvfree(btrtl_dev->fw_data);
+>         kvfree(btrtl_dev->cfg_data);
+> @@ -1056,6 +1671,13 @@ void btrtl_free(struct btrtl_device_info *btrtl_de=
+v)
+>                 kfree(entry);
+>         }
+>
+> +       list_for_each_entry_safe(image, next, &btrtl_dev->patch_images, l=
+ist) {
+> +               list_del(&image->list);
+> +               kvfree(image->image_data);
+> +               kvfree(image->cfg_buf);
+> +               kfree(image);
+> +       }
+> +
+>         kfree(btrtl_dev);
+>  }
+>  EXPORT_SYMBOL_GPL(btrtl_free);
+> @@ -1063,7 +1685,7 @@ EXPORT_SYMBOL_GPL(btrtl_free);
+>  struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+>                                            const char *postfix)
+>  {
+> -       struct btrealtek_data *coredump_info =3D hci_get_priv(hdev);
+> +       struct btrealtek_data *btrtl_data  =3D hci_get_priv(hdev);
+>         struct btrtl_device_info *btrtl_dev;
+>         struct sk_buff *skb;
+>         struct hci_rp_read_local_version *resp;
+> @@ -1072,6 +1694,7 @@ struct btrtl_device_info *btrtl_initialize(struct h=
+ci_dev *hdev,
+>         char cfg_name[40];
+>         u16 hci_rev, lmp_subver;
+>         u8 hci_ver, lmp_ver, chip_type =3D 0;
+> +       u8 chip_id =3D 0;
+>         int ret;
+>         int rc;
+>         u8 key_id;
+> @@ -1084,8 +1707,15 @@ struct btrtl_device_info *btrtl_initialize(struct =
+hci_dev *hdev,
+>         }
+>
+>         INIT_LIST_HEAD(&btrtl_dev->patch_subsecs);
+> +       INIT_LIST_HEAD(&btrtl_dev->patch_images);
+>
+>  check_version:
+> +       ret =3D btrtl_read_chip_id(hdev, &chip_id);
+> +       if (!ret && chip_id >=3D CHIP_ID_V3_BASE) {
+> +               btrtl_dev->project_id =3D chip_id;
+> +               goto read_local_ver;
+> +       }
+> +
+>         ret =3D btrtl_vendor_read_reg16(hdev, RTL_CHIP_SUBVER, reg_val);
+>         if (ret < 0)
+>                 goto err_free;
+> @@ -1108,6 +1738,7 @@ struct btrtl_device_info *btrtl_initialize(struct h=
+ci_dev *hdev,
+>                 }
+>         }
+>
+> +read_local_ver:
+>         skb =3D btrtl_read_local_version(hdev);
+>         if (IS_ERR(skb)) {
+>                 ret =3D PTR_ERR(skb);
+> @@ -1185,7 +1816,11 @@ struct btrtl_device_info *btrtl_initialize(struct =
+hci_dev *hdev,
+>                 goto err_free;
+>         }
+>
+> -       rc =3D btrtl_vendor_read_reg16(hdev, RTL_SEC_PROJ, reg_val);
+> +       if (btrtl_dev->project_id >=3D CHIP_ID_V3_BASE)
+> +               rc =3D btrtl_vendor_read_reg16(hdev, RTL_SEC_PROJ_V3, reg=
+_val);
+> +       else
+> +               rc =3D btrtl_vendor_read_reg16(hdev, RTL_SEC_PROJ_V2, reg=
+_val);
+> +
+>         if (rc < 0)
+>                 goto err_free;
+>
+> @@ -1243,7 +1878,7 @@ struct btrtl_device_info *btrtl_initialize(struct h=
+ci_dev *hdev,
+>                 hci_set_msft_opcode(hdev, 0xFCF0);
+>
+>         if (btrtl_dev->ic_info)
+> -               coredump_info->rtl_dump.controller =3D btrtl_dev->ic_info=
+->hw_info;
+> +               btrtl_data->rtl_dump.controller =3D btrtl_dev->ic_info->h=
+w_info;
+>
+>         return btrtl_dev;
+>
+> @@ -1416,6 +2051,35 @@ int btrtl_shutdown_realtek(struct hci_dev *hdev)
+>  }
+>  EXPORT_SYMBOL_GPL(btrtl_shutdown_realtek);
+>
+> +
+> +int btrtl_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+> +{
+> +       struct sk_buff *clone =3D skb_clone(skb, GFP_ATOMIC);
+> +       struct hci_event_hdr *hdr;
+> +       u8 *p;
+> +
+> +       if (!clone)
+> +               goto out;
+> +
+> +       hdr =3D skb_pull_data(clone, sizeof(*hdr));
+> +       if (!hdr || hdr->evt !=3D HCI_VENDOR_PKT)
+> +               goto out;
+> +
+> +       p =3D skb_pull_data(clone, 1);
+> +       if (!p)
+> +               goto out;
+> +       switch (*p) {
+> +       case 0x77:
+> +               if (btrealtek_test_and_clear_flag(hdev, REALTEK_DOWNLOADI=
+NG))
+> +                       btrealtek_wake_up_flag(hdev, REALTEK_DOWNLOADING)=
+;
+> +               break;
+> +       }
+> +out:
+> +       consume_skb(clone);
+> +       return hci_recv_frame(hdev, skb);
+> +}
+> +EXPORT_SYMBOL_GPL(btrtl_recv_event);
+> +
+>  static unsigned int btrtl_convert_baudrate(u32 device_baudrate)
+>  {
+>         switch (device_baudrate) {
+> diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
+> index a2d9d34f9fb0..dd4acdf29b2f 100644
+> --- a/drivers/bluetooth/btrtl.h
+> +++ b/drivers/bluetooth/btrtl.h
+> @@ -12,6 +12,19 @@
+>  #define rtl_dev_info(dev, fmt, ...) bt_dev_info(dev, "RTL: " fmt, ##__VA=
+_ARGS__)
+>  #define rtl_dev_dbg(dev, fmt, ...) bt_dev_dbg(dev, "RTL: " fmt, ##__VA_A=
+RGS__)
+>
+> +#define FW_TYPE_V0             0
+> +#define FW_TYPE_V1             1
+> +#define FW_TYPE_V2             2
+> +#define FW_TYPE_V3_1           3
+> +#define FW_TYPE_V3_2           4
+> +#define is_v3_fw(type) (type =3D=3D FW_TYPE_V3_1 || type =3D=3D FW_TYPE_=
+V3_2)
+> +
+> +#define DL_FIX_CI_ID           0
+> +#define DL_FIX_CI_ADDR         1
+> +#define DL_FIX_PATCH_ADDR      2
+> +#define DL_FIX_SEC_HDR_ADDR    3
+> +#define DL_FIX_ADDR_MAX                4
+> +
+>  struct btrtl_device_info;
+>
+>  struct rtl_chip_type_evt {
+> @@ -103,8 +116,79 @@ struct rtl_vendor_cmd {
+>         __u8 param[5];
+>  } __packed;
+>
+> +struct rtl_vendor_write_cmd {
+> +       u8 type;
+> +       __le32 addr;
+> +       __le32 val;
+> +} __packed;
+> +
+> +struct rtl_rp_read_chip_id {
+> +       __u8 status;
+> +       __u8 chip_id;
+> +} __packed;
+> +
+> +struct rtl_rp_dl_v3 {
+> +       __u8 status;
+> +       __u8 index;
+> +       __u8 err;
+> +} __packed;
+> +
+> +struct rtl_epatch_header_v3 {
+> +       __u8 signature[8];
+> +       __u8 timestamp[8];
+> +       __le32 ver_rsvd;
+> +       __le32 num_sections;
+> +} __packed;
+> +
+> +struct rtl_section_v3 {
+> +       __le32 opcode;
+> +       __le64 len;
+> +       u8 data[];
+> +} __packed;
+> +
+> +struct rtl_addr_fix {
+> +       u32 addr;
+> +       u32 value;
+> +};
+> +
+> +struct rtl_section_patch_image {
+> +       u16 image_id;
+> +       u8 index;
+> +       u8 config_rule;
+> +       u8 need_config;
+> +
+> +       struct rtl_addr_fix fix[DL_FIX_ADDR_MAX];
+> +
+> +       u32 image_len;
+> +       u8 *image_data;
+> +       u32 image_ver;
+> +
+> +       u8  *cfg_buf;
+> +       u16 cfg_len;
+> +
+> +       struct list_head list;
+> +};
+> +
+> +struct rtl_patch_image_hdr {
+> +       __le16 chip_id;
+> +       u8 ic_cut;
+> +       u8 key_id;
+> +       u8 enable_ota;
+> +       __le16 image_id;
+> +       u8 config_rule;
+> +       u8 need_config;
+> +       u8 rsv[950];
+> +
+> +       __le64 addr_fix[DL_FIX_ADDR_MAX * 2];
+> +       u8 index;
+> +
+> +       __le64 patch_image_len;
+> +       __u8 data[];
+> +} __packed;
+> +
 >  enum {
+>         REALTEK_ALT6_CONTINUOUS_TX_CHIP,
+> +       REALTEK_DOWNLOADING,
+>
+>         __REALTEK_NUM_FLAGS,
+>  };
+> @@ -130,8 +214,20 @@ struct btrealtek_data {
+>  #define btrealtek_get_flag(hdev)                                       \
+>         (((struct btrealtek_data *)hci_get_priv(hdev))->flags)
+>
+> +#define btrealtek_wake_up_flag(hdev, nr)                               \
+> +       do {                                                            \
+> +               struct btrealtek_data *rtl =3D hci_get_priv((hdev));     =
+ \
+> +               wake_up_bit(rtl->flags, (nr));                          \
+> +       } while (0)
+> +
+>  #define btrealtek_test_flag(hdev, nr)  test_bit((nr), btrealtek_get_flag=
+(hdev))
+>
+> +#define btrealtek_test_and_clear_flag(hdev, nr)                         =
+       \
+> +               test_and_clear_bit((nr), btrealtek_get_flag(hdev))
+> +
+> +#define btrealtek_wait_on_flag_timeout(hdev, nr, m, to)                 =
+       \
+> +               wait_on_bit_timeout(btrealtek_get_flag(hdev), (nr), m, to=
+)
+> +
+>  #if IS_ENABLED(CONFIG_BT_RTL)
+>
+>  struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+> @@ -148,6 +244,7 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
+>                             unsigned int *controller_baudrate,
+>                             u32 *device_baudrate, bool *flow_control);
+>  void btrtl_set_driver_name(struct hci_dev *hdev, const char *driver_name=
+);
+> +int btrtl_recv_event(struct hci_dev *hdev, struct sk_buff *skb);
+>
+>  #else
+>
+> @@ -157,6 +254,11 @@ static inline struct btrtl_device_info *btrtl_initia=
+lize(struct hci_dev *hdev,
+>         return ERR_PTR(-EOPNOTSUPP);
+>  }
+>
+> +static inline int btrtl_recv_event(struct hci_dev *hdev, struct sk_buff =
+*skb)
+> +{
+> +       return -EOPNOTSUPP;
+> +}
+> +
+>  static inline void btrtl_free(struct btrtl_device_info *btrtl_dev)
+>  {
+>  }
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 7f14ce96319b..55a845efaeb5 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2798,6 +2798,9 @@ static int btusb_recv_event_realtek(struct hci_dev =
+*hdev, struct sk_buff *skb)
+>                 return 0;
+>         }
+>
+> +       if (skb->data[0] =3D=3D HCI_VENDOR_PKT)
+> +               return btrtl_recv_event(hdev, skb);
+> +
+>         return hci_recv_frame(hdev, skb);
+>  }
+>
 > --
-> 2.45.2
+> 2.34.1
 
-Sashiko seems to have found quite a few problems with this set:
+Sashiko flagged quite a few problems with these changes:
 
-https://sashiko.dev/#/patchset/20260624075505.1318804-1-chris.lu%40mediatek=
-.com
+https://sashiko.dev/#/patchset/20260624053334.3151885-1-hildawu%40realtek.c=
+om
 
 --=20
 Luiz Augusto von Dentz
