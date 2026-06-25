@@ -1,108 +1,101 @@
-Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347D2347DD;
-	Thu, 25 Jun 2026 16:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7791684B0
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2026 17:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782403577; cv=none; b=RrwJPyQbSfuT8+iVNhNUbFya+K+TyjiMM+/dlmTiBlqg4+G+4ZyvRQx7qgnsSRbVWbOZCTyuDwIIOyIFjEWhWlSXLydCi/NqHQ3Kdkpt6/i8O+liXpguowcemnLdC21gnWWkWFxHRL6+zEw6D7ahitw+tIBebR8IFgUC6nX+IKM=
+	t=1782408412; cv=none; b=F7OhdiP2MpuP1dwCY2z2Ygb4MLMJkf4wmAJaxDl2VC2ZRw3gfaLb90y1bpWfvYKBfC1NdcX0nrtruocT7LgmzxYJ1gx61EXOUgYIhHUq4Je1zaDSSvrtHOBWQVXB8zCrK3xqBmtUEbTryrd1+8S6mW01jPFreZujVBNL9lZVjnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782403577; c=relaxed/simple;
-	bh=l+DHLD0yCxEuPehPS7ksD3dSugjvskURTfhbZEviHx8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pN2vSveU3waJdMCuz1tTXIG7CUjvF5a1nXc262cAbQjP2QoepBQMkKS5oCU4A4gpeVjnnCdBs9fx9Ogv+K6T/D60HkWVq2dCf5DQq3wqWa5GGBi0TGuILrf/skHoFhPvnC+P3s1Qjpoj+ZEzMQ3lK3SKWSFGl4HnOHiAXdA9akc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [117.182.75.66])
-	by APP-05 (Coremail) with SMTP id zQCowAAnoPPxUT1qk2o9FQ--.23845S2;
-	Fri, 26 Jun 2026 00:06:10 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] btmrvl: Fix hdev dangling pointer and error code in register_hdev
-Date: Fri, 26 Jun 2026 00:06:07 +0800
-Message-Id: <20260625160607.81615-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1782408412; c=relaxed/simple;
+	bh=1Wnh+Zpl4IKF9RpGFJUDVJouoRlsRUfkxAw5L4TVJ0Y=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=WaXadi2vn06+vQh+UECc/5R2g12sGQ/V8q1x+XGQ974ZtVrq8NtISYgRYvvO6BQ8u9QPpIXpsXYDfT4QuocxcNuB02xlN1xzAeomt4ZuhrNKHOKu0QlupF/p5Ym1b44r3n4HIRsyFm4LiYHf9d4MY/C5Dh2fLrlq6bzJEJ6UtqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U6WNLeBw; arc=none smtp.client-ip=74.125.82.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U6WNLeBw"
+Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-139986373b8so187531c88.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2026 10:26:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782408410; x=1783013210; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=1Wnh+Zpl4IKF9RpGFJUDVJouoRlsRUfkxAw5L4TVJ0Y=;
+        b=U6WNLeBwoSX1rbbMVKcXi9l4rEUQ24D32+v2BY6QYH4vfj5da65MH+d9qs0xRckrcF
+         U2RK3gHcR0tbJSoZt1MuwEIkYoE1UIvMh4U+f3uWVdgEa8SfMPMmhtcQtmysUizK3fzd
+         NHt24iW5mA5JyeBcgbnKok9rax1pllTKhYpmbLx+qZYMpfGCBx4BMkAQ0mLH4iRmBGUh
+         bExiC/0koD2XloY8m8533koDKkS8zmxqGEQneUA2/6A6dpnfO7IgThkbQtqskJ1dr879
+         uCYx3AJE6RNPhBiq1V4atGIyjQ7Fhp/tsF3Yz0mfoDuXc3f9cnh9yAKupSxFMWov6/wM
+         S/WA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782408410; x=1783013210;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1Wnh+Zpl4IKF9RpGFJUDVJouoRlsRUfkxAw5L4TVJ0Y=;
+        b=SyhrC2DEey5ZJ53i9wFQAsH1xL0XEpzDKB05CW0xLkydte6rkSlciUmt72ZO1hc/aD
+         dlPZ3vNuLaUusv2X1HL6mnsIsQ9l8aYZZraW6i/aBen9jDShrN4OjVBg0u+TujFzFKPE
+         1qCihNOxtOJmp6pa4TKZ4atuHOCkNG5fhhwYbgnybKpfn0Wukj2JUCTo+L3UouVKlnyO
+         R9nOI5nP9nc3+f6OUk7z2YeAWAP/TEsMGKI3OChNiGETdRkFJ9YjQOpIG5TWnTTQmbHs
+         CmNY64OrzXrtXKanR/Vr8b1MCdTYd/cR9Dm6JrBDvkqpfcbbqP84UuyaaLZEUcXR82kb
+         7vqA==
+X-Gm-Message-State: AOJu0YzzFtOr3c2fvnmsYKOYErHm6f48QnhsNp3hiJ7UMpnD3CZx3UF6
+	H/vGmsdrV3FoV1S53UEQwQFKHC1wlfQOCgdjbciRQ+CLpcl7zRuuhqWwpN3x9Q==
+X-Gm-Gg: AfdE7cksphGiMLrpyL1nxgEvlKiryfCSWiD6rEsEkz0bT//vAUzSa7tAx+5gfXTT+7S
+	etgw3NOuJUYt5DjgMaIez6R6LlIW+LCavmUz6Gu25oSBI8wmhbYR7mNAiyFtdTIqFrYX2067yoZ
+	GZyrsRmxwWj2mKkZ83ry/snuk1byAGQrRUEzPo7CGVXgyv9fMDW0kovqWLly08uh7MMlpnzHa0q
+	52f3H8g9iupciGjagC+m1r0+Is4f6+JMB8IrNFFislCAU1h7QEi+gvWWr6kdQKDla+mcgTdHeEi
+	n4PHuD2yy5/MGcnbaxwz9zl4fKAfi2f03mV/QiIu2pj9LtNL8mFsMe/vzrxhHwxwSxT7LYoYJ7X
+	utoP+yxYJ2ceJ6n+kF970+PbpO4E7JKvtBfKMNu9RxiR/xvANyyAJS+3OwpF3vqCwiFBWeBm8zM
+	dqO9r7HRKyNejGyTKkXGW+
+X-Received: by 2002:a05:7022:62a7:b0:128:cf80:deea with SMTP id a92af1059eb24-139dbb1847amr2951097c88.1.1782408409863;
+        Thu, 25 Jun 2026 10:26:49 -0700 (PDT)
+Received: from [172.17.0.2] ([52.161.178.104])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-139d8f55b04sm10205713c88.4.2026.06.25.10.26.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jun 2026 10:26:49 -0700 (PDT)
+Message-ID: <6a3d64d9.e1ebb1b2.8c9ac.b337@mx.google.com>
+Date: Thu, 25 Jun 2026 10:26:49 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5288354127271637833=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAAnoPPxUT1qk2o9FQ--.23845S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJr1ftrWxGw4kAFWUXFW7CFg_yoW8AFy3pa
-	1kWa4Yyr1FgrWIvrs8AF4Iqa90ganxX3y8CasxAwn3Zr4ay3yvyrs8ZFyjqr15KrZ5Zw13
-	KasrWw1Uu3WUAaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
-	4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
-	AVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4U
-	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUjuHq7UUUU
-	U==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCQ8JA2o9Q74fFgAAsv
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, vulab@iscas.ac.cn
+Subject: RE: btintel_pcie: Clear hdev pointer in error path of btintel_pcie_setup_hdev
+In-Reply-To: <20260625155149.79838-1-vulab@iscas.ac.cn>
+References: <20260625155149.79838-1-vulab@iscas.ac.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-In btmrvl_register_hdev(), when hci_register_dev() fails, the
-function frees the hci_dev via hci_free_dev() but leaves
-priv->btmrvl_dev.hcidev as a dangling pointer. While the subsequent
-cleanup code does not currently access it, setting it to NULL is a
-defensive fix that prevents potential use-after-free.
+--===============5288354127271637833==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Additionally, the function always returns -ENOMEM on the
-hci_register_dev() failure path, discarding the actual error code.
-Fix this by preserving and returning the original error code.
+This is an automated email and please do not reply to this email.
 
-Cc: stable@vger.kernel.org
-Fixes: 132ff4e5fa8d ("Bluetooth: Add btmrvl driver for Marvell Bluetooth devices")
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: drivers/bluetooth/btintel_pcie.c:2478
+error: drivers/bluetooth/btintel_pcie.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- drivers/bluetooth/btmrvl_main.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index d6f0ad0b4b6e..3a4c8abae05b 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -683,7 +683,7 @@ int btmrvl_register_hdev(struct btmrvl_private *priv)
- 	ret = hci_register_dev(hdev);
- 	if (ret < 0) {
- 		BT_ERR("Can not register HCI device");
--		goto err_hci_register_dev;
-+		goto err_hci_register_dev_free;
- 	}
- 
- #ifdef CONFIG_DEBUG_FS
-@@ -692,8 +692,9 @@ int btmrvl_register_hdev(struct btmrvl_private *priv)
- 
- 	return 0;
- 
--err_hci_register_dev:
-+err_hci_register_dev_free:
- 	hci_free_dev(hdev);
-+	priv->btmrvl_dev.hcidev = NULL;
- 
- err_hdev:
- 	/* Stop the thread servicing the interrupts */
-@@ -702,7 +703,7 @@ int btmrvl_register_hdev(struct btmrvl_private *priv)
- 	btmrvl_free_adapter(priv);
- 	kfree(priv);
- 
--	return -ENOMEM;
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(btmrvl_register_hdev);
- 
--- 
-2.39.5 (Apple Git-154)
 
+--===============5288354127271637833==--
