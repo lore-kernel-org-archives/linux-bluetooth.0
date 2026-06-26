@@ -1,167 +1,172 @@
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE703BAD95;
-	Fri, 26 Jun 2026 11:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782472773; cv=pass; b=iJZoGSFmc5GcXnORLvWKOVICvwopuyUHy09o64WwgSTVlrK7AaG1HczmdFEwUeLRBpnmneFNNgxctmFXGBurQ2Xf5lAI5RKfMvu1Zx8tVD32ppQbJmOC8qlk+/DSYdGs/D186Gyw7JA9VEigE/pY08GpdDTXuJ+I9ruuSk4fCNE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782472773; c=relaxed/simple;
-	bh=Xuly9O0tAMSVu+2hyLKWHwTaD+lUumrMQlikUH/DvvM=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=ApVg1W3rOWwmnHLHzq717yTEwWDxVVRLU1VHsQPU78i6jCnce5IXkPgGnGmy0T0ybs3PNw2DXgJ3zv3QS+gFyqj4MANCMyHhfI6zgyFky2NRa9g7hwCwJnEeU8tdxk5bnWQUKOr5fmCGTXiSxnHWOiGR/HsHFNq2mSS40Ngobpw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rong.moe; spf=pass smtp.mailfrom=rong.moe; dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b=UOYFlsAJ; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rong.moe
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rong.moe
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC223EAC89
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jun 2026 11:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782472834; cv=none; b=crvctOwpBwR2fw3aXDUJaLiHPNhpktKtwijqMS5K42qYOdqgRH6cNdV7BlXsEbPwlviFvrEBrdYOOBVpEiFIig9lQwLd6wjpj7NIYsRY6RWCUqOBVxDg8OuZE4Upy5rAfIe4c9s9qVsSzJuIYX8BimCechlISvYOdImnWjMmOHE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782472834; c=relaxed/simple;
+	bh=AODr9g7jG0ahMDR1iDWx5Ha4Byxlb7oWkWpK+6uo/Hk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p7wbuW0OIXWNVPFCor6czbDDzygRa3QwlOmQpk6F/SiRw1PUUPpwMsi9Rz7G5zQAQ+A4pIH+J5JSd/TUqAwtfs7b+Ot0Zxi+WQOEylLFYyL0PmnqQ00U0cmlufGYCWy9Rxq1vMRL+MzXI2hQW++6DEg+HXS9SRl5EBfKH+PLdrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=g1zAlDyz; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=jngTtTGh; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b="UOYFlsAJ"
-ARC-Seal: i=1; a=rsa-sha256; t=1782472758; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=g8AUlxrBF5LH1GVl4lbltQSlbHrBtU+213LJQo5t+QW0EbW/YPv83nBSa8PkdbpQmX+vlVt7yl+FiQZlTVbx8T6scTC0OYIlUcfCKP+GYuphXNqVVr9NxVwVCxrT725U1BJUQefRwkeOGpPfm4CC8vE4jzQ7icbfL64n/bDlN0s=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1782472758; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=Xuly9O0tAMSVu+2hyLKWHwTaD+lUumrMQlikUH/DvvM=; 
-	b=kk47VyBMA9hd2okHqdwPc5hvmRv4AlSYFHEW7VIEeEt7ZljEZD5AWvn7AREOtXU2Ex9lNuuC1HLEPlHhCJJWgUJSLnHuI6Cey8ceBhQijiGfBH76tfJj732BrEtqLs3Xr28S7+rgnnxiehDWHqHjwYkuaxjStBO25ZAItT9B2pY=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=rong.moe;
-	spf=pass  smtp.mailfrom=i@rong.moe;
-	dmarc=pass header.from=<i@rong.moe>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1782472757;
-	s=zmail2048; d=rong.moe; i=i@rong.moe;
-	h=Date:Date:From:From:To:To:CC:Subject:Subject:In-Reply-To:References:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To:Cc;
-	bh=Xuly9O0tAMSVu+2hyLKWHwTaD+lUumrMQlikUH/DvvM=;
-	b=UOYFlsAJ4DQ/kmhSh5cHu2StIi3xJxPNds8AsvqRmV4iXu0AruvmZo29XeTfjfHZ
-	q+8NskdgpCDSCeO9GEZA0GGj32fR2GLNmCmqcP84YJI6utuaLSRIdEESGIqR/7uq+Y4
-	eAhkEeCEWyV3MU2H05CcB/JI/mQWP6So2P4gFm1d+tZXLpgGyeJPsfOLfmWizm8vkUx
-	+UCJJcOjFhzNEbzHz0ikg+EBiF0jyJSx+wPt7uWahPs85JlGkEE2HUgTv+MULTrID7t
-	wCLKzMRimxNy9cFdMksGnQmhSbjb40zsBdhf4CZZNKId92yoIxmsHuooUM+TKOY+kzN
-	by9nK4CC5w==
-Received: by mx.zohomail.com with SMTPS id 1782472755335165.29894146156312;
-	Fri, 26 Jun 2026 04:19:15 -0700 (PDT)
-Date: Fri, 26 Jun 2026 19:19:06 +0800
-From: Rong Zhang <i@rong.moe>
-To: =?UTF-8?B?Q2hyaXMgTHUgKOmZuOeomuazkyk=?= <Chris.Lu@mediatek.com>,
- "patchwork-bot+bluetooth@kernel.org" <patchwork-bot+bluetooth@kernel.org>,
- "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>
-CC: "marcel@holtmann.org" <marcel@holtmann.org>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- =?UTF-8?B?U1MgV3UgKOW3q+aGsuasoyk=?= <ss.wu@mediatek.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- "linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
- "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>
-Subject: Re: [PATCH] Bluetooth: btmtk: Disable remote wakeup for MT7922/MT7925
-User-Agent: Thunderbird for Android
-In-Reply-To: <3f9c376a5dbfc9d737e2a7f83c5db8e591fb8793.camel@mediatek.com>
-References: <20260603-btmtk-remote-wakeup-v1-1-5c1006442f36@rong.moe> <178050901239.1520440.2026593395539384648.git-patchwork-notify@kernel.org> <3f9c376a5dbfc9d737e2a7f83c5db8e591fb8793.camel@mediatek.com>
-Message-ID: <17FE08E9-2229-4C97-846F-6FA099E22C90@rong.moe>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="g1zAlDyz";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="jngTtTGh"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65QAcipr858269
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jun 2026 11:20:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	efSmsLNw8E+yGzrU4i9rfMYqOeX4WnsvoEalewcGYnQ=; b=g1zAlDyz9+fjFEn1
+	eSLwg5hGzrK6g6mloSVh46LugG7GsSngDqO0kgNgdgND6LIRSGZXWL+6k34xsLaa
+	E0GaUP01R6u7FDeAt4tY85T8+QZC9Ph7N8Rei1xnQJsIR4Vaf0ua58e2H44b4Vh6
+	zsRya1YcadyGXUZMluRvvhQ3xB43A6rLUrguZaV8685jFOP9gawXuLDp9oJ8QMW7
+	OZ+84CuflpoD+EzVf5b1tTB+t28WxZTCyyJYKTn0OQHTifpEoRseAGg/nOsISOI3
+	y0d18VYFI12DOixIFrZ37QjG1Eex9Dm9DVSgncvQo/ETUDKXO6Ar3QOaNKB6pKWH
+	lA1LTg==
+Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com [209.85.217.69])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f1p2trhce-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jun 2026 11:20:31 +0000 (GMT)
+Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-734f236d7c2so34667137.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jun 2026 04:20:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1782472831; x=1783077631; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=efSmsLNw8E+yGzrU4i9rfMYqOeX4WnsvoEalewcGYnQ=;
+        b=jngTtTGh/QW48K6XX3v+hysyuC0lWG7i7XbvFodzJ6RQXMEwG8vU9VMJ4Xy/BXVo6f
+         xCxLR6c+EsRhbo69q2Ci9HPbvLvSCIId8YEthagyCWaqIrY1G6lHlk1FIW2JWx+J2t2K
+         Vb6zK9TO/HsLg8NzOPbewohurkuzvZUDkV7wm3G+avBk90kvUmZ/WPUcePtwJz1FK3ek
+         hDxXDGWh0jcEFC1qDIVtBsF9/QRym5+xr6cGUErs3w1IBK3raav2YuQZXCAFFEfbUzCJ
+         9OEp/yoLLUkAZ1W2jaIsnYzVT0jduRtYpPZQmHY2nRVBa47EdfbxA4wq/wsEP/0fg34l
+         JLlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782472831; x=1783077631;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=efSmsLNw8E+yGzrU4i9rfMYqOeX4WnsvoEalewcGYnQ=;
+        b=oAlakLIvNgwl7/O4ziUHsGp2PlFU96ZZCICDVdb1yCUAnVvdG6lwRDAXR+cuEUIpdY
+         OQd1j7OwgP1VU9iPQsG458p9ZPVyLxV5APZNOMwAf/H6ocDikRzc8NsW3pFaa32wTO5z
+         oADkhh9JAWu1MTkXc1XEvTnXAVUgE5yzY4cK3I1VuX0zeIicmy0cAYQeoxWypYSscpW/
+         RROAeMJQwLaWQwFcNr6+5mYfXdPgzLmQiedCRPd6KkS+nigiKDVHepX03RblYGsblAos
+         On6PW2TS28kYIJjTwwfe66sP7pNNscL3DnVc+BvKWj3lKzCoVJqLSkiyk5assfCIbvH6
+         o6cw==
+X-Forwarded-Encrypted: i=1; AHgh+RraEDDCv24X7QzJGAP6WJtBI/cEBTN16PBikZRNONMoISHZK45wPwEwhjln9jHKXNPlNSl28T9o0QNQCIw235U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzortw0C0tjpK4nvH9TZ/fNCEI66P7B21SS6MlA8BgpHOzGJVIn
+	Crcf7isRQBujJKrUI4vBYHgsXYSo3v/akjTsEim2wpXsO0vgUU/z9h4La4BqnypCjuEu2IZc6Rw
+	u2PpZuuEDgAUOWQn8TD6WBqY43SHl5OceI779hNGdW+MByW8HMhKdKB+y2oWdm5OSpe1xX2w=
+X-Gm-Gg: AfdE7cmHB8sHX1bQzomiFpnEarUR4Fe7kskQTBzXhLmLuVchYBilqBuC3v6ndXiGNFv
+	DGkRhmBVnGrOz63ybILsVWqQ4nHB/jFrIgQfRuOkVeA79gKrP/4raFi4hgBgniEsHTGF5q/o10y
+	E4I7p+LDUp53XXVuUSDt2xgABjpH38Gx5XizJzrVJMbdmnpOwmTWEpnnQgTI8E1WLlJzfRypaZf
+	b3tnb9LQGUcFYXG2wkLOaFVprCrei+8fKZI3Cb8ONouiancRW1xYR4Eb3wi+7BP2rKvArWU/ncP
+	+3brOuH/MvZN8K7gPhYUIYtUSLEnsb9FJoeMm7o/FsL9SZDx+t13dTBIm3Cro+dNdD76WjXJME4
+	qwAHIF3NXA6cpeeytYCasQrsAzuHjXzcbo9w=
+X-Received: by 2002:a05:6102:148e:b0:6c2:7d0d:e09f with SMTP id ada2fe7eead31-73433e3675amr1071155137.1.1782472830787;
+        Fri, 26 Jun 2026 04:20:30 -0700 (PDT)
+X-Received: by 2002:a05:6102:148e:b0:6c2:7d0d:e09f with SMTP id ada2fe7eead31-73433e3675amr1071127137.1.1782472830410;
+        Fri, 26 Jun 2026 04:20:30 -0700 (PDT)
+Received: from [192.168.120.170] ([178.235.128.140])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-697f3ade18esm2731485a12.7.2026.06.26.04.20.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Jun 2026 04:20:29 -0700 (PDT)
+Message-ID: <38aceb33-b28e-4994-b277-de070b6dae2b@oss.qualcomm.com>
+Date: Fri, 26 Jun 2026 13:20:25 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-ZohoMailClient: External
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/6] remoteproc: qcom: Add M0 BTSS secure PIL driver
+To: george.moussalem@outlook.com, Jens Axboe <axboe@kernel.dk>,
+        Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jeff Johnson <jjohnson@kernel.org>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        Saravana Kannan
+ <saravanak@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King
+ <linux@armlinux.org.uk>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org
+References: <20260625-ipq5018-bluetooth-v1-0-d999be0e04f7@outlook.com>
+ <20260625-ipq5018-bluetooth-v1-2-d999be0e04f7@outlook.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20260625-ipq5018-bluetooth-v1-2-d999be0e04f7@outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjI2MDA5MiBTYWx0ZWRfX4+kAyGyfA3nB
+ v137AymFnB2WWUqQ7vVuM3ifM5hz1tHAkQd52NlMDz7zvnzLM7UwrXyOvv3s5sQ3iw1kk8OPGD5
+ PqLUzLioe2QkNNKMLlaYAHI+SqRh6Jg=
+X-Proofpoint-GUID: tlpflD7PYodkWzc2WkbZdE802Lke9AgA
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjI2MDA5MiBTYWx0ZWRfX6/5+E/7BeVIk
+ +qxwoo62r8LtX1FZgFUs7Q9rxN1wYMW0rYF7MBD3eAc4X76j7BuqTQpdVEux6lFOfLNPyW2k93e
+ 9rF4O5jwpZDOtsA+sO+7cHoM9Pz8EOwvuspTzZaiYWxp3XZXEDpxRaffrFOqLUA+O4brhh4+qVY
+ X156uqHwX4RrCqitNK3/MNMkDKyP7mxbM3YMud/Y5zCEznWqxgCkcJrx+bESt8fWRtPsREsQ9Vk
+ ZnunieXiDfZGKe6yiRLcACBqFJVc+DlcCbMSBfr1Ui7pgOZi3sPvk3IJRiwQ/kaTcfSrTNsqaJ1
+ vuLDn00OKKh4+k5TM5X8Q+eoYQyTXY3003DQzDIvqZJqZ8hnaoRHB8hgXZxF+6VX/7MxmVKx/xs
+ q9DLlnLfE1hwjR1kQeY7vkCp6GlBC4+C8ohTj3rqQavm7dOQEi5n12MSa4N6YkTVmAnF2Uh8GBH
+ e1kQ16hFQyVvBDku7UQ==
+X-Proofpoint-ORIG-GUID: tlpflD7PYodkWzc2WkbZdE802Lke9AgA
+X-Authority-Analysis: v=2.4 cv=IM8yzAvG c=1 sm=1 tr=0 ts=6a3e607f cx=c_pps
+ a=5HAIKLe1ejAbszaTRHs9Ug==:117 a=PRfkaYvzSr8QmIIGAkY2Sg==:17
+ a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22
+ a=UqCG9HQmAAAA:8 a=sp8NEORZx8pkfp9qRiAA:9 a=QEXdDO2ut3YA:10
+ a=gYDTvv6II1OnSo0itH1n:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-26_03,2026-06-24_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 bulkscore=0 malwarescore=0 adultscore=0 lowpriorityscore=0
+ impostorscore=0 priorityscore=1501 phishscore=0 suspectscore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606260092
 
-Hi Chris,
+On 6/25/26 4:10 PM, George Moussalem via B4 Relay wrote:
+> From: George Moussalem <george.moussalem@outlook.com>
+> 
+> Add support to bring up the M0 core of the bluetooth subsystem found in
+> the IPQ5018 SoC.
+> 
+> The signed firmware loaded is authenticated by TrustZone. If successful,
+> the M0 core boots the firmware and the peripheral is taken out of reset
+> using a Secure Channel Manager call to TrustZone.
+> 
+> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+> ---
 
-=E4=BA=8E 2026=E5=B9=B46=E6=9C=8826=E6=97=A5 GMT+08:00 10:40:54=EF=BC=8C"C=
-hris Lu (=E9=99=B8=E7=A8=9A=E6=B3=93)" <Chris=2ELu@mediatek=2Ecom> =E5=86=
-=99=E9=81=93=EF=BC=9A
->Hi Luiz,
->
->Could we revert this change?
+Can this not fit inside the existing PAS driver?
 
-Please don't=2E The fundamental goal of the patch is to make MT7922/MT7925=
- *usable* on affected platforms=2E
-
-Moreover, almost all recent AMD platforms ship with MT7922/MT7925, reverti=
-ng this patch affects quite a lot of users=2E Almost every AMD platform I'v=
-e met suffers from the issue, and there are plenty of bug reports=2E
-
-Intel platforms never ship with MTK WLAN NICs, so I can't tell if the issu=
-e is reproducible on them=2E
-
->
->Sorry, MediaTek wasn't aware someone submitted this change and it had
->already been merged=2E
->
->MTK believes this issue is strongly related to the platform's USB hub
->behavior,=20
-
-Still, I believe that there are some interoperability issues in MT7922/MT7=
-925's hardware or firmware, as reinitializing the XHCI root hub (by logical=
-ly removing it from the PCI bus and probing it again) doesn't make it recov=
-er at all=2E
-
-> The product lines MTK directly support haven't reported such
->issue=2E
-
-=2E=2E=2Eor did you mean none of the existing AMD platforms are supported =
-by MTK?
-
->
->Disable wake capability would severely impact wake on Bluetooth on
->MTK's official product lines=2E
-
-Could you kindly explain "MTK's official product lines"?
-
-> Furthermore, this patch looks like a
->workaround=2E There should be a better way to handle this issue=2E We hop=
-e
->this change can be reverted=2E
-
-The issue is severe on affected platforms by making the Bluetooth interfac=
-e completely gone=2E IMHO, we must figure out the "better way" before rever=
-ting it, or else it's more like burying your head into sand by shouting "wo=
-rks fine on our platforms" (TM)=2E
-
-That being said, I think we can narrow the range of the quirk down to AMD =
-platforms only=2E Does it make sense to you? If so, I will submit a patch f=
-or this=2E
-
-Thanks,
-Rong
-
->
->
->On Wed, 2026-06-03 at 17:50 +0000, patchwork-bot+bluetooth@kernel=2Eorg
->wrote:
->> Hello:
->>=20
->> This patch was applied to bluetooth/bluetooth-next=2Egit (master)
->> by Luiz Augusto von Dentz <luiz=2Evon=2Edentz@intel=2Ecom>:
->>=20
->> On Wed, 03 Jun 2026 02:38:10 +0800 you wrote:
->> > These NICs are often reported to lose their Bluetooth interfaces,
->> > i=2Ee,
->> > their USB interfaces suddenly become completely unresponsive,
->> > causing
->> > the USB core to reset them, only to find that they are no longer
->> > accessible=2E A power cycle is required to make the Bluetooth
->> > interfaces
->> > recover=2E
->> >=20
->> > After some investigations, I found that their USB autosuspend
->> > remote
->> > wakeup capabilities are so broken that they are precisely the
->> > culprit
->> > behind the issue:
->> >=20
->> > [=2E=2E=2E]
->>=20
->> Here is the summary with links:
->> =C2=A0 - Bluetooth: btmtk: Disable remote wakeup for MT7922/MT7925
->> =C2=A0=C2=A0=C2=A0 https://git=2Ekernel=2Eorg/bluetooth/bluetooth-next/=
-c/247570151789
->>=20
->> You are awesome, thank you!
->
->
->Best Regards,
->Chris Lu
+Konrad
