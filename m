@@ -1,168 +1,175 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70F8B3A8732
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jun 2026 05:20:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C081A1DA0E1
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jun 2026 08:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782451210; cv=none; b=JHBvtgx4dofDeohm1b6DDUJZO7fpVuFiCrQ3InLQ3q+06kcqBxAsqD5Up51fOKOBAsYf9mV0WjSNoB8txQJFLBm9rk7KrVUQ5c1c5eqt9RhMec2NuS5wPIg4Ctov3Jz8kt20BYok36aYB1fV0hCxhsYEF920LRAoJSjvNbIcB7k=
+	t=1782463161; cv=none; b=bvQeeUS0GCaM22UxKl+fVq/QEfiyKmOhRtTZK2rTZG7qNAGR5LRprBb/XNV/rFSFe6zEm241F58cvxwpHso4Hn6MEkgolUY/CHHeG4bY9cWSLjyycfNxXgV9ZBMszWQFJTtbPudFoGiGgSYsZa+W+qFN4UFU7QqRMub9Bg+Y9b4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782451210; c=relaxed/simple;
-	bh=WKgBK9QgtyJcI0h2tkQjPicZvAZwBNsQSOOoAXpALN0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dLLO6+Y1+W+m39AoB/TaL0dagaDpzAG9fhbJcIfHTwVQDPd6rgQX1VaWZB+TMit0MjspaSVtBOy5wpuwdtvRJOZJeRYHE0ZimdGEYANzlPHRVuv4B9ldyxk5BfNa69H5Y31f3Py9tQQ8Rc4WuVSmvPh6GT4ecMwAygQj8wcdXco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Y4Jt5Qbj; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=d6fEV1CE; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1782463161; c=relaxed/simple;
+	bh=ejoiUeHue3lCltkh0TZsZp360yRLKxUEEsbptY9lVvM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=htVaIlsSAjtErCOh3ijaUiZlozreQK7aOCwl0pUr2IVJqNotyyM6SEqPruk6JNSsKCQPeboXA8au9IJcnuN0aPL5SwR/HxMpc4nqyDqUpfCqIFohbopUGtDGf1iBT9fhcTJB+eBJoJCUZxO6Q28RgRCilbWMCgQz2DN1RnKda5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JKPvJE2K; arc=none smtp.client-ip=74.125.82.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Y4Jt5Qbj";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="d6fEV1CE"
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65Q2ipEE4181775
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jun 2026 05:20:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	9eQxVHI0s6IYSxZbSFmI7Yut85fEmi4YSANEBHXsji4=; b=Y4Jt5QbjF/5P/INL
-	n0QLmmov4PLiyn8UrlsabG5AEGxyBK8aeAZ1LOXJD0zn0zJqEQIJPZEU4NPMmEFD
-	L9ndMGLSoBGaF3sA15ZIz+FyOzR76Ak1mF574fRw9mgppDPci2S76Knn7ye4k7dt
-	RZVoMbpSBqMhoCPg8ib881zhmNfekZ3wgGW1G5/ZgO4q/AVHWqmwVV96CFhwB0t4
-	/wjBn5e+DBJ6DmhLyYpIqFu42TUo1nrGW2tA8ORNzCuaFnoVuvScm9QSvYcnTU5h
-	Qn1b6JXu4Kh+sEU+LZIASJdGBjZXjnm2UDbbB34x7+7dviesem6yGnhzsiKlRhGw
-	YMbipg==
-Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f17s8jvvk-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jun 2026 05:20:08 +0000 (GMT)
-Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-30c8aa3ca3eso62718eec.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jun 2026 22:20:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JKPvJE2K"
+Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-139a5f4ca15so851067c88.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jun 2026 01:39:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1782451207; x=1783056007; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=9eQxVHI0s6IYSxZbSFmI7Yut85fEmi4YSANEBHXsji4=;
-        b=d6fEV1CE6Dfibm+itlBHVzPQkSGRUTShUavtCIz4GjofQUYUY3lHOAV/0ONyaOitjl
-         6O08WLOrqn94M/EkgI15QnBYtQ8++aKodoqc+8Bo0i6KZHJ2Fx6D8/i/Dh4JaJvF1+1K
-         Jutecj8pUVpkpi5hdB/pbYhP+eFzX+2TV68OZn0eWewp8/eSAVVKAbnYVkV0hpvszBwk
-         EANB8oADM4ZxJmuaU5NN+opBqMcCM5ZTcKbiHSmGbe/TCbQ1yfoD6m5nD3MAuyA1jOcc
-         m78Gs+Qg+y3zgoDUxVqt0EU2DFRro8/j6Dh5OenvaZ+VTLvfvL2WfyaYWW93NxjdaLch
-         DaSA==
+        d=gmail.com; s=20251104; t=1782463159; x=1783067959; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=CO72VQsPQVSFv1W05y18v2AFxaV3yOoXi+XmzmeaE1M=;
+        b=JKPvJE2KMzu9zPcn+PqMDA0wdIpSDFFurKk+byCcw6icSlG/AxO/ze2xA/8vEX08ol
+         pGJpmhZ/+ZufiJiqD1xQahSHTJ9QdqQvsUpumIc65JCXUYFPUoq2KAFdJTaHuzNcbYGI
+         asH7Qq/dEcyMg0iw9DbkjqVkbB8bDKDN6ddxAOcscmDB5EIZrCRFsP93QHIjTP1VX2VD
+         GMM/Uk288fypVJ1eVFFQoI+JfiTQ/GbV55WAcPYZQ6oVi1Hu0ioueVXFl56kH5QqmqNN
+         qg/8CmDHb0vJTdWXUV0MKQ6/+lnw6Ew690AVsYEXsmYPEaWSaZLfz6tBjlp3p/P7+8ML
+         5Nlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782451207; x=1783056007;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=9eQxVHI0s6IYSxZbSFmI7Yut85fEmi4YSANEBHXsji4=;
-        b=Jis2ry3WHK9x4TIIgpC/Lr0mbKiKq9t1iSV7O9+Q7GKy5zRId0CDgCfGF9VwLVs3+4
-         uapO/uTv1Ekq6FyezCegzfXRsaeg7E4mDqfPlSVfFNj2R2Z1H8RK9d0jX8wtb649IpCI
-         HsHXOydiGfk4vJcZm0FxJMjCBSWhxI772Hopwro2mUedt0RjjlbiLl7+zbnzxc7Fn7wP
-         yJU+waeFxZ5rC5ccSWxwSPhXICnaphpk02CS84+RbXjXR29j8kivjzrltuSZlWSb1i0F
-         IBtZ8AzRHQ1o3FViPuB3PqjX513IUcuQXAWlYmEmC5ddRrXscArlHgBqL8fHhkrfORM9
-         RYuw==
-X-Forwarded-Encrypted: i=1; AHgh+Rr0MRvZAOAzvS8K6lzshqrnbGM1+uhLXehZR8dDNfYobPo5T3HW9T8e5VmH/1oOpP6oiymZGT5Qh+tISwC1I9Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxalksPRyinE44VCcmUj2Hh9DVUirVIlXooPD8RJ3emKM3mYY8k
-	Th/b5T5lc6//jMR19SXJ+cxcXEL9CybLZtf3oBCMTfb4jgO6YqR1BrGeds47pPWPxffeczckodj
-	jqTRpLhY3+g6QEXi0FlKa+6D1vaEFqpQe5ezzCvhktuw6RAYbKKVbZq9fB3HYV3dwwV9sIiM=
-X-Gm-Gg: AfdE7cnpNMqNq4QMEo0J4Yre01u9IPMaJHUoXu3MD7+gu5LOvnwoLiGbZ3HStqqSV/y
-	gnQ7cwNn4Cq7rLrE1FT1rt/NVZqSZnKj+/L9+/xCK5vCPAQjUjgyXBawh1Q6MKGZgT1t0VUQ6pa
-	cqUx14W4PxeVKUvBHyI5PHupLbBR+D+i9eZzx3+mcRzlGGEdrpdXiRO3zLDdxGCMeyk56e0jRVs
-	ZakxJky0B1XlcnFoAwPJQ7bkLX3agYOBGDqfzrEIFbMFo+jB+voeV9PyW0bENYdO00+nzdi678m
-	+dhciszpgi1VUyKQEi5lzICNIUpiifhbBJCjfEWQHlhbYsZjpD3A1WYqRMcLyEfCDJc674P+nYq
-	Ds0HWNVcea7T6l26tMEAV3CNa8QIwXygMoQn+BT+7G4N+v2nycWmWwFHP4g==
-X-Received: by 2002:a05:7300:d517:b0:30c:5197:3a09 with SMTP id 5a478bee46e88-30c84d5fea7mr2312220eec.7.1782451207317;
-        Thu, 25 Jun 2026 22:20:07 -0700 (PDT)
-X-Received: by 2002:a05:7300:d517:b0:30c:5197:3a09 with SMTP id 5a478bee46e88-30c84d5fea7mr2312195eec.7.1782451206771;
-        Thu, 25 Jun 2026 22:20:06 -0700 (PDT)
-Received: from hu-zijuhu-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30c7c4ca240sm14345291eec.4.2026.06.25.22.20.05
+        d=1e100.net; s=20251104; t=1782463159; x=1783067959;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CO72VQsPQVSFv1W05y18v2AFxaV3yOoXi+XmzmeaE1M=;
+        b=s1P9kHAZL1NSXeHhNd+xvfEjW+hxS1KJXVNwKQsDcTJM2g9a2TnYAqBh0J4kM1FdXj
+         AS2Qf/+8Neava0j1qSo3AUAqteYk4r8LjZ2YYiMFp3AVNensyXttHkKoidQ+qwYHLOcV
+         T0Pg54tUpmxAfpAqPKwb4qRcqpRlhIPwqkEQ+AkIBAQU9V7Yn79LvA+b77FxutmboFM8
+         oOWmh2mxfsKyo8dDxGL+SrOFoscGO5vRPKP64bPe24ePGuSDnsEW02zUwlKMgjotFLJi
+         HbcTomnGSAvfckKWHkGj/Bsi1feDkINDpePO51qIB2Xowf8lsHYL7DMrLdVbjnp4KajU
+         w98A==
+X-Gm-Message-State: AOJu0YxJPTzySnczYdgM7IO+Z3MU/AmtIrGQmkJi0Va6A7BpgnSiMebn
+	zVbTTIUXf+QJxAynLqC3WmBiGrVGZD0PYeweEVtUydJzsh8hhR5v9jDTYhZj+g==
+X-Gm-Gg: AfdE7cky0/8s0SEU1LX5AERdTWzy3K+1xCK5sdKCTQUQ5ewgS0eO+ush1P4nLeQmLay
+	aaFmD3Ril8HE6i5oU956UL8SwD7rC13SY6M+Hj9nOS4tVt9gqHjhOJuVheI6MSF94r6XqzTxsW9
+	wqXy1UTMPAO6FU+aZSa37cl4eYXYYuUWbi0gHlXGgC39Llou7lXsSpt/8SpXdLw5AnBVwPDcYbO
+	Uyn1pQT8WgwkvChZLPfCKcZY/PXE5AFqlii7B3OyNpiHKS7KJjQXXRQhQWSUtY7mkexBcuO4Eqf
+	4OSTsDI9tOG8je0pOEmoPwBYJw1Ekt4wjxRbtLmxEttkaTVJ/14KVuxwjH8Pjdcdrd5+j/yjxXg
+	bZIqJdu0TOPVxTTFrYjFeD/3H4Lu9+yPCuddmPV4341VlZ6nTEZu33zGY5lYGiZcYr940EVkOYE
+	+gLsU8vXDtkKghmMJ/KO4=
+X-Received: by 2002:a05:7022:410:b0:133:3bb1:8d40 with SMTP id a92af1059eb24-139dba6db68mr4704838c88.15.1782463158685;
+        Fri, 26 Jun 2026 01:39:18 -0700 (PDT)
+Received: from [172.17.0.2] ([20.25.151.118])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-139e78317f3sm2120410c88.9.2026.06.26.01.39.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jun 2026 22:20:05 -0700 (PDT)
-From: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Date: Thu, 25 Jun 2026 22:19:57 -0700
-Subject: [PATCH v2 12/12] Bluetooth: btusb: Use & instead of == to test
- bitflag BTUSB_IGNORE
+        Fri, 26 Jun 2026 01:39:18 -0700 (PDT)
+Message-ID: <6a3e3ab6.331483e7.b2c6.6a4c@mx.google.com>
+Date: Fri, 26 Jun 2026 01:39:18 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1069128489825856229=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zijun.hu@oss.qualcomm.com
+Subject: RE: Bluetooth: btusb/btqca/hci_sync: Clean up btusb and fix several bugs
+In-Reply-To: <20260625-bt_bugfix-v2-1-93396a6f7d5e@oss.qualcomm.com>
+References: <20260625-bt_bugfix-v2-1-93396a6f7d5e@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============1069128489825856229==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260625-bt_bugfix-v2-12-93396a6f7d5e@oss.qualcomm.com>
-References: <20260625-bt_bugfix-v2-0-93396a6f7d5e@oss.qualcomm.com>
-In-Reply-To: <20260625-bt_bugfix-v2-0-93396a6f7d5e@oss.qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Rocky Liao <quic_rjliao@quicinc.com>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Ben Young Tae Kim <ytkim@qca.qualcomm.com>,
-        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Tim Jiang <quic_tjiang@quicinc.com>
-Cc: Zijun Hu <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        linux-arm-msm@vger.kernel.org, Zijun Hu <zijun.hu@oss.qualcomm.com>,
-        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-X-Mailer: b4 0.14.3
-X-Proofpoint-ORIG-GUID: RklblB7aClY0N4YbJ9y7vkLLZcN5Tlmv
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjI2MDA0MCBTYWx0ZWRfX07hnRSIyKS+l
- LWOUSPJvnfX2bQnIhWT8xKzmxeJTkDCTic+/hrVEuXVn91rF9Fx1JM5xzLGksyfG6cC156sCdzz
- gJWPB04uIJcifRQmDpibGd+0eTPZPYY=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjI2MDA0MCBTYWx0ZWRfX/ONuVJfzhQU9
- IFj/3iZlkCHaq0K2wuYBZL3QIkHUDf3i5NFkztPtZcMgYP3CBNSI5zQ4TI2wo9eGVShW3Z7CkMz
- +MK8Qmo+QbI9cTdZ+3SWru9vlH0YKlVhhtU/snsQ1RL3DPvcJclI5BSRkfWqsaGsOK+KR4VgNSr
- mKWhzyQFsgfcAKZobxV7QKwYonU1oX5zucAmB66SLfgWXSfU7kBMi5zDP+MJwTPn1VnM33tCJCA
- H0+UwE1XvbAPkEtn4dk+Xsyj9/B2jQzDG0ZrYimmPencGj6qaISoU4aKIHRyhDm3hcBQUAI2Vbh
- V8/NS6PrZZI+I5W3GbSIMetHVBNCyx7nlrNU6C9v1Nsw7fw7sHWufRnSYxe9dQR8OF+bGDkqmhL
- w6THZhcu7QfqQAL/Oa8AIV8AEfHu+yM8d9UXk7gtyw5Kc9l8M0yHdxmfgaVKeOMlTF6Ex5O9CmI
- DwMxAinki2LyVDwWhgA==
-X-Authority-Analysis: v=2.4 cv=GKo41ONK c=1 sm=1 tr=0 ts=6a3e0c08 cx=c_pps
- a=PfFC4Oe2JQzmKTvty2cRDw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22
- a=EUspDBNiAAAA:8 a=HKrVEy9w7v3RiqOSl70A:9 a=QEXdDO2ut3YA:10
- a=6Ab_bkdmUrQuMsNx7PHu:22
-X-Proofpoint-GUID: RklblB7aClY0N4YbJ9y7vkLLZcN5Tlmv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-26_01,2026-06-24_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 adultscore=0 malwarescore=0 priorityscore=1501
- lowpriorityscore=0 suspectscore=0 bulkscore=0 impostorscore=0 phishscore=0
- spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2606260040
 
-The driver_info field is a bitmask, so use & instead of == to test the
-BTUSB_IGNORE bitflag against it, which is consistent with how the other
-flags are tested.
+This is automated email and please do not reply to this email!
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1116853
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      14.56 seconds
+VerifyFixes                   PASS      0.39 seconds
+VerifySignedoff               PASS      0.30 seconds
+GitLint                       FAIL      6.75 seconds
+SubjectPrefix                 PASS      3.22 seconds
+BuildKernel                   PASS      26.93 seconds
+CheckAllWarning               PASS      29.60 seconds
+CheckSparse                   PASS      31.00 seconds
+BuildKernel32                 PASS      25.89 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      503.08 seconds
+TestRunner_l2cap-tester       FAIL      60.66 seconds
+TestRunner_iso-tester         PASS      80.79 seconds
+TestRunner_bnep-tester        PASS      18.64 seconds
+TestRunner_mgmt-tester        FAIL      206.27 seconds
+TestRunner_rfcomm-tester      PASS      25.66 seconds
+TestRunner_sco-tester         PASS      32.94 seconds
+TestRunner_ioctl-tester       PASS      25.81 seconds
+TestRunner_mesh-tester        FAIL      26.24 seconds
+TestRunner_smp-tester         PASS      23.77 seconds
+TestRunner_userchan-tester    PASS      20.22 seconds
+TestRunner_6lowpan-tester     PASS      22.61 seconds
+IncrementalBuild              PASS      73.79 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2,02/12] Bluetooth: btusb: Fix BD_ADDR byte order in btusb_set_bdaddr_wcn6855()
+
+1: T1 Title exceeds max length (81>80): "[v2,02/12] Bluetooth: btusb: Fix BD_ADDR byte order in btusb_set_bdaddr_wcn6855()"
+[v2,04/12] Bluetooth: btusb: QCA: Fix populating devcoredump fields on unenabled devices
+
+1: T1 Title exceeds max length (88>80): "[v2,04/12] Bluetooth: btusb: QCA: Fix populating devcoredump fields on unenabled devices"
+[v2,07/12] Bluetooth: btqca: Simplify qca_send_reset() by using __hci_reset_sync()
+
+1: T1 Title exceeds max length (82>80): "[v2,07/12] Bluetooth: btqca: Simplify qca_send_reset() by using __hci_reset_sync()"
+[v2,08/12] Bluetooth: btusb: Simplify btusb_shutdown_qca() by using __hci_reset_sync()
+
+1: T1 Title exceeds max length (86>80): "[v2,08/12] Bluetooth: btusb: Simplify btusb_shutdown_qca() by using __hci_reset_sync()"
+[v2,10/12] Bluetooth: hci_event: Log error for HCI reset status error in hci_cc_reset()
+
+1: T1 Title exceeds max length (87>80): "[v2,10/12] Bluetooth: hci_event: Log error for HCI reset status error in hci_cc_reset()"
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_l2cap-tester - FAIL
+Desc: Run l2cap-tester with test-runner
+Output:
+Total: 96, Passed: 95 (99.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+L2CAP BR/EDR Server - Set PHY 3M                     Failed       0.268 seconds
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 488 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.236 seconds
+LL Privacy - Add Device 3 (AL is full)               Failed       0.456 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.604 seconds
+Mesh - Send cancel - 2                               Timed out    1.984 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/354
+
 ---
- drivers/bluetooth/btusb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index d2e15a91584f..21e125db1b1f 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4109,7 +4109,7 @@ static int btusb_probe(struct usb_interface *intf,
- 			id = match;
- 	}
- 
--	if (id->driver_info == BTUSB_IGNORE)
-+	if (id->driver_info & BTUSB_IGNORE)
- 		return -ENODEV;
- 
- 	if (id->driver_info & BTUSB_ATH3012) {
 
--- 
-2.34.1
-
+--===============1069128489825856229==--
