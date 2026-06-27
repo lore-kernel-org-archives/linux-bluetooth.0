@@ -1,150 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A3729BD91
-	for <linux-bluetooth@vger.kernel.org>; Sat, 27 Jun 2026 10:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABEA42F99B8
+	for <linux-bluetooth@vger.kernel.org>; Sat, 27 Jun 2026 15:35:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782555199; cv=none; b=u0MfT2gO6y0glCXb5aQVUzJHK1DYofaN0fGth7sBX1ONXRkuFdiY7hynzA+os3biouPDVp8aG4XD/7OivsmxqEWvX45DX0kAPmcLw7ux8d2tIv4Nk7vOkJc27Kg4lvJT/QSGCCAscrF6ot9N1tCIKcjk/eP4BSyT0oWP0JNd6sw=
+	t=1782574553; cv=none; b=s55yyMFeYQaN8VI60acy5qXE50Sr36VxeiS4PDbSlNSUsymhLaqKGtT8lznhMEh9rTJ47As0MzucRRch3f727b6eYnkPFSyU4YAUVM5hHyGVAEfOr8og9go5G6BzNEVYSQ4sits5UvELhL5suXMHzvJlJWp/QRHyvK/O9NbQMUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782555199; c=relaxed/simple;
-	bh=b6EkOpvSwGHUv3eO+z3JklU/4lSEuqlKBNofegbUyt0=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=OrrklsCDvGLp+Ikf2zmxKnwLKtTXBQSsuOwHRP4yxtdef+vJ2PIH+rZaByyFkQsq6ynZfwZ42pJd0jCFaLLxGxSUo6CNDJB30XTLbhWWQwCBQJol25kiInH5GdHifRLHiXwLpzTzgTzwTNoDr4WXRAGvSa7lZLpoQErlnAwF//U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ym7DXGP6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1782574553; c=relaxed/simple;
+	bh=OMfHcOBxtpB0j9NTcAJ2DVfk+zscKvIV9aTQqt0BfCE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WMk8RL0Kzkw37m5AwPQb6/MkvfOkp8WjrGtGqKHcfgXcY0956rtJg1gTAeg8Z+YvnV2AzpM0C67h62mAwVFK+8bIFwDpExOIzAo6EnYyXjZe5ZBpfFNMVfkIf70WTlvhplN1juQ0fqMzAML3zh4v5ogHnUIdpVdb8sMwj3bCNKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lNiRGn30; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ym7DXGP6"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CE3B4C2BCB3
-	for <linux-bluetooth@vger.kernel.org>; Sat, 27 Jun 2026 10:13:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1782555198;
-	bh=b6EkOpvSwGHUv3eO+z3JklU/4lSEuqlKBNofegbUyt0=;
-	h=From:To:Subject:Date:From;
-	b=Ym7DXGP6v7MB5fcckIBgB9M+RkIuhC/PF6KKDvSEh6Jbc4bg9xrxDdQCrUmXj4krd
-	 98BcBXZQH/eu6jFi4KMfSxoSwDQA1cSxuqyUF2xlAQlVe+Ho2WksdbX3kqNXnjhsvh
-	 xtM5dPKdXmXF13omsaxi2CPqWaf3sQAXI8Vd1oLfMH715MMFuTCbKiJuFqSy9FuwWr
-	 ZAkJDR1Q27/UuqK0u+B/gABNb9Rbbc9pDIJ5vcEUBRGCRuhN6pmaFq62TjBVBszEzK
-	 dyqUV2F+9OZMmJUQp09pqzxFWMSS6ZpM05a0Ne1mt0SuqIZNUQyLxO1K9iXYEVcqyA
-	 muwBGkt/7+yAA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 857A2C3279F; Sat, 27 Jun 2026 10:13:18 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221696] New: btmtk: regression in 6.6.142: NULL pointer
- dereference in btmtk_usb_hci_wmt_sync during resume from S4
-Date: Sat, 27 Jun 2026 10:13:17 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: kernel@mattwhitlock.name
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys bug_status bug_severity priority
- component assigned_to reporter cf_regression
-Message-ID: <bug-221696-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lNiRGn30"
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-4629051c9d1so1013255f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 27 Jun 2026 08:35:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782574550; x=1783179350; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=e+kkJ09VUw+7SzKi5twgS6gbZyQ8SvfRATjQ8fCfUko=;
+        b=lNiRGn30c7IQHm/e9j1d9xBYIvDWBzrJv7e9n/IVow4DymOxG3uUPvAmZRj0f1Nghe
+         uMww/vSen6jPfZ8ykfnq3v9UfoA2ENlvLmSDwn8hxW9eLR7CLj5A+/Yn8Z1W256dS0DW
+         2W2a++9NGtIXIEkqyssdYFpw5FKLnA6oBiKZBVIzgAtQbhrnIuZIj/vKEohNwmVClKyD
+         DVPOv0bnMAAXRdAFNbqZtgSDsvqcnmyDSY5+67v5io2HOJNhDWRgMQJVitA0X6q/d6YY
+         rcfdmx3W7qt/AknWNGBVRLDxg5ityb8thuSNDY0NZPiv2IpEC5QZlnSrKa1ahk6L13xN
+         phew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782574550; x=1783179350;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e+kkJ09VUw+7SzKi5twgS6gbZyQ8SvfRATjQ8fCfUko=;
+        b=QWIwIV6Ur39QnvpL57iUpedmKtZ+4N1RouAWl6xDbIrzp26FW3HWpLThHz6RSrG0cA
+         OoeXbwjt69FptjJ5IqJkcpUv2/0zM9EMkNczTNWUpRFHnCYDrt8uf8vvmlNO4hNmQqgV
+         6OGwi0ZLJ0BmgR3X8c/777+O/HC7AQzalYJnjQObP8d+2hz3EQDmZV97dTaNXIAWKCXH
+         6e3pndZbTBerzvskpi2Auaxxh5hdEV7vq3gcdWl6OuXPZSGpE3LTikAQlMndLlh+Wvc3
+         dKuF+AM8SJ8vAHfjxtTh75YODmyHumNFSThpqhWR26xr8YWgZddvzmU5kqiGBKAxkRBH
+         0alQ==
+X-Gm-Message-State: AOJu0YwuuKcsD8xnyB4gjx92pnUg9b790LtfHDOJGD4cOBLlVLej4yBx
+	6AOy6jfUcxz3Am+E9P5LgihqVcoA7ljFocG1fU98noYsAoBbxwn77v1m
+X-Gm-Gg: AfdE7cn1NVfNSXfj48tf9a74yLggf9wl4dUjbaj8et9TJx5qEddGnuGNu4jAmAW6J8P
+	Dx5VIWB1ETaVBSuXubQeeSAbvJQ/iJZ5WXvJd5ZgpXKRWzTXtCGSG1+ynU2GzCIIgJh7/b+S9uc
+	L29+c8Psa7791y2lv+BqwyYrWXe4dFcLOzl4/K1NI+8TpLhdsAzxk9mEbUynxOfc+Zp9LNpaARN
+	LzYlY24nvb+beTkQxvnfoMKf+SZCERrOfmcdLGi5ceq8ricd/jcJM5uvEIpiDZKnaP2wGTh/uhi
+	HOtWgNBBAb9qg2PjicZzG86wVM2a+w87ZMNog0WdIeuxViTzANPD4Hk4D8PlESV2fYaU1KXHy9E
+	bRyn8v4Z2FUWWn1B67X11hSUxrsz8ohg4Kjgz1EKVp02uDFi0PhNhlyjq9QPX4AklV18QJmaM9m
+	hWGrvyu2o7KuLC
+X-Received: by 2002:a05:600c:5297:b0:493:85ae:2575 with SMTP id 5b1f17b1804b1-49385ae2619mr28301695e9.27.1782574549790;
+        Sat, 27 Jun 2026 08:35:49 -0700 (PDT)
+Received: from tibor-herobox0 ([150.251.225.4])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49268ffe204sm172595745e9.7.2026.06.27.08.35.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Jun 2026 08:35:49 -0700 (PDT)
+From: Tibor Harcsa <silurust@gmail.com>
+To: luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Tibor Harcsa <silurust@gmail.com>
+Subject: [PATCH] Bluetooth: btusb: Add IMC Networks QCA9377 to quirks table
+Date: Sat, 27 Jun 2026 17:35:05 +0200
+Message-ID: <20260627153505.20173-1-silurust@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221696
+Add the USB ID (13d3:3503) for the IMC Networks Qualcomm Atheros
+QCA9377 Bluetooth controller to the btusb quirks table. This
+device requires Qualcomm Rome firmware and wideband speech support
+to function properly; otherwise, BLE scanning fails with HCI
+unexpected event opcode 0x2005 errors.
 
-            Bug ID: 221696
-           Summary: btmtk: regression in 6.6.142: NULL pointer dereference
-                    in btmtk_usb_hci_wmt_sync during resume from S4
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 6.6.142
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: kernel@mattwhitlock.name
-        Regression: Yes
+Signed-off-by: Tibor Harcsa <silurust@gmail.com>
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-I have a problem that appeared in the 6.6.y series recently, I believe in or
-around f0457842215438786e2e205ad06a4fbb8ab63cd0, although I haven't bisecte=
-d.
-The problem did not exist in 6.6.140 but does exist in 6.6.142 and 6.6.143.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 08c0a99a6..7963fd48a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -297,6 +297,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3501), .driver_info = BTUSB_QCA_ROME |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x13d3, 0x3503), .driver_info = BTUSB_QCA_ROME |
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* QCA WCN6855 chipset */
+ 	{ USB_DEVICE(0x0489, 0xe0c7), .driver_info = BTUSB_QCA_WCN6855 |
+-- 
+2.54.0
 
-The problem =E2=80=94 during resume from hibernation (platform S4) I see th=
-is NULL
-pointer dereference in the kernel log:
-
-BUG: kernel NULL pointer dereference, address: 0000000000000219
-#PF: supervisor read access in kernel mode
-#PF: error_code(0x0000) - not-present page
-PGD 0 P4D 0
-Oops: 0000 [#1] SMP
-CPU: 7 PID: 214 Comm: kworker/u33:0 Not tainted 6.6.143-gentoo #1
-Hardware name: Framework Laptop 16 (AMD Ryzen 7040 Series)/FRANMZCP09, BIOS
-04.03 12/22/2025
-Workqueue: hci0 hci_power_on
-RIP: 0010:__pm_runtime_resume+0x15/0x80
-Code: 55 fe ff ff 83 e0 02 45 31 e4 e9 45 fd ff ff 66 0f 1f 44 00 00 f3 0f =
-1e
-fa 41 54 55 53 48 89 fb 48 83 ec=E2=80=A6
-RSP: 0018:ffffc90004a37c18 EFLAGS: 00010246
-RAX: ffff88810bdcd4f8 RBX: 0000000000000050 RCX: 0000000000000000
-RDX: 0000000000000035 RSI: 0000000000000004 RDI: 0000000000000050
-RBP: 0000000000000035 R08: ffff888fdfde6bd0 R09: ffff888101338a40
-R10: 0000000000000001 R11: 0000000000000040 R12: ffff888101338a40
-R13: ffffc90004a37cc0 R14: 000000000000003a R15: ffffc90004a37cb4
-FS:  0000000000000000(0000) GS:ffff888fdfdc0000(0000) knlGS:0000000000000000
-GS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000219 CR3: 0000000003e11000 CR4: 0000000000750ee0
-PKRU: 55555554
-Call Trace:
- <TASK>
- usb_autopm_get_interface+0x1a/0x50
- btmtk_usb_hci_wmt_sync+0xb8/0x480
- ? btmtk_usb_wmt_recv+0x240/0x240
- btmtk_setup_firmware_79xx+0x1a4/0x360
- btusb_mtk_setup+0x45b/0x690
- hci_dev_open_sync+0xdd/0xa40
- ? try_to_wake_up+0x235/0x510
- hci_power_on+0x69/0x2b0
- ? lock_timer_base+0x6a/0x90
- process_one_work+0x154/0x2f0
- ? process_one_work+0x2f0/0x2f0
- worker_thread+0x18b/0x310
- kthread+0xe0/0x110
- ? kthread_complete_and_exit+0x30/0x30
- ret_from_fork+0x2c/0x40
- ? kthread_complete_and_exit+0x30/0x30
- ret_from_frok_asm+0x11/0x20
- </TASK>
-CR2: 0000000000000219
----[ end trace 0000000000000000 ]---
-
-The BUG dump appears while the system is waiting for me to enter my LUKS
-passphrase =E2=80=94 i.e., *before* the initramfs writes the swap device ma=
-jor:minor to
-/sys/power/resume to initiate resume from hibernation.
-
-I am still running kernel 6.6.140 in my current session. In other words, a
-6.6.143 kernel is booting to resume a suspended session that is running a
-6.6.140 kernel.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
