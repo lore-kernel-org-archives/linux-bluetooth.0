@@ -1,135 +1,126 @@
-Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.perfora.net (mout.perfora.net [74.208.4.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76F770836
-	for <linux-bluetooth@vger.kernel.org>; Sat, 27 Jun 2026 19:39:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C0A30AABE
+	for <linux-bluetooth@vger.kernel.org>; Sat, 27 Jun 2026 22:45:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.208.4.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782589201; cv=none; b=S5gPm6JWZ4rorecJ3o2FMnqrvgxfhqGGH37bdfbty/wam2vgHUG2t6Dt/82UibENiEp6WG5jwDeszryfLARgP6qhcnZeHEpvYpoY4ROQDbWU1LpTdSFLUfxRzVwUfNpW4aSS3pdcRNRHy7JAkL2rkCaB2GQZTpXlRovRoNUaqNs=
+	t=1782600315; cv=none; b=OPLqFNnmEiLc9iEaUNinoaK94n4/3wUQn8fZy9LY3RvAUwOI8UiOi6sTjv9JdLle5fs5/DtxzEY7MQZmzKXlKJxeU3QwCKicdz8E56UaV/xCBnuTifC9hKYHuq9BRlOjGJ8V2VGidyuuewgtT8nsY1E6Gjx5OpJZTd9zkghqwI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782589201; c=relaxed/simple;
-	bh=QGRA4Val8MCsX4hPrPgmggNQj5rLjhIFHZS2SGDCYc0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=i0yib5V0DrsiNGEfYQjLooDXdMJ1RComKiMIAHayNSRKR5GqR/TsXxRSJl4zLPuNeRuLd1roUfZJ+IGqwtJGN6VMPJu8iUrLF36ADRBjbBu96FVZk4ZHc3QgEJsbY62+vQHS0asfjnZ/Xsj1uvrFGXJ3W1qfcctpNN67UINv6vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EkZcwtba; arc=none smtp.client-ip=74.125.82.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EkZcwtba"
-Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-30bf8b2bd20so4415393eec.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 27 Jun 2026 12:39:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782589199; x=1783193999; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=VyQfx6k1ABvKifMImPLbl7u5B15qm8IuM9WrvlvcbVQ=;
-        b=EkZcwtba6XT+QeBlULCADY1RgR9tT2iMCYxLWJhQQkEoIZqWKi7vcKvV0QFqi1GnNK
-         4Aviy3vatz0jY0qa2ytqlbUoVTs+u/JIn/JAUPjdINgdsE0dlcyjaAlr8Kanb2eEFK38
-         4/V0w6Ka22ZuY6qRI6Ivz0SbWWrwX7Ye8+a0fhgNWshMyaYZMS1epJkjxow32sTT8ACg
-         gVj+6/RSHnj1ruiBCcgDe+iWnjhc0HNwZrgysul+QpJO0kQ0dzuQxHiBcoVIlS/uhmoM
-         CP3a14ETj9OqwUiSjfMGFmCvRg0vt/Oz5Ui75W4nRfJsGrmPKJMsIcMosPYkKi9dNl6x
-         4xfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782589199; x=1783193999;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VyQfx6k1ABvKifMImPLbl7u5B15qm8IuM9WrvlvcbVQ=;
-        b=Dc1zLfE4TaJkYRNSUyaieb/2GKQ8vKB1DyvlGfER7myTzWB0fKVBDPVt2XxUPC8mwj
-         rGORWyDykYZbfQkBavAN7xqhuLhPd09VPiWdRdEMHvLmaH24vfKcCnB/WTLpXyWzqsNW
-         mUF0a9HzBlQvxXNYmkyLlguslHRSl0wFRYKHpttGMhw+YVoVyig+FCeLHkr++TtEnjkX
-         cZZowWi70Dh/7xmoaiCiUGSEhcSFO86RQR2eGh9FAJnMzfObTpNOC+zE22m3bClNX3an
-         HLaxB6eiUllEXxM2oK/NJeet09avxaOkxzOZU10KEc2ApjefNbGyAycqalqap6Wt3RyQ
-         weuw==
-X-Gm-Message-State: AOJu0Yw64H4bJU/yFp4jqyttVfMeUifsDkaFOt83TeF8+mWi3YNmt4/o
-	9sI6y67qHrzx8SFjuAmjLZUHUff4cRKHQzhnYUz4GlL42JDWL9jOoZ0SszE2DA==
-X-Gm-Gg: AfdE7cmW57d0FgwlL+ot3XRVJQLTVpcd+go8pcjzvVgZBuEyEyfGU7PhYUxEVouMEpl
-	RNKuet0mOOBUBVSC1wUNbI2Gv9hepf+jcOxPvGIFmv6Sb1yG05Yc6AEYviNBgFH2WJnkXv+Q9/7
-	TT+K6Ff18wrniNMkO9qmqR4dMgx9Em7+ljQr6wF44QosmMVQ1C5XHvhMR5xwLc8LnEBe9wiaHX8
-	5tGteMjvkR+tRAnMAa0QWe1cVS6vZsVzhVMtKWqVmi06iEFYwsExtWuc+U2qZQh/RuIJ8apJCLV
-	McHM2JX1Z1uBA0rbPPJgS1N+815W5cjaGfzap8DDFNNuwRWifsg3ZT1SltTLeU4/wbtbJa8NtVP
-	4Pltj07kQJd98bxztj/xfPAGnz9j2sUcRT1mDCX6yxItJrH9FqN2V42aKk4cUd2tS6hvWc2d79F
-	8ZuUjGNt7GYJMbo/hKIbo8dg==
-X-Received: by 2002:a05:7301:2a24:b0:30b:f73f:ff6e with SMTP id 5a478bee46e88-30cab06e5a1mr5097330eec.11.1782589198739;
-        Sat, 27 Jun 2026 12:39:58 -0700 (PDT)
-Received: from [172.17.0.2] ([172.184.211.113])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30c7c199561sm36550810eec.0.2026.06.27.12.39.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Jun 2026 12:39:58 -0700 (PDT)
-Message-ID: <6a40270e.510f576d.1293ea.d44b@mx.google.com>
-Date: Sat, 27 Jun 2026 12:39:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0606638181227351748=="
+	s=arc-20240116; t=1782600315; c=relaxed/simple;
+	bh=9R4gUqq0mJuZ35mGDls8CP8pQCotv9h1QSIDDMiw2Rk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uOhAW23qxNs8i6lOHlyl3ER9GYgq6NsjHjLAp5QQgIDvqSjQ8KCjWgGXkhXm9s2EsxML74R4AVQoUPaVXCo3PlFbj0G7usAmpQ5w5Ouk9SRxbYsyHFp4oNvf8sESzJN9/FsXpdMRMftylEWyOKhoDTbd0XR8Gtic/DbI0s/XDzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=matthew-cash.com; spf=pass smtp.mailfrom=matthew-cash.com; arc=none smtp.client-ip=74.208.4.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=matthew-cash.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=matthew-cash.com
+Received: from client.hidden.invalid by mrelay.perfora.net (mreueus003
+ [74.208.5.2]) with ESMTPSA (Nemesis) id 0LonZF-1xKMJ126N1-00ZzLr; Sun, 28 Jun
+ 2026 00:45:12 +0200
+From: Matthew Cash <matthew@matthew-cash.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Matthew Cash <matthew@matthew-cash.com>
+Subject: [PATCH BlueZ v2] profiles/midi: Fix zero timestampHigh
+Date: Sat, 27 Jun 2026 15:44:44 -0700
+Message-ID: <20260627224444.531788-1-matthew@matthew-cash.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, matthew@matthew-cash.com
-Subject: RE: [BlueZ] profiles/midi: Fix zero timestampHigh
-In-Reply-To: <20260627175712.228564-1-matthew@matthew-cash.com>
-References: <20260627175712.228564-1-matthew@matthew-cash.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:LGUY7giVDTv3vTs76u8iAxv+hPM5UkHI9g3Rm2khgmsl7JGsnKk
+ D9nUTIMkdppdjVCkOnGEAef8WRGOTGuGRu4XHWw4MunfHu5rHRpOZFWSrDuN1qLwR3aTJaJ
+ orNE228U3Mh3igRrxfNhs7bX9UPXJFYq1j2N8Ty0xl8rbsihB53tjQu35Keu7Ji47A09juI
+ micZO28jOLm7xloCPCHZA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:eZnrMi/mMyQ=;6K/Jb/jsJCIlGCB5/wV/vhPidM/
+ 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
 
---===============0606638181227351748==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+BLE-MIDI timestampHigh can legitimately be zero. The MIDI parser used
+timestamp_high == 0 to decide whether it had already consumed the packet
+header, so packets starting with 0x80 0x80 caused the next running-status
+payload byte to be consumed as another timestamp header.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1117512
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.87 seconds
-GitLint                       PASS      0.48 seconds
-BuildEll                      PASS      20.81 seconds
-BluezMake                     PASS      557.39 seconds
-MakeCheck                     PASS      1.01 seconds
-MakeDistcheck                 PASS      159.80 seconds
-CheckValgrind                 PASS      159.07 seconds
-CheckSmatch                   PASS      313.75 seconds
-bluezmakeextell               PASS      104.20 seconds
-IncrementalBuild              PASS      554.95 seconds
-ScanBuild                     PASS      991.64 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ] profiles/midi: Fix zero timestampHigh
-WARNING:LONG_LINE_COMMENT: line length of 84 exceeds 80 columns
-#123: FILE: profiles/midi/libmidi.h:86:
-+	bool timestamp_high_set;         /* timestampHigh read for current packet */
-
-/github/workspace/src/patch/14648381.patch total: 0 errors, 1 warnings, 32 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14648381.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
-https://github.com/bluez/bluez/pull/2255
-
+Track whether timestampHigh has been read separately from its value so
+packed MIDI events with zero timestampHigh are parsed correctly.
 ---
-Regards,
-Linux Bluetooth
+ profiles/midi/libmidi.c | 5 ++++-
+ profiles/midi/libmidi.h | 2 ++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
+diff --git a/profiles/midi/libmidi.c b/profiles/midi/libmidi.c
+index 6f2914a8c..ef33f7dfd 100644
+--- a/profiles/midi/libmidi.c
++++ b/profiles/midi/libmidi.c
+@@ -110,6 +110,7 @@ int midi_read_init(struct midi_read_parser *parser)
+ 	parser->timestamp = 0;
+ 	parser->timestamp_low = 0;
+ 	parser->timestamp_high = 0;
++	parser->timestamp_high_set = false;
+ 
+ 	parser->sysex_stream.data = malloc(MIDI_SYSEX_MAX_SIZE);
+ 	if (!parser->sysex_stream.data)
+@@ -355,8 +356,10 @@ size_t midi_read_raw(struct midi_read_parser *parser, const uint8_t *data,
+ 	size_t i = 0;
+ 	bool err = false;
+ 
+-	if (parser->timestamp_high == 0)
++	if (!parser->timestamp_high_set) {
+ 		parser->timestamp_high = data[i++] & 0x3F;
++		parser->timestamp_high_set = true;
++	}
+ 
+ 	snd_midi_event_reset_encode(parser->midi_ev);
+ 
+diff --git a/profiles/midi/libmidi.h b/profiles/midi/libmidi.h
+index 41f522dd4..bcfac2063 100644
+--- a/profiles/midi/libmidi.h
++++ b/profiles/midi/libmidi.h
+@@ -83,6 +83,7 @@ struct midi_read_parser {
+ 	int16_t timestamp;               /* last MIDI-BLE timestamp */
+ 	int8_t timestamp_low;            /* MIDI-BLE timestampLow from the current packet */
+ 	int8_t timestamp_high;           /* MIDI-BLE timestampHigh from the current packet */
++	bool timestamp_high_set;         /* timestampHigh read */
+ 	struct midi_buffer sysex_stream; /* SysEx stream */
+ 	snd_midi_event_t *midi_ev;       /* midi<->seq event */
+ };
+@@ -100,6 +101,7 @@ static inline void midi_read_reset(struct midi_read_parser *parser)
+ 	parser->rstatus = 0;
+ 	parser->timestamp_low = 0;
+ 	parser->timestamp_high = 0;
++	parser->timestamp_high_set = false;
+ }
+ 
+ /* Parses raw BLE-MIDI messages and populates a sequencer event representing the
+-- 
+2.54.0
 
---===============0606638181227351748==--
