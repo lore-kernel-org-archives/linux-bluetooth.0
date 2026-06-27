@@ -1,230 +1,150 @@
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D6715E5BB;
-	Fri, 26 Jun 2026 19:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782503911; cv=pass; b=cNfmF9wOv6bxBY1YcJ+/CR1xh7OH9eywqNH32Ea5Zy5uPXYdveE3BWeFth7+FR88hbccEynEuoUP56HR0mQzi0ujzHMkmDLh70am/F8/jf421bWM/Kt7Qx88SSO6+hkt0Hilfpzhx/oSyCCZ10kVEbGtRbZWpG6oL00bES9mp5A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782503911; c=relaxed/simple;
-	bh=hN6IJrxrkBeM+8JFP5IBkHknLb1SWS3twmt3qdin/0U=;
-	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
-	 Date:MIME-Version; b=N+wjL5IL2BRydv7OLgeyjc1k4w/M/PVBBMlSGmVgesFHAxRf7L8y8b5cGhO1KfplIrp7vWwz19sNd6n6dc5t9ar3/pM5MCEkXSDY7xSbLq6J1C9kDTSSN6Bd2xj0syO+AaLgLvyXeV2qzrLRiynp0g0p7FiPRiGG5P9BggVtrXM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rong.moe; spf=pass smtp.mailfrom=rong.moe; dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b=IP/eqXj9; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rong.moe
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rong.moe
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A3729BD91
+	for <linux-bluetooth@vger.kernel.org>; Sat, 27 Jun 2026 10:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782555199; cv=none; b=u0MfT2gO6y0glCXb5aQVUzJHK1DYofaN0fGth7sBX1ONXRkuFdiY7hynzA+os3biouPDVp8aG4XD/7OivsmxqEWvX45DX0kAPmcLw7ux8d2tIv4Nk7vOkJc27Kg4lvJT/QSGCCAscrF6ot9N1tCIKcjk/eP4BSyT0oWP0JNd6sw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782555199; c=relaxed/simple;
+	bh=b6EkOpvSwGHUv3eO+z3JklU/4lSEuqlKBNofegbUyt0=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=OrrklsCDvGLp+Ikf2zmxKnwLKtTXBQSsuOwHRP4yxtdef+vJ2PIH+rZaByyFkQsq6ynZfwZ42pJd0jCFaLLxGxSUo6CNDJB30XTLbhWWQwCBQJol25kiInH5GdHifRLHiXwLpzTzgTzwTNoDr4WXRAGvSa7lZLpoQErlnAwF//U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ym7DXGP6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b="IP/eqXj9"
-ARC-Seal: i=1; a=rsa-sha256; t=1782503894; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=D3WZsCftahOcMt4cxKE8kIy3vHriVPJPnKUPnh8TUb+BgXjDnK5xKTeOwa4HCNB1DC3Ep33o256HPWq79ViBnTMoDbFe0iVYvxUzlAHu0La1cQXkWqRpvy5r6FJ1Qz+xT+jtotwbPhsZhBVNX/OJsc60h/cBGQHStt92JvtauNk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1782503894; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=q2IKUBOjt0LLv1AclgrcUtUEkkgxk7U1S1o+izpivZM=; 
-	b=hlbDxphJYgUIeqgUFmtVBIi8eI5XeJcBXjXmBnQMWRaenqfkQw7/jWHxXB7nbMbtDBBrL4FPyGY4nL8u9OAHNUYmTj6XrN9mGPWqYLrtYwoRk6omt8QFiOU+7MkuoUBY9lJ0pNYsA6bZ0Zi8+HMOuACN/xnepnB80yfy/1xGigI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=rong.moe;
-	spf=pass  smtp.mailfrom=i@rong.moe;
-	dmarc=pass header.from=<i@rong.moe>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1782503894;
-	s=zmail2048; d=rong.moe; i=i@rong.moe;
-	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date:Date:MIME-Version:Message-Id:Reply-To;
-	bh=q2IKUBOjt0LLv1AclgrcUtUEkkgxk7U1S1o+izpivZM=;
-	b=IP/eqXj9LaZbSwoZ+aUFHMNf6IRTAjnG5jLWdv1XxZVhgU6mMLc1woFm1XdMrl26
-	+pykSvpr5QQg4Z/UTtctPjAty0yauWOGz/9TouvKEOX+Go9Fuox6yuczQLQfGk72uir
-	CYdhds8x2b+QUYfjOMsThqJiNWk10M7BJtvc1Ik091ogbCtQ/EkzU+oJwIM7FtyG04b
-	766vU8hNA0Ijde6vXNRrgTnl7p1L4180KX9jD/zQ7tamxZSkCYqJ/KmK5ZOendQabNF
-	KZKg5IRJOswoLRjmTCiornuVnxY21iO5l4mz45LmwSn6EY16+5mrrykL2voHTxui1Y2
-	Wnmbp0p9qg==
-Received: by mx.zohomail.com with SMTPS id 1782503892877670.3110593257745;
-	Fri, 26 Jun 2026 12:58:12 -0700 (PDT)
-Message-ID: <4e96132bcfb267af05c06dc277b5ba6895e3ddde.camel@rong.moe>
-Subject: Re: [PATCH] Bluetooth: btmtk: Disable remote wakeup for
- MT7922/MT7925
-From: Rong Zhang <i@rong.moe>
-To: Chris Lu =?Big5?Q?=28=B3=B0=B8X=AAl=29?= <Chris.Lu@mediatek.com>, 
- "luiz.dentz@gmail.com"
-	 <luiz.dentz@gmail.com>
-Cc: "marcel@holtmann.org" <marcel@holtmann.org>, AngeloGioacchino Del Regno
-	 <angelogioacchino.delregno@collabora.com>, SS Wu
- =?Big5?Q?=28=A7=C5=BE=CB=AAY=29?=
-	 <ss.wu@mediatek.com>, "linux-kernel@vger.kernel.org"
-	 <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	 <linux-arm-kernel@lists.infradead.org>, "linux-bluetooth@vger.kernel.org"
-	 <linux-bluetooth@vger.kernel.org>, "patchwork-bot+bluetooth@kernel.org"
-	 <patchwork-bot+bluetooth@kernel.org>, "linux-mediatek@lists.infradead.org"
-	 <linux-mediatek@lists.infradead.org>, "matthias.bgg@gmail.com"
-	 <matthias.bgg@gmail.com>
-In-Reply-To: <fd8587e97a48e49332a4ad36e51e18739d000250.camel@mediatek.com>
-References: <20260603-btmtk-remote-wakeup-v1-1-5c1006442f36@rong.moe>
-		 <178050901239.1520440.2026593395539384648.git-patchwork-notify@kernel.org>
-		 <3f9c376a5dbfc9d737e2a7f83c5db8e591fb8793.camel@mediatek.com>
-		 <17FE08E9-2229-4C97-846F-6FA099E22C90@rong.moe>
-		 <CABBYNZ+rR71SKUEuZBTf+E3SwRNzV2-s-zt8EwNJM3PSx9qB_A@mail.gmail.com>
-	 <fd8587e97a48e49332a4ad36e51e18739d000250.camel@mediatek.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ym7DXGP6"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CE3B4C2BCB3
+	for <linux-bluetooth@vger.kernel.org>; Sat, 27 Jun 2026 10:13:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1782555198;
+	bh=b6EkOpvSwGHUv3eO+z3JklU/4lSEuqlKBNofegbUyt0=;
+	h=From:To:Subject:Date:From;
+	b=Ym7DXGP6v7MB5fcckIBgB9M+RkIuhC/PF6KKDvSEh6Jbc4bg9xrxDdQCrUmXj4krd
+	 98BcBXZQH/eu6jFi4KMfSxoSwDQA1cSxuqyUF2xlAQlVe+Ho2WksdbX3kqNXnjhsvh
+	 xtM5dPKdXmXF13omsaxi2CPqWaf3sQAXI8Vd1oLfMH715MMFuTCbKiJuFqSy9FuwWr
+	 ZAkJDR1Q27/UuqK0u+B/gABNb9Rbbc9pDIJ5vcEUBRGCRuhN6pmaFq62TjBVBszEzK
+	 dyqUV2F+9OZMmJUQp09pqzxFWMSS6ZpM05a0Ne1mt0SuqIZNUQyLxO1K9iXYEVcqyA
+	 muwBGkt/7+yAA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 857A2C3279F; Sat, 27 Jun 2026 10:13:18 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221696] New: btmtk: regression in 6.6.142: NULL pointer
+ dereference in btmtk_usb_hci_wmt_sync during resume from S4
+Date: Sat, 27 Jun 2026 10:13:17 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: kernel@mattwhitlock.name
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys bug_status bug_severity priority
+ component assigned_to reporter cf_regression
+Message-ID: <bug-221696-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 27 Jun 2026 03:56:59 +0800
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Evolution 3.56.2-10 
-X-ZohoMailClient: External
 
-Hi Chris, Luiz,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221696
 
-On Fri, 2026-06-26 at 17:56 +0000, Chris Lu (=E9=99=B8=E7=A8=9A=E6=B3=93) w=
-rote:
-> Hi Rong and Luiz,
->=20
-> On Fri, 2026-06-26 at 12:54 -0400, Luiz Augusto von Dentz wrote:
-> > Hi,
-> >=20
-> >=20
-> > On Fri, Jun 26, 2026 at 7:19=E2=80=AFAM Rong Zhang <i@rong.moe> wrote:
-> > >=20
-> > > Hi Chris,
-> > >=20
-> > > =E4=BA=8E 2026=E5=B9=B46=E6=9C=8826=E6=97=A5 GMT+08:00 10:40:54=EF=BC=
-=8C"Chris Lu (=E9=99=B8=E7=A8=9A=E6=B3=93)"
-> > > <Chris.Lu@mediatek.com> =E5=86=99=E9=81=93=EF=BC=9A
-> > > > Hi Luiz,
-> > > >=20
-> > > > Could we revert this change?
-> > >=20
-> > > Please don't. The fundamental goal of the patch is to make
-> > > MT7922/MT7925 *usable* on affected platforms.
-> > >=20
-> > > Moreover, almost all recent AMD platforms ship with MT7922/MT7925,
-> > > reverting this patch affects quite a lot of users. Almost every AMD
-> > > platform I've met suffers from the issue, and there are plenty of
-> > > bug reports.
-> > >=20
-> > > Intel platforms never ship with MTK WLAN NICs, so I can't tell if
-> > > the issue is reproducible on them.
-> >=20
-> We still have non-AMD platforms with MT7922/7925, where=C2=A0
-> "wakeup by Bluetooth" is an essential feature. In other word, this
-> change will have a serious impact to them.
+            Bug ID: 221696
+           Summary: btmtk: regression in 6.6.142: NULL pointer dereference
+                    in btmtk_usb_hci_wmt_sync during resume from S4
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 6.6.142
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: kernel@mattwhitlock.name
+        Regression: Yes
 
-Oh, perhaps I missed something before. Your words were a bit unclear to
-me at first glance.
+I have a problem that appeared in the 6.6.y series recently, I believe in or
+around f0457842215438786e2e205ad06a4fbb8ab63cd0, although I haven't bisecte=
+d.
+The problem did not exist in 6.6.140 but does exist in 6.6.142 and 6.6.143.
 
-You previous reply said "wake on Bluetooth". I interpreted it as USB
-remote wakeup upon Bluetooch device connection.
+The problem =E2=80=94 during resume from hibernation (platform S4) I see th=
+is NULL
+pointer dereference in the kernel log:
 
-"Wakeup by Bluetooth" is clearer. You meant using the Bluetooth
-interface as a wakeup source to wake up the system from sleep, right?
+BUG: kernel NULL pointer dereference, address: 0000000000000219
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 0 P4D 0
+Oops: 0000 [#1] SMP
+CPU: 7 PID: 214 Comm: kworker/u33:0 Not tainted 6.6.143-gentoo #1
+Hardware name: Framework Laptop 16 (AMD Ryzen 7040 Series)/FRANMZCP09, BIOS
+04.03 12/22/2025
+Workqueue: hci0 hci_power_on
+RIP: 0010:__pm_runtime_resume+0x15/0x80
+Code: 55 fe ff ff 83 e0 02 45 31 e4 e9 45 fd ff ff 66 0f 1f 44 00 00 f3 0f =
+1e
+fa 41 54 55 53 48 89 fb 48 83 ec=E2=80=A6
+RSP: 0018:ffffc90004a37c18 EFLAGS: 00010246
+RAX: ffff88810bdcd4f8 RBX: 0000000000000050 RCX: 0000000000000000
+RDX: 0000000000000035 RSI: 0000000000000004 RDI: 0000000000000050
+RBP: 0000000000000035 R08: ffff888fdfde6bd0 R09: ffff888101338a40
+R10: 0000000000000001 R11: 0000000000000040 R12: ffff888101338a40
+R13: ffffc90004a37cc0 R14: 000000000000003a R15: ffffc90004a37cb4
+FS:  0000000000000000(0000) GS:ffff888fdfdc0000(0000) knlGS:0000000000000000
+GS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000219 CR3: 0000000003e11000 CR4: 0000000000750ee0
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ usb_autopm_get_interface+0x1a/0x50
+ btmtk_usb_hci_wmt_sync+0xb8/0x480
+ ? btmtk_usb_wmt_recv+0x240/0x240
+ btmtk_setup_firmware_79xx+0x1a4/0x360
+ btusb_mtk_setup+0x45b/0x690
+ hci_dev_open_sync+0xdd/0xa40
+ ? try_to_wake_up+0x235/0x510
+ hci_power_on+0x69/0x2b0
+ ? lock_timer_base+0x6a/0x90
+ process_one_work+0x154/0x2f0
+ ? process_one_work+0x2f0/0x2f0
+ worker_thread+0x18b/0x310
+ kthread+0xe0/0x110
+ ? kthread_complete_and_exit+0x30/0x30
+ ret_from_fork+0x2c/0x40
+ ? kthread_complete_and_exit+0x30/0x30
+ ret_from_frok_asm+0x11/0x20
+ </TASK>
+CR2: 0000000000000219
+---[ end trace 0000000000000000 ]---
 
-Hmm, it makes more sense to me.
+The BUG dump appears while the system is waiting for me to enter my LUKS
+passphrase =E2=80=94 i.e., *before* the initramfs writes the swap device ma=
+jor:minor to
+/sys/power/resume to initiate resume from hibernation.
 
-My patch was inspired by commit f4292e2faf52 ("Bluetooth: btusb: Make
-the CSR clone chip force-suspend workaround more generic"). The
-mentioned commit is correct as the quirky chips can't perform remote
-wakeup at all.
+I am still running kernel 6.6.140 in my current session. In other words, a
+6.6.143 kernel is booting to resume a suspended session that is running a
+6.6.140 kernel.
 
-If MT7922/MT7925 can reliably wake up the system from sleep, my patch
-could be a burden. I won't insist anymore if you'd like to revert it.
+--=20
+You may reply to this email to add a comment.
 
->=20
-> > We cannot really remove it anymore, since it has already been pulled.
-> > Therefore, I strongly prefer that the issue is fixed somehow or if
-> > there is no other way then a proper revert patch must be sent, since
-> > I
-> > don't have any hardware with this controller I cannot really test
-> > this
-> > myself.
-> >=20
-> Got  it.
-> > > >=20
-> > > > Sorry, MediaTek wasn't aware someone submitted this change and it
-> > > > had
-> > > > already been merged.
-> > > >=20
-> > > > MTK believes this issue is strongly related to the platform's USB
-> > > > hub
-> > > > behavior,
-> > >=20
-> > > Still, I believe that there are some interoperability issues in
-> > > MT7922/MT7925's hardware or firmware, as reinitializing the XHCI
-> > > root hub (by logically removing it from the PCI bus and probing it
-> > > again) doesn't make it recover at all.
-> > >=20
-> > > > The product lines MTK directly support haven't reported such
-> > > > issue.
-> > >=20
-> > > ...or did you mean none of the existing AMD platforms are supported
-> > > by MTK?
-> > >=20
-> I'll report it to corresponding department to see if they have such
-> issue. (I'm not from Bluetooth with AMD platform support team)
->=20
-> > > >=20
-> > > > Disable wake capability would severely impact wake on Bluetooth
-> > > > on
-> > > > MTK's official product lines.
-> > >=20
-> > > Could you kindly explain "MTK's official product lines"?
-> > >=20
-> Some products are module makers selling our modules to downstream
-> customers directly.
->=20
-> > > > Furthermore, this patch looks like a
-> > > > workaround. There should be a better way to handle this issue. We
-> > > > hope
-> > > > this change can be reverted.
-> > >=20
-> > > The issue is severe on affected platforms by making the Bluetooth
-> > > interface completely gone. IMHO, we must figure out the "better
-> > > way" before reverting it, or else it's more like burying your head
-> > > into sand by shouting "works fine on our platforms" (TM).
-> > >=20
-> > > That being said, I think we can narrow the range of the quirk down
-> > > to AMD platforms only. Does it make sense to you? If so, I will
-> > > submit a patch for this.
-> >=20
-> As I mentioned above, we have many platforms using the kernel driver,
-> not just AMD,
->=20
-> If this change can be limited to specific platform , it would be the
-> best way so far.
-
-I plan to submit another patch to properly fix it next week. In general,
-I will:
-
-- narrow the quirk down to AMD platforms only
-- disable USB remote wakeup for runtime autosuspend only
-- leave the wakeup source as is, so users can enable "wakeup by
-Bluetooth" even on AMD platforms if they really want it
-
-Hopefully it will minimize the impact of the workaround.
-
-Thanks,
-Rong
-
->=20
-> > Ok, then you guys please coordinate. I don't want to start requiring
-> > Sign-Off-By (SOB) from driver authors because this instance shows
-> > that
-> > response time can be very long. Therefore, the best way forward in my
-> > opinion, is to have the issue fixed in a way that works for both of
-> > you.
->=20
-> Of course, Mediatek BT team also agree that any issue need to be
-> resolved, However, original issue for this change requires further
-> verification of Hardware/firmware and even USB behavior. A device that
-> can reproduce the issue stably is required in order to experiment and
-> identify the root cause.
->=20
-> As mentioned, I'll deliver internally to relate support team. If they
-> have similar settings, MTK will attempt to reproduce it and provide an
-> official solution.
->=20
-> Thanks very much for your input and understanding.
->=20
-> Best Regards,
-> Chris Lu
+You are receiving this mail because:
+You are the assignee for the bug.=
