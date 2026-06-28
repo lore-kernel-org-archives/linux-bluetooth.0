@@ -1,89 +1,124 @@
-Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7DD345CBF;
-	Sun, 28 Jun 2026 12:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F4A1A6824
+	for <linux-bluetooth@vger.kernel.org>; Sun, 28 Jun 2026 13:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782648979; cv=none; b=kqDO9KKdf6FytsT2MgifEnfkTRn0dRtdzSbFRzuVU+sI+lDRyfCSvJlTToazIAAMeI/4gj8orPuGnK6nQtfG4RurJPoZJ9thWs3e5tO6vvjFlqTZIgpfd4KlsH2k6mYScB7bk/x2oK1pA7TFdo6tMnURrnCZ/Mtiw7VA37vlQfg=
+	t=1782652609; cv=none; b=uZIaS7oMy2QypzecCwupd9SYHv8iTL2mPu/Bl4DOhEojTVt56wJJVCagyXGeSNm+FCpQBpg5IdPduQdUN5wdKBxvqXIna2nPmek+KpwULW3zE69ZkFVV8f2Dz55bBH1tNCDeA6AtvauNTvT8Ik8HwY3fmZ5j+Sb63w8LQoaQaTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782648979; c=relaxed/simple;
-	bh=K3LEOZi3mb6+Ahq/uyE5LxMYUu9tCgUnWkf5g+oXaEM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=O5ILlHdRXdDHqqLKElQMBKUJXQ2U620O/wBbvtNTIUPMgwhr80BFjn1tIqo76wJsOIbeC8vpI8SUIhZAVoFPO9TQSnV6tDd7qw5L1tolLsiSzL0PE8GW4Z+8qQzQfBtXYjh3Otd+4p7Cr+Viagxr0Lul/+tshOAQ9foQgPiJL9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [117.182.74.7])
-	by APP-05 (Coremail) with SMTP id zQCowABXo8aMEEFqIOfDFQ--.54108S2;
-	Sun, 28 Jun 2026 20:16:14 +0800 (CST)
-From: WenTao Liang <vulab@iscas.ac.cn>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	WenTao Liang <vulab@iscas.ac.cn>,
-	Greg KH <gregkh@linuxfoundation.org>
-Subject: [PATCH v2] bluetooth: fix hci_dev registration leak in virtbt_probe
-Date: Sun, 28 Jun 2026 20:16:10 +0800
-Message-Id: <20260628121610.44496-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1782652609; c=relaxed/simple;
+	bh=gg5NqPnGCma8YlphGQHMGDQAk7oN92rc3HLKlB5IlJQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ZSNBwTSgV9Ko0QL5Pa+qHenyUO9zcWgj3t60irhmyGQnV4XyT5aqTab5d6r5Lu7leINeMxiWcdZ+Ee8MrjQdzpsuegFvVicXT6/D7sM5OdpEn5QITD2Wh+OZEsOBu1ZX1x/kGqytzHTkugmXQM9XnQWK77D2rwR7h36Ieq7Zd7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EuiWkG5W; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EuiWkG5W"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-92e45d3658dso29389785a.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 28 Jun 2026 06:16:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782652608; x=1783257408; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=7xxzbOphSvTqbCA5Tya1A6rq9kQCOsAJmpoz0JMWrMA=;
+        b=EuiWkG5WW3lPQj8vfMIIig1EDFgR15jOeIP2yNGvxqhnV56yUH81EgzJMf9eHi9IYr
+         9ACZBsB01Tj8OYnUaFRU6cQF3GCyyIBvqP7QP3pGGwrfS7BMBCwtHIaQayDmw8fpgyHn
+         Y4I8w89L55JAh4OOUGLIXMGe+mWkAaJtcRLCYC6ojHSUiJCjApSvBd8KxOEDlBLNf2Q5
+         i4G+l8/xwF3J3+XRI9rBS+YtsumO33DmBPOL9085fYA0+jKVoTKL4z410xgYwQGG/pYS
+         tkUINaf7+86AIM4QsTfQaf157mc0Iuh9aU4tRxiyCkQ0mCfKxojmmsFhnAUWIEOnPwY8
+         tilQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782652608; x=1783257408;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7xxzbOphSvTqbCA5Tya1A6rq9kQCOsAJmpoz0JMWrMA=;
+        b=imMaBEsQ7V+WtCF48a4fbDtrKU0M/J7ZXDfr13KpRqpetXfCT8VResCfQz+biiXfl1
+         ENNzanvp3y4usB9c/DmCWXNuvyOZnnEZsSezvc9TcXls/pm61qXoOI8137jlAkN6l5/l
+         N5lTfSg88BID4StoL0Q9FH81UnE6QHzx82yrqcvZHvm+TnuN7S6uGY6QS2+H6tWDi7OC
+         +iOP8Kj00WfD5K5mppLdmdclAHZwMM4Soests3sVDwHwkDZIW4ydhsuJwlO5fesuKbZk
+         Va9PJDBuQmfUt3BFTkXgBSeyilnUa85gu2IPE7un6m3bdQ+gDaWawVO6ap9K9f8RWkAl
+         RchA==
+X-Gm-Message-State: AOJu0YyNf6W/yrldztUVnIZNAs0RvsE5DT8kbVuwMzNM6FwtffQo1HlZ
+	YX4IyjRSkZNNTQyn9txli++uw1H1o0jfMuL1MmBM2xjYf9lhy+i5cw+OqLMXkg==
+X-Gm-Gg: AfdE7cnrlGfKxvIW6AMBhDC78VJDNpdkU6U5a7pgH3blmBM8hFzrZxw3bogA219ac8w
+	PdkGPazf4tyLx/2n9NsfX1VTwEO2PY1PJgl7KVs2a1sr1DiWNulOvSx98P4A1DbdAWKk1UiAQjk
+	nfNLNwF0DiIi/sHnyOmy3kApceGNhfyMoM2HPP7S+y97LKHcaEBk8teKOY+92Fvc7v6j06Ys2PM
+	16U2kqv4MLzQv1fAJuSjlTuZt+0aby7/CXp0zDwXggZY6Aua1/TYz2qatFRC4VeiONpCm7rpCfH
+	jX8AGGd8JKE1PV39RyYTwsM65o2WXmMdF/sLJC1Y42d9Netw01G7iu6+EHFKYfAweSFcNgFX2YP
+	3BAGlmKe762e+lny/mAE87IobQaghBuqS+KyzVJF/wWsBnrc6IJmdOh/doLVFtOcEadwChG9BAg
+	sHfTw3jUqd/wpZ7vU9+w==
+X-Received: by 2002:a05:620a:2544:b0:915:f96b:8f5a with SMTP id af79cd13be357-9293d5b2184mr1938263185a.36.1782652607685;
+        Sun, 28 Jun 2026 06:16:47 -0700 (PDT)
+Received: from [172.17.0.2] ([20.83.174.53])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-925fe235092sm1772036385a.21.2026.06.28.06.16.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 Jun 2026 06:16:47 -0700 (PDT)
+Message-ID: <6a411ebf.f14b93a6.36012d.5f3a@mx.google.com>
+Date: Sun, 28 Jun 2026 06:16:47 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4545815938812805959=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowABXo8aMEEFqIOfDFQ--.54108S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrtr1fAw4kKw1xJr1fZrW3Awb_yoWkCFX_Wa
-	4xZ3sruFn8CF12k3W2kF4fZr1Fva4FgFs7X34aq3s5WryDWF4UXw42qr1DAF1xW3y8CF15
-	Aw4YqF4ay34fujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb48FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s
-	1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0
-	cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8Jw
-	ACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_JF0_
-	Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
-	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI
-	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-	1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI
-	42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VUjJ73PUUUU
-	U==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAAMA2pAiorXYAABsf
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, vulab@iscas.ac.cn
+Subject: RE: [v2] bluetooth: fix hci_dev registration leak in virtbt_probe
+In-Reply-To: <20260628121610.44496-1-vulab@iscas.ac.cn>
+References: <20260628121610.44496-1-vulab@iscas.ac.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-When virtbt_open_vdev fails after hci_register_dev succeeds, the
-open_failed error path calls hci_free_dev, which only releases the
-allocation reference. The Bluetooth subsystem still holds a registration
-reference and keeps the device on hci_dev_list. Fix by calling
-hci_unregister_dev first, then hci_free_dev, matching the pattern in
-virtbt_remove.
+--===============4545815938812805959==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Suggested-by: Greg KH <gregkh@linuxfoundation.org>
-Fixes: dc65b4b0f90a ("Bluetooth: virtio_bt: fix device removal")
-Cc: stable@vger.kernel.org
-Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1117669
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.22 seconds
+VerifyFixes                   PASS      0.29 seconds
+VerifySignedoff               PASS      0.35 seconds
+GitLint                       PASS      0.65 seconds
+SubjectPrefix                 FAIL      0.28 seconds
+BuildKernel                   PASS      25.65 seconds
+CheckAllWarning               PASS      28.26 seconds
+CheckSparse                   PASS      27.19 seconds
+BuildKernel32                 PASS      25.18 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      458.09 seconds
+IncrementalBuild              PASS      24.98 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/364
+
 ---
-Changes in v2:
-- Fix patch format based on reviewer feedback
----
- drivers/bluetooth/virtio_bt.c | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
-index 140ab55c9fc5..bf6827431bb8 100644
---- a/drivers/bluetooth/virtio_bt.c
-+++ b/drivers/bluetooth/virtio_bt.c
-@@ -397,6 +397,7 @@ static int virtbt_probe(struct virtio_device *vdev)
- 	return 0;
- 
- open_failed:
-+	hci_unregister_dev(hdev);
- 	hci_free_dev(hdev);
- failed:
- 	vdev->config->del_vqs(vdev);
--- 
-2.39.5 (Apple Git-154)
 
+--===============4545815938812805959==--
