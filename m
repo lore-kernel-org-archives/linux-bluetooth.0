@@ -1,123 +1,136 @@
-Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5F523ED5B;
-	Sun, 28 Jun 2026 16:49:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDF623D2A4;
+	Sun, 28 Jun 2026 18:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782665402; cv=none; b=H+D2F1jgwPiJV1KfOLkTMTr/DQUU0frcDYaqJjHzUkvex0wkAwrS+jCD7tYFA16/SL02O2VxNT8bG25g072y4dS5xeQRPLgaYwTbKnFYF8dAgFJQCSj8etGL7YWoXTAvU7gLg88V4+K7nmFku8uVhP9b8BqHcZGg+D7kbSm97zI=
+	t=1782672847; cv=none; b=q8SRp1ekAB1m0BDAYmFEl/kbzN1v6/VvlwviVr1HMYTS/5lF26hFxEAzA8Pz12a47ZEU6Iu2DoTS2ABjO22VzVCOAy/bI0QSX9hLnajravGzvj3isQHU6Ea2LiaSXGNMerP3HWAMPK1oXOIgdiSgkX2Uwn5KaACVidHgrwBTTZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782665402; c=relaxed/simple;
-	bh=se2niBpMSNOX2w1eFlrVb4amVz3TmX71rPzQ8ZOg80g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=U4lnBOHgHe9fc9nK8xjWah1aAlJHiP52RJxlT2YoKTTWXTf+d4875K4cxgkaMWT6LJRG/Ciu1us1/mHtM/vQdyq7FNl97oscvnF2/Onc/K8AMCQO+SJ105Le/Sn85Ru+ieAvFHsl8SKFCOFWUx81LcXd7fZYrZHrf9UvUfUCgo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=whynothugo.nl; spf=pass smtp.mailfrom=whynothugo.nl; dkim=pass (2048-bit key) header.d=whynothugo.nl header.i=@whynothugo.nl header.b=vNZdivUQ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=fS0ankCn; arc=none smtp.client-ip=103.168.172.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=whynothugo.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=whynothugo.nl
+	s=arc-20240116; t=1782672847; c=relaxed/simple;
+	bh=2mBQgjcxrqblWqv5J8Qk8wJk+A0S9tR+UwxzmB1h0I4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Edp7pQjjaXJCG4LcD1+Dt1H4LcUZrVueXrE0mCT5LziUY9mmCeGXc7bCfbvBATWLxAwim9GbwxPtXNV1hgFVH1zmiZsJoSmJYTdRgP6Z4/O9wUIqKIyf7+doMrSxW56bMXetu2LW3lt6kX/TQYxOQwF2arNDWvqX48krnfTFhoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oMVPNL6S; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=whynothugo.nl header.i=@whynothugo.nl header.b="vNZdivUQ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="fS0ankCn"
-Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 5FE1B14000CF;
-	Sun, 28 Jun 2026 12:49:59 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-09.internal (MEProxy); Sun, 28 Jun 2026 12:49:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=whynothugo.nl;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
-	 t=1782665399; x=1782751799; bh=Aohqya3n72C0oN4pVy1jddVD2mFgIBs/
-	95yy3WBT8uM=; b=vNZdivUQUf0S2oi/m9rguxFNKfdxC2dqHGwLRpykUFIHxcJI
-	BSHXHW1j+stbhxxB+hZ12oDAHr68WDGsErdBPfEfqJLNHwRdHwp46PsPowA7jevF
-	llMdWfFfILQM0drZ229psH/sJP0ACO4dEkeRfTK7Ot7mMgvDYpHyrMwC92/E+xRO
-	zDbAAyaSqQfUquk7LhjUsEdlqBJloJrGEn+5vR4m9rMbZDNx/mJBJofhvPr7tG+a
-	IHIL7gsSiA1sn16SwxsdXy1KuafrNGR5XNZnvGKiqGZhm4lJIFkdOzAkr+37tsoW
-	YFoa7os/zfzNxbrC7eY48xV1nCvQF3CVzoQxPg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1782665399; x=
-	1782751799; bh=Aohqya3n72C0oN4pVy1jddVD2mFgIBs/95yy3WBT8uM=; b=f
-	S0ankCnmwof63CZrx3OptVM9V+gFy/wdGyseFLr9oC/PYyhGn44xXdeUzEenORP7
-	D6S4S4Nhy05CEuh65u6CrmdxzUcnW5frq10psfSuOmmwuArH9b7ncO7lkm9bCPTQ
-	2Oq8slHDirnn6BVAji/KbgBpYyAX56EEGa+OsfXB+IhQ4bm3pEOPKI//OPs9fNWI
-	e4JYMYv1r4FPjJ9sKfBiM+ORvl2RH1yq4N3cqa7UExOYRS2ksbgo3MOiwhNCYREi
-	M5cNe+ZTlt5O7zMMTom2vAGwzQgdrx0xmAJTk41nVGVCbE8JG8CiE7uMnLefWdl/
-	vU7HlEYGeh/SRcUGdzhxg==
-X-ME-Sender: <xms:tlBBavK29PZEWFlUAQ4sY7uv1T7T-WmGj1gcfJt-UNdhSJoLwgIUMg>
-    <xme:tlBBapLIqV5VJVaIaZOOBZxorYvHAdfSvIAL56Q8ew0T3ajbwea2PXoSkXSiT5XDu
-    AG-DZQoz5bzo5r9MBoA3lkc3qnj7U0yJoR7dk0g2GpIbTTOQfGOhcw>
-X-ME-Received: <xmr:tlBBaij71e4MX7cKEAt2GabyEmASvWUSmwm3EOgInfdx_wzlf3nL2bJ5d2rC5gy6jAqGABTSP1tGvE89Gfc>
-X-ME-Proxy-Cause: dmFkZTFp9IbH9HW8AM1WkjtDh10e0B9qAsYtq8Fa5LLnzibcJRuNnSNfvU/9juu0zMrz7A
-    EpTAA4Dz3EOdt4AcVxP9MX+os7lOdQ/rPqezIH42Mr6r5BybTap6TUPZ6pSgDuNvTZS0x8
-    xrpluk3gnwLPMKcHedfHX23k0nGVD5mUPZi9tOgI9IlWqhUIMbFvs9jHd2xr3YkufQOo7c
-    Ez/MBS/iqlYN9RigZ0L8N/x0omSVSp1HlFJS2qsdFYcJFTZkHyfbyCTNPOcsoPTb1DzxEZ
-    iGYbt4acO/BWW4RkMZuVtuc0Qd5E2i5LeUtg9wVYqfen5wyl6WH341NgISRh/8kbqYFMdD
-    yi1EeFZDIMW2ci6gkpD5TSta5Fx4qPFBQHNDlk05cKtm7AvZph7xUMLrY8z2QgfIwEs9Oa
-    rE+WyL0LG4v4Ewin0loP0GdJThiMa6OSnoQkPRx21aA1u1YP/36HQFWYUsoJmEYDb1onr3
-    wN4qgf4Zs/XYCBlFnymGn8+LFoXQj5ZUWm5PjblT1yh3vluOdlSDa2IMx+QDUdkh7cPs3L
-    U7UyYYqacYK+dNWqgAQD+CWKX1dutDOwt2GpO2NCfDDs7QhJ0pSh8QxFCmmtmET3gjMctF
-    GxLRV34LPh0W8IMDV+z+qbskVPSW6j9+1rkzFJ1wG5wjpjIMxM/ry+61hXZQ
-X-ME-Proxy: <xmx:tlBBarPwE-x2ZlMJSJCjZexv68kWzwiVFNIEUJwPim8J_Mh5gqGLKg>
-    <xmx:tlBBaloQPRe7K5ln_sD77v08LU-tHNExL82E2sJadNxpanhP1y4foQ>
-    <xmx:tlBBal5YIUNsPt_h5Jc2Dmjo3mPpopEIo-_blq6FqmAHX0GqaJUcew>
-    <xmx:tlBBarhXjXwKsfYu_bl4D-k4cRT80deXcJP0lvPMg9JqGjzUqVJLnA>
-    <xmx:t1BBar5TcN1gZYdXvx805me_cNTLMy1vAZkJw4PtQEBag92m5572aLZw>
-Feedback-ID: ib8c04050:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 28 Jun 2026 12:49:57 -0400 (EDT)
-From: Hugo Osvaldo Barrera <hugo@whynothugo.nl>
-To: hugo@whynothugo.nl
-Cc: conor+dt@kernel.org,
-	devicetree@vger.kernel.org,
-	krzk+dt@kernel.org,
-	linusw@kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	robh@kernel.org
-Subject: Re: [PATCH 2/2] dt-bindings: bluetooth: broadcom: add BCM43752
-Date: Sun, 28 Jun 2026 18:49:13 +0200
-Message-ID: <20260628164915.19580-2-hugo@whynothugo.nl>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260628095500.29810-2-hugo@whynothugo.nl>
-References: <20260628095500.29810-2-hugo@whynothugo.nl>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oMVPNL6S"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9D661F00A3A;
+	Sun, 28 Jun 2026 18:54:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782672846;
+	bh=TcbXPpzfkxQPhdknKxPzE7hKJWojVVYNJ0ZYN7VuqUo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=oMVPNL6SGcurNCHXmW3JSPOFJI7LH22YpXBxlnznKGMdIsyI5od+fvvZQORfmixi4
+	 2L1jV5FAXwl4QGVq+k/k3nIGmT9xw2yO/jDCg1Qsmt6l+tgWabUSdiWGJQmBsp+c0r
+	 r/11LXfw6sDRUWlbeMYYEhHISwmY5WhDpWeMtQop3avlDAaKPOJYpwqJULGXyclMcG
+	 LEFqaUmhxbdzHb7DALTBvRQSK7p+QiYZEnC505OmTXbQZDDOkaqC2FzkyV2di0yIPq
+	 V0cyA4hD6W4Q2dBuocn6AJPu9Bps9oYQ7iPmwW29QmFaf8KawKNEE/30XrqtugZWrk
+	 OqfO2HS5hy8pQ==
+Date: Sun, 28 Jun 2026 11:54:04 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Demi Marie Obenour <demiobenour@gmail.com>
+Cc: Andy Lutomirski <luto@amacapital.net>, linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, iwd@lists.linux.dev,
+	linux-hardening@vger.kernel.org, Milan Broz <gmazyland@gmail.com>
+Subject: Re: [PATCH] crypto: af_alg - Add af_alg_restrict sysctl, defaulting
+ to 1
+Message-ID: <20260628185404.GA2292@quark>
+References: <20260622234803.6982-1-ebiggers@kernel.org>
+ <CALCETrXPj0u=FZ=aFcZAHk3fFZa7rCuPEjx6cOMXmT3sdkC7SA@mail.gmail.com>
+ <20260623192715.GE1850517@google.com>
+ <c7cb79ce-48f9-4433-ab4f-88b4c4df996c@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <c7cb79ce-48f9-4433-ab4f-88b4c4df996c@gmail.com>
 
-On Sun, 28 Jun 2026, at 13:57, bluez.test.bot@gmail.com wrote:
-> […]
-> ##############################
-> Test: SubjectPrefix - FAIL
-> Desc: Check subject contains "Bluetooth" prefix
-> Output:
-> "Bluetooth: " prefix is not specified in the subject
+On Tue, Jun 23, 2026 at 10:09:27PM -0400, Demi Marie Obenour wrote:
+> On 6/23/26 15:27, Eric Biggers wrote:
+> > On Tue, Jun 23, 2026 at 12:12:24PM -0700, Andy Lutomirski wrote:
+> >> On Mon, Jun 22, 2026 at 4:49 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> >>>
+> >>> AF_ALG is a frequent source of vulnerabilities and a maintenance
+> >>> nightmare.  It exposes far more functionality to userspace than ever
+> >>> should have been exposed, especially to unprivileged processes.  Recent
+> >>> exploits have targeted kernel internal implementation details like
+> >>> "authencesn" that have zero use case for userspace access.
+> >>>
+> >>> Fortunately, AF_ALG is rarely used in practice, as userspace crypto
+> >>> libraries exist.  And when it is used, only some functionality is known
+> >>> to be used, and many users are known to hold capabilities already.
+> >>> iwd for example requires CAP_NET_ADMIN and has a known algorithm list
+> >>> (https://lore.kernel.org/linux-crypto/bcbbef00-5881-421b-8892-7be6c04b832d@gmail.com/).
+> >>>
+> >>> Thus, let's restrict the set of allowed algorithms by default, depending
+> >>> on the capabilities held.
+> >>>
+> >>> Add a sysctl /proc/sys/crypto/af_alg_restrict with meaning:
+> >>>
+> >>>     0: unrestricted
+> >>>     1: limited functionality
+> >>>     2: completely disabled
+> >>>
+> >>> Set the default value to 1, which enables an algorithm allowlist for
+> >>> unprivileged processes and a slightly longer allowlist for privileged
+> >>> processes.
+> >>
+> >> In our brave new world of containers, this is a bit awkward.  The
+> >> admin is sort of asking two separate questions:
+> >>
+> >> 1. Is the actual running distro and its privileged components capable
+> >> of working without AF_ALG or with only the parts marked as being
+> >> unprivileged?
+> >>
+> >> 2. Is the system running contains that need the unprivileged parts?
+> >> (Which is maybe just sha1 for ip?  I really don't know.)
+> >>
+> >> Should there maybe be two separate options so that all options are
+> >> available?  Or maybe something between 2 and 3 that means "limited
+> >> functionality and privileged modes are completely disabled"?
+> > 
+> > If we want to offer more settings we could.  I could see this getting
+> > quite complex pretty quickly once everyone weighs in, though.  There's
+> > quite a bit of value in keeping things simple, even if the offered
+> > settings won't be optimal for every case.
+> > 
+> > - Eric
+> 
+> What about exposing both allowlists to userspace and making them
+> configurable?
+> 
+> I'm mostly concerned about systems running code (possibly
+> closed-source) that uses algorithms that nobody here knows about.
+> It would be better to allow a single algorithm than to turn off all
+> restrictions.
+> -- 
+> Sincerely,
+> Demi Marie Obenour (she/her/hers)
 
-I followed the style of previous patches introducing
-similar changes to this same file. Should I include
-this prefix for this patch too?
+I think the following is what you're asking for:
 
-> ##############################
-> Test: TestRunner_mgmt-tester - FAIL
-> Desc: Run mgmt-tester with test-runner
-> Output:
-> Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
->
-> Failed Test Cases
-> Read Exp Feature - Success                           Failed       0.257 seconds
+    sysctl crypto.algif_aead_priv_allowlist='ccm(aes)'
+    sysctl crypto.algif_aead_unpriv_allowlist=''
+    sysctl crypto.algif_hash_priv_allowlist='cmac(aes),hmac(md5),hmac(sha1),hmac(sha256),hmac(sha384),hmac(sha512),md4,md5,sha224,sha256,sha384,sha512'
+    sysctl crypto.algif_hash_unpriv_allowlist='sha1'
+    sysctl crypto.algif_skcipher_priv_allowlist='cbc(aes),cbc(des),cbc(des3_ede),ctr(aes),ecb(aes),ecb(des)'
+    sysctl crypto.algif_skcipher_unpriv_allowlist='adiantum(xchacha12,aes),adiantum(xchacha20,aes),hctr2(aes),xts(aes)'
+    sysctl crypto.algif_rng_priv_allowlist=''
+    sysctl crypto.algif_rng_unpriv_allowlist=''
 
-I can't find any reference of "mgmt-tester" anywhere
-in the repo. Is this failure unrelated to my changes?
+We could do that if it's what people want.  Just keep in mind that it
+would be much more complex than the single tristate sysctl.  And in
+practice the number of people who are knowledgeable enough to create
+these lists is quite small; we've seen similar things with other "Crypto
+API" configuration knobs that seem to never be touched in practice.
 
--- 
-Hugo
+Any thoughts?
 
+- Eric
