@@ -1,127 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F20305057;
-	Sun, 28 Jun 2026 08:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B2A331EBA;
+	Sun, 28 Jun 2026 09:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782636171; cv=none; b=tHP5LTHpOHG1JxKAYSy8JqDKBmCHX0aR+BtNWzhW69r+Jp//b9sMocdyWkcBXl8x4TZPhLlI1MmghXg74rK6CpSYS8OHclpbO84NJfsEXV6crzFIqTMfTwNMeaXiN/Dsr/QVQ+ldWHoJHhPicjCcH6ZiN9UVBTgIbYq0ivtsj5s=
+	t=1782640511; cv=none; b=Q8z3CFgM3kse7zGMaRqGzcwOTnK8l6NxNYjT9l9Sft7exoeqp3+e3KiIm6hQr9M84ydIHCZw+HCQyhge8YkoT+2G0myhNwDqaUkQVgnZsDauUDRW61lNgsISE6oo7/ZQEf/ZEB64sa3cC2LcNQ2yozOgYlE9N8u1obaYufOVHBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782636171; c=relaxed/simple;
-	bh=0i5idEgghoYBhHIz4PQpVFIFx1eFrUiBGYi9zy3Ruh8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eiTC6vFnrW1x2v2L4azuZUJyz4TAOVARXCaWw6+XMOAGpr0nivt6YMTgfYk+wFdFRRwE2o+8XGgU5QcV0+Y1kg0AQndRXYlHFgeyK72jtvCGb7qjBck6yRySpB04BqIG613CNSodGnvZ7pZNWWmer0NrkNvm4K9W3tFxKCk3o2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oz8FJ1xl; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782640511; c=relaxed/simple;
+	bh=j6bCiAcMt8BsQBJ0rxI6FWEW9qfvWgb1MSKXcpvsBSg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S1OPLWObB9fj0vFMth3td2oGH93F7RCrefF83EnHzBUQbkfsYVAotFujrDy9L/TWscUhgeWlrK779Ql2nw2QT6We8GRI1dfTVtZvdFkUQcElduIKO3Yebr2/BQm/T1VHjq8OmFKqlVVmjPHD4Rd+CZxJp2pImhdyebPVXekB5bc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=whynothugo.nl; spf=pass smtp.mailfrom=whynothugo.nl; dkim=pass (2048-bit key) header.d=whynothugo.nl header.i=@whynothugo.nl header.b=Xf3+DEHD; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=fVjRtSgg; arc=none smtp.client-ip=103.168.172.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=whynothugo.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=whynothugo.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oz8FJ1xl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD7431F000E9;
-	Sun, 28 Jun 2026 08:42:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782636170;
-	bh=Y9xKYEPwRIjbQX3xDQwzOj3RkiQaVnBTxpGMVhYocWA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=oz8FJ1xlQhU/aVhJH0Qxl2aUhUCr9knogttbe0s4OPyTCIBepsrHCIixRaTZyNpB1
-	 IFiLEPCK/dsUdoh7BqESOQO8DOsoYJGeu5iEqFQb7+3WwuhfSM+yiJzpCajYJKiyAC
-	 ac42MAeBo0e3PZEvEPkpuPlyrgW3iZptnbOvlRCGJiA3FFJYg9b6BvDummdh/HaCEG
-	 PoSIAEdJyPakgEuoCC1903/h4HHFtRdS6UproO4no5Dlm5lF/I9ehG70sCLjW7gdeS
-	 m6G9mINCAdtlsvxfmhJgiaTkewn1dchDdJ429+HmlaaLdieQFrGxpFeDWYtfoY/QAQ
-	 mdAPsfLFMyusA==
-Message-ID: <5e514621-c92b-4a88-abc3-51cbcc5179ba@kernel.org>
-Date: Sun, 28 Jun 2026 10:42:45 +0200
+	dkim=pass (2048-bit key) header.d=whynothugo.nl header.i=@whynothugo.nl header.b="Xf3+DEHD";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="fVjRtSgg"
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.phl.internal (Postfix) with ESMTP id EC3CBEC0169;
+	Sun, 28 Jun 2026 05:55:07 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Sun, 28 Jun 2026 05:55:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=whynothugo.nl;
+	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
+	:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to; s=fm2; t=1782640507; x=1782726907; bh=Z5zuYXmmI0
+	JsqCCZmMVooswBo+HyKuQAEnd2ARkWiEM=; b=Xf3+DEHDAbA1hb4fBAxC0pHADL
+	RhmEZCfv4g/0TXfa+Ue04sKbHOdjWlKe0IxMQD9KgT4PvEkMAZmBdNCTJnqqg6qA
+	dONYLNJ/Danl0ADWBznKrmAhzqJhJpevz+ziUZdf0zFAg59oqUHSn5UUPt7sFiF7
+	Jl0wqNMDCONxIWxiBid26Vnv6kO0nkQRNall33uw1MjilJGkzgER3xfNVHPqhBEC
+	4sO0p3qo9Vi06wEtQDhn77UKeZpug84DIiWnADBWZdqBc+7H5fBhWkRwMSa+heY0
+	x8IsgutleuZOA2JcCil1EzMMr7A5dsxIDmktRyt/plDaVaDw1v3iCHqkMSJw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1782640507; x=1782726907; bh=Z5zuYXmmI0JsqCCZmMVooswBo+HyKuQAEnd
+	2ARkWiEM=; b=fVjRtSggWc41oPEf6ZSvnAUtyd7sRhuh+7NYlQz3jwxT7MYoggH
+	1lsW3bHh6ndwNWx+TXaK+RIfah6h2w/b0nH3cdoYefT3wJuem1+5GGo7zwtZK/hv
+	02tWeEDVzGGi/7326j0jBQEmtMJ8ibs/GbP2zMv4O2kMlEqgPf8QgPp91s2nUrv6
+	5i1G+ziNIxAsOC9Mn36TATFOFbyF0PqP0xzG0QvVyNQALXZwUsOgqFyF25Vm7lMv
+	hUYN2Rrt6U7HssD7wYKpu1h2yMcScv66wPAjmPPCLLcTC93hz4h4rHdEpnWGYDVG
+	n12wbtRC2c2lp9PwgQQfbr4hBDXyBGBmSlg==
+X-ME-Sender: <xms:e-9AakeJ1GSuexYFQeVfCR0dq6hwQIu3cnZplNKL_GYirxWtlkN8eQ>
+    <xme:e-9AasO0StoYnOfhHjIDRaQUl_KtiTzfZkWlQxXTyGXfw_E6lvnH2PoRx0acCwraw
+    zV_5LA7hLyxeaKzFK6TC7pg5lv2o4fEFpAz0uRJr515KRII9AB11eU>
+X-ME-Received: <xmr:e-9AagWSumHBpesPVuaHLHQT-F_JR594jqSVagwwl_9FD34ah42Vcnjkjd78FCbV_9Wnhxgc-jZPXs2ps2o>
+X-ME-Proxy-Cause: dmFkZTGCg3NKO7YZXHApB1ryaQzWoEc//Zls4Hbbwe5Utl4xoKmU9WQ7UWoQSEgZ/RJay1
+    ivKnLTVYO2N+3QNdZJ2wIDrrb5dGLRQYUR8v6ktWCUFcMNBEv4rowmd15b3z1TRpfU8c1p
+    M+7UXuLMcPe/mveibb+6/qubMmoTCD7HmQqyPt8rm4DGMqDQliNrGZG2LqT++OMcxIRuQD
+    lJMXUSLgQRR6HdzLL4rufs6T1Za6UD5wzFE6W3ArgLc2Dp1TBZRvT4rPxpj+AOnHv/ZcVe
+    x/EfHZR3Puc0FdQZ1AN4cKSSdpGl+e89IS0vtnhERujWoH5V2FoUvQ8LVOzSUad39W+8Ce
+    BqWFXfoxxkoP9qNOore9ams2O7SwzSBIHRODPiohvZv5gDG8/ctGjLnXkNnvHRvWJdvUR4
+    GIDu9cG78xY7EH9kESMunLew4KVYPxVXBkvUnPlnqYVKyYQubq7rEm7TnzbMhAvL/SQzV9
+    tQFgoSVx4FR2DphirsGzr9GiHdKAtq6XG/eppwQ7XKdRu9u5BPKoLaQn5b4Qk303qlil3x
+    9E5zDXvajfI6DWTlCGIf+bYA2+TQypDjJVlEG3dqKv34hZPE/GLALBVMX9eXR20HK+8iDD
+    tBqWWXoNM9EgOgvGsvpWNS+wGiKP8oWuQQi1Atp1tK73Frj1GkqZKxhe7UaA
+X-ME-Proxy: <xmx:e-9Aasy6rvAEoFP957DH_bCu1aEVNp1M2AiFY_pEFOdU4upoHzNQBg>
+    <xmx:e-9Aav-SwxsQA29D2BnjCbd1qVVBIJ8_H8tUCacPgXh3vgZnr1Bpjg>
+    <xmx:e-9Aap8244-uttExM5NCmrM80zraUNecKB_7ykRi5pQI6--G7zF4Xg>
+    <xmx:e-9AamVfs5q1kd-jhb-Jsrv7I07jfmTKeFZiB334sGSVZAaNzHZaxg>
+    <xmx:e-9AatNwJc9-LiV31WjMzXutc0-dgUwwAR9vVfacAiFCSY_GEk9spYkJ>
+Feedback-ID: ib8c04050:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 28 Jun 2026 05:55:06 -0400 (EDT)
+From: Hugo Osvaldo Barrera <hugo@whynothugo.nl>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Linus Walleij <linusw@kernel.org>,
+	linux-bluetooth@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Hugo Osvaldo Barrera <hugo@whynothugo.nl>
+Subject: [PATCH 1/2] Bluetooth: hci_bcm: add BCM43752
+Date: Sun, 28 Jun 2026 11:54:59 +0200
+Message-ID: <20260628095500.29810-1-hugo@whynothugo.nl>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: hci_bcm: add BCM43752
-To: Hugo Osvaldo Barrera <hugo@whynothugo.nl>,
- Marcel Holtmann <marcel@holtmann.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260628011032.10437-1-hugo@whynothugo.nl>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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
-In-Reply-To: <20260628011032.10437-1-hugo@whynothugo.nl>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 28/06/2026 03:10, Hugo Osvaldo Barrera wrote:
-> Add the compatible for BCM43752 used in Fydetab Duo.
-> 
-> Signed-off-by: Hugo Osvaldo Barrera <hugo@whynothugo.nl>
-> ---
->  .../devicetree/bindings/net/bluetooth/brcm,bluetooth.yaml        | 1 +
->  drivers/bluetooth/hci_bcm.c                                      | 1 +
+Add the compatible for BCM43752 used in Fydetab Duo.
+
+Signed-off-by: Hugo Osvaldo Barrera <hugo@whynothugo.nl>
+---
+ drivers/bluetooth/hci_bcm.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 1a4fc3882fd2..443969afa747 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -1591,6 +1591,7 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
+ 	{ .compatible = "brcm,bcm43438-bt", .data = &bcm43438_device_data },
+ 	{ .compatible = "brcm,bcm4349-bt", .data = &bcm43438_device_data },
+ 	{ .compatible = "brcm,bcm43540-bt", .data = &bcm4354_device_data },
++	{ .compatible = "brcm,bcm43752-bt" },
+ 	{ .compatible = "brcm,bcm4335a0" },
+ 	{ .compatible = "cypress,cyw4373a0-bt", .data = &cyw4373a0_device_data },
+ 	{ .compatible = "infineon,cyw55572-bt", .data = &cyw55572_device_data },
+-- 
+2.54.0
 
 
-Please run scripts/checkpatch.pl on the patches and fix reported
-warnings. After that, run also 'scripts/checkpatch.pl --strict' on the
-patches and (probably) fix more warnings. Some warnings can be ignored,
-especially from --strict run, but the code here looks like it needs a
-fix. Feel free to get in touch if the warning is not clear.
-
-Please use scripts/get_maintainers.pl to get a list of necessary people
-and lists to CC. It might happen, that command when run on an older
-kernel, gives you outdated entries. Therefore please be sure you base
-your patches on recent Linux kernel.
-
-Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-people, so fix your workflow. Tools might also fail if you work on some
-ancient tree (don't, instead use mainline) or work on fork of kernel
-(don't, instead use mainline). Just use b4 and everything should be
-fine, although remember about `b4 prep --auto-to-cc` if you added new
-patches to the patchset.
-
-You missed at least devicetree list (maybe more), so this won't be
-tested by automated tooling. Performing review on untested code might be
-a waste of time.
-
-Please kindly resend and include all necessary To/Cc entries.
-
-Best regards,
-Krzysztof
