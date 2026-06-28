@@ -1,112 +1,127 @@
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A929BE63;
-	Sun, 28 Jun 2026 03:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F20305057;
+	Sun, 28 Jun 2026 08:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782618909; cv=none; b=LQabKyKk21ahGhrM6gIJ6jxfCvMnXDBg9DvS38hQ/CqjXNpQUuM86aZ/hRgJxB/Bz74f1Xxvjvw5BZt61euqXS0rzZ1ev0F1TFoVawLbF2NuYIqwEyg/puKQPGhnmIFXlgx6D3n3JBOFHpOAfMREp9aecX2jGqWg5WbPydtFBOg=
+	t=1782636171; cv=none; b=tHP5LTHpOHG1JxKAYSy8JqDKBmCHX0aR+BtNWzhW69r+Jp//b9sMocdyWkcBXl8x4TZPhLlI1MmghXg74rK6CpSYS8OHclpbO84NJfsEXV6crzFIqTMfTwNMeaXiN/Dsr/QVQ+ldWHoJHhPicjCcH6ZiN9UVBTgIbYq0ivtsj5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782618909; c=relaxed/simple;
-	bh=SHoLFQU2D/IfHQWNUt92JvP/1EoWsmj6+/TbrdG6eZw=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=Dg5dh3X6FYGBL2ON53q8Uvtv7RLQCxbkQhHjnOauwrbHOxwt3gBzRmvdwAth19WId3OgquIMt7eewM3/A+3svgiIOul5+Qr34CaOJPayFrn0E06WTgGeT0rwmKmdukUfZ1ho+mL4pBzigZ9jckUlHuHLmSzYyBFHgCY/6v26DBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from smtpclient.apple (unknown [117.182.74.7])
-	by APP-01 (Coremail) with SMTP id qwCowADXfdYKm0BqqCuqAw--.7249S3;
-	Sun, 28 Jun 2026 11:55:05 +0800 (CST)
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1782636171; c=relaxed/simple;
+	bh=0i5idEgghoYBhHIz4PQpVFIFx1eFrUiBGYi9zy3Ruh8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eiTC6vFnrW1x2v2L4azuZUJyz4TAOVARXCaWw6+XMOAGpr0nivt6YMTgfYk+wFdFRRwE2o+8XGgU5QcV0+Y1kg0AQndRXYlHFgeyK72jtvCGb7qjBck6yRySpB04BqIG613CNSodGnvZ7pZNWWmer0NrkNvm4K9W3tFxKCk3o2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oz8FJ1xl; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oz8FJ1xl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD7431F000E9;
+	Sun, 28 Jun 2026 08:42:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782636170;
+	bh=Y9xKYEPwRIjbQX3xDQwzOj3RkiQaVnBTxpGMVhYocWA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=oz8FJ1xlQhU/aVhJH0Qxl2aUhUCr9knogttbe0s4OPyTCIBepsrHCIixRaTZyNpB1
+	 IFiLEPCK/dsUdoh7BqESOQO8DOsoYJGeu5iEqFQb7+3WwuhfSM+yiJzpCajYJKiyAC
+	 ac42MAeBo0e3PZEvEPkpuPlyrgW3iZptnbOvlRCGJiA3FFJYg9b6BvDummdh/HaCEG
+	 PoSIAEdJyPakgEuoCC1903/h4HHFtRdS6UproO4no5Dlm5lF/I9ehG70sCLjW7gdeS
+	 m6G9mINCAdtlsvxfmhJgiaTkewn1dchDdJ429+HmlaaLdieQFrGxpFeDWYtfoY/QAQ
+	 mdAPsfLFMyusA==
+Message-ID: <5e514621-c92b-4a88-abc3-51cbcc5179ba@kernel.org>
+Date: Sun, 28 Jun 2026 10:42:45 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.8\))
-Subject: Re: [PATCH] fix: net/bluetooth: iso_conn_del: extra iso_conn_put on
- iso_sock_hold   failure path
-From: WenTao Liang <vulab@iscas.ac.cn>
-In-Reply-To: <20260626115312.33528-1-vulab@iscas.ac.cn>
-Date: Sun, 28 Jun 2026 11:54:54 +0800
-Cc: linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <B4DD84C4-BB14-408A-8760-B3CA55CC3BD4@iscas.ac.cn>
-References: <20260626115312.33528-1-vulab@iscas.ac.cn>
-To: marcel@holtmann.org,
- luiz.dentz@gmail.com
-X-Mailer: Apple Mail (2.3826.700.81.1.8)
-X-CM-TRANSID:qwCowADXfdYKm0BqqCuqAw--.7249S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ar18CF4rWrW5Cr17WFy3Jwb_yoW8GFyfpF
-	W7WFWftFZrJ3sakF4IkFs5XF4jvFsxuFyIkr1kKr4ruwn8t3yUA398WrWqgF45trZ2qrs8
-	JF4DtFnagFWUCFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBmb7Iv0xC_KF4lb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI
-	8067AKxVWUGwA2048vs2IY020Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF
-	64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcV
-	CY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280
-	aVCY1x0267AKxVWxJr0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4
-	CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvj
-	eVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCY1x0262kKe7AKxVWUAVWUtwCF04
-	k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18
-	MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr4
-	1lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1U
-	MIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I
-	8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUxeT5DUUUU
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCRIMA2pAiNkd5gABsV
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: hci_bcm: add BCM43752
+To: Hugo Osvaldo Barrera <hugo@whynothugo.nl>,
+ Marcel Holtmann <marcel@holtmann.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260628011032.10437-1-hugo@whynothugo.nl>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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
+In-Reply-To: <20260628011032.10437-1-hugo@whynothugo.nl>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-
-> 2026=E5=B9=B46=E6=9C=8826=E6=97=A5 19:53=EF=BC=8CWenTao Liang =
-<vulab@iscas.ac.cn> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> In iso_conn_del(), iso_conn_hold_unless_zero() acquires a temporary
->  reference which is correctly balanced by iso_conn_put() at line 279. =
-When
->  iso_sock_hold() returns NULL (sk =3D=3D NULL), an additional
->  iso_conn_put(conn) is called, dropping hcon's reference to conn too
->  early. The caller (e.g., hci_conn_del) will later also =
-iso_conn_put(),
->  causing a double-free or use-after-free.
->=20
-> Remove the extra iso_conn_put(conn) on the sk =3D=3D NULL path.
->=20
-> Cc: stable@vger.kernel.org
-> Fixes: dc26097bdb86 ("Bluetooth: ISO: Use kref to track lifetime of =
-iso_conn")
-> Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
+On 28/06/2026 03:10, Hugo Osvaldo Barrera wrote:
+> Add the compatible for BCM43752 used in Fydetab Duo.
+> 
+> Signed-off-by: Hugo Osvaldo Barrera <hugo@whynothugo.nl>
 > ---
-> net/bluetooth/iso.c | 4 +---
-> 1 file changed, 1 insertion(+), 3 deletions(-)
->=20
-> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> index 3abd8111dda8..99755671e469 100644
-> --- a/net/bluetooth/iso.c
-> +++ b/net/bluetooth/iso.c
-> @@ -278,10 +278,8 @@ static void iso_conn_del(struct hci_conn *hcon, =
-int err)
-> 	iso_conn_unlock(conn);
-> 	iso_conn_put(conn);
->=20
-> -	if (!sk) {
-> -		iso_conn_put(conn);
-> +	if (!sk)
-> 		return;
-> -	}
->=20
-> 	lock_sock(sk);
-> 	iso_sock_clear_timer(sk);
-> --=20
-> 2.39.5 (Apple Git-154)
+>  .../devicetree/bindings/net/bluetooth/brcm,bluetooth.yaml        | 1 +
+>  drivers/bluetooth/hci_bcm.c                                      | 1 +
 
-Please ignore this patch. I will resend a proper version after
-learning the kernel submission process.
 
-Apologies for the noise.
+Please run scripts/checkpatch.pl on the patches and fix reported
+warnings. After that, run also 'scripts/checkpatch.pl --strict' on the
+patches and (probably) fix more warnings. Some warnings can be ignored,
+especially from --strict run, but the code here looks like it needs a
+fix. Feel free to get in touch if the warning is not clear.
+
+Please use scripts/get_maintainers.pl to get a list of necessary people
+and lists to CC. It might happen, that command when run on an older
+kernel, gives you outdated entries. Therefore please be sure you base
+your patches on recent Linux kernel.
+
+Tools like b4 or scripts/get_maintainer.pl provide you proper list of
+people, so fix your workflow. Tools might also fail if you work on some
+ancient tree (don't, instead use mainline) or work on fork of kernel
+(don't, instead use mainline). Just use b4 and everything should be
+fine, although remember about `b4 prep --auto-to-cc` if you added new
+patches to the patchset.
+
+You missed at least devicetree list (maybe more), so this won't be
+tested by automated tooling. Performing review on untested code might be
+a waste of time.
+
+Please kindly resend and include all necessary To/Cc entries.
 
 Best regards,
-WenTao Liang=
-
+Krzysztof
