@@ -1,157 +1,123 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 988501A6824
-	for <linux-bluetooth@vger.kernel.org>; Sun, 28 Jun 2026 15:07:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5F523ED5B;
+	Sun, 28 Jun 2026 16:49:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782659229; cv=none; b=X5ld9G7WTh5zy9T90ZLzVkSkRJMNrIWi404B44tsd9fde5AGGNcRLLa91Kmor8t39Y35b0kfwvwnXyQ1DJTRy5RPLx21M2iPVQhfWWM2Hqbr8p4Ae/pdqViLMDrue/Are2JWhHzGPXEB30u33sZcF/Gu1i3dYmwNxzdVDO1YBY4=
+	t=1782665402; cv=none; b=H+D2F1jgwPiJV1KfOLkTMTr/DQUU0frcDYaqJjHzUkvex0wkAwrS+jCD7tYFA16/SL02O2VxNT8bG25g072y4dS5xeQRPLgaYwTbKnFYF8dAgFJQCSj8etGL7YWoXTAvU7gLg88V4+K7nmFku8uVhP9b8BqHcZGg+D7kbSm97zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782659229; c=relaxed/simple;
-	bh=8rCygv+8QreMiw7J9/7RLzMeUsz8HYyU52Bsp6pRz64=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=DT5V2U45mXrnYN9i20vh1xousAUpuekMEvSuQLfE6lBKFVfQ3ujw8TMiyowuGXnAnc32QqJbJBcIlxCdtWa7rfpFj65yF/0cpDqxvegT1a6E7jch66F7aI8jvsAo+OpEiz0qV5DnCQnAQLQg8NmLl43bcSJFSUtf+/RSHy92m+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TaGR4X9W; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782665402; c=relaxed/simple;
+	bh=se2niBpMSNOX2w1eFlrVb4amVz3TmX71rPzQ8ZOg80g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=U4lnBOHgHe9fc9nK8xjWah1aAlJHiP52RJxlT2YoKTTWXTf+d4875K4cxgkaMWT6LJRG/Ciu1us1/mHtM/vQdyq7FNl97oscvnF2/Onc/K8AMCQO+SJ105Le/Sn85Ru+ieAvFHsl8SKFCOFWUx81LcXd7fZYrZHrf9UvUfUCgo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=whynothugo.nl; spf=pass smtp.mailfrom=whynothugo.nl; dkim=pass (2048-bit key) header.d=whynothugo.nl header.i=@whynothugo.nl header.b=vNZdivUQ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=fS0ankCn; arc=none smtp.client-ip=103.168.172.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=whynothugo.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=whynothugo.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TaGR4X9W"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-92120eb916aso273135785a.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 28 Jun 2026 08:07:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782659227; x=1783264027; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0LHhcfUwmRooJ5mWwHhfcHQV8BTv4sFjrRulqi0oZxs=;
-        b=TaGR4X9W0ltlort5mlzvZKrq/8VFvbJqHc5wFQnnxjoGHqULF3d3npoF4lV36zrjGd
-         L+3cAWpsbEvQzhCd1kLbEHj8l5UZ3GEU6RO1wFofcqIaENxOaHjgz3v4mbRsq0JIdnWL
-         arpTLHpTbRGxRpq8Vn83K8Rkqbl3wITIHTW+47eqmHkZ5CKfHoK+g0jzELatQMVlyY0I
-         IW/CnjECFTIb0z+EUbgSjFd7GrbBqv8EVW1Lm4ElY9BJ1QXgPLUq1VOv3wH4qox/Ob2v
-         BfnbdAFyU3DGHpHc8xKF/R5N0nVvP2MJWnA1aW+f7bm4XNO2jo06dVkWtR2HOI675hn5
-         Ap6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782659227; x=1783264027;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0LHhcfUwmRooJ5mWwHhfcHQV8BTv4sFjrRulqi0oZxs=;
-        b=QLsaUrXDPXTvkCLPtJF48sY6qK8btj5za8BglhFfSC4jSbRw63E0FN7zQAVyzxkoZc
-         sksvP5tKabqRIgp18QLmKQa+rjrzCRTufISDW9+8Q56XAozksO8F9gtBVvp/JD0VZ7i7
-         I8YPOgoaeFNFYmMNeI6e+Q53IMpCetURFbpMh66D6cnpUx3NA6DpFpm0MJ7nkjmyGJbY
-         c47/7W4V3+kcnPIU3f5+p8dMer5LFhgZUVhEq7v+u9eLw973s4Nwv6udqSnAeUqvcKhl
-         04f/C9V3ZHcl9mBWghzJH55KfD8GhhVQpTGdznL/98/+kTjjER9UiLiZSZkIjlDLUy/m
-         c4/A==
-X-Gm-Message-State: AOJu0Ywgv9NsPWAF686mUBg6wC/oafJSPYo32n0gXrWTvt2By91fJqzw
-	4IWX+VBKdeFzlNcWyplLO1/rC6tJBEOTDpmQVmwgIHsjGIt+wxpvVA33gQmUlw==
-X-Gm-Gg: AfdE7ckIBjcy5Xl6gkHzIJud0mXTjUPC9NdUJP9jvmjPzTexNwW66gCeDvn6o8LGJSL
-	ncb9j1MZUU/mBHa0T5wPGfq2ytM6eISXEQEZ2o3wx3017k+TSpHWRj3fjMg8SOdC8Q1Zi+ZJFW3
-	n+1jUVB+g7aN1YQJCAxoRRgx0PDWBYOHa+QM4qnRnFvsiFq9p6//4xhBvf+CJ3RFckxKuvppkXe
-	e/gX/IcJbhPUwq4/toMrTcauCH/wlKxtYJcT39KHegGjcgKKuBVdhghyWS1S1t5+mkbc8SRz6Ig
-	aARz1gsku8xl3bv24ClcQmnPbPQV2NXigmKvupJ6MNs2LDf+BtIov/sZRh+p5WCiQUplvrGOYAp
-	/Yur3JNKMfFIMZJRGgcJcqBCxRDEo1j0QcmVPG0yWAdce/regjkiY/E0YJ3TQyKit0Z0gluvnAN
-	+Rri1RgzbWM5fclSeJpOHZZNYTbSf1Xg==
-X-Received: by 2002:ac8:5511:0:b0:51a:8c97:9391 with SMTP id d75a77b69052e-51a8c979683mr69140161cf.72.1782659227472;
-        Sun, 28 Jun 2026 08:07:07 -0700 (PDT)
-Received: from [172.17.0.2] ([20.55.127.229])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51bfdc32a93sm622781cf.25.2026.06.28.08.07.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Jun 2026 08:07:06 -0700 (PDT)
-Message-ID: <6a41389a.4b29c3fd.ff37b.e71c@mx.google.com>
-Date: Sun, 28 Jun 2026 08:07:06 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3733814659749185217=="
+	dkim=pass (2048-bit key) header.d=whynothugo.nl header.i=@whynothugo.nl header.b="vNZdivUQ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="fS0ankCn"
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 5FE1B14000CF;
+	Sun, 28 Jun 2026 12:49:59 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-09.internal (MEProxy); Sun, 28 Jun 2026 12:49:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=whynothugo.nl;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
+	 t=1782665399; x=1782751799; bh=Aohqya3n72C0oN4pVy1jddVD2mFgIBs/
+	95yy3WBT8uM=; b=vNZdivUQUf0S2oi/m9rguxFNKfdxC2dqHGwLRpykUFIHxcJI
+	BSHXHW1j+stbhxxB+hZ12oDAHr68WDGsErdBPfEfqJLNHwRdHwp46PsPowA7jevF
+	llMdWfFfILQM0drZ229psH/sJP0ACO4dEkeRfTK7Ot7mMgvDYpHyrMwC92/E+xRO
+	zDbAAyaSqQfUquk7LhjUsEdlqBJloJrGEn+5vR4m9rMbZDNx/mJBJofhvPr7tG+a
+	IHIL7gsSiA1sn16SwxsdXy1KuafrNGR5XNZnvGKiqGZhm4lJIFkdOzAkr+37tsoW
+	YFoa7os/zfzNxbrC7eY48xV1nCvQF3CVzoQxPg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1782665399; x=
+	1782751799; bh=Aohqya3n72C0oN4pVy1jddVD2mFgIBs/95yy3WBT8uM=; b=f
+	S0ankCnmwof63CZrx3OptVM9V+gFy/wdGyseFLr9oC/PYyhGn44xXdeUzEenORP7
+	D6S4S4Nhy05CEuh65u6CrmdxzUcnW5frq10psfSuOmmwuArH9b7ncO7lkm9bCPTQ
+	2Oq8slHDirnn6BVAji/KbgBpYyAX56EEGa+OsfXB+IhQ4bm3pEOPKI//OPs9fNWI
+	e4JYMYv1r4FPjJ9sKfBiM+ORvl2RH1yq4N3cqa7UExOYRS2ksbgo3MOiwhNCYREi
+	M5cNe+ZTlt5O7zMMTom2vAGwzQgdrx0xmAJTk41nVGVCbE8JG8CiE7uMnLefWdl/
+	vU7HlEYGeh/SRcUGdzhxg==
+X-ME-Sender: <xms:tlBBavK29PZEWFlUAQ4sY7uv1T7T-WmGj1gcfJt-UNdhSJoLwgIUMg>
+    <xme:tlBBapLIqV5VJVaIaZOOBZxorYvHAdfSvIAL56Q8ew0T3ajbwea2PXoSkXSiT5XDu
+    AG-DZQoz5bzo5r9MBoA3lkc3qnj7U0yJoR7dk0g2GpIbTTOQfGOhcw>
+X-ME-Received: <xmr:tlBBaij71e4MX7cKEAt2GabyEmASvWUSmwm3EOgInfdx_wzlf3nL2bJ5d2rC5gy6jAqGABTSP1tGvE89Gfc>
+X-ME-Proxy-Cause: dmFkZTFp9IbH9HW8AM1WkjtDh10e0B9qAsYtq8Fa5LLnzibcJRuNnSNfvU/9juu0zMrz7A
+    EpTAA4Dz3EOdt4AcVxP9MX+os7lOdQ/rPqezIH42Mr6r5BybTap6TUPZ6pSgDuNvTZS0x8
+    xrpluk3gnwLPMKcHedfHX23k0nGVD5mUPZi9tOgI9IlWqhUIMbFvs9jHd2xr3YkufQOo7c
+    Ez/MBS/iqlYN9RigZ0L8N/x0omSVSp1HlFJS2qsdFYcJFTZkHyfbyCTNPOcsoPTb1DzxEZ
+    iGYbt4acO/BWW4RkMZuVtuc0Qd5E2i5LeUtg9wVYqfen5wyl6WH341NgISRh/8kbqYFMdD
+    yi1EeFZDIMW2ci6gkpD5TSta5Fx4qPFBQHNDlk05cKtm7AvZph7xUMLrY8z2QgfIwEs9Oa
+    rE+WyL0LG4v4Ewin0loP0GdJThiMa6OSnoQkPRx21aA1u1YP/36HQFWYUsoJmEYDb1onr3
+    wN4qgf4Zs/XYCBlFnymGn8+LFoXQj5ZUWm5PjblT1yh3vluOdlSDa2IMx+QDUdkh7cPs3L
+    U7UyYYqacYK+dNWqgAQD+CWKX1dutDOwt2GpO2NCfDDs7QhJ0pSh8QxFCmmtmET3gjMctF
+    GxLRV34LPh0W8IMDV+z+qbskVPSW6j9+1rkzFJ1wG5wjpjIMxM/ry+61hXZQ
+X-ME-Proxy: <xmx:tlBBarPwE-x2ZlMJSJCjZexv68kWzwiVFNIEUJwPim8J_Mh5gqGLKg>
+    <xmx:tlBBaloQPRe7K5ln_sD77v08LU-tHNExL82E2sJadNxpanhP1y4foQ>
+    <xmx:tlBBal5YIUNsPt_h5Jc2Dmjo3mPpopEIo-_blq6FqmAHX0GqaJUcew>
+    <xmx:tlBBarhXjXwKsfYu_bl4D-k4cRT80deXcJP0lvPMg9JqGjzUqVJLnA>
+    <xmx:t1BBar5TcN1gZYdXvx805me_cNTLMy1vAZkJw4PtQEBag92m5572aLZw>
+Feedback-ID: ib8c04050:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 28 Jun 2026 12:49:57 -0400 (EDT)
+From: Hugo Osvaldo Barrera <hugo@whynothugo.nl>
+To: hugo@whynothugo.nl
+Cc: conor+dt@kernel.org,
+	devicetree@vger.kernel.org,
+	krzk+dt@kernel.org,
+	linusw@kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	robh@kernel.org
+Subject: Re: [PATCH 2/2] dt-bindings: bluetooth: broadcom: add BCM43752
+Date: Sun, 28 Jun 2026 18:49:13 +0200
+Message-ID: <20260628164915.19580-2-hugo@whynothugo.nl>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260628095500.29810-2-hugo@whynothugo.nl>
+References: <20260628095500.29810-2-hugo@whynothugo.nl>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: Bluetooth: hci_conn: hold conn references in hci_sync tasks
-In-Reply-To: <7a22e9136652bfc95b52bacc146e5ac461b82ec2.1782652695.git.pav@iki.fi>
-References: <7a22e9136652bfc95b52bacc146e5ac461b82ec2.1782652695.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
---===============3733814659749185217==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Sun, 28 Jun 2026, at 13:57, bluez.test.bot@gmail.com wrote:
+> […]
+> ##############################
+> Test: SubjectPrefix - FAIL
+> Desc: Check subject contains "Bluetooth" prefix
+> Output:
+> "Bluetooth: " prefix is not specified in the subject
 
-This is automated email and please do not reply to this email!
+I followed the style of previous patches introducing
+similar changes to this same file. Should I include
+this prefix for this patch too?
 
-Dear submitter,
+> ##############################
+> Test: TestRunner_mgmt-tester - FAIL
+> Desc: Run mgmt-tester with test-runner
+> Output:
+> Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+>
+> Failed Test Cases
+> Read Exp Feature - Success                           Failed       0.257 seconds
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1117683
+I can't find any reference of "mgmt-tester" anywhere
+in the repo. Is this failure unrelated to my changes?
 
----Test result---
+-- 
+Hugo
 
-Test Summary:
-CheckPatch                    PASS      9.42 seconds
-VerifyFixes                   PASS      0.33 seconds
-VerifySignedoff               PASS      0.29 seconds
-GitLint                       FAIL      5.36 seconds
-SubjectPrefix                 PASS      2.27 seconds
-BuildKernel                   PASS      27.32 seconds
-CheckAllWarning               PASS      29.65 seconds
-CheckSparse                   PASS      30.33 seconds
-BuildKernel32                 PASS      26.44 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      498.43 seconds
-TestRunner_l2cap-tester       PASS      58.76 seconds
-TestRunner_iso-tester         PASS      77.50 seconds
-TestRunner_bnep-tester        PASS      18.91 seconds
-TestRunner_mgmt-tester        FAIL      211.39 seconds
-TestRunner_rfcomm-tester      PASS      25.97 seconds
-TestRunner_sco-tester         PASS      32.02 seconds
-TestRunner_ioctl-tester       PASS      26.08 seconds
-TestRunner_mesh-tester        FAIL      26.08 seconds
-TestRunner_smp-tester         PASS      23.51 seconds
-TestRunner_userchan-tester    PASS      20.07 seconds
-TestRunner_6lowpan-tester     PASS      22.75 seconds
-IncrementalBuild              PASS      46.39 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v4,2/7] Bluetooth: hci_sync: hold conn in hci_connect_acl/le_sync() callbacks
-
-16: B2 Line has trailing whitespace: "    "
-[v4,7/7] Bluetooth: hci_sync: remove unnecessary hci_conn_get in create_conn_sync
-
-1: T1 Title exceeds max length (81>80): "[v4,7/7] Bluetooth: hci_sync: remove unnecessary hci_conn_get in create_conn_sync"
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.234 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.608 seconds
-Mesh - Send cancel - 2                               Timed out    1.991 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/365
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3733814659749185217==--
