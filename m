@@ -1,52 +1,52 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC57282F28;
-	Sun, 28 Jun 2026 13:20:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD99E3A6418;
+	Sun, 28 Jun 2026 13:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782652842; cv=pass; b=F9IT86vjDCs8SHD5JVcKJvJX15MRrBl4nuyl9GFdRjgApMxTw2FV9mgr/JVWpnkVJqjgb0akkCDdZC5OJFQUfcl5B7ogvUS+35Mw8H3XMcvxfomedmnC2aRd3pspKCL1emHDelKjnDqm+KUo8P1kHFR/QqXlz/wpdPy5+lEVZUA=
+	t=1782652844; cv=pass; b=HdaG9oknLtNf9atbhcxIrn0ZmJwpopG9Wzz62PJKdwCCCTaNVi7zKr5WTfV5LXPye8g/57Sat8Bkcy8/evQbOjtWH8nn+1Bqs/wOjvMs77ck59MM5ufQguwxDlyGH6YA/Ma7eEKvJe9mlbDhDmmv8zCvmdjBkn9vKq2tnmsrCrg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782652842; c=relaxed/simple;
-	bh=RLyxI5RzgQz3kb0pVTJZ2LMDHvEXRn3fW/MmEhZn+Vc=;
+	s=arc-20240116; t=1782652844; c=relaxed/simple;
+	bh=AP/V99rpXy5MRBYg/dAtuY+INiijBU0lyet2/mpWey4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DXWnTgUoK7BSyAYQjDnLWbWw9C+3aiucYaw29x2dYhBOztMGhFgjVDY0MtbZKpxFqvKdVNe8rN2zpVwhJ1g1M41uJkU5N/9kpnORJzbX2Q+w7i9woShm2OzDjaUyWQ8BEXPOsS+N210csDzEVav7v+GGBMnqVa1SBddSQRpoIiA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=H78nYUTJ; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=iqswnoQN+fpLQHBHvrwqY2bUetC27/qE1cnsKFaTCBfhuNMA4jHBKj0txgh4X4L8R4mF95dxPTXrbUEPZSwZ/T9vr7tPIM1UQvvV/gdjr9I5wnFJAGAedxLabwLVgrMhUdPqEqVgY1gRPoSORRo7qKwzBaiW6GEGz0BF8xZK40E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=baFSV0nx; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="H78nYUTJ"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="baFSV0nx"
 Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:1::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gp95M0rf5zycB;
-	Sun, 28 Jun 2026 16:20:39 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4gp95N1RPczytg;
+	Sun, 28 Jun 2026 16:20:40 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1782652839;
+	t=1782652841;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PbmZ477KR59tWiV6y8UnBZU3nV0EGG4le+04HLFIqhA=;
-	b=H78nYUTJWHevwAq+Xs0dX3pST3mqIqz7Hn5mB/+h8Nrx1HqjZRQL3cA10KtlVGmTqBOzVz
-	SRVFTeRwzwgqiu3lx+G1ra1QSpmUXzCZ4Sdh/tahPGApZe97TwtxYRB+meda25tsOOxqqc
-	/sMdEy3xrr+eb7EpfxQXSB/B21rZqDA=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1782652839;
-	b=LP4mmCr+yt6u5DZ0bEXI1dCMVTVCSwTvaQXDSlSbxBlySgM7w8vfT8+UEwTMUySSmREG/1
-	Za89Yh0c6R+H4JDG3dbbr4OhSx8/3DhAlEK/xuLHbMqHlmpl9K3X+DFBbxPkBGiKSlBDrw
-	x0gZ3oAwSnRAFknn6qy1o6cxc/22gmA=
+	bh=jnoiwwH9jZ3IwfMueT8vBcEF3Xw3XRXp5669KzTN1/w=;
+	b=baFSV0nxhWEROzK2vhc+UQsZuyjeBxEwxGijHcj3yiWkc4ocFXZZIaODGG3cVDP/AhwWEY
+	nt4jNPyW4Mk8eTY+AhCp/jV93UZbxNdDN7BrabYnsT8TzeKNZdFYV+lA06Y4MxBPkmUBLP
+	th7DyyzFNzDCKMfygnk1Kxiahbl+loM=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1782652841;
+	b=gJ+3gtSnogmUpn3DHvTJZi8vc51c5fZ8cPP4Ly8YSw74thDOJLB5Azq/njXcxTaadJi4sW
+	YCNmNr5bnwKb8hCRHOXU2Oy/tQSVSbI882tZMmXwvQwAPNqvw8WhKippNZe0QTDAMFKLGE
+	m1Ev3ubAIUU+EcjgNWWoCnppL1YgUgw=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1782652839;
+	s=meesny; t=1782652841;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PbmZ477KR59tWiV6y8UnBZU3nV0EGG4le+04HLFIqhA=;
-	b=aVMEZ65sVoWSx/APU1iW4fbDUzin0wRPH8ZEBQgmV7W9Tlocca/o1X4P4Rm//fZD+oNP9E
-	D+ol1Zkb9wNDj3lGE9uJPgtNrOgg+qZCMFXOW4ikckdSIuegvbQRusd1axsKVC957+SEQN
-	1CTjDn79KNhfaXRFBzjUhNfK9gidZgE=
+	bh=jnoiwwH9jZ3IwfMueT8vBcEF3Xw3XRXp5669KzTN1/w=;
+	b=Wkis/6U75Booe/ONY+iNTGcK4BLJHhVlpFWZQcO3M0kgEcF0mcbdzhyP3p34SdhiZaeq+F
+	YNP7tuYrA2K1HCZAIGJ3WWGttOrinQtNQfN8rFFPhWcvadt8AuN0lexiTG4lYdunkdic3+
+	8pxdTKFwLIJkn4peX82DtHrmKpk3yGk=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -57,9 +57,9 @@ Cc: Pauli Virtanen <pav@iki.fi>,
 	luiz.dentz@gmail.com,
 	oss@fourdim.xyz,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 1/7] Bluetooth: hci_conn: hold conn reference in abort_conn_sync()
-Date: Sun, 28 Jun 2026 16:20:26 +0300
-Message-ID: <7a22e9136652bfc95b52bacc146e5ac461b82ec2.1782652695.git.pav@iki.fi>
+Subject: [PATCH v4 2/7] Bluetooth: hci_sync: hold conn in hci_connect_acl/le_sync() callbacks
+Date: Sun, 28 Jun 2026 16:20:27 +0300
+Message-ID: <0ec91c6904681af89011633ff81d31c46b0eac82.1782652695.git.pav@iki.fi>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <cover.1782652695.git.pav@iki.fi>
 References: <cover.1782652695.git.pav@iki.fi>
@@ -71,12 +71,12 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There is theoretical UAF if the conn is freed while the hci_sync task is
-running.
+There is theoretical UAF if the conn is freed while the hci_sync task
+is running.
 
 Hold refcount to avoid that.
 
-Fixes: 227a0cdf4a02 ("Bluetooth: MGMT: Fix not generating command complete for MGMT_OP_DISCONNECT")
+Fixes: 881559af5f5c ("Bluetooth: hci_sync: Attempt to dequeue connection attempt")
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
 
@@ -85,35 +85,87 @@ Notes:
     - no change
     v3:
     - split to multiple patches per different Fixes:
+    
+    hci_conn_get() was added inside hci_le_create_conn_sync()
+    in commit 76c2d047410ba, but it is too late to do there as the
+    hci_conn_get() itself may be UAF.
 
- net/bluetooth/hci_conn.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_sync.c | 32 ++++++++++++++++++++++++--------
+ 1 file changed, 24 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 1966cd153d97..6036ff66d8d9 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -3163,6 +3163,13 @@ static int abort_conn_sync(struct hci_dev *hdev, void *data)
- 	return hci_abort_conn_sync(hdev, conn, conn->abort_reason);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index a693259dd3ee..66f42a3dc5a1 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -7014,12 +7014,23 @@ static int hci_acl_create_conn_sync(struct hci_dev *hdev, void *data)
+ 	return err;
  }
  
-+static void abort_conn_destroy(struct hci_dev *hdev, void *data, int err)
++static void hci_acl_create_conn_sync_complete(struct hci_dev *hdev, void *data,
++					      int err)
 +{
 +	struct hci_conn *conn = data;
 +
 +	hci_conn_put(conn);
 +}
 +
- int hci_abort_conn(struct hci_conn *conn, u8 reason)
+ int hci_connect_acl_sync(struct hci_dev *hdev, struct hci_conn *conn)
  {
- 	struct hci_dev *hdev = conn->hdev;
-@@ -3188,7 +3195,10 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
- 	 * as a result to MGMT_OP_DISCONNECT/MGMT_OP_UNPAIR which does
- 	 * already queue its callback on cmd_sync_work.
- 	 */
--	err = hci_cmd_sync_run_once(hdev, abort_conn_sync, conn, NULL);
-+	err = hci_cmd_sync_run_once(hdev, abort_conn_sync, hci_conn_get(conn),
-+				    abort_conn_destroy);
+ 	int err;
+ 
+-	err = hci_cmd_sync_queue_once(hdev, hci_acl_create_conn_sync, conn,
+-				      NULL);
++	err = hci_cmd_sync_queue_once(hdev, hci_acl_create_conn_sync,
++				      hci_conn_get(conn),
++				      hci_acl_create_conn_sync_complete);
++	if (err)
++		hci_conn_put(conn);
+ 	return (err == -EEXIST) ? 0 : err;
+ }
+ 
+@@ -7030,36 +7041,41 @@ static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
+ 	bt_dev_dbg(hdev, "err %d", err);
+ 
+ 	if (err == -ECANCELED)
+-		return;
++		goto done;
+ 
+ 	hci_dev_lock(hdev);
+ 
+ 	if (!hci_conn_valid(hdev, conn))
+-		goto done;
++		goto unlock;
+ 
+ 	if (!err) {
+ 		hci_connect_le_scan_cleanup(conn, 0x00);
+-		goto done;
++		goto unlock;
+ 	}
+ 
+ 	/* Check if connection is still pending */
+ 	if (conn != hci_lookup_le_connect(hdev))
+-		goto done;
++		goto unlock;
+ 
+ 	/* Flush to make sure we send create conn cancel command if needed */
+ 	flush_delayed_work(&conn->le_conn_timeout);
+ 	hci_conn_failed(conn, bt_status(err));
+ 
+-done:
++unlock:
+ 	hci_dev_unlock(hdev);
++done:
++	hci_conn_put(conn);
+ }
+ 
+ int hci_connect_le_sync(struct hci_dev *hdev, struct hci_conn *conn)
+ {
+ 	int err;
+ 
+-	err = hci_cmd_sync_queue_once(hdev, hci_le_create_conn_sync, conn,
++	err = hci_cmd_sync_queue_once(hdev, hci_le_create_conn_sync,
++				      hci_conn_get(conn),
+ 				      create_le_conn_complete);
 +	if (err)
 +		hci_conn_put(conn);
  	return (err == -EEXIST) ? 0 : err;
