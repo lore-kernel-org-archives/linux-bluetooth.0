@@ -1,68 +1,33 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D703A641C;
-	Sun, 28 Jun 2026 12:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782648779; cv=pass; b=NwoV248OBkEqXIW0HAPXZW1TJQW9h9ZjaT9Crar589LoBML5yoDGWrm+9vMxC5V26FgJW/tT2OOL9/qfZxG/OKOFl4MVc95doed/lW99qtHBobTuN3+31ED/ovM+smpgGi0KrySuru/63ejb8e/nNyka8JVE/gxIf7qhfp44mLg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782648779; c=relaxed/simple;
-	bh=Nja9u7aMTcM3IFE2wa5YUS9bqKOjc8UMhQ37cUeYAgI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GPtPBvpOofxqJG6kkfugpz9t3VYtlwPxr5OVnt4vYOu0WWYvRfD9v7qCS+eQ/0o3uHDyfm9JruuTBeVLrHDL18kQo+xBNgcLm5+LngSDzLOhNK+vJmaksi0qxFvXZ+SdolpVQ/cDesVV/dfoGcKvsT1xZtbyqh73WCC2paEUzj4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=ZYED6PtK; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="ZYED6PtK"
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:1::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gp7b65RNLzyw4;
-	Sun, 28 Jun 2026 15:12:50 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1782648771;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j88F7guV0mq8jpKrUMAiiOxgoX5fxQRlA0LEw3Wfe/Y=;
-	b=ZYED6PtKrPSugmkHeLB7CFqzgM5zi3J6mv9BTIC55wWqblf9TCpudSySOHoOCnhQrjCNBO
-	vLCzFJvzo5mYAZABXT5KbANjayqnVsrJ2mafRbYQvdbhoTqx9lLwYRQMEnbFFQsDZ4EtEr
-	V/TyLQ7F4QAq4TN41VAONjeLDNNreDA=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1782648771;
-	b=XNWkq/JH/XDw/2NafOt0UGD8g0fdNSagvsEiZ8+fBDIrqJPy0XkNihCmWEP7FBj1uev45O
-	IcZ9vm3tI7SFDt74R+ss84vSWVEEyqvSPY8qU8oE/Y6p5+ruJK7nuJi+K+h0xDmtVvMnhn
-	V8uVdhAsYrvCp5wh2BEr2c5weV8E0c8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1782648771;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j88F7guV0mq8jpKrUMAiiOxgoX5fxQRlA0LEw3Wfe/Y=;
-	b=ZVX6Wl15uQMZtIczMdnxM/yCduGAi2D6d2mPDl9HZykt3YS0V3g70t9Lp2xv1V074ONy/w
-	JRaIVTS4HQx+g4Xe9Kc+9fJcl65fAaMSmdAIwAFnLmmpGS/qBCcozsCMX5dQKAq+RNdZNL
-	bY4XMN+MgmLhSiArFOcGLa1kuElxqNo=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7DD345CBF;
+	Sun, 28 Jun 2026 12:16:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782648979; cv=none; b=kqDO9KKdf6FytsT2MgifEnfkTRn0dRtdzSbFRzuVU+sI+lDRyfCSvJlTToazIAAMeI/4gj8orPuGnK6nQtfG4RurJPoZJ9thWs3e5tO6vvjFlqTZIgpfd4KlsH2k6mYScB7bk/x2oK1pA7TFdo6tMnURrnCZ/Mtiw7VA37vlQfg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782648979; c=relaxed/simple;
+	bh=K3LEOZi3mb6+Ahq/uyE5LxMYUu9tCgUnWkf5g+oXaEM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=O5ILlHdRXdDHqqLKElQMBKUJXQ2U620O/wBbvtNTIUPMgwhr80BFjn1tIqo76wJsOIbeC8vpI8SUIhZAVoFPO9TQSnV6tDd7qw5L1tolLsiSzL0PE8GW4Z+8qQzQfBtXYjh3Otd+4p7Cr+Viagxr0Lul/+tshOAQ9foQgPiJL9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [117.182.74.7])
+	by APP-05 (Coremail) with SMTP id zQCowABXo8aMEEFqIOfDFQ--.54108S2;
+	Sun, 28 Jun 2026 20:16:14 +0800 (CST)
+From: WenTao Liang <vulab@iscas.ac.cn>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	marcel@holtmann.org,
+Cc: marcel@holtmann.org,
 	luiz.dentz@gmail.com,
-	oss@fourdim.xyz,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 7/7] Bluetooth: hci_sync: remove unnecessary hci_conn_get in create_conn_sync
-Date: Sun, 28 Jun 2026 15:12:38 +0300
-Message-ID: <8f4f898b035b687be3428d7bc321a88a58d1042d.1782645211.git.pav@iki.fi>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <7a22e9136652bfc95b52bacc146e5ac461b82ec2.1782645211.git.pav@iki.fi>
-References: <7a22e9136652bfc95b52bacc146e5ac461b82ec2.1782645211.git.pav@iki.fi>
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	WenTao Liang <vulab@iscas.ac.cn>,
+	Greg KH <gregkh@linuxfoundation.org>
+Subject: [PATCH v2] bluetooth: fix hci_dev registration leak in virtbt_probe
+Date: Sun, 28 Jun 2026 20:16:10 +0800
+Message-Id: <20260628121610.44496-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -70,72 +35,55 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowABXo8aMEEFqIOfDFQ--.54108S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrtr1fAw4kKw1xJr1fZrW3Awb_yoWkCFX_Wa
+	4xZ3sruFn8CF12k3W2kF4fZr1Fva4FgFs7X34aq3s5WryDWF4UXw42qr1DAF1xW3y8CF15
+	Aw4YqF4ay34fujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb48FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s
+	1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0
+	cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8Jw
+	ACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_JF0_
+	Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
+	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI
+	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+	1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI
+	42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VUjJ73PUUUU
+	U==
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAAMA2pAiorXYAABsf
 
-hci_conn_get() without already held reference is data race against
-concurrent deletion.
+When virtbt_open_vdev fails after hci_register_dev succeeds, the
+open_failed error path calls hci_free_dev, which only releases the
+allocation reference. The Bluetooth subsystem still holds a registration
+reference and keeps the device on hci_dev_list. Fix by calling
+hci_unregister_dev first, then hci_free_dev, matching the pattern in
+virtbt_remove.
 
-In previous patches, the refcount has been changed to be taken before
-starting the hci_sync task, so remove these extra get() + put() as they
-are not needed.
-
-Fixes: 76c2d047410ba ("Bluetooth: hci_conn: Fix null ptr deref in hci_abort_conn()")
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+Suggested-by: Greg KH <gregkh@linuxfoundation.org>
+Fixes: dc65b4b0f90a ("Bluetooth: virtio_bt: fix device removal")
+Cc: stable@vger.kernel.org
+Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
 ---
- net/bluetooth/hci_sync.c | 13 -------------
- 1 file changed, 13 deletions(-)
+Changes in v2:
+- Fix patch format based on reviewer feedback
+---
+ drivers/bluetooth/virtio_bt.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index ab5436e548f9..e4f63f6a51b0 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6607,11 +6607,6 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
+diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
+index 140ab55c9fc5..bf6827431bb8 100644
+--- a/drivers/bluetooth/virtio_bt.c
++++ b/drivers/bluetooth/virtio_bt.c
+@@ -397,6 +397,7 @@ static int virtbt_probe(struct virtio_device *vdev)
+ 	return 0;
  
- 	bt_dev_dbg(hdev, "conn %p", conn);
- 
--	/* Hold a reference so conn stays valid for the HCI_CONN_CREATE
--	 * clear_bit() at done.
--	 */
--	hci_conn_get(conn);
--
- 	clear_bit(HCI_CONN_SCANNING, &conn->flags);
- 	conn->state = BT_CONNECT;
- 
-@@ -6626,7 +6621,6 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
- 			conn->state = BT_OPEN;
- 			hci_abort_conn_sync(hdev, conn,
- 					    HCI_ERROR_REJ_LIMITED_RESOURCES);
--			hci_conn_put(conn);
- 			return -EBUSY;
- 		}
- 
-@@ -6720,7 +6714,6 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
- 
- 	/* Re-enable advertising after the connection attempt is finished. */
- 	hci_resume_advertising_sync(hdev);
--	hci_conn_put(conn);
- 	return err;
- }
- 
-@@ -6995,11 +6988,6 @@ static int hci_acl_create_conn_sync(struct hci_dev *hdev, void *data)
- 	else
- 		cp.role_switch = 0x00;
- 
--	/* Hold a reference so conn stays valid for the HCI_CONN_CREATE
--	 * clear_bit() below.
--	 */
--	hci_conn_get(conn);
--
- 	/* Mark create connection in flight so hci_cancel_connect_sync() can
- 	 * cancel it while blocking on the connection complete event.
- 	 */
-@@ -7011,7 +6999,6 @@ static int hci_acl_create_conn_sync(struct hci_dev *hdev, void *data)
- 				       conn->conn_timeout, NULL);
- 
- 	clear_bit(HCI_CONN_CREATE, &conn->flags);
--	hci_conn_put(conn);
- 
- 	return err;
- }
+ open_failed:
++	hci_unregister_dev(hdev);
+ 	hci_free_dev(hdev);
+ failed:
+ 	vdev->config->del_vqs(vdev);
 -- 
-2.54.0
+2.39.5 (Apple Git-154)
 
