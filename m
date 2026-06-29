@@ -1,72 +1,68 @@
-Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BA33F787E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 14:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C603E8688
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 14:27:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782743225; cv=none; b=QBVDiGhg/DWBi4Qd+Yyg+ecay7dqXP/3kN2+fIPdkqOdYFM1FB7o8k6SqDFvVLNm0w8Fy4ZSe9XFaPoJm7j423pY0EkQrs3OtT/55h+uHqrnN8X/s67nnOl5xHCxyneS1zRxCqEBJL8YVmZr+oGn7YPvPrRkAqYHCjXa8nCOKgQ=
+	t=1782743270; cv=none; b=KE584+jUo2jw4c/TdqqV6ltTIPaRo+U4u9gw/OEid5VTuoropMhqphoOEeWO0BhPMjUb6WoFfkzFuQcR1E9nK2DGH8dNSaGbm7bPwzaivshnJZjkn1S8umUBysOdoKLC+AOTAlsZumzl2zT2o6PvYT4/bVVxNeO0BkwZ0cmu3xY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782743225; c=relaxed/simple;
-	bh=xVjyUMuHLynoN8g83q0hUYdm7KNWtnoosMvI/snXuyM=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cYqKuAoAWLHJ66rI0HtYyXQ3DQb1mMJD1qkY0HAryHbi9F++tA+Yf1BdfkhcNqsbJKJjIbTUW9sJCvWRFhNbM1oPKcfDriS05jg6lUZkmVAOlqWcX88LSObXtzbDU3oQW1CqUUpodSduKUtTC9EMlAljAI2nEBN0dVmt2f5JUSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qFK3Sgu8; arc=none smtp.client-ip=209.85.217.44
+	s=arc-20240116; t=1782743270; c=relaxed/simple;
+	bh=qlCHelgwHcM/NAfl7GyfyIugYXC+3hbtWlcLejIfbQM=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=u5AOPO0lLcyoDvCMQEP0lMvSaBV7/2uKFQGg4g4IhC2nZ8/C5VkNCK4wxZV4ri1LRTQU6luTzh8Bz7JHuukqxhP1NzRrYFVOKsX1xVO/VBKuRrc1g3cPffF7z+95cGVQkXIReCKGoMJTQsi6t72aXJcMYts6Q/P4ZSmpaXDgzUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g564ey9o; arc=none smtp.client-ip=209.85.221.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qFK3Sgu8"
-Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-7387013d24aso742530137.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 07:27:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g564ey9o"
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5bd6c268151so2666229e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 07:27:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782743223; x=1783348023; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OJn748z7kco//vyV6hl4zmq8Nv0zi3K5zLZa6zqvm+U=;
-        b=qFK3Sgu8msyTn+LXs64QWAhA7CM+3xygw/sw5AC/uh+QQQYYCeVLknc2LrYfj8BDTT
-         dVbkJi0I0d1VYbjnuUZ3Ac7zqHdkUq7M4opF4KqrZ54ncUbtDvwoaMGgNzgeUNrwzQdf
-         qZ3+c56+GfUJzRVYqmhcrIG7+FfB5ZEqlBoucwqmw48/CLnucCJYKVWpFS/HyYu0T/3m
-         M5aCBUtDJMEz/lW7INnWfpyGj2nqwtPj3SxJudJHdeMj1kZEYEGINP8Z5ZZm0AkQ3FHd
-         9jOu4id+B8C99gYWuE+iumok16Abf8FSBQgJyBPaY/6cdk3lBkv9D/L9Q6POKnFYpZJb
-         UJ8Q==
+        d=gmail.com; s=20251104; t=1782743268; x=1783348068; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xZFwSQbxySWxwdXopAH3CVkPIWGjj87/WneQVfrjJFQ=;
+        b=g564ey9o7jq6KkQQiBGPX5nUMANCTfwa5AP1oIe++jsv3cMNvZ6+EAtzxJbGoO2RMW
+         dF+6ltvvJy5Zt1aF6LBFhT9BGjY9j3IeQjbk7FC7E3dETT294PKJ8WUkwJ+xzJta9al1
+         RvVwoKqjseJ9uzN0hm0OSW2hR60axveo+oGQTs6bjAcicxOhNxnjD3EFYaWvm0HDLjOf
+         3pv2HZHeqQDORme+mQBproka90naeHDYMWySF7UxGtQuSa0Vj+Wr4ItCo5iZoaskW5LP
+         tiC3DNdjXe2LTOG5qR+CqKeDolRF1CtCWFWj+K/l/qzDwCYcsZj8uUaImbw9lYS4FJUO
+         lLaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782743223; x=1783348023;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OJn748z7kco//vyV6hl4zmq8Nv0zi3K5zLZa6zqvm+U=;
-        b=CRF2ihzQOkxv0jY/BAojhfmcemEmsAwWErRl6blsikfXOUsIk8bLmjw30Fjkz5Rv7W
-         hkMM7j1S9hePWVhFAk+L1XY7JgeeIFRzlJTv94ghJ0TkgWx4D8yQckbPrL/7xYPbP0iS
-         N0bgnLrVgqrZHmXIHg5yTT7juqOGUzJikkSI1fg8oMPX1HD6kKx0BFC4dhfKZvRb3/sF
-         lnFhQiq8yGMKkOznqdyZX6OlCPD6dOp8MhgWWRrs227EX+q08T7J0bt50oJmYH/OmnOB
-         6FS0DODOoTT1tmFEtpfgR9G3CvvNp+IiJVBAv38duVUYT7jEQ6SGsg4YKY8BsS51Lx93
-         2NaQ==
-X-Gm-Message-State: AOJu0Yya2rZq09t+5ukhWuAb+zZyzJZeG+mmj8fAuzhBozXkApwJo/Ng
-	5PF1p45Hjdg6gcGSTVOYKvQy/lUc3RVeqbnFhLMzPGOWgNE2Ni/L1WmrfjdxQJyV
-X-Gm-Gg: AfdE7cnUld0VW95dIa4z00L36WHW8aBJjOpyKK6CYCMm9U7w679ODNd3p38bsKu5cVW
-	jiKqNvr8n66N/Ba6xThKGJ/wFo7RxgVr+aAt7hoBZV6b7fD2EMKZojhoZTfXmUk2Cl5mez5zm+y
-	7MZ2irxtBUlaWRJvi4mhFhSEOxB46mOaFoNOTfZ0EledZR40Yv7bYHMCA6xrKAeLD4AaDSVqBve
-	WCtBwotdsxIT+oCaRupb9DosRkIMTFJFOWHPDe4O/biMg59ppbfbECfSTGag5iEv7VxlGOLIypg
-	NVyC/HNiDGTwE+zjxlRvy5WnQ0SZzQYqvagIkdMMopweshiaa8kkUp9lPJg40p45ydVbSYsq4Gn
-	MOFdzdodiHBf/y2SfarBEnCbvQ1KugPL0upqoj+fFkRNX4lq9xJbZMmNGplDmvi4tolNI5ZYbZS
-	O+x4dFWTEowkYtrikNBsIIBARhFnwzYGXHxQxNsDcaUfgv6WekcpbMqPLgwjZDIvI8b/zu/bqbe
-	pvBVN8=
-X-Received: by 2002:a05:6102:e13:b0:739:5c3d:605f with SMTP id ada2fe7eead31-739f8a29c3fmr480700137.9.1782743222601;
-        Mon, 29 Jun 2026 07:27:02 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782743268; x=1783348068;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xZFwSQbxySWxwdXopAH3CVkPIWGjj87/WneQVfrjJFQ=;
+        b=XmuVYK8dZpU7KwU/KJCzhzeKmv0w3n4GwTJfnfavw9Wfd0xdAKmouk+aQO+uaUScpR
+         5cwbncmtxX7SBNbY4mQXYLjmHPt0NzRYvbUcjQsvPaBjL2RHr32UJhNSfq3yJCeP+jHH
+         rOU8tcJwdIKxVpVXt0QKohkQNZSh9o6jbnzz7ot2BRclLWhaGRtgeu7qx7nncATQbcjL
+         ESVAWhUtLCmNm5o7lHcg69h4uN9qXPNMZ+OrZXHLicYa4Ejlp6vr/b9LZU4Y99XgyzPG
+         KIOubtp2d5aA2vgC0Hy5B+XfDWIfMXwX+dalACP0gxs2zJYXBxBuskNgZwc3YsDfYlb7
+         YBcA==
+X-Gm-Message-State: AOJu0YywsfPp9iC0vM1rolX6rRSHMOUE25xO8+nAvLrON5sg0uMbFUbO
+	kt5qBn5PhG+7XpJhlV0kRGTOassDLWl++arqycNt9tMKTzF+9EjZWByv+ZqgotWA
+X-Gm-Gg: AfdE7cmEmv71UNoIFbyhBDEflG+AO2anJ5lPJ0V2U1875C4yXjM8SDYC+jW4rggTv3l
+	vEJplZvUv+is167j6iMmiyD+/iXqEEGn/hJDs9A1RFbNfzR3sUycoFIsElBUd6WcZqgBcbaiGU9
+	XAXHRBnZ65+7bDBM+XfhOZ0rAjuGXWas2i/MSiZ+NgqDrDl5n1BLqX/2SnbkiXMHZMX4IF5gUnK
+	HMvg+cgCa4x/t9prK3iBmsniLxHQZfJajkPll7Fl8W3Ss2uP77eTSOPIAiK4rSPd3L/qgCCg2f9
+	19sFZxNyBXIaOgHFkhu2mGOBXQaWnBKBlNKVclLByxrPmTj+P43EPBexsXLYDBMoS9w3xPW39l/
+	RwRHiPLVDk8XMnKYaEbTWPo4tTngV/r6p7IlejdKIe5sAu2Cj45KtAMgBnaPW3CFkWWBHnnDif0
+	jxtSNICcmLU9Wfsg7wmRlv+A+fLRUj/GXhQprGexUDCHZ/AQ1paHjO1x4YXlVqtvaCc+x9WS+Fz
+	WNTt7c=
+X-Received: by 2002:a05:6102:440f:b0:730:db02:1d08 with SMTP id ada2fe7eead31-73434452fd5mr7962121137.10.1782743267879;
+        Mon, 29 Jun 2026 07:27:47 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-738f72b4cf2sm1350695137.7.2026.06.29.07.27.01
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-738bcff6df0sm1632757137.10.2026.06.29.07.27.46
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 07:27:02 -0700 (PDT)
+        Mon, 29 Jun 2026 07:27:47 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 4/5] shared/bap: Use queue_foreach to notify state changes
-Date: Mon, 29 Jun 2026 10:26:48 -0400
-Message-ID: <20260629142649.966025-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 5/5] shared/bap: Protect bap_stream_notify_connecting
+Date: Mon, 29 Jun 2026 10:27:38 -0400
+Message-ID: <20260629142738.966641-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260629142649.966025-1-luiz.dentz@gmail.com>
-References: <20260629142649.966025-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -77,86 +73,34 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Use queue_foreach to notify state changes since that is considered
-safer as it does attempt to detect list modification while traversing
-the list.
+bap_stream_notify_connecting may encounter callbacks that remove itself
+while traversing the state_cbs, so this attempts to prevent to cause a
+crash by prefetching the next entry.
 ---
- src/shared/bap.c | 37 ++++++++++++++++++++-----------------
- 1 file changed, 20 insertions(+), 17 deletions(-)
+ src/shared/bap.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 6086924a9cb7..7bcf28bcefe4 100644
+index 7bcf28bcefe4..1f61227f82a7 100644
 --- a/src/shared/bap.c
 +++ b/src/shared/bap.c
-@@ -1447,10 +1447,19 @@ static bool bap_stream_io_detach(struct bt_bap_stream *stream)
- 	return true;
- }
- 
-+static void stream_state_changed(void *data, void *user_data)
-+{
-+	const struct bt_bap_state *state = data;
-+	struct bt_bap_stream *stream = user_data;
-+
-+	if (state->func)
-+		state->func(stream, stream->old_state, stream->state,
-+							state->data);
-+}
-+
- static void bap_stream_state_changed(struct bt_bap_stream *stream)
+@@ -3036,10 +3036,14 @@ static void bap_stream_notify_connecting(struct bt_bap_stream *stream,
  {
- 	struct bt_bap *bap = stream->bap;
--	const struct queue_entry *entry;
+ 	const struct queue_entry *entry;
  
- 	/* Pre notification updates */
- 	switch (stream->ep->state) {
-@@ -1475,14 +1484,13 @@ static void bap_stream_state_changed(struct bt_bap_stream *stream)
- 		break;
+-	for (entry = queue_get_entries(stream->bap->state_cbs); entry;
+-						entry = entry->next) {
++	for (entry = queue_get_entries(stream->bap->state_cbs); entry;) {
+ 		struct bt_bap_state *state = entry->data;
+ 
++		/* Prefetch next entry since the callback may remove the current
++		 * entry.
++		 */
++		entry = entry->next;
++
+ 		if (state->connecting)
+ 			state->connecting(stream, connecting, fd, state->data);
  	}
- 
--	for (entry = queue_get_entries(bap->state_cbs); entry;
--							entry = entry->next) {
--		struct bt_bap_state *state = entry->data;
-+	stream->old_state = stream->ep->old_state;
-+	stream->state = stream->ep->state;
- 
--		if (state->func)
--			state->func(stream, stream->ep->old_state,
--					stream->ep->state, state->data);
--	}
-+	/* Notify callbacks using queue_foreach since it does attempt to
-+	 * protect against concurrent modifications to the list.
-+	 */
-+	queue_foreach(bap->state_cbs, stream_state_changed, stream);
- 
- 	/* Post notification updates */
- 	switch (stream->ep->state) {
-@@ -2407,7 +2415,6 @@ static unsigned int bap_ucast_release(struct bt_bap_stream *stream,
- static void bap_bcast_set_state(struct bt_bap_stream *stream, uint8_t state)
- {
- 	struct bt_bap *bap = stream->bap;
--	const struct queue_entry *entry;
- 
- 	stream->old_state = stream->state;
- 	stream->state = state;
-@@ -2419,14 +2426,10 @@ static void bap_bcast_set_state(struct bt_bap_stream *stream, uint8_t state)
- 			bt_bap_stream_statestr(stream->old_state),
- 			bt_bap_stream_statestr(stream->state));
- 
--	for (entry = queue_get_entries(bap->state_cbs); entry;
--							entry = entry->next) {
--		struct bt_bap_state *state = entry->data;
--
--		if (state->func)
--			state->func(stream, stream->old_state,
--					stream->state, state->data);
--	}
-+	/* Notify callbacks using queue_foreach since it does attempt to
-+	 * protect against concurrent modifications to the list.
-+	 */
-+	queue_foreach(bap->state_cbs, stream_state_changed, stream);
- 
- 	/* Post notification updates */
- 	switch (stream->state) {
 -- 
 2.54.0
 
