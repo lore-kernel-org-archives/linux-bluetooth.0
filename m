@@ -1,54 +1,77 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC232409132
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 13:27:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1014305057
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 13:51:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782739639; cv=none; b=fulJXdrQ2dzwa3LXrA+hfBpqSeQEKLsDkSM1SqwozfyMvGuQx+Z2uMruuCwYE88hWCX0eQdvJ8MUkuzTGdDx/E5ffuuHXJ7wFg4eqO9h2oOaOMIjT42ioo1bddKkNIO50OMUfn2L753ah/iXkaBoH9lyh6UZ/FvDF5u1lw5YSk4=
+	t=1782741073; cv=none; b=tEiDLgRejoKaoDzJ8xWCCF3EBK3aUJcLdKlsLYn9II3/YoHpDopozIMiLksslm8UD82A5D8CFfktN+Mnto1j/1qxH1sUXBVgVszVNfp4fj/hntDSLS/NP4vpXBaPjBlk3S1j7GOFzu9FtfQFsT64LFuQbaaRaWKzpO89HqPzVlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782739639; c=relaxed/simple;
-	bh=Xs7wI06KHQiihfctdoYtNKoA8mwm/bIQQtluGtlIE9A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sVbWipyvHEZ6/Mv4hE3b8vJAUILDiWIFXxUeIeXJGQUn6mPZYM+oMX0c3SAvihIdp884ob62pmn6vgoaXsqWXXbX1gNfqez6c51zJH9Vg1Cxh0fH3R9JFQGRwlhh7vnsnxlfnmNnjgx3oE3n8/KaXuU8hFWAASZIXTn3V4au2CQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VlHO58qN; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1782741073; c=relaxed/simple;
+	bh=aOasvWeVtyoaYrqHzmJFcm8Hs9hOETEvjwaNulTBTpY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bCKF/CQDn4SgiQ46JIcyHpVrc31KQ20MuogzkhpnzAlLFOgL4UGL7hOvc7/Y6roiy0cTPGypP9+Nk/FKIxB9ds1nMiUdd4YFrTnPVgM0rOQGDSLM7MVs9axnVJ1CVG5IWoZrmAAnI3eLWDpk1qqpBbJmMPyOhI3jAP5cHwPISkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz; spf=pass smtp.mailfrom=fourdim.xyz; dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b=j0I604ov; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=YeDH7eGK; arc=none smtp.client-ip=103.168.172.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fourdim.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fourdim.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VlHO58qN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1782739638; x=1814275638;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Xs7wI06KHQiihfctdoYtNKoA8mwm/bIQQtluGtlIE9A=;
-  b=VlHO58qNTDVCbLcJPcq4gHsnOf0HddjoqPWbsh4anaj5sIwO0CTcooMc
-   KoKPpTj5W0uXrb8E/uRvH69Pspv2dDHHAUf1R3Q3ZlGENQEQpadAyWI2D
-   ZTQcPHSfkP3+6MBVSZUTChD93OttcUd6oFxSw6Y+qwZc5qB6weFEMFfcl
-   B9ioJRNAzpIRkdUCcEtZ0toNCX4ymSxkST2ra4C/ShOFWSlnmxi9nr1E4
-   xN4I5cAu+oTvqDnWo2ExbNAnK4qIkMeZpwG8aUxy7wJ4xUaUqcMHF8VyV
-   WIdvk0I50mKbwJXKkyo92104D/cJ65Hc1XKCKa/nNGQIUfukp25StlV+U
-   w==;
-X-CSE-ConnectionGUID: wrSxVIDQRmOTUh/PYUvl+g==
-X-CSE-MsgGUID: lxyxtCWGTfaHGMC/SEBUqA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11831"; a="70950237"
-X-IronPort-AV: E=Sophos;i="6.24,232,1774335600"; 
-   d="scan'208";a="70950237"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2026 06:27:17 -0700
-X-CSE-ConnectionGUID: 3gjOA8H4QYSc+wFnU7Ex1w==
-X-CSE-MsgGUID: VPmIgV4HSRCx1aIQag/Mhg==
-X-ExtLoop1: 1
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa003.fm.intel.com with ESMTP; 29 Jun 2026 06:27:16 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1] Bluetooth: btintel_pcie: Refactor FLR to use device_reprobe()
-Date: Mon, 29 Jun 2026 19:16:57 +0530
-Message-ID: <20260629134657.89584-1-kiran.k@intel.com>
+	dkim=pass (2048-bit key) header.d=fourdim.xyz header.i=@fourdim.xyz header.b="j0I604ov";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YeDH7eGK"
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailfout.phl.internal (Postfix) with ESMTP id D41B3EC01A2;
+	Mon, 29 Jun 2026 09:51:10 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-12.internal (MEProxy); Mon, 29 Jun 2026 09:51:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fourdim.xyz; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1782741070; x=1782827470; bh=hF0lrpdOBou7i12Pkt3Vw
+	qWQGq4Yqy21eMb/mk+8Jdk=; b=j0I604ovQJrmARjZBHSi/BSntlUkdy6a6Ou3i
+	jh9Hj5t/wR39b0ZAXM6v/PI1KTwMwZgaIdV7rzpuHwBHJWpLg1MRGSLtfO7p1d80
+	g/otAe5irz42Rt3W50wMICNU/cqgOgXGB8rjPKyzg811U+wwv77WDl4EumAIrul0
+	7MFHIHB5uzA7qqelfdbGgH+z0zFD5Wbjygl5ucmCo6X8Y4noxcDNfcfnNSqzZMYy
+	joIpGnT+bQugbSjTtrORgZmv0kMN4gaXsDKG6rwfzJgCDrN21yrUADcwLr4UBcss
+	VzOl5dXfuXBEiLtWWLoc041smWJ5EW1YW7gGZh10yoRfr/vog==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1782741070; x=1782827470; bh=hF0lrpdOBou7i12Pkt3VwqWQGq4Yqy21eMb
+	/mk+8Jdk=; b=YeDH7eGKaAMnWeMJe4wtsRxZz1DIV6hfkZfxXN9Ou2mGjtgh/ZC
+	hkcg+lC5VENeGKWJcZbylF+9C/Y5y2vN1Fkr0t9oDGxafwtbjqPXUWstb0/tgB0v
+	bHu6VbTsr3lr27NX97f+ygMs1z3T0joRulSe+oWmgy+Xn7wBAiPaHN2saSq0pB9O
+	qNxJDXm9yTuuScyVi9vqV1Zkr8X08i0Z25b2vqqC9pNFMiyRt+egFFGK5ju6PKUD
+	BgH2Em136ngJUQSJi1C6DFvG6lBakFZPFjk0A9BV9IuCaTzfG34iwMK9Az4UqtEx
+	WgVnCrMNo7uy2rlPquN9aI5/GhsrIxXHdQw==
+X-ME-Sender: <xms:TnhCao_6ANIXDyLXeXXYFRme-z6QZNEavsuzlGwVfB1BINET_-319Q>
+    <xme:TnhCaoIgLftYV-fSfDGoP8VszyKgF6ngxNq-Y8Fm_1yUWE86MRbOEsHbM5Qhavaul
+    y5fioKprhj9td734FCSKWfYIp4EgUdXephIT0WRlZ8jLKMaAArE-DE>
+X-ME-Received: <xmr:TnhCararwWWC3_yOv2YPB70BYzbg5K8ABwpEwIDX6dqV9PI04rCKC8LDKzgt0X0PUYTWILo>
+X-ME-Proxy-Cause: dmFkZTGf5P+HyuLHoiF1KQ560xJ+b1SWNKpPzcRY9mIvULmE9iePn4ie25NlU/tN5YHd+w
+    J3dfcGUBGZwy5oA9TpLEd9cumNhp95nlm68UgaPlxhLudcvlkMpQ5nRIYn2SSt5MAB/fEP
+    aLse3PniYSjAkYQe3uKgY8VNALNW3lvskogZxRZuYFQ3iMBbd3t6ylHXZtLBU6knsXEMIv
+    EFpM/2jrJ01i7horagCh9imLj3pITwJKxW0UBpWspZGvSm1U6xGt2M5PAFdsy6ZtHChhjg
+    iifFprmwodWgZPEq09KqqjzEE0Hid+aLP7ek6hcMDIWVUrjrFgW0kCbWUWQffRRtyk6vjn
+    Fo41TVnsVngCA/qqs7YA4MJDUR4LFpa4LkpkHs94RI+t14Y66jDidaJlgaM41ASgc6F9UW
+    02Vl6GXGsflrJCHMpqR1YmOlCTilZeGC8El8ZRfbxC8gMVDVuQ85wwAZx7y5y6B1iQj5uH
+    fDUSk+DoMwy+CP0gTZQ4ngul8huQZ3LTBelNFukBNsPYCxGX6LpIU77goDr2cKBBLC0EIJ
+    jiffXsmNt5nnS3HX/MoHM/W8DJRfnDlIX9se+Ov/gKETPv5jZ+bpaTNT+L+nKoyAAn1Amf
+    SiWOk4XspWxqdi9mh+5uhQM+V2Lp3kzhX909e2IkM1cN7Z2Q7dF6bkTIijtQ
+X-ME-Proxy: <xmx:TnhCaiIkTly3QjKtO4YZvHQ9EC8e8kJJCR9GvHOUv_8e1RDIVtzxnQ>
+    <xmx:TnhCahBqdbe7JPPHxD5ShPEn9r9ZXAKc9wYWVNTkEdRTdtgixky2Ww>
+    <xmx:TnhCavoJmktdJGYL_F7yKa2GoFvMnZrabbNchxbkzsKMbXx9r0GT8g>
+    <xmx:TnhCakjl1wFdui95gZ5Z7LosdhQQ9EpI-j4Q6s7cOO6L5f80XLk8yg>
+    <xmx:TnhCakLBFWdUCc3EApp4fxYJuRpF8Sib3xAaS7a-8Qo9L6e_BbW_IIpE>
+Feedback-ID: if72e4b10:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 29 Jun 2026 09:51:10 -0400 (EDT)
+From: Siwei Zhang <oss@fourdim.xyz>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Siwei Zhang <oss@fourdim.xyz>
+Subject: [PATCH v12 0/1] Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()
+Date: Mon, 29 Jun 2026 09:49:57 -0400
+Message-ID: <20260629135044.2302753-1-oss@fourdim.xyz>
 X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -58,181 +81,37 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The FLR branch in btintel_pcie_reset_work() open-coded the entire
-re-init sequence: btintel_pcie_release_hdev() (hci_unregister_dev +
-hci_free_dev), pci_try_reset_function(), enable_interrupts /
-config_msix / enable_bt / reset_ia / start_rx, then
-btintel_pcie_setup_hdev() (hci_alloc_dev_priv + hci_register_dev).
-Every probe() init step had to be kept in sync with this second
-copy in the reset path, and any failure mid-sequence left state to
-unwind by hand.
+Compared to v2, addresses comments on https://sashiko.dev/#/patchset/20260415204842.2363950-1-oss%40fourdim.xyz .
 
-The PLDR path already delegates teardown and re-init to the PCI
-core via device_reprobe(): .remove() destroys data through devres
-and unregisters hdev, then .probe() rebuilds everything from
-scratch. Apply the same model to FLR.
+Compared to v3, rebase against bluetooth-next.
 
-Introduce btintel_pcie_perform_flr() mirroring perform_pldr(). It
-runs pci_try_reset_function() (required to avoid the device_lock
-ABBA against btintel_pcie_remove(), which calls
-disable_work_sync(&reset_work) while holding device_lock) followed
-by device_reprobe(). On success, data is destroyed and a fresh
-probe re-INIT_WORKs coredump_work with disable count 0, so
-enable_work() must not be called; on failure, data is still alive
-and the caller balances the earlier disable_work_sync(). The
-contract is documented on the helper and reiterated at the
-reset_work() call site.
+Compared to v4, allocate the channel outside the function and pass it in as an argument to avoid the use-after-free.
 
-reset_work() shrinks to interrupt/worker drain, dispatch on
-reset_type, and the single asymmetry between the two paths. The
-out_enable label, the manual unregister/register pair, and the
-forward declaration of btintel_pcie_setup_hdev() are dropped.
+Compared to v5, extract the channel init to a separate function.
 
-No intended functional change; FLR and PLDR now share one
-teardown contract.
+Compared to v6, balance puts and holds on chans.
 
-Fixes: 256ab9520d15 ("Bluetooth: btintel_pcie: Support Function level reset")
-Assisted-by: GitHub-Copilot:claude-4.7-opus
-Signed-off-by: Kiran K <kiran.k@intel.com>
----
- drivers/bluetooth/btintel_pcie.c | 99 ++++++++++++++++----------------
- 1 file changed, 49 insertions(+), 50 deletions(-)
+Compared to v7, rebase against bluetooth-next and refactor the chan refcounting.
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 9e39327dc1fe..41b28fbcc43b 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -2485,7 +2485,6 @@ static void btintel_pcie_inc_recovery_count(struct pci_dev *pdev,
- 	}
- }
- 
--static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data);
- static void btintel_pcie_reset(struct hci_dev *hdev);
- 
- static int btintel_pcie_acpi_reset_method(struct btintel_pcie_data *data)
-@@ -2596,12 +2595,45 @@ static void btintel_pcie_perform_pldr(struct btintel_pcie_data *data)
- 	}
- }
- 
-+/*
-+ * Issue a Function Level Reset and hand teardown/re-init off to the PCI
-+ * core via device_reprobe(), mirroring the PLDR path's contract.
-+ *
-+ * Caller must hold pci_lock_rescan_remove() and must have already
-+ * disabled interrupts and drained both rx_work and coredump_work.
-+ */
-+static int btintel_pcie_perform_flr(struct btintel_pcie_data *data)
-+{
-+	struct pci_dev *pdev = data->pdev;
-+	int err;
-+
-+	/* pci_try_reset_function() avoids the device_lock ABBA against
-+	 * btintel_pcie_remove(): .remove() runs with device_lock held and
-+	 * then waits for this work via disable_work_sync(); the blocking
-+	 * pci_reset_function() would deadlock by trying to re-acquire
-+	 * device_lock here.
-+	 */
-+	err = pci_try_reset_function(pdev);
-+	if (err) {
-+		BT_ERR("Failed resetting the pcie device (%d)", err);
-+		return err;
-+	}
-+
-+	/* device_reprobe() always detaches the driver first (running
-+	 * .remove(), which frees 'data'); any re-probe failure leaves the
-+	 * device unbound but 'data' is already gone, so just log it.
-+	 */
-+	if (device_reprobe(&pdev->dev))
-+		BT_ERR("BT reprobe failed for BDF:%s", pci_name(pdev));
-+
-+	return 0;
-+}
-+
- static void btintel_pcie_reset_work(struct work_struct *wk)
- {
- 	struct btintel_pcie_data *data =
- 		container_of(wk, struct btintel_pcie_data, reset_work);
- 	struct pci_dev *pdev = data->pdev;
--	int err;
- 
- 	pci_lock_rescan_remove();
- 
-@@ -2621,60 +2653,27 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
- 	disable_work_sync(&data->coredump_work);
- 
- 	bt_dev_dbg(data->hdev, "Release bluetooth interface");
-+
-+	/* Both reset paths follow the same contract: on success they
-+	 * destroy 'data' via device_reprobe() (a fresh probe re-INIT_WORKs
-+	 * the coredump_work with disable count 0), so enable_work() must
-+	 * NOT be called on the success path. Only the FLR path can fail
-+	 * with 'data' still alive, in which case we balance the
-+	 * disable_work_sync() above so a later successful reset is not
-+	 * permanently blocked.
-+	 *
-+	 * pci_lock_rescan_remove() (held above) serializes against PCI
-+	 * device addition/removal (hotplug), so no device can be added to
-+	 * or removed from the bus list while this code runs.
-+	 */
- 	if (data->reset_type == BTINTEL_PCIE_IOSF_PRR_PLDR) {
--		/* This function holds pci_lock_rescan_remove(), which acquires
--		 * pci_rescan_remove_lock. This mutex serializes against PCI device
--		 * addition/removal (hotplug), so no device can be added to or
--		 * removed from the bus list while this code runs.
--		 *
--		 * device_reprobe() inside btintel_pcie_perform_pldr() destroys
--		 * 'data' via .remove(); a fresh probe re-INIT_WORKs the
--		 * coredump_work with disable count 0, so we must not call
--		 * enable_work() on this path.
--		 */
- 		btintel_pcie_perform_pldr(data);
- 		goto out;
- 	}
--	btintel_pcie_release_hdev(data);
- 
--	/* Use pci_try_reset_function() rather than pci_reset_function() to
--	 * avoid an ABBA deadlock against btintel_pcie_remove(): the PCI core
--	 * calls .remove() with device_lock held, and remove() then waits for
--	 * this work via cancel_work_sync(); pci_reset_function() would in
--	 * turn try to acquire the same device_lock, deadlocking both paths.
--	 */
--	err = pci_try_reset_function(pdev);
--	if (err) {
--		BT_ERR("Failed resetting the pcie device (%d)", err);
--		goto out_enable;
--	}
--
--	btintel_pcie_enable_interrupts(data);
--	btintel_pcie_config_msix(data);
-+	if (btintel_pcie_perform_flr(data))
-+		enable_work(&data->coredump_work);
- 
--	err = btintel_pcie_enable_bt(data);
--	if (err) {
--		BT_ERR("Failed to enable bluetooth hardware after reset (%d)",
--		       err);
--		goto out_enable;
--	}
--
--	btintel_pcie_reset_ia(data);
--	btintel_pcie_start_rx(data);
--	data->flags = 0;
--
--	err = btintel_pcie_setup_hdev(data);
--	if (err) {
--		BT_ERR("Failed registering hdev (%d)", err);
--		goto out_enable;
--	}
--
--out_enable:
--	/* Balance disable_work_sync() above on every exit. Leaving the
--	 * counter incremented on a failed reset would permanently disable
--	 * coredump_work even after a later successful reset.
--	 */
--	enable_work(&data->coredump_work);
- out:
- 	pci_dev_put(pdev);
- 	pci_unlock_rescan_remove();
+Compared to v8, adopt the philosophy of one assignment one reference. Make refcounting easier to follow.
+
+Compared to v9, rework on l2cap_chan_set_defaults so that new chan's default comes from pchan and
+can be used by __l2cap_chan_add.
+
+Compared to v10, rebase against bluetooth-next.
+
+Compared to v11, rebase against bluetooth-next.
+
+Siwei Zhang (1):
+  Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()
+
+ include/net/bluetooth/l2cap.h |  10 ++--
+ net/bluetooth/6lowpan.c       |  18 +-----
+ net/bluetooth/l2cap_core.c    |  78 ++++++++++++++++++++-----
+ net/bluetooth/l2cap_sock.c    | 103 ++++++++++++++++------------------
+ net/bluetooth/smp.c           |  27 ++-------
+ 5 files changed, 127 insertions(+), 109 deletions(-)
+
 -- 
 2.54.0
 
