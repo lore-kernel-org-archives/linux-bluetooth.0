@@ -1,115 +1,238 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE86D406290;
-	Mon, 29 Jun 2026 13:02:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC232409132
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 13:27:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782738121; cv=none; b=JoZolcdSYfwI09hncxVjjioCFlMGWCP94qvdIO3QGibQHLK15O1hRU1CZQurAfU4MaAKXPa0ea2DwtQNE3AnMoOFOkzUI4lv3jJS0om1q1r+H/Z+U3dVjJlERFAMycxsnr3aw2ie7ucor5nXcLHsY9+610tniST3ci132roWKko=
+	t=1782739639; cv=none; b=fulJXdrQ2dzwa3LXrA+hfBpqSeQEKLsDkSM1SqwozfyMvGuQx+Z2uMruuCwYE88hWCX0eQdvJ8MUkuzTGdDx/E5ffuuHXJ7wFg4eqO9h2oOaOMIjT42ioo1bddKkNIO50OMUfn2L753ah/iXkaBoH9lyh6UZ/FvDF5u1lw5YSk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782738121; c=relaxed/simple;
-	bh=sVfZV5FAtAUUUFWxrC0Zg7CsOdSgFgkDNnZ7Y9T5fBU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qozYfwTRn1SFFfdt4lPeyLcH2IKkH0jiSrVWvS4Oh9ylbL4xgg0XNNZMio+wh3tsSlOjj9LC+oDDaErhQDa94xWA1jw81J7Y32B9NoYdDemVAOYOAqQfRf1DuHR+kqn+8eMCu07NQx6ZvU/6LbDmFulukV7Y0DyYvPkX3Y+qDG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L+pzfhh9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1782739639; c=relaxed/simple;
+	bh=Xs7wI06KHQiihfctdoYtNKoA8mwm/bIQQtluGtlIE9A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sVbWipyvHEZ6/Mv4hE3b8vJAUILDiWIFXxUeIeXJGQUn6mPZYM+oMX0c3SAvihIdp884ob62pmn6vgoaXsqWXXbX1gNfqez6c51zJH9Vg1Cxh0fH3R9JFQGRwlhh7vnsnxlfnmNnjgx3oE3n8/KaXuU8hFWAASZIXTn3V4au2CQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VlHO58qN; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L+pzfhh9"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8A6E0C19425;
-	Mon, 29 Jun 2026 13:02:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1782738120;
-	bh=sVfZV5FAtAUUUFWxrC0Zg7CsOdSgFgkDNnZ7Y9T5fBU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=L+pzfhh9NATwjEl/MgOmoWhFnhdxeYvwUOjjCY1lXcCCkCC4M0d8chna8Yk+IedPr
-	 qWaHdDrsDhKU/9X34pK1/OANQ4ZVJuos471wzrjYGlw939Zfkv+UR+DbUdo/VUH5L/
-	 3Ghs+YJf5AoJLOvnUBilnqhuZLzL3AhoPWXzfIwBf531VE95EmpbntlWQeVX9iCXJ0
-	 ZcaDXSJdkAOnOVRuf7brPOCIe3eY/8+Z63MTog8F8ER8w8QpD9qQ1tHb+SJtBUWd1K
-	 ZTGZvo9JixsMgMtEApIeHSK5QToVz+Jeq6XmaeKFdBd9MBeeTHnuKquvL4+EEQhD6D
-	 ZUscpYvdft03w==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 763B2C43458;
-	Mon, 29 Jun 2026 13:02:00 +0000 (UTC)
-From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
-Date: Mon, 29 Jun 2026 17:01:49 +0400
-Subject: [PATCH v2 6/6] MAINTAINERS: Add entry for Qualcomm IPQ5018
- Bluetooth driver
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VlHO58qN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782739638; x=1814275638;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Xs7wI06KHQiihfctdoYtNKoA8mwm/bIQQtluGtlIE9A=;
+  b=VlHO58qNTDVCbLcJPcq4gHsnOf0HddjoqPWbsh4anaj5sIwO0CTcooMc
+   KoKPpTj5W0uXrb8E/uRvH69Pspv2dDHHAUf1R3Q3ZlGENQEQpadAyWI2D
+   ZTQcPHSfkP3+6MBVSZUTChD93OttcUd6oFxSw6Y+qwZc5qB6weFEMFfcl
+   B9ioJRNAzpIRkdUCcEtZ0toNCX4ymSxkST2ra4C/ShOFWSlnmxi9nr1E4
+   xN4I5cAu+oTvqDnWo2ExbNAnK4qIkMeZpwG8aUxy7wJ4xUaUqcMHF8VyV
+   WIdvk0I50mKbwJXKkyo92104D/cJ65Hc1XKCKa/nNGQIUfukp25StlV+U
+   w==;
+X-CSE-ConnectionGUID: wrSxVIDQRmOTUh/PYUvl+g==
+X-CSE-MsgGUID: lxyxtCWGTfaHGMC/SEBUqA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11831"; a="70950237"
+X-IronPort-AV: E=Sophos;i="6.24,232,1774335600"; 
+   d="scan'208";a="70950237"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2026 06:27:17 -0700
+X-CSE-ConnectionGUID: 3gjOA8H4QYSc+wFnU7Ex1w==
+X-CSE-MsgGUID: VPmIgV4HSRCx1aIQag/Mhg==
+X-ExtLoop1: 1
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmviesa003.fm.intel.com with ESMTP; 29 Jun 2026 06:27:16 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1] Bluetooth: btintel_pcie: Refactor FLR to use device_reprobe()
+Date: Mon, 29 Jun 2026 19:16:57 +0530
+Message-ID: <20260629134657.89584-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260629-ipq5018-bluetooth-v2-6-02770f03b6bb@outlook.com>
-References: <20260629-ipq5018-bluetooth-v2-0-02770f03b6bb@outlook.com>
-In-Reply-To: <20260629-ipq5018-bluetooth-v2-0-02770f03b6bb@outlook.com>
-To: Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulfh@kernel.org>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Johannes Berg <johannes@sipsolutions.net>, 
- Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
- Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
- Rocky Liao <quic_rjliao@quicinc.com>, 
- Saravana Kannan <saravanak@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konradybcio@kernel.org>, 
- Mathieu Poirier <mathieu.poirier@linaro.org>, 
- Philipp Zabel <p.zabel@pengutronix.de>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
- linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
- netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
- George Moussalem <george.moussalem@outlook.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1782738117; l=906;
- i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
- bh=DrQrzkPl3cbWFmYstKvKokgP5FFWzafGXK+cjmpTmUA=;
- b=WHjMybUgY1YmSj4Ea/kchfwjt9e395GAYngQB0uqV2f8fpoxFPAByR3nOPcenEnDMEMZ8Y3yx
- mlGy6okm/1TCDAfx2bhlJTXU7gZa4Ap8w7tJAuCmQsqRCYAJytae/qt
-X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
- pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
-X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
- with auth_id=364
-X-Original-From: George Moussalem <george.moussalem@outlook.com>
-Reply-To: george.moussalem@outlook.com
+Content-Transfer-Encoding: 8bit
 
-From: George Moussalem <george.moussalem@outlook.com>
+The FLR branch in btintel_pcie_reset_work() open-coded the entire
+re-init sequence: btintel_pcie_release_hdev() (hci_unregister_dev +
+hci_free_dev), pci_try_reset_function(), enable_interrupts /
+config_msix / enable_bt / reset_ia / start_rx, then
+btintel_pcie_setup_hdev() (hci_alloc_dev_priv + hci_register_dev).
+Every probe() init step had to be kept in sync with this second
+copy in the reset path, and any failure mid-sequence left state to
+unwind by hand.
 
-Add maintainers entry for Qualcomm IPQ5018 Bluetooth driver.
+The PLDR path already delegates teardown and re-init to the PCI
+core via device_reprobe(): .remove() destroys data through devres
+and unregisters hdev, then .probe() rebuilds everything from
+scratch. Apply the same model to FLR.
 
-Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+Introduce btintel_pcie_perform_flr() mirroring perform_pldr(). It
+runs pci_try_reset_function() (required to avoid the device_lock
+ABBA against btintel_pcie_remove(), which calls
+disable_work_sync(&reset_work) while holding device_lock) followed
+by device_reprobe(). On success, data is destroyed and a fresh
+probe re-INIT_WORKs coredump_work with disable count 0, so
+enable_work() must not be called; on failure, data is still alive
+and the caller balances the earlier disable_work_sync(). The
+contract is documented on the helper and reiterated at the
+reset_work() call site.
+
+reset_work() shrinks to interrupt/worker drain, dispatch on
+reset_type, and the single asymmetry between the two paths. The
+out_enable label, the manual unregister/register pair, and the
+forward declaration of btintel_pcie_setup_hdev() are dropped.
+
+No intended functional change; FLR and PLDR now share one
+teardown contract.
+
+Fixes: 256ab9520d15 ("Bluetooth: btintel_pcie: Support Function level reset")
+Assisted-by: GitHub-Copilot:claude-4.7-opus
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/bluetooth/btintel_pcie.c | 99 ++++++++++++++++----------------
+ 1 file changed, 49 insertions(+), 50 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0b9d7c8276ac..60f7251d1a16 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -22289,6 +22289,13 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/regulator/vqmmc-ipq4019-regulator.yaml
- F:	drivers/regulator/vqmmc-ipq4019-regulator.c
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 9e39327dc1fe..41b28fbcc43b 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -2485,7 +2485,6 @@ static void btintel_pcie_inc_recovery_count(struct pci_dev *pdev,
+ 	}
+ }
  
-+QUALCOMM IPQ5018 BLUETOOTH DRIVER
-+M:	George Moussalem <george.moussalem@outlook.com>
-+L:	linux-bluetooth@vger.kernel.org
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/net/bluetooth/qcom,ipq5018-bt.yaml
-+F:	drivers/bluetooth/btqcomipc.c
+-static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data);
+ static void btintel_pcie_reset(struct hci_dev *hdev);
+ 
+ static int btintel_pcie_acpi_reset_method(struct btintel_pcie_data *data)
+@@ -2596,12 +2595,45 @@ static void btintel_pcie_perform_pldr(struct btintel_pcie_data *data)
+ 	}
+ }
+ 
++/*
++ * Issue a Function Level Reset and hand teardown/re-init off to the PCI
++ * core via device_reprobe(), mirroring the PLDR path's contract.
++ *
++ * Caller must hold pci_lock_rescan_remove() and must have already
++ * disabled interrupts and drained both rx_work and coredump_work.
++ */
++static int btintel_pcie_perform_flr(struct btintel_pcie_data *data)
++{
++	struct pci_dev *pdev = data->pdev;
++	int err;
 +
- QUALCOMM IRIS VIDEO ACCELERATOR DRIVER
- M:	Vikash Garodia <vikash.garodia@oss.qualcomm.com>
- M:	Dikshita Agarwal <dikshita.agarwal@oss.qualcomm.com>
-
++	/* pci_try_reset_function() avoids the device_lock ABBA against
++	 * btintel_pcie_remove(): .remove() runs with device_lock held and
++	 * then waits for this work via disable_work_sync(); the blocking
++	 * pci_reset_function() would deadlock by trying to re-acquire
++	 * device_lock here.
++	 */
++	err = pci_try_reset_function(pdev);
++	if (err) {
++		BT_ERR("Failed resetting the pcie device (%d)", err);
++		return err;
++	}
++
++	/* device_reprobe() always detaches the driver first (running
++	 * .remove(), which frees 'data'); any re-probe failure leaves the
++	 * device unbound but 'data' is already gone, so just log it.
++	 */
++	if (device_reprobe(&pdev->dev))
++		BT_ERR("BT reprobe failed for BDF:%s", pci_name(pdev));
++
++	return 0;
++}
++
+ static void btintel_pcie_reset_work(struct work_struct *wk)
+ {
+ 	struct btintel_pcie_data *data =
+ 		container_of(wk, struct btintel_pcie_data, reset_work);
+ 	struct pci_dev *pdev = data->pdev;
+-	int err;
+ 
+ 	pci_lock_rescan_remove();
+ 
+@@ -2621,60 +2653,27 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
+ 	disable_work_sync(&data->coredump_work);
+ 
+ 	bt_dev_dbg(data->hdev, "Release bluetooth interface");
++
++	/* Both reset paths follow the same contract: on success they
++	 * destroy 'data' via device_reprobe() (a fresh probe re-INIT_WORKs
++	 * the coredump_work with disable count 0), so enable_work() must
++	 * NOT be called on the success path. Only the FLR path can fail
++	 * with 'data' still alive, in which case we balance the
++	 * disable_work_sync() above so a later successful reset is not
++	 * permanently blocked.
++	 *
++	 * pci_lock_rescan_remove() (held above) serializes against PCI
++	 * device addition/removal (hotplug), so no device can be added to
++	 * or removed from the bus list while this code runs.
++	 */
+ 	if (data->reset_type == BTINTEL_PCIE_IOSF_PRR_PLDR) {
+-		/* This function holds pci_lock_rescan_remove(), which acquires
+-		 * pci_rescan_remove_lock. This mutex serializes against PCI device
+-		 * addition/removal (hotplug), so no device can be added to or
+-		 * removed from the bus list while this code runs.
+-		 *
+-		 * device_reprobe() inside btintel_pcie_perform_pldr() destroys
+-		 * 'data' via .remove(); a fresh probe re-INIT_WORKs the
+-		 * coredump_work with disable count 0, so we must not call
+-		 * enable_work() on this path.
+-		 */
+ 		btintel_pcie_perform_pldr(data);
+ 		goto out;
+ 	}
+-	btintel_pcie_release_hdev(data);
+ 
+-	/* Use pci_try_reset_function() rather than pci_reset_function() to
+-	 * avoid an ABBA deadlock against btintel_pcie_remove(): the PCI core
+-	 * calls .remove() with device_lock held, and remove() then waits for
+-	 * this work via cancel_work_sync(); pci_reset_function() would in
+-	 * turn try to acquire the same device_lock, deadlocking both paths.
+-	 */
+-	err = pci_try_reset_function(pdev);
+-	if (err) {
+-		BT_ERR("Failed resetting the pcie device (%d)", err);
+-		goto out_enable;
+-	}
+-
+-	btintel_pcie_enable_interrupts(data);
+-	btintel_pcie_config_msix(data);
++	if (btintel_pcie_perform_flr(data))
++		enable_work(&data->coredump_work);
+ 
+-	err = btintel_pcie_enable_bt(data);
+-	if (err) {
+-		BT_ERR("Failed to enable bluetooth hardware after reset (%d)",
+-		       err);
+-		goto out_enable;
+-	}
+-
+-	btintel_pcie_reset_ia(data);
+-	btintel_pcie_start_rx(data);
+-	data->flags = 0;
+-
+-	err = btintel_pcie_setup_hdev(data);
+-	if (err) {
+-		BT_ERR("Failed registering hdev (%d)", err);
+-		goto out_enable;
+-	}
+-
+-out_enable:
+-	/* Balance disable_work_sync() above on every exit. Leaving the
+-	 * counter incremented on a failed reset would permanently disable
+-	 * coredump_work even after a later successful reset.
+-	 */
+-	enable_work(&data->coredump_work);
+ out:
+ 	pci_dev_put(pdev);
+ 	pci_unlock_rescan_remove();
 -- 
-2.53.0
-
+2.54.0
 
