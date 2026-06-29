@@ -1,202 +1,135 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C613F0AA0
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 16:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B1437F75B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 16:48:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782748809; cv=none; b=iK6iA0xWS23cgtWTzCxibmOPvXdf0mlJ6YkDM7QbcR6/KE9U+XrF9kYEYkap4yTrtadKq4h1m10BjLX/6UE5VA5IBWeXfdeFfgKOWwjWkYrba2c3DhJrXBnPSQDbixNtG3RZ3f0tY0KX47phSdaJr04dYt0ygOBT0MHX6iebAUk=
+	t=1782751739; cv=none; b=o64fjqbyW9mITND1tY04FyXczUno/ItB8euSGTBpY9cBupIGtHBXq9Rv6i9FBSdiIlIOftukxiBjGF0mclHsJ3r+uuGEC83HzP1OgUzMOGbYxGiJivrI/tS+gW1p4eIYkF5tVHmeODdAiUkZidGJhj1RdpemZ+gTnegcme5LAt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782748809; c=relaxed/simple;
-	bh=TPTRxN9rtT3+ReelBeL/J8n1fnyXyrkqljiQ6FJsaHo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=St6nmzHUTbBUZJDiWJ5H9Jwiqr7l9sVhLIHNUVRCewuovvl7gGYRMsnzs3Cjq3mvJOOuqdac1HeEuoJrHE5MuAQulBGDtN4fCkHvkES6MRa0vDEvI1V8eq4QTSefFTvEYt5ijuTEZAhi1W+jqyQ/+k6v0Owxiq7ljEYRE+exo/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=INkBPJvm; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782751739; c=relaxed/simple;
+	bh=w8xoyz0zN7WGcpqIKu2rmscyGs70EkSLiH2wOVlBf4o=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=SmlC8ggaRCtItODYr8M82dRT3PeCNQPpKHTqQFai0d8kMyfMeDOEcK/UGoBfWJ/lhjfbp/gnp6sz8E2Y4MWxyrvmSwkXOYzKQyCsTg24r8YyvophqkDiv34I5k+kJEUbdYS5mWVvPWsmQdaWa96Gps+VhGDA78AujGqm7UMnEjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Ohb4jM7D; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="INkBPJvm"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-8e5be46f663so26469016d6.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 09:00:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782748807; x=1783353607; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wdCeN7fVIkAJ2K30CMRO95gFuwlVhysFT2M5ab5h9rw=;
-        b=INkBPJvmQSx8KGIzMyUt+pEQ5G10l9BQDzgY15Fj3QW5x7OAdalbfbdeYbkO6ZrRNG
-         hyGSZuzOXUXrj0ECwWoFxc6uat3vgxINUfXI64cjaAwjbS6vhkCI1JJNCYfkdRG/LNmS
-         OB0h5VfuVQYVE5y2cNGtO2MEqNetZWoyQYzF/5VOA3vRAFEHRVypzwfyWeSl/E3XxhgC
-         QEkkTDaYLAsd1YaNmuCwDmGFhjOxxlcSG2G8KW+HZkQDmA/p1GsPAB3RFgQQ6qSw+b0e
-         kO/kL6NkF+BxGxWKD/o30LZgqK2r9vTuiCwxZL65kAWWKEEkT5XgI6x25Q19P9Bw8ayu
-         WuQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782748807; x=1783353607;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wdCeN7fVIkAJ2K30CMRO95gFuwlVhysFT2M5ab5h9rw=;
-        b=r9bFkB1KajD+Uy8zF2GrybVcji15FRTViyHaSbivXRSsUi7Ftk6w7dMtExiii5NbkR
-         FR1nw1pQ9bQpM8jy6xwnCB/b2iNGxtjhPCD+aymoYPE7sufOIkIMnBlcQVto6QENVOXQ
-         svMwRnl6fvDU7/zPScs1m0Ects2Mf5FG2m+XD9o7UH2aDg7Zh6rwlWTyFNkCAxwv7Z9y
-         D0gFAqsWn3aUl8C50NQpHy+fNVFjiI2g280n/4f5fxoPjFV5R8SGVb4CDTl1UP0+qRE4
-         E9gygAsSnwBHe7HgY5+yop7fAsie0eGRXSPm3NfY9Kx1lLfFicG6CDdB0QD84gXiS/9n
-         /XGA==
-X-Gm-Message-State: AOJu0Ywzp2mAk2KuzbrRGzpX6O6Qb1XftWDhG8FY2MAiRrzIazZso9im
-	rnw9884NxFj2luMbXM8cKGZTQwMIa+xe0zOqWiEewYX7AR5ze/aY2z3KacfSNA==
-X-Gm-Gg: AfdE7ckxN8WnQ1zSA27xwe+dQbP0NEKaEWAD2rL3LTfXrtQUjUtzAi/AdxjGAnz/VPa
-	0CpGJdDTZm/jq+SYcCHQcjgvciagH7p9qaApGJVa7VXdZ6noXYtLwGJE85rtV7x6IeMBcDiEp1Z
-	KXAppDmXieaEGr/q+JPel591NEkiDknw40KSwpI5XE4KdyW/ASpkTbTPa6ezuG+xGE5n6dxtX0s
-	Khwq3Of1CgacHG7mYG+vHiSo7N/Q96d4yT/Tqg15GxoYilk7aIsp0O2fDZbNC8E/LIG95EPQXhX
-	TCOypnX+wyu53kwnpsVBhpgHWUoTJmhfJa022VnDXQjpjBiCrjQNcIhOYs1AlTvz8XHP89Q8jgS
-	8g3Yen2Cgrxt+sbehnlinPbr3oN+yNtAH2Tb7k2LIragDXBYVguC/XT/+xCeMF8bSshkvCKDMW4
-	OPqamHY9A38iMYx1sgcfWC
-X-Received: by 2002:a05:6214:810b:b0:8e8:7de7:ec20 with SMTP id 6a1803df08f44-8e87de7f75amr188912326d6.4.1782748806197;
-        Mon, 29 Jun 2026 09:00:06 -0700 (PDT)
-Received: from [172.17.0.2] ([135.119.239.42])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8f1a69c32c0sm1116026d6.29.2026.06.29.09.00.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 09:00:05 -0700 (PDT)
-Message-ID: <6a429685.aa74d419.371192.904e@mx.google.com>
-Date: Mon, 29 Jun 2026 09:00:05 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0165990193940147268=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Ohb4jM7D"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1782751737;
+	bh=ud7+LIdlaKQ7KymGFYuPdTyLYf1Wn8lKE5/CrUwssPU=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Ohb4jM7DXtsAZtoS9V6JEE0423k+GRellnOMzHhO2EOKdEoTXwt0IbjwuBKJOUSra
+	 GtadZzpcOyVfcq8trILvU8ZtbHw3uSkDyAo4VxRLbHFkpFcjo9Z9T49dhH0sTg76xW
+	 FAU7F7qo1ac6uD678jhfLhLyNYXZylACfMNkEEHE=
+Received: from github.com (hubbernetes-node-2a9f5a6.ash1-iad.github.net [10.56.149.43])
+	by smtp.github.com (Postfix) with ESMTPA id D510E60074A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 09:48:57 -0700 (PDT)
+Date: Mon, 29 Jun 2026 09:48:57 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1118322/000000-dc5f00@github.com>
+Subject: [bluez/bluez] 4bb428: bass: Fix possible crash on
+ bass_update_bis_sync
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, george.moussalem@outlook.com
-Subject: RE: Add support for IPQ5018 Bluetooth
-In-Reply-To: <20260629-ipq5018-bluetooth-v2-1-02770f03b6bb@outlook.com>
-References: <20260629-ipq5018-bluetooth-v2-1-02770f03b6bb@outlook.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============0165990193940147268==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/1118322
+  Home:   https://github.com/bluez/bluez
+  Commit: 4bb4281e3b7b51c2b322f4ba1882826c139ef52a
+      https://github.com/bluez/bluez/commit/4bb4281e3b7b51c2b322f4ba1882826c139ef52a
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-29 (Mon, 29 Jun 2026)
 
-Dear submitter,
+  Changed paths:
+    M profiles/audio/bass.c
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1118237
+  Log Message:
+  -----------
+  bass: Fix possible crash on bass_update_bis_sync
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      10.52 seconds
-VerifyFixes                   PASS      0.21 seconds
-VerifySignedoff               PASS      0.24 seconds
-GitLint                       FAIL      4.28 seconds
-SubjectPrefix                 FAIL      2.16 seconds
-BuildKernel                   PASS      25.41 seconds
-CheckAllWarning               PASS      28.30 seconds
-CheckSparse                   PASS      28.42 seconds
-BuildKernel32                 PASS      24.73 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      457.14 seconds
-TestRunner_l2cap-tester       PASS      57.17 seconds
-TestRunner_iso-tester         PASS      80.06 seconds
-TestRunner_bnep-tester        PASS      19.10 seconds
-TestRunner_mgmt-tester        FAIL      208.31 seconds
-TestRunner_rfcomm-tester      PASS      25.26 seconds
-TestRunner_sco-tester         PASS      31.86 seconds
-TestRunner_ioctl-tester       PASS      25.76 seconds
-TestRunner_mesh-tester        FAIL      25.21 seconds
-TestRunner_smp-tester         PASS      23.11 seconds
-TestRunner_userchan-tester    PASS      22.68 seconds
-TestRunner_6lowpan-tester     PASS      23.40 seconds
-IncrementalBuild              PASS      37.85 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v2,1/6] dt-bindings: net: bluetooth: Document Qualcomm IPQ5018 Bluetooth controller
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#106: 
-new file mode 100644
-
-total: 0 errors, 1 warnings, 86 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14651116.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+bass_update_bis_sync does use bass_remove_bis which may end up
+removing the current entry causing a crash on entry->next, to avoid
+that prefetch the next entry.
 
 
-[v2,4/6] Bluetooth: Introduce Qualcomm IPQ5018 IPC based HCI driver
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#154: 
-new file mode 100644
+  Commit: 7a4396677522a537c751327defe8d66ca26ad3cd
+      https://github.com/bluez/bluez/commit/7a4396677522a537c751327defe8d66ca26ad3cd
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-29 (Mon, 29 Jun 2026)
 
-total: 0 errors, 1 warnings, 1076 lines checked
+  Changed paths:
+    M src/shared/bap.c
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
+  Log Message:
+  -----------
+  shared/bap: Check if stream is valid before attempting to release
 
-/github/workspace/src/patch/14651118.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+bt_bap_stream_release shall check if the stream is still valid before
+attempting to release it just as done with other operations.
 
 
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2,1/6] dt-bindings: net: bluetooth: Document Qualcomm IPQ5018 Bluetooth controller
+  Commit: 6214233de73d8e101322487f79bf8a89b8ccdb7a
+      https://github.com/bluez/bluez/commit/6214233de73d8e101322487f79bf8a89b8ccdb7a
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-29 (Mon, 29 Jun 2026)
 
-1: T1 Title exceeds max length (84>80): "[v2,1/6] dt-bindings: net: bluetooth: Document Qualcomm IPQ5018 Bluetooth controller"
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+  Changed paths:
+    M src/shared/bap.c
 
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.238 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+  Log Message:
+  -----------
+  shared/bap: Don't transition to IDLE inside bap_bcast_set_state
 
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.964 seconds
-Mesh - Send cancel - 2                               Timed out    1.989 seconds
+Remove the recursive stream_set_state(IDLE) call from the RELEASING
+case in bap_bcast_set_state. This call re-entered bap_bcast_set_state
+while the state_cbs queue was still being iterated, causing a
+use-after-free if a callback unregistered itself during notification.
 
 
-https://github.com/bluez/bluetooth-next/pull/368
+  Commit: cb4ff884ae40b2bad3ba63191b4f9848c8d892b1
+      https://github.com/bluez/bluez/commit/cb4ff884ae40b2bad3ba63191b4f9848c8d892b1
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-29 (Mon, 29 Jun 2026)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Use queue_foreach to notify state changes
+
+Use queue_foreach to notify state changes since that is considered
+safer as it does attempt to detect list modification while traversing
+the list.
 
 
---===============0165990193940147268==--
+  Commit: dc5f004af4bbc56381a74f2dd11b113608941ded
+      https://github.com/bluez/bluez/commit/dc5f004af4bbc56381a74f2dd11b113608941ded
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-29 (Mon, 29 Jun 2026)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Protect bap_stream_notify_connecting
+
+bap_stream_notify_connecting may encounter callbacks that remove itself
+while traversing the state_cbs, so this attempts to prevent to cause a
+crash by prefetching the next entry.
+
+
+Compare: https://github.com/bluez/bluez/compare/4bb4281e3b7b%5E...dc5f004af4bb
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
