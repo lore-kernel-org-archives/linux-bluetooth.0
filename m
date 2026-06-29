@@ -1,134 +1,157 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB2718B0A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 19:53:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46FC22E7364
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 20:27:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782762829; cv=none; b=rvKbp4GqFyoCHbwQXSwZQKJY/cfsqC68GVabxb+APYw2oGstqthHLcLx7+jALqIVPjj3l7Krd6HJwwgr6PWT98/qtQZS458fKj8YqYoYFVAl1dEef3VGb2pK/pcvUH0RjCxttDlcG22NLfiTFlwEw+vGHqo+n/NTJN1SRjNZpSc=
+	t=1782764827; cv=none; b=HMB+u0xKfHKAXLfGmrfrKFroD4/yhX8iuz7AjhEj4/fEVpOE0T+MYsSwttj503sgm9Z/83wrM4EmZU/4yFiJcswvKDlykfIr1QBkdPOOT2L8JtrHr8OJAR6GyrfLD2Su2AQlzHedWt8f2edHb+si8vzfgpkjcufcMntSzZ3euYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782762829; c=relaxed/simple;
-	bh=pdYmlox7wvP8FNPYtOxwVwhVgmMiuMfNVdV6AFzfvxQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jsmYpF6q9Cx/2kQYRMLteS0/5M1IB1IvJeLXciPcMfY9c++ppXFbr6arNpxGb2bqhRLAtf/CiA77ml6I//qXuaBg3lxK3HiRYfKMvurWzrNd//aA/TGqG9m2+CNbydtoPLs3/EvDPnrKxlpUPfVQ/4mKnqPqLuBkat9Dl3co++g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ihFA4gsM; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782764827; c=relaxed/simple;
+	bh=TxvH6kdNS/7zUygrjXrYssVuU7fL8FLlljONPm53+Fw=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=GFqinzZHcoy1Nxbu9fcVqTDnaqJDKYHIcEs5nG3LB0rm0/2PQr5MtehxE4ADqwAtd1hXR9DKcnBcS02d0ywIkYPURUSBaDLFad0PON+shp1Uyga7rA1FYL22ReJuNww1SzAglLGpfGS47CbY1hkZw9hlAa0jGcWxd0t4hOB/vMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=BIF3AXNl; arc=none smtp.client-ip=192.30.252.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ihFA4gsM"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4924593f45dso48631515e9.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 12:53:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782762826; x=1783367626; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X1DT3DoO2F+B/zFZkMDPupEIQfu/nZYFxRc1kTaLRjk=;
-        b=ihFA4gsMyi9tNs44pUpharMVh56awJeyxKF0+actGs6N5erK3nCqc1FiPqBq5IDdsU
-         RhZv8jqXlxi0cQxcb9hyeRThdCqUUGgF4E4GxGRFs6kwyhxIlD5zXS1W1oSXj55DRTdK
-         OSyUk8KcGThK5OqdDxt9inkBvzpEa0u9o4L8Gyj+UiiPP8JO5xbvbMub80CgUUvhgXx4
-         Dy64+5TBSqUeUvWCIF75nn3Kaj3n3+JyJWKimSlY2r/hS3L9uq52zzfclv41Xlj3M8Ii
-         CtfHU7+mjkvvbsCQHh7AFbRX01iZ+j6/NDYWoHJ2c3ZD/y+nj+p7+iTgVFDz2j63Kw8L
-         SQWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782762826; x=1783367626;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=X1DT3DoO2F+B/zFZkMDPupEIQfu/nZYFxRc1kTaLRjk=;
-        b=Nz4i1OsVeKhQoLc65EogRmxLom6KHs/lpUSkfbfUxAONLGgg6ANuFQ0bsmCj8SUGzZ
-         VkS/iVRqS2xzE2nrsXK45uaSE+1ZFkl78JWt2ktm2I+sINlde6qPUiHlZw5VdmRpRJyt
-         jFyAUgX4REGMLFXTi/SssJOX471wPIS26D5JraLGSf0uiXhT+1OuzvHkxkWNr79fCRy9
-         g+LnJS8jLZj67jsLxf/Nx4O5o9ocAAFbcMqBamm8yDqCbRil710NP6iQpVF9MGl4TaFz
-         lrEjU/pGksSyoHfUND5zmPE9v3CnnM/SboEygWgatwZuJfC6GCfxBzHblyI9si/LsFNe
-         cf9g==
-X-Gm-Message-State: AOJu0YxZ3x5Pmmky55pa0+tqt6dwNMCGeEKAvc22kJhRRWIWJPSO65EM
-	CoMaEY0EfP2x52tbfTeN5wzrntPl4sUvRMeVPKV5gHtsysp3h6QkY3js
-X-Gm-Gg: AfdE7cl0DgNfw9aOdSRa6hQGY5Xge960qnEN0Lxd3UhFndueYhzJD90n+0dQ584epgO
-	aNPy/ZarR1BNvl1IWgM02x9shqEdxa5n1vVgSV7Snvx2+TZOvFgVz/ZrP2iz71uRmxW18REOiRv
-	+n1iShDpd/ftNL5N+o5s7wWNwzYV/EgaYBk2WtgIySkUybco3OluHrIT+bYZenXyTCpNnOzU7hF
-	jq3OntcWSKfuHln7qIUhq40Ws7KkNt9nCnwvze1lnwmAbr2qFpbVrvmln34qyhybYCeBNng6k3P
-	rmXF8qhlM4gmdSTz+fDbYEqrpGp8LZIm7QhTgKAQv6omUBrVNOhl7sIObB2qTgmTAabIes0l/xU
-	o0KKN8h+iV9mG3/1xYHwLNqsMshhb6cnHvr8k8C/kbzjc4n6sHL+F6OsMaddfUeICuFa9leQVOO
-	arucIjVjch4QLzAA==
-X-Received: by 2002:a05:600c:5392:b0:492:4cce:53e2 with SMTP id 5b1f17b1804b1-493b8281690mr15979945e9.3.1782762825880;
-        Mon, 29 Jun 2026 12:53:45 -0700 (PDT)
-Received: from tibor-herobox0 ([150.251.225.12])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493b8ccc639sm10841515e9.3.2026.06.29.12.53.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 12:53:45 -0700 (PDT)
-From: Tibor Harcsa <silurust@gmail.com>
-To: luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Tibor Harcsa <silurust@gmail.com>,
-	Copilot <223556219+Copilot@users.noreply.github.com>
-Subject: [PATCH v2] Bluetooth: btusb: Add IMC Networks QCA9377 to quirks table
-Date: Mon, 29 Jun 2026 21:53:34 +0200
-Message-ID: <20260629195334.11944-1-silurust@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260627153505.20173-1-silurust@gmail.com>
-References: <20260627153505.20173-1-silurust@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="BIF3AXNl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1782764825;
+	bh=Re4LEd0zfJef8Nz/XSyPng1Xfkk23QmEAWWgQvMM+5E=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=BIF3AXNlO+tsZN7dsCOTKtrpjaQroOl4Cvo+52Rnz9WCVmeaGB0mzWP5CkJC7ehC7
+	 IRMJoKE7Xlhziq4IYWXFVATFcx8CaxnCIJx1BibMZSgdz2pzDCAlu1JS3EhbMJfqir
+	 8ovuMYF6c9ihAErEBQ8UlER0ft2HL192l3wgT12E=
+Received: from github.com (hubbernetes-node-5fac825.ash1-iad.github.net [10.56.225.13])
+	by smtp.github.com (Postfix) with ESMTPA id 7DEF318C976
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 13:27:05 -0700 (PDT)
+Date: Mon, 29 Jun 2026 13:27:05 -0700
+From: Matthew <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/eb9b35-220f10@github.com>
+Subject: [bluez/bluez] 27a4c4: bass: Fix possible crash on
+ bass_update_bis_sync
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Add the USB ID (13d3:3503) for the IMC Networks Qualcomm Atheros
-QCA9377 Bluetooth controller to the btusb quirks table. This device
-requires Qualcomm Rome firmware and wideband speech support to function
-properly; otherwise, BLE scanning fails with HCI unexpected event
-opcode 0x2005 errors.
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 27a4c48b048113576925adad4477aee02c8119b6
+      https://github.com/bluez/bluez/commit/27a4c48b048113576925adad4477aee02c8119b6
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-29 (Mon, 29 Jun 2026)
 
-The device reports the following in /sys/kernel/debug/usb/devices:
+  Changed paths:
+    M profiles/audio/bass.c
 
-P:  Vendor=13d3 ProdID=3503 Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+  Log Message:
+  -----------
+  bass: Fix possible crash on bass_update_bis_sync
 
-Signed-off-by: Tibor Harcsa <silurust@gmail.com>
-Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
----
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+bass_update_bis_sync does use bass_remove_bis which may end up
+removing the current entry causing a crash on entry->next, to avoid
+that prefetch the next entry.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 08c0a99a6..7963fd48a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -297,6 +297,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3501), .driver_info = BTUSB_QCA_ROME |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x13d3, 0x3503), .driver_info = BTUSB_QCA_ROME |
-+						     BTUSB_WIDEBAND_SPEECH },
- 
- 	/* QCA WCN6855 chipset */
- 	{ USB_DEVICE(0x0489, 0xe0c7), .driver_info = BTUSB_QCA_WCN6855 |
--- 
-2.54.0
 
+  Commit: 2262e371564994b429b045cdd34f53eee0cd0c13
+      https://github.com/bluez/bluez/commit/2262e371564994b429b045cdd34f53eee0cd0c13
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-29 (Mon, 29 Jun 2026)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Check if stream is valid before attempting to release
+
+bt_bap_stream_release shall check if the stream is still valid before
+attempting to release it just as done with other operations.
+
+
+  Commit: c0fec57e9fa28692dc36e12616c5b74e4fa425ec
+      https://github.com/bluez/bluez/commit/c0fec57e9fa28692dc36e12616c5b74e4fa425ec
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-29 (Mon, 29 Jun 2026)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Don't transition to IDLE inside bap_bcast_set_state
+
+Remove the recursive stream_set_state(IDLE) call from the RELEASING
+case in bap_bcast_set_state. This call re-entered bap_bcast_set_state
+while the state_cbs queue was still being iterated, causing a
+use-after-free if a callback unregistered itself during notification.
+
+
+  Commit: a9b6c8a2ea624a62101df16dde5735f4bde1631b
+      https://github.com/bluez/bluez/commit/a9b6c8a2ea624a62101df16dde5735f4bde1631b
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-29 (Mon, 29 Jun 2026)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Use queue_foreach to notify state changes
+
+Use queue_foreach to notify state changes since that is considered
+safer as it does attempt to detect list modification while traversing
+the list.
+
+
+  Commit: a2c7bc03b75969f784d1ea1feacc78773063025c
+      https://github.com/bluez/bluez/commit/a2c7bc03b75969f784d1ea1feacc78773063025c
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-06-29 (Mon, 29 Jun 2026)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Protect bap_stream_notify_connecting
+
+bap_stream_notify_connecting may encounter callbacks that remove itself
+while traversing the state_cbs, so this attempts to prevent to cause a
+crash by prefetching the next entry.
+
+
+  Commit: 220f102c8db9888bd113d0d53cd246ece3012696
+      https://github.com/bluez/bluez/commit/220f102c8db9888bd113d0d53cd246ece3012696
+  Author: Matthew Cash <matthew@matthew-cash.com>
+  Date:   2026-06-29 (Mon, 29 Jun 2026)
+
+  Changed paths:
+    M profiles/midi/libmidi.c
+    M profiles/midi/libmidi.h
+
+  Log Message:
+  -----------
+  profiles/midi: Fix zero timestampHigh
+
+BLE-MIDI timestampHigh can legitimately be zero. The MIDI parser used
+timestamp_high == 0 to decide whether it had already consumed the packet
+header, so packets starting with 0x80 0x80 caused the next running-status
+payload byte to be consumed as another timestamp header.
+
+Track whether timestampHigh has been read separately from its value so
+packed MIDI events with zero timestampHigh are parsed correctly.
+
+
+Compare: https://github.com/bluez/bluez/compare/eb9b35c8d13d...220f102c8db9
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
