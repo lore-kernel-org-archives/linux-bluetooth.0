@@ -1,68 +1,72 @@
 Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0423F6C2E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 14:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E053F6C2E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 14:27:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782743221; cv=none; b=uLJan2FWs8Pi7S7CFcaqkWHp9OIMxWdBB6czgDdSqGHpHcRVmKBPv33McqmaKnxeYs7B5JpehQBPhg28a5ZAsXkzcTUt53gq7Pwab9ZYtNk2NDYr2zPYMZZjNC1FBMT9fwnRDSCUg+IQOp+UE2N6sDqPI2hXYL8VxWagLZSFeu4=
+	t=1782743223; cv=none; b=dXPz27bXcrr5SDEn4nhsSomdOYrv8JSsV+LWl/ALRkxewW2cU9eFQZ7ag8Ipx8SC9UNJfjz5fw2mIu4JBF/rlGnjgYPd0axUMshIq7axUWYSm4jUufc7oAttL732tN8Q7ONQVKioCcD/aWudLHCyU+6pP1O4xVRujalSW0Y0fuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782743221; c=relaxed/simple;
-	bh=2F+TH1TM1acXvmLfa2fLN5mrNnqXNYeDm2GaQ5xlfQQ=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=KlRN/MLBW/R1jjLrtlYgfKwpztQXnXVnxAppvB/5OKARX34pNkfeGdS5pSYJHKI2GRFi8pAsVFjHuPwC7o0Yp+DirQUK0f1Ur+ExycSgbB0VCj0U29kBaRTgcPw9PbJfUUeymycK8H6MAj51JzGe0+rryHxTv3zzLhX+NIaSa1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LC+bJWyH; arc=none smtp.client-ip=209.85.217.52
+	s=arc-20240116; t=1782743223; c=relaxed/simple;
+	bh=s6hsVPwczfvrarbW9msptPZgE8A7UGv/z7WRX7ac7vE=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HQHUHUjZy1k6GpZJYAkdDVDigNvvev2JdGdXGJhYQUKPLYcdwzDLi3hzEZriSVJFvytiEWIwrEbjdCrEiUo89WJdCCjQU0q0iIZhW5sz1ZaJ9Gq+W6DupMkdogCYxHTvk7qIcTXy4BA6b5R2tFFs2AM9I/RZ5FNj+jZu211E77w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BwWf+gNY; arc=none smtp.client-ip=209.85.217.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LC+bJWyH"
-Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-73770fd1cd9so737305137.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 07:26:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BwWf+gNY"
+Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-7383cdb7800so1153980137.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 07:27:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782743219; x=1783348019; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tDZ2JtdsIg0YMG6AxdlQ7+ijohmZbDaNAfUnxVkAxWk=;
-        b=LC+bJWyHH4N5JnSW++xTinurIBk3vRel2noPwnrKNcaGhi58f+Hbd0aoU1BFiEZ8Pg
-         zOvg+LmxLGK904p/etWeywGhYMt+2FAfMOvHDORozNtS143AVVVMT8w2qb/8ifHtLV3j
-         EF/BxXb1Bm5SrI4oQ1vSrgtXQETtF0ro15jxvzwBb2Nhg6njkaP4MN33REAWnzSD4ILm
-         mH+8IsxUd7dYpYFpaM8/eFw9m4YYZpxm1fxnPLoeU9xMvwFcGBjg8z2EXchdW6laAVge
-         KM7404g/B0+t/14ZQ588kXa9ya1TJ5fBwrMBM5W8uHOp/WQ5rCCJlDuKKXuBPHH7r0iJ
-         mt8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782743219; x=1783348019;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20251104; t=1782743221; x=1783348021; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tDZ2JtdsIg0YMG6AxdlQ7+ijohmZbDaNAfUnxVkAxWk=;
-        b=Hi91qvZoUu7Ed6AYN/YrJqcu7rHvljDOqvGhrSraYtcZkoaPZMeTaXZrD1/rmGdCXe
-         cVF9cJzEvmP7GKBwmtq+5pzdZ2uRfurMurOpM765pTsilxN2jqnSyv42z6w47F6l2nYb
-         GTJN3pe3KLUnn5ZhM7TsKyiLOaXfQ/Hwv+2kfSwkUDDFBfm2yC9A+zGx7DJDmNML3H+e
-         d76VKqeFCxm6MRzXkaZPG+MXI3tE6sv7Pk8w+4HIAHyrqZH++omOcmfE9SZ6n3LqbSR3
-         2u6RRaUTl5gU5nC1YnAipRqKkc7wou5pZuu7fO/+MLLWsUGbAGR1qvD92t7hvnsRKwDL
-         Tvlw==
-X-Gm-Message-State: AOJu0YwFDmGBBOTgQ8Y9nyI0jUIi8iZ2Iuq8jz2U+rZDhpas044U5Qep
-	vXOEgzCefXmDoIe8jC6sJwr9HzS1aEBPQxJXYvJr/DsWQTPJb6D2XB2SoKLU8vdN
-X-Gm-Gg: AfdE7ckD667TaDF9CzAUYJDTyZKf8jM//Ncs2rUsYH59Y8uBMKb/T59bqyy1QrO1p0z
-	AytnJOIKxfHCtQa1AensBu9heRcfZ7Ypke1hvp2rRPbGZzR0YVK+rNbs9ZvaoOXjqGHjveB/lgr
-	uQlHYvhP63w25ZNnRZy34E1oItQ21XpopWvCx/Pg2zjo2Pa0iLhR74Vrw4jmiNzXZLBr0bJSw3G
-	zptRCU1SlskPvTcWidKmff/56ec1HJQmFSYHOPmrNoQUPWnr/ksRbPt/rVl3zO6oGsFDkFJSoJp
-	+eDrEz7D3vJOVxNqt2BlzpvnI1OZiZ4xd0HlrpE0LhPxTV6SlYAK4SvLEB5Ro/P8e/b2Ad+DnIK
-	mJnVa5abw4qr88tEO9qrajUIVBrrX8GZlrmoxqUk8JnBx0xlf/l6T/2PEMSk2bqoOiY2eTdyGJW
-	0cb0IEhTbTT02VZX67UA9SWdAyPqbsZEr7vJocY66dvrKWnWqGvNFsQxRlZ9BZzUW/fikDzKPzY
-	VBryjBCvzRt4J7g5Q==
-X-Received: by 2002:a05:6102:5093:b0:738:9dd5:9b03 with SMTP id ada2fe7eead31-7389dd59bb4mr1551478137.20.1782743218916;
-        Mon, 29 Jun 2026 07:26:58 -0700 (PDT)
+        bh=I6xYwL84HKHKXCjzdLtK0via8XkXYBIUjSj6kSdnFLA=;
+        b=BwWf+gNY9yELCHsirE0dlvO8Taspt8F+4FvkB+PhD1x7uLtd1/LyU6AwnRmwlnAXEy
+         2J4eNKRidzm3KJ56NN/18nlEwV6bJEBE9E3EVfLKiwsUH0Wa7IPabh15goV6moucrMxq
+         Z3grgcgoqzdF/X8ketCDP6eyiDSCCUOBVaD95rNazQkYzcU4QzcvqqnGl1h/LCfIx2F4
+         5v2ZYshqrrX7rsq8ulx74TFqYwCwUToClqfiqOvpHkB5UuJflWum7KUS5CQOmw/6e0PJ
+         MVqMi7kf5x1f0IHEAfJVpY+mTiGfMXpmH84js28HctJ3wEj0LkcynbMxFdTGThG0nB27
+         P6Yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782743221; x=1783348021;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=I6xYwL84HKHKXCjzdLtK0via8XkXYBIUjSj6kSdnFLA=;
+        b=qSyV8Egqu679O7vcKpe78LkSzM7lsH3WSCaW18s0PBceLc0JhgPNDJD4HM/b1TuUM4
+         9ZWUEaZvo51y3yvhucyAGXqI3kj2dsKEefA1SoWw7fGeCC9uo2CcLSAOBy/W9iOs2cnh
+         Lj77uidX63fWJ5Iy8X2AI0xW60DfL9d1tAPeEii6whx02aFxsXzYYMZwxtDmXLOMZ5f9
+         Mh8jyJRRYsRjKcftN0HCtZzK4bYHhDuG/KlnOaZmee1Taoh4BUoiVZoso4n0Wh4OsDTD
+         ki8z3flER+PVJY77gKasermY72zRwSgHD+MgkQfw7kv/+8KksaQElzd9/oxQk/5+04Uz
+         4JHA==
+X-Gm-Message-State: AOJu0YzIIEo7KuZqoAz3EcQvg1bm9Qk+C4zeLXSKLZvT1UZzhOVgBmzL
+	bMnyiWe+27d/Q/lhb9T1iGgEdEyrLTKKeRGkyP/PRB4OfZxRmdhP7RJQCTaKztp5
+X-Gm-Gg: AfdE7clgaVosim2h03QRBBh/zgeeX9ts6oq1NY+4xwHHefd0NiCk5tyKC+sptFp5v/t
+	gn4k61ofDq5aU8u9xVfs1myeWBuCWc+MhmDfoWM+d1pafzgXJ9AEeB0131uv0C2U7e2UNuXwQJz
+	psNF1MEYu8kSOc9wrqILioO8OfcTcnjWlJ+YUvyl1Z88Qi05BNH5vLsma/2vVjJ/5vQgCjISqA6
+	cyUxAk58XLKhgvaQNsNUkwbOl0YbakgYQ9On+EPIfkCNfS1EQePHQLAgiw6pZxBpBpUXWhh/zyE
+	N7DEDhixDEpxg/L5gsGENZlnkltgA3v75zqmABObCeQdM6gLrBT2Zjqo72XyCTU5D3n7TS3ytzP
+	jx9oEBItULlW8WWna396ylvrm8Q1h0VXH7TpnIOKSJzBC4i1i2FeHFWPUT71hkwUe8uJ1TQFUxE
+	7bs1mFRr97LlWpapSQZrhodZUWW1hfs0sE80ZaId8nJ/r90hCTQ6xHfG8S0IzXgZCIu47OKgYxf
+	pTalWE=
+X-Received: by 2002:a05:6102:3049:b0:737:915b:157e with SMTP id ada2fe7eead31-737915b1bc6mr3253583137.29.1782743220906;
+        Mon, 29 Jun 2026 07:27:00 -0700 (PDT)
 Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-738f72b4cf2sm1350695137.7.2026.06.29.07.26.57
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-738f72b4cf2sm1350695137.7.2026.06.29.07.26.59
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 07:26:58 -0700 (PDT)
+        Mon, 29 Jun 2026 07:27:00 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 1/5] bass: Fix possible crash on bass_update_bis_sync
-Date: Mon, 29 Jun 2026 10:26:45 -0400
-Message-ID: <20260629142649.966025-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 2/5] shared/bap: Check if stream is valid before attempting to release
+Date: Mon, 29 Jun 2026 10:26:46 -0400
+Message-ID: <20260629142649.966025-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260629142649.966025-1-luiz.dentz@gmail.com>
+References: <20260629142649.966025-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,35 +77,26 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-bass_update_bis_sync does use bass_remove_bis which may end up
-removing the current entry causing a crash on entry->next, to avoid
-that prefetch the next entry.
+bt_bap_stream_release shall check if the stream is still valid before
+attempting to release it just as done with other operations.
 ---
- profiles/audio/bass.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ src/shared/bap.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
-index a5ef80fbc835..533d45babfeb 100644
---- a/profiles/audio/bass.c
-+++ b/profiles/audio/bass.c
-@@ -2014,11 +2014,15 @@ static void bass_update_bis_sync(struct bass_delegator *dg,
- 	const struct queue_entry *entry;
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 6f2f4fc11f7c..9dd07bc5f2e2 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -6727,6 +6727,9 @@ unsigned int bt_bap_stream_release(struct bt_bap_stream *stream,
+ 	unsigned int id;
+ 	struct bt_bap *bap;
  
- 	/* Check if existing setups if BIS needs to be added/removed */
--	for (entry = queue_get_entries(dg->setups); entry;
--				entry = entry->next) {
-+	for (entry = queue_get_entries(dg->setups); entry;) {
- 		struct bass_setup *setup = entry->data;
- 		uint8_t state;
- 
-+		/* Prefetch next entry since the likes of bass_remove_bis can
-+		 * end up removing the next entry.
-+		 */
-+		entry = entry->next;
++	if (!bap_stream_valid(stream))
++		return 0;
 +
- 		state = bt_bap_stream_get_state(setup->stream);
+ 	if (!stream || !stream->ops || !stream->ops->release)
+ 		return 0;
  
- 		DBG("stream %p: BIS %d state %s(%u)", setup->stream, setup->bis,
 -- 
 2.54.0
 
