@@ -1,235 +1,142 @@
-Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27BD3BADBC;
-	Mon, 29 Jun 2026 15:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782746918; cv=pass; b=t5tw01aXGSQHqrj2ME1BMxE+CZMg2WenxJpGR3kMsEzDKR3Z3BIjbEVCoDN1DsW1r4ANUdm9cYRywqSL1/C27sKUSuC6ewCbAOPpT8Dppv2+K3n6zoh4FjaN8qebmNeflGdw+eIyi4X27Q7skpegfpHUGj97e+pselbxYTbQUi0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782746918; c=relaxed/simple;
-	bh=bNVHrm3l/01Xl7syJ9ikTQGv0v698tb5LMeMyaxUNWM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=qntwiSfvI5h3+B31I5F897BiIDwZLenG8uTcD4KItC2ZbQMHPIbX1SnDc3QLMiqaf3IMDTEcueNI4vNKlUK6xIjbf5AUKDBqrnwOfWiE9USwGF/lZYFgE1Qz32BzVRhAjYohdRKiDxQ/4xIjhMYCeTdzSvoqlD9yv16I97WQ6dg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rong.moe; spf=pass smtp.mailfrom=rong.moe; dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b=bJxMcgTr; arc=pass smtp.client-ip=136.143.188.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rong.moe
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rong.moe
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b="bJxMcgTr"
-ARC-Seal: i=1; a=rsa-sha256; t=1782746898; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=CtlubN3O8T/gOMm2+m+XcDWQpAq/BF9WpPC0tSjP56mWXesZRObtNEcYXZYMIccoIM6KuKEyuvtUbqiQbNfU0YtNnsJUwgt06RWGc0JuQ/eFQ8/+fO59Pct8dxTlJS2ATyz5m51Ccd9da7ZSZDw2BTZ13CwiPeBPO9ma114LxC0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1782746898; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=B109+8NZEbMQJ0pDHwjFopml2ryZkezn+CpF9BZP+m0=; 
-	b=ELdEe6YWSjqJAjZD0z59BviM+eT8nv6Ozqmym+B89mTnXL/jmw4FTUGhYilNzPADzovGObCJfyvmPco4sSvEz/GMYoaY6eb0D97bMKmpUlpBSm35oobkkppKGJGRwKDe3MZA98PuDtPLIM14Z9hQ9p/HIw+uDsxGCyeCo31scjo=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=rong.moe;
-	spf=pass  smtp.mailfrom=i@rong.moe;
-	dmarc=pass header.from=<i@rong.moe>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1782746898;
-	s=zmail2048; d=rong.moe; i=i@rong.moe;
-	h=From:From:Date:Date:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Message-Id:To:To:Cc:Cc:Reply-To;
-	bh=B109+8NZEbMQJ0pDHwjFopml2ryZkezn+CpF9BZP+m0=;
-	b=bJxMcgTrrMris7kfCVoAGhygrhOqnwMpXzMvmEwDUVbgywJC1hkMN1TX+Me7XnZS
-	/KqoNmgwLx6k5DMntK9sz3RgTobK54hh0u+DYD+NHOge/ZzwBKlR6RJcgEODwIO/q/t
-	d1HaoV8yBNXBNaFUiuYOHmYUDl4kVVQem/Z3wz8eNfr1QDrWusFWYMJbb45RKNNCfQF
-	vuVFDh7fxiOdDygrjxv/1D4Viwgg4YerGoysO2Qu3mdFcV8WSgdQ+yyeAFSm5zTCL84
-	7hwNPUV0soR2hqACk2qMqjy/VHYK1lZBFrQ0pEeB5J5S6Kz9QoT6G99esv6MIB+ijUP
-	X3lAdYdQRg==
-Received: by mx.zohomail.com with SMTPS id 1782746895981162.6356666501132;
-	Mon, 29 Jun 2026 08:28:15 -0700 (PDT)
-From: Rong Zhang <i@rong.moe>
-Date: Mon, 29 Jun 2026 23:27:58 +0800
-Subject: [PATCH] Bluetooth: Properly disable remote wakeup for
- MT7922/MT7925 on Ryzen platform
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00FC83B42DC
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 15:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782747452; cv=none; b=dtYUuSjizhoztjx/YAj1HDlSs8Deddx7zCQVgiwO2eXiPjCvoiXpQYEqsVz0EFKY2LmsNdPNnSlN4fbMQEc1upeqH12Zpt74e6MJhLKxhI5qfKB82lcIMYxnFdNMzyaJUgvidyMq3R40TnqYmJAyxugWO8wqYl4NzJ0+YqTHm10=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782747452; c=relaxed/simple;
+	bh=BODU8nH72xA0ScZ+HzwpHMr8UOUoOL0Z1xiarATGzqY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jBP72CoqzcMKhT5J6QDBBM44tzXDSP82KLTeak1qQJaTqZOnquj/ZcdIBYVFWor7SaKoX0Eg7fUN42OU6kd1PEqZIZlXU6x11lA8Oz+gLt4tYprXUKLUvk4zwtVm4qkykytV4W+ewiq9dcCHcK2nBZZMq9OPgaKXIuQoP4fH2sk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-693c69b97e7so6687910a12.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 08:37:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782747449; x=1783352249;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3PSkrSvBcOj2Vfr1tOG9HdESUGrp+uU5X3MHl1xNqsM=;
+        b=nifhDPBcFzd3Zi95v2dDI56wakI6FxAIZDkgne4BO9NBKYBQRw2mEpE3apamNK8Byz
+         Q6SV5FJwJXNaJSoaYNcvKdKcedJlEiG8uCH1dJJ6geVVsp21AlOCEbG71hqVtS1iE4F/
+         CbliLzr5pf+jS9Cns7yWihL6NvgW4bzXT4SJWylR6Sip6c73zMQdQ0ns8bF5pfUtBJ0G
+         TVz+NACOM/skzkXlw/ViLgY6kYI0j/TIpBV2Mip4dAhdlS3ha738tQnBkmyVIwU0xdxa
+         gT53cu+pL7DFlJTzsc/EdKK9f50fGYFcZvHNbQEqJYqguBoLxZNXT5SFtJGlDloDtwf5
+         HjHA==
+X-Forwarded-Encrypted: i=1; AHgh+Rq74PonOgAH86h5lem/QKz0Msq6v2Lhsf6lzoeR8gxg/OZ252SePR2RgUJAXggXBY/7mkS+RgkZxjdkY7YW6mY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzA1lpzQHSTfik1FapZoADXV4SnxUQy7rYyWzfoZ3g2Jq6FkCSp
+	gCvgRQwoXOF/yVnB75ueANWy4ypp4VdEWHS7nPE4Jd34x4e9PcSQIdPjGZntZAN05dc=
+X-Gm-Gg: AfdE7cl8bS1Cuw2gimaq0dRqv3l5Zh4rndRtHRE5TsKL7CQ5dCV/QZSokZrRtLLPTHQ
+	+m9SuCJsYQ6SFNWcwWH6pZK4LrjRFAsDjD1ijAgWsZaaB4+yJ/JI9+EhP4yhv96oLgV4MbZUmrx
+	xpF2nX0kS+V5ctB74f4BISvDT054oTt0I+C0hz2sQ5CmlozfAhUNaMffgkjzJtaiXNuhuc1vHYP
+	aabM1N8vy5S/iz2jnIxubfRFGWjHHPWQz7xrhhH6MEU9wxlDtnqyllAGokV+27Mwk7Qq9ONpj+O
+	AhSV1XqUgbYz58/oNXxxXkDDzWrreSqAqSKs3OxW/4zI6eA+5tCnawJXsMBYPpbzRJF2WqUZH0n
+	OVlwxlhRNKNwf+WD4s9SDz9w5JUeO7U9OIMiKES/kZSlbK81sLLrwQRMrlJe2vZxjblV/GvuDjC
+	TcJlX2jvftU6N9Ee//65JUOG1fPSLZdgDvIYkUjXl1R6i0mhOZxw==
+X-Received: by 2002:a17:907:969f:b0:bee:ac9b:9abc with SMTP id a640c23a62f3a-c1205ea96b2mr883157066b.22.1782747449333;
+        Mon, 29 Jun 2026 08:37:29 -0700 (PDT)
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com. [209.85.128.49])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c11fbbaa46asm807946966b.10.2026.06.29.08.37.29
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Jun 2026 08:37:29 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-493b68b4643so3539165e9.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 08:37:29 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ81E1M6ULNaikI6QvUY8sD+F5g6pUMtBJPzP+Sc6qTpKxim7YvTA2+nV9h9IpA7y0jUNdCcwwtH8wlVOkkzZNw=@vger.kernel.org
+X-Received: by 2002:a17:907:3c8b:b0:c12:f84:85d4 with SMTP id
+ a640c23a62f3a-c120f8487bamr796791266b.24.1782746977928; Mon, 29 Jun 2026
+ 08:29:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260629-btmtk-ryzen-remote-wakeup-v1-1-1d2f1cee6d22@rong.moe>
-X-B4-Tracking: v=1; b=H4sIAP2OQmoC/yXMyw6CMBBG4Vchs3aSiqLoqxAXbf3RkVDItHgjv
- LtVl9/inJkiVBDpWMykuEuUIWSsVwX5qw0XsJyzqdwYZ2t/YJf61LG+3gis6IcEftgO08imquz
- W7Hd1iZZyPypaef7ezenvOLkbfPoOaVk+2uGS530AAAA=
-X-Change-ID: 230ba8c9-btmtk-ryzen-remote-wakeup-055a407682ef
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
- =?utf-8?q?Chris_Lu_=28=E9=99=B8=E7=A8=9A=E6=B3=93=29?= <Chris.Lu@mediatek.com>, 
- =?utf-8?q?Will-CY_Lee_=28=E6=9D=8E=E6=94=BF=E7=A9=8E=29?= <Will-CY.Lee@mediatek.com>, 
- =?utf-8?q?SS_Wu_=28=E5=B7=AB=E6=86=B2=E6=AC=A3=29?= <ss.wu@mediatek.com>, 
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- Rong Zhang <i@rong.moe>
-X-Mailer: b4 0.16-dev-d5d98
-X-ZohoMailClient: External
+References: <20260629135917.1308621-1-arnd@kernel.org>
+In-Reply-To: <20260629135917.1308621-1-arnd@kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 29 Jun 2026 17:29:24 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdXhsM4JzArRuB=A46N-Ogbn2Fans+PVJVA-hEytFq=DeQ@mail.gmail.com>
+X-Gm-Features: AVVi8CfSSg4DcoB7CGCYddSfqoWpUaOwYUjpkorP-3LR7U8E7vJ9ucbePhiZLD8
+Message-ID: <CAMuHMdXhsM4JzArRuB=A46N-Ogbn2Fans+PVJVA-hEytFq=DeQ@mail.gmail.com>
+Subject: Re: [PATCH] [RFC] gpiolib: introduce gpio_name() helper
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Marcel Holtmann <marcel@holtmann.org>, MyungJoo Ham <myungjoo.ham@samsung.com>, 
+	Chanwoo Choi <cw00.choi@samsung.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Andy Shevchenko <andy@kernel.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+	Ulf Hansson <ulfh@kernel.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-i2c@vger.kernel.org, 
+	linux-iio@vger.kernel.org, linux-input@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-pm@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-It is reported that a remote wakeup could cause MT7922/MT7925's btusb
-interface completely unresponsive. Resetting the xHCI root hub doesn't
-help at all, and recovering from such a state needs a power cycle.
+Hi Arnd,
 
-All reports seen to be relevant to Ryzen-based laptops. These NICs are
-usually used as OEM components thanks to some sort of reference designs.
+On Mon, 29 Jun 2026 at 15:59, Arnd Bergmann <arnd@kernel.org> wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> Most remaining users of desc_to_gpio() only call it for printing debug
+> information.
+>
+> Replace this with a new gpiod_name() helper that returns the
+> gpio_desc->name string after checking the gpio_desc pointer.
+>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Their popularity on other platforms is unclear. While there is still a
-chance that the quirk may exist on other platforms, be cautious and only
-apply the quirk on AMD platforms for the time being.
+Thanks for your patch!
 
-Meanwhile, though device_set_wakeup_capable(false) is the correct fix
-for other NICs with fake remote wakeup capabilities, doing so for
-MT7922/MT7925 effectively prevents it from being used as wakeup
-sources as per userspace requests. Hence, return -EBUSY on runtime
-suspend to prevent the interface from being autosuspended while it's
-still opened, which has the same effect as
-device_set_wakeup_capable(false), since disabling remote wakeup simply
-causes the USB core to gate runtime autosuspend as well due to
-needs_remote_wakeup == 1. The interface can be safely autosuspended as
-long as remote wakeup is disabled, i.e., after closing the HCI device.
+> Not sure if this the way we want to take this, or if the gpio name is
+> an appropriate replacement in debug printk.
+>
+> Since most of the callers of desc_to_gpio() and gpio_to_desc() are
+> otherwise in drivers that already depend on CONFIG_GPIOLIB_LEGACY and
+> include linux/gpio/legacy.h, only a handful of instances remain that
+> are otherwise in files that otherwise only use the descriptor interfaces:
 
-Specifically, the interface may still take the advantage of remote
-wakeup in order to wake up the system from sleep if userspace has
-enabled it as a wakeup source.
+> --- a/drivers/gpio/gpio-aggregator.c
+> +++ b/drivers/gpio/gpio-aggregator.c
+> @@ -758,8 +758,8 @@ int gpiochip_fwd_desc_add(struct gpiochip_fwd *fwd, struct gpio_desc *desc,
+>
+>         fwd->descs[offset] = desc;
+>
+> -       dev_dbg(chip->parent, "%u => gpio %d irq %d\n", offset,
+> -               desc_to_gpio(desc), gpiod_to_irq(desc));
+> +       dev_dbg(chip->parent, "%u => gpio %s irq %d\n", offset,
+> +               gpiod_name(desc), gpiod_to_irq(desc));
+>
+>         return 0;
+>  }
 
-Fixes: e31d761628ad ("Bluetooth: btmtk: Disable remote wakeup for MT7922/MT7925")
-Signed-off-by: Rong Zhang <i@rong.moe>
----
- drivers/bluetooth/btmtk.c | 10 ---------
- drivers/bluetooth/btusb.c | 57 +++++++++++++++++++++++++++++++++++++++++++----
- 2 files changed, 53 insertions(+), 14 deletions(-)
+Before, this printed:
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 02a96342e964..4614434dd57b 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -1381,16 +1381,6 @@ int btmtk_usb_setup(struct hci_dev *hdev)
- 		break;
- 	case 0x7922:
- 	case 0x7925:
--		/*
--		 * A remote wakeup could cause the device completely unresponsive, and
--		 * recovering from such a state needs a power cycle.
--		 *
--		 * Since the remote wakeup capability is super broken, just disable it
--		 * to get rid of the troubles. The device can still be autosuspended
--		 * when the bluetooth interface is closed.
--		 */
--		device_set_wakeup_capable(&btmtk_data->udev->dev, false);
--		fallthrough;
- 	case 0x7961:
- 	case 0x7902:
- 	case 0x6639:
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 08c0a99a62c5..023ae782f41a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -6,6 +6,7 @@
-  *  Copyright (C) 2005-2008  Marcel Holtmann <marcel@holtmann.org>
-  */
- 
-+#include <linux/cpufeature.h>
- #include <linux/dmi.h>
- #include <linux/module.h>
- #include <linux/usb.h>
-@@ -957,6 +958,7 @@ struct qca_dump_info {
- #define BTUSB_USE_ALT3_FOR_WBS	15
- #define BTUSB_ALT6_CONTINUOUS_TX	16
- #define BTUSB_HW_SSR_ACTIVE	17
-+#define BTUSB_WAKEUP_BROKEN	18
- 
- struct btusb_data {
- 	struct hci_dev       *hdev;
-@@ -2936,10 +2938,20 @@ static int btusb_send_frame_mtk(struct hci_dev *hdev, struct sk_buff *skb)
- 	}
- }
- 
-+static inline bool platform_is_ryzen(void)
-+{
-+#ifdef CONFIG_X86
-+	return boot_cpu_has(X86_FEATURE_ZEN);
-+#else
-+	return false;
-+#endif
-+}
-+
- static int btusb_mtk_setup(struct hci_dev *hdev)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
- 	struct btmtk_data *btmtk_data = hci_get_priv(hdev);
-+	int err;
- 
- 	/* MediaTek WMT vendor cmd requiring below USB resources to
- 	 * complete the handshake.
-@@ -2956,7 +2968,29 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
- 		btusb_mtk_claim_iso_intf(data);
- 	}
- 
--	return btmtk_usb_setup(hdev);
-+	err = btmtk_usb_setup(hdev);
-+	if (err)
-+		return err;
-+
-+	switch (btmtk_data->dev_id) {
-+	case 0x7922:
-+	case 0x7925:
-+		/*
-+		 * All reports seen to be relevant to Ryzen-based laptops. These
-+		 * NICs are usually used as OEM components thanks to some sort
-+		 * of reference designs.
-+		 *
-+		 * Their popularity on other platforms is unclear. While there
-+		 * is still a chance that the quirk may exist on other
-+		 * platforms, be cautious and only apply the quirk on AMD
-+		 * platforms for the time being.
-+		 */
-+		if (platform_is_ryzen())
-+			set_bit(BTUSB_WAKEUP_BROKEN, &data->flags);
-+		break;
-+	}
-+
-+	return 0;
- }
- 
- static int btusb_mtk_shutdown(struct hci_dev *hdev)
-@@ -4532,11 +4566,26 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- 
- 	BT_DBG("intf %p", intf);
- 
--	/* Don't auto-suspend if there are connections or discovery in
--	 * progress; external suspend calls shall never fail.
-+	/*
-+	 * It is reported that remote wakeup events could sometimes cause some
-+	 * adapters completely unresponsive. Resetting the xHCI root hub doesn't
-+	 * help at all, and recovering from such a state needs a power cycle.
-+	 * Since disabling remote wakeup simply causes the USB core to gate
-+	 * runtime autosuspend as well due to needs_remote_wakeup == 1, let's do
-+	 * this ourselves to make our life easier. The interface can be safely
-+	 * autosuspended as long as remote wakeup is disabled, i.e., after
-+	 * closing the HCI device.
-+	 *
-+	 * Don't auto-suspend if there are connections or discovery in progress.
-+	 *
-+	 * External suspend calls shall never fail. Specifically, a device with
-+	 * broken remote wakeup may still take the advantage of remote wakeup in
-+	 * order to wake up the system from sleep if userspace has enabled it as
-+	 * a wakeup source.
- 	 */
- 	if (PMSG_IS_AUTO(message) &&
--	    (hci_conn_count(data->hdev) || hci_discovery_active(data->hdev)))
-+	    ((test_bit(BTUSB_WAKEUP_BROKEN, &data->flags) && data->intf->needs_remote_wakeup) ||
-+	     hci_conn_count(data->hdev) || hci_discovery_active(data->hdev)))
- 		return -EBUSY;
- 
- 	if (data->suspend_count++)
+    gpio-aggregator gpio-aggregator.1: 0 => gpio 589 irq 188
+    gpio-aggregator gpio-aggregator.1: 1 => gpio 590 irq 189
 
----
-base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
-change-id: 230ba8c9-btmtk-ryzen-remote-wakeup-055a407682ef
+After, this prints:
 
-Thanks,
-Rong
+    gpio-aggregator gpio-aggregator.1: 0 => gpio (null) irq 188
+    gpio-aggregator gpio-aggregator.1: 1 => gpio (null) irq 189
 
+Same results for instantiation using sysfs or configfs[1], although
+the latter does have optional support for specifying the name.
+
+[1] Documentation/admin-guide/gpio/gpio-aggregator.rst
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
