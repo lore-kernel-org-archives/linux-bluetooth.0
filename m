@@ -1,199 +1,182 @@
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA462340A6C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 12:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623CD4048A3;
+	Mon, 29 Jun 2026 13:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782736239; cv=none; b=uKiUqrraS7ePShoEeoIdQZ/RmMjInXmFLQvBFVIrvSa7xN1q5SdKTJsAUSku2tiDYutSyfcOVXLnH0foZsWkq/CTCVaODcU+xkGuG6Kk152ZqU3vDsL6nHOjpEySbVlMuI40bJm7AeuR3T9pFSrJXF7b8HIw6bOV0fryFPDs34A=
+	t=1782738120; cv=none; b=RKyHoUt4rqLVkadFuSOfpnWrKvVcGjBwLx1zM/7DFP2e2TXMYoxOTP5mZqfBc+amuDZcf1XFjlxz2BfH/b7OMS3txBc6jblDpzTpqIuRXXtnHvGSGb0Wz9zKF0TdGFe+bt/5Pt4s1h7nSKSvYcrv8ifeKbirYLpp1LVMsDEQwWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782736239; c=relaxed/simple;
-	bh=WeYcucgW4yQNrRKhrKXC1Fd5Scs55MIH4/3jDe2EETM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=aDobm4o6fZJSUEH01eKu1qlRUlC/yG9Y2cv2urw8IxfecgRiZwe8YN4XYjaVAV7bQ/4LrhejBH2zt04cBMvpaBng4eJgqfYAWGiL2ONMOxpNHhnd7qX90AeeBo3CMYthwcsFJHulfiOi5Fz0lQtYaHmm8g/xca6sshLBCfv8zBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EroNx2H+; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782738120; c=relaxed/simple;
+	bh=PYsU5W5Jszwt6dlzc2hq7qPa4TZSCcC7107VrIfpRq4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=O75/ZikIOE0BwgnbppEklEme7XVRZcHajW584G1onaWQpR4HqfM3KGZkHsNX0CrjBm2QmTO3eN2CnkNWLSi0ZkIak4ZGSqiQSc3y1BAt/FJsor/wqWMllo9XL3L1sq3z4TNfUEqx0vUekSaj9cfyoXSfYMOwQPXYJLnByLxvIL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hvqpG0jG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EroNx2H+"
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-92e602d2c0fso4947285a.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 05:30:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782736237; x=1783341037; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ALm/0rrk6bDPLBvS416GWEWzUW9IAHg4LG2m+vOGZfI=;
-        b=EroNx2H+X8FkDyeBjzDMdQ127ki0jM8qi2B8t6R8x6KlF8TSftuDZ+rlx6mdzEy7vY
-         XZKUv4xN8hcs2Pb9FInXJeLZ7w512gIduq2ZZp0xJPQM8t3wYxYaPw/ljUYkrPvgsVSd
-         NmRa3FAadVtGpl+CElKjBcohP+4pnMBALF5pb0qvswrYYTi9Us+2p1T8JUGbp+nWDTwp
-         q9Zqf1Vuom8RNe1pMrBt1WoFvwDhHugethpacRBhfqzfjkAJEbsU741eji9YgbsqVoFm
-         EM5PPL2hZmjW3/afdscx3Atlo84ay1t0TCrTdAA+QMd9Z1WSHoxgcp4UBAUAOwAeHQ3J
-         wF6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782736237; x=1783341037;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ALm/0rrk6bDPLBvS416GWEWzUW9IAHg4LG2m+vOGZfI=;
-        b=KuTNt+zzsaLgI7jvBzZu70Hr8Xx8vDQ+whiRflTTfn4eGccRSxG58YmAJztAK4zYZx
-         IrI+aLCkaUOytIj9A+XTTP17sOKL4vtBachRCTos+qixUVfe1+OG0/mjV3juAHwIHtXb
-         s9aaXgTUEhEmXPz2GxHt/ypZjtuCC0wk53aHzS01O/hAnDnuBf5u/naYM7upSu5vPXIo
-         blbLSVZwpC3V47ElQeF3ZcAqEJkQkpkdNl26e/H2qs4Jg47ETZ/l7xBRRFl2BvQB8B7C
-         nrLu0CWa8W+zgDWk5a2CWcR1LroiAWVbVe0sW46/AJ11R7AC8K9Mngn4zBodlURQla79
-         jHOg==
-X-Gm-Message-State: AOJu0YwDMrR/1S4eOkxaFSwYo8PNxm9OJAfychCxWeDhELUIeaB2kiC5
-	aBmgXFc9bzssM4LgjWxCxR1sIHsWVm+yN9cbJU/HWm6lw19l6TKD/RS4+L88iA==
-X-Gm-Gg: AfdE7cmCkcTCL2jBugqC0TokaLTptx6CmyUVw01Ln+tmBscW1p6iZnrGML+uGHpYZEM
-	taJ70g5RS+/8rzoQGthrTH5e7WZWhYMRqyRXDYSYBxnwlsWRBgSdUYTHPxIhU2tWx+PfhmFyO41
-	LZsH6MI2nxMnGd7IWLzy26rA+njEe9hP+XWX5SWnFb1yXktmt+ugq37TANDJ2yvQYdFBlA/mK4r
-	fLA9AKjifOZRLToWWWE4YtKRZ7eIk+9HlmcSG0OUktARdTYztO+nRGgwRP9JofKJeCwCpwR+2H1
-	y7D+pKh2ZnzdCIOWA8PleTKDyXkrRAxYYoPgbVFTUyxgz5OcSkyuN+86BrZ53hlY+LJ7zoR3dvD
-	f1Zhd1hqobJVbHrbbw/XjSe4fx/sxstFeMZEpcFIFBLNfSYwK4ociNC0TGfb+nkMRkLaBVAlCtZ
-	UtRMgZvsH87MqpYPSDj5U=
-X-Received: by 2002:a05:622a:3d2:b0:51c:98f:f288 with SMTP id d75a77b69052e-51c098ff87emr12780571cf.25.1782736236344;
-        Mon, 29 Jun 2026 05:30:36 -0700 (PDT)
-Received: from [172.17.0.2] ([68.154.117.36])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51a51a9a3a4sm165915751cf.17.2026.06.29.05.30.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2026 05:30:35 -0700 (PDT)
-Message-ID: <6a42656b.344b9575.10bf6.27a0@mx.google.com>
-Date: Mon, 29 Jun 2026 05:30:35 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3279162272894041785=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hvqpG0jG"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D951FC19425;
+	Mon, 29 Jun 2026 13:01:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1782738120;
+	bh=PYsU5W5Jszwt6dlzc2hq7qPa4TZSCcC7107VrIfpRq4=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=hvqpG0jG9MLJ2LzRp+rQjOaaz2Eq3EHPANMdl3fiXMPXHEnPd/gQv0DdAM+vaUWrL
+	 PCXPlBfinBtSzgfzoBHRJkodUTTLrlmp0alWUQ3pKK9UzDoiYzDK1EDFPfj1Mm9KXY
+	 uvAsQ4kZrhS5I8Ky9Yv8iAJGQQuju1bQ9Vzm/VwmaaBd+gVHUbfHK48wk44fO2K2v/
+	 o+Izd+Wi3mlhCvjih3zSB0cgnMauXwGTtIiQozW/RD8gUn1aFbUPz/+wkxOCZsgW0a
+	 IY9XEHLh5mTAACWekd6c8Ucmwgbxc6dRPyWFjtbUMWPmzdtRyIAom3EINd2aDGrAoF
+	 BgfHNhV/P4ygA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B70E0C43458;
+	Mon, 29 Jun 2026 13:01:59 +0000 (UTC)
+From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
+Subject: [PATCH v2 0/6] Add support for IPQ5018 Bluetooth
+Date: Mon, 29 Jun 2026 17:01:43 +0400
+Message-Id: <20260629-ipq5018-bluetooth-v2-0-02770f03b6bb@outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, loic.poulain@oss.qualcomm.com
-Subject: RE: Support for block device NVMEM providers
-In-Reply-To: <20260629-block-as-nvmem-v6-1-f02513dcd46d@oss.qualcomm.com>
-References: <20260629-block-as-nvmem-v6-1-f02513dcd46d@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============3279162272894041785==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/32PwW6EIBRFf8WwLhNA0WKaZv5jMgvARyUjMgKSa
+ Sb+e1H33bzk3uSdk/tGEYKFiPrqjQJkG62fS2AfFdKjnH8A26FkxAhrScs4ts+FE/qJ1bRC8j6
+ NmLTGtK0WQ8drVP6eAYx9Hczb/cwBlrWg01kiBzHKA91XXyeZskL0+oFlxHN24HDmmGDBgaiaG
+ GMEufoYL8sqJ+2du5TzvduUjID3xqa+agYqVc0ao1WHdvdoY/Lh95iX6SH/Z0mmRTkIIRQQII3
+ prn5Nk/eP3Ybu27b9Aaa7V0AwAQAA
+X-Change-ID: 20260625-ipq5018-bluetooth-06ff66c9d753
+To: Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulfh@kernel.org>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Johannes Berg <johannes@sipsolutions.net>, 
+ Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+ Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+ Rocky Liao <quic_rjliao@quicinc.com>, 
+ Saravana Kannan <saravanak@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konradybcio@kernel.org>, 
+ Mathieu Poirier <mathieu.poirier@linaro.org>, 
+ Philipp Zabel <p.zabel@pengutronix.de>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
+ linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+ George Moussalem <george.moussalem@outlook.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1782738117; l=4779;
+ i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
+ bh=PYsU5W5Jszwt6dlzc2hq7qPa4TZSCcC7107VrIfpRq4=;
+ b=xqRVC4qJa5oodNX6Ol6uwLIBboUPhmbP6yhabpjphXDQKdvx+gDmVBXZlPpYq5TIMrRJ0BSKN
+ hPwQcE5UKDcCAW/rY7s3lUNt6t/Ec4gVcxz3Q3LmUia12HPLJoDb7Nu
+X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
+ pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
+X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
+ with auth_id=364
+X-Original-From: George Moussalem <george.moussalem@outlook.com>
+Reply-To: george.moussalem@outlook.com
 
-This is automated email and please do not reply to this email!
+Hello,
 
-Dear submitter,
+This patch series introduces Bluetooth support for IPQ5018.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1118019
+Bluetooth firmware is loaded by the host into a dedicated reserved
+memory carveout and authenticated by TrustZone. A Secure Channel Manager
+(SCM) call safely brings the peripheral core out of reset.
 
----Test result---
+A shared memory ring buffer topology handles runtime data frame
+transport between the host APSS and the Bluetooth controller.
+An outgoing APCS IPC bit and an incoming GIC interrupt handle
+host/guest signaling.
 
-Test Summary:
-CheckPatch                    FAIL      13.40 seconds
-VerifyFixes                   PASS      0.36 seconds
-VerifySignedoff               PASS      0.37 seconds
-GitLint                       FAIL      8.96 seconds
-SubjectPrefix                 FAIL      3.60 seconds
-BuildKernel                   PASS      26.23 seconds
-CheckAllWarning               PASS      29.02 seconds
-CheckSparse                   PASS      30.50 seconds
-BuildKernel32                 PASS      25.34 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      472.18 seconds
-TestRunner_l2cap-tester       PASS      59.46 seconds
-TestRunner_iso-tester         PASS      78.71 seconds
-TestRunner_bnep-tester        PASS      19.19 seconds
-TestRunner_mgmt-tester        FAIL      215.99 seconds
-TestRunner_rfcomm-tester      PASS      26.36 seconds
-TestRunner_sco-tester         PASS      32.71 seconds
-TestRunner_ioctl-tester       PASS      26.51 seconds
-TestRunner_mesh-tester        FAIL      26.18 seconds
-TestRunner_smp-tester         PASS      23.02 seconds
-TestRunner_userchan-tester    PASS      19.78 seconds
-TestRunner_6lowpan-tester     PASS      22.58 seconds
-IncrementalBuild              PASS      82.18 seconds
+This series has been tested and verified on various IPQ5018 router
+boards utilizing firmware extracted from GPL distributions, using both
+mdt and mbn file formats.
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v6,5/9] block: implement NVMEM provider
-WARNING: please write a help paragraph that fully describes the config symbol with at least 4 lines
-#211: FILE: block/Kconfig:212:
-+config BLK_NVMEM
-+	bool "Block device NVMEM provider"
-+	depends on OF
-+	depends on NVMEM
-+	help
-+	  Allow block devices (or partitions) to act as NVMEM providers,
-+	  typically used with eMMC to store MAC addresses or Wi-Fi
-+	  calibration data on embedded devices.
-+
+[   14.781511] Bluetooth: hci0: QCA Product ID   :0x00000016
+[   14.781583] Bluetooth: hci0: QCA SOC Version  :0x20180100
+[   14.785926] Bluetooth: hci0: QCA ROM Version  :0x00000100
+[   14.791546] Bluetooth: hci0: QCA Patch Version:0x00003ded
+[   14.796698] Bluetooth: hci0: QCA controller version 0x01000100
+[   14.802217] Bluetooth: hci0: QCA Downloading qca/mpnv10.bin
+[   16.393850] Bluetooth: hci0: QCA Build Info: BTFW.MAPLE.1.0.0-00102-MPL_ROM_PATCHZ-1
 
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#233: 
-new file mode 100644
+Best regards,
+George Moussalem
 
-total: 0 errors, 2 warnings, 174 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14649785.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v6,9/9] arm64: dts: qcom: arduino-imola: Describe NVMEM layout for WiFi/BT addresses
-
-1: T1 Title exceeds max length (85>80): "[v6,9/9] arm64: dts: qcom: arduino-imola: Describe NVMEM layout for WiFi/BT addresses"
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.248 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.459 seconds
-Mesh - Send cancel - 2                               Timed out    1.990 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/366
+Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+---
+Changes in v2:
+- removed unused struct member btss_reset from m0_btss struct.
+- used devm_reset_control_get_exclusive_deasserted to acquire and
+  deassert btss_reset in one call. No need to explicitly assert upon
+  unbind since devres will handle it.
+- As per Bjorn's comments, collapsed the rproc and BT driver into one
+  which now handles firmware loading and transport.
+- As per further review comments and above change, squashed the two
+  devicetree bindings into one to represent the Bluetooth controller
+- Added new SCM call to drive Bluetooth power modes. Based on testing on
+  more router boards, this is required during start/stop sequences to
+  avoid the controller hanging. This is only supported on relatively
+  newer QSEE versions, so the SCM call is checked for availability
+  before use.
+- Refactored resource lifecycle management in the driver so that IRQ and
+  work queue are managed at the driver level (probe/remove) while FW
+  loading and powering on/off the controller is handled upon hdev
+  open/close.
+- Consolidated TX send functions for custom IPC and HCI frames into one
+  and solved a potential NULL pointer dereference issue under TX
+  pressure.
+- Replace code to load and initialize firmware metadate by existing
+  qcom_mdt_pas_init function. 
+- Solved an off byone calculation error in the RX parser.
+- Added entry to MAINTAINERS file
+- Link to v1: https://lore.kernel.org/r/20260625-ipq5018-bluetooth-v1-0-d999be0e04f7@outlook.com
 
 ---
-Regards,
-Linux Bluetooth
+George Moussalem (6):
+      dt-bindings: net: bluetooth: Document Qualcomm IPQ5018 Bluetooth controller
+      Bluetooth: btqca: Add IPQ5018 support
+      firmware: qcom: scm: Add support for setting Bluetooth power modes
+      Bluetooth: Introduce Qualcomm IPQ5018 IPC based HCI driver
+      arm64: dts: qcom: ipq5018: add nodes required for Bluetooth support
+      MAINTAINERS: Add entry for Qualcomm IPQ5018 Bluetooth driver
+
+ .../bindings/net/bluetooth/qcom,ipq5018-bt.yaml    |   86 ++
+ MAINTAINERS                                        |    7 +
+ arch/arm64/boot/dts/qcom/ipq5018.dtsi              |   25 +-
+ drivers/bluetooth/Kconfig                          |   11 +
+ drivers/bluetooth/Makefile                         |    1 +
+ drivers/bluetooth/btqca.c                          |   16 +
+ drivers/bluetooth/btqca.h                          |    3 +
+ drivers/bluetooth/btqcomipc.c                      | 1052 ++++++++++++++++++++
+ drivers/firmware/qcom/qcom_scm.c                   |   49 +
+ drivers/firmware/qcom/qcom_scm.h                   |    1 +
+ include/linux/firmware/qcom/qcom_scm.h             |    1 +
+ 11 files changed, 1251 insertions(+), 1 deletion(-)
+---
+base-commit: 4d1ab324fcb7d20df5a071edb0304461846fdc12
+change-id: 20260625-ipq5018-bluetooth-06ff66c9d753
+prerequisite-message-id: <20260612-block-as-nvmem-v5-0-95e0b30fff90@oss.qualcomm.com>
+prerequisite-patch-id: 6ce8686c1683f468d86b4502f5ec9d19c392a382
+prerequisite-patch-id: e362f7fcbacff716b7ef720e6780786a7d88c013
+prerequisite-patch-id: 9168930e40551e842c8171d5433a6f39ad4b78a4
+prerequisite-patch-id: 64fecfbd1e085d7d2ab0ae23295ca34ec8e14c5e
+prerequisite-patch-id: 566804aaa690ee9aa285d0fd75fd16d94fbadebf
+prerequisite-patch-id: dc18bec338f54b3051f4523f9d1d3c0566a20ccd
+prerequisite-patch-id: b6b3eb46429936ab49423d295433daf47981db0f
+prerequisite-patch-id: 75caa99e3bbcdf41b6462b9f5f703bea1d4a65fa
+prerequisite-patch-id: 35e9968f482f78ca233eb0306d9c5fdbff093175
+
+Best regards,
+-- 
+George Moussalem <george.moussalem@outlook.com>
 
 
---===============3279162272894041785==--
