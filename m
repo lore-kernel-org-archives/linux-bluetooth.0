@@ -1,62 +1,62 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE6931352A;
-	Tue, 30 Jun 2026 19:04:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D547A340A6A;
+	Tue, 30 Jun 2026 19:10:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782846296; cv=pass; b=iZDFtt6T5RCdmxh5D7fZh9xmrREeXXE3QRJ/Jbvbs8RhewV/7xpqm/AG/05E2Noemd991RylN2omHZD2hW8aixj9ebzDAcKacf5u7kf12nPqV9qPGZcUGBQl6QTN/Ar3zQRiPSF1vdWS+gxHWhP9o56+EPkteGhm6ptfjP74oB8=
+	t=1782846648; cv=pass; b=L+pxFfLs8zx3mgEes6tsrquoKHKheo3F4PbdnHDNe4euEPo6JuIx2quPgWcBxammWxaG11Tx9POoXnajFR3QcXGy6BmfVOywXIt19Ch8fRR96R8twW8NmLe6GB4mIusx6M5kIQ+bctb3XdS4SPhgpOGqMziW1djsCf7Nu6Zs8d0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782846296; c=relaxed/simple;
+	s=arc-20240116; t=1782846648; c=relaxed/simple;
 	bh=y8gjwL4/a7r6fz2NBmkQNw0OT2SQaXgTU1f2/kLWodI=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=h1Rhk4tFgI5uPD2ZkCAvMuVvQzn+I3pvz3EE9h+bLolUGp8Vh9ulmHXsvA6wnYgUG3Xs6i+kTuH5AxG+B9+8DlMwMZD8uKO5dDYud1Sa2wu4WRvGOa82EzOTrl2mHO+v0Ai5QfeGXXF4AEqhq0cWPigVEB9fZE401s9uP7EpWck=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=U9zsjtI9; arc=pass smtp.client-ip=185.185.170.37
+	 Content-Type:MIME-Version; b=qwOhKz0h6oQZUqb4lvAvyCF8UKbMVLUCqhviNT80qLd7IL4HVjxfADDTTy8sThichFdGUnr1MlHZpSHl+Dx+WEJ+iFrpw4I2uGWXRBP8nLwhDGnuAPk62Fka1tU3FkXWP6RMdhV/gLJahA1YOvlw3e5mecvr5859Wz+Bfe83ft4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=sVbSxewj; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="U9zsjtI9"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="sVbSxewj"
 Received: from [192.168.1.196] (unknown [IPv6:2a02:ed04:3581:4::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1)
+	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4gqXdV11hbz49Q3y;
-	Tue, 30 Jun 2026 22:04:46 +0300 (EEST)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4gqXdH2lv8z49Pxd;
+	Tue, 30 Jun 2026 22:04:35 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1782846286;
+	t=1782846276;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
 	bh=9nbJpUGpEw2+GCtoobGilrwfIs0Msy8sz0H9ItOrRc0=;
-	b=U9zsjtI92lkGRQtNmnXNuKLHTUaFa/eG3/eWNRWW5ROVMINrAec6ijB/PgtCxQTcmHt0N5
-	bRLQShPDKeOkqIDNzwFGiSHOX+hXWAA1rWs+EvlHr7i0PLIRu+kf7XQYKW4UcOja87F0/G
-	r+/aHt5jl2+9KGo9irkxh+m106YrTPc9VCJv7/zvzeHgh3kz1At5CLOpBEjUBFzZP5irzM
-	qXv1QOMDROGC3+25WXXRc7sK1iFY1UIb8iGlRJ1WRmc74+eOvzDBCyGJIlvVkmIaNN3anY
-	aVDox45mCveu7b1vupmxPUCtRDxEIUwkC8PEC5vfmw+V0P3Cd1MHg7p30/JZUA==
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1782846286;
-	b=hU7PjWfts35JivyyI77dM4pBMN+CxYrAt6rK88meXkphQ/r9QU5akhjRVxCx2LJmO0LtpT
-	MOe+kedAFSO+wAjsiVVHBLgwZXDG4R3VN7VaDuatsEtRswG4uO0b8C9IqoJFlnHjNVupyB
-	/2pExqGKvL1KBvr6qfsxUVBtkEGRZLhvbECBbxmL135u1OadsR83ITuPvowHx5e3OkimkG
-	iYfD7Bl37FI0T9y0nVt2XHbwUpkdiQdrS+MfQsL7HaAMUU5Z7+pWlefep41JulyWu2iowk
-	0aj7wGbk9PhDFFeiLqkcR99lZd4TdttdZipwg4z7FMioMgP2cIisQUv6s0eAiQ==
+	b=sVbSxewjzxdu4QcO1AOPDqbYJ5sG9ZaoRD/C1QW+PjTM4AdsELTt6FQS/8H0S7zTcuT/87
+	8US6m/jzpmrDL5ccYeC/PYU/JYCzBLYIMMjAFndvwu9MKkHwB+fiVnXsBTpDtmh0S5Wu5V
+	4pmrI4WIZlGh6RouVfFp2mpNB6A07p2q+b7V4YiQwa7lTEemJFxiseCY2uNmsMM5eYxka9
+	G66BCl4IZz9DHxpULQlt7Z9x0a4Zv3Fue2NF6jGxVnonbOIXTwQotEYJHfBSaGgW3GX2K7
+	8V4PRRf1Ubutwd+GCXMAv15alneB5b67IfAWkPnI2XazNp9OQoSN2ZmaX+phQQ==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1782846276;
+	b=gORSEL7bIlD0813SnxvGS15b9J/Ep01Cbabajy62379/vEu19coc/OQDpDIvluklHvPc9R
+	eWLBw7zVTq3KO0nGrPh0Hmsa9hgD69h7nvkx5oemoQeXTK4YMoUo88Fq3qmXMx2aMiByUZ
+	F9cBecbm0VhHA2EFkjg0nQc0TEYhNSAu91GBuluNtGUYoEfVscPc8R7cgHOFWOpzc5Q30m
+	r7NZBQPs+fNksz+AXqiD58S7uJPT3Ai+urbKjwi4Um+/PwW4anPjsG1gLOVBZtnBtxif5N
+	YvZVzhOm2J0qHKDZG+3RjAbGZL4CWDVeCwHP+/2bIr90yvjew8/yaaO50X4jbg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1782846286;
+	s=lahtoruutu; t=1782846276;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
 	bh=9nbJpUGpEw2+GCtoobGilrwfIs0Msy8sz0H9ItOrRc0=;
-	b=gFoL0iJa4OsMUPqJd33gCbFRf0AZVUUVTCwhikcZOlavSTZZK5ruomHSU81ZLXugFbm1Wb
-	vwLcwOK731M4p7koiH7Cg0PZlB2iTT7l4/VXTqeDoN137MHkEUWWEh+XBEDmlEAabEXV2Y
-	lKPVgDD79pNkcInlLpG+3x3pgSeTCJzfukBKl2zFGPJj6N3FafNrXK46940MjZwuadu+f0
-	SdZgs6P0/5k8Z70Gd5OJb1D03y/KvN4q4lXtrbtqAV1NBQggwnYbeoYeU8niMy2Qqgb+y6
-	ZJoUkOk3HPMyY3g14dA+tSs4gmV9WAFel/lmWM5BOyR1jQIdPyvqF3eKtCmlqw==
+	b=wZCFhFSucDMip6fhNNdS8R2hRnpz+Unz5FCZgcFYbYsf82bWAAPHgbdvruj2ReSSKck/95
+	Kgp+6lbTk8gHww9iW7OAgBOVvZlRXt8zU3mPt8FlmZWYlU0XUxV3wHq6ipYwujAuA/ywKN
+	CTJ4tIJ1iG8nb6VVlWjQR2rtaoep7HfU9t/lyFZixEmOF6CCol0FxrGirsGJ5wfegnMVOy
+	WgiqWD2Ad/j7tZEzt7kaoZqx4KRKqITpDFT92haUI7JfjQ1tOMJOzvK5TfWCdsb6ATlW7m
+	nMiLXUyYgAjE4c7VfQApd8l9k05Egypjom++hSUactMQJ/1mN8LGooRXbxGS2A==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <54780f64cf658a0ef53b7116076cb4406a0f666c.camel@iki.fi>
+Message-ID: <e69f21b1ea68ddba54f43430b7c50e2c13bfbac6.camel@iki.fi>
 Subject: Re: [PATCH] Bluetooth: bpa10x: check response length in
  bpa10x_setup()
 From: Pauli Virtanen <pav@iki.fi>
@@ -65,7 +65,7 @@ To: Weiming Shi <bestswngs@gmail.com>, Marcel Holtmann
 Cc: Johan Hedberg <johan.hedberg@intel.com>,
  linux-bluetooth@vger.kernel.org, 	linux-kernel@vger.kernel.org, Xiang Mei
  <xmei5@asu.edu>
-Date: Tue, 30 Jun 2026 22:04:45 +0300
+Date: Tue, 30 Jun 2026 22:04:34 +0300
 In-Reply-To: <20260630062759.2769059-3-bestswngs@gmail.com>
 References: <20260630062759.2769059-3-bestswngs@gmail.com>
 Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
