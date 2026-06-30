@@ -1,159 +1,101 @@
-Received: from out-44.smtp.github.com (out-44.smtp.github.com [192.30.252.143])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB7C2F8EA3
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 11:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.143
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A74E34751E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 11:40:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782819313; cv=none; b=R+kG9IQ7id4+ugsgLQzPvOe0ZJ+qfhiTILvL5cL2pvrue/PdViK983Ti0LkcgnTG+vyc3oNeyRvfwOMWfTPsJXkqK7kkcPJW1t9pBos8M7ojQe73L7gu72c/MWFjM3vDDyP5UPiV0RJiDt67TjIqB4iqBE2QzJ7hvxpgPPcqWyw=
+	t=1782819620; cv=none; b=pqzWNRBaRZEP0Ga35S1CVHk7YvEzSpCir+kO7WrTA1Lhlf2fjAUroKZbsGj7Aowcp9b8EHctHAFqkhD8qBDTVkm6AuksMpsiIpQGCFnjIMTLpbHYcd0vnB11IFJbZul5N+PzXs2iviNwPOsWbJ2CJQQul9vdeKS+O62jjqkYrbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782819313; c=relaxed/simple;
-	bh=sE4NE2U8g+BEema2Ec/FnSH8mmBpGlxAbtrP7yBcZdU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=IcFwdSqYHLcHfvPowortI69ARN4jz17rzcvO7yHLtnwNIQsoSjemPn4gC0gfbJBHPRDugi0B0l7xAobjNDMc04yHbk4WySYUV7+AJplYcsR6IpWtnEQF0kBebv2aQhnpl/LPWpUWcjVZYViQZLmdjhE/PAjCOhjiLnBntc3Xqpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=PteaLd+Z; arc=none smtp.client-ip=192.30.252.143
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1782819620; c=relaxed/simple;
+	bh=yAjdB83FN3IFOEN20ILrTVy63n7zFcAyeg0cTILLgRE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=csYzWD/FrpBePsjcb2JjX+iWDynS2EkTGTyFS5x6MZCHpIrv+SKAUPPhxdfWABp5pzWLTEfYIuHaOjJCgjdkDnQxmx6KV5hroVq4mB01TXOhpD+QOKeC89YSmPqhJIeBYEk5tWy7bDvZf2O1mqWCB+YgCOHdrz52qEOJOycwzZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N9cbfQb4; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="PteaLd+Z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1782819310;
-	bh=xUC6ojuX7X141ZxhaVBjHo+ZKZt9LFgQcLqmM9lQpAY=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=PteaLd+ZuarK8GkVxFKMCGrANziuVfzrJe13opVruOZtSfeNhGg9VfqHrjrRWMUTd
-	 oqaK2VySACMMmfZQk14VhzpNlEUlq/q6bwgcFtTxLdBR88cUYXTR87c6LHZJH8W54L
-	 A9q/bboDwPPfwnDduyAVLUG5MVnI6b/yaJMN0slQ=
-Received: from github.com (hubbernetes-node-e1ae6ae.ash1-iad.github.net [10.56.164.42])
-	by smtp.github.com (Postfix) with ESMTPA id AAD148494EC
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 04:35:10 -0700 (PDT)
-Date: Tue, 30 Jun 2026 04:35:10 -0700
-From: Bhavani <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1118869/000000-9d4da6@github.com>
-Subject: [bluez/bluez] 801a5c: shared: remove default settings params from
- bt_rap...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N9cbfQb4"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-92e501244f5so111057485a.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 04:40:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782819618; x=1783424418; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=yAjdB83FN3IFOEN20ILrTVy63n7zFcAyeg0cTILLgRE=;
+        b=N9cbfQb4NGrM4UVlu7+z5ACWPhxaewXMVZKhA6N63nHQ9enXLGPY88rbLq/kHAAub8
+         nXTz+3StdrNknI883F9y7mkKa+nUWtGhpjGhyGL28EV7Q+TsEM3P8CZGEw1EnVDARwk1
+         QLutuZ35GKrBPz25ThkTe/RxGs8o691Y0fin6VyjoE17Mbt4gA4m9sWgi5q3J0GSg2cH
+         AwldQQbKNo295TQCTazr/HU2JV1l4QYJtfOnpcMfZoCeyB/D574CU966ziOR/pb9Zg/a
+         e9BbYhNISn1LUf4iWzEWbQ/WrUzEH5Lhe/eu1zZ+Yqxx6s/yxauOs6iZNJ81DnA/wbTb
+         PzOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782819618; x=1783424418;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yAjdB83FN3IFOEN20ILrTVy63n7zFcAyeg0cTILLgRE=;
+        b=N8a8Ji33bR1xgERNNRE03ESgdVmUEm07MlPK2D1uQBGXx8yu0qs8PbzRkk5ub+iR2s
+         kvTvUaZCOC93GLlPQe7255DGnudh12poWonuIX/wMAVlnJB9cCuHTrotxH6zfT0ftpcT
+         4ieHnZTc4L+1F8yPki0TJf1UYM2FOsjwKbdzvxG0ag131EfIC1g6O+FfeCNqTAx+XICg
+         +vferEHjMwYn5BVbofI5CugB2othbZJJG5FUGNAOGmYrg7lNCtjphAEQHG5JKIkKK8mz
+         VmX7ozpd7xyAIadqdL9x5qKQkrA+LqGVkpljOU7vFLd1lCjYBWyIczDbNsqidwPdNIY/
+         asvw==
+X-Gm-Message-State: AOJu0YxnLPa+vI+7vWhfQSmBtDGwtX7Tymisu/aOwoPkOGIg3cU1CqUw
+	olno7mWzg7M49BeDwAyTypGal6+EFZPRrMyxRY+W8G2vRWag9A+Rn2omFo2fgA==
+X-Gm-Gg: AfdE7ck190XCK/0MNPlXz5MXaZnNnO5gL7BjAaMPfWtwEQYvpspW12+2HF7apWucrbn
+	rpaCxpFQeduZOVPbrds3on63CFZK8GzRB0Tlrw/DvGHKBtS9sBalQNfmtTPr8ltxnbZjgMDLlGi
+	ln/20iSS88Le8adUJjpdR3B8fvSibb26QNV3defeQLbxwquKV+QDMOfbf2EADTuRi4QRcr24cl5
+	Udy9eRV2jvBIJLtCTM8Ha3QRj3R6Jm8XmJKBFolNd+wEmoNXIU8FGEbTAaRz8OHY9vW7Hx2rqpK
+	KLKs3Ix/x/5sTXoYjRqMVtJYoR7rmCfOYWQT/KUPYvZsN69tj4us+n6tFjpNPRC5W/W1C++Rgup
+	pwoFxHi5CKEha3/zBqLC4HvJ9Oveh4Dn0eoF6JM9hAjoGhHd/mvjak4W5d7vD1FN5WFYR5/TuY4
+	vRUlqUSyQ7XW3sxRlMkLw/
+X-Received: by 2002:a05:620a:3713:b0:92e:5936:f661 with SMTP id af79cd13be357-92e624632e1mr499776285a.4.1782819617982;
+        Tue, 30 Jun 2026 04:40:17 -0700 (PDT)
+Received: from [172.17.0.2] ([64.236.153.145])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8f1a27e64a9sm22312316d6.4.2026.06.30.04.40.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jun 2026 04:40:17 -0700 (PDT)
+Message-ID: <6a43ab21.3c73b6eb.18ca87.de51@mx.google.com>
+Date: Tue, 30 Jun 2026 04:40:17 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0438628472941474351=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, sherry.sun@oss.nxp.com
+Subject: RE: Add PCIe M.2 Key E connector support for NXP i.MX boards
+In-Reply-To: <20260630103139.3823329-2-sherry.sun@oss.nxp.com>
+References: <20260630103139.3823329-2-sherry.sun@oss.nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============0438628472941474351==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1118869
-  Home:   https://github.com/bluez/bluez
-  Commit: 801a5c4d9c6fe13bf6e73e04a3b40c5a8fad7c8d
-      https://github.com/bluez/bluez/commit/801a5c4d9c6fe13bf6e73e04a3b40c5a8fad7c8d
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-06-30 (Tue, 30 Jun 2026)
+This is an automated email and please do not reply to this email.
 
-  Changed paths:
-    M src/shared/rap.h
+Dear Submitter,
 
-  Log Message:
-  -----------
-  shared: remove default settings params from bt_rap_attach_hci
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-role, cs_sync_ant_sel and max_tx_power were passed into bt_rap_attach_hci
-but these are CS default settings that belong to the measurement session,
-Callers need to set them via bt_rap_set_default_settings_params() in
-start_measurement where they belong, alongside the other per-session
-CS parameters
+----- Output -----
+
+error: patch failed: drivers/pci/controller/dwc/pci-imx6.c:1382
+error: drivers/pci/controller/dwc/pci-imx6.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
 
 
-  Commit: 66fd6c144600296a291bf54be58b9baa110d9e62
-      https://github.com/bluez/bluez/commit/66fd6c144600296a291bf54be58b9baa110d9e62
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-06-30 (Tue, 30 Jun 2026)
-
-  Changed paths:
-    M profiles/ranging/rap.c
-    M profiles/ranging/rap_hci.c
-
-  Log Message:
-  -----------
-  profiles: update bt_rap_attach_hci call to drop default settings args
-
-role, cs_sync_ant_sel and max_tx_power are no longer passed at attach
-time. They are applied via bt_rap_set_default_settings_params() in
-start_measurement where they belong, alongside the other per-session
-CS parameters
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: af7b71cf565f5fcfc3c8302b6adc6c6aa215586d
-      https://github.com/bluez/bluez/commit/af7b71cf565f5fcfc3c8302b6adc6c6aa215586d
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-06-30 (Tue, 30 Jun 2026)
-
-  Changed paths:
-    M src/btd.h
-    M src/main.c
-    M src/main.conf
-
-  Log Message:
-  -----------
-  rap: remove CS default settings from main.conf
-
-role, cs_sync_ant_sel and max_tx_power were configurable in main.conf
-and parsed in main.c, but these are per-measurement parameters that
-callers supply via StartMeasurement
-
-
-  Commit: 15ba2adfd3d757bc88088854295242c3cea80e40
-      https://github.com/bluez/bluez/commit/15ba2adfd3d757bc88088854295242c3cea80e40
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-06-30 (Tue, 30 Jun 2026)
-
-  Changed paths:
-    M src/shared/rap.h
-
-  Log Message:
-  -----------
-  shared: replace the wrapper API
-
-Replace API bt_rap_attach_hci_v2 with
-bt_rap_attach_hci which has less parameters
-to avoid compilation error for individual patches
-
-
-  Commit: 88e942cc79b1fe19ec5f0ecd8325f09fdf10424d
-      https://github.com/bluez/bluez/commit/88e942cc79b1fe19ec5f0ecd8325f09fdf10424d
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-06-30 (Tue, 30 Jun 2026)
-
-  Changed paths:
-    M profiles/ranging/rap.c
-    M profiles/ranging/rap_hci.c
-
-  Log Message:
-  -----------
-  profiles: replace wrapper API
-
-replace bt_rap_attach_hci_v2 with bt_rap_attach_hci API
-which has less parameters to avoid compilation error
-in individual patchsets
-
-
-  Commit: 9d4da6e27b6cc928ca041f31e514b4952fb0613b
-      https://github.com/bluez/bluez/commit/9d4da6e27b6cc928ca041f31e514b4952fb0613b
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-06-30 (Tue, 30 Jun 2026)
-
-  Changed paths:
-    M src/shared/rap.h
-
-  Log Message:
-  -----------
-  shared: remove wrapper API
-
-Remove bt_rap_attach_hci_v2 wrapper API
-which was added to prevent compilation error
-in individual patchsets
-
-
-Compare: https://github.com/bluez/bluez/compare/801a5c4d9c6f%5E...9d4da6e27b6c
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============0438628472941474351==--
