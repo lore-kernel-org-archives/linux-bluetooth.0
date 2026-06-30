@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6B3395AE2
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 19:35:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247273C108A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 19:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782848135; cv=none; b=Y0aTukh64JHcBFUMQXlGK9hFdIPN+rLpavZLd7vuQliaKqFFSO9yQ4U4cBspvJjZyjkqYotIXx8RIjMTPTnrxUw9lcMpCAXBxOCl7nKaPxRDUeP7L5y3rIB99Zl4QZa64rupnw5a9h4Ib9z5qoqn85zCMqo2AskeOb0b2usWCqk=
+	t=1782848173; cv=none; b=ID6ctIdEk7F/rvHjBC7OcLpPTG4e0REcM8Vzhb6JrMvr9KtZZnRvsIodNYKyqa0je93qZxlusw3+aOfuBuF5Q6TVJ+5JQn73TnJtx/5Xdd+yy3pMwm6J5IxOpm8/NKqkIJgKJvZkjzUmURoWQ+3kFe8jLmUxIKJZMsks8uVtrgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782848135; c=relaxed/simple;
-	bh=KkaQn3u1O7hSkJHCbaNpxfhIeOrMJIhBahokqneFLcc=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=jaK0r84n5rLhX5suU5apexF8zZJ9q2CAOXEPZ8IGiWgQZlebEN6MtAnAHbrcv8nenXOnO0ZqXkF5yNZZdGhzNiujvQbk8FoQAOigUVAlSUoSd8rTvTPCcAcJzxrolQf33OQzmK8vD9jhH5IoivYqJOlOBffSiVp4ST0qIMyDQWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kng5Lehs; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1782848173; c=relaxed/simple;
+	bh=Mg0q3O8+E+xEqYDLQuBbkdOGVb9IJ57JrlWGnraZ9V8=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=a8JcOIRzvcJPRYwdMM4InVIJcjTjPIfhdDUsNk/4sbwfOp0KfF8a1Tsoq164k/CnlpMNPwr5dN/iDn8mcdVYW2fTsbNPA2xpF1iqkwiLI7Y5he53IBUl8HwHzokoG0XidicfwhCO8MZlUs5vVeQP4Yn+miqr+/Y9jYBMExx81z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=asMQ1Sc6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kng5Lehs"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A57E2C2BCC6
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 19:35:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="asMQ1Sc6"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id ECA5FC2BCB9
+	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 19:36:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1782848134;
-	bh=KkaQn3u1O7hSkJHCbaNpxfhIeOrMJIhBahokqneFLcc=;
+	s=k20201202; t=1782848173;
+	bh=Mg0q3O8+E+xEqYDLQuBbkdOGVb9IJ57JrlWGnraZ9V8=;
 	h=From:To:Subject:Date:From;
-	b=Kng5LehshYdo2qYS/APAH+++diJKw+zUEWrF/AaW4uMyjvH1VG3UVcYx3MMZuqRTr
-	 lXQyb6pyAK51JLnENU6J6tpoGCFnT2PHAz/PL+hEXY1VFO6rYmdkOLRx4PdfgPGoTe
-	 31sClbBFsUElpt7c+JRjADFdCtxnqLYUmFo8yP+NoX6k7LvWy/vLLCWtEyP8qrw5UI
-	 pFXOWe89FH66rSg9vAdKKwBCXWW5P02mBT0AA8BsditKNjTad7FLyqkEXDD/QGs81X
-	 ZSNMZ8Hg3mOsy5rr8s1Ms/itEeYFVpF/uXIqLJBe21CvMazZ+HtrYXp2NsUos/HKrl
-	 mTclVc1ID7vtA==
+	b=asMQ1Sc63c77E6QsvGjhtLaYuh+3cWktwVHn7dFFh+bpsirhsRLL/xMtTijPfpMNc
+	 cb7t8H0G2D25yp7fUliyR99TLBXjM8AgUwVAzGcLYrVdDliqGDnR5FN36f06WdxAJm
+	 BtNQ7pYznLAyMsx/9nm06tXVZqGzLRS/vKBwyk8nAPcya22MmFRStkfSaVuuNQ8fV1
+	 t4QtuPe+E8swhLGUihwyW+we2nv9ueyJmIOF1/0odVBw9yMv8UlutZRz2/YH0JkiSa
+	 zeZ78Jq2qHNH/U9t3lOKK5z4zjWmJpkJdKxEZuc+TQNTW9DgYZxKBsYVUcSW2uVmqs
+	 qSOcD4ivb0ztw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 7AC20C41612; Tue, 30 Jun 2026 19:35:34 +0000 (UTC)
+	id DA96DC41612; Tue, 30 Jun 2026 19:36:12 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: =?UTF-8?B?W0J1ZyAyMjE3MDZdIE5ldzogYnR1c2IvYnRtdGs6IE1UNzkyMSBC?=
+Subject: =?UTF-8?B?W0J1ZyAyMjE3MDddIE5ldzogYnR1c2IvYnRtdGs6IE1UNzkyMSBC?=
  =?UTF-8?B?VCBhdWRpbyBmYWlscyBhZnRlciBzdXNwZW5kL3Jlc3VtZSDigJQgc3RhbGUg?=
  =?UTF-8?B?QUNMIGNvbm5lY3Rpb24gaGFuZGxlIHJlcXVpcmVzIG1vZHVsZSByZWxvYWQg?=
  =?UTF-8?B?dG8gY2xlYXI=?=
-Date: Tue, 30 Jun 2026 19:35:33 +0000
+Date: Tue, 30 Jun 2026 19:36:12 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: new
 X-Bugzilla-Watch-Reason: None
@@ -51,7 +51,7 @@ X-Bugzilla-Flags:
 X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
  op_sys bug_status bug_severity priority component assigned_to reporter
  cf_regression attachments.created
-Message-ID: <bug-221706-62941@https.bugzilla.kernel.org/>
+Message-ID: <bug-221707-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -63,9 +63,9 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221706
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221707
 
-            Bug ID: 221706
+            Bug ID: 221707
            Summary: btusb/btmtk: MT7921 BT audio fails after
                     suspend/resume =E2=80=94 stale ACL connection handle re=
 quires
@@ -82,8 +82,8 @@ quires
           Reporter: sandeepmahendrakar11@gmail.com
         Regression: No
 
-Created attachment 310396
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D310396&action=3Dedit
+Created attachment 310397
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D310397&action=3Dedit
 Attached: dmesg output (bt-dmesg.log) and lsusb -v + uname -a (bt-lsusb.log=
 ).=20
 dmesg confirms the reported issue and shows additional detail: alongside the
