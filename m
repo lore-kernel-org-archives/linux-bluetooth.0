@@ -1,295 +1,212 @@
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C78552580E1;
-	Tue, 30 Jun 2026 19:15:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F26B202F71
+	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 19:33:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782846950; cv=pass; b=bQViMmfKPYjiMVJEdHkaftD62iRrXlQC/WFOGxIdmKirl62GOVSB/5SDuvFHGn/4WNElVDApI5Pcz5gZ79wZfpAMyArZDnww+Dx/9ubhh7X5ttEKhwOsHimANWHxlw3g6gc7lW+Q00olM+Yl/vyMMbx3YntCW6oW5rnx2g5RVIw=
+	t=1782848036; cv=pass; b=Ud6+9/ul/JUl0QSJt1WBukar7GqxE/6OZY+/4wK01lFm/fKMgko7wSQAtFUWV9yDIfVfRzkJGVGCK2KcWxp6VfRpef2KSlxVzJh5q4DUzmo31NP7vWQCxHjTUtC5+abSEwKNveGQNgEvLw+lsw6IEK3y00sOTW1rkHGqfxGW36w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782846950; c=relaxed/simple;
-	bh=8hMo+0gTrjI/uJh+UUz9hPhW4SlFPnkUvoujDFUZjZI=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=HDmFkdDZb/VDp6fcd3eHCAd9m/3ovqolfsZD7H+iCTkp0i/5jzEbjucCpKCI4BBIONjZOUCG/JM7sCFLlXLU9cy/jMRmuLYvQV06crGZ+W2vnH2D9th51da0HPJ/w1ytuo7FDWBx3Pz7CO+rqMOY9TGaYqlx86LdFIQHd3F333A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rong.moe; spf=pass smtp.mailfrom=rong.moe; dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b=WKdlm2zY; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rong.moe
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rong.moe
+	s=arc-20240116; t=1782848036; c=relaxed/simple;
+	bh=RWpuP1HOANd3Mw9LUIgxvKsgox/WnpchLIpwxpd/rBQ=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=neEjak+v3gJ4czfIVFaxm2hKjwCBfWLvT8/pUWtydm32uXMo/9JAEeV7PrI3LxK2STOMtV1WrFZJjM9JHermHnVd8kHKyIc0GTxTpVd3L3qfJSl9ka1S8BvY6bdmSS54eWgLmahIO80Wb99R5BMD8dd78knDFxTpQTztNqlXruk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YF9S91kA; arc=pass smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rong.moe header.i=i@rong.moe header.b="WKdlm2zY"
-ARC-Seal: i=1; a=rsa-sha256; t=1782846932; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=O3eJ1En/l9r2mDqOFLIxD267cRY9zriaeO74GfZ6YClSvSR+yp+31StrsNE5ll4CHdH/wX00frO5sXGD6rH/zSvyS1KNzhzJSnn6xXQ+u63Cgo/mCbqJ57wpu50N1oafYLjhOm3aEdR1cIy60W+1ZNP3j8Yj1u5833ek7Lywe9A=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1782846932; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=1qagP0VuISi0UOXqphEC64UCJS1rYEuCpGZ+HrzWmK8=; 
-	b=LUdOVPOY11Mr+fl4wSwar9giH8+XUDU/7D4Vuae2BF0zQqVPb5irb37bdETm8cHv76a0cLvpHCZg3mhvOdJ+1frpEyljiJDN9IZHEzf1FyBXQjet6gSOaxkf7i9S7KqawSeLGOJRyPKRgJvBkTLwpeXnr3C2TRbbWzdqK7l366M=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=rong.moe;
-	spf=pass  smtp.mailfrom=i@rong.moe;
-	dmarc=pass header.from=<i@rong.moe>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1782846932;
-	s=zmail2048; d=rong.moe; i=i@rong.moe;
-	h=Date:Date:From:From:To:To:CC:Subject:Subject:In-Reply-To:References:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To:Cc;
-	bh=1qagP0VuISi0UOXqphEC64UCJS1rYEuCpGZ+HrzWmK8=;
-	b=WKdlm2zYjWv5uWW9qnDQTh9z34SpI6+w5yRv78MPN9oW1AWAwK1yqWOD3hBwbb0D
-	PFXcLD5Epg5tr0xjHWfQOBuv4bNTuWT6A2+tm6oqTAdsgpXQT5Xbjsd8Mg+eQ7H3z2X
-	tIcaf+AvRcwbdi2w2MEgX1FkFKJ+JndHaNkwRLkucZf3/GYHCdYTnu2u3knbJAGqMVN
-	bne78IRVMI3zJnsP28CRxCTee95JtrjB06LFWTcn8Ja6XgP1kFpAQ54AcBnhMa6S4n4
-	F0i61y0/n9ObNFou24Zh2kI1pGI/IJNbAOSzy9Epj4uj3b6tTnr6F4ZHKFEdW3EVW+W
-	Cnwd/JSIzQ==
-Received: by mx.zohomail.com with SMTPS id 1782846928874810.0972195254349;
-	Tue, 30 Jun 2026 12:15:28 -0700 (PDT)
-Date: Wed, 01 Jul 2026 03:15:19 +0800
-From: Rong Zhang <i@rong.moe>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: Marcel Holtmann <marcel@holtmann.org>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
- =?UTF-8?B?Q2hyaXMgTHUgKOmZuOeomuazkyk=?= <Chris.Lu@mediatek.com>,
- =?UTF-8?B?V2lsbC1DWSBMZWUgKOadjuaUv+epjik=?= <Will-CY.Lee@mediatek.com>,
- =?UTF-8?B?U1MgV3UgKOW3q+aGsuasoyk=?= <ss.wu@mediatek.com>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH=5D_Bluetooth=3A_Properly_disable_remo?=
- =?US-ASCII?Q?te_wakeup_for_MT7922/MT7925_on_Ryzen_platform?=
-User-Agent: Thunderbird for Android
-In-Reply-To: <CABBYNZLhqQF-V8sJORwMW2C_4FxFY+pkAK=cSDg4aeWJYfiJrA@mail.gmail.com>
-References: <20260629-btmtk-ryzen-remote-wakeup-v1-1-1d2f1cee6d22@rong.moe> <CABBYNZLhqQF-V8sJORwMW2C_4FxFY+pkAK=cSDg4aeWJYfiJrA@mail.gmail.com>
-Message-ID: <7410991C-F48D-4D58-8F27-0DFCB27E81FF@rong.moe>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YF9S91kA"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-47248615e4dso3222713f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 12:33:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782848033; cv=none;
+        d=google.com; s=arc-20260327;
+        b=lJucYauOaQNhyZh2QgThFOXiVVVq+qDTHkFRr0Lil0Rv2wQWBMcVJTQzYuuo80cIxD
+         xjGnpvcZGUYY4jlPizVgu6Gx3VTCn1FLy/UjeWrhlgJ4c/vAyWIZ9XQ9aylZ7q8tkInH
+         9sGwwwDhzkKiWhzwy9SKfsR9H5/NSGDybgkMlV0GHfcnjiHKQ3vk9v7VbOZDvDk0M0Za
+         3x9jZe5zVXet6p4ljarRo7DykjkdK2fXZiJPoLCD6czKKJxZy1b8tIsTZC3WQCdNJbWg
+         ST+OKfYdNZMAUZQqbcmcBQEKLlhmFz2IrNwhfKe+X/iq9TnS3ytPGosIwMb+tYd+Zv2b
+         yCbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=NUUH1p4sJ7WqPdD8mr/jyFqmyFX9fLUZS4OT3W1zTpg=;
+        fh=v4Z3N2Htbr8NtGqMLkQjkIE/EbeUcf6lhEWEAm07n3g=;
+        b=XnFqNiEEf3LIEKOmBzKI7MQukuZ2ms0pGJgTIUBMklEqh39yEy7mv4Op5kHTGI3shJ
+         j7y9ffTzgSBiVL88ckENkh06NfeWc4jzzfScTrWEIcD052oWP5dqcPK8l9hEEgjIl8Ol
+         ZQp3lcgGoEuZ9nmYJbLfT/xfqFo8DaCnIDfftB0gfp/EjHB1EU2/LekOudlrcclwxfGc
+         WiknGl0p8B5ixAkBG7BKydlyPrD+eb1NG+O7+biGuUu9ORFMjTwPoihCTQPEjo+h6wII
+         Qor5vBUBUiIEZWobJe5PCeg6HSvSM3cbgbOUhAEO+eMn+O6KNoImk8j3a/bU/fmZWC6B
+         ipyg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782848033; x=1783452833; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=NUUH1p4sJ7WqPdD8mr/jyFqmyFX9fLUZS4OT3W1zTpg=;
+        b=YF9S91kAOUA8Yqv3TSXMGW/i2nu7D3eAQG73GsFQvs6czbeQMmlRIuXMWGAFaEfLup
+         sG7ZvC0lPdNsNMKRVjfBiySP/nVnOssMdbqtqucv77AunDhlnPdOk9YN7DVcNmvxtQjm
+         PUsXTsPeZCqs7hyBBJFVxpvy8eZlX+IWD/ZjS9/6Uar4tT/Qr2VJjivn1rW9q5LQg2kp
+         iS7bL9sL+/BeC6RHDDG3v3gRCNtc8thMv9CUBt/JdGapWy9x+wGKG5Zu5ISLczMKxyK+
+         ueBwuD1f2IHe0pzdf9DzNMNeGYnKRPz0mQv6hBJ4D2lBD7rszmE2p05CDvl4irB6gNOP
+         cDAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782848033; x=1783452833;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NUUH1p4sJ7WqPdD8mr/jyFqmyFX9fLUZS4OT3W1zTpg=;
+        b=SHs8JlOzQVDpREWxwj03iV72aUc3YBb28YiVB7VFwUVzyT+td2hiNll2gtaxbvi6hc
+         1culoivZjLiQITe7rLQWddrH1k/1V/aRqPGHyZt7EK3Skh+VGf0ADvn5eM1fpOBKPlkX
+         CYgopZLQLt2SK3pe2kWQQDJUrP3gAwFWxNW9DXUE70Ysx2APNgiwyqO4rDgi81Xqdg6j
+         kRedHnlbYxQjb2QF08XgJ58hlNtb6Xt3/GyzOZMOl0N417qEMgD0sYFjsp/I7Q59Shj6
+         gmnj9jHJUiFKvLYeQpfZQi002NIeRH6x9GDVXKPNAVfIrDNbUZJtuF0KIlyfvjuQDvD5
+         3wPA==
+X-Gm-Message-State: AOJu0YwNP/w3p1rq4jAhg7pnJjSZyCil46mWqqMKY+UtWFSj1jYIgjTW
+	xggLTXZfuK+DrEWTjAx6tg5x/5Msee6quz7LY1djyNlcKcPUZ6NBmjtn+FfuivrxTm0wWp3b2W9
+	c4YLiRIlGVic2Vet6vy4IKDJloroTj4/P3/eTQorTwQ==
+X-Gm-Gg: AfdE7clfVgy1tArtCA551RMwwJiG41DeuXfbESohD8YWvNzfNKVQPA97fTkwkIywTqX
+	NLzs3EWQcHlLlkrtetjnxQoF+UE2AAuEq0q/ktvgj2x30FTWv6a7BTlLep4Zp2Lm696t42n1RmJ
+	XXcuMtRIpxGxSYL+yj9Hy/reHJQxk7Cmz7iiem2cKlfMhz2WxAcb2j0sM+vJhH09XlibEDCfEav
+	Qv34TSkUSCXxRQz7UHR2P472AOE0LyZTNdinck7DKCX6/qoydpw3jffarOXV1UPEkrE/24AUNSD
+	34aEuYYO276eMQ==
+X-Received: by 2002:a05:6000:2510:b0:470:c049:b444 with SMTP id
+ ffacd0b85a97d-47654b115a0mr2774203f8f.0.1782848032690; Tue, 30 Jun 2026
+ 12:33:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-ZohoMailClient: External
+From: LocalHost <localhost.detect@gmail.com>
+Date: Wed, 1 Jul 2026 04:33:41 +0900
+X-Gm-Features: AVVi8CesiUgqWaklt7W1S8NKLOpzsL1K-ahiN4GrQBRQ48VQ5Beua4ugW7eTIEs
+Message-ID: <CAOpx92dGSe4pFZTvNpZsAQzzsQfH2XxaVtaSBdFtCpht3wLTRw@mail.gmail.com>
+Subject: RFCOMM/HIDP: validate skb length before accessing frame header
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Luiz,
+Hi,
 
-=E4=BA=8E 2026=E5=B9=B47=E6=9C=881=E6=97=A5 GMT+08:00 02:13:39=EF=BC=8CLui=
-z Augusto von Dentz <luiz=2Edentz@gmail=2Ecom> =E5=86=99=E9=81=93=EF=BC=9A
->Hi Rong,
->
->On Mon, Jun 29, 2026 at 11:28=E2=80=AFAM Rong Zhang <i@rong=2Emoe> wrote:
->>
->> It is reported that a remote wakeup could cause MT7922/MT7925's btusb
->> interface completely unresponsive=2E Resetting the xHCI root hub doesn'=
-t
->> help at all, and recovering from such a state needs a power cycle=2E
->>
->> All reports seen to be relevant to Ryzen-based laptops=2E These NICs ar=
-e
->> usually used as OEM components thanks to some sort of reference designs=
-=2E
->>
->> Their popularity on other platforms is unclear=2E While there is still =
-a
->> chance that the quirk may exist on other platforms, be cautious and onl=
-y
->> apply the quirk on AMD platforms for the time being=2E
->>
->> Meanwhile, though device_set_wakeup_capable(false) is the correct fix
->> for other NICs with fake remote wakeup capabilities, doing so for
->> MT7922/MT7925 effectively prevents it from being used as wakeup
->> sources as per userspace requests=2E Hence, return -EBUSY on runtime
->> suspend to prevent the interface from being autosuspended while it's
->> still opened, which has the same effect as
->> device_set_wakeup_capable(false), since disabling remote wakeup simply
->> causes the USB core to gate runtime autosuspend as well due to
->> needs_remote_wakeup =3D=3D 1=2E The interface can be safely autosuspend=
-ed as
->> long as remote wakeup is disabled, i=2Ee=2E, after closing the HCI devi=
-ce=2E
->>
->> Specifically, the interface may still take the advantage of remote
->> wakeup in order to wake up the system from sleep if userspace has
->> enabled it as a wakeup source=2E
->>
->> Fixes: e31d761628ad ("Bluetooth: btmtk: Disable remote wakeup for MT792=
-2/MT7925")
->> Signed-off-by: Rong Zhang <i@rong=2Emoe>
->> ---
->>  drivers/bluetooth/btmtk=2Ec | 10 ---------
->>  drivers/bluetooth/btusb=2Ec | 57 +++++++++++++++++++++++++++++++++++++=
-++++++----
->>  2 files changed, 53 insertions(+), 14 deletions(-)
->>
->> diff --git a/drivers/bluetooth/btmtk=2Ec b/drivers/bluetooth/btmtk=2Ec
->> index 02a96342e964=2E=2E4614434dd57b 100644
->> --- a/drivers/bluetooth/btmtk=2Ec
->> +++ b/drivers/bluetooth/btmtk=2Ec
->> @@ -1381,16 +1381,6 @@ int btmtk_usb_setup(struct hci_dev *hdev)
->>                 break;
->>         case 0x7922:
->>         case 0x7925:
->> -               /*
->> -                * A remote wakeup could cause the device completely un=
-responsive, and
->> -                * recovering from such a state needs a power cycle=2E
->> -                *
->> -                * Since the remote wakeup capability is super broken, =
-just disable it
->> -                * to get rid of the troubles=2E The device can still b=
-e autosuspended
->> -                * when the bluetooth interface is closed=2E
->> -                */
->> -               device_set_wakeup_capable(&btmtk_data->udev->dev, false=
-);
->> -               fallthrough;
->>         case 0x7961:
->>         case 0x7902:
->>         case 0x6639:
->> diff --git a/drivers/bluetooth/btusb=2Ec b/drivers/bluetooth/btusb=2Ec
->> index 08c0a99a62c5=2E=2E023ae782f41a 100644
->> --- a/drivers/bluetooth/btusb=2Ec
->> +++ b/drivers/bluetooth/btusb=2Ec
->> @@ -6,6 +6,7 @@
->>   *  Copyright (C) 2005-2008  Marcel Holtmann <marcel@holtmann=2Eorg>
->>   */
->>
->> +#include <linux/cpufeature=2Eh>
->>  #include <linux/dmi=2Eh>
->>  #include <linux/module=2Eh>
->>  #include <linux/usb=2Eh>
->> @@ -957,6 +958,7 @@ struct qca_dump_info {
->>  #define BTUSB_USE_ALT3_FOR_WBS 15
->>  #define BTUSB_ALT6_CONTINUOUS_TX       16
->>  #define BTUSB_HW_SSR_ACTIVE    17
->> +#define BTUSB_WAKEUP_BROKEN    18
->>
->>  struct btusb_data {
->>         struct hci_dev       *hdev;
->> @@ -2936,10 +2938,20 @@ static int btusb_send_frame_mtk(struct hci_dev =
-*hdev, struct sk_buff *skb)
->>         }
->>  }
->>
->> +static inline bool platform_is_ryzen(void)
->> +{
->> +#ifdef CONFIG_X86
->> +       return boot_cpu_has(X86_FEATURE_ZEN);
->> +#else
->> +       return false;
->> +#endif
->> +}
->> +
->>  static int btusb_mtk_setup(struct hci_dev *hdev)
->>  {
->>         struct btusb_data *data =3D hci_get_drvdata(hdev);
->>         struct btmtk_data *btmtk_data =3D hci_get_priv(hdev);
->> +       int err;
->>
->>         /* MediaTek WMT vendor cmd requiring below USB resources to
->>          * complete the handshake=2E
->> @@ -2956,7 +2968,29 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
->>                 btusb_mtk_claim_iso_intf(data);
->>         }
->>
->> -       return btmtk_usb_setup(hdev);
->> +       err =3D btmtk_usb_setup(hdev);
->> +       if (err)
->> +               return err;
->> +
->> +       switch (btmtk_data->dev_id) {
->> +       case 0x7922:
->> +       case 0x7925:
->> +               /*
->> +                * All reports seen to be relevant to Ryzen-based lapto=
-ps=2E These
->> +                * NICs are usually used as OEM components thanks to so=
-me sort
->> +                * of reference designs=2E
->> +                *
->> +                * Their popularity on other platforms is unclear=2E Wh=
-ile there
->> +                * is still a chance that the quirk may exist on other
->> +                * platforms, be cautious and only apply the quirk on A=
-MD
->> +                * platforms for the time being=2E
->> +                */
->
->Is this going to be a reliable way to detect if wakeup is broken or
->not? Since USB is a bus capable of hotplug, this check would block not
->only internal/built-in controllers with the above IDs but also those
->plugged via external ports if the CPU happens to be of the ZEN
->familly=2E
+I found a missing minimum-length check in rfcomm_recv_frame() and the
+HIDP frame handlers (hidp_recv_ctrl_frame / hidp_recv_intr_frame) that
+allows a connected Bluetooth peer to crash the kernel by sending a
+zero-length L2CAP frame.
 
-Hmm, it seems that we can detect the device's position by comparing its pa=
-rent and its bus=2E We can additionally make it further by checking against=
- the root hub's VID=2E In this manner we should be able to drop the boot_cp=
-u_has() check too=2E
+The initial candidate was identified using a custom AI-assisted code
+analysis tool I developed. All subsequent verification, data-flow
+tracing, guard analysis, and impact assessment were performed manually
+by reviewing the source code.
 
-I will try and send a v2=2E
+Affected: net/bluetooth/rfcomm/core.c, net/bluetooth/hidp/core.c
+Impact: remote/adjacent kernel crash (DoS) via established session.
 
-Thanks,
-Rong
+SUMMARY
 
->
->> +               if (platform_is_ryzen())
->> +                       set_bit(BTUSB_WAKEUP_BROKEN, &data->flags);
->> +               break;
->> +       }
->> +
->> +       return 0;
->>  }
->>
->>  static int btusb_mtk_shutdown(struct hci_dev *hdev)
->> @@ -4532,11 +4566,26 @@ static int btusb_suspend(struct usb_interface *=
-intf, pm_message_t message)
->>
->>         BT_DBG("intf %p", intf);
->>
->> -       /* Don't auto-suspend if there are connections or discovery in
->> -        * progress; external suspend calls shall never fail=2E
->> +       /*
->> +        * It is reported that remote wakeup events could sometimes cau=
-se some
->> +        * adapters completely unresponsive=2E Resetting the xHCI root =
-hub doesn't
->> +        * help at all, and recovering from such a state needs a power =
-cycle=2E
->> +        * Since disabling remote wakeup simply causes the USB core to =
-gate
->> +        * runtime autosuspend as well due to needs_remote_wakeup =3D=
-=3D 1, let's do
->> +        * this ourselves to make our life easier=2E The interface can =
-be safely
->> +        * autosuspended as long as remote wakeup is disabled, i=2Ee=2E=
-, after
->> +        * closing the HCI device=2E
->> +        *
->> +        * Don't auto-suspend if there are connections or discovery in =
-progress=2E
->> +        *
->> +        * External suspend calls shall never fail=2E Specifically, a d=
-evice with
->> +        * broken remote wakeup may still take the advantage of remote =
-wakeup in
->> +        * order to wake up the system from sleep if userspace has enab=
-led it as
->> +        * a wakeup source=2E
->>          */
->>         if (PMSG_IS_AUTO(message) &&
->> -           (hci_conn_count(data->hdev) || hci_discovery_active(data->h=
-dev)))
->> +           ((test_bit(BTUSB_WAKEUP_BROKEN, &data->flags) && data->intf=
-->needs_remote_wakeup) ||
->> +            hci_conn_count(data->hdev) || hci_discovery_active(data->h=
-dev)))
->>                 return -EBUSY;
->>
->>         if (data->suspend_count++)
->>
->> ---
->> base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
->> change-id: 230ba8c9-btmtk-ryzen-remote-wakeup-055a407682ef
->>
->> Thanks,
->> Rong
->>
->
->
+rfcomm_recv_frame() and the HIDP ctrl/intr handlers dereference the
+first byte(s) of an incoming L2CAP frame and unconditionally call
+skb_pull() without verifying that the skb contains sufficient data.
+A connected peer sending a zero-length frame triggers an out-of-bounds
+read and an unsigned skb->len underflow (0 -> 0xFFFFFFFF), crashing
+the kernel.
+
+This is the same anti-pattern in two subsystems -- both sit directly
+on L2CAP and trust that incoming frames are non-empty.
+
+ROOT CAUSE: RFCOMM (rfcomm/core.c:1769-1797)
+
+rfcomm_recv_frame() casts skb->data to a 3-byte struct rfcomm_hdr and
+immediately dereferences it:
+
+```
+struct rfcomm_hdr *hdr = (void *) skb->data;
+...
+dlci = __get_dlci(hdr->addr);       /* data[0] */
+type = __get_type(hdr->ctrl);       /* data[1] -- OOB if len < 2 */
+
+/* Trim FCS */
+skb->len--; skb->tail--;            /* underflow if len == 0 */
+fcs = *(u8 *)skb_tail_pointer(skb); /* OOB read */
+```
+
+There is no "if (skb->len < RFCOMM_HDR_SIZE)" guard. For a 0-byte
+frame, skb->len-- underflows the unsigned 32-bit field to 0xFFFFFFFF,
+and the subsequent skb_pull(skb, 3|4) leaves skb->len enormous,
+propagating into downstream parsers.
+
+The caller rfcomm_process_rx() (core.c:1964-1976) dequeues skbs from
+the L2CAP socket receive queue and calls only skb_linearize() (which
+succeeds on empty skbs) before passing them to rfcomm_recv_frame()
+with no length floor.
+
+ROOT CAUSE: HIDP (hidp/core.c:560-623)
+
+hidp_recv_ctrl_frame() and hidp_recv_intr_frame() perform the
+identical pattern:
+
+```
+hdr = skb->data[0];          /* OOB if len == 0 */
+skb_pull(skb, 1);            /* underflow if len == 0 */
+```
+
+Neither handler checks skb->len before accessing skb->data[0]. The
+caller hidp_session_run() (core.c:1254-1273) dequeues from the
+ctrl/intr socket receive queues with only skb_linearize() -- no
+minimum-length validation.
+
+REACHABILITY
+
+Both RFCOMM and HIDP sit on L2CAP Basic mode sockets. The L2CAP data
+channel dispatch (l2cap_core.c, L2CAP_MODE_BASIC case) checks only
+chan->imtu < skb->len (upper bound) before passing the frame up. A
+zero-length L2CAP B-frame (lh->len = 0 in the L2CAP header) passes
+this check (imtu < 0 is false) and reaches the RFCOMM/HIDP handlers
+with skb->len == 0.
+
+A connected/paired Bluetooth peer with an established RFCOMM or HIDP
+session can send such a frame.
+
+IMPACT
+
+The reliable outcome is a kernel crash (DoS):
+
+- The underflowed skb->len (~4 billion) defeats downstream length
+checks (pskb_may_pull, skb_pull_data -- these compare against the
+corrupted huge length and pass), causing subsequent parsers to read
+far past the buffer boundary until a page fault triggers a kernel
+oops.
+- The consistent, reliable impact is DoS. There is no deterministic
+information leak -- any path that might echo data back (e.g.
+RFCOMM_TEST, HIDP report_return) depends on uncontrolled adjacent
+heap bytes passing FCS/type gates (~0.003% probability per attempt).
+
+SUGGESTED FIX
+
+RFCOMM (rfcomm/core.c), top of rfcomm_recv_frame():
+
+```
++ if (skb->len < sizeof(*hdr) + 1) {  /* header + FCS */
++     kfree_skb(skb);
++     return s;
++ }
+```
+
+HIDP (hidp/core.c), top of hidp_recv_ctrl_frame() and
+hidp_recv_intr_frame():
+
+```
++ if (!skb->len) {
++     kfree_skb(skb);
++     return;
++ }
+```
+
+NOTES
+
+- Line numbers are from the current net/bluetooth tree; approximate.
+- Both fixes are one-shot guards consistent with similar checks
+throughout the Bluetooth stack (e.g. l2cap_sig_channel checks
+skb->len < L2CAP_CMD_HDR_SIZE before processing).
+- A reproducer (ASan model of the underflow and OOB read) is
+available upon request.
+
+Thanks.
