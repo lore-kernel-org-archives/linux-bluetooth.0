@@ -1,136 +1,100 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68469283FD9
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 13:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0668224E4A1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 14:43:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782827790; cv=none; b=B4xRGRCfScWdVI9zWN452UoSNv45HrpSq9h5k1SiAmjcjxhYeLBS+ccYNtDR1HZbSi3YiX+c2qtSfk29EuDZXMI7hKgnXeHaJgmNxP0PYnAC92S71K/7oknwDIvbvK/uOVS/FzlaGs9YFiwEqkpukEGfhDGdBMSv9ZXizvSfzC0=
+	t=1782830633; cv=none; b=kDp32ZU3nSDWwurGJy9z+HZBNQ9VdOcrhiZLhvkIGOxcqxmaAM5Njp7CnueW6n2FB1U5vLHRh5l8k1AbkJ7pGVKbJ+p24cyy0RJJRSsFSkTtXAnytMMYEKrXzmmkYLOpVwoY6cMqZSYxfgs7d5rJmQqJNQu5tZQvdGpdrjlJ/Yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782827790; c=relaxed/simple;
-	bh=dRnHA1QoVuAbJuPHar2E6RuYJw41stBRUjrK65sEnIQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=GqjrEQHdt8WBL0nGwiwYZIsGVq/QboOnFm0k+gSioGbNEZpAfGmcxbq3bqldr9r6AvzvYGD1NbZbwvbFDJqEfTHK3qQhQewwH9cFag66uv2doFW8PmQKRTD464dCSpekzYWjfRRqgljsNxZz83xjAMrv+Uk5J61iBFzEi0XQddA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K6oio7Ce; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782830633; c=relaxed/simple;
+	bh=qpeseQp59dvQQ0ooe+UW2+l1fvlqNH7RS/1FWS5IKpU=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tENQrvrVCJ2XXpjCQK7F8oWY06GvXTWcK1Roi/pfVqdZ7xQq6zDLOeSPQc7rOoW1U/ogA8yO7NMwSZysjWuQKrfHx0VrDyM5ZeG7s00epXdac5v9VkdsfYNZRZyL9K3WZYOpuoYQjhKNNUWRuIT8NfgZwBaDtFxA0ZJxPAiUR1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rv3vQ1kG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K6oio7Ce"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-51a837c8618so40034171cf.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 06:56:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782827788; x=1783432588; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=YT1lZUN9YV045Vu1awOJt6moJwt7fh2iG8/dzsq9LE4=;
-        b=K6oio7CeYSLLbAMnLJHkprKJXWYA3mMMRGrX2vIjqWzDsmD8IJgsu7vO00+oF5sMsJ
-         wdI5SS7LpZkZU2Hks5lbhNsPGO6u82vRxjtmVPocMRPhUpCZ/81HZhcHeF9RKaBFCRTJ
-         Rw9lkGhcBteclTytcyH9TRsqyqsP44kdFGnmdeN6LwNGZTMXpkvKUZeFO0wfc8ZFfHIQ
-         aBi9H1dNKABpPHVNQY7ljrNnC/d7D364esOaz04xqjvwlFYJtieNxpehU9TnKSxMHJuQ
-         CAzq7XVte8bHCPvrw/TlA2oFDmpJkv5f9ryCuApwJg5Pn7rPskbQE+e8wyQo1wHAusis
-         yEFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782827788; x=1783432588;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YT1lZUN9YV045Vu1awOJt6moJwt7fh2iG8/dzsq9LE4=;
-        b=DCr2rEsaTpRPfoou5xBM76qQ2r6yb/JO4f6VkjoJxwu3EYsHCw+wRi0lwkfRAU8htn
-         uiJOiSYUdClE+oYK+jxoe4FKJAwcWCVQl5C892qbNqQpcm6xT6/JyxRN9LBFT1d4QhOC
-         OzFaYLFmuytAzV5EMOVuIr28qEsozgHzLWsJFGKZxSCqrB4T4zRrOaKKG3Nj7y7tnnaS
-         BDIjl6qcp5fdj9C81GVvxbkkH+BsJYFoqPNfM83nRt1iYs9/eK8MkLxz8ibhmphlUiV4
-         euqm+vlSp6NkbydkJGwCCs5o0GHdO5gDoMMe5NN1VVhQS1ACS7pIrvyXu7tmUwBuiXUP
-         j1PA==
-X-Gm-Message-State: AOJu0Yw2uwYrezJ3Y2NpGQTMAvaQ4hY9VwOQ6wTd8EkeDP3eTn3Cmzsw
-	VhPv+ewmgx0O+HfrhoN6iPVfKyGID4tqlg5lRqW3Vjzc5bF012g1FozCCZGprw==
-X-Gm-Gg: AfdE7ckiH1yRfBNu17R+EHiZbRsh4gYrNmXLFsAt64XO2hAP5MjiH9NrIbdQ5YtuaBl
-	2VAdkZI0m1jP7yeffEhxOqZEV1Xa9ALNW1wjTWjhYW21mLe+5D6SYDfkKJaGoln8mZ5w+MmndUU
-	qKFhzJpra4qaO9IxMyqI4ZNMYAhL9AXwcX8n3vli89jHDMeJp5cSZ80DtRD+85XGNiZHuIVYZQs
-	BE+OG21OLno8fpzOQSv7K52JX1+l42uTrHoIHZlglDxSFlGodi9jPuxHh99muLMHLJTtzW+nvYB
-	LEeLvr/so7dwnraUo3v+cPUZZTBag8uqHIhEj9428mHwslnTBghVub3EQukQsr47V4nPULC61c8
-	OasKWFhCdq9sw5tBBby3L+g687VR6Xhlti4w+73vuHrpg0r/U9QgtREmvHwYwLq54q1vVIc0Ukp
-	lORX2sYoFMQ8phZXToopEW
-X-Received: by 2002:a05:622a:286:b0:519:f420:d780 with SMTP id d75a77b69052e-51c10795bacmr43579921cf.30.1782827788347;
-        Tue, 30 Jun 2026 06:56:28 -0700 (PDT)
-Received: from [172.17.0.2] ([135.232.216.49])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51c10a360e0sm18705561cf.30.2026.06.30.06.56.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jun 2026 06:56:27 -0700 (PDT)
-Message-ID: <6a43cb0b.97717f65.1aed61.b923@mx.google.com>
-Date: Tue, 30 Jun 2026 06:56:27 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2528050687471071054=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rv3vQ1kG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9FF71F00A3A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 14:43:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782830631;
+	bh=MWgqL4Q5HMM/wY0dJqa72d3dmGGWeJtoQeyqL+l/mHo=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=Rv3vQ1kGTiT4hZknb84sZNeMfoSVn1+L25N83pneo3w6QaI4EjqKsE6bBSTYSZrIU
+	 o9HGM/BYdsze9fR2EuYvdLzFxO6CpgiWNph8DwGvgUDxJrs3CEx65YbIYoxQh6U/vc
+	 IbLcrd427UIs9NkJ1xx/Kt9xIu/NiwtLCvguFD17IofOKOey3UxhI8Fj9BykgIgV6j
+	 w3hYiOjkjNRLc6PBtjPJL1LQu2xZHkDB2DP0YkbY6X0zg12aCM+BGqYVJCoftuNaKY
+	 yhosx+wfJTT33/3gaeXu/zTjwoXxnD6/fABkT9eMtDl1UqqZhEoxU0MKKL13ziNoyA
+	 VibvqZmncwSNg==
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-39b14cf91b9so12958921fa.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 07:43:51 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RoriY2GKvFRCcfgaIBqRWSzxes4v9MgW0pa5pdD8VBYrJV/LXelo05Toknpa6EMmm1t1qDeCxCqPpnmjk+Oquo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzC45JxoZOwsB1DLCwLZzqsinQBPm/TiuTHgnA4qYkhbAZjqSpO
+	p8UjJIVHSdlepdKURS6WY95nTL3H0fJd6dgHqegfV2BNmippfyXhGUj3LMZ5gvsmHqImZN5TKUI
+	dvHhClSJboiAAcbHcfenfjh21nj6Y6p7vhAP9dzA/2g==
+X-Received: by 2002:a2e:a583:0:b0:39a:cfe8:dcbd with SMTP id
+ 38308e7fff4ca-39b1de46111mr10193951fa.30.1782830630565; Tue, 30 Jun 2026
+ 07:43:50 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 30 Jun 2026 07:43:49 -0700
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 30 Jun 2026 07:43:49 -0700
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260625-bt_bugfix-v2-10-93396a6f7d5e@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
-Subject: RE: Bluetooth: btmtk: Add MT7928 support
-In-Reply-To: <20260630123539.668776-2-chris.lu@mediatek.com>
-References: <20260630123539.668776-2-chris.lu@mediatek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20260625-bt_bugfix-v2-0-93396a6f7d5e@oss.qualcomm.com> <20260625-bt_bugfix-v2-10-93396a6f7d5e@oss.qualcomm.com>
+Date: Tue, 30 Jun 2026 07:43:49 -0700
+X-Gmail-Original-Message-ID: <CAMRc=MfppsRM3Hgc19Lo802a9q8F3bhtpWEJWYaGx3EhMN=SUw@mail.gmail.com>
+X-Gm-Features: AVVi8Cd-5lG2ghbwyHrUALRHfNv8luAp3awpnNvrT8xBYuoVE17qtZWxapNEHoA
+Message-ID: <CAMRc=MfppsRM3Hgc19Lo802a9q8F3bhtpWEJWYaGx3EhMN=SUw@mail.gmail.com>
+Subject: Re: [PATCH v2 10/12] Bluetooth: hci_event: Log error for HCI reset
+ status error in hci_cc_reset()
+To: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Rocky Liao <quic_rjliao@quicinc.com>, Bartosz Golaszewski <brgl@kernel.org>, 
+	Ben Young Tae Kim <ytkim@qca.qualcomm.com>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+	Matthias Kaehlcke <mka@chromium.org>, Tim Jiang <quic_tjiang@quicinc.com>, 
+	Zijun Hu <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-arm-msm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
---===============2528050687471071054==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, 26 Jun 2026 07:19:55 +0200, Zijun Hu <zijun.hu@oss.qualcomm.com> said:
+> HCI_Reset is a critical command, but hci_cc_reset() uses bt_dev_dbg()
+> to log it, so a non-zero error status response may not be noticed.
+>
+> Fix by using bt_dev_err() when a status error occurs.
+>
+> Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
+> ---
+>  net/bluetooth/hci_event.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index b6d963ce26d0..a90d2c6a6e59 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -269,7 +269,10 @@ static u8 hci_cc_reset(struct hci_dev *hdev, void *data, struct sk_buff *skb)
+>  {
+>  	struct hci_ev_status *rp = data;
+>
+> -	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
+> +	if (rp->status)
+> +		bt_dev_err(hdev, "HCI reset failed (status 0x%2.2x)", rp->status);
+> +	else
+> +		bt_dev_dbg(hdev, "HCI reset succeeded");
+>
+>  	clear_bit(HCI_RESET, &hdev->flags);
+>
+>
+> --
+> 2.34.1
+>
+>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1118999
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      4.49 seconds
-VerifyFixes                   PASS      0.31 seconds
-VerifySignedoff               PASS      0.29 seconds
-GitLint                       FAIL      1.96 seconds
-SubjectPrefix                 PASS      1.13 seconds
-BuildKernel                   PASS      26.92 seconds
-CheckAllWarning               PASS      29.67 seconds
-CheckSparse                   PASS      28.65 seconds
-BuildKernel32                 PASS      26.32 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      489.46 seconds
-IncrementalBuild              PASS      31.29 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v6,2/3] Bluetooth: btmtk: Improve BT firmware logging
-
-11: B1 Line exceeds max length (92>80): "[  212.878783] Bluetooth: hci1: Loading BT firmware: mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin"
-12: B1 Line exceeds max length (93>80): "[  212.889614] Bluetooth: hci1: BT HW ver: 0x7922, SW ver: 0x008a, Build Time: 20260224103448"
-14: B1 Line exceeds max length (115>80): "[  216.048890] Bluetooth: hci1: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported."
-[v6,3/3] Bluetooth: btmtk: Add MT7928 support
-
-24: B1 Line exceeds max length (92>80): "[  159.784050] usb 1-3: New USB device found, idVendor=0e8d, idProduct=7935, bcdDevice= 1.00"
-29: B1 Line exceeds max length (97>80): "[  159.795736] Bluetooth: hci1: Loading CBMCU firmware: mediatek/mt7928/CBMCU_CODE_MT7935_1_1.bin"
-30: B1 Line exceeds max length (102>80): "[  159.807197] Bluetooth: hci1: CBMCU HW ver: 0x7935, SW ver: 0x0000, Build Time: 20260601T161751+0800"
-32: B1 Line exceeds max length (99>80): "[  160.143013] Bluetooth: hci1: Loading BT firmware: mediatek/mt7928/BT_RAM_CODE_MT7935_1_1_hdr.bin"
-33: B1 Line exceeds max length (93>80): "[  160.152775] Bluetooth: hci1: BT HW ver: 0x7935, SW ver: 0x0000, Build Time: 20260527000816"
-35: B1 Line exceeds max length (115>80): "[  163.242280] Bluetooth: hci1: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported."
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-
-
-https://github.com/bluez/bluetooth-next/pull/376
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2528050687471071054==--
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
