@@ -1,48 +1,67 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63823DE451;
-	Tue, 30 Jun 2026 17:43:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B171F12CDBE;
+	Tue, 30 Jun 2026 18:02:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782841400; cv=none; b=NdhEDZvglRbqIUCHPqe8MD1Qm8qo9fiZbk7+G2Dmb/DtyGxTarqS1cKfnuUaFLfzIqWraANXyeGQHxL7Iroasc1q6McmqVucAdMSNn4R8i4s/SN1xnnS7BYfBdIjZeA/tMuRJEUeeAUfkmLee2wL/ZDYd5kUIaodlomI9wUwYgE=
+	t=1782842541; cv=none; b=HY5uuORJQgWLnQaRoNT6A4TDhCOtXsbVR9jeZqD73iH4iNa8W37z6oGNHPPAZhOR6P/kgNoWGCr3cOdvkZAieaWmz1ttWZSv9rQMXrkqwhHpJHWZyggechlJA9ck1+ScnE7GCW4gX4oXp4+mvpNqYKrASSo09dmtEElMwZZHI0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782841400; c=relaxed/simple;
-	bh=4bME/lFWu03KnccIT78SQlKlqTHUi2zHDGnJOGODiv0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=rk5knAvUtiYzjpZ7Wf97HumV/pboPXVVLe6QFFWWOUZ+UXHDIyM9LcFUV+xZ/CGDC/3PSdGUpC/iRTh/cHZYa11M+ubWdlo4z2WALA8GdMnOqPeixetecrqnhbqFJDWfgreT1Xdtypa07xAjpFP1EFJmrCPNw2GDdIxfVd26ZbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gOFLfW1D; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782842541; c=relaxed/simple;
+	bh=V16u8iU0zk+lCqlS1wIv/DHcIm7oRipJJhddV2VDekY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jbJ2hMw/+Vq/pFsMsKTj8FKzDhpW4T/fiI68JKB8snivEHVN4luFKCI0Ryz2sNRcNhDb7ONGaB7b0Kdsjd9ps7uZxjjQTAFoUGlMx5Y66YW9mGQ8pnHcAkOtFmEHgXVa5edmDf8L9ACP8f4WmgbOx5TL5RG4soRY1OyS1aJ+9Oc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bW2LtgBu; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gOFLfW1D"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E9321F00A3A;
-	Tue, 30 Jun 2026 17:43:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bW2LtgBu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D4201F000E9;
+	Tue, 30 Jun 2026 18:02:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782841397;
-	bh=S3iXaxGaxT2dySeFVOF2DWE5gKOSoGbd0S/9p13lfiE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To;
-	b=gOFLfW1DzKuL4/zlQfn4onCyUuXVpktPNdtadshp8G1pFpnQMG7D3o7ViZK8+lScO
-	 TEs6YfC6jM77MewJww0XCCw9syRBHs0zH3bcbPY8zi9DYXBouWKG7HWQ3IYnOu4F+K
-	 jIGFUUttvihSV6RugIDs9aPsvH3Nw+2UWEYf6L4JJzMDeHuMK7d4WwnIT3DXKjZVtq
-	 8k0LFdMAUmWDR26QPCafsRnlERdpPsm4rcrt84rVMYwLWgck/Mryz679ch8r/b29H2
-	 BwAzXwbJr5AmLAgqoF9XW65nmWg+68WmguWP8KX7zf9OQCnzCiQHW1ZzJRiANn8hXZ
-	 Mh5d1kelM4GtA==
-Date: Tue, 30 Jun 2026 12:43:16 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: "Sherry Sun (OSS)" <sherry.sun@oss.nxp.com>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	Frank.Li@nxp.com, s.hauer@pengutronix.de, kernel@pengutronix.de,
-	festevam@gmail.com, amitkumar.karwar@nxp.com,
-	neeraj.sanjaykale@nxp.com, marcel@holtmann.org,
-	luiz.dentz@gmail.com, hongxing.zhu@nxp.com, l.stach@pengutronix.de,
-	lpieralisi@kernel.org, kwilczynski@kernel.org, mani@kernel.org,
-	bhelgaas@google.com, brgl@kernel.org, imx@lists.linux.dev,
-	linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	s=k20260515; t=1782842540;
+	bh=xrqqsPqaXbkExbvl7l6TbPo4VTzO9ytLt6edYlDgBT8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=bW2LtgBuXbPQAq4eiMMa8cUMnVjLuqj3Q6ugsddafkV7o5cM+0nsN+QgGxgqaE9Ke
+	 Hd2L/gR2uB4HHXsgPXibU6mlHo7TutX96zAGXa4SDB3W0MssskuFm1/Eozs7oBwvBA
+	 arL/o6a4H3Fr26i7Cxlgj1M2y63FOHzWKO/ny5MVsnEGMsX3sys6c3Cs30jcJHkO9+
+	 XRCna9Z2QOrPjFQ4omy9vh5UCxbCXgIqPfvOAEHTQtsCudlU/X2XioMfoqlzkl5rr7
+	 lEWWmTRxZJRsYFaORIATLAzNFLotlOzIx22OKAL6w1ojr3Hk3eIYpyEl3bK8vY9eJe
+	 Hrdb/XaxU/e/g==
+Date: Tue, 30 Jun 2026 13:02:19 -0500
+From: Rob Herring <robh@kernel.org>
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Ulf Hansson <ulfh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jeff Johnson <jjohnson@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Rocky Liao <quic_rjliao@quicinc.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>, linux-mmc@vger.kernel.org,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org,
-	sherry.sun@nxp.com, Ryder Lee <ryder.lee@mediatek.com>,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH V4 2/8] PCI: imx6: Add skip_pwrctrl_off flag support
-Message-ID: <20260630174316.GA162203@bhelgaas>
+	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	daniel@makrotopia.org, stable@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Subject: Re: [PATCH v6 1/9] block: partitions: of: Skip child nodes without
+ reg property
+Message-ID: <20260630180219.GA4139943-robh@kernel.org>
+References: <20260629-block-as-nvmem-v6-0-f02513dcd46d@oss.qualcomm.com>
+ <20260629-block-as-nvmem-v6-1-f02513dcd46d@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -51,87 +70,26 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260630103139.3823329-3-sherry.sun@oss.nxp.com>
+In-Reply-To: <20260629-block-as-nvmem-v6-1-f02513dcd46d@oss.qualcomm.com>
 
-[+cc Mediatek folks]
+On Mon, Jun 29, 2026 at 10:55:20AM +0200, Loic Poulain wrote:
+> Child nodes of a fixed-partitions node are not necessarily partition
+> entries, for example an nvmem-layout node has no reg property. The
+> current code passes a NULL reg pointer and uninitialized len to the
+> length check, which can result in a kernel panic or silent failure to
+> register any partitions.
 
-On Tue, Jun 30, 2026 at 06:31:33PM +0800, Sherry Sun (OSS) wrote:
-> From: Sherry Sun <sherry.sun@nxp.com>
-> 
-> Use dw_pcie_rp::skip_pwrctrl_off to avoid powering off devices during
-> suspend to preserve wakeup capability of the devices and also not to power
-> on the devices in the init path.
+That does not sound right to me. A fixed-partitions node should only be 
+defining partitions with address ranges. I would expect a partition node 
+could be nvmem-layout, but not the whole address range. If you wanted 
+the latter, then just do:
 
-Only pci-imx6.c, pcie-qcom.c, and pcie-mediatek-gen3.c use
-pci-pwrctrl.  pcie-qcom.c already has similar skip_pwrctrl_off checks,
-but pcie-mediatek-gen3.c does not.  Does it need them?
+partitions {
+  ...
+};
 
-> This allows controller power-off to be skipped when some devices(e.g. M.2
-> cards key E without auxiliary power) required to support PCIe L2 link state
-> and wake-up mechanisms.
-> 
-> Signed-off-by: Sherry Sun <sherry.sun@nxp.com>
-> ---
->  drivers/pci/controller/dwc/pci-imx6.c | 21 ++++++++++++++-------
->  1 file changed, 14 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/pci/controller/dwc/pci-imx6.c b/drivers/pci/controller/dwc/pci-imx6.c
-> index 1b535bb6fd31..0685573fee71 100644
-> --- a/drivers/pci/controller/dwc/pci-imx6.c
-> +++ b/drivers/pci/controller/dwc/pci-imx6.c
-> @@ -1382,10 +1382,12 @@ static int imx_pcie_host_init(struct dw_pcie_rp *pp)
->  		}
->  	}
->  
-> -	ret = pci_pwrctrl_power_on_devices(dev);
-> -	if (ret) {
-> -		dev_err(dev, "failed to power on pwrctrl devices\n");
-> -		goto err_reg_disable;
-> +	if (!pp->skip_pwrctrl_off) {
-> +		ret = pci_pwrctrl_power_on_devices(dev);
-> +		if (ret) {
-> +			dev_err(dev, "failed to power on pwrctrl devices\n");
-> +			goto err_reg_disable;
-> +		}
->  	}
->  
->  	ret = imx_pcie_clk_enable(imx_pcie);
-> @@ -1454,7 +1456,8 @@ static int imx_pcie_host_init(struct dw_pcie_rp *pp)
->  err_clk_disable:
->  	imx_pcie_clk_disable(imx_pcie);
->  err_pwrctrl_power_off:
-> -	pci_pwrctrl_power_off_devices(dev);
-> +	if (!pp->skip_pwrctrl_off)
-> +		pci_pwrctrl_power_off_devices(dev);
->  err_reg_disable:
->  	if (imx_pcie->vpcie)
->  		regulator_disable(imx_pcie->vpcie);
-> @@ -1473,7 +1476,8 @@ static void imx_pcie_host_exit(struct dw_pcie_rp *pp)
->  	}
->  	imx_pcie_clk_disable(imx_pcie);
->  
-> -	pci_pwrctrl_power_off_devices(pci->dev);
-> +	if (!pci->pp.skip_pwrctrl_off)
-> +		pci_pwrctrl_power_off_devices(pci->dev);
->  	if (imx_pcie->vpcie)
->  		regulator_disable(imx_pcie->vpcie);
->  }
-> @@ -1990,11 +1994,14 @@ static int imx_pcie_probe(struct platform_device *pdev)
->  static void imx_pcie_shutdown(struct platform_device *pdev)
->  {
->  	struct imx_pcie *imx_pcie = platform_get_drvdata(pdev);
-> +	struct dw_pcie *pci = imx_pcie->pci;
-> +	struct dw_pcie_rp *pp = &pci->pp;
->  
->  	/* bring down link, so bootloader gets clean state in case of reboot */
->  	imx_pcie_assert_core_reset(imx_pcie);
->  	imx_pcie_assert_perst(imx_pcie, true);
-> -	pci_pwrctrl_power_off_devices(&pdev->dev);
-> +	if (!pp->skip_pwrctrl_off)
-> +		pci_pwrctrl_power_off_devices(&pdev->dev);
->  	pci_pwrctrl_destroy_devices(&pdev->dev);
->  }
->  
-> -- 
-> 2.50.1
-> 
+nvmem-layout {
+  ...
+};
+
+Rob
