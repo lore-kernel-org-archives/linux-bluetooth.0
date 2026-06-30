@@ -1,165 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1AC396588;
-	Tue, 30 Jun 2026 06:19:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA735271A94
+	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 06:28:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782800353; cv=none; b=aEA9DR5ex+AHsnNNyCoYAcuRjq5iD+ILjq1kOMwg4PTp5K64LMmL8Lhg19Qs6AciQ+b+usBkuuXTB/2L52zfNUiv2OLKM1Htj+RitiNA83nGT4LLphAArXCtdKvim4lrAOjJMyUPtObtiUVU5tGjpDjAC3m2Wy977fJYnodfwC8=
+	t=1782800905; cv=none; b=LEaqVo0g/Ydt09TDdvTYCZVh/kV5BbNB7VB+VlgGwrf2VIZE7biInk6oFxTs0BPziW34H+ZtQqQwFJNBhF9O3J6oiqBRAeSmbuGfXvg2OFfh8WORttOkdaNuS1m1JmetEKufB6QcFHXC0Yz1Mhr9jKGlUaZNwNhJuPwbncScpkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782800353; c=relaxed/simple;
-	bh=AqDsct3vg4EkmYvjIthGbbEt5EqA+5w5suFL1b5gJpY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b8A2/TtxHAH7dsdDl1Ns1S3YqDapFeNaceuToVvGpf60Olq/fWY877wUj5UUHbTkXl9RXyTQmEsHEQ6qTzdgq7+9L06mkOtI3XpjTxExWQtLLiyYJ73RoUczMCDVOyZtkpjYMeZ5gkC/WCRPfXVCXmHwWYkJZAxJlQuAESHsxC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vw6R5LKp; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782800905; c=relaxed/simple;
+	bh=0dLwTO/FItc8J86jULzgmGmgDjHcoRfaec8EGRmIZto=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O+l2pYcTUAOyLmGCWEGWA4hp2fb4R6Z1X4w3yqqhOrb1u6mJH1UNXy7WYApTL60X5K1YWRKOospuqfQLjgJ2qEiMttj3cczuVjwI6dZgpp5Q6tEulBYx0SGh8nigFiNyW93Fg6JqoDyV6G91GrlVQ19ZU64t0A+4mV36IQXojAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jMD5uWN1; arc=none smtp.client-ip=74.125.82.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vw6R5LKp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA4571F000E9;
-	Tue, 30 Jun 2026 06:19:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782800352;
-	bh=qMiG0Alun6q3tS0Lfxy2DZB8LH3E6RU8IaYzZ98kJPE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=Vw6R5LKpATzPgLliEKZ19Q0EtU7HZ8sYgi1WTs+y/db48PlO5fs4EtFmRoRoxbFVm
-	 XYZi81/r7Ii13cvqVFEfXFWSpC3mCeCSpOsYsnr5+NX+7Gt8+ncMroeu85FUkVjfs6
-	 tq/bejYQIVxnmrQQvn9nPp8OBObmN3as+2VQ7desYE3KQEqyyGYPCnHxhFu5Ed3dDk
-	 L98PTPEtODX/IIBBxTmniLus/0z6YSCd1lXegOi0UBabLOa1Q1TE4ucLX7eYrME11a
-	 +E9t1LvZsKXCWVFvKnSgnhyZIPj69IOM49bxhxpqVopnnl6tP97fSjgijBTLWuVCB+
-	 pE8pbibs5Yr4w==
-Message-ID: <976ad3b4-ada5-4fc0-8fba-97eb172ede91@kernel.org>
-Date: Tue, 30 Jun 2026 08:18:56 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jMD5uWN1"
+Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-1384ebe7a10so7586716c88.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jun 2026 23:28:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782800904; x=1783405704; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eV+sxxoEB5gY5bMKWSs1XgHUd3+mXY3r1O8q2kqzLec=;
+        b=jMD5uWN15uYtsel1C0XV7EFI8mpgWGNBZBFE5Tjvja3yIELW9dKjl9f4fWnUkHmjg5
+         HNY/bbiFkRRsiqnSNx+TeE96yCDLxZfUirjEwAo18d+fG3B8cZ7OXMYCkO+w9/dMqiVY
+         YeS4nRQPKNALNL1EcmpjMnZmYXlzfxitY7RfH41NSe4M1TQFgOOWQGB8fZg0wgg5eriB
+         K0Icik1BeRNzWZg9VY/nuHU6y8ZUT4e8DT4K7KF9NSaxxqP/+gWiDFTW7HElbNeHmovo
+         J966+E9zFa0dIIB3d+P0jUUGJtrO8aDggHBdHqmy+eVRhybYAWwxU6sWHRRiCA98Q4u2
+         txog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782800904; x=1783405704;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eV+sxxoEB5gY5bMKWSs1XgHUd3+mXY3r1O8q2kqzLec=;
+        b=nTzN9YFbWNOp3K/KSr1Vpm9Cqo4rHdmyfhvQumJDaSi7Fgbl+B5Kv87vv7/H9galqk
+         kp5b3gwlsl4p/kMVqwAQaslWv1gvyd2o+vx8u+zhBuc/VTM7e/kEVJq0Jp6eUzlNiKyp
+         bdWI7MxM7kSLEyU27CWDgnU9SvTRfp7rseO1mjAOIHHuKNVo0EZQAbKpZ3SxvVO9oMjX
+         K4GMPgS63bPJrGe54hhW/D6iI+QfHtFKTQgJTXcMw7FP28ze3whjFFuKq6zhJVkARKjs
+         +hORKMNWtmi73F9SnhKP7rbEaAYIXp/j61L8gWgQd0Vt+0MNzyK7OipE34PTaGAyjyS2
+         O/BQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9soh4IgDOg4GIaGB2dy0Z845ndysI5HHhmiwIbfPC74gw4ZzvuMhBE4C56GW1EdSlALpVtz4KHcihvjmhO34U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCx6eHdFYRNvhN1uO/DP9C0neLFxGF3vAX6jC8t9/yWQBtmSnX
+	+0HIbIgqdMzKkKyOzOm/aPN7H1YAbW+GNPnL++JevihWRza05/HTlC98
+X-Gm-Gg: AfdE7cnsRFDek0k/4/1M5o4u4TygvCWHWcapCIyNrhVSy9wY/cEqF2MzaRMXD+JfDi1
+	iZ64VCkA5hxbf8tM6zsDWw//FZG3KOFsEQy7hzSb2pBvsM11hvWFyxAueh/nDCudvuw+SKZh4rh
+	RhriAug78CwmOAsWIQPiFdZvxPCAK/JajAZCfw1J4JqZKZZ464RhVSBOcR52eIdISQJaxQj+4+6
+	fwkCAFamTYJ1YWXB8NQwajRNT3b1wC4YKIqqglX/JWkvXw5F6v53OYZESG5fFXY8F0XBazsljDT
+	228DKNMFS7ztDjWAj3VYr9Of58uh/6vXv3TIcjWLQRyVRjyMNgqxR5VkRKQxaAi18UZDAiOo2US
+	oUNy2uioSpc28242kTjpWKlwxaOky1ljPRUvvfyJdS3pQAmhF6W41Y0LteqFmPLwIiUPBZBO9Wo
+	dk63Rg1ZYD6NK3kTDxbpawE5zH5NxnVvNNCLk0qaBnOZiE4YfZhhTUK3ejig==
+X-Received: by 2002:a05:7022:6707:b0:139:f599:8124 with SMTP id a92af1059eb24-13b2a147a43mr1556581c88.3.1782800903778;
+        Mon, 29 Jun 2026 23:28:23 -0700 (PDT)
+Received: from fx.tailc0aff1.ts.net ([206.206.192.132])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b2aba794csm3883398c88.10.2026.06.29.23.28.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jun 2026 23:28:23 -0700 (PDT)
+From: Weiming Shi <bestswngs@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Johan Hedberg <johan.hedberg@intel.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Weiming Shi <bestswngs@gmail.com>,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH] Bluetooth: bpa10x: check response length in bpa10x_setup()
+Date: Mon, 29 Jun 2026 23:28:01 -0700
+Message-ID: <20260630062759.2769059-3-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/6] dt-bindings: net: bluetooth: Document Qualcomm
- IPQ5018 Bluetooth controller
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- George Moussalem <george.moussalem@outlook.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulfh@kernel.org>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Johannes Berg
- <johannes@sipsolutions.net>, Jeff Johnson <jjohnson@kernel.org>,
- Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann
- <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Rocky Liao <quic_rjliao@quicinc.com>, Saravana Kannan
- <saravanak@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Philipp Zabel <p.zabel@pengutronix.de>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
- devicetree@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath10k@lists.infradead.org, linux-arm-msm@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-remoteproc@vger.kernel.org
-References: <20260625-ipq5018-bluetooth-v1-0-d999be0e04f7@outlook.com>
- <20260625-ipq5018-bluetooth-v1-4-d999be0e04f7@outlook.com>
- <20260626-discerning-light-swan-6b599c@quoll>
- <SN7PR19MB673692EBED649CF6DC9833A89DEB2@SN7PR19MB6736.namprd19.prod.outlook.com>
- <0e0fb3af-968f-46d2-be6c-18b76c7d2a1a@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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
-In-Reply-To: <0e0fb3af-968f-46d2-be6c-18b76c7d2a1a@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 26/06/2026 13:30, Konrad Dybcio wrote:
-> On 6/26/26 1:20 PM, George Moussalem wrote:
->> On 6/26/26 14:53, Krzysztof Kozlowski wrote:
->>> On Thu, Jun 25, 2026 at 06:10:08PM +0400, George Moussalem wrote:
->>>> Document the Qualcomm IPQ5018 Bluetooth controller.
->>>>
->>>> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
->>>> ---
-> 
-> [...]
-> 
->>>> +      compatible = "qcom,ipq5018-bt";
->>>> +
->>>> +      qcom,ipc = <&apcs_glb 8 23>;
->>>> +      interrupts = <GIC_SPI 162 IRQ_TYPE_EDGE_RISING>;
->>>
->>> No firmware to load?
->>
->> firmware is loaded by the remoteproc in patch 1
->>
->>>
->>> It feels like remoteproc node split is fake. The property qcom,rproc is
->>> even more supporting that case. Shouldn't this be simply one device -
->>> bluetooth? What sort of two devices do you have exactly? How can I
->>> identify them in the hardware?
->>
->> I wasn't sure how to represent the HW. Should I make this bluetooth node
->> a childnode of the rproc? Essentially, this is the transport layer
->> (using shared memory space and IPC/interrupt).
->>
->> Most QCA BT controllers are also childnodes of a serdev/uart node as
->> they use serdev for transport.
->>
->> From what I understand, it's simply BT firmware running on this
->> dedicated M0 core in the SoC itself connected to an RF.
-> 
-> Seems like this rhymes with the WPSS remoteproc +ATH1xK_AHB situation
-> - the Q6 core power sequences and manages the wireless controller,
-> while Linux gets to drive the device as it would if it were connected
-> over PCIe/ UART respectively, just with MMIO writes instead.
+bpa10x_setup() sends the vendor command 0xfc0e and passes the response
+to bt_dev_info() and hci_set_fw_info() as a "%s" string starting at
+skb->data + 1, without checking the length:
 
-But the ATH (except the MMIO for remoteproc bringup) are physically
-connected over other bus, like PCIe and UART.
+	bt_dev_info(hdev, "%s", (char *)(skb->data + 1));
+	hci_set_fw_info(hdev, "%s", skb->data + 1);
 
-What is here?
+A device that returns a one-byte response (status only) leaves
+skb->data + 1 past the end of the data, and the %s walk reads adjacent
+slab memory until it meets a NUL. The same happens when the payload is
+not NUL-terminated within skb->len. The out-of-bounds bytes end up in
+the kernel log and the firmware-info debugfs file.
 
-Best regards,
-Krzysztof
+Bail out if the response is too short or not NUL-terminated.
+
+Fixes: ddd68ec8f484 ("Bluetooth: bpa10x: Read revision information in setup stage")
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+---
+ drivers/bluetooth/bpa10x.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
+index 2ae38a321c4b..07c6ed6f18ac 100644
+--- a/drivers/bluetooth/bpa10x.c
++++ b/drivers/bluetooth/bpa10x.c
+@@ -255,6 +255,12 @@ static int bpa10x_setup(struct hci_dev *hdev)
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+ 
++	/* Reject a short or non-terminated response before the %s reads. */
++	if (skb->len < 2 || skb->data[skb->len - 1] != '\0') {
++		kfree_skb(skb);
++		return -EILSEQ;
++	}
++
+ 	bt_dev_info(hdev, "%s", (char *)(skb->data + 1));
+ 
+ 	hci_set_fw_info(hdev, "%s", skb->data + 1);
+-- 
+2.43.0
+
