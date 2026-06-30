@@ -1,75 +1,75 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F26B202F71
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 19:33:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A64A149DF1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 19:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782848036; cv=pass; b=Ud6+9/ul/JUl0QSJt1WBukar7GqxE/6OZY+/4wK01lFm/fKMgko7wSQAtFUWV9yDIfVfRzkJGVGCK2KcWxp6VfRpef2KSlxVzJh5q4DUzmo31NP7vWQCxHjTUtC5+abSEwKNveGQNgEvLw+lsw6IEK3y00sOTW1rkHGqfxGW36w=
+	t=1782848131; cv=pass; b=jXeUhemPr1muoo1MeiJE1Ea9ghUk1IhLXeq1UUG84+lZB8Nxkw0s0WqQfe0U1ezSaTERhYOQU/JscMaaBTJbtKlV2pUzoWNtQ8dEnZkSZSmR7ARu4fViq3UjTkra1cv9D9+3ReEhVUpmxPfq2VqT7Kw9AAhFvpo2I7kKUeAVPRA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782848036; c=relaxed/simple;
-	bh=RWpuP1HOANd3Mw9LUIgxvKsgox/WnpchLIpwxpd/rBQ=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=neEjak+v3gJ4czfIVFaxm2hKjwCBfWLvT8/pUWtydm32uXMo/9JAEeV7PrI3LxK2STOMtV1WrFZJjM9JHermHnVd8kHKyIc0GTxTpVd3L3qfJSl9ka1S8BvY6bdmSS54eWgLmahIO80Wb99R5BMD8dd78knDFxTpQTztNqlXruk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YF9S91kA; arc=pass smtp.client-ip=209.85.221.46
+	s=arc-20240116; t=1782848131; c=relaxed/simple;
+	bh=P+fEJEIZPyP+xOSvKPSY1utsc9fEx4yFDskO55ILDM0=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=NnLUAGVSVfRaI+vUyvgZg8pWL6ZlcXdjwOu2v6Q+b60+tk4iqS+AmXyNPZpUeyfu9I25G8mO9DPlpiNwmgBp6DBZZpiK+K6d77j08Zscol5OcaDtwyV+DkBKjCzlSM2VX7XlUThF+8kv7Qxk4QinS6A4dkuN/6lXLxuIU8beL0I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dSBn1lPc; arc=pass smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YF9S91kA"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-47248615e4dso3222713f8f.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 12:33:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782848033; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dSBn1lPc"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-49270caa5c0so39080005e9.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 12:35:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782848128; cv=none;
         d=google.com; s=arc-20260327;
-        b=lJucYauOaQNhyZh2QgThFOXiVVVq+qDTHkFRr0Lil0Rv2wQWBMcVJTQzYuuo80cIxD
-         xjGnpvcZGUYY4jlPizVgu6Gx3VTCn1FLy/UjeWrhlgJ4c/vAyWIZ9XQ9aylZ7q8tkInH
-         9sGwwwDhzkKiWhzwy9SKfsR9H5/NSGDybgkMlV0GHfcnjiHKQ3vk9v7VbOZDvDk0M0Za
-         3x9jZe5zVXet6p4ljarRo7DykjkdK2fXZiJPoLCD6czKKJxZy1b8tIsTZC3WQCdNJbWg
-         ST+OKfYdNZMAUZQqbcmcBQEKLlhmFz2IrNwhfKe+X/iq9TnS3ytPGosIwMb+tYd+Zv2b
-         yCbg==
+        b=Y93R4ZhUmEZxvjNzks/eKq8tbRf6yl3ZshvZUILSKg9spV9Kq9qyyFFxk+GdCnpeCX
+         LMgFvWuWrD1jZuaDfiw+cAGGv6VrXS9G+crgFeEmZw2kk9L5Zpf9JWPTP/XDKwgGIjEq
+         7ilHPRv8Zi4DehG+k9DUgi7YvI8ioK2jZsJeMHpu3M1msA9HzHVp4RBTeCS9KEmQcFQE
+         qGqYWbY57Ea6P0B8ansjYaAR8NIjag2rFaaUfOz+aJZISmzGmxyUY0Dowk1OkacBw/yi
+         vTprskQ7QW5nLh0YjJYZZqiNXYD8BO8HKzDhjib1nD5eM2RvspqbwcsFMlxob0KVc+HH
+         ggqw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=NUUH1p4sJ7WqPdD8mr/jyFqmyFX9fLUZS4OT3W1zTpg=;
+        bh=CzpTZr480p7V0MaUtJeFZBHfP22/xOys/yE+npjBWdM=;
         fh=v4Z3N2Htbr8NtGqMLkQjkIE/EbeUcf6lhEWEAm07n3g=;
-        b=XnFqNiEEf3LIEKOmBzKI7MQukuZ2ms0pGJgTIUBMklEqh39yEy7mv4Op5kHTGI3shJ
-         j7y9ffTzgSBiVL88ckENkh06NfeWc4jzzfScTrWEIcD052oWP5dqcPK8l9hEEgjIl8Ol
-         ZQp3lcgGoEuZ9nmYJbLfT/xfqFo8DaCnIDfftB0gfp/EjHB1EU2/LekOudlrcclwxfGc
-         WiknGl0p8B5ixAkBG7BKydlyPrD+eb1NG+O7+biGuUu9ORFMjTwPoihCTQPEjo+h6wII
-         Qor5vBUBUiIEZWobJe5PCeg6HSvSM3cbgbOUhAEO+eMn+O6KNoImk8j3a/bU/fmZWC6B
-         ipyg==;
+        b=stbzPozNKjBY2mEn6DuW3Y/fmUO+H+sv+kBAUw9eDykjMhgedtOPWo7x24aHeI+CmV
+         RjiV6qelCn9qm+jNzP4vdQFovBgP2eP52SH8kwwBty/XsFH07WboYnIKvhoW8LnDOcYo
+         cUduLuB5xzWnf3GVCxyu2cZEMi/tEYwBfhVJM8ivEUYXNDfPO8mUNz9tRnx6bjzfmnP+
+         nMWXITcuEjQvEg0JY2eWeZv2ey7d8WfRdKTqjR2xGzp8NS2+IWZnVfDv+lF0uChQCNcs
+         DVhRxvtwWVezoO6lGDZ8WrFgI4CVpaoNJLChxi+KGRK0uPWJz1qlQBmgL5bQl5ZGjzXx
+         tTdA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782848033; x=1783452833; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782848128; x=1783452928; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=NUUH1p4sJ7WqPdD8mr/jyFqmyFX9fLUZS4OT3W1zTpg=;
-        b=YF9S91kAOUA8Yqv3TSXMGW/i2nu7D3eAQG73GsFQvs6czbeQMmlRIuXMWGAFaEfLup
-         sG7ZvC0lPdNsNMKRVjfBiySP/nVnOssMdbqtqucv77AunDhlnPdOk9YN7DVcNmvxtQjm
-         PUsXTsPeZCqs7hyBBJFVxpvy8eZlX+IWD/ZjS9/6Uar4tT/Qr2VJjivn1rW9q5LQg2kp
-         iS7bL9sL+/BeC6RHDDG3v3gRCNtc8thMv9CUBt/JdGapWy9x+wGKG5Zu5ISLczMKxyK+
-         ueBwuD1f2IHe0pzdf9DzNMNeGYnKRPz0mQv6hBJ4D2lBD7rszmE2p05CDvl4irB6gNOP
-         cDAQ==
+        bh=CzpTZr480p7V0MaUtJeFZBHfP22/xOys/yE+npjBWdM=;
+        b=dSBn1lPcWrg3I4S/fEJJeguDN+cRAg+OQHgxuKkktW5Toy4Fr9sf/GZ2I00X1hk890
+         PwHKa9/lC5WqrSFMpf7dBXi21oQMK608hZO6UQ5DfTaq8hAwLhvELmsK8e2dh0aDcMO8
+         7n5Z+PjP4n23dwGgDtp5B8hr/9PAb28cUyIfNgDVI2P3cMhfo9Fwps0+lvk4zw/KLseA
+         UES9uxHB/WN8lu2GsxGLYS9WLKbuEIX9f5GwBn07NXJ6S6TiokpqVLpUEburoZCvvJQ5
+         61Dd2Dow8SxWpPgS9f8Bgimt4EFCpt6LXpmt9W+oq2psBvI1byLq2ScuF1iCQYp/nhqC
+         VvaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782848033; x=1783452833;
+        d=1e100.net; s=20251104; t=1782848128; x=1783452928;
         h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NUUH1p4sJ7WqPdD8mr/jyFqmyFX9fLUZS4OT3W1zTpg=;
-        b=SHs8JlOzQVDpREWxwj03iV72aUc3YBb28YiVB7VFwUVzyT+td2hiNll2gtaxbvi6hc
-         1culoivZjLiQITe7rLQWddrH1k/1V/aRqPGHyZt7EK3Skh+VGf0ADvn5eM1fpOBKPlkX
-         CYgopZLQLt2SK3pe2kWQQDJUrP3gAwFWxNW9DXUE70Ysx2APNgiwyqO4rDgi81Xqdg6j
-         kRedHnlbYxQjb2QF08XgJ58hlNtb6Xt3/GyzOZMOl0N417qEMgD0sYFjsp/I7Q59Shj6
-         gmnj9jHJUiFKvLYeQpfZQi002NIeRH6x9GDVXKPNAVfIrDNbUZJtuF0KIlyfvjuQDvD5
-         3wPA==
-X-Gm-Message-State: AOJu0YwNP/w3p1rq4jAhg7pnJjSZyCil46mWqqMKY+UtWFSj1jYIgjTW
-	xggLTXZfuK+DrEWTjAx6tg5x/5Msee6quz7LY1djyNlcKcPUZ6NBmjtn+FfuivrxTm0wWp3b2W9
-	c4YLiRIlGVic2Vet6vy4IKDJloroTj4/P3/eTQorTwQ==
-X-Gm-Gg: AfdE7clfVgy1tArtCA551RMwwJiG41DeuXfbESohD8YWvNzfNKVQPA97fTkwkIywTqX
-	NLzs3EWQcHlLlkrtetjnxQoF+UE2AAuEq0q/ktvgj2x30FTWv6a7BTlLep4Zp2Lm696t42n1RmJ
-	XXcuMtRIpxGxSYL+yj9Hy/reHJQxk7Cmz7iiem2cKlfMhz2WxAcb2j0sM+vJhH09XlibEDCfEav
-	Qv34TSkUSCXxRQz7UHR2P472AOE0LyZTNdinck7DKCX6/qoydpw3jffarOXV1UPEkrE/24AUNSD
-	34aEuYYO276eMQ==
-X-Received: by 2002:a05:6000:2510:b0:470:c049:b444 with SMTP id
- ffacd0b85a97d-47654b115a0mr2774203f8f.0.1782848032690; Tue, 30 Jun 2026
- 12:33:52 -0700 (PDT)
+        bh=CzpTZr480p7V0MaUtJeFZBHfP22/xOys/yE+npjBWdM=;
+        b=skiGJXxDbhTDJL5cB5CAI5GHiDQTh3lXBSQoHg4yoDPTUB3pxEUvWxqBVgvIa34qGc
+         gxfvC4SReXMSHvr/HI1mm7DhwfUar2ZLCNf0tNo6vuV7A/tK7c8yNzhj80TF+9q9QKVB
+         fAERbaM4pkltrB+wswjleJdpPcxtOE/kecaThpWljpA/svp+T9w+fQfPJ59WfUx4PpxB
+         xs5Dpc3w2HFyu7ahWSssMcwC+z9U9kTDs5uSIpSb3GIVUPmqqLCec/AYaQgzFOZ+u6pp
+         MiZKi7nq3CEQfD7cVpl4IsM+wknMWlqV6+HnXZLCeRrZBHRDYxCB0CfxxqbBrv4PXs3S
+         nWiQ==
+X-Gm-Message-State: AOJu0YyvdZXCRZysku3+mMXmCjZr6L3aChIHPU0PvpGlUlIy7R5mnOMj
+	Sb0ezEIeEaUj1MVvraEolLpV6aQZcOb8oNFeA66gMtVh1eg+aoolsGrWRehHxa5Vj2ZxWNBitmp
+	Tu9VvVCb84RDbRXRk12DqT4KYVJr1QNQ=
+X-Gm-Gg: AfdE7cnGlkDqLeterbrbwm3Fd8cj/+HZD8Y4cLy2VnQbhOdxAhzEf+gjzI97sGPrkbe
+	GTPu6va/Ux2PRnQlHC/F+QcSPUo3oHGz/4F30fWFx2JMOGZvnCUlAD1dG4/v+iMn7suHjK/YJTn
+	mFzRCZjgFmYttwW0jM7EscPj0n4gPHMTuxTQwWPvn3i+HLR72j/xobQV8p/qcH3Kj6f1EOBVkmw
+	PRDEEvBa5tdov/lnCTYIein0zNxXJ6d/CYeROjrUk5RdK9Ga9Eda9gvGD+RK5Q4ImqJNNi1SU5E
+	54Xo9wZoyea4PQ==
+X-Received: by 2002:a05:600c:8889:10b0:493:bf84:53d8 with SMTP id
+ 5b1f17b1804b1-493bf84541amr1471755e9.9.1782848127576; Tue, 30 Jun 2026
+ 12:35:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -77,136 +77,176 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: LocalHost <localhost.detect@gmail.com>
-Date: Wed, 1 Jul 2026 04:33:41 +0900
-X-Gm-Features: AVVi8CesiUgqWaklt7W1S8NKLOpzsL1K-ahiN4GrQBRQ48VQ5Beua4ugW7eTIEs
-Message-ID: <CAOpx92dGSe4pFZTvNpZsAQzzsQfH2XxaVtaSBdFtCpht3wLTRw@mail.gmail.com>
-Subject: RFCOMM/HIDP: validate skb length before accessing frame header
+Date: Wed, 1 Jul 2026 04:35:15 +0900
+X-Gm-Features: AVVi8Cfv9feFlRKQLYxQa27yYRhABoj62IknmbSWI6Z9_GYezTRkdqQ4jxkLGa8
+Message-ID: <CAOpx92cQMiAR2BX5UeDdF5F8nqbkFAgo0yihDo+PVjobYVmTVw@mail.gmail.com>
+Subject: Bluetooth: ISO: validate fragment length in ISO_END reassembly path
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
 Hi,
 
-I found a missing minimum-length check in rfcomm_recv_frame() and the
-HIDP frame handlers (hidp_recv_ctrl_frame / hidp_recv_intr_frame) that
-allows a connected Bluetooth peer to crash the kernel by sending a
-zero-length L2CAP frame.
+I found a missing length bounds check in the ISO_END reassembly branch
+of iso_recv() that allows a kernel crash (DoS) via crafted HCI ISO
+fragments.
 
 The initial candidate was identified using a custom AI-assisted code
 analysis tool I developed. All subsequent verification, data-flow
 tracing, guard analysis, and impact assessment were performed manually
 by reviewing the source code.
 
-Affected: net/bluetooth/rfcomm/core.c, net/bluetooth/hidp/core.c
-Impact: remote/adjacent kernel crash (DoS) via established session.
+Affected: net/bluetooth/iso.c
+Impact: remote/adjacent-triggerable kernel crash (DoS). This is NOT
+controlled memory corruption -- see "Impact" below.
 
 SUMMARY
 
-rfcomm_recv_frame() and the HIDP ctrl/intr handlers dereference the
-first byte(s) of an incoming L2CAP frame and unconditionally call
-skb_pull() without verifying that the skb contains sufficient data.
-A connected peer sending a zero-length frame triggers an out-of-bounds
-read and an unsigned skb->len underflow (0 -> 0xFFFFFFFF), crashing
-the kernel.
+iso_recv() reassembles fragmented HCI ISO data frames into a
+per-connection buffer conn->rx_skb sized to the total frame length
+declared in the ISO_START header. The ISO_CONT branch validates each
+fragment against the remaining buffer capacity (conn->rx_len); the
+sibling ISO_END branch does not. An ISO_END fragment whose length
+exceeds conn->rx_len reaches skb_put() with an oversized length,
+tripping skb_over_panic() (kernel BUG/panic) -- a denial of service.
 
-This is the same anti-pattern in two subsystems -- both sit directly
-on L2CAP and trust that incoming frames are non-empty.
+ROOT CAUSE
 
-ROOT CAUSE: RFCOMM (rfcomm/core.c:1769-1797)
-
-rfcomm_recv_frame() casts skb->data to a 3-byte struct rfcomm_hdr and
-immediately dereferences it:
+In net/bluetooth/iso.c, the ISO_START branch allocates the reassembly
+skb to the declared total length and records the remaining capacity:
 
 ```
-struct rfcomm_hdr *hdr = (void *) skb->data;
+conn->rx_skb = bt_skb_alloc(len, GFP_KERNEL);   /* iso.c:2594 */
 ...
-dlci = __get_dlci(hdr->addr);       /* data[0] */
-type = __get_type(hdr->ctrl);       /* data[1] -- OOB if len < 2 */
-
-/* Trim FCS */
-skb->len--; skb->tail--;            /* underflow if len == 0 */
-fcs = *(u8 *)skb_tail_pointer(skb); /* OOB read */
+conn->rx_len = len - skb->len;                   /* iso.c:2602 */
 ```
 
-There is no "if (skb->len < RFCOMM_HDR_SIZE)" guard. For a 0-byte
-frame, skb->len-- underflows the unsigned 32-bit field to 0xFFFFFFFF,
-and the subsequent skb_pull(skb, 3|4) leaves skb->len enormous,
-propagating into downstream parsers.
-
-The caller rfcomm_process_rx() (core.c:1964-1976) dequeues skbs from
-the L2CAP socket receive queue and calls only skb_linearize() (which
-succeeds on empty skbs) before passing them to rfcomm_recv_frame()
-with no length floor.
-
-ROOT CAUSE: HIDP (hidp/core.c:560-623)
-
-hidp_recv_ctrl_frame() and hidp_recv_intr_frame() perform the
-identical pattern:
+The ISO_CONT branch correctly rejects an oversized fragment before
+appending it:
 
 ```
-hdr = skb->data[0];          /* OOB if len == 0 */
-skb_pull(skb, 1);            /* underflow if len == 0 */
+case ISO_CONT:
+    ...
+    if (skb->len > conn->rx_len) {               /* iso.c:2622 */
+        BT_ERR("Fragment is too long (len %d, expected %d)", ...);
+        kfree_skb(conn->rx_skb);
+        conn->rx_skb = NULL;
+        conn->rx_len = 0;
+        goto drop;
+    }
+    skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
+                              skb->len);
+    conn->rx_len -= skb->len;
+    break;
 ```
 
-Neither handler checks skb->len before accessing skb->data[0]. The
-caller hidp_session_run() (core.c:1254-1273) dequeues from the
-ctrl/intr socket receive queues with only skb_linearize() -- no
-minimum-length validation.
+The sibling ISO_END branch is missing the equivalent
+skb->len > conn->rx_len guard -- it only checks for a zero rx_len:
+
+```
+case ISO_END:
+    if (!conn->rx_len) {                         /* iso.c:2637 */
+        BT_ERR("Unexpected end frame (len %d)", skb->len);
+        goto drop;
+    }
+
+    skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
+                              skb->len);          /* iso.c:2642 */
+    conn->rx_len -= skb->len;                     /* iso.c:2644 */
+    ...
+```
+
+If an ISO_END fragment arrives with skb->len > conn->rx_len (i.e.
+larger than the remaining tailroom of rx_skb), skb_put(conn->rx_skb,
+skb->len) advances the tail past the end of the allocation. skb_put()
+detects skb->tail > skb->end and calls skb_over_panic(), which BUG()s.
 
 REACHABILITY
 
-Both RFCOMM and HIDP sit on L2CAP Basic mode sockets. The L2CAP data
-channel dispatch (l2cap_core.c, L2CAP_MODE_BASIC case) checks only
-chan->imtu < skb->len (upper bound) before passing the frame up. A
-zero-length L2CAP B-frame (lh->len = 0 in the L2CAP header) passes
-this check (imtu < 0 is false) and reaches the RFCOMM/HIDP handlers
-with skb->len == 0.
+pb is derived from hci_iso_flags_pb(flags) (iso.c:2524) and the
+fragment length from the ISO data header. A peer that supplies HCI ISO
+data -- a malicious/compromised controller, or an over-the-air
+broadcaster to a host performing broadcast ISO/BIS sync -- can send:
 
-A connected/paired Bluetooth peer with an established RFCOMM or HIDP
-session can send such a frame.
+1. ISO_START declaring a small total length (e.g. 16), with a short
+first fragment, so rx_skb is allocated small and rx_len is small.
+2. ISO_END with skb->len greater than the remaining rx_len.
 
-IMPACT
+The ISO_END branch appends without bounds-checking, skb_put() fires
+skb_over_panic(), kernel panics.
 
-The reliable outcome is a kernel crash (DoS):
+The practical attack surface depends on how aggressively the local
+controller validates incoming ISO PDU segmentation before forwarding
+to the host. A compromised controller (e.g. malicious USB dongle
+firmware) can trivially set the PB flag and fragment length. For a
+purely over-the-air attacker, reachability depends on the controller
+passing fragments through without re-validating their lengths --
+common in low-cost BIS receivers, and consistent with the threat model
+of prior BlueZ ISO/L2CAP issues.
 
-- The underflowed skb->len (~4 billion) defeats downstream length
-checks (pskb_may_pull, skb_pull_data -- these compare against the
-corrupted huge length and pass), causing subsequent parsers to read
-far past the buffer boundary until a page fault triggers a kernel
-oops.
-- The consistent, reliable impact is DoS. There is no deterministic
-information leak -- any path that might echo data back (e.g.
-RFCOMM_TEST, HIDP report_return) depends on uncontrolled adjacent
-heap bytes passing FCS/type gates (~0.003% probability per attempt).
+IMPACT (deliberately not overstated)
+
+The reachable, reliable outcome is a kernel crash (DoS):
+
+- For any ISO_END length that exceeds the skb's true tailroom
+(skb->end), skb_put() calls skb_over_panic() -> BUG() BEFORE the
+skb_copy_from_linear_data() memcpy executes (skb_put() is fully
+evaluated before its return value is passed to the copy). The result
+is a panic, not an attacker-controlled write.
+- This is NOT a controlled heap overflow / RCE primitive: reaching the
+adjacent slab object requires skb->tail > skb->end, which is exactly
+the condition skb_over_panic() traps. The two are mutually exclusive
+-- the panic always wins.
+- The conn->rx_len -= skb->len line would underflow the u32 counter,
+but it sits after the skb_put() panic and is therefore unreachable
+in the overflow case (noted only for completeness, not as additional
+impact).
+
+A note on PoCs circulating for this issue: an ASan model that
+re-implements skb_put() without its tail > end check will report an
+out-of-bounds write. That is an artifact of the model; the real kernel
+skb_put() panics first. The honest impact is remote/adjacent-
+triggerable DoS.
 
 SUGGESTED FIX
 
-RFCOMM (rfcomm/core.c), top of rfcomm_recv_frame():
+Mirror the ISO_CONT guard in the ISO_END branch:
 
 ```
-+ if (skb->len < sizeof(*hdr) + 1) {  /* header + FCS */
-+     kfree_skb(skb);
-+     return s;
-+ }
+case ISO_END:
+    if (!conn->rx_len) {
+        BT_ERR("Unexpected end frame (len %d)", skb->len);
+        goto drop;
+    }
 ```
 
-HIDP (hidp/core.c), top of hidp_recv_ctrl_frame() and
-hidp_recv_intr_frame():
+- if (skb->len > conn->rx_len) {
+- `BT_ERR("End fragment is too long (len %d, expected %d)",`
+- `skb->len, conn->rx_len);`
+- `kfree_skb(conn->rx_skb);`
+- `conn->rx_skb = NULL;`
+- `conn->rx_len = 0;`
+- `goto drop;`
+- }
 
-```
-+ if (!skb->len) {
-+     kfree_skb(skb);
-+     return;
-+ }
-```
+    skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
+    skb->len);
+    conn->rx_len -= skb->len;
+
+
+A zero-length ISO_END fragment is not an out-of-bounds case (skb_put
+with size 0 is a no-op and iso_recv() is invoked once per packet, so
+there is no loop), but it leaves conn->rx_skb/conn->rx_len in an
+unterminated state. If preferred, the guard can also cover it:
+if (!skb->len || skb->len > conn->rx_len).
 
 NOTES
 
 - Line numbers are from the current net/bluetooth tree; approximate.
-- Both fixes are one-shot guards consistent with similar checks
-throughout the Bluetooth stack (e.g. l2cap_sig_channel checks
-skb->len < L2CAP_CMD_HDR_SIZE before processing).
-- A reproducer (ASan model of the underflow and OOB read) is
-available upon request.
+- Discovered via AI-assisted code analysis; the data-flow chain
+(hci_isodata_packet -> iso_recv -> ISO_END), the ISO_CONT/ISO_END
+asymmetry, and the skb_put()/skb_over_panic() behavior were
+verified manually.
+- A reproducer (ASan model) is available upon request.
 
 Thanks.
