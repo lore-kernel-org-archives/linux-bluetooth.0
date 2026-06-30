@@ -1,306 +1,169 @@
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB2F3E0C47
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 18:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389C73DE422
+	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 18:19:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782843234; cv=pass; b=EKHwZrH75QZdcqpLtLebrFFZ2/TiWYYtNLcwkmY8bSKwfUpUlexrCeeHjLrdGjOufLrUgPAhaZeeSAmQ84zGkUXpbbSX1/kONpMM0fUokJW7sFcp1v7IYT1Qhlap8brhE+apWnwRPBNTa2MdMPq6C4Cityg7ckmQ2y80lXBhIss=
+	t=1782843588; cv=pass; b=iZ3Az6YOWkHXQR6G9KKB9pajRbAWCirByFu3W1kx2WC39h3SrajqqbzgH88hbEy3BYuGLZIFH7AV4WnLswOuYe03LbVDVrLxn5zdHUo7rn86KGRMgAV3sNZu7cRdjnHin+JubbBRyBtDzEqe+CfTGzTS4mZlCUPR3sfTYvzjHI8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782843234; c=relaxed/simple;
-	bh=UGbYlaQgwW18fu7kYLjI0Kp48R62rEIrckmBTnB7rAo=;
+	s=arc-20240116; t=1782843588; c=relaxed/simple;
+	bh=XOwwrLgZFOGGmskpUaWz6HVn/KWe0h0lAqT7NstjqDc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BE892bmBlNerJj1bZoD3vmVVcfOxLHGOJwNTB8NDJool6hWL7BiSrvXNwLL5woOxowgMgvYkDIocwZejDHsEzhK+Prm5ki9tCr1PXlMLazPVRLXwj1bKrHr+yga5Wkrz66ck/qtuMV7Pyqv4DQ67fGE67NzjbTxmB5aM4FOHGAM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PPhSxSH9; arc=pass smtp.client-ip=209.85.167.174
+	 To:Cc:Content-Type; b=WH2qUCkJIyreRGFwOOFy/pqcVq+bjuz+Rugwo+SQuJHR1Vnv9/Z3ra/Frgr22A8bh9HC539XWIfBwRGwiNhmCywoXpRdaHaAUkaXusVCkqK3wBVX6UZzvkApCF1EUz12IWsYWSKfjG3sT/SgpOXTHn4iNH3VGpEL1FOy2IuAUHg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dBH2Hy6A; arc=pass smtp.client-ip=209.85.210.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PPhSxSH9"
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-495ee8e807aso579084b6e.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 11:13:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782843231; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dBH2Hy6A"
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7e9ecd7216cso708776a34.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 11:19:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782843585; cv=none;
         d=google.com; s=arc-20260327;
-        b=DBW4HPI1z7ikTdCiuKck7pCHgu363dprq5ZoRVwQGDN4QMduuO6g+Tmw8vl7SrqjtT
-         veNsfSFttLF58bi/D5avCMuCWIexsj0fsWn7AsAgRSLXjgo89OdUn2vUyRypcB4TYFuE
-         KaKuEotXnSkN4qczYKe5auf27Y9XAk018o0+LjzXGavJ8Xnaq6pfQuBzdRP2R9aPp1Di
-         nJPYS9BeEcL4nEW/zEOo4d8MIlV3k1G+zZpNr48u3UDQ7yqjIZmtbNDKq5PkeD3Rk1hR
-         p0bZSzciU5yK93hu/6FmjN8cINjOWSpJJJ05+7DYTeQkHogR8vnhZ5u08DJpycWCoASG
-         favQ==
+        b=iOkIdB3xAaXlpxXyCxZ4u5n1kBxn2p/29ambBonkBH7eTTUMjx6SvIqRQdosNwQrzc
+         a/4v/huZA+vQIB0Dl/D8RT1Kb8xoSv7s/AJMWZbL7hIEVBTwy1p8lLDUKlYpJ03Yjehf
+         WYDL7l7n2QlzaUKtE+7gkgwjP/14A7/uCVfe5ss633U/FUHJVUlJmIETSR9+z0xM2N+1
+         jIVgq+d8TPhoOuNAW2haWhWH9Y7pFCREy1SbzAjSXgpVL1vhlx3Aifk3CII4KASfPxpH
+         RohemWOL8rt9PuAXfSlPxYMuw4ya4rE4yQRkyWHK1JsLdMqW9xkn4FER/Xx5wFaEZOHP
+         A/lQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=OrrsP9OG2U9lID1ZHHoUeFSJyWq6cn3Ni7Hbvjxkttw=;
-        fh=+UF4WEFJCXokI1KVaJuNvhV47TZtLx4HFtzKdIpr9Pg=;
-        b=J8biD2/TiowYQbsQKrbmtiaIa5T5A3g8tcEowy3rkYbDiLZryt24tsSIciL84eZZ6k
-         8nNT29HrX/DJuc/GnST9Fhd+4x4h8/8+Z4snmD3WPiNl7//gL0kD1Jg4G2mWTzL10XQi
-         Dgqbcdo4HNS7Xoez49EPGFmyNYFSfmff8XqQWLAhM3LTTDUhX2q+d/3oqFMxegWBBSgR
-         klxdodvYAMROtUpU0yEgFlLd0OUqQXljt39rUKAkzc0faexqP2ZhBX/KJAWhlbA2WFxZ
-         V+Xx+DUje8MRFHrjONIelMxC5cZOcJL4No8VtrhOi+KaPssvhqqM83IYrKVTwvLc6YIH
-         agnA==;
+        bh=oE54+rx3E28RNN81m89+aO2BvQkOWgie8l/8oIwgbIY=;
+        fh=OFYYGJVLlnUb6P+Jg5KM4KJKQwAospMSJBnnBul51zM=;
+        b=UAxHscbGwPMx951NBIGupE/gKRV3/GJRX5isVTOti354YnIU8SHEJvdD5Rj4tQnlRz
+         TW8cQ0s20yNZ2bYjJfNXOaRVoLKcmv5HJEXYLT9ZB3drGFt5ulQqQqcdk5/ibhkmrLQ/
+         g6WL3UL0kE7HPWLIANqesBNywp5B9rxQK/2sdSfG3kV0Z1XSVprpZCqfuf6TABZboB7Q
+         zCtApWny29W/yEoB//C75JCov8qvm/0o/EQSwgV0NwhI83Xm5UxZ1nuyLCgpqdg/jQaR
+         ceO1tQviq3Sn4Ve2L6Bfa584X8Nz1L4knUtPVpc70jXaiFubr3NZYpPbvHBQ/IiZcahQ
+         yQ4g==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782843231; x=1783448031; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782843585; x=1783448385; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OrrsP9OG2U9lID1ZHHoUeFSJyWq6cn3Ni7Hbvjxkttw=;
-        b=PPhSxSH96mWePqPIBMP76tcgs+UWFOtHcchRcBBfI8kMatPf8p3LeJKiPu/7C8DCJ/
-         l/RhJQfK/y1fmOLCTTuL2NagxOLm7deeQmbMDh+rH69k3sT/Hw64NQx428ZUnK2vniiw
-         JdASeOOH8gt8+d6eU5BkLnPj7+yBCzk2UH8XlD4Ffi35Xzyr1W2A61sltL7AwTm1fC0t
-         ydtoV9fO7XYwAfa3ZvsAyyz29gonXqukZoiWLJ8vA5YASoR45/biKU1pYaccqsPiynLK
-         IZ4BlCVUrDBGrCEHNxmQ0+xS5LKcmi64TZy3OOsh91fM+b/SYPB6RhB1eyj1dBEDZigP
-         8B8Q==
+        bh=oE54+rx3E28RNN81m89+aO2BvQkOWgie8l/8oIwgbIY=;
+        b=dBH2Hy6AUAUFZaO1kupzlsHKmB2NFD/MC2ciu94QZ0hKHZwy8wKPbLbBWyjHeAarhe
+         myK5zG2hr9h2SaReNU9iVd85sLtkEIvaKyDmezMvAzkxiN29uLRLPmH8V6m0Np5AUbY9
+         yu8LFde1J/oz+mnwcByWZdylWik+Qnf0FS/CcnrfV4vbxY3CvX5CheVa3RZ1WUECrSdX
+         TgMn8G02QHuIYPM3qf3nQeStmsLb4D78x1xavmlBozObv7ss72LV6tQ+ht9pV2UllxNM
+         mGwI0YrrNzXfSTeOlYE0evxHUkHOEEi9axWYAQVKREAe3F0vnKwj879Pu8U8BjSzKNsx
+         93hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782843231; x=1783448031;
+        d=1e100.net; s=20251104; t=1782843585; x=1783448385;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=OrrsP9OG2U9lID1ZHHoUeFSJyWq6cn3Ni7Hbvjxkttw=;
-        b=TQqlQedQ8bdS/dh8Qg5n/qZaacfSRiNQD0Watkc1ff/4gZI4pMXwWz9blwOkUVBheN
-         brwrgG0R0PVHAgpF1IcuuWJejfGEhzInRoj4V58dGEOcwRCbI3rlir3I8EDrtnNw83Ys
-         pG/KwEub4+5kN7V+A0YygwpArudsyqGqYS6FWXX3mE4vOqMDYoWzG2hstfjnrz5XLPz6
-         gq9U8eWJSHDtnSuD64Sch7cjdc44MBknK9DPIKUP/3TiXSehi+hh/QwdatsPOY10FFr/
-         VzafflTUe7dnNCi8QUYWS0m63waxBlc0EdUuOFUonn5ylXSh3G1kpBJwj8kHoanf2aBC
-         6GRQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+QeZpLyGFDke6uFhiGG2cUfRy1QHGMpSCISOE723G6cDVzznfLQ+Cz0RB+xXBZyuV0tdIyb+MAjvZg6Wb5hS8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3WDILUgeN7/+AnQeGGVwGckVDZHUplzQJGu6s3FN88QeIZlNI
-	xGmk0mwIt9NaoWrq1KGkkjB4HmMCWXmIS0l/Z6kUe094WA87VRnbvfnePFAI/kz4QkdUNJdFl2O
-	1dS/FS4xaCIApGRtVSl7vMQklzitBMEY=
-X-Gm-Gg: AfdE7cknzZpdr224xFxfQkhkH963K8u2DocOP4YSOnMwktnuWvjNNu9lPq1S1+/GCQX
-	tGyjrbY5fPzMfcgesiQmG/pv6p07PF/twSpv7JqIRVaTdr4RQrpgqCHzTGqq8lRIy+zgqGGVF2z
-	uYhAVJtBGTlfJfSlYpFWckBGb4/XLXlGtIgbbprRdy+oSemhxhE9p5GpIx6cCc9auobtJTNsdiu
-	/eac4gOmkwUkfjF31qaciI26Cp4bpSFrmeI1VroyEKqU+8TmapRHjE8YZ7054+30xi5K/QqT03N
-	AxXAdqMmuUO/f+E4B5CU36Qf7bKzgs6J+0ItoyURiVXmpoBiBN8paYTJz6SSzhVv9fU=
-X-Received: by 2002:a05:6808:1308:b0:48b:626c:77b0 with SMTP id
- 5614622812f47-495eaef2c2emr3952635b6e.26.1782843230620; Tue, 30 Jun 2026
- 11:13:50 -0700 (PDT)
+        bh=oE54+rx3E28RNN81m89+aO2BvQkOWgie8l/8oIwgbIY=;
+        b=U0sXFLF4vC9WEb+3ULf1aNWoOLMdQW1tVSKIzAF9pwUWCNx+9/rCrJnFZ9xOpWq2UM
+         FJaS/8Ttf4CU9kRT8HSqC/yWIPousAVTF0aC3Cd+uvGlvrZGBd2bkgS1WmEkJ0Otgbhd
+         f/aoTL8LVA7KI9aBsMYsehAHhAHnk18AfUyI49gldA+QZzRBU2kGKiIRe0ZCpuSRT6tE
+         ueFOSU+kJxeSMrCwYqhNfngTdfYeyEQOGxVOKEQZdEdzcyXzpuNKOcBwb7cUssMn/oGg
+         pFc2Lrlay4Uc3CA3P/mXBlIz12uxLh2ikll6pHySAMoJFKkUbkdAJkUDBSHkWxh10mVF
+         3Lkw==
+X-Forwarded-Encrypted: i=1; AFNElJ+EwmrfNPM9kucYEosoM1uuplcflYvZ8cs/4xJHRna2evgRo7YgBsOrPtsOcz+nEgfi1EjJN/lqCQqWl3xJQZI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziN739Mahk+v+CNc/sEDl8Vq3RUrrCY3p/BUjYeXDVwkl37uGW
+	euIUlpmubaXiEjAxl5PNcuGRN6ceOwnaoj6tkeTcN1ByycePma+NGPiVXbY9fpmmLJHfDuJNHn+
+	RrBOpOFRoOODvH8zHC4kiIcu9EGWkoVO7/rI5AVDUVQ==
+X-Gm-Gg: AfdE7cmo/sRJtOheC2kDLJsI7xVcqistfkiKxBmqWduMCIc10Z/ZQvuKVFWhAXiOnZR
+	2HOfbhvVP4nSVqIRNA5O9QBeW89WA35T/ne1ifTy+r6JlhuwDfVxaC7zgJMvdPBdZsTvIUJBN1T
+	/Nnl3+NRfM7VDF/4EcbyrtXRRQ3lE1LKcz+C9HHatmtXgpIBsLlSyNr11Gx1dP/M26qhAIFQh9Y
+	q/X346nOOFs+oeInjBW5zdiGxnHtZJtsCyi+50mxUiPDn4Hrss99cArrkKOnmexUSOsyLJ0FTv7
+	oGMsAgiwSPtbSSTkZcLRcByCKHUL2YLUqyNDBkh8SNFrAQQrB51oHd56
+X-Received: by 2002:a05:6808:8957:b0:489:6bf3:2d54 with SMTP id
+ 5614622812f47-495eafc3fd5mr3895556b6e.37.1782843585139; Tue, 30 Jun 2026
+ 11:19:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260629-btmtk-ryzen-remote-wakeup-v1-1-1d2f1cee6d22@rong.moe>
-In-Reply-To: <20260629-btmtk-ryzen-remote-wakeup-v1-1-1d2f1cee6d22@rong.moe>
+References: <20260630123539.668776-1-chris.lu@mediatek.com> <20260630123539.668776-2-chris.lu@mediatek.com>
+In-Reply-To: <20260630123539.668776-2-chris.lu@mediatek.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 30 Jun 2026 14:13:39 -0400
-X-Gm-Features: AVVi8Cf_dKRwkrq_lWyyBPSPON224TZvf1AOfBhLImbCwdJjDU6urnQUGZKhu3Y
-Message-ID: <CABBYNZLhqQF-V8sJORwMW2C_4FxFY+pkAK=cSDg4aeWJYfiJrA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Properly disable remote wakeup for
- MT7922/MT7925 on Ryzen platform
-To: Rong Zhang <i@rong.moe>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, =?UTF-8?B?Q2hyaXMgTHUgKOmZuOeomuazkyk=?= <Chris.Lu@mediatek.com>, 
-	=?UTF-8?B?V2lsbC1DWSBMZWUgKOadjuaUv+epjik=?= <Will-CY.Lee@mediatek.com>, 
-	=?UTF-8?B?U1MgV3UgKOW3q+aGsuasoyk=?= <ss.wu@mediatek.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Date: Tue, 30 Jun 2026 14:19:33 -0400
+X-Gm-Features: AVVi8CckfBlQXS-AvJ4P_5PwELwNv10OM6MlJ2Jz8lbFBi_--zDr5zCfTIMBNcY
+Message-ID: <CABBYNZLho7-McDKpFC+AtotGyy7S=SXP-mT30MWBQ8p44oB-1g@mail.gmail.com>
+Subject: Re: [PATCH v6 1/3] Bluetooth: btmtk: Replace magic numbers with WMT
+ packet flag enum
+To: Chris Lu <chris.lu@mediatek.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>, 
+	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>, 
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-mediatek <linux-mediatek@lists.infradead.org>, Paul Menzel <pmenzel@molgen.mpg.de>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Rong,
+Hi Chris,
 
-On Mon, Jun 29, 2026 at 11:28=E2=80=AFAM Rong Zhang <i@rong.moe> wrote:
+On Tue, Jun 30, 2026 at 8:35=E2=80=AFAM Chris Lu <chris.lu@mediatek.com> wr=
+ote:
 >
-> It is reported that a remote wakeup could cause MT7922/MT7925's btusb
-> interface completely unresponsive. Resetting the xHCI root hub doesn't
-> help at all, and recovering from such a state needs a power cycle.
+> Add BTMTK_WMT_PKT_* enum to represent WMT download packet sequence flags,
+> improving code readability. Replace magic numbers (1, 2, 3) in
+> btmtk_setup_firmware_79xx() with descriptive enum values:
 >
-> All reports seen to be relevant to Ryzen-based laptops. These NICs are
-> usually used as OEM components thanks to some sort of reference designs.
+> - BTMTK_WMT_PKT_START (1): First packet of a sequence
+> - BTMTK_WMT_PKT_CONTINUE (2): Continuation packet
+> - BTMTK_WMT_PKT_END (3): Final packet of a sequence
 >
-> Their popularity on other platforms is unclear. While there is still a
-> chance that the quirk may exist on other platforms, be cautious and only
-> apply the quirk on AMD platforms for the time being.
->
-> Meanwhile, though device_set_wakeup_capable(false) is the correct fix
-> for other NICs with fake remote wakeup capabilities, doing so for
-> MT7922/MT7925 effectively prevents it from being used as wakeup
-> sources as per userspace requests. Hence, return -EBUSY on runtime
-> suspend to prevent the interface from being autosuspended while it's
-> still opened, which has the same effect as
-> device_set_wakeup_capable(false), since disabling remote wakeup simply
-> causes the USB core to gate runtime autosuspend as well due to
-> needs_remote_wakeup =3D=3D 1. The interface can be safely autosuspended a=
-s
-> long as remote wakeup is disabled, i.e., after closing the HCI device.
->
-> Specifically, the interface may still take the advantage of remote
-> wakeup in order to wake up the system from sleep if userspace has
-> enabled it as a wakeup source.
->
-> Fixes: e31d761628ad ("Bluetooth: btmtk: Disable remote wakeup for MT7922/=
-MT7925")
-> Signed-off-by: Rong Zhang <i@rong.moe>
+> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 > ---
->  drivers/bluetooth/btmtk.c | 10 ---------
->  drivers/bluetooth/btusb.c | 57 +++++++++++++++++++++++++++++++++++++++++=
-++----
->  2 files changed, 53 insertions(+), 14 deletions(-)
+>  drivers/bluetooth/btmtk.c | 6 +++---
+>  drivers/bluetooth/btmtk.h | 6 ++++++
+>  2 files changed, 9 insertions(+), 3 deletions(-)
 >
 > diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-> index 02a96342e964..4614434dd57b 100644
+> index 02a96342e964..21c08ee1cdbf 100644
 > --- a/drivers/bluetooth/btmtk.c
 > +++ b/drivers/bluetooth/btmtk.c
-> @@ -1381,16 +1381,6 @@ int btmtk_usb_setup(struct hci_dev *hdev)
->                 break;
->         case 0x7922:
->         case 0x7925:
-> -               /*
-> -                * A remote wakeup could cause the device completely unre=
-sponsive, and
-> -                * recovering from such a state needs a power cycle.
-> -                *
-> -                * Since the remote wakeup capability is super broken, ju=
-st disable it
-> -                * to get rid of the troubles. The device can still be au=
-tosuspended
-> -                * when the bluetooth interface is closed.
-> -                */
-> -               device_set_wakeup_capable(&btmtk_data->udev->dev, false);
-> -               fallthrough;
->         case 0x7961:
->         case 0x7902:
->         case 0x6639:
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 08c0a99a62c5..023ae782f41a 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -6,6 +6,7 @@
->   *  Copyright (C) 2005-2008  Marcel Holtmann <marcel@holtmann.org>
->   */
+> @@ -230,12 +230,12 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev,=
+ const char *fwname,
+>                         while (dl_size > 0) {
+>                                 dlen =3D min_t(int, 250, dl_size);
+>                                 if (first_block =3D=3D 1) {
+> -                                       flag =3D 1;
+> +                                       flag =3D BTMTK_WMT_PKT_START;
+>                                         first_block =3D 0;
+>                                 } else if (dl_size - dlen <=3D 0) {
+> -                                       flag =3D 3;
+> +                                       flag =3D BTMTK_WMT_PKT_END;
+>                                 } else {
+> -                                       flag =3D 2;
+> +                                       flag =3D BTMTK_WMT_PKT_CONTINUE;
+>                                 }
 >
-> +#include <linux/cpufeature.h>
->  #include <linux/dmi.h>
->  #include <linux/module.h>
->  #include <linux/usb.h>
-> @@ -957,6 +958,7 @@ struct qca_dump_info {
->  #define BTUSB_USE_ALT3_FOR_WBS 15
->  #define BTUSB_ALT6_CONTINUOUS_TX       16
->  #define BTUSB_HW_SSR_ACTIVE    17
-> +#define BTUSB_WAKEUP_BROKEN    18
+>                                 wmt_params.flag =3D flag;
+> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+> index c83c24897c95..51c18dde0a80 100644
+> --- a/drivers/bluetooth/btmtk.h
+> +++ b/drivers/bluetooth/btmtk.h
+> @@ -66,6 +66,12 @@ enum {
+>         BTMTK_WMT_ON_PROGRESS,
+>  };
 >
->  struct btusb_data {
->         struct hci_dev       *hdev;
-> @@ -2936,10 +2938,20 @@ static int btusb_send_frame_mtk(struct hci_dev *h=
-dev, struct sk_buff *skb)
->         }
->  }
->
-> +static inline bool platform_is_ryzen(void)
-> +{
-> +#ifdef CONFIG_X86
-> +       return boot_cpu_has(X86_FEATURE_ZEN);
-> +#else
-> +       return false;
-> +#endif
-> +}
+> +enum {
+> +       BTMTK_WMT_PKT_START =3D 1,
+> +       BTMTK_WMT_PKT_CONTINUE =3D 2,
+> +       BTMTK_WMT_PKT_END =3D 3,
+> +};
 > +
->  static int btusb_mtk_setup(struct hci_dev *hdev)
->  {
->         struct btusb_data *data =3D hci_get_drvdata(hdev);
->         struct btmtk_data *btmtk_data =3D hci_get_priv(hdev);
-> +       int err;
->
->         /* MediaTek WMT vendor cmd requiring below USB resources to
->          * complete the handshake.
-> @@ -2956,7 +2968,29 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
->                 btusb_mtk_claim_iso_intf(data);
->         }
->
-> -       return btmtk_usb_setup(hdev);
-> +       err =3D btmtk_usb_setup(hdev);
-> +       if (err)
-> +               return err;
-> +
-> +       switch (btmtk_data->dev_id) {
-> +       case 0x7922:
-> +       case 0x7925:
-> +               /*
-> +                * All reports seen to be relevant to Ryzen-based laptops=
-. These
-> +                * NICs are usually used as OEM components thanks to some=
- sort
-> +                * of reference designs.
-> +                *
-> +                * Their popularity on other platforms is unclear. While =
-there
-> +                * is still a chance that the quirk may exist on other
-> +                * platforms, be cautious and only apply the quirk on AMD
-> +                * platforms for the time being.
-> +                */
+>  struct btmtk_wmt_hdr {
+>         u8      dir;
+>         u8      op;
+> --
+> 2.45.2
 
-Is this going to be a reliable way to detect if wakeup is broken or
-not? Since USB is a bus capable of hotplug, this check would block not
-only internal/built-in controllers with the above IDs but also those
-plugged via external ports if the CPU happens to be of the ZEN
-familly.
+sashiko has quite a few comments for these changes:
 
-> +               if (platform_is_ryzen())
-> +                       set_bit(BTUSB_WAKEUP_BROKEN, &data->flags);
-> +               break;
-> +       }
-> +
-> +       return 0;
->  }
->
->  static int btusb_mtk_shutdown(struct hci_dev *hdev)
-> @@ -4532,11 +4566,26 @@ static int btusb_suspend(struct usb_interface *in=
-tf, pm_message_t message)
->
->         BT_DBG("intf %p", intf);
->
-> -       /* Don't auto-suspend if there are connections or discovery in
-> -        * progress; external suspend calls shall never fail.
-> +       /*
-> +        * It is reported that remote wakeup events could sometimes cause=
- some
-> +        * adapters completely unresponsive. Resetting the xHCI root hub =
-doesn't
-> +        * help at all, and recovering from such a state needs a power cy=
-cle.
-> +        * Since disabling remote wakeup simply causes the USB core to ga=
-te
-> +        * runtime autosuspend as well due to needs_remote_wakeup =3D=3D =
-1, let's do
-> +        * this ourselves to make our life easier. The interface can be s=
-afely
-> +        * autosuspended as long as remote wakeup is disabled, i.e., afte=
-r
-> +        * closing the HCI device.
-> +        *
-> +        * Don't auto-suspend if there are connections or discovery in pr=
-ogress.
-> +        *
-> +        * External suspend calls shall never fail. Specifically, a devic=
-e with
-> +        * broken remote wakeup may still take the advantage of remote wa=
-keup in
-> +        * order to wake up the system from sleep if userspace has enable=
-d it as
-> +        * a wakeup source.
->          */
->         if (PMSG_IS_AUTO(message) &&
-> -           (hci_conn_count(data->hdev) || hci_discovery_active(data->hde=
-v)))
-> +           ((test_bit(BTUSB_WAKEUP_BROKEN, &data->flags) && data->intf->=
-needs_remote_wakeup) ||
-> +            hci_conn_count(data->hdev) || hci_discovery_active(data->hde=
-v)))
->                 return -EBUSY;
->
->         if (data->suspend_count++)
->
-> ---
-> base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
-> change-id: 230ba8c9-btmtk-ryzen-remote-wakeup-055a407682ef
->
-> Thanks,
-> Rong
->
-
+https://sashiko.dev/#/patchset/20260630123539.668776-1-chris.lu%40mediatek.=
+com
 
 --=20
 Luiz Augusto von Dentz
