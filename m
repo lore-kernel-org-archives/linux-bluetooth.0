@@ -1,119 +1,168 @@
-Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DED631352A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 18:35:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782844529; cv=none; b=HVJH5N5iFEgyrAeoXPUbW9fK1coiVC1AaibOjG8qIhzD4VKWbMYcRRkzdgH5nNly87+7x+Mlhm+VddvRgPLhdOssLKbJLWI4o5c3hP9X/Sww+XXpTkJ+xjb3sbcYZzHYx+ilafW3MpykQbhiB+TKymgISytxdIioAviDesxMbH0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782844529; c=relaxed/simple;
-	bh=b6YQJV2j8YeuWmYJBuV0rwadlyws9zaUynvTWbVzIVc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=VPcw2BaD/QJ7DE2T2KyGasTLe1FjeCOrNVP2MyRwqDzf0a2qvDesoM2pi+Z21qVMRbbD4Cz07Dbx6ZgU2qhESeBrQT1sVOUe8rDNq1LINmFkEgPIEaX3VqKU+yU72C2Wwr4Uiqg2NoWGikKMiOluCeC4vIl0Vu72V76GgZv5UOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sbdw+BQa; arc=none smtp.client-ip=74.125.82.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE6931352A;
+	Tue, 30 Jun 2026 19:04:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782846296; cv=pass; b=iZDFtt6T5RCdmxh5D7fZh9xmrREeXXE3QRJ/Jbvbs8RhewV/7xpqm/AG/05E2Noemd991RylN2omHZD2hW8aixj9ebzDAcKacf5u7kf12nPqV9qPGZcUGBQl6QTN/Ar3zQRiPSF1vdWS+gxHWhP9o56+EPkteGhm6ptfjP74oB8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782846296; c=relaxed/simple;
+	bh=y8gjwL4/a7r6fz2NBmkQNw0OT2SQaXgTU1f2/kLWodI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=h1Rhk4tFgI5uPD2ZkCAvMuVvQzn+I3pvz3EE9h+bLolUGp8Vh9ulmHXsvA6wnYgUG3Xs6i+kTuH5AxG+B9+8DlMwMZD8uKO5dDYud1Sa2wu4WRvGOa82EzOTrl2mHO+v0Ai5QfeGXXF4AEqhq0cWPigVEB9fZE401s9uP7EpWck=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=U9zsjtI9; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sbdw+BQa"
-Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-30c965eab27so1247230eec.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 11:35:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782844527; x=1783449327; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=TcPNz6FW+dcQ+7i+EHkbv4zHLBvksHigcwUfcty6HQM=;
-        b=sbdw+BQaxTIa6226TGr6cbXG3UjUvOy2Wz4tn8cpu7cd4/9Ozl688IRDAkKyQ2selR
-         XVF7jW4lFer0MUjf8yvvIabGicek677pO94L0UcBqwuDS8cyKgWOxJz2McjA8KuSJOjw
-         z2NZMfFw2uxonsgdjmLINqFzzAoHbJV6gLal/cfRYGARzuxwBM+h/wv3VynXxdebBkMT
-         6hiu6OYNRUiuU9/UXGKEWLVFTss4yy6kZVrU2ta6qVbR1hZh0QGDj3/hI6zzvn3gxaa3
-         ys/gliR2QFvErbrj4d1kIpgMhVTnR0EXMjqzNHC3c5M4CTeEM4LqojX2wDYCUGjqamVW
-         fZdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782844527; x=1783449327;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TcPNz6FW+dcQ+7i+EHkbv4zHLBvksHigcwUfcty6HQM=;
-        b=V14GMVS3QROXkEItY3hIxY6sVLPDlrGXzfyuG6Fw+jJjLG7AfQEAgmVzrhZI6MjVV2
-         t9TIlrwwyZidXNaNPeqS4bvAdThecHIZBs/jiXsmtDTSNXsa+nF+GpHkbV9hxib9hkP/
-         N1NRsgYAnAph91ypqBLmgpS6KXYeQvgSinErAE78HSHAPSLp2ZbJEGxSBX+dMKrKk0WL
-         rwvAjzTpT+LOsP+ppQ0TW0fdahpJiDzf/HOy/A4E/qz6WUUgdfbGFFgidZxNVSNE+EoO
-         OvFt8dCIdegFqbLWwNdgt1e4k3xu99IgRfhDPGr2C2yqhdYnRIAylE315Lhf28nS3bTZ
-         oTsA==
-X-Gm-Message-State: AOJu0YxsJ0KjlkYZ9xakMDBtraDSxXuXimGF5CNwlJ+4pQMu9CY2aZ3L
-	Ze69MVllrSu2B0agvuLf3ajgmerxfAoQepybp7GDxwLvQbAoZXH6ByeeyhZPpQ==
-X-Gm-Gg: AfdE7cm7jHzdbQ5xEfRN5epO1SY/OIP25/xEPEDpfJi5MezmSRTGx9at1lDclSbkG5V
-	TFCapkit79f1LzlJaGA0UQLEX0pmQOCxk/8jwaqh2N1Ek0xwNQsDIl/PCErEatCTKMZ6kIglVU9
-	RmVqbAXvFAFX3GS8qTcfivk1wHrr2cQqgQYNU/gjJTyX9sLDZ5dz1qenNM0aWD5SZKt+TXRBhxS
-	0mFULSLB/6gsfLpX2BUtPwAazkBDGoTVkIizirZbBTwCpPU/sXozSbsQ3XE7agNmoo97kq/mHlY
-	DNVOJYTt4y1lg+2+xSdQePlhJa9+BtjxTLAnPJiFetfYGGfek43uYjt7pCFg2CH5MILz4MMvH15
-	gA4U472vyuYa2/WA2ZvOvqSiZ0BpVUKhDlkSfxbX8rbu17ugjxQ3iQSHw4AKWOy7WuG+CW7ZFgB
-	vTYweCVEZb+3pwmv22vpvvJlnK8nnVCnM=
-X-Received: by 2002:a05:7301:600a:b0:30c:ab4f:46c3 with SMTP id 5a478bee46e88-30ef0a1ffd3mr1455191eec.41.1782844527321;
-        Tue, 30 Jun 2026 11:35:27 -0700 (PDT)
-Received: from [172.17.0.2] ([20.168.107.213])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30ee2f584bdsm11169326eec.4.2026.06.30.11.35.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jun 2026 11:35:26 -0700 (PDT)
-Message-ID: <6a440c6e.481afadf.29a24b.2357@mx.google.com>
-Date: Tue, 30 Jun 2026 11:35:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1601827691789905813=="
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="U9zsjtI9"
+Received: from [192.168.1.196] (unknown [IPv6:2a02:ed04:3581:4::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4gqXdV11hbz49Q3y;
+	Tue, 30 Jun 2026 22:04:46 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1782846286;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=9nbJpUGpEw2+GCtoobGilrwfIs0Msy8sz0H9ItOrRc0=;
+	b=U9zsjtI92lkGRQtNmnXNuKLHTUaFa/eG3/eWNRWW5ROVMINrAec6ijB/PgtCxQTcmHt0N5
+	bRLQShPDKeOkqIDNzwFGiSHOX+hXWAA1rWs+EvlHr7i0PLIRu+kf7XQYKW4UcOja87F0/G
+	r+/aHt5jl2+9KGo9irkxh+m106YrTPc9VCJv7/zvzeHgh3kz1At5CLOpBEjUBFzZP5irzM
+	qXv1QOMDROGC3+25WXXRc7sK1iFY1UIb8iGlRJ1WRmc74+eOvzDBCyGJIlvVkmIaNN3anY
+	aVDox45mCveu7b1vupmxPUCtRDxEIUwkC8PEC5vfmw+V0P3Cd1MHg7p30/JZUA==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1782846286;
+	b=hU7PjWfts35JivyyI77dM4pBMN+CxYrAt6rK88meXkphQ/r9QU5akhjRVxCx2LJmO0LtpT
+	MOe+kedAFSO+wAjsiVVHBLgwZXDG4R3VN7VaDuatsEtRswG4uO0b8C9IqoJFlnHjNVupyB
+	/2pExqGKvL1KBvr6qfsxUVBtkEGRZLhvbECBbxmL135u1OadsR83ITuPvowHx5e3OkimkG
+	iYfD7Bl37FI0T9y0nVt2XHbwUpkdiQdrS+MfQsL7HaAMUU5Z7+pWlefep41JulyWu2iowk
+	0aj7wGbk9PhDFFeiLqkcR99lZd4TdttdZipwg4z7FMioMgP2cIisQUv6s0eAiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1782846286;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=9nbJpUGpEw2+GCtoobGilrwfIs0Msy8sz0H9ItOrRc0=;
+	b=gFoL0iJa4OsMUPqJd33gCbFRf0AZVUUVTCwhikcZOlavSTZZK5ruomHSU81ZLXugFbm1Wb
+	vwLcwOK731M4p7koiH7Cg0PZlB2iTT7l4/VXTqeDoN137MHkEUWWEh+XBEDmlEAabEXV2Y
+	lKPVgDD79pNkcInlLpG+3x3pgSeTCJzfukBKl2zFGPJj6N3FafNrXK46940MjZwuadu+f0
+	SdZgs6P0/5k8Z70Gd5OJb1D03y/KvN4q4lXtrbtqAV1NBQggwnYbeoYeU8niMy2Qqgb+y6
+	ZJoUkOk3HPMyY3g14dA+tSs4gmV9WAFel/lmWM5BOyR1jQIdPyvqF3eKtCmlqw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <54780f64cf658a0ef53b7116076cb4406a0f666c.camel@iki.fi>
+Subject: Re: [PATCH] Bluetooth: bpa10x: check response length in
+ bpa10x_setup()
+From: Pauli Virtanen <pav@iki.fi>
+To: Weiming Shi <bestswngs@gmail.com>, Marcel Holtmann
+ <marcel@holtmann.org>,  Luiz Augusto von Dentz	 <luiz.dentz@gmail.com>
+Cc: Johan Hedberg <johan.hedberg@intel.com>,
+ linux-bluetooth@vger.kernel.org, 	linux-kernel@vger.kernel.org, Xiang Mei
+ <xmei5@asu.edu>
+Date: Tue, 30 Jun 2026 22:04:45 +0300
+In-Reply-To: <20260630062759.2769059-3-bestswngs@gmail.com>
+References: <20260630062759.2769059-3-bestswngs@gmail.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
-Subject: RE: [v2] Bluetooth: btintel_pcie: Refactor FLR to use device_reprobe()
-In-Reply-To: <20260630165919.102803-1-kiran.k@intel.com>
-References: <20260630165919.102803-1-kiran.k@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============1601827691789905813==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+ma, 2026-06-29 kello 23:28 -0700, Weiming Shi kirjoitti:
+> bpa10x_setup() sends the vendor command 0xfc0e and passes the response
+> to bt_dev_info() and hci_set_fw_info() as a "%s" string starting at
+> skb->data + 1, without checking the length:
+>=20
+> 	bt_dev_info(hdev, "%s", (char *)(skb->data + 1));
+> 	hci_set_fw_info(hdev, "%s", skb->data + 1);
+>=20
+> A device that returns a one-byte response (status only) leaves
+> skb->data + 1 past the end of the data, and the %s walk reads adjacent
+> slab memory until it meets a NUL. The same happens when the payload is
+> not NUL-terminated within skb->len. The out-of-bounds bytes end up in
+> the kernel log and the firmware-info debugfs file.
+>=20
+> Bail out if the response is too short or not NUL-terminated.
+>=20
+> Fixes: ddd68ec8f484 ("Bluetooth: bpa10x: Read revision information in set=
+up stage")
+> Reported-by: Xiang Mei <xmei5@asu.edu>
+> Assisted-by: Claude:claude-opus-4-8
+> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> ---
+>  drivers/bluetooth/bpa10x.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>=20
+> diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
+> index 2ae38a321c4b..07c6ed6f18ac 100644
+> --- a/drivers/bluetooth/bpa10x.c
+> +++ b/drivers/bluetooth/bpa10x.c
+> @@ -255,6 +255,12 @@ static int bpa10x_setup(struct hci_dev *hdev)
+>  	if (IS_ERR(skb))
+>  		return PTR_ERR(skb);
+> =20
+> +	/* Reject a short or non-terminated response before the %s reads. */
+> +	if (skb->len < 2 || skb->data[skb->len - 1] !=3D '\0') {
+> +		kfree_skb(skb);
+> +		return -EILSEQ;
+> +	}
 
-Dear submitter,
+Was this tested on real hardware?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1119161
+With an out-of-bounds access fix like the above in btmtk some weeks
+ago, it turned out HW actually was sending truncated data, and it was
+found only later in production use that the driver was broken by the
+fix.
 
----Test result---
+> +
+>  	bt_dev_info(hdev, "%s", (char *)(skb->data + 1));
+> =20
+>  	hci_set_fw_info(hdev, "%s", skb->data + 1);
 
-Test Summary:
-CheckPatch                    PASS      0.57 seconds
-VerifyFixes                   PASS      0.08 seconds
-VerifySignedoff               PASS      0.08 seconds
-GitLint                       PASS      0.22 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      24.59 seconds
-CheckAllWarning               PASS      27.23 seconds
-CheckSparse                   PASS      25.59 seconds
-BuildKernel32                 PASS      23.84 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      459.08 seconds
-IncrementalBuild              PASS      22.83 seconds
-
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-
-
-https://github.com/bluez/bluetooth-next/pull/377
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1601827691789905813==--
+--=20
+Pauli Virtanen
