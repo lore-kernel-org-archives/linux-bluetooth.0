@@ -1,100 +1,159 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0668224E4A1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 14:43:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E4523BCEE
+	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 15:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782830633; cv=none; b=kDp32ZU3nSDWwurGJy9z+HZBNQ9VdOcrhiZLhvkIGOxcqxmaAM5Njp7CnueW6n2FB1U5vLHRh5l8k1AbkJ7pGVKbJ+p24cyy0RJJRSsFSkTtXAnytMMYEKrXzmmkYLOpVwoY6cMqZSYxfgs7d5rJmQqJNQu5tZQvdGpdrjlJ/Yk=
+	t=1782834357; cv=none; b=KQL8jENxhl5+iwW5Rn+VyyzvuQwKKCXFz1HqBVUx5qsOB9XWQvodX2dxSfixNg6cr7reeLqksLWwjxbfzMJf35EdvrfVFX6WQTA0YAH8fc3JdjZUpCStXS+ihbGcxCRmg06KD8yEjHE5QkNJfaGIwUyQWlBqnf0iwmeRAexTYGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782830633; c=relaxed/simple;
-	bh=qpeseQp59dvQQ0ooe+UW2+l1fvlqNH7RS/1FWS5IKpU=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tENQrvrVCJ2XXpjCQK7F8oWY06GvXTWcK1Roi/pfVqdZ7xQq6zDLOeSPQc7rOoW1U/ogA8yO7NMwSZysjWuQKrfHx0VrDyM5ZeG7s00epXdac5v9VkdsfYNZRZyL9K3WZYOpuoYQjhKNNUWRuIT8NfgZwBaDtFxA0ZJxPAiUR1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rv3vQ1kG; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782834357; c=relaxed/simple;
+	bh=d6LH4azfbQBU8OuIjPzfS8B6Hu/x7rfCcTXdsf+eZ9o=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=heahNXV2B/izJsmTcmijgBt/z3cePfOVdUH1JmPhU1JXDPbGz0oZQVKo6J89uZD5mCQEtRhPqDHM9Y+ln8Mo4ixvRALvI/TR3aEAVJdt54P83wVFrGphjkaAfy/eYxT2VoTfy80KVi4wfCEgNEmx10kl5DbH54T9bUs4xhTrLmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Qvc7ElT+; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rv3vQ1kG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9FF71F00A3A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 14:43:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782830631;
-	bh=MWgqL4Q5HMM/wY0dJqa72d3dmGGWeJtoQeyqL+l/mHo=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=Rv3vQ1kGTiT4hZknb84sZNeMfoSVn1+L25N83pneo3w6QaI4EjqKsE6bBSTYSZrIU
-	 o9HGM/BYdsze9fR2EuYvdLzFxO6CpgiWNph8DwGvgUDxJrs3CEx65YbIYoxQh6U/vc
-	 IbLcrd427UIs9NkJ1xx/Kt9xIu/NiwtLCvguFD17IofOKOey3UxhI8Fj9BykgIgV6j
-	 w3hYiOjkjNRLc6PBtjPJL1LQu2xZHkDB2DP0YkbY6X0zg12aCM+BGqYVJCoftuNaKY
-	 yhosx+wfJTT33/3gaeXu/zTjwoXxnD6/fABkT9eMtDl1UqqZhEoxU0MKKL13ziNoyA
-	 VibvqZmncwSNg==
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-39b14cf91b9so12958921fa.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 07:43:51 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RoriY2GKvFRCcfgaIBqRWSzxes4v9MgW0pa5pdD8VBYrJV/LXelo05Toknpa6EMmm1t1qDeCxCqPpnmjk+Oquo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzC45JxoZOwsB1DLCwLZzqsinQBPm/TiuTHgnA4qYkhbAZjqSpO
-	p8UjJIVHSdlepdKURS6WY95nTL3H0fJd6dgHqegfV2BNmippfyXhGUj3LMZ5gvsmHqImZN5TKUI
-	dvHhClSJboiAAcbHcfenfjh21nj6Y6p7vhAP9dzA/2g==
-X-Received: by 2002:a2e:a583:0:b0:39a:cfe8:dcbd with SMTP id
- 38308e7fff4ca-39b1de46111mr10193951fa.30.1782830630565; Tue, 30 Jun 2026
- 07:43:50 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 30 Jun 2026 07:43:49 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 30 Jun 2026 07:43:49 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260625-bt_bugfix-v2-10-93396a6f7d5e@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Qvc7ElT+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1782834355;
+	bh=rnpaNiZmzrkeHbTjlnwpsmdyxbZV4AXUarTrgEadT64=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Qvc7ElT+HgQjPJzyEwugBIOPFjOBC6E21xEXU+joJuLsvCR5VIr41g/o4gMFuyonl
+	 TuH3TSVdRnq1TgEtP7uW8Oe28+ePpRPqkT94oUcWcdbOFpht7Twp4O2p3J1/A0lbEG
+	 Cmoe4+mtiBhbqJlGZlsvkBpTSZUCvVKsd64xqCsc=
+Received: from github.com (hubbernetes-node-7579ddf.ac4-iad.github.net [10.52.169.31])
+	by smtp.github.com (Postfix) with ESMTPA id 49A6478E8A2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 08:45:55 -0700 (PDT)
+Date: Tue, 30 Jun 2026 08:45:55 -0700
+From: Bhavani <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1119059/000000-74a305@github.com>
+Subject: [bluez/bluez] fee356: shared: remove default settings params from
+ bt_rap...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260625-bt_bugfix-v2-0-93396a6f7d5e@oss.qualcomm.com> <20260625-bt_bugfix-v2-10-93396a6f7d5e@oss.qualcomm.com>
-Date: Tue, 30 Jun 2026 07:43:49 -0700
-X-Gmail-Original-Message-ID: <CAMRc=MfppsRM3Hgc19Lo802a9q8F3bhtpWEJWYaGx3EhMN=SUw@mail.gmail.com>
-X-Gm-Features: AVVi8Cd-5lG2ghbwyHrUALRHfNv8luAp3awpnNvrT8xBYuoVE17qtZWxapNEHoA
-Message-ID: <CAMRc=MfppsRM3Hgc19Lo802a9q8F3bhtpWEJWYaGx3EhMN=SUw@mail.gmail.com>
-Subject: Re: [PATCH v2 10/12] Bluetooth: hci_event: Log error for HCI reset
- status error in hci_cc_reset()
-To: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Rocky Liao <quic_rjliao@quicinc.com>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Ben Young Tae Kim <ytkim@qca.qualcomm.com>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
-	Matthias Kaehlcke <mka@chromium.org>, Tim Jiang <quic_tjiang@quicinc.com>, 
-	Zijun Hu <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-arm-msm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Fri, 26 Jun 2026 07:19:55 +0200, Zijun Hu <zijun.hu@oss.qualcomm.com> said:
-> HCI_Reset is a critical command, but hci_cc_reset() uses bt_dev_dbg()
-> to log it, so a non-zero error status response may not be noticed.
->
-> Fix by using bt_dev_err() when a status error occurs.
->
-> Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
-> ---
->  net/bluetooth/hci_event.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index b6d963ce26d0..a90d2c6a6e59 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -269,7 +269,10 @@ static u8 hci_cc_reset(struct hci_dev *hdev, void *data, struct sk_buff *skb)
->  {
->  	struct hci_ev_status *rp = data;
->
-> -	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
-> +	if (rp->status)
-> +		bt_dev_err(hdev, "HCI reset failed (status 0x%2.2x)", rp->status);
-> +	else
-> +		bt_dev_dbg(hdev, "HCI reset succeeded");
->
->  	clear_bit(HCI_RESET, &hdev->flags);
->
->
-> --
-> 2.34.1
->
->
+  Branch: refs/heads/1119059
+  Home:   https://github.com/bluez/bluez
+  Commit: fee3563b14f36116bdc4b1dd3bb827ff5113ebc2
+      https://github.com/bluez/bluez/commit/fee3563b14f36116bdc4b1dd3bb827ff5113ebc2
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-06-30 (Tue, 30 Jun 2026)
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+  Changed paths:
+    M src/shared/rap.h
+
+  Log Message:
+  -----------
+  shared: remove default settings params from bt_rap_attach_hci
+
+role, cs_sync_ant_sel and max_tx_power were passed into bt_rap_attach_hci
+but these are CS default settings that belong to the measurement session,
+Callers need to set them via bt_rap_set_default_settings_params() in
+start_measurement where they belong, alongside the other per-session
+CS parameters
+
+
+  Commit: 810a55beb6a01886ae9b80304d2778637032e677
+      https://github.com/bluez/bluez/commit/810a55beb6a01886ae9b80304d2778637032e677
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-06-30 (Tue, 30 Jun 2026)
+
+  Changed paths:
+    M profiles/ranging/rap.c
+    M profiles/ranging/rap_hci.c
+
+  Log Message:
+  -----------
+  profiles: update bt_rap_attach_hci call to drop def settings
+
+role, cs_sync_ant_sel and max_tx_power are no longer passed at attach
+time. They are applied via bt_rap_set_default_settings_params() in
+start_measurement where they belong, alongside the other per-session
+CS parameters
+
+
+  Commit: 7e04dff983faf194a6bf3cde42a73eb538d98e73
+      https://github.com/bluez/bluez/commit/7e04dff983faf194a6bf3cde42a73eb538d98e73
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-06-30 (Tue, 30 Jun 2026)
+
+  Changed paths:
+    M src/btd.h
+    M src/main.c
+    M src/main.conf
+
+  Log Message:
+  -----------
+  rap: remove CS default settings from main.conf
+
+role, cs_sync_ant_sel and max_tx_power were configurable in main.conf
+and parsed in main.c, but these are per-measurement parameters that
+callers supply via StartMeasurement
+
+
+  Commit: 6a8079c039cc12db471ef2d722f345b9842d6015
+      https://github.com/bluez/bluez/commit/6a8079c039cc12db471ef2d722f345b9842d6015
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-06-30 (Tue, 30 Jun 2026)
+
+  Changed paths:
+    M src/shared/rap.h
+
+  Log Message:
+  -----------
+  shared: replace the wrapper API
+
+Replace API bt_rap_attach_hci_v2 with
+bt_rap_attach_hci which has less parameters
+to avoid compilation error for individual patches
+
+
+  Commit: 7441d315e80ffe498e61f618d7d5d5d280c2194a
+      https://github.com/bluez/bluez/commit/7441d315e80ffe498e61f618d7d5d5d280c2194a
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-06-30 (Tue, 30 Jun 2026)
+
+  Changed paths:
+    M profiles/ranging/rap.c
+    M profiles/ranging/rap_hci.c
+
+  Log Message:
+  -----------
+  profiles: replace wrapper API
+
+replace bt_rap_attach_hci_v2 with bt_rap_attach_hci API
+which has less parameters to avoid compilation error
+in individual patchsets
+
+
+  Commit: 74a3059a93b9a31aaa08c2dc354638d54e89a8b6
+      https://github.com/bluez/bluez/commit/74a3059a93b9a31aaa08c2dc354638d54e89a8b6
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-06-30 (Tue, 30 Jun 2026)
+
+  Changed paths:
+    M src/shared/rap.h
+
+  Log Message:
+  -----------
+  shared: remove wrapper API
+
+Remove bt_rap_attach_hci_v2 wrapper API
+which was added to prevent compilation error
+in individual patchsets
+
+
+Compare: https://github.com/bluez/bluez/compare/fee3563b14f3%5E...74a3059a93b9
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
