@@ -1,330 +1,272 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CDBE3E5EE1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 07:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F650369D5A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 08:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782806351; cv=none; b=J1R2twHrFlnRh9A6mx3fwkL9AENSOyXIKi4Dh6ZeCLOwwD+15hhSjZugCD5uRyfZToou9MMcfKZA2LgHejfIvfFobYDrWvwXrjojUtdZY0BzXwb5uw1EvmxuCrFsm/LlxZjLDy6lhM5xWKpPRzTwvzH47x1na+J8yTyj8gxYqnk=
+	t=1782807085; cv=none; b=sQOyp/0mxyx+pIvcCGAB8zqYBMHNjPPktKcCmDOSzEftq7Jw9zdnnj1kx5mWz9i48tRjSWNva7eTDDFnig7Xr69cDHdiU8zRo0XV8qUYzT8hDx/aDweqVgbFNDM6V9S+qxdUBlJ2P5A2cHciP3FQBHzQHQqrjGk+whpUP/6+3H8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782806351; c=relaxed/simple;
-	bh=lg9op26MdqxKJ0MH2DFR1A8jhvcD3iF2cAsxZl87Y8g=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OBWLc2FlXdDOAn1lhVCW0FjYbiR9+8YRmtMyS3dW+w7y2nvhQYkDl6a4IoPgRDzbJXDoPtArtrKlPVAyTzI5+QKWUswZPMLP6n5CS28vxryygdOuLMsx/JoCE1fL2QNaBInABF+Kt2bs1YmsbJpTsqr8Q8D2lh3rb/Tx1pPExmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UApqONX7; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782807085; c=relaxed/simple;
+	bh=yKUJy+tVqvDRI2K7FYwDCdTd2oSuwfy92zhHBydp5Uw=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=tpt4LBVgahHttJOtSagxztm4KZm3VJubejt5yt8SZMatO9R+cbXP+4f8ijphwF6zkofquYUsVmsZSV/vZQfBnfYUdtdHjbMbDwS0/7tk9PvXE7kXBy7NnOt7iy6h9Olwuk3DHtn38ITWY5wqNmc2CZJNnESuD2kTq4sW8K5A6t0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GnLiyiMZ; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UApqONX7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A2EC1F01566
-	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 07:59:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782806350;
-	bh=pXIU515qOOsxjN8QinSZ8G3UR3cgYahzlHHeqpmljMM=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=UApqONX7eMgCERbddo2DmM0foPkY80T/19yA0QFKJJP6JF+xYwKDCIm4aHGLpJQXI
-	 13GviSlgmWgLgMgz3SkrRbSBaEMCWg25BCdutM9hiNropI//pw3z/BNKZp+arIfZIC
-	 04qFhW8Dh3tPCuB3ag5lC2sS39rcurxGyfUIe9eJMj+I+51DkgJ0nPjaiXvwahrqW3
-	 vhBRMMa53WLJ0jFS/4ly4iGruIeyPDhBAIB/rYB5mT4INe9KwysuohH7rbTud+XfJ/
-	 Nub9HGOZBi1Vit4WsTvSVp/YL6yPK1m+aKg75KuPWHIt3IeeUJwH2RaWmbLKQHTBUr
-	 t5VMcqt9nddxQ==
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-39ad1d2555aso35005251fa.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jun 2026 00:59:10 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RrvhOhwiEDuCOG6TN5FAjmPRbgQy/pApRrWn4SnlOgo1R/I7ddVv2r9OG8LgMxZUPPwJZFhLcjmFGu/vkWcgNw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzR6XzypEBBY4hXJ8LBvp7s6+N1TLTyrl3y2OXn1SW1I46HcwGO
-	Hm7vK2zgWhMlqU0S+eqhnWfyB11C1oRvnBbyV/pZEAJSU++JsiqEWj9vrtIrddVdz5NMuPDp6BA
-	7qaUo5szcGsWfZQJXF4X/h4+acYgoUiYgwRw/pV4b1Q==
-X-Received: by 2002:a2e:9a0f:0:b0:39a:fb24:36cb with SMTP id
- 38308e7fff4ca-39b1e01b79emr5212551fa.40.1782806348810; Tue, 30 Jun 2026
- 00:59:08 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 30 Jun 2026 07:59:07 +0000
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 30 Jun 2026 07:59:07 +0000
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260629-block-as-nvmem-v6-5-f02513dcd46d@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GnLiyiMZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782807083; x=1814343083;
+  h=date:from:to:cc:subject:message-id;
+  bh=yKUJy+tVqvDRI2K7FYwDCdTd2oSuwfy92zhHBydp5Uw=;
+  b=GnLiyiMZaXgBWH8Sx25mHPTFbY/TkI5slUC76P1daztLXM70HAE4kDF7
+   sA56B7o6AD9R1wWXJ8rw9OY04M18UM37dfLrAFzWHHtKepV9jym1qNUyE
+   Laq2roXkqIgE0Ay5ZEFD0wFEr5LPgGrQ7KcFbEVarVkNCdFdR1Mh27YZX
+   cqJu4/qPhaREUol24RRpuxqeC15nrl0T7cYX2zJyCGkEnKLb49Gc72IdF
+   JejJG3u2acGIxD4bgOMlXIKcu3LtOgKcam6sttMGHr7thZzt4qV61yBUU
+   GWqmv4G5s78L3Z1UMjHASUp5pm5TZX97JDax6R2zcg7aM+7keDxZ+KmR3
+   A==;
+X-CSE-ConnectionGUID: 3axAWPN6Qhewy5tEspRJJg==
+X-CSE-MsgGUID: H0Bf5gwcTIG9jJtHiGJotQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11832"; a="82502274"
+X-IronPort-AV: E=Sophos;i="6.24,233,1774335600"; 
+   d="scan'208";a="82502274"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 01:11:23 -0700
+X-CSE-ConnectionGUID: LvqsR2BQSYq4rhBYN2mA3A==
+X-CSE-MsgGUID: 7H6dYmNwT+mXAUyrKaFW3w==
+X-ExtLoop1: 1
+Received: from lkp-server02.sh.intel.com (HELO ea128546eb3d) ([10.239.97.151])
+  by fmviesa003.fm.intel.com with ESMTP; 30 Jun 2026 01:11:21 -0700
+Received: from kbuild by ea128546eb3d with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1weTYt-0000000086P-0TIm;
+	Tue, 30 Jun 2026 08:11:19 +0000
+Date: Tue, 30 Jun 2026 16:10:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 0e2c0392b9dc2afaa50de15ef2e581902c515aff
+Message-ID: <202606301640.vdroc6Kz-lkp@intel.com>
+User-Agent: s-nail v14.9.25
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260629-block-as-nvmem-v6-0-f02513dcd46d@oss.qualcomm.com> <20260629-block-as-nvmem-v6-5-f02513dcd46d@oss.qualcomm.com>
-Date: Tue, 30 Jun 2026 07:59:07 +0000
-X-Gmail-Original-Message-ID: <CAMRc=McvGOyMrK8vMU=6CZi1-p3=aVy8S3UbN5etJ9uKdNEP5g@mail.gmail.com>
-X-Gm-Features: AVVi8Cc7BGwD2qRbSWg1iNJ-MyLvd3Ot0x9QeV3LoARCUPBdEZ_Ym2hO5krr8DI
-Message-ID: <CAMRc=McvGOyMrK8vMU=6CZi1-p3=aVy8S3UbN5etJ9uKdNEP5g@mail.gmail.com>
-Subject: Re: [PATCH v6 5/9] block: implement NVMEM provider
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, daniel@makrotopia.org, Ulf Hansson <ulfh@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Saravana Kannan <saravanak@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 29 Jun 2026 10:55:24 +0200, Loic Poulain
-<loic.poulain@oss.qualcomm.com> said:
-> From: Daniel Golle <daniel@makrotopia.org>
->
-> On embedded devices using an eMMC it is common that one or more partitions
-> on the eMMC are used to store MAC addresses and Wi-Fi calibration EEPROM
-> data. Allow referencing the partition in device tree for the kernel and
-> Wi-Fi drivers accessing it via the NVMEM layer.
->
-> For now, NVMEM is only registered for the whole disk block device, as the
-> OF node is currently only associated to it.
->
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> Co-developed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> ---
->  block/Kconfig             |   9 ++++
->  block/Makefile            |   1 +
->  block/blk-nvmem.c         | 111 ++++++++++++++++++++++++++++++++++++++++++++++
->  block/blk.h               |   8 ++++
->  block/genhd.c             |   4 ++
->  include/linux/blk_types.h |   3 ++
->  include/linux/blkdev.h    |   1 +
->  7 files changed, 137 insertions(+)
->
-> diff --git a/block/Kconfig b/block/Kconfig
-> index 15027963472d7b40e27b9097a5993c457b5b3054..0b33747e16dc33473683706f75c92bdf8b648f7c 100644
-> --- a/block/Kconfig
-> +++ b/block/Kconfig
-> @@ -209,6 +209,15 @@ config BLK_INLINE_ENCRYPTION_FALLBACK
->  	  by falling back to the kernel crypto API when inline
->  	  encryption hardware is not present.
->
-> +config BLK_NVMEM
-> +	bool "Block device NVMEM provider"
-> +	depends on OF
-> +	depends on NVMEM
-> +	help
-> +	  Allow block devices (or partitions) to act as NVMEM providers,
-> +	  typically used with eMMC to store MAC addresses or Wi-Fi
-> +	  calibration data on embedded devices.
-> +
->  source "block/partitions/Kconfig"
->
->  config BLK_PM
-> diff --git a/block/Makefile b/block/Makefile
-> index 7dce2e44276c4274c11a0a61121c83d9c43d6e0c..d7ac389e71902bc091a8800ea266190a43b3e63d 100644
-> --- a/block/Makefile
-> +++ b/block/Makefile
-> @@ -36,3 +36,4 @@ obj-$(CONFIG_BLK_INLINE_ENCRYPTION)	+= blk-crypto.o blk-crypto-profile.o \
->  					   blk-crypto-sysfs.o
->  obj-$(CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK)	+= blk-crypto-fallback.o
->  obj-$(CONFIG_BLOCK_HOLDER_DEPRECATED)	+= holder.o
-> +obj-$(CONFIG_BLK_NVMEM)                += blk-nvmem.o
-> diff --git a/block/blk-nvmem.c b/block/blk-nvmem.c
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..4b35a74255059320ef0cbd3c0003f1510bae5733
-> --- /dev/null
-> +++ b/block/blk-nvmem.c
-> @@ -0,0 +1,111 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * block device NVMEM provider
-> + *
-> + * Copyright (c) 2024 Daniel Golle <daniel@makrotopia.org>
-> + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-> + *
-> + * Useful on devices using a partition on an eMMC for MAC addresses or
-> + * Wi-Fi calibration EEPROM data.
-> + */
-> +
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 0e2c0392b9dc2afaa50de15ef2e581902c515aff  Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_new_connection_cb()
 
-Add linux/cleanup.h for __free() and linux/device.h for dev_err_probe().
+elapsed time: 723m
 
-> +#include <linux/file.h>
-> +#include <linux/nvmem-provider.h>
-> +#include <linux/nvmem-consumer.h>
-> +#include <linux/of.h>
-> +#include <linux/pagemap.h>
-> +#include <linux/property.h>
-> +
-> +#include "blk.h"
-> +
-> +static int blk_nvmem_reg_read(void *priv, unsigned int from, void *val, size_t bytes)
-> +{
-> +	dev_t devt = (dev_t)(uintptr_t)priv;
-> +	size_t bytes_left = bytes;
-> +	loff_t pos = from;
-> +	int ret = 0;
-> +
-> +	struct file *bdev_file __free(fput) =
-> +		bdev_file_open_by_dev(devt, BLK_OPEN_READ, NULL, NULL);
-> +	if (IS_ERR(bdev_file))
-> +		return PTR_ERR(bdev_file);
-> +
-> +	while (bytes_left) {
-> +		pgoff_t f_index = pos >> PAGE_SHIFT;
-> +		struct folio *folio;
-> +		size_t folio_off;
-> +		size_t to_read;
-> +
-> +		folio = read_mapping_folio(bdev_file->f_mapping, f_index, NULL);
-> +		if (IS_ERR(folio)) {
-> +			ret = PTR_ERR(folio);
-> +			break;
-> +		}
-> +
-> +		folio_off = offset_in_folio(folio, pos);
-> +		to_read = min(bytes_left, folio_size(folio) - folio_off);
-> +		memcpy_from_folio(val, folio, folio_off, to_read);
-> +		pos += to_read;
-> +		bytes_left -= to_read;
-> +		val += to_read;
-> +		folio_put(folio);
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +int blk_nvmem_add(struct block_device *bdev)
-> +{
-> +	struct device *dev = &bdev->bd_device;
-> +	struct nvmem_config config = {};
-> +
-> +	/* skip devices which do not have a device tree node */
-> +	if (!dev_of_node(dev))
-> +		return 0;
-> +
-> +	/* skip devices without an nvmem layout defined */
-> +	struct device_node *child __free(device_node) =
-> +		of_get_child_by_name(dev_of_node(dev), "nvmem-layout");
-> +	if (!child)
-> +		return 0;
-> +
-> +	/*
-> +	 * skip block device too large to be represented as NVMEM devices,
-> +	 * nvmem_config.size is a signed int
-> +	 */
-> +	if (bdev_nr_bytes(bdev) > INT_MAX) {
-> +		dev_warn(dev, "block device too large to be an NVMEM provider\n");
-> +		return 0;
-> +	}
-> +
-> +	config.id = NVMEM_DEVID_NONE;
-> +	config.dev = dev;
-> +	config.name = dev_name(dev);
-> +	config.owner = THIS_MODULE;
-> +	config.priv = (void *)(uintptr_t)dev->devt;
-> +	config.reg_read = blk_nvmem_reg_read;
-> +	config.size = bdev_nr_bytes(bdev);
-> +	config.word_size = 1;
-> +	config.stride = 1;
-> +	config.read_only = true;
-> +	config.root_only = true;
-> +	config.ignore_wp = true;
-> +	config.of_node = to_of_node(dev->fwnode);
-> +
-> +	bdev->bd_nvmem = nvmem_register(&config);
-> +	if (IS_ERR(bdev->bd_nvmem)) {
-> +		int ret = PTR_ERR(bdev->bd_nvmem);
-> +
-> +		bdev->bd_nvmem = NULL;
-> +		dev_err_probe(dev, ret, "Failed to register NVMEM device\n");
-> +		return ret;
+configs tested: 197
+configs skipped: 2
 
-Just do return dev_err_probe().
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +void blk_nvmem_del(struct block_device *bdev)
-> +{
-> +	nvmem_unregister(bdev->bd_nvmem);
-> +	bdev->bd_nvmem = NULL;
-> +}
-> diff --git a/block/blk.h b/block/blk.h
-> index ec4674cdf2ead4fd259ff5fc42401f591e684ee9..ed0c10168ba7be10855509637f824a9cea2b9ccb 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -757,4 +757,12 @@ static inline void blk_debugfs_unlock(struct request_queue *q,
->  	memalloc_noio_restore(memflags);
->  }
->
-> +#ifdef CONFIG_BLK_NVMEM
-> +int blk_nvmem_add(struct block_device *bdev);
-> +void blk_nvmem_del(struct block_device *bdev);
-> +#else
-> +static inline int blk_nvmem_add(struct block_device *bdev) { return 0; }
-> +static inline void blk_nvmem_del(struct block_device *bdev) {}
-> +#endif
-> +
->  #endif /* BLK_INTERNAL_H */
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 7d6854fd28e95ae9134309679a7c6a937f5b7db8..1b2382de6fb30c1e5f60f45c04dc03ed3bf5d5f2 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -421,6 +421,8 @@ static void add_disk_final(struct gendisk *disk)
->  		 */
->  		dev_set_uevent_suppress(ddev, 0);
->  		disk_uevent(disk, KOBJ_ADD);
-> +
-> +		blk_nvmem_add(disk->part0);
->  	}
->
->  	blk_apply_bdi_limits(disk->bdi, &disk->queue->limits);
-> @@ -704,6 +706,8 @@ static void __del_gendisk(struct gendisk *disk)
->
->  	disk_del_events(disk);
->
-> +	blk_nvmem_del(disk->part0);
-> +
->  	/*
->  	 * Prevent new openers by unlinked the bdev inode.
->  	 */
-> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> index 8808ee76e73c09e0ceaac41ba59e86fb0c4efc64..ace6f59b860d0813665b2f62a1c03a1f4be94059 100644
-> --- a/include/linux/blk_types.h
-> +++ b/include/linux/blk_types.h
-> @@ -73,6 +73,9 @@ struct block_device {
->  	int			bd_writers;
->  #ifdef CONFIG_SECURITY
->  	void			*bd_security;
-> +#endif
-> +#ifdef CONFIG_BLK_NVMEM
-> +	struct nvmem_device	*bd_nvmem;
->  #endif
->  	/*
->  	 * keep this out-of-line as it's both big and not needed in the fast
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 890128cdea1ce66863c5baa36f3b336ec4550807..f15d2b5bf9e4fd2368b8a70416a978e22c0d4333 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -30,6 +30,7 @@
->
->  struct module;
->  struct request_queue;
-> +struct nvmem_device;
+tested configs:
+alpha                             allnoconfig    gcc-16.1.0
+alpha                            allyesconfig    gcc-16.1.0
+alpha                               defconfig    gcc-16.1.0
+arc                              allmodconfig    clang-23
+arc                               allnoconfig    gcc-16.1.0
+arc                              allyesconfig    clang-23
+arc                                 defconfig    gcc-16.1.0
+arc                   randconfig-001-20260630    clang-23
+arc                   randconfig-002-20260630    clang-23
+arc                    vdk_hs38_smp_defconfig    gcc-16.1.0
+arm                               allnoconfig    gcc-16.1.0
+arm                              allyesconfig    clang-23
+arm                                 defconfig    gcc-16.1.0
+arm                   randconfig-001-20260630    clang-23
+arm                   randconfig-002-20260630    clang-23
+arm                   randconfig-003-20260630    clang-23
+arm                   randconfig-004-20260630    clang-23
+arm64                            allmodconfig    clang-23
+arm64                             allnoconfig    gcc-16.1.0
+arm64                               defconfig    gcc-16.1.0
+arm64                 randconfig-001-20260630    clang-23
+arm64                 randconfig-002-20260630    clang-23
+arm64                 randconfig-003-20260630    clang-23
+arm64                 randconfig-004-20260630    clang-23
+csky                             allmodconfig    gcc-16.1.0
+csky                              allnoconfig    gcc-16.1.0
+csky                                defconfig    gcc-16.1.0
+csky                  randconfig-001-20260630    clang-23
+csky                  randconfig-002-20260630    clang-23
+hexagon                          allmodconfig    gcc-16.1.0
+hexagon                           allnoconfig    gcc-16.1.0
+hexagon                             defconfig    gcc-16.1.0
+hexagon               randconfig-001-20260630    clang-18
+hexagon               randconfig-002-20260630    clang-18
+i386                             allmodconfig    clang-22
+i386                              allnoconfig    gcc-16.1.0
+i386                             allyesconfig    clang-22
+i386        buildonly-randconfig-001-20260630    clang-22
+i386        buildonly-randconfig-002-20260630    clang-22
+i386        buildonly-randconfig-003-20260630    clang-22
+i386        buildonly-randconfig-004-20260630    clang-22
+i386        buildonly-randconfig-005-20260630    clang-22
+i386        buildonly-randconfig-006-20260630    clang-22
+i386                                defconfig    gcc-16.1.0
+i386                           randconfig-001    clang-22
+i386                  randconfig-001-20260630    clang-22
+i386                           randconfig-002    clang-22
+i386                  randconfig-002-20260630    clang-22
+i386                           randconfig-003    clang-22
+i386                  randconfig-003-20260630    clang-22
+i386                           randconfig-004    clang-22
+i386                  randconfig-004-20260630    clang-22
+i386                           randconfig-005    clang-22
+i386                  randconfig-005-20260630    clang-22
+i386                           randconfig-006    clang-22
+i386                  randconfig-006-20260630    clang-22
+i386                           randconfig-007    clang-22
+i386                  randconfig-007-20260630    clang-22
+i386                  randconfig-011-20260630    gcc-12
+i386                  randconfig-012-20260630    gcc-12
+i386                  randconfig-013-20260630    gcc-12
+i386                  randconfig-014-20260630    gcc-12
+i386                  randconfig-015-20260630    gcc-12
+i386                  randconfig-016-20260630    gcc-12
+i386                  randconfig-017-20260630    gcc-12
+loongarch                        allmodconfig    clang-23
+loongarch                         allnoconfig    gcc-16.1.0
+loongarch                           defconfig    clang-23
+loongarch             randconfig-001-20260630    clang-18
+loongarch             randconfig-002-20260630    clang-18
+m68k                             allmodconfig    gcc-16.1.0
+m68k                              allnoconfig    gcc-16.1.0
+m68k                             allyesconfig    clang-23
+m68k                                defconfig    clang-23
+microblaze                        allnoconfig    gcc-16.1.0
+microblaze                       allyesconfig    gcc-16.1.0
+microblaze                          defconfig    clang-23
+mips                             allmodconfig    gcc-16.1.0
+mips                              allnoconfig    gcc-16.1.0
+mips                             allyesconfig    gcc-16.1.0
+mips                      malta_kvm_defconfig    gcc-16.1.0
+mips                        qi_lb60_defconfig    clang-17
+nios2                            allmodconfig    clang-20
+nios2                             allnoconfig    clang-23
+nios2                               defconfig    clang-23
+nios2                 randconfig-001-20260630    clang-18
+nios2                 randconfig-002-20260630    clang-18
+openrisc                         allmodconfig    clang-20
+openrisc                          allnoconfig    clang-23
+openrisc                            defconfig    gcc-16.1.0
+parisc                           allmodconfig    gcc-16.1.0
+parisc                            allnoconfig    clang-23
+parisc                           allyesconfig    clang-17
+parisc                              defconfig    gcc-16.1.0
+parisc                         randconfig-001    clang-22
+parisc                randconfig-001-20260630    clang-22
+parisc                         randconfig-002    clang-22
+parisc                randconfig-002-20260630    clang-22
+parisc64                            defconfig    clang-23
+powerpc                          allmodconfig    gcc-16.1.0
+powerpc                           allnoconfig    clang-23
+powerpc                        randconfig-001    clang-22
+powerpc               randconfig-001-20260630    clang-22
+powerpc                        randconfig-002    clang-22
+powerpc               randconfig-002-20260630    clang-22
+powerpc64                      randconfig-001    clang-22
+powerpc64             randconfig-001-20260630    clang-22
+powerpc64                      randconfig-002    clang-22
+powerpc64             randconfig-002-20260630    clang-22
+riscv                            alldefconfig    gcc-16.1.0
+riscv                            allmodconfig    clang-23
+riscv                             allnoconfig    clang-23
+riscv                            allyesconfig    clang-23
+riscv                               defconfig    gcc-16.1.0
+riscv                 randconfig-001-20260630    gcc-9.5.0
+riscv                 randconfig-002-20260630    gcc-9.5.0
+s390                             allmodconfig    clang-17
+s390                              allnoconfig    clang-23
+s390                             allyesconfig    gcc-16.1.0
+s390                                defconfig    gcc-16.1.0
+s390                  randconfig-001-20260630    gcc-9.5.0
+s390                  randconfig-002-20260630    gcc-9.5.0
+sh                               allmodconfig    gcc-16.1.0
+sh                                allnoconfig    clang-23
+sh                               allyesconfig    clang-17
+sh                                  defconfig    gcc-14
+sh                    randconfig-001-20260630    gcc-9.5.0
+sh                    randconfig-002-20260630    gcc-9.5.0
+sh                          rsk7201_defconfig    gcc-16.1.0
+sparc                             allnoconfig    clang-23
+sparc                               defconfig    gcc-16.1.0
+sparc                 randconfig-001-20260630    clang-17
+sparc                 randconfig-002-20260630    clang-17
+sparc64                          allmodconfig    clang-20
+sparc64                             defconfig    gcc-14
+sparc64               randconfig-001-20260630    clang-17
+sparc64               randconfig-002-20260630    clang-17
+um                               allmodconfig    clang-17
+um                                allnoconfig    clang-23
+um                               allyesconfig    gcc-16.1.0
+um                                  defconfig    gcc-14
+um                             i386_defconfig    gcc-14
+um                    randconfig-001-20260630    clang-17
+um                    randconfig-002-20260630    clang-17
+um                           x86_64_defconfig    gcc-14
+x86_64                           allmodconfig    clang-22
+x86_64                            allnoconfig    clang-23
+x86_64                           allyesconfig    clang-22
+x86_64               buildonly-randconfig-001    clang-22
+x86_64      buildonly-randconfig-001-20260630    clang-22
+x86_64               buildonly-randconfig-002    clang-22
+x86_64      buildonly-randconfig-002-20260630    clang-22
+x86_64               buildonly-randconfig-003    clang-22
+x86_64      buildonly-randconfig-003-20260630    clang-22
+x86_64               buildonly-randconfig-004    clang-22
+x86_64      buildonly-randconfig-004-20260630    clang-22
+x86_64               buildonly-randconfig-005    clang-22
+x86_64      buildonly-randconfig-005-20260630    clang-22
+x86_64               buildonly-randconfig-006    clang-22
+x86_64      buildonly-randconfig-006-20260630    clang-22
+x86_64                              defconfig    gcc-14
+x86_64                                  kexec    clang-22
+x86_64                         randconfig-001    gcc-14
+x86_64                randconfig-001-20260630    gcc-14
+x86_64                         randconfig-002    gcc-14
+x86_64                randconfig-002-20260630    gcc-14
+x86_64                         randconfig-003    gcc-14
+x86_64                randconfig-003-20260630    gcc-14
+x86_64                         randconfig-004    gcc-14
+x86_64                randconfig-004-20260630    gcc-14
+x86_64                         randconfig-005    gcc-14
+x86_64                randconfig-005-20260630    gcc-14
+x86_64                         randconfig-006    gcc-14
+x86_64                randconfig-006-20260630    gcc-14
+x86_64                randconfig-011-20260630    gcc-14
+x86_64                randconfig-012-20260630    gcc-14
+x86_64                randconfig-013-20260630    gcc-14
+x86_64                randconfig-014-20260630    gcc-14
+x86_64                randconfig-015-20260630    gcc-14
+x86_64                randconfig-016-20260630    gcc-14
+x86_64                randconfig-071-20260630    clang-22
+x86_64                randconfig-072-20260630    clang-22
+x86_64                randconfig-073-20260630    clang-22
+x86_64                randconfig-074-20260630    clang-22
+x86_64                randconfig-075-20260630    clang-22
+x86_64                randconfig-076-20260630    clang-22
+x86_64                               rhel-9.4    clang-22
+x86_64                           rhel-9.4-bpf    gcc-14
+x86_64                          rhel-9.4-func    clang-22
+x86_64                    rhel-9.4-kselftests    clang-22
+x86_64                         rhel-9.4-kunit    gcc-14
+x86_64                           rhel-9.4-ltp    gcc-14
+x86_64                          rhel-9.4-rust    clang-22
+xtensa                            allnoconfig    clang-23
+xtensa                           allyesconfig    clang-20
+xtensa                randconfig-001-20260630    clang-17
+xtensa                randconfig-002-20260630    clang-17
 
-Why is the forward declaration here and not in blk_types.h where it's needed?
-
->  struct elevator_queue;
->  struct blk_trace;
->  struct request;
->
-> --
-> 2.34.1
->
->
-
-With the above nits addressed, LGTM:
-
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-
-Bart
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
