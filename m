@@ -1,143 +1,91 @@
-Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52AD83BED08
-	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2026 09:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3702D3FBEBC
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2026 09:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782897199; cv=none; b=WTAhKXYwMD+KXAIeajSKcwgLzRRSETM+/eLSHOeqxpt/QNRVKgAcnZkEaxpFOQCMCA4B6C+JzPjQDGtmnLFmTqxTWCfJffbhVBFK626G+8577r9V651kbrnizRb9zVOg4A1KCXgZtAmpZqQB6H3+1RSBoWW3U+n1XE3RcAgKbNU=
+	t=1782899920; cv=none; b=lNmnDWVFVQV/+OxrE8TSjE0WT99yA/JrhDdkh13Dwe0oJF7VZw26jovxx8vps9Bh4QUGNQsmBqXMlbJ01y57EcaP8HCLU/nTEzLc56B3S9VNFQHdUsDuZPBHMIbPYg2xGwwwMklOXlmYmFJtXH2O2V5EG5ve/it9yHxuR0oL9QE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782897199; c=relaxed/simple;
-	bh=1BtVrj+I7ULA9VHQ85OdzhVoUNNIjE8F4Xf6FogYYR4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=MsA0C6Q1zJco+IWkgjj6e2zrC8nDW+i3bbyEI08fNrHvmTaspU7CIyu6fHwuyBvKca3q8YFHGzLARVzyONWd/yDDHCKYziU5zx/H4xIJ5xwSDDEFyVJH/wO1Z4/CmxQKh2wB0LHQ9Yhc2fUQiN1n9e/CoS12hVIFRNnYHH7ht0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nzj9NRRM; arc=none smtp.client-ip=74.125.82.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782899920; c=relaxed/simple;
+	bh=ydO8Ft5Urm5M09KG8cScRhJ3iye6Vu29eRTcwv+lefo=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GM7ZW1BPqDocduqCDm4kW9QIEdmbnSrABhwuQvRFPrpsC5A2qmHoLb1uNiOq2pohYMWH8ps1mgTsWvCPox1c+vBpnbXCqpW15qiiPziywpCsooXZmaMQkrXtW06W44tMtSxUXj9rWTkzLGqYBa1C8NQ37Pfhj2xTIcSpOTwEa10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MaL/yjKM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nzj9NRRM"
-Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-30bf132969bso521820eec.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jul 2026 02:13:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782897197; x=1783501997; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3tbPAcPFUlYLSWx1Uyp/z7NgoEF0Fs6UohbmBspMkuU=;
-        b=nzj9NRRMhmzpWmgays/xh2vKHgikJwEDYoIXC8wrel9e8oJj31eBT4WRFe5BSwd0jI
-         b3OfJCqE2jnszVhgWa+bg3IkhQSzCstDfpFzneGLp37V7rcO791Y7gBwqPrmwr/5d25g
-         AdjfB0IVxLCQBSd6Rfm2Uji9Yg1Aj6+PuOjk4y4T5aFrMHiPoym4xbvV8qWjC36sfF5p
-         mBBHyLGSvPWCqxN4SU2G5od2fW7qmOb0Adn7Xeq5+ygK50w+KnMcc0YbXZHHdDnm9cEZ
-         Bj0RKgQ9W9FDB1YPZJk4gWEUTTRUyhZiBUzA3gK24RbRMxAYExe/6tEzg9uEJMm2B6dW
-         IWCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782897197; x=1783501997;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3tbPAcPFUlYLSWx1Uyp/z7NgoEF0Fs6UohbmBspMkuU=;
-        b=NMI8pqhPqUgHFIVvF1YKWnMD8ejH1g6X7GAGseQqFQXcdt2kAncHVSFOwuOeMLpp4c
-         tH55xhvngTMfPWVsPo/AhQ6Epyu3rvX76qr9PbJFd6CU/3vogqIdH6UeHCQC96wuuuMy
-         lWsHfMWcpd0HAIuvLf0LptV5rIKGMw+VLMHEnIg2E4qixRrKaw947fIsb/zs1/nSR4Py
-         KNUeRd5Uw5Ty86lwBdTAUXhPKiPlpI7ICnT7mNGVdwYVHx32d2vIwycngEgyHRNarPXJ
-         2MawFkM47GsYWJusspDV0PUj99pvNFH++aToHUmbHuozklFpVAm2gf1KRzvGSlFtRj9L
-         MXpw==
-X-Gm-Message-State: AOJu0YzH70Ahu7vDI4xT7Kwwyt3I8Vbms5l49+7mO3fxq3UV71q78M10
-	VrUJ1v8XTuzFtRK2aXgWLgEOhAi9MuZY2Nq/3RiuIQfLRQ0gCK3TeevSCrLilA==
-X-Gm-Gg: AfdE7cmqdQnaLfWvKoHg9ucRlXcKXKjMakxjip2/rDYZZgVMYPFkWr/34+HrfAYUO8W
-	q0XmoKdW4oHC2xy1WSN8JT1Y+jipRi0VQfPLuwt7bG+q+EblU5eZWLy2IFjp2xVcLGSbMmi0cqI
-	/d1xyOlediVvwh2fAu/1Ke+0yh/0guFLxtopW91yJp5o5cmhZOQfqpCIMNxoUat7Nv9Q1rLZPck
-	WZlMEKEAsZLOhyCJRna8i9v4y08eLA4zHL+tajc54NhEb8kgu27AAaqCe3Ia292FONxgFAxVwXt
-	5z3hluyaGX35iE7ExYjADUO7FL2tIWq6q6BBIJb3MRQ6nmdU29Yf61SytphzGMzJ6kBaqrwHB1W
-	/4TpmU9Qb9eTrO6a+FcdmAtXV7TqcZTUlIDraxeEMy0TIGH8d4lmVO6ESH2Qp1qluxutq8ZfCXq
-	dtMWOFXzx2ZsnVyFfhaNY=
-X-Received: by 2002:a05:7300:6420:b0:30c:536e:3a87 with SMTP id 5a478bee46e88-30eff05464bmr912073eec.3.1782897197252;
-        Wed, 01 Jul 2026 02:13:17 -0700 (PDT)
-Received: from [172.17.0.2] ([128.24.161.17])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30ee300e4a7sm17367035eec.13.2026.07.01.02.13.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2026 02:13:16 -0700 (PDT)
-Message-ID: <6a44da2c.ac469dc7.22d7c7.86d6@mx.google.com>
-Date: Wed, 01 Jul 2026 02:13:16 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8879210692122911116=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MaL/yjKM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 084511F0155C
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2026 09:58:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782899919;
+	bh=ydO8Ft5Urm5M09KG8cScRhJ3iye6Vu29eRTcwv+lefo=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=MaL/yjKM23uRludhdmmZ/pKii3StVcH78bbsWWybDYwbISt2i7e25j9KBm/ltPtyN
+	 XGTqeiB7Ui1fTWOKe6cmbDOaCa0Gh2ukI1Blgh4/JscEquN0V7NidxbWcCsMFv+Jd5
+	 zQ0wlXT1RcXbBR8YbeJ4zQJVuoPwzoSktWAr5ZLETC3SShkGudys8nIebgKuotKHkP
+	 IX/H5FlnXGYAgS4ozo7QnUmxjTPjq8d3Ak552DqwKFVad8dtMolWhL9gdsliRc1QHb
+	 BhmUGZrXTuZoVIIBCLI8L+AAXP/DLxfCSDDCslKePeVul25emIdooLYApll/O+VzH1
+	 yilRymzKctFNQ==
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5aeae771c49so426413e87.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jul 2026 02:58:38 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rqqt/I9rVDeVpS6SacjIBMYotEuLg0I6ymTZm9MyRW9NfJlRIaxJLF6vHvOpgF7N0nGiZPOHXwpSQTpV62utho=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWs2GNx04vjBox9LwWOmGJY8B7/g9xLyvYHsYqPihQ0zbLspkf
+	5aNhb3ascXPZnHVYe/FRo9SECk4xZAyieuisEzwvttVBl8PumZIMTS9sjLi/X+buCmqZ51SfB8Y
+	AEsb/mY/5EfGUv3wy4zuh+eQTHDZRWo1nU22eN+6F0Q==
+X-Received: by 2002:a05:6512:a34d:b0:5ae:b952:6c with SMTP id
+ 2adb3069b0e04-5aec6797747mr213198e87.13.1782899917728; Wed, 01 Jul 2026
+ 02:58:37 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 1 Jul 2026 05:58:36 -0400
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 1 Jul 2026 05:58:36 -0400
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260629-ipq5018-bluetooth-v2-3-02770f03b6bb@outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kaihsin.chung@synaptics.corp-partner.google.com
-Subject: RE: [v9] Bluetooth: btbcm: Add Synaptics 4384 chip support
-In-Reply-To: <20260701080138.3786003-1-kaihsin.chung@synaptics.com>
-References: <20260701080138.3786003-1-kaihsin.chung@synaptics.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20260629-ipq5018-bluetooth-v2-0-02770f03b6bb@outlook.com> <20260629-ipq5018-bluetooth-v2-3-02770f03b6bb@outlook.com>
+Date: Wed, 1 Jul 2026 05:58:36 -0400
+X-Gmail-Original-Message-ID: <CAMRc=MfTh4-RM7R-Ku=MFjo2EQLoe9dt5-AFBtrMx+zZJRHKLQ@mail.gmail.com>
+X-Gm-Features: AVVi8CcMVsM_VtMs4RD3avK1gS-7SxkMAq-P9mHbEgm5Sdw31SbqOo7iHTS4Zj8
+Message-ID: <CAMRc=MfTh4-RM7R-Ku=MFjo2EQLoe9dt5-AFBtrMx+zZJRHKLQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/6] firmware: qcom: scm: Add support for setting
+ Bluetooth power modes
+To: george.moussalem@outlook.com
+Cc: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
+	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Johannes Berg <johannes@sipsolutions.net>, Jeff Johnson <jjohnson@kernel.org>, 
+	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+	Rocky Liao <quic_rjliao@quicinc.com>, Saravana Kannan <saravanak@kernel.org>, 
+	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Mathieu Poirier <mathieu.poirier@linaro.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 
---===============8879210692122911116==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Mon, 29 Jun 2026 15:01:46 +0200, George Moussalem via B4 Relay
+<devnull+george.moussalem.outlook.com@kernel.org> said:
+> From: George Moussalem <george.moussalem@outlook.com>
+>
+> The Bluetooth subsystem (BTSS) on the IPQ5018 SoC supports setting power
+> modes which are required to be configured through a Secure Channel
+> Manager (SCM) call to TrustZone. However, not all Trusted Execution
+> Environment (QSEE) images support this call, so first check if the call
+> is available.
+>
+> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+> ---
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1119519
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.90 seconds
-VerifyFixes                   PASS      0.09 seconds
-VerifySignedoff               PASS      0.09 seconds
-GitLint                       PASS      0.24 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      27.59 seconds
-CheckAllWarning               PASS      30.11 seconds
-CheckSparse                   PASS      29.78 seconds
-BuildKernel32                 PASS      26.70 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      515.07 seconds
-IncrementalBuild              PASS      25.92 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v9] Bluetooth: btbcm: Add Synaptics 4384 chip support
-WARNING: DT compatible string "brcm,bcm4384-bt" appears un-documented -- check ./Documentation/devicetree/bindings/
-#165: FILE: drivers/bluetooth/hci_bcm.c:1595:
-+	{ .compatible = "brcm,bcm4384-bt" },
-
-WARNING: From:/Signed-off-by: email address mismatch: 'From: Kaihsin Chung <kaihsin.chung@synaptics.corp-partner.google.com>' != 'Signed-off-by: Kaihsin Chung <kaihsin.chung@synaptics.com>'
-
-total: 0 errors, 2 warnings, 31 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/patch/14655389.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-
-
-https://github.com/bluez/bluetooth-next/pull/378
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8879210692122911116==--
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
