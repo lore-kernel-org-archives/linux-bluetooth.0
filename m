@@ -1,76 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7E5356756;
-	Wed,  1 Jul 2026 03:06:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E8052DB78C
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2026 06:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782875192; cv=none; b=pFUqObaFWQcFn14UZUHuoYVoQHVuSr2EmEyvQen3NJ9bGpAWJuzzyyhflDBLKZdsGWz8xJEl/N5PgBqlU9RVWtwkXtSb9pwdrr/nUHkkor4N8KmY4+VPAIv6Fyi0FZ6N0SftPyqZVjlrn9w3KgH6k0ldNaTmf/KyLcL8gBPgzpw=
+	t=1782888170; cv=none; b=t/mmrFGEbJ9W/7Mo1GTidGx9njWXOv4VpeXPwv2xWK00R09ZlFv8SNX/4EvEsn8VgkfqKRpnPvElDHdPlZL305eENUji3RaYKvcYMMxIicPK3HWw+btRMBMf2dqBHQnigCMIUBD86d7/FTxqy+LsCWwCCiuLBwQHUMG1KS0QmeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782875192; c=relaxed/simple;
-	bh=JBciXCeia/ZKV04Q3HNw6OAQhHJB+njKCuyEUxsY6p4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bVBOCU9UeeF+8FvNbroJk96pVqRC7J9C8Os/KfS330SX0NTUaQNsEYiRXulFH5PDYneOXOuKu5mdyEaWmj8R1ml7GTc99QerqmPuJ9+Yq+PShQHBr3CJwmmsVD/GDKur1pxUO4Rl0E9C6huna1yTlUZqQLKtbilM36SOKZP1pDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZNQw/dHz; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782888170; c=relaxed/simple;
+	bh=MssTcRg00r2GxxisW2Ymt3NF81zPgAsW6XnPlUrbuuM=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=lcyFT+5sabK++ND+T/mXJE1X+0kxu/NFtgNxC5/HRCiJSw2yHwrMgUNdgPqvJKhCVop8/WLATlIQa5BGScTYpPb2Zy8dJIwBc+3sOGpUIcGR+zgjncbtp1fMNPosYIfWa+KHA5kDPFljgZtPJmUgOkod7ryBnbw8IAeFYvD68K0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pXI2HNQb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZNQw/dHz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7BD91F000E9;
-	Wed,  1 Jul 2026 03:06:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782875191;
-	bh=KFACxb93Pqlx2Oj8v3zDX99ADpl6A5clMxDQYx3jf/U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ZNQw/dHzz1O9JrEq1vLt6KjhQIsKk3/R/uMntjLw1V97JSqUlIz/7pyAIto1AWWO4
-	 HnqsXB9gPdG1V4ODA4Bemx322eGybcG1zampzGQkZcO7L6QVL1FIWfDnAfTWmmys78
-	 CySR/HAMGwE5HxPa28kGCuG0F6RSpG4fWUvkXZLgPsKD82rgKxwHiuU11cRTVSS6Ni
-	 UL9LyXLOWH7MJqgbShYn7vIrN+pkd9K0dxHuvrsyVlvkRKMaUOsfpMo9cKbN/qDTXN
-	 4UHaAkiQR+HDntRZQJwOMO0HzygofhnO3lRvNM4W+J1IoNH5fPCYBSVhTWPaBEPO1U
-	 uI45TQiFUZ6JA==
-Date: Tue, 30 Jun 2026 20:04:51 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Simon Richter <Simon.Richter@hogyros.de>
-Cc: Demi Marie Obenour <demiobenour@gmail.com>,
-	Andy Lutomirski <luto@amacapital.net>, linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, iwd@lists.linux.dev,
-	linux-hardening@vger.kernel.org, Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH] crypto: af_alg - Add af_alg_restrict sysctl, defaulting
- to 1
-Message-ID: <20260701030451.GA1799@sol>
-References: <20260622234803.6982-1-ebiggers@kernel.org>
- <CALCETrXPj0u=FZ=aFcZAHk3fFZa7rCuPEjx6cOMXmT3sdkC7SA@mail.gmail.com>
- <20260623192715.GE1850517@google.com>
- <c7cb79ce-48f9-4433-ab4f-88b4c4df996c@gmail.com>
- <20260628185404.GA2292@quark>
- <641f0391-dd4b-4b25-88f5-5298fa6bf823@hogyros.de>
- <8c24ad17-8295-47be-a562-44c23538c4cb@gmail.com>
- <d96594ba-4ad5-4541-9660-2469875db9b7@hogyros.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pXI2HNQb"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 31019C2BCC6
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2026 06:42:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1782888169;
+	bh=MssTcRg00r2GxxisW2Ymt3NF81zPgAsW6XnPlUrbuuM=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=pXI2HNQbHuiscLefjCpGXwZQqyWyd39h1UoJkiy+Mj9P7AwYEiTIxWFkaJv/7/Uvt
+	 HB4HAhemsbYp54reyJTNVQouXR3o0wKhfgvkA3IIhPsRQvGIhqUfXb/YeAzBQP/85m
+	 3XaXYrO6qfFHboXzRyPaAdTa/EgkADx8q18hzABEVumm2yWQiMTo4FhYMx5z5KfyLq
+	 zdIiRF0I6aPYbNH2kv6ID7RZQLP/HdHuAiGv0uOCXGI5P7ZOQNe7S1NTZm9WiqeUYH
+	 eQPFWlaTOTwC0DMvWz62+yNf0kVLBI9GJaZn5QL+WI3i4fIWz/W5XSR43sSEjN7TuD
+	 wxIOCFeaXn4Ig==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 19E30C4160E; Wed,  1 Jul 2026 06:42:49 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221696] btmtk: regression in 6.6.142: NULL pointer dereference
+ in btmtk_usb_hci_wmt_sync during resume from S4
+Date: Wed, 01 Jul 2026 06:42:48 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: regressions@leemhuis.info
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-221696-62941-8sWQYN8j83@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221696-62941@https.bugzilla.kernel.org/>
+References: <bug-221696-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d96594ba-4ad5-4541-9660-2469875db9b7@hogyros.de>
 
-On Wed, Jul 01, 2026 at 11:53:16AM +0900, Simon Richter wrote:
-> Hi,
-> 
-> On 7/1/26 12:54 AM, Demi Marie Obenour wrote:
-> 
-> > That said, if the crypto_rng support is to remain, should it have a
-> > non-empty allowlist for privileged processes?  Otherwise, it's dead code
-> > with the default sysctl value.
-[...]
-> I think that embedded systems will still use this code until a better
-> alternative exists, so it's not entirely dead, and the best way to get rid
-> of it is to build something better.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221696
 
-/dev/urandom, /dev/random, and /dev/hwrng.  I.e. what userspace
-*actually* uses already.  algif_rng is a redundant, much harder to use
-interface that got added off to the side for some reason.
+The Linux kernel's regression tracker (Thorsten Leemhuis) (regressions@leem=
+huis.info) changed:
 
-- Eric
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |regressions@leemhuis.info
+
+--- Comment #1 from The Linux kernel's regression tracker (Thorsten Leemhui=
+s) (regressions@leemhuis.info) ---
+Not my area of expertise, but sounds a bit like your problem will hopefully
+soon be fixed by
+https://lore.kernel.org/all/20260626104604.3465124-1-sivakumar.bs@gmail.com/
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
