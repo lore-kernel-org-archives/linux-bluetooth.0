@@ -1,49 +1,52 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F8D2D5940;
-	Wed,  1 Jul 2026 15:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A1D244692;
+	Wed,  1 Jul 2026 15:46:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782920819; cv=pass; b=VI/oznI2jSf+8mnxjPeFFR2Nthri1NgnuRX4aTrN/vqVcowRjQJO7/CVZlOVNMNtMrxeikBlKhYF+1vcl30XdK0hj3qdUvybjXKfWSU1uUGKTpudREYaHNui/6tqOMQT6D84kKgVSXbPMXTBev8ouXg+OAu5umDrC3sKA2fwoQQ=
+	t=1782920819; cv=pass; b=WYTbTUcGGChIKwDXMDyn+APoUGI6XqVZcPNUM2/3GDgFrwCthpXse7zT0WhrbEBTDVIASBvcUM4O9j130lJ3DOxnJXWXnkNnbgO3B5x7Et/05g3UtikgcNxh/e9E1V6Y+TNGU4C7mjxmS51u+Q/mLSbHPY3IS8EMN7+YlvepMbk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782920819; c=relaxed/simple;
-	bh=TJ5tE0vSlj45M9dEKmCz0DymCehhYxYhl8MFDr/T3Tg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dwolEjilqyvDlgy3E/yaEGAWK1vemTf7I+C0y6ihVC5RKZEgXbbjB1kEMXCozDkWh3zfXekqdwSQS3fFqfPKbzYxeLSDoTBcY4Ucf9fPlc0ANqXlAJNbzidQb+NVgs2KSKIbL/EvWhRQi/iD1ItrEriaJgm1Cwn83StSEpeAH80=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=HSf2Zl2j; arc=pass smtp.client-ip=195.140.195.201
+	bh=WjvG8PsRYbDOu5SaZmGMCwznJL4bt9UxECSB6ppFLUY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GXZQWaE7fl23yRpC3H9DiY7XsMVo+z5Hxf9IYlah1FsFq9qn15wTakpAuI5XyMHf2aaI9Yyh0IVSztvas5JY6FW2tZCHsw5akn/RPf0GUDJJCwhEBCuOJ8K7aglSJwF5mktb2FyTwDKuNOrIv3NiXsMomi9yg5sSIA8y5bFhhZk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=gnyTGC8G; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="HSf2Zl2j"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="gnyTGC8G"
 Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:1::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gr4Bb3pk6zyQt;
-	Wed, 01 Jul 2026 18:46:47 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4gr4Bd0lhGzyf2;
+	Wed, 01 Jul 2026 18:46:49 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1782920808;
+	t=1782920809;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=EbC8XfBRTVGSnr6/urzKgaF2h9N+46AS4EdMNL6KXVk=;
-	b=HSf2Zl2jjrjpjehd1GLk7DbJUB/HsRa3BnOVABkkC6aAl+JCVUaz+peB01D5oGhCUO4wVh
-	JYj9anBiign/nAjUQhAa2jTiM7NBHkn7BOCo/Hp7ajCPyf/Z4PI5beqNUEH6xc+3NRigZA
-	5ORlg5yuPP2JMvSm1a5+k//GWNMtsQE=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1782920808;
-	b=o2+M6UDEI+xsx7DLFL5IM908jOqeJBE9ctTOx1JeOKyQ0i4V+MvKSW2fslWoUEyw0Zc1pr
-	s0/0zgmZ0nSSgSu2r5IAMjW2FzjvNQ3QiPEHgkeI1zNrUxMvK0B8FpXa57Mz9g/xvYtMqJ
-	g70e1mEADIkaUWNm0CsCzaeOctcQKtE=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=obJAgbKCExRSYXtL9XNsghMfX0L9lmc746F2oIEBeuM=;
+	b=gnyTGC8G06rtC32oVnT2rfFCATgQho35bDU14RaJu1iMeh7/6BU1BpzqB/UcFd0YMZjMxA
+	myvqpnWewKAxXUGY/6pWd3Pcoc03xaHv4n88+rJOo+ZVFjKX+lGpWVnp0E3eyMTvyhh0RZ
+	bQ3ijmVblBs85RO5YtgmlDhgWUxowRw=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1782920809;
+	b=HpO9suF0FxCwZH1TUq5OxMc7hccGqsXuaYHiCJnu/7lv3h/R6nmUkFRyC0PJv9x7lZkkqR
+	8us54Yy1fviUBVQJC95fQl5nfZV7leqNv2000bDuW+sttIZyCyOwEnWmvDm2cBYTrZuAeL
+	Uf36U7Ogjz6H09iRftAr2X9HrElbD5s=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1782920808;
+	s=meesny; t=1782920809;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=EbC8XfBRTVGSnr6/urzKgaF2h9N+46AS4EdMNL6KXVk=;
-	b=OXK3CxnH+xByryDNlbmYIXOq00b+ueoLfh0wnagrNjftv/q+3GBaUD/e/h0+aE8nrMF6ag
-	mrKNgcBUPshVEubc5XFAv7JIeqWnDF4DorZefje1TCPUQliGwroNtbo4myOF35QNnNXh22
-	si5U9HegHNU0wh6nUKjBG3BHrLVoOYY=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=obJAgbKCExRSYXtL9XNsghMfX0L9lmc746F2oIEBeuM=;
+	b=qm0E3i3yC017ISZwNGz/P033VZF7clJwm2VF97lmEpGhk6wy5CBA2s/qwcjtZ720Kg/Kqo
+	l73Kj0LRFeOs5B6TCTdKIetMJ8WGUn7zM0MA29xIiKK+wvfbmJfg12NP4BsZlAy8nzkdQw
+	6IAeEgxOgoQz1LoqB5T68dgJNGYi6Zc=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -54,10 +57,12 @@ Cc: Pauli Virtanen <pav@iki.fi>,
 	luiz.dentz@gmail.com,
 	devnexen@gmail.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: ISO: fix malformed ISO_END/CONT handling
-Date: Wed,  1 Jul 2026 18:46:38 +0300
-Message-ID: <da68c9b8242e9fbf482b1512e9d612768f2cc7e8.1782920668.git.pav@iki.fi>
+Subject: [PATCH 2/2] Bluetooth: ISO: exclude RFU bits from ISO_SDU_Length
+Date: Wed,  1 Jul 2026 18:46:39 +0300
+Message-ID: <f3372d2d8a03a1d408a75c6036a1f4a8372e57a4.1782920668.git.pav@iki.fi>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <da68c9b8242e9fbf482b1512e9d612768f2cc7e8.1782920668.git.pav@iki.fi>
+References: <da68c9b8242e9fbf482b1512e9d612768f2cc7e8.1782920668.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -66,95 +71,34 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Core specification (Part C vol 4 sec 5.4.5) does not exclude empty
-ISO_CONT, ISO_END packets.  We currently reject them if they are last.
+slen contains ISO_SDU_Length (12 bits), RFU (2 bits),
+Packet_Status_Flags (2 bits).
 
-If controller sends malformed sequence
+Exclude the RFU bits from hci_iso_data_len. Also add masks to the pack
+macro.
 
-    ISO_START -> rx_len = 4, ISO_CONT skb->len 4, ISO_START
-
-that ends payload in ISO_CONT, we leak conn->rx_skb. If controller sends
-too long ISO_END, we panic on skb_put. If controller sends too short
-ISO_END we accept it.
-
-Fix by marking unfinished ISO_START via conn->rx_skb != NULL.  Check
-skb->len properly before skb_put.  Combine the ISO_CONT/END code paths
-as they require the same initial checks. Reject too short ISO_END
-packets.
-
-Fixes: 6aba94a49bc9 ("Bluetooth: ISO: drop ISO_END frames received without prior ISO_START")
-Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
+Fixes: 4de0fc599eb9 ("Bluetooth: Add definitions for CIS connections")
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- net/bluetooth/iso.c | 31 ++++++++++++++++---------------
- 1 file changed, 16 insertions(+), 15 deletions(-)
+ include/net/bluetooth/hci.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index cd7c7c9ea4fc..2e95a153912c 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -2540,7 +2540,7 @@ int iso_recv(struct hci_dev *hdev, u16 handle, struct sk_buff *skb, u16 flags)
- 	switch (pb) {
- 	case ISO_START:
- 	case ISO_SINGLE:
--		if (conn->rx_len) {
-+		if (conn->rx_skb || conn->rx_len) {
- 			BT_ERR("Unexpected start frame (len %d)", skb->len);
- 			kfree_skb(conn->rx_skb);
- 			conn->rx_skb = NULL;
-@@ -2621,12 +2621,14 @@ int iso_recv(struct hci_dev *hdev, u16 handle, struct sk_buff *skb, u16 flags)
- 		break;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 38186a245f14..50f0eef71fb1 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -3413,8 +3413,9 @@ static inline struct hci_iso_hdr *hci_iso_hdr(const struct sk_buff *skb)
+ #define hci_iso_flags_pack(pb, ts)	((pb & 0x03) | ((ts & 0x01) << 2))
  
- 	case ISO_CONT:
--		BT_DBG("Cont: frag len %d (expecting %d)", skb->len,
-+	case ISO_END:
-+		BT_DBG("%s: frag len %d (expecting %d)",
-+		       (pb == ISO_END) ? "End" : "Cont", skb->len,
- 		       conn->rx_len);
+ /* ISO data length and flags pack/unpack */
+-#define hci_iso_data_len_pack(h, f)	((__u16) ((h) | ((f) << 14)))
+-#define hci_iso_data_len(h)		((h) & 0x3fff)
++#define hci_iso_data_len_pack(h, f)	((__u16) (((h) & 0x0fff) | \
++						  (((f) & 0x3) << 14)))
++#define hci_iso_data_len(h)		((h) & 0x0fff)
+ #define hci_iso_data_flags(h)		((h) >> 14)
  
--		if (!conn->rx_len) {
--			BT_ERR("Unexpected continuation frame (len %d)",
--			       skb->len);
-+		if (!conn->rx_skb) {
-+			BT_ERR("Unexpected ISO %s frame (len %d)",
-+			       (pb == ISO_END) ? "End" : "Cont", skb->len);
- 			goto drop;
- 		}
- 
-@@ -2642,17 +2644,9 @@ int iso_recv(struct hci_dev *hdev, u16 handle, struct sk_buff *skb, u16 flags)
- 		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
- 					  skb->len);
- 		conn->rx_len -= skb->len;
--		break;
- 
--	case ISO_END:
--		if (!conn->rx_len) {
--			BT_ERR("Unexpected end frame (len %d)", skb->len);
--			goto drop;
--		}
--
--		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
--					  skb->len);
--		conn->rx_len -= skb->len;
-+		if (pb == ISO_CONT)
-+			break;
- 
- 		if (!conn->rx_len) {
- 			struct sk_buff *rx_skb = conn->rx_skb;
-@@ -2663,6 +2657,13 @@ int iso_recv(struct hci_dev *hdev, u16 handle, struct sk_buff *skb, u16 flags)
- 			 */
- 			conn->rx_skb = NULL;
- 			iso_recv_frame(conn, rx_skb);
-+		} else {
-+			BT_ERR("ISO fragment incomplete (len %d, expected %d)",
-+			       skb->len, conn->rx_len);
-+			kfree_skb(conn->rx_skb);
-+			conn->rx_skb = NULL;
-+			conn->rx_len = 0;
-+			goto drop;
- 		}
- 		break;
- 	}
+ /* codec transport types */
 -- 
 2.54.0
 
