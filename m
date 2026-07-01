@@ -1,136 +1,136 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C02C298991
-	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2026 14:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161B7423A78
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2026 15:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782916294; cv=none; b=fVKprLnTeZmEswFApyHLbTSJBZAw5s8+XJHbUD0WRM6yFRLB7MCYKK2Zdz+OT69aEpKIhiai1sWhsOGaoLe/tHY+ZfBb+c9SYDwVqWVDoe1ABy8DAD5ckADqKi9nfiS4uuQ7I5JD5aRPH3N6oYIyK1jB8nwLzQdSYwxcB/ORPIU=
+	t=1782918559; cv=none; b=oqoywGufpCHzT865CdO3yVML0IalFLrjeWD6DYBLCS0zIyUBDi1tNRGdRqA9NUEwnhHbTQhBAJoSMfabEDq02QOmbMqlK+YnlDEZCFA4mcEQFm8lpysrBbARJVJSjc0aQYWQW0hiGYa+V2WbKavR2dG/O47QyzMflHzZzg8xidM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782916294; c=relaxed/simple;
-	bh=d3Yt3evpOlTUdIKBXRBnsSrnWnoMi3mr+hdSPsCnkz4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=m2d/aUBcqZDDzIoOiYKsxCYYCb0DSQDAQjQQWQxtHvXwfBNkWl4RnqLMVZXWyeXAWn4eOnMfcL8rM/Yznz7uenAsIuay1bBm6QUNFFimsWJWsGEos+QpH4v6376Nbn8ay308/2Yr68/J6ualb4HqjauGus6j75H+V1/GUZRa9pQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S5XeCohx; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782918559; c=relaxed/simple;
+	bh=tUhbqP/DU1xPpF4wqNoexxMOosLjOYJwC7VRnXVHvzs=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=g7VuCs9fSIKDnNvbNuLDNaaHR7gG00kPeSJC+NGx5ighdDXfIdmGA5Zlck2JCgA/MLAMfu4Vw3co/8w+Qw5GpBVdzeTIOrs3PoC24pCChu/A7s3mBsWwZvhRppkLEWCRYTn8kIclRbcbynPym8diTs32xGAIVaMVTlVerb7Dnsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qsckfCG2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S5XeCohx"
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-8000e21f014so10713727b3.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jul 2026 07:31:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782916292; x=1783521092; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=RYui4rwMevN5us/ns6ZOKvH/+rlfAQvGc1XJViabSek=;
-        b=S5XeCohxT2RIFzDv+WUAQVT9v3yUuh5gIItlrbylWWucnWsAgZzmg9GedhSawXWRbp
-         LGHfvChIFqQXrJO4hrsjmaQgu+HD9iIlx83mTJoWzxGWQa0dbjVVNwRBnoKsiy0l9WDA
-         ftaFJC46thifAE2LUIsq0CDzbchwd5gycdErMQMsVjitp2WZCYim3vUKEbpxOqIwODL1
-         iz3tRojFp/mGV40dxZgUuiSX584ghtcwDKT32zK2b/4aYaq/vgZLwcUEgmTbT6gh7OOJ
-         ebqvdxjIgb/SMP11yqdZG3cnNMWbpiCzaOzFqi1gIUF+7h6SoNtJA1ivbAgiO/M+x2rb
-         K+5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782916292; x=1783521092;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RYui4rwMevN5us/ns6ZOKvH/+rlfAQvGc1XJViabSek=;
-        b=MTGKkLgFJ8Govxuu93SOp4KfxtwQGKqXENHMpWSHcL3ZHu4sgodD+k1KsyAJJpKgUc
-         nlFyt2KZv05zcIBFOF6DGsefje433NLHthwZYGth7Ie1gd+JOUe36YSrDibalw8jEhoa
-         YmchOrliQtzBEFZwoGHLdJnPsnbgmUHHV2fSpqHcpYoXj4fdUZhekoJkFbT6bFAnJfXU
-         ddtQiyt9W6coLN1ySFlBo3sJUAJQUXneGczZwevpRH90jpIaO5aa/d4nSgVVI2a6j6qJ
-         leyBOBvnYkQqLqB+wGB0UmiaZayWbRy8X2x1UF9zbEM1E89iSWNY9hK4MpqhKc4L8UGB
-         PbWw==
-X-Gm-Message-State: AOJu0Ywx+k7NH5t+ln09+2emt83JJEEm7CJbfYjK/WMX1sSALU8Fb8hh
-	Su+KVokCMYbwgkEYZQp3GTLuVewwmNXsCxmkEtj5tiBUuqwXYLZKSskBk4TTCvvx
-X-Gm-Gg: AfdE7ck2IQVB0wqmDSmLWtpJSpEokNmou3QNULJUJ4wm/8pqcwJFz+HJUDa9v8t37Cf
-	QgqC4zbSlHcXAwLujxi9Zx72my9xq1bfcaO0UwsN6pTiMJ3paycfjeCWGGT9aae3ldDWAAtFpz2
-	RmxDSNpCQlsM3V9u0x2ha6qrMH2r8h3yNsaADKaZQuFngqQ3zpVPX8ohu74Gy56uq1Df3mtKHkR
-	cQYQ7+cSROSffSndeuA9CNSaT7tb6Wdtoi0mpgxLdAZJd7AAET5fhjXFxjty6jL4Xo+SYlTE5ut
-	4jgzkpN8UpUcwiyHToDAMWZRDffpX27ps4OXvSuWSfRrNvusonpM+iJBbrRPVd9hcpt+uZdC/Gl
-	6VrH6+6/Z4ZIMbJAGYrVag3vvjO86YMnCciW5Tfl4uZ99oy1QK7FTZ7pz9VDvsSYr2w8dZ3ASr4
-	ZWU8YkhLwWuTcIhBi03et/KNdbeY1kJw==
-X-Received: by 2002:a05:7300:4309:b0:304:de2b:446f with SMTP id 5a478bee46e88-30eff2b53a4mr2078907eec.28.1782915864125;
-        Wed, 01 Jul 2026 07:24:24 -0700 (PDT)
-Received: from [172.17.0.2] ([20.55.163.188])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30ee300e4a7sm20481827eec.13.2026.07.01.07.24.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2026 07:24:23 -0700 (PDT)
-Message-ID: <6a452317.ac469dc7.22d7c7.70e3@mx.google.com>
-Date: Wed, 01 Jul 2026 07:24:23 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2033344892074157209=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qsckfCG2"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6F3F8C2BCC9
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2026 15:09:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1782918558;
+	bh=tUhbqP/DU1xPpF4wqNoexxMOosLjOYJwC7VRnXVHvzs=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=qsckfCG2hLr4V5PxwVWLurrm6pqljz8qPX2L0V4SvrOV/CXvoYwcjrPJYkiZGlPu2
+	 SO88F6D0A+R97dCLWzd7bWvdg/G6FYFmiAQ4b5vDtRrml0CfkItddZ+hln9xMaoCfE
+	 ZW5rzQS2N7gjE1/b9zLlcued+DDF+4CpBeXvxwem/T1Qnkbb5tWzkNsaxbnvKqk0WC
+	 n2+QQ5V9uujHt6U9XU3PjBVTB/JBMwPS8ufAfe99y42ANrMYnx7i9vcCUDG7WY2WqB
+	 jsoeVr7rurpgcB/OxnT3jVY4YVOCRmfWO5WxDDK5XPpQvzBr+mvMfe0Ce49ip3lxWl
+	 +tLcoeaNsZ8kQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 5DC6DC53BBF; Wed,  1 Jul 2026 15:09:18 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 220564] hci0: ACL packet for unknown connection handle 3837 and
+ sound interruption
+Date: Wed, 01 Jul 2026 15:09:18 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: robhogan@gmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-220564-62941-11iNnkhOy2@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-220564-62941@https.bugzilla.kernel.org/>
+References: <bug-220564-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
-Subject: RE: Bluetooth: btmtk: Add MT7928 support
-In-Reply-To: <20260701121345.1231906-2-chris.lu@mediatek.com>
-References: <20260701121345.1231906-2-chris.lu@mediatek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============2033344892074157209==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220564
 
-This is automated email and please do not reply to this email!
+--- Comment #13 from Rob Hogan (robhogan@gmail.com) ---
+I'm pretty sure it's the same issue. Extract from syslog below:
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1119720
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.40 seconds
-VerifyFixes                   PASS      0.09 seconds
-VerifySignedoff               PASS      0.09 seconds
-GitLint                       FAIL      0.73 seconds
-SubjectPrefix                 PASS      0.25 seconds
-BuildKernel                   PASS      27.21 seconds
-CheckAllWarning               PASS      29.79 seconds
-CheckSparse                   PASS      29.10 seconds
-BuildKernel32                 PASS      26.45 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      496.96 seconds
-IncrementalBuild              PASS      30.21 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v7,2/3] Bluetooth: btmtk: Improve BT firmware logging
-
-14: B1 Line exceeds max length (92>80): "[  212.878783] Bluetooth: hci1: Loading BT firmware: mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin"
-15: B1 Line exceeds max length (93>80): "[  212.889614] Bluetooth: hci1: BT HW ver: 0x7922, SW ver: 0x008a, Build Time: 20260224103448"
-17: B1 Line exceeds max length (115>80): "[  216.048890] Bluetooth: hci1: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported."
-[v7,3/3] Bluetooth: btmtk: Add MT7928 support
-
-28: B1 Line exceeds max length (92>80): "[ 6931.197167] usb 1-3: New USB device found, idVendor=0e8d, idProduct=7935, bcdDevice= 1.00"
-33: B1 Line exceeds max length (97>80): "[ 6931.213478] Bluetooth: hci1: Loading CBMCU firmware: mediatek/mt7928/CBMCU_CODE_MT7935_1_1.bin"
-34: B1 Line exceeds max length (98>80): "[ 6931.215214] Bluetooth: hci1: CBMCU HW ver: 0x7935, SW ver: 0x0000, Build Time: 20260601T161751+"
-36: B1 Line exceeds max length (99>80): "[ 6931.643916] Bluetooth: hci1: Loading BT firmware: mediatek/mt7928/BT_RAM_CODE_MT7935_1_1_hdr.bin"
-37: B1 Line exceeds max length (93>80): "[ 6931.650467] Bluetooth: hci1: BT HW ver: 0x7935, SW ver: 0x0000, Build Time: 20260527000816"
-39: B1 Line exceeds max length (115>80): "[ 6935.039833] Bluetooth: hci1: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported."
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
+Jul  1 16:01:49 mwenge kernel: [439779.598878] Bluetooth: hci0: ACL packet =
+for
+unknown connection handle 3837
+Jul  1 16:02:08 mwenge bluetoothd[760091]: src/adapter.c:dev_disconnected()
+Device F0:EF:86:C3:50:D8 disconnected, reason 1
+Jul  1 16:02:08 mwenge bluetoothd[760091]:
+src/adapter.c:adapter_remove_connection()
+Jul  1 16:02:08 mwenge bluetoothd[760091]: plugins/policy.c:disconnect_cb()
+reason 1
+Jul  1 16:02:08 mwenge bluetoothd[760091]: plugins/policy.c:disconnect_cb()
+Device /org/bluez/hci0/dev_F0_EF_86_C3_50_D8 identified for auto-reconnecti=
+on
+Jul  1 16:02:08 mwenge bluetoothd[760091]:
+plugins/policy.c:reconnect_set_timer() attempt 1/7 1 seconds
+Jul  1 16:02:08 mwenge bluetoothd[760091]:
+src/adapter.c:bonding_attempt_complete() hci0 bdaddr F0:EF:86:C3:50:D8 type=
+ 0
+status 0xe
+Jul  1 16:02:08 mwenge bluetoothd[760091]:
+src/device.c:device_bonding_complete() bonding (nil) status 0x0e
+Jul  1 16:02:08 mwenge bluetoothd[760091]: src/device.c:device_bonding_fail=
+ed()
+status 14
+Jul  1 16:02:08 mwenge bluetoothd[760091]: src/adapter.c:resume_discovery()
+Jul  1 16:02:08 mwenge bluetoothd[760091]: profiles/audio/avdtp.c:session_c=
+b()
+Jul  1 16:02:08 mwenge bluetoothd[760091]: profiles/audio/avdtp.c:avdtp_ref=
+()
+0x5c5568690930: ref=3D3
+Jul  1 16:02:08 mwenge bluetoothd[760091]:
+profiles/audio/avdtp.c:connection_lost() Disconnected from F0:EF:86:C3:50:D8
+Jul  1 16:02:08 mwenge bluetoothd[760091]: profiles/audio/a2dp.c:abort_cfm()
+Source 0x5c5568671120: Abort_Cfm
+Jul  1 16:02:08 mwenge bluetoothd[760091]:
+profiles/audio/avdtp.c:avdtp_sep_set_state() stream state changed: STREAMIN=
+G ->
+IDLE
+Jul  1 16:02:08 mwenge bluetoothd[760091]:
+profiles/audio/transport.c:media_transport_remove_owner() Transport
+/org/bluez/hci0/dev_F0_EF_86_C3_50_D8/sep1/fd3 Owner :1.79
 
 
-https://github.com/bluez/bluetooth-next/pull/379
+And here is the relevant handle entry in btmon:
 
----
-Regards,
-Linux Bluetooth
+> ACL Data RX: Handle 3837 flags 0x02 dlen 143         #33540 [hci0] 390.03=
+6978
+      Channel: 515 len 139 [PSM 0 mode Basic (0x00)] {chan 65535}
+        33 00 cb db 90 00 01 00 58 17 02 00 00 00 00 00  3.......X.......
+        00 0e 81 00 00 00 00 00 00 01 00 00 00 00 00 00  ................
+        00 2a 25 00 00 03 14 01 00 42 27 00 00 00 00 00  .*%......B'.....
+        00 00 00 00 00 00 00 00 00 ca db 90 00 4a da 90  .............J..
+        00 07 c4 50 00 00 00 20 00 00 40 f8 05 e1 7f 00  ...P... ..@.....
+        00 3f 00 09 00 0d 00 00 00 3d 00 09 00 b6 00 00  .?.......=3D......
+        00 02 00 20 00 05 00 00 00 01 00 09 00 00 00 09  ... ............
+        00 0d 00 00 00 3b 00 09 00 1a 00 00 00 30 00 09  .....;.......0..
+        00 0f 00 00 00 3b 00 09 00 0d 00                 .....;.....=20=20=
+=20=20=20
 
 
---===============2033344892074157209==--
+The full btmon log is too large to attach I think. Let me know if there's
+something else I should be turning on to help debug.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
