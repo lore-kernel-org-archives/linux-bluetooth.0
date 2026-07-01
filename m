@@ -1,194 +1,210 @@
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC0848C8B4
-	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2026 15:55:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782921313; cv=pass; b=lZM7ZQZ+YfAyhPnrgzYXBCBaG6c4A7htDzp1oe+dbB/rUkFjcHL7tF9QV1sPL5mTeS3W46rCtoltEJinMDy/XZcbEAC1V01msG2WS1RphVDOfi7ztSpzcBuAHILpezPkDVX/PGQnuwNHzKrOM/ErHIQtOQ5yI37X+azIip1pIjI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782921313; c=relaxed/simple;
-	bh=sCLJX+qJhodReDkoeJC9g/BGwOIq04v1mlFoZc/q2Fw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gLbC5bPpkb3lU233HOTKJjkgZbRIGSJG2GVnWyoQO7Enot7aP1HBEMOo+1n3ZfZ49q6uuqv3uC1tLn0TOdLmm1lETxeinMxEw65Vdef7IhRP5/qkWwzVhNMNq48gv+fQv4eofaEga6x0XIBwLTS0KhDY+L23Nz4wU2q/2+I0ubU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dilW1tyL; arc=pass smtp.client-ip=74.125.224.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFD84949F2
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2026 16:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782921647; cv=none; b=MvnyaPwSIL/Cne3zDiYsxfgmBdNcty+AtsxQwLL6Q9LsY+w9H1HsJAVfnEfLdRu/5XFqtWnIY2cWv64x3vIycR2jqa142O5imA3PCoXRgiZFHjEPwW+gbC4Ph/b+m7rvpKFDPZeFkLxaoOBipplLqnlLahOLvuuyJdnemSbUnNo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782921647; c=relaxed/simple;
+	bh=g/kZEO26OX4smC+wgpc8bkbcZi84SL0SycYp6R1V6Wc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=MIUNn4Z5vTE54QBhKwGqPhVplIZUgdRXWBNhzKEvcDQp5xCpuDLZB2PSn9wzGbPMaagnbL0K7kHt0LSNnk0BrxoorP+gMSr82nVhrd0qecJMZK3AJrHOp3zoxBxCLoyniWjr02AuTINWQWqtWobLFaQ+v4RSIeD3tm9zTWQJG48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=RYgaxU/5; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=WBVFoOHM; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dilW1tyL"
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-664d4478a64so930604d50.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jul 2026 08:55:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782921312; cv=none;
-        d=google.com; s=arc-20260327;
-        b=aIFcczHoEBE41Ai1MlSzHsetodEUcVmiFn8ZyICx2FXnNU1a11JY/foiMlHnlIAqtb
-         v5XluBDGs8LEzvAvKevTDkvuITVa2dFx8O1kLfuvcZZUWaScachBpokuufWLBfAkW/wU
-         wvy5p1WIKE9dt4szVvuU8EJjnU0NdeamGJJ6c8HOekkZsuHMQiEPmjQkI1Zfuy1RgMRG
-         GzxuWeefJvsg1quftD5OhGfHFKxoA7cKAmtGxv1mfY62yzdNTb3C1PpJlSVqD0dMHOyA
-         Fgci2Us9Dcb+wxBv32JPdp2zIXW5KsdZ6SKEGCsL5yHwfqz6Fb8D9AbX6TXKTvzK+mJa
-         DVIA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=PXa34OubSbzCty4qUjMoYcxwd7ic9Igd3aMKODlP5w8=;
-        fh=7EusqFjU2qR1aJIjDDEnD8/d1p2pzFNweE1ZlKVoa9I=;
-        b=jaVXZ9OLXy281mAK+3Roxq0Ijnm/6MTcOVXI5szgV4dF0ofQpV5CEQ/bA/+Zy2qezh
-         NCpQ2vRone0iQ0eid/+RJ5l+wuzPS67K9m3ewmBB6xpzsdbBXeJOqFJG27r6C27n0rtw
-         xFfZ2bpeXZk63F7F4OHXYURnOegmM8/jnjXya7OFptKrZ5oqvU7V18R5lMR5CKP5zw3C
-         h+Cl0JSg3xG9524VH6LK0RYG748OZG+n3kehTQAwy+NT03VeowZoO61hPLwkQaEVLm7I
-         iU75E6kx60AxLt5lRJGNRF8raU1W70Fd+9VpMTQfNeAc1ODc71pKg4kt2C/RmlXCIwHt
-         p4qQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="RYgaxU/5";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="WBVFoOHM"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 661Fo8OF1428920
+	for <linux-bluetooth@vger.kernel.org>; Wed, 1 Jul 2026 16:00:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	1aaxhulcUS260xJYhdZ1yKDQBOfTkI9rxmodcghc7/I=; b=RYgaxU/5XUemkleJ
+	+rGnL5+wvDRn3jX+6HhlJkaAfVY+AZvzcQXBWB4qc1A05Oz36348cY8xMTbV4J6n
+	JLqnk+nD1Q34IFDibZp0WwG5205v1LtKlJtv/2Fk8XjVYR7e9Acw7hFPrSFGxPT8
+	rjfGdLGJMMhP9QFUdk/CIxmQuESLSAwZhrETYVqDodpraqRtS12dzEEvLh00MwUG
+	4nEj88OiIxNp4nt9yl0YqBzukogbPHUP9ZdfWnv2wzhc4wA5GsgwqtKGg5/0Ah6k
+	SlnJUuDDe0qqPs5NziuQNYsdKov2JzdJLN+0gIrDakdbISMtCviZ233f9L39FB4Q
+	I3KTCA==
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f53q08n4e-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jul 2026 16:00:37 +0000 (GMT)
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-92e63df032bso284379685a.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jul 2026 09:00:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782921312; x=1783526112; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PXa34OubSbzCty4qUjMoYcxwd7ic9Igd3aMKODlP5w8=;
-        b=dilW1tyLJ2LdsF2h5Lbc3U1Dbh1vuNGbUteWZH8lVQGBJBQmB3/c8pc1vS1QtzeOfJ
-         WZJPB/ITWiJj3AN8vVn6+pS31K2RiV9YoEjpgGcKE35EAT9KWjvQGcIFzV/Q+lApuYZW
-         F3F0tCbqcosnt+6ReXgjXPSfgrZtqI8x7wa0ubrkznRx23JW+22mnItr3fxHjr6AYj3l
-         1xMdxn8bFyMQFuvXgiKZCu96nvH3wKP97qLhtg8pjlgUpq/N9pzFYkjsP+JyRzKlKUdh
-         qHM9FLdnx8dXJSqbPz3f3EfeSkWtq8Po5DscRpYNTYivUsM7CfAspywKwnh+gO7JFURe
-         3ysQ==
+        d=oss.qualcomm.com; s=google; t=1782921637; x=1783526437; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1aaxhulcUS260xJYhdZ1yKDQBOfTkI9rxmodcghc7/I=;
+        b=WBVFoOHMd8wLGJdUvVpq2yxu7hTsoelaMNa2IAZPmLKoj/LRgAK8FyPiyOo/gqot+A
+         HXkmxLyKRyjaldPQiLORwdbzj3csVSg0TxRENPGRvQZDdwmYl7svpsRmZpEJkDa9g1DH
+         MN+gcRTgHL9Ycfr+2by2E+lZJlm1s1xsk/KeVIpbE6uMO6kvGX+W+uE7q31q90wSsXck
+         YSAOpeCuBu3s7EnQkCxo7fAhoMaT9dn7B9oHzlsdaVFH2mMdQEdICdzTF4owNYRKRbhq
+         H6H6VSUbvF0+RAnxYBlVLhtbEzhPoB65Ek8ZtsP5DLy2byU8qrUJiqyQ/iEWpgEfMbOV
+         YTMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782921312; x=1783526112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=PXa34OubSbzCty4qUjMoYcxwd7ic9Igd3aMKODlP5w8=;
-        b=HVDETceYF5ytJdpx/H8Zb1TRI/K2Ds7AzNNJlrD9uM9Tz+q9OR/7pBbuGCQEYwvnnn
-         OAQnX30W/68ISlow4kxM+Hvw3CJu4ikHGhc/Xppmtstdi2ElIU+G6yWRfOb6VG3jOAom
-         228WC5xjwKQn/znxMHHxAZL6umlERypjuIp6AAGHWt0md1SsxOl4dWtMs2wvyPs3jJ2s
-         1L7Z9C6I13mqXzk1oB6G7ieCCk9N8w4yZ/3Q2BTbvz2LDc5xov/wyoJPA47j6vS47D0d
-         BaIXebLTQeSzBtN4QJfnHiNA8cA7V6HX5BljPzLI9r1SHYeQmcAi1qWRbq4IUQ+3OJRI
-         J8eQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrJWGLneXUL45IlZqkOj5oghTdBEfv3okv2abWBSC55hUDFRADh36G8paSsNkMgAn8vcbgRt/DydheVxdO2AE8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyongLR8qVQGpJp5OMWic8KujXJ8S+JJ4z5C3BrgTAPU2EpAETe
-	ryPQJ3ckCDzgkyg6meQqCllncGLD0Kmc3ZTUqupxe+laAvAGZ6/16mQL44q6vp0tTQspvLQYw/I
-	ypo3NAq7LYQmiEles0/gD1liNg7BkSvo=
-X-Gm-Gg: AfdE7cmAJO8YADE2/6lZ79CaIQMG0amNvRhXENECgmTMFrdnH5BNDU7YfgO4ANk4agc
-	RS3HdNz3KB68wwBbWsnIEt51Rtp0Jeip6QjZveVSw9q8cM5tTY60f7YZ1oVl0SW7K1etTUjnGt9
-	ETkW17ioJNk1/ol8N6WxzieUS2m6O8rrQQ2FONklPzy/4B1vmOcdwawBsOxcvoK2uGB2ijcKrxU
-	+aascL2F7IQ+QMi2aAKiFxb34o9jbmw/ZQRPIgI2bQGEKnw+3kcMgVj45ulPRxhQN9IjJLh2/o3
-	4sdXvs9rCY0dC52XPRACChj657fjJIih+t7w9qGNxdga4pSA/HMHNnLZbG3LSzyB3II=
-X-Received: by 2002:a05:690e:1449:b0:664:c053:d6a2 with SMTP id
- 956f58d0204a3-66521a0acd3mr2114483d50.23.1782921311536; Wed, 01 Jul 2026
- 08:55:11 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1782921637; x=1783526437;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=1aaxhulcUS260xJYhdZ1yKDQBOfTkI9rxmodcghc7/I=;
+        b=qvy/YV9ShdIhShydtCvzQi4OE6YdVUb1Ea7ZHkzCvExux/mSww4BehaoluKKt5hjUA
+         PJE0hJg0gwV8hSfJ9yYvJUnDNfNif3tzXNvR2ftY75XbiFE8d9WlYgBrLK1g8fLWCHep
+         HqQbkDQ0WSnDLJfK/t8HCrQTTKfv8bXvYlEZJ5MTBAOx9nG5IpZA4L1KkhG5TUFsps6v
+         r9h9XlOQ2xBSldzF/89zBIvtLPmnXDhNyB4nYst5shRMGUnhQp9JtEe9fLw99fVK9Qdw
+         6DOSonChZFOjLro/O0D5rIS7OEAAFn2uZfGtWd/KqfeQ/P5LdRNyMMspyjMICTKrRN8n
+         VgTg==
+X-Forwarded-Encrypted: i=1; AFNElJ/wIC2Ad4GMBudEyRZ9mUSTwANY8Kql2VbnMXCmBax+ELB3KNVhrMac9knv8isS1iLEcDC/QfWGJeprKN5cObI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2wxIdrgrtnNKX5bQDo1NIrKnSxDr3eHsOMgmuU0ELlNkwtV2L
+	64wFGDCV+OckvApWPzMWTFSDZAgEn1cTC7IVW8qixtNgmLQNKnjtIHBn1i/Px/VdsgtqL2zpBPC
+	pIm2OrXVLYa6fMbCojzyl5+rP+AnibcwoADn5Ip0qVLPGYttn/Va6rhWsQ+wFu2h0vACkA9U=
+X-Gm-Gg: AfdE7cllh+xnaFmwAkkMWCm7Hhy7rPHPFHwDnCLZWrxZLs+X23WKORJBkP5MCSDhoUt
+	3gPpvetPnwrkfp9y47MAp7lH6cCKh9XknJgAHn+36YjLl4ixWwtBoj+sV1p1KCY8v2+VnOPE+t2
+	kC6RbcN1XybiHoMnOdK3/9mZcqD37cogmO69tFCjFr1IEA61WvmkiMmIzeJ3lRZPcT19wmstj7l
+	t6Mjxu/TAHcaUhI6SJn9hw8zQ3C1AVZCBYfICvBGd7AeTAfx66MEkR9svDuTp/6BzTiVJTK04Hg
+	rqhxbT+qFnlyMwpaxS30GBecSveir/4gz+GRO7QcMrBoopgm45xq6L+dBq8KYQsUC1RK0Y8K/cl
+	YGs9oJTtaFnxCWTs6ovyf5f4AUxo5YxPJGZdZ7tCLBjwSqtEddS7/3Z3dSwDwA9HlXs1NgX0WbB
+	yA2RL0XubnIFZYWhcoViYQ1gX/oNtFAUJZ4focHLjD35xoOt6qKM9IkJR58CTDqzE=
+X-Received: by 2002:a05:620a:4381:b0:915:29cd:306c with SMTP id af79cd13be357-92e696ad1f6mr886596685a.9.1782921635971;
+        Wed, 01 Jul 2026 09:00:35 -0700 (PDT)
+X-Received: by 2002:a05:620a:4381:b0:915:29cd:306c with SMTP id af79cd13be357-92e696ad1f6mr886542085a.9.1782921633251;
+        Wed, 01 Jul 2026 09:00:33 -0700 (PDT)
+Received: from QCOM-eG0v1AUPpu.na.qualcomm.com ([2a01:e0a:830:450:809d:5d56:19d9:ff8b])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c1288d19e03sm296613066b.4.2026.07.01.09.00.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Jul 2026 09:00:32 -0700 (PDT)
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Wed, 01 Jul 2026 18:00:25 +0200
+Subject: [PATCH v7 1/9] dt-bindings: mmc: Document fixed-layout NVMEM
+ provider support
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260701121345.1231906-1-chris.lu@mediatek.com> <20260701121345.1231906-2-chris.lu@mediatek.com>
-In-Reply-To: <20260701121345.1231906-2-chris.lu@mediatek.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 1 Jul 2026 11:55:00 -0400
-X-Gm-Features: AVVi8Cc0zrlvMcYjXiLQwVVmWaxkK7Jt0w4udvPGfPhOH5l9CxGEp5ydFE3Z1pA
-Message-ID: <CABBYNZKOD8xFk2PVcKAqB=wYnhtSyDOiUTaXSOkumMF5o-dwxg@mail.gmail.com>
-Subject: Re: [PATCH v7 1/3] Bluetooth: btmtk: Replace magic numbers with WMT
- packet flag enum
-To: Chris Lu <chris.lu@mediatek.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>, 
-	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>, 
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-mediatek <linux-mediatek@lists.infradead.org>, Paul Menzel <pmenzel@molgen.mpg.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260701-block-as-nvmem-v7-1-3fe8205ef0a8@oss.qualcomm.com>
+References: <20260701-block-as-nvmem-v7-0-3fe8205ef0a8@oss.qualcomm.com>
+In-Reply-To: <20260701-block-as-nvmem-v7-0-3fe8205ef0a8@oss.qualcomm.com>
+To: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jeff Johnson <jjohnson@kernel.org>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Saravana Kannan <saravanak@kernel.org>,
+        Christian Marangi <ansuelsmth@gmail.com>
+Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+        ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, daniel@makrotopia.org,
+        Loic Poulain <loic.poulain@oss.qualcomm.com>
+X-Mailer: b4 0.14.2
+X-Authority-Analysis: v=2.4 cv=dtnrzVg4 c=1 sm=1 tr=0 ts=6a4539a5 cx=c_pps
+ a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22 a=EUspDBNiAAAA:8
+ a=M8sXMW5dAYDte-7YvdsA:9 a=QEXdDO2ut3YA:10 a=PEH46H7Ffwr30OY-TuGO:22
+X-Proofpoint-ORIG-GUID: ciDhD2tPJ2X9bqpXUapneTVNpLIyIX_l
+X-Proofpoint-GUID: ciDhD2tPJ2X9bqpXUapneTVNpLIyIX_l
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzAxMDE2OSBTYWx0ZWRfXzDPOgw/CQvtC
+ OWrySQNEtiPcUWBkku6zxJk1wzvLfum7STGQ9yhs6H5cksEZP/MFUy25onVXk3I8DM1CXMbRLSq
+ MO4jIFf6hTamp/AOETPoypmM4OMq7guFb9akckrntFo+t5jE4y3Z1xMxHxmfkDzlCM1BmX+eXIC
+ 14OLwznKs/LnXIjGJ+3ryDiHfOLa/z/kaAJ+mxufg7Znw31TjAUQ8QoIX1iJzhYUtinW1fdDmq4
+ cQV2QtqoQoufJNCzKhpOYQ1Im8KFzuD74GiXLWRUR2LftVDu5yFSGztTx4pQWEG7lgVKY4lN136
+ cW0sKV8RjtUAkLj3LBVpM2PAOXdL9lluWTmFtO1a2M/mV+ExCvxCDJLbAPUVkCJ4YZs7FQs9ATU
+ /QOD3/ztWbT5o/T+beWbHv3Jx/hv3EJzF9BOfVt2MgUhJmZ0twMtTGfIP2xdzuTfgvxV1cXi6uO
+ Eds1vevn/ToDKwnQ/VA==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzAxMDE2OSBTYWx0ZWRfXyHXNknlad69U
+ tCVjZK62WF2RGjQOjiAGk3m2Q2Ngnswyo81u20uBcfjF9KBdICiyrjVr39alfR6t/oU6sYLqBOX
+ 7hpI26OjwRKnf4zXOQOV44HICP4IwGc=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-07-01_03,2026-06-26_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 clxscore=1015 priorityscore=1501 suspectscore=0 spamscore=0
+ lowpriorityscore=0 phishscore=0 malwarescore=0 bulkscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607010169
 
-Hi Chris,
+Allow an eMMC hardware partition node to describe an NVMEM layout so the
+partition can be exposed as an NVMEM provider. This lets a partition
+(e.g. an eMMC boot partition) store device-specific information such as a
+WiFi MAC address or a Bluetooth BD address and reference it through NVMEM
+cells.
 
-On Wed, Jul 1, 2026 at 8:13=E2=80=AFAM Chris Lu <chris.lu@mediatek.com> wro=
-te:
->
-> Add BTMTK_WMT_PKT_* enum to represent WMT download packet sequence flags,
-> improving code readability. Replace magic numbers (1, 2, 3) in
-> btmtk_setup_firmware_79xx() and btmtk_setup_firmware() with descriptive
-> enum values:
->
-> - BTMTK_WMT_PKT_START (1): First packet of a sequence
-> - BTMTK_WMT_PKT_CONTINUE (2): Continuation packet
-> - BTMTK_WMT_PKT_END (3): Final packet of a sequence
->
-> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> Assisted-by: Claude:Sonnet-4.5
-> ---
->  drivers/bluetooth/btmtk.c | 12 ++++++------
->  drivers/bluetooth/btmtk.h |  6 ++++++
->  2 files changed, 12 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-> index 02a96342e964..40c2a64aa6b7 100644
-> --- a/drivers/bluetooth/btmtk.c
-> +++ b/drivers/bluetooth/btmtk.c
-> @@ -230,12 +230,12 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev,=
- const char *fwname,
->                         while (dl_size > 0) {
->                                 dlen =3D min_t(int, 250, dl_size);
->                                 if (first_block =3D=3D 1) {
-> -                                       flag =3D 1;
-> +                                       flag =3D BTMTK_WMT_PKT_START;
->                                         first_block =3D 0;
->                                 } else if (dl_size - dlen <=3D 0) {
-> -                                       flag =3D 3;
-> +                                       flag =3D BTMTK_WMT_PKT_END;
->                                 } else {
-> -                                       flag =3D 2;
-> +                                       flag =3D BTMTK_WMT_PKT_CONTINUE;
->                                 }
->
->                                 wmt_params.flag =3D flag;
-> @@ -314,7 +314,7 @@ int btmtk_setup_firmware(struct hci_dev *hdev, const =
-char *fwname,
->
->         fw_size -=3D 30;
->         fw_ptr +=3D 30;
-> -       flag =3D 1;
-> +       flag =3D BTMTK_WMT_PKT_START;
->
->         wmt_params.op =3D BTMTK_WMT_PATCH_DWNLD;
->         wmt_params.status =3D NULL;
-> @@ -324,9 +324,9 @@ int btmtk_setup_firmware(struct hci_dev *hdev, const =
-char *fwname,
->
->                 /* Tell device the position in sequence */
->                 if (fw_size - dlen <=3D 0)
-> -                       flag =3D 3;
-> +                       flag =3D BTMTK_WMT_PKT_END;
->                 else if (fw_size < fw->size - 30)
-> -                       flag =3D 2;
-> +                       flag =3D BTMTK_WMT_PKT_CONTINUE;
->
->                 wmt_params.flag =3D flag;
->                 wmt_params.dlen =3D dlen;
-> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-> index c83c24897c95..51c18dde0a80 100644
-> --- a/drivers/bluetooth/btmtk.h
-> +++ b/drivers/bluetooth/btmtk.h
-> @@ -66,6 +66,12 @@ enum {
->         BTMTK_WMT_ON_PROGRESS,
->  };
->
-> +enum {
-> +       BTMTK_WMT_PKT_START =3D 1,
-> +       BTMTK_WMT_PKT_CONTINUE =3D 2,
-> +       BTMTK_WMT_PKT_END =3D 3,
-> +};
-> +
->  struct btmtk_wmt_hdr {
->         u8      dir;
->         u8      op;
-> --
-> 2.45.2
+Accept "fixed-layout" as the partition node compatible, in addition to
+"fixed-partitions", so the layout can be described directly on the
+partition node.
 
-Ones last issue regarding SDIO from sashiko:
+Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+---
+ .../devicetree/bindings/mmc/mmc-card.yaml          | 23 +++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-https://sashiko.dev/#/patchset/20260701121345.1231906-1-chris.lu%40mediatek=
-.com
+diff --git a/Documentation/devicetree/bindings/mmc/mmc-card.yaml b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
+index a61d6c96df759102f9c1fbfd548b026a77921cae..0422894508478c8d0ca68292b58a5fdbee218358 100644
+--- a/Documentation/devicetree/bindings/mmc/mmc-card.yaml
++++ b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
+@@ -38,7 +38,9 @@ patternProperties:
+     properties:
+       compatible:
+         contains:
+-          const: fixed-partitions
++          enum:
++            - fixed-partitions
++            - fixed-layout
+ 
+ required:
+   - compatible
+@@ -86,6 +88,25 @@ examples:
+                     read-only;
+                 };
+             };
++
++            partitions-boot2 {
++                compatible = "fixed-layout";
++
++                #address-cells = <1>;
++                #size-cells = <1>;
++
++                mac-addr@4400 {
++                    compatible = "mac-base";
++                    reg = <0x4400 0x6>;
++                    #nvmem-cell-cells = <1>;
++                };
++
++                bd-addr@5400 {
++                    compatible = "mac-base";
++                    reg = <0x5400 0x6>;
++                    #nvmem-cell-cells = <1>;
++                };
++            };
+         };
+     };
+ 
 
---=20
-Luiz Augusto von Dentz
+-- 
+2.34.1
+
