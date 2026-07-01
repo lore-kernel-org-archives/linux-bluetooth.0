@@ -1,104 +1,78 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A1D244692;
-	Wed,  1 Jul 2026 15:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782920819; cv=pass; b=WYTbTUcGGChIKwDXMDyn+APoUGI6XqVZcPNUM2/3GDgFrwCthpXse7zT0WhrbEBTDVIASBvcUM4O9j130lJ3DOxnJXWXnkNnbgO3B5x7Et/05g3UtikgcNxh/e9E1V6Y+TNGU4C7mjxmS51u+Q/mLSbHPY3IS8EMN7+YlvepMbk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782920819; c=relaxed/simple;
-	bh=WjvG8PsRYbDOu5SaZmGMCwznJL4bt9UxECSB6ppFLUY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GXZQWaE7fl23yRpC3H9DiY7XsMVo+z5Hxf9IYlah1FsFq9qn15wTakpAuI5XyMHf2aaI9Yyh0IVSztvas5JY6FW2tZCHsw5akn/RPf0GUDJJCwhEBCuOJ8K7aglSJwF5mktb2FyTwDKuNOrIv3NiXsMomi9yg5sSIA8y5bFhhZk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=gnyTGC8G; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2A3362138
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2026 15:50:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782921058; cv=none; b=QWQJNVu1pqp6X2mP1wwVYmiULU0LDt0spZ1CJ38lP/jnaL+nS6q/895wdu8nwrK7LAE5zElOvBrYUeBBgkj9fs08awINoTaUrLIkgZ5xjQ16jwSKXFxvVePhCL4DcHOqp156INfEH5DcKTw/l1InfdEKWuAUduc3tf1QPmxLeBI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782921058; c=relaxed/simple;
+	bh=PiKpTyCzFW6oJJGuzNRLv3EmmD8yxaD5dhBkqXjJZrs=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OlyFMrAf+sEHrvC0pE8W3ptxXf7F+smSBISMdbqxBUozlT7+kEYghu+CV052QXOWG4xFhsvwHkYB5MHPBoRRj8MEWxnYJy4vejFGgN5s+VtBiMQDZjacK5VwTEQDCy20VK3eQWdMXr6q/dJRVPzC5EfacSjsiomVb8ESdQRc0RY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZBbQ24iw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="gnyTGC8G"
-Received: from monolith.lan (unknown [IPv6:2a03:1b20:d:f011:1::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gr4Bd0lhGzyf2;
-	Wed, 01 Jul 2026 18:46:49 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1782920809;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=obJAgbKCExRSYXtL9XNsghMfX0L9lmc746F2oIEBeuM=;
-	b=gnyTGC8G06rtC32oVnT2rfFCATgQho35bDU14RaJu1iMeh7/6BU1BpzqB/UcFd0YMZjMxA
-	myvqpnWewKAxXUGY/6pWd3Pcoc03xaHv4n88+rJOo+ZVFjKX+lGpWVnp0E3eyMTvyhh0RZ
-	bQ3ijmVblBs85RO5YtgmlDhgWUxowRw=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1782920809;
-	b=HpO9suF0FxCwZH1TUq5OxMc7hccGqsXuaYHiCJnu/7lv3h/R6nmUkFRyC0PJv9x7lZkkqR
-	8us54Yy1fviUBVQJC95fQl5nfZV7leqNv2000bDuW+sttIZyCyOwEnWmvDm2cBYTrZuAeL
-	Uf36U7Ogjz6H09iRftAr2X9HrElbD5s=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1782920809;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=obJAgbKCExRSYXtL9XNsghMfX0L9lmc746F2oIEBeuM=;
-	b=qm0E3i3yC017ISZwNGz/P033VZF7clJwm2VF97lmEpGhk6wy5CBA2s/qwcjtZ720Kg/Kqo
-	l73Kj0LRFeOs5B6TCTdKIetMJ8WGUn7zM0MA29xIiKK+wvfbmJfg12NP4BsZlAy8nzkdQw
-	6IAeEgxOgoQz1LoqB5T68dgJNGYi6Zc=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZBbQ24iw"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6C7B3C2BCF5
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2026 15:50:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1782921058;
+	bh=PiKpTyCzFW6oJJGuzNRLv3EmmD8yxaD5dhBkqXjJZrs=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=ZBbQ24iwb1ecSdcTYkWeNK3lbB7RvUMmReoN5anKv7OAfVx+EUxK8mFGvBjfV19b/
+	 2XbFyIB50IJo+WdtJwdftSlz3ZfsRzj+9odLzGsxReLs23YHLRUZ2SWBazCCcX9psm
+	 iLw49f7VgHTskWdwivRH+YnFzhUyBOc1i1i8aPPqhIr5AzNOMLovKPqod2zyLbVzv5
+	 k9e/wtBbahmvtJBVh0WmwHikt0ul5aC0gFpOoCUKwxpkme47PSmi4mxKr0c/bZgUNz
+	 PbRpAkAL+1qTmaevN3rx/hbgL2y1uQtEFO/Q493ONNhYcwWJ3sI1mzbz6M08bk6H2K
+	 1gjzWx/vYEymw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 5ACEDC53BC7; Wed,  1 Jul 2026 15:50:58 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	devnexen@gmail.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: ISO: exclude RFU bits from ISO_SDU_Length
-Date: Wed,  1 Jul 2026 18:46:39 +0300
-Message-ID: <f3372d2d8a03a1d408a75c6036a1f4a8372e57a4.1782920668.git.pav@iki.fi>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <da68c9b8242e9fbf482b1512e9d612768f2cc7e8.1782920668.git.pav@iki.fi>
-References: <da68c9b8242e9fbf482b1512e9d612768f2cc7e8.1782920668.git.pav@iki.fi>
+Subject: [Bug 220564] hci0: ACL packet for unknown connection handle 3837 and
+ sound interruption
+Date: Wed, 01 Jul 2026 15:50:58 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-220564-62941-DRHGuMeyjL@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-220564-62941@https.bugzilla.kernel.org/>
+References: <bug-220564-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-slen contains ISO_SDU_Length (12 bits), RFU (2 bits),
-Packet_Status_Flags (2 bits).
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220564
 
-Exclude the RFU bits from hci_iso_data_len. Also add masks to the pack
-macro.
+--- Comment #14 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de=
+) ---
+Thank you! Which Linux kernel is it? Full output of `dmesg` would be nice to
+have.
 
-Fixes: 4de0fc599eb9 ("Bluetooth: Add definitions for CIS connections")
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
----
- include/net/bluetooth/hci.h | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Did it work flawlessly in the past for you?
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 38186a245f14..50f0eef71fb1 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -3413,8 +3413,9 @@ static inline struct hci_iso_hdr *hci_iso_hdr(const struct sk_buff *skb)
- #define hci_iso_flags_pack(pb, ts)	((pb & 0x03) | ((ts & 0x01) << 2))
- 
- /* ISO data length and flags pack/unpack */
--#define hci_iso_data_len_pack(h, f)	((__u16) ((h) | ((f) << 14)))
--#define hci_iso_data_len(h)		((h) & 0x3fff)
-+#define hci_iso_data_len_pack(h, f)	((__u16) (((h) & 0x0fff) | \
-+						  (((f) & 0x3) << 14)))
-+#define hci_iso_data_len(h)		((h) & 0x0fff)
- #define hci_iso_data_flags(h)		((h) >> 14)
- 
- /* codec transport types */
--- 
-2.54.0
+--=20
+You may reply to this email to add a comment.
 
+You are receiving this mail because:
+You are the assignee for the bug.=
