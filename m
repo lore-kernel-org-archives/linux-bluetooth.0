@@ -1,128 +1,161 @@
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9274C49551A
-	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2026 16:06:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0383546F3
+	for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jul 2026 16:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782921985; cv=none; b=fDIr7VKJOA8QB/k3lZfIl4EkoVXt9wWrU/FvHsN4OmuDcQsnKGOB7PAeMB4FDWFQqgcDhCb0eQVFWhEZXw+eBxlH6upKiZ8mFcslhp9opaHbS7yPiu2UoS3xnwKcdYtUN88f2XjOxICQNNgmqQTH8gwrGVH3yk2SzdxMZjzUdrI=
+	t=1782923559; cv=none; b=a26vl9RF18nj2czrYNm3uIAGeq6VIN9biWhdXG/DssIRKOh6gaVIdhKsGroot4GQjBo550mqsyZ+LC35qcFnDpsTRYLM6MGL5J8ur/JWuMTTIbX880a+49CW5gPmUn5BstfTzYk75DaW48nSqbxa0dp6G08IT+LdJ6ppsW8amzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782921985; c=relaxed/simple;
-	bh=k9YU0uRFlXA0oidy33CuvTF7ZPRER5CGiH6JKlyKV8c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NszVjbbTiDlrP1/yqk5/GsEY9VfoQkPYfJNXaDUk3kXQ3AB3cHL+mzwTp/FOr0yiag0vq6VMcWbBlFc0q+IDpl0jsmMbDu7hFc4NM4xIk8WT21fExFVD+f1RavLMQEs9S/y8PeqSuCvL7R0rKrWy72H0XNP2gO8K554lQ062+Ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NJagG2CZ; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NJagG2CZ"
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-37f7a5a217fso554843a91.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jul 2026 09:06:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782921984; x=1783526784; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=wgct0ZCS2MUNuZl9/eMGE3dNWMAQfIbPDyhKfsqkttQ=;
-        b=NJagG2CZuvDUjXBcCs+yR8RmgW/xVU01ocAf2OUD+1e7omdZJuEPWnkUmVa6X23bxq
-         rbOXYMQ9PCVnLou/s1VwwfbymbhB9SrBQqJ2rQcbqBGPNV4+PaDIsOnY7V8Oe9QCSyZm
-         WCwYw6BJgzVy/h+ex5e+gQkK68cD2GUkYUaIBnt1UHhevClhZuk4hzpgcPTzWJjyMT14
-         JSLkjMFlyf2pSzk7MUBQm3RnEqdvmma5luXX8My7TSMNwJYmy39QauA+Rl+dIC8WxjEt
-         pF8LA8vQCeyABTr6AYz+RFpKv/0Nif+iONfOja8yE5zsIJB6ra42rfznah59O5mkVIhD
-         9riA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782921984; x=1783526784;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=wgct0ZCS2MUNuZl9/eMGE3dNWMAQfIbPDyhKfsqkttQ=;
-        b=JiCeIv2bcE8l1n+aC7nIT62IcwKhCFnPJOjuVGA5eEE86360tYEDNZ1M2266x/2QD2
-         WzENXFFDN/qmHuvsjqrWjrkdZ+Xa8hQDYTtNHYb2rDNGH48g0NvrlW/mH6+dtX9p1kWA
-         rFhsicFk4vsEZoO3J68seW1FK++CQOqY6ZqB69qtYt6Fot8N89sJ7Umx7u8L8qEifFDa
-         DsKO5EvLnJqtbhDFD4pty9uMgiFy5MRyKOBnrR7QQ4mVZZSSN52hXNfOfVcuI2pgtelr
-         6Zs9FDMVmlQqaMEOxBl7OIRBOd9ueifCPlfLsgkRa4xPsWJNHFcqpTYGnjj+jKJaLy5G
-         EklQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rr/pJw5vanMgvQDLt3QFA4I0YOpwwa9A8ahlP9YxioI2i45ACQELAID649yc2PKrle9HfGW/BGH16gYhSoaDpA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywnd6GfiVnd6D3IOYcGdSojRn5TYFZaLsnHk2aGp5k0HgLvjdDG
-	R5CczXSO/hV4NuG90bHUVSG21/mlIqCTTFTrCrxiZvSsqLluuA06ThT5
-X-Gm-Gg: AfdE7cntOd+h01700u9o+DJ2dfjP09ioJ98OyhXR6HuG4KTwgsS+pZrxZa02eOXzzu3
-	t0p/tah4iUSRdR+a8RXvlLW0Y+Ry/yCm231iYKF8rhigARwbamX6QwqxjHZWR1wgeCNYyuCeHlE
-	/fI0pKmw1NCnbQQuI8PRiwVIKWidkr7sBW3wd8SpkBSKHjY/aTWE3TB3z51xPWHAJTcvma2lLlQ
-	K25oCfPqe9HN+QQXNuMExp+twi7lLvBhXvzVYtygYaTnHwFqXSvCEFZ6Q2OdZWndHI78h5sRVPk
-	c35kPwihb8hSuabLGieDkZip8i8kaH4D6ieukp/AWk6EZe/hzMbPNYhmx3HK8AmEVdaAXa+t+07
-	ADw4oHnDI2La0rQgCrQjTA4Cx+MvjGwrRcMmvwWZD4jiLPSA0fSUZcP1/nnVkyYpxD4FwKG3HsZ
-	wlqyjpZx7X6zVT8FyazSn9y9BW0HWlCNOVC/S0Nkvitef7eoVl1OSa6Wcx7Q==
-X-Received: by 2002:a17:90b:3c0e:b0:380:15fa:c5b2 with SMTP id 98e67ed59e1d1-380ba8d5584mr1379487a91.18.1782921983676;
-        Wed, 01 Jul 2026 09:06:23 -0700 (PDT)
-Received: from fx.tailc0aff1.ts.net ([206.206.192.132])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30ef2688b6esm12535397eec.30.2026.07.01.09.06.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2026 09:06:23 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Johan Hedberg <johan.hedberg@intel.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Weiming Shi <bestswngs@gmail.com>,
-	Xiang Mei <xmei5@asu.edu>
-Subject: [PATCH v2] Bluetooth: bpa10x: avoid OOB read of revision string in bpa10x_setup()
-Date: Wed,  1 Jul 2026 09:06:14 -0700
-Message-ID: <20260701160614.3160448-1-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1782923559; c=relaxed/simple;
+	bh=BwYihwVlb9EHo8nTwJjz/dQlXyLpmqkuQBM0Usvxg3k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=RWl0LPaHjaMPqjNwrIEXf3PPzR9HBgps5wyOs8f6yIoRwfxX+D3PyhtqFnMyKfqy4I/6W/nivF+Byn4QS3wVrrpvD639PJLW/JDHJzRA4wTmThEIGto5SAWJ6XnzLdOm2gXUQrq+Dd6XhmTgLkG5+OVKKf8EdPKU4hSV9kbVejQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 6F7094C442FCD7;
+	Wed, 01 Jul 2026 18:32:02 +0200 (CEST)
+Message-ID: <90dc98dd-dcee-49ac-8050-abfe6b93775b@molgen.mpg.de>
+Date: Wed, 1 Jul 2026 18:32:01 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Bug 220564] hci0: ACL packet for unknown connection handle 3837
+ and sound interruption
+To: Sean Wang <sean.wang@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
+ Mark Chen <mark-yw.chen@mediatek.com>
+References: <bug-220564-62941@https.bugzilla.kernel.org/>
+ <bug-220564-62941-11iNnkhOy2@https.bugzilla.kernel.org/>
+Content-Language: en-US
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <bug-220564-62941-11iNnkhOy2@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-bpa10x_setup() sends the vendor command 0xfc0e and passes the response
-to bt_dev_info() and hci_set_fw_info() as a "%s" string starting at
-skb->data + 1, without checking the length:
+Dear Sean, dear Chris, dear Mark,
 
-	bt_dev_info(hdev, "%s", (char *)(skb->data + 1));
-	hci_set_fw_info(hdev, "%s", skb->data + 1);
 
-A device that returns a one-byte response (status only) leaves
-skb->data + 1 past the end of the data, and the %s walk reads adjacent
-slab memory until it meets a NUL. The same happens when the payload is
-not NUL-terminated within skb->len. The out-of-bounds bytes end up in
-the kernel log and the firmware-info debugfs file.
+Unfortunately, you do not have an account in the Linux Kernel Bugzilla, 
+so I am replying to this notification.
 
-Print the revision string with a bounded "%.*s" limited to skb->len - 1
-instead. This keeps the string readable for well-behaved devices while
-never reading past the received data, and does not fail setup, so a
-device returning a short or unterminated response keeps working.
+Am 01.07.26 um 17:09 schrieb bugzilla-daemon@kernel.org:
+> https://bugzilla.kernel.org/show_bug.cgi?id=220564
+> 
+> --- Comment #13 from Rob Hogan (robhogan@gmail.com) ---
+> I'm pretty sure it's the same issue. Extract from syslog below:
+> 
+> Jul  1 16:01:49 mwenge kernel: [439779.598878] Bluetooth: hci0: ACL packet for unknown connection handle 3837
+> Jul  1 16:02:08 mwenge bluetoothd[760091]: src/adapter.c:dev_disconnected() Device F0:EF:86:C3:50:D8 disconnected, reason 1
+> Jul  1 16:02:08 mwenge bluetoothd[760091]: src/adapter.c:adapter_remove_connection()
+> Jul  1 16:02:08 mwenge bluetoothd[760091]: plugins/policy.c:disconnect_cb() reason 1
+> Jul  1 16:02:08 mwenge bluetoothd[760091]: plugins/policy.c:disconnect_cb() Device /org/bluez/hci0/dev_F0_EF_86_C3_50_D8 identified for auto-reconnection
+> Jul  1 16:02:08 mwenge bluetoothd[760091]: plugins/policy.c:reconnect_set_timer() attempt 1/7 1 seconds
+> Jul  1 16:02:08 mwenge bluetoothd[760091]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr F0:EF:86:C3:50:D8 type 0 status 0xe
+> Jul  1 16:02:08 mwenge bluetoothd[760091]: src/device.c:device_bonding_complete() bonding (nil) status 0x0e
+> Jul  1 16:02:08 mwenge bluetoothd[760091]: src/device.c:device_bonding_failed() status 14
+> Jul  1 16:02:08 mwenge bluetoothd[760091]: src/adapter.c:resume_discovery()
+> Jul  1 16:02:08 mwenge bluetoothd[760091]: profiles/audio/avdtp.c:session_cb()
+> Jul  1 16:02:08 mwenge bluetoothd[760091]: profiles/audio/avdtp.c:avdtp_ref() 0x5c5568690930: ref=3
+> Jul  1 16:02:08 mwenge bluetoothd[760091]: profiles/audio/avdtp.c:connection_lost() Disconnected from F0:EF:86:C3:50:D8
+> Jul  1 16:02:08 mwenge bluetoothd[760091]: profiles/audio/a2dp.c:abort_cfm() Source 0x5c5568671120: Abort_Cfm
+> Jul  1 16:02:08 mwenge bluetoothd[760091]: profiles/audio/avdtp.c:avdtp_sep_set_state() stream state changed: STREAMING -> IDLE
+> Jul  1 16:02:08 mwenge bluetoothd[760091]: profiles/audio/transport.c:media_transport_remove_owner() Transport /org/bluez/hci0/dev_F0_EF_86_C3_50_D8/sep1/fd3 Owner :1.79
+> 
+> 
+> And here is the relevant handle entry in btmon:
+> 
+>> ACL Data RX: Handle 3837 flags 0x02 dlen 143         #33540 [hci0] 390.036978
+>        Channel: 515 len 139 [PSM 0 mode Basic (0x00)] {chan 65535}
+>          33 00 cb db 90 00 01 00 58 17 02 00 00 00 00 00  3.......X.......
+>          00 0e 81 00 00 00 00 00 00 01 00 00 00 00 00 00  ................
+>          00 2a 25 00 00 03 14 01 00 42 27 00 00 00 00 00  .*%......B'.....
+>          00 00 00 00 00 00 00 00 00 ca db 90 00 4a da 90  .............J..
+>          00 07 c4 50 00 00 00 20 00 00 40 f8 05 e1 7f 00  ...P... ..@.....
+>          00 3f 00 09 00 0d 00 00 00 3d 00 09 00 b6 00 00  .?.......=......
+>          00 02 00 20 00 05 00 00 00 01 00 09 00 00 00 09  ... ............
+>          00 0d 00 00 00 3b 00 09 00 1a 00 00 00 30 00 09  .....;.......0..
+>          00 0f 00 00 00 3b 00 09 00 0d 00                 .....;.....
+> 
+> The full btmon log is too large to attach I think. Let me know if there's
+> something else I should be turning on to help debug.
+Claude Opus 4.8 analyzed:
 
-Fixes: ddd68ec8f484 ("Bluetooth: bpa10x: Read revision information in setup stage")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
-v2: use bounded "%.*s" instead of failing setup with -EILSEQ (Pauli)
- drivers/bluetooth/bpa10x.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+The decisive detail: the handle is byte-for-byte 3837 across three 
+unrelated reporters — different laptop, different speaker 
+(F0:EF:86:C3:50:D8 here vs. the Lenovo in comment #1), different kernel. 
+Random corruption wouldn't land on the same handle every time. A fixed 
+value is a firmware sentinel. This is the ACL twin of the ISO 
+misbehaviour Pauli Virtanen already documented ("MT7925 continuously 
+sends invalid ISO packets")—related [1][2]—, and it's the same shape as 
+the handles the MediaTek driver already intercepts:
 
-diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
-index 2ae38a321c4b..e63d1af250ec 100644
---- a/drivers/bluetooth/bpa10x.c
-+++ b/drivers/bluetooth/bpa10x.c
-@@ -255,9 +255,13 @@ static int bpa10x_setup(struct hci_dev *hdev)
- 	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
- 
--	bt_dev_info(hdev, "%s", (char *)(skb->data + 1));
-+	/* Bounded print: the device controls skb->len. */
-+	if (skb->len > 1) {
-+		int len = skb->len - 1;
- 
--	hci_set_fw_info(hdev, "%s", skb->data + 1);
-+		bt_dev_info(hdev, "%.*s", len, (char *)(skb->data + 1));
-+		hci_set_fw_info(hdev, "%.*s", len, skb->data + 1);
-+	}
- 
- 	kfree_skb(skb);
- 	return 0;
--- 
-2.43.0
+     // drivers/bluetooth/btmtk.c  btmtk_usb_recv_acl()
+     case 0xfc6f: /* Firmware dump from device */ ...
+     case 0x05ff: /* Firmware debug logging 1 */
+     case 0x05fe: /* Firmware debug logging 2 */
+         return hci_recv_diag(hdev, skb);   // routed to diag, NOT into 
+L2CAP
 
+0x2EFD isn't in that list, so it falls through to hci_recv_frame() → 
+hci_acldata_packet() → no matching connection → the error. So the 
+disconnect in Rob's syslog is likely a coincident A2DP timeout, not 
+caused by the log line — the spurious packet just shares the timeline.
+
+Should the kernel ignore handle 3837?
+
+Two different places, two different answers:
+
+- In generic hci_core.c — no. HCI_CONN_HANDLE_MAX = 0x0eff, and 3837 = 
+0x0EFD is inside the spec-valid range (just below the max). A 
+non-MediaTek controller could legitimately assign it. Dropping it 
+generically would silently break other hardware. So my rate-limit patch 
+is the right vendor-neutral change: it stops the flood without dropping 
+anyone's data.
+
+- In btmtk_usb_recv_acl() — probably yes, and that's the real fix, 
+routing these to hci_recv_diag() exactly like 0x05fe/0x05ff. That both 
+kills the spam and stops feeding garbage into L2CAP.
+
+But I won't add that magic number on inference alone, and here's the 
+honest gap:
+
+1. I have no MediaTek doc confirming 0x2EFD/0x0EFD is a firmware-log 
+handle. The existing constants came from the vendor.
+2. The existing cases match the raw 16-bit value with a non-flag high 
+nibble (0x05ff, 0xfc6f). Ours has high nibble 0x2, which looks like a 
+real PB=start flag — so matching semantics (raw 0x2EFD? masked 0x0EFD? 
+do fragments arrive as 0x1EFD?) aren't obvious, and a wrong mask could 
+drop real ACL fragments.
+
+To close that gap before touching the driver, the bug needs the full 
+btmon (Rob offered it), to confirm:
+
+- no HCI Connection Complete / LE Enhanced Connection Complete ever 
+assigns handle 0x0EFD, and
+- the 0x?EFD packets always carry this same non-L2CAP payload and never 
+a real ACL fragment.
+
+@Mediatek, can you please confirm, that this handle should be ignored.
+
+
+Kind regards,
+
+Paul
+
+
+[1]: 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6dc22ab9f085ae165e4ce89d61fb426f94e8a969
+[2]: 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=edef6576853e51faa11bb286884c362ff7fc83a0
