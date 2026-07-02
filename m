@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF1742A79B
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 08:37:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9821342B326
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 08:37:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782981431; cv=none; b=NA9c66bIMa0ZqzsXXrnvgoi5u7LAebQLof8rvfmFRmdXFU9NPDeVI5ivrTnLFtTvyHBBQdKNdopvOEYfERENGliBHtlHW34AK8hE2znhP1OWJBwk0Q0szWWibxRiZ77EsBXXuEU4i4qRn11WD/3p72mQVX64uwyQwS79ejkN9Lw=
+	t=1782981463; cv=none; b=p420yScmtMzX74gzSKvXYjVNaWivdVKNS5sYEh1jy0Gvl+sTej8SsZzaA8KvsdohbTJpmTA3rrEBhGpIdqqJcb/2FqNHS1B0UlAHQnk0H3q5nOwkfClkjUcPz2THhbGfj0vU1qU0wGIYD9Lmb25PZFKbLtleSrGyLGLKliJdUrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782981431; c=relaxed/simple;
-	bh=9/wGKKGJpBaTn34yD8jkIBOphNMn2I2ECbGzheEDkn0=;
+	s=arc-20240116; t=1782981463; c=relaxed/simple;
+	bh=kRY61SM3VjqWNfOE2JiGh4a7ZRHAE1xHf7gJOKoKllw=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C+ZTC6ngGDh4uAHD5nXw7ogrp/FkDL3k7Wl73n2UhaDyCOuJj1muzsRyEWahKy3lVn5XLTp2wN2ELHCLgbQ3UZsdQ0qGpWZMr0pIrzv4+YCrUCvz1qk6KaTBzS1n/rzP4HN/TbXtg2oqiKOHAu9ATBZhp2gDJSY0YcMw32O5s04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=eyBc2+DM; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=E1opoa9QW9g8HGzHzaCQc1wEF92DCvfpvdLPRU4A38Mw8EkWyuvGE1VqcB8/Flm+YA5L4K20Y+SyV3vgN/5LQXAnhkkFFLL6bToV1lMC87QJwmQY7VwsqCA+Ug9QfYeJsYJxq+FpJGOHq/udbTTzRoNVXvKZqSu4SnvFowunN5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=JVENfoZv; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="eyBc2+DM"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="JVENfoZv"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1782981411;
-	bh=9/wGKKGJpBaTn34yD8jkIBOphNMn2I2ECbGzheEDkn0=;
+	s=mail; t=1782981412;
+	bh=kRY61SM3VjqWNfOE2JiGh4a7ZRHAE1xHf7gJOKoKllw=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=eyBc2+DMnEiABmfH8mkz67QO5ZFLazuWSylEN6U6u2c6iDMeeT9fQe2UjSL+eQ0dq
-	 Hq8Ul2yEkznqf6koIgfNDx0Y/hlnhnLkz48saPq7d1FRe7cAzw5ph2i2gdr/D+UPvr
-	 +LBR5T3l5fDmHRDcovFOcA4gIADq1ibOr/BN6MiFuSGt4Dovqi0GKjN+bQpQD3KdNC
-	 6XZVhEJFTI8FdWEiheRsNhiSg2FTn1o7aDdstNn2r0vLDvozYh517srGLGPCzi4kHA
-	 eQNsvqogZ98AZq6ys5G++Z40Dnwy3GYRpldfTkAmzxae6S5ISO4q/68Y17yC+EHxaH
-	 ZOO1n2rMLKz2g==
+	b=JVENfoZvikwYTPPsflntLowMh9y3g4XqS8GLY1TpxPQBNM9T66WyFi5b2N839CSSJ
+	 5pfSlT4zv3bNUnlc/77MGCChLEbSjHF51cVhU9Nlbdw1E5eI8KHvWId3gNJT3Wp49M
+	 K3alydtRiO/6Vu0BdIgQQc+WsDRzK1QuEGU3QFyHnZyogdReJi3OPJuQMbQVd9GQ32
+	 1zKWHUpkHT+im5XEaesPTArZL8E03ouOSyWFayyAhosZVvoAJ5zrxo4E4TP1aBoySW
+	 zW9KgKnuWlYM/HkSLfQ4hNknx2y40vi/QhTOK5vQtHEzxhho4GszWLcntY/yseA7Ay
+	 kdWF0pTbK0Wyg==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id BEB4717E0FDF
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 10:36:51 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 0E2E317E116D
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 10:36:52 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 6/7] doc: describe admin allowlist runtime enforcement
-Date: Thu,  2 Jul 2026 10:36:40 +0200
-Message-ID: <20260702083641.378994-6-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ 7/7] profiles/audio: fix UAF on external media service teardown
+Date: Thu,  2 Jul 2026 10:36:41 +0200
+Message-ID: <20260702083641.378994-7-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260702083641.378994-1-frederic.danis@collabora.com>
 References: <20260702083641.378994-1-frederic.danis@collabora.com>
@@ -50,57 +50,89 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Document that ServiceAllowList now also governs local adapter/server
-startup and registration, and that allowlist updates are applied
-immediately on initialized adapters.
+Keep media_app endpoint/player queues in sync with object lifetime to
+avoid stale pointers during proxy removal.
 
-Clarify ServiceAllowList status semantics for both remote profile
-connection policy and local server policy.
+When admin allowlist reapply removes audio services, endpoint/player
+objects may be destroyed through non-proxy paths first.
+Later proxy_removed_cb calls queue_remove_if() and matching by path
+can dereference freed endpoint/player memory.
+
+Fix by:
+- adding media_app back-references in media_endpoint/local_player
+- unlinking from app queues inside media_endpoint_remove or
+  local_player_remove
+- setting ownership when app-registering endpoint/player objects
+
+This prevents heap-use-after-free in match_endpoint_by_path or
+match_player_by_path during service disconnect.
 
 Assisted-by: GPT:GPT-5.3-Codex
 ---
- doc/org.bluez.AdminPolicySet.rst    | 11 +++++++++++
- doc/org.bluez.AdminPolicyStatus.rst |  5 +++++
- 2 files changed, 16 insertions(+)
+ profiles/audio/media.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/doc/org.bluez.AdminPolicySet.rst b/doc/org.bluez.AdminPolicySet.rst
-index 29fe3bdf7..9ac0aa76f 100644
---- a/doc/org.bluez.AdminPolicySet.rst
-+++ b/doc/org.bluez.AdminPolicySet.rst
-@@ -41,6 +41,17 @@ Sets the service allowlist by specifying service UUIDs.
- When called, **bluetoothd(8)** will block incoming and outgoing connections to
- the service not in UUIDs for all of the clients.
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 5d9ea2cbc..95f9580b0 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -136,12 +136,14 @@ struct media_endpoint {
+ 	guint			watch;
+ 	GSList			*requests;
+ 	struct media_adapter	*adapter;
++	struct media_app	*app;
+ 	GSList			*transports;
+ 	struct endpoint_features	features;
+ };
  
-+The allowlist also applies to local adapter/server services. When an allowlist
-+exists, only adapter/server services whose policy UUID is in UUIDs are started
-+or registered.
-+
-+Updating the allowlist is applied immediately on initialized adapters:
-+
-+- services that become disallowed are stopped/removed
-+- services that become allowed are started/registered
-+
-+This does not require restarting **bluetoothd(8)** or power-cycling adapters.
-+
- Any subsequent calls to this method will supersede any previously set allowlist
- values.  Calling this method with an empty array will allow any service UUIDs to
- be used.
-diff --git a/doc/org.bluez.AdminPolicyStatus.rst b/doc/org.bluez.AdminPolicyStatus.rst
-index 702e020aa..d44ab9361 100644
---- a/doc/org.bluez.AdminPolicyStatus.rst
-+++ b/doc/org.bluez.AdminPolicyStatus.rst
-@@ -43,6 +43,11 @@ array{string} ServiceAllowList [readonly, adapter-only]
+ struct local_player {
+ 	struct media_adapter	*adapter;
++	struct media_app	*app;
+ 	char			*sender;	/* Player DBus bus id */
+ 	char			*path;		/* Player object path */
+ 	GHashTable		*settings;	/* Player settings */
+@@ -305,6 +307,11 @@ static void media_endpoint_remove(void *data)
+ 	}
+ #endif
  
- Current value of service allow list.
- 
-+When non-empty, this list controls both:
++	if (endpoint->app) {
++		queue_remove(endpoint->app->endpoints, endpoint);
++		endpoint->app = NULL;
++	}
 +
-+- remote service connection policy for device profiles
-+- local adapter/server service startup and registration policy
-+
- bool IsAffectedByPolicy [readonly, device-only]
- ```````````````````````````````````````````````
+ 	info("Endpoint unregistered: sender=%s path=%s", endpoint->sender,
+ 			endpoint->path);
  
+@@ -2076,6 +2083,11 @@ static void local_player_remove(void *data)
+ {
+ 	struct local_player *mp = data;
+ 
++	if (mp->app) {
++		queue_remove(mp->app->players, mp);
++		mp->app = NULL;
++	}
++
+ 	info("Player unregistered: sender=%s path=%s", mp->sender, mp->path);
+ 
+ 	local_player_destroy(mp);
+@@ -3168,6 +3180,8 @@ static void app_register_endpoint(void *data, void *user_data)
+ 		return;
+ 	}
+ 
++	endpoint->app = app;
++
+ 	queue_push_tail(app->endpoints, endpoint);
+ 
+ 	return;
+@@ -3196,6 +3210,8 @@ static void app_register_player(void *data, void *user_data)
+ 	if (!player)
+ 		return;
+ 
++	player->app = app;
++
+ 	if (g_dbus_proxy_get_property(proxy, "PlaybackStatus", &iter)) {
+ 		if (!set_status(player, &iter))
+ 			goto fail;
 -- 
 2.43.0
 
