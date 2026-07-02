@@ -1,140 +1,236 @@
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123143E00B5
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 10:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8023C5DB6
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 11:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782989486; cv=none; b=UMaxgNAbwGn/qVej/NKpaK1pCE//d6ASYc0cjOlLm8t1WqSNsPjbBAakGcBKar6R7znnB0W891LYiByxUvXuw9+bf0T8IY9VKWhZym7dF/O342LtSfRBA0IJVogbua3XtcO9q8u4hKXh4yWVvF1QxP8AUJ0/XwIN+y/UVjYASN0=
+	t=1782990442; cv=none; b=lYPIuNJFTo0kOSNaL6iJuJmVCJXgV9YHjGEnfAKZPMwYSV1LhEoI6OuKkdR4bV0O4XiER7VhFD9wSlu5/rTBIdlfyCYRTlZJGhVdBulVfcK60OhbNkmUupPbjAVMRYcOuTjVimDFIIPdmIz47c8GkeTr4BVD9CAyxkkYuofQA0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782989486; c=relaxed/simple;
-	bh=470pBquDzBYNHibNiPSjSckPy5Srf1mLMFvLxPxaJRQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Citm847FlRK+6I6aGJ7AiJtIFbEc5RE08PvrhbljgH/I18KiYzUeKps/q8MpEaDwXsNnfitx28Yx4vWf8A3+WPo1nxC2F8imFUNERgcmESLFhIc8vifkRZEEeHuwiYbTRA0pcQhJ59PxRTzy6usFtOJ6u6k0x4BKjnLnTFonYPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qYY5+sAV; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782990442; c=relaxed/simple;
+	bh=yFPaJIo4KO8w30F6r8CzuUaUiwQJ5osqqphdTalDtwc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=HiWy5Xj4Ha1OVzZqfkjG39U9uDfLaxH+Xfqe1byfApv7jom9dTxy0Ye7a8Dj44Lo1Od7G6ACNSdyzLJ8/sVcjyOKkgZVorF0dYaAzie83nQz3dcrjuSC7aM1+yfyuaW80DpQdxIgQBdn1rLgwY9Fzfq18nJw3QMjoc2VlTjikzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=OC5Q5C8C; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qYY5+sAV"
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-c8fee9f63d5so842181a12.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jul 2026 03:51:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782989483; x=1783594283; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=BuDyvbf1sEaxczRAtAObiDK0Dd67qWrfNTqQ2Fhy+1U=;
-        b=qYY5+sAVuNKDP3NwGjuwqieqKSguLqAU8xp6zInboMbsiUXcpqiL69DqjOsXURatL1
-         Ugbr60R+djYsg2Zyoav3wUF6aS0fv2CpWhH415ynZRt4casmGyrS4Y1MEn+INrCqNjZc
-         RhP+FBg8FqYaeOKbXXPFji8+aMgMNVN3usVYlETTKiM2D6vb6wRdxKLSjLyKnPSa94OC
-         22h8L7tDVmJn2GItvyZeKhe2YN1wAelORCfSJbYb875s5rK+kykZ5ONd3pyFtDuMQ5Mc
-         jZlAtfXJyjOzS4mU1nNnqXt6Vca5179CnzjXz98Te/qiqLKpPXQfMXs/SpnEJY5sJEPS
-         l5wQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782989483; x=1783594283;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=BuDyvbf1sEaxczRAtAObiDK0Dd67qWrfNTqQ2Fhy+1U=;
-        b=NOCwiZcjMK06Tow9PcBDjvog+jwamRm9CZSr0kutcLs0XkNOgNnTf38C62ca7Ca5Dt
-         NgHAfkpIWZaXv1Za24iW6TFDKDTMw6xgJrkppfTmrcJhnB+vWdDgcMUp9I1AtR+N2MOV
-         /1cZ5ce6/x2W/7PyPuNwokAlmN9thOV1afRUq2BH5LiR77+3YfThmqtS1/UJpqlixX3B
-         glGVHwJ59WKM14ZDmWDrk15JR5MG3SNWPMcRI4Fq1mvrOj/mISxosHcdKg6PpPSO2PTu
-         BelbYeWoLIkYNuec1u1zUuwyj6cIKNW8uVRAZn/gAzDQTp4PPEfh4A+teFdNQxEFZy7a
-         wi3Q==
-X-Gm-Message-State: AOJu0YwQaaoVf5KjlRNHO+U+l7h0pJD/pUnobCDo4wIvmoJM7l0AozTo
-	fKcrorXHGmxHcBCPKN3RiYm99GoG00YSHlFns5xjfHj73sAaOYZwEOG6v4Upyw==
-X-Gm-Gg: AfdE7cm9dGnNPScYlzfxLHtABKD0m03tuCb/z1lkB412fdZynBXiBfV03NycvGfx6Hs
-	8ch4tNIrp4Aei1yTy/VltNwpL8bQCPCypW797n3vS9XFels/smGduhoBR6IR8m3J+rhiqwpWFrG
-	0B3b73wlfX5IdBypdIuXH89akH6iLBd60aHVAvT/cTgXekzkm/jy4bXZoGFIQK5oZNPqmuOwFXU
-	6Ae/LPllA/1o5h6V42i2QlGW2Nd+O+4MGWJYP644Wy+JVG56H2hsp0sTCXU5WWy4tNMUaRrUyEn
-	/n3yajyOj2k9scT/5LYFAG46rw5IcNu2ohhArNWEiLznlDau/rcToyEZ6Ma2VnxQsHT4noHIRjh
-	gcjkazdZG3/FnNjRg+m9u6vcy4sV8n4HMekjahBn8HvnqOCs+v0QbFw0mqv4AQ2WMu1l1IB6Hyk
-	XMqNq5MUyruNmRGRmIWaAXl+Ccpp3A4w==
-X-Received: by 2002:a05:6a20:d808:b0:3bf:b228:10ae with SMTP id adf61e73a8af0-3bff402bcd9mr5828945637.5.1782989482952;
-        Thu, 02 Jul 2026 03:51:22 -0700 (PDT)
-Received: from [172.17.0.2] ([20.163.32.229])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f0bc3ea61sm8437862eec.30.2026.07.02.03.51.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2026 03:51:22 -0700 (PDT)
-Message-ID: <6a4642aa.6c8668f2.74a35.6f8b@mx.google.com>
-Date: Thu, 02 Jul 2026 03:51:22 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1980052525489057280=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="OC5Q5C8C"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1782990440;
+	bh=Z3z59QHME6fZztwQjamT4QzZQ22latjJtp+oDFqen9A=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=OC5Q5C8CMAxU/a/OV3kouUbqYxPU+APoA44g2y8zOQ2J/VqBfU4gX6LSEmEc+6q5Y
+	 nrX7BZVZn2hGosXaCZVvNjXVT1RmypJPBLsXKxh/4y0AxCN3v8Gl7rArQsE/ti2sDo
+	 HeRl7Le4wMdERwp8i0uhc1Rpg69Ph18qDv1ePSxQ=
+Received: from github.com (hubbernetes-node-dd8d134.va3-iad.github.net [10.48.178.47])
+	by smtp.github.com (Postfix) with ESMTPA id B7213808B88
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 04:07:20 -0700 (PDT)
+Date: Thu, 02 Jul 2026 04:07:20 -0700
+From: fdanis-oss <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1120331/000000-f4465f@github.com>
+Subject: [bluez/bluez] ef4bf7: plugins/admin: make AdminPolicy state
+ per-adapter
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
-Subject: RE: Bluetooth: btmtk: Add MT7928 support
-In-Reply-To: <20260702101437.1787800-2-chris.lu@mediatek.com>
-References: <20260702101437.1787800-2-chris.lu@mediatek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
---===============1980052525489057280==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+  Branch: refs/heads/1120331
+  Home:   https://github.com/bluez/bluez
+  Commit: ef4bf764309bef21dc71fbd658c87e03107c5aac
+      https://github.com/bluez/bluez/commit/ef4bf764309bef21dc71fbd658c87=
+e03107c5aac
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-07-02 (Thu, 02 Jul 2026)
 
-This is automated email and please do not reply to this email!
+  Changed paths:
+    M plugins/admin.c
 
-Dear submitter,
+  Log Message:
+  -----------
+  plugins/admin: make AdminPolicy state per-adapter
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1120412
+Fix AdminPolicy D-Bus updates being emitted on the wrong adapter path
+by removing the single global policy context and moving to per-adapter
+policy objects.
 
----Test result---
+Changes include:
+- track policy contexts in a policy queue keyed by adapter pointer
+- keep per-adapter device lists inside each policy context
+- emit ServiceAllowList changes using the callback's adapter context
+- scope device affected updates to the current adapter only
+- clean up probe/remove lifecycle so adapters are registered and torn
+  down independently
+- remove remaining global policy_data/devices coupling
 
-Test Summary:
-CheckPatch                    PASS      3.74 seconds
-VerifyFixes                   PASS      0.08 seconds
-VerifySignedoff               PASS      0.08 seconds
-GitLint                       FAIL      1.38 seconds
-SubjectPrefix                 PASS      0.46 seconds
-BuildKernel                   PASS      24.66 seconds
-CheckAllWarning               PASS      27.56 seconds
-CheckSparse                   PASS      26.65 seconds
-BuildKernel32                 PASS      27.46 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      458.97 seconds
-IncrementalBuild              PASS      32.89 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v9,1/6] Bluetooth: btmtk: Add firmware size validation in btmtk_setup_firmware_79xx()
-
-1: T1 Title exceeds max length (86>80): "[v9,1/6] Bluetooth: btmtk: Add firmware size validation in btmtk_setup_firmware_79xx()"
-[v9,5/6] Bluetooth: btmtk: Improve BT firmware logging
-
-14: B1 Line exceeds max length (92>80): "[  212.878783] Bluetooth: hci1: Loading BT firmware: mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin"
-15: B1 Line exceeds max length (93>80): "[  212.889614] Bluetooth: hci1: BT HW ver: 0x7922, SW ver: 0x008a, Build Time: 20260224103448"
-17: B1 Line exceeds max length (115>80): "[  216.048890] Bluetooth: hci1: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported."
-[v9,6/6] Bluetooth: btmtk: Add MT7928 support
-
-28: B1 Line exceeds max length (92>80): "[ 6931.197167] usb 1-3: New USB device found, idVendor=0e8d, idProduct=7935, bcdDevice= 1.00"
-33: B1 Line exceeds max length (97>80): "[ 6931.213478] Bluetooth: hci1: Loading CBMCU firmware: mediatek/mt7928/CBMCU_CODE_MT7935_1_1.bin"
-34: B1 Line exceeds max length (98>80): "[ 6931.215214] Bluetooth: hci1: CBMCU HW ver: 0x7935, SW ver: 0x0000, Build Time: 20260601T161751+"
-36: B1 Line exceeds max length (99>80): "[ 6931.643916] Bluetooth: hci1: Loading BT firmware: mediatek/mt7928/BT_RAM_CODE_MT7935_1_1_hdr.bin"
-37: B1 Line exceeds max length (93>80): "[ 6931.650467] Bluetooth: hci1: BT HW ver: 0x7935, SW ver: 0x0000, Build Time: 20260527000816"
-39: B1 Line exceeds max length (115>80): "[ 6935.039833] Bluetooth: hci1: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported."
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
+Assisted-by: GPT:GPT-5.3-Codex
 
 
-https://github.com/bluez/bluetooth-next/pull/385
+  Commit: 683e390e26c8c21db486f076fad149019e111ed2
+      https://github.com/bluez/bluez/commit/683e390e26c8c21db486f076fad14=
+9019e111ed2
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-07-02 (Thu, 02 Jul 2026)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M client/admin.c
+    M client/admin.h
+    M client/main.c
+
+  Log Message:
+  -----------
+  client/bluetoothctl: make admin.allow controller-aware
+
+Teach admin.allow to target the selected default controller when no
+controller is provided, and to accept an explicit [ctrl] argument.
+
+Replace single cached AdminPolicy proxies with per-controller proxy
+lookup keyed by controller object path, so controller selection changes
+are respected.
+
+Export controller lookup/default helpers and shared controller
+completion from main.c for reuse by admin.c.
+
+Assisted-by: GPT:GPT-5.3-Codex
 
 
---===============1980052525489057280==--
+  Commit: 8ab7554018b328deb0c8fc00b520745772834e27
+      https://github.com/bluez/bluez/commit/8ab7554018b328deb0c8fc00b5207=
+45772834e27
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-07-02 (Thu, 02 Jul 2026)
+
+  Changed paths:
+    M doc/bluetoothctl-admin.rst
+    M doc/org.bluez.AdminPolicySet.rst
+
+  Log Message:
+  -----------
+  doc: document admin.allow optional controller argument
+
+Update bluetoothctl usage to 'admin.allow [ctrl] [clear/uuid1 uuid2 ...]'=
+
+and add explicit controller examples.
+
+Refresh AdminPolicySet examples to include the controller-qualified
+admin.allow form.
+
+Assisted-by: GPT:GPT-5.3-Codex
+
+
+  Commit: be8945b213da9eb8b6646714773b364b87d430d0
+      https://github.com/bluez/bluez/commit/be8945b213da9eb8b6646714773b3=
+64b87d430d0
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-07-02 (Thu, 02 Jul 2026)
+
+  Changed paths:
+    M src/adapter.c
+    M src/adapter.h
+
+  Log Message:
+  -----------
+  src/adapter: enforce allowlist for local services
+
+Apply admin allowlist to adapter/server service startup and
+registration, and reapply policy dynamically when allowlist changes.
+
+- Gate adapter profile probe by allowlist-derived UUID policy
+- Reapply active adapter profiles on allowlist updates (stop
+  disallowed, start newly allowed)
+- Block SDP service registration when UUID is not allowed
+- Reapply existing local SDP registrations at runtime by removing
+  services that become disallowed
+
+Assisted-by: GPT:GPT-5.3-Codex
+
+
+  Commit: 49945eaf7460503e97844a7d726cd75468cc7956
+      https://github.com/bluez/bluez/commit/49945eaf7460503e97844a7d726cd=
+75468cc7956
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-07-02 (Thu, 02 Jul 2026)
+
+  Changed paths:
+    M plugins/admin.c
+
+  Log Message:
+  -----------
+  plugins/admin: reapply allowlist on policy updates
+
+Invoke adapter allowlist reapply after SetServiceAllowList updates
+so runtime state follows policy changes immediately.
+
+Assisted-by: GPT:GPT-5.3-Codex
+
+
+  Commit: 42edbdf1bf416a071502a3babc18defabde82b18
+      https://github.com/bluez/bluez/commit/42edbdf1bf416a071502a3babc18d=
+efabde82b18
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-07-02 (Thu, 02 Jul 2026)
+
+  Changed paths:
+    M doc/org.bluez.AdminPolicySet.rst
+    M doc/org.bluez.AdminPolicyStatus.rst
+
+  Log Message:
+  -----------
+  doc: describe admin allowlist runtime enforcement
+
+Document that ServiceAllowList now also governs local adapter/server
+startup and registration, and that allowlist updates are applied
+immediately on initialized adapters.
+
+Clarify ServiceAllowList status semantics for both remote profile
+connection policy and local server policy.
+
+Assisted-by: GPT:GPT-5.3-Codex
+
+
+  Commit: f4465f5c88ec013a45fda7c08a1a6fce56288441
+      https://github.com/bluez/bluez/commit/f4465f5c88ec013a45fda7c08a1a6=
+fce56288441
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2026-07-02 (Thu, 02 Jul 2026)
+
+  Changed paths:
+    M profiles/audio/media.c
+
+  Log Message:
+  -----------
+  profiles/audio: fix UAF on external media service teardown
+
+Keep media_app endpoint/player queues in sync with object lifetime to
+avoid stale pointers during proxy removal.
+
+When admin allowlist reapply removes audio services, endpoint/player
+objects may be destroyed through non-proxy paths first.
+Later proxy_removed_cb calls queue_remove_if() and matching by path
+can dereference freed endpoint/player memory.
+
+Fix by:
+- adding media_app back-references in media_endpoint/local_player
+- unlinking from app queues inside media_endpoint_remove or
+  local_player_remove
+- setting ownership when app-registering endpoint/player objects
+
+This prevents heap-use-after-free in match_endpoint_by_path or
+match_player_by_path during service disconnect.
+
+Assisted-by: GPT:GPT-5.3-Codex
+
+
+Compare: https://github.com/bluez/bluez/compare/ef4bf764309b%5E...f4465f5=
+c88ec
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
