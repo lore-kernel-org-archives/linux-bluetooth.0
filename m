@@ -1,209 +1,164 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73332353A6E
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 14:52:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8049433E70;
+	Thu,  2 Jul 2026 15:09:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783003959; cv=none; b=USKtxfc+7d1WnujVFi64DWr05HIhZLAMC4BqrvGRhwvON0o77MmlrOzeh6bltSLr0cQRq0un3510+zbVasQgxZAYiebyloH+JklCT9XFmka7w1QOeKP6ymiCCg3/2zc+XLtxu6MgMPSaha8rM58ZcwAVOzyoU86MWC0ue3+HcNc=
+	t=1783004948; cv=none; b=XCVaPpqAauurkDl/cdGARIlsmUgeByVlUnPB7ocZlfXMznNx8KSS6ueAH9E6GqVZN+7qld/QvsCPS2hShymPyM4w8hPbR2noXsrmakqx8U3m5/IRzmyoUOnO1A7Sg38efYRsJUfbaIiE2g/GPDNMxYuwijbvjasd5OFEwqddJoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783003959; c=relaxed/simple;
-	bh=vafJePQjD26LQJFO6gcyN8rPD54igOHpLteX+4u5nrU=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=m/X+tmc7Au4/Io/516Ixd5Yf8RpTGqMAlzgivaJufmwvt6Tj3RiQ9Rs3ROwRfWbaYm6Mn2x4H4X/N7fHARkqhDa85Mk3AXxacOB2LrPZpXQQ4tH1noa0t1jAe9MLRrgLAI27EkSLJdLHA48WHXbEYOHKben5wrylm1AuCxFP8R4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bhAgIkQD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1783004948; c=relaxed/simple;
+	bh=LLkHWrOMD63/9p70rDW1VrXtSZnGGOWJdRZK4hmTXHU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IpxySKPoSIWjWGsDXIPL7eDRmsg2LIxkI3I+kxi8WV7xglyD158G7aVODUzMbXOsT0lx/4biuXOreSDngJXLl0PVi4r7hijVrqLh2TryI8iuKbGFyXLEOW0EYoDQ+E1dxrDh3Ika28PHg9yd+ftqPPMKDRKbhPs6dHm4zgzgiqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AW05xYDs; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bhAgIkQD"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 158F3C19425
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 14:52:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1783003959;
-	bh=vafJePQjD26LQJFO6gcyN8rPD54igOHpLteX+4u5nrU=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=bhAgIkQDOFf9j9yltxg5S3I07lhUWoj/a+o6olr6cwUiTf/mb094dPKpZH04ldFIy
-	 6x2yjbhvJiwC7oeB4TBYv3lpfhBjusS5ckIeMMdKX8B3n+fWFELV1dtpaYXRYwskgD
-	 ebB2L8KH8+jpnh9ycv45qwHtv68uig88YHyEyhwB6p57ROlshp8gdKJOzhDiTht3oy
-	 b0D5hNB9vw3CRWUvbQbP9y2nsNDnbK8U+JXYSIpfezC6vOLEJCVDlJynE6kTyd+NG8
-	 ae1170/bPaZGpNoqx0IE9piDMfH1SPrPVlDt+HveC3MtKmKHTorffOZQC0WU9LDDna
-	 g+rgNpwbP8zDA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id E6610C4160E; Thu,  2 Jul 2026 14:52:38 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221696] btmtk: regression in 6.6.142: NULL pointer dereference
- in btmtk_usb_hci_wmt_sync during resume from S4
-Date: Thu, 02 Jul 2026 14:52:38 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: kernel@mattwhitlock.name
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221696-62941-98Fx1WnSl8@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221696-62941@https.bugzilla.kernel.org/>
-References: <bug-221696-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AW05xYDs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D70281F000E9;
+	Thu,  2 Jul 2026 15:09:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783004946;
+	bh=QNIEFVldnfVEUV19RPlvKaoxSz33OpCUlGBniTtIzbw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=AW05xYDsdvfgnVzB8HRyv3z9EU8TK33a+ymYgDW8QSn3uNOObfBq314IjboD1w1AY
+	 XrWxw7igHDiWZl/01h2Wn1NddXeuvoW/9LSafQbHZwIPrgSWIW95dlBHPD/AZ2iKeS
+	 ZEF9yi1rXSmOe26iQbRyr1WVOVr/qzi3ptJ7i0go/BHSPQJUpsr78qeSnovbQbnHgq
+	 yAFxD0Ll/hV1Xmrm8M0SqUhXnTr815ED+f0SvJ4GiowrTwUrIbW2o8QgZDdIbBPh14
+	 krAmsetbWhygP0mzeWMmyjMQoDC88V9yP1ODhIfg5GtI4e0ibi7xSQTfBS04u+cr2j
+	 7EUA5E2O57AUA==
+Date: Thu, 2 Jul 2026 17:08:56 +0200
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Cc: Loic Poulain <loic.poulain@oss.qualcomm.com>, 
+	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-pci@vger.kernel.org, 
+	linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Subject: Re: [PATCH v2 3/4] Bluetooth: hci_qca: Support QCA2066 on M.2
+ connector via pwrseq
+Message-ID: <zat6uuvh7jwfxajvqtif6d67osf6h5b2vxig3bmuch76btpdkj@bfxjj7kk5fjk>
+References: <20260702-monza-wireless-v2-0-7b56e2a6a6d4@oss.qualcomm.com>
+ <20260702-monza-wireless-v2-3-7b56e2a6a6d4@oss.qualcomm.com>
+ <43re752djujsh2kiyvjlkpmztxsh4atg6472qhir4lgay24zbo@mtlkn2xc2ors>
+ <rxt4n6vuscu33mrw24af72lb3s6urqfpkhtia44yfo4j7wtu6o@3xp57owekrgj>
+ <u5ieok3hgjcf74sxjdzv6xurmlbve46xa3imgfnom4hpjarmxa@fna5daqpyk3r>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <u5ieok3hgjcf74sxjdzv6xurmlbve46xa3imgfnom4hpjarmxa@fna5daqpyk3r>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221696
+On Thu, Jul 02, 2026 at 05:34:31PM +0300, Dmitry Baryshkov wrote:
+> On Thu, Jul 02, 2026 at 04:17:43PM +0200, Manivannan Sadhasivam wrote:
+> > On Thu, Jul 02, 2026 at 03:14:49PM +0300, Dmitry Baryshkov wrote:
+> > > On Thu, Jul 02, 2026 at 12:46:15PM +0200, Loic Poulain wrote:
+> > > > For QCA2066 (and other QCA chips) on M.2 connectors, the UART enable
+> > > > is controlled by the W_DISABLE2# signal managed by the pcie-m2 power
+> > > > sequencer rather than a dedicated BT enable GPIO.
+> > > > 
+> > > > When the serdev controller has an OF graph (indicating it is connected
+> > > > to an M.2 connector), acquire the 'uart' pwrseq target from the
+> > > > connector's power sequencer and use it to control BT power instead of
+> > > > the bt-enable GPIO.
+> > > > 
+> > > > Also allocate bt_power unconditionally for all SOC types since the
+> > > 
+> > > Can we just fold it into the main struct?
+> > > 
+> > > > pwrseq path is independent of the SOC type switch.
+> > > > 
+> > > > Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> > > > ---
+> > > >  drivers/bluetooth/hci_qca.c | 81 ++++++++++++++++++++++++---------------------
+> > > >  1 file changed, 43 insertions(+), 38 deletions(-)
+> > > > 
+> > > > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> > > > index e09debdb00a1b8e74ccd5de6147e240e533b4594..b04593a96e14ac9e87ae76fa00eda308e81dea25 100644
+> > > > --- a/drivers/bluetooth/hci_qca.c
+> > > > +++ b/drivers/bluetooth/hci_qca.c
+> > > > @@ -1872,6 +1872,9 @@ static int qca_power_on(struct hci_dev *hdev)
+> > > >  			/* Controller needs time to bootup. */
+> > > >  			msleep(150);
+> > > >  		}
+> > > > +
+> > > > +		if (qcadev->bt_power->pwrseq)
+> > > > +			pwrseq_power_on(qcadev->bt_power->pwrseq);
+> > > >  	}
+> > > >  
+> > > >  	clear_bit(QCA_BT_OFF, &qca->flags);
+> > > > @@ -2256,7 +2259,7 @@ static void qca_power_off(struct hci_uart *hu)
+> > > >  		break;
+> > > >  	}
+> > > >  
+> > > > -	if (power && power->pwrseq) {
+> > > > +	if (power->pwrseq) {
+> > > >  		pwrseq_power_off(power->pwrseq);
+> > > >  		set_bit(QCA_BT_OFF, &qca->flags);
+> > > >  		return;
+> > > > @@ -2387,6 +2390,35 @@ static int qca_init_regulators(struct qca_power *qca,
+> > > >  	return 0;
+> > > >  }
+> > > >  
+> > > > +/*
+> > > > + * Acquire the M.2 connector power sequencer.
+> > > > + *
+> > > > + * An OF graph link on the serdev controller is only present when the BT
+> > > > + * device is attached through an M.2 Key E connector. In that case the UART
+> > > > + * enable (W_DISABLE2#) is driven by the pcie-m2 power sequencer instead of a
+> > > > + * dedicated BT enable GPIO, so grab the "uart" pwrseq target from it.
+> > > > + *
+> > > > + * Returns 0 if no M.2 connector is present (nothing to do), a negative errno
+> > > > + * on error, otherwise 0 with qcadev->bt_power->pwrseq populated.
+> > > > + */
+> > > > +static int qca_serdev_get_m2_pwrseq(struct qca_serdev *qcadev, bool *bt_en_available)
+> > > > +{
+> > > > +	struct serdev_device *serdev = qcadev->serdev_hu.serdev;
+> > > > +	struct device *dev;
+> > > > +
+> > > > +	if (!of_graph_is_present(dev_of_node(&serdev->ctrl->dev)))
+> > > > +		return 0;
+> > > > +
+> > > > +	qcadev->bt_power->pwrseq = devm_pwrseq_get(&serdev->ctrl->dev, "uart");
+> > > > +	if (IS_ERR(qcadev->bt_power->pwrseq))
+> > > > +		return PTR_ERR(qcadev->bt_power->pwrseq);
+> > > > +
+> > > > +	dev = pwrseq_to_device(qcadev->bt_power->pwrseq);
+> > > > +	*bt_en_available = device_property_present(dev, "w-disable2-gpios");
+> > > 
+> > > I think here you are looking into the exact details of the other of the
+> > > graph. There might be other devices on that side, while the code now
+> > > assumes M.2. Or, consider having an M.2 controller which handles
+> > > W_DISABLE2# internally rather than through the GPIO.
+> > > 
+> > 
+> > This code only deals with M.2 connector in specific, so I'm not sure why we need
+> > to worry about *other* kind of devices. Let's worry about them when they show up
+> > (with graph interface ofc).
+> 
+> I don't think we want to go through the drivers using M.2 connectors in
+> such a case. In the end, the contract should be that there is a power
+> sequencer on the other side of the graph, but the specifics of the
+> connector should be abstracted out. Do you know, if in the x86 world the
+> W_DISABLE2# is a GPIO or is controleed by the hub.
+> 
 
---- Comment #9 from Matt Whitlock (kernel@mattwhitlock.name) ---
-Okay, got a result that makes some sense now.
+I tried to abstract out, but Bartosz didn't want pwrctrl APIs to do that level
+of abstraction as pwrctrl APIs should be generic and should not be bind to a
+specific connector and exposing its internals.
 
-# status: waiting for both 'good' and 'bad' commits
-# old: [d019930b0049fc2648a6b279893d8ad330596e81] Bluetooth: btmtk: move
-btusb_mtk_hci_wmt_sync to btmtk.c
-git bisect old d019930b0049fc2648a6b279893d8ad330596e81
-# status: waiting for 'new' commit, 1 'old' commit known
-# new: [4a50a141f05a8d1737661b19ee22ff8455b94409] Merge tag
-'bootconfig-fixes-v7.2-rc1' of
-git://git.kernel.org/pub/scm/linux/kernel/git/trace/linux-trace
-git bisect new 4a50a141f05a8d1737661b19ee22ff8455b94409
-# new: [115e74a29b530d121891238e9551c4bcdf7b04b5] Merge tag 'soc-dt-6.17' of
-git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc
-git bisect new 115e74a29b530d121891238e9551c4bcdf7b04b5
-# new: [b394eabd539d01db10e27b57ac2497cbd1d32c6d] Merge tag
-'chrome-platform-v6.14' of
-git://git.kernel.org/pub/scm/linux/kernel/git/chrome-platform/linux
-git bisect new b394eabd539d01db10e27b57ac2497cbd1d32c6d
-# new: [f8ffbc365f703d74ecca8ca787318d05bbee2bf7] Merge tag
-'pull-stable-struct_fd' of
-git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs
-git bisect new f8ffbc365f703d74ecca8ca787318d05bbee2bf7
-# new: [c85e1497dd10879f447d6a12f97762c581093e9b] Merge tag 'i3c/for-6.11' =
-of
-git://git.kernel.org/pub/scm/linux/kernel/git/i3c/linux
-git bisect new c85e1497dd10879f447d6a12f97762c581093e9b
-# new: [b3ce7a30847a54a7f96a35e609303d8afecd460b] Merge tag
-'drm-next-2024-07-18' of https://gitlab.freedesktop.org/drm/kernel
-git bisect new b3ce7a30847a54a7f96a35e609303d8afecd460b
-# new: [e2f710f97f3544df08ebe608c8157536e0ffb494] Merge tag 'ata-6.11-rc1' =
-of
-git://git.kernel.org/pub/scm/linux/kernel/git/libata/linux
-git bisect new e2f710f97f3544df08ebe608c8157536e0ffb494
-# old: [cc0f7c3f97bc6e888bf4be28a9da9dbd3735d2b4] Merge tag 'soc-drivers-6.=
-11'
-of git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc
-git bisect old cc0f7c3f97bc6e888bf4be28a9da9dbd3735d2b4
-# old: [cdf471c348c1200ca243775b4b8d6eaa6d7f3979] Merge tag
-'tag-chrome-platform-firmware-for-v6.11' of
-git://git.kernel.org/pub/scm/linux/kernel/git/chrome-platform/linux
-git bisect old cdf471c348c1200ca243775b4b8d6eaa6d7f3979
-# old: [3e7819886281e077e82006fe4804b0d6b0f5643b] Merge tag
-'for-6.11/block-20240710' of git://git.kernel.dk/linux
-git bisect old 3e7819886281e077e82006fe4804b0d6b0f5643b
-# old: [3a56e241732975c2c1247047ddbfc0ac6f6a4905] Merge tag
-'for-6.11/io_uring-20240714' of git://git.kernel.dk/linux
-git bisect old 3a56e241732975c2c1247047ddbfc0ac6f6a4905
-# old: [7d156879ffd6c48428c2f46d5c2b4b80d9c9ee79] Merge tag
-'vfs-6.11.module.description' of
-git://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs
-git bisect old 7d156879ffd6c48428c2f46d5c2b4b80d9c9ee79
-# old: [2ffd45da0b06b26f30480584de7c660d84b2d7dc] Merge tag
-'drm-fixes-2024-07-12' of https://gitlab.freedesktop.org/drm/kernel
-git bisect old 2ffd45da0b06b26f30480584de7c660d84b2d7dc
-# old: [a5819099f601c1af5b86b1f5921a56859e45b19a] Merge branch
-'runtime-constants'
-git bisect old a5819099f601c1af5b86b1f5921a56859e45b19a
-# old: [35ce46324556ba2dbc66a88013870d8bec8a99ef] Merge tag
-'x86_urgent_for_v6.10' of git://git.kernel.org/pub/scm/linux/kernel/git/tip=
-/tip
-git bisect old 35ce46324556ba2dbc66a88013870d8bec8a99ef
-# old: [119736c7af442ab398dbb806865988c98ef60d46] i2c: testunit: avoid
-re-issued work after read message
-git bisect old 119736c7af442ab398dbb806865988c98ef60d46
-# old: [0830f975e021608c527887ed2d9e122e76b9e280] MAINTAINERS: VIRTIO I2C l=
-oses
-a maintainer, gains a reviewer
-git bisect old 0830f975e021608c527887ed2d9e122e76b9e280
-# old: [ca8e83a13ace8d63ede6501a8c313fce625c141f] MAINTAINERS: delete entri=
-es
-for Thor Thayer
-git bisect old ca8e83a13ace8d63ede6501a8c313fce625c141f
-# old: [a5db8e4544a4dc7143f30a1438686a4d5fa6d775] Merge tag 'soc-arm-6.11' =
-of
-git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc
-git bisect old a5db8e4544a4dc7143f30a1438686a4d5fa6d775
-# old: [0434dbe32053d07d658165be681505120c6b1abc] Merge tag
-'linux_kselftest-next-6.11-rc1' of
-git://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest
-git bisect old 0434dbe32053d07d658165be681505120c6b1abc
-# new: [6706415bf9f3dcb425f4b60a08a3a6f1d94ec0e0] Merge tag
-'gfs2-v6.10-rc1-fixes' of
-git://git.kernel.org/pub/scm/linux/kernel/git/gfs2/linux-gfs2
-git bisect new 6706415bf9f3dcb425f4b60a08a3a6f1d94ec0e0
-# new: [af58de31bebe737235f0238843f2054996998bd5] Merge branch
-'eth-fbnic-add-network-driver-for-meta-platforms-host-network-interface'
-git bisect new af58de31bebe737235f0238843f2054996998bd5
-# old: [30b3560050486275c6207c8c90c0d53a7cc73ac1] Merge branch
-'net-make-timestamping-selectable'
-git bisect old 30b3560050486275c6207c8c90c0d53a7cc73ac1
-# new: [03afeb613bfe6b0c28e8b843959f716a3d2c42df] flow_dissector: set
-encapsulated control flags from tun_flags
-git bisect new 03afeb613bfe6b0c28e8b843959f716a3d2c42df
-# new: [921ad2879aa7733620585e4904ba673c6c916dab] Bluetooth: hci_qca: use t=
-he
-power sequencer for wcn7850 and wcn6855
-git bisect new 921ad2879aa7733620585e4904ba673c6c916dab
-# new: [d4f6acfcb0b0962e2a59165108e212a976d1f078] Bluetooth: btnxpuart: Add
-support for IW615 chipset
-git bisect new d4f6acfcb0b0962e2a59165108e212a976d1f078
-# new: [ceac1cb0259de682d78f5c784ef8e0b13022e9d9] Bluetooth: btusb: mediate=
-k:
-add ISO data transmission functions
-git bisect new ceac1cb0259de682d78f5c784ef8e0b13022e9d9
-# new: [6dc22ab9f085ae165e4ce89d61fb426f94e8a969] Bluetooth: btmtk: move
-btusb_recv_acl_mtk to btmtk.c
-git bisect new 6dc22ab9f085ae165e4ce89d61fb426f94e8a969
-# new: [5c5e8c52e3cafaa6f71efd44a42a674271e5b3ad] Bluetooth: btmtk: move
-btusb_mtk_[setup, shutdown] to btmtk.c
-git bisect new 5c5e8c52e3cafaa6f71efd44a42a674271e5b3ad
-# first 'new' commit: [5c5e8c52e3cafaa6f71efd44a42a674271e5b3ad] Bluetooth:
-btmtk: move btusb_mtk_[setup, shutdown] to btmtk.c
+That's why we ended up having pwrctrl core exposing the 'struct dev' using
+pwrseq_to_device() and letting the consumer extracting whatever information it
+needs.
 
-5c5e8c52e3cafaa6f71efd44a42a674271e5b3ad is the first 'new' commit
-commit 5c5e8c52e3cafaa6f71efd44a42a674271e5b3ad
-Author: Chris Lu <chris.lu@mediatek.com>
-Date:   Thu Jul 4 14:01:14 2024 +0800
+- Mani
 
-    Bluetooth: btmtk: move btusb_mtk_[setup, shutdown] to btmtk.c
-
-    Move btusb_mtk_[setup, shutdown] and related function from
-    btusb.c to btmtk.c which holds vendor specific stuff and
-    would make btusb.c clean.
-
-    Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-    Signed-off-by: Chris Lu <chris.lu@mediatek.com>
-    Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
- drivers/bluetooth/btmtk.c | 454
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++++++++++++++++++-
- drivers/bluetooth/btmtk.h |  23 ++++-
- drivers/bluetooth/btusb.c | 452
-+++------------------------------------------------------------------------=
-----------------------
- 3 files changed, 484 insertions(+), 445 deletions(-)
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+-- 
+மணிவண்ணன் சதாசிவம்
