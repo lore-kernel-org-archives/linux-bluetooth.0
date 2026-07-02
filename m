@@ -1,261 +1,142 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996C243D4F6
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 08:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B81C5449EB0
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 08:41:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782981504; cv=none; b=lEF48ABDoeO3Gae8P/nDd7f26Q9vFbpP051jbfQnlfO6H0OPu1/QtvY52u5ODERFnaREvMGpRcQ1ZBpU3IYfKcUwvcqpIOFer+YIvBWmPQ+j8CI6VUmDWXNYaxFsbCwbr07Tj9A6jsMqOZDf4zWq6NtvlO4ZceIp27NKQGfh6Mc=
+	t=1782981688; cv=none; b=QM5oxWCaUk/v9KSyGJyeIrm9/RWPSHFdU4fBNFY7+RYKv9nxvbec2s28kePYWNFAhTG1ZzDa0nv750TFYbLJTZvMVXK4CDbm2YDb++P0CjybwBP/NgJZqyLLHeIED0iJGSwHkeqn/cXNn+LG9ebW8sw5SW7DtfOFDHIveCbpppw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782981504; c=relaxed/simple;
-	bh=ag89vdwAzdOEq8ElDROUENPDr9akj96Mx8u5FLSQ26w=;
+	s=arc-20240116; t=1782981688; c=relaxed/simple;
+	bh=hOSB7Hf6x+qzres1xuiYhfWKZSdkEp3hruOtqqrIsNM=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=slmYSuzQLtDOacF08C3w0qePaLIHzfVZqoiuJYw7Tmg10AL2XHF5oz0oCmQmO453IKj9nPS6VJYiBCqdNKvUxXyG6ViR9n8MfFd+tJh9PmqXGOmwKFewHmaLoc0CHVYDpm2q/wkUs9xcE5/rUWTb9zfkcGLDkoefKtQa2TAXJpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=XCCmcFD6; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	 Content-Type:MIME-Version; b=meuXEWaW3uSJWmGUDZ0BRJZB7tmW7dO7REYwddsvinpoMIU0QxftzK52zNopTM1dyDbQ1g/6sy5yPDtGDlraKDBGfgdsz7U+CNASibLwi+A0bx+vcATJPle/jIc7QLfFOPjnU8zCR8OleSdBwcotyQIlBGwHaKc8R+oOFFsfS8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TCBmaoXs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="XCCmcFD6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1782981411;
-	bh=ag89vdwAzdOEq8ElDROUENPDr9akj96Mx8u5FLSQ26w=;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TCBmaoXs"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 55E33C2BCC7
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 08:41:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1782981688;
+	bh=hOSB7Hf6x+qzres1xuiYhfWKZSdkEp3hruOtqqrIsNM=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=XCCmcFD64gqeuXtmL9AV6hPDUPu2KHsswj16nILveaAFtdMQoTW5RHr7B2BIWmxMu
-	 dKQ5Ro+P6+KJ9n8w3+QtcHfyfTwckLSZ8lUee/fvXBbz1Z0cuoGUHvSgncL0IHRNa9
-	 NVmnGQyOP/wTHzunbeViWXqZyzybbhqT90Y/Jn18PDC+zNDvSklRBvxCmRnX/k/P5g
-	 l2DMG3gA0oQxgkwFqo+5L3dOfW571VmNdVaIC+uS3LyzD/3IEM4FJJFl9XJVdJZmfB
-	 fF+Q9A6Whjy5pjNniRnbO4m3bxa2c8oE94EQM3v5EfZuO1gYncSpui/tNMF11fGXAX
-	 gGjt+/48ndmIQ==
-Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 2D49817E0F68
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 10:36:51 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+	b=TCBmaoXsG4rHiWGwytKABBgqVDuS2IWUn9RzKIVlA6cw2J8B3VL+bO+C6uHYBK/ut
+	 CKgcU46AFavHO2GEHchJRyxcSimNL8byr5Ji0fRG+iMig9gaU9tRF7EqmDt8jHHI7m
+	 OBPfFI85rtl70oxjDg0zsgDY3JXcmhxRGrBHq6B5bRx+vNTEaPcrGXSSs4u6SO5Ph+
+	 IWhswYvB+pTlEeFbn1TeWkunkn3m4z1EcQq3MDw9N4zbBw2Cm7cNF9nsLSW5VNAP52
+	 9M0iijvILEYZXRJu8fFcpGgkZzSETYkeIReyTyuIhybgmRAajicI4Nnp6dosz6Yfe1
+	 XTWdl7zrGcyhw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 343D5C4160E; Thu,  2 Jul 2026 08:41:28 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/7] src/adapter: enforce allowlist for local services
-Date: Thu,  2 Jul 2026 10:36:38 +0200
-Message-ID: <20260702083641.378994-4-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260702083641.378994-1-frederic.danis@collabora.com>
-References: <20260702083641.378994-1-frederic.danis@collabora.com>
+Subject: [Bug 221696] btmtk: regression in 6.6.142: NULL pointer dereference
+ in btmtk_usb_hci_wmt_sync during resume from S4
+Date: Thu, 02 Jul 2026 08:41:28 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: kernel@mattwhitlock.name
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-221696-62941-pMlnDSljQI@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221696-62941@https.bugzilla.kernel.org/>
+References: <bug-221696-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
 
-Apply admin allowlist to adapter/server service startup and
-registration, and reapply policy dynamically when allowlist changes.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221696
 
-- Gate adapter profile probe by allowlist-derived UUID policy
-- Reapply active adapter profiles on allowlist updates (stop
-  disallowed, start newly allowed)
-- Block SDP service registration when UUID is not allowed
-- Reapply existing local SDP registrations at runtime by removing
-  services that become disallowed
+--- Comment #4 from Matt Whitlock (kernel@mattwhitlock.name) ---
+(In reply to The Linux kernel's regression tracker (Thorsten Leemhuis) from
+comment #3)
+> (b) run a git bisection
 
-Assisted-by: GPT:GPT-5.3-Codex
----
- src/adapter.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++++++
- src/adapter.h |   1 +
- 2 files changed, 140 insertions(+)
+# bad: [924b4a879cbb75aef37c160b955b92f6894b11a4] Linux 6.6.142
+# good: [eac8889a3a1c81d7113cc4656b9420e84c379cf5] Linux 6.6.140
+git bisect start '--no-checkout' 'refs/tags/v6.6.142' 'refs/tags/v6.6.140'
+# good: [1ff46c9915c1cbf454db58a8cb87f7cac818e6a6] ksmbd: scope conn->bindi=
+ng
+slowpath to bound sessions only
+git bisect good 1ff46c9915c1cbf454db58a8cb87f7cac818e6a6
+# good: [9426265e157dd77ec237c795901ed4dea6d69b5c] mptcp: pm: ADD_ADDR rtx:
+always decrease sk refcount
+git bisect good 9426265e157dd77ec237c795901ed4dea6d69b5c
+# good: [f85c81e93dbd6915970bd5f3bffcf62633c4c54c] hwmon: (pmbus/adm1266)
+reject implausible blackbox record_count
+git bisect good f85c81e93dbd6915970bd5f3bffcf62633c4c54c
+# good: [acdc12b71c9aa4be5dcd2c8062753c6d2033e235] net: tls: prevent
+chain-after-chain in plain text SG
+git bisect good acdc12b71c9aa4be5dcd2c8062753c6d2033e235
+# good: [60ef1675b652e912f3eb064767af4432393291fd] pds_core: fix debugfs_lo=
+okup
+dentry leak and error handling
+git bisect good 60ef1675b652e912f3eb064767af4432393291fd
+# bad: [c9ea01768903ae47f210cd457af1dead6de7a9c3] bpf, skmsg: fix verdict
+sk_data_ready racing with ktls rx
+git bisect bad c9ea01768903ae47f210cd457af1dead6de7a9c3
+# good: [b748250d778e575ef1a0e09939bd1366ee9b6bbf] Bluetooth: btmtk: add the
+function to get the fw name
+git bisect good b748250d778e575ef1a0e09939bd1366ee9b6bbf
+# bad: [f0457842215438786e2e205ad06a4fbb8ab63cd0] Bluetooth: btmtk: move
+btusb_mtk_hci_wmt_sync to btmtk.c
+git bisect bad f0457842215438786e2e205ad06a4fbb8ab63cd0
+# good: [73377cf3056ad72b10df90f54ce6b9822057bc66] Bluetooth: btmtk: rename
+btmediatek_data
+git bisect good 73377cf3056ad72b10df90f54ce6b9822057bc66
+# first 'bad' commit: [f0457842215438786e2e205ad06a4fbb8ab63cd0] Bluetooth:
+btmtk: move btusb_mtk_hci_wmt_sync to btmtk.c
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 538f63e0a..5a293b3f3 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1346,6 +1346,7 @@ done:
- 
- int adapter_service_add(struct btd_adapter *adapter, sdp_record_t *rec)
- {
-+	char *svc_uuid;
- 	int ret;
- 
- 	/*
-@@ -1357,6 +1358,18 @@ int adapter_service_add(struct btd_adapter *adapter, sdp_record_t *rec)
- 
- 	DBG("%s", adapter->path);
- 
-+	svc_uuid = bt_uuid2string(&rec->svclass);
-+	if (!svc_uuid)
-+		return -ENOMEM;
-+
-+	if (!btd_adapter_is_uuid_allowed(adapter, svc_uuid)) {
-+		DBG("Service %s blocked by admin allowlist", svc_uuid);
-+		free(svc_uuid);
-+		return -EPERM;
-+	}
-+
-+	free(svc_uuid);
-+
- 	ret = add_record_to_server(&adapter->bdaddr, rec);
- 	if (ret < 0)
- 		return ret;
-@@ -5201,6 +5214,70 @@ static void load_drivers(struct btd_adapter *adapter)
- 		probe_driver(adapter, l->data);
- }
- 
-+struct profile_allowlist_map {
-+	const char *name;
-+	const char *uuid;
-+	bool use_remote_uuid;
-+};
-+
-+/*
-+ * Adapter server policy UUID defaults to local_uuid when available.
-+ * Profiles listed below are exceptions where adapter-side server behavior
-+ * needs a different UUID source (e.g. A2DP source/sink role inversion) or
-+ * where server policy is derived from the profile remote_uuid.
-+ */
-+static const struct profile_allowlist_map profile_allowlist_map[] = {
-+	{ "a2dp-source", A2DP_SINK_UUID, false },
-+	{ "a2dp-sink", A2DP_SOURCE_UUID, false },
-+	{ "audio-avrcp-target", NULL, true },
-+	{ "avrcp-controller", NULL, true },
-+	{ "vcp", NULL, true },
-+	{ "micp", NULL, true },
-+	{ "ccp", NULL, true },
-+	{ "gmap", NULL, true },
-+	{ "tmap", NULL, true },
-+	{ "bass", NULL, true },
-+	{ "bap", NULL, true },
-+	{ "mcp-gmcs", NULL, true },
-+};
-+
-+static const char *profile_allowlist_uuid(const struct btd_profile *profile)
-+{
-+	size_t i;
-+
-+	if (profile->local_uuid)
-+		return profile->local_uuid;
-+
-+	if (!profile->name)
-+		return NULL;
-+
-+	for (i = 0; i < ARRAY_SIZE(profile_allowlist_map); i++) {
-+		const struct profile_allowlist_map *entry =
-+						&profile_allowlist_map[i];
-+
-+		if (strcmp(profile->name, entry->name))
-+			continue;
-+
-+		if (entry->use_remote_uuid)
-+			return profile->remote_uuid;
-+
-+		return entry->uuid;
-+	}
-+
-+	return NULL;
-+}
-+
-+static bool adapter_profile_is_allowed(struct btd_adapter *adapter,
-+					const struct btd_profile *profile)
-+{
-+	const char *uuid = profile_allowlist_uuid(profile);
-+
-+	if (!uuid)
-+		return true;
-+
-+	return btd_adapter_is_uuid_allowed(adapter, uuid);
-+}
-+
- static void probe_profile(struct btd_profile *profile, void *data)
- {
- 	struct btd_adapter *adapter = data;
-@@ -5209,6 +5286,11 @@ static void probe_profile(struct btd_profile *profile, void *data)
- 	if (profile->adapter_probe == NULL)
- 		return;
- 
-+	if (!adapter_profile_is_allowed(adapter, profile)) {
-+		DBG("%s blocked by admin allowlist", profile->name);
-+		return;
-+	}
-+
- 	err = profile->adapter_probe(profile, adapter);
- 	if (err < 0) {
- 		btd_error(adapter->dev_id, "%s: %s (%d)", profile->name,
-@@ -5219,6 +5301,63 @@ static void probe_profile(struct btd_profile *profile, void *data)
- 	adapter->profiles = g_slist_prepend(adapter->profiles, profile);
- }
- 
-+static void reapply_profile(struct btd_profile *profile, void *data)
-+{
-+	struct btd_adapter *adapter = data;
-+	bool active;
-+
-+	if (profile->adapter_probe == NULL)
-+		return;
-+
-+	active = g_slist_find(adapter->profiles, profile) != NULL;
-+
-+	if (adapter_profile_is_allowed(adapter, profile)) {
-+		if (!active)
-+			probe_profile(profile, adapter);
-+		return;
-+	}
-+
-+	if (!active)
-+		return;
-+
-+	adapter->profiles = g_slist_remove(adapter->profiles, profile);
-+
-+	if (profile->adapter_remove)
-+		profile->adapter_remove(profile, adapter);
-+}
-+
-+static void reapply_adapter_services(struct btd_adapter *adapter)
-+{
-+	sdp_list_t *l;
-+
-+	for (l = adapter->services; l != NULL;) {
-+		sdp_list_t *next = l->next;
-+		sdp_record_t *rec = l->data;
-+		char *svc_uuid;
-+
-+		svc_uuid = bt_uuid2string(&rec->svclass);
-+		if (!svc_uuid) {
-+			l = next;
-+			continue;
-+		}
-+
-+		if (!btd_adapter_is_uuid_allowed(adapter, svc_uuid))
-+			adapter_service_remove(adapter, rec->handle);
-+
-+		free(svc_uuid);
-+		l = next;
-+	}
-+}
-+
-+void btd_adapter_reapply_allowed_uuids(struct btd_adapter *adapter)
-+{
-+	if (!adapter || !adapter->initialized)
-+		return;
-+
-+	btd_profile_foreach(reapply_profile, adapter);
-+	reapply_adapter_services(adapter);
-+}
-+
- void adapter_add_profile(struct btd_adapter *adapter, gpointer p)
- {
- 	struct btd_profile *profile = p;
-diff --git a/src/adapter.h b/src/adapter.h
-index 4e07f71ad..cec528c56 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -295,6 +295,7 @@ bool btd_adapter_set_allowed_uuids(struct btd_adapter *adapter,
- 							struct queue *uuids);
- bool btd_adapter_is_uuid_allowed(struct btd_adapter *adapter,
- 							const char *uuid_str);
-+void btd_adapter_reapply_allowed_uuids(struct btd_adapter *adapter);
- 
- void btd_adapter_load_conn_param(struct btd_adapter *adapter,
- 				const bdaddr_t *peer, uint8_t bdaddr_type,
--- 
-2.43.0
+f0457842215438786e2e205ad06a4fbb8ab63cd0 is the first 'bad' commit
+commit f0457842215438786e2e205ad06a4fbb8ab63cd0
+Author: Chris Lu <chris.lu@mediatek.com>
+Date:   Thu Jul 4 14:01:13 2024 +0800
 
+    Bluetooth: btmtk: move btusb_mtk_hci_wmt_sync to btmtk.c
+
+    [ Upstream commit d019930b0049fc2648a6b279893d8ad330596e81 ]
+
+    Move btusb_mtk_hci_wmt_sync from btusb.c to btmtk.c which holds
+    vendor specific stuff and would make btusb.c clean.
+
+    Add usb.h header to btmtksdio.c/btmtkuart.c for usb related element
+    defined in btmtk.h
+
+    Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+    Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+    Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+    Stable-dep-of: dd1dda6b8d6e ("Bluetooth: btmtk: fix urb->setup_packet l=
+eak
+in error paths")
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+ drivers/bluetooth/btmtk.c     | 265 ++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btmtk.h     |  31 +++++
+ drivers/bluetooth/btmtksdio.c |   1 +
+ drivers/bluetooth/btmtkuart.c |   1 +
+ drivers/bluetooth/btusb.c     | 290 +-------------------------------------=
+----
+ 5 files changed, 305 insertions(+), 283 deletions(-)
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
