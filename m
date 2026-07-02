@@ -1,145 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 197BB4DC53B;
-	Thu,  2 Jul 2026 14:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87DE4DB566
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 14:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783001883; cv=none; b=Vd4HwFpYKCX1msnLB5+qQRe5nR183CVWwm7GnXoAZKXk7hlXru/r5/ge9azAmiAqHTBdkRXV5c6zletKR8SBNK/nHDach+xUrBazlywFBB5yrA3Wq/BbYR6je6ukcxZijrzevrLvIA2lJNozBV6NOnhz27ia9MW0mFP8D/uHMR0=
+	t=1783001916; cv=none; b=K25NiNwswzFOiODM0pMIqgB13UQQMpU7xXrh6kysz5W/+Z87nQB1J3iZ9/lRJeKCkkFl/Q9ZGv1jKuwXyv8lQR/gtfQFlcXHZVH5RzPA3ErYpbnUpJ1oh84zl8kNbGzyD5kX/jL0rN199aNq5C397yU/PQo7Lyn3Fs7zzEFHwrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783001883; c=relaxed/simple;
-	bh=vaX40iTlWpoIvTiV2p21NL1CN9B3FT5oe1ygQwdLAZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p20MAyQ2dsL83p6O8+ZxIuI+5kTc0JMD+JwZVfjYyn2+wGA0kb0sSw8iVYPlkvjgb2cUUvOCS3ov4nYCazY3BTGNiC3kOxW1FG16IGqhl5TBy63Rx8gv2rzDvtfqzXgUJRKLn/KfBpExoU/iMJN4ZWjGveY3b+IV/nITdxYloT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xx/a/TvM; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783001916; c=relaxed/simple;
+	bh=mT5SCpeEAHXkyS4AnLfK1nvRJqnS0rTW93vHIQ8Usuc=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WWkCBxrYHk4CFR+Kv+6hSU9I5EYwlAN6IMxhKOkwNAVwPSKTIYVE8T4UfWZkoWEY3uTM2Js4Ttd9cLpswYGTI8l/25BnE8x7UOQX7NADpM/+TuS+3O88jzeB5ekHRO8OA9FBWEnA6d9cgs7c0k/YXhcDrEjc9rb9npIeSZvJJ1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OXziG3ky; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xx/a/TvM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92EE31F000E9;
-	Thu,  2 Jul 2026 14:17:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783001873;
-	bh=9vXrBgiWOPMTNv950Pl4j8goBiF+aNfJS5Xso/tb3CQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Xx/a/TvMnOJ5BBmDN86goiyNT2JmCjIi1oEHX4FLSC1IixpblA4xHYShHZiT7Adb1
-	 7i61u/Oz88icbl/wdhf9YCJ0cMdyXWJFm9O/aJV5K0sS08LnW9E2e/xT9q1CIQTKKo
-	 TtjMImB+evL9gUWK2DQb8QdOYsf2dxNjQsyt+D0lIk3TmlXoXFy/FdOAQ7xwGVdJuZ
-	 xdHegE2Toa7/AOL7dC/fJ2WvOAzTnfsN6/JaEROqq5VGYSOlkYtO9jbSbuKoYEspni
-	 Fo0cgNPx8liBmx8/AbRdCS06Ik/KPhOf2d3+XzTyl36r6ZkeQ2bRKjPwV0VaFopx4n
-	 iGxx+9vJaFGjg==
-Date: Thu, 2 Jul 2026 16:17:43 +0200
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: Loic Poulain <loic.poulain@oss.qualcomm.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-pci@vger.kernel.org, 
-	linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
-	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-Subject: Re: [PATCH v2 3/4] Bluetooth: hci_qca: Support QCA2066 on M.2
- connector via pwrseq
-Message-ID: <rxt4n6vuscu33mrw24af72lb3s6urqfpkhtia44yfo4j7wtu6o@3xp57owekrgj>
-References: <20260702-monza-wireless-v2-0-7b56e2a6a6d4@oss.qualcomm.com>
- <20260702-monza-wireless-v2-3-7b56e2a6a6d4@oss.qualcomm.com>
- <43re752djujsh2kiyvjlkpmztxsh4atg6472qhir4lgay24zbo@mtlkn2xc2ors>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OXziG3ky"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 08B9DC2BCC6
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 14:18:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1783001916;
+	bh=mT5SCpeEAHXkyS4AnLfK1nvRJqnS0rTW93vHIQ8Usuc=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=OXziG3kyo7A71OpPFTTaFrhZUqA8ROdOLjGpDVJitNYH5q6Al+moaomU0ZTwlJRd5
+	 4Nuu+nlNZjEBDQ5yOooV9DPNQFpRZugIPQxVI8LIsf74/QU+IbclZEsk0h258YJXPM
+	 5HKm1hBFgROxhJQ4L3dlFm6ypJ0HqZRsoWc43Ui7flBlOAZYmu/BtAo64BkM+QmJJS
+	 PLXCmyKbNydQOHUZknxs0xIdMcu1hgADdi7aGEP6TttQ5C8fFgPxmHBbanHJZuOdaZ
+	 mg6mZQGdz9Xpl/n89HAQMpv8Mwud995D2OjoIir6U2gqkBeMdH4Cf+kSlk+ALBg8Az
+	 Z7LK+yxOgVHUw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id E4021C41612; Thu,  2 Jul 2026 14:18:35 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221696] btmtk: regression in 6.6.142: NULL pointer dereference
+ in btmtk_usb_hci_wmt_sync during resume from S4
+Date: Thu, 02 Jul 2026 14:18:35 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: kernel@mattwhitlock.name
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-221696-62941-JuxwMZrX0o@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221696-62941@https.bugzilla.kernel.org/>
+References: <bug-221696-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <43re752djujsh2kiyvjlkpmztxsh4atg6472qhir4lgay24zbo@mtlkn2xc2ors>
 
-On Thu, Jul 02, 2026 at 03:14:49PM +0300, Dmitry Baryshkov wrote:
-> On Thu, Jul 02, 2026 at 12:46:15PM +0200, Loic Poulain wrote:
-> > For QCA2066 (and other QCA chips) on M.2 connectors, the UART enable
-> > is controlled by the W_DISABLE2# signal managed by the pcie-m2 power
-> > sequencer rather than a dedicated BT enable GPIO.
-> > 
-> > When the serdev controller has an OF graph (indicating it is connected
-> > to an M.2 connector), acquire the 'uart' pwrseq target from the
-> > connector's power sequencer and use it to control BT power instead of
-> > the bt-enable GPIO.
-> > 
-> > Also allocate bt_power unconditionally for all SOC types since the
-> 
-> Can we just fold it into the main struct?
-> 
-> > pwrseq path is independent of the SOC type switch.
-> > 
-> > Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> > ---
-> >  drivers/bluetooth/hci_qca.c | 81 ++++++++++++++++++++++++---------------------
-> >  1 file changed, 43 insertions(+), 38 deletions(-)
-> > 
-> > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> > index e09debdb00a1b8e74ccd5de6147e240e533b4594..b04593a96e14ac9e87ae76fa00eda308e81dea25 100644
-> > --- a/drivers/bluetooth/hci_qca.c
-> > +++ b/drivers/bluetooth/hci_qca.c
-> > @@ -1872,6 +1872,9 @@ static int qca_power_on(struct hci_dev *hdev)
-> >  			/* Controller needs time to bootup. */
-> >  			msleep(150);
-> >  		}
-> > +
-> > +		if (qcadev->bt_power->pwrseq)
-> > +			pwrseq_power_on(qcadev->bt_power->pwrseq);
-> >  	}
-> >  
-> >  	clear_bit(QCA_BT_OFF, &qca->flags);
-> > @@ -2256,7 +2259,7 @@ static void qca_power_off(struct hci_uart *hu)
-> >  		break;
-> >  	}
-> >  
-> > -	if (power && power->pwrseq) {
-> > +	if (power->pwrseq) {
-> >  		pwrseq_power_off(power->pwrseq);
-> >  		set_bit(QCA_BT_OFF, &qca->flags);
-> >  		return;
-> > @@ -2387,6 +2390,35 @@ static int qca_init_regulators(struct qca_power *qca,
-> >  	return 0;
-> >  }
-> >  
-> > +/*
-> > + * Acquire the M.2 connector power sequencer.
-> > + *
-> > + * An OF graph link on the serdev controller is only present when the BT
-> > + * device is attached through an M.2 Key E connector. In that case the UART
-> > + * enable (W_DISABLE2#) is driven by the pcie-m2 power sequencer instead of a
-> > + * dedicated BT enable GPIO, so grab the "uart" pwrseq target from it.
-> > + *
-> > + * Returns 0 if no M.2 connector is present (nothing to do), a negative errno
-> > + * on error, otherwise 0 with qcadev->bt_power->pwrseq populated.
-> > + */
-> > +static int qca_serdev_get_m2_pwrseq(struct qca_serdev *qcadev, bool *bt_en_available)
-> > +{
-> > +	struct serdev_device *serdev = qcadev->serdev_hu.serdev;
-> > +	struct device *dev;
-> > +
-> > +	if (!of_graph_is_present(dev_of_node(&serdev->ctrl->dev)))
-> > +		return 0;
-> > +
-> > +	qcadev->bt_power->pwrseq = devm_pwrseq_get(&serdev->ctrl->dev, "uart");
-> > +	if (IS_ERR(qcadev->bt_power->pwrseq))
-> > +		return PTR_ERR(qcadev->bt_power->pwrseq);
-> > +
-> > +	dev = pwrseq_to_device(qcadev->bt_power->pwrseq);
-> > +	*bt_en_available = device_property_present(dev, "w-disable2-gpios");
-> 
-> I think here you are looking into the exact details of the other of the
-> graph. There might be other devices on that side, while the code now
-> assumes M.2. Or, consider having an M.2 controller which handles
-> W_DISABLE2# internally rather than through the GPIO.
-> 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221696
 
-This code only deals with M.2 connector in specific, so I'm not sure why we need
-to worry about *other* kind of devices. Let's worry about them when they show up
-(with graph interface ofc).
+--- Comment #8 from Matt Whitlock (kernel@mattwhitlock.name) ---
+I've figured out where the bisection went wrong. It isn't sufficient to tell
+Git that a commit that exhibits the bug is "old" and one that doesn't is "n=
+ew"
+because git-bisect actually wants to test some commits that do not have the
+bug-introducing commit as an ancestor.
 
-- Mani
+So, at each step of the bisection, I have to manually check that the
+bug-introducing commit (d019930b0049fc2648a6b279893d8ad330596e81) is actual=
+ly
+an ancestor of the current bisection step, and if it isn't, then the current
+step is definitionally "old":
 
--- 
-மணிவண்ணன் சதாசிவம்
+$ git merge-base --is-ancestor \
+      d019930b0049fc2648a6b279893d8ad330596e81 BISECT_HEAD ||
+  git bisect old
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
