@@ -1,64 +1,64 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E88F4E3784
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 14:42:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66896306B1B
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 14:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783003340; cv=none; b=TIHvDjBS5EcDz6FAzbJH9wbSYgH+0TokUl9uJ795ZazqLJv7f8K4KhRcnitxhkCU/8RFjNBVIGAQzYr1wbXhwCWgjyW8fLKBTqInX5N4H7Ol4f5ELkgeM8KImUdn2lO+eHR4s0I4CXdMPtSreL8tqYNw4ieFsWqqf+xyhAyihd8=
+	t=1783003341; cv=none; b=Fby94jeU4soUDA2woJwELtD96aH3MFv3ifgqx2/2/eOGAMJH301t3jcCVK/cAZ61q2WAjxcArMeV3Fs7VdYQzK6jglVY+Qo9VtMb4tPrmhuDljYfrK5LPVHwy5LsNKuW8ciUSsFjMWwoZBvXEOV1e0AUCbamxOmvS0tpLGZ2NHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783003340; c=relaxed/simple;
-	bh=VxFKVtox8xsppBVyhlslMwiSu0XXvRSjUt1HUa15Zew=;
+	s=arc-20240116; t=1783003341; c=relaxed/simple;
+	bh=BLdy5RYwwnxwI12/reMngqLlpG0q24uuDZT8WAkw5pI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sj1ICVqKrBYjBE/aRljFtFXQ8k5VDfB7uoeo1IjExOB14eY9xTmpyg0TIrZro4ZSJ2gFQwx93o31swUZC70lDTEq6bNNZvNrWSwX+IrQWWl7WFMbJt0UkgoS2x8sLg7ajlVD0ihuGL9jaKudYZoFE/DRE3W56ltW6xoTFTP6Kjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qlN6P/Rn; arc=none smtp.client-ip=209.85.222.173
+	 MIME-Version; b=cqzSmsjmzEcU0OW1nzfiE0H9zhlZtAxqRDPZ+jvhW89usKq9B6xATZ6JVf5Z85+ApCP87aru7Ca2kUhHFnKdh5Nw77q6Pu19byTOjfYM3iby8Zd32bFGI1Q4FZ6wMnSy4/a9E1DAAyTwe9STjPgAzMyI4mrpSjMPdj0iU1rNU8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kpHQXqCh; arc=none smtp.client-ip=209.85.222.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qlN6P/Rn"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-92e533aacf2so98528585a.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jul 2026 07:42:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kpHQXqCh"
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-92e54f8c051so95095085a.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jul 2026 07:42:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783003338; x=1783608138; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783003337; x=1783608137; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/oK8EJbyVF51Eyz5/SArRDnf9pZh/+PNn1rq0K2zPYs=;
-        b=qlN6P/RnYsxJAfAd/LHhFf9Ilqf7Gf0dMtu3yxxNlRVjLyjiai/0lBR7tAGHhj7p/m
-         FqOK3fsU5fun9LTo2xfppTEffgbMYUopiL/54tWfQDXebGX4fL24FQ/onoKDtWvPnbIo
-         m9lEFGZZ0x0xpHeZMYJmsaezvBduEf7oNbcdqmnAeJt73gF8dAk411eJVkl48Q1Hk4Oj
-         LGd7i0FaCJfUFDFw2C2tGDNX5R5mqSnGtvZAN4hDRgp6WLKNElHfm4QgSJZcIApZFoSb
-         0N8cKO9LfrSFD9YSgvbI+MkQCpc0H9ppQinIiiwP5oP78H2fJku4EUpFeQ4422DRwAPP
-         jkIQ==
+        bh=FDc1M3fzwyIo252qDTRE7KflfviUkXRwK1adxDoa5h8=;
+        b=kpHQXqChcKGMDbWjy+8IxNFzWWb08y7SEJrQFSJXZFUaXLvkAePKa+F+Ly8CyCeyo4
+         n8uYivqCyeubwp23I2rsZHdX/Mgb2zbmb32xGPlfV46Hp35kWGQc49j6qGogArE5FT8N
+         5XanaoKJQ6HYGXpJ3VQp2SCnzn/J21PHUIYfajml3zgCHSeMcRgPKaACIW23VMZa27q6
+         8AF7LyTzfmaMOmWoCbFAR7iZ5X9jZQRBl/m49Pr8rCb6askpqi88husfJ9cPF+uWlhiV
+         qvxSJHmdPKhI0Bf4aQ5y1kqLS878H2GjvlGYCh3TvT9I8iCwnA4uYIcLmSDi4FVIdeXH
+         SRfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783003338; x=1783608138;
+        d=1e100.net; s=20251104; t=1783003337; x=1783608137;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=/oK8EJbyVF51Eyz5/SArRDnf9pZh/+PNn1rq0K2zPYs=;
-        b=U7YcLUJKqtyaU923VzSLO3d/ndbabS8D76ABAjopkXTY18irzlOKAVBnSPaGmPzNxN
-         672PngGyuxemo0EXrU5iWXEqDoKwLXbRQpH7MF0p80OxYhWx3j6LPlv7Lcjh0jDu2kEX
-         W4O2nZyVMVV/5AINv2KlQIwfsAcNW9ZIBELE6dsnvo899MiEHnNT0BFFRCt8Dt2wD1uv
-         Z62H1W593HcAf3pY1R5UgJwamtPdpFu5zKRUgX/bhrtlSTSueFHNqBMQFaf1R+1L7q7n
-         R2xE5GgdWCeqsC/tv1Vk5jgA8F9kgO1R3lNjBQx/hLIsgztHlR539Rh5c8EbY//hU6yg
-         zggQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+4MdNHnT2ozoTA6zsnpROfwFj6RG4EgJimGkBywrF4upfRSijCWhiY7myn4z2O8IsrVZYsv0I+wBF0VZh1h4Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/a8u2wHQrM8FtgLegWdumKACggLL56Rt6JZYSe2A5LJTRV0f7
-	QZbAk5k+k55SSEedJO4kYQKXshxrKxBLwzZzpwjRNo8ADapEQMbe9j0l
-X-Gm-Gg: AfdE7ckA/cdh14nloifT1kU96NxCWshRNIAwfXyKu9+0Grko8AUTlh6VMzfSqEoIlX0
-	PDjM2fkp49R/9LVRmJOCyp4IVkdbeltDDxcKIO91cqDvJzgx59W6ldPuIPzJC2SbqszchaCBOcl
-	IGNrRuJH/Xt85UqlKKg36fbAWT+h1oiQDY7GanTHOPZGmVtl5bONYwwxBjErsX09xsJIoF3feAV
-	CHa1GOHVmO+TvqOOCOCLeFeKqGw31FWuJRLXS6Ui5t65hoE3sPqNvBy2eIV/GWgZM+ZksBie5ol
-	GuMbaO5iYo7YWvs+I/Hldq+p+jRxe5FM6DyOcaxAYHlGFc4M6wTOI/57CUvL3JYzWBGLGKHWBOi
-	EjQVsoP5ad21swrnrEBDeEPyqArcPe9lsjqpGsoVnqJ/Vo7hLrjZfzcqry55lYdTZFgpVzg80CB
-	RDVbFAn6idKnFWyzMVi1NToeRC1q+Mfzp7mqYYjU3j9ybiebEhak50JI0nj7QKzkOATAGglqVKX
-	yRxW6bOCVSFjEESVQ46JgGTC1Y5dYgk1Uht
-X-Received: by 2002:a05:620a:45aa:b0:915:8502:f7f9 with SMTP id af79cd13be357-92e7b0579d3mr729021785a.31.1783003338151;
-        Thu, 02 Jul 2026 07:42:18 -0700 (PDT)
-Received: from jeremy.kali (srv1619992.hstgr.cloud. [2a02:4780:75:55a3::1])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-92e800146acsm236934785a.13.2026.07.02.07.42.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        bh=FDc1M3fzwyIo252qDTRE7KflfviUkXRwK1adxDoa5h8=;
+        b=Ywnf5V4p45SCNQx3sZPOmqMF+ShIeocmKIBp9dY+Ml+F3Yt+3XY/96SgRLTa/0HZF6
+         BgxEkMggmfbk893Qe7aG9pV4y8dtlkfBaAXSG+2pNImH9eKKVp95CXA3iGpheBuMVcm+
+         HQRtCm7IuMHJQjjxWyjLiFyrvzEN/TniQihmeR/f+rPl9LAqpMG54+tlQS/JQlvR+wSj
+         Pi3WSLmQFdMAm73ezTH7sZHCOQ/XERCCX1Yidkjh3gSfEgTGtZH8dWTIFLm1p5j47oG/
+         z30tLIm+YhxxVKq5E65zhSy2GTcwdhqyPT8zsG+pdmCwJhfjMOpW4/r+MJtE/d57RXHO
+         sbjA==
+X-Forwarded-Encrypted: i=1; AFNElJ8vjaPHCHW7N3IKFUJTbbyHx5aBOKtWhj55wcRbA+rskNvhbm0965qhH73ZDseo6uPMKE6e7RS+BfUFvJG0iDo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywg5u0CaTEJcqLu2lIpEjX/tnYC/FjTb7OyzmRn5oUJfYROlPrW
+	dPjuWbCZnz3ckfJG2oocYTlq2pIYFuHFfKozzFCRS4Yhrbw8qqrMfcWV
+X-Gm-Gg: AfdE7cl1EOUgYY29n1xP+EVOsMKezT0UBFdTxgp9kerhzOu7Hfd8OuPcjpI/2naihQs
+	NJqJhGO9z7H8vFKl2S3doD3xVfvhwmRrYVTj5N6247pAKzmxnkwl/2RQhsdd69nEnLSZZAjr10Y
+	tLziHSnhin1iWGe53onMJJe50p5XpSVNnZM/LTLwofnjJ+vOkxRVpr9xsWi7Qbpcvk9wvnpQXTD
+	m0u6etxuXy9rEBTNS7Xoh7QRNms4Lvg7aMi0x7k6ln1PQLOAxR2l0KWtEECyuFMM5aVJArc6Hgd
+	zJlEHlqsNVfQxTw/ycwqsvT4KJmaJ6z7rbkvLEeuSoDsitUQe8MLaS3eK2jmQmYLBzQlOjefosx
+	2mVC2UlmwM8R2TlAcDj+qJp0Om6ojY6cnRbvaqViuKkIJk+jMeDACojZ5TKNCw3KCH4d5QBwifW
+	9r3DlFjhBNHS8BMBN0yROKxSwEyNyMDZ3C4jUol79WTTY3Y85re8Ksl38za70ejZ7hJM/IMFZq2
+	kC1Yqt8LUYB1G0Jpr9sbQlanwtSg/rEJHbd
+X-Received: by 2002:a05:620a:1a22:b0:92e:4dd2:bb24 with SMTP id af79cd13be357-92e784d10d5mr843521285a.39.1783003337207;
         Thu, 02 Jul 2026 07:42:17 -0700 (PDT)
+Received: from jeremy.kali (srv1619992.hstgr.cloud. [2a02:4780:75:55a3::1])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-92e800146acsm236934785a.13.2026.07.02.07.42.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jul 2026 07:42:16 -0700 (PDT)
 From: Jeremy Erazo <mendozayt13@gmail.com>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -70,9 +70,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Jeremy Erazo <mendozayt13@gmail.com>
-Subject: [PATCH 2/2 6.1.y] Bluetooth: ISO: Copy BASE if service data matches EIR_BAA_SERVICE_UUID
-Date: Thu,  2 Jul 2026 14:42:07 +0000
-Message-ID: <20260702144207.320421-3-mendozayt13@gmail.com>
+Subject: [PATCH 1/2 6.6.y] Bluetooth: ISO: Copy BASE if service data matches EIR_BAA_SERVICE_UUID
+Date: Thu,  2 Jul 2026 14:42:06 +0000
+Message-ID: <20260702144207.320421-2-mendozayt13@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260702144207.320421-1-mendozayt13@gmail.com>
 References: <20260702144207.320421-1-mendozayt13@gmail.com>
@@ -92,8 +92,8 @@ the service UUID is Basic Audio Announcement Service UUID.
 [Stable backport rationale]
 
 This fix landed in mainline v6.7 without a Fixes: tag, so the stable
-autoselect bot never picked it up.  linux-6.1.y HEAD (v6.1.176) still
-carries the pre-fix code at net/bluetooth/iso.c:1613:
+autoselect bot never picked it up.  linux-6.6.y HEAD (v6.6.143) still
+carries the pre-fix code at net/bluetooth/iso.c:1935:
 
 	if (sk) {
 		memcpy(iso_pi(sk)->base, ev3->data, ev3->length);
@@ -113,53 +113,53 @@ The upstream refactor addresses this by:
      the PA payload is copied.
   2. Bounding the copy with base_len <= sizeof(iso_pi(sk)->base).
 
-Backport notes for 6.1.y:
-  * eir_get_service_data() is already declared in net/bluetooth/eir.h.
-  * The header include for eir.h and the EIR_BAA_SERVICE_UUID define
-    are added here, matching the upstream commit.
-  * The put_user() addition in iso_sock_getsockopt() that was part of
-    the same upstream commit is not included; that hunk is a separate
-    getsockopt correctness fix and is not required for the OOB write
-    fix (getsockopt(BT_ISO_BASE) is a controlled path that already
-    validates optlen against sizeof(iso_pi(sk)->base)).  Applying the
-    getsockopt hunk here would risk a user-visible ABI change on a
-    stable branch.
+The refactor applies cleanly against v6.6.143 - eir_get_service_data(),
+EIR_BAA_SERVICE_UUID, and BASE_MAX_LENGTH already exist in the 6.6.y
+tree.
 
 Reachability: any host with an ISO listening socket bound as a
 broadcast sink (LE Audio / Auracast).  No pairing required.
 
 Fixes: 9c0826310bfb ("Bluetooth: ISO: Add support for periodic adv reports processing")
-Cc: stable@vger.kernel.org # 6.1.y
+Cc: stable@vger.kernel.org # 6.6.y
 Signed-off-by: Claudia Draghicescu <claudia.rosu@nxp.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-[jerazo: backport to 6.1.y; add #include "eir.h" and EIR_BAA_SERVICE_UUID define; drop unrelated getsockopt hunk]
+[jerazo: backport to 6.6.y, no context conflicts]
 Signed-off-by: Jeremy Erazo <mendozayt13@gmail.com>
 ---
- net/bluetooth/iso.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ net/bluetooth/iso.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 7ea3e6335..6b8622bec 100644
+index 011b2187b..8843bd5c5 100644
 --- a/net/bluetooth/iso.c
 +++ b/net/bluetooth/iso.c
-@@ -14,6 +14,8 @@
+@@ -14,6 +14,7 @@
+ #include <net/bluetooth/bluetooth.h>
  #include <net/bluetooth/hci_core.h>
  #include <net/bluetooth/iso.h>
- 
 +#include "eir.h"
-+
+ 
  static const struct proto_ops iso_sock_ops;
  
- static struct bt_sock_list iso_sk_list = {
-@@ -46,6 +48,7 @@ static void iso_sock_kill(struct sock *sk);
+@@ -47,6 +48,7 @@ static void iso_sock_kill(struct sock *sk);
  
  #define EIR_SERVICE_DATA_LENGTH 4
  #define BASE_MAX_LENGTH (HCI_MAX_PER_AD_LENGTH - EIR_SERVICE_DATA_LENGTH)
 +#define EIR_BAA_SERVICE_UUID	0x1851
  
- struct iso_pinfo {
- 	struct bt_sock		bt;
-@@ -1606,12 +1609,16 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ /* iso_pinfo flags values */
+ enum {
+@@ -1587,6 +1589,8 @@ static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
+ 		len = min_t(unsigned int, len, base_len);
+ 		if (copy_to_user(optval, base, len))
+ 			err = -EFAULT;
++		if (put_user(len, optlen))
++			err = -EFAULT;
+ 
+ 		break;
+ 
+@@ -1928,12 +1932,16 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
  
  	ev3 = hci_recv_event_data(hdev, HCI_EV_LE_PER_ADV_REPORT);
  	if (ev3) {
