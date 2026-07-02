@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9833E33A00C
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 08:36:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A004042A7B8
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 08:36:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782981418; cv=none; b=tpiEzAUXWhfwF9j1FbAzkF3lg6MGXY0bSNL1zPRKgdNTdczI3ZTb7XF/Kxlg9d+g7HOhrAU6fwRs2cmMnPHGQCaPcIDaLrqIkSUI+wI8s9haRiEgzfLxZYWLCsrhfH0F1Mc11B0S9zmvyFBdfIhXQqVTzVeh4NjTUquSsIbetA8=
+	t=1782981419; cv=none; b=BUFB/98/fO1IVRKpfu3ACWU+slfrTkwCWC6yjMEHi0jUX+ue2qzTIRKJozzpA6zRNfcH0C6DI63hdV24KCfjg/+SNoIcPPLI3+ravRgdrSl/E7fwFTJ9MP3ly6eHT82BU/Pdz1lzlCf1I/ntXlNH5GWGwttzTH7Bq7mB1Cx7s0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782981418; c=relaxed/simple;
-	bh=+V/eeusjVH2yoBpHBsJX7+S7BJTYKKjLiV3AruSJr5M=;
+	s=arc-20240116; t=1782981419; c=relaxed/simple;
+	bh=yIOZupxsXJTLr/7IAkr2LHb6AKXwcSSxMTxNPONUFss=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I0a5q4HQnxRJTEwTPOzNaZAvzFgGsOAcczMQgxrbBCjk+NvF84EBb38MPpXCx3ICB3wDRU6t27RYsF1KuVkimKawKiLHHcDoKb3QLV7T1tY1FJLs9xce263QasDpUVbTit2uL22iNZpPikOBtWqBFYYtSvRAML/JSDlL20yLHw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=pEGoB1l3; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=Ng66olFrEysGUwQCTjpo5CdGPY7gJvZJeTCCaz5LV5fATYCVRom1xVVIOlB8Y6Q+K+qrQ61riReSn8c3h7E7ry0YRcfpHPTyxXRp4VN80Dpa83QNngjokPjiNbxKtasjecKOa8a5q1MMdDFS+Gml53TCrguHBMC/zsmLXu6Xxf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=PlT9/3MQ; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="pEGoB1l3"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="PlT9/3MQ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1782981411;
-	bh=+V/eeusjVH2yoBpHBsJX7+S7BJTYKKjLiV3AruSJr5M=;
+	s=mail; t=1782981410;
+	bh=yIOZupxsXJTLr/7IAkr2LHb6AKXwcSSxMTxNPONUFss=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=pEGoB1l3B0Zzu9K5smYNv2amyCrKKz8PUMnQLuodcMYQAvPTnknAXLNiB0EmgDg7u
-	 TfRmkzScG/igfNXvER/xm+w8O8qUK5nBC7U4nmp1DXjyj0duYhMevt/SgHotBBiK4E
-	 Fm5TnD/s6nBoy6dWcGBuu9tF0oMeEi6eQxV7SfTK8eGjccrjZvSuwhYKWqdq53xJZN
-	 yccd2009+P2yw6rnt3z8B/EaFygbulFWpV+lalB6Js7+H9JHGuRmg5o3NQCJs47QsH
-	 zTUWsrbsPDC2QslsydUTReTWiojbh6gixGNFXru+GLrN+PSwL3Pqe72mUwcW3xBBMS
-	 jj2COcY7Ex2hw==
+	b=PlT9/3MQeJdSxLe+9R4P3GVJzjbMoNduJ7uyE6imHRaipHWpl8II/n7EkyLN3uRK3
+	 3JxGjWy9nE302FVrBlkxWafuTjZ0O14dtRhdcSsRY9HTzens+LC4a+Szv3qovEJIx+
+	 OlTPYmS+aH/Bab9X0Ht1NzRMAX6ZZaixCJeir/dMwYOUyo4oAmvrIn0wYNpFPQZs0h
+	 Q1U6LeAcM/hd8sMaGXhxeT58QA9yR8qX6zsUovzTreG3eqhdkHGwdQKLt1Mq7ff1Cr
+	 fRicyG02AJMYZKx2RPOZZHL+c15mKMgXkGKikTQo7+C0g4PKhZo9Vr5NyY+1fg0y0A
+	 I5SujrcwZJuBA==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id DD14A17E0128
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 9944817E010F
 	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 10:36:50 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/7] doc: document admin.allow optional controller argument
-Date: Thu,  2 Jul 2026 10:36:37 +0200
-Message-ID: <20260702083641.378994-3-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ 2/7] client/bluetoothctl: make admin.allow controller-aware
+Date: Thu,  2 Jul 2026 10:36:36 +0200
+Message-ID: <20260702083641.378994-2-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260702083641.378994-1-frederic.danis@collabora.com>
 References: <20260702083641.378994-1-frederic.danis@collabora.com>
@@ -50,73 +50,291 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Update bluetoothctl usage to 'admin.allow [ctrl] [clear/uuid1 uuid2 ...]'
-and add explicit controller examples.
+Teach admin.allow to target the selected default controller when no
+controller is provided, and to accept an explicit [ctrl] argument.
 
-Refresh AdminPolicySet examples to include the controller-qualified
-admin.allow form.
+Replace single cached AdminPolicy proxies with per-controller proxy
+lookup keyed by controller object path, so controller selection changes
+are respected.
+
+Export controller lookup/default helpers and shared controller
+completion from main.c for reuse by admin.c.
 
 Assisted-by: GPT:GPT-5.3-Codex
 ---
- doc/bluetoothctl-admin.rst       | 13 +++++++++++--
- doc/org.bluez.AdminPolicySet.rst |  1 +
- 2 files changed, 12 insertions(+), 2 deletions(-)
+ client/admin.c | 114 ++++++++++++++++++++++++++++++++++++++-----------
+ client/admin.h |   4 ++
+ client/main.c  |  25 +++++++++--
+ 3 files changed, 116 insertions(+), 27 deletions(-)
 
-diff --git a/doc/bluetoothctl-admin.rst b/doc/bluetoothctl-admin.rst
-index d4446ce95..ce15b8728 100644
---- a/doc/bluetoothctl-admin.rst
-+++ b/doc/bluetoothctl-admin.rst
-@@ -9,7 +9,7 @@ Admin Policy Submenu
- :Version: BlueZ
- :Copyright: Free use of this software is granted under the terms of the GNU
-             Lesser General Public Licenses (LGPL).
--:Date: November 2022
-+:Date: June 2026
- :Manual section: 1
- :Manual group: Linux System Administration
+diff --git a/client/admin.c b/client/admin.c
+index dc218ed2c..584d4630b 100644
+--- a/client/admin.c
++++ b/client/admin.c
+@@ -16,6 +16,7 @@
+ #include <string.h>
+ #include <stdlib.h>
  
-@@ -30,15 +30,22 @@ allow
++#include "bluetooth/bluetooth.h"
+ #include "gdbus/gdbus.h"
+ #include "src/shared/shell.h"
  
- Allow service UUIDs and block rest of them.
+@@ -23,27 +24,79 @@
+ #define _GNU_SOURCE
  
--:Usage: **> allow [clear/uuid1 uuid2 ...]**
-+:Usage: **> allow [ctrl] [clear/uuid1 uuid2 ...]**
-+:[ctrl]: Bluetooth controller address (optional; defaults to the selected controller)
- :Uses: **org.bluez.AdminPolicySet(5)** property **ServiceAllowList**
- :[clear/uuid1 uuid2 ...]: List of service UUIDs to allow, or "clear" to remove all restrictions
- :Example Get current allowed UUIDs list:
- 	| **> allow**
-+:Example Get current allowed UUIDs list for a specific controller:
-+	| **> allow 00:11:22:33:44:55**
- :Example Allow Serial Port Profile only:
- 	| **> allow 0x1101**
-+:Example Allow Serial Port Profile on a specific controller:
-+	| **> allow 00:11:22:33:44:55 0x1101**
- :Example Allow Serial Port Profile and LAN Access Profile:
- 	| **> allow 0x1101 0x1102**
-+:Example Allow Serial Port Profile and LAN Access Profile on a specific controller:
-+	| **> allow 00:11:22:33:44:55 0x1101 0x1102**
- :Example Allow Serial Port Profile, LAN Access Profile, and Dialup Networking Profile:
- 	| **> allow 0x1101 0x1102 0x1103**
- :Example Allow Advanced Audio Distribution Profile only:
-@@ -51,6 +58,8 @@ Allow service UUIDs and block rest of them.
- 	| **> allow 00001101-0000-1000-8000-00805f9b34fb 00001102-0000-1000-8000-00805f9b34fb**
- :Example Remove all UUID restrictions:
- 	| **> allow clear**
-+:Example Remove all UUID restrictions on a specific controller:
-+	| **> allow 00:11:22:33:44:55 clear**
- :Example Allow SPP, LAP, and DUN using mixed UUID formats:
- 	| **> allow 0x1101 00001102-0000-1000-8000-00805f9b34fb 0x1103**
+ static DBusConnection *dbus_conn;
+-static GList *admin_proxies;
+-static GDBusProxy *set_proxy;
+-static GDBusProxy *status_proxy;
++static GList *set_proxies;
++static GList *status_proxies;
  
-diff --git a/doc/org.bluez.AdminPolicySet.rst b/doc/org.bluez.AdminPolicySet.rst
-index db132b7de..29fe3bdf7 100644
---- a/doc/org.bluez.AdminPolicySet.rst
-+++ b/doc/org.bluez.AdminPolicySet.rst
-@@ -55,3 +55,4 @@ Possible errors:
- Examples:
+ static void admin_menu_pre_run(const struct bt_shell_menu *menu);
  
- :bluetoothctl: > admin.allow [clear/uuid1 uuid2 ...]
-+:bluetoothctl: > admin.allow [ctrl] [clear/uuid1 uuid2 ...]
+-static void admin_policy_set_set_proxy(GDBusProxy *proxy)
++static GDBusProxy *admin_policy_find_proxy(GList *proxies,
++						const char *path)
+ {
+-	set_proxy = proxy;
++	GList *list;
++
++	for (list = g_list_first(proxies); list; list = g_list_next(list)) {
++		GDBusProxy *proxy = list->data;
++
++		if (!strcmp(g_dbus_proxy_get_path(proxy), path))
++			return proxy;
++	}
++
++	return NULL;
++}
++
++static GDBusProxy *admin_policy_get_status_proxy(const char *controller_path)
++{
++	if (!controller_path)
++		return NULL;
++
++	return admin_policy_find_proxy(status_proxies, controller_path);
++}
++
++static GDBusProxy *admin_policy_get_set_proxy(const char *controller_path)
++{
++	if (!controller_path)
++		return NULL;
++
++	return admin_policy_find_proxy(set_proxies, controller_path);
+ }
+ 
+-static void admin_policy_set_status_proxy(GDBusProxy *proxy)
++static GDBusProxy *admin_policy_get_controller(int argc, char *argv[],
++						int *arg_index)
+ {
+-	status_proxy = proxy;
++	GDBusProxy *controller;
++
++	*arg_index = 1;
++
++	if (argc > 1 && strlen(argv[1])) {
++		controller = bluetoothctl_find_controller(argv[1]);
++		if (controller) {
++			*arg_index = 2;
++			return controller;
++		}
++
++		if (bachk(argv[1]) == 0) {
++			bt_shell_printf("Controller %s not available\n",
++								argv[1]);
++			return NULL;
++		}
++	}
++
++	controller = bluetoothctl_get_default_controller();
++	if (controller)
++		return controller;
++
++	bt_shell_printf("No default controller available\n");
++	return NULL;
+ }
+ 
+-static void admin_policy_read_service_allowlist(DBusConnection *dbus_conn)
++static void admin_policy_read_service_allowlist(GDBusProxy *controller)
+ {
+ 	DBusMessageIter iter, subiter;
++	GDBusProxy *status_proxy;
+ 	char *uuid = NULL;
++	const char *controller_path = g_dbus_proxy_get_path(controller);
+ 
++	status_proxy = admin_policy_get_status_proxy(controller_path);
+ 	if (!status_proxy || !g_dbus_proxy_get_property(status_proxy,
+ 						"ServiceAllowList", &iter)) {
+ 		bt_shell_printf("Failed to get property\n");
+@@ -106,10 +159,14 @@ static void set_service_reply(DBusMessage *message, void *user_data)
+ 	return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ }
+ 
+-static void admin_policy_set_service_allowlist(int argc, char *argv[])
++static void admin_policy_set_service_allowlist(GDBusProxy *controller,
++						int argc, char *argv[])
+ {
+ 	struct uuid_list_data data;
++	GDBusProxy *set_proxy;
++	const char *controller_path = g_dbus_proxy_get_path(controller);
+ 
++	set_proxy = admin_policy_get_set_proxy(controller_path);
+ 	if (!set_proxy) {
+ 		bt_shell_printf("Set proxy not ready\n");
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+@@ -128,15 +185,23 @@ static void admin_policy_set_service_allowlist(int argc, char *argv[])
+ 
+ static void cmd_admin_allow(int argc, char *argv[])
+ {
+-	if (argc <= 1) {
+-		admin_policy_read_service_allowlist(dbus_conn);
++	GDBusProxy *controller;
++	int arg_index;
++
++	controller = admin_policy_get_controller(argc, argv, &arg_index);
++	if (!controller)
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
++	if (argc <= arg_index) {
++		admin_policy_read_service_allowlist(controller);
+ 		return;
+ 	}
+ 
+-	if (strcmp(argv[1], "clear") == 0)
+-		argc--;
++	if (strcmp(argv[arg_index], "clear") == 0)
++		arg_index++;
+ 
+-	admin_policy_set_service_allowlist(argc - 1, argv + 1);
++	admin_policy_set_service_allowlist(controller, argc - arg_index,
++						argv + arg_index);
+ }
+ 
+ static const struct bt_shell_menu admin_menu = {
+@@ -144,15 +209,15 @@ static const struct bt_shell_menu admin_menu = {
+ 	.desc = "Admin Policy Submenu",
+ 	.pre_run = admin_menu_pre_run,
+ 	.entries = {
+-	{ "allow", "[clear/uuid1 uuid2 ...]", cmd_admin_allow,
+-				"Allow service UUIDs and block rest of them"},
++	{ "allow", "[ctrl] [clear/uuid1 uuid2 ...]", cmd_admin_allow,
++				"Allow service UUIDs and block rest of them",
++				bluetoothctl_controller_generator},
+ 	{} },
+ };
+ 
+ static void admin_policy_status_added(GDBusProxy *proxy)
+ {
+-	admin_proxies = g_list_append(admin_proxies, proxy);
+-	admin_policy_set_status_proxy(proxy);
++	status_proxies = g_list_append(status_proxies, proxy);
+ }
+ 
+ static void proxy_added(GDBusProxy *proxy, void *user_data)
+@@ -162,15 +227,14 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ 	interface = g_dbus_proxy_get_interface(proxy);
+ 
+ 	if (!strcmp(interface, "org.bluez.AdminPolicySet1"))
+-		admin_policy_set_set_proxy(proxy);
++		set_proxies = g_list_append(set_proxies, proxy);
+ 	else if (!strcmp(interface, "org.bluez.AdminPolicyStatus1"))
+ 		admin_policy_status_added(proxy);
+ }
+ 
+ static void admin_policy_status_removed(GDBusProxy *proxy)
+ {
+-	admin_proxies = g_list_remove(admin_proxies, proxy);
+-	admin_policy_set_status_proxy(NULL);
++	status_proxies = g_list_remove(status_proxies, proxy);
+ }
+ 
+ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+@@ -180,7 +244,7 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+ 	interface = g_dbus_proxy_get_interface(proxy);
+ 
+ 	if (!strcmp(interface, "org.bluez.AdminPolicySet1"))
+-		admin_policy_set_set_proxy(NULL);
++		set_proxies = g_list_remove(set_proxies, proxy);
+ 	else if (!strcmp(interface, "org.bluez.AdminPolicyStatus1"))
+ 		admin_policy_status_removed(proxy);
+ }
+@@ -189,8 +253,10 @@ static GDBusClient *client;
+ 
+ static void disconnect_handler(DBusConnection *connection, void *user_data)
+ {
+-	g_list_free_full(admin_proxies, NULL);
+-	admin_proxies = NULL;
++	g_list_free_full(set_proxies, NULL);
++	set_proxies = NULL;
++	g_list_free_full(status_proxies, NULL);
++	status_proxies = NULL;
+ }
+ 
+ void admin_add_submenu(void)
+diff --git a/client/admin.h b/client/admin.h
+index 0047770dc..be58fb2fa 100644
+--- a/client/admin.h
++++ b/client/admin.h
+@@ -10,3 +10,7 @@
+ 
+ void admin_add_submenu(void);
+ void admin_remove_submenu(void);
++
++GDBusProxy *bluetoothctl_get_default_controller(void);
++GDBusProxy *bluetoothctl_find_controller(const char *address);
++char *bluetoothctl_controller_generator(const char *text, int state);
+diff --git a/client/main.c b/client/main.c
+index 9d9ac8b14..5e9f2eeb5 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -881,6 +881,25 @@ static struct adapter *find_ctrl_by_address(GList *source, const char *address)
+ 	return NULL;
+ }
+ 
++GDBusProxy *bluetoothctl_get_default_controller(void)
++{
++	if (!default_ctrl)
++		return NULL;
++
++	return default_ctrl->proxy;
++}
++
++GDBusProxy *bluetoothctl_find_controller(const char *address)
++{
++	struct adapter *adapter;
++
++	adapter = find_ctrl_by_address(ctrl_list, address);
++	if (!adapter)
++		return NULL;
++
++	return adapter->proxy;
++}
++
+ static GDBusProxy *find_proxies_by_iface(GList *source, const char *path,
+ 							const char *iface)
+ {
+@@ -2788,7 +2807,7 @@ static char *generic_generator(const char *text, int state,
+ 	return NULL;
+ }
+ 
+-static char *ctrl_generator(const char *text, int state)
++char *bluetoothctl_controller_generator(const char *text, int state)
+ {
+ 	static int index = 0;
+ 	static int len = 0;
+@@ -3876,9 +3895,9 @@ static const struct bt_shell_menu main_menu = {
+ 	.entries = {
+ 	{ "list",         NULL,       cmd_list, "List available controllers" },
+ 	{ "show",         "[ctrl]",   cmd_show, "Controller information",
+-							ctrl_generator },
++					bluetoothctl_controller_generator },
+ 	{ "select",       "<ctrl>",   cmd_select, "Select default controller",
+-							ctrl_generator },
++					bluetoothctl_controller_generator },
+ 	{ "devices",      "[Paired/Bonded/Trusted/Connected]", cmd_devices,
+ 					"List available devices, with an "
+ 					"optional property as the filter" },
 -- 
 2.43.0
 
