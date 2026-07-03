@@ -1,138 +1,144 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from fluid8.de (fluid8.de [152.53.155.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3111F30A9
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Jul 2026 18:50:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F820247291
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Jul 2026 18:53:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.53.155.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783104644; cv=none; b=sbfV3tJ50ST0exmLW5257pD+BU4FlMOAYRqg9g3R8h/rIC8U18fRU8AyGwd6R6crZclH9AY6FHnIYYQuOd6SYR9W5OteJpa7l0MET6EGr/GhIbZlHF5KjpdgkYOlVUyhicL7e31YRHmohvhXwvSujn52Mv8VsatoiaFJ70OLcK4=
+	t=1783104806; cv=none; b=sI9wAo7bIKU+tlJC5TGn9kh3obC/3HNrKZI/YYyVbEsfqdZpscg2ncTwMORtx6ytf4bas28ZZ44T0i2UnpNqFHNU3tFuXPjdKCD/jrOsiNSRYvXnxclVGbBNuOB0BE837uo6rx/Hean93h6U0UO+RvYXoHuX6xV+5Wx3MSDhClQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783104644; c=relaxed/simple;
-	bh=kegckKHo7DPJhThHogXn/0Hihn/frJkJVdDn6izLSpI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=j2Zl5cBSvSARdNytDs0wa810rV3reJNhgoOgJ3Q55gt6tSsyU27vmBSWZU6wzYoL+UM8fzU2v6uxISZpD75COHtQWy8saP2klP80O7apq9EhhbQGqMMr57sbgfOOwpWiYy7WV4oELdGtFBUvUxoQtLPvFCe3tDYGCH6r/Byt+p4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=q+9nJBec; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783104806; c=relaxed/simple;
+	bh=J69/fD4hLwcXMvT1LziHTJToP7lyVSLF7vxDNEkroWM=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=VqO3bZYIc1gEqIGeEP4ES1W9x1So3EWId4OVRNhq09HRolZCCHDyJWQZD3QUyXxDpYch5aQV9q9BtgJm+YYeOkZMd6cpVakOmPrYbQsVzD6k581vxbbV2wecSKX4+UmxUFkzz4MFVK7TYBUtHPiqLOV/DMn8Pxh1PcTcj6ghoTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fluid8.de; spf=pass smtp.mailfrom=fluid8.de; dkim=pass (1024-bit key) header.d=fluid8.de header.i=@fluid8.de header.b=vI1QzaJ5; arc=none smtp.client-ip=152.53.155.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fluid8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fluid8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q+9nJBec"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-8efbafa1bacso5865406d6.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Jul 2026 11:50:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783104642; x=1783709442; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=EpZrwQqhtBenT7nV/+3EqH+GCyhbL07KhLcHPaPHOY0=;
-        b=q+9nJBecN9g4UgIMxyBUj4mmam7T3Tdv2GuJNcNuAUEebd6X8vLDEFigHuthn0Ds7U
-         U8NNzG5m23KVXrRemzINVDX9anNEJSviCxadGZtV9oMQz5/9eaPMn90PBCP0WeQwmQow
-         ct+SnC8JzN5bOycV8G+VY2DfS4Dz0FhLEWgv2AFiyzSwVf2znnLopo8EeGnbrL1/1dmj
-         UCsF7P4FvPcnXcIQg6VYaRyIEkgC+Y0OCTUC6bNNeXreoqHDwZBQnjYiAjWkOxnZo+Ie
-         0Qyrn210Hq0+/pTX7semg8RHg3ec6maHcgERyEO/RyA9Kot3JPWsLJyNzpEAPYMJwfyX
-         +f8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783104642; x=1783709442;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EpZrwQqhtBenT7nV/+3EqH+GCyhbL07KhLcHPaPHOY0=;
-        b=P+Uhn6GbiUWN+wUx4ia23bdyrw87fyzYFqlbCUY8/RpfhubO2vFIjI9sSXoBpeizCJ
-         jJAcaGpagoT36isa1aCM/mTvShiaXABFNIpVTClwJbARb8rZh5rKlwlODb00h2oBwQJU
-         ofk+wOmLl+WtpgP90gFPN/VVYtKuX1hdGQmGfUv/Dl96+mqTQhF7cc/n9SZxPnq8GTJH
-         nY9sos/4xp3CW6l+cV6uWsSj0ERgSH6pJ/9kRlioJn4JXMP4lNBw7gwK90uyAwlPbaUH
-         H2Fz6pFtlEHzKCVPXP52T8Sn06ddXUqFNg/1sIdKPVqoN3jqelxmljajFwT4MCGK1xSW
-         0Zcg==
-X-Gm-Message-State: AOJu0YwSPsKkUxYmWmRVHLrpqbajEkds+0/3W8WKDtIm0W/5+AMZHhm3
-	4dFq4faRcn760yeDEmwETcOP+4WiTjVF4DgYgzn/6vemEyj/au3qg1tWIqo+eQ==
-X-Gm-Gg: AfdE7cmKTbL3dMimLEWytfI7w6vfKzpYY3gK6D0wipeije+N2QHdqtouJRmiea65oP7
-	n7dHVutW1ZcjI1wqMeQWZAsHs1/pJ1snLE0CS9YT56OSfd7m6KNd76cFccQgG2rvMzWQ8FEhxvc
-	fMbtrFt17IV17WoearVsRsxNnh6iETg0F1kiV10/QwGrQRz7JHLr6ykr09DdCOUPJrmhreGynM7
-	KHbNMztl7yt++xkXS/AKIFTzp4oqIOSDqpVZDdfUYLThpHDstgGJW5wwICo19fGwxOXHBX18zvI
-	qzp+I6sge18sb4ci6uzGLkZqEBwePSF6oHyVIPTlY4eHkoGQo+b8+94KBYFWs9TcFNqsgD3sDlg
-	BOIOgDbhVqi/zW2ojkaMkP2N4CV8SamH2zmSZY47Wc2JEDmPkkXPmJQ8FGX+SZW5N1jlBUe4aGe
-	LdFC04OiSYv9gROWojf+V8ozxv8b0yLns=
-X-Received: by 2002:a05:6214:20a6:b0:8ef:e0d0:9fae with SMTP id 6a1803df08f44-8f74afc1a3cmr6727936d6.14.1783104642022;
-        Fri, 03 Jul 2026 11:50:42 -0700 (PDT)
-Received: from [172.17.0.2] ([48.217.107.120])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8f46e27d137sm61727106d6.9.2026.07.03.11.50.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jul 2026 11:50:41 -0700 (PDT)
-Message-ID: <6a480481.36695ec4.2a7238.4417@mx.google.com>
-Date: Fri, 03 Jul 2026 11:50:41 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7079306447172216066=="
+	dkim=pass (1024-bit key) header.d=fluid8.de header.i=@fluid8.de header.b="vI1QzaJ5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fluid8.de; s=mail;
+	t=1783104252; bh=J69/fD4hLwcXMvT1LziHTJToP7lyVSLF7vxDNEkroWM=;
+	h=Date:To:From:Subject:From;
+	b=vI1QzaJ5K+g2gWo6g+ENFpCLZr40oL4aIKPFkFJwJk9+4OvywkRA3ihoHVf8M+aff
+	 PaF6PtN2hhPf05PV9TrDPb1bA7GEWWXw9gGtL1oFrmSFcxPIWfH26JmL1JuEqK1+Ra
+	 gvjiEzmHogsTQkRnkloTg/SyEbE1Fk/ib0UwM9Do=
+Message-ID: <11453504-20db-45d0-87e0-ce5582dcbab4@fluid8.de>
+Date: Fri, 3 Jul 2026 20:44:11 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, zzzccc427@gmail.com
-Subject: RE: [v2] Bluetooth: MGMT: validate LOAD_CONN_PARAM entry before update
-In-Reply-To: <20260703172455.2363611-1-zzzccc427@gmail.com>
-References: <20260703172455.2363611-1-zzzccc427@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Language: en-GB, de-DE
+To: linux-bluetooth@vger.kernel.org
+From: Jochen <dev@fluid8.de>
+Subject: =?UTF-8?Q?Outdated_Intel_BT_firmware_ibt-hw-37=2E7=2E10-fw-1=2E0=2E?=
+ =?UTF-8?Q?1=2E2d=2Ed=2Ebseq_=28patch_0x27=29_breaks_all_HFP/SCO_audio_?=
+ =?UTF-8?Q?=E2=80=94_Windows_driver_ships_working_patch_0x2b?=
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============7079306447172216066==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+hello everybody,
 
-This is automated email and please do not reply to this email!
+this is my first e-mail to a linux kernel list. Claude.ai to find the cause of this problem and created this text.
 
-Dear submitter,
+# Outdated Intel BT firmware ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq (patch 0x27) breaks all HFP/SCO audio — Windows driver ships working patch 0x2b
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1121293
+## Summary
 
----Test result---
+The legacy Intel Bluetooth firmware `intel/ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq`
+in linux-firmware carries RAM patch **0x27 (39)** and has not been updated
+since 2014. With this patch level, the HFP/HSP microphone path (SCO/eSCO,
+CVSD) of the affected controllers is completely unusable: the decoded audio
+is a constant full-scale buzz unrelated to microphone input, and the kernel
+log floods with `Bluetooth: hci0: corrupted SCO packet`.
 
-Test Summary:
-CheckPatch                    PASS      0.82 seconds
-VerifyFixes                   PASS      0.13 seconds
-VerifySignedoff               PASS      0.17 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.16 seconds
-BuildKernel                   PASS      27.08 seconds
-CheckAllWarning               PASS      29.49 seconds
-CheckSparse                   PASS      28.61 seconds
-BuildKernel32                 PASS      26.33 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      494.89 seconds
-TestRunner_mgmt-tester        FAIL      208.00 seconds
-TestRunner_mesh-tester        FAIL      27.05 seconds
-IncrementalBuild              PASS      26.66 seconds
+Intel's own Windows driver package for the same hardware ships RAM patch
+**0x2b (43)** for the same firmware variant. Loading that patch on Linux
+(extracted from the Windows driver, converted 1:1 — the embedded blob is
+already in bseq format) **fully fixes HFP audio**: clean, intelligible
+microphone audio and zero corrupted SCO packets, on both eSCO and basic SCO.
 
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+Since firmware submissions must come from the vendor, this is a request for
+Intel to submit their final patch level for the ibt-hw-37.7.x legacy
+(Wilkins Peak) firmware files to linux-firmware.
 
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.245 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+## Hardware
 
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.731 seconds
-Mesh - Send cancel - 2                               Timed out    1.987 seconds
+- Intel Dual Band Wireless-AC 3160 combo card
+- BT controller: USB `8087:07dc`, "Legacy ROM 2.5 revision 0.0 build 1 week 45 2013"
+- Loaded firmware file: `intel/ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq`
+- Distro/kernel: Ubuntu, kernel 7.0.0-27-generic, linux-firmware 20260319
+- Headset used for testing: Jabra Evolve 65 (BT), PipeWire/WirePlumber 0.5.x, native HFP backend, CVSD
 
+## Symptom with current linux-firmware (patch 0x27)
 
-https://github.com/bluez/bluetooth-next/pull/394
+- HFP microphone capture is a constant full-scale roar: peak = 32768,
+   RMS ≈ 29400, RMS envelope flat at maximum for the whole capture,
+   completely uncorrelated with speech. (Typical CVSD delta-decoder railing
+   on a desynchronized/garbage bitstream.)
+- Kernel log: thousands of `corrupted SCO packet` messages per 10 s capture
+   (btusb SCO reassembly desyncs on the controller's bursty/corrupted
+   eSCO-over-USB stream).
+- Independent of: eSCO vs. basic SCO (tested via forced HV3), xHCI vs. EHCI
+   routing, alt-setting, autosuspend. A2DP is unaffected.
+- Long-standing reports of the same symptom on this chip family, e.g.
+   Ubuntu bug #1310558 (2014, fixed back then by a firmware patch update),
+   Linux Mint discussion #662 (2024, kernel 6.8, unresolved).
 
----
-Regards,
-Linux Bluetooth
+## Fix: patch 0x2b from Intel's Windows driver
 
+Source (publicly available from Intel): `BT_21.10.1_64_Win8.1.exe`.
+The package embeds the RAM patch for each firmware variant inside the
+driver binaries, already in bseq format (identical HCI cmd/event record
+stream as consumed by btintel's legacy patching):
 
---===============7079306447172216066==--
+- Header for fw variant 1.0.1.2d in linux-firmware:
+   `018efc0a 00010008 0004012d 0d27` → patch **0x27**
+- Header in the Windows driver (identical blob in all driver builds
+   20.91.3.1 … 20.100.5.1 contained in the package):
+   `018efc0a 00010008 0004012d 0d2b` → patch **0x2b**
+- Extracted blob: 22627 bytes, 191 well-formed cmd/event records,
+   same first command (0xfc8e) and same final command (0xfc60) as the
+   linux-firmware file; sha256 `7a0ca9155e0ec489…` (full hash on request)
+
+Result after installing this blob as
+`/lib/firmware/intel/ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq` and cold-booting
+(the controller keeps the old RAM patch across warm reloads;
+`Intel BT fw patch 0x2b completed & activated` confirmed in dmesg):
+
+- eSCO (stock kernel, CVSD): clean intelligible microphone audio,
+   0% clipping, speech-correlated RMS envelope, **0 corrupted SCO packets**
+   during 15 s capture (previously ~2600 per 10 s). Some later runs show a
+   small residue (~18 per 15 s) with no audible impact.
+- Same result with basic SCO.
+- Bonus: the USB autosuspend instability we saw with 0x27 (controller
+   drops off the bus under SCO load) is also gone with 0x2b — verified
+   with default runtime-PM settings including a real suspend/resume cycle.
+
+## Comparison of all 37.7.10 variants
+
+| linux-firmware file | patch in linux-firmware | patch in Windows driver |
+|---|---|---|
+| fw-1.0.1.2d.d.bseq | 0x27 | **0x2b** |
+| fw-1.80.1.2d.d.bseq | 0x2a | **0x2b** |
+| fw-1.0.2.3.d.bseq | 0x56 | 0x57 |
+| fw-1.80.2.3.d.bseq | 0x57 | 0x57 (current) |
+
+The `.2d` variants are the outdated ones; `1.80.2.3` already matches the
+final Windows level.
+
+## Request
+
+Could Intel please submit the final patch level (0x2b) for the
+`ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq` (and `fw-1.80.1.2d.d.bseq`) files —
+and generally the last released patch levels for the 37.7.x legacy family —
+to linux-firmware? The blobs already exist in bseq format inside Intel's
+Windows driver packages; only a licensed re-release is needed.
+
+I can provide full captures (WAV), btmon/usbmon traces, exact extraction
+offsets, and full hashes on request.
+
+kind regards,
+Jochen
+
