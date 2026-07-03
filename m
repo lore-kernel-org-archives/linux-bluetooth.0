@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5240733EB1B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496A233F8D4;
 	Fri,  3 Jul 2026 05:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783054922; cv=none; b=asGXBbj9XCkO1ukr4GTaQxCMsTaSUFp0r5Z9I4aiZc1NQDLimUMXdA9Iuf5t6u7yMedlVlvYMjYVLT4gIy985J+FO+BT/NeZGQ9eFcyzyjUMUMgPiQjLxwCUxo0vKW54IdGS79ClJROhowaIiJQw02dUHoG8WUNOP+77tC86Ujs=
+	t=1783054922; cv=none; b=E1a3DdTpxPocUbAETDp8RJpzDeL94vncfxti2gFkKOkOXOOQXM4VYTuQX/hwMuMhjragVHVNvML2sjWlH0/1h/4HlVj7WgiwMFFbLrwrzElfWTGikhFbsdbuonEN6QMAKqa3H3RSYLZlWewBsSk85V08ppwJIxIEzIr/9TfH7Ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783054922; c=relaxed/simple;
-	bh=ruRDsLiRVJS672K5oo8OA4gOAKdVmvXkKSjCKbHPxU8=;
+	bh=VyfLwM5lbgN18nmeHXfOE3MKdEsUxvDJNMoBL95qAXU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=cthfOg+sUMpF3Gyw/ngGFfx4R3rpF+IkGNUpAczyHSZOTKtNZlqdIOZY7999bMMYbHio06tjeNBeS2984z7/g5fpJb+0aj1e0OvDOw/+Yep10IAuHxH/nGYAomZrwDnbur1pSQHea6DOdMSUBhASX/FzRd9nBv4VJfY5fj6/n9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bXeLB3U6; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=A++Llt9LeDq7fzQHQimWcDX9dThNwnPDKrbScyMrtTi3G+FRaRKrbL8ZddCi7uHmSE3sqHnwyLv+OpTQe+mQRAvtGQqIWgS+o7IQkYmhDaZ7gsbIFQDbkb8XqNa95P4bpqGHr7f8QPlALhQbF3au0Z/yp+b+/6SuYhnjqNbZjcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nxHBp3PO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bXeLB3U6"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 819A2C2BD05;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nxHBp3PO"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5F8C0C2BCFC;
 	Fri,  3 Jul 2026 05:02:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1783054921;
-	bh=ruRDsLiRVJS672K5oo8OA4gOAKdVmvXkKSjCKbHPxU8=;
+	bh=VyfLwM5lbgN18nmeHXfOE3MKdEsUxvDJNMoBL95qAXU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=bXeLB3U6yQm2dXWm2NCHItX6pqksGIi3ASnLd4uio/VaejhsI5OP+ZKxfq1oo9/Wk
-	 dFcG0RttORwXtlGHeDLKYnYfueGcFJzqjt1rmyEiD49cL2d71q1QK1Vm/K9gmhHQEC
-	 /oohR3+Ij5Lk8HAB3/QhoR1lKGBKkdK4McaZ1SyuaNRYgPeYcDTIHSi2aFUH7Yfp7k
-	 3v1KLhTpvElpLJWNMfBPHeaM/1LkjxO89/K6IgAI8xj5k09PfRtTiayNc/WMRDg60K
-	 UvYvdrb79Oybm4myi6qcny8IEcAXzfN0UWFe4+u4Xqhq3tGgNDgnSsApkm/YyAPf4m
-	 t0rmNz7Nic5pg==
+	b=nxHBp3PO+24usf3SL9aJ5v+eojm7afCp7Ryd6T8yp+/wARVApeLvuyc/wvZ22u3aG
+	 of3NHbPiMfWZQ/Yx1Zw2E2AzSQJyxOPk6OHut6AZApWHhj5RfOvSwVxdBP1ukc08Xu
+	 0jNYE5XdyJjBZozkM9+2oBb8qvfENFjVRB9lW/32HfZHia1T8yHEIiNauXBblM/4fC
+	 ccfrB/QG17EY+R7NC2pBY6KCx+3jRIbV5bizUh/9dNT3DCuQQ3JJgVwjMMZp5b4tvA
+	 3cW0U4Wiz5FZAsRdVjVRHY8jiJQSkAMwMsIyJM5Qv4cdkR5zSXvZzdw19U+fGdxWTg
+	 3CJ7bhWF7xN6Q==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED84C43458;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43CE6C44502;
 	Fri,  3 Jul 2026 05:02:01 +0000 (UTC)
 From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
-Date: Fri, 03 Jul 2026 09:01:53 +0400
-Subject: [PATCH v3 5/6] arm64: dts: qcom: ipq5018: add nodes required for
- Bluetooth support
+Date: Fri, 03 Jul 2026 09:01:51 +0400
+Subject: [PATCH v3 3/6] firmware: qcom: scm: Add support for setting
+ Bluetooth power modes
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -41,7 +41,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260703-ipq5018-bluetooth-v3-5-62da72818ab3@outlook.com>
+Message-Id: <20260703-ipq5018-bluetooth-v3-3-62da72818ab3@outlook.com>
 References: <20260703-ipq5018-bluetooth-v3-0-62da72818ab3@outlook.com>
 In-Reply-To: <20260703-ipq5018-bluetooth-v3-0-62da72818ab3@outlook.com>
 To: Bartosz Golaszewski <brgl@kernel.org>, 
@@ -53,13 +53,14 @@ To: Bartosz Golaszewski <brgl@kernel.org>,
  Philipp Zabel <p.zabel@pengutronix.de>
 Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- George Moussalem <george.moussalem@outlook.com>
+ George Moussalem <george.moussalem@outlook.com>, 
+ Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1783054918; l=1634;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783054918; l=3492;
  i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
- bh=W34SYW/fjbOsDklvwrwSAhVsxNGBAP8d0fG4MddytFo=;
- b=odimwWqx4LOzTR3PXrfLhZJHoOeqpZSyfolbErDBbi4U7QejQr3mrRdwJlblQGu9ncqCpWzvW
- UkDUEWENAMmBphY0kKnIvOUrCNbRxV+D4PvhQOmHbE9BBslrwcCLJbX
+ bh=J2esFcAMc0BwqZnD7lz+a1GHFMeiuZUIt3j0q34Iiqg=;
+ b=2xMQ5uI2uH09qPo75c+KJiqFwLyBd14YmZwQsiju3byyWehRTRQt2BaSoTI0Tm5ySIBwHX09W
+ tSCzCUpGar4AGkITWp11QTZOKG1nyg1GPTfu4I+AdQun+cb/DkcWXC/
 X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
  pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
 X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
@@ -69,63 +70,99 @@ Reply-To: george.moussalem@outlook.com
 
 From: George Moussalem <george.moussalem@outlook.com>
 
-Add nodes for the reserved memory carveout and Bluetooth.
+The Bluetooth subsystem (BTSS) on the IPQ5018 SoC supports setting power
+modes which are required to be configured through a Secure Channel
+Manager (SCM) call to TrustZone. However, not all Trusted Execution
+Environment (QSEE) images support this call, so first check if the call
+is available.
 
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 Signed-off-by: George Moussalem <george.moussalem@outlook.com>
 ---
- arch/arm64/boot/dts/qcom/ipq5018.dtsi | 25 ++++++++++++++++++++++++-
- 1 file changed, 24 insertions(+), 1 deletion(-)
+ drivers/firmware/qcom/qcom_scm.c       | 44 ++++++++++++++++++++++++++++++++++
+ drivers/firmware/qcom/qcom_scm.h       |  1 +
+ include/linux/firmware/qcom/qcom_scm.h |  1 +
+ 3 files changed, 46 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/qcom/ipq5018.dtsi b/arch/arm64/boot/dts/qcom/ipq5018.dtsi
-index 6f8004a22a1f..65a47ba7d3a3 100644
---- a/arch/arm64/boot/dts/qcom/ipq5018.dtsi
-+++ b/arch/arm64/boot/dts/qcom/ipq5018.dtsi
-@@ -17,6 +17,23 @@ / {
- 	#address-cells = <2>;
- 	#size-cells = <2>;
+diff --git a/drivers/firmware/qcom/qcom_scm.c b/drivers/firmware/qcom/qcom_scm.c
+index 6b601a4b89db..a34e0f75df3c 100644
+--- a/drivers/firmware/qcom/qcom_scm.c
++++ b/drivers/firmware/qcom/qcom_scm.c
+@@ -1094,6 +1094,50 @@ bool qcom_scm_pas_supported(u32 pas_id)
+ }
+ EXPORT_SYMBOL_GPL(qcom_scm_pas_supported);
  
-+	bluetooth: bluetooth {
-+		compatible = "qcom,ipq5018-bt";
-+
-+		firmware-name = "qca/bt_fw_patch.mbn";
-+
-+		clocks = <&gcc GCC_BTSS_LPO_CLK>;
-+		clock-names = "lpo";
-+		resets = <&gcc GCC_BTSS_BCR>;
-+
-+		qcom,ipc = <&apcs_glb 8 23>;
-+		interrupts = <GIC_SPI 162 IRQ_TYPE_EDGE_RISING>;
-+
-+		memory-region = <&btss_region>;
-+
-+		status = "disabled";
++/**
++ * qcom_scm_pas_set_bluetooth_power_mode() - Configure power mode for the
++ *					     Bluetooth subsystem (BTSS)
++ * @pas_id:	peripheral authentication service id
++ * @eco_mode:	true for ECO mode, false for normal operation
++ *
++ * Return: 0 on success, negative errno on failure.
++ * Returns -EOPNOTSUPP if the firmware configuration call is unavailable.
++ */
++int qcom_scm_pas_set_bluetooth_power_mode(u32 pas_id, bool eco_mode)
++{
++	struct qcom_scm_desc desc = {
++		.svc = QCOM_SCM_SVC_PIL,
++		.cmd = QCOM_SCM_PIL_PAS_BT_PWR_MODE,
++		.arginfo = QCOM_SCM_ARGS(2),
++		.args[0] = pas_id,
++		.args[1] = eco_mode ? 0x4 : 0x0,
++		.owner = ARM_SMCCC_OWNER_SIP,
 +	};
++	struct qcom_scm_res res;
++	int ret;
 +
- 	clocks {
- 		gephy_rx_clk: gephy-rx-clk {
- 			compatible = "fixed-clock";
-@@ -136,6 +153,11 @@ reserved-memory {
- 		#size-cells = <2>;
- 		ranges;
- 
-+		btss_region: bluetooth@7000000 {
-+			reg = <0x0 0x07000000 0x0 0x58000>;
-+			no-map;
-+		};
++	if (!__qcom_scm_is_call_available(__scm->dev, QCOM_SCM_SVC_PIL,
++					  QCOM_SCM_PIL_PAS_BT_PWR_MODE))
++		return -EOPNOTSUPP;
 +
- 		bootloader@4a800000 {
- 			reg = <0x0 0x4a800000 0x0 0x200000>;
- 			no-map;
-@@ -647,7 +669,8 @@ watchdog: watchdog@b017000 {
++	ret = qcom_scm_clk_enable();
++	if (ret)
++		return ret;
++
++	ret = qcom_scm_bw_enable();
++	if (ret)
++		goto disable_clk;
++
++	ret = qcom_scm_call(__scm->dev, &desc, &res);
++	qcom_scm_bw_disable();
++
++disable_clk:
++	qcom_scm_clk_disable();
++
++	return ret ? : res.result[0];
++}
++EXPORT_SYMBOL_GPL(qcom_scm_pas_set_bluetooth_power_mode);
++
+ static int __qcom_scm_pas_mss_reset(struct device *dev, bool reset)
+ {
+ 	struct qcom_scm_desc desc = {
+diff --git a/drivers/firmware/qcom/qcom_scm.h b/drivers/firmware/qcom/qcom_scm.h
+index caab80a73e17..5579df5a2aca 100644
+--- a/drivers/firmware/qcom/qcom_scm.h
++++ b/drivers/firmware/qcom/qcom_scm.h
+@@ -105,6 +105,7 @@ int qcom_scm_shm_bridge_enable(struct device *scm_dev);
+ #define QCOM_SCM_PIL_PAS_SHUTDOWN	0x06
+ #define QCOM_SCM_PIL_PAS_IS_SUPPORTED	0x07
+ #define QCOM_SCM_PIL_PAS_MSS_RESET	0x0a
++#define QCOM_SCM_PIL_PAS_BT_PWR_MODE	0x21
+ #define QCOM_SCM_PIL_PAS_GET_RSCTABLE	0x21
  
- 		apcs_glb: mailbox@b111000 {
- 			compatible = "qcom,ipq5018-apcs-apps-global",
--				     "qcom,ipq6018-apcs-apps-global";
-+				     "qcom,ipq6018-apcs-apps-global",
-+				     "syscon";
- 			reg = <0x0b111000 0x1000>;
- 			#clock-cells = <1>;
- 			clocks = <&a53pll>, <&xo_board_clk>, <&gcc GPLL0>;
+ #define QCOM_SCM_SVC_IO			0x05
+diff --git a/include/linux/firmware/qcom/qcom_scm.h b/include/linux/firmware/qcom/qcom_scm.h
+index 5747bd191bf1..aca937ac8ddd 100644
+--- a/include/linux/firmware/qcom/qcom_scm.h
++++ b/include/linux/firmware/qcom/qcom_scm.h
+@@ -93,6 +93,7 @@ struct resource_table *qcom_scm_pas_get_rsc_table(struct qcom_scm_pas_context *c
+ 						  size_t *output_rt_size);
+ 
+ int qcom_scm_pas_prepare_and_auth_reset(struct qcom_scm_pas_context *ctx);
++int qcom_scm_pas_set_bluetooth_power_mode(u32 pas_id, bool eco_mode);
+ 
+ int qcom_scm_io_readl(phys_addr_t addr, unsigned int *val);
+ int qcom_scm_io_writel(phys_addr_t addr, unsigned int val);
 
 -- 
 2.53.0
