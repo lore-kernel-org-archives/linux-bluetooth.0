@@ -1,112 +1,102 @@
-Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB495342523;
-	Fri,  3 Jul 2026 08:55:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5573B27C5
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Jul 2026 09:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783068915; cv=none; b=LimNRRBrnLNNnEjjXcpVEOT/z3ml78T0XCJx+EtwD5xmhRv9HaOoeFQxJkt62qeZZA+eHrRbLDPa7TAFvdNOlr9sJ31MinfDRuIKNzrOaeIWb4pzk+K4l3iRKLKNxrZ5hMD1q7AHz05mxifJg1BqIaVBYwAYE/R+8f+Ixls3CP8=
+	t=1783071451; cv=none; b=WNtn9HCEU4iDu0wzsW/BVx48oRG/bzHljB9QLtcv0oa3/RguMCjmsW612sgZv+EOodz+mTDnXfIoU+A49ZJVj0+3uunuLkio/9Nauixb4u2p0Td4NEbqqFzCyIc5SqeONGRiyQgqyqkNoTkkcs8GbaLl0BNvE7dpWzGrg1TBo3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783068915; c=relaxed/simple;
-	bh=eKI7OrRx+ws5BlmMIWzhn+c130GYvd1H5bURxsobRfc=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=bF9iXCqXH+D69BxBPUJOQxRnRSSVHkTF31tIOqWtcFqWEzsz+dDtp6UZrBPDuU5flua9cAOu/9DNEMxwZ9AA0tP/+yIRcjfrzBFTFoVjnqpuZPo+X9lZUBIG5cqSuLG8SIG5ITRqQYQNeZwgqt1l5eQ5m21n8k6qbo9WsdYZhxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=usYiVT09; arc=none smtp.client-ip=43.163.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+	s=arc-20240116; t=1783071451; c=relaxed/simple;
+	bh=2DDPsX3OgGqTTeeFsHygz31PYHq3LPPF6DwORwPyIss=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=PU7zA/mIN4/URtIZYTKx8SvK3MAKryR1JcO+PHLFrwbRiOsQfhXIL7phb+6VRJAMI6Q2dIRNzB4tmUXqhVFvXwfW4TPzQ/+ANOqXWaiTJuGp7ggBj2yUAQSbx2dIacR98nQiz1TUHkGi+bnl2LwR7LdLZ6m8ib/DExNYt7RAMrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QuskPv15; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="usYiVT09"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1783068900;
-	bh=2WchnoND6ZC1YwTNCHecshM3Pc20MGGj5Wsynwy65MQ=;
-	h=From:To:Cc:Subject:Date;
-	b=usYiVT090sSCtVH9kIe/h4I5xmOX3RczL0SqgyMUZhLs/91lT64XylogdO6kekkI0
-	 7avKiXOibOgpnmYkDDolZPfpkU8Vn9otQS+OUAL09Pk2Q0EvWU+Lz1h3hiY5TumFV9
-	 upPiDlqrzSVX5uU1H04dg8tdUe1Zn4ZsnhwPRSt0=
-Received: from localhost.localdomain ([116.128.244.169])
-	by newxmesmtplogicsvrszc56-0.qq.com (NewEsmtp) with SMTP
-	id DBB0E4DF; Fri, 03 Jul 2026 16:54:59 +0800
-X-QQ-mid: xmsmtpt1783068899tj8mnhzdw
-Message-ID: <tencent_A0AEA018EC865AB4DC9D2A43D1E5B71DE905@qq.com>
-X-QQ-XMAILINFO: NC4p7XQIBeahOvhCmaNs6GQdEXblxuUuh1DoSiC2/JGnCnxOpAgHVpdaW8GPuP
-	 ExE51I1hy0NJVF+LzV0jNTPLOY6ynESgXMrZ8B9Mo1ZpXznzhUHDi8K9Vg1KYY8KdMLTdtmGBgwW
-	 MuMCzPAcL+AjirB8PP+TYLFOL/1Ss/87Bijo2jw0S0lCQIFL/ld69DRWU0Ay12a+/Kn9Hbuc9ElE
-	 dXViQeU3+BmGVlIc08OJIJu01mLSmU6KQxtFlc9YKC3hXItURsVCSRNdC/xfWF3/Q9PZf53DBcI6
-	 0tw9AindTJtZ7W4402FI/KPfmgHIU78EtnHU0AbiwLp2AJCR4a3eMeFbYiJnbNWxwyRDNCtwI/IY
-	 YvC85Xbd2cmlnYZwLNdH2gsrrj0tezTpE3Dcv7LAH0pmAxlGB9Qjb9JBkBl8pBZF8IWNGCM6zYHA
-	 pE7fhTVFeAs2OaBDWGVEPkj2slJ4uVtzjPvInVXj4soT9SPcBA3HUt9+ktz8t1GCp8VoA7j6Rxqb
-	 OM6q7dzMfo8QbEy3o1wYo2hgAnx+OVFjwPrhVrR4fUmtDujJzIdOSI+kb7/P6I1CqeW0Ae9bzd91
-	 wm049vR7+GcyomUBrz3G9EMbar61+9KxDoAADCXbFSjWWcWAVGVy1yzvdmVrQF+A/jfQLu3gq+Xt
-	 zIFWB/SqO5A26zy5FjAMijlLvlZ68bILKDE9feMVKLvYGxDh0zcgTsUPuAPUTidkZNh6P66f5bRa
-	 9nCkf2ZmipEz1daHdpKsSw9gz6Kca9TluFtpuIjimUbAauVrk4ZVuqTIS+MnoAlddInRXXXeKb++
-	 Zb6CCjlkEf9Abb6cHcG/eXIR2KkqVSln4jkXQ9hnO4HzEIWwzs+c4MPLJocsxGAtzaP+V0fd1iEc
-	 NNdpRP7nbdOmB0Jl1fgbMavSVppcx9A4MVkhUXR4y/Zb87vts2MVlIpEJSP7rxuEGBBdJKBz1FuS
-	 uVCsuol+JbCNLPLcMINNJYplyFpSo6x6e+xErh+vW4stvFnb0lyDI2oBxoM97kPqkWVQS4DI7nRv
-	 4CdtbGF0od94KOYwzh7lzy60h9g4w=
-X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
-From: Zhao Dongdong <winter91@foxmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Zhao Dongdong <zhaodongdong@kylinos.cn>
-Subject: [PATCH] Bluetooth: btusb: fix USB interface release on probe error path
-Date: Fri,  3 Jul 2026 16:54:56 +0800
-X-OQ-MSGID: <20260703085456.421662-1-winter91@foxmail.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QuskPv15"
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-36b9d265355so298177a91.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Jul 2026 02:37:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783071449; x=1783676249; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=2DDPsX3OgGqTTeeFsHygz31PYHq3LPPF6DwORwPyIss=;
+        b=QuskPv15A8qavGP1h4poKOCpMdMEKc6AxtZ3rgS9nVyE3VeruL9HNGc3LiGnq+s9Cj
+         567PnwPqmdruQtH8FrrZN0Vd9PsjQS743vlzoFpZK9slnG0dLfJlc96uF/OlWdD3oRHh
+         LRG54E2txyFJxxJ8xme9ZfoK31TLpMPHrZTBDEvMCMib1Jy5FkfhIODTuFnn7UPyIFCy
+         ai4bivFO4uY3so78og37F7ewJOWLlBhnaF8K3l5eJcIzfJCRELutON8oXiAA6bBBq4SY
+         u33v8fpq4zyT3cI7dM4Q/7ROMh3o4etK+WRRbcUHtftspmrpKtX2BbHzY12kgOA7VIz7
+         HrTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783071449; x=1783676249;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=2DDPsX3OgGqTTeeFsHygz31PYHq3LPPF6DwORwPyIss=;
+        b=qe/hYG34vWCjrA5O2U6x5/u9rA58lVuYnInlTQpST7qhvWSKs10I9DcROkWABl6eB0
+         A4U7vdb5QNUsxEfleSL/JmwlO6bpgZCInL3a/VlGxAZo81y+BtGU1qSi+jxTNacpqhv6
+         QlKiA/EtCypUl7r1sXotXxpxr+OB0OmiBMIsa9tDDGwbGu3ayAOrsQecrwIEgutMtxav
+         3CiV2X0yjk//SVdiT4jDPFYE8g+JJqKFmGyrtW1/3rgWYb8WofFHr78ez22uPvdcNV1N
+         J8TJejBOw4PpSbeE4rhmxsqkqWVIsGQ0KGMiHdMc/QKHnFjqNQpzEBJvlJENp6CD6QpK
+         cp2A==
+X-Gm-Message-State: AOJu0YzTPUrHwcneMtRvf1EsCdx6GHIOjFscC2XW1i1lX6dEx0kenMwz
+	KFnoaVkqW8+89s4CpUaEuYZm6oOQr9b4Si/7D/EPigzgT3dMYUQVx9BbhxEh+g==
+X-Gm-Gg: AfdE7cm57sE1hPmIk6x9yoeXb1HPjaa+a6iwA2kQbfuh6rvAS+Vf8yrx2yHWqhvz/m3
+	V0UibF0cSp4nGuaL+WsMoa8PKbXGe2z3kGC0ax0LLx88lGKibjnOH0BczEz91HGCoLxlGNQfXfY
+	S6tg97DhCpD6shIuU9RobW5f017jEnRS2+HyC4hDCRS0sbPeddzgL57Ll9LIla71uLu/SPpLkQP
+	mfoWNzZckR1TiN6BEfY7f1jU3oZJDUcZ4bahTVnRVG209ZXZcFJKRSVpiq4zUMB82mXuWy5rKxt
+	xqD4UUAzmyON90z7Qi/hr+4Au1ZT7YlJZZi5nC43t3H8104HVPDxNLnmZVSm9WihVvCdrbK3vuT
+	P+yLiI0ZVbtaO2BOkUDO3CSpEgrXHnBLawMAy2eAvw2HSUh9c0TAbThaEDpSf/wB/CULjP07O0U
+	iyBHivtHQ4nJi1gZkB3m0=
+X-Received: by 2002:a17:90a:e7d0:b0:37f:f8c5:93c9 with SMTP id 98e67ed59e1d1-380ba829f80mr9530326a91.10.1783071449444;
+        Fri, 03 Jul 2026 02:37:29 -0700 (PDT)
+Received: from [172.17.0.2] ([20.169.75.245])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f0bbd221bsm19387280eec.22.2026.07.03.02.37.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Jul 2026 02:37:28 -0700 (PDT)
+Message-ID: <6a4782d8.cbc3f03a.3be201.4702@mx.google.com>
+Date: Fri, 03 Jul 2026 02:37:28 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8502332631805265444=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, winter91@foxmail.com
+Subject: RE: Bluetooth: btusb: fix USB interface release on probe error path
+In-Reply-To: <tencent_A0AEA018EC865AB4DC9D2A43D1E5B71DE905@qq.com>
+References: <tencent_A0AEA018EC865AB4DC9D2A43D1E5B71DE905@qq.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Zhao Dongdong <zhaodongdong@kylinos.cn>
+--===============8502332631805265444==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-When hci_register_dev() fails in btusb_probe(), the isochronous and
-diag USB interfaces previously claimed via
-usb_driver_claim_interface() are not released. This causes USB
-interface reference count leakage, preventing subsequent re-probe of
-the same device and leaving stale entries in /sys/kernel/debug/usb.
+This is an automated email and please do not reply to this email.
 
-Add a new out_release_iface error label that releases any claimed
-interfaces before falling through to out_free_dev for the remaining
-cleanup. This follows the kernel's standard reverse-order cleanup
-chain pattern and avoids releasing interfaces on earlier error paths
-where they may not have been claimed yet.
+Dear Submitter,
 
-Fixes: 9bfa35fe422c ("[Bluetooth] Add SCO support to btusb driver")
-Signed-off-by: Zhao Dongdong <zhaodongdong@kylinos.cn>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: drivers/bluetooth/btusb.c:4407
+error: drivers/bluetooth/btusb.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- drivers/bluetooth/btusb.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 830fefb342c6..829d7dbcd84d 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4407,7 +4407,7 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 	err = hci_register_dev(hdev);
- 	if (err < 0)
--		goto out_free_dev;
-+		goto out_release_iface;
- 
- 	usb_set_intfdata(intf, data);
- 
-@@ -4416,6 +4416,12 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 	return 0;
- 
-+out_release_iface:
-+	if (data->diag)
-+		usb_driver_release_interface(&btusb_driver, data->diag);
-+	if (data->isoc)
-+		usb_driver_release_interface(&btusb_driver, data->isoc);
-+
- out_free_dev:
- 	if (data->reset_gpio)
- 		gpiod_put(data->reset_gpio);
--- 
-2.25.1
 
+--===============8502332631805265444==--
