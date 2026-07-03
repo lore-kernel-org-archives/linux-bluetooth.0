@@ -1,74 +1,177 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C1F381E93
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 22:59:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1C03403E8;
+	Fri,  3 Jul 2026 05:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783033185; cv=none; b=En5eGACcObovIA4NzwXnKaIYvgBqq1EC9fhSAw9P0/0pdnLdnFtSQnfTgqqj5LlBKeBSqtTmgsD97QzjPAxTazfm+iod6xNdIvO3b7J5D07abhCCy73Dsg6QmdrVe6Hlzm5h9mMLqlxrAv5duwGRgcjKiEJ6QX0Cdv5OaGe9q6g=
+	t=1783054922; cv=none; b=Mn2VyZg0kr61krZid7B6XgJIfJamdHV/DFsO5d3+nvGqEYrq5+RYJ7fSsyF8bB7wa+o97/f9dTzwPScv/ag87X7s4Ko3EI/nvwEaaBppnRXOFJh/TpUOujPcQj/gXHieVAtdy0ezUra82liTfi3XGaq2HhPD1XLV2Pg/WvmRvXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783033185; c=relaxed/simple;
-	bh=bFkR958k8s8OK+2Fz6S0VNJ31VZTgI1Vnmu9Cfv7kO8=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=c+5/OP9T8O980eTN+NdFPcXZx1MnPokC1Cnb/Grys/BkBFbyys4l51kZptojQTU3pDOK/ltuh6aJoqyTH1YEsJfbx/7Xx7G4m3LXxWM7QCh53jxRpzorGh+FzLdEATCwHvTzgTmPRpEUdJAnQXGcSbScn/341BGuXdT0roAiu1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bYtdrnq2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1783054922; c=relaxed/simple;
+	bh=c0m4PMeN5o8unC7bCLyrC/imCnarrxFyVW2BtWa/MBw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=uduPxDwTpPefl4xfeV8q3y3IjOn9MCjByXVO28Lw3CwyyWquVfXKDQ9id9+GPz3aKxm2VLABU/Zq3b7yPunezd7NoO9Rb+fMXGQsjkp2XzyPVNeVAQP30N677Wsy+MRlQnVYsO4wSFLGdFIH8g20QlLhWqUiBgKH/CYX3dvWzI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SL3srDkT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bYtdrnq2"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 50890C19425
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jul 2026 22:59:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SL3srDkT"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3BCBFC2BCB9;
+	Fri,  3 Jul 2026 05:02:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1783033185;
-	bh=bFkR958k8s8OK+2Fz6S0VNJ31VZTgI1Vnmu9Cfv7kO8=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=bYtdrnq20OzxLPuipytff9RtUvXX8ttgCRaACQzcJFJEIcJS1P16kub5QgSpun0Wk
-	 kDiKPqQviRxL/2NttfTLKDc+50xAJtY4ioXKEoFxSgENrWqqpBzwrQ3o5tZL1AYRpu
-	 RY+GKM+KJXmk2C9BCHAGWNcQmUU+EVperdObBH+U+zfH3/5nTLge4eaYgO8RlgQ3p6
-	 C21aFH3QmMwST/EkMTeFNzp425JOEW2QMrBOwCKo9vTpoazHp+1Ej7Hnuimoa424TR
-	 0Rj8qjt8sFQmfDKQ1dj1ux4T/e1W1U3SqqecUddeBnU87NG+UNW0m7HNQ7IjpAkt6Q
-	 JZq0uyXd9EgbA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 41221C4160E; Thu,  2 Jul 2026 22:59:45 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 221521] Bluetooth: btusb/mt7921 - Failed to send wmt func ctrl
- (-22) on MediaTek MT7921 combo adapter
-Date: Thu, 02 Jul 2026 22:59:44 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: p@atiq.xyz
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: CODE_FIX
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-221521-62941-LRzC1bJLTY@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-221521-62941@https.bugzilla.kernel.org/>
-References: <bug-221521-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1783054921;
+	bh=c0m4PMeN5o8unC7bCLyrC/imCnarrxFyVW2BtWa/MBw=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=SL3srDkTZf2e/XXYu5qiuW0NaRe34YZmM8s80qyjNDkOaHmvvVBBEIjR7szTWjlev
+	 ecoQF7pNIPv4P+uMMZjgXau6rqf3F4i57uQSBaYxNMxZkzwCidMZqt5rz3/eOjsx8b
+	 csBG+s8tiJuedUTgC5lqNGgvEq6zlHBjwQs4uyDHvTN9opgnDQsQvHBuGusdL2eN/4
+	 Sz8iErPIAlejWpXhz3b55XRjBgUNliRLaN47AjyJpjEwE0r38c/wnMWsQEffI6kP/H
+	 +g7UNPksfytiNz9Q5NGWwGRvB9YP8GZx7pa8kDkAIFNgEbaow+LZ/vB1GtIiU7HDzj
+	 UnrI+rIcV8YgA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D4F5C43602;
+	Fri,  3 Jul 2026 05:02:01 +0000 (UTC)
+From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
+Date: Fri, 03 Jul 2026 09:01:49 +0400
+Subject: [PATCH v3 1/6] dt-bindings: net: bluetooth: Document Qualcomm
+ IPQ5018 Bluetooth controller
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260703-ipq5018-bluetooth-v3-1-62da72818ab3@outlook.com>
+References: <20260703-ipq5018-bluetooth-v3-0-62da72818ab3@outlook.com>
+In-Reply-To: <20260703-ipq5018-bluetooth-v3-0-62da72818ab3@outlook.com>
+To: Bartosz Golaszewski <brgl@kernel.org>, 
+ Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konradybcio@kernel.org>, 
+ Philipp Zabel <p.zabel@pengutronix.de>
+Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ George Moussalem <george.moussalem@outlook.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783054918; l=2835;
+ i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
+ bh=d1Mw/yAsL63HsWWol0YJxbOQeRLt9sHgbZjS0kdvWbI=;
+ b=N1y7JzAtrrCecAKlmLN/asjDH3yHF7hO7rhy/Vl65Dt4XTiixB2H6YPOXIqzhQzV4O0acDQ89
+ /+3kqA3406fDoVeKVL/3yFc23TA1OeKUFI99+HLDDkCwASayky5qdHs
+X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
+ pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
+X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
+ with auth_id=364
+X-Original-From: George Moussalem <george.moussalem@outlook.com>
+Reply-To: george.moussalem@outlook.com
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221521
+From: George Moussalem <george.moussalem@outlook.com>
 
---- Comment #19 from Solarized (p@atiq.xyz) ---
-Fixed on kernel-7.0.11
+Document the Qualcomm IPQ5018 Bluetooth controller.
 
---=20
-You may reply to this email to add a comment.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+---
+ .../bindings/net/bluetooth/qcom,ipq5018-bt.yaml    | 86 ++++++++++++++++++++++
+ 1 file changed, 86 insertions(+)
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/qcom,ipq5018-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/qcom,ipq5018-bt.yaml
+new file mode 100644
+index 000000000000..2119162994e0
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/bluetooth/qcom,ipq5018-bt.yaml
+@@ -0,0 +1,86 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/bluetooth/qcom,ipq5018-bt.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Qualcomm IPQ5018 Bluetooth
++
++maintainers:
++  - George Moussalem <george.moussalem@outlook.com>
++
++properties:
++  compatible:
++    enum:
++      - qcom,ipq5018-bt
++
++  clocks:
++    items:
++      - description: Bluetooth Subsystem low power oscillator clock
++
++  clock-names:
++    items:
++      - const: lpo
++
++  firmware-name:
++    maxItems: 1
++
++  memory-region:
++    items:
++      - description: |
++          Reserved memory carveout for firmware loading and runtime data
++          transport between the host and the Bluetooth controller.
++
++  interrupts:
++    maxItems: 1
++
++  qcom,ipc:
++    $ref: /schemas/types.yaml#/definitions/phandle-array
++    items:
++      - items:
++          - description: syscon node representing the APCS registers
++          - description: offset to the register within the syscon
++          - description: IPC bit within the register
++    description: |
++      The outgoing IPC bit used for signaling the Bluetooth controller of a host
++      event or for sending an ACK if the remote processor expects it.
++
++  resets:
++    items:
++      - description: Bluetooth Subsystem reset
++
++required:
++  - compatible
++  - clocks
++  - clock-names
++  - firmware-name
++  - interrupts
++  - qcom,ipc
++  - resets
++
++allOf:
++  - $ref: bluetooth-controller.yaml#
++  - $ref: qcom,bluetooth-common.yaml
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/clock/qcom,gcc-ipq5018.h>
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++    #include <dt-bindings/reset/qcom,gcc-ipq5018.h>
++
++    bluetooth {
++      compatible = "qcom,ipq5018-bt";
++
++      firmware-name = "qca/bt_fw_patch.mbn";
++
++      clocks = <&gcc GCC_BTSS_LPO_CLK>;
++      clock-names = "lpo";
++      resets = <&gcc GCC_BTSS_BCR>;
++
++      qcom,ipc = <&apcs_glb 8 23>;
++      interrupts = <GIC_SPI 162 IRQ_TYPE_EDGE_RISING>;
++
++      memory-region = <&btss_region>;
++    };
+
+-- 
+2.53.0
+
+
