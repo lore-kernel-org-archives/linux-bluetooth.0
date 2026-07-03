@@ -1,144 +1,78 @@
-Received: from fluid8.de (fluid8.de [152.53.155.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F820247291
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Jul 2026 18:53:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.53.155.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F423E30C15B
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Jul 2026 19:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783104806; cv=none; b=sI9wAo7bIKU+tlJC5TGn9kh3obC/3HNrKZI/YYyVbEsfqdZpscg2ncTwMORtx6ytf4bas28ZZ44T0i2UnpNqFHNU3tFuXPjdKCD/jrOsiNSRYvXnxclVGbBNuOB0BE837uo6rx/Hean93h6U0UO+RvYXoHuX6xV+5Wx3MSDhClQ=
+	t=1783106479; cv=none; b=kGoc20dmNC9jfp4MIchnAQ0xlTR0fDKqiqHBDX4ZmoyrJCz9O0iCKmkt9MWqdGjBxtTEaI1IOcyfK91wR8YxZ2fm2/9VURljyppxrIN2m0Y+6yTBqr+Oh/TqpBm3fUMLwb1VSJd2FsThyAZdx/+gCENpneR+rszo4jUwQsvGpEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783104806; c=relaxed/simple;
-	bh=J69/fD4hLwcXMvT1LziHTJToP7lyVSLF7vxDNEkroWM=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=VqO3bZYIc1gEqIGeEP4ES1W9x1So3EWId4OVRNhq09HRolZCCHDyJWQZD3QUyXxDpYch5aQV9q9BtgJm+YYeOkZMd6cpVakOmPrYbQsVzD6k581vxbbV2wecSKX4+UmxUFkzz4MFVK7TYBUtHPiqLOV/DMn8Pxh1PcTcj6ghoTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fluid8.de; spf=pass smtp.mailfrom=fluid8.de; dkim=pass (1024-bit key) header.d=fluid8.de header.i=@fluid8.de header.b=vI1QzaJ5; arc=none smtp.client-ip=152.53.155.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fluid8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fluid8.de
+	s=arc-20240116; t=1783106479; c=relaxed/simple;
+	bh=s9/yrX52VOFD5RhytNsb/DN/ydewaovxeFos4vhPg2c=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=QvJz6KHkxkZ+ZeU+vSC2VMm6TjVPSZJu4uQOlMZyUp5FQLwBM6+F6ql+lhKw8Ri7qd0GNWMtPdgPNyIn5fRQ6XQRjrQZ5m1AWH7gC4qOPR+KyFrG8rv7CGsa0Rjy1QJhJGYHha+lifS4VoPLRjesm/rJqan4CB52vtWt/ZuIKzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rr355++7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fluid8.de header.i=@fluid8.de header.b="vI1QzaJ5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fluid8.de; s=mail;
-	t=1783104252; bh=J69/fD4hLwcXMvT1LziHTJToP7lyVSLF7vxDNEkroWM=;
-	h=Date:To:From:Subject:From;
-	b=vI1QzaJ5K+g2gWo6g+ENFpCLZr40oL4aIKPFkFJwJk9+4OvywkRA3ihoHVf8M+aff
-	 PaF6PtN2hhPf05PV9TrDPb1bA7GEWWXw9gGtL1oFrmSFcxPIWfH26JmL1JuEqK1+Ra
-	 gvjiEzmHogsTQkRnkloTg/SyEbE1Fk/ib0UwM9Do=
-Message-ID: <11453504-20db-45d0-87e0-ce5582dcbab4@fluid8.de>
-Date: Fri, 3 Jul 2026 20:44:11 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rr355++7"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 83B77C2BCF6
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Jul 2026 19:21:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1783106478;
+	bh=s9/yrX52VOFD5RhytNsb/DN/ydewaovxeFos4vhPg2c=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=rr355++7tXEckkcz4v1UPHWdzfvsyM8XtC1k9lYQjoWzC8f4/rIy0fcvoCc5ZFTq1
+	 /v2L3gHB/DBZCwP4x2uAfILe/IXbTzC+kztzlOjvixHaAlfW4TaTsbwcuberA0NeAe
+	 3ZOXEkTbUVW68icMoKWycoe3u5aoSpJTQ6sIQKVCdr8+HMWEQnWHEM36WnJccTsxk3
+	 Vavj4X5VKqfN6yKPdRsOKTWc5ytAGXTTW5XC11dH16zR13QH3tfCrjut3Bjx5BNT1m
+	 C/6+eme/TF06f5wntguVETfEiTTWRY2d/2LfpcuDunTesU5asP6aC7T1OqSsB2/xtq
+	 OlXLurt38zncg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 5E8E2C53BC7; Fri,  3 Jul 2026 19:21:18 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 220564] hci0: ACL packet for unknown connection handle 3837 and
+ sound interruption
+Date: Fri, 03 Jul 2026 19:21:17 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: jcubic@jcubic.pl
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-220564-62941-Au6pqz4s5a@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-220564-62941@https.bugzilla.kernel.org/>
+References: <bug-220564-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Language: en-GB, de-DE
-To: linux-bluetooth@vger.kernel.org
-From: Jochen <dev@fluid8.de>
-Subject: =?UTF-8?Q?Outdated_Intel_BT_firmware_ibt-hw-37=2E7=2E10-fw-1=2E0=2E?=
- =?UTF-8?Q?1=2E2d=2Ed=2Ebseq_=28patch_0x27=29_breaks_all_HFP/SCO_audio_?=
- =?UTF-8?Q?=E2=80=94_Windows_driver_ships_working_patch_0x2b?=
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-hello everybody,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220564
 
-this is my first e-mail to a linux kernel list. Claude.ai to find the cause of this problem and created this text.
+--- Comment #18 from Jakub T. Jankiewicz (jcubic@jcubic.pl) ---
+I didn't notice any sound interruption anymore. Right now I'm on kernel
+7.0.13-100.fc43.x86_64
 
-# Outdated Intel BT firmware ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq (patch 0x27) breaks all HFP/SCO audio — Windows driver ships working patch 0x2b
+I still have many messages in the system log, but that is part of
+https://bugzilla.kernel.org/show_bug.cgi?id=3D80791
 
-## Summary
+--=20
+You may reply to this email to add a comment.
 
-The legacy Intel Bluetooth firmware `intel/ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq`
-in linux-firmware carries RAM patch **0x27 (39)** and has not been updated
-since 2014. With this patch level, the HFP/HSP microphone path (SCO/eSCO,
-CVSD) of the affected controllers is completely unusable: the decoded audio
-is a constant full-scale buzz unrelated to microphone input, and the kernel
-log floods with `Bluetooth: hci0: corrupted SCO packet`.
-
-Intel's own Windows driver package for the same hardware ships RAM patch
-**0x2b (43)** for the same firmware variant. Loading that patch on Linux
-(extracted from the Windows driver, converted 1:1 — the embedded blob is
-already in bseq format) **fully fixes HFP audio**: clean, intelligible
-microphone audio and zero corrupted SCO packets, on both eSCO and basic SCO.
-
-Since firmware submissions must come from the vendor, this is a request for
-Intel to submit their final patch level for the ibt-hw-37.7.x legacy
-(Wilkins Peak) firmware files to linux-firmware.
-
-## Hardware
-
-- Intel Dual Band Wireless-AC 3160 combo card
-- BT controller: USB `8087:07dc`, "Legacy ROM 2.5 revision 0.0 build 1 week 45 2013"
-- Loaded firmware file: `intel/ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq`
-- Distro/kernel: Ubuntu, kernel 7.0.0-27-generic, linux-firmware 20260319
-- Headset used for testing: Jabra Evolve 65 (BT), PipeWire/WirePlumber 0.5.x, native HFP backend, CVSD
-
-## Symptom with current linux-firmware (patch 0x27)
-
-- HFP microphone capture is a constant full-scale roar: peak = 32768,
-   RMS ≈ 29400, RMS envelope flat at maximum for the whole capture,
-   completely uncorrelated with speech. (Typical CVSD delta-decoder railing
-   on a desynchronized/garbage bitstream.)
-- Kernel log: thousands of `corrupted SCO packet` messages per 10 s capture
-   (btusb SCO reassembly desyncs on the controller's bursty/corrupted
-   eSCO-over-USB stream).
-- Independent of: eSCO vs. basic SCO (tested via forced HV3), xHCI vs. EHCI
-   routing, alt-setting, autosuspend. A2DP is unaffected.
-- Long-standing reports of the same symptom on this chip family, e.g.
-   Ubuntu bug #1310558 (2014, fixed back then by a firmware patch update),
-   Linux Mint discussion #662 (2024, kernel 6.8, unresolved).
-
-## Fix: patch 0x2b from Intel's Windows driver
-
-Source (publicly available from Intel): `BT_21.10.1_64_Win8.1.exe`.
-The package embeds the RAM patch for each firmware variant inside the
-driver binaries, already in bseq format (identical HCI cmd/event record
-stream as consumed by btintel's legacy patching):
-
-- Header for fw variant 1.0.1.2d in linux-firmware:
-   `018efc0a 00010008 0004012d 0d27` → patch **0x27**
-- Header in the Windows driver (identical blob in all driver builds
-   20.91.3.1 … 20.100.5.1 contained in the package):
-   `018efc0a 00010008 0004012d 0d2b` → patch **0x2b**
-- Extracted blob: 22627 bytes, 191 well-formed cmd/event records,
-   same first command (0xfc8e) and same final command (0xfc60) as the
-   linux-firmware file; sha256 `7a0ca9155e0ec489…` (full hash on request)
-
-Result after installing this blob as
-`/lib/firmware/intel/ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq` and cold-booting
-(the controller keeps the old RAM patch across warm reloads;
-`Intel BT fw patch 0x2b completed & activated` confirmed in dmesg):
-
-- eSCO (stock kernel, CVSD): clean intelligible microphone audio,
-   0% clipping, speech-correlated RMS envelope, **0 corrupted SCO packets**
-   during 15 s capture (previously ~2600 per 10 s). Some later runs show a
-   small residue (~18 per 15 s) with no audible impact.
-- Same result with basic SCO.
-- Bonus: the USB autosuspend instability we saw with 0x27 (controller
-   drops off the bus under SCO load) is also gone with 0x2b — verified
-   with default runtime-PM settings including a real suspend/resume cycle.
-
-## Comparison of all 37.7.10 variants
-
-| linux-firmware file | patch in linux-firmware | patch in Windows driver |
-|---|---|---|
-| fw-1.0.1.2d.d.bseq | 0x27 | **0x2b** |
-| fw-1.80.1.2d.d.bseq | 0x2a | **0x2b** |
-| fw-1.0.2.3.d.bseq | 0x56 | 0x57 |
-| fw-1.80.2.3.d.bseq | 0x57 | 0x57 (current) |
-
-The `.2d` variants are the outdated ones; `1.80.2.3` already matches the
-final Windows level.
-
-## Request
-
-Could Intel please submit the final patch level (0x2b) for the
-`ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq` (and `fw-1.80.1.2d.d.bseq`) files —
-and generally the last released patch levels for the 37.7.x legacy family —
-to linux-firmware? The blobs already exist in bseq format inside Intel's
-Windows driver packages; only a licensed re-release is needed.
-
-I can provide full captures (WAV), btmon/usbmon traces, exact extraction
-offsets, and full hashes on request.
-
-kind regards,
-Jochen
-
+You are receiving this mail because:
+You are the assignee for the bug.=
