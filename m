@@ -1,168 +1,145 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [46.38.247.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E407346AFD
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Jul 2026 06:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F9A1A6816;
+	Fri,  3 Jul 2026 06:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.38.247.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783058441; cv=none; b=orZ7kqZuW36Ia6qKNRwT2mFSxz2KB08y6icl73oOxznlIAlTBnadIBT5uaIe1uZD3/e5fKMBBZF4e0Jet6910bSTx3+A7JNnHb6Z/rfBKCEG/0+LGMvhtPXidudphCaZqdYraaBx5tDH2KgwGu/nSUpyxdPLvYt7LGcWHCVlEUA=
+	t=1783060461; cv=none; b=dUIO/qaF0bGO6Bp9jKDkl0DZ5zPVOd0QmVBh6NPK1VOmonh3Q73IYKV/LRTPConrvurbN7r3JDwP9+7fRbH0dg4sg0kD76sQjHL1V/PQgC+IzWOUcWuu8gPvLjDDciBLNZx0SdGhT7W26VUifFR9e1BRJt0NN+rPAgwonNmq8A0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783058441; c=relaxed/simple;
-	bh=01ctfTpR3Oc5ejLd+QOo/enswnmwvzz7Ey4v7LhW41I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=crqb8kRH7cdAIYkjvmBjMlHROUJAjoyI84zpB1UdoTisX9oypA3iKa+XBQfgbb3oh8UNJPJumtMmdqg/htDNOAAxEojm/PfxVUM0P3n0bmp9oPFoQgDQtrWMigyalxZOVT1Ky8esG522ahAis+kZXnu48SBiYnxiKjptTp0Spwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hJRHdUcp; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783060461; c=relaxed/simple;
+	bh=wquMac3iXj0ao4VbxcoVDw1jeCiQnyRzUPYephGxJWI=;
+	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=HnttalywxptoH/xKs/xMWP6ftA1iQ+Om0/qoSYS7jm+bu5pIpQ4i1wIBd0LCH2bLTM2SpLjNJd2YE49G1hSKIklnymUoDGj8S0hnFBBWPYb4OXUvxDmCkSrP3AyYRG2qFKL9N2vdPMC171Z5u8KDs6VwmayLMDSDqIG5Rn1q4LA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=jO+neQFa; arc=none smtp.client-ip=46.38.247.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hJRHdUcp"
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-37ffdc718f8so246288a91.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jul 2026 23:00:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783058439; x=1783663239; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MEe9tK0pdPJ/vh4fadxqcTP4nEzSKtWpGeT5rRxX6RY=;
-        b=hJRHdUcpYlSnjc3U+3iioLh97NzBkX6FFlsQMU7GMGuwVjhbFG6Lq2UGrHEiyJ2CFU
-         nPDg3UA4b6OWxcGN8Suv8Z5FS2BwkaDHJlW0sfK4wxJQdtUMBkYI5KRhv06E31qHIVQG
-         YrlLv4YyyMm7NERnzXRkI+z6kT0L71q3pt80EGXVt8RNBlMNPQsUMLHml9/3g6fpTMQP
-         yqQn8+atUK3MqdMGkrqaGaPchpYWS72szwDb25BlCRm4d0R4zPDURwFik0dokxsfoTCt
-         dkqEfumX+Bu0kJzQt3G/kmvP19JmL/uMND/0VNvXVU+9KXU4DRVtdbNDx7ccspuOa6AE
-         DKlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783058439; x=1783663239;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MEe9tK0pdPJ/vh4fadxqcTP4nEzSKtWpGeT5rRxX6RY=;
-        b=LkCV8j9vNqF/8NzssvV43rt97EW6gECdJPNHH47ha4z70JDpxSqSBLYm/8jtZEA2w7
-         xW81Anw+59TyhQVMIzsafSmrQDSA1smkYHSj9PztJbiTugDDyb9+Fe9tKMGkLjXH8rH1
-         DHJzilZ9man2zVvhVQjsxEkpt3e7mI8A2TcA3mzAXfS6W/cbnoud04J194YhROTvl34i
-         mpYSV4OGjbY6Z3Aeq33EEMmujHlS6RFn/DX17NxkNh3EWj1EP2lfdeCl+cMmzdVkRvdS
-         kHsRujmHNIb0AMGIQdGuNmWRu/WK41c1zV9NcQltS3tC7VsclQWt9mA/ur25kTFMO5MD
-         vJtg==
-X-Gm-Message-State: AOJu0Yw7KejGHqu7vuo7TML6UIUOlas/4HV59nbTk1rn0+/RkGykbTyb
-	Uj7+lmlDwRukJYkI7HY6Xm05LOZwbsurghSJ+yIBOQA4ApY901WTKXuo
-X-Gm-Gg: AfdE7cmuO32mVAA/c1DAe8MByp1BmDl+ElAs+X5McoNo9YsWm5RglZLM2w1P47tvw7t
-	E9FhfaXBOZoAAcmZjtydnb6ZZg0Fz1eBNzV6tt0JBxQj3Sie+v8VWieRJgwSl9i6T20jhEmxWcx
-	XEoo00jcvSZ7HwxugGOZAV0S29dCKG0N04xoGvKeaOa6hQ7JxnQfY7mlDK0QGJPIUTkQObUWAUX
-	7Z57cfNbtpvI0Uo46pOb3UdDct2TiDlenAOCMHI35EKn2iTR9u4fmZv6TVPDyRbTsSG1gajfryu
-	svjfHMus+eWfPUoNCKDA48MVzxcz6FRr/sRbPxaZ4fsw/kdDiI2Za3KKlVpzXldy/H/a+4FeIiY
-	9/V1nP2NNhtJRmUC876m7z+nF+IHpn2X0Rpza8rMmHN2ouq3Dc4hbKhvOy2tkt/cdRJK2/FxdxN
-	Frrp0ph2s=
-X-Received: by 2002:a05:6a21:4516:b0:3bb:106d:77be with SMTP id adf61e73a8af0-3bfed560398mr10645154637.44.1783058439156;
-        Thu, 02 Jul 2026 23:00:39 -0700 (PDT)
-Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c9e92b81be9sm2159628a12.30.2026.07.02.23.00.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2026 23:00:38 -0700 (PDT)
-From: Cen Zhang <zzzccc427@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	baijiaju1990@gmail.com,
-	zzzccc427@gmail.com
-Subject: [PATCH] Bluetooth: MGMT: Fix ADD_EXT_ADV_DATA rollback of committed instances
-Date: Fri,  3 Jul 2026 14:00:33 +0800
-Message-Id: <20260703060033.570932-1-zzzccc427@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="jO+neQFa"
+Received: from mors-relay-8404.netcup.net (localhost [127.0.0.1])
+	by mors-relay-8404.netcup.net (Postfix) with ESMTPS id 4gs3r35lNTz87WN;
+	Fri,  3 Jul 2026 08:34:11 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1783060451;
+	bh=wquMac3iXj0ao4VbxcoVDw1jeCiQnyRzUPYephGxJWI=;
+	h=Date:From:To:Cc:Subject:From;
+	b=jO+neQFag7qS8Cgf8KU1wj+x/nI53fFdkKDx2K8wqjmvGTh7jm1rGT15FxgM09CWL
+	 KT/1vzPjkCpWSEWIyDOBHn9+xkbPCWaWj2L074CoeXe4vP5Z89olWEj9vUqtU0n6n7
+	 siMKD/UVZpHP3Z1C5JRpGbtvhnCa3CgbbRUKr7Xrucp0sXePPaIdyDTnYKLNwnEYX5
+	 gI4WKp/0rWO3R7+61Z5srPavtLa3eU3f9HYt8Zw5JR9zZX293rIvlfaBtJU7ZZAZDs
+	 ld4vsP+ngYqwswTfWq4winj3H6cJZS0YJvHxq7t/CfovPF4YxeheQVNPxjRuX74K33
+	 Xp50OszJwfVmw==
+Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-8404.netcup.net (Postfix) with ESMTPS id 4gs3r352PZz4y3R;
+	Fri,  3 Jul 2026 08:34:11 +0200 (CEST)
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4gs3r30D8pz8sbF;
+	Fri,  3 Jul 2026 08:34:10 +0200 (CEST)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id A9DAC5F9DD;
+	Fri,  3 Jul 2026 08:34:09 +0200 (CEST)
+Authentication-Results: mxe9fb;
+        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <7ea1c4a0-d38f-413b-993b-7846b2b7debd@leemhuis.info>
+Date: Fri, 3 Jul 2026 08:34:04 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Content-Language: de-DE, en-US
+To: Chris Lu <chris.lu@mediatek.com>, Sean Wang <sean.wang@mediatek.com>
+Cc: Linux kernel regressions list <regressions@lists.linux.dev>,
+ linux-mediatek <linux-mediatek@lists.infradead.org>,
+ linux-kernel <linux-kernel@vger.kernel.org>,
+ linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+ "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: btmtk: regression in 6.6.142: NULL pointer dereference in
+ btmtk_usb_hci_wmt_sync during resume from S4
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-PPP-Message-ID: <178306045006.2570955.4688252285094479308@mxe9fb.netcup.net>
+X-Rspamd-Server: rspamd-worker-8404
+X-Rspamd-Queue-Id: A9DAC5F9DD
+X-NC-CID: VbNHS0oX1QXCKViIOo6Fnmu8ywTSde/sFR4qjOaanBJLN0ZeUKo=
 
-add_ext_adv_data() uses clear_new_instance to roll back failures after
-preparing advertising data. That path is valid for a newly created pending
-instance, but a malformed ADD_EXT_ADV_DATA request can also reach it for
-an already committed advertising instance. In that case clear_new_instance
-frees the live adv_info while hci_cmd_sync_work() may still be using it.
+Hi Chris & Sean! I noticed a report about a regression with btmtk that
+happens in 6.6.y series. This strictly speaking is the domain of the
+stable team, but maybe you want to take a look nevertheless:
 
-The buggy scenario involves two paths, with each column showing the order
-within that path:
+https://bugzilla.kernel.org/show_bug.cgi?id=221696
 
-  advertising enable path:           ADD_EXT_ADV_DATA error path:
-  1. look up the committed adv_info  1. accept an update for that instance
-  2. wait for the controller         2. hit clear_new_instance on failure
-     response                        3. remove and free the live adv_info
-  3. resume and access adv_info
+To quote:
+"""
+I have a problem that appeared in the 6.6.y series recently, I believe
+in or around f0457842215438786e2e205ad06a4fbb8ab63cd0, although I
+haven't bisected. The problem did not exist in 6.6.140 but does exist in
+6.6.142 and 6.6.143.
 
-Validation reproduced this kernel report:
-BUG: KASAN: slab-use-after-free in hci_enable_ext_advertising_sync+0x99/0x190 [bluetooth]
-Read of size 1 at addr ffff888104e3f010 by task kworker/u17:1/2502
-Workqueue: hci0 hci_cmd_sync_work [bluetooth]
+The problem — during resume from hibernation (platform S4) I see this
+NULL pointer dereference in the kernel log:
 
+BUG: kernel NULL pointer dereference, address: 0000000000000219
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 0 P4D 0
+Oops: 0000 [#1] SMP
+CPU: 7 PID: 214 Comm: kworker/u33:0 Not tainted 6.6.143-gentoo #1
+Hardware name: Framework Laptop 16 (AMD Ryzen 7040 Series)/FRANMZCP09,
+BIOS 04.03 12/22/2025
+Workqueue: hci0 hci_power_on
+RIP: 0010:__pm_runtime_resume+0x15/0x80
+Code: 55 fe ff ff 83 e0 02 45 31 e4 e9 45 fd ff ff 66 0f 1f 44 00 00 f3
+0f 1e fa 41 54 55 53 48 89 fb 48 83 ec…
+RSP: 0018:ffffc90004a37c18 EFLAGS: 00010246
+RAX: ffff88810bdcd4f8 RBX: 0000000000000050 RCX: 0000000000000000
+RDX: 0000000000000035 RSI: 0000000000000004 RDI: 0000000000000050
+RBP: 0000000000000035 R08: ffff888fdfde6bd0 R09: ffff888101338a40
+R10: 0000000000000001 R11: 0000000000000040 R12: ffff888101338a40
+R13: ffffc90004a37cc0 R14: 000000000000003a R15: ffffc90004a37cb4
+FS:  0000000000000000(0000) GS:ffff888fdfdc0000(0000) knlGS:0000000000000000
+GS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000219 CR3: 0000000003e11000 CR4: 0000000000750ee0
+PKRU: 55555554
 Call Trace:
  <TASK>
- dump_stack_lvl+0x66/0xa0
- print_report+0xce/0x5f0
- ? hci_enable_ext_advertising_sync+0x99/0x190 [bluetooth]
- ? __virt_addr_valid+0x19f/0x330
- ? hci_enable_ext_advertising_sync+0x99/0x190 [bluetooth]
- kasan_report+0xe0/0x110
- ? hci_enable_ext_advertising_sync+0x99/0x190 [bluetooth]
- ? __pfx_add_ext_adv_data_sync+0x10/0x10 [bluetooth]
- hci_enable_ext_advertising_sync+0x99/0x190 [bluetooth]
- ? __pfx_hci_enable_ext_advertising_sync+0x10/0x10 [bluetooth]
- hci_cmd_sync_work+0x187/0x210 [bluetooth]
- process_one_work+0x4fd/0xbc0
- worker_thread+0x2d8/0x570
- kthread+0x1ad/0x1f0
- ret_from_fork+0x3c9/0x540
- ret_from_fork_asm+0x1a/0x30
+ usb_autopm_get_interface+0x1a/0x50
+ btmtk_usb_hci_wmt_sync+0xb8/0x480
+ ? btmtk_usb_wmt_recv+0x240/0x240
+ btmtk_setup_firmware_79xx+0x1a4/0x360
+ btusb_mtk_setup+0x45b/0x690
+ hci_dev_open_sync+0xdd/0xa40
+ ? try_to_wake_up+0x235/0x510
+ hci_power_on+0x69/0x2b0
+ ? lock_timer_base+0x6a/0x90
+ process_one_work+0x154/0x2f0
+ ? process_one_work+0x2f0/0x2f0
+ worker_thread+0x18b/0x310
+ kthread+0xe0/0x110
+ ? kthread_complete_and_exit+0x30/0x30
+ ret_from_fork+0x2c/0x40
+ ? kthread_complete_and_exit+0x30/0x30
+ ret_from_frok_asm+0x11/0x20
+ </TASK>
+CR2: 0000000000000219
+---[ end trace 0000000000000000 ]---
 
-Allocated by task 2515:
- kasan_save_stack+0x33/0x60
- kasan_save_track+0x17/0x60
- __kasan_kmalloc+0xaa/0xb0
- hci_add_adv_instance+0x35d/0x440 [bluetooth]
- add_ext_adv_params+0x291/0x510 [bluetooth]
- hci_sock_sendmsg+0x96b/0xf80 [bluetooth]
- __sys_sendto+0x2bc/0x2d0
- __x64_sys_sendto+0x76/0x90
- do_syscall_64+0x115/0x6a0
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+The BUG dump appears while the system is waiting for me to enter my LUKS
+passphrase — i.e., *before* the initramfs writes the swap device
+major:minor to /sys/power/resume to initiate resume from hibernation.
 
-Freed by task 2515:
- kasan_save_stack+0x33/0x60
- kasan_save_track+0x17/0x60
- kasan_save_free_info+0x3b/0x60
- __kasan_slab_free+0x5f/0x80
- kfree+0x313/0x590
- hci_remove_adv_instance+0x130/0x1b0 [bluetooth]
- add_ext_adv_data+0x263/0x640 [bluetooth]
- hci_sock_sendmsg+0x96b/0xf80 [bluetooth]
- __sys_sendto+0x2bc/0x2d0
- __x64_sys_sendto+0x76/0x90
- do_syscall_64+0x115/0x6a0
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+I am still running kernel 6.6.140 in my current session. In other words,
+a 6.6.143 kernel is booting to resume a suspended session that is
+running a 6.6.140 kernel.
+"""
 
-Only pending instances should be rolled back from ADD_EXT_ADV_DATA
-failures. Leave committed instances in place so queued controller work
-cannot retain a freed adv_info pointer.
+This does not happen in mainline -- apparently it is fixed by
+"Bluetooth: btmtk: move btusb_mtk_[setup, shutdown] to btmtk.c"
 
-Fixes: 12410572833a2 ("Bluetooth: Break add adv into two mgmt commands")
-Assisted-by: Codex:gpt-5.5
-Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
----
- net/bluetooth/mgmt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 733a4b70e10c..a4126d616efa 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -9220,7 +9220,8 @@ static int add_ext_adv_data(struct sock *sk, struct hci_dev *hdev, void *data,
- 	goto unlock;
- 
- clear_new_instance:
--	hci_remove_adv_instance(hdev, cp->instance);
-+	if (adv_instance->pending)
-+		hci_remove_adv_instance(hdev, cp->instance);
- 
- unlock:
- 	hci_dev_unlock(hdev);
--- 
-2.43.0
-
+Ciao, Thorsten
