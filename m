@@ -1,112 +1,112 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF4835E1B1
-	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Jul 2026 08:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB495342523;
+	Fri,  3 Jul 2026 08:55:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783068099; cv=none; b=uG3r3J0ZsA6/G9mu2hSOW5cHZeE8NwyO/EpE3L9G9kN0jnlJkF5m+IcqvcqMZtXV+AxXsJs3I7GzT4scOQMjJekJjYdPloFDsQPZSQ6i9poXV24owGZz8AXnLTtOqjPXgnMAVbZlHKEtV3LhNZlm+WC6L+c3aG8Gr5sMaTbqIF0=
+	t=1783068915; cv=none; b=LimNRRBrnLNNnEjjXcpVEOT/z3ml78T0XCJx+EtwD5xmhRv9HaOoeFQxJkt62qeZZA+eHrRbLDPa7TAFvdNOlr9sJ31MinfDRuIKNzrOaeIWb4pzk+K4l3iRKLKNxrZ5hMD1q7AHz05mxifJg1BqIaVBYwAYE/R+8f+Ixls3CP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783068099; c=relaxed/simple;
-	bh=VCpaQ5LE4T9Qi8o+ejHPLKTVrkPjB+GKvjKbH2FTWJs=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=QrxmVv/yF736nBK8VelHwg0WfeZ+X4hnprWkMJEU8YMMz9tssnOWOg4gehtwfg51e7oVrXHVmlUdG5t5oBlpCn6IfpsKDnxeUppiK60HSiZCL8Z/Bnl+qMaC/HE96387y575YkfbwUPx+8Dx8S3+0YtCgTC1neJatiMr9izli5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cujrt318; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783068915; c=relaxed/simple;
+	bh=eKI7OrRx+ws5BlmMIWzhn+c130GYvd1H5bURxsobRfc=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=bF9iXCqXH+D69BxBPUJOQxRnRSSVHkTF31tIOqWtcFqWEzsz+dDtp6UZrBPDuU5flua9cAOu/9DNEMxwZ9AA0tP/+yIRcjfrzBFTFoVjnqpuZPo+X9lZUBIG5cqSuLG8SIG5ITRqQYQNeZwgqt1l5eQ5m21n8k6qbo9WsdYZhxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=usYiVT09; arc=none smtp.client-ip=43.163.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cujrt318"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-92e855da580so25704385a.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Jul 2026 01:41:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783068096; x=1783672896; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=9j3lyEfEKARYSu+IuXitBhNQR65GrFvwr8YLCG1MXrI=;
-        b=Cujrt3181obZFexkPMU5WodMl2QuGHUeVqXbZhNIq6WtIyB4hVFYw0fg6CuYYwYvt0
-         CSGl5DVSd+ofQ/1Dg2SJlsW3346q3RwOoCCu+l7DKR+Kef3RQ7NyQKZ5RrJPlSgRMf1W
-         12RKw7cTEYc46lXvp3l1oev11VysCreS9yYM1eLsAyai1MkFboqJZzXqm03KW5XjBr8b
-         oZdkcydKsS4uN6d6RQzEEwquHrpomRkT0RqIR9uPWiCJv3H36P7C/D9zAGlmhZ7XjdyU
-         +cu6O+v/3ZhNOvVrr8dHcE791n8CbzhBl0vUPUfHjLbV6h6jl6NF/mtx9KPoRI1uZvvS
-         FDmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783068096; x=1783672896;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9j3lyEfEKARYSu+IuXitBhNQR65GrFvwr8YLCG1MXrI=;
-        b=QIkuqfiivni7h5XoJ0RkK2aOZy58yC2zkgpxH64z1Sr9FTb1SVy489xOX139jUZ/TF
-         BWUWAjw6L2LTIPYSc6B1U+RY2L8vi16byZUoPrmwpx866UzNGeZYdxps3GQBTsa/hqJa
-         x9EEUbnG9MUl55ifphBij6SmWcb5YJR1Ok5g+eu9EG6sM9qVOAqO7v3zRgR/e3Gck4Bt
-         OepbLuJUTKgpKRmo1iGcXFs67vekVFs88N26jipmj7MnfIeGXBBkJ2opPfngJOks4CT3
-         an/c/0Gh3CR2UMU3gAt++200S2EXDBGQncR2g5KB0mv/qLWK+IMbP9fOPiIZzHFNtQ/j
-         kxFg==
-X-Gm-Message-State: AOJu0YxxbqJe4DDqpvmp33z/K3OsTGnpVuKqvuqUJFb9+1F8fH7cyYGV
-	VAkeenvepAiM1V6aHcRMVJFbffrNN/EgKzUoYmZZQ7FuwErU+rWFdPSt3fjJUQ==
-X-Gm-Gg: AfdE7cl9XH6yxzRtn1XYym5k1Nd3wH9vH24sOaLYBwlFb7rGpCtt6142IOpPnnpY/H0
-	aEx3PuzB4if07V8asfM7Pvku/i2BJdN2S3a02U4aj+P2YKQKEzaZs3yyir+PvpvOjvHEpjrnCjw
-	R7nA2sfG/zybPuCQuCb71wGNCpvr13Z4xDn6LQJzLsojhQc+KhzdUGeUZMLadSOYR47in4L0N5r
-	CwzIdXHMlldJo/W0DslhpF4tTAujCgzTZqLPwdB0A22BKR7EcjAKjYQQ/3CG3tnNxYghpC0y3BX
-	UHhbJsTk7nHHZZPzbWYluZcbbOrwOl5n8r+PHPMbMfzc/ePEcyK8eokz22y16oPayYrPZvNz9ZX
-	BsJA9BcLyYmApzxi9nWEU6fdtsalH4MQ0SiAwuJxZO9xWGdWb9ITfdyZm08/+klF+pEOphSJd4t
-	H4MkkP2MBdJwek2Ryi
-X-Received: by 2002:a05:620a:710c:b0:92e:5b92:98bb with SMTP id af79cd13be357-92e78209b22mr1397621285a.14.1783068096096;
-        Fri, 03 Jul 2026 01:41:36 -0700 (PDT)
-Received: from [172.17.0.2] ([20.51.199.4])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-92e90b9db95sm112239285a.14.2026.07.03.01.41.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jul 2026 01:41:35 -0700 (PDT)
-Message-ID: <6a4775bf.f0689485.16816.96a7@mx.google.com>
-Date: Fri, 03 Jul 2026 01:41:35 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8913524377744873044=="
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="usYiVT09"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1783068900;
+	bh=2WchnoND6ZC1YwTNCHecshM3Pc20MGGj5Wsynwy65MQ=;
+	h=From:To:Cc:Subject:Date;
+	b=usYiVT090sSCtVH9kIe/h4I5xmOX3RczL0SqgyMUZhLs/91lT64XylogdO6kekkI0
+	 7avKiXOibOgpnmYkDDolZPfpkU8Vn9otQS+OUAL09Pk2Q0EvWU+Lz1h3hiY5TumFV9
+	 upPiDlqrzSVX5uU1H04dg8tdUe1Zn4ZsnhwPRSt0=
+Received: from localhost.localdomain ([116.128.244.169])
+	by newxmesmtplogicsvrszc56-0.qq.com (NewEsmtp) with SMTP
+	id DBB0E4DF; Fri, 03 Jul 2026 16:54:59 +0800
+X-QQ-mid: xmsmtpt1783068899tj8mnhzdw
+Message-ID: <tencent_A0AEA018EC865AB4DC9D2A43D1E5B71DE905@qq.com>
+X-QQ-XMAILINFO: NC4p7XQIBeahOvhCmaNs6GQdEXblxuUuh1DoSiC2/JGnCnxOpAgHVpdaW8GPuP
+	 ExE51I1hy0NJVF+LzV0jNTPLOY6ynESgXMrZ8B9Mo1ZpXznzhUHDi8K9Vg1KYY8KdMLTdtmGBgwW
+	 MuMCzPAcL+AjirB8PP+TYLFOL/1Ss/87Bijo2jw0S0lCQIFL/ld69DRWU0Ay12a+/Kn9Hbuc9ElE
+	 dXViQeU3+BmGVlIc08OJIJu01mLSmU6KQxtFlc9YKC3hXItURsVCSRNdC/xfWF3/Q9PZf53DBcI6
+	 0tw9AindTJtZ7W4402FI/KPfmgHIU78EtnHU0AbiwLp2AJCR4a3eMeFbYiJnbNWxwyRDNCtwI/IY
+	 YvC85Xbd2cmlnYZwLNdH2gsrrj0tezTpE3Dcv7LAH0pmAxlGB9Qjb9JBkBl8pBZF8IWNGCM6zYHA
+	 pE7fhTVFeAs2OaBDWGVEPkj2slJ4uVtzjPvInVXj4soT9SPcBA3HUt9+ktz8t1GCp8VoA7j6Rxqb
+	 OM6q7dzMfo8QbEy3o1wYo2hgAnx+OVFjwPrhVrR4fUmtDujJzIdOSI+kb7/P6I1CqeW0Ae9bzd91
+	 wm049vR7+GcyomUBrz3G9EMbar61+9KxDoAADCXbFSjWWcWAVGVy1yzvdmVrQF+A/jfQLu3gq+Xt
+	 zIFWB/SqO5A26zy5FjAMijlLvlZ68bILKDE9feMVKLvYGxDh0zcgTsUPuAPUTidkZNh6P66f5bRa
+	 9nCkf2ZmipEz1daHdpKsSw9gz6Kca9TluFtpuIjimUbAauVrk4ZVuqTIS+MnoAlddInRXXXeKb++
+	 Zb6CCjlkEf9Abb6cHcG/eXIR2KkqVSln4jkXQ9hnO4HzEIWwzs+c4MPLJocsxGAtzaP+V0fd1iEc
+	 NNdpRP7nbdOmB0Jl1fgbMavSVppcx9A4MVkhUXR4y/Zb87vts2MVlIpEJSP7rxuEGBBdJKBz1FuS
+	 uVCsuol+JbCNLPLcMINNJYplyFpSo6x6e+xErh+vW4stvFnb0lyDI2oBxoM97kPqkWVQS4DI7nRv
+	 4CdtbGF0od94KOYwzh7lzy60h9g4w=
+X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
+From: Zhao Dongdong <winter91@foxmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Zhao Dongdong <zhaodongdong@kylinos.cn>
+Subject: [PATCH] Bluetooth: btusb: fix USB interface release on probe error path
+Date: Fri,  3 Jul 2026 16:54:56 +0800
+X-OQ-MSGID: <20260703085456.421662-1-winter91@foxmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, prathibha.madugonde@oss.qualcomm.com
-Subject: RE: [v1] shared/rap: Add bcs_procedure_data aggregation and procedure data API
-In-Reply-To: <20260703052056.3568571-1-prathm@qti.qualcomm.com>
-References: <20260703052056.3568571-1-prathm@qti.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8913524377744873044==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Zhao Dongdong <zhaodongdong@kylinos.cn>
 
-This is automated email and please do not reply to this email!
+When hci_register_dev() fails in btusb_probe(), the isochronous and
+diag USB interfaces previously claimed via
+usb_driver_claim_interface() are not released. This causes USB
+interface reference count leakage, preventing subsequent re-probe of
+the same device and leaving stale entries in /sys/kernel/debug/usb.
 
-Dear submitter,
+Add a new out_release_iface error label that releases any claimed
+interfaces before falling through to out_free_dev for the remaining
+cleanup. This follows the kernel's standard reverse-order cleanup
+chain pattern and avoids releasing interfaces on earlier error paths
+where they may not have been claimed yet.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1120879
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.01 seconds
-GitLint                       PASS      0.34 seconds
-BuildEll                      PASS      27.45 seconds
-BluezMake                     PASS      549.12 seconds
-MakeCheck                     PASS      8.09 seconds
-MakeDistcheck                 PASS      156.76 seconds
-CheckValgrind                 PASS      153.14 seconds
-CheckSmatch                   PASS      308.11 seconds
-bluezmakeextell               PASS      101.35 seconds
-IncrementalBuild              PASS      547.73 seconds
-ScanBuild                     PASS      969.55 seconds
-
-
-
-https://github.com/bluez/bluez/pull/2266
-
+Fixes: 9bfa35fe422c ("[Bluetooth] Add SCO support to btusb driver")
+Signed-off-by: Zhao Dongdong <zhaodongdong@kylinos.cn>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 830fefb342c6..829d7dbcd84d 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -4407,7 +4407,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	err = hci_register_dev(hdev);
+ 	if (err < 0)
+-		goto out_free_dev;
++		goto out_release_iface;
+ 
+ 	usb_set_intfdata(intf, data);
+ 
+@@ -4416,6 +4416,12 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	return 0;
+ 
++out_release_iface:
++	if (data->diag)
++		usb_driver_release_interface(&btusb_driver, data->diag);
++	if (data->isoc)
++		usb_driver_release_interface(&btusb_driver, data->isoc);
++
+ out_free_dev:
+ 	if (data->reset_gpio)
+ 		gpiod_put(data->reset_gpio);
+-- 
+2.25.1
 
---===============8913524377744873044==--
