@@ -1,39 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9868838E10C
-	for <linux-bluetooth@vger.kernel.org>; Sat,  4 Jul 2026 15:19:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE464433E8C
+	for <linux-bluetooth@vger.kernel.org>; Sat,  4 Jul 2026 16:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783178380; cv=none; b=iOsdKzhBJu0F7BCp4HFvkBvACBX9zpUGMjOPrK5wyfFtN/Z3wD8oYyxocNsSHOl69oBPi8VtslbYBz0+XmJ2IKHZ0HtemvQtp1Lcmk8Bt3lvjWC9EIjx1b9yK5Vegg6hdiBXaK5UpwsIu+fQKCwBDRud2C/0y5a38WxfKkRmSYc=
+	t=1783183178; cv=none; b=hUdovCbFqstPqCdKhrYYLw8njtjo59MJBO3gL06EJizrIPQp++JzIfwZOUvNUaoWjv507b93uAOt36MN+CAMU/TXtQko8vFfxQIBNdcapLY7XZ1KDAnQAAIX7ZZTawLhdNZMjl+l6V/9EkNidP3e7BHpInUgBL104Livwbt2OLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783178380; c=relaxed/simple;
-	bh=EIrMB7mC0tQvpxbIP13UJD7BH+seA6Ch4qu0ISemYRM=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=uT0fDsxZkVRDiJxw+H5SgmSl0A95j0apZ75UjTeKPCHXEXF9BynPuCkN7nZxz0w72Fiq4EuZIKuTQYuni/skUcRM3ozgp9i1Yd0oJx+6HkrO73Yw4NZbJ9uOlKFTmaDQtERDH8Fsi0r7z2y3pdfQ7Fxl/lxpyRZU5R52HAELET8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C7aQn4+S; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1783183178; c=relaxed/simple;
+	bh=ccRxJrdBOW4N/rhF7ZC7u8yaBALjLt1dt94bECOKEIs=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=H7EzVAIz0ax9jdCORUgLppUY/h+tqXYE9SFEAY5VGs8boMrbTKT98+nsOaUqIYx/y9Wx24C0X+NMLmHLTiXzlRcOPaY63vwKzoD0CxGKYwSJAELxQxPqvmYGPNaHEODeRkj9Ms3D49lbGOxgP7gZF8yI8AFmSpeVfAnEHRgGv5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kzEn5QjB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C7aQn4+S"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E29EBC19425
-	for <linux-bluetooth@vger.kernel.org>; Sat,  4 Jul 2026 15:19:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kzEn5QjB"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 54729C19425
+	for <linux-bluetooth@vger.kernel.org>; Sat,  4 Jul 2026 16:39:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1783178379;
-	bh=EIrMB7mC0tQvpxbIP13UJD7BH+seA6Ch4qu0ISemYRM=;
+	s=k20201202; t=1783183178;
+	bh=ccRxJrdBOW4N/rhF7ZC7u8yaBALjLt1dt94bECOKEIs=;
 	h=From:To:Subject:Date:From;
-	b=C7aQn4+S7+8379h7sHhhUNFf/m5lCsVv4gEQ/r3ZW/IJCe7ugt6kJAEVWkEtmoaPy
-	 xJjlu30ZPAPjfzGM8Id1q3wHt8LOoXQTirxkkcHdsLj2XA/dM3CjHJ5+xAgfb0zAgy
-	 qX0TH774ODIJ0O2mibBGCG5E4srG4dmUinvxU3ldxmS/mDzbrpgS0N1wz5YvzZEbu/
-	 lkOCNcJCJmlEmLDhVqO39/jblNqDnXu2yF9o4TuZ5DS9WrEbgwu1bRnKrlYtdLIL6E
-	 A4JoumtOwaFSve0AgqIKwdX6HFsaKF0Z+MfJg71UrobYKDcSpgsRqnnYOPpGUGW+l4
-	 ky0k3HkCBx67g==
+	b=kzEn5QjB+66Gs3myf/6PuM8kK6wOL5xmTFxLJsCkjsLuSZi1D2N0Nqu0YX930SIL/
+	 i7rLNsy04fIbfGVqg3V94LcA2qunohxZOiQr5H9tHgHC9N3/foAlgCbSbnhcLdlmDs
+	 puYSsCyT3FUXJMhkqMugDdqIz+gJS6TZzkphZOkvqg/WDF259dbI/vWM3cu4FmlrBy
+	 FqGXBJ3zRQHuPX9WuUJ3IXYZYxFHJD3UjvPgQ8SjbdUbKAxWmZHMy5AJDHgyEX/OW7
+	 UK1cZTM2deRaXDl7GGQufXYlsyVxTzjn9KaE9YMmxeq9azmdpgtJ9CXl4RLnTG7Z/k
+	 vN5yNbkWzE67A==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id C2133C4160E; Sat,  4 Jul 2026 15:19:39 +0000 (UTC)
+	id 3F0DAC433E1; Sat,  4 Jul 2026 16:39:38 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: =?UTF-8?B?W0J1ZyAyMjE3MjBdIE5ldzogT3V0ZGF0ZWQgSW50ZWwgQlQgZmly?=
- =?UTF-8?B?bXdhcmUgaWJ0LWh3LTM3LjcuMTAtZnctMS4wLjEuMmQuZC5ic2VxIChwYXRj?=
- =?UTF-8?B?aCAweDI3KSBicmVha3MgYWxsIEhGUC9TQ08gYXVkaW8g4oCUIFdpbmRvd3Mg?=
- =?UTF-8?B?ZHJpdmVyIHNoaXBzIHdvcmtpbmcgcGF0Y2ggMHgyYg==?=
-Date: Sat, 04 Jul 2026 15:19:39 +0000
+Subject: [Bug 221722] New: Blanket HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN
+ for all MediaTek chips breaks HFP mSBC microphone on MT7925 (0489:e111)
+Date: Sat, 04 Jul 2026 16:39:38 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: new
 X-Bugzilla-Watch-Reason: None
@@ -41,17 +39,17 @@ X-Bugzilla-Product: Drivers
 X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: dev@fluid8.de
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: purpleritza@gmail.com
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_file_loc bug_id short_desc product version
- cf_kernel_version rep_platform op_sys bug_status bug_severity priority
- component assigned_to reporter cf_regression
-Message-ID: <bug-221720-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-221722-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -63,133 +61,205 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D221720
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221722
 
-               URL: https://lore.kernel.org/linux-bluetooth/11453504-20db-
-                    45d0-87e0-ce5582dcbab4@fluid8.de/T/#u
-            Bug ID: 221720
-           Summary: Outdated Intel BT firmware
-                    ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq (patch 0x27) breaks
-                    all HFP/SCO audio =E2=80=94 Windows driver ships workin=
-g patch
-                    0x2b
+            Bug ID: 221722
+           Summary: Blanket HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN for
+                    all MediaTek chips breaks HFP mSBC microphone on
+                    MT7925 (0489:e111)
            Product: Drivers
            Version: 2.5
-    Kernel Version: 7.0.0
           Hardware: All
                 OS: Linux
             Status: NEW
-          Severity: blocking
+          Severity: normal
           Priority: P3
          Component: Bluetooth
           Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: dev@fluid8.de
+          Reporter: purpleritza@gmail.com
         Regression: No
 
-## Summary
+SUMMARY
 
-The legacy Intel Bluetooth firmware `intel/ibt-hw-37.7.10-fw-1.0.1.2d.d.bse=
-q`
-in linux-firmware carries RAM patch **0x27 (39)** and has not been updated
-since 2014. With this patch level, the HFP/HSP microphone path (SCO/eSCO,
-CVSD) of the affected controllers is completely unusable: the decoded audio
-is a constant full-scale buzz unrelated to microphone input, and the kernel
-log floods with `Bluetooth: hci0: corrupted SCO packet`.
+- One line to remove: hci_set_quirk(hdev,
+HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN)
+from the IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK) block in btusb_probe().
+- Location: drivers/bluetooth/btusb.c, line ~4279 in current mainline.
+- Rationale: Blanket quirk for all MediaTek chips is incorrect.
+MT7925 firmware correctly implements HCI_Enhanced_Setup_Sync_Conn.
+The quirk was added for MT7921 only; scope it per-chip or remove
+blanket and rely on fallback logic.
+- Kernel fallback handles failure gracefully (re-tries with legacy
+command), so no audio functionality is lost even on chips that
+truly don't support Enhanced Setup.
 
-Intel's own Windows driver package for the same hardware ships RAM patch
-**0x2b (43)** for the same firmware variant. Loading that patch on Linux
-(extracted from the Windows driver, converted 1:1 =E2=80=94 the embedded bl=
-ob is
-already in bseq format) **fully fixes HFP audio**: clean, intelligible
-microphone audio and zero corrupted SCO packets, on both eSCO and basic SCO.
+ADDITIONAL CONTEXT: The MT6639 case
 
-Since firmware submissions must come from the vendor, this is a request for
-Intel to submit their final patch level for the ibt-hw-37.7.x legacy
-(Wilkins Peak) firmware files to linux-firmware.
+A separate patch submission exists for the MT6639 (dev_id 0x6639):
+Title: "Bluetooth: btusb: Add HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN
+for MT6639"
+This adds the quirk for MT6639 only, which is the OPPOSITE direction
+(adding the quirk where it was not set before). This confirms that
+Enhanced Setup behavior varies across MediaTek chip variants and
+should not be blanket-configured.
 
-## Hardware
+BENEFIT:
+HFP/HFP mSBC microphone works on MT7925 (and likely other
+newer MediaTek chips). Users can make voice calls, use voice
+assistants, and join conference calls with Bluetooth headsets.
 
-- Intel Dual Band Wireless-AC 3160 combo card
-- BT controller: USB `8087:07dc`, "Legacy ROM 2.5 revision 0.0 build 1 week=
- 45
-2013"
-- Loaded firmware file: `intel/ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq`
-- Distro/kernel: Ubuntu, kernel 7.0.0-27-generic, linux-firmware 20260319
-- Headset used for testing: Jabra Evolve 65 (BT), PipeWire/WirePlumber 0.5.=
-x,
-native HFP backend, CVSD
 
-## Symptom with current linux-firmware (patch 0x27)
+HARDWARE
 
-- HFP microphone capture is a constant full-scale roar: peak =3D 32768,
-   RMS =E2=89=88 29400, RMS envelope flat at maximum for the whole capture,
-   completely uncorrelated with speech. (Typical CVSD delta-decoder railing
-   on a desynchronized/garbage bitstream.)
-- Kernel log: thousands of `corrupted SCO packet` messages per 10 s capture
-   (btusb SCO reassembly desyncs on the controller's bursty/corrupted
-   eSCO-over-USB stream).
-- Independent of: eSCO vs. basic SCO (tested via forced HV3), xHCI vs. EHCI
-   routing, alt-setting, autosuspend. A2DP is unaffected.
-- Long-standing reports of the same symptom on this chip family, e.g.
-   Ubuntu bug #1310558 (2014, fixed back then by a firmware patch update),
-   Linux Mint discussion #662 (2024, kernel 6.8, unresolved).
+USB Bluetooth adapter:
+Vendor:   0x0489  Foxconn / Hon Hai
+Product:  0xe111  Wireless_Device
+Chipset:  MediaTek MT7925 (Filogic 330)
+Module:   Foxconn / Hon Hai (integrated in laptop)
+Firmware: BT_RAM_CODE_MT7925_1_1_hdr.bin (Build Time: 20260605184651a)
 
-## Fix: patch 0x2b from Intel's Windows driver
+dmesg:
+usb 3-2.3: New USB device found, idVendor=3D0489, idProduct=3De111, bcdDevi=
+ce=3D 1.00
+mt7925e 0000:03:00.0: ASIC revision: 79250000
+mt7925e 0000:03:00.0: HW/SW Version: 0x8a108a10, Build Time: 20260605184651a
 
-Source (publicly available from Intel): `BT_21.10.1_64_Win8.1.exe`.
-The package embeds the RAM patch for each firmware variant inside the
-driver binaries, already in bseq format (identical HCI cmd/event record
-stream as consumed by btintel's legacy patching):
 
-- Header for fw variant 1.0.1.2d in linux-firmware:
-   `018efc0a 00010008 0004012d 0d27` =E2=86=92 patch **0x27**
-- Header in the Windows driver (identical blob in all driver builds
-   20.91.3.1 =E2=80=A6 20.100.5.1 contained in the package):
-   `018efc0a 00010008 0004012d 0d2b` =E2=86=92 patch **0x2b**
-- Extracted blob: 22627 bytes, 191 well-formed cmd/event records,
-   same first command (0xfc8e) and same final command (0xfc60) as the
-   linux-firmware file; sha256 `7a0ca9155e0ec489=E2=80=A6` (full hash on re=
-quest)
+SOFTWARE
 
-Result after installing this blob as
-`/lib/firmware/intel/ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq` and cold-booting
-(the controller keeps the old RAM patch across warm reloads;
-`Intel BT fw patch 0x2b completed & activated` confirmed in dmesg):
+Kernel:   7.0.14-arch1-1 (x86_64, SMP PREEMPT_DYNAMIC)
+Distro:   Arch Linux
+Bluetooth: BTUSB + BTMTK kernel modules
+Userspace: WirePlumber 0.5, PipeWire, bluez
 
-- eSCO (stock kernel, CVSD): clean intelligible microphone audio,
-   0% clipping, speech-correlated RMS envelope, **0 corrupted SCO packets**
-   during 15 s capture (previously ~2600 per 10 s). Some later runs show a
-   small residue (~18 per 15 s) with no audible impact.
-- Same result with basic SCO.
-- Bonus: the USB autosuspend instability we saw with 0x27 (controller
-   drops off the bus under SCO load) is also gone with 0x2b =E2=80=94 verif=
-ied
-   with default runtime-PM settings including a real suspend/resume cycle.
 
-## Comparison of all 37.7.10 variants
+PROBLEM DESCRIPTION
 
-| linux-firmware file | patch in linux-firmware | patch in Windows driver |
-|---|---|---|
-| fw-1.0.1.2d.d.bseq | 0x27 | **0x2b** |
-| fw-1.80.1.2d.d.bseq | 0x2a | **0x2b** |
-| fw-1.0.2.3.d.bseq | 0x56 | 0x57 |
-| fw-1.80.2.3.d.bseq | 0x57 | 0x57 (current) |
+HFP/HFP mSBC microphone produces complete silence when a Bluetooth
+headset is connected via HFP/HFP (Hands-Free Profile) on the MediaTek
+MT7925 USB Bluetooth adapter.
 
-The `.2d` variants are the outdated ones; `1.80.2.3` already matches the
-final Windows level.
+The SCO audio stream is established successfully, data frames arrive
+at the host, but every sample is zero (silence). The headset's
+microphone is known to work on other platforms/adapters.
 
-## Request
 
-Could Intel please submit the final patch level (0x2b) for the
-`ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq` (and `fw-1.80.1.2d.d.bseq`) files =E2=
-=80=94
-and generally the last released patch levels for the 37.7.x legacy family =
-=E2=80=94
-to linux-firmware? The blobs already exist in bseq format inside Intel's
-Windows driver packages; only a licensed re-release is needed.
+ROOT CAUSE
 
-I can provide full captures (WAV), btmon/usbmon traces, exact extraction
-offsets, and full hashes on request.
+In drivers/bluetooth/btusb.c, the function btusb_probe() sets
+HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN for ALL MediaTek
+Bluetooth USB devices unconditionally:
+
+if (IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK) &&
+(id->driver_info & BTUSB_MEDIATEK)) {
+...
+hci_set_quirk(hdev, HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN);
+...
+}
+
+This quirk was introduced by commit e11523e97f474
+("Bluetooth: btusb: Add support for Mediatek MT7921") in 2022,
+based on Bugzilla #215576 where the MT7921 failed to establish
+HFP connections with HCI_Enhanced_Setup_Sync_Conn.
+
+When the quirk is set, the kernel falls back to the legacy
+HCI_Setup_Sync_Conn command, which only transmits a voice_setting
+parameter and does NOT convey the mSBC codec configuration
+(codec ID, frame size, data path) that the HCI_Enhanced_Setup_Sync_Conn
+command includes.
+
+The Mediatek MT7925 firmware (build 2026-06-05) correctly implements
+HCI_Enhanced_Setup_Sync_Conn and the associated mSBC codec
+configuration. Without this command, the firmware defaults to a
+non-functional codec configuration, resulting in zero-sample output.
+
+Evidence from dmesg:
+
+Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection
+command is advertised, but not supported.
+
+This message appears because:
+1. The controller advertises support via HCI command bit
+2. The kernel has set HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN
+3. The kernel falls back to legacy HCI_Setup_Sync_Conn
+
+
+VERIFICATION
+
+Test: Capture PCM samples from the HFP mSBC audio source with and
+without the quirk.
+
+WITH quirk set (stock kernel):
+- All 14,336 PCM samples are zero (complete silence)
+- RMS amplitude: 0.0
+
+WITH quirk removed (DKMS patch removing the single line):
+- 14,333 out of 14,336 PCM samples are non-zero (valid audio)
+- RMS amplitude: ~0.07 (normal speech-level signal)
+
+The only change is the removal of:
+hci_set_quirk(hdev, HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN);
+from the MediaTek section of btusb_probe().
+
+No other modifications were made. The Qualcomm instance of the same
+quirk (in btusb_setup_qca()) was left untouched.
+
+
+PROPOSED FIX
+
+The quirk should NOT be applied blanket to all MediaTek chips.
+Instead, it should be scoped per-chip based on which controllers
+actually exhibit the Enhanced Setup failure.
+
+Two approaches:
+
+APPROACH A (minimal, recommended):
+Remove the blanket quirk from the MediaTek section in btusb_probe().
+The quirk was added for MT7921 based on Bugzilla #215576, but even
+for MT7921 the Enhanced Setup path may work in newer firmware
+revisions. If regression is found on a specific chip, it can be
+re-added with a per-USB-ID quirk table or a DMI-based workaround.
+
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -4276,7 +4276,6 @@ static int btusb_probe(struct usb_inter
+hdev->set_bdaddr =3D btmtk_set_bdaddr;
+hdev->send =3D btusb_send_frame_mtk;
+hci_set_quirk(hdev,
+-                      HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN);
+hci_set_quirk(hdev, HCI_QUIRK_NON_PERSISTENT_SETUP);
+data->recv_acl =3D btmtk_usb_recv_acl;
+data->recv_event =3D btmtk_recv_event;
+
+APPROACH B (conservative):
+Add the quirk only for known-bad chip IDs using a per-device
+quirk table or by checking dev_id from btmtk_usb_setup() and
+only setting the quirk for dev_id =3D=3D 0x7922 (MT7921) or other
+confirmed-bad chips.
+
+
+SAFETY / IMPACT ANALYSIS
+
+RISK OF REMOVING THE BLANKET QUIRK:
+Low to moderate.
+
+1. The quirk was originally added for MT7921 (dev_id 0x7922).
+Even on MT7921, the HCI_Enhanced_Setup_Sync_Conn failure
+manifests as a connection rejection, after which the kernel
+fallback logic re-attempts with legacy HCI_Setup_Sync_Conn.
+So at worst, the headset takes slightly longer to connect
+(one extra round trip) rather than failing entirely.
+
+2. The upstream Bluetooth stack has robust fallback logic:
+if Enhanced Setup fails, the kernel retries with legacy
+Setup_Sync_Conn. No audio functionality is lost.
+
+3. Newer MediaTek chips (MT7925, MT7927/MT6639) with recent
+firmware DO implement Enhanced Setup correctly. The blanket
+quirk penalises all of them.
+
+4. The same quirk for Qualcomm chips (in btusb_setup_qca()) is
+NOT affected by this change.
 
 --=20
 You may reply to this email to add a comment.
