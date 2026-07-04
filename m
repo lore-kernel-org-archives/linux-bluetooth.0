@@ -1,96 +1,73 @@
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4293389114
-	for <linux-bluetooth@vger.kernel.org>; Sat,  4 Jul 2026 04:32:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159992B2D7
+	for <linux-bluetooth@vger.kernel.org>; Sat,  4 Jul 2026 14:48:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783139555; cv=none; b=goWSzNyaIUrWSBaeDlBv6T3a968t2/z0zkMoLpu2NNmDgtovRtTMBUBQEQAC3lmHpJQt0jKpdpfZ6uK2tWuN7yIQe8lD/EFiOwioHWSjMGEpdaRPpMlA2uMUWJ4xhBjgIgnTIJANQa3j3XORFpEYzlfnvU33dg7K47pRH8C6e3I=
+	t=1783176533; cv=none; b=PllS36fExM3O4JO3QRJAbdC3/pJpG1HVgFwGC1fEIao8Evw4abV4qwYzTDIVAA4VGSrNyZ2nMUJsUbkamEf8scvTQgU1GIpou8AhAuDhQpv249qcaN7AxP7Isenk2iSNcETIY20nMIinavoYOn0ipRixOqgfWBUASBMChdAQBRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783139555; c=relaxed/simple;
-	bh=06gc9IXpC2jofr+SXsgUCFWPC/mfwj+s1of1GafUVRY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Y1zssu97trvnB8EOgxtz+kEwQMfUrT7sDGxwLZd6JOpW0ggcypzyS1fWbB/5hsp8mn65moUGeApTP805IOGbrfUgTxX5iF1IyJt0eXJjvci2lNAO14jjjB8im34XvtjIcV3n0frm+JSJU2JS/5JXuCATIijhfIpkIqCwmc5JgVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-6a1625758a5so1213346eaf.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Jul 2026 21:32:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783139543; x=1783744343;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5P/fePy8QSpMNDezmlu6pffCePyENab8eqxU66rFLWA=;
-        b=QR+ZacJhKwBE9JjdWb6Oebbt3a6//qZh7fBxGvczosOi+4Du863NPov4GmqE3rRAAi
-         3hswi3S2WsaunbHv4GZpw7hvkJiGp8d+3kAOvZWW8AoLoDiMdaja/91FDH6OgHS1ZwWm
-         ajSnmegLjrbKoJ51GifEzPyEMuAYCEqd+M2QYSYdcHWaCVr0uESvkbvhaI8ILTUaMiyW
-         jkJzXAV/5nK0+aZj140kUz2cv+HK5M6/gH4Shs3Ky1IKDgi3jVnoO729Jo3ZawKOq2ZR
-         kjvHdh+lhQEUkqeUQK4NvJosDBQxs1Jq15i1zpN8YqTuw8s8jrVqP6LwvQsAXchK7jTp
-         fwMw==
-X-Gm-Message-State: AOJu0YxX+l+i7+L32x88q9qY9+AfCY5GMuRoiaG78Vkl8HmmznIaqkGy
-	og2eVSeey2qPP2o7yOSRTm9gITFDdFdt86eBsbxUNSYoegN5wFIL1G6kMPqCwnfIzxp/f8jqdlw
-	4ZRRS38mMp1eVJG7j9VFOWbojJoJx0v0kTJeguh7s4fiArTxMoyHhq+3lQYI=
+	s=arc-20240116; t=1783176533; c=relaxed/simple;
+	bh=GCvPP7X6Xg0gNGQyw/nw6t/nMJlKgkM0yv8qQE+uedU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=W5yApb9IOUksQTCsLauz05L+WpUbvXUqzzfEL9vFUexcwURXUKPABg147xbPeXgd2X9P8XoS5NUl0Yrp06cXmpsb8T/aTD+QYDzUWIkcA1h+4NSSiLQcAp91izhobP7Gby1Ge9lXWp3J7AEbvUFVU1okVy39JJ1sZG86vsK349s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BXOwXZGQ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BXOwXZGQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BD741C19425
+	for <linux-bluetooth@vger.kernel.org>; Sat,  4 Jul 2026 14:48:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1783176532;
+	bh=GCvPP7X6Xg0gNGQyw/nw6t/nMJlKgkM0yv8qQE+uedU=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=BXOwXZGQBj0f4+zO71nHU5Brm2loCO86DnnZ20zXCf6oiRoRiEwQzo9B7BmQei0Y/
+	 QuqJi39vf8+d3ZztQeGIgbETCNMlbTO4N3k5brRo8mUMG7X8ELpq8jBdQ1F/+k/Pbs
+	 CrNvcSwZQDk4Ikm8FUf5XXdn50nR/kU+VOYJ/vbZf0P0zUYY6A4H2G81+wz3vyQc5P
+	 NSq0Ix4JCtRsGvsb4L961LooJCZw3NFnzxn6VdpMSWQ+ayxgWwRIJTzyVdMBSqAXpt
+	 wPcy8flaDhRkAgNqyYxnxKvEOCO6tG0PUs+y9p+9Y0jBcp5bm3qRfUl7lrwS9xWoQJ
+	 L9boXjn66kRqw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id A3C49C433E1; Sat,  4 Jul 2026 14:48:52 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221627] MT7925E - System locks up with flashing caps lock
+Date: Sat, 04 Jul 2026 14:48:52 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: tom@helix.me.uk
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-221627-62941-CuMUcMID0l@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221627-62941@https.bugzilla.kernel.org/>
+References: <bug-221627-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:f07:b0:6a1:4a27:cd22 with SMTP id
- 006d021491bc7-6a32f346dcdmr1121613eaf.0.1783139543184; Fri, 03 Jul 2026
- 21:32:23 -0700 (PDT)
-Date: Fri, 03 Jul 2026 21:32:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a488cd7.b42ede87.8bd1.0004.GAE@google.com>
-Subject: [syzbot] Monthly bluetooth report (Jul 2026)
-From: syzbot <syzbot+list07f56372059d168b9714@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
 
-Hello bluetooth maintainers/developers,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221627
 
-This is a 31-day syzbot report for the bluetooth subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/bluetooth
+--- Comment #1 from Thomas (tom@helix.me.uk) ---
+It's caused by switching between AP's with the same 6GHz wifi name.
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 21 issues are still open and 104 have already been fixed.
-There are also 7 low-priority issues.
+--=20
+You may reply to this email to add a comment.
 
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  9439    Yes   WARNING in call_timer_fn
-                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
-<2>  586     Yes   WARNING: ODEBUG bug in hci_release_dev (2)
-                   https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
-<3>  374     No    WARNING in l2cap_chan_del
-                   https://syzkaller.appspot.com/bug?extid=3272785b7a1fc9b510f6
-<4>  345     Yes   KASAN: wild-memory-access Read in l2cap_connect_cfm
-                   https://syzkaller.appspot.com/bug?extid=0e4ebcc970728e056324
-<5>  203     Yes   KASAN: slab-use-after-free Read in l2cap_sock_new_connection_cb
-                   https://syzkaller.appspot.com/bug?extid=cdae834448ec8c3602fe
-<6>  107     Yes   KASAN: slab-use-after-free Read in l2cap_sock_ready_cb (2)
-                   https://syzkaller.appspot.com/bug?extid=9265e754091c2d27ea29
-<7>  58      No    WARNING in l2cap_chan_send
-                   https://syzkaller.appspot.com/bug?extid=b6919040d9958e2fc1ae
-<8>  4       No    WARNING in hci_send_cmd (4)
-                   https://syzkaller.appspot.com/bug?extid=00f5a866124dc44cce14
-<9>  3085    No    KASAN: vmalloc-out-of-bounds Read in kcov_remote_start
-                   https://syzkaller.appspot.com/bug?extid=8a173e13208949931dc7
-<10> 191     Yes   KASAN: slab-use-after-free Read in bt_accept_unlink
-                   https://syzkaller.appspot.com/bug?extid=a1595e656a83ea5b78eb
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+You are receiving this mail because:
+You are the assignee for the bug.=
