@@ -1,167 +1,82 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33451A5B90;
-	Sun,  5 Jul 2026 08:24:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE3E367B8E
+	for <linux-bluetooth@vger.kernel.org>; Sun,  5 Jul 2026 08:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783239859; cv=none; b=hPcO0/n+WuSe0x9hkZ3/GUMMM21doIDBo6um53x8PkrN3Jynu6RUNC314YIYfbk/NfYUQHanADVDwMut7qMbSi4raRprnGBw84mwWpnOfAXQHro/0zJErUyZTsA9LVGEBV6Ifayq9e6LWq4rJ34QH1wLoD5XfGC/y0GcP6TeXxI=
+	t=1783239945; cv=none; b=FDANXwNQs5xyu79c38to+Ksz2F6R5Ymu5WFIRf7EwD00333Qp4G0redcnSW1RRRWzbFg2pHNifUtpG+sVTJtTOslCACAv8uJgXlRyRt3fxbPzOlLQaayHMEasyy85nQr29k+eOA+gEiBgG1dQ38xCCVq2Ghjc40aJTOAGmNG46Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783239859; c=relaxed/simple;
-	bh=dJXc85mPbri0BpJs+6pV9WAwIcyRBD2c2BH3wJtGCIc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jAEU1yAh5kK71mKWxKNSBDiUsuRNjj+IMMDf2eCNXr+eCwtZh5Z9BoBG0mMuXEtKzHNKSuLaPYqX8J5LFN/M4x2F1WaCs0KLCY/7SoyA97lTswBhVa3qq0bapoJovu37x9LBAFgQQogbAyEmSh0SGylCve22PdecRnhtDXBxLrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.221] (p5dc55dc6.dip0.t-ipconnect.de [93.197.93.198])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 5235E4C1F29982;
-	Sun, 05 Jul 2026 10:23:59 +0200 (CEST)
-Message-ID: <18399a54-f1b9-4831-ad43-b9bf43abf33e@molgen.mpg.de>
-Date: Sun, 5 Jul 2026 10:23:56 +0200
+	s=arc-20240116; t=1783239945; c=relaxed/simple;
+	bh=Pwxk9u4hpEvRSfHD9UCa5x7rmqIvgfWirBh2dW/c6xg=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=P9nKBAIT8A6n24glGEE6w09f81vlzBM1BMuYyldyIFqzI+Zc25DqR6BaYgIQ4CFhodR43WW/3B8AJGssyYF1cDyGglZxr1OZGB699fWkhBfRJuXcIQ9TvOq/KSOmuiA2N1ExuK4QHL+EzJznUcGNvIeFDKrCeGEts1AmaXhYxQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QipH3+CW; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QipH3+CW"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C7FE5C2BCF6
+	for <linux-bluetooth@vger.kernel.org>; Sun,  5 Jul 2026 08:25:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1783239944;
+	bh=Pwxk9u4hpEvRSfHD9UCa5x7rmqIvgfWirBh2dW/c6xg=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=QipH3+CWmoNprTbgAiLaYedfVkG2ou8eSJxzAXGUlhGhvi/X1Q11aZ9pBGItNH1kI
+	 bkxJIXIBCIrisaIYV9ntc0tw2ow18ZAA/cCTuZlANjVUNx/xYI9GLQXQ8PemMH9i3I
+	 cwz9TocyCEhWENJWeYn9WIin0LOprZO/UZbmBwCwiPXVp4WXkSuKwLqHX2+BuSUdwA
+	 qhymH7yyxPm0i6hiWfN3xm6B8KZr/dH68d5JgRIe+qVZRd131vVbWB43jsO9XklXwh
+	 DbTh14cUCk5c6Dtnf1J9lzAdFGW8jUs0bmIU/yVODoEf9mCVFM+G+OO1WaqGonLxWd
+	 uTuom32vg0KWw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id ADE2EC41614; Sun,  5 Jul 2026 08:25:44 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221724] RTL8852BE Bluetooth (0bda:b853) fails to initialize -
+ hci0 stays DOWN
+Date: Sun, 05 Jul 2026 08:25:44 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-221724-62941-V43juA4dzt@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221724-62941@https.bugzilla.kernel.org/>
+References: <bug-221724-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btusb: Add ASUS USB-BT540 and USB-BT600 for
- Realtek 8761CU
-To: cito@online.de
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- luiz.dentz@gmail.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20260704231312.340274-1-cito@online.de>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260704231312.340274-1-cito@online.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-Dear Christoph,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221724
 
+Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) changed:
 
-Thank you for the patch.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |pmenzel+bugzilla.kernel.org
+                   |                            |@molgen.mpg.de
 
-Am 05.07.26 um 01:13 schrieb cito@online.de:
-> From: Christoph Zwerschke <cito@online.de>
-> 
-> Add the vendor/product IDs (0x0b05, 0x1bef) and (0x0b05, 0x1d70) to the
-> usb_device_id table for the Realtek RTL8761CU-based ASUS USB-BT540 and
-> USB-BT600 adapters. Both bind via the generic Bluetooth class today, so
-> BTUSB_REALTEK is never set and the rtl8761cu firmware is not loaded,
-> leaving the controller non-functional. With the entries the driver loads
-> rtl_bt/rtl8761cu_fw.bin (already shipped by linux-firmware) and the
-> adapters work (tested: A2DP and ASHA).
+--- Comment #1 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de)=
+ ---
+Please attach the output of `dmesg`.
 
-I recommend to make it two patches. (The summary/title would also be 
-shorter then.)
+--=20
+You may reply to this email to add a comment.
 
-> Similar to commit bc597f0cc44f
-> ("Bluetooth: btusb: Add TP-Link UB600 for Realtek 8761BUV").
-> 
-> Both adapters share the same descriptor layout and differ only in
-> idProduct, hence a single patch adding both entries.
-> 
-> Device info from /sys/kernel/debug/usb/devices:
-> 
-> T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 22 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0b05 ProdID=1bef Rev= 2.00
-> S:  Manufacturer=Realtek
-> S:  Product=Bluetooth Controller
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> 
-> T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 23 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0b05 ProdID=1d70 Rev= 2.00
-> S:  Manufacturer=Realtek
-> S:  Product=Bluetooth Controller
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Christoph Zwerschke <cito@online.de>
-> ---
->   drivers/bluetooth/btusb.c | 6 ++++++
->   1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index e9b0b1dcc1d1..9726a007d25a 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -856,6 +856,12 @@ static const struct usb_device_id quirks_table[] = {
->   	{ USB_DEVICE(0x37ad, 0x0600), .driver_info = BTUSB_REALTEK |
->   						     BTUSB_WIDEBAND_SPEECH },
->   
-> +	/* Additional Realtek 8761CU Bluetooth devices */
-> +	{ USB_DEVICE(0x0b05, 0x1bef), .driver_info = BTUSB_REALTEK |
-> +						     BTUSB_WIDEBAND_SPEECH },
-> +	{ USB_DEVICE(0x0b05, 0x1d70), .driver_info = BTUSB_REALTEK |
-> +						     BTUSB_WIDEBAND_SPEECH },
-> +
->   	/* Additional Realtek 8821AE Bluetooth devices */
->   	{ USB_DEVICE(0x0b05, 0x17dc), .driver_info = BTUSB_REALTEK },
->   	{ USB_DEVICE(0x13d3, 0x3414), .driver_info = BTUSB_REALTEK },
-
-Either way, this looks good.
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
+You are receiving this mail because:
+You are the assignee for the bug.=
