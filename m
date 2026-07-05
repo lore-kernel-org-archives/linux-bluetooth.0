@@ -1,168 +1,148 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472BC37FF60;
-	Sun,  5 Jul 2026 14:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783262888; cv=pass; b=t2rXffjabc5kBqs0tyNwf4ZP0hfAHYVSPR3jNgghFrxFxSsO1/sLBkwfnqEQ1Rc0Xy+re+3h5TFO93bgUVpZJ6rRjQfLD1M91Z+FKzjjOJLlIKcA7dArVR10T1zUJpvzvB2kC/tZqRCqVhJBHqRpmHgVwyuX9RpZrNemhh7ZXGI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783262888; c=relaxed/simple;
-	bh=OarsU4AFDItynnQ/IVyZsD3y2w66Chdn2vWG11OXQLg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I8GXSJt6E9N2dAOLngYRvmZasxDEjjn0BtPYHS1lmaDEVXjc+YCQ8e10NdNE/m6LIt03NNtSq3EcAbTHRzuf90ErCnc+MN+iOVK5fzgkuE04+N7asUdF/C06x0QzMwq3NntAtPqxgoOoFx4fFK0CnmccJ9/2aTjpEpSUtGlVKgk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=Z/QJde8w; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=l6ZDtraW; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3D8357D08
+	for <linux-bluetooth@vger.kernel.org>; Sun,  5 Jul 2026 15:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783265743; cv=none; b=XSTB2iUpJF3BFZF5HXE4wkNSK6m1+nJ6eXRu/Hoa5cF6yUZZsYNgxOVbmWOkiyhdjDWfrzs34syT26iny2xUorwZdN5klRCwdniMZWaCbBrZ66GMSV0m3Ty+pfp6fctqKtGwO6Rh+MshyziQ23lyYUMM33FVEpLNh7FcsElC6ro=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783265743; c=relaxed/simple;
+	bh=J+0GP8rplDSmOsLb7otPplTUrCY3bQn+MGzycPHVmqQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=JZKPcWskLKbA0/CkUxZMyGZjf4vX7IkS48g3QaM9F6qMxoIzbJsXYegpwdevyA2TJob84zsbGnrdpW2mWjXvK7fL3iHPJjcxGkKe63btrbNruYe8BP1sC/s04dHXrb0u5J7+0E/fPB//0FvtoLotEZgoKHf01/cQthlgvh6d3Wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QsJwaL69; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="Z/QJde8w";
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="l6ZDtraW"
-Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519)
-	(No client certificate requested)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPS id 4gtVhq5JPmz49QB0;
-	Sun, 05 Jul 2026 17:47:55 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1783262875;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D8yjxxScepQchwS3esOTpvoKh/241FX2Ybqa2TUOifw=;
-	b=Z/QJde8wEFjeCGJLsbGgwIzHtr1kpTq9K0kYUTd7MaujgAV+AFNDLIk93fYUoPtLMptfZY
-	Ve090s/nfdZDrVUk5CXrPMpxtM1I5tx+fUCu2OJfLK8F3k3mgcGyKD+ocgFszpvCwGFeJj
-	8N3n/AK7qiPQfCTxlkDRAstWhY/CnhbXwiteY+X4jrAKSNS9J/8OUSrBfnM9UtVqjqJK82
-	liy1P/1bsLXKUUikUd5Iz7jjC+jxQ3WhapJjyE3Ah5u5+Z+0Mhgfin7rDGbwcl2IgxrzN9
-	ZA2p0f1GoqhmJvsO7HxhqZzVHFbWSnwdwxJ7oP2w4C925h1QVRJoTddXmUPzlg==
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:1::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gtVhg225QzydN;
-	Sun, 05 Jul 2026 17:47:47 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1783262868;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D8yjxxScepQchwS3esOTpvoKh/241FX2Ybqa2TUOifw=;
-	b=l6ZDtraWfw7biubw+fma+f3KarEpTAgIagHVnUxeLPBCd1IjlxUw5d3EZ6c9yGw3aKw95p
-	aj49x3KOCXew3vbnHEh/yri2QxKcIGAd7u0AKHDaI8qSwdLesuWHPeWXfYLGGI5IBLaHVe
-	7ZQiqGLbTf5Wed+BntoCsgKnPbn2aJs=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1783262868;
-	b=TlsLA3d361NWG/xcPSkE1HURTmBBYhKXoMZw/3LHdu54Z/pddwae363oL2ANbPLvLUw7wh
-	cZSkW8zORIHw9M7lGjJQoCTgnigkpTuh9Q3H5gcraRE19Rgc/FLbxVkP5dRG9dyj/eV/Kj
-	VDCZ18lzywBDrzqWbkiKEEIxRGuvz7o=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1783262868;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D8yjxxScepQchwS3esOTpvoKh/241FX2Ybqa2TUOifw=;
-	b=a8wH6kkhV2+VmereOjCDYBV//0AaH4I8sf+3Mzc8Xd7zbaLKGHbHJH0UP1MH5lQ0rQcwwO
-	nUmTJtZUEh5z4b1G+zpGerbh1nezALro8TMNf/wOOH1jmxzHjX+qTi0VA1X3FElmcPPBPE
-	NJENRGaRyr+oNH+pvApPKytvmk318pc=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/4] Bluetooth: mgmt: fix RCU use in unpair_device/disconnect_sync
-Date: Sun,  5 Jul 2026 17:47:37 +0300
-Message-ID: <ca1274055d6c705b5af808d81d192802ad68feff.1783262689.git.pav@iki.fi>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <cover.1783262689.git.pav@iki.fi>
-References: <cover.1783262689.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QsJwaL69"
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-92e6391b114so150183585a.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Jul 2026 08:35:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783265741; x=1783870541; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=Frt92mM8SowZrmrrKk9joqOjkgGhmxgpUn9k1FbQwwQ=;
+        b=QsJwaL69F2fkjrg6aLa2MFmCsqGTIPfRJg6TFrs83L6v2bCj4ZB4KHCSKjyC6sd93Q
+         hRFe+lLYYu1dfHg+UCDszsWPwL92I4HBDFJAizf04Pc8FDpneqDK/giBJfUwNqv4h5Zz
+         GDidIcg+iYA5PID2Je+pNod4YNL6tUSiYuy7cOnSBHNTfbjS+ipFnDFCfr6wFI5Z/GuT
+         mD6/wF9o7jqojWWax0TttDaSmPGPBjVYHHGtn+10PzKoppE2HzlAgKlw/YxnXQduSslE
+         1RewdtAyjb1UNv4cAs4ii5SdioYugR4atFGo7FwojvIt4p2rjAYEYNgOejqJW5T5DpaG
+         5MNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783265741; x=1783870541;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=Frt92mM8SowZrmrrKk9joqOjkgGhmxgpUn9k1FbQwwQ=;
+        b=jYTrjHvCXOI+9/XY5akcP1JfyjuPQRtLatTGZEDLLYklrPvMvx58T0kOyxp5ygBEzp
+         znuWMYrMqmAehtdd1gDU6xjjUwhUoZcY+uFTIARE/zhenRMER1fMQCc1OzT89pyscZ+k
+         F03aWwIC56xcTKGMn6HnqFXlwNKNLjCHlx2jTCZKBALP/9WHTmoqEE3qnpuZxtbnEi3A
+         J8UKststK0tbcCg0zoyowMdjHT4y7OuHcmExKclIuSZlm2rkM2Ls/+1wYJ2MkHilHg5n
+         HP9F4dhds9e8W7MrzetZndmgkspi2KTgO4jDbwfId9lmCrxFTHvu1OrtLyFxCf5foWdz
+         XkFA==
+X-Gm-Message-State: AOJu0YwEpzTeUmEbmkw2sUB7lrkY0aVAV/dM/Rf4WCJ0PyFu/p9kHWzE
+	p+vwaOXV4/2A99jZaxW01gxoI2Oz6up8xVtKoZXk2QgwCRLKKGIi7aE0b6ovTw==
+X-Gm-Gg: AfdE7cmRIPZmyLIPorlSSehl2Moq9dTxeukruHZxBKtj9qFzpG3V7M8P/oYXCdFVl/X
+	Oi0xJLkJgZhx3Fh/M0hZQTUDdB41o5++8flA0cC0wAFMp0hknm3g6GZ6zOef8fixO99wuRtwc/M
+	MT9O58sTyk0t0yag0l7sQjIKzHuQSK4A56Nmby8Dloec7ezMY04QpJw8mQd3G6TZ7Kb+0RCmwQN
+	IUb96yq7n48PqpNjaqtuUBaZc7gM7sVEF4GmByiW7DWgkFp9qaj0KoqPydGj8pwep/vGIl5hgH9
+	K/5jJA0sS07jkl8spH5HuISdTp2u1sZlrDXQr2Fht88eZsJMkTvgkW339IjVnMv4QtOuQddPy3I
+	R52LLUbLEh8VDjfGD5tndp14L5MnglPmy4YpfdJerXbXdxhbxPnFON5RGjH84iSTq4A575fINTG
+	6847RKllgXya7B29j+A6Q=
+X-Received: by 2002:a05:620a:4710:b0:91f:3793:d90 with SMTP id af79cd13be357-92e9a2f69dbmr970795285a.10.1783265741127;
+        Sun, 05 Jul 2026 08:35:41 -0700 (PDT)
+Received: from [172.17.0.2] ([20.102.235.81])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-92e90ccde4fsm698409485a.39.2026.07.05.08.35.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Jul 2026 08:35:40 -0700 (PDT)
+Message-ID: <6a4a79cc.62b4ec9b.26adff.fed6@mx.google.com>
+Date: Sun, 05 Jul 2026 08:35:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3425357518156391286=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: Bluetooth: fix hci_conn lookup RCU usage + holding refcounts
+In-Reply-To: <acd866db0f2eb2cb4279f3b76e4be0e76feb39c4.1783262689.git.pav@iki.fi>
+References: <acd866db0f2eb2cb4279f3b76e4be0e76feb39c4.1783262689.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Dereferencing RCU-protected pointers outside critical sections is
-invalid and may lead to UAF.
+--===============3425357518156391286==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Take RCU for hci_conn lookups.  Since hci_abort_conn() cannot be called
-with RCU held, take refcount temporarily.
+This is automated email and please do not reply to this email!
 
-Fixes: 227a0cdf4a028 ("Bluetooth: MGMT: Fix not generating command complete for MGMT_OP_DISCONNECT")
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1121810
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.69 seconds
+VerifyFixes                   PASS      0.11 seconds
+VerifySignedoff               PASS      0.11 seconds
+GitLint                       PASS      1.13 seconds
+SubjectPrefix                 PASS      0.41 seconds
+BuildKernel                   PASS      27.19 seconds
+CheckAllWarning               PASS      29.07 seconds
+CheckSparse                   PASS      28.22 seconds
+BuildKernel32                 PASS      25.82 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      492.77 seconds
+TestRunner_l2cap-tester       PASS      58.33 seconds
+TestRunner_iso-tester         PASS      85.88 seconds
+TestRunner_bnep-tester        PASS      18.66 seconds
+TestRunner_mgmt-tester        FAIL      208.80 seconds
+TestRunner_rfcomm-tester      PASS      24.69 seconds
+TestRunner_sco-tester         PASS      31.95 seconds
+TestRunner_ioctl-tester       PASS      25.39 seconds
+TestRunner_mesh-tester        FAIL      25.87 seconds
+TestRunner_smp-tester         PASS      23.08 seconds
+TestRunner_userchan-tester    PASS      19.63 seconds
+TestRunner_6lowpan-tester     PASS      22.07 seconds
+IncrementalBuild              PASS      34.65 seconds
+
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.241 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.721 seconds
+Mesh - Send cancel - 2                               Timed out    1.990 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/400
+
 ---
- net/bluetooth/mgmt.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 733a4b70e10c..cfcb97badd02 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3091,6 +3091,8 @@ static int unpair_device_sync(struct hci_dev *hdev, void *data)
- 	struct mgmt_cp_unpair_device *cp = cmd->param;
- 	struct hci_conn *conn;
- 
-+	rcu_read_lock();
-+
- 	if (cp->addr.type == BDADDR_BREDR)
- 		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
- 					       &cp->addr.bdaddr);
-@@ -3098,6 +3100,11 @@ static int unpair_device_sync(struct hci_dev *hdev, void *data)
- 		conn = hci_conn_hash_lookup_le(hdev, &cp->addr.bdaddr,
- 					       le_addr_type(cp->addr.type));
- 
-+	if (conn)
-+		hci_conn_get(conn);
-+
-+	rcu_read_unlock();
-+
- 	if (!conn)
- 		return 0;
- 
-@@ -3105,6 +3112,7 @@ static int unpair_device_sync(struct hci_dev *hdev, void *data)
- 	 * will clean up the connection no matter the error.
- 	 */
- 	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
-+	hci_conn_put(conn);
- 
- 	return 0;
- }
-@@ -3252,6 +3260,8 @@ static int disconnect_sync(struct hci_dev *hdev, void *data)
- 	struct mgmt_cp_disconnect *cp = cmd->param;
- 	struct hci_conn *conn;
- 
-+	rcu_read_lock();
-+
- 	if (cp->addr.type == BDADDR_BREDR)
- 		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
- 					       &cp->addr.bdaddr);
-@@ -3259,6 +3269,11 @@ static int disconnect_sync(struct hci_dev *hdev, void *data)
- 		conn = hci_conn_hash_lookup_le(hdev, &cp->addr.bdaddr,
- 					       le_addr_type(cp->addr.type));
- 
-+	if (conn)
-+		hci_conn_get(conn);
-+
-+	rcu_read_unlock();
-+
- 	if (!conn)
- 		return -ENOTCONN;
- 
-@@ -3266,6 +3281,7 @@ static int disconnect_sync(struct hci_dev *hdev, void *data)
- 	 * will clean up the connection no matter the error.
- 	 */
- 	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
-+	hci_conn_put(conn);
- 
- 	return 0;
- }
--- 
-2.55.0
 
+--===============3425357518156391286==--
