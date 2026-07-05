@@ -1,147 +1,120 @@
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E8A37DAA9
-	for <linux-bluetooth@vger.kernel.org>; Sun,  5 Jul 2026 11:56:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50690347C5
+	for <linux-bluetooth@vger.kernel.org>; Sun,  5 Jul 2026 12:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783252617; cv=none; b=b6uTK+N+Nejn46LQ8TK3v59lUXIGFLp11d+qq/S2I5rQwesDpzjTcsEOCYv7g1R2+mPBhXGA9nVcbBWvJkLoPp2CIG6Ydvv/J9smCcQ9wkYn1KKyYSI2jD7XE9lyjjthKYLOyeRLpwowHsxRJS5r+hPZlDbLb9Po+UUBlpXe2DU=
+	t=1783254288; cv=none; b=PTpG1EmDusykfsQZO8ApLIQsR2bfZUr0HsXMrs9qHJV9Zf1HUjU3uavBxtZGSUd27fRUhB5N7m7gADK29EpZLoSmU/cCmJmPVl1zXCZ/ExvAwI1jdQUEWE5dW05JNfT7WnCCPQkquqHmF6Lgmr5MRbqH6Cw/JcvuBB6B0tOoesU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783252617; c=relaxed/simple;
-	bh=ZpBpDhRlBEf1wyNvaNZaS7fLIl4HOxR7G7oVZkBp3ew=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GUnf0u2r4zrcAKI1ZjqkdqHz7seA63bTHLQN4SKbwGS3pCYhZjau4zejLIfOR6mSC/De9ncbzj84UJSqHCNQtLez5K0fZtRyT1gyCa1bWbk7XoqJmFKceBT/yjUhDt1Y7FEaSpQVnoYza/5rk31/ZHEwX7i7THksFzmdyfKnErQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=zFBApqhf; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0sec.ai
+	s=arc-20240116; t=1783254288; c=relaxed/simple;
+	bh=6VGv6evtIRXEsMIZCwAP8FxdPkwES22C02CPNow+CdU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=MEqk9s5EebCTCdqynrmXo2/LofBE/3wY+O75H4dfxt/r7cH6qBz4Btt7zszx/S9q31+RR7NJIXCE7kQKYUf1iqBmcJyehBLTocrzbntQFuj9TEuGsaHZLX8fbzWwxlipHuYOwcyy2yuEfRIiSZwLuSmMz780wYOpCn4F4IBmFP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UauY6NFV; arc=none smtp.client-ip=209.85.215.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b="zFBApqhf"
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-47dc6e04367so41354f8f.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Jul 2026 04:56:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UauY6NFV"
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-c9d1fc053e0so1761072a12.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Jul 2026 05:24:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0sec.ai; s=google; t=1783252613; x=1783857413; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EV257GsPAdFkYYKujprEQlB3BUfGHubKEIdwYlwwzjs=;
-        b=zFBApqhfcCUPdjzF3ejy7rU8jDn8uBJUg2ujxTYp5ImPFdGPvxgBocjuxZq1QTyTc0
-         iH7pGknglUAt/Wuf3OSyaztolgF5P6EVxMVumXfLnS5KYgIbkzupKIXQZIVq4OjKAKee
-         NThp8BQpdp9pT/JP2nmFrIGqI8JL34dSgoBPLrfk7h5tdrGsr4s8M0ddhUHVdxlTB5qx
-         gMCugOYg53/Mvc6DUq3SJVEueKMpYj5oAzx+eMBB0ZxDBJLzLssNA+TL/jFPk8Ucn/mh
-         7yqMcYydYaGpTvOWxXf0JPNf+t43/g8znsEf3cKSe4MDHRgxYilLdDxHHYgz1oIbdhTk
-         JL3Q==
+        d=gmail.com; s=20251104; t=1783254287; x=1783859087; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=uGAuGTTpwCnXMNELtLsOt9mkN0D62XcESgLoiJvYK1c=;
+        b=UauY6NFVSVoByyinMttuJaDb+k9/zImXFs+Z7t02mlbHWLAf7JFYCMlx0N7azRgtEb
+         EhfdrDDOHUBuycjGbBJxMWNMO/MW+OaTjPp2HccusGnl+RAT1HuCGk27317vRtC+s1hd
+         4m1RBR32IdVm+5lXjcVTS0a6yx/kRNe7oDQE9XuTlYuuFzqDXOP94OUfuGRa8V9JgTZ0
+         LByRoDyqbS/b5+VEV2+Gc3yih6Q/XjRCVSMZbSyaDK/N66atOYTMOLR7LAX3gZHHlo17
+         LCPsiOVRSiAAozEaSNygPbcqYJ3yMbSYmCmuUQUTQlKmiedvqiT6L8/wDJp8uGbttSIq
+         wClg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783252613; x=1783857413;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EV257GsPAdFkYYKujprEQlB3BUfGHubKEIdwYlwwzjs=;
-        b=GiGs9ferP1xKccFLyJNQFrSfPnLycoAYbYSrWvD/T3hZFYlcxFCKov3Nh4yv9mneLU
-         sGSGeQuQ5Ne9fJbpKRJzgaTR6R6pKxcsZtj3502f9jEuury5jWVBkvLuC9ANpTyti37+
-         bGpfKZcmQAB0Q/+6+xzBqNVJ2BZ18O0tGHYTXS1TbHUTD26hACD+QvSPGAiI3yvXiN4U
-         lEfXnWnWvMpasPvZDAXv6TGyCMfdlgCLVfYwJEo0hL9n6dzFdV1D+ynLYyyz619c8mq0
-         dALPghEYx/Wg2/uPWHGr+ljPt6Zvq02ra9ToPHREYr1QpgALVFNoPL02cRjJbePiGqy9
-         TgNw==
-X-Gm-Message-State: AOJu0YyBo7Pdd0PM1AYFSlO2FTJZAz0LwrFTOygU4QB+dj0CxAUBBN54
-	L/TfNq+n7VnQ3SYC2PPQR/1KVxU/c7x+yXrdD/vTLKxlK9RpizdxRtcxdDLgBP/t1Ilt
-X-Gm-Gg: AfdE7cmkOD/qjdnJDjXP32/eu8rCbBKlpyJ4HGD9yrt72TyIDTPpfnJbgHj8wFos0eD
-	BNgYCZU+YdSIU0e49fmVAkbkoKPuRrhAXm47TdD2uGhN1dg6ZEY/uSgZUjeWzxsg+mWVvd8i5wR
-	hoyklltQTLv7xv+4jrtVRW9/koBeISVIlKN8hEEM0OX02csjWWk+NWd7NgS8bYcPV+zKDwHe7kX
-	mc2wZJh+f8+83/2ETB4mVTTmfIiRvU43DrH9it3BA2FDmJrlFsIFoXNTnvrweshLBzxMnLFa5xD
-	c4GIYRmPtern/Nt8J9yYTIdnnubtvRlgHlgzOfVyyYvQ/IkAszK6c5A4qbdrqvh2nE/ZjVlN6NF
-	QKIq5MoC1oYdovPXMcCMvTeBZTSpCVpYj3mo2wYh4VqcyCcrOJVkf0RK5mUCFvngWVS+MnoYXxi
-	Z4z1Iov15mNNhyFTqGXHxUFLJcXU7Yij3QU+HWI2KQ6jkbYL/E4ewPRXglh6R0b/vJfIhxLa38L
-	yEpEIaq5tMHyFnAnOsEHgXcZiaJ6ON7WYdwW+J4We7Avg==
-X-Received: by 2002:a5d:5885:0:b0:45e:779a:302c with SMTP id ffacd0b85a97d-47aae2c5e12mr7467125f8f.29.1783252612919;
-        Sun, 05 Jul 2026 04:56:52 -0700 (PDT)
-Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.219.178])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0f2186bsm15364670f8f.36.2026.07.05.04.56.51
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 05 Jul 2026 04:56:52 -0700 (PDT)
-From: Doruk Tan Ozturk <doruk@0sec.ai>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-	Neeraj Kale <neeraj.sanjaykale@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Doruk Tan Ozturk <doruk@0sec.ai>
-Subject: [PATCH] Bluetooth: btnxpuart: Fix out-of-bounds firmware read in nxp_recv_fw_req_v1()
-Date: Sun,  5 Jul 2026 13:56:50 +0200
-Message-ID: <20260705115650.81724-1-doruk@0sec.ai>
-X-Mailer: git-send-email 2.53.0
+        d=1e100.net; s=20251104; t=1783254287; x=1783859087;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=uGAuGTTpwCnXMNELtLsOt9mkN0D62XcESgLoiJvYK1c=;
+        b=ZPm0nH1XRSgtw5owvTPo2HuXBLMziw9Hyz11LSLigcJX81oSiWiI8i2uexIjyUQOkj
+         P5V3wEtnPE4ttm4jY9Ad08Fx+ibaOg8rZQmBvdWAJKGUvh6zKjUaPDgyMJmTUDLZ33M/
+         FlzpVbcMwTsKa/ws456npH9NWePcxnw9I/DD1n5XADbwrdULxeb6/2yhnTsVxHZ7e11t
+         nJeZcDEstGFMetW/PDyyO4pBavyrf62Hi6W8qRIsTAU6wFrZkGH2+ehCNOXLqreGcYkE
+         wFwgt1Zkc0XdrT/QqyFfLtvss8dEpKBXbeLr5fm11R05hdnTGY6nxbbEPE6Inh8ODZcm
+         mLdw==
+X-Gm-Message-State: AOJu0YzMqUAC6d2lttJk5sXS45N5loHl3g/9KPH/wUl9KylSokD7O5Xr
+	wBIyPvN+vlJAeraXZ6hqZrv/CCxejU18BzzV7pq2Cdj2UaY+TlcgQ9kFhGDQ7w==
+X-Gm-Gg: AfdE7cka1B0riwukAprG6uZzXyNdERadn77/cie6JSs8BB+PRg3h2dNsL/yQlycX4GX
+	FISssMkk2rzCKr05byN3amUZ+u1nUT+EO1+uQjoPvDsw0Qrh+o0gdQZL15AEk9iX9nE4O2fQ18h
+	Q8osFKf6A27b/h4M/HcHjgM73o/gpwj0oCkl428nFopwCcgytO6Yy4FU9jNjFzPU+0Bvv9eBaPe
+	B4Vt7+MtFRXZ0eT0f2t6hGgsIKE/PCMMKpi6X8VvmnYCvPW1xZVMZ9gH1aY6U/gExxQes7s3Tp7
+	tDMYkC6bYAnmY7bqIGvYmO0Hy4XVwu3dyhrVIK0jVGpSZY++3ttgiqDVdspLOD1aGiAN6iOMsW1
+	bRaxZwdaMFzG/dEYxB07A6gU+xMq9rQZJH0e4+/b2a9ITQnNUd5r1Z3m4X4L4t8vh/36KDDXF67
+	QacdnSAQ3oWNfvoxnAyXv2nx6dWsW+bQ==
+X-Received: by 2002:a05:6a21:48b:b0:3bf:db2a:d164 with SMTP id adf61e73a8af0-3c03e51e2demr6784908637.53.1783254286573;
+        Sun, 05 Jul 2026 05:24:46 -0700 (PDT)
+Received: from [172.17.0.2] ([172.185.31.97])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b3c7682acsm38114675c88.0.2026.07.05.05.24.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Jul 2026 05:24:46 -0700 (PDT)
+Message-ID: <6a4a4d0e.492e23e4.e71ca.2afc@mx.google.com>
+Date: Sun, 05 Jul 2026 05:24:46 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0882489324321647824=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, doruk@0sec.ai
+Subject: RE: Bluetooth: btnxpuart: Fix out-of-bounds firmware read in nxp_recv_fw_req_v1()
+In-Reply-To: <20260705115650.81724-1-doruk@0sec.ai>
+References: <20260705115650.81724-1-doruk@0sec.ai>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Commit 25c286d75821 ("Bluetooth: btnxpuart: Fix out-of-bounds firmware
-read in nxp_recv_fw_req_v3()") bounded the v3 firmware download offset but
-left an unbounded read in the v1 handler.
+--===============0882489324321647824==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-nxp_recv_fw_req_v1() advances a device-driven download offset
-(fw_dnld_v1_offset) by fw_v1_sent_bytes on every request, and that
-bookkeeping runs even when the payload write is skipped, so the offset can
-walk past nxpdev->fw->size. When the controller then requests a header
-(len == HDR_LEN), the driver reads the 16-byte bootloader header at
+This is automated email and please do not reply to this email!
 
-  nxp_get_data_len(nxpdev->fw->data + nxpdev->fw_dnld_v1_offset)
+Dear submitter,
 
-with no bound on the offset, reading past the end of the firmware image.
-A malicious or malfunctioning NXP UART controller can drive this to read
-out-of-bounds kernel memory during firmware download.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1121769
 
-Bound the offset before the header read, and convert the payload write
-guard to the overflow-safe form used by the v3 path (fw_dnld_v1_offset is
-u32, so fw_dnld_v1_offset + len can wrap).
+---Test result---
 
-This was found by 0sec automated security-research tooling
-(https://0sec.ai).
+Test Summary:
+CheckPatch                    PASS      0.56 seconds
+VerifyFixes                   PASS      0.44 seconds
+VerifySignedoff               PASS      0.07 seconds
+GitLint                       PASS      0.20 seconds
+SubjectPrefix                 PASS      0.06 seconds
+BuildKernel                   PASS      27.62 seconds
+CheckAllWarning               PASS      29.78 seconds
+CheckSparse                   PASS      28.33 seconds
+BuildKernel32                 PASS      26.47 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      509.22 seconds
+IncrementalBuild              PASS      25.23 seconds
 
-Fixes: 689ca16e5232 ("Bluetooth: NXP: Add protocol support for NXP Bluetooth chipsets")
-Cc: stable@vger.kernel.org
-Assisted-by: 0sec:claude-opus-4-8
-Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/399
+
 ---
- drivers/bluetooth/btnxpuart.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-index 6a1cffe08d5f..88d9ebf25a8f 100644
---- a/drivers/bluetooth/btnxpuart.c
-+++ b/drivers/bluetooth/btnxpuart.c
-@@ -1041,11 +1041,17 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
- 		 * and we need to re-send the previous header again.
- 		 */
- 		if (len == nxpdev->fw_v1_expected_len) {
--			if (len == HDR_LEN)
-+			if (len == HDR_LEN) {
-+				if (nxpdev->fw_dnld_v1_offset >= nxpdev->fw->size ||
-+				    nxpdev->fw->size - nxpdev->fw_dnld_v1_offset < HDR_LEN) {
-+					bt_dev_err(hdev, "FW request offset out of bounds");
-+					goto free_skb;
-+				}
- 				nxpdev->fw_v1_expected_len = nxp_get_data_len(nxpdev->fw->data +
- 									nxpdev->fw_dnld_v1_offset);
--			else
-+			} else {
- 				nxpdev->fw_v1_expected_len = HDR_LEN;
-+			}
- 		} else if (len == HDR_LEN) {
- 			/* FW download out of sync. Send previous chunk again */
- 			nxpdev->fw_dnld_v1_offset -= nxpdev->fw_v1_sent_bytes;
-@@ -1053,7 +1059,8 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
- 		}
- 	}
- 
--	if (nxpdev->fw_dnld_v1_offset + len <= nxpdev->fw->size)
-+	if (nxpdev->fw_dnld_v1_offset < nxpdev->fw->size &&
-+	    len <= nxpdev->fw->size - nxpdev->fw_dnld_v1_offset)
- 		serdev_device_write_buf(nxpdev->serdev, nxpdev->fw->data +
- 					nxpdev->fw_dnld_v1_offset, len);
- 	nxpdev->fw_v1_sent_bytes = len;
--- 
-2.43.0
 
+--===============0882489324321647824==--
