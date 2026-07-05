@@ -1,128 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.134])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D28A1E98E3;
-	Sun,  5 Jul 2026 09:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06521E98E3;
+	Sun,  5 Jul 2026 09:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.134
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783244464; cv=none; b=OetSS4O/e3MeBgJh3tXiBtzcyjyzZ3bp2pyhgY6x4rP1ocFN9RmLARFBTFg5TLwQX6tsn18+1Dd/nsZfGLAzHJvL4ZBKHTF9xopH45bmOHk0RU2ZVwtoF0Xnb67qzu/mes1jK5dIrBcruPlwsvvjEbQtsXEWFNDoN6nAEwZ1dSk=
+	t=1783244514; cv=none; b=J2ga7Gn9X3Zu2ExDAlCs11be6RPT5DuPinl5+vZHy0VZk03LqeOoxoPDNW+rCu6AccuI5CTREEuhI2XB1F9Sy9jq6T+qYcYq/FYrmJHfT9aG4sEp3pRD0P8gIpUYWh3pM61FZEOLlZLe70r0mFsipwXYxCcKT+2ZJRkArVNszqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783244464; c=relaxed/simple;
-	bh=9BIwAT2H0rDSI/lKbvxm2OFan7zA2VrfktjGTwaQUG0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YOtxdc+3KQDywdXw97ANFyeqEO7dnRwp3cQdRb9V0LTDERjiKdn8xS+z73is3AUrOb1RAdE6o1MZsj7twX/DK6tTihdGRg0HlZR/nOID7X0U60q9Ba7DBXN0LXR+TODaKAohNElu3jjuzHbd30jUzetz7Z40ZbeQ5eF/Vjcqx1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LnZeET97; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783244514; c=relaxed/simple;
+	bh=o3PMuQUuU13l6fMz1haB1pi/YwgPoQPgYhVcQoaDZ1Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=TeofwGt3iYSsP77cSMkexzHvY+jtmG16qMHTW4txi3X+8wX2tQ0TVodpnOyItonJtqibUsP5k7nDtQ1qQLT/E+eJteeAS8E2YjVc5AM+s4BUShFFHE0awtj4pVVp055YrJDqjKQxpXIcwaZw2o8ogw9++IVEHCLQ+z7nILyIK5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=online.de; spf=pass smtp.mailfrom=online.de; dkim=pass (2048-bit key) header.d=online.de header.i=cito@online.de header.b=A1/iey2u; arc=none smtp.client-ip=212.227.126.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=online.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=online.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LnZeET97"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A8B51F000E9;
-	Sun,  5 Jul 2026 09:41:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783244463;
-	bh=Hdyh5zOFcKcufj1yOBd3EhgY7X7r9MufdMbg4bsq0YA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=LnZeET97yyxw2QaeXV9SMqVKxwHxV5VTk4VGyY38ExBPj0oFJy+/KYKlUUif4pTgQ
-	 6N9nolWBwZffC6kxm+s6HhWRCnoz2XZxXT0ZTSuI/swVSqvKMRzpRvm8+AhP7iG/rM
-	 T5jUTcd76hiep6vQBwl9XoM5/WRhXYMHfpCUu/Y/SBLUfeOeapcNTVZ9ej7bV+dinu
-	 LrdGiePki+uv9AIRbNV6UGhevdtOUt4MyOOVhfVcGjRNS3icOebUrZ+NVuQ9mpy1OJ
-	 0zMek7AWhPwR7zRFS5nBHFXOnD4qZVrY9iRyHXzd2b/YHGlgHgWVyaOVZWeHbl7FZg
-	 pOc1CLpzitS4w==
-Received: from johan by xi.lan with local (Exim 4.99.4)
-	(envelope-from <johan@kernel.org>)
-	id 1wgJLQ-00000001NIa-3FhT;
-	Sun, 05 Jul 2026 11:41:00 +0200
-Date: Sun, 5 Jul 2026 11:41:00 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Xiang Mei <xmei5@asu.edu>
-Cc: Bartosz Golaszewski <brgl@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Johan Hovold <johan+linaro@kernel.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bestswngs@gmail.com
-Subject: Re: [PATCH bluetooth] Bluetooth: qca: fix NVM tag length underflow
- in TLV parser
-Message-ID: <akomrM-h521h6M0i@hovoldconsulting.com>
-References: <20260704231030.996390-1-xmei5@asu.edu>
+	dkim=pass (2048-bit key) header.d=online.de header.i=cito@online.de header.b="A1/iey2u"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=online.de;
+	s=s42582890; t=1783244511; x=1783849311; i=cito@online.de;
+	bh=YHuloi6q1OTIJYzLPEIVpABKRpjLGu7Z/vzt/jDfr88=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
+	 References:MIME-Version:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=A1/iey2uTj+T/mcE0lCmZtgxOpDzzjGVeLKfBwNHQbVupfIxfGS1649SHvqzl+kB
+	 kkU2o5gy+aKxCJ6nV/YYTyt0ZRKSMFoWON+lVWT7yDACCzShvqk9f991ApdQ1WM2S
+	 UAM1J/VF29Gaqikum00cXv99Ffv/D/OR93N/CrD9WUpQ7V0NfTYWM4CRe7+CR7Iog
+	 jh7BvkvKtwsWlET3pf3XMymWuxuXh4XnK4JCqFRA4U+n6eZMWurlIlOSr+VzmrF3O
+	 OEhIAwROdcC3lOBVgBSWmz4UqL3MT54NflN3m+sA1fOEfyWDtlVq1NAMoeo7AEWdu
+	 /A04zux0ZB/ovCNVjg==
+X-UI-Sender-Class: 6003b46c-3fee-4677-9b8b-2b628d989298
+Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue009
+ [212.227.15.167]) with ESMTPSA (Nemesis) id 1Md6V1-1xFMf13mvD-00hyWe; Sun, 05
+ Jul 2026 11:29:01 +0200
+From: cito@online.de
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-kernel@vger.kernel.org,
+	Christoph Zwerschke <cito@online.de>
+Subject: [PATCH v2 0/2] Bluetooth: btusb: Add ASUS USB-BT540 and USB-BT600 for Realtek 8761CU
+Date: Sun,  5 Jul 2026 11:28:55 +0200
+Message-ID: <20260705092857.27050-1-cito@online.de>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260704231312.340274-1-cito@online.de>
+References: <20260704231312.340274-1-cito@online.de>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260704231030.996390-1-xmei5@asu.edu>
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:ydi8+VgAdmTB3KODhqDNPAa2/iHefYeiv9Tav/MjEmPiMmceslb
+ tPsUzB8ni6EPYYogLRbnc5zObvlyMqD0p1UX2DxMnufMNbr02ez3duJ2GLnE3M2wF8oHOpB
+ xnBPJHLupWHZuU+SUdNndUK7JFvnAOa/0eiyvlKSkntbK/ag5oJ00jX7Z5qeQtIRG9DFLej
+ e/3nAF5Xl/zc/WpDWDiUA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:9eyHHvs7QEI=;IcSTX1bq3N3n6bDKllGwe8fUHKK
+ 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
+ NsT0yfGw==
 
-On Sat, Jul 04, 2026 at 04:10:30PM -0700, Xiang Mei wrote:
-> In the TLV_TYPE_NVM branch of qca_tlv_check_data() the tag loop bound is
-> "while (idx < length - sizeof(struct tlv_type_nvm))". "length" is a signed
-> int from the firmware TLV header and sizeof(struct tlv_type_nvm) is a
-> size_t (12), so "length" is converted to size_t and any firmware-supplied
-> "length" < 12 makes the subtraction wrap to a huge value.
+From: Christoph Zwerschke <cito@online.de>
 
-Yeah, there should have been a lower bound check on length before the
-loop.
+Dear Paul,
 
-> The loop body
-> then reads a 12-byte struct tlv_type_nvm past the end of the short
-> vmalloc'd firmware buffer (and the EDL_TAG_ID_* handlers can write past it).
+thank you for reviewing.
 
-No, only four bytes are read before the loop exits without any further
-consequences due to the following check:
+As you recommended, the change is now split into one patch per adapter.
 
-	 if (length < idx + sizeof(struct tlv_type_nvm) + tag_len)
-	 	return -EINVAL;
+Patch 1 introduces the new "Realtek 8761CU" section (the header comment pl=
+us
+the USB-BT540 entry), patch 2 adds the USB-BT600 entry to that section.
 
-which is false if length < 12.
+Changes in v2:
+ - Split the single patch into one patch per adapter, as recommended by
+   Paul Menzel.
 
-> Rewrite the bound as "idx + sizeof(struct tlv_type_nvm) <= length"; both
-> operands are non-negative, so it no longer underflows and a "length" too
-> small for one record correctly skips the loop.
+Christoph Zwerschke (2):
+  Bluetooth: btusb: Add ASUS USB-BT540 for Realtek 8761CU
+  Bluetooth: btusb: Add ASUS USB-BT600 for Realtek 8761CU
 
-This works too.
+ drivers/bluetooth/btusb.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
->   BUG: KASAN: vmalloc-out-of-bounds in qca_download_firmware.isra.0 (drivers/bluetooth/btqca.c:421)
->   Read of size 2 at addr ffffc900000e5004 by task kworker/u9:0/52
->   Workqueue: hci0 hci_power_on
->   Call Trace:
->    ...
->    kasan_report (mm/kasan/report.c:595)
->    qca_download_firmware.isra.0 (drivers/bluetooth/btqca.c:421 drivers/bluetooth/btqca.c:617)
->    qca_uart_setup (drivers/bluetooth/btqca.c:948)
->    qca_setup (drivers/bluetooth/hci_qca.c:2029)
->    hci_uart_setup (drivers/bluetooth/hci_ldisc.c:438)
->    hci_dev_open_sync (net/bluetooth/hci_sync.c:5227)
->    hci_power_on (net/bluetooth/hci_core.c:920)
->    process_one_work (kernel/workqueue.c:3322)
->    worker_thread (kernel/workqueue.c:3486)
->    kthread (kernel/kthread.c:436)
->    ret_from_fork (arch/x86/kernel/process.c:158)
->    ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
-> 
-> Fixes: 2e4edfa1e2bd ("Bluetooth: qca: add missing firmware sanity checks")
-> Reported-by: Weiming Shi <bestswngs@gmail.com>
-> Assisted-by: Claude:claude-opus-4-8
-> Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> ---
->  drivers/bluetooth/btqca.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index 04ebe290bc78..10c496eaea2c 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -415,7 +415,7 @@ static int qca_tlv_check_data(struct hci_dev *hdev,
->  
->  		idx = 0;
->  		data = tlv->data;
-> -		while (idx < length - sizeof(struct tlv_type_nvm)) {
-> +		while (idx + sizeof(struct tlv_type_nvm) <= length) {
->  			tlv_nvm = (struct tlv_type_nvm *)(data + idx);
->  
->  			tag_id = le16_to_cpu(tlv_nvm->tag_id);
+=2D-=20
+2.55.0
 
-With the commit message fixed you can add my:
-
-Reviewed-by: Johan Hovold <johan@kernel.org>
-
-Johan
