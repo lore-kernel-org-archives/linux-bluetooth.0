@@ -1,127 +1,102 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA69336C9E5;
-	Sun,  5 Jul 2026 20:58:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783285128; cv=none; b=Rd9IMHmBFzqZ3+hkdf/Wv/npinzyLhy07prhh/x7Y2MItWh9qL0SX3tYeVtU1BCk9WwThnmJg/U4AVuz6HPOztdx4DPKILjeSuPh7zAWNdESX8Syg//ERfXEQG+n+evbGd7MvgPT4HsvtX71ikDqkjJbpvez1myO7GwzV8TCuDo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783285128; c=relaxed/simple;
-	bh=wxOLKp7wOdNjCDZBu3sPsyZlCtvYzCeNLqu5UUdpqGk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nFB57PQwKUw+8TMO0StV17iiDl/Wz+elRhWmInFvZtYouPdFjzjF2Tr6gv0cmOnw60yp73PCQoY7oawbvI2JNuAERAHUX9ggB/Zy+5qJri10D6IBXrDWGRG5qNBjIkWwYIsc1v+M5eLjjcyQOvlO5Fxdkpr6tFm1NP6oaNZuOk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.225] (p5dc553f8.dip0.t-ipconnect.de [93.197.83.248])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF6F2472A2;
+	Sun,  5 Jul 2026 22:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783291387; cv=pass; b=GZ386+WvPSLVD/BXZTkkxMGCpzdfO8DySQLPVFHXw8mQVjKtzzfvpReaHmi/bzNKDRGzNfqsXPSLYFrX7zr0y5YXrgUTKE0VTaJmcl/QbVUZzEV1JOsNCNK5md5JPgDi9y3GzuKikln9F/qfP2p+QZmjxMZV84WMGyhM6hQmSGU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783291387; c=relaxed/simple;
+	bh=etocJXQNf1/VrWxvwqqrHrzoKHPYUi0R5Y2KEVIRtaA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N6wTrQ58HDMEPZ/51BVw0t3+p31AkVjSba1x/9QXeUxeb9n2EiQYJizn8ZqfCVuPRgmnWO+d1+udbB3csGhQjpHuFXAH7wMswAAe8hPb4VQITHvODTZl39khw5rQuFcXLtOPOb8F41H5is0n5fp8PV/bdeawEgYDPpaVQVITUrM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=jEfTpghO; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="jEfTpghO"
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:1::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id A977E4C2C37D5D;
-	Sun, 05 Jul 2026 22:58:31 +0200 (CEST)
-Message-ID: <f28eea1f-80da-4def-b11f-33a531a1b595@molgen.mpg.de>
-Date: Sun, 5 Jul 2026 22:58:29 +0200
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4gtjF15P7zzyNV;
+	Mon, 06 Jul 2026 01:43:01 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1783291382;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=8GnoGjbworScue1IHoa4aw13pT2bjV8uYoGXooZhEU4=;
+	b=jEfTpghO8T/oK6yxAoC+BIlPND9j5jRMDzrpxNBp7pTgFpOD4JlhT6VmKwDNkvpX13iwpB
+	XOM+3z1UaHUR5Zztz/3W0xYltq6hY7hMn/yBp/6vRORn02y6ae8OJGYYuVAUIf9fDSKFye
+	lE3al169OK9kkmCqxGM90RKUMHTauew=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1783291382;
+	b=DnAsSsCPfyDgs3Mff9+hXFSpPIYtKbZEyXr8SC4+e8ZsJDWcW68qpxIyROvLVLNvJwPjO2
+	3rGhhZu1nerSqowOcx7NFQ4PHAWDN0snWIvvj4ah/K//4Qt7TultjBlk6H2BOMGB7WyoQF
+	+d9CI6/d1RZyoC3KGbB8jDPyVqhB1FI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1783291382;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=8GnoGjbworScue1IHoa4aw13pT2bjV8uYoGXooZhEU4=;
+	b=EsCCA5ZneVb0Tqr7rY4cacsPAgEHw4BToXKZ+zP+Ea4Gu03TtpoQU5ogHyPJDZX3yfm/j4
+	661t5Ra23oaX82QdUZsxBYRzaSQrfmjbbfiNKOB+LavV/6EWb2R4ybryo8XYbJWQqZzPOp
+	boQcBlSe2VqXq72z3kY2t/qt4gP9YQA=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/4] Bluetooth: fix hci_conn lookup RCU usage + holding refcounts
+Date: Mon,  6 Jul 2026 01:42:43 +0300
+Message-ID: <cover.1783275015.git.pav@iki.fi>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btnxpuart: Fix out-of-bounds firmware read in
- nxp_recv_fw_req_v1()
-To: Doruk Tan Ozturk <doruk@0sec.ai>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Amitkumar Karwar <amitkumar.karwar@nxp.com>,
- Neeraj Kale <neeraj.sanjaykale@nxp.com>, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20260705115650.81724-1-doruk@0sec.ai>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260705115650.81724-1-doruk@0sec.ai>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Dear Doruk,
+Resending parts of
+https://lore.kernel.org/linux-bluetooth/cover.1762100290.git.pav@iki.fi/
+plus additional hci_conn_params usage fix.
 
+v2:
+- Take hdev->lock instead of RCU in hci_update_scan_sync() to
+  guard also the hdev->accept_list access.
 
-Thank you for the patch.
+- In unpair_device/disconnect_sync, take hdev->lock instead of RCU.
+  This avoids potential access to uninitialized struct device.
 
-Am 05.07.26 um 13:56 schrieb Doruk Tan Ozturk:
-> Commit 25c286d75821 ("Bluetooth: btnxpuart: Fix out-of-bounds firmware
-> read in nxp_recv_fw_req_v3()") bounded the v3 firmware download offset but
-> left an unbounded read in the v1 handler.
-> 
-> nxp_recv_fw_req_v1() advances a device-driven download offset
-> (fw_dnld_v1_offset) by fw_v1_sent_bytes on every request, and that
-> bookkeeping runs even when the payload write is skipped, so the offset can
-> walk past nxpdev->fw->size. When the controller then requests a header
-> (len == HDR_LEN), the driver reads the 16-byte bootloader header at
-> 
->    nxp_get_data_len(nxpdev->fw->data + nxpdev->fw_dnld_v1_offset)
-> 
-> with no bound on the offset, reading past the end of the firmware image.
-> A malicious or malfunctioning NXP UART controller can drive this to read
-> out-of-bounds kernel memory during firmware download.
-> 
-> Bound the offset before the header read, and convert the payload write
-> guard to the overflow-safe form used by the v3 path (fw_dnld_v1_offset is
-> u32, so fw_dnld_v1_offset + len can wrap).
-> 
-> This was found by 0sec automated security-research tooling
-> (https://0sec.ai).
-> 
-> Fixes: 689ca16e5232 ("Bluetooth: NXP: Add protocol support for NXP Bluetooth chipsets")
-> Cc: stable@vger.kernel.org
-> Assisted-by: 0sec:claude-opus-4-8
-> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
-> ---
->   drivers/bluetooth/btnxpuart.c | 13 ++++++++++---
->   1 file changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-> index 6a1cffe08d5f..88d9ebf25a8f 100644
-> --- a/drivers/bluetooth/btnxpuart.c
-> +++ b/drivers/bluetooth/btnxpuart.c
-> @@ -1041,11 +1041,17 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
->   		 * and we need to re-send the previous header again.
->   		 */
->   		if (len == nxpdev->fw_v1_expected_len) {
-> -			if (len == HDR_LEN)
-> +			if (len == HDR_LEN) {
-> +				if (nxpdev->fw_dnld_v1_offset >= nxpdev->fw->size ||
-> +				    nxpdev->fw->size - nxpdev->fw_dnld_v1_offset < HDR_LEN) {
-> +					bt_dev_err(hdev, "FW request offset out of bounds");
+  In __hci_conn_add() it looks like we should move
+  hci_conn_hash_add(hdev, conn); after hci_conn_init_sysfs(conn);
+  so that the pattern
 
-Would it make sense to log all the values, as I’d think, such an issue 
-might be hard to reproduce and gathering the values miht be difficult?
+    conn = hci_conn_lookup(...)
+    if (conn)
+	    hci_conn_get(conn)
 
-> +					goto free_skb;
-> +				}
->   				nxpdev->fw_v1_expected_len = nxp_get_data_len(nxpdev->fw->data +
->   									nxpdev->fw_dnld_v1_offset);
-> -			else
-> +			} else {
->   				nxpdev->fw_v1_expected_len = HDR_LEN;
-> +			}
->   		} else if (len == HDR_LEN) {
->   			/* FW download out of sync. Send previous chunk again */
->   			nxpdev->fw_dnld_v1_offset -= nxpdev->fw_v1_sent_bytes;
-> @@ -1053,7 +1059,8 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
->   		}
->   	}
->   
-> -	if (nxpdev->fw_dnld_v1_offset + len <= nxpdev->fw->size)
-> +	if (nxpdev->fw_dnld_v1_offset < nxpdev->fw->size &&
-> +	    len <= nxpdev->fw->size - nxpdev->fw_dnld_v1_offset)
->   		serdev_device_write_buf(nxpdev->serdev, nxpdev->fw->data +
->   					nxpdev->fw_dnld_v1_offset, len);
->   	nxpdev->fw_v1_sent_bytes = len;
+  can be done with RCU without needing hdev->lock.
+  But better done in separate patch series.
 
+Pauli Virtanen (4):
+  Bluetooth: hci_sync: extend conn_hash lookup critical sections
+  Bluetooth: mgmt: fix locking in unpair_device/disconnect_sync
+  Bluetooth: mgmt: hold reference for hci_conn in mgmt_pending_cmds
+  Bluetooth: hci_sync: hold hdev->lock for hci_conn_params lookups
 
-Kind regards,
+ net/bluetooth/hci_sync.c | 62 ++++++++++++++++++++++++++++++++++++----
+ net/bluetooth/mgmt.c     | 42 ++++++++++++++++++++++++---
+ 2 files changed, 94 insertions(+), 10 deletions(-)
 
-Paul
+-- 
+2.55.0
+
