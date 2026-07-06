@@ -1,102 +1,84 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31753F0774
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jul 2026 18:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3D3437862
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jul 2026 18:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.202.193.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783362115; cv=none; b=fAd7HawSD2XvUOoLZChwRDEqalweHBHcbbxrtB7BJsc3jcbQCdo8LuL73Gn3fobngMLmUOGTzJ+qgLdpFmhmqKqiZ2iYaT/gYdMmHJHL1DEd6TAyqrEMfZUxeHtV79fuwTdmZ3bQQBa4eVLOX5V+noF2x49ZUaZMJNCnrZaiFl0=
+	t=1783362138; cv=none; b=c0PnRWC4xBe+jkCZ4MLBeR4xX01wJcaHBs02FO4zQtZT/Jeho1ZyO4LOOA1wAcnZPOPwLp5/uZqv+3BY3zvEqSzCg1YStDQkfnJMgCsONO31Lfur1A/a5qd1o6UNSiWagPHWv6SO47gIVVXAIcWO3B0W1SgB/OW1CgfWOpIpmsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783362115; c=relaxed/simple;
-	bh=nhJpGrmncRd3ffi5WYFE++wBX8/00CryudPcgriKnv0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=jEBtbwSHME+oDits8NQD0TPB2fJxjV50gsoSuMCxLxY8nnTWan2mxKjW8f0rJmsBi63JwJrrvW8i8TUTTLJxwN0IlCq0WpJe1skMjrUPxB7b7tRhAogEmOkTfAevdlRXt9+nYN7YP2/yPSjNuS5XQE/qiqkbYW79hp09o0FNiK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F2nHXHPY; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783362138; c=relaxed/simple;
+	bh=+93hx6XVp6hnWKYUhk6yq/sXR5a08PxGewfyuomRE2A=;
+	h=Content-Type:Date:Message-Id:Subject:Cc:From:To:Mime-Version:
+	 References:In-Reply-To; b=Hge59aRnDum1NQwt01BXd9Mpn4XiRzA47rRR7NJ2RP4IWws7iwuxJdXEA+ZHzhQbhDA2DuiFRzMkOn2sB7zEuZOBNAHC5NSupIHoYfivPE9L0oDXxXGTkQMG/IkusqHG3NjNPpeSitNIfULv8Q1vR41+h7bX31VgN2i69+td67w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rcpassos.me; spf=pass smtp.mailfrom=rcpassos.me; dkim=pass (2048-bit key) header.d=rcpassos.me header.i=@rcpassos.me header.b=RQuPLUX0; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=Kh0B5ylV; arc=none smtp.client-ip=34.202.193.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rcpassos.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rcpassos.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F2nHXHPY"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-51c16ac21acso16147531cf.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jul 2026 11:21:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783362113; x=1783966913; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=nhJpGrmncRd3ffi5WYFE++wBX8/00CryudPcgriKnv0=;
-        b=F2nHXHPYfU1Vv6ceMI2Y2VQOD+63LNNJi/3Hm+jL3px/BNHdJkyjFdZzlJoF2p14K+
-         qoKIeFtA5kJ4m1BKGrqhIU8AQ4IceF8JHfo9UKfyATBN5F0X6PiHxi3mYd4eyMOMYv7U
-         BST+4rs6sxO5E7DZMHg4AqkFdNcix318fexCnaG9uBhIlhHQG3PnsoYylhYweNAqJQwB
-         xS1BmFtER0Vqv63J3/Ag8Mm2wziCTAphC8jP9QSemNpfMyJzlhVexm+yVrfLaUV39rXE
-         XELGnqY7N/axNeImUf7uuFSlgHZ4BUKdfpNVj39tYiPV4Y9DY3RTQVdJ45j+B3T5E/nt
-         F2tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783362113; x=1783966913;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=nhJpGrmncRd3ffi5WYFE++wBX8/00CryudPcgriKnv0=;
-        b=ObUYxDeETuZ+IxPmCEqeNzIBfNXDI6PsMwfylzcyhWGSiEDiBMbShOXUMRZvO/CR8s
-         AvkOJ/wNZfqhEN0vgUy6PrIPymchrn35OaWi4RNcQzcCu2QfmSd1kz+yzrtVf6Y4sSz5
-         vrejePHnUOpAfmLqLxXAXXmyBrJ7Uon/SWSC+de9QKW3w7+FwkrKcklsCJr2hvYrxYR5
-         rDT46lomcvW565q/ruOumqFNpVIEegr203YlDHlWauUxV/xM8o+1YauAtF//Cz/LdeRI
-         8Ju3YGKFF3HXKrwr2DsIfqLxHc77mukNF+T51niF7oB65qMgH2PX8P10fdDWamYTGS97
-         tj9g==
-X-Gm-Message-State: AOJu0YzOsbre9pKO5iuOKZRnjT55XeQqxc5AiTPDuJHHV9Xmk4ElS4Hs
-	tqYmK4WrWilxWiR3PGpIO50v8j1UIApfKECNynQpo/ts1Yy1MHm9SX6UY9qOJA==
-X-Gm-Gg: AfdE7cn/fdr2Ls65kyoNwahNAOetAViDQB6bQAOtIQchecz5xOvZtO1vuGLzYZk7Fni
-	Pz+VpwAbiNic50KCQ8FtEatKNjqQfMlxxTRMPAzA/d6yFGw+rKlLKToKhJoHnKmxVUEY0f6AcqT
-	Bt/FphjjEEBQ0qEwu80H497yGz9eL7odPNMK4y6PXHL3MzNwP7Ulz+72FWxETGwPcIaKZ1D8mXE
-	gdM8OjGuJxGwGNdP3iIxnbIq7Wa2vbX5+3Jvzsa+Ad8JbYlGG1kXbRKurd/89TOoBidr+8iXx9Q
-	M8HOhcvDVxdA8qBS+AouHJA9RCjTcTUqLjV+f07UVvDUtM+KUcjEVOgsBufjkgJheg6SbSLTjjT
-	eaaWhu3TjKaiLQo6R62qO8Elp0Fm0Q2zmy65WSXtc+CeoAXLQzx0dma0IZ/G6NOi3PW2Z6CEIas
-	73Ibf0HnucPwwy/FhZZBlk1Q==
-X-Received: by 2002:ac8:7d88:0:b0:516:df59:32cf with SMTP id d75a77b69052e-51c7479f5b5mr21473061cf.7.1783362112897;
-        Mon, 06 Jul 2026 11:21:52 -0700 (PDT)
-Received: from [172.17.0.2] ([135.237.130.146])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8f4726b3201sm143232656d6.46.2026.07.06.11.21.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2026 11:21:52 -0700 (PDT)
-Message-ID: <6a4bf240.50eb26ae.3261b2.81e9@mx.google.com>
-Date: Mon, 06 Jul 2026 11:21:52 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1954849190832953644=="
+	dkim=pass (2048-bit key) header.d=rcpassos.me header.i=@rcpassos.me header.b="RQuPLUX0";
+	dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b="Kh0B5ylV"
+Authentication-Results: purelymail.com; auth=pass
+DKIM-Signature: a=rsa-sha256; b=RQuPLUX0AgnrLZJVUCxiIX2ZUpaP1ztnxfTSLd3J638vuJAV0mNnU23tAHs/oqGSuezVvg6sE7n8eAS3PPn1ARRIJylwsWEkt1nwMCWgI81iAUBp6jwf+A8idEvKwQMqkMg87gNtBmqPYm2RPs8LA+vLQHvMxQzRpRornwiCQqMRfs1rHy6/+PL93xICFOQCcFDv5jBYdP0dKSRw/vq0W9CzBCBAMua+cdhsG2jFe+aBWPeY2kypG+KIvzo3I+PNh48aBp0NqSYpDbRmGgzMY6FKxVrEppInCWsZZM1b5GxrTyb4msGJx1e2ca7zy1riYiCwLTotlIk4rQiImwmCZQ==; s=purelymail3; d=rcpassos.me; v=1; bh=+93hx6XVp6hnWKYUhk6yq/sXR5a08PxGewfyuomRE2A=; h=Received:Date:Subject:From:To;
+DKIM-Signature: a=rsa-sha256; b=Kh0B5ylVuJIOUxKMm9ypUEKa6ixP4vE15z0DtWFF61NlVf8pt8FKaKDmK/s4EsIpBfN37fLPK+ZXuP32a8tEkXAl1N9nhcx0G4KTwd127+X5LnqjkTh4wOxdeqXmzvjyawp2UV0DVO9d8WXL48p0hV24kYA8C3uZglEepYCZBP5qF5Xi1RJHUzIQ3oGwLY5OIHVk66CwqvHc9WJOF4bbRAPEBqcrtucY4mR2dMvV7HQeMLl4h1fg3lKemsz99DQPN4Ms57GqvlNqefOcdcQMAWdgUH/cViQZUypnksYa9iZ98t3kWtNGZvmVn1bHh8ZRZdaJtAWaFv0fHbTuToKJSQ==; s=purelymail3; d=purelymail.com; v=1; bh=+93hx6XVp6hnWKYUhk6yq/sXR5a08PxGewfyuomRE2A=; h=Feedback-ID:Received:Date:Subject:From:To;
+Feedback-ID: 45355:7809:null:purelymail
+X-Pm-Original-To: linux-bluetooth@vger.kernel.org
+Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id 205051992;
+          (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
+          Mon, 06 Jul 2026 18:21:59 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 06 Jul 2026 15:21:57 -0300
+Message-Id: <DJRP3YO7Y0WK.20KNRZIMX1CYK@rcpassos.me>
+Subject: Re: [PATCH v2] Bluetooth: Properly disable remote wakeup for
+ MT7922/MT7925 on Ryzen platform
+Cc: "Luiz Augusto von Dentz" <luiz.von.dentz@intel.com>,
+ =?utf-8?b?Q2hyaXMgTHUgKOmZuOeomuazkyk=?= <Chris.Lu@mediatek.com>,
+ =?utf-8?b?V2lsbC1DWSBMZWUgKOadjuaUv+epjik=?= <Will-CY.Lee@mediatek.com>,
+ =?utf-8?b?U1MgV3UgKOW3q+aGsuasoyk=?= <ss.wu@mediatek.com>,
+ <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>,
+ <linux-mediatek@lists.infradead.org>
+From: "Rafael Passos" <rafael@rcpassos.me>
+To: "Rong Zhang" <i@rong.moe>, "Rafael Passos" <rafael@rcpassos.me>, "Marcel
+ Holtmann" <marcel@holtmann.org>, "Luiz Augusto von Dentz"
+ <luiz.dentz@gmail.com>, "Matthias Brugger" <matthias.bgg@gmail.com>,
+ "AngeloGioacchino Del Regno" <angelogioacchino.delregno@collabora.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, george.moussalem@outlook.com
-Subject: RE: Add support for IPQ5018 Bluetooth
-In-Reply-To: <20260706-ipq5018-bluetooth-v4-1-350262a30959@outlook.com>
-References: <20260706-ipq5018-bluetooth-v4-1-350262a30959@outlook.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: aerc 0.21.0
+References: <20260701-btmtk-ryzen-remote-wakeup-v2-1-767ac7907472@rong.moe>
+ <DJRKO72HWZOI.QJYJUAC45QOJ@rcpassos.me>
+ <79D5F3E6-8F40-4422-BB2D-16691E377394@rong.moe>
+In-Reply-To: <79D5F3E6-8F40-4422-BB2D-16691E377394@rong.moe>
 
---===============1954849190832953644==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Mon Jul 6, 2026 at 12:08 PM -03, Rong Zhang wrote:
+> Hi Rafael,=20
+>
+> =E4=BA=8E 2026=E5=B9=B47=E6=9C=886=E6=97=A5 GMT+08:00 22:53:17=EF=BC=8CRa=
+fael Passos <rafael@rcpassos.me> =E5=86=99=E9=81=93=EF=BC=9A
+>>Tested-by: Rafael Passos <rafael@rcpassos.me>
+>
+> Thanks a lot for your testing!
+>
+> Your issue sounds related to the remote wakeup issue I am addressing. Aft=
+er triggering the remote wakeup bug, rebooting the platform without a power=
+ cycle [1] always causes a failure in USB enumeration before the driver pat=
+h.
 
-This is an automated email and please do not reply to this email.
+In my case, just the power cycle was not sufficient. I had to also
+change settings in BIOS [1], and only then it came back.
+Even after reverting all settings to the same state as before.
 
-Dear Submitter,
+I was hoping to fix this in Kernel, but I don't see a way forward.
+If you have any other ideas or patches to test, send them my way!
+I will gladly help.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+[1] I turned off sr-iov, resize-bar & disabled "Bluetooth On/Off".
+In a previous attempt, fast-boot and TPM were also disabled.
 
------ Output -----
-
-error: patch failed: drivers/bluetooth/btqca.c:997
-error: drivers/bluetooth/btqca.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1954849190832953644==--
+Thanks,
+Rafael Passos
