@@ -1,91 +1,92 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEBC421F00
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jul 2026 16:16:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B493A414DDB
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jul 2026 16:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783354594; cv=none; b=X/jNQQ7/CcYTWF1N2lFV+a+FU8Fy8xGGMKBFbNbpghxK5oSgBY7bv0v8uF66gtxURpimKynOBNFvq4bqR+/zrlh/dd1UlK7VOHMCotXLk00M0qS2tZJqbejvJNwvmwUKtvZ7R+QcfzgxMqNL8DVvpJzZzJZ33kpo2ukBoLjmPjY=
+	t=1783354597; cv=none; b=akur3udkNBkjU279+f6Z4mRbICA3i5X/XrNpl7o9vK7odMVdU4kvUDgmRyt+qqsDM14SkHO03MUBBD/Pn+NFabcBFEm9CdSmWtEzYvhKGCZafNYaoXckAHHBr0uom9d7VJuOApAJp/YsD+vB01kWpupzZTEe3MKcTTwETGAXkDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783354594; c=relaxed/simple;
-	bh=r6s5rcKyjiOB6g67YnIdS7cHaeByKCpGrIrJJMGeEic=;
+	s=arc-20240116; t=1783354597; c=relaxed/simple;
+	bh=Z3vwiOAItWkAQAqpSQZ6dMIZKgULwq9jO/94fYgIVv4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rN0xhrDbKKpeox1k7oRCljsgpJqFQMmnN7y6ZNu+UX0guS4CAaXnb1zFm1F1H8BtF+iSLokYLd42IboxyHvnohiSa94lxjqumL6ZfQEkBIll6mCB6UVPVzdHRayRdO9p+Tgw1kvAg5hXZng4QwAnoDdYIrQ0WOIyJHJ3BuqEQ20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=n/GTMOxL; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Usw9Ie+s; arc=none smtp.client-ip=205.220.168.131
+	 MIME-Version:Content-Type; b=n6Iqr2rEoOomoMSDaaOQt+RNn61v1234m91KxyKgMo+EVg2FTT2ZubKhEzttUnFycl9AvTsQaFkd6GHx/U1w3IsQnPq6NjDhFXnQ5Grtvdz7wZVdR995kDd4/lfzBD6QLkxh+ZrRaELn4pPxmW9qRXy5bfg9TRNoBWyo8RZ8MlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=PanFUYVj; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=YnFB0+BM; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="n/GTMOxL";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Usw9Ie+s"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 666FF617832946
-	for <linux-bluetooth@vger.kernel.org>; Mon, 6 Jul 2026 16:16:31 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="PanFUYVj";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="YnFB0+BM"
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 666FFBoo958653
+	for <linux-bluetooth@vger.kernel.org>; Mon, 6 Jul 2026 16:16:33 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	HriuJxWLCo/+5whrWs0Ax9LMcFbbxDLsldAv8A7+NF8=; b=n/GTMOxLeqhXS9i3
-	ioBd7ot+T61wDUFtMTS0cN2bR/Zp2xyX/YwwWgJ3wsRx/OsPBuCMNyYege5IBtWp
-	i8XJUYwtEFibPfePybyBS9HcHf7ijatc9Hb5fRfQYMQ/NlONr6pE32NY3c8SVovh
-	NF5wgzAmrakI2kBn6rY1bzqIQGJecwtfEcs3saFiQg675Jn20W1Q8GwA0cP+35Ah
-	TAjqlMNA9esyYEm1CfjHbLu6ECdJFdCg9shUj6/2vdByHJZZ1IPqVLn3MqbXr4i8
-	zSFW1OrNHI2QgqbPg+TA6NRAzZq+nG2QKPvMav8ceHt8JKCREAMvMFt6MjKLS2p4
-	lS25qQ==
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f8a98hpbk-1
+	nECjUFVLckNxoDMjtq6J78n+blr7vv9CJPHKf2hzqjQ=; b=PanFUYVjeCAWIaMU
+	wjdGEWV8tAD2ag0NjDnGQ+e8tOjgOSsqKEP9M6dGQGrrzHqAxv1hooRZGkTr0eTw
+	Qn/PAqn1BF6z4XGAbh1FLoeT08WRpH4Of1Si3BZnXA/AnU11C++sF48kneAEajGZ
+	ypd5qOmsVgBjTQFuHY8JFJEZAzQ0X6XJySsCrg1N9mnBrQXKJezvptPAP34O4yVl
+	JfwCKckRxO9tHWMrTVtmy1ciNFik1UtP6PtPV012j5LaXjAiladcbK9nrFA1DOnK
+	LRhWJb4RGUhcA0C6Wn+ftyEZCgiNUR+jN9kg72I/liDM79/0Yb6Kch62E8HygK+q
+	k+wN7g==
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f88h9a87q-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jul 2026 16:16:31 +0000 (GMT)
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-c889d1eedcdso5094420a12.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jul 2026 09:16:31 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jul 2026 16:16:33 +0000 (GMT)
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-381250979d5so3128559a91.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jul 2026 09:16:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1783354591; x=1783959391; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HriuJxWLCo/+5whrWs0Ax9LMcFbbxDLsldAv8A7+NF8=;
-        b=Usw9Ie+sutkijRYezviPdvVn3fy9QN4rD1iMjO7n2p3iY8XOdP4uzT9HTVQIz4ZNft
-         H7BCrYog/weXWhz09n8UGIp8OFTsMx5ni6TDBk9zk+6STfCMbF1YB3J5QfwrvwpM70YZ
-         NrDBgW2v5nlbJhlYwQtK4ra/lEcOoJDu97FigixBsIvsEse4y+im+zTe3gitu2OZjZkR
-         tHNSdKzx74gt9SujM/b1lcNcbBTxrPZjvgId5RYCZBx+lV4Owls2kIEtEviaoP3i4lEN
-         uULIQw8NtxVkv+7b9Pxruitm+VLmGSoDOmy+emv+9N2WFNpURTDwRWKRUf7TjU2kJBLw
-         i0QA==
+        d=oss.qualcomm.com; s=google; t=1783354592; x=1783959392; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=nECjUFVLckNxoDMjtq6J78n+blr7vv9CJPHKf2hzqjQ=;
+        b=YnFB0+BM/R0sn+oRz9bO/7AtaV3lvTn2eteN7a/xpUhKqv5Rbp+RnfDR8P/Ih7fXzq
+         +/l6+PvXzBtykr1hlbtjA6IPZywusUSt4FiXglNUHZZJJnMV+Tih7IfB5HADTI+p+28d
+         LnHECshglgjGmojyiRXJ+8/d/66IYjZl5conFeE3dAsZtXyIQc0lGgfiQlRQaSGvZVp7
+         mc9CC62kGkY4jZr5ukJk1YJqRKjjt2e5rDoQwSW5Qr6vopsUdyKzwDZ9AgbvMzdOcmP3
+         rPZKVnULD3YS2z5/mhrA3UHfktAk1TuSZl9eJ0ITZPfB3T/O9PJW9JvC7mGt2oDEGney
+         lD4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783354591; x=1783959391;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=HriuJxWLCo/+5whrWs0Ax9LMcFbbxDLsldAv8A7+NF8=;
-        b=rprhDHx0X6SnamRfG/OjYSTPSZkg8unCePalUq9dOh6hu1zYFPcHFUf2Pc1sUE7FfC
-         q02ZG+7GvROtFfOHREVFdBRhFYeQyvWKGMgW3ZMU/tU9EBmtpFkSmJMZ9sMpXnmLD6LX
-         p+4tgt9wvCPca0JPdyOQ3CJzkbw1ORUiILmrj8rsGsi/xwtRXRU53K/lj8nGQmsZZyYn
-         E2P3WVCfFjOLb0akAmgq9PKpF3y56BOtEJ+dpDfWkmMjnEqb0WqQrw5112xHrdg+MY0a
-         zaG6sL8juWWGw7i3GxiY3PPKwoK0iul3HHJtQBLpbifAmEyF0R+ftRwr2jsMtEw3MfTj
-         tBWQ==
-X-Gm-Message-State: AOJu0Yz3WafKLgkLKwu+ejCJdqL+WF7QsonPdqnTKxczJS2SveTZbOHj
-	JIqqSFLMWVidC1fgWxcBInfZ6QDsXgSemilCWSxUZVtzFXhXiCbusfasItheUFnlJTGIvpnf8Q6
-	Waibx1wDca2ZRBqGh0JBvaS/+ys0L2cynu5g+vp+OPu8TPdpwtBMSOkICr6x4Xnk+RvBwU2wEfg
-	qw60A=
-X-Gm-Gg: AfdE7ckR2Mt9g+rFkTvZd/YlhmcLHBEtPj4PLhXEyqs61iS6ttozagfruSNkqKFDuu7
-	fBZR0axR7ssB1l07Z+wSVrYgAFR3F+SES3SemxAlcBy4vpd4l0We3pMarB309CgSQAWP2TLeSxH
-	iS5z+gWOW8m3g2J7E1xSb1WcD7BMnoKCrc0ObZkvYIaM2tNPAz33GY6GR7DL9QYFFpp0wapTSLk
-	LmCvzWvaJZXmaw0nlWv9lxlU63xuzgA9ClCKs1dJa/iu387CM4s0ehlNMu+NmNJQYzfUOJTv4RQ
-	z11Z2NshfL51o2HCN6ZjewghUelxhKGlolWpreNsISa3SoM7CH2zFEoseZ8l0AkpcCopR3PDFuh
-	jPsmc7zr5WxjcX5M5QCF1bj+Ypnk0K9uZytAYpLv8
-X-Received: by 2002:a05:6300:67c7:b0:3bf:b5fb:d7ac with SMTP id adf61e73a8af0-3c08ed4062dmr1503939637.10.1783354590215;
+        d=1e100.net; s=20251104; t=1783354592; x=1783959392;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=nECjUFVLckNxoDMjtq6J78n+blr7vv9CJPHKf2hzqjQ=;
+        b=KvSQu1QUIo6WdMq2owKyo1ESuiIoVV6kT2g9rfePX3mKjVf71FcT3I9SIG2bcmFFbX
+         iLQz8C+K9FZqHX1nMWLOQEWG4Kb6cf1C3/F0/ryXNnMEw7mZAJiR5Eo0xOoL0FA4IOyL
+         ZJArbII+4Fsxd9BH0SXKGnLHcUFx/YUpqPmTBgwVEAqvrpQdnfCWqtnMm7DOz8N+3Ltz
+         0hnjtfy8F/OCPy6Rwch+UI1M0j9Wq7EkElY3c9++bNOPL9o/nXEAO7FioLEK5etMxKCJ
+         l2vQqC1wOjhfm95rHYNQrwGaFd+tfu8lg4lQXKUjceiFicRlNTRmqocaO82cYxPPMhLI
+         NZbQ==
+X-Gm-Message-State: AOJu0YyaxCWOgnWwUCUuRrrKznqNOcpcYz5Y9CDPXLwwhVxTlZURvdA4
+	RIGIkWe0lwfOu4dt+m+/5xekbo1oieXV1x+tpL9NzF5Cwz6i0W5eBMmy3VS76S+OL7KQMilSwrJ
+	9QS1Djx4uu0GGxbJ42P9hkZCEDBAXtC+N2nZ210Gye96MPbxaoXod+mrMhgwi9MAkc+6qO7iD2I
+	TQqhw=
+X-Gm-Gg: AfdE7ckeqedfmvYLmO4zT/LQ4HE4yB5Uj09erp6V42wX+Y0k8HQ/5uJAoucmgXb9nNv
+	Cy71ZGIoRu/bq0NH7IQhcil5wqd574tx+NqDKdfyehnZqD88hpLic7R1pUQ6C4dFvVA1Wc3FBzm
+	mwutlrCXclm0glREa3OCK21YsSYJ1SeEc1MRUSWo463LTHntXKPEm2H0YgL3uArIsSkZA+tJwZT
+	FGLpLLc1Ah7JuFrrMvXZyYmQ0xEcF5JeDnNWtXCkXr0g3qtKhEvBDDcoaaKZMc6c1HCDTj5cweT
+	Vie4kmpZ6bhek4F/p2eQA4jOuq2T349fpaaeU7mtpryPemM5kqfiTXSyVq5LGhu7/hUyEyLgxFW
+	wJp+oLeFm4J32/4TT95s4SwmMefsle9iDYm88WEVw
+X-Received: by 2002:a17:90b:55cd:b0:36d:5d1c:c4ad with SMTP id 98e67ed59e1d1-38755478040mr1143280a91.9.1783354591116;
+        Mon, 06 Jul 2026 09:16:31 -0700 (PDT)
+X-Received: by 2002:a17:90b:55cd:b0:36d:5d1c:c4ad with SMTP id 98e67ed59e1d1-38755478040mr1143211a91.9.1783354590211;
         Mon, 06 Jul 2026 09:16:30 -0700 (PDT)
-X-Received: by 2002:a05:6300:67c7:b0:3bf:b5fb:d7ac with SMTP id adf61e73a8af0-3c08ed4062dmr1503648637.10.1783354585880;
-        Mon, 06 Jul 2026 09:16:25 -0700 (PDT)
 Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f31e7a2a8sm40022434eec.25.2026.07.06.09.16.23
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f31e7a2a8sm40022434eec.25.2026.07.06.09.16.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2026 09:16:25 -0700 (PDT)
+        Mon, 06 Jul 2026 09:16:29 -0700 (PDT)
 From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
         quic_anubhavg@quicinc.com,
         Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Subject: [PATCH BlueZ v1 3/5] doc/org.bluez.ChannelSounding1: Add Used by reference and Examples
-Date: Mon,  6 Jul 2026 21:46:01 +0530
-Message-Id: <20260706161603.2744459-4-naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v1 4/5] profiles: Add D-Bus Channel Sounding control API
+Date: Mon,  6 Jul 2026 21:46:02 +0530
+Message-Id: <20260706161603.2744459-5-naga.akella@oss.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260706161603.2744459-1-naga.akella@oss.qualcomm.com>
 References: <20260706161603.2744459-1-naga.akella@oss.qualcomm.com>
@@ -97,635 +98,1286 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Authority-Analysis: v=2.4 cv=SpigLvO0 c=1 sm=1 tr=0 ts=6a4bd4df cx=c_pps
- a=Oh5Dbbf/trHjhBongsHeRQ==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+X-Proofpoint-ORIG-GUID: G7AZsYIwgZQQ4e7KnyrInPxWzxLCeecL
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA2MDE2NSBTYWx0ZWRfX7zS55rKf6W3e
+ jYWPkeDPRaE/C2SHSkjctKMYigs7R3/e5JPlVBzw6h1WLRoNQRNUuWy0f0axOc4lkrbfBAptnnR
+ RTMZ0ZkBTiTQR2MRS0tTs48Wrj3c8UI=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA2MDE2NSBTYWx0ZWRfX6pQwp/207qye
+ 59HnEx7W+75Lie3Y/lV9L4KIaevm8FhF6Qh7QI9riNVsl6JumgiNCx/8UVogf4fKl7TppSloNEW
+ PC5HGuoWa/UbX51KD6c8wBUA2+AYJaV4pRR+M0htRarzVktsDBzXED4uO49ivF6ds8Jbxmnty/C
+ StbAttjhiMuTWocyzNcU6tqG7azP2nD7ZftMLm9d08nTjPi4epXxadJv3Y2peZgSpA9n1wMc377
+ uB/9P2mDKNa56VpRFfcPFpy4KXWZQtViX19iDn5XocM0u5bePQXrMQCVdnCzk8mB05tGBxr8QIf
+ pwVgMdpyy2TGZxj1GTWFGb9yigYYgcgxLJfWfAEhh+rOQmBRhQ6JYdkODLxxy48XNHRvtvS+5Pc
+ njyj9J7UMZgfU9hwOCq+23UKyva9aa0UzfV5VnCuRSo2fJwBupZFgiOWIpd+0SQfcwoRD0kuetB
+ gmqDDkfx3tKD4eKJSVw==
+X-Proofpoint-GUID: G7AZsYIwgZQQ4e7KnyrInPxWzxLCeecL
+X-Authority-Analysis: v=2.4 cv=GulyPE1C c=1 sm=1 tr=0 ts=6a4bd4e1 cx=c_pps
+ a=0uOsjrqzRL749jD1oC5vDA==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
  a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22
- a=wa7QpaTpAAAA:8 a=VwQbUJbxAAAA:8 a=RreBWJL54Kam1S7jYLkA:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10 a=_Vgx9l1VpLgwpw_dHYaR:22 a=ehqneT2-Ts4HTEaPPMaO:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA2MDE2NSBTYWx0ZWRfX9YJMiCYXiYzZ
- L0PkWHS27aUoCqV9wmc/lpPMb9cIBOnQbM2dANuEXHTIF+l1mR1Zt4j/5xqUmc1nGecsHOfunGJ
- IkEHHdItsmZ6cFrtMFdsvjJtW9mkAv07todvpNuFEc8tnMFuODMwjGwkBhAagNh5nkmSWBy5XBA
- IkLxZcmJTXhghI5euULY4Z1MzKDQFCwJg5ZEJ4n2QVM+7G4hwztWmDKckFYUJK4PjS5HiStSNGY
- YN+2F6F86LdG15kxkUt8P9H5jT1oS+KgYTmtvw4EpNWSMK/3o7k06oLtJ4ppHnxMoPSoyncAFJr
- VMDG8Pbd7jqZEcLosbuE/reXOw2fRO6olzFQzzl0FFe9dR/BUcQzfr2YFkCsvSv2Csre1sSfGAO
- u3sPQmoJEZwXfVF60O05zj0mBjzguFdCBFTbPDJ8yJdR8nRIDcD14ptzKAT8Rd7RhQwAgKQ9r7w
- xSBGnkqJKO19N//ljGA==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA2MDE2NSBTYWx0ZWRfX1NsChMPjB36L
- DDfQAGSFQJZRzzIVRK7x9gMtDD08joFnISa+l/OhghJFpS34n9/a69JiuywMLbd58k560QIqIKq
- gtNbmbFL3nxPioXkr342GN1nFkZf67U=
-X-Proofpoint-GUID: oVgxy-9RmfBLUtyyHR2_e5-n4pnkrF46
-X-Proofpoint-ORIG-GUID: oVgxy-9RmfBLUtyyHR2_e5-n4pnkrF46
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22
+ a=4jpyLtET5F4ua5H85VEA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=mQ_c8vxmzFEMiUWkPHU9:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-07-06_02,2026-07-06_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 priorityscore=1501 spamscore=0 clxscore=1015 phishscore=0
- bulkscore=0 adultscore=0 suspectscore=0 impostorscore=0 lowpriorityscore=0
+ spamscore=0 adultscore=0 clxscore=1015 malwarescore=0 impostorscore=0
+ priorityscore=1501 suspectscore=0 lowpriorityscore=0 phishscore=0 bulkscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607060165
 
-Add :Used by: field linking to bluetoothctl cs submenu and
-Examples section showing corresponding bluetoothctl cs commands
-for D-Bus methods
----
- doc/bluetoothctl-cs.rst            | 278 ++++++++++++++++++++++++++
- doc/org.bluez.ChannelSounding1.rst | 302 +++++++++++++++++++++++++++++
- 2 files changed, 580 insertions(+)
- create mode 100644 doc/bluetoothctl-cs.rst
- create mode 100644 doc/org.bluez.ChannelSounding1.rst
+Expose org.bluez.ChannelSounding1 on the device path,
+adding SetDefaultSettings, StartMeasurement, and StopMeasurement methods
+and an Active property to let external clients configure and
+control CS ranging sessions.
 
-diff --git a/doc/bluetoothctl-cs.rst b/doc/bluetoothctl-cs.rst
-new file mode 100644
-index 000000000..c16c89298
---- /dev/null
-+++ b/doc/bluetoothctl-cs.rst
-@@ -0,0 +1,278 @@
-+================
-+bluetoothctl-cs
-+================
-+
-+--------------------------
-+Channel Sounding Submenu
-+--------------------------
-+
-+:Version: BlueZ
-+:Copyright: Free use of this software is granted under the terms of the GNU
-+            Lesser General Public Licenses (LGPL).
-+:Date: June 2026
-+:Manual section: 1
-+:Manual group: Linux System Administration
-+
-+SYNOPSIS
-+========
-+
-+**bluetoothctl** [--options] [cs.commands]
-+
-+This submenu controls Bluetooth Channel Sounding (CS) distance measurement
-+using the **org.bluez.ChannelSounding1(5)** D-Bus interface. It allows
-+starting and stopping measurements and inspecting the current parameter
-+state and active session identifier.
-+
-+CS parameters can be overridden on any **start** call using inline
-+``param=value`` arguments. Overrides are applied to the local parameter
-+state before the measurement is started, so **show** reflects them
-+immediately after.
-+
-+
-+Channel Sounding Commands
-+=========================
-+
-+start
-+-----
-+
-+Sets one or more CS parameters and starts a distance measurement on the
-+connected device. All configuration is sent to the daemon in a single
-+**StartMeasurement** call. On success the device path is printed to
-+the console. Multiple simultaneous sessions across different devices are
-+supported; each is tracked independently.
-+
-+Calling **start** on a device that already has an active measurement
-+returns an error without starting a second session on the same device.
-+
-+Positional arguments are optional and must appear before any
-+``param=value`` pairs:
-+
-+- ``duration_secs`` — auto-stop timeout in seconds; ``0`` (default) means
-+  no timeout.
-+
-+Any additional argument of the form ``param=value`` overrides the named
-+parameter for this call and for all subsequent calls. Array-valued
-+parameters (``channel_map``, ``min_sub_event_len``, ``max_sub_event_len``)
-+use colon-separated hex bytes with no ``0x`` prefix.
-+
-+:Usage: **> start [dev_addr [duration_secs]] [param=value ...]**
-+:Uses: **org.bluez.ChannelSounding1(5)** method **StartMeasurement**
-+:[dev_addr]: Bluetooth address of the target device (optional; uses the
-+             only available CS-capable device when omitted)
-+:[duration_secs]: Seconds before auto-stop (optional, default 0 = no timeout)
-+:[param=value]: One or more ``param=value`` overrides (optional)
-+
-+**Settable parameters:**
-+
-+.. list-table::
-+   :header-rows: 1
-+   :widths: 35 15 50
-+
-+   * - Parameter
-+     - Default
-+     - Description
-+   * - ``role``
-+     - ``0x03``
-+     - ``0x01`` Initiator, ``0x02`` Reflector, ``0x03`` Both
-+   * - ``cs_sync_ant_sel``
-+     - ``0xFF``
-+     - CS sync antenna selection (0xFE/0xFF reserved)
-+   * - ``max_tx_power``
-+     - ``20``
-+     - Max TX power in dBm (signed, range −127 to +20)
-+   * - ``config_id``
-+     - ``0``
-+     - CS configuration identifier
-+   * - ``main_mode_type``
-+     - ``1``
-+     - ``1`` Mode 1 (RTT), ``2`` Mode 2 (PBR), ``3`` Both
-+   * - ``sub_mode_type``
-+     - ``0xFF``
-+     - Sub-mode within main mode; ``0xFF`` = unused
-+   * - ``main_mode_min_steps``
-+     - ``2``
-+     - Min CS main mode steps per subevent
-+   * - ``main_mode_max_steps``
-+     - ``3``
-+     - Max CS main mode steps per subevent
-+   * - ``main_mode_repetition``
-+     - ``1``
-+     - Times main mode steps are repeated in a subevent
-+   * - ``mode0_steps``
-+     - ``2``
-+     - CS Mode 0 steps at the beginning of each subevent
-+   * - ``rtt_types``
-+     - ``0``
-+     - RTT measurement types bitmask
-+   * - ``cs_sync_phy``
-+     - ``0x01``
-+     - PHY for CS sync: ``0x01`` LE 1M, ``0x02`` LE 2M
-+   * - ``channel_map``
-+     - ``FC:FF:7F:FC:FF:FF:FF:FF:FF:1F``
-+     - 10-byte channel map bitmap (colon-separated hex)
-+   * - ``channel_map_repetition``
-+     - ``1``
-+     - Consecutive repetitions of the channel map
-+   * - ``channel_selection_type``
-+     - ``0``
-+     - CS channel selection algorithm
-+   * - ``channel_shape``
-+     - ``0``
-+     - Shape used in channel selection algorithm
-+   * - ``channel_jump``
-+     - ``2``
-+     - Channel jump size
-+   * - ``companion_signal_enable``
-+     - ``0``
-+     - ``1`` to transmit companion signal, ``0`` to disable
-+   * - ``max_procedure_duration``
-+     - ``1600``
-+     - Maximum duration of one CS measurement procedure
-+   * - ``min_period_between_procedures``
-+     - ``30``
-+     - Minimum time between consecutive procedures
-+   * - ``max_period_between_procedures``
-+     - ``150``
-+     - Maximum time between consecutive procedures
-+   * - ``max_procedure_count``
-+     - ``0``
-+     - Max number of procedures; ``0`` = no limit
-+   * - ``min_sub_event_len``
-+     - ``00:20:00``
-+     - Min CS subevent length, 3-byte LE (colon-separated hex)
-+   * - ``max_sub_event_len``
-+     - ``03:20:00``
-+     - Max CS subevent length, 3-byte LE (colon-separated hex)
-+   * - ``tone_antenna_config_selection``
-+     - ``0x07``
-+     - Antenna config for CS tone exchanges
-+   * - ``phy``
-+     - ``0x01``
-+     - PHY for CS procedures: ``0x01`` LE 1M, ``0x02`` LE 2M
-+   * - ``tx_power_delta``
-+     - ``0x80``
-+     - Remote vs local TX power delta; ``0x80`` = not applicable
-+   * - ``preferred_peer_antenna``
-+     - ``0x03``
-+     - Preferred antenna for the peer device
-+   * - ``snr_control_initiator``
-+     - ``0xFF``
-+     - SNR control for initiator; ``0xFF`` = no preference
-+   * - ``snr_control_reflector``
-+     - ``0xFF``
-+     - SNR control for reflector; ``0xFF`` = no preference
-+
-+:Example Start with all defaults, no timeout:
-+	| **> start**
-+:Example Start on a specific device:
-+	| **> start AA:BB:CC:DD:EE:FF**
-+:Example Start on a specific device with 10-second auto-stop:
-+	| **> start AA:BB:CC:DD:EE:FF 10**
-+:Example Start with 10-second auto-stop (single device, address omitted):
-+	| **> start 0 10**
-+:Example Start with no timeout, explicit:
-+	| **> start**
-+:Example Start with 5-minute auto-stop:
-+	| **> start AA:BB:CC:DD:EE:FF 300**
-+:Example Start as Initiator only:
-+	| **> start role=0x01**
-+:Example Start as Reflector only:
-+	| **> start role=0x02**
-+:Example Start as both Initiator and Reflector:
-+	| **> start role=0x03**
-+:Example Start with Mode 2 (PBR) main mode:
-+	| **> start main_mode_type=2**
-+:Example Start with both RTT and PBR modes:
-+	| **> start main_mode_type=3**
-+:Example Start with LE 2M PHY for CS procedures:
-+	| **> start phy=0x02**
-+:Example Start with LE 2M PHY for both CS sync and procedures:
-+	| **> start cs_sync_phy=0x02 phy=0x02**
-+:Example Start with reduced TX power (10 dBm):
-+	| **> start max_tx_power=10**
-+:Example Start with companion signal enabled:
-+	| **> start companion_signal_enable=1**
-+:Example Start with a procedure limit of 100:
-+	| **> start max_procedure_count=100**
-+:Example Start with high SNR preference on both roles:
-+	| **> start snr_control_initiator=0x01 snr_control_reflector=0x01**
-+:Example Start with custom channel map (all enabled):
-+	| **> start channel_map=FF:FF:FF:FF:FF:FF:FF:FF:FF:FF**
-+:Example Start Initiator, Mode 2, LE 2M, 30-second timeout:
-+	| **> start AA:BB:CC:DD:EE:FF 30 role=0x01 main_mode_type=2 phy=0x02 cs_sync_phy=0x02**
-+:Example Start both roles, Mode 1, no limit, custom step counts:
-+	| **> start role=0x03 main_mode_type=1 main_mode_min_steps=4 main_mode_max_steps=8**
-+:Example Start on a device, Reflector, 60-second timeout:
-+	| **> start AA:BB:CC:DD:EE:FF 60 role=0x02**
-+
-+defset
-+------
-+
-+Sets the CS default settings (``role``, ``cs_sync_ant_sel``,
-+``max_tx_power``) on the connected device without starting a
-+measurement. This is required for the Reflector role: a Reflector
-+never calls **start** because it waits passively for the remote
-+Initiator, so **defset** is the only way to push these settings to
-+the daemon before the remote side initiates the procedure.
-+
-+Any ``param=value`` arguments update the local parameter state and
-+are immediately sent to the daemon via **SetDefaultSettings**.
-+Omitting all arguments sends the current local values unchanged.
-+
-+:Usage: **> defset [param=value ...]**
-+:Uses: **org.bluez.ChannelSounding1(5)** method **SetDefaultSettings**
-+:[param=value]: One or more of ``role``, ``cs_sync_ant_sel``,
-+               ``max_tx_power`` (optional)
-+:Example Configure as Reflector:
-+	| **> defset role=0x02**
-+:Example Configure as Both with reduced TX power:
-+	| **> defset role=0x03 max_tx_power=10**
-+:Example Apply current local values without changing them:
-+	| **> defset**
-+
-+stop
-+----
-+
-+Stops an active CS distance measurement. When only one measurement is
-+running the device address may be omitted. When multiple measurements
-+are active the address is required to identify which one to stop.
-+
-+:Usage: **> stop [dev_addr]**
-+:Uses: **org.bluez.ChannelSounding1(5)** method **StopMeasurement**
-+:[dev_addr]: Bluetooth address of the device to stop (optional when
-+             only one session is active; required otherwise)
-+:Example Stop the only active measurement:
-+	| **> stop**
-+:Example Stop a specific device when multiple are active:
-+	| **> stop AA:BB:CC:DD:EE:FF**
-+:Example Stop a second device:
-+	| **> stop 11:22:33:44:55:66**
-+
-+show
-+----
-+
-+Displays all active measurements (device path for each) and the full
-+set of CS parameter values that will be used on the next **start** call.
-+When no measurements are active, ``none`` is shown.
-+
-+The parameter output is divided into three sections:
-+
-+- **Default Settings** — role, CS sync antenna selection, max TX power.
-+- **CS Config Params** — per-procedure configuration fields including
-+  mode type, step counts, PHY, and channel map.
-+- **CS Frequency Params** — procedure scheduling fields including
-+  duration, period, subevent lengths, and SNR control.
-+
-+:Usage: **> show**
-+:Example Show active session and all CS parameters:
-+	| **> show**
-+
-+RESOURCES
-+=========
-+
-+http://www.bluez.org
-+
-+REPORTING BUGS
-+==============
-+
-+linux-bluetooth@vger.kernel.org
-diff --git a/doc/org.bluez.ChannelSounding1.rst b/doc/org.bluez.ChannelSounding1.rst
-new file mode 100644
-index 000000000..73f484507
---- /dev/null
-+++ b/doc/org.bluez.ChannelSounding1.rst
-@@ -0,0 +1,302 @@
-+==========================
-+org.bluez.ChannelSounding1
-+==========================
-+
-+----------------------------------------------
-+BlueZ D-Bus Channel Sounding API documentation
-+----------------------------------------------
-+
-+:Version: BlueZ
-+:Date: June 2026
-+:Manual section: 5
-+:Manual group: Linux System Administration
-+
-+Interface
-+=========
-+
-+:Service:	org.bluez
-+:Interface:	org.bluez.ChannelSounding1
-+:Object path:	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-+:Used by:	**bluetoothctl(1)**, **bluetoothctl-cs(1)**
-+
-+Methods
-+-------
-+
-+void StartMeasurement(dict params)
-+``````````````````````````````````
-+
-+Starts a Channel Sounding distance measurement procedure on the connected
-+device. All configuration is supplied in a single ``a{sv}`` dictionary.
-+Any key that is omitted retains its current value in the daemon.
-+
-+The device to measure is identified by the D-Bus object path on which
-+this method is called
-+(``[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX``).
-+Only one measurement per device object may be active at a time. Calling
-+**StartMeasurement** while a session is already active returns
-+``org.bluez.Error.InProgress``.
-+
-+Supported dictionary keys:
-+
-+:uint32 duration_secs (Default: 0):
-+
-+	Duration in seconds before the measurement is stopped
-+	automatically. A value of 0 disables the automatic timeout.
-+
-+:byte role (Default: 0x03):
-+
-+	CS role to use for the measurement.
-+
-+	Possible values:
-+
-+	:0x01: Initiator
-+	:0x02: Reflector
-+	:0x03: Both (Initiator and Reflector)
-+
-+:byte cs_sync_ant_sel (Default: 0xFF):
-+
-+	CS sync antenna selection. Values 0xFE and 0xFF are reserved
-+	by the Bluetooth specification.
-+
-+:byte max_tx_power (Default: 0x14):
-+
-+	Maximum TX power in dBm, treated as a signed value. Valid
-+	range is -127 to +20 dBm.
-+
-+:byte config_id:
-+
-+	CS configuration identifier.
-+
-+:byte main_mode_type:
-+
-+	Main CS mode used in the procedure.
-+
-+:byte sub_mode_type:
-+
-+	Sub-mode within the main mode. Set to 0xFF when unused.
-+
-+:byte main_mode_min_steps:
-+
-+	Minimum number of CS main mode steps per CS subevent.
-+
-+:byte main_mode_max_steps:
-+
-+	Maximum number of CS main mode steps per CS subevent.
-+
-+:byte main_mode_repetition:
-+
-+	Number of times the main mode steps are repeated in a
-+	subevent.
-+
-+:byte mode0_steps:
-+
-+	Number of CS Mode 0 steps at the beginning of each subevent.
-+
-+:byte rtt_types:
-+
-+	Round Trip Time measurement types for the configuration.
-+
-+:byte cs_sync_phy:
-+
-+	PHY used for CS sync packets.
-+
-+	Possible values:
-+
-+	:0x01: LE 1M PHY
-+	:0x02: LE 2M PHY
-+
-+:array{byte} channel_map:
-+
-+	10-byte channel map bitmap. Must be exactly 10 bytes.
-+
-+:byte channel_map_repetition:
-+
-+	Number of consecutive repetitions of the channel map.
-+
-+:byte channel_selection_type:
-+
-+	Algorithm used for CS channel selection.
-+
-+:byte channel_shape:
-+
-+	Shape used in the channel selection algorithm.
-+
-+:byte channel_jump:
-+
-+	Channel jump size used in the channel selection algorithm.
-+
-+:byte companion_signal_enable:
-+
-+	Set to 1 to transmit a companion signal alongside the CS
-+	tone, 0 to disable.
-+
-+:uint16 max_procedure_duration:
-+
-+	Maximum duration of a single CS measurement procedure.
-+
-+:uint16 min_period_between_procedures:
-+
-+	Minimum time between consecutive CS measurement procedures.
-+
-+:uint16 max_period_between_procedures:
-+
-+	Maximum time between consecutive CS measurement procedures.
-+
-+:uint16 max_procedure_count:
-+
-+	Maximum number of CS measurement procedures to run.
-+	A value of 0 means no limit.
-+
-+:array{byte} min_sub_event_len:
-+
-+	Minimum CS subevent length as a 3-byte little-endian value.
-+	Must be exactly 3 bytes.
-+
-+:array{byte} max_sub_event_len:
-+
-+	Maximum CS subevent length as a 3-byte little-endian value.
-+	Must be exactly 3 bytes.
-+
-+:byte tone_antenna_config_selection:
-+
-+	Antenna configuration used for CS tone exchanges.
-+
-+:byte phy:
-+
-+	PHY used during CS procedures.
-+
-+	Possible values:
-+
-+	:0x01: LE 1M PHY
-+	:0x02: LE 2M PHY
-+
-+:byte tx_power_delta:
-+
-+	Difference between remote and local TX power during CS
-+	procedures. 0x80 indicates not applicable.
-+
-+:byte preferred_peer_antenna:
-+
-+	Preferred antenna to be used by the peer device.
-+
-+:byte snr_control_initiator:
-+
-+	SNR control setting for the initiator role.
-+	0xFF indicates no preference.
-+
-+:byte snr_control_reflector:
-+
-+	SNR control setting for the reflector role.
-+	0xFF indicates no preference.
-+
-+Possible errors:
-+
-+:org.bluez.Error.InProgress:
-+:org.bluez.Error.InvalidArgs:
-+:org.freedesktop.DBus.Error.Failed:
-+
-+Examples:
-+
-+:bluetoothctl set role then start:
-+	| [cs] > start AA:BB:CC:DD:EE:FF role=0x01 main_mode_type=2
-+:bluetoothctl start with defaults:
-+	| [cs] > start [dev_addr [duration_secs]]
-+
-+void SetDefaultSettings(dict params)
-+`````````````````````````````````````
-+
-+Sets the CS default settings for this device without starting a
-+measurement. This method is intended for the Reflector role, where
-+the device waits passively for the remote Initiator to begin the
-+procedure and therefore never calls **StartMeasurement**. It allows
-+the application to configure ``role``, ``cs_sync_ant_sel``, and
-+``max_tx_power`` ahead of time so they are in effect when the
-+controller processes the remote CS configuration.
-+Need this to set default settings in Reflector role.
-+
-+Supported dictionary keys:
-+
-+:byte role (Default: 0x03):
-+
-+	CS role to use for the measurement.
-+
-+	Possible values:
-+
-+	:0x01: Initiator
-+	:0x02: Reflector
-+	:0x03: Both (Initiator and Reflector)
-+
-+:byte cs_sync_ant_sel (Default: 0xFF):
-+
-+	CS sync antenna selection. Values 0xFE and 0xFF are reserved
-+	by the Bluetooth specification.
-+
-+:byte max_tx_power (Default: 0x14):
-+
-+	Maximum TX power in dBm, treated as a signed value. Valid
-+	range is -127 to +20 dBm.
-+
-+Possible errors:
-+
-+:org.bluez.Error.InvalidArgs:
-+:org.freedesktop.DBus.Error.Failed:
-+
-+Examples:
-+
-+:bluetoothctl configure as Reflector:
-+	| [cs] > defset role=0x02
-+
-+void StopMeasurement(void)
-+``````````````````````````
-+
-+Stops the active Channel Sounding distance measurement on this device.
-+The device is identified by the D-Bus object path on which this method
-+is called — no session identifier is required.
-+
-+Raises ``org.bluez.Error.NotConnected`` if no measurement is active.
-+
-+Possible errors:
-+
-+:org.bluez.Error.NotConnected:
-+:org.freedesktop.DBus.Error.Failed:
-+
-+In **bluetoothctl(1)**, the device address argument may be omitted only
-+when a single measurement is active; it is required when multiple
-+measurements are active.
-+
-+Examples:
-+
-+:bluetoothctl stop the only active measurement:
-+	| [cs] > stop
-+:bluetoothctl stop a specific device when multiple are active:
-+	| [cs] > stop AA:BB:CC:DD:EE:FF
-+
-+Properties
-+----------
-+
-+boolean Active [readonly]
-+`````````````````````````
-+
-+Indicates whether a CS distance measurement procedure is currently
-+active on this device.
-+
-+Set to ``true`` when a procedure starts — either because the local
-+Initiator called **StartMeasurement** successfully, or because the
-+remote Initiator enabled a CS procedure on the local Reflector.
-+
-+Set to ``false`` when the procedure stops for any reason: the local
-+application called **StopMeasurement**, the measurement duration timer
-+expired, or the ACL connection was dropped.
-+
-+This property emits ``PropertiesChanged`` on every transition so that
-+clients can track measurement state without polling.
-+
-+RESOURCES
-+=========
-+
-+http://www.bluez.org
-+
-+REPORTING BUGS
-+==============
-+
-+linux-bluetooth@vger.kernel.org
+Replace hardcoded CS configuration values with configurable HCI accessors
+(bt_rap_{get,set}_cs_config_params, bt_rap_{get,set}_cs_freq_params,
+bt_rap_{get,set}_default_settings_params).
+Add measurement control APIs (bt_rap_start_measurement,
+bt_rap_stop_measurement) with optional timeout-based auto-stop
+and callbacks for timeout and procedure-state changes,
+allowing DBus Active state to reflect actual controller procedure status.
+---
+ profiles/ranging/rap.c     | 405 ++++++++++++++++++++++++++++++---
+ profiles/ranging/rap_hci.c | 454 +++++++++++++++++++++++++++----------
+ 2 files changed, 712 insertions(+), 147 deletions(-)
+
+diff --git a/profiles/ranging/rap.c b/profiles/ranging/rap.c
+index fa3e27328..deb03b139 100644
+--- a/profiles/ranging/rap.c
++++ b/profiles/ranging/rap.c
+@@ -35,7 +35,11 @@
+ #include "src/shared/rap.h"
+ #include "attrib/att.h"
+ #include "src/log.h"
++#include "src/shared/cs-types.h"
+ #include "src/btd.h"
++#include "src/dbus-common.h"
++
++#define CS_INTERFACE "org.bluez.ChannelSounding1"
+ 
+ struct rap_adapter_data {
+ 	struct btd_adapter *adapter;
+@@ -43,6 +47,14 @@ struct rap_adapter_data {
+ 	int ref_count;  /* Number of devices using this adapter */
+ };
+ 
++struct cs_session {
++	bool active;
++	uint32_t duration_secs;
++	struct bt_rap_le_cs_default_settings settings;
++	struct bt_rap_le_cs_config    cfg;
++	struct bt_rap_le_cs_frequency freq;
++};
++
+ struct rap_data {
+ 	struct btd_device *device;
+ 	struct btd_service *service;
+@@ -50,6 +62,8 @@ struct rap_data {
+ 	unsigned int ready_id;
+ 	struct rap_adapter_data *adapter_data;  /* Shared adapter-level HCI */
+ 	void *hci_sm;  /* Per-device HCI state machine */
++	uint16_t conn_handle;  /* Last known connection handle */
++	struct cs_session active_session;  /* active==false when idle */
+ };
+ 
+ static struct queue *sessions;
+@@ -293,6 +307,335 @@ static void rap_attached(struct bt_rap *rap, void *user_data)
+ 	rap_data_add(data);
+ }
+ 
++static DBusMessage *set_default_settings(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
++{
++	struct rap_data *data = user_data;
++	struct bt_rap_le_cs_default_settings settings;
++	DBusMessageIter iter, dict;
++
++	bt_rap_get_default_settings_params(data->hci_sm, &settings);
++
++	dbus_message_iter_init(msg, &iter);
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
++		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
++					"Expected a{sv} dictionary");
++
++	dbus_message_iter_recurse(&iter, &dict);
++
++	while (dbus_message_iter_get_arg_type(&dict) == DBUS_TYPE_DICT_ENTRY) {
++		DBusMessageIter entry, variant;
++		const char *key;
++		int vtype;
++
++		dbus_message_iter_recurse(&dict, &entry);
++		dbus_message_iter_get_basic(&entry, &key);
++		dbus_message_iter_next(&entry);
++		dbus_message_iter_recurse(&entry, &variant);
++		vtype = dbus_message_iter_get_arg_type(&variant);
++
++		if (strcmp(key, "role") == 0) {
++			if (vtype != DBUS_TYPE_BYTE)
++				goto bad_type;
++			dbus_message_iter_get_basic(&variant, &settings.role);
++		} else if (strcmp(key, "cs_sync_ant_sel") == 0) {
++			if (vtype != DBUS_TYPE_BYTE)
++				goto bad_type;
++			dbus_message_iter_get_basic(&variant,
++						    &settings.cs_sync_ant_sel);
++		} else if (strcmp(key, "max_tx_power") == 0) {
++			uint8_t bval;
++
++			if (vtype != DBUS_TYPE_BYTE)
++				goto bad_type;
++			dbus_message_iter_get_basic(&variant, &bval);
++			settings.max_tx_power = (int8_t)bval;
++		}
++
++		dbus_message_iter_next(&dict);
++		continue;
++bad_type:
++		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
++					"Unexpected variant type for key");
++	}
++
++	if (!bt_rap_set_default_settings_params(data->hci_sm, &settings))
++		return g_dbus_create_error(msg, DBUS_ERROR_FAILED,
++					"Set default settings failed");
++
++	return dbus_message_new_method_return(msg);
++}
++
++static DBusMessage *start_measurement(DBusConnection *conn,
++				DBusMessage *msg, void *user_data)
++{
++	struct rap_data *data = user_data;
++	struct bt_rap_le_cs_config cfg;
++	struct bt_rap_le_cs_frequency freq;
++	struct bt_rap_le_cs_default_settings settings;
++	uint32_t duration_secs = 0;
++	DBusMessageIter iter, dict;
++
++	if (data->active_session.active)
++		return g_dbus_create_error(msg,
++					"org.bluez.Error.InProgress",
++					"Measurement already active");
++
++	/* Seed locals from current state-machine defaults */
++	bt_rap_get_cs_config_params(data->hci_sm, &cfg);
++	bt_rap_get_cs_freq_params(data->hci_sm, &freq);
++	bt_rap_get_default_settings_params(data->hci_sm, &settings);
++
++	dbus_message_iter_init(msg, &iter);
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
++		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
++					   "Expected a{sv} dictionary");
++
++	dbus_message_iter_recurse(&iter, &dict);
++
++	while (dbus_message_iter_get_arg_type(&dict) == DBUS_TYPE_DICT_ENTRY) {
++		DBusMessageIter entry, variant;
++		const char *key;
++		int vtype;
++
++		dbus_message_iter_recurse(&dict, &entry);
++		dbus_message_iter_get_basic(&entry, &key);
++		dbus_message_iter_next(&entry);
++		dbus_message_iter_recurse(&entry, &variant);
++		vtype = dbus_message_iter_get_arg_type(&variant);
++
++		if (strcmp(key, "duration_secs") == 0) {
++			if (vtype != DBUS_TYPE_UINT32)
++				goto bad_type;
++			dbus_message_iter_get_basic(&variant, &duration_secs);
++		} else if (strcmp(key, "role") == 0 &&
++			   vtype == DBUS_TYPE_BYTE) {
++			dbus_message_iter_get_basic(&variant, &settings.role);
++		} else if (strcmp(key, "cs_sync_ant_sel") == 0 &&
++			   vtype == DBUS_TYPE_BYTE) {
++			dbus_message_iter_get_basic(&variant,
++						    &settings.cs_sync_ant_sel);
++		} else if (strcmp(key, "max_tx_power") == 0 &&
++			   vtype == DBUS_TYPE_BYTE) {
++			uint8_t bval;
++
++			dbus_message_iter_get_basic(&variant, &bval);
++			settings.max_tx_power = (int8_t)bval;
++		} else if (strcmp(key, "channel_map") == 0) {
++			DBusMessageIter array;
++			uint8_t *bytes;
++			int len;
++
++			if (vtype != DBUS_TYPE_ARRAY)
++				goto bad_type;
++			dbus_message_iter_recurse(&variant, &array);
++			dbus_message_iter_get_fixed_array(&array, &bytes, &len);
++			if (len != 10)
++				return g_dbus_create_error(msg,
++						DBUS_ERROR_INVALID_ARGS,
++						"channel_map must be 10 bytes");
++			memcpy(cfg.channel_map[0], bytes, 10);
++		} else if (strcmp(key, "min_sub_event_len") == 0 ||
++			   strcmp(key, "max_sub_event_len") == 0) {
++			DBusMessageIter array;
++			uint8_t *bytes;
++			int len;
++
++			if (vtype != DBUS_TYPE_ARRAY)
++				goto bad_type;
++			dbus_message_iter_recurse(&variant, &array);
++			dbus_message_iter_get_fixed_array(&array, &bytes, &len);
++			if (len != 3)
++				return g_dbus_create_error(msg,
++						DBUS_ERROR_INVALID_ARGS,
++						"sub_event_len must be 3 bytes");
++			if (strcmp(key, "min_sub_event_len") == 0)
++				memcpy(freq.min_sub_event_len[0], bytes, 3);
++			else
++				memcpy(freq.max_sub_event_len[0], bytes, 3);
++		} else if (strcmp(key, "max_procedure_duration") == 0 ||
++			   strcmp(key, "min_period_between_procedures") == 0 ||
++			   strcmp(key, "max_period_between_procedures") == 0 ||
++			   strcmp(key, "max_procedure_count") == 0) {
++			uint16_t u16val;
++
++			if (vtype != DBUS_TYPE_UINT16)
++				goto bad_type;
++			dbus_message_iter_get_basic(&variant, &u16val);
++
++			if (strcmp(key, "max_procedure_duration") == 0)
++				freq.max_procedure_duration[0] = u16val;
++			else if (strcmp(key,
++					"min_period_between_procedures") == 0)
++				freq.min_period_between_procedures[0] = u16val;
++			else if (strcmp(key,
++					"max_period_between_procedures") == 0)
++				freq.max_period_between_procedures[0] = u16val;
++			else
++				freq.max_procedure_count[0] = u16val;
++		} else {
++			/* All remaining keys expect a byte variant */
++			uint8_t bval;
++
++			if (vtype != DBUS_TYPE_BYTE)
++				goto bad_type;
++			dbus_message_iter_get_basic(&variant, &bval);
++
++			if (strcmp(key, "config_id") == 0)
++				cfg.config_id[0] = bval;
++			else if (strcmp(key, "main_mode_type") == 0)
++				cfg.main_mode_type[0] = bval;
++			else if (strcmp(key, "sub_mode_type") == 0)
++				cfg.sub_mode_type[0] = bval;
++			else if (strcmp(key, "main_mode_min_steps") == 0)
++				cfg.main_mode_min_steps[0] = bval;
++			else if (strcmp(key, "main_mode_max_steps") == 0)
++				cfg.main_mode_max_steps[0] = bval;
++			else if (strcmp(key, "main_mode_repetition") == 0)
++				cfg.main_mode_repetition[0] = bval;
++			else if (strcmp(key, "mode0_steps") == 0)
++				cfg.mode0_steps[0] = bval;
++			else if (strcmp(key, "rtt_types") == 0)
++				cfg.rtt_types[0] = bval;
++			else if (strcmp(key, "cs_sync_phy") == 0)
++				cfg.cs_sync_phy[0] = bval;
++			else if (strcmp(key, "channel_map_repetition") == 0)
++				cfg.channel_map_repetition[0] = bval;
++			else if (strcmp(key, "channel_selection_type") == 0)
++				cfg.channel_selection_type[0] = bval;
++			else if (strcmp(key, "channel_shape") == 0)
++				cfg.channel_shape[0] = bval;
++			else if (strcmp(key, "channel_jump") == 0)
++				cfg.channel_jump[0] = bval;
++			else if (strcmp(key, "companion_signal_enable") == 0)
++				cfg.companion_signal_enable[0] = bval;
++			else if (strcmp(key,
++					"tone_antenna_config_selection") == 0)
++				freq.tone_antenna_config_selection[0] = bval;
++			else if (strcmp(key, "phy") == 0)
++				freq.phy[0] = bval;
++			else if (strcmp(key, "tx_power_delta") == 0)
++				freq.tx_power_delta[0] = bval;
++			else if (strcmp(key, "preferred_peer_antenna") == 0)
++				freq.preferred_peer_antenna[0] = bval;
++			else if (strcmp(key, "snr_control_initiator") == 0)
++				freq.snr_control_initiator[0] = bval;
++			else if (strcmp(key, "snr_control_reflector") == 0)
++				freq.snr_control_reflector[0] = bval;
++		}
++
++		dbus_message_iter_next(&dict);
++		continue;
++bad_type:
++		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
++					   "Unexpected variant type for key");
++	}
++
++	if (data->conn_handle == 0)
++		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
++					   "Device not connected");
++
++	if (!bt_rap_set_default_settings_params(data->hci_sm, &settings))
++		return g_dbus_create_error(msg, DBUS_ERROR_FAILED,
++					   "Set default settings failed");
++
++	if (!bt_rap_set_cs_config_params(data->hci_sm, &cfg))
++		return g_dbus_create_error(msg, DBUS_ERROR_FAILED,
++					   "Set CS config params failed");
++
++	if (!bt_rap_set_cs_freq_params(data->hci_sm, &freq))
++		return g_dbus_create_error(msg, DBUS_ERROR_FAILED,
++					   "Set CS freq params failed");
++
++	if (!bt_rap_start_measurement(data->hci_sm, data->conn_handle,
++							duration_secs))
++		return g_dbus_create_error(msg, DBUS_ERROR_FAILED,
++					   "Start measurement failed");
++
++	data->active_session.active        = true;
++	data->active_session.duration_secs = duration_secs;
++	data->active_session.settings      = settings;
++	data->active_session.cfg           = cfg;
++	data->active_session.freq          = freq;
++
++	return dbus_message_new_method_return(msg);
++}
++
++static DBusMessage *stop_measurement(DBusConnection *conn,
++				DBusMessage *msg, void *user_data)
++{
++	struct rap_data *data = user_data;
++
++	if (!data->active_session.active)
++		return g_dbus_create_error(msg,
++					"org.bluez.Error.NotConnected",
++					"No active measurement");
++
++	if (!bt_rap_stop_measurement(data->hci_sm))
++		return g_dbus_create_error(msg, DBUS_ERROR_FAILED,
++					"Stop measurement failed");
++
++	memset(&data->active_session, 0, sizeof(data->active_session));
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++				device_get_path(data->device),
++				CS_INTERFACE, "Active");
++
++	return dbus_message_new_method_return(msg);
++}
++
++static const GDBusMethodTable cs_dbus_methods[] = {
++	{ GDBUS_METHOD("SetDefaultSettings",
++			GDBUS_ARGS({ "params", "a{sv}" }),
++			NULL,
++			set_default_settings) },
++	{ GDBUS_METHOD("StartMeasurement",
++			GDBUS_ARGS({ "params", "a{sv}" }),
++			NULL,
++			start_measurement) },
++	{ GDBUS_METHOD("StopMeasurement",
++			NULL,
++			NULL,
++			stop_measurement) },
++	{ }
++};
++
++static gboolean cs_property_get_active(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *user_data)
++{
++	struct rap_data *data = user_data;
++	dbus_bool_t active = data->active_session.active ||
++				bt_rap_is_procedure_active(data->hci_sm);
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &active);
++	return TRUE;
++}
++
++static const GDBusPropertyTable cs_dbus_properties[] = {
++	{ "Active", "b", cs_property_get_active, NULL, NULL, 0 },
++	{ }
++};
++
++static void rap_measurement_timeout_cb(void *user_data)
++{
++	struct rap_data *data = user_data;
++
++	memset(&data->active_session, 0, sizeof(data->active_session));
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++				device_get_path(data->device),
++				CS_INTERFACE, "Active");
++}
++
++static void rap_proc_active_changed(bool active, void *user_data)
++{
++	struct rap_data *data = user_data;
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++				device_get_path(data->device),
++				CS_INTERFACE, "Active");
++}
++
+ static int rap_probe(struct btd_service *service)
+ {
+ 	struct btd_device *device = btd_service_get_device(service);
+@@ -329,6 +672,10 @@ static int rap_probe(struct btd_service *service)
+ 
+ 	bt_rap_set_user_data(data->rap, service);
+ 
++	bt_rap_set_timeout_cb(data->hci_sm, rap_measurement_timeout_cb, data);
++
++	bt_rap_set_proc_active_cb(data->hci_sm, rap_proc_active_changed, data);
++
+ 	return 0;
+ }
+ 
+@@ -347,13 +694,16 @@ static void rap_remove(struct btd_service *service)
+ 		return;
+ 	}
+ 
++	g_dbus_unregister_interface(btd_get_dbus_connection(),
++				    device_get_path(device),
++				    CS_INTERFACE);
++
+ 	rap_data_remove(data);
+ }
+ 
+ static int rap_accept(struct btd_service *service)
+ {
+ 	struct btd_device *device = btd_service_get_device(service);
+-	struct btd_adapter *adapter = device_get_adapter(device);
+ 	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
+ 	struct rap_data *data = btd_service_get_user_data(service);
+ 	struct bt_att *att;
+@@ -370,33 +720,6 @@ static int rap_accept(struct btd_service *service)
+ 		return -EINVAL;
+ 	}
+ 
+-	/* init shared adapter HCI channel */
+-	if (!data->adapter_data) {
+-		data->adapter_data = rap_adapter_data_ref(adapter);
+-		if (!data->adapter_data) {
+-			error("Failed to get adapter HCI channel");
+-			return -EINVAL;
+-		}
+-		DBG("Using shared HCI channel for adapter (ref_count=%d)",
+-			data->adapter_data->ref_count);
+-	}
+-
+-	/* per-device HCI state machine */
+-	if (!data->hci_sm) {
+-		data->hci_sm = bt_rap_attach_hci(data->rap,
+-					data->adapter_data->hci,
+-					btd_opts.defaults.bcs.role,
+-					btd_opts.defaults.bcs.cs_sync_ant_sel,
+-					btd_opts.defaults.bcs.max_tx_power);
+-		if (!data->hci_sm) {
+-			error("Failed to attach HCI state machine for device");
+-			rap_adapter_data_unref(data->adapter_data);
+-			data->adapter_data = NULL;
+-			return -EINVAL;
+-		}
+-		DBG("HCI state machine attached successfully for device");
+-	}
+-
+ 	if (!bt_rap_attach(data->rap, client)) {
+ 		error("RAP unable to attach");
+ 		return -EINVAL;
+@@ -411,8 +734,7 @@ static int rap_accept(struct btd_service *service)
+ 		if (bt_hci_get_conn_handle(data->adapter_data->hci,
+ 					(const uint8_t *) bdaddr, &handle)) {
+ 			DBG("Found conn handle 0x%04X for %s", handle, addr);
+-			DBG("Setting up handle mapping: handle=0x%04X",
+-				handle);
++			data->conn_handle = handle;
+ 			bt_rap_set_conn_hndl(data->hci_sm,
+ 					data->rap, handle,
+ 					(const uint8_t *) bdaddr,
+@@ -426,12 +748,33 @@ static int rap_accept(struct btd_service *service)
+ 
+ 	btd_service_connecting_complete(service, 0);
+ 
++	g_dbus_register_interface(btd_get_dbus_connection(),
++				  device_get_path(data->device),
++				  CS_INTERFACE, cs_dbus_methods,
++				  NULL, cs_dbus_properties, data, NULL);
++
+ 	return 0;
+ }
+ 
+ static int rap_disconnect(struct btd_service *service)
+ {
+-	DBG(" ");
++	struct rap_data *data = btd_service_get_user_data(service);
++	char addr[18];
++
++	ba2str(device_get_address(btd_service_get_device(service)), addr);
++	DBG("%s", addr);
++	if (!data) {
++		error("RAP Service not handled by profile");
++		return -EINVAL;
++	}
++
++	if (data && data->hci_sm && data->conn_handle) {
++		bt_rap_clear_conn_handle(data->hci_sm, data->conn_handle);
++		data->conn_handle = 0;
++	}
++
++	memset(&data->active_session, 0, sizeof(data->active_session));
++
+ 	btd_service_disconnecting_complete(service, 0);
+ 	return 0;
+ }
+diff --git a/profiles/ranging/rap_hci.c b/profiles/ranging/rap_hci.c
+index 13f1365f3..daae66359 100644
+--- a/profiles/ranging/rap_hci.c
++++ b/profiles/ranging/rap_hci.c
+@@ -21,6 +21,8 @@
+ #include "lib/bluetooth/bluetooth.h"
+ #include "src/shared/util.h"
+ #include "src/shared/queue.h"
++#include "src/shared/timeout.h"
++#include "src/shared/cs-types.h"
+ #include "src/shared/rap.h"
+ #include "src/shared/att.h"
+ #include "src/log.h"
+@@ -60,19 +62,28 @@ _Static_assert(ARRAY_SIZE(state_names) == CS_STATE_UNSPECIFIED + 1,
+ typedef void (*cs_callback_t)(uint16_t length,
+ 			const void *param, void *user_data);
+ 
+-/* State Machine Context */
++typedef void (*cs_timeout_func_t)(void *user_data);
++
+ struct cs_state_machine {
+ 	enum cs_state current_state;
+ 	enum cs_state old_state;
+ 	struct bt_hci *hci;
+ 	struct bt_rap *rap;
+ 	struct queue *event_ids;
++	unsigned int measurement_timeout_id;
+ 	bool initiator;
+ 	bool procedure_active;
+ 	struct bt_rap_hci_cs_options cs_opt;  /* Per-instance CS options */
+ 	uint8_t role_enable;  /* Role value for HCI commands (1, 2, or 3) */
+ 	struct queue *conn_mappings;  /* Per-instance connection mappings */
++	uint16_t active_conn_handle;  /* current measurement handle */
+ 	struct timespec last_chan_class_time;  /* For 1-second rate limit */
++	struct bt_rap_le_cs_config   cs_config;
++	struct bt_rap_le_cs_frequency cs_frequency;
++	cs_timeout_func_t timeout_func;
++	void *timeout_data;
++	void (*proc_active_func)(bool active, void *user_data);
++	void *proc_active_data;
+ };
+ 
+ /* Connection Handle Mapping */
+@@ -85,7 +96,83 @@ struct rap_conn_mapping {
+ 	struct bt_rap *rap;
+ };
+ 
+-/* Connection Mapping Helper Functions */
++bool bt_rap_set_cs_config_params(void *hci_sm,
++				 const struct bt_rap_le_cs_config *config)
++{
++	struct cs_state_machine *sm = hci_sm;
++
++	if (!sm || !config)
++		return false;
++
++	sm->cs_config = *config;
++	return true;
++}
++
++bool bt_rap_set_cs_freq_params(void *hci_sm,
++			       const struct bt_rap_le_cs_frequency *frequency)
++{
++	struct cs_state_machine *sm = hci_sm;
++
++	if (!sm || !frequency)
++		return false;
++
++	sm->cs_frequency = *frequency;
++	return true;
++}
++
++bool bt_rap_set_default_settings_params(void *hci_sm,
++			const struct bt_rap_le_cs_default_settings *settings)
++{
++	struct cs_state_machine *sm = hci_sm;
++
++	if (!sm || !settings)
++		return false;
++
++	sm->role_enable            = settings->role;
++	sm->cs_opt.role            = settings->role;
++	sm->cs_opt.cs_sync_ant_sel = settings->cs_sync_ant_sel;
++	sm->cs_opt.max_tx_power    = settings->max_tx_power;
++	return true;
++}
++
++bool bt_rap_get_cs_config_params(void *hci_sm,
++				 struct bt_rap_le_cs_config *config)
++{
++	struct cs_state_machine *sm = hci_sm;
++
++	if (!sm || !config)
++		return false;
++
++	*config = sm->cs_config;
++	return true;
++}
++
++bool bt_rap_get_cs_freq_params(void *hci_sm,
++			       struct bt_rap_le_cs_frequency *frequency)
++{
++	struct cs_state_machine *sm = hci_sm;
++
++	if (!sm || !frequency)
++		return false;
++
++	*frequency = sm->cs_frequency;
++	return true;
++}
++
++bool bt_rap_get_default_settings_params(void *hci_sm,
++			struct bt_rap_le_cs_default_settings *settings)
++{
++	struct cs_state_machine *sm = hci_sm;
++
++	if (!sm || !settings)
++		return false;
++
++	settings->role            = sm->cs_opt.role;
++	settings->cs_sync_ant_sel = sm->cs_opt.cs_sync_ant_sel;
++	settings->max_tx_power    = sm->cs_opt.max_tx_power;
++	return true;
++}
++
+ static void mapping_free(void *data)
+ {
+ 	struct rap_conn_mapping *mapping = data;
+@@ -173,6 +260,12 @@ static void cs_state_machine_init(struct cs_state_machine *sm,
+ 				uint8_t role, uint8_t cs_sync_ant_sel,
+ 				int8_t max_tx_power)
+ {
++	static const uint8_t ch_map[10] = {
++		0xFC, 0xFF, 0x7F, 0xFC, 0xFF,
++		0xFF, 0xFF, 0xFF, 0xFF, 0x1F
++	};
++	uint8_t i;
++
+ 	if (!sm)
+ 		return;
+ 
+@@ -185,15 +278,50 @@ static void cs_state_machine_init(struct cs_state_machine *sm,
+ 
+ 	/* Store role_enable for HCI commands (1, 2, or 3 from config) */
+ 	sm->role_enable = role;
+-
+-	/* Initialize per-instance CS options
+-	 * Note: cs_opt.role will be overwritten with actual role (0x00 or 0x01)
+-	 * from config complete event, but role_enable preserves the HCI value
+-	 */
+-	sm->cs_opt.role = role;
++	sm->cs_opt.role            = role;
+ 	sm->cs_opt.cs_sync_ant_sel = cs_sync_ant_sel;
+-	sm->cs_opt.max_tx_power = max_tx_power;
+-	sm->cs_opt.rtt_type = 0;  /* Will be set from config complete event */
++	sm->cs_opt.max_tx_power    = max_tx_power;
++	sm->cs_opt.rtt_type        = 0;
++
++	sm->cs_config.num_configs = BT_RAP_CS_MAX_CONFIGS;
++	for (i = 0; i < BT_RAP_CS_MAX_CONFIGS; i++) {
++		sm->cs_config.config_id[i]              = i;
++		sm->cs_config.main_mode_type[i]         = 0x01;
++		sm->cs_config.sub_mode_type[i]          = 0xFF;
++		sm->cs_config.main_mode_min_steps[i]    = 0x02;
++		sm->cs_config.main_mode_max_steps[i]    = 0x03;
++		sm->cs_config.main_mode_repetition[i]   = 0x01;
++		sm->cs_config.mode0_steps[i]            = 0x02;
++		sm->cs_config.role[i]                   = 0x00;
++		sm->cs_config.rtt_types[i]              = 0x00;
++		sm->cs_config.cs_sync_phy[i]            = 0x01;
++		memcpy(sm->cs_config.channel_map[i], ch_map, 10);
++		sm->cs_config.channel_map_repetition[i] = 0x01;
++		sm->cs_config.channel_selection_type[i] = 0x00;
++		sm->cs_config.channel_shape[i]          = 0x00;
++		sm->cs_config.channel_jump[i]           = 0x02;
++		sm->cs_config.companion_signal_enable[i] = 0x00;
++	}
++
++	sm->cs_frequency.num_durations = BT_RAP_CS_MAX_FREQ_SETS;
++	for (i = 0; i < BT_RAP_CS_MAX_FREQ_SETS; i++) {
++		sm->cs_frequency.max_procedure_duration[i]        = 0x0640;
++		sm->cs_frequency.min_period_between_procedures[i] = 0x001E;
++		sm->cs_frequency.max_period_between_procedures[i] = 0x0096;
++		sm->cs_frequency.max_procedure_count[i]           = 0x0000;
++		sm->cs_frequency.min_sub_event_len[i][0]          = 0x00;
++		sm->cs_frequency.min_sub_event_len[i][1]          = 0x20;
++		sm->cs_frequency.min_sub_event_len[i][2]          = 0x00;
++		sm->cs_frequency.max_sub_event_len[i][0]          = 0x03;
++		sm->cs_frequency.max_sub_event_len[i][1]          = 0x20;
++		sm->cs_frequency.max_sub_event_len[i][2]          = 0x00;
++		sm->cs_frequency.tone_antenna_config_selection[i] = 0x07;
++		sm->cs_frequency.phy[i]                           = 0x01;
++		sm->cs_frequency.tx_power_delta[i]                = 0x80;
++		sm->cs_frequency.preferred_peer_antenna[i]        = 0x03;
++		sm->cs_frequency.snr_control_initiator[i]         = 0xFF;
++		sm->cs_frequency.snr_control_reflector[i]         = 0xFF;
++	}
+ }
+ 
+ /* State Transition Logic */
+@@ -228,10 +356,17 @@ static enum cs_state cs_get_current_state(struct cs_state_machine *sm)
+ 
+ static bool is_initiator_role(const struct cs_state_machine *sm)
+ {
+-	return sm->role_enable == 0x01 || sm->role_enable == 0x03;
++	return sm->role_enable == 0x01;
++}
++
++/* For role_enable=0x03 (Both), Central acts as Initiator and Peripheral as
++ * Reflector — the link layer topology determines the CS role assignment.
++ */
++static bool is_both_role(const struct cs_state_machine *sm)
++{
++	return sm->role_enable == 0x03;
+ }
+ 
+-/* Helper function to send read remote capabilities for all connections */
+ static bool bt_rap_read_remote_supported_capabilities(void *hci_sm,
+ 		uint16_t handle)
+ {
+@@ -262,20 +397,6 @@ static bool bt_rap_read_remote_supported_capabilities(void *hci_sm,
+ 	return true;
+ }
+ 
+-/* Helper function to send read remote capabilities for all connections */
+-static void send_read_remote_cap_for_mapping(void *data, void *user_data)
+-{
+-	struct rap_conn_mapping *mapping = data;
+-	struct cs_state_machine *sm = user_data;
+-
+-	if (!mapping || !sm)
+-		return;
+-
+-	DBG("Sending read remote capabilities for handle 0x%04X",
+-		mapping->handle);
+-	bt_rap_read_remote_supported_capabilities(sm, mapping->handle);
+-}
+-
+ /* HCI Event Callbacks */
+ static void rap_rd_loc_supp_cap_done_cb(const void *data, uint8_t size,
+ 					void *user_data)
+@@ -324,12 +445,9 @@ static void rap_rd_loc_supp_cap_done_cb(const void *data, uint8_t size,
+ 	/* Transition to INIT state before reading remote capabilities */
+ 	cs_set_state(sm, CS_STATE_INIT);
+ 
+-	/* Send read remote capabilities for all connected devices */
+-	if (sm->conn_mappings) {
+-		DBG("Sending read remote capabilities for all connections");
+-		queue_foreach(sm->conn_mappings,
+-				send_read_remote_cap_for_mapping, sm);
+-	}
++	DBG("Sending read remote capabilities for handle 0x%04X",
++		sm->active_conn_handle);
++	bt_rap_read_remote_supported_capabilities(sm, sm->active_conn_handle);
+ }
+ 
+ static void rap_send_hci_cs_create_config_command(struct cs_state_machine *sm,
+@@ -338,11 +456,6 @@ static void rap_send_hci_cs_create_config_command(struct cs_state_machine *sm,
+ 	struct bt_hci_cmd_le_cs_create_config cmd;
+ 	unsigned int status;
+ 
+-	uint8_t channel_map[10] = {
+-		0xFC, 0xFF, 0x7F, 0xFC, 0xFF,
+-		0xFF, 0xFF, 0xFF, 0xFF, 0x1F
+-	};
+-
+ 	if (!sm || !sm->hci) {
+ 		error("CS Create Config: sm or hci is null");
+ 		return;
+@@ -353,22 +466,22 @@ static void rap_send_hci_cs_create_config_command(struct cs_state_machine *sm,
+ 	memset(&cmd, 0, sizeof(cmd));
+ 	cmd.handle = cpu_to_le16(handle);
+ 	cmd.create_context = 1;
+-	/* Default values, will change to pick user given values later */
+-	cmd.config_id              = 0x00;
+-	cmd.main_mode_type         = 0x01;
+-	cmd.sub_mode_type          = 0xFF;
+-	cmd.min_main_mode_steps    = 0x02;
+-	cmd.max_main_mode_steps    = 0x03;
+-	cmd.main_mode_repetition   = 0x01;
+-	cmd.mode_0_steps           = 0x02;
+-	cmd.role                   = 0x00;
+-	cmd.rtt_type               = 0x00;
+-	cmd.cs_sync_phy            = 0x01;
+-	memcpy(cmd.channel_map, channel_map, 10);
+-	cmd.channel_map_repetition = 0x01;
+-	cmd.channel_selection_type = 0x00;
+-	cmd.ch3c_shape             = 0x00;
+-	cmd.ch3c_jump              = 0x02;
++
++	cmd.config_id              = sm->cs_config.config_id[0];
++	cmd.main_mode_type         = sm->cs_config.main_mode_type[0];
++	cmd.sub_mode_type          = sm->cs_config.sub_mode_type[0];
++	cmd.min_main_mode_steps    = sm->cs_config.main_mode_min_steps[0];
++	cmd.max_main_mode_steps    = sm->cs_config.main_mode_max_steps[0];
++	cmd.main_mode_repetition   = sm->cs_config.main_mode_repetition[0];
++	cmd.mode_0_steps           = sm->cs_config.mode0_steps[0];
++	cmd.role                   = sm->cs_config.role[0];
++	cmd.rtt_type               = sm->cs_config.rtt_types[0];
++	cmd.cs_sync_phy            = sm->cs_config.cs_sync_phy[0];
++	memcpy(cmd.channel_map, sm->cs_config.channel_map[0], 10);
++	cmd.channel_map_repetition = sm->cs_config.channel_map_repetition[0];
++	cmd.channel_selection_type = sm->cs_config.channel_selection_type[0];
++	cmd.ch3c_shape             = sm->cs_config.channel_shape[0];
++	cmd.ch3c_jump              = sm->cs_config.channel_jump[0];
+ 	cmd.reserved               = 0x00;
+ 
+ 	status = bt_hci_send(sm->hci, BT_HCI_CMD_LE_CS_CREATE_CONFIG,
+@@ -388,6 +501,7 @@ static void rap_def_settings_done_cb(const void *data, uint8_t size,
+ {
+ 	const struct bt_hci_rsp_le_cs_set_def_settings *rp;
+ 	struct cs_state_machine *sm = user_data;
++	struct rap_conn_mapping *m;
+ 
+ 	if (!sm || !data || size < sizeof(*rp))
+ 		return;
+@@ -403,14 +517,24 @@ static void rap_def_settings_done_cb(const void *data, uint8_t size,
+ 	}
+ 
+ 	if (rp->status == 0) {
+-		/* Success - proceed to configuration */
+ 		cs_set_state(sm, CS_STATE_WAIT_CONFIG_CMPLT);
+ 
+-		/* If role is initiator, send CS Create Config command */
+-		if (is_initiator_role(sm))
++		/* Send CS Create Config if we are (or will act as) Initiator.
++		 * For role_enable=Both, Central acts as Initiator.
++		 */
++		if (is_initiator_role(sm)) {
+ 			rap_send_hci_cs_create_config_command(sm, rp->handle);
+-		else
++		} else if (is_both_role(sm)) {
++			m = find_mapping_by_handle(sm, rp->handle);
++
++			if (m && m->is_central)
++				rap_send_hci_cs_create_config_command(sm,
++								rp->handle);
++			else
++				DBG("Both role: Wait for CS Config Cmpl");
++		} else {
+ 			DBG("Reflector role: Waiting for CS Config Completed");
++		}
+ 	} else {
+ 		/* Error - transition to stopped */
+ 		error("CS Set default setting failed with status 0x%02X",
+@@ -434,7 +558,7 @@ static void rap_send_hci_cs_remove_config_command(struct cs_state_machine *sm,
+ 
+ 	memset(&cmd, 0, sizeof(cmd));
+ 	cmd.handle = cpu_to_le16(handle);
+-	cmd.config_id = 0x00;  /* Default config ID */
++	cmd.config_id = sm->cs_config.config_id[0];
+ 
+ 	status = bt_hci_send(sm->hci, BT_HCI_CMD_LE_CS_REMOVE_CONFIG,
+ 				&cmd, sizeof(cmd), NULL, sm, NULL);
+@@ -481,13 +605,6 @@ static bool rap_send_hci_cs_set_procedure_parameters(
+ {
+ 	struct bt_hci_cmd_le_cs_set_proc_params cmd;
+ 	unsigned int status;
+-	uint8_t min_sub_event_len[3] = {
+-		0x00, 0x20, 0x00
+-	};
+-
+-	uint8_t max_sub_event_len[3] = {
+-		0x03, 0x20, 0x00
+-	};
+ 
+ 	if (!sm || !sm->hci) {
+ 		error("CS Set Procedure Parameters: sm or hci is null");
+@@ -498,20 +615,25 @@ static bool rap_send_hci_cs_set_procedure_parameters(
+ 
+ 	memset(&cmd, 0, sizeof(cmd));
+ 	cmd.handle = cpu_to_le16(handle);
+-	/* Default values, will change to pick user given values later */
+-	cmd.config_id = 0x00;
+-	cmd.max_procedure_len = 0x0640;
+-	cmd.min_procedure_interval = 0x1E;
+-	cmd.max_procedure_interval = 0x96;
+-	cmd.max_procedure_count = 0x00;
+-	memcpy(cmd.min_subevent_len, min_sub_event_len, 3);
+-	memcpy(cmd.max_subevent_len, max_sub_event_len, 3);
+-	cmd.tone_antenna_config_selection = 0x07;
+-	cmd.phy                    = 0x01;
+-	cmd.tx_power_delta         = 0x80;
+-	cmd.preferred_peer_antenna = 0x03;
+-	cmd.snr_control_initiator  = 0xFF;
+-	cmd.snr_control_reflector  = 0xFF;
++
++	cmd.config_id = sm->cs_config.config_id[0];
++	cmd.max_procedure_len =
++		cpu_to_le16(sm->cs_frequency.max_procedure_duration[0]);
++	cmd.min_procedure_interval =
++		cpu_to_le16(sm->cs_frequency.min_period_between_procedures[0]);
++	cmd.max_procedure_interval =
++		cpu_to_le16(sm->cs_frequency.max_period_between_procedures[0]);
++	cmd.max_procedure_count =
++		cpu_to_le16(sm->cs_frequency.max_procedure_count[0]);
++	memcpy(cmd.min_subevent_len, sm->cs_frequency.min_sub_event_len[0], 3);
++	memcpy(cmd.max_subevent_len, sm->cs_frequency.max_sub_event_len[0], 3);
++	cmd.tone_antenna_config_selection =
++		sm->cs_frequency.tone_antenna_config_selection[0];
++	cmd.phy                    = sm->cs_frequency.phy[0];
++	cmd.tx_power_delta         = sm->cs_frequency.tx_power_delta[0];
++	cmd.preferred_peer_antenna = sm->cs_frequency.preferred_peer_antenna[0];
++	cmd.snr_control_initiator  = sm->cs_frequency.snr_control_initiator[0];
++	cmd.snr_control_reflector  = sm->cs_frequency.snr_control_reflector[0];
+ 
+ 	status = bt_hci_send(sm->hci, BT_HCI_CMD_LE_CS_SET_PROC_PARAMS,
+ 				&cmd, sizeof(cmd), NULL, sm, NULL);
+@@ -541,7 +663,7 @@ static bool rap_send_hci_cs_procedure_enable(struct cs_state_machine *sm,
+ 
+ 	memset(&cmd, 0, sizeof(cmd));
+ 	cmd.handle = cpu_to_le16(handle);
+-	cmd.config_id = 0x00; /* Default config Id */
++	cmd.config_id = sm->cs_config.config_id[0];
+ 	cmd.enable = enable_proc ? 0x01 : 0x00;
+ 
+ 	status = bt_hci_send(sm->hci, BT_HCI_CMD_LE_CS_PROC_ENABLE,
+@@ -591,6 +713,8 @@ static void rap_rd_rem_fae_cmplt_evt(const void *data, uint8_t size,
+ {
+ 	struct cs_state_machine *sm = (struct cs_state_machine *) user_data;
+ 	const struct bt_hci_evt_le_cs_rd_rem_fae_complete *evt;
++	struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete tmp_ev;
++	struct rap_conn_mapping *m;
+ 	struct iovec iov;
+ 	int i;
+ 
+@@ -598,11 +722,9 @@ static void rap_rd_rem_fae_cmplt_evt(const void *data, uint8_t size,
+ 		size < sizeof(struct bt_hci_evt_le_cs_rd_rem_fae_complete))
+ 		return;
+ 
+-	/* Initialize iovec with the event data */
+ 	iov.iov_base = (void *) data;
+ 	iov.iov_len = size;
+ 
+-	/* Pull the entire structure at once */
+ 	evt = util_iov_pull_mem(&iov, sizeof(*evt));
+ 
+ 	if (!evt) {
+@@ -612,21 +734,20 @@ static void rap_rd_rem_fae_cmplt_evt(const void *data, uint8_t size,
+ 
+ 	DBG("status=0x%02X, handle=0x%04X", evt->status, evt->handle);
+ 
+-	/* Check status */
+ 	if (evt->status != 0) {
+ 		/* Status 0x11 (Unsupported Feature or Parameter Value) means
+ 		 * the remote has zero FAE, the procedure continues
+ 		 * to the Default Settings step.
+ 		 */
+ 		if (evt->status == 0x11) {
+-			DBG("Remote FAE=0 (No_FAE), proceed to Def Settings");
+-			if (is_initiator_role(sm)) {
+-				struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete
+-								tmp_ev;
++			m = find_mapping_by_handle(sm, evt->handle);
+ 
++			DBG("Remote FAE=0 (No_FAE), proceed to Def Settings");
++			if (is_initiator_role(sm) ||
++			    (is_both_role(sm) && m && m->is_central)) {
+ 				memset(&tmp_ev, 0, sizeof(tmp_ev));
+ 				tmp_ev.handle = evt->handle;
+-				DBG("Initiator: send def settings (No_FAE)");
++				DBG("Init/Both: send def settings (No_FAE)");
+ 				rap_send_hci_def_settings_command(sm, &tmp_ev);
+ 			} else {
+ 				DBG("Reflector role: continuing after No_FAE");
+@@ -651,13 +772,13 @@ static void rap_rd_rem_fae_cmplt_evt(const void *data, uint8_t size,
+ 	}
+ 
+ 	/* After receiving FAE Table, send default settings */
+-	/* Local capabilities already read before this event */
+-	if (is_initiator_role(sm)) {
+-		struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete tmp_ev;
++	m = find_mapping_by_handle(sm, evt->handle);
+ 
++	if (is_initiator_role(sm) ||
++	    (is_both_role(sm) && m && m->is_central)) {
+ 		memset(&tmp_ev, 0, sizeof(tmp_ev));
+ 		tmp_ev.handle = evt->handle;
+-		DBG("Initiator role: send def settings after FAE table");
++		DBG("Init/Both: send def settings after FAE");
+ 		rap_send_hci_def_settings_command(sm, &tmp_ev);
+ 	} else {
+ 		DBG("Reflector role: Proceeding after FAE Table");
+@@ -698,17 +819,16 @@ static void rap_rd_rmt_supp_cap_cmplt_evt(const void *data, uint8_t size,
+ {
+ 	struct cs_state_machine *sm = user_data;
+ 	const struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete *evt;
++	struct rap_conn_mapping *m;
+ 	struct iovec iov;
+ 	uint16_t subfeatures_supported;
+ 
+ 	if (!sm || !data || size < sizeof(*evt))
+ 		return;
+ 
+-	/* Initialize iovec with the event data */
+ 	iov.iov_base = (void *) data;
+ 	iov.iov_len = size;
+ 
+-	/* Pull the entire structure at once */
+ 	evt = util_iov_pull_mem(&iov, sizeof(*evt));
+ 
+ 	if (!evt) {
+@@ -718,7 +838,6 @@ static void rap_rd_rmt_supp_cap_cmplt_evt(const void *data, uint8_t size,
+ 
+ 	DBG("status=0x%02X, handle=0x%04X", evt->status, evt->handle);
+ 
+-	/* Check status */
+ 	if (evt->status != 0) {
+ 		error("Remote capabilities failed with status 0x%02X",
+ 			evt->status);
+@@ -738,16 +857,17 @@ static void rap_rd_rmt_supp_cap_cmplt_evt(const void *data, uint8_t size,
+ 	subfeatures_supported = le16_to_cpu(evt->subfeatures_supported);
+ 	DBG("subfeatures_supported=0x%04X", subfeatures_supported);
+ 
+-	/* Check Bit 1 of subfeatures_supported (0x0002) */
+ 	if (!(subfeatures_supported & 0x0002)) {
+ 		DBG("Bit 1 not set, sending Read Remote FAE Table");
+ 		bt_rap_read_remote_fae_table(sm, evt->handle);
+ 		return;
+ 	}
+ 
+-	/* Local capabilities already read before this event */
+-	if (is_initiator_role(sm)) {
+-		DBG("Initiator role: send def settings cmd for handle 0x%04X",
++	m = find_mapping_by_handle(sm, evt->handle);
++
++	if (is_initiator_role(sm) ||
++	    (is_both_role(sm) && m && m->is_central)) {
++		DBG("Init/Both: send def settings for 0x%04X",
+ 			evt->handle);
+ 		rap_send_hci_def_settings_command(sm, evt);
+ 	} else {
+@@ -763,25 +883,23 @@ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
+ 	struct cs_state_machine *sm = user_data;
+ 	const struct bt_hci_evt_le_cs_config_complete *evt;
+ 	struct rap_ev_cs_config_cmplt rap_ev;
++	struct rap_conn_mapping *mapping;
+ 	struct iovec iov;
+ 
+ 	if (!sm || !data || size < sizeof(*evt))
+ 		return;
+ 
+-	/* Initialize iovec with the event data */
+ 	iov.iov_base = (void *) data;
+ 	iov.iov_len = size;
+ 
+ 	DBG("size=0x%02X", size);
+ 
+-	/* State Check */
+ 	if (cs_get_current_state(sm) != CS_STATE_WAIT_CONFIG_CMPLT) {
+ 		DBG("Event received in Wrong State!! ");
+ 		DBG("Expected : CS_STATE_WAIT_CONFIG_CMPLT");
+ 		return;
+ 	}
+ 
+-	/* Pull the entire structure at once */
+ 	evt = util_iov_pull_mem(&iov, sizeof(*evt));
+ 	if (!evt) {
+ 		error("Failed to pull config complete struct");
+@@ -855,9 +973,6 @@ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
+ 
+ 	/* CS Security Enable may only be issued by the BLE Central */
+ 	if (rap_ev.role == 0x00) {
+-		/* Initiator role */
+-		struct rap_conn_mapping *mapping;
+-
+ 		mapping = find_mapping_by_handle(sm, evt->handle);
+ 		if (!mapping || !mapping->is_central) {
+ 			error("CS Security Enable skipped: not BLE Central");
+@@ -980,8 +1095,8 @@ static void rap_cs_proc_enable_cmplt_evt(const void *data, uint8_t size,
+ 
+ 	DBG("size=0x%02X", size);
+ 
+-	/* State Check */
+-	if (cs_get_current_state(sm) != CS_STATE_WAIT_PROC_CMPLT) {
++	if ((cs_get_current_state(sm) != CS_STATE_WAIT_PROC_CMPLT) &&
++		(cs_get_current_state(sm) != CS_STATE_STARTED)) {
+ 		DBG("Event received in Wrong State!! ");
+ 		DBG("Expected : CS_STATE_WAIT_PROC_CMPLT");
+ 		return;
+@@ -1002,6 +1117,8 @@ static void rap_cs_proc_enable_cmplt_evt(const void *data, uint8_t size,
+ 			evt->status);
+ 		cs_set_state(sm, CS_STATE_STOPPED);
+ 		sm->procedure_active = false;
++		if (sm->proc_active_func)
++			sm->proc_active_func(false, sm->proc_active_data);
+ 		return;
+ 	}
+ 
+@@ -1030,9 +1147,13 @@ static void rap_cs_proc_enable_cmplt_evt(const void *data, uint8_t size,
+ 	if (rap_ev.state == 0x01) {
+ 		cs_set_state(sm, CS_STATE_STARTED);
+ 		sm->procedure_active = true;
++		if (sm->proc_active_func)
++			sm->proc_active_func(true, sm->proc_active_data);
+ 	} else if (rap_ev.state == 0x00) {
+ 		cs_set_state(sm, CS_STATE_STOPPED);
+ 		sm->procedure_active = false;
++		if (sm->proc_active_func)
++			sm->proc_active_func(false, sm->proc_active_data);
+ 	}
+ 
+ 	/* Send callback to RAP Profile */
+@@ -1621,11 +1742,9 @@ void *bt_rap_attach_hci(struct bt_rap *rap, struct bt_hci *hci,
+ 
+ 	queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
+ 
+-	DBG("CS options: role=%u, cs_sync_ant_sel=%u, max_tx_power=%d",
+-		role, cs_sync_ant_sel, max_tx_power);
+-
+-	/* place holder, need DBus API to be called */
+-	bt_rap_read_local_supported_capabilities(sm);
++	DBG("HCI state machine attached (role=%u, ant=0x%02x, power=%d)",
++		sm->role_enable, sm->cs_opt.cs_sync_ant_sel,
++		sm->cs_opt.max_tx_power);
+ 
+ 	return sm;
+ 
+@@ -1638,6 +1757,73 @@ fail:
+ 	return NULL;
+ }
+ 
++static bool measurement_timeout_cb(void *user_data)
++{
++	struct cs_state_machine *sm = user_data;
++
++	sm->measurement_timeout_id = 0;
++
++	DBG("Measurement duration expired, stopping CS procedure");
++	bt_rap_stop_measurement(sm);
++
++	if (sm->timeout_func)
++		sm->timeout_func(sm->timeout_data);
++
++	return false;
++}
++
++bool bt_rap_start_measurement(void *hci_sm, uint16_t conn_handle,
++			      uint32_t duration_secs)
++{
++	struct cs_state_machine *sm = hci_sm;
++
++	if (!sm || !sm->hci)
++		return false;
++
++	if (!find_mapping_by_handle(sm, conn_handle)) {
++		error("start_measurement: hndl 0x%04X not found", conn_handle);
++		return false;
++	}
++
++	sm->active_conn_handle = conn_handle;
++
++	if (sm->measurement_timeout_id) {
++		timeout_remove(sm->measurement_timeout_id);
++		sm->measurement_timeout_id = 0;
++	}
++
++	if (!bt_rap_read_local_supported_capabilities(sm))
++		return false;
++
++	if (duration_secs > 0)
++		sm->measurement_timeout_id = timeout_add_seconds(duration_secs,
++					measurement_timeout_cb, sm, NULL);
++
++	return true;
++}
++
++bool bt_rap_stop_measurement(void *hci_sm)
++{
++	struct cs_state_machine *sm = hci_sm;
++
++	if (!sm || !sm->hci)
++		return false;
++
++	if (sm->measurement_timeout_id) {
++		timeout_remove(sm->measurement_timeout_id);
++		sm->measurement_timeout_id = 0;
++	}
++
++	if (!find_mapping_by_handle(sm, sm->active_conn_handle)) {
++		error("stop_measurement: handle 0x%04X not found",
++		      sm->active_conn_handle);
++		return false;
++	}
++
++	return rap_send_hci_cs_procedure_enable(sm, sm->active_conn_handle,
++						false);
++}
++
+ bool bt_rap_set_conn_hndl(void *hci_sm, struct bt_rap *rap,
+ 		uint16_t handle, const uint8_t *bdaddr, uint8_t bdaddr_type,
+ 		bool is_central)
+@@ -1672,6 +1858,40 @@ void bt_rap_clear_conn_handle(void *hci_sm, uint16_t handle)
+ 
+ 	DBG("Clearing connection mapping: handle=0x%04X", handle);
+ 	remove_conn_mapping(sm, handle);
++	sm->procedure_active = false;
++}
++
++bool bt_rap_is_procedure_active(void *hci_sm)
++{
++	struct cs_state_machine *sm = hci_sm;
++
++	if (!sm)
++		return false;
++
++	return sm->procedure_active;
++}
++
++void bt_rap_set_timeout_cb(void *hci_sm, void (*func)(void *), void *user_data)
++{
++	struct cs_state_machine *sm = hci_sm;
++
++	if (!sm)
++		return;
++
++	sm->timeout_func = func;
++	sm->timeout_data = user_data;
++}
++
++void bt_rap_set_proc_active_cb(void *hci_sm, void (*func)(bool, void *),
++				void *user_data)
++{
++	struct cs_state_machine *sm = hci_sm;
++
++	if (!sm)
++		return;
++
++	sm->proc_active_func = func;
++	sm->proc_active_data = user_data;
+ }
+ 
+ void bt_rap_detach_hci(struct bt_rap *rap, void *hci_sm)
+@@ -1690,12 +1910,14 @@ void bt_rap_detach_hci(struct bt_rap *rap, void *hci_sm)
+ 			queue_foreach(sm->event_ids, unregister_event_id,
+ 								sm->hci);
+ 
++		if (sm->measurement_timeout_id) {
++			timeout_remove(sm->measurement_timeout_id);
++			sm->measurement_timeout_id = 0;
++		}
++
+ 		queue_destroy(sm->event_ids, NULL);
+ 
+-		/* Clean up per-instance connection mappings.
+-		 * Each state machine owns its own conn_mappings queue;
+-		 * this destroys all mappings for this instance only.
+-		 */
++		/* destroys mappings for this instance only */
+ 		queue_destroy(sm->conn_mappings, mapping_free);
+ 
+ 		/* Free the state machine */
 -- 
 
