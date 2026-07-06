@@ -1,147 +1,174 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1163DDB1F
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jul 2026 13:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783343486; cv=none; b=JDedLlc3NCUCerWnzOCb0qfwXxmibRA55bepVM2mA6Wmh33Ujpxyod6TVFKrfLCHGSwWYgTeJwLVvoHV7m7Nfye2uUZhJKNtGqpF3FUY0E4hR3/0UC2L1hUleYRfOhfkor9jfFj3udbLcIE2Rve7jIZLmj1bjJ35YYdEnb12IyI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783343486; c=relaxed/simple;
-	bh=TEbpbURkBxLAAzZhgrsOXYk3/7eNBZY/GFZdYS7x7jw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=MFYhj83X0D994li1SvzfH42XczhmmYKLcRFuLyFvzKNVbpet3/klsqrWlFdPPbg8iI4MRMe6pRcLiUNvxrqhDp+QlM5Ldt2MavC4yT0Ymoo49a4ew4klAB3dQrfzGmQgaBrBn5SgCHb97OOWsDoMLA4LzULGsvDqEMMPngmGJSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n4ZWNYxj; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA4441A78B
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jul 2026 13:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783344122; cv=pass; b=dxKdtD86777bLh8/383tWxh7h8QHzIS/4cKCOSNxA121gCCEIyWaBekTKDZIl6qVHHTutlQGDCeo8OeoINKg0svBlk9N+L2lRRkNWSJsd0OFd/O6zHIgRwONOokJ0q+V3WeiIypAjV/pSXa+ecVJ/+aky9+Ad1X/CgpkSFg9SGk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783344122; c=relaxed/simple;
+	bh=NRpkEVsrO11eq4CxBW/dXRw+VTRn2w7uSQ1EWJH5sLw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZT7lMzuwK0oQLXDLjqfwryWBq2dLRqSY706U5fpd3oQBtt/1GsDoR4YBFRKMr6MgBIkLKZIhgkvPzyOd3hy26VlfdG7Uo+wXeTsHvloiqW25ibqKXAxSwa47E1g3/mBKAsre3SOTCsF6UpVY2+NNQhvjMhxAHE1IRXESFvWmHlQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DbE8Vcui; arc=pass smtp.client-ip=74.125.224.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n4ZWNYxj"
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-c999f162c9aso1953883a12.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jul 2026 06:11:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DbE8Vcui"
+Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-664d7863920so2218650d50.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jul 2026 06:22:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783344120; cv=none;
+        d=google.com; s=arc-20260327;
+        b=gezZqnWODtM9dPyn8OdpEEeDrYGQdZo7yBXghV2IET+8q2e/98elbXbl1EXCq8bJPY
+         chxDHv+W1IGKzGrKoEp72zE9p8gv9/wQOzmfNhFBcb9VCRXCFhXS1DQGKs2/bpqjzeiU
+         1WeF0S6GSbmHAcNB5+avsdBz09BRtlfh7N5vFXzR8RbPBEF5c/VJZJ/lcZWbQ83W2fS2
+         TGO1/Z0IQWzeKVGzHonVTUsuKCdZek9rleeNuMxPun0ymXj7qfaglC3lxBNMeqocFRT0
+         8j8zEUS/KhoYCBzRlctWGy/eUzogEKfsOPHEtdq4HprNO9rdQC7pnlFFy7uZLE9q2C2I
+         LWPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Crk8V3NFGTDCyc22U0OiJpfYC0BId6QVuYdAFk61QFs=;
+        fh=a3VsNKzd/8P581Kn+tZLk++vm6FcqjSJCnXgOmTm+t8=;
+        b=Is1Ip6AFW4csE8cDrdkMH5LQeygOlNIEA35s+HIy6nlvryC0oSVpA6ALNE+2vSgfJg
+         pNB25DmGSX1+Uj+WYaXSddR/BH31ECWb9jelDdr/tGTjeQuMTnjFKS4/kAXx9o3OdU4F
+         Y6AbSIFpFI9vY+UXpiOqEtq5dM7qj+3mmrh+51bnCe/oZTdTKaD6ns/pFi+tFLUyeS/w
+         xRUTXWmB3jzccnUQEthz2XERi8WM1w2id1nRf8ZkAxqjJ9OKFI/ziLUtJ6yDqa7lOE9J
+         dS15nvrQlFk8wDoolR9eqAIKw3nUPysj/6qe1+YJ6CNVVfTH4gROPC+E1UJcVWpCQxV+
+         9kdA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783343485; x=1783948285; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=lgzrF+O9sse4ePpwOBgorMwiQRPOF7l8eRWpWvigiD8=;
-        b=n4ZWNYxjQ5R9g5+HcuU+rFTYNVh5xuAQtHxiIc0RnoioZqdb8qV3SEhxcbkcrZJs6S
-         oPnmH/dskxDOXH3eCirwzcYehExKx6g8zYWOPh44eEnJzHucZvEtYYmsxwkLFu3BARBv
-         GoPKhjyPP4/90VpB/oASX2xOb1NeyZA2k6yjChjr7vd3V+CPBR5brouimT1j26ZxmSci
-         Z09Bg2dTX+7MEcumgEgh2ULtBqQIZFh/q84jnNZ08PWREJqvWG2VnUOYiEBd0vwGUpuo
-         Sm4Z74OUdClSC2Vs6mEv8uq1wTD8EaP2VMk/gN0GXnK7xuo5jvaHAJq66JurOm9UBKtn
-         HfDQ==
+        d=gmail.com; s=20251104; t=1783344120; x=1783948920; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Crk8V3NFGTDCyc22U0OiJpfYC0BId6QVuYdAFk61QFs=;
+        b=DbE8VcuiydVfXlBkInQvRmwiawHbdxa/Ni2S5ZH30k1rcJ1LRWoAtD3wTUHGlJa18o
+         WLhPv6i1fF6p5mmOOyhcJNobnkqSNOTVCu8UkOFf154u7T2GoDyVDcUBKiuPESrzcV+f
+         jKJ8HzOL9d8M/syqO6CI1N5tjtrjck/uzo7IPXa884jDh9B5llR2r9Yj0mxZCHHH5of+
+         JhRjrJq5JF8jL+H7DJDR7hFK+kbk+sWSbyd1VfEGtR2sxE0rfZaoJOT4weNM1NzNEx46
+         Kv0r5fBNR9I+VF4u0mbaKeaS22m/EHhEoSDtWY3ti3MXXj3B4X0uzO5UdXlfebn4S2S7
+         NlwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783343485; x=1783948285;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lgzrF+O9sse4ePpwOBgorMwiQRPOF7l8eRWpWvigiD8=;
-        b=aLYOzDmp08WkWfkUofWSOFXBkXREPhu1JYmOsGRRHdKyS0qNZ/gLNAtkUZLm64LCkz
-         tu0yuq36tXDdAoIwZyCnEvWIeuGDD4X7OVWVI3GaETVLqZYV+VEbuVCOzZloEQQDZFcG
-         aMaWaI+qqBLJ1psAKQngV3zgprawKXACQelWv5QldqfTyLCHa2V3V3T6K1DLBOZdM8RG
-         /PDfsxhb3KoC8i9GWcV5rQD/pbxdZvfUk1n24WIV+2FYgwBeBUwRJH3ygaH3LHQTTSu3
-         X82XWjL+Y5oCCGFGNuIw4bZ507KnZpn7AzS9KnRsKZqPYOZyv49kF7v6n0jNl6cEz4Le
-         W0rA==
-X-Gm-Message-State: AOJu0YzArnqazbzZP7Oa0MHB6v5N7tkY2Zn9rpGJCnOX5jlBlYfTaZt7
-	pV5A5vRsMoirA3TAiV5T75JTmg8mX77YQtTLIkLBgPiVyE+cJeZCoIn/C9Qqrg==
-X-Gm-Gg: AfdE7cnZQp236I8FxhA7h0a++XnEEX6/DRHfQsU5SwNLaxH+hwzn2aIbCq5y4ZE+6JX
-	TS+zW+W3361Llf836NU2rYH40hi0N8bVbm2MTF+WgQrIIUegfwbUWsgXmlTw6oTTA+iUeRowBGS
-	XM3Zn6NT2bLFa5aDKuDisaDJIkJwCFiwXzZxj+ulXXYY0lRaokPBmibziUbtsbz/omRkCwYABgI
-	/POyAliF1EO3tr18onc5T2C1GXngNk1DMoKhQNBQZTRFAoTvHO3l3nUXdM3cn3MxvJScetyGlzI
-	Ud5zr6du9ThCyjTXJ6a0BzWGKXpQECu3317AH653w7MpMfFAPP5j8ysfYqzTMijitNK1PqjqY+3
-	l2aU3a3GmaDko+xAw8sKHxkf/GXhh3ydFTwhi2xJ1+JVF31xpn3R5j1xzewHOEn1esWVsOAUC5g
-	j0J0q/zJNDnNzRl+KG6jA=
-X-Received: by 2002:a05:6a21:730c:b0:3b4:8ba9:4d8e with SMTP id adf61e73a8af0-3c08edde9f6mr629042637.23.1783343484655;
-        Mon, 06 Jul 2026 06:11:24 -0700 (PDT)
-Received: from [172.17.0.2] ([13.83.166.250])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f0b7b9a1bsm54455158eec.3.2026.07.06.06.11.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2026 06:11:24 -0700 (PDT)
-Message-ID: <6a4ba97c.4a342cbc.134cb.9ab1@mx.google.com>
-Date: Mon, 06 Jul 2026 06:11:24 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4055443072441778856=="
+        d=1e100.net; s=20251104; t=1783344120; x=1783948920;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Crk8V3NFGTDCyc22U0OiJpfYC0BId6QVuYdAFk61QFs=;
+        b=hXiEoy+DZ82kfOtAEi6enpotMzC0fuK8ctqQnAfY2dTFi/q1BTH45TqnuGwJNR+uZa
+         fs5uRW8ZmlLmmcOSotqGi6bInjbGc5XJReoCoV4Is3GToZq7k3RYAiKa+0JeGl/tHQ2w
+         yoCtE8CSqX8NQ+GexEQkGV8OXg7l3c/U/GXRkn9cy/BJk4o0YI35QpOj+sQ8mteyqEIH
+         ESrz/fdTsfYS5o983wtLDBN2oVj60jo4qFIsKLOMfzJBEbrP1bR9dX0ZWHLkyYy0iK+V
+         TejHZopromCw1ijPdCVraBLStRMhe/MQhjyxS+rLo/2zy03eY5BddbZlvK26frDtELWU
+         GbAQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rq37Ozv7h0JEtQaphdfNJFeT0FwxVzyb7Eg6EBwQLREIKEj2n4cwrJuMaDoieF7yjdv7iIhX2rKnFZhcSVxyTA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzSOtcfAKcTz8wY/5tbWk0G6rF8uuj+xxyok/eqjxt7FkMt39S
+	Qk87XcIrhb0FTM2vyw49plmfDnb2gmS7ql6e4kMoIS6UPVn4+ty8mAdtO/WgjaoZMnUmD/jQcXn
+	725oWLFK5m+2GVqw6S6x9NuyRIuZFhAw=
+X-Gm-Gg: AfdE7cnUZqvXyxTlxNWdJUoBoxX/jWD7lT8oLPyV6r0viMUFV/Us9joAh1rlqv0Xgy2
+	oui0sOJLfQtWcDIly0hmSjRLlj9Pgf2xzcW3Oju9FrlB3ijpF41kUWN8q468LGAbLKOdqqRe1aS
+	LoWRTvMAlXfky2uUTgu/ONKyKky3QXY3xiWuDtxrnCiRJ8oW12Otx63P3bygq2LcFnBGKniE/zz
+	KsZ1tDBKLNLWHZ6BhPqJnvsmDjbtiL9a0vxzczaMUNUG0ZUvnV/Ll8b3Lk7b2GNpJIwj0x5qzhv
+	LfewQRTADWS0fGdDuHGxIEISGP1VsO/9dcvyBgX/z2SUmo+7imHaS4KYZPs=
+X-Received: by 2002:a05:690e:d4a:b0:664:ce2f:faaf with SMTP id
+ 956f58d0204a3-6677fadaca9mr563422d50.31.1783344119481; Mon, 06 Jul 2026
+ 06:21:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, shuai.zhang@oss.qualcomm.com
-Subject: RE: [v1] Bluetooth: Increase HCI_AUTO_OFF_TIMEOUT to 10 seconds
-In-Reply-To: <20260706121525.2717691-1-shuai.zhang@oss.qualcomm.com>
 References: <20260706121525.2717691-1-shuai.zhang@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20260706121525.2717691-1-shuai.zhang@oss.qualcomm.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 6 Jul 2026 09:21:47 -0400
+X-Gm-Features: AVVi8Cf-YDNoL4XWaUnO0AcjXOX198k_S_3iGuDieL4X7Pj_zPzTnJZtt5mCgGQ
+Message-ID: <CABBYNZJTdONXJqKa5oR9EKAsZkLQBZ+w74GYQfKna79B4RCUMw@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: Increase HCI_AUTO_OFF_TIMEOUT to 10 seconds
+To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	chejiang@qti.qualcomm.com, quic_chezhou@quicinc.com, 
+	wei.deng@oss.qualcomm.com, jinwang.li@oss.qualcomm.com, 
+	mengshi.wu@oss.qualcomm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============4055443072441778856==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Shuai,
 
-This is automated email and please do not reply to this email!
+On Mon, Jul 6, 2026 at 8:15=E2=80=AFAM Shuai Zhang <shuai.zhang@oss.qualcom=
+m.com> wrote:
+>
+> HCI_AUTO_OFF_TIMEOUT controls how long the kernel waits after an
+> adapter completes its initial setup before automatically powering
+> it off, in case userspace (bluetoothd) has not yet issued
+> MGMT_OP_SET_POWERED. This avoids leaving the controller powered
+> while unused.
+>
+> On platforms where other services are ordered ahead of it, the
+> actual time at which bluetooth.service starts and issues
+> SET_POWERED can be delayed past this 2 second window. For example,
+> cloud-init-local.service can perform a network metadata probe
+> during early boot, delaying bluetooth.service startup by several
+> seconds:
+>
+>     $ systemd-analyze critical-chain bluetooth.service
+>     bluetooth.service +594ms
+>      `-basic.target @9.342s
+>         `-sockets.target @9.335s
+>            `-snapd.socket @9.267s +58ms
+>               `-sysinit.target @9.025s
+>                  `-cloud-init.service @8.377s +604ms
+>                     `-cloud-init-local.service @7.000s +1.340s
+>                        `-systemd-remount-fs.service @3.257s +44ms
+>                           `-systemd-fsck-root.service @2.803s +394ms
+>                              `-systemd-journald.socket @2.223s
+>                                 `-system.slice @1.772s
+>                                    `--.slice @1.772s
+>
+> Once the 2 second window is exceeded, HCI_AUTO_OFF fires before
+> SET_POWERED is received, powering off the controller and losing
+> its firmware state. The SET_POWERED that bluetoothd eventually
+> sends then has to reopen the device, triggering an otherwise
+> avoidable repeat setup and firmware re-download, adding several
+> more seconds of delay.
+>
+> Increase the timeout from 2 to 10 seconds to give userspace on
+> systems with slower service ordering a more realistic window to
+> take over, avoiding this unnecessary repeat setup, while still
+> bounding how long an unclaimed controller stays powered on.
 
-Dear submitter,
+Ok, but we have no idea if the system has Bluetooth enabled. Making it
+a 10 seconds timeout might leave Bluetooth powered unnecessarily.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1122329
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.59 seconds
-VerifyFixes                   PASS      0.07 seconds
-VerifySignedoff               PASS      0.10 seconds
-GitLint                       PASS      0.21 seconds
-SubjectPrefix                 PASS      0.06 seconds
-BuildKernel                   PASS      28.22 seconds
-CheckAllWarning               PASS      31.62 seconds
-CheckSparse                   PASS      29.52 seconds
-BuildKernel32                 PASS      27.54 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      514.33 seconds
-TestRunner_l2cap-tester       PASS      64.26 seconds
-TestRunner_iso-tester         PASS      98.47 seconds
-TestRunner_bnep-tester        PASS      20.43 seconds
-TestRunner_mgmt-tester        FAIL      229.99 seconds
-TestRunner_rfcomm-tester      PASS      28.67 seconds
-TestRunner_sco-tester         PASS      34.43 seconds
-TestRunner_ioctl-tester       PASS      28.20 seconds
-TestRunner_mesh-tester        FAIL      27.34 seconds
-TestRunner_smp-tester         PASS      24.92 seconds
-TestRunner_userchan-tester    PASS      21.42 seconds
-TestRunner_6lowpan-tester     PASS      25.81 seconds
-IncrementalBuild              PASS      28.01 seconds
-
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.277 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.442 seconds
-Mesh - Send cancel - 2                               Timed out    1.981 seconds
+> Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+> ---
+>  include/net/bluetooth/hci.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 50f0eef71..ee3f295f9 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -483,7 +483,7 @@ enum {
+>  #define HCI_CMD_TIMEOUT                msecs_to_jiffies(2000)  /* 2 seco=
+nds */
+>  #define HCI_NCMD_TIMEOUT       msecs_to_jiffies(4000)  /* 4 seconds */
+>  #define HCI_ACL_TX_TIMEOUT     msecs_to_jiffies(45000) /* 45 seconds */
+> -#define HCI_AUTO_OFF_TIMEOUT   msecs_to_jiffies(2000)  /* 2 seconds */
+> +#define HCI_AUTO_OFF_TIMEOUT   msecs_to_jiffies(10000) /* 10 seconds */
+>  #define HCI_ACL_CONN_TIMEOUT   msecs_to_jiffies(20000) /* 20 seconds */
+>  #define HCI_LE_CONN_TIMEOUT    msecs_to_jiffies(20000) /* 20 seconds */
+>  #define HCI_ISO_TX_TIMEOUT     usecs_to_jiffies(0x7fffff) /* 8388607 use=
+cs */
+> --
+> 2.34.1
+>
 
 
-https://github.com/bluez/bluetooth-next/pull/404
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4055443072441778856==--
+--=20
+Luiz Augusto von Dentz
