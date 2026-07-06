@@ -1,84 +1,149 @@
-Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3D3437862
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jul 2026 18:22:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.202.193.197
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783362138; cv=none; b=c0PnRWC4xBe+jkCZ4MLBeR4xX01wJcaHBs02FO4zQtZT/Jeho1ZyO4LOOA1wAcnZPOPwLp5/uZqv+3BY3zvEqSzCg1YStDQkfnJMgCsONO31Lfur1A/a5qd1o6UNSiWagPHWv6SO47gIVVXAIcWO3B0W1SgB/OW1CgfWOpIpmsg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783362138; c=relaxed/simple;
-	bh=+93hx6XVp6hnWKYUhk6yq/sXR5a08PxGewfyuomRE2A=;
-	h=Content-Type:Date:Message-Id:Subject:Cc:From:To:Mime-Version:
-	 References:In-Reply-To; b=Hge59aRnDum1NQwt01BXd9Mpn4XiRzA47rRR7NJ2RP4IWws7iwuxJdXEA+ZHzhQbhDA2DuiFRzMkOn2sB7zEuZOBNAHC5NSupIHoYfivPE9L0oDXxXGTkQMG/IkusqHG3NjNPpeSitNIfULv8Q1vR41+h7bX31VgN2i69+td67w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rcpassos.me; spf=pass smtp.mailfrom=rcpassos.me; dkim=pass (2048-bit key) header.d=rcpassos.me header.i=@rcpassos.me header.b=RQuPLUX0; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=Kh0B5ylV; arc=none smtp.client-ip=34.202.193.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rcpassos.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rcpassos.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FEB3BED4F
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jul 2026 18:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783362993; cv=pass; b=m/j+aJ0/KVx88YI9Pi+KJgTk09kjDKQ+hmu4oA80rJ0RCDhqpFfZ1TwRmYO0VNn8t/Ix4UaBEQqtWMgoi6l7wLIQQb+1PVF8AmCls0027YKmF5gemS6FRkL5pWOuVCQSqOZyAr76GOPn+oTVY/shrmOJO1NGPzON3xBCt0V/U4w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783362993; c=relaxed/simple;
+	bh=PQ/1xy6a3puINBaYqT2e7b7BbcSZZGAO5m3b6c5J4R4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jgCEFR0WMwTUO2UhcTBnMPbjUnjYvPpGryz8Ek5moYoH6XQpb2dde0Rm0UotycpffYuD9HhBwUXqg7EWNNwEfMo/zFeeZ8YmzO+jGpWEP2v9MnFlYyrSo/P4J9IrQSonNWvFMbZRCSioDkdeXrqspIZe+wNfiwGWxmVvvqQZc8I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W8U2QCUH; arc=pass smtp.client-ip=74.125.224.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rcpassos.me header.i=@rcpassos.me header.b="RQuPLUX0";
-	dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b="Kh0B5ylV"
-Authentication-Results: purelymail.com; auth=pass
-DKIM-Signature: a=rsa-sha256; b=RQuPLUX0AgnrLZJVUCxiIX2ZUpaP1ztnxfTSLd3J638vuJAV0mNnU23tAHs/oqGSuezVvg6sE7n8eAS3PPn1ARRIJylwsWEkt1nwMCWgI81iAUBp6jwf+A8idEvKwQMqkMg87gNtBmqPYm2RPs8LA+vLQHvMxQzRpRornwiCQqMRfs1rHy6/+PL93xICFOQCcFDv5jBYdP0dKSRw/vq0W9CzBCBAMua+cdhsG2jFe+aBWPeY2kypG+KIvzo3I+PNh48aBp0NqSYpDbRmGgzMY6FKxVrEppInCWsZZM1b5GxrTyb4msGJx1e2ca7zy1riYiCwLTotlIk4rQiImwmCZQ==; s=purelymail3; d=rcpassos.me; v=1; bh=+93hx6XVp6hnWKYUhk6yq/sXR5a08PxGewfyuomRE2A=; h=Received:Date:Subject:From:To;
-DKIM-Signature: a=rsa-sha256; b=Kh0B5ylVuJIOUxKMm9ypUEKa6ixP4vE15z0DtWFF61NlVf8pt8FKaKDmK/s4EsIpBfN37fLPK+ZXuP32a8tEkXAl1N9nhcx0G4KTwd127+X5LnqjkTh4wOxdeqXmzvjyawp2UV0DVO9d8WXL48p0hV24kYA8C3uZglEepYCZBP5qF5Xi1RJHUzIQ3oGwLY5OIHVk66CwqvHc9WJOF4bbRAPEBqcrtucY4mR2dMvV7HQeMLl4h1fg3lKemsz99DQPN4Ms57GqvlNqefOcdcQMAWdgUH/cViQZUypnksYa9iZ98t3kWtNGZvmVn1bHh8ZRZdaJtAWaFv0fHbTuToKJSQ==; s=purelymail3; d=purelymail.com; v=1; bh=+93hx6XVp6hnWKYUhk6yq/sXR5a08PxGewfyuomRE2A=; h=Feedback-ID:Received:Date:Subject:From:To;
-Feedback-ID: 45355:7809:null:purelymail
-X-Pm-Original-To: linux-bluetooth@vger.kernel.org
-Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id 205051992;
-          (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
-          Mon, 06 Jul 2026 18:21:59 +0000 (UTC)
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 06 Jul 2026 15:21:57 -0300
-Message-Id: <DJRP3YO7Y0WK.20KNRZIMX1CYK@rcpassos.me>
-Subject: Re: [PATCH v2] Bluetooth: Properly disable remote wakeup for
- MT7922/MT7925 on Ryzen platform
-Cc: "Luiz Augusto von Dentz" <luiz.von.dentz@intel.com>,
- =?utf-8?b?Q2hyaXMgTHUgKOmZuOeomuazkyk=?= <Chris.Lu@mediatek.com>,
- =?utf-8?b?V2lsbC1DWSBMZWUgKOadjuaUv+epjik=?= <Will-CY.Lee@mediatek.com>,
- =?utf-8?b?U1MgV3UgKOW3q+aGsuasoyk=?= <ss.wu@mediatek.com>,
- <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>,
- <linux-mediatek@lists.infradead.org>
-From: "Rafael Passos" <rafael@rcpassos.me>
-To: "Rong Zhang" <i@rong.moe>, "Rafael Passos" <rafael@rcpassos.me>, "Marcel
- Holtmann" <marcel@holtmann.org>, "Luiz Augusto von Dentz"
- <luiz.dentz@gmail.com>, "Matthias Brugger" <matthias.bgg@gmail.com>,
- "AngeloGioacchino Del Regno" <angelogioacchino.delregno@collabora.com>
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W8U2QCUH"
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-664ae993e4bso232073d50.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jul 2026 11:36:32 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783362991; cv=none;
+        d=google.com; s=arc-20260327;
+        b=r6aHOXoWlYmvTxazExDXUD+RH0Xk7bhnXbnbHZULYb8aEPHNoMwukk8+EouqWTWLza
+         5BgTv9AzFpjcLGKwB0cK+z2nL6kGfhKtxB6phC8lIR0rAt91g6u/yHwRb4SOblcgzReR
+         dlEcK7OsiZ+Hy5KnCweC/E0xTzyoAHAnItbOaoGAGxBNNthmdkPeSznj/WPVUW9CrloF
+         nYjC1cLT5uv+a8ZeEIiKfESxzP9kpLJ7D23mNxFEd4f/8rxpKG/lEqJLe34yFt4JWkou
+         W6a1cIFttHWrHbP+tc/+FRCLBNl5j6WY5bbFk/9ArJOEQCnmYTON6ibYLm0P1v0s3xmQ
+         O7Bw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=fZqkJjaKpXhp4TDNIgLLDiBbOKbRzti84NpGMNpZWKU=;
+        fh=/tdZATM6D1CeA7B1eghKX3g7S0qlN/bKleL73ijHStk=;
+        b=p21IVfb13xxyurTZQHkFR48BFY7yhk2aCVD+lFEI1knMAQYLow0iYaf9j3qVyK5WXM
+         bAoNQ6wNVi6K2giRlwsjtQE8qwZJizEP2eKHJdNZvktYmYZix8LfrE4yduFWu5Qg+/ox
+         JZ8gV8yYXol3JjNOkwLbsv2lQho4hkR0DUXR674k28cpRrof9cxNxXxRWTdu5/vt3bQ2
+         MRrwEW9T5S7oXydhSTfTTXGWt4tZyg7j74nRWkPvLCCnee3bTaMMq9gvDqumZ4fUvHnL
+         3MTZTJEEvIMjXrZLcicADwnJZOlMhtQjl6o7JeT6jU1bAa0QuSgnxQKIimbt7n3KZP0R
+         MBeQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783362991; x=1783967791; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fZqkJjaKpXhp4TDNIgLLDiBbOKbRzti84NpGMNpZWKU=;
+        b=W8U2QCUHxDpz1sPQZ7XOrkaH/Tu3fq65L5KpzU5sPh1YdO8OUZ+zQk3quIMY5Pi6Yu
+         SlIg56KE9SbP9ufLGoV1XOlZXtLi1HPJmNUncReb2kRQ2x/4TjmysQW+WrUUoWqMU5Wq
+         ydsNQBGF8y5p9XUQzqhyySyFn/3tOp271B2uX0R3Gi1dYXc9jOA+pUamLc1m8i+Fci9H
+         Ff2sQkEQrSE2CcJ2Mm2wX6/4qD0TPk8Qxd3LCPYwV17WNRpVOc5m6GAHtRTmahYi723l
+         NTjfTbiWE2Dc/QkRTIQsLI+IC52eEigtUdTOb3NxGTTkNigoCvdcTixJluUtoDfY1U8j
+         X8WQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783362991; x=1783967791;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=fZqkJjaKpXhp4TDNIgLLDiBbOKbRzti84NpGMNpZWKU=;
+        b=fwDuS1CFhqhPIo+ynCPlU1q9UoPlCE1OtkhXpX7bVrhjgfQ+lRIs8SFhRqCqL91Bbe
+         b0XIywlI/rGDNEzl8BY8IKiNvgmlSeG8jl2S9Ow1sQHrk5XPiSEYeCAaYsBIh6YH5gmv
+         oDE6C4bn0nwQ5F9T/o84pB/e/K3ptc5wT++oThZePSGKNY35yM8Ep/iOZvLhK5HLsH2d
+         7/Q7QH/WBYSXJKUunUt49zAjdL1rRrmb0j4l2af2okndIUS48NoNDMfIK6Mb98cHvuqK
+         pH6NAc2aomvrmuNCZa5xocsUcC2ZkeWH8fOQyH5Os+3H7vIScxH/klTRTDAViL9SIgEe
+         QHxA==
+X-Forwarded-Encrypted: i=1; AHgh+RpSLuWBfqDfT3ILaGTXca49ltplpNNj91X/YFpexgWJpTrcjpnvEEaueXLzMEzGcCczz2TRJNtaxREjISRPzyo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8UDYyZ+niwldTfrGfQvosvOkFyMTHEaxZfxMj6GzAn2qgxQSq
+	2G42+Qn4fyoIxGHI0t4d4EDLjHHZkB0cH50Q+oqCYrIwgmQt8LFdRGTTV8NGZr3YFizKLSqWyD8
+	KDobA+BCOuZPbtO2p9VhYSgR1g93y21g=
+X-Gm-Gg: AfdE7clZ+UrZ8GnThpxahXkMbW4FoA8+M8B4n8GycQFIBra1QdnmqqnHnV6tya83YZ0
+	AAsuPgKyNq4rXoic7c4cb3vQYaWidjTau46NDppA5+MZP42EtMFgK1BGy0/qr62e/i0bNdMOI5k
+	7MMX8FeCAifbHDgH3Q9NQbJR3P03VoXO35jDm7hfKKux5oeweCtb3nZbQ7nXHyzlE3AcG4QVpXe
+	7A5FYEAvxkyZwCjRiI0obV0XiiHtL3JoxOYTtHSWKcbSZeVgrYBla6BOFwUn8kG2P1fVvkJpNSs
+	nTH7YL+MAm38rv3Pp9WTQyAKI5inmQzRBFJ/wrBvik+XV7ZngSoViHB3
+X-Received: by 2002:a05:690e:11c1:b0:664:c5f8:e342 with SMTP id
+ 956f58d0204a3-66780d9d9bcmr1088563d50.3.1783362991520; Mon, 06 Jul 2026
+ 11:36:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: aerc 0.21.0
-References: <20260701-btmtk-ryzen-remote-wakeup-v2-1-767ac7907472@rong.moe>
- <DJRKO72HWZOI.QJYJUAC45QOJ@rcpassos.me>
- <79D5F3E6-8F40-4422-BB2D-16691E377394@rong.moe>
-In-Reply-To: <79D5F3E6-8F40-4422-BB2D-16691E377394@rong.moe>
+MIME-Version: 1.0
+References: <20260706-ipq5018-bluetooth-v4-0-350262a30959@outlook.com> <20260706-ipq5018-bluetooth-v4-6-350262a30959@outlook.com>
+In-Reply-To: <20260706-ipq5018-bluetooth-v4-6-350262a30959@outlook.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 6 Jul 2026 14:36:19 -0400
+X-Gm-Features: AVVi8CcGJO8Ch3pCjXKhOWgi95XsZ_kdRoHC9Z0sM3JRFuLLpn2tg0JlAJ13czI
+Message-ID: <CABBYNZ+6BYa-CrC08piL++ysOomiWK2gbYAv3ecWwpE+RpsNOw@mail.gmail.com>
+Subject: Re: [PATCH v4 6/6] MAINTAINERS: Add entry for Qualcomm IPQ5018
+ Bluetooth driver
+To: george.moussalem@outlook.com
+Cc: Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, linux-arm-msm@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon Jul 6, 2026 at 12:08 PM -03, Rong Zhang wrote:
-> Hi Rafael,=20
+Hi George,
+
+On Mon, Jul 6, 2026 at 1:27=E2=80=AFPM George Moussalem via B4 Relay
+<devnull+george.moussalem.outlook.com@kernel.org> wrote:
 >
-> =E4=BA=8E 2026=E5=B9=B47=E6=9C=886=E6=97=A5 GMT+08:00 22:53:17=EF=BC=8CRa=
-fael Passos <rafael@rcpassos.me> =E5=86=99=E9=81=93=EF=BC=9A
->>Tested-by: Rafael Passos <rafael@rcpassos.me>
+> From: George Moussalem <george.moussalem@outlook.com>
 >
-> Thanks a lot for your testing!
+> Add maintainers entry for Qualcomm IPQ5018 Bluetooth driver.
 >
-> Your issue sounds related to the remote wakeup issue I am addressing. Aft=
-er triggering the remote wakeup bug, rebooting the platform without a power=
- cycle [1] always causes a failure in USB enumeration before the driver pat=
-h.
+> Acked-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+> ---
+>  MAINTAINERS | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 0b9d7c8276ac..60f7251d1a16 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -22289,6 +22289,13 @@ S:     Maintained
+>  F:     Documentation/devicetree/bindings/regulator/vqmmc-ipq4019-regulat=
+or.yaml
+>  F:     drivers/regulator/vqmmc-ipq4019-regulator.c
+>
+> +QUALCOMM IPQ5018 BLUETOOTH DRIVER
+> +M:     George Moussalem <george.moussalem@outlook.com>
 
-In my case, just the power cycle was not sufficient. I had to also
-change settings in BIOS [1], and only then it came back.
-Even after reverting all settings to the same state as before.
+Do you work for Qualcomm or have access to their specs?
 
-I was hoping to fix this in Kernel, but I don't see a way forward.
-If you have any other ideas or patches to test, send them my way!
-I will gladly help.
+> +L:     linux-bluetooth@vger.kernel.org
+> +S:     Maintained
+> +F:     Documentation/devicetree/bindings/net/bluetooth/qcom,ipq5018-bt.y=
+aml
+> +F:     drivers/bluetooth/btqcomipc.c
+> +
+>  QUALCOMM IRIS VIDEO ACCELERATOR DRIVER
+>  M:     Vikash Garodia <vikash.garodia@oss.qualcomm.com>
+>  M:     Dikshita Agarwal <dikshita.agarwal@oss.qualcomm.com>
+>
+> --
+> 2.53.0
+>
+>
 
-[1] I turned off sr-iov, resize-bar & disabled "Bluetooth On/Off".
-In a previous attempt, fast-boot and TPM were also disabled.
 
-Thanks,
-Rafael Passos
+--=20
+Luiz Augusto von Dentz
