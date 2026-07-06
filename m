@@ -1,168 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E5842A799;
-	Mon,  6 Jul 2026 06:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04129392824
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jul 2026 07:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783320293; cv=none; b=It+cdTbbOfPdxDSuLspBAiqv3Cc0xBDBFPIB0Sq0PAi9alCGpwHzOKfvzGYLFWcx9TSYIr5xCTjuYokcBtFexMGaHcPgp7GEdQpaetaegHjMVHgESKY/HyphQI8Y9dlCXgP1gqkgTFgnB/ko9sju7WVWP61MxHWVMlRIl2RkGAw=
+	t=1783321650; cv=none; b=mfuI4D9v1GNW9Y/OIiC4DMr53Tt7Dht1bkxNqj+WBNp37a0h2eNa9ORZF9cfi5fvjXM+eA9FOJUtIauKi8sWpEZ8vIaIPELEBJJ45r51eQOGL4VweQ+QgpFxNxaEKgWUp8tDvyf0SMjdBBlLRheS7uB1fz7gUGDfASn34IH3YNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783320293; c=relaxed/simple;
-	bh=xQqqE7JBbyahFaqaJ0tvO7axntcfjCqwxtMCYAG7yKw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fA0oM7UIGi6b7k9Z+p6Sfvo9XwsTat5pt6glYP3BWmpBiMnH2JgVgKiGewjDlp0+HiBPMQkIc9NA4SdskyL/Y7Hn9B+sJLGlIYLxpWNjFgjcG2vzyWkmmcLej2JrVRjZ3if0yKvnnJ+drQs+Kas9ps507Qbl5TnHgWO77jItr6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IpEh56T1; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783321650; c=relaxed/simple;
+	bh=r4YwqlE/r7hsHaEIBnHKVRKIaFoCMjmYN4ooXMo613k=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=FVdXjvUnnPwy/Pc9Jn+E3coLCmP51fbGwZGmMdJocit9eLaXSm9OMWU3qTNZyMZe/h5civYZwUsg2hNOxVboOtRgjEg590vTMJQKEd169SLg7NmgWy1eUy8YHWGlB/bfZ8ANZqN/V1ShIiVkYnS+kg3El8pEVfsTq+21XdPWmJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dFjgTAXT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IpEh56T1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F44C1F000E9;
-	Mon,  6 Jul 2026 06:44:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783320280;
-	bh=/fPwJ5XgRM6mvxg/vC5xFu7gKO1w6g8o9vmcGDZN3lw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=IpEh56T1GIDmOQX1RCRaoOsSsgDiuNbWlgnxSxm4/DHvKCf1EIK1Iu0pDmKgay+th
-	 GW15L23bEe6g/qbRQ3a7oM5eHrf9jker/7266zhJHse7XaPZPE1QhQYYN1LHUs1PLx
-	 64AlDCa0/X1LxnNiNGjcHbRxomlJmU8/C32bnq8TZRZ7m3JFGcA28gP7Kt0JafX1M9
-	 ah1yk8O/jJdN6v2rrdBmJgriO8C31X9rAsm/Gc67754018FNdBwT+DvLh0MemtDLkS
-	 hMtEPNB1d8Zo0A+3UUNFZlU2nVc+70lwPjmNQUOydNemM834P+i2Cnt4Sv7mvhB+9x
-	 hqi7uNJA/SDWQ==
-Date: Mon, 6 Jul 2026 08:44:29 +0200
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: Loic Poulain <loic.poulain@oss.qualcomm.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-pci@vger.kernel.org, 
-	linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
-	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-Subject: Re: [PATCH v2 3/4] Bluetooth: hci_qca: Support QCA2066 on M.2
- connector via pwrseq
-Message-ID: <l4qycbmz2zaroe5rreuop4dx7ugfcx37hfaketvn43trdpaept@jyx65agqznq4>
-References: <20260702-monza-wireless-v2-0-7b56e2a6a6d4@oss.qualcomm.com>
- <20260702-monza-wireless-v2-3-7b56e2a6a6d4@oss.qualcomm.com>
- <43re752djujsh2kiyvjlkpmztxsh4atg6472qhir4lgay24zbo@mtlkn2xc2ors>
- <rxt4n6vuscu33mrw24af72lb3s6urqfpkhtia44yfo4j7wtu6o@3xp57owekrgj>
- <u5ieok3hgjcf74sxjdzv6xurmlbve46xa3imgfnom4hpjarmxa@fna5daqpyk3r>
- <zat6uuvh7jwfxajvqtif6d67osf6h5b2vxig3bmuch76btpdkj@bfxjj7kk5fjk>
- <ynhos7h4x3kbqbio2gkigoo5rqbwogrzihkylxv5pqjtqpqmnq@rlyjaiopx74a>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dFjgTAXT"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 06A75C2BCF4
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jul 2026 07:07:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1783321648;
+	bh=r4YwqlE/r7hsHaEIBnHKVRKIaFoCMjmYN4ooXMo613k=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=dFjgTAXTpLDm3HMPSxYeuzXVpa0diSsPNz9GAb5xOj8WN26so7/yEZJsb3TQ36Rat
+	 wSVD0h3TOEd3Cebr9tsM91Mp2rE0Db2T2LAIkv5x9qtIGG8u8Vgq3JQQGT8lFSHH06
+	 QrJN8zNHxZq+CHE/UmYbdDGXH2+A3RM78IFBspKHZM/gZ+10M8+Y6l9P9ZOHVc3DNQ
+	 a4jY7ZL1UJTBE7kSdNbepsIpwXYUTOmQ6k3avhyJoCBkrFb0ZNIIQMWiVco37oG24D
+	 jqR1SxLqcB3FhoL7Y4qY2s72GVPa5AahQ4zTAHlgC2R5dcI3jlJnya6RsSvDZcc0AW
+	 uzZ9K8vHdkg7g==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id DE1E2C41613; Mon,  6 Jul 2026 07:07:27 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221696] btmtk: regression in 6.6.142: NULL pointer dereference
+ in btmtk_usb_hci_wmt_sync during resume from S4
+Date: Mon, 06 Jul 2026 07:07:27 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: regressions@leemhuis.info
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-221696-62941-9ZSWyOI9w1@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-221696-62941@https.bugzilla.kernel.org/>
+References: <bug-221696-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ynhos7h4x3kbqbio2gkigoo5rqbwogrzihkylxv5pqjtqpqmnq@rlyjaiopx74a>
 
-On Sat, Jul 04, 2026 at 03:11:13AM +0300, Dmitry Baryshkov wrote:
-> On Thu, Jul 02, 2026 at 05:08:56PM +0200, Manivannan Sadhasivam wrote:
-> > On Thu, Jul 02, 2026 at 05:34:31PM +0300, Dmitry Baryshkov wrote:
-> > > On Thu, Jul 02, 2026 at 04:17:43PM +0200, Manivannan Sadhasivam wrote:
-> > > > On Thu, Jul 02, 2026 at 03:14:49PM +0300, Dmitry Baryshkov wrote:
-> > > > > On Thu, Jul 02, 2026 at 12:46:15PM +0200, Loic Poulain wrote:
-> > > > > > For QCA2066 (and other QCA chips) on M.2 connectors, the UART enable
-> > > > > > is controlled by the W_DISABLE2# signal managed by the pcie-m2 power
-> > > > > > sequencer rather than a dedicated BT enable GPIO.
-> > > > > > 
-> > > > > > When the serdev controller has an OF graph (indicating it is connected
-> > > > > > to an M.2 connector), acquire the 'uart' pwrseq target from the
-> > > > > > connector's power sequencer and use it to control BT power instead of
-> > > > > > the bt-enable GPIO.
-> > > > > > 
-> > > > > > Also allocate bt_power unconditionally for all SOC types since the
-> > > > > 
-> > > > > Can we just fold it into the main struct?
-> > > > > 
-> > > > > > pwrseq path is independent of the SOC type switch.
-> > > > > > 
-> > > > > > Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> > > > > > ---
-> > > > > >  drivers/bluetooth/hci_qca.c | 81 ++++++++++++++++++++++++---------------------
-> > > > > >  1 file changed, 43 insertions(+), 38 deletions(-)
-> > > > > > @@ -2387,6 +2390,35 @@ static int qca_init_regulators(struct qca_power *qca,
-> > > > > >  	return 0;
-> > > > > >  }
-> > > > > >  
-> > > > > > +/*
-> > > > > > + * Acquire the M.2 connector power sequencer.
-> > > > > > + *
-> > > > > > + * An OF graph link on the serdev controller is only present when the BT
-> > > > > > + * device is attached through an M.2 Key E connector. In that case the UART
-> > > > > > + * enable (W_DISABLE2#) is driven by the pcie-m2 power sequencer instead of a
-> > > > > > + * dedicated BT enable GPIO, so grab the "uart" pwrseq target from it.
-> > > > > > + *
-> > > > > > + * Returns 0 if no M.2 connector is present (nothing to do), a negative errno
-> > > > > > + * on error, otherwise 0 with qcadev->bt_power->pwrseq populated.
-> > > > > > + */
-> > > > > > +static int qca_serdev_get_m2_pwrseq(struct qca_serdev *qcadev, bool *bt_en_available)
-> > > > > > +{
-> > > > > > +	struct serdev_device *serdev = qcadev->serdev_hu.serdev;
-> > > > > > +	struct device *dev;
-> > > > > > +
-> > > > > > +	if (!of_graph_is_present(dev_of_node(&serdev->ctrl->dev)))
-> > > > > > +		return 0;
-> > > > > > +
-> > > > > > +	qcadev->bt_power->pwrseq = devm_pwrseq_get(&serdev->ctrl->dev, "uart");
-> > > > > > +	if (IS_ERR(qcadev->bt_power->pwrseq))
-> > > > > > +		return PTR_ERR(qcadev->bt_power->pwrseq);
-> > > > > > +
-> > > > > > +	dev = pwrseq_to_device(qcadev->bt_power->pwrseq);
-> > > > > > +	*bt_en_available = device_property_present(dev, "w-disable2-gpios");
-> > > > > 
-> > > > > I think here you are looking into the exact details of the other of the
-> > > > > graph. There might be other devices on that side, while the code now
-> > > > > assumes M.2. Or, consider having an M.2 controller which handles
-> > > > > W_DISABLE2# internally rather than through the GPIO.
-> > > > > 
-> > > > 
-> > > > This code only deals with M.2 connector in specific, so I'm not sure why we need
-> > > > to worry about *other* kind of devices. Let's worry about them when they show up
-> > > > (with graph interface ofc).
-> > > 
-> > > I don't think we want to go through the drivers using M.2 connectors in
-> > > such a case. In the end, the contract should be that there is a power
-> > > sequencer on the other side of the graph, but the specifics of the
-> > > connector should be abstracted out. Do you know, if in the x86 world the
-> > > W_DISABLE2# is a GPIO or is controleed by the hub.
-> > > 
-> > 
-> > I tried to abstract out, but Bartosz didn't want pwrctrl APIs to do that level
-> > of abstraction as pwrctrl APIs should be generic and should not be bind to a
-> > specific connector and exposing its internals.
-> > 
-> > That's why we ended up having pwrctrl core exposing the 'struct dev' using
-> > pwrseq_to_device() and letting the consumer extracting whatever information it
-> > needs.
-> 
-> Do we have other ways to control M.2? For example on the x86 systems,
-> are those signals controlled via GPIOs (or GPIO-like registers) or are
-> they controlled separately by something like M.2 controller? Or do you
-> have an idea about other non-x86 systems?
-> 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221696
 
-Thre is no OS-visible M.2 power control in ACPI systems. ACPI defines PRx
-objects to control power to the PCI devices based on the D-state and the OS just
-evaluates the _ON/_OFF methods of the respective objects.
+--- Comment #10 from The Linux kernel's regression tracker (Thorsten Leemhu=
+is) (regressions@leemhuis.info) ---
+The next 6.6.y release (to be released in a few days) will have a few fixes
+backported, please let us know if it helps
+https://lore.kernel.org/all/2026070315-stable-reply-0016@kernel.org/
 
-So this API is not going to be useful on non-DT systems where the BT_EN GPIO
-handling is abstracted away. And also on platforms where BT_EN is not controlled
-by GPIOs. But I haven't seen DT platforms handling BT_EN (or W_DISABLE2#)
-signal in a non-GPIO way.
+--=20
+You may reply to this email to add a comment.
 
-I too prefer an API to query whether the connector supports BT_EN or not, but
-I'm not sure how to come up with a generic pwrseq API which also satisfies the
-requirement. If you have any suggestions, please let me know!
-
-FWIW, I tried adding pwrseq_is_fixed() API [1] earlier, which was turned down by
-Bartosz.
-
-- Mani
-
-[1] https://lore.kernel.org/all/20260422-pwrseq-m2-bt-v1-1-720d02545a64@oss.qualcomm.com/
-
--- 
-மணிவண்ணன் சதாசிவம்
+You are receiving this mail because:
+You are the assignee for the bug.=
