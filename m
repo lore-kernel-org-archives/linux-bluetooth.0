@@ -1,139 +1,179 @@
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33A13D891D
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jul 2026 12:37:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDDE93F86E0;
+	Tue,  7 Jul 2026 12:56:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783427828; cv=none; b=OERk6i89Ku/5eeDmqjvZep7j1vkxfpTxKB8Vd4JV8wG6TGmKQf+HcNzoFexLpcMB3FtXHJ0ERPXeqI1HS2Zfb9tUkCFqCx62raaDMO6Rcvlnf+daCjSai84SG323RmI1PqMvOiQE4Kc/GK/PSEYLQAuNrNfabjn2hlux4QA0Zmg=
+	t=1783428986; cv=none; b=PuVUlb30NdZtKtPg+1HLlF35/NQ9BIFR416RMpuntqGKnkpAOnfYtYzFquKwbhIfV1qRgHKQk1nEFE7xOupQltnP2xXfwqwGbmidRkBKgWwXRnphpzUsjku8QvUhiPh+68zEFNBr2LcKqW0MK+E2Ur7tP4TdtPFRdXog2Ac87F8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783427828; c=relaxed/simple;
-	bh=qa8MyWuOwiuUYF4R+ZTvYh7o3lxwqv8og5eZS7nri10=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=kKmdlHS48f469Iih+Y60oharb5/I2L2PcnbXZISpdg5IhauMdiIIoyLPnSOawbI9gmMhMIZWa0SaVEvExUdl1iVadcKgK04eA7qmK2tEdNB5V3N/8harWUI+lqIKsHReZCPOTQ+rv8nLrH2AYcCXszeBi7BG/bAYX6wDJuzzjoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZaIOtjd8; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783428986; c=relaxed/simple;
+	bh=wzQzJCG4MlDwdxc62SzKy3GIfbDOqwiBHtGk1LTQx/A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nU/R55ER4saamRgoyoM5keIL5dPGqLJbYQIDvopbhbrfI6ZZS1FSw2rpz8aELrdgYsg1EciqesgfcovKOMTz1qeYPZffPVrervrtyYR1rj3ieFrJ9NIlTofAGtS2RJ7hDM5Z0SF5LzPLqFHpBgrByp+eePsxChjFgQK43CwLfI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IVIYphd3; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZaIOtjd8"
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-8eeadbc5e21so29315586d6.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jul 2026 05:37:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783427825; x=1784032625; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=NSdwmFDGNddva299YtKbNZeegt0T0aLnucGkgsmcitU=;
-        b=ZaIOtjd8E+jrQGNYdAcIlWa+HV/BqQnRCL/CMvQTMf+wUwN7FcBCxtHDyFu9RjUsT/
-         LeC8WYQ1rRc+qXRKulu+U1tHziqYdROExNwvMGX+X50oiNc9YOE6+1H4yqpOnPnonrf0
-         3PEHpfVjW19g7VMkXCTCEA7YwREQlollmYsBNkdVB7gguEQYGUrwhmtaNcYeFBsNYPkp
-         OdwAwO854OW21tK4Qh7KxyMsN8UewYq9agJP4qtVs3kZbtLF543s9CFfOh2JQyHekKYh
-         wLnUspw0H5A0MVEbH+VY4XP3iJWnttTRDD7rD6FQDFn0nkC4JsG9XWu6Agn+/xOpcxy7
-         7+rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783427825; x=1784032625;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=NSdwmFDGNddva299YtKbNZeegt0T0aLnucGkgsmcitU=;
-        b=jv3FfVUE2dPqzmuuWsxLdN5bKPn2MnyfixUPWROqXyY5LagtZTWOy0LCWMchi60kn9
-         9OGkma4+ZqLBjQM27ev6NAJ2nkqv/F6MOjNBYYezVVG/rVMfI2+IYKBKnK2cehsMIA0I
-         5zUexQ9kb7LlOld30Ri+kK4X0lyKqPZuC/xthwtOZ0mdMWrG7kpcla1OLUCQMzuXZegP
-         uEkrIJ9XPbv6MwimIcexFktKF2sfsFUdWHqXnTckuIRIDYrfZ2kONrHNozt1IB9rzASy
-         gp/I4rqKRlJRkaCpqDS/JrIPq87j+R3Kh4ZvN6La7ZyqjcK6+KanApMQq3JvH6aoAayE
-         hjYA==
-X-Gm-Message-State: AOJu0YzrVN3N2iJkw4g82HK9eiDKD4QMIFgx/tGOdzptwElxZLHwp3X1
-	/mEdh9JowrPgp/KxanTFBCEf72iH7NYxo3siz/SIiKXqaVTQMo6j1/zGRa5gyg==
-X-Gm-Gg: AfdE7cmCEIV983gD2eTIYt51+ryWpyEsK+5d76tU4qOyh4EjMSrKpoyJWRgQ5zv2tUr
-	06BYal1YrD3nQZLegvKVuXB2D0rTd/q0U5ZEL31FqAeYsaYIwOhZP3edGyW/G1eWiCwZy3ebBbx
-	XpQj8Nv/VDG0ZT0IYzDiS2wY1RuW7vRELgK4dtaW5NVVWPJ2u6EcjTHpxW3bp8kc5NwcuR/gnsB
-	TB6j40668M9vo1BNoqJtMgcSKB35WvSs4i36j3ZkbxJpTirUw2x5CyGrTswbRpSUThorMWoBMXm
-	65ITYnJsNCA4X3iYYeEAlW1E41GKzVtFs4yphZOsox/pNYsj+WpgRDQd6LFj8a1DQagkL5jX4o9
-	A3Ti2mjOOCVc5mnkhVNvJHSk6JliopP7HlUYhwspU2H1bH9+DxfItbPtYLhcaqxdVdJMosBkFM8
-	Nr2owDlfrbV3D+m8/qymbV
-X-Received: by 2002:a05:6214:e49:b0:8ef:ddf7:3135 with SMTP id 6a1803df08f44-8fcb50df029mr58174016d6.38.1783427825473;
-        Tue, 07 Jul 2026 05:37:05 -0700 (PDT)
-Received: from [172.17.0.2] ([52.186.174.153])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8f471de93a1sm156426566d6.34.2026.07.07.05.37.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jul 2026 05:37:05 -0700 (PDT)
-Message-ID: <6a4cf2f1.d0999061.39a55a.8f0a@mx.google.com>
-Date: Tue, 07 Jul 2026 05:37:05 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============9212537470192736398=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IVIYphd3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 624371F000E9;
+	Tue,  7 Jul 2026 12:56:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783428984;
+	bh=kKWSyw13IWntJBR8YfJfes2vxwrE1EZhmmSxrr/jofM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=IVIYphd37jrdtezzejaHoaOJshB8TI4/62ds7cKQBfQ1bewL8ODuEoUq2XyuVwcGG
+	 mFWVDKCa/SX7is8wQSqUGLT4viw7Ib0LH1M8Enh5tWnZ8vVr7vietTAiZLBnUoTHud
+	 tiyGZFTXn7KJ1hM0k0n2ykvhumev8TfhonVUdqhKl1kHtxcZcpPag12gI/IpgO7OE+
+	 urweBYxj/LexP+WUc41uRVzcnGHSNIfD6XNGQxmw0BpMmdek2emScnPGlh7i6Luwll
+	 mj5S1l5H/c8YLTgrcCjOn0v2eAzIl+3VrVh/yTfHPeVM8WhwOaX7Ug1wRuU9hg6vr8
+	 dmFRlDnxxA18w==
+Date: Tue, 7 Jul 2026 14:56:14 +0200
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>, 
+	Bartosz Golaszewski <brgl@kernel.org>
+Cc: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
+	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-pci@vger.kernel.org, 
+	linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Subject: Re: [PATCH v2 3/4] Bluetooth: hci_qca: Support QCA2066 on M.2
+ connector via pwrseq
+Message-ID: <b4myznfs5kkochdhzm2ypcfiolk2l2a7nvjbhkkcqueumkyvpe@nyvvhhcslk7e>
+References: <20260702-monza-wireless-v2-0-7b56e2a6a6d4@oss.qualcomm.com>
+ <20260702-monza-wireless-v2-3-7b56e2a6a6d4@oss.qualcomm.com>
+ <43re752djujsh2kiyvjlkpmztxsh4atg6472qhir4lgay24zbo@mtlkn2xc2ors>
+ <rxt4n6vuscu33mrw24af72lb3s6urqfpkhtia44yfo4j7wtu6o@3xp57owekrgj>
+ <u5ieok3hgjcf74sxjdzv6xurmlbve46xa3imgfnom4hpjarmxa@fna5daqpyk3r>
+ <zat6uuvh7jwfxajvqtif6d67osf6h5b2vxig3bmuch76btpdkj@bfxjj7kk5fjk>
+ <ynhos7h4x3kbqbio2gkigoo5rqbwogrzihkylxv5pqjtqpqmnq@rlyjaiopx74a>
+ <l4qycbmz2zaroe5rreuop4dx7ugfcx37hfaketvn43trdpaept@jyx65agqznq4>
+ <CAFEp6-0AA-hTy=3KaRNEJ+kF0otGLTGTujvWJqhT2dHDj94E4w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, xiuzhuo.shang@oss.qualcomm.com
-Subject: RE: [v1] Bluetooth: MGMT: Fix discovery state race against cmd_sync worker
-In-Reply-To: <20260707093426.372897-1-xiuzhuo.shang@oss.qualcomm.com>
-References: <20260707093426.372897-1-xiuzhuo.shang@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFEp6-0AA-hTy=3KaRNEJ+kF0otGLTGTujvWJqhT2dHDj94E4w@mail.gmail.com>
 
---===============9212537470192736398==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Jul 07, 2026 at 11:14:10AM +0200, Loic Poulain wrote:
+> On Mon, Jul 6, 2026 at 8:44 AM Manivannan Sadhasivam <mani@kernel.org> wrote:
+> >
+> > On Sat, Jul 04, 2026 at 03:11:13AM +0300, Dmitry Baryshkov wrote:
+> > > On Thu, Jul 02, 2026 at 05:08:56PM +0200, Manivannan Sadhasivam wrote:
+> > > > On Thu, Jul 02, 2026 at 05:34:31PM +0300, Dmitry Baryshkov wrote:
+> > > > > On Thu, Jul 02, 2026 at 04:17:43PM +0200, Manivannan Sadhasivam wrote:
+> > > > > > On Thu, Jul 02, 2026 at 03:14:49PM +0300, Dmitry Baryshkov wrote:
+> > > > > > > On Thu, Jul 02, 2026 at 12:46:15PM +0200, Loic Poulain wrote:
+> > > > > > > > For QCA2066 (and other QCA chips) on M.2 connectors, the UART enable
+> > > > > > > > is controlled by the W_DISABLE2# signal managed by the pcie-m2 power
+> > > > > > > > sequencer rather than a dedicated BT enable GPIO.
+> > > > > > > >
+> > > > > > > > When the serdev controller has an OF graph (indicating it is connected
+> > > > > > > > to an M.2 connector), acquire the 'uart' pwrseq target from the
+> > > > > > > > connector's power sequencer and use it to control BT power instead of
+> > > > > > > > the bt-enable GPIO.
+> > > > > > > >
+> > > > > > > > Also allocate bt_power unconditionally for all SOC types since the
+> > > > > > >
+> > > > > > > Can we just fold it into the main struct?
+> > > > > > >
+> > > > > > > > pwrseq path is independent of the SOC type switch.
+> > > > > > > >
+> > > > > > > > Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> > > > > > > > ---
+> > > > > > > >  drivers/bluetooth/hci_qca.c | 81 ++++++++++++++++++++++++---------------------
+> > > > > > > >  1 file changed, 43 insertions(+), 38 deletions(-)
+> > > > > > > > @@ -2387,6 +2390,35 @@ static int qca_init_regulators(struct qca_power *qca,
+> > > > > > > >     return 0;
+> > > > > > > >  }
+> > > > > > > >
+> > > > > > > > +/*
+> > > > > > > > + * Acquire the M.2 connector power sequencer.
+> > > > > > > > + *
+> > > > > > > > + * An OF graph link on the serdev controller is only present when the BT
+> > > > > > > > + * device is attached through an M.2 Key E connector. In that case the UART
+> > > > > > > > + * enable (W_DISABLE2#) is driven by the pcie-m2 power sequencer instead of a
+> > > > > > > > + * dedicated BT enable GPIO, so grab the "uart" pwrseq target from it.
+> > > > > > > > + *
+> > > > > > > > + * Returns 0 if no M.2 connector is present (nothing to do), a negative errno
+> > > > > > > > + * on error, otherwise 0 with qcadev->bt_power->pwrseq populated.
+> > > > > > > > + */
+> > > > > > > > +static int qca_serdev_get_m2_pwrseq(struct qca_serdev *qcadev, bool *bt_en_available)
+> > > > > > > > +{
+> > > > > > > > +   struct serdev_device *serdev = qcadev->serdev_hu.serdev;
+> > > > > > > > +   struct device *dev;
+> > > > > > > > +
+> > > > > > > > +   if (!of_graph_is_present(dev_of_node(&serdev->ctrl->dev)))
+> > > > > > > > +           return 0;
+> > > > > > > > +
+> > > > > > > > +   qcadev->bt_power->pwrseq = devm_pwrseq_get(&serdev->ctrl->dev, "uart");
+> > > > > > > > +   if (IS_ERR(qcadev->bt_power->pwrseq))
+> > > > > > > > +           return PTR_ERR(qcadev->bt_power->pwrseq);
+> > > > > > > > +
+> > > > > > > > +   dev = pwrseq_to_device(qcadev->bt_power->pwrseq);
+> > > > > > > > +   *bt_en_available = device_property_present(dev, "w-disable2-gpios");
+> > > > > > >
+> > > > > > > I think here you are looking into the exact details of the other of the
+> > > > > > > graph. There might be other devices on that side, while the code now
+> > > > > > > assumes M.2. Or, consider having an M.2 controller which handles
+> > > > > > > W_DISABLE2# internally rather than through the GPIO.
+> > > > > > >
+> > > > > >
+> > > > > > This code only deals with M.2 connector in specific, so I'm not sure why we need
+> > > > > > to worry about *other* kind of devices. Let's worry about them when they show up
+> > > > > > (with graph interface ofc).
+> > > > >
+> > > > > I don't think we want to go through the drivers using M.2 connectors in
+> > > > > such a case. In the end, the contract should be that there is a power
+> > > > > sequencer on the other side of the graph, but the specifics of the
+> > > > > connector should be abstracted out. Do you know, if in the x86 world the
+> > > > > W_DISABLE2# is a GPIO or is controleed by the hub.
+> > > > >
+> > > >
+> > > > I tried to abstract out, but Bartosz didn't want pwrctrl APIs to do that level
+> > > > of abstraction as pwrctrl APIs should be generic and should not be bind to a
+> > > > specific connector and exposing its internals.
+> > > >
+> > > > That's why we ended up having pwrctrl core exposing the 'struct dev' using
+> > > > pwrseq_to_device() and letting the consumer extracting whatever information it
+> > > > needs.
+> > >
+> > > Do we have other ways to control M.2? For example on the x86 systems,
+> > > are those signals controlled via GPIOs (or GPIO-like registers) or are
+> > > they controlled separately by something like M.2 controller? Or do you
+> > > have an idea about other non-x86 systems?
+> > >
+> >
+> > Thre is no OS-visible M.2 power control in ACPI systems. ACPI defines PRx
+> > objects to control power to the PCI devices based on the D-state and the OS just
+> > evaluates the _ON/_OFF methods of the respective objects.
+> >
+> > So this API is not going to be useful on non-DT systems where the BT_EN GPIO
+> > handling is abstracted away. And also on platforms where BT_EN is not controlled
+> > by GPIOs. But I haven't seen DT platforms handling BT_EN (or W_DISABLE2#)
+> > signal in a non-GPIO way.
+> >
+> > I too prefer an API to query whether the connector supports BT_EN or not, but
+> > I'm not sure how to come up with a generic pwrseq API which also satisfies the
+> > requirement. If you have any suggestions, please let me know!
+> >
+> > FWIW, I tried adding pwrseq_is_fixed() API [1] earlier, which was turned down by
+> > Bartosz.
+> 
+> So, I'll submit a new version incorporating Dmitry's request to fold
+> bt_power into the main structure.
+> However, what should we do about the powerseq point? Should we keep it as it is?
+> 
 
-This is automated email and please do not reply to this email!
+@Bartosz: Thoughts?
 
-Dear submitter,
+- Mani
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1122959
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.25 seconds
-VerifyFixes                   PASS      0.13 seconds
-VerifySignedoff               PASS      0.13 seconds
-GitLint                       PASS      0.33 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      27.05 seconds
-CheckAllWarning               PASS      29.58 seconds
-CheckSparse                   PASS      28.81 seconds
-BuildKernel32                 PASS      26.80 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      499.12 seconds
-TestRunner_mgmt-tester        FAIL      219.48 seconds
-TestRunner_mesh-tester        FAIL      24.52 seconds
-IncrementalBuild              PASS      29.02 seconds
-
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.247 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.436 seconds
-Mesh - Send cancel - 2                               Failed       0.316 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/407
-
----
-Regards,
-Linux Bluetooth
-
-
---===============9212537470192736398==--
+-- 
+மணிவண்ணன் சதாசிவம்
