@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC18383C8F;
-	Tue,  7 Jul 2026 17:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B3843845CD
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jul 2026 17:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783445432; cv=none; b=aj2fAyz5h7N8LzN0hOGWqKj2O88dUuIB8SdUidMlj/qTTWIRwZ4//w05SZj5u5TkD+6fE8DwdX7JdTJN7cIFp3rOxdTVjf6RUQmszrussrrsxQvJl1LwThbhpjxAjDOC6WEkvlNAGPtzj9Zkb8XvySvbEBoe3KKuBAeQiPHUUjE=
+	t=1783445433; cv=none; b=pusfKgb/ajqzVWIHGP5x7d3f9ykb+zaECEtjJJsqfXMmebPukOwsYdN/U391d1D2ZR9qXPSh5DlB+ot6EWQjPFUh0JuBIs0vccnyOxFYG3L1ErUn37QomntiX7N5xR9NhdgdJE+GYU4enKLaieoo+Df3SZuyMTQ97Le6JgxtK4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783445432; c=relaxed/simple;
-	bh=rGrDtGqvFE9ExnRotptipIl01RYbE/vLYZyjj3Dmi2c=;
+	s=arc-20240116; t=1783445433; c=relaxed/simple;
+	bh=uwdwJznzAlCoN9uj53gbdo7udarndAxAl0cmrSQlEc4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=b5sDpWgjK9vGc4zTVlCNc2Z4prVNugpHgEpeur0WO6WwbDrpGIaUEiRWyCIityOWJy4I0EWNYviQTuGUHTE4ZtL3qME+y/H37USPOsyjQJjWDowwgSsJqX4TB6s3n96d6+RvfbVxoyPJbemLh6QY3vG9fEa2KSplR6GriQjNWHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l3+hNIOo; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=H9fR0HI48aH0tcBaMVF0+rxEMccmboD75qdLrszw77a9eq52xVCI3VFRuq767OlOk3jFU2ZWSYDk9nmSba9KaL2kB1nGpq/T2fwRadKD2+js7kkI7ereWLh5gWrhlLuO84P/5PCxPMCK/Quf5Hf/nC3gtTKRnwsuj+WZzfENur4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fJoqB2wG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l3+hNIOo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7FE11F000E9;
-	Tue,  7 Jul 2026 17:30:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fJoqB2wG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B2CB1F000E9;
+	Tue,  7 Jul 2026 17:30:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783445430;
-	bh=NBO5Uo/YYWIDD25/FgFeyCsR3ZSgKvA15Mr4DvpF9eg=;
+	s=k20260515; t=1783445432;
+	bh=uSxpKyB5uj4y8SIrclCFWILc70c+1WroHN+/WMxQank=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=l3+hNIOoaKDn15c/ltnD/9PVfHvYXsRdUwQNwc0pOl4s+21uSUaxU4Hoaxpr80OHA
-	 LOP0tfg1mVfno4/xCK7AcY5QG/IRgjyWCmxkMpZsMJCLDqyrSv08zAq7MBvA36Djrj
-	 VDmVV8VCMfsC+I4fxNK5wwwfEx/UhrAB7dTnGvdwZgnaYvPlcqFEeE1AS++ANvClpm
-	 UNyxEGU0deDU3SWw2QVAmV4knSynSCbwWcAKXLkhNgU7px21OAoqJ5PS0nd/r9ZRmV
-	 wgXOcBMWksFr/RIrzJdwgGXgdynPe4k1Z+xg+ogyMoc+kj+oaH5jR3+KH6Qnbb9rWv
-	 TSgNh/avJlS6Q==
+	b=fJoqB2wGeOxSW0gX8NjgRNfqGgS57ut/qGNIVIRT9LJTfg1wKOQ8CpDfplBv87tX/
+	 lEfaUTTu5hqBXEoP0zE/wNFCmr99AFqsrGCbbSvdvVypoUeCCWwrWAEOThWEbr28Qj
+	 p2YEBkv31+GOKD+3fdFUrEvl4KzKhXLgA0Kx6oSzRvTIP5BaaOBOjnUq1nMqW4fGb5
+	 A0Dg/0707QIRT1TgUbnmtuJw4QqtBw0PUVTfBie9zB2YwiK9Hypc3ZsxckITWulNuA
+	 Wam+ncjGGgnktNV1FPtjRMUmYIRySc3sJybtcMYCPcX6CySLBN3BKyg623TcVBSLbT
+	 AIf7iMeVBVPvw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0CF839253FD;
-	Tue,  7 Jul 2026 17:30:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 569D839253FD;
+	Tue,  7 Jul 2026 17:30:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,39 +37,41 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bluetooth] Bluetooth: qca: fix NVM tag length underflow in
- TLV
- parser
+Subject: Re: [PATCH v3] Bluetooth: MGMT: revalidate LOAD_CONN_PARAM queued
+ update
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178344541038.2101608.10046636030996083737.git-patchwork-notify@kernel.org>
-Date: Tue, 07 Jul 2026 17:30:10 +0000
-References: <20260704231030.996390-1-xmei5@asu.edu>
-In-Reply-To: <20260704231030.996390-1-xmei5@asu.edu>
-To: Xiang Mei <xmei5@asu.edu>
-Cc: brgl@kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com,
- johan+linaro@kernel.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, bestswngs@gmail.com
+ <178344541188.2101608.13776117493322216001.git-patchwork-notify@kernel.org>
+Date: Tue, 07 Jul 2026 17:30:11 +0000
+References: <20260707041518.2799385-1-zzzccc427@gmail.com>
+In-Reply-To: <20260707041518.2799385-1-zzzccc427@gmail.com>
+To: Cen Zhang <zzzccc427@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, baijiaju1990@gmail.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sat,  4 Jul 2026 16:10:30 -0700 you wrote:
-> In the TLV_TYPE_NVM branch of qca_tlv_check_data() the tag loop bound is
-> "while (idx < length - sizeof(struct tlv_type_nvm))". "length" is a signed
-> int from the firmware TLV header and sizeof(struct tlv_type_nvm) is a
-> size_t (12), so "length" is converted to size_t and any firmware-supplied
-> "length" < 12 makes the subtraction wrap to a huge value. The loop body
-> then reads a 12-byte struct tlv_type_nvm past the end of the short
-> vmalloc'd firmware buffer (and the EDL_TAG_ID_* handlers can write past it).
+On Tue,  7 Jul 2026 12:15:18 +0800 you wrote:
+> MGMT_OP_LOAD_CONN_PARAM queues conn_update_sync() when a single parameter
+> update changes an existing LE central connection. The queued work currently
+> stores a borrowed hci_conn_params entry from hdev->le_conn_params. A later
+> LOAD_CONN_PARAM request can clear disabled parameters and free that entry
+> before hci_cmd_sync_work() runs the queued callback.
+> 
+> Do not keep the borrowed hci_conn_params pointer in queued work. Queue the
+> hci_conn instead and hold a reference until the queued callback completes.
+> When the work runs, revalidate that the connection is still present, look
+> up the current hci_conn_params entry, and cancel the update if userspace
+> removed that entry while the work was pending.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: qca: fix NVM tag length underflow in TLV parser
-    https://git.kernel.org/bluetooth/bluetooth-next/c/198bd312df38
+  - [v3] Bluetooth: MGMT: revalidate LOAD_CONN_PARAM queued update
+    https://git.kernel.org/bluetooth/bluetooth-next/c/3fbd73d24dcc
 
 You are awesome, thank you!
 -- 
