@@ -1,259 +1,347 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB083148D9
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jul 2026 14:02:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783432960; cv=none; b=Fu/f1IY/4LwOsOqrAfCgBcjGiaXg1sm/oa5YHkC7YXqBLic+5nma/R4/lvNj5cc6v6APxN+nHO5sM4j2VG4/qJYxkLs3NV2EQAGRpLyi8SbVotZl6/TQkC0kn2LxC2AiHzPlXkMjrbEQ0ocSVlIlcD8zzTNkiR0mI8NzF9FWYGg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783432960; c=relaxed/simple;
-	bh=T7XOeMmDi5PEuS29Icsd6gEKz1v4I9eNID1RE8K+gjc=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i9Xd0EaCiR84YLPzX/ryLgnxx4XOxV7Sxwtc0qtVhT3xqKEHA6CCFvddyYuvcgdOKoJb1FqOPuTq9MghPhXkasckX9/6OnqxOOpixqBBF1U5GYiK3SY0fHcXSS1EATwsVdhp0mxmfZc/3Lzpgr0bReSV5mOwdMKn9dIasMM6P50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ncZwAu75; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D7F313E2B
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jul 2026 14:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783433363; cv=pass; b=m1zto0JilPSLhFYUa4qlw1xG2QwV2ogAdy1+ZE3gfjNOmTmhSZ4h/5+Kx7SBelbFlSKMt+rX154wIbz3zKONNIb2FI3E1VsF2Ke94kF28r5YbhUiaeBCcZlq95nTFPmzNSG/IN947g/ihJ4WlfOjOMjqW/3qBKvX2oo9LC6Grk4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783433363; c=relaxed/simple;
+	bh=4Gk/T7gcb9Frs7VwcGVHH2iC1ABibfBUNLCg4sA29Ho=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oPUY9PAhTqGjOGSI7EF99FGrlPvjtY0GH510Me/YI+eeoVTPjt1iKOliTzHRuKbQn/XMys6FplGMrssWyZ/tidOJY2Ewvf+nxrlhwNUMwQX8wHb2hUODK9jxoJO5m+nU3zx1cgqItYhBOY+QW1m6FqACdFbtWNUAu7HVgq16sTU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=igV8La/b; arc=pass smtp.client-ip=74.125.224.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ncZwAu75"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 838A81F01559
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jul 2026 14:02:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783432958;
-	bh=3G29P2M20+AzJKzYQgpzohO583/nH/Yg8BUiARXkN/c=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=ncZwAu75yHlsPWm+aquFCt4VPef4k5QUBnLMPBsv3b+eaHl+ePR8yhewHYi0qBbP8
-	 J+81xoTGGAzZLpnRAStRdZqAvPknqoV02XF5854WdH/UGseOJjNWi35EaeA2eu+3yL
-	 QWDeaR9bJt6E2b2UmI/a2pn7DM2elLmq0PSEpciAH60jQOjKJoOiDm4wMEInWKWHWL
-	 XBMarxYcEcqPZHQCQZMAEqV33+r27vdIQKQweLwVl5uNplF4UoMaoo/4ongABKgJz/
-	 Um1am1/MALxX7qlCBoPs8UadtvJ1hwH7PGY40PFG8M2FbDnkOT+CZPgBJAQPanYGM1
-	 +xIPyCYc7DD9w==
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-39b38d3c929so35061871fa.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jul 2026 07:02:38 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RoErO3T98SX/yORRXb0g5XiiugtVQBCVQ+qOwmWHWdWJ4UlZ3LJ9yXbEhFQMoK2ulxSvlxJeMcap2oGHTQBG3w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2kmXHq8VBoNEM1U4KTckOJ/42bt2kPvf/qQT8mPgRWpkz0tPx
-	M3J+KRDLanrwSHMvvmCcXw5TCeVx+4cp/PyaD0r/NfKcnvsbO62Y+UpnDzFbHSQQp93eX6xZZJX
-	y9x+rdC8HEUxa9Tnd9o/bKA10mFigVXCdKjjEmJSXeA==
-X-Received: by 2002:a05:651c:f:b0:39b:bc9:90ac with SMTP id
- 38308e7fff4ca-39c60035948mr8638371fa.30.1783432957101; Tue, 07 Jul 2026
- 07:02:37 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 7 Jul 2026 07:02:35 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 7 Jul 2026 07:02:35 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <b4myznfs5kkochdhzm2ypcfiolk2l2a7nvjbhkkcqueumkyvpe@nyvvhhcslk7e>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="igV8La/b"
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-6651bc57458so2747500d50.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jul 2026 07:09:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783433360; cv=none;
+        d=google.com; s=arc-20260327;
+        b=QpqkL63UlV6mpkjjElJnnQUZrgFC8DU0x3reKuPN/eRFn6UKDLpNWOQoYtj2HFiTh5
+         WugrabfwpraWleQlG7JIQGaBMyZWjUusHgSBTPiF25q1H/nZ8kpp1XhGbipQ8ZN5iSvQ
+         vJXx+fhRgf4DjK5FSq81C6OphqpPKQaLIrPwm0UIWGZH9K1FqzBTlfOLgGKXn6svzrzV
+         HwxgdZ0h9J5IPldHpXhJ/eLBYZVAgQNu0t8YLpZvvY/Lvm4fefYf8jfbr2gM2ovEO8St
+         V7C65HM+wF21xuhGmAeMsivsQB4PtMZOypSgb8MOuL3RKeA+udNcCNiiIQKgAtJTQrq+
+         uC9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=AdoCQ4ZX5BtlQtLCqarU4DocdJVuupPvE5g+WnHkPbY=;
+        fh=/vklIAWVaRe11ziRV8KwNh4FssYL/JFMBACc+LsDRx8=;
+        b=aP9ihuwbUxIzlKJCrh0y9/AKYno66dETVqr3E6wb4FfO4RihJRQYm0qp7BmbJs+qti
+         zlH1rs58TMvChCOwtBKE/GB+w6CngQHL+H6qw46QS6YED4Van9AKnivaVmOKKzacY/cJ
+         IlJXjQJxaHJDX6mBg52GOf+x8et9IkWl11kAcm2OLSdeavg81IajEscFD7jTDLaL5s+n
+         iyAuH02rN8YbX7+hMWxeKibPSGArc/ePa3RA07v63a8Zt0IxjFGJzZas7/LNwnAYqqEm
+         sl8lbc+0KHdb9y/psmnB8wGcIEiihruhI9yXgwcx8Q9mSnHECVCftynm8t5kZWbG/zva
+         44yw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783433360; x=1784038160; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=AdoCQ4ZX5BtlQtLCqarU4DocdJVuupPvE5g+WnHkPbY=;
+        b=igV8La/bD7l0S3iQ8CEZJyztpRYbJ8r69cKY2/4pp+PjZeuN6BII0gPCZMBTlMmW+8
+         s2R03uC3fiNd2DLLh/QPhA1kxWhyMqnpe/GpXmv+ZLwGQnLKVTk50yXr5NXKFNsX9Ayj
+         lrKlpt+pVhHSd54FDMYlJxg4UNlqZqrJTRm9Vl/UYXAvaIchRrmMtWfQvBUYBqBLBSHG
+         IVzBnAqo8Dv1eFNoTgzUhSYd28M292oCcD56GEx90tr1WokrXJuxav1H6kNO0BweQH7m
+         sIJqyVuoy427zWAjlSs0n54QPqMMYRj4yX1v2Webr6SVFX+/qgEVNxWtOOOsATvZ1xPS
+         8vgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783433360; x=1784038160;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=AdoCQ4ZX5BtlQtLCqarU4DocdJVuupPvE5g+WnHkPbY=;
+        b=cfenhy1PfZpGmKAVQArWlPXj3Zul+eOhNxrv8+Rf/ECfgoH6SglhhsXCDGnGlO2zqk
+         yo1DyatiDAmm9dwAu2jMI9ZPnXEbqcFnn/ShQ543MqSSD/Xa6cUT45te2in1uXD/ZHf7
+         t8+Zq+5I3XwSLb/4ZaSZ2q61Ii9spFQIaQX3cqPIURUUeIhiNjl4cqHyt16k+l5LQzxi
+         T1LdebBvyc0LH2wgewR8cryasUhQ6xVoJw4NmexnDWVu9WJfqgnOWkFcNTVPnPCSn2F8
+         A4IOOOQUrDHdKLTWdUbZBVWmGEtSa5EQxvyut2xQFmKySvfEpSJQmAkuZW4gx1djZMFZ
+         nj5A==
+X-Forwarded-Encrypted: i=1; AHgh+RpO01RcPYNvG2dz2Bzc5myE0cTR4IlKZnhblxjVLIisP6YAlQnRvAg0merOWiEi7EfUcsEFghUkgb91NK6I6pM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCUQCkH42RQU8yugRQjxd1sCl6b5jL4OsQVPLYhMXmaARPeQGL
+	BaICDYjlUVRAqUjqJ9Q8IDXvWkkgl2j1+/UIxUcE6brFO4P6MKQasvMzd5zRJYUQHu4Lh0GJC+N
+	dN8lHfEz3x84XPWhgaXiWjR4AaQvGgBA=
+X-Gm-Gg: AfdE7cmjNUheXcNSFE5GabncbpGttkeqJVluJDN7/N95rGfgNoZWwdU9WTrdDCSeQEt
+	0W/ChDkMCfcl/oAs4zrZw6afwWuuaw5sHz6MzuOTCqo113zIz9alHFpFU/w8Rrp/4w7vNcehAQn
+	DdrEhy+Z0MvlkvuxH0s0cTeimo28YCqzbK/ynZ3LIrVyhpqeG7QXNIoExpm8pVJ4WPwF3R3j/DZ
+	6sMxJDjES3B+LQV2jg0wvKI5c15rWY6NmUYf+ymzNBRgu/QEwO6NTxg1ntwA8qYBX8Xe3YSWBJH
+	O6WJ6/9AmYLvJPW6j0XblQ9ogEbHG7mPO3XJ5OxFc1WzJyqfROuVuPJoPZU=
+X-Received: by 2002:a05:690e:1c08:b0:667:7750:14cb with SMTP id
+ 956f58d0204a3-6677f7ec627mr3586743d50.0.1783433359929; Tue, 07 Jul 2026
+ 07:09:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260702-monza-wireless-v2-0-7b56e2a6a6d4@oss.qualcomm.com>
- <20260702-monza-wireless-v2-3-7b56e2a6a6d4@oss.qualcomm.com>
- <43re752djujsh2kiyvjlkpmztxsh4atg6472qhir4lgay24zbo@mtlkn2xc2ors>
- <rxt4n6vuscu33mrw24af72lb3s6urqfpkhtia44yfo4j7wtu6o@3xp57owekrgj>
- <u5ieok3hgjcf74sxjdzv6xurmlbve46xa3imgfnom4hpjarmxa@fna5daqpyk3r>
- <zat6uuvh7jwfxajvqtif6d67osf6h5b2vxig3bmuch76btpdkj@bfxjj7kk5fjk>
- <ynhos7h4x3kbqbio2gkigoo5rqbwogrzihkylxv5pqjtqpqmnq@rlyjaiopx74a>
- <l4qycbmz2zaroe5rreuop4dx7ugfcx37hfaketvn43trdpaept@jyx65agqznq4>
- <CAFEp6-0AA-hTy=3KaRNEJ+kF0otGLTGTujvWJqhT2dHDj94E4w@mail.gmail.com> <b4myznfs5kkochdhzm2ypcfiolk2l2a7nvjbhkkcqueumkyvpe@nyvvhhcslk7e>
-Date: Tue, 7 Jul 2026 07:02:35 -0700
-X-Gmail-Original-Message-ID: <CAMRc=Mf6q5s6UgSRCOeHq=9CKeO_91k59T8Yr3kZ8N7OifyBRw@mail.gmail.com>
-X-Gm-Features: AVVi8CdomZKaOaY4QiMrsZCCt-GUEYJD7tlypMd4eAMjuWUCA-oEYhkx6wXXzs8
-Message-ID: <CAMRc=Mf6q5s6UgSRCOeHq=9CKeO_91k59T8Yr3kZ8N7OifyBRw@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] Bluetooth: hci_qca: Support QCA2066 on M.2
- connector via pwrseq
-To: Manivannan Sadhasivam <mani@kernel.org>
-Cc: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-pci@vger.kernel.org, 
-	linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	devicetree@vger.kernel.org, 
-	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, 
-	Loic Poulain <loic.poulain@oss.qualcomm.com>
+References: <20260707093426.372897-1-xiuzhuo.shang@oss.qualcomm.com>
+In-Reply-To: <20260707093426.372897-1-xiuzhuo.shang@oss.qualcomm.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 7 Jul 2026 10:09:07 -0400
+X-Gm-Features: AVVi8CdhspMrbH2pvJNN8ASf_Zebyq0dNRZdvHpxPbku9FW2X3yUDminqy4JhvU
+Message-ID: <CABBYNZ+X-+ZJYz-V-_QSP5kCJpJJaBiyO=wMHD+Ut+b=639t2Q@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: MGMT: Fix discovery state race against
+ cmd_sync worker
+To: Xiuzhuo Shang <xiuzhuo.shang@oss.qualcomm.com>
+Cc: Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, linux-arm-msm@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com, 
+	wei.deng@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com, 
+	mengshi.wu@oss.qualcomm.com, jinwang.li@oss.qualcomm.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 7 Jul 2026 14:56:14 +0200, Manivannan Sadhasivam <mani@kernel.org> =
-said:
-> On Tue, Jul 07, 2026 at 11:14:10AM +0200, Loic Poulain wrote:
->> On Mon, Jul 6, 2026 at 8:44=E2=80=AFAM Manivannan Sadhasivam <mani@kerne=
-l.org> wrote:
->> >
->> > On Sat, Jul 04, 2026 at 03:11:13AM +0300, Dmitry Baryshkov wrote:
->> > > On Thu, Jul 02, 2026 at 05:08:56PM +0200, Manivannan Sadhasivam wrot=
-e:
->> > > > On Thu, Jul 02, 2026 at 05:34:31PM +0300, Dmitry Baryshkov wrote:
->> > > > > On Thu, Jul 02, 2026 at 04:17:43PM +0200, Manivannan Sadhasivam =
-wrote:
->> > > > > > On Thu, Jul 02, 2026 at 03:14:49PM +0300, Dmitry Baryshkov wro=
-te:
->> > > > > > > On Thu, Jul 02, 2026 at 12:46:15PM +0200, Loic Poulain wrote=
-:
->> > > > > > > > For QCA2066 (and other QCA chips) on M.2 connectors, the U=
-ART enable
->> > > > > > > > is controlled by the W_DISABLE2# signal managed by the pci=
-e-m2 power
->> > > > > > > > sequencer rather than a dedicated BT enable GPIO.
->> > > > > > > >
->> > > > > > > > When the serdev controller has an OF graph (indicating it =
-is connected
->> > > > > > > > to an M.2 connector), acquire the 'uart' pwrseq target fro=
-m the
->> > > > > > > > connector's power sequencer and use it to control BT power=
- instead of
->> > > > > > > > the bt-enable GPIO.
->> > > > > > > >
->> > > > > > > > Also allocate bt_power unconditionally for all SOC types s=
-ince the
->> > > > > > >
->> > > > > > > Can we just fold it into the main struct?
->> > > > > > >
->> > > > > > > > pwrseq path is independent of the SOC type switch.
->> > > > > > > >
->> > > > > > > > Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com=
+Hi Xiuzhuo,
+
+On Tue, Jul 7, 2026 at 5:34=E2=80=AFAM Xiuzhuo Shang
+<xiuzhuo.shang@oss.qualcomm.com> wrote:
 >
->> > > > > > > > ---
->> > > > > > > >  drivers/bluetooth/hci_qca.c | 81 ++++++++++++++++++++++++=
----------------------
->> > > > > > > >  1 file changed, 43 insertions(+), 38 deletions(-)
->> > > > > > > > @@ -2387,6 +2390,35 @@ static int qca_init_regulators(stru=
-ct qca_power *qca,
->> > > > > > > >     return 0;
->> > > > > > > >  }
->> > > > > > > >
->> > > > > > > > +/*
->> > > > > > > > + * Acquire the M.2 connector power sequencer.
->> > > > > > > > + *
->> > > > > > > > + * An OF graph link on the serdev controller is only pres=
-ent when the BT
->> > > > > > > > + * device is attached through an M.2 Key E connector. In =
-that case the UART
->> > > > > > > > + * enable (W_DISABLE2#) is driven by the pcie-m2 power se=
-quencer instead of a
->> > > > > > > > + * dedicated BT enable GPIO, so grab the "uart" pwrseq ta=
-rget from it.
->> > > > > > > > + *
->> > > > > > > > + * Returns 0 if no M.2 connector is present (nothing to d=
-o), a negative errno
->> > > > > > > > + * on error, otherwise 0 with qcadev->bt_power->pwrseq po=
-pulated.
->> > > > > > > > + */
->> > > > > > > > +static int qca_serdev_get_m2_pwrseq(struct qca_serdev *qc=
-adev, bool *bt_en_available)
->> > > > > > > > +{
->> > > > > > > > +   struct serdev_device *serdev =3D qcadev->serdev_hu.ser=
-dev;
->> > > > > > > > +   struct device *dev;
->> > > > > > > > +
->> > > > > > > > +   if (!of_graph_is_present(dev_of_node(&serdev->ctrl->de=
-v)))
->> > > > > > > > +           return 0;
->> > > > > > > > +
->> > > > > > > > +   qcadev->bt_power->pwrseq =3D devm_pwrseq_get(&serdev->=
-ctrl->dev, "uart");
->> > > > > > > > +   if (IS_ERR(qcadev->bt_power->pwrseq))
->> > > > > > > > +           return PTR_ERR(qcadev->bt_power->pwrseq);
->> > > > > > > > +
->> > > > > > > > +   dev =3D pwrseq_to_device(qcadev->bt_power->pwrseq);
->> > > > > > > > +   *bt_en_available =3D device_property_present(dev, "w-d=
-isable2-gpios");
->> > > > > > >
->> > > > > > > I think here you are looking into the exact details of the o=
-ther of the
->> > > > > > > graph. There might be other devices on that side, while the =
-code now
->> > > > > > > assumes M.2. Or, consider having an M.2 controller which han=
-dles
->> > > > > > > W_DISABLE2# internally rather than through the GPIO.
->> > > > > > >
->> > > > > >
->> > > > > > This code only deals with M.2 connector in specific, so I'm no=
-t sure why we need
->> > > > > > to worry about *other* kind of devices. Let's worry about them=
- when they show up
->> > > > > > (with graph interface ofc).
->> > > > >
->> > > > > I don't think we want to go through the drivers using M.2 connec=
-tors in
->> > > > > such a case. In the end, the contract should be that there is a =
-power
->> > > > > sequencer on the other side of the graph, but the specifics of t=
-he
->> > > > > connector should be abstracted out. Do you know, if in the x86 w=
-orld the
->> > > > > W_DISABLE2# is a GPIO or is controleed by the hub.
->> > > > >
->> > > >
->> > > > I tried to abstract out, but Bartosz didn't want pwrctrl APIs to d=
-o that level
->> > > > of abstraction as pwrctrl APIs should be generic and should not be=
- bind to a
->> > > > specific connector and exposing its internals.
->> > > >
->> > > > That's why we ended up having pwrctrl core exposing the 'struct de=
-v' using
->> > > > pwrseq_to_device() and letting the consumer extracting whatever in=
-formation it
->> > > > needs.
->> > >
->> > > Do we have other ways to control M.2? For example on the x86 systems=
-,
->> > > are those signals controlled via GPIOs (or GPIO-like registers) or a=
-re
->> > > they controlled separately by something like M.2 controller? Or do y=
-ou
->> > > have an idea about other non-x86 systems?
->> > >
->> >
->> > Thre is no OS-visible M.2 power control in ACPI systems. ACPI defines =
-PRx
->> > objects to control power to the PCI devices based on the D-state and t=
-he OS just
->> > evaluates the _ON/_OFF methods of the respective objects.
->> >
->> > So this API is not going to be useful on non-DT systems where the BT_E=
-N GPIO
->> > handling is abstracted away. And also on platforms where BT_EN is not =
-controlled
->> > by GPIOs. But I haven't seen DT platforms handling BT_EN (or W_DISABLE=
-2#)
->> > signal in a non-GPIO way.
->> >
->> > I too prefer an API to query whether the connector supports BT_EN or n=
-ot, but
->> > I'm not sure how to come up with a generic pwrseq API which also satis=
-fies the
->> > requirement. If you have any suggestions, please let me know!
->> >
->> > FWIW, I tried adding pwrseq_is_fixed() API [1] earlier, which was turn=
-ed down by
->> > Bartosz.
->>
->> So, I'll submit a new version incorporating Dmitry's request to fold
->> bt_power into the main structure.
->> However, what should we do about the powerseq point? Should we keep it a=
-s it is?
->>
+> start_discovery_internal(), start_service_discovery() and stop_discovery(=
+)
+> queue a cmd_sync work item and only then move the discovery state machine
+> into its transient value (DISCOVERY_STARTING / DISCOVERY_STOPPING):
+>   err =3D hci_cmd_sync_queue(hdev, ..._sync, cmd, ..._complete);
+>   if (err < 0) { ... }
+>   hci_discovery_set_state(hdev, DISCOVERY_STARTING /* or STOPPING */);
+> The matching completion callbacks run on hdev->req_workqueue serialised
+> by hci_req_sync_lock, which is independent of hdev->lock. So once the
+> work has been queued, the worker can be scheduled, run the sync function
+> and invoke the completion before the caller has executed the trailing
+> hci_discovery_set_state(). The completion's success path writes the
+> terminal state (DISCOVERY_STOPPED for stop, DISCOVERY_FINDING for start);
+> the caller then overwrites it with the transient value, and the state
+> machine is wedged: every subsequent Start (Service) Discovery is
+> rejected by the DISCOVERY_STOPPED gate with MGMT_STATUS_BUSY (0x0a),
+> with no HCI traffic generated, until bluetoothd or the adapter is
+> restarted.
+> Fix it in three parts:
+>   1. In all three call sites move hci_discovery_set_state(STARTING /
+>      STOPPING) to before hci_cmd_sync_queue(). The transient state is
+>      therefore always published before any worker can run the
+>      completion. On queue-submit failure, roll back to
+>      DISCOVERY_STOPPED.
+>   2. In start_discovery_complete() and stop_discovery_complete(), wrap
+>      the terminal hci_discovery_set_state() call with
+>      hci_dev_lock() / hci_dev_unlock(). These callbacks run without
+>      hdev->lock; serialising the state write matches the pattern used
+>      by mgmt_set_powered_complete() and removes any residual ordering
+>      hazard against a concurrent mgmt path holding hdev->lock.
+>   3. Generalise the "ignore -ECANCELED" early return in both completion
+>      callbacks to "on any err < 0, also reset the transient state to
+>      STOPPED". With (1) in place the state observed at completion time
+>      is always known.
+>      For the stop path this also fixes a pre-existing wedge: when any
+>      sub-command issued from hci_stop_discovery_sync() returns an
+>      error, stop_discovery_complete() is invoked with err < 0. The
+>      existing "if (!err) set_state(STOPPED)" tail then skips the reset
+>      and the state machine sits in DISCOVERY_STOPPING forever.
+
+Needs the Fixes tag since we might want to backport.
+
+> Signed-off-by: Xiuzhuo Shang <xiuzhuo.shang@oss.qualcomm.com>
+> ---
+>  net/bluetooth/mgmt.c | 86 +++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 74 insertions(+), 12 deletions(-)
 >
-> @Bartosz: Thoughts?
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 733a4b70e10c..25ad9c10740d 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -5975,15 +5975,38 @@ static void start_discovery_complete(struct hci_d=
+ev *hdev, void *data, int err)
+>
+>         bt_dev_dbg(hdev, "err %d", err);
+>
+> -       if (err =3D=3D -ECANCELED || !mgmt_pending_valid(hdev, cmd))
+> +       if (err < 0) {
+> +               /* The queued start-discovery work failed before the norm=
+al
+> +                * completion path could advance the state machine. The
+> +                * caller already moved the state to DISCOVERY_STARTING
+> +                * (under hdev->lock, before queueing). Reset it here so =
+the
+> +                * gate in start_discovery_internal()/start_service_disco=
+very()
+> +                * does not wedge in STARTING and reject every future Sta=
+rt
+> +                * (Service) Discovery with MGMT_STATUS_BUSY.
+> +                */
+> +               hci_dev_lock(hdev);
+> +               if (hdev->discovery.state =3D=3D DISCOVERY_STARTING)
+> +                       hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+> +               hci_dev_unlock(hdev);
+> +
+> +               if (err =3D=3D -ECANCELED)
+> +                       return;
+> +       }
+> +
+> +       if (!mgmt_pending_valid(hdev, cmd))
+>                 return;
+>
+>         mgmt_cmd_complete(cmd->sk, cmd->hdev->id, cmd->opcode, mgmt_statu=
+s(err),
+>                           cmd->param, 1);
+>         mgmt_pending_free(cmd);
+>
+> -       hci_discovery_set_state(hdev, err ? DISCOVERY_STOPPED:
+> +       /* Serialise discovery.state writes against any concurrent mgmt p=
+ath
+> +        * holding hdev->lock; this callback runs on req_workqueue withou=
+t it.
+> +        */
+> +       hci_dev_lock(hdev);
+> +       hci_discovery_set_state(hdev, err ? DISCOVERY_STOPPED :
+>                                 DISCOVERY_FINDING);
+> +       hci_dev_unlock(hdev);
+>  }
+>
+>  static int start_discovery_sync(struct hci_dev *hdev, void *data)
+> @@ -6051,15 +6074,23 @@ static int start_discovery_internal(struct sock *=
+sk, struct hci_dev *hdev,
+>                 goto failed;
+>         }
+>
+> +       /* Publish the transient state BEFORE queueing the work. The
+> +        * completion callback runs on hdev->req_workqueue serialised by
+> +        * hci_req_sync_lock, which is independent of hdev->lock; setting
+> +        * the state after the queue allowed the worker to win the race
+> +        * and have its terminal STOPPED/FINDING write overwritten by thi=
+s
+> +        * trailing STARTING write, wedging discovery in STARTING.
+> +        */
+> +       hci_discovery_set_state(hdev, DISCOVERY_STARTING);
+
+Hmm, do we really need to do this if hdev lock is taken at
+start_discovery_sync? Because that should then synchronize the
+callback won't be able to change the state before it is set to
+DISCOVERY_STARTING.
+
+>         err =3D hci_cmd_sync_queue(hdev, start_discovery_sync, cmd,
+>                                  start_discovery_complete);
+>         if (err < 0) {
+> +               hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+>                 mgmt_pending_remove(cmd);
+>                 goto failed;
+>         }
+>
+> -       hci_discovery_set_state(hdev, DISCOVERY_STARTING);
+> -
+>  failed:
+>         hci_dev_unlock(hdev);
+>         return err;
+> @@ -6178,15 +6209,19 @@ static int start_service_discovery(struct sock *s=
+k, struct hci_dev *hdev,
+>                 }
+>         }
+>
+> +       /* Publish the transient state BEFORE queueing; see the comment i=
+n
+> +        * start_discovery_internal() for the race details.
+> +        */
+> +       hci_discovery_set_state(hdev, DISCOVERY_STARTING);
+
+Ditto.
+
+>         err =3D hci_cmd_sync_queue(hdev, start_discovery_sync, cmd,
+>                                  start_discovery_complete);
+>         if (err < 0) {
+> +               hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+>                 mgmt_pending_remove(cmd);
+>                 goto failed;
+>         }
+>
+> -       hci_discovery_set_state(hdev, DISCOVERY_STARTING);
+> -
+>  failed:
+>         hci_dev_unlock(hdev);
+>         return err;
+> @@ -6196,17 +6231,40 @@ static void stop_discovery_complete(struct hci_de=
+v *hdev, void *data, int err)
+>  {
+>         struct mgmt_pending_cmd *cmd =3D data;
+>
+> -       if (err =3D=3D -ECANCELED || !mgmt_pending_valid(hdev, cmd))
+> -               return;
+> -
+>         bt_dev_dbg(hdev, "err %d", err);
+>
+> +       if (err < 0) {
+> +               /* The queued stop-discovery work failed before the norma=
+l
+> +                * completion path could advance the state machine. The
+> +                * caller already moved the state to DISCOVERY_STOPPING
+> +                * (under hdev->lock, before queueing). Reset it here so
+> +                * the gate does not wedge in STOPPING.
+> +                */
+> +               hci_dev_lock(hdev);
+> +               if (hdev->discovery.state =3D=3D DISCOVERY_STOPPING)
+> +                       hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+> +               hci_dev_unlock(hdev);
+> +
+> +               if (err =3D=3D -ECANCELED)
+> +                       return;
+> +       }
+> +
+> +       if (!mgmt_pending_valid(hdev, cmd))
+> +               return;
+> +
+>         mgmt_cmd_complete(cmd->sk, cmd->hdev->id, cmd->opcode, mgmt_statu=
+s(err),
+>                           cmd->param, 1);
+>         mgmt_pending_free(cmd);
+>
+> -       if (!err)
+> +       if (!err) {
+> +               /* Serialise discovery.state writes against any concurren=
+t
+> +                * mgmt path holding hdev->lock; this callback runs on
+> +                * req_workqueue without it.
+> +                */
+> +               hci_dev_lock(hdev);
+>                 hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+> +               hci_dev_unlock(hdev);
+> +       }
+>  }
+>
+>  static int stop_discovery_sync(struct hci_dev *hdev, void *data)
+> @@ -6248,15 +6306,19 @@ static int stop_discovery(struct sock *sk, struct=
+ hci_dev *hdev, void *data,
+>                 goto unlock;
+>         }
+>
+> +       /* Publish the transient state BEFORE queueing; see the comment i=
+n
+> +        * start_discovery_internal() for the race details.
+> +        */
+> +       hci_discovery_set_state(hdev, DISCOVERY_STOPPING);
+
+Ditto.
+
+>         err =3D hci_cmd_sync_queue(hdev, stop_discovery_sync, cmd,
+>                                  stop_discovery_complete);
+>         if (err < 0) {
+> +               hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+>                 mgmt_pending_remove(cmd);
+>                 goto unlock;
+>         }
+>
+> -       hci_discovery_set_state(hdev, DISCOVERY_STOPPING);
+> -
+>  unlock:
+>         hci_dev_unlock(hdev);
+>         return err;
+> --
+> 2.43.0
 >
 
-As discussed in private with Dmitry: I think we should go with a new interf=
-ace:
 
-  bool pwrseq_always_on(struct pwrseq_desc *pwrseq);
-
-with the following semantics: if it returns true, the user can call
-pwrseq_power_on() but a subsequent pwrseq_power_off() will fail with -ENOTS=
-UPP.
-That should give the bluetooth driver the knowledge it needs without breaki=
-ng
-the logical API boundaries while also being more precise than pwrseq_is_fix=
-ed().
-
-Does it make sense?
-
-Bartosz
+--=20
+Luiz Augusto von Dentz
