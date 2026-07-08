@@ -1,149 +1,77 @@
-Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213382EDD7D
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jul 2026 15:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783523716; cv=pass; b=DPI49tSKBCDGZos9HyGUlEjU4La4G3h/Hy/h4/PuxkhpTZXvZTuqyqOeUEwk4tuzpQBud/lKNCkFB1+TkHKPxFu0zoJ4nPCr7jo+nVEQV+iWdj/ChgJUlDUKB+Y1CdoVUjuPP6aH+RT8PXxEmZ9tWfiVbt38iuSr4H3SwWHvntE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783523716; c=relaxed/simple;
-	bh=BivWDSxDU/tO0SkasCcRl26dlfTOHMkfuNrvfjMHzPE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Up3PEzkZzEEzUR2Nbn44ASsEVy8r7Uu4ACACtl79fKrKtemOXaiQW+KdluK7QutHznDCtE2U/8IaV43gdK2XLqCYUhYgIkjzCK91gC2ePIfWzoPHzW7TgKYLSFQxJAE0FsclRUUsEbj4ukrmG7yWASNGQNsSFb8KKGeNIRxoAcw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ryYjEgHB; arc=pass smtp.client-ip=74.125.224.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9BFB35C1B4
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jul 2026 16:10:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783527026; cv=none; b=gHRBRCZ8LjMKQA8I54Gz6D6DiCJFr7hKtoUUzYWavq5hE0DgqTnrx0xGsQamEv662rGgmXgmH6gk+wxJY6b6yR+mxFrSAq0GLgEwINZetC7bOKrjrPa+bms0d/W4dghRuTc4t3qNHQg1M6vnK6P4R/KDrUelgDwbW99ECNrIxDA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783527026; c=relaxed/simple;
+	bh=5pFRg381gD96wE5c2BxF31dsV1L4k0wcqHHNrPUbHlE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=G4uYWHgI90rhpOpDtTX1OlkIyQo3Kwoqw/fhQr36IT0UjC1WMDKw7Yt8HcM6g68iWFQqRqG33bbP5lA/7hNrH1o7l3k3/Vc2uXeHtxaxJYl5GCAU90upZOuNkYy5pJsXefhUkTB+tURMcutoYctaUtgrzvsNX36EPZCXabOOBTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CV92NBSl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ryYjEgHB"
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-664a09bc459so1129188d50.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jul 2026 08:15:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783523713; cv=none;
-        d=google.com; s=arc-20260327;
-        b=rDiT5CxzacV6ReEXetFHvYThluf1GfHGsDrMKOG/FqQRVRQNMTZXTelmFLCeFZe4Qk
-         EM7PxB5XTUt2ne8q/JhUTBAG9mLjstfFWry8SANZueDofqqD0Nda2++0af0+QaE83hhl
-         0WAdlt1foMfLHf7DAKb+VPl/G/L6xqWtKcATX++TroikpFqxep3Y2fkZeH6n3ogD+Rm0
-         8cGHgR9IkKVeVFeY4YqmXIH5Pm9MS8nR2Fz0SxxRUZORgUuH0IS75L57pfBqG1jz4lEi
-         fKHJOzXqSiEIAiXdU7w8JVbxjLVSrfX+yu/mQSDjDkgCttbMcUFrkQN1YjPF1dp7dovg
-         b68Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=BivWDSxDU/tO0SkasCcRl26dlfTOHMkfuNrvfjMHzPE=;
-        fh=XG6eqXGa80mxcosiCO9sP96O6SohR/POAtNZ4eLMC2Y=;
-        b=Q7j+sUMop8rs7Idp3QahhAoAl4A/ZjOOPUUHsjMbuqcMSi0ASki1C5bDG/mfD3zkGc
-         k+ztzHs+XBU74fXrLErFbHVIy0B+bNaf/uqkxl7BrylQcYO9u3wyX0i2S86KGPxdy/Ii
-         bnRBNx3M1xXvDIVdWGL64XDEOZjgQ8f2EcrvMLZrcxAZZp86oI5NQCOwPoHZMgzmP4+R
-         5iYaSgh1Xys34FVOkKt/eCkir0JMU60+rHhnpA1Jj41APM4u7dQmM3YPH27MhLM5hc9s
-         bu6tOBNP5AOI7/wXx3lbzKfJmXycXRoZv2bOVV4H63tmPFKto6iJWHB8wd1vZ637jY3r
-         XGXA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783523713; x=1784128513; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=BivWDSxDU/tO0SkasCcRl26dlfTOHMkfuNrvfjMHzPE=;
-        b=ryYjEgHB1mL4UqWXkWqV1Pi9hkCGC/uItd+A+RmJDFyDLuWublqaxIQupl/Gv7x2m1
-         j3yH5oe9aDV0J/CcSuVqsvinStFkuljNMYm1ieGVnCRm0EY83/QN7QueqF6R4/Q9pzpV
-         3P+oc03HyU6SjJyPfyUxKdCpo4x6jgl3MLgyt8BrWm/sZ9NJriC0gUbAS8XIxePDslb1
-         1JbT749f+YB7MVrLZJYPfdUdPEj8yDXUQeXjn3IVThxX29X4NzHiNL7rGJ5NwkQuJlsL
-         bkfEkOOHC2A2yYNQJPmoDIbKzunRx6WCCiSICzYnALrCPn4k9ML7Dt+AZOgiVNAMydUa
-         KXeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783523713; x=1784128513;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=BivWDSxDU/tO0SkasCcRl26dlfTOHMkfuNrvfjMHzPE=;
-        b=QBrSs1APMrH+R1IwqRwonnwZzmYjY5oq4cpADnaFqRgjAkZeFjW5VuzQ4tubBtyGf+
-         7IvXYCZbK8Nu4MCEbw6JYAbWP5rSKKAbvIUOnSfMeQ2ZDih1ajid/qJpCiwHJApRKFm3
-         bdgZaGd6zY6a6Psdnka2N+nsEOafglsxeAVc2txAKKArcMOL+hoThKMb2k9YJlPHHMqn
-         Ba0skYC9iIDtwSyWxFUm3DzrjCGCiuQ1RxzElAMk0PmpzAVeU0fb+gs4L9E4Bos2jasl
-         YW5MORJZjveSYXcvFjPZLGBm10O/czFMirBXam8cIQ2cPWUfwoOzZjfyLa6c5E3KDQ3L
-         RIUQ==
-X-Forwarded-Encrypted: i=1; AHgh+RpaibMcr9xboId+b+RSt+N9QaVGmokv4Bbjp9+xmvcMwa13lsfgjLIrLpaLLxdVEBo3VFB905aTleHOWpiBp44=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiAHFhqx9T+x4vANt0RUSnBxpJrqouNSUJlZoA6NvQzjiBSaLD
-	Y0zXb8Swj2xCum5vYqbzAJzZxrV905tyEf8YHG1sjHfnCSPY5gE7fsqSN1JqUE4cMSrx4lMPlqo
-	ay91z850yaom4kLwX/7o4DviqDvcSLe4=
-X-Gm-Gg: AfdE7cnNYdbVwh4ZIKJDXNI0vlVW5Vs8mVmjFMO0jPqdsev9VzfdaVEswcIg0SBzmbW
-	sO+2W0qzvc98GUOh/vL3G5i2X1bV+jkLhOoD3sz7PD964si7dCAbruJzUU371V6uUFwfKwF6prM
-	uJ/EaFOT2Sb1rBu0nF+TGZwxBxnnTk2VTrVBC3B8oP3JllxDek4w/G/rDel0oHiQw6AE+mNEgom
-	KH5So8fsYJg6tQk0toqJRmWZVk6flsywJQxJdBxKE4XbqG7hJliqk6NNh79ny/9EtrHNwtrj2ZU
-	WxCdvehzQqw+AShpO1bwki3lRsXyCS92Jb8WkK0IXxBpEeLdcvzWHbG4
-X-Received: by 2002:a05:690e:4852:20b0:664:bd7f:1345 with SMTP id
- 956f58d0204a3-6679f005639mr1752205d50.13.1783523712905; Wed, 08 Jul 2026
- 08:15:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CV92NBSl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FE101F000E9;
+	Wed,  8 Jul 2026 16:10:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783527025;
+	bh=6mVOF+JeoehEOc2F6RYftxZu86yJ4PZmZnccrNLRhMQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=CV92NBSlQ9MaI8o2UKvitktRQbQFzBPBlqxlNkrXP5sTSgdTK8Cm9rPOQuuhrWLOQ
+	 BnAiIU5Ov9PuJUIHZu3A/UgxuP56ZwlJFKXG8K80JkEMwlnOEdn6zS3LQ0e5HFtp0L
+	 kH4zcN/tdVSqsYoH9YeyuAH6XqH/4kaMtR7K3IoaGsKwF9O1DRpAZZmec0mto1A5uf
+	 dYrc092z85psvXUpqLxaBEtb4m/3onzBTX7U89vKjICRTE6ZxOtBEhqn9g1hVMOc7l
+	 XMugGrNw52VMxY4QzfjmUSeQvnncAgAJQM+Y1w9rMFzKIKdzkOd57V0Tv5LtZtB844
+	 b6g0oBO1REapg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D09E53930FBE;
+	Wed,  8 Jul 2026 16:10:05 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260704231030.996390-1-xmei5@asu.edu> <akomrM-h521h6M0i@hovoldconsulting.com>
- <CAPpSM+Sph2Drdv_HxKTkfkHP-qDPqrRHYQ9eaOhJ5YGE-5cKYQ@mail.gmail.com> <ak5czs34RMdBhPkP@hovoldconsulting.com>
-In-Reply-To: <ak5czs34RMdBhPkP@hovoldconsulting.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 8 Jul 2026 11:15:00 -0400
-X-Gm-Features: AVVi8CfYROOt-cSHN2PWEaGgx9WIED1MmbNOzj0LWH8N2V0uAhNurT7DiXGwKKk
-Message-ID: <CABBYNZ+gp57kxcXZTLWgd5n19cmDc1Z8TimW0bv7CQLT7khzug@mail.gmail.com>
-Subject: Re: [PATCH bluetooth] Bluetooth: qca: fix NVM tag length underflow in
- TLV parser
-To: Johan Hovold <johan@kernel.org>
-Cc: Xiang Mei <xmei5@asu.edu>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hovold <johan+linaro@kernel.org>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bestswngs@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: split coredump worker into
+ per-trigger works
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <178352700464.3009771.15016263615696178190.git-patchwork-notify@kernel.org>
+Date: Wed, 08 Jul 2026 16:10:04 +0000
+References: <20260702170359.26233-1-kiran.k@intel.com>
+In-Reply-To: <20260702170359.26233-1-kiran.k@intel.com>
+To: Kiran K <kiran.k@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+ chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com
 
-Hi Johan,
+Hello:
 
-On Wed, Jul 8, 2026 at 10:21=E2=80=AFAM Johan Hovold <johan@kernel.org> wro=
-te:
->
-> On Tue, Jul 07, 2026 at 10:55:23AM -0700, Xiang Mei wrote:
-> > On Sun, Jul 5, 2026 at 2:41=E2=80=AFAM Johan Hovold <johan@kernel.org> =
-wrote:
-> > > On Sat, Jul 04, 2026 at 04:10:30PM -0700, Xiang Mei wrote:
->
-> > > > The loop body
-> > > > then reads a 12-byte struct tlv_type_nvm past the end of the short
-> > > > vmalloc'd firmware buffer (and the EDL_TAG_ID_* handlers can write =
-past it).
-> > >
-> > > No, only four bytes are read before the loop exits without any furthe=
-r
-> > > consequences due to the following check:
->
-> > Thanks Johan, and you're right. Only the 2-byte tag_id (and at most
-> > the 4 bytes of tag_id/tag_len) is read out of bounds. This commit
-> > message overstated the impact, and I should have caught that.
-> >
-> > Unfortunately, the bot merged this patch when I was preparing the v2
-> > this morning. If you think the inaccurate commit message is worth
-> > fixing on record, I can send a follow-up to the maintainers to correct
-> > the message
->
-> It was Luiz who applied the patch -- perhaps he did not notice my
-> conditional Reviewed-by tag.
->
-> I assume the Bluetooth tree is not rebased so I don't think there's
-> anything that can be done here and there is no need to send a v2 (unless
-> Luiz says otherwise).
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-If only the commit message that needs updating then I guess we don't
-need to worry about if stating something slightly inaccurate.
+On Thu,  2 Jul 2026 22:33:59 +0530 you wrote:
+> btintel_pcie_coredump_worker() handled three unrelated jobs in one
+> work item: collect a DRAM trace coredump, read the hardware exception
+> event, and read the firmware-trigger event. The worker walked three
+> flag bits at runtime and each interrupt path mutated multiple bits
+> to communicate which sub-jobs the worker should run, which made the
+> ownership rules for those bits hard to reason about and entangled
+> the trigger reason with the in-progress accounting.
+> 
+> [...]
 
-> > > With the commit message fixed you can add my:
-> > >
-> > > Reviewed-by: Johan Hovold <johan@kernel.org>
->
-> Johan
+Here is the summary with links:
+  - [v1] Bluetooth: btintel_pcie: split coredump worker into per-trigger works
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ca75417ab179
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
---=20
-Luiz Augusto von Dentz
