@@ -1,368 +1,216 @@
-Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazolkn19012056.outbound.protection.outlook.com [52.103.2.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148EC393DF5
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jul 2026 13:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027E742F6E2;
+	Wed,  8 Jul 2026 14:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.2.56
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783518687; cv=pass; b=dwMTFzt5vy5ksWuIm1wwE/42KH6qO87xUs6APOihr6nPlX/rqvofUC2ZNLk9nI7OGz6cmwamvmsEBBK5lJxbrQclqcSoDgfZ/QcK1+Dg3e5t7flbkDZScjHaWbVw96xBDaA7Rdll9/jMEh3nxSi97ggCdXGCBj3jfikIZ+LWXpA=
+	t=1783519355; cv=fail; b=k3LDGk4CthZsGYo4IfmdYNbp3xYjHtWL5S3+W+c7x9p/N8rMabHMW6WJ6UPc/caF8wfLmOPmnQ3v2cItrOQ5DdlXbghP4F6ntsfQ9DFGTX+VW6+BoFvHzvlkAqqnXU7v/+UKIwci8l5GbjOwFC0v7XHWBastCejCVsLTQX2li5I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783518687; c=relaxed/simple;
-	bh=JEw8HwFuQl+tAwqyru3dgnqdruNr5r2f0R67dLeVx6Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mdadUP22QHWtQAat/cyRw9A8OdltsLswpzmHx8XeV/DYQ+B7Zk03BiyuH8UMVtems5nDw0PPN48Sbyz4ydri9ZyO7vXcMmY/o/6GII2jCmxJmIoSkBaXVa8QqZFpQxHgmNf0DSYs2WkjV33Kmy3miq+j+xDr2OZsomlxzNFAz04=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JOcVW4n8; arc=pass smtp.client-ip=74.125.224.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783519355; c=relaxed/simple;
+	bh=lPN7dOzP21ObA8pwwQ0TjC4q5ZDphs4udITRaKbJtvk=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=d+A5IK5R/sLnRh6gSv0Y95/rtb9m4Bkmnx+81QUeh7fbBd/pD/jRip0fk2LPa3V7OJe2hHiWYi5XLqSxzlWOKvZKO3712T8d3v1odd1sbYdciID9KPbqCr1/NWUlPjzHbZpoGxAmnNNd6y6xXVu9SnpMO8Dd4r9J13PFxT3sx6w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=duQJrz6i; arc=fail smtp.client-ip=52.103.2.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JOcVW4n8"
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-667b0ced2d3so297064d50.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jul 2026 06:51:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783518674; cv=none;
-        d=google.com; s=arc-20260327;
-        b=H2CNNObRVK+ECCH18GPrBzYuOrKI9poWMxjo8Wpfsy84C4OGj64A0g9b1IeDLl+1FT
-         rygTdi+WX6YtlXalAJ0TOH4jAd/WjnN9Uend2SLO7IiS2fEaVIopb2uOklHtfN1FEkzO
-         +LqRKV2FioayBQlOKLanS5K6IMVqxBJCd2m5esZIhQCuf4nyp0DipzOQ0aKGTKqX2Vre
-         49Pc8pxMstiQtEfosRUamX5Fhni0DPcwKNzF7XqOYPBPklJ2v40CdQvnIVAk4p/KdZNb
-         YrhBQs2BAh05CRNE5CFydMLVU9wfX8rMfdTdHxOAs3j5w3LAx/z4DFOSUmHwDUpmi8qe
-         B2eA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ZV3C4UpUpSJJxBdiVf23ZW56xvpWwW6MMX7CrWEfTZA=;
-        fh=s2X4nHVHbl3UT8dCE6qXcF9REzH7uKX3ePhmwy9Bxi0=;
-        b=O2iVMEz+hGcMDZJkUn1KjGDS5Fwq3JGwGPxks4DygjS9YnuK6s6kHLkv1H5Jx6pldf
-         gEXuvS+OOUdHw5xJMG/ZFyIu2ObErKQIHg4uPb/rQvFyZ0y06SvQ97+js7DxAdDjShhI
-         zRFhQiyaiI7KJOPjVM0MHnQw+8YmUdjPbW4owtSkhpJr3859BEBkE+gMWiSeu+eGUrje
-         7ymWCqF0wKCbbRSxoFGSe/M3LN7LcvD6/73AIGx6ZawpwuPqagjwkimjv5NFJMC3Tcmw
-         ELwLZM18+ST4ktzapjXOuayjthC8K5i3JxbpXBYt9A34Yn+1te4bmbEGKgh/vcU7CgXH
-         X0OQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783518674; x=1784123474; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZV3C4UpUpSJJxBdiVf23ZW56xvpWwW6MMX7CrWEfTZA=;
-        b=JOcVW4n8UerNhfWvNml/+fRPG4+3lkFIJdyUG0fWTMVeBlOfm9OOcRoH31tA/39Eqa
-         R2awZjRVC8UVswq74M2P8360aU9HsQZXRn5LN5vYmDxPQkfQugQRwfc15mGOBtJqoVyg
-         S8DhrABqwX4NnVEdbh2AdWKkwg1MJ7hmO+D27gtlIAjipGgMxqJjyQuBd1sB8zKU5US1
-         tyXPO/IQ00DsAuLPvdD9SSXwtf1ZkoIcWfwT2zqIi4awDIgyhS/JQhABUHfbiqRSmzT5
-         YNPOmSZCjMhS6dKEWGPoHXq8j1KpBbtEFkpIpCVaSr+4kMfOYvgj7He14AhFX9YaeILp
-         6A8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783518674; x=1784123474;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZV3C4UpUpSJJxBdiVf23ZW56xvpWwW6MMX7CrWEfTZA=;
-        b=XiNfS93ZmPuDuxIVJPPyhDRSqVitMvxgjLjjeo4WawqNsIdmehZpDd9frHithRQxv1
-         8/2Z+fSDcdn9LG6sl8RX7b5fxALMMU2/fD7bFg3OadB9zDkfu7lPtBJy+pYmIo9JaOjg
-         hvJcqYAdWH1a93SEIKKoo5Jx6I3G8T2kuWbedA9BnD3Ka/H+IM8CZrkxv9/N2U80/mGu
-         PAlUFU8leOHH6X7r6FtnDmiUBbdSp0ebSjkYu5fyRUXnOptWVs6ZscplNTyTc2ty/Ov7
-         wF6D23b4zwemepETL5wee0rAioKt9dgZWXzkd6eddObZurJ9K8sCQa9E2kINUTvImgp8
-         6WkQ==
-X-Forwarded-Encrypted: i=1; AHgh+RryeXABLW2NP3fpCt6KHulk8st/IjRFqixLOPrjv1c5gBNCTx3R959H19Rb8n5ToSDpFqwfDUQdRScsCkXwptM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOy2868Y6BG50CCyUtB5hEE/Yr2JZXKdr50Ldw8uGObIIrIfc5
-	sL8LqWEl98jMcBHE5OrHqZSvfy2ERANysi0Mz8MPmRTsM3URu7Y52M+M/fvVoy1t+0iM0AfNkkG
-	nXVNwAcqb2G9JKmHevoZExSSiqIMJrtw=
-X-Gm-Gg: AfdE7ck/eufeISBzIkvGlr2W75P+4/aDw1Sj4wknJTCK+Hx3JAdAqbwBV+m8wdARtvp
-	CcKmv0UUFSS/YLO1HrCS1MKyjpM3MwqK0M81dy4KcqHZ6QQFDJWxQZOFzhxcnAlauYojQ3ysb78
-	Gdk/yYXVKBjoL/90UdGiq9g2ENTg6WjCdgSI2GjcRgyRUsZYyIz3JxYBKQqvOBYPff+ewAWsBqI
-	22/qe/AqINU6taYUqWa9bkxU7ehiYAKZN05WxkXzwNaWR77bFm+hqJSOxdk0GjSnw7IXbmFVXv3
-	WevIiVuHKYBhGu2FAXTEA4yQ5CjD7lEIxZMuMoUfwtpicpTqmxIjWZhxbuo=
-X-Received: by 2002:a05:690e:4841:b0:667:6c44:ba95 with SMTP id
- 956f58d0204a3-6679f153120mr1460876d50.62.1783518674078; Wed, 08 Jul 2026
- 06:51:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="duQJrz6i"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fKrnrmm8KAF9P5kDrg0DHzzVOJ2gUpaij9RYZaRbq4WOCQrtMfupNY+3klPMqvazDSx9I4dBsp5lMNgotNPIfNf2CFn1pTtALkvIgFVefIDorhjIdh+10CkICs55sbkn53NVN1znS1Z8tybuzvU7AnlKXON9CgszMt+PsE9NCiJnkDbQpWBHWRqSn4TMenN8YPckGnEsiPZP8X1syKVAAy8u7W1X3jYleX/uXbBVTrc51XM8igy1xI+w77IzlL1T8PDORKv/fyAh60J9p5UYlnXIIHUieH7OcQpTlhtZtzL4aEzkBkE81+q0zQ6aGdNGJadlU/mwHqbBt2VNgRhpMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9YZWTEsOBI3O4NwMkyRUHa58SBz1BZ3S3lL4WqVLHKw=;
+ b=lpYiA926ceuXuZxvb7VEpiw8agGdjnruYJ1MpF+w3spxAPP2yfDxQXuP/LEDzuVfRii0I1DyFRm4bkS7JD0ELX7Ss3DE8h6oTjEwNbLupnXeRH3tSmEpPAknCeh+BWbRj8479Si69iOs1cNLnoBsnGChnQb0sljkTpHhZoU+DzTSTB4IvfAu3bjHGGvYV/UAfXc0PrzpmH9/H4jUdeesO1EhzQz2Q2g+5DyQJyA1hiyshkt3HAyKAbh9+gNfAa3mSenvMWXdEQ2ZNGgx6fbOV7FdsdOeWyUqejST+b0nMcbpL6FhA0uSVhbZwHS1ZxOh0i7e6czbk3lR/FNA9/4yJg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9YZWTEsOBI3O4NwMkyRUHa58SBz1BZ3S3lL4WqVLHKw=;
+ b=duQJrz6iU6pOesZNO4lKK6G96DUO16WWJYRC6k2hSOfn2pIBpo0BrVGnN4/GcyxowFCWH89KHnwEZcArIeFPMNyAQt4HW/O+ULI+HdpUBEpeCEzNbXAkkY+JAR6belfeDoqw9BbB6/PWhYWIHmTrUgSqMDKf6cg2+p5TVZ5VXHbn1X+3fM/1xmUc8YaSIIWrcneYF13RvuH4s2zFBMp58/5IvzbzoxcDYbS4De3/BhcLQln6ywb4cOtLHxFpWSgwVUydOlJD0IAIN13hSY87ow5F5DMbbQTYfeDUDghLSR+XDvkfMQZZZwi+GefAkdpkz+v8soylsP1mAF8PU+NB8g==
+Received: from SN7PR19MB6736.namprd19.prod.outlook.com (2603:10b6:806:263::12)
+ by SA1PR19MB6599.namprd19.prod.outlook.com (2603:10b6:806:253::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.11; Wed, 8 Jul
+ 2026 14:02:31 +0000
+Received: from SN7PR19MB6736.namprd19.prod.outlook.com
+ ([fe80::4b6c:b84f:b71c:d0a]) by SN7PR19MB6736.namprd19.prod.outlook.com
+ ([fe80::4b6c:b84f:b71c:d0a%3]) with mapi id 15.21.0181.009; Wed, 8 Jul 2026
+ 14:02:31 +0000
+Message-ID:
+ <SN7PR19MB6736D59014488112041508E99DFF2@SN7PR19MB6736.namprd19.prod.outlook.com>
+Date: Wed, 8 Jul 2026 18:02:22 +0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 4/6] Bluetooth: Introduce Qualcomm IPQ5018 IPC based
+ HCI driver
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: George Moussalem via B4 Relay
+ <devnull+george.moussalem.outlook.com@kernel.org>,
+ linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>
+References: <20260706-ipq5018-bluetooth-v4-0-350262a30959@outlook.com>
+ <20260706-ipq5018-bluetooth-v4-4-350262a30959@outlook.com>
+ <CAMRc=Mf3TpJ6hM=LbX6GwztY-rGG66AeGGJ1pxLmWUSSK91Dtw@mail.gmail.com>
+Content-Language: en-US
+From: George Moussalem <george.moussalem@outlook.com>
+In-Reply-To: <CAMRc=Mf3TpJ6hM=LbX6GwztY-rGG66AeGGJ1pxLmWUSSK91Dtw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MR1P264CA0203.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:501:57::18) To SN7PR19MB6736.namprd19.prod.outlook.com
+ (2603:10b6:806:263::12)
+X-Microsoft-Original-Message-ID:
+ <02d534a0-9bba-40b6-94fb-fd9088ea1890@outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260708093822.3495633-1-xiuzhuo.shang@oss.qualcomm.com>
-In-Reply-To: <20260708093822.3495633-1-xiuzhuo.shang@oss.qualcomm.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 8 Jul 2026 09:51:02 -0400
-X-Gm-Features: AVVi8CfaHmxTvZvtG2K6Ng3GQP2_U34HrbzGAz_wFxb8w03AATbevrrfs9zcCE4
-Message-ID: <CABBYNZJ+Kw0RGE3sW4AWUTzHeAH0Z1UhBQwdkhtpQg5FKOUtCw@mail.gmail.com>
-Subject: Re: [PATCH v3] Bluetooth: MGMT: Fix discovery state race against
- cmd_sync worker
-To: Xiuzhuo Shang <xiuzhuo.shang@oss.qualcomm.com>
-Cc: Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-arm-msm@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com, 
-	wei.deng@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com, 
-	mengshi.wu@oss.qualcomm.com, jinwang.li@oss.qualcomm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR19MB6736:EE_|SA1PR19MB6599:EE_
+X-MS-Office365-Filtering-Correlation-Id: 87818d6b-1efc-4081-438a-08dedcf98d43
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|51005399006|19110799012|41001999006|5072599009|25010399006|8060799015|15080799012|23021999003|24021099003|6090799003|37011999003|12121999013|440099028|3412199025|40105399003;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?TTFyVWliNXl5ZVRmUkNUTGlUSWl3N1I4TTZRVnFHbmUvZVMyWTdoQkZKU0Fa?=
+ =?utf-8?B?MCtFblRKb2M3T3BRTzcyRzFVN0xuK2VEWFBTK1htMFZTVTFPL3hhTFpSeFV3?=
+ =?utf-8?B?V2V2bmgzU09xSGRiMjUrUjJscmtFdGRnS2dMS21Da1RIN2xVbFhaT0UwQTZP?=
+ =?utf-8?B?Y0NXKzNzeUc4YTNlK09vVlNIdnRObXRwSUZMOVdzNFExcUFFSHpVVkZRUlRt?=
+ =?utf-8?B?NDRsaXN0M3p5SElwd2tTb25ickZXbG8zNTN4cVBZM2VHQjZ1aS9Xa0QyMjFn?=
+ =?utf-8?B?Uzc0Lzg2SUxTcytpaWR1dDNlYzZsVmdsczZHVk9yMi80QlNDNE0zNDN6eEJo?=
+ =?utf-8?B?V3loUzd6TGJRZ3BJM0FyUE5HeXJWTmxEVmpWbDYrekl0aDRrbldqMU93VXBC?=
+ =?utf-8?B?WFJ1VE1XWkduWnBUaXBaSnpLUnVLRkx0cmRiYkRUMC9hRFBUbmxKbHBJMDhr?=
+ =?utf-8?B?cG5iU1hSbm5McmFWRXpuMTdCN1NZUWRRZmJzcXdTcHFZZWIxNTJnZ3BoTkVS?=
+ =?utf-8?B?NjN2aUpXakFja2p4REpEeHdRSTJMUGxtOE9PYUl2V29YZWRnRG5BT1RFSFc0?=
+ =?utf-8?B?M3dwVlg1Z1Ivb3NyamY1dC9RUUlBUnBvNU9qRjZlbU1TQjgyRFBKNGNJR0dV?=
+ =?utf-8?B?QUk2NUJoeTY1M2hpaUFhaFYwaU1Famd4NWNRKzZ5eTRHMzVwY3M3T2ZVdkxF?=
+ =?utf-8?B?dFNHUExQZGNja0syeStxSUVCVGlTcUUrTytMMm9MM2RjM3VieW1uNW1qQW8w?=
+ =?utf-8?B?NnVCZjBxcVJlVWRDdzJ1UFF6cEZuT2lYbVBtRGU5UnJIWkx6NVFzZUNkNVpF?=
+ =?utf-8?B?OWpDSW9iWVU5WExmZkN5dVNBOVJXNThTcWF6eHZoVUJyWlc1bnJVTXIvZ2Qy?=
+ =?utf-8?B?Z3NwN1JQRmJhVFZXSmZPbGZCakxZaDlHWUR5VmgzdW9IZ3Y0KzhLd1ZCaml1?=
+ =?utf-8?B?c2l2T3RBSmdLWGRHYzIvVUk3NWtyeE9zWVFDK2krOFFaMFpEUExnc1BMNHMr?=
+ =?utf-8?B?UHhSWlp0Z0JRMlprZElMTXVxb3VmSnhxc1JJVHhKd09nWUZiKzdrZFIvakhN?=
+ =?utf-8?B?N1lEWDRIMHZiQmo2aGF6YTVTbE9yUEhOME9lMjh6SEFEb0pvT1kyeXRnTFcw?=
+ =?utf-8?B?Ri80dXVmY3N3N1R3bnFLY3ZPOWllNlE0TmlpNkdvTUFlT1JhL1pveXBZTlEr?=
+ =?utf-8?B?eDRTRVNtbkhQZytUbnJzb3NyQVJNQmpWbUM0N09CN3JnbTJPV3BVMW1oZUwr?=
+ =?utf-8?B?S2dmK3JUWHVOUU5XM010K1BQV0g5Z3dtU2FRVW5mcnVMNXJIYnROMnBkMWJu?=
+ =?utf-8?B?NU5mMUlLVTdyb1pFSTl6S2JGNEZZZEtUZGJyRmJGUDIzTXVjcC9iWUkzSzRF?=
+ =?utf-8?B?dFc0R3dCczdUZHVpellrbmpiMHRvclRrT1lOY3QxMU5GT1I3amFBeURDS0hJ?=
+ =?utf-8?Q?AKpbRleI?=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RXo5NXFSK1VIWVJSMi80VW9Ud2tvaDErRGZQRThGeDhadVI5Y0FxNFd0UGZs?=
+ =?utf-8?B?WXJDdkllOGc5dXpWdTU3bFRRUjhnNTVqNmZHWjF1U0pTOVR5elVPTjFBWllQ?=
+ =?utf-8?B?M0tyUXBERWFqZ2FlTGpyOFNsT3ZSVEFHSUttY0J1WGhESGltbzU2QUU0bFNC?=
+ =?utf-8?B?Z2MyWU9RcTF4OU1mZW1iRlhMZVIwU1dib0w3ZFRldXR0WVVNdGxjRW84aE4r?=
+ =?utf-8?B?UGxVM25wL2NyV0VuaXd0OXRrTW8yWTFodUtmZ24xbjZhQkFXUzhHNEc5aXIv?=
+ =?utf-8?B?SXYzQldWUWVuU1RmdFFhd01UYmovYnFUcndpa1IzTjVZbUpuY2NMdGtob3Vw?=
+ =?utf-8?B?b05aL29BdHBJSVNUYjRuMTNOd2JjekY2dE4wRmpFNVNPMllxWVhPQXNncUtB?=
+ =?utf-8?B?OTVCWG8zMVRNWDlrTXNmZGhvRlg2cS9odWFBMUdLR2VzRWwzRElMeDhrc3o3?=
+ =?utf-8?B?cGpNQVNKSUwrNWRIVXplWHVjbFc3bzlDek1PR3h5TGJSUlAyd0g1NTM2K010?=
+ =?utf-8?B?TUVYYjg1Tkg2a252MzVFV3NOTVZSL1pkL2JBMUNqSnJ0cUJOTmF4MkRrbllk?=
+ =?utf-8?B?TDAvU0tkd29SZ1NPaXNHR2xPMWZqQWt5cGt3OE1SRS9lVFBpR1J5VFpVaXpG?=
+ =?utf-8?B?aFk2KzNLL0FhUjE4ZWR6eWZIRXdhZlRlK2F2SEc3cE5ESncvdTJpYU4xb2VB?=
+ =?utf-8?B?Y0NsNVJRbFBhSjVtWXUwY0VQR3NxYTNSazYvYnVvbTJ4UHZxZWhaM3Nmdjda?=
+ =?utf-8?B?dWpqclQ4MlVlNndUL2psZ2k4N3BtSy95c1VWcmx1R1FSc3lQZjRZOHp6aklp?=
+ =?utf-8?B?TUorRVhPVzdhRmxnNFRYUGZJeG1uQVFSbjErNUpzdUV4Y2xBTmt4K0dEdDln?=
+ =?utf-8?B?WEtheG41c2JDbi8wSmlBZ3BHUUlXYmw1R2k2dGZMd0VpQXJpQkkzWG5rY1BE?=
+ =?utf-8?B?REkzS1lVcC9Ca2pSTWJRbDNma2FOY2lSYTB5eUE0NnczWmJiRnZ3ZUE1Zzly?=
+ =?utf-8?B?RXNIY25sTWpsd3hxL2RsTERQK3pYM0VWeUVHdi9MN0lmbUtOaXUxOE04dnFn?=
+ =?utf-8?B?SytVaVQ0WjVHZU42S3hHak9lMkl4TkF5WXgvK0RjU0tkelFrMDExeElwRVA2?=
+ =?utf-8?B?Zm04MXlNN0ZsanAzaWl3bTc1Z2ttL0xCQmUyS01CcW41YXFDUUx1TDU0aHZz?=
+ =?utf-8?B?c0djOEFzWkVSODlIQk9ZN3NXZDJLRUtzZXllU1poVkNucDRxNU1xT3VVdGFN?=
+ =?utf-8?B?NkRvQWVCN0ZGR0NXZDRqUTRKaGJxTE5TdjVaY0drSDI4S1FZb1h4YWRvMFNl?=
+ =?utf-8?B?WTMrTW9rTUVaYTlXQkpNTGN2clorUUI4M1JDKzJRVGVNS3RGYTRVb1VGZFMw?=
+ =?utf-8?B?RVZvWkxnMkZCMS81ZUZTSHhIb2l2S2hzZ0U2LzJtcUtudFpLS0dGaEd3SUsx?=
+ =?utf-8?B?TVpuT281cG53NFZHWVhuR0x0Mk1EMkJxZmwxTmFCT0VwUEZjUThoSXNVSzBW?=
+ =?utf-8?B?eTZvQmxPRFY5anRhMjBuaUFCc1E1c3dWRlJpZDZzNU5ZbVpYckpmQ1hERko1?=
+ =?utf-8?B?QVhpVWhtbzhsWUtlampBZWlqWFFra1RSbTBXQ1g5Yis0Rm0yaDZyWm95aXl5?=
+ =?utf-8?B?V1Z1N3h5QVIvcUJnaDFYMHRPNkFXaE5pVVJ4TmZOQU5KQVozM1ZtRW54ency?=
+ =?utf-8?B?K2FHOXZlYjIwdkFBR3RWWlZNa1FjMC91WXp0UHFHTVdTclMxOSsyZkZRcTF3?=
+ =?utf-8?B?T1VyTlN1NUhrdHYxUDdrNVZ6cmUvUmRvNDc0aW9Eb2wzVy9XWnlxV3NSR1Iw?=
+ =?utf-8?B?amtEdW5zSUZlT3pnbTAyUTlVb2VwSE9UcHVEcmZiblN0MHlvcUtZQzQ0aFky?=
+ =?utf-8?B?NWpEYkhrU0hmdUp4Y3RMaURqVnNBbzJTQVN5Z0RudXBZV0E9PQ==?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87818d6b-1efc-4081-438a-08dedcf98d43
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR19MB6736.namprd19.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2026 14:02:31.7268
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR19MB6599
 
-Hi Xiuzhuo,
+On 7/8/26 16:37, Bartosz Golaszewski wrote:
+> On Mon, 6 Jul 2026 19:26:20 +0200, George Moussalem via B4 Relay
+> <devnull+george.moussalem.outlook.com@kernel.org> said:
+>> From: George Moussalem <george.moussalem@outlook.com>
+>>
+>> Add support for the Bluetooth controller found in the IPQ5018 SoC.
+>> This driver implements firmware loading and the transport layer between
+>> the HCI core and the Bluetooth controller.
+>>
+>> The firmware is loaded by the host into the dedicated reserved memory
+>> carveout and authenticated by TrustZone. A Secure Channel Manager (SCM)
+>> call safely brings the peripheral core out of reset.
+>>
+>> A shared memory ring buffer topology handles runtime data frame
+>> transport between the host APSS and the controller.
+>>
+>> An outgoing APCS IPC bit and an incoming GIC interrupt handle host/guest
+>> signaling.
+>>
+>> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+>> ---
+> 
+> ...
+> 
+>> +
+>> +		/* Check if firmware is split across multiple segment files */
+>> +		if (phdr->p_offset > fw->size ||
+>> +		    phdr->p_filesz > fw->size - phdr->p_offset) {
+>> +			seg_name = kasprintf(GFP_KERNEL, "%.*sb%02d",
+>> +					     (int)stem_len, desc->firmware, i);
+>> +			if (!seg_name) {
+>> +				ret = -ENOMEM;
+>> +				goto release_fw;
+>> +			}
+>> +
+>> +			ret = request_firmware(&seg_fw, seg_name,
+>> +					       desc->dev);
+>> +			if (ret)
+>> +				dev_err(desc->dev,
+>> +					"Could not find split segment binary: %s\n",
+>> +					seg_name);
+>> +
+>> +			/*
+>> +			 * Use the virtual instead of the physical address as
+>> +			 * the offset
+>> +			 */
+>> +			memcpy_toio(desc->mem_region + phdr->p_vaddr, seg_fw->data,
+>> +				    phdr->p_filesz);
+>> +
+>> +			release_firmware(seg_fw);
+> 
+> I think sashiko is correct pointing out this would be left uninitialized.
 
-On Wed, Jul 8, 2026 at 5:38=E2=80=AFAM Xiuzhuo Shang
-<xiuzhuo.shang@oss.qualcomm.com> wrote:
->
-> start_discovery_internal(), start_service_discovery() and stop_discovery(=
-)
-> queue a cmd_sync work item and only then move the discovery state machine
-> into its transient value (DISCOVERY_STARTING / DISCOVERY_STOPPING):
->
->   err =3D hci_cmd_sync_queue(hdev, ..._sync, cmd, ..._complete);
->   if (err < 0) { ... }
->   hci_discovery_set_state(hdev, DISCOVERY_STARTING /* or STOPPING */);
->
-> The matching completion callbacks run on hdev->req_workqueue serialised
-> by hci_req_sync_lock, which is independent of hdev->lock. So once the
-> work has been queued, the worker can be scheduled, run the sync function
-> and invoke the completion before the caller has executed the trailing
-> hci_discovery_set_state(). The completion's success path writes the
-> terminal state (DISCOVERY_STOPPED for stop, DISCOVERY_FINDING for start);
-> the caller then overwrites it with the transient value, and the state
-> machine is wedged: every subsequent Start (Service) Discovery is
-> rejected by the DISCOVERY_STOPPED gate with MGMT_STATUS_BUSY (0x0a),
-> with no HCI traffic generated, until bluetoothd or the adapter is
-> restarted.
->
-> Fix it in three parts:
->
->   1. In all three call sites move hci_discovery_set_state(STARTING /
->      STOPPING) to before hci_cmd_sync_queue(). The transient state is
->      therefore always published before any worker can run the
->      completion. On queue-submit failure, roll back to
->      DISCOVERY_STOPPED.
->
->   2. In start_discovery_complete() and stop_discovery_complete(), wrap
->      the terminal hci_discovery_set_state() call with
->      hci_dev_lock() / hci_dev_unlock(). These callbacks run without
->      hdev->lock; serialising the state write matches the pattern used
->      by mgmt_set_powered_complete() and removes any residual ordering
->      hazard against a concurrent mgmt path holding hdev->lock.
->
->   3. Generalise the "ignore -ECANCELED" early return in both completion
->      callbacks to "on any non-zero err, also reset the transient state
->      to STOPPED". With (1) in place the state observed at completion
->      time is always known.
->
->      For the stop path this also fixes a pre-existing wedge: when any
->      sub-command issued from hci_stop_discovery_sync() returns an
->      error, stop_discovery_complete() is invoked with err !=3D 0. The
->      existing "if (!err) set_state(STOPPED)" tail then skips the reset
->      and the state machine sits in DISCOVERY_STOPPING forever.
->
-> Fixes: abfeea476c68 ("Bluetooth: hci_sync: Convert MGMT_OP_START_DISCOVER=
-Y")
-> Signed-off-by: Xiuzhuo Shang <xiuzhuo.shang@oss.qualcomm.com>
-> ---
-> Changes in v3:
->  - Replace inline patch title with lore.kernel.org URL in v2 link
->    reference to fix GitLint B1 line-length check.
->  - Link to v2:
->    https://lore.kernel.org/all/20260708062009.3047447-1-xiuzhuo.shang@oss=
-.qualcomm.com/
->
-> Changes in v2:
->  - Fix if (err < 0) to if (err) in both start_discovery_complete() and
->    stop_discovery_complete() to also catch positive HCI status codes,
->    flagged by Sashiko.
->  - Add Fixes: tag for commit abfeea476c68 as requested.
->  - Update commit message wording from "err < 0" to "non-zero err" to
->    match the code change.
->  - Link to v1:
->    https://lore.kernel.org/all/20260707093426.372897-1-xiuzhuo.shang@oss.=
-qualcomm.com/
->
->  net/bluetooth/mgmt.c | 86 +++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 74 insertions(+), 12 deletions(-)
->
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 733a4b70e10c..81c09c24a14b 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -5975,15 +5975,38 @@ static void start_discovery_complete(struct hci_d=
-ev *hdev, void *data, int err)
->
->         bt_dev_dbg(hdev, "err %d", err);
->
-> -       if (err =3D=3D -ECANCELED || !mgmt_pending_valid(hdev, cmd))
-> +       if (err) {
-> +               /* The queued start-discovery work failed before the norm=
-al
-> +                * completion path could advance the state machine. The
-> +                * caller already moved the state to DISCOVERY_STARTING
-> +                * (under hdev->lock, before queueing). Reset it here so =
-the
-> +                * gate in start_discovery_internal()/start_service_disco=
-very()
-> +                * does not wedge in STARTING and reject every future Sta=
-rt
-> +                * (Service) Discovery with MGMT_STATUS_BUSY.
-> +                */
-> +               hci_dev_lock(hdev);
-> +               if (hdev->discovery.state =3D=3D DISCOVERY_STARTING)
-> +                       hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-> +               hci_dev_unlock(hdev);
-> +
-> +               if (err =3D=3D -ECANCELED)
-> +                       return;
-> +       }
-> +
-> +       if (!mgmt_pending_valid(hdev, cmd))
->                 return;
->
->         mgmt_cmd_complete(cmd->sk, cmd->hdev->id, cmd->opcode, mgmt_statu=
-s(err),
->                           cmd->param, 1);
->         mgmt_pending_free(cmd);
->
-> -       hci_discovery_set_state(hdev, err ? DISCOVERY_STOPPED:
-> +       /* Serialise discovery.state writes against any concurrent mgmt p=
-ath
-> +        * holding hdev->lock; this callback runs on req_workqueue withou=
-t it.
-> +        */
-> +       hci_dev_lock(hdev);
-> +       hci_discovery_set_state(hdev, err ? DISCOVERY_STOPPED :
->                                 DISCOVERY_FINDING);
-> +       hci_dev_unlock(hdev);
->  }
->
->  static int start_discovery_sync(struct hci_dev *hdev, void *data)
-> @@ -6051,15 +6074,23 @@ static int start_discovery_internal(struct sock *=
-sk, struct hci_dev *hdev,
->                 goto failed;
->         }
->
-> +       /* Publish the transient state BEFORE queueing the work. The
-> +        * completion callback runs on hdev->req_workqueue serialised by
-> +        * hci_req_sync_lock, which is independent of hdev->lock; setting
-> +        * the state after the queue allowed the worker to win the race
-> +        * and have its terminal STOPPED/FINDING write overwritten by thi=
-s
-> +        * trailing STARTING write, wedging discovery in STARTING.
-> +        */
-> +       hci_discovery_set_state(hdev, DISCOVERY_STARTING);
+yeah, I'm working my way through the issues reported. Will fix this.
 
-I guess I will need to repeat myself, now that the callbacks do
-acquire hdev lock the comments above are invalid, the callback will
-attempt to hdev->lock making it wait the hci_dev_unlock bellow past
-setting DISCOVERY_STARTING, so the change above is no longer needed.
+> 
+> Bart
 
->         err =3D hci_cmd_sync_queue(hdev, start_discovery_sync, cmd,
->                                  start_discovery_complete);
->         if (err < 0) {
-> +               hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
->                 mgmt_pending_remove(cmd);
->                 goto failed;
->         }
->
-> -       hci_discovery_set_state(hdev, DISCOVERY_STARTING);
-> -
->  failed:
->         hci_dev_unlock(hdev);
->         return err;
-> @@ -6178,15 +6209,19 @@ static int start_service_discovery(struct sock *s=
-k, struct hci_dev *hdev,
->                 }
->         }
->
-> +       /* Publish the transient state BEFORE queueing; see the comment i=
-n
-> +        * start_discovery_internal() for the race details.
-> +        */
-> +       hci_discovery_set_state(hdev, DISCOVERY_STARTING);
-> +
->         err =3D hci_cmd_sync_queue(hdev, start_discovery_sync, cmd,
->                                  start_discovery_complete);
->         if (err < 0) {
-> +               hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
->                 mgmt_pending_remove(cmd);
->                 goto failed;
->         }
->
-> -       hci_discovery_set_state(hdev, DISCOVERY_STARTING);
-> -
->  failed:
->         hci_dev_unlock(hdev);
->         return err;
-> @@ -6196,17 +6231,40 @@ static void stop_discovery_complete(struct hci_de=
-v *hdev, void *data, int err)
->  {
->         struct mgmt_pending_cmd *cmd =3D data;
->
-> -       if (err =3D=3D -ECANCELED || !mgmt_pending_valid(hdev, cmd))
-> -               return;
-> -
->         bt_dev_dbg(hdev, "err %d", err);
->
-> +       if (err) {
-> +               /* The queued stop-discovery work failed before the norma=
-l
-> +                * completion path could advance the state machine. The
-> +                * caller already moved the state to DISCOVERY_STOPPING
-> +                * (under hdev->lock, before queueing). Reset it here so
-> +                * the gate does not wedge in STOPPING.
-> +                */
-> +               hci_dev_lock(hdev);
-> +               if (hdev->discovery.state =3D=3D DISCOVERY_STOPPING)
-> +                       hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-> +               hci_dev_unlock(hdev);
-> +
-> +               if (err =3D=3D -ECANCELED)
-> +                       return;
-> +       }
-> +
-> +       if (!mgmt_pending_valid(hdev, cmd))
-> +               return;
-> +
->         mgmt_cmd_complete(cmd->sk, cmd->hdev->id, cmd->opcode, mgmt_statu=
-s(err),
->                           cmd->param, 1);
->         mgmt_pending_free(cmd);
->
-> -       if (!err)
-> +       if (!err) {
-> +               /* Serialise discovery.state writes against any concurren=
-t
-> +                * mgmt path holding hdev->lock; this callback runs on
-> +                * req_workqueue without it.
-> +                */
-> +               hci_dev_lock(hdev);
->                 hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-> +               hci_dev_unlock(hdev);
-> +       }
->  }
->
->  static int stop_discovery_sync(struct hci_dev *hdev, void *data)
-> @@ -6248,15 +6306,19 @@ static int stop_discovery(struct sock *sk, struct=
- hci_dev *hdev, void *data,
->                 goto unlock;
->         }
->
-> +       /* Publish the transient state BEFORE queueing; see the comment i=
-n
-> +        * start_discovery_internal() for the race details.
-> +        */
-> +       hci_discovery_set_state(hdev, DISCOVERY_STOPPING);
-> +
->         err =3D hci_cmd_sync_queue(hdev, stop_discovery_sync, cmd,
->                                  stop_discovery_complete);
->         if (err < 0) {
-> +               hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
->                 mgmt_pending_remove(cmd);
->                 goto unlock;
->         }
->
-> -       hci_discovery_set_state(hdev, DISCOVERY_STOPPING);
-> -
->  unlock:
->         hci_dev_unlock(hdev);
->         return err;
-> --
-> 2.43.0
->
+Best regards,
+George
 
-
---=20
-Luiz Augusto von Dentz
