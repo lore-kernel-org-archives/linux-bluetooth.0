@@ -1,77 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9BFB35C1B4
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jul 2026 16:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B9B35C188
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jul 2026 16:16:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783527026; cv=none; b=gHRBRCZ8LjMKQA8I54Gz6D6DiCJFr7hKtoUUzYWavq5hE0DgqTnrx0xGsQamEv662rGgmXgmH6gk+wxJY6b6yR+mxFrSAq0GLgEwINZetC7bOKrjrPa+bms0d/W4dghRuTc4t3qNHQg1M6vnK6P4R/KDrUelgDwbW99ECNrIxDA=
+	t=1783527411; cv=none; b=l7hAYq+Em3vtYKZZW+8c+3DiTyo55wC5YQygFUw/C84pu42AZfHmG+ize00lbJFKwpXMmXT027iiGoL3J2XkxdZI0DgQtEPnF073KDTp+FzMMW1EGrsNvVTFmR3OI8/mfgnbLm07FIFzgLBBkqQ1Q3lSnUbm/o7tQLHJMkq3nIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783527026; c=relaxed/simple;
-	bh=5pFRg381gD96wE5c2BxF31dsV1L4k0wcqHHNrPUbHlE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=G4uYWHgI90rhpOpDtTX1OlkIyQo3Kwoqw/fhQr36IT0UjC1WMDKw7Yt8HcM6g68iWFQqRqG33bbP5lA/7hNrH1o7l3k3/Vc2uXeHtxaxJYl5GCAU90upZOuNkYy5pJsXefhUkTB+tURMcutoYctaUtgrzvsNX36EPZCXabOOBTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CV92NBSl; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783527411; c=relaxed/simple;
+	bh=6p1CGNSU+0qgY8s4ibdT8fsDjwlxT2VV70rPm1n3PeY=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=IiImCrXZIUGdE5WQRh5iVRIQ7+EnZNT0fVnkKVJVJ98HESV4u7aQfiHmHs229kr3SQxoS3b0k7oFYL2ECfqM5NON8XysieF2GQBJE1wHekWXoXnnNLEEjtHKldXlrF7mhsmQ9xCM78aQALH+5pAWsdV2PBceCib9HzriDoC1sN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Dr0rbACU; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CV92NBSl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FE101F000E9;
-	Wed,  8 Jul 2026 16:10:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783527025;
-	bh=6mVOF+JeoehEOc2F6RYftxZu86yJ4PZmZnccrNLRhMQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=CV92NBSlQ9MaI8o2UKvitktRQbQFzBPBlqxlNkrXP5sTSgdTK8Cm9rPOQuuhrWLOQ
-	 BnAiIU5Ov9PuJUIHZu3A/UgxuP56ZwlJFKXG8K80JkEMwlnOEdn6zS3LQ0e5HFtp0L
-	 kH4zcN/tdVSqsYoH9YeyuAH6XqH/4kaMtR7K3IoaGsKwF9O1DRpAZZmec0mto1A5uf
-	 dYrc092z85psvXUpqLxaBEtb4m/3onzBTX7U89vKjICRTE6ZxOtBEhqn9g1hVMOc7l
-	 XMugGrNw52VMxY4QzfjmUSeQvnncAgAJQM+Y1w9rMFzKIKdzkOd57V0Tv5LtZtB844
-	 b6g0oBO1REapg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D09E53930FBE;
-	Wed,  8 Jul 2026 16:10:05 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Dr0rbACU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1783527409;
+	bh=+6PTjbc0/1BYjjPyeASCylla1/RhQUXkFlRYE3CPrYM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Dr0rbACUCbiJbjijSMOAHO9qRAd1O8NtHvZ+WZmpvz8Ot4LoHfo+Qk+eCwvirf9PD
+	 SIANsTLkCGMjSMY2pkjNcZgMbMATj60AzUyjxmEAP5sF4f8M/qXPPPS12CC0c1diHb
+	 XoEO75fz5P00cUo0DDrTaK9qVnxdYHGPgZNR8lF8=
+Received: from github.com (hubbernetes-node-f38b9f1.ac4-iad.github.net [10.52.81.33])
+	by smtp.github.com (Postfix) with ESMTPA id 40114A094D
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jul 2026 09:16:49 -0700 (PDT)
+Date: Wed, 08 Jul 2026 09:16:49 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/1107894/19245b-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: split coredump worker into
- per-trigger works
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <178352700464.3009771.15016263615696178190.git-patchwork-notify@kernel.org>
-Date: Wed, 08 Jul 2026 16:10:04 +0000
-References: <20260702170359.26233-1-kiran.k@intel.com>
-In-Reply-To: <20260702170359.26233-1-kiran.k@intel.com>
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/1107894
+  Home:   https://github.com/bluez/bluez
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Thu,  2 Jul 2026 22:33:59 +0530 you wrote:
-> btintel_pcie_coredump_worker() handled three unrelated jobs in one
-> work item: collect a DRAM trace coredump, read the hardware exception
-> event, and read the firmware-trigger event. The worker walked three
-> flag bits at runtime and each interrupt path mutated multiple bits
-> to communicate which sub-jobs the worker should run, which made the
-> ownership rules for those bits hard to reason about and entangled
-> the trigger reason with the in-progress accounting.
-> 
-> [...]
-
-Here is the summary with links:
-  - [v1] Bluetooth: btintel_pcie: split coredump worker into per-trigger works
-    https://git.kernel.org/bluetooth/bluetooth-next/c/ca75417ab179
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
