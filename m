@@ -1,106 +1,180 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A978E3C342B;
-	Thu,  9 Jul 2026 07:26:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FF73FBEC9;
+	Thu,  9 Jul 2026 09:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783581977; cv=none; b=HBgqQ8co/Qx3mom/rGt7NWWT+qFBVezZBbO1rw5MVQIc/VUYZ87r2upkOOw5dpiRpl5vf2Vp6wZimnvLyFvTBCPALWL1Ah0gjRSkLs1OuuVlnyC2JxmSX5E4hxJbkZHp+yA9UMCQ824TrFy6OUJzSBEmEBzE5c/96Lr5XbcIBko=
+	t=1783588717; cv=none; b=l8s9ZC6+qVChHll27ncND9aKeeNgWzxBhs69sQgAKqSATX9HAipISPu0Im1Zmw5KHWVEqjvRkyUbHCY4qkT5PMH0m1xjwpdBVSolI+zTM84G5iCuIKEmfR4PaqUvH7KjLO1/9Y7+kutGgLrpRJ1sxmzDBE00RSUHSsvxlTjkMOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783581977; c=relaxed/simple;
-	bh=MmQrnX3IFMx9jVADwFhcRhKr0DDNF01lUw9/K2ne7MQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GMuP4dRamLNTIvVIdeTHLciAhc+px4/hcMOQG8xEIlcE7e5XmFnIn3MnRws4ulj0Tpu7Yfdn0dqIRYFcczXDboVUqSHhqA8ZjyT5uss8Ob+S4h3WrClKEjG2wPI0BPTRsPFYWeXZS31kYwK+T07roCPoxwLri53qbtEXE/QSYgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.150] (ip5f5af733.dynamic.kabel-deutschland.de [95.90.247.51])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id BDEF14C288718F;
-	Thu, 09 Jul 2026 09:26:02 +0200 (CEST)
-Message-ID: <435c7cb7-945e-47c2-b70a-dff137f03699@molgen.mpg.de>
-Date: Thu, 9 Jul 2026 09:26:01 +0200
+	s=arc-20240116; t=1783588717; c=relaxed/simple;
+	bh=lyUxfmF0LBkosbLRpYQs7h+GaQeX4a20whx1y6sHZZQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=nJz/KHnlakkRofeA2HR6e+rjGJEd7Ujrk0yceB4APFtteHFiBB90ZcDs27vaGBcICg9DI1YmKirD8EdJ2g7hKuanrvKSNZKP9R7ZkCBKruhVZfC3fBW3/CF8jnb9x9T8MSGzK4N+BqhR3gEKZ6TTCv/sPpazZRvP2qv9UNacad0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SiX9ojRG; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SiX9ojRG"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5A0EFC2BCB7;
+	Thu,  9 Jul 2026 09:18:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1783588716;
+	bh=lyUxfmF0LBkosbLRpYQs7h+GaQeX4a20whx1y6sHZZQ=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=SiX9ojRGFOEVhP8J6sOmeM8RACKeqKR0bnbH+Mkc5RcnbKF6mxu3p+IomqWzM7Zh1
+	 6lhxUT/edvwimu6Hzd7lhZ18JLO2A3CPcOHKtlRY428kHdXMf8hHQQHfN4TGYh0q3s
+	 /j+EsCWp7XFvyAoYopazxI93KbTGQeg+86Od1OLXVQ1bME2fxJ5tY95PjzrXgA9KB1
+	 gZqEvr2iVDMG2WDqKq6zv7ookSY7l/+e8QO+aNFzpVieZaWQ/BqgTV7tQfakyH1tB/
+	 oeFaGosy0XDZPJJ5izOADCkI5R3964A1wzE5EpjSiOMuDugqKVFG5GXlZiLrOU4oVa
+	 dtQBDynhzcThw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38DC7C44503;
+	Thu,  9 Jul 2026 09:18:36 +0000 (UTC)
+From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
+Date: Thu, 09 Jul 2026 13:18:27 +0400
+Subject: [PATCH v5 1/6] dt-bindings: net: bluetooth: Document Qualcomm
+ IPQ5018 Bluetooth controller
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: hci_qca: Clear memdump state on invalid dump
- size
-To: Ruoyu Wang <ruoyuw560@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, johan.hedberg@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- Zijun Hu <zijun.hu@oss.qualcomm.com>
-References: <20260709062250.4166128-1-ruoyuw560@gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260709062250.4166128-1-ruoyuw560@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20260709-ipq5018-bluetooth-v5-1-e476c41f03b8@outlook.com>
+References: <20260709-ipq5018-bluetooth-v5-0-e476c41f03b8@outlook.com>
+In-Reply-To: <20260709-ipq5018-bluetooth-v5-0-e476c41f03b8@outlook.com>
+To: Bartosz Golaszewski <brgl@kernel.org>, 
+ Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konradybcio@kernel.org>, 
+ Philipp Zabel <p.zabel@pengutronix.de>
+Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ George Moussalem <george.moussalem@outlook.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, 
+ Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1783588713; l=2939;
+ i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
+ bh=FUFR6bvdqLqm5h7c0TMuM1xLAxk28MFZv+PsDoVNsWU=;
+ b=EB+sgeNKPjxQ89m3oxISIrF4smtMJmyUoYw3VxagYKQQhiGaDKS1iQtXB9uflr10ceKsenpPI
+ 4kdTiBhbymoDWYWiGUrzMcg0a3djhSir+lEeRocSHMRWzyHmGv9znlT
+X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
+ pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
+X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
+ with auth_id=364
+X-Original-From: George Moussalem <george.moussalem@outlook.com>
+Reply-To: george.moussalem@outlook.com
 
-[Cc: +Zijun Hu from Qualcomm]
+From: George Moussalem <george.moussalem@outlook.com>
 
-Dear Ruoyu,
+Document the Qualcomm IPQ5018 Bluetooth controller.
+
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Acked-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+---
+ .../bindings/net/bluetooth/qcom,ipq5018-bt.yaml    | 87 ++++++++++++++++++++++
+ 1 file changed, 87 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/qcom,ipq5018-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/qcom,ipq5018-bt.yaml
+new file mode 100644
+index 000000000000..6bd74c01b821
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/bluetooth/qcom,ipq5018-bt.yaml
+@@ -0,0 +1,87 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/bluetooth/qcom,ipq5018-bt.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Qualcomm IPQ5018 Bluetooth
++
++maintainers:
++  - Bartosz Golaszewski <brgl@kernel.org>
++  - George Moussalem <george.moussalem@outlook.com>
++
++properties:
++  compatible:
++    enum:
++      - qcom,ipq5018-bt
++
++  reg:
++    items:
++      - description: |
++          Shared memory for firmware loading and runtime data transport between
++          the host and the Bluetooth controller.
++
++  clocks:
++    items:
++      - description: Bluetooth Subsystem low power oscillator clock
++
++  clock-names:
++    items:
++      - const: lpo
++
++  firmware-name:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  qcom,ipc:
++    $ref: /schemas/types.yaml#/definitions/phandle-array
++    items:
++      - items:
++          - description: syscon node representing the APCS registers
++          - description: offset to the register within the syscon
++          - description: IPC bit within the register
++    description: |
++      The outgoing IPC bit used for signaling the Bluetooth controller of a host
++      event or for sending an ACK if the remote processor expects it.
++
++  resets:
++    items:
++      - description: Bluetooth Subsystem reset
++
++required:
++  - compatible
++  - clocks
++  - clock-names
++  - firmware-name
++  - interrupts
++  - qcom,ipc
++  - reg
++  - resets
++
++allOf:
++  - $ref: bluetooth-controller.yaml#
++  - $ref: qcom,bluetooth-common.yaml
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/clock/qcom,gcc-ipq5018.h>
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++    #include <dt-bindings/reset/qcom,gcc-ipq5018.h>
++
++    bluetooth@7000000 {
++      compatible = "qcom,ipq5018-bt";
++      reg = <0x07000000 0x58000>;
++
++      firmware-name = "qca/bt_fw_patch.mbn";
++
++      clocks = <&gcc GCC_BTSS_LPO_CLK>;
++      clock-names = "lpo";
++      resets = <&gcc GCC_BTSS_BCR>;
++
++      qcom,ipc = <&apcs_glb 8 23>;
++      interrupts = <GIC_SPI 162 IRQ_TYPE_EDGE_RISING>;
++    };
+
+-- 
+2.53.0
 
 
-Thank you for your patch.
-
-Am 09.07.26 um 08:22 schrieb Ruoyu Wang:
-> qca_controller_memdump() allocates qca->qca_memdump before processing
-> the first dump packet. For a sequence-zero packet it then disables IBS,
-> marks memdump collection active, and reads the advertised dump size.
-> 
-> If the controller reports a zero dump size, the error path frees the
-> local qca_memdump object and returns without clearing qca->qca_memdump
-> or undoing the collection state. A later memdump work item initializes
-> its local pointer from qca->qca_memdump and skips allocation when that
-> pointer is non-NULL, so it can operate on freed memory. The stale
-> collection and IBS-disabled flags can also leave waiters or later
-> transmit handling blocked behind an aborted dump.
-> 
-> Clear the saved pointer and memdump state before returning from the
-> invalid-size path, matching the cleanup used when hci_devcd_init() fails.
-> 
-> A static analysis checker reported the stale memdump state, and manual
-> source review confirmed the invalid-size failure path.
-> 
-> Fixes: 06d3fdfcdf5c ("Bluetooth: hci_qca: Add qcom devcoredump support")
-> Signed-off-by: Ruoyu Wang <ruoyuw560@gmail.com>
-> ---
->   drivers/bluetooth/hci_qca.c | 4 ++++
->   1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index b2d1ee3a3d115..1222f97800f4a 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1087,6 +1087,10 @@ static void qca_controller_memdump(struct work_struct *work)
->   			if (!(qca_memdump->ram_dump_size)) {
->   				bt_dev_err(hu->hdev, "Rx invalid memdump size");
->   				kfree(qca_memdump);
-> +				qca->qca_memdump = NULL;
-> +				qca->memdump_state = QCA_MEMDUMP_COLLECTED;
-> +				clear_and_wake_up_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
-> +				clear_bit(QCA_IBS_DISABLED, &qca->flags);
->   				kfree_skb(skb);
->   				mutex_unlock(&qca->hci_memdump_lock);
->   				return;
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
-
-
-PS: gemini/gemini-3.1-pro-preview commented on several pre-existing 
-issues [1], ideally Qualcomm would look at.
-
-[1]: 
-https://sashiko.dev/#/patchset/20260709062250.4166128-1-ruoyuw560%40gmail.com
