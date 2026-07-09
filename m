@@ -1,225 +1,110 @@
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013014.outbound.protection.outlook.com [40.107.162.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DF936CE03;
-	Thu,  9 Jul 2026 14:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783608209; cv=fail; b=dd5pAI4DQZYhM4QOAFHlsfij6L8iCPM6r4qn6MJbcrkr0kKeBodSmuPeFmQE/iDkzXsIdU/OayydE+UGRBYvw6f3OCv7LZL9cniG7VzPJNJPx7VpWOag+tWjf4RocpEyuSoYON1z/BGofwMWTzrB3g191csgQUXwVVFLCT3D8zg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783608209; c=relaxed/simple;
-	bh=FBW2OHGlr6ySBO4gMZsAox60vWGUiUUoxZeupIwMOFg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=MkNxfJFO7ygB2rPCBbwKdTWK5uABIo6yvQNq/ZDONOHa0u0vzlbs0yULy2srZ7gI7KvAUOq0HAbnH3LLHvYd9RfFkLrP04N1FcjorL6zT0OT3XfAzHrFKe1CYXAJu3H6oK5klHxVSa0wiT4NiCewSYSManR3gD1FdG8MPDp2YmY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=p5RD+N7u; arc=fail smtp.client-ip=40.107.162.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14484450F2
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2026 14:46:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783608394; cv=none; b=gnRnYuDvOogvrxYBUvMDP0nFsmwbKeWy/PhvI5cswbIzHyPNtyVKScA70OGGxeNKPj4U6lzaO4yU/wR7HeuwGUDvGYaRPHCSzAWVr/tCSEoM5BCiVUvUWlq2vfCSTUzFLuesVKMDetCR/SWws+qgH8Y1omo81DOryKaVEQmxGNQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783608394; c=relaxed/simple;
+	bh=TYGb7FaTIZZ6R9SECePzqJz3QrZ7I9J2QiX3BLnUNyY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=MuJhitdQH7WVUX4i0VPfoD+gWEaUNj4i8f327sMo5+wlWFQZni6HqreKuyI86k9GlFPx/NaNQBvlfkP8Eq8V9hCp+z4HL4+ypr91SCx6kOfGfI5bmldkuj7a20E2htLjO9emFMjxMPF16dzA14vkogwlCo2nzJf9Qq6WsAgkKjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cPNCWQce; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="p5RD+N7u"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=AZCm3IlEB94cqrGjGi4oTWNuBZUF+hAqmg/F9kI39fZDD31jeHBoBmFRY/OHlqooA44AwqL7TPdS2Cg2z6izQOqp80IdBXfN/2BoaBdGdwmqxjnI2PCAxeyy0Hx56K4WQxz5aG6KCuCMT+m9JihBZEea60C2n0oi9t+DPGcFXJSYGjCMr3E2FPWlWgv5MDpIu7AJPm2FmSbqFxyvshHdMFwVUbwNzIaiY0PpFZMUSSALm0dxSWlnU+m5QO9KQ10aAtqbnSyQhygO6JXOOFT4yh+XbWYiI4b+UReNDX8iuLHOV5NGkyaAsoazBWrCmgMqtZNObQeqaLhKlN/GZerZ2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hbw/nzl+kgJvK+ax4xbtOPir91QsnYFIPDVBu3SfArg=;
- b=NUItrKklU+qkbRRQyKT3cL9ahFvLPjBwz3jAoNelpmFpW+OI7gIDCOBNcsH4e/6yJH3emVr0pm3T79kHf3aklj8Gs5T8fFSdx8aOLAiL6ifpjusW9iOcLTTzFEDpa9RWUuPCED6uVibZWQgIdE6FJKPKspCJB7Okk6S+GfaJ6b5QKuZopbWY4HiE5AR+oHz9dPi4+LdEYi/PIziWzrKNhqJICvfvCbINjblkraSjHdqSr57Dym2bnRRclg3K378l7K4ujLqpOrZGBnr7X2W0TN4RFussdLOafB2Hy0+3K1Uex9qu4dcOUwUhFNJsJ9K1hK/lxbniMdyyLZc+unpukw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hbw/nzl+kgJvK+ax4xbtOPir91QsnYFIPDVBu3SfArg=;
- b=p5RD+N7uzKq4p49E7TFchqC/w+t3nkbf8j5UpIX7Zh5BcyNzNPa3XMB3rbpWGJaNLx35XMBp9VoXAceSrtJGSrRGEI+1mrUQBzHX6543KVxomIpAF8ncc0XjwjZIic6RzT+Vo3gqhgekHoeojQW5+BOPCWZsYLEY2TA8oRz+nWZQldPGApABW6M2QAaMiwTy7YrvzMb+enbCE8VNs5in4PVYpGf1hUGjCBtDAkRLoPtO8ltBNwoQHYlkNHSfJXxLK9qWEks+MGK/aHRNv4hZkb9F6HY6YmanfPL/XS2uNxbWWCEx1ReS3dHEuHVuSnCTQBn9ar9XqEV6Tnt7LONftQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-Received: from GV2PR04MB11799.eurprd04.prod.outlook.com (2603:10a6:150:2cf::9)
- by DU4PR04MB11460.eurprd04.prod.outlook.com (2603:10a6:10:5ef::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Thu, 9 Jul 2026
- 14:43:19 +0000
-Received: from GV2PR04MB11799.eurprd04.prod.outlook.com
- ([fe80::2146:83a2:5329:b7c]) by GV2PR04MB11799.eurprd04.prod.outlook.com
- ([fe80::2146:83a2:5329:b7c%6]) with mapi id 15.21.0159.007; Thu, 9 Jul 2026
- 14:43:18 +0000
-Date: Thu, 9 Jul 2026 09:43:07 -0500
-From: Frank Li <Frank.li@oss.nxp.com>
-To: "Sherry Sun (OSS)" <sherry.sun@oss.nxp.com>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	Frank.Li@nxp.com, s.hauer@pengutronix.de, kernel@pengutronix.de,
-	festevam@gmail.com, amitkumar.karwar@nxp.com,
-	neeraj.sanjaykale@nxp.com, marcel@holtmann.org,
-	luiz.dentz@gmail.com, hongxing.zhu@nxp.com, l.stach@pengutronix.de,
-	lpieralisi@kernel.org, kwilczynski@kernel.org, mani@kernel.org,
-	bhelgaas@google.com, brgl@kernel.org, imx@lists.linux.dev,
-	linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, sherry.sun@nxp.com
-Subject: Re: [PATCH V5 1/4] PCI: imx6: Move pci_pwrctrl_create_devices() to
- imx_pcie_probe()
-Message-ID: <ak-ze5X_zYGoKvjI@SMW015318>
-References: <20260709101555.3034853-1-sherry.sun@oss.nxp.com>
- <20260709101555.3034853-2-sherry.sun@oss.nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260709101555.3034853-2-sherry.sun@oss.nxp.com>
-X-ClientProxiedBy: SA0PR11CA0039.namprd11.prod.outlook.com
- (2603:10b6:806:d0::14) To GV2PR04MB11799.eurprd04.prod.outlook.com
- (2603:10a6:150:2cf::9)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cPNCWQce"
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-381891a9525so1277807a91.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jul 2026 07:46:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783608391; x=1784213191; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=m/dgrie5EbwwAWoxY27aoanIdtDlDw61GyeUReDYD9s=;
+        b=cPNCWQceqn/k6qxV11VMRs/sJxxTofx2MPnmEU/Xv4GZzUToeTFGW/Z7klYRPxubAG
+         D1rlfRNLFBjAqr5eLtvyT+xpJ6Dr6AtDE/OhMYztmeBl/lUACMuCsvnULLc22yMsTGBb
+         W5vifCJv+fN77wFi97dycaOVVsmqW3kyfrri4axB1T+A8lJHDvtBp/sVWkipf4e+rwDr
+         xu04jwq2m+B6wTWp9idzy42dMWflCZ7UX6eR97JrGQDTT7RAVSocqw2u04MKMlpJ/yhy
+         su1uFyqFgihPlF55PRiWebUxRyhezyqGZfS02lPzu3ZQVYprUXVAU1wsDW9T8dzNqiQG
+         gGbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783608391; x=1784213191;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=m/dgrie5EbwwAWoxY27aoanIdtDlDw61GyeUReDYD9s=;
+        b=ezIOxlxh0aYWOiIZOXw0mx1w1fPlLaTO5viaoziPW1vDNrK7HX8CSpp/qdVEMN+CPm
+         fbnMVltgLKja6m5pAY7hzZPlG5H0YP0Zlrr7XcrZFHmiA4kgKrDYu5ANy6W5aBc8kRoi
+         kcHhnKl4l9XnyqSrKCpC52aGmYD8r5OwGZyhu5knTxXLep4zc+17rSfpJaIpHZYHBgAU
+         j/q6U3PV7xbQjiuX6k7WOKBNADBICjAOR5QF0oK7FznUJw5FFSbCGgRyOeFA5EParM8A
+         9vToGhNruhGdQDqJ2q3J9ceCIHqrELIMH/jA1Bt1iz57Yz7YS7h/ZdnCz1CVhkWwxc1j
+         6lrQ==
+X-Gm-Message-State: AOJu0Yx3lZ6Nsh30U/tD2Sk+oeu9c1mc+HHu2smVnUtNOyHKlhc0im2Y
+	FAl7o063Jw7gpoGtQhg9IEixwMgNHPZ36KiPFZRPy6kbsDGAkCovC8rglUiM9w==
+X-Gm-Gg: AfdE7clKDfpmd2lN40kGbIemeXjevsn1Ubu971dMczuH5YsXAasg94gCWMYtEYLXzqM
+	I3rQ9FXtvgj4LRzGluSe8zdwAK12SF1hPP9zNmAy0Ui39Vf7UPchuv/XVQKs3BEtgUoeE9WcrAz
+	o6lcHV0eLwotKtsS5jug7cjsEjsb2+sEb6+Sngp9GngSt38+/pvkzYOuntgjPn2t1vZhx5+3Y10
+	wea9o1aL+iGYGFMaTrCDLqvebBbb8SXV8S5jetLK2DeSoi3OZoSvulN3/X1Fvkz84dVXRNSAZSM
+	Q5IwwO51aoHg1dNx4LptOKrPAxWXhIfm2qagiOYc4ThyWt99Jno7pEYZNgYaodtSq2pcwXvJCGD
+	AxR7YdFtvRX9CdlfyQSUGUZfGi+1RL7ybuVAJdvaEIgWkk5zJrrWe/Ck0GRlxqLJooCpIz0djWu
+	NJ8uNNSHY3VBNgyadR
+X-Received: by 2002:a17:90b:2f06:b0:381:50ab:1594 with SMTP id 98e67ed59e1d1-3894120590amr8604371a91.27.1783608390658;
+        Thu, 09 Jul 2026 07:46:30 -0700 (PDT)
+Received: from [172.17.0.2] ([20.163.6.81])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31174ac14f2sm33679652eec.27.2026.07.09.07.46.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 07:46:30 -0700 (PDT)
+Message-ID: <6a4fb446.f732ad81.3a4994.eb01@mx.google.com>
+Date: Thu, 09 Jul 2026 07:46:30 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2841121533900069135=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GV2PR04MB11799:EE_|DU4PR04MB11460:EE_
-X-MS-Office365-Filtering-Correlation-Id: bf654f09-43f1-4632-8d8c-08deddc86a9e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|23010399003|19092799006|7416014|1800799024|4143699003|18002099003|5023799004|11063799006|56012099006|6133799003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	Yr8JkocKyHOzy/0xld7g6WZLdoceIWKq4y86vWYQzM5MiSqpYdvB/gZOt1GCR8e0SgHuoNZkfK+zM8yBg/ihZjc/++1PtEMFDpyQqWUDTwi6WryAkx1BGsSD48Pr9IMKW7dSSArCUmxKiZukE1PXaTPLmEOSVrEvFTDJDFnAILfGMWtZFpIhFmKH/vQnXZwo2BO9YxqecsS7t7bDNBX45ZYssa6XZCEir9oSwNMkYAbGenmAMqNKqV6WSauc30I90az15pL7fTZG6UTZkPIbx2yWahZvY9hiY2+JA/sKGDGZXNK1dYd1HHf40FUm8Vqu+nLIVpt7qj31TPbN/72Xv1BXJGPoKQvD0HC5Q0pJqHjIpaQhdi2BwsuJWIbDU10hz8yKiMKluQ8esSrD+2LfGSad4fQFLdWCPpDJOe8Y4VQA24zLPCJPEq6k41BzWF/dpvtdw8YJUc0jBbUAlPNUtroMPQwW1x9UGPRI/Rob6/C9aWcwnIYy7BA+A5HJ2+ObuWiy9s042vD/mrDuXsbA5+Jlfn/AwKOJxVB0DaZwNbUNXJzIihQEWGPt4oA+hZ51fKFiYYBvD6EPn95XusePwaBeY5PCsB0EOfVD5KBhGDZpAHF+cu9TwnlD4vvKxdMTtEv9YdtSTRcBYlAYwIrpXtZFlOu9QDIC9z8fzQVKTp8=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV2PR04MB11799.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(23010399003)(19092799006)(7416014)(1800799024)(4143699003)(18002099003)(5023799004)(11063799006)(56012099006)(6133799003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?LLeD+qpcDN4ifH0VsOM/e4JZFg54Mnc6cbfI39q0AlYvX8vNaWIHJStnTs42?=
- =?us-ascii?Q?+H3BenUb4EWNXn/GbVa9RRz2G0uyI2QE6mHb9A/3U20a1mlkdEiqzKS44Q1X?=
- =?us-ascii?Q?hapENuSghPdokjF/F8HkuuZDWaVWT49ifzf8tdatBs5Yu/UrYcKLCoTbNI81?=
- =?us-ascii?Q?+j0p7KO2IOoqtHNZGLQXNOx6U1YVIyPzMPveRJbr/bHCcmm1HSnisVud8Ojs?=
- =?us-ascii?Q?E+YHvE4zdkm+SUciPJlaPzkT/uLhLPJmJjH62X8lsBgfsTJUwANA9XyErBUS?=
- =?us-ascii?Q?un46gi5EMQ7tUgWs7awpproEQM03bPi2xzeJY6h5RpubWLutl0tubJECqhhh?=
- =?us-ascii?Q?XshbMYjh+znIS6IOYg71GnAdDuuOrfUXPTkODiKVQDrrNY83FuvTiW/pb6pv?=
- =?us-ascii?Q?iXBw8vGzM3IzzQy/aiaU3+R1tQtJ1K6RS65rfPwyx//77d53nvmcR2aGcqN7?=
- =?us-ascii?Q?I/r3VCb2njDg2SfxjbfT/FVwE64oIJUX1t5k1w5W5KHqls4umHNyAmKmFzBN?=
- =?us-ascii?Q?MKxyRhsRdeIsKnbAnrD1qk9H0ehqr8pf14RjqW5tAiI4k1MZlppDViakvyQa?=
- =?us-ascii?Q?VRMS/TvKbCulUcHZKYqWdoM5TMP9LZ+Cm+ART6Aim/nI1RyeynswC01h8zmE?=
- =?us-ascii?Q?Trh3fIi0tCcjLOvGw6R3Xy5umiFjouCPkucwVraILZYdxl9mUYvFSpMhEi/7?=
- =?us-ascii?Q?zOUoaZ7KkvKr1CT0fYWuJj8Dv/GTDDhTmP2thKsCbVUC2f7IJ0+sFd7izTHf?=
- =?us-ascii?Q?GLahGThhgIyyCb3kSh3FmOL76PbZwMEUxQCJqfRhL53+f3pz/pB3teErybkZ?=
- =?us-ascii?Q?qJ0bZyLw0vSWGUKJ0u+vGmaHNn6ZrhssI215TW1ClE7oBFAcLuvh1IoEMbOX?=
- =?us-ascii?Q?uR4gO71Lq38YsXntBqlvLNXNuIJ6cWj9SmXK53SzJJKqrU3pj3VEmtpshKQ9?=
- =?us-ascii?Q?XyUc7XRrLwBvpjAkd5E1/3MNKLWhDQNJqOxgtrU4mNWgK1tt9m1Www2fy+f/?=
- =?us-ascii?Q?6nKhwp+YWpkqaDZ9GVWT5ghtTkl3X9i0k2f44eCoDi8NRUPBjgnIYSQi1mk+?=
- =?us-ascii?Q?WumCalXwUSRp54eGX/xBbEiJRLYuHKwha5UcUIcvaNu6ykEbbfHzvXiJMRx/?=
- =?us-ascii?Q?bIfRDImvKzmEqfw5TijHt523Gxt1H6crezKRf7kq9CalNxWc8/CfaDvjA2NE?=
- =?us-ascii?Q?XUZsUwDdbUn3yXQppKuk3uXsf2yRXuUztGSioW80ZUc6WLFR2kIhmlHZLntG?=
- =?us-ascii?Q?3aj8v0siNZc58Cvx2P0s8/12YGXTn/rmzggl0JjRZ87haItu/DJY3On+2EZj?=
- =?us-ascii?Q?stdVwHaeXLUVP07UitXiRiMC9ODHnpD7usp/2wtikiG8JamzEiAIT1HASMIj?=
- =?us-ascii?Q?IljSt+iqZxpTWE/yKbiE+4nBrYghjxPBVXjYQ04hcdvpLqgzEnJIKMVECLnq?=
- =?us-ascii?Q?03pM10735v7tKiMNQy4t9TSXfpA3CcjgyXYWuMRdnKYoUd4N7N3TfSKSuMKP?=
- =?us-ascii?Q?ZLSuf30psATSszRUX7iN+HUXF0RA63kdKIWqYfUoMF961SeVJLUyZPA9RHmw?=
- =?us-ascii?Q?2E8H6wDe2rh6S6qS/hsGTHPoimiOJD49CuDdXtnqxmodC56w48e+nQz/YbxJ?=
- =?us-ascii?Q?9REGGfFM6Kajpo4ZlmM1Ew2ZYzLcR/8jh87A4hVEcNFn17VtNXMPe0z0cIIL?=
- =?us-ascii?Q?sqsR6IGu96b+H6O/ZXRo/GWwSgkXEO6XNt2de5cJDyJfKBiByZvIC7eOg4gG?=
- =?us-ascii?Q?iz163rMoTrGFjFlDZipzMlpx4DKbW3txlUKi9tm7UrKt83S14sAj?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf654f09-43f1-4632-8d8c-08deddc86a9e
-X-MS-Exchange-CrossTenant-AuthSource: GV2PR04MB11799.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2026 14:43:18.8472
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cTE6xlAEIEqS7Na5vUcN5dSYoBsyXcvAhugecOV//ihrvN7IPvx0t7LXN/xqdLABakYLqaLtuhq6UGpotSFrjO0F2FJOq+A84WZaO+tYcqhEF3oCvqXFOxsE3JjFZZK8
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB11460
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, tomcatshoek@zeelandnet.nl
+Subject: RE: [BlueZ] adapter: Fix crash on UUID discovery filter match
+In-Reply-To: <20260709122704.351232-1-tomcatshoek@zeelandnet.nl>
+References: <20260709122704.351232-1-tomcatshoek@zeelandnet.nl>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Thu, Jul 09, 2026 at 06:15:52PM +0800, Sherry Sun (OSS) wrote:
-> From: Sherry Sun <sherry.sun@nxp.com>
->
-> Previously, pci_pwrctrl_create_devices() was placed in
-> imx_pcie_host_init(), which is the .init callback of dw_pcie_host_ops.
-> This callback is invoked not only during probe, but also during resume.
->
-> This caused pci_pwrctrl_create_devices() to be called multiple
-> times across suspend/resume cycles, which is unnecessary since the
-> pwrctrl devices only need to be created once.
->
-> Move pci_pwrctrl_create_devices() to imx_pcie_probe() so that it is only
-> called once during probe, similar to other regulator_get calls.
->
-> Signed-off-by: Sherry Sun <sherry.sun@nxp.com>
-> ---
+--===============2841121533900069135==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Reviewed-by: Frank Li <Frank.Li@nxp.com>
+This is automated email and please do not reply to this email!
 
->  drivers/pci/controller/dwc/pci-imx6.c | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
->
-> diff --git a/drivers/pci/controller/dwc/pci-imx6.c b/drivers/pci/controller/dwc/pci-imx6.c
-> index f55a68f60eea..92f8e4a299e8 100644
-> --- a/drivers/pci/controller/dwc/pci-imx6.c
-> +++ b/drivers/pci/controller/dwc/pci-imx6.c
-> @@ -1382,16 +1382,10 @@ static int imx_pcie_host_init(struct dw_pcie_rp *pp)
->  		}
->  	}
->
-> -	ret = pci_pwrctrl_create_devices(dev);
-> -	if (ret) {
-> -		dev_err(dev, "failed to create pwrctrl devices\n");
-> -		goto err_reg_disable;
-> -	}
-> -
->  	ret = pci_pwrctrl_power_on_devices(dev);
->  	if (ret) {
->  		dev_err(dev, "failed to power on pwrctrl devices\n");
-> -		goto err_pwrctrl_destroy;
-> +		goto err_reg_disable;
->  	}
->
->  	ret = imx_pcie_clk_enable(imx_pcie);
-> @@ -1461,9 +1455,6 @@ static int imx_pcie_host_init(struct dw_pcie_rp *pp)
->  	imx_pcie_clk_disable(imx_pcie);
->  err_pwrctrl_power_off:
->  	pci_pwrctrl_power_off_devices(dev);
-> -err_pwrctrl_destroy:
-> -	if (ret != -EPROBE_DEFER)
-> -		pci_pwrctrl_destroy_devices(dev);
->  err_reg_disable:
->  	if (imx_pcie->vpcie)
->  		regulator_disable(imx_pcie->vpcie);
-> @@ -1954,11 +1945,15 @@ static int imx_pcie_probe(struct platform_device *pdev)
->  	if (ret)
->  		return ret;
->
-> +	ret = pci_pwrctrl_create_devices(dev);
-> +	if (ret)
-> +		return dev_err_probe(dev, ret, "failed to create pwrctrl devices\n");
-> +
->  	pci->use_parent_dt_ranges = true;
->  	if (imx_pcie->drvdata->mode == DW_PCIE_EP_TYPE) {
->  		ret = imx_add_pcie_ep(imx_pcie, pdev);
->  		if (ret < 0)
-> -			return ret;
-> +			goto err_pwrctrl_destroy;
->
->  		/*
->  		 * FIXME: Only single Device (EPF) is supported due to the
-> @@ -1973,7 +1968,7 @@ static int imx_pcie_probe(struct platform_device *pdev)
->  		pci->pp.use_atu_msg = true;
->  		ret = dw_pcie_host_init(&pci->pp);
->  		if (ret < 0)
-> -			return ret;
-> +			goto err_pwrctrl_destroy;
->
->  		if (pci_msi_enabled()) {
->  			u8 offset = dw_pcie_find_capability(pci, PCI_CAP_ID_MSI);
-> @@ -1985,6 +1980,11 @@ static int imx_pcie_probe(struct platform_device *pdev)
->  	}
->
->  	return 0;
-> +
-> +err_pwrctrl_destroy:
-> +	if (ret != -EPROBE_DEFER)
-> +		pci_pwrctrl_destroy_devices(dev);
-> +	return ret;
->  }
->
->  static void imx_pcie_shutdown(struct platform_device *pdev)
-> --
-> 2.50.1
->
->
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1124682
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.76 seconds
+GitLint                       PASS      0.22 seconds
+BuildEll                      PASS      18.07 seconds
+BluezMake                     PASS      628.26 seconds
+CheckSmatch                   PASS      269.35 seconds
+bluezmakeextell               PASS      94.72 seconds
+IncrementalBuild              PASS      651.86 seconds
+ScanBuild                     PASS      866.74 seconds
+
+
+
+https://github.com/bluez/bluez/pull/2283
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2841121533900069135==--
