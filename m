@@ -1,111 +1,127 @@
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A77330D3B
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2026 14:21:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADDD6381AFF
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2026 14:40:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783606913; cv=none; b=S5BdJZZU23+NGyVnPjTFQLpTLegTF0MRjl2H0I4ZZd2PHJyM2cK8uNm6umQVW6csjxQEi8cI/1mcO8p490P8lPcGC2wvTNQgsnsok+gswH56OcooQ9bvQF7JgQe1uN1QGsBc2FRsJZMItfJfGGj9xEOKtEdDV3bb/djs2fN7wNg=
+	t=1783608033; cv=none; b=WfgDGHsP385x8fWPXwDWpL9P1Htxaf13wGe102hlm1IrrTs4+26e2PP90s7aCDomqdDthpjEjQLGgq4ICgjaqRANWfFedkNpt2yJ9xgR6wTBq+2MbdDuh1apVQWe2oxTn5Iw3ntSzmnIHRtAzJ+2OKCh3AXxOpXX5ECURdm4JCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783606913; c=relaxed/simple;
-	bh=difH9GbaET8Rhru0GV41xEpGX/KL75uz77wTry5xCH0=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Vj21s6Ge8NafyMqZb8dW6UQB2xr+vfFYh8LnpVJyeD27oWBzL4b6l0/ZBXBGjT2YLRL+0lwMWsGQqLdqnIcPUiOBwl/UB7FyEMo3iI4I2tQ+spirvQx0Tq1GMLn1MAUn0DMHY4mYF46GHZ6TxTVpbKjlLOjFVIt8ioeqr8ioYrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A87183EDBA;
-	Thu,  9 Jul 2026 14:21:42 +0000 (UTC)
-Message-ID: <a2d7c978a97b5e55a05cb7000f4d20d8c8dc542e.camel@hadess.net>
-Subject: Re: [PATCH BlueZ] adapter: Fix crash on UUID discovery filter match
-From: Bastien Nocera <hadess@hadess.net>
-To: Tom Catshoek <tomcatshoek@zeelandnet.nl>, linux-bluetooth@vger.kernel.org
-Date: Thu, 09 Jul 2026 16:21:42 +0200
-In-Reply-To: <20260709122704.351232-1-tomcatshoek@zeelandnet.nl>
-References: <20260709122704.351232-1-tomcatshoek@zeelandnet.nl>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	s=arc-20240116; t=1783608033; c=relaxed/simple;
+	bh=43HbWZvOm2CymL5MKr27eCMELUNblUkBRfN9WYlOGfI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=D+OdytBgjSpi/Oj+5D9Kil2CZjrIySAIjww1f32U08r+h20aq0WTJC8Sm8d0Ldb3YkVla4u7PJ8oZnCLWWM5tkJkGtlnL2Hl0AfM1nUXx4J4lI8340M3eLy/SSPuwopjTEtTh9IhEkdzvK5ZvmsuJvDwBgqEDX3LOkN6ehhXTRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hpm8GQtm; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hpm8GQtm"
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-388b404ea89so1145109a91.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jul 2026 07:40:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783608032; x=1784212832; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=a5tD0+lLpxUMNF61dtPcHsueHJWAUVQKPuQCXpFsYKw=;
+        b=Hpm8GQtmcAdZS2ajveA+VBYMVTFvJk2EPT25ls/n4m2VMGKbTrqDD7AMMCa4SxbADL
+         aAIARXeofJzm8bxUHtAPjjKycBbS3Y+F10WxkvBrj8Dw0tN71oqyMZbuPf5RDXHkF7QA
+         mvC5H2AZJoFuCLFPFE+TBEUKXj2wW4oKszMo4gJRf8OxnuO/ifpyw6EeeLB/YP8g+gkf
+         CWUBi0YWwxpgl0pwOL7HYFiCLB+YXYdkd6DNT33b9J8EIO8RI6rmPP6wlHeYec5yJk5L
+         c0P93+FGizZa+E73Zaftj4JygrlA8lzNDpscscJYD0bN4A+rOEzg20Ta1wr9RMIq2mvW
+         G4vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783608032; x=1784212832;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=a5tD0+lLpxUMNF61dtPcHsueHJWAUVQKPuQCXpFsYKw=;
+        b=VIsysSI2bQiB33jaOxgwLXSq7grvumQbsmQlUW65s1rS1sB/9Q+eV1RePvwmfDifWd
+         vGFZJ7Rbq2vHO3awL2RyDXwpyFx2Wky02dPiKOg9wq3J4L9ow1DS6IEgGqHq2uWqXLF7
+         4VGFUQH91ZhkzyEvX1lu5PEA4Q+1I8woGoqX4F9vU+qnarbeZgFaAky47Y4eV1ChSKro
+         GiamvxcpuBBjtqAS98oWe5ZMcx58U4KdNU6XubYZKPWBLX1FizMQ6IcD4EpD4I/1oLux
+         AbyY5paBz/mTTGEAZAfBxCJXjDuzj77HFdJ5Rv6OjDbgt7+fb0NKs4dT+C0RyCasyXnr
+         iVJA==
+X-Gm-Message-State: AOJu0YykTx5WM3iKFOfFZF2VUVztdaKzlDL1pth+LmXTZyNWzU7vb9OA
+	i5L9kEYA/M6my2bm+Qa9SFdCroSmH0bY4D/ZVnob/IN85cmhqkiChhSjaNBN+w==
+X-Gm-Gg: AfdE7cmOE7rGYsSsWU4WqkPytxs/3gS97lHlTt0Klr7vyo7DkD/cfUYF7Zg/RTKFcSx
+	41IfhIFUiXl+jXgQbkxFuOC4djkPbPsPAtwZfl14G+0RUbkEtX3XIUyOUXgzMl7GJ6dnztGGuj9
+	QB5daDV0pwMi6etgru66LFe/INoYteALAHTPoxr5zgMUa0136MrmW+QZ/QZj1lBlVw1FkxxfjCv
+	jp13J+lInR50KrClxdSCcsFFQnt7+bZxVItvvQq23GUTTJdcKrHx36v/SKLFRilqnrrmk/txir+
+	qQsX7GR+qtgGw7tNg0fsFONkLuJJ8MS9lNs9FBypdPJHi284FmyRNTEOKYTWYApc72xlnXWQ1Yn
+	HapTjJDhEj06ZsAXRNpzjNwZIGC9RZLMgG5yRSnxaD91tPAx+nZ1b5tMiHEytYGmNz1Dlmbii9T
+	2ThDahUtxPEMkxVAGWUxJW8A==
+X-Received: by 2002:a17:90a:dfc8:b0:381:10a3:8b10 with SMTP id 98e67ed59e1d1-38b75138728mr3562275a91.14.1783608031848;
+        Thu, 09 Jul 2026 07:40:31 -0700 (PDT)
+Received: from [172.17.0.2] ([172.184.220.217])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31174a56848sm33018711eec.16.2026.07.09.07.40.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 07:40:31 -0700 (PDT)
+Message-ID: <6a4fb2df.fdc477d6.23591.44af@mx.google.com>
+Date: Thu, 09 Jul 2026 07:40:31 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6164412493355017764=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: dmFkZTGhVF2/IS+jXN9DkX4NOivjVdU+te5YuW6bGZaV+3KAvkyYuqh+wpZyTt8vEIfLvnhOOcQWFSaD5B90zxPv4ZcVlOStzAYHny+ESjeTwqL3KpYHzXfm5ATzIj2s7lW/JRp/LoqvytkOdgiMo6s6QGiMGRp6AE802U2+rn7ri9nrRNv5MZNR2vgu05vuU1PaN1axJ/v6j9mmQ6nfnAMMxSoq+yHnn+h/WnKLF2mawXyvHUFWe6LdVkXnCxphwK+yx8cmfu2s5rVfXEExVVqh4OEZlj8UtP9Du1axR8f8mTHdZunPxbPEiiqGTQR/MlwY+3STJL73ea+Q69iTi14+14dKkHABNr+cfIDIvbE5He24mM2PIkqYwsK77mWEImFtVFQO6RAapk+XU5VEheClItqYXLru7TH5SiHn1m9k6k48VDaWbayhINGACtlHTFykV88yg+LEjhPj8WPZPRJacmnqpUckMxzTFxFDTLCoNI1FaduZm3AIxtDisi1SyDnlIKfNwYv9M4KOKridR+nJTg3rUl3aelFqo91AIS04BetWpJ8ssxOB3j8VNpWwCArKQRQukQ3vFnTKDm5ZXq0g0qILjV0wqik9gDNzsofsxa1WbtjGvH6O0Hardf6I6zfBtub0kqCbjDlDfscvagVnrbGebCrsvhK09xzr7Rhzbgs7pQ
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, haoxiang_li2024@163.com
+Subject: RE: [v4] Bluetooth: virtio: Fix virtbt_probe() init and cleanup
+In-Reply-To: <20260709114745.4030794-1-haoxiang_li2024@163.com>
+References: <20260709114745.4030794-1-haoxiang_li2024@163.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Thu, 2026-07-09 at 14:27 +0200, Tom Catshoek wrote:
-> is_filter_match() looks up each discovery-filter UUID in the queue of
-> services parsed from a device advertisement. When that services list
-> was
-> migrated from a GSList to a struct queue, the queue_find() call kept
-> GLib's g_slist_find_custom() argument order, passing the UUID string
-> where queue_find() expects a match function and the comparison
-> function
-> where it expects the match data.
->=20
-> As a result queue_find() calls the UUID string as if it were a
-> function,
-> jumping into non-executable heap and crashing bluetoothd with SIGSEGV
-> as
-> soon as an advertisement matches a UUID filter configured via
-> SetDiscoveryFilter.
->=20
-> Add a queue_match_func_t helper and pass the arguments in the correct
-> order.
+--===============6164412493355017764==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-That'd be my fault, can you please add:
-Fixes: 91c340d359b7 ("shared: Remove glib dependency from src/shared/ad.c")
-to the commit mesage.
+This is automated email and please do not reply to this email!
 
-I checked the other queue_find() change in the same commit, and the
-args were reordered correctly.
+Dear submitter,
 
-I don't understand why we need match_uuid() though, does it fix a
-warning? If so, it might be nice to do in a separate commit (fix the
-order first, fix the warning second).
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1124641
 
->=20
-> Fixes: https://github.com/bluez/bluez/issues/2282
-> ---
-> =C2=A0src/adapter.c | 11 +++++++++--
-> =C2=A01 file changed, 9 insertions(+), 2 deletions(-)
->=20
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 210225243..4ffa32a52 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -7184,6 +7184,14 @@ static void adapter_msd_notify(struct
-> btd_adapter *adapter,
-> =C2=A0	}
-> =C2=A0}
-> =C2=A0
-> +static bool match_uuid(const void *data, const void *match_data)
-> +{
-> +	const char *uuid =3D data;
-> +	const char *match =3D match_data;
-> +
-> +	return strcmp(uuid, match) =3D=3D 0;
-> +}
-> +
-> =C2=A0static bool is_filter_match(GSList *discovery_filter, struct
-> eir_data *eir_data,
-> =C2=A0								int8
-> _t rssi)
-> =C2=A0{
-> @@ -7216,8 +7224,7 @@ static bool is_filter_match(GSList
-> *discovery_filter, struct eir_data *eir_data,
-> =C2=A0				 * uuid.
-> =C2=A0				 */
-> =C2=A0				if (queue_find(eir_data->services,
-> -							m->data,
-> -							g_strcmp) !=3D
-> NULL)
-> +							match_uuid,
-> m->data))
-> =C2=A0					got_match =3D true;
-> =C2=A0			}
-> =C2=A0		}
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.56 seconds
+VerifyFixes                   PASS      0.07 seconds
+VerifySignedoff               PASS      0.07 seconds
+GitLint                       FAIL      0.20 seconds
+SubjectPrefix                 PASS      0.06 seconds
+BuildKernel                   PASS      26.91 seconds
+CheckAllWarning               PASS      29.72 seconds
+CheckSparse                   PASS      28.07 seconds
+BuildKernel32                 PASS      25.92 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      496.53 seconds
+IncrementalBuild              PASS      25.31 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v4] Bluetooth: virtio: Fix virtbt_probe() init and cleanup
+
+32: B1 Line exceeds max length (85>80): " - Reset and close the virtio device on probe failures after DRIVER_OK. Thanks, Luiz!"
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/418
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6164412493355017764==--
