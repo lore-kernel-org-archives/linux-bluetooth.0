@@ -1,124 +1,156 @@
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E6E3002DF
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2026 13:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783604680; cv=none; b=MR7D7ebca6w0mLMea3Xo/EL+TPL+tf0XfNMnQH+rZ7CQSEaC1u4+GgrOXbNorENIcR8NGupqYGCswfNPX9ftp7tWS+wkTnOCcQaTRyws755pzVE7ZY4Gms7rln+KX2k5/8Yb/74fgNtcjcckeHZZ5lWYS5wNsAnynJYrPqxZDes=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783604680; c=relaxed/simple;
-	bh=+e3rLnCPnclexU/TGq7To9ayodC+7dNeuVtCBIYlwpI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MNLagb9sjmsesxQFkureWpzlMEqoyAG6sPgE5QOW09TMM2ObtJojeFUBazQuMQVamUI9c6WmxP6L9g8eDtnSdKTkNNWOmatEMrUKeewCd17w8EsaDRrX4zR3YOd1+hIS55MmIem8gH2R9CvnLKmsRTqQYHpuwD0lyi5YHpTSFDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dPpD5sMT; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74CD37205C
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2026 13:46:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783604779; cv=pass; b=GPo1cHlUTuhDH+2uyjB8z7SvY5tvd0WuxtE+Qw3j7ekKswmgh2mP1jRJ3RsIux6UVM0gDiqEc8FB4DT4iXQ1A0Wy7tUQ27tPgPMW2U5ZxWWVB+mmRtwMEClKDPdzIUFtSulpX4p3jDIiEeWdV7u6UINTLUMzFmD5F8TfdOJXrWY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783604779; c=relaxed/simple;
+	bh=RMbVu+fxaVZsZomZVTtq38AHoy7C26AVGzbg+senexU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ddIvIYi9o3TG14VVoBJ48CRoGv5UFPA7zTk/agTUBOqwRt+vYk0E5ZzSv9eayRmwOqu8s8Xbpiajr9tntP125j5ZL1Vv52PMkM/xTkpG/SO0nLbTwLLh4xY1HVDLPsyxXb5ZwD0DlMRhShQx96rfiuLwc8nIzVn1xRwguXlMFpE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F2LlrCtX; arc=pass smtp.client-ip=74.125.224.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dPpD5sMT"
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-49ff971e903so685322b6e.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jul 2026 06:44:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F2LlrCtX"
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-667bae10ba3so535884d50.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jul 2026 06:46:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783604776; cv=none;
+        d=google.com; s=arc-20260327;
+        b=qHzAvX1gWYEYG93hL0mjy8ds084QIHCJ6gJwtoIcC9LGgUokJPmXq4vE4Kp/GBsKBQ
+         lxUr0HVSLyJ9/Y5f3ZJfGwQNdJO03Fc/ArhTu6Z2mC8TfbkURymMhzSMX9VIWrHdZMlR
+         +APtdO9zGlwU0l2TpksIuVHn+C9fT+bDmCuR3DRhvXeqSzTgtfzEgoKc9knEqQ17LKdM
+         nPf5KJczMeh3IGxN/SwHwNluFfovJZOgsb5yuQZX3Z4ycmiBDmiyBky0gpDr3K+RJic2
+         OF+qF4rfleAmjoPYOzzAHBlDgePBgWNEEtdTL9s2go826l23GgVS5EIKpzZiI5Gnzt+w
+         64vQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=l1NeMaGVhmRUTU25HGvUarIMaGGLRefoRei9QxPnGy4=;
+        fh=DHIcuCE0V2SUSPR+iPoT/Zu2VFyYRAv/ElxsWgQ9D8s=;
+        b=d0DXLbq4QUHZ5d1C/1Sa3//dbOj7UFGNfLqJCLiR3Gfdxr+ZS+xyB0t3Thb0AoE56k
+         ePZTghsxuXr2xkU5Lo75hm5sYkB09+TgqEfsvH/YwUNM0TyGjfxGVYBI1hU+WzRU8Ccz
+         ADUIRxoikTUVWsO5Ic4RRdHHl30fXTpIIgoKlGVqQejdK1HdfhARGutO0+v/bl4N1hFL
+         lognXD+H03jFRwYbBYyNOizHbHZ9cnYemy5pIZ1gKY+JaqbYviP6NWlyFcLADQoOcLjM
+         oPcDL/Me5Qrx5bq0j+PgqfEpoBL1C2rYcshqbPXpLCgb8EBvV+6+IeWXJJn7i54Jt2hl
+         8/gQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783604678; x=1784209478; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+        d=gmail.com; s=20251104; t=1783604776; x=1784209576; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=7dGLWuFqFGELNIvjyOuEZBSnAuzpWLyUsbUpEnwxx1M=;
-        b=dPpD5sMT4Uhem8FljfUpzaVxwWwcyJx4IU2C0jYPgDcK0NUcmwvVC30xi7VQ/eBLzB
-         +ijSx//CSzntCqJGmSON5MhvF1c7EipZsLfNKyCEBTir94UL1PS9cTlthw6wUE8VilqG
-         Zo8jXjNDrRgFQcZV5CLZfVOHgpL0czm6iVChspTdlV2J3Toc/EK8LX446b3r+7uE00ed
-         vcDEZ07bp+NHGUz9OjJqYJ/OUepiM8ygg0g25WnH/YA76ooWCvGseyEAlLW6ag5SZucQ
-         usQHX1W0dIbUBceFeN+pqkYdPwnWMF7wME/IgNl8UXIBxzXB2gsc90DfU3KuyOlrY/ZL
-         Z0qw==
+        bh=l1NeMaGVhmRUTU25HGvUarIMaGGLRefoRei9QxPnGy4=;
+        b=F2LlrCtXi8jPlt+rdqgsBbCI9T24/gO9NYfTfwwUD4Pa9LjP4CzpHjhsZ6WWTYRyp5
+         s19DPrNLDtyQmNjxzljDrBvIqj1ZSbdgyDkx5qPEVGOJwXA4/u5Wvh/8aTkAhyD8c0/y
+         P+1bOqVFGSmpfBAN061ELiJ6alR+KjTPvj4iNQnykNiIt/V5cz9gdoIVS7LJlQ7JeT4E
+         44+R5DWnP2tAe6QYyf+jEuvMvNkVuWLpvHNZ+a3x3efoJnbcPIDm91O7sR8tALNYg/lb
+         GKmWxiuu9y6cV7mQmUz9OcyBo7Wc4V1Crp/AbnSSTyBHMeDbRgK91g3zqzz5LE7LHmWU
+         J0Vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783604678; x=1784209478;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20251104; t=1783604776; x=1784209576;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=7dGLWuFqFGELNIvjyOuEZBSnAuzpWLyUsbUpEnwxx1M=;
-        b=qAo809DIIjABYZKb5qKVH6YmepCxUdCFMO03nHrNLPEPtl/GDsHDA6Gfv9pBEb/VW7
-         Vg5Ik6qEsIu1pBVrDjeIjflbs4YB6J1RcHtMD/SG5MESl1dLCfdR3V2fETLoUY28qoSi
-         LX8F0rHOhMY09LmqkcY+OJTBdS/uXCUJQhAO21Apax9GUnG4Z68IgeC4PEG1EHe0LkZF
-         5eqYLGk/lT81bZEyl4XF8/vM+2DggC9EXkEqYdDHgLvC3746q9VW9LaX9KLQJrVKgfyE
-         CwSfV56ey80MkDxeVihZWzXbGSoLx6TTTO1BfTPNBJfhMed1JRzlrE0xAcDQUHRnkQtC
-         jaKg==
-X-Forwarded-Encrypted: i=1; AFNElJ/scCwlKwoMF9SD14gsAjI33fV8nj5RsEfcum5CNu1OJ9eUhxsCHcWA9jG7qaQ4z2fS2CImGblpvP8P5ZTPBSU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQo8+WxMrVI961tT87r5sOAnQ8+odWy9SbaK7m4R8vnbYy0XOm
-	emk879+8WPU7y1r04t1UDvJPDxJ0BPF5ppGIN2L+KPPTYc6RfCMyhXGO
-X-Gm-Gg: AfdE7ckP1mEPzxREt18onNOrn0DyBCqoQxZV4aofC54PHNGb7V7GNmq5KWrh+2GoQ13
-	zUIMmbyiViZxebrtdbrxyI6hkaW32GnZMXvtIhco8YGvFWh0tXaHMPDT+57DxPUkGGFFF3o3OJM
-	qQu+U/FoRzv8ORNnE4+PAGae39FKhaMgZUF2PhVDZjSvsgMsad5brLxvEBtnXIeQn+1zTK8CMMw
-	+M/yVSjH6oKS8wfbevHEy2xlKbeB51zQXPePgMeEbnnKhzl2So9Ma05nHzDmy3MlPnfo08V42oN
-	YFjSYYKOGLbkcvQL8S1uAM0R2aqN5mZf8lZ8sU6VK8bcX0zr2eSbZJ4LW3cc1fvoEjlhvOjxQ0m
-	ertZk7JvIxNcxFl9LNs8SwR9tu9o0/NE0OO4UDlUBdIywNzU8TdteBaeE/FvS9H4I2p/krQ7W8A
-	4a8/cJDjt879sCKeQ=
-X-Received: by 2002:a05:6808:4f0e:b0:495:ca1b:7865 with SMTP id 5614622812f47-4a34d9c8f64mr3213817b6e.11.1783604678277;
-        Thu, 09 Jul 2026 06:44:38 -0700 (PDT)
-Received: from localhost ([74.80.182.70])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4a1adca6bedsm3836998b6e.8.2026.07.09.06.44.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 06:44:37 -0700 (PDT)
-Date: Thu, 9 Jul 2026 16:44:31 +0300
-From: Dan Carpenter <error27@gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Haoxiang Li <haoxiang_li2024@163.com>, marcel@holtmann.org,
-	luiz.dentz@gmail.com, yangyingliang@huawei.com,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v4] Bluetooth: virtio: Fix virtbt_probe() init and cleanup
-Message-ID: <ak-lvwzHUfuFcRRa@stanley.mountain>
-References: <20260709114745.4030794-1-haoxiang_li2024@163.com>
- <ak-T4SMxr4rw10jP@stanley.mountain>
- <20260709083606-mutt-send-email-mst@kernel.org>
+        bh=l1NeMaGVhmRUTU25HGvUarIMaGGLRefoRei9QxPnGy4=;
+        b=aC2W9bxZhr5Zu9zIr2xZs1Kp1lwFB0s5i8bfRrhZHNDO3Su09Wswh84O6/CZGbnr6k
+         viEfb7JB023XSMtxbksR/XA6ChVtm1hW8KWOYp0aWnGA7SqSpppdAfC1RhZM4l/YWKk6
+         LaJPsNVmDQvCq3a36+uKCR8b3ozLMdZ0vEqYFQ0MFGcdNq3NYVkCoQPOWbGt+meNQVVm
+         5+kJpDy3eRJPqXYGPTKKGC3cqP9jaDZU7/KRhKeapWiYoNsdOnfTwGyVoTHhdnrCV9qR
+         CRd9zLC/NALOV5/XH6V5h2zEKL8xib+EZTWijzpu2LzxgQQnMJcjca7QAhW6+AOwOmH2
+         FtgA==
+X-Forwarded-Encrypted: i=1; AHgh+Rqs2AwA8HYfETFPmcMOVyUNvMlJte07Ss73So36zHEeFULeNUXoh85vSy8Pj9R8eGf7t5+Z9mXDgJZqq+69VkA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0txDvOu3rUBVnLG835NKkli1x+7ivcXFCMTlNaknvJIEu3Qrb
+	0oF0tLERpgaxwCPXja90cc5IThTuhQYvOlklHKO/kLrxjW3MjCcLuCCdsrD1jo9WZaYmDwCWvpZ
+	eMLL3QZx/XNc2CBVevxU+nE0ch+g9WiI=
+X-Gm-Gg: AfdE7cnoQEvLGJhfQlH0XiGFAfTK+EsEw/e2JjbKXTB0BvjV14rY1lEOYK5o2TNlpAK
+	CXmNv/ku1mhIptrBYODv0EwtE47vlPVcWX0TFSl5P98Da8cVWFt0+rdfXgI8pHtgg1oDiuByhE7
+	55gYZQOXTYTeCWjlkPxoDjPs1s/R9roBBD/95q2a+7OCQq9TJJl7/dxHBqq/Ns99YSUNjL/BST1
+	EOWWQyyvDTuDz6y4GygoS+HGOOPmuRAQrAVYzBVW3KzrGT/MDITViIOj+90apfDISP8fQ9T6kem
+	eQcl8EqIhsM2NNBvwaZyyPWQ6JUSWLX/Fm5v8fW2UtjQiLTY8gmLJfG4LP8p/YYmGXELBw==
+X-Received: by 2002:a05:690e:d44:b0:667:c30e:5b0e with SMTP id
+ 956f58d0204a3-667c30e5d4emr21900d50.108.1783604775550; Thu, 09 Jul 2026
+ 06:46:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260709083606-mutt-send-email-mst@kernel.org>
+References: <20260708-btusb_prep_qcc2072-v1-0-d835b187fd01@oss.qualcomm.com>
+In-Reply-To: <20260708-btusb_prep_qcc2072-v1-0-d835b187fd01@oss.qualcomm.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 9 Jul 2026 09:46:03 -0400
+X-Gm-Features: AVVi8CeSzSYr7k9nr3K1HgjzRex5osH8xe1xJp63B_NHqYXLPYlyPh3iuEpID5c
+Message-ID: <CABBYNZLYXEAqXrVfCxFtgYEU-gCZariPYiGbk3zES0tQ+4qSAQ@mail.gmail.com>
+Subject: Re: [PATCH 0/6] Bluetooth: btusb: Preparation for upcoming Qualcomm
+ QCC2072 support
+To: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Zijun Hu <zijun_hu@icloud.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 09, 2026 at 08:36:32AM -0400, Michael S. Tsirkin wrote:
-> 
-> why make changes at all if no one can test. in fact, why have a driver
-> then.
+Hi Zijun,
 
-It would be interesting to see what proportion of kernel patches are
-actually tested...  Testing the code is often impossible because you
-need the hardware.
+On Thu, Jul 9, 2026 at 2:15=E2=80=AFAM Zijun Hu <zijun.hu@oss.qualcomm.com>=
+ wrote:
+>
+> This series collects the btusb and devcoredump changes required by the
+> upcoming Qualcomm QCC2072 Bluetooth driver. None of them are QCC2072-
+> specific: they refactor btusb into a shape that can host vendor-specific
+> source files, and make a few coredump helpers reusable.
 
-In drivers/staging probably very few patches are tested.  Every couple
-years I look at the data from where the problems come from and it's
-normally from complicated changes from the driver maintainer.  The
-number of bugs introduced by checkpatch and static checker fixes is
-really tiny.
+I really this not a 'lets redesign btusb because our driver is not
+standard Bluetooth Class' kind of thing, we already have hdev->setup
+and other callbacks for vendor specific functionality, if you want
+more than that perhaps it needs to be become it own driver.
 
-It's about risk vs reward.  Fixing a security issue is a huge reward.
-Cleaning up the code.  Fixing obvious leaks and static checker issues.
-Those things are all valuable because they raise the standards and
-they prevent copy and paste bugs.
+> Posting them as a standalone series because the QCC2072 driver itself is
+> larger and will take longer to review. These prerequisites are small and
+> self-contained, so they can hopefully be reviewed and merged on their own
+> in the meantime.
+>
+> The series contains:
+>  - coredump: a readable state-name helper and a fixed-size dump header,
+>    both reused by the vendor driver
+>  - btusb: an indirect recv_intr() hook, hci_dev-based recv wrappers, a
+>    shared reset-prepare helper, and a split into btusb_main.c so vendor
+>    files can be added later
+>
+> No functional change intended.
+>
+> Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
+> ---
+> Zijun Hu (6):
+>       Bluetooth: coredump: Introduce and apply hci_devcd_state_name()
+>       Bluetooth: coredump: Allow drivers to pad dump header to fixed size
+>       Bluetooth: btusb: Add an indirect recv_intr() hook to btusb_data
+>       Bluetooth: btusb: Add wrappers btusb_recv_{event,acl}_hdev()
+>       Bluetooth: btusb: Add a simple static btusb_prepare_reset()
+>       Bluetooth: btusb: Build the driver from multiple source files
+>
+>  drivers/bluetooth/Makefile                  |  2 ++
+>  drivers/bluetooth/{btusb.c =3D> btusb_main.c} | 33 +++++++++++++++++++++=
++---
+>  include/net/bluetooth/coredump.h            | 11 +++++++++
+>  net/bluetooth/coredump.c                    | 38 ++++++++++++++++++++---=
+------
+>  4 files changed, 68 insertions(+), 16 deletions(-)
+> ---
+> base-commit: ca75417ab1793f23b3ddc91869f0809b593d6954
+> change-id: 20260708-btusb_prep_qcc2072-23604a4e81d1
+>
+> Best regards,
+> --
+> Zijun Hu <zijun.hu@oss.qualcomm.com>
+>
 
-I consider a few things:
 
-1. Is it a security fix?  I recently fixed some memory corruption and
-   broke a driver.  I tried to be careful, I wrote a long commit message
-   describing my thinking, but I still messed up.  And that's okay
-   because fixing security bugs is important.
-2. Is the code new?  If it is then there are probably very few users,
-   and the original developer is still around so it's pretty safe to
-   change.
-3. Is it an error path?  Code on error paths is hard to test in the
-   best of times.  The risk is very low.
-4. Is the change small and obvious?
-
-On the other hand, I often leave known bugs.  In this case, we're talking
-about a use after free if the driver fails to probe.  That's not a
-security thing.  It's unlikely to ever affect anyone in real life.  The
-fix affects the success path so it could easily cause the driver to stop
-working.
-
-regards,
-dan carpenter
+--=20
+Luiz Augusto von Dentz
