@@ -1,101 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0177740D597;
-	Thu,  9 Jul 2026 11:06:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A18409100
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2026 11:47:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783595166; cv=none; b=G58VCxQjIC+Di76xQEX9qJSQnZn1m5acs4UNJvnS1ugIdUtBT6BxARmwufuoIEj9+oWTczknducI7revEUJDL7okqijg0z2T3hVDCnXqRNBpWe7hW/2KgOhHcCSb9KGzn3cYbULFCcSDNv1g94RVKzcdKum9sdXUL6/4em/n9hY=
+	t=1783597643; cv=none; b=CR1FMFIiwT5OczX3j84+4dAHsabKFQ238s0Q9JqNdvDc2BbK17hz/UXyCFra4qXuDRlLMu2y7TJx0/JUyK6Z30SYGJvKaKcUSMGbtafhZR74LWG+KQ+YDP5i3Yae5Rs9fFQGAgQUmjfIRahLFsG36LOxU8MUWHvcvuNr34eQRYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783595166; c=relaxed/simple;
-	bh=L0ggTBIg+L0Zgsb9SaIua+cfUbpNOZLlpQePBd/bpF8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a0NQ+Kv/3gaJfX3kmcthQRgEHMjo8rXQ2VaHCP7L/lD5ColcTOIDQ2DrVqmVmFMHfpfdRuDWeMDMjmeKyVQHalw/4MZgmNi35QodTmRZw6a/TGceoxHFUXJ2U1QRY4GhccDBbnzft0JjItj5bamLR/C08ZF1+iUn3etLrVp76Io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hps1OtM+; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783597643; c=relaxed/simple;
+	bh=/COlRRXaoH9NNlgjVg/+LPmx9BQ4x4p4lGUaPrCNATs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ahFAsWUjYDhiTzP5OmP/uUmy2hLXWJyk/GZnIa/ylqooEyvIXzptf6Z7ScX9em9/bH6X3hK94Rk4uBr6Pacp2demYI30RpBv/pU4GgzE9ml9lOShBpTwTfAri23YAI4dYwdD6mzOAZoxhfAP9VGZi2smJgqpTzyAMAyowCvUhdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mwLeHQND; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hps1OtM+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B12D1F000E9;
-	Thu,  9 Jul 2026 11:06:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783595164;
-	bh=QRCOi1d3juindKV8dv250wRxKWzlLL1Iz7KoGGc0b8M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hps1OtM+WQiybTvEwq7SFT/jX5ykgJD968jK72dCf6FGvtq6M0OL9mtqfmZcMdnvF
-	 aMjZ7OaD/Wk3fmDNy3PcSIn+vNN+aWPHAufbRLu84JaGgO8Cfpn6UirTXAjwk+HDuJ
-	 GjV7pmIJFIEbaDlyg3aMMUu//jdpe2uL2LNfnxXDdtCeQhWCcbeXxAn6CaDfZ/xedt
-	 ahVUhAlPPe4jMSsTi5Tbbl8eTGrlfMuN5zDf/67uYVUGkqcoCD+xJmpuBThZEcjaFF
-	 XDMUfQWlssU5ykPRHmgjADymUtFiko5/0JG26KafA7tUEC/EwZhGfQDauS71TQfeMv
-	 QoImqTQAruQ6g==
-Received: from johan by xi.lan with local (Exim 4.99.4)
-	(envelope-from <johan@kernel.org>)
-	id 1whmZu-00000003WFh-0HXu;
-	Thu, 09 Jul 2026 13:06:02 +0200
-Date: Thu, 9 Jul 2026 13:06:02 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Xiang Mei <xmei5@asu.edu>, Bartosz Golaszewski <brgl@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hovold <johan+linaro@kernel.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bestswngs@gmail.com
-Subject: Re: [PATCH bluetooth] Bluetooth: qca: fix NVM tag length underflow
- in TLV parser
-Message-ID: <ak-AmguTdGpr04dm@hovoldconsulting.com>
-References: <20260704231030.996390-1-xmei5@asu.edu>
- <akomrM-h521h6M0i@hovoldconsulting.com>
- <CAPpSM+Sph2Drdv_HxKTkfkHP-qDPqrRHYQ9eaOhJ5YGE-5cKYQ@mail.gmail.com>
- <ak5czs34RMdBhPkP@hovoldconsulting.com>
- <CABBYNZ+gp57kxcXZTLWgd5n19cmDc1Z8TimW0bv7CQLT7khzug@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mwLeHQND"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-84847f60deeso737215b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jul 2026 04:47:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783597641; x=1784202441; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=/COlRRXaoH9NNlgjVg/+LPmx9BQ4x4p4lGUaPrCNATs=;
+        b=mwLeHQNDHUZHjZAJCPi7artPjbpa6y7AQn9X9xpMRGtJ0H4ITcapGaE0Ixr+j3eNxB
+         d4QvVZ08AiexEO0dEhzqxOzjjFXl6LOrnR4TkwnD3Gd7ywq3yc5gOVWICmzf0s4lhLL5
+         7QAg3yiQ7/038HX+g7gUlrqM6siRWttPBsorZhQ1c83yOIErrK4gRvl9SoMcSgP5PKLn
+         N9WS+rlqd6ZV1KzX1MEydaEAsB3G8ZaUdTeXW2Lfvq49NGD/lQPNyox+cdAc6Tk63PS6
+         +PrAu/bp6WPU8FkABMvKUWUV0xqH1eNAA2DEurmCquX/jRwYt3Roc0nfCbXXze+fil0U
+         6xIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783597641; x=1784202441;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=/COlRRXaoH9NNlgjVg/+LPmx9BQ4x4p4lGUaPrCNATs=;
+        b=sQkAWvs8P52w1usOyajnBj6bOGBIasrNjEgOKkuqug1/D/pQy0490HEX7IClvbFniL
+         4cxqAvSXGuq/fqVB8TRXShiyvREqCMXAfHGBXEHys8LLHcvxvxC4nWWoA/NLXA76P74J
+         9rPXORsh5P9mb+Tlz8WDOH8wjqMGRAcQ7NiDEHUu6fmsxpn6mTrFWzczarbrEdzAz+nw
+         qE1RDcPCk56/qovN3Xv/x99kHEXf4/cPnxD057ytLPCzb6V8XN789X9nEHh3fAMYFhWz
+         j7JyxOxEbcXyOHRRD5PbMLdmoPk0kITsooVCd8RWMFjZ0po/HiwHiOQpC/XNZqqpI4cE
+         Z0tw==
+X-Gm-Message-State: AOJu0Yz/xGI14YKIyNRrGM/SxIT8h8BVoC0iCjEbhRDh9aMzfF3+k2a4
+	uXEAmjU9cTAwGNy4zH42ChradsovOYhEGOW90ij4A72LZFGS3D95fyq9l3FhZvOS
+X-Gm-Gg: AfdE7cm1ju2SfqYfdP6TZu027YK6v1UQgy9T6dNTx/0pMxNbS58ZBn24bZAEF2epCf/
+	/pWBRG5NRIuHwrq3IJW4uFVpnpIZUxRUlflm7BTMa9+iimXxxUFEKwk2KahX7Q85uY6UvmJqaLs
+	rj0hQfleu3isyEtThvLWmaeXRlvC2Au1f/sMj4rLIZvVev4fqYwCjeE0T+y0N5P1BXaWKwFvmjk
+	sG+47pTYjjzoaBukbBxUolHR2O9+IeS71WwRD+9zJqzcA/lxTaTmY9SrlzXtqF6SO6DMKwrUoWA
+	4V0NNfy0qisxyq/mqNkCXj9+mYbHCX4Eu1EdskFV3mFNDbOV1J0oc8/jtRVaCmoIqexs64c+xI9
+	t4PEtwMZxxWp4kgEbUCRQKU1ars4zzYwzqSL/9xPLkf6WIVcdGIZug3J9xFJHGFKtLkMJU9txop
+	6RdkPhI3O6PtK3J/hdfg==
+X-Received: by 2002:a05:6a20:d81a:b0:3bf:a8fa:a7b1 with SMTP id adf61e73a8af0-3c0d6c6f129mr3311876637.37.1783597641108;
+        Thu, 09 Jul 2026 04:47:21 -0700 (PDT)
+Received: from [172.17.0.2] ([134.33.70.58])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3117483941csm31028138eec.7.2026.07.09.04.47.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 04:47:20 -0700 (PDT)
+Message-ID: <6a4f8a48.e9d484b9.15e549.7642@mx.google.com>
+Date: Thu, 09 Jul 2026 04:47:20 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6607473248918696179=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZ+gp57kxcXZTLWgd5n19cmDc1Z8TimW0bv7CQLT7khzug@mail.gmail.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, sherry.sun@oss.nxp.com
+Subject: RE: Add PCIe M.2 Key E connector support for NXP i.MX boards
+In-Reply-To: <20260709101555.3034853-2-sherry.sun@oss.nxp.com>
+References: <20260709101555.3034853-2-sherry.sun@oss.nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Wed, Jul 08, 2026 at 11:15:00AM -0400, Luiz Augusto von Dentz wrote:
-> On Wed, Jul 8, 2026 at 10:21 AM Johan Hovold <johan@kernel.org> wrote:
-> > On Tue, Jul 07, 2026 at 10:55:23AM -0700, Xiang Mei wrote:
-> > > On Sun, Jul 5, 2026 at 2:41 AM Johan Hovold <johan@kernel.org> wrote:
-> > > > On Sat, Jul 04, 2026 at 04:10:30PM -0700, Xiang Mei wrote:
+--===============6607473248918696179==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-> > > > > The loop body
-> > > > > then reads a 12-byte struct tlv_type_nvm past the end of the short
-> > > > > vmalloc'd firmware buffer (and the EDL_TAG_ID_* handlers can write past it).
-> > > >
-> > > > No, only four bytes are read before the loop exits without any further
-> > > > consequences due to the following check:
-> >
-> > > Thanks Johan, and you're right. Only the 2-byte tag_id (and at most
-> > > the 4 bytes of tag_id/tag_len) is read out of bounds. This commit
-> > > message overstated the impact, and I should have caught that.
-> > >
-> > > Unfortunately, the bot merged this patch when I was preparing the v2
-> > > this morning. If you think the inaccurate commit message is worth
-> > > fixing on record, I can send a follow-up to the maintainers to correct
-> > > the message
-> >
-> > It was Luiz who applied the patch -- perhaps he did not notice my
-> > conditional Reviewed-by tag.
-> >
-> > I assume the Bluetooth tree is not rebased so I don't think there's
-> > anything that can be done here and there is no need to send a v2 (unless
-> > Luiz says otherwise).
-> 
-> If only the commit message that needs updating then I guess we don't
-> need to worry about if stating something slightly inaccurate.
+This is an automated email and please do not reply to this email.
 
-It's mostly an issue for backporting and determining the impact of the
-fix. The commit message as it stands suggests that the bug can result in
-memory corruption when it really is just a 4-byte oob read.
+Dear Submitter,
 
-And then the inclusion of my tag makes it look like I failed to spot
-this during review.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-But let's keep it this way this time.
+----- Output -----
 
-Johan
+error: patch failed: drivers/pci/controller/dwc/pci-imx6.c:1382
+error: drivers/pci/controller/dwc/pci-imx6.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6607473248918696179==--
