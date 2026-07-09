@@ -1,150 +1,155 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C4742B749
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2026 12:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302B5212548
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2026 12:51:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783600601; cv=none; b=pw9kadEy2tCaFy8Kk3cIrejfCGUpRIh4qo7tJtJgwcPUXHCagTNNpo1FxmBJXEy6A3KGOGTTNkq4oE13KMHa6nZelU04jwNW8onLZSvRnv/lv6NEiIw9kbDTLu8SxUyE7X7y/zrTjXINxqInQHQB58U6UISs8Qzeq1GH7WE85yw=
+	t=1783601514; cv=none; b=R55N5RHe1RTuEnMlDIzCkZpl0I4d8ihGL0guAei8EEQ9cgy89nBySUhGcLPM9WrapzogmYydGLyCsyo/zcs69B0bq0/B9eaCGz/xVPlce4f14rvpJ6vB4rdlyiWGSwCYK6A90P3o6397vIaqjuEaHl3H7uio/kIA9tJPs+EiG00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783600601; c=relaxed/simple;
-	bh=CdLOGrLsX4K4SEZ10SMqCGElMKDoLo6fIagv31h55LA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ApPriaNX0Z1C/ha6eRKAOBpWC9iXc1yO1f08YjBf4Rlig21FNOhjKVFXY6QZEGFMi2aX/PEcmFyjjboSRwwl9riuAwM0RwWBovhCH8dAQLCZ019bPWdubqSDV/IfbFgy66m50mQTRfwvmxk+DEsyXOHcwBvkd2U1r/I9y+ZfcbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Uc8HcZX/; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=fgg3s5D9; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1783601514; c=relaxed/simple;
+	bh=gG5zWqwuMu8ApOu6d8A1wOtafwpC84IJDuMW2G5TYJE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gK9uBU/K9XI5VDNpKm6HXEPHrumaTPXCXmdJvvKjb7sqWs4zz4Z9LXEcki8lAIhtSbs0zc9qAAiduDW1OcVbXbG57bwR4dbBx/MKtSm1VwjmkJsPiN2C++4WAaaAoxxyKgqSuwmvUGckkF40d7xiqTBi/AFzO4g5tBGyi+B/3o0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=UT5yIZ8E; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=P6O2lhoe; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uc8HcZX/";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="fgg3s5D9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783600598;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KavkeeVI7BmP8QSeokBd+WQVOIUMBshHyo5uj4Thjyw=;
-	b=Uc8HcZX/7EyCdX/Bu/6+h050DYjVLcsrWz721Padpi18f4M5Cl0VpMQx5ZFP3G46l21USo
-	y3YdvMfRHQ9Jp/Mdwc1tk+n2VWz/6qNpRgk9VkJanR9LDiqJFDJnzPXGxin0Sd6bplQFEn
-	X4tV0P7LpOdsH8QPfmMXP7bQUUh/Ick=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-611-8k8R30AMNOa_KlUB-jJLKA-1; Thu, 09 Jul 2026 08:36:37 -0400
-X-MC-Unique: 8k8R30AMNOa_KlUB-jJLKA-1
-X-Mimecast-MFC-AGG-ID: 8k8R30AMNOa_KlUB-jJLKA_1783600596
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-47dee73fdc7so763350f8f.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jul 2026 05:36:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="UT5yIZ8E";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="P6O2lhoe"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 669BNT0c1489088
+	for <linux-bluetooth@vger.kernel.org>; Thu, 9 Jul 2026 12:51:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=aVHv/qvuO3yALsIYRdKVYocl2ys6ifkekwG
+	OPg1Bkbk=; b=UT5yIZ8EyDsjDrboWk1jWSqtVTqVEGva7a0zR65917a8Ba6Lp1k
+	EP+s3lpA7sSEuoL9DqxWhffNYYeHcGLZPpduuhnM8HZfyGUsIKKNasKspXNNoFzv
+	8gAVvCGFcUzpv48Bx2HZxU7E+pbm7vB56GxOVZ9NnTXjCVzEojFxr0ULSs9OfQav
+	ln6/XrfdeFhWENV7A4Niz+L7/Rth2i0WJqalFhjONeAmLUNkZ3U8aUyeY0SFw2OQ
+	Dm4bXfPv/mOArDJXnst6ks3vM5W6hEjq+uD+XcL4wyQqexwak23KA4wmMc51915j
+	P4QE813naJLSOwvK3Zv1enggJiSNGIeVNVg==
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4f9wwfu8d4-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jul 2026 12:51:52 +0000 (GMT)
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-c894c1c4aa9so1441067a12.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jul 2026 05:51:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1783600596; x=1784205396; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=KavkeeVI7BmP8QSeokBd+WQVOIUMBshHyo5uj4Thjyw=;
-        b=fgg3s5D957zD8AHoeXv264kTnVOdE0WBXNaxMgh1ftvGLQLU+GBvXB9Gl2XhhWDsIY
-         FcHyQMy8BJRk9DLU7qbTvFNb0Xw0rTD/u0eC46EgiAgQz9ItBBQwJ73N/DpXs2TYolDc
-         baarJiwdHWluZzThNP4TtUmx444SDqN62Hem/trddGR8M29bvJoDNOPhK8qPiVEzpcS5
-         kGxObrAghuoKmNq9VobvbJos/T81V1oHWR27qY93hGn55WsbTq430YGH1RiXXqF+mZ0s
-         yjPV6X1rHV+tUqW0fxFblG85aqhwbqTZ1WBr+rnRzbHfZKDEEv9fGzN9UbYBzLr7D0B9
-         BJKw==
+        d=oss.qualcomm.com; s=google; t=1783601511; x=1784206311; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=aVHv/qvuO3yALsIYRdKVYocl2ys6ifkekwGOPg1Bkbk=;
+        b=P6O2lhoePgSSSqKZFXy+IarEXsT+1njW5Cy5Yc0TLnozfo886PVjmm4OaieMqEjlrC
+         PLIZltq67o73myAK2tY4D+iOMn+7ZegjJpg4kABb67bya0wdNU/SGhZLlPMqo8XWHOsT
+         L9phkCNteu6wAbAz5+puf7IzAVULWc+bcVAPT3yOZrJ0/HLyHNCuvMz+6TcJojezNZJP
+         PI0qPpysPOf5mbfNKyLgH51BRQbKQUss6q/QiXNb/LGQkxVCw5NqKYWigKmG4xbAmAHc
+         qTYVkdZwjYxDvgUS/eUjPhqEBYJ12KU7CvdFEux8qvG+FXjAgOWZkX80L6VpAxo9wxGq
+         Ynww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783600596; x=1784205396;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=KavkeeVI7BmP8QSeokBd+WQVOIUMBshHyo5uj4Thjyw=;
-        b=P6BGq2d8lGPKVuWeE2QR4TUxJji+gqhRgpTlkcH3Kea+sHFgDgkEHVfzT/0gCk5BAM
-         suJ7BCr/losbpWtoP6U3p5Q+nPFTgFC3owpxBwXJpu+Otxe0cDsmFF57iAki/CcVO5co
-         JnuxsN5V8B2GaAqci8Cy3uyfx5qpuE3WriORu5Ay7a698tsQZpF/Qhin79P9gAaooZBE
-         CFPg1TltIvBrJ9Ms4Jl0cVIvZkHHcIxZDAepe+WQuLngtVu03S4g/MgDeL0oeJvovGKm
-         UMcUxztRy5uwGV8Z4yHcdYXTcNB0AFyI0/gGi9xiCzYHLWxAAi2vD8Jobmj/6SEfD04/
-         NEiw==
-X-Forwarded-Encrypted: i=1; AHgh+RrIr0b285+HT+uSfF+Iq4NdW5830UFk2eHY1I1lJIxCAvgEJQOuZFHtPmzVvcMiwPq0mTwPB/q6fMPSWo5gOJk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMScVTUUNv+6M/RfEXmNlJaqPaY09rwOsKSxAuuGfD7Swft45n
-	Spd2X4mJ1WnGxtcKpnOjEIED5ynUHPUDzO3n9KYY9q2xyFutlqdsNd0wjYJdnWGTSVoPg658kxT
-	eQESfyYvPyYx979JaCkDre+bWRQaqVfDaKlapyFRsaykvqrDLf1PLpgPju8ZAQj7+e6Twhg==
-X-Gm-Gg: AfdE7ck9q7voa3L7iCO18J37rTQQm9Vnw0hEkWYHqyTvtIGmKA6+ExUtgXySbqCg0HU
-	9HhCaKeFKwygRHNeGDKqDamBU8DxaXNbjnoq5RF1ib05X6rY2YXWv6gB6oL8lUeMTbJWp6CY36E
-	cxy1QRBIUwxnLag3QE42Ok6X+4nNjkgwlXaTOsxfq2qKi/n7MfidLyiqTiEJaeF/OLj1h+eWrr8
-	1hySs34//6bg8IGGkuu6EE1oilVc8R9aI4CC+dQQUDWlVfTwQkieI6KzBzQBNxl23YN76Mkh3CP
-	7PZNbm2VX6EUqK0sMBVXeK7rTIoX+BZ7NHVeDc3PWZtAwe7DNWlBUmnq6BrNaX23mUkSNwQL/Zr
-	lIGMRTE0Vzx+QASdp7O9rIpRFTi+1PD22
-X-Received: by 2002:a5d:584c:0:b0:472:ec66:274a with SMTP id ffacd0b85a97d-47df074e24amr7671052f8f.7.1783600596109;
-        Thu, 09 Jul 2026 05:36:36 -0700 (PDT)
-X-Received: by 2002:a5d:584c:0:b0:472:ec66:274a with SMTP id ffacd0b85a97d-47df074e24amr7670997f8f.7.1783600595551;
-        Thu, 09 Jul 2026 05:36:35 -0700 (PDT)
-Received: from redhat.com (IGLD-80-230-68-31.inter.net.il. [80.230.68.31])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0a558easm51266922f8f.27.2026.07.09.05.36.34
+        d=1e100.net; s=20251104; t=1783601511; x=1784206311;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=aVHv/qvuO3yALsIYRdKVYocl2ys6ifkekwGOPg1Bkbk=;
+        b=ZLxvLQ8IhepXF+6HQsE5JvfpwGi6fzpBXZfffTSjWjCs7yw/6Nw5c4iJH4zjGZJjWf
+         e5T4ACsAefDqAcV7AOnRfrioOAPMu4yS0ER2vWOh7+5ycnhqQmLNMutETN3/aFiVEMAP
+         lmRW9qmmnxzTwl7tIhOOp+dLdJnr/7JI7LFQV6laXwPGg+VCFl9comrzAnYLDxQu5wuv
+         5pw6mgPwZRfVHrvF6kzs/Js81+T3pIaTwRZxiyydPEQjg/gcqUK6KIYpLTyaZg7lFwp4
+         N7rmFq4KYvHoY5TrNeZ1N9VcV2UFL4+HHcdyuhI71182F3oO+1x7dMLEM+7MV+eCbvFk
+         kiwg==
+X-Gm-Message-State: AOJu0YwzcAtn+4hHDWIl8R8IIsu/Ed8LNHg4cVaBSYJXejmd5cb61NBc
+	R8TA5Dcl1a6DvNeN64w4A5PeRKsjdsN1hFKcmsTkiVqdhyGXoMB7gMK04n6WdFvE5vSfZoQusce
+	3GakHxT8Pg1hbD66gTajpzkksZeKLcTknK8Pk78hYPqBAH5NZfsGFDhwc0SG2f+NHFLXpSPeifA
+	vR3sQ=
+X-Gm-Gg: AfdE7cmj9ux+aurtcowqiOp7WsS8A1DJr5raXDhb6kcVmQ8C/2bjyKNaoC8rI+ncSjo
+	J0sak/Qy1ojEQxCc/eL1b3MaIv87RefmbouPhxVQT8tTVq5aQj0U2SacaagHdhciZpe9yd6qRST
+	g0C0teF92Birseian9V7AR5NDEqCBUkfgA6mNkaFrrfBpUkh4bQ4I96wdadcO0pCMG0OIlW29sh
+	OHgITyy27WIByPwuG4MJvbxA1T74Doz+IEu+q4x5d+l0KfCgb10eFYaCgUHydH7zjqfBxJLSTEC
+	d25HXS0j09bs6mTl2jXIRcCvYo/fPNHoliDNX4XUlGjn9BeK05o2DikNvy7u9f9Y6bMYiihxmMr
+	3zmb1k5Vo/w1w6geIlyLMvySL10ibEQIZKjLgYSfh
+X-Received: by 2002:a05:6a20:cfa8:b0:3bf:b931:b3f4 with SMTP id adf61e73a8af0-3c0bd1588e8mr7873031637.51.1783601511014;
+        Thu, 09 Jul 2026 05:51:51 -0700 (PDT)
+X-Received: by 2002:a05:6a20:cfa8:b0:3bf:b931:b3f4 with SMTP id adf61e73a8af0-3c0bd1588e8mr7873005637.51.1783601510485;
+        Thu, 09 Jul 2026 05:51:50 -0700 (PDT)
+Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3117d847e17sm28875679eec.18.2026.07.09.05.51.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 05:36:35 -0700 (PDT)
-Date: Thu, 9 Jul 2026 08:36:32 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Dan Carpenter <error27@gmail.com>
-Cc: Haoxiang Li <haoxiang_li2024@163.com>, marcel@holtmann.org,
-	luiz.dentz@gmail.com, yangyingliang@huawei.com,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v4] Bluetooth: virtio: Fix virtbt_probe() init and cleanup
-Message-ID: <20260709083606-mutt-send-email-mst@kernel.org>
-References: <20260709114745.4030794-1-haoxiang_li2024@163.com>
- <ak-T4SMxr4rw10jP@stanley.mountain>
+        Thu, 09 Jul 2026 05:51:50 -0700 (PDT)
+From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
+        quic_anubhavg@quicinc.com,
+        Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v3 0/3] doc: Add Channel Sounding API and bluetoothctl documentation
+Date: Thu,  9 Jul 2026 18:21:39 +0530
+Message-Id: <20260709125142.2655974-1-naga.akella@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ak-T4SMxr4rw10jP@stanley.mountain>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzA5MDEyNSBTYWx0ZWRfX77JgMVFu3PAh
+ X+D2jhKJlAHkT2k4qnkkWTriOvtLdds1/51U5AwXMj/0iselPAayXDPp3TysMAOOy9+8iiMpRoG
+ 5ncqxfzPS1BX01lVW+qHRFBtLsajranNOq6dV66XHAt59d5kpibbyiPkvY2lNxXKheCmhH+gH6D
+ I4IexOSdaWJ6m4doQE1eg9/WH6H9CHhWUwHmKEuqxXVdPgbFyiQVES9ifTUT1WRvgk3vxqtb4Km
+ Q0FG6ce1CHnDqrfomEJQ4JStjdywEbkouMxGp6vhl2iGYv8Og8VBgPutQ5DzUqUuOUreRRlAQrb
+ 2LW/DtNzXRofWq4/UAR+PEVw5KBYwtH7Bei89l2oo+bNi9B49W2X4AuCMb32m/4gkoMmWMcPGZk
+ s/8ZeT5piS4NMDGTFIq5jnw/mVT8L7Lig8PtYAc/gnxzYACKxwRHarilvTgpDoKmeZMndPVBqL8
+ Wu5OCkFemrrUax0qUhA==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzA5MDEyNSBTYWx0ZWRfX0Evae+mNO7HF
+ 61oIiiHIQzcSyyj4DnGzWRYy6zRhzgfmTDOZ/0unQZnq85Uv/5OsSFEfZNI63aNmNgUz8Ukic/x
+ 0hiGjPtB6DHjyMvoe/6yziZEWnM+/CU=
+X-Proofpoint-ORIG-GUID: EqPWTW0JwE0YthBuZVrlrFJGy5L89j2l
+X-Proofpoint-GUID: EqPWTW0JwE0YthBuZVrlrFJGy5L89j2l
+X-Authority-Analysis: v=2.4 cv=Krh9H2WN c=1 sm=1 tr=0 ts=6a4f9968 cx=c_pps
+ a=oF/VQ+ItUULfLr/lQ2/icg==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22 a=iSzkMiWJHOwH8bCpblYA:9
+ a=3WC7DwWrALyhR5TkjVHa:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-09_02,2026-07-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 phishscore=0 priorityscore=1501 impostorscore=0
+ lowpriorityscore=0 adultscore=0 spamscore=0 suspectscore=0 bulkscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2607090125
 
-On Thu, Jul 09, 2026 at 03:28:17PM +0300, Dan Carpenter wrote:
-> On Thu, Jul 09, 2026 at 07:47:45PM +0800, Haoxiang Li wrote:
-> > virtbt_probe() allocates vbt before setting up the virtqueues, but some
-> > failure paths return without freeing it.
-> > 
-> > The probe path also registers the HCI device before the virtio transport
-> > is opened. Since hci_register_dev() makes the HCI device visible and queues
-> > power_on work, move it after virtio_device_ready() and virtbt_open_vdev()
-> > so the transport is ready before the HCI core can use it.
-> > 
-> > On failures after DRIVER_OK, reset and close the virtio device before
-> > deleting the virtqueues and freeing vbt. This also cancels pending rx work
-> > before vbt is freed.
-> > 
-> > Fixes: afd2daa26c7a ("Bluetooth: Add support for virtio transport driver")
-> > Fixes: dc65b4b0f90a ("Bluetooth: virtio_bt: fix device removal")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
-> > ---
-> > Changes in v2:
-> >  - Rework virtbt_probe() error paths into an unwind ladder.
-> >  - Free vbt on probe failures.
-> >  - Reset the virtio device and unregister the HCI device before freeing it
-> >    when virtbt_open_vdev() fails.
-> >  - Close the virtio device before unregistering the HCI device in remove().
-> > 
-> >    Thanks Dan for the suggestions. The blog is very helpful.
-> > 
-> > Changes in v3:
-> >  - Remove virtio_reset_device() from the virtbt_open_vdev() failure path.
-> > 
-> > Changes in v4:
-> >  - Move hci_register_dev() after virtio_device_ready() and virtbt_open_vdev().
-> >  - Reset and close the virtio device on probe failures after DRIVER_OK. Thanks, Luiz!
-> 
-> These are Sashiko warnings.  To be honest, I would feel really
-> uncomfortable blindly applying them without testing.  If someone
-> can test, then great.  Otherwise, I would probably apply v3.  The
-> stuff that Sashiko complained about was all pre-existing issues
-> even though for the last one it said it wasn't but it was.
-> 
-> regards,
-> dan carpenter
+Improve Channel Sounding documentation by adding cross-references
+between the D-Bus APIs and bluetoothctl commands, along with practical
+usage examples.
 
-why make changes at all if no one can test. in fact, why have a driver
-then.
+The D-Bus API documents gain :Used by: references to the bluetoothctl
+cs submenu and examples for methods and signals, while the
+bluetoothctl documentation is updated with :Uses: references,
+argument descriptions, and usage examples.
+
+Changes in v3:
+- Addressed review comments.
+- Dropped the rest of the previously submitted series pending redesign
+
+Changes in v2:
+- Addressed review comments.
+- Dropped the rest of the previously submitted series pending redesign
+
+
+Naga Bhavani Akella (3):
+  doc/org.bluez.ChannelSounding1:Add Used by reference and Examples
+  doc/org.bluez.ChannelSoundingRanging1:Add references and examples
+  doc/bluetoothctl-cs: Add :Uses: fields and document arguments
+
+ Makefile.am                               |   4 +
+ doc/bluetoothctl-cs.rst                   | 281 ++++++++++++
+ doc/org.bluez.ChannelSounding1.rst        | 532 ++++++++++++++++++++++
+ doc/org.bluez.ChannelSoundingRanging1.rst |  66 +++
+ 4 files changed, 883 insertions(+)
+ create mode 100644 doc/bluetoothctl-cs.rst
+ create mode 100644 doc/org.bluez.ChannelSounding1.rst
+ create mode 100644 doc/org.bluez.ChannelSoundingRanging1.rst
 
 -- 
-MST
 
