@@ -1,154 +1,111 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F78B199D8
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2026 14:21:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A77330D3B
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2026 14:21:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783606873; cv=none; b=CUKepMu/V0K1PbSazcFgE4AQpjwgbFTZ5A1XggWBAWCxBjx/GCi13JYyZjEXa+4BF7/Iqq9nhMu/Jn590ml1SyrJFPRz4VKnUrb179+zdDTsaprNjL94clB5rqjxvxHzBT1h8kPLNBPYdEF32Z/JHdsexZxH0MmSS8d5YE3Ii1k=
+	t=1783606913; cv=none; b=S5BdJZZU23+NGyVnPjTFQLpTLegTF0MRjl2H0I4ZZd2PHJyM2cK8uNm6umQVW6csjxQEi8cI/1mcO8p490P8lPcGC2wvTNQgsnsok+gswH56OcooQ9bvQF7JgQe1uN1QGsBc2FRsJZMItfJfGGj9xEOKtEdDV3bb/djs2fN7wNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783606873; c=relaxed/simple;
-	bh=tZELtjKJqBuV9EVwMW9I8r+Zfo5ceXTDE5jeQ+a8vOU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S8oKCHMW79fkZop7FTGsO3pu6/ahM+uOzPpPEGfPRiUT+elw50a/n9NCNNGBuK+f+yp9q+KVN78k0oKhX5CeG+ctZAE1UuNOm4+NcX0bpUgLueiuVi/U7ItxtIf7TauSBA0qaWvZJUCdmUz/51KKM0wApFVc5cTjRNv7PerZlg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VKVZQ/2F; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=FNX6rtba; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VKVZQ/2F";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="FNX6rtba"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783606870;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b4EU8eRYY65P/bki26bW15zZV0Wc6U0922CjckSToFo=;
-	b=VKVZQ/2FPFXNGMBLm1goKnd5iZExhjIO0GxYjckJuF4mU9tz2CqeMis0JjT4abhq8OVSkb
-	pb7/rZ9odIAyJZeMNhVJDAK3CF9s33DOlFD/PFdQc763BpPYojbRh89vLT2Iul8agQ09sS
-	M7/6KefVfP9Yxs14G79dBVbhsO4LSbM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-624-W5dwm4laO3y3BZdf2wASRQ-1; Thu, 09 Jul 2026 10:21:09 -0400
-X-MC-Unique: W5dwm4laO3y3BZdf2wASRQ-1
-X-Mimecast-MFC-AGG-ID: W5dwm4laO3y3BZdf2wASRQ_1783606868
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-493e3ecd385so24319995e9.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jul 2026 07:21:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1783606868; x=1784211668; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=b4EU8eRYY65P/bki26bW15zZV0Wc6U0922CjckSToFo=;
-        b=FNX6rtbaycqa+upmuph4EPhdjnj/paeoV6HQ987AP/1taZfqD/IcxtZj0bRuctb7kB
-         liXAvC7D/Ugz9TEcEWmU42S76taYXAFgrIuW4K8kBPxWmt9KifT6GpIHgFGldJ8zcIJj
-         91PuVthg4iwsivZOBK0dDyIdrYKqFwW6EdbBri77vY6futdnfWttH1oil6ZHW7vAg6ty
-         LutK/7EE+9/CmkQ6xybaSDJNtjik3STZP1WIhkFLXJnj93iKoeIq0rhSk3iICRNauJqi
-         FgYBQfyHlm2Nye1Zc7LfBi26Sl/Sc9o7AgYNrMQQUfuEZ3vzHjsq8kGCYVtAovTjdjSB
-         R1+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783606868; x=1784211668;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=b4EU8eRYY65P/bki26bW15zZV0Wc6U0922CjckSToFo=;
-        b=lUs1XK/cKRbzKYrL5qIjcIgHcgxSefED77EU42VgD8hMzYzeLFeUe/Ky9XXyZrjHaG
-         Vpx5CJOlevbssg7pG15c1kPi2DKmJyimxC3f2Mc1J6QZv/LrORsHM6XY7+MWy4T9mWaJ
-         tCjhAAWrdEclV4DEWw0RvKZN5F+nGpoejDnEAlvlWP39nbaJOrJNLkH8BwOwtdNCVFpP
-         4vUM9Hgt2GVVF70M6K2nwU3UWKTYh6/c/SyOtR5ib+wWZaGCRA/3R4xHnFnlYKUI6sM5
-         VzHDx70zAV8wpqtugCeQDbxhLf2fssW+LRH1GbNyYO0DmAD6tRE7ua3NOFaipxQtvS0H
-         M3Vg==
-X-Forwarded-Encrypted: i=1; AHgh+RqQ5x2RDqJ1HwtbHRA0mCZemiMdWd14n7nObW4r9PpQvPP/tjGvTfWcSMm5H0p9i+7jLl+eGHcDn0nuZ8aAo28=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx23x9UY0rbUKDYQGLaMFA9nS9LRnXEZrUxsOqYSgIjevcuXeVn
-	i30jRJ5ZYGr/npDznICZ0g72W2muvgbMOEGzxqMtFy0/v+si0+SWGgPWPLGGj03KofpMs8aI4eJ
-	DKzK3ddiKC7uqwnsTDBcSR8q6KHHG2SbkhzWiLo16zMmMgjjgqzbz8o1Yg+MENBjDa607rQ==
-X-Gm-Gg: AfdE7cklvJYbJTLV92frfO4orpIJtw88bZXDR3dkiUbMeGrFWG6KhY8QXAzcOd36gPu
-	sqgOVgEA4QC8gby4lJ7Cjp6GctmL0uIyFBU9vhNuxTovxJU+VPFweBla2gx1j9KGVczN69t05JE
-	m4CAc8TBp2Njbiajzt/fDMlAhQuRK1RQwzdrhlv28TlH9oqa7xU3ACjLnoIkMaRqnpvYkGB247X
-	1FZ9ILmhOlUUSGxL8/JKoboxyfmp64TRCifiyAcHC/icQkn/k6y3p4rt9xFornGsf5SjIbXUy1W
-	fnANmovYASpjj8AR8sPPaXKCflZOfaAeoAs2xcEPc1HB56/Fy1r8ksfdIBoo1aZj9U1Xcvlsmct
-	SkfhltPGu/YwIsBnhd+XP/LZs62/yQr4x
-X-Received: by 2002:a05:600c:3f0a:b0:490:e974:e006 with SMTP id 5b1f17b1804b1-493e68e8195mr71460365e9.29.1783606868054;
-        Thu, 09 Jul 2026 07:21:08 -0700 (PDT)
-X-Received: by 2002:a05:600c:3f0a:b0:490:e974:e006 with SMTP id 5b1f17b1804b1-493e68e8195mr71459835e9.29.1783606867530;
-        Thu, 09 Jul 2026 07:21:07 -0700 (PDT)
-Received: from redhat.com (IGLD-80-230-68-31.inter.net.il. [80.230.68.31])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e5a5d174sm165949165e9.2.2026.07.09.07.21.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 07:21:07 -0700 (PDT)
-Date: Thu, 9 Jul 2026 10:21:04 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Dan Carpenter <error27@gmail.com>
-Cc: Haoxiang Li <haoxiang_li2024@163.com>, marcel@holtmann.org,
-	luiz.dentz@gmail.com, yangyingliang@huawei.com,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v4] Bluetooth: virtio: Fix virtbt_probe() init and cleanup
-Message-ID: <20260709101904-mutt-send-email-mst@kernel.org>
-References: <20260709114745.4030794-1-haoxiang_li2024@163.com>
- <ak-T4SMxr4rw10jP@stanley.mountain>
- <20260709083606-mutt-send-email-mst@kernel.org>
- <ak-lvwzHUfuFcRRa@stanley.mountain>
+	s=arc-20240116; t=1783606913; c=relaxed/simple;
+	bh=difH9GbaET8Rhru0GV41xEpGX/KL75uz77wTry5xCH0=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Vj21s6Ge8NafyMqZb8dW6UQB2xr+vfFYh8LnpVJyeD27oWBzL4b6l0/ZBXBGjT2YLRL+0lwMWsGQqLdqnIcPUiOBwl/UB7FyEMo3iI4I2tQ+spirvQx0Tq1GMLn1MAUn0DMHY4mYF46GHZ6TxTVpbKjlLOjFVIt8ioeqr8ioYrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A87183EDBA;
+	Thu,  9 Jul 2026 14:21:42 +0000 (UTC)
+Message-ID: <a2d7c978a97b5e55a05cb7000f4d20d8c8dc542e.camel@hadess.net>
+Subject: Re: [PATCH BlueZ] adapter: Fix crash on UUID discovery filter match
+From: Bastien Nocera <hadess@hadess.net>
+To: Tom Catshoek <tomcatshoek@zeelandnet.nl>, linux-bluetooth@vger.kernel.org
+Date: Thu, 09 Jul 2026 16:21:42 +0200
+In-Reply-To: <20260709122704.351232-1-tomcatshoek@zeelandnet.nl>
+References: <20260709122704.351232-1-tomcatshoek@zeelandnet.nl>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ak-lvwzHUfuFcRRa@stanley.mountain>
+X-GND-Sasl: hadess@hadess.net
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: dmFkZTGhVF2/IS+jXN9DkX4NOivjVdU+te5YuW6bGZaV+3KAvkyYuqh+wpZyTt8vEIfLvnhOOcQWFSaD5B90zxPv4ZcVlOStzAYHny+ESjeTwqL3KpYHzXfm5ATzIj2s7lW/JRp/LoqvytkOdgiMo6s6QGiMGRp6AE802U2+rn7ri9nrRNv5MZNR2vgu05vuU1PaN1axJ/v6j9mmQ6nfnAMMxSoq+yHnn+h/WnKLF2mawXyvHUFWe6LdVkXnCxphwK+yx8cmfu2s5rVfXEExVVqh4OEZlj8UtP9Du1axR8f8mTHdZunPxbPEiiqGTQR/MlwY+3STJL73ea+Q69iTi14+14dKkHABNr+cfIDIvbE5He24mM2PIkqYwsK77mWEImFtVFQO6RAapk+XU5VEheClItqYXLru7TH5SiHn1m9k6k48VDaWbayhINGACtlHTFykV88yg+LEjhPj8WPZPRJacmnqpUckMxzTFxFDTLCoNI1FaduZm3AIxtDisi1SyDnlIKfNwYv9M4KOKridR+nJTg3rUl3aelFqo91AIS04BetWpJ8ssxOB3j8VNpWwCArKQRQukQ3vFnTKDm5ZXq0g0qILjV0wqik9gDNzsofsxa1WbtjGvH6O0Hardf6I6zfBtub0kqCbjDlDfscvagVnrbGebCrsvhK09xzr7Rhzbgs7pQ
 
-On Thu, Jul 09, 2026 at 04:44:31PM +0300, Dan Carpenter wrote:
-> On Thu, Jul 09, 2026 at 08:36:32AM -0400, Michael S. Tsirkin wrote:
-> > 
-> > why make changes at all if no one can test. in fact, why have a driver
-> > then.
-> 
-> It would be interesting to see what proportion of kernel patches are
-> actually tested...  Testing the code is often impossible because you
-> need the hardware.
+On Thu, 2026-07-09 at 14:27 +0200, Tom Catshoek wrote:
+> is_filter_match() looks up each discovery-filter UUID in the queue of
+> services parsed from a device advertisement. When that services list
+> was
+> migrated from a GSList to a struct queue, the queue_find() call kept
+> GLib's g_slist_find_custom() argument order, passing the UUID string
+> where queue_find() expects a match function and the comparison
+> function
+> where it expects the match data.
+>=20
+> As a result queue_find() calls the UUID string as if it were a
+> function,
+> jumping into non-executable heap and crashing bluetoothd with SIGSEGV
+> as
+> soon as an advertisement matches a UUID filter configured via
+> SetDiscoveryFilter.
+>=20
+> Add a queue_match_func_t helper and pass the arguments in the correct
+> order.
 
-Sure I agree - if I am refactoring kernel APIs I would often
-compile the driver and that is it.
-But that is different from poking at a driver specifically.
-If I do that then yes I expect the patch to be tested.
+That'd be my fault, can you please add:
+Fixes: 91c340d359b7 ("shared: Remove glib dependency from src/shared/ad.c")
+to the commit mesage.
 
+I checked the other queue_find() change in the same commit, and the
+args were reordered correctly.
 
+I don't understand why we need match_uuid() though, does it fix a
+warning? If so, it might be nice to do in a separate commit (fix the
+order first, fix the warning second).
 
-> In drivers/staging probably very few patches are tested.  Every couple
-> years I look at the data from where the problems come from and it's
-> normally from complicated changes from the driver maintainer.  The
-> number of bugs introduced by checkpatch and static checker fixes is
-> really tiny.
-> 
-> It's about risk vs reward.  Fixing a security issue is a huge reward.
-> Cleaning up the code.  Fixing obvious leaks and static checker issues.
-> Those things are all valuable because they raise the standards and
-> they prevent copy and paste bugs.
-> 
-> I consider a few things:
-> 
-> 1. Is it a security fix?  I recently fixed some memory corruption and
->    broke a driver.  I tried to be careful, I wrote a long commit message
->    describing my thinking, but I still messed up.  And that's okay
->    because fixing security bugs is important.
-> 2. Is the code new?  If it is then there are probably very few users,
->    and the original developer is still around so it's pretty safe to
->    change.
-> 3. Is it an error path?  Code on error paths is hard to test in the
->    best of times.  The risk is very low.
-> 4. Is the change small and obvious?
-> 
-> On the other hand, I often leave known bugs.  In this case, we're talking
-> about a use after free if the driver fails to probe.  That's not a
-> security thing.  It's unlikely to ever affect anyone in real life.  The
-> fix affects the success path so it could easily cause the driver to stop
-> working.
-
-Exactly, agree on all points.
-
-> regards,
-> dan carpenter
-
+>=20
+> Fixes: https://github.com/bluez/bluez/issues/2282
+> ---
+> =C2=A0src/adapter.c | 11 +++++++++--
+> =C2=A01 file changed, 9 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 210225243..4ffa32a52 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -7184,6 +7184,14 @@ static void adapter_msd_notify(struct
+> btd_adapter *adapter,
+> =C2=A0	}
+> =C2=A0}
+> =C2=A0
+> +static bool match_uuid(const void *data, const void *match_data)
+> +{
+> +	const char *uuid =3D data;
+> +	const char *match =3D match_data;
+> +
+> +	return strcmp(uuid, match) =3D=3D 0;
+> +}
+> +
+> =C2=A0static bool is_filter_match(GSList *discovery_filter, struct
+> eir_data *eir_data,
+> =C2=A0								int8
+> _t rssi)
+> =C2=A0{
+> @@ -7216,8 +7224,7 @@ static bool is_filter_match(GSList
+> *discovery_filter, struct eir_data *eir_data,
+> =C2=A0				 * uuid.
+> =C2=A0				 */
+> =C2=A0				if (queue_find(eir_data->services,
+> -							m->data,
+> -							g_strcmp) !=3D
+> NULL)
+> +							match_uuid,
+> m->data))
+> =C2=A0					got_match =3D true;
+> =C2=A0			}
+> =C2=A0		}
