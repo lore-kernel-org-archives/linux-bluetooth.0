@@ -1,48 +1,58 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out203-205-221-236.mail.qq.com (out203-205-221-236.mail.qq.com [203.205.221.236])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C1238C2DE;
-	Thu,  9 Jul 2026 01:04:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785692E7394;
+	Thu,  9 Jul 2026 01:58:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783559093; cv=none; b=nHocFb4OLO4uh57K0p2qs1QX6QBcDK7npoUNg+aG1VU6o3jgOwEoJ5MO0oTDeXaeqR+FCRv4mZElA81JUl23z6U244/jO/RMIF+v1e69ijrkXAKnM7cNLsrFVY8Spn/6ff+myDW1hslOgRbZalNurIURGbQPJkDIWdzpMepuHM4=
+	t=1783562311; cv=none; b=u4gvoWxD2C9rT3eHx1DtdgO5HFLFoQEY7Wd0ohJ8oIrkZ1pRzltDD2xX7cJp33M0Zx2t9IqhsIOpeUO4OuxmLnlQApVehTI1J0PaLBzav+j1uOsPV8dt5E9bmvcbIl8/1Z4sbWqvO0AFyyUY6WeRwSaBmXhAXzcwjzIlT9iTCrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783559093; c=relaxed/simple;
-	bh=xUs4wAy8JUb9Ic57L2kyMPNp79QTUf3tscDEOPv85gY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dAeU1iEccFim8Pxg9PPZn08G/9kyr8hz0mZmk4myo19/EFHRjps3BnifmZOzOQ44el84GK9JSOPBweOKFIwC7i9RdIsgh7AVkFAsx/YBFnrW55WYgk+XWYKXM9ur60kYhD4VsLCcZDApqPaci79lajfUK39ddFXdTua6an056bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EjuP8cpz; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783562311; c=relaxed/simple;
+	bh=Q6GS0tGEFL8Iq5Kwz0a1FovYfPubdFKF2hAcfqAkgJc=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=Q80oB9TmMs//Vy5qpI0xDG6KYXM4bW/ZZiZAXO/OoBAFivEBzFjnaU0Qt8W1VsV5zDi4Ixf/RPBtS6wUVw6DXZFBYmQWFXQGKGr5fHpwfnytCriGCAgS6Bx/aCzgLetyWo+jiUywvN7TzhgdgzgbTbjCcyGgHZMBTj3a2LDP1q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=cJwIOhZi; arc=none smtp.client-ip=203.205.221.236
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EjuP8cpz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E6D11F000E9;
-	Thu,  9 Jul 2026 01:04:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783559092;
-	bh=PsqFAtt/QiPLYAvf8WoanRCKQA0mCWJzQjJEyhGxIcw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=EjuP8cpz615bGCqS+Wx3a0DcogUkF5ac0TPjrNtqEGVxCpXY+bn84IZnWHWoSD6fL
-	 j4pp5YtbUuU1kQuF9obftZAeuGSgSGPvp9GI+l6Som8b7xOj0qUqTLQcCuo4+WCBzz
-	 /aoVzB4ZXA3L/Siy7wkXtyE5OzJCljP5HyDlo1nV6+rAT6OZOCRgDYSyAf3lR3bu0o
-	 SBqECDV1XzSFh5h6q4Uh5qBwTKUeXnCo9kcwjTS6GOUKlHa7i9TYauQeT/0ZYtM4j/
-	 XgPnYJquOUx7m/CwR9CMt1+3UwXTtuWfwwuRB5tLA1/IfGjsKPY81UvZBf4kFcdYh0
-	 ez1Ar1fDEP3jQ==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
-Cc: Sasha Levin <sashal@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Claudia Draghicescu <claudia.rosu@nxp.com>,
-	linux-bluetooth@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="cJwIOhZi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1783562299;
+	bh=M9HosSdQ/iP6aZZ9wByFKDq/TxAPVCMaSusu1sWM1tU=;
+	h=From:To:Cc:Subject:Date;
+	b=cJwIOhZiHCNwAKgo7l3Pp385s72FHxscYz1A+LQQTnBKZKXEsGCoEgIYE1xEzpV+e
+	 9tM/6uES3VKDXgjbPp+WuGYQ0wjPsJXUQMwL/4BNXbqfxD7kT/eTZw4rIXXnYu8yjC
+	 JBb4WfavZTu6rN8xDl8f0gx2Fqy7pHnMLQh/PKfM=
+Received: from localhost.localdomain ([116.128.244.169])
+	by newxmesmtplogicsvrsza53-0.qq.com (NewEsmtp) with SMTP
+	id E913A4B6; Thu, 09 Jul 2026 09:58:17 +0800
+X-QQ-mid: xmsmtpt1783562297tycy6v8kn
+Message-ID: <tencent_EC14979976A7BBA1E2B79B3F5116F7C30C07@qq.com>
+X-QQ-XMAILINFO: MZtEYADUG4AgtO9U+yZuAV1+mxAoDF4pgpJEhp7ZYfFoY4mKi2Et9vJYue4q8e
+	 pdhG53ANe19CqN4JF9bRwVthtwHCetROIOcPDwMS87R3EbRnJtleSl0TtPHZHLKgFapfjTL3ldiU
+	 lX3xd6WvzHuXr7CRtT2ygt/llU0ltVNmLKabMcHgVYFgYUjkAY7gRzwGyo6MubsSu6rEfippqiue
+	 jZW2XpCzsxpcxMg+RYTV/3fpuSmoSRtzkPpkAVDpPsHnP5UWo1/XDGrZMA7o3SD0Ay0V3CCUTSSQ
+	 9Wl/iox7t9a2Uzy2cEcUkj9z8oyKznhztXaOrjAbPaLkVgupFDSkfJ1f7BLnrJ4QHDB88iihyXrT
+	 PCwPe01LQQ6ziLOob4Rb7h61d5xyJbPMnCV63jYbntxlfE8ZRgby7nlSg0jr5cc3mP3nTQrTxsh7
+	 ts2Vk02Z60SP5kM3bnA3SDfR+MwzJLJXlfuQxyLxRqil5B38G0sVJMTzo9o3q5bAdG+8JvcG0mOq
+	 3lbeF3qyIDa8ssWmo9I1+L7VMW+iC0G4An83l5ougpNGasjitYZZKY+CqDboBG/zpwBntuTURENI
+	 ZQeuLRQwbSopypWzAonhuKAU1WxVb5YNm0OEGohq3cLzbNPCCb5iw1hjOXEwEGnPPvcYi3/gh6vW
+	 mkAE2y5DgNY5CGzYfU6KnO+OvT8bbCLAaTaGFAto2SQSf60HRw1gNvw1MLzHx/ZU4/cF6TGphrd6
+	 MhMDm23gjjjy1wuRKe/HDMbqq/8c8N0VA7FUyAUnvwprPdlZ6kGQ5/1j9BWozzHi1xp7Osg3+Xty
+	 VAubHP78v90iq7dwoJXV8FpAzs4qCf8Hgt9PHvQQXv+9qmsWapcxVpANT+RsqNTcJDutOXhvuc8T
+	 okfdjiLaWV4yMW99QGzIocUEU/UEkiJ32Spse/rGtG7yz8iUychVXYPt8c3sJHS9dYmXSTwXwazz
+	 v2b/eSeKFT4BdTUjTx+wKFZWK8BB/fl87RXAloJDgWMs5oWwlKDOs90dECWqu0/Nn7Hmd665TYwi
+	 k0GkVMaWni+2Vl4FaS
+X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
+From: Zhao Dongdong <winter91@foxmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	"Jeremy Erazo (Devel Group)" <mendozayt13@gmail.com>
-Subject: Re: [PATCH v2 0/2] Bluetooth: ISO: backport missed OOB write fix to 6.6.y and 6.1.y
-Date: Wed,  8 Jul 2026 21:04:45 -0400
-Message-ID: <20260708194323.agent5-0001@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260707220526.271712-1-mendozayt13@gmail.com>
-References: <20260707220526.271712-1-mendozayt13@gmail.com>
+	Zhao Dongdong <zhaodongdong@kylinos.cn>
+Subject: [PATCH] Bluetooth: virtio_bt: fix memory leak in virtbt_probe
+Date: Thu,  9 Jul 2026 09:57:50 +0800
+X-OQ-MSGID: <20260709015750.80288-1-winter91@foxmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -51,18 +61,47 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-> Root cause: upstream commit f4da3ee15de9944482382181329bb6d7335ca003
-> ("Bluetooth: ISO: Copy BASE if service data matches EIR_BAA_SERVICE_UUID",
-> 2023-09-28, mainline v6.7) addressed the OOB write in iso_connect_ind()
-> but landed without a Fixes: tag, so the stable autoselect bot never
-> picked it up.
+From: Zhao Dongdong <zhaodongdong@kylinos.cn>
 
-The upstream commit cherry-picks cleanly onto both trees, so I've queued
-f4da3ee15de994 directly for 6.6 and 6.1 instead of the v2 patches. That
-keeps the eir.h include placement identical to upstream (addressing
-Greg's review) and also carries the getsockopt put_user() hunk as part
-of the original commit. No need for a v3.
+In virtbt_probe(), the vbt structure is allocated via kzalloc_obj()
+but not freed when virtio_find_vqs() fails. Additionally, the
+open_failed and failed error labels do not free vbt, causing a
+memory leak on any error path after vbt allocation.
 
+Fix the leak by adding a dedicated err_find_vqs label after del_vqs
+in the failed path, so that find_vqs failures skip del_vqs (since
+vqs were never established) while still freeing vbt. The existing
+failed and open_failed labels also gain vbt cleanup.
+
+Fixes: afd2daa26c7a ("Bluetooth: Add support for virtio transport driver")
+Signed-off-by: Zhao Dongdong <zhaodongdong@kylinos.cn>
+---
+ drivers/bluetooth/virtio_bt.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
+index 140ab55c9fc5..61ab3863bb0f 100644
+--- a/drivers/bluetooth/virtio_bt.c
++++ b/drivers/bluetooth/virtio_bt.c
+@@ -311,7 +311,7 @@ static int virtbt_probe(struct virtio_device *vdev)
+ 
+ 	err = virtio_find_vqs(vdev, VIRTBT_NUM_VQS, vbt->vqs, vqs_info, NULL);
+ 	if (err)
+-		return err;
++		goto find_vqs_failed;
+ 
+ 	hdev = hci_alloc_dev();
+ 	if (!hdev) {
+@@ -400,6 +400,9 @@ static int virtbt_probe(struct virtio_device *vdev)
+ 	hci_free_dev(hdev);
+ failed:
+ 	vdev->config->del_vqs(vdev);
++find_vqs_failed:
++	vdev->priv = NULL;
++	kfree(vbt);
+ 	return err;
+ }
+ 
 -- 
-Thanks,
-Sasha
+2.25.1
+
