@@ -1,150 +1,203 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6714B3F8233;
-	Thu,  9 Jul 2026 11:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE373B14D3
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2026 12:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783597697; cv=none; b=XBaZ6LUryOxsZ12HswtvM1Jjma+yQWL1ZpwG5hA2GDlCI60/JLHPvKh8CbuAyBc8uns0G7nC9bhVltMiW0Ok4jFl2nAOzeXr3hQr/bNMFS/lbw1grvNLgW4dOueVNZ8FCYjdCjI86UR7NTmA1y0ZzwT17iAuID9TYo1MXdAiK9M=
+	t=1783599695; cv=none; b=fz4CBQ4+/cF14WsuTCPDesg/lAvSTbA34ezzRgAsgg3RIV2zrdkl4XcKofIIYbKo/H411owpsG8DkcaC9zvDZEViMSXxn7CVo5m+cYxab9m7FknYJ1Cx3oulKhS+IaQEEqFHXVOdMaBfJ6OjSW5fChPiZB7FCxKKLwWS/ohVZdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783597697; c=relaxed/simple;
-	bh=3GHVytqAiXztOpvo3irA/vj2g4iFfeqJ9bonYBsjPOY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eCw0uXUKyIXNLa7/2RV3SnjOPfIBLjM7A2IROdrl77wJ2KcGWt0bZ/gzz52jOSr3PPVbYp4NjwQmdC9SdF4/PSSzET8kuXRfy22BBFhDjDxSy9hrX/iFI2zgp9AQ+nufJ3eIyXGejJzzefhhxd7zB82uTSruyGFPL5ZmXTBhSJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=jqWYavq4; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1783599695; c=relaxed/simple;
+	bh=8uSAq8arSVsm+loQxDS6lyItmimb8B940XyVsN43fpA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=snl5XcmMe6/m3gD9nqCXmmoXbBAtAai89zEJhsoUkMxlxl/kyqeE3GfHMpXBwKxb9w2LKNFmQ9CXDcJymBUOwaFM4Sg1QOI4e7Yx5rBIWIYchcVAg2rucrrsQtJD/1Qw8Z5ndwqzyohdyO8EJlQnQEesxq1P56Z9KJ8RrcgnZrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pOaepx+T; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="jqWYavq4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=TQ
-	2dgI13JWSwktDEmuOJMUNjWbExU+eiPgxf6tnfoW8=; b=jqWYavq4f045OAUzlJ
-	Wqgm2eBhuNfeNeIsU8fONZtNpzBVFYn9huJy92i7dfQgH6NbDkivi5U9oRuBKp4d
-	oY505kINaHjREeaR1qzL8d9A7JpT/iA0YUoAOLTDa2zCWd8H1S0LjNQYZnbA2Dod
-	2LJxSQd8JVPuk9S/tLXNP2beo=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wAHRqBiik9q5_JKIw--.24489S2;
-	Thu, 09 Jul 2026 19:47:48 +0800 (CST)
-From: Haoxiang Li <haoxiang_li2024@163.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	yangyingliang@huawei.com,
-	error27@gmail.com,
-	mst@redhat.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Haoxiang Li <haoxiang_li2024@163.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v4] Bluetooth: virtio: Fix virtbt_probe() init and cleanup
-Date: Thu,  9 Jul 2026 19:47:45 +0800
-Message-Id: <20260709114745.4030794-1-haoxiang_li2024@163.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pOaepx+T"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-848595b338cso732874b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jul 2026 05:21:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783599694; x=1784204494; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=EVrXLql3UOa3SxY9clHiM5izENQFrIDZAC2yv3Xm7Co=;
+        b=pOaepx+T+qUK53ca/otDp1nOCzhN6Upj65LHBsYh1QlFx+FLLKSE5k2SJW/S/K6Ffi
+         gc1lNQb+fgqQjq0ZpfnsvKdEcmrOdRgNd1PkieveZXQo8y5QhQ/ecaBD/x6/2Vi1/Xpf
+         h9iEwT/Hgn9mx/+3RcL34JgKes0tsPDvZvQQMRpV+C0mGDiMkR819qufrVFyWeK/TgE2
+         8Qut2Z29R/yKNqetb/PDg/Uhc2dB6n2Z+0DBksh1vQHLtnllfW1eQtkRA67Jc+l8Q0xF
+         Pyxf0v8CSzzlI1LW1KWi4xemPmWRVIDq4OAbkA5WpGtFUz0pQY6+tnoUpMR2z7fwFEgm
+         1Xcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783599694; x=1784204494;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=EVrXLql3UOa3SxY9clHiM5izENQFrIDZAC2yv3Xm7Co=;
+        b=BE8XD87OAYio9Nxd/punLjnbE1rn4wkiUA31onVQonXGY4kYvdkiedOyh0RUyH0ZaT
+         OW99DeGNW3g8OlCijQiu3aBo442KAyMdTrqqDQez2/WWp4gDFoDyzrTBeiY+Qb9W87o/
+         yWLUW97Fdj/Jue6Uv9PkJtkq5cRNNsHT+413fLvF9Lyp2G6ROWYpglQokakNZ4TawddN
+         wDPqv/e+qIo3IQQy7if0h+8Lz4W61wONg2qKJ+PLXSeEOCVGeLtcgqovZjmTmtODzySJ
+         QTGHfXm+x3KzHOpBRJ1+pIdzjk1z2b7P0sR9H1UQIyJrRFNG+C62bSgYR2vDm2CLg0G3
+         juqQ==
+X-Gm-Message-State: AOJu0YyRYboycymCAwzxsboBjH0J5BMvOa1tMOTlO3oi2RCFojKnxV7o
+	3HnkGXG4gtOYtVX/ziOZukqU0ZEOMVouaYmoO/cg9AbsAvfip4rKYPGFZUEvsA==
+X-Gm-Gg: AfdE7cmAUIc+e82WoEcCTJPRcfXsWLCfBXcnrB8YDFXeCfIZtyYapwPoZDgXIx5sg6I
+	JzMl8of3GNrZSRP3e/xJQR+hzZx9a+95KCidKbb5FHERSyigtg9xJBVIYuMBHFdQqdwxZkced1F
+	oddnVnvILO4CYZdR3QDRJpyR0KeI7sJJcDMRsZmd7+7J4XNQ2hihaG4LHGgW7o4pJBkNNXutjSp
+	DQ5Q4S5D2+DwTlMQA6S7DQ4/ZyjVZ+PBriuV4xyLlA3VsgNaqrGt579ioBlzbryvXPf3Bi7X3lm
+	FvvIhIrLzAj6AVqUxAqqtnMbPowe6jznXNx5lvvzoYCyPUDrHPsZxmzUkM1hp97zfhrauuy+DFL
+	8RZUu84emwrBQtKnlLWKjNFutxs+kpI5EJ0Iwbm2kHERBnICcZ6JH0D8k7k9gCacROTu72R9r2J
+	IcRG3lLUV29FY1VbskreYz4w==
+X-Received: by 2002:a05:6a20:258e:b0:3c0:9c18:d5a8 with SMTP id adf61e73a8af0-3c0bd1c625fmr8740936637.69.1783599693377;
+        Thu, 09 Jul 2026 05:21:33 -0700 (PDT)
+Received: from [172.17.0.2] ([172.184.210.210])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31174a583bcsm35149246eec.19.2026.07.09.05.21.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 05:21:32 -0700 (PDT)
+Message-ID: <6a4f924c.f1c1923d.991d1.97fa@mx.google.com>
+Date: Thu, 09 Jul 2026 05:21:32 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0912913918223314289=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wAHRqBiik9q5_JKIw--.24489S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxArWxAF1DXF13XFWUXF48Crg_yoW5WrW5pF
-	sxWF98AFy0gFW3Can8Xa18ua4xCFs7C3yIgrWaq3s0grZ0yrWUAryjy34UKa4UZrZ8Zay8
-	JF4kJ34kZrWDuFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0JUUfQiUUUUU=
-X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/xtbC7QQqmGpPimRsSgAA32
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, george.moussalem@outlook.com
+Subject: RE: Add support for IPQ5018 Bluetooth
+In-Reply-To: <20260709-ipq5018-bluetooth-v5-1-e476c41f03b8@outlook.com>
+References: <20260709-ipq5018-bluetooth-v5-1-e476c41f03b8@outlook.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-virtbt_probe() allocates vbt before setting up the virtqueues, but some
-failure paths return without freeing it.
+--===============0912913918223314289==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The probe path also registers the HCI device before the virtio transport
-is opened. Since hci_register_dev() makes the HCI device visible and queues
-power_on work, move it after virtio_device_ready() and virtbt_open_vdev()
-so the transport is ready before the HCI core can use it.
+This is automated email and please do not reply to this email!
 
-On failures after DRIVER_OK, reset and close the virtio device before
-deleting the virtqueues and freeing vbt. This also cancels pending rx work
-before vbt is freed.
+Dear submitter,
 
-Fixes: afd2daa26c7a ("Bluetooth: Add support for virtio transport driver")
-Fixes: dc65b4b0f90a ("Bluetooth: virtio_bt: fix device removal")
-Cc: stable@vger.kernel.org
-Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1124520
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      5.36 seconds
+VerifyFixes                   PASS      0.07 seconds
+VerifySignedoff               PASS      0.07 seconds
+GitLint                       FAIL      1.23 seconds
+SubjectPrefix                 FAIL      0.43 seconds
+BuildKernel                   PASS      27.68 seconds
+CheckAllWarning               PASS      30.76 seconds
+CheckSparse                   PASS      28.91 seconds
+BuildKernel32                 PASS      27.09 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      503.36 seconds
+TestRunner_l2cap-tester       PASS      58.63 seconds
+TestRunner_iso-tester         PASS      75.61 seconds
+TestRunner_bnep-tester        PASS      19.34 seconds
+TestRunner_mgmt-tester        FAIL      214.55 seconds
+TestRunner_rfcomm-tester      PASS      25.23 seconds
+TestRunner_sco-tester         PASS      32.47 seconds
+TestRunner_ioctl-tester       PASS      25.77 seconds
+TestRunner_mesh-tester        FAIL      24.84 seconds
+TestRunner_smp-tester         PASS      23.02 seconds
+TestRunner_userchan-tester    PASS      19.89 seconds
+TestRunner_6lowpan-tester     PASS      22.64 seconds
+IncrementalBuild              PASS      33.55 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v5,1/6] dt-bindings: net: bluetooth: Document Qualcomm IPQ5018 Bluetooth controller
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#96: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 87 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14674953.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v5,4/6] Bluetooth: Introduce Qualcomm IPQ5018 IPC based HCI driver
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#143: 
+new file mode 100644
+
+total: 0 errors, 1 warnings, 1257 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14674958.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v5,1/6] dt-bindings: net: bluetooth: Document Qualcomm IPQ5018 Bluetooth controller
+
+1: T1 Title exceeds max length (84>80): "[v5,1/6] dt-bindings: net: bluetooth: Document Qualcomm IPQ5018 Bluetooth controller"
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.236 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.824 seconds
+Mesh - Send cancel - 2                               Timed out    1.992 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/417
+
 ---
-Changes in v2:
- - Rework virtbt_probe() error paths into an unwind ladder.
- - Free vbt on probe failures.
- - Reset the virtio device and unregister the HCI device before freeing it
-   when virtbt_open_vdev() fails.
- - Close the virtio device before unregistering the HCI device in remove().
+Regards,
+Linux Bluetooth
 
-   Thanks Dan for the suggestions. The blog is very helpful.
 
-Changes in v3:
- - Remove virtio_reset_device() from the virtbt_open_vdev() failure path.
-
-Changes in v4:
- - Move hci_register_dev() after virtio_device_ready() and virtbt_open_vdev().
- - Reset and close the virtio device on probe failures after DRIVER_OK. Thanks, Luiz!
----
- drivers/bluetooth/virtio_bt.c | 27 ++++++++++++++++-----------
- 1 file changed, 16 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
-index 140ab55c9fc5..e7e79ba3c1f7 100644
---- a/drivers/bluetooth/virtio_bt.c
-+++ b/drivers/bluetooth/virtio_bt.c
-@@ -311,12 +311,12 @@ static int virtbt_probe(struct virtio_device *vdev)
- 
- 	err = virtio_find_vqs(vdev, VIRTBT_NUM_VQS, vbt->vqs, vqs_info, NULL);
- 	if (err)
--		return err;
-+		goto err_free_vbt;
- 
- 	hdev = hci_alloc_dev();
- 	if (!hdev) {
- 		err = -ENOMEM;
--		goto failed;
-+		goto err_del_vqs;
- 	}
- 
- 	vbt->hdev = hdev;
-@@ -383,23 +383,28 @@ static int virtbt_probe(struct virtio_device *vdev)
- 	if (virtio_has_feature(vdev, VIRTIO_BT_F_AOSP_EXT))
- 		hci_set_aosp_capable(hdev);
- 
--	if (hci_register_dev(hdev) < 0) {
--		hci_free_dev(hdev);
--		err = -EBUSY;
--		goto failed;
--	}
--
- 	virtio_device_ready(vdev);
- 	err = virtbt_open_vdev(vbt);
- 	if (err)
--		goto open_failed;
-+		goto err_close_vdev;
-+
-+	err = hci_register_dev(hdev);
-+	if (err < 0) {
-+		err = -EBUSY;
-+		goto err_close_vdev;
-+	}
- 
- 	return 0;
- 
--open_failed:
-+err_close_vdev:
-+	virtio_reset_device(vdev);
-+	virtbt_close_vdev(vbt);
- 	hci_free_dev(hdev);
--failed:
-+err_del_vqs:
- 	vdev->config->del_vqs(vdev);
-+err_free_vbt:
-+	vdev->priv = NULL;
-+	kfree(vbt);
- 	return err;
- }
- 
--- 
-2.25.1
-
+--===============0912913918223314289==--
