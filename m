@@ -1,126 +1,123 @@
-Received: from spamfilter04.delta.nl (spamfilter04.delta.nl [217.102.255.83])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24BE4219E8
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2026 12:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.102.255.83
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BFA23F23AF
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2026 12:28:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783600053; cv=none; b=oHG3UnppcD4ZNtNGOQoywCzKIpBhGHJcUnMvfWDBZF3AJihbbf7w6HtK5SiF7Qp66+YyLUZ4jGfu3MK1nmJaB8g/3VCHSM8bvycjBw+eAQmvcqpjOZpskKdB+dCyiQEuYud9B80FtiSXJAZVv/nKoH0pacnXdr+AAq1IIeIhJ0E=
+	t=1783600106; cv=none; b=u9UPpB0LlxpwWJV2KBdPoZBUkQBdz59+IselVWFftenybzYXADWqIJmwbzSqhEzhVmNamrO5WeYc5CsoxyI806JSpg/syRRR57ZeDw/7rnALI57qdKYPd6p9DgHK+56IcqWeGhEiLpj8zgTzpksO+c5eKbs8E5VSIF/OKrUKURA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783600053; c=relaxed/simple;
-	bh=intjPTGWlcZJUzAPW3d6YzPENubW3dCETeXSGUTL2YM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oHTPAcaauFeS9y4S0NYXZxQsk6xMd9TKnrLQE43siuioc0SIJEzz1vVIssgsNviR0VgqeZbMeFSngc9OaeM0tBM+GDp3cc0Y2xPjEbHaTYDLCFGKwMKKVsiriErOjO6pLgFZ31s3GSH4ydkzI1N+gPkiFMl/0kcTSBa8F37JyUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeelandnet.nl; spf=pass smtp.mailfrom=zeelandnet.nl; dkim=pass (2048-bit key) header.d=zeelandnet.nl header.i=@zeelandnet.nl header.b=LJtFMy5P; arc=none smtp.client-ip=217.102.255.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeelandnet.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zeelandnet.nl
+	s=arc-20240116; t=1783600106; c=relaxed/simple;
+	bh=uYQf5c0BQoHX6DBg7Groisb/ulKzUj3hF4pVgEjeWTE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ci8LwsattD+w21hpwLFfsAWrk4SZ5FKNgenJot5obV6aWnZAxRAEqhbLNWEyWAtLXPLmLeIGmfFfROK1tcbXuiBfn9l9wdFbnKhiBRnlVPTMfZNHnQY+jxmS6QDgEsctm9qePL8/QnJ03YR8LLjRL55niHYKPjaKpovpcVcVYos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X8CIlOSR; arc=none smtp.client-ip=209.85.210.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zeelandnet.nl header.i=@zeelandnet.nl header.b="LJtFMy5P"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=zeelandnet.nl; s=se2; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
-	Date:Subject:Cc:To:From:reply-to:sender:bcc:in-reply-to:references:
-	content-type; bh=nrLSflP9Yi/ToxhOJsiwfAEvblN1jTJ5RuHlw7vdu4E=; b=LJtFMy5PayLA
-	6iEsKw2Hb9TNBBm8Vc2M61M+FoWVRwmrte1z7I8MVOxdUTNLIjxIpvwS5ROKylyCOBPblOFGEGDsj
-	fOLHYbYVhyCyncI0L5laiN2IULOL4dQAIDZJVxaZYNqJkdMUlOlyywOPDYavV2oxTk2lyzZZXTBA1
-	iR5Pi1KHE1FFRcUpOVp5UTvbbdDj2jG9OfV1OC2W/7VUZDKkb11hTa1vG4gQxX5icgk8ShgoPmvQ/
-	eglApIbC3UxkCCc+MMC4jaUuzynIlp30Exujr63uPxw6dxD7DP7mqDFpF9CoDRuU37BYfGt/B/Eh8
-	k25AXFjqhdLlDRsYpaoLvA==;
-Received: from [217.102.255.198] (helo=mail.zeelandnet.nl)
-	by spamfilter04.delta.nl with esmtp (Exim 4.94.2)
-	(envelope-from <tomcatshoek@zeelandnet.nl>)
-	id 1whoEW-0012Oz-BU; Thu, 09 Jul 2026 14:27:35 +0200
-X-Sender-IP: 83.84.65.18
-Received: from tomarchryzen.lan (83-84-65-18.cable.dynamic.v4.ziggo.nl [83.84.65.18])
-	(Authenticated sender: tomcatshoek@zeelandnet.nl)
-	by mail.zeelandnet.nl (Postfix) with ESMTPA;
-	Thu,  9 Jul 2026 14:27:22 +0200 (CEST)
-From: Tom Catshoek <tomcatshoek@zeelandnet.nl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Tom Catshoek <tomcatshoek@zeelandnet.nl>
-Subject: [PATCH BlueZ] adapter: Fix crash on UUID discovery filter match
-Date: Thu,  9 Jul 2026 14:27:04 +0200
-Message-ID: <20260709122704.351232-1-tomcatshoek@zeelandnet.nl>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X8CIlOSR"
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7eb545db3afso1033662a34.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jul 2026 05:28:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783600104; x=1784204904; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=+0scXORZJfAFimY9Y8Fd7n7er05lMNqpmWecxRPQPtE=;
+        b=X8CIlOSRLa6f4ggbAwCIBRx6HmtuVgrCH4kEB2QhQxOtjKwhbaYUpzcQ9050o0avOh
+         9+RNaLb+b7dp5QyJ7pb7OCI43fp1kni7zSsOP00UAa8iMkEKed8O5g+SFm7eRQCWi69F
+         9T70JIROMHaV/gukhp3Y223UBnNFw7XAL9RNyz8oXKl8TrxlUg8k2PNk1OwoLsGn96pQ
+         /XmIadXLS4lOcKhwQP+d0quc4f60FMm1HNx3BiwINTdXGUDrYnkwoHl/kS8sCJeDU/h4
+         daoRtk+mV8LdKLBJnj44VtvO0X0Zjj6Q0KHjDHkLDVKtgXSwXlJmO9P2udzyGysldOmO
+         AQKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783600104; x=1784204904;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=+0scXORZJfAFimY9Y8Fd7n7er05lMNqpmWecxRPQPtE=;
+        b=MzH7qUbpee+y9AdNC5L2lwXxjr3+LkEsGHlG/FBHIprmQz4cNbPNA0O6UFknFvo1Qp
+         Le32Bg+3RgvwxIZK4RP6gwf2PqehkH+RhDcDY3tDRTD8gVYNoZ8HQbmiqCuAuU2gWA41
+         Sl6IKa1RWdeKqWZJKeyrvtYZRPlCxJDXhrWIXaEBeGy6wcx6IbziWlenb2mJ2jF6TiDS
+         dHsX5Z8E1sZy6iff35/b2Re1A+SZiyc3i4/t7HP6PR6jRcRLde2UTkUlm0L0dVAbTW2C
+         9F3WXCuaIQm9P59xa2REdudbFm4+oCYzqyWw41jMj6tqQOYXqe2rxU+C8pMG980By8Dd
+         fgfQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+Pk15GxpgOQmPUWoJ0yK0lW1QEiVqEFhqAkehwJIV9fsTaawJaKdSoq1EsbjRG/WxcoCQx4MFDFzQh19/GhtM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8+9YBMuRcAsNvusxUUv+ROxDac2DncUSIZzEGL0NcQuFnB93L
+	u+n4TkK76G3XSq7sQsBeRO19QG6pqbs/0/GoD4tywCUERVfPD2yC+A6j
+X-Gm-Gg: AfdE7cnuXjQ/+TmytuWGUfcIkvZ6Yxy9RKteSAuTlaUPXbCna8wftVm8E5vW0y1C+BT
+	pEn/6ld2ji6+i6TeqQHjhk3bnS4Yz2mCu6/ZWJEqVM8UPaZaJXQgsFIElfM5/AW6fnQvBTRVKt3
+	TadWxjB1tpSUyDfffhCiaQzoFnxfkxmxy+C38SB/4VWI6RdkbLIxeV/ObgJb0CJh92rXEYpnIaU
+	naZNdZGv/DqUIHrmKiQw4nZQ0EEMER9jJtv7rwH55Coe17wsurjrEvkXKbzXnO6cXVKyzwqFgId
+	PheP9sRcEpL6kruJnnh4iq2GUJg8bLyYfD9/70cYKs5iQJKR6elpqf+GO7EIPeJ27RHL4eEYpCY
+	a6CPFhy6lUV4kJlKItkQG/nU5bwgAIM86sfmStiLXhZ2Pnzb8T5JQFn+ncIc4TBro6Q15mAwUAe
+	sDk4TD
+X-Received: by 2002:a05:6830:6aae:b0:7dc:d0e3:5bc1 with SMTP id 46e09a7af769-7ebcfe7da83mr5106525a34.13.1783600104075;
+        Thu, 09 Jul 2026 05:28:24 -0700 (PDT)
+Received: from localhost ([74.80.182.70])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7ebcb2631dfsm3947846a34.13.2026.07.09.05.28.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 05:28:23 -0700 (PDT)
+Date: Thu, 9 Jul 2026 15:28:17 +0300
+From: Dan Carpenter <error27@gmail.com>
+To: Haoxiang Li <haoxiang_li2024@163.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, yangyingliang@huawei.com,
+	mst@redhat.com, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v4] Bluetooth: virtio: Fix virtbt_probe() init and cleanup
+Message-ID: <ak-T4SMxr4rw10jP@stanley.mountain>
+References: <20260709114745.4030794-1-haoxiang_li2024@163.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DELTA-Domain: zeelandnet.nl
-X-DELTA-Username: 217.102.255.198
-Authentication-Results: delta.nl; auth=pass smtp.auth=217.102.255.198@zeelandnet.nl
-X-DELTA-Outgoing-Class: ham
-X-DELTA-Outgoing-Evidence: SB/global_tokens (0.00835450675665)
-X-Recommended-Action: accept
-X-Filter-ID: 9kzQTOBWQUFZTohSKvQbgI7ZDo5ubYELi59AwcWUnuUfyIcnHf3a0WCtna8UjjA6ar/aZZnX9yUS
- oquBA/HlQSu2SmbhJN1U9FKs8X3+Nt1e9xGgHpSCmLkfl25qZSy4A5F2aRjVfBzlUyXBRvKR0w9h
- kRlGHAo3NQuCQ2GgWEt+oaZ2ZNKAGVAgNukt+g/OlDtR/qCXMVqSLVxeSwueS0r/pqDh7apldsyM
- rNwI+mb6BpeseSBELv+0jcKNeZXKtC8pyCYYciHB12Lu4CxajAlsWE7tOYTNT8lmDvRJlbmOpK/F
- 6IU0v47iJjbX7I+9/fNoXjtFtCxlBW3DVyFe1uu2beRqilmjgQ6jA3UwYgm3QTha208ypFqQwBFb
- xm4JX7semJdl8Weuy8+tlMSTQwhoy9D5QZ6a84vJal7pM1XhlAOd290vPXa7Loma0jthScFjNlc1
- ym1ZMTyrHit3ucCra4pX+1a4LelmaTlLLSPOTUW8VuQuUjH2AV/aKRMG5ZuHnC6Q1xaigh/Kg6Bv
- Sy809eu/jWYBEJqyf9bfNG0ApoE6XUb6dlFWUtzi+p1bkdDJUxnGxw0egtRuEOribsHPt90rvmGO
- s5SvixjKO+7m/wWr4WZH8qWfzhK4dwPX6r3C2Qgzc+xROZfGnoE361ocd16tuABey7l0hihU3cu2
- LEHMAWWzwetiJ2Lrb7jakC/ZGhjihaxNSPYchWMM7fFAMyKkuNSmGasIEySLeO3lEQv8duYCgra7
- +K3X1QBUqiydTl+lieKrIWjlBRM24qPqET5A/FgpN2HwDuYrXKRlALcqA0HF7VonKLQi4KzrOprq
- PcI6TzRLzj+7IBoZm2NDaD/lUQRdMdfd37rjVEDTPpuFqUUQz+mM8JAD4ECW0fihWUDVT8Tezf81
- XTp2u2pJFGei59CM69J3MPW8zcVrrevAXc5+2feqX19eY6mb8F7jYaSBzb3xA9DALHJzmcbZtNYm
- syA6q549GjYvpujrjuU3A3io6xJmD59iFVkbE/0HgvoO1HH3QikyPk+Z8skqL4vcCZdkoHbHsBzz
- 8vCdNy+TLo0glVoz5ULuXhi/d7mKJ7eLk5+BUGRLQ+nWoGQKfdsYiMyl4UyMG/ykgqLimuazXgva
- v3T8Xx736OrsXnV5yUc6vrtweAuDPge+fQ==
-X-Report-Abuse-To: spam@spamfilter03.delta.nl
-X-Complaints-To: abuse@spamfilter01.delta.nl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260709114745.4030794-1-haoxiang_li2024@163.com>
 
-is_filter_match() looks up each discovery-filter UUID in the queue of
-services parsed from a device advertisement. When that services list was
-migrated from a GSList to a struct queue, the queue_find() call kept
-GLib's g_slist_find_custom() argument order, passing the UUID string
-where queue_find() expects a match function and the comparison function
-where it expects the match data.
+On Thu, Jul 09, 2026 at 07:47:45PM +0800, Haoxiang Li wrote:
+> virtbt_probe() allocates vbt before setting up the virtqueues, but some
+> failure paths return without freeing it.
+> 
+> The probe path also registers the HCI device before the virtio transport
+> is opened. Since hci_register_dev() makes the HCI device visible and queues
+> power_on work, move it after virtio_device_ready() and virtbt_open_vdev()
+> so the transport is ready before the HCI core can use it.
+> 
+> On failures after DRIVER_OK, reset and close the virtio device before
+> deleting the virtqueues and freeing vbt. This also cancels pending rx work
+> before vbt is freed.
+> 
+> Fixes: afd2daa26c7a ("Bluetooth: Add support for virtio transport driver")
+> Fixes: dc65b4b0f90a ("Bluetooth: virtio_bt: fix device removal")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
+> ---
+> Changes in v2:
+>  - Rework virtbt_probe() error paths into an unwind ladder.
+>  - Free vbt on probe failures.
+>  - Reset the virtio device and unregister the HCI device before freeing it
+>    when virtbt_open_vdev() fails.
+>  - Close the virtio device before unregistering the HCI device in remove().
+> 
+>    Thanks Dan for the suggestions. The blog is very helpful.
+> 
+> Changes in v3:
+>  - Remove virtio_reset_device() from the virtbt_open_vdev() failure path.
+> 
+> Changes in v4:
+>  - Move hci_register_dev() after virtio_device_ready() and virtbt_open_vdev().
+>  - Reset and close the virtio device on probe failures after DRIVER_OK. Thanks, Luiz!
 
-As a result queue_find() calls the UUID string as if it were a function,
-jumping into non-executable heap and crashing bluetoothd with SIGSEGV as
-soon as an advertisement matches a UUID filter configured via
-SetDiscoveryFilter.
+These are Sashiko warnings.  To be honest, I would feel really
+uncomfortable blindly applying them without testing.  If someone
+can test, then great.  Otherwise, I would probably apply v3.  The
+stuff that Sashiko complained about was all pre-existing issues
+even though for the last one it said it wasn't but it was.
 
-Add a queue_match_func_t helper and pass the arguments in the correct
-order.
-
-Fixes: https://github.com/bluez/bluez/issues/2282
----
- src/adapter.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/src/adapter.c b/src/adapter.c
-index 210225243..4ffa32a52 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -7184,6 +7184,14 @@ static void adapter_msd_notify(struct btd_adapter *adapter,
- 	}
- }
- 
-+static bool match_uuid(const void *data, const void *match_data)
-+{
-+	const char *uuid = data;
-+	const char *match = match_data;
-+
-+	return strcmp(uuid, match) == 0;
-+}
-+
- static bool is_filter_match(GSList *discovery_filter, struct eir_data *eir_data,
- 								int8_t rssi)
- {
-@@ -7216,8 +7224,7 @@ static bool is_filter_match(GSList *discovery_filter, struct eir_data *eir_data,
- 				 * uuid.
- 				 */
- 				if (queue_find(eir_data->services,
--							m->data,
--							g_strcmp) != NULL)
-+							match_uuid, m->data))
- 					got_match = true;
- 			}
- 		}
--- 
-2.55.0
+regards,
+dan carpenter
 
