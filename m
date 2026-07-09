@@ -1,101 +1,133 @@
-Received: from spamfilter04.delta.nl (spamfilter04.delta.nl [217.102.255.83])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0C8413D6F
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2026 16:21:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.102.255.83
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783614076; cv=none; b=Zy1srnfmXnKA4/NEDUoXkTZuLj7DQwTG3bJqt1pK6d6F/faY5znZBWHPm8QUwIFqIvUjfKISreW2bVp9kgQTHbFfohVR/wDd+Acp0LSlswkP+BMQSzBB0wiJc+Yl+3EdLOC2D828QGyhII6g31YVkKbhZRJxVuAq2KswnUI0ljI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783614076; c=relaxed/simple;
-	bh=iYx0S247giLjPbILqbidAE72IzBuipPeO3VWB5yN9GQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JB0kq/OnfSKPMTvrE7ra90abFkXQaIO/gp/fb4grQZqijUmVt1p1XWPsHquKkgiGdmxsn5+gZuJK8R7vyUzDn0JHzdoMRsPTD/pgJZMwKwjL42ZOGCs19Zl9iMX1iZu3fVlHKfmeNXhquNTX1DXLdo2EZUmwfMGVPiWaVkNXqlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeelandnet.nl; spf=pass smtp.mailfrom=zeelandnet.nl; dkim=pass (2048-bit key) header.d=zeelandnet.nl header.i=@zeelandnet.nl header.b=r9MjIYeA; arc=none smtp.client-ip=217.102.255.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeelandnet.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zeelandnet.nl
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFCE32D5925
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jul 2026 16:23:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783614221; cv=pass; b=ruIT5vf5QkrhfKkMARr5jKcI4/0B2mRMo93yUWM642IygswU79zqCbVcqTMSadakac4ujA5YKniNDeql1rFoEvx3WJXjGI95oi6qdl5R3fptCWbuHovjrcERSxV2AlNQcpqDsGVg4X+bUh/YI5PZawcSiuXNKX9AwR8ni+sz6cU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783614221; c=relaxed/simple;
+	bh=vYmjxs1YH/BT4J1DEjWLBYwLUCcli8aaDvXA5hyUAsE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iywXE+2pQ16528LcnJnCDMYxSae/Vr0Y8YUeZuWNRlf1ZIgGXI/ozeyHtZdYHAJwQezfB6gn0wokHYrSrxl1ATTtB+H2OMar8+0HgxVJpY+0Tz3wuifNeEg/k3i+JTHOAgacmIp3g18uEhd/PPxo0xdSU7KBv0RV8UVfhX/wlJg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IzIBaGM2; arc=pass smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zeelandnet.nl header.i=@zeelandnet.nl header.b="r9MjIYeA"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=zeelandnet.nl; s=se2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:
-	From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:reply-to:sender:
-	bcc; bh=iYx0S247giLjPbILqbidAE72IzBuipPeO3VWB5yN9GQ=; b=r9MjIYeAjutdEMrCqKwBT
-	jnfsq/UgUl7hvxBHxc0+uhSC6JGR4+xcnxBWtsi9W6Fi1iOVSbbWQClTEp0sMDY039QJzWsewlcO3
-	OMJtN2mLf6Aht/jjZyZilmQkrJYmQVI5aCOsjKfpeWA0GbRDtL0T44SFztsrnNlFUu9u+TVxBFKLI
-	RWEoh6fKjLDVE9fpb+JcB4u9gAKC5LfRyN89hmi/KIa1Bwy10Uwx9vum1+DG9DG9qQuKUYFZDnVox
-	wm3ro/FG2uRkUwdLzIbHFTvAx5GTcALmDNVnpZ/lOvRVTDRhiAKvumVAWMy1pQfrkhKvtdwdb6tGC
-	k0nhmpo/rYy1Q==;
-Received: from [217.102.255.198] (helo=mail.zeelandnet.nl)
-	by spamfilter04.delta.nl with esmtp (Exim 4.94.2)
-	(envelope-from <tomcatshoek@zeelandnet.nl>)
-	id 1whs1j-002Ele-Rj; Thu, 09 Jul 2026 18:21:19 +0200
-X-Sender-IP: 83.84.65.18
-Received: from [192.168.8.139] (83-84-65-18.cable.dynamic.v4.ziggo.nl [83.84.65.18])
-	(Authenticated sender: tomcatshoek@zeelandnet.nl)
-	by mail.zeelandnet.nl (Postfix) with ESMTPA;
-	Thu,  9 Jul 2026 18:21:09 +0200 (CEST)
-Message-ID: <bb434c3b-8523-4412-a3bf-dd888964ea40@zeelandnet.nl>
-Date: Thu, 9 Jul 2026 18:21:09 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IzIBaGM2"
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-664d35b4777so1529381d50.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jul 2026 09:23:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783614218; cv=none;
+        d=google.com; s=arc-20260327;
+        b=bVWq9GqXKCJMpy5OZbpQMhOzsmIr6QM14hkxVULbgn/LOrWIcBc/irb/UyGJCOUG/D
+         GLwW6lAsael99Qf+cBmODfSxhrBn5K/TmHoXY3r6uXAfgyvxUUXxYbYH+QYLD3lphk7/
+         +DidHflX0QIbr0JRAOjX5N2Pge7sQ5mB6DYPnqL0borYfMw57oB9PfuFGvMe1Ha0Z6iF
+         Sdkb8TBF9TebZXJ++UI9mKgy5ci8SvUqqRXHxGMlSiIN/TARc1qB88A8rQEopQkAsHkn
+         KS68h5rPzVYWR6DeMDxePvf5C0IlRARIOkU+pRJTdYpBO1SuK5KDW3XxariCGbmtzau7
+         75TA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vYmjxs1YH/BT4J1DEjWLBYwLUCcli8aaDvXA5hyUAsE=;
+        fh=h2GtZZY16XGfmnFstuyvEuThwaSk1q7VKdNypZJFS3E=;
+        b=KL8kDJrt2FLyK9uVblBM6uTiDHY9JeC5g/5dFvZAYWbs2uQfnmMXmE3kninq4sozKN
+         XPpYf9MFq3ePrEyJJzk0ZOf1IDZqHdejJ5BpmSDcd59wHRmV5hfhk2vJNkinifnfs+Wc
+         GgT0wkkNmavk/Maj33NJGLoV+EHSI2Tu/uJUJuIlfN/vKqAdet3EwtELETvISRpUIvxW
+         Hu1iJxhfGXqYaaxd+YkHGPWd0Dy8QM7y3jbjbqtdH53cuIUXiStA1sIfkVjsEFmoKyg9
+         nucD98MlITCY+Bg/uJDQC8kVUFakqiiGVuOd3ZNdHy8uOx4+NlzMLCGHWNnv1SmNzJAI
+         iIUg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783614218; x=1784219018; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=vYmjxs1YH/BT4J1DEjWLBYwLUCcli8aaDvXA5hyUAsE=;
+        b=IzIBaGM2AhOZ9f6nugHM2OHyPVvgKaYtszzX4i2SmlbjP4UKpAgtqSyQJsBAQXgF5M
+         yZawxlzQshmrho8aCPf/cZv5ItBo7VaAW1YC2kYpiv/yJlPAuqQ2Jq87NAe0PkF4alJt
+         dYbLtd4eWnA81znjGqvLU0tzusm0YaCkDWpNN6mKDMe/Ewl3oKSZj6sT0iTFq6fOefPl
+         SE8efGxQCKIajcVrMBGwS3oxC7Jlh/fpG96iLWliiIdOuWAmxZfs+i7LC3atxPfJq0AM
+         urzl6qnWgRRy1fhPYzBqX8BcMWOTSfs4cXA3bBzrVm+ZWQ9faUkZe7pgOYbJt71epbIA
+         fvmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783614218; x=1784219018;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=vYmjxs1YH/BT4J1DEjWLBYwLUCcli8aaDvXA5hyUAsE=;
+        b=EyHSlHpd+edO3M+1RkrqGgbmGhMOIjW8+3LwsRZ6Rm/hdoylYvjknZa7Hpw1Ognx1s
+         trirr+CIFdLQKgVXNs/qdXUFoqOW4+wIjBKZb5xmitEDjdfdhjA/yhY4lHY1Kbr5JJAH
+         6dEYY0ooUupR9ULT+wiUgRmM3Dgxt1ZlyVbCPbAYVqO7o6pzslx/HFIVqkY/BHmk+9U7
+         7nhBiFOPR/SmaEdOhh9GkLgUjwfBGxelkxdr547f1dlwEfyEc2m+z7gNLR3+LqDVL4Zh
+         JMyy3sd+u0ipM8pR6OQOIwZb2MSZrfzmaCHPPps6GdE7ilT45E861bUV2pR3FDXXP2vU
+         FEOA==
+X-Forwarded-Encrypted: i=1; AHgh+RphznusXly0rlw9zht5uafo5pDwJ1XUgUHooUS+Pr48cVGwgYI4kz0/jQombWmNr0nZ7QK+hfj4k+A1yK+16X4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YylHwUIcOSnngHHoyJW8+iiq6tYT9Ch1I3yhCCdRXLOG/qCV47q
+	g4gJ/w8uc/EhAftMmR+sBtEvozKnsD140lnx1O6QFsFLU2yovVqWi4KUWzoqkff6Ugfz9tusXXL
+	4QB3H8iGpyRQyI4JEnPNMWa4KvJUAGgo=
+X-Gm-Gg: AfdE7cn/pKC9lJ/cuQRnUNJHS3O5Wt2jkTxRlbARmEdci44KO+PRv7SWgal+6im8wvD
+	wx2j/OVAgYr6HQNOcNztbB2ek48PeQCE8bd2IO7c5dS/ksiUwU/JcSpDsHlAi8CENDNxAOhf9tn
+	5WZ3ufFCfsOPvOfqBhndoE51j4fUwo6PvcunebNRlBpNevKqQGCbVGOnhhuD/ovScbRvy6d8BBE
+	HH3d+j064fmu1eevhFL1ldLdKjang/cDdrGCp91DQ5QUA9M7No/7Mf4hzMirkDs6/z+0tZmpnwP
+	eDwBKKAhO77csecpU5OFTTGeCrdwYZIf9or/XpgBBZFkCwx/19J6mR+wsiw=
+X-Received: by 2002:a05:690e:4393:b0:667:a025:89ac with SMTP id
+ 956f58d0204a3-667a0259a5cmr3696252d50.44.1783614218349; Thu, 09 Jul 2026
+ 09:23:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ] adapter: Fix crash on UUID discovery filter match
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
 References: <20260709122704.351232-1-tomcatshoek@zeelandnet.nl>
  <a2d7c978a97b5e55a05cb7000f4d20d8c8dc542e.camel@hadess.net>
- <CABBYNZKxGTT5609JUo+04edy3X7hiZmWfXB2cmVGYLTVBz0O3A@mail.gmail.com>
-Content-Language: en-US
-From: Tom Catshoek <tomcatshoek@zeelandnet.nl>
-In-Reply-To: <CABBYNZKxGTT5609JUo+04edy3X7hiZmWfXB2cmVGYLTVBz0O3A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-DELTA-Domain: zeelandnet.nl
-X-DELTA-Username: 217.102.255.198
-Authentication-Results: delta.nl; auth=pass smtp.auth=217.102.255.198@zeelandnet.nl
-X-DELTA-Outgoing-Class: ham
-X-DELTA-Outgoing-Evidence: Combined (0.14)
-X-Recommended-Action: accept
-X-Filter-ID: 9kzQTOBWQUFZTohSKvQbgI7ZDo5ubYELi59AwcWUnuVuK/8LamVj1f22m8nqYObU658KFz7wDC+F
- rhbKJ87KLSu2SmbhJN1U9FKs8X3+Nt1e9xGgHpSCmLkfl25qZSy4A5F2aRjVfBzlUyXBRvKR0w9h
- kRlGHAo3NQuCQ2GgWEv2Uvyp1aICWaGr/7JTUPvJlDtR/qCXMVqSLVxeSwueS0r/pqDh7apldsyM
- rNwI+mb6BpeseSBELv+0jcKNeZXKtC8pyCYYciHB12Lu4CxajAlsWE7tOYTNT8lmDvRJlbmOpK/F
- 6IU0v47iJjbX7I+9/fNoXjtFtCxlBW3DVyFe1uu2beRqilmjgQ6jA3UwYgnsj5xBssn0tIIHA3aH
- QzCq60l8YRpcxCjc2gcMa3Btw+OTpzU5Yy8oe2B0dJEHaEmRLhyAOTJ5XKwvY/YSmcVOS3wTsXmJ
- 5Ud3FtVPfFXaXb4ABfO8ZRD+1SC4D1hqb+gNrCNJAeb/xhy9lTvEeC1ydyAb70J8tnpgKKbx9SpW
- efMqeEDJgTZbKI27031mClCdQQU4k5lfixI9cze7LnSskunODYtbvP72vAmOyjpz9e0VK1rnzSzA
- 2CTh63EFousoRYI/CVsxJODS2djk74fWGlGCaItSoj5tvtyx4H0WuE3w+nMbHRSg12OSAEHyDPUJ
- fN3KdUi5/j3ZFY1CYhJRwMcuGrIdKv+2ITlayta1AzjC0Pd2cJljcXdyFqqFZM/YFQUjl/mEgebR
- XNImN3IPOoVYoUKHU2W281p626ckr7Ia7Mbho/n6Ih4xUNNsJs5zNz4P9CoP4R1c3iB9zJ9Sl6c3
- mH5PgiiLVm0XuwK4R5iIYO3jc9EORbD/McHqWgwRFZ4oobg8BBg3Jq+ntzj0eN7kNgLj2ulenJXG
- Jd/gxQXifP0XGHtDvGfHQgH/0Ugeoq44EbRuDRK8+Yg2fzEBcvRlrRaGF9JH59V1zQ8WU80hK+6h
- PmeNtk1wz7BJOTh+pvlHhV6a5QjptwQBGybQLpzYMIy3xGNkduq8CSOOf6zyFSViSoFvEwGEa+Kx
- 8LcFpcEj86SU6pw6DC+q1pGztu1J5nnvyhUFGkldhKTSyJACk+V/V60H6JfJnsg72wE4R3rtLKZQ
- FnSZvLDcdc3irzMnbkkeR/bLV8ffzH+ilQ==
-X-Report-Abuse-To: spam@spamfilter03.delta.nl
-X-Complaints-To: abuse@spamfilter01.delta.nl
+ <CABBYNZKxGTT5609JUo+04edy3X7hiZmWfXB2cmVGYLTVBz0O3A@mail.gmail.com> <bb434c3b-8523-4412-a3bf-dd888964ea40@zeelandnet.nl>
+In-Reply-To: <bb434c3b-8523-4412-a3bf-dd888964ea40@zeelandnet.nl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 9 Jul 2026 12:23:25 -0400
+X-Gm-Features: AVVi8CeRLSCu2T3IygCooLjV7pnz8DjdxjF3uX_bnmMT2EvZVjTVToFmnUDycuU
+Message-ID: <CABBYNZLNpsM8UQxM7wpfLKikM+Lto9t+aBne21xgn4t_2Oe1dQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] adapter: Fix crash on UUID discovery filter match
+To: Tom Catshoek <tomcatshoek@zeelandnet.nl>
+Cc: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/9/26 5:00 PM, Luiz Augusto von Dentz wrote:
+Hi Tom,
+
+On Thu, Jul 9, 2026 at 12:21=E2=80=AFPM Tom Catshoek <tomcatshoek@zeelandne=
+t.nl> wrote:
 >
-> On Thu, Jul 9, 2026 at 10:39 AM Bastien Nocera <hadess@hadess.net> wrote:
->> I don't understand why we need match_uuid() though, does it fix a
->> warning? If so, it might be nice to do in a separate commit (fix the
->> order first, fix the warning second).
+> On 7/9/26 5:00 PM, Luiz Augusto von Dentz wrote:
+> >
+> > On Thu, Jul 9, 2026 at 10:39=E2=80=AFAM Bastien Nocera <hadess@hadess.n=
+et> wrote:
+> >> I don't understand why we need match_uuid() though, does it fix a
+> >> warning? If so, it might be nice to do in a separate commit (fix the
+> >> order first, fix the warning second).
+> >
+> > That is probably needed since the callback signature/return doesn't
+> > match the likes of strcmp.
 >
-> That is probably needed since the callback signature/return doesn't
-> match the likes of strcmp.
+> Exactly, queue_find() wants a queue_match_func_t, which returns a bool,
+> and strcmp returns 0 on a match so it needed a wrapper.
+>
+> Also sorry I wasn't fast enough preparing v2 with the added line
+> Fixes: 91c340d359b7 ("shared: Remove glib dependency from
+> src/shared/ad.c") Bastien suggested, please let me know if I can still
+> do something there.
+>
+> Thanks guys!
 
-Exactly, queue_find() wants a queue_match_func_t, which returns a bool,
-and strcmp returns 0 on a match so it needed a wrapper.
+There is a Fixes tag already:
 
-Also sorry I wasn't fast enough preparing v2 with the added line
-Fixes: 91c340d359b7 ("shared: Remove glib dependency from
-src/shared/ad.c") Bastien suggested, please let me know if I can still
-do something there.
+Fixes: https://github.com/bluez/bluez/issues/2282
 
-Thanks guys!
+And that already informs the whole problem, including 91c340d359b7
+being the culprit, doesn't it?
+
+--=20
+Luiz Augusto von Dentz
