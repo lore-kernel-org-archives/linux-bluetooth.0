@@ -1,88 +1,120 @@
-Received: from out-31.smtp.github.com (out-31.smtp.github.com [192.30.252.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95462882D6
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 18:53:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778CE386C20
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 19:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783709602; cv=none; b=N92Wn2yIZ7eyYkSeTy0sutCSSWfrdq/VUcoQKBnXTS7KmepxWCVwOqEvcZX9c1K7YVwJO+Oeyax/chg3XupLIVszqSv7+eevVnltPV6Sk2YCgkfTA4nRs+W1dYJOJhLHPDuzEE5bfqsDtYFJ3dBUgK+wn3aTJIly1brM1I0ZKww=
+	t=1783711404; cv=none; b=baxGx+rr0haYX9rSqaskJPPg/dNI/l1MVd55zX/j/vUHGRHXky52O5lM+xXskWjMh3tSfRVmr6kqeSgZXqsEVuE69iKvlOqdVm6BnUYtOvB9Bun0ctD6ESk64DNSrcB3xVkm4SxvCT2TTLMPSwn7Hw3s80yiECq0AIJ+YSveGuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783709602; c=relaxed/simple;
-	bh=OkyFj/gU0IajBdrl6b/ppVzWnLIbV78LK3ClyMpceJs=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=PPVQbk6onzDdpubZ7RNAZSDEwKzb8VSWW76hnOBCcJh9LQLH82GziX7XxlZbJ+7FlvX9uQyilG460hBKm6zoxY7DB+985QIEy55hUTijPqQR2WAzUV1KoXTf6yKA7p/PbZMa3Bh0nhnJ9+v41J+BeAoK7vlyrVCK02SeIO8uyIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=B9RUjoEX; arc=none smtp.client-ip=192.30.252.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1783711404; c=relaxed/simple;
+	bh=zj4V2VW6oS46SSjH++Kt9DNkJi5utDtzWBoNI65MOEU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=VErVZkAFar4p8GmPQhEnxeNqtUzwIWmC1K43cY0d3KQJtpKu9CZAjsRZyrIgn3jG2Dak/358ZuMBHyYVrABsSVUeBOE8lRYN1pXPIft6D+Tdn3NstozWkkl/rVoEpOfu4Uk51gfMoBvEOzmFmphIoLhjMFBH4JuvOnSMkJ4sGIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sROu2dmN; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="B9RUjoEX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1783709600;
-	bh=I1RTUHIv16YbnjPI5EZdhUE4troE6Mmcv62JRmNa9ok=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=B9RUjoEX+2Vpebjihm3Y+Iw/ThXwGVRAaoHCHPxTvwUKaFnIj7bm92DsZJR7jK3DV
-	 x7KUZ/lPnb40bE3BIYBmCRZpnDi1XLXKtbS1omfufCpzxBRJmAXsGEYYCDYBzdxnHw
-	 s5sxjFAt3DIjiAPzNli9tWJyM2ACkZtjkPI7Ny7w=
-Received: from github.com (hubbernetes-node-ee6454e.ac4-iad.github.net [10.52.131.23])
-	by smtp.github.com (Postfix) with ESMTPA id 3031E320D0D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 11:53:20 -0700 (PDT)
-Date: Fri, 10 Jul 2026 11:53:20 -0700
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1125549/000000-00500a@github.com>
-Subject: [bluez/bluez] 855382: lib: add iso_data_* macros to hci.h
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sROu2dmN"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-8f0d6853360so10679816d6.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 12:23:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783711401; x=1784316201; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=RDOXiVrL5DTG4JNMJS3KmbWV/drpIdnuXnDZgvBonsI=;
+        b=sROu2dmNKeYSHxvzE6LHHxy5t9AFD8PnWowjNXnMK6aQSGYPfRP0zQewvSU0wCCeEr
+         blU6APhnTwYJHoNX9WvtJ1vWl+b+FhbeJvRYsI1bDuiUyiJUzB95BmolIKe7KjD9taxZ
+         umP/R7ftYtd1PaMwXjhbbFeLLsXuqqP6x7S9yBi146d8kVW4N/0dJXE/U0eD+Wb5i4nG
+         6yv/cTAHo90NB+7Xt4DRnkgVOuZzREW+NMQRresD498sUyU9yftzA6HLmhtb9V24rKoY
+         U8UvVfSHyYxzJcjtDBrWMtJazSjC9Tf0nJ15OqcLD2DjCpSvOD9HAm7LZbjD2k15vakZ
+         yhYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783711401; x=1784316201;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=RDOXiVrL5DTG4JNMJS3KmbWV/drpIdnuXnDZgvBonsI=;
+        b=nNG0mF7nPP2iKk3tTmTJbTv44ochzzuQf7vzTkZEWssrFtfcKTWaEY/IdcboX1DvwA
+         vZLG1IKV3Tc8zhhiavi2qSASX0ar2hYww2IyItPXee0Jmez8k+RiTZuM7Y5ySdMX90EA
+         RKvSBCr4qMYdSYOriS87A4n5Ae6HZm3rmhtBb/GFPKoETUhbhIPAptXJUBSF4IzYqnDC
+         YNyksGgKN0Q4UmYdGJ7Vc1R0rULrCb7z9dILL0HzFmGZFWQoYTjxfqVQxStFw2yqQvwi
+         w9Lxs4cC6LQCZLnQaEBHAEle8vkQmRnM3peSGLVFQjSq0eJPMZsetaYNElvGs3bLZ5K/
+         +GYw==
+X-Gm-Message-State: AOJu0YzZn3xbPqInC/wO1H1zXGm2UXNUDl0YHC7XCwM9NVZDULbbbDyC
+	ijUGpT77EfCtGH2KrLcUUqS5f8eWM1TuETHenV5Cv6R5KWzJ2tJgk6upV/1TGw==
+X-Gm-Gg: AfdE7cmYexd3KgV0JlVaRT/tJoiKHw5Seico3tZ5F6X6/R46b2JkcZO9b1CiMxTvXIG
+	tLsSQ9KxvRP46cDJ7Q5OGWp1iBEYJh394cpiYH2sgHkcohqp/JMJxJeYZHY5CzwUXlAW/AXeC/Y
+	UOPJDhbAViY7CQy9c55Jm/sBdhqh1gjdbCbotu2XUUKplcq455zAJtqfq4bxdLlhVr/Qr23B1Hh
+	o9NhgtEJSquMG84U+rpnb5KEE7AmZ/3Um9IvyI6iuGgjAek2+JCO1N4HaFImy6Rf0Rd6lRRrMl6
+	lt9SZ8hb+03NtL+XtpqdumIeufDvac48bhzDj1xGXy+s3rmLiE6SmVIWEwvqBYSk07R3pB/OZwQ
+	jyPTmzsozr0NQEa9mLj4/4jwFN1BixUBk3PUoopAU96IEN/uzCSXZDyp4PijRN0YYhZOsoV9qas
+	2HXa6JdbbA+DKMf2I8KUQ=
+X-Received: by 2002:a05:6214:21c2:b0:8ef:ec2c:6b70 with SMTP id 6a1803df08f44-9040226e2acmr4826346d6.53.1783711401003;
+        Fri, 10 Jul 2026 12:23:21 -0700 (PDT)
+Received: from [172.17.0.2] ([40.116.72.211])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ffd7c1da1bsm48125656d6.30.2026.07.10.12.23.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jul 2026 12:23:20 -0700 (PDT)
+Message-ID: <6a5146a8.a374d419.cd3a8.02dc@mx.google.com>
+Date: Fri, 10 Jul 2026 12:23:20 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6225410186341473022=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, acharyalaxman8848@gmail.com
+Subject: RE: Bluetooth: btrtl: validate firmware patch bounds
+In-Reply-To: <20260710172503.64964-1-acharyalaxman8848@gmail.com>
+References: <20260710172503.64964-1-acharyalaxman8848@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============6225410186341473022==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1125549
-  Home:   https://github.com/bluez/bluez
-  Commit: 8553822b49f3204a59f942c60d00f32d5a38c10a
-      https://github.com/bluez/bluez/commit/8553822b49f3204a59f942c60d00f32d5a38c10a
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-07-10 (Fri, 10 Jul 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M lib/bluetooth/hci.h
+Dear submitter,
 
-  Log Message:
-  -----------
-  lib: add iso_data_* macros to hci.h
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1125523
 
-Add macros for parsing ISO Data Packet header items.
+---Test result---
 
+Test Summary:
+CheckPatch                    PASS      0.69 seconds
+VerifyFixes                   PASS      0.12 seconds
+VerifySignedoff               PASS      0.12 seconds
+GitLint                       PASS      0.30 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      26.55 seconds
+CheckAllWarning               PASS      29.52 seconds
+CheckSparse                   PASS      27.83 seconds
+BuildKernel32                 PASS      26.25 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      508.77 seconds
+IncrementalBuild              PASS      26.24 seconds
 
-  Commit: 00500ac0cd55ab2a46075475bdc620538783c657
-      https://github.com/bluez/bluez/commit/00500ac0cd55ab2a46075475bdc620538783c657
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-07-10 (Fri, 10 Jul 2026)
-
-  Changed paths:
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: fix parsing of ISO packet data header and slen check
-
-Check PB flag to see whether timestamp and data headers are present.
-
-Check bounds before accessing data. Bump handle_str length to fit
-maximum.
-
-Byteswap length values, and mask Packet_Status_Flag correctly.  Remove
-SDU length check, as we are not tracking fragmentation.
-
-Fixes: https://github.com/bluez/bluez/issues/2292
-Assisted-by: GLM-5.2
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
 
 
-Compare: https://github.com/bluez/bluez/compare/8553822b49f3%5E...00500ac0cd55
+https://github.com/bluez/bluetooth-next/pull/423
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6225410186341473022==--
