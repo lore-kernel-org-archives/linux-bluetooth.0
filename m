@@ -1,75 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85CE143B3FE
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 16:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7DD1632DD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 17:24:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783701629; cv=none; b=U71pIdHhD2tb4awF2tNRYHdR7CVvYV9mZ6ukSsyOCl+wIZ+sAjjQfxyy2xcor4k8OAhp8JO16ogD5ne0PbkuC9V7SnkKsBwI7trPfcuDqQBdXElitv6s9EQDxOIe8kpfB0eL8tvKbIKeowlt6sYz+5Xt9rO9j5zLeGT4X8FBlys=
+	t=1783704283; cv=none; b=d3YcRX7rkAEJiSZE1YiVUecs1SJ6X/0N3rwyMXgePwz/cRRszKsq5d/UAJ7DOKUU/aDHo7UVwnD8xb+T3VwBwptrAelCXSlfr3RcuWKJJ1ZaiA32S6d2aKH4Vfow4Lp/IoG3Xvcx91iXbGVqPKG7MHP9UPGO9bBnbJvmXcdAe7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783701629; c=relaxed/simple;
-	bh=vShdWstB01GrJIa2e5SQHD/7iK9QEjsDzFMfaLfLy3k=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WF038PkJK2T4ZGROJJeisEOvthsA1AlHl38RkVulSVUEZbESamDZ3jVy2kJ14VbZuU4/4/59iyUNv+lZAvU2NPpKJIacIpsrLAehNm0vjIKG0JPSnU9UJ/FdATMSWMT8taOVdsgqHOvUXhO005pKoIiMsNqponQPmHiSjVyOUwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FVTsF+jd; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783704283; c=relaxed/simple;
+	bh=sTNsAx0yFvGRjQFLd5lPoaNUE5oWq8CHWgq7lrNXrLU=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=k9tEa2xBR8McbocRgPXMa+bQHVyu50lVLW1V6VZ5WbcmhOgHsJ6Trn6zUN7e++bCIV2ph4tlkLGtfjMQ6GJacPOLzmle8LnL6z2SHl+QkG+BRO6ng4KxJtO18dI6fn0AK+Axh+qNKdY6LZMtMzD6babFr53xczP9/vslUtLqxyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=cWm4mxUK; arc=none smtp.client-ip=192.30.252.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FVTsF+jd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 216DE1F00A3E;
-	Fri, 10 Jul 2026 16:40:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783701627;
-	bh=17yvXn8vG4bDfBrcdTozVRUAg9kbviDgfM87nArRGmw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=FVTsF+jdc7NEgxabiegZvM47sXlgNknthvAZcZ4T1U983OaiBBgUbhsKL5enBg1On
-	 FMOYOaXn5X7fuf3l98ua9XQw6tT/rS4u1bQZcZJB8TqAJHzQpXQqEpqsIxWDwF2uvQ
-	 aJKCR1wT9Y3Td5vwlCuEayhZ0xr73Se1bpYGs1cnalZkVhanBYD8g9+ncY7iRVfGKa
-	 RhyVNyeROOd84GWJPdBy1trNW5O5RRrJvGggGKLsfNLSa2zr/x+TSJopaUa9rQw3Cd
-	 km5rbYD/2eo3g0ONAEQt/pYBhiNaOHWwGTohBofvp+WZ/yb/nnOnO/d91uRjaOIROk
-	 R4bpbUhd3tnfA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 197803924FA5;
-	Fri, 10 Jul 2026 16:40:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="cWm4mxUK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1783704281;
+	bh=nh1ghisrcYh5KBqDTqeT20jQboCUr1etxMn68qprOuY=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=cWm4mxUKcF8IdYCkEwjtLSKZmMWcAIXEIYg1MRNwG6f/6QE2Kp+F7zYxV9G6EfJ2j
+	 /dEdKVBYZk6tlUR2JBosUog/MecsoWciwVTAGp8TvNYRHQnZC9j9a2lm+R2no4EN12
+	 Av7WfeRKMEQ8nvwTpg5xZKTtYEVLCod0ZMOggWBo=
+Received: from github.com (hubbernetes-node-a590f92.va3-iad.github.net [10.48.173.54])
+	by smtp.github.com (Postfix) with ESMTPA id 41413281566
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 10:24:41 -0700 (PDT)
+Date: Fri, 10 Jul 2026 10:24:41 -0700
+From: Mikhail <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/82af2b-b7d71e@github.com>
+Subject: [bluez/bluez] b7d71e: a2dp: Fix loading of remote SEP from cache
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] a2dp: Fix loading of remote SEP from cache
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <178370160465.762415.8304209421100482316.git-patchwork-notify@kernel.org>
-Date: Fri, 10 Jul 2026 16:40:04 +0000
-References: <20260710072817.270328-1-mikhail.v.gavrilov@gmail.com>
-In-Reply-To: <20260710072817.270328-1-mikhail.v.gavrilov@gmail.com>
-To: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: b7d71e5067856b0daf2f1f73b3fc95483236610e
+      https://github.com/bluez/bluez/commit/b7d71e5067856b0daf2f1f73b3fc95483236610e
+  Author: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+  Date:   2026-07-10 (Fri, 10 Jul 2026)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M profiles/audio/a2dp.c
 
-On Fri, 10 Jul 2026 12:28:17 +0500 you wrote:
-> Commit 912f5efb0dd9 ("a2dp: Fix handling of codec capability storage")
-> added an 'i >= 2' condition to the loop that parses the stored codec
-> capabilities. Since i starts at 0 the loop body never runs, i stays 0,
-> and the subsequent 'if (i != size)' check discards every endpoint found
-> in the cache:
-> 
->   load_remote_sep() Unable to load LastUsed: rseid 6 not found
-> 
-> [...]
+  Log Message:
+  -----------
+  a2dp: Fix loading of remote SEP from cache
 
-Here is the summary with links:
-  - [BlueZ] a2dp: Fix loading of remote SEP from cache
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b7d71e506785
+Commit 912f5efb0dd9 ("a2dp: Fix handling of codec capability storage")
+added an 'i >= 2' condition to the loop that parses the stored codec
+capabilities. Since i starts at 0 the loop body never runs, i stays 0,
+and the subsequent 'if (i != size)' check discards every endpoint found
+in the cache:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+  load_remote_sep() Unable to load LastUsed: rseid 6 not found
+
+With no remote SEP loaded, avdtp_discover() can no longer take the
+cached path and issues AVDTP Discover/Get All Capabilities on every
+reconnect, and a2dp_setup_remote_path() returns NULL so the transport
+ends up at /org/bluez/hciX/dev_YY/fd0 instead of .../sepN/fd0.
+
+The condition was presumably meant to bound the writes into data[128],
+which the original commit did not actually fix: caps is read with
+'%512s' so size / 2 can be up to 256. Validate size up front instead.
+
+Fixes: https://github.com/bluez/bluez/issues/2285
 
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
