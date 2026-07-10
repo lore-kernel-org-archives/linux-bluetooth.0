@@ -1,221 +1,218 @@
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azolkn19012054.outbound.protection.outlook.com [52.103.10.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987A03F1AC8;
-	Fri, 10 Jul 2026 09:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.10.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783675947; cv=fail; b=Oz155CQ6PvTeQFUCN0nrkrhjKecSPU1/D38d1Cttj8grNvq6UDkyCTcJHCUf+CwmcQ5OziBIC35lCBflVfR5lR3GW1PL6QxgBpdfakwE70YMrejDUX9DVQQPiqVf1dKHTyLKE0ZUzh1joIR+0/ZzQRaNDyDcswMAmKPgk8NmjnY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783675947; c=relaxed/simple;
-	bh=aWzXueH88SGkwIkGHX+eVWP8uaek/FR1CfhySoReIb4=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=brlCrL6ukBUPygSA56C7mjxc+AOeBeM6xEa10U5hIsJxeliTqpeWZKExnSMJm1PV4pRuMTtpei56WDvDCCybLhJ8YAhLnFvyYWEkhbNj6P7s9X2587MuJ4W24AikYJMLDzg7cxSZ47NtJAzpNMo5A1wu5phVHtK2rg/NQWDmWeA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=k0K5vRub; arc=fail smtp.client-ip=52.103.10.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 124BD3F8714
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783676866; cv=none; b=TcZ9TnMXgWIzdbfLXrXR1oFKKM0MX58lyTAU7Q2wedC9IjeVfWIn0mzGneqFTVld1og/QXYgn+f82cle+QfT60C128avHNPmsUtQMUwfVMlgl2uG/MLLIufh4+JXEwJHlYmkfx7PJHwEh+xXar3Nv75otSeTCo2xKKzWSN2fmJo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783676866; c=relaxed/simple;
+	bh=5KQJMiWUVWflGl5J80u+4+tqFDAGP9E1KnRSQJYirxM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OdnyooWyO+vM8lAWJxXGDmdhp7jpuD0u7iUENinJ2sB6Atm+lVt45bJvUekbsHuuj56e7NWMzI8ymBOIZH0AWE3Y4B0jQcFzQ2l9/lvBty6p6ZAeA7cpeKgSIhUHhrL2orXNg39vFa5v9+i59XDXzWiFqJzRvPN6TS3pMcHR86s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cj1QwXNj; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="k0K5vRub"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HqvRqdyHnouWLOUbki5x+s9b21aILWO+jAVsZf1sva6av0F0/2G7yfTWYYaalFu7cY79sOYC8vmvoasai1xWwHmpgGMKRyPjugiwlkBcRgV6isWklXm7iesm/McqAgR7OxCJhlYy/lxJSX2mAxIPljxe/ozmMbu8God52CdBAD1Aa+gmoy2wI74fzn5epiTH3zCPnaOol2w9rqY0eceG8wX55dg6S5buF8Z3yVsFa6vqa38VsmaeZETBZSWVWGe1LEFlU3kMV/PCHgbbMyet8KobaLGgdYNYEBN86OhR3U2j83M6Wctl0ILJrG/R8OtxAmex9z5/+FkRoyZ6MTD3Jw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/SXKAgYPp/Ql+gr8bMcDe0XB7G/ZuWFh/IjVNaGUHD8=;
- b=QQPtr5/5bY5Xeah6NPBGhgietQvpraey5sCiUVjNitBHC400ziesbla5+epLEaKcWJYwcwQpE6BpfpnMr2PnnrELvSUPGIOS8RAWRqOZz8ymvqOfVOjZmRgJukKreeQA5cWVeK7o5O2QdzHteDSBl5XU0r3NdpoJhApigI5llQXk8uKNH+yV3RO95/NXUNX1y5xGhT159f8YBP/3w2CROJAb4ZSR5454lQlVnW/i5buzDajNiluN3wbZKWlvrlEgyIvSQtCqB//Ijd2lgvFbmKOe7dby9pT7H16ZV7FhGwmplLZfAqNanwrop8B46m/MabHziYMr7XSvqSXUv7vh4Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/SXKAgYPp/Ql+gr8bMcDe0XB7G/ZuWFh/IjVNaGUHD8=;
- b=k0K5vRubywNbjamyV0T4+HfpzHkvEP/OMPHPtWLoOfv7Kd2G+/ueSKMiSZKk2aIzHJK548AW6riVIX5TGnRrYjKeUXpZq9p676gSel54mr+worGGJA5z4EBaxcQ0SiQcdekPLus+A3w7089sTC8C6nKRvjYsODkeZ3nMqYqswo04EFgUykDksOtLZG8gPdvhlhGUQNLnKnLJx+/xeFTe3WuRjNjMOjVn8ZvDLEpi8qerpp7WgvGxw/AktGgMaSCbCUeH0bXxNM6ixyTBkTq52mSYczaT3lbpA16y1HP67TgWmiZLShOYVGy05/IlNYL9KZ8g9Fx+6RTsCdx2L7kx3Q==
-Received: from SN7PR19MB6736.namprd19.prod.outlook.com (2603:10b6:806:263::12)
- by SA1PR19MB5230.namprd19.prod.outlook.com (2603:10b6:806:1a8::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.13; Fri, 10 Jul
- 2026 09:32:21 +0000
-Received: from SN7PR19MB6736.namprd19.prod.outlook.com
- ([fe80::4b6c:b84f:b71c:d0a]) by SN7PR19MB6736.namprd19.prod.outlook.com
- ([fe80::4b6c:b84f:b71c:d0a%3]) with mapi id 15.21.0181.009; Fri, 10 Jul 2026
- 09:32:21 +0000
-Message-ID:
- <SN7PR19MB6736D10971D569CC4F97F21C9DFD2@SN7PR19MB6736.namprd19.prod.outlook.com>
-Date: Fri, 10 Jul 2026 13:32:11 +0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 5/6] arm64: dts: qcom: ipq5018: add node required for
- Bluetooth support
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Bartosz Golaszewski <brgl@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Jeff Johnson <jeff.johnson@oss.qualcomm.com>
-References: <20260709-ipq5018-bluetooth-v5-0-e476c41f03b8@outlook.com>
- <20260709-ipq5018-bluetooth-v5-5-e476c41f03b8@outlook.com>
- <11796dd7-11c8-45e3-8f9e-1dc27da0b229@oss.qualcomm.com>
- <SN7PR19MB673648D6C15A8E15D35F1E5E9DFE2@SN7PR19MB6736.namprd19.prod.outlook.com>
- <fab734fd-adfe-45b6-a10f-a8a25f7affb1@oss.qualcomm.com>
- <CAMRc=MccvtBxJaddbX0PjjMpV+6iwZeYf2ebq953msbMeVN=Aw@mail.gmail.com>
- <c75c88bc-3aba-44cb-a530-1d994bcd8954@oss.qualcomm.com>
-Content-Language: en-US
-From: George Moussalem <george.moussalem@outlook.com>
-In-Reply-To: <c75c88bc-3aba-44cb-a530-1d994bcd8954@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-X-ClientProxiedBy: DX0P273CA0010.AREP273.PROD.OUTLOOK.COM
- (2603:1086:300:26::16) To SN7PR19MB6736.namprd19.prod.outlook.com
- (2603:10b6:806:263::12)
-X-Microsoft-Original-Message-ID:
- <c7babae1-91e1-4666-9ad1-24f582a1f70e@outlook.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cj1QwXNj"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5aec139da7eso868238e87.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 02:47:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783676857; x=1784281657; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=iJKCagyd/SIrmWaSiMe9KDmEGLx+4cDuv8NGl1ssZz0=;
+        b=cj1QwXNjv29DV0tVDFOL2R2A2VrGAShrciwpUD/g6VnaJUS7qt9/oGY5JBiFCh9WfM
+         dxnK6mKlwUtZ4nmXu8HNWXOC5zz/z/FwNq5hiI/5OAKyWlq1xcYVtkMiS3H5lhpo2Fv6
+         k1F4nu+T5EhZvF+mJP7IqhOWKcvEJF6nwl0Z6ZYek4FjZB/Ca0iJkXjB+B8VPT2ct+Dh
+         h0gpGtJeymhSnLF6tXf4Jy77R7kTDRBxd9kkqLkJQmmgMYCISvRSAJIW9sr8K14E2wvk
+         UZieIit/6+9LtssFk2A/M2NhyzaPEDW3LesQroZTzGu6bE+eYmFyIhTb++unuCC8mIje
+         3PZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783676857; x=1784281657;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=iJKCagyd/SIrmWaSiMe9KDmEGLx+4cDuv8NGl1ssZz0=;
+        b=h/33Oxd4fuGO7xrp4wBkS2I6Ing5TRWs2KHzzX7hwqaw/E7MU/aD2fkUSfm1d6swFX
+         wyD1tNDs1klV7G9vZAzUuZ6MFcMnzodfHRXb9ZCmMHuvueaN7UoG3TZvR1XSXEhFrKsT
+         d5XnYnst2gqcCGPMYiXeOQMiNC0VR9eM21NYYeBg6nSyDoKG7P8VYBJmXudNIWN4l11r
+         I4rvCt+VOtXOp9p+fBxY1BimhlFSJPe9xaAW4qt2fvCxc8rQa3e/H9cPSCuku9T2WeJy
+         cSBMQybCm0pf641T98t583+ewoUVVY2uHYX3MoLoIxhJIgZK7TLP7lon0ApIedBa6sht
+         aTVg==
+X-Gm-Message-State: AOJu0YwfOwLodt5fUwo+PoXtYlw22B0Fe8JsNYouXoQPB0VqOSJ3mzBJ
+	frM8Ic2dgYsw5ns6vZFDe1zMtnPCbe3KdFCdDQ9zERAlSGL/zDJOKNC1yUCeACwUBDeF4A==
+X-Gm-Gg: AfdE7cmZGKjuCCWzh26h/1KahQa2U6594nv2jDKua63nADMwdLo03ETaSbpN+1zUy81
+	Oq4YnbX2uqzVo7Kt7+S/FnRR7IKImJlnrHAckdq2ZYRTV5LthRv8QdB17auXFoLPmISlRvQPs/l
+	LeUrqhsZBXstKTFiUReOTVqWW47gif/2G9GzxufgJxR78M1uLk9aZl62BlvSKVt0rePFK2acP/1
+	tJpcvshnqWSYmrE3KZNESLcXimRcjx2YsPzNRWpTR/zhxE1I8Z5XDSbNWmOS7lottMQtdjivOk3
+	Fi8trKRiVAQicHwb+Y3ln99GuXrplV1QZHSb/FjR9PtJIxPMNB1zCGnU11dzGbNJpGsNFo9TsTs
+	jqG3DuC3558pltR0ijsV/L8uK+HP9qrbugjKgU2gsdzrn4Jho56t446YgWpeAV/bbMq6zB37Vuz
+	f9y/7vIOc0iE+vRv624vxIOg==
+X-Received: by 2002:a05:6512:6708:b0:5aa:62df:cd0f with SMTP id 2adb3069b0e04-5b01c6061a0mr497391e87.2.1783676857247;
+        Fri, 10 Jul 2026 02:47:37 -0700 (PDT)
+Received: from localhost ([188.234.148.119])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b01ca4a1d5sm473878e87.11.2026.07.10.02.47.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jul 2026 02:47:35 -0700 (PDT)
+From: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+Subject: [PATCH] Bluetooth: mgmt: Translate HCI reason in Device Disconnected event
+Date: Fri, 10 Jul 2026 14:47:31 +0500
+Message-ID: <20260710094731.59767-1-mikhail.v.gavrilov@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR19MB6736:EE_|SA1PR19MB5230:EE_
-X-MS-Office365-Filtering-Correlation-Id: 247e9b9f-f9f1-4b7a-03a0-08dede6623f3
-X-MS-Exchange-SLBlob-MailProps:
-	Om8TgR6f4EDKwbHiBQa7ExePO6wqvFC1V6tSpLHNpEtyml6v3Tprz/IU3aYz/Niqmc8TMAi1NYweclbewc8hI+h2osAfWXlDLE3MBU8bZ+zkpsGB78PgJlYk0JcXlUxSfMeB3kd2xBHXqTGQTCLeucX/7G7EruWULSs2a0/bizpxItRON9ABNZ8A9cQinW+mXZC2mrlnQ0BcVfxNWU65IsTMibbj5OEYkb2BSkK51XRBmUwbtRtoIulteNlqXw+cas3MVDXcQtntu1AerTNQhO/scoQqdyAr/YWWA4DWmF/HS2vvZcX/xStjXR+vDJ4JeRsWrQHH06GqoaGLgthhGZN9+7jxhzMjQRTIYgTYb/i7vtj4ll4TRll7jhcAVRekStIaFhlW4DaJgqduob2jayztaXpXapK10uLANN5haOdpKgW1uXusdsLgogpQS79q0XmXLLaA6TnKjitb+sFwbmW2XBx9BBtoNAoU3ZnFhorvI2InGphMV+qDvGxIezDSHQgK3RFEJLAglLOFSN7SNzFLdrv2temNluRiv+qPFr1Oih7oH5r7PWrVp6s2sTn3CcMX2IYUh4X2LsZckZZz9wI3/TioeRn+V/vGIkTYQMRnCherc6C2LQgmURx1ulA1Z+JjaRs/jwUo7Xi03j5tSBKg3YI3TjKnbWEtYRe7jvpat/cSrvNOdz/Mf4MM5+XTdpAVgnzbKzEkr7kDsdKIppYIIEVh01y4thumrAARijwloarNTXSMN296LmcDVQhX/UALMPgOLr9SAkmqAd0eb4VABkP5TXHJRTzhY+L1rs7frIb9IAWzZjWPvpwKjnOHMls2tYilj8gwH6kkTVhjSVjHjS38wmiW
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|8060799015|24021099003|19110799012|6090799003|23021999003|25010399006|37011999003|5072599009|4140399003|15080799012|51005399006|10035399007|40105399003|1602099012|56899033|440099028|3412199025|4302099013;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cjN1aHloNlFENlJDQWpvRGY5djI1VFZqTVJ2eHZQckdRVHJoZGhXYnNYL1BT?=
- =?utf-8?B?Q1lHaXdWMlVFbzliWTRlbkVMZ09JRktkazBTRHRMSWgxMmt4dVE4N0srVmlU?=
- =?utf-8?B?SWhZbGgyT3pRODRDQlhYQU9IaXdnL0xSWVc0TWVrTVAxdlRJWkJ5M1BWME9G?=
- =?utf-8?B?QTFLVXFnVGJITmlMWXZ0THd2KzJuMlVBVnVnQVEwbWZWUEFRT3ZJQ0xYTDFm?=
- =?utf-8?B?OWFySlZOTWg4V3dvdlNHaWw3QU5SbkNjYm9GNDFlNEVhSUVKVU03WFh4Rnd2?=
- =?utf-8?B?bHNKUU96MjRZNmx1YldLQkkxTittNHJtWG9wdWJUU1pvZUJiekQxdDRhcjh6?=
- =?utf-8?B?VUZzbndMekZ6aUwwV1pxZDVJNEllM0FQUkpLcUNMU1JRUUpLdzNuRkxjTTFC?=
- =?utf-8?B?bHRKQVFjNDJNc2RFMGFtdWlFTXJjQTdOOW9EYVR1NDU5UjBpb2NaVDR0ZGZz?=
- =?utf-8?B?U3MzQnhiaFBITmtoOWVMSFJZZzFYWUlxb2pNNlFjVmwvUndHREFSK2lCT1lF?=
- =?utf-8?B?VUJvQXM2QWN0VzhJTTgzQkY5emloTFlFMDdWSVZReENIanR6VUh4R2ZXbXNR?=
- =?utf-8?B?MDc0aDlNZG5Xclg3bXdSeU9LVCs3TWRzeFk5OVFzNEEwellWd0o3UkZmbzdq?=
- =?utf-8?B?S2g1VGI0R1ZHN3FvTFg4UTJlbXpZelNNM3RVNyszKzZvaXBPNUo3SmRCbm1p?=
- =?utf-8?B?NUVabmRrd2lkYXJpOXNJd1IrdEtHV1JhZzRTNy9mbzh4UFc4Z1FkZ05jUXZk?=
- =?utf-8?B?Z2kxU1NmNmNlQ2JTeFI3a2xXN1hzaHBNdGhCZXdxdU5LUFJLVGJHYkkvUHVQ?=
- =?utf-8?B?NUJQNVFRUS9rRGFDdk1vRVorTjNqUEdhVm1uL2JIcG9hL3N5RnAvNkl3ZDNC?=
- =?utf-8?B?ekNjN2szTko0di9hRVM1NFExTDRJaG1paVhRMDhRc3o1cG81WXlGdnJkTUdX?=
- =?utf-8?B?MzlGL2FlSWVIOW4yQXo3YTI0SndCQ0w2ZHphK0JxYzFOTkdUdnpiSUk4cG84?=
- =?utf-8?B?TC9ZbUFZZ0h6WUd5ZU0rYUtjY0YxcFB1VGYyZjlJaWZFOGZTVHl4M3hDNDhr?=
- =?utf-8?B?OXRRbVlqbGorcW5mbXRRVEcwU3pRL2dtbjlZd2F1OXh2U2xCYjN4dHhEWWZM?=
- =?utf-8?B?Qjh2dW5HaEpTLzdod1AzTXdjbkJaY1krek51ZWJBVUFwSmozbHNuM1FERjB5?=
- =?utf-8?B?d2RLdzdBdGMrZnBWRStDSTJpLy9OTy9lSlRJQVdabitOMDZKa2pscWc5em92?=
- =?utf-8?B?NUZGRDlMT0Y4YUNiM3cvZ1ptY2xxTmhwQ285T0RuVENnZm1sRDlpSEI2dEM4?=
- =?utf-8?B?eElVWFh5RG9QS1o0VFI5UW9HRUNkN3IvU1h5Nm1JUDZSQXhJRlJxbXJ1b1pY?=
- =?utf-8?Q?yzum/SSpoJ1LG/a7F+VAcF2nktJOHBHA=3D?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cWR1WmJUT0VqV3QzMk1ZYWc1VkZKTTh5MXNQZ3VEUHViSlJ6azdDU1lqanoy?=
- =?utf-8?B?bEl2UlZRZDhYN2lYOXJjMTZteERyUEhhQnhLOThJZDBzRXhFbGNDRmhGVTZl?=
- =?utf-8?B?TW1BeWEzTm5LMVZYMzBMc3RQMUlkeU9yZ2FLaFFyOC8yc0NSbDl2U1MxL08z?=
- =?utf-8?B?VU0ydmN5d2FJbUZMamVpanBtc2Z1UnJUcEJWZ0QyMjdUSDlrYUlnM3VuaU1N?=
- =?utf-8?B?L1FxRU5ZRkRYaWZIOVdWY2hoQVVQQXQrYWxvZEdHc2lKMU1kSm5BRkRRR2Rl?=
- =?utf-8?B?OVhYTkdZSW9Ld1ltNnVrcHk5T05aaGUyaEhMZzJpUlIyclprRitmUkltZFE0?=
- =?utf-8?B?Y1R4dTU0MGRuWWlXNUFuejZ5Z0dWNHBrM2tqMkxVRy9MS1IrSDNndm1EbDJR?=
- =?utf-8?B?RUhOQlJLZHpoOTd0QVA2S2FPYUVXY1Z5aVpuVGZiQmU2SWtqUmY0a1lRSGlL?=
- =?utf-8?B?MVE1c0xudlBDenhCQVdSSjFLSDQxckxyTzJsNXcyM0xJT3JiTFlvRjZtdVRX?=
- =?utf-8?B?LzFnck90djdlb3pzQlAvQzdCbTNZSjRNNU00Y2V6NDRSS2dTSFJUZXBwSkJ0?=
- =?utf-8?B?cVFNeUNQUDNhTStwWktyVm5jQ0R4S3BBWElUbEN5ZDVCQjNWWmIycU5rNjUw?=
- =?utf-8?B?MitBUjMzc1VJck5DbzhPUkh3c1YwTXFGbXQrbUQ1TDBCZFVlS3BEQnRiUlEv?=
- =?utf-8?B?N001aWszWU9BWEhLVlAwcGQvL0xYcjJ6MEFkWm9EMmNaTTJ0b2FHTUFiNllW?=
- =?utf-8?B?cEJ1eXYyeDRaNnc5N2x1OHpNUUsxSVdnYVdDczhKK1J4L0Jtd1hDNU8rck5o?=
- =?utf-8?B?Mml2emlxa1ZHOVJ2VG5LYjRkTHFXK1hpYU41b1FscE5nc1M1SnJvK2VHWVVx?=
- =?utf-8?B?cCt4aXZDQ1VTMEhFanZKZnFGc3RSTnJMdkJtYk9OTFRRVWQxRVgwY2xjeWcw?=
- =?utf-8?B?L0FMaE9LU1VtTUxGc1piNDgvdWFNeVZSZy92S3VBelB0dW5OK2RXWGJXVS9B?=
- =?utf-8?B?N1NHSWk4SldtZDcyT0VhNlhkT3NpSVBmSWdvaldMUWhwKzlkTHc5VXRoZ0Uv?=
- =?utf-8?B?UklmMzNJWjgrTDlBV0kxNml5d0pTSkFybkp4Z2pjdHFITHpRY3plRHJrbVdL?=
- =?utf-8?B?L0l4Qnd1aGVSYzRUVGNOUWd5Q2djWEVGNDN1YTFscDBsYXlBSE9yckgxWWRa?=
- =?utf-8?B?VmVlaVNxeFFCeS9QcUIzL09LZWZPU2FmSHJib0o5Sk5TUEFxNklPcGg1OTVr?=
- =?utf-8?B?Nk1obTNFTm5laW4vTG5od2JQM0Q5Tkd6NFk3Kzg0TkROK1NCQTMwV21oODQ5?=
- =?utf-8?B?S2djK2FPOFhmTVdHelVEbGd0ZW5DL0t5VGdHYkkxWHBCSWY4bzY1ZjNOME9D?=
- =?utf-8?B?S3U0RWx6UHgxM2NHOVFCbW1ucXBjcTJTWnpHL1dWSHRCZHI4VGIvOEJDd3Uw?=
- =?utf-8?B?cEdFdW9nYjJEaHYyVE1FR1VDbmVlQ2xtU3k4ckl2aEFseWxXUnFjTVBwbDY3?=
- =?utf-8?B?UmxjTm45SW1ZWWRlS0s0VEpGV0ltZitqVk5mRUVzNTFKd1ZwQjVDTHFrSHQx?=
- =?utf-8?B?VjZnQm5HVkJyaTQ2UTQrUVBBRmZ4enZoOEtrNXI2b1dYM0l5NDBBTEo4Tnk5?=
- =?utf-8?B?NGNDNlgxU1UvL20zenozWEt4UGhIb09FZUM3SmxVSGhUZDIzb2toMUVTM2Ji?=
- =?utf-8?B?TlFDYXZEQkUrWTZFK3RQb2JFMmxnNmpEclkxalJ2ZFZ2STVVYjlCR0RXeXMx?=
- =?utf-8?B?RXVZaDEzYmdUWnZsSVZjek8vUXp6amJXQXhxUnVSTzZWdVNESHR5SS9qRHB5?=
- =?utf-8?B?cE5hY2Fib0tHdWN3RFVneHhnSG1hS0JKYklsc1dad1c5Vm5aQW1aM0k3MXlI?=
- =?utf-8?B?UGZ4c2pXQVRaMnZyRis5NzFzOWR0Rlp4OU5naTJQdWRqQlE9PQ==?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 247e9b9f-f9f1-4b7a-03a0-08dede6623f3
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR19MB6736.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2026 09:32:21.2729
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR19MB5230
+Content-Transfer-Encoding: 8bit
 
-On 7/10/26 13:23, Konrad Dybcio wrote:
-> On 7/10/26 11:14 AM, Bartosz Golaszewski wrote:
->> On Thu, 9 Jul 2026 20:40:04 +0200, Konrad Dybcio
->> <konrad.dybcio@oss.qualcomm.com> said:
->>> On 7/9/26 8:25 PM, George Moussalem wrote:
->>>> On 7/9/26 22:17, Konrad Dybcio wrote:
->>>>> On 7/9/26 11:18 AM, George Moussalem via B4 Relay wrote:
->>>>>> From: George Moussalem <george.moussalem@outlook.com>
->>>>>>
->>>>>> Add node to enable Bluetooth support on the IPQ5018 platform.
->>>>>>
->>>>>> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
->>>>>> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
->>>>>> ---
->>>>>>  arch/arm64/boot/dts/qcom/ipq5018.dtsi | 16 ++++++++++++++++
->>>>>>  1 file changed, 16 insertions(+)
->>>>>>
->>>>>> diff --git a/arch/arm64/boot/dts/qcom/ipq5018.dtsi b/arch/arm64/boot/dts/qcom/ipq5018.dtsi
->>>>>> index 6f8004a22a1f..8c252fa3ff5b 100644
->>>>>> --- a/arch/arm64/boot/dts/qcom/ipq5018.dtsi
->>>>>> +++ b/arch/arm64/boot/dts/qcom/ipq5018.dtsi
->>>>>> @@ -453,6 +453,22 @@ tcsr: syscon@1937000 {
->>>>>>  			reg = <0x01937000 0x21000>;
->>>>>>  		};
->>>>>>
->>>>>> +		bluetooth: bluetooth@7000000 {
->>>>>> +			compatible = "qcom,ipq5018-bt";
->>>>>> +			reg = <0x07000000 0x58000>;
->>>>>> +
->>>>>> +			firmware-name = "qca/bt_fw_patch.mbn";
->>>>>
->>>>> Hm, rethinking this, it must have ipq5018 somewhere in the name
->>>>
->>>> I agree but all QCA BT firmware and rampatches are published in the
->>>> /lib/firmware/qca directory, see:
->>>> https://git.kernel.org/pub/scm/linux/kernel/git/ath/linux-firmware.git/tree/qca
->>>
->>> +Jeff, Bartosz?
->>>
->>
->> I'm not sure what the question is. This particular blob doesn't seem to exist
->> anywhere in linux-firmware yet. I agree, ideally the platform name should be in
->> the firmware name so let's upstream it to linux-firmware as such? Am I missing
->> something?
-> 
-> That's what I'd like to happen - just wanted to make sure you're in the
-> loop, so that a platform-specific MBN doesn't end up with such a generic
-> name in case that was the plan.
+MGMT_EV_DEVICE_DISCONNECTED carries a reason field which is defined to
+be one of MGMT_DEV_DISCONN_* (0x00..0x05). hci_disconn_complete_evt()
+converts the HCI error with hci_to_mgmt_reason(), but two other paths
+pass the raw HCI error straight through:
 
-Perfect, kindly let me know what the name of the MBN that will be
-upstreamed to linux-firmware will be and I'll adjust the name in the
-next version. The current name was taken as-is from firmware images
-distributed to vendors and as available in code.qualcomm.com.
+  hci_cs_disconnect()   -> cp->reason
+  mgmt_connect_failed() -> status
 
-If it will be provided as MBN format, shall I remove support for loading
-MDT in the driver or leave as is?
+The latter is reached whenever the adapter is powered off or suspended:
+hci_disconnect_all_sync() aborts every link with
+HCI_ERROR_REMOTE_POWER_OFF, hci_disconnect_sync() deliberately does not
+wait for HCI_EV_DISCONN_COMPLETE for that reason, so that
+hci_abort_conn_sync() finishes the connection off through
+hci_conn_failed() instead.
 
-> 
-> Konrad
+As a result userspace sees an out of range reason:
 
-George
+  @ MGMT Event: Device Disconnected (0x000c) plen 8
+        BR/EDR Address: 8C:A9:6F:2C:51:46
+        Reason: Reserved (0x15)
+
+  bluetoothd: btd_bearer_disconnected() Unknown disconnection value: 21
+  bluetoothd: device_disconnected() Unknown disconnection value: 21
+
+Export hci_to_mgmt_reason() and use it in both places, so that a power
+off is reported as MGMT_DEV_DISCONN_REMOTE rather than as the raw
+HCI_ERROR_REMOTE_POWER_OFF (0x15).
+
+Fixes: d47da6bd4cfa ("Bluetooth: hci_core: Fix sending MGMT_EV_CONNECT_FAILED")
+Fixes: 182ee45da083 ("Bluetooth: hci_sync: Rework hci_suspend_notifier")
+Signed-off-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+---
+
+Tested on 7.2.0-rc2 with an MT7922 controller and Denon PerL Pro
+earbuds. Before the patch "systemctl stop bluetooth" produced
+
+  @ MGMT Event: Device Disconnected  Reason: Reserved (0x15)
+  bluetoothd: btd_bearer_disconnected() Unknown disconnection value: 21
+
+and with it the event carries MGMT_DEV_DISCONN_REMOTE, with no
+complaint from bluetoothd. Explicit disconnects, which take the
+hci_disconn_complete_evt() path, are unchanged.
+
+Note that the hci_cs_disconnect() call site is not reachable in
+practice: it requires either hdev->suspended, in which case
+mgmt_device_disconnected() overrides the reason with
+MGMT_DEV_DISCONN_LOCAL_HOST_SUSPEND anyway, or a
+HCI_ERROR_UNKNOWN_CONN_ID race. It is fixed for consistency only and
+was not exercised by the above.
+
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_event.c        | 18 +-----------------
+ net/bluetooth/mgmt.c             | 19 ++++++++++++++++++-
+ 3 files changed, 20 insertions(+), 18 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 4ca09298e11a..e7133ff87fbf 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -2430,6 +2430,7 @@ void mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key,
+ 		       bool persistent);
+ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
+ 			   u8 *name, u8 name_len);
++u8 hci_to_mgmt_reason(u8 err);
+ void mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			      u8 link_type, u8 addr_type, u8 reason,
+ 			      bool mgmt_connected);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index b6d963ce26d0..741d658e9630 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2763,7 +2763,7 @@ static void hci_cs_disconnect(struct hci_dev *hdev, u8 status)
+ 	}
+ 
+ 	mgmt_device_disconnected(hdev, &conn->dst, conn->type, conn->dst_type,
+-				 cp->reason, mgmt_conn);
++				 hci_to_mgmt_reason(cp->reason), mgmt_conn);
+ 
+ 	hci_disconn_cfm(conn, cp->reason);
+ 
+@@ -3381,22 +3381,6 @@ static void hci_conn_request_evt(struct hci_dev *hdev, void *data,
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static u8 hci_to_mgmt_reason(u8 err)
+-{
+-	switch (err) {
+-	case HCI_ERROR_CONNECTION_TIMEOUT:
+-		return MGMT_DEV_DISCONN_TIMEOUT;
+-	case HCI_ERROR_REMOTE_USER_TERM:
+-	case HCI_ERROR_REMOTE_LOW_RESOURCES:
+-	case HCI_ERROR_REMOTE_POWER_OFF:
+-		return MGMT_DEV_DISCONN_REMOTE;
+-	case HCI_ERROR_LOCAL_HOST_TERM:
+-		return MGMT_DEV_DISCONN_LOCAL_HOST;
+-	default:
+-		return MGMT_DEV_DISCONN_UNKNOWN;
+-	}
+-}
+-
+ static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
+ 				     struct sk_buff *skb)
+ {
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 733a4b70e10c..1c1b64e651dc 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -9848,6 +9848,22 @@ bool mgmt_powering_down(struct hci_dev *hdev)
+ 	return false;
+ }
+ 
++u8 hci_to_mgmt_reason(u8 err)
++{
++	switch (err) {
++	case HCI_ERROR_CONNECTION_TIMEOUT:
++		return MGMT_DEV_DISCONN_TIMEOUT;
++	case HCI_ERROR_REMOTE_USER_TERM:
++	case HCI_ERROR_REMOTE_LOW_RESOURCES:
++	case HCI_ERROR_REMOTE_POWER_OFF:
++		return MGMT_DEV_DISCONN_REMOTE;
++	case HCI_ERROR_LOCAL_HOST_TERM:
++		return MGMT_DEV_DISCONN_LOCAL_HOST;
++	default:
++		return MGMT_DEV_DISCONN_UNKNOWN;
++	}
++}
++
+ void mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			      u8 link_type, u8 addr_type, u8 reason,
+ 			      bool mgmt_connected)
+@@ -9909,7 +9925,8 @@ void mgmt_connect_failed(struct hci_dev *hdev, struct hci_conn *conn, u8 status)
+ 
+ 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)) {
+ 		mgmt_device_disconnected(hdev, &conn->dst, conn->type,
+-					 conn->dst_type, status, true);
++					 conn->dst_type,
++					 hci_to_mgmt_reason(status), true);
+ 		return;
+ 	}
+ 
+-- 
+2.55.0
+
