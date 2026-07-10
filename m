@@ -1,94 +1,114 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B3E1A6831;
-	Fri, 10 Jul 2026 05:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD3639C013
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 05:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783660840; cv=none; b=gACYliNnGKBtG26LowHzh9xltBezQJ0Euisl7EWLHWhoECKTSvJaN1rvogwevdEK4RiEn/e57Qd3qKRUgbXYS0wtSbLBlqQ5RgHv7FCqFfh5WKpE3ozdz3kSD6BxXVzsSc5ll15t6OE0/juFnlQLsIr3i1ZQBgRd7oYIZkiFGM0=
+	t=1783663162; cv=none; b=ahbpUeWk8S62S9yXq9UjFcc4FZeuPufKPP+RQtSWMZpsr4Q1I+UiSV6D07nzVTYnpwhEuchUAzVdRpiRL8dAbMCFaIh6VZhuqqz2fv8h4epgKLyuz8jdjKqnd7MHun0efUsMuEonb5tkQ9Vk5xqHYpba+WaQgGvrithK++5FzA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783660840; c=relaxed/simple;
-	bh=X06be8K14fS2iYWGmL47KS8e6UcDD/6sAcOPl3pToCY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OEknsE+jAZMdyEQZjT+IHWWnjQCP8wE6Fl+v30Y0t1CoWqTB73LhgvnMcBiRZl1HiBt0OzAh18EezGulhBH6xij6RsJTh2IzopHzmvNpht+qJsp9AgwZIqh+S0gYo5RK4sZ7b1S5euHC+ZfIV6AB0gWI+1M8l4YJzrnv3TWdIEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Qa5JbdRs; arc=none smtp.client-ip=205.220.180.131
+	s=arc-20240116; t=1783663162; c=relaxed/simple;
+	bh=SkReEt50Sh/wsMzlorza5xGtChevmrmpKuUaqlEahvY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XuZbYPLjeMgn152VNbUsTJDX33+zExX2TpceLN1pjXLi2rFBSIb0lcFNzCUmoBBG9VwxY0VYxqAvuLROJo1Dbn0Ren6DCmxJOg1Lr375BfolMxWj+UwlcUw0p1uudl6GOdbyDDkqPayBrQ65HUxS9fnyjqfrMOW+BI8CnOk2f2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ELGsFUfF; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=aYO1FGGu; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Qa5JbdRs"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ELGsFUfF";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="aYO1FGGu"
 Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66A3n3Hv3802185;
-	Fri, 10 Jul 2026 05:20:18 GMT
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66A3n3B13802165
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 05:59:19 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=DiDcWbCJEyLDZIzNfdjEV6
-	Kae0+VjhzNFhDn9FG56y8=; b=Qa5JbdRsNk3hW/9I7B3jJXgcLE87ENu5sh2L6L
-	U0zabmvoRceRv3KKXUgBlj9H3JyX33AjFgfMM8jJSrzeVvJWwwI1An56RFFUZQri
-	d57unsXFH85an4g+HcDvZkZ7lD+fcenAyc7Wluunqp3nZivnaWnrqWwg+TQTDl1x
-	aCqIqHMNlRcFi7q3XKUZdEzAmZKxIQOsqwS5Z46dBOx2QHkABx35AvlHw4XjECGb
-	X9MMrtNkNxUpXMux0dm/uHo1wd65ixnb5DyJ1rK2ROZH3IHBUl0xcC4LI98TZjJc
-	FAzrcNaVwi+oK7qis0WvP/jN4NliHmsme+/bHZf/lI/apykw==
-Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4facqpkd5k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jul 2026 05:20:17 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (8.18.1.7/8.18.1.7) with ESMTP id 66A5KE0G000382;
-	Fri, 10 Jul 2026 05:20:14 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 4f6u8jp3df-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jul 2026 05:20:14 +0000 (GMT)
-Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 66A5KDow000375;
-	Fri, 10 Jul 2026 05:20:14 GMT
-Received: from bt-iot-sh03-lnx.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 66A5KDSn000370
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jul 2026 05:20:13 +0000 (GMT)
-Received: by bt-iot-sh03-lnx.qualcomm.com (Postfix, from userid 2385805)
-	id B990443841; Fri, 10 Jul 2026 13:20:12 +0800 (CST)
-From: Xiuzhuo Shang <xiuzhuo.shang@oss.qualcomm.com>
-To: Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
-        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
-        shuai.zhang@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com,
-        jinwang.li@oss.qualcomm.com, xiuzhuo.shang@oss.qualcomm.com
-Subject: [PATCH v4] Bluetooth: MGMT: Fix discovery state race against cmd_sync worker
-Date: Fri, 10 Jul 2026 13:19:57 +0800
-Message-ID: <20260710052009.728899-1-xiuzhuo.shang@oss.qualcomm.com>
-X-Mailer: git-send-email 2.43.0
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=Y3HWL7FUxAozLAGHTfyAHE79eroZnGgejCg
+	9eMjjCcE=; b=ELGsFUfFS2CgEre178hQaMxWd+m429wc59rc2/b8HXXR0dEbHX6
+	1Ku4PmyDz6hm1weToPqGdT30Q8znnjR3k2U6K1r080v7gcqTUz8qxAU6FHn7jZF6
+	1uHn3I2k/llZOlQH+vZg8o64xQNZgWwBRlspU0NlEwiyyAhZvaOOHlhVaNygd9XB
+	bRWDS4IYIGnWjE1hHxwg5Rh52SGAZ15Y8PsS1EVvNBvmRUxorN2YqVc7Ez6wzycY
+	i+FTgZ/a415Ttm7bkki/hpAD9m/Haeu184P15sT+miHwFiJRBYFDGyL4/7YkXd4W
+	utjzdhZImVy5tSefMl+tLYUNh7W9cpTyDuw==
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4facqpkhvu-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 05:59:19 +0000 (GMT)
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c88fc985a65so1004421a12.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jul 2026 22:59:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1783663159; x=1784267959; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Y3HWL7FUxAozLAGHTfyAHE79eroZnGgejCg9eMjjCcE=;
+        b=aYO1FGGuLsIqimOztFN+CBa54uCRyXLoEGYs7sGoZBsW+nrYlk9FWwWemV6fHEBM80
+         Gu2FVWx7CdCIJwNqwVdEvTEOD9vGscNIpXG9G8Npk2s+Zx5dyHsPyRRGFpPhT0vgMPCc
+         sNV1RNLy3ODYhGBk04aPEShITb6svpJaCoXdTrq/O2lAdCnjZCvNuCQj2SoW4rpm63wR
+         l7ycWSXljWjRCs87W/yCdLeHfkgua5OzCOuLGi1hOU1MCRuTk4kRv3GBkeAERNTD3d4A
+         CGZdDkf4oVVNCN8hrn3RBZ5J58gq+GwtBwDQfuNTZ7+QWxtZlR2amazrP1FUExd9xUB6
+         mXNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783663159; x=1784267959;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Y3HWL7FUxAozLAGHTfyAHE79eroZnGgejCg9eMjjCcE=;
+        b=TtgNub4Ipz5e/oOZNp9jM7JJdHzvMkdgJep7ErUIlVovVbk4vqbaD1Wkrs6VYOmdQS
+         6e+6u52Vyub6MYewVZ3LcbII26fLOtt9HiVtndTsLl/0EvrqYGyr4NGRMfWF7hqUvAY7
+         4MWgSOI3dsvfz2W8KgoCUTxAm3aMW3qKnE0GJOFcl27izCxZW7IL1jdZyMJkOEI3fSJo
+         JebJlbJOTO5ssQ43CDnprpydO8nU6y6TWgLB3kmKFD+aW6RtvhvPj+Ozth0pU8BgIN9w
+         OK7Sb1jalep/XfyamUdKWu8SaccDm8tOKwUae0Yp80/p8nlJvqoMJo/zCfbncAaYyBRa
+         LATA==
+X-Gm-Message-State: AOJu0YxReeBOfIt+dN8PsjToH/KnkaNLlvb9CZ/ypH/OjkiTSY9+ukuF
+	6lqu2+AEl5o8EchIUDF4rK6NMQQE9/qr26iyY5iaG3hy1R4oSalBtwbSU23f4eUeVVF12UDrhtj
+	cFF5PMpdA0cT/r9tlfDXrGxKGUYTwzi3NOXha942f5RMF/e/2NXJw2IqqlubQvVj9hlxwrPa1fp
+	jIQsU=
+X-Gm-Gg: AfdE7cl7K+E+nF0ku82RMmD4Iu2eROO6V5SQ2Io/t6fnENH+9tZU+heTZpbVKytlfwR
+	SMD0uB+xB4p2cRpHIzxnM+FYU2vdWGnk2Le98MhtlH+0+u1m91P7JwVo0wk+7MHYHy+/6mNUamX
+	CCbX85e99Dh+sfetUpUvM1ixSvogNaJsZmAHiry0zrIk4w+OB/g5O7pfTrjp6p1IYN2woVuXIWm
+	J/51AsL8+lZ88uim7a/oPSWskfTuP0jE+6bxujIOLiWD6FDrGsfGlIhWwq6ied5c5BQinoEfG/f
+	DbBvV7A2thLjwxGruGCwqpKIcmNdmifiUT1fwxLYOzxQT02ORfoYLw36Cu+acyD17zC3rB6jP9R
+	TpJdpBGBSX9Qy7bLvoSngwXL0VilIN22wYmhxpBvb
+X-Received: by 2002:a05:6a20:430b:b0:3bf:bfe6:ab6e with SMTP id adf61e73a8af0-3c0bcf49b4emr12815185637.6.1783663158683;
+        Thu, 09 Jul 2026 22:59:18 -0700 (PDT)
+X-Received: by 2002:a05:6a20:430b:b0:3bf:bfe6:ab6e with SMTP id adf61e73a8af0-3c0bcf49b4emr12815153637.6.1783663158246;
+        Thu, 09 Jul 2026 22:59:18 -0700 (PDT)
+Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b659d7c8bsm39678529c88.12.2026.07.09.22.59.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 22:59:17 -0700 (PDT)
+From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
+        quic_anubhavg@quicinc.com,
+        Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v4 0/3] doc: Add Channel Sounding API and bluetoothctl documentation
+Date: Fri, 10 Jul 2026 11:29:07 +0530
+Message-Id: <20260710055910.3691701-1-naga.akella@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
 Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEwMDA0NyBTYWx0ZWRfX9DVH/2o8HZQ5
- U0LVKnhBYv9XaNkHCVAArPESWoYsg1CT2MMovjw2CXMcIHUqvBByZfo5v6gygBKRKcU6OrFrI8F
- 8UeC4TpB4uudrRgUTcMYZTwdACgd8b5/l54ciVjvHTY1AP1gESS9RJwHmXCDDleA3GvGdIWZGL8
- oeaSIbnjS5YhliLwEgGRc+SIwiTzOCmi6zy5qRqRQoYDOAZUKHnsWz6U2+R6cTLrWWj4/8bmyjh
- PfaYbj6uTNBIhNXsVP4hj74IJsPcl2LLzIwsvLo6I6qilIW5arlM1DGcQ8feW0CVpNJI1uM0AWR
- MWMs7Uzp2iWsA311bR0MTTIedB+pWd+bs98v2YkGyV0bgFoG1MtIDbTnQjJr2/50gOxYeI5Cor9
- y1zJ2k5eXWuNa6mNm7/UiM9WOs8RkeeJ7cdLVixcYo4oIdF46gy0d2Ao1AEUpztIY2rpMyIHus6
- Kodj0SxbF1+9+fgaS7g==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEwMDA0NyBTYWx0ZWRfXxaUYyNjclNBM
- i2V+lEga91+PrqUk8Yp3HCR8CV8/m4MHt0E5mVnNt8dSW/v+c8Fe4D4WwhJzTE0o0dPCn/kyNkE
- lCs0WXy2LlrgKepZzsG8e8cp0LGReGs=
-X-Proofpoint-GUID: nB2SfWwSU-opGlzPqZ9aUOZlxbSXQhL8
-X-Proofpoint-ORIG-GUID: nB2SfWwSU-opGlzPqZ9aUOZlxbSXQhL8
-X-Authority-Analysis: v=2.4 cv=GJ441ONK c=1 sm=1 tr=0 ts=6a508112 cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=qf4gfuq51q0A:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22 a=VwQbUJbxAAAA:8
- a=EUspDBNiAAAA:8 a=3JPR9GYJdaIQrRVmcmYA:9 a=3ZKOabzyN94A:10 a=k40Crp0UdiQA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEwMDA1NCBTYWx0ZWRfX7sWAJanUWiyY
+ yLcgJyg0y9DwcekGW/MrrfUbRAXHlSSUNqRYCfhlxuODGZkSa3lZRftVyNKPe8/E6W0c5xPquyo
+ /V1eeOJsLCQlUJF7Tr5i8GtOKsVqy9fQBmAB4uOmsZC/f2yg8NExRR1oVg9jfAVlpHob/1/cgSQ
+ mHdjT8rTICehsIjOgFBXlpG5TknMbGdapzwUgDZ0S5Ftdx7Q8dKgYCxVkTurynCI821FF+eQXEe
+ A31yZ6rKPITvuu20gKqV+PODNB0urnnHhSfJHyi/OkrejPobw2KE2o3OugUHy3nsfPtQ3Znx24X
+ SXsyEKKwZjrVuwFfyGhlJD/LfrNq1lIc7Ro/TT0ayF7zabGLwNYy+RP6zwP02JzDJhOy6gE55/j
+ fQGOE0rNv1xCWSPuF1oocThF8Z/ok3ddQVvWb4OiQK5kO2v6ICxKUWiF8vAvXZLgohz7h9vN2W3
+ oRDIhS7wrtf5n7WfRXA==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEwMDA1NCBTYWx0ZWRfX6iEbH8yQGyOS
+ 2XyonY5M0IzigkdpFxz5LHb3kaZ03dVC9MsZ1U3cULYYqMU0+CmUfo/KtX5HMMGXoewNv4doOFX
+ p79S1hg31JHwbBC6ng8XKwChLnbglt0=
+X-Proofpoint-GUID: Tu3PWLxmw3o_I1N1UUCnNgs2Mvpg1184
+X-Proofpoint-ORIG-GUID: Tu3PWLxmw3o_I1N1UUCnNgs2Mvpg1184
+X-Authority-Analysis: v=2.4 cv=GJ441ONK c=1 sm=1 tr=0 ts=6a508a37 cx=c_pps
+ a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22 a=iSzkMiWJHOwH8bCpblYA:9
+ a=x9snwWr2DeNwDh03kgHS:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-07-10_01,2026-07-09_04,2025-10-01_01
@@ -97,178 +117,44 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  clxscore=1015 suspectscore=0 spamscore=0 phishscore=0 adultscore=0
  impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607100047
+ definitions=main-2607100054
 
-start_discovery_internal(), start_service_discovery() and stop_discovery()
-queue a cmd_sync work item and only then move the discovery state machine
-into its transient value (DISCOVERY_STARTING / DISCOVERY_STOPPING):
+Improve Channel Sounding documentation by adding cross-references
+between the D-Bus APIs and bluetoothctl commands, along with practical
+usage examples.
 
-  err = hci_cmd_sync_queue(hdev, ..._sync, cmd, ..._complete);
-  if (err < 0) { ... }
-  hci_discovery_set_state(hdev, DISCOVERY_STARTING /* or STOPPING */);
+The D-Bus API documents gain :Used by: references to the bluetoothctl
+cs submenu and examples for methods and signals, while the
+bluetoothctl documentation is updated with :Uses: references,
+argument descriptions, and usage examples.
 
-The matching completion callbacks run on hdev->req_workqueue serialised
-by hci_req_sync_lock, which is independent of hdev->lock. So once the
-work has been queued, the worker can be scheduled, run the sync function
-and invoke the completion before the caller has executed the trailing
-hci_discovery_set_state(). The completion's success path writes the
-terminal state (DISCOVERY_STOPPED for stop, DISCOVERY_FINDING for start);
-the caller then overwrites it with the transient value, and the state
-machine is wedged: every subsequent Start (Service) Discovery is
-rejected by the DISCOVERY_STOPPED gate with MGMT_STATUS_BUSY (0x0a),
-with no HCI traffic generated, until bluetoothd or the adapter is
-restarted.
-
-Fix it in two parts:
-
-  1. In start_discovery_complete() and stop_discovery_complete(), wrap
-     the terminal hci_discovery_set_state() call with
-     hci_dev_lock() / hci_dev_unlock(). These callbacks run without
-     hdev->lock; the caller holds hdev->lock across hci_cmd_sync_queue()
-     and the trailing set_state(STARTING / STOPPING), so the callback's
-     hci_dev_lock() blocks until the caller has published the transient
-     state and released the lock. This serialises the state writes and
-     closes the race window without needing to reorder the set_state
-     call relative to hci_cmd_sync_queue().
-
-  2. Generalise the "ignore -ECANCELED" early return in both completion
-     callbacks to "on any non-zero err, also reset the transient state
-     to STOPPED".
-
-     For the stop path this also fixes a pre-existing wedge: when any
-     sub-command issued from hci_stop_discovery_sync() returns an
-     error, stop_discovery_complete() is invoked with err != 0. The
-     existing "if (!err) set_state(STOPPED)" tail then skips the reset
-     and the state machine sits in DISCOVERY_STOPPING forever.
-
-Fixes: abfeea476c68 ("Bluetooth: hci_sync: Convert MGMT_OP_START_DISCOVERY")
-Signed-off-by: Xiuzhuo Shang <xiuzhuo.shang@oss.qualcomm.com>
----
 Changes in v4:
- - Drop the "move set_state before hci_cmd_sync_queue" change (Part 1
-   in v1-v3): now that the completion callbacks acquire hci_dev_lock,
-   they block until the caller releases hdev->lock — which happens only
-   after set_state(STARTING/STOPPING) has been written. The lock
-   acquisition therefore serialises the state writes without reordering
-   the set_state call.
- - Update commit message from "Fix it in three parts" to "two parts"
-   and revise Part 1 description to explain the locking argument.
- - Link to v3:
-   https://lore.kernel.org/all/20260708093822.3495633-1-xiuzhuo.shang@oss.qualcomm.com/
+- Addressed review comments.
+- Dropped the rest of the previously submitted series pending redesign
 
 Changes in v3:
- - Replace inline patch title with lore.kernel.org URL in v2 link
-   reference to fix GitLint B1 line-length check.
- - Link to v2:
-   https://lore.kernel.org/all/20260708062009.3047447-1-xiuzhuo.shang@oss.qualcomm.com/
+- Addressed review comments.
+- Dropped the rest of the previously submitted series pending redesign
 
 Changes in v2:
- - Fix if (err < 0) to if (err) in both start_discovery_complete() and
-   stop_discovery_complete() to also catch positive HCI status codes,
-   flagged by Sashiko.
- - Add Fixes: tag for commit abfeea476c68 as requested.
- - Update commit message wording from "err < 0" to "non-zero err" to
-   match the code change.
- - Link to v1:
-   https://lore.kernel.org/all/20260707093426.372897-1-xiuzhuo.shang@oss.qualcomm.com/
+- Addressed review comments.
+- Dropped the rest of the previously submitted series pending redesign
 
- net/bluetooth/mgmt.c | 58 +++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 52 insertions(+), 6 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 733a4b70e10c..2295042234f8 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -5975,15 +5975,38 @@ static void start_discovery_complete(struct hci_dev *hdev, void *data, int err)
- 
- 	bt_dev_dbg(hdev, "err %d", err);
- 
--	if (err == -ECANCELED || !mgmt_pending_valid(hdev, cmd))
-+	if (err) {
-+		/* The queued start-discovery work failed before the normal
-+		 * completion path could advance the state machine. The
-+		 * caller already moved the state to DISCOVERY_STARTING
-+		 * (under hdev->lock; the callback's hci_dev_lock() blocked
-+		 * until the caller wrote the transient state and released
-+		 * the lock). Reset it here so the gate in
-+		 * start_discovery_internal()/start_service_discovery()
-+		 * does not wedge in STARTING and reject every future Start
-+		 * (Service) Discovery with MGMT_STATUS_BUSY.
-+		 */
-+		hci_dev_lock(hdev);
-+		if (hdev->discovery.state == DISCOVERY_STARTING)
-+			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+		hci_dev_unlock(hdev);
-+
-+		if (err == -ECANCELED)
-+			return;
-+	}
-+
-+	if (!mgmt_pending_valid(hdev, cmd))
- 		return;
- 
- 	mgmt_cmd_complete(cmd->sk, cmd->hdev->id, cmd->opcode, mgmt_status(err),
- 			  cmd->param, 1);
- 	mgmt_pending_free(cmd);
- 
--	hci_discovery_set_state(hdev, err ? DISCOVERY_STOPPED:
-+	/* Serialise discovery.state writes against any concurrent mgmt path
-+	 * holding hdev->lock; this callback runs on req_workqueue without it.
-+	 */
-+	hci_dev_lock(hdev);
-+	hci_discovery_set_state(hdev, err ? DISCOVERY_STOPPED :
- 				DISCOVERY_FINDING);
-+	hci_dev_unlock(hdev);
- }
- 
- static int start_discovery_sync(struct hci_dev *hdev, void *data)
-@@ -6196,17 +6219,40 @@ static void stop_discovery_complete(struct hci_dev *hdev, void *data, int err)
- {
- 	struct mgmt_pending_cmd *cmd = data;
- 
--	if (err == -ECANCELED || !mgmt_pending_valid(hdev, cmd))
--		return;
--
- 	bt_dev_dbg(hdev, "err %d", err);
- 
-+	if (err) {
-+		/* The queued stop-discovery work failed before the normal
-+		 * completion path could advance the state machine. The
-+		 * caller already moved the state to DISCOVERY_STOPPING
-+		 * (under hdev->lock; the callback's hci_dev_lock() blocked
-+		 * until the caller wrote the transient state and released
-+		 * the lock). Reset it here so the gate does not wedge in
-+		 * STOPPING.
-+		 */
-+		hci_dev_lock(hdev);
-+		if (hdev->discovery.state == DISCOVERY_STOPPING)
-+			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+		hci_dev_unlock(hdev);
-+
-+		if (err == -ECANCELED)
-+			return;
-+	}
-+
-+	if (!mgmt_pending_valid(hdev, cmd))
-+		return;
-+
- 	mgmt_cmd_complete(cmd->sk, cmd->hdev->id, cmd->opcode, mgmt_status(err),
- 			  cmd->param, 1);
- 	mgmt_pending_free(cmd);
- 
--	if (!err)
-+	if (!err) {
-+		/* Serialise discovery.state writes against any concurrent
-+		 * mgmt path holding hdev->lock; this callback runs on
-+		 * req_workqueue without it.
-+		 */
-+		hci_dev_lock(hdev);
- 		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+		hci_dev_unlock(hdev);
-+	}
- }
- 
- static int stop_discovery_sync(struct hci_dev *hdev, void *data)
+Naga Bhavani Akella (3):
+  doc/org.bluez.ChannelSounding1:Add Used by reference and Examples
+  doc/org.bluez.ChannelSoundingRanging1:Add references and examples
+  doc/bluetoothctl-cs: Add :Uses: fields and document arguments
+
+ Makefile.am                               |   4 +
+ Makefile.tools                            |   5 +-
+ doc/bluetoothctl-cs.rst                   | 283 ++++++++++++
+ doc/org.bluez.ChannelSounding1.rst        | 534 ++++++++++++++++++++++
+ doc/org.bluez.ChannelSoundingRanging1.rst |  66 +++
+ 5 files changed, 890 insertions(+), 2 deletions(-)
+ create mode 100644 doc/bluetoothctl-cs.rst
+ create mode 100644 doc/org.bluez.ChannelSounding1.rst
+ create mode 100644 doc/org.bluez.ChannelSoundingRanging1.rst
+
 -- 
-2.43.0
 
