@@ -1,52 +1,52 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9CDD3EF66A;
-	Fri, 10 Jul 2026 08:24:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C673EFFA1;
+	Fri, 10 Jul 2026 08:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783671845; cv=pass; b=pA5n3EL+rpfOe86hB8qBxeg81wwTl7rPA5RqyoRwu3VhPwwX4pmTMWqFrS11xAjaVKAqqptREWLwNScDJSsh4iOVL08IjvzbyY96whJPLGDfgIBIqnXotLG++gINXcvkJQ0CFLMO7x/LQ4bg0NDJRjnsyCnkcU8jorFgpb7tN+Q=
+	t=1783671846; cv=pass; b=toUdaDGC3xQsvAF1PnMH8vXM07j1gHr321Xm2vWbJddE6kQgarX4YmJgNLYElK7QH/G0rbeE8jyA9dIb0Tgt0BtU3CvvvXZqlQWUfoww4QSG6Cmu5nnKVM2hJW5DegcVVC5PUKlzZAbxtyiwQWlofcb50WRq3a+eGJUghmKT55E=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783671845; c=relaxed/simple;
-	bh=fZ49Q7SeFthw4t896e0k/bg19qfxY9mN58heOC0c61g=;
+	s=arc-20240116; t=1783671846; c=relaxed/simple;
+	bh=g1ImQy1vuGqWTQQgW3En/Th6zW/2Z1D7+gOQwqKiXsM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iM90VYHvMRcFtqkjALQJPo37UQ85zO8/MlGgaBSuQKpqHhpUXbN2acRyDggve0Rhr/vapajrksWZYmvq2Nj4hKFjao8QND9jT7kXwUABGcUwBiDkdwHj6Y6RuQCHeMgv1c3ZhlpO9uJ2MrNwJWiwrqYRHfzaOLvGIcSgXtYH4R4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=LT49TQZm; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=V0sW5zTyRBD6No1bycA2InHZ8uupGlU1tNfr1rbVEJDF2TnupId3t7XfDYv4KZWo1CrCWWr5r/Om3po+gnczxgmAlIxlC6B6FtEsJ62QgoJGNrGJBo3Fp4UPBoWChl8XsvqU4FLBkbRYsp7gKUBUWWIVLNz9jQxDAlogiNvOw+k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=F66VdIMe; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="LT49TQZm"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="F66VdIMe"
 Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a03d])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gxPxR3sxxzybm;
-	Fri, 10 Jul 2026 11:23:55 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4gxPxS4nPCzyvg;
+	Fri, 10 Jul 2026 11:23:56 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1783671835;
+	t=1783671837;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HmK9QaRWo8lr8saImh/i1zoXbZl7bR5ojsH+iQznLAY=;
-	b=LT49TQZmdYbuQCQPDGXr229MnPleUlIKB9VS4MxtwuNboF0XyBgHmDJkzf0MRF/i1ZZeJF
-	zVK5GxISeX2PJ7zuiPsgmBDVamJ9ZlqSY+goV2tfE0g+fd1IM8/XIn0MlCxyE62TbxV9Rd
-	dOR56mdww/umafxqXpRqs0TIhMqRiNM=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1783671835;
-	b=lJub6NFI+BW6uDfwnhy5MWUz70XiWmJ3pcAU3L//mATLuzY6nT5E04orC5T9iJXG7S3zZr
-	FP+c4kLBvH9SIZKjXOWJbOqLAIbOoVc8E6oY3vV1SiEzWM7MUAW0Ycw9PyH4aQtNegXSR5
-	+tNoVzGrbVSnic0Q4rr/a7guym0J+zI=
+	bh=884Qbk6aAhZ5jB1/V9NFJtofiSnkEMDDqf2HFjscPaA=;
+	b=F66VdIMeUJMpFrONO4XbTgpuAuDm8rqpcRc9+KlI+9eTtmOAF5HtGV+9W0MCbEMpwGxw50
+	jyxOeAN7WiICuB2lhJ8C2iqvps3ppi4ueC5LX5I3EWj+B2gVSOLCOfQmujD3N+mgDdftlW
+	jeufg4urDVWiDVhKD3trhEqxlQLCm8A=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1783671837;
+	b=J70qlUpVHJzmg7GOyhbxo58aAye0FNJsAgsaxwx5Hs4AQRav8xVNKmTJYsLKzMl0dJDlTz
+	AUKb2vFCAJtjdzGukBUCWpXCbSDCgmY4MXrQF55hZLTbNBouNUusifHnSgi6WGkL8dE2fJ
+	JTEq+Ar1u0q4IpceSaFD6wOlZZG4NoM=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1783671835;
+	s=meesny; t=1783671837;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HmK9QaRWo8lr8saImh/i1zoXbZl7bR5ojsH+iQznLAY=;
-	b=uSmrfyP4H2BpcfKsgwr/MkQb0Odk39dDNpSA7uqg79R5x3SjGuRSf57j5Z3bTIEdWxoouI
-	/DVtRYx3wHHf6K6u484J02NHMVtlaoGMHqENlcJ8VHtHOS4o8ThZO+Ik+cYTOP7Q2BmQb1
-	5d4naVC+5eHDi8JuUCAa+Mngp5EarPs=
+	bh=884Qbk6aAhZ5jB1/V9NFJtofiSnkEMDDqf2HFjscPaA=;
+	b=jTH+zhikpPqm8yOVcGJj/SVGxys2bLKl9LodKy4U80FGH8JSFmGdNMK0SKD6y8C7w0AY9q
+	D03ERuzLtXP3IiIiPwWUxxDlYkQ1J2FlmUozrNCkTY+N9AO4yeRM0e3YtfogFoQQVqRcfp
+	6WLLx1TxN31KTmbHzuxEN5EZwOzfaAY=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -56,9 +56,9 @@ Cc: Pauli Virtanen <pav@iki.fi>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 1/4] Bluetooth: hci_sync: extend conn_hash lookup critical sections
-Date: Fri, 10 Jul 2026 11:23:40 +0300
-Message-ID: <4853db33fb044122e1eac76736c5cd0529d13349.1783671570.git.pav@iki.fi>
+Subject: [PATCH v3 3/4] Bluetooth: mgmt: hold reference for hci_conn in mgmt_pending_cmds
+Date: Fri, 10 Jul 2026 11:23:42 +0300
+Message-ID: <292363bfecaa083d3a8aa1b5a9f29041cb7eb826.1783671570.git.pav@iki.fi>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <cover.1783671570.git.pav@iki.fi>
 References: <cover.1783671570.git.pav@iki.fi>
@@ -70,21 +70,18 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Using RCU-protected pointers outside the critical sections without
-refcount is incorrect and may result to UAF.
+Dereferencing RCU-protected pointers outside critical sections is
+invalid and may lead to UAF.  Use of hci_conn in hci_sync callbacks also
+needs to hold refcount to avoid UAF.
 
-Extend critical section to cover both hci_conn_hash lookup and use of
-the returned conn.
+Take appropriate locks for hci_conn lookups, and take refcount for
+hci_conn pointers stored in mgmt_pending_cmd so that the pointer stays
+valid.
 
-Add surrounding rcu_read_lock() also when return value is not used, in
-preparation for RCU lockdep requirement to hci_lookup_le_connect().
+When accessing conn->state, ensure hdev->lock is held to avoid data
+race.
 
-This avoids concurrent deletion of the conn before we are done
-dereferencing it.
-
-Also, make sure to hold hdev->lock when accessing hdev->accept_list.
-
-Fixes: 58ddd115fe063 ("Bluetooth: hci_conn: Fix not setting conn_timeout for Broadcast Receiver")
+Fixes: 7b445e220db9 ("Bluetooth: MGMT: Fix holding hci_conn reference while command is queued")
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
 
@@ -92,170 +89,86 @@ Notes:
     v3:
     - no change
     v2:
-    - take hdev->lock instead of RCU in hci_update_scan_sync() to
-      guard also the hdev->accept_list access
+    - no change
 
- net/bluetooth/hci_sync.c | 42 +++++++++++++++++++++++++++++++++++++---
- 1 file changed, 39 insertions(+), 3 deletions(-)
+ net/bluetooth/mgmt.c | 26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index b096fca86bb5..5dddeed11372 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -1028,14 +1028,19 @@ static int hci_set_random_addr_sync(struct hci_dev *hdev, bdaddr_t *rpa)
- 	 * In this kind of scenario skip the update and let the random
- 	 * address be updated at the next cycle.
- 	 */
-+	rcu_read_lock();
-+
- 	if (bacmp(&hdev->random_addr, BDADDR_ANY) &&
- 	    (hci_dev_test_flag(hdev, HCI_LE_ADV) ||
- 	    hci_lookup_le_connect(hdev))) {
- 		bt_dev_dbg(hdev, "Deferring random address update");
- 		hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
-+		rcu_read_unlock();
- 		return 0;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 39268f58a49d..c61cb9750872 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7404,6 +7404,9 @@ static void get_conn_info_complete(struct hci_dev *hdev, void *data, int err)
+ 		rp.max_tx_power = HCI_TX_POWER_INVALID;
  	}
  
-+	rcu_read_unlock();
++	if (conn)
++		hci_conn_put(conn);
 +
- 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_RANDOM_ADDR,
- 				     6, rpa, HCI_CMD_TIMEOUT);
- }
-@@ -2621,12 +2626,17 @@ static int hci_pause_addr_resolution(struct hci_dev *hdev)
- 	/* Cannot disable addr resolution if scanning is enabled or
- 	 * when initiating an LE connection.
- 	 */
-+	rcu_read_lock();
-+
- 	if (hci_dev_test_flag(hdev, HCI_LE_SCAN) ||
- 	    hci_lookup_le_connect(hdev)) {
-+		rcu_read_unlock();
- 		bt_dev_err(hdev, "Command not allowed when scan/LE connect");
- 		return -EPERM;
- 	}
+ 	mgmt_cmd_complete(cmd->sk, cmd->hdev->id, MGMT_OP_GET_CONN_INFO, status,
+ 			  &rp, sizeof(rp));
  
-+	rcu_read_unlock();
-+
- 	/* Cannot disable addr resolution if advertising is enabled. */
- 	err = hci_pause_advertising_sync(hdev);
- 	if (err) {
-@@ -2764,6 +2774,8 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- 	if (hci_dev_test_flag(hdev, HCI_PA_SYNC)) {
- 		struct hci_conn *conn;
- 
-+		rcu_read_lock();
-+
- 		conn = hci_conn_hash_lookup_create_pa_sync(hdev);
- 		if (conn) {
- 			struct conn_params pa;
-@@ -2773,6 +2785,8 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- 			bacpy(&pa.addr, &conn->dst);
- 			pa.addr_type = conn->dst_type;
- 
-+			rcu_read_unlock();
-+
- 			/* Clear first since there could be addresses left
- 			 * behind.
- 			 */
-@@ -2782,6 +2796,8 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- 			err = hci_le_add_accept_list_sync(hdev, &pa,
- 							  &num_entries);
- 			goto done;
-+		} else {
-+			rcu_read_unlock();
- 		}
- 	}
- 
-@@ -2792,10 +2808,13 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- 	 * the controller.
- 	 */
- 	list_for_each_entry_safe(b, t, &hdev->le_accept_list, list) {
--		if (hci_conn_hash_lookup_le(hdev, &b->bdaddr, b->bdaddr_type))
-+		rcu_read_lock();
-+
-+		if (hci_conn_hash_lookup_le(hdev, &b->bdaddr, b->bdaddr_type)) {
-+			rcu_read_unlock();
- 			continue;
-+		}
- 
--		/* Pointers not dereferenced, no locks needed */
- 		pend_conn = hci_pend_le_action_lookup(&hdev->pend_le_conns,
- 						      &b->bdaddr,
- 						      b->bdaddr_type);
-@@ -2803,6 +2822,8 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- 							&b->bdaddr,
- 							b->bdaddr_type);
- 
-+		rcu_read_unlock();
-+
- 		/* If the device is not likely to connect or report,
- 		 * remove it from the acceptlist.
- 		 */
-@@ -2929,6 +2950,8 @@ static int hci_le_set_ext_scan_param_sync(struct hci_dev *hdev, u8 type,
- 		if (sent) {
- 			struct hci_conn *conn;
- 
-+			rcu_read_lock();
-+
- 			conn = hci_conn_hash_lookup_ba(hdev, PA_LINK,
- 						       &sent->bdaddr);
- 			if (conn) {
-@@ -2953,8 +2976,12 @@ static int hci_le_set_ext_scan_param_sync(struct hci_dev *hdev, u8 type,
- 					phy++;
- 				}
- 
-+				rcu_read_unlock();
-+
- 				if (num_phy)
- 					goto done;
-+			} else {
-+				rcu_read_unlock();
- 			}
- 		}
- 	}
-@@ -3205,12 +3232,16 @@ int hci_update_passive_scan_sync(struct hci_dev *hdev)
- 		/* If there is at least one pending LE connection, we should
- 		 * keep the background scan running.
- 		 */
-+		bool exists;
- 
- 		/* If controller is connecting, we should not start scanning
- 		 * since some controllers are not able to scan and connect at
- 		 * the same time.
- 		 */
--		if (hci_lookup_le_connect(hdev))
-+		rcu_read_lock();
-+		exists = hci_lookup_le_connect(hdev);
-+		rcu_read_unlock();
-+		if (exists)
- 			return 0;
- 
- 		bt_dev_dbg(hdev, "start background scanning");
-@@ -3428,6 +3459,7 @@ int hci_write_fast_connectable_sync(struct hci_dev *hdev, bool enable)
- }
- 
- static bool disconnected_accept_list_entries(struct hci_dev *hdev)
-+	__must_hold(&hdev->lock)
- {
- 	struct bdaddr_list *b;
- 
-@@ -3468,12 +3500,16 @@ int hci_update_scan_sync(struct hci_dev *hdev)
- 	if (hdev->scanning_paused)
- 		return 0;
+@@ -7418,6 +7421,8 @@ static int get_conn_info_sync(struct hci_dev *hdev, void *data)
+ 	int err;
+ 	__le16   handle;
  
 +	hci_dev_lock(hdev);
 +
- 	if (hci_dev_test_flag(hdev, HCI_CONNECTABLE) ||
- 	    disconnected_accept_list_entries(hdev))
- 		scan = SCAN_PAGE;
+ 	/* Make sure we are still connected */
+ 	if (cp->addr.type == BDADDR_BREDR)
+ 		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
+@@ -7425,12 +7430,16 @@ static int get_conn_info_sync(struct hci_dev *hdev, void *data)
  	else
- 		scan = SCAN_DISABLED;
+ 		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->addr.bdaddr);
+ 
+-	if (!conn || conn->state != BT_CONNECTED)
++	if (!conn || conn->state != BT_CONNECTED) {
++		hci_dev_unlock(hdev);
+ 		return MGMT_STATUS_NOT_CONNECTED;
++	}
+ 
+-	cmd->user_data = conn;
++	cmd->user_data = hci_conn_get(conn);
+ 	handle = cpu_to_le16(conn->handle);
  
 +	hci_dev_unlock(hdev);
 +
- 	if (hci_dev_test_flag(hdev, HCI_DISCOVERABLE))
- 		scan |= SCAN_INQUIRY;
+ 	/* Refresh RSSI each time */
+ 	err = hci_read_rssi_sync(hdev, handle);
+ 
+@@ -7564,6 +7573,9 @@ static void get_clock_info_complete(struct hci_dev *hdev, void *data, int err)
+ 	}
+ 
+ complete:
++	if (conn)
++		hci_conn_put(conn);
++
+ 	mgmt_cmd_complete(cmd->sk, cmd->hdev->id, cmd->opcode, status, &rp,
+ 			  sizeof(rp));
+ 
+@@ -7580,15 +7592,21 @@ static int get_clock_info_sync(struct hci_dev *hdev, void *data)
+ 	memset(&hci_cp, 0, sizeof(hci_cp));
+ 	hci_read_clock_sync(hdev, &hci_cp);
+ 
++	hci_dev_lock(hdev);
++
+ 	/* Make sure connection still exists */
+ 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->addr.bdaddr);
+-	if (!conn || conn->state != BT_CONNECTED)
++	if (!conn || conn->state != BT_CONNECTED) {
++		hci_dev_unlock(hdev);
+ 		return MGMT_STATUS_NOT_CONNECTED;
++	}
+ 
+-	cmd->user_data = conn;
++	cmd->user_data = hci_conn_get(conn);
+ 	hci_cp.handle = cpu_to_le16(conn->handle);
+ 	hci_cp.which = 0x01; /* Piconet clock */
+ 
++	hci_dev_unlock(hdev);
++
+ 	return hci_read_clock_sync(hdev, &hci_cp);
+ }
  
 -- 
 2.55.0
