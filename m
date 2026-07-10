@@ -1,90 +1,90 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3B73F9F56
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6693F8714
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783676977; cv=none; b=ZOp3FtDq4dGYGhb63ECOefy8nYoaJwv2Zm+nSMOnapyQKSnc7e5f6WOC7uDLRT/puoppK+g2AtWsm5p1ZmewqPK2ZXHvw07zm1+ZQ4iF2ekC7hnXDviU6DjgZTrMvgz27JcmD6jsNsoi2NUnJ/78JT1cWz8oyDLD0S5cK6lv1Ck=
+	t=1783676981; cv=none; b=qnupBR26pzV1tXiPUi0FRkrYW5LhqeWgDzt6qLPOAhONAx4/4LSFpJTo9QhXjK1SB97ex+p//k/kjRxg9kayviR4SaUj7Y1KBbTNW3KSFq7cK7RaX22yXoAdult8YJlX9z7itT9uGDzkDhx51Oj2cYRzuk9cucC+g5NaxCivuAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783676977; c=relaxed/simple;
-	bh=8WA6p/0wiTfKWqWxABEp3eLCsxMiRXOP72zXB2yx034=;
+	s=arc-20240116; t=1783676981; c=relaxed/simple;
+	bh=j3LduURT8rxCJTYKDubd5erHUPOZL38qD+c/lSTjo2A=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cocCfn1VGlM2V6p2+IWJpvoY889NlEqNRd3US+cKjuGywH0yPLooBYwliMg73zHRlZg6qtDwhEcY5QkAB/+okaxzQBH291WeEh84bzTdIvlZ3Ct3FL6kGPEVFf3avZDbVbUOZJ7Rg30ddNNXiFByO0FlO+D4mqWfkSF1cLHeVm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=kscSWGBf; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=I5qxKvwU; arc=none smtp.client-ip=205.220.180.131
+	 MIME-Version; b=UvhN5MMRDLhcplYzlJr3kPQneaVS2hC8C8wt3GKJB4myQyuTcAObMrcrP/2RGHu3LngUrrSA7lC8Rry74GlpQ/Sw0p3F5j7l2/v1+T++Hg997Cfev/emAbNYIAQgZERusaMtCRFbP4nWH5y0Gdy1I1ODUsPhh4ti7P0q6bmIVr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=YRNZPNdb; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=KWRCRFcZ; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="kscSWGBf";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="I5qxKvwU"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66A7eKKH190769
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:49:31 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="YRNZPNdb";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="KWRCRFcZ"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66A9TTeN291965
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:49:38 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=VnePDlf4jvF
-	B5fxwH4nz2ECFHVsFzom0R6dISUmNV1o=; b=kscSWGBfn4CEZGXVMCaCAdo6YKm
-	LADCad3aaQec30uzSMtWlt4SuV8dtrLKzLBng+uFAMiKq4FV9szq5iPucA+qCk2H
-	XeCzHacmFLKJ7UQ0lhdI/F8SS2U/2+kpX7SUguTo2U5Ing57uE1WRgBUJyoQ5tt2
-	8aRQ5gPdHgrh6ndr0OY8VRAxD5wIh4O2FotWA2z2m59s4CLwzLgE/dAHAAJYpAWo
-	89HhKnal53KhiZu/1F3YcwzWlwHbVCGRMlTS+65eU6WQYp9j0Hxj3wWy5Ftk51XB
-	Sio94N3YcD73qGJ8Q4Laie7J8YTNKVBUsIscFYQJTTiQqWzHp3wqcg0pj5g==
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fas6n19sw-1
+	:mime-version:references:subject:to; s=qcppdkim1; bh=t+IPsUAtIa1
+	TLrb+NRl9jeu80hXf3Er7HQgBYa3TXUE=; b=YRNZPNdbn9Eh87ZY7UN5ahqeYD3
+	E2eFXx91Lt+1OmrX51oplzi3+C9mxMKIA9uXEJH07OKhZnoczQleHNJb8yonXMjL
+	D8KyT1CUtmQrUD6PNiLImP74HXly4T3oxKfTlEPQHiyF8julNwn0DUFxv9xqQZdg
+	e6Sxxhfkc7Fhu2lc9HuCWXCJiziYqI+aHhy3N+oghHp3Y8LctozRA8Xv0oNkcClj
+	w98dyHAmUY40oqacHrE3qWuceXgigIsIGMGjd+9aoHCWSHa2w5602T7nq0LS9R23
+	m028KBzM0GP8VoQ/SQQ6I5KLgf0boOzhZUW78gICHVK3O2/qnaHkwdGRmlA==
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com [209.85.215.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fax5dg2sr-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:49:31 +0000 (GMT)
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-ca7c1e22995so1342356a12.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 02:49:31 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:49:38 +0000 (GMT)
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-c891ed872ddso1152569a12.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 02:49:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1783676971; x=1784281771; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1783676977; x=1784281777; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=VnePDlf4jvFB5fxwH4nz2ECFHVsFzom0R6dISUmNV1o=;
-        b=I5qxKvwUGkGQx4KlByVrh9h+rYG3zNyuZYLjJpMSZtOvbyuhWVGTE1CZz+e2iD8cxF
-         A+5LrQOWqocV9R35HOyg1adW5isX+Dv3bFRjPw6AiLtJ6l9PfKKCKhZGamm5+zrvMiKc
-         5Yu/7Kt+kZM9aaR1lJEBi15gQxhyI9YCRvG11wkuEdg7zPWdcz+uXPLz25cc2UBGv8U0
-         f9gtI1UHMsP7S7/c20Z/w9rXw2BfTW1Aj6LnfSVM3wCh5rJdiZaQo2ogtx6nbhB5mmB+
-         f6P/oNMVZbkR/m18eLZFRT/eRoa+50kWycOZfkhFJu9WJZCMLteQjCXbNn8oH0hV3PRk
-         2cwg==
+        bh=t+IPsUAtIa1TLrb+NRl9jeu80hXf3Er7HQgBYa3TXUE=;
+        b=KWRCRFcZK8N/xmQqjxLE/QktaPmCLcvtWrG4kYio9c692DoWCiz33fsBoCvFfR8vdw
+         OpDbc8FF1OXzP3dgLiNG03cmoGirhgeDM50bx2zpieqKS3pn+9QrC5K8lj+vnupxSV+2
+         6KXvJG6y/8EQwIv1BupgXTYjPRy1ITooj7HChaKHpp0QHg2CJ7dZUWvfjAAdr5mIzIwf
+         4Y9kq6V0R8RcW1aCwZyrY1sqFpSbUag0HCYWcXpqPkxfaiIIJxD9RJ21iY5Zk5kyM84N
+         R8ryJosY4zyWm8f+I0/76lAHikzkMNhlYzF7PVJzO2GCX5AWnXVzVjAv6mTwH2jI568U
+         JfZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783676971; x=1784281771;
+        d=1e100.net; s=20251104; t=1783676977; x=1784281777;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=VnePDlf4jvFB5fxwH4nz2ECFHVsFzom0R6dISUmNV1o=;
-        b=KgjXpsUk4yvJ25P7LhSnKGtdx+AXnSEXii4Qouza9N3NzQjQrHkCgbdktpOmz1v0uw
-         EPJKUyYJmh2PegTvw5BVsbNZwaacp1/Q0vRxERllaOd3ypekPaVsmqvIoUF/9hJwMrmf
-         v0r8ZaLbGBlzyfGtQfSwk5YlZXNi5Qr5mKKBbLAZCBc0P6u13ThUwTHVFEFhlzapFi8u
-         GDfzWWauexNxoxpNJIjk9l92v0ZOgBQCSiO+vJRY0eJz1gLH4IZxfPqprro8BSULYHEX
-         epqwuDHxGcAtqcLPZj12UuBk6/3Fh33IcQSVBdxgcsgvXvBojpv5dgAfv/UieNJVu9iH
-         FrBA==
-X-Gm-Message-State: AOJu0Yxigz0c2U5bOAl/MssoRrpHQ4ZLpjcIdIEIMUg4htviXOdhR2SL
-	AatYDcYmHO8YTcn1AOp/Yv5AJp9IN+n4z2hfC1M8+amr74OMiaFAUOZevEqEiN2zgwqCsc0/ov7
-	WCIiuMVuF28KF+SxDrr7hLQzcukR6huTbELdXCNvh27BJaEXxI677dDjlZH+Zsl7j8B0z4zHv9V
-	TVLQY=
-X-Gm-Gg: AfdE7clb44WAEARvAUJM30BFnMI+OezZwF104XImktWh1XLkSW1Vvv2mFZJBR9oTYMx
-	63EwNY/PH0JOiVNcfiQoztVhByWnfd7/bH4grHmfrG0UD7Ox445zKhZlcyZRPsPUBu3uDHFCbL7
-	X2scSFHpLBjZM2hGfw+f7CbrhakEXifiv1ctpVNrsz1QZeNFuyBpwraz0B/H1K7OpT4+y94mzQM
-	PkWOn+IKbiR58GQnr5om66bE12GL4vrKJN5Pf4HG9ayQ0yqutZGMexf6Zv55YuUmQNx3wT4kNKv
-	RqGn+gRWF1OFZEonPxkoBUgxc+hW2Ahn058dbK5H8EtPFFUAkBn3ku9bLAJU5EANus/Cs7FbOmj
-	fggipjRyLWlrump9m0zq3hXeFCPvJmFESL0y5xz4E
-X-Received: by 2002:a05:6a20:6f8d:b0:3b2:a809:1000 with SMTP id adf61e73a8af0-3c0bcf48f6emr12892300637.3.1783676970410;
-        Fri, 10 Jul 2026 02:49:30 -0700 (PDT)
-X-Received: by 2002:a05:6a20:6f8d:b0:3b2:a809:1000 with SMTP id adf61e73a8af0-3c0bcf48f6emr12892264637.3.1783676969867;
-        Fri, 10 Jul 2026 02:49:29 -0700 (PDT)
+        bh=t+IPsUAtIa1TLrb+NRl9jeu80hXf3Er7HQgBYa3TXUE=;
+        b=IFGTw14N2fSfIlhvJdB8g64gyThQ138+aKyrxac75jUXKJhVpUXwmryDbIZ11+fRQ3
+         tdYXHmY5Ug69D3+TBuOO5vQl+PTjW0rKlP7222GQNdyAXAK1BIXKlrsRpnpW/lOUUEPi
+         6wKVGbPayDYJaeJFlvKcpjVqKQmITnDKnNL0zjjluiOYFOrwd3svK7Th1+4d34qEh/fU
+         0sKF3mmmTXyxblkaV9KA/HT00ua4+Uu1WPn1JjaMmdkDEgf+j5PD1pY8AO1C+QDlFgk9
+         W9BIzS846qF7Ijs7n/Vl+ZUymdBjdhb5mn/8JR/aH59Lf2aqZ43y9hbe2+kLB//RrSLC
+         +RyA==
+X-Gm-Message-State: AOJu0YyTD5Res2zJ8xrlEv7iFHiCip5mRD0M6ULQnx0Ico0r710t02CG
+	Qu/tPOr7vmQjqtpToOLQ6VJJmrlm9D5SFYxnCfAhYvCMX+IFgtTGWm+yTcgpkiH11qL+FOhIGbH
+	HVOmC9S1VBR5jj2t1wXAM7gwOzy3lefcUN7CKCtuAsuVFuoIjJQZqrqLhKVSZlQRqaIYJ2h2uSH
+	OMlx0=
+X-Gm-Gg: AfdE7cnWXmNN4AE7wj5HxbFAHzpMHZ5ztr4WhOM2Q/eA2aQx9EBKCeNs/z7HnRVi/4e
+	j+CIdj0o6wV7XqDs7n29+GBHNd/yBMj5QaYysew7yTmeMUpLJ6kfVTjuRkCGa4vULGSFEU9ZJ18
+	dT5b6GyyaLm9GC5RmfWJ25HSMMTmN3G4+NCeBWr0SdwZDe7IAbanIyGdP3bKf837vULkLayFHob
+	HWA9XA18sLKrsUICfsZKbR9rqVpaMZ83Qrc45+SAj1IuxCw1P4ZminXGNoQWolwjWL43ySIRLSf
+	373z40TAabbtXirzzMwvDV+zJEch6QFxpnNQ9slP8X8EtvRjWtFbpaIKx2Gnq/etcBgK+3R69sS
+	ch29zqZlqGfd8xJVu+ACg7GY1QpNjAemX4RZWr4Y3
+X-Received: by 2002:a05:6a20:9c9b:b0:3b3:1c7b:ffb with SMTP id adf61e73a8af0-3c0bca8e5femr13791004637.34.1783676977314;
+        Fri, 10 Jul 2026 02:49:37 -0700 (PDT)
+X-Received: by 2002:a05:6a20:9c9b:b0:3b3:1c7b:ffb with SMTP id adf61e73a8af0-3c0bca8e5femr13790968637.34.1783676976832;
+        Fri, 10 Jul 2026 02:49:36 -0700 (PDT)
 Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-313b3206aaasm4106526eec.13.2026.07.10.02.49.27
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-313b3206aaasm4106526eec.13.2026.07.10.02.49.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jul 2026 02:49:29 -0700 (PDT)
+        Fri, 10 Jul 2026 02:49:36 -0700 (PDT)
 From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
         quic_anubhavg@quicinc.com,
         Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Subject: [PATCH BlueZ v2 1/4] rap: Add Channel Sounding parameter types and APIs
-Date: Fri, 10 Jul 2026 15:19:16 +0530
-Message-Id: <20260710094919.4047204-2-naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v2 2/4] src: Register GATT profiles for Channel Sounding reflector
+Date: Fri, 10 Jul 2026 15:19:17 +0530
+Message-Id: <20260710094919.4047204-3-naga.akella@oss.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260710094919.4047204-1-naga.akella@oss.qualcomm.com>
 References: <20260710094919.4047204-1-naga.akella@oss.qualcomm.com>
@@ -95,166 +95,83 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEwMDA5NiBTYWx0ZWRfX83XuDxYpfqu1
- psuqI/QYte3MZT/ZTM8+nJ3bBOpIZ38owJz3bLLs1LOlPCip8vE+wKNmKjyiMAoAMDoq9jOaeQS
- MZM2v/KUi29IZieNKRmVf7ZRD7lsZR8=
-X-Authority-Analysis: v=2.4 cv=DYgnbPtW c=1 sm=1 tr=0 ts=6a50c02b cx=c_pps
- a=oF/VQ+ItUULfLr/lQ2/icg==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEwMDA5NiBTYWx0ZWRfXxeXlQu4Dycgx
+ 4BSEZ2IroqmTe4rxz/FHAfxwjRBBYa8vUJVsufLFlPMopc88MvvBd43PWwKd9OWUJoXY9rI8qOh
+ aVDZ7zGyS70+jwQSsdaKTWbY1A2jHYY=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEwMDA5NiBTYWx0ZWRfX4xXvxyOcR4tp
+ 1MrgR3Xg6wUlwd9zpCTEVUMl52btV/stJ+gC+aRIWlfHhM+umS/X6OlaTTInHbd9oTFygeYYe48
+ YOLx+abJ8ziieCZpu+sbqjRONX6Zj8L6Rf8ZumUqpkb6z9ziFXfV+icwYDMf3aumgUSpyhxrzJy
+ k+dr8M+2gWis/X3WmyWSQVcmo87NASRek+fCt6YXUC5pIacCc5lnxY1OQ584Nfmu69KzoPz9DDv
+ 5e84Yo1SDeK23XoNkfEsPXIWDbKvRZSfeoArLZFqFr8MlXpIS3yq0gI+ViWQwIVt+VbpKhf9HJ1
+ M4Yq/ksR+7R6Yg2/9bnHo+TXZSBPPLYVGMul2XLZcv68n/Nx+YN6W7jfWZfxPWVhTjrHn9YucBJ
+ s7R6rxKre9hrXBLC6JiZjiYPHF7ohRFvnuHkPROsmmelXEc/qBOKk2eS2Uo1BWHvrnO7vaxBC7L
+ bYCR8YhPQteBsj2/ALA==
+X-Proofpoint-GUID: hSR8o7l20XJOHjod6ZIifZ0JgN27kuFL
+X-Proofpoint-ORIG-GUID: hSR8o7l20XJOHjod6ZIifZ0JgN27kuFL
+X-Authority-Analysis: v=2.4 cv=M/x97Sws c=1 sm=1 tr=0 ts=6a50c032 cx=c_pps
+ a=rz3CxIlbcmazkYymdCej/Q==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
  a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22 a=GhXf9q-71yA2H53oXBwA:9
- a=3WC7DwWrALyhR5TkjVHa:22
-X-Proofpoint-ORIG-GUID: pMTXTCiuMDhAbxrEWlDcY6v74vHP_hjP
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEwMDA5NiBTYWx0ZWRfX2c91UOiOqRVA
- e3fw3rb1ApJVP02Nk/3PD2phqKWbunVOAJT0FyORM21d7NsujqS4029GCQe2DhqP3UBKZy+t2u1
- 3Tn2tqdKMUZxryPXMCcb+CZQx7mO3ZO7b8PeoE6wW14AbU4zPxKXlvoRJ35yxGW276fzhvXmEUd
- jFFi4dSfeI726dYhxCMH1z9G4/pswmIRfHU8CE0R326XUMDZxb2/YXNE7epHzgteSMt5NX6tllk
- 13dytZW7mSwdbKiCSN9k6K00iltamZIBMJaeyHI1FojFv39hXbDUArPB+gYFOCQ3bi3d+vg6Flv
- FlFoyI23+UL716Kre+IWkFC8Ec+U6oK9mi3iL7W9OJwOMvkb578ra8ZPvFoP2Hl+JpUdRIqmPrW
- CHqQRTksLXIXN/uCGapY3XTxZbSwLVJrI3JBUehDOrUoZ/lvhLialbSywwMLacn5dRmS616prMo
- C5ZXH2T0RkcVfusQm4A==
-X-Proofpoint-GUID: pMTXTCiuMDhAbxrEWlDcY6v74vHP_hjP
+ a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22 a=mucxSH6ds5ffYonggmIA:9
+ a=bFCP_H2QrGi7Okbo017w:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-07-10_02,2026-07-09_04,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 lowpriorityscore=0 adultscore=0 suspectscore=0 bulkscore=0
- clxscore=1015 phishscore=0 malwarescore=0 spamscore=0 impostorscore=0
+ lowpriorityscore=0 adultscore=0 bulkscore=0 malwarescore=0 suspectscore=0
+ phishscore=0 spamscore=0 clxscore=1015 priorityscore=1501 impostorscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607100096
 
-Add shared Channel Sounding parameter structures
-(bt_rap_le_cs_config, bt_rap_le_cs_frequency and
-bt_rap_le_cs_default_settings) for exchanging
-CS configuration, frequency, and default settings
-between the RAP DBus layer and HCI state machine.
-
-Add getter/setter APIs for CS config, frequency
-and default settings, add measurement.
+Probe and accept GATT_UUID profiles on non-initiator (reflector)
+devices before gatt_client discovery checks,
+ensuring RAP's org.bluez.ChannelSounding1 DBus interface is registered
+even when GATT client discovery is skipped.
 ---
- Makefile.am           |  2 +-
- src/shared/cs-types.h | 50 +++++++++++++++++++++++++++++++++++++++++++
- src/shared/rap.h      | 27 ++++++++++++++++++++++-
- 3 files changed, 77 insertions(+), 2 deletions(-)
- create mode 100644 src/shared/cs-types.h
+ src/device.c | 28 +++++++++++++++++++++-------
+ 1 file changed, 21 insertions(+), 7 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 76c4ab5d4..a7b063c6e 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -249,7 +249,7 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
- 			src/shared/asha.h src/shared/asha.c \
- 			src/shared/battery.h src/shared/battery.c \
- 			src/shared/uinput.h src/shared/uinput.c \
--			src/shared/rap.h src/shared/rap.c
-+			src/shared/rap.h src/shared/rap.c src/shared/cs-types.h
+diff --git a/src/device.c b/src/device.c
+index 65d84be56..cedfe3a20 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -6301,17 +6301,31 @@ static void gatt_debug(const char *str, void *user_data)
+ static void gatt_client_init(struct btd_device *device)
+ {
+ 	uint8_t features;
++	GSList *uuid_list;
  
+ 	gatt_client_cleanup(device);
  
- if READLINE
-diff --git a/src/shared/cs-types.h b/src/shared/cs-types.h
-new file mode 100644
-index 000000000..0d53d4ab8
---- /dev/null
-+++ b/src/shared/cs-types.h
-@@ -0,0 +1,50 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
-+/*
-+ * BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-+ */
-+
-+#pragma once
-+
-+#include <stdint.h>
-+
-+struct bt_rap_le_cs_config {
-+	uint8_t config_id;
-+	uint8_t main_mode_type;
-+	uint8_t sub_mode_type;
-+	uint8_t main_mode_min_steps;
-+	uint8_t main_mode_max_steps;
-+	uint8_t main_mode_repetition;
-+	uint8_t mode0_steps;
-+	uint8_t role;
-+	uint8_t rtt_types;
-+	uint8_t cs_sync_phy;
-+	uint8_t channel_map[10];
-+	uint8_t channel_map_repetition;
-+	uint8_t channel_selection_type;
-+	uint8_t channel_shape;
-+	uint8_t channel_jump;
-+	uint8_t companion_signal_enable;
-+};
-+
-+struct bt_rap_le_cs_frequency {
-+	uint16_t max_procedure_duration;
-+	uint16_t min_period_between_procedures;
-+	uint16_t max_period_between_procedures;
-+	uint16_t max_procedure_count;
-+	uint8_t  min_sub_event_len[3];
-+	uint8_t  max_sub_event_len[3];
-+	uint8_t  tone_antenna_config_selection;
-+	uint8_t  phy;
-+	uint8_t  tx_power_delta;
-+	uint8_t  preferred_peer_antenna;
-+	uint8_t  snr_control_initiator;
-+	uint8_t  snr_control_reflector;
-+};
-+
-+struct bt_rap_le_cs_default_settings {
-+	uint8_t role;
-+	uint8_t cs_sync_ant_sel;
-+	int8_t  max_tx_power;
-+};
-diff --git a/src/shared/rap.h b/src/shared/rap.h
-index 7bc49f03d..5582635e6 100644
---- a/src/shared/rap.h
-+++ b/src/shared/rap.h
-@@ -9,8 +9,8 @@
- #include <inttypes.h>
+-	if (!btd_device_is_initiator(device) && !btd_opts.reverse_discovery) {
+-		DBG("Reverse service discovery disabled: skipping GATT client");
+-		return;
+-	}
++	if (!btd_device_is_initiator(device)) {
++		/*
++		 * For the reflector role GATT client discovery is skipped, but
++		 * profiles that match GATT_UUID still need to be probed and
++		 * accepted so they can register their D-Bus interfaces (e.g.
++		 * org.bluez.ChannelSounding1).
++		 */
++		uuid_list = g_slist_append(NULL, (char *)GATT_UUID);
++		device_probe_profiles(device, uuid_list);
++		g_slist_free(uuid_list);
++		device_accept_gatt_profiles(device);
  
- #include "src/shared/io.h"
--#include "bluetooth/mgmt.h"
- #include "src/shared/hci.h"
-+#include "src/shared/cs-types.h"
- 
- struct bt_rap;
- struct gatt_db;
-@@ -189,6 +189,23 @@ bool bt_rap_unregister(unsigned int id);
- 
- struct bt_rap *bt_rap_new(struct gatt_db *ldb, struct gatt_db *rdb);
- 
-+bool bt_rap_set_cs_config_params(void *hci_sm,
-+				const struct bt_rap_le_cs_config *config);
-+bool bt_rap_set_cs_freq_params(void *hci_sm,
-+				const struct bt_rap_le_cs_frequency *frequency);
-+bool bt_rap_set_default_settings_params(void *hci_sm,
-+				const struct bt_rap_le_cs_default_settings *s);
-+bool bt_rap_get_cs_config_params(void *hci_sm,
-+				struct bt_rap_le_cs_config *config);
-+bool bt_rap_get_cs_freq_params(void *hci_sm,
-+				struct bt_rap_le_cs_frequency *frequency);
-+bool bt_rap_get_default_settings_params(void *hci_sm,
-+				struct bt_rap_le_cs_default_settings *s);
-+/* Distance measurement control */
-+bool bt_rap_start_measurement(void *hci_sm, uint16_t conn_handle,
-+				uint32_t duration_secs);
-+bool bt_rap_stop_measurement(void *hci_sm);
+-	if (!btd_device_is_initiator(device) && !btd_opts.gatt_client) {
+-		DBG("GATT client disabled: skipping GATT client");
+-		return;
++		if (!btd_opts.reverse_discovery) {
++			DBG("Reverse srvc disc disabled: skip GATT client");
++			return;
++		}
 +
- /* HCI Raw Channel Approach */
- void bt_rap_hci_cs_config_complete_callback(uint16_t length,
- 					     const void *param,
-@@ -220,3 +237,11 @@ bool bt_rap_set_conn_hndl(void *hci_sm,
- 			bool is_central);
++		if (!btd_opts.gatt_client) {
++			DBG("GATT client disabled: skipping GATT client");
++			return;
++		}
+ 	}
  
- void bt_rap_clear_conn_handle(void *hci_sm, uint16_t handle);
-+
-+bool bt_rap_is_procedure_active(void *hci_sm);
-+
-+void bt_rap_set_timeout_cb(void *hci_sm, void (*func)(void *),
-+				void *user_data);
-+
-+void bt_rap_set_proc_active_cb(void *hci_sm, void (*func)(bool, void *),
-+				void *user_data);
+ 	features =  BT_GATT_CHRC_CLI_FEAT_ROBUST_CACHING
 -- 
 
