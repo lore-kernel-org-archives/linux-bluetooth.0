@@ -1,163 +1,102 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B5F3EFD24;
-	Fri, 10 Jul 2026 08:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783671846; cv=pass; b=eFPryiXONzVBCkg0sGSf1KiItImL7FU/CYGf+EjTh9Q/MBcTrG6L8OwPuT14XwkFnyPkqo85zdiK58HzJcVPE2xunkZ+Lf/7Qzq41stIj1XNBx6dwpHaEkx4O0mFXOMXIR9K1vTJn1WzaWU+NRUNN7QBBuEHIxE9DnCUvXfIwcc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783671846; c=relaxed/simple;
-	bh=qp0LG+dtJvvKhzg73t44YNka2xRXHC8fRZsBriQRA8w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NgMv5hilfUTawjQNiAC07aOTeaxdf9aoNthIdhm49CE5C7WrYGx2cwZaQg0J2sR2yZpu6T67vsyNUTfXfz+8gviT7D11n+JovAePBDG9o9CXknla+JWJdq3YnGYosbJZuoqeCz9kTP4emEd4PUK9AhlZKwfdEthVoZf8TlmPclQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=P+NYFwok; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40FF350A05
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 08:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783672545; cv=none; b=bStSHRea0Gq+pKrXdwJHBaAD0Qv2UXobZ2alFGXLf0pqT2Khb/mmE5HvRGnsRS/o+VE6RpAtd6S9gsK8YrJKdYRi7r69zhfg0HMlRCf2yVm4cITA/gE8Qh97hEpzWG+vsnoP9MIOsarFOdywGoQ1T44/z6bH0GIqEtIG2FnMY0E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783672545; c=relaxed/simple;
+	bh=5yI41wWurcDCuo7BHEsjSwkI6WR4A/rp12cJasKU76E=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=K1bwXbtJ4QdCPgE0UneiPags8R4LK0QpQN3Ev+eWbKJKQkT401C/2KPw44GLQqnvWzeezwoJZNB6lrPiu0qwUOpaV/WAQKZaddgS7Im5cEFXgjg94fW8ZVcqAhb4CkCOdr3C95o9bLtr2AOSI73FRWTPEXuH59HIx+GRBi+hedE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dWpo8F2D; arc=none smtp.client-ip=209.85.210.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="P+NYFwok"
-Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a03d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gxPxT1fPhzytg;
-	Fri, 10 Jul 2026 11:23:57 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1783671837;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b1VEWul+HyxrXWU8hZyHnEDDT4MJtjTgusKZVWDnfrQ=;
-	b=P+NYFwokOwr+orldZ2spD11y3QdgMoCDjwgxK1F4GqhVyJTGbAEBarIMxcNRW28CZ6Hkxv
-	inr6YFmXOljeAgKsfldXqsrtl+Q/UwWjUI5x/Yjdru8s2Z/z7fkYy3cmTc++8lFkQ1ALzD
-	m2bKcWl5vs9xahI7V7KvF3Est5D9Wcw=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1783671837;
-	b=OdFp2CFi4iySuy4L63hpaDAIA/chRAjNqxL5Qs3KX5CchzX57mYoQGcFZsJVmQbbgu9DqL
-	YBM6pJZaGZ6W94xAgjEutACdsvWqmAVPDbWRLljKR9zTalwJyzQ7JAbRTRpUS4h8tuis/S
-	5HVRJDRzVmyTYv8PkZrO5QtMikwn6Xk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1783671837;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b1VEWul+HyxrXWU8hZyHnEDDT4MJtjTgusKZVWDnfrQ=;
-	b=y7GC/vOimeCYk0g1vlNnz1o4dA6r928iXs38wBuqb/9ksnLuWxQD5/f1DeUx9ASxTVj9Mq
-	/+5EUkbmARXDz37oMdbCK1sgDlEEhOMOWCVNeQuPnd/Ns1nALWzDTK2smoT5F+pl19lAAt
-	kUkagGf+seWj4o2lJsY0PlgaDbGhec4=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 4/4] Bluetooth: hci_sync: hold hdev->lock for hci_conn_params lookups
-Date: Fri, 10 Jul 2026 11:23:43 +0300
-Message-ID: <50fcbacc691eaffe08a6e3828be372840e1fdf80.1783671570.git.pav@iki.fi>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <cover.1783671570.git.pav@iki.fi>
-References: <cover.1783671570.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dWpo8F2D"
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7e9fa42f08cso597252a34.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 01:35:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783672543; x=1784277343; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=5yI41wWurcDCuo7BHEsjSwkI6WR4A/rp12cJasKU76E=;
+        b=dWpo8F2DVmMCApz17GkizS5En2T7KY13/+ejNTF8LJ0hPtbM3IL8wEgCCCJUM6npyC
+         0tZ9z//tqoD+lH7+2C70fy4ZbQkbtM/bTq31Nhmfenutp44guIaBn6PT0px8g9XhC0fE
+         qf04pPJgd66Cp+5Clm1uSfmKzDwRTfVO1Vd2qlpOLPbCtXrxQkuCKkxoAUg4op5yLpQQ
+         /2P1tiHqrf7M8xWlXdVNh1LMpSomKlojsP3jOZExVxWHybsuuslk9UO0kHdjAXnlqt6T
+         wq/PB0EC31ZruXfhQB7/fp1gKXVyng44g0nKtwjYH3eHpAW3OhNfu7iHEyr6i3j9R6nO
+         1RNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783672543; x=1784277343;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=5yI41wWurcDCuo7BHEsjSwkI6WR4A/rp12cJasKU76E=;
+        b=jTebfp1aQrZo1KwiiDY210nFy3dacJc79sy25cnVWe2QdIX4Q/+gJK42WBXFbez7pK
+         b3oSCRygAmSjTnA8plluQ6LDU62IgPGOD3dh32oyUykqPOYd7W2XJjPFk4MNzOpEr5pL
+         gsAT/CToGB9blYLAOMeE1Xii9ghe5C7VQy6Yfh8qn7/EwrkLGz/cq4lJzJKUbyTUF8cH
+         aG0wNnuXvxR+tsADtPNOZs3eTfoUaK/LpQvQ2pgErG0QEEOiUDXN1U7/Zyn8dzIU9pyk
+         EPJJCawfGwRHJnD9HtIBAIbJ8aa9/6+PeveopMB0Bz5Bfect/nbflM7HtQysHFDszeIX
+         S5fQ==
+X-Gm-Message-State: AOJu0YwFDPDExMDPvxinYXeBjRF8Vt5za9Tlbpp3L60ZU2JWLI0YdWbS
+	p0SsgllLwUtpv6UWhwOHo7jzdVZDyV6U9Qj0rpaMX/I2Djsnd/F6QuW9E+HMDO2a
+X-Gm-Gg: AfdE7cnDMa4jXJgYIMUgKIyzQjm87aD6fqg3iUTYq24SMUrZ7eMv98tslVdPA5RlNPw
+	97UFgA/xQ2sAQO5jaHZbY2KZ9t2DP8gXRVfRuef1YZKy9tQjKiSZ/AMXdYAeb2YOiq20Vk1sYIi
+	F1qcrHeYefCijzwxswr3LdzE6XBL6ArpAFlN3cBcOUGjoo6QibMfb4FPR09s0QRyEThKGZJ13rE
+	A0mL8PRKc2XuZLz7Tss/oWWSJ+R33gAR2dBTOODPfgr+HHr7hNL4L4qn0lmoSHMYOBWNQ+nHP0P
+	2MI6/54AmeDdYpJl0eo5R6gYJrfk3q5YwXNjEpjzXLzLlnB2dvUDxK9hSoufci2RXNA7Qi+fftC
+	WB9fcW2PFj+M6YFIxdLAIF/M1noZHRHOGJTG9rcToTg2O+d0SnGxfNLUyClTataTaOJc4SLXw2/
+	xxFOf2HaLh7IGC7o9o2U8=
+X-Received: by 2002:a05:6830:2109:b0:7df:5fc:3fd8 with SMTP id 46e09a7af769-7ebcfe54187mr7923635a34.1.1783672542710;
+        Fri, 10 Jul 2026 01:35:42 -0700 (PDT)
+Received: from [172.17.0.2] ([20.118.28.215])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7ebcb3f6826sm5965718a34.27.2026.07.10.01.35.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jul 2026 01:35:41 -0700 (PDT)
+Message-ID: <6a50aedd.bb286e2c.394855.648a@mx.google.com>
+Date: Fri, 10 Jul 2026 01:35:41 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8881913339933806078=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, xiuzhuo.shang@oss.qualcomm.com
+Subject: RE: [v1] gdbus: Skip BLE random-address devices and remove broad match rule
+In-Reply-To: <20260710075548.1072741-1-xiuzhuo.shang@oss.qualcomm.com>
+References: <20260710075548.1072741-1-xiuzhuo.shang@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-hci_conn_params_lookup requires hdev->lock be held, otherwise the list
-iteration or param access is not safe.
+--===============8881913339933806078==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Hold hdev->lock for params lookups in hci_sync.
+This is an automated email and please do not reply to this email.
 
-Fixes: c530569adc19 ("Bluetooth: hci_core: Introduce HCI_CONN_FLAG_PAST")
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: gdbus/client.c:937
+error: gdbus/client.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
+Regards,
+Linux Bluetooth
 
-Notes:
-    v3:
-    - copy params->flags in hci_le_pa_create_sync() to reduce number of
-      unlocks in branches. Note the lock also protects the `le` hci_conn.
-    v2:
-    - no change
 
- net/bluetooth/hci_sync.c | 24 ++++++++++++++++++++----
- 1 file changed, 20 insertions(+), 4 deletions(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 5dddeed11372..b4ca34abe032 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6677,6 +6677,8 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
- 	if (!hci_dev_test_flag(hdev, HCI_LE_SIMULTANEOUS_ROLES))
- 		hci_pause_advertising_sync(hdev);
- 
-+	hci_dev_lock(hdev);
-+
- 	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
- 	if (params) {
- 		conn->le_conn_min_interval = params->conn_min_interval;
-@@ -6690,6 +6692,8 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
- 		conn->le_supv_timeout = hdev->le_supv_timeout;
- 	}
- 
-+	hci_dev_unlock(hdev);
-+
- 	/* If controller is scanning, we stop it since some controllers are
- 	 * not able to scan and connect at the same time. Also set the
- 	 * HCI_LE_SCAN_INTERRUPTED flag so that the command complete
-@@ -7247,13 +7251,13 @@ static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
- }
- 
- static int hci_le_past_params_sync(struct hci_dev *hdev, struct hci_conn *conn,
--				   struct hci_conn *acl, struct bt_iso_qos *qos)
-+				   u16 acl_handle, struct bt_iso_qos *qos)
- {
- 	struct hci_cp_le_past_params cp;
- 	int err;
- 
- 	memset(&cp, 0, sizeof(cp));
--	cp.handle = cpu_to_le16(acl->handle);
-+	cp.handle = cpu_to_le16(acl_handle);
- 	/* An HCI_LE_Periodic_Advertising_Sync_Transfer_Received event is sent
- 	 * to the Host. HCI_LE_Periodic_Advertising_Report events will be
- 	 * enabled with duplicate filtering enabled.
-@@ -7318,16 +7322,28 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
- 	 * 2. Check if that HCI_CONN_FLAG_PAST has been set which indicates that
- 	 *    user really intended to use PAST.
- 	 */
-+	hci_dev_lock(hdev);
-+
- 	le = hci_conn_hash_lookup_le(hdev, &conn->dst, conn->dst_type);
- 	if (le) {
- 		struct hci_conn_params *params;
-+		hci_conn_flags_t flags = 0;
-+		u16 le_handle = le->handle;
- 
- 		params = hci_conn_params_lookup(hdev, &le->dst, le->dst_type);
--		if (params && params->flags & HCI_CONN_FLAG_PAST) {
--			err = hci_le_past_params_sync(hdev, conn, le, qos);
-+		if (params)
-+			flags = params->flags;
-+
-+		hci_dev_unlock(hdev);
-+
-+		if (flags & HCI_CONN_FLAG_PAST) {
-+			err = hci_le_past_params_sync(hdev, conn, le_handle,
-+						      qos);
- 			if (!err)
- 				goto done;
- 		}
-+	} else {
-+		hci_dev_unlock(hdev);
- 	}
- 
- 	/* SID has not been set listen for HCI_EV_LE_EXT_ADV_REPORT to update
--- 
-2.55.0
-
+--===============8881913339933806078==--
