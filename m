@@ -1,92 +1,92 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACECD3F8714
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:49:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68B23F9298
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:49:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783676988; cv=none; b=Ar/l/RKVWYFBRRDHO9tcgSogl54r0IaRfU9wM0khoGSZyKfz8EpNAmVkqJct4VI8V6W2sDoYQTRFyYGej8UjvM/78h2r79GO0IttsDyz9/NRDWYSQIBVIjObcRDq0zMwD9tB+sYRCtDSDhNGifTh6P8gI9KNUoaZjoNM6TpGu6g=
+	t=1783676993; cv=none; b=KfEwjgAfdq619AjDJ7pFFqcDahdfcYvTuNMpDSQXQewXPhwJNiqYIJregEYbZOxlvN/GGysk+pCgD3jIYhvxIDgNRTrtgTw9SOUz3L8jNFA256WlVEebEe9N86oDT5/YjsmJnePus/AaWgoIcq8ETwfr3yO9cndkD03W4/nRVV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783676988; c=relaxed/simple;
-	bh=agDS4cF5CBZRlGoJ1SZ+wqFZtJ29cGKquV06XsmIA6s=;
+	s=arc-20240116; t=1783676993; c=relaxed/simple;
+	bh=sqVBHbNIX4sA8I7HNeZkVA9ekbS+Ya2wzHioOI7pNm8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ky3dG3Pl1gPoHZixtM92qGJAKo4gjD+gFtjIf47LTXccPXQhlC01NdaR89OOC7w+Foqh+3CjGpGNw3saOp1aeeEWTc4YeOgFyEaWQEilZ/g8tyPByM5fslwZwFs0lwNzVNJdFSQw7mpGk4HQbLJl6VdQTO/omFGWeeNrwUef6AE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=faje1Nv+; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=JDyRT7U0; arc=none smtp.client-ip=205.220.180.131
+	 MIME-Version:Content-Type; b=CI6TrpoxXJU1PuEX5zOqCCo9dEjDsq3YlL/Mgg57dKxoxAN0XjUv03oHLBMcYaZ4+526s9r4SmGDgMieF3iwP+O0jqGXmcdOVSsd27yn1X2OtT8GiuPAGZbc1eaoh1bkusEodk+6DtDXUrkOsh+k2IM7UZGarVaoTKRwwKXiGfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Vg63nnTt; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=A4y/JuRd; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="faje1Nv+";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="JDyRT7U0"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66A7eWVV191115
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:49:44 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Vg63nnTt";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="A4y/JuRd"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66A7dVbf4156540
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:49:50 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	tdd+jMjgODtXfdp0IYljt05k6L5Ncq4gJe1a962W5EQ=; b=faje1Nv+Dr6wJpFv
-	87CBOcNhF7alXt7zWuNx6XqrG141hzwIwwC8ucAHzd7GNOAcKJgcbOcJXhChzlAL
-	q4iYWndViJbqcFOtUHTUChO5HCP6DGD0iggsZOV83VJG1tbcwrHs83adJYg6WJ20
-	UUgEKdPu1As3AaCrR7d9btV6tZEXAs7DOiicupLRRu5ELVPeGkQk7MjqCX88thFi
-	2AetbKJcBMGGHUpvYwaZcdf5AcRrkIVctM3brUeFRB724KalBCvQZC24UsBmXk+O
-	iRm2ZJfQOa63jsVRC0dDmb5smy1lrFs84SfFBjQhEUK6DXbF0gawX8fEAYZBbViS
-	t0KTeg==
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fas6n19u2-1
+	s97CR8F8YkthtziY0JtqEapDqfBCvbizxchHlEAplRw=; b=Vg63nnTtX9Z4XnUX
+	KQoiOfqjoeIyKHtOStHCw6j1BzOr7C6wgM9CH4dPBE1rEDiWpBFhwjge638PhWgn
+	ubDgxn4pPTV2h0djtLKici4knn2dor1mDmF3waKzE4v0MXqMO1dCyS0renrANYR3
+	e6y8dm8L413ZPn3MbYwp1QXbK7w82dN1dvw05yMlhGCjwZSegmZ8inTF05yJHK9C
+	LW5rBVPhibhnrbrh93WovwU9OmsEkoe3OLQbi9SuTI1t+m7W1PEQ/lSciblBxetc
+	sWDLj/SET8Fy2L/Bp0guBk+94Escl5PHjNHM+MswStsX9HLuzbm0my2c3pvIQgdC
+	AF1fhg==
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fahv8jq3p-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:49:44 +0000 (GMT)
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-38127ae6b99so1293432a91.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 02:49:44 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:49:49 +0000 (GMT)
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c889d1eedcdso1250042a12.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 02:49:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1783676983; x=1784281783; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1783676989; x=1784281789; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=tdd+jMjgODtXfdp0IYljt05k6L5Ncq4gJe1a962W5EQ=;
-        b=JDyRT7U0u1jBuL1ZAupXFkEGKeFtJkyX0p3rFSydGP8zZZ7Md6ewwILP5p01qHe/pG
-         J8rMNW9rSYQwoH8TkhahIeSoNrbsOzUFJ1HKYx8X75sgfdlgD2TiQ93A7RLZwSP/yhwO
-         bSWH/WCb4+bqPBZmzmXUJm8N9UAPVeSWkQC/YVdTYtu9tlbrtNn3ec71ySauzCzKQAOG
-         h1NAIxxp6CE9YU+Fs/XlH+i/emsdGuAGxVXNaftUAEx+GzlH8v2reI9aYpLkPRSO2Q7O
-         F9TPgK0AXTzorEjSwtSDzAm95x4W/qoJSxipUU3GhzNs/fF2hVYkkVwpKgk4PfGjRlKW
-         74cg==
+        bh=s97CR8F8YkthtziY0JtqEapDqfBCvbizxchHlEAplRw=;
+        b=A4y/JuRdTS5rpFKwez6QujqJZ0cGtcFQudVbfVNBflNZPeo6eFqua2cVv+GPXblDuG
+         HbB5GfXy4XzmDqY2iAuwsBkmkqjVKPZZorW3qfultS6WhwPyl21AcWdc0x1NEunx4u1J
+         sL0rt6XPHQutHxM3WSQySSkQXjk+r/2rATOrKdIy1cOmBhAyQpcvgZZhaKveM3ogtpUT
+         GlEuyGdNhYpEU4AmfQ5elwCNgWPnDj+NIj/EWG3i1R3nmGofeTH3Q5jFzkIhjghGm1b0
+         n6QVP3RMaQvyrpHrYrodMKOxRef6xcrGPK0PrEHcH07NdVp6uz93pw0qjWrk6kcvgPny
+         uOiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783676983; x=1784281783;
+        d=1e100.net; s=20251104; t=1783676989; x=1784281789;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=tdd+jMjgODtXfdp0IYljt05k6L5Ncq4gJe1a962W5EQ=;
-        b=SeP92es2c/XQi7dZO36I6MveIzfoozb++olOYQWT+qdYEOlRQTzK7YljnzvyHTo9Pa
-         /7mTkALnSYu+BnmHq4fQqKxWeNAYwMHNi3oZNIudoLM27VX1EHXx2hOrckRKELvFTJU2
-         IyfqeJ6WguG45epcZy0Dm+XEN/wS2Vt3VpSpG2rJyJssTJ4jvByf8w8EFkYqqGQRGDDx
-         Tnp1Zbp9JK/WI/SzSuvMUGEJVoKVoCniJ6Y3gC3U5hceeC5+nUwRSinSSDJQMeLcgg+B
-         Y+00HhYpAnE+XopcEuYf8jNj8uVAf2BOWv3wg1iJmILAvSpg+42k+0uW+jyW2EiE8MAs
-         0MSA==
-X-Gm-Message-State: AOJu0Ywm7ElPgzf7qIw2IKKj5ZPkCJtMXNirpR4ovjS2yNg/oOhddmA8
-	Yjlc3epOqshp43NlpUqMGnDbmYj4GPuluKfg6+WVyzT/iTYEnggpJ6zY6odv7CrVZL9d7ZDhch4
-	nNsIOaequmA65xMOZ0VzZNVWaSLr0HUwrVxCTgPK7QmfD1iR+AY8MmEkIft1zVU+Hznf48QEvv8
-	1JFVM=
-X-Gm-Gg: AfdE7cmB5UO6N2qEnupx+TUw6Lly1CCu6SK66F0TlZifIQB0tf9zFvAEr3iR6k1sg+3
-	ITDVZ5R84Q5rmNvWK0y+Skq9LdI2UnaSZd/HqVjYiP1vBnjwd4xvSiuiPbqnoNDBuenatVxcwO6
-	4ICLlrzdZpI1MIQtUL6V/e2GOhgRhi7CEqR3/zMgy/ppJlYRhPFzN1u6Y09C1bhL8l4alGkq38C
-	l/dRNM+xibX+wVrQpc5aWbTIRSGr+3IIX22jKZ7SEI6ZhCPrrDbPbWUxKCyy2/P6c0pvQeC44eF
-	DrcK51GYQkPsLVJ3AfvDScD8OjsbmjB668uj9hol3LeYJslEwc1WUi/Hehhjw/Oh+K5t/m+H6V1
-	anRbDHrRG8o/9AiQfegwan/MPPeQToxOXAEicxqzK
-X-Received: by 2002:a17:90b:3d86:b0:36a:caf2:3815 with SMTP id 98e67ed59e1d1-38d15876f4amr3228739a91.15.1783676983008;
-        Fri, 10 Jul 2026 02:49:43 -0700 (PDT)
-X-Received: by 2002:a17:90b:3d86:b0:36a:caf2:3815 with SMTP id 98e67ed59e1d1-38d15876f4amr3228676a91.15.1783676982235;
-        Fri, 10 Jul 2026 02:49:42 -0700 (PDT)
+        bh=s97CR8F8YkthtziY0JtqEapDqfBCvbizxchHlEAplRw=;
+        b=BAjP/CUtWy8xNGsNc+906JW9tdQkJqCnEGP/9AZTA/7vWASrHAvz8JDeCW9ErF69JU
+         8SqfmQJjYES9RvxfgOSxijfTt6Af4xe1SbsAv6RjUlwKhWAkNDNmUQwbnseMqxAvQjqQ
+         UM8iThugDiRHqzcIkS3hReR0XcNhowmdGoWC78zULY9g10HBSNFAnUFDqtD98hVF9nsn
+         JQuWPO8OQdyYsrMCukmd6Za+qFi6l/Q0GPpvGlxFrzAawBatsLCtNjSHuuHEcA7LMk09
+         c3ID7mPdHkzhXbNFONV7YBV2i2hxr42G/5pKhW4ESGOHnRmv1yxqATgmB8snrsoHnKCt
+         YP4Q==
+X-Gm-Message-State: AOJu0YzL/d5TSzQcVxBKZXueEAg2cMqnAqqf1QRswL77KHJO7wmVQA0u
+	iyapcmlPu42v26CwmJEqUig5Zz5grfm46/1/+1JOf6BrJKD392AM1aFXv1fbTIfhZYsJSNVe971
+	drWcYLpepW+8opriEl78hPHtCHFQdohJExGPcXCoL4BqqNGE3a5QCVJgziK3kLXA4hcDwUZbMyk
+	zScqo=
+X-Gm-Gg: AfdE7ckNj/d/xYpn9Pfal/MXrsVRw/jBTyMiQWuKVafP+hqzC/+s/xBZo24nBSZS2oh
+	Mv5+uUEm3BbwavmBI4NVy8oAwMIhwEk9oXgQH2UwPCPC48loMNUoAoZpKayic0PhDWmUp37r5sl
+	McJ0D3ifS8g+IV0HpGpvkaEffRyT1qO/tG63UHHfkETHTmKN39U8lcSoHj1i1tNZyBBXneIBuA/
+	ZX3I8hfQnWVIxaIod9HLG1Hdk4Fqr8isgBDRptcWP6RH+IUjBh07TmtYMPc5NV/T0SYXZDqQRvh
+	fW8imzayKuvFVLX03HtV9H+uSB9K6eZhmr0z5SdHU96ixeaBm+NE8mK26Rgk5Etdlib75A42KUp
+	gMnBoPsh5hdPr0XXQaN0R8hYBAsvwF9yggzhsj9no
+X-Received: by 2002:a05:6a21:682:b0:3c0:9c1a:893c with SMTP id adf61e73a8af0-3c0bcce3492mr12976517637.68.1783676988132;
+        Fri, 10 Jul 2026 02:49:48 -0700 (PDT)
+X-Received: by 2002:a05:6a21:682:b0:3c0:9c1a:893c with SMTP id adf61e73a8af0-3c0bcce3492mr12976457637.68.1783676987273;
+        Fri, 10 Jul 2026 02:49:47 -0700 (PDT)
 Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-313b3206aaasm4106526eec.13.2026.07.10.02.49.39
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-313b3206aaasm4106526eec.13.2026.07.10.02.49.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jul 2026 02:49:41 -0700 (PDT)
+        Fri, 10 Jul 2026 02:49:46 -0700 (PDT)
 From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
         quic_anubhavg@quicinc.com,
         Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Subject: [PATCH BlueZ v2 3/4] profiles: Add D-Bus Channel Sounding control APIs
-Date: Fri, 10 Jul 2026 15:19:18 +0530
-Message-Id: <20260710094919.4047204-4-naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v2 4/4] client: Add Channel Sounding shell submenu
+Date: Fri, 10 Jul 2026 15:19:19 +0530
+Message-Id: <20260710094919.4047204-5-naga.akella@oss.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260710094919.4047204-1-naga.akella@oss.qualcomm.com>
 References: <20260710094919.4047204-1-naga.akella@oss.qualcomm.com>
@@ -98,1299 +98,1354 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEwMDA5NiBTYWx0ZWRfX5a+87HDiT258
- BOFwHsUZovfL9Qjbbolu6pj4G00eJk4RjKosur1WvPCVeqC11EvQCexjxwJf6Abijtudx/tmcml
- kR45O4v8Iuiptu9LYBFUYVNKsicUkpY=
-X-Authority-Analysis: v=2.4 cv=DYgnbPtW c=1 sm=1 tr=0 ts=6a50c038 cx=c_pps
- a=RP+M6JBNLl+fLTcSJhASfg==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+X-Proofpoint-GUID: 961Ze5qLwRSszHu867vtgtsNseIJOLWS
+X-Proofpoint-ORIG-GUID: 961Ze5qLwRSszHu867vtgtsNseIJOLWS
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEwMDA5NiBTYWx0ZWRfX6UwJ58vi0RbD
+ uf6E7P/u7bLA41M4j9osWVP51lALG6H4NxYCoHCDQPidpxODFPpyokBylWN+EM+DInIrnE4PZNO
+ IJqQv6VLpzcy/Aaku5/nLsV6JAD/EqQ=
+X-Authority-Analysis: v=2.4 cv=funsol4f c=1 sm=1 tr=0 ts=6a50c03d cx=c_pps
+ a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
  a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22
- a=gyo3rhEH3o3uM01JGDwA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=iS9zxrgQBfv6-_F4QbHw:22
-X-Proofpoint-ORIG-GUID: BOetCXxom3R-1zRBBCjIDft_VXMDpfqC
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEwMDA5NiBTYWx0ZWRfX2jdM8Yw+9l51
- YNhyZYa005icbkw6FMjZehEfdrU6ibuyDPHfLE2iE+/yFBLTK5Ap4pL4HoyhUm+63cIAddGqyCA
- OO3Pz+03nxYM0ebNuyma5ivoCna+uGWs22umgZRExZ646UGivicwsAJHkF4TWjDhi8916ArB+vC
- H3V4ksowJec/yeiwlkf0RD/7T4M36jd0BS3peq9I/GkTi0lzKAFj4zQDZX5v2S4K71olHbgZCpp
- YHTQsHdgIbvv2DdTrdZMEmtVcd5TMIOJbgukhTN1OOXi/U6PGbwfXNHUQ9Xdi5TQxKZqB41PA9A
- HNnY01Kl/q4eotgI4DNab+C2a90/HbuT3CLaPtOCRlx3+XhUs1DCQ9cvdRJpYyU/V5P9Bg6G/so
- YPNlvwVTgO6xAGuD5wzfPXFU3CAtx6GKcghhoXHrv1MDEIBSphZmfjMQWyBq/6I4hyOa6sFw5Ko
- 5O5MlPdNklh8BEK6J3w==
-X-Proofpoint-GUID: BOetCXxom3R-1zRBBCjIDft_VXMDpfqC
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
+ a=BNXz1j1ro0pgg1kRGjgA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=x9snwWr2DeNwDh03kgHS:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEwMDA5NiBTYWx0ZWRfX+372MmSQOrt6
+ BBz/0BhsbCWyCGpMGz6DpW0O9iVGehCRF5fenijyqbpUgBO2rd1StmtKZYRREaUEdGBQOqKrZP4
+ +e0irpk0xEmfQK57Az73uj+gRExrMDOTmXw7o1DPp8OyeldT2lkV6wHnzcmPSPtBterBrxithw4
+ nqhB9sswojRjilngf5p3HqtQq6+u5PUzbj4HMIHAmXgImu1XKfQhAXiy2n4Ym2xNnkzHqZqAqFR
+ EYLqqNMPtc5JzoikoA/9nA70w2bG8mWGhLFBaClQ5JCbk/psOu4O9yQpyR8W0xZzMYA9KOW8VRm
+ XJvKV9pZsdOwJArG1FWPJkmW5P6UpI2wuxRr2xYNiOfKhSjIgVhJvSpJYZJVyEqnTEClYBzeTrP
+ 4CBPgzw8+5z2fRhhEz15pvCLAGzX2YZY3joZbX4dQo5ArrF7gm//NV6nOieCJ44XS0V6h6NhqOZ
+ KmYN79g1q/ORvGukrdw==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-07-10_02,2026-07-09_04,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 lowpriorityscore=0 adultscore=0 suspectscore=0 bulkscore=0
- clxscore=1015 phishscore=0 malwarescore=0 spamscore=0 impostorscore=0
+ spamscore=0 phishscore=0 clxscore=1015 lowpriorityscore=0 adultscore=0
+ bulkscore=0 suspectscore=0 malwarescore=0 priorityscore=1501 impostorscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607100096
 
-Expose org.bluez.ChannelSounding1 on the device path,
-adding SetDefaultSettings, StartMeasurement, and StopMeasurement methods
-and an Active property to let external clients configure and
-control CS ranging sessions.
-
-Replace hardcoded CS configuration values with configurable HCI accessors
-(bt_rap_{get,set}_cs_config_params, bt_rap_{get,set}_cs_freq_params,
-bt_rap_{get,set}_default_settings_params).
-Add measurement control APIs (bt_rap_start_measurement,
-bt_rap_stop_measurement) with optional timeout-based auto-stop
-and callbacks for timeout and procedure-state changes,
-allowing DBus Active state to reflect actual controller procedure status.
+Add a cs bt_shell submenu for controlling
+org.bluez.ChannelSounding1, supporting measurement start/stop,
+default-setting configuration, and session status display.
+Maintain reusable validated CS parameters and
+track active sessions via D-Bus Active state,
+replies, and disconnects.
+Integrate with client/main.c to manage per-adapter
+ChannelSounding proxies, device resolution,
+property updates, and session cleanup.
 ---
- profiles/ranging/rap.c     | 347 +++++++++++++++++++++++-
- profiles/ranging/rap_hci.c | 531 +++++++++++++++++++++++++------------
- 2 files changed, 699 insertions(+), 179 deletions(-)
+ Makefile.tools |    3 +-
+ client/cs.c    | 1157 ++++++++++++++++++++++++++++++++++++++++++++++++
+ client/cs.h    |   18 +
+ client/main.c  |   27 +-
+ 4 files changed, 1203 insertions(+), 2 deletions(-)
+ create mode 100644 client/cs.c
+ create mode 100644 client/cs.h
 
-diff --git a/profiles/ranging/rap.c b/profiles/ranging/rap.c
-index fa3e27328..f65ce3512 100644
---- a/profiles/ranging/rap.c
-+++ b/profiles/ranging/rap.c
-@@ -10,6 +10,7 @@
- #endif
- 
- #include <stdbool.h>
-+#include <stddef.h>
- #include <errno.h>
- 
- #include <glib.h>
-@@ -35,7 +36,11 @@
- #include "src/shared/rap.h"
- #include "attrib/att.h"
- #include "src/log.h"
-+#include "src/shared/cs-types.h"
- #include "src/btd.h"
-+#include "src/dbus-common.h"
+diff --git a/Makefile.tools b/Makefile.tools
+index 6188449f1..b5f7ef8da 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -16,7 +16,8 @@ client_bluetoothctl_SOURCES = client/main.c \
+ 					client/mgmt.h client/mgmt.c \
+ 					client/assistant.h client/assistant.c \
+ 					client/hci.h client/hci.c \
+-					client/telephony.h client/telephony.c
++					client/telephony.h client/telephony.c \
++					client/cs.h client/cs.c
+ client_bluetoothctl_LDADD = lib/libbluetooth-internal.la \
+ 			gdbus/libgdbus-internal.la src/libshared-glib.la \
+ 			$(GLIB_LIBS) $(DBUS_LIBS) -lreadline
+diff --git a/client/cs.c b/client/cs.c
+new file mode 100644
+index 000000000..89251b502
+--- /dev/null
++++ b/client/cs.c
+@@ -0,0 +1,1157 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
++ */
 +
-+#define CS_INTERFACE "org.bluez.ChannelSounding1"
- 
- struct rap_adapter_data {
- 	struct btd_adapter *adapter;
-@@ -43,6 +48,14 @@ struct rap_adapter_data {
- 	int ref_count;  /* Number of devices using this adapter */
- };
- 
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#define _GNU_SOURCE
++#include <stdio.h>
++#include <stdlib.h>
++#include <stdint.h>
++#include <stdbool.h>
++#include <string.h>
++
++#include <glib.h>
++
++#include "gdbus/gdbus.h"
++#include "src/shared/shell.h"
++#include "src/shared/util.h"
++#include "cs.h"
++
++static GList * cs_proxies;
++static GList **cs_device_list;
++static DBusConnection *dbus_conn;
++
++#define RANGING_INTERFACE "org.bluez.ChannelSoundingRanging1"
++#define RANGE_ESTIMATE     "RangeEstimate"
++
++/* One signal watch per device proxy, so each device's RangeEstimate
++ * watch can be independently added/removed instead of clobbering a
++ * single shared handle.
++ */
++struct cs_watch {
++	GDBusProxy *proxy;
++	guint watch_id;
++};
++
++static GList *cs_watches;
++
++/* ---- Per-device active session ---- */
++
 +struct cs_session {
-+	bool active;
-+	uint32_t duration_secs;
-+	struct bt_rap_le_cs_default_settings settings;
-+	struct bt_rap_le_cs_config    cfg;
-+	struct bt_rap_le_cs_frequency freq;
++	GDBusProxy *proxy;
 +};
 +
- struct rap_data {
- 	struct btd_device *device;
- 	struct btd_service *service;
-@@ -50,6 +63,8 @@ struct rap_data {
- 	unsigned int ready_id;
- 	struct rap_adapter_data *adapter_data;  /* Shared adapter-level HCI */
- 	void *hci_sm;  /* Per-device HCI state machine */
-+	uint16_t conn_handle;  /* Last known connection handle */
-+	struct cs_session active_session;  /* active==false when idle */
- };
- 
- static struct queue *sessions;
-@@ -293,6 +308,303 @@ static void rap_attached(struct bt_rap *rap, void *user_data)
- 	rap_data_add(data);
- }
- 
-+enum cs_dict_target {
-+	CS_TARGET_SETTINGS,
-+	CS_TARGET_CFG,
-+	CS_TARGET_FREQ,
++static GList *cs_sessions;
++
++static struct cs_session *cs_find_session(GDBusProxy *proxy);
++
++/* ---- Parameter state (used to build the StartMeasurement dict) ---- */
++
++static uint8_t cs_role        = 0x03;
++static uint8_t cs_sync_ant    = 0xFF;
++static int8_t  cs_max_tx_power = 0x14;
++
++static struct {
++	uint8_t config_id;
++	uint8_t main_mode_type;
++	uint8_t sub_mode_type;
++	uint8_t main_mode_min_steps;
++	uint8_t main_mode_max_steps;
++	uint8_t main_mode_repetition;
++	uint8_t mode0_steps;
++	uint8_t role;
++	uint8_t rtt_types;
++	uint8_t cs_sync_phy;
++	uint8_t channel_map[10];
++	uint8_t channel_map_repetition;
++	uint8_t channel_selection_type;
++	uint8_t channel_shape;
++	uint8_t channel_jump;
++	uint8_t companion_signal_enable;
++} cs_cfg = {
++	.config_id               = 0x00,
++	.main_mode_type          = 0x01,
++	.sub_mode_type           = 0xFF,
++	.main_mode_min_steps     = 0x02,
++	.main_mode_max_steps     = 0x03,
++	.main_mode_repetition    = 0x01,
++	.mode0_steps             = 0x02,
++	.role                    = 0x00,
++	.rtt_types               = 0x00,
++	.cs_sync_phy             = 0x01,
++	.channel_map             = { 0xFC, 0xFF, 0x7F, 0xFC, 0xFF,
++				     0xFF, 0xFF, 0xFF, 0xFF, 0x1F },
++	.channel_map_repetition  = 0x01,
++	.channel_selection_type  = 0x00,
++	.channel_shape           = 0x00,
++	.channel_jump            = 0x02,
++	.companion_signal_enable = 0x00,
 +};
 +
-+struct cs_dict_param_desc {
-+	const char *key;
-+	enum cs_dict_target target;
-+	int vtype;
-+	size_t offset;
++static struct {
++	uint16_t max_procedure_duration;
++	uint16_t min_period_between_procedures;
++	uint16_t max_period_between_procedures;
++	uint16_t max_procedure_count;
++	uint8_t  min_sub_event_len[3];
++	uint8_t  max_sub_event_len[3];
++	uint8_t  tone_antenna_config_selection;
++	uint8_t  phy;
++	uint8_t  tx_power_delta;
++	uint8_t  preferred_peer_antenna;
++	uint8_t  snr_control_initiator;
++	uint8_t  snr_control_reflector;
++} cs_freq = {
++	.max_procedure_duration        = 0x0640,
++	.min_period_between_procedures = 0x001E,
++	.max_period_between_procedures = 0x0096,
++	.max_procedure_count           = 0x0000,
++	.min_sub_event_len             = { 0x00, 0x20, 0x00 },
++	.max_sub_event_len             = { 0x03, 0x20, 0x00 },
++	.tone_antenna_config_selection = 0x07,
++	.phy                           = 0x01,
++	.tx_power_delta                = 0x80,
++	.preferred_peer_antenna        = 0x03,
++	.snr_control_initiator         = 0xFF,
++	.snr_control_reflector         = 0xFF,
 +};
 +
-+#define CS_SETTINGS_FIELD(_key, _field) \
-+	{ _key, CS_TARGET_SETTINGS, DBUS_TYPE_BYTE, \
-+		offsetof(struct bt_rap_le_cs_default_settings, _field) }
-+#define CS_CFG_FIELD(_key, _field) \
-+	{ _key, CS_TARGET_CFG, DBUS_TYPE_BYTE, \
-+		offsetof(struct bt_rap_le_cs_config, _field) }
-+#define CS_FREQ_U8_FIELD(_key, _field) \
-+	{ _key, CS_TARGET_FREQ, DBUS_TYPE_BYTE, \
-+		offsetof(struct bt_rap_le_cs_frequency, _field) }
-+#define CS_FREQ_U16_FIELD(_key, _field) \
-+	{ _key, CS_TARGET_FREQ, DBUS_TYPE_UINT16, \
-+		offsetof(struct bt_rap_le_cs_frequency, _field) }
-+
-+static const struct cs_dict_param_desc cs_dict_param_table[] = {
-+	CS_SETTINGS_FIELD("role", role),
-+	CS_SETTINGS_FIELD("sync_ant_sel", cs_sync_ant_sel),
-+	CS_CFG_FIELD("config_id", config_id),
-+	CS_CFG_FIELD("main_mode_type", main_mode_type),
-+	CS_CFG_FIELD("sub_mode_type", sub_mode_type),
-+	CS_CFG_FIELD("main_mode_min_steps", main_mode_min_steps),
-+	CS_CFG_FIELD("main_mode_max_steps", main_mode_max_steps),
-+	CS_CFG_FIELD("main_mode_repetition", main_mode_repetition),
-+	CS_CFG_FIELD("mode0_steps", mode0_steps),
-+	CS_CFG_FIELD("rtt_types", rtt_types),
-+	CS_CFG_FIELD("sync_phy", cs_sync_phy),
-+	CS_CFG_FIELD("channel_map_repetition", channel_map_repetition),
-+	CS_CFG_FIELD("channel_selection_type", channel_selection_type),
-+	CS_CFG_FIELD("channel_shape", channel_shape),
-+	CS_CFG_FIELD("channel_jump", channel_jump),
-+	CS_CFG_FIELD("companion_signal_enable", companion_signal_enable),
-+	CS_FREQ_U16_FIELD("max_procedure_duration", max_procedure_duration),
-+	CS_FREQ_U16_FIELD("min_period_between_procedures",
-+				min_period_between_procedures),
-+	CS_FREQ_U16_FIELD("max_period_between_procedures",
-+				max_period_between_procedures),
-+	CS_FREQ_U16_FIELD("max_procedure_count", max_procedure_count),
-+	CS_FREQ_U8_FIELD("tone_antenna_config_selection",
-+				tone_antenna_config_selection),
-+	CS_FREQ_U8_FIELD("phy", phy),
-+	CS_FREQ_U8_FIELD("tx_power_delta", tx_power_delta),
-+	CS_FREQ_U8_FIELD("preferred_peer_antenna", preferred_peer_antenna),
-+	CS_FREQ_U8_FIELD("snr_control_initiator", snr_control_initiator),
-+	CS_FREQ_U8_FIELD("snr_control_reflector", snr_control_reflector),
++enum cs_param_type {
++	CS_PARAM_U8,
++	CS_PARAM_U8_RANGE,
++	CS_PARAM_U16,
 +};
 +
-+static const struct cs_dict_param_desc *cs_find_dict_param_desc(
-+							const char *key)
++struct cs_param_desc {
++	const char *name;
++	enum cs_param_type type;
++	void *field;
++	unsigned long min;
++	unsigned long max;
++	const char *range_error;
++};
++
++static const struct cs_param_desc cs_param_table[] = {
++	{ .name = "sync_ant_sel", .type = CS_PARAM_U8, .field = &cs_sync_ant },
++	{ .name = "config_id", .type = CS_PARAM_U8,
++		.field = &cs_cfg.config_id },
++	{ .name = "main_mode_type", .type = CS_PARAM_U8,
++		.field = &cs_cfg.main_mode_type },
++	{ .name = "sub_mode_type", .type = CS_PARAM_U8,
++		.field = &cs_cfg.sub_mode_type },
++	{ .name = "main_mode_min_steps", .type = CS_PARAM_U8,
++		.field = &cs_cfg.main_mode_min_steps },
++	{ .name = "main_mode_max_steps", .type = CS_PARAM_U8,
++		.field = &cs_cfg.main_mode_max_steps },
++	{ .name = "main_mode_repetition", .type = CS_PARAM_U8,
++		.field = &cs_cfg.main_mode_repetition },
++	{ .name = "mode0_steps", .type = CS_PARAM_U8,
++		.field = &cs_cfg.mode0_steps },
++	{ .name = "rtt_types", .type = CS_PARAM_U8,
++		.field = &cs_cfg.rtt_types },
++	{ .name = "role", .type = CS_PARAM_U8_RANGE, .field = &cs_role,
++		.min = 0x01, .max = 0x03,
++		.range_error = "role: 01=Initiator 02=Reflector 03=Both\n" },
++	{ .name = "sync_phy", .type = CS_PARAM_U8_RANGE,
++		.field = &cs_cfg.cs_sync_phy, .min = 0x01, .max = 0x02,
++		.range_error = "sync_phy: 0x01=LE 1M 0x02=LE 2M\n" },
++	{ .name = "channel_map_repetition", .type = CS_PARAM_U8,
++		.field = &cs_cfg.channel_map_repetition },
++	{ .name = "channel_selection_type", .type = CS_PARAM_U8,
++		.field = &cs_cfg.channel_selection_type },
++	{ .name = "channel_shape", .type = CS_PARAM_U8,
++		.field = &cs_cfg.channel_shape },
++	{ .name = "channel_jump", .type = CS_PARAM_U8,
++		.field = &cs_cfg.channel_jump },
++	{ .name = "companion_signal_enable", .type = CS_PARAM_U8_RANGE,
++		.field = &cs_cfg.companion_signal_enable, .min = 0, .max = 1,
++		.range_error = "companion_signal_enable: 0 or 1\n" },
++	{ .name = "max_procedure_duration", .type = CS_PARAM_U16,
++		.field = &cs_freq.max_procedure_duration },
++	{ .name = "min_period_between_procedures", .type = CS_PARAM_U16,
++		.field = &cs_freq.min_period_between_procedures },
++	{ .name = "max_period_between_procedures", .type = CS_PARAM_U16,
++		.field = &cs_freq.max_period_between_procedures },
++	{ .name = "max_procedure_count", .type = CS_PARAM_U16,
++		.field = &cs_freq.max_procedure_count },
++	{ .name = "tone_antenna_config_selection", .type = CS_PARAM_U8,
++		.field = &cs_freq.tone_antenna_config_selection },
++	{ .name = "phy", .type = CS_PARAM_U8_RANGE, .field = &cs_freq.phy,
++		.min = 0x01, .max = 0x02,
++		.range_error = "phy: 0x01=LE 1M  0x02=LE 2M\n" },
++	{ .name = "tx_power_delta", .type = CS_PARAM_U8,
++		.field = &cs_freq.tx_power_delta },
++	{ .name = "preferred_peer_antenna", .type = CS_PARAM_U8,
++		.field = &cs_freq.preferred_peer_antenna },
++	{ .name = "snr_control_initiator", .type = CS_PARAM_U8,
++		.field = &cs_freq.snr_control_initiator },
++	{ .name = "snr_control_reflector", .type = CS_PARAM_U8,
++		.field = &cs_freq.snr_control_reflector },
++};
++
++static gboolean range_estimate_cb(DBusConnection *connection,
++					DBusMessage *msg, void *user_data)
 +{
-+	size_t i;
++	GDBusProxy *proxy = user_data;
++	DBusMessageIter iter;
++	double distance;
++	uint8_t confidence;
 +
-+	for (i = 0; i < ARRAY_SIZE(cs_dict_param_table); i++) {
-+		if (!strcmp(cs_dict_param_table[i].key, key))
-+			return &cs_dict_param_table[i];
++	if (!dbus_message_iter_init(msg, &iter))
++		return TRUE;
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_DOUBLE)
++		return TRUE;
++
++	dbus_message_iter_get_basic(&iter, &distance);
++	dbus_message_iter_next(&iter);
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_BYTE)
++		return TRUE;
++
++	dbus_message_iter_get_basic(&iter, &confidence);
++
++	bt_shell_printf("[CS] %s Distance: %.3f m  Confidence: %u%%\n",
++			g_dbus_proxy_get_path(proxy), distance, confidence);
++
++	return TRUE;
++}
++
++static struct cs_watch *cs_find_watch(GDBusProxy *proxy)
++{
++	struct cs_watch *w;
++	GList *list;
++
++	for (list = g_list_first(cs_watches); list; list = g_list_next(list)) {
++		w = list->data;
++
++		if (w->proxy == proxy)
++			return w;
 +	}
 +
 +	return NULL;
 +}
 +
-+static DBusMessage *start_measurement(DBusConnection *conn,
-+				DBusMessage *msg, void *user_data)
++void cs_proxy_added(GDBusProxy *proxy)
 +{
-+	struct rap_data *data = user_data;
-+	struct bt_rap_le_cs_config cfg = { 0 };
-+	struct bt_rap_le_cs_frequency freq = { 0 };
-+	struct bt_rap_le_cs_default_settings settings = { 0 };
-+	uint32_t duration_secs = 0;
-+	DBusMessageIter iter = { 0 }, dict = { 0 };
-+	DBusMessageIter entry = { 0 }, variant = { 0 };
-+	const char *key = NULL;
-+	int vtype = 0;
-+	const struct cs_dict_param_desc *desc = NULL;
-+	void *base = NULL;
++	struct cs_watch *w;
 +
-+	if (data->active_session.active)
-+		return g_dbus_create_error(msg,
-+					"org.bluez.Error.InProgress",
-+					"Measurement already active");
++	cs_proxies = g_list_append(cs_proxies, proxy);
 +
-+	/* Seed locals from current state-machine defaults */
-+	bt_rap_get_cs_config_params(data->hci_sm, &cfg);
-+	bt_rap_get_cs_freq_params(data->hci_sm, &freq);
-+	bt_rap_get_default_settings_params(data->hci_sm, &settings);
++	if (!dbus_conn)
++		dbus_conn = bt_shell_get_env("DBUS_CONNECTION");
 +
-+	dbus_message_iter_init(msg, &iter);
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-+		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
-+					   "Expected a{sv} dictionary");
++	if (!dbus_conn)
++		return;
 +
-+	dbus_message_iter_recurse(&iter, &dict);
++	w = g_new0(struct cs_watch, 1);
++	w->proxy = proxy;
++	w->watch_id = g_dbus_add_signal_watch(dbus_conn, NULL,
++					g_dbus_proxy_get_path(proxy),
++					RANGING_INTERFACE, RANGE_ESTIMATE,
++					range_estimate_cb, proxy, NULL);
++	cs_watches = g_list_append(cs_watches, w);
++}
 +
-+	while (dbus_message_iter_get_arg_type(&dict) == DBUS_TYPE_DICT_ENTRY) {
-+		dbus_message_iter_recurse(&dict, &entry);
-+		dbus_message_iter_get_basic(&entry, &key);
-+		dbus_message_iter_next(&entry);
-+		dbus_message_iter_recurse(&entry, &variant);
-+		vtype = dbus_message_iter_get_arg_type(&variant);
++void cs_proxy_removed(GDBusProxy *proxy)
++{
++	struct cs_session *s;
++	struct cs_watch *w;
++	GList *list;
 +
-+		if (strcmp(key, "duration_secs") == 0) {
-+			if (vtype != DBUS_TYPE_UINT32)
-+				goto bad_type;
-+			dbus_message_iter_get_basic(&variant, &duration_secs);
-+		} else if (strcmp(key, "max_tx_power") == 0) {
-+			uint8_t bval = 0;
++	cs_proxies = g_list_remove(cs_proxies, proxy);
 +
-+			if (vtype != DBUS_TYPE_BYTE)
-+				goto bad_type;
-+			dbus_message_iter_get_basic(&variant, &bval);
-+			settings.max_tx_power = (int8_t)bval;
-+		} else if (strcmp(key, "channel_map") == 0) {
-+			DBusMessageIter array = { 0 };
-+			uint8_t *bytes = NULL;
-+			int len = 0;
++	for (list = g_list_first(cs_sessions); list;
++	     list = g_list_next(list)) {
++		s = list->data;
 +
-+			if (vtype != DBUS_TYPE_ARRAY)
-+				goto bad_type;
-+			dbus_message_iter_recurse(&variant, &array);
-+			dbus_message_iter_get_fixed_array(&array, &bytes, &len);
-+			if (len != 10)
-+				return g_dbus_create_error(msg,
-+						DBUS_ERROR_INVALID_ARGS,
-+						"channel_map must be 10 bytes");
-+			memcpy(cfg.channel_map, bytes, 10);
-+		} else if (strcmp(key, "min_sub_event_len") == 0 ||
-+			   strcmp(key, "max_sub_event_len") == 0) {
-+			DBusMessageIter array = { 0 };
-+			uint8_t *bytes = NULL;
-+			int len = 0;
++		if (s->proxy == proxy) {
++			cs_sessions = g_list_remove(cs_sessions, s);
++			g_free(s);
++			break;
++		}
++	}
 +
-+			if (vtype != DBUS_TYPE_ARRAY)
-+				goto bad_type;
-+			dbus_message_iter_recurse(&variant, &array);
-+			dbus_message_iter_get_fixed_array(&array, &bytes, &len);
-+			if (len != 3)
-+				return g_dbus_create_error(msg,
-+						DBUS_ERROR_INVALID_ARGS,
-+						"sub_event_len must be 3 bytes");
-+			if (strcmp(key, "min_sub_event_len") == 0)
-+				memcpy(freq.min_sub_event_len, bytes, 3);
-+			else
-+				memcpy(freq.max_sub_event_len, bytes, 3);
-+		} else {
-+			desc = cs_find_dict_param_desc(key);
-+			if (!desc)
-+				goto bad_type;
++	w = cs_find_watch(proxy);
++	if (w) {
++		g_dbus_remove_watch(dbus_conn, w->watch_id);
++		cs_watches = g_list_remove(cs_watches, w);
++		g_free(w);
++	}
++}
 +
-+			if (vtype != desc->vtype)
-+				goto bad_type;
++/* Drop any active CS session for a device proxy path on disconnect. */
++void cs_device_disconnected(const char *dev_path)
++{
++	struct cs_session *s;
++	GList *list;
 +
-+			switch (desc->target) {
-+			case CS_TARGET_CFG:
-+				base = &cfg;
-+				break;
-+			case CS_TARGET_FREQ:
-+				base = &freq;
-+				break;
-+			default:
-+				base = &settings;
-+				break;
-+			}
++	for (list = g_list_first(cs_sessions); list;
++	     list = g_list_next(list)) {
++		s = list->data;
 +
-+			if (desc->vtype == DBUS_TYPE_UINT16)
-+				dbus_message_iter_get_basic(&variant,
-+					(uint16_t *)((uint8_t *)base +
-+								desc->offset));
-+			else
-+				dbus_message_iter_get_basic(&variant,
-+					(uint8_t *)base + desc->offset);
++		if (!strcmp(g_dbus_proxy_get_path(s->proxy), dev_path)) {
++			bt_shell_printf("Measurement stopped (disconnected)"
++					" on %s\n", dev_path);
++			cs_sessions = g_list_remove(cs_sessions, s);
++			g_free(s);
++			break;
++		}
++	}
++}
++
++/* Drop active CS session when the daemon reports the measurement stopped. */
++void cs_measurement_stopped(GDBusProxy *proxy)
++{
++	struct cs_session *s = cs_find_session(proxy);
++
++	if (!s)
++		return;
++
++	bt_shell_printf("Measurement stopped (timer expired) on %s\n",
++			g_dbus_proxy_get_path(proxy));
++	cs_sessions = g_list_remove(cs_sessions, s);
++	g_free(s);
++}
++
++/* Record a measurement started by the remote side (Reflector role). */
++void cs_measurement_started(GDBusProxy *proxy)
++{
++	struct cs_session *s;
++
++	if (cs_find_session(proxy))
++		return;
++
++	s = g_new0(struct cs_session, 1);
++	s->proxy = proxy;
++	cs_sessions = g_list_append(cs_sessions, s);
++
++	bt_shell_printf("Measurement started on %s\n",
++			g_dbus_proxy_get_path(proxy));
++}
++
++void cs_set_device_list(GList **devices)
++{
++	cs_device_list = devices;
++}
++
++/* Resolve a Bluetooth address to the device's D-Bus object path. */
++static const char *cs_resolve_address(const char *address)
++{
++	GDBusProxy *proxy;
++	DBusMessageIter iter;
++	const char *str;
++	GList *list;
++
++	if (!cs_device_list) {
++		bt_shell_printf("DBG: cs_device_list is NULL\n");
++		return NULL;
++	}
++
++	if (!*cs_device_list) {
++		bt_shell_printf("DBG: *cs_device_list is empty\n");
++		return NULL;
++	}
++
++	for (list = g_list_first(*cs_device_list); list;
++	     list = g_list_next(list)) {
++		proxy = list->data;
++
++		if (!g_dbus_proxy_get_property(proxy, "Address", &iter)) {
++			bt_shell_printf("DBG: proxy %s has no Address\n",
++					g_dbus_proxy_get_path(proxy));
++			continue;
 +		}
 +
-+		dbus_message_iter_next(&dict);
-+		continue;
-+bad_type:
-+		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
-+					   "Unexpected variant type for key");
++		dbus_message_iter_get_basic(&iter, &str);
++
++		if (!strcasecmp(str, address))
++			return g_dbus_proxy_get_path(proxy);
 +	}
 +
-+	if (data->conn_handle == 0)
-+		return g_dbus_create_error(msg, DBUS_ERROR_INVALID_ARGS,
-+					   "Device not connected");
-+
-+	if (!bt_rap_set_default_settings_params(data->hci_sm, &settings))
-+		return g_dbus_create_error(msg, DBUS_ERROR_FAILED,
-+					   "Set default settings failed");
-+
-+	if (!bt_rap_set_cs_config_params(data->hci_sm, &cfg))
-+		return g_dbus_create_error(msg, DBUS_ERROR_FAILED,
-+					   "Set CS config params failed");
-+
-+	if (!bt_rap_set_cs_freq_params(data->hci_sm, &freq))
-+		return g_dbus_create_error(msg, DBUS_ERROR_FAILED,
-+					   "Set CS freq params failed");
-+
-+	/* Reflector never initiates a CS procedure locally: apply the
-+	 * settings so the controller is ready to respond to the remote
-+	 * Initiator, but do not arm a local measurement session.
-+	 */
-+	if (settings.role == 0x02)
-+		return dbus_message_new_method_return(msg);
-+
-+	if (!bt_rap_start_measurement(data->hci_sm, data->conn_handle,
-+							duration_secs))
-+		return g_dbus_create_error(msg, DBUS_ERROR_FAILED,
-+					   "Start measurement failed");
-+
-+	data->active_session.active        = true;
-+	data->active_session.duration_secs = duration_secs;
-+	data->active_session.settings      = settings;
-+	data->active_session.cfg           = cfg;
-+	data->active_session.freq          = freq;
-+
-+	return dbus_message_new_method_return(msg);
++	return NULL;
 +}
 +
-+static DBusMessage *stop_measurement(DBusConnection *conn,
-+				DBusMessage *msg, void *user_data)
++/* Find the ChannelSounding1 proxy for the device at the given object path. */
++static GDBusProxy *cs_find_proxy(const char *dev_path)
 +{
-+	struct rap_data *data = user_data;
++	GDBusProxy *proxy;
++	const char *path;
++	GList *list;
 +
-+	if (!data->active_session.active)
-+		return g_dbus_create_error(msg,
-+					"org.bluez.Error.NotConnected",
-+					"No active measurement");
-+
-+	if (!bt_rap_stop_measurement(data->hci_sm))
-+		return g_dbus_create_error(msg, DBUS_ERROR_FAILED,
-+					"Stop measurement failed");
-+
-+	memset(&data->active_session, 0, sizeof(data->active_session));
-+
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+				device_get_path(data->device),
-+				CS_INTERFACE, "Active");
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static const GDBusMethodTable cs_dbus_methods[] = {
-+	{ GDBUS_METHOD("StartMeasurement",
-+			GDBUS_ARGS({ "params", "a{sv}" }),
-+			NULL,
-+			start_measurement) },
-+	{ GDBUS_METHOD("StopMeasurement",
-+			NULL,
-+			NULL,
-+			stop_measurement) },
-+	{ }
-+};
-+
-+static gboolean cs_property_get_active(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	struct rap_data *data = user_data;
-+	dbus_bool_t active = data->active_session.active ||
-+				bt_rap_is_procedure_active(data->hci_sm);
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &active);
-+	return TRUE;
-+}
-+
-+static const GDBusPropertyTable cs_dbus_properties[] = {
-+	{ "Active", "b", cs_property_get_active, NULL, NULL, 0 },
-+	{ }
-+};
-+
-+static void rap_measurement_timeout_cb(void *user_data)
-+{
-+	struct rap_data *data = user_data;
-+
-+	memset(&data->active_session, 0, sizeof(data->active_session));
-+
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+				device_get_path(data->device),
-+				CS_INTERFACE, "Active");
-+}
-+
-+static void rap_proc_active_changed(bool active, void *user_data)
-+{
-+	struct rap_data *data = user_data;
-+
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+				device_get_path(data->device),
-+				CS_INTERFACE, "Active");
-+}
-+
- static int rap_probe(struct btd_service *service)
- {
- 	struct btd_device *device = btd_service_get_device(service);
-@@ -347,6 +659,10 @@ static void rap_remove(struct btd_service *service)
- 		return;
- 	}
- 
-+	g_dbus_unregister_interface(btd_get_dbus_connection(),
-+				    device_get_path(device),
-+				    CS_INTERFACE);
-+
- 	rap_data_remove(data);
- }
- 
-@@ -395,6 +711,11 @@ static int rap_accept(struct btd_service *service)
- 			return -EINVAL;
- 		}
- 		DBG("HCI state machine attached successfully for device");
-+
-+		bt_rap_set_timeout_cb(data->hci_sm, rap_measurement_timeout_cb,
-+					data);
-+		bt_rap_set_proc_active_cb(data->hci_sm, rap_proc_active_changed,
-+					data);
- 	}
- 
- 	if (!bt_rap_attach(data->rap, client)) {
-@@ -411,8 +732,7 @@ static int rap_accept(struct btd_service *service)
- 		if (bt_hci_get_conn_handle(data->adapter_data->hci,
- 					(const uint8_t *) bdaddr, &handle)) {
- 			DBG("Found conn handle 0x%04X for %s", handle, addr);
--			DBG("Setting up handle mapping: handle=0x%04X",
--				handle);
-+			data->conn_handle = handle;
- 			bt_rap_set_conn_hndl(data->hci_sm,
- 					data->rap, handle,
- 					(const uint8_t *) bdaddr,
-@@ -426,12 +746,33 @@ static int rap_accept(struct btd_service *service)
- 
- 	btd_service_connecting_complete(service, 0);
- 
-+	g_dbus_register_interface(btd_get_dbus_connection(),
-+				  device_get_path(data->device),
-+				  CS_INTERFACE, cs_dbus_methods,
-+				  NULL, cs_dbus_properties, data, NULL);
-+
- 	return 0;
- }
- 
- static int rap_disconnect(struct btd_service *service)
- {
--	DBG(" ");
-+	struct rap_data *data = btd_service_get_user_data(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(btd_service_get_device(service)), addr);
-+	DBG("%s", addr);
-+	if (!data) {
-+		error("RAP Service not handled by profile");
-+		return -EINVAL;
++	if (!cs_proxies) {
++		bt_shell_printf("DBG: cs_proxies is empty\n");
++		return NULL;
 +	}
 +
-+	if (data && data->hci_sm && data->conn_handle) {
-+		bt_rap_clear_conn_handle(data->hci_sm, data->conn_handle);
-+		data->conn_handle = 0;
++	for (list = g_list_first(cs_proxies); list;
++	     list = g_list_next(list)) {
++		proxy = list->data;
++		path = g_dbus_proxy_get_path(proxy);
++
++		if (!strcmp(path, dev_path))
++			return proxy;
 +	}
 +
-+	memset(&data->active_session, 0, sizeof(data->active_session));
++	return NULL;
++}
 +
- 	btd_service_disconnecting_complete(service, 0);
- 	return 0;
- }
-diff --git a/profiles/ranging/rap_hci.c b/profiles/ranging/rap_hci.c
-index 13f1365f3..e57f967a2 100644
---- a/profiles/ranging/rap_hci.c
-+++ b/profiles/ranging/rap_hci.c
-@@ -21,6 +21,8 @@
- #include "lib/bluetooth/bluetooth.h"
- #include "src/shared/util.h"
- #include "src/shared/queue.h"
-+#include "src/shared/timeout.h"
-+#include "src/shared/cs-types.h"
- #include "src/shared/rap.h"
- #include "src/shared/att.h"
- #include "src/log.h"
-@@ -60,19 +62,28 @@ _Static_assert(ARRAY_SIZE(state_names) == CS_STATE_UNSPECIFIED + 1,
- typedef void (*cs_callback_t)(uint16_t length,
- 			const void *param, void *user_data);
- 
--/* State Machine Context */
-+typedef void (*cs_timeout_func_t)(void *user_data);
-+
- struct cs_state_machine {
- 	enum cs_state current_state;
- 	enum cs_state old_state;
- 	struct bt_hci *hci;
- 	struct bt_rap *rap;
- 	struct queue *event_ids;
-+	unsigned int measurement_timeout_id;
- 	bool initiator;
- 	bool procedure_active;
- 	struct bt_rap_hci_cs_options cs_opt;  /* Per-instance CS options */
- 	uint8_t role_enable;  /* Role value for HCI commands (1, 2, or 3) */
- 	struct queue *conn_mappings;  /* Per-instance connection mappings */
-+	uint16_t active_conn_handle;  /* current measurement handle */
- 	struct timespec last_chan_class_time;  /* For 1-second rate limit */
-+	struct bt_rap_le_cs_config   cs_config;
-+	struct bt_rap_le_cs_frequency cs_frequency;
-+	cs_timeout_func_t timeout_func;
-+	void *timeout_data;
-+	void (*proc_active_func)(bool active, void *user_data);
-+	void *proc_active_data;
- };
- 
- /* Connection Handle Mapping */
-@@ -85,7 +96,83 @@ struct rap_conn_mapping {
- 	struct bt_rap *rap;
- };
- 
--/* Connection Mapping Helper Functions */
-+bool bt_rap_set_cs_config_params(void *hci_sm,
-+				 const struct bt_rap_le_cs_config *config)
++static struct cs_session *cs_find_session(GDBusProxy *proxy)
 +{
-+	struct cs_state_machine *sm = hci_sm;
++	struct cs_session *s;
++	GList *list;
 +
-+	if (!sm || !config)
++	for (list = g_list_first(cs_sessions); list;
++	     list = g_list_next(list)) {
++		s = list->data;
++
++		if (s->proxy == proxy)
++			return s;
++	}
++
++	return NULL;
++}
++
++/* ---- dict helpers ---- */
++
++static void dict_append_byte(DBusMessageIter *dict, const char *key,
++			     uint8_t val)
++{
++	DBusMessageIter entry, variant;
++
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
++					 NULL, &entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++					 DBUS_TYPE_BYTE_AS_STRING, &variant);
++	dbus_message_iter_append_basic(&variant, DBUS_TYPE_BYTE, &val);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(dict, &entry);
++}
++
++static void dict_append_uint16(DBusMessageIter *dict, const char *key,
++			       uint16_t val)
++{
++	DBusMessageIter entry, variant;
++
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
++					 NULL, &entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++					 "q", &variant);
++	dbus_message_iter_append_basic(&variant, DBUS_TYPE_UINT16, &val);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(dict, &entry);
++}
++
++static void dict_append_uint32(DBusMessageIter *dict, const char *key,
++			       uint32_t val)
++{
++	DBusMessageIter entry, variant;
++
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
++					 NULL, &entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++					 "u", &variant);
++	dbus_message_iter_append_basic(&variant, DBUS_TYPE_UINT32, &val);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(dict, &entry);
++}
++
++static void dict_append_byte_array(DBusMessageIter *dict, const char *key,
++				   const uint8_t *bytes, int len)
++{
++	DBusMessageIter entry, variant, array;
++
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
++					 NULL, &entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++					 "ay", &variant);
++	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
++					 DBUS_TYPE_BYTE_AS_STRING, &array);
++	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
++					     &bytes, len);
++	dbus_message_iter_close_container(&variant, &array);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(dict, &entry);
++}
++
++/* ---- start ---- */
++
++static uint32_t pending_duration_secs;
++static const char *pending_dev_path;
++
++static void start_measurement_setup(DBusMessageIter *iter, void *user_data)
++{
++	DBusMessageIter dict;
++	uint8_t tx = (uint8_t)cs_max_tx_power;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++					 "{sv}", &dict);
++
++	/* timing */
++	dict_append_uint32(&dict, "duration_secs", pending_duration_secs);
++
++	/* default settings */
++	dict_append_byte(&dict, "role",            cs_role);
++	dict_append_byte(&dict, "sync_ant_sel", cs_sync_ant);
++	dict_append_byte(&dict, "max_tx_power",    tx);
++
++	/* CS config */
++	dict_append_byte(&dict, "config_id",
++			 cs_cfg.config_id);
++	dict_append_byte(&dict, "main_mode_type",
++			 cs_cfg.main_mode_type);
++	dict_append_byte(&dict, "sub_mode_type",
++			 cs_cfg.sub_mode_type);
++	dict_append_byte(&dict, "main_mode_min_steps",
++			 cs_cfg.main_mode_min_steps);
++	dict_append_byte(&dict, "main_mode_max_steps",
++			 cs_cfg.main_mode_max_steps);
++	dict_append_byte(&dict, "main_mode_repetition",
++			 cs_cfg.main_mode_repetition);
++	dict_append_byte(&dict, "mode0_steps",
++			 cs_cfg.mode0_steps);
++	dict_append_byte(&dict, "rtt_types",
++			 cs_cfg.rtt_types);
++	dict_append_byte(&dict, "sync_phy",
++			 cs_cfg.cs_sync_phy);
++	dict_append_byte_array(&dict, "channel_map",
++			       cs_cfg.channel_map, 10);
++	dict_append_byte(&dict, "channel_map_repetition",
++			 cs_cfg.channel_map_repetition);
++	dict_append_byte(&dict, "channel_selection_type",
++			 cs_cfg.channel_selection_type);
++	dict_append_byte(&dict, "channel_shape",
++			 cs_cfg.channel_shape);
++	dict_append_byte(&dict, "channel_jump",
++			 cs_cfg.channel_jump);
++	dict_append_byte(&dict, "companion_signal_enable",
++			 cs_cfg.companion_signal_enable);
++
++	/* CS frequency */
++	dict_append_uint16(&dict, "max_procedure_duration",
++			   cs_freq.max_procedure_duration);
++	dict_append_uint16(&dict, "min_period_between_procedures",
++			   cs_freq.min_period_between_procedures);
++	dict_append_uint16(&dict, "max_period_between_procedures",
++			   cs_freq.max_period_between_procedures);
++	dict_append_uint16(&dict, "max_procedure_count",
++			   cs_freq.max_procedure_count);
++	dict_append_byte_array(&dict, "min_sub_event_len",
++			       cs_freq.min_sub_event_len, 3);
++	dict_append_byte_array(&dict, "max_sub_event_len",
++			       cs_freq.max_sub_event_len, 3);
++	dict_append_byte(&dict, "tone_antenna_config_selection",
++			 cs_freq.tone_antenna_config_selection);
++	dict_append_byte(&dict, "phy",
++			 cs_freq.phy);
++	dict_append_byte(&dict, "tx_power_delta",
++			 cs_freq.tx_power_delta);
++	dict_append_byte(&dict, "preferred_peer_antenna",
++			 cs_freq.preferred_peer_antenna);
++	dict_append_byte(&dict, "snr_control_initiator",
++			 cs_freq.snr_control_initiator);
++	dict_append_byte(&dict, "snr_control_reflector",
++			 cs_freq.snr_control_reflector);
++
++	dbus_message_iter_close_container(iter, &dict);
++}
++
++/* ---- cs_set_param: apply name=value to the local parameter state ---- */
++static bool parse_hex_bytes(const char *name, const char *valstr,
++					uint8_t *out, unsigned int count)
++{
++	const char *str = valstr;
++	char *endptr;
++	unsigned long uval;
++	unsigned int i = 0;
++
++	while (i < count) {
++		uval = strtoul(str, &endptr, 16);
++		if (endptr == str || uval > 0xFF) {
++			bt_shell_printf("%s: invalid byte at index %u\n",
++					name, i);
++			return false;
++		}
++		out[i++] = (uint8_t)uval;
++		if (*endptr == '\0')
++			break;
++		if (*endptr != ':') {
++			bt_shell_printf("%s: expected ':' separator\n", name);
++			return false;
++		}
++		str = endptr + 1;
++	}
++
++	if (i != count) {
++		bt_shell_printf("%s: need exactly %u colon-separated hex"
++				" bytes\n", name, count);
 +		return false;
++	}
 +
-+	sm->cs_config = *config;
 +	return true;
 +}
 +
-+bool bt_rap_set_cs_freq_params(void *hci_sm,
-+			       const struct bt_rap_le_cs_frequency *frequency)
++static const struct cs_param_desc *cs_find_param_desc(const char *name)
 +{
-+	struct cs_state_machine *sm = hci_sm;
++	size_t i;
 +
-+	if (!sm || !frequency)
++	for (i = 0; i < ARRAY_SIZE(cs_param_table); i++) {
++		if (!strcmp(cs_param_table[i].name, name))
++			return &cs_param_table[i];
++	}
++
++	return NULL;
++}
++
++static bool cs_set_param(const char *name, const char *valstr)
++{
++	const struct cs_param_desc *desc;
++	char *endptr;
++	unsigned long uval;
++	long sval;
++
++	/* Byte-array: channel_map — 10 colon-separated hex bytes */
++	if (strcmp(name, "channel_map") == 0) {
++		if (!parse_hex_bytes(name, valstr, cs_cfg.channel_map, 10))
++			return false;
++		return true;
++	}
++
++	/* Byte-array: min/max_sub_event_len — 3 colon-separated hex bytes */
++	if (strcmp(name, "min_sub_event_len") == 0)
++		return parse_hex_bytes(name, valstr,
++					cs_freq.min_sub_event_len, 3);
++	if (strcmp(name, "max_sub_event_len") == 0)
++		return parse_hex_bytes(name, valstr,
++					cs_freq.max_sub_event_len, 3);
++
++	/* max_tx_power is signed (-127 to +20 dBm) */
++	if (strcmp(name, "max_tx_power") == 0) {
++		sval = strtol(valstr, &endptr, 0);
++
++		if (*endptr != '\0' || sval < -127 || sval > 20) {
++			bt_shell_printf("max_tx_power: valid range -127"
++					" to 20 dBm\n");
++			return false;
++		}
++		cs_max_tx_power = (int8_t)sval;
++		return true;
++	}
++
++	desc = cs_find_param_desc(name);
++	if (!desc) {
++		bt_shell_printf("Unknown parameter: %s\n", name);
 +		return false;
++	}
 +
-+	sm->cs_frequency = *frequency;
++	/* All remaining parameters are unsigned */
++	uval = strtoul(valstr, &endptr, 0);
++	if (*endptr != '\0') {
++		bt_shell_printf("%s: invalid value '%s'\n", name, valstr);
++		return false;
++	}
++
++	if (desc->type == CS_PARAM_U8_RANGE &&
++			(uval < desc->min || uval > desc->max)) {
++		bt_shell_printf("%s", desc->range_error);
++		return false;
++	}
++
++	if (desc->type == CS_PARAM_U16)
++		*(uint16_t *)desc->field = (uint16_t)uval;
++	else
++		*(uint8_t *)desc->field = (uint8_t)uval;
++
 +	return true;
 +}
 +
-+bool bt_rap_set_default_settings_params(void *hci_sm,
-+			const struct bt_rap_le_cs_default_settings *settings)
++static void start_measurement_reply(DBusMessage *message, void *user_data)
 +{
-+	struct cs_state_machine *sm = hci_sm;
++	GDBusProxy *proxy = user_data;
++	struct cs_session *s;
++	DBusError error;
 +
-+	if (!sm || !settings)
-+		return false;
++	dbus_error_init(&error);
++	if (dbus_set_error_from_message(&error, message)) {
++		bt_shell_printf("StartMeasurement failed: %s\n", error.message);
++		dbus_error_free(&error);
++		return;
++	}
 +
-+	sm->role_enable            = settings->role;
-+	sm->cs_opt.role            = settings->role;
-+	sm->cs_opt.cs_sync_ant_sel = settings->cs_sync_ant_sel;
-+	sm->cs_opt.max_tx_power    = settings->max_tx_power;
-+	return true;
++	if (cs_role == 0x02) {
++		bt_shell_printf("Default settings applied on %s;"
++				" Reflector role does not start a local"
++				" measurement\n",
++				g_dbus_proxy_get_path(proxy));
++		return;
++	}
++
++	s = g_new0(struct cs_session, 1);
++	s->proxy    = proxy;
++	cs_sessions = g_list_append(cs_sessions, s);
++
++	bt_shell_printf("Measurement started on %s\n",
++			g_dbus_proxy_get_path(proxy));
 +}
 +
-+bool bt_rap_get_cs_config_params(void *hci_sm,
-+				 struct bt_rap_le_cs_config *config)
++static void cs_print_role_hint(uint8_t role)
 +{
-+	struct cs_state_machine *sm = hci_sm;
-+
-+	if (!sm || !config)
-+		return false;
-+
-+	*config = sm->cs_config;
-+	return true;
++	if (role == 0x02)
++		bt_shell_printf("Note: Reflector role only uses"
++				" role/cs_sync_ant_sel/max_tx_power;"
++				" other CS config/frequency parameters"
++				" are ignored.\n");
++	else
++		bt_shell_printf("Note: Initiator role requires dev_addr"
++				" and duration_secs; CS config/frequency"
++				" parameters configure the measurement"
++				" procedure.\n");
 +}
 +
-+bool bt_rap_get_cs_freq_params(void *hci_sm,
-+			       struct bt_rap_le_cs_frequency *frequency)
-+{
-+	struct cs_state_machine *sm = hci_sm;
-+
-+	if (!sm || !frequency)
-+		return false;
-+
-+	*frequency = sm->cs_frequency;
-+	return true;
-+}
-+
-+bool bt_rap_get_default_settings_params(void *hci_sm,
-+			struct bt_rap_le_cs_default_settings *settings)
-+{
-+	struct cs_state_machine *sm = hci_sm;
-+
-+	if (!sm || !settings)
-+		return false;
-+
-+	settings->role            = sm->cs_opt.role;
-+	settings->cs_sync_ant_sel = sm->cs_opt.cs_sync_ant_sel;
-+	settings->max_tx_power    = sm->cs_opt.max_tx_power;
-+	return true;
-+}
-+
- static void mapping_free(void *data)
- {
- 	struct rap_conn_mapping *mapping = data;
-@@ -173,6 +260,11 @@ static void cs_state_machine_init(struct cs_state_machine *sm,
- 				uint8_t role, uint8_t cs_sync_ant_sel,
- 				int8_t max_tx_power)
- {
-+	static const uint8_t ch_map[10] = {
-+		0xFC, 0xFF, 0x7F, 0xFC, 0xFF,
-+		0xFF, 0xFF, 0xFF, 0xFF, 0x1F
-+	};
-+
- 	if (!sm)
- 		return;
- 
-@@ -185,15 +277,44 @@ static void cs_state_machine_init(struct cs_state_machine *sm,
- 
- 	/* Store role_enable for HCI commands (1, 2, or 3 from config) */
- 	sm->role_enable = role;
--
--	/* Initialize per-instance CS options
--	 * Note: cs_opt.role will be overwritten with actual role (0x00 or 0x01)
--	 * from config complete event, but role_enable preserves the HCI value
--	 */
--	sm->cs_opt.role = role;
-+	sm->cs_opt.role            = role;
- 	sm->cs_opt.cs_sync_ant_sel = cs_sync_ant_sel;
--	sm->cs_opt.max_tx_power = max_tx_power;
--	sm->cs_opt.rtt_type = 0;  /* Will be set from config complete event */
-+	sm->cs_opt.max_tx_power    = max_tx_power;
-+	sm->cs_opt.rtt_type        = 0;
-+
-+	sm->cs_config.config_id              = 0;
-+	sm->cs_config.main_mode_type         = 0x01;
-+	sm->cs_config.sub_mode_type          = 0xFF;
-+	sm->cs_config.main_mode_min_steps    = 0x02;
-+	sm->cs_config.main_mode_max_steps    = 0x03;
-+	sm->cs_config.main_mode_repetition   = 0x01;
-+	sm->cs_config.mode0_steps            = 0x02;
-+	sm->cs_config.role                   = 0x00;
-+	sm->cs_config.rtt_types              = 0x00;
-+	sm->cs_config.cs_sync_phy            = 0x01;
-+	memcpy(sm->cs_config.channel_map, ch_map, 10);
-+	sm->cs_config.channel_map_repetition = 0x01;
-+	sm->cs_config.channel_selection_type = 0x00;
-+	sm->cs_config.channel_shape          = 0x00;
-+	sm->cs_config.channel_jump           = 0x02;
-+	sm->cs_config.companion_signal_enable = 0x00;
-+
-+	sm->cs_frequency.max_procedure_duration        = 0x0640;
-+	sm->cs_frequency.min_period_between_procedures = 0x001E;
-+	sm->cs_frequency.max_period_between_procedures = 0x0096;
-+	sm->cs_frequency.max_procedure_count           = 0x0000;
-+	sm->cs_frequency.min_sub_event_len[0]          = 0x00;
-+	sm->cs_frequency.min_sub_event_len[1]          = 0x20;
-+	sm->cs_frequency.min_sub_event_len[2]          = 0x00;
-+	sm->cs_frequency.max_sub_event_len[0]          = 0x03;
-+	sm->cs_frequency.max_sub_event_len[1]          = 0x20;
-+	sm->cs_frequency.max_sub_event_len[2]          = 0x00;
-+	sm->cs_frequency.tone_antenna_config_selection = 0x07;
-+	sm->cs_frequency.phy                           = 0x01;
-+	sm->cs_frequency.tx_power_delta                = 0x80;
-+	sm->cs_frequency.preferred_peer_antenna        = 0x03;
-+	sm->cs_frequency.snr_control_initiator         = 0xFF;
-+	sm->cs_frequency.snr_control_reflector         = 0xFF;
- }
- 
- /* State Transition Logic */
-@@ -228,7 +349,15 @@ static enum cs_state cs_get_current_state(struct cs_state_machine *sm)
- 
- static bool is_initiator_role(const struct cs_state_machine *sm)
- {
--	return sm->role_enable == 0x01 || sm->role_enable == 0x03;
-+	return sm->role_enable == 0x01;
-+}
-+
-+/* For role_enable=0x03 (Both), Central acts as Initiator and Peripheral as
-+ * Reflector — the link layer topology determines the CS role assignment.
++/* Generic handler for the per-parameter set commands (cs.role,
++ * cs.main_mode_type, ...); argv[0] is the parameter name (the command
++ * itself), argv[1] is the value.
 + */
-+static bool is_both_role(const struct cs_state_machine *sm)
++static void cmd_cs_set(int argc, char *argv[])
 +{
-+	return sm->role_enable == 0x03;
- }
- 
- /* Helper function to send read remote capabilities for all connections */
-@@ -262,20 +391,6 @@ static bool bt_rap_read_remote_supported_capabilities(void *hci_sm,
- 	return true;
- }
- 
--/* Helper function to send read remote capabilities for all connections */
--static void send_read_remote_cap_for_mapping(void *data, void *user_data)
--{
--	struct rap_conn_mapping *mapping = data;
--	struct cs_state_machine *sm = user_data;
--
--	if (!mapping || !sm)
--		return;
--
--	DBG("Sending read remote capabilities for handle 0x%04X",
--		mapping->handle);
--	bt_rap_read_remote_supported_capabilities(sm, mapping->handle);
--}
--
- /* HCI Event Callbacks */
- static void rap_rd_loc_supp_cap_done_cb(const void *data, uint8_t size,
- 					void *user_data)
-@@ -324,12 +439,9 @@ static void rap_rd_loc_supp_cap_done_cb(const void *data, uint8_t size,
- 	/* Transition to INIT state before reading remote capabilities */
- 	cs_set_state(sm, CS_STATE_INIT);
- 
--	/* Send read remote capabilities for all connected devices */
--	if (sm->conn_mappings) {
--		DBG("Sending read remote capabilities for all connections");
--		queue_foreach(sm->conn_mappings,
--				send_read_remote_cap_for_mapping, sm);
--	}
-+	DBG("Sending read remote capabilities for handle 0x%04X",
-+		sm->active_conn_handle);
-+	bt_rap_read_remote_supported_capabilities(sm, sm->active_conn_handle);
- }
- 
- static void rap_send_hci_cs_create_config_command(struct cs_state_machine *sm,
-@@ -338,11 +450,6 @@ static void rap_send_hci_cs_create_config_command(struct cs_state_machine *sm,
- 	struct bt_hci_cmd_le_cs_create_config cmd;
- 	unsigned int status;
- 
--	uint8_t channel_map[10] = {
--		0xFC, 0xFF, 0x7F, 0xFC, 0xFF,
--		0xFF, 0xFF, 0xFF, 0xFF, 0x1F
--	};
--
- 	if (!sm || !sm->hci) {
- 		error("CS Create Config: sm or hci is null");
- 		return;
-@@ -352,23 +459,23 @@ static void rap_send_hci_cs_create_config_command(struct cs_state_machine *sm,
- 
- 	memset(&cmd, 0, sizeof(cmd));
- 	cmd.handle = cpu_to_le16(handle);
--	cmd.create_context = 1;
--	/* Default values, will change to pick user given values later */
--	cmd.config_id              = 0x00;
--	cmd.main_mode_type         = 0x01;
--	cmd.sub_mode_type          = 0xFF;
--	cmd.min_main_mode_steps    = 0x02;
--	cmd.max_main_mode_steps    = 0x03;
--	cmd.main_mode_repetition   = 0x01;
--	cmd.mode_0_steps           = 0x02;
--	cmd.role                   = 0x00;
--	cmd.rtt_type               = 0x00;
--	cmd.cs_sync_phy            = 0x01;
--	memcpy(cmd.channel_map, channel_map, 10);
--	cmd.channel_map_repetition = 0x01;
--	cmd.channel_selection_type = 0x00;
--	cmd.ch3c_shape             = 0x00;
--	cmd.ch3c_jump              = 0x02;
-+	cmd.create_context = 0x01; /* Initiates cs config procedure */
++	if (argc < 2) {
++		bt_shell_printf("Usage: %s <value>\n", argv[0]);
++		return;
++	}
 +
-+	cmd.config_id              = sm->cs_config.config_id;
-+	cmd.main_mode_type         = sm->cs_config.main_mode_type;
-+	cmd.sub_mode_type          = sm->cs_config.sub_mode_type;
-+	cmd.min_main_mode_steps    = sm->cs_config.main_mode_min_steps;
-+	cmd.max_main_mode_steps    = sm->cs_config.main_mode_max_steps;
-+	cmd.main_mode_repetition   = sm->cs_config.main_mode_repetition;
-+	cmd.mode_0_steps           = sm->cs_config.mode0_steps;
-+	cmd.role                   = sm->cs_config.role;
-+	cmd.rtt_type               = sm->cs_config.rtt_types;
-+	cmd.cs_sync_phy            = sm->cs_config.cs_sync_phy;
-+	memcpy(cmd.channel_map, sm->cs_config.channel_map, 10);
-+	cmd.channel_map_repetition = sm->cs_config.channel_map_repetition;
-+	cmd.channel_selection_type = sm->cs_config.channel_selection_type;
-+	cmd.ch3c_shape             = sm->cs_config.channel_shape;
-+	cmd.ch3c_jump              = sm->cs_config.channel_jump;
- 	cmd.reserved               = 0x00;
++	if (!cs_set_param(argv[0], argv[1]))
++		return;
++
++	if (!strcmp(argv[0], "role"))
++		cs_print_role_hint(cs_role);
++}
++
++/* Tab completion for params whose only legal values are a small fixed
++ * enum, so users don't need to consult documentation to know what's
++ * valid.
++ */
++static char *cs_value_generator(const char *text, int state,
++					const char * const values[])
++{
++	static unsigned int index, len;
++	const char *value;
++
++	if (!state) {
++		index = 0;
++		len = strlen(text);
++	}
++
++	while ((value = values[index])) {
++		index++;
++
++		if (!strncmp(value, text, len))
++			return strdup(value);
++	}
++
++	return NULL;
++}
++
++static const char * const cs_role_values[] = { "0x01", "0x02", "0x03", NULL };
++
++static char *cs_role_generator(const char *text, int state)
++{
++	return cs_value_generator(text, state, cs_role_values);
++}
++
++static const char * const cs_main_mode_type_values[] = { "1", "2", "3", NULL };
++
++static char *cs_main_mode_type_generator(const char *text, int state)
++{
++	return cs_value_generator(text, state, cs_main_mode_type_values);
++}
++
++static const char * const cs_phy_values[] = { "0x01", "0x02", NULL };
++
++static char *cs_phy_generator(const char *text, int state)
++{
++	return cs_value_generator(text, state, cs_phy_values);
++}
++
++static const char * const cs_bool_values[] = { "0", "1", NULL };
++
++static char *cs_bool_generator(const char *text, int state)
++{
++	return cs_value_generator(text, state, cs_bool_values);
++}
++
++static const char * const cs_sub_mode_type_values[] = { "0x01", "0x02",
++							"0x03", "0xFF", NULL };
++
++static char *cs_sub_mode_type_generator(const char *text, int state)
++{
++	return cs_value_generator(text, state, cs_sub_mode_type_values);
++}
++
++static void cmd_cs_start(int argc, char *argv[])
++{
++	GDBusProxy *proxy;
++	char *endptr;
++	unsigned long val;
++
++	pending_duration_secs = 0;
++	pending_dev_path = NULL;
++
++	if (argc >= 2) {
++		pending_dev_path = cs_resolve_address(argv[1]);
++		if (!pending_dev_path) {
++			bt_shell_printf("Device %s not found\n", argv[1]);
++			return;
++		}
++	}
++
++	if (argc >= 3) {
++		val = strtoul(argv[2], &endptr, 0);
++
++		if (*endptr != '\0') {
++			bt_shell_printf("Invalid duration: %s\n", argv[2]);
++			return;
++		}
++		pending_duration_secs = (uint32_t)val;
++	}
++
++	if (argc > 3) {
++		bt_shell_printf("Too many arguments\n");
++		return;
++	}
++
++	cs_print_role_hint(cs_role);
++
++	if (pending_dev_path) {
++		proxy = cs_find_proxy(pending_dev_path);
++		if (!proxy) {
++			bt_shell_printf("No ChannelSounding1 interface for"
++					" that device\n");
++			return;
++		}
++	} else {
++		if (!cs_proxies) {
++			bt_shell_printf("No ChannelSounding1 interface"
++					" available\n");
++			return;
++		}
++		proxy = cs_proxies->data;
++	}
++
++	if (cs_find_session(proxy)) {
++		bt_shell_printf("Measurement already active on %s\n",
++				g_dbus_proxy_get_path(proxy));
++		return;
++	}
++
++	if (!g_dbus_proxy_method_call(proxy, "StartMeasurement",
++				      start_measurement_setup,
++				      start_measurement_reply, proxy, NULL))
++		bt_shell_printf("Failed to send StartMeasurement\n");
++}
++
++/* ---- stop ---- */
++
++static void stop_measurement_reply(DBusMessage *message, void *user_data)
++{
++	struct cs_session *s = user_data;
++	DBusError error;
++
++	dbus_error_init(&error);
++	if (dbus_set_error_from_message(&error, message)) {
++		bt_shell_printf("StopMeasurement failed: %s\n", error.message);
++		dbus_error_free(&error);
++		return;
++	}
++
++	bt_shell_printf("Measurement stopped on %s\n",
++			g_dbus_proxy_get_path(s->proxy));
++	cs_sessions = g_list_remove(cs_sessions, s);
++	g_free(s);
++}
++
++static void cmd_cs_stop(int argc, char *argv[])
++{
++	const char *dev_path;
++	struct cs_session *s;
++	GDBusProxy *proxy;
++
++	if (argc >= 2) {
++		dev_path = cs_resolve_address(argv[1]);
++
++		if (!dev_path) {
++			bt_shell_printf("Device %s not found\n", argv[1]);
++			return;
++		}
++		proxy = cs_find_proxy(dev_path);
++		if (!proxy) {
++			bt_shell_printf("No ChannelSounding1 interface for"
++					" that device\n");
++			return;
++		}
++		s = cs_find_session(proxy);
++		if (!s) {
++			bt_shell_printf("No active measurement on %s\n",
++					argv[1]);
++			return;
++		}
++	} else {
++		if (!cs_sessions) {
++			bt_shell_printf("No active measurements\n");
++			return;
++		}
++		if (g_list_length(cs_sessions) > 1) {
++			bt_shell_printf("Multiple active measurements —"
++					" specify device address\n");
++			return;
++		}
++		s = cs_sessions->data;
++	}
++
++	if (!g_dbus_proxy_method_call(s->proxy, "StopMeasurement",
++				      NULL,
++				      stop_measurement_reply, s, NULL))
++		bt_shell_printf("Failed to send StopMeasurement\n");
++}
++
++/* ---- show ---- */
++
++static void cmd_cs_show(int argc, char *argv[])
++{
++	struct cs_session *s;
++	size_t j;
++	GList *list;
++
++	bt_shell_printf("Active measurements:\n");
++	if (!cs_sessions) {
++		bt_shell_printf("  none\n");
++	} else {
++		for (list = g_list_first(cs_sessions); list;
++		     list = g_list_next(list)) {
++			s = list->data;
++
++			bt_shell_printf("  %s\n",
++					g_dbus_proxy_get_path(s->proxy));
++		}
++	}
++
++	bt_shell_printf("\n=== Default Settings ===\n");
++	bt_shell_printf("  role           : %u"
++			" (1=Initiator 2=Reflector 3=Both)\n", cs_role);
++	bt_shell_printf("  sync_ant_sel   : 0x%02x\n", cs_sync_ant);
++	bt_shell_printf("  max_tx_power   : %d dBm\n", cs_max_tx_power);
++
++	bt_shell_printf("\n=== CS Config Params ===\n");
++	bt_shell_printf("  config_id               : %u\n",
++			cs_cfg.config_id);
++	bt_shell_printf("  main_mode_type          : 0x%02x\n",
++			cs_cfg.main_mode_type);
++	bt_shell_printf("  sub_mode_type           : 0x%02x\n",
++			cs_cfg.sub_mode_type);
++	bt_shell_printf("  main_mode_min_steps     : %u\n",
++			cs_cfg.main_mode_min_steps);
++	bt_shell_printf("  main_mode_max_steps     : %u\n",
++			cs_cfg.main_mode_max_steps);
++	bt_shell_printf("  main_mode_repetition    : %u\n",
++			cs_cfg.main_mode_repetition);
++	bt_shell_printf("  mode0_steps             : %u\n",
++			cs_cfg.mode0_steps);
++	bt_shell_printf("  configured role         : %u\n",
++			cs_cfg.role);
++	bt_shell_printf("  rtt_types               : %u\n",
++			cs_cfg.rtt_types);
++	bt_shell_printf("  sync_phy                : %u\n",
++			cs_cfg.cs_sync_phy);
++	bt_shell_printf("  channel_map             :");
++	for (j = 0; j < 10; j++)
++		bt_shell_printf(" %02x", cs_cfg.channel_map[j]);
++	bt_shell_printf("\n");
++	bt_shell_printf("  channel_map_repetition  : %u\n",
++			cs_cfg.channel_map_repetition);
++	bt_shell_printf("  channel_selection_type  : %u\n",
++			cs_cfg.channel_selection_type);
++	bt_shell_printf("  channel_shape           : %u\n",
++			cs_cfg.channel_shape);
++	bt_shell_printf("  channel_jump            : %u\n",
++			cs_cfg.channel_jump);
++	bt_shell_printf("  companion_signal_enable : %u\n",
++			cs_cfg.companion_signal_enable);
++
++	bt_shell_printf("\n=== CS Frequency Params ===\n");
++	bt_shell_printf("  max_procedure_duration        : %u\n",
++			cs_freq.max_procedure_duration);
++	bt_shell_printf("  min_period_between_procedures : %u\n",
++			cs_freq.min_period_between_procedures);
++	bt_shell_printf("  max_period_between_procedures : %u\n",
++			cs_freq.max_period_between_procedures);
++	bt_shell_printf("  max_procedure_count           : %u\n",
++			cs_freq.max_procedure_count);
++	bt_shell_printf("  min_sub_event_len             : %02x %02x %02x\n",
++			cs_freq.min_sub_event_len[0],
++			cs_freq.min_sub_event_len[1],
++			cs_freq.min_sub_event_len[2]);
++	bt_shell_printf("  max_sub_event_len             : %02x %02x %02x\n",
++			cs_freq.max_sub_event_len[0],
++			cs_freq.max_sub_event_len[1],
++			cs_freq.max_sub_event_len[2]);
++	bt_shell_printf("  tone_antenna_config_selection : 0x%02x\n",
++			cs_freq.tone_antenna_config_selection);
++	bt_shell_printf("  phy                           : 0x%02x\n",
++			cs_freq.phy);
++	bt_shell_printf("  tx_power_delta                : 0x%02x\n",
++			cs_freq.tx_power_delta);
++	bt_shell_printf("  preferred_peer_antenna        : 0x%02x\n",
++			cs_freq.preferred_peer_antenna);
++	bt_shell_printf("  snr_control_initiator         : 0x%02x\n",
++			cs_freq.snr_control_initiator);
++	bt_shell_printf("  snr_control_reflector         : 0x%02x\n",
++			cs_freq.snr_control_reflector);
++}
++
++static const struct bt_shell_menu cs_menu = {
++	.name = "cs",
++	.desc = "Channel Sounding Submenu",
++	.entries = {
++	{ "start",  "[dev_addr] [duration_secs]",
++				cmd_cs_start,
++				"Start distance measurement using the"
++				" current parameters (see cs.<param>"
++				" commands below).\n"
++				"\t\t\t\t\t\tInitiator (role 0x01/0x03): requires"
++				" dev_addr and duration_secs.\n"
++				"\t\t\t\t\t\tReflector (role 0x02): dev_addr/"
++				"duration_secs are ignored, and no local"
++				" measurement is started.",
++				NULL },
++	{ "stop",   "[dev_addr]",
++				cmd_cs_stop,
++				"Stop the active distance measurement;"
++				" address required when multiple are active" },
++	{ "show",   NULL,
++				cmd_cs_show,
++				"Show active session id and current"
++				" CS parameters" },
++	{ "role", "<0x01|0x02|0x03>", cmd_cs_set,
++				"CS role: 0x01 Initiator, 0x02 Reflector,"
++				" 0x03 Both (default 0x03)",
++				cs_role_generator },
++	{ "sync_ant_sel", "<value>", cmd_cs_set,
++				"CS sync antenna selection; 0xFE/0xFF"
++				" reserved (default 0xFF)" },
++	{ "max_tx_power", "<-127..20>", cmd_cs_set,
++				"Max TX power in dBm, signed (default 20)" },
++	{ "config_id", "<value>", cmd_cs_set,
++				"CS configuration identifier (default 0)" },
++	{ "main_mode_type", "<1|2|3>", cmd_cs_set,
++				"1 Mode 1 (RTT), 2 Mode 2 (PBR), 3 Both"
++				" (default 1)",
++				cs_main_mode_type_generator },
++	{ "sub_mode_type", "<0x01|0x02|0x03|0xFF>", cmd_cs_set,
++				"Sub-mode within main mode; 0xFF = unused"
++				" (default 0xFF)",
++				cs_sub_mode_type_generator },
++	{ "main_mode_min_steps", "<value>", cmd_cs_set,
++				"Min CS main mode steps per subevent"
++				" (default 2)" },
++	{ "main_mode_max_steps", "<value>", cmd_cs_set,
++				"Max CS main mode steps per subevent"
++				" (default 3)" },
++	{ "main_mode_repetition", "<value>", cmd_cs_set,
++				"Times main mode steps are repeated in a"
++				" subevent (default 1)" },
++	{ "mode0_steps", "<value>", cmd_cs_set,
++				"CS Mode 0 steps at the beginning of each"
++				" subevent (default 2)" },
++	{ "rtt_types", "<value>", cmd_cs_set,
++				"RTT measurement types bitmask (default 0)" },
++	{ "sync_phy", "<0x01|0x02>", cmd_cs_set,
++				"PHY for CS sync: 0x01 LE 1M, 0x02 LE 2M"
++				" (default 0x01)",
++				cs_phy_generator },
++	{ "channel_map", "<10 colon-separated hex bytes>", cmd_cs_set,
++				"10-byte channel map bitmap"
++				" (default FC:FF:7F:FC:FF:FF:FF:FF:FF:1F)" },
++	{ "channel_map_repetition", "<value>", cmd_cs_set,
++				"Consecutive repetitions of the channel map"
++				" (default 1)" },
++	{ "channel_selection_type", "<value>", cmd_cs_set,
++				"CS channel selection algorithm (default 0)" },
++	{ "channel_shape", "<value>", cmd_cs_set,
++				"Shape used in channel selection algorithm"
++				" (default 0)" },
++	{ "channel_jump", "<value>", cmd_cs_set,
++				"Channel jump size (default 2)" },
++	{ "companion_signal_enable", "<0|1>", cmd_cs_set,
++				"1 to transmit companion signal, 0 to disable"
++				" (default 0)",
++				cs_bool_generator },
++	{ "min_sub_event_len", "<3 colon-separated hex bytes>", cmd_cs_set,
++				"Min CS subevent length, 3-byte LE"
++				" (default 00:20:00)" },
++	{ "max_sub_event_len", "<3 colon-separated hex bytes>", cmd_cs_set,
++				"Max CS subevent length, 3-byte LE"
++				" (default 03:20:00)" },
++	{ "max_procedure_duration", "<value>", cmd_cs_set,
++				"Maximum duration of one CS measurement"
++				" procedure (default 1600)" },
++	{ "min_period_between_procedures", "<value>", cmd_cs_set,
++				"Minimum time between consecutive procedures"
++				" (default 30)" },
++	{ "max_period_between_procedures", "<value>", cmd_cs_set,
++				"Maximum time between consecutive procedures"
++				" (default 150)" },
++	{ "max_procedure_count", "<value>", cmd_cs_set,
++				"Max number of procedures; 0 = no limit"
++				" (default 0)" },
++	{ "tone_antenna_config_selection", "<value>", cmd_cs_set,
++				"Antenna config for CS tone exchanges"
++				" (default 0x07)" },
++	{ "phy", "<0x01|0x02>", cmd_cs_set,
++				"PHY for CS procedures: 0x01 LE 1M, 0x02 LE 2M"
++				" (default 0x01)",
++				cs_phy_generator },
++	{ "tx_power_delta", "<value>", cmd_cs_set,
++				"Remote vs local TX power delta; 0x80 = not"
++				" applicable (default 0x80)" },
++	{ "preferred_peer_antenna", "<value>", cmd_cs_set,
++				"Preferred antenna for the peer device"
++				" (default 0x03)" },
++	{ "snr_control_initiator", "<value>", cmd_cs_set,
++				"SNR control for initiator; 0xFF = no"
++				" preference (default 0xFF)" },
++	{ "snr_control_reflector", "<value>", cmd_cs_set,
++				"SNR control for reflector; 0xFF = no"
++				" preference (default 0xFF)" },
++	{ NULL } },
++};
++
++void cs_add_submenu(void)
++{
++	bt_shell_add_submenu(&cs_menu);
++}
++
++void cs_remove_submenu(void)
++{
++	g_list_free_full(cs_sessions, g_free);
++	cs_sessions = NULL;
++
++	while (cs_watches) {
++		struct cs_watch *w = cs_watches->data;
++
++		g_dbus_remove_watch(dbus_conn, w->watch_id);
++		cs_watches = g_list_remove(cs_watches, w);
++		g_free(w);
++	}
++
++	g_list_free(cs_proxies);
++	cs_proxies = NULL;
++}
+diff --git a/client/cs.h b/client/cs.h
+new file mode 100644
+index 000000000..8902c8143
+--- /dev/null
++++ b/client/cs.h
+@@ -0,0 +1,18 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
++ */
++
++#include "gdbus/gdbus.h"
++
++void cs_add_submenu(void);
++void cs_remove_submenu(void);
++
++void cs_proxy_added(GDBusProxy *proxy);
++void cs_proxy_removed(GDBusProxy *proxy);
++void cs_device_disconnected(const char *dev_path);
++void cs_measurement_started(GDBusProxy *proxy);
++void cs_measurement_stopped(GDBusProxy *proxy);
++void cs_set_device_list(GList **devices);
+diff --git a/client/main.c b/client/main.c
+index 9d9ac8b14..b5cad8afc 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -39,6 +39,7 @@
+ #include "assistant.h"
+ #include "hci.h"
+ #include "telephony.h"
++#include "cs.h"
  
- 	status = bt_hci_send(sm->hci, BT_HCI_CMD_LE_CS_CREATE_CONFIG,
-@@ -388,6 +495,7 @@ static void rap_def_settings_done_cb(const void *data, uint8_t size,
- {
- 	const struct bt_hci_rsp_le_cs_set_def_settings *rp;
- 	struct cs_state_machine *sm = user_data;
-+	struct rap_conn_mapping *m;
+ /* String display constants */
+ #define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
+@@ -124,6 +125,7 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
+ 	battery_proxies = NULL;
  
- 	if (!sm || !data || size < sizeof(*rp))
- 		return;
-@@ -403,14 +511,24 @@ static void rap_def_settings_done_cb(const void *data, uint8_t size,
+ 	default_ctrl = NULL;
++	cs_set_device_list(NULL);
+ }
+ 
+ static void print_adapter(GDBusProxy *proxy, const char *description)
+@@ -391,8 +393,10 @@ static struct adapter *adapter_new(GDBusProxy *proxy)
+ 
+ 	ctrl_list = g_list_append(ctrl_list, adapter);
+ 
+-	if (!default_ctrl)
++	if (!default_ctrl) {
+ 		default_ctrl = adapter;
++		cs_set_device_list(&adapter->devices);
++	}
+ 
+ 	return adapter;
+ }
+@@ -525,6 +529,8 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ 		bearer_added(proxy);
+ 	} else if (!strcmp(interface, "org.bluez.Bearer.LE1")) {
+ 		bearer_added(proxy);
++	} else if (!strcmp(interface, "org.bluez.ChannelSounding1")) {
++		cs_proxy_added(proxy);
  	}
+ }
  
- 	if (rp->status == 0) {
--		/* Success - proceed to configuration */
- 		cs_set_state(sm, CS_STATE_WAIT_CONFIG_CMPLT);
+@@ -656,6 +662,8 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+ 		bearer_removed(proxy);
+ 	} else if (!strcmp(interface, "org.bluez.Bearer.LE1")) {
+ 		bearer_removed(proxy);
++	} else if (!strcmp(interface, "org.bluez.ChannelSounding1")) {
++		cs_proxy_removed(proxy);
+ 	}
+ }
  
--		/* If role is initiator, send CS Create Config command */
--		if (is_initiator_role(sm))
-+		/* Send CS Create Config if we are (or will act as) Initiator.
-+		 * For role_enable=Both, Central acts as Initiator.
-+		 */
-+		if (is_initiator_role(sm)) {
- 			rap_send_hci_cs_create_config_command(sm, rp->handle);
--		else
-+		} else if (is_both_role(sm)) {
-+			m = find_mapping_by_handle(sm, rp->handle);
+@@ -729,6 +737,10 @@ static void property_changed(GDBusProxy *proxy, const char *name,
+ 				else if (!connected && default_dev == proxy)
+ 					set_default_device(NULL, NULL);
+ 
++				if (!connected)
++					cs_device_disconnected(
++						g_dbus_proxy_get_path(proxy));
 +
-+			if (m && m->is_central)
-+				rap_send_hci_cs_create_config_command(sm,
-+								rp->handle);
+ 				/* If the device is connected and the filter
+ 				 * is auto_connect and it matches the pattern,
+ 				 * stop discovery.
+@@ -821,6 +833,16 @@ static void property_changed(GDBusProxy *proxy, const char *name,
+ 			print_iter(str, name, iter);
+ 			g_free(str);
+ 		}
++	} else if (!strcmp(interface, "org.bluez.ChannelSounding1")) {
++		if (!strcmp(name, "Active")) {
++			dbus_bool_t active;
++
++			dbus_message_iter_get_basic(iter, &active);
++			if (active)
++				cs_measurement_started(proxy);
 +			else
-+				DBG("Both role: Wait for CS Config Cmpl");
-+		} else {
- 			DBG("Reflector role: Waiting for CS Config Completed");
++				cs_measurement_stopped(proxy);
 +		}
- 	} else {
- 		/* Error - transition to stopped */
- 		error("CS Set default setting failed with status 0x%02X",
-@@ -434,7 +552,7 @@ static void rap_send_hci_cs_remove_config_command(struct cs_state_machine *sm,
- 
- 	memset(&cmd, 0, sizeof(cmd));
- 	cmd.handle = cpu_to_le16(handle);
--	cmd.config_id = 0x00;  /* Default config ID */
-+	cmd.config_id = sm->cs_config.config_id;
- 
- 	status = bt_hci_send(sm->hci, BT_HCI_CMD_LE_CS_REMOVE_CONFIG,
- 				&cmd, sizeof(cmd), NULL, sm, NULL);
-@@ -481,13 +599,6 @@ static bool rap_send_hci_cs_set_procedure_parameters(
- {
- 	struct bt_hci_cmd_le_cs_set_proc_params cmd;
- 	unsigned int status;
--	uint8_t min_sub_event_len[3] = {
--		0x00, 0x20, 0x00
--	};
--
--	uint8_t max_sub_event_len[3] = {
--		0x03, 0x20, 0x00
--	};
- 
- 	if (!sm || !sm->hci) {
- 		error("CS Set Procedure Parameters: sm or hci is null");
-@@ -498,20 +609,25 @@ static bool rap_send_hci_cs_set_procedure_parameters(
- 
- 	memset(&cmd, 0, sizeof(cmd));
- 	cmd.handle = cpu_to_le16(handle);
--	/* Default values, will change to pick user given values later */
--	cmd.config_id = 0x00;
--	cmd.max_procedure_len = 0x0640;
--	cmd.min_procedure_interval = 0x1E;
--	cmd.max_procedure_interval = 0x96;
--	cmd.max_procedure_count = 0x00;
--	memcpy(cmd.min_subevent_len, min_sub_event_len, 3);
--	memcpy(cmd.max_subevent_len, max_sub_event_len, 3);
--	cmd.tone_antenna_config_selection = 0x07;
--	cmd.phy                    = 0x01;
--	cmd.tx_power_delta         = 0x80;
--	cmd.preferred_peer_antenna = 0x03;
--	cmd.snr_control_initiator  = 0xFF;
--	cmd.snr_control_reflector  = 0xFF;
-+
-+	cmd.config_id = sm->cs_config.config_id;
-+	cmd.max_procedure_len =
-+		cpu_to_le16(sm->cs_frequency.max_procedure_duration);
-+	cmd.min_procedure_interval =
-+		cpu_to_le16(sm->cs_frequency.min_period_between_procedures);
-+	cmd.max_procedure_interval =
-+		cpu_to_le16(sm->cs_frequency.max_period_between_procedures);
-+	cmd.max_procedure_count =
-+		cpu_to_le16(sm->cs_frequency.max_procedure_count);
-+	memcpy(cmd.min_subevent_len, sm->cs_frequency.min_sub_event_len, 3);
-+	memcpy(cmd.max_subevent_len, sm->cs_frequency.max_sub_event_len, 3);
-+	cmd.tone_antenna_config_selection =
-+		sm->cs_frequency.tone_antenna_config_selection;
-+	cmd.phy                    = sm->cs_frequency.phy;
-+	cmd.tx_power_delta         = sm->cs_frequency.tx_power_delta;
-+	cmd.preferred_peer_antenna = sm->cs_frequency.preferred_peer_antenna;
-+	cmd.snr_control_initiator  = sm->cs_frequency.snr_control_initiator;
-+	cmd.snr_control_reflector  = sm->cs_frequency.snr_control_reflector;
- 
- 	status = bt_hci_send(sm->hci, BT_HCI_CMD_LE_CS_SET_PROC_PARAMS,
- 				&cmd, sizeof(cmd), NULL, sm, NULL);
-@@ -541,7 +657,7 @@ static bool rap_send_hci_cs_procedure_enable(struct cs_state_machine *sm,
- 
- 	memset(&cmd, 0, sizeof(cmd));
- 	cmd.handle = cpu_to_le16(handle);
--	cmd.config_id = 0x00; /* Default config Id */
-+	cmd.config_id = sm->cs_config.config_id;
- 	cmd.enable = enable_proc ? 0x01 : 0x00;
- 
- 	status = bt_hci_send(sm->hci, BT_HCI_CMD_LE_CS_PROC_ENABLE,
-@@ -591,6 +707,8 @@ static void rap_rd_rem_fae_cmplt_evt(const void *data, uint8_t size,
- {
- 	struct cs_state_machine *sm = (struct cs_state_machine *) user_data;
- 	const struct bt_hci_evt_le_cs_rd_rem_fae_complete *evt;
-+	struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete tmp_ev;
-+	struct rap_conn_mapping *m;
- 	struct iovec iov;
- 	int i;
- 
-@@ -598,11 +716,9 @@ static void rap_rd_rem_fae_cmplt_evt(const void *data, uint8_t size,
- 		size < sizeof(struct bt_hci_evt_le_cs_rd_rem_fae_complete))
- 		return;
- 
--	/* Initialize iovec with the event data */
- 	iov.iov_base = (void *) data;
- 	iov.iov_len = size;
- 
--	/* Pull the entire structure at once */
- 	evt = util_iov_pull_mem(&iov, sizeof(*evt));
- 
- 	if (!evt) {
-@@ -612,21 +728,20 @@ static void rap_rd_rem_fae_cmplt_evt(const void *data, uint8_t size,
- 
- 	DBG("status=0x%02X, handle=0x%04X", evt->status, evt->handle);
- 
--	/* Check status */
- 	if (evt->status != 0) {
- 		/* Status 0x11 (Unsupported Feature or Parameter Value) means
- 		 * the remote has zero FAE, the procedure continues
- 		 * to the Default Settings step.
- 		 */
- 		if (evt->status == 0x11) {
--			DBG("Remote FAE=0 (No_FAE), proceed to Def Settings");
--			if (is_initiator_role(sm)) {
--				struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete
--								tmp_ev;
-+			m = find_mapping_by_handle(sm, evt->handle);
- 
-+			DBG("Remote FAE=0 (No_FAE), proceed to Def Settings");
-+			if (is_initiator_role(sm) ||
-+			    (is_both_role(sm) && m && m->is_central)) {
- 				memset(&tmp_ev, 0, sizeof(tmp_ev));
- 				tmp_ev.handle = evt->handle;
--				DBG("Initiator: send def settings (No_FAE)");
-+				DBG("Init/Both: send def settings (No_FAE)");
- 				rap_send_hci_def_settings_command(sm, &tmp_ev);
- 			} else {
- 				DBG("Reflector role: continuing after No_FAE");
-@@ -651,13 +766,13 @@ static void rap_rd_rem_fae_cmplt_evt(const void *data, uint8_t size,
  	}
- 
- 	/* After receiving FAE Table, send default settings */
--	/* Local capabilities already read before this event */
--	if (is_initiator_role(sm)) {
--		struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete tmp_ev;
-+	m = find_mapping_by_handle(sm, evt->handle);
- 
-+	if (is_initiator_role(sm) ||
-+	    (is_both_role(sm) && m && m->is_central)) {
- 		memset(&tmp_ev, 0, sizeof(tmp_ev));
- 		tmp_ev.handle = evt->handle;
--		DBG("Initiator role: send def settings after FAE table");
-+		DBG("Init/Both: send def settings after FAE");
- 		rap_send_hci_def_settings_command(sm, &tmp_ev);
- 	} else {
- 		DBG("Reflector role: Proceeding after FAE Table");
-@@ -698,6 +813,7 @@ static void rap_rd_rmt_supp_cap_cmplt_evt(const void *data, uint8_t size,
- {
- 	struct cs_state_machine *sm = user_data;
- 	const struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete *evt;
-+	struct rap_conn_mapping *m;
- 	struct iovec iov;
- 	uint16_t subfeatures_supported;
- 
-@@ -745,9 +861,11 @@ static void rap_rd_rmt_supp_cap_cmplt_evt(const void *data, uint8_t size,
- 		return;
- 	}
- 
--	/* Local capabilities already read before this event */
--	if (is_initiator_role(sm)) {
--		DBG("Initiator role: send def settings cmd for handle 0x%04X",
-+	m = find_mapping_by_handle(sm, evt->handle);
-+
-+	if (is_initiator_role(sm) ||
-+	    (is_both_role(sm) && m && m->is_central)) {
-+		DBG("Init/Both: send def settings for 0x%04X",
- 			evt->handle);
- 		rap_send_hci_def_settings_command(sm, evt);
- 	} else {
-@@ -763,6 +881,7 @@ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
- 	struct cs_state_machine *sm = user_data;
- 	const struct bt_hci_evt_le_cs_config_complete *evt;
- 	struct rap_ev_cs_config_cmplt rap_ev;
-+	struct rap_conn_mapping *mapping;
- 	struct iovec iov;
- 
- 	if (!sm || !data || size < sizeof(*evt))
-@@ -855,9 +974,6 @@ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
- 
- 	/* CS Security Enable may only be issued by the BLE Central */
- 	if (rap_ev.role == 0x00) {
--		/* Initiator role */
--		struct rap_conn_mapping *mapping;
--
- 		mapping = find_mapping_by_handle(sm, evt->handle);
- 		if (!mapping || !mapping->is_central) {
- 			error("CS Security Enable skipped: not BLE Central");
-@@ -980,8 +1096,8 @@ static void rap_cs_proc_enable_cmplt_evt(const void *data, uint8_t size,
- 
- 	DBG("size=0x%02X", size);
- 
--	/* State Check */
--	if (cs_get_current_state(sm) != CS_STATE_WAIT_PROC_CMPLT) {
-+	if ((cs_get_current_state(sm) != CS_STATE_WAIT_PROC_CMPLT) &&
-+		(cs_get_current_state(sm) != CS_STATE_STARTED)) {
- 		DBG("Event received in Wrong State!! ");
- 		DBG("Expected : CS_STATE_WAIT_PROC_CMPLT");
- 		return;
-@@ -1002,6 +1118,8 @@ static void rap_cs_proc_enable_cmplt_evt(const void *data, uint8_t size,
- 			evt->status);
- 		cs_set_state(sm, CS_STATE_STOPPED);
- 		sm->procedure_active = false;
-+		if (sm->proc_active_func)
-+			sm->proc_active_func(false, sm->proc_active_data);
- 		return;
- 	}
- 
-@@ -1030,9 +1148,13 @@ static void rap_cs_proc_enable_cmplt_evt(const void *data, uint8_t size,
- 	if (rap_ev.state == 0x01) {
- 		cs_set_state(sm, CS_STATE_STARTED);
- 		sm->procedure_active = true;
-+		if (sm->proc_active_func)
-+			sm->proc_active_func(true, sm->proc_active_data);
- 	} else if (rap_ev.state == 0x00) {
- 		cs_set_state(sm, CS_STATE_STOPPED);
- 		sm->procedure_active = false;
-+		if (sm->proc_active_func)
-+			sm->proc_active_func(false, sm->proc_active_data);
- 	}
- 
- 	/* Send callback to RAP Profile */
-@@ -1080,7 +1202,7 @@ static void parse_mode_zero_data(struct iovec *iov,
- 	util_iov_pull_u8(iov, &mode_data->packet_ant);
- 	DBG("CS Step mode 0");
- 
--	if (cs_role == CS_INITIATOR && iov->iov_len >= 4) {
-+	if (cs_role == CS_INITIATOR && iov->iov_len >= 2) {
- 		util_iov_pull_le16(iov, &freq_offset);
- 		mode_data->init_measured_freq_offset = freq_offset;
- 	}
-@@ -1171,7 +1293,6 @@ static void parse_mode_three_data(struct iovec *iov,
- 				uint8_t cs_role, uint8_t cs_rtt_type,
- 				uint8_t max_paths)
- {
--	uint8_t k;
- 	struct cs_mode_one_data *mode_one = &mode_data->mode_one_data;
- 	struct cs_mode_two_data *mode_two = &mode_data->mode_two_data;
- 
-@@ -1186,21 +1307,7 @@ static void parse_mode_three_data(struct iovec *iov,
- 	parse_mode_one_data(iov, mode_one, cs_role, cs_rtt_type);
- 
- 	/* Parse Mode 2 portion */
--	if (iov->iov_len >= 1) {
--		util_iov_pull_u8(iov, &mode_two->ant_perm_index);
--		for (k = 0; k < max_paths; k++) {
--			int16_t i_val, q_val;
--
--			if (iov->iov_len < 4)
--				break;
--			parse_i_q_sample(iov, &i_val, &q_val);
--			mode_two->tone_pct[k].i_sample = i_val;
--			mode_two->tone_pct[k].q_sample = q_val;
--
--			util_iov_pull_u8(iov,
--					 &mode_two->tone_quality_indicator[k]);
--		}
--	}
-+	parse_mode_two_data(iov, mode_two, max_paths);
  }
  
- /* Parse a single CS step */
-@@ -1537,8 +1644,27 @@ void *bt_rap_attach_hci(struct bt_rap *rap, struct bt_hci *hci,
- 			uint8_t role, uint8_t cs_sync_ant_sel,
- 			int8_t max_tx_power)
- {
-+	static const struct {
-+		uint8_t subevent;
-+		bt_hci_callback_func_t callback;
-+	} subevents[] = {
-+		{ BT_HCI_EVT_LE_CS_RD_REM_SUPP_CAP_COMPLETE,
-+					rap_rd_rmt_supp_cap_cmplt_evt },
-+		{ BT_HCI_EVT_LE_CS_RD_REM_FAE_COMPLETE,
-+					rap_rd_rem_fae_cmplt_evt },
-+		{ BT_HCI_EVT_LE_CS_CONFIG_COMPLETE,
-+					rap_cs_config_cmplt_evt },
-+		{ BT_HCI_EVT_LE_CS_SEC_ENABLE_COMPLETE,
-+					rap_cs_sec_enable_cmplt_evt },
-+		{ BT_HCI_EVT_LE_CS_PROC_ENABLE_COMPLETE,
-+					rap_cs_proc_enable_cmplt_evt },
-+		{ BT_HCI_EVT_LE_CS_SUBEVENT_RESULT,
-+					rap_cs_subevt_result_evt },
-+		{ BT_HCI_EVT_LE_CS_SUBEVENT_RESULT_CONTINUE,
-+					rap_cs_subevt_result_cont_evt },
-+	};
- 	struct cs_state_machine *sm;
--	unsigned int id;
-+	unsigned int i;
+@@ -1090,6 +1112,7 @@ static void cmd_select(int argc, char *argv[])
+ 		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
  
- 	if (!rap || !hci) {
- 		error("rap or hci null");
-@@ -1564,78 +1690,95 @@ void *bt_rap_attach_hci(struct bt_rap *rap, struct bt_hci *hci,
- 	}
+ 	default_ctrl = adapter;
++	cs_set_device_list(&adapter->devices);
+ 	print_adapter(adapter->proxy, NULL);
  
- 	/* Register each LE Meta subevent individually */
--	id = bt_hci_register_subevent(hci,
--			BT_HCI_EVT_LE_CS_RD_REM_SUPP_CAP_COMPLETE,
--			rap_rd_rmt_supp_cap_cmplt_evt, sm, NULL);
--	if (!id)
--		goto fail;
-+	for (i = 0; i < ARRAY_SIZE(subevents); i++) {
-+		unsigned int id = bt_hci_register_subevent(hci,
-+						subevents[i].subevent,
-+						subevents[i].callback,
-+						sm, NULL);
-+		if (!id) {
-+			error("Failed to register hci le meta subevents");
-+			queue_foreach(sm->event_ids, unregister_event_id, hci);
-+			queue_destroy(sm->event_ids, NULL);
-+			queue_destroy(sm->conn_mappings, mapping_free);
-+			free(sm);
-+			return NULL;
-+		}
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+@@ -4003,6 +4026,7 @@ int main(int argc, char *argv[])
+ 	assistant_add_submenu();
+ 	hci_add_submenu();
+ 	telephony_add_submenu();
++	cs_add_submenu();
+ 	bt_shell_set_prompt(PROMPT_OFF, NULL);
  
--	queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
-+		queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
-+	}
+ 	bt_shell_handle_non_interactive_help();
+@@ -4044,6 +4068,7 @@ int main(int argc, char *argv[])
+ 	assistant_remove_submenu();
+ 	hci_remove_submenu();
+ 	telephony_remove_submenu();
++	cs_remove_submenu();
  
--	id = bt_hci_register_subevent(hci,
--		BT_HCI_EVT_LE_CS_RD_REM_FAE_COMPLETE,
--		rap_rd_rem_fae_cmplt_evt, sm, NULL);
-+	DBG("HCI state machine attached (role=%u, ant=0x%02x, power=%d)",
-+		sm->role_enable, sm->cs_opt.cs_sync_ant_sel,
-+		sm->cs_opt.max_tx_power);
+ 	g_dbus_client_unref(client);
  
--	if (!id)
--		goto fail;
-+	return sm;
-+}
- 
--	queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
-+static bool measurement_timeout_cb(void *user_data)
-+{
-+	struct cs_state_machine *sm = user_data;
- 
--	id = bt_hci_register_subevent(hci,
--			BT_HCI_EVT_LE_CS_CONFIG_COMPLETE,
--			rap_cs_config_cmplt_evt, sm, NULL);
--	if (!id)
--		goto fail;
-+	sm->measurement_timeout_id = 0;
- 
--	queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
-+	DBG("Measurement duration expired, stopping CS procedure");
-+	bt_rap_stop_measurement(sm);
- 
--	id = bt_hci_register_subevent(hci,
--			BT_HCI_EVT_LE_CS_SEC_ENABLE_COMPLETE,
--			rap_cs_sec_enable_cmplt_evt, sm, NULL);
--	if (!id)
--		goto fail;
-+	if (sm->timeout_func)
-+		sm->timeout_func(sm->timeout_data);
- 
--	queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
-+	return false;
-+}
- 
--	id = bt_hci_register_subevent(hci,
--			BT_HCI_EVT_LE_CS_PROC_ENABLE_COMPLETE,
--			rap_cs_proc_enable_cmplt_evt, sm, NULL);
--	if (!id)
--		goto fail;
-+bool bt_rap_start_measurement(void *hci_sm, uint16_t conn_handle,
-+			      uint32_t duration_secs)
-+{
-+	struct cs_state_machine *sm = hci_sm;
- 
--	queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
-+	if (!sm || !sm->hci)
-+		return false;
- 
--	id = bt_hci_register_subevent(hci,
--			BT_HCI_EVT_LE_CS_SUBEVENT_RESULT,
--			rap_cs_subevt_result_evt, sm, NULL);
--	if (!id)
--		goto fail;
-+	if (!find_mapping_by_handle(sm, conn_handle)) {
-+		error("start_measurement: hndl 0x%04X not found", conn_handle);
-+		return false;
-+	}
- 
--	queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
-+	sm->active_conn_handle = conn_handle;
- 
--	id = bt_hci_register_subevent(hci,
--			BT_HCI_EVT_LE_CS_SUBEVENT_RESULT_CONTINUE,
--			rap_cs_subevt_result_cont_evt, sm, NULL);
--	if (!id)
--		goto fail;
-+	if (sm->measurement_timeout_id) {
-+		timeout_remove(sm->measurement_timeout_id);
-+		sm->measurement_timeout_id = 0;
-+	}
- 
--	queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
-+	if (!bt_rap_read_local_supported_capabilities(sm))
-+		return false;
- 
--	DBG("CS options: role=%u, cs_sync_ant_sel=%u, max_tx_power=%d",
--		role, cs_sync_ant_sel, max_tx_power);
-+	if (duration_secs > 0)
-+		sm->measurement_timeout_id = timeout_add_seconds(duration_secs,
-+					measurement_timeout_cb, sm, NULL);
- 
--	/* place holder, need DBus API to be called */
--	bt_rap_read_local_supported_capabilities(sm);
-+	return true;
-+}
- 
--	return sm;
-+bool bt_rap_stop_measurement(void *hci_sm)
-+{
-+	struct cs_state_machine *sm = hci_sm;
-+
-+	if (!sm || !sm->hci)
-+		return false;
-+
-+	if (sm->measurement_timeout_id) {
-+		timeout_remove(sm->measurement_timeout_id);
-+		sm->measurement_timeout_id = 0;
-+	}
- 
--fail:
--	error("Failed to register hci le meta subevents");
--	queue_foreach(sm->event_ids, unregister_event_id, hci);
--	queue_destroy(sm->event_ids, NULL);
--	queue_destroy(sm->conn_mappings, mapping_free);
--	free(sm);
--	return NULL;
-+	if (!find_mapping_by_handle(sm, sm->active_conn_handle)) {
-+		error("stop_measurement: handle 0x%04X not found",
-+		      sm->active_conn_handle);
-+		return false;
-+	}
-+
-+	return rap_send_hci_cs_procedure_enable(sm, sm->active_conn_handle,
-+						false);
- }
- 
- bool bt_rap_set_conn_hndl(void *hci_sm, struct bt_rap *rap,
-@@ -1672,6 +1815,40 @@ void bt_rap_clear_conn_handle(void *hci_sm, uint16_t handle)
- 
- 	DBG("Clearing connection mapping: handle=0x%04X", handle);
- 	remove_conn_mapping(sm, handle);
-+	sm->procedure_active = false;
-+}
-+
-+bool bt_rap_is_procedure_active(void *hci_sm)
-+{
-+	struct cs_state_machine *sm = hci_sm;
-+
-+	if (!sm)
-+		return false;
-+
-+	return sm->procedure_active;
-+}
-+
-+void bt_rap_set_timeout_cb(void *hci_sm, void (*func)(void *), void *user_data)
-+{
-+	struct cs_state_machine *sm = hci_sm;
-+
-+	if (!sm)
-+		return;
-+
-+	sm->timeout_func = func;
-+	sm->timeout_data = user_data;
-+}
-+
-+void bt_rap_set_proc_active_cb(void *hci_sm, void (*func)(bool, void *),
-+				void *user_data)
-+{
-+	struct cs_state_machine *sm = hci_sm;
-+
-+	if (!sm)
-+		return;
-+
-+	sm->proc_active_func = func;
-+	sm->proc_active_data = user_data;
- }
- 
- void bt_rap_detach_hci(struct bt_rap *rap, void *hci_sm)
-@@ -1690,12 +1867,14 @@ void bt_rap_detach_hci(struct bt_rap *rap, void *hci_sm)
- 			queue_foreach(sm->event_ids, unregister_event_id,
- 								sm->hci);
- 
-+		if (sm->measurement_timeout_id) {
-+			timeout_remove(sm->measurement_timeout_id);
-+			sm->measurement_timeout_id = 0;
-+		}
-+
- 		queue_destroy(sm->event_ids, NULL);
- 
--		/* Clean up per-instance connection mappings.
--		 * Each state machine owns its own conn_mappings queue;
--		 * this destroys all mappings for this instance only.
--		 */
-+		/* destroys mappings for this instance only */
- 		queue_destroy(sm->conn_mappings, mapping_free);
- 
- 		/* Free the state machine */
 -- 
 
