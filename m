@@ -1,35 +1,35 @@
-Received: from out-6.smtp.github.com (out-6.smtp.github.com [192.30.252.197])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8632376466
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 17:25:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D37A36BCC0
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 17:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783704344; cv=none; b=gph6KA3s3wMWGXBd7xvvDbt7byU8elXLogof0zhNzHcNfNm2/RktPefkBIlTsYg/jpZYgKQqBwZiVJtdDLnlmS+XJikwTnCoUa12loUY9t1K1GmfXRHfTp3iO6WEjSwVgxEeocPqxsXd4fbhSXy1ryPQ/y6dIcJt29RzdVJgwss=
+	t=1783704347; cv=none; b=r8zholocKvOPnkDIpVa5F4QzfoEeMsNLlWRGRRBDFcDEc2W4uvPBsdo+sPpdlPsJbNyk1JoRfvjMwC+Ex5y5dKVdqbUDot9A/WbhTqiLfQmbb6B/h5wqltaCqpiSbYIrbfYPGLEGiGxOJXxbCtH8DdRzjCiEv73dMhys61SBg9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783704344; c=relaxed/simple;
-	bh=YH7X6ElN9X2jkehmYlZIOO+t5qUfFDgLCfS8uwE4vQw=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=RNhnkp9KJWn0hOUjLIlZ3IJzKe8vS+NbbyZvPvWdmWqjI8qV6t8KntPAHRDGm/sARHm+E2rhS8iwwcjZqBQyfom1u6O8fJQpZyndk938LrfD+QJD/i4n4NwuiifuLwk0ROfDFOPnfr/MD7F37XJHfMJARqKHngmn1eSESUAlico=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=TPnTKGfk; arc=none smtp.client-ip=192.30.252.197
+	s=arc-20240116; t=1783704347; c=relaxed/simple;
+	bh=aDLKJn6Y6jbWF/DtbSgFRFgdu25dqO8dp8mHZbz3+AM=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=DkufbRc8Le+NLcggpbP3GceT85Xo4i+pYCB6HscxR0hc7YcwO3bohOpt4oLwf/wT6PrJragfpbZXyorklLGKKxnTI9eF3Ig47EryOTU/rz6re1ui569NX8NfwQnbkkb6Q1Ewx+hDApG+o8Zze7mpwB5zaHgGkLRbVAzgfMVkMUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Ze5mYua7; arc=none smtp.client-ip=192.30.252.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="TPnTKGfk"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Ze5mYua7"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1783704340;
-	bh=Iyp62HL7LsBuxTsgcx4EA4J5h4LqJVPjkgj8duKWRFc=;
+	s=pf2023; t=1783704343;
+	bh=o25D6aPizTm3VWqdaGsAXQYrKl2yrASafndrnGFsWAw=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=TPnTKGfkQYIjctcPlwK6NDj7ao5V9KDPip2k/j/vGVWbhI/UFdW80lykV5YEgY89m
-	 NExiSz8mlmdIfz9z7IwV0BPsCRiBzliDRXhUJWqcvOoO3+D9wJfhlLnLt3jpCZMAYv
-	 sBfPe2Z+e68E5408aJRyjU7QvDsQKTYrWPubS6Vo=
-Received: from github.com (hubbernetes-node-ca05332.va3-iad.github.net [10.48.174.43])
-	by smtp.github.com (Postfix) with ESMTPA id ADD4C781268
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 10:25:40 -0700 (PDT)
-Date: Fri, 10 Jul 2026 10:25:40 -0700
-From: Pauli Virtanen <noreply@github.com>
+	b=Ze5mYua7fB563MS/bjx4O+Udcq0ExjQqiBaVRbaO0cNjOUnhP6rClBzkQbSO/2tn1
+	 rDem33m7c0CCBLvW5myfQ+c5cR67VCE+O7IWv/CL4I3A/SeIpAKZCbUxeZ5Vn2U6Bv
+	 /aC7c3Xd5Np2ps6FO6uDML4Nq/2J05pmwizBDEmY=
+Received: from github.com (hubbernetes-node-82ef565.va3-iad.github.net [10.48.73.47])
+	by smtp.github.com (Postfix) with ESMTPA id 5B1FC50098A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 10:25:43 -0700 (PDT)
+Date: Fri, 10 Jul 2026 10:25:43 -0700
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1125495/000000-9e3c1d@github.com>
-Subject: [bluez/bluez] 5051e5: lib: add iso_data_* macros to hci.h
+Message-ID: <bluez/bluez/push/refs/heads/1125195/3f0cff-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,47 +42,7 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1125495
+  Branch: refs/heads/1125195
   Home:   https://github.com/bluez/bluez
-  Commit: 5051e5a45f44cceaef0cb1bff87fb52c126571f9
-      https://github.com/bluez/bluez/commit/5051e5a45f44cceaef0cb1bff87fb52c126571f9
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-07-10 (Fri, 10 Jul 2026)
-
-  Changed paths:
-    M lib/bluetooth/hci.h
-
-  Log Message:
-  -----------
-  lib: add iso_data_* macros to hci.h
-
-Add macros for parsing ISO Data Packet header items.
-
-
-  Commit: 9e3c1d50e95b0013587f4a8fdbb71ee524beb507
-      https://github.com/bluez/bluez/commit/9e3c1d50e95b0013587f4a8fdbb71ee524beb507
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2026-07-10 (Fri, 10 Jul 2026)
-
-  Changed paths:
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: fix parsing of ISO packet data header and slen check
-
-Check PB flag to see whether timestamp and data headers are present.
-
-Check bounds before accessing data. Bump handle_str length to fit
-maximum.
-
-Byteswap length values, and mask Packet_Status_Flag correctly.  Remove
-SDU length check, as we are not tracking fragmentation.
-
-Fixes: https://github.com/bluez/bluez/issues/2292
-Assisted-by: GLM-5.2
-
-
-Compare: https://github.com/bluez/bluez/compare/5051e5a45f44%5E...9e3c1d50e95b
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
