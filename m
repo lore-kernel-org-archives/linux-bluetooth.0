@@ -1,36 +1,36 @@
-Received: from out-29.smtp.github.com (out-29.smtp.github.com [192.30.252.128])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE933E2745
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 08:35:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006723B6370
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 08:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783672555; cv=none; b=szlgKWVDmvGgwlmIjWNTEGnaUkAWMWEcmFnscpssSCgkhAXjx3iF0yVCwcGQ2QEy+v024q8FcsQPxUoenVLl2oM46wwmStcl8c0IO20ZN2RTh+uj7Z8GTzmaEovOeNLZRG7eYhJQ5c2jH4GWqtlU3thjWqnzvDR4VzdfloludR4=
+	t=1783672559; cv=none; b=axfY6vVe70lakTvg8JUFc0TaLYfuLmm6aJWlafHwogKD+/uQPqeSxHj6gBnRvPqqw7IhhslBWBtP2yKpfbTdsxZYFkxgcWT4+eTZixuE1ldqWUlSj9FotMq50zBOjJtYdrB/UZaw28XLCCHup4LEsH/ABdq+vwtNgTo8zz+V/Ps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783672555; c=relaxed/simple;
-	bh=Y/blJaOzRraTcNxSVdbx7MfevFkmutRw2iB9n2j0g10=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=BcJTP2/pmgsWbnvgHKlLvwYjKO0SQ3F2W3j2T+TihBoQnClOtYgs8nbGW+XXQQ07cQeZw0+DxcdItNJg0DUYUUfmjIRZ8HqTN1omM1FtEtNCq3vlyZdWhETXPBHDNyaN+M3DCIB8L4uT95TJMR0II+SpEraOa5OJ4R1PiU1llR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=hVOggaSB; arc=none smtp.client-ip=192.30.252.128
+	s=arc-20240116; t=1783672559; c=relaxed/simple;
+	bh=CDXoyp6EBl6gcmR+Yk1wRWKkvJK+ggq1E+dMemJldT4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=mIDjEG7HhJZWcPjXlQbl0ToaBTz4AMMhrCFL3jy7DCDQ4C3ceRiO1viKOTcAW0Jv89QTD2tn/71hD6JdBYlL0qVZeTKPhg9fMvc/+BLrAL22MvAIfEMv0bofN3J6pb56Xqxc8Dd5H1rJGPeclWqfAgBvwWzF50YGl2MJyo2lvrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=QB+LvUqe; arc=none smtp.client-ip=192.30.252.207
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="hVOggaSB"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="QB+LvUqe"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1783672553;
-	bh=wmCEzEmAjUTUoYjPoDF/TijEVW+WravNwh5K1N9mfl0=;
+	s=pf2023; t=1783672557;
+	bh=t1WPN+ZxDY7kiFCaAWADVPGnwb/07GMkrsLnSwwenRM=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=hVOggaSBqotLVUxhTT8QF+mnFqr0VcjlwWdzUptMd0X2VEjnAhWTvvwKe0ky2LovO
-	 kg7C7q/yFnKeTfbE3N+oSAArTkEOv3qtPIq7CjT5+3plKu1kFnhDiPnJkGzOKsWHV3
-	 K2asrI+XtbWx0ATTc9b/FEmkHSDT2w1FOudEzybo=
-Received: from github.com (hubbernetes-node-52ddd2c.ac4-iad.github.net [10.52.221.82])
-	by smtp.github.com (Postfix) with ESMTPA id A6E533212F4
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 01:35:53 -0700 (PDT)
-Date: Fri, 10 Jul 2026 01:35:53 -0700
+	b=QB+LvUqeqidaETTVAlTpmKmnOUuB6c0YPEoxmKC2uTC3exlyvB1/fMPqXU+T6vThn
+	 8EfGKg6GwYArCr95sjxlY3NA6PLDvuzxfYAxWZ27LZ0ObnTQ1ZRulcrg37UK7R+lCt
+	 p3KK3MJ4X1Eg1pOlOacWFJVhIDneENl4NtYdPaSk=
+Received: from github.com (hubbernetes-node-94d846a.ac4-iad.github.net [10.52.222.83])
+	by smtp.github.com (Postfix) with ESMTPA id 2CEA1A0C86
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 01:35:57 -0700 (PDT)
+Date: Fri, 10 Jul 2026 01:35:57 -0700
 From: Bhavani <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1125144/000000-2c883e@github.com>
-Subject: [bluez/bluez] f851eb: doc/org.bluez.ChannelSounding1:Add Used by
- referen...
+Message-ID: <bluez/bluez/push/refs/heads/1125185/000000-c90ff7@github.com>
+Subject: [bluez/bluez] dda6a6: rap: Add Channel Sounding parameter types and
+ APIs
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,60 +43,50 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1125144
+  Branch: refs/heads/1125185
   Home:   https://github.com/bluez/bluez
-  Commit: f851ebb27566df31850f3d695a8d6b837e5c5ddc
-      https://github.com/bluez/bluez/commit/f851ebb27566df31850f3d695a8d6b837e5c5ddc
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-07-10 (Fri, 10 Jul 2026)
-
-  Changed paths:
-    A doc/org.bluez.ChannelSounding1.rst
-
-  Log Message:
-  -----------
-  doc/org.bluez.ChannelSounding1:Add Used by reference and Examples
-
-Add :Used by: field linking to bluetoothctl cs submenu and
-Examples section showing corresponding bluetoothctl cs commands
-for D-Bus methods
-
-
-  Commit: 5d82c71db9c14ad8c0d94fc4105e413d3cf48d67
-      https://github.com/bluez/bluez/commit/5d82c71db9c14ad8c0d94fc4105e413d3cf48d67
+  Commit: dda6a66bf77cca529b8f11744370bf1b9f918515
+      https://github.com/bluez/bluez/commit/dda6a66bf77cca529b8f11744370bf1b9f918515
   Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
   Date:   2026-07-10 (Fri, 10 Jul 2026)
 
   Changed paths:
     M Makefile.am
-    A doc/org.bluez.ChannelSoundingRanging1.rst
+    A src/shared/cs-types.h
+    M src/shared/rap.h
 
   Log Message:
   -----------
-  doc/org.bluez.ChannelSoundingRanging1:Add references and examples
+  rap: Add Channel Sounding parameter types and APIs
 
-Add :Used by: field linking to bluetoothctl cs submenu and
-Examples section showing the corresponding bluetoothctl output
-for the RangeEstimate signal
+Add shared Channel Sounding parameter structures
+(bt_rap_le_cs_config, bt_rap_le_cs_frequency and
+bt_rap_le_cs_default_settings) for exchanging
+CS configuration, frequency, and default settings
+between the RAP DBus layer and HCI state machine.
+
+Add getter/setter APIs for CS config, frequency
+and default settings, add measurement.
 
 
-  Commit: 2c883ed23ba17c2eecec2bb83be557c0a6b5aa6e
-      https://github.com/bluez/bluez/commit/2c883ed23ba17c2eecec2bb83be557c0a6b5aa6e
+  Commit: c90ff7c1ac6891fb9c027ea272875ae456d41453
+      https://github.com/bluez/bluez/commit/c90ff7c1ac6891fb9c027ea272875ae456d41453
   Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
   Date:   2026-07-10 (Fri, 10 Jul 2026)
 
   Changed paths:
-    M Makefile.tools
-    A doc/bluetoothctl-cs.rst
+    M src/device.c
 
   Log Message:
   -----------
-  doc/bluetoothctl-cs: Add :Uses: fields and document arguments
+  src: Register GATT profiles for Channel Sounding reflector
 
-Add :Uses: fields to link commands to their corresponding D-Bus API
-methods, and document command arguments with usage examples.
+Probe and accept GATT_UUID profiles on non-initiator (reflector)
+devices before gatt_client discovery checks,
+ensuring RAP's org.bluez.ChannelSounding1 DBus interface is registered
+even when GATT client discovery is skipped.
 
 
-Compare: https://github.com/bluez/bluez/compare/f851ebb27566%5E...2c883ed23ba1
+Compare: https://github.com/bluez/bluez/compare/dda6a66bf77c%5E...c90ff7c1ac68
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
