@@ -1,70 +1,89 @@
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 124BD3F8714
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:47:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883E43F9287
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:49:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783676866; cv=none; b=TcZ9TnMXgWIzdbfLXrXR1oFKKM0MX58lyTAU7Q2wedC9IjeVfWIn0mzGneqFTVld1og/QXYgn+f82cle+QfT60C128avHNPmsUtQMUwfVMlgl2uG/MLLIufh4+JXEwJHlYmkfx7PJHwEh+xXar3Nv75otSeTCo2xKKzWSN2fmJo=
+	t=1783676972; cv=none; b=suc2Bcj4LyxSP0Mna8gjdpO8wxct92dvLpyd6sBd4jFP6SYaOKtyyNZG1sCPG+HB6zZrZWK691UXr/WDGMYkMvTH0o/EpfeCKNs6O0UhP3eBJ2CMGCcYYuvgNNoudLiyaKR9XrEvjO0mI+0K23kza85SyXTJh48qiOqpDpbV1sY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783676866; c=relaxed/simple;
-	bh=5KQJMiWUVWflGl5J80u+4+tqFDAGP9E1KnRSQJYirxM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OdnyooWyO+vM8lAWJxXGDmdhp7jpuD0u7iUENinJ2sB6Atm+lVt45bJvUekbsHuuj56e7NWMzI8ymBOIZH0AWE3Y4B0jQcFzQ2l9/lvBty6p6ZAeA7cpeKgSIhUHhrL2orXNg39vFa5v9+i59XDXzWiFqJzRvPN6TS3pMcHR86s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cj1QwXNj; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783676972; c=relaxed/simple;
+	bh=uZaNgwn/+Zwmocm3ej1e0Y8Jp4t3M3eyNPDpXSZEOxE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ALxO88ThlDXevkGSmKVNts2t1HA9JBHTT/h6+5cpFRsj19v8IhyFpfDQUycMhPOWzjOVOvJjFp9Ja0yDLiO2dr/2DNRUIBH+MhNPi8eO+g1tDc++K99oNNYxTouRP2Cdc39BE6kbN8elxontXga1Y1dgIwBYeNtAvdGtOMtE8eY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=JVkeOLay; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=EhlLOHPL; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cj1QwXNj"
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5aec139da7eso868238e87.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 02:47:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="JVkeOLay";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="EhlLOHPL"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66A7dWwO4194177
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:49:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=b4VyP8FUl27H8hpvcS5ifax29mQaStLkczj
+	ssmvcOGM=; b=JVkeOLay8MMMVHCt4iWD9QPHv+lk/dsHFww7i7Rm2hCBrqrr9sE
+	LratZNGrotOpfn/TxkrytQJefGFxhXCkbyX3Pfc5M/Vgpppm4MxVJMHsR9iHtiv4
+	WyRpom7C5n4R1iI29IWLGS3XcppjIHaChkekU+Cp71dcRR65aTOzgZNWZwOeFre4
+	egXUhjLYA3unXkUzmWxucvCvynPMZDO9KvQAmzI9GDefvbUBz0tcySECVn09M9x/
+	oNEl0Ona42FwZxFqHsBZOhXWPqRM1is1eE2j2NLtwFwUQU71+DG0mVEIEhtubRBG
+	zyls9yDM/AhibBDKt+u4LDvOVLeVjfmZHAw==
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4faf24updy-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 09:49:27 +0000 (GMT)
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-c891ed872ddso1152309a12.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jul 2026 02:49:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783676857; x=1784281657; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1783676966; x=1784281766; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=iJKCagyd/SIrmWaSiMe9KDmEGLx+4cDuv8NGl1ssZz0=;
-        b=cj1QwXNjv29DV0tVDFOL2R2A2VrGAShrciwpUD/g6VnaJUS7qt9/oGY5JBiFCh9WfM
-         dxnK6mKlwUtZ4nmXu8HNWXOC5zz/z/FwNq5hiI/5OAKyWlq1xcYVtkMiS3H5lhpo2Fv6
-         k1F4nu+T5EhZvF+mJP7IqhOWKcvEJF6nwl0Z6ZYek4FjZB/Ca0iJkXjB+B8VPT2ct+Dh
-         h0gpGtJeymhSnLF6tXf4Jy77R7kTDRBxd9kkqLkJQmmgMYCISvRSAJIW9sr8K14E2wvk
-         UZieIit/6+9LtssFk2A/M2NhyzaPEDW3LesQroZTzGu6bE+eYmFyIhTb++unuCC8mIje
-         3PZg==
+        bh=b4VyP8FUl27H8hpvcS5ifax29mQaStLkczjssmvcOGM=;
+        b=EhlLOHPLRFKzr/3/qgwrK2z4oF3OV+sAWaqYsJGzL/fnJkzsEKJ/ZElz0o476rYhhq
+         ngxPPqVvFKzwEiqjw0B7LMEP3i/wTTi8l6DV8M3N9+e6kNm5LH5HnJS2t3qpsjrMePhr
+         x1syZLJbeON2AxTpcerhaX2k/Wv4RsGDD0Kx1uzmAVuS10OmgB8rQJsS45KCSk/92iU1
+         VvWlqqoP6PUi+5OjilTsLBE4+dIxMd7dRXln3DxbD0dIiAnlMvEEeVLV/mTBCHtbAyuc
+         L9JqBxcLebnytfgnErfSUyqTruwkJ8MomeseriRmU94YSMAX2EOVyLxdT2dzN9vQ5epc
+         BF5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783676857; x=1784281657;
+        d=1e100.net; s=20251104; t=1783676966; x=1784281766;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=iJKCagyd/SIrmWaSiMe9KDmEGLx+4cDuv8NGl1ssZz0=;
-        b=h/33Oxd4fuGO7xrp4wBkS2I6Ing5TRWs2KHzzX7hwqaw/E7MU/aD2fkUSfm1d6swFX
-         wyD1tNDs1klV7G9vZAzUuZ6MFcMnzodfHRXb9ZCmMHuvueaN7UoG3TZvR1XSXEhFrKsT
-         d5XnYnst2gqcCGPMYiXeOQMiNC0VR9eM21NYYeBg6nSyDoKG7P8VYBJmXudNIWN4l11r
-         I4rvCt+VOtXOp9p+fBxY1BimhlFSJPe9xaAW4qt2fvCxc8rQa3e/H9cPSCuku9T2WeJy
-         cSBMQybCm0pf641T98t583+ewoUVVY2uHYX3MoLoIxhJIgZK7TLP7lon0ApIedBa6sht
-         aTVg==
-X-Gm-Message-State: AOJu0YwfOwLodt5fUwo+PoXtYlw22B0Fe8JsNYouXoQPB0VqOSJ3mzBJ
-	frM8Ic2dgYsw5ns6vZFDe1zMtnPCbe3KdFCdDQ9zERAlSGL/zDJOKNC1yUCeACwUBDeF4A==
-X-Gm-Gg: AfdE7cmZGKjuCCWzh26h/1KahQa2U6594nv2jDKua63nADMwdLo03ETaSbpN+1zUy81
-	Oq4YnbX2uqzVo7Kt7+S/FnRR7IKImJlnrHAckdq2ZYRTV5LthRv8QdB17auXFoLPmISlRvQPs/l
-	LeUrqhsZBXstKTFiUReOTVqWW47gif/2G9GzxufgJxR78M1uLk9aZl62BlvSKVt0rePFK2acP/1
-	tJpcvshnqWSYmrE3KZNESLcXimRcjx2YsPzNRWpTR/zhxE1I8Z5XDSbNWmOS7lottMQtdjivOk3
-	Fi8trKRiVAQicHwb+Y3ln99GuXrplV1QZHSb/FjR9PtJIxPMNB1zCGnU11dzGbNJpGsNFo9TsTs
-	jqG3DuC3558pltR0ijsV/L8uK+HP9qrbugjKgU2gsdzrn4Jho56t446YgWpeAV/bbMq6zB37Vuz
-	f9y/7vIOc0iE+vRv624vxIOg==
-X-Received: by 2002:a05:6512:6708:b0:5aa:62df:cd0f with SMTP id 2adb3069b0e04-5b01c6061a0mr497391e87.2.1783676857247;
-        Fri, 10 Jul 2026 02:47:37 -0700 (PDT)
-Received: from localhost ([188.234.148.119])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b01ca4a1d5sm473878e87.11.2026.07.10.02.47.35
+        bh=b4VyP8FUl27H8hpvcS5ifax29mQaStLkczjssmvcOGM=;
+        b=FgtcIiImgyGHp8V+QP3xt6nEXevx1AvQcDeoPQpvNsiA8mW3/5pRfxWMiWTezIzWdv
+         eGrqNJHxlHV/6cPuA6PH/GWqMMZ4B0CKmz0rJTOm6/Omd/T7tMWGjoEyi6Lm//SShb2l
+         0sY/8l7f2e4S1qip9W1hFQn7zO2oTylhY4I1Z1YlbB9B2qeRkk4f+50QfOw+Tm3qGwO2
+         5WC7E2ccpf6ndohJYZwcTcM5K6QnfpzG3tEtEmuu+EN21KO1yIkcGLvlceer+vleApnw
+         mzaWOx9Fu596nycNF0+TUfISQGk50uyiacwJOySi1np8aF52u86XxplhI/Cc2813UTHO
+         PNfg==
+X-Gm-Message-State: AOJu0YzuF6X34QbmIoLQXenveZwUV+QCfOUK3NgnP8tHQzDzH8L0XUC8
+	V0pzdJTfTUSMAvanLT5oEkHV6V2tcpmJ2A5F9pGZg+LXwADvLLPjv8c5KmdL+Z9FVDvcEaTw6gt
+	64fTR1goiC0i5ogkcp+3AwZHPHAiLYflMEwgVlks7OkX0AciRQY12HVVv45FkgNfZEfpz7HQIcz
+	PVj/0=
+X-Gm-Gg: AfdE7cnGuxnt7i8KdKHNr0K8a78RT5aOHHwNu4EmhD76IFWnpBeBPxVkQW0L4bWMaDQ
+	9JKilR171StKomxdWMAQlEvFnqPkMUD1AG2u0i2VVTQKuLqU5dqsbFX16DgXejb4lw1Mvsma9Br
+	QJBbj2YZHYUsstnmwXvkrsqBaFOKv+/htZrOkchx13kFOhk1uxRZLAUBFG7yHYULVkfkeETkYtM
+	bzspxiSh4UUcwhTpmZUiqLcj62zywyJPK6NfBiWLP9x1CoCys3/Lz7/3cLjLclTcZH9WUovRDam
+	eL3MLab43UTv4651I1N+enX0xprJ3g1Iz8hBzQFfPjCQnZX0gcZQZk5i8Dhwmmb39vbTQZs+Gvb
+	lq3BJJpmpBh0uzK+3/lzL2GzC0JCfa8EFXWOFelWJ
+X-Received: by 2002:a05:6a21:a89:b0:3c0:9c1a:8937 with SMTP id adf61e73a8af0-3c0bcc6a263mr14303841637.63.1783676966277;
+        Fri, 10 Jul 2026 02:49:26 -0700 (PDT)
+X-Received: by 2002:a05:6a21:a89:b0:3c0:9c1a:8937 with SMTP id adf61e73a8af0-3c0bcc6a263mr14303795637.63.1783676965724;
+        Fri, 10 Jul 2026 02:49:25 -0700 (PDT)
+Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-313b3206aaasm4106526eec.13.2026.07.10.02.49.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jul 2026 02:47:35 -0700 (PDT)
-From: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+        Fri, 10 Jul 2026 02:49:25 -0700 (PDT)
+From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-Subject: [PATCH] Bluetooth: mgmt: Translate HCI reason in Device Disconnected event
-Date: Fri, 10 Jul 2026 14:47:31 +0500
-Message-ID: <20260710094731.59767-1-mikhail.v.gavrilov@gmail.com>
-X-Mailer: git-send-email 2.55.0
+Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
+        quic_anubhavg@quicinc.com,
+        Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v2 0/4] Add Channel Sounding Dbus support and
+Date: Fri, 10 Jul 2026 15:19:15 +0530
+Message-Id: <20260710094919.4047204-1-naga.akella@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -72,147 +91,77 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: NlVeQ0loTHgLhX8IoTqslj0nyiSmhuXZ
+X-Proofpoint-ORIG-GUID: NlVeQ0loTHgLhX8IoTqslj0nyiSmhuXZ
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzEwMDA5NiBTYWx0ZWRfX+5MMUDOTs5Cw
+ tr1hisqTSKmyjaTp65GGe8hAR0mgFTYx2R36EMOxxdfT83DMQrdhmsfyhKENIf9mnspCCRmLO4S
+ yuZOOkeOojJy69VKcCGL7QFsJl8hKWY=
+X-Authority-Analysis: v=2.4 cv=daKwG3Xe c=1 sm=1 tr=0 ts=6a50c027 cx=c_pps
+ a=oF/VQ+ItUULfLr/lQ2/icg==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22 a=XHHUWyw0eKzNyklp_SAA:9
+ a=3WC7DwWrALyhR5TkjVHa:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzEwMDA5NiBTYWx0ZWRfX6VvDxQrUURiu
+ onFwsAaLIuPHk5ilsYEKcFyKOe13MZIAnDlOGQ3qvOsOw4IXlKBPVKqUVrjSUCE2xHuitIQEYQp
+ iMAUCwE2pPG+MXnZM9FK1jRX6KjcKGCxudb7eM4+EDULCT6s0tBrThtqk/IMIU1tqCVoxMPdBx8
+ YVjmPYSANiXX310JmywtF1HaeIXnEkaJ806MCqAo2aTz6JrzBINKT+4Wd+NScOYdWjafTN+9d9u
+ 2WwZ+6Zs01ssd9mDhp0ARzKAN7CUKIVCuQg2+RmE04sMPWcQZb+qgTQREr5k2gCmLx+AfBFpyif
+ PPfJa0pVxCHTWgSXnAfkAZbgwud8qtR5N6xewg8oTZ08H5x/bkg2CM7NqOd5EDNpo0oiZeJAEPp
+ kMPXy9JP7GzwEZhTZqSUmmtsMeok+dkBwa7tt6GfwdAU4/n/23Q8UgcYB1y8BBXbkJJ+6xU6LIm
+ PaUb9vnTdaaMjJ85AUQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-10_02,2026-07-09_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 phishscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
+ clxscore=1015 malwarescore=0 priorityscore=1501 bulkscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607100096
 
-MGMT_EV_DEVICE_DISCONNECTED carries a reason field which is defined to
-be one of MGMT_DEV_DISCONN_* (0x00..0x05). hci_disconn_complete_evt()
-converts the HCI error with hci_to_mgmt_reason(), but two other paths
-pass the raw HCI error straight through:
+This series adds user-facing control and configuration support for
+Bluetooth LE Channel Sounding (CS) through a new DBus interface and
+bluetoothctl integration.
 
-  hci_cs_disconnect()   -> cp->reason
-  mgmt_connect_failed() -> status
+The RAP profile is extended to expose an
+org.bluez.ChannelSounding1 interface, allowing external applications
+to configure default Channel Sounding settings and start or stop
+measurement procedures. CS configuration, frequency, and default
+settings are moved from hardcoded values into shared parameter
+structures and accessor APIs, enabling runtime configuration from the
+DBus layer.
 
-The latter is reached whenever the adapter is powered off or suspended:
-hci_disconnect_all_sync() aborts every link with
-HCI_ERROR_REMOTE_POWER_OFF, hci_disconnect_sync() deliberately does not
-wait for HCI_EV_DISCONN_COMPLETE for that reason, so that
-hci_abort_conn_sync() finishes the connection off through
-hci_conn_failed() instead.
+To make the new functionality accessible from the command line,
+bluetoothctl adds a dedicated "cs" submenu for configuring parameters,
+starting and stopping measurements, and monitoring active sessions.
 
-As a result userspace sees an out of range reason:
+The series also ensures the Channel Sounding interface is available on
+reflector devices by registering relevant GATT profiles even when GATT
+client discovery is skipped
 
-  @ MGMT Event: Device Disconnected (0x000c) plen 8
-        BR/EDR Address: 8C:A9:6F:2C:51:46
-        Reason: Reserved (0x15)
+Changes in v2:
+- Add patches 3-4 to support channel sounding dbus implementation
 
-  bluetoothd: btd_bearer_disconnected() Unknown disconnection value: 21
-  bluetoothd: device_disconnected() Unknown disconnection value: 21
 
-Export hci_to_mgmt_reason() and use it in both places, so that a power
-off is reported as MGMT_DEV_DISCONN_REMOTE rather than as the raw
-HCI_ERROR_REMOTE_POWER_OFF (0x15).
+Naga Bhavani Akella (4):
+  rap: Add Channel Sounding parameter types and APIs
+  src: Register GATT profiles for Channel Sounding reflector
+  profiles: Add D-Bus Channel Sounding control APIs
+  client: Add Channel Sounding shell submenu
 
-Fixes: d47da6bd4cfa ("Bluetooth: hci_core: Fix sending MGMT_EV_CONNECT_FAILED")
-Fixes: 182ee45da083 ("Bluetooth: hci_sync: Rework hci_suspend_notifier")
-Signed-off-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
----
+ Makefile.am                |    2 +-
+ Makefile.tools             |    3 +-
+ client/cs.c                | 1157 ++++++++++++++++++++++++++++++++++++
+ client/cs.h                |   18 +
+ client/main.c              |   27 +-
+ profiles/ranging/rap.c     |  347 ++++++++++-
+ profiles/ranging/rap_hci.c |  531 +++++++++++------
+ src/device.c               |   28 +-
+ src/shared/cs-types.h      |   50 ++
+ src/shared/rap.h           |   27 +-
+ 10 files changed, 2000 insertions(+), 190 deletions(-)
+ create mode 100644 client/cs.c
+ create mode 100644 client/cs.h
+ create mode 100644 src/shared/cs-types.h
 
-Tested on 7.2.0-rc2 with an MT7922 controller and Denon PerL Pro
-earbuds. Before the patch "systemctl stop bluetooth" produced
-
-  @ MGMT Event: Device Disconnected  Reason: Reserved (0x15)
-  bluetoothd: btd_bearer_disconnected() Unknown disconnection value: 21
-
-and with it the event carries MGMT_DEV_DISCONN_REMOTE, with no
-complaint from bluetoothd. Explicit disconnects, which take the
-hci_disconn_complete_evt() path, are unchanged.
-
-Note that the hci_cs_disconnect() call site is not reachable in
-practice: it requires either hdev->suspended, in which case
-mgmt_device_disconnected() overrides the reason with
-MGMT_DEV_DISCONN_LOCAL_HOST_SUSPEND anyway, or a
-HCI_ERROR_UNKNOWN_CONN_ID race. It is fixed for consistency only and
-was not exercised by the above.
-
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_event.c        | 18 +-----------------
- net/bluetooth/mgmt.c             | 19 ++++++++++++++++++-
- 3 files changed, 20 insertions(+), 18 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 4ca09298e11a..e7133ff87fbf 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -2430,6 +2430,7 @@ void mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key,
- 		       bool persistent);
- void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
- 			   u8 *name, u8 name_len);
-+u8 hci_to_mgmt_reason(u8 err);
- void mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			      u8 link_type, u8 addr_type, u8 reason,
- 			      bool mgmt_connected);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index b6d963ce26d0..741d658e9630 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2763,7 +2763,7 @@ static void hci_cs_disconnect(struct hci_dev *hdev, u8 status)
- 	}
- 
- 	mgmt_device_disconnected(hdev, &conn->dst, conn->type, conn->dst_type,
--				 cp->reason, mgmt_conn);
-+				 hci_to_mgmt_reason(cp->reason), mgmt_conn);
- 
- 	hci_disconn_cfm(conn, cp->reason);
- 
-@@ -3381,22 +3381,6 @@ static void hci_conn_request_evt(struct hci_dev *hdev, void *data,
- 	hci_dev_unlock(hdev);
- }
- 
--static u8 hci_to_mgmt_reason(u8 err)
--{
--	switch (err) {
--	case HCI_ERROR_CONNECTION_TIMEOUT:
--		return MGMT_DEV_DISCONN_TIMEOUT;
--	case HCI_ERROR_REMOTE_USER_TERM:
--	case HCI_ERROR_REMOTE_LOW_RESOURCES:
--	case HCI_ERROR_REMOTE_POWER_OFF:
--		return MGMT_DEV_DISCONN_REMOTE;
--	case HCI_ERROR_LOCAL_HOST_TERM:
--		return MGMT_DEV_DISCONN_LOCAL_HOST;
--	default:
--		return MGMT_DEV_DISCONN_UNKNOWN;
--	}
--}
--
- static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
- 				     struct sk_buff *skb)
- {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 733a4b70e10c..1c1b64e651dc 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -9848,6 +9848,22 @@ bool mgmt_powering_down(struct hci_dev *hdev)
- 	return false;
- }
- 
-+u8 hci_to_mgmt_reason(u8 err)
-+{
-+	switch (err) {
-+	case HCI_ERROR_CONNECTION_TIMEOUT:
-+		return MGMT_DEV_DISCONN_TIMEOUT;
-+	case HCI_ERROR_REMOTE_USER_TERM:
-+	case HCI_ERROR_REMOTE_LOW_RESOURCES:
-+	case HCI_ERROR_REMOTE_POWER_OFF:
-+		return MGMT_DEV_DISCONN_REMOTE;
-+	case HCI_ERROR_LOCAL_HOST_TERM:
-+		return MGMT_DEV_DISCONN_LOCAL_HOST;
-+	default:
-+		return MGMT_DEV_DISCONN_UNKNOWN;
-+	}
-+}
-+
- void mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			      u8 link_type, u8 addr_type, u8 reason,
- 			      bool mgmt_connected)
-@@ -9909,7 +9925,8 @@ void mgmt_connect_failed(struct hci_dev *hdev, struct hci_conn *conn, u8 status)
- 
- 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)) {
- 		mgmt_device_disconnected(hdev, &conn->dst, conn->type,
--					 conn->dst_type, status, true);
-+					 conn->dst_type,
-+					 hci_to_mgmt_reason(status), true);
- 		return;
- 	}
- 
 -- 
-2.55.0
 
