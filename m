@@ -1,95 +1,113 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F19239A7F6;
-	Sun, 12 Jul 2026 12:43:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783860184; cv=pass; b=Or8pb8d9RoQOVArDAtigZAgQmDreTYI4puCSZYsEjQiCJwTsHcmUIVjNxvQvuCJhcWgiZ9ed5yoT4886DX+H61QyvE65A5Ik2hqHEIMm6vIlD5qfNy80IYrHQVVOsqmtfG5o4uQbu9Vn9hiuO7xm0rpDKfIC3yutMIF9rCrQtRg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783860184; c=relaxed/simple;
-	bh=dAd5tTm06RX/+PCttrns/4DY9vOEIcmNawJVE5qlIFo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H4KpumAq65F86WAK+9YKGhqa7D/OS2oDUYp0ft2oxITmsXtZd55YZB0QxBIwv+0AMHPQEQsFyHu8UhphmAEIHejlLrjfKliDo/hMzA9hUaQvJE/yCy66i0gHN70O7JujpAuxDMb5TipRRMPaw/h4r7uOSAM9r/M7bYkSR2lECgQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=FH9hwjzF; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934ED1A6807
+	for <linux-bluetooth@vger.kernel.org>; Sun, 12 Jul 2026 13:24:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783862682; cv=none; b=i0FOa3QDYNKB2oa9mhfJH0yMDJNAr/xJn41UVFASfkDU5gYQmI5UW1iv5+QPeqMrVFd55rmPpwoNmHAIhC8j9OGdxKpw0GgXaAfn5LEQ1bimROtdgWwlsu003zz0zLhEThi1u4jLcfAI4I0qg2HIokL0L/SghqDrceAojsKCz6s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783862682; c=relaxed/simple;
+	bh=kmNvlfdkNYJwvKuFWhPEjK62ej9hSkuSDTrQzup8vKI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=NN+GpASyJYuReSK2YKJhVO/9TEw0mtUdEnWL0xA/OAqxCP4X2LKoG6EDulcdZLenNJrNwkEAX+TVxi/+SMfuVGt50p6IcP99OYHl/WVWm94pz1151AbXQA1XL1So8x5lLPsH+LBvfv6sOLZbPvCRqG9UNwn+fiuDEydxlFAkuxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PzNhY9Tw; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="FH9hwjzF"
-Received: from monolith.lan (unknown [185.65.133.89])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4gylbK6lWKz10Y9;
-	Sun, 12 Jul 2026 15:42:53 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1783860175;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=48S2c86lboq4vEeROkXpXGdmfPL0XsQyKsCp6yHBJIA=;
-	b=FH9hwjzFnUT9VMyupMkaB7sNntxl43dbEms7vQqKQGrpCVdOcmZCqUbZMhjDv4tQUDzQUQ
-	Aw3cfjFof8sS87O9Mx9AZEl8Jf12N/ZSfFZ7vFyL9KOf/Vca8U5Cn++fdfFR0ToYTgsgpI
-	MKw6uNqe8ZWQQh+5dGmfTKPDaUJElqc=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1783860175;
-	b=I0oTVO6ovnG3GvKEuEAEOkyAvJGJH89Bp2F8SjsUuPtKYhq0wti5CSSPmmchC0jNozJHiC
-	C4kmoZwWf52pXlOLQqO+EQmX9gkhO+KA1wxDoIPqaoqK8kfGT/LVIydSiVmi85bDlkCimk
-	/GAMCdTYM2CLanNHiWQotNtNDNzzcds=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1783860175;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=48S2c86lboq4vEeROkXpXGdmfPL0XsQyKsCp6yHBJIA=;
-	b=faV7r7pDQrNAruTyqyR4XFTu3eNm3tiIdkCfk9XGzoZCEQh/IA1PexOZ+zZEhqgCz2gYmW
-	eERhmYYf9j1Vd6X6z9hz+NszSjB4YPPd6cTSuepIu1a4pyp0qRGVRaynuS8+4cPkhUMI9p
-	ejUzLdvOEGdK/3gu/SxAA9X2hr5sgN4=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	elver@google.com,
-	bvanassche@acm.org,
-	linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH 2/2] Bluetooth: enable context analysis for headers
-Date: Sun, 12 Jul 2026 15:42:46 +0300
-Message-ID: <ec3a235a79254560e4acd4f71ed7ca95c8763f77.1783860121.git.pav@iki.fi>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <9a718ecfbeb46077d8100dcb687e1ab6073986f6.1783860121.git.pav@iki.fi>
-References: <9a718ecfbeb46077d8100dcb687e1ab6073986f6.1783860121.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PzNhY9Tw"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2c7c61b5292so40465715ad.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Jul 2026 06:24:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783862681; x=1784467481; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=QfWOIyj5Dh1RyW6lJ4ZHjGKaJH5YK30QhHZE5Vm089E=;
+        b=PzNhY9Tw0TeABdJibEq27gdg+9LUpnGERN9qsNvp0sGFY+NASpr3el8PUhV48VrbnE
+         4MgUE4GFcURza2+VpHUFxKkhw1NHErRicorkkTROx0yPOqLCK96wbkNUEUahz9Vfq2Ui
+         B7P56s4R8hMiOccmcrBB3x7Wfd4C6pOGfOhCf+IcRC5hksLkKo44twtO3l6wtYNR3nsY
+         y/PZX03efO3rWLoZUoHlKdwCjTesKj8bWx3a6Q8I+YTFda6YkHbAXwY58lMMTtRdetdK
+         UhwwlgEmRIvXEh2jy7JgRgcK39zhyAwaDtKN0kNulJ6g5GisedrwaEDhiNL5ENMo/sos
+         W+Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783862681; x=1784467481;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=QfWOIyj5Dh1RyW6lJ4ZHjGKaJH5YK30QhHZE5Vm089E=;
+        b=RlTBAOgw7+DetkI6ActLT8V/mpZwoGyWHojqvd9TqLazujSDLSjEEMROPfW3RfHiqR
+         TwGuDVwOo/OsbSRag/b+i2gIKXt/YQJAGET4WaZ9+Pli+sbYD0yW+vovknlyfJ8xC3j+
+         QJJSeBxSavFTZRHV6CJpd46e7XlHQZl7M9lV5F+LcPEF3D9XdkcRlfIucguJB6skOgi1
+         iexUh8HYD00lb+4Rnx4I69GkBDnqpay19PUN/jazRjY7325aaeXjWSWQlvFerYlwJJPT
+         idrpxRJRqqiZYcIbE65SB3NdD0xYfgJs0dXFI0kIJGtQuz7SYQXGVm/ugrIhrrIxJR8O
+         mwKA==
+X-Gm-Message-State: AOJu0YwJKyKX3RUCD7yoL4r5/a0TEQQmn57z+3ToaxJUDzJVTH70lyGI
+	vwlQkyeH3SFdnGqK4jAN3htgQIS02bbkNEjpGLzRewGhllmsTtyWm99ThoiZ0g==
+X-Gm-Gg: AfdE7clTlfCCekCUf7twddM4A+B58tITmWeTax+V8H+lCYtAqEPbMIFX6Iu8HCz7ygD
+	h5SXDutl/D/Eyk3qGwWZvmuGnGDOSTnQcCX+G841FoV65xGiiyw5hDHmBJ0n3jN4T43RnBdHpOM
+	GMm5vUUtcWf7672NwSRqRvBHKDonNocUjBvrxHyPKpIoLb/o7fJSbMPGb/95jvn3DFgQ4+aIdCh
+	Eoj3rmll9MjQr4BwWYGLSRba3vytcEu6dfBBnS9mT+S+mgvmNu7yPlyXOmdYn015ocX3OZ751gp
+	aucdYG+vSttuJDUqdjoeK2rsyyGNBmhMqv6vRkNcM6tgiCj1ecWpTfnlVEJ8xJIdFxHYqfcRgyE
+	4ETQhSBEANR1BN1d7HCvkBJNL5sstLmRwiB1M3R9bJT9jI4PITjVOQ2M/BeqyEsfYU2pyCgWXZl
+	sonKk75ZK6LeFpKirjP20=
+X-Received: by 2002:a17:90b:2d4e:b0:380:fead:448d with SMTP id 98e67ed59e1d1-38dc74cf95bmr5976082a91.13.1783862680896;
+        Sun, 12 Jul 2026 06:24:40 -0700 (PDT)
+Received: from [172.17.0.2] ([52.234.45.177])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31174accb0esm63451038eec.30.2026.07.12.06.24.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Jul 2026 06:24:40 -0700 (PDT)
+Message-ID: <6a539598.6c8668f2.e4f82.4c24@mx.google.com>
+Date: Sun, 12 Jul 2026 06:24:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3295827065177186492=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, naga.akella@oss.qualcomm.com
+Subject: RE: Add Channel Sounding Dbus support and
+In-Reply-To: <20260712121743.2842547-2-naga.akella@oss.qualcomm.com>
+References: <20260712121743.2842547-2-naga.akella@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Remove context analysis suppression for include/net/bluetooth/*, now
-that previous commits have resolved the warnings.
+--===============3295827065177186492==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1126078
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.68 seconds
+GitLint                       PASS      0.84 seconds
+BuildEll                      PASS      21.10 seconds
+BluezMake                     PASS      551.30 seconds
+MakeCheck                     PASS      23.41 seconds
+MakeDistcheck                 PASS      162.29 seconds
+CheckValgrind                 PASS      231.67 seconds
+CheckSmatch                   PASS      315.86 seconds
+bluezmakeextell               PASS      102.37 seconds
+IncrementalBuild              PASS      574.32 seconds
+ScanBuild                     PASS      993.72 seconds
+
+
+
+https://github.com/bluez/bluez/pull/2301
+
 ---
- scripts/context-analysis-suppression.txt | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/scripts/context-analysis-suppression.txt b/scripts/context-analysis-suppression.txt
-index 1c51b6153f08..d4476d9ed10a 100644
---- a/scripts/context-analysis-suppression.txt
-+++ b/scripts/context-analysis-suppression.txt
-@@ -32,3 +32,4 @@ src:*include/linux/seqlock*.h=emit
- src:*include/linux/spinlock*.h=emit
- src:*include/linux/srcu*.h=emit
- src:*include/linux/ww_mutex.h=emit
-+src:*include/net/bluetooth/*=emit
--- 
-2.55.0
 
+--===============3295827065177186492==--
