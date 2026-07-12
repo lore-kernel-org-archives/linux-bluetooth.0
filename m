@@ -1,145 +1,243 @@
-Received: from out-30.smtp.github.com (out-30.smtp.github.com [192.30.252.129])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F873126B0
-	for <linux-bluetooth@vger.kernel.org>; Sun, 12 Jul 2026 12:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.129
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783859647; cv=none; b=dZ29tLg7cPXzsXpc2x671GEiwT6W2vHYovnSLBc6InbGbUNStMKM1QC4L0Lm17pHAisinFcFBjEbXsNk0ipS46JPYBxGF+cU4TPYtTQKkYT3alWSZfUVJ/DWgKuYaY+iiVSaFuqA1LRNA6OOxCsczEsOillT4di0mkOTrmf134c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783859647; c=relaxed/simple;
-	bh=G51SjxgYyrMGvPo0GfwWgunj0n1ad1yGakMdvIW5Ez0=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=U4kxXi9fZLucA9DxPXEVEeOdYHOAuoQKJ4+h2rr9IepaTy04seQLXNpnKy4mV5GdUTxrG2lmcvzh9emFiP2y8p1fKaCJRbEGrigvtAM09RmRCK6gtyA5fqEc3ewNF6JNh05UNbxsHPuuwUouA6x5Smcg2cbivCV4Xjo7MQqm1Dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=kej6txNy; arc=none smtp.client-ip=192.30.252.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C023769F6;
+	Sun, 12 Jul 2026 12:43:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783860183; cv=pass; b=BUoAhtJ5WifIoy8wp4XOQBnzVhAmpk+SJhH9UPx7NLmFwEtk5QasjoL4ymQUjIajVHBLNO3eUmcygyjebmKAOyyGAAIumOx/ZvpQwNw8sRtyLr/6iKlIdcC4iI+XUN7kUZG5npSMXENNxeZMFcQXbLw/OT4ZJOOkxdyCOEgLRL4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783860183; c=relaxed/simple;
+	bh=jU3PcpTR1QlnFIDXkG+WTqd0Lh3ixFjhrOZokEX6Xb0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oZrdwmsFsKdU+QOgNnVae+VPwU3ZeVXXGrUqI6zWZqycSzPL9rpnG8V5VdzSs/A5yzZWs+1dzeiRgy6wkkfG3HGvJ7j7SMEHFVT1jbW648G284uCy5/iz+oHtp8ZQDkzy/RgLMz/QFsHCL6iiaH3T/StfTHD4Qjk/yuB0LJCk8Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=Ic7dw0Hf; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="kej6txNy"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1783859645;
-	bh=+sCjuq0I/vZ7Oszkh7LDNrRBcAOpz1r5p/55FMEB4tM=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=kej6txNyidB+8y2DaVhqYr4qD8/PJv43k0CYCw18YZyUbflBUxR4g8CwMNXwVYfP6
-	 Meqj5Q6GftHoZCNXg7I7jTmNuqFCxrLv54PMkzKZfUzHYBWbWAASyGUUtRaWLZF0bc
-	 WJIEOg+qud+LbAqLwsCHoBpD7vFqxbzw91sJ3pX8=
-Received: from github.com (hubbernetes-node-2f5a1e3.ac4-iad.github.net [10.52.131.37])
-	by smtp.github.com (Postfix) with ESMTPA id AA8DB3207F1
-	for <linux-bluetooth@vger.kernel.org>; Sun, 12 Jul 2026 05:34:05 -0700 (PDT)
-Date: Sun, 12 Jul 2026 05:34:05 -0700
-From: Bhavani <noreply@github.com>
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="Ic7dw0Hf"
+Received: from monolith.lan (unknown [185.65.133.89])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4gylbH21tVz10Y4;
+	Sun, 12 Jul 2026 15:42:51 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1783860173;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=jZRkVzX/u9U+IPOo7SrMEFUtVB7zvSSobp2J+upYakQ=;
+	b=Ic7dw0HfoSX6/YwMlBmk3ea8AMoWzWoIe/uxyaWDoOPSAlkLXfddx4dYVbM2zipzn7HRnr
+	ac9rBdwVipxtH3mb3Vi19XR0n6rF+r8fYjtCPnChrgXruIR/P8klsNWlb6x/5TyIFs1ZuM
+	YWJq43LWtW4t+crq5SK+lej7NH7koDg=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1783860173;
+	b=aerzkxVTHKLlB9EGJc9Mty0cPimLfi3jOymtW8dwgl0JpIVV6a8m39U/dYygSR3idnw7jM
+	XohquIlI6VUj+YV6xzup3Uq0rSrXyxN5jbqxEjULUnB8SkOcIRZQuGBuYbarbXiN+I4Kod
+	1ardIxmzZB3s426s5fArP4YQehLZxqA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1783860173;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=jZRkVzX/u9U+IPOo7SrMEFUtVB7zvSSobp2J+upYakQ=;
+	b=Gvc9+ynlx5wI1ne2qCetVFFuSQnFqRKzMT7Z4SMW+M8mfht4tp48PNGKp2QR4Hd6ckKkKL
+	jzheQ4kWGjuUftKvIAvjRES7NLJVhmjUk4VHmP8nGRjjJUbePzjCPtQCxX39T73TZ+xJA0
+	7Cwj6c4h3Eem/j88ZcJ7mpdKOgWBYE0=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1126078/000000-a317a3@github.com>
-Subject: [bluez/bluez] e60637: rap: Add Channel Sounding parameter types and
- APIs
+Cc: Pauli Virtanen <pav@iki.fi>,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	elver@google.com,
+	bvanassche@acm.org,
+	linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: [PATCH 1/2] Bluetooth: L2CAP: avoid maybe-return-locked and add locking annotations
+Date: Sun, 12 Jul 2026 15:42:45 +0300
+Message-ID: <9a718ecfbeb46077d8100dcb687e1ab6073986f6.1783860121.git.pav@iki.fi>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1126078
-  Home:   https://github.com/bluez/bluez
-  Commit: e60637ba8cc4fa3eaf41de1f913138af64673571
-      https://github.com/bluez/bluez/commit/e60637ba8cc4fa3eaf41de1f913138af64673571
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-07-12 (Sun, 12 Jul 2026)
+Replace the maybe-return-locked behavior of
+l2cap_get_chan_by_scid/dcid() by doing locking in the caller after NULL
+check. This allows the static context analysis to handle this.  No
+functional change intended.
 
-  Changed paths:
-    M Makefile.am
-    A src/shared/cs-types.h
-    M src/shared/rap.h
+Add context analysis annotations related to l2cap_chan_lock/unlock().
 
-  Log Message:
-  -----------
-  rap: Add Channel Sounding parameter types and APIs
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
 
-Add shared Channel Sounding parameter structures
-(bt_rap_le_cs_config, bt_rap_le_cs_frequency and
-bt_rap_le_cs_default_settings) for exchanging
-CS configuration, frequency, and default settings
-between the RAP DBus layer and HCI state machine.
+Notes:
+    Possibly the l2cap_ops::alloc_skb callback should have generally
+    __must_hold(&chan->lock) and not just in l2cap_sock.c
+    
+    This would imply l2cap_chan_send() should hold the lock, but trying to
+    add the annotations reveals l2cap_chan_send is called without chan->lock
+    from some places:
+    
+    net/bluetooth/smp.c:589:2: warning: calling function 'l2cap_chan_send' requires holding mutex 'conn->smp->lock' exclusively [-Wthread-safety-analysis]
+      589 |         l2cap_chan_send(chan, &msg, 1 + len, NULL);
+          |         ^
+    1 warning generated.
+    net/bluetooth/6lowpan.c:455:8: warning: calling function 'l2cap_chan_send' requires holding mutex 'chan->lock' exclusively [-Wthread-safety-analysis]
+      455 |         err = l2cap_chan_send(chan, &msg, skb->len, NULL);
+          |               ^
+    
+    Don't know now if the context in these places allows l2cap_chan_lock()
 
-Add getter/setter APIs for CS config, frequency
-and default settings, add measurement.
+ include/net/bluetooth/l2cap.h |  2 ++
+ net/bluetooth/l2cap_core.c    | 25 +++++++++++++++++--------
+ net/bluetooth/l2cap_sock.c    |  1 +
+ 3 files changed, 20 insertions(+), 8 deletions(-)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index ef6ce1c20a4f..53a68fc32f10 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -825,11 +825,13 @@ struct l2cap_chan *l2cap_chan_hold_unless_zero(struct l2cap_chan *c);
+ void l2cap_chan_put(struct l2cap_chan *c);
+ 
+ static inline void l2cap_chan_lock(struct l2cap_chan *chan)
++	__acquires(&chan->lock)
+ {
+ 	mutex_lock_nested(&chan->lock, atomic_read(&chan->nesting));
+ }
+ 
+ static inline void l2cap_chan_unlock(struct l2cap_chan *chan)
++	__releases(&chan->lock)
+ {
+ 	mutex_unlock(&chan->lock);
+ }
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 538ae9aa3479..ba8e69dfbe11 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -109,7 +109,7 @@ static struct l2cap_chan *__l2cap_get_chan_by_scid(struct l2cap_conn *conn,
+ }
+ 
+ /* Find channel with given SCID.
+- * Returns a reference locked channel.
++ * Returns a reference.
+  */
+ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn,
+ 						 u16 cid)
+@@ -118,17 +118,15 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn,
+ 
+ 	c = __l2cap_get_chan_by_scid(conn, cid);
+ 	if (c) {
+-		/* Only lock if chan reference is not 0 */
++		/* Only hold if chan reference is not 0 */
+ 		c = l2cap_chan_hold_unless_zero(c);
+-		if (c)
+-			l2cap_chan_lock(c);
+ 	}
+ 
+ 	return c;
+ }
+ 
+ /* Find channel with given DCID.
+- * Returns a reference locked channel.
++ * Returns a reference.
+  */
+ static struct l2cap_chan *l2cap_get_chan_by_dcid(struct l2cap_conn *conn,
+ 						 u16 cid)
+@@ -137,10 +135,8 @@ static struct l2cap_chan *l2cap_get_chan_by_dcid(struct l2cap_conn *conn,
+ 
+ 	c = __l2cap_get_chan_by_dcid(conn, cid);
+ 	if (c) {
+-		/* Only lock if chan reference is not 0 */
++		/* Only hold if chan reference is not 0 */
+ 		c = l2cap_chan_hold_unless_zero(c);
+-		if (c)
+-			l2cap_chan_lock(c);
+ 	}
+ 
+ 	return c;
+@@ -4086,6 +4082,7 @@ static struct l2cap_chan *l2cap_new_connection(struct l2cap_conn *conn,
+ 
+ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
+ 			  u8 *data, u8 rsp_code)
++	__context_unsafe(/* conditional locking */)
+ {
+ 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
+ 	struct l2cap_conn_rsp rsp;
+@@ -4364,6 +4361,8 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
+ 		return 0;
+ 	}
+ 
++	l2cap_chan_lock(chan);
++
+ 	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2 &&
+ 	    chan->state != BT_CONNECTED) {
+ 		cmd_reject_invalid_cid(conn, cmd->ident, chan->scid,
+@@ -4475,6 +4474,8 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
+ 	if (!chan)
+ 		return 0;
+ 
++	l2cap_chan_lock(chan);
++
+ 	switch (result) {
+ 	case L2CAP_CONF_SUCCESS:
+ 		l2cap_conf_rfc_get(chan, rsp->data, len);
+@@ -4581,6 +4582,8 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn,
+ 		return 0;
+ 	}
+ 
++	l2cap_chan_lock(chan);
++
+ 	rsp.dcid = cpu_to_le16(chan->scid);
+ 	rsp.scid = cpu_to_le16(chan->dcid);
+ 	l2cap_send_cmd(conn, cmd->ident, L2CAP_DISCONN_RSP, sizeof(rsp), &rsp);
+@@ -4618,6 +4621,8 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn,
+ 		return 0;
+ 	}
+ 
++	l2cap_chan_lock(chan);
++
+ 	if (chan->state != BT_DISCONN) {
+ 		l2cap_chan_unlock(chan);
+ 		l2cap_chan_put(chan);
+@@ -5115,6 +5120,8 @@ static inline int l2cap_le_credits(struct l2cap_conn *conn,
+ 	if (!chan)
+ 		return -EBADSLT;
+ 
++	l2cap_chan_lock(chan);
++
+ 	max_credits = LE_FLOWCTL_MAX_CREDITS - chan->tx_credits;
+ 	if (credits > max_credits) {
+ 		BT_ERR("LE credits overflow");
+@@ -6974,6 +6981,8 @@ static void l2cap_data_channel(struct l2cap_conn *conn, u16 cid,
+ 		return;
+ 	}
+ 
++	l2cap_chan_lock(chan);
++
+ 	BT_DBG("chan %p, len %d", chan, skb->len);
+ 
+ 	/* If we receive data on a fixed channel before the info req/rsp
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 735167f73f31..4afc5b370b97 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1740,6 +1740,7 @@ static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state,
+ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
+ 					       unsigned long hdr_len,
+ 					       unsigned long len, int nb)
++	__must_hold(&chan->lock)
+ {
+ 	struct sock *sk = chan->data;
+ 	struct sk_buff *skb;
+-- 
+2.55.0
 
-  Commit: dbbf2ac08f40b6537568fc2a418c3aeba75842ec
-      https://github.com/bluez/bluez/commit/dbbf2ac08f40b6537568fc2a418c3aeba75842ec
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-07-12 (Sun, 12 Jul 2026)
-
-  Changed paths:
-    M src/device.c
-
-  Log Message:
-  -----------
-  src: Register GATT profiles for Channel Sounding reflector
-
-Probe and accept GATT_UUID profiles on non-initiator (reflector)
-devices before gatt_client discovery checks,
-ensuring RAP's org.bluez.ChannelSounding1 DBus interface is registered
-even when GATT client discovery is skipped.
-
-
-  Commit: 481899b86437b09f50ee68c7ad0e9d1fabe9ce5a
-      https://github.com/bluez/bluez/commit/481899b86437b09f50ee68c7ad0e9d1fabe9ce5a
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-07-12 (Sun, 12 Jul 2026)
-
-  Changed paths:
-    M profiles/ranging/rap.c
-    M profiles/ranging/rap_hci.c
-
-  Log Message:
-  -----------
-  profiles: Add D-Bus Channel Sounding control APIs
-
-Expose org.bluez.ChannelSounding1 on the device path,
-adding SetDefaultSettings, StartMeasurement, and StopMeasurement methods
-and an Active property to let external clients configure and
-control CS ranging sessions.
-
-Replace hardcoded CS configuration values with configurable HCI accessors
-(bt_rap_{get,set}_cs_config_params, bt_rap_{get,set}_cs_freq_params,
-bt_rap_{get,set}_default_settings_params).
-Add measurement control APIs (bt_rap_start_measurement,
-bt_rap_stop_measurement) with optional timeout-based auto-stop
-and callbacks for timeout and procedure-state changes,
-allowing DBus Active state to reflect actual controller procedure status.
-
-
-  Commit: a317a3fb368cde3546ce52c1371ce57f4947f56a
-      https://github.com/bluez/bluez/commit/a317a3fb368cde3546ce52c1371ce57f4947f56a
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-07-12 (Sun, 12 Jul 2026)
-
-  Changed paths:
-    M Makefile.tools
-    A client/cs.c
-    A client/cs.h
-    M client/main.c
-
-  Log Message:
-  -----------
-  client: Add Channel Sounding shell submenu
-
-Add a cs bt_shell submenu for controlling
-org.bluez.ChannelSounding1, supporting measurement start/stop,
-default-setting configuration, and session status display.
-Maintain reusable validated CS parameters and
-track active sessions via D-Bus Active state,
-replies, and disconnects.
-Integrate with client/main.c to manage per-adapter
-ChannelSounding proxies, device resolution,
-property updates, and session cleanup.
-
-
-Compare: https://github.com/bluez/bluez/compare/e60637ba8cc4%5E...a317a3fb368c
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
