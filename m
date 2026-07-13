@@ -1,124 +1,103 @@
-Received: from out203-205-221-239.mail.qq.com (out203-205-221-239.mail.qq.com [203.205.221.239])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C453B42C2;
-	Mon, 13 Jul 2026 09:38:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E4F33B951
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2026 10:02:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783935526; cv=none; b=V+F7BMMqkPdHiml1CgKg68rztUbd5KJG03Oacuk7GeHH2Nu22a8xJCypFxdp8fE52lAx8juQO1Lo03XIzijUhf/7GKhGei+76PMnpKpPWpyBh195ZxXzPedlI3SnS8OFKMzrWqXgr0MM9kx6UQml0OlYtJH/VyHHwsuEVWSne+s=
+	t=1783936981; cv=none; b=N2mwVKO9Uh9sgVqBkwVwADWiy/6cK0e4W53O7/eA/Q4tOYjtY26/6U1eojOgSlMIVmJl0RR+eWh1gWIL8EiIEhEEleJzTcYksfHGd8orBZ5eRw1nS2L+C1r8o9MNCuTgfeLUT/+iG71AWTxAqXJLWt0MNrQM++HKhdGsibDGdOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783935526; c=relaxed/simple;
-	bh=bPcrT+Tg7YD6yhcrHBRzXYiThoOZ4NWXVppGZnjmZVo=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=fZ7X/1aAqLHcWLQr9zxzT8vkXVcvu/APaijArmpYLhTbq+TjVNNYdz5LnMZal8WJA944cg6fPwJ1qkuOyVitNu140E85z3vJwqpetHkLtgn2SseUQZAKC7rFkASWaX/3O8ZmPAo+NawcFyb5rQoyxWFng28gN/coZ5FE5rSwZ7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=d2uVbAle; arc=none smtp.client-ip=203.205.221.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+	s=arc-20240116; t=1783936981; c=relaxed/simple;
+	bh=+39Ki4qDUj+GEqgoJeQgJ1rBqMF6ALjRvnVbQJ5YrKk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=CagIpWJgQxIZITPAnRoWIJK6cXUh3HRMBfSXCfh78vg0tLs/QMjS1J4nRAR82ir8DKu8jT60NomMIoz4VjuebYuclf4DHdPkCVQOstBDkp1SrznUYHQoAxevMpipEt0v8EbswDnqK53AaK5+RPbzB7G7eewSovJNHBL+cBauYTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uf7mMT9p; arc=none smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="d2uVbAle"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1783935517;
-	bh=8Wjj2nFh1/eA2LCw0fmBvTWRNHY54TXI1rsxSWwH0hI=;
-	h=From:To:Cc:Subject:Date;
-	b=d2uVbAleYZlNleiEQ3+p82//xCcCVsIHE0Fu5pRjYsxb5sxYKyNLEVkLE2jPf27fP
-	 EsgcsamRG3R0HYQBSac2XI/6+xQoLSoE/BnMxMWDA+5hkY8Z572SpYP4+HjrBEDvq4
-	 lc3mM5yc+r7KXqVdjVkVAtIxuvDl59yYWf77L/AE=
-Received: from localhost.localdomain ([116.128.244.169])
-	by newxmesmtplogicsvrsza63-0.qq.com (NewEsmtp) with SMTP
-	id 9A316CBE; Mon, 13 Jul 2026 17:38:35 +0800
-X-QQ-mid: xmsmtpt1783935515tce1lowq4
-Message-ID: <tencent_44ED865C14DA3D3823CA85AE1DF2CEBC1805@qq.com>
-X-QQ-XMAILINFO: MZtEYADUG4AgCymIC1dY7kLkaTeDl1gVe0aEsp7rWmbrVpp4POOP64PJ+rMEky
-	 jCWe/wsAFBS+0cHYJHJ5RZWwf8fu8c9rH0SZULkRyxRhX/M1g+DE4Cp+3mL26qDX1CIERa7xL9mQ
-	 qgxuPVUAVIhIlpvKxhVCh3e9QvUGXGSuM4ZSfG6XWUbogqxX9kWOcia56+mjwGl21WpIkTXKLXcc
-	 0CzxFKU8k1QrDcuw4qK3r9aOB4TJihx0bcCmBBkiI2Ak1zVj8u6eoEsf43XMfnKH80fZKssTYCIm
-	 j1Xm1E/S6pyr1bwxHFXMdyKRNL+kaMPdc4zvxRnxIvF/Pu8Pk+MynZBalK7q+lCN1o0pyHJ+6l+m
-	 n15p+nVdWBqet364tm7FIaSLBa91GB+nGHYtUUP9v2EbO0R0ttMVPYWjD4L2eVu7E1DX1mz7Z/JI
-	 +tkLIeH6SBRVZoy1l4xCqjukCf3aMEyhAHRHaS1o+M4f9NHHOfGag3q/9vLZ/YcTF/wtrggSaSGS
-	 PJv8ze/OfiJepoyqGQnPYnQobESLqYQaSC473ncZLz/g15ytETpfV8zFhh85TXeYBZDaRzsgiS55
-	 x4TAdKGj3h/rGkQkldmfUyupcY2ERmGzmgNv2PL0GA/fHYgKcwgwR5VryZGy0jSr4WCU7DImtZmQ
-	 n+E85705SXM7yNLIqEgKhA/YJo2adQQakYzr6bf+T+8g/j5kxv5y/LY+CFbFGxBJILsnIkzwjQpP
-	 JdOlR+4xzmcsf/vqt3OWXoGgOO/mxttVfujqE7S6pBqQTfaVp3YnWCrTvjSXTeyHeTbOerUYbJvt
-	 Lp5b6c9cvzBMnpsdYXEVQ7/PXf3O7CVQ/aUa+EWKZZF4EiczUfvnH1XghsMnh98Q66fD8l8gh688
-	 RRM4ws7LFBBXfe36kaBNwuUTdbym2K1t11VbIutv21/cOIthsk0Ltp0Gv8TLKvBVFqrCTByM5+yY
-	 0chAfltOnjqYkTGhuzdnO+dJrk1BIV4h6tna2lWwhnpiEDZmsCVNC707+Rwg2hRV/AF0Wn3JhW9X
-	 sYwtfCI6FGzMzjo3+GcI9jT69ZKYE=
-X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
-From: Zhao Dongdong <winter91@foxmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Zhao Dongdong <zhaodongdong@kylinos.cn>
-Subject: [PATCH] Bluetooth: btintel_pcie: Fix DMA memory leak on probe failure
-Date: Mon, 13 Jul 2026 17:38:33 +0800
-X-OQ-MSGID: <20260713093833.484005-1-winter91@foxmail.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uf7mMT9p"
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-9061a795d76so10319046d6.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2026 03:02:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783936979; x=1784541779; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=+39Ki4qDUj+GEqgoJeQgJ1rBqMF6ALjRvnVbQJ5YrKk=;
+        b=Uf7mMT9p3oLejaXbWBvN1STMBDV8kZIy/atXwcCy1GM/TNFPZDQg2tAnS44SM446iY
+         jJzwntOkUsjGkvsHHCFfjrUcUEUnV4EhQWoG0okAzkIsywsIA2sHdn32WWjMbHQ/2uay
+         QeLF5TJRmtvmDk3bmWEEhhePCda8zpY9W7a2pArtNbjsQF7Pn525+KLqQf1nKNPK5qr2
+         UiFbiyR0qqhK+hk34yjqhFdRzFZIzqYkXZVTzqPVySEILnhGpkVwfCEmc9qhvHb1Q1rE
+         rY/ThMy78WKjoBQBDuKtqkGA/2+1St2eoqDbeyz1RpnpGxIgtdl0phwb1D8bBi3yXSbw
+         TS+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783936979; x=1784541779;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=+39Ki4qDUj+GEqgoJeQgJ1rBqMF6ALjRvnVbQJ5YrKk=;
+        b=qpzc3tgsAoCEiienkWCKHlb/TT9AbVscuK7dxOweu2vMQyMxnhseVDglQimt7BUoaw
+         UQpoaCN6xw+xzbGTXmUXqnI3dNJGOK7mBBWrswIvQqhdTrQcjmA4Uan5WLQYpQgvnEEw
+         VvBQBhkBL4zgX6NiKVEm7hQC+9sH2rhtGYp3+z22Kk/yzVaLJVjflNAQqKfA+rEepQt3
+         vXwRp/fhc5TBDqikuF9c13NwBuYbav7kw2b4vy3cLMIrUNhAbXvmhC10V7XvWD165KEk
+         ryr5fQ5ce3TAwpVj8R74AEtjORLHsRCyjUG7qsSTX0H+Pcjw6eSwIgS14VCl88vtCfuM
+         r8eQ==
+X-Gm-Message-State: AOJu0Yxr9aNBZqjs9llpVwfd+19Tk5qC1GAMBCgWpy3GvWhc8h6cL1r7
+	HSbg3XGfh8XAdn7Vk3PJJCqUjFdVddzR4S5jBmjiFWKVNwhp4gfcRgkDi4GDKg==
+X-Gm-Gg: AfdE7ck8RVOSXNb5eHHq5/DmpW73Ww5G80c8hFR/21pKmtmZCjClf6/W8plPOrglBh9
+	qcphSPuQ3kpJR4/1bqMsfL7kYEsrHbhdnGRkM6/cxM5eavuVV84BqggwldUQ45FyFnNlkfK0sMa
+	xvM6isx+hHNX5+0o6ntqkGkwS37Ku5DmPEkInriLp7qPEPvMtDyoIXDrhj/KlTcr4U06XvfhuNG
+	dfaPpR4Qdd3dft3xXaqoZWbO7tMw6O+IFCLh2BPKg65dtWsfDrNkEoEiTLBdl1LaRpJ6zcVvCt5
+	8LsAoc+kUCpt3XjzGffxzJ5aVvEe6Sl4QfePdioIYQJ9ExbprYMcrhXrxSZ1PjvOEYkaKHqQ9bV
+	Me/do4A2v+wKgPvF7++ZXdMae2cO9CMt1lzFUMQUuKdbmZ3+MoVwOjVy/ledXjlWAvCHsiS8ipm
+	nhv14+GedaeKZ3l6YU1ZZCqjWoQxIgAA==
+X-Received: by 2002:a05:6214:2f8c:b0:8f0:b75:c4ae with SMTP id 6a1803df08f44-90400b8ac10mr94810936d6.9.1783936978663;
+        Mon, 13 Jul 2026 03:02:58 -0700 (PDT)
+Received: from [172.17.0.2] ([20.102.102.64])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9063df4319asm24399266d6.38.2026.07.13.03.02.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jul 2026 03:02:57 -0700 (PDT)
+Message-ID: <6a54b7d1.8426f43d.10fd16.1f50@mx.google.com>
+Date: Mon, 13 Jul 2026 03:02:57 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5827930641074182914=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zijun.hu@oss.qualcomm.com
+Subject: RE: Bluetooth: btusb: Add support for Qualcomm QCC2072
+In-Reply-To: <20260713-btusb_qcom-v1-1-39cabc0dd601@oss.qualcomm.com>
+References: <20260713-btusb_qcom-v1-1-39cabc0dd601@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Zhao Dongdong <zhaodongdong@kylinos.cn>
+--===============5827930641074182914==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-In btintel_pcie_probe(), when btintel_pcie_alloc() succeeds but a
-later step (btintel_pcie_enable_bt, btintel_pcie_start_rx, or
-btintel_pcie_setup_hdev) fails, the DMA buffers and descriptors
-allocated by btintel_pcie_alloc() are not freed. The exit_error
-path only resets the device and destroys workqueues, causing a
-DMA memory leak.
+This is an automated email and please do not reply to this email.
 
-Fix this by introducing an exit_error_free label that calls
-btintel_pcie_free(data) to release all DMA buffers and the DMA
-pool before proceeding to the common exit_error path. Error paths
-after successful allocation jump to exit_error_free, while the
-allocation failure itself (which is already cleaned up internally
-by btintel_pcie_alloc) jumps directly to exit_error.
+Dear Submitter,
 
-Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
-Signed-off-by: Zhao Dongdong <zhaodongdong@kylinos.cn>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: drivers/bluetooth/Makefile:52
+error: drivers/bluetooth/Makefile: patch does not apply
+error: drivers/bluetooth/btusb_main.c: does not exist in index
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- drivers/bluetooth/btintel_pcie.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 9e39327dc1fe..b672ce376e9d 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -2896,7 +2896,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 
- 	err = btintel_pcie_enable_bt(data);
- 	if (err)
--		goto exit_error;
-+		goto exit_error_free;
- 
- 	/* CNV information (CNVi and CNVr) is in CSR */
- 	data->cnvi = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_HW_REV_REG);
-@@ -2905,16 +2905,20 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 
- 	err = btintel_pcie_start_rx(data);
- 	if (err)
--		goto exit_error;
-+		goto exit_error_free;
- 
- 	err = btintel_pcie_setup_hdev(data);
- 	if (err)
--		goto exit_error;
-+		goto exit_error_free;
- 
- 	bt_dev_dbg(data->hdev, "cnvi: 0x%8.8x cnvr: 0x%8.8x", data->cnvi,
- 		   data->cnvr);
- 	return 0;
- 
-+exit_error_free:
-+	/* Free DMA buffers and descriptors allocated in btintel_pcie_alloc() */
-+	btintel_pcie_free(data);
-+
- exit_error:
- 	/* reset device before exit */
- 	btintel_pcie_reset_bt(data);
--- 
-2.25.1
 
+--===============5827930641074182914==--
