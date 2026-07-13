@@ -1,120 +1,148 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8DA83090E2
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2026 12:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B23BF4192E5
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2026 13:11:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783947016; cv=none; b=e7pNG00litTjBKtmpy2Ptg0DIs7qx35Nq03bqdyZNwm0ThH1UK7BrIC4EJ855phkVdKYGR/VXjfriBTSxTwo3ToLbC+UESYls0BNn79X75s3xOkyjpy7jQXG23TdvH/65Jrt7SdaumKkrn90WGPSm5UJoTBasbOUzmDG7jka7Eo=
+	t=1783948314; cv=none; b=S2Vla/6q1W0vo5/BzmLZ9qf4OHZ1SJvXcFa0Ckr4vbkjToXsZI28Hf8WgcpxGlsMpJZMOHIasOoQsHN2e8Z7FPTJlb8Grtme+iMulfb0pQ1MDuT+cBSyeeJ+HWViCOJyHClGLlbYoWxJxaie8ufUmTSXzMgT33ORDDftl9LfqXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783947016; c=relaxed/simple;
-	bh=S92pQ2C0qUV/KBqi32UApWFOvWJs4dXNLhZODPKvz9M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=INVgvf2Ev1vs56gQk4s1gBZ+gJt8YgJl4Jx4dqRJ3Pt0wkZI7rbMDKSAcDTKcEdPiWeDNG/47HtOlsMh+OuDhZT1VmKYlFRhpLALEgYE6eVgXKRvekmWUnkoUzzDlr3MuGZhJQVHB3x9ud9mu6lNibfqjYPdiCDsJcceDb4CDCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S3LyF4yF; arc=none smtp.client-ip=209.85.214.181
+	s=arc-20240116; t=1783948314; c=relaxed/simple;
+	bh=MECoRKzXYMOnWzyBntgAjLehLJ9FnD/10992gUFcJas=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ZU8+83lsCzP2Z3eftduuBxO7IlBKN0BjQWP9YUQHmNlKHBK1D9HMH+98DrSM8xtscwbtsn7Isu4+PKoLBI4MUK1N4EZHuCTNW36idyQCXbOH2D2P0kvoZ8wLwgt6najGpd9TCEnsRHNc23VEX66b/zxqACZbUV1774D2WLPoq4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZGxSl+fJ; arc=none smtp.client-ip=209.85.160.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S3LyF4yF"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2ccf2360620so26050975ad.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2026 05:50:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZGxSl+fJ"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-51c1372f84dso22112761cf.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2026 06:11:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783947015; x=1784551815; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=TvooeHfwR2QntnuwEEpfCHr1XrT9fgk2dlfW1+7scHw=;
-        b=S3LyF4yFCL8Rb/DLclSRrX8LAud28j1tN9zG8au2ig8qIULMOML73cVJ+9ZeQqazhQ
-         sqV28oVOALOyyGqBIaVS3Q7TNcO9yKtf4iOcEqhzJVBPcGt6/j1XR93sYo2zCHeBjJqx
-         jLrjp+PC9M9AEc3OMM24Xt3dBdgziXgOXIG3OIfaXbMVScJoJnIm0ntvklxUJs/skj4t
-         kxt+Gb2DpLnVyrh9tgkJCWhSGTWFfzpXKzQJcQp7faDf6GiSioQ+JdxbQeMMR+igbq7R
-         3YkyZmq0vi5ml9owV+R4O6pIX77dcEmyv23/EKjoDMj73pwCR7pJ2/+py2VzmeN35HDs
-         NXNw==
+        d=gmail.com; s=20251104; t=1783948312; x=1784553112; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=psfLuqkGR6g92CRTnTbBDYuEK6gypbVEcJsfhlpwID0=;
+        b=ZGxSl+fJcOgzcnX8Rg87blzKAUWqyF+CLtA5D/rPjNMx2IRli2nbXdYf/ulU+KuLRI
+         mMREXD9ge+HHt3fHCkoC+OZrdzxI8cy58DCIyjta3hF5wTUV0OHbOJ5ltNY+/4/DXhXw
+         j1RNJ9MpYQUI5efAw2RxWFFwnXEL8ykOBFhbr4D/QF+nWf3LuCDe8AD5vwnr+fN7KluC
+         LWtc6wg6Xu0aNUL+X9T0hzOwnN5g4BUBuWbSmoQ3MBrJldtgarQSPR8qNDpk8+lV7kKK
+         cPeq2OU0iDJp4zBmegAUpnaIaIk8d4gpbuqdsQ2BtdYsFSh2SP1PVMKhJ0tkc5Uoce7b
+         FX0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783947015; x=1784551815;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=TvooeHfwR2QntnuwEEpfCHr1XrT9fgk2dlfW1+7scHw=;
-        b=e87DdslB2E7Llt6vJDx/s5x2jBCst75f4zU3FJA9pwpKXgZdTe5XQ6caQlQZnAAgxf
-         sIPC1ny8tTeMO4uKlMXUcKNyoVeGMv09f4b9ttpKDHO9SxgVtunfYmXYXxk9oM+6MFCU
-         958GNkLW0c37F+1LjnuRiO+gD1G61cMGZQRhUn/kZakL3kwZthh0Bovx/xzyb61tWSvb
-         i8lcckHVcw113Ozf0VnF9bhHqrVCYMZOVrAAr/iITyd7WsWLCfwdRq7907XbGemCSG8b
-         3fccBuw3qP7hU296nSPmYmOjIg96R7mtzwIddMIMvlW5JRybFjEF00w8OCfE7DCb+St+
-         ay7g==
-X-Gm-Message-State: AOJu0YyAFI6o40yMsCGQdqhmcY5X7YsXvJr/vhi1QIn2365WxopWCyfx
-	tMtDTTs5mDnuddRI9dD7yJ8DKR9aA30ls4HaHoP1rQGDs3j3V0G5M0Pe
-X-Gm-Gg: AfdE7ckIw9rEEwPJHBEvjQO8Ss1zO5W7rHKc5bst9gJI3KCzC+0hyUjuHzUaXtInRND
-	9/4Esn4rb158hjwj6JQ/WHXI6wskdXSXfuRe9DG429bVVRamjzHFMjgYMUtdnHotj+L9j7iuVXz
-	b6LPHATNlcNXPMAxABsRxxuzuJXnr92iaPIL0OiPdmnWsdots8/vpwWQddOcQPvFiTTIeBIEzbU
-	MYWvweMU7KXTTqdr7gtz5ynafIU8NJEjpKFuTT48jIuxhkl2lAIh3FzUfa/aIIWIO7MWr6aigp2
-	vywGLvipXgNUcLmZs9Ay/rWXcBCDPKS7hCcFXERSHLoHSMg2F/4iR65iOBZ93aYX4XfHpQSneNH
-	/4Xs7kuaFQfhKxSifQH69K55aMfzqyUq06b1E/O559YuoIEzHPKTyVSAkU/anbj6Gy399z5kVli
-	X9lNLQ0TePSFEJx931hK/zoxElTtvo1F/o6hFUHzCwIMLmTL76zWPfaI5D6uj2ULuyxYQa+lCmg
-	7fg+eZP31CewpkPCm20Lxnf4T3UpA3uUg==
-X-Received: by 2002:a17:903:3904:b0:2c9:c517:d078 with SMTP id d9443c01a7336-2ce9f038f6amr81245505ad.36.1783947014974;
-        Mon, 13 Jul 2026 05:50:14 -0700 (PDT)
-Received: from localhost.localdomain ([101.251.7.10])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9bdb76asm101815485ad.12.2026.07.13.05.50.12
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 13 Jul 2026 05:50:14 -0700 (PDT)
-From: Laxman Acharya Padhya <acharyalaxman8848@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: btbcm: bound local name logging
-Date: Mon, 13 Jul 2026 18:35:08 +0545
-Message-ID: <20260713125008.75358-1-acharyalaxman8848@gmail.com>
-X-Mailer: git-send-email 2.51.2
+        d=1e100.net; s=20251104; t=1783948312; x=1784553112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=psfLuqkGR6g92CRTnTbBDYuEK6gypbVEcJsfhlpwID0=;
+        b=g37QOCZHMMxNvvDLGZyTW1Mj6vRp2lrz8JM4lqKPq8skqactnmbqoCc0V0HJo4ym5Z
+         m1eMFzX8SaQCOYaDE7qjxaS2QiP8w8BItORx/fBBPAe++oT4209ISHwBLS189uQPbyZI
+         Q2JPYoZzm88FDHR++2atDgcU7OSmP6OxUWWFIEGiM9qj4Naz+WlUH527n5qzUL1FeErd
+         2IUUSswSxuyZl2Ik+HkdP5Z4k/1QSF07RJkBkqGx/wGXg+FZK00KkU8ZeoaarTJvEIcp
+         /wj0Kg4exzo2YElkX5mYgelxWbTCREq+ZpQ7d4hmR7/dUaEKw2wISKoG6LUOK1h22A2F
+         +8qg==
+X-Gm-Message-State: AOJu0Yxa7wgL75Y56jsVwxtI6ZWybiDpuzmT3XvNvlS9dyemAs4SVTBY
+	bi2qvTBh6phqoPfggjDpdVvvbEICnqd3NKYWpCu3QwA6gT+NQVw+U0/kzZtkiA==
+X-Gm-Gg: AfdE7cmgjZKid1JMiVcPa+tzaDc08e6qoBeEOqx6usHw6wCDDQopbPruDXtuUyD87eu
+	nrTt6GFPrpilJ9t5ovu6iuLNSVkseKP8kO+5bEU9vSsOSZzFAS9jeMaJwfxxNpbhZ1kOzJ/HOeg
+	PDV+6nPwV5euxkdbIYPxZJi5cFBhGmPocuBXoNtu1RgtN+DWcfuaxImqwVofVen6eLFsQ+QCnQE
+	if3T4DqMe/bDbnGYVxshmTk+kUOyuF6+h0oREXkyUgcqquoowDZvBKPQusEOTsHU+Pl7NgkkFmM
+	QZpfg3sBPlAmZ0qnz7ug03YXG301drZaagyMba98c024phPvRUdOTfkFv10Ma7mxTSxCona6/oK
+	Hxz+4poDJk6zZJ0BL+A/KorO7bP5GjQ8Fbdwh8G6KWK73UadJjZ0TEVQMGU2pt+H52W4vVhXXsB
+	nVygeWhKXVN6KnxMmvEJPu
+X-Received: by 2002:ac8:5705:0:b0:51b:efbb:fbf with SMTP id d75a77b69052e-51cbf16f51dmr85351061cf.18.1783948311521;
+        Mon, 13 Jul 2026 06:11:51 -0700 (PDT)
+Received: from [172.17.0.2] ([172.172.119.99])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51caaf621e6sm80187571cf.24.2026.07.13.06.11.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jul 2026 06:11:51 -0700 (PDT)
+Message-ID: <6a54e417.043ad0dd.13e2bf.3ef4@mx.google.com>
+Date: Mon, 13 Jul 2026 06:11:51 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7280104866314249567=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zijun.hu@oss.qualcomm.com
+Subject: RE: Bluetooth: btusb: Preparation for upcoming Qualcomm QCC2072 support
+In-Reply-To: <20260713-btusb_prep_qcc2072-v2-1-bbcb651285f2@oss.qualcomm.com>
+References: <20260713-btusb_prep_qcc2072-v2-1-bbcb651285f2@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The HCI Read Local Name response contains a fixed 248-byte name. A NUL
-terminator is supplied only when the name is shorter than the maximum
-length.
+--===============7280104866314249567==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-btbcm prints the returned name using %s, so a maximum-length controller
-name lets the log formatting read past the HCI response buffer.
+This is automated email and please do not reply to this email!
 
-Use a precision of HCI_MAX_NAME_LENGTH when logging the name.
+Dear submitter,
 
-Fixes: 9bc63ca0904d ("Bluetooth: btbcm: Read the local name in setup stage")
-Fixes: 2fcdd562b91b ("Bluetooth: btbcm: Make btbcm_initialize() print local-name on re-init too")
-Cc: stable@vger.kernel.org
-Signed-off-by: Laxman Acharya Padhya <acharyalaxman8848@gmail.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1126612
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      4.00 seconds
+VerifyFixes                   PASS      0.13 seconds
+VerifySignedoff               PASS      0.14 seconds
+GitLint                       PASS      2.22 seconds
+SubjectPrefix                 PASS      0.65 seconds
+BuildKernel                   PASS      25.07 seconds
+CheckAllWarning               PASS      28.29 seconds
+CheckSparse                   PASS      27.40 seconds
+BuildKernel32                 PASS      24.96 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      459.28 seconds
+TestRunner_l2cap-tester       PASS      57.49 seconds
+TestRunner_iso-tester         PASS      94.91 seconds
+TestRunner_bnep-tester        PASS      20.86 seconds
+TestRunner_mgmt-tester        FAIL      221.58 seconds
+TestRunner_rfcomm-tester      PASS      26.04 seconds
+TestRunner_sco-tester         PASS      32.42 seconds
+TestRunner_ioctl-tester       PASS      25.98 seconds
+TestRunner_mesh-tester        FAIL      25.96 seconds
+TestRunner_smp-tester         PASS      23.13 seconds
+TestRunner_userchan-tester    PASS      20.10 seconds
+TestRunner_6lowpan-tester     PASS      22.83 seconds
+IncrementalBuild              PASS      48.79 seconds
+
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.239 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.605 seconds
+Mesh - Send cancel - 2                               Timed out    1.987 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/430
+
 ---
- drivers/bluetooth/btbcm.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 463d59890bef..499e12169ca3 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -479,7 +479,8 @@ static int btbcm_print_local_name(struct hci_dev *hdev)
- 	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
- 
--	bt_dev_info(hdev, "%s", (char *)(skb->data + 1));
-+	bt_dev_info(hdev, "%.*s", HCI_MAX_NAME_LENGTH,
-+		    (char *)(skb->data + 1));
- 	kfree_skb(skb);
- 
- 	return 0;
-@@ -766,7 +767,8 @@ int btbcm_setup_apple(struct hci_dev *hdev)
- 	/* Read Local Name */
- 	skb = btbcm_read_local_name(hdev);
- 	if (!IS_ERR(skb)) {
--		bt_dev_info(hdev, "%s", (char *)(skb->data + 1));
-+		bt_dev_info(hdev, "%.*s", HCI_MAX_NAME_LENGTH,
-+			    (char *)(skb->data + 1));
- 		kfree_skb(skb);
- 	}
- 
--- 
-2.51.2
 
+--===============7280104866314249567==--
