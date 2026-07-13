@@ -1,148 +1,160 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B23BF4192E5
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2026 13:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783948314; cv=none; b=S2Vla/6q1W0vo5/BzmLZ9qf4OHZ1SJvXcFa0Ckr4vbkjToXsZI28Hf8WgcpxGlsMpJZMOHIasOoQsHN2e8Z7FPTJlb8Grtme+iMulfb0pQ1MDuT+cBSyeeJ+HWViCOJyHClGLlbYoWxJxaie8ufUmTSXzMgT33ORDDftl9LfqXc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783948314; c=relaxed/simple;
-	bh=MECoRKzXYMOnWzyBntgAjLehLJ9FnD/10992gUFcJas=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ZU8+83lsCzP2Z3eftduuBxO7IlBKN0BjQWP9YUQHmNlKHBK1D9HMH+98DrSM8xtscwbtsn7Isu4+PKoLBI4MUK1N4EZHuCTNW36idyQCXbOH2D2P0kvoZ8wLwgt6najGpd9TCEnsRHNc23VEX66b/zxqACZbUV1774D2WLPoq4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZGxSl+fJ; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95AD8433E7D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2026 13:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783950644; cv=pass; b=j6tjHBlgoli1mGzMzTngq+bMGe2vPoOuLkFpqh2GoRcBZhJJ6IYua2Q9BfBgWDOS0L+CGteNRCAp5EYSN+5OygZN9lNEUIfD+aP1gyVfxAX4/DiRN+RBiYcXtuEvE+Bsi4Q1SCKYvwbYCY7FMQbfGpiN7SXqLCWWU3k4x975QTI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783950644; c=relaxed/simple;
+	bh=Iuc0JAF0y9twX0FlX3O2JRXMiLqqzlx/Jc1ZOxIZ4wE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=eZGwkm6dgcruzc9UIK5XnxQJ+WtcYudYtxydjM2NLqaN9EGgbnM3lzZYk+JwKiDY7yXBX73xofWVCZB/doiNrCgzDdhdz0Y194SgBNqfp3AVLoKjn0Uc062WBXIljJXR7TWg0PPzVfPxf7uNaEM18FOveLMStvkh9YMvL1JCApA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=f9P4TLSW; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZGxSl+fJ"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-51c1372f84dso22112761cf.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2026 06:11:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783948312; x=1784553112; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=psfLuqkGR6g92CRTnTbBDYuEK6gypbVEcJsfhlpwID0=;
-        b=ZGxSl+fJcOgzcnX8Rg87blzKAUWqyF+CLtA5D/rPjNMx2IRli2nbXdYf/ulU+KuLRI
-         mMREXD9ge+HHt3fHCkoC+OZrdzxI8cy58DCIyjta3hF5wTUV0OHbOJ5ltNY+/4/DXhXw
-         j1RNJ9MpYQUI5efAw2RxWFFwnXEL8ykOBFhbr4D/QF+nWf3LuCDe8AD5vwnr+fN7KluC
-         LWtc6wg6Xu0aNUL+X9T0hzOwnN5g4BUBuWbSmoQ3MBrJldtgarQSPR8qNDpk8+lV7kKK
-         cPeq2OU0iDJp4zBmegAUpnaIaIk8d4gpbuqdsQ2BtdYsFSh2SP1PVMKhJ0tkc5Uoce7b
-         FX0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783948312; x=1784553112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=psfLuqkGR6g92CRTnTbBDYuEK6gypbVEcJsfhlpwID0=;
-        b=g37QOCZHMMxNvvDLGZyTW1Mj6vRp2lrz8JM4lqKPq8skqactnmbqoCc0V0HJo4ym5Z
-         m1eMFzX8SaQCOYaDE7qjxaS2QiP8w8BItORx/fBBPAe++oT4209ISHwBLS189uQPbyZI
-         Q2JPYoZzm88FDHR++2atDgcU7OSmP6OxUWWFIEGiM9qj4Naz+WlUH527n5qzUL1FeErd
-         2IUUSswSxuyZl2Ik+HkdP5Z4k/1QSF07RJkBkqGx/wGXg+FZK00KkU8ZeoaarTJvEIcp
-         /wj0Kg4exzo2YElkX5mYgelxWbTCREq+ZpQ7d4hmR7/dUaEKw2wISKoG6LUOK1h22A2F
-         +8qg==
-X-Gm-Message-State: AOJu0Yxa7wgL75Y56jsVwxtI6ZWybiDpuzmT3XvNvlS9dyemAs4SVTBY
-	bi2qvTBh6phqoPfggjDpdVvvbEICnqd3NKYWpCu3QwA6gT+NQVw+U0/kzZtkiA==
-X-Gm-Gg: AfdE7cmgjZKid1JMiVcPa+tzaDc08e6qoBeEOqx6usHw6wCDDQopbPruDXtuUyD87eu
-	nrTt6GFPrpilJ9t5ovu6iuLNSVkseKP8kO+5bEU9vSsOSZzFAS9jeMaJwfxxNpbhZ1kOzJ/HOeg
-	PDV+6nPwV5euxkdbIYPxZJi5cFBhGmPocuBXoNtu1RgtN+DWcfuaxImqwVofVen6eLFsQ+QCnQE
-	if3T4DqMe/bDbnGYVxshmTk+kUOyuF6+h0oREXkyUgcqquoowDZvBKPQusEOTsHU+Pl7NgkkFmM
-	QZpfg3sBPlAmZ0qnz7ug03YXG301drZaagyMba98c024phPvRUdOTfkFv10Ma7mxTSxCona6/oK
-	Hxz+4poDJk6zZJ0BL+A/KorO7bP5GjQ8Fbdwh8G6KWK73UadJjZ0TEVQMGU2pt+H52W4vVhXXsB
-	nVygeWhKXVN6KnxMmvEJPu
-X-Received: by 2002:ac8:5705:0:b0:51b:efbb:fbf with SMTP id d75a77b69052e-51cbf16f51dmr85351061cf.18.1783948311521;
-        Mon, 13 Jul 2026 06:11:51 -0700 (PDT)
-Received: from [172.17.0.2] ([172.172.119.99])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51caaf621e6sm80187571cf.24.2026.07.13.06.11.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2026 06:11:51 -0700 (PDT)
-Message-ID: <6a54e417.043ad0dd.13e2bf.3ef4@mx.google.com>
-Date: Mon, 13 Jul 2026 06:11:51 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7280104866314249567=="
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="f9P4TLSW"
+Received: from monolith.lan (unknown [193.138.7.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4gzP344FdDz49Q4V;
+	Mon, 13 Jul 2026 16:50:40 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1783950640;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gI8xNkJSBYRMGpW0XhvamH/MDVvPqmR129C+CefdCr4=;
+	b=f9P4TLSWwfwAila0EPZFVDTgZ3ycBddOQMoiInc9DD/tJAFy6cFQ0W1ieg8zlrTBh8ijWt
+	MIFadboIN7TQNDKlxuHt2JHm/Az3NRRZDgJk3MFsblCrVANUuE8+3XfEddUyomJQHKluyK
+	YdUdPxZZLiwOXuJ+noMr0A/Qx/GsVrCGWkJ89l4D9Z+Yp9Wa75xdTOf0/AaHRGMz3K+FpZ
+	wXZFUMaKcjhS/OavUkfH5OsnUPExPLgA0VIQeGEvzlqfvYhRe2EdhMyfyLZ6kAZUT20Ja3
+	zQI3PQ+lFq4EpmPnIUSpYPaYYKV2kNeV5wbuvZYjMNyOgju7ntKc7gxqI2IBlQ==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1783950640;
+	b=GGHOH76dy7dEzSH0E9giTJcYBfJFX9j+iYChLpWtTTI1YnA3czNdwZvuZGwZwu6VpSUJrQ
+	AfBReN5MP+bAVGdmSAfQytYFlfm9suGoY6OSZpUZLJA2tlrbP46Q+MPr8pbO5b+71nIe4f
+	JFNtXZvQUge7JMzUUdoKPfZtrM2OTV8yfaIXXOVyrnZsjwgGmZG3hf15SR/2zhj49NC414
+	OqqymUqmg/ProOijnilT4sgamhd+TgDUW/Kmt+cbg/SmWwtmWB14dcwnYpRDljaRJ0CcP6
+	fxED05RbSXx02DknY/QhQ405gWb8f6526nflR2OsijH9xpQQpy9uNUPOTBZkkA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1783950640;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gI8xNkJSBYRMGpW0XhvamH/MDVvPqmR129C+CefdCr4=;
+	b=clFR9DoooX298chwveXRpIYh4cc/ARJVRv13lYdv+ik8kPPPPhDY9SLnR5N8dMdJx+oQm2
+	qTTs0mzW1AuwDLwdlkOSqtttD3Md4lahynqSGl1dq8CeQvuq8nGh7/UNkK6ktQ6BPbxwDd
+	ryhGsy1AtNNtyo+O6kGAiLdwPfCocLOM0oRPwqIy5JIETSJDKUMJzZpsKFnekXXDYJWDBh
+	VRImCnxIYyRzplhcON20qtVPnEJolDqzFkzasUVFbOwOeUpuo1bWfSzq4rsXxwG/pL38+J
+	+JDNOdaWkd/I53dFILMvCwC8nwC4ClNx55juNRXUkM+mFj1HUUtwyBV0sxII4g==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ 3/4] tools/6lowpan-tester: add test for VHCI teardown without disable
+Date: Mon, 13 Jul 2026 16:50:25 +0300
+Message-ID: <44fd75c5d99186b6846e175f16867e19bd0c9242.1783950503.git.pav@iki.fi>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <acc2842d415b9bef95e60243695463fa7953bf71.1783950503.git.pav@iki.fi>
+References: <acc2842d415b9bef95e60243695463fa7953bf71.1783950503.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, zijun.hu@oss.qualcomm.com
-Subject: RE: Bluetooth: btusb: Preparation for upcoming Qualcomm QCC2072 support
-In-Reply-To: <20260713-btusb_prep_qcc2072-v2-1-bbcb651285f2@oss.qualcomm.com>
-References: <20260713-btusb_prep_qcc2072-v2-1-bbcb651285f2@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============7280104866314249567==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Check 6lowpan teardown when controller disappers with active devices.
+Add test
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1126612
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      4.00 seconds
-VerifyFixes                   PASS      0.13 seconds
-VerifySignedoff               PASS      0.14 seconds
-GitLint                       PASS      2.22 seconds
-SubjectPrefix                 PASS      0.65 seconds
-BuildKernel                   PASS      25.07 seconds
-CheckAllWarning               PASS      28.29 seconds
-CheckSparse                   PASS      27.40 seconds
-BuildKernel32                 PASS      24.96 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      459.28 seconds
-TestRunner_l2cap-tester       PASS      57.49 seconds
-TestRunner_iso-tester         PASS      94.91 seconds
-TestRunner_bnep-tester        PASS      20.86 seconds
-TestRunner_mgmt-tester        FAIL      221.58 seconds
-TestRunner_rfcomm-tester      PASS      26.04 seconds
-TestRunner_sco-tester         PASS      32.42 seconds
-TestRunner_ioctl-tester       PASS      25.98 seconds
-TestRunner_mesh-tester        FAIL      25.96 seconds
-TestRunner_smp-tester         PASS      23.13 seconds
-TestRunner_userchan-tester    PASS      20.10 seconds
-TestRunner_6lowpan-tester     PASS      22.83 seconds
-IncrementalBuild              PASS      48.79 seconds
-
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.239 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.605 seconds
-Mesh - Send cancel - 2                               Timed out    1.987 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/430
-
+Client Connect - No Disable
 ---
-Regards,
-Linux Bluetooth
+ tools/6lowpan-tester.c | 28 +++++++++++++++++++++++-----
+ 1 file changed, 23 insertions(+), 5 deletions(-)
 
+diff --git a/tools/6lowpan-tester.c b/tools/6lowpan-tester.c
+index 738714d68..a8faf6eb5 100644
+--- a/tools/6lowpan-tester.c
++++ b/tools/6lowpan-tester.c
+@@ -76,6 +76,9 @@ struct client_data {
+ 
+ 	/* Interface listener socket type, SOCK_RAW / DGRAM */
+ 	int sk_type;
++
++	/* Don't disable 6lowpan before adapter teardown */
++	bool no_teardown_disable;
+ };
+ 
+ static void print_debug(const char *str, void *user_data)
+@@ -264,6 +267,7 @@ static void test_pre_setup(const void *test_data)
+ static void test_post_teardown(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
++	const struct client_data *cdata = data->test_data;
+ 	int ret;
+ 
+ 	if (data->io_id > 0) {
+@@ -276,11 +280,13 @@ static void test_post_teardown(const void *test_data)
+ 		data->packet_fd = -1;
+ 	}
+ 
+-	ret = write_6lowpan("6lowpan_enable", "0");
+-	if (ret < 0) {
+-		tester_warn("Failed to disable 6lowpan");
+-		tester_post_teardown_failed();
+-		return;
++	if (!cdata || !cdata->no_teardown_disable) {
++		ret = write_6lowpan("6lowpan_enable", "0");
++		if (ret < 0) {
++			tester_warn("Failed to disable 6lowpan");
++			tester_post_teardown_failed();
++			return;
++		}
+ 	}
+ 
+ 	hciemu_unref(data->hciemu);
+@@ -317,6 +323,10 @@ static const struct client_data client_connect_disable = {
+ 	.disable_on_connect = true,
+ };
+ 
++static const struct client_data client_connect_no_disable = {
++	.no_teardown_disable = true,
++};
++
+ static const struct client_data client_connect_disconnect = {
+ 	.disconnect = true,
+ };
+@@ -653,6 +663,10 @@ static void client_l2cap_connect_cb(uint16_t handle, uint16_t cid,
+ 			data->dcid = 0;
+ 			tester_test_passed();
+ 		}
++	} else if (cdata->no_teardown_disable) {
++		data->handle = 0;
++		data->dcid = 0;
++		tester_test_passed();
+ 	}
+ }
+ 
+@@ -708,6 +722,10 @@ int main(int argc, char *argv[])
+ 							setup_powered_client,
+ 							test_connect);
+ 
++	test_6lowpan("Client Connect - No Disable", &client_connect_no_disable,
++							setup_powered_client,
++							test_connect);
++
+ 	test_6lowpan("Client Connect - Disconnect", &client_connect_disconnect,
+ 							setup_powered_client,
+ 							test_connect);
+-- 
+2.55.0
 
---===============7280104866314249567==--
