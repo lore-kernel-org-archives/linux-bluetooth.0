@@ -1,102 +1,183 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B8B22FE0F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2026 03:56:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159C62750FB;
+	Mon, 13 Jul 2026 04:56:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783914996; cv=none; b=UHF5KLeYgzODWU9qIUyD9dDEDqAef/1/gMA7E61qyXlBWkG82dzwXZtOQYSTxd/nDHrd+zoVtAm7QnM5agFIs8LVHeppvtvI7usSnPSZCgYRb2SAV9qn1G65ewbIQ13v3p06M4mIBx9b7e4CqQOjXZexMBtUPlCRVE/VAW2WPY4=
+	t=1783918619; cv=none; b=olXsU4+51/XJIcMlh2VfWKrmVzjXzGB2s/8W8eWrz/4nJy4LGkRMGV4QOZ/y/XXYBap9z2HE9E52Bjk+i6e58m9dtzSNuc9C8QcL80kU7zO/FblB1rhX6SVUpFBhSDvegGi/yGbV6tK1YjgV2r5abOMjjN9h6sH4CELB7tnzcoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783914996; c=relaxed/simple;
-	bh=icAG2J6TfhF1GYce1l2rQCWHyVvSqwxRXtQjoDmzBuU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=NPW0ELTRAWu4AEOsZWh0XVjsISDJ7QtDSD9pHqG59f127xtqifXgGitK9Kn+idunmO88j1Cgf2WVAEunansNBupAVkfkKORuATaYt6JuTCLSsyELkY5iuJVHR3y0VrEOvi7r14In3gGxz+i1irZRO5Qbxq0DXkLK4ZjgIkXZXLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=coP5g6bY; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783918619; c=relaxed/simple;
+	bh=/94lvdcimq2Roxo5Vqv88vv9tLT99AmeMn/ihS83wuM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qP9Zhlgk16+hS3otkqA638WAAEopzfmhcJh1BriZ2I2zEQEh4u3LDC0hbbHCn5kEtvMArl/n+y228rbr5giKruniF9MT9T2pdhftNbCmQdB6fpD15TdfF/So9Ikee2gTzgk17B71WQzTBI38cQ1rqUjHvmJSaJki6blyhoBoc8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PBY+E11j; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="coP5g6bY"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-902fc790cd5so24880496d6.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Jul 2026 20:56:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783914994; x=1784519794; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=icAG2J6TfhF1GYce1l2rQCWHyVvSqwxRXtQjoDmzBuU=;
-        b=coP5g6bYaU9SJzYqRjzM18TNnkVKW90fW0qBXrw9OWJKM4KMGA2IOZRBwsOr/ksHZe
-         Vdi6cv8rEzsofN3YqW/Ul2pxj/3JO2WdzP3+pIbYTCpemoV+1UigsSj38+AaN5CGeAfd
-         b5Y0NAD7rMYof062ec6xsYYePaYdO6M6+7MAqxdDMiAE/ijVGb+JASIiJNFBdCcg/Qot
-         d24Mp2ahE/L0qLWKdXVS3W6qUkc0n/6O/RWS3lq1aAv8GB1dEn1GF47JnqkyuJ95ei9M
-         3OV2fyuxxg8XYRik8atNYdYFctPubvwplbwO4dtOMLslEE6YCP3VUI0cP6GLoq/HNn36
-         6lrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783914994; x=1784519794;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=icAG2J6TfhF1GYce1l2rQCWHyVvSqwxRXtQjoDmzBuU=;
-        b=K5XK6PdI/v9SeRS88GSEw23BS10bxDFz43s1TrvdDJS1nGtDhYSgvbhD6429qRQZAT
-         L8ONb+W/fKeHxpqBw35gJC6AYMtTG0LR9BSNpf2yin+OfVUrZ5nn7upzNVVWwl+nLOzG
-         IvZqE+OBR3li8DisInuf0Z2jJCpWb0eZ7AKzV+ank7puaR2fuQ14qSlhNAn37YRqGSkG
-         W4Jpb9UgKCC9xn7EjLF2HMGBNtVHtJW3IXtanlvmMcNOFwQoHXWUnZjtfLOXTkMS6VQu
-         SYBSESz08kpd+FP30KT4J3zTkI9XALC+chRDFfsIq/X5rZKetNSMsoK877sGla1woPAu
-         h/4Q==
-X-Gm-Message-State: AOJu0YycPnnrHLMhtO70og9j9UdPuavhrLnGxgSe4xO2sDoEbhxtPy2m
-	xiJBtCKutL/GVCZvHq02tWwPXJhDoeFRwuigrpYM2V0U12RNv3hC/UBEtQOjzQ==
-X-Gm-Gg: AfdE7cnoSms98f03aIK7tPzJvAqvQf5cavH7v8CplPJTbQiZ+ljTR1zbEi5QkgLEdXG
-	XPBY4KvLf+vLL3rmYFS4GdAaWvV5+W+1SHORHc1VPkTNEuMj/k+B/RdOSTaQoywY7P5GebdLNYt
-	zAMSjvRx00rEZvUXnQwmhmKkjNeKY2pO90kyL6QC7LhU29JFuqi7bIYoLluD9Tl9d9F8G43DGj1
-	pP+v48phbAcH4ab8PdxaJ5jJeJsH/V3izEPIVKrO6pUDIVJc3l9KuRTA34NS8sgfxup2Zv7uLBD
-	Ot7pBqi6m2vE0SMBfL2mgInQtHjOug9wjzloJVZol4DwkCfu2DTdizIPWga+n5cExFIL4cPVe5s
-	Tb7bArB2TbgwjTlJx2knnJR+/7Mihy5tEvONOdkfkkKsOgTMgFtiTksLSdUeYb3DJbEJKX7PUr/
-	NiTnKa8pSVnUfCBaCzTqo=
-X-Received: by 2002:a05:6214:23c9:b0:8cc:de2:3b5d with SMTP id 6a1803df08f44-90401a7ef49mr94637476d6.16.1783914994235;
-        Sun, 12 Jul 2026 20:56:34 -0700 (PDT)
-Received: from [172.17.0.2] ([40.76.117.242])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ffd87cad3csm119619326d6.48.2026.07.12.20.56.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Jul 2026 20:56:33 -0700 (PDT)
-Message-ID: <6a5461f1.46adc49a.1045f9.5936@mx.google.com>
-Date: Sun, 12 Jul 2026 20:56:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4254913815483232816=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PBY+E11j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 520441F000E9;
+	Mon, 13 Jul 2026 04:56:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783918617;
+	bh=jJKBYEa9rmr3kvyqLbAs5Ywz97Hji7oACJ4jFgIyWhw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=PBY+E11jlqgQQIDZUU5NB9ily54ng2B7A0IQ+x0NPi3w7IQmtXvMM+0UwvlBndEZ0
+	 U7IRy2Zmfp/d2Q01FJuhFhlk7q3eKOffl+0iWGSaalhP7lyaepNkO9/1ZUe8AMBs01
+	 Vousxc+DyINtJgVKHFZaNoUyJ1oLHWxyP4zFF6peyuFyNBCnG9Nk33Z8ol3Xj+pqQ8
+	 eAPwklqg/O4gC5VAprHX1ofLAAOR8m5bLsHOBNy4x6wmkoLqpwm9IyI9Lbft7CvNAU
+	 GKgANzx6p3Rfs+aFcYreUOj5Q7vVvsF7Kl4NOLXaGCd5KNvG3zJguTMvNgiFx+fP0F
+	 Jb0+zqqfMSSiw==
+Date: Mon, 13 Jul 2026 06:56:45 +0200
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: "Sherry Sun (OSS)" <sherry.sun@oss.nxp.com>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	Frank.Li@nxp.com, s.hauer@pengutronix.de, kernel@pengutronix.de, 
+	festevam@gmail.com, amitkumar.karwar@nxp.com, neeraj.sanjaykale@nxp.com, 
+	marcel@holtmann.org, luiz.dentz@gmail.com, hongxing.zhu@nxp.com, 
+	l.stach@pengutronix.de, lpieralisi@kernel.org, kwilczynski@kernel.org, 
+	bhelgaas@google.com, brgl@kernel.org, imx@lists.linux.dev, linux-pci@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org, sherry.sun@nxp.com
+Subject: Re: [PATCH V6 3/4] Bluetooth: btnxpuart: Add M.2 Bluetooth device
+ support using pwrseq
+Message-ID: <mow4vuf6zf6c7uzb7zbvwuw3b5p5q5rfghw266f2eiesvhssle@7jzavek52rt7>
+References: <20260713023435.235765-1-sherry.sun@oss.nxp.com>
+ <20260713023435.235765-4-sherry.sun@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, sherry.sun@oss.nxp.com
-Subject: RE: Add PCIe M.2 Key E connector support for NXP i.MX boards
-In-Reply-To: <20260713023435.235765-2-sherry.sun@oss.nxp.com>
-References: <20260713023435.235765-2-sherry.sun@oss.nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260713023435.235765-4-sherry.sun@oss.nxp.com>
 
---===============4254913815483232816==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Mon, Jul 13, 2026 at 10:34:34AM +0800, Sherry Sun (OSS) wrote:
+> From: Sherry Sun <sherry.sun@nxp.com>
+> 
+> Power supply to the M.2 Bluetooth device attached to the host using M.2
+> connector is controlled using the 'uart' pwrseq device. So add support
+> for getting the pwrseq device if the OF graph link is present.
+> 
+> Once obtained, pwrseq_power_on() is called to power up the M.2 Bluetooth
+> card. The power sequencer descriptor is obtained via pwrseq_get() with
+> the UART controller device (serdev->ctrl->dev), since the OF graph
+> link is defined on the UART controller node.
+> 
+> Also add the explicit pwrseq_put() call in all exit paths, pwrseq_put()
+> already calls pwrseq_power_off() internally, so no separate
+> pwrseq_power_off() call is needed.
+> 
+> Signed-off-by: Sherry Sun <sherry.sun@nxp.com>
 
-This is an automated email and please do not reply to this email.
+Reviewed-by: Manivannan Sadhasivam <mani@kernel.org>
 
-Dear Submitter,
+- Mani
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> Reviewed-by: Frank Li <Frank.Li@nxp.com>
+> ---
+> Hi Frank and Bartosz, this V6 patch using pwrseq_put() in all exit paths to
+> fix the power sequencer reference leak issue during BT driver unload and
+> reload as reported by sashiko. I'm keeping your Reviewed-by tag. I can
+> remove it if you think it's inappropriate.
+> ---
+>  drivers/bluetooth/btnxpuart.c | 34 ++++++++++++++++++++++++++++++----
+>  1 file changed, 30 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+> index 0bb300eef157..81a11ac05114 100644
+> --- a/drivers/bluetooth/btnxpuart.c
+> +++ b/drivers/bluetooth/btnxpuart.c
+> @@ -9,6 +9,8 @@
+>  
+>  #include <linux/serdev.h>
+>  #include <linux/of.h>
+> +#include <linux/of_graph.h>
+> +#include <linux/pwrseq/consumer.h>
+>  #include <linux/skbuff.h>
+>  #include <linux/unaligned.h>
+>  #include <linux/firmware.h>
+> @@ -211,6 +213,7 @@ struct btnxpuart_dev {
+>  
+>  	struct ps_data psdata;
+>  	struct btnxpuart_data *nxp_data;
+> +	struct pwrseq_desc *pwrseq;
+>  	struct reset_control *pdn;
+>  	struct hci_uart hu;
+>  };
+> @@ -1872,11 +1875,26 @@ static int nxp_serdev_probe(struct serdev_device *serdev)
+>  		return err;
+>  	}
+>  
+> +	if (of_graph_is_present(dev_of_node(&serdev->ctrl->dev))) {
+> +		struct pwrseq_desc *pwrseq;
+> +
+> +		pwrseq = pwrseq_get(&serdev->ctrl->dev, "uart");
+> +		if (IS_ERR(pwrseq))
+> +			return dev_err_probe(&serdev->dev, PTR_ERR(pwrseq),
+> +					     "failed to get pwrseq\n");
+> +
+> +		nxpdev->pwrseq = pwrseq;
+> +		err = pwrseq_power_on(pwrseq);
+> +		if (err)
+> +			goto err_pwrseq_put;
+> +	}
+> +
+>  	/* Initialize and register HCI device */
+>  	hdev = hci_alloc_dev();
+>  	if (!hdev) {
+>  		dev_err(&serdev->dev, "Can't allocate HCI device\n");
+> -		return -ENOMEM;
+> +		err = -ENOMEM;
+> +		goto err_pwrseq_put;
+>  	}
+>  
+>  	reset_control_deassert(nxpdev->pdn);
+> @@ -1907,13 +1925,16 @@ static int nxp_serdev_probe(struct serdev_device *serdev)
+>  	if (bacmp(&ba, BDADDR_ANY))
+>  		hci_set_quirk(hdev, HCI_QUIRK_USE_BDADDR_PROPERTY);
+>  
+> -	if (hci_register_dev(hdev) < 0) {
+> +	err = hci_register_dev(hdev);
+> +	if (err < 0) {
+>  		dev_err(&serdev->dev, "Can't register HCI device\n");
+>  		goto probe_fail;
+>  	}
+>  
+> -	if (ps_setup(hdev))
+> +	if (ps_setup(hdev)) {
+> +		err = -ENODEV;
+>  		goto probe_fail_unregister;
+> +	}
+>  
+>  	hci_devcd_register(hdev, nxp_coredump, nxp_coredump_hdr,
+>  			   nxp_coredump_notify);
+> @@ -1925,7 +1946,10 @@ static int nxp_serdev_probe(struct serdev_device *serdev)
+>  probe_fail:
+>  	reset_control_assert(nxpdev->pdn);
+>  	hci_free_dev(hdev);
+> -	return -ENODEV;
+> +err_pwrseq_put:
+> +	if (nxpdev->pwrseq)
+> +		pwrseq_put(nxpdev->pwrseq);
+> +	return err;
+>  }
+>  
+>  static void nxp_serdev_remove(struct serdev_device *serdev)
+> @@ -1952,6 +1976,8 @@ static void nxp_serdev_remove(struct serdev_device *serdev)
+>  	ps_cleanup(nxpdev);
+>  	hci_unregister_dev(hdev);
+>  	reset_control_assert(nxpdev->pdn);
+> +	if (nxpdev->pwrseq)
+> +		pwrseq_put(nxpdev->pwrseq);
+>  	hci_free_dev(hdev);
+>  }
+>  
+> -- 
+> 2.50.1
+> 
 
------ Output -----
-
-error: patch failed: drivers/pci/controller/dwc/pci-imx6.c:1382
-error: drivers/pci/controller/dwc/pci-imx6.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4254913815483232816==--
+-- 
+மணிவண்ணன் சதாசிவம்
