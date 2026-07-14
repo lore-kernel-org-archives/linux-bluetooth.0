@@ -1,49 +1,49 @@
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C97D449EA9;
-	Tue, 14 Jul 2026 12:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9BF448393;
+	Tue, 14 Jul 2026 12:33:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784032421; cv=none; b=G6kKOKrMjQssWKYysa58tvsoD9t/fUMk9z/yMjR7yHPLGtMvIQrexLrW8TBeonDi8erQQcT6zdxx309+0dnCE8DabDbu7nfTjtD2pHiLkRbd3fw+lwYyG3bPT4Aj01A2LrzvXs2tPbxMZPhCroh1FR9HVQUvGHAy/ysAgvRwVRc=
+	t=1784032427; cv=none; b=oLzAeEcyTHlctueI3ensw+jVgQ9IpvHVRA6ixVt9x2dDLNjDw7ALP9NIIt3zoBAe8+bXBgcDBkA9nhTWFofhpx/x3+E/mvblUmECdzixVbDEPYuwZ0b9Pw12BLqJqx8j8FMKGo7hFZ66fSGagZyN5msGnNkRcNGtjvndzM1ucE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784032421; c=relaxed/simple;
-	bh=i0fsFUSkMXITgWzAtond0+kbiK5IFKSuHXMHIx+C2Lg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=teflb7au86f9IgZj8KpLpC/+1N6MgyGBHTyDLDUH8IFK48lKkwwm4LrNwVxnKgw2zIgnQaeSOntxk7wSakLKK3XiDrJSm21AEdHUUw0U1vWI5wrZNnQmCGjDce7eqZBvaGQT/dXqRHZMZtCPdcogBeCYhVyHO9NxnxeZbklv6zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=lxTjXlzW; arc=none smtp.client-ip=60.244.123.138
+	s=arc-20240116; t=1784032427; c=relaxed/simple;
+	bh=/tX3LmyIgjGCSKTG4vWoxaECrIeQXTlsdyJakbY9Tg0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gk+ZXeEUfTyby4ibzWEIP78ZRPlIjVj93SEeLXKfq33TybEjwxxyIzHHVZWGuyzf0PHAtqXVhqItT7KMXsejTBUq+37cM0XtlHGC8vzS1lVi3jvT4PYq5avz+u9aVSlqPk72fARebirzqkG2KgZVAY9QxDgbFdy5SJi/69zGYMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=cpU+7a55; arc=none smtp.client-ip=210.61.82.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="lxTjXlzW"
-X-UUID: 3045d4d67f8011f1b1788b6acf885367-20260714
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="cpU+7a55"
+X-UUID: 30dd9bb87f8011f18dc8c9802ae25ab1-20260714
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=HRgpQ687rmVlcSLEtzyKur7PumzkNtjmY3LfBO60S8w=;
-	b=lxTjXlzWOniemOK8C/U0pEFVF7Iadk7voGMIDZPdraHZbWYNdA50Xo4wjLonu5YV6ExKDggy9LGOoHZ5flfNbV64OA7sMb4k81ywUIG7UM888dmicptKvhfbgiWhzQP4iJ27rnhMZ222/3rwYGnvIWItBhJP0d436balCeLKI0I=;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=f/cTAXxiF3k07rNmAgKvsKAUCLozevrZSLPZeWFNbt0=;
+	b=cpU+7a55GNOFtYxRJW8boUTr0Doaa2az4/es2ImdbPcNdqHdWv4nqRjaML3i0vrF2++iAL3FZpEX+V8QHyXeR8aQS11MVERUHEa35HhP21TnvI1vpbCyetRNlF31Kyx493SpI2FgZN4MY7II6aLk7KRPcb0v/X/ZZW7/Qc1DFBQ=;
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.17,REQID:00e2ffd8-e39f-475c-96ca-1eecb3aba5be,IP:0,U
+X-CID-O-INFO: VERSION:1.3.17,REQID:cdd338b9-fc70-4fa6-9e57-b8b689c5bf42,IP:0,U
 	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
 	release,TS:0
-X-CID-META: VersionHash:d497b38,CLOUDID:808e2115-ea64-44d4-98db-4e1fb89955a3,B
-	ulkID:nil,BulkQuantity:0,SF:102|136|836|865|888|898,TC:-5,Content:0|15|50|
-	99|100|102|156|200|213,EDM:-3|-100,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:
-	nil,BEC:-1,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC
-	:0
+X-CID-META: VersionHash:d497b38,CLOUDID:9d8e2115-ea64-44d4-98db-4e1fb89955a3,B
+	ulkID:nil,BulkQuantity:0,SF:81|82|102|836|865|888|898,TC:-5,Content:0|15|5
+	0|99|200|213,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:
+	0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
 X-CID-BVR: 2,SSN|SDN
 X-CID-BAS: 2,SSN|SDN,0,_
 X-CID-FACTOR: TF_CID_SPAM_SNR
 X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 3045d4d67f8011f1b1788b6acf885367-20260714
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw01.mediatek.com
+X-UUID: 30dd9bb87f8011f18dc8c9802ae25ab1-20260714
+Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw02.mediatek.com
 	(envelope-from <chris.lu@mediatek.com>)
 	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1732117842; Tue, 14 Jul 2026 20:33:16 +0800
+	with ESMTP id 1376438619; Tue, 14 Jul 2026 20:33:17 +0800
 Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- MTKMBS09N1.mediatek.inc (172.21.101.35) with Microsoft SMTP Server
+ mtkmbs13n1.mediatek.inc (172.21.101.193) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 14 Jul 2026 20:33:15 +0800
+ 15.2.2562.29; Tue, 14 Jul 2026 20:33:16 +0800
 Received: from mtksitap99.mediatek.inc (10.233.130.16) by
  mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.2562.29 via Frontend Transport; Tue, 14 Jul 2026 20:33:15 +0800
+ 15.2.2562.29 via Frontend Transport; Tue, 14 Jul 2026 20:33:16 +0800
 From: Chris Lu <chris.lu@mediatek.com>
 To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
 	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
@@ -52,10 +52,12 @@ CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
 	<pmenzel@molgen.mpg.de>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
 	linux-kernel <linux-kernel@vger.kernel.org>, linux-mediatek
 	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH v10 0/7] Bluetooth: btmtk: Add MT7928 support
-Date: Tue, 14 Jul 2026 20:33:06 +0800
-Message-ID: <20260714123314.814333-1-chris.lu@mediatek.com>
+Subject: [PATCH v10 6/7] Bluetooth: btmtk: Improve BT firmware logging
+Date: Tue, 14 Jul 2026 20:33:12 +0800
+Message-ID: <20260714123314.814333-7-chris.lu@mediatek.com>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20260714123314.814333-1-chris.lu@mediatek.com>
+References: <20260714123314.814333-1-chris.lu@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,120 +67,55 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-This patch series adds support for MT7928 (device ID 0x7935) to the
-btmtk driver, which requires a new two-stage firmware loading process
-with CBMCU firmware.
+Improve firmware loading log messages to provide more useful information:
 
-The series is organized to fix existing issues first, then improve code
-quality, and finally add new functionality:
+- Add firmware filename before loading to help identify which file
+  is being loaded
+- Display chip ID (dev_id) as HW version instead of firmware's hwver
+  field, which provides more meaningful hardware identification
+- Use %.16s format specifier for hdr->datetime field to prevent
+  potential buffer over-read, as the field is a 16-byte array that
+  may not be null-terminated
 
-Patch 1 fixes a DMA out-of-bounds access in btmtksdio_tx_packet() where
-round_up() alignment causes DMA to read beyond the skb buffer, potentially
-leaking kernel memory or triggering IOMMU faults.
+log output with MT7922
+[  212.878783] Bluetooth: hci1: Loading BT firmware: mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin
+[  212.889614] Bluetooth: hci1: BT HW ver: 0x7922, SW ver: 0x008a, Build Time: 20260224103448
+[  216.048877] Bluetooth: hci1: Device setup in 3096530 usecs
+[  216.048890] Bluetooth: hci1: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
+[  216.114179] Bluetooth: hci1: AOSP extensions version v1.00
+[  216.114220] Bluetooth: hci1: AOSP quality report is supported
+[  216.116782] Bluetooth: MGMT ver 1.23
 
-Patch 2 fixes a pre-existing security issue in btmtk_setup_firmware_79xx()
-by adding comprehensive firmware size validation to prevent out-of-bounds
-memory access with truncated or malicious firmware files.
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+Assisted-by: Claude:Sonnet-4.5
+---
+ drivers/bluetooth/btmtk.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Patch 3 fixes a pre-existing bug in btmtksdio_setup() where
-btmtk_fw_get_filename() generates the correct firmware path but is
-immediately overwritten by snprintf() with a generic legacy format,
-causing newer chips to request incorrect filenames.
-
-Patch 4 fixes a regression introduced in commit 28b7c5a6db74
-("Bluetooth: btmtk: Add MT6639 (MT7927) Bluetooth support") where
-SDIO devices would incorrectly log "BT HW ver: 0x0000" due to
-hardcoded dev_id=0.
-
-Patch 5 refactors existing firmware download code by replacing magic
-numbers with a descriptive BTMTK_WMT_PKT_* enum, making the packet
-sequencing logic clearer.
-
-Patch 6 improves BT firmware logging to provide more useful information
-for debugging: adds firmware filename before loading and displays chip ID
-as HW version instead of firmware's hwver field.
-
-Patch 7 implements MT7928 firmware download flow, which requires loading
-CBMCU firmware before Bluetooth firmware. The CBMCU firmware uses a
-two-phase download sequence: Phase 1 downloads the section containing
-global descriptor and signature data, Phase 2 downloads the remaining
-firmware sections.
-
-Tested on MT7928 hardware with successful firmware loading and
-Bluetooth functionality verification.
-
-Changes in v10:
-- Add Patch 1 to fix DMA out-of-bounds access in btmtksdio_tx_packet()
-  Discovered during v9 review - round_up() alignment can cause DMA to read
-  beyond skb buffer, potentially leaking kernel memory or triggering IOMMU
-  faults. Fix by expanding skb tailroom and zero-filling padding.
-
-Changes in v9:
-- Reorder patches to group SDIO fixes together (Patch 3-4)
-- Patch 2 (was Patch 1 in v8): Fix firmware size validation in
-  btmtk_setup_firmware_79xx()
-- Patch 3 (was Patch 1, new in v9): Fix firmware filename override in
-  btmtksdio_setup() where btmtk_fw_get_filename() result was incorrectly
-  overwritten by snprintf()
-- Patch 4 (was Patch 2 in v8): Fix SDIO device logging regression
-  SDIO devices were passing hardcoded 0, causing "BT HW ver: 0x0000" log
-
-Changes in v8:
-- Add Patch 2 (now Patch 3 in v10) to fix firmware size validation in
-  btmtk_setup_firmware_79xx()
-- Add Patch 3 (now Patch 4 in v10) to fix SDIO device logging regression
-  SDIO devices were passing hardcoded 0, causing "BT HW ver: 0x0000" log
-
-Changes in v7:
-- Patch 5 (was Patch 1): Extend magic number refactoring to
-  btmtk_setup_firmware() in addition to btmtk_setup_firmware_79xx() for
-  consistency
-- Patch 6 (was Patch 2): Fix potential buffer over-read by
-  using %.16s format specifier for hdr->datetime which is a 16-byte
-  array that may not be null-terminated
-- Patch 7 (was Patch 3): Apply same %.16s fix to CBMCU firmware logging
-
-Changes in v6:
-- Fix timeout handling in btmtk_cbmcu_patch_status() to return -ETIMEDOUT
-  instead of success when polling exhausts retry count
-- Add integer overflow protection in btmtk_load_cbmcu_firmware() using
-  check_mul_overflow() and check_add_overflow()
-
-Changes in v5:
-- Split into three patches: refactoring, logging improvement, and
-  new feature
-- Add Patch 6 (was Patch 2) to improve BT firmware logging
-  independently
-- Apply same logging improvements to CBMCU firmware in Patch 7
-  (was Patch 3)
-
-Changes in v4:
-- Split into two patches: refactoring and new feature
-- Add BTMTK_WMT_PKT_* enum to improve code readability
-- Replace magic numbers (0xF0, 0xF1) with descriptive macros
-
-Changes in v3:
-- Add firmware size validation with bounds checking
-- Improve error messages with context information
-
-Changes in v2:
-- Simplified enum usage by consolidating status definitions
-
-Chris Lu (7):
-  Bluetooth: btmtksdio: Fix DMA out-of-bounds access in TX path
-  Bluetooth: btmtk: Add firmware size validation in
-    btmtk_setup_firmware_79xx()
-  Bluetooth: btmtksdio: Remove redundant firmware filename override
-  Bluetooth: btmtksdio: Pass hardware dev_id to mt79xx_setup()
-  Bluetooth: btmtk: Replace magic numbers with WMT packet flag enum
-  Bluetooth: btmtk: Improve BT firmware logging
-  Bluetooth: btmtk: Add MT7928 support
-
- drivers/bluetooth/btmtk.c     | 427 +++++++++++++++++++++++++++++++++-
- drivers/bluetooth/btmtk.h     |   9 +
- drivers/bluetooth/btmtksdio.c |  40 +++-
- 3 files changed, 457 insertions(+), 19 deletions(-)
-
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index 3fe6b4fdc438..75519765bb49 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -148,6 +148,8 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
+ 	size_t expected_size;
+ 	u8 cmd[64];
+ 
++	bt_dev_info(hdev, "Loading BT firmware: %s", fwname);
++
+ 	err = request_firmware(&fw, fwname, &hdev->dev);
+ 	if (err < 0) {
+ 		bt_dev_err(hdev, "Failed to load firmware file (%d)", err);
+@@ -188,8 +190,8 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
+ 		goto err_release_fw;
+ 	}
+ 
+-	bt_dev_info(hdev, "HW/SW Version: 0x%04x%04x, Build Time: %s",
+-		    le16_to_cpu(hdr->hwver), le16_to_cpu(hdr->swver), hdr->datetime);
++	bt_dev_info(hdev, "BT HW ver: 0x%04x, SW ver: 0x%04x, Build Time: %.16s",
++		    dev_id & 0xffff, le16_to_cpu(hdr->swver), hdr->datetime);
+ 
+ 	for (i = 0; i < section_num; i++) {
+ 		first_block = 1;
 -- 
 2.45.2
 
