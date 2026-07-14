@@ -1,122 +1,102 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242F743F4D1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 09:19:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906963DA7E6
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 09:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784020792; cv=none; b=vGJ+Av/0TjLWcvqeiwumZ6xzRLYWhMXhgBK7fkCIRVprVvgTjnaHwHfU+fnGrqGShOPsfXrZYltchvBIHEE/aUZ7wu3ZmdNTV9jEifXxYBYkqUEj0JEcU+FmXpP7IjqIYyoUM/8TlOE+BtV0XJaIqz/qkDg6SDOnU7U8aDUDdII=
+	t=1784021639; cv=none; b=NS02BjJNkRdBKMEaAKE8ZyW+zthNEWMUM8Bfrxus4I4NUb1lh5mUjGvDw/N/aID7dyptwHfNUoRVdUgcGMg70sjrkaZgDAXn4LlKLqm3/BdU6A0umdLspEmW9zwaziosEnu4Q/piO4CLRuFWCotWy4xxRKDVdAY6EEXXPtGYoNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784020792; c=relaxed/simple;
-	bh=/g3pe33ub2DRLIIXRYqePYMCCSpU/4pjQXT7ntRw8NY=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ciUlsNQ87tbDSXhVlpKqfY9dxOODvq20Evtz5lh+NkOAbX3xvWnMV94A/BcZy1aPFjpZcE4DuK8MD9VnLnhEvswx18t0rjItM8MtERQ5FBbr2DvVr87LSCx/S01VAlYpha1aM1/NX1vqjSIwBA03RsWCyzp+wLhqjzf44Irwg4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=PG6ZnU6p; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1784021639; c=relaxed/simple;
+	bh=U5k5cUZb2o7ykWg0EEjNwh2TQj+iH6OiR7kO9+IK9+s=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=mxzwaT8W0P5nxu39ME+hr3jC7AAQ9ZkCdx3kLdiVDEIIdozVwOynZONjbFOLgbpcgskuRfJ2HgU59Lx2UcLFXek5IEPOo4lQ/OiL1wYaCm4jWEyY6NGPImPukX5IdMjPa29aIdUdabQ0TtNEw3Dlo8ULBr33MB5IwUztX2O+nr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R/vsuKM1; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="PG6ZnU6p"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1784020790;
-	bh=G28oiwNuMKmLTDHr3FBoXpgRxaedsmVNmBs/54O/McU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=PG6ZnU6pJ7o/Se3DFLwceVz5W8MaZ5o94vXf049OtgHcWK/pSZhX0T2MNc6jusKbw
-	 JqXOfhNsKrfDtv08DtiKIoikILpzl43IWbQaGRmrwP/4QjA7mTEFJ6pS04ojI+1CM7
-	 uOUp50jjPdgzFglliw8/5Clx2WVpp0+GAdLhFq+k=
-Received: from github.com (hubbernetes-node-da468ee.ac4-iad.github.net [10.52.171.37])
-	by smtp.github.com (Postfix) with ESMTPA id 2230A78109B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 02:19:50 -0700 (PDT)
-Date: Tue, 14 Jul 2026 02:19:50 -0700
-From: Bhavani <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1127251/000000-76701e@github.com>
-Subject: [bluez/bluez] b57f45: doc/org.bluez.ChannelSounding1:Add Used by
- referen...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R/vsuKM1"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-51c0cea8883so6543211cf.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 02:33:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784021637; x=1784626437; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=U5k5cUZb2o7ykWg0EEjNwh2TQj+iH6OiR7kO9+IK9+s=;
+        b=R/vsuKM1otVLi2LDo/Q5F1JPWqCeQg8porNFMmds+dA9yQ/TYV9cy41YzixwC9ybXt
+         fDESMr5i/lCso74CiZ2AdhXKlsSxwjAR72vrkkGyM8WvQwVWVhqYo1GMufGeD9LyJ9R3
+         HD1R3w1G93Mn/8bZc/VHJXx+2ydgnYfhdwTZUFcq9PefGLYZMZHcRIOCUVeSLFLq/U7s
+         qCofdZIrpe5yXKPKNBjrjKtyiL0GtUT6WmV9BB6C8TJQtHFI3X6hupFEr19We5/N8lzY
+         1KKZkjFtOmxyTllu6gWo9GnH8GX29QmgMXWkc8LqG4RLf/J4mwQLYFbNJekbhFYYzNT/
+         i4Ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784021637; x=1784626437;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=U5k5cUZb2o7ykWg0EEjNwh2TQj+iH6OiR7kO9+IK9+s=;
+        b=A6wmbH0PmzTwLPUtjzKeVP7LW3DUYDtQjwc1g2T3buPTEmXKbLv/Tma8fG+8NlV0Hy
+         4kg2dvVAZi8TC94rwYe19i+J52Z/UYZRQkGnF7/8Psv1102yOrnW1V5sEIZUVpIDjAO1
+         jNwkLdATbtuuUAzo8LEGpeTjy/XJ6iattbifHbGRmbZ20uavv1KNWw1vyTfNNxxeJoAX
+         68AXyJtnBYfQjIWbsga3ZXq2tx7vJgB/tcDRrvYHoUMlpiZwxO96+8iDJO8B3dj3PEl3
+         edy3bii+uNPcpWmWnez9mGLQZFgT9OWP2KqBPJFZIwtpO4FWx8KcKKM3k8h+1S6CJoJB
+         0xMA==
+X-Gm-Message-State: AOJu0YyoDyW9/d8tHdlbQlFiioGD3wTQfTWoRu6/UrDW920fKMLrPFqg
+	D6ToYxaLVWWuDJdejQ4Un9FwqkrA0wqGD4asfK3loqHnd9BcFmkIT6yiaOT1TQ==
+X-Gm-Gg: AfdE7cmYMQbH+NkY5iVVK5XfQE0b6QAuDl2JR6+RiypbvMIBIUzM/xBnPQ1fAlF2qm+
+	/cnOK7NytUI5cSnbcUP5Qyq7Tk6PSfkXRG2DS+mZh0cYY1PVPGMCYPsg+bTaxULFhhYoIaYwOFw
+	7DFRSX7pO/98Cml0WbMsZFKVPLdMh6kPlGgkLcaDMKIoDGRdyAiy0bIBO3Pm5Pvv2Idl5HsgdQO
+	HFjC1bK6+zSy282eMIb4Y3LaBuiXCO02gwdVBo78Pw1HXGvgXLa2+CMhTuSEPwe98AqDF9JKXGU
+	D98Z9gxHCmZw4kJUODRU0ciNQk9AvsY8B4RiqyvNV0xpXUIV3rw8LY9ILFUH47um2CKN40GlKpk
+	W/PU/6Mt8xFRwKiaYu/wpRm/Nz5SjOEWQHjgjoJPKk1AwkVPrWUd9GzK+Z30MTlbpnJ4eRbLZ6m
+	xzOLLd743BQtZf/8v8gw==
+X-Received: by 2002:ac8:5a48:0:b0:51b:fdc0:ddee with SMTP id d75a77b69052e-51caa160372mr171542941cf.30.1784021637400;
+        Tue, 14 Jul 2026 02:33:57 -0700 (PDT)
+Received: from [172.17.0.2] ([20.98.23.165])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51cba49439dsm92906341cf.27.2026.07.14.02.33.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jul 2026 02:33:56 -0700 (PDT)
+Message-ID: <6a560284.3e3849ba.1f46c6.61f4@mx.google.com>
+Date: Tue, 14 Jul 2026 02:33:56 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4548462230384552767=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, winter91@foxmail.com
+Subject: RE: [v2] Bluetooth: btintel_pcie: Fix DMA memory leak on probe failure
+In-Reply-To: <tencent_9EDB39EF4A8A9D6EF645A7DC2F32B25CA209@qq.com>
+References: <tencent_9EDB39EF4A8A9D6EF645A7DC2F32B25CA209@qq.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============4548462230384552767==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1127251
-  Home:   https://github.com/bluez/bluez
-  Commit: b57f4583cfe4a1eb34d886970339b6c7854c7b6c
-      https://github.com/bluez/bluez/commit/b57f4583cfe4a1eb34d886970339b6c7854c7b6c
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-07-14 (Tue, 14 Jul 2026)
+This is an automated email and please do not reply to this email.
 
-  Changed paths:
-    A doc/org.bluez.ChannelSounding1.rst
+Dear Submitter,
 
-  Log Message:
-  -----------
-  doc/org.bluez.ChannelSounding1:Add Used by reference and Examples
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Add :Used by: field linking to bluetoothctl cs submenu and
-Examples section showing corresponding bluetoothctl cs commands
-for D-Bus methods
+----- Output -----
+
+error: patch failed: drivers/bluetooth/btintel_pcie.c:2918
+error: drivers/bluetooth/btintel_pcie.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
 
 
-  Commit: e1841462a7654678c76ad578e955710f69591d37
-      https://github.com/bluez/bluez/commit/e1841462a7654678c76ad578e955710f69591d37
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-07-14 (Tue, 14 Jul 2026)
-
-  Changed paths:
-    M Makefile.am
-    A doc/org.bluez.ChannelSoundingRanging1.rst
-
-  Log Message:
-  -----------
-  doc/org.bluez.ChannelSoundingRanging1:Add references and examples
-
-Add :Used by: field linking to bluetoothctl cs submenu and
-Examples section showing the corresponding bluetoothctl output
-for the RangeEstimate signal
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: 0ceb0039ac98685986e02320670bf1c4af3da269
-      https://github.com/bluez/bluez/commit/0ceb0039ac98685986e02320670bf1c4af3da269
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-07-14 (Tue, 14 Jul 2026)
-
-  Changed paths:
-    M Makefile.tools
-    A doc/bluetoothctl-cs.rst
-
-  Log Message:
-  -----------
-  doc/bluetoothctl-cs: Add :Uses: fields and document arguments
-
-Add :Uses: fields to link commands to their corresponding D-Bus API
-methods, and document command arguments with usage examples.
-
-
-  Commit: 76701e5ddfd61d9948ef75f41213bbbc4ba8db13
-      https://github.com/bluez/bluez/commit/76701e5ddfd61d9948ef75f41213bbbc4ba8db13
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-07-14 (Tue, 14 Jul 2026)
-
-  Changed paths:
-    A client/scripts/cs-initiator.bt
-    A client/scripts/cs-reflector.bt
-
-  Log Message:
-  -----------
-  client: Add scripts to start cs Initiator/reflector
-
-This adds sample bluetoothctl scripts for cs initiator/
-reflector.
-
-cs-initiator.bt sets up and runs a CS measurement as an Initiator
-cs-reflector.bt sets up the device to respond as a Reflector
-
-
-Compare: https://github.com/bluez/bluez/compare/b57f4583cfe4%5E...76701e5ddfd6
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============4548462230384552767==--
