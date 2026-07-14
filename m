@@ -1,94 +1,115 @@
-Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC7734D4FE
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 03:00:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A3937F8A1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 03:09:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783998016; cv=none; b=C3G1pHJSOnrjNLDJmE9+GsXIhdAGw3yWR1FCHxTuacZpi9+zj2KG7LAVRT5vIVciZpMdQMRXhDRUbyQT/vI7fEUTcI/CJfJsNKzlTr+vnHg7O3Ek3x+JMLccz0yBNaslSScm0S0x5LOo9GntSFyUi3USjbeEzLpBYJRp0bm7ZkQ=
+	t=1783998592; cv=none; b=jkL9aICqguLFVxo+Hbnk4YxvCmwrcQoa89CEcvhHHrNs4G69K3Wj/S3/DegoJcVPJHob4Bp72CiiJ/JAbVY/GI4Mz2sodCIlejLLxajapPuZP6WH/HS45yvd/f94jbb3epViqNASUj2IiD0KCiXzWeBjmMDVxa/6nUpAjhENygo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783998016; c=relaxed/simple;
-	bh=ttRt8kVTyY24QC4cVXRavjZuxhkwVLu5Bv6kaeorHic=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=Dhqo6WJFgHp5yfWx/DO5vewmfDBEb3mmzJWpbfsRQoCsZLMi2Q8j1J5jwmmf7LOmI2m4JvaehK5vkubMUED7Xa+jAl7HFfQj7i2SSz70lkuOxau6jSKQ6P9xonqgC8HEs+b6pzlIs13TiXucLfBVfIRLY+PGtJ1ta6Y2fzSfZeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=B4ZhLFPj; arc=none smtp.client-ip=43.163.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1783998592; c=relaxed/simple;
+	bh=wK4iFhU9kA2rZiahVSoJjq8DU1ohH9A1CB0QHz2alp8=;
+	h=Message-ID:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Zge3IHK74ZiQACKJSPgZzu+lZdOBl5YIolMaz2QIjXnVrQLn1Y6aLQhnS5xRBHhUch96pFEUKXHSyPHx5+F4f7TqL1E0F7zuvT5+9VvCnToBk15t922/X61NErYCtDFjZAkjowlQbQpq0/NzA6tn9XOFKR0mBWezdyS4Blm/P2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DG/+dGgM; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="B4ZhLFPj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1783998004; bh=jaHeTN2b3tilUe3vtWw7BcWd9HMPc++S15Dza8276nE=;
-	h=From:To:Cc:Subject:Date;
-	b=B4ZhLFPjrwtgQEzDKoVegVW2yiGGbx+uY4vOiL+HpcPIEyF8PbKJiULpYRsyiv8p/
-	 o7QGpBPUDxM3OIYmXVykD8hswTUZNWmxkQahCl/LmDSABen/4oHkDfDPcFILrDGhwV
-	 4dAlTrZQjqMth3C2tEw+EGe8k7VsBYOmPUZdXXDg=
-Received: from caitao123456-pc.. ([116.128.244.169])
-	by newxmesmtplogicsvrszc43-0.qq.com (NewEsmtp) with SMTP
-	id D249E299; Tue, 14 Jul 2026 10:52:36 +0800
-X-QQ-mid: xmsmtpt1783997556t4vpj910p
-Message-ID: <tencent_406D2B6F64B41152DB435F3A88E40205340A@qq.com>
-X-QQ-XMAILINFO: NT7uTz3cNku2z2NAHw958b+C8QJOTN1zYiZnPbEx+g+XWNH/b+FwYjefYhrWqR
-	 94VhWNeeTSeki12vg+QJTeBrklB4N+vvTbyqRFDccsp4ZRTtZ42NaRTlbJklXFdkyEePV5CLnqPV
-	 ZOkzrs5F5vV1/sxOScMHd6Q4mYw9dRavqpCIOXG50pFPqzgi5K0guUwhzZMGsbOhrudxak0H0LI1
-	 Y+sEDGwRA/w2UjsnEnsbr9lCdLeJyihvSqBBoVdOGGkUh9KvtAtjIEv+cDZGuRj32niQMJmbBArr
-	 v767Wk2jdJAS9rgCA4rkWdYrrdj+Xo4+YpyOfE9ENwqhjKOuv57bu6zGJDrzCIaJGljHOVSb+kH7
-	 Ic1+sbuIqlqsW5v5AgWQk+CntrgE3Q8O/xtVVFEtgCQiV3UWckbHm2ao0jeVL5iUUTAer3f31g7h
-	 u7O2O86fwtfYB66rzZ+IOcQ0ZYLqJSvisx+3qQUDHSyZLvbdDKLyzxOf5ylpw4HSuUsvKB0QqQac
-	 kn5cTwxEkRHG3wj8H2skasrJ5ARXVcN2pelSBpRkhlmAE9wRuhbDAMR2fU7GRtXlPrrC7j2R2T1d
-	 x8YAXj7IwjbWwkH9xV8Bzz25cJlG3TOe6ZvYiIwfVtGlNjOoBgyTt0mgDrQZhYi+XR6X6qKKodm+
-	 b8e1Euytiqaa7UCfeLIrPFiZfvEc0ov6NMWBcty5KdmDv7dVFkaPBY1ZlZLeR1amlHJ0m4XPTShS
-	 keSMJ8rBgX5MYWKKCpasP9QeGlWz9kUH/C74XjULzA7U8MU6zaOHwbdVvwZ8q35UyDjlUHuXfqM/
-	 yy3wgVbCn6Oj4/rReJaFbJYwcH6bV4TMYiBxLK+UqWVvcxzh90BgeJHq9f4oi8vJRq1y+Mu1t47R
-	 D6Gvts4jJ6KOgoK2WK/7F1w2CbgFaNBWZ0zmwnq57j1Dxq89PaeG+VyPvf6dH0X+RnwQeIBHtyti
-	 1a1MFna3kL4auO49f+mprS4gobO11iSGh9owCHo9IKJtJekGRveupLNoje2iwZr4xyFnpOOxiCvG
-	 9X+/kQtfjDYzYLevXnxxYyAkUbpIt8YA1pFlJxavDPvoArzonmI2vGKCiS7mw=
-X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
-From: caitao <294305068@qq.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	caitao <caitao@kylinos.cn>
-Subject: [PATCH] Bluetooth: MGMT: Add length check in confirm_name
-Date: Tue, 14 Jul 2026 10:52:28 +0800
-X-OQ-MSGID: <20260714025228.96568-1-294305068@qq.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DG/+dGgM"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-51c167c58f2so25335681cf.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2026 20:09:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783998590; x=1784603390; darn=vger.kernel.org;
+        h=mime-version:content-transfer-encoding:content-type:references
+         :in-reply-to:subject:cc:to:from:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=wK4iFhU9kA2rZiahVSoJjq8DU1ohH9A1CB0QHz2alp8=;
+        b=DG/+dGgMdGL5IPWIF1iXofKUJBoxaR1eZNyKeA9xPqnTAHQsMCp7XYacNmfwxQgHoq
+         Jl+UkK7kP/0+jAySivTopKQYeWhMDoJECB0ixm3ik8LMUlJxY7VhfCAyMOEOulx4i+Fs
+         iBhAJx37flnW0j8VE3F2cdZw8E2Ni++OnyUZ1ttc62V11AidF2hLMEe5r+yN2RgO0G0/
+         vchhAwzDESJwynwXhi8pG/svc39kTPzbiJt7WNNiRrsx9kVAvaIiYznYCvpYR02Q0Se7
+         gV0Ge2rkaTH3+XiVhbB9xO84kz3EoDKuJ8lBpffxqis5IYqlbR0p/L7mejGiNtBLkMu1
+         g8JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783998590; x=1784603390;
+        h=mime-version:content-transfer-encoding:content-type:references
+         :in-reply-to:subject:cc:to:from:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=wK4iFhU9kA2rZiahVSoJjq8DU1ohH9A1CB0QHz2alp8=;
+        b=lhEwDHLHWJnCjw3nEgpn+Z42lH+urJSxcSXH7MiwzgWfOSGX3f4YHnLw80ROZyl5SU
+         x+IKF3L/lVmIUu48exANMIdljmBdqamFTZrS5Jj3pdPz3053opOklACNts8R6mdAYQYx
+         EF2D8blYMNDGMEaQ0YB3fJi3Mc8J/oC6+O9z3dRRJSDXFq5ukLkPrut2H/IUqBFTlOfK
+         Urw872G7R2VA2xRNGyzO506SOZAt2mlPiVGCu4ZQuPcmPn/n3HSWaIYyThmUYEj/YMH5
+         zf+XtJEGSBPdPbxUuwkVkaF2/MU0RUQwTGyKrQUSTQvDgTeK60f6Wtpst85cLZSa6u42
+         /Zrg==
+X-Gm-Message-State: AOJu0YzgwAHTK5MCV3CXcBhtEn6CtTjypfwsLDFwvwPAp/qC0zBBwmhl
+	7ECCT/bNN7TaWENNYLgVkjstxrHRqQNRt/HeZLi2Woq0S13h2oSjLadN
+X-Gm-Gg: AfdE7cmFamANh+wQTqZSMub9KB1NTAx4vgkVJ/+KJw+KOudpVehSCHocibt4s9AJQ/R
+	GX6OR1gdb+4Ipx6/lYPGu10fiMPtVpiYtTZ7LHmSaojUPsSiB987oCWeBru0EzYFhgaSYrxHpzZ
+	NPmCJkggRPyTeLAAqtLZN8PM5t57Ixf//kmrhhURbHQDob3+OaocSbHgdDMYA/6cO/smjMQLvZC
+	9PKgAPMrSYdP2qByEhrKEyCOMcz0I2DOMEyxtFvSZjBJeNfkTBE4ePE9qOQ/ISWZwPbCQM3hF4/
+	85gApNOziWSsE8C85ivXSq2f4AVWfOIIWIWwMbXy1Bn4zCuXKk8DVfVfd4qQCVZQmCpr5epYhAF
+	xQdySEWqpMoITKL6CHHPME8EDk3ZAE4qy7KES0xFpg/ceC6Sjv12YC6UPI7nFETk5z9A9945Aje
+	CWM3Vt9LAOgfo7ODSNr9pNzQoRwwker0Phe3WKY3oGr/YFSBrU2CJ6q/5BOCs=
+X-Received: by 2002:a05:622a:1b8b:b0:517:8e65:68ea with SMTP id d75a77b69052e-51e424540a8mr3623901cf.54.1783998590132;
+        Mon, 13 Jul 2026 20:09:50 -0700 (PDT)
+Received: from [127.0.1.1] ([209.202.207.85])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51caae206b6sm101289021cf.14.2026.07.13.20.09.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jul 2026 20:09:49 -0700 (PDT)
+Message-ID: <6a55a87d.c6960a0e.13e016.2f67@mx.google.com>
+Date: Mon, 13 Jul 2026 20:09:49 -0700 (PDT)
+From: Ameen Al-Asady <ameenaladdin@gmail.com>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: btintel: Fix spurious error on FW download
+ error recovery
+In-Reply-To: <0f0d783d-8b03-4048-bd7f-b97dc2bce92f@molgen.mpg.de>
+References: <20260713215537.81222-1-ameenaladdin@gmail.com>
+ <0f0d783d-8b03-4048-bd7f-b97dc2bce92f@molgen.mpg.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: caitao <caitao@kylinos.cn>
+Hi Paul,
 
-The confirm_name function did not validate the length of the incoming
-data before accessing the mgmt_cp_confirm_name structure, which could
-lead to out-of-bounds reads if a short packet was sent.
+Thanks for the review.
 
-Add a length check at the beginning of the function to ensure the data
-is at least sizeof(struct mgmt_cp_confirm_name). If the check fails,
-return MGMT_STATUS_INVALID_PARAMS without accessing the invalid data.
+> "fail" is ambiguous to me. Maybe "errors out".
 
-Signed-off-by: caitao <caitao@kylinos.cn>
----
- net/bluetooth/mgmt.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Reworded in v2.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a0a491e5311e..aab8e64283aa 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6271,6 +6271,10 @@ static int confirm_name(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	bt_dev_dbg(hdev, "sock %p", sk);
- 
-+	if (len < sizeof(*cp))
-+		return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_CONFIRM_NAME,
-+					 MGMT_STATUS_INVALID_PARAMS, NULL, 0);
-+
- 	hci_dev_lock(hdev);
- 
- 	if (!hci_discovery_active(hdev)) {
--- 
-2.43.0
+> Any hint how to match the firmware versions, or add a sentence what
+> firmware is on the controller and which one is downloaded?
 
+Added the firmware build lines to the log excerpt in v2. The
+controller was running build 81755 (2024.33) and the file on disk
+contained build 82122 (2026.5).
+
+> Please mention the system you tested this on.
+
+Done. Tested on an Intel AX210 (USB 8087:0032) on a 7.1.3 kernel by
+rebinding btusb with a non-matching firmware file on disk, in both
+the downgrade and upgrade direction. Both runs took the -ENODEV path,
+logged the info message instead of the error and completed the
+download after re-enumeration.
+
+> Excuse my ignorance, but moving kfree_skb to a new else branch is
+> not totally clear to me.
+
+When __hci_cmd_sync() fails it returns an error pointer instead of a
+real skb, so there is nothing to free. kfree_skb() must only run in
+the success case, which is now the else branch. The old code had the
+same behavior through the early return.
+
+v2 sent.
+
+Regards,
+Ameen
