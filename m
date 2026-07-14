@@ -1,289 +1,163 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C787A47D92D
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 14:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784037895; cv=none; b=QfIP9wUs4eEEctdz1KxSmCkKVFwG4AAUvatbTFUfPyQdT6ekgdmzKWzjlr7XjhM3fJBs6VKPfRYCEy1SGdiHUE4z4BE8ErDxmYSNrRcswiEqqILJj2S8uaBJ7HTVsY7/V/OIC3W64mPGHYqv9Ti+KDzzWwHfEv0RG8+nuQKg/4A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784037895; c=relaxed/simple;
-	bh=aczmG7/khz/S5sDnKpZ536JNBfsAfiydQvXTne6gqYI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=haCG8qsmiqzC7KpuTOCZSOHsBIOApsRbmSbU/K3Gullxl7oLY9SUmp5eIhtgyjzAH/3x/5TPUF9MGCxOfFpnTHKG/cqwBtgToTF3VdZjs5OQJKMkULGlivNz6wDO3cCUZHVLUc2GcVMVvFdZr5odwYfN5kmb257spMIPOAG196k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jymbgm0d; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68ACC448CF6
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 14:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784039379; cv=pass; b=BP/PhTNHd8oU/1Bz8SsLpaYI7DEIxtNTsvZHMRQc4oa0joPhexAolwwvKW/+QsDAhSMCR5vpoPqW9os5FO/K98dmVNOrJIlCC5sEuuZLOSxngzQrf49LbdrDrFoFKLJJuATjeWbOeehRtyQIWxH3MNbXvzUIHMwTH98MnFWYr98=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784039379; c=relaxed/simple;
+	bh=T1PcUP93DIGnYog0L/wZqAF9YVPvRMahVM1DS3xX3as=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ic85vnka/JJNJ85NBPOCpAe7YPQ8RdB0BHjj+xGw1gyccJQDDT21sFGjtjzjvVKlUWffihV104JIFhEqRi65tLsFEieQaw1adW+xV6nmMwnaWji3AAR8tYT9IJoYb1Ep75QwmBvns/XYHyZ3HmyX/jimCqQEIGGNIZlHzUAKvY0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GeaZH0Nm; arc=pass smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jymbgm0d"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1784037891; x=1815573891;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=aczmG7/khz/S5sDnKpZ536JNBfsAfiydQvXTne6gqYI=;
-  b=jymbgm0dR1B9VAiqGd91FClHcKGbs6QosTP9dB9NG1q8ZB5pcjkhpkbE
-   MbQbB1V+dQz0EO3GXzLCmacRyEdDSbpC88CZFYdiD44vwowOKPnL6n5/D
-   eQePaDj0xXaF9D3bpJAqzHJrbwOVU6bOvk6Ejv+wRkSHWbjcLyTFvo5SE
-   3zyORkgIq6CGLQulx185i9eYwWvQa/vJvAXLa5nwY/6wK99XYPbFuShMZ
-   udSsZlt1xWgOf5CT6f2pKeJgdkLCxiSPifqjT388+UFo9TykpIYqnnUqf
-   FmvtbBDKWmOy0CDoDdZyLycFCmblPhBeDnhx9K9XX6Z4BhxLhhPQ+KPpr
-   g==;
-X-CSE-ConnectionGUID: k3Ve8p7nSFOdXY6064RKRg==
-X-CSE-MsgGUID: ICTN2aacQdO464Klp4gCiQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11846"; a="84445058"
-X-IronPort-AV: E=Sophos;i="6.25,163,1779174000"; 
-   d="scan'208";a="84445058"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2026 07:04:49 -0700
-X-CSE-ConnectionGUID: DS7KirjKRuaMdBbTb4ocxw==
-X-CSE-MsgGUID: 9euRofwzSF6Y63y6Nih41A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,163,1779174000"; 
-   d="scan'208";a="251911113"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa010.fm.intel.com with ESMTP; 14 Jul 2026 07:04:47 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1] Bluetooth: btintel_pcie: serialize reset_type with RECOVERY_IN_PROGRESS
-Date: Tue, 14 Jul 2026 19:54:30 +0530
-Message-ID: <20260714142430.200689-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GeaZH0Nm"
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-8051ad12d23so10121687b3.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 07:29:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784039377; cv=none;
+        d=google.com; s=arc-20260327;
+        b=VMtOqOBluAKdtWDPsQ9dztZE6Ncs6dk8CnVt054rWj2bc97qJCI8Yh7nJS+Z39nxO/
+         AjFCKLkVZ5RMmahEvx0/HNUfuZcpkv2fBBR+rojmd757mAzOjXFdsCwlPPPy/twi8lhf
+         i7uS8Gu31AN48JkSnritj7/oZVyDeX10x97wZwsmm29zJz4BnIGCQDwi61EvkXi1PE8R
+         X5Iwv6a2H26aSPvtFrefk7GTECefFRpGt3TkTgvr4Bu5BgrP94Dfwp23I9Bv/eITI8Xu
+         nn4xJfUpJEVHMPzaqKmK/vr9mn1gJYct/AHidwsxTyveOkDDxKg90vt8nTxLx5tEUsOA
+         t2JQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=V+nXasnD6xVRUVlvFoJBrHp/vP0vGiCb1Eh4HdVkwG4=;
+        fh=f6Z5kcv0/JTot2yABn89Ik4MYkN+lY6tWxnk97i+UYM=;
+        b=FQaC1a4PFy5ZonPhd+Jycbea15Dfje8v59pxSJ+6JUSqQ+fIjSDwKuDIgWq64DmWTJ
+         YBWc9E15aMqZExqQp5aKydRr0MyY0rdKeQAdIG5oySDRQRC9v/hVxZ3dCVy7pHu/VC1h
+         JwNOmEAvBdgwP45lucICFtkBLXN+Qj2CRoro/stGE9ZRB88KcCxwpk0zVpjm9JLLNUe/
+         ADuTy4uXsWMZQclQWHbhiuK/HrXZJQ+wZuupfmGnPFyRv49uXie/MgB7m6sKhDhAhxI5
+         56tvFXgtvBMUM8NH0W3YSwZu0YBRfPJdzMJXP35JLN0VPPD3P33eW05W+o5lmPgboR4s
+         zZyw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784039377; x=1784644177; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=V+nXasnD6xVRUVlvFoJBrHp/vP0vGiCb1Eh4HdVkwG4=;
+        b=GeaZH0Nm1ToRQQCIw3cRFG9wOWCRRSZOzywJgTl+/KPB7NPpsrg5OIZNcT+V9OjC7u
+         VfKRcvdUO2wMAZWYnM3598zSNvGGFuJQgmnMkGt4eFUOum6E08uvxpBt2ufPAPjmInlf
+         iGI7Qkwk2hi8xxxcHszDnS550yPQSbU/uMciyO19El/lrjF63XX+ixdx2o07LHbAyupf
+         lNLnloaYqOGKm5bC5At1hTlcsqdZnv0yVZysoVlfdy6tFRqvbww6eyXWyGmLguxG38AB
+         VEs+Bhi75+Vr8m8YxTR42Qicg5Rbc3RMjbsodUidpJ7mfjH123Dh1PAqLSyvl/VZeW2/
+         H2dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784039377; x=1784644177;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=V+nXasnD6xVRUVlvFoJBrHp/vP0vGiCb1Eh4HdVkwG4=;
+        b=TwN/w4mbNE+OMr+ZOnN2+Ouz0h+1SesFL7sKdZDf/50qHSNaC8Il0jlh1znh64NMEB
+         89I698KGF+3IVJPNHpFDH53CDvBrtzgbxF1un3J+cZvKCmJS9udhPMWxhjDXcY5COn5t
+         dQXlm3uejK3Hf//MdJOU2rV5tJ9ATMsC4jNI37E1iLklubaLEoQxyo/SezzK2Rp/IuSS
+         Z83eIS91jqbNmoU8mhlcti59jH2TS9m+kwe39rUHaQ3gffyopMzbD0CAgcC6X6LZ/9mP
+         bFCRzKtcjYTT5jKpeybuEJR+JraqnxfAS+hJuK/t3QpaHsa4OgaHvCq78Inbt+55kcGu
+         nPVg==
+X-Forwarded-Encrypted: i=1; AHgh+RoRpWMWVKf639auxXC9UXqxw3oMhqv2k55esicMKx3b72tlc2NkcZSEXq6khhVSw5u2UaMHMpucX6kopDwAnoM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBx+zQzXV4D9W0CS9HO6PUqkOHr/11/h0GZ6YBRGV7SY3rQakz
+	AgbZdmyG+gkOk34eH6iSNmogbaCXYw7o6EUiazwPqEvcLJ4lpXlAUlxU8uojUTabsiDIPWN3W5J
+	EHaqceX/LixgUovpanutT+SWEviT4On8=
+X-Gm-Gg: AfdE7clM+wQ5ERiccdG80flhkJoCsI/+yeVNwjfk4qHRZwGb2HrixCHegv+SX+kzO0+
+	Ipd0QdsLmqIycB7xicTMzGsApK892g9AC3alrtehGwkujbgUcZVirYaX9G/6qbLaolzYDKyxcFx
+	o6Tecf6xt/359bbKfrmrr1lORtIVVTxRP6FD96dkk89Fe3T1DetJ0CsYS4q+gvufNvwylacTzas
+	uQ0Qjr5J8JTvfnddd+nXCeHZvgSYCbbhfXugzwu22LX+FcFlHuo5QTtbkS58iQXMnzumzUZzUQy
+	SCIwcYiRMjyTFK1uD4RcaNA3QUN83hpwfioXPttfrWMfXxf5Ykfooc3o
+X-Received: by 2002:a05:690c:c503:b0:81e:bd02:b02c with SMTP id
+ 00721157ae682-81ebd02bd27mr24322667b3.1.1784039377285; Tue, 14 Jul 2026
+ 07:29:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260713-btusb_qcom-v1-1-39cabc0dd601@oss.qualcomm.com>
+ <CABBYNZJpdeoZ16bObLRPhng2dfyNeK9ix9_-z_hMZhJ0QxTxGg@mail.gmail.com> <3d681f10-959e-4d0e-99e5-a471ef8929a3@oss.qualcomm.com>
+In-Reply-To: <3d681f10-959e-4d0e-99e5-a471ef8929a3@oss.qualcomm.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 14 Jul 2026 10:29:25 -0400
+X-Gm-Features: AUfX_my43HCicIFUhMDV92d4WGqO4msi9dtCUXgp9U4F6In0ZjVFSkRP3NOruCQ
+Message-ID: <CABBYNZJ0zoVVVxuM48L=Km==gnrQuskrbjB6q_aNV0KEEY3+5w@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Add support for Qualcomm QCC2072
+To: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Zijun Hu <zijun_hu@icloud.com>, 
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The reset path had two concurrency holes. Both are reachable in
-practice when btintel_pcie_hw_error() is invoked from the HCI rx
-path while another reset is being requested or is already in
-flight.
+Hi Zijun,
 
-  1. data->reset_type was a plain shared field. The hw_error path
-     wrote it BEFORE the test_and_set_bit(RECOVERY_IN_PROGRESS)
-     guard inside btintel_pcie_reset(), so a second hw_error could
-     clobber the type chosen by an earlier in-flight request:
+On Tue, Jul 14, 2026 at 9:48=E2=80=AFAM Zijun Hu <zijun.hu@oss.qualcomm.com=
+> wrote:
+>
+> On 7/14/2026 4:45 AM, Luiz Augusto von Dentz wrote:
+> >> To avoid adding large vendor-specific code into the BTUSB main
+> >> file, add btusb_qcom.c/.h to support multi-subsystem BT chips.
+> > Ok, so this is not the first time we are seeing the driver want to
+> > have it own processing of HCI traffic, but instead of doing post host
+> > processing it is doing pre host, which creates quite a few issues
+> > since 1. you can use safer skb helper like skb_pull_data and 2.
+> > requires to do HCI processing of traffic not meant to the driver,
+> > besides not being able to use something like struct hci_ev table that
+> > would help to avoid having the same bugs we fixed over the years.
+> >
+> > So what we might have to do is some way to for drivers to register
+> > their own event table, provided they don't conflict with the host, or
+> > if it just HCI_EV_VENDOR then perhaps that can be done with just
+> > hci->vendor_ev callback.
+>
+>   Hi Luiz,
+>
+>   Thank you for the advice. Let me clarify the design:
+>
+> A.  Why pre-host processing?
+>
+>   QCC2072's endpoints carry non-BT frames (PERI event and PERI ACL) along=
+side BT frames. btusb_qcom.c must first reassemble the raw byte stream into
+>   complete frames =E2=80=94 of either kind. Once assembled, non-BT frames=
+ are intercepted and handled locally; BT frames are passed up to the stack =
+untouched.
 
-       CPU0 (reset_work)             CPU1 (hw_error #2)
-                                     dev_data->reset_type = PLDR
-       T2: read reset_type
-                                     dev_data->reset_type = FLR
-                                     reset() test_and_set sees 1
-                                     -> drops, but type already
-                                        clobbered
+Well they are still HCI commands/events aren't they? If they properly
+use the vendor command/event range I don't see a problem here. Also,
+if you pre-process, it will skip sending to the monitor, making
+debugging much harder.
 
-     The HCI reset path (.reset = btintel_pcie_reset, used by
-     HCIDEVRESET / `hciconfig hciX reset`) compounded this by not
-     writing reset_type at all -- it inherited whatever value a
-     previous hw_error / resume() had left, which could be PLDR.
+> B.  What to do with non-BT frames
+>
+>   There are two options:
+>   1. Don't let them reach the host stack at all, or
+>   2. Route them through the stack by an opaque channel such as HCI_VENDOR=
+_PKT =E2=80=94 defined by the stack but with no implementation yet.
 
-  2. btintel_pcie_dump_debug_registers() was called unconditionally
-     at the top of hw_error(). When reset_work was already running
-     pci_try_reset_function(), the BT MMIO window can read all-1s
-     or trigger AER for the duration of the FLR, polluting the
-     debug dump with no useful information.
+We have vendor diagostic packets already in the form of HCI_DIAG_PKT.
 
-Refactor the reset path to make RECOVERY_IN_PROGRESS the sole
-serializer for both the type write and the work scheduling:
+> C.  Why not skb_pull_data() for non-BT frames
+>
+>   We want to preserve and log the complete frame for diagnostics, so we d=
+eliberately avoid skb_pull_data().
 
-  - Replace btintel_pcie_reset(hdev) with
-    btintel_pcie_request_reset(data, type). The helper takes the
-    desired reset variant as a parameter and writes
-    data->reset_type only after winning test_and_set_bit(); losers
-    return without touching the field, so concurrent triggers can
-    no longer clobber an in-flight reset's type. reset_work()'s
-    read of reset_type is now ordered after the bit transition via
-    schedule_work()'s memory barrier.
+Yeah, that is price tag of pre-processing, but even for vendor packets
+if they don't reach hci_send_to_monitor you won't be able to see on
+the likes of btmon.
 
-  - Add a thin btintel_pcie_hci_reset() wrapper for the
-    hdev->reset callback that always requests FLR explicitly. The
-    HCIDEVRESET path no longer inherits stale state from prior
-    error events.
+>
+> We'll also look into leveraging hci_ev table for non-BT frame handling in=
+ v2.
+>
+>
 
-  - Add an early test_bit(RECOVERY_IN_PROGRESS) gate at the top of
-    hw_error() so dump_debug_registers() and the recovery-counter
-    bookkeeping are skipped when a reset is already in flight; the
-    authoritative test_and_set lives in request_reset() and races
-    cleanly against any caller that passes the optimistic check.
 
-  - Convert the two resume() reset sites (FREEZE/HIBERNATE and the
-    D0-error path) to request_reset(data, FLR), removing the
-    redundant manual reset_type writes.
-
-No new locks are introduced; the fix relies on the existing
-RECOVERY_IN_PROGRESS bit transition for ordering.
-
-Assisted-by: GitHub-Copilot:claude-4.7-opus
-Signed-off-by: Kiran K <kiran.k@intel.com>
----
- drivers/bluetooth/btintel_pcie.c | 88 +++++++++++++++++++++++---------
- 1 file changed, 64 insertions(+), 24 deletions(-)
-
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 013568197a39..2a10476bae4b 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -2550,8 +2550,6 @@ static void btintel_pcie_inc_recovery_count(struct pci_dev *pdev,
- 	}
- }
- 
--static void btintel_pcie_reset(struct hci_dev *hdev);
--
- static int btintel_pcie_acpi_reset_method(struct btintel_pcie_data *data)
- {
- 	union acpi_object *obj, argv4;
-@@ -2749,56 +2747,99 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
- 	pci_unlock_rescan_remove();
- }
- 
--static void btintel_pcie_reset(struct hci_dev *hdev)
-+/* Schedule a device reset of the requested type.
-+ *
-+ * BTINTEL_PCIE_RECOVERY_IN_PROGRESS serializes all reset requesters
-+ * (HCI ioctl, hw_error, resume error path, etc.) so that:
-+ *
-+ *   - dev_data->reset_type is written by exactly one caller (the
-+ *     thread that wins test_and_set_bit), eliminating the race where
-+ *     a second hw_error could clobber an already-scheduled reset's
-+ *     type;
-+ *   - the write happens AFTER the bit is set, so reset_work observes
-+ *     it through schedule_work()'s memory ordering;
-+ *   - losers return without touching reset_type or scheduling the
-+ *     work, so concurrent triggers are silently coalesced into the
-+ *     in-flight one (whose recovery will reinitialize the device
-+ *     regardless of the dropped trigger's variant).
-+ *
-+ * The bit is cleared only by .remove() / re-probe via fresh devm
-+ * allocation, which is the intended one-shot semantics: a reset
-+ * tears down and re-probes 'data', so there is no "in-flight"
-+ * reset to follow up after device_reprobe() succeeds.
-+ */
-+static void btintel_pcie_request_reset(struct btintel_pcie_data *data,
-+				       enum btintel_pcie_reset_type type)
- {
--	struct btintel_pcie_data *data;
--
--	data = hci_get_drvdata(hdev);
--
- 	if (!test_bit(BTINTEL_PCIE_SETUP_DONE, &data->flags))
- 		return;
- 
- 	if (test_and_set_bit(BTINTEL_PCIE_RECOVERY_IN_PROGRESS, &data->flags))
- 		return;
- 
-+	data->reset_type = type;
-+
- 	pci_dev_get(data->pdev);
- 	schedule_work(&data->reset_work);
- }
- 
-+/* hdev->reset callback (HCIDEVRESET ioctl, e.g. `hciconfig hciX reset`).
-+ *
-+ * User-triggered resets always use FLR; PLDR is reserved for the
-+ * hw_error path (controller-reported fatal exceptions, code 0x13).
-+ */
-+static void btintel_pcie_hci_reset(struct hci_dev *hdev)
-+{
-+	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-+
-+	btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_FLR);
-+}
-+
- static void btintel_pcie_hw_error(struct hci_dev *hdev, u8 code)
- {
--	struct btintel_pcie_dev_recovery *data;
-+	struct btintel_pcie_dev_recovery *rec;
- 	struct btintel_pcie_data *dev_data = hci_get_drvdata(hdev);
- 	struct pci_dev *pdev = dev_data->pdev;
-+	enum btintel_pcie_reset_type type;
- 	time64_t retry_window;
- 
-+	/* Cheap pre-check: if a reset is already in flight, skip MMIO
-+	 * reads in dump_debug_registers() and the recovery-counter
-+	 * bookkeeping entirely. The PCI core may be mid-FLR (BME / config
-+	 * window torn down by pci_try_reset_function()), in which case
-+	 * those reads return all-1s or trigger AER. The authoritative
-+	 * guard is the test_and_set_bit() inside
-+	 * btintel_pcie_request_reset(), which races cleanly against
-+	 * concurrent triggers that pass this check.
-+	 */
-+	if (test_bit(BTINTEL_PCIE_RECOVERY_IN_PROGRESS, &dev_data->flags))
-+		return;
-+
- 	btintel_pcie_dump_debug_registers(hdev);
- 
--	data = btintel_pcie_get_recovery(pdev, &hdev->dev);
--	if (!data)
-+	rec = btintel_pcie_get_recovery(pdev, &hdev->dev);
-+	if (!rec)
- 		return;
- 
--	if (code == 0x13)
--		dev_data->reset_type = BTINTEL_PCIE_IOSF_PRR_PLDR;
--	else
--		dev_data->reset_type = BTINTEL_PCIE_IOSF_PRR_FLR;
-+	type = (code == 0x13) ? BTINTEL_PCIE_IOSF_PRR_PLDR
-+			      : BTINTEL_PCIE_IOSF_PRR_FLR;
- 
- 	bt_dev_err(hdev, "Encountered exception err:0x%x triggering: %s", code,
--		   dev_data->reset_type == BTINTEL_PCIE_IOSF_PRR_PLDR ? "PLDR" : "FLR");
--	retry_window = ktime_get_boottime_seconds() - data->last_error;
-+		   type == BTINTEL_PCIE_IOSF_PRR_PLDR ? "PLDR" : "FLR");
-+	retry_window = ktime_get_boottime_seconds() - rec->last_error;
- 
- 	if (retry_window < BTINTEL_PCIE_RESET_WINDOW_SECS &&
--	    data->count >= BTINTEL_PCIE_FLR_MAX_RETRY) {
-+	    rec->count >= BTINTEL_PCIE_FLR_MAX_RETRY) {
- 		bt_dev_err(hdev, "Exhausted maximum: %d recovery attempts: %d",
--			   BTINTEL_PCIE_FLR_MAX_RETRY, data->count);
-+			   BTINTEL_PCIE_FLR_MAX_RETRY, rec->count);
- 		bt_dev_dbg(hdev, "Boot time: %lld seconds",
- 			   ktime_get_boottime_seconds());
- 		bt_dev_dbg(hdev, "last error at: %lld seconds",
--			   data->last_error);
-+			   rec->last_error);
- 		return;
- 	}
- 	btintel_pcie_inc_recovery_count(pdev, &hdev->dev);
--	btintel_pcie_reset(hdev);
-+	btintel_pcie_request_reset(dev_data, type);
- }
- 
- static bool btintel_pcie_wakeup(struct hci_dev *hdev)
-@@ -2888,7 +2929,7 @@ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
- 	hdev->hw_error = btintel_pcie_hw_error;
- 	hdev->set_diag = btintel_set_diag;
- 	hdev->set_bdaddr = btintel_set_bdaddr;
--	hdev->reset = btintel_pcie_reset;
-+	hdev->reset = btintel_pcie_hci_reset;
- 	hdev->wakeup = btintel_pcie_wakeup;
- 	hdev->hci_drv = &btintel_pcie_hci_drv;
- 
-@@ -3176,8 +3217,7 @@ static int btintel_pcie_resume(struct device *dev)
- 	if (data->pm_sx_event == PM_EVENT_FREEZE ||
- 	    data->pm_sx_event == PM_EVENT_HIBERNATE) {
- 		set_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags);
--		data->reset_type = BTINTEL_PCIE_IOSF_PRR_FLR;
--		btintel_pcie_reset(data->hdev);
-+		btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_FLR);
- 		return 0;
- 	}
- 
-@@ -3204,7 +3244,7 @@ static int btintel_pcie_resume(struct device *dev)
- 		btintel_pcie_queue_coredump(data,
- 					    BTINTEL_PCIE_TRIGGER_REASON_FW_ASSERT);
- 		set_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags);
--		btintel_pcie_reset(data->hdev);
-+		btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_FLR);
- 	}
- 	return err;
- }
--- 
-2.54.0
-
+--=20
+Luiz Augusto von Dentz
