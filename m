@@ -1,131 +1,121 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from out203-205-221-235.mail.qq.com (out203-205-221-235.mail.qq.com [203.205.221.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40C086341
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 00:00:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E1C184540;
+	Tue, 14 Jul 2026 02:15:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783987259; cv=none; b=i82Wo8trKDG/0Yw3imCdIWPckxPCl4/yFjqOE/LsCyM34HfWOK5/PmfjHW+3mniipj9pxD7DiAbmfTmr1PZD8h0SmOxT0aYaQcoiZp+GGopOPo2KMglfIWUWFiv6AdzX9hVDfdQ+8ff3PEqXND3iCBUo1juimjbRDvRjUWImc4o=
+	t=1783995332; cv=none; b=MDYn498LN2sWENkpaE1rK54hYUTpHE71GMPhKEgnLbOed0luOUSSxSxvagEvOdUR2YcmNRagP2iAokzI4W6NvybSUtNNTT6ay3cgkAaWA2L93D95WGILt49wd8lcdzUQgKTo4fdaD/Dokqg7uW8c8+ux/WX5CZQxc3n8s5apGUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783987259; c=relaxed/simple;
-	bh=b2URWJlXaxtkxdXeB/4/ceGBjzHtmKJkamCR5K7hfZg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q1HuvIbvmqZkhehszMsfrK7gWGrNf00lnt2+wztBvqSn++4a8RvlJoPsnVcJfs8aBWWsdGEnD1YJUWLH9mNobjd0vZYgRpLU0N2NSip2sJTkkJdxg+TOYBEwCzb7+XoZ1yNVatUTwqINfyoWjmgI64MN5SnYr3scyYAc5aMp4Qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.150] (ip5f5af733.dynamic.kabel-deutschland.de [95.90.247.51])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 2736B4C2C37D58;
-	Tue, 14 Jul 2026 02:00:39 +0200 (CEST)
-Message-ID: <0f0d783d-8b03-4048-bd7f-b97dc2bce92f@molgen.mpg.de>
-Date: Tue, 14 Jul 2026 02:00:38 +0200
+	s=arc-20240116; t=1783995332; c=relaxed/simple;
+	bh=sBsYv9TuIgobYyuo1/ajZj1nC5NO7+EJ8LX73x86V4w=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=k/KgIinY6NaF0YVieejlBklc+t74UL7fWb1VTwMlnwWOl8Q5EPYsiwllOOs9i1XArN9D7LJ6kSRHCt7LKo1uGoDiMKZH0YFIXUDL8jYzjp1DqEVY8u0PDrtRuEpMeWTpb8yPx71gwaHIb+yaxVbcSqal41V/C8yCGyGYOtjvsso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=lpbyRd4y; arc=none smtp.client-ip=203.205.221.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="lpbyRd4y"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1783995321;
+	bh=HnWwYzjugCbUF/fK/feJAv2dej9MCyhC7pzRFbjCjFM=;
+	h=From:To:Cc:Subject:Date;
+	b=lpbyRd4y4zoVlnOrmYRgSjkaKRIDvo3tP84MRta+yGwuVjgpOGM6oxBzYtuUhUPun
+	 2Hr4A6RrcbqAvsbD1enAz75fHo7FgsQ1VQOVUmFA4bBFd/AQEVbzmDAVTjRb6mA7GU
+	 WyQ+d1fbXcADNUKw1Z2TEO94xMJsz4v19onssQvU=
+Received: from localhost.localdomain ([116.128.244.169])
+	by newxmesmtplogicsvrszc43-0.qq.com (NewEsmtp) with SMTP
+	id 38A88873; Tue, 14 Jul 2026 10:14:10 +0800
+X-QQ-mid: xmsmtpt1783995250t09gvhk3f
+Message-ID: <tencent_968BDEBA1F64E4B914B4E3DC25149BDDF40A@qq.com>
+X-QQ-XMAILINFO: MOnz+xTS1+9ijierBmfPtKwMYhSA96Dv5wH13vu3VOPB8w+HYq0M8/LMOWKKlQ
+	 If8qht1EjwxO+Z1F9/W3vQUd+dMa3oVoacWXJo6KRqpIvOAKHtfJNROmzPsD8kI0BUppkRJ/V29E
+	 hBK6S4at1C32b/HMHR/kBrWgOIyXIkUSLvWWd2SOsrYS9BrhqLBCQIPgoUbUFPvoQSBXb5Hqf2Jh
+	 rDsQGmR9eMc2LmxgM/VFjwJ1GxERBD68sR8OAWzWf02rpvkLuqIi32b5kh8ARMyTgYgOYJTwbKzH
+	 akM3Q7OK6kUqpVtJsq9n/JOl1v1om2+Pk0TVwkzENixF6eao18jxxAe9StD2xTUy32NrNcNYn2wj
+	 qhShfCoQpoZvima2qJBCyGMyaypbaM/9b0jDH+lbbOal+l3N+ZJSFJM53faAnP/VOh++lyQboZBi
+	 2uGAxdPNJmsTE3PcHOtaIbUuMsEFKOoE/3oUiM99vyNAnEzKMzlbxQr8QfCru5bLnMXn2ihFf0Yy
+	 NTFxmcPDR4rKBC7Y9S72r275USwhCBD8RteDG2oCPxKQZAJP6YwetjptLeEHuKZ1jX9Zbc9BHHzk
+	 +3jIoBnCjd90NcPsuZms4zpKaQw9jq9ohnsftGbkjR0rJ2iK31RrDwGGaJQgQhcfy31vsjYt3U1s
+	 Gms3Dhv3TSctqwPPQfepR//Yla/IOjhib1EJLGorLbQg9fcUFs96mpbS5y04zireFz7bVKt/PKCm
+	 KlCkgiWMiR2Cl8iRzW2BB7AYvmm4DRljmkImw0TvkxRQtXHKFKwr9mSKtpA00TajkJm8+NN8Sjqb
+	 +skIbNVbkrDwML9SiNOlhy6e8Je6S9TJ8QcA4cm3pgg+yqGeDBYGJHB56ujGwssDuaYdk3OBa42M
+	 JE219NCflCxfH+nqZdMf8Ab9eBF2V1i2gjkHlnBqtls5NvC0+9xz9xAXaW/GH+j1DcZtL+9sjAXi
+	 ZUIMrNRvBeAt1AkOWcP6VrqRJ9RdYayyI+WswbSiOCrbcEmmjjmi5KEy/mKQB7ggRaqPab9C+Rc7
+	 HAn4mf3gXaiBQD6MQeFnfHAoI+uRs=
+X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
+From: Zhao Dongdong <winter91@foxmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Zhao Dongdong <zhaodongdong@kylinos.cn>
+Subject: [PATCH] Bluetooth: virtio_bt: fix virtbt_probe error handling
+Date: Tue, 14 Jul 2026 10:13:50 +0800
+X-OQ-MSGID: <20260714021350.105385-1-winter91@foxmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] Bluetooth: btintel: Fix spurious error on FW download
- error recovery
-To: Ameen Al-Asady <ameenaladdin@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org
-References: <20260713215537.81222-1-ameenaladdin@gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260713215537.81222-1-ameenaladdin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Dear Ameen,
+From: Zhao Dongdong <zhaodongdong@kylinos.cn>
 
+The error handling in virtbt_probe() has two issues:
 
-Thank you for your patch.
+1. Memory leak: vbt is allocated via kzalloc_obj() but not freed on
+   the virtio_find_vqs() failure path nor the generic failed path.
 
-Am 13.07.26 um 23:55 schrieb Ameen Al-Asady:
-> When firmware download fails because the controller is running an
+2. Clean-up order on open failure: virtbt_open_vdev() failing after
+   hci_register_dev() leaves the device registered and queues
+   dangling. Only hci_free_dev() is called, skipping unregister,
+   reset and buffer cleanup.
 
-“fail” is ambiguous to me. Maybe “errors out”.
+Fix 1: add find_vqs_failed label (after del_vqs) so that VQS
+failures skip queue teardown while still freeing vbt.
 
-> operational image whose version does not match the firmware file on
-> disk (the normal case for a firmware upgrade across a warm reboot,
-> since the operational image survives in controller RAM),
-> btintel_reset_to_bootloader() sends the Intel Reset vendor command to
-> force the controller back into bootloader mode for the download retry.
-> 
-> The controller acts on Intel Reset by resetting and re-enumerating on
-> the bus, which can happen before the command complete event is
-> delivered. In that case __hci_cmd_sync() fails with -ENODEV and the
-> driver logs a misleading error even though recovery is proceeding
-> exactly as intended:
-> 
->    Bluetooth: hci0: Found device firmware: intel/ibt-0041-0041.sfi
->    Bluetooth: hci0: Boot Address: 0x100800
->    Bluetooth: hci0: Firmware Version: 202-5.26
->    usb 1-6: USB disconnect, device number 4
->    Bluetooth: hci0: FW download error recovery failed (-19)
->    usb 1-6: new full-speed USB device number 5 using xhci_hcd
->    ...
->    Bluetooth: hci0: Firmware loaded in 2827613 usecs
+Fix 2: re-open the open_failed path to mirror the remove sequence
+in reverse order: virtbt_close_vdev() to drop queued buffers,
+virtio_reset_device() to quiesce the device, hci_unregister_dev()
+to deregister from the BT core, then hci_free_dev().
 
-Any hint how to match the firmware versions, or add a sentence what 
-firmware is on the controller and which one is downloaded?
+Fixes: afd2daa26c7a ("Bluetooth: Add support for virtio transport driver")
+Signed-off-by: Zhao Dongdong <zhaodongdong@kylinos.cn>
+---
+ drivers/bluetooth/virtio_bt.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-> Treat -ENODEV as the expected outcome of the reset rather than a
-> recovery failure, and keep the error message for genuine failures.
+diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
+index 140ab55c9fc5..cca7e1281740 100644
+--- a/drivers/bluetooth/virtio_bt.c
++++ b/drivers/bluetooth/virtio_bt.c
+@@ -311,7 +311,7 @@ static int virtbt_probe(struct virtio_device *vdev)
 
-Please mention the system you tested this on.
+ 	err = virtio_find_vqs(vdev, VIRTBT_NUM_VQS, vbt->vqs, vqs_info, NULL);
+ 	if (err)
+-		return err;
++		goto find_vqs_failed;
 
-> Signed-off-by: Ameen Al-Asady <ameenaladdin@gmail.com>
-> ---
->   drivers/bluetooth/btintel.c | 18 ++++++++++++++----
->   1 file changed, 14 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index 5e9cac090..472542bff 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -1363,12 +1363,22 @@ static void btintel_reset_to_bootloader(struct hci_dev *hdev)
->   	skb = __hci_cmd_sync(hdev, BTINTEL_HCI_OP_RESET, sizeof(params),
->   			     &params, HCI_INIT_TIMEOUT);
->   	if (IS_ERR(skb)) {
-> -		bt_dev_err(hdev, "FW download error recovery failed (%ld)",
-> -			   PTR_ERR(skb));
-> -		return;
-> +		/* The controller acts on Intel Reset by resetting and
-> +		 * re-enumerating on the bus, which can happen before the
-> +		 * command complete event is delivered. The resulting
-> +		 * -ENODEV means the reset took effect, not that recovery
-> +		 * failed.
-> +		 */
-> +		if (PTR_ERR(skb) != -ENODEV) {
-> +			bt_dev_err(hdev,
-> +				   "FW download error recovery failed (%ld)",
-> +				   PTR_ERR(skb));
-> +			return;
-> +		}
-> +	} else {
-> +		kfree_skb(skb);
->   	}
->   	bt_dev_info(hdev, "Intel reset sent to retry FW download");
-> -	kfree_skb(skb);
+ 	hdev = hci_alloc_dev();
+ 	if (!hdev) {
+@@ -397,9 +397,15 @@ static int virtbt_probe(struct virtio_device *vdev)
+ 	return 0;
 
-Excuse my ignorance, but moving kfree_skb to a new else branch is not 
-totally clear to me.
+ open_failed:
++	virtbt_close_vdev(vbt);
++	virtio_reset_device(vdev);
++	hci_unregister_dev(hdev);
+ 	hci_free_dev(hdev);
+ failed:
+ 	vdev->config->del_vqs(vdev);
++find_vqs_failed:
++	vdev->priv = NULL;
++	kfree(vbt);
+ 	return err;
+ }
 
->   
->   	/* Current Intel BT controllers(ThP/JfP) hold the USB reset
->   	 * lines for 2ms when it receives Intel Reset in bootloader mode.
-> 
-> base-commit: eab19cb7618e5c50fd1f8c1efdc4e66e16575975
+--
+2.43.0
 
-
-Kind regards,
-
-Paul
