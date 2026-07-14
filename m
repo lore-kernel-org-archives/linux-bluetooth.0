@@ -1,148 +1,131 @@
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3497435DA78
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2026 22:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40C086341
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 00:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783983028; cv=none; b=URhz2v1vd5sA14w70DjOWDRLNXcGZfOPAvstCLc4Payn4YLXSyDf8x+PZDb/yK6vEV5Sks6uR84O/PSYByQla3BbgTeteysUCLP4w/c2gbYzko0NXZdh5TSMQs68F0tCN6N68QASlHrxysYDOuL3NG2yAy8j0o/bYT9fFmlhWw8=
+	t=1783987259; cv=none; b=i82Wo8trKDG/0Yw3imCdIWPckxPCl4/yFjqOE/LsCyM34HfWOK5/PmfjHW+3mniipj9pxD7DiAbmfTmr1PZD8h0SmOxT0aYaQcoiZp+GGopOPo2KMglfIWUWFiv6AdzX9hVDfdQ+8ff3PEqXND3iCBUo1juimjbRDvRjUWImc4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783983028; c=relaxed/simple;
-	bh=5SewTj3ws8dGFoYodOl9sjNwKy6K38zGBPTAGaBozKQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=MeZRC0wJ9gddkXUfbq74XwRXg/aiXzZglg3h7OO/RV1q0Fmop6RkcvjR7SJMRfizos99GbrluKh4WljItFIGl2ew5qjq7FTAkRV8LlKNdvGx2SZZcrVGc0u8bkbnFykWPMnTIAC+c2rQSci4qgB2UITusSqqIk098pk19gT2JUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rCPcsQVK; arc=none smtp.client-ip=209.85.210.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rCPcsQVK"
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7e9ecb1e13cso2885097a34.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2026 15:50:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783983026; x=1784587826; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=UKZg8plGu6xV88L8HcqVexdDuT6hPu3EdisY9Ds+O84=;
-        b=rCPcsQVKEU5KI/qjjPu30cwbTFebdNNGEtL/jpAEl1YjSEK9rccfGBBU1vd7Y8EMYY
-         U/G4a/tXwjEB88LYDYyMGtaws9Xhan7J+MeNy9tL1LMMm0mneoxJ0xB298/6YEJVM5dO
-         fQXA+m5NAlE+45zEz7qdEzrlqG3JIv0/Uckwn768z/i++vQ4TE6P6wIzp5jEPYLT/y5V
-         hsBnBnPXyka43pQC1xgZTHzc2wkUxACE8mgtkImdePr36Nsm6QG7E41tZfdClGVfQRGF
-         /kAC+iGoKU1K3u9o65SYfrlib5UXDvaQUQc4DHzNqhhDRgUZu4mRaI8CvpI5Lsjw7D6I
-         0H0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783983026; x=1784587826;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=UKZg8plGu6xV88L8HcqVexdDuT6hPu3EdisY9Ds+O84=;
-        b=Z+GzsCIXfBlYXsncJs8G7VSCcwsWTsyJiSMwvrZyibAiGReJeQS9tqwVwMMCbFzvx3
-         9c5MSArQhIF3cbPbwnxaJbhwyqrSDDYJ5ixGjk53vY5Rnz0OqV/bpF2kDzLb87TUWbV7
-         D8r7/30aYwv9ewI0VphzTFhOgB78Db2i1h9HO2gtl+SOZbKKBiMDN2Eybhxm+GUqtSNp
-         R/26Uwyle0cRcrL1p3hsZeZ3hJQ7MrLqu/HS746qXuZmFHVh/v6cFaN0bcpl8OFP+X1h
-         1tldxnhdB9/WMpUuW737uSVXT0ylSihzQBtwLagClOLUad6vj2qD+GMGdL78My+g/o2g
-         m2Wg==
-X-Gm-Message-State: AOJu0YxJGN+6vlLLcLZF9CuA9w2PzUrdnPm6hJSuYb4wgfVS61P1eiQl
-	1NHYUC6n5a3O5oipwHTRBctuEa6w+T7tvJBd4D+e/fTB1KrX0b1DFoosbEzy1Q==
-X-Gm-Gg: AfdE7ck52djHN/FWT2wrRYfhJwqw20bc+EE7FnVNyHRkTEN95AO+Vu8bKZTAH0cradK
-	xQsOSZmOUyDaOAj2pKFyxgKbbADsA5v8SXW+W9qHDlkitJYdgVwgxG1YGEqTuVWYf7NV7/7PXj+
-	5lhZwCcnUdz0O6Y51zfXMHM4SGw72E+gpb7ExvzvXYelo6m3kR3ZGfs1c6wLwVrWIYXxOa6OwRl
-	0F8WOSyI1BtOCxjU1f8EsLoTfoCfqq8rNh/L7pTHvEAltTNCHivo6/jlQ2zTrm9K/rV8ekl1DzU
-	Tt0hAvu/46ok+WHhTnGIykG8uZCBCmw4cxzwElhixxuzpYNfU3PBu8ksVISdOB5leTr1FoMnvD4
-	dAR9XtIjhNh/zElhFl5YkdZmEnG1kwUxaLQUYLAS0UkbNwa2B/rDlAjgQethu9qNdrKu3Hp5HsP
-	nnsERxQlBBj/WXgh8Uef4=
-X-Received: by 2002:a05:6830:6aeb:b0:7e9:dd7f:7a83 with SMTP id 46e09a7af769-7ec09302286mr7211459a34.0.1783983026094;
-        Mon, 13 Jul 2026 15:50:26 -0700 (PDT)
-Received: from [172.17.0.2] ([52.176.19.195])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7ec2183a32csm4892121a34.23.2026.07.13.15.50.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2026 15:50:25 -0700 (PDT)
-Message-ID: <6a556bb1.a29f8321.394f63.d2c4@mx.google.com>
-Date: Mon, 13 Jul 2026 15:50:25 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7575926918220352637=="
+	s=arc-20240116; t=1783987259; c=relaxed/simple;
+	bh=b2URWJlXaxtkxdXeB/4/ceGBjzHtmKJkamCR5K7hfZg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q1HuvIbvmqZkhehszMsfrK7gWGrNf00lnt2+wztBvqSn++4a8RvlJoPsnVcJfs8aBWWsdGEnD1YJUWLH9mNobjd0vZYgRpLU0N2NSip2sJTkkJdxg+TOYBEwCzb7+XoZ1yNVatUTwqINfyoWjmgI64MN5SnYr3scyYAc5aMp4Qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.150] (ip5f5af733.dynamic.kabel-deutschland.de [95.90.247.51])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 2736B4C2C37D58;
+	Tue, 14 Jul 2026 02:00:39 +0200 (CEST)
+Message-ID: <0f0d783d-8b03-4048-bd7f-b97dc2bce92f@molgen.mpg.de>
+Date: Tue, 14 Jul 2026 02:00:38 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ameenaladdin@gmail.com
-Subject: RE: [1/2] Bluetooth: btintel: Fix spurious error on FW download error recovery
-In-Reply-To: <20260713215537.81222-1-ameenaladdin@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] Bluetooth: btintel: Fix spurious error on FW download
+ error recovery
+To: Ameen Al-Asady <ameenaladdin@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org
 References: <20260713215537.81222-1-ameenaladdin@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260713215537.81222-1-ameenaladdin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============7575926918220352637==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1126920
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.72 seconds
-VerifyFixes                   PASS      0.11 seconds
-VerifySignedoff               PASS      0.11 seconds
-GitLint                       PASS      0.57 seconds
-SubjectPrefix                 PASS      0.21 seconds
-BuildKernel                   PASS      25.29 seconds
-CheckAllWarning               PASS      28.08 seconds
-CheckSparse                   PASS      26.83 seconds
-BuildKernel32                 PASS      25.24 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      456.79 seconds
-TestRunner_l2cap-tester       PASS      57.69 seconds
-TestRunner_iso-tester         PASS      80.99 seconds
-TestRunner_bnep-tester        PASS      18.81 seconds
-TestRunner_mgmt-tester        FAIL      206.36 seconds
-TestRunner_rfcomm-tester      PASS      24.99 seconds
-TestRunner_sco-tester         PASS      30.51 seconds
-TestRunner_ioctl-tester       PASS      25.57 seconds
-TestRunner_mesh-tester        FAIL      24.92 seconds
-TestRunner_smp-tester         PASS      22.74 seconds
-TestRunner_userchan-tester    PASS      19.71 seconds
-TestRunner_6lowpan-tester     PASS      22.64 seconds
-IncrementalBuild              PASS      27.18 seconds
-
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.237 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.901 seconds
-Mesh - Send cancel - 2                               Timed out    1.989 seconds
+Dear Ameen,
 
 
-https://github.com/bluez/bluetooth-next/pull/432
+Thank you for your patch.
 
----
-Regards,
-Linux Bluetooth
+Am 13.07.26 um 23:55 schrieb Ameen Al-Asady:
+> When firmware download fails because the controller is running an
+
+“fail” is ambiguous to me. Maybe “errors out”.
+
+> operational image whose version does not match the firmware file on
+> disk (the normal case for a firmware upgrade across a warm reboot,
+> since the operational image survives in controller RAM),
+> btintel_reset_to_bootloader() sends the Intel Reset vendor command to
+> force the controller back into bootloader mode for the download retry.
+> 
+> The controller acts on Intel Reset by resetting and re-enumerating on
+> the bus, which can happen before the command complete event is
+> delivered. In that case __hci_cmd_sync() fails with -ENODEV and the
+> driver logs a misleading error even though recovery is proceeding
+> exactly as intended:
+> 
+>    Bluetooth: hci0: Found device firmware: intel/ibt-0041-0041.sfi
+>    Bluetooth: hci0: Boot Address: 0x100800
+>    Bluetooth: hci0: Firmware Version: 202-5.26
+>    usb 1-6: USB disconnect, device number 4
+>    Bluetooth: hci0: FW download error recovery failed (-19)
+>    usb 1-6: new full-speed USB device number 5 using xhci_hcd
+>    ...
+>    Bluetooth: hci0: Firmware loaded in 2827613 usecs
+
+Any hint how to match the firmware versions, or add a sentence what 
+firmware is on the controller and which one is downloaded?
+
+> Treat -ENODEV as the expected outcome of the reset rather than a
+> recovery failure, and keep the error message for genuine failures.
+
+Please mention the system you tested this on.
+
+> Signed-off-by: Ameen Al-Asady <ameenaladdin@gmail.com>
+> ---
+>   drivers/bluetooth/btintel.c | 18 ++++++++++++++----
+>   1 file changed, 14 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index 5e9cac090..472542bff 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -1363,12 +1363,22 @@ static void btintel_reset_to_bootloader(struct hci_dev *hdev)
+>   	skb = __hci_cmd_sync(hdev, BTINTEL_HCI_OP_RESET, sizeof(params),
+>   			     &params, HCI_INIT_TIMEOUT);
+>   	if (IS_ERR(skb)) {
+> -		bt_dev_err(hdev, "FW download error recovery failed (%ld)",
+> -			   PTR_ERR(skb));
+> -		return;
+> +		/* The controller acts on Intel Reset by resetting and
+> +		 * re-enumerating on the bus, which can happen before the
+> +		 * command complete event is delivered. The resulting
+> +		 * -ENODEV means the reset took effect, not that recovery
+> +		 * failed.
+> +		 */
+> +		if (PTR_ERR(skb) != -ENODEV) {
+> +			bt_dev_err(hdev,
+> +				   "FW download error recovery failed (%ld)",
+> +				   PTR_ERR(skb));
+> +			return;
+> +		}
+> +	} else {
+> +		kfree_skb(skb);
+>   	}
+>   	bt_dev_info(hdev, "Intel reset sent to retry FW download");
+> -	kfree_skb(skb);
+
+Excuse my ignorance, but moving kfree_skb to a new else branch is not 
+totally clear to me.
+
+>   
+>   	/* Current Intel BT controllers(ThP/JfP) hold the USB reset
+>   	 * lines for 2ms when it receives Intel Reset in bootloader mode.
+> 
+> base-commit: eab19cb7618e5c50fd1f8c1efdc4e66e16575975
 
 
---===============7575926918220352637==--
+Kind regards,
+
+Paul
