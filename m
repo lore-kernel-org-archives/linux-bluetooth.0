@@ -1,76 +1,58 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from out203-205-221-155.mail.qq.com (out203-205-221-155.mail.qq.com [203.205.221.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0AC40D598;
-	Tue, 14 Jul 2026 08:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784018483; cv=pass; b=jD5x8vpOzg8ceT2S2dRvpAikOqtY0G5urOxxzxjd+IQtKKQNGCrSF4xn3nlxwF84DlJ5r8gtZqcoCd2Rf74o6IjYYJqqj30Vtriy0qdqaGC5bBVWbxtTPUsGsnsatnmGmpxVcC0+7+g9tbdjusoueeLZBkRE2G49pt3+FnHcg+s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784018483; c=relaxed/simple;
-	bh=RxU+HTMT4e7gqntzch9vJgiaNm5ZGZt+PRgQScwOTos=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AsOAma+hHmd+SP8n+q1deSdM0EBafCSKXdhyH+0btHBCvapUrSdd/SoZndE28ZXg3mdg/RAew7Awz3/hfKEjMP8HI8AfiRHwQHBCUnLFa6iKO5TNQVbtfSs2uIawOisEoaHaPoJmAK6S29wyVT1QbLLIjqoob7UXyVYQcH8sNYs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=PS0I4NIF; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F693FFAC6;
+	Tue, 14 Jul 2026 08:43:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.155
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784018606; cv=none; b=aGUHKdy08pQS+Jyy6HoaefCYm6emow1lNBy8tqmoatWGKumheCDI6a+31J1nsooj9Glepbt20vT7Wk82BuFpNgNOYgjkD93gwU+eECqmVnoiTeG0vI2b8knoYYClpArcNaYydBW7u0TxOBaQzGG9TW1z09hnbSTJ7gpFTWCVmcg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784018606; c=relaxed/simple;
+	bh=myxCmWil1LxRLAqXUKw1VUKHRSF+fYcGMgeQGTkIHXs=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=GGylSMgB7bPmOXcsqikCHjIwxRshOsLef6KCfHb+OqTNPCYdtJnzFUksxcWm8kbEYSNQ4atbdtgnUwKKqilNMC9McdgTcgUDYoHNx6IZByW44vC++QL7u48FX+SNaxjKK3jG32r7KmgZ42Jl+2IHr7/PQqu+k+hvhiD3U7//wlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=yRL6Y1Zv; arc=none smtp.client-ip=203.205.221.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="PS0I4NIF"
-Received: from monolith.lan (unknown [185.77.218.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4gzt7P2Nbmz49Q7r;
-	Tue, 14 Jul 2026 11:41:05 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1784018465;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mmcNuCzruBf46D7jtK0IDQXcz3yC7dwreqOBRSsfTAs=;
-	b=PS0I4NIFk+kXN1BgJaJj6kvJrPa8P55EeBLwwdgIkUQKcltE+LxgFw8b/uf06YyIZs3VJT
-	DWMkRrjP5KOs5mMvy0L977o/GIk/tzcRZq3VXvDwRubuSpXdvDg/7oBzy9HWqvHT20+RPD
-	Qkol+IyB1JMQxGmnUggqX23hiOA9qKXInMiMgTs/vitS7BogYdbzBn4y99BPD5Dwh1tJwv
-	nT1d9govN7cvvTr63Dz+0cRH9jUwX5ngZ1cply7Eis49NoDS1NuF0wZcV2wDug4fOHzj3P
-	E5It5cjfR0zAyWGH5mjEK8mkB/5qmxypWpq4R4gM3rjWNhjbNsdCiRXhp0P7RQ==
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1784018465;
-	b=s2RxHCpEp/DUVv0EWIoSRQpb0gvsyUpuVl0OjUDA+71M6BJytsq1VvV8e3lcw4Z45dlhUd
-	fbaGYaE1viNjNNJJpnu8hxHXgyoIK80Lt41agLTkoH+yT8/xGBx2S2gqMh6S6RKyxYMiy1
-	kPSy4e3aKu6CYn+fYG8x88r2ko4apyLW2gCIUIECv62XBHuTgrS6rhxS3/ocACErCasc6Y
-	Ntt2rUOoivIXdK3dNZ0NBxF/qmoVHxIjlaUr1f96wbHUhWn0Al/CR7P1ND91/Ypz6HfqBT
-	rO5MNU93WU2f5vC8/7iKKb3UU1N+vTKRH+TZdODGVBbLHEG1nhH4URoQFaR3Og==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1784018465;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mmcNuCzruBf46D7jtK0IDQXcz3yC7dwreqOBRSsfTAs=;
-	b=X0/GtUU/BaCZqgTSIa+YqOzcX38iysbEEmz08gRgGGMqViAO8qZvu2TvkXtfN0jeGbqxOd
-	WKFI5vx4+HMWrBta2E9pY/bFGRkQNovO4BmyD8QwxKb9wN9Q9sl/OcvACYlrNyDknutpcd
-	ibhKBNBU0Kubo3F3XpLRsYZYNANMLsyXX6Mv2WFceXj3iOkuwSTDvhko5z3eZzlZLRCZvQ
-	voRdxtHIZbTbSt5mJla5jOHBeTrMnP3iUsDiLqUxP2I/JlgllfSkMVJefo3Zf3R4km5EgX
-	n51jbj0XpFMT5FQVt+/sx7dyXYG1tKJpJ6HZ4utMqGnZBkQDEM9z4kDzfhn8Jw==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	elver@google.com,
-	bvanassche@acm.org,
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="yRL6Y1Zv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1784018596;
+	bh=mLUpHb90XJyZ7siSeut6+6pq0zRtMZTMB5UnCqaKyt0=;
+	h=From:To:Cc:Subject:Date;
+	b=yRL6Y1ZvU7cNQVh8ezbPNQn4WSErU3GkuOhwOcXu7+H9eE/hQmdOiuCOhGWdmrqlj
+	 vhnPxVbaHckMfdpOKZyEVJ7HjNS9w73bWCR9tCaU2iPnLGgOObsQnKgA9Qap5rsrsU
+	 fZHjRo55ukZXk/D3pecJQDSa7GlqE7nPPMEPAJrQ=
+Received: from localhost.localdomain ([116.128.244.169])
+	by newxmesmtplogicsvrszc50-0.qq.com (NewEsmtp) with SMTP
+	id ACE2B6CB; Tue, 14 Jul 2026 16:43:14 +0800
+X-QQ-mid: xmsmtpt1784018594tc8r6o986
+Message-ID: <tencent_9EDB39EF4A8A9D6EF645A7DC2F32B25CA209@qq.com>
+X-QQ-XMAILINFO: MKjJ7hBG/9lw06qMXC2HMvS/wFRGiwgu0IqJ1RLZzPIOkSOJXcvFZCNEFIWXIN
+	 9LSYbCq/5mKocCbtUsMlYmpYL6iqUYQjb04Ho5yqBOpT4w0L2w4UYHo5cOsH6WLD0ZUNY6Mzv0sY
+	 z012OSqWm2/AIeaET3A/Hqcfv2/amYQBLzZQmSVKFcZuC9FUh9G+pT5OeqePNe2EWFT7CYdAiMe7
+	 bvrTN7dtCBVVUHM/AfwUWM1UEepq0gtUSpcaZgpWoAJ3rdWfXGlyVKobTgVdJtowRMTG7lpuFs/u
+	 V4PzCoMyA1OxyEQzYQVhF9sL85s0tmhPqVwN5CzCzfzgOyN4bnSSeKTGA/uYgcjVYtiEjzAvs+DL
+	 cN7IoTcUnUonj0BQwm0EbDSGF5S7jzcl/fogAZqiBuG1UbaigEjxJzRMAYBdiK0pXIqN5JJLwvsy
+	 o92CTY14w80+aHOVY27w5IEa0B7q8UNLGttzvVdILWF/dQqt7OepWYClHqe3s2vMazVlKhKcpwRv
+	 uHVOXjcfEEc/1Rih/6DnmaX9PoEEEbuum5Kcb3dbM74ns8UWvA5u+Z1cvEs/5TmU5tjfli8kt1DN
+	 opOLYqigraNTghpR+Q9UQ86h1EwsLOFLPy8H6zvkgN83L09bek5nwtDMqmLjYqOmRW01NrFRqC+I
+	 T5ZjuSTfqySQb35QC/W3P/L8s8S+8ezBEp0uj4GWp4xrij3Trb95bmotw4RLqSDeSlTKj/4Qa1QP
+	 JlkpRVFz5qwcXzeKZj3nvWUIaX4pTKaNn77XQrtwy2e6t+stYOU2vScuINbEZj3X9gNQFIxF7fR+
+	 TJokcYLyYkZvjbybe1rWwq/sbREDEuNfsoRx8oYoCpo/H/xqs0jlMjbwB0E9gNPNBX4aO0SO6rkM
+	 9ZhUJFA+qhHXA5ioas8+p8XiFKTAS3fixwQz0bbOG33SivBZ3pvaP/DJ5pp5z+z93ZMTUsRmDw8r
+	 S9LfeASlKMZ3JGjn7XlSSUDx7RiIxOIE4uxw/gbBknp/TWCwZ/UWsTco5RKON6gOIEL19gYKTUDV
+	 0SV6l393VzsOwKpSeCzxnLU6/Oz03KtpAKkKhJ9UIh/JUE46+92e2wgaTL9MA=
+X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
+From: Zhao Dongdong <winter91@foxmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH v2 2/3] Bluetooth: L2CAP: add locking annotations for l2cap_chan_lock/unlock
-Date: Tue, 14 Jul 2026 11:40:50 +0300
-Message-ID: <a0e6db05b52994c3c27d854e2d35ab0256b93769.1784018377.git.pav@iki.fi>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <aaf5b46dd2519f7b3c7e74f9b232be2130ca30db.1784018377.git.pav@iki.fi>
-References: <aaf5b46dd2519f7b3c7e74f9b232be2130ca30db.1784018377.git.pav@iki.fi>
+	Zhao Dongdong <zhaodongdong@kylinos.cn>
+Subject: [PATCH v2] Bluetooth: btintel_pcie: Fix DMA memory leak on probe failure
+Date: Tue, 14 Jul 2026 16:42:28 +0800
+X-OQ-MSGID: <20260714084228.400718-1-winter91@foxmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -79,80 +61,68 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add minimal context analysis annotations to l2cap_chan_lock/unlock() and
-callers required for no warnings.
+From: Zhao Dongdong <zhaodongdong@kylinos.cn>
 
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+In btintel_pcie_probe(), when btintel_pcie_alloc() succeeds but a
+later step (btintel_pcie_enable_bt, btintel_pcie_start_rx, or
+btintel_pcie_setup_hdev) fails, the DMA buffers and descriptors
+allocated by btintel_pcie_alloc() are not freed. The exit_error
+path only resets the device and destroys workqueues, causing a
+DMA memory leak.
+
+Fix this by calling btintel_pcie_free(data) after btintel_pcie_reset_bt()
+to release all DMA buffers and the DMA pool. A NULL guard is added
+in btintel_pcie_free() and data->dma_pool is cleared after any
+partial allocation failure in btintel_pcie_alloc(), making the
+unconditional free() call safe on all error paths.
+
+Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
+Signed-off-by: Zhao Dongdong <zhaodongdong@kylinos.cn>
 ---
+v2: Fix UAF in probe error path by resetting hardware before freeing DMA.
+v1: https://lore.kernel.org/linux-bluetooth/tencent_44ED865C14DA3D3823CA85AE1DF2CEBC1805@qq.com/
+---
+ drivers/bluetooth/btintel_pcie.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Notes:
-    v2:
-    - split code changes and adding annotations to separate patches
-    
-    Possibly the l2cap_ops::alloc_skb callback should have generally
-    __must_hold(&chan->lock) and not just in l2cap_sock.c
-    
-    This would imply l2cap_chan_send() should hold the lock, but trying to
-    add the annotations reveals l2cap_chan_send is called without chan->lock
-    from some places:
-    
-    net/bluetooth/smp.c:589:2: warning: calling function 'l2cap_chan_send' requires holding mutex 'conn->smp->lock' exclusively [-Wthread-safety-analysis]
-      589 |         l2cap_chan_send(chan, &msg, 1 + len, NULL);
-          |         ^
-    1 warning generated.
-    net/bluetooth/6lowpan.c:455:8: warning: calling function 'l2cap_chan_send' requires holding mutex 'chan->lock' exclusively [-Wthread-safety-analysis]
-      455 |         err = l2cap_chan_send(chan, &msg, skb->len, NULL);
-          |               ^
-    
-    Don't know now if the context in these places allows l2cap_chan_lock()
-
- include/net/bluetooth/l2cap.h | 2 ++
- net/bluetooth/l2cap_core.c    | 1 +
- net/bluetooth/l2cap_sock.c    | 1 +
- 3 files changed, 4 insertions(+)
-
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index ef6ce1c20a4f..53a68fc32f10 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -825,11 +825,13 @@ struct l2cap_chan *l2cap_chan_hold_unless_zero(struct l2cap_chan *c);
- void l2cap_chan_put(struct l2cap_chan *c);
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 9e39327dc1fe..a005b2e390a2 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -1920,6 +1920,9 @@ static int btintel_pcie_setup_rxq_bufs(struct btintel_pcie_data *data,
  
- static inline void l2cap_chan_lock(struct l2cap_chan *chan)
-+	__acquires(&chan->lock)
+ static void btintel_pcie_free(struct btintel_pcie_data *data)
  {
- 	mutex_lock_nested(&chan->lock, atomic_read(&chan->nesting));
++	if (!data->dma_pool)
++		return;
++
+ 	btintel_pcie_free_rxq_bufs(data, &data->rxq);
+ 	btintel_pcie_free_txq_bufs(data, &data->txq);
+ 
+@@ -1980,6 +1983,7 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
+ 				 &p_addr);
+ 	if (!v_addr) {
+ 		dma_pool_destroy(data->dma_pool);
++		data->dma_pool = NULL;
+ 		err = -ENOMEM;
+ 		goto exit_error;
+ 	}
+@@ -2072,6 +2076,7 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
+ exit_error_pool:
+ 	dma_pool_free(data->dma_pool, data->dma_v_addr, data->dma_p_addr);
+ 	dma_pool_destroy(data->dma_pool);
++	data->dma_pool = NULL;
+ exit_error:
+ 	return err;
  }
+@@ -2918,6 +2923,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
+ exit_error:
+ 	/* reset device before exit */
+ 	btintel_pcie_reset_bt(data);
++	btintel_pcie_free(data);
  
- static inline void l2cap_chan_unlock(struct l2cap_chan *chan)
-+	__releases(&chan->lock)
- {
- 	mutex_unlock(&chan->lock);
- }
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 322a1895c1bd..5a76c348712d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4078,6 +4078,7 @@ static struct l2cap_chan *l2cap_new_connection(struct l2cap_conn *conn,
+ 	destroy_workqueue(data->coredump_workqueue);
  
- static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
- 			  u8 *data, u8 rsp_code)
-+	__context_unsafe(/* conditional locking */)
- {
- 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
- 	struct l2cap_conn_rsp rsp;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 735167f73f31..4afc5b370b97 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1740,6 +1740,7 @@ static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state,
- static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
- 					       unsigned long hdr_len,
- 					       unsigned long len, int nb)
-+	__must_hold(&chan->lock)
- {
- 	struct sock *sk = chan->data;
- 	struct sk_buff *skb;
 -- 
-2.55.0
+2.25.1
 
