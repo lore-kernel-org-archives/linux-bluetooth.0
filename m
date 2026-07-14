@@ -1,343 +1,172 @@
-Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A6728751B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 12:42:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784032944; cv=pass; b=rcl/WlQqDBy47vVRU1AOeggbNKEBiQRcAHrq7rNz1LxuTo0nA671STKraXr4sJ0O0w2bhc0kldWvugzBThjgE/KRdIzVIaBVyxUz6ogo/Za2Avj89CjqHxcGnhTQ2ciga3yjxUB1jTRIHiircJ9vySD24pVB5mgfFafR2RD11Po=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784032944; c=relaxed/simple;
-	bh=Q02fasoEx743KNWC3sJ06EbS84NB6pnvoF3c3X5gMPM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UCld3UOwv5UPdg2Bx+JkKt9tbvmvZHPGpTHhFxlhJ3J4HcjWW3y3wpV+vT47vgsYAULG8BES/RwmIcPhCw54C5BSBJKMXgsfcqtCpDoWHBrOaStGbAKJtrpFjk6LHkfxxWrU5M6iGq4cpyYy41nfWIa1Ef5O1LB+raaOOWkP0Io=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZkHWEOdI; arc=pass smtp.client-ip=74.125.224.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB513AA1A7
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 12:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784033535; cv=none; b=RR1kHedBfY5/6A0y2bgXu34HQpWn9QaAn6G89PwW/oYnVcwF0z7Y4l9poPdZUttW7YEwEMhvsIX1kEiYIYHo7ovpdnbG1jORJn4hqx31NuMNIYikevvYuULEy2gie2qCfS3DU3YVC8EqE+sHYd+/Hc9oSaSKRzEQr3WqFXT9Fj0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784033535; c=relaxed/simple;
+	bh=K/aLER6+ebVkGgjRtZVtDuCurkZdvKTMurcmLpU+6qo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=avaUcbUCEtvrSghYNmoQg+tXYFAk0ycf1UXveM4krU44XWyY/+Ng6KigAiGUq9GMpdKj6n471MgWtb153/f5TFiR8GqnoIkmAnNqTCenaR6/K1SESVz1RU/Wn0tGEcj7RfqCyUcrOo/AL6UcbR56Fz56TMQ0NSJE2MileGDib4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=sk3JiuPO; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0sec.ai
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZkHWEOdI"
-Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-664e3ed58bcso1335216d50.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 05:42:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784032942; cv=none;
-        d=google.com; s=arc-20260327;
-        b=RBx2EQ7CE6vS/5R+0i4cQZ76I+D6HsFmHHtvS3bSPCMR3u7TAY+m75qKlqMcpgU5Xt
-         TBad02ZeomICLzXOgOQvj+vvnza1sixbD7WEwvWkIOVes2jnI+CVzXJub17XGfbC1ent
-         BmtXvh2IiiIhAH2Tz2i0SsRaIgU9He3OSYzymAFCg9xhl0cNU4HNBkGbgniNwckV5vwZ
-         gfJvooeUKI8BwGfHVk45vCk/PERSncOJHSBUt0G8+aS9hWS+bJydONGBX+YJfpyTCGlz
-         /38FgqjOLfJsVLJZBQKz0UUWOkmXDgUC94M55hEE3Wqj2abZhBcacxWqHoFVkuWAUnRU
-         uJOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=QHNFQwGwvPNhEiSWHD3Kb+fp/5rmXxMz+PlfsCaIDUI=;
-        fh=kuWs0MQdxjKAKHnVbu79j2bwH32LhwsN8SkwwMg2OYU=;
-        b=m2hmQpHogF7K4baWC4NoreNAt4ke9Q3gOLvNCv6rCKOf9HGREsGccNW4AbZTFGdZkG
-         Z0Szjuh6RpVBjLsXBXf3ajxS3QM7A+7H3ypfW2XGxzsPdAak0he93CmduP8Q+Rkmc8p0
-         9G3f2DwaDEC4ApqDHS5YOPlfliMEY5GZuktWzBMc274lspW2/vjlXrPyNpsQFNM7EGHR
-         5lpZuHWBeJMqTO9d473ZIRBQ3cEskIvo0eM0uHXwHO5r9Jx65fcHZX+8dUY1lQ2qswm1
-         AvxhkMPtTZbz0aTpAcRFHcFK3i85FqhZVnYzLJAJCce2pA12R8nK0OqUMcp2q7TuEbes
-         xOVw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b="sk3JiuPO"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-493bb510ce4so30363585e9.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 05:52:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784032942; x=1784637742; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=QHNFQwGwvPNhEiSWHD3Kb+fp/5rmXxMz+PlfsCaIDUI=;
-        b=ZkHWEOdIinH2dRwQJnlpL/uZQG3WM2R+5G5hj/ModoeGUq5R+3NXtao26QuAxCE2iN
-         TATSqIvjlD1C3mFWNwOHsj8Pmq+ytize4nDL0R0gfRBSOvmuZCWyCzlk7v7Jot9P7Gh8
-         NCPXew/FxGj97CrLZmN+dTnWl+f+q0PCOUrAHD5zV4DnF4NlOEa1ni+tvZMplUFk6Lfg
-         p9oRRPjJFXaALhgbcI/K0LCmQEpkQQetQLQIMt+OC94Rdos7Cdgw4Oj4crSifmNu6TRc
-         EI2OnlpKyne0XLY6VL9SGjHhteZR45s6OhsGtLmYDAGjDUshoMBoql+Er5nZ6aL1Qf9y
-         Xjyw==
+        d=0sec.ai; s=google; t=1784033532; x=1784638332; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=uhf+KlmAvjC3IU/9RdHkwgo2wg9fs34PDje4Hy9fpNw=;
+        b=sk3JiuPOqxdxnkH7kO50+YJGa2IxqAOoVxMoO3FKJdtydnbninLrPlh48hQjpqpIMx
+         PhgvGZgAMfcYIErJcDb1h/QoWxVP4uJUxProb1uO96XmzmviLdHICmubWE/w2xiTF0ES
+         FQeBQqoiMQtIPppiWezODMiAVZw1kQsz+lzexh/uuPAk8u/Qx2xviaOQtgStfWY42sTd
+         2YMEMTAUtygUjAsmi/HKdP7FiWxPwr1a9GWUz2m7foW2Vug2RqeIQIlzEZOnZUI1TKaN
+         aOECkYFoKNUhqy+pvrF+Pt8FjXM+lOlATaxhvwDYyEGKecATuYyWgtdtsJFY9MMBXyLW
+         GyOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784032942; x=1784637742;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=QHNFQwGwvPNhEiSWHD3Kb+fp/5rmXxMz+PlfsCaIDUI=;
-        b=NvDBQDGdUlcaRgXK2ByScVxh/XiaQH4SFTxEJAPBWwpGSBEQxyQYRp8D6pyu2h/xKz
-         mdFktb/5yMi2j0zv+AtsxhZ/Bv81izWS97OFcCfq85Shn3BCUpFxr3mBv20AeND+B8t6
-         4/FCVeytr9KXPaDF6lHXePG21g/y7lE+xJgbqqRf0MFP9GuuJ40vW7vNH7Y9iOyV+g0L
-         q/t+lyuPWYpgnT+sljeeV2cr8mo83W2a7sIWPkZT+pHOu0nKv0xFUGhr6PZ+2HF633Gt
-         jjY/oS8Teh+8jp3Pyl0DydZorq24lj0QTOs/hcb0WpGFFARd1T7dXVTyjGQm3uGAsHT+
-         P0kg==
-X-Gm-Message-State: AOJu0YzwMlH1/jWj7xahLxrgwMS2aVnTvgggsGpw32/8Op+tkombuq6x
-	vOEceASPmhqX3ny7UiX/avE4h3eQUnnSlO45qjdZOnqqho/fuo9byMesdS8bqBsWQicADQn/Ka0
-	kAl9gu+kmK1T6zf7gr9R/YUOmWh0XMg0=
-X-Gm-Gg: AfdE7cnKmxIFmD7CuzuFntU0PKLnliQHI49cNMQm8pWf/eRwOAEnq6a15BGQ3jT5y4Q
-	0gIRVyB3vZmNcMN4SCGNd0+mg2j71R08mjldf2fz8sasGiNN2wP1ZvqOrhniOLwgtGGjUfqBFmq
-	KRv4+34N2VhcI+mdpORMHb0v8W0tXrtt9fjSaIiMINHjgOtCSvuRU4Cf4Gq187mOWGpPqhBYOSM
-	xfJixcm9KseaG919roiK7zqDBKYOkdKLN6MJcFlJpzyHnrP4I+Nxy3482PC75xUrukNgPw2cTAt
-	XWETNaSFHuxbRmiUCbuUrFmfc/uH8HWIIs74GWToNls8J2uoa9biq+8v
-X-Received: by 2002:a05:690c:e3c1:b0:81e:ba51:9098 with SMTP id
- 00721157ae682-81eba519101mr26012467b3.8.1784032941758; Tue, 14 Jul 2026
- 05:42:21 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1784033532; x=1784638332;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=uhf+KlmAvjC3IU/9RdHkwgo2wg9fs34PDje4Hy9fpNw=;
+        b=Nm/6DLpzO7NiDgslBhLYo78YvWW5HmmdMOScaVVT5W6otJOEEy/3xoWN6cmrJD8Hps
+         PTgQpiv/beDWLzzj2Tsc+wfrSTJS8UlKFwRcxvXFNYDaubLoABr9n1g/N5sgDFYGDWSh
+         5tNtNcIn86CkbsDKfAXbj8d3PETILio2wC34VSYsglOZqPo99MD+2kQGf+sW1nCJGi5l
+         NxOjB5rkDujjW8rz+pWYNL3Gdj+KZbabDKFPnIUxfNfzJGERKZdQfp3jMDdxL9/kfiOm
+         0uaVem3PxnCTjm3gsSWwh9ACPLXQ4t14S9ItqSOWQaVCRiSnIBo/lS5laES7Hv0SYGlg
+         8buA==
+X-Gm-Message-State: AOJu0Yxm4bsNruRuv/6xS2Jzpw7l1OjbUsfzoZv5WVBLiaLbfqRhYhA5
+	dGJJX1fcj798mzLZGGVZdUu/BHRWp43TcdzkX0jCS2qFs3s4dP0Yx1MGdDmvEFf5I+Xm9JXDOib
+	Cosl9YU9i
+X-Gm-Gg: AfdE7cmvSN/+aagJM1YcgUY0jNxzQsog0bi9/UA4H9lh0zwdpk/4mI4GRglfzj1YHNf
+	wftW4IgoPMS/IbfNmhcal+oWjeaOwn95u+KVwZF+xMqL6hUGjAjcFQZX907smEXCA64G3Ddb1Na
+	IveD60Ep3BvNCv3GLqi1NwuJH+fC0MOZ6xg9uSi6cwYS2eO/QZiXYzHLhzwyY88DfvlDXBr9hqK
+	nQ/A6fWNPp1382WyV0WWY6bFIm3rsS/k9iW5z6ISQQ9Lt3xqlRk7539AcRtwy81M1tUGewzLEyF
+	oK1tKTne8DdAHnlSG3VStVIygJ+8+xPM5wf1mNK3aDXjz8Q/WzSUWp7/+Potf5+JNSvTya9O9cB
+	YXEMFoaxqt2t50pJDJFPbRIepwfBuiadsNnmrwdcWktHRRsaf4j1wtGjUaVtNHw4qIAzB8/5gdj
+	ZgN+FNMKRGKyX/+IYQrTPAsA7if4qfrU2V21gFQ8+osX4tLL/lHqUMjQ/Zupa6n89+nq3K68GIM
+	ViKp2zb4VbTIewEuvkU2kIFgngkD0pMu34=
+X-Received: by 2002:a05:600c:609a:b0:492:4363:e7eb with SMTP id 5b1f17b1804b1-495389d21cfmr22459345e9.32.1784033531857;
+        Tue, 14 Jul 2026 05:52:11 -0700 (PDT)
+Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.188])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4950a2f9402sm78431305e9.13.2026.07.14.05.52.10
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 14 Jul 2026 05:52:11 -0700 (PDT)
+From: Doruk Tan Ozturk <doruk@0sec.ai>
+To: luiz.dentz@gmail.com,
+	marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: L2CAP: take chan_l lock in ecred defer recvmsg path to fix list corruption
+Date: Tue, 14 Jul 2026 14:52:09 +0200
+Message-ID: <20260714125209.39790-1-doruk@0sec.ai>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <tencent_A9E80607A55CCF00F26DBE8D8CB605EA5707@qq.com>
-In-Reply-To: <tencent_A9E80607A55CCF00F26DBE8D8CB605EA5707@qq.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 14 Jul 2026 08:42:08 -0400
-X-Gm-Features: AVVi8CeECIR2cw6qOpmwZNyud9zuIlgnumFDpqya30LctMzNBFEVtAIuGUDqJiE
-Message-ID: <CABBYNZJjQDDTHO8=tMGmGmBi9Cgddf4rq=t1iOBgM_Uiyo-czA@mail.gmail.com>
-Subject: Re: [BUG] start_discovery_internal forces mutually exclusive BR/EDR
- and LE scans on Intel AX210
-To: caitao <294305068@qq.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, 
-	caitao <caitao@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi,
+When a deferred L2CAP_MODE_EXT_FLOWCTL connection is accepted,
+l2cap_sock_recvmsg() (BT_CONNECT2 + BT_SK_DEFER_SETUP branch) calls
+__l2cap_ecred_conn_rsp_defer() while holding only lock_sock(sk).  That
+function walks conn->chan_l via __l2cap_chan_list_id() and, on the
+authorization/refuse path, removes channels with l2cap_chan_del() ->
+list_del(&chan->list) -- all without conn->lock.
 
-On Mon, Jul 13, 2026 at 11:18=E2=80=AFPM caitao <294305068@qq.com> wrote:
->
-> From: caitao <caitao@kylinos.cn>
->
-> Dear Bluetooth Maintainers,
->
-> I am reporting a limitation in the Bluetooth MGMT layer that prevents
-> independent control of BR/EDR inquiry and LE scan, which persists even on
-> hardware that clearly supports such operations.
+conn->chan_l is serialised by conn->lock and is concurrently mutated by
+the RX worker, which processes inbound signalling (e.g. an
+L2CAP_DISCONN_REQ -> l2cap_chan_del()) under conn->lock.  A lockless
+traversal/removal racing the RX worker's list_del() corrupts the list:
 
-That is a design choice, you either scan on one bearer or both. It
-does not allow independent discovery sessions exactly because you can
-discover simultaneously on the bearer.
+  list_del corruption, ...->next is LIST_POISON1 (dead000000000100)
+  WARNING lib/list_debug.c:56 __list_del_entry_valid_or_report
+   l2cap_chan_del+0xdb/0x1140
+   __l2cap_ecred_conn_rsp_defer+0x61d/0x700
+   l2cap_sock_recvmsg+0x758/0x8b0
+  Oops: general protection fault
+  KASAN: maybe wild-memory-access in range [dead000000000100-...]
+   __l2cap_ecred_conn_rsp_defer+0x3c6/0x700
+   l2cap_sock_recvmsg+0x758/0x8b0
 
-> [1] Problem Description
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> The function start_discovery_internal() in net/bluetooth/mgmt.c enforces
-> mutual exclusion between BR/EDR inquiry and LE scan by requiring that
-> hdev->discovery.state =3D=3D DISCOVERY_STOPPED before starting any new di=
-scovery.
-> This prevents:
->   - Starting LE scan while BR/EDR inquiry is active
->   - Starting BR/EDR inquiry while LE scan is active
->   - Independently controlling each scan type
->
-> This limitation exists despite the fact that many modern Bluetooth contro=
-llers,
-> including the Intel AX210 in my system, support independent and simultane=
-ous
-> scanning as evidenced by the ability to use hcitool commands separately.
+This is the recvmsg-path sibling of commit 41c2713b204e ("Bluetooth:
+L2CAP: Fix possible crash on l2cap_ecred_conn_rsp"), which addressed the
+same conn->chan_l manipulation on the signalling (l2cap_ecred_conn_rsp)
+side; the deferred-accept path was left unguarded.
 
-The kernel has the following quirk to enable simultaneous discovery:
+Take conn->lock around __l2cap_ecred_conn_rsp_defer().  The established
+lock order is conn->lock -> chan->lock -> sk_lock (the RX worker reaches
+the socket via l2cap_chan_del() -> l2cap_sock_teardown_cb() ->
+lock_sock_nested()), so the socket lock is dropped before conn->lock is
+taken, mirroring l2cap_sock_shutdown() and l2cap_sock_cleanup_listen().
+The conn is pinned with l2cap_conn_hold_unless_zero() across the
+unlocked window.  Only the EXT_FLOWCTL branch needs this; the LE and
+BR/EDR defer paths respond for a single channel and do not walk
+conn->chan_l.
 
-    /* When this quirk is set, LE scan and BR/EDR inquiry is done
-     * simultaneously, otherwise it's interleaved.
-     *
-     * This quirk can be set before hci_register_dev is called or
-     * during the hdev->setup vendor callback.
-     */
-    HCI_QUIRK_SIMULTANEOUS_DISCOVERY,
+Found by 0sec (https://0sec.ai).
+Fixes: 15f02b910562 ("Bluetooth: L2CAP: Add initial code for Enhanced Credit Based Mode")
+Cc: stable@vger.kernel.org
+Assisted-by: 0sec
+Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+---
+ net/bluetooth/l2cap_sock.c | 34 ++++++++++++++++++++++++++++++++--
+ 1 file changed, 32 insertions(+), 2 deletions(-)
 
-    case DISCOV_TYPE_INTERLEAVED:
-        /* When running simultaneous discovery, the LE scanning time
-         * should occupy the whole discovery time sine BR/EDR inquiry
-         * and LE scanning are scheduled by the controller.
-         *
-         * For interleaving discovery in comparison, BR/EDR inquiry
-         * and LE scanning are done sequentially with separate
-         * timeouts.
-         */
-        if (hci_test_quirk(hdev, HCI_QUIRK_SIMULTANEOUS_DISCOVERY)) {
-            timeout =3D msecs_to_jiffies(DISCOV_LE_TIMEOUT);
-            /* During simultaneous discovery, we double LE scan
-             * interval. We must leave some time for the controller
-             * to do BR/EDR inquiry.
-             */
-            err =3D hci_start_interleaved_discovery_sync(hdev);
-            break;
-        }
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 735167f73f31..796b9a4eee24 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1227,9 +1227,39 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	if (sk->sk_state == BT_CONNECT2 && test_bit(BT_SK_DEFER_SETUP,
+ 						    &bt_sk(sk)->flags)) {
+ 		if (pi->chan->mode == L2CAP_MODE_EXT_FLOWCTL) {
++			struct l2cap_chan *chan = pi->chan;
++			struct l2cap_conn *conn;
++
+ 			sk->sk_state = BT_CONNECTED;
+-			pi->chan->state = BT_CONNECTED;
+-			__l2cap_ecred_conn_rsp_defer(pi->chan);
++			chan->state = BT_CONNECTED;
++
++			/* __l2cap_ecred_conn_rsp_defer() walks and mutates
++			 * conn->chan_l (via __l2cap_chan_list_id() and
++			 * l2cap_chan_del()), which is serialised by conn->lock
++			 * and is concurrently modified by the RX worker.  The
++			 * established lock order is
++			 * conn->lock -> chan->lock -> sk_lock, so the socket
++			 * lock must be dropped before taking conn->lock to
++			 * avoid inverting it (lockdep deadlock).  Pin the conn
++			 * across the unlocked window.
++			 */
++			conn = l2cap_conn_hold_unless_zero(chan->conn);
++			release_sock(sk);
++			if (conn) {
++				mutex_lock(&conn->lock);
++				/* The RX worker may have torn the channel down
++				 * (FLAG_DEL, removed from conn->chan_l) while the
++				 * socket lock was dropped; skip the response in
++				 * that case. conn->lock below serialises the
++				 * chan_l walk against the RX worker's
++				 * l2cap_chan_del().
++				 */
++				if (!test_bit(FLAG_DEL, &chan->flags))
++					__l2cap_ecred_conn_rsp_defer(chan);
++				mutex_unlock(&conn->lock);
++				l2cap_conn_put(conn);
++			}
++			lock_sock(sk);
+ 		} else if (bdaddr_type_is_le(pi->chan->src_type)) {
+ 			sk->sk_state = BT_CONNECTED;
+ 			pi->chan->state = BT_CONNECTED;
+-- 
+2.43.0
 
-static int hci_start_interleaved_discovery_sync(struct hci_dev *hdev)
-{
-    int err;
-
-    bt_dev_dbg(hdev, "");
-
-    err =3D hci_active_scan_sync(hdev, hdev->le_scan_int_discovery * 2);
-    if (err)
-        return err;
-
-    return hci_inquiry_sync(hdev, DISCOV_BREDR_INQUIRY_LEN, 0);
-}
-
-So it does start LE Scanning and BR/EDR Inquiry simultaneously if
-supported (driver sets HCI_QUIRK_SIMULTANEOUS_DISCOVERY).
-
-> [2] Hardware and Software Environment
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> - Kernel: 6.6.0-58-generic (Ubuntu)
-> - Bluetooth Controller: Intel Corp. AX210 Bluetooth (USB ID 8087:0032)
-> - Firmware: intel/ibt-0041-0041.sfi (loaded successfully)
-> - BlueZ version: (please run `bluetoothctl --version` and fill in)
->
-> Relevant dmesg output:
->     [ 3.839316] Bluetooth: Core ver 2.22
->     [ 3.839335] NET: Registered PF_BLUETOOTH protocol family
->     [ 3.986759] Bluetooth: hci0: Device revision is 0
->     [ 3.986810] Bluetooth: hci0: No support for _PRR ACPI method
->     [ 3.988198] Bluetooth: hci0: Found device firmware: intel/ibt-0041-00=
-41.sfi
->     [ 5.749096] Bluetooth: hci0: Waiting for firmware download to complet=
-e
->     [ 5.749738] Bluetooth: hci0: Firmware loaded in 1720250 usecs
->     [ 5.775405] Bluetooth: hci0: Found Intel DDC parameters: intel/ibt-00=
-41-0041.ddc
->     [ 5.780803] Bluetooth: hci0: Firmware timestamp 2023.48 buildtype 1 b=
-uild 75324
->     [ 5.859917] Bluetooth: MGMT ver 1.22
->
->
-> [3] Code Analysis
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> In net/bluetooth/mgmt.c, start_discovery_internal() contains:
->
-> static int start_discovery_internal(struct sock *sk, struct hci_dev *hdev=
-,
->                                     u16 op, void *data, u16 len)
-> {
->     ...
->     if (hdev->discovery.state !=3D DISCOVERY_STOPPED ||
->         hci_dev_test_flag(hdev, HCI_PERIODIC_INQ)) {
->         err =3D mgmt_cmd_complete(sk, hdev->id, op, MGMT_STATUS_BUSY,
->                                 &cp->type, sizeof(cp->type));
->         goto failed;
->     }
->     ...
-> }
->
-> This single state check treats all discovery types as a monolithic operat=
-ion,
-> rather than tracking BR/EDR and LE discovery states separately.
->
-> [4] Expected Behavior
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> - Allow independent start/stop of BR/EDR inquiry and LE scan via MGMT com=
-mands.
-> - If hardware supports simultaneous scan (via HCI_QUIRK_SIMULTANEOUS_DISC=
-OVERY),
->   allow both to run concurrently.
-> - For hardware that does not support concurrent scans, either:
->   a) Automatically interleave the scans, or
->   b) Return a clear error indicating the specific limitation.
->
-> [5] Actual Behavior
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> - bluetoothctl scan on starts both scans, but cannot control them separat=
-ely.
-> - Must execute scan off before switching scan types.
-> - MGMT_STATUS_BUSY is returned for any scan start request while another s=
-can
->   is in progress, regardless of hardware capabilities.
->
-> [6] Steps to Reproduce
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> 1. Start bluetoothctl:
->    $ bluetoothctl
->
-> 2. Start discovery (both BR/EDR and LE):
->    [bluetooth]# scan on
->    [CHG] Controller XX:XX:XX:XX:XX:XX Discovering: yes
->
-> 3. Observe that both scan types are active.
->
-> 4. Attempt to switch to LE-only scan without stopping:
->    [bluetooth]# scan le
->    (This fails or requires scan off first)
-
-Why? scan on starts either interleaved or simultaneous scanning. Why
-would we need to allow another scan session to a single bearer for the
-same client?
-
-> 5. Stop all scanning:
->    [bluetooth]# scan off
->
-> 6. Now LE-only scan can be started:
->    [bluetooth]# scan le
->
-> Alternatively, using MGMT commands directly (if mgmt-tool is available):
->   # Start BR/EDR inquiry
->   $ mgmt-tool -c "start-discovery"
->
->   # Try to start LE scan while BR/EDR is active
->   $ mgmt-tool -c "start-discovery-le"
->   (Returns MGMT_STATUS_BUSY)
->
-> [7] Evidence of Hardware Capability
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> The Intel AX210 controller can perform independent scans via HCI commands=
-:
->
->   # BR/EDR inquiry
->   $ sudo hcitool scan
->
->   # LE scan (can run simultaneously or independently)
->   $ sudo hcitool lescan
->
-> Both commands succeed without requiring the other to be stopped, confirmi=
-ng
-> that the limitation is purely in the MGMT layer policy, not in the hardwa=
-re.
->
-> [8] Potential Fix Directions
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
->
-> 1. Introduce separate state tracking for BR/EDR and LE discovery:
->    - hdev->discovery.br_state (BR/EDR inquiry state)
->    - hdev->discovery.le_state (LE scan state)
-
-Nope, we allow a single discovery session per D-Bus client. Allowing
-independent control doesn't work on some controllers which means
-clients would still need to use interleaved scanning anyway.
-Independent clients can start sessions independently, though.
-
-> 2. Modify start_discovery_internal() to check only the relevant state:
->    - For BR/EDR inquiry: check br_state =3D=3D DISCOVERY_STOPPED
->    - For LE scan: check le_state =3D=3D DISCOVERY_STOPPED
-
-Why would we want to add this complexity to MGMT?
-
-> 3. If HCI_QUIRK_SIMULTANEOUS_DISCOVERY is set, allow both to be active
->    simultaneously; otherwise, the existing mutual exclusion remains.
-
-Ok, so the model knows about HCI_QUIRK_SIMULTANEOUS_DISCOVERY and
-stils argues that is not supported, priceless.
-
-> 4. Update the HCI event handling to properly update both states.
->
-> [9] Additional Information
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
->
-> Please let me know if you need any further details, such as full HCI trac=
-es
-> using btmon or additional kernel logs.
->
-> Thank you for your time and consideration.
-
-Btw, this is a total waste of my time to read an AI-generated message
-that argues given your prompt, this sounds more like a question about
-why scanning is not done simultaneously which generated this whole
-design change based on a question.
-
---=20
-Luiz Augusto von Dentz
