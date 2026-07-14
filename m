@@ -1,58 +1,89 @@
-Received: from out203-205-221-155.mail.qq.com (out203-205-221-155.mail.qq.com [203.205.221.155])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F693FFAC6;
-	Tue, 14 Jul 2026 08:43:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A7123DA5C3
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 08:50:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784018606; cv=none; b=aGUHKdy08pQS+Jyy6HoaefCYm6emow1lNBy8tqmoatWGKumheCDI6a+31J1nsooj9Glepbt20vT7Wk82BuFpNgNOYgjkD93gwU+eECqmVnoiTeG0vI2b8knoYYClpArcNaYydBW7u0TxOBaQzGG9TW1z09hnbSTJ7gpFTWCVmcg=
+	t=1784019047; cv=none; b=R4Voc44p+wa4L1McCCh7Qdlcb3lku8wEG4xQPu63nYyO6NXNSRxQOE26jwJpjUdGXiC9Vas3GhhDkbuRWlLrwGuME0JP2UQ4Dq/EOjWRL9ch8hg2Cz+zgl1ZMZ+rxg3sTRyWIRYtlPYqJ+7pwrOqXQuJW9jpkW8wcxa3kAqkdWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784018606; c=relaxed/simple;
-	bh=myxCmWil1LxRLAqXUKw1VUKHRSF+fYcGMgeQGTkIHXs=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=GGylSMgB7bPmOXcsqikCHjIwxRshOsLef6KCfHb+OqTNPCYdtJnzFUksxcWm8kbEYSNQ4atbdtgnUwKKqilNMC9McdgTcgUDYoHNx6IZByW44vC++QL7u48FX+SNaxjKK3jG32r7KmgZ42Jl+2IHr7/PQqu+k+hvhiD3U7//wlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=yRL6Y1Zv; arc=none smtp.client-ip=203.205.221.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+	s=arc-20240116; t=1784019047; c=relaxed/simple;
+	bh=aWv4CsUWOUPleRsEVDAXgnSsI9COV/1b37JFZigUlH8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ttrZn9LVRplejVZAiXcgZgyHCOMvr2VAJ8hBS4EN0dWtD4QVd5yARPfXj7rmZVOYnSVub5mp/kczaBsNXGg1jTvYDicHfOcpmmU8mDhYoV4gFaaBHb+6DXd704jp6gbhK2q8Mnm8fMTuYW6wQaQVDmMiwWlS74WHNbKBNpYq0ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=acaIgr+g; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=dZGwu33b; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="yRL6Y1Zv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1784018596;
-	bh=mLUpHb90XJyZ7siSeut6+6pq0zRtMZTMB5UnCqaKyt0=;
-	h=From:To:Cc:Subject:Date;
-	b=yRL6Y1ZvU7cNQVh8ezbPNQn4WSErU3GkuOhwOcXu7+H9eE/hQmdOiuCOhGWdmrqlj
-	 vhnPxVbaHckMfdpOKZyEVJ7HjNS9w73bWCR9tCaU2iPnLGgOObsQnKgA9Qap5rsrsU
-	 fZHjRo55ukZXk/D3pecJQDSa7GlqE7nPPMEPAJrQ=
-Received: from localhost.localdomain ([116.128.244.169])
-	by newxmesmtplogicsvrszc50-0.qq.com (NewEsmtp) with SMTP
-	id ACE2B6CB; Tue, 14 Jul 2026 16:43:14 +0800
-X-QQ-mid: xmsmtpt1784018594tc8r6o986
-Message-ID: <tencent_9EDB39EF4A8A9D6EF645A7DC2F32B25CA209@qq.com>
-X-QQ-XMAILINFO: MKjJ7hBG/9lw06qMXC2HMvS/wFRGiwgu0IqJ1RLZzPIOkSOJXcvFZCNEFIWXIN
-	 9LSYbCq/5mKocCbtUsMlYmpYL6iqUYQjb04Ho5yqBOpT4w0L2w4UYHo5cOsH6WLD0ZUNY6Mzv0sY
-	 z012OSqWm2/AIeaET3A/Hqcfv2/amYQBLzZQmSVKFcZuC9FUh9G+pT5OeqePNe2EWFT7CYdAiMe7
-	 bvrTN7dtCBVVUHM/AfwUWM1UEepq0gtUSpcaZgpWoAJ3rdWfXGlyVKobTgVdJtowRMTG7lpuFs/u
-	 V4PzCoMyA1OxyEQzYQVhF9sL85s0tmhPqVwN5CzCzfzgOyN4bnSSeKTGA/uYgcjVYtiEjzAvs+DL
-	 cN7IoTcUnUonj0BQwm0EbDSGF5S7jzcl/fogAZqiBuG1UbaigEjxJzRMAYBdiK0pXIqN5JJLwvsy
-	 o92CTY14w80+aHOVY27w5IEa0B7q8UNLGttzvVdILWF/dQqt7OepWYClHqe3s2vMazVlKhKcpwRv
-	 uHVOXjcfEEc/1Rih/6DnmaX9PoEEEbuum5Kcb3dbM74ns8UWvA5u+Z1cvEs/5TmU5tjfli8kt1DN
-	 opOLYqigraNTghpR+Q9UQ86h1EwsLOFLPy8H6zvkgN83L09bek5nwtDMqmLjYqOmRW01NrFRqC+I
-	 T5ZjuSTfqySQb35QC/W3P/L8s8S+8ezBEp0uj4GWp4xrij3Trb95bmotw4RLqSDeSlTKj/4Qa1QP
-	 JlkpRVFz5qwcXzeKZj3nvWUIaX4pTKaNn77XQrtwy2e6t+stYOU2vScuINbEZj3X9gNQFIxF7fR+
-	 TJokcYLyYkZvjbybe1rWwq/sbREDEuNfsoRx8oYoCpo/H/xqs0jlMjbwB0E9gNPNBX4aO0SO6rkM
-	 9ZhUJFA+qhHXA5ioas8+p8XiFKTAS3fixwQz0bbOG33SivBZ3pvaP/DJ5pp5z+z93ZMTUsRmDw8r
-	 S9LfeASlKMZ3JGjn7XlSSUDx7RiIxOIE4uxw/gbBknp/TWCwZ/UWsTco5RKON6gOIEL19gYKTUDV
-	 0SV6l393VzsOwKpSeCzxnLU6/Oz03KtpAKkKhJ9UIh/JUE46+92e2wgaTL9MA=
-X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
-From: Zhao Dongdong <winter91@foxmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Zhao Dongdong <zhaodongdong@kylinos.cn>
-Subject: [PATCH v2] Bluetooth: btintel_pcie: Fix DMA memory leak on probe failure
-Date: Tue, 14 Jul 2026 16:42:28 +0800
-X-OQ-MSGID: <20260714084228.400718-1-winter91@foxmail.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="acaIgr+g";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="dZGwu33b"
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66E6Sb7Q4005305
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 08:50:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=7L4Xith+6oSQA5D2Lo89qYUhK0yvbUYqOrP
+	6Cpo1GEk=; b=acaIgr+g1PC82EoMbb/LRTRnLhKZXPw4ybPjdHrji+cse7sOICu
+	ZBxGiMvfS7DqstUX02yDa4W14j9VQRgzwD3PDE/HyeGLZ1YMC1YojjGet5YJf71t
+	HIud3eG70auAtMseAxQGEUjrvJM+YzXTRAw2FDWQ6h0w1+CfdhaCkiNVMa8NdKuk
+	yi/rei2WVegKKEtyYsvhOqm0VpfJ6H6GQEj7SQ3jf0h5suEdsLRf3GB6C0i3Zi2R
+	WQwCbQctOHbhTyvBCN3IACBwStfe3NPTznEx9Af/HmCU8fWrfxMhbYEF2Jb21VJv
+	RtXAerip4zYAMV8DvKloMz6gMjofN4JJRYg==
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fd44ctwmw-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 08:50:45 +0000 (GMT)
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-c8924f4d0a4so6217709a12.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 01:50:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1784019045; x=1784623845; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=7L4Xith+6oSQA5D2Lo89qYUhK0yvbUYqOrP6Cpo1GEk=;
+        b=dZGwu33blm3MTZbQ/6tsXcE6YQFLuZtHoKH/CKebsoPsoMR89vyt1wxRDdgddpNlGR
+         econRYAPWD9KaesYpTgbZu6uz6Zt4ZIC2nZmn66cBRyD0K98KdEZIAQ+ru+ZwhA43oMM
+         oMYqL3j/ZXK7e15Ssxt4UI48pkMqoLVA1PW5BxCdHhWKiwOzq4yF4i4TmFLyZ8ZjASx8
+         AhpW6ttYb+MNLGaVa82kF+NIy10v2+65RHJ8dLoRevcS3kJ2IFh2bzHfxDgjWDaKGlA/
+         zY3/2wZ2wNukMbi59fAlBB8P94P6u2xKXr6Ssn+vf3HXLkbowrsmZaG6DzfnKfq9aM0K
+         /cwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784019045; x=1784623845;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=7L4Xith+6oSQA5D2Lo89qYUhK0yvbUYqOrP6Cpo1GEk=;
+        b=GAZwOVdcP3Ic7Xl94pdPG2+zJ19stqgEwV9tgE0tGNUxEVh55xFNqPEOZ/z+xf2tjz
+         IGYhJnnpRYxQQAmWhC/YijZvVTIsfod+UsBzCscpLfhkbeVNJhF3LtDNk/7K+ZZB3KUX
+         HLLZl4phQVlDIFDq2GkZzGapQjQ6ZRsXdSwVSIwF+EtqywJ6Mq1tqpuJUO35uk03R4u0
+         cQvA9D8wyg04jHR5c0s3uxm38dtx625YfKZnuYo4OjaNlA1PHzJ2PZAZn+5hgdbFoRio
+         D4B/g29wB6VhezU/SLVXo7zm3qPbOM4t0MjvjZj3nCPC/8/E93eJJCyNwJ7VL13F6vlP
+         o0hg==
+X-Gm-Message-State: AOJu0YxFtqRajo45NGKYDDIantxCBX13WwyofT/v6Cy9pCtzq0bJzp0O
+	33xA2CFmV+kmNvIR0F3kDicMNSiItXhYbEjXGK/uzP/T4t3XKpPQcfw55tO8vmNCJK/QTu/UjYR
+	2LNLNzvOWt8+k/Kr2d/Dh+qTAHddYYNh/rcoJxSc7N1P5U4sU0pymn/momRprEMXk9N9puLAfMh
+	rkVEo=
+X-Gm-Gg: AfdE7cm+C0QGCmPn9h58YK3FJ4d76PSr5tOOXg112VOoVlwpYQyGts8XqVJMu0ittyK
+	XM9Z42k697xOfc74QJ47uKv39uL0fJB10F975O2DNfEDpuuKjAr0efmI9kDiWEw3moxTEdQGTlF
+	JZ3EwPauAm1lVfH37QFlwNtS/H8T0OCjDHYUIClE3ph69UNcaGVHO64j1FHQhrmifkU3XXYTpnD
+	kaz1k6K5za1OxR42EPuS2caexZGPwqsjWVjSennKeMvxUpnhVlqZl36XXAGFEQKsDjsaqYXCjix
+	636g0LIUOEpsTuWVThJ8Pl6NkQwPRnHXSRxbuJLSaqs372JngjXOLXIofgZs2okU0GJbiU73o8x
+	GDjYI26EmVJQR4J5Dm0uzRGF0vgiHLEiPyWcznUXr
+X-Received: by 2002:a05:6a21:3384:b0:39f:3efb:e888 with SMTP id adf61e73a8af0-3c1102989admr16879829637.25.1784019044960;
+        Tue, 14 Jul 2026 01:50:44 -0700 (PDT)
+X-Received: by 2002:a05:6a21:3384:b0:39f:3efb:e888 with SMTP id adf61e73a8af0-3c1102989admr16879783637.25.1784019044535;
+        Tue, 14 Jul 2026 01:50:44 -0700 (PDT)
+Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b9081d5c3sm27645721c88.9.2026.07.14.01.50.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jul 2026 01:50:44 -0700 (PDT)
+From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
+        quic_anubhavg@quicinc.com,
+        Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v5 0/4] doc: Add Channel Sounding API
+Date: Tue, 14 Jul 2026 14:20:33 +0530
+Message-Id: <20260714085037.1285756-1-naga.akella@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -60,69 +91,78 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: YPIJG0cEod5_1hoARCEcmC51XAf4On17
+X-Proofpoint-ORIG-GUID: YPIJG0cEod5_1hoARCEcmC51XAf4On17
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE0MDA5MSBTYWx0ZWRfXwWVankfGTR9P
+ oqVondX0TJv3UIbqhLt2y2p3/XVtH/jsY6orXcVMHJSBbshEfkfimSV7kphcIN+M6rMV+sNHEp+
+ plMCt8weHmGQYGGhxmBG/3COB+931/E=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE0MDA5MSBTYWx0ZWRfX8QwnwMIv82al
+ 8wfIZkK4TE0LE7L8fv/1thXFpJOKZjRIKExCrxvSfB3PdIBgwHNaOeEU1I4mOxmcQaobXzoG25c
+ FUa+6kQvFhzPy1reA25YP8QEwe438xTzLjX+5+ne+f9cZHnq6d4Ze/rN+8hqD0ioJ6foNYxo/WY
+ xGjH+q3J9LYG/qKYcDmZzdgjVMCkyGScsYN5O6GRzfn7TXmHgXI3Pdl4dDRAhaekz6qVmQ+Y19X
+ p5ulOHhCV8BbubHgCn6OFdXh+LtyraSucxuNPSlre4wHf/znGptZu3+2eTOmSAWBah1Kysnll9j
+ kTQ3raweQrQDejJx8+bMtOz4P03Hz8unTUB/bD2ST62jDUnG/Tp82vbGO2X6Ett1p1/FqlCbywn
+ urv0HnTg52edL/KgEM7JUY38MdLya4NIhGPrfV2RBgdq0fCyKlj1F4AY81g+rCxCMliZbC/xlCf
+ cka5KTPuHzHmdSP7Ttg==
+X-Authority-Analysis: v=2.4 cv=P84KQCAu c=1 sm=1 tr=0 ts=6a55f865 cx=c_pps
+ a=Oh5Dbbf/trHjhBongsHeRQ==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22 a=iSzkMiWJHOwH8bCpblYA:9
+ a=_Vgx9l1VpLgwpw_dHYaR:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-14_02,2026-07-10_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 priorityscore=1501 impostorscore=0 malwarescore=0
+ lowpriorityscore=0 phishscore=0 spamscore=0 bulkscore=0 suspectscore=0
+ adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2607140091
 
-From: Zhao Dongdong <zhaodongdong@kylinos.cn>
+Improve Channel Sounding documentation by adding cross-references
+between the D-Bus APIs and bluetoothctl commands, along with practical
+usage examples.
 
-In btintel_pcie_probe(), when btintel_pcie_alloc() succeeds but a
-later step (btintel_pcie_enable_bt, btintel_pcie_start_rx, or
-btintel_pcie_setup_hdev) fails, the DMA buffers and descriptors
-allocated by btintel_pcie_alloc() are not freed. The exit_error
-path only resets the device and destroys workqueues, causing a
-DMA memory leak.
+The D-Bus API documents gain :Used by: references to the bluetoothctl
+cs submenu and examples for methods and signals, while the
+bluetoothctl documentation is updated with :Uses: references,
+argument descriptions, and usage examples.
 
-Fix this by calling btintel_pcie_free(data) after btintel_pcie_reset_bt()
-to release all DMA buffers and the DMA pool. A NULL guard is added
-in btintel_pcie_free() and data->dma_pool is cleared after any
-partial allocation failure in btintel_pcie_alloc(), making the
-unconditional free() call safe on all error paths.
+Changes in v5:
+- Add Example scripts for cs reflector and initiator 
+- Document CS params per-command
 
-Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
-Signed-off-by: Zhao Dongdong <zhaodongdong@kylinos.cn>
----
-v2: Fix UAF in probe error path by resetting hardware before freeing DMA.
-v1: https://lore.kernel.org/linux-bluetooth/tencent_44ED865C14DA3D3823CA85AE1DF2CEBC1805@qq.com/
----
- drivers/bluetooth/btintel_pcie.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Changes in v4:
+- Addressed review comments.
+- Dropped the rest of the previously submitted series pending redesign
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 9e39327dc1fe..a005b2e390a2 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -1920,6 +1920,9 @@ static int btintel_pcie_setup_rxq_bufs(struct btintel_pcie_data *data,
- 
- static void btintel_pcie_free(struct btintel_pcie_data *data)
- {
-+	if (!data->dma_pool)
-+		return;
-+
- 	btintel_pcie_free_rxq_bufs(data, &data->rxq);
- 	btintel_pcie_free_txq_bufs(data, &data->txq);
- 
-@@ -1980,6 +1983,7 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
- 				 &p_addr);
- 	if (!v_addr) {
- 		dma_pool_destroy(data->dma_pool);
-+		data->dma_pool = NULL;
- 		err = -ENOMEM;
- 		goto exit_error;
- 	}
-@@ -2072,6 +2076,7 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
- exit_error_pool:
- 	dma_pool_free(data->dma_pool, data->dma_v_addr, data->dma_p_addr);
- 	dma_pool_destroy(data->dma_pool);
-+	data->dma_pool = NULL;
- exit_error:
- 	return err;
- }
-@@ -2918,6 +2923,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- exit_error:
- 	/* reset device before exit */
- 	btintel_pcie_reset_bt(data);
-+	btintel_pcie_free(data);
- 
- 	destroy_workqueue(data->coredump_workqueue);
- 
+Changes in v3:
+- Addressed review comments.
+- Dropped the rest of the previously submitted series pending redesign
+
+Changes in v2:
+- Addressed review comments.
+- Dropped the rest of the previously submitted series pending redesign
+
+Naga Bhavani Akella (4):
+  doc/org.bluez.ChannelSounding1:Add Used by reference and Examples
+  doc/org.bluez.ChannelSoundingRanging1:Add references and examples
+  doc/bluetoothctl-cs: Add :Uses: fields and document arguments
+  client: Add scripts to start cs Initiator/reflector
+
+ Makefile.am                               |   4 +
+ Makefile.tools                            |   5 +-
+ client/scripts/cs-initiator.bt            |   6 +
+ client/scripts/cs-reflector.bt            |   5 +
+ doc/bluetoothctl-cs.rst                   | 546 ++++++++++++++++++++++
+ doc/org.bluez.ChannelSounding1.rst        | 534 +++++++++++++++++++++
+ doc/org.bluez.ChannelSoundingRanging1.rst |  66 +++
+ 7 files changed, 1164 insertions(+), 2 deletions(-)
+ create mode 100644 client/scripts/cs-initiator.bt
+ create mode 100644 client/scripts/cs-reflector.bt
+ create mode 100644 doc/bluetoothctl-cs.rst
+ create mode 100644 doc/org.bluez.ChannelSounding1.rst
+ create mode 100644 doc/org.bluez.ChannelSoundingRanging1.rst
+
 -- 
-2.25.1
 
