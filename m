@@ -1,74 +1,56 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out203-205-221-242.mail.qq.com (out203-205-221-242.mail.qq.com [203.205.221.242])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840CB383320
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 03:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3327925783C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jul 2026 03:18:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.242
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783998610; cv=none; b=HY7zTkYgCCpjkwT4rThK8CPVLaRKwy4GifdcmwbNwhVf8VR8L7sMI0utdNrxnFGlf247zqmobKlMoXf9nOan64elDJcjCJH7jWsZtVDJVTSntASYYuCHUYyh+1645Q6QrHePLltRqKSNOVo0D777OdmY3uqaau5OEvxHv/wKTlI=
+	t=1783999135; cv=none; b=dB6YKLwDyODNmjlH2HpCIepO5wG4KIKNseeRa0F2ofLrkXc5tpS3EIZ93oZ6IArpJRxnYj/tyWvpVhk6Py+zOQLMbPNolobmJzB+P29ghZX8THtKuNLSIjyrgZWEFktJlyat/13D60wJcan3+/gXn4a+xRS60Jqww9wyyWJtYyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783998610; c=relaxed/simple;
-	bh=in/zU+bpaBcikYil84rJAmbNYh7oLZ4LgY89LY/JYP8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NjJ3c9d6CHyMU+JNcsuwLb+cCISlt84aXkWCVk2FbaJtox3+enw2pkdNisfP14sjRfaNQwtS78iqJxTykXLRCW1XSxoue3Bzn+Sz1N3CkSewNwZe9eMtcPUtyaggGriOsuC6AYjFRjOgPVUWg/fWV3b/zlLqAx6tmZ+LZKk3vqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OiFeRCOg; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783999135; c=relaxed/simple;
+	bh=riLaMPEmQgoxptwsCf1Kdu3Ki/D+M9nIPlRDS/0Ubpw=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=ORYH78rBWpf1RAAaBCQgkSBqBwaswZ3Xm2JhmNIWz8pdl38CZLKsKVKwefHFz7aWtg5L4CxL6+7xQ5swczBjVVZV51EtgeRlhiFD1UAjCMkqWD9Fu0T7NYO+MkbCwWyMnoJnf/WfS9gLWibq/T9jMu7QL2wQ+0PeDIahgWQw6Z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=KWF+8Hfc; arc=none smtp.client-ip=203.205.221.242
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OiFeRCOg"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-51c16ac21acso3652611cf.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jul 2026 20:10:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783998608; x=1784603408; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=looH15ecL5VpYfgf8qYiXk8yKrr71rtniUSxLscBZKg=;
-        b=OiFeRCOgoVC87Gr8jvCFXthE2ITF7RUWaLXnizM+rlEGmJJ7zvQissGruOWB6D5Vna
-         uBsl/qtczQ5rwpMwbfHjTsbEAF93t5pAPACHvhR7LCsSx2OQWXffocEYRrzDQnAA4Urx
-         OyoWPcUHtz9GHtSynu47St9Gxgo05Y3g8SDH2mm3pHG1zQskeYW00iwiywD7Uyl+9xjF
-         Cc+mARqKz1+zNvHPGqCIjwxk3EvkfvmAIcEGuic0bmyRwVeWPufIVbWkp873GXaXgdUh
-         rta9/Wcjd+Q3dmmweuN7dydSA54R2BZioqgRQX+dERsqanPHzGbhxpolTOd9P9A1Mk9f
-         izAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783998608; x=1784603408;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=looH15ecL5VpYfgf8qYiXk8yKrr71rtniUSxLscBZKg=;
-        b=DlI1rxb65EbfViiKYon/DlGNdtFroSPxSBWt6e3PyN9ZcoGoMTrG6y/VV2BvjKjHEl
-         CLUEX7WG8jFHkcquk1esTP7HpkbtAAWRwgDamTu/XqllVToAEtZ4OQf9p1sexfheVcSv
-         3TsPQrYR5/ddKb9X8JtzwjiBRRbV7HbBgTKWHD2SVFb1ckKRioQII49bntIwIm+KgK2K
-         EQSfcl9oVvF+XNy70hCfIohjX7iC+TmsNJIAWZyamjYu3JPAHiLu7KnCNU+bt13U6R02
-         +Wnxpa0ylUchg0wtLWt8+MqlIeqc9JmVrayOL5bC8ofavtJDh+6Ui4jxTrfHuULgtq5k
-         9J0g==
-X-Gm-Message-State: AOJu0YxyoBNK7Dslz1hG+03fkWtIN6Ery1+g7RIj/h39VcMtAYlAIro4
-	l0LAMsE9t2bJc7Y0qI5eDp3Ed1t3JSAVxZoEZJG/a/G+DyXCDuWH32/vZuLh9aHm2x4=
-X-Gm-Gg: AfdE7cktUmer1I8xy+GzIHc0unEs+pAQb0cxLUC12RexSF1fyAcwGPN/TmYhyOCzL/4
-	6yxe+khocYvEF34hE75viGrtyMa/V6p3i7kroct7E+jgHmX3CAhXRhLLimcT7jVXYXTExHP08xm
-	UejoOKwOkwe1jQT3j7TLWNuDpxRSl/uSouVweay1egr4Xl/jetFufrQNARFqLAiQxl5AhFizKQ8
-	mAtYZwD6SbfMstQZhDDU6499NplVur/2wOc3e3HV9NLB3auko7ol35WXCsXBF6xCy6aiJsI3+QR
-	mQcK1ncG/M0no5Bjuddxwb8HzKhJYyiB3Gc3dLvoynla8vZBjqAWjlXru8JZfmKxcShaDpzm/ze
-	DpQSkla6B312avtO8H1Q5PZj7ndN42jfq+NlQlsieR8aBrCbaRwoeuz73G8zcpN6OE5FDR4PFi+
-	Spg1VVOGq2Zr4kt6BHR56DTvpvyjwB5iZvuoN6
-X-Received: by 2002:ac8:5d08:0:b0:51c:217d:d772 with SMTP id d75a77b69052e-51cbf0be5d9mr118903141cf.19.1783998608411;
-        Mon, 13 Jul 2026 20:10:08 -0700 (PDT)
-Received: from pc ([209.202.207.85])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51caaf621e6sm99098461cf.24.2026.07.13.20.10.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2026 20:10:07 -0700 (PDT)
-From: Ameen Al-Asady <ameenaladdin@gmail.com>
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="KWF+8Hfc"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1783999124; bh=rv3+1Liice68cFN0j7y1yD3gap3T4mbreCJEv66lNOY=;
+	h=From:To:Cc:Subject:Date;
+	b=KWF+8HfcNSrmp8R549JF2CMs+qgZ+4gnMjCNtScsI506ZlAi+ocyyhz22mrgPhd0d
+	 G6pEVAa39ZntJszw1jY9onDORwexkMwsY793sGcJ4cU+21fVyZTLetbbZYhRQ0bTFO
+	 6l1BhCl4IwABq6rlSDto3fb8P2dE/YfOX0lkHuI4=
+Received: from caitao123456-pc.. ([116.128.244.169])
+	by newxmesmtplogicsvrsza53-0.qq.com (NewEsmtp) with SMTP
+	id 4AA0585A; Tue, 14 Jul 2026 11:18:42 +0800
+X-QQ-mid: xmsmtpt1783999122tica3ngs5
+Message-ID: <tencent_A9E80607A55CCF00F26DBE8D8CB605EA5707@qq.com>
+X-QQ-XMAILINFO: No7DFzN00JnRjwKedgQft2qrNssfbSNaG5FlMVtp8+lGCCFKkiKjEGO3EfOPYH
+	 PJWYoaqD14ZavZWFD153YVwJakUIGDcs9jggnr02l0K4AeoLWrU2a588ZS+Viu0iUWPI8Q6rTI9L
+	 kHEAYe8FXbLmiCflV/4CX++uWreWXOswT5FNunDTdhCu6flAoWDl5Xx5lqNE2ORG6+66IXJ/ukHd
+	 S1c2tqEcSpz6fpBc/6WyOwu0DAJj4I1E9r3dCKzWaU766hG/eSsZNIN4xb2KOXuu7TEGjHTsY0uE
+	 +s+C90O6R59SYYPvaUGzznAHc/WzB9U/WwoRiAZv5VjzEZfZz1DJcaJjw+eUgbyYPObO7f29OPJQ
+	 PcDwxVWNVGbirA9HUN7noJpqE3qJmXFOCaNSSma6aSXY5bSgHw+wEHlh/SPDNwMQalfmTPAxVuYu
+	 bPGTTupAfSIn3y51l1+U0pNviWQXdldDH/VbwFPge8dxrOMmmvabQJDEHhbgLiAn0R/l30ELpmrS
+	 xvvpYRriuSeBmM5LAnfNg7WQAhgEFA8rBmGfAt3/JsD+bQON4GlgG/UlaHz2YWk+odF0JA67HsLj
+	 vnVk8BZ/4f2lDZF5G2gDBUBVEI2pxTLUeiHhesDPgmbh6Ki0b+1B/O26gJ3FYQk/s3MxFqW6WrlA
+	 PH3265Q/azIqbWwuPXJ9iJoqwNKXbTqex1MLOA7dIrMOnmlkt1MEIqi2s6iSIq4vFNrX+66scdnd
+	 ekAM0mNkhLjZbZxyDh1kueceTAUv5WW01IWS2GoHEPgJ0GNQUbqDR93SDHQniADyjKJWLW2IdrND
+	 SRlWku2og9T99wB3l+Kmtahu6z77pLJnsn4n/K0x1owKzQWKPRJdENubgf1payzhgiuydkscLYLw
+	 TuqIbCsi4IWJGSfnPMWV0PW51lRvQgNrTIFdf0ZbxcHXJiACC3TS/LTikrIfxZFQcex6wFmKi3NJ
+	 a0EANEd/dRnljOuzSV7jmHRLc88PiP8eV9wV2rRtV2b63NnKrRr9z8jZyUU7aRH2JRmvq0Xmoj4/
+	 izw8lRlsCwJUqfqoQ8
+X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
+From: caitao <294305068@qq.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Ameen Al-Asady <ameenaladdin@gmail.com>
-Subject: [PATCH v2 2/2] Bluetooth: hci_sync: Skip MSFT/AOSP init when controller init failed
-Date: Mon, 13 Jul 2026 23:10:05 -0400
-Message-ID: <20260714031005.230895-2-ameenaladdin@gmail.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260714031005.230895-1-ameenaladdin@gmail.com>
-References: <20260714031005.230895-1-ameenaladdin@gmail.com>
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	caitao <caitao@kylinos.cn>
+Subject: [BUG] start_discovery_internal forces mutually exclusive BR/EDR and LE scans on Intel AX210
+Date: Tue, 14 Jul 2026 11:18:34 +0800
+X-OQ-MSGID: <20260714031834.111880-1-294305068@qq.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -77,46 +59,156 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-hci_dev_init_sync() calls msft_do_open() and aosp_do_open()
-unconditionally, even when setup or the HCI init sequence has already
-failed. Both send vendor commands with __hci_cmd_sync(), so on a dead
-or uninitialized controller each of them blocks the power-on sequence
-for a full HCI_CMD_TIMEOUT and logs a spurious error.
+From: caitao <caitao@kylinos.cn>
 
-This is easy to trigger with an Intel USB controller that needs a
-firmware upgrade: btintel resets the controller to bootloader mode,
-the device drops off the bus and hdev->setup() fails with -EINVAL,
-after which msft_do_open() still spends two more seconds waiting for
-a response that cannot arrive:
+Dear Bluetooth Maintainers,
 
-  usb 1-6: USB disconnect, device number 4
-  Bluetooth: hci0: FW download error recovery failed (-19)
-  Bluetooth: hci0: Failed to read MSFT supported features (-110)
-  usb 1-6: new full-speed USB device number 5 using xhci_hcd
+I am reporting a limitation in the Bluetooth MGMT layer that prevents
+independent control of BR/EDR inquiry and LE scan, which persists even on
+hardware that clearly supports such operations.
 
-Only initialize the MSFT and AOSP extensions when the controller
-initialized successfully.
+[1] Problem Description
+=======================
 
-Signed-off-by: Ameen Al-Asady <ameenaladdin@gmail.com>
----
-v2: no changes
+The function start_discovery_internal() in net/bluetooth/mgmt.c enforces
+mutual exclusion between BR/EDR inquiry and LE scan by requiring that
+hdev->discovery.state == DISCOVERY_STOPPED before starting any new discovery.
+This prevents:
+  - Starting LE scan while BR/EDR inquiry is active
+  - Starting BR/EDR inquiry while LE scan is active
+  - Independently controlling each scan type
 
- net/bluetooth/hci_sync.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This limitation exists despite the fact that many modern Bluetooth controllers,
+including the Intel AX210 in my system, support independent and simultaneous
+scanning as evidenced by the ability to use hcitool commands separately.
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index b4ca34abe..38158835c 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5173,7 +5173,7 @@ static int hci_dev_init_sync(struct hci_dev *hdev)
- 	    hci_dev_test_flag(hdev, HCI_VENDOR_DIAG) && hdev->set_diag)
- 		ret = hdev->set_diag(hdev, true);
- 
--	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-+	if (!ret && !hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
- 		msft_do_open(hdev);
- 		aosp_do_open(hdev);
- 	}
--- 
-2.55.0
+[2] Hardware and Software Environment
+=====================================
+
+- Kernel: 6.6.0-58-generic (Ubuntu)
+- Bluetooth Controller: Intel Corp. AX210 Bluetooth (USB ID 8087:0032)
+- Firmware: intel/ibt-0041-0041.sfi (loaded successfully)
+- BlueZ version: (please run `bluetoothctl --version` and fill in)
+
+Relevant dmesg output:
+    [ 3.839316] Bluetooth: Core ver 2.22
+    [ 3.839335] NET: Registered PF_BLUETOOTH protocol family
+    [ 3.986759] Bluetooth: hci0: Device revision is 0
+    [ 3.986810] Bluetooth: hci0: No support for _PRR ACPI method
+    [ 3.988198] Bluetooth: hci0: Found device firmware: intel/ibt-0041-0041.sfi
+    [ 5.749096] Bluetooth: hci0: Waiting for firmware download to complete
+    [ 5.749738] Bluetooth: hci0: Firmware loaded in 1720250 usecs
+    [ 5.775405] Bluetooth: hci0: Found Intel DDC parameters: intel/ibt-0041-0041.ddc
+    [ 5.780803] Bluetooth: hci0: Firmware timestamp 2023.48 buildtype 1 build 75324
+    [ 5.859917] Bluetooth: MGMT ver 1.22
+
+
+[3] Code Analysis
+=================
+
+In net/bluetooth/mgmt.c, start_discovery_internal() contains:
+
+static int start_discovery_internal(struct sock *sk, struct hci_dev *hdev,
+                                    u16 op, void *data, u16 len)
+{
+    ...
+    if (hdev->discovery.state != DISCOVERY_STOPPED ||
+        hci_dev_test_flag(hdev, HCI_PERIODIC_INQ)) {
+        err = mgmt_cmd_complete(sk, hdev->id, op, MGMT_STATUS_BUSY,
+                                &cp->type, sizeof(cp->type));
+        goto failed;
+    }
+    ...
+}
+
+This single state check treats all discovery types as a monolithic operation,
+rather than tracking BR/EDR and LE discovery states separately.
+
+[4] Expected Behavior
+=====================
+
+- Allow independent start/stop of BR/EDR inquiry and LE scan via MGMT commands.
+- If hardware supports simultaneous scan (via HCI_QUIRK_SIMULTANEOUS_DISCOVERY),
+  allow both to run concurrently.
+- For hardware that does not support concurrent scans, either:
+  a) Automatically interleave the scans, or
+  b) Return a clear error indicating the specific limitation.
+
+[5] Actual Behavior
+===================
+
+- bluetoothctl scan on starts both scans, but cannot control them separately.
+- Must execute scan off before switching scan types.
+- MGMT_STATUS_BUSY is returned for any scan start request while another scan
+  is in progress, regardless of hardware capabilities.
+
+[6] Steps to Reproduce
+======================
+
+1. Start bluetoothctl:
+   $ bluetoothctl
+
+2. Start discovery (both BR/EDR and LE):
+   [bluetooth]# scan on
+   [CHG] Controller XX:XX:XX:XX:XX:XX Discovering: yes
+
+3. Observe that both scan types are active.
+
+4. Attempt to switch to LE-only scan without stopping:
+   [bluetooth]# scan le
+   (This fails or requires scan off first)
+
+5. Stop all scanning:
+   [bluetooth]# scan off
+
+6. Now LE-only scan can be started:
+   [bluetooth]# scan le
+
+Alternatively, using MGMT commands directly (if mgmt-tool is available):
+  # Start BR/EDR inquiry
+  $ mgmt-tool -c "start-discovery"
+
+  # Try to start LE scan while BR/EDR is active
+  $ mgmt-tool -c "start-discovery-le"
+  (Returns MGMT_STATUS_BUSY)
+
+[7] Evidence of Hardware Capability
+===================================
+
+The Intel AX210 controller can perform independent scans via HCI commands:
+
+  # BR/EDR inquiry
+  $ sudo hcitool scan
+
+  # LE scan (can run simultaneously or independently)
+  $ sudo hcitool lescan
+
+Both commands succeed without requiring the other to be stopped, confirming
+that the limitation is purely in the MGMT layer policy, not in the hardware.
+
+[8] Potential Fix Directions
+============================
+
+1. Introduce separate state tracking for BR/EDR and LE discovery:
+   - hdev->discovery.br_state (BR/EDR inquiry state)
+   - hdev->discovery.le_state (LE scan state)
+
+2. Modify start_discovery_internal() to check only the relevant state:
+   - For BR/EDR inquiry: check br_state == DISCOVERY_STOPPED
+   - For LE scan: check le_state == DISCOVERY_STOPPED
+
+3. If HCI_QUIRK_SIMULTANEOUS_DISCOVERY is set, allow both to be active
+   simultaneously; otherwise, the existing mutual exclusion remains.
+
+4. Update the HCI event handling to properly update both states.
+
+[9] Additional Information
+==========================
+
+Please let me know if you need any further details, such as full HCI traces
+using btmon or additional kernel logs.
+
+Thank you for your time and consideration.
+
+Signed-off-by: caitao <caitao@kylinos.cn>
 
