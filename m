@@ -1,30 +1,30 @@
 Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0930B438498;
-	Wed, 15 Jul 2026 11:20:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFDC4483B2;
+	Wed, 15 Jul 2026 11:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784114462; cv=none; b=gaBKwO7bry12XvTqGOXtFNFvQmUc+6LUPsr731OribL9xTW9i906YLns1QrybSap3P+jsZGmFrWYtd3fC/88CpEEaaxvyOd+dlDXiVAaSO6NILPoaU532fyR45iqjhpR1I7ZXM9mQtl0+3tT5nj8RCY4nHUPKSOH9VbLDkDlik8=
+	t=1784114462; cv=none; b=korzLQQ8CKsOcayBLRfGN0ZQME1HXjVd8L20m6DQBrtcGczf8byLju8iB9kwSPffGZrYCkYREgM2Q4IvDT7gmuYXRrouCncTkPfcDkxzXAiMJidPDRfAoKgOviGnzgOk349c9z8avaS3ZPPcTdSHsr7ITWMc0kinC8rsdCPvnwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1784114462; c=relaxed/simple;
-	bh=//BiBQQ9/pb2D4p8oYQegRCGdVHAKxLO+GOCKtr63ZE=;
+	bh=QBN/GFMYoksAuSP2pFZSZzaAQDn07zgLVGCrcMClj4M=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RVrXkmlHbIVUcGYfIlmHAL2UJHo/ljVThOy58EcpeTPHvaX0yOFYCPOwkrwi9yeVJpsHypdFZtKBofjWwV3pwSdP94PIEHTok7HztUnS8IEJsgLtTw9ScC4DH7RYzJF6v9/rscSQVLS3ZeKM5O44nJiFUdoTw11A6tyfCMPNl10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=FVPq4v/z; arc=none smtp.client-ip=210.61.82.184
+	 MIME-Version:Content-Type; b=lG1pguW4FF/YbL9YndybzW6F0gFy3ly8Nsv/aoLDPIOKvUIKgUHwr8NNh+bBQYU3uw1n+5BO8yV4Wm9T01WaxsrTJ6iFdRwz37A9m1AYD/+N36sl3JUy+aaiBA4DXjr1i3vC2fQM4cwt/SvoNWuZmXtoKfium75lrJjUbSwuJr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=nVbN+k/Q; arc=none smtp.client-ip=210.61.82.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="FVPq4v/z"
-X-UUID: 3ca783c2803f11f18dc8c9802ae25ab1-20260715
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="nVbN+k/Q"
+X-UUID: 3c8973e6803f11f18dc8c9802ae25ab1-20260715
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=biHARXTi5HhbkroAZdRCCqUki4qlgbYdasCtqlgw5xw=;
-	b=FVPq4v/zSqkO6WuR8mvaYoEa6RtJptWW5KUT/tUDlpwKgFBh1DxLL//3GS5tBEmgQYoSaMGRtLlhuJC2496Qvz7/FuTXiKs6BIHUcmqvW52YIoH5b7zJkOrCWGEq2MisgWDfq3OYdCqwdhPlA47lBwvggbGWHMcPEmCnIeT2paQ=;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=FH1zPI4XK0KFGvrVm9AbaQMRRKWSN4Ihv2jsnFAkNts=;
+	b=nVbN+k/QWXsIY8GAegbxPv1nr2tYkv+bGLTV1FmxPjmracU8kVK8FCKFsqNdQ+wwhgNZPKExrpK5gKTOU5f73GO4LYgowCFkn6gfLCP0Xm8wvT5Sj+/wdGvQIFgGRfHOu2TXJDzcAfLGkOGKYxPU0UyXdVhC+l2qrki8ZZF745Y=;
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.17,REQID:5679d60e-d983-4fdc-bb18-b571211b4186,IP:0,U
-	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:d497b38,CLOUDID:f6c7b937-7759-43a9-ae06-f4df9d53bea1,B
+X-CID-O-INFO: VERSION:1.3.17,REQID:7cb9ba3e-ce15-43d6-918b-8a7ba783ceb8,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:d497b38,CLOUDID:80f42619-ab14-4403-9336-76696324c5a8,B
 	ulkID:nil,BulkQuantity:0,SF:81|82|102|836|865|888|898,TC:-5,Content:0|15|5
 	0|99|200|213,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:
 	0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
@@ -32,18 +32,18 @@ X-CID-BVR: 2,SSN|SDN
 X-CID-BAS: 2,SSN|SDN,0,_
 X-CID-FACTOR: TF_CID_SPAM_SNR
 X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 3ca783c2803f11f18dc8c9802ae25ab1-20260715
-Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw02.mediatek.com
+X-UUID: 3c8973e6803f11f18dc8c9802ae25ab1-20260715
+Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw02.mediatek.com
 	(envelope-from <chris.lu@mediatek.com>)
 	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1380643165; Wed, 15 Jul 2026 19:20:51 +0800
+	with ESMTP id 837820058; Wed, 15 Jul 2026 19:20:51 +0800
 Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
- MTKMBS14N1.mediatek.inc (172.21.101.75) with Microsoft SMTP Server
+ mtkmbs13n1.mediatek.inc (172.21.101.193) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Wed, 15 Jul 2026 19:20:50 +0800
+ 15.2.2562.29; Wed, 15 Jul 2026 19:20:49 +0800
 Received: from mtksitap99.mediatek.inc (10.233.130.16) by
  mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.2562.29 via Frontend Transport; Wed, 15 Jul 2026 19:20:50 +0800
+ 15.2.2562.29 via Frontend Transport; Wed, 15 Jul 2026 19:20:49 +0800
 From: Chris Lu <chris.lu@mediatek.com>
 To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
 	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
@@ -52,9 +52,9 @@ CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
 	<pmenzel@molgen.mpg.de>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
 	linux-kernel <linux-kernel@vger.kernel.org>, linux-mediatek
 	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH v11 5/7] Bluetooth: btmtksdio: Remove redundant firmware filename override
-Date: Wed, 15 Jul 2026 19:20:45 +0800
-Message-ID: <20260715112048.1448868-6-chris.lu@mediatek.com>
+Subject: [PATCH v11 3/7] Bluetooth: btmtk: Improve BT firmware logging
+Date: Wed, 15 Jul 2026 19:20:43 +0800
+Message-ID: <20260715112048.1448868-4-chris.lu@mediatek.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20260715112048.1448868-1-chris.lu@mediatek.com>
 References: <20260715112048.1448868-1-chris.lu@mediatek.com>
@@ -67,36 +67,55 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-btmtksdio_setup() calls btmtk_fw_get_filename() to generate the correct
-firmware filename based on chip ID, then immediately overwrites it with
-snprintf() using a generic legacy format. This causes newer chips that
-require chip-specific firmware paths (MT6639, MT7925, MT7928) to request
-incorrect legacy filenames, leading to firmware load failures.
+Improve firmware loading log messages to provide more useful information:
 
-The USB driver (btmtkusb.c) correctly uses btmtk_fw_get_filename()
-without overriding the result. Match that behavior by removing the
-redundant snprintf() call.
+- Add firmware filename before loading to help identify which file
+  is being loaded
+- Display chip ID (dev_id) as HW version instead of firmware's hwver
+  field, which provides more meaningful hardware identification
+- Use %.16s format specifier for hdr->datetime field to prevent
+  potential buffer over-read, as the field is a 16-byte array that
+  may not be null-terminated
 
-Fixes: 7f935b21bee4 ("Bluetooth: btmtk: apply the common btmtk_fw_get_filename")
+log output with MT7922
+[  212.878783] Bluetooth: hci1: Loading BT firmware: mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin
+[  212.889614] Bluetooth: hci1: BT HW ver: 0x7922, SW ver: 0x008a, Build Time: 20260224103448
+[  216.048877] Bluetooth: hci1: Device setup in 3096530 usecs
+[  216.048890] Bluetooth: hci1: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
+[  216.114179] Bluetooth: hci1: AOSP extensions version v1.00
+[  216.114220] Bluetooth: hci1: AOSP quality report is supported
+[  216.116782] Bluetooth: MGMT ver 1.23
+
 Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+Assisted-by: Claude:Sonnet-4.5
 ---
- drivers/bluetooth/btmtksdio.c | 3 ---
- 1 file changed, 3 deletions(-)
+ drivers/bluetooth/btmtk.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index 088fdfb56231..4a160d5131f1 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -1164,9 +1164,6 @@ static int btmtksdio_setup(struct hci_dev *hdev)
- 		btmtk_fw_get_filename(fwname, sizeof(fwname), dev_id,
- 				      fw_version, 0);
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index 3491060b3ae9..595e346accc3 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -148,6 +148,8 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
+ 	size_t expected_size;
+ 	u8 cmd[64];
  
--		snprintf(fwname, sizeof(fwname),
--			 "mediatek/BT_RAM_CODE_MT%04x_1_%x_hdr.bin",
--			 dev_id & 0xffff, (fw_version & 0xff) + 1);
- 		err = mt79xx_setup(hdev, fwname, dev_id);
- 		if (err < 0)
- 			return err;
++	bt_dev_info(hdev, "Loading BT firmware: %s", fwname);
++
+ 	err = request_firmware(&fw, fwname, &hdev->dev);
+ 	if (err < 0) {
+ 		bt_dev_err(hdev, "Failed to load firmware file (%d)", err);
+@@ -188,8 +190,8 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
+ 		goto err_release_fw;
+ 	}
+ 
+-	bt_dev_info(hdev, "HW/SW Version: 0x%04x%04x, Build Time: %s",
+-		    le16_to_cpu(hdr->hwver), le16_to_cpu(hdr->swver), hdr->datetime);
++	bt_dev_info(hdev, "BT HW ver: 0x%04x, SW ver: 0x%04x, Build Time: %.16s",
++		    dev_id & 0xffff, le16_to_cpu(hdr->swver), hdr->datetime);
+ 
+ 	for (i = 0; i < section_num; i++) {
+ 		first_block = 1;
 -- 
 2.45.2
 
