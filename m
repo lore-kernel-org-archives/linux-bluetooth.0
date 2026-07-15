@@ -1,287 +1,160 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5E6332638
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 15:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784131099; cv=none; b=PZnSFFIhr1DhWYV0kFqG6E7264aK74AAwYomYDH/I3WlBYGqD+QcfaK3NbKXApfHlvVdpsYdhou2ZAe1wAEeAQ9GSzViWmkY2VhRZUmJbsblIbhYPpVEzZiIzwsQu42GHvppgPdaTqRsKCpBvrOf9KDSpaCZVgrZ54SCPpecxdc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784131099; c=relaxed/simple;
-	bh=gkFVR+bLtw7X6xaoYtwEZ+fp99LDMlY5xhkrtrHgrG8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gzA9R5g9dDevV2CJYyz2Mj+hstijjYYuLud3lCJClXzSM8jWQlbaymQOAL9h6q+rWFqxEARiJC/dVKb9jpufwUmkwvB2uD6AZ0E2Hf7NP69JU9SflTgWyrL/6nW4KdCMmLEL28/W7WK8zn5m9s/i/LvqwPMSo4LFtAnmlCMRfwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FIU9Y8Zc; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879D03806D5
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 15:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784131190; cv=pass; b=YCnoqqZt1CyNwcFqO2pgp/BYvB+Qq2m9G8gBcS9zOT06Xjld/FkL3qGJ0e3qUZcR2cw6Y7PjdWlkY1n1DJXFtq8OCpeUpoFzLycPWGuFAQmrYrQknDipQJBbyykr8LheajaSfypBIvYWFF8ZiYfBJWo8bp+jet+Gv+PF203YVgg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784131190; c=relaxed/simple;
+	bh=DPcB2TZSmBxPEC+8EyEBQrTR2/hcBQ+lzRbrXaGAZHg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bM8iOsOgQ6v5pA771h7WxQsFYSwmz7bimka7SvE6xWwwUBzNBe7TNZhwEaaStHWf5Qwq4mjjdcBNwmoXHkjaYFZHlz//XkUxncbBCeTpQmWMFiC63asIem54iKWWxwNQMq4WeOh1aZI9Rx13MufYc9sjiZ3xCKSbX+pp1/KmNCk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b=EQVaeKZb; arc=pass smtp.client-ip=136.143.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FIU9Y8Zc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1784131098; x=1815667098;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=gkFVR+bLtw7X6xaoYtwEZ+fp99LDMlY5xhkrtrHgrG8=;
-  b=FIU9Y8ZckNxaDLMY2cD4RhPuQPPsZ46yV1gCf60jVyMRyH4RXz33Vfu1
-   Mqn8WIdammqwqGo81624MXKr1Ae+BDXxCESttPrDKo2v88aORbbelrr72
-   zdBV2jHnSYHKG+S4qXZNuEjEnYbCPBVIMkJqHwFSdtnCrXSAWfJxSbbDH
-   w1vx0gkn++NNMW6Q1oQsduhqrBeO7U6LQEgbjk8IeiMP+buz6x1FhDLPE
-   /USmHZCXVFdVsejYApWXAGTcICfNoWbPR9kaW8n4WfqQ4JB71DhjV0+G7
-   P+59CzyS/xKQJJp1nnATkjdKLcpn8Cnqsy41Psu+OdF6JDyVncr3kaTWh
-   Q==;
-X-CSE-ConnectionGUID: lHEos+pQSEOhLjvDJiM1JQ==
-X-CSE-MsgGUID: luO32ryOT96QGX5slWhn7Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11847"; a="88450392"
-X-IronPort-AV: E=Sophos;i="6.25,165,1779174000"; 
-   d="scan'208";a="88450392"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2026 08:58:18 -0700
-X-CSE-ConnectionGUID: YvtOlD1kRoatt8e3P/gF/g==
-X-CSE-MsgGUID: ofRDiSiOSpSgC8hsWCpJNA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,165,1779174000"; 
-   d="scan'208";a="254474010"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orviesa006.jf.intel.com with ESMTP; 15 Jul 2026 08:58:16 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v2] Bluetooth: btintel_pcie: serialize reset_type with RECOVERY_IN_PROGRESS
-Date: Wed, 15 Jul 2026 21:47:53 +0530
-Message-ID: <20260715161754.213393-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b="EQVaeKZb"
+ARC-Seal: i=1; a=rsa-sha256; t=1784131185; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=HcHA0vVEPAgzWTeNi45hRDUFO+1s18Kylc7p1FvTZsgBW5VvPWuLyCqFShNM0571IECfJEltYrytu2T/+Vplj8clfYYZmNj9835bx67IP3yhHcD92hEg/3Nk1XqopvKeVDwhSs6MvBtvCSYI05JRgTPqoDSH/pRexJLIYxAQcSw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1784131185; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=9Y1MFITtRyt71+dN05OoDHqiTJ0JdPA1NAsByV/1rBc=; 
+	b=VScUIUvOQ6eSTkAEsErX8K6HcLhx/X7845TXAVikWJiHhhA+6w/iIyHJln/xFWkbHlfSbc6QjrA4cr4UzaBJIDJqjPzyU+wxTsdFMNR4pyc9B3MBDMbeSqDToXN9VW3Fm0/ZBCKwk5ymbPtQ0NE3JGrioXzMjVgLNzYJ/1IsRlU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=frederic.danis@collabora.com;
+	dmarc=pass header.from=<frederic.danis@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1784131185;
+	s=zohomail; d=collabora.com; i=frederic.danis@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=9Y1MFITtRyt71+dN05OoDHqiTJ0JdPA1NAsByV/1rBc=;
+	b=EQVaeKZba9V+jLr20E6i1+7mHs/opwFtNqdjm/ZQnTPuKyYhmyD/mIKO+V5UGlCL
+	HwrFk4x0e7oz2PATbIthU/qKF2CDRzjhj17J45BMP5qHWJYz0/a67HPdc3m8Segx8ox
+	09UxVU1tH0qJ05tcQDG2ju4e+rZ1WfStN5E0fsjY=
+Received: by mx.zohomail.com with SMTPS id 1784131183304291.66613768209027;
+	Wed, 15 Jul 2026 08:59:43 -0700 (PDT)
+Message-ID: <a46d9fe9-a1cf-4767-9ba7-7c03f44228b9@collabora.com>
+Date: Wed, 15 Jul 2026 17:59:40 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ v2 3/8] doc: document admin.allow optional
+ controller argument
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <20260715090206.212130-1-frederic.danis@collabora.com>
+ <20260715090206.212130-4-frederic.danis@collabora.com>
+ <CABBYNZ+vttWK-2f8gJSATZ9pXBeg2Ncy-OreH+63ppiuQ0ricg@mail.gmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
+In-Reply-To: <CABBYNZ+vttWK-2f8gJSATZ9pXBeg2Ncy-OreH+63ppiuQ0ricg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-The reset path had two concurrency holes. Both are reachable in
-practice when btintel_pcie_hw_error() is invoked from the HCI rx
-path while another reset is being requested or is already in
-flight.
+Hi Luiz,
 
-  1. data->reset_type was a plain shared field. The hw_error path
-     wrote it BEFORE the test_and_set_bit(RECOVERY_IN_PROGRESS)
-     guard inside btintel_pcie_reset(), so a second hw_error could
-     clobber the type chosen by an earlier in-flight request:
+On 15/07/2026 15:40, Luiz Augusto von Dentz wrote:
+> Hi Frédéric,
+>
+> On Wed, Jul 15, 2026 at 5:03 AM Frédéric Danis
+> <frederic.danis@collabora.com> wrote:
+>> Update bluetoothctl usage to 'admin.allow [ctrl] [clear/uuid1 uuid2 ...]'
+>> and add explicit controller examples.
+>>
+>> Refresh AdminPolicySet examples to include the controller-qualified
+>> admin.allow form.
+>>
+>> Assisted-by: GPT:GPT-5.3-Codex
+>> ---
+>>   doc/bluetoothctl-admin.rst       | 13 +++++++++++--
+>>   doc/org.bluez.AdminPolicySet.rst |  1 +
+>>   2 files changed, 12 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/doc/bluetoothctl-admin.rst b/doc/bluetoothctl-admin.rst
+>> index d4446ce95..ce15b8728 100644
+>> --- a/doc/bluetoothctl-admin.rst
+>> +++ b/doc/bluetoothctl-admin.rst
+>> @@ -9,7 +9,7 @@ Admin Policy Submenu
+>>   :Version: BlueZ
+>>   :Copyright: Free use of this software is granted under the terms of the GNU
+>>               Lesser General Public Licenses (LGPL).
+>> -:Date: November 2022
+>> +:Date: June 2026
+>>   :Manual section: 1
+>>   :Manual group: Linux System Administration
+>>
+>> @@ -30,15 +30,22 @@ allow
+>>
+>>   Allow service UUIDs and block rest of them.
+>>
+>> -:Usage: **> allow [clear/uuid1 uuid2 ...]**
+>> +:Usage: **> allow [ctrl] [clear/uuid1 uuid2 ...]**
+>> +:[ctrl]: Bluetooth controller address (optional; defaults to the selected controller)
+>>   :Uses: **org.bluez.AdminPolicySet(5)** property **ServiceAllowList**
+>>   :[clear/uuid1 uuid2 ...]: List of service UUIDs to allow, or "clear" to remove all restrictions
+>>   :Example Get current allowed UUIDs list:
+>>          | **> allow**
+>> +:Example Get current allowed UUIDs list for a specific controller:
+>> +       | **> allow 00:11:22:33:44:55**
+>>   :Example Allow Serial Port Profile only:
+>>          | **> allow 0x1101**
+>> +:Example Allow Serial Port Profile on a specific controller:
+>> +       | **> allow 00:11:22:33:44:55 0x1101**
+>>   :Example Allow Serial Port Profile and LAN Access Profile:
+>>          | **> allow 0x1101 0x1102**
+>> +:Example Allow Serial Port Profile and LAN Access Profile on a specific controller:
+>> +       | **> allow 00:11:22:33:44:55 0x1101 0x1102**
+>>   :Example Allow Serial Port Profile, LAN Access Profile, and Dialup Networking Profile:
+>>          | **> allow 0x1101 0x1102 0x1103**
+>>   :Example Allow Advanced Audio Distribution Profile only:
+>> @@ -51,6 +58,8 @@ Allow service UUIDs and block rest of them.
+>>          | **> allow 00001101-0000-1000-8000-00805f9b34fb 00001102-0000-1000-8000-00805f9b34fb**
+>>   :Example Remove all UUID restrictions:
+>>          | **> allow clear**
+>> +:Example Remove all UUID restrictions on a specific controller:
+>> +       | **> allow 00:11:22:33:44:55 clear**
+>>   :Example Allow SPP, LAP, and DUN using mixed UUID formats:
+>>          | **> allow 0x1101 00001102-0000-1000-8000-00805f9b34fb 0x1103**
+>>
+>> diff --git a/doc/org.bluez.AdminPolicySet.rst b/doc/org.bluez.AdminPolicySet.rst
+>> index db132b7de..29fe3bdf7 100644
+>> --- a/doc/org.bluez.AdminPolicySet.rst
+>> +++ b/doc/org.bluez.AdminPolicySet.rst
+>> @@ -55,3 +55,4 @@ Possible errors:
+>>   Examples:
+>>
+>>   :bluetoothctl: > admin.allow [clear/uuid1 uuid2 ...]
+>> +:bluetoothctl: > admin.allow [ctrl] [clear/uuid1 uuid2 ...]
+> Normally, the command should use the controller main menu aka.
+> bluetoothctl> select so we probably need a environment variable to
+> pass adapter currently in use.
 
-       CPU0 (reset_work)             CPU1 (hw_error #2)
-                                     dev_data->reset_type = PLDR
-       T2: read reset_type
-                                     dev_data->reset_type = FLR
-                                     reset() test_and_set sees 1
-                                     -> drops, but type already
-                                        clobbered
+The proposed implementation allows to pass or not the controller, 
+allowing to change admin policy for another controller than the selected 
+one.
+If it is not present this command uses the selected one.
 
-     The hdev->reset callback (.reset = btintel_pcie_reset,
-     invoked via the sysfs reset attribute
-     /sys/class/bluetooth/hciX/reset and from hci_cmd_timeout())
-     compounded this by not writing reset_type at all -- it
-     inherited whatever value a previous hw_error / resume() had
-     left, which could be PLDR.
+>
+>> --
+>> 2.43.0
+>>
+>>
+>
 
-  2. btintel_pcie_dump_debug_registers() was called unconditionally
-     at the top of hw_error(). When reset_work was already running
-     pci_try_reset_function(), the BT MMIO window can read all-1s
-     or trigger AER for the duration of the FLR, polluting the
-     debug dump with no useful information.
-
-Refactor the reset path to make RECOVERY_IN_PROGRESS the sole
-serializer for both the type write and the work scheduling:
-
-  - Replace btintel_pcie_reset(hdev) with
-    btintel_pcie_request_reset(data, type). The helper takes the
-    desired reset variant as a parameter and writes
-    data->reset_type only after winning test_and_set_bit(); losers
-    return without touching the field, so concurrent triggers can
-    no longer clobber an in-flight reset's type. reset_work()'s
-    read of reset_type is now ordered after the bit transition via
-    schedule_work()'s memory barrier.
-
-  - Add a thin btintel_pcie_hci_reset() wrapper for the
-    hdev->reset callback (invoked via the sysfs reset attribute
-    /sys/class/bluetooth/hciX/reset and from hci_cmd_timeout())
-    that always requests FLR explicitly, so these paths no longer
-    inherit stale state from prior error events.
-
-  - Add an early test_bit(RECOVERY_IN_PROGRESS) gate at the top of
-    hw_error() so dump_debug_registers() and the recovery-counter
-    bookkeeping are skipped when a reset is already in flight; the
-    authoritative test_and_set lives in request_reset() and races
-    cleanly against any caller that passes the optimistic check.
-
-  - Convert the two resume() reset sites (FREEZE/HIBERNATE and the
-    D0-error path) to request_reset(data, FLR), removing the
-    redundant manual reset_type writes.
-
-Assisted-by: GitHub-Copilot:claude-4.7-opus
-Signed-off-by: Kiran K <kiran.k@intel.com>
----
-changes in v2:
-- corrected comment above btintel_pcie_request_reset() from "HCI ioctl"
-to "sysfs reset attribute, hci_cmd_timeout()", matching the actual
-hdev->reset invocation sites in hci_sysfs:reset_store() and
-hci_core.c:hci_cmd_timeout()
-
-- Amend the commit message bullet for btintel_pcie_reset() to replace
-the incorrect HCIDEVRESET reference (that ioctl goes through
-hci_dev_do_reset() and issues HCI_OP_RESET, not hdev->reset) with sysfs
-reset attribute and hci_cmd_timeout() paths.
-
- drivers/bluetooth/btintel_pcie.c | 75 ++++++++++++++++++++++----------
- 1 file changed, 51 insertions(+), 24 deletions(-)
-
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 013568197a39..2e28847263ab 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -2550,8 +2550,6 @@ static void btintel_pcie_inc_recovery_count(struct pci_dev *pdev,
- 	}
- }
- 
--static void btintel_pcie_reset(struct hci_dev *hdev);
--
- static int btintel_pcie_acpi_reset_method(struct btintel_pcie_data *data)
- {
- 	union acpi_object *obj, argv4;
-@@ -2749,56 +2747,86 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
- 	pci_unlock_rescan_remove();
- }
- 
--static void btintel_pcie_reset(struct hci_dev *hdev)
-+/* Schedule a device reset of the requested type.
-+ *
-+ * BTINTEL_PCIE_RECOVERY_IN_PROGRESS serializes all reset requesters
-+ * (sysfs reset attribute, hci_cmd_timeout(), hw_error, resume error
-+ * path, etc.) so that:
-+ *
-+ *   - dev_data->reset_type is written by exactly one caller (the
-+ *     thread that wins test_and_set_bit), eliminating the race where
-+ *     a second hw_error could clobber an already-scheduled reset's
-+ *     type;
-+ *   - the write happens AFTER the bit is set, so reset_work observes
-+ *     it through schedule_work()'s memory ordering;
-+ *   - losers return without touching reset_type or scheduling the
-+ *     work, so concurrent triggers are silently coalesced into the
-+ *     in-flight one (whose recovery will reinitialize the device
-+ *     regardless of the dropped trigger's variant).
-+ *
-+ * The bit is cleared only by .remove() / re-probe via fresh devm
-+ * allocation, which is the intended one-shot semantics: a reset
-+ * tears down and re-probes 'data', so there is no "in-flight"
-+ * reset to follow up after device_reprobe() succeeds.
-+ */
-+static void btintel_pcie_request_reset(struct btintel_pcie_data *data,
-+				       enum btintel_pcie_reset_type type)
- {
--	struct btintel_pcie_data *data;
--
--	data = hci_get_drvdata(hdev);
--
- 	if (!test_bit(BTINTEL_PCIE_SETUP_DONE, &data->flags))
- 		return;
- 
- 	if (test_and_set_bit(BTINTEL_PCIE_RECOVERY_IN_PROGRESS, &data->flags))
- 		return;
- 
-+	data->reset_type = type;
-+
- 	pci_dev_get(data->pdev);
- 	schedule_work(&data->reset_work);
- }
- 
-+static void btintel_pcie_hci_reset(struct hci_dev *hdev)
-+{
-+	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-+
-+	btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_FLR);
-+}
-+
- static void btintel_pcie_hw_error(struct hci_dev *hdev, u8 code)
- {
--	struct btintel_pcie_dev_recovery *data;
-+	struct btintel_pcie_dev_recovery *rec;
- 	struct btintel_pcie_data *dev_data = hci_get_drvdata(hdev);
- 	struct pci_dev *pdev = dev_data->pdev;
-+	enum btintel_pcie_reset_type type;
- 	time64_t retry_window;
- 
-+	if (test_bit(BTINTEL_PCIE_RECOVERY_IN_PROGRESS, &dev_data->flags))
-+		return;
-+
- 	btintel_pcie_dump_debug_registers(hdev);
- 
--	data = btintel_pcie_get_recovery(pdev, &hdev->dev);
--	if (!data)
-+	rec = btintel_pcie_get_recovery(pdev, &hdev->dev);
-+	if (!rec)
- 		return;
- 
--	if (code == 0x13)
--		dev_data->reset_type = BTINTEL_PCIE_IOSF_PRR_PLDR;
--	else
--		dev_data->reset_type = BTINTEL_PCIE_IOSF_PRR_FLR;
-+	type = (code == 0x13) ? BTINTEL_PCIE_IOSF_PRR_PLDR
-+			      : BTINTEL_PCIE_IOSF_PRR_FLR;
- 
- 	bt_dev_err(hdev, "Encountered exception err:0x%x triggering: %s", code,
--		   dev_data->reset_type == BTINTEL_PCIE_IOSF_PRR_PLDR ? "PLDR" : "FLR");
--	retry_window = ktime_get_boottime_seconds() - data->last_error;
-+		   type == BTINTEL_PCIE_IOSF_PRR_PLDR ? "PLDR" : "FLR");
-+	retry_window = ktime_get_boottime_seconds() - rec->last_error;
- 
- 	if (retry_window < BTINTEL_PCIE_RESET_WINDOW_SECS &&
--	    data->count >= BTINTEL_PCIE_FLR_MAX_RETRY) {
-+	    rec->count >= BTINTEL_PCIE_FLR_MAX_RETRY) {
- 		bt_dev_err(hdev, "Exhausted maximum: %d recovery attempts: %d",
--			   BTINTEL_PCIE_FLR_MAX_RETRY, data->count);
-+			   BTINTEL_PCIE_FLR_MAX_RETRY, rec->count);
- 		bt_dev_dbg(hdev, "Boot time: %lld seconds",
- 			   ktime_get_boottime_seconds());
- 		bt_dev_dbg(hdev, "last error at: %lld seconds",
--			   data->last_error);
-+			   rec->last_error);
- 		return;
- 	}
- 	btintel_pcie_inc_recovery_count(pdev, &hdev->dev);
--	btintel_pcie_reset(hdev);
-+	btintel_pcie_request_reset(dev_data, type);
- }
- 
- static bool btintel_pcie_wakeup(struct hci_dev *hdev)
-@@ -2888,7 +2916,7 @@ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
- 	hdev->hw_error = btintel_pcie_hw_error;
- 	hdev->set_diag = btintel_set_diag;
- 	hdev->set_bdaddr = btintel_set_bdaddr;
--	hdev->reset = btintel_pcie_reset;
-+	hdev->reset = btintel_pcie_hci_reset;
- 	hdev->wakeup = btintel_pcie_wakeup;
- 	hdev->hci_drv = &btintel_pcie_hci_drv;
- 
-@@ -3176,8 +3204,7 @@ static int btintel_pcie_resume(struct device *dev)
- 	if (data->pm_sx_event == PM_EVENT_FREEZE ||
- 	    data->pm_sx_event == PM_EVENT_HIBERNATE) {
- 		set_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags);
--		data->reset_type = BTINTEL_PCIE_IOSF_PRR_FLR;
--		btintel_pcie_reset(data->hdev);
-+		btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_FLR);
- 		return 0;
- 	}
- 
-@@ -3204,7 +3231,7 @@ static int btintel_pcie_resume(struct device *dev)
- 		btintel_pcie_queue_coredump(data,
- 					    BTINTEL_PCIE_TRIGGER_REASON_FW_ASSERT);
- 		set_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags);
--		btintel_pcie_reset(data->hdev);
-+		btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_FLR);
- 	}
- 	return err;
- }
 -- 
-2.54.0
+Frédéric Danis
+Senior Software Engineer
+
+Collabora Ltd.
+Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
+Registered in England & Wales, no. 5513718
+
 
