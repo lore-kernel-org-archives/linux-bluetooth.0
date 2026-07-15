@@ -1,120 +1,147 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71769443A81
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 10:51:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FD7446848;
+	Wed, 15 Jul 2026 11:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784112662; cv=none; b=s4YXt5NMFwJx473ZSMY+XODQM0qSYGREt9eYD+nrIwrEMVBVVC/rYUT9ULVXVzVcYLLR2P0h427DnnV3xtd/eVycwfuP7gT1Ig0flq024k+GjBwS8gwcYwzeeTlO2pqFuxEPthY4LrNStmtm5IxLowXdFULTcZWrn3x1JCXbKZ4=
+	t=1784114460; cv=none; b=SNFZURYQBVk5waSYD5rj1W6Lvm/Vy1TcNhpsomGQvMpnoq7fl1kAaHo6A+8p3RHhhDdYpGf4cxBe79fLJIlClG2IRaPrtxrR6RA670vopcFh/V6Um/DkJ9ASxtHbG8krzXD+cfzQTC6hyZa4H/QOmcstpyrQjxlz/fuGxxylS4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784112662; c=relaxed/simple;
-	bh=5aodyq3mLoZ2eXAqYdCo4bhv70z4waRjj+cW8v39AG8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=QhQ158pfILMm4ldpJ8+zRUQinsLqKfgAiw9cR2UD7yhi5IdZbqQTlB7fBPLDKd0a7bzBZirD6ZuWSvL2dU5DK23MYiSzU+Kl+duzgewdT4O99UiKmDsyQqUP5RAQpgEQzblgKJtY6FegeGaBfUo7WT2N73cOO4h9kuJSi+fMd9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KXXoFaPg; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1784114460; c=relaxed/simple;
+	bh=CXZw16nF47ro55YLlnkq0+5AXwVPQ0Sbw2nBULUs5fw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pfwM7P1sDJtfwKlsySMpUiHWj9rGJDyiSjMxzorCk7P95vCWXI9hyjpW2NBTpcByFKtI8vajTofZsEpG7NlyetFsruODjHprl0MGW1npKCNcByhsN9V4dUF08SHc9IFzHmQ1DRem6eDIUrS5P/buKbPnfO1es+K4IAA8NmrQreg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=nuwhUTJl; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXXoFaPg"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-902fc790cd5so54737076d6.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 03:50:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784112659; x=1784717459; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=CoPNy+hnPJYG/4FrhXHfXQMIvVY5rXvfOhBZzyRIy74=;
-        b=KXXoFaPgbtbYavG5QeBrFr5ZVUZxcAEFpxeDNK8893Cu32ULRZFP0KoIEYZwwwDGJh
-         0t419cMJrLtbzqjGIoM2EIFoDmXOXy9RgMgOTUpeOYCUGPmlznhgpCzs+EQi56c9xqub
-         Q+KgsOfJNc/kGPTc868OtG2bufPg80KXEoikRm1CZd7xlhb9dN8gDiCVWjj9HP3WZFE5
-         Dgnz1fgpXE0G6v1SWNH4scDmrhs78rdy2nOjanaLOci98FpeIkYxX5uqCt4k5p3I4oaf
-         9IJ2Hk+Xzx+egHYUazdp8djugZY3aQESx2qKHa/9pZ01CPAeX7945laIwjUpcax2y9iT
-         GFew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784112659; x=1784717459;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=CoPNy+hnPJYG/4FrhXHfXQMIvVY5rXvfOhBZzyRIy74=;
-        b=SwwepVX35Z7Fm/r7lr8Nz5u96RqWXBYg+CYtHxGyGmXWYyNaBakJrl+z43wr2b5CoR
-         BIK0cBms8fSP1fvK9TtIjJdi6MdUD9DDRCS9oKbuABQuY765FtSCKtqqiZUl7Ad2Y0Yh
-         pyJm1bN2+inpBgwhnzYLj9ouQN/YUENkoGaeUCLpmfNnNQkAAGxJEW8nyqnjn04taG6G
-         aaGOgsKf0ro8dFL9hrxWn2JqLcx7WUpabSmYfSvcnKNXrbC73rvTUiQCX1v7GSUbtNTK
-         iIdOC87C3+IZbC+FDP0m0J6tAoW/i35KusxNRdrLSMlFeheAWvkYTLHWGaTYwkj9KIp9
-         gavQ==
-X-Gm-Message-State: AOJu0YzW6cVvqj+GFBxTCEyXOdHuD7FNTx5Qs7cOmKxkRAevgrOfiQnx
-	LvwoeT0qPSDhmwayhRA6OssPpEe1YJ6cpcr0HGw1ZMZqVv8/01IC5u6lCq36Sg==
-X-Gm-Gg: AfdE7cmSFRuVcnuuVh4iBF9m19g7A4uYzVNOUTUDYybZ4jrK5F6+/M4MmgjhEFAZIrD
-	jDl1+FonSpK+xekvfQ1NekhnIhgqAlPKz6yeTCr9mSZIYCSOaGffmgf1e35gqxQJrIH8h8iFu9c
-	t7iDl6LRXIlMw4cTK7yS7DGSNIfK49xJwzZbNkls3X7MQXZwX7vENAPAKbIEh/XOgU41++nBn99
-	JYSB7Oy6iOiK4o1Ag6rrTZLhR14J5i2JJXvxZbhZHgg7IXEI/lzJBG6IuwL79GhkOrl0+wXG1nV
-	PEvJ/nX/8EGIRmSfYWgVMCWAUTy0zEpDm+7R0hF8x8275kOMQ1paIhvio5BiekMLd3tkUK+gsAr
-	sSJdOZpFr8d8v0npDYB+eQb9J2HmtBcWNRXpySoTfMU9QB37hDAx+dg0E/jmVihoQxUN2O/3TPf
-	fDg7EkdAQrLSOwKDNeVMUhNe9TYls80Q==
-X-Received: by 2002:a05:6214:c4c:b0:8ff:496e:1071 with SMTP id 6a1803df08f44-90747c2eeb4mr87666546d6.1.1784112658607;
-        Wed, 15 Jul 2026 03:50:58 -0700 (PDT)
-Received: from [172.17.0.2] ([20.109.38.114])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ffd87c8d4csm207084056d6.44.2026.07.15.03.50.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jul 2026 03:50:58 -0700 (PDT)
-Message-ID: <6a576612.45cbbc81.84df2.f94e@mx.google.com>
-Date: Wed, 15 Jul 2026 03:50:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0348771843949533908=="
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="nuwhUTJl"
+X-UUID: 3cde67b6803f11f18dc8c9802ae25ab1-20260715
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=nO4iw7FfBkyOHJAjjnbya3620DOrnkSFerGvpQtGq4I=;
+	b=nuwhUTJlvaUvChu0YZ5VbVBgF9wuf6hJelG/hiSpRqhtFxNzZc8w4M4SWzW375jkgmTMTucTLW0QZFbAqoUOw4sMGN9cVP3JKbtALKzENY3rd/SVmFE4Y6DlJwWyXoqR/ILl0Gd0P1Rgyrst6eU2MrtZ20LH4XvssLhB0RyRh64=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.17,REQID:788d7d13-0ec9-4283-8721-4a6ec1ee8cc3,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:d497b38,CLOUDID:cf2c4b3f-46cf-453a-bd84-ad9fc7cb0e8c,B
+	ulkID:nil,BulkQuantity:0,SF:81|82|102|836|865|888|898,TC:-5,Content:0|15|5
+	0|99|200|213,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:
+	0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 3cde67b6803f11f18dc8c9802ae25ab1-20260715
+Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw02.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 128618378; Wed, 15 Jul 2026 19:20:51 +0800
+Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
+ mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Wed, 15 Jul 2026 19:20:50 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.2562.29 via Frontend Transport; Wed, 15 Jul 2026 19:20:50 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
+	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>, Paul Menzel
+	<pmenzel@molgen.mpg.de>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH v11 6/7] Bluetooth: btmtk: Replace magic numbers with WMT packet flag enum
+Date: Wed, 15 Jul 2026 19:20:46 +0800
+Message-ID: <20260715112048.1448868-7-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20260715112048.1448868-1-chris.lu@mediatek.com>
+References: <20260715112048.1448868-1-chris.lu@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pengpeng@iscas.ac.cn
-Subject: RE: Bluetooth: btrtl: validate config entry bounds
-In-Reply-To: <20260715083604.28393-1-pengpeng@iscas.ac.cn>
-References: <20260715083604.28393-1-pengpeng@iscas.ac.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
---===============0348771843949533908==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Add BTMTK_WMT_PKT_* enum to represent WMT download packet sequence flags,
+improving code readability. Replace magic numbers (1, 2, 3) in
+btmtk_setup_firmware_79xx() and btmtk_setup_firmware() with descriptive
+enum values:
 
-This is automated email and please do not reply to this email!
+- BTMTK_WMT_PKT_START (1): First packet of a sequence
+- BTMTK_WMT_PKT_CONTINUE (2): Continuation packet
+- BTMTK_WMT_PKT_END (3): Final packet of a sequence
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1128000
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.75 seconds
-VerifyFixes                   PASS      0.13 seconds
-VerifySignedoff               PASS      0.14 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      30.16 seconds
-CheckAllWarning               PASS      29.66 seconds
-CheckSparse                   PASS      28.21 seconds
-BuildKernel32                 PASS      26.32 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      464.27 seconds
-IncrementalBuild              PASS      24.43 seconds
-
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-
-
-https://github.com/bluez/bluetooth-next/pull/442
-
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Assisted-by: Claude:Sonnet-4.5
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btmtk.c | 12 ++++++------
+ drivers/bluetooth/btmtk.h |  6 ++++++
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index 595e346accc3..75519765bb49 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -271,12 +271,12 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
+ 			while (dl_size > 0) {
+ 				dlen = min_t(int, 250, dl_size);
+ 				if (first_block == 1) {
+-					flag = 1;
++					flag = BTMTK_WMT_PKT_START;
+ 					first_block = 0;
+ 				} else if (dl_size - dlen <= 0) {
+-					flag = 3;
++					flag = BTMTK_WMT_PKT_END;
+ 				} else {
+-					flag = 2;
++					flag = BTMTK_WMT_PKT_CONTINUE;
+ 				}
+ 
+ 				wmt_params.flag = flag;
+@@ -355,7 +355,7 @@ int btmtk_setup_firmware(struct hci_dev *hdev, const char *fwname,
+ 
+ 	fw_size -= 30;
+ 	fw_ptr += 30;
+-	flag = 1;
++	flag = BTMTK_WMT_PKT_START;
+ 
+ 	wmt_params.op = BTMTK_WMT_PATCH_DWNLD;
+ 	wmt_params.status = NULL;
+@@ -365,9 +365,9 @@ int btmtk_setup_firmware(struct hci_dev *hdev, const char *fwname,
+ 
+ 		/* Tell device the position in sequence */
+ 		if (fw_size - dlen <= 0)
+-			flag = 3;
++			flag = BTMTK_WMT_PKT_END;
+ 		else if (fw_size < fw->size - 30)
+-			flag = 2;
++			flag = BTMTK_WMT_PKT_CONTINUE;
+ 
+ 		wmt_params.flag = flag;
+ 		wmt_params.dlen = dlen;
+diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+index c83c24897c95..51c18dde0a80 100644
+--- a/drivers/bluetooth/btmtk.h
++++ b/drivers/bluetooth/btmtk.h
+@@ -66,6 +66,12 @@ enum {
+ 	BTMTK_WMT_ON_PROGRESS,
+ };
+ 
++enum {
++	BTMTK_WMT_PKT_START = 1,
++	BTMTK_WMT_PKT_CONTINUE = 2,
++	BTMTK_WMT_PKT_END = 3,
++};
++
+ struct btmtk_wmt_hdr {
+ 	u8	dir;
+ 	u8	op;
+-- 
+2.45.2
 
---===============0348771843949533908==--
