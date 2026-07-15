@@ -1,123 +1,699 @@
-Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A73E2E7365;
-	Wed, 15 Jul 2026 08:36:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B13A03CE4B5
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 08:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784104569; cv=none; b=S8LM+SRX7XpUwwueCK7LLjsVMsNC9jH5sgfpP2FvLZPwkX+7TPJab78XUtQuPIxlMUoahaN0P0MlmWcdTTpqtzVlvE97PApDKHODsNHyO2p/V9N/wVrMR/1/gKhe7udqoKTO6Zvh07Pui8eBeWuqjT3TyjQpsihWm/AIO604rQs=
+	t=1784104814; cv=none; b=ABOvtH0yBqtw4arkgAjKsRAW8fjDXG5GjZJpR82wM9IugEfdj1TQhFRMRFNLDp3uF2diqVeTQan7xHSN3xEdy9VDZkJLG39hyrjW381CsLEX6xU+C6oPyY6OKxA0cu5XWvf3Dl4nB8EOPcLz1tYr/ALHcsvYSqxS2HC2D1GYt5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784104569; c=relaxed/simple;
-	bh=veCD3K8Q3dVLi6XqB97BswAEquaVcb2rZA15NOngp24=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BsZOz9KeGAyZTtypxLfb0WThn3Ibes6MyUio0Cw4CUtwimHMkUDsvfCEmBGtU9+ZaNgL1WXj+EOUOyWdPXdw+4WkeFbgdsqgx998/q192nqyQ/urBQLWwbbpxOtIUEAvJBV//Z02BrrLErohDMnwilt6UpozsrGpN1O+hlLgb7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [111.196.245.140])
-	by APP-05 (Coremail) with SMTP id zQCowADHNel0RldqeExHGA--.5090S2;
-	Wed, 15 Jul 2026 16:36:04 +0800 (CST)
-From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: Pengpeng Hou <pengpeng@iscas.ac.cn>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Subject: [PATCH] Bluetooth: btrtl: validate config entry bounds
-Date: Wed, 15 Jul 2026 16:36:04 +0800
-Message-ID: <20260715083604.28393-1-pengpeng@iscas.ac.cn>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1784104814; c=relaxed/simple;
+	bh=/G+Lq/w0/O1pqUINNkuNBSGtPVMjevNCL2NtanGI0SM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oiZRBZhet/+HGCAJOKSgB9QgC17eQkHB6ncE5CmaH5x1n1g1pGUllFHQ3/R+Y/K17mvqvhxoFz6BHIw/mXUoJSSDYu5qNIlDWCgs1WchFSXFvcjk8M/J+DR/tKQaixI6zCiwxl05A+tqqPZSstMjihDwefAaFzqqr1Al2bVszBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=p0SplNV8; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Pug1SsAi; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="p0SplNV8";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Pug1SsAi"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66F3lGAJ2406127
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 08:40:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	IxNJXtXR5luCdfm+TrB025UGnYHWPS/Q5n6KssArM5I=; b=p0SplNV8XMnKOhcr
+	yjYqE0zCiYMjTMh3vfvWYYtPpubRh8ObknhGKj1jiT7o7vT3TkHIBr2r4UsuNYbD
+	bq21M6hfU4YZ4+JfTGv64V50maa5DW9V6XTpXjfqakVrgnMddBRL2Fvwqqzvx7tR
+	H4dCg7t9uSINsBrC0kqzBxV92WB1NTV7P8rlzqJJV3mfGd65Zvw719uswr7g3hHB
+	FrV1R2gKAGm1lsUBXk+J5gsieLZx9KcKSPY6UxammOkeI+MQSc/DneiNiYSzthc5
+	GxQKTdrE/+IueF6YH+RzZqRYPDpmmO+imb7xLFBriQYnR0pNYZWRILwWPJAfy9bY
+	q9rPQQ==
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com [209.85.215.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fds9g2s46-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 08:40:11 +0000 (GMT)
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-c890bac374eso13390199a12.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 01:40:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1784104809; x=1784709609; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=IxNJXtXR5luCdfm+TrB025UGnYHWPS/Q5n6KssArM5I=;
+        b=Pug1SsAi6+qg/xefeu12vaaYlRxkkrHs2QlsYgBsslfzw1RlkZE3TBoozHiVqs4eWk
+         9dmKYM+kXUIAz3tGqam/A/4OvLfo3sdm2UFZ2IuaNS1k1f2ntMzkBqeNbFD5u6RjoHj4
+         Gbj+UySNBMb1gOjIEMu3QxyXK7EaZPrRoqpIFMhz6a13XUyTSboNdIhvTMB6O48zSPrf
+         PBgEFh6crLYdTo7sIMPfOJt7svsoojvrTo6kjknoZpFSZuwdIZ7j0IlvdpM/6yLg7JUB
+         OnwTC0oNHYFhHfuJGFX/qWRsbkHgLGqX6z3MmGuwslCI9p32hgmZwhH8uleXe9Oz2o0j
+         mmzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784104809; x=1784709609;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=IxNJXtXR5luCdfm+TrB025UGnYHWPS/Q5n6KssArM5I=;
+        b=eHIna2zIEu4aVj4dWFUYKejscs86ZiH96rj8yWP2RIr4cd7fTVuVTIoG7cdWxhro05
+         ST2YRCurALdRLL1NoJp0c1YEJqqzVok8wwYG9rtEvauou8mFDntebASa7j9Aa4oi8459
+         4Q7mvUVmwylZdrNpxcBSYmD1sqZabR9anogH6JwIU3BWk62RDix8DjAL7fXfjdQAsOcK
+         UyjAVwALnhMmpGmBd0BVE1XVVhzC82DMNHbBNlFuP1It6Z/H4WWhKgQ+kMokiAnigb/L
+         1VM7p7SPg46jwNTjtI/6HV/vCqixE8ksSt2kh7mB4cafUoVuCxqhI1AB5+OVMts4gWAV
+         BvBw==
+X-Gm-Message-State: AOJu0YzjtWxJ6dlSAVr+RupDgCf+8gHsjAdOQ1l5hoCBTICkHYqfw/ip
+	//tmpaG5JWBQftG7sS3mBAEs6BGl1N1Ncj1x+zDajM/oVvEHZVS5Rsxk16az+xWXNjF+cFGNDKL
+	+X7xJLx2ZqDbsuBvQ/DHTMlLe1dOa2dqR6cFl1GsccLs2Gbsu7/BQbAbs3gToJQgWpLXPIDjAsi
+	YVOGA=
+X-Gm-Gg: AfdE7cmowCWuH9pSG15wBmdm4IaSHF353qeZTxZYhjL2GHfXOWuBG4qxZBeHcmxRegR
+	C1a4U4TZuck0WQfwGh8v0UEX+zlt8dw7AVxOGmpL+S7pUIV/E1D0JeAacgw9GS45frF+ReeweAS
+	oAOyrxNfwWJUanopA3XDeJTPb26PDrTSYg6ebsY8JZ2z+GU60MyZmDMYRe10rVZTdM3pzkQzLDv
+	g64SlntCjHHgr2Xdo5p2EEXd5OHEKUuWg8F3iVqsyn38hF76Q5jRK3O6IhzJag9OMCUqFH1Qew/
+	Edr2HROOqDtgWBbp9VPQCJipwfj+rvIbX8u+/zwfVS255cjNwFmwZS+pZ8mJeuc1uZ84foMnk/C
+	V4gfJH+kpFPmSplnNGfkAr0OKsm2gt4fLoP7ErIrz
+X-Received: by 2002:a05:6a20:7353:b0:3ab:2fa:756c with SMTP id adf61e73a8af0-3c36c0f69a1mr2477578637.1.1784104809187;
+        Wed, 15 Jul 2026 01:40:09 -0700 (PDT)
+X-Received: by 2002:a05:6a20:7353:b0:3ab:2fa:756c with SMTP id adf61e73a8af0-3c36c0f69a1mr2477537637.1.1784104808585;
+        Wed, 15 Jul 2026 01:40:08 -0700 (PDT)
+Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13b659d8da9sm163872322c88.14.2026.07.15.01.40.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jul 2026 01:40:08 -0700 (PDT)
+From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
+        quic_anubhavg@quicinc.com,
+        Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+Subject: [PATCH BlueZ v6 1/3] doc/org.bluez.ChannelSounding1:Add Used by reference and Examples
+Date: Wed, 15 Jul 2026 14:09:56 +0530
+Message-Id: <20260715083958.2723407-2-naga.akella@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260715083958.2723407-1-naga.akella@oss.qualcomm.com>
+References: <20260715083958.2723407-1-naga.akella@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowADHNel0RldqeExHGA--.5090S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cw1rGryxWr4DCFy5XFyDGFg_yoW5JF4UpF
-	WUWFyYy34rJF4Syr4xtF1fCFWY93s7Way2gasxur95Ar43CrWrCF98KrySva4DCr4kGr1x
-	ZFZYqF429FWDGFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
-	JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
-	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
-	v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUeKsjUU
-	UUU
-X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE1MDA4MyBTYWx0ZWRfXy0LhNEZ0g98z
+ QB+ClVXofYjXtXwJ7ZPcxK548L6Mi8U1RwbhVjwXMmSl7sUqVHGal9oARg2gG7z7mQng7erDimv
+ pCdiagkXAtd8O3f7ZG/qN++vIk9FJ04=
+X-Proofpoint-ORIG-GUID: KBA5HHjtk78MgumKu9qwkMn4z49L3Bvc
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE1MDA4MyBTYWx0ZWRfX3R8s6E+p9b6r
+ 2EIs0AQqVPPiQiX9dUb5kK2Ab2P6yuewL5ltJyM8MJD9acIUsjB8cKR3OZkRMvh7/sTkh7zUxrn
+ Xx7hyYpbhUgHAsSsXxS/cIbM182lqGpfrrQ5IaIfRnyzFRHezd3sDUnia/0cWQF+h5gQe2kl1Tn
+ OQjTRENCCVgZ52R8/DUUWeAabB70dPVWfMV2zSnKKJr9O8GFglJaLZ5omrolsULiNnuMv5tO3mh
+ mvdBkiBAOGiiyYE14+ME01LXj0DAHriXYZERzO21ZiuVqZXbEUsrsjNuSCbvlE7O7GxMteClCUA
+ ofLoTghFYQnGvZFrCd9HcT/oeU0g5uhQ+y1KimGJyEBxDSSR8mPKWwF5M82wnAkyQUTTI6oIeSl
+ mbJuUNu6Dby8lV3jaiFbdaeVdeWDaEL/Iwe33N4+AAWDQ1s3f9sS1Vf3z7mDKNZj+kyTdCbMCCn
+ Oh1Zs0YbvGG9JsUKq4w==
+X-Proofpoint-GUID: KBA5HHjtk78MgumKu9qwkMn4z49L3Bvc
+X-Authority-Analysis: v=2.4 cv=VoATxe2n c=1 sm=1 tr=0 ts=6a57476b cx=c_pps
+ a=rz3CxIlbcmazkYymdCej/Q==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22
+ a=wa7QpaTpAAAA:8 a=VwQbUJbxAAAA:8 a=u-z_awnPeUhD23_djrsA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10 a=bFCP_H2QrGi7Okbo017w:22 a=ehqneT2-Ts4HTEaPPMaO:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-15_02,2026-07-14_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 spamscore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0
+ priorityscore=1501 impostorscore=0 suspectscore=0 adultscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607150083
 
-btrtl_get_uart_settings() walks variable-length entries in an externally
-loaded Realtek configuration blob.  It previously checked only that the
-cursor was below the physical data area before reading an entry header and
-advancing by its declared payload length.  A truncated final entry could
-therefore make the parser read an incomplete header or consume a payload
-beyond the configuration data.
-
-The format gives a logical entry area in config->total_len.  First prove it
-fits in the physical blob.  Parse only that logical area afterward.  This
-preserves valid physical tail padding while requiring each fixed header and
-payload to fit in the current logical configuration area.
-
-Fixes: b85b0ee1001b ("Bluetooth: btrtl: add support for retrieving the UART settings")
-Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
+Add :Used by: field linking to bluetoothctl cs submenu and
+Examples section showing corresponding bluetoothctl cs commands
+for D-Bus methods
 ---
- drivers/bluetooth/btrtl.c | 21 ++++++++++++++++-----
- 1 file changed, 16 insertions(+), 5 deletions(-)
+ Makefile.am                        |   2 +
+ doc/org.bluez.ChannelSounding1.rst | 534 +++++++++++++++++++++++++++++
+ 2 files changed, 536 insertions(+)
+ create mode 100644 doc/org.bluez.ChannelSounding1.rst
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 49ecb18fea45..fab9a59a1eb4 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -1460,11 +1460,11 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
- {
- 	struct rtl_vendor_config *config;
- 	struct rtl_vendor_config_entry *entry;
--	int i, total_data_len;
-+	int i, declared_data_len, physical_data_len;
- 	bool found = false;
+diff --git a/Makefile.am b/Makefile.am
+index 76c4ab5d4..23b96c2e3 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -405,6 +405,7 @@ man_MANS += doc/org.bluez.Telephony.5 doc/org.bluez.Call.5
+ man_MANS += doc/org.bluez.ThermometerManager.5 \
+ 		doc/org.bluez.Thermometer.5 \
+ 		doc/org.bluez.ThermometerWatcher.5
++man_MANS += doc/org.bluez.ChannelSounding1.5
+ endif
+ manual_pages += doc/bluetoothd.8
+ manual_pages += doc/hci.7 doc/mgmt.7 doc/l2cap.7 doc/rfcomm.7 doc/sco.7 \
+@@ -445,6 +446,7 @@ manual_pages += doc/org.bluez.Telephony.5 doc/org.bluez.Call.5
+ manual_pages += doc/org.bluez.ThermometerManager.5 \
+ 		doc/org.bluez.Thermometer.5 \
+ 		doc/org.bluez.ThermometerWatcher.5
++manual_pages += doc/org.bluez.ChannelSounding1.5
  
--	total_data_len = btrtl_dev->cfg_len - sizeof(*config);
--	if (total_data_len <= 0) {
-+	physical_data_len = btrtl_dev->cfg_len - sizeof(*config);
-+	if (physical_data_len <= 0) {
- 		rtl_dev_warn(hdev, "no config loaded");
- 		return -EINVAL;
- 	}
-@@ -1475,14 +1475,25 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
- 		return -EINVAL;
- 	}
- 
--	if (total_data_len < le16_to_cpu(config->total_len)) {
-+	declared_data_len = le16_to_cpu(config->total_len);
-+	if (declared_data_len > physical_data_len) {
- 		rtl_dev_err(hdev, "config is too short");
- 		return -EINVAL;
- 	}
- 
--	for (i = 0; i < total_data_len; ) {
-+	for (i = 0; i < declared_data_len; ) {
-+		if (declared_data_len - i < sizeof(*entry)) {
-+			rtl_dev_err(hdev, "truncated config entry header");
-+			return -EINVAL;
-+		}
+ EXTRA_DIST += src/genbuiltin src/bluetooth.conf \
+ 			src/main.conf profiles/network/network.conf \
+diff --git a/doc/org.bluez.ChannelSounding1.rst b/doc/org.bluez.ChannelSounding1.rst
+new file mode 100644
+index 000000000..c06e1d728
+--- /dev/null
++++ b/doc/org.bluez.ChannelSounding1.rst
+@@ -0,0 +1,534 @@
++==========================
++org.bluez.ChannelSounding1
++==========================
 +
- 		entry = ((void *)config->entry) + i;
- 
-+		if (entry->len > declared_data_len - i - sizeof(*entry)) {
-+			rtl_dev_err(hdev, "truncated config entry payload");
-+			return -EINVAL;
-+		}
++----------------------------------------------
++BlueZ D-Bus Channel Sounding API documentation
++----------------------------------------------
 +
- 		switch (le16_to_cpu(entry->offset)) {
- 		case 0xc:
- 			if (entry->len < sizeof(*device_baudrate)) {
++:Version: BlueZ
++:Date: June 2026
++:Manual section: 5
++:Manual group: Linux System Administration
++
++Interface
++=========
++
++:Service:	org.bluez
++:Interface:	org.bluez.ChannelSounding1
++:Object path:	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
++:Used by:	**bluetoothctl(1)**, **bluetoothctl-cs(1)**
++
++Methods
++-------
++
++void StartMeasurement(dict params)
++``````````````````````````````````
++
++Starts a Channel Sounding distance measurement procedure on the connected
++device. All configuration is supplied in a single ``a{sv}`` dictionary.
++Any key that is omitted retains its current value in the daemon.
++
++The device to measure is identified by the D-Bus object path on which
++this method is called
++(``[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX``).
++Only one measurement per device object may be active at a time. Calling
++**StartMeasurement** while a session is already active returns
++``org.bluez.Error.InProgress``.
++
++When ``role`` is Reflector (``0x02``), this method does not start a CS
++distance measurement: a Reflector never initiates a procedure locally,
++so it cannot start one via this call. Instead, all given configuration
++is applied and stored so the controller is ready to respond once a
++remote Initiator begins a procedure, and the method returns success
++without arming a local measurement session. The ``Active`` property
++only transitions to ``true`` when a remote-initiated procedure
++actually starts, which may happen well after this method returns (or
++not at all, if the remote never initiates one). Clients that watch
++``PropertiesChanged`` for ``Active`` (as **bluetoothctl-cs(1)** does)
++are notified of both the remote-initiated start and its eventual stop.
++
++For Initiator role (or Both), ``duration_secs`` and the device object
++path are the parameters that matter to start a measurement; every
++other key below is optional configuration with a usable default. For
++Reflector role, only ``role``, ``sync_ant_sel`` and ``max_tx_power``
++are required or have any effect — the remaining keys are accepted but
++otherwise unused, since no local procedure is armed.
++
++Supported dictionary keys:
++
++:uint32 duration_secs (Default: 0):
++
++	Duration in seconds before the measurement is stopped
++	automatically. A value of 0 disables the automatic timeout.
++
++:byte role (Default: 0x03):
++
++	CS role to use for the measurement.
++
++	Possible values:
++
++	:0x01: Initiator
++	:0x02: Reflector
++	:0x03: Both (Initiator and Reflector)
++
++:byte sync_ant_sel (Default: 0xFF):
++
++	CS sync antenna selection. Values 0xFE and 0xFF are reserved
++	by the Bluetooth specification.
++
++:byte max_tx_power (Default: 0x14):
++
++	Maximum TX power in dBm, treated as a signed value. Valid
++	range is -127 to +20 dBm.
++
++:byte config_id:
++
++	CS configuration identifier.
++
++:byte main_mode_type:
++
++	Main CS mode used in the procedure.
++
++:byte sub_mode_type:
++
++	Sub-mode within the main mode. Set to 0xFF when unused.
++
++:byte main_mode_min_steps:
++
++	Minimum number of CS main mode steps per CS subevent.
++
++:byte main_mode_max_steps:
++
++	Maximum number of CS main mode steps per CS subevent.
++
++:byte main_mode_repetition:
++
++	Number of times the main mode steps are repeated in a
++	subevent.
++
++:byte mode0_steps:
++
++	Number of CS Mode 0 steps at the beginning of each subevent.
++
++:byte rtt_types:
++
++	Round Trip Time measurement types for the configuration.
++
++:byte sync_phy:
++
++	PHY used for CS sync packets.
++
++	Possible values:
++
++	:0x01: LE 1M PHY
++	:0x02: LE 2M PHY
++
++:array{byte} channel_map:
++
++	10-byte channel map bitmap. Must be exactly 10 bytes.
++
++:byte channel_map_repetition:
++
++	Number of consecutive repetitions of the channel map.
++
++:byte channel_selection_type:
++
++	Algorithm used for CS channel selection.
++
++:byte channel_shape:
++
++	Shape used in the channel selection algorithm.
++
++:byte channel_jump:
++
++	Channel jump size used in the channel selection algorithm.
++
++:byte companion_signal_enable:
++
++	Set to 1 to transmit a companion signal alongside the CS
++	tone, 0 to disable.
++
++:uint16 max_procedure_duration:
++
++	Maximum duration of a single CS measurement procedure.
++
++:uint16 min_period_between_procedures:
++
++	Minimum time between consecutive CS measurement procedures.
++
++:uint16 max_period_between_procedures:
++
++	Maximum time between consecutive CS measurement procedures.
++
++:uint16 max_procedure_count:
++
++	Maximum number of CS measurement procedures to run.
++	A value of 0 means no limit.
++
++:array{byte} min_sub_event_len:
++
++	Minimum CS subevent length as a 3-byte little-endian value.
++	Must be exactly 3 bytes.
++
++:array{byte} max_sub_event_len:
++
++	Maximum CS subevent length as a 3-byte little-endian value.
++	Must be exactly 3 bytes.
++
++:byte tone_antenna_config_selection:
++
++	Antenna configuration used for CS tone exchanges.
++
++:byte phy:
++
++	PHY used during CS procedures.
++
++	Possible values:
++
++	:0x01: LE 1M PHY
++	:0x02: LE 2M PHY
++
++:byte tx_power_delta:
++
++	Difference between remote and local TX power during CS
++	procedures. 0x80 indicates not applicable.
++
++:byte preferred_peer_antenna:
++
++	Preferred antenna to be used by the peer device.
++
++:byte snr_control_initiator:
++
++	SNR control setting for the initiator role.
++	0xFF indicates no preference.
++
++:byte snr_control_reflector:
++
++	SNR control setting for the reflector role.
++	0xFF indicates no preference.
++
++Possible errors:
++
++:org.bluez.Error.InProgress:
++:org.bluez.Error.InvalidArgs:
++:org.freedesktop.DBus.Error.Failed:
++
++Examples:
++
++:bluetoothctl set role then start:
++	| [cs] > role 0x01
++	| [cs] > main_mode_type 2
++	| [cs] > start AA:BB:CC:DD:EE:FF
++:bluetoothctl start with defaults:
++	| [cs] > start [dev_addr] [duration_secs]
++:bluetoothctl configure as Reflector (applies settings, does not start a measurement):
++	| [cs] > role 0x02
++	| [cs] > start
++
++void StopMeasurement(void)
++``````````````````````````
++
++Stops the active Channel Sounding distance measurement on this device.
++The device is identified by the D-Bus object path on which this method
++is called — no session identifier is required.
++
++Raises ``org.bluez.Error.NotConnected`` if no measurement is active.
++
++Possible errors:
++
++:org.bluez.Error.NotConnected:
++:org.freedesktop.DBus.Error.Failed:
++
++In **bluetoothctl(1)**, the device address argument may be omitted only
++when a single measurement is active; it is required when multiple
++measurements are active.
++
++Examples:
++
++:bluetoothctl stop the only active measurement:
++	| [cs] > stop
++:bluetoothctl stop a specific device when multiple are active:
++	| [cs] > stop AA:BB:CC:DD:EE:FF
++
++Signals
++-------
++
++void ProcedureData(dict data)
++``````````````````````````````
++
++Emitted when a Channel Sounding measurement procedure completes on this
++device, carrying the raw CS procedure results as reported by the
++controller. Consumers such as an external ranging estimation daemon
++subscribe to this signal to compute distance estimates.
++
++:dict data:
++
++	:int32 procedureCounter:
++
++		Procedure counter value from the controller.
++
++	:int32 procedureSequence:
++
++		Sequence number of this procedure.
++
++	:byte initiatorSelectedTxPower:
++
++		TX power selected by the Initiator, treated as a signed
++		value.
++
++	:byte reflectorSelectedTxPower:
++
++		TX power selected by the Reflector, treated as a signed
++		value.
++
++	:uint32 initiatorSubeventCount:
++
++		Number of subevent results reported by the Initiator.
++
++	:array{dict} initiatorSubeventResults:
++
++		Present only when ``initiatorSubeventCount`` is greater
++		than 0. One entry per Initiator subevent, each with the
++		fields described in `Subevent Result`_ below.
++
++	:byte initiatorProcedureAbortReason:
++
++		Reason the Initiator's procedure was aborted, 0 if not
++		aborted.
++
++	:uint32 reflectorSubeventCount:
++
++		Number of subevent results reported by the Reflector.
++
++	:array{dict} reflectorSubeventResults:
++
++		Present only when ``reflectorSubeventCount`` is greater
++		than 0. One entry per Reflector subevent, each with the
++		fields described in `Subevent Result`_ below.
++
++	:byte reflectorProcedureAbortReason:
++
++		Reason the Reflector's procedure was aborted, 0 if not
++		aborted.
++
++	:dict procedureEnableConfig:
++
++		:byte toneAntennaConfigSelection:
++
++			Antenna configuration used for CS tone exchanges.
++
++		:uint32 subeventLenUs:
++
++			Subevent length in microseconds.
++
++		:byte subeventsPerEvent:
++
++			Number of subevents per event.
++
++		:uint32 subeventInterval:
++
++			Interval between subevents.
++
++		:uint32 eventInterval:
++
++			Interval between events.
++
++		:uint32 procedureInterval:
++
++			Interval between procedures.
++
++		:uint32 procedureCount:
++
++			Number of procedures configured.
++
++		:uint32 maxProcedureLen:
++
++			Maximum procedure length.
++
++	:dict csConfigParam:
++
++		:byte modeType:
++
++			Main CS mode used in the procedure.
++
++		:byte subModeType:
++
++			Sub-mode within the main mode.
++
++		:byte rttType:
++
++			Round Trip Time measurement type.
++
++		:array{byte} channelMap:
++
++			10-byte channel map bitmap.
++
++		:byte minMainModeSteps:
++		:byte maxMainModeSteps:
++		:byte mainModeRepetition:
++		:byte mode0Steps:
++
++		:byte role:
++
++			CS role in effect for the procedure (Initiator,
++			Reflector, or Both).
++
++		:byte csSyncPhyType:
++
++			PHY used for CS sync packets.
++
++		:byte channelSelectionType:
++		:byte ch3cShapeType:
++		:byte ch3cJump:
++		:byte channelMapRepetition:
++		:byte tIp1TimeUs:
++		:byte tIp2TimeUs:
++		:byte tFcsTimeUs:
++		:byte tPmTimeUs:
++		:byte tSwTimeUsSupportedByLocal:
++		:byte tSwTimeUsSupportedByRemote:
++
++		:uint32 bleConnInterval:
++
++			BLE connection interval in effect during the
++			procedure.
++
++Subevent Result
++~~~~~~~~~~~~~~~~
++
++Each element of ``initiatorSubeventResults`` and
++``reflectorSubeventResults`` is a dict with the following fields:
++
++:int32 startAclConnEvtCounter:
++
++	ACL connection event counter at the start of the subevent.
++
++:int32 freqComp:
++
++	Frequency compensation value.
++
++:byte refPwrLvl:
++
++	Reference power level, treated as a signed value.
++
++:byte numAntPaths:
++
++	Number of antenna paths used.
++
++:byte subeventAbortReason:
++
++	Reason the subevent was aborted, 0 if not aborted.
++
++:uint64 timestampNanos:
++
++	Timestamp of the subevent result, in nanoseconds.
++
++:uint32 numSteps:
++
++	Number of steps reported in this subevent.
++
++:array{dict} stepData:
++
++	One entry per step. Each entry has:
++
++	:byte stepMode:
++
++		CS step mode (0-3).
++
++	:byte stepChannel:
++
++		Channel used for the step.
++
++	:dict modeZeroData:
++
++		Present when ``stepMode`` is 0.
++
++		:byte packetQuality:
++		:byte packetRssiDbm:
++		:byte packetAntenna:
++
++		:int32 initiatorMeasuredFreqOffset:
++
++			Frequency offset measured by the Initiator.
++
++	:dict modeOneData:
++
++		Present when ``stepMode`` is 1.
++
++		:byte packetQuality:
++		:byte packetNadm:
++		:byte packetRssiDbm:
++
++		:int32 toaTodInitiator:
++
++			Time of Arrival / Time of Departure at the
++			Initiator.
++
++		:int32 todToaReflector:
++
++			Time of Departure / Time of Arrival at the
++			Reflector.
++
++		:byte packetAntenna:
++
++		:array{int32} packetPct1:
++
++			In-phase/quadrature sample pair, as
++			``[i_sample, q_sample]``.
++
++		:array{int32} packetPct2:
++
++			In-phase/quadrature sample pair, as
++			``[i_sample, q_sample]``.
++
++	:dict modeTwoData:
++
++		Present when ``stepMode`` is 2.
++
++		:byte antennaPermutationIndex:
++
++		:array{int32} tonePctIQSamples:
++
++			Interleaved in-phase/quadrature tone samples, as
++			``[i_sample, q_sample, ...]`` — one pair per
++			antenna path.
++
++		:array{byte} toneQualityIndicators:
++
++			One quality indicator byte per antenna path.
++
++	:dict modeThreeData:
++
++		Present when ``stepMode`` is 3. Contains the combined
++		fields of both **modeOneData** and **modeTwoData**.
++
++Properties
++----------
++
++boolean Active [readonly]
++`````````````````````````
++
++Indicates whether a CS distance measurement procedure is currently
++active on this device.
++
++Set to ``true`` when a procedure starts — either because the local
++Initiator called **StartMeasurement** successfully, or because the
++remote Initiator enabled a CS procedure on the local Reflector.
++
++Set to ``false`` when the procedure stops for any reason: the local
++application called **StopMeasurement**, the measurement duration timer
++expired, or the ACL connection was dropped.
++
++This property emits ``PropertiesChanged`` on every transition so that
++clients can track measurement state without polling.
++
++RESOURCES
++=========
++
++http://www.bluez.org
++
++REPORTING BUGS
++==============
++
++linux-bluetooth@vger.kernel.org
 -- 
-2.43.0
 
