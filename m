@@ -1,129 +1,140 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31A2432BC9
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 12:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABAE438474
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 12:19:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784117798; cv=none; b=h8LLwml3DAU+gDJZC7HyLIh/wL/WV7dzZDPLoyDnpTBQywRjEMCDG+V6taq8Ipvj/tqWshjG1b2WBYKGf5FG9wJ4IInXZEoxH20f+wSV7HdCQ2xZCnojW4RTX+eQpGnAQf+QrTbg6faLMS1jC0TUsmz1BXfpETNfjBz83IrfZ4I=
+	t=1784117961; cv=none; b=Ze71ZebAFwu6FoOx+2Ju2ep9ye1ywvjBn8JTqiYDAp0v1GrHEQDxL9aUTWa2H+UIOzUpTBCsVZYvR6XUP0SbO+uYjetbytC4bvR9gXKzCMBwj/oMt3a+veRODnFiArBF3wDn7HeKLbkxqaJ0YhYiuPrh3zMvqbKeaftDJFB8t8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784117798; c=relaxed/simple;
-	bh=Cfq5vJYMPMZEyYH8csDFncwJC2tCF6VnIfqVZToCwMU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Up57heFVPBR7Z0bpglB3UOCjI7I3631Rwo357UQFlA8QHTkOebGtsbxxdMfLOIYVhF273zE4PGvQJc2NJnXFdaWLD4Ditr/GX00Q1UqZ+Xzq1/oLEE/dD8kvFxvQnb6EulebEnH/AKgK6uCoGqhJLjjxt9AY8RMymljyJ3E88+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d74KycAt; arc=none smtp.client-ip=209.85.210.181
+	s=arc-20240116; t=1784117961; c=relaxed/simple;
+	bh=XS+HXdcqVya7QYrEOlwGLsZZLvZJ9zGG/aGa/WrwTMw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=B8mKf0Wp/hoFFFPuPbxEtwbwect7pGl4GY8QoSncn4PXe2RiM1iFZ1uRkabSoY7vFSuCuz0QccI72o4UEtXe4T5ysCOyPKuDzMHfa+eNgNuFqThd05dRLgA2JO3BWoW+GabZXTq4/GHNSwE7UID7GEsgGwEPfJgHP5CkaxtPcvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OfTBMJss; arc=none smtp.client-ip=209.85.216.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d74KycAt"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-8487b7b3fc8so4950719b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 05:16:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OfTBMJss"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-383b4a3755fso1911815a91.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 05:19:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784117795; x=1784722595; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=5EjMm3Pe1hURXTuERE7/aHfs67oTRO5cGbYvCX8GSks=;
-        b=d74KycAtduoGP5TsO34jrT3fE05gL6dspNjIOn9Ybc2SNiHB07/IzZtcmfaL07NiBW
-         9FeBLpjVXt4+/CWo+K4vbdLwQoXp8DJDKIaUP0ZoudbI6Fhpv1ziWMD6FnOXhu1IX9g4
-         nOE2EqN/2oZfEQDOS/y4YyW9Ex82aX8kAM0RyNsvN044TJ7c2zgaH2Tq76vBM9JYGxw7
-         5SsHPQGPSjSg5hnSQCzh8J3PPRo8MEyqQWaF/ZZhWVlPU4K5QDimIfUhAVzcB/ssqWOz
-         /8c5Q+arYS3jtYgoBHEbAPvFwNI1U5Mne3ibxUnxKvhJiYaWKBXjkgffhSSKsVLyQ2tB
-         +S5A==
+        d=gmail.com; s=20251104; t=1784117958; x=1784722758; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=6ULlQ5kzbkrS0EPi6GH/5TN5XrJz4reifXy53xmNR3o=;
+        b=OfTBMJssSGlbRCOVua2pARcyasUFgAMGcij4nYMbizH94NIIRPaPHVCacrzkyJzb27
+         eRRAUMouJ6A2BBGVLOxCWhMe2SDjJXTZ2UeEp6Huqlp8kBSNZzLewsXStdi0SA8udGL1
+         /fKrHDISKms3Bo3LZjQbpkSFtlFn8Gf2inT/J72EbgBcLj1dyP1kUWPEdf0dCU5jPD2W
+         wykIc1XC26crHUOtr8seQdJZK61sOgvYjlmrt0vpkph1dN9VblkAKJ3TvBtOtgB3jq0M
+         Opjr5T1gMXnC9K6+uZO40rnFZ7fdYzXwZAZtyEFoiNXeRSR/tRNYVC/yFIvkL3CxXytI
+         Tc1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784117795; x=1784722595;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=5EjMm3Pe1hURXTuERE7/aHfs67oTRO5cGbYvCX8GSks=;
-        b=SDcPGlGNFWSHY7KJoCaC+YwCY7zgoIzoUZHYwZyJaGlXPrqTxOysuo5S0MrDjkOpuO
-         X7+k9le1SLEjbfufgug64LMeiI4jDJLebIIp5koHTj+2EHX1TXjv9iGb5jPNrr6OesXG
-         jkhH7rhHzl04Sg4+alr7hWN/azIV3rnyFeTJNHcHKUErDRxAVphdFQCvUEiYU4CVIjjx
-         +N3CekxB2sc+Y9wrG6nK9oCPswrHj6gFsYMVicIorvD9lEKx3hU/j9X3tbK5Bld9fEsS
-         RCZo2Q0d7gF8xuXo03sphEzeV4TgEEEFL3VLdrQUeiBdn9bdrJHjcrAzfKkRkR6Ly6br
-         GJjQ==
-X-Gm-Message-State: AOJu0Yx9R9Q9CSrJjKrtpOeMHrPWy3yKlBE0AOJtkVZwzfB54ReYaIqx
-	RELPNwH89ww9Vbt3/7J0o9XYarBVXX8SHYvtEse3wOIiyl9D9N+kDTRY
-X-Gm-Gg: AfdE7ck3KVC1sfEKoaCW7RfYcUd+bRk2VFwkuwPLzkA1QUDoRxOVbXv1jUiRyhDlWaJ
-	N8Uf/kGxa+808nOaGIIVvAtCDPKh5NV3Wd5rSFyOdFPkdiHoYiwOpg4W+c2WPJlJvQBqQFRBxwR
-	EIL9HhtQjiu+BPiC0b6K/tF/CXNnJ3oc+88JsarfPC64BfE0pb5Mge7+Z6PUT0Js8RMhhGCLsrb
-	JQVESzR8v0/PzEvVGEBMw/xNsEbdPARCyOXydDDYyztfXQVS/hNQtlicHVCqudxT0cFn3kKRaWc
-	C2BVJ4n4f+d41+Vnud9vhH9jPTHQNHZxqW04s8XbGnkHs4KmCSJ5gTzkoWuDcCuICkXrAq3lQQv
-	Ko8jhmZ0Per0P9zQ/Fk5TAxncJe1oli0H2UcqaH3qOi48yImPYm+iFY7LXGXVE9fPK5tejwmKDP
-	spi3+zXN33IDU0w5hv4AfZOs9q0/PLqSZigOvhiT5XtgET4IP7BMw+T/Szkakr0W9NbYzXfLuDo
-	dOQsA==
-X-Received: by 2002:a05:6a00:1bc8:b0:848:57f3:8f8f with SMTP id d2e1a72fcca58-84a5162db64mr6653300b3a.51.1784117794637;
-        Wed, 15 Jul 2026 05:16:34 -0700 (PDT)
-Received: from nugod-NUC15CRHU5.tail9f095a.ts.net ([218.237.104.87])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84a4f238901sm3126766b3a.12.2026.07.15.05.16.32
+        d=1e100.net; s=20251104; t=1784117958; x=1784722758;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=6ULlQ5kzbkrS0EPi6GH/5TN5XrJz4reifXy53xmNR3o=;
+        b=gAB790fo4Hy8bpt42t9QT06JFT6RdK1wW8X3xsvRry1HJAeQmhHvLm79JJmua7Y5Gv
+         zbTCu0rSPYD5MD1JiE5y1ofkheJRWKaE9kDyH2g+vWwPzaaOT7ILH+N+zzkndsEFMCu2
+         02ElJzL9UUMxA/z6Aj3I90o/iB+dIObQEnFXohkq/b2Z2q/lGkwIejzCvYqVDA5xfO+1
+         Ve5jHUiphYEo1Eo34hqK4QhugArFsicn/Iy6RdxdI7uzXLKVTMzZeS7jE6uvheVaWrZj
+         OIrMyWspNZYWK/3GVMfvcs+NcEreWy8JT0YYvsSJyP0Bg6QahgbzIiBFR3UkvLzmLLEe
+         fFrw==
+X-Gm-Message-State: AOJu0Ywk5MFyimlnvLGj4HXAQ4mamzxctNpuheHXHD7xrwSA7WNq93jw
+	NDvjnc6/KLVgV6z6IOBYVzfjhD4IvlmARl04gTZYVx+bvmWwtODin5VGzPHEvA==
+X-Gm-Gg: AfdE7clAnMG7G1BRjFKZZqnAYcKv4MFYNPZHDci3gwqW2BKhVaWp1pFKu5u/Erd25k8
+	3brXw3J4KuLd653rQRHslXQ0xT1oWRoOSa5YUus54qTLAdV+B/hBqgWPj2bfAEtd7RbYEwmkMQe
+	pNmzQyHCkPTKyF4puhg2/l5Yc0VjX5ngNuGgZ7Bj5j+C1m+ofroPrrl2/jksNsYtps3AQ5xHWyC
+	Rr/Vb8ymeekyS2ygciSFWtPQoPa3OB/RhLJmHid8lAXH90e1VxoFqibdlzgYfHob2Ug6bIhFDID
+	6ilcyh/416JOf/KyKv7rEPT/D4oz+BQjwExLvJwoWkaylp+0Yr2LpT0jqFrzH22Xbz6uXdGktLC
+	xfvT7PSmVvHgv4RW02X0J0vlboP2uYsnvepcd1v0H7/xLXFah+mImMTTI0qAQBtGYm0UTQQ++87
+	UVlhOkzO3bvQ6Q9lQkaCpL
+X-Received: by 2002:a17:90b:590c:b0:37e:1bc4:b6ae with SMTP id 98e67ed59e1d1-38dc73bdd28mr16527861a91.8.1784117958325;
+        Wed, 15 Jul 2026 05:19:18 -0700 (PDT)
+Received: from [172.17.0.2] ([172.185.46.210])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3140e4fc28dsm1224572eec.2.2026.07.15.05.19.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jul 2026 05:16:34 -0700 (PDT)
-From: HyeongJun An <sammiee5311@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	HyeongJun An <sammiee5311@gmail.com>
-Subject: [PATCH] Bluetooth: virtio_bt: avoid OOB read of build info string in virtbt_setup_zephyr()
-Date: Wed, 15 Jul 2026 21:16:28 +0900
-Message-ID: <20260715121628.1590321-1-sammiee5311@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Wed, 15 Jul 2026 05:19:17 -0700 (PDT)
+Message-ID: <6a577ac5.7270d2fd.33a4d0.6532@mx.google.com>
+Date: Wed, 15 Jul 2026 05:19:17 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2325619320776751157=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
+Subject: RE: Bluetooth: btmtk: Add MT7928 support
+In-Reply-To: <20260715112048.1448868-2-chris.lu@mediatek.com>
+References: <20260715112048.1448868-2-chris.lu@mediatek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-virtbt_setup_zephyr() sends the Zephyr vendor command 0xfc08 (Read Build
-Information) and passes the response to bt_dev_info() and hci_set_fw_info()
-as a "%s" string starting at skb->data + 1, without checking the length:
+--===============2325619320776751157==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  bt_dev_info(hdev, "%s", (char *)(skb->data + 1));
-  hci_set_fw_info(hdev, "%s", skb->data + 1);
+This is automated email and please do not reply to this email!
 
-A backend that returns a one-byte response (status only) leaves
-skb->data + 1 past the end of the received data, and the %s walk reads
-adjacent slab memory until it meets a NUL. The same happens when the
-payload is not NUL-terminated within skb->len. The out-of-bounds bytes
-end up in the kernel log and the firmware-info debugfs file.
+Dear submitter,
 
-Print the build-information string with a bounded "%.*s" limited to
-skb->len - 1 instead. This keeps the string readable for well-behaved
-backends while never reading past the received data, and does not fail
-setup, so a backend returning a short or unterminated response keeps
-working.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1128086
 
-This mirrors commit dd068ef04412 ("Bluetooth: bpa10x: avoid OOB read of
-revision string in bpa10x_setup()"), which fixed the identical pattern;
-the virtio backend is likewise treated as untrusted for the receive path.
+---Test result---
 
-Fixes: afd2daa26c7a ("Bluetooth: Add support for virtio transport driver")
-Signed-off-by: HyeongJun An <sammiee5311@gmail.com>
-Assisted-by: Claude:claude-opus-4-8
+Test Summary:
+CheckPatch                    PASS      3.67 seconds
+VerifyFixes                   PASS      0.07 seconds
+VerifySignedoff               PASS      0.15 seconds
+GitLint                       FAIL      1.35 seconds
+SubjectPrefix                 PASS      0.48 seconds
+BuildKernel                   PASS      19.87 seconds
+CheckAllWarning               PASS      22.18 seconds
+CheckSparse                   PASS      21.36 seconds
+BuildKernel32                 PASS      21.82 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      365.28 seconds
+IncrementalBuild              PASS      34.11 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v11,2/7] Bluetooth: btmtk: Add firmware size validation in btmtk_setup_firmware_79xx()
+
+1: T1 Title exceeds max length (87>80): "[v11,2/7] Bluetooth: btmtk: Add firmware size validation in btmtk_setup_firmware_79xx()"
+[v11,3/7] Bluetooth: btmtk: Improve BT firmware logging
+
+14: B1 Line exceeds max length (92>80): "[  212.878783] Bluetooth: hci1: Loading BT firmware: mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin"
+15: B1 Line exceeds max length (93>80): "[  212.889614] Bluetooth: hci1: BT HW ver: 0x7922, SW ver: 0x008a, Build Time: 20260224103448"
+17: B1 Line exceeds max length (115>80): "[  216.048890] Bluetooth: hci1: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported."
+[v11,7/7] Bluetooth: btmtk: Add MT7928 support
+
+28: B1 Line exceeds max length (92>80): "[ 6931.197167] usb 1-3: New USB device found, idVendor=0e8d, idProduct=7935, bcdDevice= 1.00"
+33: B1 Line exceeds max length (97>80): "[ 6931.213478] Bluetooth: hci1: Loading CBMCU firmware: mediatek/mt7928/CBMCU_CODE_MT7935_1_1.bin"
+34: B1 Line exceeds max length (98>80): "[ 6931.215214] Bluetooth: hci1: CBMCU HW ver: 0x7935, SW ver: 0x0000, Build Time: 20260601T161751+"
+36: B1 Line exceeds max length (99>80): "[ 6931.643916] Bluetooth: hci1: Loading BT firmware: mediatek/mt7928/BT_RAM_CODE_MT7935_1_1_hdr.bin"
+37: B1 Line exceeds max length (93>80): "[ 6931.650467] Bluetooth: hci1: BT HW ver: 0x7935, SW ver: 0x0000, Build Time: 20260527000816"
+39: B1 Line exceeds max length (115>80): "[ 6935.039833] Bluetooth: hci1: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported."
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+
+
+https://github.com/bluez/bluetooth-next/pull/443
+
 ---
- drivers/bluetooth/virtio_bt.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
-index 140ab55c9fc5..c20d54088c8c 100644
---- a/drivers/bluetooth/virtio_bt.c
-+++ b/drivers/bluetooth/virtio_bt.c
-@@ -120,9 +120,13 @@ static int virtbt_setup_zephyr(struct hci_dev *hdev)
- 	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
- 
--	bt_dev_info(hdev, "%s", (char *)(skb->data + 1));
-+	/* Bounded print: the backend controls skb->len. */
-+	if (skb->len > 1) {
-+		int len = skb->len - 1;
- 
--	hci_set_fw_info(hdev, "%s", skb->data + 1);
-+		bt_dev_info(hdev, "%.*s", len, (char *)(skb->data + 1));
-+		hci_set_fw_info(hdev, "%.*s", len, skb->data + 1);
-+	}
- 
- 	kfree_skb(skb);
- 	return 0;
--- 
-2.43.0
 
+--===============2325619320776751157==--
