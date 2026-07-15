@@ -1,136 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DFDF448D08
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 12:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 394813C76BE
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 12:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784117250; cv=none; b=hEaGj1HqhJ2g0A4gpLaG0DUNplE1luCIeTBsMteDDkOlk8vRR+TGVFb37vpgEaKxPL67uwFQZ6Mg3egspvtGxUwhYBmCRLxpnrtgIw6TdL4/Du+zuyciLwVaeYqTp5WMW3+cRY5wYrNybZ6w1iXMG0QJwMZYKsGSbBrLCO576bw=
+	t=1784117410; cv=none; b=rIsB37UhSS6rNZBi5GyFTDstJ8e3/+NPmXPHUUstnETFsVMjhZ2QAyRzD6Mdh9C8fO7ycAOwJJlPzii1+2A/U4U8kJvEExgcBPm4JuWCiygoDIxSZinyAp9CEaoZZ2q8R5jwRiGOTa5lKZOPuQKguDj1taUAVTeUcso6xpOh6+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784117250; c=relaxed/simple;
-	bh=f2Zj74TZ4DoqiACSYtc5w8cY4fNh79DTd3mLuz53jr8=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iSfuHKQqTmdmEME6lY8lZEfy2CqRfjvfTk0rlUhDicDd5RaneLDUw0q/C2vPJDeTUfYqQXRAaOfDBti2jn8i3qEIzPdfS7PO+d1Erb+cY3foPOvXTV6+3QLYi/8lCJKstk7IdqCGgkVnf3vXPhYRkK6uw8b6tAmpcfxukBD0DgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g8ts8fDP; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784117410; c=relaxed/simple;
+	bh=Ue8hx++9YxohKyy4QiWyQo55DedY9VeUzq7lm6Sr15A=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=bWZozz0atEPey+ad9sWnJQ5QUEK+bEFuHwJVOp2dzTq4zgtf0ydAhJ6LL3BOf3YdFYJgABcYzn8f2jqQwECpYxO7XXfd0AFdiYuZAfNpsuoO+e7MRQXjZCUKMuEQmkJvndwAjnsfVPgw3Kejs+fO8x8EMMV1YSsbUgN7NpX0M14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sOho7z2d; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g8ts8fDP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A5FE1F0155A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 12:07:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784117248;
-	bh=WKCD7udqW/dT/0NFTWMaszCBVogtz2n64C25G28PPzI=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=g8ts8fDPfeP4aPC4wcsC8csEYsmlfO9W55RW7E+28seh+twc4ka/lYw4hfsfDzqoL
-	 KnPMsLyiPUWAthLbF28u3T77KAMt/7h2e1Bvpv3QQEbBlPMRH2IH08iYX+1TiNCb+N
-	 xdP5RFHIXeNlvRieT6iU0iQqnyTmPR/58lgRXx/T3uef1Bro6FLeYnjt8WjpO8sjis
-	 +tF/t/vRCi6qviGJ28NvyU+rkJ22Az3x4vRrT/WlPJMA+h+5Lp7UUH4FTnVP1/5Qhh
-	 LZzDJ5Zis4XciF9fqLZzt16VKYXsdC961v/sL6O2nX1zQ6GsWW+BMSvV+p4AmpMYK4
-	 0vnQP4LZmyrJw==
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-39c8e65e3f5so50038051fa.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 05:07:28 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rqsc9GcX/m/b+V+qg+wSYr/BOljXkG6EZ64GIZm8l9YtxFg6vWNRiGLCzWl+y/4NBEWKCK/D5uCOt7nzhn6VEE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+bVrDd27JHDNdmxxJjO+zeKs01wohV50KtHENGSt+jiEez7On
-	mqdtAa8eK2+d5MAsxI3w5IPvPIFXd0zLX8+Ub75DCpc0+os3ttWLA0jcxb0Z7I2kcBFaIcsfGZO
-	f5COmJTukaNWuIIQvxSEANCUHpQ+Z82KOkIIyxMvMMg==
-X-Received: by 2002:a05:6512:3ca1:b0:5ae:bb4b:9357 with SMTP id
- 2adb3069b0e04-5b159b76543mr1504606e87.27.1784117246567; Wed, 15 Jul 2026
- 05:07:26 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 15 Jul 2026 05:07:24 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 15 Jul 2026 05:07:24 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260703-block-as-nvmem-v8-4-98ae32bfc49a@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sOho7z2d"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B8659C2BCB7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jul 2026 12:10:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1784117409;
+	bh=Ue8hx++9YxohKyy4QiWyQo55DedY9VeUzq7lm6Sr15A=;
+	h=From:To:Subject:Date:From;
+	b=sOho7z2dqrCV5qyBACqeoXudSu/YRaGDgMu4dWQVf/eE5zgwZ+B5u+RvQXNr90rVE
+	 lgAXw4a1PoEsG59sKNhnFeQGrL2kER9EOJIQ4u3kbJ93q4H3ZCYsbrPeWZM1brEWUd
+	 SCedNuMzfYo/RQ0yK4PhLkjfNLZ2AK6ELeqN6zJrp0izBFgZeyOra4LqvToozM7DNw
+	 V0hwATYVPKnZbhuEz1FwYNG2WnWBnN2VE7iPUEbbTIDCm23Ylu9AQmLr7K22eq0imP
+	 qNsg4CTn3at2mdQ69BDmRME2mTWHCbQKnsd2+ocWQ4IPWhJA+fNJ4Zd4nfaeO+plGC
+	 UZ9U1RC4lhejQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id A1487C433E1; Wed, 15 Jul 2026 12:10:09 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 221754] New: RTL8852BE Bluetooth (0bda:b853) fails to init:
+ Opcode 0xfcf0 failed: -16, hci0 never registers with mgmt (BD Address
+ 00:00:00:00:00:00)
+Date: Wed, 15 Jul 2026 12:10:09 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: serge.brun@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-221754-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260703-block-as-nvmem-v8-0-98ae32bfc49a@oss.qualcomm.com> <20260703-block-as-nvmem-v8-4-98ae32bfc49a@oss.qualcomm.com>
-Date: Wed, 15 Jul 2026 05:07:24 -0700
-X-Gmail-Original-Message-ID: <CAMRc=MdNehSRQT3MUs+QtbZsHcUCS8YjyZchTgHCVv-HaLQkeA@mail.gmail.com>
-X-Gm-Features: AUfX_mzq1KbXpXfl_bzC2i2_CZOvOZaRAVu5gjRfir9Gou3fViKyrxWRMFDDFs8
-Message-ID: <CAMRc=MdNehSRQT3MUs+QtbZsHcUCS8YjyZchTgHCVv-HaLQkeA@mail.gmail.com>
-Subject: Re: [PATCH v8 4/9] nvmem: layouts: Support fixed-layout as the nvmem
- device node itself
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, daniel@makrotopia.org, Ulf Hansson <ulfh@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Saravana Kannan <saravanak@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 3 Jul 2026 15:45:17 +0200, Loic Poulain
-<loic.poulain@oss.qualcomm.com> said:
-> of_nvmem_layout_get_container() only looks for a child node named
-> "nvmem-layout" to locate the cell definitions. This does not cover
-> providers whose device tree node is itself the fixed-layout container,
-> such as an eMMC boot partition block device whose fwnode points directly
-> at a "fixed-layout" compatible partitions node.
->
-> When no "nvmem-layout" child is present, fall back to returning the nvmem
-> device node itself if it is compatible with "fixed-layout", so that its
-> cells are parsed by nvmem_add_cells_from_fixed_layout().
->
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> ---
->  drivers/nvmem/layouts.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/nvmem/layouts.c b/drivers/nvmem/layouts.c
-> index b90584e1b99eab4217cbe7ec48373e18a7caf0dc..efa631ce7283bdd6c8ecda75915911b5e3a33c99 100644
-> --- a/drivers/nvmem/layouts.c
-> +++ b/drivers/nvmem/layouts.c
-> @@ -167,7 +167,18 @@ static int nvmem_layout_bus_populate(struct nvmem_device *nvmem,
->
->  struct device_node *of_nvmem_layout_get_container(struct nvmem_device *nvmem)
->  {
-> -	return of_get_child_by_name(nvmem->dev.of_node, "nvmem-layout");
-> +	struct device_node *np;
-> +
-> +	/* Search for nvmem-layout child */
-> +	np = of_get_child_by_name(nvmem->dev.of_node, "nvmem-layout");
-> +	if (np)
-> +		return np;
-> +
-> +	/* The nvmem of_node is itself a fixed-layout node */
-> +	if (of_device_is_compatible(nvmem->dev.of_node, "fixed-layout"))
-> +		return of_node_get(nvmem->dev.of_node);
-> +
-> +	return NULL;
->  }
->  EXPORT_SYMBOL_GPL(of_nvmem_layout_get_container);
->
->
-> --
-> 2.34.1
->
->
+https://bugzilla.kernel.org/show_bug.cgi?id=3D221754
 
-I have it on my TODO list to convert nvmem layouts to be fwnode-agnostic. While
-I'm not sure when I'll have the time to look into it, I think it makes sense
-to not introduce any new OF-specific interfaces. Can you make it into:
+            Bug ID: 221754
+           Summary: RTL8852BE Bluetooth (0bda:b853) fails to init: Opcode
+                    0xfcf0 failed: -16, hci0 never registers with mgmt (BD
+                    Address 00:00:00:00:00:00)
+           Product: Drivers
+           Version: 2.5
+          Hardware: AMD
+                OS: Linux
+            Status: NEW
+          Severity: blocking
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: serge.brun@gmail.com
+        Regression: No
 
-  struct fwnode_handle *nvmem_layout_get_container_node(struct
-nvmem_device *nvmem);
+Full bug report for Realtek RTL8852BE internal Bluetooth failing to initial=
+ize
+on
+Lenovo IdeaPad Pro 5 14AGP11 (Ubuntu 26.04, kernel 7.0.0-27-generic). Inclu=
+des
+dmesg output, hciconfig/btmgmt/rfkill output, and a list of all troubleshoo=
+ting
+steps already attempted (driver reload, USB rebind, firmware replacement, D=
+KMS
+rebuild, manual BD address assignment) =E2=80=94 all reproducing the identi=
+cal
+Opcode 0xfcf0 / -EBUSY failure.
 
-by replacing of_get_child_by_name() with fwnode_get_name_child_node() and
-of_device_is_compatible() with device_is_compatible()? That would mean less
-churn in the future.
+--=20
+You may reply to this email to add a comment.
 
-Other than that, it looks good.
-
-Bart
+You are receiving this mail because:
+You are the assignee for the bug.=
