@@ -1,213 +1,159 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3862940D570
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 11:00:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FCA43F23BD;
+	Thu, 16 Jul 2026 11:24:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784199626; cv=none; b=ea20iAkKMpQbVzarvJ7SeGmOK6S6/QCMKvGwQpbCyWjQXYKAcz9/gD21UWdT/hRy58NlO7DHH2dFsa6lRDeErbhw8FipUza7FdZK6zVZ/FkZnqEgPDe3rLB0KbdJ2Jooc88EAoaWtEzpL2HKc56SwuSIOy83YNcUOpER6NKaGpY=
+	t=1784201045; cv=none; b=cMC1QFlL+xdorRwyydTdh/DY4afHRsBaCPB/W88X4ScHdnVcjrezgATJQmw7QHveYKR6fSbYyWiA8aSalcAutbCSkHwOCCoR70ZLlyDr89vXl7SMJ1tp/1a2eZ6rt0yvgdfZSAuUCVta3FKdpzGJU+jonKd3nplBHUvyeAQcKJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784199626; c=relaxed/simple;
-	bh=UzZTsTOucqfC1Ql4QPY47lE0WAeSIgaWW77lyYd+TiQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=KV0rIYr58znLChvpQ9BqMgwbS0ilSpB5BXxFa4F81bgjA/JoShvu6xfL5kQL83A9cIfLsZ/tfksl4N/uOhN1GZUW5R6z+HfSVsG4F7vzA14FXX4adplVAfONgJswu2ycNeWUn+g/wh+B6h0n58baQ+TYab2gCfNCvLuyeh2Rf2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qEh1tlOF; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1784201045; c=relaxed/simple;
+	bh=YKap3/vGxMXHuEqWG0FqQnF2Bd85ZflBYQrpmSS1kn0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kK0b4Kn2qnHu+5/wdMUye68D1w4IkLegOMr/0yjk6GkW4fC4k1DwX7ge6drf0UR7eU2zUQGz6wSb98p9DtruZvDTqoIqrqQOxBum9UiCMqdv8pLBkWj93UH1f7e+7np2HBhSmXPnIxNBMU/C0uMxj1n6J5JZkpTjikpU702Qy1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=orRzJIwa; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qEh1tlOF"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-8ef7b7651ecso813476d6.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 04:00:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784199624; x=1784804424; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=UzZTsTOucqfC1Ql4QPY47lE0WAeSIgaWW77lyYd+TiQ=;
-        b=qEh1tlOF8/lsgtjK86A7nv9Cgve/t8VN5t/IV2oGeG1Yj1benk0/rMQE4xFpuMY5N0
-         7Vyyyi4M9BxK0bO8w7gn7h07vn0HcnjLM74zpK0rRT1uWI5+Id8wnIzfzLuHUFGLw6qx
-         VWpXPm+lIjfwhsTyqQeuicS5RS4r4cMitRKiymYqnqB27cOSe3FW6ME05mB0lI1rr8uL
-         XBwQrXYPS+dXPBcghYpEkmjO+Kl9V3JyzP6NCIkcf3AOHawSXM2R/7nQsCqevbczr/PX
-         e0hzV0nB2CXAos5279elvmorVKi6ANYfjgvU9dwg5W//9BW8SR06Ct1nhVX2gm94Gg3B
-         8DUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784199624; x=1784804424;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=UzZTsTOucqfC1Ql4QPY47lE0WAeSIgaWW77lyYd+TiQ=;
-        b=LNw3EvDOLYpSAsMJa23pQg5eUzPkR119XRR4PmVwrTf/SZqnuUUCyOu5tMFzR0fj6N
-         R6Z3/8XNL6QELuuOdN/6nvjvNyCs2leEzwNN8BGNXtuF7jRjZFzDeNzkO0i0nsTsq4Ra
-         PsjQi1097aNsKQCW0WMmgdaIsCBvgZzJZ0jLsHuMCTPvz6aPrAkOT2hAXcOuos42zyOE
-         fsBAQyC+CRk8z8oDfeqULxJ0yuE66wkio5G/Ah0datzvgGgoS2eANMFe2assUfEXZBgG
-         WgLSUOINK4RzZ52MCPpoJW+6/SQz/LApWxG68gBLSudjjNLHgrD2c8lOOtvy18GLXNwZ
-         q5Yg==
-X-Gm-Message-State: AOJu0Yw7VoaxQuDfmy3avJP7qgV+0GPO57W8cvDBlbdgngMdisFW2BCr
-	l+c31MGeegNa5hNrhZs1Xd011Ts3MbErQjs0zs/9TUXA2WkWuYbAtcOhnfYIjA==
-X-Gm-Gg: AfdE7clkQOYMzDw30iPlTbVocHchMFLEKwvrtkxWgAhKrveQuBIj6xvqbClkOHFVCBB
-	qrS733ih36ZyIkC4Y7oLXDaXeG0eWn21prVHyoz48Ux7i7NuMJxNhzt0yTaIq6OWibb2ELBYP+E
-	ZxS5DDP3Yz/MDy1XCFBXCWxdWR/qiUUm33lD/HQzFJFO7hmA0CJxEVitVIwMGPeKUOYjaIo+62O
-	L0eZPWtixRSsdtTS343ZqaYlf5vcmWUDIL43e6vBl3qjI7A3M6bJAK4yUq6mf/o/UcR2y4wbpZ/
-	BMpjh1WKfDtF0GtewGm3Ut+QBmmhlINpHKTBcv5Z/e2J4/NBx2N3zJ95Yd7UIArNv23kEEPZQuH
-	zQVlIMF8wD3t9Tmnz/M87SAGhkgXydhqnN3VEHLD5G76Pl7EX2mMO3swtfItu4oSkILPXker4py
-	imJQMBkZdQbsRd4krCDZ8=
-X-Received: by 2002:a05:622a:50c:b0:516:82e2:7788 with SMTP id d75a77b69052e-51fbeeb3148mr17686041cf.1.1784199623701;
-        Thu, 16 Jul 2026 04:00:23 -0700 (PDT)
-Received: from [172.17.0.2] ([20.109.92.214])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90749b913absm78041096d6.10.2026.07.16.04.00.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jul 2026 04:00:23 -0700 (PDT)
-Message-ID: <6a58b9c7.a40fb949.1d2f56.2336@mx.google.com>
-Date: Thu, 16 Jul 2026 04:00:23 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2978535741602096698=="
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="orRzJIwa"
+X-UUID: d5ae5aa4810811f1b1788b6acf885367-20260716
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=NrLmXw2+grSg8BDLzNZP31Z2rCqGp6CpomTh+kmD5Sk=;
+	b=orRzJIwaPxwfrAXW/bpuKouCrlHXkN8obXjIV04nNvG1u867udZqmR7TgX1Ry+w0FvUoLa+tbFHLwH3B/EhQvrQSy9cNonrydRSPf8Lu6ps0EFQKIN8qNsNDoYywYllPfXxnaVwH5F6Vd6lll61AlgrlHncKpqxeui5mT/EHWVE=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.18,REQID:35ff0a52-1822-4c1d-bfbe-b23d2df5aa41,IP:0,U
+	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:-25
+X-CID-META: VersionHash:8a735a6,CLOUDID:f70d8d5f-762a-4584-baab-4eebe609beea,B
+	ulkID:nil,BulkQuantity:0,SF:81|82|102|836|865|888|898,TC:-5,Content:0|15|5
+	0|99|200|213,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:
+	0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: d5ae5aa4810811f1b1788b6acf885367-20260716
+Received: from mtkmbs09n1.mediatek.inc [(172.21.101.35)] by mailgw01.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 258385921; Thu, 16 Jul 2026 19:23:56 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Thu, 16 Jul 2026 19:23:55 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.2562.29 via Frontend Transport; Thu, 16 Jul 2026 19:23:55 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
+	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>, Paul Menzel
+	<pmenzel@molgen.mpg.de>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH v13 2/7] Bluetooth: btmtk: Add firmware size validation in btmtk_setup_firmware_79xx()
+Date: Thu, 16 Jul 2026 19:23:47 +0800
+Message-ID: <20260716112353.2192865-3-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20260716112353.2192865-1-chris.lu@mediatek.com>
+References: <20260716112353.2192865-1-chris.lu@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chengyi.zhao@qq.com
-Subject: RE: policy: Connect profiles for bonded inbound ACL connections
-In-Reply-To: <tencent_3E2A052E7982856EDEFA3F608C72C2C8AF05@qq.com>
-References: <tencent_3E2A052E7982856EDEFA3F608C72C2C8AF05@qq.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
---===============2978535741602096698==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Add firmware size validation to prevent out-of-bounds access when loading
+truncated or malicious firmware files.
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTEyODcxNAoKLS0t
-VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
-ICAgRkFJTCAgICAgIDAuNjEgc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBQ
-QVNTICAgICAgMC4zMyBzZWNvbmRzCkJ1aWxkRWxsICAgICAgICAgICAgICAgICAgICAgIFBBU1Mg
-ICAgICAyMC41MyBzZWNvbmRzCkJsdWV6TWFrZSAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAg
-ICA1MTguMjYgc2Vjb25kcwpDaGVja1NtYXRjaCAgICAgICAgICAgICAgICAgICBQQVNTICAgICAg
-Mjk1LjU2IHNlY29uZHMKYmx1ZXptYWtlZXh0ZWxsICAgICAgICAgICAgICAgUEFTUyAgICAgIDk1
-LjU3IHNlY29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgRkFJTCAgICAgIDQ5MC4w
-NSBzZWNvbmRzClNjYW5CdWlsZCAgICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICA4OTcuNzYg
-c2Vjb25kcwoKRGV0YWlscwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hl
-Y2tQYXRjaCAtIEZBSUwKRGVzYzogUnVuIGNoZWNrcGF0Y2gucGwgc2NyaXB0Ck91dHB1dDoKcG9s
-aWN5OiBDb25uZWN0IHByb2ZpbGVzIGZvciBib25kZWQgaW5ib3VuZCBBQ0wgY29ubmVjdGlvbnMK
-RVJST1I6SU5JVElBTElTRURfU1RBVElDOiBkbyBub3QgaW5pdGlhbGlzZSBzdGF0aWNzIHRvIE5V
-TEwKIzI4MjogRklMRTogc3JjL2FkYXB0ZXIuYzoxNzA6CitzdGF0aWMgR1NMaXN0ICpjb25uZWN0
-X2xpc3QgPSBOVUxMOwoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3BhdGNoLzE0NjkwNjQ3LnBhdGNo
-IHRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjE1IGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZv
-ciBzb21lIG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRv
-CiAgICAgIG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0t
-Zml4IG9yIC0tZml4LWlucGxhY2UuCgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvcGF0Y2gvMTQ2OTA2
-NDcucGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LgoKTk9URTogSWdub3Jl
-ZCBtZXNzYWdlIHR5cGVzOiBDT01NSVRfTUVTU0FHRSBDT01QTEVYX01BQ1JPIENPTlNUX1NUUlVD
-VCBGSUxFX1BBVEhfQ0hBTkdFUyBNSVNTSU5HX1NJR05fT0ZGIFBSRUZFUl9QQUNLRUQgU1BEWF9M
-SUNFTlNFX1RBRyBTUExJVF9TVFJJTkcgU1NDQU5GX1RPX0tTVFJUTwoKTk9URTogSWYgYW55IG9m
-IHRoZSBlcnJvcnMgYXJlIGZhbHNlIHBvc2l0aXZlcywgcGxlYXNlIHJlcG9ydAogICAgICB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUgQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCgojIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQmx1ZXpNYWtlIC0gRkFJTApEZXNjOiBC
-dWlsZCBCbHVlWgpPdXRwdXQ6Cgp0b29scy9tZ210LXRlc3Rlci5jOiBJbiBmdW5jdGlvbiDigJht
-YWlu4oCZOgp0b29scy9tZ210LXRlc3Rlci5jOjEyOTkwOjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNr
-aW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1hc3NpZ25tZW50
-c+KAmSwgcmV0cnlpbmcgd2l0aG91dAoxMjk5MCB8IGludCBtYWluKGludCBhcmdjLCBjaGFyICph
-cmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0LWF2ZHRwLmM6IEluIGZ1bmN0aW9uIOKA
-mG1haW7igJk6CnVuaXQvdGVzdC1hdmR0cC5jOjc2Njo1OiBub3RlOiB2YXJpYWJsZSB0cmFja2lu
-ZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVudHPi
-gJksIHJldHJ5aW5nIHdpdGhvdXQKICA3NjYgfCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJn
-dltdKQogICAgICB8ICAgICBefn5+CnVuaXQvdGVzdC1hdnJjcC5jOiBJbiBmdW5jdGlvbiDigJht
-YWlu4oCZOgp1bml0L3Rlc3QtYXZyY3AuYzo5ODk6NTogbm90ZTogdmFyaWFibGUgdHJhY2tpbmcg
-c2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZ
-LCByZXRyeWluZyB3aXRob3V0CiAgOTg5IHwgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3Zb
-XSkKICAgICAgfCAgICAgXn5+fgptb25pdG9yL3BhY2tldC5jOiBJbiBmdW5jdGlvbiDigJhwcmlu
-dF9mZWF0dXJlc19zdWJwYWdl4oCZOgptb25pdG9yL3BhY2tldC5jOjI5NDA6Mjk6IGVycm9yOiDi
-gJgldeKAmSBkaXJlY3RpdmUgd3JpdGluZyBiZXR3ZWVuIDEgYW5kIDEwIGJ5dGVzIGludG8gYSBy
-ZWdpb24gb2Ygc2l6ZSBiZXR3ZWVuIDUgYW5kIDcgWy1XZXJyb3I9Zm9ybWF0LW92ZXJmbG93PV0K
-IDI5NDAgfCAgIHNwcmludGYoc3RyLCAiRmVhdHVyZXNbJXUvJXVdIiwgcGFnZSwgaSk7CiAgICAg
-IHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+Cm1vbml0b3IvcGFja2V0LmM6Mjk0MDox
-Njogbm90ZTogZGlyZWN0aXZlIGFyZ3VtZW50IGluIHRoZSByYW5nZSBbMCwgMjE0NzQ4MzY0Nl0K
-IDI5NDAgfCAgIHNwcmludGYoc3RyLCAiRmVhdHVyZXNbJXUvJXVdIiwgcGFnZSwgaSk7CiAgICAg
-IHwgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9t
-IC91c3IvaW5jbHVkZS9zdGRpby5oOjg2NywKICAgICAgICAgICAgICAgICBmcm9tIG1vbml0b3Iv
-cGFja2V0LmM6MTg6Ci91c3IvaW5jbHVkZS94ODZfNjQtbGludXgtZ251L2JpdHMvc3RkaW8yLmg6
-MzY6MTA6IG5vdGU6IOKAmF9fYnVpbHRpbl9fX3NwcmludGZfY2hr4oCZIG91dHB1dCBiZXR3ZWVu
-IDE0IGFuZCAyNSBieXRlcyBpbnRvIGEgZGVzdGluYXRpb24gb2Ygc2l6ZSAxOAogICAzNiB8ICAg
-cmV0dXJuIF9fYnVpbHRpbl9fX3NwcmludGZfY2hrIChfX3MsIF9fVVNFX0ZPUlRJRllfTEVWRUwg
-LSAxLAogICAgICB8ICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fgogICAzNyB8ICAgICAgIF9fYm9zIChfX3MpLCBfX2ZtdCwgX192
-YV9hcmdfcGFjayAoKSk7CiAgICAgIHwgICAgICAgfn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtl
-WzFdOiAqKiogW01ha2VmaWxlOjcwNjA6IG1vbml0b3IvcGFja2V0Lm9dIEVycm9yIDEKbWFrZVsx
-XTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmls
-ZTo0MTc0OiBhbGxdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6
-IEluY3JlbWVudGFsQnVpbGQgLSBGQUlMCkRlc2M6IEluY3JlbWVudGFsIGJ1aWxkIHdpdGggdGhl
-IHBhdGNoZXMgaW4gdGhlIHNlcmllcwpPdXRwdXQ6Cgp0b29scy9tZ210LXRlc3Rlci5jOiBJbiBm
-dW5jdGlvbiDigJhtYWlu4oCZOgp0b29scy9tZ210LXRlc3Rlci5jOjEyOTkwOjU6IG5vdGU6IHZh
-cmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2lu
-Zy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAoxMjk5MCB8IGludCBtYWluKGludCBh
-cmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0LWF2ZHRwLmM6IElu
-IGZ1bmN0aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdmR0cC5jOjc2Njo1OiBub3RlOiB2YXJp
-YWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmct
-YXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA3NjYgfCBpbnQgbWFpbihpbnQgYXJn
-YywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnVuaXQvdGVzdC1hdnJjcC5jOiBJbiBm
-dW5jdGlvbiDigJhtYWlu4oCZOgp1bml0L3Rlc3QtYXZyY3AuYzo5ODk6NTogbm90ZTogdmFyaWFi
-bGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNraW5nLWFz
-c2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CiAgOTg5IHwgaW50IG1haW4oaW50IGFyZ2Ms
-IGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgptb25pdG9yL3BhY2tldC5jOiBJbiBmdW5j
-dGlvbiDigJhwcmludF9mZWF0dXJlc19zdWJwYWdl4oCZOgptb25pdG9yL3BhY2tldC5jOjI5NDA6
-Mjk6IGVycm9yOiDigJgldeKAmSBkaXJlY3RpdmUgd3JpdGluZyBiZXR3ZWVuIDEgYW5kIDEwIGJ5
-dGVzIGludG8gYSByZWdpb24gb2Ygc2l6ZSBiZXR3ZWVuIDUgYW5kIDcgWy1XZXJyb3I9Zm9ybWF0
-LW92ZXJmbG93PV0KIDI5NDAgfCAgIHNwcmludGYoc3RyLCAiRmVhdHVyZXNbJXUvJXVdIiwgcGFn
-ZSwgaSk7CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+Cm1vbml0b3IvcGFj
-a2V0LmM6Mjk0MDoxNjogbm90ZTogZGlyZWN0aXZlIGFyZ3VtZW50IGluIHRoZSByYW5nZSBbMCwg
-MjE0NzQ4MzY0Nl0KIDI5NDAgfCAgIHNwcmludGYoc3RyLCAiRmVhdHVyZXNbJXUvJXVdIiwgcGFn
-ZSwgaSk7CiAgICAgIHwgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBp
-bmNsdWRlZCBmcm9tIC91c3IvaW5jbHVkZS9zdGRpby5oOjg2NywKICAgICAgICAgICAgICAgICBm
-cm9tIG1vbml0b3IvcGFja2V0LmM6MTg6Ci91c3IvaW5jbHVkZS94ODZfNjQtbGludXgtZ251L2Jp
-dHMvc3RkaW8yLmg6MzY6MTA6IG5vdGU6IOKAmF9fYnVpbHRpbl9fX3NwcmludGZfY2hr4oCZIG91
-dHB1dCBiZXR3ZWVuIDE0IGFuZCAyNSBieXRlcyBpbnRvIGEgZGVzdGluYXRpb24gb2Ygc2l6ZSAx
-OAogICAzNiB8ICAgcmV0dXJuIF9fYnVpbHRpbl9fX3NwcmludGZfY2hrIChfX3MsIF9fVVNFX0ZP
-UlRJRllfTEVWRUwgLSAxLAogICAgICB8ICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAzNyB8ICAgICAgIF9fYm9zIChfX3Mp
-LCBfX2ZtdCwgX192YV9hcmdfcGFjayAoKSk7CiAgICAgIHwgICAgICAgfn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFz
-IGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjcwNjA6IG1vbml0b3IvcGFja2V0Lm9dIEVy
-cm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTog
-KioqIFtNYWtlZmlsZTo0MTc0OiBhbGxdIEVycm9yIDIKcG9saWN5OiBDb25uZWN0IHByb2ZpbGVz
-IGZvciBib25kZWQgaW5ib3VuZCBBQ0wgY29ubmVjdGlvbnMKCnRvb2xzL21nbXQtdGVzdGVyLmM6
-IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnRvb2xzL21nbXQtdGVzdGVyLmM6MTI5OTA6NTogbm90
-ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRy
-YWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CjEyOTkwIHwgaW50IG1haW4o
-aW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rlc3QtYXZkdHAu
-YzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2ZHRwLmM6NzY2OjU6IG5vdGU6
-IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFj
-a2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDc2NiB8IGludCBtYWluKGlu
-dCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0LWF2cmNwLmM6
-IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdnJjcC5jOjk4OTo1OiBub3RlOiB2
-YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tp
-bmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA5ODkgfCBpbnQgbWFpbihpbnQg
-YXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+Cm1vbml0b3IvcGFja2V0LmM6IElu
-IGZ1bmN0aW9uIOKAmHByaW50X2ZlYXR1cmVzX3N1YnBhZ2XigJk6Cm1vbml0b3IvcGFja2V0LmM6
-Mjk0MDoyOTogZXJyb3I6IOKAmCV14oCZIGRpcmVjdGl2ZSB3cml0aW5nIGJldHdlZW4gMSBhbmQg
-MTAgYnl0ZXMgaW50byBhIHJlZ2lvbiBvZiBzaXplIGJldHdlZW4gNSBhbmQgNyBbLVdlcnJvcj1m
-b3JtYXQtb3ZlcmZsb3c9XQogMjk0MCB8ICAgc3ByaW50ZihzdHIsICJGZWF0dXJlc1sldS8ldV0i
-LCBwYWdlLCBpKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn4KbW9uaXRv
-ci9wYWNrZXQuYzoyOTQwOjE2OiBub3RlOiBkaXJlY3RpdmUgYXJndW1lbnQgaW4gdGhlIHJhbmdl
-IFswLCAyMTQ3NDgzNjQ2XQogMjk0MCB8ICAgc3ByaW50ZihzdHIsICJGZWF0dXJlc1sldS8ldV0i
-LCBwYWdlLCBpKTsKICAgICAgfCAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fgpJbiBm
-aWxlIGluY2x1ZGVkIGZyb20gL3Vzci9pbmNsdWRlL3N0ZGlvLmg6ODY3LAogICAgICAgICAgICAg
-ICAgIGZyb20gbW9uaXRvci9wYWNrZXQuYzoxODoKL3Vzci9pbmNsdWRlL3g4Nl82NC1saW51eC1n
-bnUvYml0cy9zdGRpbzIuaDozNjoxMDogbm90ZTog4oCYX19idWlsdGluX19fc3ByaW50Zl9jaGvi
-gJkgb3V0cHV0IGJldHdlZW4gMTQgYW5kIDI1IGJ5dGVzIGludG8gYSBkZXN0aW5hdGlvbiBvZiBz
-aXplIDE4CiAgIDM2IHwgICByZXR1cm4gX19idWlsdGluX19fc3ByaW50Zl9jaGsgKF9fcywgX19V
-U0VfRk9SVElGWV9MRVZFTCAtIDEsCiAgICAgIHwgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgIDM3IHwgICAgICAgX19ib3Mg
-KF9fcyksIF9fZm10LCBfX3ZhX2FyZ19wYWNrICgpKTsKICAgICAgfCAgICAgICB+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0
-ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6NzA2MDogbW9uaXRvci9wYWNrZXQu
-b10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpt
-YWtlOiAqKiogW01ha2VmaWxlOjQxNzQ6IGFsbF0gRXJyb3IgMgoKCmh0dHBzOi8vZ2l0aHViLmNv
-bS9ibHVlei9ibHVlei9wdWxsLzIzMTkKCi0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgKCg==
+Add three levels of validation:
+1. Minimum size check for header and global descriptor
+2. Section map bounds check with integer overflow protection using
+   check_mul_overflow() and check_add_overflow()
+3. Section data bounds check before accessing each section
 
---===============2978535741602096698==--
+This matches the validation approach used in btmtk_load_cbmcu_firmware().
+
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+Assisted-by: Claude:Sonnet-4.5
+---
+ drivers/bluetooth/btmtk.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
+
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index 02a96342e964..3491060b3ae9 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -145,6 +145,7 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
+ 	int err, dlen, i, status;
+ 	u8 flag, first_block, retry;
+ 	u32 section_num, dl_size, section_offset;
++	size_t expected_size;
+ 	u8 cmd[64];
+ 
+ 	err = request_firmware(&fw, fwname, &hdev->dev);
+@@ -153,12 +154,40 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
+ 		return err;
+ 	}
+ 
++	/* Validate minimum firmware size for header and global descriptor */
++	if (fw->size < MTK_FW_ROM_PATCH_HEADER_SIZE + MTK_FW_ROM_PATCH_GD_SIZE) {
++		bt_dev_err(hdev, "Firmware file too small: size=%zu, expected at least %u bytes",
++			   fw->size, MTK_FW_ROM_PATCH_HEADER_SIZE + MTK_FW_ROM_PATCH_GD_SIZE);
++		err = -EINVAL;
++		goto err_release_fw;
++	}
++
+ 	fw_ptr = fw->data;
+ 	fw_bin_ptr = fw_ptr;
+ 	hdr = (struct btmtk_patch_header *)fw_ptr;
+ 	globaldesc = (struct btmtk_global_desc *)(fw_ptr + MTK_FW_ROM_PATCH_HEADER_SIZE);
+ 	section_num = le32_to_cpu(globaldesc->section_num);
+ 
++	/* Check for potential integer overflow in size calculation */
++	if (check_mul_overflow((size_t)MTK_FW_ROM_PATCH_SEC_MAP_SIZE,
++			       (size_t)section_num, &expected_size) ||
++	    check_add_overflow(expected_size,
++			       (size_t)(MTK_FW_ROM_PATCH_HEADER_SIZE +
++					MTK_FW_ROM_PATCH_GD_SIZE),
++			       &expected_size)) {
++		bt_dev_err(hdev, "Firmware size calculation overflow (section_num=%u)",
++			   section_num);
++		err = -EINVAL;
++		goto err_release_fw;
++	}
++
++	if (fw->size < expected_size) {
++		bt_dev_err(hdev, "Firmware truncated: size=%zu, expected=%zu (section_num=%u)",
++			   fw->size, expected_size, section_num);
++		err = -EINVAL;
++		goto err_release_fw;
++	}
++
+ 	bt_dev_info(hdev, "HW/SW Version: 0x%04x%04x, Build Time: %s",
+ 		    le16_to_cpu(hdr->hwver), le16_to_cpu(hdr->swver), hdr->datetime);
+ 
+@@ -171,6 +200,16 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
+ 		section_offset = le32_to_cpu(sectionmap->secoffset);
+ 		dl_size = le32_to_cpu(sectionmap->bin_info_spec.dlsize);
+ 
++		/* Validate section boundaries to prevent out-of-bounds access */
++		if (dl_size > 0 &&
++		    (section_offset > fw->size ||
++		     dl_size > fw->size - section_offset)) {
++			bt_dev_err(hdev, "Section %d out of bounds: offset=%u, size=%u, fw_size=%zu",
++				   i, section_offset, dl_size, fw->size);
++			err = -EINVAL;
++			goto err_release_fw;
++		}
++
+ 		/* MT6639: only download sections where dlmode byte0 == 0x01,
+ 		 * matching the Windows driver behavior which skips WiFi/other
+ 		 * sections that would cause the chip to hang.
+-- 
+2.45.2
+
