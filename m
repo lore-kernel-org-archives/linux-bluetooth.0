@@ -1,190 +1,332 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from out162-62-57-137.mail.qq.com (out162-62-57-137.mail.qq.com [162.62.57.137])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650533F7898
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 09:35:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.180.131
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784194539; cv=fail; b=c0ooNSwuTbdhtuH3/uH/pLEW3o/+NiOBQLvUvUUram4Z5UG+KSClUa4UOqOzNkyPjlRLtYdAGlrqXbhDKSyRM0iqPVmSBmxNYDSO/ZSk2RuD0YXA86N5S92b3KdPK+P1eGmz9WVSgqe8vtQ30ccpJZOqHGuQpW5kvK4DYENhKQY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784194539; c=relaxed/simple;
-	bh=m0HwazGZY7eypKQeLx8j4Nq6lmtQe1QkW3DB7lwfK4Q=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=KUvIn/JW5NYXbw+PymBsRJyeR9XX8mnOFDXJMF/+2eDeA6AIG2pDvUxA+gzlnYYltlulPpspuQrIS/T6Wvy7DYlufGk0YuQa6JkDmrPWNd+lyvJiYCy0JgF/gO1DX0UAiV9Tge8KewOb+Y5xM6FxZVaDrKDiqhNUKx+Pw1l4pto=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qti.qualcomm.com; spf=pass smtp.mailfrom=qti.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=opf1pR8M; arc=fail smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qti.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qti.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5C83CC9E8
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 10:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.137
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784196255; cv=none; b=WMwIt5fMC089+w57tLQ5csvza3zBlbb/1WglZ0ehnLVDjUIBjLL4EgtjDhPCMlPLz5Rrs9s/bP2pKpYp85e/1UKSEuLqifoxhMT4QZqUnZcoNAxpIVq5vCRn5KwRch8IDQyZvwYgPLyN68XSNALNgtJzTujo8i1kk6pbuTT1foQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784196255; c=relaxed/simple;
+	bh=P+uJHKl7Qv18NfTPYQjmhMJxVkhMFqKiI6Pa0Rqp5PA=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=f46lfgY9ObCGrjhfcWQsiQJY2Qx5r4dC7Ee6HBX6ONgjTfutMbu7glMPk6oXhKa1LqhN6nQRo5JgibXBFQgvOeDyh1ONGQJU7H5DNfcPETmtVMAGybAQaz1eLFrTJdF1BRmtA7RWIU8duVkGO8kfKcZBEVdHcUBcQnu/ILgPc48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=VhR2JF6w; arc=none smtp.client-ip=162.62.57.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="opf1pR8M"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66G7Dvex2115230
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 09:35:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=m0HwazGZY7eypKQeLx8j4N
-	q6lmtQe1QkW3DB7lwfK4Q=; b=opf1pR8M0/PTK1Kf3SugV7dWSirfM0XEYda6EM
-	C2NmNnvgxEmkr8rVQ9wxymI0W11rKDutAz1OYe1k6yKIk/y5pi00mWMmxdCGJvrx
-	plAzmZcyWMdhhDSMNjb7kOE0iLdaVZQzHWPDt3wZCJ72EVroJFQk4dsVuaKfzxAj
-	8uhCyYTLC2iNoGYPyE5fZ3zV/TGqgxFiQ6gsqYmjqhuGHF5rF9vLMBw52YckC2qo
-	7mtUFXaXHuMGZlLp22OPyy+k35NmmB3rFvSec8VRKwGBEJgaKHvofdciM2J/ZVOm
-	12gDs5x+Ebi7ZVY0M/yEoW0I+71ZJFHA4qoHaRfNT9boUNsQ==
-Received: from dm2pr04cu003.outbound.protection.outlook.com (mail-dm2pr04cu00306.outbound.protection.outlook.com [40.93.13.62])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4feeg1k3bd-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 09:35:37 +0000 (GMT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PY80o5P4FqnowM40bz0qAUsUfZ17NBOQ7xnU3w2ZPH3GsHXBgCvJsyS7GnxMepT6qotFvay/m5cb9Jb68OgvIpPOD69psAKYDF+ZpJlCi5RxXy2CM8QJgwWfHb3BLnOMRYdbE9eVMkFVzFqpso/Hr6ZsRb7JnfehGQmCA0bQVaXnl6G1pDXKsUJaMdYRPfkBJZAChNlyJeNSWXvpIStl6oCGiv/kgHyrda65EG5PJ3G3F/e7BIESxXedBQM6nWUN7jekM7io6EW61JBHTDokrCoSYzvEj3/7VmXm9EDqpncJEfg4+M005v3+FZo2UbK4uFZCF63zesJxxfkI9pd3Gw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=m0HwazGZY7eypKQeLx8j4Nq6lmtQe1QkW3DB7lwfK4Q=;
- b=k0F8IAE3ok4MYaSr/qtA+VEGrIms9f+k/nTsgLlyYk1DoBg7HtfWEpAAWCkQfF7bRwMdztZGHEkzOZwjdmrazi3XCRIO0T/K3/3xmAH9W+kT3Bz/CMc258n4hEu6CupVwaZdL+vcDDafO97VPfVjwCZd25QRP8UUm8J5BOsmLPvpQtlepOCT4v4u1aJ++qcKe/eWeCXSx7w90wcOai+sVCx0UGDRBj1KTM/0HcNmWKMLGFaZ60VbUE957j2+shdPn7al52rADDTH7q1znmJypdaL0DsIkALHGiz2CSFIbmOnHpSZX6TYxQVathGVRK+zmM9E9wn7yvf0vEdGlOHjFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=qti.qualcomm.com; dmarc=pass action=none
- header.from=qti.qualcomm.com; dkim=pass header.d=qti.qualcomm.com; arc=none
-Received: from CO1PR02MB8667.namprd02.prod.outlook.com (2603:10b6:303:15e::24)
- by PH7PR02MB9357.namprd02.prod.outlook.com (2603:10b6:510:270::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.223.11; Thu, 16 Jul
- 2026 09:35:32 +0000
-Received: from CO1PR02MB8667.namprd02.prod.outlook.com
- ([fe80::e174:cf1f:9fe1:726a]) by CO1PR02MB8667.namprd02.prod.outlook.com
- ([fe80::e174:cf1f:9fe1:726a%3]) with mapi id 15.21.0223.011; Thu, 16 Jul 2026
- 09:35:32 +0000
-From: Yixi Cai <yixicai@qti.qualcomm.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "Cheng Jiang (IOE)" <chejiang@qti.qualcomm.com>,
-        Jinwang Li
-	<jinwli@qti.qualcomm.com>,
-        Eleanor Xiao <eyxiao@qti.qualcomm.com>,
-        Huali Xie
-	<hxie@qti.qualcomm.com>,
-        Jie Zhang <jiezhang@qti.qualcomm.com>,
-        Peng Cheng
-	<penche@qti.qualcomm.com>,
-        Mohammed Sameer Mulla <mohamull@qti.qualcomm.com>,
-        "Ling Li (Linda)" <lingli@qti.qualcomm.com>
-Subject: Missing test steps for BNEP/DID/FTP/HFP/MAP/OPP/PAN/PBAP profiles in
- BlueZ doc tree
-Thread-Topic: Missing test steps for BNEP/DID/FTP/HFP/MAP/OPP/PAN/PBAP
- profiles in BlueZ doc tree
-Thread-Index: Ad0VBlEiPI0L+ouaQSmhN5euOmquhQ==
-Date: Thu, 16 Jul 2026 09:35:31 +0000
-Message-ID:
- <CO1PR02MB86670E3FE83E8FFC3AE6915098C72@CO1PR02MB8667.namprd02.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CO1PR02MB8667:EE_|PH7PR02MB9357:EE_
-x-ms-office365-filtering-correlation-id: 84044576-a64f-4228-7e61-08dee31d9495
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|23010399003|376014|366016|1800799024|10067099003|38070700021|6133799003|11063799006|5023799004|56012099006|18002099003;
-x-microsoft-antispam-message-info:
- W8PcKloHwb8URckhQt+6hdqlSISHOCal1ns9ox6cwiLicSWG5iG6y8tWS4G/ItPvDXlwQG/DyXKu/MB1cMydcfNzsdG38lvovoxm+O6el3nMoWd3+EWUy7h8XitAhdK7w8KT5bVYpNTwsQbePhneFs4IwJG6IOctMjZQM7a0vycDQtMa9+oRBmt8ruxhT+3F7VaxZ88smfdzMZ5ZPrMXyLYRoVTHi/Jddtw/mN7wPsDbLLvYf0EK3PLl12KBOIH1snSoLnMyA+ubQ1Dg3D995vfsTR27Ogebv673Xv2AnjB3kwWMpBlTM5L9jz+VmMupL2F88WSZ+OPaJFgk/XRAZzPg1PbzdV9AssKPahsQSfkLu20wD1F1+3MXti33hGDdGhcvdSrQ2bST00E2RAjp+22Nz6KcR7QAmCftxUU0fmqdR+KHXrWH37hCIEOSo78YLcH87kK/QDfgl80317Ei1zk6He1xZJx+WypFizkUAKVJ9t62TeVjlky0FBvnPw+d5+YWv3EREJENwwEMhzDC3R57TQ+ExQda/KIrtXVRp6JU24SsnbCvTVHzfH7xwbq2DKb51boRKnuC6DiuVaooE6n6+lvsQoJ0p3hzLtJXrOrNVeyXEItZBNZfvsPrCnfF2BIMIJT0qdz47PNjypvVp/az3ixBRytjOaeq+dh1dA5kSz5AeafsuQpdNVraqkCiHMA+llMxa1Gp85Gd0e7kuUh1HjE1rnJBkrHiFnoeJQs=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR02MB8667.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(366016)(1800799024)(10067099003)(38070700021)(6133799003)(11063799006)(5023799004)(56012099006)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Yub7SFmR7SEcYF/mU1i6/0gdku+Vi6t9xmBBN4up1Qd6uQcURCV/tL3BuYRL?=
- =?us-ascii?Q?ZpxQacVmmw38cHT0em9+Vuhd9J3hMB4JqConSgfSLmPonn+rDJgDRZMuudm6?=
- =?us-ascii?Q?htqzzeoVFIBTH3IlophyjsKSG7TZtV10r/RMPakoZOFt3kpzkxrGQUxTOxf6?=
- =?us-ascii?Q?sNgOFMuDeJeedSBmP8qh200+lAUuYVhE4B775xoXGDJSDSVxYBlwHztA0pm6?=
- =?us-ascii?Q?JyskeU6IdYh8LCwR7YQJhQ2ZAxMEEh8DAzpSYCitHJEXGrwZ5pFwpeLTwQxT?=
- =?us-ascii?Q?KSgY3AUnd4HiSUAKcbigrYVKSbYeBRRdiJZdQ8d1aK4eaZCBdd5WG67lUL+m?=
- =?us-ascii?Q?mqeCnmSKev9zrdBo5yZp3RewJPFpA93dxWYLrx/Yc7K5QB5tMQQbEEGfrv7n?=
- =?us-ascii?Q?9zxrg9YS5KIo8j9m91amnF+jBISX6iI9APTkylSAcCiihugsau25PFUR5g6N?=
- =?us-ascii?Q?CpGSOv8aFrPpqXXWm96i1NAHLlIF3FVAW3iboAMqriqlRaGj38Vx9U5JEzPQ?=
- =?us-ascii?Q?9e3TkrOY2chWUT+iHKtJ5aG6Q4O2+bVqrn9rWH4Zu5TuD+qj4jU31PYw/fHC?=
- =?us-ascii?Q?KyCTP7xq8fwJgg2LYuq5D8NjdD41UPXLvBHbwhDK0mpr/4O7dUSwa3QvPeKi?=
- =?us-ascii?Q?YURV2/3AQEJwmhJ/xWbfqV9GXRR+T3CvSOTW0sQ75zV/rBjhOvL7gXWLqhwS?=
- =?us-ascii?Q?fOMmVeEe0lMJiW6K6lLwtDNCFVOb48J9cbuRQ2TqYdixVeZ6rzRA7NQJOi+5?=
- =?us-ascii?Q?HUu6s0jPKYaqwCbp3sa0U7CE1YiQ30/PkNbeU2XYe4VpwtYqcsdvG3FeuQcI?=
- =?us-ascii?Q?d6E8aV1ue/muuwgpMVCtd0onFGf+y96GhRJcl5ExhTiFY92m609HL/68tZFJ?=
- =?us-ascii?Q?gVI786bMfchmtjq7iDntXo8pYmOGvGxkOIGUGOzTYD9MAWKfDkCpzzvJedJI?=
- =?us-ascii?Q?AENVnUrnYwLnzLV7wAPiz1Uct54LjP2rxg+GJJetRS1w3GqITx9HwaIhKGK8?=
- =?us-ascii?Q?agKwYNMS/YkNKbOBO7b2M2IIc6A6Qm0LE6koS64wZTi0s+EI2YsAbGT7hxkM?=
- =?us-ascii?Q?lySIDR2Bm3VHCFscs0SGOJrtGJuTFoFS6+dQv5OTnWHpXP5huEuX38BaJ/KM?=
- =?us-ascii?Q?ly4m/SxIC5QiKwEIjU1RoOFBDHqhneDicCaFtYaPkSgRv/CxwMJ048Yoot2y?=
- =?us-ascii?Q?8kuLviIRh+M6cp9ZV1y5VVCwEWUXw71f3D3PCBbKnT1f1ws2DrvdKnvsZDA0?=
- =?us-ascii?Q?FGFhtA6/v0uoxUBoUNSPpjoCzVssvM29G0oXKbTkw21g2iCkMjMEMHtNW4BE?=
- =?us-ascii?Q?vu/ZoESFWIBgRS0NpZeeviCtRsg4u8VZrhLDv4y58l1BTlab8WhZdAT1tpFe?=
- =?us-ascii?Q?X1+gG8TZuAqY/5VA71T6ZCHEDgPXnCjx5EmPVLLUHlvazVeVvaOnh9EW/zIN?=
- =?us-ascii?Q?t8Kf4U9KFOUxJ/YAOgSvSuPq5yOo9/O4bWNlXEaS0+2nC1+A+EFzuJc2l6Kf?=
- =?us-ascii?Q?zy5K8K2PNA875idmiQLed0FomJ9fdLv6/Qho/SEvoa/HSc4AZpA7OKbGDpbS?=
- =?us-ascii?Q?DwfeD1mrprZ17xV98DNPbuzO5YZA+Gwyax901nytCnXYTiXRTVcbOqLgAt5R?=
- =?us-ascii?Q?nYyVF8hif8zqE7FkueCfTwUcAMZRHAcE0Vn/NBmwymaungj0QmH8UDXqUU5r?=
- =?us-ascii?Q?xQFOA6B6lpWqbPvXicHKwj1+nR8vg4JC+GZEd8RlRAoCwX3JBHvWIRpQL+pW?=
- =?us-ascii?Q?zOMldZPHrA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="VhR2JF6w"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1784196247; bh=X0+/XKEOFmIwuwY7fq0XH6KuG/0LGxzensQfw1+1Qvw=;
+	h=From:To:Cc:Subject:Date;
+	b=VhR2JF6w0hQ3OSVLvwyPOoDXuh71RybXZZXuimv5htqrko9PHFAnZeepSv9NNc4SN
+	 Zm21S9t8AR8Fk9rEdvrVZpEmn0BjRX8InWfNmN2kw36nPt5CJ9lmsR99a7zcSZaQ45
+	 d+YQBken+Ei9gffY/deoQ3RnZjPtAyJNbu1KSreA=
+Received: from v25u1-PC ([61.183.83.60])
+	by newxmesmtplogicsvrsza73-0.qq.com (NewEsmtp) with SMTP
+	id 104BA84B; Thu, 16 Jul 2026 18:04:04 +0800
+X-QQ-mid: xmsmtpt1784196244t5xyyo2cm
+Message-ID: <tencent_3E2A052E7982856EDEFA3F608C72C2C8AF05@qq.com>
+X-QQ-XMAILINFO: NAuAIaytDrXpbrrEdKGwWwXufoR2moys3kYq/52Z8sB06EEx5sPHwaykqiwBhr
+	 zH1F7DTOGuzwf9Ejl1XPlSpIh0YyzNuDaNwLbdSzDuNT9ZUjlx1ZbQhBRNb2K/GmiVceeTUWxHSl
+	 /uNO9bq7OCOxoiWIZ/2s0abhR4zOH9yCG+wr+qyxBlOTYCdq80IHnWu99u+2W4JoClWHdqosLip9
+	 JwW7wD1ngPJIIhWGoUcCGHQdMg3QyTT8873cfPkoT6p15uT7wAirbVjndR0S3lFmu4qD0VItFNfL
+	 TT5Pbpk312Nbj3jv4M3noFPcOZyg6tmkwX7Nz9x28O8W6P8CpMlbN7IHfOsmOrvzt3hUZe0oeiUw
+	 OY4HcWJSsALCOp47kHmY4QjzLlPmHoEpg8uEHElDejY5Acndp0z5D1u0Kfyj0iDAKUCX77JB7fzb
+	 0P8q7Gxp5mM34Xmv5IZ1dLYDlLPHHCqzkGRMrVVeuK6nidvcqPWDAaAzEXFESySZjKgNudf8vGZ4
+	 FeW0xp42Y4YGZZB53xtttBjV0R//aF+ocBxTy4nRWueZXUyS25pqXW4Ehz9OMjiy7s3u42yvf0+M
+	 jlwSNz9Qk3RXuz2zBsOnYIJ8Ad5s80fYQKVLayx39sKIYRMzHX1vUq8RGB2f37wq0hwWW1vcp96X
+	 YJcS5kgyCr+Id0J08ehwYzOUhWLzfYXfDd/XL5Wf4N1ls//JoosU0W1pOiv0vjiz/qMN6G9owQij
+	 GBuZgp3sxGUMxZdsUrrmS5aPvxfm5ktbpYAxIbzyVHXE+lODBpDXUde1CnXYyXzVKWcB+AW6PUtJ
+	 YM42sS2DddNjmJYAXt6Q+t0IaobTDZkqhNPXRi78C01NBkWxUA9VbpSh9rAln+oxs0PKYt188tvX
+	 3Tl46KWrpCD27r7WYz+35vHbBKdZ5SzpYxrFymb9aujVwxKajW36M61iUZb5GFm1J2O8LeATbXNY
+	 tVtClxH3UFAMpR4G6MY7jB905HPo2yTJmIU5i2BFSOsvG6bcgLpXwwX18uqX1LdYVlt9J+ihyd0c
+	 ZtZGKJKHz4OSScWdVS
+X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
+From: Chengyi Zhao <chengyi.zhao@qq.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com,
+	Chengyi Zhao <zhaochengyi@uniontech.com>
+Subject: [PATCH] policy: Connect profiles for bonded inbound ACL connections
+Date: Thu, 16 Jul 2026 18:04:04 +0800
+X-OQ-MSGID: <20260716100404.61991-1-chengyi.zhao@qq.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked:
-	ItoJnm/twhF8vFJGTV0y5DfMm7eAJ48lPUZsfQ85xFh71E0HwjRHVo7NrplWSNuHfQyYvOnfrkhlCMY8CIwF1+3DTksRZeiJbeimRNHnHTIhUlsocGYF4L2CGG5h7/1j6e+uOMG5qW11eLpqhT00h0EBbT+TA9XjAUJUPouTdDB7YVBznJbcHTclRSUsgf7X6T0rv6v6UotO7t8X0HVosE9BpgDhblGqySdemOijCOyL4YQtP3dUxD/2wNkNzGUUOEZT8xB/cWtnW4zzoSAYYQmJfSI9sT1aHqo7CrNFf8+HIwTj1puuNf9Bx+GT/74dTaaulhy9chwZhm+Ma8l5sQ==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	axIJaCwKQP+oU0AY063sfr/+CPAP166zi3HAhBcs/P/PMKsc+o/fMf7DkjYx+T7eCVSujKeMfIrIl2XPI9KMV1/nPLZFsm5xvrb7ZaCKiwpKr9CX5AKo0W4cOkOUzghEPck48Krhy180ILCdxv8MlRP87D68D8Lo/o82GwkF8/jqw3WdvfiaeG56BNjQcrd6XoRU5R+CeUYntbZLNqUjMV4bQ3tgpm0z5Bb/SDUoA2XuzPf20x/pqLxNH9jWjQbheJWpU0OhrZ5b2TMB6tMHTN2FimMqMLzM/M6RaHeexqiCYK/AYwnQK6I9Si/z/GZvRtGMSUIzr0v1cbD791I6R4o5LmP2u6Z1+++yNYMnAh+V80k3VwD58bvbq8ImFJ17gceKrCPlFJQU9uc0hi71/pG8WhDLJD4YeL6EN4Jh+fjNXgh+ZdrGwc5fmqg4fAHGWTmvM+fb2MC6l/UZdUXYpwN6AuLjAAl1/ucZVOF5/Y4BOA/IP187/Zt+3rZCE0ou55gc2m3rUGMt8jCYiHy5TRx60br2FakMMddud5eXldWou/C3K2ON+KoReWR+Bp4LnZbSgT6Q9fujVYHe7ecv2pFYDDWMZDskJsMlRZr1eINxbcnc+BSpeXImP6HTXivp
-X-OriginatorOrg: qti.qualcomm.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR02MB8667.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 84044576-a64f-4228-7e61-08dee31d9495
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jul 2026 09:35:31.9413
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: IFelmj0zEDVx6YcKKncOnOuLYUShcW2vFfnTe+wSj1T/WMLtCm9zHTo1IYmxpe53pe12fgfJ3SPktbxw0ZlNoYTkuxwSOWaBJLpXvskNxmE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR02MB9357
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE2MDA5OCBTYWx0ZWRfX5xuakdz70FUr
- Yxfr4uJFcTFaIkXNDU5VQJDEK9TJpuwW4GHwFUnobNZiH7EF8ekSKPLp3gZr53/fsgHjMzwZ7/E
- KZOOK7HMIBNj75gzmu3gVpnyf1oDcaraVYC0ZvH7gcF47z9d32gAuqUSikN9/slBGiLSrWjs25v
- XLihQ43eukwPP50Mp1SUIh/nRwOCa1E872TdU/PAFLkfJ/5BnUpINws0dzJjm188f+IhysRohd/
- 0mIlJAEY00/vaYeE2f4Gg8kEpbIbxvdVIYtTSNJIiJHgBim9gHfTCApRlH/MnlsG2GQOxZMW+XI
- 1x1qkP+yo2s0TkQTj4LArVz2JC5m+KqoQaI6q8E8+G3h24kLGhWdHsCXGvFnalotjEWwvkll0p2
- voA++/R6tYzTEdDbQgB94Jtq8fussEMXsMoRrn2VseXj+VFtDnRKuhXbo5YjBJa2hCop+DE1QIC
- MMeZ1E00Bxw6oOr5dTQ==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE2MDA5OCBTYWx0ZWRfX57ZGZrgHj02s
- ric9WtBpv8b6EUtO1Wl4KtT+3s3N0Eax8SlVvInp6bCrOjE2UQv/j71MDQ8UKCMwB7c7e4u4zIR
- QdEHHT8hGdaCRdwUj2fZ496+EujqFOY=
-X-Proofpoint-GUID: VwJGNnKLJIwySQDYiKYw8mqIE57AhLEg
-X-Proofpoint-ORIG-GUID: VwJGNnKLJIwySQDYiKYw8mqIE57AhLEg
-X-Authority-Analysis: v=2.4 cv=SsOgLvO0 c=1 sm=1 tr=0 ts=6a58a5e9 cx=c_pps
- a=ftK1B4U+KuHZUR4f5igEJw==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=3WHJM1ZQz_JShphwDgj5:22 a=VwQbUJbxAAAA:8 a=3cqyFr4hi9waq_PBeLgA:9
- a=CjuIK1q_8ugA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-16_03,2026-07-15_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 suspectscore=0 priorityscore=1501 bulkscore=0
- malwarescore=0 spamscore=0 impostorscore=0 adultscore=0 clxscore=1015
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607160098
+Content-Transfer-Encoding: 8bit
 
-Hi BlueZ upstream community,
+From: Chengyi Zhao <zhaochengyi@uniontech.com>
 
-We are currently working on BlueZ Bluetooth host certification and are look=
-ing for profile-level test steps in the official doc tree: https://git.kern=
-el.org/pub/scm/bluetooth/bluez.git/tree/doc/qualification
-However, we noticed that test documentation for the following profiles appe=
-ars to be missing: BNEP, DID, FTP, HFP, MAP, OPP, PAN, PBAP
+When a bonded device initiates an inbound ACL connection (e.g. after
+resume, the remote wins the page race), BlueZ accepts the ACL link
+but does not establish AVDTP/AVCTP profiles. The remote's subsequent
+L2CAP connect for PSM 25 fails with "security block" because the link
+is not yet encrypted, and the kernel does not retry. The ACL link
+stays up with no audio.
 
-Could you point us to where we can find the corresponding test steps or cer=
-tification guidelines for these profiles?=20
+Add btd_connect_cb callback infrastructure to the adapter core
+mirroring the existing btd_disconnect_cb pattern, invoked from
+connected_callback so it only fires on new MGMT_EV_DEVICE_CONNECTED
+events. Register a callback in the policy plugin that starts a
+2-second grace timer for bonded BR/EDR connections. If an audio
+profile connects naturally within the window the timer is cancelled;
+otherwise btd_device_connect_services is called as a fallback, but
+only if no audio profile is connected yet. The grace timer is also
+cancelled on disconnect to avoid racing with device removal.
 
-Any guidance would be greatly appreciated.
+Outbound L2CAP is queued by the kernel until encryption completes,
+surviving the race. The fallback is safe when the host already won
+since btd_device_connect_services returns -EBUSY if a connection is
+already in progress.
+---
+ plugins/policy.c | 106 +++++++++++++++++++++++++++++++++++++++++++++++
+ src/adapter.c    |  24 +++++++++++
+ src/adapter.h    |   4 ++
+ 3 files changed, 134 insertions(+)
 
+diff --git a/plugins/policy.c b/plugins/policy.c
+index 0e1ce5c9a..c0004e743 100644
+--- a/plugins/policy.c
++++ b/plugins/policy.c
+@@ -45,6 +45,7 @@
+ #define HS_RETRIES SOURCE_RETRIES
+ #define CT_RETRIES 1
+ #define TG_RETRIES CT_RETRIES
++#define GRACE_TIMEOUT 2
+ 
+ struct reconnect_data {
+ 	struct btd_device *dev;
+@@ -92,6 +93,7 @@ struct policy_data {
+ 	uint8_t tg_retries;
+ 	unsigned int hs_timer;
+ 	uint8_t hs_retries;
++	unsigned int grace_timer;
+ };
+ 
+ static struct reconnect_data *reconnect_find(struct btd_device *dev)
+@@ -190,6 +192,9 @@ static void policy_remove(void *user_data)
+ 	if (data->hs_timer > 0)
+ 		timeout_remove(data->hs_timer);
+ 
++	if (data->grace_timer > 0)
++		timeout_remove(data->grace_timer);
++
+ 	g_free(data);
+ }
+ 
+@@ -209,6 +214,83 @@ static struct policy_data *policy_get_data(struct btd_device *dev)
+ 	return data;
+ }
+ 
++static bool policy_has_audio_profile(struct btd_device *dev)
++{
++	struct btd_service *service;
++
++	service = btd_device_get_service(dev, A2DP_SINK_UUID);
++	if (service && btd_service_get_state(service) ==
++					BTD_SERVICE_STATE_CONNECTED)
++		return true;
++
++	service = btd_device_get_service(dev, A2DP_SOURCE_UUID);
++	if (service && btd_service_get_state(service) ==
++					BTD_SERVICE_STATE_CONNECTED)
++		return true;
++
++	return false;
++}
++
++static void policy_clear_grace_timer(struct policy_data *data)
++{
++	if (data->grace_timer > 0) {
++		timeout_remove(data->grace_timer);
++		data->grace_timer = 0;
++	}
++}
++
++static bool policy_grace_timeout(gpointer user_data)
++{
++	struct policy_data *data = user_data;
++	struct btd_device *dev = data->dev;
++	int err;
++
++	data->grace_timer = 0;
++
++	DBG("Grace period expired for %s", device_get_path(dev));
++
++	if (policy_has_audio_profile(dev))
++		return false;
++
++	err = btd_device_connect_services(dev, NULL);
++	if (err < 0)
++		error("Fallback profile connection failed: %s (%d)",
++							strerror(-err), -err);
++
++	return false;
++}
++
++static void policy_set_grace_timer(struct policy_data *data)
++{
++	policy_clear_grace_timer(data);
++
++	DBG("Starting %d second grace period for %s", GRACE_TIMEOUT,
++						device_get_path(data->dev));
++
++	data->grace_timer = timeout_add_seconds(GRACE_TIMEOUT,
++						policy_grace_timeout, data,
++						NULL);
++}
++
++static void policy_connect_cb(struct btd_device *dev, uint8_t bdaddr_type)
++{
++	struct policy_data *data;
++
++	if (bdaddr_type != BDADDR_BREDR)
++		return;
++
++	if (!device_is_bonded(dev, BDADDR_BREDR))
++		return;
++
++	if (policy_has_audio_profile(dev))
++		return;
++
++	DBG("Bonded BREDR ACL connected for %s", device_get_path(dev));
++
++	data = policy_get_data(dev);
++	policy_set_grace_timer(data);
++}
++
+ static bool policy_connect_hs(gpointer user_data)
+ {
+ 	struct policy_data *data = user_data;
+@@ -716,6 +798,22 @@ static void service_cb(struct btd_service *service,
+ 			g_str_equal(profile->remote_uuid, HSP_HS_UUID))
+ 		hs_cb(service, old_state, new_state);
+ 
++	/* Cancel grace timer if an audio profile connected naturally.
++	 * Only A2DP connectivity cancels the timer: a non-audio profile
++	 * (HFP, HID, etc.) may connect after the security block window
++	 * without resolving the A2DP failure the timer is meant to catch.
++	 */
++	if (new_state == BTD_SERVICE_STATE_CONNECTED) {
++		struct btd_device *dev = btd_service_get_device(service);
++		struct policy_data *data = find_data(dev);
++
++		if (data && data->grace_timer > 0 &&
++				policy_has_audio_profile(dev)) {
++			DBG("Audio connected during grace period, cancelling");
++			policy_clear_grace_timer(data);
++		}
++	}
++
+ 	/*
+ 	 * Return if the reconnection feature is not enabled (all
+ 	 * subsequent code in this function is about that).
+@@ -810,9 +908,14 @@ static void reconnect_set_timer(struct reconnect_data *reconnect, int timeout)
+ static void disconnect_cb(struct btd_device *dev, uint8_t reason)
+ {
+ 	struct reconnect_data *reconnect;
++	struct policy_data *data;
+ 
+ 	DBG("reason %u", reason);
+ 
++	data = find_data(dev);
++	if (data)
++		policy_clear_grace_timer(data);
++
+ 	/* Only attempt reconnect for the following reasons */
+ 	if (reason != MGMT_DEV_DISCONN_TIMEOUT &&
+ 	    reason != MGMT_DEV_DISCONN_LOCAL_HOST_SUSPEND)
+@@ -917,6 +1020,8 @@ static int policy_init(void)
+ 
+ 	service_id = btd_service_add_state_cb(service_cb, NULL);
+ 
++	btd_add_connect_cb(policy_connect_cb);
++
+ 	conf = btd_get_main_conf();
+ 	if (!conf) {
+ 		reconnect_uuids = g_strdupv((char **) default_reconnect);
+@@ -988,6 +1093,7 @@ static void policy_exit(void)
+ {
+ 	btd_remove_disconnect_cb(disconnect_cb);
+ 	btd_remove_conn_fail_cb(conn_fail_cb);
++	btd_remove_connect_cb(policy_connect_cb);
+ 
+ 	if (reconnect_uuids)
+ 		g_strfreev(reconnect_uuids);
+diff --git a/src/adapter.c b/src/adapter.c
+index 4ffa32a52..e6e061893 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -167,6 +167,7 @@ static GSList *adapter_drivers = NULL;
+ 
+ static GSList *disconnect_list = NULL;
+ static GSList *conn_fail_list = NULL;
++static GSList *connect_list = NULL;
+ 
+ struct link_key_info {
+ 	bdaddr_t bdaddr;
+@@ -8609,6 +8610,17 @@ int adapter_bonding_attempt(struct btd_adapter *adapter, const bdaddr_t *bdaddr,
+ 	return 0;
+ }
+ 
++static void connect_notify(struct btd_device *dev, uint8_t bdaddr_type)
++{
++	GSList *l;
++
++	for (l = connect_list; l; l = g_slist_next(l)) {
++		btd_connect_cb connect_cb = l->data;
++
++		connect_cb(dev, bdaddr_type);
++	}
++}
++
+ static void disconnect_notify(struct btd_device *dev, uint8_t reason)
+ {
+ 	GSList *l;
+@@ -8662,6 +8674,16 @@ void btd_remove_disconnect_cb(btd_disconnect_cb func)
+ 	disconnect_list = g_slist_remove(disconnect_list, func);
+ }
+ 
++void btd_add_connect_cb(btd_connect_cb func)
++{
++	connect_list = g_slist_append(connect_list, func);
++}
++
++void btd_remove_connect_cb(btd_connect_cb func)
++{
++	connect_list = g_slist_remove(connect_list, func);
++}
++
+ static void disconnect_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -9606,6 +9628,8 @@ static void connected_callback(uint16_t index, uint16_t length,
+ 		adapter_msd_notify(adapter, device, eir_data.msd_list);
+ 
+ 	eir_data_free(&eir_data);
++
++	connect_notify(device, ev->addr.type);
+ }
+ 
+ static void controller_resume_notify(struct btd_adapter *adapter)
+diff --git a/src/adapter.h b/src/adapter.h
+index 4e07f71ad..a9e1bbf66 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -65,6 +65,10 @@ typedef void (*btd_conn_fail_cb) (struct btd_device *device, uint8_t status);
+ void btd_add_conn_fail_cb(btd_conn_fail_cb func);
+ void btd_remove_conn_fail_cb(btd_conn_fail_cb func);
+ 
++typedef void (*btd_connect_cb) (struct btd_device *device, uint8_t bdaddr_type);
++void btd_add_connect_cb(btd_connect_cb func);
++void btd_remove_connect_cb(btd_connect_cb func);
++
+ struct btd_adapter *adapter_find(const bdaddr_t *sba);
+ struct btd_adapter *adapter_find_by_id(int id);
+ 
+-- 
+2.50.1
 
-
-
-Thanks
-Yixi
