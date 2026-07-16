@@ -1,333 +1,213 @@
-Received: from out162-62-57-64.mail.qq.com (out162-62-57-64.mail.qq.com [162.62.57.64])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E2E38D6B8
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 10:55:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3862940D570
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 11:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784199313; cv=none; b=toGYTWbvlmLX28DM3HjufihWz2BoTXAafsJRHGvPBlb3EOjYaBDHUPRDTMBNks5e/GjBkDng9jtNZk0xTyAhaVcs3L4YhyKhkgnzkfSg/Wh3RxEdIUFxF/WpUvi1cWTLBv0TzmKXIE5+nJ162p2poBzR94GUfuUBNq1GjMfqdkc=
+	t=1784199626; cv=none; b=ea20iAkKMpQbVzarvJ7SeGmOK6S6/QCMKvGwQpbCyWjQXYKAcz9/gD21UWdT/hRy58NlO7DHH2dFsa6lRDeErbhw8FipUza7FdZK6zVZ/FkZnqEgPDe3rLB0KbdJ2Jooc88EAoaWtEzpL2HKc56SwuSIOy83YNcUOpER6NKaGpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784199313; c=relaxed/simple;
-	bh=P+uJHKl7Qv18NfTPYQjmhMJxVkhMFqKiI6Pa0Rqp5PA=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=qBrYri1oki9j0noalh8ZDrYOSkYWKfJjT8XuFkHT7RHnqQiXLeT5e7iY/aVEMTXWAjMNtsf6oRh8P+VBHEkA2/o0mOGiM+smzgr3967AkEdyBmmYJGgXZjwmU5kXgptJ7kLb/GaR2jAp7G3iiFWlMGgIZAKDcQLTBR1STCFwP08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=uj5zEyJv; arc=none smtp.client-ip=162.62.57.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1784199626; c=relaxed/simple;
+	bh=UzZTsTOucqfC1Ql4QPY47lE0WAeSIgaWW77lyYd+TiQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=KV0rIYr58znLChvpQ9BqMgwbS0ilSpB5BXxFa4F81bgjA/JoShvu6xfL5kQL83A9cIfLsZ/tfksl4N/uOhN1GZUW5R6z+HfSVsG4F7vzA14FXX4adplVAfONgJswu2ycNeWUn+g/wh+B6h0n58baQ+TYab2gCfNCvLuyeh2Rf2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qEh1tlOF; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="uj5zEyJv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1784199305; bh=X0+/XKEOFmIwuwY7fq0XH6KuG/0LGxzensQfw1+1Qvw=;
-	h=From:To:Cc:Subject:Date;
-	b=uj5zEyJvzIKm12KMXYv80PzCmC6DIen2lyZhwqnAcpJi2tL9w4OOP2be6/En4HSr2
-	 6umdWTjT6KrrV4ZJJ4uKPa/XCq2iJSFC1luXw9GzMaR75BDBXWnOxtoHUnO+ewJiRy
-	 w0BhUrznuz8V99Oet3Wv42u8W0PjZfBrXTaHH0qE=
-Received: from v25u1-PC ([61.183.83.60])
-	by newxmesmtplogicsvrsza53-0.qq.com (NewEsmtp) with SMTP
-	id DC39B052; Thu, 16 Jul 2026 18:55:03 +0800
-X-QQ-mid: xmsmtpt1784199303t1ldcuq0o
-Message-ID: <tencent_7E6A07CE6162892EDEFA29E082F2D2A8AE05@qq.com>
-X-QQ-XMAILINFO: NMGzQWUSIfvT7+0FjoSCa6+JAtMgiIPDYLqrR4PQeVVuPt0p0OYLKgFJYhgXaf
-	 RqhKdlcrQdZFg4U9zZCZvWzSsvfb8O1W9UDlw9NpPu3VsfgTj9qpW0tUlru03lEhA9PRPwMbA+wD
-	 zIwoaNgDq8K5HqVnxll69vff/6Acf1+A5gwgX0IWGaNy7QbI4WnJhkeoDyesremvshRE7zm+AAnp
-	 BsUQcYjIeN4g2z4M6pxAIyjSWZADottTZudnJ5RePjE6H1vBoujITNyEOeskhKLxnSXY4W392hSY
-	 fdQz/Bsp/FtjmH1AuQ/tCPxuRC1kEHhDyVXf/YAnPtQ32vxCTqEewPSl2b0KcQ0fThS3JqlkbW0Z
-	 /vhUVXYR1gPbPxs0iVaKNvO5OZwvfR9P1GF/CcUGaY23JxR4KxJ+yq0JBcg3A1PY/h2wrB0pnhyR
-	 1Wu1X3p2fMntV6ocsFgXPUEpm59+icwrNaAu0ph+0Uj9T40xczPIsZxSVWOx9KPo7L4Utzz4KMyk
-	 PGj7B+uyi69P9P8mOhgYwGCPVTklIghv1PJ0ZLgv4eKS2PQbR2sM5NdonoS5XK6x6nWhBEKN9JeW
-	 oW9P4IM27Pno5hb8QA7xie0FvH4dcDRQKSMdi5mzk94OABiFz6TNb3pOGvPWCDxCXu4ldtBIqKI4
-	 DjjC7DfqYUpKfe5BIJzYEJ97Kh+Fv1QlyeQgBqvQRfb7xCa4WaygwYmIqdXDdaStuMDstsvsTuwg
-	 H80sX6oXUXkKCt13vKAn/iCFVvUy7e0umG2380RghILK1gachi6GtIRuqscxQyacEdlx9pqAbAlK
-	 cAhgUD95MIraYsgiWb3fLuRBUmLjnlAC0xZVpCK7dPN7TsuRgBsKq/YwfQVGA+nK4aqTgOeOMqJU
-	 oK7joXGcyuNOuahTi5WftkRHFYWlDfpGvX8bdIEmsn529fHCMr51BpTFnjiGiPl8rKsgeAZpxx96
-	 cQx5e58hv9VMwR0i6IZ32hfYigHK6ZH1rwkkZ2GwJK14OZgYXT9dn78MC4W8aPHrB9eglTpJj0ZT
-	 6IitATXtuKoO4IHRUhOusvURKAJ0HJbzTP05XpJQbQfAqU7KSnWp96FfG+djE=
-X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
-From: Chengyi Zhao <chengyi.zhao@qq.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.von.dentz@intel.com,
-	marcel@holtmann.org,
-	Chengyi Zhao <zhaochengyi@uniontech.com>
-Subject: [PATCH BlueZ] policy: Connect profiles for bonded inbound ACL connections
-Date: Thu, 16 Jul 2026 18:55:03 +0800
-X-OQ-MSGID: <20260716105503.63216-1-chengyi.zhao@qq.com>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qEh1tlOF"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-8ef7b7651ecso813476d6.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 04:00:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784199624; x=1784804424; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=UzZTsTOucqfC1Ql4QPY47lE0WAeSIgaWW77lyYd+TiQ=;
+        b=qEh1tlOF8/lsgtjK86A7nv9Cgve/t8VN5t/IV2oGeG1Yj1benk0/rMQE4xFpuMY5N0
+         7Vyyyi4M9BxK0bO8w7gn7h07vn0HcnjLM74zpK0rRT1uWI5+Id8wnIzfzLuHUFGLw6qx
+         VWpXPm+lIjfwhsTyqQeuicS5RS4r4cMitRKiymYqnqB27cOSe3FW6ME05mB0lI1rr8uL
+         XBwQrXYPS+dXPBcghYpEkmjO+Kl9V3JyzP6NCIkcf3AOHawSXM2R/7nQsCqevbczr/PX
+         e0hzV0nB2CXAos5279elvmorVKi6ANYfjgvU9dwg5W//9BW8SR06Ct1nhVX2gm94Gg3B
+         8DUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784199624; x=1784804424;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=UzZTsTOucqfC1Ql4QPY47lE0WAeSIgaWW77lyYd+TiQ=;
+        b=LNw3EvDOLYpSAsMJa23pQg5eUzPkR119XRR4PmVwrTf/SZqnuUUCyOu5tMFzR0fj6N
+         R6Z3/8XNL6QELuuOdN/6nvjvNyCs2leEzwNN8BGNXtuF7jRjZFzDeNzkO0i0nsTsq4Ra
+         PsjQi1097aNsKQCW0WMmgdaIsCBvgZzJZ0jLsHuMCTPvz6aPrAkOT2hAXcOuos42zyOE
+         fsBAQyC+CRk8z8oDfeqULxJ0yuE66wkio5G/Ah0datzvgGgoS2eANMFe2assUfEXZBgG
+         WgLSUOINK4RzZ52MCPpoJW+6/SQz/LApWxG68gBLSudjjNLHgrD2c8lOOtvy18GLXNwZ
+         q5Yg==
+X-Gm-Message-State: AOJu0Yw7VoaxQuDfmy3avJP7qgV+0GPO57W8cvDBlbdgngMdisFW2BCr
+	l+c31MGeegNa5hNrhZs1Xd011Ts3MbErQjs0zs/9TUXA2WkWuYbAtcOhnfYIjA==
+X-Gm-Gg: AfdE7clkQOYMzDw30iPlTbVocHchMFLEKwvrtkxWgAhKrveQuBIj6xvqbClkOHFVCBB
+	qrS733ih36ZyIkC4Y7oLXDaXeG0eWn21prVHyoz48Ux7i7NuMJxNhzt0yTaIq6OWibb2ELBYP+E
+	ZxS5DDP3Yz/MDy1XCFBXCWxdWR/qiUUm33lD/HQzFJFO7hmA0CJxEVitVIwMGPeKUOYjaIo+62O
+	L0eZPWtixRSsdtTS343ZqaYlf5vcmWUDIL43e6vBl3qjI7A3M6bJAK4yUq6mf/o/UcR2y4wbpZ/
+	BMpjh1WKfDtF0GtewGm3Ut+QBmmhlINpHKTBcv5Z/e2J4/NBx2N3zJ95Yd7UIArNv23kEEPZQuH
+	zQVlIMF8wD3t9Tmnz/M87SAGhkgXydhqnN3VEHLD5G76Pl7EX2mMO3swtfItu4oSkILPXker4py
+	imJQMBkZdQbsRd4krCDZ8=
+X-Received: by 2002:a05:622a:50c:b0:516:82e2:7788 with SMTP id d75a77b69052e-51fbeeb3148mr17686041cf.1.1784199623701;
+        Thu, 16 Jul 2026 04:00:23 -0700 (PDT)
+Received: from [172.17.0.2] ([20.109.92.214])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90749b913absm78041096d6.10.2026.07.16.04.00.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jul 2026 04:00:23 -0700 (PDT)
+Message-ID: <6a58b9c7.a40fb949.1d2f56.2336@mx.google.com>
+Date: Thu, 16 Jul 2026 04:00:23 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2978535741602096698=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, chengyi.zhao@qq.com
+Subject: RE: policy: Connect profiles for bonded inbound ACL connections
+In-Reply-To: <tencent_3E2A052E7982856EDEFA3F608C72C2C8AF05@qq.com>
+References: <tencent_3E2A052E7982856EDEFA3F608C72C2C8AF05@qq.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Chengyi Zhao <zhaochengyi@uniontech.com>
+--===============2978535741602096698==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-When a bonded device initiates an inbound ACL connection (e.g. after
-resume, the remote wins the page race), BlueZ accepts the ACL link
-but does not establish AVDTP/AVCTP profiles. The remote's subsequent
-L2CAP connect for PSM 25 fails with "security block" because the link
-is not yet encrypted, and the kernel does not retry. The ACL link
-stays up with no audio.
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTEyODcxNAoKLS0t
+VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
+ICAgRkFJTCAgICAgIDAuNjEgc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBQ
+QVNTICAgICAgMC4zMyBzZWNvbmRzCkJ1aWxkRWxsICAgICAgICAgICAgICAgICAgICAgIFBBU1Mg
+ICAgICAyMC41MyBzZWNvbmRzCkJsdWV6TWFrZSAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAg
+ICA1MTguMjYgc2Vjb25kcwpDaGVja1NtYXRjaCAgICAgICAgICAgICAgICAgICBQQVNTICAgICAg
+Mjk1LjU2IHNlY29uZHMKYmx1ZXptYWtlZXh0ZWxsICAgICAgICAgICAgICAgUEFTUyAgICAgIDk1
+LjU3IHNlY29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgRkFJTCAgICAgIDQ5MC4w
+NSBzZWNvbmRzClNjYW5CdWlsZCAgICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICA4OTcuNzYg
+c2Vjb25kcwoKRGV0YWlscwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hl
+Y2tQYXRjaCAtIEZBSUwKRGVzYzogUnVuIGNoZWNrcGF0Y2gucGwgc2NyaXB0Ck91dHB1dDoKcG9s
+aWN5OiBDb25uZWN0IHByb2ZpbGVzIGZvciBib25kZWQgaW5ib3VuZCBBQ0wgY29ubmVjdGlvbnMK
+RVJST1I6SU5JVElBTElTRURfU1RBVElDOiBkbyBub3QgaW5pdGlhbGlzZSBzdGF0aWNzIHRvIE5V
+TEwKIzI4MjogRklMRTogc3JjL2FkYXB0ZXIuYzoxNzA6CitzdGF0aWMgR1NMaXN0ICpjb25uZWN0
+X2xpc3QgPSBOVUxMOwoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3BhdGNoLzE0NjkwNjQ3LnBhdGNo
+IHRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjE1IGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZv
+ciBzb21lIG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRv
+CiAgICAgIG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0t
+Zml4IG9yIC0tZml4LWlucGxhY2UuCgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvcGF0Y2gvMTQ2OTA2
+NDcucGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LgoKTk9URTogSWdub3Jl
+ZCBtZXNzYWdlIHR5cGVzOiBDT01NSVRfTUVTU0FHRSBDT01QTEVYX01BQ1JPIENPTlNUX1NUUlVD
+VCBGSUxFX1BBVEhfQ0hBTkdFUyBNSVNTSU5HX1NJR05fT0ZGIFBSRUZFUl9QQUNLRUQgU1BEWF9M
+SUNFTlNFX1RBRyBTUExJVF9TVFJJTkcgU1NDQU5GX1RPX0tTVFJUTwoKTk9URTogSWYgYW55IG9m
+IHRoZSBlcnJvcnMgYXJlIGZhbHNlIHBvc2l0aXZlcywgcGxlYXNlIHJlcG9ydAogICAgICB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUgQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCgojIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQmx1ZXpNYWtlIC0gRkFJTApEZXNjOiBC
+dWlsZCBCbHVlWgpPdXRwdXQ6Cgp0b29scy9tZ210LXRlc3Rlci5jOiBJbiBmdW5jdGlvbiDigJht
+YWlu4oCZOgp0b29scy9tZ210LXRlc3Rlci5jOjEyOTkwOjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNr
+aW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1hc3NpZ25tZW50
+c+KAmSwgcmV0cnlpbmcgd2l0aG91dAoxMjk5MCB8IGludCBtYWluKGludCBhcmdjLCBjaGFyICph
+cmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0LWF2ZHRwLmM6IEluIGZ1bmN0aW9uIOKA
+mG1haW7igJk6CnVuaXQvdGVzdC1hdmR0cC5jOjc2Njo1OiBub3RlOiB2YXJpYWJsZSB0cmFja2lu
+ZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVudHPi
+gJksIHJldHJ5aW5nIHdpdGhvdXQKICA3NjYgfCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJn
+dltdKQogICAgICB8ICAgICBefn5+CnVuaXQvdGVzdC1hdnJjcC5jOiBJbiBmdW5jdGlvbiDigJht
+YWlu4oCZOgp1bml0L3Rlc3QtYXZyY3AuYzo5ODk6NTogbm90ZTogdmFyaWFibGUgdHJhY2tpbmcg
+c2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZ
+LCByZXRyeWluZyB3aXRob3V0CiAgOTg5IHwgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3Zb
+XSkKICAgICAgfCAgICAgXn5+fgptb25pdG9yL3BhY2tldC5jOiBJbiBmdW5jdGlvbiDigJhwcmlu
+dF9mZWF0dXJlc19zdWJwYWdl4oCZOgptb25pdG9yL3BhY2tldC5jOjI5NDA6Mjk6IGVycm9yOiDi
+gJgldeKAmSBkaXJlY3RpdmUgd3JpdGluZyBiZXR3ZWVuIDEgYW5kIDEwIGJ5dGVzIGludG8gYSBy
+ZWdpb24gb2Ygc2l6ZSBiZXR3ZWVuIDUgYW5kIDcgWy1XZXJyb3I9Zm9ybWF0LW92ZXJmbG93PV0K
+IDI5NDAgfCAgIHNwcmludGYoc3RyLCAiRmVhdHVyZXNbJXUvJXVdIiwgcGFnZSwgaSk7CiAgICAg
+IHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+Cm1vbml0b3IvcGFja2V0LmM6Mjk0MDox
+Njogbm90ZTogZGlyZWN0aXZlIGFyZ3VtZW50IGluIHRoZSByYW5nZSBbMCwgMjE0NzQ4MzY0Nl0K
+IDI5NDAgfCAgIHNwcmludGYoc3RyLCAiRmVhdHVyZXNbJXUvJXVdIiwgcGFnZSwgaSk7CiAgICAg
+IHwgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9t
+IC91c3IvaW5jbHVkZS9zdGRpby5oOjg2NywKICAgICAgICAgICAgICAgICBmcm9tIG1vbml0b3Iv
+cGFja2V0LmM6MTg6Ci91c3IvaW5jbHVkZS94ODZfNjQtbGludXgtZ251L2JpdHMvc3RkaW8yLmg6
+MzY6MTA6IG5vdGU6IOKAmF9fYnVpbHRpbl9fX3NwcmludGZfY2hr4oCZIG91dHB1dCBiZXR3ZWVu
+IDE0IGFuZCAyNSBieXRlcyBpbnRvIGEgZGVzdGluYXRpb24gb2Ygc2l6ZSAxOAogICAzNiB8ICAg
+cmV0dXJuIF9fYnVpbHRpbl9fX3NwcmludGZfY2hrIChfX3MsIF9fVVNFX0ZPUlRJRllfTEVWRUwg
+LSAxLAogICAgICB8ICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAzNyB8ICAgICAgIF9fYm9zIChfX3MpLCBfX2ZtdCwgX192
+YV9hcmdfcGFjayAoKSk7CiAgICAgIHwgICAgICAgfn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtl
+WzFdOiAqKiogW01ha2VmaWxlOjcwNjA6IG1vbml0b3IvcGFja2V0Lm9dIEVycm9yIDEKbWFrZVsx
+XTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmls
+ZTo0MTc0OiBhbGxdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6
+IEluY3JlbWVudGFsQnVpbGQgLSBGQUlMCkRlc2M6IEluY3JlbWVudGFsIGJ1aWxkIHdpdGggdGhl
+IHBhdGNoZXMgaW4gdGhlIHNlcmllcwpPdXRwdXQ6Cgp0b29scy9tZ210LXRlc3Rlci5jOiBJbiBm
+dW5jdGlvbiDigJhtYWlu4oCZOgp0b29scy9tZ210LXRlc3Rlci5jOjEyOTkwOjU6IG5vdGU6IHZh
+cmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2lu
+Zy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAoxMjk5MCB8IGludCBtYWluKGludCBh
+cmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0LWF2ZHRwLmM6IElu
+IGZ1bmN0aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdmR0cC5jOjc2Njo1OiBub3RlOiB2YXJp
+YWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmct
+YXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA3NjYgfCBpbnQgbWFpbihpbnQgYXJn
+YywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnVuaXQvdGVzdC1hdnJjcC5jOiBJbiBm
+dW5jdGlvbiDigJhtYWlu4oCZOgp1bml0L3Rlc3QtYXZyY3AuYzo5ODk6NTogbm90ZTogdmFyaWFi
+bGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNraW5nLWFz
+c2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CiAgOTg5IHwgaW50IG1haW4oaW50IGFyZ2Ms
+IGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgptb25pdG9yL3BhY2tldC5jOiBJbiBmdW5j
+dGlvbiDigJhwcmludF9mZWF0dXJlc19zdWJwYWdl4oCZOgptb25pdG9yL3BhY2tldC5jOjI5NDA6
+Mjk6IGVycm9yOiDigJgldeKAmSBkaXJlY3RpdmUgd3JpdGluZyBiZXR3ZWVuIDEgYW5kIDEwIGJ5
+dGVzIGludG8gYSByZWdpb24gb2Ygc2l6ZSBiZXR3ZWVuIDUgYW5kIDcgWy1XZXJyb3I9Zm9ybWF0
+LW92ZXJmbG93PV0KIDI5NDAgfCAgIHNwcmludGYoc3RyLCAiRmVhdHVyZXNbJXUvJXVdIiwgcGFn
+ZSwgaSk7CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+Cm1vbml0b3IvcGFj
+a2V0LmM6Mjk0MDoxNjogbm90ZTogZGlyZWN0aXZlIGFyZ3VtZW50IGluIHRoZSByYW5nZSBbMCwg
+MjE0NzQ4MzY0Nl0KIDI5NDAgfCAgIHNwcmludGYoc3RyLCAiRmVhdHVyZXNbJXUvJXVdIiwgcGFn
+ZSwgaSk7CiAgICAgIHwgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBp
+bmNsdWRlZCBmcm9tIC91c3IvaW5jbHVkZS9zdGRpby5oOjg2NywKICAgICAgICAgICAgICAgICBm
+cm9tIG1vbml0b3IvcGFja2V0LmM6MTg6Ci91c3IvaW5jbHVkZS94ODZfNjQtbGludXgtZ251L2Jp
+dHMvc3RkaW8yLmg6MzY6MTA6IG5vdGU6IOKAmF9fYnVpbHRpbl9fX3NwcmludGZfY2hr4oCZIG91
+dHB1dCBiZXR3ZWVuIDE0IGFuZCAyNSBieXRlcyBpbnRvIGEgZGVzdGluYXRpb24gb2Ygc2l6ZSAx
+OAogICAzNiB8ICAgcmV0dXJuIF9fYnVpbHRpbl9fX3NwcmludGZfY2hrIChfX3MsIF9fVVNFX0ZP
+UlRJRllfTEVWRUwgLSAxLAogICAgICB8ICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAzNyB8ICAgICAgIF9fYm9zIChfX3Mp
+LCBfX2ZtdCwgX192YV9hcmdfcGFjayAoKSk7CiAgICAgIHwgICAgICAgfn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFz
+IGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjcwNjA6IG1vbml0b3IvcGFja2V0Lm9dIEVy
+cm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTog
+KioqIFtNYWtlZmlsZTo0MTc0OiBhbGxdIEVycm9yIDIKcG9saWN5OiBDb25uZWN0IHByb2ZpbGVz
+IGZvciBib25kZWQgaW5ib3VuZCBBQ0wgY29ubmVjdGlvbnMKCnRvb2xzL21nbXQtdGVzdGVyLmM6
+IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnRvb2xzL21nbXQtdGVzdGVyLmM6MTI5OTA6NTogbm90
+ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRy
+YWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CjEyOTkwIHwgaW50IG1haW4o
+aW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rlc3QtYXZkdHAu
+YzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2ZHRwLmM6NzY2OjU6IG5vdGU6
+IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFj
+a2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDc2NiB8IGludCBtYWluKGlu
+dCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0LWF2cmNwLmM6
+IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdnJjcC5jOjk4OTo1OiBub3RlOiB2
+YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tp
+bmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA5ODkgfCBpbnQgbWFpbihpbnQg
+YXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+Cm1vbml0b3IvcGFja2V0LmM6IElu
+IGZ1bmN0aW9uIOKAmHByaW50X2ZlYXR1cmVzX3N1YnBhZ2XigJk6Cm1vbml0b3IvcGFja2V0LmM6
+Mjk0MDoyOTogZXJyb3I6IOKAmCV14oCZIGRpcmVjdGl2ZSB3cml0aW5nIGJldHdlZW4gMSBhbmQg
+MTAgYnl0ZXMgaW50byBhIHJlZ2lvbiBvZiBzaXplIGJldHdlZW4gNSBhbmQgNyBbLVdlcnJvcj1m
+b3JtYXQtb3ZlcmZsb3c9XQogMjk0MCB8ICAgc3ByaW50ZihzdHIsICJGZWF0dXJlc1sldS8ldV0i
+LCBwYWdlLCBpKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn4KbW9uaXRv
+ci9wYWNrZXQuYzoyOTQwOjE2OiBub3RlOiBkaXJlY3RpdmUgYXJndW1lbnQgaW4gdGhlIHJhbmdl
+IFswLCAyMTQ3NDgzNjQ2XQogMjk0MCB8ICAgc3ByaW50ZihzdHIsICJGZWF0dXJlc1sldS8ldV0i
+LCBwYWdlLCBpKTsKICAgICAgfCAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fgpJbiBm
+aWxlIGluY2x1ZGVkIGZyb20gL3Vzci9pbmNsdWRlL3N0ZGlvLmg6ODY3LAogICAgICAgICAgICAg
+ICAgIGZyb20gbW9uaXRvci9wYWNrZXQuYzoxODoKL3Vzci9pbmNsdWRlL3g4Nl82NC1saW51eC1n
+bnUvYml0cy9zdGRpbzIuaDozNjoxMDogbm90ZTog4oCYX19idWlsdGluX19fc3ByaW50Zl9jaGvi
+gJkgb3V0cHV0IGJldHdlZW4gMTQgYW5kIDI1IGJ5dGVzIGludG8gYSBkZXN0aW5hdGlvbiBvZiBz
+aXplIDE4CiAgIDM2IHwgICByZXR1cm4gX19idWlsdGluX19fc3ByaW50Zl9jaGsgKF9fcywgX19V
+U0VfRk9SVElGWV9MRVZFTCAtIDEsCiAgICAgIHwgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgIDM3IHwgICAgICAgX19ib3Mg
+KF9fcyksIF9fZm10LCBfX3ZhX2FyZ19wYWNrICgpKTsKICAgICAgfCAgICAgICB+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0
+ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6NzA2MDogbW9uaXRvci9wYWNrZXQu
+b10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpt
+YWtlOiAqKiogW01ha2VmaWxlOjQxNzQ6IGFsbF0gRXJyb3IgMgoKCmh0dHBzOi8vZ2l0aHViLmNv
+bS9ibHVlei9ibHVlei9wdWxsLzIzMTkKCi0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgKCg==
 
-Add btd_connect_cb callback infrastructure to the adapter core
-mirroring the existing btd_disconnect_cb pattern, invoked from
-connected_callback so it only fires on new MGMT_EV_DEVICE_CONNECTED
-events. Register a callback in the policy plugin that starts a
-2-second grace timer for bonded BR/EDR connections. If an audio
-profile connects naturally within the window the timer is cancelled;
-otherwise btd_device_connect_services is called as a fallback, but
-only if no audio profile is connected yet. The grace timer is also
-cancelled on disconnect to avoid racing with device removal.
-
-Outbound L2CAP is queued by the kernel until encryption completes,
-surviving the race. The fallback is safe when the host already won
-since btd_device_connect_services returns -EBUSY if a connection is
-already in progress.
----
- plugins/policy.c | 106 +++++++++++++++++++++++++++++++++++++++++++++++
- src/adapter.c    |  24 +++++++++++
- src/adapter.h    |   4 ++
- 3 files changed, 134 insertions(+)
-
-diff --git a/plugins/policy.c b/plugins/policy.c
-index 0e1ce5c9a..c0004e743 100644
---- a/plugins/policy.c
-+++ b/plugins/policy.c
-@@ -45,6 +45,7 @@
- #define HS_RETRIES SOURCE_RETRIES
- #define CT_RETRIES 1
- #define TG_RETRIES CT_RETRIES
-+#define GRACE_TIMEOUT 2
- 
- struct reconnect_data {
- 	struct btd_device *dev;
-@@ -92,6 +93,7 @@ struct policy_data {
- 	uint8_t tg_retries;
- 	unsigned int hs_timer;
- 	uint8_t hs_retries;
-+	unsigned int grace_timer;
- };
- 
- static struct reconnect_data *reconnect_find(struct btd_device *dev)
-@@ -190,6 +192,9 @@ static void policy_remove(void *user_data)
- 	if (data->hs_timer > 0)
- 		timeout_remove(data->hs_timer);
- 
-+	if (data->grace_timer > 0)
-+		timeout_remove(data->grace_timer);
-+
- 	g_free(data);
- }
- 
-@@ -209,6 +214,83 @@ static struct policy_data *policy_get_data(struct btd_device *dev)
- 	return data;
- }
- 
-+static bool policy_has_audio_profile(struct btd_device *dev)
-+{
-+	struct btd_service *service;
-+
-+	service = btd_device_get_service(dev, A2DP_SINK_UUID);
-+	if (service && btd_service_get_state(service) ==
-+					BTD_SERVICE_STATE_CONNECTED)
-+		return true;
-+
-+	service = btd_device_get_service(dev, A2DP_SOURCE_UUID);
-+	if (service && btd_service_get_state(service) ==
-+					BTD_SERVICE_STATE_CONNECTED)
-+		return true;
-+
-+	return false;
-+}
-+
-+static void policy_clear_grace_timer(struct policy_data *data)
-+{
-+	if (data->grace_timer > 0) {
-+		timeout_remove(data->grace_timer);
-+		data->grace_timer = 0;
-+	}
-+}
-+
-+static bool policy_grace_timeout(gpointer user_data)
-+{
-+	struct policy_data *data = user_data;
-+	struct btd_device *dev = data->dev;
-+	int err;
-+
-+	data->grace_timer = 0;
-+
-+	DBG("Grace period expired for %s", device_get_path(dev));
-+
-+	if (policy_has_audio_profile(dev))
-+		return false;
-+
-+	err = btd_device_connect_services(dev, NULL);
-+	if (err < 0)
-+		error("Fallback profile connection failed: %s (%d)",
-+							strerror(-err), -err);
-+
-+	return false;
-+}
-+
-+static void policy_set_grace_timer(struct policy_data *data)
-+{
-+	policy_clear_grace_timer(data);
-+
-+	DBG("Starting %d second grace period for %s", GRACE_TIMEOUT,
-+						device_get_path(data->dev));
-+
-+	data->grace_timer = timeout_add_seconds(GRACE_TIMEOUT,
-+						policy_grace_timeout, data,
-+						NULL);
-+}
-+
-+static void policy_connect_cb(struct btd_device *dev, uint8_t bdaddr_type)
-+{
-+	struct policy_data *data;
-+
-+	if (bdaddr_type != BDADDR_BREDR)
-+		return;
-+
-+	if (!device_is_bonded(dev, BDADDR_BREDR))
-+		return;
-+
-+	if (policy_has_audio_profile(dev))
-+		return;
-+
-+	DBG("Bonded BREDR ACL connected for %s", device_get_path(dev));
-+
-+	data = policy_get_data(dev);
-+	policy_set_grace_timer(data);
-+}
-+
- static bool policy_connect_hs(gpointer user_data)
- {
- 	struct policy_data *data = user_data;
-@@ -716,6 +798,22 @@ static void service_cb(struct btd_service *service,
- 			g_str_equal(profile->remote_uuid, HSP_HS_UUID))
- 		hs_cb(service, old_state, new_state);
- 
-+	/* Cancel grace timer if an audio profile connected naturally.
-+	 * Only A2DP connectivity cancels the timer: a non-audio profile
-+	 * (HFP, HID, etc.) may connect after the security block window
-+	 * without resolving the A2DP failure the timer is meant to catch.
-+	 */
-+	if (new_state == BTD_SERVICE_STATE_CONNECTED) {
-+		struct btd_device *dev = btd_service_get_device(service);
-+		struct policy_data *data = find_data(dev);
-+
-+		if (data && data->grace_timer > 0 &&
-+				policy_has_audio_profile(dev)) {
-+			DBG("Audio connected during grace period, cancelling");
-+			policy_clear_grace_timer(data);
-+		}
-+	}
-+
- 	/*
- 	 * Return if the reconnection feature is not enabled (all
- 	 * subsequent code in this function is about that).
-@@ -810,9 +908,14 @@ static void reconnect_set_timer(struct reconnect_data *reconnect, int timeout)
- static void disconnect_cb(struct btd_device *dev, uint8_t reason)
- {
- 	struct reconnect_data *reconnect;
-+	struct policy_data *data;
- 
- 	DBG("reason %u", reason);
- 
-+	data = find_data(dev);
-+	if (data)
-+		policy_clear_grace_timer(data);
-+
- 	/* Only attempt reconnect for the following reasons */
- 	if (reason != MGMT_DEV_DISCONN_TIMEOUT &&
- 	    reason != MGMT_DEV_DISCONN_LOCAL_HOST_SUSPEND)
-@@ -917,6 +1020,8 @@ static int policy_init(void)
- 
- 	service_id = btd_service_add_state_cb(service_cb, NULL);
- 
-+	btd_add_connect_cb(policy_connect_cb);
-+
- 	conf = btd_get_main_conf();
- 	if (!conf) {
- 		reconnect_uuids = g_strdupv((char **) default_reconnect);
-@@ -988,6 +1093,7 @@ static void policy_exit(void)
- {
- 	btd_remove_disconnect_cb(disconnect_cb);
- 	btd_remove_conn_fail_cb(conn_fail_cb);
-+	btd_remove_connect_cb(policy_connect_cb);
- 
- 	if (reconnect_uuids)
- 		g_strfreev(reconnect_uuids);
-diff --git a/src/adapter.c b/src/adapter.c
-index 4ffa32a52..e6e061893 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -167,6 +167,7 @@ static GSList *adapter_drivers = NULL;
- 
- static GSList *disconnect_list = NULL;
- static GSList *conn_fail_list = NULL;
-+static GSList *connect_list = NULL;
- 
- struct link_key_info {
- 	bdaddr_t bdaddr;
-@@ -8609,6 +8610,17 @@ int adapter_bonding_attempt(struct btd_adapter *adapter, const bdaddr_t *bdaddr,
- 	return 0;
- }
- 
-+static void connect_notify(struct btd_device *dev, uint8_t bdaddr_type)
-+{
-+	GSList *l;
-+
-+	for (l = connect_list; l; l = g_slist_next(l)) {
-+		btd_connect_cb connect_cb = l->data;
-+
-+		connect_cb(dev, bdaddr_type);
-+	}
-+}
-+
- static void disconnect_notify(struct btd_device *dev, uint8_t reason)
- {
- 	GSList *l;
-@@ -8662,6 +8674,16 @@ void btd_remove_disconnect_cb(btd_disconnect_cb func)
- 	disconnect_list = g_slist_remove(disconnect_list, func);
- }
- 
-+void btd_add_connect_cb(btd_connect_cb func)
-+{
-+	connect_list = g_slist_append(connect_list, func);
-+}
-+
-+void btd_remove_connect_cb(btd_connect_cb func)
-+{
-+	connect_list = g_slist_remove(connect_list, func);
-+}
-+
- static void disconnect_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -9606,6 +9628,8 @@ static void connected_callback(uint16_t index, uint16_t length,
- 		adapter_msd_notify(adapter, device, eir_data.msd_list);
- 
- 	eir_data_free(&eir_data);
-+
-+	connect_notify(device, ev->addr.type);
- }
- 
- static void controller_resume_notify(struct btd_adapter *adapter)
-diff --git a/src/adapter.h b/src/adapter.h
-index 4e07f71ad..a9e1bbf66 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -65,6 +65,10 @@ typedef void (*btd_conn_fail_cb) (struct btd_device *device, uint8_t status);
- void btd_add_conn_fail_cb(btd_conn_fail_cb func);
- void btd_remove_conn_fail_cb(btd_conn_fail_cb func);
- 
-+typedef void (*btd_connect_cb) (struct btd_device *device, uint8_t bdaddr_type);
-+void btd_add_connect_cb(btd_connect_cb func);
-+void btd_remove_connect_cb(btd_connect_cb func);
-+
- struct btd_adapter *adapter_find(const bdaddr_t *sba);
- struct btd_adapter *adapter_find_by_id(int id);
- 
--- 
-2.50.1
-
+--===============2978535741602096698==--
