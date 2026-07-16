@@ -1,69 +1,199 @@
-Received: from out-7.smtp.github.com (out-7.smtp.github.com [192.30.252.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB653BB11C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 08:06:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C283EFD27
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 08:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784189172; cv=none; b=SDEWKFmYOCu+/KySlI7yW9dyh+x7pXY+TxbqDT6yXVtOCxNnA19iURXAjJqhmbTmfmCkW8MKac1dNQ49GtQ3EJdQ2YOEwehDNWscs47jvSWA+Y6Zp4O6RcoQgmuWzrYyiHuu6W7wFBUp9mZTEo/bbEa04Qkk382KuCwpNN9t3ro=
+	t=1784190709; cv=none; b=aWLFKEsjXOZ1SAGCjjilgdpzy8tasQ/nlKJ/ebsKEBkJ9tR2b5XyFcrvn4ZR/+NUmsnN0dppwGJlTXxy0/wnst1THuyt5YBdDVU5Ksw46K90OngECy271zdkEhyosKM7/nnBBTsR1WlxEgXpOhXJTKC2q8QyBUUozLTAvvLBpjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784189172; c=relaxed/simple;
-	bh=QfiEkNHY/rR1asVm33sY5B5tZLBKfaqqdZeMpsyW1xI=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=XITpkTepcIHZNklT3cwiBnAzALu/mCKSXicuAQf/98tCBlVI3jkZenk2OjRBCNpd7ynd9hr6xdKNQJyULlYIfPnNqdMbEm0DbDcVAuL4MbAyft91dEJa9wJxzG5/CSQf4+8stLeVBoovMHAYroF64+6jzZunMytl9ASBkU13gH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Spt5VYHP; arc=none smtp.client-ip=192.30.252.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1784190709; c=relaxed/simple;
+	bh=6DHfUJVqQheLEpAIKU2YHLWqGBbQ8kKr9sjbdC1PERk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M0FRemImFcxxsNU/yOhCJwTwakYa3pjxjxHU4Nq3XFtDPY+58/CWdAiMWoo1WVy9A7mDfgTgAZOLfyDLK0wPVCqHOW0cgeMv2FqIsur6w65ZvSJdVasvWqrfAqbMuq5uhpwJN9jIq/6rQIxm8ooThrD7uuX75yiJduGxZDg/eu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=cKJ0mHMg; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Spt5VYHP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1784189170;
-	bh=WV/CoIUNxENFDd9yZxHLipjprwOwVCogwipd6X72asA=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Spt5VYHPP00iRZsu8t4A79jDEMoAR4QpbLTki6xSi5UAxF0bMHlysBTas/TmaH2x8
-	 o/dYGlIq2pRiFcxvpJBXFEmI36ks5dG5ZY5SwxxNNEjjGlD5nKa9UJLscWq9gDYyZo
-	 7eNsvMH2fQgE7R0bKHbHtihEIeshBdw31qntVb5Y=
-Received: from github.com (hubbernetes-node-9895ccd.va3-iad.github.net [10.48.135.33])
-	by smtp.github.com (Postfix) with ESMTPA id 323D5781325
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 01:06:10 -0700 (PDT)
-Date: Thu, 16 Jul 2026 01:06:10 -0700
-From: Bhavani <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1128574/000000-eaf23a@github.com>
-Subject: [bluez/bluez] eaf23a: client: Add scripts to start cs
- Initiator/reflector
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="cKJ0mHMg"
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-38e1a9d9105so2429775a91.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 01:31:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1784190707; x=1784795507; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Bc4d8vqk+lliMKPmpqbLIgPhIFDsMX/hIWVD5yj9aEU=;
+        b=cKJ0mHMg6aEmy0v65cg1aQr6syhYObFrAAz3Ipw+5pyERDObvZIzibmBLAiGagP3hC
+         aRtfqHQLa8QGwLsgtmh7oillq20h7IeK0W9uE3ybzhwz9W1Uji6/vw7l/CSFdGv6znBv
+         i7dFNY2eg56Mjp71OZbFuVxetr78jDR48UPQM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784190707; x=1784795507;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Bc4d8vqk+lliMKPmpqbLIgPhIFDsMX/hIWVD5yj9aEU=;
+        b=UsjjJf28Q51+4/pB/KDversFFyCQYtUIc1f8oOy2qWibLSVin3Tak+cyTMFVAgItZ0
+         wCmQTMXjP/hbKK6rjXq2EnjpAAPEY4B5tvScZrb6t/3DxBknX+HnuF17siwRZkuGXO1S
+         3quoZLm0OlfRa31kEhL92uYIWC7Ki2NACZdkSzl7WeVKxqDANI1fzNKnvIwioY7dL3qt
+         RfBBGuf82QMq8vxQN+rFZ8OT74rSIZ4URqZ56ffOQkDPKhXzkOoE3xGMXMoSzAJgqbta
+         I+gvUKRdzXpECIUbekFT6FPh0b7KhAUCZ3jY2bG9JfBXZqAuxAjEEClQz8oAn5G37t4z
+         uLhQ==
+X-Forwarded-Encrypted: i=1; AHgh+RqnfI/zuBTOxPwau27JuoQo6wcTKu2zQLlf87waY3gMNqq/sEP3JQRVThVCPDUJXEcNNIjAtlGLOiCOqSXENZk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcPeJesVbZYjyr7mVBA5HRF//9Ck0m9+YJ5J3f0HV0vaYGacn2
+	Nyan10itXDkHveAmJH1Y8+b08p7ZUTY3vOZzl+j7s/ZdwHc/v4Hr2mvKuBJZp3VOrA==
+X-Gm-Gg: AfdE7cnaYxz0wDccjciTg5hy12RI+0htjDvnaZTV+JjC5jZvn2fn7dCsTWsoxYqTckU
+	gD9aVKtf2H5opr4CmHgzjmZQvEfI3n3Oh3LUUYcAqM60cs0bjhxzLVs7Bz9LbKDCeOZHo881czj
+	FFuWc9DwYaeFjWQKDgsX6ecq791L6cd1US4dLcyNc+eUk7YApb6djxZeaN0mtx1IlSsI9/fXT7m
+	o5FfqmgMw+9lmwjIUMgHKrHs+iz2YUamt+OidKiwNJ7Fcj2hVU/MmcMAc1hZ8XUDE7a2ipURCyA
+	llodWGO5RbggGmiSYthEKxKKDCrtnRUnZsk5PqpC/Y0p4/ogeKtLEd+CHdZBfp+CDbisdc6DNm4
+	gdXrFFWJbhnHNbuCg2HFNo3FWzqiYSzrUYS7u9NRp5OOo57IC9SH0PTnsDV0680OK39lioi5tv0
+	AwNXlel3rlDxTBveRM1c9nEk0l8KDKaCajhg==
+X-Received: by 2002:a17:90b:4a04:b0:387:e0bb:5802 with SMTP id 98e67ed59e1d1-38e2a12332amr5930901a91.41.1784190706821;
+        Thu, 16 Jul 2026 01:31:46 -0700 (PDT)
+Received: from google.com ([2a00:79e0:201d:8:8cee:ac9c:232c:cca3])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38e39e5f713sm923742a91.14.2026.07.16.01.31.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jul 2026 01:31:46 -0700 (PDT)
+Date: Thu, 16 Jul 2026 16:31:41 +0800
+From: Chen-Yu Tsai <wenst@chromium.org>
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Manivannan Sadhasivam <mani@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, linux-pci@vger.kernel.org,
+	linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Subject: Re: [PATCH v3 08/11] Bluetooth: hci_qca: Support QCA2066 on M.2
+ connector via pwrseq
+Message-ID: <20260716083141.GA4101439@google.com>
+References: <20260710-monza-wireless-v3-0-46253587af64@oss.qualcomm.com>
+ <20260710-monza-wireless-v3-8-46253587af64@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260710-monza-wireless-v3-8-46253587af64@oss.qualcomm.com>
 
-  Branch: refs/heads/1128574
-  Home:   https://github.com/bluez/bluez
-  Commit: eaf23ada4f52f3747c0aa1a2bc918b0bfa81cdee
-      https://github.com/bluez/bluez/commit/eaf23ada4f52f3747c0aa1a2bc918b0bfa81cdee
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-07-16 (Thu, 16 Jul 2026)
+On Fri, Jul 10, 2026 at 11:57:34AM +0200, Loic Poulain wrote:
+> For QCA2066 (and other QCA chips) on M.2 connectors, the UART enable is
+> controlled by the W_DISABLE2# signal managed by the pcie-m2 power sequencer
+> rather than a dedicated BT enable GPIO.
+> 
+> When the serdev controller has an OF graph (indicating it is connected to
+> an M.2 connector), acquire the 'uart' pwrseq target from the connector's
+> power sequencer and use it to control BT power instead of the bt-enable
+> GPIO. This is factored out into qca_serdev_get_m2_pwrseq().
+> 
+> Reviewed-by: Manivannan Sadhasivam <mani@kernel.org>
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> ---
+>  drivers/bluetooth/hci_qca.c | 35 ++++++++++++++++++++++++-----------
+>  1 file changed, 24 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 24dc5bf6d192be7e1d500df6bdf36e6184f9eaf7..f6529d359ffbd97f8a3c4c0593680ab200215b36 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1872,6 +1872,9 @@ static int qca_power_on(struct hci_dev *hdev)
+>  			/* Controller needs time to bootup. */
+>  			msleep(150);
+>  		}
+> +
+> +		if (qcadev->bt_power.pwrseq)
+> +			pwrseq_power_on(qcadev->bt_power.pwrseq);
+>  	}
+>  
+>  	clear_bit(QCA_BT_OFF, &qca->flags);
+> @@ -2387,6 +2390,20 @@ static int qca_init_regulators(struct qca_power *qca,
+>  	return 0;
+>  }
+>  
+> +static int qca_serdev_get_m2_pwrseq(struct qca_serdev *qcadev)
+> +{
+> +	struct serdev_device *serdev = qcadev->serdev_hu.serdev;
+> +
+> +	if (!of_graph_is_present(dev_of_node(&serdev->ctrl->dev)))
+> +		return 0;
+> +
+> +	qcadev->bt_power.pwrseq = devm_pwrseq_get(&serdev->ctrl->dev, "uart");
 
-  Changed paths:
-    A client/scripts/cs-initiator.bt
-    A client/scripts/cs-reflector.bt
+Note that this ultimately ties the lifecycle of the returned pwrseq
+descriptor to the uart, which is probably not what you want.
 
-  Log Message:
-  -----------
-  client: Add scripts to start cs Initiator/reflector
+I ended up manually doing pwrseq_get() with devm_add_action_or_reset()
+so that the descriptor is released when the serdev driver is unbound.
+This was for the Realtek driver. I haven't sent patches yet.
 
-This adds sample bluetoothctl scripts for cs initiator/
-reflector.
+> +	if (IS_ERR(qcadev->bt_power.pwrseq))
+> +		return PTR_ERR(qcadev->bt_power.pwrseq);
+> +
+> +	return 0;
+> +}
+> +
+>  static int qca_serdev_probe(struct serdev_device *serdev)
+>  {
+>  	struct qca_serdev *qcadev;
+> @@ -2417,6 +2434,10 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+>  	else
+>  		qcadev->btsoc_type = QCA_ROME;
+>  
+> +	err = qca_serdev_get_m2_pwrseq(qcadev);
+> +	if (err)
+> +		return err;
+> +
+>  	switch (qcadev->btsoc_type) {
+>  	case QCA_WCN3950:
+>  	case QCA_WCN3988:
+> @@ -2426,17 +2447,9 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+>  	case QCA_WCN6750:
+>  	case QCA_WCN6855:
+>  	case QCA_WCN7850:
+> -		/*
+> -		 * OF graph link is only present for BT devices attached through
+> -		 * the M.2 Key E connector.
+> -		 */
+> -		if (of_graph_is_present(dev_of_node(&serdev->ctrl->dev))) {
+> -			qcadev->bt_power.pwrseq = devm_pwrseq_get(&serdev->ctrl->dev,
+> -								  "uart");
 
-cs-initiator.bt sets up and runs a CS measurement as an Initiator
-cs-reflector.bt sets up the device to respond as a Reflector
+It's already incorrect here. But I think the original patch that
+introduces this hasn't landed?
 
 
+ChenYu
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+> -			if (IS_ERR(qcadev->bt_power.pwrseq))
+> -				return PTR_ERR(qcadev->bt_power.pwrseq);
+> +		/* M.2 connector modules are powered by the pwrseq acquired above. */
+> +		if (qcadev->bt_power.pwrseq)
+>  			break;
+> -		}
+>  
+>  		if (!device_property_present(&serdev->dev, "enable-gpios")) {
+>  			/*
+> @@ -2528,7 +2541,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+>  			return PTR_ERR(qcadev->susclk);
+>  		}
+>  	}
+> -	
+> +
+>  	if (qcadev->bt_power.pwrseq) {
+>  		bt_en_available = pwrseq_power_is_controllable(qcadev->bt_power.pwrseq);
+>  		if (!bt_en_available) {
+> 
+> -- 
+> 2.34.1
+> 
