@@ -1,138 +1,159 @@
-Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.54])
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01AB280CFB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 01:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9994A29D265;
+	Thu, 16 Jul 2026 01:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784167157; cv=none; b=e8j245DVXHqr5PaubLOM+coQuADlVrne5WmEVw77EVkFAkO5UvaSPsLH+UNp4UoGvkNUD5clwZ2IcF9MRWnodqGXCZZLZ/djSQBjTdnvDG7wL82t9s8tntK++btQjdMgaRJTz00RlqzpAVf45aZsofa5W57ZVy9QPBtzh4PBQoM=
+	t=1784167172; cv=none; b=mCELWaVskUVaix+ZCGGuPJXNzyYRx+y3Pds+hhl6IpIDtGzgJquzBRQcnFCkLLlZSdGGzdobmE16S+uRdCAb35dLRBTztkvid4/CUFLBux4UChVCAghFXTXw6qCE5vjf6AFfyXTv9P7rFKoRrUbJIN1JnQnp6+d33qPF+LnV5Fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784167157; c=relaxed/simple;
-	bh=pKAntcTvuPSG6XnNfUOaYWmg1iIFXImxR365hpF05hg=;
-	h=From:To:Cc:Subject:Mime-Version:Content-Type:Date:Message-ID:
-	 References:In-Reply-To; b=tSpmzb6zds4lbaZvAWWITpBrhPeReFyg5KnndKVctLxb6rA+XlfgwYPzSOybJCWWFCWPZk3Ue9LuslLwTYwJ8tVL492WGvlgYzavLeFKQ/Ad6VSgq1CV3c810iPEJ7zkEYvh/tQ1dJTpBSfLbQFxFV1TeLaSYoGfo4ut2tMU1Ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=H471oBnh; arc=none smtp.client-ip=43.163.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1784167172; c=relaxed/simple;
+	bh=YKap3/vGxMXHuEqWG0FqQnF2Bd85ZflBYQrpmSS1kn0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m6x5AYape0xdkiFXUQg/B/MzNtmOOFNJ6FKqNUtmWrRL5KDYqHb2WneEOzzr4GohORhGPNgjxQVCfQsk/I2re2I4tL1+prYh75WQ8Mr66cBFQe3dm9jFwgKFwC7KDdMPZgarW+05folO57dcEF/unMEr3NvYQKPhXvzQosEU+MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=UWi9vfdn; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="H471oBnh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1784167146; bh=pKAntcTvuPSG6XnNfUOaYWmg1iIFXImxR365hpF05hg=;
-	h=From:To:Cc:Subject:Date:References:In-Reply-To;
-	b=H471oBnhVNbsRRhp7VSHK47W6rZy3K6WEjURsRskjVxJuf2MRWabJeOBWzNYGvYJ/
-	 2t1BK8BN40/etZ9LNDg5mdhzQOOk9M8zCztz7RE1lV9oYqp8OLeJiISZolNkUKQP9+
-	 AIsd2Hp1YoNTH0TXSZfWUThKTt4uqfkmLmK89uaE=
-X-QQ-XMRINFO: OWPUhxQsoeAViuV9r0csk6xZ44DqSs99Dg==
-X-QQ-XMAILINFO: OFOY+UPnoCftIUndHn24qW83uEV5yv1/qcG9kfyQGp4zJb9hs8y7BLXI15LLVg
-	 sB+kDIi4v3kYtn/T5ZiqgFVdkkTfklk0lf7a3xQq29klUWX/EMjOn1LfmdhzawjMatR3p66YoeYl4
-	 Umvv3scYRp5C4OwQv5kHlWKpGJEQdwz79hOe7b7GXUSQUnrSfba2oNAZrngJxVLHka8yS8rBXxC/4
-	 i5JcjdCmHwVas0WhMAhT26Tg2LP4txX6WoqT2Xr/Xc5mfTpl0xvoa9UVUbscxb4lWMzxxY7/EAFhj
-	 ONZF5fVhWYFKHA7yWKAiw9hYLq42BDsoBXbvJSaANbcIixRqDwf6jWKD/PmQ1nHaeCxfGlQnUyC9P
-	 Hbd/V3/aSlrcrKoUXnciPX9qy1tSM3HFYHXnydJsGS61qHxsdC4WJfgGYRSB+wdbYyzd5KA/DpDId
-	 UfUnrccqWZm+jCjZiO5udNmsCD0D1YMKqf5Q7W49X+3BQIU0ADHDCpBmTeA+xhI2seP8l7/plKYf6
-	 hclrjJg12wIxBdyXnFL+8y5URs2bJNMIv+inMbtlgMLIhfQ7gsylopaLk8z820JmG1EN1g1SPCtpT
-	 cYkIF3H1Enl8LbGZc8rkZrdHCmQ3casJZPfpY0gzAJGBn6DI3QG5MPoKNZQWkvWwtnwF0XXLApsOk
-	 6A0rBW60y1pejrYt+ZCExTo0D5k1G07Ww9yB7jUSD1X0OvV5cmBscolvHPfSXzEleqIKK4CysaT8P
-	 XMwC6Wa7TElYIcbJz2O2x2sMrYZYK0l220tKxHPV+ExH6xguIV+tT5uyvDwRtGuVLyYKuLMxqv1pS
-	 iYnDhKaKNF8Dpwd+KEnn4IArvyj8Zw3kZFFdms5hMPi8xPEATsMrO0QtVbMAoSkZzwDckfAYzE8Dv
-	 aZ+SIFSkpW60Mv1P3gA1YBNMhEm9g7nMHu8BG2/ymgQKz+oQAzeWqDyvWhK7cIvQMwTjJDYkQRWIv
-	 2YFFEywOTge7hSfSeyzIbMRoOeU44vGBM0wQom2lEB2Ob7m7eC/OcGnB96PNhDsrpBIFN7ecbexXP
-	 /h3O9hYqhzvMGWw/geNb+OF44gbdUQ1OtS5lyvgggXxdFBGQudxbO+024Ww==
-From: "=?utf-8?B?Q2hlbmd5aQ==?=" <chengyi.zhao@qq.com>
-To: "=?utf-8?B?THVpeiBBdWd1c3RvIHZvbiBEZW50eg==?=" <luiz.dentz@gmail.com>
-Cc: "=?utf-8?B?bGludXgtYmx1ZXRvb3Ro?=" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ] adapter: Trigger profile connection on inbound device connection
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="UWi9vfdn"
+X-UUID: f74036a080b911f18dc8c9802ae25ab1-20260716
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=NrLmXw2+grSg8BDLzNZP31Z2rCqGp6CpomTh+kmD5Sk=;
+	b=UWi9vfdnghw3GNv11YVBiruRpo0ECGCcPuflmwZKAopIb/JE7ZKPLm0pwrfk85IEa/+ITq3W12s74B8WKAE1nxHKJ5F1hOpNUYfXVUE+kKGcrG0o+qQmBbNYAT5radErzhooUX9Xb0lw7ussiwPnXtrZBatKoZS6jxfUHQ+t2TI=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.17,REQID:21e6f93c-74f0-4169-b5fc-ae45f10fc68b,IP:0,U
+	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:-25
+X-CID-META: VersionHash:d497b38,CLOUDID:5b1d885f-762a-4584-baab-4eebe609beea,B
+	ulkID:nil,BulkQuantity:0,SF:81|82|102|836|865|888|898,TC:-5,Content:0|15|5
+	0|99|200|213,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:
+	0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: f74036a080b911f18dc8c9802ae25ab1-20260716
+Received: from mtkmbs11n1.mediatek.inc [(172.21.101.185)] by mailgw02.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 411696915; Thu, 16 Jul 2026 09:59:23 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ MTKMBS14N2.mediatek.inc (172.21.101.76) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Thu, 16 Jul 2026 09:59:21 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.2562.29 via Frontend Transport; Thu, 16 Jul 2026 09:59:21 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
+	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>, Paul Menzel
+	<pmenzel@molgen.mpg.de>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH v12 2/7] Bluetooth: btmtk: Add firmware size validation in btmtk_setup_firmware_79xx()
+Date: Thu, 16 Jul 2026 09:59:14 +0800
+Message-ID: <20260716015920.1886719-3-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20260716015920.1886719-1-chris.lu@mediatek.com>
+References: <20260716015920.1886719-1-chris.lu@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-Date: Thu, 16 Jul 2026 09:59:05 +0800
-X-Priority: 3
-Message-ID: <tencent_5BB81149D502DCC9440E5D97754D003F6506@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-References: <tencent_C252270EE8A4AC5702E228978CF8ABF4E109@qq.com>
-	<CABBYNZKR_ft-ofL9--z1CJ87jMuaKM6uS-Z6-CcyK3+t9r=Dmg@mail.gmail.com>
-In-Reply-To: <CABBYNZKR_ft-ofL9--z1CJ87jMuaKM6uS-Z6-CcyK3+t9r=Dmg@mail.gmail.com>
-X-QQ-mid: xmsezc43-0t1784167145t9lxy966o
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-SGkgTHVpeiwKClRoYW5rIHlvdSBmb3IgdGhlIHJldmlldyBhbmQgdGhlIGd1aWRhbmNlLgoK
-SSBoYXZlIHJld3JpdHRlbiB0aGUgcGF0Y2ggYWNjb3JkaW5nIHRvIHlvdXIgc3VnZ2VzdGlv
-bnM6CgoxLiBNb3ZlZCB0aGUgbG9naWMgZnJvbSBhZGFwdGVyLmMgdG8gcGx1Z2lucy9wb2xp
-Y3kuYwoyLiBBZGRlZCBhIGdyYWNlIHBlcmlvZCBtZWNoYW5pc20gKDUwMG1zKSBpbnN0ZWFk
-IG9mIGltbWVkaWF0ZSBjb25uZWN0aW9uCgpUaGUgbmV3IGltcGxlbWVudGF0aW9uIHdvcmtz
-IGFzIGZvbGxvd3M6CgotIGFkYXB0ZXIuYyBub3cgb25seSBub3RpZmllcyByZWdpc3RlcmVk
-IGNhbGxiYWNrcyB3aGVuIGEgYm9uZGVkCiAgZGV2aWNlIGNvbm5lY3RzIHZpYSBpbmJvdW5k
-IEFDTCAobmV3IGJ0ZF9kZXZpY2VfY29ubmVjdGVkX2NiIEFQSSkKCi0gcG9saWN5LmMgbWFp
-bnRhaW5zIGFuIGluYm91bmRfY29ubmVjdF9kYXRhIGxpc3Qgd2l0aCBwZXItZGV2aWNlCiAg
-dGltZXJzLiBXaGVuIGEgYm9uZGVkIEJSL0VEUiBkZXZpY2UgY29ubmVjdHMgdmlhIGluYm91
-bmQgQUNMOgoKICAqIFN0YXJ0IGEgNTAwbXMgZ3JhY2UgcGVyaW9kIHRpbWVyCiAgKiBBbGxv
-dyB0aGUgcmVtb3RlIGEgd2luZG93IHRvIHNlbGYtaW5pdGlhdGUgQVZEVFAgY29ubmVjdGlv
-bgogICogV2hlbiB0aW1lciBleHBpcmVzLCBjaGVjayBpZiBhdWRpbyBwcm9maWxlIChBMkRQ
-L0hGUC9IU1ApIGlzCiAgICBhbHJlYWR5IGNvbm5lY3RlZAogICogSWYgbm90LCBjYWxsIGJ0
-ZF9kZXZpY2VfY29ubmVjdF9zZXJ2aWNlcygpIHRvIHRyaWdnZXIgb3V0Ym91bmQKICAgIHBy
-b2ZpbGUgY29ubmVjdGlvbnMgZnJvbSBob3N0IHNpZGUKClRoZSA1MDBtcyBncmFjZSBwZXJp
-b2QgaXMgY2hvc2VuIGJlY2F1c2U6Ci0gfjgwbXMgZm9yIEVuY3J5cHRpb24gQ2hhbmdlIGFm
-dGVyIEFDTCBlc3RhYmxpc2htZW50Ci0gQWRkaXRpb25hbCBtYXJnaW4gZm9yIHJlbW90ZSBm
-aXJtd2FyZSByZXRyeSBvdmVyaGVhZAotIFNob3J0IGVub3VnaCB0byBub3QgZGVsYXkgYXVk
-aW8gb3V0cHV0IG5vdGljZWFibHkKClRoaXMgYXBwcm9hY2ggcmVzcGVjdHMgdGhlIHBvbGlj
-eSBwbHVnaW4ncyByZXNwb25zaWJpbGl0eSBmb3IKY29ubmVjdGlvbiBwb2xpY2llcyBhbmQg
-YXZvaWRzIGFnZ3Jlc3NpdmUgaW1tZWRpYXRlIHJlY29ubmVjdGlvbi4KCkEgdjIgcGF0Y2gg
-d2lsbCBiZSBzZW50IHNob3J0bHkuCgpUaGFua3MsCkNoZW5neWkKCuWOn+Wni+mCruS7tgrl
-j5Hku7bkurrvvJpMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QGdtYWlsLmNv
-bT4K5Y+R5Lu25pe26Ze077yaMjAyNuW5tDfmnIgxNOaXpSAyMjo0MwrmlLbku7bkurrvvJpD
-aGVuZ3lpIFpoYW8gPGNoZW5neWkuemhhb0BxcS5jb20+CuaKhOmAge+8mmxpbnV4LWJsdWV0
-b290aCA8bGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZz4K5Li76aKY77yaUmU6IFtQ
-QVRDSCBCbHVlWl0gYWRhcHRlcjogVHJpZ2dlciBwcm9maWxlIGNvbm5lY3Rpb24gb24gaW5i
-b3VuZCBkZXZpY2UgY29ubmVjdGlvbgoKCkhpLAoKT27CoFR1ZSzCoEp1bMKgMTQswqAyMDI2
-wqBhdMKgNDoyMeKAr0FNwqBDaGVuZ3lpwqBaaGFvwqA8Y2hlbmd5aS56aGFvQHFxLmNvbT7C
-oHdyb3RlOgo+Cj7CoFdoZW7CoGHCoGJvbmRlZMKgZGV2aWNlwqBpbml0aWF0ZXPCoGFuwqBp
-bmJvdW5kwqBBQ0zCoGNvbm5lY3Rpb27CoGJlZm9yZcKgdGhlCj7CoGhvc3TCoHNlbmRzwqBh
-bsKgb3V0Ym91bmTCoG9uZcKgKGUuZy4swqBhZnRlcsKgcmVzdW1lwqB0aGXCoHJlbW90ZcKg
-d2luc8KgdGhlCj7CoHJhY2UpLMKgQmx1ZVrCoGFjY2VwdHPCoHRoZcKgQUNMwqBsaW5rwqB2
-aWHCoGNvbm5lY3RlZF9jYWxsYmFjaygpwqBidXTCoGRvZXMKPsKgbm90wqBlc3RhYmxpc2jC
-oEFWRFRQL0FWQ1RQwqBwcm9maWxlcy7CoFRoZcKgcmVtb3RlJ3PCoHN1YnNlcXVlbnTCoEwy
-Q0FQCj7CoGNvbm5lY3TCoGZvcsKgUFNNwqAyNcKgZmFpbHPCoHdpdGjCoCJzZWN1cml0ecKg
-YmxvY2siwqBiZWNhdXNlwqB0aGXCoGxpbmvCoGlzCj7CoG5vdMKgeWV0wqBlbmNyeXB0ZWQs
-wqBhbmTCoHRoZcKga2VybmVswqBkb2VzwqBub3TCoHJldHJ5LsKgVGhlwqBBQ0zCoGxpbmvC
-oHN0YXlzCj7CoHVwwqB3aXRowqBub8KgYXVkaW8uCgpUaGlzwqBzb3VuZHPCoGxpa2XCoGHC
-oHByb2JsZW3CoG9uwqB0aGXCoHJlbW90ZcKgc2lkZcKgaWbCoGl0wqBhdHRlbXB0c8KgdG8K
-Y29ubmVjdMKgd2l0aG91dMKgZW5jcnlwdGluZ8KgdGhlwqBsaW5rwqBmaXJzdMKgZm9ywqBB
-VkRUUC9BVkNUUCzCoHNvwqB0aGlzCnNlZW1zwqBtb3JlwqBsaWtlwqBhwqB3b3JrYXJvdW5k
-LsKgT3LCoGl0wqBpc8KgYcKgY29udHJvbGxlcsKgcHJvYmxlbSzCoHBlcmhhcHMKdGhlwqBF
-bmNyeXB0aW9uwqBDaGFuZ2VkwqBldmVudMKgaGFzwqBhbHJlYWR5wqBoYXBwZW5lZMKgYnV0
-wqBpc8KgYXJyaXZpbmcKbGF0ZT8KCj7CoEZpeDrCoGluwqBjb25uZWN0ZWRfY2FsbGJhY2so
-KSzCoGNhbGzCoGJ0ZF9kZXZpY2VfY29ubmVjdF9zZXJ2aWNlcygpwqBmb3IKPsKgYm9uZGVk
-wqBpbmJvdW5kwqBkZXZpY2VzLsKgVGhpc8KgaW5pdGlhdGVzwqBvdXRib3VuZMKgcHJvZmls
-ZcKgY29ubmVjdGlvbnMKPsKgZnJvbcKgdGhlwqBob3N0wqBzaWRlLsKgVW5saWtlwqBpbmJv
-dW5kwqBMMkNBUCzCoG91dGJvdW5kwqBMMkNBUMKgaXPCoHF1ZXVlZAo+wqBiecKgdGhlwqBr
-ZXJuZWzCoHVudGlswqBlbmNyeXB0aW9uwqBjb21wbGV0ZXMswqBzb8KgaXTCoHN1cnZpdmVz
-wqB0aGXCoHJhY2UuCj7CoFNhZmXCoHdoZW7CoHRoZcKgaG9zdMKgYWxyZWFkecKgd29uOsKg
-dGhlwqBmdW5jdGlvbsKgcmV0dXJuc8KgLUVCVVNZwqBpZgo+wqBkZXYtPmNvbm5lY3TCoG9y
-wqBkZXYtPnBlbmRpbmfCoGlzwqBzZXQuCj7CoC0tLQo+wqDCoHNyYy9hZGFwdGVyLmPCoHzC
-oDPCoCsrKwo+wqDCoDHCoGZpbGXCoGNoYW5nZWQswqAzwqBpbnNlcnRpb25zKCspCj4KPsKg
-ZGlmZsKgLS1naXTCoGEvc3JjL2FkYXB0ZXIuY8KgYi9zcmMvYWRhcHRlci5jCj7CoGluZGV4
-wqA0ZmZhMzJhNTIuLjRmMWJkYTRhYsKgMTAwNjQ0Cj7CoC0tLcKgYS9zcmMvYWRhcHRlci5j
-Cj7CoCsrK8KgYi9zcmMvYWRhcHRlci5jCj7CoEBAwqAtOTYwNiw2wqArOTYwNiw5wqBAQMKg
-c3RhdGljwqB2b2lkwqBjb25uZWN0ZWRfY2FsbGJhY2sodWludDE2X3TCoGluZGV4LMKgdWlu
-dDE2X3TCoGxlbmd0aCwKPsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBhZGFw
-dGVyX21zZF9ub3RpZnkoYWRhcHRlcizCoGRldmljZSzCoGVpcl9kYXRhLm1zZF9saXN0KTsK
-Pgo+wqDCoMKgwqDCoMKgwqDCoMKgZWlyX2RhdGFfZnJlZSgmZWlyX2RhdGEpOwo+wqArCj7C
-oCvCoMKgwqDCoMKgwqDCoGlmwqAoZGV2aWNlX2lzX2JvbmRlZChkZXZpY2UswqBCREFERFJf
-QlJFRFIpKQo+wqArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgYnRkX2RldmljZV9j
-b25uZWN0X3NlcnZpY2VzKGRldmljZSzCoE5VTEwpOwoKVGhlwqBwb2xpY3nCoHBsdWdpbsKg
-aXPCoHN1cHBvc2VkwqB0b8KgaGFuZGxlwqBjb25uZWN0aW9uwqBwb2xpY2llc8KgbGlrZcKg
-dGhpcy4KWW91wqB3aWxswqBwcm9iYWJsecKgbmVlZMKgYcKgZ3JhY2XCoHBlcmlvZMKgdG/C
-oHdhaXTCoGZvcsKgdGhlwqByZW1vdGXCoHRvwqBzdGFydApjb25uZWN0aW5nwqBpZsKgaXTC
-oGlzwqB0aGXCoGNlbnRyYWw7wqBvbmx5wqB0aGVuwqBzaG91bGTCoHlvdcKgc3RhcnTCoGNv
-bm5lY3RpbmcKdGhlwqBwcm9maWxlcy4KCj7CoMKgfQo+Cj7CoMKgc3RhdGljwqB2b2lkwqBj
-b250cm9sbGVyX3Jlc3VtZV9ub3RpZnkoc3RydWN0wqBidGRfYWRhcHRlcsKgKmFkYXB0ZXIp
-Cj7CoC0tCj7CoDIuNTAuMQo+Cj4KCgotLcKgCkx1aXrCoEF1Z3VzdG/CoHZvbsKgRGVudHoK
-Cg==
+Add firmware size validation to prevent out-of-bounds access when loading
+truncated or malicious firmware files.
+
+Add three levels of validation:
+1. Minimum size check for header and global descriptor
+2. Section map bounds check with integer overflow protection using
+   check_mul_overflow() and check_add_overflow()
+3. Section data bounds check before accessing each section
+
+This matches the validation approach used in btmtk_load_cbmcu_firmware().
+
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+Assisted-by: Claude:Sonnet-4.5
+---
+ drivers/bluetooth/btmtk.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
+
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index 02a96342e964..3491060b3ae9 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -145,6 +145,7 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
+ 	int err, dlen, i, status;
+ 	u8 flag, first_block, retry;
+ 	u32 section_num, dl_size, section_offset;
++	size_t expected_size;
+ 	u8 cmd[64];
+ 
+ 	err = request_firmware(&fw, fwname, &hdev->dev);
+@@ -153,12 +154,40 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
+ 		return err;
+ 	}
+ 
++	/* Validate minimum firmware size for header and global descriptor */
++	if (fw->size < MTK_FW_ROM_PATCH_HEADER_SIZE + MTK_FW_ROM_PATCH_GD_SIZE) {
++		bt_dev_err(hdev, "Firmware file too small: size=%zu, expected at least %u bytes",
++			   fw->size, MTK_FW_ROM_PATCH_HEADER_SIZE + MTK_FW_ROM_PATCH_GD_SIZE);
++		err = -EINVAL;
++		goto err_release_fw;
++	}
++
+ 	fw_ptr = fw->data;
+ 	fw_bin_ptr = fw_ptr;
+ 	hdr = (struct btmtk_patch_header *)fw_ptr;
+ 	globaldesc = (struct btmtk_global_desc *)(fw_ptr + MTK_FW_ROM_PATCH_HEADER_SIZE);
+ 	section_num = le32_to_cpu(globaldesc->section_num);
+ 
++	/* Check for potential integer overflow in size calculation */
++	if (check_mul_overflow((size_t)MTK_FW_ROM_PATCH_SEC_MAP_SIZE,
++			       (size_t)section_num, &expected_size) ||
++	    check_add_overflow(expected_size,
++			       (size_t)(MTK_FW_ROM_PATCH_HEADER_SIZE +
++					MTK_FW_ROM_PATCH_GD_SIZE),
++			       &expected_size)) {
++		bt_dev_err(hdev, "Firmware size calculation overflow (section_num=%u)",
++			   section_num);
++		err = -EINVAL;
++		goto err_release_fw;
++	}
++
++	if (fw->size < expected_size) {
++		bt_dev_err(hdev, "Firmware truncated: size=%zu, expected=%zu (section_num=%u)",
++			   fw->size, expected_size, section_num);
++		err = -EINVAL;
++		goto err_release_fw;
++	}
++
+ 	bt_dev_info(hdev, "HW/SW Version: 0x%04x%04x, Build Time: %s",
+ 		    le16_to_cpu(hdr->hwver), le16_to_cpu(hdr->swver), hdr->datetime);
+ 
+@@ -171,6 +200,16 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
+ 		section_offset = le32_to_cpu(sectionmap->secoffset);
+ 		dl_size = le32_to_cpu(sectionmap->bin_info_spec.dlsize);
+ 
++		/* Validate section boundaries to prevent out-of-bounds access */
++		if (dl_size > 0 &&
++		    (section_offset > fw->size ||
++		     dl_size > fw->size - section_offset)) {
++			bt_dev_err(hdev, "Section %d out of bounds: offset=%u, size=%u, fw_size=%zu",
++				   i, section_offset, dl_size, fw->size);
++			err = -EINVAL;
++			goto err_release_fw;
++		}
++
+ 		/* MT6639: only download sections where dlmode byte0 == 0x01,
+ 		 * matching the Windows driver behavior which skips WiFi/other
+ 		 * sections that would cause the chip to hang.
+-- 
+2.45.2
 
