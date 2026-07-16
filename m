@@ -1,199 +1,101 @@
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C283EFD27
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 08:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034F23DEFF1;
+	Thu, 16 Jul 2026 08:48:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784190709; cv=none; b=aWLFKEsjXOZ1SAGCjjilgdpzy8tasQ/nlKJ/ebsKEBkJ9tR2b5XyFcrvn4ZR/+NUmsnN0dppwGJlTXxy0/wnst1THuyt5YBdDVU5Ksw46K90OngECy271zdkEhyosKM7/nnBBTsR1WlxEgXpOhXJTKC2q8QyBUUozLTAvvLBpjg=
+	t=1784191691; cv=none; b=bAoyMFRkGeA8PyCCl2+zhc+x28mNBtaBkGvBt4ksd/B4GH+CeQJMthlWtDtnqWws26R8nbxm6S8Es4BDv6aaO2c7nLFzLymIoaqenF054HZr46DOQAYIaju2aqp92s0rsz81AFSl+TIGTZtkjhSmvM1+/QYQcpw93WQ+DIiQRjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784190709; c=relaxed/simple;
-	bh=6DHfUJVqQheLEpAIKU2YHLWqGBbQ8kKr9sjbdC1PERk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M0FRemImFcxxsNU/yOhCJwTwakYa3pjxjxHU4Nq3XFtDPY+58/CWdAiMWoo1WVy9A7mDfgTgAZOLfyDLK0wPVCqHOW0cgeMv2FqIsur6w65ZvSJdVasvWqrfAqbMuq5uhpwJN9jIq/6rQIxm8ooThrD7uuX75yiJduGxZDg/eu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=cKJ0mHMg; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="cKJ0mHMg"
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-38e1a9d9105so2429775a91.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 01:31:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1784190707; x=1784795507; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Bc4d8vqk+lliMKPmpqbLIgPhIFDsMX/hIWVD5yj9aEU=;
-        b=cKJ0mHMg6aEmy0v65cg1aQr6syhYObFrAAz3Ipw+5pyERDObvZIzibmBLAiGagP3hC
-         aRtfqHQLa8QGwLsgtmh7oillq20h7IeK0W9uE3ybzhwz9W1Uji6/vw7l/CSFdGv6znBv
-         i7dFNY2eg56Mjp71OZbFuVxetr78jDR48UPQM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784190707; x=1784795507;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Bc4d8vqk+lliMKPmpqbLIgPhIFDsMX/hIWVD5yj9aEU=;
-        b=UsjjJf28Q51+4/pB/KDversFFyCQYtUIc1f8oOy2qWibLSVin3Tak+cyTMFVAgItZ0
-         wCmQTMXjP/hbKK6rjXq2EnjpAAPEY4B5tvScZrb6t/3DxBknX+HnuF17siwRZkuGXO1S
-         3quoZLm0OlfRa31kEhL92uYIWC7Ki2NACZdkSzl7WeVKxqDANI1fzNKnvIwioY7dL3qt
-         RfBBGuf82QMq8vxQN+rFZ8OT74rSIZ4URqZ56ffOQkDPKhXzkOoE3xGMXMoSzAJgqbta
-         I+gvUKRdzXpECIUbekFT6FPh0b7KhAUCZ3jY2bG9JfBXZqAuxAjEEClQz8oAn5G37t4z
-         uLhQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqnfI/zuBTOxPwau27JuoQo6wcTKu2zQLlf87waY3gMNqq/sEP3JQRVThVCPDUJXEcNNIjAtlGLOiCOqSXENZk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcPeJesVbZYjyr7mVBA5HRF//9Ck0m9+YJ5J3f0HV0vaYGacn2
-	Nyan10itXDkHveAmJH1Y8+b08p7ZUTY3vOZzl+j7s/ZdwHc/v4Hr2mvKuBJZp3VOrA==
-X-Gm-Gg: AfdE7cnaYxz0wDccjciTg5hy12RI+0htjDvnaZTV+JjC5jZvn2fn7dCsTWsoxYqTckU
-	gD9aVKtf2H5opr4CmHgzjmZQvEfI3n3Oh3LUUYcAqM60cs0bjhxzLVs7Bz9LbKDCeOZHo881czj
-	FFuWc9DwYaeFjWQKDgsX6ecq791L6cd1US4dLcyNc+eUk7YApb6djxZeaN0mtx1IlSsI9/fXT7m
-	o5FfqmgMw+9lmwjIUMgHKrHs+iz2YUamt+OidKiwNJ7Fcj2hVU/MmcMAc1hZ8XUDE7a2ipURCyA
-	llodWGO5RbggGmiSYthEKxKKDCrtnRUnZsk5PqpC/Y0p4/ogeKtLEd+CHdZBfp+CDbisdc6DNm4
-	gdXrFFWJbhnHNbuCg2HFNo3FWzqiYSzrUYS7u9NRp5OOo57IC9SH0PTnsDV0680OK39lioi5tv0
-	AwNXlel3rlDxTBveRM1c9nEk0l8KDKaCajhg==
-X-Received: by 2002:a17:90b:4a04:b0:387:e0bb:5802 with SMTP id 98e67ed59e1d1-38e2a12332amr5930901a91.41.1784190706821;
-        Thu, 16 Jul 2026 01:31:46 -0700 (PDT)
-Received: from google.com ([2a00:79e0:201d:8:8cee:ac9c:232c:cca3])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38e39e5f713sm923742a91.14.2026.07.16.01.31.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jul 2026 01:31:46 -0700 (PDT)
-Date: Thu, 16 Jul 2026 16:31:41 +0800
-From: Chen-Yu Tsai <wenst@chromium.org>
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: Manivannan Sadhasivam <mani@kernel.org>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, linux-pci@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-Subject: Re: [PATCH v3 08/11] Bluetooth: hci_qca: Support QCA2066 on M.2
- connector via pwrseq
-Message-ID: <20260716083141.GA4101439@google.com>
-References: <20260710-monza-wireless-v3-0-46253587af64@oss.qualcomm.com>
- <20260710-monza-wireless-v3-8-46253587af64@oss.qualcomm.com>
+	s=arc-20240116; t=1784191691; c=relaxed/simple;
+	bh=5hU4yg3GdDdLx1LhoSoBWJA47GLb1DMB2e/Nj2XLUaA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R8LJK2Wzj4p+glNP5c3kU4UXfH5Q9EzA6n4cCqlD94UO5rv9V0vnMpyOfw9qZYf0rO1VFkzIk16Tp0Z9BTg1N3IKJOcz9sWCPUI4kznzz3FhX9dZgTEy96IDn/rg4iRPsaZefTJTdlXHZU158c8PtiRAYVUh01zjljj8tE4Se0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 0b49832080f311f1aa26b74ffac11d73-20260716
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_DIGIT_LEN
+	HR_FROM_NAME, HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER
+	HR_SJ_NOR_SYM, HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT
+	HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED
+	SA_EXISTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS
+	CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU
+	AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:bf1d0df6-0808-4072-b45f-698fb7fc4fc1,IP:15,
+	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:40
+X-CID-INFO: VERSION:1.3.12,REQID:bf1d0df6-0808-4072-b45f-698fb7fc4fc1,IP:15,UR
+	L:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:40
+X-CID-META: VersionHash:e7bac3a,CLOUDID:d01f4b5bf46d39c55baa145fdf947810,BulkI
+	D:260716164759XAYF71P7,BulkQuantity:0,Recheck:0,SF:10|66|78|102|127|865|89
+	8,TC:nil,Content:0|15|50,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil
+	,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 0b49832080f311f1aa26b74ffac11d73-20260716
+X-User: liqiang01@kylinos.cn
+Received: from cvdaxia.localdomain [(116.128.244.171)] by mailgw.kylinos.cn
+	(envelope-from <liqiang01@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 378013744; Thu, 16 Jul 2026 16:47:57 +0800
+From: Li Qiang <liqiang01@kylinos.cn>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-kernel@vger.kernel.org,
+	Li Qiang <liqiang01@kylinos.cn>
+Subject: [PATCH 0/5] Bluetooth: harden packet and transport parsing
+Date: Thu, 16 Jul 2026 16:47:27 +0800
+Message-ID: <cover.1784191283.git.liqiang01@kylinos.cn>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260710-monza-wireless-v3-8-46253587af64@oss.qualcomm.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 10, 2026 at 11:57:34AM +0200, Loic Poulain wrote:
-> For QCA2066 (and other QCA chips) on M.2 connectors, the UART enable is
-> controlled by the W_DISABLE2# signal managed by the pcie-m2 power sequencer
-> rather than a dedicated BT enable GPIO.
-> 
-> When the serdev controller has an OF graph (indicating it is connected to
-> an M.2 connector), acquire the 'uart' pwrseq target from the connector's
-> power sequencer and use it to control BT power instead of the bt-enable
-> GPIO. This is factored out into qca_serdev_get_m2_pwrseq().
-> 
-> Reviewed-by: Manivannan Sadhasivam <mani@kernel.org>
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> ---
->  drivers/bluetooth/hci_qca.c | 35 ++++++++++++++++++++++++-----------
->  1 file changed, 24 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 24dc5bf6d192be7e1d500df6bdf36e6184f9eaf7..f6529d359ffbd97f8a3c4c0593680ab200215b36 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1872,6 +1872,9 @@ static int qca_power_on(struct hci_dev *hdev)
->  			/* Controller needs time to bootup. */
->  			msleep(150);
->  		}
-> +
-> +		if (qcadev->bt_power.pwrseq)
-> +			pwrseq_power_on(qcadev->bt_power.pwrseq);
->  	}
->  
->  	clear_bit(QCA_BT_OFF, &qca->flags);
-> @@ -2387,6 +2390,20 @@ static int qca_init_regulators(struct qca_power *qca,
->  	return 0;
->  }
->  
-> +static int qca_serdev_get_m2_pwrseq(struct qca_serdev *qcadev)
-> +{
-> +	struct serdev_device *serdev = qcadev->serdev_hu.serdev;
-> +
-> +	if (!of_graph_is_present(dev_of_node(&serdev->ctrl->dev)))
-> +		return 0;
-> +
-> +	qcadev->bt_power.pwrseq = devm_pwrseq_get(&serdev->ctrl->dev, "uart");
+This series hardens Bluetooth packet receive paths and the HCI UART
+transmit path against malformed lengths and invalid callback return
+values.
 
-Note that this ultimately ties the lifecycle of the returned pwrseq
-descriptor to the uart, which is probably not what you want.
+The affected code accesses protocol fields before confirming that the
+complete headers are present, or trusts a received length while
+appending to an skb. The HCI UART write worker also assumes that a tty
+driver always returns a valid written-byte count. These assumptions can
+lead to out-of-bounds accesses or invalid skb manipulation when data is
+truncated or a lower-level driver reports an invalid result.
 
-I ended up manually doing pwrseq_get() with devm_add_action_or_reset()
-so that the descriptor is released when the serdev driver is unbound.
-This was for the Realtek driver. I haven't sent patches yet.
+Validate packet headers and declared data ranges before dereferencing
+or copying them. Reject tty write return values outside the skb length,
+and reset the QCA memdump state when a collection is discarded.
 
-> +	if (IS_ERR(qcadev->bt_power.pwrseq))
-> +		return PTR_ERR(qcadev->bt_power.pwrseq);
-> +
-> +	return 0;
-> +}
-> +
->  static int qca_serdev_probe(struct serdev_device *serdev)
->  {
->  	struct qca_serdev *qcadev;
-> @@ -2417,6 +2434,10 @@ static int qca_serdev_probe(struct serdev_device *serdev)
->  	else
->  		qcadev->btsoc_type = QCA_ROME;
->  
-> +	err = qca_serdev_get_m2_pwrseq(qcadev);
-> +	if (err)
-> +		return err;
-> +
->  	switch (qcadev->btsoc_type) {
->  	case QCA_WCN3950:
->  	case QCA_WCN3988:
-> @@ -2426,17 +2447,9 @@ static int qca_serdev_probe(struct serdev_device *serdev)
->  	case QCA_WCN6750:
->  	case QCA_WCN6855:
->  	case QCA_WCN7850:
-> -		/*
-> -		 * OF graph link is only present for BT devices attached through
-> -		 * the M.2 Key E connector.
-> -		 */
-> -		if (of_graph_is_present(dev_of_node(&serdev->ctrl->dev))) {
-> -			qcadev->bt_power.pwrseq = devm_pwrseq_get(&serdev->ctrl->dev,
-> -								  "uart");
+The affected Bluetooth objects were built with the required Bluetooth
+configuration dependencies enabled. The series also passes
+git diff --check and checkpatch on the generated patches.
 
-It's already incorrect here. But I think the original patch that
-introduces this hasn't landed?
+Li Qiang (5):
+  Bluetooth: bfusb: validate received block boundaries
+  Bluetooth: btmrvl: validate event packet lengths
+  Bluetooth: hci_bcsp: validate received packet lengths
+  Bluetooth: hci_ldisc: reject invalid tty write lengths
+  Bluetooth: hci_qca: validate controller memdump frames
+
+ drivers/bluetooth/bfusb.c       | 37 +++++++++++++++++++--
+ drivers/bluetooth/btmrvl_main.c | 10 ++++++
+ drivers/bluetooth/hci_bcsp.c    |  5 ++-
+ drivers/bluetooth/hci_ldisc.c   |  6 ++++
+ drivers/bluetooth/hci_qca.c     | 58 +++++++++++++++++++++++----------
+ 5 files changed, 95 insertions(+), 21 deletions(-)
 
 
-ChenYu
-
-> -			if (IS_ERR(qcadev->bt_power.pwrseq))
-> -				return PTR_ERR(qcadev->bt_power.pwrseq);
-> +		/* M.2 connector modules are powered by the pwrseq acquired above. */
-> +		if (qcadev->bt_power.pwrseq)
->  			break;
-> -		}
->  
->  		if (!device_property_present(&serdev->dev, "enable-gpios")) {
->  			/*
-> @@ -2528,7 +2541,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
->  			return PTR_ERR(qcadev->susclk);
->  		}
->  	}
-> -	
-> +
->  	if (qcadev->bt_power.pwrseq) {
->  		bt_en_available = pwrseq_power_is_controllable(qcadev->bt_power.pwrseq);
->  		if (!bt_en_available) {
-> 
-> -- 
-> 2.34.1
-> 
+base-commit: 123b934b63a0bb3f7aa016f640b992406acd4047
+-- 
+2.43.0
