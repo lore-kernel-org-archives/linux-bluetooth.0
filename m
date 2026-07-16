@@ -1,199 +1,248 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 898B13F4825;
-	Thu, 16 Jul 2026 08:48:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C513F4DC0
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 08:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784191696; cv=none; b=OLhZOEqDiIlDPmQRgYH4HGatWGz8tYZ6Qeu1Uzl12WtOYzVEf3Bb+k8/MFzhP8uZz5ivK8rlNdrIqA6MXmxTB7liiXd5xWvrn516AqpVCwq+8EJ4NkZTg+C0LgnYWzyhjgiSziLVVzeFmp9hPhabDDUoI7DtYtGxUlCAopAf2oc=
+	t=1784191804; cv=none; b=eeEQWEMzYViboS+oX7/CKgltxKokHOEsREl52yzJ5QNA975AwKmqYinnOKS5bkBZCM1shBk6hEc5nDBXMPpuN3gZhfkCasNUZV/dskBayqslxyqXc2CEXSFvsLFpC84HkNoSdIiTLusmT2hSFIiq40gosH6XX2FbQVo9vn7uaF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784191696; c=relaxed/simple;
-	bh=WUy/DueWHXdfslzF2Ib8dbFUG7k3Yte9eQjky9JmwPU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I9SVmjDcrsx6gP9kT0AYL6hBzXm6O1PsHpDIMq10LXfjFL2j6E8D4bU3AYCtmk5qxPS+wTzf+7BMCCIkSGJlgRjrkaTBFc18lTEihhean2fN3w+uzLdh5wexmcpUvPBQ2DKbWDrAxotwKKe0VzTX6yDNjNaGSdoRiSgG1cMxM6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 0c7314aa80f311f1aa26b74ffac11d73-20260716
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_DIGIT_LEN
-	HR_FROM_NAME, HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER
-	HR_SJ_NOR_SYM, HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT
-	HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED
-	SA_EXISTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS
-	CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU
-	AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:909b81ca-e4f2-4f5e-9d47-a5b9421acf68,IP:15,
-	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:40
-X-CID-INFO: VERSION:1.3.12,REQID:909b81ca-e4f2-4f5e-9d47-a5b9421acf68,IP:15,UR
-	L:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:40
-X-CID-META: VersionHash:e7bac3a,CLOUDID:98c56fec77a48d406ad30e5678ceb5d1,BulkI
-	D:260716164802BG83684B,BulkQuantity:0,Recheck:0,SF:10|66|78|81|82|102|127|
-	865|898,TC:nil,Content:0|15|50,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,
-	QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-	,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 0c7314aa80f311f1aa26b74ffac11d73-20260716
-X-User: liqiang01@kylinos.cn
-Received: from cvdaxia.localdomain [(116.128.244.171)] by mailgw.kylinos.cn
-	(envelope-from <liqiang01@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 95112118; Thu, 16 Jul 2026 16:47:59 +0800
-From: Li Qiang <liqiang01@kylinos.cn>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-kernel@vger.kernel.org,
-	Li Qiang <liqiang01@kylinos.cn>
-Subject: [PATCH 5/5] Bluetooth: hci_qca: validate controller memdump frames
-Date: Thu, 16 Jul 2026 16:47:32 +0800
-Message-ID: <d22a531ed598e7da1e715a0d620cb6f29fdc0e7f.1784191283.git.liqiang01@kylinos.cn>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1784191283.git.liqiang01@kylinos.cn>
-References: <cover.1784191283.git.liqiang01@kylinos.cn>
+	s=arc-20240116; t=1784191804; c=relaxed/simple;
+	bh=DdPZ4zB2Zc3oj2ugcI5wlzzgHDT5NVHCzQvVTLsMMQ8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=fr2W6GBraU9ATioMZv2UO6cgYCSioY3ruOdHXBx2715tJ3KtsPhkEx6HfKyOqfNpmpw0cRxBjExmVeRcDV+EC5G8sB2H8Gm17S7ZfcV4YsL4Lo1sPRG7AVIFml+CSlGOKfLUrXA8FtTlKN3brtmDUKKgmIhMuTJi2eRMzT/ZGZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hkmhYC/B; arc=none smtp.client-ip=209.85.167.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hkmhYC/B"
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-48a0ca07c38so3575596b6e.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 01:49:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784191794; x=1784796594; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=DdPZ4zB2Zc3oj2ugcI5wlzzgHDT5NVHCzQvVTLsMMQ8=;
+        b=hkmhYC/Bx3+QkqrgJTJigi21HnpJV9iQpzEY6lERUt3tYENFNXjuduJ6YBDSQcFYze
+         ZL6+xDAkSK/FQI6tpZrX2cO1nfFGG/7NSLM/1d1nJlBDNivcxkkcOupw3/0yU2/vDA35
+         hQAtT6xMBK5rXUdMuvSStrzdmPxhlrxKC8IcYNQHLD5LDvZQRa7gVMXP3+mT+AuMHlpq
+         zq6zheYWljxRw5+wS+kh/cJ594su+n/96j5b1jd2q5UwG6ATQF9qm6OacEEjMX5pDqA9
+         xtVJmi2pnqiVCP+cxVEsviYQWCZbiEswdoCQ8QgFHY/5uIgbMr7siLwrTWOiiVpnopw7
+         mxUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784191794; x=1784796594;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=DdPZ4zB2Zc3oj2ugcI5wlzzgHDT5NVHCzQvVTLsMMQ8=;
+        b=strXpKEFBg6CuGxbmNTExRTYGfROesZ9dT0lhSOfuf9NEM6zPCQwtjbd+THO7Eg9Zm
+         SNsFE0t5FW6GOPw7rmW7sQowQfhulRQ5ef0XRpjl7lC2NFGhnRDDEEh4GV1BOp0f1QyN
+         +zNmXLo0Rc9z9j39xXhvsWtTENp/adC8noGfRnN+ltbURncPiZjyBshV75e+EVZC6H4s
+         B9jtcetvOApXKGQd0965pBb7re3mz42dKG5shLcsbUmNecvau2Y98oJ7zk2+ti3muX0R
+         8SsijCoGr9dlFKXev3flFGI+FCD5s1G/NpKuxHyqSyDrwBRkpdE1I35iZ44eDGZl6vJq
+         S8RA==
+X-Gm-Message-State: AOJu0Yy6Kae8CSBC8cUAoLYD5xH+rdj5ThW56C+C8eTt+miMMLCIlou+
+	UDw5/WpJaC3wKaLvEzYvclmpV0byamEOSGFaBAZfLh7ySI+xQ57QqHYozi4cZyv5
+X-Gm-Gg: AfdE7cnCrYMDmho0YgDo55HpkNpmvqp7gdKEW9nrnTAosMMG8u1SIyDc+7tyaIR9IYV
+	Q/+LXsCOEHUq90axD9E2mTMq7MZSLeGGE/chrHvy7IUyTpmhCHgbNIwc1nHS1pFPGgIMnBigr+s
+	190XE8+rVT8Hazwudp1vsv3Sv9SuJ4fCW62kEsEGKEzpIgHg0gnJuUHMivGDiRe+bf3dlo0NiHm
+	fLjUS93mbzhOEZpDu6gTVlSQiy/8mZAOeY1yeu+DWdht87M9yuLe1VkalaWllj2qA5RFY4DMMit
+	vqMZi8uiLTktqVCTpEveAG2kEXUmQ2dLC2go5/cgqZxFIaI8NlAD55dgDKZjRkx6AFtxtnqb8o1
+	ta+MapKPn0n8rri6kX30n6nWQNh7ShWbSVMJl/LvudVoCSmyr4hnTEd8vz2jj1z6u9c8bxbk/a7
+	cCZ6TmueMl
+X-Received: by 2002:a05:6808:221d:b0:496:dfe1:6d91 with SMTP id 5614622812f47-4a472b41732mr9899277b6e.42.1784191793641;
+        Thu, 16 Jul 2026 01:49:53 -0700 (PDT)
+Received: from [172.17.0.2] ([52.176.38.198])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4a1ad5a77e3sm17520736b6e.6.2026.07.16.01.49.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jul 2026 01:49:53 -0700 (PDT)
+Message-ID: <6a589b31.7e1b0c51.30d61d.1cf7@mx.google.com>
+Date: Thu, 16 Jul 2026 01:49:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8841472621008957758=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, naga.akella@oss.qualcomm.com
+Subject: RE: [BlueZ,v1] client: Add scripts to start cs Initiator/reflector
+In-Reply-To: <20260716064842.4016066-1-naga.akella@oss.qualcomm.com>
+References: <20260716064842.4016066-1-naga.akella@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The QCA controller memdump worker reads frame and dump-size headers
-before validating the received skb length. The event classifier likewise
-accesses its fixed header without ensuring that all accessed bytes are
-present. Malformed controller data can therefore cause out-of-bounds
-reads.
+--===============8841472621008957758==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-Validate every header and the initial dump size before changing the dump
-state. Reset the local dump state when discarding an unstarted
-collection. Use subtraction-based capacity checks to prevent overflow
-while accounting for received and synthesized dump data.
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9MTEyODU3NAoKLS0t
+VGVzdCByZXN1bHQtLS0KClRlc3QgU3VtbWFyeToKQ2hlY2tQYXRjaCAgICAgICAgICAgICAgICAg
+ICAgUEFTUyAgICAgIDAuMzYgc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBQ
+QVNTICAgICAgMC4yOCBzZWNvbmRzCkJ1aWxkRWxsICAgICAgICAgICAgICAgICAgICAgIFBBU1Mg
+ICAgICAyMC4xOCBzZWNvbmRzCkJsdWV6TWFrZSAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAg
+ICA0ODQuNjkgc2Vjb25kcwpNYWtlQ2hlY2sgICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
+MTcuOTEgc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBQQVNTICAgICAgMTUy
+LjY1IHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDEyNC4w
+NSBzZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICAyOTMuNDgg
+c2Vjb25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBQQVNTICAgICAgOTQuNTUgc2Vj
+b25kcwpJbmNyZW1lbnRhbEJ1aWxkICAgICAgICAgICAgICBGQUlMICAgICAgNTExLjc2IHNlY29u
+ZHMKU2NhbkJ1aWxkICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDg3MC44OCBzZWNvbmRz
+CgpEZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCbHVlek1ha2Ug
+LSBGQUlMCkRlc2M6IEJ1aWxkIEJsdWVaCk91dHB1dDoKCnRvb2xzL21nbXQtdGVzdGVyLmM6IElu
+IGZ1bmN0aW9uIOKAmG1haW7igJk6CnRvb2xzL21nbXQtdGVzdGVyLmM6MTI5OTA6NTogbm90ZTog
+dmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNr
+aW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CjEyOTkwIHwgaW50IG1haW4oaW50
+IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rlc3QtYXZkdHAuYzog
+SW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2ZHRwLmM6NzY2OjU6IG5vdGU6IHZh
+cmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2lu
+Zy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDc2NiB8IGludCBtYWluKGludCBh
+cmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0LWF2cmNwLmM6IElu
+IGZ1bmN0aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdnJjcC5jOjk4OTo1OiBub3RlOiB2YXJp
+YWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmct
+YXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA5ODkgfCBpbnQgbWFpbihpbnQgYXJn
+YywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+Cm1vbml0b3IvcGFja2V0LmM6IEluIGZ1
+bmN0aW9uIOKAmHByaW50X2ZlYXR1cmVzX3N1YnBhZ2XigJk6Cm1vbml0b3IvcGFja2V0LmM6Mjk0
+MDoyOTogZXJyb3I6IOKAmCV14oCZIGRpcmVjdGl2ZSB3cml0aW5nIGJldHdlZW4gMSBhbmQgMTAg
+Ynl0ZXMgaW50byBhIHJlZ2lvbiBvZiBzaXplIGJldHdlZW4gNSBhbmQgNyBbLVdlcnJvcj1mb3Jt
+YXQtb3ZlcmZsb3c9XQogMjk0MCB8ICAgc3ByaW50ZihzdHIsICJGZWF0dXJlc1sldS8ldV0iLCBw
+YWdlLCBpKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn4KbW9uaXRvci9w
+YWNrZXQuYzoyOTQwOjE2OiBub3RlOiBkaXJlY3RpdmUgYXJndW1lbnQgaW4gdGhlIHJhbmdlIFsw
+LCAyMTQ3NDgzNjQ2XQogMjk0MCB8ICAgc3ByaW50ZihzdHIsICJGZWF0dXJlc1sldS8ldV0iLCBw
+YWdlLCBpKTsKICAgICAgfCAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fgpJbiBmaWxl
+IGluY2x1ZGVkIGZyb20gL3Vzci9pbmNsdWRlL3N0ZGlvLmg6ODY3LAogICAgICAgICAgICAgICAg
+IGZyb20gbW9uaXRvci9wYWNrZXQuYzoxODoKL3Vzci9pbmNsdWRlL3g4Nl82NC1saW51eC1nbnUv
+Yml0cy9zdGRpbzIuaDozNjoxMDogbm90ZTog4oCYX19idWlsdGluX19fc3ByaW50Zl9jaGvigJkg
+b3V0cHV0IGJldHdlZW4gMTQgYW5kIDI1IGJ5dGVzIGludG8gYSBkZXN0aW5hdGlvbiBvZiBzaXpl
+IDE4CiAgIDM2IHwgICByZXR1cm4gX19idWlsdGluX19fc3ByaW50Zl9jaGsgKF9fcywgX19VU0Vf
+Rk9SVElGWV9MRVZFTCAtIDEsCiAgICAgIHwgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgIDM3IHwgICAgICAgX19ib3MgKF9f
+cyksIF9fZm10LCBfX3ZhX2FyZ19wYWNrICgpKTsKICAgICAgfCAgICAgICB+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQg
+YXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6NzA2MDogbW9uaXRvci9wYWNrZXQub10g
+RXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtl
+OiAqKiogW01ha2VmaWxlOjQxNzQ6IGFsbF0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMKVGVzdDogTWFrZUNoZWNrIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBDaGVj
+awpPdXRwdXQ6Cgptb25pdG9yL3BhY2tldC5jOiBJbiBmdW5jdGlvbiDigJhwcmludF9mZWF0dXJl
+c19zdWJwYWdl4oCZOgptb25pdG9yL3BhY2tldC5jOjI5NDA6Mjk6IGVycm9yOiDigJgldeKAmSBk
+aXJlY3RpdmUgd3JpdGluZyBiZXR3ZWVuIDEgYW5kIDEwIGJ5dGVzIGludG8gYSByZWdpb24gb2Yg
+c2l6ZSBiZXR3ZWVuIDUgYW5kIDcgWy1XZXJyb3I9Zm9ybWF0LW92ZXJmbG93PV0KIDI5NDAgfCAg
+IHNwcmludGYoc3RyLCAiRmVhdHVyZXNbJXUvJXVdIiwgcGFnZSwgaSk7CiAgICAgIHwgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIF5+Cm1vbml0b3IvcGFja2V0LmM6Mjk0MDoxNjogbm90ZTog
+ZGlyZWN0aXZlIGFyZ3VtZW50IGluIHRoZSByYW5nZSBbMCwgMjE0NzQ4MzY0Nl0KIDI5NDAgfCAg
+IHNwcmludGYoc3RyLCAiRmVhdHVyZXNbJXUvJXVdIiwgcGFnZSwgaSk7CiAgICAgIHwgICAgICAg
+ICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC91c3IvaW5j
+bHVkZS9zdGRpby5oOjg2NywKICAgICAgICAgICAgICAgICBmcm9tIG1vbml0b3IvcGFja2V0LmM6
+MTg6Ci91c3IvaW5jbHVkZS94ODZfNjQtbGludXgtZ251L2JpdHMvc3RkaW8yLmg6MzY6MTA6IG5v
+dGU6IOKAmF9fYnVpbHRpbl9fX3NwcmludGZfY2hr4oCZIG91dHB1dCBiZXR3ZWVuIDE0IGFuZCAy
+NSBieXRlcyBpbnRvIGEgZGVzdGluYXRpb24gb2Ygc2l6ZSAxOAogICAzNiB8ICAgcmV0dXJuIF9f
+YnVpbHRpbl9fX3NwcmludGZfY2hrIChfX3MsIF9fVVNFX0ZPUlRJRllfTEVWRUwgLSAxLAogICAg
+ICB8ICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fgogICAzNyB8ICAgICAgIF9fYm9zIChfX3MpLCBfX2ZtdCwgX192YV9hcmdfcGFj
+ayAoKSk7CiAgICAgIHwgICAgICAgfn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiog
+W01ha2VmaWxlOjcwNjA6IG1vbml0b3IvcGFja2V0Lm9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtl
+ZmlsZToxMDgyMjogY2hlY2tdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+ClRlc3Q6IENoZWNrVmFsZ3JpbmQgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrIHdp
+dGggVmFsZ3JpbmQKT3V0cHV0OgoKdG9vbHMvbWdtdC10ZXN0ZXIuYzogSW4gZnVuY3Rpb24g4oCY
+bWFpbuKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzoxMjk5MDo1OiBub3RlOiB2YXJpYWJsZSB0cmFj
+a2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVu
+dHPigJksIHJldHJ5aW5nIHdpdGhvdXQKMTI5OTAgfCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAq
+YXJndltdKQogICAgICB8ICAgICBefn5+Cm1vbml0b3IvcGFja2V0LmM6IEluIGZ1bmN0aW9uIOKA
+mHByaW50X2ZlYXR1cmVzX3N1YnBhZ2XigJk6Cm1vbml0b3IvcGFja2V0LmM6Mjk0MDoyOTogZXJy
+b3I6IOKAmCV14oCZIGRpcmVjdGl2ZSB3cml0aW5nIGJldHdlZW4gMSBhbmQgMTAgYnl0ZXMgaW50
+byBhIHJlZ2lvbiBvZiBzaXplIGJldHdlZW4gNSBhbmQgNyBbLVdlcnJvcj1mb3JtYXQtb3ZlcmZs
+b3c9XQogMjk0MCB8ICAgc3ByaW50ZihzdHIsICJGZWF0dXJlc1sldS8ldV0iLCBwYWdlLCBpKTsK
+ICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn4KbW9uaXRvci9wYWNrZXQuYzoy
+OTQwOjE2OiBub3RlOiBkaXJlY3RpdmUgYXJndW1lbnQgaW4gdGhlIHJhbmdlIFswLCAyMTQ3NDgz
+NjQ2XQogMjk0MCB8ICAgc3ByaW50ZihzdHIsICJGZWF0dXJlc1sldS8ldV0iLCBwYWdlLCBpKTsK
+ICAgICAgfCAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVk
+IGZyb20gL3Vzci9pbmNsdWRlL3N0ZGlvLmg6ODY3LAogICAgICAgICAgICAgICAgIGZyb20gbW9u
+aXRvci9wYWNrZXQuYzoxODoKL3Vzci9pbmNsdWRlL3g4Nl82NC1saW51eC1nbnUvYml0cy9zdGRp
+bzIuaDozNjoxMDogbm90ZTog4oCYX19idWlsdGluX19fc3ByaW50Zl9jaGvigJkgb3V0cHV0IGJl
+dHdlZW4gMTQgYW5kIDI1IGJ5dGVzIGludG8gYSBkZXN0aW5hdGlvbiBvZiBzaXplIDE4CiAgIDM2
+IHwgICByZXR1cm4gX19idWlsdGluX19fc3ByaW50Zl9jaGsgKF9fcywgX19VU0VfRk9SVElGWV9M
+RVZFTCAtIDEsCiAgICAgIHwgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgIDM3IHwgICAgICAgX19ib3MgKF9fcyksIF9fZm10
+LCBfX3ZhX2FyZ19wYWNrICgpKTsKICAgICAgfCAgICAgICB+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3Jz
+Cm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6NzA2MDogbW9uaXRvci9wYWNrZXQub10gRXJyb3IgMQpt
+YWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlOiAqKiogW01h
+a2VmaWxlOjEwODIyOiBjaGVja10gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMKVGVzdDogSW5jcmVtZW50YWxCdWlsZCAtIEZBSUwKRGVzYzogSW5jcmVtZW50YWwgYnVpbGQg
+d2l0aCB0aGUgcGF0Y2hlcyBpbiB0aGUgc2VyaWVzCk91dHB1dDoKCnRvb2xzL21nbXQtdGVzdGVy
+LmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnRvb2xzL21nbXQtdGVzdGVyLmM6MTI5OTA6NTog
+bm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFy
+LXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CjEyOTkwIHwgaW50IG1h
+aW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rlc3QtYXZk
+dHAuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2ZHRwLmM6NzY2OjU6IG5v
+dGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10
+cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDc2NiB8IGludCBtYWlu
+KGludCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0LWF2cmNw
+LmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdnJjcC5jOjk4OTo1OiBub3Rl
+OiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJh
+Y2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA5ODkgfCBpbnQgbWFpbihp
+bnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+Cm1vbml0b3IvcGFja2V0LmM6
+IEluIGZ1bmN0aW9uIOKAmHByaW50X2ZlYXR1cmVzX3N1YnBhZ2XigJk6Cm1vbml0b3IvcGFja2V0
+LmM6Mjk0MDoyOTogZXJyb3I6IOKAmCV14oCZIGRpcmVjdGl2ZSB3cml0aW5nIGJldHdlZW4gMSBh
+bmQgMTAgYnl0ZXMgaW50byBhIHJlZ2lvbiBvZiBzaXplIGJldHdlZW4gNSBhbmQgNyBbLVdlcnJv
+cj1mb3JtYXQtb3ZlcmZsb3c9XQogMjk0MCB8ICAgc3ByaW50ZihzdHIsICJGZWF0dXJlc1sldS8l
+dV0iLCBwYWdlLCBpKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn4KbW9u
+aXRvci9wYWNrZXQuYzoyOTQwOjE2OiBub3RlOiBkaXJlY3RpdmUgYXJndW1lbnQgaW4gdGhlIHJh
+bmdlIFswLCAyMTQ3NDgzNjQ2XQogMjk0MCB8ICAgc3ByaW50ZihzdHIsICJGZWF0dXJlc1sldS8l
+dV0iLCBwYWdlLCBpKTsKICAgICAgfCAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fgpJ
+biBmaWxlIGluY2x1ZGVkIGZyb20gL3Vzci9pbmNsdWRlL3N0ZGlvLmg6ODY3LAogICAgICAgICAg
+ICAgICAgIGZyb20gbW9uaXRvci9wYWNrZXQuYzoxODoKL3Vzci9pbmNsdWRlL3g4Nl82NC1saW51
+eC1nbnUvYml0cy9zdGRpbzIuaDozNjoxMDogbm90ZTog4oCYX19idWlsdGluX19fc3ByaW50Zl9j
+aGvigJkgb3V0cHV0IGJldHdlZW4gMTQgYW5kIDI1IGJ5dGVzIGludG8gYSBkZXN0aW5hdGlvbiBv
+ZiBzaXplIDE4CiAgIDM2IHwgICByZXR1cm4gX19idWlsdGluX19fc3ByaW50Zl9jaGsgKF9fcywg
+X19VU0VfRk9SVElGWV9MRVZFTCAtIDEsCiAgICAgIHwgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgIDM3IHwgICAgICAgX19i
+b3MgKF9fcyksIF9fZm10LCBfX3ZhX2FyZ19wYWNrICgpKTsKICAgICAgfCAgICAgICB+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRy
+ZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6NzA2MDogbW9uaXRvci9wYWNr
+ZXQub10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4u
+LgptYWtlOiAqKiogW01ha2VmaWxlOjQxNzQ6IGFsbF0gRXJyb3IgMgpbQmx1ZVosdjFdIGNsaWVu
+dDogQWRkIHNjcmlwdHMgdG8gc3RhcnQgY3MgSW5pdGlhdG9yL3JlZmxlY3RvcgoKdG9vbHMvbWdt
+dC10ZXN0ZXIuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzox
+Mjk5MDo1OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg
+4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKMTI5OTAg
+fCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnVuaXQv
+dGVzdC1hdmR0cC5jOiBJbiBmdW5jdGlvbiDigJhtYWlu4oCZOgp1bml0L3Rlc3QtYXZkdHAuYzo3
+NjY6NTogbm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKA
+mC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CiAgNzY2IHwg
+aW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rl
+c3QtYXZyY3AuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2cmNwLmM6OTg5
+OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgt
+ZnZhci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDk4OSB8IGlu
+dCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KbW9uaXRvci9w
+YWNrZXQuYzogSW4gZnVuY3Rpb24g4oCYcHJpbnRfZmVhdHVyZXNfc3VicGFnZeKAmToKbW9uaXRv
+ci9wYWNrZXQuYzoyOTQwOjI5OiBlcnJvcjog4oCYJXXigJkgZGlyZWN0aXZlIHdyaXRpbmcgYmV0
+d2VlbiAxIGFuZCAxMCBieXRlcyBpbnRvIGEgcmVnaW9uIG9mIHNpemUgYmV0d2VlbiA1IGFuZCA3
+IFstV2Vycm9yPWZvcm1hdC1vdmVyZmxvdz1dCiAyOTQwIHwgICBzcHJpbnRmKHN0ciwgIkZlYXR1
+cmVzWyV1LyV1XSIsIHBhZ2UsIGkpOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBefgptb25pdG9yL3BhY2tldC5jOjI5NDA6MTY6IG5vdGU6IGRpcmVjdGl2ZSBhcmd1bWVudCBp
+biB0aGUgcmFuZ2UgWzAsIDIxNDc0ODM2NDZdCiAyOTQwIHwgICBzcHJpbnRmKHN0ciwgIkZlYXR1
+cmVzWyV1LyV1XSIsIHBhZ2UsIGkpOwogICAgICB8ICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+
+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdXNyL2luY2x1ZGUvc3RkaW8uaDo4NjcsCiAg
+ICAgICAgICAgICAgICAgZnJvbSBtb25pdG9yL3BhY2tldC5jOjE4OgovdXNyL2luY2x1ZGUveDg2
+XzY0LWxpbnV4LWdudS9iaXRzL3N0ZGlvMi5oOjM2OjEwOiBub3RlOiDigJhfX2J1aWx0aW5fX19z
+cHJpbnRmX2Noa+KAmSBvdXRwdXQgYmV0d2VlbiAxNCBhbmQgMjUgYnl0ZXMgaW50byBhIGRlc3Rp
+bmF0aW9uIG9mIHNpemUgMTgKICAgMzYgfCAgIHJldHVybiBfX2J1aWx0aW5fX19zcHJpbnRmX2No
+ayAoX19zLCBfX1VTRV9GT1JUSUZZX0xFVkVMIC0gMSwKICAgICAgfCAgICAgICAgICBefn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KICAgMzcgfCAg
+ICAgICBfX2JvcyAoX19zKSwgX19mbXQsIF9fdmFfYXJnX3BhY2sgKCkpOwogICAgICB8ICAgICAg
+IH5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3Mg
+YmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtlZmlsZTo3MDYwOiBtb25p
+dG9yL3BhY2tldC5vXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVk
+IGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDE3NDogYWxsXSBFcnJvciAyCgoKaHR0cHM6
+Ly9naXRodWIuY29tL2JsdWV6L2JsdWV6L3B1bGwvMjMxOAoKLS0tClJlZ2FyZHMsCkxpbnV4IEJs
+dWV0b290aAoK
 
-Signed-off-by: Li Qiang <liqiang01@kylinos.cn>
----
- drivers/bluetooth/hci_qca.c | 58 ++++++++++++++++++++++++++-----------
- 1 file changed, 41 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index b2d1ee3a3d11..b5d4b8e0e376 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1057,6 +1057,34 @@ static void qca_controller_memdump(struct work_struct *work)
- 			return;
- 		}
- 
-+		if (skb->len < sizeof(*cmd_hdr)) {
-+			bt_dev_err(hu->hdev, "Rx short memdump header");
-+			kfree_skb(skb);
-+			mutex_unlock(&qca->hci_memdump_lock);
-+			continue;
-+		}
-+
-+		cmd_hdr = (void *) skb->data;
-+		seq_no = __le16_to_cpu(cmd_hdr->seq_no);
-+		skb_pull(skb, sizeof(struct qca_memdump_event_hdr));
-+
-+		if (!seq_no) {
-+			if (skb->len < sizeof(*dump)) {
-+				bt_dev_err(hu->hdev, "Rx short memdump size");
-+				kfree_skb(skb);
-+				mutex_unlock(&qca->hci_memdump_lock);
-+				continue;
-+			}
-+
-+			dump = (void *)skb->data;
-+			if (!__le32_to_cpu(dump->dump_size)) {
-+				bt_dev_err(hu->hdev, "Rx invalid memdump size");
-+				kfree_skb(skb);
-+				mutex_unlock(&qca->hci_memdump_lock);
-+				continue;
-+			}
-+		}
-+
- 		if (!qca_memdump) {
- 			qca_memdump = kzalloc_obj(*qca_memdump, GFP_ATOMIC);
- 			if (!qca_memdump) {
-@@ -1068,9 +1096,6 @@ static void qca_controller_memdump(struct work_struct *work)
- 		}
- 
- 		qca->memdump_state = QCA_MEMDUMP_COLLECTING;
--		cmd_hdr = (void *) skb->data;
--		seq_no = __le16_to_cpu(cmd_hdr->seq_no);
--		skb_pull(skb, sizeof(struct qca_memdump_event_hdr));
- 
- 		if (!seq_no) {
- 
-@@ -1082,15 +1107,7 @@ static void qca_controller_memdump(struct work_struct *work)
- 			 */
- 			set_bit(QCA_IBS_DISABLED, &qca->flags);
- 			set_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
--			dump = (void *) skb->data;
- 			qca_memdump->ram_dump_size = __le32_to_cpu(dump->dump_size);
--			if (!(qca_memdump->ram_dump_size)) {
--				bt_dev_err(hu->hdev, "Rx invalid memdump size");
--				kfree(qca_memdump);
--				kfree_skb(skb);
--				mutex_unlock(&qca->hci_memdump_lock);
--				return;
--			}
- 
- 			queue_delayed_work(qca->workqueue,
- 					   &qca->ctrl_memdump_timeout,
-@@ -1123,6 +1140,8 @@ static void qca_controller_memdump(struct work_struct *work)
- 		if (!test_bit(QCA_MEMDUMP_COLLECTION, &qca->flags)) {
- 			bt_dev_err(hu->hdev, "QCA: Discarding other packets");
- 			kfree(qca_memdump);
-+			qca->qca_memdump = NULL;
-+			qca->memdump_state = QCA_MEMDUMP_IDLE;
- 			kfree_skb(skb);
- 			mutex_unlock(&qca->hci_memdump_lock);
- 			return;
-@@ -1140,9 +1159,11 @@ static void qca_controller_memdump(struct work_struct *work)
- 			seq_no != QCA_LAST_SEQUENCE_NUM) {
- 			bt_dev_err(hu->hdev, "QCA controller missed packet:%d",
- 				   qca_memdump->current_seq_no);
--			rx_size = qca_memdump->received_dump;
--			rx_size += QCA_DUMP_PACKET_SIZE;
--			if (rx_size > qca_memdump->ram_dump_size) {
-+			if (qca_memdump->received_dump >
-+				    qca_memdump->ram_dump_size ||
-+			    QCA_DUMP_PACKET_SIZE >
-+				    qca_memdump->ram_dump_size -
-+				    qca_memdump->received_dump) {
- 				bt_dev_err(hu->hdev,
- 					   "QCA memdump received %d, no space for missed packet",
- 					   qca_memdump->received_dump);
-@@ -1154,8 +1175,10 @@ static void qca_controller_memdump(struct work_struct *work)
- 			qca_memdump->current_seq_no++;
- 		}
- 
--		rx_size = qca_memdump->received_dump  + skb->len;
--		if (rx_size <= qca_memdump->ram_dump_size) {
-+		if (qca_memdump->received_dump <= qca_memdump->ram_dump_size &&
-+		    skb->len <= qca_memdump->ram_dump_size -
-+				qca_memdump->received_dump) {
-+			rx_size = qca_memdump->received_dump + skb->len;
- 			if ((seq_no != QCA_LAST_SEQUENCE_NUM) &&
- 			    (seq_no != qca_memdump->current_seq_no)) {
- 				bt_dev_err(hu->hdev,
-@@ -1235,7 +1258,8 @@ static int qca_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
- 	 * received we store dump into a file before closing hci. This
- 	 * dump will help in triaging the issues.
- 	 */
--	if ((skb->data[0] == HCI_VENDOR_PKT) &&
-+	if (skb->len >= offsetof(struct qca_memdump_event_hdr, seq_no) &&
-+	    (skb->data[0] == HCI_VENDOR_PKT) &&
- 	    (get_unaligned_be16(skb->data + 2) == QCA_SSR_DUMP_HANDLE))
- 		return qca_controller_memdump_event(hdev, skb);
- 
--- 
-2.43.0
-
+--===============8841472621008957758==--
