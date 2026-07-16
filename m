@@ -1,112 +1,154 @@
-Received: from out-35.smtp.github.com (out-35.smtp.github.com [192.30.252.134])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D673C5849
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 21:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.134
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0060282F12
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 22:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784237912; cv=none; b=SZTTGl+6pHCI5nyB/sJDxKIfSZqG+0egd4aMafXPVGLJGhL86ph+lBF38S/KhyBlQ7LoXkna6PhrtYaSYlOIzZiIPw+K4VM6IT7wFIPOK43OhkO4rK9x0iphdvfvVEB+0mA3UON60vyOMG1XHEbFvbjrJiguUpxDD5JurY7r3oA=
+	t=1784240436; cv=none; b=SSlqNLpWNfWn70NJ7C49KrmxGnPCuBCfFPz7KuBhHdE1w6DADdz2WHpK5EgLRCwRadt8AYUGIQ+chbv37KJ8lCdNpkXluzCyD/cxdN0nHE+D6PgavPL6eLanzl1Q4eH3GgaBqt3vE/DHUfORKh2/m8AxclRjlKUHSxTZr73/dmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784237912; c=relaxed/simple;
-	bh=6X7jcYk8pkv79+jcBPY7SnyMnQXGZlX0NgtYt46f/gs=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=C5tO0k3axdpD7wqhj/XE9sCdeSZPk5mcvzw1BX0XXsx5ErlhWN7QpXRFhotoSJhYJh7u+qBCy8h/K0RAg6plv87rIik8SAojfCptQObimUG+/e5QUtT+NZ+l5pF+neNytYM+jQeY890XCFpA2V+zWT0K4ryb1xxiq5nY34IoifM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=dm60wRte; arc=none smtp.client-ip=192.30.252.134
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1784240436; c=relaxed/simple;
+	bh=IiiHonleB0c3UBRwLK5PFyMK+79UDCg6n/HmybewN5Q=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ZTqLAipSeBq1ndFMTGfT4yHCgFjrcrzRF2DT5MfopnN/KORFHLxEn0TT4IiQPt71lB72wvhnKSJxmue2sqTSP5TpHpvZHHNonlehjpq5FPGe8Rh0RJG+uqOsF/xp9U+79RuQGlHSImerZTshm5h/sqHVdX2cgmb/6OeUBVp3mvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F6vgMkYb; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="dm60wRte"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1784237910;
-	bh=jpKINc8XrJ6b9brncz6YQMpSutEzTquNVrBEoagRSaY=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=dm60wRteFuX6DovaqWw66jF0K0Gf9RKfVugOsmZ31lBxbfKef9JaTjHEsvg2SFOh4
-	 wY0clGV/cvSyMX4gRnofvjraKyZLHQIjJfPqi2MrBzAIhp+FTzPzOW97AiFgJ3Na7c
-	 YWhLX0jhVgQTyMSb0oSgIkw5Aa/OuSa88H4LqrmU=
-Received: from github.com (hubbernetes-node-268465d.ac4-iad.github.net [10.52.153.34])
-	by smtp.github.com (Postfix) with ESMTPA id 87A0E74097B
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 14:38:30 -0700 (PDT)
-Date: Thu, 16 Jul 2026 14:38:30 -0700
-From: Philipp Dunkel <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1129094/000000-b555d9@github.com>
-Subject: [bluez/bluez] b555d9: adapter: Infer BR/EDR only at public LE
- addresses
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F6vgMkYb"
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-38dfe910e9dso4389618a91.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 15:20:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784240435; x=1784845235; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=FlkEVxAeKVN9OTdcdam1ZBtsJq4w7gHjDd92/10jVYM=;
+        b=F6vgMkYbZnzHGgxIS38tPvQ8oenh+gZLWubO+EKioS5eQwrAr81AIDkNaWOq+fxxVd
+         YNc6fgQFHyjKuT4rPe/z8jfjA4AjrtXi9XyMa5d0gY8Wzr5p78DuAgUAPqlECXs46GbE
+         iyoU1RtfNBTs557R5vy6BfnUOQpWzK1zvAgkZKd3sE0bOOviEqg5AbtQ42e5+/u4rrzz
+         nby3Rj2AJaALB9i9eIK24pLq+9RFplJ9SQyd96Cia46uhUPkvr9dMOjxltXImYvlKHm1
+         1MEU3kAO2yHJNojHxwg7OGwf2JpwJzgO2OIKtSzuZHJib8OE1Of/bYIkP8LgQijymG5E
+         Y+sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784240435; x=1784845235;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=FlkEVxAeKVN9OTdcdam1ZBtsJq4w7gHjDd92/10jVYM=;
+        b=laAhrEmdZfJiZcOD8S/i2wuApt2Ymxhd2F1MG1MLBMAST3qDrWXvFOt1x4NvYYRbLi
+         Pn2vFYJTCgWCqEQBdOarI8S1ATW3m73seZ9BkLcNdJV34KkDe2NteFC54/sDV3hZmjoM
+         rBtKvCl/WZ3IqBu1Yb2w5B0qto3behe3AEMfAvj2TkkXApVRUVQ7MQ/emq+M/OAvyzVI
+         Mhru8B+Hz7Cio1SHe2LdMdWB3r863GYDB+aqQtVghRVhrfvlJWxNzmHrQeRlKLygFR9N
+         DNBM2Tf312Ej4U227/OZyz/Tk+bj1B0T9VUwm1DW8fzj4YNHINgPtAeqNmWOB0uC/MCS
+         iYfg==
+X-Gm-Message-State: AOJu0Yxd44ZlotV5a1fTJevn4y7G1j6xC/rmRRMrRKP1fg2rFyL0v6J9
+	yRFU0swKdE49kalskAY4Feyl3IeDdZSVp2fjL/e+c9O8/LTya9unQbACArGxsA==
+X-Gm-Gg: AfdE7ckF+34dnaM4zzNxqXfnHO904YovyKgyrvK77bXq3ANhFPVJ+QB3vXTa1DsbfJt
+	oDdzZ+ZQGYk4otI8a/wvbmtg/3O+J/gJgBMF4Kb3ur4usDPrKW9yeeaPnLnb1mnNA5TnFmHqrHm
+	04h5/0yn6n1JXFWe/brHszwnMsYOoqzAdo8FdSjI7NivYNX3S91rYpC5PcyWPNT+Nbzt0FiMlPP
+	Mw/sJ9hUITKG/kYqRO/iEHK/EK2OuGHw26h2oV1zrDfFKEY8Gzo0v7qoMN81GsZhn4wAgcof4Ae
+	ORylFleZvJzRzCKnrk+Us0wKQoDOGOO9qi8RjK4nv3FyhLJR09qyKI6YRZFGnxQFKuS3i9p81e2
+	l7y8jd8JZWPNi4YPDcZ4dxrQmJS99sZ0XfF8XBqH0QTh8jBb/3LgenaIdMooRUPHL7GAO9pJC7F
+	UyuAFfOh9KrZ8=
+X-Received: by 2002:a17:90b:3b4c:b0:381:96a2:14d7 with SMTP id 98e67ed59e1d1-38e17e42772mr12930227a91.22.1784240434893;
+        Thu, 16 Jul 2026 15:20:34 -0700 (PDT)
+Received: from [172.17.0.2] ([172.185.150.246])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31429f9d439sm54775eec.5.2026.07.16.15.20.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jul 2026 15:20:34 -0700 (PDT)
+Message-ID: <6a595932.743400b0.23a7b2.c8e7@mx.google.com>
+Date: Thu, 16 Jul 2026 15:20:34 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0453955810891848991=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pip@pipobscure.com
+Subject: RE: [BlueZ] adapter: Infer BR/EDR only at public LE addresses
+In-Reply-To: <20260716204514.79356-1-pip@pipobscure.com>
+References: <20260716204514.79356-1-pip@pipobscure.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============0453955810891848991==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1129094
-  Home:   https://github.com/bluez/bluez
-  Commit: b555d9dbac2ef9a5d1670c08d1600103b211f709
-      https://github.com/bluez/bluez/commit/b555d9dbac2ef9a5d1670c08d1600103b211f709
-  Author: Philipp Dunkel <pip@pipobscure.com>
-  Date:   2026-07-16 (Thu, 16 Jul 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M src/adapter.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  adapter: Infer BR/EDR only at public LE addresses
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1129094
 
-btd_adapter_device_found() records BR/EDR support for any LE device
-whose advertising Flags lack "BR/EDR Not Supported" (EIR_BREDR_UNSUP).
-The address type is not considered:
+---Test result---
 
-	if (bdaddr_type != BDADDR_BREDR && eir_data.flags &&
-				!(eir_data.flags & EIR_BREDR_UNSUP)) {
-		device_set_bredr_support(dev);
+Test Summary:
+CheckPatch                    FAIL      0.30 seconds
+GitLint                       FAIL      0.22 seconds
+BuildEll                      PASS      20.20 seconds
+BluezMake                     PASS      550.48 seconds
+CheckSmatch                   PASS      308.97 seconds
+bluezmakeextell               PASS      100.80 seconds
+IncrementalBuild              PASS      542.15 seconds
+ScanBuild                     PASS      958.34 seconds
 
-When the advertisement uses a random address the device gets a BR/EDR
-bearer whose address is that random address, and start_discovery_cb()
-then prefers SDP over GATT:
-
-	if (device->bredr)
-		device_browse_sdp(device, NULL);
-	else
-		device_browse_gatt(device, NULL);
-
-SDP requires a BR/EDR ACL, so bluetoothd pages the random address. A
-random address is not a BD_ADDR and cannot be paged, so the attempt
-always ends in Page Timeout, and the failure tears down the working LE
-link:
-
-  connect_failed_callback() hci0 5A:B4:98:1F:CC:04 status 4
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ] adapter: Infer BR/EDR only at public LE addresses
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#88: 
   bonding_attempt_complete() hci0 bdaddr 5A:B4:98:1F:CC:04 type 0 status 0x4
-  device_bonding_complete() bonding (nil) status 0x04
-  browse_request_cancel()
-  btd_gatt_database_att_disconnected()
 
-Nothing requested the connection ("bonding (nil)") and the LE link was
-healthy. Any LE association that outlives the page timeout is killed by
-it; measured on one host, applications get about 4.7 s from connect
-before the link disappears, of which GATT discovery already takes 2.3 s.
-
-Current phones advertise Flags 0x1a (LE General Discoverable plus
-Simultaneous LE and BR/EDR, with BR/EDR Not Supported clear) from
-resolvable private addresses, so this triggers routinely rather than in
-some corner case.
-
-The Flags bits describe what the device supports. They do not promise
-that the address it is advertising from is a BD_ADDR. A dual-mode device
-uses the same Public Device Address for BR/EDR and LE, so the inference
-is sound only for BDADDR_LE_PUBLIC. Restrict it to that.
-
-The other two device_set_bredr_support() callers already require the
-device to have been seen over BR/EDR (bdaddr_type == BDADDR_BREDR), so
-they are unaffected. A device later seen over BR/EDR, or whose RPA is
-resolved to a public identity, still gets BR/EDR support recorded there.
-
+WARNING:BAD_SIGN_OFF: Non-standard signature: Assisted-by:
+#113: 
 Assisted-by: Claude Code:claude-opus-4-8
 
+ERROR:BAD_SIGN_OFF: Unrecognized email address: 'Claude Code:claude-opus-4-8'
+#113: 
+Assisted-by: Claude Code:claude-opus-4-8
+
+/github/workspace/src/patch/14692154.patch total: 1 errors, 2 warnings, 18 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14692154.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ] adapter: Infer BR/EDR only at public LE addresses
+
+7: B3 Line contains hard tab characters (\t): "	if (bdaddr_type != BDADDR_BREDR && eir_data.flags &&"
+8: B3 Line contains hard tab characters (\t): "				!(eir_data.flags & EIR_BREDR_UNSUP)) {"
+9: B3 Line contains hard tab characters (\t): "		device_set_bredr_support(dev);"
+15: B3 Line contains hard tab characters (\t): "	if (device->bredr)"
+16: B3 Line contains hard tab characters (\t): "		device_browse_sdp(device, NULL);"
+17: B3 Line contains hard tab characters (\t): "	else"
+18: B3 Line contains hard tab characters (\t): "		device_browse_gatt(device, NULL);"
+
+
+https://github.com/bluez/bluez/pull/2324
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0453955810891848991==--
