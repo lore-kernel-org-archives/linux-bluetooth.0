@@ -1,265 +1,147 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from out-4.smtp.github.com (out-4.smtp.github.com [192.30.252.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DB938E8C1
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 16:18:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E249426EC1
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 16:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784218745; cv=none; b=dEFxruShEpYG8VeY4UKokQtDfLI0wcBi0GurGN+LnhrPFbSuIxFX8dLfLBOvGFYfagWZT1xW6Vk3gBEWPyUoKj62pBiF9wfJcQddNNdwO0RNMNcjUCfF2RkWLsyNmeq9hIYPLMloAbctCsfvPAkns9EZPB9ynOS0uzidqfX2kTY=
+	t=1784219933; cv=none; b=PQDv99DUVOtTeZdgFjmyhDomP83dp6tiDBIdUChwmPE3BSIwyAdyYRBzXwga/MTb3oGLzRIwyp50inF2oXeTFB4v8HA4LLpbiM+WyMjOyQNEXZ15IgIB1WD9Oh3w7CamLC2oZ5xaLacEwkbeoy5hRk0df6sT8422gNg7QwD2MbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784218745; c=relaxed/simple;
-	bh=EILi4Z/HlIjZKXIC4ZrM+OocFMeGQtXeC7RenzsUUVA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=tX8sByHDBmv6DTGt0CwlhS+p8GIjYoxpYxCjIatpR6QiCfO9akHbDzaFn1K5/pwGVcjw7lYTP2i1z6F7aUlyEm6aMqNdBkXgLXE+mUPIcIAOTtDAOHorO9In675Pomeq/EpRx0EEtHy6X1FuBxUT18Jmq5oW8yFOSUZ1GgQyEBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=c/rtDTJD; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=YthqtWeP; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1784219933; c=relaxed/simple;
+	bh=f8+nC92p+csavZm+TtIT7ekKP5e9gfghpctUt8BFaFo=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=mg+HkqIVeZmWV4G+4Kld8R6avDvt/vZFskfCbj1xFsRD3+ax8xPqstAmT1ZbGsrXfp33bYTFniLrq/NNx8F49f0QZZZ1PAMbfKGIB9fI7jv89YiEEr19lGM0DX3HwWmpAzNqv2Sevl5e/6NPjyBRF9lxSGVfL/ZG3e3Ka1uduHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Js+f2gaF; arc=none smtp.client-ip=192.30.252.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="c/rtDTJD";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="YthqtWeP"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66GDJnQr2897300
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 16:18:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	A3c/IYji9aAg2mwzDYhmuLrQNs2xKPwSpSPEjBK9EwM=; b=c/rtDTJD2bBUuIJM
-	hdttu0V9zXhG5WmLieds7CmF3jBFmc5tJNz1pjRl487UTSU+uw3uRYydfFzSkqhZ
-	c/Czndk/hi7/yUnUcl0RfatlbRBMkd3LU8YLsZlbstfG0L9idsCR06LcWQqwuE34
-	AApHWciA5NMznkYM0E58V2lGQLnnjoxY31mZdBllmQVbVX5O7F0wtM4cVBPYgKKH
-	zkiaC3Ltn0qRnxvX/5/gv0RMHkuS4h0Q7jqE/ssWa9uIn/xtXID8l7poUdphyT9z
-	b3pMOC1ekGaOK2yEI9UM+j/HOLBSDkyfzMaGDf2HHyiPS7Q0Ag02nAqfLySMVeh2
-	2uO5aw==
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4feve1sytp-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 16:18:54 +0000 (GMT)
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-51c0ab07320so63687641cf.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 09:18:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1784218734; x=1784823534; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=A3c/IYji9aAg2mwzDYhmuLrQNs2xKPwSpSPEjBK9EwM=;
-        b=YthqtWePpi+QLwcmo0UlVsjHLio28YYGYWRTUPbFcYpCzMtrWEVOG3qF7y0oyT+RVF
-         Hhml9PdrEUD2/KPVpuUAvJR5m9cBs8Fg4HnuEJBnqDdcSEpON+PcioPfo21uGNqUjJj2
-         CSEbmGORx1v/TOXTPMqbqOPUrCTQzrkiYHmMJCP30LgvPAT/x463QPJVUiOqRdXtKgg4
-         b6DtMv1DqbiDXmvbXOw4qTgvATe/E2w7UzO/QrHwyYP2wTDd+lWVFheBIvpWCDSJPsLT
-         L25OVab6z/DC3nBnbJPR3h8u1eQHoOyoywI+vi0b87Y/VyBtn6n/SVMOYRTJbdOI3CsL
-         pKdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784218734; x=1784823534;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=A3c/IYji9aAg2mwzDYhmuLrQNs2xKPwSpSPEjBK9EwM=;
-        b=T85II2qAoDiJG5i0pSVspiOCnhQv0ElNhuBeSyBOsnnSlnAwH3lguk/7rVhYQWtRj0
-         8l0SJP8aQlCkcOxbBQglcb33zxj6Sd+PQDC9lpnExry8B59yYwSlDoAnKUfW2IkhhPGT
-         +Wux1lNQ8CLek+RgxLWVZQUGIkpxUQRGP1kDJ35ObNL+sZgV5AA0D2sYOIktERS1qgth
-         obd+FjjAC/Rp7vqeh/EKB6vPK6Ng0BY+Nt+cCEFSVmAzu+LhErGEd5Gv95YchFOPQwx6
-         SA//2HDaDT+aU07e+l8AMpvXr0B7thcOMbNlyrUWXYwTqYXbO7m2f5zPBMpnVeG2auIO
-         dhxA==
-X-Forwarded-Encrypted: i=1; AHgh+RryNSUMKpi1PTZV0IrzCad6DdxGCl1cp92Myeh9y/o6fyAX+yUulPxRnwApWWDC9kTkFRGtB7Qum/p08SrNmu0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWgM0BEg0zNhxC7+pjXPr6Ats6+WO2GgYw5nV2Pk3FZiTisDXo
-	zNakpbojJCsgcJuDbDo7ogbi+A0dhUY3uL9Cqin9u4n214gP1OlXBMwky9I99P5afOD/iZbuevu
-	MCewLJeRnnYI6rJFycc8pNeopZPUZAmKtglkusuD2B/fe/3ABssiMYWL8QQaod64v4ie1GAw=
-X-Gm-Gg: AfdE7cls0RQY63lDvcM86DOzgltAGzcO5eCeMQRoP2K2P3IeUJHVCK95FaZU8swxskP
-	wrzvj4qw93i5KWkykPrTpUdIFiAbG0r3l/ZHnIlmXcVxEbQHGpyDLpxUcY9xp35/Y8kqI4pLE9t
-	z3wnaJ1X0U602U9szSTfFozBPbp+lWfrhVGmlPzk8BiPPdLmcpstk3ytV8famNiQtHZgkXH0QjT
-	UqKbyH9f62eJprDrJA5w0vJwVzI0Hk+GzCJdOePIME4LXGDykLulPZHd+2j7MS5dr2rdDsdYas2
-	DxeTZoesnKn1wA1Nka31msu/S96XzQY6euIpfgMRG0ouTUiHxfmlXTo+CNJQSKNn8N/uLALoQHd
-	1BZMtIYCGPlUOk722sXUiAYpM/r9Ersnh3f5/W3sgEN/TUc1I9IH7WOmW+Yh0WFN7bmDWaw/H8Q
-	B4cMQRlYmcXHisvFYoHnYv7FVOV/pGY7ISvUB0QrbgGsYMtc40CFw=
-X-Received: by 2002:a05:622a:1aa1:b0:51c:c37:df31 with SMTP id d75a77b69052e-520bc709f45mr3031611cf.7.1784218733742;
-        Thu, 16 Jul 2026 09:18:53 -0700 (PDT)
-X-Received: by 2002:a05:622a:1aa1:b0:51c:c37:df31 with SMTP id d75a77b69052e-520bc709f45mr3031111cf.7.1784218733144;
-        Thu, 16 Jul 2026 09:18:53 -0700 (PDT)
-Received: from QCOM-eG0v1AUPpu.na.qualcomm.com ([2a01:e0a:830:450:751c:d61c:c91:60dd])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c168744bdddsm257262866b.48.2026.07.16.09.18.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jul 2026 09:18:49 -0700 (PDT)
-From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Thu, 16 Jul 2026 18:18:28 +0200
-Subject: [PATCH v4 11/11] arm64: dts: qcom: monaco-arduino-monza: Add
- QCA2066 M.2 WiFi/BT support
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Js+f2gaF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1784219919;
+	bh=9DWnSlGg41GC08zt5M9QlkmmOWOUD8xtVB1vMUiwP4U=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Js+f2gaFu1H9VfvFee3RfPlhyIPLAc2B+8U8UVrYDVvEZ85hMosrGFcEOWPHifTHd
+	 tYxPt7JRWAvKFRghpulD8pqwoL0Cj42Ef1MKpSNoygwFTv5UPrgrG+zXA7RahXaD1r
+	 MuHLKn6ckI4FkjwRBuiLpQHKkecq8mtarWp03nmo=
+Received: from github.com (hubbernetes-node-2429117.va3-iad.github.net [10.48.73.46])
+	by smtp.github.com (Postfix) with ESMTPA id 0F7E9340D0D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 09:38:39 -0700 (PDT)
+Date: Thu, 16 Jul 2026 09:38:39 -0700
+From: Bhavani <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/ae5d5a-efd216@github.com>
+Subject: [bluez/bluez] befde3: rap: Add Channel Sounding parameter types and
+ APIs
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260716-monza-wireless-v4-11-9b02e6f549d7@oss.qualcomm.com>
-References: <20260716-monza-wireless-v4-0-9b02e6f549d7@oss.qualcomm.com>
-In-Reply-To: <20260716-monza-wireless-v4-0-9b02e6f549d7@oss.qualcomm.com>
-To: Manivannan Sadhasivam <mani@kernel.org>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>
-Cc: linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
-        Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
-        Loic Poulain <loic.poulain@oss.qualcomm.com>,
-        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-X-Mailer: b4 0.14.2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE2MDE2NiBTYWx0ZWRfX4h+EbemAH7eo
- 4LBurW37atyX2jvNITJVzxRamo+uXSYxWr61nBWYIExEpW77GBkTmHnSK6zhC3QlAYnhCjE+yBc
- rzBJI0ZMInBIXA7/wsPzmE4IzPdbGLIGopMwSQDXJ1qeRii3Dy6zq/6Pw5vDhQo+BparIhD9Ax/
- 7r14HyobeufcwQvLnI002ZCuEYFjmc5gva4IBNP01CFS+8rzk5EQDt16PHL5zK0jbNbXt7Hfq5a
- DDoUTKEVrOceodaEF1lJKuZGu23kzSISTkZegclITJ9jHZJgnhmJofvZgfJJpKko6RlCy54DKga
- dmwGugMlwjOMwSWNkEyEhXpcF9zrlMrx+576swPIaBaE325XvqCoZlYVPJiIIP1xpoHClpsHsO+
- eagofL/fQ1zkTKebvSIulN1vSoo+gDe3MlV1WK1k1Z3UMf1ambRTCfs1ZhI7mxLtmqOv58TOZwI
- SD9Z4XGwZ1CMF64s+3w==
-X-Authority-Analysis: v=2.4 cv=DvpmPm/+ c=1 sm=1 tr=0 ts=6a59046e cx=c_pps
- a=WeENfcodrlLV9YRTxbY/uA==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22 a=EUspDBNiAAAA:8
- a=VwQbUJbxAAAA:8 a=EzCDy3pf2FPqfMyO2-oA:9 a=QEXdDO2ut3YA:10
- a=kacYvNCVWA4VmyqE58fU:22
-X-Proofpoint-GUID: vSYiAEp-fkCbXkn4dN2RQl0YHVs5uFnq
-X-Proofpoint-ORIG-GUID: vSYiAEp-fkCbXkn4dN2RQl0YHVs5uFnq
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE2MDE2NiBTYWx0ZWRfX3zGPxib3Ro5n
- Ue+3mIHikN3Pg7tqslgkWEPsvZR+jnIxwYmPTCytk48Zarko3SMhExxuAOciRsP/OFbP7Yiwbq+
- FDHAP5d6GOgAbq6nT7Sbp/qb5lmluXs=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-16_05,2026-07-15_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 suspectscore=0 priorityscore=1501 phishscore=0
- lowpriorityscore=0 bulkscore=0 spamscore=0 malwarescore=0 impostorscore=0
- adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607160166
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Add support for the QCA2066 (QCNFA765) WiFi/Bluetooth module on the
-Arduino VENTUNO Q board. The module is interfaced via LGA and is
-compatible with the M.2 Key E.
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: befde3661e03049f2c84288a658433ba1559b357
+      https://github.com/bluez/bluez/commit/befde3661e03049f2c84288a658433ba1559b357
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-07-16 (Thu, 16 Jul 2026)
 
-Add wireless-lga-connector node using pcie-m2-e-connector binding,
-connecting PCIe port 0 to the WiFi interface and UART10 port 3 to
-the Bluetooth interface.
+  Changed paths:
+    M Makefile.am
+    A src/shared/cs-types.h
+    M src/shared/rap.h
 
-Add pcie@1,0 downstream port node with pciclass,0604 compatible so
-the pci-pwrctrl driver can acquire the power sequencer and enable
-the M.2 slot before PCIe enumeration.
+  Log Message:
+  -----------
+  rap: Add Channel Sounding parameter types and APIs
 
-Add nfa725b_default_state pinctrl for the W_DISABLE1/2 GPIOs
-(gpio56/gpio55) used by the power sequencer.
+Add shared Channel Sounding parameter structures
+(bt_rap_le_cs_config, bt_rap_le_cs_frequency and
+bt_rap_le_cs_default_settings) for exchanging
+CS configuration, frequency, and default settings
+between the RAP DBus layer and HCI state machine.
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Reviewed-by: Manivannan Sadhasivam <mani@kernel.org>
-Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
----
- arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts | 64 +++++++++++++++++++++--
- 1 file changed, 60 insertions(+), 4 deletions(-)
+Add getter/setter APIs for CS config, frequency
+and default settings, add measurement.
 
-diff --git a/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts b/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
-index f67a554adf956696aeac2348e478dbd0b74f0e62..5e41e637c1c705ce0f3847aa71b229261a1e3664 100644
---- a/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
-+++ b/arch/arm64/boot/dts/qcom/monaco-arduino-monza.dts
-@@ -155,6 +155,40 @@ vreg_nvme: regulator-3p3-m2 {
- 		enable-active-high;
- 		startup-delay-us = <20000>;
- 	};
-+
-+	wireless-lga-connector {
-+		compatible = "qcom,pcie-m2-1418-lga-connector",
-+			     "pcie-m2-e-connector";
-+		vpcie3v3-supply = <&vdc_3v3>;
-+		vpcie1v8-supply = <&vdc_1v8>;
-+		w-disable1-gpios = <&tlmm 56 GPIO_ACTIVE_LOW>;
-+		w-disable2-gpios = <&tlmm 55 GPIO_ACTIVE_LOW>;
-+		pinctrl-0 = <&nfa725b_default_state>;
-+		pinctrl-names = "default";
-+
-+		ports {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+
-+			/* WiFi/PCIe */
-+			port@0 {
-+				reg = <0>;
-+
-+				lga_pcie_ep: endpoint {
-+					remote-endpoint = <&pcie_ep>;
-+				};
-+			};
-+
-+			/* Bluetooth/UART */
-+			port@3 {
-+				reg = <3>;
-+
-+				lga_uart_ep: endpoint {
-+					remote-endpoint = <&uart10_ep>;
-+				};
-+			};
-+		};
-+	};
- };
- 
- &cci1 {
-@@ -409,6 +443,22 @@ pci@0,0 {
- 		ranges;
- 		reg = <0x010000 0x00 0x00 0x00 0x00>;
- 
-+		pcie@1,0 {
-+			#address-cells = <3>;
-+			#size-cells = <2>;
-+			device_type = "pci";
-+			compatible = "pciclass,0604";
-+			bus-range = <0x00 0xff>;
-+			ranges;
-+			reg = <0x020800 0x00 0x00 0x00 0x00>;
-+
-+			port {
-+				pcie_ep: endpoint {
-+					remote-endpoint = <&lga_pcie_ep>;
-+				};
-+			};
-+		};
-+
- 		pci@2,0 {
- 			#address-cells = <3>;
- 			#size-cells = <2>;
-@@ -501,6 +551,12 @@ max98091_default: max98091-default-state {
- 		bias-pull-up;
- 	};
- 
-+	nfa725b_default_state: nfa725b-default-state {
-+		pins = "gpio55", "gpio56";
-+		function = "gpio";
-+		bias-disable;
-+	};
-+
- 	pcie1_default_state: pcie1-default-state {
- 		wake-pins {
- 			pins = "gpio21";
-@@ -544,10 +600,10 @@ &uart7 {
- &uart10 {
- 	status = "okay";
- 
--	bluetooth: bluetooth {
--		compatible = "qcom,qca2066-bt";
--		enable-gpios = <&tlmm 55 GPIO_ACTIVE_HIGH>;
--		clocks = <&sleep_clk>;
-+	port {
-+		uart10_ep: endpoint {
-+			remote-endpoint = <&lga_uart_ep>;
-+		};
- 	};
- };
- 
 
--- 
-2.34.1
+  Commit: 66d986081360dbd9531432fc378affe9df5912e0
+      https://github.com/bluez/bluez/commit/66d986081360dbd9531432fc378affe9df5912e0
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-07-16 (Thu, 16 Jul 2026)
 
+  Changed paths:
+    M profiles/ranging/rap.c
+    M profiles/ranging/rap_hci.c
+
+  Log Message:
+  -----------
+  profiles: Add D-Bus Channel Sounding control APIs
+
+Expose org.bluez.ChannelSounding1 on the device path,
+adding SetDefaultSettings, StartMeasurement, and StopMeasurement methods
+and an Active property to let external clients configure and
+control CS ranging sessions.
+
+Replace hardcoded CS configuration values with configurable HCI accessors
+(bt_rap_{get,set}_cs_config_params, bt_rap_{get,set}_cs_freq_params,
+bt_rap_{get,set}_default_settings_params).
+Add measurement control APIs (bt_rap_start_measurement,
+bt_rap_stop_measurement) with optional timeout-based auto-stop
+and callbacks for timeout and procedure-state changes,
+allowing DBus Active state to reflect actual controller procedure status.
+
+
+  Commit: 79d1a58208e8a23b3df0003d9452195e0b4105c3
+      https://github.com/bluez/bluez/commit/79d1a58208e8a23b3df0003d9452195e0b4105c3
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-07-16 (Thu, 16 Jul 2026)
+
+  Changed paths:
+    M Makefile.tools
+    A client/cs.c
+    A client/cs.h
+    M client/main.c
+
+  Log Message:
+  -----------
+  client: Add Channel Sounding shell submenu
+
+Add a cs bt_shell submenu for controlling
+org.bluez.ChannelSounding1, supporting measurement start/stop,
+default-setting configuration, and session status display.
+Maintain reusable validated CS parameters and
+track active sessions via D-Bus Active state,
+replies, and disconnects.
+Integrate with client/main.c to manage per-adapter
+ChannelSounding proxies, device resolution,
+property updates, and session cleanup.
+
+
+  Commit: efd216fe280ba5dd38d1b6084f64784bf1328731
+      https://github.com/bluez/bluez/commit/efd216fe280ba5dd38d1b6084f64784bf1328731
+  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+  Date:   2026-07-16 (Thu, 16 Jul 2026)
+
+  Changed paths:
+    A client/scripts/cs-initiator.bt
+    A client/scripts/cs-reflector.bt
+
+  Log Message:
+  -----------
+  client: Add scripts to start cs Initiator/reflector
+
+This adds sample bluetoothctl scripts for cs initiator/
+reflector.
+
+cs-initiator.bt sets up and runs a CS measurement as an Initiator
+cs-reflector.bt sets up the device to respond as a Reflector
+
+
+Compare: https://github.com/bluez/bluez/compare/ae5d5a1e3032...efd216fe280b
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
