@@ -1,76 +1,68 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4AF41A558
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 15:00:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D35941D63D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 15:10:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784214033; cv=none; b=XUrb0hd08r+dWkI3SJ2Lun7W0orjyfG4NqVq2+VUS03o29L2iAgrJ5ne7TT5qm109flGVDD1zlKsjiTZgUibC5Hl9hR59T2xywJmn7K84A9iM8ZS+VRMqPd8kup9E+e3hCBWICmsFTE1z+jZxYbrZld/gExwDUg0uOjkuLrd9PI=
+	t=1784214643; cv=none; b=Jg7PFdn0K/qmmwDe4Iermg4HYqrr38lLgAEDOYz46Yq4/FiDJKiUnxLyw51VeO1XbBtbCYWMr6XkVWTmoyTDaJLAxyqRmo3yUweq2cb+OFM0S0Pg49kgFhjc2tRKoEqvo5qlHWPuARjYiQN+xZOIBsg+VHjcFeQTUVTwpWup/Yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784214033; c=relaxed/simple;
-	bh=vOCniFeI6uG202mNyRJFTsh2QXWebXosQZ5YxlBFewI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cogDu9/FhWzUrIWfvfHIqIVLw0UltcrEgkyAMQEfxxBO1+CVHYko/DJA/XTqCF2DhTH9XDG1FdOOS1i9OP84B6s5i8/ipBT0bjfpNHH9Jve7J2KlP0LKFzqMbI/RLyOxpFgoweLFMYMYNHaqOreq1ZC8QBxVY4ZyF5FxrX2Aylg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fyO1Shj2; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784214643; c=relaxed/simple;
+	bh=A2HwWBps/bP3d8PjcA0rU2MMASUWwJAykPFRSwaJLDY=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=W97n0b8SOPpicFX118lFVvX6G5UEzIexbamvt9kQoD0lpKvfXWIbL/IJW6gvJUXXm/VZQkTC0eCOvXhkBA35yeLUvA+OchD6PLQkjKZ9sD5Sw5MH56xras2J8d7E2krr8dP+2pUL2q/io3lroSGaDQeTdCXtmXx1XefCiAeHvew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=X9d5fmAB; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fyO1Shj2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F33361F00A3A;
-	Thu, 16 Jul 2026 15:00:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784214032;
-	bh=85v5DGl4eKFoaTHusO1J2kXiesQ742unMNqvV3lhmeM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=fyO1Shj2V7btFKHq5cmM4PjyXx9tR9zgH/AtV/8bY/1jJ9FyrnO6DNY7qAJQw+Kdh
-	 UI7KfJ0K1KKbZe4SfiJPI6Gnt+3vl+Fn5Ovzrgv37dD/oAucifI6XUcihlfE3LWRis
-	 lsOPPJfYNQFYyy3kdctIC+7rv4Cy1+huilMKYIqHga9y16bweq3eep26zXFNirr96p
-	 RkTaXu1WKjRMw/iFyJrVWSVVxTXTUnuxgKE8TgTP90Lxj6PPIth3TnHck+oqQQvpWk
-	 Ag8OmDUDNd3P7lHhC1dThItzVTJKc016s0+ZaHc0nbyexLwNgzU1Asw5pucf5Ran2G
-	 tBBdFb3yOpiSQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 56A4D3808205;
-	Thu, 16 Jul 2026 15:00:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="X9d5fmAB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1784214640;
+	bh=GVJQ0XwG16j1fqJrD3X0hoJZbrDyphagJYi7K+OXUu8=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=X9d5fmAB/0BVwEvH63zyxxAssOrq2fcGKL7/mDZoxITQ4D9AKgATzxN8EL8hhfITO
+	 7fJyZSGz6jd+CHRecojbPOhkkJ64jLfELxQcyXKsEYRN490nqBSWPPmlsXE7kja8IN
+	 /aWNJVVpkWdimRyhpLV/PASB1sih0YOU2HjB2/ZY=
+Received: from github.com (hubbernetes-node-6c7c246.va3-iad.github.net [10.48.65.47])
+	by smtp.github.com (Postfix) with ESMTPA id 28FFC801100
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jul 2026 08:10:40 -0700 (PDT)
+Date: Thu, 16 Jul 2026 08:10:40 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/30db66-ae5d5a@github.com>
+Subject: [bluez/bluez] ae5d5a: monitor: Fix build error
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] monitor: Fix build error
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <178421400513.855463.13112359622405296446.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Jul 2026 15:00:05 +0000
-References: <20260715170747.1933443-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260715170747.1933443-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: ae5d5a1e30323b6e73fd529c3c63f9f68fc07000
+      https://github.com/bluez/bluez/commit/ae5d5a1e30323b6e73fd529c3c63f9f68fc07000
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2026-07-15 (Wed, 15 Jul 2026)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M monitor/packet.c
 
-On Wed, 15 Jul 2026 13:07:47 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This fixes the following error:
-> 
->    36 |   return __builtin___sprintf_chk (__s, __USE_FORTIFY_LEVEL - 1,
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    37 |       __bos (__s), __fmt, __va_arg_pack ());
->       |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> [...]
+  Log Message:
+  -----------
+  monitor: Fix build error
 
-Here is the summary with links:
-  - [BlueZ,v1] monitor: Fix build error
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ae5d5a1e3032
+This fixes the following error:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+   36 |   return __builtin___sprintf_chk (__s, __USE_FORTIFY_LEVEL - 1,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   37 |       __bos (__s), __fmt, __va_arg_pack ());
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
