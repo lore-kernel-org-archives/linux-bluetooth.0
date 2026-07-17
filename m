@@ -1,144 +1,184 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6CBE3E0226
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 08:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C7F343D75;
+	Fri, 17 Jul 2026 08:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784276971; cv=none; b=QWugxeaw0dVWNfYaq0bNjG/uskphD8053SIntjaJ7HJYunawuGtXQtmvG3NycmmmbgTey8SUSgm3f0424Dl9PrW+rKcaeoZbGMnKorCRTZYkP9+xvKAOKvbKh6oLY0IUVLuZ/P5Vc+sN/C1Bi54mEgarMCfX2HjNB36wpwoVbz4=
+	t=1784277586; cv=none; b=VWzPIj+ABgMJaXDzFKK8o+V4ecCF5fQ/VKGgCFO+X6qqCioOohnosZ5a+NHKuCms7TJ1cdf5iD2hAEG0IhYBOax22hbnhaf7Nj6XAOwtyf4Qj7ZHVewlDBbbLP2RRxokRsNT+LdTH9tAK4z7G/45d2lgLgZjIhcz3FpDosLCeq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784276971; c=relaxed/simple;
-	bh=gYJGpWPn3e3bGCIfGgtUOZeACOMhz8yVeCqfuC3c2zs=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=InQM4J0nPDdtylPcAxmT9AMQPQMwf6KgReilrzdSphSS9wQy8C9GflXBVw2ugN6/uNO+MCgIiQ7TM0TG4L1pH2wgB3J0Qsv3+/N0uK+gruzwXFemcnFg3Jz/skjE1Bexah3QNDzEt00XOHHMKq7aNFDca4X+7Zhb8SDHJrPQ6o4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MOxgN5Vw; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784277586; c=relaxed/simple;
+	bh=b8Iwl6CNpT4qOX6Ot14Bv10aLVTuf0sIeSa0JQJCYi4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A8yK88Jbv5pd73CYA6gsRleHcR0qhFXm95qdbVayNtRxjQfZO1TXI7SEhvzl6nuE23BVkn1VodvlmJdq/dIS49JkxkF69MO/rNNsaDmx/UXl+7tQX/YvkFpdcpW6hxzrchVurigyABZr2aRF17GDgGSFrqL6SCdwbkAEhU1X0mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=rxnM1WbU; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MOxgN5Vw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33A041F00A3F
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 08:29:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784276968;
-	bh=EPZgr4u40Ey253+h5jZaWa/6ga/57quCqeZN6Y3LbLs=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=MOxgN5Vw0ExTWFj/csnN0Eq1CWmvQhK4Uhi0Qmu6WfKTz7ScXP5gKOZ+DjIv5XEbD
-	 KK55g99Uh9TRYVscAXPiRqO8rbSGR0St22hqW8n+UbyQlNEN3VTeGuiPVlB4mxsc/i
-	 UWN46RdUqAoVguX6rv619gIPbCqrt+i2pT8hIRnK7AorfCbHOebHnq9jceHyuPuvrn
-	 UK3Wo5pzjCVV9Rw1CE+7EC+EJlWXR1CDJXu/TPc3kCbtpF7qXyAzaA853jV0ot6UQj
-	 hheX2Hg/Kq5E6zplZEjKU9Hk8SPU1IOCdZV3V+fN8UY8ylt8ewWgPKllCZzUBZCLB1
-	 SZe6ydnUs4ZoA==
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5b0117d49dcso7173071e87.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 01:29:28 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RprPYYoq49BjcTGNbKx7lmvKPHEoA9N60uMUsbga3gsRjcoGkM/SJn4B6NuhA5SPu2UOPIdeV8b+DMQBVbezbo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAsWrHm4W5m2OrbEgFdGd7FZR5IQ3MF9OgF9pqgfttEet5tDcN
-	YnkBNPOb/r4FxFEVRmk3xc77Ry1uSEcYUN6IL+ffVlOwrtEyBG1JVQMMM0Yee9pIAlq88f207e7
-	EZEfetJLPIVMYOcrllZf4JhWAYx9u68jb7YB7zO+8Rg==
-X-Received: by 2002:a05:6512:6d0:b0:5b0:1359:3dd4 with SMTP id
- 2adb3069b0e04-5b28f8471b5mr432020e87.5.1784276966788; Fri, 17 Jul 2026
- 01:29:26 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 17 Jul 2026 01:29:25 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 17 Jul 2026 01:29:25 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <CAMRc=MdNehSRQT3MUs+QtbZsHcUCS8YjyZchTgHCVv-HaLQkeA@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="rxnM1WbU"
+X-UUID: 0c141d4c81bb11f1b1788b6acf885367-20260717
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=wfEBk7+DETCq/337t74L0/OSrJQnXlYUDD8RMnEvRSA=;
+	b=rxnM1WbU7dt/zl95xYPAdzc2ujjpTWx8YHg+D+uEy5WcwGLOM1IGXpTFx94+9r1y0nANtg1j3ngZtqorPet84LlgA1MKHu3GIFbuGZRHZASP6QPpt0L3Q4TStBDyb1qFjkMFZGA7R9BpmMDMaMAaWoI9qGVnhRk9eF7rCEzdDAU=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.18,REQID:33094e42-8da0-4274-be4a-4f4000d265b4,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:8a735a6,CLOUDID:23ddf450-9df4-4a32-98eb-0af8dcdad6c0,B
+	ulkID:nil,BulkQuantity:0,SF:102|136|836|865|888|898,TC:-5,Content:0|15|50|
+	99|100|102|156|200|213,EDM:-3|-100,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:
+	nil,BEC:-1,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC
+	:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 0c141d4c81bb11f1b1788b6acf885367-20260717
+Received: from mtkmbs09n1.mediatek.inc [(172.21.101.35)] by mailgw01.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 161473863; Fri, 17 Jul 2026 16:39:38 +0800
+Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
+ mtkmbs13n1.mediatek.inc (172.21.101.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Fri, 17 Jul 2026 16:39:37 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.2562.29 via Frontend Transport; Fri, 17 Jul 2026 16:39:37 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
+	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>, Paul Menzel
+	<pmenzel@molgen.mpg.de>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH v16 0/7] Bluetooth: btmtk: Add MT7928 support
+Date: Fri, 17 Jul 2026 16:39:29 +0800
+Message-ID: <20260717083936.2923891-1-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260703-block-as-nvmem-v8-0-98ae32bfc49a@oss.qualcomm.com>
- <20260703-block-as-nvmem-v8-4-98ae32bfc49a@oss.qualcomm.com> <CAMRc=MdNehSRQT3MUs+QtbZsHcUCS8YjyZchTgHCVv-HaLQkeA@mail.gmail.com>
-Date: Fri, 17 Jul 2026 01:29:25 -0700
-X-Gmail-Original-Message-ID: <CAMRc=MeNHzEn+pizmbTUCU6YCiTWZS7cr_yEBSNis8NuYqYjig@mail.gmail.com>
-X-Gm-Features: AUfX_mzH2Q0kFyO4TFR4vp1sRhWEa1QLfB0S2bP-OIJE8-QcpGQ5uxWfAzjRRCI
-Message-ID: <CAMRc=MeNHzEn+pizmbTUCU6YCiTWZS7cr_yEBSNis8NuYqYjig@mail.gmail.com>
-Subject: Re: [PATCH v8 4/9] nvmem: layouts: Support fixed-layout as the nvmem
- device node itself
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, daniel@makrotopia.org, 
-	Loic Poulain <loic.poulain@oss.qualcomm.com>, Ulf Hansson <ulfh@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeff Johnson <jjohnson@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
-	Rocky Liao <quic_rjliao@quicinc.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Saravana Kannan <saravanak@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Wed, 15 Jul 2026 14:07:24 +0200, Bartosz Golaszewski <brgl@kernel.org> said:
-> On Fri, 3 Jul 2026 15:45:17 +0200, Loic Poulain <loic.poulain@oss.qualcomm.com> said:
->> of_nvmem_layout_get_container() only looks for a child node named
->> "nvmem-layout" to locate the cell definitions. This does not cover
->> providers whose device tree node is itself the fixed-layout container,
->> such as an eMMC boot partition block device whose fwnode points directly
->> at a "fixed-layout" compatible partitions node.
->>
->> When no "nvmem-layout" child is present, fall back to returning the nvmem
->> device node itself if it is compatible with "fixed-layout", so that its
->> cells are parsed by nvmem_add_cells_from_fixed_layout().
->>
->> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
->> ---
->>  drivers/nvmem/layouts.c | 13 ++++++++++++-
->>  1 file changed, 12 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/nvmem/layouts.c b/drivers/nvmem/layouts.c
->> index b90584e1b99eab4217cbe7ec48373e18a7caf0dc..efa631ce7283bdd6c8ecda75915911b5e3a33c99 100644
->> --- a/drivers/nvmem/layouts.c
->> +++ b/drivers/nvmem/layouts.c
->> @@ -167,7 +167,18 @@ static int nvmem_layout_bus_populate(struct nvmem_device *nvmem,
->>
->>  struct device_node *of_nvmem_layout_get_container(struct nvmem_device *nvmem)
->>  {
->> -	return of_get_child_by_name(nvmem->dev.of_node, "nvmem-layout");
->> +	struct device_node *np;
->> +
->> +	/* Search for nvmem-layout child */
->> +	np = of_get_child_by_name(nvmem->dev.of_node, "nvmem-layout");
->> +	if (np)
->> +		return np;
->> +
->> +	/* The nvmem of_node is itself a fixed-layout node */
->> +	if (of_device_is_compatible(nvmem->dev.of_node, "fixed-layout"))
->> +		return of_node_get(nvmem->dev.of_node);
->> +
->> +	return NULL;
->>  }
->>  EXPORT_SYMBOL_GPL(of_nvmem_layout_get_container);
->>
->>
->> --
->> 2.34.1
->>
->>
->
-> I have it on my TODO list to convert nvmem layouts to be fwnode-agnostic. While
-> I'm not sure when I'll have the time to look into it, I think it makes sense
-> to not introduce any new OF-specific interfaces. Can you make it into:
->
->   struct fwnode_handle *nvmem_layout_get_container_node(struct nvmem_device *nvmem);
->
-> by replacing of_get_child_by_name() with fwnode_get_name_child_node() and
-> of_device_is_compatible() with device_is_compatible()? That would mean less
-> churn in the future.
->
-> Other than that, it looks good.
->
-> Bart
->
+This patch series adds support for MT7928 (device ID 0x7935) to the
+btmtk driver, which requires a new two-stage firmware loading process
+with CBMCU firmware.
 
-Scratch that, I didn't realize this isn't a new function but a rework of an
-existing one.
+Patch 1 fixes SKB handling issues: DMA out-of-bounds read and cloned
+SKB corruption. Fix by calling skb_unshare() and expanding skb tailroom
+with zero-padding. Use double-pointer to properly update caller's SKB
+pointer, preventing use-after-free.
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Patch 2 adds firmware size validation with integer overflow protection
+to prevent out-of-bounds access with malicious firmware files.
 
-Bart
+Patch 3 passes hardware dev_id to mt79xx_setup() to fix incorrect chip
+ID logging (was hardcoded to 0).
+
+Patch 4 removes redundant snprintf() that overrides btmtk_fw_get_filename()
+result, causing newer chips to request incorrect firmware filenames.
+
+Patch 5 improves firmware logging: adds filename log, uses chip ID as
+HW version, and uses %.16s format specifier for datetime field.
+
+Patch 6 replaces magic numbers with BTMTK_WMT_PKT_* enum for better
+code readability.
+
+Patch 7 implements MT7928 CBMCU firmware download with two-phase loading
+sequence and cert_len overflow protection.
+
+Tested on MT7928 hardware with successful firmware loading and
+Bluetooth functionality verification.
+
+Changes in v16:
+- Fix Patch 1 SKB ownership issues reported by Sashiko:
+  * Use double-pointer (struct sk_buff **pskb) to properly update
+    caller's SKB pointer when skb_unshare() allocates new SKB
+  * On error paths, do not free SKB - leave it valid for caller
+    to requeue, preventing use-after-free in btmtksdio_txrx_work()
+  * Prevents memory leak when pskb_expand_head() fails after
+    skb_unshare() succeeds
+
+Changes in v15:
+- Rebased onto latest bluetooth-next/HEAD (bd8bee79e1fa)
+- No functional changes from v14
+- Fixed patch application issues reported by Sashiko
+
+Changes in v14:
+- Rebased onto latest bluetooth-next tree
+- No functional changes from v13
+
+Changes in v13:
+- Fix cloned SKB corruption (HIGH severity) by adding skb_unshare() (Patch 1)
+- Fix cert_len integer overflow (CRITICAL severity) in CBMCU firmware loading (Patch 7)
+
+Pre-existing issues fixed in subsequent patches:
+- Patch 2 introduces format string issue (%s on non-null-terminated field)
+  -> Fixed in Patch 5 using %.16s format specifier
+- Patch 3 context has pre-existing snprintf() override (identified in v12 review)
+  -> Fixed in Patch 4, resolving firmware load failures on MT6639/MT7925/MT7928
+This gradual improvement approach allows independent backporting of each fix.
+
+v12 -> v13:
+- Added skb_unshare() to prevent cloned SKB corruption
+- Added overflow checks for cert_len calculation
+- Split SDIO firmware loading fixes into two patches
+
+Changes in v12:
+- Reordered patches to fix dependency: move "Pass dev_id" before
+  "Improve logging" so dev_id is available when logging
+
+Changes in v11:
+- Fixed use-after-free: reassign sdio_hdr after pskb_expand_head()
+- Reordered patches for bisectability
+
+Changes in v10:
+- Added Patch 1 to fix DMA out-of-bounds access
+
+Changes in v9:
+- Reordered patches to group SDIO fixes together
+
+Changes in v8:
+- Split firmware validation from dev_id pass-through into separate patches
+
+Changes in v7:
+- Added Fixes tag per feedback
+
+Changes in v6:
+- Added Fixes tag and restructured parameter comment
+
+Changes in v5:
+- Moved documentation to function-level comment
+
+Changes in v4:
+- Fixed commit message and expanded description
+
+Changes in v3:
+- Changed dev_id type from u16 to u32
+
+Changes in v2:
+- Combined MT7928 functionality into single patch
+
+Chris Lu (7):
+  Bluetooth: btmtksdio: Fix SKB handling issues in TX path
+  Bluetooth: btmtk: Add firmware size validation in
+    btmtk_setup_firmware_79xx()
+  Bluetooth: btmtksdio: Pass hardware dev_id to mt79xx_setup()
+  Bluetooth: btmtksdio: Remove redundant firmware filename override
+  Bluetooth: btmtk: Improve BT firmware logging
+  Bluetooth: btmtk: Replace magic numbers with WMT packet flag enum
+  Bluetooth: btmtk: Add MT7928 support
+
+ drivers/bluetooth/btmtk.c     | 427 +++++++++++++++++++++++++++++++++-
+ drivers/bluetooth/btmtk.h     |   9 +
+ drivers/bluetooth/btmtksdio.c |  74 ++++--
+ 3 files changed, 485 insertions(+), 25 deletions(-)
+
+-- 
+2.45.2
+
