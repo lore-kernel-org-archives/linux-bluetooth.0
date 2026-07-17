@@ -1,122 +1,124 @@
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5753E44E8;
-	Fri, 17 Jul 2026 08:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EAFD2E6CC0
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 09:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784278497; cv=none; b=uomPCnD4MIsTAMvsVYHEwthPEnTjNHcxj05oRNeW0MCQyHR/YT5UIFomoYU2n/3QewMgDU+em8em9qzBmIpmDbMa82yguO2+/Qu8vdyH6pcy0eIDQEW8iDo4rrPOawuT9jlnda621AeBWIk483islPu4mAqXsBaaaT88zdMs3Jc=
+	t=1784279456; cv=none; b=bahC3L2EQSESb/0dKVhU9kCl2DEqpH/Nj07o4XbK/WCRV77tIlun5+FCmCJESNdVvCjTIAmi0GvXGTWjqPP20hSGLMdbvlxGyNYpUKmrH3JI62f5jIIp6UcIcQRE/JNvUap7n5qp4yVvMbETUG/N1tGXAuSrR0kEWifW3PhN8NY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784278497; c=relaxed/simple;
-	bh=pR8p7SA2PrGwmlsJ5hWOx6OcqaRJK45+2+NjxO464w4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N8G5mTuvVbxJ0c00VewWMJMnD9JaNp0mTzVgpu7tfgfXxMmLQJSSBvXO/3GIc5hSyITiV0GfkdGmP8KRGWqDh0CNkmDkkvL/mmyLa3zcMJnGG/SmgYiaOqOs+KQAsyG9aOPPGu/icQDGkMBHml3SZJ2AHGYS2usw85Z3NXFNtx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=I7+ZG5fU; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	s=arc-20240116; t=1784279456; c=relaxed/simple;
+	bh=D2ZEIhgxTzgZ3glNRGsknvNaBjjoYZdfbPW6it3tjRQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=njbd1cGg/YDSkiMVXa1iMW/HdCLqWEJGb4H+i4JIup+nT9AstNCxyidGZ+/sqk++Sve3STQXxCTRd1FbVO05brsPGaOweuWIHRkNI0UaTc7VANw256XtZtFo/Ih7b3kVJVfHWyrwzWYRkSw1iTatU+oFgAeWYAeea/g1CXUEBq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UsVWulRE; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="I7+ZG5fU"
-X-UUID: 0c9bd2a081bb11f18dc8c9802ae25ab1-20260717
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=JHebVX3uufPtej3tISmY4aw/qYZynF2oybqtvVa6CAc=;
-	b=I7+ZG5fUMC03xx0RDGTz1lj0URf8NnISdLcP3vG/1VHGKGRmN49PXT65MPAP+XIHwSMjVp1MALG/2+bmy63r+d8z2CFpVEA7OkD5F8rvr6Xc67jrZeIb+U0OweP0T0E/at0chaZWRN7vlwckIEMNBE/Kr1RCkTI5c1NzMw69q+A=;
-X-CID-CACHE: Type:Local,Time:202607171542+08,HitQuantity:1
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.18,REQID:03ea4707-04ed-4e79-9c44-12a17a89e0f4,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:8a735a6,CLOUDID:753d965f-762a-4584-baab-4eebe609beea,B
-	ulkID:nil,BulkQuantity:0,SF:81|82|102|836|865|888|898,TC:-5,Content:0|15|5
-	0|99|200|213,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:
-	0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 0c9bd2a081bb11f18dc8c9802ae25ab1-20260717
-Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw02.mediatek.com
-	(envelope-from <chris.lu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1817113123; Fri, 17 Jul 2026 16:39:39 +0800
-Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
- mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Fri, 17 Jul 2026 16:39:38 +0800
-Received: from mtksitap99.mediatek.inc (10.233.130.16) by
- mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.2562.29 via Frontend Transport; Fri, 17 Jul 2026 16:39:38 +0800
-From: Chris Lu <chris.lu@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
-	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>, Paul Menzel
-	<pmenzel@molgen.mpg.de>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH v16 5/7] Bluetooth: btmtk: Improve BT firmware logging
-Date: Fri, 17 Jul 2026 16:39:34 +0800
-Message-ID: <20260717083936.2923891-6-chris.lu@mediatek.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20260717083936.2923891-1-chris.lu@mediatek.com>
-References: <20260717083936.2923891-1-chris.lu@mediatek.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UsVWulRE"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-51c0c68aa31so43517851cf.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 02:10:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784279453; x=1784884253; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=h3AAhmhAC/+qvv007xcpjDmu7SRuItXa4s8O6U93k3A=;
+        b=UsVWulREnO1xug2RWyvkCGV8yT0HbpK5pT6RYAi2sVatNL6kWzAfIDKSEYDEXRL3kx
+         ft5/hFihoYEXuRc/xtvkvl7DNmg5B9Y4+/kQO544V/esyraw6my5Arpw3/6EHAY+CGq2
+         QII5Z1iyKzJHXqOcSFL+Vn79i1cCFDM2pL1E6sKbUTNBojyIpZFzI6+FkpnMlRSy3SgS
+         X5A8aSlFHzxsqF6HAuwRJB68JeV0XvYNyUEL8+BndgRxUHgOkfQMr6rofBJYAzNnUmK2
+         QTyqEOpON4FUyBSBEV5mgv+FhMxWYUH7Xe5nPVNcEa5+s1xzwlHbhCXkp9YR+3V4jYLO
+         gBHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784279453; x=1784884253;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=h3AAhmhAC/+qvv007xcpjDmu7SRuItXa4s8O6U93k3A=;
+        b=AWtgwodlohWKU6OT7AwwX14pWPWy6LOqYBs5k9yjnbUE2ppVCPqIbELV1QuyoirA1T
+         Vyk/EAUha0zvJGKk3maw4+ZhJ+GgeUyFeojijxArmcqAMEowjEHZJ/WMD5PWtCs/2RU2
+         BWAUrLQ0sH95gXc71AdP5itUXN/336u4TSj5OmG/0dWGyVkueh2ZpbYyuDmcD0UVODYX
+         3+W76h875EHuN4lKVs42vdfVi7z72Emt/5M37qO6Qg/eq+mue5MangKMp7AfjDqlidKZ
+         1y0fdm8xd6f6syB038dwFKWLgIqA48XZshdtLtyAheTSghaDpPeWUyDvZBkRd9NCBKoq
+         hzVw==
+X-Gm-Message-State: AOJu0YzHzVIFpgJA0po+rFLTkxWJW0uL1y2hp6Sw9nZWK/1bxhROWiYe
+	C3M0WtRvO8Jjy+TnVYJgLgEiL/G7gWhHKzshgCgcBPiQE5pWF9EyEOa4fhWczQ==
+X-Gm-Gg: AfdE7clpMl6YkC4WXGKp00/6KyXgWHXPH7SM1bljfvwfxeDmFUKXM7RbkK4MChOQ9MJ
+	s+w+CC9s1m0fyCBz/g7nchqkEZ9qpSnWGfMwIzS3iMDmWzRoDi563WALludtIip3FLo50WfzILS
+	dpZz8SpCMWokOrEOK3zqxi3rwMpPl/otXdjNjR/Jt3C1rkc8yq4hsHwqzVujWlK7L8ho6swFUsR
+	2ukwKa06FlR4WeglUI+Y3Nxnidgs0mE7GqWejE4cwT8BQE3deiqp+39eEv51QrDYuSInw+Fmjkt
+	r9sV1WuNn0zf501uhjohVuuij13q4F/GC6YFDugdS1uJy1VFc/6qUyznfzZZwziTEzAo6lyBR9H
+	g50DTPmDhhF5IBptPIHSO/9QbAXjEDjvfiq6rSNfRTxgY5Mu7IMpyUqSB/wYiCpJkgZsvWU7jWY
+	trnF7YAV2GUQ==
+X-Received: by 2002:a05:622a:4d93:b0:51c:7b12:5ff8 with SMTP id d75a77b69052e-5213d7ab878mr13235971cf.84.1784279453194;
+        Fri, 17 Jul 2026 02:10:53 -0700 (PDT)
+Received: from [172.17.0.2] ([68.154.118.243])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5214d2896f9sm7509671cf.13.2026.07.17.02.10.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jul 2026 02:10:52 -0700 (PDT)
+Message-ID: <6a59f19c.d1a89f1f.1cd619.26e3@mx.google.com>
+Date: Fri, 17 Jul 2026 02:10:52 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2998995548074235088=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, prathibha.madugonde@oss.qualcomm.com
+Subject: RE: Channel Sounding: Aggregate procedure data and expose via D-Bus
+In-Reply-To: <20260717072647.255002-2-prathm@qti.qualcomm.com>
+References: <20260717072647.255002-2-prathm@qti.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Improve firmware loading log messages to provide more useful information:
+--===============2998995548074235088==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-- Add firmware filename before loading to help identify which file
-  is being loaded
-- Display chip ID (dev_id) as HW version instead of firmware's hwver
-  field, which provides more meaningful hardware identification
-- Use %.16s format specifier for hdr->datetime field to prevent
-  potential buffer over-read, as the field is a 16-byte array that
-  may not be null-terminated
+This is automated email and please do not reply to this email!
 
-log output with MT7922
-[  212.878783] Bluetooth: hci1: Loading BT firmware: mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin
-[  212.889614] Bluetooth: hci1: BT HW ver: 0x7922, SW ver: 0x008a, Build Time: 20260224103448
-[  216.048877] Bluetooth: hci1: Device setup in 3096530 usecs
-[  216.048890] Bluetooth: hci1: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
-[  216.114179] Bluetooth: hci1: AOSP extensions version v1.00
-[  216.114220] Bluetooth: hci1: AOSP quality report is supported
-[  216.116782] Bluetooth: MGMT ver 1.23
+Dear submitter,
 
-Signed-off-by: Chris Lu <chris.lu@mediatek.com>
-Assisted-by: Claude:Sonnet-4.5
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1129350
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.95 seconds
+GitLint                       FAIL      0.69 seconds
+BuildEll                      PASS      25.67 seconds
+BluezMake                     PASS      541.37 seconds
+MakeCheck                     PASS      1.04 seconds
+MakeDistcheck                 PASS      153.47 seconds
+CheckValgrind                 PASS      146.41 seconds
+CheckSmatch                   PASS      296.61 seconds
+bluezmakeextell               PASS      95.73 seconds
+IncrementalBuild              PASS      510.76 seconds
+ScanBuild                     PASS      893.79 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v1,1/2] shared/rap: Add bcs_procedure_data aggregation and procedure data API
+
+1: T1 Title exceeds max length (84>80): "[BlueZ,v1,1/2] shared/rap: Add bcs_procedure_data aggregation and procedure data API"
+[BlueZ,v1,2/2] profiles/ranging: Add D-Bus ProcedureData signal for Channel Sounding
+
+1: T1 Title exceeds max length (84>80): "[BlueZ,v1,2/2] profiles/ranging: Add D-Bus ProcedureData signal for Channel Sounding"
+
+
+https://github.com/bluez/bluez/pull/2325
+
 ---
- drivers/bluetooth/btmtk.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 3491060b3ae9..0fd6ce09a313 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -154,6 +154,8 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
- 		return err;
- 	}
- 
-+	bt_dev_info(hdev, "Loading BT firmware: %s", fwname);
-+
- 	/* Validate minimum firmware size for header and global descriptor */
- 	if (fw->size < MTK_FW_ROM_PATCH_HEADER_SIZE + MTK_FW_ROM_PATCH_GD_SIZE) {
- 		bt_dev_err(hdev, "Firmware file too small: size=%zu, expected at least %u bytes",
-@@ -188,8 +190,8 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
- 		goto err_release_fw;
- 	}
- 
--	bt_dev_info(hdev, "HW/SW Version: 0x%04x%04x, Build Time: %s",
--		    le16_to_cpu(hdr->hwver), le16_to_cpu(hdr->swver), hdr->datetime);
-+	bt_dev_info(hdev, "BT HW ver: 0x%04x, SW ver: 0x%04x, Build Time: %.16s",
-+		    dev_id & 0xffff, le16_to_cpu(hdr->swver), hdr->datetime);
- 
- 	for (i = 0; i < section_num; i++) {
- 		first_block = 1;
--- 
-2.45.2
 
+--===============2998995548074235088==--
