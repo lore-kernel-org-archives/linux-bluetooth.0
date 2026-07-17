@@ -1,160 +1,181 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3B437C910
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 13:35:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784295333; cv=none; b=GMiSjkVNxUYqFp4FdFy2vGWRjt/GPyUe2mSaFvDmI0h28LFIafAGtxvCsBrPFl95mSoUZHEo0Ym7l2LOuL/bX9iZASEIeAPzSLEWXDPBlVJE8OnN8gO/APFS1ZnZjklcZC1lDvTg4GrMxdgqOBPqw5VTiEs9/OxUOWXkzMIq7Qc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784295333; c=relaxed/simple;
-	bh=cxFFmFaxg+5YSOAqKtyh8F/pzmRf6eKOwgbndZGS7Wg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hXZQsA9CM4FgLvMwbhd9Jv20/s/0TbirttoT6O6C03l795mgDsi2da1bTjT5TXouWIsDFTh0uhsPLRfVK53RIciZhP443uQ7aWgp/I9yzKJaFjGPzbF6uKqZZ7FSuPkFe7E7atfSSxZY4OvG7b/5yz6tLrN5vfkxWLbN5pxqi14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=VeA0F+Rc; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=e02ViHd4; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2F6F30C366
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 14:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784296993; cv=pass; b=sO2isf9PPOQ7NrMPz/Ocf9LFDHfpvkxSmGCr976zjQDhY2tjReyBVmpgmFLitpVSeuQaTRYxlvbbHMjGuSWIGk3mmIy4UP3vIObYJ+qH9wNE2Jg16PUWybiwyy1cG1FBmy1kxCaTGpznsv230CmasoukHvSQBbA1BOgwUgDix7k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784296993; c=relaxed/simple;
+	bh=j1Kpf847v8VM8bUoijHHnMhp3wscTNv9LYq+dvTS/bs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rZ6eZvFJ2eUKVFHWmihj5EXgThsawDHKAjuSY6JDzXZYfEJ0ifObBG0s8n1YWB75UkHZPN+ls18fYmv3U5E++czspHsfIX+ff7uarioDx9mdhBdhcMW97uxCa9FqMV86xJIjvMRp47pHWq0rcmTePuuKq0ejYjDivc4DkCxoH34=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PBgj0D/S; arc=pass smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="VeA0F+Rc";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="e02ViHd4"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66HCT63W1619190
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 13:35:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=9J1OFC6N1f4
-	yk6laVsNdNLriOD5bDWXNIE7FJLHmlJ4=; b=VeA0F+RcMQ80B90ChmPPDATJriQ
-	XNs1a0zuevvjHO6vHxs7n87vJzc4jtLy29Lt+6qvQQUEP7UjR4sSSO9VKA2Ipf+S
-	HFK+7HZpeMmGafxUJVR4BHA3+UVGyXMv1PRuthj9WqE+LJcN94Jnd74fc4s/Qstd
-	eKqCOVOLw2Sl4a3p2uNXgHur773qN0S4jV4KFAaVdMJ3bDflDbfYNEG43hzfJ1mt
-	pb7bzpZlt7KuhrUK6FV7NLevll+NjI4p1ydLp2j4YK2ew1kn+2/c50BnR4efwHB4
-	lOMYQXu9Lh7PTyCMyZDRCwsrIen+V+gXA6YLLg1fbz7+wtAoekSP4HqcD4w==
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fffag9fkf-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 13:35:32 +0000 (GMT)
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-38e25e4b41cso3643079a91.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 06:35:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PBgj0D/S"
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-80dc4a68e4aso64054627b3.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 07:03:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784296991; cv=none;
+        d=google.com; s=arc-20260327;
+        b=kZ+ZV7EQlYbYciqou2AjM7Zjm/c76iahvWidiClqJ1kz1VMVTBBFLKTv8HvKB/AzR6
+         NfiiJZG7quUS6PHIFEOvzY0cYYFhezDaF1XEIoyLMEl0E8fgSo7MrLmEeZwkdvUHDH6A
+         Zxa6wX8lzMPFRpCWfncixIGeaWqpD4pUqcdnb67/p6TFGZozvYsu+TzsKZdZE60sZ54A
+         0zkmnrZx1w1FeuNDtIPYAulPW+6Gk1LENrYGjEi/QuC90FU6FE435dKxWFe9S4T/gh6D
+         hWorvjkFZOrxwHZ2TwRR6xTnYjN0UfCVvAjhLPoyRtcgN8IitnSBZirY4hQwVILP7/dD
+         lQfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vK+hcGwCHRtAD4o2ewsAaJdxSZlmDDHrO8oYXh8Zd3c=;
+        fh=TxHmgKhQfYbogoK+vmJQIDCo2t34N8xamZxfQlSL1ls=;
+        b=SdkHVRDS0lKcwImRMb7jlKWNJgWTg3aZcWuLpfkzDvzsJr8nfz+GR0KH4DTkexOEYh
+         BryTlWILtwyDeZD6dydgIkvWp3XNybPwf4Lr7mikH8PhyoKpLzQdImJrA/ytF+uGAduD
+         21J35bq74Q5vFgnlPLnqLght5T95X9fdK2zJgqkzGZsf6NgH0ROB35BHNFl0OAHqfdp8
+         +1zuWNYlkzakYRKI6oF/ne9vNHJHX3y27eKHsp7HEEA5xypeWfN9JZHMecC4erzm/F9t
+         1hzNfYt/sJDJPbnWGJLT86Q1Y5q2ATMBod14tTgmF4u/nRIb11CiJ6zJxSdWvhjHJiTm
+         KBqg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1784295331; x=1784900131; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=9J1OFC6N1f4yk6laVsNdNLriOD5bDWXNIE7FJLHmlJ4=;
-        b=e02ViHd4KBSiayqS0Xlf1NSJ+2UAGGytCOKigu0GUPFVpzxHsoiMJpJVFSGP2LccjP
-         dnF5UuUufH83inOgFDEGahoPNt5UOnXNtZ2crYyGmTvD8SCofGtKesrkXsuABaCW6drZ
-         yhxsChJMZT+ESLMfPL6+MowLtA6/c0fNKKJLvl5r7MrugtN6iAeJ7nvyWqbD8RJRKOyP
-         op7QsE8J5/vIvQDOhN9h4z8yA274+PZC3GS2GtLd+orxgtdQljZ619BF3zbdtXi691vg
-         lLYGiQDHVRoP+U6LcyMsiFD/BUlmuPqRPYbADkuw8ZcIXetzMD22ywHvsaK7vhkvL45t
-         XScw==
+        d=gmail.com; s=20251104; t=1784296991; x=1784901791; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=vK+hcGwCHRtAD4o2ewsAaJdxSZlmDDHrO8oYXh8Zd3c=;
+        b=PBgj0D/SgDBf0nwqq6cvGawFMIw3Umb6ZCYS6J/IsuNHi1onlrmKFGZbSjjY+VYnBO
+         igoG6L24bf/nQv38dE5C9AUOHX53eCmd/zKLoDTIRo7fwbh5AfCgFvhvpO9vIi7NcTOe
+         6Mp8xEq42ZFeSIkqb7VyyN1Ut/xg8GVwgLu3EGGT289QOZw/U7hd+ElBuQoGhMQJTMyt
+         dYvAJeiEkg7ixQ37JGhoEp67Xw4w2lAFjQCFHU6x6hEuuN59AxJXZrIk4dlvyNps4RT7
+         k9PY1LVHPnLV0LSyBk3Qq57cNpDhgkx1n1KtzHqnNtvZsrvtewHoJk3k41Rk5Kq+fTPx
+         gCwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784295331; x=1784900131;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=9J1OFC6N1f4yk6laVsNdNLriOD5bDWXNIE7FJLHmlJ4=;
-        b=SDQ18XfV9IWbNCKC/fpc3DclQOEVn49ie3g3wDkmtIu6gxJeE878i/oiutzG0n8fQt
-         9UY1dbVGHb4e3oALuLF/0SbXpYe4wsLpxuv16HcXVAaNJjs2pLakEuW1a4L/bux6gxiW
-         Ubum2TTdknM2pMP56BspL+cyKeEdGW7d0y+X32oNyzOLXqQwTj2VXFZ/Buie6zYs4NzX
-         9Hc2au3v9yi0JFRh30v49xTGnNmiixJIOivE2QF1lqAkxefBKK0thv+ZKX2amlnITuzA
-         7tvxAN5UHmTdNfXJLcKuOmQyDEjKYax/KzOKFy6R4WRoiHq6b5oY8416grmGzBegmiYJ
-         EkdA==
-X-Gm-Message-State: AOJu0Yw4OoVKoEBAEzSvyIPCTCjB7EMokSXaRm6r+kf+z15O6VitVAk5
-	ZGc6eka3/3wo1cSWab8tfpoK/rs/Z38Rex31p6rXHLwnybvlVA2OIo9MsoxfX3jbWDrJ1hXIKgX
-	cRP3QSk0PND2imlHEGGMCHXUXbcweAssZBS1kz72+TJYYQb/25EypJxP2tBT62wEQjcMMNFeK2U
-	up/ak=
-X-Gm-Gg: AfdE7ck25STmTpJXStUtV9sOCp55GmJUG8J6wV0x+qj6DnsfYfPJUml+6qa/bfEs7uJ
-	y8mqi5RiBDqAbvd2LXwTKZbgmIDmgrBy15vhCxmgMru70hH2Kxucfq5g04PUXb10BhiEq0Y+jWI
-	K0qqHLiJja92hdmGRUgx9KYM+bjHxXZ1t+rQoJHZTwPT5rDJPTdTttegFblPMhpdTjABkQrIoVl
-	JnN1aCCgfKxo/QIupMwgXHGJd23A6fHcg8tKndzHDfKAcT4FaENnrqWawe4hoM8ZYY6cFEcoMRd
-	Ff/BS24v6ZPI0Q8LrO7CLdNGlde+Gx3ITwzq+PRjjrJuYapTk916SNGyfvvdMEUuusKXnihquj6
-	Gu275bYyCSjdXLn4brfggWxtosq9YkQ==
-X-Received: by 2002:a17:90b:2642:b0:381:6466:7160 with SMTP id 98e67ed59e1d1-38e4b56d7b2mr2984385a91.26.1784295331333;
-        Fri, 17 Jul 2026 06:35:31 -0700 (PDT)
-X-Received: by 2002:a17:90b:2642:b0:381:6466:7160 with SMTP id 98e67ed59e1d1-38e4b56d7b2mr2984340a91.26.1784295330822;
-        Fri, 17 Jul 2026 06:35:30 -0700 (PDT)
-Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31429fe4677sm6648774eec.11.2026.07.17.06.35.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jul 2026 06:35:30 -0700 (PDT)
-From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
-        quic_anubhavg@quicinc.com,
-        Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Subject: [PATCH BlueZ v1 4/4] doc: Document create_context in bluetoothctl-cs.rst
-Date: Fri, 17 Jul 2026 19:05:03 +0530
-Message-Id: <20260717133503.3711396-5-naga.akella@oss.qualcomm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260717133503.3711396-1-naga.akella@oss.qualcomm.com>
-References: <20260717133503.3711396-1-naga.akella@oss.qualcomm.com>
+        d=1e100.net; s=20251104; t=1784296991; x=1784901791;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=vK+hcGwCHRtAD4o2ewsAaJdxSZlmDDHrO8oYXh8Zd3c=;
+        b=VSGJcrkir7dqbhPE42awG4EgHDugxCnHTfhoLCVUlV9eCOa/RjIKgVkZM4/xayuDuD
+         lLlA+k57M3HZk3Ma9tK8AacPcMSI7au2AR+Q1tQ1T3PFzT+bZ+56jinSimyH93qL5ovP
+         ahinoYPyZqn2RnT8rdxfere+HWT794rixPJAmayVYB8UPE1ldL4LVr8huRt99PBlXJIg
+         b+4K4YeOeGU1pm/Nhmd4DGXq/YMWKH+PDeO8NZQilWzaKX5Kg+HFRfQ2xAl787NeL187
+         ZD4azfG7Fmn+H7pFKxV/LX6Y6EndR4vb38HH2ac4wKLFPWfo4G8v36uZrctfkYXQSwKM
+         mh2w==
+X-Gm-Message-State: AOJu0YxusjIYR5aHo2DaWHS+rNR2RnlyXYXo7iDMvBE4HzdFTpe56dlS
+	clZPt+BpENij0Ay4mzZVCI0UFFu6xRZS/gw7q44ODmSZvvU9DaHsIrXrIglCzeCi0IEi6+ptiRF
+	JtAqOzDUwR/xWT+npMFiEyAlYWKw0tBY=
+X-Gm-Gg: AfdE7cnzv2NoMs0CLZw+wTiWQ0UpeK3nT/9hn5cYdqiNzCyEQVpyA+3En7AOMWWYi/0
+	hMfVi8NPY8u8mIbMa9/CclGt8coQrjtk4bCOcF30va5QjOnKXHDJP4CTvLou8OylVugVhHFesfr
+	XJhIBkDdRCGD2kZwyjccFtMghLFTaqzlXGLiCHSqDy2yyW7NatQJaaIGieKLwBtQqRdoVhVdsMu
+	JCJJoujtnarnCyRD4hmU3FDxV5QTJqIIzytZfZ6n7+z8EJETyDmzsWzJS9uau7dpP/e2d2amg/B
+	jEzQViq2x7CVjOGLZaaiFfGTE25ubx1ENAAQSkDASHMR71md
+X-Received: by 2002:a05:690c:dc5:b0:81e:9b09:7263 with SMTP id
+ 00721157ae682-81ef22ef2d4mr8316197b3.10.1784296990823; Fri, 17 Jul 2026
+ 07:03:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE3MDEzOCBTYWx0ZWRfX5yLRG40pc+KH
- wV7aBiJahl9ErHUk2ioEGES8J+AyG1iW/g7YsM+VkU1KCQdsAg6HzI4Lq86yxXXTcuPs5ewx4ac
- BKTo2XrbCyGbfNKGm1Trk4BFowa3lWuxAMi7DY1Ug07wWPMsTxVcDv31RzVZ3xP0l8X2KN22SKh
- JsuuoOMtS0h38dHEKL/nNHNMLrLl3kEB0oNyt5+2cIlOIczkkmSuwzxBXgEwjEmGv15njrLD9ut
- jL+v1id73s2zBh1Rj3w7bUNGVEgGnlnU7G3lUUsyJ+2xYxy7/VbAI1pLUUgDcl5pnwlqX1riXad
- Q+R6w8+nrztnVR9gb6+cHOMwOUi92dmvurp2jF8/PxgjEcG8T6v0O+DExZSqvKKler6RORMePS+
- 6z9yCpJeSAN+U1b6WoQ63pQEzHRdKTRngXN10+CtoOBVfmwYxcZQFe+v48Vg8RBM0CW6iFZZpCG
- M7nDKJ+hYGIeJcE+r3w==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE3MDEzOCBTYWx0ZWRfX8EZ6i/1qFtbZ
- 0KzHRMI+3TJsxnBRqg8Epd4Ou77WnxBKf2NYdc69KEX6UzFJbd5JNaGvWW415uLpy2mIr+XDHks
- bDHEf2DuQ6l68KOuOrz5QTep1VSGWN0=
-X-Authority-Analysis: v=2.4 cv=KZfidwYD c=1 sm=1 tr=0 ts=6a5a2fa4 cx=c_pps
- a=vVfyC5vLCtgYJKYeQD43oA==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22 a=ImA1InN6HFTQjuMtSAEA:9
- a=rl5im9kqc5Lf4LNbBjHf:22
-X-Proofpoint-GUID: 8I7WeAYEa-iQN-PO3y1tMO8SLK3MoG6L
-X-Proofpoint-ORIG-GUID: 8I7WeAYEa-iQN-PO3y1tMO8SLK3MoG6L
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-17_03,2026-07-17_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 suspectscore=0 clxscore=1015 malwarescore=0 spamscore=0
- adultscore=0 lowpriorityscore=0 phishscore=0 bulkscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607170138
+References: <20260717124111.3296537-1-naga.akella@oss.qualcomm.com> <20260717124111.3296537-3-naga.akella@oss.qualcomm.com>
+In-Reply-To: <20260717124111.3296537-3-naga.akella@oss.qualcomm.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 17 Jul 2026 10:02:58 -0400
+X-Gm-Features: AUfX_myQRU-EtpyqtYrRDsCIHXVb91bQ3fDLY_LUGPr6p4OfO6_UCZaJk_faOSA
+Message-ID: <CABBYNZJuitiNCz_COYYvUEY6_TbB=d6dZet=XEmHUkh=ENrzSg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v4 2/2] profiles: Register RAS UUID reactively
+ instead of probing
+To: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com, 
+	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Document the new create_context parameter introduced in client/cs.c.
----
- doc/bluetoothctl-cs.rst | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+Hi Naga,
 
-diff --git a/doc/bluetoothctl-cs.rst b/doc/bluetoothctl-cs.rst
-index bbc1d8565..e49b4ea08 100644
---- a/doc/bluetoothctl-cs.rst
-+++ b/doc/bluetoothctl-cs.rst
-@@ -191,6 +191,24 @@ Get/set the CS configuration identifier.
- :Example Set config id to 1:
- 	| **> config_id 1**
- 
-+create_context
-+--------------
-+
-+Get/set where the CS configuration is written when **cs.start** sends
-+it to the Controller.
-+
-+:Usage: **> create_context [0|1]**
-+:[0|1]: ``0x00`` write the configuration to the local Controller only;
-+        ``0x01`` also write it to the remote Controller using the CS
-+        Configuration procedure (optional, shows current if omitted;
-+        default ``1``)
-+:Example Show current value:
-+	| **> create_context**
-+:Example Write the configuration to the local Controller only:
-+	| **> create_context 0**
-+:Example Write the configuration to both local and remote Controllers:
-+	| **> create_context 1**
-+
- main_mode_type
- --------------
- 
--- 
+On Fri, Jul 17, 2026 at 8:41=E2=80=AFAM Naga Bhavani Akella
+<naga.akella@oss.qualcomm.com> wrote:
+>
+> Replace the unconditional reflector-role GATT_UUID probe in
+> gatt_client_init() with a reactive registration driven by actual
+> remote RAS access, using the notification API added in shared/rap.
 
+It seems you already have something like that in bt_rap_register
+attached callback, it is just never used, which explains why
+rap_attached is never called and you need the likes of probe in order
+to create rap_data_new.
+
+> ---
+>  profiles/ranging/rap.c | 25 +++++++++++++++++++++++++
+>  1 file changed, 25 insertions(+)
+>
+> diff --git a/profiles/ranging/rap.c b/profiles/ranging/rap.c
+> index 3ffc0da76..4f6d7f2db 100644
+> --- a/profiles/ranging/rap.c
+> +++ b/profiles/ranging/rap.c
+> @@ -308,6 +308,27 @@ static void rap_attached(struct bt_rap *rap, void *u=
+ser_data)
+>         rap_data_add(data);
+>  }
+>
+> +static void rap_ras_accessed(struct bt_att *att, void *user_data)
+> +{
+> +       struct btd_device *device;
+> +       struct btd_service *service;
+> +
+> +       device =3D btd_adapter_find_device_by_fd(bt_att_get_fd(att));
+> +       if (!device) {
+> +               error("unable to find device for RAS access");
+> +               return;
+> +       }
+> +
+> +       service =3D btd_device_get_service(device, GATT_UUID);
+> +       if (!service) {
+> +               btd_device_add_uuid(device, GATT_UUID);
+> +               service =3D btd_device_get_service(device, GATT_UUID);
+> +       }
+> +
+> +       if (service)
+> +               service_accept(service, btd_device_is_initiator(device));
+> +}
+> +
+>  enum cs_dict_target {
+>         CS_TARGET_SETTINGS,
+>         CS_TARGET_CFG,
+> @@ -830,6 +851,7 @@ static struct btd_profile rap_profile =3D {
+>  };
+>
+>  static unsigned int rap_id;
+> +static unsigned int rap_ras_accessed_id;
+>
+>  static int rap_init(void)
+>  {
+> @@ -840,6 +862,8 @@ static int rap_init(void)
+>                 return err;
+>
+>         rap_id =3D bt_rap_register(rap_attached, rap_detached, NULL);
+> +       rap_ras_accessed_id =3D bt_rap_ras_accessed_register(rap_ras_acce=
+ssed,
+> +                                                                       N=
+ULL);
+>
+>         return 0;
+>  }
+> @@ -848,6 +872,7 @@ static void rap_exit(void)
+>  {
+>         btd_profile_unregister(&rap_profile);
+>         bt_rap_unregister(rap_id);
+> +       bt_rap_ras_accessed_unregister(rap_ras_accessed_id);
+>  }
+>
+>  BLUETOOTH_PLUGIN_DEFINE(rap, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
+> --
+>
+
+
+--=20
+Luiz Augusto von Dentz
