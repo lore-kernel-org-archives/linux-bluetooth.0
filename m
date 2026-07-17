@@ -1,92 +1,93 @@
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D1D36A370
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 15:46:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95DA2D949F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 15:47:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.181
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784303215; cv=pass; b=gTAzvQqBG7WPqqkBPvmgehF+OHuT3P29ckktFPKqgF0GR6uIiQKmFDfNaVpIbUDE4G2wyJP+r3lezt0usOn6LneB5n+lEC74Tr3UcYFPMivwjie6XG1el8uT0NcoJnaBpd8inPALvKsEn5XQtRhRd9YoTzVbfuAynhusaUm60G8=
+	t=1784303237; cv=pass; b=tn0ywr6jWLdnbSIK5J2KzsF2maITL5boC/m6OhLjwQfXIg2ZpKhSCrzk5aCBD+v5uh1imVALP2D0vdpnMUGrMo6KxcHTupOZIqkuZN1LV8sm6ztko2f7jT38npb8zHPrgWeqzj9/lgHnL/9zZbTRAd6K37MmNp8ylWb71FbXxQU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784303215; c=relaxed/simple;
-	bh=bw8IJ3nTUToFJiJoltsUkDtdFquX0yyZolILvaph4AE=;
+	s=arc-20240116; t=1784303237; c=relaxed/simple;
+	bh=ssqp+pzBwVqjC/OZREmWoHUkfjQpzqQQ5FKvwxi7qKU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WzkzTzECXkGWTFIWssJF3l6MEDDfsix9ch1H91ybGHHqMVoOgQngOqMXGTvCTlRjolM5OImEg4sz8Bw5mhACj35WwfE1vxQr/gRK0+FPl5bt08WKP2AHj5/pek2pE3o2QBrcKppxdjT4JZG0EI4WjxwpMnSHSailua9zfBpU+oQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y4c+9n80; arc=pass smtp.client-ip=209.85.128.176
+	 To:Cc:Content-Type; b=CMlHDWQ/+15xs622tvTMJKkSkBCeX1sZvba2HzoXp5KR5BcT5oezjS6i72Gtg723FG67jbgw4MLvXegNl5I3G0G/A0DLdxTVwvxaHfktZQqv3Ud28+8bGVrQui1XAyuxWtwjeqS7xktw/LIFYjlAGWrQIb+yjz04Jo39Pjs9ppc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SLLmNWrg; arc=pass smtp.client-ip=209.85.128.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y4c+9n80"
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-81ec29f1d07so52574667b3.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 08:46:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784303213; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SLLmNWrg"
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-81ee6b2da98so19741937b3.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 08:47:15 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784303235; cv=none;
         d=google.com; s=arc-20260327;
-        b=lzwNtuz/GY9lDAUHeJyMRbaE53pXU7mTkuQwNEF8meigaJbBOZ10DVRgoq2AdQ+t0R
-         yVazlsZ+muHgf3CsL7h/Q9B3STV4qU7vQ2JO938CP76LX3IjAoout/TULjljO2jTrqSY
-         qifKS28ZekfWSM654tL7KWEsVde2uUkP/M7YLDe8Uf1fukevFwj2e13HESeUKlUQPbvr
-         102CcJYU2Y62FLo89yyfwi53ydC2RiIwftX4ElD324PPeWexxgsrAzhakZnd6P0IG14L
-         ZPNatR0QojUv1T1VrQRNpWTm9aq6KiHDpkJ8rT4fE7bPk4kBsobKzGmV+K/fCXIVvJCh
-         lI0A==
+        b=khimso+peAtIDkFo1MdoVqo+FPYq8Yp1Ix9PI4H8u+CoIWp53SEKoaskBrz9eJT9Ol
+         KH+JqlQmztA0yMR8u3nLW8U+OonJ4p5PhOtdORqfSs5DpRNx49PGxrgyqN877VvLpLPE
+         jX8MK005nno8I61RwNAxPC7dFoa5Hn+S0c39SJuaV+NAExgCnGutm67U7P1YyeZ5Wiwl
+         PPPk8QOsf4aEUajN5M2gAPdWrwbTsJH1EE+3yGDEpNPo20iFjExeC8eNR04Gmj07EHze
+         bRmOdgA9YRBGrRrtVZF67OHrLx8Q30QxFY8Ip9j4e1PGhPj2p3xHuvUlLzcTTirRxEnm
+         5zuA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=9RYRQYbVym2FzqU0NlUIG9BqrH8mSEo44js+wTCgU3I=;
+        bh=wmTfKgqKmzDAIxeAA7OFX0iX+1srJ/QXaWKlhJfulns=;
         fh=SPVv+hyDtCYw/w4JWDVLs++kFTWEVgRFrw593GpkOsc=;
-        b=rxpKn3JPTomcYyYU0LXoHQO+BxJnNwPxyx8ckSgHzB4hK6plloQ5F+U/FegLOIhHco
-         Nmv1fIPidaecPeQBnbb3J/SD2x4abhA7sFpnGu4cPlCNwHHxpRJnOgu4ETaiQQ/342Mj
-         xdGDTcOI6Tub2bNXzDiBptMpOB8ni/VSljS6qDG1yZ/oFml4XTOkNqWOGbl2zKSk9vr/
-         jrh0qbIL/wASr1RPjCeIPu1NrS3NuHMST3qsOqJQrls6fGj4RsHsD+Fvc9v/voG8Pawj
-         v6O+cIcfTD3oLUARMNkynBbCpIUmw/mKaqcv5unRk9nwurT5DvgKMag1e1OibiSt0mvB
-         OtzA==;
+        b=FdhoDQVw2weerc8dBFmLteBPYKbTqYIKHcnF8Odeu8BT3m5dXK4INxgkj/cIq0eZYf
+         e+/MBvmINObie5Nnkbq6WmgHNShsq/yXdloOBb1nJzAVKVppft8i0fjMz8lMpjPcK0F3
+         4LuzvEP9pmskzMlfiJvBcyR8NU7WXUj1CbBTq6bwYt42xO93t7fZ9jqdL11OhNq9q7gK
+         bdFnCWJAF8zT3Yg3jFfRIaM2HANj84Lpi9t/+bsb6CJhl67h9pIYmK5Xzw+rj/gZ3JRv
+         LGdgPcXnpSk19FiYVEIM/d2q82RXmhFVnt4/EjrdcK8gVa2eDOJBsof72oyvYp95YMRu
+         CFSg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784303213; x=1784908013; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1784303235; x=1784908035; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=9RYRQYbVym2FzqU0NlUIG9BqrH8mSEo44js+wTCgU3I=;
-        b=Y4c+9n80ZWD15XO7O7wi8G3szi3qVvhYSUxu4OBjaxnCPkisWyxN1ux6bV79NTDpYu
-         rCPlgPWFrucaRPkKBjnSqx1ggM72xAWf6QNLZ7o7zcu/4ykU5RPLOatQXfOqKfPKhor+
-         Vc4LOsb3cyjXJ3A7bLNs3rI58+F4d7/VJ0/KWG5WQ/eMRSbBg4qRH239dhi3jDiea5qV
-         u308CtOyLYnxWQKu8tHXHrQ/Xbe1ljtg771LDZ8AiFT0DodBk7w4ljhPwVwuaIZ4ohdD
-         DcUuwNubosCixvQzh+G0QS6SBTOEogh43Gfbi5rEn/Lz51OyJ5bFl4/PxPQlBrqlEh4g
-         zJGg==
+        bh=wmTfKgqKmzDAIxeAA7OFX0iX+1srJ/QXaWKlhJfulns=;
+        b=SLLmNWrgG4MYGFQbXwFrUEQWRrRpy3/l94ubOB+xGeZ31/WA8BXtx2DMpaGw61qQRc
+         4Jpy1AbJtqmkdOmcNsQTe+bYXb5AY2wVHoLEguiWi7fzaLvM/Fdm/qm3GK8mG6wbY8i8
+         i3yaASaetuccSDcMJweScwjocZvjQh8/d3fWewJvBmf73uRcwG5VjB7Tab6EEDoPr1Tk
+         4UjaQDpw2UgEJCPoezj91ArMaJ3WCHS/SIUH5ZpWas0LF6SdMTo3AhCblqOUsy2mZmn3
+         eCKkdinoMuhh0aL3xfIM+l1AyqZ1WrODtAxIWUDKB2jLZLkooSUBqHBkxsP9NcFmu1l1
+         MuAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784303213; x=1784908013;
+        d=1e100.net; s=20251104; t=1784303235; x=1784908035;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=9RYRQYbVym2FzqU0NlUIG9BqrH8mSEo44js+wTCgU3I=;
-        b=j7gGnABsK1B5X2lNpx6nAbDJRGeLO0C5AFHqsGs4fhtd62+6LTrmhffYSxw+Yk/GbM
-         T2fpEOJWG3wJvdAbSMbd4B1ARRkp4+sLPChNNRxrUHmvVOAPMArVglpiD6Il2quROoCG
-         6o2H7+d7zE5fD33t0YWj+fa4pD1t4bvrNhVrwfsTLIV6NQ2qAMiuhtbYkQMZoJWVLwk2
-         kclONkG60Pus2Pwm3s8Z/WIU8lEsXSZ8MnT+JZ86Oki9HdMxAqnlHzabv0VVMKYlAqAg
-         WIlJ/ZTz1XaiGeTTVMITSOAm6G0K/Y8EXw0tsJxCqDLMoH/k2UJyiU7VKoaoElOW4Rh8
-         Jmqw==
-X-Gm-Message-State: AOJu0YyVdEN1uzfQXBVy8NrQPgNbckEoOlM3LS4sclukWcwCKvz82i1M
-	FpL3O1cOdCwBhPd25FSljv8MtPgY9W+aR6lyvM06AqXISfDLA86ikRZQBXUHb7Jkw8GmdP3p5Fe
-	DicLgjcyKYJ9OXHaONwm0+Uv3vHvnu5E=
-X-Gm-Gg: AfdE7cnZ7623SSjTiTRqd415L3sudAatimcXukzK/vFY19xtbh7vE1lUYTtvs9+ODET
-	j5VY/1zpLSNhgQ1mp2/kqcWuGTMtMi4tr8Qvc7BNPKt3RGsQVHRCYBDb0SGE0BGZuk7J1ZSPEPI
-	046OQBDe4EgoTvKKUWsErmCBbtcNLNfHYHTXNynHP5LQBVIQr/SdQrSlGUgx6Sdn82KHn03CieU
-	CXEzG7RDMyht717mJWspV8CEKejdxHTysReylG8sz+NZc7FlsEBKHs6lS/2r+xdMr2rTEBh+no=
-X-Received: by 2002:a05:690c:dd2:b0:81e:7075:e2e3 with SMTP id
- 00721157ae682-81ef26a561fmr10645497b3.35.1784303212647; Fri, 17 Jul 2026
- 08:46:52 -0700 (PDT)
+        bh=wmTfKgqKmzDAIxeAA7OFX0iX+1srJ/QXaWKlhJfulns=;
+        b=DYrbHl+ny44qEgKn/1T+OyBnO+/LcpbwBw6y+HoD2uYh2QxWiOqeLsOnYEQO3HNES6
+         5JfiKt3KhwW0p0UcIhPYc4e0K3LsSJT44CGJi3CuAq1PcRX1ppnHkiJNgHPDcI/lKiuc
+         cWfZRBS+hmJwOM15KPE1aQH6PLyf7njAUmjpGWBis927VKejc3oTjRTXpMq44RVubgR+
+         AYfDQeW1qtFuBBjZlpO/EvHm4ypMT2QBWAiVl6+FNzzH05A8+k/6U5RpxSPj1gI3tmR+
+         JaKeiSOripAsvCo3n90MVpbx/P2Eqzj5k563LsTI+PUOwOfkWfvtxks0feVMmLwSc7WO
+         t8Iw==
+X-Gm-Message-State: AOJu0YwptCBHkvGmUltid5x6P9VB4gZH8esoPJcbau/FwjAOhLAxOKxX
+	QwaG5rgg25oHrNxBUEDBtCcYlk2xP4609LdRCkiUDFrZXjIXzFe80htIx5lsze4OC1xTdm0lu7L
+	sqz/K73ddvjQjiaqN2SwmlgDfeSA9pXA=
+X-Gm-Gg: AfdE7cn2KFxF7YUurxzRzHE8GIhApB8KjWWKsPcHcTHrTOK9md+AWGFtrf/dwvTdhHW
+	cWTBEwZk6ggrdqQw/rvUB2ZFgCsgvBoY5Bl54vZ4o7z1HXnbp+U67C2LrWHOvN+0xYpdNpSN7MG
+	SnVpbQ4DXy/Bl8r+ma4mvAprCgmIerPztnrWC569BQFlGuGcyeyB6Nkv8cooyh/eMqH6UX6U2Sb
+	OubXXapQqv4qB102LIEyMwIsVjsLDYIbsJHanL4nwxwv1p0TJzkE+XdpCnF1xnh
+X-Received: by 2002:a05:690c:6e11:b0:80d:78bd:7a37 with SMTP id
+ 00721157ae682-81ef260c8d6mr10314317b3.49.1784303234609; Fri, 17 Jul 2026
+ 08:47:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260703081431.922054-1-zzzccc427@gmail.com>
-In-Reply-To: <20260703081431.922054-1-zzzccc427@gmail.com>
+References: <20260703060033.570932-1-zzzccc427@gmail.com>
+In-Reply-To: <20260703060033.570932-1-zzzccc427@gmail.com>
 From: Cen Zhang <zzzccc427@gmail.com>
-Date: Fri, 17 Jul 2026 23:46:41 +0800
-X-Gm-Features: AUfX_myP408gERlsjWpfmEwL9GMYvG575rzX8vaPm3ISt9pWjulFIhoYJYKvag0
-Message-ID: <CAFRLqsUu39pejCszxYxxLfHDqQ-3QE7mbN1JmEWUerpA6A2-hg@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: hci_debugfs: serialize force_bredr_smp writes
+Date: Fri, 17 Jul 2026 23:47:03 +0800
+X-Gm-Features: AUfX_mxy29SvkHLt4PeDHkvEGWE66oHRXZLvA2ORRg3PIlulreENUyLB5f_ZwUU
+Message-ID: <CAFRLqsW3Rjz_oyLiVihooJfCp7AawzdaeXr26o_EFMaYN2kJzw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: MGMT: Fix ADD_EXT_ADV_DATA rollback of
+ committed instances
 To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org, baijiaju1990@gmail.com
 Content-Type: text/plain; charset="UTF-8"
@@ -104,70 +105,103 @@ Best regards,
 Cen Zhang
 
 Cen Zhang <zzzccc427@gmail.com> =E4=BA=8E2026=E5=B9=B47=E6=9C=883=E6=97=A5=
-=E5=91=A8=E4=BA=94 16:14=E5=86=99=E9=81=93=EF=BC=9A
+=E5=91=A8=E4=BA=94 14:00=E5=86=99=E9=81=93=EF=BC=9A
 >
-> force_bredr_smp_write() calls smp_force_bredr() without hci_dev_lock().
-> That helper checks HCI_FORCE_BREDR_SMP, updates hdev->smp_bredr_data,
-> and then toggles the force flag.
+> add_ext_adv_data() uses clear_new_instance to roll back failures after
+> preparing advertising data. That path is valid for a newly created pendin=
+g
+> instance, but a malformed ADD_EXT_ADV_DATA request can also reach it for
+> an already committed advertising instance. In that case clear_new_instanc=
+e
+> frees the live adv_info while hci_cmd_sync_work() may still be using it.
 >
-> Two same-value writers can both pass the state check and run the same
-> enable or disable transition on one hdev. On the disable side, one writer
-> can clear hdev->smp_bredr_data while the other still observes the old
-> force flag and later passes NULL into smp_del_chan(). The double
-> transition can also leave the force flag out of sync with the requested
-> state.
+> The buggy scenario involves two paths, with each column showing the order
+> within that path:
 >
-> Take hci_dev_lock() around smp_force_bredr() in the debugfs write path so
-> each request observes and applies one stable BR/EDR SMP transition.
+>   advertising enable path:           ADD_EXT_ADV_DATA error path:
+>   1. look up the committed adv_info  1. accept an update for that instanc=
+e
+>   2. wait for the controller         2. hit clear_new_instance on failure
+>      response                        3. remove and free the live adv_info
+>   3. resume and access adv_info
 >
 > Validation reproduced this kernel report:
+> BUG: KASAN: slab-use-after-free in hci_enable_ext_advertising_sync+0x99/0=
+x190 [bluetooth]
+> Read of size 1 at addr ffff888104e3f010 by task kworker/u17:1/2502
+> Workqueue: hci0 hci_cmd_sync_work [bluetooth]
 >
->   KASAN null-ptr-deref in smp_del_chan+0x31/0x90
->   RIP: 0033:0x7faae680d340
->   RIP: 0010:smp_del_chan+0x31/0x90 [bluetooth]
->   Read of size 8
->   Call Trace:
->    dump_stack_lvl+0x66/0xa0
->    kasan_report+0xe0/0x110
->    smp_del_chan+0x31/0x90
->    smp_force_bredr+0x69/0xc0
->    trace_clock_x86_tsc+0x20/0x20
->    srso_alias_return_thunk+0x5/0xfbef5
->    lock_acquire+0xd0/0x300
->    ksys_write+0xd2/0x170
->    full_proxy_write+0x9e/0xd0
->    vfs_write+0x1b0/0x810
->    find_held_lock+0x2b/0x80
->    do_user_addr_fault+0x65a/0x890
->    rcu_is_watching+0x20/0x50
->    do_syscall_64+0x115/0x6a0 (arch/x86/entry/syscall_64.c:87)
->    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0x66/0xa0
+>  print_report+0xce/0x5f0
+>  ? hci_enable_ext_advertising_sync+0x99/0x190 [bluetooth]
+>  ? __virt_addr_valid+0x19f/0x330
+>  ? hci_enable_ext_advertising_sync+0x99/0x190 [bluetooth]
+>  kasan_report+0xe0/0x110
+>  ? hci_enable_ext_advertising_sync+0x99/0x190 [bluetooth]
+>  ? __pfx_add_ext_adv_data_sync+0x10/0x10 [bluetooth]
+>  hci_enable_ext_advertising_sync+0x99/0x190 [bluetooth]
+>  ? __pfx_hci_enable_ext_advertising_sync+0x10/0x10 [bluetooth]
+>  hci_cmd_sync_work+0x187/0x210 [bluetooth]
+>  process_one_work+0x4fd/0xbc0
+>  worker_thread+0x2d8/0x570
+>  kthread+0x1ad/0x1f0
+>  ret_from_fork+0x3c9/0x540
+>  ret_from_fork_asm+0x1a/0x30
 >
-> Fixes: 300acfdec916 ("Bluetooth: Introduce force_bredr_smp debugfs option=
- for testing")
+> Allocated by task 2515:
+>  kasan_save_stack+0x33/0x60
+>  kasan_save_track+0x17/0x60
+>  __kasan_kmalloc+0xaa/0xb0
+>  hci_add_adv_instance+0x35d/0x440 [bluetooth]
+>  add_ext_adv_params+0x291/0x510 [bluetooth]
+>  hci_sock_sendmsg+0x96b/0xf80 [bluetooth]
+>  __sys_sendto+0x2bc/0x2d0
+>  __x64_sys_sendto+0x76/0x90
+>  do_syscall_64+0x115/0x6a0
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> Freed by task 2515:
+>  kasan_save_stack+0x33/0x60
+>  kasan_save_track+0x17/0x60
+>  kasan_save_free_info+0x3b/0x60
+>  __kasan_slab_free+0x5f/0x80
+>  kfree+0x313/0x590
+>  hci_remove_adv_instance+0x130/0x1b0 [bluetooth]
+>  add_ext_adv_data+0x263/0x640 [bluetooth]
+>  hci_sock_sendmsg+0x96b/0xf80 [bluetooth]
+>  __sys_sendto+0x2bc/0x2d0
+>  __x64_sys_sendto+0x76/0x90
+>  do_syscall_64+0x115/0x6a0
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> Only pending instances should be rolled back from ADD_EXT_ADV_DATA
+> failures. Leave committed instances in place so queued controller work
+> cannot retain a freed adv_info pointer.
+>
+> Fixes: 12410572833a2 ("Bluetooth: Break add adv into two mgmt commands")
 > Assisted-by: Codex:gpt-5.5
 > Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
 > ---
-> v2:
-> - Reword commit message to avoid checkpatch's 75-character line warning.
+>  net/bluetooth/mgmt.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
->  net/bluetooth/hci_debugfs.c | 2 ++
->  1 file changed, 2 insertions(+)
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 733a4b70e10c..a4126d616efa 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -9220,7 +9220,8 @@ static int add_ext_adv_data(struct sock *sk, struct=
+ hci_dev *hdev, void *data,
+>         goto unlock;
 >
-> diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-> index b7f682922a16..ff344564c923 100644
-> --- a/net/bluetooth/hci_debugfs.c
-> +++ b/net/bluetooth/hci_debugfs.c
-> @@ -520,7 +520,9 @@ static ssize_t force_bredr_smp_write(struct file *fil=
-e,
->         if (err)
->                 return err;
+>  clear_new_instance:
+> -       hci_remove_adv_instance(hdev, cp->instance);
+> +       if (adv_instance->pending)
+> +               hci_remove_adv_instance(hdev, cp->instance);
 >
-> +       hci_dev_lock(hdev);
->         err =3D smp_force_bredr(hdev, enable);
-> +       hci_dev_unlock(hdev);
->         if (err)
->                 return err;
->
+>  unlock:
+>         hci_dev_unlock(hdev);
 > --
 > 2.43.0
+>
