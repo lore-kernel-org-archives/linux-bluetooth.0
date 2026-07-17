@@ -1,113 +1,144 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2303E022E
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 08:25:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6CBE3E0226
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 08:29:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784276739; cv=none; b=FUL0Jg5tka1kLx7xb0smi6Kik3ovjPeba+D6qLlzTUgKCzW62qctxr0xp8t6Pr+JjDYSd67LzfeoMi7xTcdUkucLPXbPYHD9Spife1QS5x4FIfzTh4RVJDNlZoiZLLcaE0wT2wBb1HGw/eKWXi21NKk5j/dcl5CqP7UccbFccpE=
+	t=1784276971; cv=none; b=QWugxeaw0dVWNfYaq0bNjG/uskphD8053SIntjaJ7HJYunawuGtXQtmvG3NycmmmbgTey8SUSgm3f0424Dl9PrW+rKcaeoZbGMnKorCRTZYkP9+xvKAOKvbKh6oLY0IUVLuZ/P5Vc+sN/C1Bi54mEgarMCfX2HjNB36wpwoVbz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784276739; c=relaxed/simple;
-	bh=YTpO4ddtqREy2CO45d6yYZo8QLGFfaWq8w2kZZTFC9c=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=iTYbRTB0MB8TnIp/eCA49KdiowlbKVUib8jy8GQVxKWZQcLb2rPmPsqcbzzZ+qF0tEYum+fkvrFUyW/nypmGWc4iG3i3h78gkx60/yh00QcATtSJTxS7ENLF19kO3D/b1Bp3vC3VPE1+ZjQb/nbqPFBWspAsd4OnqVJdeEktDE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Bsz6nKJt; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1784276971; c=relaxed/simple;
+	bh=gYJGpWPn3e3bGCIfGgtUOZeACOMhz8yVeCqfuC3c2zs=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=InQM4J0nPDdtylPcAxmT9AMQPQMwf6KgReilrzdSphSS9wQy8C9GflXBVw2ugN6/uNO+MCgIiQ7TM0TG4L1pH2wgB3J0Qsv3+/N0uK+gruzwXFemcnFg3Jz/skjE1Bexah3QNDzEt00XOHHMKq7aNFDca4X+7Zhb8SDHJrPQ6o4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MOxgN5Vw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Bsz6nKJt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1784276737;
-	bh=MDSd4Hyo4Z8xOlqtMb6SbfPI7W4KPMU/IgTAweV+DvU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Bsz6nKJto5vNJGn7q/RGNlZerlB5xUL42WyvtsOywFiKwQdJaAiUHaP7Xgyg2xML0
-	 eqy7M1YNSA6jHXdSFHJmCZH+ugWfU0/4YtW7X7b2vqjDFo04U9P0kbikWU5qIG+tOp
-	 AGzw9PGvsi5mbvmdLjMGXe97L/Uo8/48ylr3rZi0=
-Received: from github.com (hubbernetes-node-7a9d38e.ash1-iad.github.net [10.56.189.48])
-	by smtp.github.com (Postfix) with ESMTPA id 909E0360982
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 01:25:37 -0700 (PDT)
-Date: Fri, 17 Jul 2026 01:25:37 -0700
-From: prathibhamadugonde <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1129350/000000-27f844@github.com>
-Subject: [bluez/bluez] 5e2434: shared/rap: Add bcs_procedure_data aggregation
- and...
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MOxgN5Vw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33A041F00A3F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 08:29:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784276968;
+	bh=EPZgr4u40Ey253+h5jZaWa/6ga/57quCqeZN6Y3LbLs=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=MOxgN5Vw0ExTWFj/csnN0Eq1CWmvQhK4Uhi0Qmu6WfKTz7ScXP5gKOZ+DjIv5XEbD
+	 KK55g99Uh9TRYVscAXPiRqO8rbSGR0St22hqW8n+UbyQlNEN3VTeGuiPVlB4mxsc/i
+	 UWN46RdUqAoVguX6rv619gIPbCqrt+i2pT8hIRnK7AorfCbHOebHnq9jceHyuPuvrn
+	 UK3Wo5pzjCVV9Rw1CE+7EC+EJlWXR1CDJXu/TPc3kCbtpF7qXyAzaA853jV0ot6UQj
+	 hheX2Hg/Kq5E6zplZEjKU9Hk8SPU1IOCdZV3V+fN8UY8ylt8ewWgPKllCZzUBZCLB1
+	 SZe6ydnUs4ZoA==
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5b0117d49dcso7173071e87.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 01:29:28 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RprPYYoq49BjcTGNbKx7lmvKPHEoA9N60uMUsbga3gsRjcoGkM/SJn4B6NuhA5SPu2UOPIdeV8b+DMQBVbezbo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAsWrHm4W5m2OrbEgFdGd7FZR5IQ3MF9OgF9pqgfttEet5tDcN
+	YnkBNPOb/r4FxFEVRmk3xc77Ry1uSEcYUN6IL+ffVlOwrtEyBG1JVQMMM0Yee9pIAlq88f207e7
+	EZEfetJLPIVMYOcrllZf4JhWAYx9u68jb7YB7zO+8Rg==
+X-Received: by 2002:a05:6512:6d0:b0:5b0:1359:3dd4 with SMTP id
+ 2adb3069b0e04-5b28f8471b5mr432020e87.5.1784276966788; Fri, 17 Jul 2026
+ 01:29:26 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Fri, 17 Jul 2026 01:29:25 -0700
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Fri, 17 Jul 2026 01:29:25 -0700
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <CAMRc=MdNehSRQT3MUs+QtbZsHcUCS8YjyZchTgHCVv-HaLQkeA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+References: <20260703-block-as-nvmem-v8-0-98ae32bfc49a@oss.qualcomm.com>
+ <20260703-block-as-nvmem-v8-4-98ae32bfc49a@oss.qualcomm.com> <CAMRc=MdNehSRQT3MUs+QtbZsHcUCS8YjyZchTgHCVv-HaLQkeA@mail.gmail.com>
+Date: Fri, 17 Jul 2026 01:29:25 -0700
+X-Gmail-Original-Message-ID: <CAMRc=MeNHzEn+pizmbTUCU6YCiTWZS7cr_yEBSNis8NuYqYjig@mail.gmail.com>
+X-Gm-Features: AUfX_mzH2Q0kFyO4TFR4vp1sRhWEa1QLfB0S2bP-OIJE8-QcpGQ5uxWfAzjRRCI
+Message-ID: <CAMRc=MeNHzEn+pizmbTUCU6YCiTWZS7cr_yEBSNis8NuYqYjig@mail.gmail.com>
+Subject: Re: [PATCH v8 4/9] nvmem: layouts: Support fixed-layout as the nvmem
+ device node itself
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, daniel@makrotopia.org, 
+	Loic Poulain <loic.poulain@oss.qualcomm.com>, Ulf Hansson <ulfh@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
+	Jeff Johnson <jjohnson@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+	Rocky Liao <quic_rjliao@quicinc.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Saravana Kannan <saravanak@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-  Branch: refs/heads/1129350
-  Home:   https://github.com/bluez/bluez
-  Commit: 5e2434dbf7add97640e9053ee98bf03215ee6e54
-      https://github.com/bluez/bluez/commit/5e2434dbf7add97640e9053ee98bf03215ee6e54
-  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-  Date:   2026-07-17 (Fri, 17 Jul 2026)
+On Wed, 15 Jul 2026 14:07:24 +0200, Bartosz Golaszewski <brgl@kernel.org> said:
+> On Fri, 3 Jul 2026 15:45:17 +0200, Loic Poulain <loic.poulain@oss.qualcomm.com> said:
+>> of_nvmem_layout_get_container() only looks for a child node named
+>> "nvmem-layout" to locate the cell definitions. This does not cover
+>> providers whose device tree node is itself the fixed-layout container,
+>> such as an eMMC boot partition block device whose fwnode points directly
+>> at a "fixed-layout" compatible partitions node.
+>>
+>> When no "nvmem-layout" child is present, fall back to returning the nvmem
+>> device node itself if it is compatible with "fixed-layout", so that its
+>> cells are parsed by nvmem_add_cells_from_fixed_layout().
+>>
+>> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+>> ---
+>>  drivers/nvmem/layouts.c | 13 ++++++++++++-
+>>  1 file changed, 12 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/nvmem/layouts.c b/drivers/nvmem/layouts.c
+>> index b90584e1b99eab4217cbe7ec48373e18a7caf0dc..efa631ce7283bdd6c8ecda75915911b5e3a33c99 100644
+>> --- a/drivers/nvmem/layouts.c
+>> +++ b/drivers/nvmem/layouts.c
+>> @@ -167,7 +167,18 @@ static int nvmem_layout_bus_populate(struct nvmem_device *nvmem,
+>>
+>>  struct device_node *of_nvmem_layout_get_container(struct nvmem_device *nvmem)
+>>  {
+>> -	return of_get_child_by_name(nvmem->dev.of_node, "nvmem-layout");
+>> +	struct device_node *np;
+>> +
+>> +	/* Search for nvmem-layout child */
+>> +	np = of_get_child_by_name(nvmem->dev.of_node, "nvmem-layout");
+>> +	if (np)
+>> +		return np;
+>> +
+>> +	/* The nvmem of_node is itself a fixed-layout node */
+>> +	if (of_device_is_compatible(nvmem->dev.of_node, "fixed-layout"))
+>> +		return of_node_get(nvmem->dev.of_node);
+>> +
+>> +	return NULL;
+>>  }
+>>  EXPORT_SYMBOL_GPL(of_nvmem_layout_get_container);
+>>
+>>
+>> --
+>> 2.34.1
+>>
+>>
+>
+> I have it on my TODO list to convert nvmem layouts to be fwnode-agnostic. While
+> I'm not sure when I'll have the time to look into it, I think it makes sense
+> to not introduce any new OF-specific interfaces. Can you make it into:
+>
+>   struct fwnode_handle *nvmem_layout_get_container_node(struct nvmem_device *nvmem);
+>
+> by replacing of_get_child_by_name() with fwnode_get_name_child_node() and
+> of_device_is_compatible() with device_is_compatible()? That would mean less
+> churn in the future.
+>
+> Other than that, it looks good.
+>
+> Bart
+>
 
-  Changed paths:
-    M src/shared/rap.c
-    M src/shared/rap.h
+Scratch that, I didn't realize this isn't a new function but a rework of an
+existing one.
 
-  Log Message:
-  -----------
-  shared/rap: Add bcs_procedure_data aggregation and procedure data API
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 
-Define bcs_procedure_data to hold per-procedure CS results from both
-the local initiator and remote reflector, including subevent step data,
-selected TX powers, procedure enable config, CS config, sw_time values,
-and BLE connection interval.
-
-Add cs_proc_state with a 16-entry ring buffer in cstracker to track
-procedures keyed by procedure counter, accumulating results
-independently from each side until both report all-results-complete.
-
-Update parse_mode_{0,1,2,3}, parse_step, and parse_subevent_steps with
-output pointer parameters to capture remote reflector step data.
-Introduce parse_cs_local_initiator_data() to store local HCI subevent
-results, handling both initial and continuation events. Update
-parse_ras_data_segments() to route decoded RAS subevent data into the
-matching cs_proc_state as reflector results.
-
-Add bt_rap_set_procedure_data_cb() to register a callback fired once
-both local and remote results are complete for a given procedure.
-Add bt_rap_set_local_sw_time(), bt_rap_set_remote_sw_time(), and
-bt_rap_set_conn_interval() so callers such as rap_hci.c can supply the
-CS capability sw_time and connection interval required by upper-layer
-distance calculation algorithms.
-
-Remove unwanted function rap_detached , fix for rap profile level
-disconnections
-
-
-  Commit: 27f844638412dc9d65b0bb1f374f7e580a9e07bf
-      https://github.com/bluez/bluez/commit/27f844638412dc9d65b0bb1f374f7e580a9e07bf
-  Author: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
-  Date:   2026-07-17 (Fri, 17 Jul 2026)
-
-  Changed paths:
-    M profiles/ranging/rap.c
-    M profiles/ranging/rap_hci.c
-
-  Log Message:
-  -----------
-  profiles/ranging: Add D-Bus ProcedureData signal for Channel Sounding
-
-Marshal bcs_procedure_data (subevents, steps, mode 0/1/2/3 results,
-and CS/procedure-enable config) into an a{sv} dictionary and emit it
-as a new ProcedureData signal on the CS D-Bus interface.
-
-Register a procedure_data callback on the RAP HCI state machine so
-rap.c is notified when a procedure completes, and propagate the
-locally supported T_SW time capability from the read-local-supported-
-capabilities response into bt_rap.
-
-
-Compare: https://github.com/bluez/bluez/compare/5e2434dbf7ad%5E...27f844638412
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Bart
