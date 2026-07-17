@@ -1,199 +1,245 @@
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D36400981
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 14:06:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03E83BB9FE
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 14:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.169
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784297190; cv=pass; b=d2lZEiYg+0Cd9n6mDabBpEVUgi9NvZOKOzUyuKAngM0QazdO9H3+ZxQF2UYk+p0/Dl7Vqdp+v/a9MdUnjpfEjxD9xCNWJ4vtdErQBUhb6X7HYPtJ6qdtTO7pSJ7YXaKH4MI34Ue1B1vy7mLyGG/yiRUIuvk2phmwH5GM2Cb8aLQ=
+	t=1784297667; cv=pass; b=nBG2uSI97CPu5vzFBy6iCyAJz+GbyZeDorczAMcatojClolrSJsoe9aL/SS9dYu38VEAaYBkwEegEKDwpSEoYcN4tBv1+Iul1g3yPbmBb6XQPDY7NyPZ1/auUEFSUKY/Be5ekDewRyZ+C2a9tJl3PcndGqi2uBb93OFraFaBr1g=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784297190; c=relaxed/simple;
-	bh=VdQ9uFAJiiOOB54pGR8vlKUMj4lcyHnUiYeiyCZbYKM=;
+	s=arc-20240116; t=1784297667; c=relaxed/simple;
+	bh=Va9hV5lPpU3v0Or+rwQKjO8Euh5dC0K2hdQzLjbVzfs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I7wLr08sxwCmN0QydQtY45fcFyleoJck+k/QdEPP6TPo8PsD44Tzb9tKPmrWdUIcWlvgH8RfIflkaqCvQiQXMaeKgxEHg+Q8DYrKF13M+qHzjwjQ/TNBCv3qhF/qhMcpukWqfc4tQSrk1hp/1IX7kQMCPVtjYqilwyLn9ZMDfEk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K+xfEPU5; arc=pass smtp.client-ip=209.85.128.174
+	 To:Cc:Content-Type; b=Y7QKMtCmCnRZGt9ds6JwxyIhEUflE8zRk0qOsL9h1wSy/iERvIpXknb5JmRNU8OPiFr1yW1f88kt98hYQRXfmyst0wGPutGD2QvjAQeaeTYwl5HZrcH4SPz5vkHL4HwK7q5rVgu9JMWCeC3AYyzpiEqtKOC4XdfL85AC2j9gaUs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AoFs/Gto; arc=pass smtp.client-ip=209.85.128.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K+xfEPU5"
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-81e6f2ee60bso14083487b3.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 07:06:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784297188; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AoFs/Gto"
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-81e9d8f3289so56440437b3.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 07:14:25 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784297664; cv=none;
         d=google.com; s=arc-20260327;
-        b=ll33Mb0d2uUHVzAXtARGqn7mn+Bd3Cz7b/V7UKALhPEYfRS15ICW5O5zCf9oLuncui
-         o001bfdrxA5VKjoYIIkEkgJ/ZDxtPIeC6ij+h2l8e/49pintN9I54XDCLo0I8YY2c0nK
-         NQanOkWsoz2TqqfWkpIg6BjIoVx53gBWkub3doZEztmZipOFkzt3ZnJkUcl7Z+GzUe31
-         poXl2FQEFImN3d3XLNRYLj9FRJ0ws5oSQs8ftbknQxYOrlsvT4pMRKZPw1Uy7rYsXScI
-         ls1ydfXmL5C5gOHyPJJw9gMXuJzHmSrLLPauNnTeEpi3GPxuXa0w0xw28N5c/vpd9jnG
-         bHxQ==
+        b=nCqIfK2wpX/4Hhu6dBtwJX5I96+JZwEjsMJHDqHxgjHcqDKSLPVmjBWCRaM2d1kCCH
+         raEO9exeoo3CgOrt6sMAepgkxsdc7bhndtk1BGKXxenIpyKOwzdUF/BeIbbqx9N532F7
+         HN5k5vgeKEl7CsCl20m/gQkwdLVux6RPQUgSCGwaQ9P5CiPi2o8IN4GUi5LUP+2V6xFm
+         /ord1576iNPN6oZeWKtTU8Q+Nckkx8DxvDmh3B4dGN3UD74i+pcGcE2R4JlikuCTT85B
+         jdMSvjqOknZotjKsbY9e0JdT9aeayTMfhgG3HJKXKZ04PAnixFcJn3j8271BGTviL/iB
+         z3DQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=lBVELT/H3K+iuzoVTbPCXfZrhkyR7GoAkD5jvzLrrtM=;
-        fh=TxHmgKhQfYbogoK+vmJQIDCo2t34N8xamZxfQlSL1ls=;
-        b=LrJeZ/EVoNbYAIojl0sk+hocWxD47DzNx5iN91Ee3oH4die0jqrXx7qviWlbWZQmzR
-         RQxw13JneKMS4NSJ6AtY2V1l7Wt50l5rKR/Z93csAy2CY7Bb1tu/7UUotDtH7hqrBwnb
-         4QZbC4rvVCMZ5NzHF8Z+veFBC3SlupdSZnOtMvb9NwDy6PwxfmK7KPBrea7CdQx5UhiI
-         XwwPSi2uJDgbDbj8M4zX0F/yALKeYZMGSNOZz0l05CC+/ND2DnyTyCjvOkkj+gAT2zFk
-         1LSwkMU7mf75zyxYTHRm5L55XATXvfWdLplZNMXnoTcVtWco5rQNmJ8Vq69cboBh+IeC
-         yZug==;
+        bh=HojRGrf742nLV0xRTX05eznvpOep/lzC4//3gy9WZiI=;
+        fh=OVKswAkwWiYRiw4/jm1+w+lY4E/3x/2/3xjGrBhrIWo=;
+        b=KyuFdU+AaFhmQWwcUOofUm8KoZMURO5O8yxb0bLrWdMcGq2/WU/Gq5yzS4vwXrIktB
+         ieL7fjZdyNdalgll9Vm2O5wqFHeCkBgHJ9mDw7wWfBbQf6fRmCMSJoAY4wL50poc/7Zy
+         7kb6rda1H7N5vIoGkagtQDVggsQfQBzNn7QxpSYsqTYC4Ska2nTO7PPQeNDPovQluQs3
+         TqdgfP+RIpvCkpbICbhlBrVt18655aGGPfPovlhK6RYbTzfJeXq83BCae5aab8sivXrZ
+         J4XGT5gahtrE6frI1o6cPXolAwwnkG6S724r3HuINYpaiDDeN5r93svC51n2a1fWxYXG
+         rpUQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784297188; x=1784901988; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1784297664; x=1784902464; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=lBVELT/H3K+iuzoVTbPCXfZrhkyR7GoAkD5jvzLrrtM=;
-        b=K+xfEPU54dpOSiWazy5V1kaD5PVEwbI58rBotMLy16qtihdkq1viCN8pgqf4cArMFc
-         ydwEa/EGFR6veFPwmhLL0RjvUW2+HDPzELy1NyBjdncL4DUShIcvvUKnV7eX/ew56EFR
-         WbtvFjqTDzu4JNQUYE0OraFfEEe3AHKbiYmCRI6FtzRG+UDUEjlKPeB3wkxO/ZJMjUwk
-         keV3osmK2amM4qQ0ycucbTZk32Php/XxdyhOy1rZ4zRq5ZsB5pJssmfPzK8yZ/iv4HJv
-         tX25LRkyjxBAr4I7C2apWDfl7xkZ/LPgyzLr5Xb8tNV2SOr6FOg25Fvt7vhwjgrf4mSm
-         2ukA==
+        bh=HojRGrf742nLV0xRTX05eznvpOep/lzC4//3gy9WZiI=;
+        b=AoFs/GtoaeFFeM2HhZwDNoRISH2VkXuaw2c3IuSzhHiitYAVVjqbrVYwf+Z+P0Piav
+         FAeJHK5E8vyuW8/vvsAU8dY/JW5YHHrBAwy2MuCf0iDkx58yYwDo7WlRQJNP0Hby6SvR
+         Ui/lFAKYSkAsdyNv+EtfxnmMxLxBkSY4wLdgkxH2c0uaP1Y2Q/Nc12wIpDx3uPAvZBee
+         7WGdIALZ1MJjTc1JhEDxitlDFJAqMWo4UBRipKXqfrwNREWyZaUNBXyoqjDMRNAxZRDl
+         womw2wK2hw3jIR7i7HRBxb5SPmCDdzX+1i7a3BvBrmtSuK5vXamM7XRfc0upoFMevgXX
+         LHYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784297188; x=1784901988;
+        d=1e100.net; s=20251104; t=1784297664; x=1784902464;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=lBVELT/H3K+iuzoVTbPCXfZrhkyR7GoAkD5jvzLrrtM=;
-        b=E1jzic0MbtF5q57QVCMX5SKMR9x60fb4ABHF0QfGnOoCe5XSVJmMk5NF6ML5f8roST
-         jl7L2A6G/yzGWsvVrzB7WsdD51IDd4QA1Y8KDYeIoKskSUT4LLXyXe9kbZEFbeyPQT6p
-         G/8iEKccF1iRexkDdSRAp5BmZTiwCpw8hPRnRsgdeiXvjidp/XxR4Aedsqn5K5YB/eey
-         yPVPeeNTkyqtfDi6BAGDue91lOWyQoVCTPPgkpd4Ear4ICjFlOlA0CpgIarQuP8lTbK7
-         OSPxx8DdQep95Ja304l5MJ+q++TZzA5tw6c5I1p1zSJ7Ihsz2UOC6lYh2SRhfrisAjwv
-         QadQ==
-X-Gm-Message-State: AOJu0Yx0T7eeMg/tVrjhZhvpbBNNDrxysLK7Y2EW5e6TVXLJtREx8WJS
-	eTOgDcWiiPKd5kp20bpzufYzFQLpde+VBuTVfVSddQ5Co0xUhLGey6axPhLtGioMPH1+ekQe+qs
-	VysGGnQ+sCHcYPlwWnfzL9Ds4P4nNsFI=
-X-Gm-Gg: AfdE7ckaLGcc/dTeBp8Nv6sjBc1E2vpuOGZT23VhgbaDcUzvUJFEuLUKiKZL45NN3OW
-	U5zX3mDdzXPy/ayvnw5trY/n9e7MDIXOArwTw3AIio/bQwsay97HSObMv9YBhUrHj+cdEH2OBF2
-	mL/18Fj5pz5TBK+NigIdIX2r07aBwPSEqPMFeuxksPc+0kP45cX3z0MglNQ4z6vBbG2p3EMrKkI
-	FvY99ZQ8wfhujVWbTGq89006UlC7ZmbTVoXtlceSWyYNWFcE/ElDFKXhdtKsWiZnejQx5IuiFaZ
-	SRkshuf6kvWzubHU+oqi7e2unc+kfrF19k4ZYEHftCi3jKYe
-X-Received: by 2002:a05:690c:6c92:b0:81e:6b13:445f with SMTP id
- 00721157ae682-81ef158b10dmr9328117b3.23.1784297187971; Fri, 17 Jul 2026
- 07:06:27 -0700 (PDT)
+        bh=HojRGrf742nLV0xRTX05eznvpOep/lzC4//3gy9WZiI=;
+        b=MCsLaq5AWGv6hDcleT/t5kXMRlo5KzELRyXx0nvVMOa9o1RyMjGYhjZTqh507MIlkP
+         YwvPMKENd5DB17qC2SwEg5DohATgeCYYg7/xROo6sX+Cd0TOdeRLzK9ILakSfb2FaLw3
+         YKU9hXjZMxx0zdfTPE7N3Y9jomKlan7rJ8cZF+Kv8ha7SY6Po9NecuBCmKNMhGf3AEaI
+         5cE+GBf1U5xYsGlk/slzNOCuXpV95aoMYOYKRNcWBHx/30o8HKeGZkTv7Yak3l2MYV/E
+         ZMAa/TYGW+QtueTAsNMY+7Civ4YodEjfHmF/uxw6vtnFE2KcJ0d3pLGrV4C6rtHNmZwL
+         ewOA==
+X-Gm-Message-State: AOJu0YyUxx8Er9Rr41zOhURFgy6/9mGzpQK30L++Zr5IQXPWv+znIfWm
+	ht5CIbMTTNiIRSZe+dZCQxSTizblL4f3zsEb4QwgJkolO6KPJEgesV7mqi6GAFyJlhf8cINPyv9
+	BqqUivD656FRzRg6yfUisc0lRgp6sg2+8BCPY
+X-Gm-Gg: AfdE7clh6/WlTFjtNZ+XkDrj1YeZh+0RKZeDdDiaLPOBFr/6dTyh5WaAYzPTSxOj0to
+	WPcEqHP5g6qEWK9c5KnfFVr7iDkcLLrVJANxmHSH55Rq4DkHV2p2JayZ0HOKN+kvYC3OBqZXJvj
+	Vfde7/DABAzoA2/Z4e30pGtucIGMAVqd+N6JBR6T6/ZnG+8KzvLZ8YrskG/UJSNiq8/lna4XBiv
+	mYqGC2yRqjmWnO+HWoSu/H/Kg+Wz850qrIT3iVoyo8W+FDj5yLaE3e5XO93Ci4YCfTik504ZAzA
+	eiWxV5qXydcQdaJo7lFFkXdtF4lfgWkV9zpa5y5cRzhbM/20appBN1QJj48=
+X-Received: by 2002:a05:690c:6303:b0:81e:51aa:ff79 with SMTP id
+ 00721157ae682-81ef25191d2mr9016297b3.18.1784297664327; Fri, 17 Jul 2026
+ 07:14:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260717124111.3296537-1-naga.akella@oss.qualcomm.com>
- <20260717124111.3296537-3-naga.akella@oss.qualcomm.com> <CABBYNZJuitiNCz_COYYvUEY6_TbB=d6dZet=XEmHUkh=ENrzSg@mail.gmail.com>
-In-Reply-To: <CABBYNZJuitiNCz_COYYvUEY6_TbB=d6dZet=XEmHUkh=ENrzSg@mail.gmail.com>
+References: <20260716204514.79356-1-pip@pipobscure.com> <20260717082347.8429-1-pip@pipobscure.com>
+In-Reply-To: <20260717082347.8429-1-pip@pipobscure.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 17 Jul 2026 10:06:17 -0400
-X-Gm-Features: AUfX_mwELD1bxT8ld5EYx7mHtNsZ8YiSbZflY0rCOziyEbrZxKc467b3dKmBjDU
-Message-ID: <CABBYNZLpp-hMUrevPX=_qD5F6Jh2yH+mLJD03A+PSQsBErxAUA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v4 2/2] profiles: Register RAS UUID reactively
- instead of probing
-To: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com, 
-	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
+Date: Fri, 17 Jul 2026 10:14:12 -0400
+X-Gm-Features: AUfX_mzHka_t2JtJmUPaKRyI8XU0L48bzb1uTBFshWiBb1KcfVbACPV7ZnGWnvk
+Message-ID: <CABBYNZLZXephdTwsvp7S5z_V_wRMRx-sLJy9dQGA7mH5zSfX_w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2] adapter: Infer BR/EDR only at public LE addresses
+To: Philipp Dunkel <pip@pipobscure.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Naga,
+Hi Philipp,
 
-On Fri, Jul 17, 2026 at 10:02=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Fri, Jul 17, 2026 at 4:27=E2=80=AFAM Philipp Dunkel <pip@pipobscure.com>=
+ wrote:
 >
-> Hi Naga,
+> btd_adapter_device_found() records BR/EDR support for any LE device
+> whose advertising Flags lack "BR/EDR Not Supported" (EIR_BREDR_UNSUP).
+> The address type is not considered:
 >
-> On Fri, Jul 17, 2026 at 8:41=E2=80=AFAM Naga Bhavani Akella
-> <naga.akella@oss.qualcomm.com> wrote:
-> >
-> > Replace the unconditional reflector-role GATT_UUID probe in
-> > gatt_client_init() with a reactive registration driven by actual
-> > remote RAS access, using the notification API added in shared/rap.
+>     if (bdaddr_type !=3D BDADDR_BREDR && eir_data.flags &&
+>                     !(eir_data.flags & EIR_BREDR_UNSUP)) {
+>             device_set_bredr_support(dev);
 >
-> It seems you already have something like that in bt_rap_register
-> attached callback, it is just never used, which explains why
-> rap_attached is never called and you need the likes of probe in order
-> to create rap_data_new.
+> When the advertisement uses a random address the device gets a BR/EDR
+> bearer whose address is that random address, and start_discovery_cb()
+> then prefers SDP over GATT:
+>
+>     if (device->bredr)
+>             device_browse_sdp(device, NULL);
+>     else
+>             device_browse_gatt(device, NULL);
+>
+> SDP requires a BR/EDR ACL, so bluetoothd pages the random address. A
+> random address is not a BD_ADDR and cannot be paged, so the attempt
+> always ends in Page Timeout, and the failure tears down the working LE
+> link:
+>
+>   connect_failed_callback() hci0 5A:B4:98:1F:CC:04 status 4
+>   bonding_attempt_complete() hci0 bdaddr 5A:B4:98:1F:CC:04
+>       type 0 status 0x4
+>   device_bonding_complete() bonding (nil) status 0x04
+>   browse_request_cancel()
+>   btd_gatt_database_att_disconnected()
+>
+> Nothing requested the connection ("bonding (nil)") and the LE link was
+> healthy. Any LE association that outlives the page timeout is killed by
+> it; measured on one host, applications get about 4.7 s from connect
+> before the link disappears, of which GATT discovery already takes 2.3 s.
+>
+> Current phones advertise Flags 0x1a (LE General Discoverable plus
+> Simultaneous LE and BR/EDR, with BR/EDR Not Supported clear) from
+> resolvable private addresses, so this triggers routinely rather than in
+> some corner case.
+>
+> The Flags bits describe what the device supports. They do not promise
+> that the address it is advertising from is a BD_ADDR. A dual-mode device
+> uses the same Public Device Address for BR/EDR and LE, so the inference
+> is sound only for BDADDR_LE_PUBLIC. Restrict it to that.
+>
+> The other two device_set_bredr_support() callers already require the
+> device to have been seen over BR/EDR (bdaddr_type =3D=3D BDADDR_BREDR), s=
+o
+> they are unaffected. A device later seen over BR/EDR, or whose RPA is
+> resolved to a public identity, still gets BR/EDR support recorded there.
+> ---
+> Changes in v2:
+> - Commit message only; the code change is byte-for-byte identical to v1.
+> - Dropped the "Assisted-by:" trailer, which checkpatch rejected as a
+>   non-standard signature with an unrecognized email address. The
+>   disclosure is kept below the --- instead, see the note at the end.
 
-In case I wasn't clear, I meant shared/bap.c needs to call
-rap->attached callback whenever a session is connected, just follow
-what was done in the likes of shared/bap.c which does bt_bap_attach ->
-bap->attached, so bt_rap_attach shall probably call rap->attached.
+This is a false positive, in fact we do want to know if this was
+created by an AI Model.
 
+> - Quoted the two code excerpts with spaces rather than hard tabs
+>   (gitlint B3).
+> - Wrapped the bonding_attempt_complete() log line, which was 76 chars,
+>   onto a continuation line to fit 75. The text is unchanged.
 >
-> > ---
-> >  profiles/ranging/rap.c | 25 +++++++++++++++++++++++++
-> >  1 file changed, 25 insertions(+)
-> >
-> > diff --git a/profiles/ranging/rap.c b/profiles/ranging/rap.c
-> > index 3ffc0da76..4f6d7f2db 100644
-> > --- a/profiles/ranging/rap.c
-> > +++ b/profiles/ranging/rap.c
-> > @@ -308,6 +308,27 @@ static void rap_attached(struct bt_rap *rap, void =
-*user_data)
-> >         rap_data_add(data);
-> >  }
-> >
-> > +static void rap_ras_accessed(struct bt_att *att, void *user_data)
-> > +{
-> > +       struct btd_device *device;
-> > +       struct btd_service *service;
-> > +
-> > +       device =3D btd_adapter_find_device_by_fd(bt_att_get_fd(att));
-> > +       if (!device) {
-> > +               error("unable to find device for RAS access");
-> > +               return;
-> > +       }
-> > +
-> > +       service =3D btd_device_get_service(device, GATT_UUID);
-> > +       if (!service) {
-> > +               btd_device_add_uuid(device, GATT_UUID);
-> > +               service =3D btd_device_get_service(device, GATT_UUID);
-> > +       }
-> > +
-> > +       if (service)
-> > +               service_accept(service, btd_device_is_initiator(device)=
-);
-> > +}
-> > +
-> >  enum cs_dict_target {
-> >         CS_TARGET_SETTINGS,
-> >         CS_TARGET_CFG,
-> > @@ -830,6 +851,7 @@ static struct btd_profile rap_profile =3D {
-> >  };
-> >
-> >  static unsigned int rap_id;
-> > +static unsigned int rap_ras_accessed_id;
-> >
-> >  static int rap_init(void)
-> >  {
-> > @@ -840,6 +862,8 @@ static int rap_init(void)
-> >                 return err;
-> >
-> >         rap_id =3D bt_rap_register(rap_attached, rap_detached, NULL);
-> > +       rap_ras_accessed_id =3D bt_rap_ras_accessed_register(rap_ras_ac=
-cessed,
-> > +                                                                      =
- NULL);
-> >
-> >         return 0;
-> >  }
-> > @@ -848,6 +872,7 @@ static void rap_exit(void)
-> >  {
-> >         btd_profile_unregister(&rap_profile);
-> >         bt_rap_unregister(rap_id);
-> > +       bt_rap_ras_accessed_unregister(rap_ras_accessed_id);
-> >  }
-> >
-> >  BLUETOOTH_PLUGIN_DEFINE(rap, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAUL=
-T,
-> > --
-> >
+> This patch was developed with assistance from Claude Code
+> (claude-opus-4-8). It was reviewed line by line and the results below
+> reproduced on real hardware by me before submitting; nothing here is
+> inferred.
 >
+> Verified on a dual-mode controller with ControllerMode=3Ddual, against iO=
+S and
+> Android peers advertising Flags 0x1a from resolvable private addresses. A=
+ GATT
+> association that includes a ~7 s user prompt, which previously failed eve=
+ry
+> time at ~4.7 s with the Page Timeout above, now completes:
 >
+>   before:  connect +0.0s, GATT resolved +2.3s, first exchange +2.7s,
+>            Page Timeout +4.7s -> LE link destroyed, transfer never comple=
+ted
+>   after:   same host, same peers, classic still enabled, transfer complet=
+es
+>            with the user prompt taking 7.0s of it
+>
+> Setting ControllerMode=3Dle instead of applying the patch also makes the =
+failure
+> go away, which independently confirms the mechanism: with no classic radi=
+o
+> there is no page to time out. The patch achieves the same without giving =
+up
+> BR/EDR, and A2DP/HFP continue to work on the host afterwards.
+>
+> make is clean with no new warnings in src/adapter.c, and make check passe=
+s
+> 39/39.
+>
+> No unit test is included: src/adapter.c is linked only into bluetoothd an=
+d not
+> into any unit test target, so btd_adapter_device_found() cannot be exerci=
+sed by
+> the existing harness. Extracting the check into a unit-testable helper lo=
+oked
+> like scope creep for a bug fix, but I am happy to add that if preferred.
+>
+>  src/adapter.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 4ffa32a..30e7679 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -7415,8 +7415,17 @@ void btd_adapter_device_found(struct btd_adapter *=
+adapter,
+>          * older kernels send separate adv_ind and scan_rsp. Newer
+>          * kernels send them merged, so once we know which mgmt version
+>          * supports this we can make the non-zero check conditional.
+> +        *
+> +        * Only infer BR/EDR support when the LE address is a Public Devi=
+ce
+> +        * Address. A dual-mode device uses the same Public Device Addres=
+s for
+> +        * BR/EDR and LE, so in that case the advertised address is also =
+a valid
+> +        * BD_ADDR to page. A random address (static, resolvable or
+> +        * non-resolvable) has no defined relationship to the device's BD=
+_ADDR,
+> +        * so recording BR/EDR support against it makes the device look p=
+ageable
+> +        * at an address that can never be paged: SDP discovery then fail=
+s with
+> +        * Page Timeout and takes the working LE link down with it.
+>          */
+> -       if (bdaddr_type !=3D BDADDR_BREDR && eir_data.flags &&
+> +       if (bdaddr_type =3D=3D BDADDR_LE_PUBLIC && eir_data.flags &&
+>                                         !(eir_data.flags & EIR_BREDR_UNSU=
+P)) {
+>                 device_set_bredr_support(dev);
+>                 /* Update last seen for BR/EDR in case its flag is set */
 > --
-> Luiz Augusto von Dentz
-
+> 2.55.0
+>
+>
 
 
 --=20
