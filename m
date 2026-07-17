@@ -1,149 +1,203 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C373F823C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 12:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCFFD3BD22C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 12:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784292093; cv=none; b=QzOX5UDWgG3bYckpyVPMkGOoK72NdEO2Q5D4Hq09Vyb24/+NfizTvuL5f2kNQ0GNpQmoVJgukL5hk1GRUQL9EK+fkm5EimQK5sXEjcZaxB+IC2qcjhAc7q/mgX2E0Yu4Ia0plbOA7P7uhOzT7fzoJb1x9rggNw5gS3FhHz/jNKA=
+	t=1784292162; cv=none; b=ORC4ni47IGXOG2crnZWB+U9kRZf7tn9qtk3eRNbaM9V94bVP0ki0xTBTsmmVUWjN8FHWOsnNJ1Km7kX5dhFbNR9VWE6EzN38/nmE2S16kgNVX1hi4QyI6XZWaOfPXHyKF9fazoYclhu1twZjJqzU1fF7+ZA7UV5mijQvbA+dJCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784292093; c=relaxed/simple;
-	bh=ad7ujwsfWBYlBrp+APexI3QPW2pYIsMMi5ey2r7FrDs=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gJaQN+bg41uoek4NRVtzmisnJSm/ri7VgmqS0K29JFrLLIR5KLKV2gy6/jCmH5tBn3FbT9mhde6xQTKrQDQJtdpppJ5Ui8WhStfY6IsJm4yaL9ZmXb5hfJYwpBn4TNAOcIen1sNeINkv02xRZxBkijET3I2u+0e7aEPtItUDgBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P5JKUawp; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784292162; c=relaxed/simple;
+	bh=RjPW6zOzfDEqfPrqbx0oXzzpoEARjkvt7DbIFVg5tDI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MMFyogts47sjdv2y+dNh4N2+JRkCUny0eo5Fp8kdoXDClzIMFaT5cMkSyVNwN7AMQ2TlG0qjLr/E+CxOxP19c4DFs7gkACiOUEfWNwzSTUSQnwQafIOdJDd8/X7UgLsWclNnmRmPjU+WcUUlfR+KQ2+E1eFvh+7kfMpv0J7qWqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=E2/lU+Lo; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=b9H/FIqL; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P5JKUawp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17D7C1F00A3D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 12:41:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784292092;
-	bh=m+axLXnaKJEGHNFMBEGT4Zy3Q/EEwboTj2mFiNNj1t8=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=P5JKUawpVnBajyTslMgPIqsB/u9snuQGu2uU9xp9L1kK0MokZuGgHazXGGk2u22HN
-	 hbzS7ZPx3cFkxH39c8lmdGIcnZ7q79Po9KVHDqhzLweRthuAR9d6ql13EJVIEnNQtG
-	 33rPY5Xujv3b8Kho68WWv0SKksWxvSdaWJDEdXx2gvP3RGM+6DaTGMOmSPbg9/6iKp
-	 0yVKKk9lbwnZhNdDN44W4Fib8dQD68EBxT65AylDkDTc/2Swf2EciT+Z1LuSgpbAuw
-	 iioiWhtafNswud8HZDEJkDVrOHEuMpbYUP1tZdfa0RgMZsohhGCMdgg8aXIZMr/Dwt
-	 /xsNyWE/dWo+A==
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-39c74c469e8so61127411fa.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 05:41:32 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RpkM3LQs1aWr/YE3L0BBmHw77vxjOgNQaZiHRzY+PG6O/kvjsktPGT0Xhs87lpwSXYVbOAi7tmuBiNJm3ADK3M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqhEQq87Nt3WJk7/1gDVVbVja6PcDmApEHckFaspejd768Bhu3
-	PnA4GoEHF5K2wW9d5SPvDZJptrRhFrspiwBpiVwi4SdreO7alWPElqPGqLVuQIYBCwGOwAg0Jsi
-	ct8sM+LZBCrLP8e3CUpvVvxsL0dvCHA+DO6HUMcuf6w==
-X-Received: by 2002:a05:6512:8054:b0:5b0:f9d:f7af with SMTP id
- 2adb3069b0e04-5b28f85e66emr449360e87.4.1784292090707; Fri, 17 Jul 2026
- 05:41:30 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 17 Jul 2026 05:41:29 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 17 Jul 2026 05:41:29 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <CAFEp6-0HnYOboVWc3GUG5qMN_phP4ryJp=T=LgZs2ujyX1isMg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="E2/lU+Lo";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="b9H/FIqL"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66HCStEB1900987
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 12:42:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	NI3S/eGRPbhJy8X2oBVyMHo2H5uQPxmOWCUfyQV9hqM=; b=E2/lU+LonMLT6Key
+	1o+Db0ifJY1GayhygCJ8HKLiOgFFBLBD1gUkY5suhn/jWEBtVwTz2WxZk1tCfEpd
+	7k7hrJOr0R1snAj4TeHGk2zvFHMQaoCANxdaz8UaAYb7q0BKb4TM85OMq9P41pSt
+	6IiY2lKCVNSys0MOIJlnQXM2bE43SkESCfiSGsdEI9NIqTMKbQP6pLAs9NTEkz5/
+	Rz1P3G4w1e6B3rgFQS/2hOZvhkvUtQ+OIVFQo3P632IEU8VjTiU4G0Vo+gYe4/J0
+	d+QwdbjkKNCoi16C75Slh1hYfmismGK4l7YGpsoaaGfDGK/FWiHliHiiAUeo0Bg1
+	XBRLDA==
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ffe0usnd3-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 12:42:39 +0000 (GMT)
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-8423f1fe39eso8284255b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 05:42:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1784292158; x=1784896958; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=NI3S/eGRPbhJy8X2oBVyMHo2H5uQPxmOWCUfyQV9hqM=;
+        b=b9H/FIqL3tyj62N/jfNzkAgArYLogCcoG35Fa83VuYCx2tmwIue9ZuwCpQU3GKGURl
+         PzPeviilKMbwG7UYtr9HsvjUyIj3C9GfIPnEyTtyXJX+23spGCxcXu2yLdtoAH33eIA0
+         nCChW+I0RvnBoRc641I0FgnwZRpj9XXmke3912yUXXCUF8esBRXg0PU1P3vyFLkqzmIM
+         IgGoOmrVWvKge7h8+uLX8C52DrA3U6rfuYjWlxz65d+Qa1vbAGVbp0h9f4wqoujc87E+
+         qKa5BeccHqsmPI84JntnrBqwiU8lCQxzCEEHoc+iP9kY1WUafccW/lgSFM2sapcDzxj0
+         224A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784292158; x=1784896958;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=NI3S/eGRPbhJy8X2oBVyMHo2H5uQPxmOWCUfyQV9hqM=;
+        b=rX8gscRkI8bKmXADbmsyp6zrB855fSAvA1guuM7hS1XqgR0im/CNK8DwkS8G98pP3q
+         7GKvaDN95/JU2505dwiGCCgZlPy+ZkAjeqtmKxRcAEpSEKojGk0QywWwLfy6rAJnh1IK
+         i40B7lH8f2iNpwi52uk1C/pAiyniIg9C66+oqIOnnkSdVziq9u+Ze/7bRbhmznJZflQU
+         5Vcmow2wqzWPuxMl9nY8AQ6yYERzurujn6Z5WuXvhfkQg3x43mJrFXsryBNUxJZLPsWY
+         vaeMcUfOO0Q37jQqzE/ug2vcy80b3VOm35gdgoUhl5UY4jpu7AY0XxbjAVmYx4cUD7ze
+         1x9w==
+X-Gm-Message-State: AOJu0YzNitAqKbv7UglXF5O0XsV4NJi+U5Lm9ErugRdlN+05DyjZ6Qmu
+	1sIbhv/Svyp2UvJvarVn3DDzwWw+0hFurk/TuU5m/yL1LkzWB/84RM55DVnraW1PMfSTCM43/K1
+	xfQJISAfXbaU3LaC38yJT6qaIXbcG+S9TJHkhPwGMHXfGzYeZj/vzRgyMeLyorFHTV5Vdi8Y=
+X-Gm-Gg: AfdE7cnQovJUMGmEeEa2W7m+Rbyz46/zWZc73IRxxJdTDV/vshXZ+2UuUQii0VsXRrv
+	2qAZl0w20I4aY6FIye5QvQz5bOJYMQ0NMsC5304eUJprGuF05SCk7Oou3cc8y9XIfHPbRGpYSqh
+	2+fVxONCghtU/Rc5e8V1JFxr/zQ0SBFBm2yySsk/IKMRy0Bk//Z9ogaP5Lx0QIbnsKrtPJFnWT3
+	AB+Z3lo5hdwKCwzsSB6aoTx+6YX1pSDvX8vDGHrqfIdVdImx+P7HSEtb9B5hpm4D1IR9kKLxPoD
+	d4dDLwkLuRIAaLCwQZAEQr5N1sNEBFSU391TNVGMLq/Ga+rObseFWKDqZK/KelIRCSnB2N9x0RA
+	g7sk2DRo8WwITVLVTYqfvz0b4iJSX
+X-Received: by 2002:a05:6a00:12e4:b0:848:63f4:b4bf with SMTP id d2e1a72fcca58-84c2954a79cmr2498213b3a.74.1784292158313;
+        Fri, 17 Jul 2026 05:42:38 -0700 (PDT)
+X-Received: by 2002:a05:6a00:12e4:b0:848:63f4:b4bf with SMTP id d2e1a72fcca58-84c2954a79cmr2498177b3a.74.1784292157808;
+        Fri, 17 Jul 2026 05:42:37 -0700 (PDT)
+Received: from [10.216.31.190] ([202.46.23.19])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84c2af6e3f6sm1015274b3a.44.2026.07.17.05.42.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Jul 2026 05:42:37 -0700 (PDT)
+Message-ID: <617c63ec-a4cd-4ca7-8cff-a3c64aa78bd8@oss.qualcomm.com>
+Date: Fri, 17 Jul 2026 18:12:33 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260716-monza-wireless-v4-0-9b02e6f549d7@oss.qualcomm.com>
- <20260716-monza-wireless-v4-8-9b02e6f549d7@oss.qualcomm.com>
- <CAMRc=Mc3gt_uruVmUmqsOsvKX=52V4TBVC0hbo69KgjEGhch3A@mail.gmail.com> <CAFEp6-0HnYOboVWc3GUG5qMN_phP4ryJp=T=LgZs2ujyX1isMg@mail.gmail.com>
-Date: Fri, 17 Jul 2026 05:41:29 -0700
-X-Gmail-Original-Message-ID: <CAMRc=MdhNJEkSOCnz9tnT=wYgseZdFkUs-7VbLgBJhWWjU_cig@mail.gmail.com>
-X-Gm-Features: AUfX_mxPH67iV8-drcRF8TjP1xX1r4zX-SMyz8sadg86rCJAZgfpcbCWPTxNlVQ
-Message-ID: <CAMRc=MdhNJEkSOCnz9tnT=wYgseZdFkUs-7VbLgBJhWWjU_cig@mail.gmail.com>
-Subject: Re: [PATCH v4 08/11] Bluetooth: hci_qca: Support QCA2066 on M.2
- connector via pwrseq
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: Bartosz Golaszewski <brgl@kernel.org>, linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
-	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ v3 2/4] src: Register GATT profiles for Channel
+ Sounding reflector
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com,
+        quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
+References: <20260712121743.2842547-1-naga.akella@oss.qualcomm.com>
+ <20260712121743.2842547-3-naga.akella@oss.qualcomm.com>
+ <CABBYNZJF7ucGh-CLT0YVkgZkU-bVzY_t2-D9Luvodx4dpzDEug@mail.gmail.com>
+Content-Language: en-US
+From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+In-Reply-To: <CABBYNZJF7ucGh-CLT0YVkgZkU-bVzY_t2-D9Luvodx4dpzDEug@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Authority-Analysis: v=2.4 cv=deWwG3Xe c=1 sm=1 tr=0 ts=6a5a233f cx=c_pps
+ a=WW5sKcV1LcKqjgzy2JUPuA==:117 a=j4ogTh8yFefVWWEFDRgCtg==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22
+ a=EUspDBNiAAAA:8 a=_2_NuRsJEGNGsCXwGWsA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=OpyuDcXvxspvyRM73sMx:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE3MDEyOSBTYWx0ZWRfX6CCHZEUPOLxP
+ eZMCQqJexCjOz402jWlptwG5GW1kVS9e3gWaPPHtQ1VkdShWb/es1pL9jKQGgUgPAjEl7RwNOTO
+ usz9EEWGnjlwX2N5zUG9idVnU6GXbxOyFCGlspkqeE+0DCqwSC4sefsIcDVufmHk2g09wTpsUP2
+ ouqPjv9ztD6e0Dpanp545WDAvY6jKA6Y6h2bQ9zqAP+DrP+nkQKz5ZAF7zZ+R97DBD7epTZ4SMg
+ pev5M/ABneJfK/0+/GPVNAlxftz598iauV6jrfJOZ+ldJzJ14IeIrBPG+sEHUpfNmIHYItB3uoI
+ DNLjqF1q3FbZ2dBRbwgjuU+abd1RG/o8hce2sRGGJ7dYDDk+ak6gihLs/Vn32amu9q17n6KHHt8
+ 3E0Q7RiMaz8Z+9Di/0VI9H4LHUOKc0CkMlA1H4VphJzsiV8QPK3xQ0D2COfHhfTzUGCaiw8+6ig
+ W+Jo2FLKwJ4kfnkXneA==
+X-Proofpoint-ORIG-GUID: LfEP18I7_saXZE-F84C2OqIEkvw0EmFg
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE3MDEyOSBTYWx0ZWRfX2ogDhgZrE+ko
+ 4Gg5RdgEcvasUQkKVA7RfBKvL+LLszZNF7BkghRA81PXokunSCUOw6Es+QMm1jLr+0dJc0RsugF
+ Tmjgb8iJaH+xd2wHTavqOnSvBvN5BEw=
+X-Proofpoint-GUID: LfEP18I7_saXZE-F84C2OqIEkvw0EmFg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-17_03,2026-07-17_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 spamscore=0 bulkscore=0 priorityscore=1501 malwarescore=0
+ lowpriorityscore=0 adultscore=0 phishscore=0 impostorscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607170129
 
-On Fri, 17 Jul 2026 14:32:27 +0200, Loic Poulain
-<loic.poulain@oss.qualcomm.com> said:
-> Hi Bartosz,
->
-> On Fri, Jul 17, 2026 at 11:35=E2=80=AFAM Bartosz Golaszewski <brgl@kernel=
-.org> wrote:
+Hi Luiz,
+
+Thanks for the comment
+
+On 7/16/2026 9:45 PM, Luiz Augusto von Dentz wrote:
+> Hi Naga,
+> 
+> On Sun, Jul 12, 2026 at 8:18 AM Naga Bhavani Akella
+> <naga.akella@oss.qualcomm.com> wrote:
 >>
->> On Thu, 16 Jul 2026 18:18:25 +0200, Loic Poulain
->> <loic.poulain@oss.qualcomm.com> said:
->> > For QCA2066 (and other QCA chips) on M.2 connectors, the UART enable i=
-s
->> > controlled by the W_DISABLE2# signal managed by the pcie-m2 power sequ=
-encer
->> > rather than a dedicated BT enable GPIO.
->> >
->> > When the serdev controller has an OF graph (indicating it is connected=
- to
->> > an M.2 connector), acquire the 'uart' pwrseq target from the connector=
-'s
->> > power sequencer and use it to control BT power instead of the bt-enabl=
-e
->> > GPIO. This is factored out into qca_serdev_get_m2_pwrseq().
->> >
->> > Reviewed-by: Manivannan Sadhasivam <mani@kernel.org>
->> > Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
->> > ---
->> >  drivers/bluetooth/hci_qca.c | 41 +++++++++++++++++++++++++++++++-----=
------
->> >  1 file changed, 31 insertions(+), 10 deletions(-)
->> >
->> > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> > index 25c4387136245fca25e375951f960d7240116781..22f6185a946ef04c45e41b=
-2b34126e3f58d603ca 100644
->> > --- a/drivers/bluetooth/hci_qca.c
->> > +++ b/drivers/bluetooth/hci_qca.c
->> > @@ -1872,6 +1872,9 @@ static int qca_power_on(struct hci_dev *hdev)
->> >                       /* Controller needs time to bootup. */
->> >                       msleep(150);
->> >               }
->> > +
->> > +             if (qcadev->bt_power.pwrseq)
->> > +                     pwrseq_power_on(qcadev->bt_power.pwrseq);
->> >       }
->> >
->> >       clear_bit(QCA_BT_OFF, &qca->flags);
->> > @@ -2387,6 +2390,28 @@ static int qca_init_regulators(struct qca_power=
- *qca,
->> >       return 0;
->> >  }
->> >
->> > +static void qca_serdev_put_pwrseq(void *data)
->> > +{
->> > +     pwrseq_put(data);
->> > +}
->> > +
->> > +static int qca_serdev_get_m2_pwrseq(struct qca_serdev *qcadev)
->> > +{
->> > +     struct serdev_device *serdev =3D qcadev->serdev_hu.serdev;
->> > +     struct pwrseq_desc *pwrseq;
->> > +
->> > +     if (!of_graph_is_present(dev_of_node(&serdev->ctrl->dev)))
->> > +             return 0;
->> > +
->> > +     pwrseq =3D pwrseq_get(&serdev->ctrl->dev, "uart");
+>> Probe and accept GATT_UUID profiles on non-initiator (reflector)
+>> devices before gatt_client discovery checks,
+>> ensuring RAP's org.bluez.ChannelSounding1 DBus interface is registered
+>> even when GATT client discovery is skipped.
+> 
+> This is not how it should be done, what you do is to detect that if
+> the remote side discover/read any of RAS attributes then you add its
+> UUID via btd_device_add_uuid.
+
+Addressed the comment in patch set v4> 
+>> ---
+>>  src/device.c | 28 +++++++++++++++++++++-------
+>>  1 file changed, 21 insertions(+), 7 deletions(-)
 >>
->> There's devm_pwrseq_get() you can use instead of scheduling your own act=
-ion.
->
-> The reason is discussed here:
-> https://lore.kernel.org/all/20260716083141.GA4101439@google.com/
->
-> We want the lifetime of the pwrseq descriptor to be tied to the serdev
-> consumer device rather than the underlying serdev controller.
-> Maybe a short comment explaining this relationship would be helpful.
->
+>> diff --git a/src/device.c b/src/device.c
+>> index 65d84be56..cedfe3a20 100644
+>> --- a/src/device.c
+>> +++ b/src/device.c
+>> @@ -6301,17 +6301,31 @@ static void gatt_debug(const char *str, void *user_data)
+>>  static void gatt_client_init(struct btd_device *device)
+>>  {
+>>         uint8_t features;
+>> +       GSList *uuid_list;
+>>
+>>         gatt_client_cleanup(device);
+>>
+>> -       if (!btd_device_is_initiator(device) && !btd_opts.reverse_discovery) {
+>> -               DBG("Reverse service discovery disabled: skipping GATT client");
+>> -               return;
+>> -       }
+>> +       if (!btd_device_is_initiator(device)) {
+>> +               /*
+>> +                * For the reflector role GATT client discovery is skipped, but
+>> +                * profiles that match GATT_UUID still need to be probed and
+>> +                * accepted so they can register their D-Bus interfaces (e.g.
+>> +                * org.bluez.ChannelSounding1).
+>> +                */
+>> +               uuid_list = g_slist_append(NULL, (char *)GATT_UUID);
+>> +               device_probe_profiles(device, uuid_list);
+>> +               g_slist_free(uuid_list);
+>> +               device_accept_gatt_profiles(device);
+>>
+>> -       if (!btd_device_is_initiator(device) && !btd_opts.gatt_client) {
+>> -               DBG("GATT client disabled: skipping GATT client");
+>> -               return;
+>> +               if (!btd_opts.reverse_discovery) {
+>> +                       DBG("Reverse srvc disc disabled: skip GATT client");
+>> +                       return;
+>> +               }
+>> +
+>> +               if (!btd_opts.gatt_client) {
+>> +                       DBG("GATT client disabled: skipping GATT client");
+>> +                       return;
+>> +               }
+>>         }
+>>
+>>         features =  BT_GATT_CHRC_CLI_FEAT_ROBUST_CACHING
+>> --
+>>
+> 
+> 
 
-Ah, subtle. Yeah a comment would be helpful.
-
-Bart
