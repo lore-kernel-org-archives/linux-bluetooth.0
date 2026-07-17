@@ -1,92 +1,90 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3EF3890E4
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 07:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016083B8948
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 07:27:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784273225; cv=none; b=GRTl/aU2rO2SaeN5BH4y1mF/KEjnYVZejLiXdqheJ7fusbsRyzqFfeS0PXIzWwdHrY5ZPVvxe6HvcA79s0DCnsYgF/BTbO8Yr0omvbT8IK55g0SOvMRKUArtWbJA4PGcSKtdDxDGPpx0tXTS+KiBtz/+GZeWsSQxh8Y+PerSERI=
+	t=1784273228; cv=none; b=kr1nEIf0RhqAOv2ULs/aq5N/VAVCVlxs5MX57T2ujoqdbNg6eYDfOP5c5HcYmkeKYd3Qanylk92JOWTXMrJoLkhmxtBdKYKCM+c7o8f9FdW0uWCkhYAVdvabVpE3IgnQJYZF895szTyGdUWfWLcVeFa/XexvzVzPag9m5pcNUt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784273225; c=relaxed/simple;
-	bh=dRaziyuC5nRPnxwfEPwfInBziS3OaWhqIh2fK4e0IJI=;
+	s=arc-20240116; t=1784273228; c=relaxed/simple;
+	bh=GObPdvRt7q5E30XHclQyjHyy6ZGJHCpcNxk0iTul0AU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XlTtbwK04cyB6cHf1P1o+aB+7OoCN9HDvTi3UWTuni2FlnF5BtjBs4TMtPqi6dTLxSLVOBKZFCjT8vmjt6BA/1pVQt+L5+orOM9a2fVAARPuwAr6Wdgzfa1QCxNlmdw56CLjYJ7zl49Lckdsaxi7X1uOA+FqQhMD8ZepHr+VpTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ExG4c2o6; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=U/bUdaVs; arc=none smtp.client-ip=205.220.180.131
+	 MIME-Version; b=d/h2zxgKbi2+P/3v4MrhlgqIKpVEw1LIky7StWc0lO/s8sSgsF3EAbeDBOVnghFYIM6TjgA5ULdjst1Q3zY2eoMzGrC0IXc+KZdDO6GRJiSl5Qrr08XJQUzemWAG/TUpDbd24TnmxdV2Fd2ye/KUip+9NWmd9IhMB9kkECvt8dM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=N7VCaSc7; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=DnyZog09; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ExG4c2o6";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="U/bUdaVs"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66H6cjta1078438
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 07:27:01 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="N7VCaSc7";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="DnyZog09"
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66H6cbjP979985
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 07:27:04 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	hgOzEzAuLVw+c28W6A9rbykCJiN9UBD0W1idAiVB3K0=; b=ExG4c2o6QyK2S7pj
-	NrevjA3ux1lDyt9VyrszpBbRz5vyEHpkl9blM3OStfLKcpYIXdidnpbk+Hf/ns6s
-	y+uOZzZiVKaw+E0/1o95Oe/RgkyC6N+VEkaa+16YjoNirerWmjxL+/V7WPWTwNR0
-	JgFvGeaKXEvsCqZrEI7hyAvDfs5K9I86s8a3HqECHyMFiUcXQMmDH/ORVuC9hRIB
-	7+ozrWNRUZ4cXpmoO8m6ttHVtO6dYFBOlVPmW6BQnTNf3hHGt450ShraPrHyGnAG
-	T6o/1wl8QRJ2fZ60nnXRNa/3s2Ma0GX+ZqS0+sXRcDrogmukIGrqYwDqK/aRizXo
-	qcV9oQ==
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4feym1by0c-1
+	cc:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=qcppdkim1; bh=RCf/+XXWj8j
+	jJy+Bqer9CFYlyQvissJ2WYW45z9LOz8=; b=N7VCaSc7i5xC+U73wwadQusYyF1
+	tLg6qsAQDTQiF/GkoR3mqA/JozTD72Yc4tAQvLmDyobs+EGyEPtg93WuG5PLY7vQ
+	MDYWGM3M3yr9r0LenRqub9KlW/zuYYcMIyqdWYWbcKWMHCPivoqhoPIGQ3yP1NGi
+	BXr8dWljPsAfOs1Z0SrpN3khngxX9s1+eI0BRsvuBueSZXn3E7JqXkq9fDsWToPW
+	WXVAQ97eoApMtMcirwunAtlnN0wdMWWDpCEIxX0klmm3o4ChwZzUNkNogkcQsY2t
+	GDGSlwp0mfwmju3q5REngeeZpQJ/2g9nOHkd3JFVGFjdOZLAJFoe+GWSHKg==
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fff9gr65v-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 07:27:01 +0000 (GMT)
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-cb11535e6a1so3959004a12.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 00:27:01 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 07:27:04 +0000 (GMT)
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-ca6bd8a190cso11017688a12.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 00:27:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1784273220; x=1784878020; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=hgOzEzAuLVw+c28W6A9rbykCJiN9UBD0W1idAiVB3K0=;
-        b=U/bUdaVsxzjsbOn7Zdl4H731/uVAVXTcB+1dVe2CpMWh1ZCD2MUwAONRG2jwlGQNBT
-         LlZGPU6o1p9HfR439/EgnuLWdXOY/9+cPzO3iUjmrbyrv20eRnEZ8Dk/3Sa0ehWoCGKZ
-         FP29ZZmbP/ha+PVL6MhAUB79Q4eTdCZ1UmvoJe6LwejxG2UiFPlvjQWmXJty0kEAb7Cn
-         0Fkt3/dIpf56apucWfPhgf1OZVMQmwCVGDhWZir8YdTQctPG+y+aaXjFN/LSsvCFFCyF
-         slPEaWyvNlTMO7SNbXkkWG5JJuQ6T+VQ9usLivXckjVk/+3ibJ4sbSsFwYNGToXjRG8v
-         zYJw==
+        d=oss.qualcomm.com; s=google; t=1784273223; x=1784878023; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=RCf/+XXWj8jjJy+Bqer9CFYlyQvissJ2WYW45z9LOz8=;
+        b=DnyZog09CUXrEKuy0QWDqOWuWQewsiNA3SqPipFpSrf47h9Eacog5jph6R3cATqstE
+         5x/WnfTZ+HCuGV6ZVmvzvHs39JguOlXX/7kIlYgnT5Jnx4zzPsPlejsDI1365HampQF3
+         62841QeHCw0QUW4fhpB2JC5XjP2mUS3XtTUKMZ5kH4gPT5RdSinskAMn3kMXdTgaXruu
+         UVFOjroQJeFK5pjqF75jQQJhiGt7gG/uDet+RXHktD/lRB2wjGV6e66wW8a1HK4USs3Q
+         uDGpzR7YT/iVW1eGHuqzG/ZuOOAHA+0iEWlMTBvTQqDwX41sUeQZ6DEsdZ5yW8e9Ip3S
+         xfyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784273220; x=1784878020;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=hgOzEzAuLVw+c28W6A9rbykCJiN9UBD0W1idAiVB3K0=;
-        b=eXMQOTSGByhs2HlyflF3QhUtwqUxJdYb8IZGhQS35cT3qde0EJe2cwmm4K5EKNyvw4
-         AVyd+5wljzIJ/LStwkYFGKtbY7/juQ8k+qd4WBooXvRlWH2F7ZFxBVMgbHkYdj1fp6j/
-         8Y8ncHJx37jpAI+bIJCgDJy+O8loi+xhrGxbMMaADMFY9H3/UrpmmR8VSO/4FVCNaErY
-         FXxFOv4w36Bnxwiz6AiT/b4o4j2lsZvbz2+fBSCiN6i1B6CANjx9oFYHDJM4vAvCFsE5
-         C1Ob9i1rFIlBiWaHyVt1X03t21PyzgKaD1I0UBHTA1jiySgZMGIYofT7cR2tgcSS/oB4
-         yTJA==
-X-Gm-Message-State: AOJu0YyInyQqp/YombGiUXWrUWsIQrjb7c50b+wyhMoWIUrh2ERV74Dv
-	mjhTGxX03xGHEVl1MMU0JhQ6TfjSECc8voXmTCODArmjhZrAQRgmwL1nHW1nsjp1yieH/Wq7/x2
-	8qJQsgnFnIh6c8xUqK99h7xQxGeTv8nW0n50f+lcKrCYncs2KfmtzvmfURMXbN5xKIfvVxRiKvo
-	OaFZM=
-X-Gm-Gg: AfdE7cmc/8OlwaQjD7E4KVUhdlBuX2IsXWGEwbFGvZJyRYN7ITM3KfHG54zXXEkfP4M
-	M+dGTrYGlQAaVvACw+whDoUbelm1HCuAattP81xfawmE/5sYkqvHdVJftYxS2Lb8yZRJ3ktHrMt
-	HUUS4aqbc9KRpOiNdEG2SDAkXKRy1SaXG5YcijqdXTFBmWfCpCZf6dIxz8f/n8Mvqhih/np3HuH
-	R0MIGWyXVmJbdvJVTS7ZXWU9Yv+q91TeAHTCuBetBlcbTYGCaFTWalzZkJa5cOwmNZxhBGQcJ1T
-	Bjy0jsY3mD43pFX9J6a0fOtkhMAoBxpR4oLIELKOEeSTwyAxaYrOdlIYKelMDXXKOGBYKShWmTW
-	c5dS16/ECDKqdPn7cvDQ7+g==
-X-Received: by 2002:a05:6a20:9785:b0:3c3:af85:85e7 with SMTP id adf61e73a8af0-3c3af85b991mr907219637.34.1784273220057;
-        Fri, 17 Jul 2026 00:27:00 -0700 (PDT)
-X-Received: by 2002:a05:6a20:9785:b0:3c3:af85:85e7 with SMTP id adf61e73a8af0-3c3af85b991mr907192637.34.1784273219262;
-        Fri, 17 Jul 2026 00:26:59 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1784273223; x=1784878023;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=RCf/+XXWj8jjJy+Bqer9CFYlyQvissJ2WYW45z9LOz8=;
+        b=le031NPzcqc2QUEnVAXNm4nnU/K7ebKh4SmBXaB//d2HPUnNalg0fHvxqZfq3PfRZF
+         xf1sYRiPZzC8um0wc/bY0VQasULBzyV8iTq4N4WxhBQra8uq8AUy7uInmWOD4WmA57A1
+         NFBzVH7PcSRF8CLq7o0aT5qdxpYDn99Rca8+2/Nm4xsM9xfn1LqyH63+z1i9iNxlt92d
+         VKB29slL7ca0Mc3Aw96rGcnqiBJu9Tpg0+X9giBes1vwvDUF7PWsV3BNAFGUZgYroaGZ
+         +5brrZg3cF8Hyj78ThKwkqutvs+9sKubRRx3fASSNs4Fcgn29kTV3wk9a9YzQOoVvz5e
+         +e6A==
+X-Gm-Message-State: AOJu0Yy6019WzhXFdTMWDXFydvxtpn4HftO1b8nnPEa7uojBT83T1STt
+	BkOAunwWd+CJ+zIRPMVdwB11beMUDiXIHJrrm8XB2gbba+bPsa+PUeSDMEgmCNfkLbrvZdi8QW+
+	HsAKbCAsIMAWDdn9P6eX38MrzqYJisLxaVaUerGo/1QI04zXF81+r1AGDdLvqB2oMqHbT6lt9zr
+	b3Rtw=
+X-Gm-Gg: AfdE7cmFv//v5uS/1iWygDtcwScYo8QJnUyxSVdqbly+rmD/DGOvIpdckrTJJXrYcSz
+	fjtln9j07KNZuhA8BswejJ8gqhZzgzhFoMd9l6emc7CVQKuhL1e8iibLisCiTHbOCDUQKnuXyPB
+	PkKye5pdPfkVyyGkpsvJAmHIYrRXR9PKAznOK6oO+ZT0LpM03d3u5mSRFgze4rskxWTZ/w/dziK
+	/bTEAqREt9PkzKH1FYj/ocywh5yAVyKR0agmk4HxL29CF1oYP+89n96aJC8JewfY6E0TMSPf6/R
+	9N7MsjfEIwKpWnk5KnjAobB7Onrenft6gnRfN+0AA/DhJ6n/JUi0b601jjwzTPTJT9FRzZQ83NY
+	2hl60pLbVtteZTqLkeDjOzg==
+X-Received: by 2002:a05:6a20:3886:b0:3c3:b628:6d17 with SMTP id adf61e73a8af0-3c3b62871a1mr204126637.25.1784273223187;
+        Fri, 17 Jul 2026 00:27:03 -0700 (PDT)
+X-Received: by 2002:a05:6a20:3886:b0:3c3:b628:6d17 with SMTP id adf61e73a8af0-3c3b62871a1mr204098637.25.1784273222594;
+        Fri, 17 Jul 2026 00:27:02 -0700 (PDT)
 Received: from hu-prathm-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cb519de34d4sm455579a12.26.2026.07.17.00.26.53
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cb519de34d4sm455579a12.26.2026.07.17.00.26.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jul 2026 00:26:58 -0700 (PDT)
+        Fri, 17 Jul 2026 00:27:01 -0700 (PDT)
 From: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
 X-Google-Original-From: Prathibha Madugonde <prathm@qti.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
         quic_anubhavg@quicinc.com
-Subject: [PATCH BlueZ v1 1/2] shared/rap: Add bcs_procedure_data aggregation and procedure data API
-Date: Fri, 17 Jul 2026 12:56:46 +0530
-Message-Id: <20260717072647.255002-2-prathm@qti.qualcomm.com>
+Subject: [PATCH BlueZ v1 2/2] profiles/ranging: Add D-Bus ProcedureData signal for Channel Sounding
+Date: Fri, 17 Jul 2026 12:56:47 +0530
+Message-Id: <20260717072647.255002-3-prathm@qti.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260717072647.255002-1-prathm@qti.qualcomm.com>
 References: <20260717072647.255002-1-prathm@qti.qualcomm.com>
@@ -96,1086 +94,677 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Authority-Analysis: v=2.4 cv=KPRqylFo c=1 sm=1 tr=0 ts=6a59d945 cx=c_pps
- a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22
- a=EUspDBNiAAAA:8 a=C4rH-d3b2fZPOIAJbaIA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=x9snwWr2DeNwDh03kgHS:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE3MDA3MiBTYWx0ZWRfXyB5CmWBCW23x
- Gi017lwIM+H78iE+y6DlqBxbka9ZzOVotKINd+ni+vkq87oMSyeIJuqPxwsj4dN39AUmTr/7LPX
- 8ajLpKIDBXF/AzVV1JWqNqTMAu/JECgzVXGflJ15bUnGgOSwQA2jgQb+nlibuIZ9dEPpA/rTOEb
- 55w2e6bfHrcjT0B7BUE1aVcGivysnHRs6VEIUsDbRE3xk1hlVMNa48egDxprXZO/RJNZd7yhzYP
- z33x73i/Pd3mvGltz4sU2MjSEolTzni5SGceYuWakI9qHURb3ptOghFFDBzCumlmL2GtK6ifV2d
- 81+6carL6Ttgk8Wsowe5wblzsVgKLGoWW9UlpVZFwuqDeaxBKDFGTPRAIDeNqPMvu4ba6KkW1wd
- VoKqOuvImwNsFK3tEDr5Tsb8fRmVZfnDNLVFamOdiNaIgcOhv2rp1i647p91ef123qI5fVSJ+8W
- zG/onnh1YqyxADOaYlA==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE3MDA3MiBTYWx0ZWRfX9ZxX33xSG1I0
- RbkjAIhb8rSOIOwwnPREcmfmIY0ZHlm6FEdtCVJcivqV+KdxTa6Ig6VsxLodvvM5KGmWR+0g7Dx
- NaeYdTU17TlQ+QNpsPsY+WRqPDHKMMM=
-X-Proofpoint-GUID: QBdkoqRXLPl9736zE3aZINf3feOVnTtQ
-X-Proofpoint-ORIG-GUID: QBdkoqRXLPl9736zE3aZINf3feOVnTtQ
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzE3MDA3MiBTYWx0ZWRfX21rdIllVTFtQ
+ KMmv/VgjnoMmpYsZB5fvYucc1C8hJQNDTa8AnjRzgl0r4Tv5CiS3xxTjJYSVGoFhFuFyOpQMYGE
+ QQUyYCVzfpbuMX/hbFBTCcPSe/Dm+rY=
+X-Proofpoint-ORIG-GUID: KZ9b9qTv0-6ksI0CFgt2y_yBffOaDp5W
+X-Proofpoint-GUID: KZ9b9qTv0-6ksI0CFgt2y_yBffOaDp5W
+X-Authority-Analysis: v=2.4 cv=TaumcxQh c=1 sm=1 tr=0 ts=6a59d948 cx=c_pps
+ a=Oh5Dbbf/trHjhBongsHeRQ==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22 a=EUspDBNiAAAA:8
+ a=Newsqy96Bbjq3UVVxBYA:9 a=_Vgx9l1VpLgwpw_dHYaR:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzE3MDA3MiBTYWx0ZWRfX/jjW1ZFtSeTv
+ fHOo/jhwZxYVoeIobRYnnkQzaBQTuR/tHEj7sYmNBPOCYC5E4hBVWjayKj15VJsCsvCatgXUBEf
+ b41vzZ+6vrxGbHCvQW32XKkJB1O/8KidSV2hCuL6CArREgeh1LiMSMKKnaUaPXqNpO/09QdPVAC
+ G1j2RqQm1zpk8JTEmGklcZuZv32MyOL+9iLK83hNCFZwzyArv0874m9VUhDjQrWBhJxXRsHqSxe
+ oMYm2dhpeO/mvpDLgFAWXvr7iJqvgqrbSvr8Lj4BEtoLj0Dsa7mvMTRzKVreHzZrmUPfTJ43y2K
+ IIaZ8zR+N1lUT/bZfQ1N+pbwM9uWfiE5NLExcWDxsK3CLxL01Sbq8Zw7xfjIXOBwgewHvopqFKn
+ v8Pm0HcfUf/NTLn0zhM6QVmJ4Ibbqrv5iWEFUmp9g2Xhh2MtBGnDYd1etUkDyVvQoKT0L8ceqI8
+ h+gwooQQqh50d0RiV3w==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-07-17_02,2026-07-15_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 lowpriorityscore=0 adultscore=0 impostorscore=0
- clxscore=1015 malwarescore=0 bulkscore=0 spamscore=0 phishscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607170072
+ priorityscore=1501 impostorscore=0 clxscore=1015 adultscore=0 phishscore=0
+ spamscore=0 bulkscore=0 malwarescore=0 suspectscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607170072
 
 From: Prathibha Madugonde <prathibha.madugonde@oss.qualcomm.com>
 
-Define bcs_procedure_data to hold per-procedure CS results from both
-the local initiator and remote reflector, including subevent step data,
-selected TX powers, procedure enable config, CS config, sw_time values,
-and BLE connection interval.
+Marshal bcs_procedure_data (subevents, steps, mode 0/1/2/3 results,
+and CS/procedure-enable config) into an a{sv} dictionary and emit it
+as a new ProcedureData signal on the CS D-Bus interface.
 
-Add cs_proc_state with a 16-entry ring buffer in cstracker to track
-procedures keyed by procedure counter, accumulating results
-independently from each side until both report all-results-complete.
-
-Update parse_mode_{0,1,2,3}, parse_step, and parse_subevent_steps with
-output pointer parameters to capture remote reflector step data.
-Introduce parse_cs_local_initiator_data() to store local HCI subevent
-results, handling both initial and continuation events. Update
-parse_ras_data_segments() to route decoded RAS subevent data into the
-matching cs_proc_state as reflector results.
-
-Add bt_rap_set_procedure_data_cb() to register a callback fired once
-both local and remote results are complete for a given procedure.
-Add bt_rap_set_local_sw_time(), bt_rap_set_remote_sw_time(), and
-bt_rap_set_conn_interval() so callers such as rap_hci.c can supply the
-CS capability sw_time and connection interval required by upper-layer
-distance calculation algorithms.
-
-Remove unwanted function rap_detached , fix for rap profile level
-disconnections
+Register a procedure_data callback on the RAP HCI state machine so
+rap.c is notified when a procedure completes, and propagate the
+locally supported T_SW time capability from the read-local-supported-
+capabilities response into bt_rap.
 
 ---
- src/shared/rap.c | 673 ++++++++++++++++++++++++++++++++++++++++++++---
- src/shared/rap.h |  50 ++++
- 2 files changed, 687 insertions(+), 36 deletions(-)
+ profiles/ranging/rap.c     | 497 ++++++++++++++++++++++++++++++++++++-
+ profiles/ranging/rap_hci.c |  59 +++++
+ 2 files changed, 555 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/rap.c b/src/shared/rap.c
-index dfb272d3a..eadc41707 100644
---- a/src/shared/rap.c
-+++ b/src/shared/rap.c
-@@ -12,6 +12,8 @@
- #include <stdbool.h>
- #include <unistd.h>
- #include <errno.h>
-+#include <time.h>
-+#include <glib.h>
- 
- #include "bluetooth/bluetooth.h"
- #include "bluetooth/hci.h"
-@@ -151,6 +153,16 @@ static inline uint8_t ranging_header_get_antenna_mask(
- 	return hdr->antenna_pct & 0x0F;
+diff --git a/profiles/ranging/rap.c b/profiles/ranging/rap.c
+index 3ffc0da76..42e1ef2a4 100644
+--- a/profiles/ranging/rap.c
++++ b/profiles/ranging/rap.c
+@@ -379,6 +379,492 @@ static const struct cs_dict_param_desc *cs_find_dict_param_desc(
+ 	return NULL;
  }
  
-+static inline uint16_t ranging_header_get_counter(
-+					const struct ranging_header *hdr)
++static void dict_append_byte(DBusMessageIter *dict, const char *key,
++				uint8_t val)
 +{
-+	if (!hdr)
-+		return 0;
++	DBusMessageIter entry, variant;
 +
-+	return (uint16_t)(hdr->counter_config[0] |
-+			  ((hdr->counter_config[1] & 0x0F) << 8));
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY, NULL,
++						&entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT, "y",
++						&variant);
++	dbus_message_iter_append_basic(&variant, DBUS_TYPE_BYTE, &val);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(dict, &entry);
 +}
 +
- static inline uint8_t antenna_mask_count_paths(uint8_t antenna_mask)
- {
- 	uint8_t count = 0;
-@@ -206,11 +218,23 @@ enum cs_role {
- };
- 
- #define CS_INVALID_CONFIG_ID   0xFF
-+#define CS_RANGING_COUNTER_MASK   0x0FFF
-+
- /* Minimal enums (align to controller values if needed) */
- enum cs_procedure_done_status {
- 	CS_PROC_ALL_RESULTS_COMPLETE = 0x00,
- 	CS_PROC_PARTIAL_RESULTS      = 0x01,
--	CS_PROC_ABORTED              = 0x02
-+	CS_PROC_ABORTED              = 0x0F
-+};
-+
-+/* Per-procedure tracking — one entry per HCI procedure counter */
-+struct cs_proc_state {
-+	uint16_t proc_counter;
-+	struct bcs_procedure_data bcs_data;
-+	enum cs_procedure_done_status local_status;
-+	bool                          local_has_complete_subevent;
-+	enum cs_procedure_done_status remote_status;
-+	bool                          remote_has_complete_subevent;
- };
- 
- /* Main cs_procedure_data  */
-@@ -253,6 +277,12 @@ struct cstracker {
- 	struct ranging_header   ranging_header_;
- 	/* Client - subsequent segments appended using iovec */
- 	struct iovec segment_data;
-+
-+	/* Session-level config template and per-procedure state */
-+	struct bcs_procedure_data     bcs_proc_data;
-+	struct queue                  *proc_states;
-+	uint8_t                       procedure_sequence_after_enable;
-+	uint64_t                      proc_start_timestamp_nanos;
- };
- 
- /* Ranging Service context */
-@@ -300,6 +330,15 @@ struct bt_rap {
- 	bt_rap_destroy_func_t debug_destroy;
- 	void *debug_data;
- 	void *user_data;
-+
-+	bt_rap_procedure_data_func_t  procedure_data_cb;
-+	bt_rap_destroy_func_t         procedure_data_destroy;
-+	void                         *procedure_data_user_data;
-+
-+	/* CS capabilities sw_time and connection interval for config param */
-+	uint8_t local_sw_time;
-+	uint8_t remote_sw_time;
-+	uint16_t conn_interval;
- 	struct cstracker *resptracker;
- 	struct cstracker *reqtracker;
- };
-@@ -542,6 +581,177 @@ static bool cs_pd_ras_commit_subevent(struct cs_procedure_data *d,
- 	return true;
- }
- 
-+/* ---------- bcs_procedure_data helpers ----------------------------------- */
-+static uint64_t get_time_nanos(void)
++static void dict_append_int32(DBusMessageIter *dict, const char *key,
++				dbus_int32_t val)
 +{
-+	struct timespec ts;
++	DBusMessageIter entry, variant;
 +
-+	clock_gettime(CLOCK_REALTIME, &ts);
-+	return (uint64_t)ts.tv_sec * 1000000000ULL + ts.tv_nsec;
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY, NULL,
++						&entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT, "i",
++						&variant);
++	dbus_message_iter_append_basic(&variant, DBUS_TYPE_INT32, &val);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(dict, &entry);
 +}
 +
-+static void bcs_proc_data_clear(struct bcs_procedure_data *proc)
++static void dict_append_uint32(DBusMessageIter *dict, const char *key,
++				dbus_uint32_t val)
 +{
++	DBusMessageIter entry, variant;
++
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY, NULL,
++						&entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT, "u",
++						&variant);
++	dbus_message_iter_append_basic(&variant, DBUS_TYPE_UINT32, &val);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(dict, &entry);
++}
++
++static void dict_append_uint64(DBusMessageIter *dict, const char *key,
++				dbus_uint64_t val)
++{
++	DBusMessageIter entry, variant;
++
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY, NULL,
++						&entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT, "t",
++						&variant);
++	dbus_message_iter_append_basic(&variant, DBUS_TYPE_UINT64, &val);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(dict, &entry);
++}
++
++static void dict_append_byte_array(DBusMessageIter *dict, const char *key,
++					const uint8_t *data, int len)
++{
++	DBusMessageIter entry, variant, arr;
++	int i;
++
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY, NULL,
++						&entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT, "ay",
++						&variant);
++	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY, "y", &arr);
++	for (i = 0; i < len; i++)
++		dbus_message_iter_append_basic(&arr, DBUS_TYPE_BYTE, &data[i]);
++	dbus_message_iter_close_container(&variant, &arr);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(dict, &entry);
++}
++
++static void append_mode_zero(DBusMessageIter *dict,
++				const struct cs_mode_zero_data *m0)
++{
++	dict_append_byte(dict, "packetQuality", m0->packet_quality);
++	dict_append_byte(dict, "packetRssiDbm", m0->packet_rssi_dbm);
++	dict_append_byte(dict, "packetAntenna", m0->packet_ant);
++	dict_append_int32(dict, "initiatorMeasuredFreqOffset",
++				(dbus_int32_t)m0->init_measured_freq_offset);
++}
++
++static void append_pct_iq_pair(DBusMessageIter *dict, const char *key,
++				const struct pct_iq_sample *pct)
++{
++	DBusMessageIter entry, variant, arr;
++	dbus_int32_t i_s = pct->i_sample;
++	dbus_int32_t q_s = pct->q_sample;
++
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY, NULL,
++					 &entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT, "ai",
++					 &variant);
++	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY, "i", &arr);
++	dbus_message_iter_append_basic(&arr, DBUS_TYPE_INT32, &i_s);
++	dbus_message_iter_append_basic(&arr, DBUS_TYPE_INT32, &q_s);
++	dbus_message_iter_close_container(&variant, &arr);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(dict, &entry);
++}
++
++static void append_mode_one(DBusMessageIter *dict,
++				const struct cs_mode_one_data *m1)
++{
++	dict_append_byte(dict, "packetQuality", m1->packet_quality);
++	dict_append_byte(dict, "packetNadm", m1->packet_nadm);
++	dict_append_byte(dict, "packetRssiDbm", m1->packet_rssi_dbm);
++	dict_append_int32(dict, "toaTodInitiator",
++				(dbus_int32_t)m1->toa_tod_init);
++	dict_append_int32(dict, "todToaReflector",
++				(dbus_int32_t)m1->tod_toa_refl);
++	dict_append_byte(dict, "packetAntenna", m1->packet_ant);
++	append_pct_iq_pair(dict, "packetPct1", &m1->packet_pct1);
++	append_pct_iq_pair(dict, "packetPct2", &m1->packet_pct2);
++}
++
++static void append_mode_two(DBusMessageIter *dict,
++				const struct cs_mode_two_data *m2,
++				uint8_t num_ant_paths)
++{
++	DBusMessageIter entry, variant, arr;
++	const char *key;
++	int j;
++	int num_paths;
++
++	/*
++	 * num_ant_paths is the HCI "number of antenna paths" value
++	 * (0-indexed), so actual tone sample count = num_ant_paths + 1,
++	 * capped at array size.
++	 */
++	num_paths = (num_ant_paths + 1) < CS_MAX_ANT_PATHS ?
++				(num_ant_paths + 1) : CS_MAX_ANT_PATHS;
++
++	dict_append_byte(dict, "antennaPermutationIndex", m2->ant_perm_index);
++
++	/* tonePctIQSamples: interleaved (i,q) pairs as "ai" */
++	key = "tonePctIQSamples";
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY, NULL,
++					 &entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT, "ai",
++					 &variant);
++	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY, "i", &arr);
++	for (j = 0; j < num_paths; j++) {
++		dbus_int32_t i_s = m2->tone_pct[j].i_sample;
++		dbus_int32_t q_s = m2->tone_pct[j].q_sample;
++
++		dbus_message_iter_append_basic(&arr, DBUS_TYPE_INT32, &i_s);
++		dbus_message_iter_append_basic(&arr, DBUS_TYPE_INT32, &q_s);
++	}
++	dbus_message_iter_close_container(&variant, &arr);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(dict, &entry);
++
++	/* toneQualityIndicators: "ay" */
++	key = "toneQualityIndicators";
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY, NULL,
++					 &entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT, "ay",
++					 &variant);
++	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY, "y", &arr);
++	for (j = 0; j < num_paths; j++) {
++		uint8_t tqi = m2->tone_quality_indicator[j];
++
++		dbus_message_iter_append_basic(&arr, DBUS_TYPE_BYTE, &tqi);
++	}
++	dbus_message_iter_close_container(&variant, &arr);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(dict, &entry);
++}
++
++static void append_proc_enable_config(DBusMessageIter *outer_dict,
++				const struct rap_ev_cs_proc_enable_cmplt *cfg)
++{
++	DBusMessageIter entry, variant, inner;
++	const char *key = "procedureEnableConfig";
++	dbus_uint32_t sub_evt_len_us;
++
++	sub_evt_len_us = cfg->sub_evt_len[0] |
++			 ((uint32_t)cfg->sub_evt_len[1] << 8) |
++			 ((uint32_t)cfg->sub_evt_len[2] << 16);
++
++	dbus_message_iter_open_container(outer_dict, DBUS_TYPE_DICT_ENTRY,
++					 NULL, &entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT, "a{sv}",
++					 &variant);
++	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY, "{sv}",
++					 &inner);
++
++	dict_append_byte(&inner, "toneAntennaConfigSelection",
++			 cfg->tone_ant_config_sel);
++	dict_append_uint32(&inner, "subeventLenUs", sub_evt_len_us);
++	dict_append_byte(&inner, "subeventsPerEvent", cfg->sub_evts_per_evt);
++	dict_append_uint32(&inner, "subeventInterval", cfg->sub_evt_intrvl);
++	dict_append_uint32(&inner, "eventInterval", cfg->evt_intrvl);
++	dict_append_uint32(&inner, "procedureInterval", cfg->proc_intrvl);
++	dict_append_uint32(&inner, "procedureCount", cfg->proc_counter);
++	dict_append_uint32(&inner, "maxProcedureLen", cfg->max_proc_len);
++
++	dbus_message_iter_close_container(&variant, &inner);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(outer_dict, &entry);
++}
++
++static void append_cs_config_param(DBusMessageIter *outer_dict,
++				const struct bcs_procedure_data *bcs)
++{
++	DBusMessageIter entry, variant, inner;
++	const char *key = "csConfigParam";
++	const struct rap_ev_cs_config_cmplt *cfg = &bcs->cs_config;
++
++	dbus_message_iter_open_container(outer_dict, DBUS_TYPE_DICT_ENTRY,
++					 NULL, &entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT, "a{sv}",
++					 &variant);
++	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY, "{sv}",
++					 &inner);
++
++	dict_append_byte(&inner, "modeType", cfg->main_mode_type);
++	dict_append_byte(&inner, "subModeType", cfg->sub_mode_type);
++	dict_append_byte(&inner, "rttType", cfg->rtt_type);
++	dict_append_byte_array(&inner, "channelMap", cfg->channel_map,
++			       sizeof(cfg->channel_map));
++	dict_append_byte(&inner, "minMainModeSteps", cfg->min_main_mode_steps);
++	dict_append_byte(&inner, "maxMainModeSteps", cfg->max_main_mode_steps);
++	dict_append_byte(&inner, "mainModeRepetition", cfg->main_mode_rep);
++	dict_append_byte(&inner, "mode0Steps", cfg->mode_0_steps);
++	dict_append_byte(&inner, "role", cfg->role);
++	dict_append_byte(&inner, "csSyncPhyType", cfg->cs_sync_phy);
++	dict_append_byte(&inner, "channelSelectionType", cfg->channel_sel_type);
++	dict_append_byte(&inner, "ch3cShapeType", cfg->ch3c_shape);
++	dict_append_byte(&inner, "ch3cJump", cfg->ch3c_jump);
++	dict_append_byte(&inner, "channelMapRepetition", cfg->channel_map_rep);
++	dict_append_byte(&inner, "tIp1TimeUs", cfg->t_ip1_time);
++	dict_append_byte(&inner, "tIp2TimeUs", cfg->t_ip2_time);
++	dict_append_byte(&inner, "tFcsTimeUs", cfg->t_fcs_time);
++	dict_append_byte(&inner, "tPmTimeUs", cfg->t_pm_time);
++	dict_append_byte(&inner, "tSwTimeUsSupportedByLocal",
++			 bcs->t_sw_time_us_supported_by_local);
++	dict_append_byte(&inner, "tSwTimeUsSupportedByRemote",
++			 bcs->t_sw_time_us_supported_by_remote);
++	dict_append_uint32(&inner, "bleConnInterval", bcs->ble_conn_interval);
++
++	dbus_message_iter_close_container(&variant, &inner);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(outer_dict, &entry);
++}
++
++static void append_step_to_dict(DBusMessageIter *dict,
++				const struct cs_step_data *step,
++				uint8_t num_ant_paths)
++{
++	DBusMessageIter entry, variant, inner;
++	const char *mode_key;
++
++	dict_append_byte(dict, "stepMode", step->step_mode);
++	dict_append_byte(dict, "stepChannel", step->step_chnl);
++
++	switch (step->step_mode) {
++	case CS_MODE_ZERO:
++		mode_key = "modeZeroData";
++		dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
++						 NULL, &entry);
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
++					       &mode_key);
++		dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++						 "a{sv}", &variant);
++		dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
++						 "{sv}", &inner);
++		append_mode_zero(&inner,
++				 &step->step_mode_data.mode_zero_data);
++		dbus_message_iter_close_container(&variant, &inner);
++		dbus_message_iter_close_container(&entry, &variant);
++		dbus_message_iter_close_container(dict, &entry);
++		break;
++
++	case CS_MODE_ONE:
++		mode_key = "modeOneData";
++		dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
++						 NULL, &entry);
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
++					       &mode_key);
++		dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++						 "a{sv}", &variant);
++		dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
++						 "{sv}", &inner);
++		append_mode_one(&inner,
++				&step->step_mode_data.mode_one_data);
++		dbus_message_iter_close_container(&variant, &inner);
++		dbus_message_iter_close_container(&entry, &variant);
++		dbus_message_iter_close_container(dict, &entry);
++		break;
++
++	case CS_MODE_TWO:
++		mode_key = "modeTwoData";
++		dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
++						 NULL, &entry);
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
++					       &mode_key);
++		dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++						 "a{sv}", &variant);
++		dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
++						 "{sv}", &inner);
++		append_mode_two(&inner,
++				&step->step_mode_data.mode_two_data,
++				num_ant_paths);
++		dbus_message_iter_close_container(&variant, &inner);
++		dbus_message_iter_close_container(&entry, &variant);
++		dbus_message_iter_close_container(dict, &entry);
++		break;
++
++	case CS_MODE_THREE:
++		mode_key = "modeThreeData";
++		dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
++						 NULL, &entry);
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
++					       &mode_key);
++		dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++						 "a{sv}", &variant);
++		dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
++						 "{sv}", &inner);
++		append_mode_one(&inner,
++			&step->step_mode_data.mode_three_data.mode_one_data);
++		append_mode_two(&inner,
++			&step->step_mode_data.mode_three_data.mode_two_data,
++			num_ant_paths);
++		dbus_message_iter_close_container(&variant, &inner);
++		dbus_message_iter_close_container(&entry, &variant);
++		dbus_message_iter_close_container(dict, &entry);
++		break;
++
++	default:
++		break;
++	}
++}
++
++static void append_subevent_to_dict(DBusMessageIter *dict,
++				const struct cs_subevent_result_data *sub)
++{
++	DBusMessageIter entry, variant, arr;
++	const char *key;
 +	uint32_t i;
 +
-+	if (!proc)
-+		return;
-+
-+	for (i = 0; i < proc->initiator_subevent_count; i++)
-+		free(proc->initiator_subevent_results[i].step_data);
-+	free(proc->initiator_subevent_results);
-+	proc->initiator_subevent_results = NULL;
-+	proc->initiator_subevent_count = 0;
-+
-+	for (i = 0; i < proc->reflector_subevent_count; i++)
-+		free(proc->reflector_subevent_results[i].step_data);
-+	free(proc->reflector_subevent_results);
-+	proc->reflector_subevent_results = NULL;
-+	proc->reflector_subevent_count = 0;
-+}
-+
-+static bool bcs_proc_data_add_initiator_subevent(
-+					struct bcs_procedure_data *proc,
-+					uint16_t start_acl_evt,
-+					uint16_t freq_comp,
-+					int8_t ref_pwr,
-+					uint8_t num_ant_paths,
-+					uint8_t abort_reason,
-+					uint64_t timestamp_nanos,
-+					struct cs_step_data *steps,
-+					uint32_t num_steps)
-+{
-+	struct cs_subevent_result_data *arr;
-+	uint32_t new_count;
-+
-+	if (!proc)
-+		return false;
-+
-+	new_count = proc->initiator_subevent_count + 1;
-+	arr = realloc(proc->initiator_subevent_results,
-+					new_count * sizeof(*arr));
-+	if (!arr) {
-+		free(steps);
-+		return false;
-+	}
-+
-+	arr[new_count - 1].start_acl_conn_evt_counter = start_acl_evt;
-+	arr[new_count - 1].freq_comp = freq_comp;
-+	arr[new_count - 1].ref_pwr_lvl = ref_pwr;
-+	arr[new_count - 1].num_ant_paths = num_ant_paths;
-+	arr[new_count - 1].subevent_abort_reason = abort_reason;
-+	arr[new_count - 1].timestamp_nanos = timestamp_nanos;
-+	arr[new_count - 1].num_steps = num_steps;
-+	arr[new_count - 1].step_data = steps;
-+
-+	proc->initiator_subevent_results = arr;
-+	proc->initiator_subevent_count = new_count;
-+	return true;
-+}
-+
-+static bool bcs_proc_data_add_reflector_subevent(
-+					struct bcs_procedure_data *proc,
-+					uint16_t start_acl_evt,
-+					uint16_t freq_comp,
-+					int8_t ref_pwr,
-+					uint8_t num_ant_paths,
-+					uint8_t abort_reason,
-+					uint64_t timestamp_nanos,
-+					struct cs_step_data *steps,
-+					uint32_t num_steps)
-+{
-+	struct cs_subevent_result_data *arr;
-+	uint32_t new_count;
-+
-+	if (!proc)
-+		return false;
-+
-+	new_count = proc->reflector_subevent_count + 1;
-+	arr = realloc(proc->reflector_subevent_results,
-+					new_count * sizeof(*arr));
-+	if (!arr) {
-+		free(steps);
-+		return false;
-+	}
-+
-+	arr[new_count - 1].start_acl_conn_evt_counter = start_acl_evt;
-+	arr[new_count - 1].freq_comp = freq_comp;
-+	arr[new_count - 1].ref_pwr_lvl = ref_pwr;
-+	arr[new_count - 1].num_ant_paths = num_ant_paths;
-+	arr[new_count - 1].subevent_abort_reason = abort_reason;
-+	arr[new_count - 1].timestamp_nanos = timestamp_nanos;
-+	arr[new_count - 1].num_steps = num_steps;
-+	arr[new_count - 1].step_data = steps;
-+
-+	proc->reflector_subevent_results = arr;
-+	proc->reflector_subevent_count = new_count;
-+	return true;
-+}
-+
-+static bool match_proc_counter(const void *data, const void *match_data)
-+{
-+	const struct cs_proc_state *s = data;
-+	uint16_t proc_counter = PTR_TO_UINT(match_data);
-+
-+	return s->proc_counter == proc_counter;
-+}
-+
-+static void free_proc_state(void *data)
-+{
-+	struct cs_proc_state *s = data;
-+
-+	bcs_proc_data_clear(&s->bcs_data);
-+	free(s);
-+}
-+
-+static struct cs_proc_state *find_or_create_proc_state(struct cstracker *t,
-+							uint16_t proc_counter)
-+{
-+	struct cs_proc_state *s;
-+
-+	s = queue_find(t->proc_states, match_proc_counter,
-+					UINT_TO_PTR(proc_counter));
-+	if (s)
-+		return s;
-+
-+	s = new0(struct cs_proc_state, 1);
-+	s->proc_counter  = proc_counter;
-+	s->local_status  = CS_PROC_PARTIAL_RESULTS;
-+	s->remote_status = CS_PROC_PARTIAL_RESULTS;
-+	/* Copy session-level config from template */
-+	s->bcs_data.proc_enable_config = t->bcs_proc_data.proc_enable_config;
-+	s->bcs_data.cs_config = t->bcs_proc_data.cs_config;
-+	s->bcs_data.t_sw_time_us_supported_by_local =
-+			t->bcs_proc_data.t_sw_time_us_supported_by_local;
-+	s->bcs_data.t_sw_time_us_supported_by_remote =
-+			t->bcs_proc_data.t_sw_time_us_supported_by_remote;
-+	s->bcs_data.ble_conn_interval = t->bcs_proc_data.ble_conn_interval;
-+	s->bcs_data.initiator_selected_tx_power =
-+			t->bcs_proc_data.initiator_selected_tx_power;
-+	s->bcs_data.procedure_counter = proc_counter;
-+
-+	queue_push_tail(t->proc_states, s);
-+
-+	return s;
-+}
-+
-+static struct cs_proc_state *find_proc_state_for_ras(struct cstracker *t,
-+						uint16_t ranging_counter)
-+{
-+	const struct queue_entry *entry;
-+
-+	for (entry = queue_get_entries(t->proc_states); entry;
-+							entry = entry->next) {
-+		struct cs_proc_state *s = entry->data;
-+
-+		if ((s->proc_counter & CS_RANGING_COUNTER_MASK) ==
-+		    ranging_counter)
-+			return s;
-+	}
-+	return NULL;
-+}
-+/* ---------- end bcs helpers ---------------------------------------------- */
-+
- static struct ras *rap_get_ras(struct bt_rap *rap)
- {
- 	if (!rap)
-@@ -556,14 +766,6 @@ static struct ras *rap_get_ras(struct bt_rap *rap)
- 	return rap->rrapdb->ras;
- }
- 
--static void rap_detached(void *data, void *user_data)
--{
--	struct bt_rap_cb *cb = data;
--	struct bt_rap *rap = user_data;
--
--	cb->detached(rap, cb->user_data);
--}
--
- void bt_rap_detach(struct bt_rap *rap)
- {
- 	if (!queue_remove(sessions, rap))
-@@ -572,8 +774,6 @@ void bt_rap_detach(struct bt_rap *rap)
- 	bt_gatt_client_idle_unregister(rap->client, rap->idle_id);
- 	bt_gatt_client_unref(rap->client);
- 	rap->client = NULL;
--
--	queue_foreach(bt_rap_cbs, rap_detached, rap);
- }
- 
- static void rap_db_free(void *data)
-@@ -608,15 +808,21 @@ static void rap_free(void *data)
- 	rap_db_free(rap->rrapdb);
- 
- 	if (rap->resptracker) {
-+		free(rap->resptracker->segment_data.iov_base);
- 		free(rap->resptracker);
- 		rap->resptracker = NULL;
- 	}
- 
- 	if (rap->reqtracker) {
-+		queue_destroy(rap->reqtracker->proc_states, free_proc_state);
-+		free(rap->reqtracker->segment_data.iov_base);
- 		free(rap->reqtracker);
- 		rap->reqtracker = NULL;
- 	}
- 
-+	if (rap->procedure_data_destroy)
-+		rap->procedure_data_destroy(rap->procedure_data_user_data);
-+
- 	queue_destroy(rap->notify, free);
- 	queue_destroy(rap->pending, NULL);
- 	queue_destroy(rap->ready_cbs, rap_ready_free);
-@@ -702,6 +908,24 @@ bool bt_rap_set_debug(struct bt_rap *rap, bt_rap_debug_func_t func,
- 	return true;
- }
- 
-+bool bt_rap_set_procedure_data_cb(struct bt_rap *rap,
-+				  bt_rap_procedure_data_func_t cb,
-+				  void *user_data,
-+				  bt_rap_destroy_func_t destroy)
-+{
-+	if (!rap)
-+		return false;
-+
-+	if (rap->procedure_data_destroy)
-+		rap->procedure_data_destroy(rap->procedure_data_user_data);
-+
-+	rap->procedure_data_cb      = cb;
-+	rap->procedure_data_destroy = destroy;
-+	rap->procedure_data_user_data = user_data;
-+
-+	return true;
-+}
-+
- static void cs_tracker_init(struct cstracker *t)
- {
- 	if (!t)
-@@ -716,6 +940,7 @@ static void cs_tracker_init(struct cstracker *t)
- 	t->last_start_acl_conn_evt_counter = 0;
- 	t->last_freq_comp = 0;
- 	t->last_ref_pwr_lvl = 0;
-+	t->proc_states = queue_new();
- 
- 	/* Initialize ranging header using helper functions */
- 	memset(&t->ranging_header_, 0, sizeof(t->ranging_header_));
-@@ -1804,12 +2029,180 @@ static void form_ras_data_with_cs_subevent_result_cont(struct bt_rap *rap,
- 		cont->step_data);
- }
- 
-+static void write_procedure_data_to_bcs_algo(struct bt_rap *rap,
-+					     struct bcs_procedure_data *bcs)
-+{
-+	if (!rap || !bcs)
-+		return;
-+
-+	if (rap->reqtracker && rap->reqtracker->proc_start_timestamp_nanos) {
-+		uint64_t elapsed_nanos = get_time_nanos() -
-+				rap->reqtracker->proc_start_timestamp_nanos;
-+		uint32_t k;
-+
-+		DBG(rap, "Procedure elapsed time: %llu nanos",
-+		    (unsigned long long)elapsed_nanos);
-+
-+		for (k = 0; k < bcs->initiator_subevent_count; k++)
-+			bcs->initiator_subevent_results[k].timestamp_nanos =
-+								elapsed_nanos;
-+		for (k = 0; k < bcs->reflector_subevent_count; k++)
-+			bcs->reflector_subevent_results[k].timestamp_nanos =
-+								elapsed_nanos;
-+	}
-+
-+	DBG(rap, "procedure_counter=%u sequence=%u "
-+	    "init_tx_pwr=%d refl_tx_pwr=%d "
-+	    "init_abort=%d refl_abort=%d "
-+	    "init_subevents=%u refl_subevents=%u",
-+	    bcs->procedure_counter, bcs->procedure_sequence,
-+	    bcs->initiator_selected_tx_power,
-+	    bcs->reflector_selected_tx_power,
-+	    bcs->initiator_procedure_abort_reason,
-+	    bcs->reflector_procedure_abort_reason,
-+	    bcs->initiator_subevent_count,
-+	    bcs->reflector_subevent_count);
-+
-+	if (rap->procedure_data_cb)
-+		rap->procedure_data_cb(rap, bcs,
-+				       rap->procedure_data_user_data);
-+
-+	bcs_proc_data_clear(bcs);
-+}
-+
-+static void check_cs_procedure_complete(struct bt_rap *rap,
-+					 struct cstracker *reqtracker,
-+					 struct cs_proc_state *state)
-+{
-+	struct bcs_procedure_data *bcs = &state->bcs_data;
-+
-+	if (!rap->procedure_data_cb)
-+		return;
-+
-+	if (state->local_status != CS_PROC_ALL_RESULTS_COMPLETE ||
-+	    state->remote_status != CS_PROC_ALL_RESULTS_COMPLETE) {
-+		DBG(rap, "Procedure not complete: local=%d remote=%d",
-+		    state->local_status, state->remote_status);
-+		return;
-+	}
-+
-+	if (!state->local_has_complete_subevent &&
-+	    !state->remote_has_complete_subevent) {
-+		DBG(rap, "No complete subevent available");
-+		return;
-+	}
-+
-+	reqtracker->procedure_sequence_after_enable++;
-+	bcs->procedure_sequence = reqtracker->procedure_sequence_after_enable;
-+	write_procedure_data_to_bcs_algo(rap, bcs);
-+
-+	queue_remove(reqtracker->proc_states, state);
-+	free(state);
-+}
-+
-+static void parse_cs_local_initiator_data(struct bt_rap *rap,
-+					bool has_header_fields,
-+					uint8_t config_id,
-+					uint8_t num_ant_paths,
-+					uint16_t proc_counter,
-+					uint16_t start_acl_conn_evt_counter,
-+					uint16_t freq_comp,
-+					int8_t ref_pwr_lvl,
-+					uint8_t proc_done_status,
-+					uint8_t subevt_done_status,
-+					uint8_t abort_reason,
-+					uint8_t num_steps_reported,
-+					const struct cs_step_data *hci_steps)
-+{
-+	struct cstracker *reqtracker = rap->reqtracker;
-+	uint16_t effective_counter;
-+	struct cs_proc_state *state;
-+	struct bcs_procedure_data *bcs;
-+
-+	effective_counter = has_header_fields ? proc_counter
-+					      : reqtracker->last_proc_counter;
-+
-+	state = find_or_create_proc_state(reqtracker, effective_counter);
-+	if (!state)
-+		return;
-+
-+	bcs = &state->bcs_data;
-+
-+	bcs->initiator_selected_tx_power      = reqtracker->selected_tx_power;
-+	bcs->initiator_procedure_abort_reason = abort_reason & 0x0F;
-+
-+	state->local_status =
-+		(enum cs_procedure_done_status)(proc_done_status & 0x0F);
-+	if ((subevt_done_status & 0x0F) == 0x00)
-+		state->local_has_complete_subevent = true;
-+
-+	if (has_header_fields) {
-+		struct cs_step_data *steps = NULL;
-+
-+		reqtracker->proc_start_timestamp_nanos = get_time_nanos();
-+
-+		bcs->procedure_counter        = proc_counter;
-+		reqtracker->last_proc_counter = proc_counter;
-+		reqtracker->last_start_acl_conn_evt_counter =
-+					start_acl_conn_evt_counter;
-+		reqtracker->last_freq_comp   = freq_comp;
-+		reqtracker->last_ref_pwr_lvl = ref_pwr_lvl;
-+
-+		if (num_steps_reported > 0 && hci_steps) {
-+			steps = calloc(num_steps_reported, sizeof(*steps));
-+			if (!steps)
-+				return;
-+			memcpy(steps, hci_steps,
-+			       num_steps_reported * sizeof(*steps));
-+		}
-+
-+		bcs_proc_data_add_initiator_subevent(bcs,
-+				start_acl_conn_evt_counter,
-+				freq_comp, ref_pwr_lvl,
-+				num_ant_paths,
-+				(abort_reason >> 4) & 0x0F,
-+				0,
-+				steps, num_steps_reported);
-+	} else {
-+		struct cs_subevent_result_data *last;
-+		struct cs_step_data *new_steps;
-+		uint32_t old_count, new_count;
-+
-+		if (!bcs->initiator_subevent_results ||
-+		    bcs->initiator_subevent_count == 0)
-+			return;
-+
-+		last = &bcs->initiator_subevent_results[
-+					bcs->initiator_subevent_count - 1];
-+		old_count = last->num_steps;
-+		new_count = old_count + num_steps_reported;
-+
-+		if (num_steps_reported > 0 && hci_steps) {
-+			new_steps = realloc(last->step_data,
-+					    new_count * sizeof(*new_steps));
-+			if (!new_steps)
-+				return;
-+
-+			memcpy(&new_steps[old_count], hci_steps,
-+			       num_steps_reported * sizeof(*new_steps));
-+			last->step_data = new_steps;
-+			last->num_steps = new_count;
-+		}
-+
-+		last->subevent_abort_reason = (abort_reason >> 4) & 0x0F;
-+	}
-+
-+	check_cs_procedure_complete(rap, reqtracker, state);
-+}
-+
-+
- static void fill_initiator_data_from_cs_subevent_result_cont(struct bt_rap *rap,
- 		const struct rap_ev_cs_subevent_result_cont *cont,
- 		uint16_t length)
- {
- 	size_t base_len = offsetof(struct rap_ev_cs_subevent_result_cont,
- 					step_data);
-+	struct cstracker *reqtracker;
- 
- 	if (!rap || !rap->reqtracker || !cont)
- 		return;
-@@ -1819,6 +2212,22 @@ static void fill_initiator_data_from_cs_subevent_result_cont(struct bt_rap *rap,
- 
- 	DBG(rap, "Received CS subevent result continue subevent: len=%u",
- 		length);
-+
-+	reqtracker = rap->reqtracker;
-+
-+	parse_cs_local_initiator_data(rap,
-+				false,
-+				cont->config_id,
-+				cont->num_ant_paths,
-+				reqtracker->last_proc_counter,
-+				reqtracker->last_start_acl_conn_evt_counter,
-+				reqtracker->last_freq_comp,
-+				reqtracker->last_ref_pwr_lvl,
-+				cont->proc_done_status,
-+				cont->subevt_done_status,
-+				cont->abort_reason,
-+				cont->num_steps_reported,
-+				cont->step_data);
- }
- 
- static void fill_initiator_data_from_cs_subevent_result(struct bt_rap *rap,
-@@ -1836,7 +2245,20 @@ static void fill_initiator_data_from_cs_subevent_result(struct bt_rap *rap,
- 		return;
- 
- 	DBG(rap, "Received CS subevent result subevent: len=%u", length);
--	/* TODO: Store initiator subevent result data */
-+
-+	parse_cs_local_initiator_data(rap,
-+				true,
-+				data->config_id,
-+				data->num_ant_paths,
-+				data->proc_counter,
-+				data->start_acl_conn_evt_counter,
-+				data->freq_comp,
-+				data->ref_pwr_lvl,
-+				data->proc_done_status,
-+				data->subevt_done_status,
-+				data->abort_reason,
-+				data->num_steps_reported,
-+				data->step_data);
- }
- 
- void bt_rap_hci_cs_subevent_result_cont_callback(uint16_t length,
-@@ -1880,6 +2302,7 @@ void bt_rap_hci_cs_procedure_enable_complete_callback(uint16_t length,
- 	const struct rap_ev_cs_proc_enable_cmplt *data = param;
- 	struct bt_rap *rap = user_data;
- 	struct cstracker *resptracker;
-+	struct cstracker *reqtracker;
- 
- 	DBG(rap, "Received CS procedure enable complete subevent: len=%u",
- 	    length);
-@@ -1895,6 +2318,21 @@ void bt_rap_hci_cs_procedure_enable_complete_callback(uint16_t length,
- 	/* Populate responder tracker */
- 	resptracker->config_id = data->config_id;
- 	resptracker->selected_tx_power = data->sel_tx_pwr;
-+
-+	if (!rap->reqtracker) {
-+		reqtracker = new0(struct cstracker, 1);
-+		cs_tracker_init(reqtracker);
-+		rap->reqtracker = reqtracker;
-+	}
-+
-+	reqtracker = rap->reqtracker;
-+	reqtracker->config_id = data->config_id;
-+	reqtracker->selected_tx_power = data->sel_tx_pwr;
-+	reqtracker->bcs_proc_data.initiator_selected_tx_power =
-+							data->sel_tx_pwr;
-+
-+	/* Store procedure enable config in the session-level template */
-+	reqtracker->bcs_proc_data.proc_enable_config = *data;
- }
- 
- void bt_rap_hci_cs_sec_enable_complete_callback(uint16_t length,
-@@ -1945,6 +2383,39 @@ void bt_rap_hci_cs_config_complete_callback(uint16_t length,
- 	reqtracker->config_id = data->config_id;
- 	reqtracker->role = data->role;
- 	reqtracker->rtt_type = data->rtt_type;
-+	reqtracker->procedure_sequence_after_enable = 0;
-+
-+	/* Store cs_config in session-level template for procedure data */
-+	reqtracker->bcs_proc_data.cs_config = *data;
-+	reqtracker->bcs_proc_data.t_sw_time_us_supported_by_local =
-+						rap->local_sw_time;
-+	reqtracker->bcs_proc_data.t_sw_time_us_supported_by_remote =
-+						rap->remote_sw_time;
-+	reqtracker->bcs_proc_data.ble_conn_interval = rap->conn_interval;
-+}
-+
-+void bt_rap_set_local_sw_time(struct bt_rap *rap, uint8_t local_sw_time)
-+{
-+	if (!rap)
-+		return;
-+
-+	rap->local_sw_time = local_sw_time;
-+}
-+
-+void bt_rap_set_remote_sw_time(struct bt_rap *rap, uint8_t remote_sw_time)
-+{
-+	if (!rap)
-+		return;
-+
-+	rap->remote_sw_time = remote_sw_time;
-+}
-+
-+void bt_rap_set_conn_interval(struct bt_rap *rap, uint16_t conn_interval)
-+{
-+	if (!rap)
-+		return;
-+
-+	rap->conn_interval = conn_interval;
- }
- 
- struct bt_rap *bt_rap_new(struct gatt_db *ldb, struct gatt_db *rdb)
-@@ -2122,7 +2593,8 @@ static size_t get_mode_zero_length(enum cs_role remote_role)
- }
- 
- static void parse_mode_zero(struct bt_rap *rap, struct iovec *mode_iov,
--			    enum cs_role remote_role)
-+			    enum cs_role remote_role,
-+			    struct cs_mode_zero_data *out)
- {
- 	uint8_t packet_quality;
- 	int8_t packet_rssi_dbm;
-@@ -2143,7 +2615,12 @@ static void parse_mode_zero(struct bt_rap *rap, struct iovec *mode_iov,
- 		}
- 	}
- 
--	/* TODO: Store this data as reflector data */
-+	if (out) {
-+		out->packet_quality = packet_quality;
-+		out->packet_rssi_dbm = (uint8_t)packet_rssi_dbm;
-+		out->packet_ant = packet_ant;
-+		out->init_measured_freq_offset = init_measured_freq_offset;
-+	}
- }
- 
- static size_t get_mode_one_length(bool include_pct)
-@@ -2154,7 +2631,8 @@ static size_t get_mode_one_length(bool include_pct)
- }
- 
- static void parse_mode_one(struct bt_rap *rap, struct iovec *mode_iov,
--			   enum cs_role remote_role, bool include_pct)
-+			   enum cs_role remote_role, bool include_pct,
-+			   struct cs_mode_one_data *out)
- {
- 	uint8_t packet_quality;
- 	uint8_t packet_nadm;
-@@ -2178,7 +2656,20 @@ static void parse_mode_one(struct bt_rap *rap, struct iovec *mode_iov,
- 		parse_i_q_sample(mode_iov, &pct2_i, &pct2_q);
- 	}
- 
--	/* TODO: Store this data as reflector data */
-+	if (out) {
-+		out->packet_quality = packet_quality;
-+		out->packet_nadm = packet_nadm;
-+		out->packet_rssi_dbm = (uint8_t)packet_rssi_dbm;
-+		out->packet_ant = packet_ant;
-+		if (remote_role == CS_ROLE_REFLECTOR)
-+			out->tod_toa_refl = time_value;
-+		else
-+			out->toa_tod_init = time_value;
-+		out->packet_pct1.i_sample = pct1_i;
-+		out->packet_pct1.q_sample = pct1_q;
-+		out->packet_pct2.i_sample = pct2_i;
-+		out->packet_pct2.q_sample = pct2_q;
-+	}
- }
- 
- static size_t get_mode_two_length(uint8_t num_antenna_paths)
-@@ -2189,7 +2680,8 @@ static size_t get_mode_two_length(uint8_t num_antenna_paths)
- }
- 
- static void parse_mode_two(struct bt_rap *rap, struct iovec *mode_iov,
--			   uint8_t num_antenna_paths)
-+			   uint8_t num_antenna_paths,
-+			   struct cs_mode_two_data *out)
- {
- 	uint8_t ant_perm_index;
- 	int16_t tone_pct_i[5];
-@@ -2228,7 +2720,14 @@ static void parse_mode_two(struct bt_rap *rap, struct iovec *mode_iov,
- 	DBG(rap, "    cs_mode_two_data: ant_perm_idx=%u",
- 		ant_perm_index);
- 
--	/* TODO: Store this data as reflector data */
-+	if (out) {
-+		out->ant_perm_index = ant_perm_index;
-+		for (k = 0; k < num_paths; k++) {
-+			out->tone_pct[k].i_sample = tone_pct_i[k];
-+			out->tone_pct[k].q_sample = tone_pct_q[k];
-+			out->tone_quality_indicator[k] = tone_quality[k];
++	dict_append_int32(dict, "startAclConnEvtCounter",
++			  (dbus_int32_t)sub->start_acl_conn_evt_counter);
++	dict_append_int32(dict, "freqComp", (dbus_int32_t)sub->freq_comp);
++	dict_append_byte(dict, "refPwrLvl", (uint8_t)sub->ref_pwr_lvl);
++	dict_append_byte(dict, "numAntPaths", sub->num_ant_paths);
++	dict_append_byte(dict, "subeventAbortReason",
++			 sub->subevent_abort_reason);
++	dict_append_uint64(dict, "timestampNanos", sub->timestamp_nanos);
++	dict_append_uint32(dict, "numSteps", sub->num_steps);
++
++	/* stepData: av (each element is a{sv}) */
++	key = "stepData";
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY, NULL,
++					 &entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT, "av",
++					 &variant);
++	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY, "v", &arr);
++	if (sub->step_data) {
++		for (i = 0; i < sub->num_steps; i++) {
++			DBusMessageIter inner, step_dict;
++
++			dbus_message_iter_open_container(&arr,
++					DBUS_TYPE_VARIANT, "a{sv}", &inner);
++			dbus_message_iter_open_container(&inner,
++					DBUS_TYPE_ARRAY, "{sv}", &step_dict);
++			append_step_to_dict(&step_dict, &sub->step_data[i],
++					    sub->num_ant_paths);
++			dbus_message_iter_close_container(&inner, &step_dict);
++			dbus_message_iter_close_container(&arr, &inner);
 +		}
 +	}
++	dbus_message_iter_close_container(&variant, &arr);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(dict, &entry);
++}
++
++static void append_subevent_array(DBusMessageIter *outer_dict,
++				const char *key,
++				const struct cs_subevent_result_data *subevents,
++				uint32_t count)
++{
++	DBusMessageIter entry, variant, arr;
++	uint32_t i;
++
++	dbus_message_iter_open_container(outer_dict, DBUS_TYPE_DICT_ENTRY,
++					 NULL, &entry);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT, "av",
++					 &variant);
++	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY, "v", &arr);
++	for (i = 0; i < count; i++) {
++		DBusMessageIter inner, sub_dict;
++
++		dbus_message_iter_open_container(&arr, DBUS_TYPE_VARIANT,
++						 "a{sv}", &inner);
++		dbus_message_iter_open_container(&inner, DBUS_TYPE_ARRAY,
++						 "{sv}", &sub_dict);
++		append_subevent_to_dict(&sub_dict, &subevents[i]);
++		dbus_message_iter_close_container(&inner, &sub_dict);
++		dbus_message_iter_close_container(&arr, &inner);
++	}
++	dbus_message_iter_close_container(&variant, &arr);
++	dbus_message_iter_close_container(&entry, &variant);
++	dbus_message_iter_close_container(outer_dict, &entry);
++}
++
++static void rap_emit_procedure_data(struct rap_data *data,
++				const struct bcs_procedure_data *bcs)
++{
++	DBusMessage *signal;
++	DBusMessageIter iter, dict;
++
++	signal = dbus_message_new_signal(device_get_path(data->device),
++					 CS_INTERFACE, "ProcedureData");
++	if (!signal) {
++		error("Failed to allocate ProcedureData signal");
++		return;
++	}
++
++	dbus_message_iter_init_append(signal, &iter);
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
++
++	dict_append_int32(&dict, "procedureCounter",
++			  (dbus_int32_t)bcs->procedure_counter);
++	dict_append_int32(&dict, "procedureSequence",
++			  (dbus_int32_t)bcs->procedure_sequence);
++	dict_append_byte(&dict, "initiatorSelectedTxPower",
++			 (uint8_t)bcs->initiator_selected_tx_power);
++	dict_append_byte(&dict, "reflectorSelectedTxPower",
++			 (uint8_t)bcs->reflector_selected_tx_power);
++
++	dict_append_uint32(&dict, "initiatorSubeventCount",
++			   bcs->initiator_subevent_count);
++	if (bcs->initiator_subevent_results &&
++					bcs->initiator_subevent_count > 0)
++		append_subevent_array(&dict, "initiatorSubeventResults",
++				      bcs->initiator_subevent_results,
++				      bcs->initiator_subevent_count);
++
++	dict_append_byte(&dict, "initiatorProcedureAbortReason",
++			 bcs->initiator_procedure_abort_reason);
++
++	dict_append_uint32(&dict, "reflectorSubeventCount",
++			   bcs->reflector_subevent_count);
++	if (bcs->reflector_subevent_results &&
++					bcs->reflector_subevent_count > 0)
++		append_subevent_array(&dict, "reflectorSubeventResults",
++				      bcs->reflector_subevent_results,
++				      bcs->reflector_subevent_count);
++
++	dict_append_byte(&dict, "reflectorProcedureAbortReason",
++			 bcs->reflector_procedure_abort_reason);
++
++	append_proc_enable_config(&dict, &bcs->proc_enable_config);
++	append_cs_config_param(&dict, bcs);
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	g_dbus_send_message(btd_get_dbus_connection(), signal);
++}
++
++static void rap_procedure_data(struct bt_rap *rap,
++				struct bcs_procedure_data *bcs,
++				void *user_data)
++{
++	struct rap_data *data = user_data;
++
++	DBG("procedure_counter=%u", bcs->procedure_counter);
++	rap_emit_procedure_data(data, bcs);
++}
++
+ static DBusMessage *start_measurement(DBusConnection *conn,
+ 				DBusMessage *msg, void *user_data)
+ {
+@@ -534,6 +1020,9 @@ bad_type:
+ 	data->active_session.cfg           = cfg;
+ 	data->active_session.freq          = freq;
+ 
++	bt_rap_hci_set_procedure_data_cb(data->hci_sm, rap_procedure_data,
++					 data, NULL);
++
+ 	return dbus_message_new_method_return(msg);
  }
  
- static size_t get_mode_three_length(uint8_t num_antenna_paths, bool include_pct)
-@@ -2239,13 +2738,17 @@ static size_t get_mode_three_length(uint8_t num_antenna_paths, bool include_pct)
- 
- static void parse_mode_three(struct bt_rap *rap, struct iovec *mode_iov,
- 			     enum cs_role remote_role, bool include_pct,
--			     uint8_t num_antenna_paths)
-+			     uint8_t num_antenna_paths,
-+			     struct cs_mode_three_data *out)
- {
-+	struct cs_mode_one_data *out_m1 = out ? &out->mode_one_data : NULL;
-+	struct cs_mode_two_data *out_m2 = out ? &out->mode_two_data : NULL;
-+
- 	/* Mode 3 = Mode 1 + Mode 2 */
--	parse_mode_one(rap, mode_iov, remote_role, include_pct);
-+	parse_mode_one(rap, mode_iov, remote_role, include_pct, out_m1);
- 
- 	if (mode_iov->iov_len > 0)
--		parse_mode_two(rap, mode_iov, num_antenna_paths);
-+		parse_mode_two(rap, mode_iov, num_antenna_paths, out_m2);
- }
- 
- static bool parse_subevent_header(struct iovec *iov,
-@@ -2278,7 +2781,8 @@ static bool parse_subevent_header(struct iovec *iov,
- 
- static bool parse_step(struct bt_rap *rap, struct iovec *iov,
- 			struct cstracker *reqtracker,
--			uint8_t num_antenna_paths, uint8_t step_idx)
-+			uint8_t num_antenna_paths, uint8_t step_idx,
-+			struct cs_step_data *out_step)
- {
- 	uint8_t mode_byte, step_mode;
- 	bool include_pct;
-@@ -2337,20 +2841,42 @@ static bool parse_step(struct bt_rap *rap, struct iovec *iov,
- 	mode_iov.iov_base = payload;
- 	mode_iov.iov_len = step_payload_len;
- 
-+	if (out_step) {
-+		out_step->step_mode = step_mode;
-+		out_step->step_chnl = 0;
-+		out_step->step_data_length = (uint8_t)step_payload_len;
-+	}
-+
- 	switch (step_mode) {
--	case CS_MODE_ZERO:
--		parse_mode_zero(rap, &mode_iov, remote_role);
-+	case CS_MODE_ZERO: {
-+		struct cs_mode_zero_data *out = out_step ?
-+			&out_step->step_mode_data.mode_zero_data : NULL;
-+
-+		parse_mode_zero(rap, &mode_iov, remote_role, out);
- 		break;
--	case CS_MODE_ONE:
--		parse_mode_one(rap, &mode_iov, remote_role, include_pct);
-+	}
-+	case CS_MODE_ONE: {
-+		struct cs_mode_one_data *out = out_step ?
-+			&out_step->step_mode_data.mode_one_data : NULL;
-+
-+		parse_mode_one(rap, &mode_iov, remote_role, include_pct, out);
- 		break;
--	case CS_MODE_TWO:
--		parse_mode_two(rap, &mode_iov, num_antenna_paths);
-+	}
-+	case CS_MODE_TWO: {
-+		struct cs_mode_two_data *out = out_step ?
-+			&out_step->step_mode_data.mode_two_data : NULL;
-+
-+		parse_mode_two(rap, &mode_iov, num_antenna_paths, out);
- 		break;
--	case CS_MODE_THREE:
-+	}
-+	case CS_MODE_THREE: {
-+		struct cs_mode_three_data *out = out_step ?
-+			&out_step->step_mode_data.mode_three_data : NULL;
-+
- 		parse_mode_three(rap, &mode_iov, remote_role, include_pct,
--						num_antenna_paths);
-+					num_antenna_paths, out);
- 		break;
-+	}
- 	default:
- 		break;
- 	}
-@@ -2360,12 +2886,16 @@ static bool parse_step(struct bt_rap *rap, struct iovec *iov,
- 
- static void parse_subevent_steps(struct bt_rap *rap, struct iovec *iov,
- 				struct cstracker *reqtracker,
--				uint8_t num_antenna_paths, uint8_t num_steps)
-+				uint8_t num_antenna_paths, uint8_t num_steps,
-+				struct cs_step_data *out_steps)
- {
- 	uint8_t i;
- 
- 	for (i = 0; i < num_steps; i++) {
--		if (!parse_step(rap, iov, reqtracker, num_antenna_paths, i))
-+		struct cs_step_data *out = out_steps ? &out_steps[i] : NULL;
-+
-+		if (!parse_step(rap, iov, reqtracker, num_antenna_paths, i,
-+				out))
- 			break;
- 	}
- }
-@@ -2376,6 +2906,10 @@ static void parse_ras_data_segments(struct bt_rap *rap,
- 	struct iovec iov;
- 	uint8_t antenna_mask;
- 	uint8_t num_antenna_paths;
-+	uint16_t ranging_counter;
-+	struct cs_proc_state *state = NULL;
-+	struct bcs_procedure_data *bcs = NULL;
-+	bool is_initiator;
- 
- 	if (!rap || !reqtracker)
- 		return;
-@@ -2387,10 +2921,30 @@ static void parse_ras_data_segments(struct bt_rap *rap,
- 		ranging_header_get_antenna_mask(&reqtracker->ranging_header_);
- 	num_antenna_paths = antenna_mask_count_paths(antenna_mask);
- 
-+	ranging_counter =
-+		ranging_header_get_counter(&reqtracker->ranging_header_);
-+
-+	/* Find the per-procedure state that matches this RAS counter */
-+	if (rap->procedure_data_cb) {
-+		state = find_proc_state_for_ras(reqtracker, ranging_counter);
-+		if (state) {
-+			bcs = &state->bcs_data;
-+			bcs->reflector_selected_tx_power =
-+				reqtracker->ranging_header_.selected_tx_power;
-+		}
-+	}
-+
-+	/* When local role=INITIATOR, remote data goes to
-+	 * reflector_subevent_results. When local role=REFLECTOR,
-+	 * remote data goes to initiator_subevent_results.
-+	 */
-+	is_initiator = (reqtracker->role == CS_ROLE_INITIATOR);
-+
- 	iov = reqtracker->segment_data;
- 
- 	while (iov.iov_len >= RAS_SUBEVENT_HEADER_SIZE) {
- 		struct ras_subevent_header hdr;
-+		struct cs_step_data *steps = NULL;
- 
- 		if (!parse_subevent_header(&iov, &hdr))
- 			break;
-@@ -2402,19 +2956,66 @@ static void parse_ras_data_segments(struct bt_rap *rap,
- 		    hdr.reference_power_level,
- 		    hdr.num_steps_reported);
- 
-+		if (bcs && hdr.num_steps_reported > 0)
-+			steps = calloc(hdr.num_steps_reported, sizeof(*steps));
-+
- 		parse_subevent_steps(rap, &iov, reqtracker,
- 					num_antenna_paths,
--					hdr.num_steps_reported);
-+					hdr.num_steps_reported,
-+					steps);
-+
-+		if (bcs) {
-+			uint32_t stored_steps =
-+					steps ? hdr.num_steps_reported : 0;
-+
-+			if (is_initiator)
-+				bcs_proc_data_add_reflector_subevent(bcs,
-+					hdr.start_acl_conn_event,
-+					hdr.frequency_compensation,
-+					hdr.reference_power_level,
-+					num_antenna_paths,
-+					hdr.subevent_abort_reason,
-+					0,
-+					steps, stored_steps);
-+			else
-+				bcs_proc_data_add_initiator_subevent(bcs,
-+					hdr.start_acl_conn_event,
-+					hdr.frequency_compensation,
-+					hdr.reference_power_level,
-+					num_antenna_paths,
-+					hdr.subevent_abort_reason,
-+					0,
-+					steps, stored_steps);
-+			steps = NULL; /* ownership transferred */
-+		} else {
-+			free(steps);
-+			steps = NULL;
-+		}
- 
--		if (hdr.subevent_done_status ==
--		    SUBEVENT_DONE_ALL_RESULTS_COMPLETE ||
--		    hdr.ranging_done_status ==
-+		if (state) {
-+			if (hdr.subevent_done_status ==
-+			    SUBEVENT_DONE_ALL_RESULTS_COMPLETE)
-+				state->remote_has_complete_subevent = true;
-+			if (hdr.ranging_done_status ==
-+			    RANGING_DONE_ALL_RESULTS_COMPLETE)
-+				state->remote_status =
-+						CS_PROC_ALL_RESULTS_COMPLETE;
-+		}
-+
-+		if (bcs && hdr.ranging_abort_reason)
-+			bcs->reflector_procedure_abort_reason =
-+					hdr.ranging_abort_reason & 0x0F;
-+
-+		if (hdr.ranging_done_status ==
- 		    RANGING_DONE_ALL_RESULTS_COMPLETE) {
- 			DBG(rap, "Ranging procedure complete");
- 			break;
- 		}
- 	}
- 
-+	if (state)
-+		check_cs_procedure_complete(rap, reqtracker, state);
-+
- 	free(reqtracker->segment_data.iov_base);
- 	reqtracker->segment_data.iov_base = NULL;
- 	reqtracker->segment_data.iov_len = 0;
-diff --git a/src/shared/rap.h b/src/shared/rap.h
-index 5582635e6..342b504ea 100644
---- a/src/shared/rap.h
-+++ b/src/shared/rap.h
-@@ -157,10 +157,45 @@ struct rap_ev_cs_subevent_result_cont {
- 	struct cs_step_data step_data[];
+@@ -588,6 +1077,11 @@ static const GDBusPropertyTable cs_dbus_properties[] = {
+ 	{ }
  };
  
-+struct cs_subevent_result_data {
-+	uint16_t             start_acl_conn_evt_counter;
-+	uint16_t             freq_comp;
-+	int8_t               ref_pwr_lvl;
-+	uint8_t              num_ant_paths;
-+	uint8_t              subevent_abort_reason;
-+	uint64_t             timestamp_nanos;
-+	uint32_t             num_steps;
-+	struct cs_step_data *step_data;
++static const GDBusSignalTable cs_dbus_signals[] = {
++	{ GDBUS_SIGNAL("ProcedureData", GDBUS_ARGS({ "data", "a{sv}" })) },
++	{ }
 +};
 +
-+struct bcs_procedure_data {
-+	uint16_t procedure_counter;
-+	uint16_t procedure_sequence;
-+
-+	int8_t   initiator_selected_tx_power;
-+	int8_t   reflector_selected_tx_power;
-+
-+	struct cs_subevent_result_data *initiator_subevent_results;
-+	uint32_t initiator_subevent_count;
-+	uint8_t  initiator_procedure_abort_reason;
-+
-+	struct cs_subevent_result_data *reflector_subevent_results;
-+	uint32_t reflector_subevent_count;
-+	uint8_t  reflector_procedure_abort_reason;
-+
-+	struct rap_ev_cs_proc_enable_cmplt proc_enable_config;
-+	struct rap_ev_cs_config_cmplt      cs_config;
-+	uint8_t  t_sw_time_us_supported_by_local;
-+	uint8_t  t_sw_time_us_supported_by_remote;
-+	uint16_t ble_conn_interval;
-+};
- typedef void (*bt_rap_debug_func_t)(const char *str, void *user_data);
- typedef void (*bt_rap_ready_func_t)(struct bt_rap *rap, void *user_data);
- typedef void (*bt_rap_destroy_func_t)(void *user_data);
- typedef void (*bt_rap_func_t)(struct bt_rap *rap, void *user_data);
-+typedef void (*bt_rap_procedure_data_func_t)(struct bt_rap *rap,
-+					struct bcs_procedure_data *data,
-+					void *user_data);
+ static void rap_measurement_timeout_cb(void *user_data)
+ {
+ 	struct rap_data *data = user_data;
+@@ -752,7 +1246,8 @@ static int rap_accept(struct btd_service *service)
+ 	g_dbus_register_interface(btd_get_dbus_connection(),
+ 				  device_get_path(data->device),
+ 				  CS_INTERFACE, cs_dbus_methods,
+-				  NULL, cs_dbus_properties, data, NULL);
++				  cs_dbus_signals, cs_dbus_properties,
++				  data, NULL);
  
- struct bt_rap *bt_rap_ref(struct bt_rap *rap);
- void bt_rap_unref(struct bt_rap *rap);
-@@ -177,6 +212,10 @@ bool bt_rap_set_user_data(struct bt_rap *rap, void *user_data);
- bool bt_rap_set_debug(struct bt_rap *rap, bt_rap_debug_func_t func,
- 			void *user_data, bt_rap_destroy_func_t destroy);
+ 	return 0;
+ }
+diff --git a/profiles/ranging/rap_hci.c b/profiles/ranging/rap_hci.c
+index e57f967a2..3da98972e 100644
+--- a/profiles/ranging/rap_hci.c
++++ b/profiles/ranging/rap_hci.c
+@@ -442,6 +442,8 @@ static void rap_rd_loc_supp_cap_done_cb(const void *data, uint8_t size,
+ 	DBG("Sending read remote capabilities for handle 0x%04X",
+ 		sm->active_conn_handle);
+ 	bt_rap_read_remote_supported_capabilities(sm, sm->active_conn_handle);
++
++	bt_rap_set_local_sw_time(sm->rap, rsp->t_sw_time_supported);
+ }
  
-+bool bt_rap_set_procedure_data_cb(struct bt_rap *rap,
-+				bt_rap_procedure_data_func_t cb,
-+				void *user_data,
-+				bt_rap_destroy_func_t destroy);
- /* session related functions */
- unsigned int bt_rap_register(bt_rap_func_t attached, bt_rap_func_t detached,
- 					void *user_data);
-@@ -228,6 +267,10 @@ void *bt_rap_attach_hci(struct bt_rap *rap, struct bt_hci *hci,
- 			int8_t max_tx_power);
- void bt_rap_detach_hci(struct bt_rap *rap, void *hci_sm);
+ static void rap_send_hci_cs_create_config_command(struct cs_state_machine *sm,
+@@ -873,6 +875,8 @@ static void rap_rd_rmt_supp_cap_cmplt_evt(const void *data, uint8_t size,
+ 		cs_set_state(sm, CS_STATE_INIT);
+ 		rap_send_hci_def_settings_command(sm, evt);
+ 	}
++
++	bt_rap_set_remote_sw_time(sm->rap, evt->t_sw_time_supported);
+ }
+ 
+ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
+@@ -1162,6 +1166,46 @@ static void rap_cs_proc_enable_cmplt_evt(const void *data, uint8_t size,
+ 			&rap_ev, sm->rap);
+ }
+ 
++static void rap_le_conn_update_complete_evt(const void *data, uint8_t size,
++					    void *user_data)
++{
++	struct cs_state_machine *sm = user_data;
++	const struct bt_hci_evt_le_conn_update_complete *evt;
++	struct rap_conn_mapping *mapping;
++	struct bt_rap *rap;
++	struct iovec iov;
++
++	if (!sm || !data ||
++	    size < sizeof(struct bt_hci_evt_le_conn_update_complete))
++		return;
++
++	iov.iov_base = (void *) data;
++	iov.iov_len = size;
++
++	evt = util_iov_pull_mem(&iov, sizeof(*evt));
++	if (!evt) {
++		error("Failed to pull LE conn update complete struct");
++		return;
++	}
++
++	DBG("status=0x%02X handle=0x%04X interval=%u",
++	    evt->status, evt->handle, evt->interval);
++
++	if (evt->status != 0)
++		return;
++
++	mapping = find_mapping_by_handle(sm, evt->handle);
++	if (mapping && mapping->rap) {
++		DBG("Found handle 0x%04X in mapping cache", evt->handle);
++		rap = mapping->rap;
++	} else {
++		error("No mapping found for handle 0x%04X", evt->handle);
++		return;
++	}
++
++	bt_rap_set_conn_interval(rap, evt->interval);
++}
++
+ static void parse_i_q_sample(struct iovec *iov, int16_t *i_sample,
+ 				int16_t *q_sample)
+ {
+@@ -1662,6 +1706,8 @@ void *bt_rap_attach_hci(struct bt_rap *rap, struct bt_hci *hci,
+ 					rap_cs_subevt_result_evt },
+ 		{ BT_HCI_EVT_LE_CS_SUBEVENT_RESULT_CONTINUE,
+ 					rap_cs_subevt_result_cont_evt },
++		{ BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE,
++					rap_le_conn_update_complete_evt },
+ 	};
+ 	struct cs_state_machine *sm;
+ 	unsigned int i;
+@@ -1781,6 +1827,19 @@ bool bt_rap_stop_measurement(void *hci_sm)
+ 						false);
+ }
  
 +bool bt_rap_hci_set_procedure_data_cb(void *hci_sm,
 +				bt_rap_procedure_data_func_t cb,
 +				void *user_data,
-+				bt_rap_destroy_func_t destroy);
- /* Connection handle mapping functions */
- bool bt_rap_set_conn_hndl(void *hci_sm,
- 			struct bt_rap *rap,
-@@ -245,3 +288,10 @@ void bt_rap_set_timeout_cb(void *hci_sm, void (*func)(void *),
- 
- void bt_rap_set_proc_active_cb(void *hci_sm, void (*func)(bool, void *),
- 				void *user_data);
++				bt_rap_destroy_func_t destroy)
++{
++	struct cs_state_machine *sm = hci_sm;
 +
-+/* CS capability sw_time and connection interval setters */
-+void bt_rap_set_local_sw_time(struct bt_rap *rap, uint8_t local_sw_time);
++	if (!sm || !sm->rap)
++		return false;
 +
-+void bt_rap_set_remote_sw_time(struct bt_rap *rap, uint8_t remote_sw_time);
++	return bt_rap_set_procedure_data_cb(sm->rap, cb, user_data, destroy);
++}
 +
-+void bt_rap_set_conn_interval(struct bt_rap *rap, uint16_t conn_interval);
+ bool bt_rap_set_conn_hndl(void *hci_sm, struct bt_rap *rap,
+ 		uint16_t handle, const uint8_t *bdaddr, uint8_t bdaddr_type,
+ 		bool is_central)
 -- 
 2.34.1
 
