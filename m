@@ -1,64 +1,50 @@
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17ABD3AE185;
-	Fri, 17 Jul 2026 07:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44ECC3B7747
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jul 2026 08:24:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784274151; cv=none; b=aNf68nCY2XzA6BbdkOQ2f7yXFZVRKzZtv5Sm0IcNGwol3MMH95C4bJAtrAdCk4LSQu+QiyhEGp3mcIPPZSpvyHIr5v/4Fbizt3UIk8RVrnMH6WnghH959LCZGZRVWzfPPthAGJk87Bedwp7GRl84aDelq2mXmpSY7UMptvFDCAk=
+	t=1784276652; cv=none; b=IxsOqbq0prLv5N6soGQkVX4psFgDw6B66FAfNmjxcpdn3xJPtDeXCw+hBN6j9jzoMKTZuQnxbG5FSaDmgJsq61Pw00q+xZx6lG2qUJPo/oqC6HIxOZZz3WQY4EQac5GwdcCA/vDe5VLkala/Ux3W36UwME02m0eT4UsCeePMVao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784274151; c=relaxed/simple;
-	bh=Lct5Ws4FrNW1eOgoH0ujSzKVe+qtEpB71r1YDW8VMUg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u2Vttktro8iZFVzLMbhtPQW+YaarZlblSsoIxft6/RVW6fA9zkNMRDzRrst12kaS0DJy/Iebx0Ew/sGa9TmIUMmRNKKVbEcEH8GfT/kTRE6YHzNwJUeHKxr6/czs6o8ms9qd4JzE4XDq5mNvF4auvNyHakJCNtwiktNB/34fLcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=SahQTPI7; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	s=arc-20240116; t=1784276652; c=relaxed/simple;
+	bh=73a/Z4iLGvKKuswT3OmA8mWhuw4n4Ny7MJAGkmqUBrU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qcwoF/OSeF6zhV6ZEOqbFTPSlIyrEyXbClWLEJL47zEAD5EAP1sc6ENFuT3rATI1WxA2dmLWiFnpeze/EtbYWHcfFfER4HR4PgVLeFMndL7ZkOaca9GBKc241rnRIRJMyJoLVSzjf53jbqYDnAxLUgdrkagWKV+UDavDwY7tDyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pipobscure.com; spf=pass smtp.mailfrom=pipobscure.com; dkim=pass (2048-bit key) header.d=pipobscure.com header.i=@pipobscure.com header.b=qStEtWX0; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pipobscure.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pipobscure.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="SahQTPI7"
-X-UUID: 04c1a56c81b311f1b1788b6acf885367-20260717
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=UkJP00WWHMh7btbts8pn4CZJ7R634Y09YTRE5mued9Q=;
-	b=SahQTPI74McjDy44fU6iSToIyas8SbzVpNZvrTF0SYHGgFraKI1XAgYyYdZTD5rVy1v39MQaoKi2v8bW4Z7GCJt8ylvQgl6Gr2wYHEskdl4GVn1n13n5qyy4n9Q+4I1JYeWUxgcsMnl4av/a/Ra9xG4b+aIjaV9TtP6XKGldkFg=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.18,REQID:d640fea0-7f88-4e70-9ebc-5b670574c045,IP:0,U
-	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:-25
-X-CID-META: VersionHash:8a735a6,CLOUDID:cbee12d7-d84b-4e52-b801-314e13fb1691,B
-	ulkID:nil,BulkQuantity:0,SF:81|82|102|136|836|865|888|898,TC:-5,Content:0|
-	15|50|99|100|102|156|200|213,EDM:-3|-100,IP:nil,URL:0,File:130,RT:0,Bulk:n
-	il,QS:nil,BEC:-1,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE
-	:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 04c1a56c81b311f1b1788b6acf885367-20260717
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw01.mediatek.com
-	(envelope-from <chris.lu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1379371891; Fri, 17 Jul 2026 15:42:10 +0800
-Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
- mtkmbs13n2.mediatek.inc (172.21.101.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Fri, 17 Jul 2026 15:42:09 +0800
-Received: from mtksitap99.mediatek.inc (10.233.130.16) by
- mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.2562.29 via Frontend Transport; Fri, 17 Jul 2026 15:42:09 +0800
-From: Chris Lu <chris.lu@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Will Lee <will-cy.Lee@mediatek.com>,
-	SS Wu <ss.wu@mediatek.com>, Steve Lee <steve.lee@mediatek.com>, Paul Menzel
-	<pmenzel@molgen.mpg.de>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH v15 7/7] Bluetooth: btmtk: Add MT7928 support
-Date: Fri, 17 Jul 2026 15:42:06 +0800
-Message-ID: <20260717074207.2869999-8-chris.lu@mediatek.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20260717074207.2869999-1-chris.lu@mediatek.com>
-References: <20260717074207.2869999-1-chris.lu@mediatek.com>
+	dkim=pass (2048-bit key) header.d=pipobscure.com header.i=@pipobscure.com header.b="qStEtWX0"
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4h1jcG5G98z8tZw;
+	Fri, 17 Jul 2026 10:23:58 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pipobscure.com;
+	s=MBO0001; t=1784276639;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=d9l1njqM926e3qGNEjsBrFZ+9acahsFaZNJPjHCdoM0=;
+	b=qStEtWX0e+9jC7YyI+W7d73wX9AFCIWLpDUyUDy0KUDX9x3Zjf2hG15JiHQLP+KiiHmkOv
+	rXh1dzA2WGwOHZ5APKsQ4ftoTTTyTuyExGkvo4OK41RcWgePfgyo2isOH6fh/zWHk034aY
+	Z1feAevnG95TT2zaX+5geKgsoC5DWFO/ZTsi+rz+JGkN50HEVdNAPTpyDhT3RA1S8dM6Sf
+	KIkqTpyyF3Fg5ZrEdZYqiUqwRAi1d0hk/I/2MHl4uz8sbuoAYDyZwWtHuI1byDfulsf3/I
+	6o7bZefOWrbDj+OVNGCA0aeyu70XXuzc95zNCTBi4qki0GgsGCcHhp5lSbgabg==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=none;
+	spf=pass (outgoing_mbo_mout: domain of pip@pipobscure.com designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=pip@pipobscure.com
+From: Philipp Dunkel <pip@pipobscure.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Philipp Dunkel <pip@pipobscure.com>
+Subject: [PATCH BlueZ v2] adapter: Infer BR/EDR only at public LE addresses
+Date: Fri, 17 Jul 2026 10:23:47 +0200
+Message-ID: <20260717082347.8429-1-pip@pipobscure.com>
+In-Reply-To: <20260716204514.79356-1-pip@pipobscure.com>
+References: <20260716204514.79356-1-pip@pipobscure.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -66,499 +52,121 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+X-Rspamd-Queue-Id: 4h1jcG5G98z8tZw
 
-Add support for MT7928 (internal device ID is MT7935) which requires
-additional firmware (CBMCU firmware) loading before Bluetooth firmware.
+btd_adapter_device_found() records BR/EDR support for any LE device
+whose advertising Flags lack "BR/EDR Not Supported" (EIR_BREDR_UNSUP).
+The address type is not considered:
 
-CBMCU is a new component on MT7928 to handle common part shared across
-the combo chip (Wi-Fi/Bluetooth's subsystem), providing a better user
-experience through improved coordination between subsystems.
+    if (bdaddr_type != BDADDR_BREDR && eir_data.flags &&
+                    !(eir_data.flags & EIR_BREDR_UNSUP)) {
+            device_set_bredr_support(dev);
 
-Implement two-phase CBMCU firmware download: Phase 1 loads section with
-type 0x5 containing global descriptor, section maps and signature data;
-Phase 2 loads remaining firmware sections. Add retry mechanism for
-concurrent download protection.
+When the advertisement uses a random address the device gets a BR/EDR
+bearer whose address is that random address, and start_discovery_cb()
+then prefers SDP over GATT:
 
-After CBMCU firmware loads successfully, the driver continues to load
-corresponding BT firmware based on device ID through fallthrough to
-case 0x7922/0x7925.
+    if (device->bredr)
+            device_browse_sdp(device, NULL);
+    else
+            device_browse_gatt(device, NULL);
 
-Use %.16s format specifier for hdr->datetime field in CBMCU firmware
-logging to prevent potential buffer over-read, as the field is a 16-byte
-array that may not be null-terminated.
+SDP requires a BR/EDR ACL, so bluetoothd pages the random address. A
+random address is not a BD_ADDR and cannot be paged, so the attempt
+always ends in Page Timeout, and the failure tears down the working LE
+link:
 
-The firmware(CBMCU_CODE_MT7935_1_1.bin/BT_RAM_CODE_MT7935_1_1_hdr.bin)
-required for MT7928 will be scheduled for upload to linux-firmware at
-a later stage.
+  connect_failed_callback() hci0 5A:B4:98:1F:CC:04 status 4
+  bonding_attempt_complete() hci0 bdaddr 5A:B4:98:1F:CC:04
+      type 0 status 0x4
+  device_bonding_complete() bonding (nil) status 0x04
+  browse_request_cancel()
+  btd_gatt_database_att_disconnected()
 
-MT7928 bring-up kernel log:
-[ 6931.197167] usb 1-3: New USB device found, idVendor=0e8d, idProduct=7935, bcdDevice= 1.00
-[ 6931.197212] usb 1-3: New USB device strings: Mfr=5, Product=6, SerialNumber=7
-[ 6931.197237] usb 1-3: Product: Wireless_Device
-[ 6931.197258] usb 1-3: Manufacturer: MediaTek Inc.
-[ 6931.197279] usb 1-3: SerialNumber: 000000000
-[ 6931.213478] Bluetooth: hci1: Loading CBMCU firmware: mediatek/mt7928/CBMCU_CODE_MT7935_1_1.bin
-[ 6931.215214] Bluetooth: hci1: CBMCU HW ver: 0x7935, SW ver: 0x0000, Build Time: 20260601T161751+
-[ 6931.623962] Bluetooth: hci1: CBMCU firmware download completed
-[ 6931.643916] Bluetooth: hci1: Loading BT firmware: mediatek/mt7928/BT_RAM_CODE_MT7935_1_1_hdr.bin
-[ 6931.650467] Bluetooth: hci1: BT HW ver: 0x7935, SW ver: 0x0000, Build Time: 20260527000816
-[ 6935.039790] Bluetooth: hci1: Device setup in 3369644 usecs
-[ 6935.039833] Bluetooth: hci1: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
-[ 6935.160654] Bluetooth: hci1: AOSP extensions version v2.00
-[ 6935.160710] Bluetooth: hci1: AOSP quality report is supported
-[ 6935.162954] Bluetooth: MGMT ver 1.23
+Nothing requested the connection ("bonding (nil)") and the LE link was
+healthy. Any LE association that outlives the page timeout is killed by
+it; measured on one host, applications get about 4.7 s from connect
+before the link disappears, of which GATT discovery already takes 2.3 s.
 
-Signed-off-by: Chris Lu <chris.lu@mediatek.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Reviewed-by: Sean Wang <sean.wang@mediatek.com>
-Assisted-by: Claude:Sonnet-4.5
+Current phones advertise Flags 0x1a (LE General Discoverable plus
+Simultaneous LE and BR/EDR, with BR/EDR Not Supported clear) from
+resolvable private addresses, so this triggers routinely rather than in
+some corner case.
+
+The Flags bits describe what the device supports. They do not promise
+that the address it is advertising from is a BD_ADDR. A dual-mode device
+uses the same Public Device Address for BR/EDR and LE, so the inference
+is sound only for BDADDR_LE_PUBLIC. Restrict it to that.
+
+The other two device_set_bredr_support() callers already require the
+device to have been seen over BR/EDR (bdaddr_type == BDADDR_BREDR), so
+they are unaffected. A device later seen over BR/EDR, or whose RPA is
+resolved to a public identity, still gets BR/EDR support recorded there.
 ---
- drivers/bluetooth/btmtk.c | 370 +++++++++++++++++++++++++++++++++++++-
- drivers/bluetooth/btmtk.h |   3 +
- 2 files changed, 372 insertions(+), 1 deletion(-)
+Changes in v2:
+- Commit message only; the code change is byte-for-byte identical to v1.
+- Dropped the "Assisted-by:" trailer, which checkpatch rejected as a
+  non-standard signature with an unrecognized email address. The
+  disclosure is kept below the --- instead, see the note at the end.
+- Quoted the two code excerpts with spaces rather than hard tabs
+  (gitlint B3).
+- Wrapped the bonding_attempt_complete() log line, which was 76 chars,
+  onto a continuation line to fit 75. The text is unchanged.
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index e059e72d9dbe..9e17c72d7f40 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -21,6 +21,12 @@
- #define MTK_FW_ROM_PATCH_SEC_MAP_SIZE	64
- #define MTK_SEC_MAP_COMMON_SIZE	12
- #define MTK_SEC_MAP_NEED_SEND_SIZE	52
-+#define MTK_SEC_MAP_LENGTH_SIZE	4
-+#define MTK_SEC_CBMCU_DESC	0x5
-+
-+/* CBMCU WMT command flags */
-+#define BTMTK_CBMCU_FLAG_QUERY_STATUS	0xF0
-+#define BTMTK_CBMCU_FLAG_ENABLE_PATCH	0xF1
- 
- /* It is for mt79xx iso data transmission setting */
- #define MTK_ISO_THRESHOLD	264
-@@ -120,6 +126,11 @@ void btmtk_fw_get_filename(char *buf, size_t size, u32 dev_id, u32 fw_ver,
- 		snprintf(buf, size,
- 			 "mediatek/mt%04x/BT_RAM_CODE_MT%04x_1_%x_hdr.bin",
- 			 dev_id & 0xffff, dev_id & 0xffff, (fw_ver & 0xff) + 1);
-+	/* MT7928 */
-+	else if (dev_id == 0x7935)
-+		snprintf(buf, size,
-+			 "mediatek/mt7928/BT_RAM_CODE_MT%04x_1_1_hdr.bin",
-+			 dev_id & 0xffff);
- 	else if (dev_id == 0x7961 && fw_flavor)
- 		snprintf(buf, size,
- 			 "mediatek/BT_RAM_CODE_MT%04x_1a_%x_hdr.bin",
-@@ -775,6 +786,7 @@ static int btmtk_usb_hci_wmt_sync(struct hci_dev *hdev,
- 			status = BTMTK_WMT_ON_UNDONE;
- 		break;
- 	case BTMTK_WMT_PATCH_DWNLD:
-+	case BTMTK_WMT_CBMCU_DWNLD:
- 		if (wmt_evt->whdr.flag == 2)
- 			status = BTMTK_WMT_PATCH_DONE;
- 		else if (wmt_evt->whdr.flag == 1)
-@@ -911,6 +923,351 @@ static u32 btmtk_usb_reset_done(struct hci_dev *hdev)
- 	return val & MTK_BT_RST_DONE;
- }
- 
-+static int btmtk_cbmcu_patch_status(struct hci_dev *hdev,
-+				    wmt_cmd_sync_func_t wmt_cmd_sync,
-+				    u8 *patch_status)
-+{
-+	struct btmtk_hci_wmt_params wmt_params;
-+	int status, err, retry = 20;
-+
-+	do {
-+		wmt_params.op = BTMTK_WMT_CBMCU_DWNLD;
-+		wmt_params.flag = BTMTK_CBMCU_FLAG_QUERY_STATUS;
-+		wmt_params.dlen = 0;
-+		wmt_params.data = NULL;
-+		wmt_params.status = &status;
-+
-+		err = wmt_cmd_sync(hdev, &wmt_params);
-+		if (err < 0) {
-+			bt_dev_err(hdev, "Failed to query CBMCU patch status (%d)", err);
-+			return err;
-+		}
-+
-+		*patch_status = (u8)status;
-+
-+		if (*patch_status == BTMTK_WMT_PATCH_PROGRESS) {
-+			msleep(100);
-+			retry--;
-+		} else {
-+			break;
-+		}
-+	} while (retry > 0);
-+
-+	if (*patch_status == BTMTK_WMT_PATCH_PROGRESS) {
-+		bt_dev_err(hdev, "CBMCU patch status query timeout");
-+		return -ETIMEDOUT;
-+	}
-+
-+	return 0;
-+}
-+
-+static int btmtk_query_cbmcu_section(struct hci_dev *hdev,
-+				     wmt_cmd_sync_func_t wmt_cmd_sync,
-+				     u8 cbmcu_type,
-+				     const u8 *section_map,
-+				     u32 cert_len)
-+{
-+	struct btmtk_hci_wmt_params wmt_params;
-+	u8 cmd[64];
-+	int status, err;
-+
-+	cmd[0] = 0;
-+	cmd[1] = cbmcu_type;
-+
-+	if (cbmcu_type == 0)
-+		put_unaligned_le32(cert_len, &cmd[2]);
-+	else
-+		memcpy(&cmd[2], section_map, MTK_SEC_MAP_NEED_SEND_SIZE);
-+
-+	wmt_params.op = BTMTK_WMT_CBMCU_DWNLD;
-+	wmt_params.flag = 0;
-+	wmt_params.dlen = cbmcu_type ?
-+		MTK_SEC_MAP_NEED_SEND_SIZE + 2 :
-+		MTK_SEC_MAP_LENGTH_SIZE + 2;
-+	wmt_params.data = cmd;
-+	wmt_params.status = &status;
-+
-+	err = wmt_cmd_sync(hdev, &wmt_params);
-+	if (err < 0) {
-+		bt_dev_err(hdev, "Failed to query CBMCU section (%d)", err);
-+		return err;
-+	}
-+
-+	/* Query should return UNDONE status for successful section query */
-+	if (status != BTMTK_WMT_PATCH_UNDONE) {
-+		bt_dev_err(hdev, "CBMCU section query status error (%d)", status);
-+		return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
-+static int btmtk_download_cbmcu_section(struct hci_dev *hdev,
-+					wmt_cmd_sync_func_t wmt_cmd_sync,
-+					const u8 *fw_data,
-+					u32 dl_size)
-+{
-+	struct btmtk_hci_wmt_params wmt_params;
-+	u32 sent_len, total_size = dl_size;
-+	int err;
-+
-+	wmt_params.op = BTMTK_WMT_CBMCU_DWNLD;
-+	wmt_params.status = NULL;
-+
-+	while (dl_size > 0) {
-+		sent_len = min_t(u32, 250, dl_size);
-+
-+		if (dl_size == total_size)
-+			wmt_params.flag = BTMTK_WMT_PKT_START;
-+		else if (dl_size == sent_len)
-+			wmt_params.flag = BTMTK_WMT_PKT_END;
-+		else
-+			wmt_params.flag = BTMTK_WMT_PKT_CONTINUE;
-+
-+		wmt_params.dlen = sent_len;
-+		wmt_params.data = fw_data;
-+
-+		err = wmt_cmd_sync(hdev, &wmt_params);
-+		if (err < 0) {
-+			bt_dev_err(hdev, "Failed to send CBMCU section data (%d)", err);
-+			return err;
-+		}
-+
-+		dl_size -= sent_len;
-+		fw_data += sent_len;
-+	}
-+
-+	return 0;
-+}
-+
-+static int btmtk_enable_cbmcu_patch(struct hci_dev *hdev,
-+				    wmt_cmd_sync_func_t wmt_cmd_sync)
-+{
-+	struct btmtk_hci_wmt_params wmt_params;
-+	int err;
-+
-+	wmt_params.op = BTMTK_WMT_CBMCU_DWNLD;
-+	wmt_params.flag = BTMTK_CBMCU_FLAG_ENABLE_PATCH;
-+	wmt_params.dlen = 0;
-+	wmt_params.data = NULL;
-+	wmt_params.status = NULL;
-+
-+	err = wmt_cmd_sync(hdev, &wmt_params);
-+	if (err < 0) {
-+		bt_dev_err(hdev, "Failed to enable CBMCU patch (%d)", err);
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static int btmtk_load_cbmcu_firmware(struct hci_dev *hdev,
-+				     const char *fwname,
-+				     wmt_cmd_sync_func_t wmt_cmd_sync,
-+				     u32 dev_id)
-+{
-+	struct btmtk_patch_header *hdr;
-+	struct btmtk_global_desc *globaldesc;
-+	struct btmtk_section_map *sectionmap;
-+	const struct firmware *fw;
-+	const u8 *fw_ptr;
-+	u8 *cert_buf = NULL;
-+	u32 section_num, section_offset, dl_size, cert_len;
-+	size_t expected_size;
-+	int i, err;
-+
-+	err = request_firmware(&fw, fwname, &hdev->dev);
-+	if (err < 0) {
-+		bt_dev_err(hdev, "Failed to load CBMCU firmware file %s (%d)",
-+			   fwname, err);
-+		return err;
-+	}
-+
-+	if (fw->size < MTK_FW_ROM_PATCH_HEADER_SIZE + MTK_FW_ROM_PATCH_GD_SIZE) {
-+		bt_dev_err(hdev, "CBMCU firmware too small: size=%zu, min=%u",
-+			   fw->size,
-+			   MTK_FW_ROM_PATCH_HEADER_SIZE + MTK_FW_ROM_PATCH_GD_SIZE);
-+		err = -EINVAL;
-+		goto err_release_fw;
-+	}
-+
-+	fw_ptr = fw->data;
-+	hdr = (struct btmtk_patch_header *)fw_ptr;
-+	globaldesc = (struct btmtk_global_desc *)(fw_ptr + MTK_FW_ROM_PATCH_HEADER_SIZE);
-+	section_num = le32_to_cpu(globaldesc->section_num);
-+
-+	/* Check for potential integer overflow in size calculation */
-+	if (check_mul_overflow((size_t)MTK_FW_ROM_PATCH_SEC_MAP_SIZE,
-+			       (size_t)section_num, &expected_size) ||
-+	    check_add_overflow(expected_size,
-+			       (size_t)(MTK_FW_ROM_PATCH_HEADER_SIZE +
-+					MTK_FW_ROM_PATCH_GD_SIZE),
-+			       &expected_size)) {
-+		bt_dev_err(hdev, "CBMCU firmware size calculation overflow (section_num=%u)",
-+			   section_num);
-+		err = -EINVAL;
-+		goto err_release_fw;
-+	}
-+
-+	if (fw->size < expected_size) {
-+		bt_dev_err(hdev, "CBMCU firmware truncated: size=%zu, expected=%zu (section_num=%u)",
-+			   fw->size, expected_size, section_num);
-+		err = -EINVAL;
-+		goto err_release_fw;
-+	}
-+
-+	bt_dev_info(hdev, "CBMCU HW ver: 0x%04x, SW ver: 0x%04x, Build Time: %.16s",
-+		    dev_id & 0xffff, le16_to_cpu(hdr->swver), hdr->datetime);
-+
-+	/* Phase 1: Download section type MTK_SEC_CBMCU_DESC */
-+	for (i = 0; i < section_num; i++) {
-+		sectionmap = (struct btmtk_section_map *)
-+			(fw_ptr + MTK_FW_ROM_PATCH_HEADER_SIZE +
-+			 MTK_FW_ROM_PATCH_GD_SIZE +
-+			 MTK_FW_ROM_PATCH_SEC_MAP_SIZE * i);
-+
-+		/* Only process MTK_SEC_CBMCU_DESC section in Phase 1 */
-+		if ((le32_to_cpu(sectionmap->sectype) & 0xFFFF) != MTK_SEC_CBMCU_DESC)
-+			continue;
-+
-+		section_offset = le32_to_cpu(sectionmap->secoffset);
-+		dl_size = le32_to_cpu(sectionmap->secsize);
-+
-+		if (dl_size == 0)
-+			continue;
-+
-+		if (section_offset > fw->size ||
-+		    dl_size > fw->size - section_offset) {
-+			bt_dev_err(hdev, "CBMCU Phase 1 section out of bounds");
-+			err = -EINVAL;
-+			goto err_release_fw;
-+		}
-+
-+		cert_len = MTK_FW_ROM_PATCH_GD_SIZE +
-+			   MTK_FW_ROM_PATCH_SEC_MAP_SIZE * section_num +
-+			   dl_size;
-+
-+		/* Query cbmcu section */
-+		err = btmtk_query_cbmcu_section(hdev, wmt_cmd_sync, 0, NULL,
-+						cert_len);
-+		if (err < 0)
-+			goto err_release_fw;
-+
-+		cert_buf = kmalloc(cert_len, GFP_KERNEL);
-+		if (!cert_buf) {
-+			err = -ENOMEM;
-+			goto err_release_fw;
-+		}
-+
-+		/* Copy Global Descriptor + All Section Maps */
-+		memcpy(cert_buf,
-+		       fw_ptr + MTK_FW_ROM_PATCH_HEADER_SIZE,
-+		       MTK_FW_ROM_PATCH_GD_SIZE + MTK_FW_ROM_PATCH_SEC_MAP_SIZE * section_num);
-+
-+		/* Copy Phase 1 section data */
-+		memcpy(cert_buf + MTK_FW_ROM_PATCH_GD_SIZE +
-+		       MTK_FW_ROM_PATCH_SEC_MAP_SIZE * section_num,
-+		       fw_ptr + section_offset,
-+		       dl_size);
-+
-+		/* Download Phase 1 section */
-+		err = btmtk_download_cbmcu_section(hdev, wmt_cmd_sync,
-+						   cert_buf, cert_len);
-+		kfree(cert_buf);
-+		cert_buf = NULL;
-+
-+		if (err < 0) {
-+			bt_dev_err(hdev, "Failed to download CBMCU Phase 1 section (%d)", err);
-+			goto err_release_fw;
-+		}
-+
-+		break;
-+	}
-+
-+	/* Phase 2: Download other sections (type != MTK_SEC_CBMCU_DESC) */
-+	for (i = 0; i < section_num; i++) {
-+		sectionmap = (struct btmtk_section_map *)
-+			(fw_ptr + MTK_FW_ROM_PATCH_HEADER_SIZE +
-+			 MTK_FW_ROM_PATCH_GD_SIZE +
-+			 MTK_FW_ROM_PATCH_SEC_MAP_SIZE * i);
-+
-+		/* Skip MTK_SEC_CBMCU_DESC section in Phase 2 */
-+		if ((le32_to_cpu(sectionmap->sectype) & 0xFFFF) == MTK_SEC_CBMCU_DESC)
-+			continue;
-+
-+		section_offset = le32_to_cpu(sectionmap->secoffset);
-+		dl_size = le32_to_cpu(sectionmap->bin_info_spec.dlsize);
-+
-+		if (dl_size == 0)
-+			continue;
-+
-+		if (section_offset > fw->size ||
-+		    dl_size > fw->size - section_offset) {
-+			bt_dev_err(hdev, "CBMCU Phase 2 section %d out of bounds", i);
-+			err = -EINVAL;
-+			goto err_release_fw;
-+		}
-+
-+		/* Query cbmcu section */
-+		err = btmtk_query_cbmcu_section(hdev, wmt_cmd_sync, 1,
-+						(u8 *)&sectionmap->bin_info_spec,
-+						0);
-+		if (err < 0)
-+			goto err_release_fw;
-+
-+		/* Download section data */
-+		err = btmtk_download_cbmcu_section(hdev, wmt_cmd_sync,
-+						   fw_ptr + section_offset,
-+						   dl_size);
-+		if (err < 0) {
-+			bt_dev_err(hdev, "Failed to download CBMCU section %d (%d)", i, err);
-+			goto err_release_fw;
-+		}
-+	}
-+
-+	bt_dev_info(hdev, "CBMCU firmware download completed");
-+
-+err_release_fw:
-+	release_firmware(fw);
-+	return err;
-+}
-+
-+static int btmtk_setup_cbmcu_firmware(struct hci_dev *hdev,
-+				      wmt_cmd_sync_func_t wmt_cmd_sync,
-+				      u32 dev_id)
-+{
-+	char cbmcu_fwname[64];
-+	u8 patch_status;
-+	int err;
-+
-+	err = btmtk_cbmcu_patch_status(hdev, wmt_cmd_sync, &patch_status);
-+	if (err < 0)
-+		return err;
-+
-+	bt_dev_dbg(hdev, "CBMCU patch status: 0x%02x", patch_status);
-+
-+	if (patch_status != BTMTK_WMT_PATCH_UNDONE)
-+		return 0;
-+
-+	snprintf(cbmcu_fwname, sizeof(cbmcu_fwname),
-+		 "mediatek/mt7928/CBMCU_CODE_MT%04x_1_1.bin",
-+		 dev_id & 0xffff);
-+
-+	bt_dev_info(hdev, "Loading CBMCU firmware: %s", cbmcu_fwname);
-+
-+	err = btmtk_load_cbmcu_firmware(hdev, cbmcu_fwname, wmt_cmd_sync, dev_id);
-+	if (err < 0) {
-+		bt_dev_err(hdev, "Failed to download CBMCU firmware (%d)", err);
-+		return err;
-+	}
-+
-+	err = btmtk_enable_cbmcu_patch(hdev, wmt_cmd_sync);
-+	if (err < 0)
-+		return err;
-+
-+	return 0;
-+}
-+
- int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id)
- {
- 	u32 val;
-@@ -935,7 +1292,7 @@ int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id)
- 		if (err < 0)
- 			return err;
- 		msleep(100);
--	} else if (dev_id == 0x7925 || dev_id == 0x6639) {
-+	} else if (dev_id == 0x7925 || dev_id == 0x6639 || dev_id == 0x7935) {
- 		err = btmtk_usb_uhw_reg_read(hdev, MTK_BT_RESET_REG_CONNV3, &val);
- 		if (err < 0)
- 			return err;
-@@ -1420,6 +1777,15 @@ int btmtk_usb_setup(struct hci_dev *hdev)
- 	case 0x7668:
- 		fwname = FIRMWARE_MT7668;
- 		break;
-+	case 0x7935:
-+		/* Requires CBMCU firmware before BT firmware */
-+		err = btmtk_setup_cbmcu_firmware(hdev, btmtk_usb_hci_wmt_sync,
-+						 dev_id);
-+		if (err < 0) {
-+			bt_dev_err(hdev, "Failed to set up CBMCU firmware (%d)", err);
-+			return err;
-+		}
-+		fallthrough;
- 	case 0x7922:
- 	case 0x7925:
- 		/*
-@@ -1637,3 +2003,5 @@ MODULE_FIRMWARE(FIRMWARE_MT7922);
- MODULE_FIRMWARE(FIRMWARE_MT7961);
- MODULE_FIRMWARE(FIRMWARE_MT7925);
- MODULE_FIRMWARE(FIRMWARE_MT7927);
-+MODULE_FIRMWARE(FIRMWARE_MT7928);
-+MODULE_FIRMWARE(FIRMWARE_MT7928_CBMCU);
-diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-index c234e5ea27e5..2d087d552d31 100644
---- a/drivers/bluetooth/btmtk.h
-+++ b/drivers/bluetooth/btmtk.h
-@@ -9,6 +9,8 @@
- #define FIRMWARE_MT7961		"mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin"
- #define FIRMWARE_MT7925		"mediatek/mt7925/BT_RAM_CODE_MT7925_1_1_hdr.bin"
- #define FIRMWARE_MT7927		"mediatek/mt7927/BT_RAM_CODE_MT6639_2_1_hdr.bin"
-+#define FIRMWARE_MT7928		"mediatek/mt7928/BT_RAM_CODE_MT7935_1_1_hdr.bin"
-+#define FIRMWARE_MT7928_CBMCU	"mediatek/mt7928/CBMCU_CODE_MT7935_1_1.bin"
- 
- #define HCI_EV_WMT 0xe4
- #define HCI_WMT_MAX_EVENT_SIZE		64
-@@ -54,6 +56,7 @@ enum {
- 	BTMTK_WMT_RST = 0x7,
- 	BTMTK_WMT_REGISTER = 0x8,
- 	BTMTK_WMT_SEMAPHORE = 0x17,
-+	BTMTK_WMT_CBMCU_DWNLD = 0x58,
- };
- 
- enum {
+This patch was developed with assistance from Claude Code
+(claude-opus-4-8). It was reviewed line by line and the results below
+reproduced on real hardware by me before submitting; nothing here is
+inferred.
+
+Verified on a dual-mode controller with ControllerMode=dual, against iOS and
+Android peers advertising Flags 0x1a from resolvable private addresses. A GATT
+association that includes a ~7 s user prompt, which previously failed every
+time at ~4.7 s with the Page Timeout above, now completes:
+
+  before:  connect +0.0s, GATT resolved +2.3s, first exchange +2.7s,
+           Page Timeout +4.7s -> LE link destroyed, transfer never completed
+  after:   same host, same peers, classic still enabled, transfer completes
+           with the user prompt taking 7.0s of it
+
+Setting ControllerMode=le instead of applying the patch also makes the failure
+go away, which independently confirms the mechanism: with no classic radio
+there is no page to time out. The patch achieves the same without giving up
+BR/EDR, and A2DP/HFP continue to work on the host afterwards.
+
+make is clean with no new warnings in src/adapter.c, and make check passes
+39/39.
+
+No unit test is included: src/adapter.c is linked only into bluetoothd and not
+into any unit test target, so btd_adapter_device_found() cannot be exercised by
+the existing harness. Extracting the check into a unit-testable helper looked
+like scope creep for a bug fix, but I am happy to add that if preferred.
+
+ src/adapter.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 4ffa32a..30e7679 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7415,8 +7415,17 @@ void btd_adapter_device_found(struct btd_adapter *adapter,
+ 	 * older kernels send separate adv_ind and scan_rsp. Newer
+ 	 * kernels send them merged, so once we know which mgmt version
+ 	 * supports this we can make the non-zero check conditional.
++	 *
++	 * Only infer BR/EDR support when the LE address is a Public Device
++	 * Address. A dual-mode device uses the same Public Device Address for
++	 * BR/EDR and LE, so in that case the advertised address is also a valid
++	 * BD_ADDR to page. A random address (static, resolvable or
++	 * non-resolvable) has no defined relationship to the device's BD_ADDR,
++	 * so recording BR/EDR support against it makes the device look pageable
++	 * at an address that can never be paged: SDP discovery then fails with
++	 * Page Timeout and takes the working LE link down with it.
+ 	 */
+-	if (bdaddr_type != BDADDR_BREDR && eir_data.flags &&
++	if (bdaddr_type == BDADDR_LE_PUBLIC && eir_data.flags &&
+ 					!(eir_data.flags & EIR_BREDR_UNSUP)) {
+ 		device_set_bredr_support(dev);
+ 		/* Update last seen for BR/EDR in case its flag is set */
 -- 
-2.45.2
+2.55.0
 
