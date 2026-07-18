@@ -1,141 +1,162 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A48413559F8
-	for <linux-bluetooth@vger.kernel.org>; Sat, 18 Jul 2026 20:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFE46355814
+	for <linux-bluetooth@vger.kernel.org>; Sat, 18 Jul 2026 21:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784406321; cv=none; b=AuJltYXrHmX1Jwk647+J/Rr8Kq9MIInPoGETWWGgqg+nsocdCWqLDnM3OaKDAKC7GOPZaUSw0Uur8lebgQozZ6jA53Rw1bwWwj/j1PFHBe1gFezFXQUZwYjHOep1+GSgx+0dPyPm0i9B/u3s00UP/69CUt7/hdHKTIBg0frXQe8=
+	t=1784409747; cv=none; b=IgsQuCRYU3ZXb9ThwuumvmZkpmA5ii0BBc1DNEC/n5pLDPOZ8IE46MFEgLvqtT45NAPdsPxA5kWQCE9/X5gEBDbuuYSrVplvjteQnUDKFVTBR8Apqk96YYCyUZ2DJOMH2MAEAxZiykIBuNN1dlMPLJasvN8OwWrZM7mI+KMEQE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784406321; c=relaxed/simple;
-	bh=8L20etyvML+fPhafpAZ++/ynEVm7KP72pC6qHsUm5VY=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=atMbZa4fHnUtreUp9CcQZ+/tRVxoQFIgOK91ogShPdPOpP8QdFw7n4oufe902GG1o4uvAN+pmtdv8r7iu8z7RHTru6Iv83lrnwOoBLTUjN7OotMC6m/+L4RaDkyUklyLbgEzTjqAm8EBSMMbrAVpuU0FJ2wBwu0TdALYMhw+b/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=lQISysZB; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1784409747; c=relaxed/simple;
+	bh=07YEsE1yCrOL3T/ECiSr6U9if3xBaGVJg2x9B2pkh2s=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=pFJL2QJqPhcOEnqBjKfMbQMhB/3B8t6Ii6VMWCVBEbg7DmU8On/5sWklcVVu1WpFrneCZ+ghhnpojwyN7axUaB2YsSpthtV6PqDmzKCN48o1oWpvOkc/65Ob7D1PTYLkEuT8Z/WYP7BZ0IZ3pOz1lE7TlnXLn0TDEYmgZLxZGqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZyxUTnD3; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="lQISysZB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1784406318;
-	bh=2QQDJefyzFcrmm8nIEqcdgnkP6aYrBc4FD1T/RaHXRo=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=lQISysZBInVrvQNUAEn1xrljF0iZYTg2vpTz20biLieNJGkgXrYitqlJTqqVIv1kZ
-	 aTYxo2LmCnI7NAh0xy96jPuUJ3YaEpFx+UZ8BXlz4ew0Wfrx+c4L6wyOJbZ1qYKIwr
-	 4CDkuNVgAO4PGMVTXWykdJB1dGPob76DwPm4vTMk=
-Received: from github.com (hubbernetes-node-01c312e.ac4-iad.github.net [10.52.211.59])
-	by smtp.github.com (Postfix) with ESMTPA id A00FF781021
-	for <linux-bluetooth@vger.kernel.org>; Sat, 18 Jul 2026 13:25:18 -0700 (PDT)
-Date: Sat, 18 Jul 2026 13:25:18 -0700
-From: Philipp Dunkel <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1130150/000000-4df3db@github.com>
-Subject: [bluez/bluez] 45fc10: shared/att: don't auto-bond on reactive
- elevation
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZyxUTnD3"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2caed617615so100271375ad.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 18 Jul 2026 14:22:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784409745; x=1785014545; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=465b9uPlI8s7pLgOr2Be6xZu4fkwL18a5m3ntdZ2SL0=;
+        b=ZyxUTnD3eTRECWF1E9S3/Uddu1oGwvdJSWRayZuzrFbrc81Fq6092sszcBZCiF/R8/
+         eX0Rbdr56QxHJvP3qNopxM8ga7Qpiw/3tAkwxtu8bEs+qQN/NsC39t8NYh3YEBdL+1D6
+         LZelj7OZdsTmG4FzRJ2iEEPMYPpXtrWFNrihI3hk7z6aT61oV0qRS+9w3B6j1Fu9edcW
+         1F2qaCeXYEKVgBrOhFPHweYdvMcQJ3wyXz9nlOum+Wa2jQZhOmSQucF5FVGGEeVti67i
+         HOQHKuwYQUepujBL6KPAb+htDYzB1rFtILqOABKQ9bDeTiS/ylVZ6MaZFvAmcwKIkofC
+         kDtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784409745; x=1785014545;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=465b9uPlI8s7pLgOr2Be6xZu4fkwL18a5m3ntdZ2SL0=;
+        b=AmFBV7cTjhJJTzRqMbuwiARYbN3Dm+BITTj329wBjci25xVQnKST/Ru7k91heEYT7T
+         aSuJay/8eZdaqHWSeScxYOKXu+oU/8teJTBoF2p8QSga74HOe2w1440cKN9HaF4/wk1u
+         tREil09Z3wYTPmSBLqXqbhX+1NukcIPNr1XDK72vOnqFiXcejjHJhtgp2CuowWDfKlpv
+         s6h/TgknXZ2TtfMTYxiZ6fcItUXBq+rUqT/HnVcQywyadwLNhQPJiLoLpCm9SPEE+bJn
+         5yZFDqzTwk/cyqiZwIBveP48hgmDyYkcOINCJH4E/A1UFz8npD8rABQeIssSKjosHAXu
+         Wx2Q==
+X-Gm-Message-State: AOJu0YwWTR3pt0pX5wz/K4fIegH+JIreaYXo11RkGdY9sEZl+BoVxDTH
+	qQTmA3zd89pqaTSpMSDcy18qUFwo9NtKNMAJvHo97DE6C8LufzdTYRUokOUXVAB8
+X-Gm-Gg: AfdE7cnXMK2KIUh8PWVXM4u20EL03Ny/LUkxX4r4Jkej+SP4/whlMy64twqc99AmAT1
+	W75vw8P9O54ixcpeft+vbfTAqUk9hQqagIaOfxzco1nk2UC5fUgk+FChECtkDKCtf93R/fpD4Z4
+	byO7HxiCAVP6be0G7AtO30wO3JyGCeYAVt/dWkvcbW85riYTnh70Q/4HTKunTG9vB9ouWTl+iKy
+	lkot0DiYjmNJZj2XwiqcSjVBQRSP5J4bY6HPFfiN++aBENPq39V3MSQTNfi2YU5zLmCxfP5yTa7
+	iqw7+IPQVEnSxKYx/8KGOppnXQ1eQInCB19hZ0BWc0GG6VRdNzQlsuYSJBSctx6TzNhj5xAnBSr
+	hUW9YyiJaUMDY2xH61Rs8LZvLqei8Mv/GOBFjc7oJ60iOOxwXY98qkFyAoIDDmjgb4GBwY3pzou
+	UPv/M89If86A==
+X-Received: by 2002:a17:903:15cf:b0:2ca:c68:c554 with SMTP id d9443c01a7336-2cf34a22678mr87347245ad.38.1784409744868;
+        Sat, 18 Jul 2026 14:22:24 -0700 (PDT)
+Received: from [172.17.0.2] ([172.182.244.86])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13ce2cbb69bsm15121066c88.11.2026.07.18.14.22.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 18 Jul 2026 14:22:24 -0700 (PDT)
+Message-ID: <6a5bee90.92ea0e2a.4a9a5.5b46@mx.google.com>
+Date: Sat, 18 Jul 2026 14:22:24 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1398172612663929361=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pip@pipobscure.com
+Subject: RE: Don't auto-bond on reactive GATT security elevation
+In-Reply-To: <20260718194230.35959-2-pip@pipobscure.com>
+References: <20260718194230.35959-2-pip@pipobscure.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============1398172612663929361==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/1130150
-  Home:   https://github.com/bluez/bluez
-  Commit: 45fc1030b964091e556343571b76be0ca64be664
-      https://github.com/bluez/bluez/commit/45fc1030b964091e556343571b76be0ca64be664
-  Author: Philipp Dunkel <pip@pipobscure.com>
-  Date:   2026-07-18 (Sat, 18 Jul 2026)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M src/device.c
-    M src/shared/att.c
-    M src/shared/att.h
+Dear submitter,
 
-  Log Message:
-  -----------
-  shared/att: don't auto-bond on reactive elevation
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1130150
 
-When bluetoothd connects to a freshly discovered LE peer it probes it as
-a GATT client through its built-in profiles (battery, mcp, ...). If one
-of those reads a characteristic the peer has protected, the peer answers
-with Insufficient Authentication (0x05). change_security() reacts to that
-error by raising BT_SECURITY on the ATT socket, and on an unbonded LE
-link raising security starts SMP pairing.
+---Test result---
 
-The result is a bond that nobody asked for: no user, no agent, and no
-application requested it. It logs as a device_bonding_complete() bond
-with a (nil) requestor, and the user is shown a pairing prompt for a
-device that merely came into range and connected. On phones and laptops
-that expose authentication-gated GATT characteristics this fires on
-essentially every connection.
+Test Summary:
+CheckPatch                    FAIL      0.71 seconds
+GitLint                       PASS      0.46 seconds
+BuildEll                      PASS      18.36 seconds
+BluezMake                     PASS      653.95 seconds
+MakeCheck                     PASS      18.62 seconds
+MakeDistcheck                 PASS      147.18 seconds
+CheckValgrind                 PASS      211.82 seconds
+CheckSmatch                   PASS      248.24 seconds
+bluezmakeextell               PASS      91.53 seconds
+IncrementalBuild              PASS      1156.64 seconds
+ScanBuild                     PASS      818.66 seconds
 
-The existing opt-out cannot prevent it. change_security() only returns
-early when chan->sec_level != BT_ATT_SECURITY_AUTO, but
-bt_att_chan_set_security() records sec_level solely for BT_ATT_LOCAL
-channels. An L2CAP/LE channel keeps its zero-initialised value (AUTO)
-for its entire lifetime, so the guard never triggers and the link
-always elevates.
-
-Add bt_att_set_no_auto_sec(), a per-bt_att flag that makes
-change_security() refuse to elevate. Set it from gatt_client_init() for
-any connection that is neither bonded nor in a requested bonding, so a
-speculative profile probe that hits an authentication-protected
-characteristic fails on the auth error instead of silently pairing.
-
-Devices being bonded via Pair() are unaffected: device->bonding is set
-before the connection is established, so gatt_client_init() takes the
-existing elevate-for-bonding branch and never sets the flag. Already
-bonded devices are unaffected too: they are elevated proactively at
-attach time when their LTK is available, and reconnections see
-device_is_bonded() and skip the flag.
-
-Tested against Android (Galaxy Z Flip 4), iOS (iPhone) and macOS
-(MacBook): each connects and is probed by the built-in profiles with no
-unsolicited pairing prompt, while explicit pairing continues to work.
-
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,1/2] shared/att: don't auto-bond on reactive elevation
+WARNING:BAD_SIGN_OFF: Non-standard signature: Assisted-by:
+#107: 
 Assisted-by: Claude:Opus-4.8
-AI disclosure: this change was developed with the assistance of an AI
-model (Claude Opus 4.8). The author reviewed every line. The fix was
-built and exercised on real hardware -- against Android (Galaxy Z Flip
-4), iOS (iPhone) and macOS (MacBook) peers -- and its behaviour was
-observed directly, not inferred.
 
-
-  Commit: 4df3db7680e9da534458880a0b8a778a559a610f
-      https://github.com/bluez/bluez/commit/4df3db7680e9da534458880a0b8a778a559a610f
-  Author: Philipp Dunkel <pip@pipobscure.com>
-  Date:   2026-07-18 (Sat, 18 Jul 2026)
-
-  Changed paths:
-    M unit/test-gatt.c
-
-  Log Message:
-  -----------
-  unit/test-gatt: cover no-auto-sec on auth error
-
-Add a regression test for bt_att_set_no_auto_sec(). The client reads a
-characteristic and the peer answers with Insufficient Authentication
-(0x05). Security is armed to BT_ATT_SECURITY_AUTO so a reactive elevation
-would normally fire and retry the read, but no_auto_sec is set, so the
-error must instead be delivered to the caller with no second request on
-the wire.
-
-This is the /auto variant (which does retry after elevating) with the
-elevation forbidden. With the flag honoured the read fails once with
-0x05; without it the client retries and the test aborts on the
-unexpected Read Request, guarding the fix against regression.
-
+ERROR:BAD_SIGN_OFF: Unrecognized email address: 'Claude:Opus-4.8'
+#107: 
 Assisted-by: Claude:Opus-4.8
-AI disclosure: this change was developed with the assistance of an AI
-model (Claude Opus 4.8). The author reviewed every line. The test was
-run against the built tree: it passes with patch 1 applied and was
-confirmed to fail (client retries, harness aborts) without it.
+
+/github/workspace/src/patch/14695485.patch total: 1 errors, 1 warnings, 73 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14695485.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-Compare: https://github.com/bluez/bluez/compare/45fc1030b964%5E...4df3db7680e9
+[BlueZ,2/2] unit/test-gatt: cover no-auto-sec on auth error
+WARNING:BAD_SIGN_OFF: Non-standard signature: Assisted-by:
+#81: 
+Assisted-by: Claude:Opus-4.8
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+ERROR:BAD_SIGN_OFF: Unrecognized email address: 'Claude:Opus-4.8'
+#81: 
+Assisted-by: Claude:Opus-4.8
+
+/github/workspace/src/patch/14695486.patch total: 1 errors, 1 warnings, 46 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/patch/14695486.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+https://github.com/bluez/bluez/pull/2330
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1398172612663929361==--
