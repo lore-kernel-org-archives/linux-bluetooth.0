@@ -1,45 +1,45 @@
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4938A29D265
-	for <linux-bluetooth@vger.kernel.org>; Sat, 18 Jul 2026 19:43:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C177636CDF2
+	for <linux-bluetooth@vger.kernel.org>; Sat, 18 Jul 2026 19:43:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784403783; cv=none; b=tBpnsSqTZRND0dJPXSE5en1vrnCnHd3MSjPdmYCYE0puq5aRmq4MngG9Va2q6mqG9CyEiBwCERJ2qUUkPzrX6ngUSAiENwXVpyLnPNS4qxGC+T4x+8274DrTr+xGZoQ+g5vJ6VVsDKMgtHWwZqinxwhq0Sl0p0ElLyLZDgZqfHQ=
+	t=1784403786; cv=none; b=F3wN37ShLCWVUhb78qByDR20ueEAxwHNR73fR2t3lSl909doZhy0XtvY/mwIImmBJ91YizOSC/SraLmC1ZfdZ3CDKajSKgd7kTp0KZF96yqQX30gVlTtQik593w6Q+8wHsWCCWy7KaIXNO32CNOcyQfHkEPG8pJ1XDD2rPjvsrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784403783; c=relaxed/simple;
-	bh=qhL2QjWaBDKVKS/dIu9U4/yR53loh/DcsR8cVRZnhk8=;
+	s=arc-20240116; t=1784403786; c=relaxed/simple;
+	bh=WMnsRTAMumqPWG1UO2rXHCJf8ebEPm0QdryDqiML71g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kHcnfgmF6gBcDWaovu90+L2bUFcIkQRc8XzoHRLlVQWjGZp5exVTPxQnP4LzJIFmrBs8pG5ST4OQti0Dyssr7gSGheR17xkmoNchJGED5lLaaMIXfV72rN+OhWxeVg4aC/NzwsPr1tYC4Uy3NSzeQy7gowK5gVisITQkYb7HGqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pipobscure.com; spf=pass smtp.mailfrom=pipobscure.com; dkim=pass (2048-bit key) header.d=pipobscure.com header.i=@pipobscure.com header.b=Q1eOh6jA; arc=none smtp.client-ip=80.241.56.152
+	 MIME-Version; b=jqitvhSSkSe6nHQ48B3smTsgtfghC5K+rC6LURUM2ZdKR+WazMc8/To9NBh9vgIaOUzBl1rQZmbivKYVjMIVkRQbg8ZukC6oQ0j/hFI9sBYN8jh2O1N/KmoOtabVM4LpmwJp5ApO8SvE+X0dZZ5z6JnouDjPsQ/W/VYfA6ZCjBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pipobscure.com; spf=pass smtp.mailfrom=pipobscure.com; dkim=pass (2048-bit key) header.d=pipobscure.com header.i=@pipobscure.com header.b=T5+ac14x; arc=none smtp.client-ip=80.241.56.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pipobscure.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pipobscure.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pipobscure.com header.i=@pipobscure.com header.b="Q1eOh6jA"
+	dkim=pass (2048-bit key) header.d=pipobscure.com header.i=@pipobscure.com header.b="T5+ac14x"
 Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
 	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4h2cdG0Q4tzKmxW;
-	Sat, 18 Jul 2026 21:42:58 +0200 (CEST)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4h2cdK0p5ZzMlGx;
+	Sat, 18 Jul 2026 21:43:01 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pipobscure.com;
-	s=MBO0001; t=1784403778;
+	s=MBO0001; t=1784403781;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=naoH6S2iGrMIudH/LnyWct0IkDh1YN1YziB8IZ1SF74=;
-	b=Q1eOh6jABej35BGBEkp/FoAWMqVeZJsPPVe0X7+Mpux7/w6rr5C4CLwgCbbwzdrV09DRzN
-	O1ap1LjH2kViQDuKE2mkjaKb03PuT6LOzkbXNoud2ggyzCEIts6+sF3SQiuC8CQvy570on
-	qqM1dSwX4X1YyR30LLt6PSI0n6envlxbnGFXZjMjxceY4I2W3L91ffVvFh3WHIxWr9RTs/
-	9LyEg+tO7JD29g4+6KodSh8X+SsZ38Ts2WMnNMSy7REnkWHucd2Arw7x6LhbMzNr0h0JQN
-	H+Ap+0p2r0zPrWtI6fqbWSmP+mfyjm438duQ93Do1/DGyS7y5nB4KRcszCqSSQ==
+	bh=NPVeJQYAyr2fJsaE0NTM0UNUXNov/vkXJ0nUaeOHlsA=;
+	b=T5+ac14xxch1uJqNl+GYTbSJn4XVBHttbnQgkB0nbV0lIJl7FKLYOEpT9e9pXTl2LK3P5h
+	vxK+QPXpy2AHFF6d81c813eyVWR12biqNweLc2lwCLzQdAaf4A0aSgEBfeEXaBbQquD6R1
+	BpOSC4Q/0SkyHapAuxfjAyoDF05mYa/e25mYx/4KPlA4va0+wYJmUO2P3HHwrNGoHD1jxy
+	Dr7Ycwzq7JnY1RkIieTjIQaHubXKjzw/xfnIVKaJed4zpBqN73T2yaRijUj795i6x2xK/C
+	nmpfCGtEv4JMpE/sZb+fxDhS8Xf+i7ZgZKgdcwquHT8sKVO/fBt6zEWxCTXDWw==
 From: Philipp Dunkel <pip@pipobscure.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Philipp Dunkel <pip@pipobscure.com>
-Subject: [PATCH BlueZ 1/2] shared/att: don't auto-bond on reactive elevation
-Date: Sat, 18 Jul 2026 21:42:29 +0200
-Message-ID: <20260718194230.35959-2-pip@pipobscure.com>
+Subject: [PATCH BlueZ 2/2] unit/test-gatt: cover no-auto-sec on auth error
+Date: Sat, 18 Jul 2026 21:42:30 +0200
+Message-ID: <20260718194230.35959-3-pip@pipobscure.com>
 In-Reply-To: <20260718194230.35959-1-pip@pipobscure.com>
 References: <20260718194230.35959-1-pip@pipobscure.com>
 Precedence: bulk
@@ -50,147 +50,80 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When bluetoothd connects to a freshly discovered LE peer it probes it as
-a GATT client through its built-in profiles (battery, mcp, ...). If one
-of those reads a characteristic the peer has protected, the peer answers
-with Insufficient Authentication (0x05). change_security() reacts to that
-error by raising BT_SECURITY on the ATT socket, and on an unbonded LE
-link raising security starts SMP pairing.
+Add a regression test for bt_att_set_no_auto_sec(). The client reads a
+characteristic and the peer answers with Insufficient Authentication
+(0x05). Security is armed to BT_ATT_SECURITY_AUTO so a reactive elevation
+would normally fire and retry the read, but no_auto_sec is set, so the
+error must instead be delivered to the caller with no second request on
+the wire.
 
-The result is a bond that nobody asked for: no user, no agent, and no
-application requested it. It logs as a device_bonding_complete() bond
-with a (nil) requestor, and the user is shown a pairing prompt for a
-device that merely came into range and connected. On phones and laptops
-that expose authentication-gated GATT characteristics this fires on
-essentially every connection.
-
-The existing opt-out cannot prevent it. change_security() only returns
-early when chan->sec_level != BT_ATT_SECURITY_AUTO, but
-bt_att_chan_set_security() records sec_level solely for BT_ATT_LOCAL
-channels. An L2CAP/LE channel keeps its zero-initialised value (AUTO)
-for its entire lifetime, so the guard never triggers and the link
-always elevates.
-
-Add bt_att_set_no_auto_sec(), a per-bt_att flag that makes
-change_security() refuse to elevate. Set it from gatt_client_init() for
-any connection that is neither bonded nor in a requested bonding, so a
-speculative profile probe that hits an authentication-protected
-characteristic fails on the auth error instead of silently pairing.
-
-Devices being bonded via Pair() are unaffected: device->bonding is set
-before the connection is established, so gatt_client_init() takes the
-existing elevate-for-bonding branch and never sets the flag. Already
-bonded devices are unaffected too: they are elevated proactively at
-attach time when their LTK is available, and reconnections see
-device_is_bonded() and skip the flag.
-
-Tested against Android (Galaxy Z Flip 4), iOS (iPhone) and macOS
-(MacBook): each connects and is probed by the built-in profiles with no
-unsolicited pairing prompt, while explicit pairing continues to work.
+This is the /auto variant (which does retry after elevating) with the
+elevation forbidden. With the flag honoured the read fails once with
+0x05; without it the client retries and the test aborts on the
+unexpected Read Request, guarding the fix against regression.
 
 Assisted-by: Claude:Opus-4.8
 AI disclosure: this change was developed with the assistance of an AI
-model (Claude Opus 4.8). The author reviewed every line. The fix was
-built and exercised on real hardware -- against Android (Galaxy Z Flip
-4), iOS (iPhone) and macOS (MacBook) peers -- and its behaviour was
-observed directly, not inferred.
+model (Claude Opus 4.8). The author reviewed every line. The test was
+run against the built tree: it passes with patch 1 applied and was
+confirmed to fail (client retries, harness aborts) without it.
 ---
- src/device.c     | 13 +++++++++++++
- src/shared/att.c | 20 ++++++++++++++++++++
- src/shared/att.h |  1 +
- 3 files changed, 34 insertions(+)
+ unit/test-gatt.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index 65d84be..821a834 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -6301,6 +6301,7 @@ static void gatt_debug(const char *str, void *user_data)
- static void gatt_client_init(struct btd_device *device)
- {
- 	uint8_t features;
-+	bool unbonded;
- 
- 	gatt_client_cleanup(device);
- 
-@@ -6319,9 +6320,21 @@ static void gatt_client_init(struct btd_device *device)
- 	if (btd_opts.gatt_channels > 1)
- 		features |= BT_GATT_CHRC_CLI_FEAT_EATT;
- 
-+	unbonded = !device_is_bonded(device, device->bdaddr_type);
-+
- 	if (!btd_opts.gatt_seclevel && device->bonding) {
- 		DBG("Elevating security level since bonding is in progress");
- 		bt_att_set_security(device->att, BT_ATT_SECURITY_MEDIUM);
-+	} else if (!btd_opts.gatt_seclevel && unbonded) {
-+		/* No bond exists and none is being requested, so no
-+		 * user or agent has consented to pairing. Forbid a
-+		 * reactive security elevation: a speculative GATT
-+		 * profile probe (battery, MCP, ...) that reads an
-+		 * auth-protected characteristic must fail rather than
-+		 * silently initiating SMP bonding nobody asked for.
-+		 */
-+		DBG("Unbonded link: no reactive GATT elevation");
-+		bt_att_set_no_auto_sec(device->att, true);
- 	}
- 
- 	device->client = bt_gatt_client_new(device->db, device->att,
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 3d3c8cf..c42a521 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -92,6 +92,10 @@ struct bt_att {
- 
- 	struct sign_info *local_sign;
- 	struct sign_info *remote_sign;
-+
-+	bool no_auto_sec;		/* Never reactively elevate security
-+					 * (would initiate an unrequested bond)
-+					 */
- };
- 
- struct sign_info {
-@@ -766,6 +770,14 @@ static bool change_security(struct bt_att_chan *chan, uint8_t ecode)
- {
- 	int security;
- 
-+	/* A reactive elevation on an unbonded link starts SMP bonding.
-+	 * When the owner has forbidden auto-elevation (no_auto_sec), a
-+	 * speculative GATT profile probe that reads an auth-protected
-+	 * characteristic must fail here rather than silently pair.
-+	 */
-+	if (chan->att->no_auto_sec)
-+		return false;
-+
- 	if (chan->sec_level != BT_ATT_SECURITY_AUTO)
- 		return false;
- 
-@@ -2103,6 +2115,14 @@ bool bt_att_set_security(struct bt_att *att, int level)
- 	return bt_att_chan_set_security(chan, level);
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 535baaf..3929bb9 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -755,6 +755,22 @@ static void test_read(struct context *context)
+ 						test_read_cb, context, NULL));
  }
  
-+void bt_att_set_no_auto_sec(struct bt_att *att, bool value)
++static void test_read_no_auto_sec(struct context *context)
 +{
-+	if (!att)
-+		return;
++	const struct test_step *step = context->data->step;
 +
-+	att->no_auto_sec = value;
++	/* Arm reactive elevation (AUTO), then forbid it. An Insufficient
++	 * Authentication error must be delivered to the caller instead of
++	 * silently elevating security, which on a real unbonded link would
++	 * start SMP bonding that nobody requested.
++	 */
++	g_assert(bt_att_set_security(context->att, BT_ATT_SECURITY_AUTO));
++	bt_att_set_no_auto_sec(context->att, true);
++
++	g_assert(bt_gatt_client_read_value(context->client, step->handle,
++						test_read_cb, context, NULL));
 +}
 +
- void bt_att_set_enc_key_size(struct bt_att *att, uint8_t enc_size)
- {
- 	if (!att)
-diff --git a/src/shared/att.h b/src/shared/att.h
-index ba1f846..3dbfe86 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -112,6 +112,7 @@ bool bt_att_unregister_all(struct bt_att *att);
+ static const uint8_t read_data_1[] = {0x01, 0x02, 0x03};
  
- int bt_att_get_security(struct bt_att *att, uint8_t *enc_size);
- bool bt_att_set_security(struct bt_att *att, int level);
-+void bt_att_set_no_auto_sec(struct bt_att *att, bool value);
- void bt_att_set_enc_key_size(struct bt_att *att, uint8_t enc_size);
+ static const struct test_step test_read_1 = {
+@@ -795,6 +811,12 @@ static const struct test_step test_read_6 = {
+ 	.expected_att_ecode = 0x0c,
+ };
  
- bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
++static const struct test_step test_read_no_auto_sec_1 = {
++	.handle = 0x0003,
++	.func = test_read_no_auto_sec,
++	.expected_att_ecode = 0x05,
++};
++
+ static const struct test_step test_read_7 = {
+ 	.handle = 0x0004,
+ 	.func = test_read,
+@@ -2803,6 +2825,12 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x0a, 0x03, 0x00),
+ 			raw_pdu(0x0b, 0x01, 0x02, 0x03));
+ 
++	define_test_client("/TP/GAR/CL/BI-04-C/no-auto-sec", test_client,
++			service_db_1, &test_read_no_auto_sec_1,
++			SERVICE_DATA_1_PDUS,
++			raw_pdu(0x0a, 0x03, 0x00),
++			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x05));
++
+ 	define_test_client("/TP/GAR/CL/BI-05-C", test_client, service_db_1,
+ 			&test_read_6,
+ 			SERVICE_DATA_1_PDUS,
 -- 
 2.55.0
 
