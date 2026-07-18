@@ -1,54 +1,121 @@
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C177636CDF2
-	for <linux-bluetooth@vger.kernel.org>; Sat, 18 Jul 2026 19:43:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A48413559F8
+	for <linux-bluetooth@vger.kernel.org>; Sat, 18 Jul 2026 20:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784403786; cv=none; b=F3wN37ShLCWVUhb78qByDR20ueEAxwHNR73fR2t3lSl909doZhy0XtvY/mwIImmBJ91YizOSC/SraLmC1ZfdZ3CDKajSKgd7kTp0KZF96yqQX30gVlTtQik593w6Q+8wHsWCCWy7KaIXNO32CNOcyQfHkEPG8pJ1XDD2rPjvsrs=
+	t=1784406321; cv=none; b=AuJltYXrHmX1Jwk647+J/Rr8Kq9MIInPoGETWWGgqg+nsocdCWqLDnM3OaKDAKC7GOPZaUSw0Uur8lebgQozZ6jA53Rw1bwWwj/j1PFHBe1gFezFXQUZwYjHOep1+GSgx+0dPyPm0i9B/u3s00UP/69CUt7/hdHKTIBg0frXQe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784403786; c=relaxed/simple;
-	bh=WMnsRTAMumqPWG1UO2rXHCJf8ebEPm0QdryDqiML71g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jqitvhSSkSe6nHQ48B3smTsgtfghC5K+rC6LURUM2ZdKR+WazMc8/To9NBh9vgIaOUzBl1rQZmbivKYVjMIVkRQbg8ZukC6oQ0j/hFI9sBYN8jh2O1N/KmoOtabVM4LpmwJp5ApO8SvE+X0dZZ5z6JnouDjPsQ/W/VYfA6ZCjBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pipobscure.com; spf=pass smtp.mailfrom=pipobscure.com; dkim=pass (2048-bit key) header.d=pipobscure.com header.i=@pipobscure.com header.b=T5+ac14x; arc=none smtp.client-ip=80.241.56.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pipobscure.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pipobscure.com
+	s=arc-20240116; t=1784406321; c=relaxed/simple;
+	bh=8L20etyvML+fPhafpAZ++/ynEVm7KP72pC6qHsUm5VY=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=atMbZa4fHnUtreUp9CcQZ+/tRVxoQFIgOK91ogShPdPOpP8QdFw7n4oufe902GG1o4uvAN+pmtdv8r7iu8z7RHTru6Iv83lrnwOoBLTUjN7OotMC6m/+L4RaDkyUklyLbgEzTjqAm8EBSMMbrAVpuU0FJ2wBwu0TdALYMhw+b/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=lQISysZB; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pipobscure.com header.i=@pipobscure.com header.b="T5+ac14x"
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
-	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4h2cdK0p5ZzMlGx;
-	Sat, 18 Jul 2026 21:43:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pipobscure.com;
-	s=MBO0001; t=1784403781;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NPVeJQYAyr2fJsaE0NTM0UNUXNov/vkXJ0nUaeOHlsA=;
-	b=T5+ac14xxch1uJqNl+GYTbSJn4XVBHttbnQgkB0nbV0lIJl7FKLYOEpT9e9pXTl2LK3P5h
-	vxK+QPXpy2AHFF6d81c813eyVWR12biqNweLc2lwCLzQdAaf4A0aSgEBfeEXaBbQquD6R1
-	BpOSC4Q/0SkyHapAuxfjAyoDF05mYa/e25mYx/4KPlA4va0+wYJmUO2P3HHwrNGoHD1jxy
-	Dr7Ycwzq7JnY1RkIieTjIQaHubXKjzw/xfnIVKaJed4zpBqN73T2yaRijUj795i6x2xK/C
-	nmpfCGtEv4JMpE/sZb+fxDhS8Xf+i7ZgZKgdcwquHT8sKVO/fBt6zEWxCTXDWw==
-From: Philipp Dunkel <pip@pipobscure.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="lQISysZB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1784406318;
+	bh=2QQDJefyzFcrmm8nIEqcdgnkP6aYrBc4FD1T/RaHXRo=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=lQISysZBInVrvQNUAEn1xrljF0iZYTg2vpTz20biLieNJGkgXrYitqlJTqqVIv1kZ
+	 aTYxo2LmCnI7NAh0xy96jPuUJ3YaEpFx+UZ8BXlz4ew0Wfrx+c4L6wyOJbZ1qYKIwr
+	 4CDkuNVgAO4PGMVTXWykdJB1dGPob76DwPm4vTMk=
+Received: from github.com (hubbernetes-node-01c312e.ac4-iad.github.net [10.52.211.59])
+	by smtp.github.com (Postfix) with ESMTPA id A00FF781021
+	for <linux-bluetooth@vger.kernel.org>; Sat, 18 Jul 2026 13:25:18 -0700 (PDT)
+Date: Sat, 18 Jul 2026 13:25:18 -0700
+From: Philipp Dunkel <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Philipp Dunkel <pip@pipobscure.com>
-Subject: [PATCH BlueZ 2/2] unit/test-gatt: cover no-auto-sec on auth error
-Date: Sat, 18 Jul 2026 21:42:30 +0200
-Message-ID: <20260718194230.35959-3-pip@pipobscure.com>
-In-Reply-To: <20260718194230.35959-1-pip@pipobscure.com>
-References: <20260718194230.35959-1-pip@pipobscure.com>
+Message-ID: <bluez/bluez/push/refs/heads/1130150/000000-4df3db@github.com>
+Subject: [bluez/bluez] 45fc10: shared/att: don't auto-bond on reactive
+ elevation
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/1130150
+  Home:   https://github.com/bluez/bluez
+  Commit: 45fc1030b964091e556343571b76be0ca64be664
+      https://github.com/bluez/bluez/commit/45fc1030b964091e556343571b76be0ca64be664
+  Author: Philipp Dunkel <pip@pipobscure.com>
+  Date:   2026-07-18 (Sat, 18 Jul 2026)
+
+  Changed paths:
+    M src/device.c
+    M src/shared/att.c
+    M src/shared/att.h
+
+  Log Message:
+  -----------
+  shared/att: don't auto-bond on reactive elevation
+
+When bluetoothd connects to a freshly discovered LE peer it probes it as
+a GATT client through its built-in profiles (battery, mcp, ...). If one
+of those reads a characteristic the peer has protected, the peer answers
+with Insufficient Authentication (0x05). change_security() reacts to that
+error by raising BT_SECURITY on the ATT socket, and on an unbonded LE
+link raising security starts SMP pairing.
+
+The result is a bond that nobody asked for: no user, no agent, and no
+application requested it. It logs as a device_bonding_complete() bond
+with a (nil) requestor, and the user is shown a pairing prompt for a
+device that merely came into range and connected. On phones and laptops
+that expose authentication-gated GATT characteristics this fires on
+essentially every connection.
+
+The existing opt-out cannot prevent it. change_security() only returns
+early when chan->sec_level != BT_ATT_SECURITY_AUTO, but
+bt_att_chan_set_security() records sec_level solely for BT_ATT_LOCAL
+channels. An L2CAP/LE channel keeps its zero-initialised value (AUTO)
+for its entire lifetime, so the guard never triggers and the link
+always elevates.
+
+Add bt_att_set_no_auto_sec(), a per-bt_att flag that makes
+change_security() refuse to elevate. Set it from gatt_client_init() for
+any connection that is neither bonded nor in a requested bonding, so a
+speculative profile probe that hits an authentication-protected
+characteristic fails on the auth error instead of silently pairing.
+
+Devices being bonded via Pair() are unaffected: device->bonding is set
+before the connection is established, so gatt_client_init() takes the
+existing elevate-for-bonding branch and never sets the flag. Already
+bonded devices are unaffected too: they are elevated proactively at
+attach time when their LTK is available, and reconnections see
+device_is_bonded() and skip the flag.
+
+Tested against Android (Galaxy Z Flip 4), iOS (iPhone) and macOS
+(MacBook): each connects and is probed by the built-in profiles with no
+unsolicited pairing prompt, while explicit pairing continues to work.
+
+Assisted-by: Claude:Opus-4.8
+AI disclosure: this change was developed with the assistance of an AI
+model (Claude Opus 4.8). The author reviewed every line. The fix was
+built and exercised on real hardware -- against Android (Galaxy Z Flip
+4), iOS (iPhone) and macOS (MacBook) peers -- and its behaviour was
+observed directly, not inferred.
+
+
+  Commit: 4df3db7680e9da534458880a0b8a778a559a610f
+      https://github.com/bluez/bluez/commit/4df3db7680e9da534458880a0b8a778a559a610f
+  Author: Philipp Dunkel <pip@pipobscure.com>
+  Date:   2026-07-18 (Sat, 18 Jul 2026)
+
+  Changed paths:
+    M unit/test-gatt.c
+
+  Log Message:
+  -----------
+  unit/test-gatt: cover no-auto-sec on auth error
 
 Add a regression test for bt_att_set_no_auto_sec(). The client reads a
 characteristic and the peer answers with Insufficient Authentication
@@ -67,63 +134,8 @@ AI disclosure: this change was developed with the assistance of an AI
 model (Claude Opus 4.8). The author reviewed every line. The test was
 run against the built tree: it passes with patch 1 applied and was
 confirmed to fail (client retries, harness aborts) without it.
----
- unit/test-gatt.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 535baaf..3929bb9 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -755,6 +755,22 @@ static void test_read(struct context *context)
- 						test_read_cb, context, NULL));
- }
- 
-+static void test_read_no_auto_sec(struct context *context)
-+{
-+	const struct test_step *step = context->data->step;
-+
-+	/* Arm reactive elevation (AUTO), then forbid it. An Insufficient
-+	 * Authentication error must be delivered to the caller instead of
-+	 * silently elevating security, which on a real unbonded link would
-+	 * start SMP bonding that nobody requested.
-+	 */
-+	g_assert(bt_att_set_security(context->att, BT_ATT_SECURITY_AUTO));
-+	bt_att_set_no_auto_sec(context->att, true);
-+
-+	g_assert(bt_gatt_client_read_value(context->client, step->handle,
-+						test_read_cb, context, NULL));
-+}
-+
- static const uint8_t read_data_1[] = {0x01, 0x02, 0x03};
- 
- static const struct test_step test_read_1 = {
-@@ -795,6 +811,12 @@ static const struct test_step test_read_6 = {
- 	.expected_att_ecode = 0x0c,
- };
- 
-+static const struct test_step test_read_no_auto_sec_1 = {
-+	.handle = 0x0003,
-+	.func = test_read_no_auto_sec,
-+	.expected_att_ecode = 0x05,
-+};
-+
- static const struct test_step test_read_7 = {
- 	.handle = 0x0004,
- 	.func = test_read,
-@@ -2803,6 +2825,12 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x0a, 0x03, 0x00),
- 			raw_pdu(0x0b, 0x01, 0x02, 0x03));
- 
-+	define_test_client("/TP/GAR/CL/BI-04-C/no-auto-sec", test_client,
-+			service_db_1, &test_read_no_auto_sec_1,
-+			SERVICE_DATA_1_PDUS,
-+			raw_pdu(0x0a, 0x03, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x05));
-+
- 	define_test_client("/TP/GAR/CL/BI-05-C", test_client, service_db_1,
- 			&test_read_6,
- 			SERVICE_DATA_1_PDUS,
--- 
-2.55.0
 
+Compare: https://github.com/bluez/bluez/compare/45fc1030b964%5E...4df3db7680e9
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
