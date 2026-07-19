@@ -1,125 +1,73 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B014D280329;
-	Sun, 19 Jul 2026 05:38:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9C913A258;
+	Sun, 19 Jul 2026 13:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784439508; cv=none; b=G2XylLm4XoB7qSj8AjrXAnuqu8uwWm9/LP2y3D4bk8wFl2bF9bZ1s8gy22BjVyVzmCJdEIxxXbb0VCFqMdl3hsqplxxaI3IRUeKzPBVnoxlPVPlBiN46SE+FH/G6o9tQOF7ElIi2oRkyPVOTSHJB/xXMwJqY9UmSWgsEqjwLzlE=
+	t=1784466936; cv=none; b=YR8D6I2GmsNPt4pjwfN+OGuMaoHqrcp21xpKYG7nKekRkMAjmWsi4iDFL1taNC2tqzcFEZkSCnqpdhss/jI21dU2oKWfXAqPkdGOTIztl4iPgoL7pjQt7qghkHkOgrCbpQkARJcoL2freyMMDjxWNeiJxTU3fxzhi6Tw0g4O9/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784439508; c=relaxed/simple;
-	bh=NlG5cp5yCmVxbElFx3iARfhODKGwGM9cdEnU9IRWA5s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=cko4TvA3r7YTNxJZThh+56v2t76K8XOn0cSTe/SZqVQFGoBX0QyHP21k9YaTPYdRPMPtGeVtLgMVCUPBR35A3O5eimnWa0VcnIXCtvIgcUD62cT7CTK7cyuqGxTwJ+QhrTfOvuskh6Vs71buIhMn+df5MR53a8DDrgLi/vFDXlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=go7IicK4; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1784466936; c=relaxed/simple;
+	bh=lxCy6+4tgaC+do2rvc0+7V+EUsdw6w7kQ3US3qb8wy0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u2b7ctT7XdU89L19a/VI3m5E2EWvvZvdKuyygoNuZDeFtqKvHSKUr2Ki5n2RtxqvUZPTrwcAjOXfdGKS+GjbbnSEefB0hKv2GG975oPpUqYjxQZMvy+Oa7ytmLEnue4RSVXH6GGEDDb7pZxDX6ytD8RH/cZzx6CItHJdVHa8+/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bgmli8w0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="go7IicK4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=NlG5cp5yCmVxbElFx3iARfhODKGwGM9cdEnU9IRWA5s=; b=g
-	o7IicK4O6ZLC2liuRb7wAqR02l0Gy90FwwydCX2aKKweTa4erOBysQww8DcedI1a
-	IrZJ54ct81+t+jItbx4TgExZVTj8T0fdfrhx8Yn0w6zh87dvDH8MXi/I/tsInk6f
-	Di4TggQUoSiykVho/CAE2MvwgSYbtzYtxfhz5zWGWc=
-Received: from 19888972804$163.com ( [223.104.38.105] ) by
- ajax-webmail-wmsvr-40-116 (Coremail) ; Sun, 19 Jul 2026 13:37:45 +0800
- (CST)
-Date: Sun, 19 Jul 2026 13:37:45 +0800 (CST)
-From: "jiale yao" <19888972804@163.com>
-To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Cc: "Marcel Holtmann" <marcel@holtmann.org>, "Tim Bird" <tim.bird@sony.com>,
-	"Muhammad Bilal" <meatuni001@gmail.com>,
-	"Kees Cook" <kees@kernel.org>,
-	"Michael Bommarito" <michael.bommarito@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re:Re: [PATCH v2] Bluetooth: HIDP: add missing length check for
- incoming frames
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20260511(2e539873) Copyright (c) 2002-2026 www.mailtech.cn 163com
-In-Reply-To: <CABBYNZJdEjqd2eKmQNvPodvifnPgVvih5fnFf5sdA7Kpi7T19w@mail.gmail.com>
-References: <20260717153238.2002330-1-yaojiale02@163.com>
- <CABBYNZJdEjqd2eKmQNvPodvifnPgVvih5fnFf5sdA7Kpi7T19w@mail.gmail.com>
-X-NTES-SC: AL_Qu2TBviYtkwt4yOfbOkdm0kTgus9XsezvfQk3YBXc/wEtgLLxQcGZE5bEkDZ6uGOFiS2qCWcYiFM9vx4XatH+8IJdZoqG340ClQnNnWulg==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bgmli8w0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE74E1F000E9;
+	Sun, 19 Jul 2026 13:15:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784466935;
+	bh=lxCy6+4tgaC+do2rvc0+7V+EUsdw6w7kQ3US3qb8wy0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=bgmli8w0LfTMb84cf4Usv1oyZxqOEFetk7IgX+b/lMYq21NtFhpZJJAz7Oyifh3wy
+	 XPjiqrsUORQ9CKSnMkJJ6VVcg1hY4etT8P4vrZqviYWXehBYjvNZHb9WZA5kQemigU
+	 Y+1+AdeWWdLeiOR3EUZ5LUH+XAkYmwJc39uRNQDs/NU7fy05f5ZvMgW+Bb+wzo0ATO
+	 pQNdOzvTI11eegJuSAbbFJ5Ijlov59D/p8OgdpG25uXwjVZbU1XSuqYNUTTcBE8C1f
+	 g9dx0eQdmTn28gJR8uzEA/JeaATKUdjkkpifuH7o92ZNG+lcnwr9M59Fx3ENq7EaOX
+	 g/1MXbTONiJmA==
+Message-ID: <e48a3602-0871-4675-a80c-154d58ce7243@kernel.org>
+Date: Sun, 19 Jul 2026 15:15:31 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <220b6be5.d3f.19f78e165aa.Coremail.19888972804@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:dCgvCgDXfz6qYlxqh54gAA--.664W
-X-CM-SenderInfo: x1dryxhdohiji6rwjhhfrp/xtbCzgp0rmpcYqrgjwAA3P
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND] Bluetooth: hci_bcm4377: Use named initializers for
+ pci_device_id array
+To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig_=28The_Capable_Hub=29?=
+ <u.kleine-koenig@baylibre.com>, Janne Grunau <j@jannau.net>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Neal Gompa <neal@gompa.dev>, asahi@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260718172513.986134-2-u.kleine-koenig@baylibre.com>
+Content-Language: en-US
+From: Sven Peter <sven@kernel.org>
+In-Reply-To: <20260718172513.986134-2-u.kleine-koenig@baylibre.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-CgoKCgoKSW4gaGlkcF9yZWN2X2N0cmxfZnJhbWUoKSBhbmQgaGlkcF9yZWN2X2ludHJfZnJhbWUo
-KSwgc2tiLT5kYXRhWzBdIGlzCnJlYWQgd2l0aG91dCB2ZXJpZnlpbmcgdGhhdCBza2ItPmxlbiA+
-PSAxLiAgQSB6ZXJvLWxlbmd0aCBMMkNBUCBQRFUKZGVsaXZlcmVkIHZpYSB0aGUgSElEUCBjb250
-cm9sIG9yIGludGVycnVwdCBjaGFubmVsIGNhdXNlcyBhbgpvdXQtb2YtYm91bmRzIHJlYWQuCgpV
-c2Ugc2tiX3B1bGxfZGF0YShza2IsIDEpIHdoaWNoIGNvbWJpbmVzIHRoZSBsZW5ndGggY2hlY2sg
-YW5kIHB1bGwKaW4gb25lIG9wZXJhdGlvbiwgbWF0Y2hpbmcgdGhlIGV4aXN0aW5nIHBhdHRlcm4g
-aW4gaGlkcF9pbnB1dF9yZXBvcnQoKQphbmQgdGhlIGZpeCBpbiBjb21taXQgNjc3MGQzYThhY2Rm
-ICgiQmx1ZXRvb3RoOiBibmVwOiByZWplY3Qgc2hvcnQKZnJhbWVzIGJlZm9yZSBwYXJzaW5nIikg
-d2hpY2ggYWRkcmVzc2VkIHRoZSBzYW1lIGNsYXNzIG9mIGJ1ZyBpbiBCTkVQLgoKQXNzaXN0ZWQt
-Ynk6IENsYXVkZTpkZWVwc2Vlay12NC1wcm8KU2lnbmVkLW9mZi1ieTogSmlhbGUgWWFvIDx5YW9q
-aWFsZTAyQDE2My5jb20+Ci0tLQogbmV0L2JsdWV0b290aC9oaWRwL2NvcmUuYyB8IDIxICsrKysr
-KysrKysrKy0tLS0tLS0tLQogMSBmaWxlIGNoYW5nZWQsIDEyIGluc2VydGlvbnMoKyksIDkgZGVs
-ZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9oaWRwL2NvcmUuYyBiL25ldC9i
-bHVldG9vdGgvaGlkcC9jb3JlLmMKaW5kZXggMGUyNGM1ZTI5NTVlLi5iYjYxNjAyYjAyZTEgMTAw
-NjQ0Ci0tLSBhL25ldC9ibHVldG9vdGgvaGlkcC9jb3JlLmMKKysrIGIvbmV0L2JsdWV0b290aC9o
-aWRwL2NvcmUuYwpAQCAtNTYwLDE2ICs1NjAsMTggQEAgc3RhdGljIGludCBoaWRwX3Byb2Nlc3Nf
-ZGF0YShzdHJ1Y3QgaGlkcF9zZXNzaW9uICpzZXNzaW9uLCBzdHJ1Y3Qgc2tfYnVmZiAqc2tiLAog
-c3RhdGljIHZvaWQgaGlkcF9yZWN2X2N0cmxfZnJhbWUoc3RydWN0IGhpZHBfc2Vzc2lvbiAqc2Vz
-c2lvbiwKIAkJCQkJc3RydWN0IHNrX2J1ZmYgKnNrYikKIHsKLQl1bnNpZ25lZCBjaGFyIGhkciwg
-dHlwZSwgcGFyYW07CisJdW5zaWduZWQgY2hhciAqaGRyOworCXVuc2lnbmVkIGNoYXIgdHlwZSwg
-cGFyYW07CiAJaW50IGZyZWVfc2tiID0gMTsKIAogCUJUX0RCRygic2Vzc2lvbiAlcCBza2IgJXAg
-bGVuICV1Iiwgc2Vzc2lvbiwgc2tiLCBza2ItPmxlbik7CiAKLQloZHIgPSBza2ItPmRhdGFbMF07
-Ci0Jc2tiX3B1bGwoc2tiLCAxKTsKKwloZHIgPSBza2JfcHVsbF9kYXRhKHNrYiwgMSk7CisJaWYg
-KCFoZHIpCisJCXJldHVybjsKIAotCXR5cGUgPSBoZHIgJiBISURQX0hFQURFUl9UUkFOU19NQVNL
-OwotCXBhcmFtID0gaGRyICYgSElEUF9IRUFERVJfUEFSQU1fTUFTSzsKKwl0eXBlID0gKmhkciAm
-IEhJRFBfSEVBREVSX1RSQU5TX01BU0s7CisJcGFyYW0gPSAqaGRyICYgSElEUF9IRUFERVJfUEFS
-QU1fTUFTSzsKIAogCXN3aXRjaCAodHlwZSkgewogCWNhc2UgSElEUF9UUkFOU19IQU5EU0hBS0U6
-CkBAIC01OTcsMTQgKzU5OSwxNSBAQCBzdGF0aWMgdm9pZCBoaWRwX3JlY3ZfY3RybF9mcmFtZShz
-dHJ1Y3QgaGlkcF9zZXNzaW9uICpzZXNzaW9uLAogc3RhdGljIHZvaWQgaGlkcF9yZWN2X2ludHJf
-ZnJhbWUoc3RydWN0IGhpZHBfc2Vzc2lvbiAqc2Vzc2lvbiwKIAkJCQlzdHJ1Y3Qgc2tfYnVmZiAq
-c2tiKQogewotCXVuc2lnbmVkIGNoYXIgaGRyOworCXVuc2lnbmVkIGNoYXIgKmhkcjsKIAogCUJU
-X0RCRygic2Vzc2lvbiAlcCBza2IgJXAgbGVuICV1Iiwgc2Vzc2lvbiwgc2tiLCBza2ItPmxlbik7
-CiAKLQloZHIgPSBza2ItPmRhdGFbMF07Ci0Jc2tiX3B1bGwoc2tiLCAxKTsKKwloZHIgPSBza2Jf
-cHVsbF9kYXRhKHNrYiwgMSk7CisJaWYgKCFoZHIpCisJCXJldHVybjsKIAotCWlmIChoZHIgPT0g
-KEhJRFBfVFJBTlNfREFUQSB8IEhJRFBfREFUQV9SVFlQRV9JTlBVVCkpIHsKKwlpZiAoKmhkciA9
-PSAoSElEUF9UUkFOU19EQVRBIHwgSElEUF9EQVRBX1JUWVBFX0lOUFVUKSkgewogCQloaWRwX3Nl
-dF90aW1lcihzZXNzaW9uKTsKIAogCQlpZiAoc2Vzc2lvbi0+aW5wdXQpCi0tIAoyLjM0LjEKCgoK
-CgoKCgoKCgoKQXQgMjAyNi0wNy0xNyAyMzo0MDoxMSwgIkx1aXogQXVndXN0byB2b24gRGVudHoi
-IDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4gd3JvdGU6Cj5IaSwKPgo+T24gRnJpLCBKdWwgMTcsIDIw
-MjYgYXQgMTE6MzPigK9BTSBKaWFsZSBZYW8gPHlhb2ppYWxlMDJAMTYzLmNvbT4gd3JvdGU6Cj4+
-Cj4+IEluIGhpZHBfcmVjdl9jdHJsX2ZyYW1lKCkgYW5kIGhpZHBfcmVjdl9pbnRyX2ZyYW1lKCks
-IHNrYi0+ZGF0YVswXSBpcwo+PiByZWFkIHdpdGhvdXQgdmVyaWZ5aW5nIHRoYXQgc2tiLT5sZW4g
-Pj0gMS4gIEEgemVyby1sZW5ndGggTDJDQVAgUERVCj4+IGRlbGl2ZXJlZCB2aWEgdGhlIEhJRFAg
-Y29udHJvbCBvciBpbnRlcnJ1cHQgY2hhbm5lbCBjYXVzZXMgYW4KPj4gb3V0LW9mLWJvdW5kcyBy
-ZWFkLgo+Pgo+PiBBZGQgcHNrYl9tYXlfcHVsbChza2IsIDEpIGd1YXJkcyBiZWZvcmUgYm90aCBy
-ZWFkcywgbWF0Y2hpbmcgdGhlIGZpeAo+PiBpbiBjb21taXQgNjc3MGQzYThhY2RmICgiQmx1ZXRv
-b3RoOiBibmVwOiByZWplY3Qgc2hvcnQgZnJhbWVzIGJlZm9yZQo+PiBwYXJzaW5nIikgd2hpY2gg
-YWRkcmVzc2VkIHRoZSBzYW1lIGNsYXNzIG9mIGJ1ZyBpbiBCTkVQLgo+Pgo+PiBBc3Npc3RlZC1i
-eTogQ2xhdWRlOmRlZXBzZWVrLXY0LXBybwo+PiBTaWduZWQtb2ZmLWJ5OiBKaWFsZSBZYW8gPHlh
-b2ppYWxlMDJAMTYzLmNvbT4KPj4gLS0tCj4+ICBuZXQvYmx1ZXRvb3RoL2hpZHAvY29yZS5jIHwg
-NCArKysrCj4+ICAxIGZpbGUgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCspCj4+Cj4+IGRpZmYgLS1n
-aXQgYS9uZXQvYmx1ZXRvb3RoL2hpZHAvY29yZS5jIGIvbmV0L2JsdWV0b290aC9oaWRwL2NvcmUu
-Ywo+PiBpbmRleCAwZTI0YzVlMjk1NWUuLjZjN2RhOGFjYTczMiAxMDA2NDQKPj4gLS0tIGEvbmV0
-L2JsdWV0b290aC9oaWRwL2NvcmUuYwo+PiArKysgYi9uZXQvYmx1ZXRvb3RoL2hpZHAvY29yZS5j
-Cj4+IEBAIC01NjUsNiArNTY1LDggQEAgc3RhdGljIHZvaWQgaGlkcF9yZWN2X2N0cmxfZnJhbWUo
-c3RydWN0IGhpZHBfc2Vzc2lvbiAqc2Vzc2lvbiwKPj4KPj4gICAgICAgICBCVF9EQkcoInNlc3Np
-b24gJXAgc2tiICVwIGxlbiAldSIsIHNlc3Npb24sIHNrYiwgc2tiLT5sZW4pOwo+Pgo+PiArICAg
-ICAgIGlmICghcHNrYl9tYXlfcHVsbChza2IsIDEpKQo+PiArICAgICAgICAgICAgICAgcmV0dXJu
-Owo+Cj5XZSBjYW4gcHJvYmFibHkgcmVwbGFjZSB0aGlzIHdpdGggc2tiX3B1bGxfZGF0YS4KPgo+
-PiAgICAgICAgIGhkciA9IHNrYi0+ZGF0YVswXTsKPj4gICAgICAgICBza2JfcHVsbChza2IsIDEp
-Owo+Pgo+PiBAQCAtNjAxLDYgKzYwMyw4IEBAIHN0YXRpYyB2b2lkIGhpZHBfcmVjdl9pbnRyX2Zy
-YW1lKHN0cnVjdCBoaWRwX3Nlc3Npb24gKnNlc3Npb24sCj4+Cj4+ICAgICAgICAgQlRfREJHKCJz
-ZXNzaW9uICVwIHNrYiAlcCBsZW4gJXUiLCBzZXNzaW9uLCBza2IsIHNrYi0+bGVuKTsKPj4KPj4g
-KyAgICAgICBpZiAoIXBza2JfbWF5X3B1bGwoc2tiLCAxKSkKPj4gKyAgICAgICAgICAgICAgIHJl
-dHVybjsKPgo+RGl0dG8uCj4KPj4gICAgICAgICBoZHIgPSBza2ItPmRhdGFbMF07Cj4+ICAgICAg
-ICAgc2tiX3B1bGwoc2tiLCAxKTsKPj4KPj4gLS0KPj4gMi4zNC4xCj4+Cj4KPgo+LS0gCj5MdWl6
-IEF1Z3VzdG8gdm9uIERlbnR6Cg==
+
+
+On 7/18/26 19:25, Uwe Kleine-König (The Capable Hub) wrote:
+> Initializing a struct using list initializers is hard to read, compared
+> to that using named initializers is more ideomatic. Convert the macro
+> used to assign values in the driver's pci_device_id array accordingly.
+>
+> This change doesn't introduce any changes to the compiled array on an
+> x86 and an arm64 build.
+>
+> Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
+> ---
+
+Acked-by: Sven Peter <sven@kernel.org>
+
+
+Best,
+
+
+Sven
