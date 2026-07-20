@@ -1,102 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF293DB33F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 09:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B161230566F
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 09:51:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784540525; cv=none; b=g0Ez0qVPoOu6+D/UUogSH4REsy2pnmNkt0B6wZri0F6iXvARAu+4ImH+Co46XaHBEKtaMtmTPBZg3nDo2eiHEjzLrdoDd6JICAdTt6mJiH6HTe18/8RpTzhoz/jd66LAnhNVIh7AjeCgspq4D4q9RM9BFFN/SgCgQu5MFb95tIY=
+	t=1784541079; cv=none; b=VrfyD8jwJR+HrZD1Nv5UAS7xCju7kffBarrvS6Y5cnhMX6L50qTaLz4fLfN4wV/kObGDMC5GwCHNpE1nDdC4amz9JFZbAeyDjq2bFhmD27AFuFwtmsmMDRhsMMlgY5lWJ4hUgi+aoq25dCSsyRXHVm78A2WbNd2MsXIWaSYHCDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784540525; c=relaxed/simple;
-	bh=cdSHai9jLv/4HxW7mLiNCmQe/mk8KBtt5BbXAgO7Ky0=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fjfb9g7aeVH2jmTue/QOqJP8Lg+VXVO1cGRHTEayI7+L7qcEP+VqLITL3oBOgkW30gFOMblpLU+7iufBNMVMSgMqNwu46eY0ilpt6S8RO2h2YFT5aKY/FU3fTvl3WBAMSCOg2xKvGfIoex49cK18QGQ5fp3UTzyjx2wUgwcpbHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g+nN9/ek; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784541079; c=relaxed/simple;
+	bh=wcDxpxF3RjGyub+Kqd9fjk2xEnPpkgNzZJARdvb5sRA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=llsJfVRxqITpZSwWp1TuI5tV0vHJP2riHKxlzbbBaMhWTTum433y0kWfd3HxF3EITT6hXnTZd7RhNkQCs0lgK8KdI6hB/AIUzFdJ+1g7lRTFHOer4VLQDlqYjlYC3DU2isARp0qYaOcpLVRcqnAiruI2eoDN/PU+uYRQy/1w7WI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fpPM8Oe9; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g+nN9/ek"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A7AF1F000E9
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 09:42:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784540521;
-	bh=i2FAuja+iD4bf8uTMjY94rmQCaZe0DcJizI/mQ2EdHA=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=g+nN9/ekI21BG5tpqZ18Wp7ihyqa0KgtuVYAhlQh/j4W7bTIu4ijusrp03XioOcqZ
-	 ZY9+5k3nVTlW9RjeIhUnNnuAKch1xZwpGhwRYG40ncs90W8We5k8iaJjC5Q2oPvhLB
-	 LcEq6ItkcoXKxNTOsgN+SssbdMStsf9ZKsA+ekyudIiEoDFJ6797Ojf0Ezzllhzkhu
-	 Zs0VOE5JuolB4Tg94hMU1Dh2EHg97wk6uiJZwQtulU5ZBtXCPTnFCDlcuPyKpYI7yZ
-	 og9b5WFQbEiNE8n86vaWR7ejJbHujxl+q6jUOwLaqIOKos5oL8VKbB5gIm+YiRnj8R
-	 uFQ2AznwU1+vw==
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-39c953950dfso74805781fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 02:42:01 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Ro/Acdfjo2Uc14mczbP4t12ZSChThVSKu5JluAdoZ7DlojW00Xg4C0Nd50poqRZh2dfQvs4ruUIajTCOTDu2mc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeUO/T2T10N06Q0kdPuRFZKdU/xoI76mA8b62y1kv0tvFnOsKH
-	BTXZyC23u57UZWQLuQP39eaymQPeTq1cgaE1RxAKdEGywTGX1XrhHUCiI4nDugqtExTs5VX3v01
-	ivN4Sk5pdomNKHl6xycXM+QuitJP9R1iFdVfB9p+V7g==
-X-Received: by 2002:a05:6512:1543:20b0:5b0:1433:13b9 with SMTP id
- 2adb3069b0e04-5b28f880702mr1820033e87.25.1784540519853; Mon, 20 Jul 2026
- 02:41:59 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 20 Jul 2026 09:41:56 +0000
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 20 Jul 2026 09:41:56 +0000
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260717-fix_vendor-v1-1-f22263c1175b@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fpPM8Oe9"
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-c9e0b89e228so4220739a12.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 02:51:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784541078; x=1785145878; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=wcDxpxF3RjGyub+Kqd9fjk2xEnPpkgNzZJARdvb5sRA=;
+        b=fpPM8Oe9aMIRlDV4ZzjmCrL4xUbG5TIKntP4xJdGn7a/AVJz0pDrEekSpeppe+ib52
+         ABFMtrQixxMDOM1cSCu35RSwo7O5MmGBMGjtqLzMJbW00PsUwyEETxhWTNbUcw0Q92VH
+         9zjNYsocA+Y636tYZPqiWHNnAxmfXd1r9bz2TG6rlyhkPJrmL4IxnVjbY1j+HCZtr65J
+         7MBW6JVf4OeZqvkGJOztE46Mk7DZAlePBczVrg6Hmqfr7ouzZErSV7rJ0n7eYkxE/JiL
+         vcBHTJyIwvEDT7xjLCvZWF7Ipqak2/IMiUrzmBoUN2UiZOX0XhQm5vao09+RciFPbbuh
+         5uyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784541078; x=1785145878;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=wcDxpxF3RjGyub+Kqd9fjk2xEnPpkgNzZJARdvb5sRA=;
+        b=XLPKWSAELodbF1jB+jKYCy4W1EWU3nNeSgPLLE9hIT1u3RzM6+Jw6zoofZfkAlJaXh
+         uWoHSU8PNuJJN0BH71f4DCJlaVuxf1W/paQ3N+4Q3OznppH/mlF0K3lx8j6qaI5yvNw4
+         kyN4b/drVtFZcTekBWOKrg6t/aNxUfN1AZI5tSB4b9bkc2CB1G1BDlTXsIRS1BREVPXK
+         kO3qzgBDg+RqRELb2K20bur5khG5pPiOo6lMN41IsWFixl6fcOHh5nw3G61Eenz7banf
+         cwK8zji4F/OTMiNdD+3VCge1gRCWz58DUiAJv6ZWWByvCIVwPlg/v5h5asyiCssCLYe1
+         XOGw==
+X-Gm-Message-State: AOJu0YwMdDGUXZgZ1u79dZqaOz0T0gItfmNkMDQDHOzZdmoDDtSpGQsB
+	O4eVlfxJNFcsDyVhptlu6/ZFyIsf2N5FCl6hMvrKDVxcsUTbr72alVDUW5Bc8w==
+X-Gm-Gg: AfdE7ckhQDVtfhuiycAg0Hnj0Vb0mpckg/QA2/rPA+QVke9eETNJ/CPJvacwUZ3eOYI
+	VFvRj8NoxWw4W0yZd+2Q8j3UNK8Pt2tLjDwCTsPCgoRjMcYl9b1JcHDu4EfRh/zXEVdutJutt/f
+	qgCjMHyCFs/z7Fiut6ZAmNdV3CJPGVvJq+w6AJCv4cDlbi7+QIcvvdT6wE8M0Fzp8jO1N100oyu
+	GpXZR5VttE68JUpn7KFE2PHydxe/ida/nGHo2SiynHFAr7j8l2Xfx/gu3kmzUfCwcaqKScdithn
+	gQqXw6RGs9ipO0NRqKuYHebJlp0D3+NnA0yZee82soWVBMvCZQ0CWWih6k91FWm2XLCpUfdgB8R
+	jiuo2hNSBncZDQJM12wuVbkVRZtKpKHfODi5V7QzXaRZfY10hO3mjAzQm810igaQKgM4KaPhjX8
+	nLcDEscU1uOMs=
+X-Received: by 2002:a05:6300:95:b0:3bf:e2f1:1b08 with SMTP id adf61e73a8af0-3c3ad9717d4mr14159397637.40.1784541078009;
+        Mon, 20 Jul 2026 02:51:18 -0700 (PDT)
+Received: from [172.17.0.2] ([172.215.216.192])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3142a02b7f2sm34337175eec.13.2026.07.20.02.51.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jul 2026 02:51:17 -0700 (PDT)
+Message-ID: <6a5def95.6c5720b3.2da3b9.d724@mx.google.com>
+Date: Mon, 20 Jul 2026 02:51:17 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1657238816991117432=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260717-fix_vendor-v1-0-f22263c1175b@oss.qualcomm.com> <20260717-fix_vendor-v1-1-f22263c1175b@oss.qualcomm.com>
-Date: Mon, 20 Jul 2026 09:41:56 +0000
-X-Gmail-Original-Message-ID: <CAMRc=MfxahgQJJr-9KW1cbRuE4RY2nUP623FhvPqEeHgzHQrcg@mail.gmail.com>
-X-Gm-Features: AUfX_mw8qA2l6pq5MCOrr5SLPWlkhmKKcuyat-QX8j10xZuSC3L_eKGNN74WaoI
-Message-ID: <CAMRc=MfxahgQJJr-9KW1cbRuE4RY2nUP623FhvPqEeHgzHQrcg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] Bluetooth: hci_qca: Replace HCI_VENDOR_PKT usage with HCI_EV_VENDOR
-To: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Cc: Zijun Hu <zijun_hu@icloud.com>, linux-arm-msm@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <brgl@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, loic.poulain@oss.qualcomm.com
+Subject: RE: arm64: dts: monaco-arduino-monza: Add support for LGA WiFi/BT module
+In-Reply-To: <20260720-monza-wireless-v5-1-69ec6743543c@oss.qualcomm.com>
+References: <20260720-monza-wireless-v5-1-69ec6743543c@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Sat, 18 Jul 2026 00:08:53 +0200, Zijun Hu <zijun.hu@oss.qualcomm.com> said:
-> The macros below have different meanings even though they share the
-> same value 0xff:
->
->   HCI_VENDOR_PKT: HCI packet indicator or type
->   HCI_EV_VENDOR:  event code of a VSE
->
-> This usage of HCI_VENDOR_PKT is wrongly checking an event code.
->
-> Fix by using HCI_EV_VENDOR for event code.
-> Also fix warning "CHECK: Unnecessary parentheses around comparison"
-> given by checkpatch.pl.
->
-> Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
-> ---
->  drivers/bluetooth/hci_qca.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index bd29d422c209..f978087612ee 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1240,8 +1240,8 @@ static int qca_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
->  	 * received we store dump into a file before closing hci. This
->  	 * dump will help in triaging the issues.
->  	 */
-> -	if ((skb->data[0] == HCI_VENDOR_PKT) &&
-> -	    (get_unaligned_be16(skb->data + 2) == QCA_SSR_DUMP_HANDLE))
-> +	if (skb->data[0] == HCI_EV_VENDOR &&
-> +	    get_unaligned_be16(skb->data + 2) == QCA_SSR_DUMP_HANDLE)
->  		return qca_controller_memdump_event(hdev, skb);
->
->  	return hci_recv_frame(hdev, skb);
->
-> --
-> 2.34.1
->
->
+--===============1657238816991117432==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Acked-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+This is an automated email and please do not reply to this email.
+
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: drivers/power/sequencing/core.c:991
+error: drivers/power/sequencing/core.c: patch does not apply
+error: patch failed: include/linux/pwrseq/consumer.h:25
+error: include/linux/pwrseq/consumer.h: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1657238816991117432==--
