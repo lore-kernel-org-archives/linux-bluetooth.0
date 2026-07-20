@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AC723B52E2
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 19:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34103426687
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 19:40:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784576437; cv=none; b=LxrPuvJzVKrW0peY4JbhhcouGpGd8sGjcZ/25vRBV+m1XI6fpqRfULAOMmP66jN0mx5ebRQUTwijAhj1DJAG6hyYDIcSV8nmXlBmsXhJdhpCrg7XGUImqL+x+YGITEN+1tezaFloULzUImSqRlu0NNpeGUTQMkct9mjuje1neQc=
+	t=1784576438; cv=none; b=QY0J1L+MEQg0M4Sh89YR/i/GdjQ4iZVKhc7JO6gQf/2ujirTaSucf0cEdsgiKJ7P/sVCAn4HlvWOnGlmpJHoW9xfQiS8GSC7VQwU8piaTzvaL/XzpHK1o+07OqbR4zGpMTFWzATXYAGRbmgwegu/0Y8tO1XYrOegYqRxEEq/HMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784576437; c=relaxed/simple;
-	bh=VbIlYSbz0or3l2HRr3nyih/lq+3Fr1fZG5LUpaU/qJk=;
+	s=arc-20240116; t=1784576438; c=relaxed/simple;
+	bh=8r4BIA6JMmQow9I1j2T+53CYNTgK6UwyhXpl1GmDvvM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Tnozuht1ZjY+3qJDtzeCpX8iuAhum/DJtp/g9qv9LId0mIIiKLZXf1zhbZGiI5Bsiywwch3O+giGj7hh7GDG9nY9b6Csp3GQ9Qz+V9M48cgSCMORuq9yFmyjadF9pUo7pFtpclAGS8Nmyo29UwvMZ9LR6zaTE0a8QB/oe/TKsgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KRFvLLLP; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=VyvU6F49xCA2pEQsMkuIV0lVZmeNVUMVIUzoTF7xDH1sFP8xEepi9PWcJQBP4YGPowodVq06w3Qq97HwQptzmgV+uVKgWgwJ0ATAXQ3xCK+btjPNa4VWU4hfAzTkMEpVzOYijv6qfrMNBJ3VzFWoxabhCIxqb/ovgNCwNA6yadA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X5wgyQkr; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KRFvLLLP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A93091F000E9;
-	Mon, 20 Jul 2026 19:40:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X5wgyQkr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E52C71F00A3A;
+	Mon, 20 Jul 2026 19:40:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784576435;
-	bh=YiR00BPrWki7aRf1jWyJ4Ji/W3CxH3mEE58ELkhmcG4=;
+	s=k20260515; t=1784576436;
+	bh=msEuB3gPF6PwWlvejLR/2SiQn2qdF6cwOY83gkJxVms=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=KRFvLLLPA8DU/3p+GP0o9uYeu/K4an6R1BCVy7PiA0TZ3YTrIPsveKnmaBpeMq+w1
-	 B3LZdfkZzjeJ10LowgHid2esDGEOUhx+O4f/MHUb6VZ47vfjJSPJ82ZO9CrfB5eb0+
-	 jN+KBbkcugSJbLsyBHNlJBAkUTkKxL/sRRSXhrrYWYypIbaWApnZge5CpGLRrAbW3P
-	 5woeXvRMjjhh+uWdx6DczJJLRH4JSDU3E3UntaFr4kdVXJ3twUpDqtbq+ToEwUfoBc
-	 nYmv+H3spurfrVO6HhLn3SmjVIdECeg6n9a+DviokgpFXL+6uu47E8JdYt8HqNkfj1
-	 D/xM/mCvfcdxg==
+	b=X5wgyQkrjWAy/NGOF6ZIsJStfSRN9nzZHw7PdfUIrwmS6MSC5KvbUcTEkU8PtxgRl
+	 c+PDUm2SIQJat0yaJHsmlX+4EQ/JJR9yMtYwVaaQA8ESj/FXqMKkeHuFE9z0JT9/TS
+	 pyrQmoP83t7w/zEa2JDG0O7U+TJKx3O0jBGbr2C7ZifvTYO78N+7qRExfaVVSkir4y
+	 EOSRRnVWFtgLaM6W40Jzvu0Hy4jEY9xlhPxI/sWeDgX6fbr0bMjU1pGnSf1E/I7Jun
+	 1yKuGPSEd+ad1adQMync5UcnU1Tot/wNrJbKs/uLBy2rbj3dEj7+viUZLHWzWDKc+N
+	 sWuINK1aCa2Pw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198DD39244CA;
-	Mon, 20 Jul 2026 19:40:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 569E039244CA;
+	Mon, 20 Jul 2026 19:40:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,36 +37,38 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2] adapter: Infer BR/EDR only at public LE
- addresses
+Subject: Re: [PATCH BlueZ] policy: Connect profiles for bonded inbound ACL
+ connections
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178457640590.4136385.4018219369100632126.git-patchwork-notify@kernel.org>
-Date: Mon, 20 Jul 2026 19:40:05 +0000
-References: <20260717082347.8429-1-pip@pipobscure.com>
-In-Reply-To: <20260717082347.8429-1-pip@pipobscure.com>
-To: Philipp Dunkel <pip@pipobscure.com>
-Cc: linux-bluetooth@vger.kernel.org
+ <178457640714.4136385.3590514668103148608.git-patchwork-notify@kernel.org>
+Date: Mon, 20 Jul 2026 19:40:07 +0000
+References: <tencent_7E6A07CE6162892EDEFA29E082F2D2A8AE05@qq.com>
+In-Reply-To: <tencent_7E6A07CE6162892EDEFA29E082F2D2A8AE05@qq.com>
+To: Chengyi Zhao <chengyi.zhao@qq.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com,
+ marcel@holtmann.org, zhaochengyi@uniontech.com
 
 Hello:
 
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 17 Jul 2026 10:23:47 +0200 you wrote:
-> btd_adapter_device_found() records BR/EDR support for any LE device
-> whose advertising Flags lack "BR/EDR Not Supported" (EIR_BREDR_UNSUP).
-> The address type is not considered:
+On Thu, 16 Jul 2026 18:55:03 +0800 you wrote:
+> From: Chengyi Zhao <zhaochengyi@uniontech.com>
 > 
->     if (bdaddr_type != BDADDR_BREDR && eir_data.flags &&
->                     !(eir_data.flags & EIR_BREDR_UNSUP)) {
->             device_set_bredr_support(dev);
+> When a bonded device initiates an inbound ACL connection (e.g. after
+> resume, the remote wins the page race), BlueZ accepts the ACL link
+> but does not establish AVDTP/AVCTP profiles. The remote's subsequent
+> L2CAP connect for PSM 25 fails with "security block" because the link
+> is not yet encrypted, and the kernel does not retry. The ACL link
+> stays up with no audio.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,v2] adapter: Infer BR/EDR only at public LE addresses
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9965f36c6318
+  - [BlueZ] policy: Connect profiles for bonded inbound ACL connections
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f3f03d728542
 
 You are awesome, thank you!
 -- 
