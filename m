@@ -1,77 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C776539060A;
-	Mon, 20 Jul 2026 20:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2923C199A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 20:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784578844; cv=none; b=Ga4AxgLx/HkOApR5pwKjwVj1lqu0LFQXsN0Cj28pdmdmI72ZPjghwd34hzmMoFolqkbCeoTvx4TXJaDs39qXGu2oQSnNooVTHoKOkL99Szmq0kQwFl2+/NjuPVFwvI5EtcptpDzClxX/ddZxHBb0x5fq94wVL2JFqv5jfbMQu5w=
+	t=1784579264; cv=none; b=KBtesLbf13BhZKfIkFkC5vw4ygvukaY3zx8h3X+VZ0d4YNyAIjGTAANZOfbkOSZUmRa/RwsqgGxVNn6NtV38v4P12FzcbsWapwKajQ+SFhEFcuvYaJ9ylrx3nf1rFhngb6GX5YFGgQH0ucTxq6FbSH8uw4xe5hcb3X5fJvtsD+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784578844; c=relaxed/simple;
-	bh=Ba1J+CMd2ox1+61njIKXY1SgE6iMQIWZiYaGK4AdwxM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=F7slCoBKQN4H0EzJtuXBp0GHWpO9+WgIm+gGoCZXZmtlKRpIeiDoJ39cilkfBIsVHnHCnnNwUQsDmqb7KPjYu8G76ZvQQu3XK5ZilxQ0drfKP7QTuORMWF9KEGytZok58YW2pFEwZCC7NeZVqef4NOKIwg19ILv0GNrLC1Av5xY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IuQUIfmo; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784579264; c=relaxed/simple;
+	bh=3vWRgICfr5/gAXmmQ+urGJSR2dHXlt3i/JuOrsaF0io=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=MJI4cwTls8QTjbkZPevMHpvCK8TDhTLJJDAJZ+hUMDqW4U+JvW7p6C+IcArXJMLrz9tgvDPZDsEnT1QHkWhDTNyNMp0mU7+K4qiQSdL4fyRDMaKmevGEQ6O8lK+iPaq9b/sMf3RmimyiOSacC+Uhy6jxHky6+w0c4AS34jB6z5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PM9y+AnA; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IuQUIfmo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 711441F00A3A;
-	Mon, 20 Jul 2026 20:20:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784578842;
-	bh=8ksusWd6L1q0B1xnycc0Me636psjG/W11hwItRTC+qQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=IuQUIfmokuy9xK4Z5U+0kPwXHniwuBt0cdhED5MQokOBoiFqZfKoDxAQdmXL1dvIX
-	 MDmwPA6GO8grSdaVy4xM0Z3mm/gsF/XBZMBpakAqmmpYVyZDSxZO9+xp55FEBvBQE4
-	 lzkrFajkihPLs2JFW173nVJoVPBizEnzJokeF0XufS55pSLWeIaC8CCOMU1MnOabSe
-	 FlMXl+/SLND21vp/XBBpbYHVBq7XnmKRj7vZoDNiNqyXX5aV7XaHq8juRQ1o2ErThF
-	 PpZOZvdmeFt58k5AJoXmG7xOnbNC6BE3HOYHBb9dXX23/N7M2E60net5g75Eex6zsk
-	 FcjQ6volee03g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0B0B39244CA;
-	Mon, 20 Jul 2026 20:20:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PM9y+AnA"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2cf50c6f235so24711715ad.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 13:27:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784579260; x=1785184060; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=S+jKIufWltCAvyAdODHWXxApoaOSkMUwzm+74L2EY8s=;
+        b=PM9y+AnAdt3daO6ULpf53p0WCW00WoDtQM4CEpmaROmVra04d3kdJP22rCIGejZ256
+         71+WIumyI0okMxQ5WVsWpmw9I7GemXiU1H6xoZnz2FzbpjdzT9OYs7UlzGRFC5zInQYY
+         Ze9O7pG4F6vaFXDw4fBKBCwByvZ8ieHS4WKDOrJFdhtI6jK3Z6x/DfQ0blTbIjw4l83O
+         b7FPq7e+KtTIiqa8VKKo+CzoOImw93T0KmlWHnEGB+VpfrrtM7nanBkzYFfRfRh26Hql
+         pUzxiLYr/eNSKo0j+S4vg5s83NuMuSk2YCopzsyGJc/kcWU+IJ1TFyyI1N/UqU0VLjXX
+         aurg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784579260; x=1785184060;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=S+jKIufWltCAvyAdODHWXxApoaOSkMUwzm+74L2EY8s=;
+        b=m0ZH52zRz77DinRFW2ILSQ3hh8MkRqzeMQqCrw6jiZKX4bXBRj5RNip7I/aoXQabbT
+         IMYqF5cMCgQ8DAIZkoDh80p9FhUjqjKYo7N9M65DAyw1b1DNdddwvMK9eJbNV0EwoqR3
+         lrbUuFrc7ff54AqvVdzMtFZhqYlBf09AxvjfxgPvvvdScb7vot2+z7J7GoMi+4ivZLQQ
+         BWETL8iXjvZ95zP6ZRBp2dVg5IGVyTa29p7z8JB/TGHMVJXLNYaRGp8b1G6aO2xGZt6m
+         O02FKztvr5e7LrtrHH7OaWPw3TnassD5xqTL94SiiS4IZn7a7LU3VlvSDMSy3j8clr5a
+         6zSw==
+X-Gm-Message-State: AOJu0Yx23n32CHJQIxw4KPAR9Zh1WVeXUVLqWq4TvCmJT/GauH89/jxi
+	roiyvFsh1Y5IvHCqmXro6gnDx7/kpD/T5RdupbUt4LMST95IQIDACL8ffbgizA==
+X-Gm-Gg: AfdE7cnhH+/T3PMLIrPm+p7D3PB3sK5gCGWanxnWlMn4PJV46XywcWlIftc3/L3ezdl
+	SgwCGwow4kOsuifpT5ytF9j46JEnWX2VZY3iWi/k+a4NNiG/yU/QOxnJezpv+gIbN6s93gPKZo7
+	LoDmXSGiqpwd/lmWQoKjbGLZuU72+Uw8EewhmCWfAmME9PW6cFGA+H7ALmPAT1NibxTBS1G2J8h
+	LS40ugqXErbXIDCBHn+pdPoozWCyxPLAq/c/IFbi97BdIoylOLXowbs6aQhwft1yjGGyENFbdBj
+	V4AXiDX84sRR+Qwz9BP79Lhk1mq6DHjjpY7LOdFD2Yr8g7+IwmDfagKo21kPrPTyq4FmZ3wTtWH
+	pZtAR7wRwpujx1ScUv92Crcz1fxfbaNRwJsSnYKaBulJKZfo824j4vBDc+xBtnrdQ2VEomi+GF2
+	MySf9+miWX8jJyAa3Du54=
+X-Received: by 2002:a05:6a20:d52b:b0:3bf:e66f:2656 with SMTP id adf61e73a8af0-3c3ad9c717amr15709087637.55.1784579260166;
+        Mon, 20 Jul 2026 13:27:40 -0700 (PDT)
+Received: from [172.17.0.2] ([128.24.161.87])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13ce2cbb7c5sm33349324c88.10.2026.07.20.13.27.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jul 2026 13:27:39 -0700 (PDT)
+Message-ID: <6a5e84bb.d2cb4adc.ccd80.33a3@mx.google.com>
+Date: Mon, 20 Jul 2026 13:27:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8272079015865563103=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_sync: Protect UUID list traversal
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <178457881239.4151939.8896306930179003502.git-patchwork-notify@kernel.org>
-Date: Mon, 20 Jul 2026 20:20:12 +0000
-References: <20260719162427.2902105-1-nicoyip.dev@gmail.com>
-In-Reply-To: <20260719162427.2902105-1-nicoyip.dev@gmail.com>
-To: Chengfeng Ye <nicoyip.dev@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, doruk@0sec.ai
+Subject: RE: [v2] Bluetooth: btnxpuart: Fix out-of-bounds firmware read in nxp_recv_fw_req_v1()
+In-Reply-To: <20260720191322.14432-1-doruk@0sec.ai>
+References: <20260720191322.14432-1-doruk@0sec.ai>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hello:
+--===============8272079015865563103==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This is automated email and please do not reply to this email!
 
-On Mon, 20 Jul 2026 00:24:27 +0800 you wrote:
-> The hci_sync conversion moved class-of-device and EIR generation from an
-> HCI request built under hdev->lock to asynchronous command sync work.
-> The worker holds hdev->req_lock, but that lock does not serialize access
-> to hdev->uuids against add_uuid() and remove_uuid(), which update the
-> list under hdev->lock.
-> 
-> The following interleaving can therefore occur:
-> 
-> [...]
+Dear submitter,
 
-Here is the summary with links:
-  - Bluetooth: hci_sync: Protect UUID list traversal
-    https://git.kernel.org/bluetooth/bluetooth-next/c/9348bd469f56
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1131114
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.65 seconds
+VerifyFixes                   PASS      0.10 seconds
+VerifySignedoff               PASS      0.14 seconds
+GitLint                       FAIL      0.26 seconds
+SubjectPrefix                 PASS      0.09 seconds
+BuildKernel                   PASS      24.54 seconds
+CheckAllWarning               PASS      27.46 seconds
+CheckSparse                   PASS      26.13 seconds
+BuildKernel32                 PASS      24.39 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      451.97 seconds
+IncrementalBuild              PASS      24.16 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2] Bluetooth: btnxpuart: Fix out-of-bounds firmware read in nxp_recv_fw_req_v1()
+
+1: T1 Title exceeds max length (82>80): "[v2] Bluetooth: btnxpuart: Fix out-of-bounds firmware read in nxp_recv_fw_req_v1()"
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
 
 
+https://github.com/bluez/bluetooth-next/pull/466
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8272079015865563103==--
