@@ -1,235 +1,222 @@
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-42.smtp.github.com (out-42.smtp.github.com [192.30.252.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A101F38E12D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 19:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784577313; cv=pass; b=SO1eEksp2cUosHiixisiuI2JLsVPkt+3wMZb1YTK3s6y+JTmVoDwb5uPTNPuD+bYWr8TOj/bYZX6lvAK1xTo8sxVBtjcttZyBD6F/ScLOaasg14u2NARWk9OgaBej1shGWHpaW4/2FDkUeUYJkvmDZkz/y7M/NLEvTFCx+rqDz0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784577313; c=relaxed/simple;
-	bh=U6naqr8/fm2E7FQtlwL+QylvLk20pczaI7HxTKdFd5s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QEg9Vqnrl8hdREreoqOTefWW8OHpGXhZuTxjxPj53yMrGfSHmEX+GZxWVVYbD0Yb7b/Cgm0MgMVadlEprq3paPdUutUAO1Ft6HiSQ5H1zZ0qdKcXtwPfRWbLarsLX+GGNm328Hx8hQ4dTW26q+qL+XmxJpcIf30Q89QNcM5ZBOI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FWiRO74l; arc=pass smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8162FB97D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 19:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.141
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784577373; cv=none; b=FELXV1GwyfVJQQH7CZQbOXr7TTfMkqAJh7up9Eh7UIsWtGpQ4ehOpHjt/kRjMP83DizdMwcSvboEf102YuzywcFNU471vOWrjlZJNN05/p9c08pyv+KzULgJV7hnUcJl8CpJvs7dUMHoCQ6oVgRZK0wP4ESySIp0cUHf7Txodn0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784577373; c=relaxed/simple;
+	bh=+KxS+LULwMvnGrKTMN2H+Et3QQJNfxusAFhZob5+Fj0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=q5CYXxPjThbuMjatRex+BgSXoHQm9l1ITG/36btgJSIHmj+zEZWH3m4ijpD0gnwnn9oV997EgFYEyDeyJuZit4iPV14eaAyteC9steLnhGAHJbw3CnV+EE2OcBnvnd6L2F2fo06yCo/VafApeAj9/zjjH5ybgBgWgivwxUAbDSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=izF5iT55; arc=none smtp.client-ip=192.30.252.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FWiRO74l"
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-81e6f0b4610so110493187b3.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 12:55:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784577310; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Sfpu3E05slod7D5RwkjvxBEfrtkvk6yKUvHw0agsKbOGK72cXCfiEmIgoRrPxylafz
-         bDZmjhDVfCFF5gEOGNN/myZ07Flm9lBRf/dKPNOiXfVWsOD1st+kKZaTMp7BaO/sWwG5
-         +xeoHbAlAw/pAUtqpFLJJVhB8bR0gTyjfLw7eLwOyRQS0MOIBvJs7Fk/KcrJz8GVvIOn
-         4+BBFWyIYF4ZUybKaLEdnkWtKJRGwxs150xIf5L9k5mCXQegtFjLdl6ID8Woy3UnEq7j
-         YoXjhh+4ymI4Zko/y0LswdS60OIpYBvyTYZGqAQo90JEZ0m7NCpmFSdcN9dMi5YEknBX
-         4ocA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=/AOtXMyuIHsHhRfVMauZWyjtCTCZoSPj81jh5GgUwec=;
-        fh=UOCTs6jdHPlfzPKuNb51I6vQiCaMXSycb/FPhNl8YFI=;
-        b=NlDk7/AS6Mf6S5T4120LjjngWE0ZAJSAfN4ir4EEgfqosp12a1fveAsH369f1943Cl
-         oxlGV8FfTostCtPB87xgnyHdKcZtG2t1+XK8uzu5rsRZxIgOcSMT2ZsHfmf/zZCn3nCt
-         dxzVA/7ESN9hKFhxsiYNwLxIhnMYkR4VHnb3kUIS5pQDYMfvZop08KYR7LPjk7K+H4Lf
-         Tq+HupgvMg7dwQnf3wlkPn+6hMcmTnQ3b570WCTMyNXakuIyJJxwPo1vOCjNbshW9oMO
-         qzJD+Xy7cXPi+jSQZa9aEsJQmOGa6/kIsbafX9WdlnVomyeW3UnxSOfnKt1O8tHPACbq
-         3pxg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784577310; x=1785182110; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=/AOtXMyuIHsHhRfVMauZWyjtCTCZoSPj81jh5GgUwec=;
-        b=FWiRO74lhMxjxDk1LJhjl3w7DuNoRlmfDWqxJjJsyiAW+mnUhf87q+4lvWDg4O3VSc
-         aOtePuRrmshG1TQchNxYgQdGCfXDI44KT8/zjQ97KoxRiY/LA2EGFS0nevUhpuykRMe7
-         a25Ym9J4NvTzwF0zbg4mkSadvKPGdFb/MVQSZZDBxyoYDaxplhSQ2Ac5qL/s/aRslfAY
-         BrM75O5ZFKeRcty/fALGa9DKcpSptQmlQiStgF6t2Mv7jSQY5pqPy6ppqtssyhMGtorA
-         5MxkwDwEAHRCuWuLqS7iH802zev0FfHrjUgLOei9IjvyPN2Xp9wOgBFsn78BNBwIoQA1
-         kdmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784577310; x=1785182110;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=/AOtXMyuIHsHhRfVMauZWyjtCTCZoSPj81jh5GgUwec=;
-        b=JnuxxRkExpA6PhcatgCzpftwGBxKLq7XkCR8fKrmQoOdoBnf31RKCkP0am0ZuLYBaj
-         9CkAhxE1SziuFKXvzxWyjh8SboAKDKntGij/JYXEifF9rfY9WI6hWY7XZpUR7a5RUuNr
-         TcjqfhgrzCoQbP0bG/MgP1+3qd4mAXsLXp6u05NDkf5DFciAUqixEXATlWrGvZaYsTf5
-         TR3iUGp8wIEQl2AKGrvvqsggqQvR1u3etUARuXewb+4A5yvm9TEgxossWjQ15JczPl+E
-         Fm+dK/FLglQGEvTB+FSj5Lp3ZclZtqYRa4t/K8Joc99Bi5Ne/uCWn3aiiGxamq9qhg9T
-         0s/Q==
-X-Forwarded-Encrypted: i=1; AHgh+RojzwFNLFyXFhKrNa4mU6glGFkPcGVDWHS1/EGWP5wdejy5E2ZXiEZQc1mg1YKdiLLHvGmA41k/rUlfCfUn8XI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwO4gHR3qNU5ISSYPopbG604UHCTzDSQsYgjEQiME6nr42s7mg8
-	99TcU20CkRYF/hV80DwBsAULvgIFkU5i5da2+OcgEKq1vJDsKQ8AsjJ9nORhNy0EAoxp1aB6cxH
-	IQmN1DD+ZFYUhHdjDabDNLPYyRCWIZDiWGr8d9lPB+g==
-X-Gm-Gg: AR+sD11l71YnyNeMRQdcLy6tTPAvyxbCqbEf5xvW50skVOds4ykdVsBVToWvywPPaHB
-	XgmoSINgQQHYrX9ETbPAwqWVKFpufTWvLZIcLuagEdkhUhre/f7Y3OGX+esOwuW7mVepvCbENZb
-	UfO5ezWhXs4eG4m4eDVfWlbdSSOA9JWqdvebxrY9zrHGkasHrb9MIdf6kh2RMXje7/RIIUZC217
-	GWcXi5ox57mewkz1NB4E/1X11w6mdbJoXJVFUk4hrpTYzYGj8o5kVwWRqHMbWEheFvd9OK0afZK
-	d5wzIFwjs80CH3QVyWBlxqf8z6RU6e5jTNvZ0O8RIiEG1e2e
-X-Received: by 2002:a05:690c:6702:b0:81e:2e67:bb9b with SMTP id
- 00721157ae682-81ef26edccfmr47109007b3.58.1784577310290; Mon, 20 Jul 2026
- 12:55:10 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="izF5iT55"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1784577370;
+	bh=o3w0O33Tp8CgN8697Ci9a3meycAvTsNogXmemrZ8j6o=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=izF5iT55nL1lcGbufstlECh02fDqTEjnUDzLyvKMY0qxDWl2a4L2Ckdd/g0vy0tQg
+	 59vl7xjhbICleHTpUcbCI6iaOGV6wq3TnZjhellik2Q9mt/VZVBNfCVON9gYc5l7VC
+	 fsIcNodM8mdKqv+xirRbj6FaDPn752LunRxGHvEQ=
+Received: from github.com (hubbernetes-node-2dc1abb.ash1-iad.github.net [10.56.178.34])
+	by smtp.github.com (Postfix) with ESMTPA id 69D08841186
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 12:56:10 -0700 (PDT)
+Date: Mon, 20 Jul 2026 12:56:10 -0700
+From: uos-eng <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/efd216-f3f03d@github.com>
+Subject: [bluez/bluez] e00441: adapter: restrict delta=0 RSSI to proximity
+ filters
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260720164738.2921802-1-nicoyip.dev@gmail.com>
-In-Reply-To: <20260720164738.2921802-1-nicoyip.dev@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 20 Jul 2026 15:54:58 -0400
-X-Gm-Features: AUfX_mwx2tFRY0jR9aCJZGYE-cu6e-hrJK27ReHcPbzYy4X9ldy2V3BG6Q6JokQ
-Message-ID: <CABBYNZ+G3jD3A6-k1fEm2sSRa27o8s0PNN_arzVa8de-eJK8oQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_sync: Fix scan response data UAF
-To: Chengfeng Ye <nicoyip.dev@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi,
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: e004414a1751d29216ccab976d6c7174ec48d11c
+      https://github.com/bluez/bluez/commit/e004414a1751d29216ccab976d6c7174ec48d11c
+  Author: Xiuzhuo Shang <xiuzhuo.shang@oss.qualcomm.com>
+  Date:   2026-07-20 (Mon, 20 Jul 2026)
 
-On Mon, Jul 20, 2026 at 12:47=E2=80=AFPM Chengfeng Ye <nicoyip.dev@gmail.co=
-m> wrote:
->
-> eir_create_scan_rsp() calls hci_find_adv_instance(), whose return value i=
-s
-> valid only while hdev->lock is held.  After advertising setup was moved t=
-o
-> hci_cmd_sync_work, neither scan response data builder held that lock.
-> hci_set_ext_scan_rsp_data_sync() also kept the returned pointer while
-> waiting for the controller and wrote scan_rsp_changed through it afterwar=
-d.
->
-> An advertising termination event can therefore interleave as follows:
->
->   hci_cmd_sync_work                 hci_rx_work
->   hci_find_adv_instance()
->   __hci_cmd_sync_status()
->     wait for controller reply       hci_dev_lock()
->                                     hci_remove_adv_instance()
->                                       kfree(adv)
->   adv->scan_rsp_changed =3D false
->
-> KASAN reported:
->
->   BUG: KASAN: slab-use-after-free in hci_set_ext_scan_rsp_data_sync+0x2e1=
-/0x300
->   Write of size 1 at addr ffff88810a45d21d by task kworker/u17:0/88
->   Workqueue: hci0 hci_cmd_sync_work
->   Call Trace:
->    hci_set_ext_scan_rsp_data_sync+0x2e1/0x300
->    hci_schedule_adv_instance_sync+0x390/0x4c0
->    hci_cmd_sync_work+0x173/0x300
->   Allocated by task 87:
->    hci_add_adv_instance+0x538/0xac0
->    add_advertising+0x885/0x1160
->   Freed by task 89:
->    kfree+0x131/0x3c0
->    hci_remove_adv_instance+0x1d8/0x3b0
->    hci_le_ext_adv_term_evt+0x17b/0x730
->
-> Hold hdev->lock while looking up the instance, building the scan
-> response, and clearing its dirty bit.  Clear the bit before waiting for
-> the controller so no adv_info pointer survives the wait, and restore it
-> under the lock if the command fails.  This also preserves an update that
-> races with a successful command because that update sets the bit again.
-> Protect the legacy scan response builder with the same lock.
->
-> Fixes: cba6b758711c ("Bluetooth: hci_sync: Make use of hci_cmd_sync_queue=
- set 2")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Chengfeng Ye <nicoyip.dev@gmail.com>
-> ---
->  net/bluetooth/hci_sync.c | 32 +++++++++++++++++++++++++++-----
->  1 file changed, 27 insertions(+), 5 deletions(-)
->
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 532534bc601c..8c69a98c71e8 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -1490,9 +1490,13 @@ static int hci_set_ext_scan_rsp_data_sync(struct h=
-ci_dev *hdev, u8 instance)
->         int err;
->
->         if (instance) {
-> +               hci_dev_lock(hdev);
-> +
->                 adv =3D hci_find_adv_instance(hdev, instance);
-> -               if (!adv || !adv->scan_rsp_changed)
-> +               if (!adv || !adv->scan_rsp_changed) {
-> +                       hci_dev_unlock(hdev);
->                         return 0;
-> +               }
->         }
->
->         len =3D eir_create_scan_rsp(hdev, instance, pdu->data);
-> @@ -1502,15 +1506,27 @@ static int hci_set_ext_scan_rsp_data_sync(struct =
-hci_dev *hdev, u8 instance)
->         pdu->operation =3D LE_SET_ADV_DATA_OP_COMPLETE;
->         pdu->frag_pref =3D LE_SET_ADV_DATA_NO_FRAG;
->
-> +       if (adv) {
-> +               adv->scan_rsp_changed =3D false;
-> +               hci_dev_unlock(hdev);
-> +       }
-> +
->         err =3D __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_SCAN_RSP_DA=
-TA,
->                                     struct_size(pdu, data, len), pdu,
->                                     HCI_CMD_TIMEOUT);
-> -       if (err)
-> +       if (err) {
-> +               if (instance) {
-> +                       hci_dev_lock(hdev);
-> +                       adv =3D hci_find_adv_instance(hdev, instance);
-> +                       if (adv)
-> +                               adv->scan_rsp_changed =3D true;
-> +                       hci_dev_unlock(hdev);
-> +               }
-> +
->                 return err;
-> +       }
->
-> -       if (adv) {
-> -               adv->scan_rsp_changed =3D false;
-> -       } else {
-> +       if (!instance) {
->                 memcpy(hdev->scan_rsp_data, pdu->data, len);
->                 hdev->scan_rsp_data_len =3D len;
->         }
-> @@ -1525,8 +1541,14 @@ static int __hci_set_scan_rsp_data_sync(struct hci=
-_dev *hdev, u8 instance)
->
->         memset(&cp, 0, sizeof(cp));
->
-> +       if (instance)
-> +               hci_dev_lock(hdev);
-> +
->         len =3D eir_create_scan_rsp(hdev, instance, cp.data);
->
-> +       if (instance)
-> +               hci_dev_unlock(hdev);
-> +
->         if (hdev->scan_rsp_data_len =3D=3D len &&
->             !memcmp(cp.data, hdev->scan_rsp_data, len))
->                 return 0;
-> --
-> 2.43.0
+  Changed paths:
+    M src/adapter.c
 
-It looks like Sashiko found some other places where this could be a problem=
-:
+  Log Message:
+  -----------
+  adapter: restrict delta=0 RSSI to proximity filters
 
-https://sashiko.dev/#/patchset/20260720164738.2921802-1-nicoyip.dev%40gmail=
-.com
+When a discovery filter is active (filtered_discovery=true), BlueZ
+unconditionally calls device_set_rssi_with_delta(..., delta=0),
+causing every BLE advertisement to emit a PropertiesChanged(RSSI)
+signal regardless of whether the RSSI value changed.
 
---=20
-Luiz Augusto von Dentz
+delta=0 is only needed when a client has expressed explicit proximity
+interest by setting an RSSI or pathloss threshold in its discovery
+filter. Filters that specify only transport type or UUIDs do not
+require per-packet RSSI precision; for those, the standard
+RSSI_THRESHOLD=8 rate-limiting is both correct and desirable.
+
+The problem is triggered on dual-mode adapters by a transport-only
+filter (e.g. Transport=le). In merge_discovery_filters(), the
+transport-specific scan type (SCAN_TYPE_LE=6) does not equal the
+adapter scan type (SCAN_TYPE_DUAL=7), so has_filtered_discovery is
+set, filtered_discovery becomes true, and delta=0 is applied even
+though no proximity condition was requested. With hundreds of BLE
+devices advertising simultaneously this generates hundreds of
+unnecessary PropertiesChanged(RSSI) signals per second.
+
+Confirmed on QCS6490 (BlueZ 5.72) with Transport=le filter:
+
+  adapter.c: filtered_discovery=1 (current_discovery_filter=set)
+  device.c:  device_set_rssi_with_delta() rssi=-86 delta_threshold=0
+  device.c:  device_set_rssi_with_delta() rssi=-79 delta_threshold=0
+
+Add discovery_filter_has_proximity() which walks discovery_list and
+returns true only when at least one active filter carries a real
+proximity condition (rssi != DISTANCE_VAL_INVALID or pathloss !=
+DISTANCE_VAL_INVALID). Use this to gate the delta=0 path.
+
+Other filter fields (transport, uuids, duplicate, discoverable)
+express capability or content criteria and carry no proximity
+implication, so they are intentionally excluded from the check.
+
+
+  Commit: 004e1b5d245e2c3497780ab60b728cd0a9c14cf7
+      https://github.com/bluez/bluez/commit/004e1b5d245e2c3497780ab60b728cd0a9c14cf7
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2026-07-20 (Mon, 20 Jul 2026)
+
+  Changed paths:
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  test-runner: use virtio for the default kernel console
+
+Serial as console is slow when commands produce large amounts of output,
+e.g. for the -d debug option of the testers.
+
+Use virtio console=hvc0 as the console, requiring
+CONFIG_VIRTIO_CONSOLE=y which is already in tester config.
+
+For capturing the early boot messages, retain the qemu serial, kernel
+will switch to hvc0 during boot when the HVC driver initializes.
+
+For: time tools/test-runner -k ../../linux -- tools/sco-tester -d
+Before: real 0m32,094s, After: real 0m8,967s
+
+
+  Commit: 9965f36c6318e3a6f9879f5b0d842791a290e3ee
+      https://github.com/bluez/bluez/commit/9965f36c6318e3a6f9879f5b0d842791a290e3ee
+  Author: Philipp Dunkel <pip@pipobscure.com>
+  Date:   2026-07-20 (Mon, 20 Jul 2026)
+
+  Changed paths:
+    M src/adapter.c
+
+  Log Message:
+  -----------
+  adapter: Infer BR/EDR only at public LE addresses
+
+btd_adapter_device_found() records BR/EDR support for any LE device
+whose advertising Flags lack "BR/EDR Not Supported" (EIR_BREDR_UNSUP).
+The address type is not considered:
+
+    if (bdaddr_type != BDADDR_BREDR && eir_data.flags &&
+                    !(eir_data.flags & EIR_BREDR_UNSUP)) {
+            device_set_bredr_support(dev);
+
+When the advertisement uses a random address the device gets a BR/EDR
+bearer whose address is that random address, and start_discovery_cb()
+then prefers SDP over GATT:
+
+    if (device->bredr)
+            device_browse_sdp(device, NULL);
+    else
+            device_browse_gatt(device, NULL);
+
+SDP requires a BR/EDR ACL, so bluetoothd pages the random address. A
+random address is not a BD_ADDR and cannot be paged, so the attempt
+always ends in Page Timeout, and the failure tears down the working LE
+link:
+
+  connect_failed_callback() hci0 5A:B4:98:1F:CC:04 status 4
+  bonding_attempt_complete() hci0 bdaddr 5A:B4:98:1F:CC:04
+      type 0 status 0x4
+  device_bonding_complete() bonding (nil) status 0x04
+  browse_request_cancel()
+  btd_gatt_database_att_disconnected()
+
+Nothing requested the connection ("bonding (nil)") and the LE link was
+healthy. Any LE association that outlives the page timeout is killed by
+it; measured on one host, applications get about 4.7 s from connect
+before the link disappears, of which GATT discovery already takes 2.3 s.
+
+Current phones advertise Flags 0x1a (LE General Discoverable plus
+Simultaneous LE and BR/EDR, with BR/EDR Not Supported clear) from
+resolvable private addresses, so this triggers routinely rather than in
+some corner case.
+
+The Flags bits describe what the device supports. They do not promise
+that the address it is advertising from is a BD_ADDR. A dual-mode device
+uses the same Public Device Address for BR/EDR and LE, so the inference
+is sound only for BDADDR_LE_PUBLIC. Restrict it to that.
+
+The other two device_set_bredr_support() callers already require the
+device to have been seen over BR/EDR (bdaddr_type == BDADDR_BREDR), so
+they are unaffected. A device later seen over BR/EDR, or whose RPA is
+resolved to a public identity, still gets BR/EDR support recorded there.
+
+
+  Commit: f3f03d728542f76599385cf82348ba4f87264dcc
+      https://github.com/bluez/bluez/commit/f3f03d728542f76599385cf82348ba4f87264dcc
+  Author: Chengyi Zhao <zhaochengyi@uniontech.com>
+  Date:   2026-07-20 (Mon, 20 Jul 2026)
+
+  Changed paths:
+    M plugins/policy.c
+    M src/adapter.c
+    M src/adapter.h
+
+  Log Message:
+  -----------
+  policy: Connect profiles for bonded inbound ACL connections
+
+When a bonded device initiates an inbound ACL connection (e.g. after
+resume, the remote wins the page race), BlueZ accepts the ACL link
+but does not establish AVDTP/AVCTP profiles. The remote's subsequent
+L2CAP connect for PSM 25 fails with "security block" because the link
+is not yet encrypted, and the kernel does not retry. The ACL link
+stays up with no audio.
+
+Add btd_connect_cb callback infrastructure to the adapter core
+mirroring the existing btd_disconnect_cb pattern, invoked from
+connected_callback so it only fires on new MGMT_EV_DEVICE_CONNECTED
+events. Register a callback in the policy plugin that starts a
+2-second grace timer for bonded BR/EDR connections. If an audio
+profile connects naturally within the window the timer is cancelled;
+otherwise btd_device_connect_services is called as a fallback, but
+only if no audio profile is connected yet. The grace timer is also
+cancelled on disconnect to avoid racing with device removal.
+
+Outbound L2CAP is queued by the kernel until encryption completes,
+surviving the race. The fallback is safe when the host already won
+since btd_device_connect_services returns -EBUSY if a connection is
+already in progress.
+
+
+Compare: https://github.com/bluez/bluez/compare/efd216fe280b...f3f03d728542
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
