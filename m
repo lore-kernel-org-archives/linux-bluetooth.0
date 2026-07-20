@@ -1,131 +1,149 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B255B42BC33
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 14:09:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43627429015
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 14:10:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.182
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784556560; cv=pass; b=iGMz7rNU51lH1Cn3C7ii5VJ9dDInD9iebPU0zEnCPAPJUTL+H34L3dj7NjeA0bRE3HRco/tjrrkf+bVHnsCfShzLv0aH5vRLmKak32BoGD6oOm1T/ni8CKFNOqL6S7I/venjJzZWy2+nXUo592oZ1SBKHJbs3KP+VVQywpnMeSw=
+	t=1784556652; cv=pass; b=a/Og86P6bbY24VBwkuQK8ljbRJ/zL+Qf3gFV+9YQ/R0hEtoZctqvHYmDKrI5EsD49EoBFQWvOLxhuGZMjaA7rTitpwkvDrLHwAMdtSsj3lJxAEdoNGNMrqJeh2/C05S/0s6sNkAzquDoHepExUF6y+rB1uaQ/fyDeM5scGQcM4A=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784556560; c=relaxed/simple;
-	bh=qd8/hFAc25E6jb48eCE2wh92eWpaePh+UbVqhSUI1UI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VzBjRpTq4P61Bi0QUHfrnYPgFg6XX42jSJPz2g4OUC+zzyI6oLorJ/RReSsu9O2wxEsLuzbVnwE2j/qQ864i+Kwl+kDk62vts9hXrA7Ablrth4Kj6qxVAy+EBzpP915IS7l46QWHoNIyqfAiURXBQawzDw5yjCbf7QapF1S4A8k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=lhFPJmT8; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	s=arc-20240116; t=1784556652; c=relaxed/simple;
+	bh=U2EA2MB3ae9KEadk4B+b3u7NLWMnRQ4hRKtTinDQ0hE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dZAIn0/VwJHYGsN8UF4hMwO3tqbKkM64r3vt1mA9I2VDYy1mLm0lNsaPpXBofUSvPBKfNBpcahaJjiyO6IcsnmnkLynSSlbzWuz0rp8HO8u5i7k7Y2V1oT/IpXtjdUOj3OP4YWbtwV7ekaNJVV2NJAGCwHNiOxz6/UnVz6xeTO0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I6J3g6So; arc=pass smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="lhFPJmT8"
-Received: from monolith.lan (unknown [193.138.7.138])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4h3j743YRXz4BKKr;
-	Mon, 20 Jul 2026 17:09:04 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1784556544;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+hgpM/hGdQHfE0tGkN2IERguQSmxZWIxPbGqCtMeGbs=;
-	b=lhFPJmT8lnJpDEQLjIaZ8/EP8GMcsZdM1j5aYSsIA/gA4O2Kouo6xBgMh5lNhdpkAiV5GP
-	gxyMSC9SlrBEeiFzomsaua6hjidk/NpmFrcMk8uyCJT4m0Bvz2aJ1PhH9XSVMf8IGsDg//
-	sea15PtwkLkPQ4LwQvFaWJeJDDElPHORVCKoNBRxma3bGWe4Injd3RA1QZURKinU3drx0A
-	cmVVoivX4Pr8/JkEoruUFJKckNtePsHWq+vJIhNDqoo6OHcENj3wJQa6YxR2sR2mm9PNbz
-	GEk0Wxyjg5xswdjkcMhI+JIRMOGvvSKmpdPcsblh0wW/WKMt6XOkXoRg2WW6Tw==
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1784556544;
-	b=tbqGglZrGRVCL8aepMeYicIqFeXWjxOXdfiQgHXqx8NrwehIHwyt5jFFcW+BoJSw2aQRFn
-	GMOozSCZTOaxHLg/CZAvwAlLUWlfiCiSJGYq+ghFcJk6wYqEtXBZbHmAn0uersM8S6oRSD
-	DU40OyFToqP7CElAKXTd6imsde9gUvEY/0aRsXq3MuCXTH0TtnbW19f4oTpo8XnjbxhCES
-	4Brcs8KkfEO+MtonK50DGybvaffxRrXrI2KWv6D3qG/SDW0G6CeGjaF32IVtuya0oDq0eB
-	2u1WE7jbM2ZmUPyMjBCa2Q5OZzElWUroLZdt0F5sx4/aW18LXIXxXLysq7/Iig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1784556544;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+hgpM/hGdQHfE0tGkN2IERguQSmxZWIxPbGqCtMeGbs=;
-	b=WDQHb1HvJntpC6mk3riDfmk6W2EVYg0O+MnuLR7pMbRB5bYqVh4z0QKiTgj2dhVPNCuxnU
-	MAoJkpr4cP04n70gZk8dlIYT5puOudw82fk/j/kN8oGpeXYxnRmDnruaaVb0HopWXLtpU4
-	MF+ryIAc7Vz7BJt82d56S1+SQgi+lXRLuOzQnTSbv2VTJet8czbr8qsgSKdhuUzMDuEf7r
-	tH3tZMPuS4E+x6ZNOzSK3j4VwJMbZQAm8Y5KqC2yQp9iFvqC5+MrWD9V0fWHgSQLjH+BjE
-	R5JFuYKz3oWHwUJNNJUPeKFhMscz/uadfJcAfREk5cDXT3Wqoj+dqPfuYEEFvw==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] test-runner: use virtio for the default kernel console
-Date: Mon, 20 Jul 2026 17:09:01 +0300
-Message-ID: <e71384747c71a2fa0db585acdb727f324161d1b8.1784554811.git.pav@iki.fi>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I6J3g6So"
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-80a123ef90aso55925967b3.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 07:10:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784556650; cv=none;
+        d=google.com; s=arc-20260327;
+        b=M0wXLa/FS33iusxk2FoEIzf2l1yEk8dTAEDZToeNAr8t7LBQRYam9KAlvOpCMb33rQ
+         b4ry85LvHFn+LGo45ITVjgIVuKB4ohvuFXaqoGhkXQx95pf5shTnxfMM45Iu1rdQnMKO
+         KUbDSulmYKi0YhTSJb6GMHCFvgRiJYINbxPVNnIqaYxt4FExoX1Ab7iAnhXulEqJn+p4
+         pcy879iUGG7EVFrMxUKTBlzugi023GvC8WkRMQn7r/bFXMpu/czgbU4jk+we28BFATqR
+         SDge40b6/LoKZug1aVjfXYHlLWBwWjUhhsXN1N6B3HhRWvS+uBTXA6JHXxh0dem6aA7j
+         km4A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=inHJwBwNfOgxc+TrPzs6N4XULVKjX0Qf1MYheYO3L0g=;
+        fh=o0nTRqLI4TQ8eMTT3c6p2UQ23PD7jlumF6oGp1uTkWg=;
+        b=h/4yrtTX4uYzJ7Fqu87BgjB64ib+RXHTCe5FhU+2aa0XWrPWGGspBOypJvTv2T4wcz
+         KnIbFm9XlV7GUjCXX8mtrpTziodMCgVY2r8TvOOTSePJeiVlx1VlgA0O9PiPq/GGPIPk
+         Qxv1IDtGGeQZguF3NRa7hepTqb5BQ35ENJIN8VuxY0ysTbNfXyFFlkpAHWNvd76NGSMh
+         b+0Rj0Sukk5yu+mSU5HrTr9YsQ4KQsdDSkLY7Jn9lJEBDt9OVH3dbGEEMTef1ZPeF92/
+         FCRzIE+ypUqawHdYH+dYOZQ4ZevUDXZErzRZ0MMWhsqG6AHhx6REeb1IXyBzEeBp9OL7
+         lHRw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784556650; x=1785161450; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=inHJwBwNfOgxc+TrPzs6N4XULVKjX0Qf1MYheYO3L0g=;
+        b=I6J3g6SoExvNjSaWpnSDw1vvJ+QQv+ioazwF9nkL2UhO8HQ7Izz46Oere1Z+I5q6Yc
+         djznP4FbxX0B2ZXTE7wjo7eTt5BYXpk12alUDcOwhOfV0jR6du3otMBnsmmNnzl2y3R4
+         8KahLA4grHCSVetmvsGk67ujTzQr8+SjA88/2W5gv/oOwbIo0Uvk4yRWqWirpjIpEWFU
+         d0cST22OcZ1288vCyNpNPgoR1fthrRs0XSE1yK6W3rH4/azpS2cL/ugCVb4LNNK0xqvx
+         5mo7FIRPALZFS1HUKmB6/qen5AkecTFAXQv31w2TGFbcLucVhRcyBuMTjtjzkSVF8KtA
+         UO4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784556650; x=1785161450;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=inHJwBwNfOgxc+TrPzs6N4XULVKjX0Qf1MYheYO3L0g=;
+        b=jZC3GTZG1Zl9JGD8F74OZALH+7bzotmOQ8QVbVsfxzJhxCedfOyvB0Pkh/PvnjurX/
+         75HaZev8uCcN269UcqbZDJVlDSXPls+5JVZZeRNJuYbaO2Zvri8df2pTLRStrP8rb4XO
+         QCMZ29FHVVCH2Zkn1xeHs/hhdIceHPAnksqa0HIz10syhNwcfnVbKaepdJlmE7CMv7ZV
+         tXQyGHP7BphyFAcUd/GpGe0o882B/T+TJlLu3SBuAXoBep1WA00SKhjwF84gAZLXz6Kd
+         yucD2jAHCzntD7AMTX96/dunNQUXEvOV5pW8brJiJ+5y2GiJ+CxaaGzOE56p4yw1CQ8P
+         5djA==
+X-Forwarded-Encrypted: i=1; AHgh+Rphneu8jGKOTy1ehsEFmXToxFdZfUdf1U1CUb4+dfUeaAKpDIHmuyiI0lAqbDzXeJdStf5zeHLP3PJazvstKeE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlHNZa9odOs2+2q88UVUqj6SUEWKQreEOPKWNoFHGZm1QxNzKE
+	59TDYWbeDMlPrLZ1EL/ghUQ1k3eVEOPTY3U+r3XG8mgmYb6h8wdxcedet9ZtFw3Xw9IhtsrCUD+
+	EhaKuU9CC9qO3nxf4jybEJaWidH1TrGU=
+X-Gm-Gg: AR+sD113cujID49NfRxDyuM90WYVwAvVmylIhqtvk3kdG6QAYtzgDPEkWFsB+JO3cwI
+	2IewwDz5nJ5ZOCwLGygkrGdIhYMgmCtTzPqRxtOa+X+QJcC8vxQIAC5L39C/UHfrii4K6lav3hj
+	ZzUIEH0ls7YW6N0KQeA84EzlMRbcHbBPNM2AIE1vl6J3BrkwyNywPyrldiNqYA733QnWoexQQxe
+	z8r81+C58pbM0Io4hiIvEgNXpgFZ7/IOBGWfi4CcRd2PE+hu6HAo/G/sFDHhv097Bm/7No3svFV
+	v+RRjq3YI2JqSagtL/VzXitxatCPhxWgzfNED3PTuWZ4DQeA034qBhE1
+X-Received: by 2002:a05:690c:4983:b0:80c:16ad:2f16 with SMTP id
+ 00721157ae682-81ef1499635mr42679007b3.8.1784556649975; Mon, 20 Jul 2026
+ 07:10:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260719-vendor_hci-v1-0-df2ac5a50117@oss.qualcomm.com> <20260719-vendor_hci-v1-2-df2ac5a50117@oss.qualcomm.com>
+In-Reply-To: <20260719-vendor_hci-v1-2-df2ac5a50117@oss.qualcomm.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 20 Jul 2026 10:10:37 -0400
+X-Gm-Features: AUfX_mwC55okHxqYZHA2Rdh8HYzyPyK9rxSw5iZYAhSWVf65kWBSV_lXRnyxwbc
+Message-ID: <CABBYNZK0RSZ6xOgkx=wcme9kUWXFHydAvHR+EXwkp4eJwp-QKw@mail.gmail.com>
+Subject: Re: [PATCH bluez RFC 2/3] doc: hci-protocol: Add sock option
+ BT_RCV_VENDOR_PKT for HCI_CHANNEL_USER
+To: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Zijun Hu <zijun_hu@icloud.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Serial as console is slow when commands produce large amounts of output,
-e.g. for the -d debug option of the testers.
+Hi,
 
-Use virtio console=hvc0 as the console, requiring
-CONFIG_VIRTIO_CONSOLE=y which is already in tester config.
+On Mon, Jul 20, 2026 at 1:41=E2=80=AFAM Zijun Hu <zijun.hu@oss.qualcomm.com=
+> wrote:
+>
+> BT_RCV_VENDOR_PKT was introduced to support vendor HCI frame.
+> ---
+>  doc/hci-protocol.rst | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+>
+> diff --git a/doc/hci-protocol.rst b/doc/hci-protocol.rst
+> index db10b35df736..91cbc5b65a78 100644
+> --- a/doc/hci-protocol.rst
+> +++ b/doc/hci-protocol.rst
+> @@ -136,6 +136,24 @@ Example:
+>      len =3D sizeof(mtu);
+>      err =3D getsockopt(sock, SOL_BLUETOOTH, BT_RCVMTU, &mtu, &len);
+>
+> +BT_RCV_VENDOR_PKT (since Linux 7.3)
+> +-----------------------------------
+> +
+> +Enable receiving vendor HCI frames, requires hci_channel to be set to
+> +HCI_CHANNEL_USER.
+> +
+> +Default is disabled.
+> +
+> +Example:
+> +
+> +.. code-block::
+> +
+> +    int enable =3D 1;
+> +    int err;
+> +
+> +    err =3D setsockopt(fd, SOL_BLUETOOTH, BT_RCV_VENDOR_PKT, &enable,
+> +                                                    sizeof(enable));
+> +
 
-For capturing the early boot messages, retain the qemu serial, kernel
-will switch to hvc0 during boot when the HVC driver initializes.
+I don't think we have any socket option with this name, besides this
+should really go as an HCI packet with an H4 header set accordingly.
 
-For: time tools/test-runner -k ../../linux -- tools/sco-tester -d
-Before: real 0m32,094s, After: real 0m8,967s
----
- tools/test-runner.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+>  RESOURCES
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>
+> --
+> 2.34.1
+>
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 0e3bfb8b7..4617afc63 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -238,6 +238,8 @@ static char *const qemu_argv[] = {
- 	"-device", "virtio-9p-pci,fsdev=fsdev-root,mount_tag=/dev/root",
- 	"-chardev", "stdio,id=con,mux=on",
- 	"-serial", "chardev:con",
-+	"-device", "virtio-serial",
-+	"-device", "virtconsole,chardev=con,name=console.0",
- 	NULL
- };
- 
-@@ -291,7 +293,7 @@ static void start_qemu(void)
- 	}
- 
- 	snprintf(cmdline, sizeof(cmdline),
--				"console=ttyS0,115200n8 earlyprintk=serial "
-+				"console=hvc0 earlyprintk=serial "
- 				"no_hash_pointers=1 rootfstype=9p "
- 				"rootflags=trans=virtio,version=9p2000.u "
- 				"acpi=off pci=noacpi noapic quiet ro init=%s "
-@@ -330,11 +332,6 @@ static void start_qemu(void)
- 	argv[pos++] = "-append";
- 	argv[pos++] = (char *) cmdline;
- 
--	if (num_devs) {
--		argv[pos++] = "-device";
--		argv[pos++] = "virtio-serial";
--	}
--
- 	for (i = 0; i < num_devs; i++) {
- 		char *chrdev, *serdev;
- 
-@@ -915,7 +912,7 @@ static void run_command(char *cmdname, char *home)
- 	}
- 
- 	if (num_devs) {
--		const char *node = "/dev/hvc0";
-+		const char *node = "/dev/hvc1";
- 		unsigned int basic_flags, extra_flags;
- 
- 		printf("Attaching BR/EDR controller to %s\n", node);
--- 
-2.55.0
 
+--=20
+Luiz Augusto von Dentz
