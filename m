@@ -1,148 +1,167 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B81D2434E32
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 16:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784566082; cv=none; b=YpXjYQTkkq8MmyuWLDvr/1cSUP4MX/jfCcP0oki/qvUoW9DS/J4lTn/EBJni8OSt6U5s6FUIFdB4bBYx9S2BHfLxF0WE9dMSbRd+QOYiYI1r7bEUFgqXCqm7lONL8vyjtowIbItgK3u9c8nHdk+w1YqHKNfIP/raR6k0UVvLi2w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784566082; c=relaxed/simple;
-	bh=Fo1yVQcggw8huR8L4shf7TzbIP9fIBsb+NnC/nn5i/Y=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ly+FxGd7lKTUa5AhNTnw4r4TPiEmp9jrGm7rJH8F3nx/ZmHy3a4W/C5UATLBTUWDIExo7YviaawmKi64QYuzlxaOTnUwNNI53tO7px5iyGI5UAPBVZ4vTcu89rEe9Tk4kAiKL6aU83VZ+osWFUINWYoB/7STi9Pj93z+OGX4A3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sIPItpMv; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53CDD43E9F4
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 18:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784572027; cv=pass; b=HG6tQ3ke2j8lTAcIyEqS8kKxkaTOHoop6RCGcYXJRh34lTXWUl1tXzrQDGcmBlmYgfkJfJzRoy/ORjzy6hwdXGXbnMeDbxn9KJdDmsbdsMN2gpSkr9VDXyKLt15mEDcJ/k2wlQK9wnotkk0+BZtEExxqB3ANk0yC/AKs38b/VZI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784572027; c=relaxed/simple;
+	bh=IIpyl12pOaBLck7yxz0NeEKH4cSOt54AR4xNXObnwyM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AAIAdK7xOfFD4hvTPl/FrOIfVydNnFtmV+SRd/nRQ3YizFYjZlyX3QKOJ+IJEs65QpgRqD0iRDKK8E37rXrkmB79M8KRb95QL00axyJ+Gjs6P7Wub+5tskIbGQ20vwtXbroHEagUB2qgL0ZP5rFxD8I3aZE9VZMe4ZYvf4+15yg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=KfYTkNeW; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sIPItpMv"
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c9e7391839cso6329886a12.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 09:48:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784566081; x=1785170881; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=NNRsbityB11daGf6l3cxtEsdSRSDKD9+mz/w3nBtt78=;
-        b=sIPItpMvSGWLWbvwaKsOiRlD3V0O075Eh94vsyyLukJNJC040Uqsabu+pgpIiy9i5x
-         Hy9Fr3NIsJ3AfTaBM/u+e2+U8Q48ON49O0kdVGztQVw4yoiow3Dhs6fTeVZN23IReaPs
-         sPJJCA0y6/AJ4h9gqhjGAxmhIh3P72ewMsYhwT6aR1ICLNsNv85UIXbni28027iQv4Ll
-         KFdXMyvkjZ9qme/01HKK/eTpRaENM5SU5LjTAOShaVJdYRBaO+K4gF2Ti0KasBCQgzLr
-         N76OANz/IGNPmpdbxRqGwduH4thdaNgWPmBWOIqcvySzBB7H2uITJDZKzcuODCztb0p+
-         IKgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784566081; x=1785170881;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=NNRsbityB11daGf6l3cxtEsdSRSDKD9+mz/w3nBtt78=;
-        b=FSRlvWXhkMroebtVRCkf+HDFuUMn7SA1A0nRhKnXdJLFlI6fdrazsLtDbTje3zUDkS
-         h5reFFlTuOyFFoz72t2Al/J6q4Y4WTplu9MCrgnXwLjIet6CfHWNy8qq/7Ga760ByDYv
-         q3dDpoZMPa0ouemqSXtUDZcAYSFXtKQzJ5g6xVDAG5aRzpTukcZ5xM2og1dXT3Jl7zVL
-         9GUw8cZ0GRG/iNwCVxVK6aBoldItqmXdG3iiehUDzDm85eKW3DJljTulI8eFq+A6Fw/y
-         ctp+1hggtzgS/TZOFqx8LY2ig4J7G2QBk40hpgxOTZdt7D4AhkXnmexVHKRAiBm/x8Fi
-         +x3Q==
-X-Gm-Message-State: AOJu0YxX/Pui4P/jUm0Rx1LuoFot1KQ1eunKVzjxLb/Q/t5Zr7KS3wlZ
-	XMjscT7w84o5XqkjLtj0Zog3tprdidecvoDsD8ENjsdV0R89M+PtDJj2krcKpw==
-X-Gm-Gg: AfdE7ck7PFQ3LnpQSWR+b3piARNhVd7G+voLNNWHE+ezo+LbWqjh/GXcGNazFzae5Ae
-	GIcsm+naC5NyxOXTLi3bF1kGT/Z2vFVqC6cGSFGZtq+Kaee34+6w6z+eZKCldOs4i1Bcmgac9t0
-	yflftsr48rZLS6kMF3dbxCp+l70mhQ8giJyTLpk7APSdR+N+TG4fe67cvlnA5lX/yP7Z1yg2KLl
-	NXnLwA+xi/IaCEO6zYXT2zs3Ui8lCLh/lpWm/TQiZO6vP7JcJGauJZITxr7Zk8wWzYZJFX7ji8t
-	yr3kKUOt1QNE6YbF5ZL+hCjykN9akmXNryWxOrY6bo/9rP6FTAUgTRMOS2AV8XZZoMJJCCf+sZQ
-	6P6W66XZTp1b4Mugs/UtywmnZ2CL4VCvdR9T0IcxkHsXPc77qxVi3CgotJyOmlO7wI/T3wUbnvv
-	mFEOCiTCoO
-X-Received: by 2002:a05:6a21:4a97:b0:3c3:64cb:9b99 with SMTP id adf61e73a8af0-3c3ad5ff39dmr17558858637.6.1784566080913;
-        Mon, 20 Jul 2026 09:48:00 -0700 (PDT)
-Received: from [172.17.0.2] ([52.250.243.36])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31429f9d439sm45536746eec.5.2026.07.20.09.48.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jul 2026 09:48:00 -0700 (PDT)
-Message-ID: <6a5e5140.743400b0.23a7b2.c05b@mx.google.com>
-Date: Mon, 20 Jul 2026 09:48:00 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6295401824228557050=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="KfYTkNeW"
+Received: from monolith.lan (unknown [185.77.218.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4h3prk4B5kzyVG;
+	Mon, 20 Jul 2026 21:27:02 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1784572023;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=4UaVitcOJZOADeR1aUmdoJGY7DMYs2LE5zrtcTl69DE=;
+	b=KfYTkNeWczgnKbZx16OXfGEFQKHtQsY0PYjQJ6/kF4woFY/YpT8gv3OjC+erkheJnhGb/C
+	bTnwVcjuQHLxd7JIOISupPL7RxGbnlc/xP47WF0aM2COq307nSNSZsy4ukq0HOxUtnvhl4
+	Euo5SCRx416E8XoG943jXS9HG0YQNqU=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1784572023;
+	b=UT20mBJuGR3WRwaJINlE6YrOXK5cIRP8ym+5WaotDRDYRPb5LUqoS8C8yFQABnT1IzxCKD
+	H66E9f9PVCQIuaWTAYrVao8tuzetOIt4l0imTXpSLPmNVBT5XeGWu+i3DoVvnITPjUuoXQ
+	pTyMXzoYE8bSxOM6GeSRYnI/+ylFT4o=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1784572023;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=4UaVitcOJZOADeR1aUmdoJGY7DMYs2LE5zrtcTl69DE=;
+	b=B9d3NihdNUPAZ6ladVpMmrNkwLFvbF3NRzxaaEa4VG3SwDmdau9Mij9xrw8btftWqYEckh
+	UeSj94poJrHDLf7KXUy2Yd8Oclw7ZZycZp0FzBgQwooY0sykRXcIFvD3b+GkOqbucgtzZi
+	PKVjBCE7m6qSgQBOKwHQ7LWH4trnzt0=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] tools/iso-tester: fix GIOChannel refcounting
+Date: Mon, 20 Jul 2026 21:26:57 +0300
+Message-ID: <77c23b3b0b0b0be0ce52e5718f88f8723dabf7ee.1784571951.git.pav@iki.fi>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, iva@yenya.net
-Subject: RE: Bluetooth: fix BT dependency for submodules
-In-Reply-To: <20260720150919.9602-1-iva@yenya.net>
-References: <20260720150919.9602-1-iva@yenya.net>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============6295401824228557050==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+iso_defer_accept_* consume the reference passed in.  g_io_add_watch gets
+a reference.
 
-This is automated email and please do not reply to this email!
+Fix the refcounting accordingly. Also clear data->io_queue immediately
+after the test, so the sockets get closed.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1130992
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.95 seconds
-VerifyFixes                   PASS      0.08 seconds
-VerifySignedoff               PASS      0.08 seconds
-GitLint                       PASS      0.22 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      27.63 seconds
-CheckAllWarning               PASS      30.42 seconds
-CheckSparse                   PASS      29.04 seconds
-BuildKernel32                 PASS      35.21 seconds
-CheckKernelLLVM               SKIP      0.00 seconds
-TestRunnerSetup               PASS      512.13 seconds
-TestRunner_l2cap-tester       PASS      60.63 seconds
-TestRunner_iso-tester         PASS      89.18 seconds
-TestRunner_bnep-tester        PASS      19.06 seconds
-TestRunner_mgmt-tester        FAIL      213.64 seconds
-TestRunner_rfcomm-tester      PASS      25.85 seconds
-TestRunner_sco-tester         PASS      31.82 seconds
-TestRunner_ioctl-tester       PASS      26.32 seconds
-TestRunner_mesh-tester        FAIL      26.18 seconds
-TestRunner_smp-tester         PASS      24.30 seconds
-TestRunner_userchan-tester    PASS      20.34 seconds
-TestRunner_6lowpan-tester     PASS      23.37 seconds
-IncrementalBuild              PASS      26.15 seconds
-
-Details
-##############################
-Test: CheckKernelLLVM - SKIP
-Desc: Build kernel with LLVM + context analysis
-Output:
-Clang not found
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 494, Passed: 489 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.250 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.216 seconds
-Mesh - Send cancel - 2                               Timed out    1.992 seconds
-
-
-https://github.com/bluez/bluetooth-next/pull/463
-
+Not leaking references makes "ISO Connect Close - Success" to work
+correctly again, exposing a KASAN crash in current kernel.
 ---
-Regards,
-Linux Bluetooth
+ tools/iso-tester.c | 33 ++++++++++++++++++++-------------
+ 1 file changed, 20 insertions(+), 13 deletions(-)
 
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index 767ee0c57..fe27eaaf3 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
+@@ -697,10 +697,20 @@ static void test_pre_setup(const void *test_data)
+ 					read_index_list_callback, NULL, NULL);
+ }
+ 
++static void io_free(void *data)
++{
++	GIOChannel *io = data;
++
++	g_io_channel_unref(io);
++}
++
+ static void test_post_teardown(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+ 
++	if (data->io_queue)
++		queue_remove_all(data->io_queue, NULL, NULL, io_free);
++
+ 	mgmt_send(data->mgmt, MGMT_OP_SET_EXP_FEATURE, MGMT_INDEX_NONE,
+ 		  sizeof(reset_iso_socket_param), reset_iso_socket_param,
+ 		  NULL, NULL, NULL);
+@@ -709,13 +719,6 @@ static void test_post_teardown(const void *test_data)
+ 	data->hciemu = NULL;
+ }
+ 
+-static void io_free(void *data)
+-{
+-	GIOChannel *io = data;
+-
+-	g_io_channel_unref(io);
+-}
+-
+ static void test_data_free(void *test_data)
+ {
+ 	struct test_data *data = test_data;
+@@ -2387,8 +2390,10 @@ static gboolean iso_disconnected(GIOChannel *io, GIOCondition cond,
+ 
+ 				data->step++;
+ 
+-				iso_defer_accept_bcast(data,
+-					parent, 0, iso_accept_cb);
++				if (!iso_defer_accept_bcast(data,
++						g_io_channel_ref(parent), 0,
++						iso_accept_cb))
++					g_io_channel_unref(parent);
+ 			}
+ 
+ 			return FALSE;
+@@ -3094,15 +3099,15 @@ static void setup_connect_many(struct test_data *data, uint8_t n, uint8_t *num,
+ 		data->io_id[num[i]] = g_io_add_watch(io, G_IO_OUT, func[i],
+ 									NULL);
+ 
+-		if (!isodata->bcast || !data->reconnect)
+-			g_io_channel_unref(io);
+-		else if (data->io_queue)
++		if (data->io_queue)
+ 			/* For the broadcast reconnect scenario, do not
+ 			 * unref channel here, to avoid closing the
+ 			 * socket. All queued channels will be closed
+-			 * by test_data_free.
++			 * by test_post_teardown.
+ 			 */
+ 			queue_push_tail(data->io_queue, io);
++		else
++			g_io_channel_unref(io);
+ 
+ 		tester_print("Connect %d in progress", num[i]);
+ 
+@@ -3495,6 +3500,7 @@ static gboolean iso_accept(GIOChannel *io, GIOCondition cond,
+ 		if (!iso_defer_accept(data, new_io, num, func)) {
+ 			tester_warn("Unable to accept deferred setup");
+ 			tester_test_failed();
++			g_io_channel_unref(new_io);
+ 		}
+ 		return false;
+ 	}
+@@ -3724,6 +3730,7 @@ static void test_connect_close(const void *test_data)
+ 									data);
+ 
+ 	shutdown(sk, SHUT_RDWR);
++	g_io_channel_unref(io);
+ }
+ 
+ static gboolean iso_connect_wait_close_cb(GIOChannel *io, GIOCondition cond,
+-- 
+2.55.0
 
---===============6295401824228557050==--
