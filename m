@@ -1,157 +1,135 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A92432E8B;
-	Mon, 20 Jul 2026 15:47:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784562437; cv=pass; b=h8hnsWqAW6dn1ZhRIvkN/zUiAvpHIZLyXP86pH08NWq4MUO8i3FOyT/DRALPnQeBHsB3nQd5iwfV1dnRngd+qySJrqeiTh9yfQxHKNqghI9WC1IHmoUzYR+787TzNByUkH88WMdkfUeinJaCD7UmwPtehNiyGNLAc6zXhHI81cE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784562437; c=relaxed/simple;
-	bh=CzWJEpcNDO5NIs90gjHCnjFATR76g3HmisJvFpLaH6k=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=DYHCfS7cwHGtJiAmvXViegdiihEyOTnSgeT05Bi2EKoWhdIdaJS6v1gBTvtGA5CYoxsABUAFbNyZtmpdf/G73TAnIUjL+T5JJe1pbZtCc889MXOvoeDpsUYCxCbY5B8dg4pUBQ00ETh9g32FM5j7QykbljTLq0fwvRgzNIyUEiA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=GMpP3Khg; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C282E43DA5C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 16:38:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784565536; cv=none; b=bdkHeqklT6F0/ilA18jQ3bnCeStkhdQJG0kaXpKRS/fcvCjYxa4gRGopXb4MXZ9qchYxI1DVIG5IYOdFOkyJr6f4zvoFz9F3APaMlRYFiwIyLIq9VI1ZlbvmIu94ZeozYKO2B9dVmwzdLUx63T31I7C6knC80jz24BMAqysOfq0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784565536; c=relaxed/simple;
+	bh=OHvkcqLXNx8WwTuG8Ovtk5cZLh1BNzbnRg3Ja9vO+oU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=GwkzlZW0PezBMtuGVSjjLb/npbAoifoi9BZ0kSVvVwYzOKslg+MHc3gr4ZX+BIECl0sv3KUVc+Ey2vtEDCH+LOKvo1RRjV6QStVsc16935HJRJkGgG0z1pfj0DCu238RqL/SUOj8ROdi8YYZtc11ci3C0lRxbovpsLs6xuIvSfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h75Tw8Da; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="GMpP3Khg"
-Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:1::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4h3lJD5V1sz4BKJy;
-	Mon, 20 Jul 2026 18:47:08 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1784562429;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Nt3as3OBMOeUPF/yfrzmTJ9jTNaI62u7CdUNuf/qUvo=;
-	b=GMpP3Khg/BE4Bbx0aDa3tSRVqawPF6EMffxAogciWKj0SqsOMFFy+aAdNjUQDu56BuIhfW
-	r5+HVhtiuOmGVeYg8QhY2d2EV+1XyCAisWOPJJSMyF5tl9LfuF/qKmHwxZncnXZxn1Yedk
-	57+wfWpSEtXUFvI0fpa0nGS/qwtfqXNk+mfaE7o/Q8FvvQA7yT4jZDjtw4QDAGufgLJJmR
-	eUuTE0wL1Ux+Y7SPOeocWmBAWcsZJR3dPG2IfHdZZa6/0PEe2eO+ufwxDVsglI69tVVWj7
-	Qg7nQJUJICqwFfunxETNBUpzziXzzTcDvovPH/Pw3GBWChNY6cV+WwBtzgkyyA==
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1784562429;
-	b=oxRXV6TQjx0u7dxiQcY3vtLdF0BjAGvw1CrhWGU/zacg0Lz+1x18va2eR9r6iO5sKjuK76
-	RFxy0m8EZYkUfm/LVFBja9UWH8dMEkWdizNe0nOL+s5fDKzoVF0P+J+/HDAXerMBa5etX+
-	RijeIwqxfme+JAOpJ8EHg6N1VMfrLxFemwDJRhWtlf2onuCQSThoyUA1WejEjk/VbnBCfC
-	GES0yZGIYRJ4CcrXXL9nbica3fIuHjBRiR4uHBZXdPqpFHwlNf0zGas8IN0829lriz4v/b
-	sbVjwAstkYJiimOBpMdn7tH20HIjgLb2inpKDN54T1rZ0zEO49J4G70nwpJkHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1784562429;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Nt3as3OBMOeUPF/yfrzmTJ9jTNaI62u7CdUNuf/qUvo=;
-	b=izkFAb8+s2Ft8qcW7sge6OnkWD+k9Oou7dpPiDxeYJLb5epP2/anygsHnpyRXa4ajJ0SiY
-	phazCSne8grzwC0mQNeTksSqS3OMJtdoxpITvy9GJumstjhxKBs0YNaiG2qVsTKUn4Eu87
-	+g/ZVo7qM7qwqO5/j1D6/+nh8YjgYNBkC+aRlOj13wBJ+1N3VHwZ95AdWiBHtQyAhWgpS8
-	LWecbW23cGgx0Or5EKKaTy44nYDHZNK/i5FI1xHdYT+i/tNbImZQ8c88QJLD/G4iEgtmyT
-	fV0y+y3AZy1MprEaYw0iIWuZaZFXWaS7jEzmTQ+4Ez+bmRnt+JsZY8cEREFP6g==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <4463dae062ffcb12ad82c843052e35b550b7924b.camel@iki.fi>
-Subject: Re: [PATCH] Bluetooth: ISO: clear iso_data always when detaching
- conn from hcon
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, iulia.tanasescu@nxp.com, 
-	linux-kernel@vger.kernel.org
-Date: Mon, 20 Jul 2026 18:47:06 +0300
-In-Reply-To: <f3d8d52dcb2a5464393623a56369ea244c144460.1784559155.git.pav@iki.fi>
-References: 
-	<f3d8d52dcb2a5464393623a56369ea244c144460.1784559155.git.pav@iki.fi>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-1.fc44) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h75Tw8Da"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2cf452def93so15869215ad.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 09:38:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784565534; x=1785170334; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=m/ATW6X1gVnIGGGXkBO6eQMCGqCMy99IDGti5Cjf29c=;
+        b=h75Tw8Da4FWBfVXM8ofqXCYuWQ4XzCTEnRJekdZbcCIcUaOW/470cYks41PIc/inse
+         vQF66wybaEJbxMTywRxpOBRUmcryWi67qchhCvBhVaVrGS0BwNONhroG0SR2sBfwZhfQ
+         xo5CgYzLEZHdsBMk4oZBM89svinYPXXEHWjE6J8ZnRgJLQv1MJ0kdKwogNd/r8XHznII
+         UjEGAWSXMGtO44g2VlNvwPsy1XDBEFV4lBlmmsgZxhyy39baJsa7mCOvqgpONynydzju
+         LqdvgOjf/RVsfuZwlf6dR2oaUnG1FXA6AVAHzD0EaedlmxEExwuCxoPeksTYqNyzT+dz
+         Ovug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784565534; x=1785170334;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=m/ATW6X1gVnIGGGXkBO6eQMCGqCMy99IDGti5Cjf29c=;
+        b=mY7f9X2bWM6bwhJMU+tyoCknZ5ir0Q6Uz51SpEzU7pylE4NgJrFpdt88jnjNpEtd0u
+         /ENokc1UWv07Fz+OTZ3FplfLbmkU+JhOy5WbR4WvLlW4WgeyKlLrsBZZAg9MvsTF9JOT
+         ZU7VBPRiRKWQqQTOv0GYqc2LdjqHYDpS/B4H9U66NVjSkodbdJpVeR6Dgms7fE9rQyFT
+         wAmu2ZrNrZM9ziF6bnnrtgd9eTYpcDa7AKgb6wRVc2h929z0sxKUjTuvy4yBLmJCjfDp
+         kFL038EFUyhXfcTvqWykCjvBm9nhkWJD0OoGJuvrSlUmQTOXN3t6axcYA/wuf7CSTMSo
+         GXTQ==
+X-Gm-Message-State: AOJu0YyMW+qffeOdnD7yJOoGshHT8ezE+ybNyeaRLWX/IEh16lBtvDOV
+	eFg8rBjQGV9gFFIUqof2iPVo8mrA0JbYnuftV/cMieMhcMMFjtGV15sYdkHOHg==
+X-Gm-Gg: AR+sD123rORl/3BMUjaX9Pkcnqj9TCuVAmMBV+krYRDNxVExxRfrSE2Zrl2tTXL+UdU
+	FhEbnEjKimkSQLODxNseKxzVZOT/5g44E6EIUYmwhuzQ83ZyWTHuN1aOdEerjgbcnqvjblGIYo2
+	GSfhK5kwlr+4h7gSge7iQnPdLEreoklATfEsSCvZAManWOojDVYcoVPi5KLEBBDwyxzIxAj8YtM
+	r5sobFYwQrcGkge+k2Gs8KIyWaRffuiEHSH0v6qCn1vO5WPZas7xIHSEk472ZLNEYnhUxw0zlzw
+	1QthT2pV9VcJoJWTlDT+igNKklcPPxG0CwuobTg4FhdndaWcxHbiuMf7KoF4Tw7Jc0xKQqAFVWk
+	FwIxnCaa3sNEyy9C3evI2KyKUXpTOCdaS30WdCg1QJ0yAnZuDVrx98RFQF5Q0DNcB1Mh1m0zTMI
+	T8+RFdQIya
+X-Received: by 2002:a17:902:f683:b0:2cc:db7a:251 with SMTP id d9443c01a7336-2cf1f2561eemr196468925ad.2.1784565534021;
+        Mon, 20 Jul 2026 09:38:54 -0700 (PDT)
+Received: from [172.17.0.2] ([20.169.77.226])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3142a20bf96sm37683343eec.28.2026.07.20.09.38.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jul 2026 09:38:53 -0700 (PDT)
+Message-ID: <6a5e4f1d.160324b0.1f653e.a3fc@mx.google.com>
+Date: Mon, 20 Jul 2026 09:38:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6949216581899346262=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: Bluetooth: ISO: clear iso_data always when detaching conn from hcon
+In-Reply-To: <f3d8d52dcb2a5464393623a56369ea244c144460.1784559155.git.pav@iki.fi>
+References: <f3d8d52dcb2a5464393623a56369ea244c144460.1784559155.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============6949216581899346262==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-ma, 2026-07-20 kello 17:53 +0300, Pauli Virtanen kirjoitti:
-> When setting conn->hcon =3D NULL, also conn->hcon->iso_data =3D NULL is
-> necessary, otherwise later iso_conn_free() will UAF.
->=20
-> Fix clearing of iso_data in iso_sock_disconn()
->=20
-> Fixes KASAN: slab-use-after-free in iso_conn_hold_unless_zero on
-> iso_sock_release() followed by hci_abort_conn_sync().
->=20
-> Fixes: fbdc4bc47268 ("Bluetooth: ISO: Use defer setup to separate PA sync=
- and BIG sync")
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> ---
->=20
-> Notes:
->     The locking around iso_data and conn->hcon access looks wrong here,
->     there's very likely concurrency bugs with UAF here.  These should be
->     fixed in separate series.
->=20
->  net/bluetooth/iso.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> index 2e95a153912c..babba61eb335 100644
-> --- a/net/bluetooth/iso.c
-> +++ b/net/bluetooth/iso.c
-> @@ -837,6 +837,7 @@ static void iso_sock_disconn(struct sock *sk)
->  	sk->sk_state =3D BT_DISCONN;
->  	iso_conn_lock(iso_pi(sk)->conn);
->  	hci_conn_drop(iso_pi(sk)->conn->hcon);
-> +	iso_pi(sk)->conn->hcon->iso_data =3D NULL;
->  	iso_pi(sk)->conn->hcon =3D NULL;
->  	iso_conn_unlock(iso_pi(sk)->conn);
->  }
+This is automated email and please do not reply to this email!
 
-Well, this was wrong as noted by Sashiko, hcon shall be detached from
-conn only via iso_conn_put(), we should just drop here instead and
-maybe avoid a second drop in iso_conn_free().
+Dear submitter,
 
--> v2
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=1130974
 
---=20
-Pauli Virtanen
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.56 seconds
+VerifyFixes                   PASS      0.09 seconds
+VerifySignedoff               PASS      0.09 seconds
+GitLint                       PASS      0.24 seconds
+SubjectPrefix                 PASS      0.08 seconds
+BuildKernel                   PASS      25.05 seconds
+CheckAllWarning               PASS      27.99 seconds
+CheckSparse                   PASS      26.38 seconds
+BuildKernel32                 PASS      24.53 seconds
+CheckKernelLLVM               SKIP      0.00 seconds
+TestRunnerSetup               PASS      461.83 seconds
+TestRunner_iso-tester         FAIL      98.86 seconds
+IncrementalBuild              PASS      23.07 seconds
+
+Details
+##############################
+Test: CheckKernelLLVM - SKIP
+Desc: Build kernel with LLVM + context analysis
+Output:
+Clang not found
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 141, Passed: 134 (95.0%), Failed: 7, Not Run: 0
+
+Failed Test Cases
+ISO Disconnect - Success                             Timed out    2.623 seconds
+ISO Reconnect - Success                              Timed out    1.990 seconds
+ISO Reconnect Send and Receive #16 - Success         Timed out    1.998 seconds
+ISO Reconnect AC 6(i) - Success                      Timed out    2.307 seconds
+ISO Reconnect AC 6(ii) - Success                     Timed out    1.999 seconds
+ISO Broadcaster Reconnect - Success                  Timed out    2.731 seconds
+ISO Broadcaster Receiver Defer Reconnect - Success   Timed out    2.326 seconds
+
+
+https://github.com/bluez/bluetooth-next/pull/462
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6949216581899346262==--
