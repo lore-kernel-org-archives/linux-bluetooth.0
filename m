@@ -1,93 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160F442CB1B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 13:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784555333; cv=none; b=n6eAkIzxCWcuQLMGJ+zkt+siHCeBmAwpqMfon8S6bFV8gxZ2qTzItitvulMrJ6bDc8JKJ9RY9dNNUPwhBhRopm7Kwzbgm2yphm5XFCKBR3Ux67EyYY/NmNa6kbnGuxxP19qfpZE4pEL8/BQD7967LNAh1mPRYJISUGtkOVP0olg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784555333; c=relaxed/simple;
-	bh=VXTL0nWUs6ARY7/mBgCqD9/Pk4RANoGqiEM640qRpmI=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dlWMmUcLvuZGbiDR7akQ4/hRXlYOva3DGrmQwiWbu601j9mJqtBCiak16AujmKIj/G8cMtQkqoTqeKB/EUKdIyW6jUDNxPc2qfXcwddYB8qtMatspxTt0OgOxLhJ0pzDIns5VaT6iBqtGQz6P5U/614rOK/i19Or0oTLKedmZwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I7Uuk7al; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B255B42BC33
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 14:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784556560; cv=pass; b=iGMz7rNU51lH1Cn3C7ii5VJ9dDInD9iebPU0zEnCPAPJUTL+H34L3dj7NjeA0bRE3HRco/tjrrkf+bVHnsCfShzLv0aH5vRLmKak32BoGD6oOm1T/ni8CKFNOqL6S7I/venjJzZWy2+nXUo592oZ1SBKHJbs3KP+VVQywpnMeSw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784556560; c=relaxed/simple;
+	bh=qd8/hFAc25E6jb48eCE2wh92eWpaePh+UbVqhSUI1UI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VzBjRpTq4P61Bi0QUHfrnYPgFg6XX42jSJPz2g4OUC+zzyI6oLorJ/RReSsu9O2wxEsLuzbVnwE2j/qQ864i+Kwl+kDk62vts9hXrA7Ablrth4Kj6qxVAy+EBzpP915IS7l46QWHoNIyqfAiURXBQawzDw5yjCbf7QapF1S4A8k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=lhFPJmT8; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I7Uuk7al"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D224B1F00ACA
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 13:48:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784555329;
-	bh=L8C49SuWPc7UrHJM/7J+so26KwjGuUOI0PDx4EtC0qI=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=I7Uuk7al+n5XzzlG/XnQBVnxY7TZgxpnqsXwWLApjhiG+g/vX4f98U+9S4j0CuOXN
-	 3f85WqSEv7syaPxiHzQNQt7OXy6syNK2q7cc8W0pj/Y7HK/HdExnrG+gYCzoqwoslx
-	 FF7lHTtj0dMj/7AaOrUc/qaand8UNGH6rnk7uON6qph/amzVe0/rfHH4YXUZuMaNPW
-	 hrQvGv5q/f9cdOg/MJfA3xaJHSU1Uc6oN9dpTDjHlNFKwrKTHHWeBTuhCAyPp/AFfS
-	 PVzDT0ntC4ezmV4fp7k7KfN/X1o3xm+Z9hkDTMPiTclh8toIYxO6KVl/MzhQaV/SZE
-	 WiVTMz5Vr8aEA==
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5b14d1f9315so8831329e87.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 06:48:49 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RpHDcEP+JD8cOdEtck80jY1/ERHrWfJ0NxPZ2TbYQYSAFy7ODEOiTjx6/fl4X9pXN7pga/DEDd5mQAr4/BL9RY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyG6RHfOnO4Hfi9Q1fSLtTuUZwdWcCiODejMT7+cqPNIdNqsR/+
-	RUbzQKa52SCdBJrPydcNBYgXZT9C8UcOJpzI60j0l1PsZef4sqs8IzYajMKA2Sfduv6lOYt/r2K
-	fqKnY3rg0YnlZrnwHCgx4h9fzZWuixzS0Y8UFjNNdxA==
-X-Received: by 2002:a05:6512:282:b0:5ae:b24c:7723 with SMTP id
- 2adb3069b0e04-5b28f875b5bmr2211818e87.17.1784555328484; Mon, 20 Jul 2026
- 06:48:48 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 20 Jul 2026 06:48:46 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 20 Jul 2026 06:48:46 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <0CB2D8D715AB9933+20260713072543.3348755-1-raoxu@uniontech.com>
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="lhFPJmT8"
+Received: from monolith.lan (unknown [193.138.7.138])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4h3j743YRXz4BKKr;
+	Mon, 20 Jul 2026 17:09:04 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1784556544;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+hgpM/hGdQHfE0tGkN2IERguQSmxZWIxPbGqCtMeGbs=;
+	b=lhFPJmT8lnJpDEQLjIaZ8/EP8GMcsZdM1j5aYSsIA/gA4O2Kouo6xBgMh5lNhdpkAiV5GP
+	gxyMSC9SlrBEeiFzomsaua6hjidk/NpmFrcMk8uyCJT4m0Bvz2aJ1PhH9XSVMf8IGsDg//
+	sea15PtwkLkPQ4LwQvFaWJeJDDElPHORVCKoNBRxma3bGWe4Injd3RA1QZURKinU3drx0A
+	cmVVoivX4Pr8/JkEoruUFJKckNtePsHWq+vJIhNDqoo6OHcENj3wJQa6YxR2sR2mm9PNbz
+	GEk0Wxyjg5xswdjkcMhI+JIRMOGvvSKmpdPcsblh0wW/WKMt6XOkXoRg2WW6Tw==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1784556544;
+	b=tbqGglZrGRVCL8aepMeYicIqFeXWjxOXdfiQgHXqx8NrwehIHwyt5jFFcW+BoJSw2aQRFn
+	GMOozSCZTOaxHLg/CZAvwAlLUWlfiCiSJGYq+ghFcJk6wYqEtXBZbHmAn0uersM8S6oRSD
+	DU40OyFToqP7CElAKXTd6imsde9gUvEY/0aRsXq3MuCXTH0TtnbW19f4oTpo8XnjbxhCES
+	4Brcs8KkfEO+MtonK50DGybvaffxRrXrI2KWv6D3qG/SDW0G6CeGjaF32IVtuya0oDq0eB
+	2u1WE7jbM2ZmUPyMjBCa2Q5OZzElWUroLZdt0F5sx4/aW18LXIXxXLysq7/Iig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1784556544;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+hgpM/hGdQHfE0tGkN2IERguQSmxZWIxPbGqCtMeGbs=;
+	b=WDQHb1HvJntpC6mk3riDfmk6W2EVYg0O+MnuLR7pMbRB5bYqVh4z0QKiTgj2dhVPNCuxnU
+	MAoJkpr4cP04n70gZk8dlIYT5puOudw82fk/j/kN8oGpeXYxnRmDnruaaVb0HopWXLtpU4
+	MF+ryIAc7Vz7BJt82d56S1+SQgi+lXRLuOzQnTSbv2VTJet8czbr8qsgSKdhuUzMDuEf7r
+	tH3tZMPuS4E+x6ZNOzSK3j4VwJMbZQAm8Y5KqC2yQp9iFvqC5+MrWD9V0fWHgSQLjH+BjE
+	R5JFuYKz3oWHwUJNNJUPeKFhMscz/uadfJcAfREk5cDXT3Wqoj+dqPfuYEEFvw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] test-runner: use virtio for the default kernel console
+Date: Mon, 20 Jul 2026 17:09:01 +0300
+Message-ID: <e71384747c71a2fa0db585acdb727f324161d1b8.1784554811.git.pav@iki.fi>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0CB2D8D715AB9933+20260713072543.3348755-1-raoxu@uniontech.com>
-Date: Mon, 20 Jul 2026 06:48:46 -0700
-X-Gmail-Original-Message-ID: <CAMRc=McFRb8iZaDLY=DfLfDDA9WFJeNG94CaQeF3RJDgyqe8bg@mail.gmail.com>
-X-Gm-Features: AUfX_mw4AS4rGrPFiCIt4A6Wg2v_GfsNMetY7jsTwq9BAgndocjnJSk4IIzAsLs
-Message-ID: <CAMRc=McFRb8iZaDLY=DfLfDDA9WFJeNG94CaQeF3RJDgyqe8bg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btqcomsmd: destroy RPMsg endpoints before
- freeing hci_dev
-To: raoxu <raoxu@uniontech.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, linux-arm-msm@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org, brgl@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Mon, 13 Jul 2026 09:25:43 +0200, raoxu <raoxu@uniontech.com> said:
-> From: Xu Rao <raoxu@uniontech.com>
->
-> The command and ACL RPMsg endpoints store struct btqcomsmd as their
-> callback private data.  The receive callbacks dereference btq->hdev
-> without taking an hci_dev reference.
->
-> The current teardown order frees the hci_dev before destroying the RPMsg
-> endpoints in both the hci_register_dev() error path and the driver remove
-> path.  If WCNSS delivers data in that window, the endpoint callback can
-> run with an already freed hci_dev and pass it to the Bluetooth core.
->
-> For qcom_smd endpoints, rpmsg_destroy_ept() closes the channel and clears
-> the callback under the channel recv_lock.  The receive path holds the same
-> lock while invoking the callback, so destroying the endpoints first both
-> prevents new callbacks and serializes with any callback already running.
->
-> Destroy the command and ACL endpoints before hci_free_dev().  Keep
-> hci_unregister_dev() first during remove so the HCI core stops issuing
-> operations before the transport endpoints are shut down.  In the full
-> registration-error cleanup path, return directly after freeing the hci_dev
-> to avoid falling through to the partial-construction labels and destroying
-> the endpoints twice.
->
-> Fixes: 5052de8deff5 ("soc: qcom: smd: Transition client drivers from smd to rpmsg")
-> Fixes: 9a39a927be01 ("Bluetooth: btqcomsmd: Fix a resource leak in error handling paths in the probe function")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Xu Rao <raoxu@uniontech.com>
-> ---
+Serial as console is slow when commands produce large amounts of output,
+e.g. for the -d debug option of the testers.
 
-Acked-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Use virtio console=hvc0 as the console, requiring
+CONFIG_VIRTIO_CONSOLE=y which is already in tester config.
+
+For capturing the early boot messages, retain the qemu serial, kernel
+will switch to hvc0 during boot when the HVC driver initializes.
+
+For: time tools/test-runner -k ../../linux -- tools/sco-tester -d
+Before: real 0m32,094s, After: real 0m8,967s
+---
+ tools/test-runner.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 0e3bfb8b7..4617afc63 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -238,6 +238,8 @@ static char *const qemu_argv[] = {
+ 	"-device", "virtio-9p-pci,fsdev=fsdev-root,mount_tag=/dev/root",
+ 	"-chardev", "stdio,id=con,mux=on",
+ 	"-serial", "chardev:con",
++	"-device", "virtio-serial",
++	"-device", "virtconsole,chardev=con,name=console.0",
+ 	NULL
+ };
+ 
+@@ -291,7 +293,7 @@ static void start_qemu(void)
+ 	}
+ 
+ 	snprintf(cmdline, sizeof(cmdline),
+-				"console=ttyS0,115200n8 earlyprintk=serial "
++				"console=hvc0 earlyprintk=serial "
+ 				"no_hash_pointers=1 rootfstype=9p "
+ 				"rootflags=trans=virtio,version=9p2000.u "
+ 				"acpi=off pci=noacpi noapic quiet ro init=%s "
+@@ -330,11 +332,6 @@ static void start_qemu(void)
+ 	argv[pos++] = "-append";
+ 	argv[pos++] = (char *) cmdline;
+ 
+-	if (num_devs) {
+-		argv[pos++] = "-device";
+-		argv[pos++] = "virtio-serial";
+-	}
+-
+ 	for (i = 0; i < num_devs; i++) {
+ 		char *chrdev, *serdev;
+ 
+@@ -915,7 +912,7 @@ static void run_command(char *cmdname, char *home)
+ 	}
+ 
+ 	if (num_devs) {
+-		const char *node = "/dev/hvc0";
++		const char *node = "/dev/hvc1";
+ 		unsigned int basic_flags, extra_flags;
+ 
+ 		printf("Attaching BR/EDR controller to %s\n", node);
+-- 
+2.55.0
+
