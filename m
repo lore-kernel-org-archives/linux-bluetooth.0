@@ -1,163 +1,158 @@
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4034738F227
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 18:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784573896; cv=pass; b=aNoD6fx0DEin2zB7/cLe+9hoLpAKO+a+RGixjFxdywoW7RkRonJ2g4ryCQIhcqZAlGehQ3RuVYYuuCC+aFMG2anVtJrQSCxtfGoevxrslPWR9oKjNfIXNhScG7bXTJY8c3MxRV95IW0bL/n3dm1gaHvCshftnp0a+eTTtIFyZjQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784573896; c=relaxed/simple;
-	bh=5BaCLeEsW+JEvrVXsm4ZvsLyFs/NV4iIbdyNWZSxN0I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kCO38dCsLZtk6OPiOySHItTeLVFCProYj6qQpaN3YoA5T860JWdGfPaunPDAZ+P8XM7JHVugOizTnlLk9uCYCjTH7DB7CLVCIe0MESM8KOQZ1bilQh0If00y/AqShS5vHKQU/Ozl2MqBC7RxT9fjoMgWMOH5uoYzz88Rd4paUqU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S0R3OhAI; arc=pass smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3DE4394E91
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 19:13:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784574810; cv=none; b=AwJsT4abcOt02e/4xXQe9T5Ym2w5V6z7CVyDa1TMPL3VfECUyeUwWsFXAxCfqsURXXcmR70UsOlqNxeMX2Qu6EiccLo+2Jj5l4Srmy4CQMhNNDfeX5g+C3oKB825qIpRMpYhjsYpIFOdPvaBS9jzZ7BxLJSguwNWZkgmxMHZUC4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784574810; c=relaxed/simple;
+	bh=n9hjvS79Gw4F+TRn7WgQGmj61r8D4HoJDfkprX6ec5M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TCcU9VoGCNnIrPeD+dDt3gKMNy3mbrkfU0jmyn6XAAoQkIzUTaF83NuEKsq/ZzNd7w1wK1LOyGypJwP3DnxmPr0P+FIvCNSvWkqHNbQ49l6+CipXTejBL/Ig2jNCbVQTHzVRqVLWBTz4xAl6OYZk02qiLu4PqJqT1wXmWXkEaSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=fwj+4wkL; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0sec.ai
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S0R3OhAI"
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-80e2cfe6918so59114907b3.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 11:58:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784573894; cv=none;
-        d=google.com; s=arc-20260327;
-        b=lgVy7SDdPMxj3q0r0TBmdk6JUY1XyJgigsw4YziRMvtpT8fzzY0xQuxNSgT4D/z6uZ
-         gwQ1v/Jfk3Sg4mgOjE8RSY+N+YiIPH6twTRj7F2WHci1qN/nTWvb5zldo0o8rIxKLwOV
-         dbsJXS1fbU/VDF/REn7A8tsS6DuDIR8BnSDb6piPGrRH7lqyq4mviQ/Id1EUXd2M85D/
-         rocBG5NgUj7XGuLwE5XdXrmrVfsCMVQKj3jGWo3xagFmNWvI66DzQVgFFLfHf768i3L0
-         1h8CM+EC9dFwXdV6cX9pJWUgB3BbxdGupl5cwv3MCJgZAkCH8toypLg7R73X0FKwFy+3
-         PoIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=QcQfVm6sD6AmNgehNUy1OoDPrBVMT1KlGr1znsVrGfM=;
-        fh=OVKswAkwWiYRiw4/jm1+w+lY4E/3x/2/3xjGrBhrIWo=;
-        b=f8H+iL8CzPN9Do71KlC4dve8HTBAxL07yGk0Mx+WbRBLZng3HbohAcWprblw/E2Ifc
-         7pT/tly9Yqp+bWBJGMa+9kfEIa03Ij3mHUkRcqgIBvZeqHdlcVYppAKDuXIOGxsRkMuB
-         v6k2WTXeeyId0H0AQLKQYmD9BxiNwLTNRmEflfrgfe6/ISUcoMMc+pRITzI0FvpfFrve
-         ckhpCanzXOyiS9JiH4cO+weKOMfAHsGzbwU9FtmmxI5eXB6sQFM7HdhSU8Y6OEfaOjT8
-         sHImsi4Pib9XESt76Ew9ifnpnLNkMUsKUj2g8+jsjI/xV2Z7/VXeHqpKVJREhJ1GM17k
-         ohIA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b="fwj+4wkL"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4955de8797cso8176735e9.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 12:13:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784573894; x=1785178694; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=QcQfVm6sD6AmNgehNUy1OoDPrBVMT1KlGr1znsVrGfM=;
-        b=S0R3OhAIn3e2LsBoL40KHxSNjDRHwq3//QNasZL6/hUY8CZbYqopsd0peEvqBb1Rip
-         6xSsKfPC7H4O4VUSxXVzB9Be59rUjpu0f2D21aJrC7toSv52DPkUselEuHxmTJbbpPwh
-         gGph+cjUMSrBQGJWJiAtzf96mcySMc/YUtqJRUkidpPGgikLG+ghuITobBEkRR9EP4aO
-         9BM3k4Z4Lk/dDTC2td1+vWcG96YygczR5diGBRh5Uw3nn2zi3DrWIZ4zXI4QpbYR8aiu
-         sIZURLt5jZJXS9rOSnlupUrQH+li1ZuIHOAz1nszPdR8ajuqkTDPxi71x70MDfRCp9Pm
-         COyA==
+        d=0sec.ai; s=google; t=1784574805; x=1785179605; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=xKFoZd3/2cdDCdHVjqGsrFciG9zJW2+KmWDiRs5og20=;
+        b=fwj+4wkLC6PRhYdKyUZFyyaOrLjMUH3IsWa0MEsZFpmtUf3Wb9RwAZxriRHppMwpA4
+         WGj8NnPsR0wTSn3GoyzVE44leVL9fZ71cXtCIBJ3dwnkgczYfv56gYRVgwT48m/rnXG7
+         HIwMRgFeBBqbg4X0tKuQEY14UKIxSpRaRUcRDU+7R7saJgZuB35g2upMSNnJqPuCHGim
+         Rba1nYnrUfec3DxLNsmJ+T5cXRmb3Il67zsHkryz7nkLtrMqDDZ0Kkj1NvMVdj/xlWMU
+         SsEIzaPsWBnwn/I1rdh7cDd8JEn7dx1qKyDWfF4HEPq4N+khmL6WHdWaAvbs7HgG6S1T
+         oKBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784573894; x=1785178694;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=QcQfVm6sD6AmNgehNUy1OoDPrBVMT1KlGr1znsVrGfM=;
-        b=eoNgd6SWfyKoYMTFPLd0FGSMsA37JOCI7yd47yQk6zVFCKUEKoEn6nd5zda+H3iM9S
-         m6PR+s51ro5CdVodbDL7MKm4MpzxZ+5mVDldpij5K4Kf7UF7RudZn7X45YcneCzQGJZF
-         /Uq5cOQ/24LkNC5Iz2CTCEJMbyO5q7PHkxEUsVT/UhjdJ3KGIyvJtZiRA5PzrH5CTdZJ
-         bExBS8u1IAadjUvZbvdLf/LT5d9mpjJ51/F4IzAG8Crl5y/AGKjI217pjiMQOQsI9SQR
-         GNyFg3NIx3EFzXBiDPpG22k7FMQOJU3yS5Fhc1fq06Niutl7dvfgTFDewwWF4bgTU6Q/
-         g7+Q==
-X-Gm-Message-State: AOJu0Ywj2vXCZ6epE7XjIofeBdSzZygnUl/+pELM1P9mFolbOAYaxUBo
-	pvUEIPlfa9cx2RW0HelB+ZK5yvJMa6WvRnJy3NYW2uCyyTRp9BbJtg5RJFvmCJZPod+mfkIoang
-	NcZ9tUwAmbmb0IBAtWBDXy/dn7gFVhXeM0HxvVGE=
-X-Gm-Gg: AR+sD117USl+Ukceh/iokQGLtjCc/JTV0JHfAynvhUEZkgSJDk0xTW+tkVwCJw8AQ+H
-	4k6Sd9k0wYbz+lMZmGHKfUEu6zX188aKzyGAMC5myBHLVX+lYWuWMK2sp/RIbvjwGDPNrgNQ4Lk
-	B10IfnDsdc5LPFd6PPUTBDj6DaAHE+GvF6qK0gg570+i82fGgO5e37Dh+zCydlGButT7jCu3Ftr
-	YEVnJisUzLXDk8ABb9Hd3gq7dSgRVUaFB8DVKbYguMyZG2RdKSMNiXNc3D4/CQnBtyoBT3eC3HE
-	nfWkdDtd9fk6CPhX/kJEZiEyM/GKngNAUubpwzi5SCmSwQ==
-X-Received: by 2002:a05:690c:368f:b0:7f4:fad5:2087 with SMTP id
- 00721157ae682-81ef25e0e38mr53195217b3.38.1784573894025; Mon, 20 Jul 2026
- 11:58:14 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1784574805; x=1785179605;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=xKFoZd3/2cdDCdHVjqGsrFciG9zJW2+KmWDiRs5og20=;
+        b=pkw1s9HCA6+LSHorHHaNP/uHYEwaN6bXjTc028XKRYRoqH+oR+crD3VlXNCS3yqQjM
+         6Xgrzst6Q2jr6XIGpCnQOALvU+heByZqtb2RdYxxwVTOqz0coAulSUwXPpLlk0rfeD7n
+         KVga7mOQFlIi8SulivYWUfgyhvBy9XABuWoX4Pv0hmLZHlS3/O4uItUBP3zNW07sxSTs
+         3Klnw4L9vtfkgkDCn3ycSJcCGeKM1LZ2w09niADWbfrmiOiTZY3oWx6EjUT/mpcaeXOA
+         xUyQ0J1QY29FZG/ze9S/M/v3Hfvui5/czEDTvDvL52AIWtOwE95WXAsOuA3eybVAz1XT
+         w7Lg==
+X-Forwarded-Encrypted: i=1; AHgh+RpBWyhlHX9ok7qwPjumXB65xtmFrsdZo+7m2FcyFLEqxFAUu4P1aaqLdUxLz0u1yzScqR797ZA1KlLjNYZnzVM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFzpmBXf2x/fOQaywqYj5/yJnm+zyWXTsAn5kDNmkKZ2PXKo6P
+	jm1NQ8c3gte1xS/GvBwefOrEgc5+JLEDKodETpTe5ivXzb5wy2jFuGbQCfZ8AvhNOrTE
+X-Gm-Gg: AfdE7cltWbdlZi9+HdOvxGE+2F3oZyoKWNy+vsrko866imesUc1MH7Iguxv4NjB0VMU
+	U/XdgEx/k/uU87Zohcm6LkwZKcGLJHXXnFJd63zCL7gqcrzsuyFmhs5Ai902xWVA0xqdPr99+Uq
+	cJkIv55rKmA3ExE6/9CPGmAlRsMsxYr3c7RKv5rAvaUbjJs32qtNOAjZej+DJf0JHA+TxL0JfO+
+	7KmfcMYmKPirYmv7Mflzm9GyCsJ6wFbe7/i/HrSmssYOKJVagPDsfdEYIXGr19Fg/CxuJbSValH
+	56MfkTApkbGMzP7B/t/VpFLvp3bBKtxpEhcZ/pIxdrpuCv/09Aov7ThIF2k8D1/NtgJhdQR7U2C
+	D7nYqVmX8yj/kBMJXAoGRI7ObisjSVNmucc8Yv0fE+4m4SIBNg7iMlkWOf7foh84eieDibbXp8Z
+	wFZAqYFLNOv6e05uK5UZXkp1Zq69fsPt+GwtwJGE6hmy+CHJlEC9PYNQPHFjR7r4wDZvGKlk1Mc
+	WXontJoR1gmsuoLH07GU20s
+X-Received: by 2002:a05:600c:2204:b0:492:3754:15f2 with SMTP id 5b1f17b1804b1-4954a40bbdemr129148725e9.32.1784574804745;
+        Mon, 20 Jul 2026 12:13:24 -0700 (PDT)
+Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.14])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4956536870esm13926345e9.3.2026.07.20.12.13.23
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 20 Jul 2026 12:13:24 -0700 (PDT)
+From: Doruk Tan Ozturk <doruk@0sec.ai>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+	Neeraj Kale <neeraj.sanjaykale@nxp.com>
+Cc: Paul Menzel <pmenzel@molgen.mpg.de>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Doruk Tan Ozturk <doruk@0sec.ai>
+Subject: [PATCH v2] Bluetooth: btnxpuart: Fix out-of-bounds firmware read in nxp_recv_fw_req_v1()
+Date: Mon, 20 Jul 2026 21:13:22 +0200
+Message-ID: <20260720191322.14432-1-doruk@0sec.ai>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260718194230.35959-1-pip@pipobscure.com>
-In-Reply-To: <20260718194230.35959-1-pip@pipobscure.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 20 Jul 2026 14:58:01 -0400
-X-Gm-Features: AUfX_mzl1Vpzfrk5Ipct78iTYdtfwHyCArYVkW0fYdxIyiaSiVRSeYoZc2B8Q4Q
-Message-ID: <CABBYNZKLqADWu4rAmg9K_MbtXiLE6Xwr=QVYJva2PxGGKE4TvA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/2] Don't auto-bond on reactive GATT security elevation
-To: Philipp Dunkel <pip@pipobscure.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Philipp,
+Commit 25c286d75821 ("Bluetooth: btnxpuart: Fix out-of-bounds firmware
+read in nxp_recv_fw_req_v3()") bounded the v3 firmware download offset but
+left an unbounded read in the v1 handler.
 
-On Sat, Jul 18, 2026 at 3:43=E2=80=AFPM Philipp Dunkel <pip@pipobscure.com>=
- wrote:
->
-> bluetoothd probes every freshly connected LE peer as a GATT client
-> through its built-in profiles (battery, mcp, ...). When such a probe
-> reads a characteristic the peer has protected, the peer answers with
-> Insufficient Authentication (0x05), and change_security() reacts by
-> raising BT_SECURITY on the ATT socket. On an unbonded LE link that
-> starts SMP pairing, so the user is shown a pairing prompt for a device
-> that merely came into range -- a bond nobody requested, logged as a
-> device_bonding_complete() bond with a (nil) requestor.
+nxp_recv_fw_req_v1() advances a device-driven download offset
+(fw_dnld_v1_offset) by fw_v1_sent_bytes on every request, and that
+bookkeeping runs even when the payload write is skipped, so the offset can
+walk past nxpdev->fw->size. When the controller then requests a header
+(len == HDR_LEN), the driver reads the 16-byte bootloader header at
 
-You will need to determine which plugins are discovering attributes
-that may require encryption and disable them since they won't function
-otherwise and are probably just dead weight at that point. Also I
-don't think there is an easy policy to determine the roles of each
-side since "client" doesn't necessarily mean central, nor does
-peripheral necessarily mean server.
+  nxp_get_data_len(nxpdev->fw->data + nxpdev->fw_dnld_v1_offset)
 
-> The existing opt-out does not help: change_security() only bails when
-> chan->sec_level !=3D BT_ATT_SECURITY_AUTO, but sec_level is recorded for
-> BT_ATT_LOCAL channels only, so an L2CAP/LE channel stays at AUTO for its
-> whole lifetime and always elevates.
->
-> Patch 1 adds bt_att_set_no_auto_sec(), a per-bt_att flag that makes
-> change_security() refuse to elevate, and sets it from gatt_client_init()
-> for any link that is neither bonded nor in a requested bonding.
-> In-progress Pair() and already-bonded devices keep their existing
-> elevation paths untouched.
->
-> Patch 2 adds a unit test: it arms AUTO security and then forbids
-> elevation, asserting the auth error is delivered to the caller with no
-> retry on the wire. Without patch 1 the client retries and the test
-> aborts on the unexpected Read Request.
->
-> Tested against Android (Galaxy Z Flip 4), iOS (iPhone) and macOS
-> (MacBook): each connects and is probed with no unsolicited pairing
-> prompt, while explicit pairing continues to work.
+with no bound on the offset, reading past the end of the firmware image.
+A malicious or malfunctioning NXP UART controller can drive this to read
+out-of-bounds kernel memory during firmware download.
 
-Why are you connecting in the first place? Who is advertising?
-Actually if you end up with an encrypted link, that's a win in terms
-of security, so why would it be a bad thing?
+Bound the offset before the header read, and convert the payload write
+guard to the overflow-safe form used by the v3 path (fw_dnld_v1_offset is
+u32, so fw_dnld_v1_offset + len can wrap). Log the offset, expected length
+and firmware size at the reject site to aid debugging of a real device.
 
-> Both patches were developed with the assistance of an AI model
-> (Claude Opus 4.8), disclosed per-patch with an Assisted-by: trailer.
-> Every line was reviewed by me and the result was built, run and tested
-> on the hardware above -- behaviour observed, not inferred.
->
-> Philipp Dunkel (2):
->   shared/att: don't auto-bond on reactive elevation
->   unit/test-gatt: cover no-auto-sec on auth error
->
->  src/device.c     | 13 +++++++++++++
->  src/shared/att.c | 20 ++++++++++++++++++++
->  src/shared/att.h |  1 +
->  unit/test-gatt.c | 28 ++++++++++++++++++++++++++++
->  4 files changed, 62 insertions(+)
->
-> --
-> 2.55.0
->
->
+This was found by 0sec automated security-research tooling
+(https://0sec.ai).
 
+Fixes: 689ca16e5232 ("Bluetooth: NXP: Add protocol support for NXP Bluetooth chipsets")
+Cc: stable@vger.kernel.org
+Reviewed-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Assisted-by: 0sec:claude-opus-4-8
+Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+---
+v2: log offset/expected_len/fw size at the reject site (requested by
+    Neeraj Kale and Paul Menzel).  No functional change to the bound
+    itself vs v1.
 
---=20
-Luiz Augusto von Dentz
+v1: https://lore.kernel.org/linux-bluetooth/20260705115650.81724-1-doruk@0sec.ai/
+ drivers/bluetooth/btnxpuart.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index 0bb300eef157..6d62d07a542b 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -1041,11 +1041,19 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
+ 		 * and we need to re-send the previous header again.
+ 		 */
+ 		if (len == nxpdev->fw_v1_expected_len) {
+-			if (len == HDR_LEN)
++			if (len == HDR_LEN) {
++				if (nxpdev->fw_dnld_v1_offset >= nxpdev->fw->size ||
++				    nxpdev->fw->size - nxpdev->fw_dnld_v1_offset < HDR_LEN) {
++					bt_dev_err(hdev, "FW request out of bounds: offset %u, expected_len %u, fw size %zu",
++						   nxpdev->fw_dnld_v1_offset, len,
++						   nxpdev->fw->size);
++					goto free_skb;
++				}
+ 				nxpdev->fw_v1_expected_len = nxp_get_data_len(nxpdev->fw->data +
+ 									nxpdev->fw_dnld_v1_offset);
+-			else
++			} else {
+ 				nxpdev->fw_v1_expected_len = HDR_LEN;
++			}
+ 		} else if (len == HDR_LEN) {
+ 			/* FW download out of sync. Send previous chunk again */
+ 			nxpdev->fw_dnld_v1_offset -= nxpdev->fw_v1_sent_bytes;
+@@ -1053,7 +1061,8 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
+ 		}
+ 	}
+ 
+-	if (nxpdev->fw_dnld_v1_offset + len <= nxpdev->fw->size)
++	if (nxpdev->fw_dnld_v1_offset < nxpdev->fw->size &&
++	    len <= nxpdev->fw->size - nxpdev->fw_dnld_v1_offset)
+ 		serdev_device_write_buf(nxpdev->serdev, nxpdev->fw->data +
+ 					nxpdev->fw_dnld_v1_offset, len);
+ 	nxpdev->fw_v1_sent_bytes = len;
+-- 
+2.43.0
+
