@@ -1,137 +1,134 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411C5383316
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 14:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784642833; cv=pass; b=K9pdh1XqsH7D7OYG6OeU8OWT7lfAjsWDLAabT6oSwbfpPTn5W4VMzG08rIs59CMxex64elTBcdHCq6WXQXGTf5rjzK6iTO5c/CzP04vVfA2d2jpTju6vntCAuLMYmapuRZ1VlUimIrAZt5TdbwUz8qiLnFir86Z7sIHRIA9KXRw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784642833; c=relaxed/simple;
-	bh=MF7Gt6xSCvBWH5Z8rKDVT5ogNz4KYEfCwUkYY6EOwK8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GGLPcUhcW6GrbrCnjQnoOc3+DSvZ2/yB3uo2824yRJm/KrLsWRohBRKm2qofDN51DwMPWOzRVm7JLJPx5cjgj0ciS2BbHZMb1Q9FhBOSjDs4F5xjXWhSMSwi//5zJkljKMlXxARkyrN0IfaqV6vO4Q6TmrUyv04OkelGFREcKCY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YFpdR9RL; arc=pass smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075AF384223
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 14:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784643448; cv=none; b=qrTs9yAJjlxB2JZ6ljs55G1Eou9KLVJQqPLUx31RGrgdNnI9TQGOowx1qk+r8GsxcD9V7mRVIivhMsqAJzt4RtRlPN6B7ATEQ6IYEqsFwsTQLFfzPARgyL6jLxXHDA9x0a92nS9lf7h64rKYeF/Xhcw7wG0DAO1hB42Nz4sHckQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784643448; c=relaxed/simple;
+	bh=Y7mtcsZRD14JvWnXKHuuB7KbAY+XbTZSPOn2+28lq3g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NoTuMszMmWMobROWr/V1HMqIYjSVxgleZdgJwLFv7CxCCxhR1MzVKbSkbIBJGBziEQLt86mrlZ2mFA/BL/1zobg7m/rlwy4VKoUI72GJOpEvssgsJVsl/6EKVu8T+aRif5IvokuF71CsVBKSuUv3d2mUTFrrI8Q9e5jx5aNorq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FvPe9OQL; arc=none smtp.client-ip=209.85.221.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YFpdR9RL"
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-81ef11a0972so50235937b3.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 07:07:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784642831; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Yv6YP2aU9+gZNJrWE1lAfPUK2ZeGvR6A8V6CE+6POeFXTERpB7K/dWRG9xq8mV/tV4
-         5e6mq9yY/8sJGtBrEZbEKs4ghx5KbVTAaYSygwf6dwob7i44C114YeZxKCNYMYfK3aL5
-         O81l84aTWTxNMTITwN26pCZ0qIy9b40li5y8PnO2C/UB2LST04fRTxADTmZEK2FwkgMc
-         I1WwYDkbiF4AScV8XlQscpYVrme1uGE5AxR6nq2fTi2zCXF2wYuR0OvOowQaoA2X8ODa
-         Ggi7dysv5fBqYxaA2/Y4tHZjGy+0TEvIeuIEjEf4NiFpAPlVj5G/HfFlNe9qE6WkJ7Li
-         hTsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=mEZScEO+sxo4ItYgtDTRhGAjuHMSOfwApD7XiOQK37A=;
-        fh=SPnlVb3xEGVdPPJKCVG7yadbn/6o62p4zP6U7FBxm1U=;
-        b=Pii3VFk9QV4CZqWMtdV3IWC/1r4gUb8iadIOD3zwB/wYQRwuAR7Tu1RUJTEPII8snC
-         ZNpigkShAIziUxVKJX5oFIf0SAg4qbtlfp+4jP46F9UfqXdJMzKFZMDhNR0Vafesjc+B
-         BAF5DPe5Cs2/HmhS9k7WD4jUWmSmk7lMvgIKjyIg8WudLE7l2oXKh7XGAkBLjmHLqqET
-         7lA+90vkNaSpjY4rz9iUbturlVAUfXHuvuRve3EeDRCtaVAjf5VJ0s1/StOQzx187VC/
-         4K6Q1DMglEeWPxENBk+jzhjNwsyvn92UJy0l6GOZ5YpcNkIlfjalyd/yEVHPrnEq9XHd
-         pkVw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FvPe9OQL"
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-47f707e5d75so1714655f8f.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 07:17:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784642831; x=1785247631; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=mEZScEO+sxo4ItYgtDTRhGAjuHMSOfwApD7XiOQK37A=;
-        b=YFpdR9RLUul3f9ylcFRCP83ryrEJ1EK161S6aD5iIvRvk9tFdeKSrdjSY7rnwTzACO
-         ktgg77musa6agLG1i+Vf+IXk9tilM4C+JqYP5gn2J7w69F6vwzZksb7fx6Iijr5ZvMnV
-         TXGYWS0FPMBNnhWNdm85ELqHxAoqHN7wl3sib+dlWPxeBhwVQfWZYVdZ0/iD/6PGjQtS
-         LrsijRVYT/sTG6rWD0BAk7KvM9jFHijDrXZ6I2zcIjztUcrN69eO4aSxou7lz0aB6wCm
-         GYKQVfisrQxy++JQZBZGS8YCkIbSKdFIXl138IezAQxnkq+JWo08FYAuXy4MvVyUmkPg
-         jsoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784642831; x=1785247631;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=gmail.com; s=20251104; t=1784643445; x=1785248245; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=mEZScEO+sxo4ItYgtDTRhGAjuHMSOfwApD7XiOQK37A=;
-        b=EzcP5AqQG1748NJlySqVi3ynBgRNJVwisl9JI+qZEnNNaxbp2zQ2t8LA6K0dWeQ/iX
-         2cdvGAxC94x4CCbtpgi/1PuSmH1ykueCmMLMTr8ZR9m8+jsG0uhiOV6Seh/SsI+tDRZw
-         XQAQ9P3/vDyJJT6KdDq5np3K/H0BqwHZbeZ3e8k9jV+Z+8Kx159mNbM3WZeHnllAxZ8o
-         b6EfU47F//aPma3Kw8I10URKo3FsglnvuclE5OrRSysLUrR5w/vchdu9yjb6nAjiPVmn
-         PHk0iuV03EbgXF7YwS8AD6kBLtdZYS/n+n7Os9E2fDtsDyWTye9oPwiLmAXnUH5s84/S
-         xvAQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrbEvx90ToJh/qM3nEjwSR+V0Dm7lsjHov6idOaCIyeRZ6XUDyZU6FDkq++1SK5ONTwIXaxKwnoAbpCCEBO+3E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwS86QbM3n2VfCP7dNR9dB+gr3li1TCv2GYhnuhb3EVZTCPELPb
-	D6atVSKZLG2As4KBWH6FvMmpCkAn7wXX4CYXa3Yj/4T1Z/Drmbhz+fMiKPaarx79vlNuuQqT2hv
-	VGP66sLj32xD0doiQI+PSgUssGoAUuxtqP37Sj8du0Q==
-X-Gm-Gg: AR+sD10EmuLUxV7bDX/iMWGFyGzXlmgDQSlHTF2P25caNaooDlP40CQb+TQ7afHXPh8
-	R6Y1gWTmpj3zILmISXh9I8lRskQa/Q5WpB/JLlT0dRsIOb4EkhROG7J99ocAxmrFs0IYh5slGz1
-	VyzI8MwtyGaQK1aL2Pijyxb6gaLwBgc+89Io22F21AIWqR7qtLElB37xRk/gTFtna7TEzu5bDgf
-	a8zcnAixICzhjBWiYqqWb73RIr3hHkyC3NNIgcgovG29HIGfyK95GlZM46N8XBPssO2KR98VSOS
-	0kEoWjVR652VZIcjQHtE7q1+Mks8c/SUMwPqJ/5E6iDX/heQKJsYhBUhrxg=
-X-Received: by 2002:a05:690c:650e:b0:80a:ed07:9c1a with SMTP id
- 00721157ae682-81ef22e4812mr67235557b3.6.1784642830996; Tue, 21 Jul 2026
- 07:07:10 -0700 (PDT)
+        bh=IJSa+Sb3PDfqrXfBdEr2r8ZM79XlUMQ8qyVaVgPxVRE=;
+        b=FvPe9OQL0w1Vcdovh2fHxl+eQtBNsEz5lUxQxDfvzfrrdY8KSXV31pytrPOZsND0sk
+         GHsfVrU6FfQev1RVepLY20UGhkUuQn58wVa0CLxj+8TS7Ac2yOOxdkM7avjgSxjbWiK0
+         al+6rwEk4oj9mBk9Z67DDrgmH2hQuB3lhalCXi7ktQqSMBWEb/amKP+lInlHvMT9W8L4
+         K0yRTDzw6CG3wbdKgioHftSt/11uibI7F9uHMdCcXbz6ZuhwgtqT5VRxaCbFWYaEmqYt
+         uMqs/f/NMnAEeN/yV47yF83TqeGB10NeyvEnak1re1AMOtA+E6kI8VlA3tpiDMu5GFC3
+         CCBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784643445; x=1785248245;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=IJSa+Sb3PDfqrXfBdEr2r8ZM79XlUMQ8qyVaVgPxVRE=;
+        b=aqbhrdic67Cgf7k2WvalgrHNAlPCPuiNbSY8FIw2yCcKCxtGwFj3i67aDsJ/Ii03Yv
+         DByMdiIyg/MQsWs/OgVZZSLr10CVQAFDuSRlIhC2MlC15HQKbmkzIImysq/QeKAFUwK6
+         SDoe/ZOnEQCshpmonavhWwMcvR0YSYl3wKAKuHPA8ID5Ks7TDSfo/RvphFCHRUVzI7Zm
+         5P+6TwIvg/pa1dMna/Q7uXr4xlaJsweYtSI7/l662Ty29b/ycIGCR/ZlbDcw0Er/uTos
+         cah9djzuGSUdYeC4OuhgVVUZTh8C5RnWDPfIORE3RoBOVigVuGiZecMBMtVShdj/bQB3
+         x4dw==
+X-Gm-Message-State: AOJu0YzXjhGQbIbNZ+MhLjJKVrE9n9Iqaln4e37tHiPZIyIn4AULiHTi
+	Cf9g4m8Zd6m0mZ1RmdoLRfbUY9OjC7B7K5Lxm4zY2E3mWDo7WhQKsnTKMWrU6KaKtpmwgQ==
+X-Gm-Gg: AR+sD10enlKFpO3HW9E3GyGJb37S3Y+O3QuQa4bv57P8OC5gtXqTeqtrTajb23iovKi
+	S5PhLJqC73+YD1jciOLkuCnOD+cPCik+koaRiJQajbaGpPurmrgezUGS4yQmrthaGsXabVeY/9p
+	ugObneBegfM8TM1qJVpaIjHe165oCekrlEzxkvBgX/Gjfi64baQOWzMlZtafzW36hSvren77U7v
+	zrATx8hYFYFrL1SAU7yCIHb8sEXrPIx6JSKaYFkVMDWkPmvlSWcucdxASPGJHw/7JB4hrfWLReL
+	wPLdAbxD8UDRnTXX7brvj5klV/KKfczyg2tD52pGg5yNxvE1eXpXJag+p5wFBGWe/1DTDFb1Gg4
+	LgM2y+a3M4wGV8PIC5Cqf9+rZpbZy/MokgDUiCHfQYp4/OjQNoMxliUd+a+iyp7AWJDIsJZygpI
+	6r24TbNDBKNVfRWPY=
+X-Received: by 2002:adf:e190:0:b0:473:d65d:49c1 with SMTP id ffacd0b85a97d-47f6232c53bmr22584373f8f.32.1784643444936;
+        Tue, 21 Jul 2026 07:17:24 -0700 (PDT)
+Received: from pakrohk.localdoman ([89.34.36.164])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f63e49acesm37898270f8f.6.2026.07.21.07.17.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jul 2026 07:17:24 -0700 (PDT)
+From: Pakrohk <rhpcir@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	Pakrohk <Pakrohk@users.noreply.github.com>
+Subject: [PATCH BlueZ v2 0/3] Add HID gamepad quirk fallback for broken SDP records
+Date: Tue, 21 Jul 2026 17:47:15 +0330
+Message-ID: <cover.1753084800.git.Pakrohk@users.noreply.github.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260719-vendor_hci-v1-0-df2ac5a50117@oss.qualcomm.com>
- <20260719-vendor_hci-v1-2-df2ac5a50117@oss.qualcomm.com> <CABBYNZK0RSZ6xOgkx=wcme9kUWXFHydAvHR+EXwkp4eJwp-QKw@mail.gmail.com>
- <12ee8fef-c8b5-4e77-874d-789b24c5458f@oss.qualcomm.com>
-In-Reply-To: <12ee8fef-c8b5-4e77-874d-789b24c5458f@oss.qualcomm.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 21 Jul 2026 10:06:59 -0400
-X-Gm-Features: AUfX_mxILpP_PU1lByQCJlFTnyktKXMXCf9B-whaW-stZ42voq2jt3XSF1OFG6I
-Message-ID: <CABBYNZ+mYA9xgXhXTUdV4C1jM1iFvFSvYAtVUbGavZObGFuhoA@mail.gmail.com>
-Subject: Re: [PATCH bluez RFC 2/3] doc: hci-protocol: Add sock option
- BT_RCV_VENDOR_PKT for HCI_CHANNEL_USER
-To: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Zijun Hu <zijun_hu@icloud.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Zijun,
+From: Pakrohk <Pakrohk@users.noreply.github.com>
 
-On Tue, Jul 21, 2026 at 5:07=E2=80=AFAM Zijun Hu <zijun.hu@oss.qualcomm.com=
-> wrote:
->
-> On 7/20/2026 10:10 PM, Luiz Augusto von Dentz wrote:
-> >> +-----------------------------------
-> >> +
-> >> +Enable receiving vendor HCI frames, requires hci_channel to be set to
-> >> +HCI_CHANNEL_USER.
-> >> +
-> >> +Default is disabled.
-> >> +
-> >> +Example:
-> >> +
-> >> +.. code-block::
-> >> +
-> >> +    int enable =3D 1;
-> >> +    int err;
-> >> +
-> >> +    err =3D setsockopt(fd, SOL_BLUETOOTH, BT_RCV_VENDOR_PKT, &enable,
-> >> +                                                    sizeof(enable));
-> >> +
-> > I don't think we have any socket option with this name, besides this
-> > should really go as an HCI packet with an H4 header set accordingly.
->
-> Hi Luiz,
->
-> I named it after BT_SNDMTU/BT_RCVMTU, but that may not be a good fit.
-> Any preferred name?
-> Happy to rename.
+This patch series adds a modular quirk system that provides HID report
+descriptor fallbacks for third-party Bluetooth gamepads with incomplete
+or malformed SDP records.
 
-I mean we don't need it, you just prefix with packet type 0xff and the
-kernel should accept it.
+Problem:
+Third-party Bluetooth HID gamepads (notably TG170W / DualShock 4 v2
+clones, VID:PID 054c:09cc) expose incomplete HID SDP records. BlueZ's
+extract_hid_record() fails with -ENOENT, preventing HIDP registration.
+The Bluetooth link is active but no /dev/input/event* device is created.
+Windows and Android handle this gracefully by falling back to known HID
+descriptors. BlueZ does not.
 
---=20
-Luiz Augusto von Dentz
+Solution:
+A two-tier quirk system that activates only when SDP parsing fails for a
+specifically matched device. Does not globally weaken HID parsing.
+
+  hidp_add_connection()
+    -> extract_hid_record()           // normal SDP path
+      -> FAILS (-ENOENT)
+    -> gamepad_quirk_apply()          // check built-in + external quirks
+      -> inject fallback HID descriptor
+    -> continue HIDP setup normally
+
+Patch [1] adds HMAC-SHA256 to the internal bt_crypto library using the
+kernel AF_ALG interface, following the existing cmac(aes) pattern. This
+replaces the previous openssl CLI dependency.
+
+Patch [2] adds the core quirk system: built-in quirk for TG170W/DS4 v2,
+external quirk profile loader with HMAC signature verification, and the
+device.c integration point.
+
+Patch [3] adds bluez-quirkctl, a CLI tool for managing external quirk
+profiles (validate, install, list, remove).
+
+External quirk profiles are JSON files installed to
+/var/lib/bluez/quirks/ with HMAC-SHA256 signatures, loaded at bluetoothd
+startup. This enables community-maintained gamepad support without BlueZ
+source modifications.
+
+Testing:
+  - TG170W / DualShock 4 v2 (054c:09cc): buttons, sticks, touchpad
+    verified via evtest
+  - Kernel creates three input devices: Wireless Controller,
+    Wireless Controller Motion Sensors, Wireless Controller Touchpad
+  - External profile validation, installation, loading tested end-to-end
+  - Tampered profiles rejected by signature verification
+
+---
+Patch 1: src: add HMAC-SHA256 to bt_crypto using kernel AF_ALG
+Patch 2: input: add HID gamepad quirk fallback for broken SDP records
+Patch 3: tools: add bluez-quirkctl for managing quirk profiles
+
+-- 
+2.49.0
+
+
