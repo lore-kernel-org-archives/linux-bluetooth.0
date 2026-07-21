@@ -1,62 +1,64 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13403CB2D4;
-	Tue, 21 Jul 2026 09:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177453976A7
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 09:20:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784625605; cv=pass; b=a8DWbErpw9NA9OGKgzdj2qLwW4rr7DlkrIrAPEJ563y225AfOwtuScuNyhi7iXPNRcjgKkwZrTmhZR6P5WH8g1J/V2mj5Zgu6XL4PF1kkgRaDKl7os30pJo+CSlnkZVunKGJ63vepeOTXi5feSa1VCeb/RkvvIxpMYJxVYmoThE=
+	t=1784625621; cv=pass; b=jUgNiXdwy2rTn0IE1eofZ2mfBAT2fo28taWZ0JyqgOIGisS6oJz1aCv2Tgoz4amgW/f8ODFnQeFMhaCrGDW3dgRDcgZBewwHPXtcMtp7Yg9+NXau0X2jKulNj+cU9aBRmY9wbJQAk//C588BGPu2oaPeNMMR/EhVPAPhzvJsXDk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784625605; c=relaxed/simple;
-	bh=kQdtEFDtQWRxyq7862Qymvi8w8zvKII6uKF+COdRYRs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nmF/oSuxsR/0Pj/RCBJSAIg6l33AadIagHZHJ683DTgFEerD1YxXi+9TpeaqJv19lT62Zm5OVP8P+lMd9Y4xYjiIHtmQMy8M2f2lTS3uq4o18zZy/ieRlFukNCdDDOWiHRppRRNOzA7E0og5uARLEugN/reh9hrl0jNoKncoQFk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=TVzhiMhI; arc=pass smtp.client-ip=195.140.195.201
+	s=arc-20240116; t=1784625621; c=relaxed/simple;
+	bh=wao0LjWLsuYWNCE00cBDc3WJ6+v0zPrNGOj2aLujCmw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N35kop+fZfHO10PMcHPVDzC/s7MTlpiOH3wQ1sTTy+Um0lbtwGs5cf2GrXkq0KhfFhnl4HRKuPuyOiqg0mzfgBo6WpzJu581Fi0BnGEEDDeZQbO9grQ9RPJR3BHSglXogEf2corEl+XBtXL0W9rcCTskiC/EXPQh+cPrD1CS24w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=iXvfTpJ0; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="TVzhiMhI"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="iXvfTpJ0"
 Received: from monolith.lan (unknown [185.65.133.169])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4h4Bg31xkJzyVm;
-	Tue, 21 Jul 2026 12:19:59 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1784625600;
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4h4BgJ365pz4BKLM;
+	Tue, 21 Jul 2026 12:20:12 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1784625612;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=pd7Npr+u9nLgFCKIKRgO9/wao0EniJkp9ElHKDLHt1E=;
-	b=TVzhiMhIAyDVlCIpn79xwsnwre//uWaFHCewJIHbKThYF2guNR4gzlhXrHgGNpCiLU5Oao
-	JnEVfPT/90wRPr/iV5oNjkP+CeglvXuFZtZ4B+2OjjOh8arAN9Vnr1/YGw9MlPChCLXGDG
-	9rQEBXjGuaOLm5LJ6P9vhQyw8+pSvbI=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1784625600;
-	b=ye8FUXZd68tU/JAcFspWXpEc+dkpzDoh8acnVVEuHs2zkoZeF9N7NXKPK4wYRsvdfP9a3M
-	MkuMcY5ohCBYNg4umu62KlAePY9hbZbKvqjJ63jqsQ/opQAv8pkvN6iFUGKfL7DqsXh7iP
-	1C5iV+5P4T6CHGg4zPOjO8DrArb90RY=
+	bh=9SiXMHI9N2IaYEzPBrFsWUZOhtvOzkvX+NfYzfngFuU=;
+	b=iXvfTpJ0jy8CmbUhY4OCR+K2d4ffYpxXfRnzHToVsJzUxnwNn8Zgs4ISZKpCchky6Nqi/X
+	inZbZd+P0+oSrXtP1VDBkxowB2YGrbBtuUppL9ep6i01gpAWzjcYV8GSPXvlxO1U3K1Z7a
+	HXCEHJUADH8yo7issyGCA3oFssWPiY4LEvtJaVEMsLra3Taej/Pvjbl8KCv9eTMdfnxOOb
+	7mbzCFnNW0QVEpuS7/n21nGSrjVx3GBffr1DpAPYplDUrtFc1LytGo2Jor8Wi/WHiQ2Jv6
+	i4UGdRUckQ/d9uzrYoDDUSWv4TgxrIBQMbWVRI16JbhjVQ9Hw9i69VY3PhRSVQ==
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1784625612;
+	b=letE5F723+v6mxTtYTn1FlbW2x5NPKk0Y6quR0MepApmCDaQYLJhFH+Q92g0ggkvye+hbX
+	gW9wOKkP8ByYX9nTUOn0Hy18PfuBIizshYkMPCP3RO+AofA4SRP5NyqGPM80MV58QdRlLn
+	GHXmDQIM9A6hZYXIsTFxV7G6/5URFo5BK0Q1tqlURoLLUZL3BzRERzgE9Ar8gLSBbJfsQ8
+	p7kXxCQa5ft/UaUP9R8Owr89Rw2wNselX1Bc/OV56CcDmQcD6j/gHA6DY4ofGIWna2wpn4
+	trwM5nts/GWu/3khyCzBAvtvhvCmtQdJxhSV8V1tlcGuW5GGDib2J9K2U9WGqg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1784625600;
+	s=lahtoruutu; t=1784625612;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=pd7Npr+u9nLgFCKIKRgO9/wao0EniJkp9ElHKDLHt1E=;
-	b=hD+Ja76tyGN6AvDwCfsGe7hSJPhar5Zkaqy8rnfbPbkahkKWZWBZKqhdGN7lLhIpSAgyB4
-	bMy6AAAGldc2+WUe/wzSY/KtvrEA4UUUAqdBy9zdmy6N/RLfeKXTGngLrBmLH1Z1FVcHIS
-	qbIoX1O6fPJzSJ3weCIDVkpzjdk5ZHE=
+	bh=9SiXMHI9N2IaYEzPBrFsWUZOhtvOzkvX+NfYzfngFuU=;
+	b=FOr50Asl/pIPloALCHwQBUU76JVXapUuPDj11Xt6msT14i5xHXmUyq/sT/B8ttkGE/yCSe
+	8FFMLQ4W1lDx67PZNCBo1kTA2yGsLttjFEDXjlKYfDxXzn9KrFCDpFYhh5NvLLkZoPbhvu
+	f50f4FwJcEz2F0Vm2bsoDVjDx4PBR1zOakhDSgcMeNeiEZqh/tEBNP/JHCQyNDyvGM0tDG
+	P3rYL5xQjJB5mTHuz4wDBgBFbRamUz+kJofcB1r4AyCVlgVtSvsdevfKf9RkE/rOcdAOnQ
+	XKX8aSNAl1YBvtGZCvn4i+kzKt5Ko18VNSomn7nVQGnUarurn7dWURY6M0mZiA==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	iulia.tanasescu@nxp.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: ISO: fix UAF on socket close before shutdown completes
-Date: Tue, 21 Jul 2026 12:19:54 +0300
-Message-ID: <fbd9dd573bb1ce5f38370128dd35447e2ddfed9c.1784625576.git.pav@iki.fi>
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] tools/iso-tester: add tests for socket shutdown with linger enabled
+Date: Tue, 21 Jul 2026 12:20:08 +0300
+Message-ID: <f81384d367ad95cbe74338eba688daa46b379feb.1784624911.git.pav@iki.fi>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -66,110 +68,159 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-iso_sock_disconn() aims to disconnect the hcon by dropping it, which
-triggers iso_conn_del() to tear down the iso_conn once the HCI operation
-completes, which requires valid hcon->iso_data.  iso_sock_disconn() sets
-conn->hcon = NULL to avoid a second drop, but also preventing clearing
-hcon->iso_data on socket release. Closing the socket before
-iso_conn_del() runs then results to UAF.
+Add tests with SO_LINGER enabled, to test kernel sock transitions
+properly to BT_CLOSED on shutdown.
 
-Fix by using a separate flag to track the hcon drop status, instead of
-clearing conn->hcon.
+Unlike L2CAP, ISO sockets don't have a feature to send POLLHUP only
+after HCI Disconnect is received, so only SO_LINGER can be used to test
+the sequence is shutdown -> Disconnect, HUP -> release, and not
+shutdown -> HUP -> release -> Disconnect.
 
-Log: (BlueZ iso-tester ISO Connect Close - Success)
-BUG: KASAN: slab-use-after-free in iso_conn_hold_unless_zero
-...
- iso_conn_hold_unless_zero (net/bluetooth/iso.c:138)
- iso_conn_del (net/bluetooth/iso.c:270)
- hci_conn_failed (net/bluetooth/hci_conn.c:1408)
- hci_abort_conn_sync (net/bluetooth/hci_sync.c:5817)
+Add tests:
 
-Allocated by task 34:
- iso_conn_add (net/bluetooth/iso.c:216)
- iso_connect_cis (net/bluetooth/iso.c:507)
- iso_sock_connect (net/bluetooth/iso.c:1211)
- __sys_connect (net/socket.c:2148)
-
-Freed by task 34:
- iso_chan_del (net/bluetooth/iso.c:248)
- iso_sock_close (net/bluetooth/iso.c:885)
- iso_sock_release (net/bluetooth/iso.c:2022)
- sock_close (net/socket.c:722)
-
-Fixes: fbdc4bc47268 ("Bluetooth: ISO: Use defer setup to separate PA sync and BIG sync")
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+ISO Defer Linger - Success
+ISO Connect Linger - Success
 ---
+ tools/iso-tester.c | 68 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 67 insertions(+), 1 deletion(-)
 
-Notes:
-    v3:
-    - use test_and_set_bit() instead of lock + bool
-    v2:
-    - use flag to track dropping instead of detaching sk
-      in iso_sock_disconn()
-    
-    On previous Sashiko comment (IIUC this note text is included in the
-    context, maybe generates better review): iso_connect_cfm() with status
-    != 0 or iso_disconn_cfm() is guaranteed to be called before the ISO
-    hci_conn is deleted. It should then go to iso_conn_del() which is
-    supposed to limit the lifetime of the associated iso_conn to be shorter
-    than hci_conn.
-    
-    hci_conn::iso_data is not associated with iso_conn refcount, but
-    iso_pi(sk)->conn is supposed to hold one when non-NULL.
-
- net/bluetooth/iso.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
-
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 2e95a153912c..5dc2915f7b32 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -24,8 +24,14 @@ static struct bt_sock_list iso_sk_list = {
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index fe27eaaf3..a792a804b 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
+@@ -478,6 +478,7 @@ struct test_data {
+ 	bool suspending;
+ 	struct tx_tstamp_data tx_ts;
+ 	int seqnum;
++	GThread *thread;
  };
  
- /* ---- ISO connections ---- */
-+enum {
-+	ISO_CONN_DROPPED,
-+	__ISO_CONN_NUM_FLAGS
-+};
+ struct iso_client_data {
+@@ -522,6 +523,9 @@ struct iso_client_data {
+ 	 * Used for testing TX timestamping OPT_ID.
+ 	 */
+ 	unsigned int repeat_send;
 +
- struct iso_conn {
- 	struct hci_conn	*hcon;
-+	DECLARE_BITMAP(flags, __ISO_CONN_NUM_FLAGS);
++	/* Whether to enable SO_LINGER (for test_connect_wait_close) */
++	bool so_linger;
+ };
  
- 	/* @lock: spinlock protecting changes to iso_conn fields */
- 	spinlock_t	lock;
-@@ -107,7 +113,8 @@ static void iso_conn_free(struct kref *ref)
+ typedef bool (*iso_defer_accept_t)(struct test_data *data, GIOChannel *io,
+@@ -717,6 +721,11 @@ static void test_post_teardown(const void *test_data)
  
- 	if (conn->hcon) {
- 		conn->hcon->iso_data = NULL;
--		hci_conn_drop(conn->hcon);
-+		if (!test_and_set_bit(ISO_CONN_DROPPED, conn->flags))
-+			hci_conn_drop(conn->hcon);
- 	}
- 
- 	/* Ensure no more work items will run since hci_conn has been dropped */
-@@ -306,6 +313,7 @@ static int __iso_chan_add(struct iso_conn *conn, struct sock *sk,
- 
- 	iso_pi(sk)->conn = conn;
- 	conn->sk = sk;
-+	clear_bit(ISO_CONN_DROPPED, conn->flags);
- 
- 	if (parent)
- 		bt_accept_enqueue(parent, sk, true);
-@@ -835,10 +843,8 @@ static void iso_sock_disconn(struct sock *sk)
- 	}
- 
- 	sk->sk_state = BT_DISCONN;
--	iso_conn_lock(iso_pi(sk)->conn);
--	hci_conn_drop(iso_pi(sk)->conn->hcon);
--	iso_pi(sk)->conn->hcon = NULL;
--	iso_conn_unlock(iso_pi(sk)->conn);
-+	if (!test_and_set_bit(ISO_CONN_DROPPED, iso_pi(sk)->conn->flags))
-+		hci_conn_drop(iso_pi(sk)->conn->hcon);
+ 	hciemu_unref(data->hciemu);
+ 	data->hciemu = NULL;
++
++	if (data->thread) {
++		g_thread_unref(data->thread);
++		data->thread = NULL;
++	}
  }
  
- static void __iso_sock_close(struct sock *sk)
+ static void test_data_free(void *test_data)
+@@ -1352,6 +1361,19 @@ static const struct iso_client_data connect_ac_1_2_cig_1_2 = {
+ 	.mconn = true,
+ };
+ 
++static const struct iso_client_data linger_16_2_1 = {
++	.qos = QOS_16_2_1,
++	.expect_err = 0,
++	.so_linger = true,
++};
++
++static const struct iso_client_data linger_defer_16_2_1 = {
++	.qos = QOS_16_2_1,
++	.expect_err = 0,
++	.defer = true,
++	.so_linger = true,
++};
++
+ static const struct iso_client_data bcast_48_1_g = {
+ 	.qos = QOS_OUT_48_1_g,
+ 	.expect_err = 0,
+@@ -3679,6 +3701,19 @@ static void test_connect2_busy(const void *test_data)
+ 	setup_connect(data, 0, iso_connect_cb_busy);
+ }
+ 
++static gpointer shutdown_sk_thread_cb(gpointer data)
++{
++	int sk = PTR_TO_UINT(data);
++	struct timespec start, end;
++
++	clock_gettime(CLOCK_MONOTONIC, &start);
++	shutdown(sk, SHUT_RDWR);
++	clock_gettime(CLOCK_MONOTONIC, &end);
++
++	/* Completed before linger timeout? */
++	return UINT_TO_PTR(TS_NSEC(&end) - TS_NSEC(&start) < SEC_NSEC(2));
++}
++
+ static gboolean iso_connect_close_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+@@ -3688,6 +3723,13 @@ static gboolean iso_connect_close_cb(GIOChannel *io, GIOCondition cond,
+ 
+ 	tester_print("Disconnected");
+ 
++	if (data->thread) {
++		/* Wait for shutdown() to complete, for linger enabled */
++		if (!g_thread_join(data->thread))
++			tester_test_failed();
++		data->thread = NULL;
++	}
++
+ 	--data->step;
+ 	if (!data->step)
+ 		tester_test_passed();
+@@ -3737,16 +3779,34 @@ static gboolean iso_connect_wait_close_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+ 	struct test_data *data = tester_get_data();
++	const struct iso_client_data *isodata = data->test_data;
+ 	int sk;
+ 
+ 	tester_print("Connected");
+ 
+ 	sk = g_io_channel_unix_get_fd(io);
+ 
++	if (isodata->so_linger) {
++		struct linger val = { .l_onoff = 1, .l_linger = 2 };
++
++		if (setsockopt(sk, SOL_SOCKET, SO_LINGER, &val, sizeof(val))) {
++			tester_warn("Can't set socket option : %s (%d)",
++							strerror(errno), errno);
++			tester_test_failed();
++			return FALSE;
++		}
++	}
++
+ 	data->io_id[0] = g_io_add_watch(io, G_IO_HUP, iso_connect_close_cb,
+ 									data);
+ 
+-	shutdown(sk, SHUT_RDWR);
++	if (!isodata->so_linger)
++		shutdown(sk, SHUT_RDWR);
++	else {
++		/* With linger shutdown() blocks, so run in separate thread */
++		data->thread = g_thread_new("close_sk", shutdown_sk_thread_cb,
++							UINT_TO_PTR(sk));
++	}
+ 
+ 	return FALSE;
+ }
+@@ -4160,6 +4220,12 @@ int main(int argc, char *argv[])
+ 	test_iso("ISO Connect Wait Close - Success", &connect_16_2_1,
+ 					setup_powered, test_connect_wait_close);
+ 
++	test_iso("ISO Defer Linger - Success", &linger_16_2_1,
++					setup_powered, test_connect_wait_close);
++
++	test_iso("ISO Connect Linger - Success", &linger_defer_16_2_1,
++					setup_powered, test_connect_wait_close);
++
+ 	test_iso("ISO Connect Suspend - Success", &connect_suspend,
+ 							setup_powered,
+ 							test_connect_suspend);
 -- 
 2.55.0
 
