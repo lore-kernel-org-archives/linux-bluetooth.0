@@ -1,150 +1,128 @@
-Received: from mail-oi1-f206.google.com (mail-oi1-f206.google.com [209.85.167.206])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B048130F819
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 23:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.206
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784591790; cv=none; b=qpkKMn3GW2UoElH/TxD1Gvg0FnZGEJlSY0SWSp7ucQP4iKhJM+yVUC/5bHE4Cs8oiSNRGXXM9RoquDSU8bsn2vWHAQY4rkI5NyNRABkLd4gRhH7l4b20n7Ev8XYIEpknUEFsSZPFYmor9Uwb6lEecfS+wHVFxLsfbNL3KgvfMDk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784591790; c=relaxed/simple;
-	bh=tacwk512JYcKF+5dkygCidvXwNApZeyqPObupf06z1Y=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=JbR4LtbdXITPZvjfCYpNplh1AnEwayA3rJOP8VDQD8okYxqmlockZYm50QSVuYKgAn/3+rQ2x+UwfxcCQQ71s+b8zG+GkDza7QhpNoRa7bHLm5UM09tpsQ8fWIJiM6Et3q8qfpBE6lmLbYTMia4N8pmNB6dnRLmjLzGzimNMMks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f206.google.com with SMTP id 5614622812f47-49ce04870f8so17607066b6e.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 16:56:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0276010F1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 02:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784599851; cv=pass; b=Mo6Mg6x1+FW6a1jKNrK+9dEYoR9t7W12yK5yK61KjsOHLCPtwl91n7s9mAChdVN40Z6F2DVQ6doNGFFCrz1vg/zfRKfLhADrjZRq6j7iUhT24Hbg/N/1wScoR8q9Ui98zPOg475+1xHWfW8qGWROkVPUl96eMOrnzoTzI4D5Bc0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784599851; c=relaxed/simple;
+	bh=1dIpHQsevSfQlf9DisDaFsKWICHPyLtn7XOv7xQYkoU=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=O+Os+n+qUF5/h8mVw3m//LvbHKj/wGUWH7gIanSyrqXAQeDZ95OcK4k6tDfU7fBY4odh5I0nvVZ8M/IobJHdg9e9JTw6VUDyoQC9uJvLX4uhNCAVchM+oUzLfT9CXJmXpN8IlGkJiL5lL/BTCOj/jsxNIDuA/cuWzfWcm5QwOxA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GvE5/gqV; arc=pass smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GvE5/gqV"
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-8ef7b7651ecso43146476d6.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jul 2026 19:10:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784599849; cv=none;
+        d=google.com; s=arc-20260327;
+        b=RN46s9WCQIjcC3VfGwXtY2II1/Wx6iORkQHXmvChjO35yoIMixeSvyNKqOrrBRnHuZ
+         /WvsDINHB1a+QEqArTW4I+/PgOCKpVn/voA+Z1YUkJjytcJW+RP1kGVkLkzCxdTJsEGD
+         wfyPXf2Ef74LjZIIvl0zhfznGyX0/M+GboJM54VQbSaZ+d0b2K1/SYVWA2IQlKGxnIXX
+         zPZNZN+4W83d8ax7ilhote8dt1D6IxJsp+PNbJAxOpzlTKbVvQRLXnnltl0z0ybKVUvP
+         E0LgaWLJ7ApaqBLPq2DWX6rm1IU+p7dydOJfJHxu9aS1wqdo+fLzqLpi6fBeraVjFsUM
+         WYVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=GgYKG4AoJstaGEOQTQS0RzISCFiGWfsaq4PDHGbU77c=;
+        fh=57qyEZNdGrDPmxvVGEykGBW4sEu+txlrN6w+N80qi4o=;
+        b=NzQl9CTBWem2AbBfL+ebZoa9qwMq1vPNwfF8VxM9NRHu8gKxeGWrSEFRK6J2c3nIHB
+         IKBpLmgiIcGsC8BIu4OC53SDhtb2R8z8SZyDbINwsjkhkN6dAlmqUkF6/TNJKiln8t+s
+         nN2wifyDP/Qc5PVPECPN3+Oj0znbXtJ+19QpfysBpQZ2VUbjROakybJhiDB5GGb/9d0C
+         JOBvFyd4G/fCWcueqIlNpxJk8QxCuSMoJPW8Rn8fcMCBdXqKudiH8uoLG7CtxLLNrMCO
+         lV82l1D/k82EdaAXguXbvTlMSBKiDy4HrUSFVWlpQraPj8T84SwCXQdIQfjYv1/aPaMC
+         oRYA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784599849; x=1785204649; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=GgYKG4AoJstaGEOQTQS0RzISCFiGWfsaq4PDHGbU77c=;
+        b=GvE5/gqVwVCA0toEBQIqnSROaZgq0Zcsi7jv3v7JyTLcZes9YhRCa2oTnQtOs8cF2b
+         5tFK+J83Lw+5QfNzeqDN3qvSxR0Z6Pf7vvQDj2z/tlhhHrWNH1HJfZtNkhRGs8+OVNrd
+         vTSfLayg5VLT2hBTzVZS3IWxdp1LpRjQ/eB5Db8PTppxYaWex26BaRiCTMX4hcBXD98u
+         MCtOCAiVJXujewuMk6KyMA4f76xDvz4pUR3ujSF71qOUB9gWDdGJ33MGH5bB8UxJGyRa
+         ADLWWUN4xd0yMG4uBYf390g8JQDmy28QY2qt4N4UzFUH060TLIKW4fTDn9s8dRR6y3IK
+         +l1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784591787; x=1785196587;
-        h=content-type:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=U9wHbMHhd8AwxKX5crEIW9yPD+RhBzkSrhsrdb8HbHw=;
-        b=SCJGQNOFxctQKd781YysY60ECgvZrkPzq0hFbBauVSYjfmJJggliyrFy1DhogZ1nSQ
-         ZXLWS3ygspMUJ0aLU7oPvr9Bf9vIko4RaZww4Uayo4R/Y82MCP0qsI8l0nVCmpaGXgHf
-         FpiIw7cqff3TCqBq3VboNAWUjayhenWu6mn5EerzzDrtC7u6ANNbMlehqm9GQEwiUaAk
-         WU8PX1nqRxVMETmp9HWJTrcHQQOHg+TUcy4ETEQkAC4IaqW0dymj67WfUaiT+mXB7sR0
-         EhkBlpAqEweatxPAD1tabI6st1IGmfUwq/F+9EUIf9DMRc5tL2TPzGNfr2EiGzliiudP
-         BU3g==
-X-Gm-Message-State: AOJu0YzehI9cNjVMnti9rv537SymDzLrAMpPH74oAIjfeP7HJDVIPgK5
-	2D6XOa+nQtqD1GN8dlbVFCU1F9dddEIHMKBeAlpSgeq4bfq6wqi7tMvevysy8xyGSF4jtSxaEpx
-	DuBHcXPv/Ka3rn6Fc2+bADuq1tYU1QEIEl6Qc+8U4+g6gwM4GmRNoyx9Zti4Xzw==
+        d=1e100.net; s=20251104; t=1784599849; x=1785204649;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=GgYKG4AoJstaGEOQTQS0RzISCFiGWfsaq4PDHGbU77c=;
+        b=aYmHXmU6tYzSQoBPw4x2rWcAhcsEd4aie0Tzcx1COfncGQyK7UEtIDCn7BVMecgI/A
+         RYJR0gn2BKKD4RFhC5Qb6Jvx2lrE4vKemjxjYWIh01uTV0gGSmZV3RmsptpQzn4QTEXn
+         ukuRc3Ywh2MfTryBv4bJYib//0Wklng6n7rzb7j7dV7hnb9rPiTsoQIGbD549b4MBM3a
+         IvEB8/ykQIaHjW5Ne5Xm0xl8kWRdeN5ohnUq1LNOonGvSlf5SQDkHIu3SJCwJxyGqlhc
+         XT/DDJOQpKbF9R3Kd0dCbqjydliiIKjJbrRwkhVtG7ZaaoOY8FhrhcxZZby5GPAjSz6j
+         yTUg==
+X-Gm-Message-State: AOJu0Yx0JckSkhgpOXOWqaGIgj676+oQENwliisw5Amllt738Tu6weGM
+	tsxVgAN3lqXxdwLRp45tTM18E7VgY3DbklyoZC/vYsETsKBSdPirm3q5xPSpC6BIPJnZfav92en
+	Dk+aUTLNAgKJjcouB1h0ARC9bD0zvb42fYrYr
+X-Gm-Gg: AfdE7cntWRwqeQofidiwBeAuQ/Jk4/UKslAQ5bf1yw2uEejO2C6coKASIrRNyDxvXw1
+	fttZt6sRZ9MGLfvQrcyWqLv/hhcLTsfKBY8WVmaP/Ff258XAPhzqH0N/byI+OtSU95KCAfKIPkX
+	gkIsOWTYfXbxWK5cnIyW5Lp3LkeTZMqCeH5jLRvSEow9YNEzP6DKHPALDI8PEvA62ca1IyGRbgN
+	47EWsDmupBscDmjneMy636mk6qR6IkSPgxqRQzk+H9HHKdEM0/n4JP5PPvfTeAQeSWperVf
+X-Received: by 2002:a05:620a:1995:b0:930:866d:f86c with SMTP id
+ af79cd13be357-930a602ccc1mr2071687285a.34.1784599848719; Mon, 20 Jul 2026
+ 19:10:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:3448:b0:4a4:c12:ee68 with SMTP id
- 5614622812f47-4a4d01bb487mr8882354b6e.10.1784591787533; Mon, 20 Jul 2026
- 16:56:27 -0700 (PDT)
-Date: Mon, 20 Jul 2026 16:56:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a5eb5ab.42649fcc.6186.008b.GAE@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: null-ptr-deref Read in l2cap_chan_hold_unless_zero
-From: syzbot <syzbot+e6382a2f53f5fc7453ac@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+From: Edgard Lopes <edgardlv@gmail.com>
+Date: Mon, 20 Jul 2026 23:10:37 -0300
+X-Gm-Features: AUfX_mwiOqAKRV-cY9D0nH1588VBK4-kRIW_yltAIl6pUV-wQ4jo9CNJwLTXhAQ
+Message-ID: <CACUvvBVT=iVA4GjCHOwxdD9R6ukVmdM-mfr0u9NBfua1cBsUNA@mail.gmail.com>
+Subject: [PATCH] Bluetooth: btusb: Add ID 0b05:1825 for ASUS QCA ROME adapter
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+The Bluetooth radio of the ASUS combo WiFi/BT card based on QCA6174
+(e.g. bundled with ASUS motherboards / PCE-AC55BT) is a QCA ROME
+device rebranded under the ASUS vendor ID:
 
-syzbot found the following issue on:
+  idVendor=0x0b05, idProduct=0x1825, bcdDevice=0.01
+  bDeviceClass=e0 Sub=01 Prot=01 (full speed, MxPS=64)
+  Both interfaces Cls=e0(wlcon) Sub=01 Prot=01, driven by btusb
 
-HEAD commit:    e22254e9ddd8 Merge tag 'xfs-fixes-7.2-rc4' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13d46789580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=48ef5c5c0f192153
-dashboard link: https://syzkaller.appspot.com/bug?extid=e6382a2f53f5fc7453ac
-compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17b434b9580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17d46789580000
+Without the quirk, btusb treats it as a generic adapter and never
+loads the QCA rampatch firmware, leaving the device running its bare
+ROM firmware. In that state SCO/eSCO audio is broken: the controller
+delivers malformed packets which the kernel drops ("Bluetooth: hci0:
+corrupted SCO packet"), so HFP/HSP microphone input never works, and
+the kernel also logs "unexpected event for opcode 0x2005" during LE
+operations.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-e22254e9.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c69a30d7d78f/vmlinux-e22254e9.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f15a346cc7e1/bzImage-e22254e9.xz
+With this entry the device is set up as QCA ROME:
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e6382a2f53f5fc7453ac@syzkaller.appspotmail.com
+  Bluetooth: hci0: using rampatch file: qca/rampatch_usb_00000302.bin
+  Bluetooth: hci0: QCA: patch rome 0x302 build 0x3e8, firmware rome
+0x302 build 0x111
+  Bluetooth: hci0: using NVM file: qca/nvm_usb_00000302.bin
 
-==================================================================
-BUG: KASAN: null-ptr-deref in instrument_atomic_read include/linux/instrumented.h:82 [inline]
-BUG: KASAN: null-ptr-deref in atomic_read include/linux/atomic/atomic-instrumented.h:32 [inline]
-BUG: KASAN: null-ptr-deref in refcount_read include/linux/refcount.h:170 [inline]
-BUG: KASAN: null-ptr-deref in __refcount_add_not_zero include/linux/refcount.h:176 [inline]
-BUG: KASAN: null-ptr-deref in __refcount_inc_not_zero include/linux/refcount.h:317 [inline]
-BUG: KASAN: null-ptr-deref in refcount_inc_not_zero include/linux/refcount.h:335 [inline]
-BUG: KASAN: null-ptr-deref in kref_get_unless_zero include/linux/kref.h:133 [inline]
-BUG: KASAN: null-ptr-deref in l2cap_chan_hold_unless_zero+0x80/0x290 net/bluetooth/l2cap_core.c:511
-Read of size 4 at addr 0000000000000008 by task syz.0.158/6397
+after which eSCO audio works in both directions with zero errors
+(verified with HFP against JBL Live 770NC and other headsets).
 
-CPU: 2 UID: 0 PID: 6397 Comm: syz.0.158 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
- kasan_report+0xdf/0x1c0 mm/kasan/report.c:595
- check_region_inline mm/kasan/generic.c:186 [inline]
- kasan_check_range+0x10f/0x1e0 mm/kasan/generic.c:200
- instrument_atomic_read include/linux/instrumented.h:82 [inline]
- atomic_read include/linux/atomic/atomic-instrumented.h:32 [inline]
- refcount_read include/linux/refcount.h:170 [inline]
- __refcount_add_not_zero include/linux/refcount.h:176 [inline]
- __refcount_inc_not_zero include/linux/refcount.h:317 [inline]
- refcount_inc_not_zero include/linux/refcount.h:335 [inline]
- kref_get_unless_zero include/linux/kref.h:133 [inline]
- l2cap_chan_hold_unless_zero+0x80/0x290 net/bluetooth/l2cap_core.c:511
- l2cap_sock_cleanup_listen+0x8a/0x4d0 net/bluetooth/l2cap_sock.c:1535
- l2cap_sock_release+0x69/0x280 net/bluetooth/l2cap_sock.c:1480
- __sock_release+0xb3/0x260 net/socket.c:710
- sock_close+0x1c/0x30 net/socket.c:1501
- __fput+0x3ff/0xb50 fs/file_table.c:512
- task_work_run+0x150/0x240 kernel/task_work.c:233
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- __exit_to_user_mode_loop kernel/entry/common.c:70 [inline]
- exit_to_user_mode_loop+0x1d8/0x6f0 kernel/entry/common.c:101
- __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
- syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:230 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:318 [inline]
- do_syscall_64+0x666/0x870 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f3758d9de99
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff659f88f8 EFLAGS: 00000246 ORIG_RAX: 00000000000001b4
-RAX: 0000000000000000 RBX: 00007f3759027da0 RCX: 00007f3758d9de99
-RDX: 0000000000000000 RSI: 000000000000001e RDI: 0000000000000003
-RBP: 00007f3759027da0 R08: 0000000000000006 R09: 0000000000000000
-R10: 00007f3759027cb0 R11: 0000000000000246 R12: 0000000000046482
-R13: 00007f375902609c R14: 00000000000461ac R15: 00007f3759026090
- </TASK>
-==================================================================
+The driver_info flags match the sibling QCA6174 entry 0cf3:e300.
 
-
+Signed-off-by: Edgard Lopes Voos <edgardlv@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -259,6 +259,8 @@
+  { USB_DEVICE(0x0489, 0xe03c), .driver_info = BTUSB_ATH3012 },
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+  /* QCA ROME chipset */
++ { USB_DEVICE(0x0b05, 0x1825), .driver_info = BTUSB_QCA_ROME |
++      BTUSB_WIDEBAND_SPEECH },
+  { USB_DEVICE(0x0cf3, 0x535b), .driver_info = BTUSB_QCA_ROME |
+       BTUSB_WIDEBAND_SPEECH },
+  { USB_DEVICE(0x0cf3, 0xe007), .driver_info = BTUSB_QCA_ROME |
