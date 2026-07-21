@@ -1,118 +1,125 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB9D22E3F0
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 08:41:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19133C1093
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 08:52:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784623305; cv=none; b=HMwNa9Ck7Aa5iBttPE8WVv1JTKpMBQOSUVPx6tHcfaMsQu3SgLCpv9IdmW5PE924DmRA00Mp7T0PUctH3o16YU5Ltf8opp1wcbAHERJxgrf7uKIVaKof1iGJ3K71nW0A5zVmPyVbV/f/qokQVDRU/aGz5iI+kw2kHzBthccDmGk=
+	t=1784623968; cv=none; b=nOa9mhx1vhjLjJUfBtP1+9dO/zRXge86ALHD/76v04/w8yYHjgXb8r6o15ZG3YrCIKIrMYehcBt8ooyuqVNF+gvtVzXCGhLTOOeS6yNY7Mq9vPSwpQM3lvA+gyUrbMArToVFnJ5WbLuS5mXVfjY5bg1xcq5d+agCTZSi7b3dzfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784623305; c=relaxed/simple;
-	bh=U9vF0ps2Ko32G2k/1DMrteFWg3sY+tijApnpUSbRFig=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EaEkLrYRi55wiajveWegKdoSf5ENI04ecZ8agn727l8U+shEbkA8Le2s5zIStYc0c/KlFvOvs5ZklxPwUP6PypegzAUXmLPHH7+ONLUnpYbuvIe6zgKGubAwtyf1AN+OJkgx0qF2JQHcn/z6e+hIjZyIqNUX5qdHPRYD5bWdIrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=FHnRXGdo; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=T+2HR/aP; arc=none smtp.client-ip=205.220.168.131
+	s=arc-20240116; t=1784623968; c=relaxed/simple;
+	bh=hMxc45dbK5h3h4yZDDdw/eZ2hT703Mtnw1BNkPgNr9g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZadChttBSn8x+F6PJGi9gpT+iNdA/OVx04EB9Mi99V8hQzARPeMipZ4jCxwet/zGlLifWNFwsBA+RLSReE+152qFl114WvsAUEPVNJGG0tclZ7IZqiIEaj+Pa6Q7MAOYOVwzbEl2XwaFzgQvGDZ8ZXERUwpgzu6Fk7MeR2Vq9XI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=LvFIs1my; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=QeGdAxny; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="FHnRXGdo";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="T+2HR/aP"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="LvFIs1my";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="QeGdAxny"
 Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66L6ESWc4107138
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 08:41:43 GMT
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66L6FIYu4107224
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 08:52:45 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=iO86NuwyKvQ
-	dnHjwrXJALyjqHujjI35691E1ThLBoEY=; b=FHnRXGdoy0XCCspG47dDW3i+TDf
-	h25NzBxed/aaExVYzmHzXbu+f+UiPA7co3L8knffZ6zsvZPMQvgPHFQEPkVv1+m4
-	BOuzEnfBjjsgKyNXppif1TzzU85hfp02Mqa42ryczOzqlzR8W1pB86TkAlsvVanW
-	U18nJj2OLFKTDbapdlMT6FBjDCnnqWDinbpykKmwsoS9AsFTJJPswX0fI+CZx/6w
-	QL4r3F5qwD4sPImIhEh2m3gJ8Mw81Ts78VrnhmT7tcP0Va2us11GPUKnnguyK2xT
-	40jszvjbsOfedEpQnDV3k+wdHXx/23GX4jDCOJncfsKnogF7RFzhWOfqZGA==
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fhvqna5qk-1
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	sp65Ain+LL4hQnK7XQICRZW/5ShCZoU6KkrvavJK4GY=; b=LvFIs1myXliAVHN7
+	NEebhi2s17C4Nj9kPCGH05++1MUtXEgbfbE0BcfFvIwSrYKcqIyWwYSyK2g8xF7y
+	ZioN1qiE895+7C7GazKfGYurH+MyBrrqAJ86wcgNaxWlhwPTqxX5apB/PCLNo+AJ
+	XH2Oi8aotfap2FUc/MIAqR6gh4rqBJZeEUIjeMFoT6Wr/Ar44C+HS7JxkdT7+YWk
+	DJoYIBfCrc+YozeNv0lWv+KO6cwmVaIqzYULBIUvT6KLJhuyQfVlcrWA/GRTr7CK
+	8DkeNEra4L93faa5r0XT7aIab3qW6TQbeSuJr9MwV869OLhT/r4+05MKu/c2+Nw9
+	ULJhuA==
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fhvqna98j-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 08:41:43 +0000 (GMT)
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c9c26587e67so5286250a12.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 01:41:43 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 08:52:45 +0000 (GMT)
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-c9dfa3f8d16so1439467a12.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 01:52:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1784623302; x=1785228102; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=iO86NuwyKvQdnHjwrXJALyjqHujjI35691E1ThLBoEY=;
-        b=T+2HR/aPGPxJQOfS9WGmY7vXBsAdC7ckwcA6dnlXEac56bS7gTmhWuaigsk0yFCZ5z
-         jP9vhloaFEnpZFMvK5jLGRJ2z0cAKjVfDCLFhK3y72bqERS/dbP6wFGF4xHTV8/sLNSa
-         cazcAQnmADgK2qNS/byFz3Q2Q0I4BtSsuZiotM0VD6pnUXPZ2NMJlXZPmSRxVK7vKOE2
-         q4W6Lx35IYkYs+jfbpv09P48IkUKc5i56XfdEInlKlGGNimcHA43Lih/krztQmOSjHxq
-         YyhrARljkxsMIVKjjHNCd1qrbQVYHgrHCWZ+qOqZOCQy/3yYw1uPAr3Z4rIs7tBHmqJz
-         B8KA==
+        d=oss.qualcomm.com; s=google; t=1784623964; x=1785228764; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=sp65Ain+LL4hQnK7XQICRZW/5ShCZoU6KkrvavJK4GY=;
+        b=QeGdAxny4vWUbw6YUpL8/YnsNjDqizpsJ25iApVO/GPLDiMiUt+NHYSZrjsnJTRa8a
+         exCfvhpiVXeZO1Qb4gXHZxK66Oq0acxWSjMXSICYE/JAqaTm1YYeD+RP+tgkwHch2c2T
+         SeFp8yWN/+myzSZ/cZndOKUqfJefXnjpnwfo/LCs/9Lv7fiQJORBtdVLN05MD8H+p10o
+         U23gxkAdMaaiftv1GKe08hZuUgnzr97wKXHo2OVA34TMjQEk/Jp4e3mWowx5jC34fd8T
+         cF/MFu0Hd9dmlfBDbjtiGz67kw7rHbxlbS8Rwy6kIdrLtCBpAzmvoWe2OP55s/gjfw0I
+         o59g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784623302; x=1785228102;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=iO86NuwyKvQdnHjwrXJALyjqHujjI35691E1ThLBoEY=;
-        b=sbEAo6vcADIoVGfs6AsLAmH4OQUX58U3wyxIgEW9rLNUsR9/oWwPRIBCR3vc/hiO+t
-         xzGDZ2z9WzjrIP/UPmZzsu2QzDCRt8ZsMFDvjGI++5S4A0PzgeFQHMLbIY94fAfr0phB
-         SV2NqSOwBb8REHdkVCQA4Hai9sqBo07YFx3G+j+Zym0Jw+C7moI4ptniS+tWXFpi/Uuy
-         vqhOnn0KNQjyVokoFdvNFf6OiCjAEMY0p9YVuKEOHfLfbQLtqvp+/zfchT4NBVsNdXGE
-         BzTFuVh2qL5aeYfCqYUvGvyS+1GUa97hv0cYMH607qwR8yJbpNfCsShyZqAu0l6bAlTw
-         bJwA==
-X-Gm-Message-State: AOJu0YwuiEBI1X3ROPl4bo38XlLBFaUoWDxEeqw5CkyVryz30XRdARkW
-	Y3zUS2EoCCS/jmUQd5DzQrJgAyuXldEagPqj/Dh8y3j4yD4EGtrl2OFpAKm3wLrgCKBgxra0pvg
-	7m5wqmEoFaCRphqc/OewdzvvjwjzdDHnSjzC54Y6q7n7AvqhKZqIYT8TccPhttI7akqiWvm9C0h
-	zO+XM=
-X-Gm-Gg: AfdE7cnUxn9xnQsaDJD4u057mH+MIRqts1pr8aKQgAzVl/FdEqmpygOnNefLZ/kmTjn
-	vPLDyvs0V+aw/oiH1y7J0ve13lG6oZ7hyjVOmdF3bwx6pa3P31KZHhDFNd+zcei1FwTZN98bYgR
-	JIvNdhcVwKnVi7KotfMOuyeP2RW7CbUUN+wmWjN/TDU+DysmslKLiIBFkJwc5l7iqUyGBvY6r8f
-	9Fj0Vh0x3w/Ia/mJYFDkprbXH+wd0noPS9fc3tksOPB+UQiZrdr76bHdbI/BvS2T2X2IZquZSHg
-	EhtTJlEj651QTAMx3BhGUG22s1pK+wSNjJHeIy5w0dVgGbNyY8h5znfEo4ykKhHnnDrEAZ5wzHK
-	1X1TZvJzZ/HzYjpRotvBouSisCEvu2Q==
-X-Received: by 2002:a05:6a21:a393:b0:3b2:8674:9830 with SMTP id adf61e73a8af0-3c38d90d347mr23892741637.14.1784623302455;
-        Tue, 21 Jul 2026 01:41:42 -0700 (PDT)
-X-Received: by 2002:a05:6a21:a393:b0:3b2:8674:9830 with SMTP id adf61e73a8af0-3c38d90d347mr23892713637.14.1784623301977;
-        Tue, 21 Jul 2026 01:41:41 -0700 (PDT)
-Received: from hu-nakella-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13ce2cbb7c5sm38063131c88.10.2026.07.21.01.41.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jul 2026 01:41:41 -0700 (PDT)
-From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
-        quic_anubhavg@quicinc.com,
-        Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Subject: [PATCH BlueZ v5 2/2] profiles: centralize reflector setup
-Date: Tue, 21 Jul 2026 14:11:21 +0530
-Message-Id: <20260721084121.688467-3-naga.akella@oss.qualcomm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260721084121.688467-1-naga.akella@oss.qualcomm.com>
-References: <20260721084121.688467-1-naga.akella@oss.qualcomm.com>
+        d=1e100.net; s=20251104; t=1784623964; x=1785228764;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=sp65Ain+LL4hQnK7XQICRZW/5ShCZoU6KkrvavJK4GY=;
+        b=Nu6s+/kwAN938eGuH5TJGzNZ0i4Noj35IaW9X4OLYIsdJxdNp9f6q/uUWApanEpnxC
+         /xz3Vrvb+URuMvuHut/UyAsnCnaJpehFySicBErb7FD6XiJiy0l+Zh1cEnwajmSNOMWf
+         LH/Vd8nPYya2IiWKrKstg8H+/3zzI/EYpr/dspB4fxB5efk/aw4v1aA1zuSzVxkKKh85
+         AQ/wCSz3Yvv3LHoiYAXzIQkkxAj/RXRuan7Pzw4L0hr08iFhlQdjk/eyJx8Gg3P0d9J4
+         6a4U+ChnBIioyUCYNvfJRHTXxJcLKL91lbisGZPMMtEU9HgR0DOTW8qzgl8cU9WS4NB5
+         +eBQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpP3szgw7Tc+VZBdTK0cghjGfMzZGIMWILUSCMepkmHht9C0syVsNWhllkC/dgcoZO3ehtfGLD6eNpZ0yu/DTE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8ePIacV1q7ZlnEwtoEMCgwogDQ0w6N1zFkc7RrjrFi+3xNtl6
+	eohepJxNVeu9S2vN2nrM3eob7dcFY1KhQlmu5Ppyl0ypCfxcqNBvficNtcQmhlIemM2wMoRk7ew
+	Lq20NsPMBzzPkim4/qVOK8AAn3rIMJzR92ZgRBXuH740aad5iPyAfihJLIME3GoQ0xco57eU=
+X-Gm-Gg: AR+sD10YbZUxW+8kuJ39luHHR6lbzvTIN2XhbYV70fifJTmpRhMVMJ8zfoxfUiTHVYl
+	0Vhq88fxkwRHvQtvlX9OWpTl6AUt9WadxJS4qbHK337UV3PYyhHa1TRG0kJ8jMpMeeh8qusDP3P
+	koTZK6qK9NDwXYCGG04ppJ04d62KE9GooyWQt/JotzU1m4E2uJWDq5GHVdLY0Lf97HPjWdq1p1m
+	3R28dkWKdUrvcUtdrfgs1qq8kjUg9J5SQQ/bHlmPQV1gSENwYc3lr14QhsA8CUfiJFB3Euq3Hpo
+	XzcQwelB0w6uusUbBljyw7UPufx1sqgC/q4qcj6IQuBrwMOF0uT0k6T02vPBF2P3kmN3sOprwBo
+	nkT4LO5bGp34MJfedsKz1NaDE8x70A2pEALdYfLtbohD6zvh+5aOvr0U0qmg5i777UIQ=
+X-Received: by 2002:a05:6a00:a386:b0:837:95fc:148d with SMTP id d2e1a72fcca58-84e02f060e9mr1811822b3a.0.1784623964440;
+        Tue, 21 Jul 2026 01:52:44 -0700 (PDT)
+X-Received: by 2002:a05:6a00:a386:b0:837:95fc:148d with SMTP id d2e1a72fcca58-84e02f060e9mr1811806b3a.0.1784623963864;
+        Tue, 21 Jul 2026 01:52:43 -0700 (PDT)
+Received: from [10.133.33.193] (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84c2bf08b7dsm7218502b3a.10.2026.07.21.01.52.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Jul 2026 01:52:43 -0700 (PDT)
+Message-ID: <0c5a924f-7382-407b-a0f4-dfd7dfe0d5e6@oss.qualcomm.com>
+Date: Tue, 21 Jul 2026 16:52:40 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC] Bluetooth: Add generic support for vendor HCI frames
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Zijun Hu <zijun_hu@icloud.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260719-support_vendor_hci-v1-1-764523a4ca3d@oss.qualcomm.com>
+ <CABBYNZL_H2iRAshF-RCX41jbt0jots5i5W=aUUJC_wEN6wzp=w@mail.gmail.com>
+Content-Language: en-US
+From: Zijun Hu <zijun.hu@oss.qualcomm.com>
+In-Reply-To: <CABBYNZL_H2iRAshF-RCX41jbt0jots5i5W=aUUJC_wEN6wzp=w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzIxMDA5MSBTYWx0ZWRfX9EkklyTRDTjX
- Q2t5ixravNd+Aj88NlEPL4vABrJXX8bedUGvMR6ruHcNZIeao1nJ5OwFoCa9+V6ZROJTBKEyK6L
- TmcGMSQm6GyFr/NPei+a5ep7J1y4Jufb7mgmyRtXOWgjbcs7hASeAf1k1Ehy5Iq0+IT+bI1nKMu
- kGTkKhkkb9mE3ZAqYIsT39es32ljiQMaQCOWZeUD0NnW0RMxLTuwbCxG/yzf/SDgeTiPVAYSyoM
- 868rO5bQhNtWHUReYPnIMn43dqqGswsV3+oUvYR9TDS4kcSE/apFJWYNRClYpVs+t0b3fzKIQZS
- CPqxQvv45WjTgFfgWIlMavY07nsTkIMMq9qYOVGy1xQ7G6OuYyDM112bPsdgHOoDm8de8a4kJxs
- 4AWbp6mFs0R4olH4HI+0vQirx+zhsFLEu5oRfUeBwbQtpdNAFnAC1u4PXahFAlsFx0uuqW+jcvT
- OacL2PPN2nK09u0wgGw==
-X-Proofpoint-ORIG-GUID: -R50k16xPww-VjPdbyB9CkUJKJx04t22
-X-Proofpoint-GUID: -R50k16xPww-VjPdbyB9CkUJKJx04t22
-X-Authority-Analysis: v=2.4 cv=M5F97Sws c=1 sm=1 tr=0 ts=6a5f30c7 cx=c_pps
- a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22 a=uXYGvHFHBPWYZw0bQ00A:9
- a=x9snwWr2DeNwDh03kgHS:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzIxMDA5MSBTYWx0ZWRfX+VJmqNzPa/jD
- e5KH9mvC+OwW5xrArq3583dUPY7N670jd+hOfe3tqjMwH4RngcDQ8nyufx9462H2MnJADr+PjsP
- WovwbWRfK3SitzaK9TBbYql9frnn/EE=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzIxMDA5MyBTYWx0ZWRfXz0/ZNnZdnChh
+ iqqc/ghxzkDNYEh5PJm2JYm8YT0Uz2nHtZdE8TomlpSVhfmvcsVjbNWLCMC+rzCzIDV/qNKTxI7
+ IcDZbXnpnIyxZuSatCJFJY8xJ4jluZMplpL+7UcaCYgEvlNDzBflNcyN+PKx84h59kAmw2JxOa4
+ 0WrRAQ6525Z/IiYkN7O09PqWEOjlZLON4gCKBXXQOKgG24QPgSS7vIU6D5CSPoXuLgWae+sZgaB
+ OcMhmUpy/EsD5H4D1HUDHP9YiXJJ8jcFN1oBO97uoaulLMHEEdYDFRSTGmLLCcuAjUx2cTqStId
+ rvp+p0cbVyYwKC4s/VOTxfTmlxEW9hlq9g8mRA3fLbRu1KIe8LQRcbmoe28otXrzIPyCWSBQerl
+ nDmiKQx2wB1JxMqeWgoGg7HhPEzt3T+VirHiwiWzeDMnnGaCwQ7IvYJa28TuVmzWfTMEnYjIgEN
+ GZ8tMoSv6znndp2fnSw==
+X-Proofpoint-ORIG-GUID: vL1nNhw6z2PcU-925e8V5pgGk0Jw8T9F
+X-Proofpoint-GUID: vL1nNhw6z2PcU-925e8V5pgGk0Jw8T9F
+X-Authority-Analysis: v=2.4 cv=M5F97Sws c=1 sm=1 tr=0 ts=6a5f335d cx=c_pps
+ a=oF/VQ+ItUULfLr/lQ2/icg==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22
+ a=qJ69AeZdAAAA:8 a=P-IC7800AAAA:8 a=EUspDBNiAAAA:8 a=frvC_GAFQxaIm3GKjhQA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=3WC7DwWrALyhR5TkjVHa:22
+ a=0Y2RA1oIKXp_UzxCg4Te:22 a=d3PnA9EDa4IxuAV0gXij:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzIxMDA5MyBTYWx0ZWRfX7j1URuuiDxRp
+ wrtCLVOrEiIYf3NEi9nTao4J32y5NMHnF7I/AjzkpDzxMt/3NR6/kvDk876Lti+w5X2BTRQZlBo
+ /lvYd2SJiyzHRm4ezzCEZp3K5aIhM2Q=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-07-20_06,2026-07-20_03,2025-10-01_01
@@ -121,230 +128,134 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501 spamscore=0 bulkscore=0 impostorscore=0 phishscore=0
  adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607210091
+ definitions=main-2607210093
 
-Add a helper for reflector initialization and track D-Bus registration
-state in rap_data. Simplify connection handling, move interface cleanup
-to object destruction, and streamline removal logic.
-Remove the legacy RAS accessed callback path and its registration
-handling from initialization and shutdown.
----
- profiles/ranging/rap.c | 137 +++++++++++++++++++++++++----------------
- 1 file changed, 84 insertions(+), 53 deletions(-)
+On 7/20/2026 10:30 PM, Luiz Augusto von Dentz wrote:
+>> For Qualcomm multi-subsystem BT chips, the transport wire carries both
+>> BT-HCI and PERI-HCI frames. PERI is a subsystem on the chip. Take the
+>> upcoming QCC2072 support as an example:
+>>
+>>     Packet type                BT-HCI indicator   PERI-HCI indicator
+>>     --------------------------------------------------------------
+>>     CMD (Host -> Controller)   0x01                0x31
+>>     ACL Data (bidirectional)   0x02                0x32
+>>     EVENT (Controller -> Host) 0x04                0x34
+> I would say this was fine, but you actuall need to reclassify these to
+> 0xff and then use an extra byte for the vendor opcode. Btw, you said
+> you could define H4 headers like this? The spec defines either:
+> 
+> https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Core_v6.3/out/en/host-controller-interface/three-wire-uart-transport-layer.html#UUID-1cf959bb-57a0-e782-4324-a9bc4ee3f134_table-idm13359018144714
+> 
+> Or
+> 
+> https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Core_v6.3/out/en/host-controller-interface/uart-transport-layer.html#UUID-83881875-5fbb-c366-400f-055ba726f70e_table-idm13359015052542
+> 
+Hi Luiz,
 
-diff --git a/profiles/ranging/rap.c b/profiles/ranging/rap.c
-index 3ffc0da76..71cdc592b 100644
---- a/profiles/ranging/rap.c
-+++ b/profiles/ranging/rap.c
-@@ -65,10 +65,12 @@ struct rap_data {
- 	void *hci_sm;  /* Per-device HCI state machine */
- 	uint16_t conn_handle;  /* Last known connection handle */
- 	struct cs_session active_session;  /* active==false when idle */
-+	bool dbus_registered;
- };
- 
- static struct queue *sessions;
- static struct queue *adapter_list;  /* List of rap_adapter_data */
-+static int rap_setup_reflector(struct rap_data *data);
- 
- /* Adapter data management */
- static bool match_adapter(const void *data, const void *match_data)
-@@ -218,6 +220,13 @@ static bool match_data(const void *data, const void *match_data)
- 
- static void rap_data_free(struct rap_data *data)
- {
-+	if (data->dbus_registered) {
-+		g_dbus_unregister_interface(btd_get_dbus_connection(),
-+					    device_get_path(data->device),
-+					    CS_INTERFACE);
-+		data->dbus_registered = false;
-+	}
-+
- 	if (data->service) {
- 		btd_service_set_user_data(data->service, NULL);
- 		bt_rap_set_user_data(data->rap, NULL);
-@@ -281,14 +290,13 @@ static void rap_attached(struct bt_rap *rap, void *user_data)
- 	struct rap_data *data;
- 	struct bt_att *att;
- 	struct btd_device *device;
-+	int err;
- 
- 	DBG("%p", rap);
- 
- 	data = queue_find(sessions, match_data, rap);
--	if (data) {
--		DBG("data is already present");
--		return;
--	}
-+	if (data)
-+		goto setup;
- 
- 	att = bt_rap_get_att(rap);
- 	if (!att) {
-@@ -306,6 +314,11 @@ static void rap_attached(struct bt_rap *rap, void *user_data)
- 	data->rap = rap;
- 
- 	rap_data_add(data);
-+
-+setup:
-+	err = rap_setup_reflector(data);
-+	if (err)
-+		error("Failed to set up reflector session: %d", err);
- }
- 
- enum cs_dict_target {
-@@ -662,19 +675,13 @@ static void rap_remove(struct btd_service *service)
- 		return;
- 	}
- 
--	g_dbus_unregister_interface(btd_get_dbus_connection(),
--				    device_get_path(device),
--				    CS_INTERFACE);
--
- 	rap_data_remove(data);
- }
- 
--static int rap_accept(struct btd_service *service)
-+static int rap_setup_reflector(struct rap_data *data)
- {
--	struct btd_device *device = btd_service_get_device(service);
-+	struct btd_device *device = data->device;
- 	struct btd_adapter *adapter = device_get_adapter(device);
--	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
--	struct rap_data *data = btd_service_get_user_data(service);
- 	struct bt_att *att;
- 	const bdaddr_t *bdaddr;
- 	uint8_t bdaddr_type;
-@@ -682,26 +689,18 @@ static int rap_accept(struct btd_service *service)
- 	char addr[18];
- 
- 	ba2str(device_get_address(device), addr);
--	DBG("%s", addr);
- 
--	if (!data) {
--		error("RAP Service not handled by profile");
--		return -EINVAL;
--	}
--
--	/* init shared adapter HCI channel */
--	if (!data->adapter_data) {
--		data->adapter_data = rap_adapter_data_ref(adapter);
-+	if (!data->hci_sm) {
- 		if (!data->adapter_data) {
--			error("Failed to get adapter HCI channel");
--			return -EINVAL;
-+			data->adapter_data = rap_adapter_data_ref(adapter);
-+			if (!data->adapter_data) {
-+				error("Failed to get adapter HCI channel");
-+				return -EINVAL;
-+			}
-+			DBG("Using shared HCI channel for adapter (ref =%d)",
-+				data->adapter_data->ref_count);
- 		}
--		DBG("Using shared HCI channel for adapter (ref_count=%d)",
--			data->adapter_data->ref_count);
--	}
- 
--	/* per-device HCI state machine */
--	if (!data->hci_sm) {
- 		data->hci_sm = bt_rap_attach_hci(data->rap,
- 					data->adapter_data->hci,
- 					btd_opts.defaults.bcs.role,
-@@ -721,38 +720,70 @@ static int rap_accept(struct btd_service *service)
- 					data);
- 	}
- 
--	if (!bt_rap_attach(data->rap, client)) {
--		error("RAP unable to attach");
--		return -EINVAL;
--	}
--
--	/* Set up connection handle mapping for CS event routing */
--	att = bt_rap_get_att(data->rap);
--	bdaddr = device_get_address(device);
--	bdaddr_type = device_get_le_address_type(device);
--
--	if (att && data->adapter_data->hci && data->hci_sm) {
--		if (bt_hci_get_conn_handle(data->adapter_data->hci,
--					(const uint8_t *) bdaddr, &handle)) {
--			DBG("Found conn handle 0x%04X for %s", handle, addr);
--			data->conn_handle = handle;
--			bt_rap_set_conn_hndl(data->hci_sm,
-+	/* Set up connection handle mapping for CS event routing. Retried on
-+	 * every call until it succeeds, since att may not be available yet
-+	 * the first time this runs (e.g. called from bt_rap_attach()'s
-+	 * attached callback before rap->client/att are set).
-+	 */
-+	if (!data->conn_handle) {
-+		att = bt_rap_get_att(data->rap);
-+		bdaddr = device_get_address(device);
-+		bdaddr_type = device_get_le_address_type(device);
-+
-+		if (att && data->adapter_data->hci) {
-+			if (bt_hci_get_conn_handle(data->adapter_data->hci,
-+				(const uint8_t *)bdaddr, &handle)) {
-+				DBG("conn handle 0x%04X for %s", handle, addr);
-+				data->conn_handle = handle;
-+				bt_rap_set_conn_hndl(data->hci_sm,
- 					data->rap, handle,
--					(const uint8_t *) bdaddr,
-+					(const uint8_t *)bdaddr,
- 					bdaddr_type,
- 					btd_device_is_initiator(device));
--		} else {
--			error("Failed to find connection handle for device %s",
--				addr);
-+			} else {
-+				error("Failed to find conn for device %s",
-+					addr);
-+			}
- 		}
- 	}
- 
--	btd_service_connecting_complete(service, 0);
-+	if (!data->dbus_registered) {
-+		g_dbus_register_interface(btd_get_dbus_connection(),
-+					  device_get_path(device),
-+					  CS_INTERFACE, cs_dbus_methods,
-+					  NULL, cs_dbus_properties, data, NULL);
-+		data->dbus_registered = true;
-+	}
-+
-+	return 0;
-+}
-+
-+static int rap_accept(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
-+	struct rap_data *data = btd_service_get_user_data(service);
-+	char addr[18];
-+	int err;
- 
--	g_dbus_register_interface(btd_get_dbus_connection(),
--				  device_get_path(data->device),
--				  CS_INTERFACE, cs_dbus_methods,
--				  NULL, cs_dbus_properties, data, NULL);
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	if (!data) {
-+		error("RAP Service not handled by profile");
-+		return -EINVAL;
-+	}
-+
-+	if (!bt_rap_attach(data->rap, client)) {
-+		error("RAP unable to attach");
-+		return -EINVAL;
-+	}
-+
-+	err = rap_setup_reflector(data);
-+	if (err)
-+		return err;
-+
-+	btd_service_connecting_complete(service, 0);
- 
- 	return 0;
- }
--- 
+Let us label this approach — which multiplexes the vendor indicator under 0xff — Solution A:
 
+virtual HCI_VENDOR_PKT (0xff) + vendor indicator (0x31/0x32/0x34) + body per indicator
+I did consider this solution — let us discuss it in the section below.
+
+The PERI-HCI indicators (0x31/0x32/0x34) are defined by the Qualcomm Bluetooth Extensions
+specification for the USB (Bulk Serialization mode), H4 UART, and SPI transports. They have
+already been deployed in several generations of commercial multi-subsystem BT chips.
+
+> We end up defining vendor 0xff because it is at the end of the range
+> which is probably safer.
+>
+
+I am not sure that fully holds here:
+
+First, vendors likely reason the same way — "end of range is safer", Take Qualcomm as an example:
+it already used 0xfb/0xfc/0xfd/0xfe as internal indicators.
+
+Second, current transport drivers already use 0xff in ways that break that expectation,
+as shown below:
+
+1) bpa10x uses 0xff as the wire indicator for HCI_DIAG_PKT (0xf0):
+https://elixir.bootlin.com/linux/v7.1/source/drivers/bluetooth/bpa10x.c#L72
+
+2) btmrvl remaps its wire vendor type 0xFE onto 0xff to carry Marvell vendor events:
+https://elixir.bootlin.com/linux/v7.1/source/drivers/bluetooth/btmrvl_sdio.c#L797
+
+3) hci_vhci uses it for the handshake that creates the virtual hdev:
+https://elixir.bootlin.com/linux/v7.1/source/drivers/bluetooth/hci_vhci.c#L462
+https://elixir.bootlin.com/linux/v7.1/source/drivers/bluetooth/hci_vhci.c#L523
+>> To generically support vendor HCI frames:
+>>
+>> - Show them in btmon logs as they appear on the wire.
+>> - Allow userspace to send/receive them via HCI_CHANNEL_USER, with a
+>>   socket option to control RX, defaulting off to eliminate regression
+>>   risk for existing applications.
+> We shouldn't need to do this, we should just accept 0xff as the vendor
+> packet type and then use the following byte as the real opcode (0x31,
+> 0x32, 0x34). Otherwise, if we start accepting vendor packet types
+> outside 0xff this will get crowded quickly and could potentially clash
+> with future specs.
+> 
+
+The indicator is a full u8, the entire [0x10, 0xef] indicator range is currently
+unused, and vendor indicators should be deliberately chosen to avoid conflicting with
+the BT SIG assignments.
+
+>> - Add hdev->recv_vendor() to handle vendor frames in hci_rx_work() like
+>>   BT frame handlers.
+>> - Add hci_send_vendor_frame() API similar to existing __hci_cmd_send().
+> Encoding/decoding of the frames should be transparent. I'm fine adding
+> code to the likes of btmon to decode vendor packets, we already have
+> something similar for Intel although that uses a vendor event not a
+> vendor packet (both use 0xff, causing the confusion). The user of the
+> user channel shall be able to read/write starting with 0xff then
+> decode/encode the next byte as the actual vendor opcode.
+> 
+>> Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
+>> ---
+>> Hi Luiz
+>> To address the below concerns you raised on previous
+>> discussion, and inspired from your suggestion to add hdev callback:
+>>
+>> - Not use safer skb helper like skb_pull_data()
+>> - It will skip sending to the monitor, making debugging much harder
+>>
+>> Looking forward to your further comments.
+>>
+>> Why hdev->is_vendor() instead of multiplexing vendor frames under a
+>> virtual HCI_VENDOR_PKT + vendor indicator byte ?
+>>
+>> 1) The virtual HCI_VENDOR_PKT isn't used by the core itself
+>>    currently, and may be removed later.
+>> 2) It makes full use of the indicator (hci_skb_pkt_type(skb)) space,
+>>    which is large enough to accommodate vendor frames without an
+>>    extra layer of nesting inside HCI_VENDOR_PKT.
+>> 3) It lets userspace and btmon logs see the exact same frame as it
+>>    appears on the wire.
+
+As noted above, I chose is_vendor() over Solution A. My reasoning follows,
+for your reference.
+
+1) Userspace sees exactly what is on the wire, in the same form as BT-HCI frames — 
+   clear and consistent, as shown below:
+  ┌───────┬──────────┬────────────┬────────────┐
+  │ Frame │ BT-HCI   │ PERI-HCI   │ PERI-HCI   │
+  │       │ existing │ is_vendor()│ Solution A │
+  ├───────┼──────────┼────────────┼────────────┤
+  │ CMD   │ 0x01 …   │ 0x31 …     │ 0xff 0x31… │
+  ├───────┼──────────┼────────────┼────────────┤
+  │ ACL   │ 0x02 …   │ 0x32 …     │ 0xff 0x32… │
+  ├───────┼──────────┼────────────┼────────────┤
+  │ EVENT │ 0x04 …   │ 0x34 …     │ 0xff 0x34… │
+  └───────┴──────────┴────────────┴────────────┘
+2) is_vendor() puts PERI-HCI on an equal footing with BT-HCI, so userspace and the transport
+   driver can reuse the existing BT-HCI path rather than add a separate encode/decode layer —
+   less effort on both sides.
+
+Could you please give me a clear direction 
+Solution A or is_vendor()?
+
+I need it before I can move forward with the remaining QCC2072 btusb development work.
+
+thank you.
+
+
+ 
