@@ -1,90 +1,175 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0DD3BAD9F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 09:16:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784625378; cv=none; b=k1UG/UoMrduTJBih3RkEiAFBhqTq46adgCk7K6HNLJoBYg3mnWM8JPOXt7IPXQQT9SfaGhxNe5WkBxxDqhsVQTxLRZ4UfXqP/DF2OTZSyOnwZzF9IEmEGF22RpE0a/44vsPHt9sbj5P7PJWJthW12U9JUu8xqlopCZzwHbFO6BA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784625378; c=relaxed/simple;
-	bh=GNz2W7baZacGiH3R2VoyjxhUJMcxqWAr/kKzgYVJDcg=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Ysw/eQyempQajU1PA5PljvFNld3gYsqs+LWaoo0amDNX00OzCRKEYfHM1cXNTVh9jnv5TDoHhOFx4EkP5t9Gc14QEm2pn4ej4SkVBOt9paBvFV43R6RiGd8I/JLbKOYrDpsb8lOVoOUQP7stQvwSQ+hqslW0he2ZvF2JRbUAps8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=iRO1P4HE; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13403CB2D4;
+	Tue, 21 Jul 2026 09:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784625605; cv=pass; b=a8DWbErpw9NA9OGKgzdj2qLwW4rr7DlkrIrAPEJ563y225AfOwtuScuNyhi7iXPNRcjgKkwZrTmhZR6P5WH8g1J/V2mj5Zgu6XL4PF1kkgRaDKl7os30pJo+CSlnkZVunKGJ63vepeOTXi5feSa1VCeb/RkvvIxpMYJxVYmoThE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784625605; c=relaxed/simple;
+	bh=kQdtEFDtQWRxyq7862Qymvi8w8zvKII6uKF+COdRYRs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nmF/oSuxsR/0Pj/RCBJSAIg6l33AadIagHZHJ683DTgFEerD1YxXi+9TpeaqJv19lT62Zm5OVP8P+lMd9Y4xYjiIHtmQMy8M2f2lTS3uq4o18zZy/ieRlFukNCdDDOWiHRppRRNOzA7E0og5uARLEugN/reh9hrl0jNoKncoQFk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=TVzhiMhI; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="iRO1P4HE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1784625376;
-	bh=KMgTs3xj0OhlIwcObMssZMHCQFflZEPbeHsIqWl88UQ=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=iRO1P4HE+0hfVEMHYntn5k/AJgVeZce0dtqr2d4/LL3CLazMuE8o9S9KOUil7cVWI
-	 gHvoawh4N8bEn1UewpxFxtBHi+PysEx8fTPubGR89Ya2sv+4nsHPFY2ttkoD6iAO5T
-	 0qKtBIDsdYwM0eTadV3aFWSN6JKYFWNhWf+aOEKE=
-Received: from github.com (hubbernetes-node-9f92d1e.ac4-iad.github.net [10.52.184.34])
-	by smtp.github.com (Postfix) with ESMTPA id 7CC537810C4
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 02:16:16 -0700 (PDT)
-Date: Tue, 21 Jul 2026 02:16:16 -0700
-From: Bhavani <noreply@github.com>
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="TVzhiMhI"
+Received: from monolith.lan (unknown [185.65.133.169])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4h4Bg31xkJzyVm;
+	Tue, 21 Jul 2026 12:19:59 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1784625600;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=pd7Npr+u9nLgFCKIKRgO9/wao0EniJkp9ElHKDLHt1E=;
+	b=TVzhiMhIAyDVlCIpn79xwsnwre//uWaFHCewJIHbKThYF2guNR4gzlhXrHgGNpCiLU5Oao
+	JnEVfPT/90wRPr/iV5oNjkP+CeglvXuFZtZ4B+2OjjOh8arAN9Vnr1/YGw9MlPChCLXGDG
+	9rQEBXjGuaOLm5LJ6P9vhQyw8+pSvbI=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1784625600;
+	b=ye8FUXZd68tU/JAcFspWXpEc+dkpzDoh8acnVVEuHs2zkoZeF9N7NXKPK4wYRsvdfP9a3M
+	MkuMcY5ohCBYNg4umu62KlAePY9hbZbKvqjJ63jqsQ/opQAv8pkvN6iFUGKfL7DqsXh7iP
+	1C5iV+5P4T6CHGg4zPOjO8DrArb90RY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1784625600;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=pd7Npr+u9nLgFCKIKRgO9/wao0EniJkp9ElHKDLHt1E=;
+	b=hD+Ja76tyGN6AvDwCfsGe7hSJPhar5Zkaqy8rnfbPbkahkKWZWBZKqhdGN7lLhIpSAgyB4
+	bMy6AAAGldc2+WUe/wzSY/KtvrEA4UUUAqdBy9zdmy6N/RLfeKXTGngLrBmLH1Z1FVcHIS
+	qbIoX1O6fPJzSJ3weCIDVkpzjdk5ZHE=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/1131452/000000-a12498@github.com>
-Subject: [bluez/bluez] ede1b1: rap: use session lookup for RAS operations
+Cc: Pauli Virtanen <pav@iki.fi>,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	iulia.tanasescu@nxp.com,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3] Bluetooth: ISO: fix UAF on socket close before shutdown completes
+Date: Tue, 21 Jul 2026 12:19:54 +0300
+Message-ID: <fbd9dd573bb1ce5f38370128dd35447e2ddfed9c.1784625576.git.pav@iki.fi>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/1131452
-  Home:   https://github.com/bluez/bluez
-  Commit: ede1b10d67642eba459a9b9b8860d844ded0997c
-      https://github.com/bluez/bluez/commit/ede1b10d67642eba459a9b9b8860d844ded0997c
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-07-21 (Tue, 21 Jul 2026)
+iso_sock_disconn() aims to disconnect the hcon by dropping it, which
+triggers iso_conn_del() to tear down the iso_conn once the HCI operation
+completes, which requires valid hcon->iso_data.  iso_sock_disconn() sets
+conn->hcon = NULL to avoid a second drop, but also preventing clearing
+hcon->iso_data on socket release. Closing the socket before
+iso_conn_del() runs then results to UAF.
 
-  Changed paths:
-    M src/shared/rap.c
-    M src/shared/rap.h
+Fix by using a separate flag to track the hcon drop status, instead of
+clearing conn->hcon.
 
-  Log Message:
-  -----------
-  rap: use session lookup for RAS operations
+Log: (BlueZ iso-tester ISO Connect Close - Success)
+BUG: KASAN: slab-use-after-free in iso_conn_hold_unless_zero
+...
+ iso_conn_hold_unless_zero (net/bluetooth/iso.c:138)
+ iso_conn_del (net/bluetooth/iso.c:270)
+ hci_conn_failed (net/bluetooth/hci_conn.c:1408)
+ hci_abort_conn_sync (net/bluetooth/hci_sync.c:5817)
 
-Store disconnect information in RAP state and
-centralize attachment handling through dedicated helpers.
-Add bt_rap_get_session() and use it from all RAS
-GATT server callbacks instead of the previous accessed
-notification bridge. As part of the cleanup,
-remove the accessed callback registration APIs,
-related notification code, and the unused timeout.h include
+Allocated by task 34:
+ iso_conn_add (net/bluetooth/iso.c:216)
+ iso_connect_cis (net/bluetooth/iso.c:507)
+ iso_sock_connect (net/bluetooth/iso.c:1211)
+ __sys_connect (net/socket.c:2148)
 
+Freed by task 34:
+ iso_chan_del (net/bluetooth/iso.c:248)
+ iso_sock_close (net/bluetooth/iso.c:885)
+ iso_sock_release (net/bluetooth/iso.c:2022)
+ sock_close (net/socket.c:722)
 
-  Commit: a12498ad4b814638833fd7a2f2b35e24ad4799b0
-      https://github.com/bluez/bluez/commit/a12498ad4b814638833fd7a2f2b35e24ad4799b0
-  Author: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-  Date:   2026-07-21 (Tue, 21 Jul 2026)
+Fixes: fbdc4bc47268 ("Bluetooth: ISO: Use defer setup to separate PA sync and BIG sync")
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
 
-  Changed paths:
-    M profiles/ranging/rap.c
+Notes:
+    v3:
+    - use test_and_set_bit() instead of lock + bool
+    v2:
+    - use flag to track dropping instead of detaching sk
+      in iso_sock_disconn()
+    
+    On previous Sashiko comment (IIUC this note text is included in the
+    context, maybe generates better review): iso_connect_cfm() with status
+    != 0 or iso_disconn_cfm() is guaranteed to be called before the ISO
+    hci_conn is deleted. It should then go to iso_conn_del() which is
+    supposed to limit the lifetime of the associated iso_conn to be shorter
+    than hci_conn.
+    
+    hci_conn::iso_data is not associated with iso_conn refcount, but
+    iso_pi(sk)->conn is supposed to hold one when non-NULL.
 
-  Log Message:
-  -----------
-  profiles: centralize reflector setup
+ net/bluetooth/iso.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-Add a helper for reflector initialization and track D-Bus registration
-state in rap_data. Simplify connection handling, move interface cleanup
-to object destruction, and streamline removal logic.
-Remove the legacy RAS accessed callback path and its registration
-handling from initialization and shutdown.
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 2e95a153912c..5dc2915f7b32 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -24,8 +24,14 @@ static struct bt_sock_list iso_sk_list = {
+ };
+ 
+ /* ---- ISO connections ---- */
++enum {
++	ISO_CONN_DROPPED,
++	__ISO_CONN_NUM_FLAGS
++};
++
+ struct iso_conn {
+ 	struct hci_conn	*hcon;
++	DECLARE_BITMAP(flags, __ISO_CONN_NUM_FLAGS);
+ 
+ 	/* @lock: spinlock protecting changes to iso_conn fields */
+ 	spinlock_t	lock;
+@@ -107,7 +113,8 @@ static void iso_conn_free(struct kref *ref)
+ 
+ 	if (conn->hcon) {
+ 		conn->hcon->iso_data = NULL;
+-		hci_conn_drop(conn->hcon);
++		if (!test_and_set_bit(ISO_CONN_DROPPED, conn->flags))
++			hci_conn_drop(conn->hcon);
+ 	}
+ 
+ 	/* Ensure no more work items will run since hci_conn has been dropped */
+@@ -306,6 +313,7 @@ static int __iso_chan_add(struct iso_conn *conn, struct sock *sk,
+ 
+ 	iso_pi(sk)->conn = conn;
+ 	conn->sk = sk;
++	clear_bit(ISO_CONN_DROPPED, conn->flags);
+ 
+ 	if (parent)
+ 		bt_accept_enqueue(parent, sk, true);
+@@ -835,10 +843,8 @@ static void iso_sock_disconn(struct sock *sk)
+ 	}
+ 
+ 	sk->sk_state = BT_DISCONN;
+-	iso_conn_lock(iso_pi(sk)->conn);
+-	hci_conn_drop(iso_pi(sk)->conn->hcon);
+-	iso_pi(sk)->conn->hcon = NULL;
+-	iso_conn_unlock(iso_pi(sk)->conn);
++	if (!test_and_set_bit(ISO_CONN_DROPPED, iso_pi(sk)->conn->flags))
++		hci_conn_drop(iso_pi(sk)->conn->hcon);
+ }
+ 
+ static void __iso_sock_close(struct sock *sk)
+-- 
+2.55.0
 
-
-Compare: https://github.com/bluez/bluez/compare/ede1b10d6764%5E...a12498ad4b81
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
