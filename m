@@ -1,274 +1,462 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2F63FF1C5
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 14:36:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784644585; cv=none; b=Mb+4hCAa8IP+A0ebsYHo/jrIDVwl74AUq3kS2pV7q4iGDqkOqubrPhWN6+fGMf1bLGe/C8y1mfi9iMtXDyiNZ5GbeHAxLWCDc9lerLFVVKaH2tUR5LgqBsJuy2Ee3dLF+wxk9nYS/CtsTZ/HzxA5n2S2gfO9cNHdQgGRFU784ZU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784644585; c=relaxed/simple;
-	bh=bgL5tbxHzvFclB/B3PWFb5TCJTT05yx6BY4AiqxdJ+g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d9aSGT50KGdhqd5xFcY7Wvm+cjZViZ/aPvGGR4mvnks0MoqhzMJNew4xRNrialUt6bSA6dDMwqKuP0N3hea/iY5zrOx0Av3IZJwn5H9A00wBZXoLaLWyylykxnNRJz2V4Nm4CVpkzv0dEhCBwrLpTgwYuiEJFmurbOkll7sW0qE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LOE25jt4; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D153D3FBB77
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 14:37:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784644631; cv=pass; b=cAhfZOFHsVrS5mZKXCZ3e9LcMBSYXBXM7MWz3lmOMVKr+52/XT8rW8peBhRXsOqeHgQGp7I6yHlilUYHoGxvfjJDDartAoKnJRtyl1vQHgxDwluOrGfF3jn1L7mNOjpBulYBrpNlyO9oxUpJ0g2eTzOaTVy8x6qgHBNzZnvbOzU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784644631; c=relaxed/simple;
+	bh=wbMhfQdUy5DU1kDMwP+UHV4LJpOxpBtoRYT4TaJwris=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mM49s9wrtHwKE3ISdioA2w0maplETImb0+75diZ7Gi4gWloY8ZRyG0y/UQ/7S4WlZ6zirCvQVsf1YOYQ1X99dfJKJWXXraxXQgkHVnBkrlT+DikFrl/yyeiLeLxJS6gLgEDUFUFJJmoPcwfL0hTiN1QnIej6iw1dGtjMiaZTNTQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wt6zcnaS; arc=pass smtp.client-ip=209.85.128.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LOE25jt4"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-8423f236418so6155685b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 07:36:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wt6zcnaS"
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-81e95760e42so15862787b3.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jul 2026 07:37:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784644629; cv=none;
+        d=google.com; s=arc-20260327;
+        b=C8YsHj9J8XknfzPM1zQvV1xV989kCHsTN+C7ecEOoeZilkmv9HeILxxkTR8Lix8Q/v
+         H+FcHMSY7j3G/wZcaStLRaBCDW9EkAutzQXsRSlP8uwrH4a8CgrWoZ4Hwo9ptt3wYXAs
+         JCAjxNgu+CpPs9gE5JzMPFE8Dlb5yRJYtLxjsYTRuMgJe5CUSrXPuB1763CHlLCesJht
+         QTMm2D2YiLhzpcuy1Ot4YZxV39xlQ1uM/oLo6TYIjxyRq0vLrJSJyjHTyDZGIikCsDAi
+         2mwSe2PrqhW0UFVM1vijAx2INsVOplRxmbCHsWNJo9laZtaS9ByFnx0o6VPuOEiJXajP
+         GqzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=IpUQEua7nLEY2KnnAo2ZNfwJkcH3p1ESHpDkGqjJxaY=;
+        fh=h0t8UKtdkJEtExGnMDmoafJH1yFcBNHSNlp+JUzL/60=;
+        b=UsHEoc0Owios1kbEntpFi1AnQIfdyNpGr+Z5HoqIz/HMFxrmIKjN/ryrv/19We8fHf
+         YmoLm9PkopvHGTJTbUW5lXvegR6CxFXDNHuiqLyqN+oJqz0MBUmLMgV3tNsvtRgt6AO9
+         oCHnHStFhjFjEt1/u0LIV9YqQsUDJMpFz4HsslCyrfO6RSy1UYUncsKAk56MS9KXDw3+
+         sz1qs4L9TZoaFn8M6mgq2NzvGvBWRW1fUfFiBW+P28x0XjUqvvbGzX1n5gvTeVA+wEij
+         Kygqd0qcUuS6BZaDQ+ciuTI2j45katKHNrh0Q8UwbntwBP12XAZy9wKKjKZtEMXsAAUk
+         VqkQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784644580; x=1785249380; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=RFEFab7lU7rBQz5LFtG2fcooAxiIEXcDPE3vpaeJMHQ=;
-        b=LOE25jt4RNTouIek1FThUFguT8TJsqaZrK4BibpeHZQbsCJchL1eGrDti/KksMAlTC
-         AXj3AgRXm0WvBPitAzRBCVBXUaTGPXn+7gYXTKdm1XK4NaE5rxQFF/LcjSKtcTuOvpeJ
-         8KeM0hYdJaL0u2AQavVNHlrTChLaKBaK0ImGXf+FPvFPmwqyccBO/8rvpCO8Yq9+pdXY
-         Hq5mG3W+qCeFS+BAPU6h11w7nhmxQgRdKv1aPNHbJGEjldGXUcjlgNVPihQjiUvo80K9
-         KUlgXpM6PvXvtOoT1UsTTrwfSH/s7q0wPikbrvsNRplKHD+yoMZ79d1LQr3Gteoj47e/
-         FmHg==
+        d=gmail.com; s=20251104; t=1784644629; x=1785249429; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=IpUQEua7nLEY2KnnAo2ZNfwJkcH3p1ESHpDkGqjJxaY=;
+        b=Wt6zcnaS4AgnxJp4lVJ677HwLIVt8VSt75OnmST92YMvKhKYZfSAQII2dfT5Jx8DBY
+         OlEKiPN0hGXcAff1p/vci42ymYtPXGbx1mDrT+QZb/TFrE6mmV+axW1Sq5EEQowXey59
+         1ziIMsrvrqjzuxUimvKTnT3hOSqeJ1EKRb8GQKb+0bP1hy+RuFpTZeTTuFY39As/USeU
+         +3I5yiAqf16psRwiNB+Q3kE/341wu+iSHz/TopyKjLrA+VAojeFvgw28S4k+R6RB7i3R
+         MR0IzrQwVoS/viaweaiGk0nYDSpcM/u1zel2JumLZPCLPTB6zWZdAG3+HFLrkLHA71hv
+         sRcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784644580; x=1785249380;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=RFEFab7lU7rBQz5LFtG2fcooAxiIEXcDPE3vpaeJMHQ=;
-        b=a+agYpIV9OW/YK+Qhhp103wRzyFd6tPUnlP7DUVgvP3cNW+JJGiz4Fo2ydme5lcemd
-         JvkqjP0KBmfXZ3iOeoqb/ZSowVNDOAY8uhiXfyBtwbWpsbnClIJPo0TaTTAbvc1r97Qm
-         9hhsRxsukDToys0QawVpIO35z63eTEYHquNaFFFkeDqJ5/RaJ+nNAcZwJaXIY2BJY2ti
-         C7T8hHbpFMA3he5kIVB45D/NJ+DhBrxlxFCNqtQiH7bmZ3Q/zYR8f0BIARU5nBuqJv0S
-         4BfFgauHeew8hJ0c++TxyDxWS6gm+L9+lHT69MwB1KGlycFWOZG9awBZKqGDQ7ldxfSR
-         NKQA==
-X-Gm-Message-State: AOJu0Yy7spXileMs2wDmHsylx3wBpSxpwhMJtp+fYW77G4tEekCiM+01
-	VLwIrvE/7WXJVfOVcRSRF1eMtS7EjX02OLuD4qr7aaDN2UoD82qKubZ5LdFKBzqF
-X-Gm-Gg: AR+sD12uauxuL6KoLyWDkZX0RTKiSwaEXbkUU6ppcID4mrkvztsBicfvZ8Lib6W2B+Y
-	Pe5KHB2R91YFFjFsGWYVVgLMW7Ndko7s40uUYkghyJPU65FXbnd7cqIS7gerKBLoF2JC/KYqdlg
-	fZDZ5H0zXWeadEjeqFH42I2s0RmBpxdKJoAX06hcPCEsJr6W3kTT2DRRG/Lj3K2W6n9YHXThmqr
-	ceBOsWlT+1jxTBdzh/oTfwBKkGW7nRjQdDHbD+dOOHl4Pb2MFbHCtYj2xe0+pv/qcwtHR+lSPcz
-	ogObbGiTwfUfdbJaZdCc1PEQffCAIkrZEgIFPqlHK0p98DozzcGU+V60rFNbD5dc5X2xcQ5OgI2
-	sZCPiTXOBaaRYRdi91RGoBlzy3OVhFx0lqpHv0xKFeW/5HeFs0LP0Lxao0SvVPCMaggqyeVceMZ
-	t/FNX6QqDW7jYdycy5BwYOwm0Yzwhw
-X-Received: by 2002:a05:6a00:228e:b0:848:47db:a0ac with SMTP id d2e1a72fcca58-84c292ab554mr18485988b3a.27.1784644579964;
-        Tue, 21 Jul 2026 07:36:19 -0700 (PDT)
-Received: from enjou-Legion-Y7000P-2019 ([144.48.80.242])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84c2e388aa7sm7420058b3a.5.2026.07.21.07.36.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jul 2026 07:36:19 -0700 (PDT)
-From: Ren Wei <enjou1224z@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	padovan@profusion.mobi,
-	johan.hedberg@nokia.com,
-	vega@nebusec.ai,
-	xizh2024@lzu.edu.cn,
-	enjou1224z@gmail.com
-Subject: [PATCH 1/1] Bluetooth: mgmt: fix UAF in pair command cancellation
-Date: Tue, 21 Jul 2026 22:36:07 +0800
-Message-ID: <5f62804883f405b432f3b72656cc07dd5223e828.1784492458.git.xizh2024@lzu.edu.cn>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1784492458.git.xizh2024@lzu.edu.cn>
-References: <cover.1784492458.git.xizh2024@lzu.edu.cn>
+        d=1e100.net; s=20251104; t=1784644629; x=1785249429;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=IpUQEua7nLEY2KnnAo2ZNfwJkcH3p1ESHpDkGqjJxaY=;
+        b=KP3ofZ6ddM65aNoJirsrFgf7jiZMTzUX0vV9nzOQCDomnwu0X+6oCAWxHUq/qnn2lQ
+         eK8St2bqDVbY5K+l85jWxF04oPOO8ebBDep+b8EF1Oy6HTj73D4lB2QCGA9kuPD8lM0s
+         jMutN5+GQVjMbLEe5BkT0LEdxjIGcRPGtKXQTrogt9RcjaaKtlF8BN0bkaZ8TJBBMjFY
+         lITjtYHn+ZOyHAX8FskrQbA/MjkUum7rDq3VKsbyYsMaTRdyvFRC7R3fjXFEfMPxx20C
+         zjCbVCopcTbjPC3ZRAfP8ANoeSwo1GovUUv+UAlaSVxJwY00VvETfJH3pD2Fq+vE7kt6
+         2Isw==
+X-Gm-Message-State: AOJu0YwEMXCLosDVfE1OlQjnx8cisOHwRxYaC5oW2mKEwHAP5rJLQu9e
+	vAwWwVUp13u5hxTZAzvkoSZf+dnwqxBrSFpmkz/T11aNYymPcZbpKQyK3Ky8cJAAyLKXJcg2E7W
+	zthtxRbbhtPX0Z/cAf4fIja8DxODoJEI=
+X-Gm-Gg: AR+sD13wfTL0KHgEFbpeZt41Cgr+8VA8E6jZYJUq0I6t5Ds45UgprAM41HLhDqkdmN/
+	pdu3NYokFgiQL/mfTc+DRnD1jeEtJYwHsvZn+BEGwEz1rrFPlD8hrCYs0qmhAkoGZryn7w6ts1a
+	i+KFlmxrMBmLY1SEsu2g97jFTPH4cb6Tfl1cix00lJ/xPmKAomCYgSSNo4QFwRoOAoelXkq9DBj
+	6cNch3ZBnO2bw0Lv9DSILeOazXdd39O2TqH0KBUv6iSGYRGsDooFuxlTXN2b8OYfQlpblDLC56e
+	t1fFMMt0SY16XNu8vB0y/aaQ96zNd9Yi/8/IysiW0aF4SW0q
+X-Received: by 2002:a05:690c:6b0b:b0:81d:26f9:bc82 with SMTP id
+ 00721157ae682-81ef26b4f7dmr63747957b3.57.1784644628546; Tue, 21 Jul 2026
+ 07:37:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1753084800.git.Pakrohk@users.noreply.github.com> <patch.1753084802.git.Pakrohk@users.noreply.github.com>
+In-Reply-To: <patch.1753084802.git.Pakrohk@users.noreply.github.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 21 Jul 2026 10:36:57 -0400
+X-Gm-Features: AUfX_mwysLUMyy6sfSg1yDUUACSSQj-nC4mSLOZESe4l3wgVinnuIE_oeU8hBrk
+Message-ID: <CABBYNZJUNQjaeiy6PrDLWZ1wwgfaEFjgozfZF91J=sPq2Uxp_g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 2/3] input: add HID gamepad quirk fallback for
+ broken SDP records
+To: Pakrohk <rhpcir@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, 
+	Pakrohk <Pakrohk@users.noreply.github.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Zihan Xi <xizh2024@lzu.edu.cn>
+Hi Pakrohk,
 
-The pairing completion and authentication failure callbacks look up the
-pending MGMT_OP_PAIR_DEVICE command by walking hdev->mgmt_pending. The
-lookup returned a command that was still linked on the shared pending list,
-without keeping mgmt_pending_lock held for the later dereference and
-removal.
+On Tue, Jul 21, 2026 at 10:17=E2=80=AFAM Pakrohk <rhpcir@gmail.com> wrote:
+>
+> From: Pakrohk <Pakrohk@users.noreply.github.com>
+>
+> Add a modular gamepad quirk system to profiles/input/ that provides HID
+> report descriptor fallbacks when BlueZ's SDP parser fails.
+>
+> When extract_hid_record() returns -ENOENT for a known gamepad, the quirk
+> system checks registered quirks and injects a fallback HID descriptor so
+> the kernel's HID driver can create an input device.
+>
+> Two tiers of quirk support:
+>
+> Built-in quirks:
+>   Hardcoded C entries for known broken controllers. Currently supports
+>   DualShock 4 v2 / TG170W (054c:09cc) with a minimal BT HID descriptor
+>   matching report ID 0x11 (78 bytes, as expected by hid-playstation).
+>
+> External quirk profiles:
+>   JSON files in /var/lib/bluez/quirks/ with HMAC-SHA256 signatures.
+>   Loaded at bluetoothd startup. Enables community-maintained support
+>   without BlueZ source modifications.
+>
+> Architecture:
+>   quirk.h     - quirk struct definition and dispatch API
+>   quirk.c     - quirk registry and dispatch logic
+>   quirk-profile.h/c - external JSON profile loader with HMAC verification
+>   quirks/tg170w.c - built-in quirk for DualShock 4 v2
+>
+> The quirk only activates when SDP parsing fails AND the device matches
+> a registered quirk. This does not globally weaken HID parsing.
+>
+> Multi-factor matching avoids false positives:
+>   match =3D (vendor_id =3D=3D 0x054c && product_id =3D=3D 0x09cc)
+>        || (device_name =3D=3D "Wireless Controller"
+>            && SDP provider contains "Sony")
+>
+> Signed-off-by: Pakrohk <Pakrohk@users.noreply.github.com>
+> diff --git a/profiles/input/device.c b/profiles/input/device.c
+> index 8017e07..0089c3d 100644
+> --- a/profiles/input/device.c
+> +++ b/profiles/input/device.c
+> @@ -1089,11 +1089,8 @@ static int hidp_add_connection(struct input_device=
+ *idev)
+>
+>         err =3D extract_hid_record(idev, req);
+>         if (err < 0) {
+> -               /* Try gamepad quirk fallback for known broken devices */
+> -               if (gamepad_quirk_match(idev)) {
+> -                       DBG("HID SDP failed, trying gamepad quirk");
+> -                       err =3D gamepad_quirk_apply(idev, req);
+> -               }
+> +               DBG("HID SDP failed, trying gamepad quirk");
+> +               err =3D gamepad_quirk_apply(idev, req);
+>         }
+>
+>         if (err < 0) {
+> diff --git a/profiles/input/quirk-profile.c b/profiles/input/quirk-profil=
+e.c
+> index 8ec3835..4240154 100644
+> --- a/profiles/input/quirk-profile.c
+> +++ b/profiles/input/quirk-profile.c
+> @@ -28,22 +28,20 @@
+>
+>  #include "bluetooth/bluetooth.h"
+>  #include "bluetooth/hidp.h"
+> +#include "bluetooth/sdp.h"
+> +#include "bluetooth/sdp_lib.h"
+>
+>  #include "src/log.h"
+>
+>  #include "quirk.h"
+>  #include "quirk-profile.h"
+>
+> -/* Accessors from src/device.h and src/service.h */
+> -extern struct btd_service *input_device_get_service(
+> -                                       struct input_device *idev);
+> -extern struct btd_device *btd_service_get_device(
+> -                                       const struct btd_service *service=
+);
+> -extern uint16_t btd_device_get_vendor(struct btd_device *device);
+> -extern uint16_t btd_device_get_product(struct btd_device *device);
+> -extern bool device_name_known(struct btd_device *device);
+> -extern void device_get_name(struct btd_device *device,
+> -                                       char *name, size_t len);
+> +#include "gdbus/gdbus.h"
+> +
+> +#include "src/device.h"
+> +#include "src/service.h"
+> +#include "src/shared/crypto.h"
+> +#include "device.h"
+>
+>  #define MAX_EXTERNAL_QUIRKS 32
+>  #define HMAC_KEY_PATH QUIRK_PROFILE_DIR "/.hmac_key"
+> @@ -67,6 +65,7 @@ struct external_quirk {
+>
+>  static struct external_quirk *ext_quirks[MAX_EXTERNAL_QUIRKS + 1];
+>  static int num_ext_quirks;
+> +static struct bt_crypto *crypto;
+>
+>  /*
+>   * Parse a hex string like "0501 0905" into a byte buffer.
+> @@ -139,77 +138,23 @@ static char *read_file(const char *path, size_t *ou=
+t_len)
+>  }
+>
+>  /*
+> - * Compute HMAC-SHA256 using openssl CLI.
+> - */
+> -static char *hmac_sha256(const uint8_t *key, int key_len,
+> -                        const void *data, size_t data_len)
 
-A concurrent MGMT_OP_CANCEL_PAIR_DEVICE request can remove and free the
-same pending command before the callback uses it. The reverse race is also
-possible when cancel_pair_device() gets a command from pending_find() and a
-callback removes it before the cancel path dereferences it. This can lead
-to a use-after-free and a second list_del().
+This file doesn't even exist upstream, so how come you're modifying
+it? Looks like there is something off with this patch-set, beside it
+is saying that it doesn't use openssl so this seem to be a left over
+or something.
 
-Make the pairing lookup helpers transfer ownership of the pending command
-by removing it from hdev->mgmt_pending while holding mgmt_pending_lock.
-The callbacks and cancel path then complete the command and free it
-directly, so racing paths cannot find or free the same command again. Take
-a temporary hci_conn reference in cancel_pair_device() because the command
-completion drops the reference stored in the pending command.
+> -{
+> -       char key_hex[HMAC_KEY_SIZE * 2 + 1];
+> -       char *cmd;
+> -       char *result =3D NULL;
+> -       FILE *p, *tmpf;
+> -       int i;
+> -       const char *tmpfile =3D "/tmp/.bluez_quirk_hmac_input";
+> -       char line[256];
+> -       char *eq, *end;
+> -
+> -       for (i =3D 0; i < key_len; i++)
+> -               snprintf(key_hex + i * 2, 3, "%02x", key[i]);
+> -       key_hex[key_len * 2] =3D '\0';
+> -
+> -       tmpf =3D fopen(tmpfile, "we");
+> -       if (!tmpf)
+> -               return NULL;
+> -
+> -       fwrite(data, 1, data_len, tmpf);
+> -       fclose(tmpf);
+> -
+> -       cmd =3D malloc(strlen(key_hex) + 128);
+> -       if (!cmd) {
+> -               unlink(tmpfile);
+> -               return NULL;
+> -       }
+> -
+> -       snprintf(cmd, strlen(key_hex) + 128,
+> -               "openssl dgst -sha256 -hmac '%s' -hex < %s 2>/dev/null",
+> -               key_hex, tmpfile);
+> -
+> -       p =3D popen(cmd, "re");
+> -       free(cmd);
+> -       unlink(tmpfile);
+> -
+> -       if (!p)
+> -               return NULL;
+> -
+> -       while (fgets(line, sizeof(line), p)) {
+> -               eq =3D strstr(line, "=3D ");
+> -               if (eq) {
+> -                       eq +=3D 2;
+> -                       end =3D eq + strlen(eq) - 1;
+> -                       while (end > eq && (*end =3D=3D '\n' || *end =3D=
+=3D '\r'
+> -                                               || *end =3D=3D ' '))
+> -                               *end-- =3D '\0';
+> -                       result =3D strdup(eq);
+> -                       break;
+> -               }
+> -       }
+> -
+> -       pclose(p);
+> -       return result;
+> -}
+> -
+> -/*
+> - * Verify HMAC signature.
+> + * Verify HMAC-SHA256 signature using bt_crypto (kernel AF_ALG).
+>   */
+>  static bool verify_signature(const char *json_path,
+>                              const uint8_t *hmac_key, int key_len)
+>  {
+>         char sig_path[1024];
+>         size_t sig_len, json_len;
+> -       char *sig_hex, *json_data, *expected_sig;
+> +       char *sig_hex, *json_data;
+>         char *end;
+> +       uint8_t computed[32];
+> +       char computed_hex[65];
+> +       int i;
+>         bool valid;
+>
+> +       if (!crypto)
+> +               return false;
+> +
+>         snprintf(sig_path, sizeof(sig_path), "%s" SIG_EXT, json_path);
+>
+>         sig_hex =3D read_file(sig_path, &sig_len);
+> @@ -228,21 +173,25 @@ static bool verify_signature(const char *json_path,
+>                 return false;
+>         }
+>
+> -       expected_sig =3D hmac_sha256(hmac_key, key_len, json_data, json_l=
+en);
+> -       free(json_data);
+> -
+> -       if (!expected_sig) {
+> +       if (!bt_crypto_hmac_sha256(crypto, hmac_key, key_len,
+> +                               (const uint8_t *) json_data, json_len,
+> +                               computed)) {
+> +               free(json_data);
+>                 free(sig_hex);
+>                 return false;
+>         }
+> +       free(json_data);
+> +
+> +       for (i =3D 0; i < 32; i++)
+> +               snprintf(computed_hex + i * 2, 3, "%02x", computed[i]);
+> +       computed_hex[64] =3D '\0';
+>
+> -       valid =3D (strcmp(sig_hex, expected_sig) =3D=3D 0);
+> +       valid =3D (strcmp(sig_hex, computed_hex) =3D=3D 0);
+>
+>         if (!valid)
+>                 DBG("Signature mismatch for %s", json_path);
+>
+>         free(sig_hex);
+> -       free(expected_sig);
+>         return valid;
+>  }
+>
+> @@ -516,6 +465,12 @@ int load_external_quirks(const char *dir)
+>         if (!dir)
+>                 dir =3D QUIRK_PROFILE_DIR;
+>
+> +       if (!crypto) {
+> +               crypto =3D bt_crypto_new();
+> +               if (!crypto)
+> +                       DBG("quirk-profile: failed to init crypto");
+> +       }
+> +
+>         d =3D opendir(dir);
+>         if (!d) {
+>                 DBG("quirk-profile: cannot open %s: %s", dir, strerror(er=
+rno));
+> @@ -586,4 +541,9 @@ void free_external_quirks(void)
+>                 ext_quirks[i] =3D NULL;
+>         }
+>         num_ext_quirks =3D 0;
+> +
+> +       if (crypto) {
+> +               bt_crypto_unref(crypto);
+> +               crypto =3D NULL;
+> +       }
+>  }
+> diff --git a/profiles/input/quirk.c b/profiles/input/quirk.c
+> index 053f45b..fa5e7e6 100644
+> --- a/profiles/input/quirk.c
+> +++ b/profiles/input/quirk.c
+> @@ -36,23 +36,6 @@ static struct gamepad_quirk *quirks[] =3D {
+>         NULL
+>  };
+>
+> -bool gamepad_quirk_match(struct input_device *idev)
+> -{
+> -       int i;
+> -
+> -       /* Check built-in quirks first */
+> -       for (i =3D 0; quirks[i]; i++) {
+> -               if (quirks[i]->match(idev))
+> -                       return true;
+> -       }
+> -
+> -       /* Then check external (file-based) quirks */
+> -       if (external_quirk_match(idev))
+> -               return true;
+> -
+> -       return false;
+> -}
+> -
+>  int gamepad_quirk_apply(struct input_device *idev,
+>                         struct hidp_connadd_req *req)
+>  {
+> @@ -69,9 +52,5 @@ int gamepad_quirk_apply(struct input_device *idev,
+>         }
+>
+>         /* Try external quirks */
+> -       if (external_quirk_match(idev)) {
+> -               return external_quirk_apply(idev, req);
+> -       }
+> -
+> -       return -1;
+> +       return external_quirk_apply(idev, req);
+>  }
+> diff --git a/profiles/input/quirk.h b/profiles/input/quirk.h
+> index 08e0bce..f2fc81b 100644
+> --- a/profiles/input/quirk.h
+> +++ b/profiles/input/quirk.h
+> @@ -24,13 +24,10 @@ struct gamepad_quirk {
+>                         struct hidp_connadd_req *req);
+>  };
+>
+> -bool gamepad_quirk_match(struct input_device *idev);
+> -
+>  int gamepad_quirk_apply(struct input_device *idev,
+>                         struct hidp_connadd_req *req);
+>
+>  /* External quirk support (quirk-profile.c) */
+> -bool external_quirk_match(struct input_device *idev);
+>  int external_quirk_apply(struct input_device *idev,
+>                         struct hidp_connadd_req *req);
+>
+> diff --git a/profiles/input/quirks/tg170w.c b/profiles/input/quirks/tg170=
+w.c
+> index d3f37a8..d82c3fa 100644
+> --- a/profiles/input/quirks/tg170w.c
+> +++ b/profiles/input/quirks/tg170w.c
+> @@ -38,9 +38,14 @@
+>  #include "bluetooth/sdp.h"
+>  #include "bluetooth/sdp_lib.h"
+>
+> +#include "gdbus/gdbus.h"
+> +
+>  #include "src/log.h"
+> +#include "src/device.h"
+> +#include "src/service.h"
+>
+>  #include "../quirk.h"
+> +#include "../device.h"
+>
+>  /*
+>   * DualShock 4 Bluetooth HID Report Descriptor.
+> @@ -124,25 +129,6 @@ static const uint8_t tg170w_hid_report_descriptor[] =
+=3D {
+>  #define TG170W_VID  0x054c  /* Sony */
+>  #define TG170W_PID  0x09cc  /* DualShock 4 v2 */
+>
+> -/* Opaque structs - we don't pull in heavy headers */
+> -struct input_device;
+> -struct btd_device;
+> -struct btd_service;
+> -
+> -/* Declarations from src/device.h and src/service.h */
+> -extern struct btd_service *input_device_get_service(
+> -                                       struct input_device *idev);
+> -extern struct btd_device *btd_service_get_device(
+> -                                       const struct btd_service *service=
+);
+> -extern uint16_t btd_device_get_vendor(struct btd_device *device);
+> -extern uint16_t btd_device_get_product(struct btd_device *device);
+> -extern const sdp_record_t *btd_device_get_record(
+> -                                       struct btd_device *device,
+> -                                       const char *uuid);
+> -extern bool device_name_known(struct btd_device *device);
+> -extern void device_get_name(struct btd_device *device,
+> -                                       char *name, size_t len);
+> -
+>  static bool tg170w_match(struct input_device *idev)
+>  {
+>         struct btd_service *service;
+>
 
-Fixes: e9a416b5ce0c ("Bluetooth: Add mgmt_pair_device command")
-Cc: stable@vger.kernel.org
-Reported-by: Vega <vega@nebusec.ai>
-Assisted-by: Codex:gpt-5.4
-Signed-off-by: Zihan Xi <xizh2024@lzu.edu.cn>
-Reviewed-by: Ren Wei <enjou1224z@gmail.com>
----
- net/bluetooth/mgmt.c | 64 +++++++++++++++++++++++++++++++-------------
- 1 file changed, 46 insertions(+), 18 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d23ca1dd0893..85e60cfd1b45 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3498,11 +3498,13 @@ static int set_io_capability(struct sock *sk, struct hci_dev *hdev, void *data,
- 				 NULL, 0);
- }
- 
--static struct mgmt_pending_cmd *find_pairing(struct hci_conn *conn)
-+static struct mgmt_pending_cmd *remove_pairing(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
- 	struct mgmt_pending_cmd *cmd;
- 
-+	mutex_lock(&hdev->mgmt_pending_lock);
-+
- 	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
- 		if (cmd->opcode != MGMT_OP_PAIR_DEVICE)
- 			continue;
-@@ -3510,9 +3512,39 @@ static struct mgmt_pending_cmd *find_pairing(struct hci_conn *conn)
- 		if (cmd->user_data != conn)
- 			continue;
- 
-+		list_del(&cmd->list);
-+		mutex_unlock(&hdev->mgmt_pending_lock);
- 		return cmd;
- 	}
- 
-+	mutex_unlock(&hdev->mgmt_pending_lock);
-+
-+	return NULL;
-+}
-+
-+static struct mgmt_pending_cmd *remove_pairing_by_addr(struct hci_dev *hdev,
-+						       bdaddr_t *bdaddr)
-+{
-+	struct mgmt_pending_cmd *cmd;
-+	struct hci_conn *conn;
-+
-+	mutex_lock(&hdev->mgmt_pending_lock);
-+
-+	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
-+		if (cmd->opcode != MGMT_OP_PAIR_DEVICE)
-+			continue;
-+
-+		conn = cmd->user_data;
-+		if (bacmp(bdaddr, &conn->dst) != 0)
-+			continue;
-+
-+		list_del(&cmd->list);
-+		mutex_unlock(&hdev->mgmt_pending_lock);
-+		return cmd;
-+	}
-+
-+	mutex_unlock(&hdev->mgmt_pending_lock);
-+
- 	return NULL;
- }
- 
-@@ -3550,10 +3582,10 @@ void mgmt_smp_complete(struct hci_conn *conn, bool complete)
- 	u8 status = complete ? MGMT_STATUS_SUCCESS : MGMT_STATUS_FAILED;
- 	struct mgmt_pending_cmd *cmd;
- 
--	cmd = find_pairing(conn);
-+	cmd = remove_pairing(conn);
- 	if (cmd) {
- 		cmd->cmd_complete(cmd, status);
--		mgmt_pending_remove(cmd);
-+		mgmt_pending_free(cmd);
- 	}
- }
- 
-@@ -3563,14 +3595,14 @@ static void pairing_complete_cb(struct hci_conn *conn, u8 status)
- 
- 	BT_DBG("status %u", status);
- 
--	cmd = find_pairing(conn);
-+	cmd = remove_pairing(conn);
- 	if (!cmd) {
- 		BT_DBG("Unable to find a pending command");
- 		return;
- 	}
- 
- 	cmd->cmd_complete(cmd, mgmt_status(status));
--	mgmt_pending_remove(cmd);
-+	mgmt_pending_free(cmd);
- }
- 
- static void le_pairing_complete_cb(struct hci_conn *conn, u8 status)
-@@ -3582,14 +3614,14 @@ static void le_pairing_complete_cb(struct hci_conn *conn, u8 status)
- 	if (!status)
- 		return;
- 
--	cmd = find_pairing(conn);
-+	cmd = remove_pairing(conn);
- 	if (!cmd) {
- 		BT_DBG("Unable to find a pending command");
- 		return;
- 	}
- 
- 	cmd->cmd_complete(cmd, mgmt_status(status));
--	mgmt_pending_remove(cmd);
-+	mgmt_pending_free(cmd);
- }
- 
- static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
-@@ -3746,23 +3778,17 @@ static int cancel_pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 		goto unlock;
- 	}
- 
--	cmd = pending_find(MGMT_OP_PAIR_DEVICE, hdev);
-+	cmd = remove_pairing_by_addr(hdev, &addr->bdaddr);
- 	if (!cmd) {
- 		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_CANCEL_PAIR_DEVICE,
- 				      MGMT_STATUS_INVALID_PARAMS);
- 		goto unlock;
- 	}
- 
--	conn = cmd->user_data;
--
--	if (bacmp(&addr->bdaddr, &conn->dst) != 0) {
--		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_CANCEL_PAIR_DEVICE,
--				      MGMT_STATUS_INVALID_PARAMS);
--		goto unlock;
--	}
-+	conn = hci_conn_get(cmd->user_data);
- 
- 	cmd->cmd_complete(cmd, MGMT_STATUS_CANCELLED);
--	mgmt_pending_remove(cmd);
-+	mgmt_pending_free(cmd);
- 
- 	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_CANCEL_PAIR_DEVICE, 0,
- 				addr, sizeof(*addr));
-@@ -3780,6 +3806,8 @@ static int cancel_pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 	if (conn->conn_reason == CONN_REASON_PAIR_DEVICE)
- 		hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
- 
-+	hci_conn_put(conn);
-+
- unlock:
- 	hci_dev_unlock(hdev);
- 	return err;
-@@ -10055,14 +10083,14 @@ void mgmt_auth_failed(struct hci_conn *conn, u8 hci_status)
- 	ev.addr.type = link_to_bdaddr(conn->type, conn->dst_type);
- 	ev.status = status;
- 
--	cmd = find_pairing(conn);
-+	cmd = remove_pairing(conn);
- 
- 	mgmt_event(MGMT_EV_AUTH_FAILED, conn->hdev, &ev, sizeof(ev),
- 		    cmd ? cmd->sk : NULL);
- 
- 	if (cmd) {
- 		cmd->cmd_complete(cmd, status);
--		mgmt_pending_remove(cmd);
-+		mgmt_pending_free(cmd);
- 	}
- }
- 
--- 
-2.43.0
+--=20
+Luiz Augusto von Dentz
